@@ -1812,16 +1812,19 @@ int FltkViewer::handle ( int event )
 		 }
 		 else if (mcuCBHandle::singleton().steerEngine.isInitialized() && e.button3 && !e.alt)
 		 {
-			_paLocoData->character->steeringAgent->setTargetAgent(NULL);
-			SrVec p1;
-			SrVec p2;
-			_data->camera.get_ray(e.mouse.x, e.mouse.y, p1, p2);
-			SrPlane ground(SrVec(0,0,0), SrVec(0, 1, 0));
-			SrVec dest = ground.intersect(p1, p2);
-			dest.y = _paLocoData->character->getHeight() / 100.0f;
-			std::stringstream command;
-			command << "steer move " << _paLocoData->character->getName() << " " << dest.x << " " << dest.y << " " << dest.z;
-			mcuCBHandle::singleton().execute((char*)command.str().c_str());
+			 if (_paLocoData->character)
+			 {
+				_paLocoData->character->steeringAgent->setTargetAgent(NULL);
+				SrVec p1;
+				SrVec p2;
+				_data->camera.get_ray(e.mouse.x, e.mouse.y, p1, p2);
+				SrPlane ground(SrVec(0,0,0), SrVec(0, 1, 0));
+				SrVec dest = ground.intersect(p1, p2);
+				dest.y = _paLocoData->character->getHeight() / 100.0f;
+				std::stringstream command;
+				command << "steer move " << _paLocoData->character->getName() << " " << dest.x << " " << dest.y << " " << dest.z;
+				mcuCBHandle::singleton().execute((char*)command.str().c_str());
+			 }
 		 }
        } break;
 
@@ -3786,7 +3789,8 @@ void FltkViewer::drawSteeringInfo()
 
 	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
 	glPushMatrix();
-	glScalef(100.0f, 100.0f, 100.0f);
+
+	glScalef(1 / mcu.steeringScale, 1 / mcu.steeringScale, 1 / mcu.steeringScale);
 
 	//comment out for now, have to take a look at the steering code
 	const std::vector<SteerLib::AgentInterface*>& agents = mcu.steerEngine._engine->getAgents();
@@ -3804,7 +3808,6 @@ void FltkViewer::drawSteeringInfo()
 		(*iter)->draw();
 	}
 	
-
 	if (_data->steerMode == ModeSteerAll)
 	{
 		mcu.steerEngine._engine->getSpatialDatabase()->draw();

@@ -290,7 +290,7 @@ mcuCBHandle::mcuCBHandle()
 	face_map["_default_"] = faceDefinition;
 	physicsEngine = new SbmPhysicsSimODE();
 	physicsEngine->initSimulation();
-
+	steeringScale = 0.01f;
 }
 
 /////////////////////////////////////////////////////////////

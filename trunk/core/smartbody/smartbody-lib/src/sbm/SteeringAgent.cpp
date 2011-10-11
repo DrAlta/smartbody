@@ -29,6 +29,7 @@
 
 SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	agent = NULL;
 	target = NULL;
 	dt = 1.0f / 60.0f;
@@ -45,8 +46,8 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	scootThreshold = 0.1f;	
 	speedThreshold = 0.1f;
 	angleSpeedThreshold = 10.0f;
-	distThreshold = 180.0f;			// exposed, unit: centimeter
-	distDownThreshold = 40.0f;
+	distThreshold = 1.80f;			// exposed, unit: meter
+	distDownThreshold = 0.4f;
 
 	desiredSpeed = 1.0f;			// exposed, unit: meter/sec
 	facingAngle = -200.0f;			// exposed, unit: deg
@@ -113,7 +114,7 @@ void SteeringAgent::evaluate()
 		newSpeed = 0.0f;
 	}
 	// Update Steering Engine (position, orientation, scalar speed)
-	Util::Point newPosition(x / 100.0f, 0.0f, z / 100.0f);
+	Util::Point newPosition(x * mcu.steeringScale, 0.0f, z * mcu.steeringScale);
 	Util::Vector newOrientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
 	pprAgent->updateAgentState(newPosition, newOrientation, newSpeed);
 	pprAgent->updateAI((float)mcu.time, dt, (unsigned int)(mcu.time / dt));
@@ -133,7 +134,7 @@ void SteeringAgent::evaluate()
 			goal.desiredSpeed = desiredSpeed;
 			goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
 			goal.targetIsRandom = false;
-			goal.targetLocation = Util::Point(cmToM(x1), 0.0f, cmToM(z1 - 100.0f));
+			goal.targetLocation = Util::Point(x1 * mcu.steeringScale, 0.0f, (z1 * mcu.steeringScale - 100.0f * mcu.steeringScale));
 			agent->addGoal(goal);
 		}
 	}
@@ -894,11 +895,11 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	float distToTarget = -1;
 	if (goalQueue.size() > 0)
 	{
-		targetLoc.x = mToCm(goalQueue.front().targetLocation.x);
-		targetLoc.y = mToCm(goalQueue.front().targetLocation.y);
-		targetLoc.z = mToCm(goalQueue.front().targetLocation.z);
-		distToTarget = sqrt((x - mToCm(goalQueue.front().targetLocation.x)) * (x - mToCm(goalQueue.front().targetLocation.x)) + 
-						  (z - mToCm(goalQueue.front().targetLocation.z)) * (z - mToCm(goalQueue.front().targetLocation.z)));
+		targetLoc.x = goalQueue.front().targetLocation.x;
+		targetLoc.y = goalQueue.front().targetLocation.y;
+		targetLoc.z = goalQueue.front().targetLocation.z;
+		distToTarget = sqrt((x * mcu.steeringScale - targetLoc.x) * (x * mcu.steeringScale - targetLoc.x) + 
+							(z * mcu.steeringScale - targetLoc.z) * (z * mcu.steeringScale - targetLoc.z));
 
 		if (distToTarget < distDownThreshold)
 			character->steeringAgent->getAgent()->clearGoals();
@@ -914,19 +915,20 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 		stepAdjust = false;
 
 	float targetSpeed = steeringCommand.targetSpeed;
-	float gain = 80;
+	float gain = 0.8f;
 	if (targetSpeed > 3)
-		gain = 110;
+		gain = 1.1f;
 	if (distToTarget < targetSpeed * gain)
 		targetSpeed = distToTarget / gain;
 
 	if (stepAdjust)
 		if (!character->param_animation_ct->hasPAState("UtahStep"))
 		{
-			agentToTargetDist = distToTarget;
-			agentToTargetVec.x = targetLoc.x - x;
-			agentToTargetVec.y = targetLoc.y - y;
-			agentToTargetVec.z = targetLoc.z - z;
+			agentToTargetDist = distToTarget / mcu.steeringScale;
+			agentToTargetVec.x = targetLoc.x - x * mcu.steeringScale;
+			agentToTargetVec.y = targetLoc.y - y * mcu.steeringScale;
+			agentToTargetVec.z = targetLoc.z - z * mcu.steeringScale;
+			agentToTargetVec /= mcu.steeringScale;
 		}
 
 	PAStateData* curState =  character->param_animation_ct->getCurrentPAStateData();
@@ -959,7 +961,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	{
 		if (mcu.steeringConfig == mcu.STANDARD)
 		{
-			float targetAngle = radToDeg(atan2(mToCm(pprAgent->getStartTargetPosition().x) - x, mToCm(pprAgent->getStartTargetPosition().z) - z));
+			float targetAngle = radToDeg(atan2(pprAgent->getStartTargetPosition().x - x * mcu.steeringScale, pprAgent->getStartTargetPosition().z - z * mcu.steeringScale));
 			normalizeAngle(targetAngle);
 			float diff = targetAngle - yaw;
 			normalizeAngle(diff);
@@ -1127,7 +1129,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 				}
 			}
 		}
-		curSpeed = cmToM(curSpeed);
+		curSpeed = curSpeed * mcu.steeringScale;
 		if (steeringCommand.aimForTargetSpeed)
 		{
 			if (fabs(curSpeed - targetSpeed) > speedThreshold)
@@ -1166,7 +1168,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 		}
 		// update locomotion state
 		newSpeed = curSpeed;
-		curSpeed = mToCm(curSpeed);
+		curSpeed = curSpeed / mcu.steeringScale;
 
 		if (inControl)
 		{

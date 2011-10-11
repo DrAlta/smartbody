@@ -220,6 +220,7 @@ class mcuCBHandle {
 		std::vector<PATransitionData*>				param_anim_transitions;
 		LocomotionType								locomotion_type;
 		SteeringStateConfig							steeringConfig;
+		float										steeringScale;
 
 		TimeRegulator	*internal_timer_p;
 		TimeRegulator	*external_timer_p;
