@@ -57,6 +57,7 @@ set( SBM_FLTK_SRC
 	src/resourceViewer/TreeInfoObject.cpp
 
 	src/faceviewer/FaceViewer.cpp
+	src/FLTKListener.cpp
 
 )
 

@@ -300,7 +300,7 @@ MeCtScheduler2::~MeCtScheduler2 () {
    //remove_tracks(_tracks);
 }
 
-MeController* MeCtScheduler2::child( unsigned int n ) {
+MeController* MeCtScheduler2::child( size_t n ) {
 	if( n >= 0 && n < _tracks.size() )
 		return _tracks[ n ]->_root;
 	else
