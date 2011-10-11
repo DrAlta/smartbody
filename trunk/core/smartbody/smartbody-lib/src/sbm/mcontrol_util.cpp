@@ -1817,31 +1817,63 @@ void mcuCBHandle::addPATransition(PATransitionData* transition)
 
 bool mcuCBHandle::checkExamples()
 {
-	std::vector<std::string> requiredStates;
-	requiredStates.push_back("UtahLocomotion");
-	requiredStates.push_back("UtahStartingLeft");
-	requiredStates.push_back("UtahStartingRight");
-	requiredStates.push_back("UtahStopToWalk");
-	requiredStates.push_back("UtahWalkToStop");
-	requiredStates.push_back("UtahIdleTurnLeft");
-	requiredStates.push_back("UtahIdleTurnRight");
-	requiredStates.push_back("UtahStep");
+	std::vector<std::string> standardRequiredStates;
+	standardRequiredStates.push_back("UtahLocomotion");
+	standardRequiredStates.push_back("UtahStartingLeft");
+	standardRequiredStates.push_back("UtahStartingRight");
+	standardRequiredStates.push_back("UtahStopToWalk");
+	standardRequiredStates.push_back("UtahWalkToStop");
+	standardRequiredStates.push_back("UtahIdleTurnLeft");
+	standardRequiredStates.push_back("UtahIdleTurnRight");
+	standardRequiredStates.push_back("UtahStep");
 
 	int numMissing = 0;
-	for (size_t x = 0; x < requiredStates.size(); x++)
+	for (size_t x = 0; x < standardRequiredStates.size(); x++)
 	{
-		PAStateData* state = lookUpPAState(requiredStates[x]);
+		PAStateData* state = lookUpPAState(standardRequiredStates[x]);
 		if (!state)
 		{
 			numMissing++;
-			LOG("SteeringAgent::checkExamples() Failure: Could not find state '%s' needed for example-based locomotion.", requiredStates[x].c_str());
+			LOG("SteeringAgent::checkExamples() standard config: Could not find state '%s' needed for example-based locomotion.", standardRequiredStates[x].c_str());
+		}
+	}
+	if (numMissing > 0)
+	{
+		LOG("Steering cannot work under standard config.");
+	}
+	else
+	{
+		LOG("Steering works under standard config.");
+		steeringConfig = STANDARD;
+		return true;
+	}
+
+	std::vector<std::string> minimalRequiredStates;
+	minimalRequiredStates.push_back("UtahLocomotion");
+	minimalRequiredStates.push_back("UtahStep");
+
+	int numMissing1 = 0;
+	for (size_t x = 0; x < minimalRequiredStates.size(); x++)
+	{
+		PAStateData* state = lookUpPAState(minimalRequiredStates[x]);
+		if (!state)
+		{
+			numMissing1++;
+			LOG("SteeringAgent::checkExamples() minimal config: Could not find state '%s' needed for example-based locomotion.", minimalRequiredStates[x].c_str());
 		}
 	}
 
-	if (numMissing > 0)
+	if (numMissing1 > 0)
+	{
+		LOG("Steering cannot work under minimal config.");
 		return false;
+	}
 	else
+	{
+		LOG("Steering works under minimal config.");
+		steeringConfig = MINIMAL;
 		return true;
+	}
 }
 
 void mcuCBHandle::setInteractive(bool val)

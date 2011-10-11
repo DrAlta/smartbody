@@ -25,7 +25,7 @@
 #include <sbm/mcontrol_util.h>
 #include <sbm/me_ct_param_animation_data.h>
 #define DebugInfo 0
-#define FastStart 0
+#define FastStart 1
 
 SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 {
@@ -957,62 +957,75 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	//---start locomotion
 	if (character->param_animation_ct->isIdle() && numGoals != 0 && nextStateName == "" && distToTarget > distDownThreshold)
 	{
-		float targetAngle = radToDeg(atan2(mToCm(pprAgent->getStartTargetPosition().x) - x, mToCm(pprAgent->getStartTargetPosition().z) - z));
-		normalizeAngle(targetAngle);
-		float diff = targetAngle - yaw;
-		normalizeAngle(diff);
-		double w;
-		if (diff > 0)
+		if (mcu.steeringConfig == mcu.STANDARD)
 		{
-			if (diff > 90)
+			float targetAngle = radToDeg(atan2(mToCm(pprAgent->getStartTargetPosition().x) - x, mToCm(pprAgent->getStartTargetPosition().z) - z));
+			normalizeAngle(targetAngle);
+			float diff = targetAngle - yaw;
+			normalizeAngle(diff);
+			double w;
+			if (diff > 0)
 			{
-				w = (diff - 90) / 90;
-				std::stringstream command;
-				command << "panim schedule char " << character->getName();			
-				command << " state UtahStartingLeft loop false playnow false " << " 0 " << 1 - w << " " << w;
-				mcu.execute((char*) command.str().c_str());
+				if (diff > 90)
+				{
+					w = (diff - 90) / 90;
+					std::stringstream command;
+					command << "panim schedule char " << character->getName();			
+					command << " state UtahStartingLeft loop false playnow false " << " 0 " << 1 - w << " " << w;
+					mcu.execute((char*) command.str().c_str());
+				}
+				else
+				{
+					w = diff / 90;
+					std::stringstream command;
+					command << "panim schedule char " << character->getName();					
+					command << " state UtahStartingLeft loop false playnow false " << 1 - w << " " << w << " " << " 0 ";
+					mcu.execute((char*) command.str().c_str());
+				}
 			}
 			else
 			{
-				w = diff / 90;
-				std::stringstream command;
-				command << "panim schedule char " << character->getName();					
-				command << " state UtahStartingLeft loop false playnow false " << 1 - w << " " << w << " " << " 0 ";
-				mcu.execute((char*) command.str().c_str());
+				if (diff < -90)
+				{
+					w = (diff + 180) / 90;
+					std::stringstream command;
+					command << "panim schedule char " << character->getName();
+					command << " state UtahStartingRight loop false playnow false " << " 0 " << w << " " << 1 - w;
+					mcu.execute((char*) command.str().c_str());
+				}
+				else
+				{
+					w = -diff / 90;
+					std::stringstream command;
+					command << "panim schedule char " << character->getName();
+					command << " state UtahStartingRight loop false playnow true " << 1 - w << " " << w << " 0 ";
+					mcu.execute((char*) command.str().c_str());
+				}				
 			}
-		}
-		else
-		{
-			if (diff < -90)
-			{
-				w = (diff + 180) / 90;
-				std::stringstream command;
-				command << "panim schedule char " << character->getName();
-				command << " state UtahStartingRight loop false playnow false " << " 0 " << w << " " << 1 - w;
-				mcu.execute((char*) command.str().c_str());
-			}
-			else
-			{
-				w = -diff / 90;
-				std::stringstream command;
-				command << "panim schedule char " << character->getName();
-				command << " state UtahStartingRight loop false playnow true " << 1 - w << " " << w << " 0 ";
-				mcu.execute((char*) command.str().c_str());
-			}				
-		}
-		PAStateData* locoState = mcu.lookUpPAState("UtahLocomotion");
+			PAStateData* locoState = mcu.lookUpPAState("UtahLocomotion");
 
-		for (int i = 0; i < locoState->getNumMotions(); i++)
-		{
-			if (i == 0)
-				locoState->weights[i] = 1.0;
-			else
-				locoState->weights[i] = 0.0;
+			for (int i = 0; i < locoState->getNumMotions(); i++)
+			{
+				if (i == 0)
+					locoState->weights[i] = 1.0;
+				else
+					locoState->weights[i] = 0.0;
+			}
+			std::stringstream command1;
+			command1 << "panim schedule char " << character->getName();
+			command1 << " state UtahLocomotion loop true playnow false";
+			mcu.execute((char*) command1.str().c_str());
 		}
-		std::stringstream command1;
-		command1 << "panim schedule char " << character->getName();
-		command1 << " state UtahLocomotion loop true playnow false";
-		mcu.execute((char*) command1.str().c_str());
+
+		if (mcu.steeringConfig == mcu.MINIMAL)
+		{
+			PAStateData* locoState = mcu.lookUpPAState("UtahLocomotion");
+			locoState->paramManager->setWeight(0, 0, 0);
+			std::stringstream command;
+			command << "panim schedule char " << character->getName();
+			command << " state UtahLocomotion loop true playnow true";
+			mcu.execute((char*) command.str().c_str());
+		}
 		return 0;
 	}	
 
@@ -1024,7 +1037,8 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	}
 
 	//---If the facing angle is not correct, use idle turning
-	if (character->param_animation_ct->isIdle() && fabs(facingAngle) <= 180)
+
+	if (character->param_animation_ct->isIdle() && fabs(facingAngle) <= 180 && mcu.steeringConfig == mcu.STANDARD)
 	{
 		float diff = facingAngle - yaw;
 		normalizeAngle(diff);

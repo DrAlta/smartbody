@@ -184,6 +184,8 @@ class mcuCBHandle {
 
 	public:
 		enum LocomotionType {Basic, Example, Procedural};
+		enum SteeringStateConfig { MINIMAL = 0, STANDARD};
+
 		// Data
 		bool		loop;
 		bool		vhmsg_enabled;
@@ -217,6 +219,7 @@ class mcuCBHandle {
 		std::vector<PAStateData*>					param_anim_states;
 		std::vector<PATransitionData*>				param_anim_transitions;
 		LocomotionType								locomotion_type;
+		SteeringStateConfig							steeringConfig;
 
 		TimeRegulator	*internal_timer_p;
 		TimeRegulator	*external_timer_p;
