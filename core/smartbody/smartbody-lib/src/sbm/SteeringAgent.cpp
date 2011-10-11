@@ -908,6 +908,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	if (numGoals == 0)
 	{
 		reachTarget = true;
+		character->_reachTarget = reachTarget;
 	}
 	if (character->_numSteeringGoal == 0 && numGoals != 0 && distToTarget < distThreshold)
 		stepAdjust = true;
