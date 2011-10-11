@@ -259,7 +259,7 @@ public:
 	 *
      *  Returns NULL for invalid n.
      */
-	MeController* child( unsigned int n );
+	virtual MeController* child( size_t n );
 
 ////  Bad design to share iterators to an encapsulated collection
 //	/** Iterator for the first Track, or end() if there are no tracks. */
