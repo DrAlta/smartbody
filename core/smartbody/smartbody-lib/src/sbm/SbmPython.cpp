@@ -535,6 +535,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("setVoiceBackup", &SBCharacter::setVoiceBackup, "Sets the voice backup type: remote, audiofile, text or none (use \"\").")
 		.def("setVoiceBackupCode", &SBCharacter::setVoiceBackupCode, "Sets the voice backup code. For audiofile type, this is a path.")
 		.def("setFaceDefinition", &SBCharacter::setFaceDefinition, "Sets face definition (visemes, action units) for a character.")
+		.def("getHeight", &SBCharacter::getHeight, "Gets the height of the character.")
+
 #endif
 		//.def("getFaceDefinition", &SBCharacter::getFaceDefinition, "Gets face definition (visemes, action units) for a character.")
 #ifndef __ANDROID__

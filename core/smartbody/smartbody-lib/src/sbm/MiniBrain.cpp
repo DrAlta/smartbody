@@ -47,6 +47,7 @@ void MiniBrain::update(SbmCharacter* character, double time, double dt)
 			if (curCharacter)
 			{
 				curPosition = curCharacter->getPosition();
+				data.isAnimate = true;
 			}
 			else
 			{
@@ -55,6 +56,7 @@ void MiniBrain::update(SbmCharacter* character, double time, double dt)
 				curPosition.x = x;
 				curPosition.y = y;
 				curPosition.z = z;
+				data.isAnimate = false;
 			}
 			
 			data.velocity = (curPosition - data.position) / (float) dt;
@@ -122,63 +124,82 @@ void MiniBrain::update(SbmCharacter* character, double time, double dt)
 			fastestData = &data;
 		}
 	}
-
-	// now look at the fastest thing moving that exceeds a threshold
-	float characterHeight = character->getHeight();
-	if (fastest > characterHeight / 10.0)
+	
+	Nvbg* nvbg = character->getNvbg();
+	if (nvbg) // if an NVBG instance is running, send this information there
 	{
-		SbmPawn* gazeTarget = mcu.getPawn(fastestObject);
-		if (!gazeTarget)
-			return;
-
-		// make sure that we aren't already gazing at this object
-		MeCtScheduler2* gazeSchedule = character->gaze_sched_p;
-		if (!gazeSchedule)
-			return;
-		MeCtScheduler2::VecOfTrack tracks = gazeSchedule->tracks();
-		for (size_t t = 0; t < tracks.size(); t++)
+		for (std::map<std::string, ObjectData>::iterator piter = _data.begin();
+			 piter != _data.end();
+			 piter++)
 		{
-			MeController* controller = tracks[t]->animation_ct();
-			MeCtGaze* gaze = dynamic_cast<MeCtGaze*>(controller);
-			if (gaze)
+			const std::string& pawnName = (*piter).first;
+			ObjectData& data = (*piter).second;
+			nvbg->objectEvent(character->getName(), pawnName, data.isAnimate, data.position, data.velocity, data.relativePosition, data.relativeVelocity);
+		}
+	}
+	else // simple functionality - look at things that move quickly
+	{
+		
+
+		// now look at the fastest thing moving that exceeds a threshold
+		float characterHeight = character->getHeight();
+		if (fastest > characterHeight / 10.0)
+		{
+			SbmPawn* gazeTarget = mcu.getPawn(fastestObject);
+			if (!gazeTarget)
+				return;
+
+			// make sure that we aren't already gazing at this object
+			MeCtScheduler2* gazeSchedule = character->gaze_sched_p;
+			if (!gazeSchedule)
+				return;
+			MeCtScheduler2::VecOfTrack tracks = gazeSchedule->tracks();
+			for (size_t t = 0; t < tracks.size(); t++)
 			{
-				float x, y, z;
-				SkJoint* joint = gaze->get_target_joint(x, y, z);
-				if (joint && joint->skeleton() == gazeTarget->getSkeleton())
+				MeController* controller = tracks[t]->animation_ct();
+				MeCtGaze* gaze = dynamic_cast<MeCtGaze*>(controller);
+				if (gaze)
 				{
-					// update the time
-					fastestData->startGazeTime = time;
-					return;
+					float x, y, z;
+					SkJoint* joint = gaze->get_target_joint(x, y, z);
+					if (joint && joint->skeleton() == gazeTarget->getSkeleton())
+					{
+						// update the time
+						fastestData->startGazeTime = time;
+						return;
+					}
 				}
 			}
-		}
-		std::stringstream strstr;
-		strstr << "bml char " << character->getName() << " <gaze target=\"" << fastestObject << "\" sbm:joint-range=\"EYES NECK\"/>" << std::endl;
-		fastestData->startGazeTime = time;
-		mcu.execute((char*) strstr.str().c_str());
-		return;
-	}
-
-	// if we are staring at nothing, fade out any gazes for objects that have been 'uninteresting' for more than 2 seconds
-	for (std::map<std::string, ObjectData>::iterator piter = _data.begin();
-		 piter != _data.end();
-		 piter++)
-	{
-		ObjectData& data = (*piter).second;
-		if (data.startGazeTime > 0 && (time - data.startGazeTime) > 2.0 + float(rand() % 100) * .01f)
-		{
 			std::stringstream strstr;
-			strstr << "char " << character->getName() << " gazefade out .5" << std::endl;
-			data.startGazeTime = -1;
+			strstr << "bml char " << character->getName() << " <gaze target=\"" << fastestObject << "\" sbm:joint-range=\"EYES NECK\"/>" << std::endl;
+			fastestData->startGazeTime = time;
 			mcu.execute((char*) strstr.str().c_str());
+			return;
+		}
 
-			std::stringstream strstr2;
-			strstr2 << "char " << character->getName() << " prune" << std::endl;
-			mcu.execute_later((char*) strstr2.str().c_str(), 3 + float(rand() % 100) * .01f);
+		// if we are staring at nothing, fade out any gazes for objects that have been 'uninteresting' for more than 2 seconds
+		for (std::map<std::string, ObjectData>::iterator piter = _data.begin();
+			 piter != _data.end();
+			 piter++)
+		{
+			ObjectData& data = (*piter).second;
+			if (data.startGazeTime > 0 && (time - data.startGazeTime) > 2.0 + float(rand() % 100) * .01f)
+			{
+				std::stringstream strstr;
+				strstr << "char " << character->getName() << " gazefade out .5" << std::endl;
+				data.startGazeTime = -1;
+				mcu.execute((char*) strstr.str().c_str());
+
+				std::stringstream strstr2;
+				strstr2 << "char " << character->getName() << " prune" << std::endl;
+				mcu.execute_later((char*) strstr2.str().c_str(), 3 + float(rand() % 100) * .01f);
 
 
+			}
 		}
 	}
+
+	
 }
 
 
