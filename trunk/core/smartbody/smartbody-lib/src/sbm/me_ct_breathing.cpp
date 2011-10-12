@@ -98,6 +98,7 @@ void MeCtBreathing::setUseBlendChannels(bool val)
 		breathingChannels.add("breathX", SkChannel::XPos);
 		breathingChannels.add("breathY", SkChannel::XPos);
 		_blendChannelBreathingMotion->init(breathingChannels);
+#if 0
 		double dt = 0.016;
 		double totalTime = 6.0; // time for a breathing cycle
 		int counter = 0;
@@ -110,6 +111,23 @@ void MeCtBreathing::setUseBlendChannels(bool val)
 			counter++;
 		}
 		_blendChannelBreathingMotion->synch_points.set_time(0, .25 * totalTime, totalTime / 2,  totalTime / 2, totalTime / 2, .75 * totalTime, totalTime);
+#else
+		
+		double dt = 1.0f / 30.0f;
+		double totalTime = 1.0f / 30.0f * 50.0f; // time for a breathing cycle
+		double cycle[] = {-314.076,-314.822,-306.105,-287.696,-266.611,-254.156,-221.962,-204.197,-171.479,-131.456,-97.085,-62.244,-34.1823,27.1129,48.913,104.886,128.478,
+			               163.525,196.806,227.198,257.267,281.45,300.513,303.802,300.411,302.249,304.403,301.314,293.514,272.392,258.719,219.968,211.476,164.294,141.273,
+						   94.0298,62.7389,13.6275,-15.886,-65.0322,-94.177,-138.845,-175.796,-198.208,-232.152,-248.494,-285.866,-290.819,-300.595,-305.594,-314.547};
+		for (int counter = 0; counter < 51; counter++)
+		{
+			double time = ((float) counter) * dt;
+			_blendChannelBreathingMotion->insert_frame(counter, (float) time);
+			float* frame = _blendChannelBreathingMotion->posture(counter);
+			frame[0] = (float) cycle[counter];
+			frame[1] = (float) (time);
+		}
+		_blendChannelBreathingMotion->synch_points.set_time(0, 0, totalTime / 2,  totalTime / 2, totalTime / 2, totalTime, totalTime);
+#endif
 		_blendChannelBreathingMotion->ref();
 
 		setMotion(_blendChannelBreathingMotion);
