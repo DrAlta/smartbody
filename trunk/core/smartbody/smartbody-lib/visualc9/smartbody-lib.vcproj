@@ -468,6 +468,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\MiniBrain.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\MiniBrain.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\ParserASFAMC.cxx"
 				>
 			</File>

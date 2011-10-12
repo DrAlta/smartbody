@@ -99,6 +99,8 @@ float SrVec::len ( float n )
 
 float SrVec::norm () const
  {
+	 if (x == 0.0 && y == 0.0f && z == 0.0f)
+		 return 0.0f;
    return sqrtf ( x*x + y*y + z*z );
  }
 

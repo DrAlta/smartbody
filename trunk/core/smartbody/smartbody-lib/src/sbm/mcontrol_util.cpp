@@ -1164,6 +1164,13 @@ void mcuCBHandle::update( void )	{
 		}
 		if( char_p ) {
 
+			// run the minibrain, if available
+			MiniBrain* brain = char_p->getMiniBrain();
+			if (brain)
+			{
+				brain->update(char_p, time, time_dt);
+			}
+
 			// scene update moved to renderer
 			//if (char_p->scene_p)
 			//	char_p->scene_p->update();

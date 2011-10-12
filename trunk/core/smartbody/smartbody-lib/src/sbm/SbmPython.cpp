@@ -9,6 +9,23 @@
 #ifndef __ANDROID__ 
 struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 {
+	virtual void objectEvent(std::string character, std::string name, bool isAnimate, SrVec position, SrVec velocity, SrVec relativePosition, SrVec relativeVelocity)
+	{
+		if (boost::python::override o = this->get_override("objectEvent"))
+		{
+			try {
+				o(character, name, isAnimate, position, velocity, relativePosition, relativeVelocity);
+			} catch (...) {
+				LOG("Problem running Python command 'objectEvent'.");
+			}
+		}
+	}
+
+	void default_objectEvent(std::string character, std::string name, bool isAnimate, SrVec position, SrVec velocity, SrVec relativePosition, SrVec relativeVelocity)
+	{
+		return Nvbg::objectEvent(character, name, isAnimate, position, velocity, relativePosition, relativeVelocity);
+	}
+
 	virtual bool execute(std::string character, std::string to, std::string messageId, std::string xml)
 	{
 		if (boost::python::override o = this->get_override("execute"))
@@ -523,6 +540,9 @@ BOOST_PYTHON_MODULE(SmartBody)
 #ifndef __ANDROID__
 		.def("setNvbg", &SBCharacter::setNvbg, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Sets the NVBG handler for this character.")
 		.def("getNvbg", &SBCharacter::getNvbg, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the NVBG handler for this character.")
+		.def("setMiniBrain", &SBCharacter::setMiniBrain, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Sets the mini brain handler for this character.")
+		.def("getMiniBrain", &SBCharacter::getMiniBrain, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the mini brain handler for this character.")
+
 #endif
 		;
 
@@ -563,6 +583,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 #ifndef __ANDROID__
 	boost::python::class_<NvbgWrap, boost::noncopyable>("Nvbg")
+		.def("objectEvent", &Nvbg::objectEvent, &NvbgWrap::default_objectEvent, "An event indicating that an object of interest is present.")
 		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor.")
 		;
 

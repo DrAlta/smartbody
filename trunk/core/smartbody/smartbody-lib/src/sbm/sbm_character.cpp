@@ -217,6 +217,8 @@ SbmCharacter::~SbmCharacter( void )	{
 	}
 
 	delete steeringAgent;
+	if (_miniBrain)
+		delete _miniBrain;
 }
 
 void SbmCharacter::createStandardControllers()
@@ -420,6 +422,7 @@ void SbmCharacter::initData()
 	_height = 1.0f; 
 	_visemePlateau = true;
 	_nvbg = NULL;
+	_miniBrain = NULL;
 
 	createBoolAttribute("facebone", false, true, "Basic", 200, false, false, false, "Use bones for facial animation. If false, blendshapes will be used. If true, face will be animated via face definitions.");
 	createBoolAttribute("visemecurve", false, true, "Basic", 200, false, false, false, "Use curve-based visemes instead of discrete visemes.");
@@ -2203,773 +2206,810 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			if( cmd == "ctrl" ) {
 				return mcu_character_ctrl_cmd( getName().c_str(), args, mcu_p );
 			} 
-			else 
-				if( cmd == "bone" ) {
-					return mcu_character_bone_cmd( getName().c_str(), args, mcu_p );
-				} 
-				else 
-					if( cmd == "bonep" ) {
-						return mcu_character_bone_position_cmd( getName().c_str(), args, mcu_p );
-					} 
-					else 
-						if( cmd == "remove" ) {
-							return SbmCharacter::remove_from_scene( getName().c_str() );
-						} 
-						else 
-							if( cmd == "inspect" ) {
+else if( cmd == "bone" ) {
+		return mcu_character_bone_cmd( getName().c_str(), args, mcu_p );
+	} 
+	else if( cmd == "bonep" ) {
+			return mcu_character_bone_position_cmd( getName().c_str(), args, mcu_p );
+		} 
+		else if( cmd == "remove" ) {
+				return SbmCharacter::remove_from_scene( getName().c_str() );
+			} 
+			else if( cmd == "inspect" ) {
+					if( _skeleton ) {
+						SkJoint* joint_p = _skeleton->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME );
+						if( joint_p )	{
+							inspect_skeleton( joint_p );
+							//				inspect_skeleton_local_transform( joint_p );
+							//				inspect_skeleton_world_transform( joint_p );
+						}
+					}
+					return CMD_SUCCESS;
+				}
+				else
+					if( cmd == "channels" ) {
 
-								if( _skeleton ) {
-									SkJoint* joint_p = _skeleton->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME );
-									if( joint_p )	{
-										inspect_skeleton( joint_p );
-										//				inspect_skeleton_local_transform( joint_p );
-										//				inspect_skeleton_world_transform( joint_p );
+						if( _skeleton )
+						{
+							if( ct_tree_p ) 
+							{
+								SkChannelArray channels = _skeleton->channels();
+								int numChannels = channels.size();
+								for (int c = 0; c < numChannels; c++)
+								{
+									std::stringstream strstr;
+									strstr << c << " ";
+									SkJoint* joint = channels.joint(c);
+									if (joint)
+									{
+										strstr << joint->name() << " ";
+									}
+									SkChannel& channel = channels[c];
+									int channelSize = channel.size();
+									// get the channel index
+									int channelIndex = ct_tree_p->toBufferIndex(c);
+									strstr << channelIndex << " (" << channelSize << ") ";
+									LOG( "%s", strstr.str().c_str() );
+								}
+							}
+						}
+						return CMD_SUCCESS;
+					}
+					else 
+						if( cmd == "controllers" )
+						{
+							if( ct_tree_p )
+							{
+								int n = ct_tree_p->count_controllers();
+								for (int c = 0; c < n; c++)
+								{
+									LOG( "%s", ct_tree_p->controller(c)->getName().c_str() );
+								}
+							}
+							return CMD_SUCCESS;
+						}
+						else 
+							if (cmd == "requests")
+							{
+								BML::Processor& bp = mcu_p->bml_processor;
+								for (std::map<std::string, BML::BmlRequestPtr >::iterator iter = bp.getBMLRequestMap().begin();
+									iter != bp.getBMLRequestMap().end();
+									iter++)
+								{
+									if (all_characters)
+									{
+										LOG("%s", (*iter).second->requestId.c_str());
+									}
+									else
+									{			
+										// make sure the requests is for this character
+										std::string requestWithName = (*iter).second->requestId;
+										std::string charName = this->getName();
+										charName.append("|");
+										int index = requestWithName.find(charName);
+										if (index == 0)
+										{
+											LOG("%s", (*iter).second->requestId.c_str());
+										}
 									}
 								}
 								return CMD_SUCCESS;
 							}
-							else
-								if( cmd == "channels" ) {
-
-									if( _skeleton )
+							if (cmd == "interrupt")
+							{
+								int numRequestsInterrupted = 0;
+								BML::Processor& bp = mcu_p->bml_processor;
+								for (std::map<std::string, BML::BmlRequestPtr >::iterator iter = bp.getBMLRequestMap().begin();
+									iter != bp.getBMLRequestMap().end();
+									iter++)
+								{
+									std::string requestWithName = (*iter).second->requestId;
+									if (all_characters)
 									{
-										if( ct_tree_p ) 
+										int pipeLocation = requestWithName.find("|");
+										std::string charName = requestWithName.substr(0, pipeLocation);
+										std::string request = requestWithName.substr(pipeLocation + 1);
+										std::stringstream strstr;
+										strstr << "bp interrupt " << charName << " " << request << " .5"; 
+										mcu_p->execute((char*) strstr.str().c_str());
+										numRequestsInterrupted++;
+									}
+									else
+									{			
+										// make sure the requests is for this character
+
+										std::string charName = this->getName();
+										charName.append("|");
+										int index = requestWithName.find(charName);
+										if (index == 0)
 										{
-											SkChannelArray channels = _skeleton->channels();
-											int numChannels = channels.size();
-											for (int c = 0; c < numChannels; c++)
+											std::string request = requestWithName.substr(charName.size());
+											std::stringstream strstr;
+											strstr << "bp interrupt " << this->getName() << " " << request << " .5"; 
+											mcu_p->execute((char*) strstr.str().c_str());
+											numRequestsInterrupted++;
+										}
+									}
+									std::string name = this->getName();
+									LOG("%d requests interrupted on character %s.", numRequestsInterrupted, name.c_str());
+								}
+								return CMD_SUCCESS;
+							}
+							else if( cmd == "prune" ) {
+						return( prune_controller_tree( mcu_p ) );
+					}
+					else if( cmd == "viseme" )
+					{ 
+							char* viseme = args.read_token();
+							char* next = args.read_token();
+							//		float* curveInfo = NULL;
+							//		float weight = 0.0f;
+							//		float rampin_duration = 0.0;
+							//		int numKeys = 0;
+							//		int numKeyParams = 0;
+
+							if( _stricmp( viseme, "curveon" ) == 0 )
+							{
+								set_viseme_curve_mode(true);
+								return CMD_SUCCESS;
+							}
+							else if( _stricmp( viseme, "curveoff" ) == 0 )
+							{
+								set_viseme_curve_mode(false);
+								return CMD_SUCCESS;
+							}
+							else if( _stricmp( viseme, "timedelay" ) == 0 )
+							{
+								float timeDelay = (float)atof( next );
+								set_viseme_time_delay( timeDelay );
+								return CMD_SUCCESS;
+							}
+							if( _stricmp( viseme, "sounddelay" ) == 0 )
+							{
+								float soundDelay = (float)atof( next );
+								set_viseme_sound_delay( soundDelay );
+								return CMD_SUCCESS;
+							}
+							if( _stricmp( viseme, "magnitude" ) == 0 )
+							{
+								float magnitude = (float)atof( next );
+								set_viseme_magnitude( magnitude );
+								return CMD_SUCCESS;
+							}
+							if( _stricmp( viseme, "plateau" ) == 0 )
+							{
+								if (!next)
+								{
+									LOG("Character %s viseme plateau setting is %s", this->getName().c_str(), this->isVisemePlateau()? "on" : "off");
+									return CMD_SUCCESS;
+								}
+								if (_stricmp(next, "on") == 0)
+								{
+									this->setVisemePlateau(true);
+									LOG("Character %s viseme plateau setting is now on.", this->getName().c_str());
+								}
+								else if (_stricmp(next, "off") == 0)
+								{
+									this->setVisemePlateau(false);
+									LOG("Character %s viseme plateau setting is now off.", this->getName().c_str());
+								}
+								else
+								{
+									LOG("use: char %s viseme plateau <on|off>", this->getName().c_str());
+								}
+								return CMD_SUCCESS;
+							}
+
+							if( strcmp( viseme, "minvisemetime" ) == 0 )
+							{
+								if (!next)
+								{
+									LOG("Character %s min viseme time is %f", this->getName().c_str(), this->getMinVisemeTime());
+									return CMD_SUCCESS;
+								}
+								float minTime = (float)atof( next );
+								setMinVisemeTime( minTime );
+								return CMD_SUCCESS;
+							}
+
+							// keyword next to viseme
+							if( strcmp( viseme, "clear" ) == 0 ) // removes all head controllers
+							{
+								if (head_sched_p)
+								{
+									std::vector<MeCtScheduler2::TrackPtr> tracks = head_sched_p->tracks();
+									head_sched_p->remove_tracks(tracks);
+								}
+							}
+							else if( strcmp( next, "curve" ) == 0 )
+							{
+								int numKeys = args.read_int();
+								if( numKeys <= 0 )	
+								{
+									LOG( "Viseme data is missing" );
+									return CMD_FAILURE;
+								}
+								int num_remaining = args.calc_num_tokens();
+								int numKeyParams = num_remaining / numKeys;
+								if( num_remaining != numKeys * numKeyParams )	{
+									LOG( "Viseme data is malformed" );
+									return CMD_FAILURE;
+								}
+								float* curveInfo = new float[ num_remaining ];
+								args.read_float_vect( curveInfo, num_remaining );											
+
+								//			schedule_viseme_blend_curve( viseme, mcu_p->time, 1.0f, curveInfo, numKeys, numKeyParams );
+								schedule_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams, 0.1f, 0.1f );
+								delete [] curveInfo;
+							}
+							else if( _stricmp( next, "trap" ) == 0 )
+							{
+								// trap <weight> <dur> [<ramp-in> <ramp-out>]
+								float weight = args.read_float();
+								float dur = args.read_float();
+								float ramp_in = 0.1f;
+								float ramp_out = 0.1f;
+								if( args.calc_num_tokens() > 0 )
+									ramp_in = args.read_float();
+								if( args.calc_num_tokens() > 0 )
+									ramp_out = args.read_float();
+								schedule_viseme_trapezoid( viseme, mcu_p->time, weight, dur, ramp_in, ramp_out );
+							}
+							else
+							{
+								float weight = (float)atof(next);
+								float rampin_duration = args.read_float();
+								schedule_viseme_blend_ramp( viseme, mcu_p->time, weight, rampin_duration );
+							}
+							return CMD_SUCCESS;
+						}
+						else if (cmd == "visemeweight")
+						{
+							FaceDefinition* faceDefinition = this->getFaceDefinition();
+							if (!faceDefinition)
+							{
+								LOG("Character %s does not have any visemes defined.", getName().c_str());
+								return CMD_FAILURE;
+							}
+							int numRemaining = args.calc_num_tokens();
+							if (numRemaining == 0)
+							{
+								// dump all of the existing viseme weights
+								
+								int numVisemes = faceDefinition->getNumVisemes();
+								for (int v = 0; v < numVisemes; v++)
+								{
+									const std::string& visemeName = faceDefinition->getVisemeName(v);
+									float weight = faceDefinition->getVisemeWeight(visemeName);
+									LOG("%s %f", visemeName.c_str(), weight);
+
+								}
+								return CMD_SUCCESS;
+							}
+							if (numRemaining == 1)
+							{
+								std::string visemeName = args.read_token();
+								if (!faceDefinition->hasViseme(visemeName))
+								{
+									LOG("Character %s does not have viseme %s defined.", getName().c_str(), visemeName.c_str());
+									return CMD_FAILURE;
+								}
+								float weight = faceDefinition->getVisemeWeight(visemeName);
+								LOG("%s %f", visemeName.c_str(), weight);
+								return CMD_SUCCESS;
+							}
+							if (numRemaining == 2)
+							{
+								std::string visemeName = args.read_token();
+								if (!faceDefinition->hasViseme(visemeName))
+								{
+									LOG("Character %s does not have viseme %s defined.", getName().c_str(), visemeName.c_str());
+									return CMD_FAILURE;
+								}
+								float weight = args.read_float();
+								faceDefinition->setVisemeWeight(visemeName, weight);
+								LOG("%s %f", visemeName.c_str(), weight);
+								return CMD_SUCCESS;
+							}
+							if (numRemaining > 2)
+							{
+								LOG("Usage:\nchar %s visemeweight\nchar %s visemeweight <visemename>\nchar %s visemeweight <visemename> <weight>", getName().c_str(), getName().c_str(), getName().c_str());
+								return CMD_FAILURE;
+							}
+
+						}
+					else 	if( cmd == "viewer" ) {
+							std::string viewType = args.read_token();
+
+							if (viewType == "0" || viewType == "bones")
+							{
+								if (scene_p)
+									scene_p->set_visibility(1,0,0,0);
+								dMesh_p->set_visibility(0);
+							}
+							else if (viewType == "1" || viewType == "visgeo")
+							{
+								if (scene_p)
+									scene_p->set_visibility(0,1,0,0);
+								dMesh_p->set_visibility(0);
+							}
+							else if (viewType == "2" || viewType == "colgeo")
+							{
+								if (scene_p)
+									scene_p->set_visibility(0,0,1,0);
+								dMesh_p->set_visibility(0);
+							}
+							else if (viewType == "3" || viewType == "axis")
+							{
+								if (scene_p)
+									scene_p->set_visibility(0,0,0,1);
+								dMesh_p->set_visibility(0);
+							}
+							else if (viewType == "4" || viewType == "deformable")
+							{
+								if (scene_p)
+									scene_p->set_visibility(0,0,0,0);
+								dMesh_p->set_visibility(1);
+							}
+							else
+							{
+								LOG("Usage: char <name> viewer <bones|visgeo|colgeo|axis|deformable>");
+							}
+
+							return CMD_SUCCESS;
+						} 
+			else if( cmd == "gazefade" ) {
+
+					string fade_cmd = args.read_token();
+					bool fade_in;
+					bool print_track = false;
+					if( fade_cmd == "in" ) {
+						fade_in = true;
+					}
+					else
+						if( fade_cmd == "out" ) {
+							fade_in = false;
+						}
+						else
+							if( fade_cmd == "print" ) {
+								print_track = true;
+							}
+							else	{
+								return( CMD_NOT_FOUND );
+							}
+							float interval = args.read_float();
+							if( print_track )	{
+								LOG( "char '%s' gaze tracks:", getName().c_str() );
+							}
+							mcuCBHandle& mcu = mcuCBHandle::singleton();
+							double curTime = mcu.time;
+							MeCtScheduler2::VecOfTrack track_vec = gaze_sched_p->tracks();
+							int n = track_vec.size();
+							for( int i = 0; i < n; i++ )	{
+								MeCtScheduler2::TrackPtr t_p = track_vec[ i ];
+								MeCtBlend* blend = dynamic_cast<MeCtBlend*>(t_p->blending_ct()); 
+								MeController* ct_p = t_p->animation_ct();
+								MeCtGaze* gaze_p = dynamic_cast<MeCtGaze*> (ct_p);
+								if( gaze_p )	{	
+									if (blend) {
+										// don't fade gaze controllers that are scheduled 
+										// but have not yet been started
+
+										srLinearCurve& blend_curve = blend->get_curve();
+										int n = blend_curve.get_num_keys();
+										if( n > 0 )	{
+											double h = blend_curve.get_head_param();
+											double v = blend_curve.get_head_value();
+											if (h > curTime) // controller hasn't started yet
 											{
-												std::stringstream strstr;
-												strstr << c << " ";
-												SkJoint* joint = channels.joint(c);
-												if (joint)
-												{
-													strstr << joint->name() << " ";
-												}
-												SkChannel& channel = channels[c];
-												int channelSize = channel.size();
-												// get the channel index
-												int channelIndex = ct_tree_p->toBufferIndex(c);
-												strstr << channelIndex << " (" << channelSize << ") ";
-												LOG( "%s", strstr.str().c_str() );
+												continue;
 											}
 										}
 									}
-									return CMD_SUCCESS;
+									if( print_track )	{
+										LOG( " %s", gaze_p->getName().c_str() );
+									}
+									else
+										if( fade_in )	{
+											gaze_p->set_fade_in( interval );
+										}
+										else	{
+											gaze_p->set_fade_out( interval );
+										}
 								}
-								else 
-									if( cmd == "controllers" )
-									{
-										if( ct_tree_p )
+							}
+							return CMD_SUCCESS;
+				} 	
+				else 
+					if( cmd == "reholster" ) {
+						return( reholster_quickdraw( mcu_p ) );
+					}
+					else
+						if( cmd == "blink" )
+						{
+							if( eyelid_reg_ct_p )	{
+								eyelid_reg_ct_p->blink_now();
+								return( CMD_SUCCESS );
+							}
+							return( CMD_FAILURE );
+						}
+						else
+							if (cmd == "breathing")
+							{
+								if (breathing_p)
+								{
+									return mcu_character_breathing(getName().c_str(), args, mcu_p);
+								}
+								return CMD_FAILURE;
+							}
+							else
+								if( cmd == "eyelid" )
+								{
+									if( eyelid_reg_ct_p )	{
+
+										string eyelid_cmd  = args.read_token();
+										if( eyelid_cmd.length()==0 ) {
+
+											LOG( "char <> eyelid <command>:" );
+											LOG( " eyelid print" );
+											LOG( " eyelid pitch 0|1" );
+											LOG( " eyelid range <upper-min> <upper-max> [<lower-min> <lower-max>]" );
+											LOG( " eyelid close <closed-angle>" );
+											LOG( " eyelid tight <upper-weight> [<lower-weight>]" );
+											LOG( " eyelid delay <upper-delay> [<upper-delay>]" );
+
+
+											//				eyelid_reg_ct_p->test();
+											return( CMD_SUCCESS );
+										}
+
+										int n = args.calc_num_tokens();
+										if( eyelid_cmd == "pitch" )
 										{
-											int n = ct_tree_p->count_controllers();
-											for (int c = 0; c < n; c++)
-											{
-												LOG( "%s", ct_tree_p->controller(c)->getName().c_str() );
+											if( n > 0 )	{
+												bool enable = args.read_int() != 0;
+												eyelid_reg_ct_p->set_eyeball_tracking( enable );
 											}
+											else	{
+												LOG( "MeCtEyeLidRegulator: pitch tracking %s", 
+													eyelid_reg_ct_p->get_eyeball_tracking() ?
+													"ENABLED" : "DISABLED"
+													);
+											}
+											return( CMD_SUCCESS );
+										}
+										else
+											if( eyelid_cmd == "range" )
+											{
+												if( n < 2 )	{
+													return( CMD_FAILURE );
+												}
+												float upper_min = args.read_float();
+												float upper_max = args.read_float();
+												eyelid_reg_ct_p->set_upper_range( upper_min, upper_max );
+												if( n >= 4 )	{
+													float lower_min = args.read_float();
+													float lower_max = args.read_float();
+													eyelid_reg_ct_p->set_lower_range( lower_min, lower_max );
+												}
+												return( CMD_SUCCESS );
+											}
+											else
+												if( eyelid_cmd == "close" )
+												{
+													if( n < 1 ) {
+														return( CMD_FAILURE );
+													}
+													float close_angle = args.read_float();
+													eyelid_reg_ct_p->set_close_angle( close_angle );
+													return( CMD_SUCCESS );
+												}
+												else
+													if( eyelid_cmd == "tight" )
+													{
+														float upper_mag = args.read_float();
+														eyelid_reg_ct_p->set_upper_tighten( upper_mag );
+														if( n > 1 ) {
+															float lower_mag = args.read_float();
+															eyelid_reg_ct_p->set_lower_tighten( lower_mag );
+														}
+														return( CMD_SUCCESS );
+													}
+													if( eyelid_cmd == "delay" )
+													{
+														float upper_delay = args.read_float();
+														eyelid_reg_ct_p->set_upper_delay( upper_delay );
+														if( n > 1 ) {
+															float lower_delay = args.read_float();
+															eyelid_reg_ct_p->set_lower_delay( lower_delay );
+														}
+														return( CMD_SUCCESS );
+													}
+													if( eyelid_cmd == "print" )
+													{
+														eyelid_reg_ct_p->print();
+														return( CMD_SUCCESS );
+													}
+													return( CMD_NOT_FOUND );
+									}
+									return( CMD_FAILURE );
+								}
+								else
+									if( cmd == "softeyes" )
+									{
+										if( eyelid_ct == NULL )
+										{
+											LOG("ERROR: SbmCharacter::parse_character_command(..): character \"%s\" has no eyelid_ct.", getName().c_str() );
+											return CMD_FAILURE;
+										}
+
+										if( args.calc_num_tokens() == 0 )
+										{
+											LOG( "softeyes params: %s", isSoftEyes() ? "ENABLED" : "DISABLED" );
+											float lo, up;
+
+											eyelid_ct->get_weight( lo, up );
+											LOG( " eyelid weight: { %f, %f }", lo, up );
+
+											eyelid_ct->get_upper_lid_range( lo, up );
+											LOG( " eyelid upper trans: { %f, %f }", lo, up );
+
+											eyelid_ct->get_lower_lid_range( lo, up );
+											LOG( " eyelid lower trans: { %f, %f }", lo, up );
+
+											eyelid_ct->get_eye_pitch_range( lo, up );
+											LOG( " eyeball pitch: { %f, %f }", lo, up );
+
+											LOG( "commmands:" );
+											LOG( " char <> softeyes [on|off] " );
+											LOG( " char <> softeyes weight <lower> <upper>" );
+											LOG( " char <> softeyes upperlid|lowerlid|eyepitch <lower-lim> <upper-lim>" );
+											return CMD_SUCCESS;
+										}
+
+										std::string softEyesCommand = args.read_token();
+										if( softEyesCommand == "on")
+										{
+											setSoftEyes( true );
+										}
+										else 
+											if( softEyesCommand == "off")
+											{
+												setSoftEyes( false );
+											}
+											else	{
+
+												float lo = args.read_float();
+												float up = args.read_float();
+
+												if( softEyesCommand == "weight" )
+												{
+													eyelid_ct->set_weight( lo, up );
+												}
+												else
+													if( softEyesCommand == "upperlid" )
+													{
+														eyelid_ct->set_upper_lid_range( lo, up );
+													}
+													else 
+														if( softEyesCommand == "lowerlid" )
+														{
+															eyelid_ct->set_lower_lid_range( lo, up );
+														}
+														else 
+															if( softEyesCommand == "eyepitch" )
+															{
+																eyelid_ct->set_eye_pitch_range( lo, up );
+															}
+															else
+															{
+																LOG( "SbmCharacter::parse_character_command ERR: command '%s' not recognized", softEyesCommand.c_str());
+																return CMD_NOT_FOUND;
+															}
+															return CMD_SUCCESS;
+											}
+											return CMD_SUCCESS;
+									}
+									else if (cmd == "sk")
+									{
+										string file = args.read_token();
+										string scaleStr = args.read_token();
+										double scale = atof(scaleStr.c_str());
+										return writeSkeletonHierarchy(file, scale);		
+									}
+									else if (cmd == "minibrain")
+									{
+										if (args.calc_num_tokens() == 0)
+										{
+											MiniBrain* miniBrain = this->getMiniBrain();
+											if (miniBrain)
+											{
+												LOG("Character %s has an active minibrain.", this->getName().c_str());
+											}
+											else
+											{
+												LOG("Character %s has an inactive minibrain.", this->getName().c_str());
+											}
+											return CMD_SUCCESS;
+										}
+
+										std::string tok = args.read_token();
+										if (tok == "on")
+										{
+											MiniBrain* miniBrain = this->getMiniBrain();
+											if (miniBrain)
+											{
+												delete miniBrain;
+											}
+											miniBrain = new MiniBrain();
+											this->setMiniBrain(miniBrain);
+											LOG("Minibrain for character %s is now on", this->getName().c_str());
+										}
+										else if (tok == "off")
+										{
+											MiniBrain* miniBrain = this->getMiniBrain();
+											if (miniBrain)
+											{
+												delete miniBrain;
+											}
+											
+											this->setMiniBrain(NULL);
+											LOG("Minibrain for character %s is now off", this->getName().c_str());
+										}
+										else
+										{
+											LOG("Usage: char %s minibrain <on|off>", this->getName().c_str());
 										}
 										return CMD_SUCCESS;
 									}
-									else 
-										if (cmd == "requests")
+									else if ( cmd == "collision")
+									{
+										string phyCmd = args.read_token();
+										if (phyCmd == "on" || phyCmd == "ON")
 										{
-											BML::Processor& bp = mcu_p->bml_processor;
-											for (std::map<std::string, BML::BmlRequestPtr >::iterator iter = bp.getBMLRequestMap().begin();
-												iter != bp.getBMLRequestMap().end();
-												iter++)
-											{
-												if (all_characters)
-												{
-													LOG("%s", (*iter).second->requestId.c_str());
-												}
-												else
-												{			
-													// make sure the requests is for this character
-													std::string requestWithName = (*iter).second->requestId;
-													std::string charName = this->getName();
-													charName.append("|");
-													int index = requestWithName.find(charName);
-													if (index == 0)
-													{
-														LOG("%s", (*iter).second->requestId.c_str());
-													}
-												}
-											}
+											this->setJointPhyCollision(true);
 											return CMD_SUCCESS;
 										}
-										if (cmd == "interrupt")
+										else if (phyCmd == "off" || phyCmd == "OFF")
 										{
-											int numRequestsInterrupted = 0;
-											BML::Processor& bp = mcu_p->bml_processor;
-											for (std::map<std::string, BML::BmlRequestPtr >::iterator iter = bp.getBMLRequestMap().begin();
-												iter != bp.getBMLRequestMap().end();
-												iter++)
-											{
-												std::string requestWithName = (*iter).second->requestId;
-												if (all_characters)
-												{
-													int pipeLocation = requestWithName.find("|");
-													std::string charName = requestWithName.substr(0, pipeLocation);
-													std::string request = requestWithName.substr(pipeLocation + 1);
-													std::stringstream strstr;
-													strstr << "bp interrupt " << charName << " " << request << " .5"; 
-													mcu_p->execute((char*) strstr.str().c_str());
-													numRequestsInterrupted++;
-												}
-												else
-												{			
-													// make sure the requests is for this character
-
-													std::string charName = this->getName();
-													charName.append("|");
-													int index = requestWithName.find(charName);
-													if (index == 0)
-													{
-														std::string request = requestWithName.substr(charName.size());
-														std::stringstream strstr;
-														strstr << "bp interrupt " << this->getName() << " " << request << " .5"; 
-														mcu_p->execute((char*) strstr.str().c_str());
-														numRequestsInterrupted++;
-													}
-												}
-												std::string name = this->getName();
-												LOG("%d requests interrupted on character %s.", numRequestsInterrupted, name.c_str());
-											}
+											this->setJointPhyCollision(false);
 											return CMD_SUCCESS;
 										}
 										else
-											if( cmd == "prune" ) {
-												return( prune_controller_tree( mcu_p ) );
+										{
+											LOG( "SbmCharacter::parse_character_command ERR: incorrect parameter for collision = %s",phyCmd.c_str());
+											return CMD_FAILURE;
+										}
+									}
+									else if ( cmd == "collider" )
+									{
+										string colCmd = args.read_token();
+										if (colCmd == "build") // build all joint colliders automatically
+										{
+											this->buildJointPhyObjs();
+											return CMD_SUCCESS;
+										}
+										else if (colCmd == "joint") // build 
+										{
+											string jointName = args.read_token();
+											float length = -1.f, width = -1.f;			
+											string nextCmd = args.read_token();
+											while (nextCmd != "")
+											{
+												float nextFloat = args.read_float();
+												if (nextCmd == "length")
+													length = nextFloat;
+												else if (nextCmd == "width")
+													width = nextFloat;
+												nextCmd = args.read_token();
 											}
-											else if( cmd == "viseme" )
-											{ 
-													char* viseme = args.read_token();
-													char* next = args.read_token();
-													//		float* curveInfo = NULL;
-													//		float weight = 0.0f;
-													//		float rampin_duration = 0.0;
-													//		int numKeys = 0;
-													//		int numKeyParams = 0;
+											this->setJointCollider(jointName,length,width);
+											return CMD_SUCCESS;
+										}		
+									}
+									else if ( cmd == "handmotion")
+									{
+										string hand_cmd = args.read_token();	
+										if (hand_cmd == "grabhand" || hand_cmd == "reachhand" || hand_cmd == "releasehand")
+										{
+											string motion_name = args.read_token();
+											string tagName = args.read_token();
+											SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
+											//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
+											int reachType = MeCtReachEngine::getReachType(tagName);//
+											if (reachType == -1)
+												reachType = MeCtReachEngine::RIGHT_ARM;
+											if (motion)
+											{
+												//addReachMotion(motion);
+												TagMotion tagMotion = TagMotion(reachType,motion);
+												if (hand_cmd == "grabhand")
+													this->grabHandData.insert(tagMotion);
+												else if (hand_cmd == "reachhand")
+													this->reachHandData.insert(tagMotion);
+												else if (hand_cmd == "releasehand")
+													this->releaseHandData.insert(tagMotion);
 
-													if( _stricmp( viseme, "curveon" ) == 0 )
-													{
-														set_viseme_curve_mode(true);
-														return CMD_SUCCESS;
-													}
-													else if( _stricmp( viseme, "curveoff" ) == 0 )
-													{
-														set_viseme_curve_mode(false);
-														return CMD_SUCCESS;
-													}
-													else if( _stricmp( viseme, "timedelay" ) == 0 )
-													{
-														float timeDelay = (float)atof( next );
-														set_viseme_time_delay( timeDelay );
-														return CMD_SUCCESS;
-													}
-													if( _stricmp( viseme, "sounddelay" ) == 0 )
-													{
-														float soundDelay = (float)atof( next );
-														set_viseme_sound_delay( soundDelay );
-														return CMD_SUCCESS;
-													}
-													if( _stricmp( viseme, "magnitude" ) == 0 )
-													{
-														float magnitude = (float)atof( next );
-														set_viseme_magnitude( magnitude );
-														return CMD_SUCCESS;
-													}
-													if( _stricmp( viseme, "plateau" ) == 0 )
-													{
-														if (!next)
-														{
-															LOG("Character %s viseme plateau setting is %s", this->getName().c_str(), this->isVisemePlateau()? "on" : "off");
-															return CMD_SUCCESS;
-														}
-														if (_stricmp(next, "on") == 0)
-														{
-															this->setVisemePlateau(true);
-															LOG("Character %s viseme plateau setting is now on.", this->getName().c_str());
-														}
-														else if (_stricmp(next, "off") == 0)
-														{
-															this->setVisemePlateau(false);
-															LOG("Character %s viseme plateau setting is now off.", this->getName().c_str());
-														}
-														else
-														{
-															LOG("use: char %s viseme plateau <on|off>", this->getName().c_str());
-														}
-														return CMD_SUCCESS;
-													}
-
-													if( strcmp( viseme, "minvisemetime" ) == 0 )
-													{
-														if (!next)
-														{
-															LOG("Character %s min viseme time is %f", this->getName().c_str(), this->getMinVisemeTime());
-															return CMD_SUCCESS;
-														}
-														float minTime = (float)atof( next );
-														setMinVisemeTime( minTime );
-														return CMD_SUCCESS;
-													}
-
-													// keyword next to viseme
-													if( strcmp( viseme, "clear" ) == 0 ) // removes all head controllers
-													{
-														if (head_sched_p)
-														{
-															std::vector<MeCtScheduler2::TrackPtr> tracks = head_sched_p->tracks();
-															head_sched_p->remove_tracks(tracks);
-														}
-													}
-													else if( strcmp( next, "curve" ) == 0 )
-													{
-														int numKeys = args.read_int();
-														if( numKeys <= 0 )	
-														{
-															LOG( "Viseme data is missing" );
-															return CMD_FAILURE;
-														}
-														int num_remaining = args.calc_num_tokens();
-														int numKeyParams = num_remaining / numKeys;
-														if( num_remaining != numKeys * numKeyParams )	{
-															LOG( "Viseme data is malformed" );
-															return CMD_FAILURE;
-														}
-														float* curveInfo = new float[ num_remaining ];
-														args.read_float_vect( curveInfo, num_remaining );											
-
-														//			schedule_viseme_blend_curve( viseme, mcu_p->time, 1.0f, curveInfo, numKeys, numKeyParams );
-														schedule_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams, 0.1f, 0.1f );
-														delete [] curveInfo;
-													}
-													else if( _stricmp( next, "trap" ) == 0 )
-													{
-														// trap <weight> <dur> [<ramp-in> <ramp-out>]
-														float weight = args.read_float();
-														float dur = args.read_float();
-														float ramp_in = 0.1f;
-														float ramp_out = 0.1f;
-														if( args.calc_num_tokens() > 0 )
-															ramp_in = args.read_float();
-														if( args.calc_num_tokens() > 0 )
-															ramp_out = args.read_float();
-														schedule_viseme_trapezoid( viseme, mcu_p->time, weight, dur, ramp_in, ramp_out );
-													}
-													else
-													{
-														float weight = (float)atof(next);
-														float rampin_duration = args.read_float();
-														schedule_viseme_blend_ramp( viseme, mcu_p->time, weight, rampin_duration );
-													}
-													return CMD_SUCCESS;
-												}
-												else if (cmd == "visemeweight")
+												return CMD_SUCCESS;
+											}
+											else
+											{
+												LOG( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
+												return CMD_FAILURE;
+											}
+										}
+									}
+									else if ( cmd == "reachmotion" )
+									{
+										string reach_cmd = args.read_token();		
+										bool print_track = false;
+										if (reach_cmd == "add")
+										{			
+											string motion_name = args.read_token();		
+											string tagName = args.read_token();
+											int reachType = MeCtReachEngine::getReachType(tagName);//
+											if (reachType == -1)
+												reachType = MeCtReachEngine::RIGHT_ARM;
+											SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
+											//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
+											if (motion)
+											{
+												// assume the right hand motion and mirror the left hand motion
+												addReachMotion(reachType,motion);
+												return CMD_SUCCESS;
+											}
+											else
+											{
+												LOG( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
+												return CMD_NOT_FOUND;
+											}
+										}
+										else if (reach_cmd == "list")
+										{
+											int motion_num = this->reachMotionData.size();
+											//SkMotion* motion = getReachMotion(motion_num);
+											for (int c = 0; c < motion_num; c++)
+											{
+												LOG( "%s", getReachMotion(c)->name().c_str() );
+											}
+											return CMD_SUCCESS;
+										}
+										else if (reach_cmd == "build")
+										{			
+											if (reachEngineMap.size() == 0)
+											{
+												LOG("character %s, reach engine is not initialized.", this->getName().c_str());
+												return CMD_FAILURE;
+											}				
+											ReachEngineMap::iterator mi;
+											for ( mi  = reachEngineMap.begin();
+												mi != reachEngineMap.end();
+												mi++)
+											{
+												MeCtReachEngine* re = mi->second;
+												if (re)
 												{
-													FaceDefinition* faceDefinition = this->getFaceDefinition();
-													if (!faceDefinition)
-													{
-														LOG("Character %s does not have any visemes defined.", getName().c_str());
-														return CMD_FAILURE;
-													}
-													int numRemaining = args.calc_num_tokens();
-													if (numRemaining == 0)
-													{
-														// dump all of the existing viseme weights
-														
-														int numVisemes = faceDefinition->getNumVisemes();
-														for (int v = 0; v < numVisemes; v++)
-														{
-															const std::string& visemeName = faceDefinition->getVisemeName(v);
-															float weight = faceDefinition->getVisemeWeight(visemeName);
-															LOG("%s %f", visemeName.c_str(), weight);
-
-														}
-														return CMD_SUCCESS;
-													}
-													if (numRemaining == 1)
-													{
-														std::string visemeName = args.read_token();
-														if (!faceDefinition->hasViseme(visemeName))
-														{
-															LOG("Character %s does not have viseme %s defined.", getName().c_str(), visemeName.c_str());
-															return CMD_FAILURE;
-														}
-														float weight = faceDefinition->getVisemeWeight(visemeName);
-														LOG("%s %f", visemeName.c_str(), weight);
-														return CMD_SUCCESS;
-													}
-													if (numRemaining == 2)
-													{
-														std::string visemeName = args.read_token();
-														if (!faceDefinition->hasViseme(visemeName))
-														{
-															LOG("Character %s does not have viseme %s defined.", getName().c_str(), visemeName.c_str());
-															return CMD_FAILURE;
-														}
-														float weight = args.read_float();
-														faceDefinition->setVisemeWeight(visemeName, weight);
-														LOG("%s %f", visemeName.c_str(), weight);
-														return CMD_SUCCESS;
-													}
-													if (numRemaining > 2)
-													{
-														LOG("Usage:\nchar %s visemeweight\nchar %s visemeweight <visemename>\nchar %s visemeweight <visemename> <weight>", getName().c_str(), getName().c_str(), getName().c_str());
-														return CMD_FAILURE;
-													}
-
+													re->updateMotionExamples(getReachMotionDataSet());
 												}
-												else 
-													if( cmd == "viewer" ) {
-														std::string viewType = args.read_token();
-
-														if (viewType == "0" || viewType == "bones")
-														{
-															if (scene_p)
-																scene_p->set_visibility(1,0,0,0);
-															dMesh_p->set_visibility(0);
-														}
-														else if (viewType == "1" || viewType == "visgeo")
-														{
-															if (scene_p)
-																scene_p->set_visibility(0,1,0,0);
-															dMesh_p->set_visibility(0);
-														}
-														else if (viewType == "2" || viewType == "colgeo")
-														{
-															if (scene_p)
-																scene_p->set_visibility(0,0,1,0);
-															dMesh_p->set_visibility(0);
-														}
-														else if (viewType == "3" || viewType == "axis")
-														{
-															if (scene_p)
-																scene_p->set_visibility(0,0,0,1);
-															dMesh_p->set_visibility(0);
-														}
-														else if (viewType == "4" || viewType == "deformable")
-														{
-															if (scene_p)
-																scene_p->set_visibility(0,0,0,0);
-															dMesh_p->set_visibility(1);
-														}
-														else
-														{
-															LOG("Usage: char <name> viewer <bones|visgeo|colgeo|axis|deformable>");
-														}
-
-														return CMD_SUCCESS;
-													} 
-													else 
-														if( cmd == "gazefade" ) {
-
-															string fade_cmd = args.read_token();
-															bool fade_in;
-															bool print_track = false;
-															if( fade_cmd == "in" ) {
-																fade_in = true;
-															}
-															else
-																if( fade_cmd == "out" ) {
-																	fade_in = false;
-																}
-																else
-																	if( fade_cmd == "print" ) {
-																		print_track = true;
-																	}
-																	else	{
-																		return( CMD_NOT_FOUND );
-																	}
-																	float interval = args.read_float();
-																	if( print_track )	{
-																		LOG( "char '%s' gaze tracks:", getName().c_str() );
-																	}
-																	mcuCBHandle& mcu = mcuCBHandle::singleton();
-																	double curTime = mcu.time;
-																	MeCtScheduler2::VecOfTrack track_vec = gaze_sched_p->tracks();
-																	int n = track_vec.size();
-																	for( int i = 0; i < n; i++ )	{
-																		MeCtScheduler2::TrackPtr t_p = track_vec[ i ];
-																		MeCtBlend* blend = dynamic_cast<MeCtBlend*>(t_p->blending_ct()); 
-																		MeController* ct_p = t_p->animation_ct();
-																		MeCtGaze* gaze_p = dynamic_cast<MeCtGaze*> (ct_p);
-																		if( gaze_p )	{	
-																			if (blend) {
-																				// don't fade gaze controllers that are scheduled 
-																				// but have not yet been started
-
-																				srLinearCurve& blend_curve = blend->get_curve();
-																				int n = blend_curve.get_num_keys();
-																				if( n > 0 )	{
-																					double h = blend_curve.get_head_param();
-																					double v = blend_curve.get_head_value();
-																					if (h > curTime) // controller hasn't started yet
-																					{
-																						continue;
-																					}
-																				}
-																			}
-																			if( print_track )	{
-																				LOG( " %s", gaze_p->getName().c_str() );
-																			}
-																			else
-																				if( fade_in )	{
-																					gaze_p->set_fade_in( interval );
-																				}
-																				else	{
-																					gaze_p->set_fade_out( interval );
-																				}
-																		}
-																	}
-																	return CMD_SUCCESS;
-														} 	
-														else 
-															if( cmd == "reholster" ) {
-																return( reholster_quickdraw( mcu_p ) );
-															}
-															else
-																if( cmd == "blink" )
-																{
-																	if( eyelid_reg_ct_p )	{
-																		eyelid_reg_ct_p->blink_now();
-																		return( CMD_SUCCESS );
-																	}
-																	return( CMD_FAILURE );
-																}
-																else
-																	if (cmd == "breathing")
-																	{
-																		if (breathing_p)
-																		{
-																			return mcu_character_breathing(getName().c_str(), args, mcu_p);
-																		}
-																		return CMD_FAILURE;
-																	}
-																	else
-																		if( cmd == "eyelid" )
-																		{
-																			if( eyelid_reg_ct_p )	{
-
-																				string eyelid_cmd  = args.read_token();
-																				if( eyelid_cmd.length()==0 ) {
-
-																					LOG( "char <> eyelid <command>:" );
-																					LOG( " eyelid print" );
-																					LOG( " eyelid pitch 0|1" );
-																					LOG( " eyelid range <upper-min> <upper-max> [<lower-min> <lower-max>]" );
-																					LOG( " eyelid close <closed-angle>" );
-																					LOG( " eyelid tight <upper-weight> [<lower-weight>]" );
-																					LOG( " eyelid delay <upper-delay> [<upper-delay>]" );
-
-
-																					//				eyelid_reg_ct_p->test();
-																					return( CMD_SUCCESS );
-																				}
-
-																				int n = args.calc_num_tokens();
-																				if( eyelid_cmd == "pitch" )
-																				{
-																					if( n > 0 )	{
-																						bool enable = args.read_int() != 0;
-																						eyelid_reg_ct_p->set_eyeball_tracking( enable );
-																					}
-																					else	{
-																						LOG( "MeCtEyeLidRegulator: pitch tracking %s", 
-																							eyelid_reg_ct_p->get_eyeball_tracking() ?
-																							"ENABLED" : "DISABLED"
-																							);
-																					}
-																					return( CMD_SUCCESS );
-																				}
-																				else
-																					if( eyelid_cmd == "range" )
-																					{
-																						if( n < 2 )	{
-																							return( CMD_FAILURE );
-																						}
-																						float upper_min = args.read_float();
-																						float upper_max = args.read_float();
-																						eyelid_reg_ct_p->set_upper_range( upper_min, upper_max );
-																						if( n >= 4 )	{
-																							float lower_min = args.read_float();
-																							float lower_max = args.read_float();
-																							eyelid_reg_ct_p->set_lower_range( lower_min, lower_max );
-																						}
-																						return( CMD_SUCCESS );
-																					}
-																					else
-																						if( eyelid_cmd == "close" )
-																						{
-																							if( n < 1 ) {
-																								return( CMD_FAILURE );
-																							}
-																							float close_angle = args.read_float();
-																							eyelid_reg_ct_p->set_close_angle( close_angle );
-																							return( CMD_SUCCESS );
-																						}
-																						else
-																							if( eyelid_cmd == "tight" )
-																							{
-																								float upper_mag = args.read_float();
-																								eyelid_reg_ct_p->set_upper_tighten( upper_mag );
-																								if( n > 1 ) {
-																									float lower_mag = args.read_float();
-																									eyelid_reg_ct_p->set_lower_tighten( lower_mag );
-																								}
-																								return( CMD_SUCCESS );
-																							}
-																							if( eyelid_cmd == "delay" )
-																							{
-																								float upper_delay = args.read_float();
-																								eyelid_reg_ct_p->set_upper_delay( upper_delay );
-																								if( n > 1 ) {
-																									float lower_delay = args.read_float();
-																									eyelid_reg_ct_p->set_lower_delay( lower_delay );
-																								}
-																								return( CMD_SUCCESS );
-																							}
-																							if( eyelid_cmd == "print" )
-																							{
-																								eyelid_reg_ct_p->print();
-																								return( CMD_SUCCESS );
-																							}
-																							return( CMD_NOT_FOUND );
-																			}
-																			return( CMD_FAILURE );
-																		}
-																		else
-																			if( cmd == "softeyes" )
-																			{
-																				if( eyelid_ct == NULL )
-																				{
-																					LOG("ERROR: SbmCharacter::parse_character_command(..): character \"%s\" has no eyelid_ct.", getName().c_str() );
-																					return CMD_FAILURE;
-																				}
-
-																				if( args.calc_num_tokens() == 0 )
-																				{
-																					LOG( "softeyes params: %s", isSoftEyes() ? "ENABLED" : "DISABLED" );
-																					float lo, up;
-
-																					eyelid_ct->get_weight( lo, up );
-																					LOG( " eyelid weight: { %f, %f }", lo, up );
-
-																					eyelid_ct->get_upper_lid_range( lo, up );
-																					LOG( " eyelid upper trans: { %f, %f }", lo, up );
-
-																					eyelid_ct->get_lower_lid_range( lo, up );
-																					LOG( " eyelid lower trans: { %f, %f }", lo, up );
-
-																					eyelid_ct->get_eye_pitch_range( lo, up );
-																					LOG( " eyeball pitch: { %f, %f }", lo, up );
-
-																					LOG( "commmands:" );
-																					LOG( " char <> softeyes [on|off] " );
-																					LOG( " char <> softeyes weight <lower> <upper>" );
-																					LOG( " char <> softeyes upperlid|lowerlid|eyepitch <lower-lim> <upper-lim>" );
-																					return CMD_SUCCESS;
-																				}
-
-																				std::string softEyesCommand = args.read_token();
-																				if( softEyesCommand == "on")
-																				{
-																					setSoftEyes( true );
-																				}
-																				else 
-																					if( softEyesCommand == "off")
-																					{
-																						setSoftEyes( false );
-																					}
-																					else	{
-
-																						float lo = args.read_float();
-																						float up = args.read_float();
-
-																						if( softEyesCommand == "weight" )
-																						{
-																							eyelid_ct->set_weight( lo, up );
-																						}
-																						else
-																							if( softEyesCommand == "upperlid" )
-																							{
-																								eyelid_ct->set_upper_lid_range( lo, up );
-																							}
-																							else 
-																								if( softEyesCommand == "lowerlid" )
-																								{
-																									eyelid_ct->set_lower_lid_range( lo, up );
-																								}
-																								else 
-																									if( softEyesCommand == "eyepitch" )
-																									{
-																										eyelid_ct->set_eye_pitch_range( lo, up );
-																									}
-																									else
-																									{
-																										LOG( "SbmCharacter::parse_character_command ERR: command '%s' not recognized", softEyesCommand.c_str());
-																										return CMD_NOT_FOUND;
-																									}
-																									return CMD_SUCCESS;
-																					}
-																					return CMD_SUCCESS;
-																			}
-																			else if (cmd == "sk")
-																			{
-																				string file = args.read_token();
-																				string scaleStr = args.read_token();
-																				double scale = atof(scaleStr.c_str());
-																				return writeSkeletonHierarchy(file, scale);		
-																			}
-																			else if ( cmd == "collision")
-																			{
-																				string phyCmd = args.read_token();
-																				if (phyCmd == "on" || phyCmd == "ON")
-																				{
-																					this->setJointPhyCollision(true);
-																					return CMD_SUCCESS;
-																				}
-																				else if (phyCmd == "off" || phyCmd == "OFF")
-																				{
-																					this->setJointPhyCollision(false);
-																					return CMD_SUCCESS;
-																				}
-																				else
-																				{
-																					LOG( "SbmCharacter::parse_character_command ERR: incorrect parameter for collision = %s",phyCmd.c_str());
-																					return CMD_FAILURE;
-																				}
-																			}
-																			else if ( cmd == "collider" )
-																			{
-																				string colCmd = args.read_token();
-																				if (colCmd == "build") // build all joint colliders automatically
-																				{
-																					this->buildJointPhyObjs();
-																					return CMD_SUCCESS;
-																				}
-																				else if (colCmd == "joint") // build 
-																				{
-																					string jointName = args.read_token();
-																					float length = -1.f, width = -1.f;			
-																					string nextCmd = args.read_token();
-																					while (nextCmd != "")
-																					{
-																						float nextFloat = args.read_float();
-																						if (nextCmd == "length")
-																							length = nextFloat;
-																						else if (nextCmd == "width")
-																							width = nextFloat;
-																						nextCmd = args.read_token();
-																					}
-																					this->setJointCollider(jointName,length,width);
-																					return CMD_SUCCESS;
-																				}		
-																			}
-																			else if ( cmd == "handmotion")
-																			{
-																				string hand_cmd = args.read_token();	
-																				if (hand_cmd == "grabhand" || hand_cmd == "reachhand" || hand_cmd == "releasehand")
-																				{
-																					string motion_name = args.read_token();
-																					string tagName = args.read_token();
-																					SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
-																					//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
-																					int reachType = MeCtReachEngine::getReachType(tagName);//
-																					if (reachType == -1)
-																						reachType = MeCtReachEngine::RIGHT_ARM;
-																					if (motion)
-																					{
-																						//addReachMotion(motion);
-																						TagMotion tagMotion = TagMotion(reachType,motion);
-																						if (hand_cmd == "grabhand")
-																							this->grabHandData.insert(tagMotion);
-																						else if (hand_cmd == "reachhand")
-																							this->reachHandData.insert(tagMotion);
-																						else if (hand_cmd == "releasehand")
-																							this->releaseHandData.insert(tagMotion);
-
-																						return CMD_SUCCESS;
-																					}
-																					else
-																					{
-																						LOG( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
-																						return CMD_FAILURE;
-																					}
-																				}
-																			}
-																			else if ( cmd == "reachmotion" )
-																			{
-																				string reach_cmd = args.read_token();		
-																				bool print_track = false;
-																				if (reach_cmd == "add")
-																				{			
-																					string motion_name = args.read_token();		
-																					string tagName = args.read_token();
-																					int reachType = MeCtReachEngine::getReachType(tagName);//
-																					if (reachType == -1)
-																						reachType = MeCtReachEngine::RIGHT_ARM;
-																					SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
-																					//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
-																					if (motion)
-																					{
-																						// assume the right hand motion and mirror the left hand motion
-																						addReachMotion(reachType,motion);
-																						return CMD_SUCCESS;
-																					}
-																					else
-																					{
-																						LOG( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
-																						return CMD_NOT_FOUND;
-																					}
-																				}
-																				else if (reach_cmd == "list")
-																				{
-																					int motion_num = this->reachMotionData.size();
-																					//SkMotion* motion = getReachMotion(motion_num);
-																					for (int c = 0; c < motion_num; c++)
-																					{
-																						LOG( "%s", getReachMotion(c)->name().c_str() );
-																					}
-																					return CMD_SUCCESS;
-																				}
-																				else if (reach_cmd == "build")
-																				{			
-																					if (reachEngineMap.size() == 0)
-																					{
-																						LOG("character %s, reach engine is not initialized.", this->getName().c_str());
-																						return CMD_FAILURE;
-																					}				
-																					ReachEngineMap::iterator mi;
-																					for ( mi  = reachEngineMap.begin();
-																						mi != reachEngineMap.end();
-																						mi++)
-																					{
-																						MeCtReachEngine* re = mi->second;
-																						if (re)
-																						{
-																							re->updateMotionExamples(getReachMotionDataSet());
-																						}
-																					}
-																					return (CMD_SUCCESS);
-																				}			
-																				else if (reach_cmd == "play")
-																				{
-																					int motion_num = args.read_int();
-																					SkMotion* motion = getReachMotion(motion_num);
-																					if (motion)
-																					{
-																						//motion->name()
-																						char cmd[256];
-																						sprintf(cmd,"bml char %s <body posture=\"%s\"/>",getName().c_str(),motion->name().c_str());
-																						mcuCBHandle::singleton().execute(cmd);
-																					}			
-																					return CMD_SUCCESS;
-																				}
-																				return CMD_FAILURE;
-																			}
-																			return( CMD_NOT_FOUND );
+											}
+											return (CMD_SUCCESS);
+										}			
+										else if (reach_cmd == "play")
+										{
+											int motion_num = args.read_int();
+											SkMotion* motion = getReachMotion(motion_num);
+											if (motion)
+											{
+												//motion->name()
+												char cmd[256];
+												sprintf(cmd,"bml char %s <body posture=\"%s\"/>",getName().c_str(),motion->name().c_str());
+												mcuCBHandle::singleton().execute(cmd);
+											}			
+											return CMD_SUCCESS;
+										}
+										return CMD_FAILURE;
+									}
+									return( CMD_NOT_FOUND );
 }
 int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
@@ -3010,6 +3050,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		LOG( "  eyelid tight <upper-norm> [<lower-norm>]" );
 		LOG( "  softeyes" );
 		LOG( "  sk <file> <scale>");
+		LOG( "  minibrain <on|off>");
 		return( CMD_SUCCESS );
 	}
 
@@ -3760,4 +3801,14 @@ void SbmCharacter::setNvbg(Nvbg* nvbg)
 Nvbg* SbmCharacter::getNvbg()
 {
 	return _nvbg;
+}
+
+void SbmCharacter::setMiniBrain(MiniBrain* mini)
+{
+	_miniBrain = mini;
+}
+
+MiniBrain* SbmCharacter::getMiniBrain()
+{
+	return _miniBrain;
 }
