@@ -12,6 +12,7 @@ struct ObjectData
 	SrVec relativeVelocity;
 	SrVec relativePosition;
 	double startGazeTime;
+	bool isAnimate;
 };
 
 class SbmCharacter;
