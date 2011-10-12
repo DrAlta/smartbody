@@ -56,6 +56,12 @@ Note: for smartbody iphone running on unity, we need to rename variables inside 
 5) Cross compiling python
 	Go to trunk/ios/python, modify the SBROOT inside setup-iphoneos.sh, then run the script.
 	
+6) Cross compiling pocket sphinx(Optional)
+	http://www.rajeevan.co.uk/pocketsphinx_in_iphone/
+	The steps are on the website. Since the results are not that good on Unity and I don't have time fully test out, the code is not intergrated into smartbody yet.
+	When integrating pocketsphinx with Unity, it would have duplicated symbol problem(this might be the reason of bad recognizing result, it's under sphinx/src/util). I really built a library for Unity that can be used directly.
+	Also for Unity you may need buy prime31 iphone plugin AudioRecorder
+	
 --------------------------------Compiling using Xcode4------------------------------
 1) Build bonebus
 	Open smartbody-iphone.xcworkspace, select the scheme to be bonebus, build
