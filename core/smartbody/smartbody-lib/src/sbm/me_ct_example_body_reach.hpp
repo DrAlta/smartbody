@@ -71,6 +71,7 @@ public:
 	void set_duration(float duration) { _duration = duration; }
 
 	void setHandActionState(MeCtReachEngine::HandActionState newState);
+	MeCtReachEngine::HandActionState getHandActionState();
 	void setLinearVelocity(float vel);
 	void setReachCompleteDuration(float duration);	
 	bool addHandConstraint(SkJoint* targetJoint, const char* effectorName);

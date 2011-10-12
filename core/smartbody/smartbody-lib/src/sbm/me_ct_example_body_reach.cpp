@@ -98,6 +98,11 @@ void MeCtExampleBodyReach::setHandActionState( MeCtReachEngine::HandActionState 
 	currentReachEngine->curHandActionState = newState;
 }
 
+MeCtReachEngine::HandActionState MeCtExampleBodyReach::getHandActionState()
+{
+	return currentReachEngine->curHandActionState;
+}
+
 
 void MeCtExampleBodyReach::setReachCompleteDuration( float duration )
 {
@@ -195,7 +200,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 		std::string charName = character->getName();		
 		SrVec curXZ = curPos; curXZ.y = 0.f;
 		SrVec targetDir = targetXZ - curXZ; targetDir.normalize();					
-		SrVec steerTarget = curXZ + targetDir*(dist - character->getHeight()*0.2f);
+		SrVec steerTarget = curXZ + targetDir*(dist);// - character->getHeight()*0.2f);
 		float facing = ((float)acos(dot(targetDir,SrVec(0,0,1))))*180.f/(float)M_PI;
 		if (dot(cross(targetDir,SrVec(0,0,1)),SrVec(0,1,0)) > 0.f)
 			facing = -facing;
@@ -218,11 +223,11 @@ bool MeCtExampleBodyReach::updateLocomotion()
 	}
 
 	if (isMoving && character->_reachTarget && !character->_lastReachStatus) // character is moving and has reached the target
-	{
+	{		
 		if (dist < character->getHeight()*0.35f)
 		{			
 			// choose the correct hand
-			//LOG("reach after locomotion\n");
+			LOG("reach after locomotion\n");
 			updateReachType(targetXZ);
 			//currentReachData->startReach = true;
 			startReach = true;
@@ -232,7 +237,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 		}
 		else
 		{
-			LOG("[Reach Controller] Warning : Locomotion can not reach the target\n");
+			LOG("[Reach Controller] Warning : Locomotion can not reach the target, dist = %f\n",dist);
 			//currentReachData->startReach = false;
 			startReach = false;
 			isMoving = false;

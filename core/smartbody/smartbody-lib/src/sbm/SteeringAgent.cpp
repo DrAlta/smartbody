@@ -170,7 +170,8 @@ void SteeringAgent::evaluate()
 
 	// Event Handler	
 	if (!character->_lastReachStatus && character->_reachTarget)
-	{		
+	{	
+		LOG("character reach the target");
 		std::string eventType = "locomotion";		
 		MotionEvent motionEvent;
 		motionEvent.setType(eventType);			

@@ -91,7 +91,6 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		{
 			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
 			MeController* controller = controllerTree->findControllerByHandle(handle);
-
 			bodyReachCt = dynamic_cast<MeCtExampleBodyReach*>(controller);
 		}
 
@@ -192,17 +191,35 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		bodyReachCt->setLinearVelocity(reachVelocity);		
 	}
 
+	bool hasTarget = false;
 	if( targetPawn )	{		
 		bodyReachCt->setReachTargetPawn(const_cast<SbmPawn*>(targetPawn));		
+		hasTarget = true;
 	}
 	else if (targetJoint)
 	{
 		bodyReachCt->setReachTargetJoint(const_cast<SkJoint*>(targetJoint));
+		hasTarget = true;
 	}
 	else if (attrTargetPos && XMLString::stringLen( attrTargetPos ))
 	{
 		bodyReachCt->setReachTargetPos(targetPos);
+		hasTarget = true;
 	}
+
+	// if we didn't specify a target and want to put down an object, infer the target position in front of character
+	if (!hasTarget && bodyReachCt->getHandActionState() == MeCtReachEngine::PUT_DOWN_OBJECT)
+	{
+		float x,y,z,h,p,r;
+		curCharacter->get_world_offset(x,y,z,h,p,r);	
+	    SrVec curPos = SrVec(x,y,z); curPos.y = 0;
+
+		float height = curCharacter->getHeight();
+	    SrVec fDir = curCharacter->getFacingDirection();
+		SrVec putDownTarget = curPos + fDir*height*0.2 + SrVec(0,height*0.6,0);
+		bodyReachCt->setReachTargetPos(putDownTarget);		
+	}
+
 
 	if (!consTargetName.empty() && !consJointName.empty())
 	{
