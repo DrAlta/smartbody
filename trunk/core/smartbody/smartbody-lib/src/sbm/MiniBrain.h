@@ -3,6 +3,7 @@
 
 #include <sr/sr_vec.h>
 #include <map>
+#include <string>
 
 struct ObjectData
 {
