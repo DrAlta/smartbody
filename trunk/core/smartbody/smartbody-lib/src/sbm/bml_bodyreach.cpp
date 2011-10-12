@@ -216,7 +216,8 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 		float height = curCharacter->getHeight();
 	    SrVec fDir = curCharacter->getFacingDirection();
-		SrVec putDownTarget = curPos + fDir*height*0.2 + SrVec(0,height*0.6,0);
+		SrVec temp(0.f, height * 0.6f ,0.f);
+		SrVec putDownTarget = curPos + fDir*height*0.2f + temp;
 		bodyReachCt->setReachTargetPos(putDownTarget);		
 	}
 
