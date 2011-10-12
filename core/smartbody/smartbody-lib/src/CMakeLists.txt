@@ -310,6 +310,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SbmPythonClass.cpp
 
 	sbm/nvbg.cpp
+	sbm/MiniBrain.cpp
 
 )
 

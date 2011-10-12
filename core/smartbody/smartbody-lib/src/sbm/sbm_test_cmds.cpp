@@ -228,7 +228,8 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 	if( seq_id.length()==0 ) {
 		if( echo ) {
 			build_vrX( msg, cmd, char_id, recip_id, bml, false );
-			LOG("%s %s", cmd, msg.str().c_str());
+			// removed logging of vr messages
+			//LOG("%s %s", cmd, msg.str().c_str());
 		}
 
 		if( send ) {

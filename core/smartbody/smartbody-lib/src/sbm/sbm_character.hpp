@@ -79,6 +79,7 @@
 
 #include <sbm/me_ct_data_receiver.h>
 #include <sbm/nvbg.h>
+#include <sbm/MiniBrain.h>
 
 //#include <me/me_spline_1d.hpp>
 class MeCtMotionPlayer;
@@ -165,6 +166,7 @@ protected:
 	bool _isControllerPruning;
 
 	Nvbg* _nvbg;
+	MiniBrain* _miniBrain;
 public:
 	//  Methods
 	SbmCharacter();
@@ -396,6 +398,9 @@ public:
 
 	virtual void setNvbg(Nvbg* nvbg);
 	virtual Nvbg* getNvbg();
+
+	virtual void setMiniBrain(MiniBrain* mini);
+	virtual MiniBrain* getMiniBrain();
 
 private:
 
