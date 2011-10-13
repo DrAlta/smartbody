@@ -214,6 +214,7 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 	float blendTime = 0.0f;
 	float blendIval = 0.0f;
 	float startTime = 0.0f;
+	float articulation = 1.0f;
 	if(node->getNodeType()==1){ //node is an element node
 		DOMElement *element= (DOMElement *)node; //instantiate an element using this node
 		if( XMLString::compareString( element->getTagName(), BML::BMLDefs::TAG_VISEME )==0 ){
@@ -231,12 +232,15 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 				else if( XMLString::compareString( attr, BML::BMLDefs::ATTR_START )==0 ) {
 					startTime = xml_utils::xml_translate_float(attributes->item(i)->getNodeValue());
 				}
+				else if( XMLString::compareString( attr, BML::BMLDefs::TAG_ARTICULATION )==0 ) {
+					articulation = xml_utils::xml_translate_float(attributes->item(i)->getNodeValue(), 1.0f);
+				}
 			}
 			if( id != "") {
 #if USE_CURVES_FOR_VISEMES
 				curViseme = new VisemeData(id, startTime);
 #else
-				curViseme = new VisemeData(id.c_str(), 1.0, startTime, 0.0f, 0.0f, 0.0f); //the weight is always made one
+				curViseme = new VisemeData(id.c_str(), articulation, startTime, 0.0f, 0.0f, 0.0f); //the weight is always made one
 #endif
 				if ( visemes->size() > 0 ) 
 				{   
