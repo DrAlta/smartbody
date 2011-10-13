@@ -27,6 +27,15 @@
 #include "local_speech.h"
 #ifdef WIN32
 #include <direct.h>
+#define getFullPath(result,filename) _fullpath(result,filename,_MAX_PATH)
+#define checkPermission(pathname,mode) _access(pathname,mode)
+#define makeDirectory(pathname) _mkdir(pathname)
+#else
+#include <unistd.h>
+#define _MAX_PATH 3000
+#define getFullPath(result,filename) realpath(filename,result)
+#define checkPermission(pathname,mode) access(pathname,mode)
+#define makeDirectory(pathname) mkdir(pathname,0777)
 #endif
 
 #if 0
@@ -62,12 +71,14 @@ class XStr
       XStr( const char * const toTranscode )
       {
          // Call the private transcoding method
-         fUnicodeForm = XMLString::transcode( toTranscode );
+         //fUnicodeForm = xercesc_3_0::XMLString::transcode( toTranscode );
+	  fUnicodeForm = XMLString::transcode( toTranscode );
       }
 
       ~XStr()
       {
-         XMLString::release( &fUnicodeForm );
+         //xercesc_3_0::XMLString::release( &fUnicodeForm );
+	  XMLString::release( &fUnicodeForm );
       }
 
 
@@ -131,7 +142,7 @@ std::string FestivalSpeechRelayLocal::generateReply(const char * utterance,const
 
 	removeTabsFromString(spoken_text);
 
-	//printf( "generateReply() - \nbefore: '%s'\nafter: '%s'\n'%s'\n", utterance, spoken_text.c_str(), soundFileName );
+	LOG( "generateReply() - \nbefore: '%s'\nafter: '%s'\n'%s'\n", utterance, spoken_text.c_str(), soundFileName );
 
 	//festival_say_text(spoken_text.c_str());
 	festival_text_to_wave(spoken_text.c_str(),wave);
@@ -212,12 +223,12 @@ std::string FestivalSpeechRelayLocal::CreateMarkTimeStamps(std::string text)
 		temp = temp.substr(0, tempText.find_first_of(" "));
 
 		char number[256];
-		sprintf_s(number, "%d", i);
+		sprintf(number, "%d", i);
 		markUp = markUp.append("<mark name=\"T");
 		markUp = markUp.append(number);
 		markUp = markUp.append("\" />");
 		markUp = markUp.append(temp + "\n\n");
-		sprintf_s(number, "%d", ++i);
+		sprintf(number, "%d", ++i);
 		markUp = markUp.append("<mark name=\"T");
 		markUp = markUp.append(number);
 		markUp = markUp.append("\" />\n\n");
@@ -255,8 +266,10 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
    xmlMetaData.tags.clear();
    xmlMetaData.words.clear();
    /// Start an XML parser to parse the message we have received
-   xercesc_3_0::XMLPlatformUtils::Initialize();
-   xercesc_3_0::XercesDOMParser *parser = new XercesDOMParser();
+   //xercesc_3_0::XMLPlatformUtils::Initialize();
+   //xercesc_3_0::XercesDOMParser *parser = new XercesDOMParser(); 
+   XMLPlatformUtils::Initialize();
+   XercesDOMParser *parser = new XercesDOMParser(); 
 
    std::string truncatedTxt = txt.substr(txt.find_first_of(">")+1);
    char * message = (char*)truncatedTxt.c_str();
@@ -264,7 +277,8 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
    std::string actualText = "";
 
    /// Set up a parser for XML message in memory - code sourced from unknown online reference for Xerces XML library
-   xercesc_3_0::MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
+   //xercesc_3_0::MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
+   MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
    parser->parse(memIS);
    DOMDocument *doc = parser->getDocument();
    if ( doc )
@@ -342,13 +356,16 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
 
 
 					   /// Get the timing tag as a string
+						
 					   char * t1, *t2;
+					   char* spaceT = " ";        
 					   std::string markString(t1 = XMLString::transcode(mark));
 					   std::string speechString;
 
 					   if(speechNode !=NULL)
 					   {
-						   t2 = (speech)?XMLString::transcode(speech): " ";
+						   const char* transcodeT2 = (speech)? XMLString::transcode(speech): " ";
+						   t2 = const_cast<char*>(transcodeT2) ;
 						   speechString = t2;
 					   }
 					   else
@@ -462,15 +479,20 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	string remoteSpeechReply = agent_name+" "+message_id+" OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?><speak><soundFile name=\"";
 
 	char full[ _MAX_PATH ];
-	if ( _fullpath( full, festival_file_name.c_str(), _MAX_PATH ) == NULL )
+	if ( getFullPath( full, const_cast<char*>(festival_file_name.c_str())) == NULL )
 	{
-		printf("\nError converting path sent from SBM to absolute path\n");
+		LOG("\nError converting path sent from SBM to absolute path\n");
 	}
-	string soundPathName = full;
+#if defined(__ANDROID__)
+	string soundPathName = cacheDirectory + file_name;
+#else
+       string soundPathName = full;
+#endif
 
 	remoteSpeechReply += soundPathName+"\"/>";
 	remoteSpeechReply += replyXML + "</speak>";
-	//printf("Sound path name = %s\n",soundPathName.c_str());
+	LOG("replyXML = %s\n",replyXML.c_str());
+	LOG("Sound path name = %s\n",soundPathName.c_str());
 
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -479,6 +501,12 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	replyCmd = replyCmd + cmdConst;
 	//mcu.execute_later("RemoteSpeechReply", cmdConst ); //sends the remote speech command using singleton* MCU_p	
 	mcu.execute_later(replyCmd.c_str());
+}
+
+void FestivalSpeechRelayLocal::evalFestivalCommand( const char * cmd )
+{
+	int ret = festival_eval_command(cmd);
+	LOG("%s : ret = %d\n", cmd,ret);	
 }
 
 void FestivalSpeechRelayLocal::setVoice(std::string voice)
@@ -495,6 +523,9 @@ void FestivalSpeechRelayLocal::setVoice(std::string voice)
 
 void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string cacheDir)
 {
+	
+        freopen ("/sdcard/sbm/festivalLog.txt","w",stderr);
+
 	std::string scriptFile = "";
 	//std::string voice = "voice_kal_diphone";
 	std::string voice = "voice_roger_hts2010";
@@ -534,7 +565,6 @@ void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string 
 		std::stringstream strstr;
 		strstr << "(set! voice_default '" << voice << ")";
 		festivalCommands.push_back(strstr.str());
-		
 	}
 
 	LOG("\n");
@@ -547,7 +577,7 @@ void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string 
 	
 	printf( "Checking for Cache Directory\n");
 	// check to see if cache directory exists and if not create it
-	if( !(_access( cache_directory.c_str(), 0 ) == 0 ) )
+	if( !(checkPermission( cache_directory.c_str(), 0 ) == 0 ) )
     {
 		std::string temp = "";
 		std::vector< std::string > tokens;
@@ -557,7 +587,7 @@ void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string 
 		for (unsigned int i = 0; i < tokens.size(); i++)
 		{
 		 temp += tokens.at( i ) + "/";
-		 _mkdir( temp.c_str() );
+		 makeDirectory( temp.c_str() );
 		}
 	}
 	LOG( "Done Initializing local speech relay\n");	    
@@ -605,6 +635,10 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
 void FestivalSpeechRelayLocal::cleanString(std::string &message)
 {
 	
+}
+
+void FestivalSpeechRelayLocal::evalFestivalCommand( const char * cmd )
+{
 }
 
 void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )

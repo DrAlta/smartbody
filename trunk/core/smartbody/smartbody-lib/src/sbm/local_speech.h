@@ -46,6 +46,7 @@ public:
 	~FestivalSpeechRelayLocal();
 	void initSpeechRelay(std::string libPath, std::string cacheDirectory);
 	void processSpeechMessage( const char * message );
+       void evalFestivalCommand( const char * cmd );
 	void setVoice(std::string voice);
 protected:
 	std::string generateReply(const char * utterance,const char * soundFileName);
