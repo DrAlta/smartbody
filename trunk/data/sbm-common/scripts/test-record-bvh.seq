@@ -2,6 +2,7 @@
 # Each Characters have two animations, stop one animation before staring another one
 # Yuyu Xu, USC
 
+0	time simfps 60
 0	ctrl ~doctor/motion_sched record bvh start
 0 	test bml char doctor anim HandsAtSide_Arms_Sweep
 1	ctrl ~elder/motion_sched record bvh start

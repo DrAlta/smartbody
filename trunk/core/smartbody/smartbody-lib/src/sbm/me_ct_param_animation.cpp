@@ -74,8 +74,8 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	double timeStep = t - prevGlobalTime;
 	prevGlobalTime = t;
 	autoScheduling(t);
-	controllerBlending->updateBuffer(frame.buffer());
-
+	if (controllerBlending)
+		controllerBlending->updateBuffer(frame.buffer());
 	//--make sure there is always a pseudo idle state running in the system
 	if (!curStateModule && !nextStateModule)
 		schedule(NULL, true, true);
@@ -214,9 +214,8 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 //				std::cout << "current state " << curStateModule->data->stateName << " " << curStateModule->timeManager->localTime << std::endl;
 			curStateModule->evaluate(timeStep, frame.buffer());
 			updateWo(curStateModule->woManager->getBaseTransformMat(), woWriter, frame.buffer());
-			if (controllerBlending->getKey(t) > 0.0)
-				PATransitionManager::bufferBlending(frame.buffer(), controllerBlending->getBuffer(), frame.buffer(), controllerBlending->getKey(t), _context);
-			return true;
+			if (controllerBlending)
+				if (controllerBlending->getKey(t) > 0.0)					PATransitionManager::bufferBlending(frame.buffer(), controllerBlending->getBuffer(), frame.buffer(), controllerBlending->getKey(t), _context);			return true;
 		}
 		else
 		{
@@ -384,9 +383,9 @@ void MeCtParamAnimation::autoScheduling(double time)
 		LOG("State %s being scheduled.[ACTIVE]", curStateModule->data->stateName.c_str());
 #endif
 		waitingList.pop_front();
-		controllerBlending->addKey(time, 1.0);
-		controllerBlending->addKey(time + defaultTransition, 0.0);
-	}
+		if (controllerBlending)
+		{
+			controllerBlending->addKey(time, 1.0);			controllerBlending->addKey(time + defaultTransition, 0.0);		}	}
 	else
 	{
 		if (transitionManager)
@@ -445,8 +444,10 @@ PAStateModule* MeCtParamAnimation::createStateModule(PAStateData* stateData, boo
 	{
 		module->interpolator->setMotionContextMaps(_context);
 		module->interpolator->initChanId(_context, baseJointName);
+		module->interpolator->initPreRotation(character->getSkeleton()->search_joint(baseJointName.c_str())->quat()->prerot());
 		module->woManager->setMotionContextMaps(_context);
 		module->woManager->initChanId(_context, baseJointName);
+		module->woManager->initPreRotation(character->getSkeleton()->search_joint(baseJointName.c_str())->quat()->prerot());
 	}
 	else
 		return NULL;
@@ -464,7 +465,7 @@ void MeCtParamAnimation::reset()
 	transitionManager = NULL;
 	waitingList.clear();	
 	delete controllerBlending;
-}
+	controllerBlending = NULL;}
 
 void MeCtParamAnimation::updateWo(SrMat&mat, MeCtChannelWriter* woWriter, SrBuffer<float>& buffer)
 {

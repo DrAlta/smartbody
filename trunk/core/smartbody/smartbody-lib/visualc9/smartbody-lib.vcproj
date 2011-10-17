@@ -1418,34 +1418,6 @@
 					RelativePath="..\src\me\me_ct_pose.h"
 					>
 				</File>
-				<Filter
-					Name="paramanimation"
-					>
-					<File
-						RelativePath="..\src\sbm\me_ct_param_animation.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_param_animation.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_param_animation_data.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_param_animation_data.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_param_animation_utilities.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_param_animation_utilities.h"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="container"
@@ -1732,6 +1704,34 @@
 				</File>
 				<File
 					RelativePath="..\src\sbm\me_ct_breathing_interface.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="paramanimation"
+				>
+				<File
+					RelativePath="..\src\sbm\me_ct_param_animation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_param_animation.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_param_animation_data.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_param_animation_data.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_param_animation_utilities.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_param_animation_utilities.h"
 					>
 				</File>
 			</Filter>

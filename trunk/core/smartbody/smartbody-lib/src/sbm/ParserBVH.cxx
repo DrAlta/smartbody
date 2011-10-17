@@ -571,7 +571,10 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 	// create some defaults
 	{
 		double duration = double(motion.duration());
-		motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration * 2.0/3.0, duration);
+		if (duration > 1)
+			motion.synch_points.set_time(0.0, 0.2, duration / 2.0, duration / 2.0, duration / 2.0, duration - 0.2, duration);
+		else
+			motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration / 2.0, duration / 2.0, duration * 2.0 / 3.0, duration);
 		motion.compress();
 	}
 	return true;
