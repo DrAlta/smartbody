@@ -1552,6 +1552,8 @@ MeController* mcuCBHandle::lookup_ctrl( const string& ctrl_name, const char* pri
 			ctrl_p = char_p->head_sched_p;
 		} else if( ctrl_subname == "param_sched" ) {
 			ctrl_p = char_p->param_sched_p;
+		} else if( ctrl_subname == "data_receiver" ) {
+			ctrl_p = char_p->datareceiver_ct;
 		} else {
 			// TODO: Character specific hash map?
 
@@ -1828,8 +1830,6 @@ bool mcuCBHandle::checkExamples()
 	standardRequiredStates.push_back("UtahLocomotion");
 	standardRequiredStates.push_back("UtahStartingLeft");
 	standardRequiredStates.push_back("UtahStartingRight");
-	standardRequiredStates.push_back("UtahStopToWalk");
-	standardRequiredStates.push_back("UtahWalkToStop");
 	standardRequiredStates.push_back("UtahIdleTurnLeft");
 	standardRequiredStates.push_back("UtahIdleTurnRight");
 	standardRequiredStates.push_back("UtahStep");
@@ -1841,7 +1841,7 @@ bool mcuCBHandle::checkExamples()
 		if (!state)
 		{
 			numMissing++;
-			LOG("SteeringAgent::checkExamples() standard config: Could not find state '%s' needed for example-based locomotion.", standardRequiredStates[x].c_str());
+//			LOG("SteeringAgent::checkExamples() standard config: Could not find state '%s' needed for example-based locomotion.", standardRequiredStates[x].c_str());
 		}
 	}
 	if (numMissing > 0)
@@ -1857,7 +1857,6 @@ bool mcuCBHandle::checkExamples()
 
 	std::vector<std::string> minimalRequiredStates;
 	minimalRequiredStates.push_back("UtahLocomotion");
-	minimalRequiredStates.push_back("UtahStep");
 
 	int numMissing1 = 0;
 	for (size_t x = 0; x < minimalRequiredStates.size(); x++)
@@ -1866,7 +1865,7 @@ bool mcuCBHandle::checkExamples()
 		if (!state)
 		{
 			numMissing1++;
-			LOG("SteeringAgent::checkExamples() minimal config: Could not find state '%s' needed for example-based locomotion.", minimalRequiredStates[x].c_str());
+//			LOG("SteeringAgent::checkExamples() minimal config: Could not find state '%s' needed for example-based locomotion.", minimalRequiredStates[x].c_str());
 		}
 	}
 

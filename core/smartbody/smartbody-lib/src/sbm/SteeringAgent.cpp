@@ -47,7 +47,7 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	speedThreshold = 0.1f;
 	angleSpeedThreshold = 10.0f;
 	distThreshold = 1.80f;			// exposed, unit: meter
-	distDownThreshold = 0.4f;
+	distDownThreshold = 0.3f;
 
 	desiredSpeed = 1.0f;			// exposed, unit: meter/sec
 	facingAngle = -200.0f;			// exposed, unit: deg
@@ -171,7 +171,7 @@ void SteeringAgent::evaluate()
 	// Event Handler	
 	if (!character->_lastReachStatus && character->_reachTarget)
 	{	
-		LOG("character reach the target");
+		LOG("%s reach the target", character->getName().c_str());
 		std::string eventType = "locomotion";		
 		MotionEvent motionEvent;
 		motionEvent.setType(eventType);			
@@ -1007,7 +1007,6 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 				}				
 			}
 			PAStateData* locoState = mcu.lookUpPAState("UtahLocomotion");
-
 			for (int i = 0; i < locoState->getNumMotions(); i++)
 			{
 				if (i == 0)

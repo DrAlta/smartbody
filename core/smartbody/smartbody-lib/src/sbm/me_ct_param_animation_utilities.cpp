@@ -224,6 +224,14 @@ void PAMotions::initChanId(MeControllerContext* context, std::string baseJointNa
 	baseBuffId.q = context->toBufferIndex(baseChanId.q);
 }
 
+void PAMotions::initPreRotation(const SrQuat& q)
+{
+	basePrerot.w = q.w;
+	basePrerot.x = q.x;
+	basePrerot.y = q.y;
+	basePrerot.z = q.z;
+}
+
 
 void PAMotions::getBuffer(SkMotion* motion, double t, SrBuffer<int> map, SrBuffer<float>& buff)
 {
@@ -265,6 +273,22 @@ void PAMotions::getUpdateMat(SrMat& dest, SrMat& src)
 {
 	SrQuat quat = SrQuat(src);
 
+	SrMat prerotMat;
+//	prerot.get_mat(prerotMat);
+	basePrerot.get_mat(prerotMat);
+/*
+	SrMat src0 = src * prerotMat.inverse();
+	SrMat mat0;
+	float rx, ry, rz;
+	sr_euler_angles(rotType, src0, rx, ry, rz);
+	rx = 0.0;
+	rz = 0.0;
+	sr_euler_mat(rotType, mat0, rx, ry, rz);
+	SrMat mat;
+	mat = mat0;// * prerotMat;
+	SrQuat quatP = SrQuat(mat);
+*/
+/*
 	SrMat mat;
 	float rx, ry, rz;
 	sr_euler_angles(rotType, src, rx, ry, rz);
@@ -272,13 +296,25 @@ void PAMotions::getUpdateMat(SrMat& dest, SrMat& src)
 	rz = 0.0;
 	sr_euler_mat(rotType, mat, rx, ry, rz);
 	SrQuat quatP = SrQuat(mat);
-
-/*
-	SrVec vec = quat.axis() * quat.angle();
-	vec.x = 0;
-	vec.z = 0;
-	SrQuat quatP = SrQuat(vec);
 */
+	SrVec vec = quat.axis() * quat.angle();
+	SrVec vec1 = vec * prerotMat.inverse();
+	quat = SrQuat(vec1);
+	SrMat mat;
+	quat.get_mat(mat);
+	float rx, ry, rz;
+	sr_euler_angles(rotType, mat, rx, ry, rz);
+	rx = 0.0;
+	rz = 0.0;
+	sr_euler_mat(rotType, mat, rx, ry, rz);
+	SrQuat quatP = SrQuat(mat);
+
+//	SrVec vec = quat.axis() * quat.angle();
+//	SrVec vec1 = vec * prerotMat.inverse();
+//	vec1.x = 0;
+//	vec1.z = 0;
+//	SrQuat quatP = SrQuat(vec1);
+
 /*
 	quat_t q = quat_t(quat.w, quat.x, quat.y, quat.z);
 	euler_t e = euler_t(q);	
@@ -297,18 +333,43 @@ void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 {
 	SrQuat quat = SrQuat(src);
 
+	SrMat prerotMat;
+//	prerot.get_mat(prerotMat);
+	basePrerot.get_mat(prerotMat);
+/*
+	SrMat src0 = src * prerotMat.inverse();
+	SrMat mat0;
+	float rx, ry, rz;
+	sr_euler_angles(rotType, src0, rx, ry, rz);
+	ry = 0.0;
+	sr_euler_mat(rotType, mat0, rx, ry, rz);
+	SrMat mat;
+	mat = mat0 * prerotMat;
+	SrQuat quatP = SrQuat(mat);
+*/
+	/*
 	SrMat mat;
 	float rx, ry, rz;
 	sr_euler_angles(rotType, src, rx, ry, rz);
 	ry = 0.0;
 	sr_euler_mat(rotType, mat, rx, ry, rz);
 	SrQuat quatP = SrQuat(mat);
-
-/*
-	SrVec vec = quat.axis() * quat.angle();
-	vec.y = 0.0;
-	SrQuat quatP = SrQuat(vec);	
 	*/
+	
+	SrVec vec = quat.axis() * quat.angle();
+	SrVec vec1 = vec * prerotMat.inverse();
+	quat = SrQuat(vec1);
+	SrMat mat;
+	quat.get_mat(mat);
+	float rx, ry, rz;
+	sr_euler_angles(rotType, mat, rx, ry, rz);
+	ry = 0.0;
+	sr_euler_mat(rotType, mat, rx, ry, rz);
+	SrQuat quatP = SrQuat(mat);
+	vec1 = quatP.axis() * quatP.angle();
+	SrVec vec2 = vec1 * prerotMat;
+	quatP = SrQuat(vec2);
+
 /*
 	quat_t q = quat_t(quat.w, quat.x, quat.y, quat.z);
 	euler_t e = euler_t(q);

@@ -85,6 +85,7 @@ class PAMotions
 		std::vector<SrBuffer<int> > motionContextMaps;
 		JointChannelId baseChanId;
 		JointChannelId baseBuffId;
+		SrQuat basePrerot;
 
 	public:
 		PAMotions();
@@ -94,6 +95,7 @@ class PAMotions
 		int getNumMotions();
 		void setMotionContextMaps(MeControllerContext* context);
 		void initChanId(MeControllerContext* context, std::string baseJointName);
+		void initPreRotation(const SrQuat& q);
 
 	protected:
 		void getBuffer(SkMotion* motion, double t, SrBuffer<int> map, SrBuffer<float>& buff);
