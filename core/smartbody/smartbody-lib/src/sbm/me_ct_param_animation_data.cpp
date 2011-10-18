@@ -970,9 +970,9 @@ double MotionParameters::getParameter(int type)
 	if (type == 1)
 		return getAccSpeed();
 	if (type == 2)
-		return getAvgAngularSpeed() * 50;
+		return getAvgAngularSpeed() * 100;
 	if (type == 3)
-		return getAccAngularSpeed() * 50;
+		return getAccAngularSpeed() * 100;
 	if (type == 4)
 		return getTransitionX();
 	if (type == 5)

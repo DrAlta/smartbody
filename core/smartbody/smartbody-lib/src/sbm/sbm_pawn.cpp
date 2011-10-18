@@ -618,7 +618,7 @@ int SbmPawn::parse_pawn_command( std::string cmd, srArgBuffer& args, mcuCBHandle
 	}
 	else if (cmd == "setshape")
 	{
-		std::string geom_str = "box", color_str = "red", file_str = "";
+		std::string geom_str = "box", color_str = "red", file_str = "", type_str = "";
 		bool setRec = false;
 		bool has_geom = false;
 		SrVec size = SrVec(1.f,1.f,1.f);		
@@ -642,6 +642,9 @@ int SbmPawn::parse_pawn_command( std::string cmd, srArgBuffer& args, mcuCBHandle
 			} else if( option=="color" ) {
 				color_str = args.read_token();
 				has_geom = true;
+			} else if( option=="type" ) {
+				type_str = args.read_token();
+				has_geom = true;
 			} else if( option=="rec" ) {
 				setRec = true;
 				size[0] = steeringSpaceObjSize.x = args.read_float();
@@ -662,7 +665,8 @@ int SbmPawn::parse_pawn_command( std::string cmd, srArgBuffer& args, mcuCBHandle
 			// init steering space
 			if (!setRec)
 				steeringSpaceObjSize = size;//SrVec(size, size, size);
-			initSteeringSpaceObject();
+			if (type_str == "steering")
+				initSteeringSpaceObject();
 			return CMD_SUCCESS;
 		}
 		else
@@ -738,6 +742,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		std::string file_str = "";
 		std::string size_str = "";
 		std::string color_str = "red";
+		std::string type_str = "";
 		SrVec size = SrVec(1.f,1.f,1.f);
 		bool setRec = false;
 		SrVec rec;
@@ -753,7 +758,10 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			} else if (option == "file")
 			{
 				file_str = args.read_token();
-				has_geom = true;			
+				has_geom = true;	
+			} else if( option=="type" ) {
+				type_str = args.read_token();
+				has_geom = true;
 			} else if( option=="size" ) {
 				size_str = args.read_token();
 				has_geom = true;
@@ -817,7 +825,8 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 					float size = (float)atof(size_str.c_str());
 					pawn_p->steeringSpaceObjSize = SrVec(size, size, size);
 				}
-				pawn_p->initSteeringSpaceObject();
+				if (type_str == "steering")
+					pawn_p->initSteeringSpaceObject();
 			}
 		}
 		// 		else // default null geom object
