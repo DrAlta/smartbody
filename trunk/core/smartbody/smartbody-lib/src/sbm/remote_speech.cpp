@@ -244,7 +244,22 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 #endif
 				if ( visemes->size() > 0 ) 
 				{   
-					VisemeData* prevViseme = visemes->back();
+					int visemeIndex = visemes->size() - 1;
+					VisemeData* prevViseme = (*visemes)[visemeIndex];
+					VisemeData* origViseme = (*visemes)[visemeIndex];
+					while (fabs(prevViseme->time() - startTime) < .001)
+					{
+						visemeIndex--;
+						if (visemeIndex < 0)
+						{
+							prevViseme = origViseme;
+						}
+						else
+						{
+							prevViseme = (*visemes)[visemeIndex];
+						}
+					}
+
 					if (prevViseme->time() > startTime)
 					{
 							LOG("WARNING: Viseme %s has played at time %f comes before previous viseme %s at time %f. Reassigning start time to previous time.", curViseme->id(), curViseme->time(), prevViseme->id(), prevViseme->time());
