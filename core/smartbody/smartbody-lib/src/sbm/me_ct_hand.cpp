@@ -148,6 +148,8 @@ void MeCtHand::updateAttachedPawn()
 	//printf("update pawn\n");
 	SrMat effectorWorld = attachJoint->gmat();// motionParameter->getMotionFrameJoint(ikMotionFrame,reachEndEffector->name().get_string())->gmat();
 	SrMat newWorld = attachMat*effectorWorld;
+	SrVec pos = newWorld.get_translation();
+	//LOG("attached pawn world pos = %f %f %f",pos.x,pos.y,pos.z);
 	attachedPawn->setWorldOffset(newWorld);
 	attachedPawn->updateToColObject();
 }

@@ -268,7 +268,7 @@ void ReachHandAction::reachReturnAction( ReachStateData* rd )
 	sendReachEvent("reach",cmd);	
 	cmd = "char " + charName + " gazefade out 0.5";
 	
-	//sendReachEvent(cmd);
+	sendReachEvent("reach",cmd);
 	//rd->effectorState.removeAttachedPawn(rd);
 }
 
@@ -673,6 +673,7 @@ void ReachStateInterface::updateMotionInterp( ReachStateData* rd )
 	SRT stateError = SRT::diff(rd->getPoseState(rd->targetRefFrame),estate.ikTargetState);	
 
 	float percentTime = curStatePercentTime(rd,rd->curRefTime);		
+	//LOG("percent time = %f, dt = %f, ref time = %f, du = %f",percentTime,rd->dt, rd->curRefTime, rd->du);
 	float deltaPercent = percentTime - curStatePercentTime(rd,rd->curRefTime-rd->du);
 	float remain = 1.f - percentTime;
 	float weight = 1.f;
@@ -884,7 +885,14 @@ std::string ReachStatePreReturn::nextState( ReachStateData* rd )
 		}
 		else // return to rest pose
 		{
-			rd->curHandAction->reachReturnAction(rd);					
+			rd->curHandAction->reachReturnAction(rd);	
+
+			// fade out any gaze
+			std::string cmd;
+			std::string charName = rd->charName;
+			cmd = "char " + charName + " gazefade out 0.5";
+			rd->curHandAction->sendReachEvent("reach",cmd);
+
 			nextStateName = "Return";
 		}		
 	}

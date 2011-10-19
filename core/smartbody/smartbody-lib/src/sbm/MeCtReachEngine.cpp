@@ -427,6 +427,7 @@ ResampleMotion* MeCtReachEngine::createInterpMotion()
 void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame, float blendWeight)
 {
 	float du = 0.0;
+	//LOG("reach type = %s, dt = %f",getReachTypeTag().c_str(),dt);
 	if (initStart) // first start
 	{		
 		idleMotionFrame = inputFrame;
