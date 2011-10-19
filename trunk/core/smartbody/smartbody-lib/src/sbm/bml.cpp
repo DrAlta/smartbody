@@ -625,10 +625,11 @@ void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 		behavior->cleanup( mcu, request );
 	}
 	if( has_controllers ) {
-		// Schedule a prune command to clear them out later.
+		// Schedule a prune command to clear them out later.		
 		string command( "char " );
 		command += actorId;
 		command += " prune";
+		LOG("character prune command = %s",command.c_str());
 
 		if( mcu->execute_later( command.c_str(), 0 ) != CMD_SUCCESS ) {
 //		if( mcu->execute_later( command.c_str(), 1 ) != CMD_SUCCESS ) {

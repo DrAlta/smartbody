@@ -401,7 +401,7 @@ bool SbmGeomCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHa
 	SrVec crossHand = cross(handAxis,orienAxis); crossHand.normalize();
 	if (dot(crossHand,handXAxis) < 0.0 && dot(handAxis,orienAxis) < 0.7)
 		orienAxis = -orienAxis;
-
+	
 	SrQuat rot = SrQuat(handAxis,orienAxis);
 	outHandRot = rot*naturalRot;//naturalRot*rot;
 	outHandPos = getCenter() + SrVec(0,radius+offsetDist,0)*outHandRot;
