@@ -4,6 +4,7 @@
 #include <sbm/mcontrol_callbacks.h>
 #include "sbm/SBController.h"
 #include "sbm/me_utilities.hpp"
+#include "sbm/SBBehavior.h"
 
 namespace SmartBody {
 
@@ -560,6 +561,74 @@ void SBCharacter::setVoiceBackupCode(std::string param)
 const std::string& SBCharacter::getVoiceBackupCode()
 {
 	return get_voice_code_backup();
+}
+
+int SBCharacter::getNumBehaviors()
+{
+	std::vector<SBBehavior*>& behaviors = getBehaviors();
+	return behaviors.size();
+}
+
+SBBehavior* SBCharacter::getBehavior(int num)
+{
+	if (num < (int) _curBehaviors.size())
+		return _curBehaviors[num];
+	else
+		return NULL;
+}
+
+std::vector<SBBehavior*>& SBCharacter::getBehaviors()
+{
+	for (size_t b = 0; b < _curBehaviors.size(); b++)
+	{
+		delete _curBehaviors[b];
+	}
+	_curBehaviors.clear();
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	// locomotion
+	if (this->steeringAgent)
+	{
+		const SteerLib::AgentGoalInfo& goal = this->steeringAgent->getAgent()->currentGoal();
+		Util::Point goalTarget = goal.targetLocation;
+		LocomotionBehavior* locoBehavior = new LocomotionBehavior();
+		SrVec target(goalTarget.x, 0.f, goalTarget.z);
+		locoBehavior->setLocomotionTarget(target);
+		_curBehaviors.push_back(locoBehavior);
+	}
+
+	if (this->gaze_sched_p)
+	{
+		MeCtScheduler2::VecOfTrack tracks = gaze_sched_p->tracks();
+		for (size_t t = 0; t < tracks.size(); t++)
+		{
+			MeCtGaze* gazeCt = dynamic_cast<MeCtGaze*>(tracks[t]->animation_ct());
+			if (gazeCt)
+			{
+				float x, y, z;
+				SkJoint* joint = gazeCt->get_target_joint(x, y, z);
+				SkSkeleton* skeleton = joint->skeleton();
+				// who's skeleton is this? Very inefficient!
+				std::map<std::string, SbmPawn*>& pawns = mcu.getPawnMap();
+				for (std::map<std::string, SbmPawn*>::iterator iter = pawns.begin();
+					iter != pawns.end();
+					iter++)
+				{
+					SbmPawn* pawn = (*iter).second;
+					if (pawn->getSkeleton() == skeleton)
+					{
+						GazeBehavior* gazeBehavior = new GazeBehavior();
+						gazeBehavior->setGazeTarget(pawn->getName());
+						_curBehaviors.push_back(gazeBehavior);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	return _curBehaviors;
 }
 
 

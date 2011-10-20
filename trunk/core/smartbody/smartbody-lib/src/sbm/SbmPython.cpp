@@ -3,6 +3,7 @@
 #include "me/me_ct_scheduler2.h"
 #include "VisemeMap.hpp"
 #include "nvbg.h"
+#include "SBBehavior.h"
 
 #ifdef USE_PYTHON
 
@@ -501,6 +502,27 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("isUsePosition", &SBJoint::isUsePosition, "Determines if the joint uses position channels.")	
 		;
 
+	boost::python::class_<SBBehavior, boost::python::bases<DObject> >("SBBehavior")
+		//.def(boost::python::init<std::string, std::string>())
+		.def("getType", &SBBehavior::getType, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the type of the behavior.")
+		;
+
+	boost::python::class_<GazeBehavior, boost::python::bases<SBBehavior> >("GazeBehavior")
+	//.def(boost::python::init<std::string, std::string>())
+	.def("getGazeTarget", &GazeBehavior::getGazeTarget, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the gaze target.")
+	;
+
+	boost::python::class_<LocomotionBehavior, boost::python::bases<SBBehavior> >("LocomotionBehavior")
+	//.def(boost::python::init<std::string, std::string>())
+	.def("getLocomotionTarget", &LocomotionBehavior::getLocomotionTarget, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the locomotion target as a vector.")
+	;
+
+	boost::python::class_<SpeechBehavior, boost::python::bases<SBBehavior> >("SpeechBehavior")
+	//.def(boost::python::init<std::string, std::string>())
+	.def("getUtterance", &SpeechBehavior::getUtterance, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the current utterance.")
+	;
+
+
 	boost::python::class_<SBCharacter, boost::python::bases<DObject> >("SBCharacter")
 		//.def(boost::python::init<std::string, std::string>())
 		.def("getName", &SBCharacter::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the character.")
@@ -536,6 +558,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("setVoiceBackupCode", &SBCharacter::setVoiceBackupCode, "Sets the voice backup code. For audiofile type, this is a path.")
 		.def("setFaceDefinition", &SBCharacter::setFaceDefinition, "Sets face definition (visemes, action units) for a character.")
 		.def("getHeight", &SBCharacter::getHeight, "Gets the height of the character.")
+		.def("getNumBehaviors", &SBCharacter::getNumBehaviors, "Returns the number of behaviors of the character.")
+		.def("getBehavior", &SBCharacter::getBehavior, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the ith behavior of the character.")
 
 #endif
 		//.def("getFaceDefinition", &SBCharacter::getFaceDefinition, "Gets face definition (visemes, action units) for a character.")
