@@ -2784,6 +2784,14 @@
 			Name="SB"
 			>
 			<File
+				RelativePath="..\src\sbm\SBBehavior.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBBehavior.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SBCharacter.cpp"
 				>
 			</File>

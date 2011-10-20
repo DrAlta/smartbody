@@ -311,6 +311,7 @@ set( SMARTBODY_LIB_SBM_SRC
 
 	sbm/nvbg.cpp
 	sbm/MiniBrain.cpp
+	sbm/SBBehavior.cpp
 
 )
 

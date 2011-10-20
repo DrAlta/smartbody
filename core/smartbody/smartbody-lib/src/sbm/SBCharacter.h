@@ -9,6 +9,7 @@
 namespace SmartBody {
 
 class SBSkeleton;
+class SBBehavior;
 
 class SBCharacter : public SbmCharacter
 {
@@ -68,7 +69,12 @@ class SBCharacter : public SbmCharacter
 		void initLocomotion(MeCtLocomotion* locoCtrl);
 		void linkControllers(SBController* ctrl);
 
+		int getNumBehaviors();
+		SBBehavior* getBehavior(int num);
+		std::vector<SBBehavior*>& getBehaviors();
 
+	protected:
+		std::vector<SBBehavior*> _curBehaviors;
 
 };
 
