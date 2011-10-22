@@ -83,6 +83,11 @@ using namespace std;
 using namespace WSP;
 #endif
 
+#if TABDEMO
+#include <cstdlib>
+#include <ctime> 
+#endif
+
 const bool LOG_ABORTED_SEQ = false;
 
 /////////////////////////////////////////////////////////////
@@ -394,7 +399,9 @@ void mcuCBHandle::registerCallbacks()
 	insert( "vrExpress",  mcu_vrExpress_func );
 
 	insert( "receiver",		mcu_joint_datareceiver_func );
-
+#if TABDEMO
+	insert( "SbmMessenger", mcu_sbm_messenger_func );
+#endif
 	insert( "net_reset",           mcu_net_reset );
 	insert( "net_check",           mcu_net_check );
 	insert( "RemoteSpeechCmd"  ,   mcuFestivalRemoteSpeechCmd_func );
@@ -1014,7 +1021,16 @@ void mcuCBHandle::update( void )	{
 		c--;
 	}
 #endif
-
+#if TABDEMO
+	if (vhmsg_enabled)	
+	{
+		int err = vhmsg::ttu_poll();
+		if( err == vhmsg::TTU_ERROR )	
+		{
+			fprintf( stderr, "ttu_poll ERROR\n" );
+		}
+	}
+#endif
 	// updating steering engine
 	if (steerEngine.isInitialized())
 	{
@@ -1114,7 +1130,7 @@ void mcuCBHandle::update( void )	{
 		texm.updateTexture();
 	}	
 #endif
-	
+
 	bool isClosingBoneBus = false;
     std::map<std::string, SbmPawn*>::iterator iter;
 	for (iter = getPawnMap().begin();
@@ -1135,7 +1151,6 @@ void mcuCBHandle::update( void )	{
 			pawn->updateToColObject();
 			pawn->updateToSteeringSpaceObject();
 		}
-
 		SbmCharacter* char_p = getCharacter(pawn->getName().c_str() );
 		if (!char_p)
 		{
@@ -1220,6 +1235,33 @@ void mcuCBHandle::update( void )	{
 		}  // end of char_p processing
 	} // end of loop
 
+#if TABDEMO
+	// update current state
+	float x, y, z, yaw, pitch, roll;
+	SbmCharacter* char_p = getCharacter(mydevicename);
+	if (char_p)
+	{
+		char_p->get_world_offset(x, y, z, yaw, pitch, roll);
+		if (x <= -600 && z >= -300)	// offscreenL
+		{
+			std::string send = "reportposstate " + mydevicename + " offscreenL";
+			vhmsg::ttu_notify2("SbmMessenger", send.c_str());
+			currentstate = "offscreenL";
+		}
+		else if (x >= 600 && z >= -300)	// offscreenR
+		{
+			std::string send = "reportposstate " + mydevicename + " offscreenR";
+			vhmsg::ttu_notify2("SbmMessenger", send.c_str());
+			currentstate = "offscreenR";
+		}
+		else
+		{
+			std::string send = "reportposstate " + mydevicename + " onscreen";	
+			vhmsg::ttu_notify2("SbmMessenger", send.c_str());
+			currentstate = "onscreen";
+		}
+	}
+#endif
 	if (isClosingBoneBus)
 	{
 		for (std::map<std::string, SbmPawn*>::iterator iter = getPawnMap().begin();

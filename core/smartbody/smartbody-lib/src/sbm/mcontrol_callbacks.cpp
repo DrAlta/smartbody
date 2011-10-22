@@ -5937,6 +5937,160 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 }
 
 
+#if TABDEMO
+int mcu_sbm_messenger_func(srArgBuffer& args, mcuCBHandle *mcu_p)
+{
+	std::string command = args.read_token();
+	
+	//--- unity controlling functions
+	if (command == "move")
+	{
+		std::string direction = args.read_token();
+		std::string retCommand = "funcgoaway " + mcu_p->mydevicename + " " + direction;
+		vhmsg::ttu_notify2("SbmMessenger", retCommand.c_str());
+	}
+	if (command == "gaze")
+	{
+		if (mcu_p->currentstate == "onscreen")
+		{
+			std::string x = args.read_token();
+			std::string y = args.read_token();
+			std::string z = args.read_token();
+			std::string retCommand = "bml char " + mcu_p->mydevicename + " <gaze sbm:joint-speed=\"1000\" target=\"point\" sbm:target-pos=\"" + x + " " + y + " " + z + "\"/>";
+			mcu_p->execute((char *)retCommand.c_str());
+		}
+	}
+	if (command == "steer")
+	{
+		if (mcu_p->currentstate == "onscreen")
+		{
+			std::string x = args.read_token();
+			std::string z = args.read_token();
+			std::stringstream ss;
+			ss << "steer move " << mcu_p->mydevicename << " " << x << " 0 " << z;
+			mcu_p->execute((char *)ss.str().c_str());
+		}
+	}
+	if (command == "singleclick")	// single click on agent
+	{
+		int lowest = 1, highest = 7;
+		int range = (highest - lowest) + 1; 
+		int id = lowest + int(range*rand() / (RAND_MAX + 1.0));
+		LOG("random number is %d", id);
+		std::string retCommand;
+		switch (id)
+		{
+		case 1:
+			retCommand = "bml char " + mcu_p->mydevicename + " <head type=\"nod\"/>";
+			mcu_p->execute((char *)retCommand.c_str());
+			break;
+		case 2:
+			retCommand = "bml char " + mcu_p->mydevicename + " <head type=\"shake\"/>";
+			mcu_p->execute((char *)retCommand.c_str());
+			break;
+		case 3:
+			retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleFlinch_ToIdleHandsAtSide001\"/>";
+			mcu_p->execute((char *)retCommand.c_str());
+			break;
+		case 4:
+			retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleHandsAtSide_BeatBothLow001\"/>";
+			mcu_p->execute((char *)retCommand.c_str());
+			break;
+		case 5:
+			retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleHandsAtSide_FlinchGunshot001\"/>";
+			mcu_p->execute((char *)retCommand.c_str());
+			break;
+		case 6:
+			retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleHandsAtSide_PointForwardMid001\"/>";
+			mcu_p->execute((char *)retCommand.c_str());
+			break;
+		case 7:
+			retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleHandsAtSide_Shhhh001\"/>";
+			mcu_p->execute((char *)retCommand.c_str());
+			break;
+		default:
+			break;
+		}
+		// headnod
+		// headshake
+		// ChrUtah_IdleFlinch_ToIdleHandsAtSide001
+		// ChrUtah_IdleHandsAtSide_BeatBothLow001
+		// ChrUtah_IdleHandsAtSide_FlinchGunshot001
+		// ChrUtah_IdleHandsAtSide_PointForwardMid001
+		// ChrUtah_IdleHandsAtSide_Shhhh001
+	}
+	if (command == "setdevicename")
+	{
+		std::string deviceName = args.read_token();
+		mcu_p->mydevicename = deviceName;
+		LOG("Device name is %s\n", mcu_p->mydevicename.c_str());
+	}
+	if (command == "createcharacter")
+	{
+		std::string retCommand = "char " + mcu_p->mydevicename + " init test_billford_unity.sk art/BillFord/ChrBillFordPrefab ";
+		mcu_p->execute((char *)retCommand.c_str());
+		retCommand = "set character " + mcu_p->mydevicename + " world_offset x -800 z -200";
+		mcu_p->execute((char *)retCommand.c_str());
+		retCommand = "test bml character " + mcu_p->mydevicename + " noecho posture ChrUtah_IdleHandsAtSide001";
+		mcu_p->execute((char *)retCommand.c_str());
+	}
+	if (command == "register2server")
+	{
+		std::string retCommand = "register " + mcu_p->mydevicename;
+		vhmsg::ttu_notify2("SbmMessenger", retCommand.c_str());
+	}
+	if (command == "unregister2server")
+	{
+		std::string retCommand = "unregister " + mcu_p->mydevicename;
+		vhmsg::ttu_notify2("SbmMessenger", retCommand.c_str());
+	}
+
+	// functions from server
+	if (command == "setstate")
+	{
+		std::string deviceName = args.read_token();
+		std::string pos = args.read_token();
+		std::string mode = args.read_token();
+		LOG("%s %s %s\n", deviceName.c_str(), pos.c_str(), mode.c_str());
+		SbmCharacter* c = mcu_p->getCharacter(deviceName);
+		if (!c)
+			return CMD_SUCCESS;
+		float x, z;
+		if (pos == "onscreen")
+		{
+			x = 0;
+			z = 0;
+		}
+		if (pos == "offscreenL")
+		{
+			x = -700;
+			z = -200;
+		}
+		if (pos == "offscreenR")
+		{
+			x = 700;
+			z = -200;
+		}
+		if (mode == "godhand")
+		{
+			std::stringstream ss;
+			ss << "set character " << mcu_p->mydevicename << " world_offset x " << x << " z " << z;
+			mcu_p->execute((char *)ss.str().c_str());
+		}
+		if (mode == "loco")
+		{
+			std::stringstream ss;
+			ss << "steer move " << mcu_p->mydevicename << " " << x << " 0 " << z;
+			mcu_p->execute((char *)ss.str().c_str());
+			std::stringstream ss1;
+			ss1 << "steer facing " << mcu_p->mydevicename << " 0";
+			mcu_p->execute((char *)ss1.str().c_str());
+		}
+	}
+	return CMD_SUCCESS;
+}
+#endif
+
 int mcu_character_breathing( const char* name, srArgBuffer& args, mcuCBHandle *mcu_p) //Celso: Summer 2008
 {
 	SbmCharacter* char_p = mcu_p->getCharacter( name );
@@ -6223,7 +6377,9 @@ int mcu_vhmsg_connect_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		err = vhmsg::ttu_register( "vrKillComponent" );
 		err = vhmsg::ttu_register( "wsp" );
 		err = vhmsg::ttu_register( "receiver" );
-
+#if TABDEMO
+		err = vhmsg::ttu_register( "SbmMessenger" );
+#endif
 		mcu_p->vhmsg_enabled = true;
 		return CMD_SUCCESS;
 	} 

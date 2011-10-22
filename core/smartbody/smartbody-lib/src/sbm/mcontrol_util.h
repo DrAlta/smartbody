@@ -170,6 +170,7 @@ class SequenceManager
 
 class VHMsgLog;
 
+#define TABDEMO 1
 
 // Motion Controller Utility Callback Handle (Yes, seriously.)
 class mcuCBHandle {
@@ -185,6 +186,12 @@ class mcuCBHandle {
 	public:
 		enum LocomotionType {Basic, Example, Procedural};
 		enum SteeringStateConfig { MINIMAL = 0, STANDARD};
+
+#if TABDEMO
+		std::string mydevicename;
+		std::string currentstate;
+#endif
+
 
 		// Data
 		bool		loop;

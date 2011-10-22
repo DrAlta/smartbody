@@ -158,6 +158,9 @@ int stopprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 #endif
 
 int mcu_joint_datareceiver_func(srArgBuffer& args, mcuCBHandle *mcu_p);
+#if TABDEMO
+int mcu_sbm_messenger_func(srArgBuffer& args, mcuCBHandle *mcu_p);
+#endif
 int mcu_vrExpress_func(srArgBuffer& args, mcuCBHandle *mcu_p);
 int vhmsglog_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
