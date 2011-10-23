@@ -302,9 +302,9 @@ Build ${build.number} took ${total.build.time}
 
 Build size: ${dir.size.total} (${num.files.total} files, ${num.dirs.total} dirs)
 
-Build is available at \\arcade\SBM-Builds\${build.folder.name}
+Build is available at \\vhbuild\SBM-Builds\${build.folder.name}
 
-Log: \\arcade\SBM-Builds\${build.folder.name}\BuildLog.txt
+Log: \\vhbuild\SBM-Builds\${build.folder.name}\BuildLog.txt
 
 Revisions used:
 saso revisions (based off of r${build.svn.revision}):
