@@ -5973,9 +5973,7 @@ int mcu_sbm_messenger_func(srArgBuffer& args, mcuCBHandle *mcu_p)
 	}
 	if (command == "singleclick")	// single click on agent
 	{
-		int lowest = 1, highest = 7;
-		int range = (highest - lowest) + 1; 
-		int id = lowest + int(range*rand() / (RAND_MAX + 1.0));
+        int id = args.read_int();
 		LOG("random number is %d", id);
 		std::string retCommand;
 		switch (id)
@@ -6008,6 +6006,14 @@ int mcu_sbm_messenger_func(srArgBuffer& args, mcuCBHandle *mcu_p)
 			retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleHandsAtSide_Shhhh001\"/>";
 			mcu_p->execute((char *)retCommand.c_str());
 			break;
+        case 8:
+            retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleHandsAtSide_FlinchThunder001\"/>";
+            mcu_p->execute((char *)retCommand.c_str());
+            break;                
+        case 9:
+            retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleHoldingShotgun_CockHammer001\"/>";
+            mcu_p->execute((char *)retCommand.c_str());
+            break;                                
 		default:
 			break;
 		}
@@ -6029,7 +6035,7 @@ int mcu_sbm_messenger_func(srArgBuffer& args, mcuCBHandle *mcu_p)
 	{
 		std::string retCommand = "char " + mcu_p->mydevicename + " init test_billford_unity.sk art/BillFord/ChrBillFordPrefab ";
 		mcu_p->execute((char *)retCommand.c_str());
-		retCommand = "set character " + mcu_p->mydevicename + " world_offset x -800 z -200";
+		retCommand = "set character " + mcu_p->mydevicename + " world_offset x -650 z -200";
 		mcu_p->execute((char *)retCommand.c_str());
 		retCommand = "test bml character " + mcu_p->mydevicename + " noecho posture ChrUtah_IdleHandsAtSide001";
 		mcu_p->execute((char *)retCommand.c_str());
@@ -6063,12 +6069,12 @@ int mcu_sbm_messenger_func(srArgBuffer& args, mcuCBHandle *mcu_p)
 		}
 		if (pos == "offscreenL")
 		{
-			x = -700;
+			x = -650;
 			z = -200;
 		}
 		if (pos == "offscreenR")
 		{
-			x = 700;
+			x = 650;
 			z = -200;
 		}
 		if (mode == "godhand")
