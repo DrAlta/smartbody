@@ -296,6 +296,10 @@ mcuCBHandle::mcuCBHandle()
 	physicsEngine = new SbmPhysicsSimODE();
 	physicsEngine->initSimulation();
 	steeringScale = 0.01f;
+#if TABDEMO
+	currentstate = "";
+	mydevicename = "";
+#endif
 }
 
 /////////////////////////////////////////////////////////////
@@ -1244,21 +1248,30 @@ void mcuCBHandle::update( void )	{
 		char_p->get_world_offset(x, y, z, yaw, pitch, roll);
 		if (x <= -600 && z >= -300)	// offscreenL
 		{
-			std::string send = "reportposstate " + mydevicename + " offscreenL";
-			vhmsg::ttu_notify2("SbmMessenger", send.c_str());
-			currentstate = "offscreenL";
+			if (currentstate != "offscreenL")
+			{
+				std::string send = "reportposstate " + mydevicename + " offscreenL";
+				vhmsg::ttu_notify2("SbmMessenger", send.c_str());
+				currentstate = "offscreenL";
+			}
 		}
 		else if (x >= 600 && z >= -300)	// offscreenR
 		{
-			std::string send = "reportposstate " + mydevicename + " offscreenR";
-			vhmsg::ttu_notify2("SbmMessenger", send.c_str());
-			currentstate = "offscreenR";
+			if (currentstate != "offscreenR")
+			{
+				std::string send = "reportposstate " + mydevicename + " offscreenR";
+				vhmsg::ttu_notify2("SbmMessenger", send.c_str());
+				currentstate = "offscreenR";
+			}
 		}
 		else
 		{
-			std::string send = "reportposstate " + mydevicename + " onscreen";	
-			vhmsg::ttu_notify2("SbmMessenger", send.c_str());
-			currentstate = "onscreen";
+			if (currentstate != "onscreen")
+			{
+				std::string send = "reportposstate " + mydevicename + " onscreen";	
+				vhmsg::ttu_notify2("SbmMessenger", send.c_str());
+				currentstate = "onscreen";
+			}
 		}
 	}
 #endif
