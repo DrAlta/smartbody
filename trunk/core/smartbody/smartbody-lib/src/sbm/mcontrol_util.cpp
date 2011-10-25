@@ -1243,6 +1243,14 @@ void mcuCBHandle::update( void )	{
 	// update current state
 	float x, y, z, yaw, pitch, roll;
 	SbmCharacter* char_p = getCharacter(mydevicename);
+	static double prevRegisterTime = 0;
+	if ((time - prevRegisterTime) > 5)
+	{
+		std::string registerCommand = "register " + mydevicename;
+		vhmsg::ttu_notify2("SbmMessenger", registerCommand.c_str());
+		prevRegisterTime = time;
+	}
+
 	if (char_p)
 	{
 		char_p->get_world_offset(x, y, z, yaw, pitch, roll);
