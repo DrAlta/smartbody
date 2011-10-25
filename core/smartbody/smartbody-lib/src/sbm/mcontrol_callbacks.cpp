@@ -5945,31 +5945,33 @@ int mcu_sbm_messenger_func(srArgBuffer& args, mcuCBHandle *mcu_p)
 	//--- unity controlling functions
 	if (command == "move")
 	{
+		std::string retCommand = "char " + mcu_p->mydevicename + " gazefade out 0.5";
+		mcu_p->execute((char *)retCommand.c_str());
+
 		std::string direction = args.read_token();
-		std::string retCommand = "funcgoaway " + mcu_p->mydevicename + " " + direction;
+		retCommand = "funcgoaway " + mcu_p->mydevicename + " " + direction;
 		vhmsg::ttu_notify2("SbmMessenger", retCommand.c_str());
 	}
 	if (command == "gaze")
 	{
-		if (mcu_p->currentstate == "onscreen")
-		{
-			std::string x = args.read_token();
-			std::string y = args.read_token();
-			std::string z = args.read_token();
-			std::string retCommand = "bml char " + mcu_p->mydevicename + " <gaze sbm:joint-speed=\"1000\" target=\"point\" sbm:target-pos=\"" + x + " " + y + " " + z + "\"/>";
-			mcu_p->execute((char *)retCommand.c_str());
-		}
+		std::string x = args.read_token();
+		std::string y = args.read_token();
+		std::string z = args.read_token();
+		std::string retCommand = "bml char " + mcu_p->mydevicename + "brad" + " <gaze target=\"point\" sbm:target-pos=\"" + x + " " + y + " " + z + "\"/>";
+		mcu_p->execute((char *)retCommand.c_str());
+		retCommand = "bml char " + mcu_p->mydevicename + " <gaze sbm:joint-range=\"EYES NECK\" target=\"point\" sbm:target-pos=\"" + x + " " + y + " " + z + "\"/>";
+		mcu_p->execute((char *)retCommand.c_str());
 	}
 	if (command == "steer")
 	{
-		if (mcu_p->currentstate == "onscreen")
-		{
-			std::string x = args.read_token();
-			std::string z = args.read_token();
-			std::stringstream ss;
-			ss << "steer move " << mcu_p->mydevicename << " " << x << " 0 " << z;
-			mcu_p->execute((char *)ss.str().c_str());
-		}
+		std::string retCommand = "char " + mcu_p->mydevicename + "brad" + " gazefade out 0.5";
+		mcu_p->execute((char *)retCommand.c_str());
+
+		std::string x = args.read_token();
+		std::string z = args.read_token();
+		std::stringstream ss;
+		ss << "steer move " << mcu_p->mydevicename << "brad" << " " << x << " 0 " << z;
+		mcu_p->execute((char *)ss.str().c_str());
 	}
 	if (command == "singleclick")	// single click on agent
 	{
@@ -5979,39 +5981,39 @@ int mcu_sbm_messenger_func(srArgBuffer& args, mcuCBHandle *mcu_p)
 		switch (id)
 		{
 		case 1:
-			retCommand = "bml char " + mcu_p->mydevicename + " <head type=\"nod\"/>";
+			retCommand = "bml char " + mcu_p->mydevicename + "brad" + " <head type=\"nod\"/>";
 			mcu_p->execute((char *)retCommand.c_str());
 			break;
 		case 2:
-			retCommand = "bml char " + mcu_p->mydevicename + " <head type=\"shake\"/>";
+			retCommand = "bml char " + mcu_p->mydevicename + "brad" + " <head type=\"shake\"/>";
 			mcu_p->execute((char *)retCommand.c_str());
 			break;
 		case 3:
-			retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleFlinch_ToIdleHandsAtSide001\"/>";
+			retCommand = "bml char " + mcu_p->mydevicename + "brad" + " <animation name=\"ChrUtah_IdleFlinch_ToIdleHandsAtSide001\"/>";
 			mcu_p->execute((char *)retCommand.c_str());
 			break;
 		case 4:
-			retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleHandsAtSide_BeatBothLow001\"/>";
+			retCommand = "bml char " + mcu_p->mydevicename + "brad" + " <animation name=\"ChrUtah_IdleHandsAtSide_BeatBothLow001\"/>";
 			mcu_p->execute((char *)retCommand.c_str());
 			break;
 		case 5:
-			retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleHandsAtSide_FlinchGunshot001\"/>";
+			retCommand = "bml char " + mcu_p->mydevicename + "brad" + " <animation name=\"ChrUtah_IdleHandsAtSide_FlinchGunshot001\"/>";
 			mcu_p->execute((char *)retCommand.c_str());
 			break;
 		case 6:
-			retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleHandsAtSide_PointForwardMid001\"/>";
+			retCommand = "bml char " + mcu_p->mydevicename + "brad" + " <animation name=\"ChrUtah_IdleHandsAtSide_PointForwardMid001\"/>";
 			mcu_p->execute((char *)retCommand.c_str());
 			break;
 		case 7:
-			retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleHandsAtSide_Shhhh001\"/>";
+			retCommand = "bml char " + mcu_p->mydevicename + "brad" + " <animation name=\"ChrUtah_IdleHandsAtSide_Shhhh001\"/>";
 			mcu_p->execute((char *)retCommand.c_str());
 			break;
         case 8:
-            retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleHandsAtSide_FlinchThunder001\"/>";
+            retCommand = "bml char " + mcu_p->mydevicename + "brad" + " <animation name=\"ChrUtah_IdleHandsAtSide_FlinchThunder001\"/>";
             mcu_p->execute((char *)retCommand.c_str());
             break;                
         case 9:
-            retCommand = "bml char " + mcu_p->mydevicename + " <animation name=\"ChrUtah_IdleHoldingShotgun_CockHammer001\"/>";
+            retCommand = "bml char " + mcu_p->mydevicename + "brad" + " <animation name=\"ChrUtah_IdleHoldingShotgun_CockHammer001\"/>";
             mcu_p->execute((char *)retCommand.c_str());
             break;                                
 		default:
@@ -6039,6 +6041,13 @@ int mcu_sbm_messenger_func(srArgBuffer& args, mcuCBHandle *mcu_p)
 		mcu_p->execute((char *)retCommand.c_str());
 		retCommand = "test bml character " + mcu_p->mydevicename + " noecho posture ChrUtah_IdleHandsAtSide001";
 		mcu_p->execute((char *)retCommand.c_str());
+
+		retCommand = "char " + mcu_p->mydevicename + "brad" + " init common.sk art/Brad/BradPrefab ";
+		mcu_p->execute((char *)retCommand.c_str());
+		retCommand = "set character " + mcu_p->mydevicename + "brad" + " world_offset x 0 y 100 z 0";
+		mcu_p->execute((char *)retCommand.c_str());
+		retCommand = "bml char " + mcu_p->mydevicename + "brad" + " <body posture=\"ChrUtah_IdleHandsAtSide001\" start=\"1\"/>";
+		mcu_p->execute((char *)retCommand.c_str());
 	}
 	if (command == "register2server")
 	{
@@ -6064,8 +6073,8 @@ int mcu_sbm_messenger_func(srArgBuffer& args, mcuCBHandle *mcu_p)
 		float x, z;
 		if (pos == "onscreen")
 		{
-			x = 0;
-			z = 0;
+			x = 100;
+			z = -150;
 		}
 		if (pos == "offscreenL")
 		{
