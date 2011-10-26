@@ -2353,6 +2353,33 @@ else if( cmd == "bone" ) {
 								set_viseme_curve_mode(true);
 								return CMD_SUCCESS;
 							}
+							else if ( _stricmp( viseme, "reset") == 0)
+							{
+								// reset all of the visemes and action units to zero
+								// clear away all the controllers on the head schedule
+								MeCtScheduler2* scheduler = this->head_sched_p;
+								if (!scheduler)
+								{
+									LOG("No scheduler available");
+									return CMD_SUCCESS;
+								}
+								std::vector<MeCtScheduler2::TrackPtr> tracksToRemove;
+								MeCtScheduler2::VecOfTrack& tracks = scheduler->tracks();
+								for (size_t t = 0; t < tracks.size(); t++)
+								{
+									MeCtScheduler2::TrackPtr track = tracks[t];
+									MeController* controller = track->animation_ct();
+									MeCtChannelWriter* channelWriter = dynamic_cast<MeCtChannelWriter*>(controller);
+									if (channelWriter)
+									{
+										tracksToRemove.push_back(track);
+									}
+								}
+								scheduler->remove_tracks(tracksToRemove);
+								LOG("Removed %d visemes/Action Units", tracksToRemove.size());
+								return CMD_SUCCESS;
+							}
+
 							else if( _stricmp( viseme, "curveoff" ) == 0 )
 							{
 								set_viseme_curve_mode(false);
