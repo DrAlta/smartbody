@@ -5628,7 +5628,10 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			if (character)
 			{
 				character->statePrefix = args.read_token();
+				return CMD_SUCCESS;
 			}
+			else
+				return CMD_FAILURE;
 		}
 		else if (command == "type")
 		{
