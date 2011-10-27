@@ -300,6 +300,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/me_ct_data_receiver.cpp
 
 	sbm/SBCharacter.cpp
+	sbm/SBPawn.cpp
 	sbm/SBJoint.cpp
 	sbm/SBSkeleton.cpp
 	sbm/SBController.cpp
