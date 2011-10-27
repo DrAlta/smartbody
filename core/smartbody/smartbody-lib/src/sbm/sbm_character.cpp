@@ -93,14 +93,14 @@ MeCtSchedulerClass* CreateSchedulerCt( const char* character_name, const char* s
 	return sched_p;
 }
 
-SbmCharacter::SbmCharacter() : SbmPawn()
+SbmCharacter::SbmCharacter() : SBPawn()
 {
 	SbmCharacter::initData();
 	setClassType("");
 }
 
 SbmCharacter::SbmCharacter( const char* character_name, std::string type)
-:	SbmPawn( character_name )
+:	SBPawn( character_name )
 {
 	SbmCharacter::initData();
 	setClassType(type);
@@ -108,7 +108,7 @@ SbmCharacter::SbmCharacter( const char* character_name, std::string type)
 
 //  Constructor
 SbmCharacter::SbmCharacter( const char* character_name )
-:	SbmPawn( character_name ),
+:	SBPawn( character_name ),
 
 posture_sched_p( CreateSchedulerCt( character_name, "posture" ) ),
 motion_sched_p( CreateSchedulerCt( character_name, "motion" ) ),
@@ -2531,12 +2531,24 @@ else if( cmd == "bone" ) {
 							if (numRemaining == 2)
 							{
 								std::string visemeName = args.read_token();
+								float weight = args.read_float();
+								if (visemeName == "*")
+								{
+									// change all of the visemes
+									int numVisemes = faceDefinition->getNumVisemes();
+									for (int v = 0; v < numVisemes; v++)
+									{
+										std::string viseme = faceDefinition->getVisemeName(v);
+										faceDefinition->setVisemeWeight(viseme, weight);
+									}
+									LOG("Set all visemes to weight %f", visemeName.c_str(), weight);
+									return CMD_SUCCESS;
+								}
 								if (!faceDefinition->hasViseme(visemeName))
 								{
 									LOG("Character %s does not have viseme %s defined.", getName().c_str(), visemeName.c_str());
 									return CMD_FAILURE;
 								}
-								float weight = args.read_float();
 								faceDefinition->setVisemeWeight(visemeName, weight);
 								LOG("%s %f", visemeName.c_str(), weight);
 								return CMD_SUCCESS;

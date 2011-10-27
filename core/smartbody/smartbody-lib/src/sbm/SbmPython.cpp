@@ -175,16 +175,26 @@ BOOST_PYTHON_MODULE(SmartBody)
 	// characters
 
 //#ifndef __ANDROID__
+
+	boost::python::def("command", command, "Runs an old-Style SmartBody command.");
+	boost::python::def("commandAt", commandAt, "Runs an old-Style SmartBody command at a set time in the future.");
 	boost::python::def("getNumPawns", getNumPawns, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("getPawn", getPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the pawn object given its name. \n Input: pawn name \nOutput: pawn object");
+	boost::python::def("getPawnNames", getPawnNames, "Returns a list of all character names.\n Input: NULL \nOutput: list of pawn names");
 	boost::python::def("getNumCharacters", getNumCharacters, "Returns the number of characters.\n Input: NULL \nOutput: number of characters.");
-	boost::python::def("getCharacterByIndex", getCharacterByIndex, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the character object given its index. \n Input: character index \nOutput: character object");
 	boost::python::def("getCharacter", getCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the character object given its name. \n Input: character name \nOutput: character object");
 	boost::python::def("getCharacterNames", getCharacterNames, "Returns a list of all character names.\n Input: NULL \nOutput: list of character names");
+
 	boost::python::def("getEventManager", getEventManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event manager.");
 	boost::python::def("getMotion", getMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a the motion of given name.");
 	boost::python::def("run", runScript, "Runs a python script.");
 	boost::python::def("vhmsg", sendVHMsg, "Sends a virtual human message.");
 	boost::python::def("vhmsg2", sendVHMsg2, "Sends a virtual human message.");
+
+	boost::python::def("setDefaultCharacter", setDefaultCharacter, "Sets the default character.");
+	boost::python::def("setDefaultRecipient", setDefaultRecipient, "Sets the default recipient.");
+
+
 	//#endif
 
 #ifdef __ANDROID__
@@ -261,6 +271,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::def("removeCharacter", removeCharacter, "Remove the character given its name. \n Input: character name \n Output: NULL");
 	boost::python::def("createSkeleton", createSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a skeleton definition.");
 	boost::python::def("createController", createController, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new controller given a controller type and a controller name.");
+	boost::python::def("createPawn", createPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new pawn.");
+
 
 	// bml
 	boost::python::def("getBmlProcessor", getBmlProcessor, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the bml processor object.\n Input: NULL \nOutput: bml processor object");
@@ -522,21 +534,24 @@ BOOST_PYTHON_MODULE(SmartBody)
 	.def("getUtterance", &SpeechBehavior::getUtterance, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the current utterance.")
 	;
 
+	boost::python::class_<SBPawn, boost::python::bases<DObject> >("SBPawn")
+		.def("getName", &SBPawn::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the pawn..")
+		.def("getSkeleton", &SBPawn::getSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skeleton object of the pawn.")
+		.def("setSkeleton", &SBPawn::setSkeleton, "Attaches the skeleton to the character.")
+		.def("setName", &SBPawn::setName, "Sets or changes the name of the character.")
+		.def("getPosition", &SBPawn::getPosition, "Returns the current position of the character's world offset.")
+		.def("getOrientation", &SBPawn::getOrientation, "Returns the current orientation of the character's world offset.")
+		.def("setPosition", &SBPawn::setPosition, "Sets the current position of the character's world offset.")
+		.def("setOrientation", &SBPawn::setOrientation, "Set the current orientation of the character's world offset.")
+		.def("setHPR", &SBPawn::setHPR, "Sets the heading, pitch and roll of the character's world offset.")
+		.def("getHPR", &SBPawn::getHPR, "Gets the heading, pitch and roll of the character's world offset.")
 
-	boost::python::class_<SBCharacter, boost::python::bases<DObject> >("SBCharacter")
+	;
+
+	boost::python::class_<SBCharacter, boost::python::bases<SBPawn, DObject> >("SBCharacter")
 		//.def(boost::python::init<std::string, std::string>())
-		.def("getName", &SBCharacter::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the character.")
-		.def("setName", &SBCharacter::setName, "Sets or changes the name of the character.")
-		.def("getSkeleton", &SBCharacter::getSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skeleton object of the character.")
-		.def("setSkeleton", &SBCharacter::setSkeleton, "Attaches the skeleton to the character.")
 		.def("setMeshMap", &SBCharacter::setMeshMap, "Set the OpenCollada file for the character which contains all the smoothbinding information.")
 		.def("addMesh", &SBCharacter::addMesh, "Add obj mesh to current character for smoothbinding.")
-		.def("getPosition", &SBCharacter::getPosition, "Returns the current position of the character's world offset.")
-		.def("getOrientation", &SBCharacter::getOrientation, "Returns the current orientation of the character's world offset.")
-		.def("setPosition", &SBCharacter::setPosition, "Sets the current position of the character's world offset.")
-		.def("setOrientation", &SBCharacter::setOrientation, "Set the current orientation of the character's world offset.")
-		.def("setHPR", &SBCharacter::setHPR, "Sets the heading, pitch and roll of the character's world offset.")
-		.def("getHPR", &SBCharacter::getHPR, "Gets the heading, pitch and roll of the character's world offset.")
 		.def("isAutomaticPruning", &SBCharacter::isAutomaticPruning, "Returns true if the character's cotnroller are automatically pruned.")
 		.def("setAutomaticPruning", &SBCharacter::setAutomaticPruning, "Toggles the automatic pruning mechanism on or off.")
 		.def("pruneControllers", &SBCharacter::pruneControllers, "Prunes the controller tree.")

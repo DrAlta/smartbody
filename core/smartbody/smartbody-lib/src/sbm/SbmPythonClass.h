@@ -279,22 +279,29 @@ class Motion
 
 // SmartBody functions
 
-
+void command(const std::string& command);
+void commandAt(float seconds, const std::string& command);
 void pythonExit();
 void quitSbm();
 void reset();
 
 void printLog(const std::string& message);
 
+void setDefaultCharacter(const std::string& character);
+void setDefaultRecipient(const std::string& recipient);
+
 void runScript(std::string script);
 void sendVHMsg(std::string message);
 void sendVHMsg2(std::string messageType, std::string encodedMessage);
 int getNumCharacters();
 int getNumPawns();
+SBPawn* getPawn(std::string name);
+boost::python::list getPawnNames();
 SBCharacter* getCharacter(std::string name);
 boost::python::list getCharacterNames();
-SBCharacter* getCharacterByIndex(int index);
 SBCharacter* createCharacter(std::string char_name, std::string metaInfo = "");
+SBPawn* createPawn(std::string);
+
 SBSkeleton* createSkeleton(std::string char_name);
 SBController* createController(std::string controllerType, std::string controllerName);
 void removeCharacter(std::string charName);

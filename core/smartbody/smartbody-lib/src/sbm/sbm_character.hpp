@@ -33,6 +33,7 @@
 #include <set>
 #include <map>
 
+#include <sbm/SBPawn.h>
 
 #include <sk/sk_motion.h>
 
@@ -90,7 +91,7 @@ class SteeringAgent;
 class MeCtBasicLocomotion;
 class MeCtDataReceiver;
 
-class SbmCharacter : public SbmPawn	{
+class SbmCharacter : public SmartBody::SBPawn	{
 
 	// Locomotion + steering
 public:
