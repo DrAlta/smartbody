@@ -59,5 +59,13 @@
 2 bml char utah <saccade mode="listen"/>
 
 
+3 steer stateprefix doctor all
+3 steer stateprefix elder all
+3 steer stateprefix utah all
+3 steer stateprefix brad all
+
 4 steer start
-5 steer type example
+5 steer type doctor example
+5 steer type elder example
+5 steer type utah example
+5 steer type brad example

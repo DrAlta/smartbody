@@ -258,7 +258,6 @@ mcuCBHandle::mcuCBHandle()
 	use_param_animation( false ),
 	use_data_receiver( false ),
 	updatePhysics( false ),
-	locomotion_type( Basic ),
 	viewer_factory ( new SrViewerFactory() ),
 	bmlviewer_factory ( new GenericViewerFactory() ),
 	panimationviewer_factory ( new GenericViewerFactory() ),
@@ -1885,64 +1884,6 @@ void mcuCBHandle::addPATransition(PATransitionData* transition)
 {
 	if (!lookUpPATransition(transition->fromState->stateName, transition->toState->stateName))
 		param_anim_transitions.push_back(transition);
-}
-
-bool mcuCBHandle::checkExamples()
-{
-	std::vector<std::string> standardRequiredStates;
-	standardRequiredStates.push_back("UtahLocomotion");
-	standardRequiredStates.push_back("UtahStartingLeft");
-	standardRequiredStates.push_back("UtahStartingRight");
-	standardRequiredStates.push_back("UtahIdleTurnLeft");
-	standardRequiredStates.push_back("UtahIdleTurnRight");
-	standardRequiredStates.push_back("UtahStep");
-
-	int numMissing = 0;
-	for (size_t x = 0; x < standardRequiredStates.size(); x++)
-	{
-		PAStateData* state = lookUpPAState(standardRequiredStates[x]);
-		if (!state)
-		{
-			numMissing++;
-//			LOG("SteeringAgent::checkExamples() standard config: Could not find state '%s' needed for example-based locomotion.", standardRequiredStates[x].c_str());
-		}
-	}
-	if (numMissing > 0)
-	{
-		LOG("Steering cannot work under standard config.");
-	}
-	else
-	{
-		LOG("Steering works under standard config.");
-		steeringConfig = STANDARD;
-		return true;
-	}
-
-	std::vector<std::string> minimalRequiredStates;
-	minimalRequiredStates.push_back("UtahLocomotion");
-
-	int numMissing1 = 0;
-	for (size_t x = 0; x < minimalRequiredStates.size(); x++)
-	{
-		PAStateData* state = lookUpPAState(minimalRequiredStates[x]);
-		if (!state)
-		{
-			numMissing1++;
-//			LOG("SteeringAgent::checkExamples() minimal config: Could not find state '%s' needed for example-based locomotion.", minimalRequiredStates[x].c_str());
-		}
-	}
-
-	if (numMissing1 > 0)
-	{
-		LOG("Steering cannot work under minimal config.");
-		return false;
-	}
-	else
-	{
-		LOG("Steering works under minimal config.");
-		steeringConfig = MINIMAL;
-		return true;
-	}
 }
 
 void mcuCBHandle::setInteractive(bool val)

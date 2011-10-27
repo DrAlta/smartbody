@@ -424,6 +424,9 @@ void SbmCharacter::initData()
 	_nvbg = NULL;
 	_miniBrain = NULL;
 
+	locomotion_type = Basic;
+	statePrefix = "";
+
 	createBoolAttribute("facebone", false, true, "Basic", 200, false, false, false, "Use bones for facial animation. If false, blendshapes will be used. If true, face will be animated via face definitions.");
 	createBoolAttribute("visemecurve", false, true, "Basic", 200, false, false, false, "Use curve-based visemes instead of discrete visemes.");
 	DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
@@ -3838,4 +3841,73 @@ void SbmCharacter::setMiniBrain(MiniBrain* mini)
 MiniBrain* SbmCharacter::getMiniBrain()
 {
 	return _miniBrain;
+}
+
+
+bool SbmCharacter::checkExamples()
+{
+	if (steeringAgent)
+		steeringAgent->updateSteerStateName();
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::string prefix = this->getName();
+	if (this->statePrefix != "")
+	{
+		prefix = this->statePrefix;
+	}
+	std::string locomotionName = prefix + "Locomotion";
+	std::string stepName = prefix + "Step";
+	std::string startingLName = prefix + "StartingLeft";
+	std::string startingRName = prefix + "StartingRight";
+	std::string idleTurnLName = prefix + "IdleTurnLeft";
+	std::string idleTurnRName = prefix + "IdleTurnRight";
+	std::vector<std::string> standardRequiredStates;
+	standardRequiredStates.push_back(locomotionName);
+	standardRequiredStates.push_back(stepName);
+	standardRequiredStates.push_back(startingLName);
+	standardRequiredStates.push_back(startingRName);
+	standardRequiredStates.push_back(idleTurnLName);
+	standardRequiredStates.push_back(idleTurnRName);
+
+	int numMissing = 0;
+	for (size_t x = 0; x < standardRequiredStates.size(); x++)
+	{
+		PAStateData* state = mcu.lookUpPAState(standardRequiredStates[x]);
+		if (!state)
+		{
+			numMissing++;
+//			LOG("SteeringAgent::checkExamples() standard config: Could not find state '%s' needed for example-based locomotion.", standardRequiredStates[x].c_str());
+		}
+	}
+	if (numMissing == 0)
+	{
+		LOG("%s: Steering works under standard config.", this->getName().c_str());
+		this->steeringConfig = STANDARD;
+		return true;
+	}
+
+	std::vector<std::string> minimalRequiredStates;
+	minimalRequiredStates.push_back(locomotionName);
+	minimalRequiredStates.push_back(startingLName);
+	minimalRequiredStates.push_back(startingRName);
+	minimalRequiredStates.push_back(stepName);
+
+	int numMissing1 = 0;
+	for (size_t x = 0; x < minimalRequiredStates.size(); x++)
+	{
+		PAStateData* state = mcu.lookUpPAState(minimalRequiredStates[x]);
+		if (!state)
+		{
+			numMissing1++;
+//			LOG("SteeringAgent::checkExamples() minimal config: Could not find state '%s' needed for example-based locomotion.", minimalRequiredStates[x].c_str());
+		}
+	}
+	if (numMissing1 == 0)
+	{
+		LOG("%s: Steering works under minimal config.", this->getName().c_str());
+		this->steeringConfig = MINIMAL;
+		return true;
+	}
+	LOG("%s: Steering cannot work under example mode, revert back to basic mode", this->getName().c_str());
+	return false;
 }
