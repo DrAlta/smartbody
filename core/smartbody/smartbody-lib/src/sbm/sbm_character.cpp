@@ -2367,7 +2367,7 @@ else if( cmd == "bone" ) {
 									return CMD_SUCCESS;
 								}
 								std::vector<MeCtScheduler2::TrackPtr> tracksToRemove;
-								MeCtScheduler2::VecOfTrack& tracks = scheduler->tracks();
+								MeCtScheduler2::VecOfTrack tracks = scheduler->tracks();
 								for (size_t t = 0; t < tracks.size(); t++)
 								{
 									MeCtScheduler2::TrackPtr track = tracks[t];

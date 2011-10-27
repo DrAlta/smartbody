@@ -6582,8 +6582,8 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	if (args.calc_num_tokens() == 0)
 	{
 		// dump information about the motion
-		LOG("Motion name:   %s", motion->name());
-		LOG("Motion source: %s", motion->filename());
+		LOG("Motion name:   %s", motion->name().c_str());
+		LOG("Motion source: %s", motion->filename().c_str());
 		LOG("Num Frames:    %d", motion->frames());
 		LOG("Num Channels:  %d", motion->channels().size());
 
