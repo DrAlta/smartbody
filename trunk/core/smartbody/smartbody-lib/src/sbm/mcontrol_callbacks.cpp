@@ -5614,33 +5614,40 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			SbmCharacter* character = mcu_p->getCharacter(characterName);
 			if (character)
 			{
-				if (mcu_p->locomotion_type != mcu_p->Procedural)
+				if (character->locomotion_type != character->Procedural)
 				{
 					character->steeringAgent->desiredSpeed = (float)args.read_double();
 					return CMD_SUCCESS;
 				}
 			}		
 		}
+		else if (command == "stateprefix")
+		{
+			std::string characterName = args.read_token();
+			SbmCharacter* character = mcu_p->getCharacter(characterName);
+			if (character)
+			{
+				character->statePrefix = args.read_token();
+			}
+		}
 		else if (command == "type")
 		{
-			std::string type = args.read_token();
-			if (type == "example")
+			std::string characterName = args.read_token();
+			SbmCharacter* character = mcu_p->getCharacter(characterName);
+			if (character)
 			{
-				if (!mcu_p->use_param_animation)
+				std::string type = args.read_token();
+				if (type == "example")
 				{
-					LOG("Parameterized Animation Engine not enabled!");
-					return CMD_FAILURE;
-				}
-				if (mcu_p->checkExamples())
-					mcu_p->locomotion_type = mcu_p->Example;
-				else
-					mcu_p->locomotion_type = mcu_p->Basic;
-				
-				for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
-					iter != mcu_p->getCharacterMap().end();
-					iter++)
-				{
-					SbmCharacter* character = (*iter).second;
+					if (!mcu_p->use_param_animation)
+					{
+						LOG("Parameterized Animation Engine not enabled!");
+						return CMD_FAILURE;
+					}
+					if (character->checkExamples())
+						character->locomotion_type = character->Example;
+					else
+						character->locomotion_type = character->Basic;
 					/*
 					if (character->param_animation_ct)
 						character->param_animation_ct->set_pass_through(false);
@@ -5649,22 +5656,16 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					if (character->basic_locomotion_ct)
 						character->basic_locomotion_ct->set_pass_through(true);
 					*/
+					return CMD_SUCCESS;
 				}
-				return CMD_SUCCESS;
-			}
-			if (type == "procedural")
-			{
-				if (!mcu_p->use_locomotion)
+				if (type == "procedural")
 				{
-					LOG("Procedural Locomotion not enabled!");
-					return CMD_FAILURE;
-				}
-				mcu_p->locomotion_type = mcu_p->Procedural;
-				for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
-					iter != mcu_p->getCharacterMap().end();
-					iter++)
-				{
-					SbmCharacter* character = (*iter).second;
+					if (!mcu_p->use_locomotion)
+					{
+						LOG("Procedural Locomotion not enabled!");
+						return CMD_FAILURE;
+					}
+					character->locomotion_type = character->Procedural;
 					if (character->steeringAgent)
 						character->steeringAgent->desiredSpeed = 1.6f;
 					/*
@@ -5675,17 +5676,12 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					if (character->basic_locomotion_ct)
 						character->basic_locomotion_ct->set_pass_through(true);
 					*/
+
+					return CMD_SUCCESS;
 				}
-				return CMD_SUCCESS;
-			}
-			if (type == "basic")
-			{
-				mcu_p->locomotion_type = mcu_p->Basic;
-				for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
-					iter != mcu_p->getCharacterMap().end();
-					iter++)
+				if (type == "basic")
 				{
-					SbmCharacter* character = (*iter).second;
+					character->locomotion_type = character->Basic;
 					/*
 					if (character->param_animation_ct)
 						character->param_animation_ct->set_pass_through(true);
@@ -5694,8 +5690,8 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					if (character->basic_locomotion_ct)
 						character->basic_locomotion_ct->set_pass_through(false);
 					*/
+					return CMD_SUCCESS;
 				}
-				return CMD_SUCCESS;
 			}
 		}
 		else if (command == "facing")

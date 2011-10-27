@@ -92,6 +92,7 @@ class MeCtDataReceiver;
 
 class SbmCharacter : public SbmPawn	{
 
+	// Locomotion + steering
 public:
 	std::list<SrVec> trajectoryBuffer;
 	static const int trajectoryLength = 1000;
@@ -99,6 +100,13 @@ public:
 	int	_numSteeringGoal;
 	bool _reachTarget;
 	bool _lastReachStatus;
+
+	enum LocomotionType {Basic, Example, Procedural};
+	enum SteeringStateConfig { MINIMAL = 0, STANDARD};
+	LocomotionType								locomotion_type;
+	SteeringStateConfig							steeringConfig;
+	std::string									statePrefix;
+	bool checkExamples();
 
 public:
 	// Static Constants
@@ -443,7 +451,6 @@ protected:
 	void addActionUnitChannel(int auNum, ActionUnit* au);
 
 	void initData();
-
 };
 
 /////////////////////////////////////////////////////////////

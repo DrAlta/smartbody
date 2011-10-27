@@ -151,7 +151,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	std::string manner = xml_parse_string(BMLDefs::ATTR_MANNER, elem);
 	if (manner != "")
 	{
-		if (mcu->locomotion_type == mcu->Procedural)
+		if (c->locomotion_type == c->Procedural)
 		{
 			LOG("This mode does not support Procedural Locomotion currently!");
 			return BehaviorRequestPtr();

@@ -184,8 +184,6 @@ class mcuCBHandle {
 		unsigned int				queued_cmds;
 
 	public:
-		enum LocomotionType {Basic, Example, Procedural};
-		enum SteeringStateConfig { MINIMAL = 0, STANDARD};
 
 #if TABDEMO
 		std::string mydevicename;
@@ -225,8 +223,6 @@ class mcuCBHandle {
 
 		std::vector<PAStateData*>					param_anim_states;
 		std::vector<PATransitionData*>				param_anim_transitions;
-		LocomotionType								locomotion_type;
-		SteeringStateConfig							steeringConfig;
 		float										steeringScale;
 
 		TimeRegulator	*internal_timer_p;
@@ -500,7 +496,6 @@ public:
 		void addPAState(PAStateData* state);
 		PATransitionData* lookUpPATransition(std::string fromStateName, std::string toStateName);
 		void addPATransition(PATransitionData* transition);
-		bool checkExamples();
 		void setPhysicsEngine(bool start);
 
 

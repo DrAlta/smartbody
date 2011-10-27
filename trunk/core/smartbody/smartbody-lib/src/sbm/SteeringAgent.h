@@ -39,6 +39,7 @@ class SteeringAgent
 		void setTargetAgent(SbmCharacter* tChar);
 		SbmCharacter* getTargetAgent();
 		void startParameterTesting();
+		void updateSteerStateName();
 
 	private:
 		void normalizeAngle(float& angle);
@@ -124,6 +125,13 @@ class SteeringAgent
 
 		// heading over control to parameterized animation engine
 		bool inControl;
+
+		std::string stepStateName;
+		std::string locomotionName;
+		std::string startingLName;
+		std::string startingRName;
+		std::string idleTurnLName;
+		std::string idleTurnRName;
 };
 
 #endif
