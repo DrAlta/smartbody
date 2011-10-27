@@ -22,9 +22,6 @@ class SBCharacter : public SbmCharacter
 
 		void setType(const std::string& type);
 		const std::string& getType();
-
-		SBSkeleton* getSkeleton();
-		virtual void setSkeleton(SBSkeleton* skel);
 		
 		virtual int setup();
 
@@ -32,13 +29,6 @@ class SBCharacter : public SbmCharacter
 		void addMesh(std::string mesh);
 
 		int getNumControllers();
-		
-		SrVec getPosition();
-		SrQuat getOrientation();
-		void setPosition(SrVec pos);
-		void setOrientation(SrQuat quat);
-		void setHPR(SrVec hpr);
-		SrVec getHPR();
 
 		void setAutomaticPruning(bool val);
 		bool isAutomaticPruning();

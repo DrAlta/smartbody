@@ -1092,6 +1092,20 @@ void reset()
 	mcu.reset();
 }
 
+
+void command(const std::string& command)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	mcu.execute((char*) command.c_str());
+}
+
+void commandAt(float seconds, const std::string& command)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	mcu.execute_later((char*) command.c_str(), seconds);
+}
+
+
 void printLog(const std::string& message)
 {
 	//LOG("Haha I am printing python log");
@@ -1103,6 +1117,19 @@ void runScript(std::string script)
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	mcu.executePythonFile(script.c_str());
 }
+
+void setDefaultCharacter(const std::string& character)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	mcu.test_character_default = character;
+}
+
+void setDefaultRecipient(const std::string& recipient)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	mcu.test_recipient_default = recipient;
+}
+
 
 void sendVHMsg(std::string message)
 {
@@ -1126,12 +1153,30 @@ int getNumPawns()
 {  
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	LOG("Python calls getNumPawns");
-	return mcu.getNumPawns(); 
+	return mcu.getNumPawns() - mcu.getNumCharacters(); 
 }
 
 EventManager* getEventManager()
 {
 	return EventManager::getEventManager();
+}
+
+boost::python::list getPawnNames()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	boost::python::list ret;
+
+	for(std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+		iter != mcu.getPawnMap().end();
+		iter++)
+	{
+		SbmPawn* pawn = (*iter).second;
+		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
+		if (!character)
+			ret.append(std::string(pawn->getName()));
+	}
+
+	return ret;
 }
 
 boost::python::list getCharacterNames()
@@ -1150,34 +1195,27 @@ boost::python::list getCharacterNames()
 	return ret;
 }
 
-SBCharacter* getCharacterByIndex(int index)
+SBPawn* createPawn(std::string pawnName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	if (index < 0 ) //|| index >= mcu.character_map.num_entries())
+	SbmPawn* pawn = mcu.getPawn(pawnName);
+	SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
+	if (character)
 	{
-		//LOG("Character at index %d does not exist. Only %d characters.", index, mcu.character_map.num_entries());
+		LOG("Pawn '%s' is a character.", pawnName.c_str());
 		return NULL;
-
 	}
-/*
-	int counter = 0;
-	for(std::map<std::string, SbmCharacter*>::iterator iter = mcu.character_map.begin();
-		iter != mcu.character_map.end();
-		iter++)
+	if (pawn)
 	{
-		if (counter == index)
-		{
-			SBCharacter* sbCharacter = dynamic_cast<SBCharacter*>((*iter).second);
-			return sbCharacter;
-		}
-		else
-			counter++;
+		LOG("Pawn '%s' already exists!", pawnName.c_str());
+		return NULL;
 	}
-	*/
-
-	return NULL;
+	else
+	{
+		SBPawn* pawn = new SBPawn(pawnName.c_str());
+		return pawn;
+	}
 }
-
 
 SBCharacter* createCharacter(std::string char_name, std::string metaInfo)
 {
@@ -1641,6 +1679,22 @@ std::string getScriptFromFile(std::string fileName)
 }
 
 ////////////////////////////////////////////
+SBPawn* getPawn(std::string name)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmPawn* pawn = mcu.getPawn(name);
+	if (pawn)
+	{
+		SBPawn* sbpawn = dynamic_cast<SBPawn*>(pawn);
+		return sbpawn;
+	}
+	else
+	{
+		LOG("pawn %s does not exist.", name.c_str());
+		return NULL;
+	}
+}
+
 SBCharacter* getCharacter(std::string name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();

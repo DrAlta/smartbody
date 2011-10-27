@@ -2816,6 +2816,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\SBPawn.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBPawn.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SBSkeleton.cpp"
 				>
 			</File>

@@ -781,7 +781,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			}
 		}		
 
-		pawn_p = new SbmPawn( pawn_name.c_str() );
+		pawn_p = new SmartBody::SBPawn( pawn_name.c_str() );
 		pawn_p->setClassType("pawn");
 		SkSkeleton* skeleton = new SmartBody::SBSkeleton();
 		skeleton->ref();
@@ -1145,7 +1145,7 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return CMD_FAILURE;
 	}
 
-	pawn_p = new SbmPawn( pawn_and_attribute.c_str() );
+	pawn_p = new SmartBody::SBPawn( pawn_and_attribute.c_str() );
 
 	SkSkeleton* skeleton = new SmartBody::SBSkeleton();
 	skeleton->ref();
