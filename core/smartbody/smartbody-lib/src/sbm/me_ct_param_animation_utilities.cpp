@@ -80,8 +80,16 @@ bool PATimeManager::step(double timeStep)
 
 	prevLocalTime = localTime;
 	double newLocalTime = localTime + timeStep;
+	int loopcounter = 0;
 	while (newLocalTime > key[key.size() - 1])
 	{
+		loopcounter ++;
+		if (loopcounter > 10)
+		{
+			newLocalTime = localTime;
+			LOG("time step %f, local time %f, motion last key %f, motion key size: %d", timeStep, localTime, key[key.size() - 1], key.size());
+			return true;
+		}
 		newLocalTime -= (key[key.size() - 1] - key[0]);
 		notReachDuration = false;
 	}
