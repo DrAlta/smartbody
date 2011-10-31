@@ -170,8 +170,6 @@ class SequenceManager
 
 class VHMsgLog;
 
-#define TABDEMO 1
-
 // Motion Controller Utility Callback Handle (Yes, seriously.)
 class mcuCBHandle {
 	protected:
@@ -184,13 +182,6 @@ class mcuCBHandle {
 		unsigned int				queued_cmds;
 
 	public:
-
-#if TABDEMO
-		std::string mydevicename;
-		std::string currentstate;
-#endif
-
-
 		// Data
 		bool		loop;
 		bool		vhmsg_enabled;
