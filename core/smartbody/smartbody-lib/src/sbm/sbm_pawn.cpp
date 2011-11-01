@@ -214,6 +214,7 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 	//scene_p->init(_skeleton);
 	//int err = mcu.add_scene(scene_p);
 	dMesh_p->skeleton = _skeleton;
+	_skeleton->ref();
 }
 
 int SbmPawn::init( SkSkeleton* new_skeleton_p ) {

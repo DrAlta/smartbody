@@ -521,12 +521,13 @@ int main( int argc, char **argv )	{
 				// return -1
 			}
 		}
-		else if( s == "-seqpath" )  // -mepath <dirpath> to specify where sequence files (.seq) should be loaded from
+		else if( s == "-seqpath" || s == "-scriptpath" )  // -mepath <dirpath> to specify where sequence files (.seq) should be loaded from
 		{
 			if( ++i < argc ) {
 				LOG( "    Adding sequence path '%s'\n", argv[i] );
 
 				seq_paths.push_back( argv[i] );
+				py_paths.push_back( argv[i] );
 			} else {
 				LOG( "ERROR: Expected directory path to follow -seqpath\n" );
 				// return -1
@@ -554,11 +555,35 @@ int main( int argc, char **argv )	{
 				// return -1
 			}
 		}
-		else if( s == "-seq" )  // -seq <filename> to load seq file (replaces old -initseq notation)
+		else if( s == "-seq" || s == "-script")  // -seq <filename> to load seq file (replaces old -initseq notation)
 		{
 			if( ++i < argc ) {
-				LOG( "    Loading sequence '%s'\n", argv[i] );
-				init_seqs.push_back( argv[i] );
+				std::string filename = argv[i];
+				std::string::size_type idx;
+
+				idx = filename.rfind('.');
+
+				if(idx != std::string::npos)
+				{
+					std::string extension = filename.substr(idx+1);
+					if (extension == "py")
+					{
+						LOG( "    Loading Python scrypt '%s'\n", argv[i] );
+						init_pys.push_back( argv[i] );
+						mcu.use_python = true;
+					}
+					else
+					{
+						LOG( "    Loading sequence '%s'\n", argv[i] );
+						init_seqs.push_back( argv[i] );
+					}
+				}
+				else
+				{
+					// No extension found
+					LOG( "    Loading sequence '%s'\n", argv[i] );
+					init_seqs.push_back( argv[i] );
+				}
 			} else {
 				LOG( "ERROR: Expected filename to follow -seq\n" );
 				// return -1
@@ -707,77 +732,81 @@ int main( int argc, char **argv )	{
 #if ENABLE_DEFAULT_BOOTSTRAP
 	vector<string>::iterator it;
 
+	if( seq_paths.empty() && py_paths.empty() ) {
+		LOG( "No script paths specified. Adding current working directory to script path.\n" );
+		seq_paths.push_back( "." );
+	}
+
 	for( it = me_paths.begin();
 	     it != me_paths.end();
 		 ++it )
 	{
-		SrString seq_command = SrString( "path me " ) << (it->c_str());
-		mcu.execute( (char *)(const char *)seq_command );
+		std::stringstream strstr;
+		strstr << "path me " << it->c_str();
+		mcu.execute( (char *) strstr.str().c_str() );
 	}
 
-	if( seq_paths.empty() ) {
-		LOG( "No sequence paths specified. Adding current working directory to seq path\n" );
-		seq_paths.push_back( "." );
-	}
 	for( it = seq_paths.begin();
 	     it != seq_paths.end();
 		 ++it )
 	{
-		SrString seq_command = SrString( "path seq " ) << (it->c_str());
-		mcu.execute( (char *)(const char *)seq_command );
+		std::stringstream strstr;
+		strstr << "path seq " << (it->c_str());
+		SrString seq_command = SrString( "path seq " );
+		mcu.execute( (char *) strstr.str().c_str() );
 	}
 
 	for( it = audio_paths.begin();
 	     it != audio_paths.end();
 		 ++it )
 	{
-		SrString audio_command = SrString( "path audio " ) << (it->c_str());
-		mcu.execute( (char *)(const char *)audio_command );
+		std::stringstream strstr;
+		strstr <<  "path audio " << it->c_str();
+		mcu.execute( (char *) strstr.str().c_str() );
 	}
 
-	if (!mcu.use_python)
+
+	for( it = py_paths.begin();
+	     it != py_paths.end();
+		 ++it )
 	{
-		if( init_seqs.empty() ) {
+		std::stringstream strstr;
+		strstr << "addAssetPath('seq', '" << it->c_str() << "')";
+		mcu.executePython( (char *) strstr.str().c_str() );
+	}
+
+	// run the specified scripts
+	if( init_seqs.empty() && init_pys.empty())
+	{
+		if (!mcu.use_python)
+		{
 			LOG( "No sequences specified. Loading sequence '%s'\n", DEFAULT_SEQUENCE_FILE );
 			init_seqs.push_back( DEFAULT_SEQUENCE_FILE );
 		}
-	}
-	else
-	{
-		if( py_paths.empty() ) {
-			LOG( "No python paths specified. Adding current working directory to python path\n" );
-			py_paths.push_back( "." );
-		}
-	}
-
-	if (!mcu.use_python)
-	{
-		for( it = init_seqs.begin();
-			 it != init_seqs.end();
-			 ++it )
+		else
 		{
-			SrString seq_command = SrString( "seq " ) << (it->c_str()) << " begin";
-			mcu.execute( (char *)(const char *)seq_command );
-		}
-	}
-	else
-	{
-		if( init_pys.empty() ) {
-			LOG( "No sequences specified. Loading sequence '%s'\n", DEFAULT_PY_FILE );
+			LOG( "No Python scripts specified. Loading script '%s'\n", DEFAULT_PY_FILE );
 			init_pys.push_back( DEFAULT_PY_FILE );
 		}
 	}
 
-	if (mcu.use_python)
+	for( it = init_seqs.begin();
+		 it != init_seqs.end();
+		 ++it )
 	{
-		for( it = init_pys.begin();
-			 it != init_pys.end();
-			 ++it )
-		{
-			std::stringstream strstr;
-			strstr << "getScript(\"" << (it->c_str()) << "\").run()";
-			mcu.executePython(strstr.str().c_str());
-		}
+		SrString seq_command = SrString( "seq " ) << (it->c_str()) << " begin";
+		mcu.execute( (char *)(const char *)seq_command );
+	}
+
+
+	for( it = init_pys.begin();
+		 it != init_pys.end();
+		 ++it )
+	{
+		std::string cmd = it->c_str();
+		std::stringstream strstr;
+		strstr << "run(\"" << cmd.c_str() << "\")";
+		mcu.executePython(strstr.str().c_str());
 	}
 
 	me_paths.clear();

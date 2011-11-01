@@ -102,6 +102,8 @@ void SkScene::init ( SkSkeleton* s )
    _jgroup.size ( joints.size() );
 
    SkJoint* root = s->root();
+   if (!root)
+	   return;
 //   const char* root_name = root->name().get_string();  // expose to debugger
    SrSnGroup* g = make_joint_group ( root, s, _jgroup );
    if (!g)

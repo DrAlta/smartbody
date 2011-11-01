@@ -69,7 +69,7 @@ void MeCtFace::init( FaceDefinition* faceDefinition) {
 	clear();
 	MeController::init(NULL);
 
-	if (!faceDefinition->getFaceNeutral())
+	if (!faceDefinition || !faceDefinition->getFaceNeutral())
 		return;
 
 	int numAUs = faceDefinition->getNumAUs();

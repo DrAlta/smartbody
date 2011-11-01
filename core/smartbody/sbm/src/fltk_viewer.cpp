@@ -3511,6 +3511,8 @@ MeCtExampleBodyReach* FltkViewer::getCurrentCharacterBodyReachController()
 	if ( character )
 	{
 		MeCtSchedulerClass* reachSched = character->reach_sched_p;
+		if (!reachSched)
+			return NULL;
 		MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();		
 		MeCtReach* tempCt = NULL;
 		for (unsigned int c = 0; c < reach_tracks.size(); c++)
@@ -3537,6 +3539,8 @@ MeCtConstraint* FltkViewer::getCurrentCharacterConstraintController()
 	if ( character )
 	{
 		MeCtSchedulerClass* reachSched = character->constraint_sched_p;
+		if (!reachSched)
+			return NULL;
 		MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();		
 		MeCtReach* tempCt = NULL;
 		for (unsigned int c = 0; c < reach_tracks.size(); c++)

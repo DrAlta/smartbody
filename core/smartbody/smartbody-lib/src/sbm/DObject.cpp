@@ -338,7 +338,7 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  }
   }
 
-  void DObject::setStringAttribute( const std::string& name, const std::string value )
+  void DObject::setStringAttribute( const std::string& name, std::string value )
   {
 	  DAttribute* attr = getAttribute(name);
 	  StringAttribute* sattr = dynamic_cast<StringAttribute*>(attr);

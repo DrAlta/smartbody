@@ -2100,7 +2100,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			{
 				// set the mesh directory
 				std::string meshFullDir = curpath.string();
-				this->setStringAttribute("mesh",meshFullDir);
+				//this->setStringAttribute("mesh",meshFullDir);
 			}
 			boost::filesystem2::directory_iterator end;
 			for (boost::filesystem2::directory_iterator iter(curpath); iter != end; iter++)
@@ -3432,39 +3432,35 @@ void SbmCharacter::notify(DSubject* subject)
 {
 	SbmPawn::notify(subject);
 
-	DObject* object = dynamic_cast<DObject*>(subject);
-	if (object)
+	DAttribute* attribute = dynamic_cast<DAttribute*>(subject);
+	if (attribute)
 	{
-		DAttribute* attribute = dynamic_cast<DAttribute*>(object);
-		if (attribute)
+		if (attribute->getName() == "visemecurve")
 		{
-			if (attribute->getName() == "visemecurve")
+			BoolAttribute* curveAttribute = dynamic_cast<BoolAttribute*>(attribute);
+			set_viseme_curve_mode(curveAttribute->getValue());
+		}
+		else if (attribute->getName() == "visemetimedelay")
+		{
+			DoubleAttribute* timeDelayAttribute = dynamic_cast<DoubleAttribute*>(attribute);
+			set_viseme_time_delay((float) timeDelayAttribute->getValue());
+		}
+		else if (attribute->getName() == "mesh")
+		{
+			StringAttribute* meshAttribute = dynamic_cast<StringAttribute*>(attribute);
+			std::stringstream strstr;
+			strstr << "char " << getName() << " mesh " << meshAttribute->getValue();
+			mcuCBHandle& mcu = mcuCBHandle::singleton();
+			int success = mcu.execute((char*) strstr.str().c_str());
+			if (success != CMD_SUCCESS)
 			{
-				BoolAttribute* curveAttribute = dynamic_cast<BoolAttribute*>(attribute);
-				set_viseme_curve_mode(curveAttribute->getValue());
+				LOG("Problem setting attribute 'mesh' on character %s", getName().c_str());
 			}
-			else if (attribute->getName() == "visemetimedelay")
-			{
-				DoubleAttribute* timeDelayAttribute = dynamic_cast<DoubleAttribute*>(attribute);
-				set_viseme_time_delay((float) timeDelayAttribute->getValue());
-			}
-			else if (attribute->getName() == "mesh")
-			{
-				StringAttribute* meshAttribute = dynamic_cast<StringAttribute*>(attribute);
-				std::stringstream strstr;
-				strstr << "char " << getName() << " mesh " << meshAttribute->getValue();
-				mcuCBHandle& mcu = mcuCBHandle::singleton();
-				int success = mcu.execute((char*) strstr.str().c_str());
-				if (success != CMD_SUCCESS)
-				{
-					LOG("Problem setting attribute 'mesh' on character %s", getName().c_str());
-				}
-			}
-			if (attribute->getName() == "facebone")
-			{
-				BoolAttribute* faceBoneAttribute = dynamic_cast<BoolAttribute*>(attribute);
-				// ...
-			}
+		}
+		if (attribute->getName() == "facebone")
+		{
+			BoolAttribute* faceBoneAttribute = dynamic_cast<BoolAttribute*>(attribute);
+			// ...
 		}
 	}
 }

@@ -625,8 +625,9 @@ int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map
 	// include the media path in the pathname if applicable
 	std::string rootDir = motions_path.root_directory();
 	if (rootDir.size() == 0)
-	{		
-		finalPath = operator/(mcuCBHandle::singleton().getMediaPath(), motions_path);
+	{	
+		std::string mediaPath = mcuCBHandle::singleton().getMediaPath();
+		finalPath = operator/(mediaPath, motions_path);
 	}
 	else
 	{

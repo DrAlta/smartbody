@@ -43,6 +43,9 @@ using namespace xml_utils;
 BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu )
 {
 	MeCtSaccade* saccade_ct = request->actor->saccade_ct;
+	if (!saccade_ct)
+		return BehaviorRequestPtr();
+
 	saccade_ct->setValid(true);
 	saccade_ct->setUseModel(true);	
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
