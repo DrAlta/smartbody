@@ -111,7 +111,7 @@ XnUInt32 nColors = 10;
 #ifndef USE_GLES
 void glPrintString(void *font, char *str)
 {
-	int i,l = strlen(str);
+	int i,l = (int)strlen(str);
 
 	for(i=0; i<l; i++)
 	{
