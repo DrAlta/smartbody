@@ -151,7 +151,8 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		{
 			LOG("No animation: %s", arg.c_str());
 			motionsNotLoaded = true;
-			actor->get_locomotion_ct()->motions_loaded = false;
+			if (actor->get_locomotion_ct())
+				actor->get_locomotion_ct()->motions_loaded = false;
 			return CMD_FAILURE;
 		}
 		if(type == "standing")

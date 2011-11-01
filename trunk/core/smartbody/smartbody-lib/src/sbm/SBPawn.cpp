@@ -23,7 +23,7 @@ SBSkeleton* SBPawn::getSkeleton()
 
 void SBPawn::setSkeleton(SBSkeleton* skel)
 {
-	setSkeleton(skel);
+	SbmPawn::setSkeleton(skel);
 	setup();
 }
 

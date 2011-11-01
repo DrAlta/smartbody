@@ -545,6 +545,11 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 				motionCt->init(const_cast<SbmCharacter*>(request->actor), motion );
 				motionCt->loop( true );
 
+				if (!request->actor->posture_sched_p)
+				{
+					LOG( "Character %s does not have posture scheduler.", request->actor->getName().c_str());
+					return BehaviorRequestPtr();
+				}
 				PostureRequest * posture_new = new PostureRequest( unique_id, localId, motionCt, 1, request->actor, behav_syncs );
 				posture_new->set_persistent(true);
 

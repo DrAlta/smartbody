@@ -1328,9 +1328,10 @@ SrViewer* getViewer()
 	if (!mcu.viewer_p)
 	{
 		mcu.viewer_p = mcu.viewer_factory->create(100, 100, 640, 480);
-		mcu.viewer_p->label_viewer("SBM Viewer");
+		mcu.viewer_p->label_viewer("Visual Debugger");
 		mcu.camera_p = new SrCamera();
 		mcu.viewer_p->set_camera(*mcu.camera_p);
+		mcu.viewer_p->root(mcu.root_group_p);
 	}
 	return mcu.viewer_p;
 }
@@ -1539,6 +1540,11 @@ void addAssetPath(std::string type, std::string path)
 	{
 		pres->setType("audio");
 		mcu.audio_paths.insert(const_cast<char *>(path.c_str()));
+	}
+	else if (type == "mesh")
+	{
+		pres->setType("mesh");
+		mcu.mesh_paths.insert(const_cast<char *>(path.c_str()));
 	}
 	else
 	{

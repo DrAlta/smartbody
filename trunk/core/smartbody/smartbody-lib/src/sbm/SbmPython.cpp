@@ -279,7 +279,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 	// viewers
 	boost::python::def("getCamera", getCamera, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the camera object for the viewer. \n Input: NULL \n Output: camera object");
-	boost::python::def("getViewer", getViewer, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the sbm viewer object. \n Input: NULL \n Output: sbm viewer object");
+	boost::python::def("getViewer", getViewer, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the visual debugger. \n Input: NULL \n Output: visual debugger");
 	boost::python::def("getBmlViewer", getBmlViewer, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the bml viewer object. \n Input: NULL \n Output: bml viewer object");
 	boost::python::def("getDataViewer", getDataViewer, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the channel viewer object. \n Input: NULL \n Output: channel viewer object");
 	
@@ -441,6 +441,12 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("createIntAttribute", &DObject::createIntAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates an integer attribute.")
 		.def("createDoubleAttribute", &DObject::createDoubleAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a double attribute.")
 		.def("createStringAttribute", &DObject::createStringAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a string attribute.")
+		.def("setBoolAttribute", &DObject::setBoolAttribute, "Sets a boolean attribute of a given name to the given value.")
+		.def("setIntAttribute", &DObject::setIntAttribute, "Sets an integer attribute of a given name to the given value.")
+		.def("setDoubleAttribute", &DObject::setDoubleAttribute, "Sets a floating point attribute of a given name to the given value.")
+		.def("setStringAttribute", &DObject::setStringAttribute, "Sets a string attribute of a given name to the given value.")
+		.def("setVec3Attribute", &DObject::setVec3Attribute, "Sets a vector attribute of a given name to the given value.")
+		.def("setMatrixAttribute", &DObject::setMatrixAttribute, "Sets a matrix attribute of a given name to the given value.")
 		;
 
 	boost::python::class_<SBController, boost::python::bases<DObject> >("SBController")
@@ -545,7 +551,6 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("setOrientation", &SBPawn::setOrientation, "Set the current orientation of the character's world offset.")
 		.def("setHPR", &SBPawn::setHPR, "Sets the heading, pitch and roll of the character's world offset.")
 		.def("getHPR", &SBPawn::getHPR, "Gets the heading, pitch and roll of the character's world offset.")
-
 	;
 
 	boost::python::class_<SBCharacter, boost::python::bases<SBPawn, DObject> >("SBCharacter")

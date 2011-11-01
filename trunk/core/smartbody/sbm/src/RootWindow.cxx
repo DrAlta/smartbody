@@ -513,7 +513,7 @@ void BaseWindow::runScript(std::string filename)
 
 void BaseWindow::reloadScripts(std::string scriptsDir)
 {
-	LOG("Not yet implemented");
+	//LOG("Not yet implemented");
 	/*
 	// erase the old scripts menu
 	for (int x = menubar->size() - 1; x >= 0; x--)

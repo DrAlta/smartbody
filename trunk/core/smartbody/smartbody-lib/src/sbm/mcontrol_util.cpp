@@ -1737,7 +1737,7 @@ int mcuCBHandle::executePythonFile(const char* filename)
 		}
 	}
 
-	LOG("Could not file python script '%s", filename);
+	LOG("Could not find Python script '%s'", filename);
 	return CMD_FAILURE;
 
 #endif
