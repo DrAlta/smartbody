@@ -600,14 +600,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBScene.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SBScene.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\sr_arg_buff.cpp"
 				>
 			</File>
@@ -2792,6 +2784,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\SBBmlProcessor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBBmlProcessor.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SBCharacter.cpp"
 				>
 			</File>
@@ -2821,6 +2821,22 @@
 			</File>
 			<File
 				RelativePath="..\src\sbm\SBPawn.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBScene.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBScene.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBSimulationManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBSimulationManager.h"
 				>
 			</File>
 			<File

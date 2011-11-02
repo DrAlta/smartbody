@@ -274,6 +274,8 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public DObserver
 	LocomotionData* getLocomotionData() { return _locoData; };
 	ObjectManipulationHandle& getObjectManipulationHandle() { return _objManipulator; };
 
+	void updateLights();
+
    public : // virtual methods
 
     /*! When the window manager asks the window to close.
@@ -367,6 +369,7 @@ protected:
 	MeCtExampleBodyReach* getCurrentCharacterBodyReachController();
 	MeCtConstraint*    getCurrentCharacterConstraintController();
 	SbmCharacter*        getCurrentCharacter();
+	std::vector<SrLight> _lights;
  };
 
 

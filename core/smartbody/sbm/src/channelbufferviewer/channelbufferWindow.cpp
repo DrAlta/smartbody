@@ -19,9 +19,6 @@
  *  CONTRIBUTORS:
  *      Jingqiao Fu, USC
  */
-
-#include "vhcl.h"
-
 #include "channelbufferWindow.hpp"
 
 #include <iostream>
