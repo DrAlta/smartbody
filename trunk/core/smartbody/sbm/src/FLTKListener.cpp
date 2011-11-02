@@ -1,5 +1,7 @@
 #include "FLTKListener.h"
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
+#include <sbm/SBPawn.h>
+#include <fltk_viewer.h>
 
 FLTKListener::FLTKListener()
 {
@@ -97,6 +99,27 @@ void FLTKListener::OnCharacterChanged( const std::string& name )
 	OnCharacterCreate(name, character->getClassType());
 }
 
+void FLTKListener::OnPawnCreate( const std::string & name )
+{
+	if (name.find("light") == 0)
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		SbmPawn* pawn = mcu.getPawn(name);
+		pawn->registerObserver(this);
+	}
+}
+
+void FLTKListener::OnPawnDelete( const std::string & name )
+{
+	if (name.find("light") == 0)
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		SbmPawn* pawn = mcu.getPawn(name);
+		pawn->unregisterObserver(this);
+	}
+}
+
+
 void FLTKListener::OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
 {
 }
@@ -111,3 +134,26 @@ void FLTKListener::OnReset()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 }
+
+void FLTKListener::notify(DSubject* subject)
+{
+	SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(subject);
+	if (pawn)
+	{
+		const std::string& pawnName = pawn->getName();
+		if (pawn->getName().find("light") == 0)
+		{
+			// adjust the lights based on the new position and color
+			mcuCBHandle& mcu = mcuCBHandle::singleton();
+			FltkViewer* viewer = dynamic_cast<FltkViewer*>(mcu.viewer_p);
+			if (viewer)
+			{
+				viewer->updateLights();
+			}
+
+
+		}
+
+	}
+}
+

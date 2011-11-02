@@ -176,82 +176,102 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 //#ifndef __ANDROID__
 
-	boost::python::def("command", command, "Runs an old-Style SmartBody command.");
-	boost::python::def("commandAt", commandAt, "Runs an old-Style SmartBody command at a set time in the future.");
-	boost::python::def("getNumPawns", getNumPawns, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("getPawn", getPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the pawn object given its name. \n Input: pawn name \nOutput: pawn object");
-	boost::python::def("getPawnNames", getPawnNames, "Returns a list of all character names.\n Input: NULL \nOutput: list of pawn names");
-	boost::python::def("getNumCharacters", getNumCharacters, "Returns the number of characters.\n Input: NULL \nOutput: number of characters.");
-	boost::python::def("getCharacter", getCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the character object given its name. \n Input: character name \nOutput: character object");
-	boost::python::def("getCharacterNames", getCharacterNames, "Returns a list of all character names.\n Input: NULL \nOutput: list of character names");
+	boost::python::class_<SBScene>("SBScene")
+		.def("createCharacter", &SBScene::createCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new character given character name. \n Input: character name \nOutput: character object")
+		.def("createPawn", &SBScene::createPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new pawn.")
+		.def("removeCharacter", &SBScene::removeCharacter, "Remove the character given its name. \n Input: character name \n Output: NULL")
+		.def("removePawn", &SBScene::removePawn, "Remove the pawn given its name. \n Input: pawn name \n Output: NULL")
+		.def("getNumPawns", &SBScene::getNumPawns, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.")
+		.def("getNumCharacters", &SBScene::getNumCharacters, "Returns the number of characters.\n Input: NULL \nOutput: number of characters.")
+		.def("getPawn", &SBScene::getPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the pawn object given its name. \n Input: pawn name \nOutput: pawn object")
+		.def("getCharacter", &SBScene::getCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the character object given its name. \n Input: character name \nOutput: character object")
+		.def("getMotion", &SBScene::getMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a the motion of given name.")
+		.def("getPawnNames", &SBScene::getPawnNames, "Returns a list of all character names.\n Input: NULL \nOutput: list of pawn names")
+		.def("getCharacterNames", &SBScene::getCharacterNames, "Returns a list of all character names.\n Input: NULL \nOutput: list of character names")
+		.def("addMotion", &SBScene::addMotion, "Add motion resource given filepath and recursive flag. \n Input: path, recursive flag(boolean variable indicating whether to tranverse all the children directories) \n Output: NULL")
+		.def("addPose", &SBScene::addPose, "Add pose resource given filepath and recursive flag. \n Input: path, recursive flag(boolean variable indicating whether to tranverse all the children directories) \n Output: NULL")
+		.def("addAssetPath", &SBScene::addAssetPath, "Add path resource given path type and actual path string. \n Input: type(can be seq|me|ME), path \n Output: NULL")
+		.def("removeAssetPath", &SBScene::removeAssetPath, "Removes a  path resource given path type and actual path string. \n Input: type(can be seq|me|ME), path \n Output: NULL")
+		.def("loadAssets", &SBScene::loadAssets, "Loads the skeletons and motions from the motion paths.")
+		.def("setMediaPath",&SBScene::setMediaPath, "Sets the media path.")
+		.def("setDefaultCharacter", &SBScene::setDefaultCharacter, "Sets the default character.")
+		.def("setDefaultRecipient", &SBScene::setDefaultRecipient, "Sets the default recipient.")
+		.def("createSkeleton", &SBScene::createSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a skeleton definition.")
+		.def("getEventManager", &SBScene::getEventManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event manager.")
+		.def("command", &SBScene::command, "Runs an old-Style SmartBody command.")
+		.def("commandAt", &SBScene::commandAt, "Runs an old-style SmartBody command at a set time in the future.")
+		.def("vhmsg", &SBScene::sendVHMsg, "Sends a virtual human message.")
+		.def("vhmsg2", &SBScene::sendVHMsg2, "Sends a virtual human message.")
+		.def("run", &SBScene::runScript, "Runs a python script.")
+		.def("getSimulationManager", &SBScene::getSimulationManager, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the simulation manager object. \n Input: NULL \n Output: time manager object")
+		.def("getProfiler", &SBScene::getProfiler, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the  profiler object. \n Input: NULL \n Output: time profiler object")
+		.def("getFaceDefinition", &SBScene::getFaceDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a defined viseme and AU set given the first parameter. To get the default set, use \"_default_\"")
+		.def("getBmlProcessor", &SBScene::getBmlProcessor, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the bml processor object.\n Input: NULL \nOutput: bml processor object")
+	;
 
-	boost::python::def("getEventManager", getEventManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event manager.");
-	boost::python::def("getMotion", getMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a the motion of given name.");
-	boost::python::def("run", runScript, "Runs a python script.");
-	boost::python::def("vhmsg", sendVHMsg, "Sends a virtual human message.");
-	boost::python::def("vhmsg2", sendVHMsg2, "Sends a virtual human message.");
+	boost::python::def("createController", createController, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new controller given a controller type and a controller name.");
 
-	boost::python::def("setDefaultCharacter", setDefaultCharacter, "Sets the default character.");
-	boost::python::def("setDefaultRecipient", setDefaultRecipient, "Sets the default recipient.");
+	
 
+	
 
 	//#endif
 
 #ifdef __ANDROID__
-	boost::python::def("pa", &PyLogger::pa, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pb", &PyLogger::pb, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pc", &PyLogger::pc, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pd", &PyLogger::pd, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pe", &PyLogger::pe, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pf", &PyLogger::pf, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pg", &PyLogger::pg, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("ph", &PyLogger::ph, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pi", &PyLogger::pi, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pj", &PyLogger::pj, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pk", &PyLogger::pk, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pl", &PyLogger::pl, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pm", &PyLogger::pm, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pn", &PyLogger::pn, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("po", &PyLogger::po, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pp", &PyLogger::pp, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pq", &PyLogger::pq, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pr", &PyLogger::pr, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("ps", &PyLogger::ps, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pt", &PyLogger::pt, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pu", &PyLogger::pu, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pv", &PyLogger::pv, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pw", &PyLogger::pw, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("px", &PyLogger::px, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("py", &PyLogger::py, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("pz", &PyLogger::pz, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
-	boost::python::def("p1", &PyLogger::p1, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("p2", &PyLogger::p2, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("p3", &PyLogger::p3, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("p4", &PyLogger::p4, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("p5", &PyLogger::p5, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("p6", &PyLogger::p6, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("p7", &PyLogger::p7, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("p8", &PyLogger::p8, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
-	boost::python::def("p9", &PyLogger::p9, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("p0", &PyLogger::p0, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pa", &PyLogger::pa, "Prints an a");
+	boost::python::def("pb", &PyLogger::pb, "Prints an b");
+	boost::python::def("pc", &PyLogger::pc, "Prints an c");
+	boost::python::def("pd", &PyLogger::pd, "Prints an d");
+	boost::python::def("pe", &PyLogger::pe, "Prints an e");
+	boost::python::def("pf", &PyLogger::pf, "Prints an f");
+	boost::python::def("pg", &PyLogger::pg, "Prints an g");
+	boost::python::def("ph", &PyLogger::ph, "Prints an h");
+	boost::python::def("pi", &PyLogger::pi, "Prints an i");
+	boost::python::def("pj", &PyLogger::pj, "Prints an j");
+	boost::python::def("pk", &PyLogger::pk, "Prints an k");
+	boost::python::def("pl", &PyLogger::pl, "Prints an l");
+	boost::python::def("pm", &PyLogger::pm, "Prints an m");
+	boost::python::def("pn", &PyLogger::pn, "Prints an n");
+	boost::python::def("po", &PyLogger::po, "Prints an o");
+	boost::python::def("pp", &PyLogger::pp, "Prints an p");
+	boost::python::def("pq", &PyLogger::pq, "Prints an q");
+	boost::python::def("pr", &PyLogger::pr, "Prints an r");
+	boost::python::def("ps", &PyLogger::ps, "Prints an s");
+	boost::python::def("pt", &PyLogger::pt, "Prints an t");
+	boost::python::def("pu", &PyLogger::pu, "Prints an u");
+	boost::python::def("pv", &PyLogger::pv, "Prints an v");
+	boost::python::def("pw", &PyLogger::pw, "Prints an w");
+	boost::python::def("px", &PyLogger::px, "Prints an x");
+	boost::python::def("py", &PyLogger::py, "Prints an y");
+	boost::python::def("pz", &PyLogger::pz, "Prints an z");	
+	boost::python::def("p1", &PyLogger::p1, "Prints an 1");
+	boost::python::def("p2", &PyLogger::p2, "Prints an 2");
+	boost::python::def("p3", &PyLogger::p3, "Prints an 3");
+	boost::python::def("p4", &PyLogger::p4, "Prints an 4");
+	boost::python::def("p5", &PyLogger::p5, "Prints an 5");
+	boost::python::def("p6", &PyLogger::p6, "Prints an 6");
+	boost::python::def("p7", &PyLogger::p7, "Prints an 7");
+	boost::python::def("p8", &PyLogger::p8, "Prints an 8");
+	boost::python::def("p9", &PyLogger::p9, "Prints an 9");
+	boost::python::def("p0", &PyLogger::p0, "Prints an 0");
 
-	boost::python::def("openparen", &PyLogger::openparen, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("closeparen", &PyLogger::closeparen, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("openbracket", &PyLogger::openbracket, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("closebracket", &PyLogger::closebracket, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("openbrace", &PyLogger::openbrace, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("closebrace", &PyLogger::closebrace, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("plus", &PyLogger::plus, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("minus", &PyLogger::minus, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("aster", &PyLogger::aster, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("slash", &PyLogger::slash, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("backslash", &PyLogger::backslash, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("comma", &PyLogger::comma, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("colon", &PyLogger::colon, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("semicolon", &PyLogger::semicolon, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("equal", &PyLogger::equal, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("less", &PyLogger::less, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
-	boost::python::def("more", &PyLogger::more, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
+	boost::python::def("openparen", &PyLogger::openparen, "Prints an (");
+	boost::python::def("closeparen", &PyLogger::closeparen, "Prints a )");
+	boost::python::def("openbracket", &PyLogger::openbracket, "Prints an [");
+	boost::python::def("closebracket", &PyLogger::closebracket, "Prints a ]");
+	boost::python::def("openbrace", &PyLogger::openbrace, "Prints an {");
+	boost::python::def("closebrace", &PyLogger::closebrace, "Prints an }");
+	boost::python::def("plus", &PyLogger::plus, "Prints a +");
+	boost::python::def("minus", &PyLogger::minus, "Prints a -");
+	boost::python::def("aster", &PyLogger::aster, "Prints an *");
+	boost::python::def("slash", &PyLogger::slash, "Prints a /");
+	boost::python::def("backslash", &PyLogger::backslash, "Prints a \\");
+	boost::python::def("comma", &PyLogger::comma, "Prints a ,");
+	boost::python::def("colon", &PyLogger::colon,"Prints a :");
+	boost::python::def("semicolon", &PyLogger::semicolon, "Prints a ;");
+	boost::python::def("equal", &PyLogger::equal, "Prints an =");
+	boost::python::def("less", &PyLogger::less, "Prints a ");
+	boost::python::def("more", &PyLogger::more, "Prints a >");	
 	
 	boost::python::def("pspace", &PyLogger::pspace, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
 	boost::python::def("pnon", &PyLogger::pnon, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
@@ -267,15 +287,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 	// 
 
 #ifndef __ANDROID__
-	boost::python::def("createCharacter", createCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new character given character name. \n Input: character name \nOutput: character object");
-	boost::python::def("removeCharacter", removeCharacter, "Remove the character given its name. \n Input: character name \n Output: NULL");
-	boost::python::def("createSkeleton", createSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a skeleton definition.");
-	boost::python::def("createController", createController, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new controller given a controller type and a controller name.");
-	boost::python::def("createPawn", createPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new pawn.");
 
-
-	// bml
-	boost::python::def("getBmlProcessor", getBmlProcessor, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the bml processor object.\n Input: NULL \nOutput: bml processor object");
 
 	// viewers
 	boost::python::def("getCamera", getCamera, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the camera object for the viewer. \n Input: NULL \n Output: camera object");
@@ -285,14 +297,9 @@ BOOST_PYTHON_MODULE(SmartBody)
 	
 
 	// assets
-	boost::python::def("setMediaPath", setMediaPath, "Sets the media path.");
 	boost::python::def("execScripts", execScripts, "Execute a chain of scripts. \n Input: list of script name string e.g. [\"script1 name\", \"script2 name\", ...] \n Output: NULL");
 	boost::python::def("getScript", getScript, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the sequence file object. \n Input: script name \n Output: script object");
-	boost::python::def("addMotion", addMotion, "Add motion resource given filepath and recursive flag. \n Input: path, recursive flag(boolean variable indicating whether to tranverse all the children directories) \n Output: NULL");
-	boost::python::def("addPose", addPose, "Add pose resource given filepath and recursive flag. \n Input: path, recursive flag(boolean variable indicating whether to tranverse all the children directories) \n Output: NULL");
-	boost::python::def("addAssetPath", addAssetPath, "Add path resource given path type and actual path string. \n Input: type(can be seq|me|ME), path \n Output: NULL");
-	boost::python::def("removeAssetPath", removeAssetPath, "Removes a  path resource given path type and actual path string. \n Input: type(can be seq|me|ME), path \n Output: NULL");
-	boost::python::def("loadAssets", loadAssets, "Loads the skeletons and motions from the motion paths.");
+	
 
 	// resource access
 	boost::python::def("showCommandResources", showCommandResources, "Returns the command resources. \n Input: NULL \n Output: NULL");
@@ -304,15 +311,14 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::def("getResourceLimit", getResourceLimit, "Returns resource up limit. \n Input: NULL \n Output: resource display up limit");
 	boost::python::def("setResourceLimit", setResourceLimit, "Set resource up limit. \n Input: resource display up limit \n Output: NULL");	
 
-	// timing
-	boost::python::def("getSimulationManager", getSimulationManager, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the simulation manager object. \n Input: NULL \n Output: time manager object");
-	boost::python::def("getProfiler", getProfiler, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the  profiler object. \n Input: NULL \n Output: time profiler object");
 
 	// system
 	boost::python::def("pythonexit", pythonExit, "Exits the Python interpreter. \n Input: NULL \n Output: NULL");
 	boost::python::def("reset", reset, "Reset SBM. \n Input: NULL \n Output: NULL");
 	boost::python::def("quit", quitSbm, "Quit SBM. \n Input: NULL \n Output: NULL");
 	boost::python::def("printlog", printLog, "Write to the log. \n Input: message string \n Output: NULL");
+	boost::python::def("getScene", getScene, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the SmartBody scene object.");
+
 
 
 	// class interface
@@ -322,24 +328,24 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("abort", &Script::abort, "Abort this running script, this only works for seq script. \n Input: NULL \n Output: NULL")
 		;
 
-	boost::python::class_<SimulationManager>("SimulationManager")
-		.def("isRunning", &SimulationManager::isRunning, "Returns true if the simulation is currently running.")
-		.def("isStarted", &SimulationManager::isStarted, "Returns true if the simulation has been started.")
-		.def("printInfo", &SimulationManager::printInfo, "Print all the timing statistics. \n Input: NULL \n Output: NULL")
-		.def("printPerf", &SimulationManager::printPerf, "Print performance statistics calculated real time given a time period as input. \n Input: NULL \n Output: NULL")
-		.def("getTime", &SimulationManager::getTime, "Get the current simulation time. \n Input: NULL \n Output: current simulation time")
-		.def("start", &SimulationManager::start, "Start the simulation.")
-		.def("reset", &SimulationManager::reset, "Set the clock time to 0. \n Input: NULL \n Output: NULL")
-		.def("pause", &SimulationManager::pause, "Pause the clock. \n Input: NULL \n Output: NULL")
-		.def("resume", &SimulationManager::resume, "Resume the clock. \n Input: NULL \n Output: NULL")
-		.def("step", &SimulationManager::step, "Running the system in the step mode, user can input how many steps they want to run. \n Input: number of steps at a time \n Output: NULL")
-		.def("setSleepFps", &SimulationManager::setSleepFps, "Set the sleep fps. Sleep fps defines the target loop rate. \n Input: sleep fps \n Output: NULL")
-		.def("setEvalFps", &SimulationManager::setEvalFps, "Set the eval fps. Define the minimum interval to evaluate the frame. \n Input: evaluation fps \n Output: NULL")
-		.def("setSimFps", &SimulationManager::setSimFps, "Set the simulation fps. Add a fixed increment to output time every update. \n Input: simulation fps \n Output: NULL")
-		.def("setSleepDt", &SimulationManager::setSleepDt, "Set the sleep dt. \n Input: sleep dt \n Output: NULL")
-		.def("setEvalDt", &SimulationManager::setEvalDt, "Set the eval dt. \n Input: evaluation dt \n Output: NULL")
-		.def("setSimDt", &SimulationManager::setSimDt, "Set the sim dt. \n Input: simulation dt \n Output: NULL")
-		.def("setSpeed", &SimulationManager::setSpeed, "Set the speed for real clock time. Actual time would be real time times speed.")
+	boost::python::class_<SBSimulationManager>("SimulationManager")
+		.def("isRunning", &SBSimulationManager::isRunning, "Returns true if the simulation is currently running.")
+		.def("isStarted", &SBSimulationManager::isStarted, "Returns true if the simulation has been started.")
+		.def("printInfo", &SBSimulationManager::printInfo, "Print all the timing statistics. \n Input: NULL \n Output: NULL")
+		.def("printPerf", &SBSimulationManager::printPerf, "Print performance statistics calculated real time given a time period as input. \n Input: NULL \n Output: NULL")
+		.def("getTime", &SBSimulationManager::getTime, "Get the current simulation time. \n Input: NULL \n Output: current simulation time")
+		.def("start", &SBSimulationManager::start, "Start the simulation.")
+		.def("reset", &SBSimulationManager::reset, "Set the clock time to 0. \n Input: NULL \n Output: NULL")
+		.def("pause", &SBSimulationManager::pause, "Pause the clock. \n Input: NULL \n Output: NULL")
+		.def("resume", &SBSimulationManager::resume, "Resume the clock. \n Input: NULL \n Output: NULL")
+		.def("step", &SBSimulationManager::step, "Running the system in the step mode, user can input how many steps they want to run. \n Input: number of steps at a time \n Output: NULL")
+		.def("setSleepFps", &SBSimulationManager::setSleepFps, "Set the sleep fps. Sleep fps defines the target loop rate. \n Input: sleep fps \n Output: NULL")
+		.def("setEvalFps", &SBSimulationManager::setEvalFps, "Set the eval fps. Define the minimum interval to evaluate the frame. \n Input: evaluation fps \n Output: NULL")
+		.def("setSimFps", &SBSimulationManager::setSimFps, "Set the simulation fps. Add a fixed increment to output time every update. \n Input: simulation fps \n Output: NULL")
+		.def("setSleepDt", &SBSimulationManager::setSleepDt, "Set the sleep dt. \n Input: sleep dt \n Output: NULL")
+		.def("setEvalDt", &SBSimulationManager::setEvalDt, "Set the eval dt. \n Input: evaluation dt \n Output: NULL")
+		.def("setSimDt", &SBSimulationManager::setSimDt, "Set the sim dt. \n Input: simulation dt \n Output: NULL")
+		.def("setSpeed", &SBSimulationManager::setSpeed, "Set the speed for real clock time. Actual time would be real time times speed.")
 		;
 
 	boost::python::class_<Profiler>("Profiler")
@@ -367,19 +373,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("hide", &GenericViewer::hide_viewer, "Hides the viewer.")
 		;
 
-	boost::python::class_<GazeBML>("GazeBML")
-		.def("setTarget", &GazeBML::setTarget, "Set the target of gaze.  \n Input: target character name \n Output: NULL")
-		.def("setDirection", &GazeBML::setDirection, "Set the direction of gaze. \n Input: direction string e.g. \"up|down|left\" \n Output: NULL")
-		.def("setAngle", &GazeBML::setAngle, "Set the angle of gaze. \n Input: angle string e.g. \"90\" \n Output: NULL")
-		.def("setSpeed", &GazeBML::setSpeed, "Set the speed of gaze on lumbar neck and eye. \n Input: speed string list for lumbar neck eye respectively e.g. [\"10\",\"40\",\"50\"] \n Output: NULL")
-		.def("setSmooth", &GazeBML::setSmoothing, "Set the smooth of gaze on lumbar neck and eye. \n Input: smooth string list for lumbar neck eye respectively e.g. [\"10\",\"40\",\"50\"] \n Output: NULL")
-		;
-
-	boost::python::class_<BmlProcessor>("BmlProcessor")
-		.def("execAnimation", &BmlProcessor::execAnimation, "Execute a animation bml command. \n Input: character name, animation name \n Output: NULL")
-		.def("execPosture", &BmlProcessor::execPosture, "Execute a posture bml command. \n Input: character name, posture name \n Output: NULL")
-		.def("execGaze", &BmlProcessor::execGaze, "Execute a gaze bml command. \n Input: character name, GazeBML object \n Output: NULL")
-		.def("execBML", &BmlProcessor::execBML, "Execute a generic bml to a given character. \n Input: character name, bml string \n Output: NULL")
+	boost::python::class_<SBBmlProcessor>("BmlProcessor")
+		.def("execBML", &SBBmlProcessor::execBML, "Execute a generic bml to a given character. \n Input: character name, bml string \n Output: NULL")
 		;
 
 	boost::python::class_<Viseme>("Viseme")		
@@ -403,7 +398,6 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("disconnect", &Motion::disconnect, "Disconnect current motion with current skeleton object. \n Input: NULL \n Output: NULL")
 		;
 
-	boost::python::def("getFaceDefinition", getFaceDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a defined viseme and AU set given the first parameter. To get the default set, use \"_default_\"");
 	boost::python::class_<FaceDefinition>("FaceDefinition")
 		.def("getNumVisemes", &FaceDefinition::getNumVisemes, "Returns the number of visemes.")
 		.def("setViseme", &FaceDefinition::setViseme, "Sets a viseme to a particular motion name.")
@@ -526,18 +520,18 @@ BOOST_PYTHON_MODULE(SmartBody)
 		;
 
 	boost::python::class_<GazeBehavior, boost::python::bases<SBBehavior> >("GazeBehavior")
-	//.def(boost::python::init<std::string, std::string>())
-	.def("getGazeTarget", &GazeBehavior::getGazeTarget, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the gaze target.")
+		//.def(boost::python::init<std::string, std::string>())
+		.def("getGazeTarget", &GazeBehavior::getGazeTarget, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the gaze target.")
 	;
 
 	boost::python::class_<LocomotionBehavior, boost::python::bases<SBBehavior> >("LocomotionBehavior")
-	//.def(boost::python::init<std::string, std::string>())
-	.def("getLocomotionTarget", &LocomotionBehavior::getLocomotionTarget, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the locomotion target as a vector.")
+		//.def(boost::python::init<std::string, std::string>())
+		.def("getLocomotionTarget", &LocomotionBehavior::getLocomotionTarget, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the locomotion target as a vector.")
 	;
 
 	boost::python::class_<SpeechBehavior, boost::python::bases<SBBehavior> >("SpeechBehavior")
-	//.def(boost::python::init<std::string, std::string>())
-	.def("getUtterance", &SpeechBehavior::getUtterance, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the current utterance.")
+		//.def(boost::python::init<std::string, std::string>())
+		.def("getUtterance", &SpeechBehavior::getUtterance, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the current utterance.")
 	;
 
 	boost::python::class_<SBPawn, boost::python::bases<DObject> >("SBPawn")
@@ -733,8 +727,9 @@ void initPython(std::string pythonLibPath)
 		//LOG("before import pydoc");
 		//PyRun_SimpleString("from pydoc import *");
 #ifndef __ANDROID__
-		PyRun_SimpleString("bml = getBmlProcessor()");
-		PyRun_SimpleString("sim = getSimulationManager()");
+		PyRun_SimpleString("scene = getScene()");
+		PyRun_SimpleString("bml = scene.getBmlProcessor()");
+		PyRun_SimpleString("sim = scene.getSimulationManager()");
 #endif
 		//LOG("After import os");
 

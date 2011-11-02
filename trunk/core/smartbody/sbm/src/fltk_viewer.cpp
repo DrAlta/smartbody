@@ -866,6 +866,8 @@ void FltkViewer::init_opengl ( int w, int h )
    glPointSize ( 2.0 );
 
    glShadeModel ( GL_SMOOTH );
+
+   updateLights();
  }
 
 void FltkViewer::close_requested ()
@@ -935,7 +937,50 @@ void MakeShadowMatrix( GLfloat points[3][3], GLfloat light[4], GLfloat matrix[4]
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-   
+void FltkViewer::updateLights()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	// get any pawns called 'light#' 
+	// if none exist, use the standard lights
+	_lights.clear();
+	std::map<std::string, SbmPawn*>& pawnMap = mcu.getPawnMap();
+	for (std::map<std::string, SbmPawn*>::iterator iter = pawnMap.begin();
+		 iter != pawnMap.end();
+		 iter++)
+	{
+		SbmPawn* pawn = (*iter).second;
+		const std::string& name = pawn->getName();
+		if (name.find("light") == 0)
+		{
+			SmartBody::SBPawn* sbpawn = dynamic_cast<SmartBody::SBPawn*>(pawn);
+			SrLight light;
+			sbpawn->getPosition();
+
+		}
+	}
+
+	if (_lights.size() == 0)
+	{
+		SrLight light;
+		light.directional = false;
+		light.directional = true;
+		light.diffuse = SrColor( 1.0f, 0.95f, 0.8f );
+		light.position = SrVec( 100.0, 250.0, 400.0 );
+	//	light.constant_attenuation = 1.0f/cam.scale;
+		light.constant_attenuation = 1.0f;
+		_lights.push_back(light);
+
+		SrLight light2 = light;
+		light2.directional = false;
+		light2.diffuse = SrColor( 0.8f, 0.85f, 1.0f );
+		light2.position = SrVec( 100.0, 500.0, -200.0 );
+	//	light2.constant_attenuation = 1.0f;
+	//	light2.linear_attenuation = 2.0f;
+		_lights.push_back(light2);
+	}
+}
+
 void FltkViewer::draw() 
 {
    //static bool hasShaderSupport = false;
@@ -969,19 +1014,6 @@ void FltkViewer::draw()
    SrCamera &cam  = _data->camera;
    SrMat mat ( SrMat::NotInitialized );
 
-//	light.directional = false;
-	light.directional = true;
-	light.diffuse = SrColor( 1.0f, 0.95f, 0.8f );
-	light.position = SrVec( 100.0, 250.0, 400.0 );
-//	light.constant_attenuation = 1.0f/cam.scale;
-	light.constant_attenuation = 1.0f;
-
-	SrLight light2 = light;
-	light2.directional = false;
-	light2.diffuse = SrColor( 0.8f, 0.85f, 1.0f );
-	light2.position = SrVec( 100.0, 500.0, -200.0 );
-//	light2.constant_attenuation = 1.0f;
-//	light2.linear_attenuation = 2.0f;
 
    //----- Clear Background --------------------------------------------
    glClearColor ( _data->bcolor );
@@ -999,8 +1031,10 @@ void FltkViewer::draw()
    glScalef ( cam.scale, cam.scale, cam.scale );
 
 	glEnable ( GL_LIGHTING );
-	glLight ( 0, light );
-	glLight ( 1, light2 );
+	for (size_t x = 0; x < _lights.size(); x++)
+	{
+		glLight ( x, _lights[x] );
+	}
 
 	static GLfloat mat_emissin[] = { 0.0,  0.0,    0.0,    1.0 };
 	static GLfloat mat_ambient[] = { 0.0,  0.0,    0.0,    1.0 };
@@ -1053,6 +1087,7 @@ void FltkViewer::draw()
 		if( _data->shadowmode == ModeShadows )
 //		if ( 1 )
 		{
+			/*
 			GLfloat shadow_plane_floor[3][3] = {
 				{ 0.0, 0.0, 0.0 }, 
 				{ 1.0, 0.0, 0.0 }, 
@@ -1111,6 +1146,7 @@ void FltkViewer::draw()
 
 			glDisable( GL_CLIP_PLANE0 );
 #endif
+			*/
 		}
 	}
 
@@ -2270,6 +2306,7 @@ void FltkViewer::label_viewer(const char* str)
 
 void FltkViewer::show_viewer()
 {
+	
 	show();
 }
 

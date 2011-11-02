@@ -143,94 +143,8 @@ class Script
 		std::string type;
 };
 
-class Profiler
-{
-	public:
-		Profiler();
-		~Profiler();
-
-		void printLegend();
-		void printStats();
-};
-
-class SimulationManager
-{
-	public:
-		SimulationManager();
-		~SimulationManager();
-
-		bool isStarted();
-		bool isRunning();
-
-		void printInfo();
-		void printPerf(float v);
-		double getTime();
-		void start();
-		void reset();
-		void pause();
-		void resume();
-		void step(int n);
-		void setSleepFps(float v);
-		void setEvalFps(float v);
-		void setSimFps(float v);
-		void setSleepDt(float v);
-		void setEvalDt(float v);
-		void setSimDt(float v);
-		void setSpeed(float v);
-};
 
 
-
-class GazeBML
-{
-	public:
-		GazeBML();
-		~GazeBML();
-		
-		void setTarget(std::string targetName)	{target = targetName;}
-		const std::string& getTarget()					{return target;}
-		void setAngle(const std::string& input)		{angle = input;}
-		const std::string& getAngle()					{return angle;}
-		void setDirection(const std::string& dir)		{direction = dir;}
-		const std::string& getDirection()				{return direction;}
-		void setSpeed(boost::python::list &input);
-		boost::python::list getSpeed();
-		void setSmoothing(boost::python::list &input);
-		boost::python::list getSmoothing();
-
-		std::string buildGazeBML();
-
-	protected:
-		std::string target;
-		std::string angle;
-		std::string direction;
-		std::vector<std::string> speed;
-		std::vector<std::string> smoothing;
-};
-
-class BmlProcessor
-{
-	public:
-		BmlProcessor();
-		~BmlProcessor();
-
-		// bp settings
-	//	void reset();		
-
-		// bml msg and bml tests
-		void vrSpeak(std::string agent, std::string recip, std::string msgId, std::string msg);
-		void vrAgentBML(std::string op, std::string agent, std::string msgId, std::string msg);
-		
-		void execAnimation(std::string character, std::string anim);
-		void execPosture(std::string character, std::string posture);
-		void execGaze(std::string character, GazeBML& gazeBML);
-		void execBML(std::string character, std::string bml);
-
-	protected:
-		void build_vrX(std::ostringstream& buffer, const std::string& cmd, const std::string& char_id, const std::string& recip_id, const std::string& content, bool for_seq );
-		void send_vrX( const char* cmd, const std::string& char_id, const std::string& recip_id,
-			const std::string& seq_id, bool echo, bool send, const std::string& bml );
-};
 
 class Viseme
 {
@@ -279,42 +193,21 @@ class Motion
 
 // SmartBody functions
 
-void command(const std::string& command);
-void commandAt(float seconds, const std::string& command);
+
 void pythonExit();
 void quitSbm();
 void reset();
+SBScene* getScene();
 
 void printLog(const std::string& message);
 
-void setDefaultCharacter(const std::string& character);
-void setDefaultRecipient(const std::string& recipient);
-
-void runScript(std::string script);
-void sendVHMsg(std::string message);
-void sendVHMsg2(std::string messageType, std::string encodedMessage);
-int getNumCharacters();
-int getNumPawns();
-SBPawn* getPawn(std::string name);
-boost::python::list getPawnNames();
-SBCharacter* getCharacter(std::string name);
-boost::python::list getCharacterNames();
-SBCharacter* createCharacter(std::string char_name, std::string metaInfo = "");
-SBPawn* createPawn(std::string);
-
-SBSkeleton* createSkeleton(std::string char_name);
 SBController* createController(std::string controllerType, std::string controllerName);
-void removeCharacter(std::string charName);
-EventManager* getEventManager();
-
-SkMotion* getMotion(std::string name);
 
 Camera* getCamera();
 SrViewer* getViewer();
 GenericViewer* getBmlViewer();
 GenericViewer* getDataViewer();
 
-void setMediaPath(std::string path);
 void execScripts(boost::python::list& input);
 Script* getScript(std::string fileName);
 void showCommandResources();
@@ -325,20 +218,14 @@ void showScriptResources();
 void showControllerResources();
 void getResourceLimit();
 void setResourceLimit(int limit);
-void addPose(std::string path, bool recursive);
-void addMotion(std::string path, bool recursive);
 
-void addAssetPath(std::string type, std::string path);
-void removeAssetPath(std::string type, std::string path);
-void loadAssets();
-void loadMotions();
-void loadSkeletons();
 
-FaceDefinition* getFaceDefinition(std::string str);
 
-SimulationManager* getSimulationManager();
-Profiler* getProfiler();
-BmlProcessor* getBmlProcessor();
+
+
+
+
+
 
 // helper functions
 std::string getScriptFromFile(std::string fileName);

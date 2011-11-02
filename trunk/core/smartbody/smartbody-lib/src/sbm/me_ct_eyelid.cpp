@@ -236,9 +236,11 @@ void MeCtEyeLidRegulator::init(SbmPawn* pawn,  bool tracking_pitch)	{
 	set_close_angle( 30.0 );
 	
 	curve.insert( 0.0, 0.0 );
-	curve.insert( 0.05, 1.0 );
-	curve.insert( 0.2, 0.33 );
-	curve.insert( 0.25, 0.0 );
+	curve.insert( 0.16, 1.0 );
+	curve.insert( 0.33, 0.33 );
+	curve.insert( 0.5, 0.25 );
+	curve.insert( 0.6, 0.15 );
+	curve.insert( 0.7, 0.0 );
 	
 	pitch_tracking = tracking_pitch;
 	

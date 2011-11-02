@@ -6,6 +6,7 @@
 #ifdef WIN32
 #include <direct.h>
 #endif
+#include <vhcl.h>
 
 /************************************************************************/
 /* Shader program class                                                 */
@@ -139,7 +140,7 @@ void SbmShaderProgram::printShaderInfoLog( GLuint obj )
 	{
 		infoLog = (char *)malloc(infologLength);
 		glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
-		printf("%s\n",infoLog);
+		LOG("%s\n",infoLog);
 		free(infoLog);
 	}
 }
@@ -156,7 +157,7 @@ void SbmShaderProgram::printProgramInfoLog( GLuint obj )
 	{
 		infoLog = (char *)malloc(infologLength);
 		glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
-		printf("%s\n",infoLog);
+		LOG("%s\n",infoLog);
 		free(infoLog);
 	}
 }
@@ -169,7 +170,7 @@ void SbmShaderProgram::printOglError(const char* tag)
 	glErr = glGetError();
 	while (glErr != GL_NO_ERROR)
 	{
-		printf("glError %s: %s\n", tag,gluErrorString(glErr));
+		LOG("glError %s: %s\n", tag,gluErrorString(glErr));
 		retCode = 1;
 		glErr = glGetError();
 	}
@@ -229,21 +230,21 @@ bool SbmShaderManager::initGLExtension()
 	glewInit();
     if (glewIsSupported("GL_VERSION_3_0"))
 	{
-        printf("Ready for OpenGL 3.0\n");
+        LOG("Ready for OpenGL 3.0\n");
 		shaderInit = true;
 		shaderSupport = SUPPORT_OPENGL_3_0;
 		return true;
 	}
     else if (glewIsSupported("GL_VERSION_2_0") )
 	{
-		printf("Ready for OpenGL 2.0, but not for OpenGL 3.0.\n");
+		LOG("Ready for OpenGL 2.0, but not for OpenGL 3.0.\n");
 		shaderInit = true; 
 		shaderSupport = SUPPORT_OPENGL_2_0;
 		return true;
 	}
 	else {
 		if (counter == 3)
-			printf("OpenGL 3.0 not supported. Please check if the graphics card or driver supported OpenGL 3.0.\n");
+			LOG("OpenGL 3.0 not supported. Please check if the graphics card or driver supported OpenGL 3.0.\n");
 		//exit(1);
         counter++;
 		return false;

@@ -162,6 +162,10 @@ SbmCharacter* BaseWindow::getSelectedCharacter()
 
 void BaseWindow::show_viewer()
 {
+	#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		SbmShaderManager::singleton().setViewer(mcu.viewer_p);
+	#endif
 	show();
 }
 

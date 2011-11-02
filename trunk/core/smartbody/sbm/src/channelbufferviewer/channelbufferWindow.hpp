@@ -23,6 +23,7 @@
 #ifndef _CHANNEL_BUFFER_WINDOW_H_
 #define _CHANNEL_BUFFER_WINDOW_H_
 
+#include <vhcl.h>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Multi_Browser.H>

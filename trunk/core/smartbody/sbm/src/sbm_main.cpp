@@ -771,7 +771,7 @@ int main( int argc, char **argv )	{
 		 ++it )
 	{
 		std::stringstream strstr;
-		strstr << "addAssetPath('seq', '" << it->c_str() << "')";
+		strstr << "scene.addAssetPath('seq', '" << it->c_str() << "')";
 		mcu.executePython( (char *) strstr.str().c_str() );
 	}
 
@@ -805,7 +805,7 @@ int main( int argc, char **argv )	{
 	{
 		std::string cmd = it->c_str();
 		std::stringstream strstr;
-		strstr << "run(\"" << cmd.c_str() << "\")";
+		strstr << "scene.run(\"" << cmd.c_str() << "\")";
 		mcu.executePython(strstr.str().c_str());
 	}
 
