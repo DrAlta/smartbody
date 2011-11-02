@@ -65,6 +65,11 @@
 # include <sbm/me_ct_param_animation_data.h>
 # include <sbm/GPU/SbmDeformableMeshGPU.h>
 
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support
+#include "sbm/GPU/SbmShader.h"
+#include "sbm/GPU/SbmTexture.h"
+#endif
+
 #include <sbm/mcontrol_util.h>
 
 //#include <sbm/SbmShader.h>
@@ -77,6 +82,51 @@
 ////# define SR_USE_TRACE4  // view_all
 ////# define SR_USE_TRACE5  // timeout
 //# include <sr/sr_trace.h>
+
+const int SHADOW_MAP_RES = 2048;
+
+std::string Std_VS =
+"varying vec4 vPos;\n\
+varying vec3 normal;\n\
+void main()\n\
+{\n\
+	vPos = gl_TextureMatrix[7]* gl_ModelViewMatrix * gl_Vertex;\n\
+	gl_Position = ftransform();\n\
+	normal = normalize(gl_NormalMatrix * gl_Normal);\n\
+	gl_FrontColor = gl_FrontMaterial.diffuse*gl_LightSource[0].diffuse *vec4(max(dot(normal, normalize(gl_LightSource[0].position.xyz)), 0.0));\n\
+	gl_TexCoord[0] = gl_MultiTexCoord0;\n\
+}";
+std::string Std_FS = 
+"uniform sampler2D tex;\n\
+uniform int useShadowMap;\n\
+varying vec4 vPos;\n\
+vec4 shadowCoef()\n\
+{\n\
+	int index = 0;\n\
+	vec4 shadow_coord = vPos/vPos.w;//gl_TextureMatrix[1]*vPos;\n\
+	shadow_coord.z += 0.000005;\n\
+	//shadow_coord.w = shadow_coord.z;\n\
+	//shadow_coord.z = float(index);\n\
+	float shadow_d = texture2D(tex, shadow_coord.st).x;\n\
+	float diff = 1.0;\n\
+	diff = shadow_d - shadow_coord.z;\n\
+	return clamp( diff*850.0 + 1.0, 0.0, 1.0);//(shadow_d-0.9)*10;//clamp( diff*250.0 + 1.0, 0.0, 1.0);\n\
+}\n\
+void main()\n\
+{\n\
+	const float shadow_ambient = 1.f;\n\
+	vec4 shadow_coef = 1.0;\n\
+	if (useShadowMap) \n\
+		shadow_coef = shadowCoef();\n\
+	gl_FragColor = gl_Color*shadow_ambient * shadow_coef;\n\
+}";
+
+
+std::string Shadow_FS = 
+"void main (void)\n\
+{\n\
+gl_FragColor = gl_Color*0.5f;\n\
+}";
 
 //=============================== srSaSetShapesChanged ===========================================
 
@@ -842,8 +892,73 @@ static void gl_draw_string ( const char* s, float x, float y )
 
 //-- Render  ------------------------------------------------------------------
 
+
+void FltkViewer::initShadowMap()
+{
+	// init basic shader for rendering 
+	SbmShaderManager::singleton().addShader("Basic",Std_VS.c_str(),Std_FS.c_str(),false);
+	SbmShaderManager::singleton().addShader("BasicShadow","",Shadow_FS.c_str(),false);
+	// init shadow map and frame buffer 
+	
+	int depth_size = SHADOW_MAP_RES;
+	//glGenTextures(1, &_data->shadowMapID);
+	//LOG("Shadow map ID = %d\n",_data->shadowMapID);	
+	glGenFramebuffersEXT(1, &_data->depthFB);	
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _data->depthFB);
+	glDrawBuffer(GL_FRONT_AND_BACK);
+	
+
+	glGenTextures(1, &_data->shadowMapID);
+	glBindTexture(GL_TEXTURE_2D, _data->shadowMapID);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, depth_size, depth_size, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, depth_size, depth_size, 0, GL_RGBA, GL_FLOAT, NULL);
+	glBindTexture(GL_TEXTURE_2D,0);
+
+
+	glGenTextures(1, &_data->depthMapID);
+	glBindTexture(GL_TEXTURE_2D, _data->depthMapID);	
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, depth_size, depth_size, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);	
+	
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+    //glTexParameteri (GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);  
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, depth_size, depth_size, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glBindTexture(GL_TEXTURE_2D,0);
+
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,GL_TEXTURE_2D, _data->depthMapID,0);
+	//glBindTexture(GL_TEXTURE_2D, _data->shadowMapID);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,GL_TEXTURE_2D, _data->shadowMapID, 0);
+
+	GLenum FBOstatus = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	if(FBOstatus != GL_FRAMEBUFFER_COMPLETE_EXT)
+		printf("GL_FRAMEBUFFER_COMPLETE_EXT failed, CANNOT use FBO\n");
+
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	
+	/*
+	glGenRenderbuffersEXT(1, &_data->rboID);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _data->rboID);
+	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT,
+		depth_size, depth_size);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+	*/
+}
+
 void FltkViewer::init_opengl ( int w, int h )
- {
+ {   
    //sr_out<<"INIT"<<srnl;
    glViewport ( 0, 0, w, h );
    glEnable ( GL_DEPTH_TEST );
@@ -866,6 +981,16 @@ void FltkViewer::init_opengl ( int w, int h )
    glPointSize ( 2.0 );
 
    glShadeModel ( GL_SMOOTH );
+
+   SrCamera& cam = _data->camera;
+   //cam.zfar = 1000000;
+   cam.znear = 5.f;
+
+
+   // init shader
+   //initShadowMap();
+   //SbmShaderManager::singleton().addShader("Basic","",Std_FS.c_str(),false);
+
 
    updateLights();
  }
@@ -955,11 +1080,15 @@ void FltkViewer::updateLights()
 		{
 			SmartBody::SBPawn* sbpawn = dynamic_cast<SmartBody::SBPawn*>(pawn);
 			SrLight light;
-			sbpawn->getPosition();
-
+			light.directional = true;
+			light.diffuse = SrColor( 1.0f, 0.95f, 0.8f );
+			light.position = sbpawn->getPosition();
+			light.constant_attenuation = 1.0f;
+			_lights.push_back(light);
 		}
 	}
-
+	//LOG("light size = %d\n",_lights.size());
+	
 	if (_lights.size() == 0)
 	{
 		SrLight light;
@@ -979,25 +1108,237 @@ void FltkViewer::updateLights()
 	//	light2.linear_attenuation = 2.0f;
 		_lights.push_back(light2);
 	}
+	
 }
 
-void FltkViewer::draw() 
+void cameraInverse(float* dst, float* src)
 {
-   //static bool hasShaderSupport = false;
- 
-    //static bool hasShaderSupport = false;
+	dst[0] = src[0];
+	dst[1] = src[4];
+	dst[2] = src[8];
+	dst[3] = 0.0f;
+	dst[4] = src[1];
+	dst[5] = src[5];
+	dst[6]  = src[9];
+	dst[7] = 0.0f;
+	dst[8] = src[2];
+	dst[9] = src[6];
+	dst[10] = src[10];
+	dst[11] = 0.0f;
+	dst[12] = -(src[12] * src[0]) - (src[13] * src[1]) - (src[14] * src[2]);
+	dst[13] = -(src[12] * src[4]) - (src[13] * src[5]) - (src[14] * src[6]);
+	dst[14] = -(src[12] * src[8]) - (src[13] * src[9]) - (src[14] * src[10]);
+	dst[15] = 1.0f;
+}
+
+void FltkViewer::drawAllGeometries(bool shadowPass)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	// update deformable mesh
+
+	SrMat shadowTexMatrix;
+	if (_data->shadowmode == ModeShadows && !shadowPass) // update the texture transform matrix
+	{		
+		float cam_inverse_modelview[16];
+		const float bias[16] = {	0.5f, 0.0f, 0.0f, 0.0f, 
+			0.0f, 0.5f, 0.0f, 0.0f,
+			0.0f, 0.0f, 0.5f, 0.0f,
+			0.5f, 0.5f, 0.5f, 1.0f	};		
+		//glGetFloatv(GL_MODELVIEW_MATRIX, cam_modelview);
+		SrMat viewMat;
+		viewMat = _data->camera.get_view_mat(viewMat);
+		cameraInverse(cam_inverse_modelview, viewMat.pt(0));		
+		// since gluLookAt gives us an orthogonal matrix, we speed up the inverse computation
+		//cameraInverse(cam_inverse_modelview, cam_modelview);		
+		glActiveTexture(GL_TEXTURE7);
+		glMatrixMode(GL_TEXTURE);		
+		glLoadMatrixf(bias);
+		glMultMatrixf(_data->shadowCPM);
+		// multiply the light's (bias*crop*proj*modelview) by the inverse camera modelview
+		// so that we can transform a pixel as seen from the camera
+		glMultMatrixf(cam_inverse_modelview);	
+		glCullFace(GL_BACK);
+		SbmDeformableMeshGPU::shadowMapID = _data->depthMapID;
+	}
+	else
+	{
+		SbmDeformableMeshGPU::shadowMapID = -1;
+	}
+	
+	bool updateSim = mcu.update_timer();
+	SbmDeformableMeshGPU::useShadowPass = shadowPass;
+	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+		iter != mcu.getPawnMap().end();
+		iter++)
+	{
+		SbmPawn* pawn = (*iter).second;
+		SbmCharacter* char_p = dynamic_cast<SbmCharacter*>(pawn);
+		if( char_p && char_p->dMesh_p)
+		{
+			char_p->dMesh_p->update();
+		}
+	}
+	
+
+	_data->fcounter.start();
+	if ( _data->displayaxis ) _data->render_action.apply ( _data->sceneaxis );
+	if ( _data->boundingbox ) _data->render_action.apply ( _data->scenebox );
+
+	std::string shaderName = shadowPass ? "BasicShadow" : "Basic";
+	SbmShaderProgram* basicShader = SbmShaderManager::singleton().getShader(shaderName);
+	GLuint program = basicShader->getShaderProgram();
+	if (!shadowPass)
+		glUseProgram(program);		
+	GLuint useShadowMapLoc = glGetUniformLocation(program,"useShadowMap");
+	if (_data->shadowmode == ModeShadows && !shadowPass) // attach the texture
+	{		
+		
+		glActiveTexture(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, _data->depthMapID);
+		//glMatrixMode(GL_TEXTURE);
+		//glLoadMatrixf(shadowTexMatrix.pt(0));
+		glCullFace(GL_BACK);
+		//glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+		glUniform1i(glGetUniformLocation(program, "tex"), 7); 		
+		glMatrixMode(GL_MODELVIEW);			
+		glUniform1i(useShadowMapLoc,1);		
+	}
+	else
+	{
+		glUniform1i(useShadowMapLoc,0);		
+	}
+
+	if( _data->root )	{		
+		_data->render_action.apply ( _data->root );
+//		glDisable( GL_LIGHTING );
+/*
+		if( _data->shadowmode == ModeShadows )
+			//		if ( 1 )
+		{
+			GLfloat shadow_plane_floor[3][3] = {
+				{ 0.0, 0.0, 0.0 }, 
+				{ 1.0, 0.0, 0.0 }, 
+				{ 1.0, 0.0, -1.0 }
+			};
+			GLfloat shadow_light_pos[4];
+			GLfloat shadow_matrix[4][4];
+
+			
+			shadow_light_pos[ 0 ] = light2.position.x;
+			shadow_light_pos[ 1 ] = light2.position.y;
+			shadow_light_pos[ 2 ] = light2.position.z;
+			shadow_light_pos[ 3 ] = light2.directional ? 0.0f : 1.0f;
+
+			MakeShadowMatrix( shadow_plane_floor, shadow_light_pos, shadow_matrix );
+			glPushMatrix();
+			glMultMatrixf( (GLfloat *)shadow_matrix );
+			glColor3f( 0.6f, 0.57f, 0.53f );
+			_data->render_action.apply ( _data->root );
+			glPopMatrix();
+
+			shadow_light_pos[ 0 ] = light.position.x;
+			shadow_light_pos[ 1 ] = light.position.y;
+			shadow_light_pos[ 2 ] = light.position.z;
+			shadow_light_pos[ 3 ] = light.directional ? 0.0f : 1.0f;
+
+			MakeShadowMatrix( shadow_plane_floor, shadow_light_pos, shadow_matrix );
+#if 0
+			glPushMatrix();
+			glTranslatef( 0.0, 0.25, 0.0 );
+			glMultMatrixf( (GLfloat *)shadow_matrix );
+			glColor3f( 0.4f, 0.45f, 0.55f );
+			_data->render_action.apply ( _data->root );
+			glPopMatrix();
+#else
+			glEnable( GL_CLIP_PLANE0 );
+
+			GLdouble plane_eq_wall[ 4 ] = { 0.0, 0.0, 1.0, gridSize };
+			glClipPlane( GL_CLIP_PLANE0, plane_eq_wall );
+
+			glPushMatrix();
+			glTranslatef( 0.0, 0.25, 0.0 );
+			glMultMatrixf( (GLfloat *)shadow_matrix );
+			glColor3f( 0.4f, 0.45f, 0.55f );
+			_data->render_action.apply ( _data->root );
+			glPopMatrix();
+
+			GLdouble plane_eq_floor[ 4 ] = { 0.0, 1.0, 0.0, 0.0 };
+			glClipPlane( GL_CLIP_PLANE0, plane_eq_floor );
+
+			glPushMatrix();
+			glTranslatef( 0.0, 0.25, 0.0 );
+			glMultMatrixf( (GLfloat *)shadow_matrix );
+			glColor3f( 0.4f, 0.45f, 0.55f );
+			_data->render_action.apply ( _data->root );
+			glPopMatrix();
+
+			glDisable( GL_CLIP_PLANE0 );
+#endif
+		}
+		*/
+	}	
+	static GLfloat mat_emissin[] = { 0.0,  0.0,    0.0,    1.0 };
+	static GLfloat mat_ambient[] = { 0.0,  0.0,    0.0,    1.0 };
+	static GLfloat mat_diffuse[] = { 1.0,  1.0,    1.0,    1.0 };
+	static GLfloat mat_speclar[] = { 0.0,  0.0,    0.0,    1.0 };
+	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin );
+	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient );
+	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse );
+	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, mat_speclar );
+	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
+	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
+	float floorSize = 500;
+	glBegin(GL_QUADS);
+	glTexCoord2f(0,0);
+	glNormal3f(0,1,0);
+	glVertex3f(-floorSize,0,floorSize);	
+	glTexCoord2f(0,1);
+	glNormal3f(0,1,0);
+	glVertex3f(floorSize,0,floorSize);
+	glTexCoord2f(1,1);
+	glNormal3f(0,1,0);
+	glVertex3f(floorSize,0,-floorSize);
+	glTexCoord2f(1,0);
+	glNormal3f(0,1,0);
+	glVertex3f(-floorSize,0,-floorSize);	
+	glEnd();
+	drawPawns();
+	glUseProgram(0);	
+}
+
    
-   if ( !visible() ) return;
-   if ( !valid() ) 
+void FltkViewer::draw() 
+{	
+	if ( !visible() ) return;
+
+	SbmShaderManager& ssm = SbmShaderManager::singleton();
+	SbmTextureManager& texm = SbmTextureManager::singleton();
+
+	if (!context_valid())
+	{
+		LOG("First time initialize context");
+		ssm.initGLExtension();		
+		initShadowMap();
+	}
+	if ( !valid() ) 
+	{
+		init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
+		//hasShaderSupport = SbmShaderManager::initGLExtension();	   
+	} 	
+   
+   bool hasOpenGL        = ssm.initOpenGL();
+   bool hasShaderSupport = false;
+   // init OpenGL extension
+   if (hasOpenGL)
    {
-	   init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
-	   //hasShaderSupport = SbmShaderManager::initGLExtension();	   
-   }   
-//    if (hasShaderSupport)
-//    {
-// 	   SbmShaderManager::singleton().buildShaders();
-//    }
-   // move picking operations here to avoid interference with cbufviewer
+	   hasShaderSupport = ssm.initGLExtension();		
+   }
+   // update the shader map
+   if (hasShaderSupport)
+   {
+	   ssm.buildShaders();
+	   texm.updateTexture();
+   }	
 
    if (_objManipulator.hasPicking())
    {
@@ -1030,11 +1371,16 @@ void FltkViewer::draw()
 
    glScalef ( cam.scale, cam.scale, cam.scale );
 
+    updateLights();
 	glEnable ( GL_LIGHTING );
 	for (size_t x = 0; x < _lights.size(); x++)
 	{
-		glLight ( x, _lights[x] );
+		glLight ( x, _lights[x] );		
 	}
+
+	glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.0f);
+	glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.2f);
+	glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.08f);	
 
 	static GLfloat mat_emissin[] = { 0.0,  0.0,    0.0,    1.0 };
 	static GLfloat mat_ambient[] = { 0.0,  0.0,    0.0,    1.0 };
@@ -1058,108 +1404,19 @@ void FltkViewer::draw()
 
    //----- Render user scene -------------------------------------------
 
-	// update deformable mesh
-	bool updateSim = mcu.update_timer();
-	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-		iter != mcu.getPawnMap().end();
-		iter++)
-	{
-		SbmPawn* pawn = (*iter).second;
-		SbmCharacter* char_p = dynamic_cast<SbmCharacter*>(pawn);
-		if( char_p && char_p->dMesh_p)
-		{
-			char_p->dMesh_p->update();
-		}
-	}
-	
-
-	_data->fcounter.start();
-	if ( _data->displayaxis ) _data->render_action.apply ( _data->sceneaxis );
-	if ( _data->boundingbox ) _data->render_action.apply ( _data->scenebox );
-
-
-	if( _data->root )	{
-
-		_data->render_action.apply ( _data->root );
-
-		glDisable( GL_LIGHTING );
-
-		if( _data->shadowmode == ModeShadows )
-//		if ( 1 )
-		{
-			/*
-			GLfloat shadow_plane_floor[3][3] = {
-				{ 0.0, 0.0, 0.0 }, 
-				{ 1.0, 0.0, 0.0 }, 
-				{ 1.0, 0.0, -1.0 }
-			};
-			GLfloat shadow_light_pos[4];
-			GLfloat shadow_matrix[4][4];
-
-			shadow_light_pos[ 0 ] = light2.position.x;
-			shadow_light_pos[ 1 ] = light2.position.y;
-			shadow_light_pos[ 2 ] = light2.position.z;
-			shadow_light_pos[ 3 ] = light2.directional ? 0.0f : 1.0f;
-
-			MakeShadowMatrix( shadow_plane_floor, shadow_light_pos, shadow_matrix );
-			glPushMatrix();
-				glMultMatrixf( (GLfloat *)shadow_matrix );
-				glColor3f( 0.6f, 0.57f, 0.53f );
-				_data->render_action.apply ( _data->root );
-			glPopMatrix();
-
-			shadow_light_pos[ 0 ] = light.position.x;
-			shadow_light_pos[ 1 ] = light.position.y;
-			shadow_light_pos[ 2 ] = light.position.z;
-			shadow_light_pos[ 3 ] = light.directional ? 0.0f : 1.0f;
-
-			MakeShadowMatrix( shadow_plane_floor, shadow_light_pos, shadow_matrix );
-#if 0
-			glPushMatrix();
-				glTranslatef( 0.0, 0.25, 0.0 );
-				glMultMatrixf( (GLfloat *)shadow_matrix );
-				glColor3f( 0.4f, 0.45f, 0.55f );
-				_data->render_action.apply ( _data->root );
-			glPopMatrix();
-#else
-			glEnable( GL_CLIP_PLANE0 );
-
-			GLdouble plane_eq_wall[ 4 ] = { 0.0, 0.0, 1.0, gridSize };
-			glClipPlane( GL_CLIP_PLANE0, plane_eq_wall );
-
-			glPushMatrix();
-				glTranslatef( 0.0, 0.25, 0.0 );
-				glMultMatrixf( (GLfloat *)shadow_matrix );
-				glColor3f( 0.4f, 0.45f, 0.55f );
-				_data->render_action.apply ( _data->root );
-			glPopMatrix();
-
-			GLdouble plane_eq_floor[ 4 ] = { 0.0, 1.0, 0.0, 0.0 };
-			glClipPlane( GL_CLIP_PLANE0, plane_eq_floor );
-
-			glPushMatrix();
-				glTranslatef( 0.0, 0.25, 0.0 );
-				glMultMatrixf( (GLfloat *)shadow_matrix );
-				glColor3f( 0.4f, 0.45f, 0.55f );
-				_data->render_action.apply ( _data->root );
-			glPopMatrix();
-
-			glDisable( GL_CLIP_PLANE0 );
-#endif
-			*/
-		}
-	}
-
+	if (_data->shadowmode == ModeShadows)
+		makeShadowMap();
+	drawAllGeometries();		
    // draw the grid
 	//   if (gridList == -1)
 	//	   initGridList();
-	   drawGrid();
+	drawGrid();
 
 	drawEyeBeams();
 	drawEyeLids();
 	drawDynamics();
 	drawLocomotion();
-	drawPawns();
+	
 
 	if (_data->showcollisiongeometry)
 		drawColliders();
@@ -3872,6 +4129,88 @@ void FltkViewer::notify(DSubject* subject)
 			}
 		}
 	}
+}
+
+void FltkViewer::makeShadowMap()
+{
+
+	SrLight &light = _data->light;
+	float shad_modelview[16];
+	
+	//	glDisable(GL_LIGHTING);
+	//glDisable(GL_TEXTURE_2D);
+	// since the shadow maps have only a depth channel, we don't need color computation
+	// glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();	
+	glLoadIdentity();
+	gluPerspective(70,1,30.f,3000.f);
+	
+	SrLight& shadowLight = _lights[0]; // assume direction light
+	SrVec dir = shadowLight.position;
+	dir.normalize();
+	float distance = 800;
+	dir*= distance;
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	// the light is from position to origin
+	//gluLookAt(light.position[0], light.position[1], light.position[2], 0.f, 0.f, 0.f, 0.0f, 1.0f, 0.0f);
+	//gluLookAt(light.position[0], light.position[1], light.position[2], 0,0,0, -1.0f, 0.0f, 0.0f);
+	//gluLookAt(0, 0, 0, -light.position[0], -light.position[1], -light.position[2], -1.0f, 0.0f, 0.0f);
+	//gluLookAt(0, 600, 700, 0,0,0, 0.0f, 1.0f, 0.0f);
+	gluLookAt(dir[0],dir[1],dir[2],0,0,0,0,1,0);
+	glGetFloatv(GL_MODELVIEW_MATRIX, shad_modelview);
+	// redirect rendering to the depth texture
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _data->depthFB);
+	// store the screen viewport
+	glPushAttrib(GL_VIEWPORT_BIT);
+	int depth_size = SHADOW_MAP_RES;
+	// and render only to the shadowmap
+	glViewport(0, 0, depth_size, depth_size);
+	// offset the geometry slightly to prevent z-fighting
+	// note that this introduces some light-leakage artifacts
+	//glPolygonOffset( 1.0f, 4096.0f);
+	//glEnable(GL_POLYGON_OFFSET_FILL);
+	// draw all faces since our terrain is not closed.
+	//
+	glDisable(GL_CULL_FACE);	
+	//glCullFace(GL_FRONT);
+	// for all shadow maps:
+	// make the current depth map a rendering target
+	//glFramebufferTextureLayerEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, depth_tex_ar, 0, i);
+	//glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,GL_TEXTURE_2D, _data->shadowMapID, 0);
+	//glBindTexture(GL_TEXTURE_2D, _data->depthMapID);
+	//glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); 
+	// clear the depth texture from last time
+	//glEnable(GL_CULL_FACE);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	//glCullFace(GL_FRONT);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);	
+	// draw the scene
+	//terrain->Draw(minZ);	
+	drawAllGeometries(true);
+	glMatrixMode(GL_PROJECTION);
+	// store the product of all shadow matries for later
+	glMultMatrixf(shad_modelview);
+	glGetFloatv(GL_PROJECTION_MATRIX, _data->shadowCPM);
+	
+
+	// revert to normal back face culling as used for rendering
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glDisable(GL_POLYGON_OFFSET_FILL);
+	glPopAttrib(); 
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glEnable(GL_TEXTURE_2D);
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	
+	//SbmShaderProgram::printOglError("shadowMapError");
+
 }
 
 PALocomotionData::PALocomotionData()

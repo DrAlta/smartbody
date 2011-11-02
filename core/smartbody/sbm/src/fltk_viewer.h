@@ -291,6 +291,8 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public DObserver
         method is called also each time the window is reshaped. */
     virtual void init_opengl ( int w, int h );
 
+	void initShadowMap();
+	void makeShadowMap();
     /*! hande(int) controls the activation of the button menu, 
 		and translates fltk events into the SrEvent class
         to then call handle_event(). Note that all handle methods should return
@@ -322,6 +324,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public DObserver
     virtual int handle_keyboard ( const SrEvent &e );
 
 	void initGridList();	
+	void drawAllGeometries(bool shadowPass = false); // draw all objects with geometry ( so no debug rendering included )
 	void drawGrid();
 	void drawEyeBeams();
 	void drawEyeLids();
@@ -431,6 +434,8 @@ protected:
    SrSaGlRender render_action;
    SrSaBBox bbox_action;
 
+   GLuint  shadowMapID, depthMapID, depthFB, rboID;
+   GLfloat shadowCPM[16];
 
  };
 

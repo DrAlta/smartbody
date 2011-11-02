@@ -320,6 +320,7 @@ float SteeringAgent::evaluateBasicLoco(float x, float y, float z, float yaw)
 	normalizeAngle(angleGlobal);
 	normalizeAngle(yaw);
 	float angleDiff = angleGlobal - yaw;
+	//LOG("turning Rate= %f\n",angleDiff/dt);
 	normalizeAngle(angleDiff);
 
 	float newSpeed = desiredSpeed;
@@ -928,6 +929,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	if (distToTarget > distThreshold)
 		stepAdjust = false;
 
+	// slow down mechanism when close to the target
 	float targetSpeed = steeringCommand.targetSpeed;
 	float gain = 0.8f;
 	if (targetSpeed > 3)
