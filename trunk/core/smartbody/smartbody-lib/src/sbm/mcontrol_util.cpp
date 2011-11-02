@@ -1093,24 +1093,7 @@ void mcuCBHandle::update( void )	{
 		activeSequences.removeSequence(sequencesToDelete[d], true);
 	}
 
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
-	SbmShaderManager& ssm = SbmShaderManager::singleton();
-	SbmTextureManager& texm = SbmTextureManager::singleton();
-	bool hasOpenGL        = ssm.initOpenGL();
-	bool hasShaderSupport = false;
 
-	// init OpenGL extension
-	if (hasOpenGL)
-	{
-		hasShaderSupport = ssm.initGLExtension();		
-	}
-	// update the shader map
-	if (hasShaderSupport)
-	{
-		ssm.buildShaders();
-		texm.updateTexture();
-	}	
-#endif
 
 	bool isClosingBoneBus = false;
     std::map<std::string, SbmPawn*>::iterator iter;

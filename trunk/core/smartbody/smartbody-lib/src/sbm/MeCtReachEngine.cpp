@@ -472,7 +472,15 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	}
 
 	ikMaxOffset = ikDefaultVelocity*3.f*dt;
-	solveIK(reachData,ikMotionFrame);	
+	if (footIKFix)
+	{
+		solveIK(reachData,ikMotionFrame);	
+	}
+	else
+	{
+		ikMotionFrame = reachData->currentRefFrame;
+	}
+	
 	//ikMotionFrame = reachData->currentRefFrame;
 }
 

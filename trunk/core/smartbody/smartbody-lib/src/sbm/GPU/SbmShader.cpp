@@ -65,6 +65,8 @@ void SbmShaderProgram::initShaderProgramStr( const char* shaderVS, const char* s
 void SbmShaderProgram::buildShader()
 {
 	// build the shader after there is an opengl context
+	vsID = -1;
+	fsID = -1;
 	if (vsShaderStr.size() > 0)
 	{
 		vsID = glCreateShader(GL_VERTEX_SHADER);
@@ -79,8 +81,10 @@ void SbmShaderProgram::buildShader()
 
 	printShaderInfoLog(vsID);
 	programID = glCreateProgram();
-	glAttachShader(programID,vsID);
-	glAttachShader(programID,fsID);
+	if (vsID != -1)
+		glAttachShader(programID,vsID);
+	if (fsID != -1)
+		glAttachShader(programID,fsID);
 	glLinkProgram(programID);
 	printProgramInfoLog(programID);
 	isBuilt = true;

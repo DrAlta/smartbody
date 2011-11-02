@@ -372,9 +372,12 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 		si++)
 	{	
 		EffectorJointConstraint* cons = dynamic_cast<EffectorJointConstraint*>(si->second);//rotConstraint[i];
-		SrVec targetPos = currentReachEngine->getMotionParameter()->getMotionFrameJoint(outMotionFrame,cons->efffectorName.c_str())->gmat().get_translation();
+		SrMat gmat = currentReachEngine->getMotionParameter()->getMotionFrameJoint(outMotionFrame,cons->efffectorName.c_str())->gmat();
+		SrVec targetPos = gmat.get_translation();
+		SrQuat targetRot = SrQuat(gmat.get_rotation());		
 		for (int k=0;k<3;k++)
 			cons->targetJoint->pos()->value(k,targetPos[k]);		
+		cons->targetJoint->quat()->value(targetRot);
 		cons->targetJoint->update_gmat();
 	}
 	updateChannelBuffer(frame,outMotionFrame);

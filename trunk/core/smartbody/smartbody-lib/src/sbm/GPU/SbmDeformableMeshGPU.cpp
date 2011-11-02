@@ -15,9 +15,12 @@ static bool intFloatComp(const IntFloatPair& p1, const IntFloatPair& p2)
 const char* ShaderDir = "../../smartbody-lib/src/sbm/GPU/shaderFiles/";
 const char* VSName = "vs_skin_pos.vert";
 const char* FSName = "fs_skin_render.frag";
-const std::string shaderName = "MeshSkin";
+const std::string shaderName = "Skin_Basic";
+const std::string shadowShaderName = "Skin_Shadow";
 bool SbmDeformableMeshGPU::initShader = false;
 bool SbmDeformableMeshGPU::useGPUDeformableMesh = true;
+bool SbmDeformableMeshGPU::useShadowPass = false;
+GLuint SbmDeformableMeshGPU::shadowMapID = -1;
 
 std::string shaderVS = 
 "#version 120 \n\
@@ -26,6 +29,7 @@ uniform samplerBuffer Transform; \n\
 attribute vec4 BoneID1,BoneID2;   \n\
 attribute vec4 BoneWeight1,BoneWeight2;\n \
 attribute vec3 tangent, binormal;\n\
+varying vec4 vPos;\n\
 varying vec3 normal,lightDir[2],halfVector[2];\n\
 varying vec3 tv,bv;\n\
 varying float dist[2];\n\
@@ -78,6 +82,7 @@ void main()\n \
 	// the following three lines provide the same result\n \
 	vec3 pos = vec3(gl_Vertex.xyz);\n \
 	mat4 skin = TransformPos(pos,gl_Normal,tangent,binormal,BoneID1,BoneWeight1) + TransformPos(pos,gl_Normal,tangent,binormal,BoneID2,BoneWeight2);\n\
+	vPos = gl_TextureMatrix[7]* gl_ModelViewMatrix*vec4(skin[0].xyz,1.0);\n\
 	gl_Position = gl_ModelViewProjectionMatrix*vec4(skin[0].xyz,1.0);\n\
 	lightDir[0] = normalize(vec3(gl_LightSource[0].position));\n\
 	halfVector[0] = normalize(gl_LightSource[0].halfVector.xyz);\n\
@@ -98,6 +103,7 @@ std::string shaderVS_2 =
 attribute vec4 BoneID1,BoneID2;   \n\
 attribute vec4 BoneWeight1,BoneWeight2;\n \
 attribute vec3 tangent, binormal;\n\
+varying vec4 vPos;\n\
 varying vec3 normal,lightDir[2],halfVector[2];\n\
 varying vec3 tv,bv;\n\
 varying float dist[2];\n\
@@ -134,6 +140,7 @@ void main()\n \
 // the following three lines provide the same result\n \
 vec3 pos = vec3(gl_Vertex.xyz);\n \
 mat4 skin = TransformPos(pos,gl_Normal,tangent,binormal,BoneID1,BoneWeight1) + TransformPos(pos,gl_Normal,tangent,binormal,BoneID2,BoneWeight2);\n\
+vPos = gl_TextureMatrix[7]* gl_ModelViewMatrix * vec4(skin[0].xyz,1.0);\n\
 gl_Position = gl_ModelViewProjectionMatrix*vec4(skin[0].xyz,1.0);\n\
 lightDir[0] = normalize(vec3(gl_LightSource[0].position));\n\
 halfVector[0] = normalize(gl_LightSource[0].halfVector.xyz);\n\
@@ -149,19 +156,38 @@ tv     = normalize(gl_NormalMatrix * tangent.xyz);\n\
 bv     = normalize(gl_NormalMatrix * binormal.xyz);\n\
 }\n";
 
+std::string shaderBasicFS =
+"void main (void)\n\
+{  \n\
+gl_FragColor = vec4(1,1,1,1);\n\
+}";
+
 std::string shaderFS =
 "const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.f)*(vec3(0.2,0.2,0.2));\n\
 uniform sampler2D diffuseTexture;\n\
 uniform sampler2D normalTexture;\n\
+uniform sampler2D tex;\n\
 uniform int  useTexture;\n\
 uniform int  useNormalMap;\n\
+uniform int  useShadowMap;\n\
 varying vec3 normal,lightDir[2],halfVector[2];\n\
 varying vec3 tv,bv;\n\
+varying vec4 vPos;\n\
 uniform vec3 diffuseMaterial;\n\
 uniform vec3 specularMaterial;\n\
 uniform float  shineness;\n\
 //uniform vec3 specularColors;\n\
 varying float dist[2];\n\
+vec4 shadowCoef()\n\
+{\n\
+int index = 0;\n\
+vec4 shadow_coord = vPos/vPos.w;\n\
+shadow_coord.z += 0.000005;\n\
+float shadow_d = texture2D(tex, shadow_coord.st).x;\n\
+float diff = 1.0;\n\
+diff = (shadow_d - shadow_coord.z);\n\
+return clamp( diff*850.0 + 1.0, 0.0, 1.0);//(shadow_d-0.9)*10;//clamp( diff*250.0 + 1.0, 0.0, 1.0);\n\
+}\n\
 void main (void)\n\
 {  \n\
 	vec3 n,halfV;\n\
@@ -180,6 +206,11 @@ void main (void)\n\
 	n = normalize(normal);\n\
 	if (useNormalMap == 1)\n\
 		n = normalMapN;\n\
+	vec4 shadowWeight = 1.0;\n\
+	if (useShadowMap == 1)\n\
+	{\n\
+		shadowWeight = shadowCoef();\n\
+	}\n\
 	for (int i=0;i<2;i++)\n\
 	{\n\
 		att = 1.0/(gl_LightSource[i].constantAttenuation + gl_LightSource[i].linearAttenuation * dist[i] + gl_LightSource[i].quadraticAttenuation * dist[i] * dist[i]);	\n\
@@ -191,7 +222,8 @@ void main (void)\n\
 			color += vec4(specularMaterial*pow(NdotHV, shineness+1.0),0)*att;\n\
 		}   \n\
 	}\n\
-	gl_FragColor = color;\n\
+	const float shadow_ambient = 1.f;\n\
+	gl_FragColor = vec4(color.rgb*shadowWeight*shadow_ambient,color.a);//color*shadow_ambient*shadowWeight;//vec4(color.rgb*shadowWeight,color.a);//color*shadowWeight;\n\
 }";
 
 
@@ -211,7 +243,8 @@ SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
 
 void SbmDeformableMeshGPU::skinTransformGPU()
 {
-	GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();
+	std::string activeShader = shaderName;//SbmDeformableMeshGPU::useShadowPass ? shadowShaderName : shaderName;
+	GLuint program = SbmShaderManager::singleton().getShader(activeShader)->getShaderProgram();
 
 	updateTransformBuffer();
 	glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );	
@@ -222,7 +255,7 @@ void SbmDeformableMeshGPU::skinTransformGPU()
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glAlphaFunc ( GL_GREATER, 0.3f ) ;
-
+	
 	glEnable(GL_TEXTURE);
 	glDisable(GL_COLOR_MATERIAL);
 	glUseProgram(program);	
@@ -231,6 +264,7 @@ void SbmDeformableMeshGPU::skinTransformGPU()
  	
 	GLuint diffuse_sampler_location = glGetUniformLocation(program,"diffuseTexture");	
 	GLuint normal_sampler_location = glGetUniformLocation(program,"normalTexture");	
+	GLuint shadow_sampler_location = glGetUniformLocation(program,"tex");	
 	GLuint bone_loc1 = glGetAttribLocation(program,"BoneID1");
 	GLuint weight_loc1 = glGetAttribLocation(program,"BoneWeight1");	
 	GLuint bone_loc2 = glGetAttribLocation(program,"BoneID2");
@@ -242,6 +276,7 @@ void SbmDeformableMeshGPU::skinTransformGPU()
 	GLuint shinenessLoc = glGetUniformLocation(program,"shineness");
 	GLuint useTextureLoc = glGetUniformLocation(program,"useTexture");
 	GLuint useNormalMapLoc = glGetUniformLocation(program,"useNormalMap");
+	GLuint useShadowMapLoc = glGetUniformLocation(program,"useShadowMap");
 
 	GLuint idQuery;
 	GLuint count = 0;
@@ -339,6 +374,22 @@ void SbmDeformableMeshGPU::skinTransformGPU()
 		{
 			glUniform1i(useNormalMapLoc,0);
 		}
+		if (SbmDeformableMeshGPU::shadowMapID != -1)
+		{
+			glActiveTexture(GL_TEXTURE7_ARB);
+			glBindTexture(GL_TEXTURE_2D,shadowMapID);
+			glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+			//glTexParameteri (GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);  
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+			glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+			glUniform1i(shadow_sampler_location, 7);
+			glUniform1i(useShadowMapLoc,1);			
+			glCullFace(GL_BACK);
+		}
+		else
+		{
+			glUniform1i(useShadowMapLoc,0);
+		}
 		mesh->VBOTri->VBO()->BindBuffer();
 		glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
 		mesh->VBOTri->VBO()->UnbindBuffer();
@@ -374,11 +425,13 @@ void SbmDeformableMeshGPU::initShaderProgram()
 	//SbmShaderManager::singleton().addShader(shaderName.c_str(),vsPathName.c_str(),fsPathName.c_str());
 	if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_3_0)
 	{
+		SbmShaderManager::singleton().addShader(shadowShaderName.c_str(),shaderVS.c_str(),shaderBasicFS.c_str(),false);
 		SbmShaderManager::singleton().addShader(shaderName.c_str(),shaderVS.c_str(),shaderFS.c_str(),false);
 	}
 	else if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_2_0)
 	{
-		SbmShaderManager::singleton().addShader(shaderName.c_str(),shaderVS_2.c_str(),shaderFS.c_str(),false);
+		SbmShaderManager::singleton().addShader(shadowShaderName.c_str(),shaderVS_2.c_str(),shaderBasicFS.c_str(),false);
+		SbmShaderManager::singleton().addShader(shaderName.c_str(),shaderVS.c_str(),shaderFS.c_str(),false);
 	}
 	else
 	{

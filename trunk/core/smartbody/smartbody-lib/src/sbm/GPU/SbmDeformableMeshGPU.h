@@ -19,10 +19,11 @@ class SbmDeformableMeshGPU : public DeformableMesh
 {
 public:
 	static bool useGPUDeformableMesh;
+	static bool useShadowPass;	
+	static GLuint shadowMapID;
 protected:
 	static bool initShader;
-	bool useGPU;
-	SbmShaderProgram shaderProgram;
+	bool useGPU;	
 	int numTotalVtxs, numTotalTris;
 	VBOVec4f *VBOPos;
 	VBOVec3f *VBOTangent, *VBOBiNormal;
@@ -45,7 +46,6 @@ protected:
 	bool initBuffer(); // initialize VBO and related GPU data buffer	
 	static void initShaderProgram();
 	void skinTransformGPU();
-	void updateTransformBuffer();
-	void drawVBO();
+	void updateTransformBuffer();	
 };
 
