@@ -59,7 +59,6 @@ set( SMARTBODY_LIB_SK_SRC
 	sk/sk_channel.cpp
 	sk/sk_joint.cpp
 	sk/sk_joint_euler.cpp
-	sk/sk_joint_name.cpp
 	sk/sk_joint_pos.cpp
 	sk/sk_joint_quat.cpp
 	sk/sk_joint_swing_twist.cpp
