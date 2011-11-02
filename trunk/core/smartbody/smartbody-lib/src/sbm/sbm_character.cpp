@@ -2102,6 +2102,9 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 				std::string meshFullDir = curpath.string();
 				//this->setStringAttribute("mesh",meshFullDir);
 			}
+
+			std::vector<std::string> xmlFileList;
+			std::vector<std::string> objFileList;
 			boost::filesystem2::directory_iterator end;
 			for (boost::filesystem2::directory_iterator iter(curpath); iter != end; iter++)
 			{
@@ -2114,39 +2117,65 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 					if (ext == ".xml" || ext == ".XML" ||
 						ext == ".dae" || ext == ".DAE")
 					{
-						std::stringstream strstr;
-						strstr << "char " << getName() << " smoothbindweight " << fileName;
-						if (prefix != "")
-							strstr << " -prefix " << prefix;
-						int successWeight = mcu_p->execute((char*) strstr.str().c_str());
-						if (successWeight == CMD_SUCCESS)
-						{
-							LOG("Successfully read skin weights from file %s", fileName.c_str());
-						}
-
-						// this could also be a file containing a mesh, so run that command as well
-						std::stringstream strstr2;
-						strstr2 << "char " << getName() << " smoothbindmesh " << fileName;
-						int successMesh = mcu_p->execute((char*) strstr2.str().c_str());
-						if (successMesh == CMD_SUCCESS)
-						{
-							LOG("Successfully read mesh from file %s", fileName.c_str());
-						}
-
-						if (successMesh == CMD_FAILURE && successWeight == CMD_FAILURE)
-						{
-							LOG("Could not read skin weights or mesh from %s", fileName.c_str());
-						}
+						xmlFileList.push_back(fileName);
 					}
-					else if (ext == ".obj" || ext == ".OBJ")
+					if (ext == ".obj" || ext == ".OBJ")
 					{
-						std::stringstream strstr;
-						strstr << "char " << getName() << " smoothbindmesh " << fileName;
-						int success = mcu_p->execute((char*) strstr.str().c_str());
-						if (success != CMD_SUCCESS)
-						{
-							LOG("Problem running: %s", strstr.str().c_str());
-						}
+						objFileList.push_back(fileName);
+					}
+				}
+			}
+
+			bool hasXmlMesh = true;
+			if (xmlFileList.size() == 0)
+			{
+				LOG("No XML file is found inside %s", meshdir);
+			}
+			else
+			{
+				std::string fileName = xmlFileList[0];
+				std::stringstream strstr;
+				strstr << "char " << getName() << " smoothbindweight " << fileName;
+				if (prefix != "")
+					strstr << " -prefix " << prefix;
+				int successWeight = mcu_p->execute((char*) strstr.str().c_str());
+				if (successWeight == CMD_SUCCESS)
+				{
+					LOG("Successfully read skin weights from file %s", fileName.c_str());
+				}
+				// this could also be a file containing a mesh, so run that command as well
+				std::stringstream strstr2;
+				strstr2 << "char " << getName() << " smoothbindmesh " << fileName;
+				int successMesh = mcu_p->execute((char*) strstr2.str().c_str());
+				if (successMesh == CMD_SUCCESS)
+				{
+					LOG("Successfully read mesh from file %s", fileName.c_str());
+				}
+				else
+				{
+					hasXmlMesh = false;
+					LOG("Could not read skin mesh from %s, searching for OBJ files now", fileName.c_str());
+				}
+				if (successMesh == CMD_FAILURE && successWeight == CMD_FAILURE)
+				{
+					LOG("Could not read skin weights or mesh from %s", fileName.c_str());
+				}				
+			}
+			if (!hasXmlMesh)
+			{
+				for (size_t i = 0; i < objFileList.size(); i++)
+				{
+					std::string fileName = objFileList[i];
+					std::stringstream strstr;
+					strstr << "char " << getName() << " smoothbindmesh " << fileName;
+					int success = mcu_p->execute((char*) strstr.str().c_str());
+					if (success != CMD_SUCCESS)
+					{
+						LOG("Problem running: %s", strstr.str().c_str());
+					}
+					else
+					{
+						LOG("Successfully read mesh from file %s", fileName.c_str());
 					}
 				}
 			}

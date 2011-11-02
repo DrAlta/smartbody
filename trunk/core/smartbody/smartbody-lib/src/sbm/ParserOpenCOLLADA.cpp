@@ -319,18 +319,33 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 			}
 			else if (typeAttr == "NODE")
 			{
-				DOMNode* materialNode = ParserOpenCOLLADA::getNode("instance_material", childNode);
+				DOMNode* materialNode = ParserOpenCOLLADA::getNode("bind_material", childNode);
 				if (materialNode)
 				{
-					DOMNamedNodeMap* materialAttr = materialNode->getAttributes();
-					DOMNode* symbolNode = materialAttr->getNamedItem(BML::BMLDefs::ATTR_SYMBOL);
-					std::string materialName = getString(symbolNode->getNodeValue());
+					DOMNode* techniqueCommonNode = ParserOpenCOLLADA::getNode("technique_common", materialNode);
+					if (techniqueCommonNode)
+					{
+						const DOMNodeList* materialList = techniqueCommonNode->getChildNodes();
+						for (unsigned int ml = 0; ml < materialList->getLength(); ml++)
+						{
+							DOMNode* childNode = materialList->item(ml);
+							std::string nodeName = getString(childNode->getNodeName());	
+							if (nodeName == "instance_material")
+							{
+								DOMNamedNodeMap* materialAttr = childNode->getAttributes();
+								DOMNode* symbolNode = materialAttr->getNamedItem(BML::BMLDefs::ATTR_SYMBOL);
+								std::string materialName = getString(symbolNode->getNodeValue());
 
-					DOMNode* targetNode = materialAttr->getNamedItem(BML::BMLDefs::ATTR_TARGET);
-					std::string targetNameString = getString(targetNode->getNodeValue());
-					std::string targetName = targetNameString.substr(1);
-					if (materialId2Name.find(targetName) == materialId2Name.end())
-						materialId2Name.insert(std::make_pair(targetName, materialName));
+								DOMNode* targetNode = materialAttr->getNamedItem(BML::BMLDefs::ATTR_TARGET);
+								std::string targetNameString = getString(targetNode->getNodeValue());
+								std::string targetName = "";
+								if (targetNameString.length() > 0)
+									targetName = targetNameString.substr(1);
+								if (materialId2Name.find(targetName) == materialId2Name.end() && targetName != "")
+									materialId2Name.insert(std::make_pair(targetName, materialName));
+							}
+						}
+					}
 				}
 				parseJoints(list->item(i), skeleton, motion, scale, order, materialId2Name, parent);
 			}
@@ -673,7 +688,7 @@ std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 	if (found != string::npos)
 		return "texcoords";
 
-	LOG("ParserOpenCOLLADA::getGeometryType WARNING: type %s not supported!", idString.c_str());	
+//	LOG("ParserOpenCOLLADA::getGeometryType WARNING: type %s not supported!", idString.c_str());	
 	return "";
 }
 
@@ -771,13 +786,29 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 							DOMNode* offsetNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_OFFSET);
 							int offset = atoi(getString(offsetNode->getNodeValue()).c_str());
 							if (pStride <= offset)	pStride = offset;
-							if (inputMap.find(offset) != inputMap.end())
+							if (inputMap.find(offset) != inputMap.end())	// same offset is wrong
 							{
 								if (inputSemantic == "VERTEX" || inputSemantic == "NORMAL" || inputSemantic == "TEXCOORD")
 									LOG("ParserOpenCOLLADA::parseLibraryGeometries ERR: file not correct.");
 							}
 							else
-								inputMap.insert(std::make_pair(offset, inputSemantic));
+							{
+								// should not allow same input semantic
+								bool hasDuplicate = false;
+								std::map<int, std::string>::iterator iter = inputMap.begin();
+								for (; iter != inputMap.end(); iter++)
+								{
+									if (iter->second == inputSemantic)
+									{
+										hasDuplicate = true;
+										break;
+									}
+								}
+								if (!hasDuplicate)
+									inputMap.insert(std::make_pair(offset, inputSemantic));
+								else
+									inputMap.insert(std::make_pair(offset, "null"));
+							}
 						}
 						if (XMLString::compareString(inputNode->getNodeName(), BML::BMLDefs::ATTR_VCOUNT) == 0)
 						{
@@ -854,7 +885,6 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 //			newModel->remove_redundant_normals();
 			newModel->compress();
 			meshModelVec.push_back(newModel);
-			LOG("Found model %s (%d verts, %d faces, %d materials) in file %s", (const char*) newModel->name, newModel->V.size(), newModel->F.size(), newModel->M.size(), file);
 
 			SrString path = file;
 			SrString filename;

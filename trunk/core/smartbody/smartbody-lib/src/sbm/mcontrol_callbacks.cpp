@@ -1832,6 +1832,11 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 			// parsing geometry
 			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f);
 		}
+		else
+		{
+			LOG( "Could not load mesh from file '%s'", obj_file);
+			return CMD_FAILURE;
+		}
 
 		// below code is to adjust the mesh if there's orientation in the joints. potential bug too because here only detect the first joint
 		SkSkeleton* skel = char_p->getSkeleton();
