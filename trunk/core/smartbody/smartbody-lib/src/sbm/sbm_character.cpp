@@ -2245,7 +2245,10 @@ else if( cmd == "bone" ) {
 			return mcu_character_bone_position_cmd( getName().c_str(), args, mcu_p );
 		} 
 		else if( cmd == "remove" ) {
-				return SbmCharacter::remove_from_scene( getName().c_str() );
+				int ret = SbmCharacter::remove_from_scene( getName().c_str() );
+				mcu_p->unregisterCharacter(this);
+				return ret;
+
 			} 
 			else if( cmd == "inspect" ) {
 					if( _skeleton ) {
@@ -3459,7 +3462,7 @@ float SbmCharacter::getMinVisemeTime() const
 
 void SbmCharacter::notify(DSubject* subject)
 {
-	SbmPawn::notify(subject);
+	SBPawn::notify(subject);
 
 	DAttribute* attribute = dynamic_cast<DAttribute*>(subject);
 	if (attribute)

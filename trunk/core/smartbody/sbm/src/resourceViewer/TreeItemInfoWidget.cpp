@@ -511,22 +511,14 @@ void EventItemInfoWidget::removeEvent()
 PawnItemInfoWidget::PawnItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, DObserver* observerWindow ) 
 : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
 {
-	
-	pawnInfoObject = new TreeInfoObject();	
-	pawnName = inputItem->label();
-	pawnInfoObject->setName(pawnName);
- 	pawnInfoObject->createDoubleAttribute("pos X", 0, true, "Basic", 20, false, false, false, "?");
-	pawnInfoObject->createDoubleAttribute("pos Y", 0, true, "Basic", 20, false, false, false, "?");
-	pawnInfoObject->createDoubleAttribute("pos Z", 0, true, "Basic", 20, false, false, false, "?");
-	pawnInfoObject->createDoubleAttribute("rot X", 0, true, "Basic", 20, false, false, false, "?");
-	pawnInfoObject->createDoubleAttribute("rot Y", 0, true, "Basic", 20, false, false, false, "?");
-	pawnInfoObject->createDoubleAttribute("rot Z", 0, true, "Basic", 20, false, false, false, "?");
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	updateWidget();
 	//if (observerWindow)
 	//	pawnInfoObject->registerObserver(observerWindow);
 	pawnInfoObject->registerObserver(this);
 	this->begin();
-		attrWindow = new AttributeWindow(pawnInfoObject,x,y,w,h,name);
+		SbmPawn* pawn = mcu.getPawn(pawnName);
+		attrWindow = new AttributeWindow(pawn,x,y,w,h,name);
 		attrWindow->begin();
 		attrWindow->end();
 	this->end();

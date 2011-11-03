@@ -2915,6 +2915,8 @@ void FltkViewer::drawPawns()
 		pawn->getSkeleton()->update_global_matrices();
 		std::vector<SkJoint*>& joints = pawn->getSkeleton()->get_joint_array();		
 		//glColor3f(1.0f, 1.0f, 0.0f);
+		if (joints.size() == 0)
+			continue;
 		SrMat gmat = joints[0]->gmat();
 		
 		if (pawn->colObj_p && dynamic_cast<SbmGeomNullObject*>(pawn->colObj_p) == NULL)

@@ -145,6 +145,8 @@ CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericVi
 
 	this->resizable(tabGroup);
 	this->size_range(640, 480);
+
+	vhcl::Log::g_log.AddListener(this);
 }
 
 void CommandWindow::OnMessage( const std::string & message )
@@ -154,12 +156,14 @@ void CommandWindow::OnMessage( const std::string & message )
 
 CommandWindow::~CommandWindow()
 {
-	delete DisplayTextBuffer;
+//	delete DisplayTextBuffer;
 	//delete EditorTextBuffer;
 	delete textEditor[0];
 	delete textEditor[1];
 	/*Fl_Text_Buffer *DisplayTextBuffer;
 	Fl_Text_Display *textDisplay;*/
+
+	vhcl::Log::g_log.RemoveListener(this);
 }
 
 CommandWindow* CommandWindow::getCommandWindow(Fl_Widget* w)

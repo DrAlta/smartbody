@@ -106,6 +106,11 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		SbmPawn* pawn = mcu.getPawn(name);
 		pawn->registerObserver(this);
+		FltkViewer* viewer = dynamic_cast<FltkViewer*>(mcu.viewer_p);
+		if (viewer)
+		{
+			viewer->updateLights();
+		}
 	}
 }
 

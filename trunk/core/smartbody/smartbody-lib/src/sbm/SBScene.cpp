@@ -5,11 +5,18 @@ namespace SmartBody {
 
 SBScene::SBScene(void)
 {
+	_sim = new SBSimulationManager();
+	_profiler = new Profiler();
+	_bml = new SBBmlProcessor();
+
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 }
 
 SBScene::~SBScene(void)
 {
+	delete _sim;
+	delete _profiler;
+	delete _bml;
 }
 
 void SBScene::notify( DSubject* subject )
@@ -34,6 +41,7 @@ SBCharacter* SBScene::createCharacter(std::string charName, std::string metaInfo
 	else
 	{
 		SBCharacter* character = new SBCharacter(charName, metaInfo);
+		mcu.registerCharacter(character);
 		return character;
 	}
 }
@@ -56,6 +64,7 @@ SBPawn* SBScene::createPawn(std::string pawnName)
 	else
 	{
 		SBPawn* pawn = new SBPawn(pawnName.c_str());
+		mcu.registerPawn(pawn);
 		return pawn;
 	}
 }
@@ -66,6 +75,7 @@ void SBScene::removeCharacter(std::string charName)
 	SbmCharacter* character = mcu.getCharacter(charName);
 	if (character)
 	{
+		mcu.unregisterCharacter(character);
 		SbmCharacter::remove_from_scene(charName.c_str());
 	}	
 }
@@ -78,7 +88,10 @@ void SBScene::removePawn(std::string pawnName)
 	{
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
 		if (!character)
+		{
+			mcu.unregisterPawn(pawn);
 			SbmPawn::remove_from_scene(pawnName.c_str());
+		}
 	}	
 }
 
@@ -324,12 +337,12 @@ void SBScene::runScript(std::string script)
 
 SBSimulationManager* SBScene::getSimulationManager()
 {
-	return &_sim;
+	return _sim;
 }
 
 Profiler* SBScene::getProfiler()
 {
-	return &_profiler;
+	return _profiler;
 }
 
 FaceDefinition* SBScene::getFaceDefinition(std::string def)
@@ -352,7 +365,7 @@ FaceDefinition* SBScene::getFaceDefinition(std::string def)
 
 SBBmlProcessor* SBScene::getBmlProcessor()
 {
-	return &_bml;
+	return _bml;
 }
 
 

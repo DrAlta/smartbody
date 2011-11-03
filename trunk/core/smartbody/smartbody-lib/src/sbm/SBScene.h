@@ -71,9 +71,9 @@ class SBScene : public DObject
 		void notify(DSubject* subject);
 
 	private:
-		SBSimulationManager _sim;
-		Profiler _profiler;
-		SBBmlProcessor _bml;
+		SBSimulationManager* _sim;
+		Profiler* _profiler;
+		SBBmlProcessor* _bml;
 };
 
 };

@@ -203,7 +203,7 @@ class mcuCBHandle {
 		std::string speech_audiofile_base_path;
 		std::string process_id;
 		bool		play_internal_audio;	
-		SmartBody::SBScene     scene;
+		SmartBody::SBScene*     _scene;
 
 		
 		
@@ -298,6 +298,8 @@ class mcuCBHandle {
 		std::string getValidName(const std::string& name);
 		int registerCharacter(SbmCharacter* character);
 		int unregisterCharacter(SbmCharacter* character);
+		int registerPawn(SbmPawn* pawn);
+		int unregisterPawn(SbmPawn* pawn);
 
 		std::map<std::string, SbmPawn*>& getPawnMap();
 		bool addPawn(SbmPawn* pawn);
