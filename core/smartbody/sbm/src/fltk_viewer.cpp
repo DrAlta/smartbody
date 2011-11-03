@@ -935,7 +935,7 @@ void FltkViewer::initShadowMap()
 	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, depth_size, depth_size, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, depth_size, depth_size, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glBindTexture(GL_TEXTURE_2D,0);
 
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,GL_TEXTURE_2D, _data->depthMapID,0);
@@ -2836,6 +2836,7 @@ void FltkViewer::drawEyeLids()
 				glColor3f(1.0, 0.0, 0.0);
 				SrVec offset = eyeLidLowerLeft->offset();
 				glBegin(GL_POINTS);
+
 				glVertex3f(offset.x, offset.y, offset.z);
 				glEnd();
 
