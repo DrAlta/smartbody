@@ -178,7 +178,7 @@ uniform vec3 specularMaterial;\n\
 uniform float  shineness;\n\
 //uniform vec3 specularColors;\n\
 varying float dist[2];\n\
-vec4 shadowCoef()\n\
+float shadowCoef()\n\
 {\n\
 int index = 0;\n\
 vec4 shadow_coord = vPos/vPos.w;\n\
@@ -206,7 +206,7 @@ void main (void)\n\
 	n = normalize(normal);\n\
 	if (useNormalMap == 1)\n\
 		n = normalMapN;\n\
-	vec4 shadowWeight = 1.0;\n\
+	float shadowWeight = 1.0;\n\
 	if (useShadowMap == 1)\n\
 	{\n\
 		shadowWeight = shadowCoef();\n\
@@ -222,7 +222,7 @@ void main (void)\n\
 			color += vec4(specularMaterial*pow(NdotHV, shineness+1.0),0)*att;\n\
 		}   \n\
 	}\n\
-	const float shadow_ambient = 1.f;\n\
+	const float shadow_ambient = 1.0;\n\
 	gl_FragColor = vec4(color.rgb*shadowWeight*shadow_ambient,color.a);//color*shadow_ambient*shadowWeight;//vec4(color.rgb*shadowWeight,color.a);//color*shadowWeight;\n\
 }";
 
@@ -736,7 +736,7 @@ bool SbmDeformableMeshGPU::initBuffer()
 					SrVec nvec;
 					SrPnt2 tvec = SrPnt2(0,0);
 					nvec = dMeshStatic->shape().N[nIdx[k]];
-					if (dMeshStatic->shape().T.size() > tIdx[k])
+					if (dMeshStatic->shape().T.size() > tIdx[k] && dMeshStatic->shape().T.size() > 0 && dMeshStatic->shape().Ft.size() > 0)
 						tvec = dMeshStatic->shape().T[tIdx[k]];
 					int newNIdx = nIdx[k] + iNormalIdxOffset;
 					int newTIdx = tIdx[k] + iTextureIdxOffset;
