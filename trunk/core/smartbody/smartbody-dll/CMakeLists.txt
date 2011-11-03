@@ -12,8 +12,8 @@ add_library(
 
 target_link_libraries( smartbody-dll
 
-#	tcmalloc
-#	profiler
+	tcmalloc
+	profiler
 	smartbody-lib
 	bonebus
 	vhmsg
