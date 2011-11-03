@@ -290,7 +290,7 @@
   </library_effects>
   <library_images>
     <image id="Face_texNode" name="Face_texNode">
-      <init_from>file:///E:/trunk/data/mesh/elder/Face.tga</init_from>
+      <init_from>file:///E:/trunk/data/mesh/elder/Face.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -300,7 +300,7 @@
       </extra>
     </image>
     <image id="Hat_texNode" name="Hat_texNode">
-      <init_from>file:///E:/trunk/data/mesh/elder/Hat.tga</init_from>
+      <init_from>file:///E:/trunk/data/mesh/elder/Hat.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -310,7 +310,7 @@
       </extra>
     </image>
     <image id="Jacket_texNode" name="Jacket_texNode">
-      <init_from>file:///E:/trunk/data/mesh/elder/Jacket.tga</init_from>
+      <init_from>file:///E:/trunk/data/mesh/elder/Jacket.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -320,7 +320,7 @@
       </extra>
     </image>
     <image id="PantsShirtShoes_texNode" name="PantsShirtShoes_texNode">
-      <init_from>file:///E:/trunk/data/mesh/elder/PantsShirtShoes.tga</init_from>
+      <init_from>file:///E:/trunk/data/mesh/elder/PantsShirtShoes.dds</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
