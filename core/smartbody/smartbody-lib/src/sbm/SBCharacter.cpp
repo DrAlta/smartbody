@@ -11,13 +11,11 @@ namespace SmartBody {
 SBCharacter::SBCharacter() : SbmCharacter()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.registerCharacter(this);
 }
 
 SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name.c_str(), type)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.registerCharacter(this);
 }
 
 int SBCharacter::setup()

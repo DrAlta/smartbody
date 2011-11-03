@@ -2225,6 +2225,7 @@ int mcu_character_init(
 
 	//SbmCharacter *char_p = new SbmCharacter(char_name);
 	SmartBody::SBCharacter *char_p = new SmartBody::SBCharacter(char_name, className);
+	mcu_p->registerCharacter(char_p);
 	SkSkeleton* skeleton_p = NULL;
 	// does the skeleton already exist in the skeleton map?
 	std::map<std::string, SkSkeleton*>::iterator skelIter = mcu_p->skeleton_map.find(skel_file);

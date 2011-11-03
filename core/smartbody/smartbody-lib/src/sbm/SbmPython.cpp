@@ -203,10 +203,10 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("vhmsg", &SBScene::sendVHMsg, "Sends a virtual human message.")
 		.def("vhmsg2", &SBScene::sendVHMsg2, "Sends a virtual human message.")
 		.def("run", &SBScene::runScript, "Runs a python script.")
-		.def("getSimulationManager", &SBScene::getSimulationManager, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the simulation manager object. \n Input: NULL \n Output: time manager object")
-		.def("getProfiler", &SBScene::getProfiler, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the  profiler object. \n Input: NULL \n Output: time profiler object")
+		.def("getSimulationManager", &SBScene::getSimulationManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the simulation manager object. \n Input: NULL \n Output: time manager object")
+		.def("getProfiler", &SBScene::getProfiler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the  profiler object. \n Input: NULL \n Output: time profiler object")
 		.def("getFaceDefinition", &SBScene::getFaceDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a defined viseme and AU set given the first parameter. To get the default set, use \"_default_\"")
-		.def("getBmlProcessor", &SBScene::getBmlProcessor, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the bml processor object.\n Input: NULL \nOutput: bml processor object")
+		.def("getBmlProcessor", &SBScene::getBmlProcessor, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the bml processor object.\n Input: NULL \nOutput: bml processor object")
 	;
 
 	boost::python::def("createController", createController, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new controller given a controller type and a controller name.");

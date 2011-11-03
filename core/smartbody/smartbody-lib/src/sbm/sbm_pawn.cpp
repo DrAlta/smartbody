@@ -482,7 +482,10 @@ SbmPawn::~SbmPawn()	{
 
 
 const SkJoint* SbmPawn::get_joint( const char* joint_name ) const {
-	return _skeleton->search_joint( joint_name );
+	if (_skeleton)
+		return _skeleton->search_joint( joint_name );
+	else
+		return NULL;
 }
 
 
@@ -602,6 +605,7 @@ int SbmPawn::parse_pawn_command( std::string cmd, srArgBuffer& args, mcuCBHandle
 	if (cmd == "remove")
 	{	
 		remove_from_scene();
+		mcu_p->unregisterPawn(this);
 		return CMD_SUCCESS;
 	}
 	else if (cmd == "prune")
@@ -796,6 +800,8 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 
 		int err = pawn_p->init( skeleton );
+		mcu_p->registerPawn(pawn_p);
+
 		if( err != CMD_SUCCESS ) {
 			std::stringstream strstr;		
 			strstr << "ERROR: Unable to initialize SbmPawn \"" << pawn_name << "\".";
@@ -836,6 +842,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		// 			pawn_p->colObj_p = colObj;
 		// 		}
 
+		/*
 		bool ok = mcu_p->addPawn( pawn_p );
 		if( !ok )	{
 			std::stringstream strstr;
@@ -845,6 +852,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			skeleton->unref();
 			return err;
 		}
+		*/
 
 		if (pawn_p->colObj_p)
 		{

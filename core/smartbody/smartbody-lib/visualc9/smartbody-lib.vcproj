@@ -1980,14 +1980,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sk\sk_joint_name.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sk\sk_joint_name.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sk\sk_joint_pos.cpp"
 				>
 			</File>

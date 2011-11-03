@@ -93,7 +93,7 @@ void Script::abort()
 void Script::preProcessingScript(srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SBScene& scene = mcu.scene;
+	SBScene& scene = (*mcu._scene);
 
 	float t;
 	char *cmd;	
@@ -590,7 +590,7 @@ void printLog(const std::string& message)
 SBScene* getScene()
 {	
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	return &mcu.scene;
+	return mcu._scene;
 }
 
 SBController* createController(std::string controllerType, std::string controllerName)

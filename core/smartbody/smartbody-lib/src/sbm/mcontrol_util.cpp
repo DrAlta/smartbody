@@ -290,6 +290,7 @@ mcuCBHandle::mcuCBHandle()
 	physicsEngine = new SbmPhysicsSimODE();
 	physicsEngine->initSimulation();
 	steeringScale = 0.01f;
+	_scene = new SmartBody::SBScene();
 }
 
 /////////////////////////////////////////////////////////////
@@ -706,6 +707,8 @@ void mcuCBHandle::clear( void )	{
 	if (kinectProcessor)
 		delete kinectProcessor;
 	kinectProcessor = NULL;
+
+	delete _scene;
 }
 
 /////////////////////////////////////////////////////////////
@@ -1953,6 +1956,38 @@ std::string mcuCBHandle::getValidName(const std::string& name)
 	return currentName;
 }
 
+int mcuCBHandle::registerPawn(SbmPawn* pawn)
+{
+	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(pawn->getName());
+	if (iter != pawn_map.end())
+	{
+		LOG( "Register pawn: pawn_map.insert(..) '%s' FAILED\n", pawn->getName().c_str() ); 
+		return( CMD_FAILURE );
+	}
+
+	pawn_map.insert(std::pair<std::string, SbmPawn*>(pawn->getName(), pawn));
+	
+	if ( mcuCBHandle::singleton().sbm_character_listener )
+		mcuCBHandle::singleton().sbm_character_listener->OnPawnCreate( pawn->getName().c_str() );
+
+	return CMD_SUCCESS;
+}
+
+int mcuCBHandle::unregisterPawn(SbmPawn* pawn)
+{
+	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(pawn->getName());
+	if (iter != pawn_map.end())
+	{
+		pawn_map.erase(iter);
+	}
+
+	if ( mcuCBHandle::singleton().sbm_character_listener )
+		mcuCBHandle::singleton().sbm_character_listener->OnPawnDelete( pawn->getName().c_str() );
+
+
+	return CMD_SUCCESS;
+}
+
 int mcuCBHandle::registerCharacter(SbmCharacter* character)
 {
 	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(character->getName());
@@ -1996,7 +2031,8 @@ int mcuCBHandle::unregisterCharacter(SbmCharacter* character)
 		character_map.erase(citer);
 	}
 
-	//root_group_p->remove(character->scene_p); 
+	if ( mcuCBHandle::singleton().sbm_character_listener )
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( character->getName().c_str() );
 
 	return 1;
 }

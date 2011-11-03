@@ -266,7 +266,6 @@ void BaseWindow::LaunchConsoleCB(Fl_Widget* widget, void* data)
 	if (!rootWindow->commandWindow)
 	{
 		rootWindow->commandWindow = new CommandWindow(150, 150, 640, 480, "Commands");
-		vhcl::Log::g_log.AddListener(rootWindow->commandWindow);
 	}
 
 	rootWindow->commandWindow->show();
