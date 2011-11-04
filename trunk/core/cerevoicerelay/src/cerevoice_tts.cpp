@@ -751,7 +751,7 @@ std::string CreateMarkTimeStamps(std::string text)
 		sprintf(number, "%d", ++i);
 		markUp = markUp.append("<mark name=\"T");
 		markUp = markUp.append(number);
-		markUp = markUp.append("\" />\n\n");
+		markUp = markUp.append("\" />\t\n\n");
 		++i;
 		if (tempText.size() > temp.size())
 		{
