@@ -114,6 +114,18 @@ int DObject::getNumAttributes()
 	return m_attributeList.size();
 }
 
+std::vector<std::string> DObject::getAttributeNames()
+{
+	std::vector<std::string> attrNameList;
+	for (std::map<std::string, DAttribute*>::iterator iter = m_attributeList.begin();
+		 iter != m_attributeList.end();
+		 iter++)
+	 {
+		 attrNameList.push_back(iter->first);
+	 }
+	 return attrNameList;
+}
+
 
  bool DObject::removeAttribute(const std::string& name)
  {

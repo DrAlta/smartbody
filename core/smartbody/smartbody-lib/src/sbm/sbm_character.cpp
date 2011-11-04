@@ -3948,6 +3948,6 @@ bool SbmCharacter::checkExamples()
 		this->steeringConfig = MINIMAL;
 		return true;
 	}
-	LOG("%s: Steering cannot work under example mode, revert back to basic mode", this->getName().c_str());
+	LOG("%s: Steering cannot work under example mode, reverting back to basic mode", this->getName().c_str());
 	return false;
 }

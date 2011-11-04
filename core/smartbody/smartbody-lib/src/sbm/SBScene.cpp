@@ -148,11 +148,10 @@ SkMotion* SBScene::getMotion(std::string name)
 	return motion;
 }
 
-#ifdef USE_PYTHON
-boost::python::list SBScene::getPawnNames()
+std::vector<std::string> SBScene::getPawnNames()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	boost::python::list ret;
+	std::vector<std::string> ret;
 
 	for(std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
 		iter != mcu.getPawnMap().end();
@@ -161,28 +160,27 @@ boost::python::list SBScene::getPawnNames()
 		SbmPawn* pawn = (*iter).second;
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
 		if (!character)
-			ret.append(std::string(pawn->getName()));
+			ret.push_back(std::string(pawn->getName()));
 	}
 
 	return ret;
 }
 
-boost::python::list SBScene::getCharacterNames()
+std::vector<std::string> SBScene::getCharacterNames()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	boost::python::list ret;
+	std::vector<std::string> ret;
 
 	for(std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
 		iter != mcu.getCharacterMap().end();
 		iter++)
 	{
 		SbmCharacter* sbmCharacter = (*iter).second;
-		ret.append(std::string(sbmCharacter->getName()));
+		ret.push_back(std::string(sbmCharacter->getName()));
 	}
 
 	return ret;
 }
-#endif
 
 void SBScene::addAssetPath(std::string type, std::string path)
 {

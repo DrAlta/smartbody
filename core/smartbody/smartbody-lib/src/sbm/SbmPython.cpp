@@ -169,6 +169,10 @@ namespace SmartBody
 #ifdef USE_PYTHON
 BOOST_PYTHON_MODULE(SmartBody)
 {
+    boost::python::class_<std::vector<std::string> >("StringVec")
+        .def(boost::python::vector_indexing_suite<std::vector<std::string> >())
+    ;
+
 	//boost::python::numeric::array::set_module_and_type("numpy", "ndarray");
 	
 
@@ -430,6 +434,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 	boost::python::class_<DObject>("SBObject")
 		.def("getNumAttributes", &DObject::getNumAttributes,  "Returns the number of attributes associated with this object.")
+		.def("getAttributeNames", &DObject::getAttributeNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the attributes names associated with this object.")
 		.def("getAttribute", &DObject::getAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns an attribute of a given name")
 		.def("createBoolAttribute", &DObject::createBoolAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a boolean attribute.")
 		.def("createIntAttribute", &DObject::createIntAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates an integer attribute.")
@@ -490,7 +495,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getChannelSize", &SBSkeleton::getChannelSize, "Returns the size of the channel given index.")	
 		;
 
-	boost::python::class_<SBJoint>("SBJoint")
+	boost::python::class_<SBJoint, boost::python::bases<DObject> >("SBJoint")
 		.def(boost::python::init<>())
 		.def("setName", &SBJoint::setName, "Set the name of the joint.")
 		.def("getName", &SBJoint::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the joint.")

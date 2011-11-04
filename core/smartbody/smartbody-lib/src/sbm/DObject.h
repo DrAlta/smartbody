@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 #include "DAttribute.h"
 #include "DAttributeManager.h"
 #include "DObserver.h"
@@ -23,6 +24,9 @@ class DObject : public DObserver, public DSubject
 		bool removeAttribute(const std::string& name);
 		void clearAttributes();
 		int getNumAttributes();
+
+		std::vector<std::string> getAttributeNames();
+
 		BoolAttribute* createBoolAttribute(const std::string& name, bool value, bool notifySelf, const std::string& groupName, int priority, 
 													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
 		IntAttribute* createIntAttribute(const std::string& name, int value, bool notifySelf, const std::string& groupName, int priority, 

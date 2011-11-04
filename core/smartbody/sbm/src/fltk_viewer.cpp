@@ -100,7 +100,7 @@ std::string Std_FS =
 "uniform sampler2D tex;\n\
 uniform int useShadowMap;\n\
 varying vec4 vPos;\n\
-float shadowCoef()\n\
+vec4 shadowCoef()\n\
 {\n\
 	int index = 0;\n\
 	vec4 shadow_coord = vPos/vPos.w;//gl_TextureMatrix[1]*vPos;\n\
@@ -114,9 +114,9 @@ float shadowCoef()\n\
 }\n\
 void main()\n\
 {\n\
-	const float shadow_ambient = 1.0;\n\
-	float shadow_coef = 1.0;\n\
-	if (useShadowMap == 1) \n\
+	const float shadow_ambient = 1.f;\n\
+	vec4 shadow_coef = 1.0;\n\
+	if (useShadowMap) \n\
 		shadow_coef = shadowCoef();\n\
 	gl_FragColor = gl_Color*shadow_ambient * shadow_coef;\n\
 }";
@@ -125,7 +125,7 @@ void main()\n\
 std::string Shadow_FS = 
 "void main (void)\n\
 {\n\
-gl_FragColor = gl_Color*0.5;\n\
+gl_FragColor = gl_Color*0.5f;\n\
 }";
 
 //=============================== srSaSetShapesChanged ===========================================
@@ -935,7 +935,7 @@ void FltkViewer::initShadowMap()
 	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, depth_size, depth_size, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, depth_size, depth_size, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glBindTexture(GL_TEXTURE_2D,0);
 
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,GL_TEXTURE_2D, _data->depthMapID,0);
@@ -1316,7 +1316,6 @@ void FltkViewer::draw()
 
 	if (!context_valid())
 	{
-		LOG("First time initialize context");
 		ssm.initGLExtension();		
 		initShadowMap();
 	}
@@ -2836,7 +2835,6 @@ void FltkViewer::drawEyeLids()
 				glColor3f(1.0, 0.0, 0.0);
 				SrVec offset = eyeLidLowerLeft->offset();
 				glBegin(GL_POINTS);
-
 				glVertex3f(offset.x, offset.y, offset.z);
 				glEnd();
 
