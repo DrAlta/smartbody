@@ -11,11 +11,12 @@ scene.addAssetPath("mesh", "../../../../data/mesh")
 scene.run("init-common-assets.py")
 #0	seq init-general-parameters
 scene.run("init-common-face.py")
-#0	panim enable
+scene.command("panim enable")
 
 doctor = scene.createCharacter("doctor", "SasoBase.SasoDoctorPerez")
 doctorSkeleton = scene.createSkeleton("common.sk")
 doctor.setSkeleton(doctorSkeleton)
+doctor.setFaceDefinition(defaultFace)
 doctorPos = SrVec(35, 102, 0)
 doctor.setPosition(doctorPos)
 doctorHPR = SrVec(-17, 0, 0)
@@ -28,6 +29,7 @@ doctor.setStringAttribute("mesh", "doctor")
 elder = scene.createCharacter("elder", "SasoBase.Mayor")
 elderSkeleton = scene.createSkeleton("common.sk")
 elder.setSkeleton(elderSkeleton)
+elder.setFaceDefinition(defaultFace)
 elderPos = SrVec(-35, 102, 0)
 elder.setPosition(elderPos)
 elderHPR = SrVec(17, 0, 0)
@@ -69,6 +71,9 @@ scene.run("default-viewer.py")
 # start the simulation
 sim.start()
 
+scene.command("seq init-param-animation inline")
+scene.command("seq init-example-reach inline")
+
 bml.execBML('doctor', '<body posture="LHandOnHip_Motex"/>')
 bml.execBML('elder', '<body posture="LHandOnHip_Motex"/>')
 bml.execBML('brad', '<body posture="HandsAtSide_Motex"/>')
@@ -79,18 +84,19 @@ bml.execBML('elder', '<saccade mode="listen"/>')
 bml.execBML('brad', '<saccade mode="listen"/>')
 bml.execBML('utah', '<saccade mode="listen"/>')
 
-#1	seq init-param-animation inline
-#2	seq init-example-reach inline
+scene.command("seq init-param-animation inline")
+scene.command("seq init-example-reach inline")
+
+scene.command("steer stateprefix doctor all")
+scene.command("steer stateprefix elder all")
+scene.command("steer stateprefix utah all")
+scene.command("steer stateprefix brad all")
+
+scene.command("steer start")
+scene.command("steer type doctor example")
+scene.command("steer type elder example")
+scene.command("steer type utah example")
+scene.command("steer type brad example")
+sim.resume()
 
 
-
-#3 steer stateprefix doctor all
-#3 steer stateprefix elder all
-#3 steer stateprefix utah all
-#3 steer stateprefix brad all
-
-#4 steer start
-#5 steer type doctor example
-#5 steer type elder example
-#5 steer type utah example
-#5 steer type brad example

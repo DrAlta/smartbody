@@ -5517,6 +5517,8 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				initialConditions.goals.clear();
 				initialConditions.name = character->getName();
 				SteerLib::AgentInterface* agent = mcu_p->steerEngine._engine->createAgent( initialConditions, pprAIModule );
+				if (!character->steeringAgent)
+					character->steeringAgent = new SteeringAgent(character);
 				character->steeringAgent->setAgent(agent);
 				agent->reset(initialConditions, dynamic_cast<SteerLib::EngineInterface*>(pprAIModule));
 			}

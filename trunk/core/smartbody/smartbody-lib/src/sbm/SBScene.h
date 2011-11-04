@@ -8,16 +8,6 @@
 #include <sbm/SBSimulationManager.h>
 #include <sbm/SBBmlProcessor.h>
 
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
-#ifndef USE_PYTHON
-#define USE_PYTHON
-#endif
-#endif
-
-#ifdef USE_PYTHON
-#include <boost/python.hpp>
-#endif
-
 namespace SmartBody {
 
 class SBScene : public DObject
@@ -39,10 +29,9 @@ class SBScene : public DObject
 		int getNumPawns();
 		SBCharacter* getCharacter(std::string name);
 		SBPawn* getPawn(std::string name);
-#ifdef USE_PYTHON
-		boost::python::list getPawnNames();
-		boost::python::list getCharacterNames();
-#endif
+
+		std::vector<std::string> getPawnNames();
+		std::vector<std::string> getCharacterNames();
 
 		FaceDefinition* getFaceDefinition(std::string str);
 
