@@ -173,6 +173,18 @@ BOOST_PYTHON_MODULE(SmartBody)
         .def(boost::python::vector_indexing_suite<std::vector<std::string> >())
     ;
 
+	boost::python::class_<std::vector<float> >("FloatVec")
+        .def(boost::python::vector_indexing_suite<std::vector<float> >())
+    ;
+
+	boost::python::class_<std::vector<int> >("IntVec")
+        .def(boost::python::vector_indexing_suite<std::vector<int> >())
+    ;
+
+	boost::python::class_<std::vector<double> >("DoubleVec")
+        .def(boost::python::vector_indexing_suite<std::vector<double> >())
+    ;
+
 	//boost::python::numeric::array::set_module_and_type("numpy", "ndarray");
 	
 
@@ -211,6 +223,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getProfiler", &SBScene::getProfiler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the  profiler object. \n Input: NULL \n Output: time profiler object")
 		.def("getFaceDefinition", &SBScene::getFaceDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a defined viseme and AU set given the first parameter. To get the default set, use \"_default_\"")
 		.def("getBmlProcessor", &SBScene::getBmlProcessor, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the bml processor object.\n Input: NULL \nOutput: bml processor object")
+		.def("getStateManager", &SBScene::getStateManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the state manager object.\n Input: NULL \nOutput: state manager object")
 	;
 
 	boost::python::def("createController", createController, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new controller given a controller type and a controller name.");
@@ -379,6 +392,56 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 	boost::python::class_<SBBmlProcessor>("BmlProcessor")
 		.def("execBML", &SBBmlProcessor::execBML, "Execute a generic bml to a given character. \n Input: character name, bml string \n Output: NULL")
+		;
+
+	boost::python::class_<SBState>("SBState")
+		.def("addCorrespondancePoints", &SBState::addCorrespondancePoints, "")
+		.def("getNumMotions", &SBState::getNumMotions, "")
+		.def("getMotion", &SBState::getMotion, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		.def("getNumCorrespondancePoints", &SBState::getNumCorrespondancePoints, "")
+		.def("getCorrespondancePoints", &SBState::getCorrespondancePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		.def("getDimension", &SBState::getDimension, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		;
+
+	boost::python::class_<SBState0D, boost::python::bases<SBState> >("SBState0D")
+		.def("addMotion", &SBState0D::addMotion, "")
+	;
+
+	boost::python::class_<SBState1D, boost::python::bases<SBState> >("SBState1D")
+		.def("addMotion", &SBState1D::addMotion, "")
+	;
+
+	boost::python::class_<SBState2D, boost::python::bases<SBState> >("SBState2D")
+		.def("addMotion", &SBState2D::addMotion, "")
+		.def("addTriangle", &SBState2D::addTriangle, "")
+	;
+
+	boost::python::class_<SBState3D, boost::python::bases<SBState> >("SBState3D")
+		.def("addMotion", &SBState3D::addMotion, "")
+		.def("addTetrahedron", &SBState3D::addTetrahedron, "")
+	;
+
+	boost::python::class_<SBTransition>("SBTransition")
+		.def("set", &SBTransition::set, "")
+		.def("addCorrespondancePoint", &SBTransition::addCorrespondancePoint, "")
+		.def("getNumCorrespondancePoints", &SBTransition::getNumCorrespondancePoints, "")
+		.def("getCorrespondancePoint", &SBTransition::getCorrespondancePoint, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		.def("getFromState", &SBTransition::getFromState, boost::python::return_value_policy<boost::python::reference_existing_object>(), "")
+		.def("getToState", &SBTransition::getToState, boost::python::return_value_policy<boost::python::reference_existing_object>(), "")
+		;
+
+	boost::python::class_<SBStateManager>("SBStateManager")
+		.def("createState0D", &SBStateManager::createState0D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 1D state.")
+		.def("createState1D", &SBStateManager::createState1D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 1D state.")
+		.def("createState2D", &SBStateManager::createState2D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 2D state.")
+		.def("createState3D", &SBStateManager::createState3D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 3D state.")
+		.def("createTransition", &SBStateManager::createTransition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a transition.")
+		.def("getState", &SBStateManager::getState, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a state of a given name.")
+		.def("getNumStates", &SBStateManager::getNumStates, "Returns the number of states.")
+		.def("getStateNames", &SBStateManager::getStateNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the state names.")
+		.def("getTransition", &SBStateManager::getTransition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a transition with a given name.")
+		.def("getNumTransitions", &SBStateManager::getNumTransitions, "Returns the state names.")
+		.def("getTransitionNames", &SBStateManager::getTransitionNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the state names.")
 		;
 
 	boost::python::class_<Viseme>("Viseme")		

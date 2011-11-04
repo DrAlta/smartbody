@@ -36,6 +36,11 @@ class ParameterManager;
 class PAStateData
 {
 	public:
+		PAStateData();
+		PAStateData(PAStateData* data);
+		PAStateData(const std::string& name);
+		~PAStateData();
+
 		std::string stateName;
 		std::vector<SkMotion*> motions;
 		std::vector<std::vector<double> > keys;
@@ -45,12 +50,9 @@ class PAStateData
 		bool cycle;
 		ParameterManager* paramManager;
 
-public:
-		PAStateData(PAStateData* data);
-		PAStateData(const std::string& name);
-		~PAStateData();
-		int getNumMotions();
-		int getNumKeys();
+
+		virtual int getNumMotions();
+		virtual int getNumKeys();
 		int getMotionId(const std::string& motion);
 };
 
@@ -75,7 +77,7 @@ class PATransitionData
 		double easeInEnd;
 		
 	public:
-		int getNumEaseOut();
+		virtual int getNumEaseOut();
 };
 
 struct TriangleInfo
