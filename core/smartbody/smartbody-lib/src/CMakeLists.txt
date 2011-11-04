@@ -305,6 +305,9 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SBController.cpp
 	sbm/SBSimulationManager.cpp
 	sbm/SBBmlProcessor.cpp
+	sbm/SBState.cpp
+	sbm/SBTransition.cpp
+	sbm/SBStateManager.cpp
 	sbm/VisemeMap.cpp
 	sbm/sr_path_list.cpp
 

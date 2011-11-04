@@ -2839,6 +2839,30 @@
 				RelativePath="..\src\sbm\SBSkeleton.h"
 				>
 			</File>
+			<File
+				RelativePath="..\src\sbm\SBState.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBState.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBStateManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBStateManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBTransition.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBTransition.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="nvbg"

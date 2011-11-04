@@ -32,6 +32,11 @@
 
 const double changeLimit = 20;
 
+PAStateData::PAStateData()
+{
+	stateName = "unknown";
+}
+
 PAStateData::PAStateData(PAStateData* data)
 {
 	stateName = data->stateName;

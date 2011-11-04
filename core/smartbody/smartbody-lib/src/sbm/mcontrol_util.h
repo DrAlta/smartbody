@@ -486,11 +486,11 @@ public:
 		SkMotion* lookUpMotion(const char* motionName);
 
 		PAStateData* lookUpPAState(std::string stateName);
-
-		SkMotion* addMirrorMotion(SkMotion* motion);
 		void addPAState(PAStateData* state);
 		PATransitionData* lookUpPATransition(std::string fromStateName, std::string toStateName);
 		void addPATransition(PATransitionData* transition);
+
+		SkMotion* addMirrorMotion(SkMotion* motion);
 		void setPhysicsEngine(bool start);
 
 

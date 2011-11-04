@@ -8,6 +8,7 @@ SBScene::SBScene(void)
 	_sim = new SBSimulationManager();
 	_profiler = new Profiler();
 	_bml = new SBBmlProcessor();
+	_stateManager = new SBStateManager();
 
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 }
@@ -17,6 +18,7 @@ SBScene::~SBScene(void)
 	delete _sim;
 	delete _profiler;
 	delete _bml;
+	delete _stateManager;
 }
 
 void SBScene::notify( DSubject* subject )
@@ -364,6 +366,11 @@ FaceDefinition* SBScene::getFaceDefinition(std::string def)
 SBBmlProcessor* SBScene::getBmlProcessor()
 {
 	return _bml;
+}
+
+SBStateManager* SBScene::getStateManager()
+{
+	return _stateManager;
 }
 
 
