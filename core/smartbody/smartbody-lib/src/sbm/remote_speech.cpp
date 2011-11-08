@@ -337,10 +337,31 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 			VisemeData* firstViseme = (*visemes)[0];
 			firstViseme->rampin((*visemes)[0]->rampout());
 			firstViseme->setDuration(firstViseme->rampin() + firstViseme->rampout());
+			
+			double firstVisemeTime = firstViseme->time();
+			int curIndex = 1;
+			while (numVisemes > curIndex && fabs((*visemes)[curIndex]->time() - (*visemes)[0]->time()) < .001)
+			{
+				(*visemes)[curIndex]->rampin(firstViseme->rampin());
+				(*visemes)[curIndex]->setDuration(firstViseme->duration());
+				curIndex++;
+			}
+			
+
 			// set the blend out duration for the last viseme
 			VisemeData* lastViseme = (*visemes)[numVisemes - 1];
 			lastViseme->rampout(lastViseme->rampin());
 			lastViseme->setDuration(lastViseme->rampin() + lastViseme->rampout());
+			
+			double lastVisemeTime = lastViseme->time();
+			curIndex = numVisemes - 2;
+			while (curIndex >= 0 && fabs((*visemes)[curIndex]->time() - lastViseme->time()) < .001)
+			{
+				(*visemes)[curIndex]->rampout(lastViseme->rampin());
+				(*visemes)[curIndex]->setDuration(lastViseme->duration());
+				curIndex--;
+			}
+			
 			//if (strcmp(lastViseme->id(), "Th") == 0)
 			//	std::cout << "PrevViseme " << lastViseme->id() << " rampin = " << lastViseme->rampin() << " duration = " << lastViseme->duration() << " rampout = " << lastViseme->rampout() << std::endl;
 		}
