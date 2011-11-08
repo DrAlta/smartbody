@@ -106,6 +106,7 @@ public:
 	static void downcb(int key, Fl_Text_Editor* te);
 	static void tabcb(int key, Fl_Text_Editor* te);
 	static void ctrlUcb(int key, Fl_Text_Editor* te);
+	static void ctrlEntercb(int key, Fl_Text_Editor* te);
 
 	static void clearcb(Fl_Widget* widget, void* data);
 	static void clearhistorycb(Fl_Widget* widget, void* data);

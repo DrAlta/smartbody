@@ -20,6 +20,9 @@ class SBState : public PAStateData
 		virtual std::string getDimension();
 
 	protected:
+		bool addSkMotion(std::string motionName);
+
+	protected:
 		std::string _dimension;
 
 };
