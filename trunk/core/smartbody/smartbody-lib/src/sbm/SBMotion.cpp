@@ -152,12 +152,12 @@ void SBMotion::checkSkeleton(std::string skel)
 
 void SBMotion::connect(SBSkeleton* skel)
 {
-	connect(skel);
+	SkMotion::connect(skel);
 }
 
 void SBMotion::disconnect()
 {
-	disconnect();
+	SkMotion::disconnect();
 }
 
 SBMotion* SBMotion::mirror()
