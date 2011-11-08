@@ -132,6 +132,7 @@ CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericVi
 		//textEditor[i]->add_key_binding(FL_Enter, FL_TEXT_EDITOR_ANY_STATE, (Fl_Text_Editor::Key_Func) entercb);
 		textEditor[i]->add_key_binding('u', FL_CTRL | FL_SHIFT, (Fl_Text_Editor::Key_Func) ctrlUcb);
 		textEditor[i]->add_key_binding('u', FL_CTRL, (Fl_Text_Editor::Key_Func) ctrlUcb);
+		textEditor[i]->add_key_binding(FL_Enter,FL_CTRL, (Fl_Text_Editor::Key_Func) ctrlEntercb);
 	}
 
 	textEditor[0]->label("Sbm");
@@ -342,6 +343,11 @@ void CommandWindow::ctrlUcb(int key, Fl_Text_Editor* editor)
 	tempBuffer->remove(0, editor->insert_position());
 }
 
+
+void CommandWindow::ctrlEntercb(int key, Fl_Text_Editor* editor)
+{
+	CommandWindow::entercb(key, editor);
+}
 
 void CommandWindow::UpdateOutput(char *text, bool origCommand)
 {

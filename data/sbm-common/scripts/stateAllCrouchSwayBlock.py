@@ -25,7 +25,7 @@ params2.append(60)
 for i in range(0, len(motions)):
 	state2.addMotion(motions[i], params1[i], params2[i])
 
-points1 = DoubleVec())
+points1 = DoubleVec()
 points1.append(0)
 points1.append(0)
 points1.append(0)
@@ -46,4 +46,6 @@ points3.append(1.3)
 points3.append(1.33333)
 state2.addCorrespondancePoints(motions, points3)
 
+state2.addTriangle("ChrUtah_CrouchBlock02High_swayLf", "ChrUtah_CrouchBlock02High_swayRt", "ChrUtah_CrouchBlock02Low_swayLf")
+state2.addTriangle("ChrUtah_CrouchBlock02High_swayRt", "ChrUtah_CrouchBlock02Low_swayLf", "ChrUtah_CrouchBlock02Low_swayRt")
 
