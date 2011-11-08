@@ -70,7 +70,7 @@
 #include <sbm/time_regulator.h>
 //#include "SBMWindow.h"
 #include "CommandWindow.h"
-#include <sbm/SbmPython.h>
+#include <sbm/SBPython.h>
 #include "FLTKListener.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////

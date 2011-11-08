@@ -10,7 +10,7 @@
 #include "TreeItemInfoWidget.h"
 #include "TreeInfoObject.h"
 #include <sbm/GenericViewer.h>
-#include <sbm/VisemeMap.hpp>
+#include <sbm/SBFaceDefinition.h>
 
 class srPathList;
 class SkSkeleton;
@@ -88,7 +88,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 		void updateMotion(Fl_Tree_Item* tree, SkMotion* motion);
 		void updatePawn(Fl_Tree_Item* tree, SbmPawn* pawn);
 		void updateCharacter(Fl_Tree_Item* tree, SbmCharacter* character);	
-		void updateFaceMotion(Fl_Tree_Item* tree, FaceDefinition* faceDefinition);
+		void updateFaceMotion(Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition);
 		void updateEventHandler(Fl_Tree_Item* tree, EventHandler* handler);
 		
 		int  findTreeItemType(Fl_Tree_Item* treeItem);

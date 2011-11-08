@@ -220,7 +220,7 @@ void ResourceWindow::updateGUI()
 	}
 
 	// update face definition map
-	std::map<std::string, FaceDefinition*>::iterator fi;
+	std::map<std::string, SmartBody::SBFaceDefinition*>::iterator fi;
 	resourceTree->clear_children(treeItemList[ITEM_FACE_DEFINITION]);
 	for ( fi  = mcu.face_map.begin();
 		  fi != mcu.face_map.end();
@@ -281,7 +281,7 @@ void ResourceWindow::updateGUI()
 	}
 }
 
-void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, FaceDefinition* faceDefinition )
+void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition )
 {
 	std::string neutralMotionName = "NA";
 	if (faceDefinition->getFaceNeutral())

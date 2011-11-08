@@ -64,7 +64,7 @@ void MeCtFace::clear( void )	{
 	_baseChannelToBufferIndex.clear();
 }
 
-void MeCtFace::init( FaceDefinition* faceDefinition) {
+void MeCtFace::init(SmartBody::SBFaceDefinition* faceDefinition) {
 	
 	clear();
 	MeController::init(NULL);

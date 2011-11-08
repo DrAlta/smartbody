@@ -147,10 +147,10 @@ bool SBCharacter::isFaceNeutral()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SkMotion* face_neutral_p = NULL;
-	std::map<std::string, FaceDefinition*>::iterator faceIter = mcu.face_map.find(std::string(getName()));
+	std::map<std::string, SBFaceDefinition*>::iterator faceIter = mcu.face_map.find(std::string(getName()));
 	if (faceIter !=  mcu.face_map.end())
 	{
-		FaceDefinition* faceDefinition = (*faceIter).second;
+		SBFaceDefinition* faceDefinition = (*faceIter).second;
 		if (mcu.net_face_bones)
 			face_neutral_p = faceDefinition->getFaceNeutral();
 	}
@@ -160,7 +160,7 @@ bool SBCharacter::isFaceNeutral()
 		faceIter = mcu.face_map.find("_default_");
 		if (faceIter !=  mcu.face_map.end())
 		{
-			FaceDefinition* faceDefinition = (*faceIter).second;
+			SBFaceDefinition* faceDefinition = (*faceIter).second;
 			if (mcu.net_face_bones)
 				face_neutral_p = faceDefinition->getFaceNeutral();
 		}
@@ -181,7 +181,7 @@ bool SBCharacter::initFaceController(MeCtFace* faceCtrl)
 
 	FaceMotion* faceDefinition = NULL;
 		// get the face motion mapping per character
-	std::map<std::string, FaceDefinition*>::iterator faceIter = mcu.face_map.find(std::string(getName()));
+	std::map<std::string, SBFaceDefinition*>::iterator faceIter = mcu.face_map.find(std::string(getName()));
 	if (faceIter !=  mcu.face_map.end())
 	{
 		faceDefinition = (*faceIter).second;
@@ -571,12 +571,12 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 }
 
 
-FaceDefinition* SBCharacter::getFaceDefinition()
+SBFaceDefinition* SBCharacter::getFaceDefinition()
 {
 	return SbmCharacter::getFaceDefinition();
 }
 
-void SBCharacter::setFaceDefinition(FaceDefinition* face)
+void SBCharacter::setFaceDefinition(SBFaceDefinition* face)
 {
 		SbmCharacter::setFaceDefinition(face);
 }

@@ -61,7 +61,7 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 		if (startIndex < 0 || endIndex < 0)
 			return;
 
-		FaceDefinition* faceDefinition = character->getFaceDefinition();
+		SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
 
 		SkChannelArray& channels = character->getSkeleton()->channels();
 		for (int c = startIndex; c <= endIndex; c++)
@@ -158,7 +158,7 @@ void FaceViewer::ShowCommandsCB(Fl_Widget* widget, void* data)
 	SbmCharacter* character = mcu.getCharacter(menu[faceViewer->choiceCharacters->value()].label());
 	if (character)
 	{
-		FaceDefinition* faceDefinition = character->getFaceDefinition();
+		SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
 		if (!faceDefinition)
 		{
 			LOG("No face definition for character %s.", character->getName().c_str());

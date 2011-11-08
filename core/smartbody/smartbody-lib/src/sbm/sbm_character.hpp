@@ -52,7 +52,7 @@
 #include <sbm/MeCtReachEngine.h>
 #include <sbm/me_ct_breathing_interface.h>
 #include <sbm/me_ct_breathing.h>
-#include <sbm/VisemeMap.hpp>
+#include <sbm/SBFaceDefinition.h>
 #define MeCtSchedulerClass MeCtScheduler2
 
 #if(1) // Use primary locomotion controller
@@ -170,7 +170,7 @@ protected:
 
 	float	*viseme_history_arr;
 
-	FaceDefinition* _faceDefinition;
+	SmartBody::SBFaceDefinition* _faceDefinition;
 
 	bool _isControllerPruning;
 
@@ -184,7 +184,7 @@ public:
 	virtual ~SbmCharacter();
 	
 	int init( SkSkeleton* skeleton_p,
-				FaceDefinition* faceDefinition,
+			  SmartBody::SBFaceDefinition* faceDefinition,
 			  GeneralParamMap* param_map,
 			  const char* classType,
 			  bool use_locomotion,
@@ -400,8 +400,8 @@ public:
 	float getMinVisemeTime() const;
 	void notify(SBSubject* subject);
 
-	virtual FaceDefinition* getFaceDefinition();
-	virtual void setFaceDefinition(FaceDefinition* face);
+	virtual SmartBody::SBFaceDefinition* getFaceDefinition();
+	virtual void setFaceDefinition(SmartBody::SBFaceDefinition* face);
 	virtual void updateFaceDefinition();
 	void removeAllFaceChannels();
 
