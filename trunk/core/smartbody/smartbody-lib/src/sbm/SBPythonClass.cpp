@@ -1,11 +1,14 @@
 #include "SBPythonClass.h"
 #include "sbm/me_ct_reach.hpp"
 
-
-#ifdef USE_PYTHON
 namespace SmartBody 
 {
 
+#ifdef USE_PYTHON
+
+
+std::string PyLogger::strBuffer = "";
+/*
 Script::Script()
 {
 }
@@ -50,13 +53,21 @@ void Script::run()
 			srCmdSeq *cp_seq_p = new srCmdSeq;
 			preProcessingScript(cp_seq_p, seq_p);
 			cp_seq_p->offset((float)(mcu.time));
-			err = mcu.active_seq_map.insert(seq.c_str(), cp_seq_p);
 
-			if (err == 1)	
-				LOG("Unable to run a script '%s': this file contain be inserted to active_seq_map", seq.c_str()); 
+			if (!mcu.activeSequences.getSequence(seq))
+			{
+				mcu.activeSequences.addSequence(seq, cp_seq_p);
+			}
+			else
+			{
+				LOG("Unable to run a script '%s': this file cannot be inserted to the active sequences.", seq.c_str()); 
+			}
+			
 		}
 		else
+		{
 			LOG("Unable to run a script '%s': this file cannot be found.", seq.c_str()); 
+		}
 	}
 	else if (type == "py")
 	{
@@ -71,7 +82,7 @@ void Script::abort()
 	if (type == "seq")
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		int result = mcu.abort_seq(seq.c_str());
+		int result = mcu.abortSequence(seq.c_str());
 		if (result == 0)
 			LOG("'%s' not found, cannot abort.", seq.c_str()); 
 	}
@@ -82,6 +93,7 @@ void Script::abort()
 void Script::preProcessingScript(srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SBScene& scene = (*mcu._scene);
 
 	float t;
 	char *cmd;	
@@ -95,7 +107,7 @@ void Script::preProcessingScript(srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p)
 		{
 			char *path_tok = args.read_token();
 			char* path = args.read_token();
-			addAssetPath(std::string(path_tok), std::string(path));
+			scene.addAssetPath(std::string(path_tok), std::string(path));
 			delete [] cmd;
 			cmd = NULL;
 		}
@@ -129,217 +141,8 @@ void Script::preProcessingScript(srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p)
 }
 
 
-Profiler::Profiler()
-{
-}
+*/
 
-Profiler::~Profiler()
-{
-}
-
-void Profiler::printLegend()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.profiler_p)	
-		mcu.profiler_p->print_legend();
-	else
-		LOG("Profiler does not exist!");
-}
-
-void Profiler::printStats()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.profiler_p)	
-		mcu.profiler_p->print();
-	else
-		LOG("Profiler does not exist!");
-}
-
-SimulationManager::SimulationManager()
-{
-}
-
-SimulationManager::~SimulationManager()
-{
-}
-
-void SimulationManager::printInfo()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)	
-		mcu.timer_p->print();
-	else	
-	{
-		LOG( "TIME:%.3f ~ DT:%.3f %.2f:FPS\n",
-			mcu.time,
-			mcu.time_dt,
-			1.0 / mcu.time_dt
-		);
-	}
-}
-
-void SimulationManager::printPerf(float v)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)
-	{
-		if (v > 0.0) 
-			mcu.timer_p->set_perf(v);
-		else	
-			mcu.timer_p->set_perf(10.0);	
-	}
-	else
-		LOG("Time regulator not exist!");
-}
-
-double SimulationManager::getTime()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	return mcu.time;
-}
-
-bool SimulationManager::isStarted()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)
-		return mcu.timer_p->isStarted();
-	else
-		return false;
-}
-
-bool SimulationManager::isRunning()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)
-		return mcu.timer_p->isRunning();
-	else
-		return false;
-}
-
-void SimulationManager::reset()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)	
-		mcu.timer_p->reset();
-	else
-		LOG("Time regulator not exist!");
-}
-
-void SimulationManager::start()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)	
-		mcu.timer_p->start();
-	else
-		LOG("Time regulator not exist!");
-}
-
-void SimulationManager::pause()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)	
-		mcu.timer_p->pause();
-	else
-		LOG("Time regulator not exist!");
-}
-
-void SimulationManager::resume()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)	
-		mcu.timer_p->resume();
-	else
-		LOG("Time regulator not exist!");
-}
-
-void SimulationManager::step(int n)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)
-	{
-		if (n)
-			mcu.timer_p->step(n);
-		else
-			mcu.timer_p->step(1);
-	}
-	else
-		LOG("Time regulator not exist!");
-}
-
-void SimulationManager::setSleepFps(float v)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.timer_p)	
-	{
-		LOG("Time regulator not exist!");
-		return;
-	}
-	mcu.timer_p->set_sleep_fps(v);
-}
-
-void SimulationManager::setEvalFps(float v)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.timer_p)	
-	{
-		LOG("Time regulator not exist!");
-		return;
-	}
-	mcu.timer_p->set_eval_fps(v);
-}
-
-void SimulationManager::setSimFps(float v)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.timer_p)	
-	{
-		LOG("Time regulator not exist!");
-		return;
-	}
-	mcu.timer_p->set_sim_fps(v);
-}
-
-void SimulationManager::setSleepDt(float v)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.timer_p)	
-	{
-		LOG("Time regulator not exist!");
-		return;
-	}
-	mcu.timer_p->set_sleep_dt(v);
-}
-
-void SimulationManager::setEvalDt(float v)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.timer_p)	
-	{
-		LOG("Time regulator not exist!");
-		return;
-	}
-	mcu.timer_p->set_eval_dt(v);
-}
-
-void SimulationManager::setSimDt(float v)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.timer_p)	
-	{
-		LOG("Time regulator not exist!");
-		return;
-	}
-	mcu.timer_p->set_sim_dt(v);
-}
-
-void SimulationManager::setSpeed(float v)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)	
-		mcu.timer_p->set_speed(v);
-	else
-		LOG("Time regulator not exist!");
-}
 
 Camera::Camera()
 {
@@ -407,7 +210,7 @@ void Camera::setDefault(int preset)
 void Camera::setTrack(std::string cName, std::string jName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = mcu.getPawn(jName);
+	SbmPawn* pawn = mcu.getPawn(cName);
 	if (!pawn)
 	{
 		LOG("Object %s was not found, cannot track.", cName.c_str());
@@ -460,308 +263,8 @@ void Camera::removeTrack()
 	}
 }
 
-GazeBML::GazeBML()
-{
-}
 
-GazeBML::~GazeBML()
-{
-}
-
-void GazeBML::setSpeed(boost::python::list &input)
-{
-	speed.clear();
-	for (int i = 0; i < len(input); ++i)
-		speed.push_back(boost::python::extract<std::string>(input[i]));
-}
-
-boost::python::list GazeBML::getSpeed()
-{
-	boost::python::list ret;
-	for (size_t i = 0; i < speed.size(); i++)
-		ret.append(speed[i]);
-	return ret;
-}
-
-void GazeBML::setSmoothing(boost::python::list &input)
-{
-	smoothing.clear();
-	for (int i = 0; i < len(input); ++i)
-		smoothing.push_back(boost::python::extract<std::string>(input[i]));
-}
-
-boost::python::list GazeBML::getSmoothing()
-{
-	boost::python::list ret;
-	for (size_t i = 0; i < smoothing.size(); i++)
-		ret.append(smoothing[i]);
-	return ret;
-}
-
-std::string GazeBML::buildGazeBML()
-{
-	std::string targetAttr;
-	std::string directionAttr;
-	std::string angleAttr;
-	std::string speedAttr;
-	std::string smoothAttr;
-
-	if (target != "")
-	{
-		targetAttr = "target=\"";
-		targetAttr += target;
-		targetAttr += "\" ";
-	}
-	if (direction != "")
-	{
-		directionAttr = "direction=\"";
-		directionAttr += direction;
-		directionAttr += "\" ";		
-	}
-	if (angle != "")
-	{
-		angleAttr = "angle=\"";
-		angleAttr += angle;
-		angleAttr += "\" ";	
-	}
-	if (speed.size() == 3)
-	{
-		speedAttr = "sbm:joint-speed=\"";
-		speedAttr += speed[0];
-		speedAttr += " ";
-		speedAttr += speed[1];
-		speedAttr += " ";
-		speedAttr += speed[2];
-		speedAttr += "\" ";		
-	}
-	if (smoothing.size() == 3)
-	{
-		smoothAttr = "sbm:speed-smoothing=\"";
-		smoothAttr += smoothing[0];
-		smoothAttr += " ";
-		smoothAttr += smoothing[1];
-		smoothAttr += " ";
-		smoothAttr += smoothing[2];
-		smoothAttr += "\" ";		
-	}
-
-	std::ostringstream bml;
-	// First half of BML
-	bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-		<< "<act>\n"
-		<< "\t<bml>\n"
-		<< "\t\t<gaze " << targetAttr << directionAttr << angleAttr << speedAttr << smoothAttr << "/>\n"
-		<< "\t</bml>\n"
-		<< "</act>";
-	return bml.str();
-}
-
-BmlProcessor::BmlProcessor()
-{
-}
-
-BmlProcessor::~BmlProcessor()
-{
-}
-
-// This command is inside bml_processor.cpp, unlike most of other commands inside mcontrol_util. So unable to rewrite, instead, re-routine to bp.
-void BmlProcessor::vrSpeak(std::string agent, std::string recip, std::string msgId, std::string msg)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::stringstream msgStr;
-	msgStr << agent << " " << recip << " " << msgId << " " << msg;
-	srArgBuffer vrMsg(msgStr.str().c_str());
-	BML::Processor& bp = mcu.bml_processor;
-	bp.vrSpeak_func(vrMsg, &mcu);
-}
-
-void BmlProcessor::vrAgentBML(std::string op, std::string agent, std::string msgId, std::string msg)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (op == "request" || op == "start" || op == "end")
-	{
-		std::stringstream msgStr;
-		msgStr << agent << " " << msgId << " " << op << " " << msg;
-		srArgBuffer vrMsg(msgStr.str().c_str());
-		BML::Processor& bp = mcu.bml_processor;
-		bp.vrAgentBML_cmd_func(vrMsg, &mcu);
-	}
-	else
-	{
-		LOG("vrAgentBML option %s not recognized!", op.c_str());
-		return;	
-	}
-}
-
-void BmlProcessor::build_vrX(std::ostringstream& buffer, const std::string& cmd, const std::string& char_id, const std::string& recip_id, const std::string& content, bool for_seq ) 
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	static int test_bml_id = 0;
-
-	buffer.str("");
-	if( for_seq )
-		buffer << "send " << cmd << " ";
-	buffer << char_id << " "<< recip_id << " sbm";
-	if( mcu.process_id != "" )  // Insert process_id if present.
-		buffer << '_' << mcu.process_id; 
-	buffer << "_test_bml_" << (++test_bml_id) << std::endl << content;
-}
-
-void BmlProcessor::send_vrX( const char* cmd, const std::string& char_id, const std::string& recip_id,
-			const std::string& seq_id, bool echo, bool send, const std::string& bml ) 
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::ostringstream msg;
-
-	bool all_characters = ( char_id=="*" );
-
-	if( seq_id.length()==0 ) {
-		if( echo ) {
-			build_vrX( msg, cmd, char_id, recip_id, bml, false );
-			LOG("%s %s", cmd, msg.str().c_str());
-		}
-
-		if( send ) {
-			// execute directly
-			if( all_characters ) {
-				for(std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-					iter != mcu.getCharacterMap().end();
-					iter++)
-				{
-					SbmCharacter* character = (*iter).second;
-					build_vrX( msg, cmd, character->getName().c_str(), recip_id, bml, false );
-					mcu.vhmsg_send( cmd, msg.str().c_str() );
-				}
-			} else {
-				build_vrX( msg, cmd, char_id, recip_id, bml, false );
-				mcu.vhmsg_send( cmd, msg.str().c_str() );
-			}
-		}
-		return;
-	}else {
-		// Command sequence to trigger vrSpeak
-		srCmdSeq *seq = new srCmdSeq(); // sequence file that holds the bml command(s)
-		seq->offset( (float)( mcu.time ) );
-
-		if( echo ) {
-			msg << "echo // Running sequence \"" << seq_id << "\"...";
-			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
-				std::stringstream strstr;
-				strstr << "WARNING: send_vrX(..): Failed to insert echo header command for character \"" << char_id << "\".";
-				LOG(strstr.str().c_str());
-			}
-			build_vrX( msg, cmd, char_id, recip_id, bml, false );
-			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
-				std::stringstream strstr;
-				strstr << "WARNING: send_vrX(..): Failed to insert echoed command for character \"" << char_id << "\".";
-				LOG(strstr.str().c_str());
-			}
-		}
-		if( all_characters ) {
-			for(std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-				iter != mcu.getCharacterMap().end();
-				iter++)
-			{
-				SbmCharacter* character = (*iter).second;
-				build_vrX( msg, cmd, character->getName().c_str(), recip_id, bml, true );
-				if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
-					std::stringstream strstr;
-					strstr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\".";
-					LOG(strstr.str().c_str());
-				}
-			}
-		} else {
-			build_vrX( msg, cmd, char_id, recip_id, bml, true );
-			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
-				std::stringstream strstr;
-				strstr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\".";
-				LOG(strstr.str().c_str());
-			}
-		}
-
-		if( send ) {
-			mcu.active_seq_map.remove( seq_id.c_str() );  // remove old sequence by this name
-			if( mcu.active_seq_map.insert( seq_id.c_str(), seq ) != CMD_SUCCESS ) {
-				std::stringstream strstr;
-				strstr << "ERROR: send_vrX(..): Failed to insert seq into active_seq_map.";
-				LOG(strstr.str().c_str());
-				return;
-			}
-		} else {
-			mcu.pending_seq_map.remove( seq_id.c_str() );  // remove old sequence by this name
-			if( mcu.pending_seq_map.insert( seq_id.c_str(), seq ) != CMD_SUCCESS ) {
-				std::stringstream strstr;
-				strstr << "ERROR: send_vrX(..): Failed to insert seq into active_seq_map.";
-				LOG(strstr.str().c_str());
-				return;
-			}
-		}
-		return;
-	}
-}
-
-
-// Should I put echo and send flag as input parameters? How to support default parameters
-void BmlProcessor::execAnimation(std::string character, std::string anim)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::map<std::string, SkMotion*>::iterator motionIter = mcu.motion_map.find(anim);
-	if (motionIter == mcu.motion_map.end()) {
-		LOG("WARNING: Unknown animation \"%s\".", anim.c_str());
-	}
-
-	std::ostringstream bml;
-	bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-		<< "<act>\n"
-		<< "\t<bml>\n"
-		<< "\t\t<sbm:animation name=\"" << anim << "\"/>\n"
-		<< "\t</bml>\n"
-		<< "</act>";
-	send_vrX( "vrSpeak", character, "ALL", "", true, true, bml.str() );
-}
-
-void BmlProcessor::execPosture(std::string character, std::string posture)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::map<std::string, SkPosture*>::iterator postureIter = mcu.pose_map.find(posture);
-	if (postureIter == mcu.pose_map.end()) {
-		LOG("WARNING: Unknown posture \"%s\".", posture.c_str());
-	}
-
-	std::ostringstream bml;
-	bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-		<< "<act>\n"
-		<< "\t<bml>\n"
-		<< "\t\t<body posture=\"" << posture << "\"/>\n"
-		<< "\t</bml>\n"
-		<< "</act>";
-	send_vrX( "vrSpeak", character, "ALL", "", true, true, bml.str() );
-}
-
-void BmlProcessor::execGaze(std::string character, GazeBML& gazeBML)
-{
-	std::string bml = gazeBML.buildGazeBML();
-	if (gazeBML.getTarget() == "" || character == "")
-	{
-		LOG("execGaze Failure: Gazing character and target have to be defined both.");
-		return;
-	}
-	send_vrX( "vrSpeak", character, "ALL", "", true, true, bml );
-}
-
-void BmlProcessor::execBML(std::string character, std::string bml)
-{
-	std::ostringstream entireBml;
-	entireBml	<< "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-				<< "<act>\n"
-				<< "\t<bml>\n"
-				<< "\t\t" << bml
-				<< "\t</bml>\n"
-				<< "</act>";	
-	send_vrX( "vrSpeak", character, "ALL", "", true, true, entireBml.str() );
-}
-
+/*
 Viseme::Viseme()
 {
 }
@@ -811,217 +314,7 @@ void Viseme::setCurve(int numKeys, boost::python::list weights)
 
 	delete [] curveInfo;
 }
-
-Motion::Motion()
-{
-	motionFile = "";
-}
-
-Motion::Motion(std::string file)
-{
-	motionFile = file;
-}
-
-Motion::~Motion()
-{
-	motionFile = "";
-}
-
-std::string Motion::getMotionFileName()
-{
-	SkMotion* skMotion = getSkMotion();
-	if (skMotion)
-		return skMotion->filename();
-	else
-		return "";
-}
-
-std::string Motion::getMotionName()
-{
-	SkMotion* skMotion = getSkMotion();
-	if (skMotion)
-		return skMotion->name();
-	else
-		return "";
-}
-
-int Motion::getNumFrames()
-{
-	SkMotion* skMotion = getSkMotion();
-	if (skMotion)
-		return skMotion->frames();
-	else
-		return 0;
-}
-
-boost::python::list Motion::getFrameData(int frameId)
-{
-	SkMotion* skMotion = getSkMotion();
-	if (skMotion)
-	{
-		boost::python::list ret;
-		for (int i = 0; i < getFrameSize(); i++)
-			ret.append(skMotion->posture(frameId)[i]);
-		return ret;
-	}
-	else
-		return boost::python::list();
-}
-
-int Motion::getFrameSize()
-{
-	SkMotion* skMotion = getSkMotion();
-	if (skMotion)
-	{
-		return skMotion->posture_size();
-	}
-	else
-		return 0;
-}
-
-int Motion::getNumChannel()
-{
-	SkMotion* skMotion = getSkMotion();
-	if (!skMotion)
-		return 0;
-	
-	return skMotion->channels().size();
-}
-
-boost::python::list Motion::getChannels()
-{
-	SkMotion* skMotion = getSkMotion();
-	if (!skMotion)
-		return boost::python::list();
-
-	if (skMotion->connected_skeleton() == NULL)
-	{
-		LOG("Motion not connected to a skeleton, cannot retrieve channels.");
-		return boost::python::list();
-	}
-	boost::python::list ret;
-	SkChannelArray channels = skMotion->channels();
-	for (int i = 0; i < channels.size(); i++)
-	{
-		std::string chanName = channels[i].joint->name().c_str();
-		int	chanType = channels[i].type;
-		std::string chanTypeString;
-		switch (chanType)
-		{
-			case 0:
-				chanTypeString = "XPos";
-				break;
-			case 1:	
-				chanTypeString = "YPos";
-				break;
-			case 2:
-				chanTypeString = "ZPos";
-				break;
-			case 6:
-				chanTypeString = "Quat";
-				break;
-			default:
-				chanTypeString = "Others";
-		}
-		std::string name = chanName + " " + chanTypeString;
-		ret.append(name);
-	}
-	return ret;
-}
-
-void Motion::checkSkeleton(std::string skel)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	int chanSize;
-	SkChannel chan;
-
-	SkMotion* motion;
-	std::map<std::string, SkMotion*>::iterator motionIter = mcu.motion_map.find(getMotionName().c_str());
-	if (motionIter != mcu.motion_map.end())
-		motion = motionIter->second;
-	else
-	{
-		LOG("checkSkeleton ERR: Motion %s NOT EXIST!", getMotionName().c_str());
-		return;
-	}
-
-	SkSkeleton* skSkel = load_skeleton(skel.c_str(), mcu.me_paths, mcu.resource_manager, mcu.skScale);
-	if (skSkel)
-	{
-		int numValidChannels = motion->connect(skSkel);	// connect and check for the joints
-		SkChannelArray& mChanArray = motion->channels();
-		int mChanSize = mChanArray.size();
-		SkChannelArray& skelChanArray = skSkel->channels();
-		int skelChanSize = skelChanArray.size();
-		chanSize = mChanSize;
-		LOG("Channels in skeleton %s's channel matching motion %s's channel are preceeded with '+'", skel.c_str(), getMotionName().c_str());
-		LOG("motion %s's Channel Info:", getMotionName().c_str());
-		LOG("Channel Size: %d", chanSize);
-		for (int i = 0; i < chanSize; i++)
-		{				
-			std::stringstream outputInfo;
-			chan = mChanArray[i];
-			std::string jointName = chan.joint->name().c_str();
-			int	chanType = chan.type;
-			std::string chanTypeString;
-			switch (chanType)
-			{
-				case 0:
-					chanTypeString = "XPos";
-					break;
-				case 1:	
-					chanTypeString = "YPos";
-					break;
-				case 2:
-					chanTypeString = "ZPos";
-					break;
-				case 6:
-					chanTypeString = "Quat";
-					break;
-				default:
-					chanTypeString = "Others";
-			}
-			int pos;
-			pos = skelChanArray.linear_search(chan.joint->name(), chan.type);
-			if (pos != -1)
-				outputInfo << "+ ";
-			if (pos == -1)	
-				outputInfo << "  ";
-			outputInfo << i << ": " << jointName.c_str() << " (" << chanTypeString << ")";
-			LOG("%s", outputInfo.str().c_str());
-		}
-	}
-	else
-		LOG("Skeleton %s NOT EXIST!", skel.c_str());
-}
-
-SkMotion* Motion::getSkMotion()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::map<std::string, SkMotion*>::iterator motionIter = mcu.motion_map.find(motionFile);
-	if (motionIter != mcu.motion_map.end())
-	{
-		SkMotion* motion = (*motionIter).second;
-		return motion;
-	}
-	else
-		return NULL;
-}
-
-void Motion::connect(SBSkeleton* skel)
-{
-//	SkSkeleton* skeleton = skel->getSkSkeleton(skel->getInstanceId());
-//	SkMotion* skMotion = getSkMotion();
-//	if (skeleton && skMotion)
-//		skMotion->connect(skeleton);
-}
-
-void Motion::disconnect()
-{
-	SkMotion* skMotion = getSkMotion();
-	if (skMotion)
-		skMotion->disconnect();
-}
+*/
 
 
 int init_motion_controller( 
@@ -1056,7 +349,7 @@ int init_motion_controller(
 	}
 	ctrl_p->ref();
 
-	ctrl_p->name( ctrl_name );
+	ctrl_p->setName( ctrl_name );
 	ctrl_p->init( NULL, mot_p );
 	return( CMD_SUCCESS );
 }
@@ -1079,88 +372,15 @@ void reset()
 	mcu.reset();
 }
 
-void printLog(std::string message)
+void printLog(const std::string& message)
 {
 	LOG(message.c_str());
 }
 
-int getNumCharacters() 
-{  
+SBScene* getScene()
+{	
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	return mcu.getNumCharacters(); 
-}
-
-int getNumPawns() 
-{  
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	return mcu.getNumPawns(); 
-}
-
-boost::python::list getCharacterNames()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	boost::python::list ret;
-
-	for(std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
-	{
-		SbmCharacter* sbmCharacter = (*iter).second;
-		ret.append(std::string(sbmCharacter->getName()));
-	}
-
-	return ret;
-}
-
-SBCharacter* getCharacterByIndex(int index)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	if (index < 0 ) //|| index >= mcu.character_map.num_entries())
-	{
-		//LOG("Character at index %d does not exist. Only %d characters.", index, mcu.character_map.num_entries());
-		return NULL;
-
-	}
-/*
-	int counter = 0;
-	for(std::map<std::string, SbmCharacter*>::iterator iter = mcu.character_map.begin();
-		iter != mcu.character_map.end();
-		iter++)
-	{
-		if (counter == index)
-		{
-			SBCharacter* sbCharacter = dynamic_cast<SBCharacter*>((*iter).second);
-			return sbCharacter;
-		}
-		else
-			counter++;
-	}
-	*/
-
-	return NULL;
-}
-
-
-SBCharacter* createCharacter(std::string char_name, std::string metaInfo)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	SbmCharacter* character = mcu.getCharacter(char_name);
-	if (character)
-	{
-		LOG("Character '%s' already exists!", char_name.c_str());
-		return NULL;
-	}
-	else
-	{
-		SBCharacter* character = new SBCharacter(char_name, metaInfo);
-		return character;
-	}
-}
-
-SBSkeleton* createSkeleton(std::string skeletonDefinition)
-{
-	SBSkeleton* skeleton = new SBSkeleton(skeletonDefinition);
-	return skeleton;
+	return mcu._scene;
 }
 
 SBController* createController(std::string controllerType, std::string controllerName)
@@ -1184,10 +404,6 @@ SBController* createController(std::string controllerType, std::string controlle
 	{
 		controller = new MeCtFace();
 	}
-	else if (controllerType == "reach")
-	{
-		controller = new MeCtReach();
-	}
 	else if (controllerType == "locomotion")
 	{
 		controller = new MeCtLocomotion();
@@ -1205,29 +421,6 @@ SBController* createController(std::string controllerType, std::string controlle
 		controller->setName(controllerName);
 
 	return controller;
-}
-
-void removeCharacter(std::string charName)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.removeCharacter(charName);
-}
-
-FaceDefinition* getFaceDefinition(std::string def)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::map<std::string, FaceDefinition*>::iterator iter = mcu.face_map.find(def);
-	if (iter == mcu.face_map.end())
-	{
-		FaceDefinition* faceDefinition = new FaceDefinition();
-		mcu.face_map.insert(std::pair<std::string, FaceDefinition*>(def, faceDefinition));
-		return faceDefinition;
-	}
-	else
-	{
-		return ((*iter).second);
-	}
-
 }
 
 Camera* getCamera()
@@ -1251,9 +444,10 @@ SrViewer* getViewer()
 	if (!mcu.viewer_p)
 	{
 		mcu.viewer_p = mcu.viewer_factory->create(100, 100, 640, 480);
-		mcu.viewer_p->label_viewer("SBM Viewer");
+		mcu.viewer_p->label_viewer("Visual Debugger");
 		mcu.camera_p = new SrCamera();
 		mcu.viewer_p->set_camera(*mcu.camera_p);
+		mcu.viewer_p->root(mcu.root_group_p);
 	}
 	return mcu.viewer_p;
 }
@@ -1309,6 +503,7 @@ void execScripts(boost::python::list& input)
 	mcu.execute_seq_chain(seq_names, "ERROR: seq-chain: ");
 }
 
+/*
 Script* getScript(std::string fileName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -1348,6 +543,8 @@ Script* getScript(std::string fileName)
 		return NULL;
 	}
 }
+
+*/
 
 void showCommandResources()
 {
@@ -1443,113 +640,6 @@ void setResourceLimit(int limit)
 		mcu.resource_manager->setLimit(limit);
 }
 
-void addAssetPath(std::string type, std::string path)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	PathResource* pres = new PathResource();
-	pres->setPath(path);
-	if (type == "seq")
-	{
-		pres->setType("seq");
-		mcu.seq_paths.insert(const_cast<char *>(path.c_str()));
-	}
-	else if (type == "me" || type == "ME")
-	{
-		pres->setType("me");
-		mcu.me_paths.insert(const_cast<char *>(path.c_str()));
-	}
-	else if (type == "audio")
-	{
-		pres->setType("audio");
-		mcu.audio_paths.insert(const_cast<char *>(path.c_str()));
-	}
-	else
-	{
-		delete pres;
-		LOG("Input type %s not recognized!", type.c_str());
-		return;
-	}
-	mcu.resource_manager->addResource(pres);
-}
-
-void removeAssetPath(std::string type, std::string path)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-
-	bool ret = false;
-	if (type == "seq")
-	{
-		ret = mcu.seq_paths.remove(const_cast<char *>(path.c_str()));
-	}
-	else if (type == "me" || type == "ME")
-	{
-		ret = mcu.me_paths.remove(const_cast<char *>(path.c_str()));
-	}
-	else if (type == "audio")
-	{
-		ret = mcu.audio_paths.remove(const_cast<char *>(path.c_str()));
-	}
-	else
-	{
-		LOG("Input type %s not recognized!", type.c_str());
-		return;
-	}
-
-	if (ret)
-	{
-		// remove the resource from the resource manager
-	}
-}
-
-void loadAssets()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.me_paths.reset();
-
-	std::string path = mcu.me_paths.next_path();
-	while (path != "")
-	{
-		mcu.load_motions(path.c_str(), true);
-		mcu.load_skeletons(path.c_str(), true);
-		path = mcu.me_paths.next_path();
-	}
-}
-
-void addPose(std::string path, bool recursive)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.load_poses(path.c_str(), recursive);
-}
-
-void addMotion(std::string path, bool recursive)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.load_motions(path.c_str(), recursive);
-}
-
-void setMediaPath(std::string path)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.setMediaPath(path);
-}
-
-SimulationManager* getSimulationManager()
-{
-	SimulationManager* manager = new SimulationManager();
-	return manager;
-}
-
-Profiler* getProfiler()
-{
-	Profiler* profiler = new Profiler();
-	return profiler;
-}
-
-BmlProcessor* getBmlProcessor()
-{
-	BmlProcessor* processor = new BmlProcessor();
-	return processor;
-}
 
 std::string getScriptFromFile(std::string fileName)
 {
@@ -1602,30 +692,186 @@ std::string getScriptFromFile(std::string fileName)
 }
 
 ////////////////////////////////////////////
-SBCharacter* getCharacter(std::string name)
+
+void PyLogger::pa()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmCharacter* character = mcu.getCharacter(name);
-	if (character)
-	{
-		SBCharacter* sbcharacter = dynamic_cast<SBCharacter*>(character);
-		return sbcharacter;
-	}
-	else
-	{
-		LOG("Character %s does not exist.", name.c_str());
-		return NULL;
-	}
+	strBuffer += "a";		
 }
 
-SkMotion* getMotion(std::string name)
+void PyLogger::pb()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	strBuffer += "b";		
+}
+void PyLogger::pc()
+{
+	strBuffer += "c";		
+}
 
-	SkMotion* motion = mcu.getMotion(name);
-	return motion;
+void PyLogger::pd()
+{
+	strBuffer += "d";		
+}
+void PyLogger::pe()
+{
+	strBuffer += "e";		
+}
+
+void PyLogger::pf()
+{
+	strBuffer += "f";		
+}
+void PyLogger::pg()
+{
+	strBuffer += "g";		
+}
+
+void PyLogger::ph()
+{
+	strBuffer += "h";		
+}
+void PyLogger::pi()
+{
+	strBuffer += "i";		
+}
+
+void PyLogger::pj()
+{
+	strBuffer += "j";		
+}
+void PyLogger::pk()
+{
+	strBuffer += "k";		
+}
+
+void PyLogger::pl()
+{
+	strBuffer += "l";		
+}
+
+void PyLogger::pm()
+{
+	strBuffer += "m";		
+}
+void PyLogger::pn()
+{
+	strBuffer += "n";		
+}
+
+void PyLogger::po()
+{
+	strBuffer += "o";		
+}
+void PyLogger::pp()
+{
+	strBuffer += "p";		
+}
+
+void PyLogger::pq()
+{
+	strBuffer += "q";		
+}
+void PyLogger::pr()
+{
+	strBuffer += "r";		
+}
+
+void PyLogger::ps()
+{
+	strBuffer += "s";		
+}
+void PyLogger::pt()
+{
+	strBuffer += "t";		
+}
+
+void PyLogger::pu()
+{
+	strBuffer += "u";		
+}
+void PyLogger::pv()
+{
+	strBuffer += "v";		
+}
+
+void PyLogger::pw()
+{
+	strBuffer += "w";		
+}
+void PyLogger::px()
+{
+	strBuffer += "x";		
+}
+
+void PyLogger::py()
+{
+	strBuffer += "y";		
+}
+void PyLogger::pz()
+{
+	strBuffer += "z";		
+}
+void PyLogger::pspace()
+{
+	strBuffer +=" ";
+}
+
+void PyLogger::p1()
+{
+	strBuffer +="1";
+}
+void PyLogger::p2()
+{
+	strBuffer +="2";
+}
+void PyLogger::p3()
+{
+	strBuffer +="3";
+}
+void PyLogger::p4()
+{
+	strBuffer +="4";
+}
+void PyLogger::p5()
+{
+	strBuffer +="5";
+}
+void PyLogger::p6()
+{
+	strBuffer +="6";
+}
+void PyLogger::p7()
+{
+	strBuffer +="7";
+}
+void PyLogger::p8()
+{
+	strBuffer +="8";
+}
+void PyLogger::p9()
+{
+	strBuffer +="9";
+}
+void PyLogger::p0()
+{
+	strBuffer +="0";
 }
 
 
+
+
+void PyLogger::pnon()
+{
+	strBuffer +=".";
+}
+
+void PyLogger::outlog()
+{
+	if (strBuffer.size() > 1)
+	{
+		LOG("pyLog : %s",strBuffer.c_str());
+		strBuffer = "";
+	}	
 }
 #endif
+
+}

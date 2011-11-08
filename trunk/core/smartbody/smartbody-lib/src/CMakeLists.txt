@@ -309,11 +309,11 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SBTransition.cpp
 	sbm/SBStateManager.cpp
 	sbm/SBMotion.cpp
-	sbm/VisemeMap.cpp
+	sbm/SBFaceDefinition.cpp
 	sbm/sr_path_list.cpp
 
-	sbm/SbmPython.cpp
-	sbm/SbmPythonClass.cpp
+	sbm/SBPython.cpp
+	sbm/SBPythonClass.cpp
 
 	sbm/nvbg.cpp
 	sbm/MiniBrain.cpp

@@ -60,8 +60,8 @@
 #if USE_WSP
 #include "wsp.h"
 #endif
-#include <sbm/SbmPythonClass.h>
-#include <sbm/SbmPython.h>
+#include <sbm/SBPythonClass.h>
+#include <sbm/SBPython.h>
 #ifdef USE_PYTHON
 #include <boost/python.hpp> // boost python support
 #endif
@@ -284,7 +284,7 @@ mcuCBHandle::mcuCBHandle()
 #endif
 	createDefaultControllers();
 	// initialize the default face motion mappings
-	FaceDefinition* faceDefinition = new FaceDefinition();
+	SmartBody::SBFaceDefinition* faceDefinition = new SmartBody::SBFaceDefinition();
 	faceDefinition->setName("_default_");
 	face_map["_default_"] = faceDefinition;
 	physicsEngine = new SbmPhysicsSimODE();
@@ -555,11 +555,11 @@ void mcuCBHandle::registerCallbacks()
  */
 void mcuCBHandle::clear( void )	{
 
-	for (std::map<std::string, FaceDefinition*>::iterator iter = this->face_map.begin();
+	for (std::map<std::string, SmartBody::SBFaceDefinition*>::iterator iter = this->face_map.begin();
 		iter != face_map.end();
 		iter++)
 	{
-		FaceDefinition* face = (*iter).second;
+		SmartBody::SBFaceDefinition* face = (*iter).second;
 		delete face;
 	}
 

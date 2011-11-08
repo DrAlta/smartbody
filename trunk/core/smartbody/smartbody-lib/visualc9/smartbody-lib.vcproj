@@ -364,6 +364,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\DefaultAttributeTable.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\DefaultAttributeTable.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\Event.cpp"
 				>
 			</File>
@@ -700,14 +708,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\VisemeMap.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\VisemeMap.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\xercesc_utils.cpp"
 				>
 			</File>
@@ -824,18 +824,6 @@
 				</File>
 				<File
 					RelativePath="..\src\sbm\Physics\SbmPhysicsSimODE.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="attributes"
-				>
-				<File
-					RelativePath="..\src\sbm\DefaultAttributeTable.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\DefaultAttributeTable.h"
 					>
 				</File>
 			</Filter>
@@ -2708,19 +2696,19 @@
 			Name="python"
 			>
 			<File
-				RelativePath="..\src\sbm\SbmPython.cpp"
+				RelativePath="..\src\sbm\SBPython.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SbmPython.h"
+				RelativePath="..\src\sbm\SBPython.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SbmPythonClass.cpp"
+				RelativePath="..\src\sbm\SBPythonClass.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SbmPythonClass.h"
+				RelativePath="..\src\sbm\SBPythonClass.h"
 				>
 			</File>
 		</Filter>
@@ -2773,6 +2761,14 @@
 			</File>
 			<File
 				RelativePath="..\src\sbm\SBController.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBFaceDefinition.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBFaceDefinition.h"
 				>
 			</File>
 			<File

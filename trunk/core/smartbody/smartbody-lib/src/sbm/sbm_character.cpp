@@ -594,8 +594,8 @@ void SbmCharacter::setJointCollider( std::string jointName, float len, float rad
 
 
 
-int SbmCharacter::init( SkSkeleton* new_skeleton_p,
-					   FaceDefinition* faceDefinition,
+int SbmCharacter::init(SkSkeleton* new_skeleton_p,
+					   SmartBody::SBFaceDefinition* faceDefinition,
 					   GeneralParamMap* param_map,
 					   const char* classType,
 					   bool use_locomotion,
@@ -1629,7 +1629,7 @@ void SbmCharacter::schedule_viseme_curve(
 		else
 			visemeNames.push_back(viseme);
 
-		FaceDefinition* faceDefinition = getFaceDefinition();
+		SmartBody::SBFaceDefinition* faceDefinition = getFaceDefinition();
 
 		for( size_t nCount = 0; nCount < visemeNames.size(); nCount++ )
 		{
@@ -1725,7 +1725,7 @@ void SbmCharacter::schedule_viseme_trapezoid(
 			0.0f, 0.0f
 		};
 
-		FaceDefinition* faceDefinition = getFaceDefinition();
+		SmartBody::SBFaceDefinition* faceDefinition = getFaceDefinition();
 		float visemeWeight = 1.0f;
 		if (faceDefinition)
 		{
@@ -1762,7 +1762,7 @@ void SbmCharacter::schedule_viseme_blend_curve(
 		else
 			visemeNames.push_back(viseme);
 
-		FaceDefinition* faceDefinition = getFaceDefinition();
+		SmartBody::SBFaceDefinition* faceDefinition = getFaceDefinition();
 		float visemeWeight = 1.0f;
 
 		for( size_t nCount = 0; nCount < visemeNames.size(); nCount++ )
@@ -1808,7 +1808,7 @@ void SbmCharacter::schedule_viseme_blend_ramp(
 			0.0f, 0.0f, 
 			0.0f, 1.0f
 		};
-		FaceDefinition* faceDefinition = getFaceDefinition();
+		SmartBody::SBFaceDefinition* faceDefinition = getFaceDefinition();
 		float visemeWeight = 1.0f;
 		if (faceDefinition)
 		{
@@ -2527,7 +2527,7 @@ else if( cmd == "bone" ) {
 						}
 						else if (cmd == "visemeweight")
 						{
-							FaceDefinition* faceDefinition = this->getFaceDefinition();
+							SmartBody::SBFaceDefinition* faceDefinition = this->getFaceDefinition();
 							if (!faceDefinition)
 							{
 								LOG("Character %s does not have any visemes defined.", getName().c_str());
@@ -3598,19 +3598,19 @@ void SbmCharacter::writeSkeletonHierarchyRecurse(SkJoint* joint, std::ofstream& 
 	ostream << "}\n";
 }
 
-FaceDefinition* SbmCharacter::getFaceDefinition()
+SmartBody::SBFaceDefinition* SbmCharacter::getFaceDefinition()
 {
 	return _faceDefinition;
 }
 
-void SbmCharacter::setFaceDefinition(FaceDefinition* faceDefinition)
+void SbmCharacter::setFaceDefinition(SmartBody::SBFaceDefinition* faceDefinition)
 {
 	if (_faceDefinition)
 	{
 		delete _faceDefinition;
 		this->removeAllFaceChannels();
 	}
-	_faceDefinition = new FaceDefinition(faceDefinition);
+	_faceDefinition = new SmartBody::SBFaceDefinition(faceDefinition);
 	_faceDefinition->setName(faceDefinition->getName() + "_copy");
 
 	SkSkeleton* skeleton = getSkeleton();

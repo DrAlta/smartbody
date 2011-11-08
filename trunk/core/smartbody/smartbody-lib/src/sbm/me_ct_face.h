@@ -31,7 +31,7 @@
 #include <sk/sk_motion.h>
 #include <sk/sk_skeleton.h>
 #include <me/me_controller.h>
-#include <sbm/VisemeMap.hpp>
+#include <sbm/SBFaceDefinition.h>
 #include "sr_hash_map.h"
 #include "sbm/SBController.h"
 #include <vector>
@@ -82,7 +82,7 @@ class MeCtFace : public SmartBody::SBController	{
 		
 		void clear( void );
 		
-		void init( FaceDefinition* faceDefinition);
+		void init(SmartBody::SBFaceDefinition* faceDefinition);
 		void remove_joint( const char *joint_name );
 		void remove_channel( const char *joint_name, SkChannel::Type ch_type );
 		void add_key( const char *weight_key, SkMotion* key_pose_p );

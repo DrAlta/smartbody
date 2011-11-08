@@ -32,8 +32,8 @@ class SBScene : public SBObject
 		SBCharacter* getCharacter(std::string name);
 		SBPawn* getPawn(std::string name);
 
-		FaceDefinition* createFaceDefinition(const std::string& name);
-		FaceDefinition* getFaceDefinition(const std::string& name);
+		SBFaceDefinition* createFaceDefinition(const std::string& name);
+		SBFaceDefinition* getFaceDefinition(const std::string& name);
 		int getNumFaceDefinitions();
 		std::vector<std::string> getFaceDefinitionNames();
 
