@@ -1,4 +1,5 @@
 #include "SbmColObject.h"
+#include "SbmPhysicsSim.h"
 #include <sbm/gwiz_math.h>
 
 SrVec SbmTransform::localToGlobal( const SrVec& vLocal )
@@ -84,8 +85,7 @@ SbmTransform::SbmTransform()
 
 SbmGeomObject::SbmGeomObject(void)
 {
-	isUpdate = false;	
-	
+		
 }
 
 SbmGeomObject::~SbmGeomObject(void)
@@ -95,27 +95,20 @@ SbmGeomObject::~SbmGeomObject(void)
 
 SrVec SbmGeomObject::getCenter()
 {
-	return worldState.tran;
+	return getCombineTransform().tran;
 }
 
-void SbmGeomObject::updateGlobalTransform( const SrMat& newState )
+void SbmGeomObject::attachToPhyObj( SbmPhysicsObjInterface* phyObj )
 {
-	SrQuat newQuat = SrQuat(newState);	newQuat.normalize();
-	SrVec newPos = newState.get_translation();
-	if (newQuat != globalTransform.rot || newPos != globalTransform.tran)
-	{
-		globalTransform.rot  = newQuat;
-		globalTransform.tran = newPos;
-		worldState = SbmTransform::mult(localTransform,globalTransform);
-		isUpdate = true;
-	}	
+	attachedPhyObj = phyObj;	
 }
 
-void SbmGeomObject::setWorldState( SbmTransform& rt )
+SbmTransform& SbmGeomObject::getCombineTransform()
 {
-	worldState = rt;
-	globalTransform.gmat(localTransform.gmat().inverse()*rt.gmat());
+	combineTransform = SbmTransform::mult(localTransform,attachedPhyObj->getGlobalTransform());
+	return combineTransform;	
 }
+
 
 bool SbmGeomNullObject::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
 {
@@ -128,7 +121,7 @@ bool SbmGeomNullObject::estimateHandPosture( const SrQuat& naturalRot, SrVec& ou
 
 bool SbmGeomSphere::isInside( const SrVec& gPos, float offset )
 {
-	SrVec lpos = worldState.globalToLocal(gPos);
+	SrVec lpos = getCombineTransform().globalToLocal(gPos);
 	if (lpos.norm() < radius + offset)
 		return true;
 	return false;
@@ -141,8 +134,8 @@ SbmGeomSphere::~SbmGeomSphere()
 
 bool SbmGeomSphere::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
 {
-	SrVec p1 = worldState.globalToLocal(gPos1);
-	SrVec p2 = worldState.globalToLocal(gPos2);
+	SrVec p1 = getCombineTransform().globalToLocal(gPos1);
+	SrVec p2 = getCombineTransform().globalToLocal(gPos2);
 
 	if ( (p1).norm() < radius || (p2).norm() < radius + offset )
 		return true;
@@ -179,7 +172,7 @@ SbmGeomBox::~SbmGeomBox()
 
 bool SbmGeomBox::isInside( const SrVec& gPos, float offset )
 {
-	SrVec lpos = worldState.globalToLocal(gPos);
+	SrVec lpos = getCombineTransform().globalToLocal(gPos);
 	
 	if (lpos.x > -extent.x - offset && lpos.x < extent.x + offset && 
 		lpos.y > -extent.y - offset && lpos.y < extent.y + offset &&
@@ -191,8 +184,8 @@ bool SbmGeomBox::isInside( const SrVec& gPos, float offset )
 
 bool SbmGeomBox::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
 {
-	SrVec p1 = worldState.globalToLocal(gPos1);
-	SrVec p2 = worldState.globalToLocal(gPos2);
+	SrVec p1 = getCombineTransform().globalToLocal(gPos1);
+	SrVec p2 = getCombineTransform().globalToLocal(gPos2);
 
 	SrVec d = (p2 - p1)*0.5f;    
 	SrVec e = extent + SrVec(offset,offset,offset);    
@@ -209,11 +202,10 @@ bool SbmGeomBox::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offs
 }
 
 bool SbmGeomBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
-{
-	
+{	
 	SrVec yAxis = SrVec(0,1,0);
 	yAxis = yAxis*naturalRot;
-	SrVec ly = yAxis*worldState.rot.inverse();//worldState.globalToLocal(yAxis);
+	SrVec ly = yAxis*getCombineTransform().rot.inverse();//worldState.globalToLocal(yAxis);
 	SrVec axis[6] = {SrVec(1,0,0), SrVec(0,1,0), SrVec(0,0,1),SrVec(-1,0,0), SrVec(0,-1,0), SrVec(0,0,-1) };
 	SrVec graspAxis;
 	float minAngle = 100.f;	
@@ -229,7 +221,7 @@ bool SbmGeomBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPo
 		}		
 	}
 	//sr_out << "minAngle = " << minAngle << "  , grasp axis = " << graspAxis << srnl;
-	graspAxis = graspAxis*worldState.rot;
+	graspAxis = graspAxis*getCombineTransform().rot;
 	SrVec rotAxis = cross(yAxis,graspAxis); rotAxis.normalize();
 	SrQuat alignRot = SrQuat(rotAxis,minAngle);
 	
@@ -361,7 +353,7 @@ SbmGeomCapsule::~SbmGeomCapsule()
 
 bool SbmGeomCapsule::isInside( const SrVec& gPos, float offset)
 {
-	SrVec lpos = worldState.globalToLocal(gPos);
+	SrVec lpos = getCombineTransform().globalToLocal(gPos);
 	SrVec cPts;
 	float dist = findPointDistOnLineSegment(lpos,endPts,cPts);	
 	if (dist < radius + offset )
@@ -375,8 +367,8 @@ bool SbmGeomCapsule::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float 
 {
 	SrVec lpos[2];
 	SrVec cpt;
-	lpos[0] = worldState.globalToLocal(gPos1);
-	lpos[1] = worldState.globalToLocal(gPos2);
+	lpos[0] = getCombineTransform().globalToLocal(gPos1);
+	lpos[1] = getCombineTransform().globalToLocal(gPos2);
 	
 	float dist = findLineSegmentDistOnLineSegment(lpos,endPts,cpt);
 
@@ -393,7 +385,7 @@ bool SbmGeomCapsule::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float 
 bool SbmGeomCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
 {
 	SrVec capAxis = (endPts[1]-endPts[0]); capAxis.normalize();
-	capAxis = capAxis*worldState.rot;
+	capAxis = capAxis*getCombineTransform().rot;
 	SrVec handAxis = SrVec(0,1,0)*naturalRot; handAxis.normalize();
 	SrVec handXAxis = SrVec(-1,0,0)*naturalRot;	
 	SrVec orienAxis = cross(handXAxis,capAxis); orienAxis.normalize();	
@@ -414,14 +406,14 @@ bool SbmCollisionUtil::checkIntersection( SbmGeomObject* obj1, SbmGeomObject* ob
 	if (dynamic_cast<SbmGeomSphere*>(obj1))
 	{
 		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(obj1);
-		return obj2->isInside(obj1->getWorldState().tran,sph->radius);
+		return obj2->isInside(obj1->getCombineTransform().tran,sph->radius);
 	}
 	else if (dynamic_cast<SbmGeomCapsule*>(obj1))
 	{
 		SbmGeomCapsule* cap = dynamic_cast<SbmGeomCapsule*>(obj1);
 		SrVec g1,g2;
-		g1 = cap->endPts[0]*cap->getWorldState().gmat();
-		g2 = cap->endPts[1]*cap->getWorldState().gmat();
+		g1 = cap->endPts[0]*cap->getCombineTransform().gmat();
+		g2 = cap->endPts[1]*cap->getCombineTransform().gmat();
 		return obj2->isIntersect(g1,g2,cap->radius);		
 	}
 	else if (dynamic_cast<SbmGeomBox*>(obj1))

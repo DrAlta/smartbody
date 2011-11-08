@@ -2876,7 +2876,7 @@ void FltkViewer::drawColliders()
 			  mi++)
 		{
 			SbmPhysicsObj* obj = mi->second;
-			SrMat gmat = obj->getColObj()->getWorldState().gmat();
+			SrMat gmat = obj->getGlobalTransform().gmat();
 			this->drawColObject(obj->getColObj(), gmat);
 		}		
 	}
@@ -4018,7 +4018,9 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 	SrColor objColor;
 	objColor.set(colObj->color.c_str());
 	SrMat gMat = gmat;
+	SrMat lMat = colObj->getLocalTransform().gmat();	
 	glMultMatrixf((const float*) gMat);
+	glMultMatrixf((const float*) lMat);
 	if (dynamic_cast<SbmGeomSphere*>(colObj))
 	{
 		// draw sphere
