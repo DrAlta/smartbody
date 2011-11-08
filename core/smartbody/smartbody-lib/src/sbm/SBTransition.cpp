@@ -1,4 +1,5 @@
 #include "SBTransition.h"
+namespace SmartBody {
 
 SBTransition::SBTransition() : PATransitionData()
 {
@@ -20,6 +21,13 @@ void SBTransition::set(SBState* source, SBState* dest)
 
 void SBTransition::addCorrespondancePoint(std::string  sourceMotion, std::string destMotion, float sourceFromTime, float sourceToTime, float destFromTime, float destToTime)
 {
+	fromMotionName = sourceMotion;
+	toMotionName = destMotion;
+
+	easeOutStart.push_back(sourceFromTime);
+	easeOutEnd.push_back(sourceToTime);
+	easeInStart = destFromTime;
+	easeInEnd = destToTime;
 }
 
 int SBTransition::getNumCorrespondancePoints()
@@ -42,4 +50,6 @@ SBState* SBTransition::getToState()
 {
 	SBState* to = dynamic_cast<SBState*>(toState);
 	return to;
+}
+
 }

@@ -1,6 +1,8 @@
 #include "SBStateManager.h"
 #include <sbm/mcontrol_util.h>
 
+namespace SmartBody {
+
 SBStateManager::SBStateManager()
 {
 }
@@ -118,4 +120,6 @@ std::vector<std::string> SBStateManager::getTransitionNames()
 								  "/" + mcu.param_anim_transitions[i]->toState->stateName );
 	}
 	return transitionNames;
+}
+
 }
