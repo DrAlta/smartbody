@@ -3,6 +3,7 @@
 
 #include <sbm/me_ct_param_animation_data.h>
 #include <sbm/SBState.h>
+namespace SmartBody {
 
 class SBTransition : public PATransitionData
 {
@@ -21,6 +22,7 @@ class SBTransition : public PATransitionData
 
 	protected:
 
-
 };
+
+}
 #endif

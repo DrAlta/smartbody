@@ -1,6 +1,8 @@
 #include "SBState.h"
 #include <sbm/mcontrol_util.h>
 
+namespace SmartBody {
+
 SBState::SBState() : PAStateData()
 {
 }
@@ -209,4 +211,4 @@ void SBState3D::addTetrahedron(std::string motion1, std::string motion2, std::st
 {
 }
 
-
+}

@@ -27,7 +27,7 @@ class SBMotion : public SkMotion
 		virtual void connect(SBSkeleton* skel);
 		virtual void disconnect();
 
-		SBMotion* mirror();
+		SBMotion* mirror(std::string name);
 
 	protected:
 		std::string _motionFile;

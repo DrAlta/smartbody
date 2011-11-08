@@ -4,6 +4,8 @@
 #include <sbm/SBState.h>
 #include <sbm/SBTransition.h>
 
+namespace SmartBody {
+
 class SBStateManager
 {
 	public:
@@ -25,5 +27,5 @@ class SBStateManager
 		std::vector<std::string> getTransitionNames();
 
 };
-
+}
 #endif

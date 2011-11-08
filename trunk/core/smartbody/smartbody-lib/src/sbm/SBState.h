@@ -3,6 +3,8 @@
 
 #include <sbm/me_ct_param_animation_data.h>
 
+namespace SmartBody {
+
 class SBState : public PAStateData
 {
 	public:
@@ -71,5 +73,5 @@ class SBState3D : public SBState
 		void addTetrahedron(std::string motion1, std::string motion2, std::string motion3,std::string motion4);
 
 };
-
+}
 #endif

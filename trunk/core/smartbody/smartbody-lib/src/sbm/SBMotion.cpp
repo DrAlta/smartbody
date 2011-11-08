@@ -160,18 +160,23 @@ void SBMotion::disconnect()
 	SkMotion::disconnect();
 }
 
-SBMotion* SBMotion::mirror()
+SBMotion* SBMotion::mirror(std::string name)
 {
 	SkMotion* motion = buildMirrorMotion();
 	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
 	if (sbmotion)
 	{
-		std::string motionName = sbmotion->getName();
-		if (motionName == EMPTY_STRING)
+		std::string motionName = "";
+		if (name == "")
 		{
-			motionName = getName() + "_mirror";
-			sbmotion->setName(motionName.c_str());
+			motionName = sbmotion->getName();
+			if (motionName == EMPTY_STRING)
+				motionName = getName() + "_mirror";
 		}
+		else
+			motionName = name;
+		sbmotion->setName(motionName.c_str());
+
 		mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 		mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, motion));
 	}
