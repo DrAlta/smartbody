@@ -95,9 +95,9 @@ int MeCtInterpolator::child(std::string name)
 {
 	MeCtMotion* motionCt1 = dynamic_cast<MeCtMotion*> (child1);
 	MeCtMotion* motionCt2 = dynamic_cast<MeCtMotion*> (child2);
-	if (motionCt1->motion()->name() == name)
+	if (motionCt1->motion()->getName() == name)
 		return 0;
-	if (motionCt2->motion()->name() == name)
+	if (motionCt2->motion()->getName() == name)
 		return 1;
 	return -1;
 
@@ -170,9 +170,9 @@ void MeCtInterpolator::initKeys()
 	{
 		for (int i = 0; i < state->getNumMotions(); i++)
 		{
-			if (state->motions[i]->name() == motion1->name())
+			if (state->motions[i]->getName() == motion1->getName())
 				key1 = state->keys[i];
-			if (state->motions[i]->name() == motion2->name())
+			if (state->motions[i]->getName() == motion2->getName())
 				key2 = state->keys[i];
 		}
 	}

@@ -25,6 +25,7 @@
 #include "me_ct_step_turn.h"
 using namespace gwiz;
 
+#include <sbm/SBMotion.h>
 #include <vhcl_log.h>
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -159,7 +160,7 @@ SkMotion* MeCtStepTurn::build_mirror_motion( SkMotion* ref_motion_p )	{
 	int i, j;
 	
 	SkChannelArray& mchan_arr = ref_motion_p->channels();
-	SkMotion *mirror_p = new SkMotion;
+	SkMotion *mirror_p = new SmartBody::SBMotion();
 	mirror_p->init( mchan_arr );
 
 	int num_f = ref_motion_p->frames();
@@ -548,7 +549,7 @@ void MeCtStepTurn::print_state( int tabCount ) {
 	if( _motion ) {
 
 		// motion name
-		str = _motion->name().c_str();
+		str = _motion->getName().c_str();
 		if( str )
 			LOG(" \"%s\"", str );
 

@@ -68,7 +68,7 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 	{
 		int order;
 		std::string filebasename = boost::filesystem::basename(pathName);
-		motion.name(filebasename.c_str());
+		motion.setName(filebasename.c_str());
 		skeleton.name(filebasename.c_str());
 		parser->parse(pathName.c_str());
 		DOMDocument* doc = parser->getDocument();

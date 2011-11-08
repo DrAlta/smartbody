@@ -83,7 +83,7 @@ MeCtQuickDraw::~MeCtQuickDraw( void )	{
 void print_motion( SkMotion* mot_p )	{
 
 	if( mot_p ) {
-		LOG( "motion:'%s'\n", mot_p->name().c_str() );
+		LOG( "motion:'%s'\n", mot_p->getName().c_str() );
 		LOG( "file:'%s'\n", mot_p->filename().c_str() );
 		LOG( " ready:     %f\n", mot_p->time_ready() );
 		LOG( " str-start: %f \n", mot_p->time_stroke_start() );
@@ -836,7 +836,7 @@ void MeCtQuickDraw::print_state( int tabCount ) {
 	if( _gundraw_motion ) {
 
 		// motion name
-		str = _gundraw_motion->name().c_str();
+		str = _gundraw_motion->getName().c_str();
 		if( str )
 			LOG(" \"%s\"", str );
 
@@ -848,7 +848,7 @@ void MeCtQuickDraw::print_state( int tabCount ) {
 	if( _holster_motion ) {
 
 		// motion name
-		str = _holster_motion->name().c_str();
+		str = _holster_motion->getName().c_str();
 		if( str )
 			LOG(" \"%s\"", str );
 

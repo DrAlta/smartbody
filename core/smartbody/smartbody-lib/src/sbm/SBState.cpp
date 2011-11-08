@@ -25,7 +25,7 @@ std::string SBState::getMotion(int num)
 {
 	if (motions.size() > (size_t) num && num >= 0)
 	{
-		return motions[num]->name();
+		return motions[num]->getName();
 	}
 	else
 	{

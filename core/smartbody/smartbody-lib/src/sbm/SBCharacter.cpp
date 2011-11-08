@@ -571,4 +571,15 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 }
 
 
+FaceDefinition* SBCharacter::getFaceDefinition()
+{
+	return SbmCharacter::getFaceDefinition();
+}
+
+void SBCharacter::setFaceDefinition(FaceDefinition* face)
+{
+		SbmCharacter::setFaceDefinition(face);
+}
+
+
 };

@@ -828,7 +828,7 @@ int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 			std::string mirrorMotionName = args.read_token();
 			if (mirrorMotionName == EMPTY_STRING)
 				mirrorMotionName = refMotionName + "_mirror";
-			mirrorMotion->name(mirrorMotionName.c_str());
+			mirrorMotion->setName(mirrorMotionName.c_str());
 			map.insert(std::pair<std::string, SkMotion*>(mirrorMotionName, mirrorMotion));
 			mirrorMotion->ref();
 			return CMD_SUCCESS;
@@ -2636,7 +2636,7 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			if (motionIter != mcu_p->motion_map.end())
 			{
 				SkMotion* motion_p = (*motionIter).second;
-				faceDefinition->setFaceNeutral(motion_p->name());
+				faceDefinition->setFaceNeutral(motion_p->getName());
 				return CMD_SUCCESS;
 			} else {
 				LOG("ERROR: Unknown motion \"%s\".", motion_name.c_str());
@@ -2759,7 +2759,7 @@ inline void print_au( const int unit, const ActionUnit* au ) {
 		std::stringstream strstr;
 		strstr << "Action Unit #" << unit << ": Left SkMotion ";
 		if( au->left ) {
-			strstr << '\"' << au->left->name() << "\".";
+			strstr << '\"' << au->left->getName() << "\".";
 		} else {
 			strstr << "is NULL.";
 		}
@@ -2768,7 +2768,7 @@ inline void print_au( const int unit, const ActionUnit* au ) {
 		strstr.clear();
 		strstr << "Action Unit #" << unit << ": Right SkMotion ";
 		if( au->right ) {
-			strstr << '\"' << au->right->name() << "\".";
+			strstr << '\"' << au->right->getName() << "\".";
 		} else {
 			strstr << "is NULL.";
 		}
@@ -2777,7 +2777,7 @@ inline void print_au( const int unit, const ActionUnit* au ) {
 		std::stringstream strstr;
 		strstr << "Action Unit #" << unit << ": SkMotion ";
 		if( au->left ) {
-			strstr << '\"' << au->left->name() << "\".";
+			strstr << '\"' << au->left->getName() << "\".";
 		} else {
 			strstr << "is NULL.";
 		}
@@ -2899,7 +2899,8 @@ void print_viseme( const string& viseme, const SkMotion* motion ) {
 	if( motion == NULL ) {
 		strstr << "NULL";
 	} else {
-		strstr << '\"' << motion->name() << '\"';
+		SkMotion* m2 = const_cast<SkMotion*>(motion);
+		strstr << '\"' << m2->getName() << '\"';
 	}
 	LOG("%s", strstr.str().c_str());
 }
@@ -4641,7 +4642,7 @@ int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 		motionIter != mcu_p->motion_map.end();
 		motionIter++)
 	{
-		LOG( "  '%s'\n", (*motionIter).second->name().c_str() );
+		LOG( "  '%s'\n", (*motionIter).second->getName().c_str() );
 	}
 	
 	LOG( "POSE CTRL:\n" );
@@ -4655,7 +4656,7 @@ int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 	mcu_p->motion_ctrl_map.reset();
 	MeCtMotion * mot_ctrl_p;
 	while( mot_ctrl_p = mcu_p->motion_ctrl_map.next() )	{
-		LOG( "  '%s' : '%s'\n", mot_ctrl_p->getName().c_str(), mot_ctrl_p->motion()->name().c_str() );
+		LOG( "  '%s' : '%s'\n", mot_ctrl_p->getName().c_str(), mot_ctrl_p->motion()->getName().c_str() );
 	}
 	
 	LOG( "SIMPLE-NOD:\n" );
@@ -5126,7 +5127,7 @@ int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		delete motionEvents[x];
 	}
 	motionEvents.clear();
-	LOG("%d motion events removed from motion %s.", numEvents, motion->name().c_str());
+	LOG("%d motion events removed from motion %s.", numEvents, motion->getName().c_str());
 		
 	return CMD_SUCCESS;
 }
@@ -5177,7 +5178,7 @@ int disableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		motionEvents[x]->setEnabled(false);
 	}
-	LOG("%d motion events have been disabled from motion %s.", numEvents, motion->name().c_str());
+	LOG("%d motion events have been disabled from motion %s.", numEvents, motion->getName().c_str());
 		
 	return CMD_SUCCESS;
 }
@@ -5228,7 +5229,7 @@ int enableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		motionEvents[x]->setEnabled(true);
 	}
-	LOG("%d motion events have been enabled from motion %s.", numEvents, motion->name().c_str());
+	LOG("%d motion events have been enabled from motion %s.", numEvents, motion->getName().c_str());
 		
 	return CMD_SUCCESS;
 }
@@ -6417,7 +6418,7 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	if (args.calc_num_tokens() == 0)
 	{
 		// dump information about the motion
-		LOG("Motion name:   %s", motion->name().c_str());
+		LOG("Motion name:   %s", motion->getName().c_str());
 		LOG("Motion source: %s", motion->filename().c_str());
 		LOG("Num Frames:    %d", motion->frames());
 		LOG("Num Channels:  %d", motion->channels().size());

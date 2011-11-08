@@ -37,6 +37,7 @@ class FaceDefinition
 {
 	public:
 		FaceDefinition();
+		FaceDefinition(const std::string& name);
 		FaceDefinition(FaceDefinition* source);
 
 		~FaceDefinition();

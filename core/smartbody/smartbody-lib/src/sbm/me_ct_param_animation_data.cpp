@@ -110,7 +110,7 @@ int PAStateData::getMotionId(const std::string& motion)
 {
 	for (int i = 0; i < getNumMotions(); i++)
 	{
-		const std::string& mName = motions[i]->name();
+		const std::string& mName = motions[i]->getName();
 		if (motion == mName)
 			return i;
 	}
@@ -490,7 +490,7 @@ void ParameterManager::getParameter(float& x, float& y)
 		return;
 	else if (indices.size() == 1)
 	{
-		int id = state->paramManager->getMotionId(state->motions[indices[0]]->name());
+		int id = state->paramManager->getMotionId(state->motions[indices[0]]->getName());
 		if (id >= 0)
 		{
 			x = state->paramManager->getVec(id).x;
@@ -504,7 +504,7 @@ void ParameterManager::getParameter(float& x, float& y)
 		std::vector<SrVec> vecs;
 		for (size_t i = 0; i < indices.size(); i++)
 		{
-			int id = state->paramManager->getMotionId(state->motions[indices[i]]->name());
+			int id = state->paramManager->getMotionId(state->motions[indices[i]]->getName());
 			if (id >= 0)
 				vecs.push_back(state->paramManager->getVec(id));
 			else
@@ -530,7 +530,7 @@ void ParameterManager::getParameter(float& x, float& y, float& z)
 		return;
 	else if (indices.size() == 1)
 	{
-		int id = state->paramManager->getMotionId(state->motions[indices[0]]->name());
+		int id = state->paramManager->getMotionId(state->motions[indices[0]]->getName());
 		if (id >= 0)
 		{
 			x = state->paramManager->getVec(id).x;
@@ -545,7 +545,7 @@ void ParameterManager::getParameter(float& x, float& y, float& z)
 		std::vector<SrVec> vecs;
 		for (size_t i = 0; i < indices.size(); i++)
 		{
-			int id = state->paramManager->getMotionId(state->motions[indices[i]]->name());
+			int id = state->paramManager->getMotionId(state->motions[indices[i]]->getName());
 			if (id >= 0)
 				vecs.push_back(state->paramManager->getVec(id));
 			else

@@ -3044,7 +3044,7 @@ else if( cmd == "bone" ) {
 											//SkMotion* motion = getReachMotion(motion_num);
 											for (int c = 0; c < motion_num; c++)
 											{
-												LOG( "%s", getReachMotion(c)->name().c_str() );
+												LOG( "%s", getReachMotion(c)->getName().c_str() );
 											}
 											return CMD_SUCCESS;
 										}
@@ -3076,7 +3076,7 @@ else if( cmd == "bone" ) {
 											{
 												//motion->name()
 												char cmd[256];
-												sprintf(cmd,"bml char %s <body posture=\"%s\"/>",getName().c_str(),motion->name().c_str());
+												sprintf(cmd,"bml char %s <body posture=\"%s\"/>",getName().c_str(),motion->getName().c_str());
 												mcuCBHandle::singleton().execute(cmd);
 											}			
 											return CMD_SUCCESS;

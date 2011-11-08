@@ -156,7 +156,7 @@ void PATransitionEditor::changeStateList1(Fl_Widget* widget, void* data)
 	if (state1)
 	{
 		for (int i = 0; i < state1->getNumMotions(); i++)
-			editor->animForTransition1->add(state1->motions[i]->name().c_str());
+			editor->animForTransition1->add(state1->motions[i]->getName().c_str());
 	}
 	for (int i = 0; i < editor->animForTransition1->size(); i++)
 		editor->animForTransition1->select(i, false);
@@ -175,7 +175,7 @@ void PATransitionEditor::changeStateList2(Fl_Widget* widget, void* data)
 	if (state2)
 	{
 		for (int i = 0; i < state2->getNumMotions(); i++)
-			editor->animForTransition2->add(state2->motions[i]->name().c_str());
+			editor->animForTransition2->add(state2->motions[i]->getName().c_str());
 	}
 	for (int i = 0; i < editor->animForTransition2->size(); i++)
 		editor->animForTransition2->select(i, false);
@@ -233,7 +233,7 @@ void PATransitionEditor::changeAnimForTransition(Fl_Widget* widget, void* data)
 		PAStateData* toState = mcu.lookUpPAState(stateName2);
 		for (int i = 0; i < fromState->getNumMotions(); i++)
 		{
-			if (motionName1 == fromState->motions[i]->name())
+			if (motionName1 == fromState->motions[i]->getName())
 			{
 				int numKeys = fromState->getNumKeys();
 				block1->setStartTime(fromState->keys[i][0]);
@@ -242,7 +242,7 @@ void PATransitionEditor::changeAnimForTransition(Fl_Widget* widget, void* data)
 		}
 		for (int i = 0; i < toState->getNumMotions(); i++)
 		{
-			if (motionName2 == toState->motions[i]->name())
+			if (motionName2 == toState->motions[i]->getName())
 			{
 				int numKeys = toState->getNumKeys();
 				block2->setStartTime(toState->keys[i][0]);

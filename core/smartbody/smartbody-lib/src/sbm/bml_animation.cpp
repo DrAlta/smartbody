@@ -66,7 +66,7 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 
 			// Name controller with behavior unique_id
 			ostringstream name;
-			name << unique_id << ' ' << motion->name();
+			name << unique_id << ' ' << motion->getName();
 			motionCt->setName( name.str().c_str() );  // TODO: include BML act and behavior ids
 			motionCt->init( const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0 / twarp );
 
@@ -120,7 +120,7 @@ BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::
 			motion1Ct->init( const_cast<SbmCharacter*>(request->actor), motion1 );
 			// Name controller with behavior unique_id
 			ostringstream name;
-			name << unique_id << ' ' << motion1->name();
+			name << unique_id << ' ' << motion1->getName();
 			motion1Ct->setName( name.str().c_str() );  // TODO: include BML act and behavior ids
 		} 
 		else 
@@ -137,7 +137,7 @@ BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::
 			motion2Ct->init( const_cast<SbmCharacter*>(request->actor), motion2 );
 			// Name controller with behavior unique_id
 			ostringstream name;
-			name << unique_id << ' ' << motion2->name();
+			name << unique_id << ' ' << motion2->getName();
 			motion2Ct->setName( name.str().c_str() );  // TODO: include BML act and behavior ids
 		}
 		else 

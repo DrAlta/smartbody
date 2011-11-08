@@ -126,7 +126,7 @@ void MeCtLocomotionLimbAnim::apply_frame(int frame)
 void MeCtLocomotionLimbAnim::print_info()
 {
 	SrVec* velocity = NULL;
-	LOG("\n Printing info for walking animation %s:", walking->name().c_str());
+	LOG("\n Printing info for walking animation %s:", walking->getName().c_str());
 	/*for(int i = 0; i < get_support_joint_num(); ++i)
 	{
 		LOG("\n land_frame[%s]: %d", (const char*)*(support_joint_list->get(i)), land_frame.get(i));

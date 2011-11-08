@@ -171,10 +171,10 @@ void MeCtMotion::output ( SrOutput& out )
    MeController::output ( out );
 
    // name
-   if ( getName() != _motion->name())
+   if ( getName() != _motion->getName())
     { 
 		SrString n;
-		n.make_valid_string ( _motion->name().c_str() );
+		n.make_valid_string ( _motion->getName().c_str() );
       out << "motion " << n << srnl;
     }
 
@@ -342,7 +342,7 @@ void MeCtMotion::print_state( int tabCount ) {
 	LOG(", motion" );
 	if( _motion ) {
 		// motion name
-		str = _motion->name();
+		str = _motion->getName();
 		if( str != "")
 			LOG(" \"%s\"", str.c_str() );
 

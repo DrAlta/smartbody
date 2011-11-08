@@ -30,6 +30,7 @@
 # include <sbm/gwiz_math.h>
 # include <sr/sr_output.h>
 #include <cstdio>
+#include <sbm/SBMotion.h>
 
 std::string MeCtBreathing::type_name = "Breathing";
 
@@ -93,7 +94,7 @@ void MeCtBreathing::setUseBlendChannels(bool val)
 	{
 		// blend channels are being turned on, so
 		// create a motion containing simulated breathing
-		_blendChannelBreathingMotion = new SkMotion();
+		_blendChannelBreathingMotion = new SmartBody::SBMotion();
 		SkChannelArray breathingChannels;
 		breathingChannels.add("breathX", SkChannel::XPos);
 		breathingChannels.add("breathY", SkChannel::XPos);
@@ -194,7 +195,7 @@ void MeCtBreathing::print_state( int tabCount )
 	if( _motion ) 
 	{
 		// motion name
-		str = _motion->name();
+		str = _motion->getName();
 		if( str != "")
 			LOG("=\"%s\"", str.c_str() );
 

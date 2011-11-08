@@ -4,6 +4,7 @@
 #include <vhcl.h>
 #include <sbm/DObject.h>
 #include <sbm/SBCharacter.h>
+#include <sbm/SBMotion.h>
 #include <sbm/Event.h>
 #include <sbm/SBSimulationManager.h>
 #include <sbm/SBBmlProcessor.h>
@@ -31,14 +32,19 @@ class SBScene : public DObject
 		SBCharacter* getCharacter(std::string name);
 		SBPawn* getPawn(std::string name);
 
+		FaceDefinition* createFaceDefinition(const std::string& name);
+		FaceDefinition* getFaceDefinition(const std::string& name);
+		int getNumFaceDefinitions();
+		std::vector<std::string> getFaceDefinitionNames();
+
 		std::vector<std::string> getPawnNames();
 		std::vector<std::string> getCharacterNames();
 
-		FaceDefinition* getFaceDefinition(std::string str);
-
 		SBSkeleton* createSkeleton(std::string char_name);
 
-		SkMotion* getMotion(std::string name);
+		SBMotion* getMotion(std::string name);
+		int getNumMotions();
+		std::vector<std::string> getMotionNames();
 
 		void setMediaPath(std::string path);
 		void addAssetPath(std::string type, std::string path);

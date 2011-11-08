@@ -30,6 +30,7 @@
 # include <sr/sr_shared_class.h>
 # include <sk/sk_channel_array.h>
 # include <sbm/sr_synch_points.h>
+#include <sbm/DObject.h>
 
 class SkPosture;
 class SkSkeleton;
@@ -37,7 +38,7 @@ class MotionEvent;
 
 /*! Maintains a motion defined as a sequence of keyframes, each
 with a time stamp */
-class SkMotion : public SrSharedClass {
+class SkMotion : public DObject, public SrSharedClass {
 //class SkMotion {
 public:
 	struct Frame { 
@@ -49,7 +50,6 @@ public:
 	int _postsize;            // size of each posture
 	SkSkeleton* _skeleton;    // the connected skeleton
 	float* _floatbuffer;      // or the connected buffer
-	std::string _name;              // motion name
 	std::string _filename;          // file name (optional)
 	std::vector<Frame> _frames;   // frame data
 	SkChannelArray _channels; // channels
@@ -80,12 +80,6 @@ public :
 
 	/*! Destructor is public but pay attention to the use of ref()/unref() */
 	virtual ~SkMotion();
-
-	/*! Set a name to be associated with the motion */
-	void name ( const std::string& n ) { _name = n; }
-
-	/*! Get the name associated with the motion */
-	const std::string& name () const { return _name; }
 
 	/*! Set a file name to be associated with the motion.
 	This information is not saved in the motion file and is 
@@ -167,10 +161,10 @@ public :
 	result of channels().count_floats(). A null parameter will
 	disconnect the motion (but will not touch the channel array).
 	This call simply saves the pointer (thus is very efficient) */
-	void connect ( float* buffer );
+	virtual void connect ( float* buffer );
 
 	/*! disconnect the motion by calling connect((SkSkeleton*)0) */
-	void disconnect () { connect((SkSkeleton*)0); }
+	virtual void disconnect () { connect((SkSkeleton*)0); }
 
 	/*! Returns the current connected skeleton (can be a null pointer)*/
 	SkSkeleton* connected_skeleton () const { return _skeleton; }

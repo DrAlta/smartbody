@@ -51,6 +51,7 @@
 #include "ParserASFAMC.h"
 #include "ParserFBX.h"
 #include <sbm/SBSkeleton.h>
+#include <sbm/SBMotion.h>
 
 using namespace std;
 using namespace boost::filesystem;
@@ -252,7 +253,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 	} else {
 
 		std::string ext = extension( pathname );
-		SkMotion* motion = new SkMotion();
+		SkMotion* motion = new SmartBody::SBMotion();
 		motion->ref();
 		bool parseSuccessful = false;
 
@@ -306,7 +307,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			std::ifstream filestream(pathname.string().c_str());
 			SkSkeleton skeleton;
 			parseSuccessful = ParserASFAMC::parse(skeleton, *motion, metafilestream, filestream, float(scale));
-			motion->name(filebase.c_str());
+			motion->setName(filebase.c_str());
 		}
 #if ENABLE_FBX_PARSER
 		else if (ext == ".fbx")
@@ -332,10 +333,10 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			manager->addResource(motionRes);
 
 			string filebase = basename( pathname );
-			const char* name = motion->name().c_str();
+			const char* name = motion->getName().c_str();
 			if( name && _stricmp( filebase.c_str(), name ) ) {
 				LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.native_file_string().c_str(), filebase.c_str());
-				motion->name( filebase.c_str() );
+				motion->setName( filebase.c_str() );
 			}
 			motion->filename( pathname.native_file_string().c_str() );
 

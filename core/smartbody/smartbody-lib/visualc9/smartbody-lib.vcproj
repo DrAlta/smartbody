@@ -2808,6 +2808,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\SBMotion.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBMotion.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SBPawn.cpp"
 				>
 			</File>

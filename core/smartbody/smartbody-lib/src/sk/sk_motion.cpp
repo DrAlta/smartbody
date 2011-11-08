@@ -36,14 +36,14 @@
 #include <sbm/gwiz_math.h>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
+#include <sbm/SBMotion.h>
 
 using namespace gwiz;
 
 //============================= SkMotion ============================
 
-SkMotion::SkMotion() :
+SkMotion::SkMotion() : DObject(),
 	_postsize( 0 ),
-	_name( "" ),
 	_filename( "" ),
 	_skeleton( NULL ),
 	_floatbuffer( NULL ),
@@ -506,7 +506,9 @@ void SkMotion::operator = ( const SkMotion& m )
  {
    disconnect();
    init();
-   name(m.name());
+   SkMotion& m2 = const_cast<SkMotion&>(m);
+   const std::string& fromName = m2.getName();
+   setName(fromName);
 
    int i;
    _postsize = m._postsize;
@@ -597,13 +599,13 @@ void SkMotion::registerAnimation()
 	
 	if (xPos == -1 || yPos == -1 || zPos == -1)
 	{
-		LOG("No base position found in motion %s, cannot register.", this->name());
+		LOG("No base position found in motion %s, cannot register.", this->getName());
 		return;
 	}
 
 	if (qPos == -1)
 	{
-		LOG("No base orientation found in motion %s, cannot register.", this->name());
+		LOG("No base orientation found in motion %s, cannot register.", this->getName());
 		return;
 	}
 
@@ -641,13 +643,13 @@ void SkMotion::registerAnimation()
 	
 	if (xPos == -1 || yPos == -1 || zPos == -1)
 	{
-		LOG("No base position found in motion %s, cannot register.", this->name());
+		LOG("No base position found in motion %s, cannot register.", this->getName());
 		return;
 	}
 
 	if (qPos == -1)
 	{
-		LOG("No base orientation found in motion %s, cannot register.", this->name());
+		LOG("No base orientation found in motion %s, cannot register.", this->getName());
 		return;
 	}
 
@@ -769,7 +771,7 @@ std::vector<MotionEvent*>& SkMotion::getMotionEvents()
 SkMotion* SkMotion::buildMirrorMotion()
 {	
 	SkChannelArray& mchan_arr = this->channels();
-	SkMotion *mirror_p = new SkMotion;
+	SkMotion *mirror_p = new SmartBody::SBMotion();
 	srSynchPoints sp(synch_points);
 	mirror_p->synch_points = sp;
 	mirror_p->init( mchan_arr );
