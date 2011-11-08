@@ -44,8 +44,8 @@ that is distributed: */
 
 #include <FL/Fl_Scroll.H>
 #include "vhcl.h"
-#include "sbm/DObserver.h"
-#include "sbm/DAttribute.h"
+#include "sbm/SBObserver.h"
+#include "sbm/SBAttribute.h"
 #include <map>
 
 #include <FL/Fl_Double_Window.H>
@@ -53,12 +53,12 @@ that is distributed: */
 #include <FL/Fl_Group.H>
 
 
-class DObject;
+class SBObject;
 
-class AttributeWindow : public Fl_Group, public DObserver
+class AttributeWindow : public Fl_Group, public SmartBody::SBObserver
 {
 public:
-	AttributeWindow(DObject*, int,int,int,int,const char*);
+	AttributeWindow(SmartBody::SBObject*, int,int,int,int,const char*);
 	~AttributeWindow();
 
 	void setDirty(bool val);
@@ -66,14 +66,14 @@ public:
 	//void show();
 	//void layout();
 
-	void setObject(DObject* g);
-	DObject* getObject();
+	void setObject(SmartBody::SBObject* g);
+	SmartBody::SBObject* getObject();
 	
-	void setAttributeInfo(Fl_Widget* widget, DAttributeInfo* attrInfo);
+	void setAttributeInfo(Fl_Widget* widget, SmartBody::SBAttributeInfo* attrInfo);
 	void reorderAttributes();
 	void cleanUpAttributesInfo();
 	void cleanUpWidgets();
-	virtual void notify(DSubject* subject);
+	virtual void notify(SmartBody::SBSubject* subject);
 
 	static void BoolCB(Fl_Widget* w, void *data);
 	static void IntCB(Fl_Widget* w, void *data);
@@ -83,7 +83,7 @@ public:
 
 	static const uchar ATTRIBUTEWINDOWTYPE = (uchar)240;
 
-	DObject* object;
+	SmartBody::SBObject* object;
 
 	bool dirty;
 	std::map<std::string, Fl_Widget*> widgetMap;

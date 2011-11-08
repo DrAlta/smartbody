@@ -13,7 +13,7 @@ BMLConstraintObject::BMLConstraintObject() : BMLObject()
 	createDoubleAttribute("sbm:fade-in",-1.0,true,"Basic", 60, false, false, false,"the time for the constraint to blend in. this option is ignored if set to negative.");
 	createDoubleAttribute("sbm:fade-out",-1.0,true,"Basic", 70, false, false, false,"the time for the constraint to blend out. this option is ignored if set to negative.");
 
-	StringAttribute* constraintTypeAttr = createStringAttribute("sbm:constraint-type","pos",true,"Basic", 80, false, false, false,"the constraint type to be enforced. it can be positional or rotational constraint.");
+	SmartBody::StringAttribute* constraintTypeAttr = createStringAttribute("sbm:constraint-type","pos",true,"Basic", 80, false, false, false,"the constraint type to be enforced. it can be positional or rotational constraint.");
 	std::vector<std::string> constraintTypes;
 	constraintTypes.push_back("pos");
 	constraintTypes.push_back("rot");	
@@ -35,7 +35,7 @@ BMLConstraintObject::~BMLConstraintObject()
 {
 }
 
-void BMLConstraintObject::notify(DSubject* subject)
+void BMLConstraintObject::notify(SmartBody::SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }

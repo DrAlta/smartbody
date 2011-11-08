@@ -2,7 +2,7 @@
 #define SBSCENE_H
 
 #include <vhcl.h>
-#include <sbm/DObject.h>
+#include <sbm/SBObject.h>
 #include <sbm/SBCharacter.h>
 #include <sbm/SBMotion.h>
 #include <sbm/Event.h>
@@ -12,7 +12,7 @@
 
 namespace SmartBody {
 
-class SBScene : public DObject
+class SBScene : public SBObject
 {
 	public:
 		SBScene(void);
@@ -65,7 +65,7 @@ class SBScene : public DObject
 		SBBmlProcessor* getBmlProcessor();
 		SBStateManager* getStateManager();
 
-		void notify(DSubject* subject);
+		void notify(SBSubject* subject);
 
 	private:
 		SBSimulationManager* _sim;

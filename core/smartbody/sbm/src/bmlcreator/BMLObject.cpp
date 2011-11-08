@@ -18,14 +18,14 @@ void BMLObject::constructBML()
 	strstr << "<" << getName();
 
 	int numUsedElements = 0;
-	std::map<std::string, DAttribute*>& attributes = getAttributeList();
-	for (std::map<std::string, DAttribute*>::iterator iter = attributes.begin();
+	std::map<std::string, SmartBody::SBAttribute*>& attributes = getAttributeList();
+	for (std::map<std::string, SmartBody::SBAttribute*>::iterator iter = attributes.begin();
 		 iter != attributes.end();
 		 iter++)
 	{
-		DAttribute* attribute = (*iter).second;
+		SmartBody::SBAttribute* attribute = (*iter).second;
 
-		BoolAttribute* boolAttribute = dynamic_cast<BoolAttribute*>(attribute);
+		SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
 		if (boolAttribute)
 		{
 			if (boolAttribute->getValue() != boolAttribute->getDefaultValue())
@@ -35,7 +35,7 @@ void BMLObject::constructBML()
 			}
 		}
 		
-		IntAttribute* intAttribute = dynamic_cast<IntAttribute*>(attribute);
+		SmartBody::IntAttribute* intAttribute = dynamic_cast<SmartBody::IntAttribute*>(attribute);
 		if (intAttribute)
 		{
 			if (intAttribute->getValue() != intAttribute->getDefaultValue())
@@ -45,7 +45,7 @@ void BMLObject::constructBML()
 			}
 		}
 
-		DoubleAttribute* doubleAttribute = dynamic_cast<DoubleAttribute*>(attribute);
+		SmartBody::DoubleAttribute* doubleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
 		if (doubleAttribute)
 		{
 			if (doubleAttribute->getValue() != doubleAttribute->getDefaultValue())
@@ -55,7 +55,7 @@ void BMLObject::constructBML()
 			}
 		}
 
-		Vec3Attribute* vecAttribute = dynamic_cast<Vec3Attribute*>(attribute);
+		SmartBody::Vec3Attribute* vecAttribute = dynamic_cast<SmartBody::Vec3Attribute*>(attribute);
 		if (vecAttribute)
 		{
 			if (vecAttribute->getValue() != vecAttribute->getDefaultValue())
@@ -65,7 +65,7 @@ void BMLObject::constructBML()
 			}
 		}
 
-		StringAttribute* stringAttribute = dynamic_cast<StringAttribute*>(attribute);
+		SmartBody::StringAttribute* stringAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
 		if (stringAttribute)
 		{
 			if (stringAttribute->getValue() != stringAttribute->getDefaultValue())
@@ -88,9 +88,9 @@ std::string BMLObject::getBML()
 	return _bml;
 }
 
-void BMLObject::notify(DSubject* subject)
+void BMLObject::notify(SBSubject* subject)
 {
-	DAttribute* attribute = dynamic_cast<DAttribute*>(subject);
+	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
 	if (attribute)
 	{
 		constructBML();

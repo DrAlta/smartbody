@@ -5453,23 +5453,23 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			}
 			SteerLib::SimulationOptions* steerOptions = new SteerLib::SimulationOptions();
 			steerOptions->moduleOptionsDatabase["testCasePlayer"]["testcase"] = "3-way-confusion-1.xml";
-			std::string ai = dynamic_cast<StringAttribute*>( mcu_p->steerEngine.getAttribute("aimodule") )->getValue();
+			std::string ai = dynamic_cast<SmartBody::StringAttribute*>( mcu_p->steerEngine.getAttribute("aimodule") )->getValue();
 
 			if (ai == "")
 				return CMD_FAILURE;
 			steerOptions->moduleOptionsDatabase["testCasePlayer"]["ai"] = ai;
 			steerOptions->engineOptions.startupModules.insert("testCasePlayer");
-			std::string testCases = dynamic_cast<StringAttribute*>( mcu_p->steerEngine.getAttribute("engineOptions.testCaseSearchPath") )->getValue();
+			std::string testCases = dynamic_cast<SmartBody::StringAttribute*>( mcu_p->steerEngine.getAttribute("engineOptions.testCaseSearchPath") )->getValue();
 			steerOptions->engineOptions.testCaseSearchPath = testCases;
-			std::string moduleSearchPath = dynamic_cast<StringAttribute*>( mcu_p->steerEngine.getAttribute("engineOptions.moduleSearchPath") )->getValue();
+			std::string moduleSearchPath = dynamic_cast<SmartBody::StringAttribute*>( mcu_p->steerEngine.getAttribute("engineOptions.moduleSearchPath") )->getValue();
 			steerOptions->engineOptions.moduleSearchPath = moduleSearchPath;
-			double gridSizeX = dynamic_cast<DoubleAttribute*>( mcu_p->steerEngine.getAttribute("gridDatabaseOptions.gridSizeX") )->getValue();
-			double gridSizeZ = dynamic_cast<DoubleAttribute*>( mcu_p->steerEngine.getAttribute("gridDatabaseOptions.gridSizeZ") )->getValue();
+			double gridSizeX = dynamic_cast<SmartBody::DoubleAttribute*>( mcu_p->steerEngine.getAttribute("gridDatabaseOptions.gridSizeX") )->getValue();
+			double gridSizeZ = dynamic_cast<SmartBody::DoubleAttribute*>( mcu_p->steerEngine.getAttribute("gridDatabaseOptions.gridSizeZ") )->getValue();
 			steerOptions->gridDatabaseOptions.gridSizeX = float(gridSizeX);
             steerOptions->gridDatabaseOptions.gridSizeZ = float(gridSizeZ);
-			int numGridCellsX = dynamic_cast<IntAttribute*> (mcu_p->steerEngine.getAttribute("gridDatabaseOptions.numGridCellsX"))->getValue();
-			int numGridCellsZ = dynamic_cast<IntAttribute*> (mcu_p->steerEngine.getAttribute("gridDatabaseOptions.numGridCellsZ"))->getValue();
-			int maxItemsPerGridCell = dynamic_cast<IntAttribute*> (mcu_p->steerEngine.getAttribute("gridDatabaseOptions.maxItemsPerGridCell"))->getValue();
+			int numGridCellsX = dynamic_cast<SmartBody::IntAttribute*> (mcu_p->steerEngine.getAttribute("gridDatabaseOptions.numGridCellsX"))->getValue();
+			int numGridCellsZ = dynamic_cast<SmartBody::IntAttribute*> (mcu_p->steerEngine.getAttribute("gridDatabaseOptions.numGridCellsZ"))->getValue();
+			int maxItemsPerGridCell = dynamic_cast<SmartBody::IntAttribute*> (mcu_p->steerEngine.getAttribute("gridDatabaseOptions.maxItemsPerGridCell"))->getValue();
 			steerOptions->gridDatabaseOptions.numGridCellsX = numGridCellsX;
 			steerOptions->gridDatabaseOptions.numGridCellsZ = numGridCellsZ;
 			steerOptions->gridDatabaseOptions.maxItemsPerGridCell = maxItemsPerGridCell;
@@ -5511,7 +5511,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				initialConditions.position = Util::Point( x * mcu_p->steeringScale, 0.0f, z * mcu_p->steeringScale );
 				Util::Vector orientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
 				initialConditions.direction = orientation;
-				double initialRadius = dynamic_cast<DoubleAttribute*>( mcu_p->steerEngine.getAttribute("initialConditions.radius") )->getValue();
+				double initialRadius = dynamic_cast<SmartBody::DoubleAttribute*>( mcu_p->steerEngine.getAttribute("initialConditions.radius") )->getValue();
 				//initialConditions.radius = float(initialRadius);
 				initialConditions.radius = 0.3f;//0.2f;//0.4f;
 				initialConditions.speed = 0.0f;

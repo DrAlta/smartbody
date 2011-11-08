@@ -4,13 +4,13 @@ BMLSaccadeObject::BMLSaccadeObject() : BMLObject()
 {
 	setName("saccade");
 
-	StringAttribute* finishAttr = createStringAttribute("finish", "", true, "Basic", 10, false, false, false, "Turn on or off saccade");
+	SmartBody::StringAttribute* finishAttr = createStringAttribute("finish", "", true, "Basic", 10, false, false, false, "Turn on or off saccade");
 	std::vector<std::string> toggles;
 	toggles.push_back("true");
 	toggles.push_back("false");
 	finishAttr->setValidValues(toggles);
 
-	StringAttribute* modeAttr = createStringAttribute("mode", "", true, "Basic", 20, false, false, false, "Which mode is saccade in. Default is lisen mode");
+	SmartBody::StringAttribute* modeAttr = createStringAttribute("mode", "", true, "Basic", 20, false, false, false, "Which mode is saccade in. Default is lisen mode");
 	std::vector<std::string> modes;
 	modes.push_back("talk");
 	modes.push_back("listen");
@@ -38,7 +38,7 @@ BMLSaccadeObject::~BMLSaccadeObject()
 {
 }
 
-void BMLSaccadeObject::notify(DSubject* subject)
+void BMLSaccadeObject::notify(SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }

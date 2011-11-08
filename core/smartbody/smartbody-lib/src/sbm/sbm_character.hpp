@@ -398,7 +398,7 @@ public:
 
 	void setMinVisemeTime(float minTime);
 	float getMinVisemeTime() const;
-	void notify(DSubject* subject);
+	void notify(SBSubject* subject);
 
 	virtual FaceDefinition* getFaceDefinition();
 	virtual void setFaceDefinition(FaceDefinition* face);

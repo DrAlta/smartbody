@@ -512,7 +512,7 @@ bool MeCtEyeLidRegulator::get_use_blink_viseme()
 	return use_blink_viseme;
 }
 
-void MeCtEyeLidRegulator::notify(DSubject* subject)
+void MeCtEyeLidRegulator::notify(SBSubject* subject)
 {
 	
 }

@@ -91,7 +91,7 @@ void PawnControl::set_pawn_rot( SbmPawn* pawn, SrQuat& quat )
 	mcu.resourceDataChanged = true;
 }
 
-void PawnControl::notify(DSubject* subject)
+void PawnControl::notify(SmartBody::SBSubject* subject)
 {
 	SbmPawn* notifyPawn = dynamic_cast<SbmPawn*>(subject);
 	if (notifyPawn && notifyPawn == pawn)

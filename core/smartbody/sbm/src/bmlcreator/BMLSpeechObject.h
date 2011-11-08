@@ -11,11 +11,11 @@ class BMLSpeechObject : public BMLObject
 
 		virtual std::string getBML();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 
 	protected:
-		StringAttribute* typeAttr;
-		StringAttribute* refAttr;
-		StringAttribute* contentAttr;
+		SmartBody::StringAttribute* typeAttr;
+		SmartBody::StringAttribute* refAttr;
+		SmartBody::StringAttribute* contentAttr;
 };
 #endif

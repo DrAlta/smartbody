@@ -41,7 +41,7 @@ that is distributed: */
 
 #include "AttributeWindow.h"
 
-#include "sbm/DObject.h"
+#include "sbm/SBObject.h"
 #include <FL/Fl_Color_Chooser.H>
 //#include <FL/Fl_Color.H>
 //#include <FL/ask.h>
@@ -60,7 +60,7 @@ that is distributed: */
 #endif
 
 
-AttributeWindow::AttributeWindow(DObject* obj, int x, int y, int w, int h, const char *s) : Fl_Group(x, y, w, h, s)
+AttributeWindow::AttributeWindow(SmartBody::SBObject* obj, int x, int y, int w, int h, const char *s) : Fl_Group(x, y, w, h, s)
 {
 	//this->type(VERTICAL);
 
@@ -89,15 +89,15 @@ void AttributeWindow::cleanUpAttributesInfo()
 {
 	//LOG("AttributeWindow Destructor\n");
 	// unregister the observer for each object attributes before destruction
-	DObject* obj = getObject();	
+	SmartBody::SBObject* obj = getObject();	
 	//obj->getAttributeManager()->unregisterObserver(this);
-	std::map<std::string, DAttribute*>& attrList = obj->getAttributeList();
-	std::map<std::string, DAttribute*>::iterator ai;
+	std::map<std::string, SmartBody::SBAttribute*>& attrList = obj->getAttributeList();
+	std::map<std::string, SmartBody::SBAttribute*>::iterator ai;
 	for ( ai  = attrList.begin();
 		ai != attrList.end();
 		ai++)
 	{
-		DAttribute* attr = dynamic_cast<DAttribute*>(ai->second);
+		SmartBody::SBAttribute* attr = dynamic_cast<SmartBody::SBAttribute*>(ai->second);
 		if (attr)
 		{
 			attr->unregisterObserver(this);
@@ -117,7 +117,7 @@ void AttributeWindow::show()
 }
 */
 
-void AttributeWindow::setAttributeInfo(Fl_Widget* widget, DAttributeInfo* attrInfo)
+void AttributeWindow::setAttributeInfo(Fl_Widget* widget, SmartBody::SBAttributeInfo* attrInfo)
 {
 	// this is NOT an efficient way to change the status of the widget...
 	// since it requires one check for each widget
@@ -179,10 +179,10 @@ void AttributeWindow::setAttributeInfo(Fl_Widget* widget, DAttributeInfo* attrIn
 	}
 }
 
-bool AttributePriorityPredicate(const DAttribute* d1, const DAttribute* d2)
+bool AttributePriorityPredicate(const SmartBody::SBAttribute* d1, const SmartBody::SBAttribute* d2)
 {
-	DAttribute* a = const_cast<DAttribute*>(d1);
-	DAttribute* b = const_cast<DAttribute*>(d2);
+	SmartBody::SBAttribute* a = const_cast<SmartBody::SBAttribute*>(d1);
+	SmartBody::SBAttribute* b = const_cast<SmartBody::SBAttribute*>(d2);
 	
 	if (a->getAttributeInfo()->getGroup() == b->getAttributeInfo()->getGroup())
 	{
@@ -201,9 +201,9 @@ bool AttributePriorityPredicate(const DAttribute* d1, const DAttribute* d2)
 
 void AttributeWindow::reorderAttributes()
 {
-	std::vector<DAttribute*> list;
-	std::map<std::string, DAttribute*>& attributes = object->getAttributeList();
-	for (std::map<std::string, DAttribute*>::iterator iter = attributes.begin();
+	std::vector<SmartBody::SBAttribute*> list;
+	std::map<std::string, SmartBody::SBAttribute*>& attributes = object->getAttributeList();
+	for (std::map<std::string, SmartBody::SBAttribute*>::iterator iter = attributes.begin();
 		iter != attributes.end();
 		iter++)
 	{
@@ -212,11 +212,11 @@ void AttributeWindow::reorderAttributes()
 	}
 
 	std::sort(list.begin(), list.end(), AttributePriorityPredicate);
-	for (std::vector<DAttribute*>::iterator iter = list.begin();
+	for (std::vector<SmartBody::SBAttribute*>::iterator iter = list.begin();
 		 iter != list.end();
 		 iter++)
 	{
-		DAttributeInfo* info = (*iter)->getAttributeInfo();
+		SmartBody::SBAttributeInfo* info = (*iter)->getAttributeInfo();
 		int priority = info->getPriority();
 		std::string name = (*iter)->getName();
 	}
@@ -227,7 +227,7 @@ void AttributeWindow::reorderAttributes()
 	int numOutOfOrder = 0;
 	int childNum = 0;
 	int numChildren = mainGroup->children();
-	for (std::vector<DAttribute*>::iterator sortedIter = list.begin();
+	for (std::vector<SmartBody::SBAttribute*>::iterator sortedIter = list.begin();
 		sortedIter != list.end();
 		sortedIter++)
 	{
@@ -266,7 +266,7 @@ void AttributeWindow::draw()
 {
 	if (dirty) 
 	{
-		std::vector<DAttributeGroup*>& attributeGroups = object->getAttributeManager()->getAttributeGroups();
+		std::vector<SmartBody::SBAttributeGroup*>& attributeGroups = object->getAttributeManager()->getAttributeGroups();
 		for (size_t g = 0; g < attributeGroups.size(); g++)
 		{
 		}
@@ -274,11 +274,11 @@ void AttributeWindow::draw()
 
 		int widgetHeight = 25;
 		int startY = 10 + widgetHeight * widgetMap.size(); // start position for the next widget to be added
-		std::map<std::string, DAttribute*>& attributes = object->getAttributeList();
+		std::map<std::string, SmartBody::SBAttribute*>& attributes = object->getAttributeList();
 		
 		// sort the attribute list by priority
-		std::vector<DAttribute*> sortedAttributes;
-		for (std::map<std::string, DAttribute*>::iterator iter = attributes.begin();
+		std::vector<SmartBody::SBAttribute*> sortedAttributes;
+		for (std::map<std::string, SmartBody::SBAttribute*>::iterator iter = attributes.begin();
 			iter != attributes.end();
 			iter++)
 		{
@@ -297,11 +297,11 @@ void AttributeWindow::draw()
 			attributeStatus[mapIter->first] = 0;
 		}
 		
-		for (std::vector<DAttribute*>::iterator iter = sortedAttributes.begin();
+		for (std::vector<SmartBody::SBAttribute*>::iterator iter = sortedAttributes.begin();
 			iter != sortedAttributes.end();
 			iter++)
 		{
-			DAttribute* attr = (*iter);
+			SmartBody::SBAttribute* attr = (*iter);
 			std::string name = (*iter)->getName();
 			std::map<std::string, Fl_Widget*>::iterator mapIter = widgetMap.find(name);
 								
@@ -309,10 +309,10 @@ void AttributeWindow::draw()
 			{
 				attributeStatus[name] = 2; // attribute widget created
 
-				DAttributeInfo* attrInfo = attr->getAttributeInfo();
+				SmartBody::SBAttributeInfo* attrInfo = attr->getAttributeInfo();
 
 				// bool -> checkbox
-				BoolAttribute* boolAttr = dynamic_cast<BoolAttribute*>(attr);
+				SmartBody::BoolAttribute* boolAttr = dynamic_cast<SmartBody::BoolAttribute*>(attr);
 				if (boolAttr) 
 				{
 					boolAttr->registerObserver(this);
@@ -330,7 +330,7 @@ void AttributeWindow::draw()
 					continue;
 				}
 				// int -> input
-				IntAttribute* intAttr = dynamic_cast<IntAttribute*>(attr);
+				SmartBody::IntAttribute* intAttr = dynamic_cast<SmartBody::IntAttribute*>(attr);
 				if (intAttr) 
 				{
 					intAttr->registerObserver(this);
@@ -382,7 +382,7 @@ void AttributeWindow::draw()
 					continue;
 				}
 				// double -> floatinput
-				DoubleAttribute* doubleAttr = dynamic_cast<DoubleAttribute*>(attr);
+				SmartBody::DoubleAttribute* doubleAttr = dynamic_cast<SmartBody::DoubleAttribute*>(attr);
 				if (doubleAttr) 
 				{
 					doubleAttr->registerObserver(this);
@@ -434,7 +434,7 @@ void AttributeWindow::draw()
 					continue;
 				}
 				// string -> input, or string -> choice
-				StringAttribute* stringAttr = dynamic_cast<StringAttribute*>(attr);
+				SmartBody::StringAttribute* stringAttr = dynamic_cast<SmartBody::StringAttribute*>(attr);
 				if (stringAttr) 
 				{
 					stringAttr->registerObserver(this);
@@ -476,7 +476,7 @@ void AttributeWindow::draw()
 					continue;
 				}
 				// vec3 -> 3 float inputs
-				Vec3Attribute* vec3Attr = dynamic_cast<Vec3Attribute*>(attr);
+				SmartBody::Vec3Attribute* vec3Attr = dynamic_cast<SmartBody::Vec3Attribute*>(attr);
 				if (vec3Attr) 
 				{
 					vec3Attr->registerObserver(this);
@@ -510,7 +510,7 @@ void AttributeWindow::draw()
 				attributeStatus[mapIter->first] = 1; // attribute widget found
 
 				// check the string widgets to make sure that the valid values haven't changes
-				StringAttribute* stringAttr = dynamic_cast<StringAttribute*>(attr);
+				SmartBody::StringAttribute* stringAttr = dynamic_cast<SmartBody::StringAttribute*>(attr);
 				if (stringAttr) 
 				{
 					const std::vector<std::string>& validValues = stringAttr->getValidValues();
@@ -577,12 +577,12 @@ void AttributeWindow::draw()
 }
 
 
-DObject* AttributeWindow::getObject()
+SmartBody::SBObject* AttributeWindow::getObject()
 {
 	return object;
 }
 
-void AttributeWindow::setObject(DObject* g)
+void AttributeWindow::setObject(SmartBody::SBObject* g)
 {
 	object = g;
 	object->getAttributeManager()->registerObserver(this);
@@ -593,7 +593,7 @@ void AttributeWindow::BoolCB(Fl_Widget *w, void *data)
 	AttributeWindow *cw = (AttributeWindow*) data;
 	
 	Fl_Check_Button* check = (Fl_Check_Button*) w;
-	DObject* obj = cw->getObject();
+	SmartBody::SBObject* obj = cw->getObject();
 	
 	std::string name = "";
 	std::map<Fl_Widget*, std::string>::iterator iter = cw->reverseWidgetMap.find(w);
@@ -602,8 +602,8 @@ void AttributeWindow::BoolCB(Fl_Widget *w, void *data)
 		
 	if (name != "")
 	{
-		DAttribute* attr = obj->getAttribute(name);
-		BoolAttribute* battr = dynamic_cast<BoolAttribute*>(attr);
+		SmartBody::SBAttribute* attr = obj->getAttribute(name);
+		SmartBody::BoolAttribute* battr = dynamic_cast<SmartBody::BoolAttribute*>(attr);
 		if (battr)
 		{
 			battr->setValue(check->value()? true : false);
@@ -635,12 +635,12 @@ void AttributeWindow::IntCB(Fl_Widget *w, void *data)
 	if (iter !=  attrWin->reverseWidgetMap.end())
 		name = iter->second;
 
-	DObject* obj = attrWin->getObject();
+	SmartBody::SBObject* obj = attrWin->getObject();
 	
 	if (name != "")
 	{
-		DAttribute* attr = obj->getAttribute(name);
-		IntAttribute* iattr = dynamic_cast<IntAttribute*>(attr);
+		SmartBody::SBAttribute* attr = obj->getAttribute(name);
+		SmartBody::IntAttribute* iattr = dynamic_cast<SmartBody::IntAttribute*>(attr);
 		if (iattr)
 		{
 			// where did the input come from? The input, the wheel or the slider?
@@ -685,12 +685,12 @@ void AttributeWindow::DoubleCB(Fl_Widget *w, void *data)
 	if (iter !=  attrWin->reverseWidgetMap.end())
 		name = iter->second;
 
-	DObject* obj = attrWin->getObject();
+	SmartBody::SBObject* obj = attrWin->getObject();
 	
 	if (name != "")
 	{
-		DAttribute* attr = obj->getAttribute(name);
-		DoubleAttribute* dattr = dynamic_cast<DoubleAttribute*>(attr);
+		SmartBody::SBAttribute* attr = obj->getAttribute(name);
+		SmartBody::DoubleAttribute* dattr = dynamic_cast<SmartBody::DoubleAttribute*>(attr);
 		if (dattr)
 		{
 			// where did the input come from? The input, the wheel or the slider?
@@ -727,7 +727,7 @@ void AttributeWindow::StringCB(Fl_Widget *w, void *data)
 	Fl_Input* input = dynamic_cast<Fl_Input*>(w);
 	Fl_Choice* choice = dynamic_cast<Fl_Choice*>(w);
 
-	DObject* obj = cw->getObject();
+	SmartBody::SBObject* obj = cw->getObject();
 	
 	// get the name of the attribute
 	std::string name = "";
@@ -737,8 +737,8 @@ void AttributeWindow::StringCB(Fl_Widget *w, void *data)
 
 	if (name != "")
 	{
-		DAttribute* attr = obj->getAttribute(name);
-		StringAttribute* strattr = dynamic_cast<StringAttribute*>(attr);
+		SmartBody::SBAttribute* attr = obj->getAttribute(name);
+		SmartBody::StringAttribute* strattr = dynamic_cast<SmartBody::StringAttribute*>(attr);
 		if (strattr)
 		{
 			if (input)
@@ -770,7 +770,7 @@ void AttributeWindow::Vec3CB(Fl_Widget *w, void *data)
 	
 	Fl_Float_Input* finput = (Fl_Float_Input*) w;
 	Fl_Group* group = finput->parent();
-	DObject* obj = attrWin->getObject();
+	SmartBody::SBObject* obj = attrWin->getObject();
 	
 	// get the name of the attribute
 	std::string name = "";
@@ -780,8 +780,8 @@ void AttributeWindow::Vec3CB(Fl_Widget *w, void *data)
 
 	if (name != "")
 	{
-		DAttribute* attr = obj->getAttribute(name);
-		Vec3Attribute* vec3attr = dynamic_cast<Vec3Attribute*>(attr);
+		SmartBody::SBAttribute* attr = obj->getAttribute(name);
+		SmartBody::Vec3Attribute* vec3attr = dynamic_cast<SmartBody::Vec3Attribute*>(attr);
 		if (vec3attr)
 		{
 			// get all the children of the group
@@ -805,7 +805,7 @@ void AttributeWindow::Vec3CB(Fl_Widget *w, void *data)
 	}
 }
 
-void AttributeWindow::notify(DSubject* subject)
+void AttributeWindow::notify(SmartBody::SBSubject* subject)
 {
 	if (subject == this->getObject()->getAttributeManager())
 	{
@@ -816,10 +816,10 @@ void AttributeWindow::notify(DSubject* subject)
 
 	// assume that the notification came from a change in attribute value 
 	// directly from the attribute
-	DAttribute* attr = dynamic_cast<DAttribute*>(subject);
+	SmartBody::SBAttribute* attr = dynamic_cast<SmartBody::SBAttribute*>(subject);
 	if (attr)
 	{
-		DAttributeInfo* attrInfo = attr->getAttributeInfo();
+		SmartBody::SBAttributeInfo* attrInfo = attr->getAttributeInfo();
 
 		Fl_Widget* widget = NULL;
 		// make sure that the attribute exists in the attribute map
@@ -829,7 +829,7 @@ void AttributeWindow::notify(DSubject* subject)
 			LOG("Widget for attribute %s.%s was not found. Please check code.", this->object->getName().c_str(), attr->getName().c_str());
 			return;
 		}
-		BoolAttribute* battr = dynamic_cast<BoolAttribute*>(attr);
+		SmartBody::BoolAttribute* battr = dynamic_cast<SmartBody::BoolAttribute*>(attr);
 		if (battr)
 		{
 			Fl_Check_Button* check = (Fl_Check_Button*) iter->second;
@@ -837,7 +837,7 @@ void AttributeWindow::notify(DSubject* subject)
 			setAttributeInfo(check, attrInfo);
 			return;
 		}
-		IntAttribute* iattr = dynamic_cast<IntAttribute*>(attr);
+		SmartBody::IntAttribute* iattr = dynamic_cast<SmartBody::IntAttribute*>(attr);
 		if (iattr)
 		{
 			Fl_Group* group = (Fl_Group*) iter->second;
@@ -916,7 +916,7 @@ void AttributeWindow::notify(DSubject* subject)
 			
 			return;
 		}
-		DoubleAttribute* dattr = dynamic_cast<DoubleAttribute*>(attr);
+		SmartBody::DoubleAttribute* dattr = dynamic_cast<SmartBody::DoubleAttribute*>(attr);
 		if (dattr)
 		{
 			Fl_Group* group = (Fl_Group*) iter->second;
@@ -995,7 +995,7 @@ void AttributeWindow::notify(DSubject* subject)
 
 			return;
 		}
-		StringAttribute* sattr = dynamic_cast<StringAttribute*>(attr);
+		SmartBody::StringAttribute* sattr = dynamic_cast<SmartBody::StringAttribute*>(attr);
 		if (sattr)
 		{
 			const std::vector<std::string>& validValues = sattr->getValidValues();
@@ -1080,7 +1080,7 @@ void AttributeWindow::notify(DSubject* subject)
 			}
 			return;
 		}
-		Vec3Attribute* vec3attr = dynamic_cast<Vec3Attribute*>(attr);
+		SmartBody::Vec3Attribute* vec3attr = dynamic_cast<SmartBody::Vec3Attribute*>(attr);
 		if (vec3attr)
 		{
 			Fl_Group* group = (Fl_Group*) iter->second;

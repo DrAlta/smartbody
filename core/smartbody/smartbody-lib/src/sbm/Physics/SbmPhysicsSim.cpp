@@ -2,8 +2,8 @@
 
 SbmPhysicsSim::SbmPhysicsSim(void)
 {
-	DObject::createDoubleAttribute("gravity",980, true, "Basic", 20, false, false, false, "?");
-	DObject::createBoolAttribute("enable",false,true, "Basic", 20, false, false, false, "?");	
+	SBObject::createDoubleAttribute("gravity",980, true, "Basic", 20, false, false, false, "?");
+	SBObject::createBoolAttribute("enable",false,true, "Basic", 20, false, false, false, "?");	
 }
 
 SbmPhysicsSim::~SbmPhysicsSim(void)
@@ -12,7 +12,7 @@ SbmPhysicsSim::~SbmPhysicsSim(void)
 
 void SbmPhysicsSim::updateSimulation( float timestep )
 {
-	bool enableSim = DObject::getBoolAttribute("enable");
+	bool enableSim = SBObject::getBoolAttribute("enable");
 	if (enableSim)
 	{
 		updateSimulationInternal(timestep);
@@ -21,12 +21,12 @@ void SbmPhysicsSim::updateSimulation( float timestep )
 
 void SbmPhysicsSim::setEnable( bool enable )
 {
-	DObject::setBoolAttribute("enable",enable);
+	SBObject::setBoolAttribute("enable",enable);
 }
 
 void SbmPhysicsSim::setGravity( float gravity )
 {
-	DObject::setDoubleAttribute("gravity",gravity);
+	SBObject::setDoubleAttribute("gravity",gravity);
 }
 
 SbmPhysicsObj::SbmPhysicsObj()

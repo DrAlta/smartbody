@@ -9,7 +9,7 @@ class BMLLocomotionObject : public BMLObject
 		BMLLocomotionObject();
 		~BMLLocomotionObject();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 
 };
 #endif

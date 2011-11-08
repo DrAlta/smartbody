@@ -34,7 +34,7 @@
 #include <me/me_controller_tree_root.hpp>
 #include <me/me_ct_channel_writer.hpp>
 #include <me/me_ct_curve_writer.hpp>
-#include <sbm/DObject.h>
+#include <sbm/SBObject.h>
 
 #include "bonebus.h"
 
@@ -55,7 +55,7 @@ class srArgBuffer;
 #define SBM_PAWN_USE_WORLD_OFFSET_WRITER	(1)
 #define SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK	(0)
 
-class SbmPawn : public DObject {
+class SbmPawn : public SmartBody::SBObject {
 public:
 	//  Public Constants
 	static const char* WORLD_OFFSET_JOINT_NAME;
@@ -155,7 +155,7 @@ public:
 	virtual std::string getClassType();
 	virtual void setClassType(std::string classType);
 
-	virtual void notify(DSubject* subject);
+	virtual void notify(SBSubject* subject);
 
 #if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
 	virtual void register_controller_cleanup( MeController* ct, controller_cleanup_callback_fp func );

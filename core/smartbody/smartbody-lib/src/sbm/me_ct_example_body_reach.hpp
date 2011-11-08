@@ -82,7 +82,7 @@ public:
 	void setFootIK(bool useIK);
 	void setDefaultReachType(const std::string& reachTypeName);
 	void init(SbmPawn* pawn);	
-	void notify(DSubject* subject);
+	void notify(SBSubject* subject);
 protected:			
 	void updateChannelBuffer(MeFrameData& frame, BodyMotionFrame& motionFrame, bool bRead = false);
 	bool updateLocomotion(); // return true if locomotion is finished

@@ -20,7 +20,7 @@ using namespace Util;
 //
 // constructor
 //
-SteerSuiteEngineDriver::SteerSuiteEngineDriver() : DObject()
+SteerSuiteEngineDriver::SteerSuiteEngineDriver() : SBObject()
 {
 	_alreadyInitialized = false;
 	_engine = NULL;

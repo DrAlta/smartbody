@@ -7,7 +7,7 @@ BMLReachObject::BMLReachObject() : BMLObject()
 	createStringAttribute("target", "", true, "Basic", 10, false, false, false, "reach target");
 	//createVec3Attribute("sbm:target-pos", 0,0,0, true, "Basic", 10, false, false, false, "reach target");
 	
-	StringAttribute* reachActionAttr = createStringAttribute("sbm:action","",true,"Basic", 20, false, false, false,"the action to be executed when reaching.");
+	SmartBody::StringAttribute* reachActionAttr = createStringAttribute("sbm:action","",true,"Basic", 20, false, false, false,"the action to be executed when reaching.");
 	std::vector<std::string> reachActions;
 	reachActions.push_back("pick-up");
 	reachActions.push_back("put-down");
@@ -37,7 +37,7 @@ BMLReachObject::~BMLReachObject()
 {
 }
 
-void BMLReachObject::notify(DSubject* subject)
+void BMLReachObject::notify(SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }

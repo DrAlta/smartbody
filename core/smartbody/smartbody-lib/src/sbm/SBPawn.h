@@ -23,7 +23,7 @@ class SBPawn : public SbmPawn
 		void setHPR(SrVec hpr);
 		SrVec getHPR();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 
 
 };

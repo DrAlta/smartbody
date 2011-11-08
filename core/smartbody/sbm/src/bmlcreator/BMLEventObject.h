@@ -9,6 +9,6 @@ class BMLEventObject : public BMLObject
 		BMLEventObject();
 		~BMLEventObject();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 };
 #endif

@@ -34,7 +34,7 @@
 # include <sk/sk_joint_quat.h>
 # include <sk/sk_joint_euler.h>
 # include <sk/sk_joint_swing_twist.h>
-#include <sbm/DObject.h>
+#include <sbm/SBObject.h>
 
 #include <string>
 #include <vector>
@@ -47,7 +47,7 @@ rotations. The translation is always set by using the class
 SkJointPos, while the rotation can be used with different
 types of parameterization and joint limit control, all derived
 from SkJointQuat. */
-class SkJoint : public DObject
+class SkJoint : public SmartBody::SBObject
 { public :
 /*! RotType specifies the current joint rotation parameterization.
 Current supported types are implemented in classes

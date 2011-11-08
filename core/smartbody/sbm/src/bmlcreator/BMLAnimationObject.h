@@ -9,7 +9,7 @@ class BMLAnimationObject : public BMLObject
 		BMLAnimationObject();
 		~BMLAnimationObject();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SmartBody::SBSubject* subject);
 
 };
 #endif

@@ -9,7 +9,7 @@ class BMLStateObject : public BMLObject
 		BMLStateObject();
 		~BMLStateObject();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 
 };
 #endif

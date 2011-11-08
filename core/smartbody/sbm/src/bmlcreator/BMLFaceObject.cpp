@@ -4,13 +4,13 @@ BMLFaceObject::BMLFaceObject() : BMLObject()
 {
 	setName("face");
 
-	StringAttribute* typeAttr = createStringAttribute("type", "", "", "Basic", 10, false, false, false);
+	SmartBody::StringAttribute* typeAttr = createStringAttribute("type", "", "", "Basic", 10, false, false, false);
 	std::vector<std::string> types;
 	types.push_back("facs");
 	typeAttr->setValidValues(types);
 
 	createStringAttribute("au", "", true, "Basic", 50, false, false, false, "Action unit number");
-	StringAttribute* sideAttr = createStringAttribute("side", "", true, "Basic", 50, false, false, false, "Action unit number");
+	SmartBody::StringAttribute* sideAttr = createStringAttribute("side", "", true, "Basic", 50, false, false, false, "Action unit number");
 	std::vector<std::string> sides;
 	sides.push_back("");
 	sides.push_back("BOTH");
@@ -19,7 +19,7 @@ BMLFaceObject::BMLFaceObject() : BMLObject()
 	sideAttr->setValidValues(sides);
 	
 	createStringAttribute("au", "", true, "Basic", 60, false, false, false, "Action unit number");
-	DoubleAttribute* amountAttr = createDoubleAttribute("amount", .5, true, "Basic", 70, false, false, false, "Action unit number");
+	SmartBody::DoubleAttribute* amountAttr = createDoubleAttribute("amount", .5, true, "Basic", 70, false, false, false, "Action unit number");
 	amountAttr->setMin(0);
 
 //	not supporting duration now
@@ -40,7 +40,7 @@ BMLFaceObject::~BMLFaceObject()
 {
 }
 
-void BMLFaceObject::notify(DSubject* subject)
+void BMLFaceObject::notify(SmartBody::SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }

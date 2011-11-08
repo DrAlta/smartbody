@@ -483,7 +483,7 @@ bool MeCtExampleBodyReach::isValidReachEngine( int reachType )
 	return false;
 }
 
-void MeCtExampleBodyReach::notify(DSubject* subject)
+void MeCtExampleBodyReach::notify(SBSubject* subject)
 {
 	SbmPawn* pawn = dynamic_cast<SbmPawn*>(subject);
 	if (pawn)

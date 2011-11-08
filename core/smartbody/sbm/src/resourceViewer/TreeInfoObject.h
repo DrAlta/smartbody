@@ -1,12 +1,12 @@
 #pragma once
-#include <sbm/DObject.h>
-#include <sbm/DSubject.h>
+#include <sbm/SBObject.h>
+#include <sbm/SBSubject.h>
 
-class TreeInfoObject : public DObject
+class TreeInfoObject : public SmartBody::SBObject
 {
 public:
 	TreeInfoObject(void);
 	~TreeInfoObject(void);
 
-	virtual void notify(DSubject* subject);
+	virtual void notify(SmartBody::SBSubject* subject);
 };

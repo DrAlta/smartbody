@@ -40,7 +40,7 @@ std::string BMLSpeechObject::getBML()
 	
 }
 
-void BMLSpeechObject::notify(DSubject* subject)
+void BMLSpeechObject::notify(SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }

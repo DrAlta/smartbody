@@ -9,7 +9,7 @@ class BMLGazeObject : public BMLObject
 		BMLGazeObject();
 		~BMLGazeObject();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 
 };
 #endif

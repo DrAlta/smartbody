@@ -4,14 +4,14 @@ BMLLocomotionObject::BMLLocomotionObject() : BMLObject()
 {
 	setName("locomotion");
 
-	StringAttribute* typeAttr = createStringAttribute("type", "", "", "Basic", 20, false, false, false, "What type of locomotion are you using. Either example or procedural, default setting is basic");
+	SmartBody::StringAttribute* typeAttr = createStringAttribute("type", "", "", "Basic", 20, false, false, false, "What type of locomotion are you using. Either example or procedural, default setting is basic");
 	createStringAttribute("target", "", "", "Basic", 10, false, false, false, "Where you want the character to move. Format is (X Z)/pawn name/direction. Direction is only under sbm:step manner.");
 	std::vector<std::string> types;
 	types.push_back("basic");
 	types.push_back("example");
 	types.push_back("procedural");
 	typeAttr->setValidValues(types);
-	StringAttribute* mannerAttr = createStringAttribute("manner", "", "", "Basic", 30, false, false, false, "The manner character takes when moving. e.g. walk, jog, run, step. This attribute does not apply to procedural locomotion. Default setting is walk.");
+	SmartBody::StringAttribute* mannerAttr = createStringAttribute("manner", "", "", "Basic", 30, false, false, false, "The manner character takes when moving. e.g. walk, jog, run, step. This attribute does not apply to procedural locomotion. Default setting is walk.");
 	std::vector<std::string> manners;
 	manners.push_back("walk");
 	manners.push_back("jog");
@@ -32,7 +32,7 @@ BMLLocomotionObject::~BMLLocomotionObject()
 {
 }
 
-void BMLLocomotionObject::notify(DSubject* subject)
+void BMLLocomotionObject::notify(SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }

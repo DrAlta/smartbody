@@ -223,7 +223,7 @@ void SbmPhysicsSimODE::initSimulation()
 
 void SbmPhysicsSimODE::updateSimulationInternal( float timeStep )
 {	
-	float gravity = (float)DObject::getDoubleAttribute("gravity");
+	float gravity = (float)SBObject::getDoubleAttribute("gravity");
 	dWorldSetGravity(worldID,0.f,-fabs(gravity),0.f);	
 
 	dSpaceCollide(spaceID,this,SbmPhysicsSimODE::nearCallBack);		

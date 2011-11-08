@@ -9,7 +9,7 @@ class BMLSaccadeObject : public BMLObject
 		BMLSaccadeObject();
 		~BMLSaccadeObject();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 };
 
 #endif

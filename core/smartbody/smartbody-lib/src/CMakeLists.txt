@@ -287,11 +287,11 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SteeringAgent.cpp
 	sbm/SteerSuiteEnginerDriver.cpp
 
-	sbm/DAttribute.cpp
-	sbm/DAttributeManager.cpp
-	sbm/DObject.cpp
-	sbm/DObserver.cpp
-	sbm/DSubject.cpp
+	sbm/SBAttribute.cpp
+	sbm/SBAttributeManager.cpp
+	sbm/SBObject.cpp
+	sbm/SBObserver.cpp
+	sbm/SBSubject.cpp
 	sbm/DefaultAttributeTable.cpp
 
 	sbm/SBScene.cpp

@@ -129,7 +129,7 @@ const char* SbmPawn::WORLD_OFFSET_JOINT_NAME = "world_offset";
 SkChannelArray SbmPawn::WORLD_OFFSET_CHANNELS_P;
 
 
-SbmPawn::SbmPawn() : DObject()
+SbmPawn::SbmPawn() : SBObject()
 {
 	SbmPawn::initData();
 
@@ -139,7 +139,7 @@ SbmPawn::SbmPawn() : DObject()
 }
 
 // Constructor
-SbmPawn::SbmPawn( const char * name ) : DObject(),
+SbmPawn::SbmPawn( const char * name ) : SmartBody::SBObject(),
 scene_p( NULL ),
 #ifdef __ANDROID__ // don't use the GPU version in android
 dMesh_p( NULL) ),
@@ -1585,14 +1585,14 @@ void SbmPawn::setClassType(std::string classType)
 }
 
 
-void SbmPawn::notify(DSubject* subject)
+void SbmPawn::notify(SBSubject* subject)
 {
-	DAttribute* attribute = dynamic_cast<DAttribute*>(subject);
+	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
 	if (attribute)
 	{
 		if (attribute->getName() == "physics")
 		{
-			BoolAttribute* physicsAttr = dynamic_cast<BoolAttribute*>(attribute);
+			SmartBody::BoolAttribute* physicsAttr = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
 			setPhysicsSim(physicsAttr->getValue());
 		}
 	}

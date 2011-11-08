@@ -1,45 +1,47 @@
-#ifndef DATTRIBUTE_H
-#define DATTRIBUTE_H
+#ifndef _SBATTRIBUTE_H
+#define _SBATTRIBUTE_H
 
-#include "DSubject.h"
+#include "SBSubject.h"
 #include <string>
 #include <vector>
 #include <limits>
 #include <sr/sr_vec.h>
 #include <sr/sr_mat.h>
 
-class DObject;
-class DAttributeInfo;
+namespace SmartBody {
 
-class DAttribute : public DSubject
+class SBObject;
+class SBAttributeInfo;
+
+class SBAttribute : public SBSubject
 {
 	public:
-		DAttribute(const std::string& name);	
-		DAttribute();
-		virtual ~DAttribute();
+		SBAttribute(const std::string& name);	
+		SBAttribute();
+		virtual ~SBAttribute();
 		void setName(const std::string& name);
 		const std::string& getName();
 		virtual std::string write();
 		virtual void read();
-		DAttributeInfo* getAttributeInfo();
+		SBAttributeInfo* getAttributeInfo();
 
-		void setObject(DObject* object);
-		DObject* getObject();
+		void setObject(SBObject* object);
+		SBObject* getObject();
 
-		virtual DAttribute* copy();
+		virtual SBAttribute* copy();
 
 
 	protected:
 		std::string m_name;
-		DAttributeInfo* m_info;
-		DObject* m_object;
+		SBAttributeInfo* m_info;
+		SBObject* m_object;
 };
 
-class DAttributeGroup 
+class SBAttributeGroup 
 {
 	public:
-		DAttributeGroup(const std::string& name);
-		~DAttributeGroup();
+		SBAttributeGroup(const std::string& name);
+		~SBAttributeGroup();
 
 		const std::string& getName();
 		void setPriority(int val);
@@ -51,11 +53,11 @@ class DAttributeGroup
 };
 
 
-class DAttributeInfo
+class SBAttributeInfo
 {
 	public:
-		DAttributeInfo();
-		~DAttributeInfo();
+		SBAttributeInfo();
+		~SBAttributeInfo();
 
 		void setPriority(int val);
 		int getPriority();
@@ -66,28 +68,28 @@ class DAttributeInfo
 		bool getLocked();
 		void setHidden(bool val);
 		bool getHidden();
-		void setGroup(DAttributeGroup* group);
-		DAttributeGroup* getGroup();
+		void setGroup(SBAttributeGroup* group);
+		SBAttributeGroup* getGroup();
 		void setGroup(const std::string& groupName);
 		void setDescription(const std::string& description);
 		std::string getDescription();
 
 		std::string write();
 
-		void setAttribute(DAttribute* attr);
-		DAttribute* getAttribute();
+		void setAttribute(SBAttribute* attr);
+		SBAttribute* getAttribute();
 
 	protected:
 		bool m_readOnly;
 		bool m_locked;
 		int m_priority;
 		bool m_hidden;
-		DAttribute* m_attr;
-		DAttributeGroup* m_group;
+		SBAttribute* m_attr;
+		SBAttributeGroup* m_group;
 		std::string m_description;
 };
 
-class BoolAttribute : public DAttribute
+class BoolAttribute : public SBAttribute
 {
 	public:
 		BoolAttribute();
@@ -101,14 +103,14 @@ class BoolAttribute : public DAttribute
 
 		virtual std::string write();
 		virtual void read();
-		virtual DAttribute* copy();
+		virtual SBAttribute* copy();
 
 	private:
 		bool m_value;
 		bool m_defaultValue;
 };
 
-class IntAttribute : public DAttribute
+class IntAttribute : public SBAttribute
 {
 	public:
 		IntAttribute();
@@ -126,7 +128,7 @@ class IntAttribute : public DAttribute
 		
 		virtual std::string write();
 		virtual void read();
-		virtual DAttribute* copy();
+		virtual SBAttribute* copy();
 
 	private:
 		int m_value;
@@ -135,7 +137,7 @@ class IntAttribute : public DAttribute
 		int m_max;
 };
 
-class DoubleAttribute : public DAttribute
+class DoubleAttribute : public SBAttribute
 {
 	public:
 		DoubleAttribute();
@@ -153,7 +155,7 @@ class DoubleAttribute : public DAttribute
 
 		virtual std::string write();
 		virtual void read();
-		virtual DAttribute* copy();
+		virtual SBAttribute* copy();
 
 	private:
 		double m_value;
@@ -162,7 +164,7 @@ class DoubleAttribute : public DAttribute
 		double m_max;
 };
 
-class StringAttribute : public DAttribute
+class StringAttribute : public SBAttribute
 {
 	public:
 		StringAttribute();
@@ -178,7 +180,7 @@ class StringAttribute : public DAttribute
 
 		virtual std::string write();
 		virtual void read();
-		virtual DAttribute* copy();
+		virtual SBAttribute* copy();
 
 	private:
 		std::string m_value;
@@ -186,7 +188,7 @@ class StringAttribute : public DAttribute
 		std::vector<std::string> m_validValues;
 };
 
-class Vec3Attribute : public DAttribute
+class Vec3Attribute : public SBAttribute
 {
 	public:
 		Vec3Attribute();
@@ -200,14 +202,14 @@ class Vec3Attribute : public DAttribute
 
 		virtual std::string write();
 		virtual void read();
-		virtual DAttribute* copy();
+		virtual SBAttribute* copy();
 
 	private:
 		SrVec m_value;
 		SrVec m_defaultValue;
 };
 
-class MatrixAttribute : public DAttribute
+class MatrixAttribute : public SBAttribute
 {
 	public:
 		MatrixAttribute();
@@ -221,11 +223,13 @@ class MatrixAttribute : public DAttribute
 
 		virtual std::string write();
 		virtual void read();
-		virtual DAttribute* copy();
+		virtual SBAttribute* copy();
 
 	private:
 		SrMat m_value;
 		SrMat m_defaultValue;
+};
+
 };
 
 

@@ -2,7 +2,7 @@
 #define _NVBG_H
 
 #include "vhcl.h"
-#include <sbm/DObject.h>
+#include <sbm/SBObject.h>
 #include <string>
 
 class Nvbg 

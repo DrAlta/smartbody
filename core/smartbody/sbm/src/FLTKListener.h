@@ -4,7 +4,7 @@
 #include <sbm/mcontrol_util.h>
 #include <sk/sk_scene.h>
 
-class FLTKListener : public SBMCharacterListener, public DObserver
+class FLTKListener : public SBMCharacterListener, public SmartBody::SBObserver
 {
    public:
 	  FLTKListener();
@@ -20,7 +20,7 @@ class FLTKListener : public SBMCharacterListener, public DObserver
 	  virtual void OnChannel( const std::string & name, const std::string & channelName, const float value);
 	  virtual void OnReset();
 
-	  virtual void notify(DSubject* subject);
+	  virtual void notify(SmartBody::SBSubject* subject);
 };
 
 #endif

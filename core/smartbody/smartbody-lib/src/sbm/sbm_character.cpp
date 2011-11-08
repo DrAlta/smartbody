@@ -429,7 +429,7 @@ void SbmCharacter::initData()
 
 	createBoolAttribute("facebone", false, true, "Basic", 200, false, false, false, "Use bones for facial animation. If false, blendshapes will be used. If true, face will be animated via face definitions.");
 	createBoolAttribute("visemecurve", false, true, "Basic", 200, false, false, false, "Use curve-based visemes instead of discrete visemes.");
-	DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
+	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
 	timeDelayAttr->setMin(0.0);
 	createStringAttribute("mesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
 }
@@ -891,8 +891,8 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		std::string groupName = controller->getName();		
 		for (size_t a = 0; a < defaultAttributes.size(); a++)
 		{
-			DAttribute* attribute = defaultAttributes[a].first;
-			DAttribute* attributeCopy = attribute->copy();
+			SmartBody::SBAttribute* attribute = defaultAttributes[a].first;
+			SmartBody::SBAttribute* attributeCopy = attribute->copy();
 			this->addAttribute(attributeCopy);
 		}
 	}
@@ -3460,26 +3460,26 @@ float SbmCharacter::getMinVisemeTime() const
 	return _minVisemeTime;
 }
 
-void SbmCharacter::notify(DSubject* subject)
+void SbmCharacter::notify(SBSubject* subject)
 {
 	SBPawn::notify(subject);
 
-	DAttribute* attribute = dynamic_cast<DAttribute*>(subject);
+	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
 	if (attribute)
 	{
 		if (attribute->getName() == "visemecurve")
 		{
-			BoolAttribute* curveAttribute = dynamic_cast<BoolAttribute*>(attribute);
+			SmartBody::BoolAttribute* curveAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
 			set_viseme_curve_mode(curveAttribute->getValue());
 		}
 		else if (attribute->getName() == "visemetimedelay")
 		{
-			DoubleAttribute* timeDelayAttribute = dynamic_cast<DoubleAttribute*>(attribute);
+			SmartBody::DoubleAttribute* timeDelayAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
 			set_viseme_time_delay((float) timeDelayAttribute->getValue());
 		}
 		else if (attribute->getName() == "mesh")
 		{
-			StringAttribute* meshAttribute = dynamic_cast<StringAttribute*>(attribute);
+			SmartBody::StringAttribute* meshAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
 			std::stringstream strstr;
 			strstr << "char " << getName() << " mesh " << meshAttribute->getValue();
 			mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -3491,7 +3491,7 @@ void SbmCharacter::notify(DSubject* subject)
 		}
 		if (attribute->getName() == "facebone")
 		{
-			BoolAttribute* faceBoneAttribute = dynamic_cast<BoolAttribute*>(attribute);
+			SmartBody::BoolAttribute* faceBoneAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
 			// ...
 		}
 	}
