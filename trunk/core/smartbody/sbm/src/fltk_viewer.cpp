@@ -4117,7 +4117,7 @@ void FltkViewer::drawSteeringInfo()
 
 }
 
-void FltkViewer::notify(DSubject* subject)
+void FltkViewer::notify(SmartBody::SBSubject* subject)
 {
 	SbmPawn* pawn = dynamic_cast<SbmPawn*>(subject);
 	if (pawn)

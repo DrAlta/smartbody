@@ -36,8 +36,8 @@
 #include <sk/sk_motion.h>
 #include <sk/sk_posture.h>
 #include <sk/sk_skeleton.h>
-#include <sbm/DObject.h>
-#include <sbm/DAttribute.h>
+#include <sbm/SBObject.h>
+#include <sbm/SBAttribute.h>
 #include <sbm/DefaultAttributeTable.h>
 
 
@@ -63,7 +63,7 @@ class SbmPawn;
     last call to evaluate() and as well an integer buffer to be used as
     a mapping of indices to another buffer of float values */
 class MeController
-    : public SrSharedClass, public DObject, public DefaultAttributeTable
+    : public SrSharedClass, public SmartBody::SBObject, public DefaultAttributeTable
 {
 #if VALIDATE_BLEND_CHANNEL_REMAP
 	friend MeCtBlend;   // Temporary hack
@@ -380,7 +380,7 @@ public :
 	    print_state (that is, before it is increment for the child's print_state).  */
 	virtual void print_children( int tab_count );
 
-	void notify(DSubject* subject);
+	void notify(SBSubject* subject);
 
 	friend class MeControllerContext;
 };

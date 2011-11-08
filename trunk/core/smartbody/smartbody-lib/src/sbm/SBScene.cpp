@@ -21,7 +21,7 @@ SBScene::~SBScene(void)
 	delete _stateManager;
 }
 
-void SBScene::notify( DSubject* subject )
+void SBScene::notify( SBSubject* subject )
 {
 	BoolAttribute* boolAttr = dynamic_cast<BoolAttribute*>(subject);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();

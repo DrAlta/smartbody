@@ -140,7 +140,7 @@ void FLTKListener::OnReset()
 
 }
 
-void FLTKListener::notify(DSubject* subject)
+void FLTKListener::notify(SmartBody::SBSubject* subject)
 {
 	SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(subject);
 	if (pawn)

@@ -1,30 +1,32 @@
-#include "DAttribute.h"
-#include "DObject.h"
+#include "SBAttribute.h"
+#include "SBObject.h"
 
 #include <sstream>
 #include <limits>
 
-DAttributeGroup::DAttributeGroup(const std::string& name)
+namespace SmartBody {
+
+SBAttributeGroup::SBAttributeGroup(const std::string& name)
 {
 	m_name = name;
 	m_priority = 0;
 }
 
-DAttributeGroup::~DAttributeGroup()
+SBAttributeGroup::~SBAttributeGroup()
 {
 }
 
-const std::string& DAttributeGroup::getName()
+const std::string& SBAttributeGroup::getName()
 {
 	return m_name;
 }
 
-void DAttributeGroup::setPriority(int val)
+void SBAttributeGroup::setPriority(int val)
 {
 	m_priority = val;
 }
 
-int DAttributeGroup::getPriority()
+int SBAttributeGroup::getPriority()
 {
 	return m_priority;
 }
@@ -32,7 +34,7 @@ int DAttributeGroup::getPriority()
 // remove the min/max definition for windows systems
 // so that there is no conflict between the min or max macros
 // and the min() or max() functions in numeric_limits
-DAttributeInfo::DAttributeInfo()
+SBAttributeInfo::SBAttributeInfo()
 {
 	m_priority = 0;
 	m_readOnly = false;
@@ -42,89 +44,89 @@ DAttributeInfo::DAttributeInfo()
 	m_group = NULL;
 }
 
-DAttributeInfo::~DAttributeInfo()
+SBAttributeInfo::~SBAttributeInfo()
 {
 }
 
-void DAttributeInfo::setAttribute(DAttribute* attr)
+void SBAttributeInfo::setAttribute(SBAttribute* attr)
 {
 	m_attr = attr;;
 }
 
-DAttribute* DAttributeInfo::getAttribute()
+SBAttribute* SBAttributeInfo::getAttribute()
 {
 	return m_attr;
 }
 
-void DAttributeInfo::setPriority(int val)
+void SBAttributeInfo::setPriority(int val)
 {
 	m_priority = val;
 	getAttribute()->notifyObservers();
 }
 
-int DAttributeInfo::getPriority()
+int SBAttributeInfo::getPriority()
 {
 	return m_priority;
 }
 
-void DAttributeInfo::setReadOnly(bool val)
+void SBAttributeInfo::setReadOnly(bool val)
 {
 	m_readOnly = val;
 	getAttribute()->notifyObservers();
 }
 
-bool DAttributeInfo::getReadOnly()
+bool SBAttributeInfo::getReadOnly()
 {
 	return m_readOnly;
 }
 
-void DAttributeInfo::setLocked(bool val)
+void SBAttributeInfo::setLocked(bool val)
 {
 	m_locked = val;
 	getAttribute()->notifyObservers();
 }
 
-bool DAttributeInfo::getLocked()
+bool SBAttributeInfo::getLocked()
 {
 	return m_locked;
 }
 
-void DAttributeInfo::setHidden(bool val)
+void SBAttributeInfo::setHidden(bool val)
 {
 	m_hidden = val;
 	getAttribute()->notifyObservers();
 }
 
-bool DAttributeInfo::getHidden()
+bool SBAttributeInfo::getHidden()
 {
 	return m_hidden;
 }
 
-void DAttributeInfo::setGroup(DAttributeGroup* group)
+void SBAttributeInfo::setGroup(SBAttributeGroup* group)
 {
 	m_group = group;
 }
 
-void DAttributeInfo::setDescription(const std::string& description)
+void SBAttributeInfo::setDescription(const std::string& description)
 {
 	m_description = description;
 }
 
-std::string DAttributeInfo::getDescription()
+std::string SBAttributeInfo::getDescription()
 {
 	return m_description;
 }
 
-void DAttributeInfo::setGroup(const std::string& groupName)
+void SBAttributeInfo::setGroup(const std::string& groupName)
 {
 }
 
-DAttributeGroup* DAttributeInfo::getGroup()
+SBAttributeGroup* SBAttributeInfo::getGroup()
 {
 	return m_group;
 }
 
-std::string DAttributeInfo::write()
+std::string SBAttributeInfo::write()
 {
 	bool useReadOnly = getReadOnly();
 	bool useHidden = getHidden();
@@ -185,22 +187,22 @@ std::string DAttributeInfo::write()
 	return strstr.str();
 }
 
-DAttribute::DAttribute()
+SBAttribute::SBAttribute()
 {
 	m_name = "";
 	m_object = NULL;
-	m_info = new DAttributeInfo();
+	m_info = new SBAttributeInfo();
 	m_info->setAttribute(this);
 }
 
-DAttribute::DAttribute(const std::string& name)
+SBAttribute::SBAttribute(const std::string& name)
 {
 	m_name = name;
-	m_info = new DAttributeInfo();
+	m_info = new SBAttributeInfo();
 	m_info->setAttribute(this);
 }
 
-DAttribute::~DAttribute()
+SBAttribute::~SBAttribute()
 {
 	// by default any observers will no longer
 	// be notified by this subject.
@@ -211,53 +213,53 @@ DAttribute::~DAttribute()
 	delete m_info;
 }
 
-DAttributeInfo* DAttribute::getAttributeInfo()
+SBAttributeInfo* SBAttribute::getAttributeInfo()
 {
 	return m_info;
 }
 
-void DAttribute::setName(const std::string& name)
+void SBAttribute::setName(const std::string& name)
 {
 	m_name = name;
 }
 
-const std::string& DAttribute::getName()
+const std::string& SBAttribute::getName()
 {
 	return m_name;
 }
 
-void DAttribute::setObject(DObject* object)
+void SBAttribute::setObject(SBObject* object)
 {
 	m_object = object;
 }
 
-std::string DAttribute::write()
+std::string SBAttribute::write()
 {
 	return "";
 }
 
-void DAttribute::read()
+void SBAttribute::read()
 {
 }
 
-DAttribute* DAttribute::copy()
+SBAttribute* SBAttribute::copy()
 {
 	return NULL;
 }
 
 
-DObject* DAttribute::getObject()
+SBObject* SBAttribute::getObject()
 {
 	return m_object;
 }
 
-BoolAttribute::BoolAttribute() : DAttribute()
+BoolAttribute::BoolAttribute() : SBAttribute()
 {
 	m_value = false;
 	m_defaultValue = false;
 }
 
-BoolAttribute::BoolAttribute(const std::string& name, bool val) : DAttribute(name)
+BoolAttribute::BoolAttribute(const std::string& name, bool val) : SBAttribute(name)
 {
 	m_value = val;
 }
@@ -308,7 +310,7 @@ void BoolAttribute::read()
 {
 }
 
-DAttribute* BoolAttribute::copy()
+SBAttribute* BoolAttribute::copy()
 {
 	BoolAttribute* a = new BoolAttribute();
 	a->setName(getName());
@@ -318,13 +320,13 @@ DAttribute* BoolAttribute::copy()
 }
 
 //////////////////////////////////////////////////
-IntAttribute::IntAttribute() : DAttribute()
+IntAttribute::IntAttribute() : SBAttribute()
 {
 	m_min = -std::numeric_limits<int>::max();
 	m_max = std::numeric_limits<int>::max();
 }
 
-IntAttribute::IntAttribute(const std::string& name, int val, int min, int max) : DAttribute(name)
+IntAttribute::IntAttribute(const std::string& name, int val, int min, int max) : SBAttribute(name)
 {
 	m_value = val;
 	m_min = min;
@@ -399,7 +401,7 @@ void IntAttribute::read()
 {
 }
 
-DAttribute* IntAttribute::copy()
+SBAttribute* IntAttribute::copy()
 {
 	IntAttribute* a = new IntAttribute();
 	a->setName(getName());
@@ -412,13 +414,13 @@ DAttribute* IntAttribute::copy()
 
 //////////////////////////////////////////////////
 
-DoubleAttribute::DoubleAttribute() : DAttribute()
+DoubleAttribute::DoubleAttribute() : SBAttribute()
 {
 	m_min = -std::numeric_limits<double>::max();
 	m_max = std::numeric_limits<double>::max();
 }
 
-DoubleAttribute::DoubleAttribute(const std::string& name, double val, double min, double max) : DAttribute(name)
+DoubleAttribute::DoubleAttribute(const std::string& name, double val, double min, double max) : SBAttribute(name)
 {
 	m_value = val;
 	m_min = min;
@@ -494,7 +496,7 @@ void DoubleAttribute::read()
 {
 }
 
-DAttribute* DoubleAttribute::copy()
+SBAttribute* DoubleAttribute::copy()
 {
 	DoubleAttribute* a = new DoubleAttribute();
 	a->setName(getName());
@@ -507,11 +509,11 @@ DAttribute* DoubleAttribute::copy()
 
 //////////////////////////////////////////////////
 
-StringAttribute::StringAttribute() : DAttribute()
+StringAttribute::StringAttribute() : SBAttribute()
 {
 }
 
-StringAttribute::StringAttribute(const std::string& name, std::string val) : DAttribute(name)
+StringAttribute::StringAttribute(const std::string& name, std::string val) : SBAttribute(name)
 {
 	m_value = val;
 }
@@ -579,7 +581,7 @@ const std::vector<std::string>& StringAttribute::getValidValues()
 	return m_validValues;
 }
 
-DAttribute* StringAttribute::copy()
+SBAttribute* StringAttribute::copy()
 {
 	StringAttribute* a = new StringAttribute();
 	a->setName(getName());
@@ -593,11 +595,11 @@ DAttribute* StringAttribute::copy()
 
 //////////////////////////////////////////////////
 
-Vec3Attribute::Vec3Attribute() : DAttribute()
+Vec3Attribute::Vec3Attribute() : SBAttribute()
 {
 }
 
-Vec3Attribute::Vec3Attribute(const std::string& name) : DAttribute(name)
+Vec3Attribute::Vec3Attribute(const std::string& name) : SBAttribute(name)
 {
 }
 
@@ -646,7 +648,7 @@ void Vec3Attribute::read()
 }
 
 
-DAttribute* Vec3Attribute::copy()
+SBAttribute* Vec3Attribute::copy()
 {
 	Vec3Attribute* a = new Vec3Attribute();
 	a->setName(getName());
@@ -715,7 +717,7 @@ void MatrixAttribute::read()
 {
 }
 
-DAttribute* MatrixAttribute::copy()
+SBAttribute* MatrixAttribute::copy()
 {
 	MatrixAttribute* a = new MatrixAttribute();
 	a->setName(getName());
@@ -726,3 +728,4 @@ DAttribute* MatrixAttribute::copy()
 }
 
 
+};

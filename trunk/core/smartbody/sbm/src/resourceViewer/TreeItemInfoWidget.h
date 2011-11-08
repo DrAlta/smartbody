@@ -92,7 +92,7 @@ public:
 };
 
 
-class EventItemInfoWidget : public TreeItemInfoWidget, public DObserver
+class EventItemInfoWidget : public TreeItemInfoWidget, public SmartBody::SBObserver
 {
 protected:	
 	AttributeWindow* attrWindow;
@@ -104,17 +104,17 @@ public:
 	void addNewEvent();
 	void removeEvent();
 	virtual void updateWidget();
-	virtual void notify(DSubject* subject);
+	virtual void notify(SmartBody::SBSubject* subject);
 };
 
 
 
-class PawnItemInfoWidget : public TreeItemInfoWidget, public DObserver
+class PawnItemInfoWidget : public TreeItemInfoWidget, public SmartBody::SBObserver
 {
 public:
-	PawnItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, DObserver* observerWindow = NULL);	
+	PawnItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SBObserver* observerWindow = NULL);	
 	virtual void updateWidget();
-	virtual void notify(DSubject* subject);
+	virtual void notify(SmartBody::SBSubject* subject);
 protected:
 	AttributeWindow* attrWindow;
 	TreeInfoObject* pawnInfoObject;
@@ -125,9 +125,9 @@ class AttributeItemWidget : public TreeItemInfoWidget
 {
 protected:
 	AttributeWindow* attrWindow;
-	DObject*         infoObject;
+	SmartBody::SBObject*         infoObject;
 public:
-	AttributeItemWidget(DObject* object, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, DObserver* observerWindow = NULL);
+	AttributeItemWidget(SmartBody::SBObject* object, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow = NULL);
 	~AttributeItemWidget();
 
 	virtual void updateWidget();

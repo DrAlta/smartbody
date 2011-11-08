@@ -7,7 +7,7 @@ BMLGazeObject::BMLGazeObject() : BMLObject()
 	createStringAttribute("target", "", true, "Basic", 10, false, false, false, 
 		"Gaze target");
 	
-	StringAttribute* jointRangeAttr = 
+	SmartBody::StringAttribute* jointRangeAttr = 
 		createStringAttribute("sbm:joint-range", "", true, "Basic", 20, false, false, false, 
 			"Which logical joints will be used to gaze");
 
@@ -25,7 +25,7 @@ BMLGazeObject::BMLGazeObject() : BMLObject()
 	jointRangeAttr->setValidValues(jointRanges);
 
 
-	StringAttribute* dirAttr = 
+	SmartBody::StringAttribute* dirAttr = 
 		createStringAttribute("direction", "", true, "Basic", 30, false, false, false, 
 			"Offset from gaze target. A number can be used in place of the directions. If polar is used, then 'angle' must also be set");
 
@@ -44,7 +44,7 @@ BMLGazeObject::BMLGazeObject() : BMLObject()
 	createDoubleAttribute("angle", 0, true, "Basic", 40, false, false, false, 
 		"Angle of gaze offset when setting direction=\"POLAR\"");
 
-	StringAttribute* priorityJointAttr =createStringAttribute("sbm:priority-joint", "", true, "Basic", 50, false, false, false, 
+	SmartBody::StringAttribute* priorityJointAttr =createStringAttribute("sbm:priority-joint", "", true, "Basic", 50, false, false, false, 
 		"Which logical joint should acquire target (default is EYES.");
 
 	std::vector<std::string> priorityJoints;
@@ -79,7 +79,7 @@ BMLGazeObject::~BMLGazeObject()
 {
 }
 
-void BMLGazeObject::notify(DSubject* subject)
+void BMLGazeObject::notify(SmartBody::SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }

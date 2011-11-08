@@ -1,7 +1,7 @@
 #ifndef DEFAULT_ATTRIBUTE_TABLE_H
 #define DEFAULT_ATTRIBUTE_TABLE_H
 
-#include <sbm/DAttribute.h>
+#include <sbm/SBAttribute.h>
 #include <vector>
 #include <map>
 #include <string>
@@ -14,10 +14,10 @@ public:
 	void* varPtr;
 public:
 	VariablePointer& operator= (const VariablePointer& rt);
-	void updateVariableFromAttribute(DAttribute* attr);
+	void updateVariableFromAttribute(SmartBody::SBAttribute* attr);
 };
 
-typedef std::pair<DAttribute*,VariablePointer> AttributeVarPair;
+typedef std::pair<SmartBody::SBAttribute*,VariablePointer> AttributeVarPair;
 
 class DefaultAttributeTable
 {

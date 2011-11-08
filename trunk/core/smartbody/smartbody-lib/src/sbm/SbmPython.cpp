@@ -466,43 +466,43 @@ BOOST_PYTHON_MODULE(SmartBody)
 		;
 
 
-	boost::python::class_<DAttribute>("SBAttribute")
-		.def("getName", &DAttribute::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
+	boost::python::class_<SBAttribute>("SBAttribute")
+		.def("getName", &SBAttribute::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
 	;
 
-	boost::python::class_<BoolAttribute, boost::python::bases<DAttribute> >("BoolAttribute")
+	boost::python::class_<BoolAttribute, boost::python::bases<SBAttribute> >("BoolAttribute")
 		.def("getValue", &BoolAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
 	;
 
-	boost::python::class_<StringAttribute, boost::python::bases<DAttribute> >("StringAttribute")
+	boost::python::class_<StringAttribute, boost::python::bases<SBAttribute> >("StringAttribute")
 		.def("getValue", &StringAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
 	;
 
-	boost::python::class_<IntAttribute, boost::python::bases<DAttribute> >("IntAttribute")
+	boost::python::class_<IntAttribute, boost::python::bases<SBAttribute> >("IntAttribute")
 		.def("getValue", &IntAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
 	;
 
-	boost::python::class_<DoubleAttribute, boost::python::bases<DAttribute> >("DoubleAttribute")
+	boost::python::class_<DoubleAttribute, boost::python::bases<SBAttribute> >("DoubleAttribute")
 		.def("getValue", &DoubleAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
 	;
 
-	boost::python::class_<DObject>("SBObject")
-		.def("getNumAttributes", &DObject::getNumAttributes,  "Returns the number of attributes associated with this object.")
-		.def("getAttributeNames", &DObject::getAttributeNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the attributes names associated with this object.")
-		.def("getAttribute", &DObject::getAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns an attribute of a given name")
-		.def("createBoolAttribute", &DObject::createBoolAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a boolean attribute.")
-		.def("createIntAttribute", &DObject::createIntAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates an integer attribute.")
-		.def("createDoubleAttribute", &DObject::createDoubleAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a double attribute.")
-		.def("createStringAttribute", &DObject::createStringAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a string attribute.")
-		.def("setBoolAttribute", &DObject::setBoolAttribute, "Sets a boolean attribute of a given name to the given value.")
-		.def("setIntAttribute", &DObject::setIntAttribute, "Sets an integer attribute of a given name to the given value.")
-		.def("setDoubleAttribute", &DObject::setDoubleAttribute, "Sets a floating point attribute of a given name to the given value.")
-		.def("setStringAttribute", &DObject::setStringAttribute, "Sets a string attribute of a given name to the given value.")
-		.def("setVec3Attribute", &DObject::setVec3Attribute, "Sets a vector attribute of a given name to the given value.")
-		.def("setMatrixAttribute", &DObject::setMatrixAttribute, "Sets a matrix attribute of a given name to the given value.")
+	boost::python::class_<SBObject>("SBObject")
+		.def("getNumAttributes", &SBObject::getNumAttributes,  "Returns the number of attributes associated with this object.")
+		.def("getAttributeNames", &SBObject::getAttributeNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the attributes names associated with this object.")
+		.def("getAttribute", &SBObject::getAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns an attribute of a given name")
+		.def("createBoolAttribute", &SBObject::createBoolAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a boolean attribute.")
+		.def("createIntAttribute", &SBObject::createIntAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates an integer attribute.")
+		.def("createDoubleAttribute", &SBObject::createDoubleAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a double attribute.")
+		.def("createStringAttribute", &SBObject::createStringAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a string attribute.")
+		.def("setBoolAttribute", &SBObject::setBoolAttribute, "Sets a boolean attribute of a given name to the given value.")
+		.def("setIntAttribute", &SBObject::setIntAttribute, "Sets an integer attribute of a given name to the given value.")
+		.def("setDoubleAttribute", &SBObject::setDoubleAttribute, "Sets a floating point attribute of a given name to the given value.")
+		.def("setStringAttribute", &SBObject::setStringAttribute, "Sets a string attribute of a given name to the given value.")
+		.def("setVec3Attribute", &SBObject::setVec3Attribute, "Sets a vector attribute of a given name to the given value.")
+		.def("setMatrixAttribute", &SBObject::setMatrixAttribute, "Sets a matrix attribute of a given name to the given value.")
 		;
 
-	boost::python::class_<SBMotion, boost::python::bases<DObject> >("SBMotion")
+	boost::python::class_<SBMotion, boost::python::bases<SBObject> >("SBMotion")
 		//.def(boost::python::init<std::string>())
 		.def("getMotionFileName", &SBMotion::getMotionFileName, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the motion file name. \n Input: NULL \n Output: motion file name")
 		.def("getNumFrames", &SBMotion::getNumFrames, "Returns the number of frames inside this motion. \n Input: NULL \n Output: number of frames in the motion")
@@ -517,7 +517,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		;
 
 
-	boost::python::class_<SBController, boost::python::bases<DObject> >("SBController")
+	boost::python::class_<SBController, boost::python::bases<SBObject> >("SBController")
 		.def(boost::python::init<>())
 		.def("setName", &SBController::setName, "Sets the name for the controller.")
 		.def("getName", &SBController::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name for this controller.")
@@ -565,7 +565,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getChannelSize", &SBSkeleton::getChannelSize, "Returns the size of the channel given index.")	
 		;
 
-	boost::python::class_<SBJoint, boost::python::bases<DObject> >("SBJoint")
+	boost::python::class_<SBJoint, boost::python::bases<SBObject> >("SBJoint")
 		.def(boost::python::init<>())
 		.def("setName", &SBJoint::setName, "Set the name of the joint.")
 		.def("getName", &SBJoint::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the joint.")
@@ -589,7 +589,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("isUsePosition", &SBJoint::isUsePosition, "Determines if the joint uses position channels.")	
 		;
 
-	boost::python::class_<SBBehavior, boost::python::bases<DObject> >("SBBehavior")
+	boost::python::class_<SBBehavior, boost::python::bases<SBObject> >("SBBehavior")
 		//.def(boost::python::init<std::string, std::string>())
 		.def("getType", &SBBehavior::getType, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the type of the behavior.")
 		;
@@ -609,7 +609,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getUtterance", &SpeechBehavior::getUtterance, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the current utterance.")
 	;
 
-	boost::python::class_<SBPawn, boost::python::bases<DObject> >("SBPawn")
+	boost::python::class_<SBPawn, boost::python::bases<SBObject> >("SBPawn")
 		.def("getName", &SBPawn::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the pawn..")
 		.def("getSkeleton", &SBPawn::getSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skeleton object of the pawn.")
 		.def("setSkeleton", &SBPawn::setSkeleton, "Attaches the skeleton to the character.")
@@ -622,7 +622,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getHPR", &SBPawn::getHPR, "Gets the heading, pitch and roll of the character's world offset.")
 	;
 
-	boost::python::class_<SBCharacter, boost::python::bases<SBPawn, DObject> >("SBCharacter")
+	boost::python::class_<SBCharacter, boost::python::bases<SBPawn, SBObject> >("SBCharacter")
 		//.def(boost::python::init<std::string, std::string>())
 		.def("setMeshMap", &SBCharacter::setMeshMap, "Set the OpenCollada file for the character which contains all the smoothbinding information.")
 		.def("addMesh", &SBCharacter::addMesh, "Add obj mesh to current character for smoothbinding.")

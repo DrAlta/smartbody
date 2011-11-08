@@ -606,7 +606,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	return widget;
 }
 
-void ResourceWindow::notify( DSubject* subject )
+void ResourceWindow::notify( SmartBody::SBSubject* subject )
 {
 
 }

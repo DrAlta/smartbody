@@ -9,7 +9,7 @@ class BMLFaceObject : public BMLObject
 		BMLFaceObject();
 		~BMLFaceObject();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 
 };
 #endif

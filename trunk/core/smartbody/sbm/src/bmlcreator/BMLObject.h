@@ -1,16 +1,16 @@
 #ifndef _BMLOBJECT_H
 #define _BMLOBJECT_H
 
-#include "sbm/DObject.h"
+#include "sbm/SBObject.h"
 #include <string>
 
-class BMLObject : public DObject
+class BMLObject : public SmartBody::SBObject
 {
 	public:
 		BMLObject();
 		~BMLObject();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 
 		virtual void constructBML();
 		virtual std::string getBML();

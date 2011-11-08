@@ -30,7 +30,7 @@
 # include <sr/sr_shared_class.h>
 # include <sk/sk_channel_array.h>
 # include <sbm/sr_synch_points.h>
-#include <sbm/DObject.h>
+#include <sbm/SBObject.h>
 
 class SkPosture;
 class SkSkeleton;
@@ -38,7 +38,7 @@ class MotionEvent;
 
 /*! Maintains a motion defined as a sequence of keyframes, each
 with a time stamp */
-class SkMotion : public DObject, public SrSharedClass {
+class SkMotion : public SmartBody::SBObject, public SrSharedClass {
 //class SkMotion {
 public:
 	struct Frame { 

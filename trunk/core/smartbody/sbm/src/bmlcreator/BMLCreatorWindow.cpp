@@ -129,7 +129,7 @@ void BMLCreatorWindow::updateBMLBuffer()
 	_editor->buffer()->insert(_editor->buffer()->length(), _curBML.c_str());
 }
 
-void BMLCreatorWindow::notify(DSubject* subject)
+void BMLCreatorWindow::notify(SmartBody::SBSubject* subject)
 {
 	BMLObject* bmlObject = dynamic_cast<BMLObject*>(subject);
 	if (bmlObject)
@@ -171,36 +171,36 @@ void BMLCreatorWindow::ResetBMLCB(Fl_Widget* w, void *data)
 	
 	for (size_t x = 0; x < window->_bmlObjects.size(); x++)
 	{
-		std::map<std::string, DAttribute*>& attributes = window->_bmlObjects[x]->getAttributeList();
-		for (std::map<std::string, DAttribute*>::iterator iter = attributes.begin();
+		std::map<std::string, SmartBody::SBAttribute*>& attributes = window->_bmlObjects[x]->getAttributeList();
+		for (std::map<std::string, SmartBody::SBAttribute*>::iterator iter = attributes.begin();
 			iter != attributes.end();
 			iter++)
 		{
-			BoolAttribute* boolAttr = dynamic_cast<BoolAttribute*>((*iter).second);
+			SmartBody::BoolAttribute* boolAttr = dynamic_cast<SmartBody::BoolAttribute*>((*iter).second);
 			if (boolAttr)
 			{
 				boolAttr->setValue(boolAttr->getDefaultValue());
 			}
 
-			IntAttribute* intAttr = dynamic_cast<IntAttribute*>((*iter).second);
+			SmartBody::IntAttribute* intAttr = dynamic_cast<SmartBody::IntAttribute*>((*iter).second);
 			if (intAttr)
 			{
 				intAttr->setValue(intAttr->getDefaultValue());
 			}
 
-			DoubleAttribute* doubleAttr = dynamic_cast<DoubleAttribute*>((*iter).second);
+			SmartBody::DoubleAttribute* doubleAttr = dynamic_cast<SmartBody::DoubleAttribute*>((*iter).second);
 			if (doubleAttr)
 			{
 				doubleAttr->setValue(doubleAttr->getDefaultValue());
 			}
 
-			Vec3Attribute* vec3Attr = dynamic_cast<Vec3Attribute*>((*iter).second);
+			SmartBody::Vec3Attribute* vec3Attr = dynamic_cast<SmartBody::Vec3Attribute*>((*iter).second);
 			if (vec3Attr)
 			{
 				vec3Attr->setValue(vec3Attr->getDefaultValue());
 			}
 
-			StringAttribute* stringAttr = dynamic_cast<StringAttribute*>((*iter).second);
+			SmartBody::StringAttribute* stringAttr = dynamic_cast<SmartBody::StringAttribute*>((*iter).second);
 			if (stringAttr)
 			{
 				stringAttr->setValue(stringAttr->getDefaultValue());

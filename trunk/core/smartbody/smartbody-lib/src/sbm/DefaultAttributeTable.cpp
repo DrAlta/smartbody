@@ -10,7 +10,7 @@ DefaultAttributeTable::~DefaultAttributeTable(void)
 
 void DefaultAttributeTable::addDefaultAttributeDouble( const std::string& name, double defaultValue, double* varPtr )
 {
-	DoubleAttribute* hf = new DoubleAttribute(name);
+	SmartBody::DoubleAttribute* hf = new SmartBody::DoubleAttribute(name);
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 	VariablePointer var;
@@ -21,7 +21,7 @@ void DefaultAttributeTable::addDefaultAttributeDouble( const std::string& name, 
 
 void DefaultAttributeTable::addDefaultAttributeFloat( const std::string& name, float defaultValue, float* varPtr )
 {
-	DoubleAttribute* hf = new DoubleAttribute(name);
+	SmartBody::DoubleAttribute* hf = new SmartBody::DoubleAttribute(name);
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 	VariablePointer var;
@@ -32,7 +32,7 @@ void DefaultAttributeTable::addDefaultAttributeFloat( const std::string& name, f
 
 void DefaultAttributeTable::addDefaultAttributeInt( const std::string& name, int defaultValue, int* varPtr )
 {
-	IntAttribute* hf = new IntAttribute(name);
+	SmartBody::IntAttribute* hf = new SmartBody::IntAttribute(name);
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 	VariablePointer var;
@@ -43,7 +43,7 @@ void DefaultAttributeTable::addDefaultAttributeInt( const std::string& name, int
 
 void DefaultAttributeTable::addDefaultAttributeBool( const std::string& name, bool defaultValue, bool* varPtr )
 {
-	BoolAttribute* hf = new BoolAttribute(name);
+	SmartBody::BoolAttribute* hf = new SmartBody::BoolAttribute(name);
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 	VariablePointer var;
@@ -54,7 +54,7 @@ void DefaultAttributeTable::addDefaultAttributeBool( const std::string& name, bo
 
 void DefaultAttributeTable::addDefaultAttributeString( const std::string& name, const std::string& defaultValue, std::string* varPtr )
 {
-	StringAttribute* hf = new StringAttribute(name);
+	SmartBody::StringAttribute* hf = new SmartBody::StringAttribute(name);
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 	VariablePointer var;
@@ -65,7 +65,7 @@ void DefaultAttributeTable::addDefaultAttributeString( const std::string& name, 
 
 void DefaultAttributeTable::addDefaultAttributeVec3( const std::string& name, SrVec& defaultValue, SrVec* varPtr )
 {
-	Vec3Attribute* hf = new Vec3Attribute(name);
+	SmartBody::Vec3Attribute* hf = new SmartBody::Vec3Attribute(name);
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 	VariablePointer var;
@@ -76,7 +76,7 @@ void DefaultAttributeTable::addDefaultAttributeVec3( const std::string& name, Sr
 
 void DefaultAttributeTable::addDefaultAttributeMatrix( const std::string& name, SrMat& defaultValue, SrMat* varPtr )
 {
-	MatrixAttribute* hf = new MatrixAttribute(name);
+	SmartBody::MatrixAttribute* hf = new SmartBody::MatrixAttribute(name);
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 	VariablePointer var;
@@ -97,55 +97,55 @@ VariablePointer& VariablePointer::operator=( const VariablePointer& rt )
 	return *this;
 }
 
-void VariablePointer::updateVariableFromAttribute( DAttribute* attr )
+void VariablePointer::updateVariableFromAttribute( SmartBody::SBAttribute* attr )
 {
 	if (!varPtr) return;
 
 	if (varType == TYPE_BOOL)
 	{
-		BoolAttribute* boolAttr = dynamic_cast<BoolAttribute*>(attr);
+		SmartBody::BoolAttribute* boolAttr = dynamic_cast<SmartBody::BoolAttribute*>(attr);
 		if (!boolAttr) return; 
 		bool* boolPtr = (bool*)varPtr; 
 		*boolPtr = boolAttr->getValue();
 	}
 	else if (varType == TYPE_INT)
 	{
-		IntAttribute* intAttr = dynamic_cast<IntAttribute*>(attr);
+		SmartBody::IntAttribute* intAttr = dynamic_cast<SmartBody::IntAttribute*>(attr);
 		if (!intAttr) return; 
 		int* intPtr = (int*)varPtr; 
 		*intPtr = intAttr->getValue();
 	}
 	else if (varType == TYPE_FLOAT)
 	{
-		DoubleAttribute* doubleAttr = dynamic_cast<DoubleAttribute*>(attr);
+		SmartBody::DoubleAttribute* doubleAttr = dynamic_cast<SmartBody::DoubleAttribute*>(attr);
 		if (!doubleAttr) return; 
 		float* floatPtr = (float*)varPtr; 
 		*floatPtr = (float)doubleAttr->getValue();
 	}	
 	else if (varType == TYPE_DOUBLE)
 	{
-		DoubleAttribute* doubleAttr = dynamic_cast<DoubleAttribute*>(attr);
+		SmartBody::DoubleAttribute* doubleAttr = dynamic_cast<SmartBody::DoubleAttribute*>(attr);
 		if (!doubleAttr) return; 
 		double* doublePtr = (double*)varPtr; 
 		*doublePtr = doubleAttr->getValue();
 	}
 	else if (varType == TYPE_STRING)
 	{
-		StringAttribute* stringAttr = dynamic_cast<StringAttribute*>(attr);
+		SmartBody::StringAttribute* stringAttr = dynamic_cast<SmartBody::StringAttribute*>(attr);
 		if (!stringAttr) return; 
 		std::string* stringPtr = (std::string*)varPtr; 
 		*stringPtr = stringAttr->getValue();
 	}
 	else if (varType == TYPE_VEC3)
 	{
-		Vec3Attribute* vec3Attr = dynamic_cast<Vec3Attribute*>(attr);
+		SmartBody::Vec3Attribute* vec3Attr = dynamic_cast<SmartBody::Vec3Attribute*>(attr);
 		if (!vec3Attr) return; 
 		SrVec* vec3Ptr = (SrVec*)varPtr; 
 		*vec3Ptr = vec3Attr->getValue();
 	}
 	else if (varType == TYPE_MATRIX)
 	{
-		MatrixAttribute* matrixAttr = dynamic_cast<MatrixAttribute*>(attr);
+		SmartBody::MatrixAttribute* matrixAttr = dynamic_cast<SmartBody::MatrixAttribute*>(attr);
 		if (!matrixAttr) return; 
 		SrMat* matPtr = (SrMat*)varPtr; 
 		*matPtr = matrixAttr->getValue();

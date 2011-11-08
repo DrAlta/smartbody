@@ -9,7 +9,7 @@ class BMLGestureObject : public BMLObject
 		BMLGestureObject();
 		~BMLGestureObject();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 
 };
 #endif

@@ -831,51 +831,11 @@
 				Name="attributes"
 				>
 				<File
-					RelativePath="..\src\sbm\DAttribute.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\DAttribute.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\DAttributeManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\DAttributeManager.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\sbm\DefaultAttributeTable.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\sbm\DefaultAttributeTable.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\DObject.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\DObject.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\DObserver.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\DObserver.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\DSubject.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\DSubject.h"
 					>
 				</File>
 			</Filter>
@@ -2768,6 +2728,22 @@
 			Name="SB"
 			>
 			<File
+				RelativePath="..\src\sbm\SBAttribute.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBAttribute.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBAttributeManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBAttributeManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SBBehavior.cpp"
 				>
 			</File>
@@ -2816,6 +2792,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\SBObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBObserver.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBObserver.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SBPawn.cpp"
 				>
 			</File>
@@ -2861,6 +2853,14 @@
 			</File>
 			<File
 				RelativePath="..\src\sbm\SBStateManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBSubject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBSubject.h"
 				>
 			</File>
 			<File

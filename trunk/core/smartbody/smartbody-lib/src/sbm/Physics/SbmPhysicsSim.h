@@ -2,7 +2,7 @@
 #define _SBMPHYSICSSIM_H_ 
 #include <deque>
 #include "SbmColObject.h"
-#include <sbm/DObject.h>
+#include <sbm/SBObject.h>
 
 class SbmPhysicsObj // abstraction for objects in the physics engine
 {
@@ -28,7 +28,7 @@ public:
 };
 
 typedef std::deque<SbmPhysicsObj*> SbmPhysicsObjList;
-class SbmPhysicsSim : public DObject
+class SbmPhysicsSim : public SmartBody::SBObject
 {
 protected:
 	SbmPhysicsObjList physicsObjList;	

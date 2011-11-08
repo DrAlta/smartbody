@@ -10,7 +10,7 @@ BMLGestureObject::BMLGestureObject() : BMLObject()
 	gestures.push_back("BEAT");
 	gestures.push_back("DEPICT");
 	gestures.push_back("SIGNAL");
-	StringAttribute* typeAttr = createStringAttribute("type", "", "", "Basic", 50, false, false, false, "Type of gesture");
+	SmartBody::StringAttribute* typeAttr = createStringAttribute("type", "", "", "Basic", 50, false, false, false, "Type of gesture");
 	typeAttr->setValidValues(gestures);
 
 
@@ -28,7 +28,7 @@ BMLGestureObject::~BMLGestureObject()
 {
 }
 
-void BMLGestureObject::notify(DSubject* subject)
+void BMLGestureObject::notify(SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }

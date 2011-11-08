@@ -12,7 +12,7 @@ BMLEventObject::~BMLEventObject()
 {
 }
 
-void BMLEventObject::notify(DSubject* subject)
+void BMLEventObject::notify(SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }

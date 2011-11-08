@@ -5,7 +5,7 @@ BMLAnimationObject::BMLAnimationObject() : BMLObject()
 	setName("animation");
 
 	createStringAttribute("name", "", true, "Basic", 50, false, false, false, "Name of the motion to be played");
-	DoubleAttribute* speedAttr = createDoubleAttribute("speed", 1.0, true, "Basic", 50, false, false, false, "Speedup of the motion ('2' will play the motion twice as fast)");
+	SmartBody::DoubleAttribute* speedAttr = createDoubleAttribute("speed", 1.0, true, "Basic", 50, false, false, false, "Speedup of the motion ('2' will play the motion twice as fast)");
 	speedAttr->setMin(0);
 
 
@@ -20,7 +20,7 @@ BMLAnimationObject::~BMLAnimationObject()
 {
 }
 
-void BMLAnimationObject::notify(DSubject* subject)
+void BMLAnimationObject::notify(SmartBody::SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }

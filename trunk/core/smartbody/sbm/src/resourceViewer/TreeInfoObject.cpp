@@ -8,9 +8,9 @@ TreeInfoObject::~TreeInfoObject(void)
 {
 }
 
-void TreeInfoObject::notify( DSubject* subject )
+void TreeInfoObject::notify( SBSubject* subject )
 {
-	DAttribute* attribute = dynamic_cast<DAttribute*>(subject);
+	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
 	if (attribute)
 	{
 		//constructBML();

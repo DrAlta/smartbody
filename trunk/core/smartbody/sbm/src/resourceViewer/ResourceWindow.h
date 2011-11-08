@@ -22,7 +22,7 @@ class FaceMotion;
 class EventHandler;
 
 
-class ResourceWindow : public Fl_Double_Window, public GenericViewer, public DObserver
+class ResourceWindow : public Fl_Double_Window, public GenericViewer, public SmartBody::SBObserver
 {
 	public:
 		enum {
@@ -57,7 +57,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public DOb
 		virtual void hide_viewer();
 		virtual	void update_viewer();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SmartBody::SBSubject* subject);
 		int handle(int event);
         void show();      
         void draw();

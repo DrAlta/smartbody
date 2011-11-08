@@ -174,7 +174,7 @@ class MeCtEyeLidRegulator : public SmartBody::SBController	{
 		void set_use_blink_viseme(bool val);
 		bool get_use_blink_viseme();
 
-		void notify(DSubject* subject);
+		void notify(SBSubject* subject);
 
 	private:
 		float minval( float a, float b )	{

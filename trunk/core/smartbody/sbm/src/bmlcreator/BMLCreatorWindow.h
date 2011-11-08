@@ -8,13 +8,13 @@
 #include <FL/Fl_Text_Editor.H>
 #include "BMLObject.h"
 
-class BMLCreatorWindow : public Fl_Double_Window, public DObserver
+class BMLCreatorWindow : public Fl_Double_Window, public SmartBody::SBObserver
 {
 	public:
 		BMLCreatorWindow(int, int, int, int, const char*);
 		~BMLCreatorWindow();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SmartBody::SBSubject* subject);
 		void updateBMLBuffer();
 
 		static void RunBMLCB(Fl_Widget* w, void *data);

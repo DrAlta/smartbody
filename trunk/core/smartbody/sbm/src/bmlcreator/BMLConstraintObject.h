@@ -9,6 +9,6 @@ class BMLConstraintObject : public BMLObject
 		BMLConstraintObject();
 		~BMLConstraintObject();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 };
 #endif

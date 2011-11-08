@@ -9,7 +9,7 @@ class BMLReachObject : public BMLObject
 		BMLReachObject();
 		~BMLReachObject();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 
 };
 #endif

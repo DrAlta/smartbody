@@ -1,26 +1,28 @@
-#ifndef _DOBJECT_H_
-#define _DOBJECT_H_
+#ifndef _SBOBJECT_H_
+#define _SBOBJECT_H_
 
 #include <map>
 #include <string>
 #include <vector>
-#include "DAttribute.h"
-#include "DAttributeManager.h"
-#include "DObserver.h"
+#include "SBAttribute.h"
+#include "SBAttributeManager.h"
+#include "SBObserver.h"
 
-class DObject : public DObserver, public DSubject
+namespace SmartBody {
+
+class SBObject : public SBObserver, public SBSubject
 {
 	public:
-		DObject();
-		~DObject();
+		SBObject();
+		~SBObject();
 
 		void setName(const std::string& name);
 		const std::string& getName();
-		DAttribute* getAttribute(const std::string& attrName);
-		std::map<std::string, DAttribute*>& getAttributeList();
-		DAttributeManager* getAttributeManager();
-		void addAttribute(DAttribute* attr);
-		void addAttribute(DAttribute* attr, const std::string& groupName);
+		SBAttribute* getAttribute(const std::string& attrName);
+		std::map<std::string, SBAttribute*>& getAttributeList();
+		SBAttributeManager* getAttributeManager();
+		void addAttribute(SBAttribute* attr);
+		void addAttribute(SBAttribute* attr, const std::string& groupName);
 		bool removeAttribute(const std::string& name);
 		void clearAttributes();
 		int getNumAttributes();
@@ -55,13 +57,13 @@ class DObject : public DObserver, public DSubject
 		const std::string& getStringAttribute(const std::string& name) ;
 		const SrMat& getMatrixAttribute(const std::string& name) ;
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 
 
 	protected:
 		std::string m_name;
-		DAttributeManager* m_attributeManager;
-		std::map<std::string, DAttribute*> m_attributeList;
+		SBAttributeManager* m_attributeManager;
+		std::map<std::string, SBAttribute*> m_attributeList;
 		std::string m_emptyString;
 
 		static bool defaultBool;
@@ -71,4 +73,7 @@ class DObject : public DObserver, public DSubject
 		static std::string defaultString;
 		static SrMat defaultMatrix;
 };
+
+};
+
 #endif

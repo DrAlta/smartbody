@@ -8,7 +8,7 @@
 using namespace glfont;
 #endif
 
-class PawnControl : public DObserver
+class PawnControl : public SmartBody::SBObserver
 {
 protected:
 	SbmPawn* pawn;
@@ -30,7 +30,7 @@ public:
 	virtual void hitTest(SrCamera& cam) = 0;
 	virtual void processHit(std::vector<int>& hitNames) = 0;
 
-	virtual void notify(DSubject* subject);
+	virtual void notify(SmartBody::SBSubject* subject);
 
 protected:
 	void init_font();

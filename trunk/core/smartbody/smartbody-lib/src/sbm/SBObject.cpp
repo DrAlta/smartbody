@@ -1,21 +1,23 @@
-#include "DObject.h"
+#include "SBObject.h"
 #include <sr/sr_vec.h>
 
-bool DObject::defaultBool = true;
-int DObject::defaultInt = 0;
-double DObject::defaultDouble = 0.0;
-std::string DObject::defaultString = "";
-SrVec DObject::defaultVec = SrVec();
-SrMat DObject::defaultMatrix = SrMat();
+namespace SmartBody {
 
-DObject::DObject() : DSubject(), DObserver()
+bool SBObject::defaultBool = true;
+int SBObject::defaultInt = 0;
+double SBObject::defaultDouble = 0.0;
+std::string SBObject::defaultString = "";
+SrVec SBObject::defaultVec = SrVec();
+SrMat SBObject::defaultMatrix = SrMat();
+
+SBObject::SBObject() : SBSubject(), SBObserver()
 {
-	m_attributeManager = new DAttributeManager();
+	m_attributeManager = new SBAttributeManager();
 }
 
-DObject::~DObject()
+SBObject::~SBObject()
 {
-	for (std::map<std::string, DAttribute*>::iterator iter = m_attributeList.begin();
+	for (std::map<std::string, SBAttribute*>::iterator iter = m_attributeList.begin();
 		 iter != m_attributeList.end();
 		 iter++)
 	{
@@ -25,25 +27,25 @@ DObject::~DObject()
 
 }
 
-void DObject::setName(const std::string& name)
+void SBObject::setName(const std::string& name)
 {
 	m_name = name;
 }
 
 
-const std::string& DObject::getName()
+const std::string& SBObject::getName()
 {
 	return m_name;
 }
 
 
-void DObject::addAttribute(DAttribute* attr)
+void SBObject::addAttribute(SBAttribute* attr)
 {
 	 // check for the existence of the attribute
-	std::map<std::string, DAttribute*>::iterator iter = m_attributeList.find(attr->getName());
+	std::map<std::string, SBAttribute*>::iterator iter = m_attributeList.find(attr->getName());
 	if (iter != m_attributeList.end()) // attribute exists, remove the old attribute 
 	{
-		DAttribute* attr = iter->second;
+		SBAttribute* attr = iter->second;
 
 		// notify the attribute manager of the change
 		this->getAttributeManager()->notifyRemoveAttribute(attr);
@@ -58,13 +60,13 @@ void DObject::addAttribute(DAttribute* attr)
 	this->getAttributeManager()->notifyCreateAttribute(attr);
 }
 
-void DObject::addAttribute( DAttribute* attr, const std::string& groupName )
+void SBObject::addAttribute( SBAttribute* attr, const std::string& groupName )
 {
 	// check for the existence of the attribute
-	std::map<std::string, DAttribute*>::iterator iter = m_attributeList.find(attr->getName());
+	std::map<std::string, SBAttribute*>::iterator iter = m_attributeList.find(attr->getName());
 	if (iter != m_attributeList.end()) // attribute exists, remove the old attribute 
 	{
-		DAttribute* attr = iter->second;
+		SBAttribute* attr = iter->second;
 
 		// notify the attribute manager of the change
 		this->getAttributeManager()->notifyRemoveAttribute(attr);
@@ -74,7 +76,7 @@ void DObject::addAttribute( DAttribute* attr, const std::string& groupName )
 	}
 
 	m_attributeList[attr->getName()] = attr;
-	DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	SBAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
 	attr->getAttributeInfo()->setGroup(group);
 	attr->setObject(this);
 	// notify the attribute manager of the change
@@ -82,9 +84,9 @@ void DObject::addAttribute( DAttribute* attr, const std::string& groupName )
 }
 
 
- DAttribute* DObject::getAttribute(const std::string& name)
+ SBAttribute* SBObject::getAttribute(const std::string& name)
  {
-	std::map<std::string, DAttribute*>::iterator iter = m_attributeList.find(name);
+	std::map<std::string, SBAttribute*>::iterator iter = m_attributeList.find(name);
 	if (iter != m_attributeList.end()) // attribute exists, remove the old attribute 
 	{
 		return iter->second;
@@ -95,9 +97,9 @@ void DObject::addAttribute( DAttribute* attr, const std::string& groupName )
 	}
  }
 
- void DObject::clearAttributes()
+ void SBObject::clearAttributes()
  {
-	 std::map<std::string, DAttribute*>::iterator iter = m_attributeList.begin();
+	 std::map<std::string, SBAttribute*>::iterator iter = m_attributeList.begin();
 	 std::vector<std::string> attrNameList;
 	 for ( iter  = m_attributeList.begin();
 		   iter != m_attributeList.end();
@@ -109,15 +111,15 @@ void DObject::addAttribute( DAttribute* attr, const std::string& groupName )
 		 removeAttribute(attrNameList[i]);
  }
  
-int DObject::getNumAttributes()
+int SBObject::getNumAttributes()
 {
 	return m_attributeList.size();
 }
 
-std::vector<std::string> DObject::getAttributeNames()
+std::vector<std::string> SBObject::getAttributeNames()
 {
 	std::vector<std::string> attrNameList;
-	for (std::map<std::string, DAttribute*>::iterator iter = m_attributeList.begin();
+	for (std::map<std::string, SBAttribute*>::iterator iter = m_attributeList.begin();
 		 iter != m_attributeList.end();
 		 iter++)
 	 {
@@ -127,14 +129,14 @@ std::vector<std::string> DObject::getAttributeNames()
 }
 
 
- bool DObject::removeAttribute(const std::string& name)
+ bool SBObject::removeAttribute(const std::string& name)
  {
 	// check for the existence of the attribute
-	std::map<std::string, DAttribute*>::iterator iter = m_attributeList.find(name);
+	std::map<std::string, SBAttribute*>::iterator iter = m_attributeList.find(name);
 	if (iter != m_attributeList.end()) // attribute exists, remove the old attribute 
 	{
 
-		DAttribute* attr = iter->second;
+		SBAttribute* attr = iter->second;
 	
 		// notify the attribute manager of the change
 		this->getAttributeManager()->notifyRemoveAttribute(attr);
@@ -148,7 +150,7 @@ std::vector<std::string> DObject::getAttributeNames()
 	return false;
  }
 
-  BoolAttribute* DObject::createBoolAttribute(const std::string& name, bool value, bool notifySelf, const std::string& groupName, int priority, 
+  BoolAttribute* SBObject::createBoolAttribute(const std::string& name, bool value, bool notifySelf, const std::string& groupName, int priority, 
 											  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {
 	 BoolAttribute* boolAttr = new BoolAttribute();
@@ -163,7 +165,7 @@ std::vector<std::string> DObject::getAttributeNames()
 
 	 this->addAttribute(boolAttr);
 
-	 DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	 SBAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
 	 boolAttr->getAttributeInfo()->setGroup(group);
 
 	 if (notifySelf)
@@ -172,7 +174,7 @@ std::vector<std::string> DObject::getAttributeNames()
 	 return boolAttr;
 }
 
-IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bool notifySelf, const std::string& groupName, int priority, 
+IntAttribute* SBObject::createIntAttribute(const std::string& name, int value, bool notifySelf, const std::string& groupName, int priority, 
 												  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {
 	 IntAttribute* intAttr = new IntAttribute();
@@ -187,7 +189,7 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 
 	 this->addAttribute(intAttr);
 
-	 DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	 SBAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
 	 intAttr->getAttributeInfo()->setGroup(group);
 
 	 if (notifySelf)
@@ -196,7 +198,7 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  return intAttr;
 }
 
- DoubleAttribute* DObject::createDoubleAttribute(const std::string& name, double value, bool notifySelf, const std::string& groupName, int priority, 
+ DoubleAttribute* SBObject::createDoubleAttribute(const std::string& name, double value, bool notifySelf, const std::string& groupName, int priority, 
 												  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {
 	 DoubleAttribute* doubleAttr = new DoubleAttribute();
@@ -211,7 +213,7 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 
 	 this->addAttribute(doubleAttr);
 
-	 DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	 SBAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
 	 doubleAttr->getAttributeInfo()->setGroup(group);
 
 	 if (notifySelf)
@@ -220,7 +222,7 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  return doubleAttr;
 }
 
- Vec3Attribute* DObject::createVec3Attribute(const std::string& name, float val1, float val2, float val3, bool notifySelf, const std::string& groupName, int priority, 
+ Vec3Attribute* SBObject::createVec3Attribute(const std::string& name, float val1, float val2, float val3, bool notifySelf, const std::string& groupName, int priority, 
 												  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {
 	 Vec3Attribute* vec3Attr = new Vec3Attribute();
@@ -236,7 +238,7 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 
 	 this->addAttribute(vec3Attr);
 
-	 DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	 SBAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
 	 vec3Attr->getAttributeInfo()->setGroup(group);
 
 	 if (notifySelf)
@@ -246,7 +248,7 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 }
 
 
- StringAttribute* DObject::createStringAttribute(const std::string& name, const std::string& value, bool notifySelf, const std::string& groupName, int priority, 
+ StringAttribute* SBObject::createStringAttribute(const std::string& name, const std::string& value, bool notifySelf, const std::string& groupName, int priority, 
 												  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {
 	 StringAttribute* strAttr = new StringAttribute();
@@ -261,7 +263,7 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 
 	 this->addAttribute(strAttr);
 
-	 DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	 SBAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
 	 strAttr->getAttributeInfo()->setGroup(group);
 	
 	 if (notifySelf)
@@ -270,7 +272,7 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	 return strAttr;
 }
 
- MatrixAttribute* DObject::createMatrixAttribute(const std::string& name, SrMat& value, bool notifySelf, const std::string& groupName, int priority, 
+ MatrixAttribute* SBObject::createMatrixAttribute(const std::string& name, SrMat& value, bool notifySelf, const std::string& groupName, int priority, 
 												  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {
 	 MatrixAttribute* matrixAttr = new MatrixAttribute();
@@ -285,7 +287,7 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 
 	 this->addAttribute(matrixAttr);
 
-	 DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	 SBAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
 	 matrixAttr->getAttributeInfo()->setGroup(group);
 
 	 if (notifySelf)
@@ -294,25 +296,25 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  return matrixAttr;
 }
 
-  std::map<std::string, DAttribute*>& DObject::getAttributeList()
+  std::map<std::string, SBAttribute*>& SBObject::getAttributeList()
  {
 	return m_attributeList;
  }
 
 
-  DAttributeManager* DObject::getAttributeManager()
+  SBAttributeManager* SBObject::getAttributeManager()
 {
 	return m_attributeManager;
 }
 
-  void DObject::notify(DSubject* subject)
+  void SBObject::notify(SBSubject* subject)
 {
 	
   }
 
-  void DObject::setBoolAttribute( const std::string& name, bool value )
+  void SBObject::setBoolAttribute( const std::string& name, bool value )
   {
-	  DAttribute* attr = getAttribute(name);
+	  SBAttribute* attr = getAttribute(name);
 	  BoolAttribute* battr = dynamic_cast<BoolAttribute*>(attr);
 	  if (battr)
 	  {
@@ -320,9 +322,9 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  }
   }
 
-  void DObject::setIntAttribute( const std::string& name, int value )
+  void SBObject::setIntAttribute( const std::string& name, int value )
   {
-	  DAttribute* attr = getAttribute(name);
+	  SBAttribute* attr = getAttribute(name);
 	  IntAttribute* iattr = dynamic_cast<IntAttribute*>(attr);
 	  if (iattr)
 	  {
@@ -330,9 +332,9 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  }
   }
 
-  void DObject::setDoubleAttribute( const std::string& name, double value )
+  void SBObject::setDoubleAttribute( const std::string& name, double value )
   {
-	  DAttribute* attr = getAttribute(name);
+	  SBAttribute* attr = getAttribute(name);
 	  DoubleAttribute* dattr = dynamic_cast<DoubleAttribute*>(attr);
 	  if (dattr)
 	  {
@@ -340,9 +342,9 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  }
   }
 
-  void DObject::setVec3Attribute( const std::string& name, float val1, float val2, float val3 )
+  void SBObject::setVec3Attribute( const std::string& name, float val1, float val2, float val3 )
   {
-	  DAttribute* attr = getAttribute(name);
+	  SBAttribute* attr = getAttribute(name);
 	  Vec3Attribute* vattr = dynamic_cast<Vec3Attribute*>(attr);
 	  if (vattr)
 	  {
@@ -350,9 +352,9 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  }
   }
 
-  void DObject::setStringAttribute( const std::string& name, std::string value )
+  void SBObject::setStringAttribute( const std::string& name, std::string value )
   {
-	  DAttribute* attr = getAttribute(name);
+	  SBAttribute* attr = getAttribute(name);
 	  StringAttribute* sattr = dynamic_cast<StringAttribute*>(attr);
 	  if (sattr)
 	  {
@@ -360,9 +362,9 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  }
   }
 
-  void DObject::setMatrixAttribute( const std::string& name, SrMat& value )
+  void SBObject::setMatrixAttribute( const std::string& name, SrMat& value )
   {
-	  DAttribute* attr = getAttribute(name);
+	  SBAttribute* attr = getAttribute(name);
 	  MatrixAttribute* mattr = dynamic_cast<MatrixAttribute*>(attr);
 	  if (mattr)
 	  {
@@ -370,9 +372,9 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  }
   }
 
-  const bool& DObject::getBoolAttribute( const std::string& name )
+  const bool& SBObject::getBoolAttribute( const std::string& name )
   {
-	  DAttribute* attr = getAttribute(name);
+	  SBAttribute* attr = getAttribute(name);
 	  BoolAttribute* battr = dynamic_cast<BoolAttribute*>(attr);
 	  if (battr)
 	  {
@@ -381,9 +383,9 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  return defaultBool;
   }
 
-  const int& DObject::getIntAttribute( const std::string& name )
+  const int& SBObject::getIntAttribute( const std::string& name )
   {
-	  DAttribute* attr = getAttribute(name);
+	  SBAttribute* attr = getAttribute(name);
 	  IntAttribute* iattr = dynamic_cast<IntAttribute*>(attr);
 	  if (iattr)
 	  {
@@ -392,9 +394,9 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  return defaultInt;
   }
 
-  const double& DObject::getDoubleAttribute( const std::string& name )
+  const double& SBObject::getDoubleAttribute( const std::string& name )
   {
-	  DAttribute* attr = getAttribute(name);
+	  SBAttribute* attr = getAttribute(name);
 	  DoubleAttribute* dattr = dynamic_cast<DoubleAttribute*>(attr);
 	  if (dattr)
 	  {
@@ -403,9 +405,9 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  return defaultDouble;
   }
 
-  const SrVec& DObject::getVec3Attribute( const std::string& name )
+  const SrVec& SBObject::getVec3Attribute( const std::string& name )
   {
-	  DAttribute* attr = getAttribute(name);
+	  SBAttribute* attr = getAttribute(name);
 	  Vec3Attribute* vattr = dynamic_cast<Vec3Attribute*>(attr);
 	  if (vattr)
 	  {
@@ -414,9 +416,9 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  return defaultVec;
   }
 
-  const std::string& DObject::getStringAttribute( const std::string& name )
+  const std::string& SBObject::getStringAttribute( const std::string& name )
   {
-	  DAttribute* attr = getAttribute(name);
+	  SBAttribute* attr = getAttribute(name);
 	  StringAttribute* sattr = dynamic_cast<StringAttribute*>(attr);
 	  if (sattr)
 	  {
@@ -425,9 +427,9 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  return defaultString;
   }
 
-  const SrMat& DObject::getMatrixAttribute( const std::string& name )
+  const SrMat& SBObject::getMatrixAttribute( const std::string& name )
   {
-	  DAttribute* attr = getAttribute(name);
+	  SBAttribute* attr = getAttribute(name);
 	  MatrixAttribute* mattr = dynamic_cast<MatrixAttribute*>(attr);
 	  if (mattr)
 	  {
@@ -436,4 +438,5 @@ IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bo
 	  return defaultMatrix;
   }
 
+  };
   

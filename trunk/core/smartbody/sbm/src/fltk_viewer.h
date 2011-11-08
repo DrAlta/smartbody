@@ -71,7 +71,7 @@ class MeCtExampleBodyReach;
     In all modes, mouse interaction is done together with Ctrl and Shift modifiers.
     A popup menu appears with a right button click or ctrl+shift+m. */
 
-class FltkViewer : public SrViewer, public Fl_Gl_Window, public DObserver
+class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObserver
  {
    public : // enumerators
 
@@ -356,7 +356,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public DObserver
 
 	SrVec interactivePoint;
 	
-	virtual void notify(DSubject* subject);
+	virtual void notify(SmartBody::SBSubject* subject);
 
 	virtual void label_viewer(const char* str);
 	virtual void show_viewer();

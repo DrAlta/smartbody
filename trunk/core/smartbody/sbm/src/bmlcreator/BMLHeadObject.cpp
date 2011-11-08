@@ -4,7 +4,7 @@ BMLHeadObject::BMLHeadObject() : BMLObject()
 {
 	setName("head");
 
-	StringAttribute* typeAttr = createStringAttribute("type", "", true, "Basic", 20, false, false, false, "type of head movement");
+	SmartBody::StringAttribute* typeAttr = createStringAttribute("type", "", true, "Basic", 20, false, false, false, "type of head movement");
 	std::vector<std::string> headTypes;
 	headTypes.push_back("NOD");
 	headTypes.push_back("SHAKE");
@@ -42,7 +42,7 @@ BMLHeadObject::~BMLHeadObject()
 {
 }
 
-void BMLHeadObject::notify(DSubject* subject)
+void BMLHeadObject::notify(SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }

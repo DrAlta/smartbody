@@ -48,7 +48,7 @@ int MeController::instance_count = 0;
 
 
 MeController::MeController () 
-:	DObject(),
+:	SBObject(),
 	_active( false ),
 	_indt( 0.0f ),
 	_outdt( 0.0f ),
@@ -77,8 +77,8 @@ MeController::MeController ()
 	_buffer_changes_toggle = false;
 	_buffer_changes_toggle_reset = true;
 
-	DObject::createBoolAttribute("pass_through", false, true, "Basic", 220, false, false, false, "whether to evaluate this controller");
-	DObject::createStringAttribute("handle", "", true, "Basic", 220, false, false, false, "handle for this controller");
+	SBObject::createBoolAttribute("pass_through", false, true, "Basic", 220, false, false, false, "whether to evaluate this controller");
+	SBObject::createStringAttribute("handle", "", true, "Basic", 220, false, false, false, "handle for this controller");
 }
 
 MeController::~MeController () {
@@ -827,8 +827,8 @@ void MeController::updateDefaultVariables(SbmPawn* pawn)
 	{		
 		for (unsigned int i=0;i<_defaultAttributes.size();i++)
 		{
-			DAttribute* dattr = _defaultAttributes[i].first;
-			DAttribute* pawnDefaultAttr = pawn->getAttribute(dattr->getName());
+			SmartBody::SBAttribute* dattr = _defaultAttributes[i].first;
+			SmartBody::SBAttribute* pawnDefaultAttr = pawn->getAttribute(dattr->getName());
 			VariablePointer& varPtr = _defaultAttributes[i].second;
 			varPtr.updateVariableFromAttribute(pawnDefaultAttr);
 		}
@@ -836,9 +836,9 @@ void MeController::updateDefaultVariables(SbmPawn* pawn)
 	}
 }
 
-void MeController::notify(DSubject* subject)
+void MeController::notify(SBSubject* subject)
 {
-	BoolAttribute* boolAttribute = dynamic_cast<BoolAttribute*>(subject);
+	SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(subject);
 	if (boolAttribute)
 	{
 		if (boolAttribute->getName() == "pass_through")
@@ -847,7 +847,7 @@ void MeController::notify(DSubject* subject)
 		}
 	}
 
-	StringAttribute* stringAttribute = dynamic_cast<StringAttribute*>(subject);
+	SmartBody::StringAttribute* stringAttribute = dynamic_cast<SmartBody::StringAttribute*>(subject);
 	if (stringAttribute)
 	{
 		if (stringAttribute->getName() == "handle")

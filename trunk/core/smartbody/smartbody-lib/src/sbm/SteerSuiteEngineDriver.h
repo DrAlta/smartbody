@@ -7,9 +7,9 @@
 #include <vhcl.h>
 #include <SteerLib.h>
 #include <PPRAgent.h>
-#include <sbm/DObject.h>
+#include <sbm/SBObject.h>
 
-class SteerSuiteEngineDriver : public SteerLib::EngineControllerInterface, public DObject
+class SteerSuiteEngineDriver : public SteerLib::EngineControllerInterface, public SmartBody::SBObject
 {
 public:
 	SteerSuiteEngineDriver();

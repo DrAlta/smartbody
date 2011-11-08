@@ -88,9 +88,9 @@ SrVec SBPawn::getHPR()
 }
 
 
-void SBPawn::notify(DSubject* subject)
+void SBPawn::notify(SBSubject* subject)
 {
-	DAttribute* attribute = dynamic_cast<DAttribute*>(subject);
+	SBAttribute* attribute = dynamic_cast<SBAttribute*>(subject);
 	if (attribute)
 	{
 		if (attribute->getName() == "posX")

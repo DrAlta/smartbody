@@ -9,7 +9,7 @@ class BMLHeadObject : public BMLObject
 		BMLHeadObject();
 		~BMLHeadObject();
 
-		virtual void notify(DSubject* subject);
+		virtual void notify(SBSubject* subject);
 
 };
 #endif

@@ -238,7 +238,7 @@ void MotionItemInfoWidget::updateChannelAttributes()
 		std::string attrName = (chanName+"."+typeName);
 		if (chan.size() > 1)
 			attrName += tag[i];			
-		DoubleAttribute* attr = channelInfoObject->createDoubleAttribute(attrName.c_str(),buffer[floatIdx+i],true,"Basic",10+i,true,false,false,"?");
+		SmartBody::DoubleAttribute* attr = channelInfoObject->createDoubleAttribute(attrName.c_str(),buffer[floatIdx+i],true,"Basic",10+i,true,false,false,"?");
 		//attrWindow->notify(attr);
 	}
 	if (chan.type == SkChannel::Quat)
@@ -248,7 +248,7 @@ void MotionItemInfoWidget::updateChannelAttributes()
 		std::string attrName = (chanName+"."+"euler");
 		for (int k=0;k<3;k++)
 		{			
-			DoubleAttribute* attr = channelInfoObject->createDoubleAttribute((attrName+tag[k+1]).c_str(),euler[k],true,"Basic",20+k,true,false,false,"?");
+			SmartBody::DoubleAttribute* attr = channelInfoObject->createDoubleAttribute((attrName+tag[k+1]).c_str(),euler[k],true,"Basic",20+k,true,false,false,"?");
 		}
 	}
 
@@ -457,7 +457,7 @@ void EventItemInfoWidget::updateWidget()
 	}		
 }
 
-void EventItemInfoWidget::notify( DSubject* subject )
+void EventItemInfoWidget::notify( SmartBody::SBSubject* subject )
 {
 	EventManager* manager = EventManager::getEventManager();
 	EventHandlerMap& eventMap = manager->getEventHandlers();
@@ -508,7 +508,7 @@ void EventItemInfoWidget::removeEvent()
 /************************************************************************/
 /* Pawn Item Info Widget                                                */
 /************************************************************************/
-PawnItemInfoWidget::PawnItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, DObserver* observerWindow ) 
+PawnItemInfoWidget::PawnItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SBObserver* observerWindow ) 
 : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -542,7 +542,7 @@ void PawnItemInfoWidget::updateWidget()
 
 }
 
-void PawnItemInfoWidget::notify( DSubject* subject )
+void PawnItemInfoWidget::notify( SmartBody::SBSubject* subject )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmPawn* pawn = mcu.getPawn(pawnName);
@@ -564,7 +564,7 @@ void PawnItemInfoWidget::notify( DSubject* subject )
 	}
 }
 
-AttributeItemWidget::AttributeItemWidget( DObject* object, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, DObserver* observerWindow /*= NULL*/ )
+AttributeItemWidget::AttributeItemWidget( SmartBody::SBObject* object, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow /*= NULL*/ )
 : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
 {
 	attrWindow = NULL;
