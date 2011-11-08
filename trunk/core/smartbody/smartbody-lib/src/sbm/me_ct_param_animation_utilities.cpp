@@ -877,7 +877,7 @@ void PATransitionManager::update()
 
 	for (int i = 0; i < data->fromState->getNumMotions(); i++)
 	{
-		std::string motionName = data->fromState->motions[i]->name();
+		std::string motionName = data->fromState->motions[i]->getName();
 		if (motionName == data->fromMotionName)
 		{
 			fromKey = data->fromState->keys[i];
@@ -899,7 +899,7 @@ void PATransitionManager::update()
 	std::vector<double> toKey;
 	for (int i = 0; i < data->toState->getNumMotions(); i++)
 	{
-		std::string motionName = data->toState->motions[i]->name();
+		std::string motionName = data->toState->motions[i]->getName();
 		if (motionName == data->toMotionName)
 		{
 			toKey = data->toState->keys[i];

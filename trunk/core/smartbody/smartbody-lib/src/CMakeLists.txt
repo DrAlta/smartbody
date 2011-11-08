@@ -308,6 +308,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SBState.cpp
 	sbm/SBTransition.cpp
 	sbm/SBStateManager.cpp
+	sbm/SBMotion.cpp
 	sbm/VisemeMap.cpp
 	sbm/sr_path_list.cpp
 

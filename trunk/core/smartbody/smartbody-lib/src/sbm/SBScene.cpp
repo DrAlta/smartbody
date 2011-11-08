@@ -142,13 +142,39 @@ SBCharacter* SBScene::getCharacter(std::string name)
 	}
 }
 
-SkMotion* SBScene::getMotion(std::string name)
+SBMotion* SBScene::getMotion(std::string name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	SkMotion* motion = mcu.getMotion(name);
-	return motion;
+	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
+	return sbmotion;
 }
+
+int SBScene::getNumMotions()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	return mcu.motion_map.size();
+}
+
+std::vector<std::string> SBScene::getMotionNames()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::vector<std::string> ret;
+
+	for(std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.begin();
+		iter != mcu.motion_map.end();
+		iter++)
+	{
+		SkMotion* motion = (*iter).second;
+		ret.push_back(motion->getName());
+	}
+
+	return ret;
+}
+
+
 
 std::vector<std::string> SBScene::getPawnNames()
 {
@@ -345,24 +371,6 @@ Profiler* SBScene::getProfiler()
 	return _profiler;
 }
 
-FaceDefinition* SBScene::getFaceDefinition(std::string def)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::map<std::string, FaceDefinition*>::iterator iter = mcu.face_map.find(def);
-	if (iter == mcu.face_map.end())
-	{
-		FaceDefinition* faceDefinition = new FaceDefinition();
-		faceDefinition->setName(def);
-		mcu.face_map.insert(std::pair<std::string, FaceDefinition*>(def, faceDefinition));
-		return faceDefinition;
-	}
-	else
-	{
-		return ((*iter).second);
-	}
-
-}
-
 SBBmlProcessor* SBScene::getBmlProcessor()
 {
 	return _bml;
@@ -372,6 +380,59 @@ SBStateManager* SBScene::getStateManager()
 {
 	return _stateManager;
 }
+
+FaceDefinition* SBScene::createFaceDefinition(const std::string& name)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	// make sure the name doesn't already exist
+	if (mcu.face_map.find(name) != mcu.face_map.end())
+	{
+		LOG("Face definition named '%s' already exists.", name.c_str());
+		return NULL;
+	}
+
+	FaceDefinition* face = new FaceDefinition(name);
+	mcu.face_map.insert(std::pair<std::string, FaceDefinition*>(name, face));
+
+	return face;
+}
+
+FaceDefinition* SBScene::getFaceDefinition(const std::string& name)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	// make sure the name doesn't already exist
+	std::map<std::string, FaceDefinition*>::iterator iter = mcu.face_map.find(name);
+	if (iter == mcu.face_map.end())
+	{
+		LOG("Face definition named '%s' does not exist.", name.c_str());
+		return NULL;
+	}
+
+	return (*iter).second;
+}
+
+int SBScene::getNumFaceDefinitions()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	return 	mcu.face_map.size();
+}
+
+std::vector<std::string> SBScene::getFaceDefinitionNames()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::vector<std::string> faces;
+	for (std::map<std::string, FaceDefinition*>::iterator iter =  mcu.face_map.begin();
+		 iter !=  mcu.face_map.end();
+		 iter++)
+	{
+		faces.push_back((*iter).second->getName());
+	}
+
+	return faces;
+}
+
 
 
 };

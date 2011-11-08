@@ -541,7 +541,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 			{
 				SkMotion* motion = (*motionIter).second;
 				MeCtMotion* motionCt = new MeCtMotion();
-				motionCt->setName( motion->name() );  // TODO: include BML act and behavior ids
+				motionCt->setName( motion->getName() );  // TODO: include BML act and behavior ids
 				motionCt->init(const_cast<SbmCharacter*>(request->actor), motion );
 				motionCt->loop( true );
 

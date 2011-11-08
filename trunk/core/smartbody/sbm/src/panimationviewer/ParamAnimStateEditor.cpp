@@ -273,7 +273,7 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 		for (int i = 0; i < currentState->getNumMotions(); i++)
 		{
 			SkMotion* motion = currentState->motions[i];
-			std::string motionName = motion->name();
+			std::string motionName = motion->getName();
 			ParamAnimTrack* track = new ParamAnimTrack();
 			track->setName(motionName.c_str());
 			ParamAnimBlock* block = new ParamAnimBlock();

@@ -63,6 +63,9 @@ class SBCharacter : public SbmCharacter
 		SBBehavior* getBehavior(int num);
 		std::vector<SBBehavior*>& getBehaviors();
 
+		virtual FaceDefinition* getFaceDefinition();
+		virtual void setFaceDefinition(FaceDefinition* face);
+
 	protected:
 		std::vector<SBBehavior*> _curBehaviors;
 

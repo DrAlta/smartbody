@@ -286,7 +286,7 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, FaceDefinition* faceD
 	std::string neutralMotionName = "NA";
 	if (faceDefinition->getFaceNeutral())
 	{
-		neutralMotionName = faceDefinition->getFaceNeutral()->name();		
+		neutralMotionName = faceDefinition->getFaceNeutral()->getName();		
 	}
 	Fl_Tree_Item* neutralMotionTree = resourceTree->add(tree,"Neutral Motion");
 	neutralMotionTree->user_data((void*)ITEM_NETURAL_MOTION);
@@ -311,7 +311,7 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, FaceDefinition* faceD
 		{	
 			Fl_Tree_Item* item = NULL;
 			if (au->left)
-				item = resourceTree->add(auItem,(auType+ au->left->name()).c_str());
+				item = resourceTree->add(auItem,(auType+ au->left->getName()).c_str());
 			else
 				item = resourceTree->add(auItem, auType.c_str());
 
@@ -325,7 +325,7 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, FaceDefinition* faceD
 				Fl_Tree_Item* item = NULL;
 				if (au->left)
 				{
-					item = resourceTree->add(auItem,(auType+au->left->name()).c_str());
+					item = resourceTree->add(auItem,(auType+au->left->getName()).c_str());
 				}
 				else
 				{
@@ -338,7 +338,7 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, FaceDefinition* faceD
 				auType = "right:";
 				if (au->right)
 				{
-					item = resourceTree->add(auItem,(auType+au->right->name()).c_str());
+					item = resourceTree->add(auItem,(auType+au->right->getName()).c_str());
 				}
 				else
 				{
@@ -358,7 +358,7 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, FaceDefinition* faceD
 		std::string visemeName = faceDefinition->getVisemeName(v);
 		std::string motionName = "";
 		if (faceDefinition->getVisemeMotion(visemeName))
-			motionName = faceDefinition->getVisemeMotion(visemeName)->name();
+			motionName = faceDefinition->getVisemeMotion(visemeName)->getName();
 		Fl_Tree_Item* item = resourceTree->add(visemeTree,(visemeName+"-->"+motionName).c_str());
 		item->user_data((void*)ITEM_VISEME_MAP);		
 	}
@@ -434,7 +434,7 @@ void ResourceWindow::updateSkeleton( Fl_Tree_Item* tree, SkSkeleton* skel )
 
 void ResourceWindow::updateMotion( Fl_Tree_Item* tree, SkMotion* motion )
 {
-	Fl_Tree_Item* item = resourceTree->add(tree,motion->name().c_str());
+	Fl_Tree_Item* item = resourceTree->add(tree,motion->getName().c_str());
 	item->user_data((void*)ITEM_MOTION);
 }
 

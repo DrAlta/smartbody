@@ -23,6 +23,7 @@ class SBSkeleton : public SkSkeleton
 		int getNumJoints();
 		SBJoint* getJoint(int index);		
 		SBJoint* getJointByName(std::string jointName);
+		std::vector<std::string> getJointNames();
 
 		int getNumChannels();
 		std::string getChannelType(int index);

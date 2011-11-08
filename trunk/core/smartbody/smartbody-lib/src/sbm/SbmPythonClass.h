@@ -164,32 +164,6 @@ class Viseme
 		std::string charName;
 };
 
-class Motion
-{
-	public:
-		Motion();
-		Motion(std::string motionFile);
-		~Motion();
-
-		const std::string& getMotionFileName();
-		const std::string& getMotionName();
-		int getNumFrames();
-		boost::python::list getFrameData(int i);
-		int getFrameSize();
-
-		int getNumChannel();
-		boost::python::list getChannels();
-		void checkSkeleton(std::string skel);
-
-		SkMotion* getSkMotion();
-		
-		void connect(SBSkeleton* skel);
-		void disconnect();
-
-	protected:
-		std::string motionFile;
-		std::string emptyString;
-};
 
 // SmartBody functions
 

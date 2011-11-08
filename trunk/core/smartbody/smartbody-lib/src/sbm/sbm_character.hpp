@@ -400,9 +400,9 @@ public:
 	float getMinVisemeTime() const;
 	void notify(DSubject* subject);
 
-	FaceDefinition* getFaceDefinition();
-	void setFaceDefinition(FaceDefinition* face);
-	void updateFaceDefinition();
+	virtual FaceDefinition* getFaceDefinition();
+	virtual void setFaceDefinition(FaceDefinition* face);
+	virtual void updateFaceDefinition();
 	void removeAllFaceChannels();
 
 	virtual void setNvbg(Nvbg* nvbg);

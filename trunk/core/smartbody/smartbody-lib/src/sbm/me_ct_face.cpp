@@ -249,7 +249,7 @@ void MeCtFace::finish_adding( void )	{
 
 		}
 		
-		_visemeChannelMap.insert(std::pair<std::string, std::vector<int> > (std::string(nextKey->name()), keyIndices));
+		_visemeChannelMap.insert(std::pair<std::string, std::vector<int> > (std::string(nextKey->getName()), keyIndices));
 	}
 }
 
@@ -379,10 +379,10 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 				SkChannelArray& keyPoseChannels = key_pose_p->channels();
 
 				pose_var_index = 0;
-				std::map<std::string, std::vector<int> >::iterator iter = _visemeChannelMap.find(std::string(key_pose_p->name()));
+				std::map<std::string, std::vector<int> >::iterator iter = _visemeChannelMap.find(std::string(key_pose_p->getName()));
 				if (iter == _visemeChannelMap.end())
 				{
-					LOG("Viseme %s not found in channel-buffer map. Programmer needs to fix this! Might be lack of finish_adding function.", key_pose_p->name().c_str());
+					LOG("Viseme %s not found in channel-buffer map. Programmer needs to fix this! Might be lack of finish_adding function.", key_pose_p->getName().c_str());
 					continue;
 				}
 				std::vector<int>& keyToChannelMap = (*iter).second;
