@@ -497,14 +497,16 @@ void SbmCharacter::updateJointPhyObjs()
 	_skeleton->update_global_matrices();
 	for (size_t i=0;i<joints.size();i++)
 	{
-		SkJoint* curJoint = joints[i];
+		SkJoint* curJoint = joints[i]; 
+		if (!curJoint->parent())
+			continue;
 		const std::string& jointName = curJoint->name();
 		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
 		{
 			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
-			const SrMat& gmat = curJoint->gmat();
-			phyObj->getColObj()->updateGlobalTransform(gmat);
-			phyObj->updateSimObj();
+			const SrMat& gmat = curJoint->parent()->gmat();
+			phyObj->setGlobalTransform(gmat);
+			phyObj->updatePhySim();
 		}
 	}	
 }
@@ -519,7 +521,7 @@ void SbmCharacter::setJointPhyCollision( bool useCollision )
 		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
 		{
 			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
-			phyObj->setCollisionSim(useCollision);
+			phyObj->enableCollisionSim(useCollision);
 		}
 	}	
 }
@@ -555,7 +557,7 @@ void SbmCharacter::buildJointPhyObjs()
 void SbmCharacter::setJointCollider( std::string jointName, float len, float radius )
 {
 	SkJoint* joint = _skeleton->search_joint(jointName.c_str());
-	if (!joint || joint->num_children() == 0)
+	if (!joint || joint->parent() == 0)
 		return;
 	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
 	if (!phySim)
@@ -572,8 +574,9 @@ void SbmCharacter::setJointCollider( std::string jointName, float len, float rad
 		delete phyObj;
 	}
 
-	SkJoint* child = joint->child(0);
-	SrVec offset = child->offset(); 
+	//SkJoint* child = joint->child(0);
+	SkJoint* parent = joint->parent();
+	SrVec offset = joint->offset(); 
 	SrVec center = offset*0.5f;
 	SrVec dir = offset; dir.normalize();
 	float boneLen = offset.len();	
@@ -584,10 +587,11 @@ void SbmCharacter::setJointCollider( std::string jointName, float len, float rad
 
 	// generate new geometry
 	SbmGeomObject* newGeomObj = new SbmGeomCapsule(center-dir*len*0.5f, center+dir*len*0.5f,radius);
-	SbmPhysicsObj* jointPhy = phySim->createPhyObj();
-	jointPhy->initGeometry(newGeomObj,10.f);	
-	jointPhy->setPhysicsSim(false);
+	SbmPhysicsObj* jointPhy = phySim->createPhyObj();	
+	jointPhy->setGeometry(newGeomObj,10.f);	
 	phySim->addPhysicsObj(jointPhy);
+	phySim->updatePhyObjGeometry(jointPhy);		
+	jointPhy->enablePhysicsSim(false);	
 	jointPhyObjMap[jointName] = jointPhy;
 }
 

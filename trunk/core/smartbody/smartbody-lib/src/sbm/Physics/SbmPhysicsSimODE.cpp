@@ -14,11 +14,6 @@ SbmPhysicsObjODE::SbmPhysicsObjODE()
 
 SbmPhysicsObjODE::~SbmPhysicsObjODE()
 {
-// 	SbmPhysicsSimODE* odeSim = SbmPhysicsSimODE::getODESim();
-// 	if (odeSim)
-// 	{
-// 		dSpaceRemove(odeSim->getSpaceID(),geomID);	
-// 	}
 	dGeomDestroy(geomID);
 	dGeomTriMeshDataDestroy(meshdataID);	
 	dBodyDestroy(bodyID);	
@@ -44,12 +39,12 @@ void SbmPhysicsObjODE::setCollisionSim( bool bCol )
 }
 
 
-void SbmPhysicsObjODE::updateColObj()
+void SbmPhysicsObjODE::updateSbmObj()
 {
-	if (!colObj || !hasPhysicsSim())
+	if (!hasPhysicsSim())
 		return;
 	// write the current simulation result into object world state
-	SbmTransform curT;// = colObj->getGlobalTransform();
+	SbmTransform curT;//colObj->getGlobalTransform();
 	const dReal* quat = dBodyGetQuaternion(bodyID);
 	curT.rot.w = quat[0];
 	curT.rot.x = quat[1];
@@ -60,16 +55,14 @@ void SbmPhysicsObjODE::updateColObj()
 	curT.tran[0] = pos[0];
 	curT.tran[1] = pos[1];
 	curT.tran[2] = pos[2];
-	colObj->setWorldState(curT);
+	setGlobalTransform(curT);
+	//colObj->updateGlobalTransform(curT);
 	//sr_out << "new pos = " << curT.tran << srnl;
 }
 
-void SbmPhysicsObjODE::updateSimObj()
-{
-	if (!colObj)
-		return;
-
-	SbmTransform& curT = colObj->getWorldState();
+void SbmPhysicsObjODE::updatePhySim()
+{	
+	SbmTransform& curT = getGlobalTransform();
 	dQuaternion quat;
 	quat[0] = (dReal)curT.rot.w;	
 	quat[1] = (dReal)curT.rot.x;
@@ -87,8 +80,8 @@ void SbmPhysicsObjODE::initGeometry( SbmGeomObject* obj, float mass )
 
 	bodyID = dBodyCreate(odeSim->getWorldID());
 	if (obj)
-	{
-		SbmTransform& curT = obj->getWorldState();
+	{		
+		SbmTransform& curT = getGlobalTransform();
 		dQuaternion quat;
 		quat[0] = (dReal)curT.rot.w;	
 		quat[1] = (dReal)curT.rot.x;
@@ -96,13 +89,24 @@ void SbmPhysicsObjODE::initGeometry( SbmGeomObject* obj, float mass )
 		quat[3] = (dReal)curT.rot.z;
 		dBodySetQuaternion(bodyID,quat);
 		dBodySetPosition(bodyID,(dReal)curT.tran[0],(dReal)curT.tran[1],(dReal)curT.tran[2]);
-		
+
 		colObj = obj;
 		objMass = mass;		
 		createODEGeometry(obj,mass);
 		dBodySetMass(bodyID,&odeMass);
 		if (geomID)
+		{
 			dGeomSetBody(geomID,bodyID);
+
+			SbmTransform& offsetT = obj->getLocalTransform();
+			dGeomSetOffsetPosition(geomID,(dReal)offsetT.tran[0],(dReal)offsetT.tran[1],(dReal)offsetT.tran[2]);
+			dQuaternion quat;
+			quat[0] = (dReal)offsetT.rot.w;	
+			quat[1] = (dReal)offsetT.rot.x;
+			quat[2] = (dReal)offsetT.rot.y;
+			quat[3] = (dReal)offsetT.rot.z;
+			dGeomSetOffsetQuaternion(geomID,quat);
+		}
 		//dBodySetAutoDisableFlag(bodyID,1);
 	}	
 }
@@ -158,6 +162,7 @@ void SbmPhysicsObjODE::createODEGeometry( SbmGeomObject* obj, float mass )
 		dMassAdjust(&odeMass,(dReal)mass);
 	}
 }
+
 /************************************************************************/
 /* Physics Sim ODE                                                      */
 /************************************************************************/
@@ -232,7 +237,15 @@ void SbmPhysicsSimODE::updateSimulationInternal( float timeStep )
 	dWorldQuickStep(worldID,timeStep);	
 	dJointGroupEmpty(contactGroupID);
 
-	std::for_each(physicsObjList.begin(),physicsObjList.end(),std::mem_fun(&SbmPhysicsObj::updateColObj));
+	//std::for_each(physicsObjList.begin(),physicsObjList.end(),std::mem_fun(&SbmPhysicsObj::updateSbmObj));
+	SbmPhysicsObjMap::iterator mi;
+	for ( mi  = physicsObjList.begin();
+		  mi != physicsObjList.end();
+		  mi++)
+	{
+		SbmPhysicsObj* phyObj = mi->second; 
+		phyObj->updateSbmObj();
+	}
 }
 
 SbmPhysicsSimODE* SbmPhysicsSimODE::getODESim()
@@ -241,15 +254,245 @@ SbmPhysicsSimODE* SbmPhysicsSimODE::getODESim()
 	return odePhysics;
 }
 
+void SbmPhysicsSimODE::addPhysicsCharacter( SbmPhysicsCharacter* phyChar )
+{
+	
+}
+
+void SbmPhysicsSimODE::removePhysicsCharacter( SbmPhysicsCharacter* phyChar )
+{
+
+}
+
+
 void SbmPhysicsSimODE::addPhysicsObj( SbmPhysicsObj* obj )
 {
-	physicsObjList.push_back(obj);
+	if (hasPhysicsObj(obj)) return;
+	SbmPhysicsSimODE* odeSim = SbmPhysicsSimODE::getODESim();
+	if (!odeSim)	return;
+	if (!odeSim->systemIsInit())   return;
+
+	SbmPhysicsSim::addPhysicsObj(obj);
+	if (odeObjMap.find(obj->getID()) == odeObjMap.end())
+	{
+		odeObjMap[obj->getID()] = new SbmODEObj();
+	}
+
+	SbmODEObj* odeObj = getODEObj(obj);		
+	odeObj->bodyID = dBodyCreate(odeSim->getWorldID());
+	if (obj)
+	{		
+		SbmTransform& curT = obj->getGlobalTransform();
+		dQuaternion quat;
+		quat[0] = (dReal)curT.rot.w;	
+		quat[1] = (dReal)curT.rot.x;
+		quat[2] = (dReal)curT.rot.y;
+		quat[3] = (dReal)curT.rot.z;
+		dBodySetQuaternion(odeObj->bodyID,quat);
+		dBodySetPosition(odeObj->bodyID,(dReal)curT.tran[0],(dReal)curT.tran[1],(dReal)curT.tran[2]);
+	}
+	if (obj->getColObj())
+		updatePhyObjGeometry(obj,obj->getColObj());
 }
 
 void SbmPhysicsSimODE::removePhysicsObj( SbmPhysicsObj* obj )
 {
-	SbmPhysicsObjList::iterator li = std::find(physicsObjList.begin(),physicsObjList.end(),obj);
-	if (li != physicsObjList.end())
-		physicsObjList.erase(li);
+	if (!hasPhysicsObj(obj)) return;
+	SbmPhysicsSimODE* odeSim = SbmPhysicsSimODE::getODESim();
+	if (!odeSim)	return;
+	if (!odeSim->systemIsInit())   return;
 
+	SbmPhysicsSim::removePhysicsObj(obj);
+	SbmODEObjMap::iterator li = odeObjMap.find(obj->getID());
+	if (li != odeObjMap.end())
+	{
+		SbmODEObj* odeObj = li->second;
+		delete odeObj;
+		odeObjMap.erase(li);
+	}
+}
+
+SbmJointObj* SbmPhysicsSimODE::createJointObj()
+{
+	return new SbmJointObj();
+}
+
+SbmPhysicsObj* SbmPhysicsSimODE::createPhyObj()
+{
+	return new SbmPhysicsObj();
+}
+
+SbmODEObj* SbmPhysicsSimODE::getODEObj( SbmPhysicsObj* obj )
+{
+	SbmODEObj* odeObj = NULL;
+	if (hasPhysicsObj(obj))
+	{
+		odeObj = odeObjMap[obj->getID()];
+	}	
+	return odeObj;	
+}
+
+
+void SbmPhysicsSimODE::updatePhyObjGeometry( SbmPhysicsObj* obj, SbmGeomObject* geom /*= NULL*/ )
+{
+	SbmPhysicsSimODE* odeSim = SbmPhysicsSimODE::getODESim();
+	if (!odeSim)	return;
+	if (!odeSim->systemIsInit())   return;
+	SbmODEObj* odeObj = getODEObj(obj);	
+	if (odeObj)
+	{
+		if (geom && geom != obj->getColObj())
+		{
+			obj->setGeometry(geom,10.f);		
+		}
+		odeObj->cleanGeometry();
+		odeObj->geomID = createODEGeometry(obj,obj->getMass());
+		dBodySetMass(odeObj->bodyID,&odeObj->odeMass);
+		if (odeObj->geomID && obj->getColObj())
+		{			
+			dGeomSetBody(odeObj->geomID ,odeObj->bodyID);
+			SbmTransform& offsetT = obj->getColObj()->getLocalTransform();
+			dGeomSetOffsetPosition(odeObj->geomID,(dReal)offsetT.tran[0],(dReal)offsetT.tran[1],(dReal)offsetT.tran[2]);
+			dQuaternion quat;
+			quat[0] = (dReal)offsetT.rot.w;	
+			quat[1] = (dReal)offsetT.rot.x;
+			quat[2] = (dReal)offsetT.rot.y;
+			quat[3] = (dReal)offsetT.rot.z;
+			dGeomSetOffsetQuaternion(odeObj->geomID,quat);
+		}
+		//dBodySetAutoDisableFlag(bodyID,1);
+	}	
+}
+void SbmPhysicsSimODE::enablePhysicsSim( SbmPhysicsObj* obj, bool bSim )
+{
+	SbmODEObj* odeObj = getODEObj(obj);	
+	obj->hasPhysicsSim(bSim);
+	if (obj->hasPhysicsSim())
+		dBodyEnable(odeObj->bodyID);
+	else
+		dBodyDisable(odeObj->bodyID);
+	
+}
+
+void SbmPhysicsSimODE::enableCollisionSim( SbmPhysicsObj* obj, bool bCol )
+{
+	SbmODEObj* odeObj = getODEObj(obj);	
+	obj->hasCollisionSim(bCol);
+	if (obj->hasCollisionSim())
+		dGeomEnable(odeObj->geomID);
+	else
+		dGeomDisable(odeObj->geomID);
+}
+
+void SbmPhysicsSimODE::updateSbmObj( SbmPhysicsObj* obj )
+{
+	if (!obj->hasPhysicsSim())
+		return;
+	SbmODEObj* odeObj = getODEObj(obj);	
+	// write the current simulation result into object world state
+	SbmTransform curT;//colObj->getGlobalTransform();
+	const dReal* quat = dBodyGetQuaternion(odeObj->bodyID);
+	curT.rot.w = quat[0];
+	curT.rot.x = quat[1];
+	curT.rot.y = quat[2];
+	curT.rot.z = quat[3];
+
+	const dReal* pos = dBodyGetPosition(odeObj->bodyID);
+	curT.tran[0] = pos[0];
+	curT.tran[1] = pos[1];
+	curT.tran[2] = pos[2];
+	obj->setGlobalTransform(curT);
+}
+
+void SbmPhysicsSimODE::updatePhySim( SbmPhysicsObj* obj )
+{
+	SbmODEObj* odeObj = getODEObj(obj);	
+	SbmTransform& curT = obj->getGlobalTransform();
+	dQuaternion quat;
+	quat[0] = (dReal)curT.rot.w;	
+	quat[1] = (dReal)curT.rot.x;
+	quat[2] = (dReal)curT.rot.y;
+	quat[3] = (dReal)curT.rot.z;
+	dBodySetQuaternion(odeObj->bodyID,quat);
+	dBodySetPosition(odeObj->bodyID,(dReal)curT.tran[0],(dReal)curT.tran[1],(dReal)curT.tran[2]);
+}
+
+dGeomID SbmPhysicsSimODE::createODEGeometry( SbmPhysicsObj* obj, float mass )
+{
+	SbmPhysicsSimODE* odeSim = SbmPhysicsSimODE::getODESim();
+	if (!odeSim)	return 0;
+	if (!odeSim->systemIsInit())   return 0;
+	SbmODEObj* odeObj = getODEObj(obj);	
+	SbmGeomObject* geom = obj->getColObj();
+	dGeomID geomID = 0;
+	if (dynamic_cast<SbmGeomSphere*>(geom))
+	{
+		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(geom);
+		geomID = dCreateSphere(odeSim->getSpaceID(),(dReal)sph->radius);
+		//dMassSetSphereTotal(&odeMass,mass,(dReal)sph->radius);
+		dMassSetSphere(&odeObj->odeMass,mass,(dReal)sph->radius);
+	}
+	else if (dynamic_cast<SbmGeomBox*>(geom))
+	{
+		SbmGeomBox* box = dynamic_cast<SbmGeomBox*>(geom);
+		SrVec extent = box->extent*2.f;
+		geomID = dCreateBox(odeSim->getSpaceID(),(dReal)extent.x,(dReal)extent.y,(dReal)extent.z);
+		//dMassSetBoxTotal(&odeMass,(dReal)1.f,(dReal)extent.x,(dReal)extent.y,(dReal)extent.z);
+		dMassSetBox(&odeObj->odeMass,(dReal)mass,(dReal)extent.x,(dReal)extent.y,(dReal)extent.z);
+	}
+	else if (dynamic_cast<SbmGeomCapsule*>(geom))
+	{
+		SbmGeomCapsule* cap = dynamic_cast<SbmGeomCapsule*>(geom);		
+		geomID = dCreateCapsule(odeSim->getSpaceID(),(dReal)cap->radius,(dReal)cap->extent);
+		//dMassSetCapsuleTotal(&odeMass,(dReal)mass,3,(dReal)cap->radius,(dReal)cap->extent);
+		dMassSetCapsule(&odeObj->odeMass,(dReal)mass,3,(dReal)cap->radius,(dReal)cap->extent);
+	}
+	else if (dynamic_cast<SbmGeomTriMesh*>(geom))
+	{
+		SbmGeomTriMesh* tri = dynamic_cast<SbmGeomTriMesh*>(geom);
+		SrModel* model = tri->geoMesh;
+		//model->invert_faces();
+		SrBox bbox;		
+		model->get_bounding_box(bbox);		
+		odeObj->meshdataID = dGeomTriMeshDataCreate();
+		//dGeomTriMeshDataBuildSimple(meshdataID,(const dReal*)(&model->V[0]),model->V.size(),(const dTriIndex*)(&model->F[0]),model->F.size()*3);
+		dGeomTriMeshDataBuildSingle(odeObj->meshdataID,(const dReal*)(&model->V[0]),3*sizeof(float),model->V.size(),(const dTriIndex*)(&model->F[0]),model->F.size()*3,3*sizeof(int));
+		geomID = dCreateTriMesh(odeSim->getSpaceID(),odeObj->meshdataID,NULL,NULL,NULL);		
+		dMassSetTrimesh(&odeObj->odeMass,(dReal)mass,geomID);		
+		if (dMassCheck(&odeObj->odeMass) != 1) // set the default mass to its bounding box
+			dMassSetBox(&odeObj->odeMass,(dReal)mass,bbox.size().x*0.5f,bbox.size().y*0.5f,bbox.size().z*0.5f);		
+		//dGeomSetPosition(geomID,-odeMass.c[0], -odeMass.c[1], -odeMass.c[2]);
+		dMassTranslate( &odeObj->odeMass, -odeObj->odeMass.c[0], -odeObj->odeMass.c[1], -odeObj->odeMass.c[2]);		
+	}
+	else // no geoemtry
+	{
+		//dMassSetZero(&odeMass);			
+		dMassAdjust(&odeObj->odeMass,(dReal)mass);
+	}
+	return geomID;
+}
+
+SbmODEObj::SbmODEObj()
+{
+	bodyID = 0;
+	geomID = 0;
+	meshdataID = 0;
+	physicsObj = NULL;
+}
+
+SbmODEObj::~SbmODEObj()
+{
+	cleanGeometry();
+	if (bodyID)
+		dBodyDestroy(bodyID);
+}
+
+void SbmODEObj::cleanGeometry()
+{
+	if (geomID)
+		dGeomDestroy(geomID);
+	if (meshdataID)
+		dGeomTriMeshDataDestroy(meshdataID);	
+	geomID = 0;
+	meshdataID = 0;
 }

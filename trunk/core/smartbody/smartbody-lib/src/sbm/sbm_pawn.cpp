@@ -854,9 +854,9 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 		*/
 
-		if (pawn_p->colObj_p)
+		if (pawn_p->phyObj_p)
 		{
-			pawn_p->setWorldOffset(pawn_p->colObj_p->getWorldState().gmat());
+			pawn_p->setWorldOffset(pawn_p->phyObj_p->getGlobalTransform().gmat());
 		}
 		// [BMLR] Send notification to the renderer that a pawn was created.
 		// NOTE: This is sent both for characters AND pawns
@@ -1391,11 +1391,6 @@ bool SbmPawn::initGeomObj( const char* geomType, SrVec size, const char* color, 
 	}
 	else if (strcmp(geomType,"null") == 0)
 	{
-		if (phyObj_p) // remove physics
-		{
-			removePhysicsObj();
-		}
-
 		if (colObj_p) // remove geometry
 		{
 			delete colObj_p;
@@ -1407,23 +1402,18 @@ bool SbmPawn::initGeomObj( const char* geomType, SrVec size, const char* color, 
 	{
 		LOG("Can not create pawn geometry. Undefined geom type : %s\n",geomType);
 		return false;
-	}
-
-	if (phyObj_p) // remove physics
-	{
-		removePhysicsObj();
-	}
-
+	}		
 	if (colObj_p) // remove geometry
 	{
 		delete colObj_p;
 		colObj_p = NULL;
-	}
+	}	
 	if (colObj)
 		colObj->color = color;
-	colObj_p = colObj;
+	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	colObj_p = colObj;	
+	initPhysicsObj();	
 	updateToColObject();
-	initPhysicsObj();
 	return true;
 }
 
@@ -1433,9 +1423,12 @@ void SbmPawn::initPhysicsObj()
 	if (!phySim)
 		return;
 	//printf("init physics obj\n");
-	phyObj_p = phySim->createPhyObj();
-	phyObj_p->initGeometry(colObj_p,1.f);	
+	if (!phyObj_p)
+		phyObj_p = phySim->createPhyObj();
+	//phyObj_p-(colObj_p,1.f);	
+	phyObj_p->setGeometry(colObj_p,1.f);	
 	phySim->addPhysicsObj(phyObj_p);
+	phySim->updatePhyObjGeometry(phyObj_p);				
 }
 
 void SbmPawn::removePhysicsObj()
@@ -1450,26 +1443,23 @@ void SbmPawn::removePhysicsObj()
 
 void SbmPawn::updateFromColObject()
 {
-	if (colObj_p)
+	if (phyObj_p)
 	{
 		//setWorldOffset(colObj_p->getWorldState().gmat());
-		setWorldOffset(colObj_p->getWorldState().gmat());
+		setWorldOffset(phyObj_p->getGlobalTransform().gmat());
 	}
 }
 
 void SbmPawn::updateToColObject()
 {
-	if (colObj_p)
+	if (phyObj_p)
 	{
 		SRT newWorldState; 
 		newWorldState.gmat(get_world_offset_joint()->gmat());
 		//colObj_p->getWorldState().gmat();
-		colObj_p->setWorldState(newWorldState);
+		phyObj_p->setGlobalTransform(newWorldState);
 		//colObj_p->updateGlobalTransform(get_world_offset_joint()->gmat());
-		if (phyObj_p)
-		{
-			phyObj_p->updateSimObj();			
-		}
+		phyObj_p->updatePhySim();					
 	}
 }
 
@@ -1543,7 +1533,7 @@ void SbmPawn::setPhysicsSim( bool enable )
 	if (!phyObj_p)
 		return;
 
-	phyObj_p->setPhysicsSim(enable);	
+	phyObj_p->enablePhysicsSim(enable);	
 }
 
 bool SbmPawn::hasPhysicsSim()
@@ -1559,7 +1549,7 @@ void SbmPawn::setCollision( bool enable )
 	if (!phyObj_p)
 		return;
 
-	phyObj_p->setCollisionSim(enable);
+	phyObj_p->enableCollisionSim(enable);
 }
 
 ///////////////////////////////////////////////////////////////////////////

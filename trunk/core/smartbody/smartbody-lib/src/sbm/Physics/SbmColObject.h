@@ -31,22 +31,22 @@ public:
 
 typedef SbmTransform SRT;
 
+class SbmPhysicsObjInterface;
+
 class SbmGeomObject
 {
 public:
 	std::string  color;
-protected:
-	SbmTransform worldState;
-	SbmTransform localTransform;
-	SbmTransform globalTransform;
-	bool         isUpdate;
+protected:	
+	SbmPhysicsObjInterface* attachedPhyObj;
+	SbmTransform localTransform;	
+	SbmTransform combineTransform;	
 public:
-	SbmGeomObject(void);
-	void updateGlobalTransform(const SrMat& gmat);
-	virtual ~SbmGeomObject(void);
-	SbmTransform& getWorldState() { return worldState; }
-	SbmTransform& getGlobalTransform() { return globalTransform; }
-	void setWorldState(SbmTransform& rt);
+	SbmGeomObject(void);	
+	virtual ~SbmGeomObject(void);	
+	void attachToPhyObj(SbmPhysicsObjInterface* phyObj);
+	SbmTransform& getLocalTransform() { return localTransform; }	
+	SbmTransform& getCombineTransform();
 	virtual SrVec getCenter();	
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) = 0; // check if a point is inside the object	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f) { return false; }; // check if a line segment is intersect with the object

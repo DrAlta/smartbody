@@ -492,6 +492,7 @@ public:
 
 		SkMotion* addMirrorMotion(SkMotion* motion);
 		void setPhysicsEngine(bool start);
+		SbmPhysicsSim* getPhysicsEngine() { return physicsEngine; }
 
 
 		int execute( const char *key, srArgBuffer& args ) { 
