@@ -1,86 +1,86 @@
-#include "SBStateManager.h"
+#include "SBAnimationStateManager.h"
 #include <sbm/mcontrol_util.h>
 
 namespace SmartBody {
 
-SBStateManager::SBStateManager()
+SBAnimationStateManager::SBAnimationStateManager()
 {
 }
 
-SBStateManager::~SBStateManager()
+SBAnimationStateManager::~SBAnimationStateManager()
 {
 }
 
-SBState0D* SBStateManager::createState0D(std::string name)
+SBAnimationState0D* SBAnimationStateManager::createState0D(std::string name)
 {
-	SBState0D* state = new SBState0D(name);
+	SBAnimationState0D* state = new SBAnimationState0D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.addPAState(state);
 	return state;
 }
 
-SBState1D* SBStateManager::createState1D(std::string name)
+SBAnimationState1D* SBAnimationStateManager::createState1D(std::string name)
 {
-	SBState1D* state = new SBState1D(name);
+	SBAnimationState1D* state = new SBAnimationState1D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.addPAState(state);
 	return state;
 }
 
-SBState2D* SBStateManager::createState2D(std::string name)
+SBAnimationState2D* SBAnimationStateManager::createState2D(std::string name)
 {
-	SBState2D* state = new SBState2D(name);
+	SBAnimationState2D* state = new SBAnimationState2D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.addPAState(state);
 	return state;
 }
 
-SBState3D* SBStateManager::createState3D(std::string name)
+SBAnimationState3D* SBAnimationStateManager::createState3D(std::string name)
 {
-	SBState3D* state = new SBState3D(name);
+	SBAnimationState3D* state = new SBAnimationState3D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.addPAState(state);
 	return state;
 }
 
-SBTransition* SBStateManager::createTransition(std::string source, std::string dest)
+SBAnimationTransition* SBAnimationStateManager::createTransition(std::string source, std::string dest)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SBState* sourceState = getState(source);
+	SBAnimationState* sourceState = getState(source);
 	if (!sourceState)
 	{
 		LOG("Source state %s does not exist. No transition created.", source.c_str());
 		return NULL;
 	}
-	SBState* destState = getState(dest);
+	SBAnimationState* destState = getState(dest);
 	if (!destState)
 	{
 		LOG("Destination state %s does not exist. No transition created.", dest.c_str());
 		return NULL;
 	}
-	SBTransition* transition = new SBTransition(source + "/" + dest);
+	SBAnimationTransition* transition = new SBAnimationTransition(source + "/" + dest);
 	transition->set(sourceState, destState);
 	mcu.addPATransition(transition);
 	return transition;
 }
 
-SBState* SBStateManager::getState(std::string name)
+SBAnimationState* SBAnimationStateManager::getState(std::string name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	PAStateData* stateData = mcu.lookUpPAState(name);
-	SBState* state = dynamic_cast<SBState*>(stateData);
+	SBAnimationState* state = dynamic_cast<SBAnimationState*>(stateData);
 	return state;
 }
 
-int SBStateManager::getNumStates()
+int SBAnimationStateManager::getNumStates()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	return mcu.param_anim_states.size();
 }
 
-std::vector<std::string> SBStateManager::getStateNames()
+std::vector<std::string> SBAnimationStateManager::getStateNames()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
@@ -92,24 +92,24 @@ std::vector<std::string> SBStateManager::getStateNames()
 	return states;
 }
 
-SBTransition* SBStateManager::getTransition(std::string source, std::string dest)
+SBAnimationTransition* SBAnimationStateManager::getTransition(std::string source, std::string dest)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	PATransitionData* transitionData = mcu.lookUpPATransition(source, dest);
-	SBTransition* transition = dynamic_cast<SBTransition*>(transitionData);
+	SBAnimationTransition* transition = dynamic_cast<SBAnimationTransition*>(transitionData);
 
 	return transition;
 }
 
-int SBStateManager::getNumTransitions()
+int SBAnimationStateManager::getNumTransitions()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	return mcu.param_anim_transitions.size();
 }
 
-std::vector<std::string> SBStateManager::getTransitionNames()
+std::vector<std::string> SBAnimationStateManager::getTransitionNames()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
