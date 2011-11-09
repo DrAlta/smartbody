@@ -2,7 +2,7 @@
 #define _SBTRANSITION_H_
 
 #include <sbm/me_ct_param_animation_data.h>
-#include <sbm/SBState.h>
+#include <sbm/SBAnimationState.h>
 namespace SmartBody {
 
 class SBTransition : public PATransitionData
@@ -12,13 +12,13 @@ class SBTransition : public PATransitionData
 		SBTransition(std::string name);
 		~SBTransition();
 
-		void set(SBState* source, SBState* dest);
+		void set(SBAnimationState* source, SBAnimationState* dest);
 		void addCorrespondancePoint(std::string sourceMotion, std::string destMotion, float sourceFromTime, float sourceToTime, float destFromTime, float destToTime);
 		int getNumCorrespondancePoints();
 		std::vector<float> getCorrespondancePoint(int num);
 
-		SBState* getFromState();
-		SBState* getToState();
+		SBAnimationState* getFromState();
+		SBAnimationState* getToState();
 
 	protected:
 

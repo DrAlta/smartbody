@@ -305,8 +305,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SBController.cpp
 	sbm/SBSimulationManager.cpp
 	sbm/SBBmlProcessor.cpp
-	sbm/SBState.cpp
-	sbm/SBTransition.cpp
+	sbm/SBAnimationState.cpp
+	sbm/SBAnimationTransition.cpp
 	sbm/SBStateManager.cpp
 	sbm/SBMotion.cpp
 	sbm/SBFaceDefinition.cpp
