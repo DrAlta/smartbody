@@ -112,7 +112,10 @@ bool SBState::addSkMotion(std::string motion)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SkMotion* skMotion = mcu.lookUpMotion(motion.c_str());
 	if (skMotion)
+	{
 		motions.push_back(skMotion);
+		skMotion->ref();
+	}
 	else
 	{
 		LOG("SBState add sk motion failure, %s doesn't exist", motion.c_str());

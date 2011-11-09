@@ -6,3 +6,6 @@ scene.run("stateAllStarting.py")
 scene.run("stateAllIdleTurn.py")
 # step state, stepping adjusting
 scene.run("stateAllStep.py")
+
+# transitions
+scene.run("transitions.py")
