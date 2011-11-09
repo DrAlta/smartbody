@@ -205,6 +205,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getNumCharacters", &SBScene::getNumCharacters, "Returns the number of characters.\n Input: NULL \nOutput: number of characters.")
 		.def("getPawn", &SBScene::getPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the pawn object given its name. \n Input: pawn name \nOutput: pawn object")
 		.def("getCharacter", &SBScene::getCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the character object given its name. \n Input: character name \nOutput: character object")
+		.def("getSkeleton", &SBScene::getSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skeleton object given its name. \n Input: skeleton name \nOutput: skeleton object")
 		.def("getMotion", &SBScene::getMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a the motion of given name.")
 		.def("getNumMotions", &SBScene::getNumMotions, "Returns the number of motions available.")
 		.def("getMotionNames", &SBScene::getMotionNames, "Returns the names of motions available.")
@@ -400,30 +401,33 @@ BOOST_PYTHON_MODULE(SmartBody)
 		;
 
 	boost::python::class_<SBState>("SBState")
-		.def("addCorrespondancePoints", &SBState::addCorrespondancePoints, "")
-		.def("getNumMotions", &SBState::getNumMotions, "")
-		.def("getMotion", &SBState::getMotion, boost::python::return_value_policy<boost::python::return_by_value>(), "")
-		.def("getNumCorrespondancePoints", &SBState::getNumCorrespondancePoints, "")
-		.def("getCorrespondancePoints", &SBState::getCorrespondancePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "")
-		.def("getDimension", &SBState::getDimension, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		.def("addCorrespondancePoints", &SBState::addCorrespondancePoints, "Correspondance points for motions inside the state.")
+		.def("getNumMotions", &SBState::getNumMotions, "Number of motions inside the state.")
+		.def("getMotion", &SBState::getMotion, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the motion name given index. \n Input: index of motion \n Output: motion name")
+		.def("getNumCorrespondancePoints", &SBState::getNumCorrespondancePoints, "Number of correspondance points for the motions in the state")
+		.def("getCorrespondancePoints", &SBState::getCorrespondancePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the correspondance points in one motion given the index. \n Input: index of motion \n Output: correspondance points vector of this motion")
+		.def("getDimension", &SBState::getDimension, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the dimension of the state. Dimension represents the number of parameter for each motion. 0D means no parameter, 1D means one parameter for each motion etc.")
 		;
 
 	boost::python::class_<SBState0D, boost::python::bases<SBState> >("SBState0D")
-		.def("addMotion", &SBState0D::addMotion, "")
+		.def("addMotion", &SBState0D::addMotion, "Add motion to 0D state. \n Input: motion name. \n Output: NULL")
 	;
 
 	boost::python::class_<SBState1D, boost::python::bases<SBState> >("SBState1D")
-		.def("addMotion", &SBState1D::addMotion, "")
+		.def("addMotion", &SBState1D::addMotion, "Add motion and one parameter to 1D state. \n Input: motion name, parameter. \n Output: NULL")
+		.def("setParameter", &SBState1D::setParameter, "Set/Change the parameter for given motion. \n Input: motion name, parameter. \n Output: NULL")
 	;
 
 	boost::python::class_<SBState2D, boost::python::bases<SBState> >("SBState2D")
-		.def("addMotion", &SBState2D::addMotion, "")
-		.def("addTriangle", &SBState2D::addTriangle, "")
+		.def("addMotion", &SBState2D::addMotion, "Add motion and two parameters to 2D state. \n Input: motion name, parameter1, parameter2. \n Output: NULL")
+		.def("setParameter", &SBState2D::setParameter, "Set/Change the parameter for given motion. \n Input: motion name, parameter1, parameter2. \n Output: NULL")
+		.def("addTriangle", &SBState2D::addTriangle, "Add triangles to the state. By changing the point inside triangle, you can get different blending weights and different results")
 	;
 
 	boost::python::class_<SBState3D, boost::python::bases<SBState> >("SBState3D")
-		.def("addMotion", &SBState3D::addMotion, "")
-		.def("addTetrahedron", &SBState3D::addTetrahedron, "")
+		.def("addMotion", &SBState3D::addMotion, "Add motion and three parameters to 3D state. \n Input: motion name, parameter1, parameter2, parameter3. \n Output: NULL")
+		.def("setParameter", &SBState3D::setParameter, "Set/Change the parameter for given motion. \n Input: motion name, parameter1, parameter2, parameter3. \n Output: NULL")
+		.def("addTetrahedron", &SBState3D::addTetrahedron, "Add tetrahedrons to the state. By changing the point inside tetrahedron, you can get different blending weights and different results")
 	;
 
 	boost::python::class_<SBTransition>("SBTransition")
@@ -520,6 +524,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("connect", &SBMotion::connect, "Connect current motion to a skeleton object so the channels inside the motion are mapped to the channels inside skeleton. \n Input: Skeleton Object \n Output: NULL")
 		.def("disconnect", &SBMotion::disconnect, "Disconnect current motion with current skeleton object. \n Input: NULL \n Output: NULL")
 		.def("mirror", &SBMotion::mirror, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Mirrors the motion.")
+		.def("getJointSpeed", &SBMotion::getJointSpeed, "Get the accumulative joint speed. \n Input: SBJoint, start time, end time \n Output: joint speed(unit: same with the skeleton)")
+		.def("getJointAngularSpeed", &SBMotion::getJointAngularSpeed, "Get the joint accumulative angular speed. \n Input: SBJoint, start time, end time \n Output: joint angular speed(unit: degree/sec)")		
 		;
 
 

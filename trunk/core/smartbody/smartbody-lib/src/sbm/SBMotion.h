@@ -4,6 +4,7 @@
 #include <vector>
 #include <sbm/SBSkeleton.h>
 #include <sk/sk_motion.h>
+#include <sbm/SBJoint.h>
 
 namespace SmartBody {
 
@@ -28,6 +29,9 @@ class SBMotion : public SkMotion
 		virtual void disconnect();
 
 		SBMotion* mirror(std::string name);
+
+		float getJointSpeed(SBJoint* joint, float startTime, float endTime);
+		float getJointAngularSpeed(SBJoint* joint, float startTime, float endTime);
 
 	protected:
 		std::string _motionFile;

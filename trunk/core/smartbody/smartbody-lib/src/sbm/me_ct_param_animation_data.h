@@ -113,9 +113,9 @@ class ParameterManager
 		void getParameter(float& x);
 		void getParameter(float& x, float& y);
 		void getParameter(float& x, float& y, float& z);
-		void addParameter(const std::string& motion, double x);
-		void addParameter(const std::string& motion, double x, double y);
-		void addParameter(const std::string& motion, double x, double y, double z);
+		void setParameter(const std::string& motion, double x);
+		void setParameter(const std::string& motion, double x, double y);
+		void setParameter(const std::string& motion, double x, double y, double z);
 		void addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3);
 		void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
 		void buildTetrahedron();

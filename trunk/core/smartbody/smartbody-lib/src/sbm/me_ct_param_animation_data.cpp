@@ -560,34 +560,59 @@ void ParameterManager::getParameter(float& x, float& y, float& z)
 	}
 }
 
-void ParameterManager::addParameter(const std::string& motion, double x)
+void ParameterManager::setParameter(const std::string& motion, double x)
 {
+	type = 0;
 	SrVec vec;
 	vec.x = (float)x;
+	for (size_t i = 0; i < motionNames.size(); i++)
+	{
+		if (motionNames[i] == motion)
+		{
+			parameters[i] = vec;
+			return;
+		}
+	} 
 	motionNames.push_back(motion);
 	parameters.push_back(vec);
-	type = 0;
 }
 
-void ParameterManager::addParameter(const std::string& motion, double x, double y)
+void ParameterManager::setParameter(const std::string& motion, double x, double y)
 {
+	type = 1;
 	SrVec vec;
 	vec.x = (float)x;
 	vec.y = (float)y;
+	for (size_t i = 0; i < motionNames.size(); i++)
+	{
+		if (motionNames[i] == motion)
+		{
+			parameters[i] = vec;
+			return;
+		}
+	}
 	motionNames.push_back(motion);
 	parameters.push_back(vec);
-	type = 1;
+
 }
 
-void ParameterManager::addParameter(const std::string& motion, double x, double y, double z)
+void ParameterManager::setParameter(const std::string& motion, double x, double y, double z)
 {
+	type = 2;
 	SrVec vec;
 	vec.x = (float)x;
 	vec.y = (float)y;
 	vec.z = (float)z;
+	for (size_t i = 0; i < motionNames.size(); i++)
+	{
+		if (motionNames[i] == motion)
+		{
+			parameters[i] = vec;
+			return;
+		}
+	}
 	motionNames.push_back(motion);
 	parameters.push_back(vec);
-	type = 2;
 }
 
 void ParameterManager::addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)

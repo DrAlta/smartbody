@@ -23,6 +23,10 @@ class SBState : public PAStateData
 
 	protected:
 		bool addSkMotion(std::string motionName);
+		/*
+			This function make sure that all the correspondance points are in ascendant order
+		*/
+		void validateCorrespondancePoints();
 
 	protected:
 		std::string _dimension;
@@ -48,6 +52,7 @@ class SBState1D : public SBState
 		~SBState1D();
 
 		void addMotion(std::string motion, float parameter);
+		void setParameter(std::string motion, float parameter);
 };
 
 class SBState2D : public SBState
@@ -58,8 +63,8 @@ class SBState2D : public SBState
 		~SBState2D();
 
 		void addMotion(std::string motion, float parameter1, float paramter2);
+		void setParameter(std::string motion, float parameter1, float parameter2);
 		void addTriangle(std::string motion1, std::string motion2, std::string motion3);
-
 };
 
 class SBState3D : public SBState
@@ -70,6 +75,7 @@ class SBState3D : public SBState
 		~SBState3D();
 
 		void addMotion(std::string motion, float parameter1, float paramter2, float paramter3);
+		void setParameter(std::string motion, float parameter1, float parameter2, float parameter3);
 		void addTetrahedron(std::string motion1, std::string motion2, std::string motion3,std::string motion4);
 
 };

@@ -56,6 +56,8 @@ void SBState::addCorrespondancePoints(std::vector<std::string> motionNames, std:
 	{
 		keys[i].push_back(points[i]);
 	}
+
+	validateCorrespondancePoints();
 }
 
 int SBState::getNumMotions()
@@ -106,6 +108,7 @@ bool SBState::addSkMotion(std::string motion)
 		weights.push_back(0.0);
 	//---
 
+	//TODO: remove skMotion maybe
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SkMotion* skMotion = mcu.lookUpMotion(motion.c_str());
 	if (skMotion)
@@ -116,6 +119,26 @@ bool SBState::addSkMotion(std::string motion)
 		return false;
 	}
 	return true;
+}
+
+/*
+	P.S. This is organized way, but is not a efficient way to do it
+*/
+void SBState::validateCorrespondancePoints()
+{
+	for (int i = 0; i < getNumMotions(); i++)
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		SkMotion* skMotion = mcu.lookUpMotion(motions[i]->getName().c_str());		
+		for (int j = 1; j < getNumCorrespondancePoints(); j++)
+		{
+			if (keys[i][j] < keys[i][j - 1])
+			{
+				for (int k = j; k < getNumCorrespondancePoints(); k++)
+					keys[i][k] += skMotion->duration();
+			}
+		}
+	}
 }
 
 SBState0D::SBState0D() : SBState("unknown")
@@ -155,7 +178,12 @@ void SBState1D::addMotion(std::string motion, float parameter)
 	addSkMotion(motion);
 
 	paramManager->setType(0);
-	paramManager->addParameter(motion, parameter);
+	paramManager->setParameter(motion, parameter);
+}
+
+void SBState1D::setParameter(std::string motion, float parameter)
+{
+	paramManager->setParameter(motion, parameter);
 }
 
 SBState2D::SBState2D() : SBState("unknown")
@@ -176,7 +204,12 @@ void SBState2D::addMotion(std::string motion, float parameter1, float parameter2
 	addSkMotion(motion);
 	
 	paramManager->setType(1);
-	paramManager->addParameter(motion, parameter1, parameter2);
+	paramManager->setParameter(motion, parameter1, parameter2);
+}
+
+void SBState2D::setParameter(std::string motion, float parameter1, float parameter2)
+{
+	paramManager->setParameter(motion, parameter1, parameter2);
 }
 
 void SBState2D::addTriangle(std::string motion1, std::string motion2, std::string motion3)
@@ -204,11 +237,17 @@ void SBState3D::addMotion(std::string motion, float parameter1, float parameter2
 	addSkMotion(motion);
 	
 	paramManager->setType(1);
-	paramManager->addParameter(motion, parameter1, parameter2, parameter3);
+	paramManager->setParameter(motion, parameter1, parameter2, parameter3);
+}
+
+void SBState3D::setParameter(std::string motion, float parameter1, float parameter2, float parameter3)
+{
+	paramManager->setParameter(motion, parameter1, parameter2, parameter3);
 }
 
 void SBState3D::addTetrahedron(std::string motion1, std::string motion2, std::string motion3,std::string motion4)
 {
+	paramManager->addTetrahedron(motion1, motion2, motion3, motion4);
 }
 
 }

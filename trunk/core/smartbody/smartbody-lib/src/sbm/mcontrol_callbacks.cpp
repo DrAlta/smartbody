@@ -949,7 +949,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 						if (motionId < 0) return CMD_FAILURE;
 						double param = parseMotionParameters(m, parameter, state->keys[motionId][0], state->keys[motionId][state->getNumKeys() - 1]);
 						if (param < -9000) param = atof(parameter.c_str());
-						state->paramManager->addParameter(m, param);
+						state->paramManager->setParameter(m, param);
 					}
 					else if (type == "2D")
 					{
@@ -959,7 +959,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 						double paramY = parseMotionParameters(m, parameterY, state->keys[state->getMotionId(m)][0], state->keys[state->getMotionId(m)][state->getNumKeys() - 1]);
 						if (paramX < -9000) paramX = atof(parameterX.c_str());
 						if (paramY < -9000) paramY = atof(parameterY.c_str());
-						state->paramManager->addParameter(m, paramX, paramY);
+						state->paramManager->setParameter(m, paramX, paramY);
 					}
 					else if (type == "3D")
 					{
@@ -970,7 +970,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 							param[pc] = parseMotionParameters(m, para, state->keys[state->getMotionId(m)][0], state->keys[state->getMotionId(m)][state->getNumKeys() - 1]);
 							if (param[pc] < -9000) param[pc] = atof(para.c_str());
 						}
-						state->paramManager->addParameter(m, param[0], param[1], param[2]);
+						state->paramManager->setParameter(m, param[0], param[1], param[2]);
 					}
 				}
 //				if (type == "3D")
