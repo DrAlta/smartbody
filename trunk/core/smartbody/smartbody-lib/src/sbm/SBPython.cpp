@@ -688,7 +688,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def(boost::python::init<float, float, float>())
 		.def("getData", &SrVec::getData, "gets the x,y,z values")
 		.def("setData", &SrVec::setData, "sets the x,y,z values")
-		.def("norm", &SrVec::norm, "gets the length of the vector")
+		.def("len", &SrVec::norm, "gets the length of the vector")
 		.def("normalize", &SrVec::normalize, "normalizes the vector")
 		.def("isZero", &SrVec::iszero, "returns True if the vector is zero")
 		;
