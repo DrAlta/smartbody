@@ -32,6 +32,7 @@ class SBMotion : public SkMotion
 
 		float getJointSpeed(SBJoint* joint, float startTime, float endTime);
 		float getJointAngularSpeed(SBJoint* joint, float startTime, float endTime);
+		std::vector<float> getJointTransition(SBJoint* joint, float startTime, float endTime);
 
 	protected:
 		std::string _motionFile;
