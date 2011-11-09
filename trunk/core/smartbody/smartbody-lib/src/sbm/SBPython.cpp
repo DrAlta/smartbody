@@ -18,7 +18,7 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 			try {
 				o(character, name, isAnimate, position, velocity, relativePosition, relativeVelocity);
 			} catch (...) {
-				LOG("Problem running Python command 'objectEvent'.");
+				PyErr_Print();
 			}
 		}
 	}
@@ -35,7 +35,7 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 			try {
 				return o(character, to, messageId, xml);
 			} catch (...) {
-				LOG("Problem running Python command 'execute'.");
+				PyErr_Print();
 			}
 		}
 
@@ -59,7 +59,7 @@ struct EventHandlerWrap :  EventHandler, boost::python::wrapper<EventHandler>
 			try {
 				o(event);
 			} catch (...) {
-				LOG("Problem running Python for EventHandler in 'executeAction'.");
+				PyErr_Print();
 			}
 		}
 
@@ -83,7 +83,7 @@ struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrappe
 			try {
 				o();
 			} catch (...) {
-				LOG("Problem running PythonController command 'start'.");
+				PyErr_Print();
 			}
 		}
 
@@ -102,7 +102,7 @@ struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrappe
 			try {
 				o();
 			} catch (...) {
-				LOG("Problem running PythonController command 'init'.");
+				PyErr_Print();
 			}
 		}
 
@@ -121,7 +121,7 @@ struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrappe
 			try {
 				o();
 			} catch (...) {
-				LOG("Problem running PythonController command 'evaluate'.");
+				PyErr_Print();
 			}
 		}
 
@@ -140,7 +140,7 @@ struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrappe
 			try {
 				o();
 			} catch (...) {
-				LOG("Problem running PythonController command 'stop'.");
+				PyErr_Print();
 			}
 		}
 
@@ -688,12 +688,17 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def(boost::python::init<float, float, float>())
 		.def("getData", &SrVec::getData, "gets the x,y,z values")
 		.def("setData", &SrVec::setData, "sets the x,y,z values")
+		.def("norm", &SrVec::norm, "gets the length of the vector")
+		.def("normalize", &SrVec::normalize, "normalizes the vector")
+		.def("isZero", &SrVec::iszero, "returns True if the vector is zero")
 		;
 
 	boost::python::class_<SrMat>("SrMat")
 		.def(boost::python::init<>())
 		.def("getData", &SrMat::getData, "gets the data in the matrix at r,c")
 		.def("setData", &SrMat::setData, "sets the data in the matrix at r,c")
+		.def("identity", &SrMat::identity, "sets the data in the matrix to an identity matrix")
+		.def("transpose", &SrMat::transpose, "transposes the data in the matrix")
 		;
 
 	boost::python::class_<SrQuat>("SrQuat")
