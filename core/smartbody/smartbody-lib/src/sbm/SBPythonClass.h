@@ -123,52 +123,6 @@ class Camera
 		void removeTrack();
 };
 
-/*
-class Script
-{
-	public:
-		Script();
-		Script(std::string seqName);
-		~Script();
-
-		void print();
-		void run();
-		void abort();
-
-		void setType(const std::string& typ) {type = typ;}
-		const std::string& getType()		{return type;}
-
-	protected:
-		std::string seq;
-		void preProcessingScript(srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p);
-		std::string type;
-};
-
-*/
-
-/*
-class Viseme
-{
-	public:
-		Viseme();
-		~Viseme();
-		void setVisemeName(const std::string& name) {visemeName = name;}
-		const std::string& getVisemeName() {return visemeName;}
-		void setCharName(const std::string& name) {charName = name;}
-		const std::string& getCharName() {return charName;}
-
-		void setWeight(float weight, float dur, float rampin, float rampout);
-		void setCurve(int num, boost::python::list weights);
-
-	protected:
-		std::string visemeName;
-		std::string charName;
-};
-*/
-
-// SmartBody functions
-
-
 void pythonExit();
 void quitSbm();
 void reset();
@@ -183,7 +137,6 @@ SrViewer* getViewer();
 GenericViewer* getBmlViewer();
 GenericViewer* getDataViewer();
 
-void execScripts(boost::python::list& input);
 //Script* getScript(std::string fileName);
 void showCommandResources();
 void showMotionResources();
