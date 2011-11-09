@@ -74,8 +74,8 @@ endif()
 
 target_link_libraries( sbm-fltk
 
-	tcmalloc
-	profiler
+	#tcmalloc
+	#profiler
 	smartbody-lib
 	bonebus
 	vhmsg
