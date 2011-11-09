@@ -248,4 +248,43 @@ float SBMotion::getJointAngularSpeed(SBJoint* joint, float startTime, float endT
 	return accAngularSpd;
 }
 
+std::vector<float> SBMotion::getJointTransition(SBJoint* joint, float startTime, float endTime)
+{
+	std::vector<float> transitions;
+	if (connected_skeleton() == NULL)
+	{
+		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
+		transitions.push_back(0);
+		transitions.push_back(0);
+		transitions.push_back(0);
+		return transitions;
+	}
+	float dt = duration() / float(frames() - 1);
+	int minFrameId = int(startTime / dt);
+	int maxFrameId = int(endTime / dt);
+	apply_frame(minFrameId);
+	connected_skeleton()->update_global_matrices();
+	const SrMat& srcMat = joint->gmat();
+	const SrMat& srcMat0 = joint->gmatZero();
+	SrVec srcPnt = SrVec(srcMat.get(12), srcMat.get(13), srcMat.get(14));
+	float rx, ry, rz;
+	float rx0, ry0, rz0;
+	sr_euler_angles(rotType, srcMat, rx, ry, rz);
+	sr_euler_angles(rotType, srcMat0, rx0, ry0, rz0);
+	apply_frame(maxFrameId);
+	connected_skeleton()->update_global_matrices();
+	const SrMat& destMat = joint->gmat();
+	SrVec destPnt = SrVec(destMat.get(12), destMat.get(13), destMat.get(14));
+	SrVec transitionVec = destPnt - srcPnt;
+	SrVec heading = SrVec(sin(ry - ry0 - 1.57f), 0, cos(ry - ry0 - 1.57f));
+	float x = dot(transitionVec, heading);
+	transitions.push_back(x);
+	float y = destMat.get(14) - srcMat.get(14);
+	transitions.push_back(y);
+	heading = SrVec(sin(ry - ry0), 0, cos(ry - ry0));
+	float z = dot(transitionVec, heading);
+	transitions.push_back(z);
+	return transitions;
+}
+
 };
