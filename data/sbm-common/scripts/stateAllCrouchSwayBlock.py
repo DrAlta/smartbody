@@ -1,8 +1,7 @@
-# mirror functions here...
+print "** State: allCrouchSwayBlock"
 
 stateManager = scene.getStateManager()
-
-state2 = stateManager.createState2D("allCrouchSwayBlock")
+state = stateManager.createState2D("allCrouchSwayBlock")
 
 motions = StringVec()
 motions.append("ChrUtah_CrouchBlock02High_swayLf")

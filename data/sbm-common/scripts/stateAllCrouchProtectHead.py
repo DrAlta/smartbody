@@ -1,8 +1,9 @@
-# mirror functions here...
+print "** State: allCrouchProtectHead"
+
+mirrorMotion = scene.getMotion("ChrUtah_Relax001_CrouchProtectHead_right")
+mirrorMotion.mirror("ChrUtah_Relax001_CrouchProtectHead_left")
 
 stateManager = scene.getStateManager()
-
-print "** State: allCrouchProtectHead"
 state1 = stateManager.createState1D("allCrouchProtectHead")
 motions = StringVec()
 motions.append("ChrUtah_Relax001_CrouchProtectHead_center")

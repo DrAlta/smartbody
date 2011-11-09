@@ -1,6 +1,7 @@
 #include "SBMotion.h"
 #include <sbm/mcontrol_util.h>
 #include <sbm/me_utilities.hpp>
+#include <sr/sr_euler.h>
 
 namespace SmartBody {
 
@@ -181,6 +182,70 @@ SBMotion* SBMotion::mirror(std::string name)
 		mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, motion));
 	}
 	return sbmotion;
+}
+
+float SBMotion::getJointSpeed(SBJoint* joint, float startTime, float endTime)
+{
+	if (connected_skeleton() == NULL)
+	{
+		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
+		return 0;
+	}
+
+	float dt = duration() / float(frames() - 1);
+	int minFrameId = int(startTime / dt);
+	int maxFrameId = int(endTime / dt);
+	float distance = 0;
+	for (int i = minFrameId; i < maxFrameId - 1; i++)
+	{
+		apply_frame(i);
+		connected_skeleton()->update_global_matrices();
+		const SrMat& srcMat = joint->gmat();
+		SrVec srcPt = SrVec(srcMat.get(12), srcMat.get(13), srcMat.get(14));
+		apply_frame(i + 1);
+		connected_skeleton()->update_global_matrices();
+		const SrMat& destMat = joint->gmat();
+		SrVec destPt = SrVec(destMat.get(12), destMat.get(13), destMat.get(14));
+		distance += dist(srcPt, destPt);
+	}
+	float accSpd = distance / (endTime - startTime);
+	return accSpd;
+}
+
+float SBMotion::getJointAngularSpeed(SBJoint* joint, float startTime, float endTime)
+{
+	if (connected_skeleton() == NULL)
+	{
+		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
+		return 0;
+	}
+	float dt = duration() / float(frames() - 1);
+	int minFrameId = int(startTime / dt);
+	int maxFrameId = int(endTime / dt);
+	float diffRotY = 0.0f;
+	for (int i = minFrameId; i < maxFrameId - 1; i++)
+	{
+		apply_frame(i);
+		connected_skeleton()->update_global_matrices();
+		const SrMat& srcMat = joint->gmat();
+		float rx, ry, rz;
+		sr_euler_angles(rotType, srcMat, rx, ry, rz);
+		float srcRotY = ry;
+		apply_frame(i + 1);
+		connected_skeleton()->update_global_matrices();
+		const SrMat& destMat = joint->gmat();
+		sr_euler_angles(rotType, destMat, rx, ry, rz);
+		float destRotY = ry;
+		float diff;
+		if (destRotY * srcRotY < 0 && fabs(destRotY) > 1.0f)
+			diff = - destRotY - srcRotY;
+		else
+			diff = destRotY - srcRotY;
+		diffRotY += diff;
+	}
+	float accAngularSpd = diffRotY / (endTime - startTime);
+	accAngularSpd *= (180.0f/ float(M_PI));
+	return accAngularSpd;
 }
 
 };

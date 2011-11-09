@@ -30,6 +30,7 @@ class SBScene : public SBObject
 		int getNumCharacters();
 		int getNumPawns();
 		SBCharacter* getCharacter(std::string name);
+		SBSkeleton* getSkeleton(std::string name);
 		SBPawn* getPawn(std::string name);
 
 		SBFaceDefinition* createFaceDefinition(const std::string& name);

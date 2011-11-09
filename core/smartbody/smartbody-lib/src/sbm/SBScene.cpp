@@ -142,6 +142,17 @@ SBCharacter* SBScene::getCharacter(std::string name)
 	}
 }
 
+SBSkeleton* SBScene::getSkeleton(std::string name)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::map<std::string, SkSkeleton*>::iterator iter = mcu.skeleton_map.find(name);
+	SkSkeleton* skskel = NULL;
+	if (iter != mcuCBHandle::singleton().skeleton_map.end())
+		skskel = iter->second;
+	SBSkeleton* sbskel = dynamic_cast<SBSkeleton*>(skskel);
+	return sbskel;
+}
+
 SBMotion* SBScene::getMotion(std::string name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
