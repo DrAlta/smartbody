@@ -2844,6 +2844,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\SBScript.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBScript.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SBSimulationManager.cpp"
 				>
 			</File>

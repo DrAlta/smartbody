@@ -76,7 +76,6 @@ scene.run("init-param-animation.py")
 # start the simulation
 sim.start()
 
-#scene.command("seq init-param-animation inline")
 scene.command("seq init-example-reach inline")
 
 bml.execBML('doctor', '<body posture="LHandOnHip_Motex"/>')

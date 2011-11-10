@@ -5,6 +5,7 @@
 #include <sbm/SBObject.h>
 #include <sbm/SBCharacter.h>
 #include <sbm/SBMotion.h>
+#include <sbm/SBScript.h>
 #include <sbm/Event.h>
 #include <sbm/SBSimulationManager.h>
 #include <sbm/SBBmlProcessor.h>
@@ -60,6 +61,13 @@ class SBScene : public SBObject
 		void setDefaultCharacter(const std::string& character);
 		void setDefaultRecipient(const std::string& recipient);
 
+		void addScript(std::string name, SBScript* script);
+		void removeScript(std::string name);
+		int getNumScripts();
+		SBScript* getScript(std::string name);
+		std::vector<std::string> getScriptNames();
+		std::map<std::string, SBScript*>& getScripts();
+
 		EventManager* getEventManager();		
 		SBSimulationManager* getSimulationManager();
 		Profiler* getProfiler();
@@ -73,6 +81,8 @@ class SBScene : public SBObject
 		Profiler* _profiler;
 		SBBmlProcessor* _bml;
 		SBAnimationStateManager* _stateManager;
+
+		std::map<std::string, SBScript*> _scripts;
 };
 
 };
