@@ -101,8 +101,39 @@ void SBSimulationManager::reset()
 void SBSimulationManager::start()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	// run the start scripts
+	std::map<std::string, SBScript*>& scripts = mcu._scene->getScripts();
+	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
+		 iter != scripts.end();
+		 iter++)
+	{
+		(*iter).second->start();
+	}
+	
+
 	if (mcu.timer_p)	
 		mcu.timer_p->start();
+	else
+		LOG("Time regulator not exist!");
+}
+
+void SBSimulationManager::stop()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	// run the stop scripts
+	std::map<std::string, SBScript*>& scripts = mcu._scene->getScripts();
+	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
+		 iter != scripts.end();
+		 iter++)
+	{
+		(*iter).second->stop();
+	}
+	
+
+	if (mcu.timer_p)	
+		mcu.timer_p->stop();
 	else
 		LOG("Time regulator not exist!");
 }

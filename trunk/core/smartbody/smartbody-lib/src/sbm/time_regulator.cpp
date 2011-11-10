@@ -169,6 +169,10 @@ void TimeRegulator::start( double in_time ) {
 	started = true;
 }
 
+void TimeRegulator::stop(  ) {
+	pause();
+}
+
 void TimeRegulator::reset( double in_time ) {
 
 	double reset_val;

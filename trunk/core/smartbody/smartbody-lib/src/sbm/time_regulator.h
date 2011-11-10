@@ -127,6 +127,7 @@ class TimeRegulator	{
 		}
 		
 		void start( double in_time = -1.0 );
+		void stop( void );
 		void reset( double in_time = -1.0 );
 		bool update( double in_time = -1.0 );
 

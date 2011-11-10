@@ -1008,6 +1008,16 @@ int mcuCBHandle::remove_scene( SrSnGroup *scene_p )	{
 
 void mcuCBHandle::update( void )	{
 
+	std::map<std::string, SBScript*>& scripts = _scene->getScripts();
+
+	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
+		iter != scripts.end();
+		iter++)
+	{
+		(*iter).second->beforeUpdate();
+	}
+
+
 #if 0
 	static int c = 3;
 	if( c )	{
@@ -1223,6 +1233,20 @@ void mcuCBHandle::update( void )	{
 	if (panimationviewer_p)
 		panimationviewer_p->update_viewer();
 
+
+	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
+		iter != scripts.end();
+		iter++)
+	{
+		(*iter).second->update(time);
+	}
+
+	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
+		iter != scripts.end();
+		iter++)
+	{
+		(*iter).second->afterUpdate();
+	}
 	
 }
 

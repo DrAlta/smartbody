@@ -47,6 +47,96 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 		return Nvbg::execute(character, to, messageId, xml);
 	}
 };
+
+
+struct SBScriptWrap :  SBScript, boost::python::wrapper<SBScript>
+{
+	virtual void start()
+	{
+		if (boost::python::override o = this->get_override("start"))
+		{
+			try {
+				o();
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+	}
+
+	void default_start()
+	{
+		return SBScript::start();
+	}
+
+	virtual void stop()
+	{
+		if (boost::python::override o = this->get_override("stop"))
+		{
+			try {
+				o();
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+	}
+
+	void default_stop()
+	{
+		return SBScript::stop();
+	}
+
+	virtual void beforeUpdate()
+	{
+		if (boost::python::override o = this->get_override("beforeUpdate"))
+		{
+			try {
+				o();
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+	}
+
+	void default_beforeUpdate()
+	{
+		return SBScript::beforeUpdate();
+	}
+
+	virtual void update(double time)
+	{
+		if (boost::python::override o = this->get_override("update"))
+		{
+			try {
+				o(time);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+	}
+
+	void default_update(double time)
+	{
+		return SBScript::update(time);
+	}
+
+	virtual void afterUpdate()
+	{
+		if (boost::python::override o = this->get_override("afterUpdate"))
+		{
+			try {
+				o();
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+	}
+
+	void default_afterUpdate()
+	{
+		return SBScript::afterUpdate();
+	}
+};
+
 #endif
 
 #if !defined (__ANDROID__) && !defined(SBM_IPHONE)
@@ -220,12 +310,20 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("setDefaultCharacter", &SBScene::setDefaultCharacter, "Sets the default character.")
 		.def("setDefaultRecipient", &SBScene::setDefaultRecipient, "Sets the default recipient.")
 		.def("createSkeleton", &SBScene::createSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a skeleton definition.")
-		.def("getEventManager", &SBScene::getEventManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event manager.")
+		.def("addScript", &SBScene::addScript, "Adds a script to the scene.")
+		.def("removeScript", &SBScene::removeScript, "Returns the number of scripts.")
+		.def("getNumScripts", &SBScene::getNumScripts, "Returns the number of scripts.")
+		.def("getScriptNames", &SBScene::getScriptNames, "Returns the names of all the scripts.")
+		.def("getScript", &SBScene::getScript, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a script.")
+
+		// command processing
 		.def("command", &SBScene::command, "Runs an old-Style SmartBody command.")
 		.def("commandAt", &SBScene::commandAt, "Runs an old-style SmartBody command at a set time in the future.")
 		.def("vhmsg", &SBScene::sendVHMsg, "Sends a virtual human message.")
 		.def("vhmsg2", &SBScene::sendVHMsg2, "Sends a virtual human message.")
 		.def("run", &SBScene::runScript, "Runs a python script.")
+		// managers
+		.def("getEventManager", &SBScene::getEventManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event manager.")
 		.def("getSimulationManager", &SBScene::getSimulationManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the simulation manager object. \n Input: NULL \n Output: time manager object")
 		.def("getProfiler", &SBScene::getProfiler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the  profiler object. \n Input: NULL \n Output: time profiler object")
 		.def("getBmlProcessor", &SBScene::getBmlProcessor, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the bml processor object.\n Input: NULL \nOutput: bml processor object")
@@ -358,6 +456,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("printPerf", &SBSimulationManager::printPerf, "Print performance statistics calculated real time given a time period as input. \n Input: NULL \n Output: NULL")
 		.def("getTime", &SBSimulationManager::getTime, "Get the current simulation time. \n Input: NULL \n Output: current simulation time")
 		.def("start", &SBSimulationManager::start, "Start the simulation.")
+		.def("stop", &SBSimulationManager::stop, "Stop the simulation.")
 		.def("reset", &SBSimulationManager::reset, "Set the clock time to 0. \n Input: NULL \n Output: NULL")
 		.def("pause", &SBSimulationManager::pause, "Pause the clock. \n Input: NULL \n Output: NULL")
 		.def("resume", &SBSimulationManager::resume, "Resume the clock. \n Input: NULL \n Output: NULL")
@@ -721,6 +820,13 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor.")
 		;
 
+	boost::python::class_<SBScriptWrap, boost::noncopyable>("SBScript")
+		.def("start", &SBScript::start, &SBScriptWrap::default_start, "Script start.")
+		.def("beforeUpdate", &SBScript::beforeUpdate, &SBScriptWrap::default_beforeUpdate, "Script before update step.")
+		.def("update", &SBScript::update, &SBScriptWrap::default_update, "Script updates.")
+		.def("afterUpdate", &SBScript::afterUpdate, &SBScriptWrap::default_afterUpdate, "Script after update step.")
+		.def("stop", &SBScript::stop, &SBScriptWrap::default_stop, "Script stop.")
+		;
 
 	boost::python::class_<EventHandlerWrap, boost::noncopyable>("EventHandler")
 		.def("executeAction", &EventHandler::executeAction, &EventHandlerWrap::default_executeAction, "Execute the event handler.")

@@ -15,6 +15,13 @@ SBScene::SBScene(void)
 
 SBScene::~SBScene(void)
 {
+	for (std::map<std::string, SBScript*>::iterator iter = _scripts.begin();
+		 iter != _scripts.end();
+		 iter++)
+	{
+		delete (*iter).second;
+	}
+
 	delete _sim;
 	delete _profiler;
 	delete _bml;
@@ -444,6 +451,66 @@ std::vector<std::string> SBScene::getFaceDefinitionNames()
 	return faces;
 }
 
+void SBScene::addScript(std::string name, SBScript* script)
+{
+	std::map<std::string, SBScript*>::iterator iter = _scripts.find(name);
+	if (iter != _scripts.end())
+	{
+		LOG("Script with name %s already exists.", name.c_str());
+		return;
+	}
+
+	_scripts.insert(std::pair<std::string, SBScript*>(name, script));
+}
+
+void SBScene::removeScript(std::string name)
+{
+	std::map<std::string, SBScript*>::iterator iter = _scripts.find(name);
+	if (iter != _scripts.end())
+	{
+		_scripts.erase(iter);
+		return;
+	}
+	LOG("Script with name %s does not exist.", name.c_str());
+
+}
+
+int SBScene::getNumScripts()
+{
+	return _scripts.size();
+}
+
+std::vector<std::string> SBScene::getScriptNames()
+{
+	std::vector<std::string> scriptNames;
+
+	for (std::map<std::string, SBScript*>::iterator iter = _scripts.begin();
+		 iter != _scripts.end();
+		 iter++)
+	{
+		scriptNames.push_back((*iter).first);
+	}
+
+	return scriptNames;
+
+}
+
+SBScript* SBScene::getScript(std::string name)
+{
+	std::map<std::string, SBScript*>::iterator iter = _scripts.find(name);
+	if (iter == _scripts.end())
+	{
+		LOG("Script with name %s already exists.", name.c_str());
+		return NULL;
+	}
+
+	return (*iter).second;
+}
+
+std::map<std::string, SBScript*>& SBScene::getScripts()
+{
+	return _scripts;
+}
 
 
 };
