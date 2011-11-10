@@ -139,6 +139,7 @@ _soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 	head_sched_p->ref();
 	param_sched_p->ref();
 	eyelid_ct->ref();
+	phyChar = NULL;
 }
 
 
@@ -488,11 +489,13 @@ void SbmCharacter::locomotion_set_turning_mode(int mode)
 	}
 }
 
-void SbmCharacter::updateJointPhyObjs()
+void SbmCharacter::updateJointPhyObjs(bool phySim)
 {
 	if (!_skeleton)
 		return;
+	if (!phyChar) return;
 
+	std::map<std::string,SbmJointObj*> jointPhyObjMap = phyChar->getJointObjMap();
 	const std::vector<SkJoint*>& joints = _skeleton->joints();	
 	_skeleton->update_global_matrices();
 	for (size_t i=0;i<joints.size();i++)
@@ -504,16 +507,25 @@ void SbmCharacter::updateJointPhyObjs()
 		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
 		{
 			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
-			const SrMat& gmat = curJoint->parent()->gmat();
-			phyObj->setGlobalTransform(gmat);
-			phyObj->updatePhySim();
+			if (phySim)
+			{
+				phyObj->updateSbmObj();
+			}
+			else
+			{
+				const SrMat& gmat = curJoint->parent()->gmat();
+				phyObj->setGlobalTransform(gmat);
+				phyObj->updatePhySim();
+			}		
 		}
 	}	
 }
 
 void SbmCharacter::setJointPhyCollision( bool useCollision )
 {	
-	const std::vector<SkJoint*>& joints = _skeleton->joints();		
+	if (!phyChar) return;
+	const std::vector<SkJoint*>& joints = _skeleton->joints();	
+	std::map<std::string,SbmJointObj*> jointPhyObjMap = phyChar->getJointObjMap();
 	for (size_t i=0;i<joints.size();i++)
 	{
 		SkJoint* curJoint = joints[i];
@@ -533,27 +545,24 @@ void SbmCharacter::buildJointPhyObjs()
 	if (!phySim)
 		return;
 	//printf("init physics obj\n");	
+	phyChar = new SbmPhysicsCharacter();
+	std::vector<std::string> jointNameList;
 	for (size_t i=0;i<joints.size();i++)
 	{
 		SkJoint* curJoint = joints[i];
 		std::string jointName = curJoint->name();
-		// 		if (curJoint->visgeo())
-		// 		{
-		// 			SbmGeomObject* jointGeom = new SbmGeomTriMesh(curJoint->visgeo());			
-		// 			SbmPhysicsObj* jointPhy = phySim->createPhyObj();
-		// 			jointPhy->initGeometry(jointGeom,1.f);	
-		// 			jointPhy->setPhysicsSim(false);
-		// 			phySim->addPhysicsObj(jointPhy);
-		// 			jointPhyObjMap[jointName] = jointPhy;
-		// 		}
-		// 		else // use procedural capsule geometry
+		jointNameList.push_back(jointName);		
+		/*
 		{
 			setJointCollider(jointName,-1.f, -1.f);
 
-		}
+		}*/
 	}
+	std::string charName = getName();
+	phyChar->initPhysicsCharacter(charName,jointNameList,true);
+	phySim->addPhysicsCharacter(phyChar);
 }
-
+/*
 void SbmCharacter::setJointCollider( std::string jointName, float len, float radius )
 {
 	SkJoint* joint = _skeleton->search_joint(jointName.c_str());
@@ -594,6 +603,7 @@ void SbmCharacter::setJointCollider( std::string jointName, float len, float rad
 	jointPhy->enablePhysicsSim(false);	
 	jointPhyObjMap[jointName] = jointPhy;
 }
+*/
 
 
 
@@ -2967,6 +2977,7 @@ else if( cmd == "bone" ) {
 											this->buildJointPhyObjs();
 											return CMD_SUCCESS;
 										}
+										/*
 										else if (colCmd == "joint") // build 
 										{
 											string jointName = args.read_token();
@@ -2983,7 +2994,8 @@ else if( cmd == "bone" ) {
 											}
 											this->setJointCollider(jointName,length,width);
 											return CMD_SUCCESS;
-										}		
+										}	
+										*/
 									}
 									else if ( cmd == "handmotion")
 									{

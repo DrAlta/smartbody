@@ -125,7 +125,7 @@ void main()\n\
 std::string Shadow_FS = 
 "void main (void)\n\
 {\n\
-gl_FragColor = gl_Color*0.5f;\n\
+gl_FragColor = gl_Color;\n\
 }";
 
 //=============================== srSaSetShapesChanged ===========================================
@@ -1184,7 +1184,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	if ( _data->displayaxis ) _data->render_action.apply ( _data->sceneaxis );
 	if ( _data->boundingbox ) _data->render_action.apply ( _data->scenebox );
 
-	std::string shaderName = shadowPass ? "BasicShadow" : "Basic";
+	std::string shaderName = _data->shadowmode == ModeShadows && !shadowPass ? "Basic" : "BasicShadow";
 	SbmShaderProgram* basicShader = SbmShaderManager::singleton().getShader(shaderName);
 	GLuint program = basicShader->getShaderProgram();
 	if (!shadowPass)
@@ -2869,13 +2869,14 @@ void FltkViewer::drawColliders()
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		std::map<std::string,SbmPhysicsObj*>& jointPhyObjs = character->getJointPhyObjs();
-		std::map<std::string,SbmPhysicsObj*>::iterator mi;
+		SbmPhysicsCharacter* phyChar = character->getPhysicsCharacter();		
+		std::map<std::string,SbmJointObj*>& jointPhyObjs = phyChar->getJointObjMap();
+		std::map<std::string,SbmJointObj*>::iterator mi;
 		for ( mi  = jointPhyObjs.begin();
 			  mi != jointPhyObjs.end();
 			  mi++)
 		{
-			SbmPhysicsObj* obj = mi->second;
+			SbmJointObj* obj = mi->second;
 			SrMat gmat = obj->getGlobalTransform().gmat();
 			this->drawColObject(obj->getColObj(), gmat);
 		}		

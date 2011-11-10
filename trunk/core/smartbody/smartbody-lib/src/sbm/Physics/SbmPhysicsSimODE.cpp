@@ -254,9 +254,43 @@ SbmPhysicsSimODE* SbmPhysicsSimODE::getODESim()
 	return odePhysics;
 }
 
+void SbmPhysicsSimODE::linkJointObj( SbmJointObj* obj )
+{
+	SbmJointObj* parent = obj->getParentObj();
+	if (!parent) return;
+
+	SbmODEObj* odeObj = getODEObj(obj);	
+	SbmODEObj* pode = getODEObj(parent);
+	dJointID j = dJointCreateBall(worldID, 0);
+	dJointAttach(j, pode->bodyID, odeObj->bodyID);
+	SrVec apoint = parent->getJoint()->getMatrixGlobal().get_translation();
+	//now we'll set the world position of the ball-and-socket joint. It is important that the bodies are placed in the world
+	//properly at this point
+	dJointSetBallAnchor(j, apoint.x,apoint.y,apoint.z);
+}
+
 void SbmPhysicsSimODE::addPhysicsCharacter( SbmPhysicsCharacter* phyChar )
 {
-	
+	std::vector<SbmJointObj*> jointObjList = phyChar->getJointObjList();	
+	// add rigid body object
+	if (hasPhysicsCharacter(phyChar))
+		return;
+
+	// add rigid body
+	for (unsigned int i=0;i<jointObjList.size();i++)
+	{
+		SbmJointObj* obj = jointObjList[i];
+		addPhysicsObj(obj);
+	}
+
+	// add joint constraints
+	/*
+	for (unsigned int i=0;i<jointObjList.size();i++)
+	{
+		SbmJointObj* obj = jointObjList[i];		
+		linkJointObj(obj);
+	}
+	*/
 }
 
 void SbmPhysicsSimODE::removePhysicsCharacter( SbmPhysicsCharacter* phyChar )
