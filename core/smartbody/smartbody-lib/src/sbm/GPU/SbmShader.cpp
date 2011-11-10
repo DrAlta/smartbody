@@ -23,9 +23,12 @@ SbmShaderProgram::SbmShaderProgram()
 
 SbmShaderProgram::~SbmShaderProgram()
 {
-	glDeleteObjectARB(programID);
-	glDeleteObjectARB(vsID);
-	glDeleteObjectARB(fsID);
+	if (programID > 0 )
+		glDeleteObjectARB(programID);
+	if (vsID > 0)
+		glDeleteObjectARB(vsID);
+	if (fsID > 0)
+		glDeleteObjectARB(fsID);
 	isBuilt = false;
 }
 

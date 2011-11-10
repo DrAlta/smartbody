@@ -90,6 +90,7 @@ class MeCtSaccade;
 class SteeringAgent;
 class MeCtBasicLocomotion;
 class MeCtDataReceiver;
+class SbmPhysicsCharacter;
 
 class SbmCharacter : public SmartBody::SBPawn	{
 
@@ -101,6 +102,7 @@ public:
 	int	_numSteeringGoal;
 	bool _reachTarget;
 	bool _lastReachStatus;
+	SbmPhysicsCharacter* phyChar;
 
 	enum LocomotionType {Basic, Example, Procedural};
 	enum SteeringStateConfig { MINIMAL = 0, STANDARD};
@@ -155,7 +157,7 @@ protected:
 
 	// associate each joint with a physics object
 	// currently, we assume the vis-geo as the geometry ( or an capsule to the child if vis-geo is not available )
-	std::map<std::string, SbmPhysicsObj*> jointPhyObjMap; 	
+	//std::map<std::string, SbmPhysicsObj*> jointPhyObjMap; 	
 
 	// reach engine map
 	ReachEngineMap reachEngineMap;
@@ -365,12 +367,12 @@ public:
 	int   getCurrentReachType() { return currentReachType; }
 	void   setCurrentReachType(int type) { currentReachType = type; }
 
-	std::map<std::string,SbmPhysicsObj*>& getJointPhyObjs() { return jointPhyObjMap; }
+	SbmPhysicsCharacter* getPhysicsCharacter() { return phyChar; }
 	void buildJointPhyObjs();
 	void setJointCollider(std::string jointName, float size);
-	void updateJointPhyObjs();
+	void updateJointPhyObjs(bool phySim = false);
 	void setJointPhyCollision(bool useCollision);
-	void setJointCollider(std::string jointName, float len, float radius);
+	//void setJointCollider(std::string jointName, float len, float radius);
 		
 	// viseme curve related functions
 	void set_viseme_curve_mode( bool mode )		{ use_viseme_curve = mode; }

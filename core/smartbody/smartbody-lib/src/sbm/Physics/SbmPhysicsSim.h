@@ -68,9 +68,11 @@ protected:
 	std::map<std::string, SbmGeomObject*> jointGeometryMap;
 	std::string characterName;
 public:
+	std::string getName() { return characterName; }
 	virtual void initPhysicsCharacter(std::string& characterName, std::vector<std::string>& jointNameList, bool buildGeometry = false);	
 	SbmJointObj* getJointObj(std::string& jointName); // get body part associated with this joint
 	std::vector<SbmJointObj*> getJointObjList();
+	std::map<std::string,SbmJointObj*> getJointObjMap();
 protected:
 	void cleanUpJoints();
 	SbmGeomObject* createJointGeometry(SBJoint* joint, float radius = -1);
@@ -93,6 +95,8 @@ public:
 	void setEnable(bool enable);
 	void setGravity(float gravity);	
 	virtual bool hasPhysicsObj(SbmPhysicsObj* obj);
+	virtual bool hasPhysicsCharacter(SbmPhysicsCharacter* phyChar);
+
 	virtual void addPhysicsObj(SbmPhysicsObj* obj);
 	virtual void removePhysicsObj(SbmPhysicsObj* obj);
 	virtual void addPhysicsCharacter(SbmPhysicsCharacter* phyChar) = 0;	

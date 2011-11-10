@@ -54,6 +54,15 @@ bool SbmPhysicsSim::hasPhysicsObj( SbmPhysicsObj* obj )
 	else
 		return false;
 }
+
+bool SbmPhysicsSim::hasPhysicsCharacter( SbmPhysicsCharacter* phyChar )
+{
+	if (characterMap.find(phyChar->getName()) != characterMap.end())
+		return true;
+	else
+		return false;
+}
+
 /************************************************************************/
 /* SbmPhyObjInterface                                                   */
 /************************************************************************/
@@ -163,6 +172,11 @@ std::vector<SbmJointObj*> SbmPhysicsCharacter::getJointObjList()
 		jointObjList.push_back(mi->second);
 	}
 	return jointObjList;	
+}
+
+std::map<std::string,SbmJointObj*> SbmPhysicsCharacter::getJointObjMap()
+{
+	return jointMap;
 }
 
 void SbmPhysicsCharacter::initPhysicsCharacter( std::string& characterName, std::vector<std::string>& jointNameList, bool buildGeometry )

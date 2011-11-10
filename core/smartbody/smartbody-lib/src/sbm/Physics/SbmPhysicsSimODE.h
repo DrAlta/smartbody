@@ -83,6 +83,7 @@ protected:
 	static void nearCallBack(void *data, dGeomID o1, dGeomID o2);
 	SbmODEObj* getODEObj(SbmPhysicsObj* obj);
 	dGeomID createODEGeometry(SbmPhysicsObj* obj, float mass);
+	void linkJointObj(SbmJointObj* obj);
 };
 #endif
 
