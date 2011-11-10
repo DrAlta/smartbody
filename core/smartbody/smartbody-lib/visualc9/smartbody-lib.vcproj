@@ -2716,6 +2716,30 @@
 			Name="SB"
 			>
 			<File
+				RelativePath="..\src\sbm\SBAnimationState.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBAnimationState.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBAnimationStateManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBAnimationStateManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBAnimationTransition.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBAnimationTransition.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SBAttribute.cpp"
 				>
 			</File>
@@ -2836,35 +2860,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBState.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SBState.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SBStateManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SBStateManager.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\SBSubject.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\src\sbm\SBSubject.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SBTransition.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SBTransition.h"
 				>
 			</File>
 		</Filter>
