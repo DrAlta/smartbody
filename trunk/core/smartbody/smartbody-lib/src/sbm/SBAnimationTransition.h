@@ -5,12 +5,12 @@
 #include <sbm/SBAnimationState.h>
 namespace SmartBody {
 
-class SBTransition : public PATransitionData
+class SBAnimationTransition : public PATransitionData
 {
 	public:
-		SBTransition();
-		SBTransition(std::string name);
-		~SBTransition();
+		SBAnimationTransition();
+		SBAnimationTransition(std::string name);
+		~SBAnimationTransition();
 
 		void set(SBAnimationState* source, SBAnimationState* dest);
 		void addCorrespondancePoint(std::string sourceMotion, std::string destMotion, float sourceFromTime, float sourceToTime, float destFromTime, float destToTime);

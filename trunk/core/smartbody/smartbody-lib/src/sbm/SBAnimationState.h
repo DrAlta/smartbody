@@ -5,12 +5,12 @@
 
 namespace SmartBody {
 
-class SBState : public PAStateData
+class SBAnimationState : public PAStateData
 {
 	public:
-		SBState();
-		SBState(std::string name);
-		~SBState();
+		SBAnimationState();
+		SBAnimationState(std::string name);
+		~SBAnimationState();
 
 		void addCorrespondancePoints(std::vector<std::string> motions, std::vector<double> points);
 
@@ -34,45 +34,45 @@ class SBState : public PAStateData
 };
 
 
-class SBState0D : public SBState
+class SBAnimationState0D : public SBAnimationState
 {
 	public:
-		SBState0D();
-		SBState0D(std::string name);
-		~SBState0D();
+		SBAnimationState0D();
+		SBAnimationState0D(std::string name);
+		~SBAnimationState0D();
 
 		void addMotion(std::string motion);
 };
 
-class SBState1D : public SBState
+class SBAnimationState1D : public SBAnimationState
 {
 	public:
-		SBState1D();
-		SBState1D(std::string name);
-		~SBState1D();
+		SBAnimationState1D();
+		SBAnimationState1D(std::string name);
+		~SBAnimationState1D();
 
 		void addMotion(std::string motion, float parameter);
 		void setParameter(std::string motion, float parameter);
 };
 
-class SBState2D : public SBState
+class SBAnimationState2D : public SBAnimationState
 {
 	public:
-		SBState2D();
-		SBState2D(std::string name);
-		~SBState2D();
+		SBAnimationState2D();
+		SBAnimationState2D(std::string name);
+		~SBAnimationState2D();
 
 		void addMotion(std::string motion, float parameter1, float paramter2);
 		void setParameter(std::string motion, float parameter1, float parameter2);
 		void addTriangle(std::string motion1, std::string motion2, std::string motion3);
 };
 
-class SBState3D : public SBState
+class SBAnimationState3D : public SBAnimationState
 {
 	public:
-		SBState3D();
-		SBState3D(std::string name);
-		~SBState3D();
+		SBAnimationState3D();
+		SBAnimationState3D(std::string name);
+		~SBAnimationState3D();
 
 		void addMotion(std::string motion, float parameter1, float paramter2, float paramter3);
 		void setParameter(std::string motion, float parameter1, float parameter2, float parameter3);

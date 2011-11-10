@@ -1,21 +1,21 @@
-#include "SBState.h"
+#include "SBAnimationState.h"
 #include <sbm/mcontrol_util.h>
 
 namespace SmartBody {
 
-SBState::SBState() : PAStateData()
+SBAnimationState::SBAnimationState() : PAStateData()
 {
 }
 
-SBState::SBState(std::string name) : PAStateData(name)
+SBAnimationState::SBAnimationState(std::string name) : PAStateData(name)
 {
 }
 
-SBState::~SBState()
+SBAnimationState::~SBAnimationState()
 {
 }
 
-void SBState::addCorrespondancePoints(std::vector<std::string> motionNames, std::vector<double> points)
+void SBAnimationState::addCorrespondancePoints(std::vector<std::string> motionNames, std::vector<double> points)
 {
 	if (motions.size() == 0)
 	{
@@ -60,12 +60,12 @@ void SBState::addCorrespondancePoints(std::vector<std::string> motionNames, std:
 	validateCorrespondancePoints();
 }
 
-int SBState::getNumMotions()
+int SBAnimationState::getNumMotions()
 {
 	return motions.size();
 }
 
-std::string SBState::getMotion(int num)
+std::string SBAnimationState::getMotion(int num)
 {
 	if (motions.size() > (size_t) num && num >= 0)
 	{
@@ -77,12 +77,12 @@ std::string SBState::getMotion(int num)
 	}
 }
 
-int SBState::getNumCorrespondancePoints()
+int SBAnimationState::getNumCorrespondancePoints()
 {
 	return getNumKeys();
 }
 
-std::vector<double> SBState::getCorrespondancePoints(int num)
+std::vector<double> SBAnimationState::getCorrespondancePoints(int num)
 {
 	if (keys.size() > (size_t) num && num >= 0)
 	{
@@ -94,14 +94,14 @@ std::vector<double> SBState::getCorrespondancePoints(int num)
 	}
 }
 
-std::string SBState::getDimension()
+std::string SBAnimationState::getDimension()
 {
 	return _dimension;
 }
 
-bool SBState::addSkMotion(std::string motion)
+bool SBAnimationState::addSkMotion(std::string motion)
 {
-	//TODO: remove weights from SBState
+	//TODO: remove weights from SBAnimationState
 	if (motions.size() == 0)
 		weights.push_back(1.0);
 	else
@@ -118,7 +118,7 @@ bool SBState::addSkMotion(std::string motion)
 	}
 	else
 	{
-		LOG("SBState add sk motion failure, %s doesn't exist", motion.c_str());
+		LOG("SBAnimationState add sk motion failure, %s doesn't exist", motion.c_str());
 		return false;
 	}
 	return true;
@@ -127,7 +127,7 @@ bool SBState::addSkMotion(std::string motion)
 /*
 	P.S. This is organized way, but is not a efficient way to do it
 */
-void SBState::validateCorrespondancePoints()
+void SBAnimationState::validateCorrespondancePoints()
 {
 	for (int i = 0; i < getNumMotions(); i++)
 	{
@@ -144,39 +144,39 @@ void SBState::validateCorrespondancePoints()
 	}
 }
 
-SBState0D::SBState0D() : SBState("unknown")
+SBAnimationState0D::SBAnimationState0D() : SBAnimationState("unknown")
 {
 }
 
-SBState0D::SBState0D(std::string name) : SBState(name)
+SBAnimationState0D::SBAnimationState0D(std::string name) : SBAnimationState(name)
 {
 	_dimension = "0D";
 }
 
-SBState0D::~SBState0D()
+SBAnimationState0D::~SBAnimationState0D()
 {
 }
 
-void SBState0D::addMotion(std::string motion)
+void SBAnimationState0D::addMotion(std::string motion)
 {
 	addSkMotion(motion);
 }
 
-SBState1D::SBState1D() : SBState("unknown")
+SBAnimationState1D::SBAnimationState1D() : SBAnimationState("unknown")
 {
 }
 
 
-SBState1D::SBState1D(std::string name) : SBState(name)
+SBAnimationState1D::SBAnimationState1D(std::string name) : SBAnimationState(name)
 {
 	_dimension = "1D";
 }
 
-SBState1D::~SBState1D()
+SBAnimationState1D::~SBAnimationState1D()
 {
 }
 
-void SBState1D::addMotion(std::string motion, float parameter)
+void SBAnimationState1D::addMotion(std::string motion, float parameter)
 {
 	addSkMotion(motion);
 
@@ -184,25 +184,25 @@ void SBState1D::addMotion(std::string motion, float parameter)
 	paramManager->setParameter(motion, parameter);
 }
 
-void SBState1D::setParameter(std::string motion, float parameter)
+void SBAnimationState1D::setParameter(std::string motion, float parameter)
 {
 	paramManager->setParameter(motion, parameter);
 }
 
-SBState2D::SBState2D() : SBState("unknown")
+SBAnimationState2D::SBAnimationState2D() : SBAnimationState("unknown")
 {
 }
 
-SBState2D::SBState2D(std::string name) : SBState(name)
+SBAnimationState2D::SBAnimationState2D(std::string name) : SBAnimationState(name)
 {
 	_dimension = "2D";
 }
 
-SBState2D::~SBState2D()
+SBAnimationState2D::~SBAnimationState2D()
 {
 }
 
-void SBState2D::addMotion(std::string motion, float parameter1, float parameter2)
+void SBAnimationState2D::addMotion(std::string motion, float parameter1, float parameter2)
 {
 	addSkMotion(motion);
 	
@@ -210,32 +210,32 @@ void SBState2D::addMotion(std::string motion, float parameter1, float parameter2
 	paramManager->setParameter(motion, parameter1, parameter2);
 }
 
-void SBState2D::setParameter(std::string motion, float parameter1, float parameter2)
+void SBAnimationState2D::setParameter(std::string motion, float parameter1, float parameter2)
 {
 	paramManager->setParameter(motion, parameter1, parameter2);
 }
 
-void SBState2D::addTriangle(std::string motion1, std::string motion2, std::string motion3)
+void SBAnimationState2D::addTriangle(std::string motion1, std::string motion2, std::string motion3)
 {
 	paramManager->addTriangle(motion1, motion2, motion3);
 }
 
-SBState3D::SBState3D() : SBState("unknown")
+SBAnimationState3D::SBAnimationState3D() : SBAnimationState("unknown")
 {
 }
 
 
-SBState3D::SBState3D(std::string name) : SBState(name)
+SBAnimationState3D::SBAnimationState3D(std::string name) : SBAnimationState(name)
 {
 	_dimension = "3D";
 }
 
-SBState3D::~SBState3D()
+SBAnimationState3D::~SBAnimationState3D()
 {
 }
 
 
-void SBState3D::addMotion(std::string motion, float parameter1, float parameter2, float parameter3)
+void SBAnimationState3D::addMotion(std::string motion, float parameter1, float parameter2, float parameter3)
 {
 	addSkMotion(motion);
 	
@@ -243,12 +243,12 @@ void SBState3D::addMotion(std::string motion, float parameter1, float parameter2
 	paramManager->setParameter(motion, parameter1, parameter2, parameter3);
 }
 
-void SBState3D::setParameter(std::string motion, float parameter1, float parameter2, float parameter3)
+void SBAnimationState3D::setParameter(std::string motion, float parameter1, float parameter2, float parameter3)
 {
 	paramManager->setParameter(motion, parameter1, parameter2, parameter3);
 }
 
-void SBState3D::addTetrahedron(std::string motion1, std::string motion2, std::string motion3,std::string motion4)
+void SBAnimationState3D::addTetrahedron(std::string motion1, std::string motion2, std::string motion3,std::string motion4)
 {
 	paramManager->addTetrahedron(motion1, motion2, motion3, motion4);
 }
