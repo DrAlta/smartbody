@@ -1,0 +1,5 @@
+0	echo >>> Loading common motions and poses...
+0	path ME sbm
+0	load motions -R sbm
+0	load poses -R sbm
+0	load skeletons -R sbm
