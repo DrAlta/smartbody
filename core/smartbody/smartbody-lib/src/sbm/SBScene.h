@@ -8,7 +8,7 @@
 #include <sbm/Event.h>
 #include <sbm/SBSimulationManager.h>
 #include <sbm/SBBmlProcessor.h>
-#include <sbm/SBStateManager.h>
+#include <sbm/SBAnimationStateManager.h>
 
 namespace SmartBody {
 
@@ -64,7 +64,7 @@ class SBScene : public SBObject
 		SBSimulationManager* getSimulationManager();
 		Profiler* getProfiler();
 		SBBmlProcessor* getBmlProcessor();
-		SBStateManager* getStateManager();
+		SBAnimationStateManager* getStateManager();
 
 		void notify(SBSubject* subject);
 
@@ -72,7 +72,7 @@ class SBScene : public SBObject
 		SBSimulationManager* _sim;
 		Profiler* _profiler;
 		SBBmlProcessor* _bml;
-		SBStateManager* _stateManager;
+		SBAnimationStateManager* _stateManager;
 };
 
 };
