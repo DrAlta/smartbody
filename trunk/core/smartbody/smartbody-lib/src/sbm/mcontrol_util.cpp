@@ -1616,7 +1616,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 
 		const SrQuat& q = j->quat()->value();
 
-		character->AddBoneRotation( j->name().c_str(), q.w, q.x, q.y, q.z, time );
+		character->AddBoneRotation( j->extName().c_str(), q.w, q.x, q.y, q.z, time );
 
 		//printf( "%s %f %f %f %f\n", (const char *)j->name(), q.w, q.x, q.y, q.z );
 	}
@@ -1645,7 +1645,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 		//these coordinates are meant to mimic the setpositionbyname coordinates you give to move the character
 		//so if you wanted to move a joint on the face in the x direction you'd do whatever you did to move the actor
 		//itself further in the x position.
-		character->AddBonePosition( j->name().c_str(), posx, posy, posz, time );
+		character->AddBonePosition( j->extName().c_str(), posx, posy, posz, time );
 	}
 
 	character->EndSendBonePositions();
