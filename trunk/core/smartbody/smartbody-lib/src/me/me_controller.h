@@ -380,7 +380,7 @@ public :
 	    print_state (that is, before it is increment for the child's print_state).  */
 	virtual void print_children( int tab_count );
 
-	void notify(SBSubject* subject);
+    virtual void notify(SmartBody::SBSubject* subject);
 
 	friend class MeControllerContext;
 };

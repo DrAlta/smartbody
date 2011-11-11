@@ -1,11 +1,11 @@
 #ifndef _SIMULATIONMANAGER_H
 #define _SIMULATIONMANAGER_H
 
-class Profiler
+class SBProfiler
 {
 	public:
-		Profiler();
-		~Profiler();
+		SBProfiler();
+		~SBProfiler();
 
 		void printLegend();
 		void printStats();

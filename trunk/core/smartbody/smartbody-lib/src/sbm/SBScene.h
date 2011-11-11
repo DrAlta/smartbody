@@ -70,7 +70,7 @@ class SBScene : public SBObject
 
 		EventManager* getEventManager();		
 		SBSimulationManager* getSimulationManager();
-		Profiler* getProfiler();
+		SBProfiler* getProfiler();
 		SBBmlProcessor* getBmlProcessor();
 		SBAnimationStateManager* getStateManager();
 
@@ -78,7 +78,7 @@ class SBScene : public SBObject
 
 	private:
 		SBSimulationManager* _sim;
-		Profiler* _profiler;
+		SBProfiler* _profiler;
 		SBBmlProcessor* _bml;
 		SBAnimationStateManager* _stateManager;
 

@@ -6,7 +6,7 @@ namespace SmartBody {
 SBScene::SBScene(void)
 {
 	_sim = new SBSimulationManager();
-	_profiler = new Profiler();
+	_profiler = new SBProfiler();
 	_bml = new SBBmlProcessor();
 	_stateManager = new SBAnimationStateManager();
 
@@ -384,7 +384,7 @@ SBSimulationManager* SBScene::getSimulationManager()
 	return _sim;
 }
 
-Profiler* SBScene::getProfiler()
+SBProfiler* SBScene::getProfiler()
 {
 	return _profiler;
 }

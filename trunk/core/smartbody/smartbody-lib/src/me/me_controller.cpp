@@ -836,7 +836,7 @@ void MeController::updateDefaultVariables(SbmPawn* pawn)
 	}
 }
 
-void MeController::notify(SBSubject* subject)
+void MeController::notify(SmartBody::SBSubject* subject)
 {
 	SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(subject);
 	if (boolAttribute)
