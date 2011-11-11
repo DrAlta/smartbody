@@ -434,6 +434,8 @@ void mcuCBHandle::registerCallbacks()
     insert( "resetanimation",	   resetanim_func);
 	insert( "animation",		   animation_func);
 	insert( "vhmsglog",			   vhmsglog_func);
+	insert( "skscale",			   skscale_func);
+	insert( "skmscale",			   skmscale_func);
 
 #ifdef USE_GOOGLE_PROFILER
 	insert( "startprofile",			   startprofile_func );

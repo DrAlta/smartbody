@@ -6662,6 +6662,52 @@ int vhmsglog_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 }
 
+int skscale_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	int num = args.calc_num_tokens();
+	if ( num > 1 )
+	{
+		LOG("Use: skscale <value>");
+		return CMD_FAILURE;
+	}
+
+	if ( num == 1 )
+	{
+		double value = args.read_double();
+
+		if (mcu_p)
+		{
+			mcu_p->skScale = value;
+		}
+		return CMD_SUCCESS;
+	}
+
+	return CMD_FAILURE;
+}
+
+int skmscale_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	int num = args.calc_num_tokens();
+	if ( num > 1 )
+	{
+		LOG("Use: skmscale <value>");
+		return CMD_FAILURE;
+	}
+
+	if ( num == 1 )
+	{
+		double value = args.read_double();
+
+		if (mcu_p)
+		{
+			mcu_p->skmScale = value;
+		}
+		return CMD_SUCCESS;
+	}
+
+	return CMD_FAILURE;
+}
+
 int mcu_reset_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 {
 	// TODO: If arg, call as init, else call previous init
