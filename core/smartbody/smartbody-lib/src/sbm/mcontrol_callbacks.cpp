@@ -2478,7 +2478,7 @@ int mcu_character_bone_cmd(
 
 			if ( _stricmp( j->name().c_str(), bone ) == 0 )
 			{
-				actor->bonebusCharacter->AddBoneRotation( j->name().c_str(), w, x, y, z, mcu_p->time );
+				actor->bonebusCharacter->AddBoneRotation( j->extName().c_str(), w, x, y, z, mcu_p->time );
 
 				//LOG( "%s %f %f %f %f\n", (const char *)j->name(), w, x, y, z );
 			}
@@ -2499,7 +2499,7 @@ int mcu_character_bone_cmd(
 				float posy = j->pos()->value( 1 );
 				float posz = j->pos()->value( 2 );
 
-				actor->bonebusCharacter->AddBonePosition( j->name().c_str(), posx, posy, posz, mcu_p->time );
+				actor->bonebusCharacter->AddBonePosition( j->extName().c_str(), posx, posy, posz, mcu_p->time );
 			}
 		}
 
@@ -2558,7 +2558,7 @@ int mcu_character_bone_position_cmd(
             posy = y;
             posz = z;
 
-			actor->bonebusCharacter->AddBonePosition( j->name().c_str(), posx, posy, posz, mcu_p->time );
+			actor->bonebusCharacter->AddBonePosition( j->extName().c_str(), posx, posy, posz, mcu_p->time );
          }
       }
 
