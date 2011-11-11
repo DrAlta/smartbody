@@ -298,6 +298,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/KinectProcessor.cpp
 	sbm/me_ct_data_receiver.cpp
 
+	sbm/SBScript.cpp
 	sbm/SBCharacter.cpp
 	sbm/SBPawn.cpp
 	sbm/SBJoint.cpp
@@ -307,7 +308,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SBBmlProcessor.cpp
 	sbm/SBAnimationState.cpp
 	sbm/SBAnimationTransition.cpp
-	sbm/SBStateManager.cpp
+	sbm/SBAnimationStateManager.cpp
 	sbm/SBMotion.cpp
 	sbm/SBFaceDefinition.cpp
 	sbm/sr_path_list.cpp

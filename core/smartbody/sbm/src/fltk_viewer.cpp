@@ -2870,7 +2870,7 @@ void FltkViewer::drawColliders()
 	{
 		SbmCharacter* character = (*iter).second;
 		SbmPhysicsCharacter* phyChar = character->getPhysicsCharacter();		
-		std::map<std::string,SbmJointObj*>& jointPhyObjs = phyChar->getJointObjMap();
+		std::map<std::string,SbmJointObj*> jointPhyObjs = phyChar->getJointObjMap();
 		std::map<std::string,SbmJointObj*>::iterator mi;
 		for ( mi  = jointPhyObjs.begin();
 			  mi != jointPhyObjs.end();

@@ -210,7 +210,7 @@
 				DSTROOT = /tmp/smartbody_dll.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "smartbody-dll/smartbody-dll-Prefix.pch";
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
 					../boost/boost_1_44_0,
@@ -258,7 +258,7 @@
 				DSTROOT = /tmp/smartbody_dll.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "smartbody-dll/smartbody-dll-Prefix.pch";
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
 					../boost/boost_1_44_0,

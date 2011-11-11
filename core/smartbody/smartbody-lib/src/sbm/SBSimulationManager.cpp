@@ -1,15 +1,15 @@
 #include "SBSimulationManager.h"
 #include <sbm/mcontrol_util.h>
 
-Profiler::Profiler()
+SBProfiler::SBProfiler()
 {
 }
 
-Profiler::~Profiler()
+SBProfiler::~SBProfiler()
 {
 }
 
-void Profiler::printLegend()
+void SBProfiler::printLegend()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (mcu.profiler_p)	
@@ -18,7 +18,7 @@ void Profiler::printLegend()
 		LOG("Profiler does not exist!");
 }
 
-void Profiler::printStats()
+void SBProfiler::printStats()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (mcu.profiler_p)	

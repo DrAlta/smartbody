@@ -470,9 +470,9 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("setSpeed", &SBSimulationManager::setSpeed, "Set the speed for real clock time. Actual time would be real time times speed.")
 		;
 
-	boost::python::class_<Profiler>("Profiler")
-		.def("printLegend", &Profiler::printLegend, "Print time profiler legend. \n Input: NULL \n Output: NULL")
-		.def("printStats", &Profiler::printStats, "Print time profiler statistics. \n Input: NULL \n Output: NULL")
+	boost::python::class_<SBProfiler>("Profiler")
+		.def("printLegend", &SBProfiler::printLegend, "Print time profiler legend. \n Input: NULL \n Output: NULL")
+		.def("printStats", &SBProfiler::printStats, "Print time profiler statistics. \n Input: NULL \n Output: NULL")
 		;
 
 	boost::python::class_<Camera>("Camera")

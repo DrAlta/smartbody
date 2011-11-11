@@ -202,7 +202,7 @@
 				DSTROOT = /tmp/bonebus.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "bonebus/bonebus-Prefix.pch";
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = (
 					../../lib/bonebus/include,
 					../../lib/vhcl/include,
@@ -223,7 +223,7 @@
 				DSTROOT = /tmp/bonebus.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "bonebus/bonebus-Prefix.pch";
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = (
 					../../lib/bonebus/include,
 					../../lib/vhcl/include,

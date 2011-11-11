@@ -29,13 +29,6 @@
 
 const char* MeCtIK::TYPE = "MeCtIK";
 
-#ifdef __ANDROID__
-#define SBM_INLINE
-#else
-#define SBM_INLINE inline
-#endif
-
-
 /** Constructor */
 MeCtIK::MeCtIK() {
 
