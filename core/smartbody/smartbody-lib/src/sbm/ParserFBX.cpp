@@ -749,7 +749,7 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
             // translational data, x, y, or z
             //tempVec = joint->offset()[fbxAnimData[j]->channelType - SkChannel::XPos];
             //keyChannelData = fbxAnimData[j]->keyFrameDataFrame[i];
-            motion.posture(i)[floatIndex] = (fbxAnimData[j]->keyFrameDataFrame[i] - joint->offset()[fbxAnimData[j]->channelType - SkChannel::XPos]) / scale;
+            motion.posture(i)[floatIndex] = (fbxAnimData[j]->keyFrameDataFrame[i] * scale) - joint->offset()[fbxAnimData[j]->channelType - SkChannel::XPos];
          }
 
          // rots are stored as 3 seperate entries in fbxAnimData, x, y, z euler angles.  You need all 3 of them to 
