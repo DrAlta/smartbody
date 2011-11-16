@@ -56,8 +56,8 @@
 0 panim transition fromstate allStartingRight tostate allLocomotion ChrUtah_StopToWalkRt01 1 0.54 0.83 ChrUtah_Meander01 1.1 1.5
 
 ## Idle Adjust
-0 panim state allIdleTurnLeft cycle false 3 ChrUtah_LiftFootLf01 ChrUtah_Turn90Lf01 ChrUtah_Turn180Lf01 3 0 0.255738 0.633333 0 0.762295 1.96667 0 0.87541 2.46667
-0 panim state allIdleTurnRight cycle false 3 ChrUtah_LiftFootRt01 ChrUtah_Turn90Rt01 ChrUtah_Turn180Rt01 3 0 0.25082 0.633333 0 0.757377 1.96667 0 0.821311 2.46667
+0 panim state allIdleTurn cycle false 5 ChrUtah_Idle001 ChrUtah_Turn90Lf01 ChrUtah_Turn180Lf01 ChrUtah_Turn90Rt01 ChrUtah_Turn180Rt01 3 0 0.255738 0.633333 0 0.762295 1.96667 0 0.87541 2.46667 0 0.757377 1.96667 0 0.821311 2.46667
+0 panim state allIdleTurn parameter 1D 5 ChrUtah_Idle001 0 ChrUtah_Turn90Lf01 -90 ChrUtah_Turn180Lf01 -180 ChrUtah_Turn90Rt01 90 ChrUtah_Turn180Rt01 180
 
 #2D Grid
 0 panim state allStep cycle true 7 ChrUtah_Idle001 ChrUtah_Idle01_StepBackwardRt01 ChrUtah_Idle01_StepForwardRt01 ChrUtah_Idle01_StepSidewaysRt01 ChrUtah_Idle01_StepBackwardLf01 ChrUtah_Idle01_StepForwardLf01 ChrUtah_Idle01_StepSidewaysLf01 3  0 0.556322 1.46414 0 0.556322 1.46414 0 0.543678 1.46414 0 0.482989 1.46414 0 0.395402 1.33333 0 0.531034 1.33333 0 0.473563 1.33103 

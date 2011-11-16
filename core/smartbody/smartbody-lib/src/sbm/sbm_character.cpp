@@ -3915,15 +3915,13 @@ bool SbmCharacter::checkExamples()
 	std::string stepName = prefix + "Step";
 	std::string startingLName = prefix + "StartingLeft";
 	std::string startingRName = prefix + "StartingRight";
-	std::string idleTurnLName = prefix + "IdleTurnLeft";
-	std::string idleTurnRName = prefix + "IdleTurnRight";
+	std::string idleTurnName = prefix + "IdleTurn";
 	std::vector<std::string> standardRequiredStates;
 	standardRequiredStates.push_back(locomotionName);
 	standardRequiredStates.push_back(stepName);
 	standardRequiredStates.push_back(startingLName);
 	standardRequiredStates.push_back(startingRName);
-	standardRequiredStates.push_back(idleTurnLName);
-	standardRequiredStates.push_back(idleTurnRName);
+	standardRequiredStates.push_back(idleTurnName);
 
 	int numMissing = 0;
 	for (size_t x = 0; x < standardRequiredStates.size(); x++)
