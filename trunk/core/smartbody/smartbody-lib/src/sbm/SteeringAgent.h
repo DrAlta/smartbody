@@ -130,8 +130,7 @@ class SteeringAgent
 		std::string locomotionName;
 		std::string startingLName;
 		std::string startingRName;
-		std::string idleTurnLName;
-		std::string idleTurnRName;
+		std::string idleTurnName;
 };
 
 #endif

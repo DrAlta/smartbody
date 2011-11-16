@@ -97,8 +97,7 @@ void SteeringAgent::updateSteerStateName()
 	locomotionName = prefix + "Locomotion";
 	startingLName = prefix + "StartingLeft";
 	startingRName = prefix + "StartingRight";
-	idleTurnLName = prefix + "IdleTurnLeft";
-	idleTurnRName = prefix + "IdleTurnRight";
+	idleTurnName = prefix + "IdleTurn";
 }
 
 void SteeringAgent::evaluate()
@@ -1067,42 +1066,16 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 		float diff = facingAngle - yaw;
 		normalizeAngle(diff);
 		std::string playNow;
-		if (fabs(diff) > facingAngleThreshold)
+		if (fabs(diff) > facingAngleThreshold && !character->param_animation_ct->hasPAState(idleTurnName.c_str()))
 		{
-			double w = 0;
-			playNow = "false";
-			if (diff <= -90 && !character->param_animation_ct->hasPAState(idleTurnRName.c_str()))
-			{
-				w = (diff + 180) / 180;
-				std::stringstream command1;
-				command1 << "panim schedule char " << character->getName();
-				command1 << " state " << idleTurnRName << " loop false playnow " << playNow << " 0 " << w << " " << 1 - w;
-				mcu.execute((char*) command1.str().c_str());						
-			}
-			else if (diff >= 90 && !character->param_animation_ct->hasPAState(idleTurnLName.c_str()))
-			{
-				w = (diff - 90) / 90;
-				std::stringstream command1;
-				command1 << "panim schedule char " << character->getName();
-				command1 << " state " << idleTurnLName << " loop false playnow " << playNow << " 0 " << 1 - w << " " << w;
-				mcu.execute((char*) command1.str().c_str());												
-			}
-			else if (diff <= 0 && !character->param_animation_ct->hasPAState(idleTurnRName.c_str()))
-			{
-				w = fabs(diff / 90);
-				std::stringstream command1;
-				command1 << "panim schedule char " << character->getName();
-				command1 << " state " << idleTurnRName << " loop false playnow " << playNow << " " << 1 - w << " " << w << " 0 ";
-				mcu.execute((char*) command1.str().c_str());
-			}
-			else if (diff >= 0 && !character->param_animation_ct->hasPAState(idleTurnLName.c_str()))
-			{
-				w = diff / 90;
-				std::stringstream command1;
-				command1 << "panim schedule char " << character->getName();
-				command1 << " state " << idleTurnLName << " loop false playnow " << playNow << " " << 1 - w << " " << w << " 0 ";
-				mcu.execute((char*) command1.str().c_str());	
-			}
+			PAStateData* idleTurnState = mcu.lookUpPAState(idleTurnName.c_str());
+			idleTurnState->paramManager->setWeight(-diff);
+			std::stringstream command;
+			command << "panim schedule char " << character->getName();			
+			command << " state " << idleTurnName << " loop false playnow false ";
+			for (int i = 0; i < idleTurnState->getNumMotions(); i++)
+				command << idleTurnState->weights[i] << " ";
+			mcu.execute((char*) command.str().c_str());
 		}
 		else
 		{
