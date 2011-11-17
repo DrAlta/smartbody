@@ -775,9 +775,16 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
    }
    
    // set the meta data
-   motion.synch_points.set_time(metaData.readyTime, metaData.strokeStart, 
-         metaData.emphasisTime, metaData.strokeTime, metaData.relaxTime);
-   motion.compress();
+   if (numKeys >= 1)
+   {
+      motion.synch_points.set_time(motion.keytime(0), metaData.readyTime, metaData.strokeStart, 
+         metaData.emphasisTime, metaData.strokeTime, metaData.relaxTime, motion.keytime(numKeys - 1));
+      motion.compress();
+   }
+   else
+   {
+      LOG("FBX animation %s metadata was not set because it doesn't have any key frames", motion.getName().c_str());
+   }
 }
 
 bool ParserFBX::HasSmartbodyChannel(KFbxNode* pNode, const char* pChannelName, bool& out_ChannelValue)
