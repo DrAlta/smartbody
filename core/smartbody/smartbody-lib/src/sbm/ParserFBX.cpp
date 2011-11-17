@@ -46,7 +46,7 @@ bool ParserFBX::parse(SkSkeleton& skeleton, SkMotion& motion, const std::string&
 
    // save the name of the skeleton/anim
    std::string filebasename = boost::filesystem::basename(fileName);
-   motion.name(filebasename.c_str());
+   motion.setName(filebasename.c_str());
    skeleton.name(filebasename.c_str());
    int order = -1;
 
@@ -731,6 +731,13 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
          if (fbxAnimData[j]->channelType == SkChannel::XRot)
          {
             // rotational data 
+            //float xRot = fbxAnimData[j]->keyFrameDataFrame[i];
+            //float yRot = fbxAnimData[j+1]->keyFrameDataFrame[i];
+            //float zRot = fbxAnimData[j+2]->keyFrameDataFrame[i];
+            
+            //if (stricmp(joint->name().c_str(), "JtElbowLf") == 0)
+            //   LOG("Frame %d %s, x: %.2f, y: %.2f, z: %.2f", i, joint->name().c_str(), xRot, yRot, zRot);
+
             // convert euler angles to mat
             sr_euler_mat(order, mat, fbxAnimData[j]->keyFrameDataFrame[i] * DEG_TO_RAD,
                fbxAnimData[j+1]->keyFrameDataFrame[i] * DEG_TO_RAD, fbxAnimData[j+2]->keyFrameDataFrame[i] * DEG_TO_RAD);
@@ -743,6 +750,8 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
             motion.posture(i)[floatIndex+1] = quat.x;
             motion.posture(i)[floatIndex+2] = quat.y;
             motion.posture(i)[floatIndex+3] = quat.z;
+
+            
          }
          else
          {
@@ -759,15 +768,15 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
       }
       //numKeys = fbxAnimData[j - 1]->keyFrameData.size();
    }
-   
+  
    if (metaData == (double)0)
    {
-      LOG("FBX animation %s has no SBM Metadata", motion.name().c_str());
+      LOG("FBX animation %s has no SBM Metadata", motion.getName().c_str());
    }
    
    // set the meta data
-   motion.synch_points.set_time(metaData.readyTime, metaData.strokeStart,
-      metaData.emphasisTime, metaData.strokeTime, metaData.relaxTime);
+   motion.synch_points.set_time(metaData.readyTime, metaData.strokeStart, 
+         metaData.emphasisTime, metaData.strokeTime, metaData.relaxTime);
    motion.compress();
 }
 
