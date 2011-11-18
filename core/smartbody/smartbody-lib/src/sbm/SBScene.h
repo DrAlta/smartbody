@@ -10,6 +10,7 @@
 #include <sbm/SBSimulationManager.h>
 #include <sbm/SBBmlProcessor.h>
 #include <sbm/SBAnimationStateManager.h>
+#include <sbm/SBSteerManager.h>
 
 namespace SmartBody {
 
@@ -73,6 +74,7 @@ class SBScene : public SBObject
 		SBProfiler* getProfiler();
 		SBBmlProcessor* getBmlProcessor();
 		SBAnimationStateManager* getStateManager();
+		SBSteerManager* getSteerManager();
 
 		void notify(SBSubject* subject);
 
@@ -81,6 +83,7 @@ class SBScene : public SBObject
 		SBProfiler* _profiler;
 		SBBmlProcessor* _bml;
 		SBAnimationStateManager* _stateManager;
+		SBSteerManager* _steerManager;
 
 		std::map<std::string, SBScript*> _scripts;
 };

@@ -3,13 +3,14 @@
 
 #include <sbm/sbm_character.hpp>
 #include "sbm/SBController.h"
-
+#include <sbm/SBSteerAgent.h>
 
 
 namespace SmartBody {
 
 class SBSkeleton;
 class SBBehavior;
+class SBSteerAgent;
 
 class SBCharacter : public SbmCharacter
 {
@@ -65,6 +66,8 @@ class SBCharacter : public SbmCharacter
 
 		virtual SBFaceDefinition* getFaceDefinition();
 		virtual void setFaceDefinition(SBFaceDefinition* face);
+
+		void setSteerAgent(SBSteerAgent* agent);
 
 	protected:
 		std::vector<SBBehavior*> _curBehaviors;

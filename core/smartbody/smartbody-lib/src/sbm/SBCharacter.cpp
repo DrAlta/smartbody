@@ -581,5 +581,9 @@ void SBCharacter::setFaceDefinition(SBFaceDefinition* face)
 		SbmCharacter::setFaceDefinition(face);
 }
 
+void SBCharacter::setSteerAgent(SBSteerAgent* sbAgent)
+{
+	sbAgent->setCurrentSBCharacter(this);
+}
 
 };

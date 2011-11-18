@@ -1048,8 +1048,11 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				int numWeights = args.calc_num_tokens();
 				if (numWeights > 0)
 				{
-					for (int i = 0; i < state->getNumMotions(); i++)
-						state->weights[i] = args.read_double();
+					if (state)
+					{
+						for (int i = 0; i < state->getNumMotions(); i++)
+							state->weights[i] = args.read_double();
+					}
 				}
 				character->param_animation_ct->schedule(state, l, pn);
 			}

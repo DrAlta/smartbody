@@ -90,6 +90,9 @@ SteeringAgent::~SteeringAgent()
 
 void SteeringAgent::updateSteerStateName()
 {
+	if (!character)
+		return;
+
 	std::string prefix = character->getName();
 	if (character->statePrefix != "")
 		prefix = character->statePrefix;
@@ -98,11 +101,16 @@ void SteeringAgent::updateSteerStateName()
 	startingLName = prefix + "StartingLeft";
 	startingRName = prefix + "StartingRight";
 	idleTurnName = prefix + "IdleTurn";
+	jumpName = prefix + "Jump";
 }
 
 void SteeringAgent::evaluate()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	if (!character)
+		return;
+
 	//---get current world offset position
 	float x, y, z;
 	float yaw, pitch, roll;
@@ -200,6 +208,16 @@ void SteeringAgent::setAgent(SteerLib::AgentInterface* a)
 SteerLib::AgentInterface* SteeringAgent::getAgent()
 {
 	return agent;
+}
+
+void SteeringAgent::setCharacter(SbmCharacter* c)
+{
+	character = c;
+}
+
+SbmCharacter* SteeringAgent::getCharacter()
+{
+	return character;
 }
 
 void SteeringAgent::setTargetAgent(SbmCharacter* tChar)
@@ -1086,7 +1104,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 
 
 	//---Need a better way to handle the control between steering and Parameterized Animation Controller
-	if (character->param_animation_ct->hasPAState("UtahJump"))
+	if (character->param_animation_ct->hasPAState(jumpName))
 		inControl = false;
 	else
 		inControl = true;
@@ -1207,13 +1225,13 @@ float SteeringAgent::evaluateSteppingLoco(float x, float y, float z, float yaw)
 		float offsety = dot(agentToTargetVec, heading);
 		SrVec verticalHeading = SrVec(sin(degToRad(yaw - 90)), 0, cos(degToRad(yaw - 90)));
 		float offsetx = dot(agentToTargetVec, verticalHeading);
-		if (!character->param_animation_ct->hasPAState("UtahStep"))
+		if (!character->param_animation_ct->hasPAState(stepStateName.c_str()))
 		{
-			PAStateData* stepState = mcu.lookUpPAState("UtahStep");
-			stepState->paramManager->setWeight(offsetx, offsety);
+			PAStateData* stepState = mcu.lookUpPAState(stepStateName.c_str());
+			stepState->paramManager->setWeight(x, y);
 			std::stringstream command;
 			command << "panim schedule char " << character->getName();			
-			command << " state UtahStep loop false playnow false ";
+			command << " state " << stepStateName << " loop false playnow false ";
 			for (int i = 0; i < stepState->getNumMotions(); i++)
 				command << stepState->weights[i] << " ";
 			mcu.execute((char*) command.str().c_str());

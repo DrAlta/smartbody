@@ -2868,6 +2868,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\SBSteerAgent.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBSteerAgent.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBSteerManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBSteerManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SBSubject.cpp"
 				>
 			</File>

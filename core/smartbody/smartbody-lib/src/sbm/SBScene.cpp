@@ -9,6 +9,7 @@ SBScene::SBScene(void)
 	_profiler = new SBProfiler();
 	_bml = new SBBmlProcessor();
 	_stateManager = new SBAnimationStateManager();
+	_steerManager = new SBSteerManager();
 
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 }
@@ -399,6 +400,11 @@ SBAnimationStateManager* SBScene::getStateManager()
 	return _stateManager;
 }
 
+SBSteerManager* SBScene::getSteerManager()
+{
+	return _steerManager;
+}
+
 SmartBody::SBFaceDefinition* SBScene::createFaceDefinition(const std::string& name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -511,6 +517,5 @@ std::map<std::string, SBScript*>& SBScene::getScripts()
 {
 	return _scripts;
 }
-
 
 };
