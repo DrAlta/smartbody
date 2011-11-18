@@ -2106,16 +2106,19 @@ int FltkViewer::handle ( int event )
 		 {
 			 if (_paLocoData->character)
 			 {
-				_paLocoData->character->steeringAgent->setTargetAgent(NULL);
-				SrVec p1;
-				SrVec p2;
-				_data->camera.get_ray(e.mouse.x, e.mouse.y, p1, p2);
-				SrPlane ground(SrVec(0,0,0), SrVec(0, 1, 0));
-				SrVec dest = ground.intersect(p1, p2);
-				dest.y = _paLocoData->character->getHeight() / 100.0f;
-				std::stringstream command;
-				command << "steer move " << _paLocoData->character->getName() << " " << dest.x << " " << dest.y << " " << dest.z;
-				mcuCBHandle::singleton().execute((char*)command.str().c_str());
+				 if (_paLocoData->character->steeringAgent)
+				 {
+					_paLocoData->character->steeringAgent->setTargetAgent(NULL);
+					SrVec p1;
+					SrVec p2;
+					_data->camera.get_ray(e.mouse.x, e.mouse.y, p1, p2);
+					SrPlane ground(SrVec(0,0,0), SrVec(0, 1, 0));
+					SrVec dest = ground.intersect(p1, p2);
+					dest.y = _paLocoData->character->getHeight() / 100.0f;
+					std::stringstream command;
+					command << "steer move " << _paLocoData->character->getName() << " " << dest.x << " " << dest.y << " " << dest.z;
+					mcuCBHandle::singleton().execute((char*)command.str().c_str());
+				 }
 			 }
 		 }
        } break;

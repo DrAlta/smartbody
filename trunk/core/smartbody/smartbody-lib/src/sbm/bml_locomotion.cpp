@@ -168,17 +168,17 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		{
 			if (c->param_animation_ct)
 			{
-				if (c->param_animation_ct->hasPAState("UtahJump"))
+				if (c->param_animation_ct->hasPAState(c->steeringAgent->jumpName))
 					return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
 				std::stringstream command1;
-				if (c->param_animation_ct->getCurrentStateName() == "UtahLocomotion")
+				if (c->param_animation_ct->getCurrentStateName() == c->steeringAgent->locomotionName)
 				{
-					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"UtahJump\" sbm:startnow=\"true\"/>";
-					command1 << "<sbm:states loop=\"true\" name=\"UtahLocomotion\" sbm:startnow=\"false\"/>";
+					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"" << c->steeringAgent->jumpName << "\" sbm:startnow=\"true\"/>";
+					command1 << "<sbm:states loop=\"true\" name=\"" << c->steeringAgent->locomotionName << "\" sbm:startnow=\"false\"/>";
 				}
 				else
 				{
-					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"UtahJump\" sbm:startnow=\"true\"/>";
+					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"" << c->steeringAgent->jumpName << "\" sbm:startnow=\"true\"/>";
 				}
 				mcu->execute((char*)command1.str().c_str());
 				return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
@@ -187,7 +187,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		else 
 			return BehaviorRequestPtr();
 		// also has to update state weight
-		PAStateData* locoData = mcu->lookUpPAState("UtahLocomotion");
+		PAStateData* locoData = mcu->lookUpPAState(c->steeringAgent->locomotionName);
 		if (locoData)
 			locoData->paramManager->setWeight(c->steeringAgent->desiredSpeed * 100.0f, 0.0);
 	}
@@ -264,13 +264,13 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 	// execute steps
 	if (stepMode)
-	{
+	{		
 		if (!c->param_animation_ct)
 		{
 			LOG("Parameterized Animation Engine not setup, cannot use step control.");
 			return BehaviorRequestPtr();
 		}
-		if (c->param_animation_ct->hasPAState("UtahStep") || !c->param_animation_ct->isIdle())
+		if (c->param_animation_ct->hasPAState(c->steeringAgent->stepStateName) || !c->param_animation_ct->isIdle())
 			return BehaviorRequestPtr();
 		c->steeringAgent->stepAdjust = false;
 		if (stepTargetMode)		// given target
@@ -285,7 +285,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			{
 				std::stringstream command1;
 				command1 << "panim schedule char " << c->getName();
-				command1 << " state UtahStep loop false playnow false ";
+				command1 << " state " << c->steeringAgent->stepStateName << " loop false playnow false ";
 				if (stepDirection == "forward")
 					command1 << "0 0 1 0 0 0 0";
 				if (stepDirection == "backward")

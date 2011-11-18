@@ -328,6 +328,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getProfiler", &SBScene::getProfiler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the  profiler object. \n Input: NULL \n Output: time profiler object")
 		.def("getBmlProcessor", &SBScene::getBmlProcessor, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the bml processor object.\n Input: NULL \nOutput: bml processor object")
 		.def("getStateManager", &SBScene::getStateManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the state manager object.\n Input: NULL \nOutput: state manager object")
+		.def("getSteerManager", &SBScene::getSteerManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the steer manager object.\n Input: NULL \nOutput: steer manager object")
 	;
 
 	boost::python::def("createController", createController, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new controller given a controller type and a controller name.");
@@ -551,6 +552,22 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getNumTransitions", &SBAnimationStateManager::getNumTransitions, "Returns the state names.")
 		.def("getTransitionNames", &SBAnimationStateManager::getTransitionNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the state names.")
 		;
+
+	boost::python::class_<SBSteerManager>("SBSteerManager")
+		.def("createSteerAgent", &SBSteerManager::createSteerAgent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a steer agent.")
+		.def("removeSteerAgent", &SBSteerManager::removeSteerAgent, "Remove a steer agent.")
+		.def("getNumSteerAgents", &SBSteerManager::getNumSteerAgents, "Return number of steer agents.")
+		.def("getSteerAgent", &SBSteerManager::getSteerAgent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return steer agent given its name.")
+		.def("getSteerAgentNames", &SBSteerManager::getSteerAgentNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Return steer agent names.")
+		.def("start", &SBSteerManager::start, "Start the steer simulation.")
+		.def("stop", &SBSteerManager::stop, "Stop the steer simulation.")
+		.def("setSteerUnit", &SBSteerManager::setSteerUnit, "Set the steer unit, only supporting meter or centimeter now.")
+		.def("getSteerUnit", &SBSteerManager::getSteerUnit, "Return the steer unit.")
+		;
+
+	boost::python::class_<SBSteerAgent>("SBSteerAgent")
+		;
+
 /*
 	boost::python::class_<Viseme>("Viseme")		
 		.def("getName", &Viseme::getVisemeName, boost::python::return_value_policy<boost::python::return_by_value>(), "Get the viseme name. \n Input: NULL \n Output: viseme name")
@@ -762,7 +779,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getHeight", &SBCharacter::getHeight, "Gets the height of the character.")
 		.def("getNumBehaviors", &SBCharacter::getNumBehaviors, "Returns the number of behaviors of the character.")
 		.def("getBehavior", &SBCharacter::getBehavior, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the ith behavior of the character.")
-
+		.def("setSteerAgent", &SBCharacter::setSteerAgent, "Set the steer agent of the character")
 #endif
 		//.def("getFaceDefinition", &SBCharacter::getFaceDefinition, "Gets face definition (visemes, action units) for a character.")
 #ifndef __ANDROID__

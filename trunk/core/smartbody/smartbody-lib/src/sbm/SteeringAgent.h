@@ -36,6 +36,8 @@ class SteeringAgent
 		void evaluate();
 		void setAgent(SteerLib::AgentInterface* a);
 		SteerLib::AgentInterface* getAgent();
+		void setCharacter(SbmCharacter* c);
+		SbmCharacter* getCharacter();
 		void setTargetAgent(SbmCharacter* tChar);
 		SbmCharacter* getTargetAgent();
 		void startParameterTesting();
@@ -131,6 +133,7 @@ class SteeringAgent
 		std::string startingLName;
 		std::string startingRName;
 		std::string idleTurnName;
+		std::string jumpName;
 };
 
 #endif
