@@ -72,6 +72,7 @@ scene.run("default-viewer.py")
 
 scene.run("init-param-animation.py")
 
+scene.run("init-steer-agents.py")
 
 # start the simulation
 sim.start()
@@ -88,19 +89,8 @@ bml.execBML('elder', '<saccade mode="listen"/>')
 bml.execBML('brad', '<saccade mode="listen"/>')
 bml.execBML('utah', '<saccade mode="listen"/>')
 
-scene.command("seq init-param-animation inline")
 scene.command("seq init-example-reach inline")
 
-scene.command("steer stateprefix doctor all")
-scene.command("steer stateprefix elder all")
-scene.command("steer stateprefix utah all")
-scene.command("steer stateprefix brad all")
-
-scene.command("steer start")
-scene.command("steer type doctor example")
-scene.command("steer type elder example")
-scene.command("steer type utah example")
-scene.command("steer type brad example")
 sim.resume()
 
 
