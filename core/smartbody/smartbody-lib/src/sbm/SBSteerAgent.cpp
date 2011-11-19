@@ -1,4 +1,5 @@
 #include "SBSteerAgent.h"
+#include <sbm/mcontrol_util.h>
 
 namespace SmartBody {
 
@@ -14,11 +15,61 @@ SBSteerAgent::~SBSteerAgent()
 {
 }
 
+void SBSteerAgent::setSteerStateNamePrefix(std::string prefix)
+{
+	_stateNamePrefix = prefix;
+	SteeringAgent* agent = dynamic_cast<SteeringAgent*>(this);
+	SbmCharacter* character = agent->getCharacter();
+	if (character)
+		character->statePrefix = _stateNamePrefix;
+}
+
+void SBSteerAgent::setSteerType(std::string type)
+{
+	_steerType = type;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SteeringAgent* agent = dynamic_cast<SteeringAgent*>(this);
+	SbmCharacter* character = agent->getCharacter();
+	if (!character)
+		return;
+
+	if (_steerType == "example")
+	{
+		if (!mcu.use_param_animation)
+		{
+			LOG("Parameterized Animation Engine not enabled!");
+			return;
+		}
+		if (character->checkExamples())
+			character->locomotion_type = character->Example;
+		else
+			character->locomotion_type = character->Basic;
+	}
+	if (type == "procedural")
+	{
+		if (!mcu.use_locomotion)
+		{
+			LOG("Procedural Locomotion not enabled!");
+			return;
+		}
+		character->locomotion_type = character->Procedural;
+		if (character->steeringAgent)
+			character->steeringAgent->desiredSpeed = 1.6f;
+	}
+	if (type == "basic")
+	{
+		character->locomotion_type = character->Basic;
+	}
+}
+
 void SBSteerAgent::setCurrentSBCharacter(SBCharacter* sbCharacter)
 {
 	setCharacter(sbCharacter);
 	SteeringAgent* agent = dynamic_cast<SteeringAgent*>(this);
 	sbCharacter->steeringAgent = agent;
+
+	setSteerStateNamePrefix(_stateNamePrefix);
+	setSteerType(_steerType);
 }
 
 SBCharacter* SBSteerAgent::getCurrentSBCharacter()
