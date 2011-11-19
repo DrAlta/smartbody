@@ -9,6 +9,7 @@ SBScene::SBScene(void)
 	_profiler = new SBProfiler();
 	_bml = new SBBmlProcessor();
 	_stateManager = new SBAnimationStateManager();
+	_reachManager = new SBReachManager();
 	_steerManager = new SBSteerManager();
 
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
@@ -27,6 +28,7 @@ SBScene::~SBScene(void)
 	delete _profiler;
 	delete _bml;
 	delete _stateManager;
+	delete _reachManager;
 }
 
 void SBScene::notify( SBSubject* subject )
@@ -398,6 +400,11 @@ SBBmlProcessor* SBScene::getBmlProcessor()
 SBAnimationStateManager* SBScene::getStateManager()
 {
 	return _stateManager;
+}
+
+SBReachManager* SBScene::getReachManager()
+{
+	return _reachManager;
 }
 
 SBSteerManager* SBScene::getSteerManager()

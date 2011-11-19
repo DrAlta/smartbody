@@ -511,13 +511,17 @@ void EventItemInfoWidget::removeEvent()
 PawnItemInfoWidget::PawnItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SBObserver* observerWindow ) 
 : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
 {
+	pawnInfoObject = NULL;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	pawnName = inputItem->label();
 	updateWidget();
 	//if (observerWindow)
 	//	pawnInfoObject->registerObserver(observerWindow);
-	pawnInfoObject->registerObserver(this);
+	
 	this->begin();
 		SbmPawn* pawn = mcu.getPawn(pawnName);
+		if (pawn)
+			pawn->registerObserver(this);
 		attrWindow = new AttributeWindow(pawn,x,y,w,h,name);
 		attrWindow->begin();
 		attrWindow->end();
@@ -531,13 +535,13 @@ void PawnItemInfoWidget::updateWidget()
 	if (!pawn) return;
 	float x, y, z, h, p, r;
 	pawn->get_world_offset(x,y,z,h,p,r);
-	pawnInfoObject->setDoubleAttribute("pos X",x);
-	pawnInfoObject->setDoubleAttribute("pos Y",y);
-	pawnInfoObject->setDoubleAttribute("pos Z",z);
+	pawn->setDoubleAttribute("posX",x);
+	pawn->setDoubleAttribute("posY",y);
+	pawn->setDoubleAttribute("posZ",z);
 
-	pawnInfoObject->setDoubleAttribute("rot X",h);
-	pawnInfoObject->setDoubleAttribute("rot Y",p);
-	pawnInfoObject->setDoubleAttribute("rot Z",r);
+	pawn->setDoubleAttribute("rotX",h);
+	pawn->setDoubleAttribute("rotY",p);
+	pawn->setDoubleAttribute("rotZ",r);
 	//pawnInfoObject->getAttribute("pos X")->
 
 }
