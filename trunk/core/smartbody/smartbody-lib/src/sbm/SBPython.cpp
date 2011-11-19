@@ -328,6 +328,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getProfiler", &SBScene::getProfiler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the  profiler object. \n Input: NULL \n Output: time profiler object")
 		.def("getBmlProcessor", &SBScene::getBmlProcessor, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the bml processor object.\n Input: NULL \nOutput: bml processor object")
 		.def("getStateManager", &SBScene::getStateManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the state manager object.\n Input: NULL \nOutput: state manager object")
+		.def("getReachManager", &SBScene::getReachManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the reach manager object.\n Input: NULL \nOutput: state manager object")
 		.def("getSteerManager", &SBScene::getSteerManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the steer manager object.\n Input: NULL \nOutput: steer manager object")
 	;
 
@@ -552,6 +553,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getNumTransitions", &SBAnimationStateManager::getNumTransitions, "Returns the state names.")
 		.def("getTransitionNames", &SBAnimationStateManager::getTransitionNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the state names.")
 		;
+
 
 	boost::python::class_<SBSteerManager>("SBSteerManager")
 		.def("createSteerAgent", &SBSteerManager::createSteerAgent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a steer agent.")
@@ -790,6 +792,30 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 #endif
 		;
+
+boost::python::class_<SBReach>("SBReach")
+		.def("getCharacter", &SBReach::getCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the character associated with this reach engine.")
+		.def("copy", &SBReach::copy, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Copies the reach engine.")
+		.def("addMotion", &SBReach::addMotion, "Adds a motion to the reach engine.")
+		.def("removeMotion", &SBReach::removeMotion, "Removes a motion from the reach engine.")
+		.def("getNumMotions", &SBReach::getNumMotions, "Returns the number of motions in the reach engine.")
+		.def("getMotionNames", &SBReach::getMotionNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the names of the motions used in the reach engine.")
+		.def("build", &SBReach::build, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Constructs the reach engine using the exisiting motions.")
+		.def("setGrabHandMotion", &SBReach::setGrabHandMotion, "Sets the hand pose to be used during grasping.")
+		.def("getGrabHandMotion", &SBReach::getGrabHandMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the hand pose to be used during grasping.")
+		.def("setReleaseHandMotion", &SBReach::setReleaseHandMotion,  "Sets the hand pose to be used when releasing an object.")
+		.def("getReleaseHandMotion", &SBReach::getReleaseHandMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the hand pose to be used when releasing an object.")
+		.def("setReachHandMotion", &SBReach::setReachHandMotion, "Sets the hand pose to be used when reaching for an object.")
+		.def("getReachHandMotion", &SBReach::getReachHandMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the hand pose to be used when reaching for an object.")
+		;
+
+	boost::python::class_<SBReachManager>("SBReachManager")
+		.def("createReach", &SBReachManager::createReach, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a reach engine for a character.")
+		.def("removeReach", &SBReachManager::removeReach, "Removes a reach engine for a character")
+		.def("getNumReaches", &SBReachManager::getNumReaches, "Returns the number of reach engines present.")
+		.def("getReach", &SBReachManager::getReach, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a reach engine for a given character.")
+		;
+
 
 	boost::python::class_<Event>("Event")
 		.def("getType", &Event::getType, "Returns the event type.")

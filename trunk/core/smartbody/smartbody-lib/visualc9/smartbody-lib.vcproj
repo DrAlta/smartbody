@@ -2836,6 +2836,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\SBReach.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBReach.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBReachManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBReachManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SBScene.cpp"
 				>
 			</File>
