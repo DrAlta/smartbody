@@ -93,8 +93,7 @@ protected:
 	void getPinchFrame(BodyMotionFrame& pinchFrame, SrVec& wristOffset);
 	FingerID findFingerID(const char* jointName);
 	void updateFingerChains( BodyMotionFrame& targetMotionFrame, float maxAngDelta);
-	BodyMotionFrame& findTargetFrame(GrabState state);
-	SkMotion* findTagSkMotion(int tag, const MotionDataSet& motionSet);
+	BodyMotionFrame& findTargetFrame(GrabState state);	
 	SbmPawn* getAttachedPawn();
 	SbmPawn* getTargetObject();
 };

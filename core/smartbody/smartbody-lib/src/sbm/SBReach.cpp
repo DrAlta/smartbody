@@ -38,30 +38,36 @@ void SBReach::addMotion(std::string type, SBMotion* motion)
 		return;
 	}
 
-	if (type == "left" || type == "LEFT")
+	int reachType = MeCtReachEngine::getReachType(type);
+	if (reachType != -1)
 	{
-		_character->addReachMotion(MeCtReachEngine::LEFT_ARM, motion);
-	}
-	else if (type == "right" || type == "RIGHT")
-	{
-		_character->addReachMotion(MeCtReachEngine::RIGHT_ARM, motion);
-	}
-	else if (type == "both" || type == "BOTH")
-	{
-		_character->addReachMotion(MeCtReachEngine::LEFT_ARM, motion);
-		_character->addReachMotion(MeCtReachEngine::RIGHT_ARM, motion);
+		_character->addReachMotion(reachType,motion);
 	}
 	else
 	{
-		LOG("Please use 'LEFT', 'RIGHT', or 'BOTH'");
+		LOG("Please use 'LEFT' or 'RIGHT'");
 		return;
 	}
 }
 
 void SBReach::removeMotion(std::string type, SBMotion* motion)
 {
-	// ...
-	// ...
+	if (!_character)
+	{
+		LOG("No character present, motion %s was not removed from reach.", motion->getName().c_str());
+		return;
+	}
+
+	int reachType = MeCtReachEngine::getReachType(type);
+	if (reachType != -1)
+	{
+		_character->removeReachMotion(reachType,motion);
+	}	
+	else
+	{
+		LOG("Please use 'LEFT' or 'RIGHT'");
+		return;
+	}
 }
 
 int SBReach::getNumMotions()
@@ -75,8 +81,15 @@ int SBReach::getNumMotions()
 std::vector<std::string> SBReach::getMotionNames(std::string type)
 {
 	std::vector<std::string> motionNames;
-	// ...
-	// ...
+	MotionDataSet& motionSet = const_cast<MotionDataSet&>(_character->getReachMotionDataSet());
+	MotionDataSet::iterator vi;
+	for ( vi  = motionSet.begin();
+		  vi != motionSet.end();
+		  vi++)
+	{
+		SkMotion* motion = (*vi).second;
+		motionNames.push_back(motion->getName());
+	}	
 	return motionNames;
 
 }
@@ -98,34 +111,85 @@ void SBReach::build(SBCharacter* character)
 	}
 }
 
-void SBReach::setGrabHandMotion(SBMotion* grabMotion)
+void SBReach::setGrabHandMotion(std::string type, SBMotion* grabMotion)
 {
+	if (!_character)
+		return;
+	MotionDataSet& grabMotionSet = const_cast<MotionDataSet&>(_character->getGrabHandData());
+	int reachType = MeCtReachEngine::getReachType(type);
+	if (reachType != -1)
+	{
+		TagMotion motion = TagMotion(reachType,grabMotion);
+		grabMotionSet.insert(motion);
+	}
+	else
+	{
+		LOG("Please use 'LEFT' or 'RIGHT'");
+		return;
+	}	
 }
 
-SBMotion* SBReach::getGrabHandMotion()
+SBMotion* SBReach::getGrabHandMotion(std::string type)
 {
-	// ...
-	return NULL;
+	MotionDataSet& grabMotionSet = const_cast<MotionDataSet&>(_character->getGrabHandData());
+	int reachType = MeCtReachEngine::getReachType(type);
+	SkMotion* skMotion = SbmCharacter::findTagSkMotion(reachType,grabMotionSet);
+	SBMotion* sbMotion = dynamic_cast<SBMotion*>(skMotion);
+	return sbMotion;
 }
 
-void SBReach::setReleaseHandMotion(SBMotion* releasebMotion)
+void SBReach::setReleaseHandMotion(std::string type, SBMotion* releasebMotion)
 {
+	if (!_character)
+		return;
+	MotionDataSet& releaseMotionSet = const_cast<MotionDataSet&>(_character->getReleaseHandData());
+	int reachType = MeCtReachEngine::getReachType(type);
+	if (reachType != -1)
+	{
+		TagMotion motion = TagMotion(reachType,releasebMotion);
+		releaseMotionSet.insert(motion);
+	}
+	else
+	{
+		LOG("Please use 'LEFT' or 'RIGHT'");
+		return;
+	}	
 }
 
-SBMotion* SBReach::getReleaseHandMotion()
+SBMotion* SBReach::getReleaseHandMotion(std::string type)
 {
-	// ...
-	return NULL;
+	MotionDataSet& releaseMotionSet = const_cast<MotionDataSet&>(_character->getReleaseHandData());
+	int reachType = MeCtReachEngine::getReachType(type);
+	SkMotion* skMotion = SbmCharacter::findTagSkMotion(reachType,releaseMotionSet);
+	SBMotion* sbMotion = dynamic_cast<SBMotion*>(skMotion);
+	return sbMotion;
 }
 
-void SBReach::setReachHandMotion(SBMotion* reachbMotion)
+void SBReach::setReachHandMotion(std::string type, SBMotion* reachMotion)
 {
+	if (!_character)
+		return;
+	MotionDataSet& reachMotionSet = const_cast<MotionDataSet&>(_character->getReachHandData());
+	int reachType = MeCtReachEngine::getReachType(type);
+	if (reachType != -1)
+	{
+		TagMotion motion = TagMotion(reachType,reachMotion);
+		reachMotionSet.insert(motion);
+	}
+	else
+	{
+		LOG("Please use 'LEFT' or 'RIGHT'");
+		return;
+	}	
 }
 
-SBMotion* SBReach::getReachHandMotion()
+SBMotion* SBReach::getReachHandMotion(std::string type)
 {
-	// ...
-	return NULL;
+	MotionDataSet& reachMotionSet = const_cast<MotionDataSet&>(_character->getReachHandData());
+	int reachType = MeCtReachEngine::getReachType(type);
+	SkMotion* skMotion = SbmCharacter::findTagSkMotion(reachType,reachMotionSet);
+	SBMotion* sbMotion = dynamic_cast<SBMotion*>(skMotion);
+	return sbMotion;
 }
 
 }

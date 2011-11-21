@@ -174,19 +174,7 @@ void MeCtHand::setGrabTargetObject( SbmPawn* targetObj )
 	//setGrabState(GRAB_START);	
 }
 
-SkMotion* MeCtHand::findTagSkMotion( int tag, const MotionDataSet& motionSet )
-{
-	MotionDataSet::const_iterator vi;
-	for ( vi  = motionSet.begin();
-		  vi != motionSet.end();
-		  vi++)
-	{
-		TagMotion tagMotion = *vi;
-		if (tagMotion.first == tag)
-			return tagMotion.second;
-	}
-	return NULL;
-}
+
 
 void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const MotionDataSet& grabPose, const MotionDataSet& releasePose)
 {
@@ -230,9 +218,9 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 		_channels.add(joint->name(), SkChannel::Quat);		
 	}	
 	SkMotion *releaseHand, *grabHand, *reachHand;
-	releaseHand = findTagSkMotion(type,releasePose);
-	grabHand = findTagSkMotion(type,grabPose);
-	reachHand = findTagSkMotion(type,reachPose);
+	releaseHand = SbmCharacter::findTagSkMotion(type,releasePose);
+	grabHand = SbmCharacter::findTagSkMotion(type,grabPose);
+	reachHand = SbmCharacter::findTagSkMotion(type,reachPose);
 
 	if (releaseHand && grabHand && reachHand)
 	{

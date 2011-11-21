@@ -45,10 +45,11 @@ typedef std::map<unsigned long,SbmODEObj*> SbmODEObjMap;
 class SbmPhysicsSimODE :
 	public SbmPhysicsSim
 {
+public:
+	dGeomID  groundID;
 protected:
 	dWorldID worldID;
-	dSpaceID spaceID;	
-	dGeomID  groundID;
+	dSpaceID spaceID;		
 	dJointGroupID contactGroupID;
 	bool   hasInit;	
 	SbmODEObjMap odeObjMap;

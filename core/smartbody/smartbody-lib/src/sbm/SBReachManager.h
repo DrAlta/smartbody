@@ -20,7 +20,6 @@ class SBReachManager
 
 	protected:
 		std::map<std::string, SBReach*> _reaches;
-
 };
 
 

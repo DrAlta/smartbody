@@ -1675,6 +1675,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="physics"
+				>
+				<File
+					RelativePath="..\src\sbm\me_ct_physics_controller.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_physics_controller.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="BML"

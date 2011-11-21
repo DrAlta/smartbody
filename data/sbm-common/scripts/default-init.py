@@ -89,7 +89,9 @@ bml.execBML('elder', '<saccade mode="listen"/>')
 bml.execBML('brad', '<saccade mode="listen"/>')
 bml.execBML('utah', '<saccade mode="listen"/>')
 
-scene.command("seq init-example-reach inline")
+#scene.command("seq init-example-reach inline")
+scene.run("init-example-reach.py")
+reachSetup("doctor")
 
 sim.resume()
 

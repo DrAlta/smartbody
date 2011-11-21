@@ -1,6 +1,7 @@
 #ifndef ODECONFIG_H
 #define ODECONFIG_H
 
+#define dDOUBLE
 #ifndef dDOUBLE
 #ifndef dSINGLE
 #define dSINGLE
