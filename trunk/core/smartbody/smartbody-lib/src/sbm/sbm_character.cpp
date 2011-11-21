@@ -335,6 +335,12 @@ void SbmCharacter::createStandardControllers()
 	std::string datareceiverCtName = getName() + "'s data receiver controller";
 	this->datareceiver_ct->setName(datareceiverCtName.c_str());
 
+	this->physics_ct = new MeCtPhysicsController(this);
+	std::string physicsCtName = getName() + "'s physics controller";
+	this->physics_ct->setName(physicsCtName.c_str());
+
+	
+
 	posture_sched_p->ref();
 	motion_sched_p->ref();
 	gaze_sched_p->ref();
@@ -372,6 +378,7 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( head_sched_p );
 	ct_tree_p->add_controller( face_ct );
 	ct_tree_p->add_controller( param_sched_p );
+	ct_tree_p->add_controller( physics_ct );
 	ct_tree_p->add_controller( motionplayer_ct );
 	ct_tree_p->add_controller( datareceiver_ct );
 
@@ -501,8 +508,6 @@ void SbmCharacter::updateJointPhyObjs(bool phySim)
 	for (size_t i=0;i<joints.size();i++)
 	{
 		SkJoint* curJoint = joints[i]; 
-		if (!curJoint->parent())
-			continue;
 		const std::string& jointName = curJoint->name();
 		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
 		{
@@ -513,7 +518,10 @@ void SbmCharacter::updateJointPhyObjs(bool phySim)
 			}
 			else
 			{
-				const SrMat& gmat = curJoint->parent()->gmat();
+				SrMat pmat = curJoint->gmat();
+				if (curJoint->parent()) pmat = curJoint->parent()->gmat();
+				SrMat tranMat; tranMat.translation(curJoint->offset()*0.5f);
+				const SrMat& gmat = tranMat*pmat;
 				phyObj->setGlobalTransform(gmat);
 				phyObj->updatePhySim();
 			}		
@@ -546,18 +554,43 @@ void SbmCharacter::buildJointPhyObjs()
 		return;
 	//printf("init physics obj\n");	
 	phyChar = new SbmPhysicsCharacter();
+	std::queue<SkJoint*> tempJointList;
 	std::vector<std::string> jointNameList;
+	std::set<std::string> excludeNameList; 
+	excludeNameList.insert("r_wrist");
+	excludeNameList.insert("l_wrist");
+	excludeNameList.insert("spine5");
+	excludeNameList.insert("l_ankle");
+	excludeNameList.insert("r_ankle");
+	SkJoint* rootJoint = _skeleton->root();
+	jointNameList.push_back(rootJoint->name());
+	tempJointList.push(rootJoint->child(0));
+
+	
+	while (!tempJointList.empty())
+	{
+		SkJoint* joint = tempJointList.front(); tempJointList.pop();
+		std::string jName = joint->name();
+		jointNameList.push_back(jName);
+		if (excludeNameList.find(jName) != excludeNameList.end())
+			continue;
+		for (int i=0;i<joint->num_children();i++)
+		{
+			SkJoint* cj = joint->child(i);	
+			if (std::find(joints.begin(),joints.end(),cj) != joints.end())
+				tempJointList.push(cj);
+		}
+	}
+		
+	/*
 	for (size_t i=0;i<joints.size();i++)
 	{
 		SkJoint* curJoint = joints[i];
 		std::string jointName = curJoint->name();
-		jointNameList.push_back(jointName);		
-		/*
-		{
-			setJointCollider(jointName,-1.f, -1.f);
+		jointNameList.push_back(jointName);				
+	}*/
+	
 
-		}*/
-	}
 	std::string charName = getName();
 	phyChar->initPhysicsCharacter(charName,jointNameList,true);
 	phySim->addPhysicsCharacter(phyChar);
@@ -893,7 +926,7 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 	mcu.execute(reachCmd);
 #endif
 
-	//buildJointPhyObjs();
+	buildJointPhyObjs();
 
 
 	// get the default attributes from the default controllers
@@ -2147,8 +2180,10 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			}
 			else
 			{
+				
 				std::string fileName = xmlFileList[0];
 				std::stringstream strstr;
+				
 				strstr << "char " << getName() << " smoothbindweight " << fileName;
 				if (prefix != "")
 					strstr << " -prefix " << prefix;
@@ -2157,6 +2192,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 				{
 					LOG("Successfully read skin weights from file %s", fileName.c_str());
 				}
+				
 				// this could also be a file containing a mesh, so run that command as well
 				std::stringstream strstr2;
 				strstr2 << "char " << getName() << " smoothbindmesh " << fileName;
@@ -3439,6 +3475,18 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 }
 
+
+bool SbmCharacter::removeReachMotion( int tag, SkMotion* motion )
+{
+	TagMotion tagMotion = TagMotion(tag, motion);
+	if (reachMotionData.find(tagMotion) != reachMotionData.end()) 
+	{
+		reachMotionData.erase(tagMotion);
+		return true;
+	}
+	return false;
+}
+
 bool SbmCharacter::addReachMotion( int tag, SkMotion* motion )
 {
 	TagMotion tagMotion = TagMotion(tag, motion);
@@ -3964,4 +4012,18 @@ bool SbmCharacter::checkExamples()
 	}
 	LOG("%s: Steering cannot work under example mode, reverting back to basic mode", this->getName().c_str());
 	return false;
+}
+
+SkMotion* SbmCharacter::findTagSkMotion( int tag, const MotionDataSet& motionSet )
+{
+	MotionDataSet::const_iterator vi;
+	for ( vi  = motionSet.begin();
+		vi != motionSet.end();
+		vi++)
+	{
+		TagMotion tagMotion = *vi;
+		if (tagMotion.first == tag)
+			return tagMotion.second;
+	}
+	return NULL;
 }

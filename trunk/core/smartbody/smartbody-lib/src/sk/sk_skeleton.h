@@ -48,6 +48,7 @@ class SkSkeleton : public SrSharedClass
     SkJoint* _root;
     std::vector<SkJoint*> _joints;
     std::map<std::string, SkJoint*> _jointMap;
+	std::map<std::string, SkJoint*> _extJointMap;
     bool _gmat_uptodate;
 
     // collision detection:

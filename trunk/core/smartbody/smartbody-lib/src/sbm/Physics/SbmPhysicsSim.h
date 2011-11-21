@@ -54,6 +54,7 @@ protected:
 public:
 	SbmJointObj();
 	~SbmJointObj();
+	SrMat getRelativeOrientation();
 	SBJoint* getJoint() { return sbmJoint; 	}
 	SbmJointObj* getParentObj() { return parentObj; }
 	void setParentObj(SbmJointObj* parent) { parentObj = parent; }
@@ -72,7 +73,7 @@ public:
 	virtual void initPhysicsCharacter(std::string& characterName, std::vector<std::string>& jointNameList, bool buildGeometry = false);	
 	SbmJointObj* getJointObj(std::string& jointName); // get body part associated with this joint
 	std::vector<SbmJointObj*> getJointObjList();
-	std::map<std::string,SbmJointObj*> getJointObjMap();
+	std::map<std::string,SbmJointObj*>& getJointObjMap();
 protected:
 	void cleanUpJoints();
 	SbmGeomObject* createJointGeometry(SBJoint* joint, float radius = -1);

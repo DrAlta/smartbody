@@ -217,10 +217,24 @@ SkJoint* SkSkeleton::search_joint ( const char* n )
 		}
 	}
 
+	if (_extJointMap.size() == 0 &&
+		_joints.size() > 0)
+	{
+		int jointSize = _joints.size();
+		for (int i = 0; i < jointSize; i++)
+		{
+			_extJointMap.insert(std::pair<std::string, SkJoint*>(_joints[i]->extName(), _joints[i]));
+		}
+	}
+
 	std::map<std::string, SkJoint*>::iterator iter = _jointMap.find(n);
 	if (iter != _jointMap.end())
 	{
 		return (*iter).second;
+	}
+	else if ( _extJointMap.find(n) != _extJointMap.end())
+	{
+		return (_extJointMap.find(n)->second);
 	}
 	else
 	{

@@ -22,18 +22,16 @@ class SBReach
 		std::vector<std::string> getMotionNames(std::string type);
 		void build(SBCharacter* character);
 		
-		void setGrabHandMotion(SBMotion* grabMotion);
-		SBMotion* getGrabHandMotion();
-		void setReleaseHandMotion(SBMotion* releasebMotion);
-		SBMotion* getReleaseHandMotion();
-		void setReachHandMotion(SBMotion* reachbMotion);
-		SBMotion* getReachHandMotion();
+		void setGrabHandMotion(std::string type, SBMotion* grabMotion);
+		SBMotion* getGrabHandMotion(std::string type);
+		void setReleaseHandMotion(std::string type,SBMotion* releasebMotion);
+		SBMotion* getReleaseHandMotion(std::string type);
+		void setReachHandMotion(std::string type,SBMotion* reachMotion);
+		SBMotion* getReachHandMotion(std::string type);
 
 	protected:
 
-
 		SBCharacter* _character;
-
 };
 
 }

@@ -79,6 +79,7 @@
 #include "SteeringAgent.h"
 
 #include <sbm/me_ct_data_receiver.h>
+#include <sbm/me_ct_physics_controller.h>
 #include <sbm/nvbg.h>
 #include <sbm/MiniBrain.h>
 
@@ -91,6 +92,7 @@ class SteeringAgent;
 class MeCtBasicLocomotion;
 class MeCtDataReceiver;
 class SbmPhysicsCharacter;
+class MeCtPhysicsController;
 
 class SbmCharacter : public SmartBody::SBPawn	{
 
@@ -257,6 +259,7 @@ public:
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
 	MeCtSchedulerClass*	param_sched_p; // general parameters
 
+	MeCtPhysicsController* physics_ct;
 	MeCtDataReceiver*	datareceiver_ct;
 	MeCtParamAnimation* param_animation_ct;
 	MeCtMotionPlayer*	motionplayer_ct;
@@ -356,7 +359,10 @@ public:
 	MeCtLocomotionClass* get_locomotion_ct();
 
 public:
+	static SkMotion* findTagSkMotion(int tag, const MotionDataSet& motionSet);
+	static void addTagSkMotion(int tag, SkMotion* motion, MotionDataSet& motionSet);
 	bool addReachMotion(int tag, SkMotion* motion);
+	bool removeReachMotion(int tag, SkMotion* motion);
 	SkMotion* getReachMotion(int index);
 	const MotionDataSet& getReachMotionDataSet() const { return reachMotionData;}
 

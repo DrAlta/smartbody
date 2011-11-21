@@ -340,8 +340,10 @@ SbmGeomCapsule::SbmGeomCapsule( const SrVec& p1, const SrVec& p2, float r )
 	localTransform.rot = rot;
 	localTransform.tran = pos;
 
-	endPts[0] = SrVec(0,0,-extent);
-	endPts[1] = SrVec(0,0,extent);
+	//endPts[0] = SrVec(0,0,-extent);
+	//endPts[1] = SrVec(0,0,extent);
+	endPts[0] = p1*localTransform.gmat().inverse();//SrVec(0,0,-extent);
+	endPts[1] = p2*localTransform.gmat().inverse();//SrVec(0,0,extent);
 	radius = r;		
 	//updateGlobalTransform(SrMat::id);
 }

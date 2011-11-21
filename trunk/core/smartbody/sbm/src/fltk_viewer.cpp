@@ -1,4 +1,5 @@
 /*
+ /*
  *  sr_viewer.cpp - part of SBM: SmartBody Module
  *  Copyright (C) 2008  University of Southern California
  *
@@ -1403,6 +1404,7 @@ void FltkViewer::draw()
 
    //----- Render user scene -------------------------------------------
 
+	//glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 	if (_data->shadowmode == ModeShadows)
 		makeShadowMap();
 	drawAllGeometries();		
@@ -2872,8 +2874,9 @@ void FltkViewer::drawColliders()
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		SbmPhysicsCharacter* phyChar = character->getPhysicsCharacter();		
-		std::map<std::string,SbmJointObj*> jointPhyObjs = phyChar->getJointObjMap();
+		SbmPhysicsCharacter* phyChar = character->getPhysicsCharacter();				
+		if (!phyChar) continue;
+		std::map<std::string,SbmJointObj*>& jointPhyObjs = phyChar->getJointObjMap();
 		std::map<std::string,SbmJointObj*>::iterator mi;
 		for ( mi  = jointPhyObjs.begin();
 			  mi != jointPhyObjs.end();

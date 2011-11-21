@@ -1170,8 +1170,10 @@ void mcuCBHandle::update( void )	{
 			//	char_p->scene_p->update();
 			//char_p->dMesh_p->update();
 			//char_p->updateJointPhyObjs();
-			//bool hasPhySim = physicsEngine->getBoolAttribute("enable");
-			//char_p->updateJointPhyObjs(false);
+			bool hasPhySim = physicsEngine->getBoolAttribute("enable");
+
+			//char_p->updateJointPhyObjs(hasPhySim);
+			char_p->updateJointPhyObjs(false);
 			char_p->_skeleton->update_global_matrices();
 			char_p->forward_visemes( time );	
 			char_p->forward_parameters( time );	
