@@ -1,4 +1,7 @@
 include_directories( "." )
+include_directories( "/home/shapiro/smartbody/trunk/lib/festival/src/include" )
+include_directories( "/home/shapiro/smartbody/trunk/lib/festival/src/modules/VHDuration" )
+include_directories( "/home/shapiro/smartbody/trunk/lib/speech_tools/include" )
 
 ####
 
@@ -309,6 +312,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SBAnimationState.cpp
 	sbm/SBAnimationTransition.cpp
 	sbm/SBAnimationStateManager.cpp
+	sbm/SBSteerManager.cpp
+	sbm/SBSteerAgent.cpp
 	sbm/SBReachManager.cpp
 	sbm/SBReach.cpp
 	sbm/SBMotion.cpp
