@@ -124,7 +124,11 @@ extern SpeechRequestData xmlMetaData;
 std::string festivalLibDir = "";
 //const char * FESTIVAL_RELAY_LIB_DIR = "..\\..\\lib\\festival\\festival\\lib";
 
+#ifdef _WIN32_
 string cache_directory = "..\\..\\data\\cache\\festival\\";
+#else
+string cache_directory = "../../data/cache/festival/";
+#endif
 
 
 /// Cleans up spurious whitespaces in string, and removes weird \n's
@@ -279,6 +283,7 @@ std::string storeXMLMetaData( const std::string & txt)
 							/// Push tag and word into xmlMetaData
 							xmlMetaData.tags.push_back(markString);
 							xmlMetaData.words.push_back(temporaryText);
+							actualText += " ";
 							actualText += temporaryText;
 							cleanString(actualText);
 					   }
@@ -463,8 +468,17 @@ std::string generateReply(const char * utterance,const char * soundFileName)
 	printf( "generateReply() - \nbefore: '%s'\nafter: '%s'\n'%s'\n", utterance, spoken_text.c_str(), soundFileName );
 
 	//festival_say_text(spoken_text.c_str());
-	festival_text_to_wave(spoken_text.c_str(),wave);
-    wave.save(soundFileName,"riff");
+	int result = festival_text_to_wave(spoken_text.c_str(),wave);
+	if (result == FALSE)
+	{
+		printf("Problem creating sound file from speech '%s'", spoken_text.c_str());
+	}
+    //wave.save(soundFileName,"riff");
+    int saveResult = wave.save(soundFileName,"wav");
+    if (saveResult == FALSE)
+    {
+    	printf("Problem writing sound to file '%s'", soundFileName);
+    }
 
 	return xmlMetaData.replyString;
 }
@@ -800,12 +814,14 @@ int main(int argc, char **argv)
 		printf( "Warning, audio cache directory, %s, does not exist. Creating directory...\n", cache_directory.c_str() );
 		for (unsigned int i = 0; i < tokens.size(); i++)
 		{
-		 temp += tokens.at( i ) + "\\";
 #ifdef _WIN32_
+		 temp += tokens.at( i ) + "\\";
 		 _mkdir( temp.c_str() );
 #else
+		temp += tokens.at( i ) + "/";
 		mkdir(temp.c_str(), 0777);
 #endif
+		printf("Creating directory '%s'", temp.c_str());
 		}
 	}
 
