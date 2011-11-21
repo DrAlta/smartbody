@@ -58,7 +58,12 @@
 #include <xercesc/dom/DOMErrorHandler.hpp>
 #include <xercesc/util/XMLString.hpp>
 #include <algorithm>
+#ifdef _WIN32
 #include <direct.h>
+#else
+#include <sys/stat.h>
+#include <sys/types.h>
+#endif
 #include "vhmsg-tt.h"
 #include <festival.h>
 #include <VHDuration.h>
@@ -79,12 +84,12 @@ class XStr
       XStr( const char * const toTranscode )
       {
          // Call the private transcoding method
-         fUnicodeForm = xercesc_3_0::XMLString::transcode( toTranscode );
+         fUnicodeForm = xercesc::XMLString::transcode( toTranscode );
       }
 
       ~XStr()
       {
-         xercesc_3_0::XMLString::release( &fUnicodeForm );
+         xercesc::XMLString::release( &fUnicodeForm );
       }
 
 
@@ -159,8 +164,8 @@ std::string storeXMLMetaData( const std::string & txt)
    xmlMetaData.tags.clear();
    xmlMetaData.words.clear();
    /// Start an XML parser to parse the message we have received
-   xercesc_3_0::XMLPlatformUtils::Initialize();
-   xercesc_3_0::XercesDOMParser *parser = new XercesDOMParser();
+   xercesc::XMLPlatformUtils::Initialize();
+   xercesc::XercesDOMParser *parser = new XercesDOMParser();
 
    std::string truncatedTxt = txt.substr(txt.find_first_of(">")+1);
    char * message = (char*)truncatedTxt.c_str();
@@ -168,7 +173,7 @@ std::string storeXMLMetaData( const std::string & txt)
    std::string actualText = "";
 
    /// Set up a parser for XML message in memory - code sourced from unknown online reference for Xerces XML library
-   xercesc_3_0::MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
+   xercesc::MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
    parser->parse(memIS);
    DOMDocument *doc = parser->getDocument();
    if ( doc )
@@ -252,7 +257,7 @@ std::string storeXMLMetaData( const std::string & txt)
 
 					   if(speechNode !=NULL)
 					   {
-						   t2 = (speech)?XMLString::transcode(speech): " ";
+						   t2 = (speech)? (char*) XMLString::transcode(speech): (char*) " ";
 						   speechString = t2;
 					   }
 					   else
@@ -334,12 +339,20 @@ std::string CreateMarkTimeStamps(std::string text)
 		temp = temp.substr(0, tempText.find_first_of(" "));
 
 		char number[256];
+#ifdef _WIN32_
 		sprintf_s(number, "%d", i);
+#else
+		sprintf(number, "%d", i);
+#endif
 		markUp = markUp.append("<mark name=\"T");
 		markUp = markUp.append(number);
 		markUp = markUp.append("\" />");
 		markUp = markUp.append(temp + "\n\n");
+#ifdef _WIN32_
 		sprintf_s(number, "%d", ++i);
+#else
+		sprintf(number, "%d", ++i);
+#endif
 		markUp = markUp.append("<mark name=\"T");
 		markUp = markUp.append(number);
 		markUp = markUp.append("\" />\n\n");
@@ -407,7 +420,7 @@ std::string TransformTextWithTimes(std::string txt)
 				   speechID = "sp1";
 			   }*/
 			   //hard coding sp1
-			   speechID = "sp1";
+			   speechID = (char*) "sp1";
 			   //XMLString::transcode(speechElement->getAttribute(X("type"))) 
 			   actualText = actualText.append("<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + "application/ssml+xml" + "\">\n\n");
 			   actualText = actualText.append(textContent);
@@ -495,8 +508,17 @@ void process_message( const char * message )
 
 	string remoteSpeechReply = agent_name+" "+message_id+" OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?><speak><soundFile name=\"";
 
+#ifdef _WIN32_
 	char full[ _MAX_PATH ];
+#else
+	char full[PATH_MAX];
+#endif
+#ifdef _WIN32_
 	if ( _fullpath( full, festival_file_name.c_str(), _MAX_PATH ) == NULL )
+#else
+	realpath(festival_file_name.c_str(), full);
+	if (full == NULL) 
+#endif
 	{
 		printf("\nError converting path sent from SBM to absolute path\n");
 	}
@@ -575,6 +597,7 @@ void close_activeMQ()
 }
 
 
+#ifdef _WIN32_
 BOOL WINAPI ConsoleHandler(DWORD CEvent)
 {
     //char mesg[128];
@@ -591,6 +614,7 @@ BOOL WINAPI ConsoleHandler(DWORD CEvent)
     }
     return TRUE;
 }
+#endif
 
 
 
@@ -598,17 +622,24 @@ int main(int argc, char **argv)
 {
 	std::string scriptFile = "";
 	std::string voice = "voice_rab_diphone";
+#ifdef _WIN32_
 	std::string festivalLibDir = "..\\..\\lib\\festival\\festival\\lib";
+#else
+	std::string festivalLibDir = "../../lib/festival/lib";
+#endif
 
 	for(int i=1; i<argc; ++i)
 	{
 		printf("%s\n", argv[i]);
+#ifdef _WIN32_
 		if(!strcmp(argv[i],"-hideConsole"))
 		{
 			HWND hWnd = GetConsoleWindow();
 			ShowWindow( hWnd, SW_HIDE );
 		}
-		else if (!strcmp(argv[i], "-script"))
+		else 
+#endif
+		if (!strcmp(argv[i], "-script"))
 		{
 			if (argc > i + 1)
 			{
@@ -665,6 +696,7 @@ int main(int argc, char **argv)
     festival_initialize(load_init_files,heap_size);
 
 
+#ifdef _WIN32_
 	if (SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler,TRUE)==FALSE)
 	{
 		// unable to install handler... 
@@ -673,6 +705,7 @@ int main(int argc, char **argv)
 		printf("Unable to install handler for console events!\n");
 		return -1;
 	}
+#endif
 
 
 	printf( "Festival Text To Speech Engine:\n\n" );
@@ -686,7 +719,7 @@ int main(int argc, char **argv)
 		std::ifstream scriptStream(scriptFile.c_str());
 		if (!scriptStream.good())
 		{
-			printf("Cannot open script file: %s. Using default Festival commands instead.\n"); 
+			printf("Cannot open script file: %s. Using default Festival commands instead.\n", scriptFile.c_str()); 
 		}
 		else
 		{
@@ -740,8 +773,24 @@ int main(int argc, char **argv)
 
 	printf( "Checking for Cache Directory\n");
 	// check to see if cache directory exists and if not create it
-	if( !(_access( cache_directory.c_str(), 0 ) == 0 ) )
-    {
+	bool cacheDirExists = false;
+#ifdef _WIN32_
+	if( (_access( cache_directory.c_str(), 0 ) == 0 ) )
+	{
+		cacheDirExists = true;
+	}
+#else
+	struct stat statbuf;
+	if (stat(cache_directory.c_str(), &statbuf) != -1)
+	{
+		if (S_ISDIR(statbuf.st_mode))
+		{
+			cacheDirExists = true;
+		}
+	}
+#endif
+	if (!cacheDirExists)
+    	{
 		std::string temp = "";
 		std::vector< std::string > tokens;
 		const std::string delimiters = "\\/";
@@ -752,7 +801,11 @@ int main(int argc, char **argv)
 		for (unsigned int i = 0; i < tokens.size(); i++)
 		{
 		 temp += tokens.at( i ) + "\\";
+#ifdef _WIN32_
 		 _mkdir( temp.c_str() );
+#else
+		mkdir(temp.c_str(), 0777);
+#endif
 		}
 	}
 
