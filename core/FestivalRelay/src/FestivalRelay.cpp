@@ -124,7 +124,7 @@ extern SpeechRequestData xmlMetaData;
 std::string festivalLibDir = "";
 //const char * FESTIVAL_RELAY_LIB_DIR = "..\\..\\lib\\festival\\festival\\lib";
 
-#ifdef _WIN32_
+#ifdef WIN32
 string cache_directory = "..\\..\\data\\cache\\festival\\";
 #else
 string cache_directory = "../../data/cache/festival/";
@@ -344,7 +344,7 @@ std::string CreateMarkTimeStamps(std::string text)
 		temp = temp.substr(0, tempText.find_first_of(" "));
 
 		char number[256];
-#ifdef _WIN32_
+#ifdef WIN32
 		sprintf_s(number, "%d", i);
 #else
 		sprintf(number, "%d", i);
@@ -353,7 +353,7 @@ std::string CreateMarkTimeStamps(std::string text)
 		markUp = markUp.append(number);
 		markUp = markUp.append("\" />");
 		markUp = markUp.append(temp + "\n\n");
-#ifdef _WIN32_
+#ifdef WIN32
 		sprintf_s(number, "%d", ++i);
 #else
 		sprintf(number, "%d", ++i);
@@ -522,12 +522,12 @@ void process_message( const char * message )
 
 	string remoteSpeechReply = agent_name+" "+message_id+" OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?><speak><soundFile name=\"";
 
-#ifdef _WIN32_
+#ifdef WIN32
 	char full[ _MAX_PATH ];
 #else
 	char full[PATH_MAX];
 #endif
-#ifdef _WIN32_
+#ifdef WIN32
 	if ( _fullpath( full, festival_file_name.c_str(), _MAX_PATH ) == NULL )
 #else
 	realpath(festival_file_name.c_str(), full);
@@ -611,7 +611,7 @@ void close_activeMQ()
 }
 
 
-#ifdef _WIN32_
+#ifdef WIN32
 BOOL WINAPI ConsoleHandler(DWORD CEvent)
 {
     //char mesg[128];
@@ -636,7 +636,7 @@ int main(int argc, char **argv)
 {
 	std::string scriptFile = "";
 	std::string voice = "voice_rab_diphone";
-#ifdef _WIN32_
+#ifdef WIN32
 	std::string festivalLibDir = "..\\..\\lib\\festival\\festival\\lib";
 #else
 	std::string festivalLibDir = "../../lib/festival/lib";
@@ -645,7 +645,7 @@ int main(int argc, char **argv)
 	for(int i=1; i<argc; ++i)
 	{
 		printf("%s\n", argv[i]);
-#ifdef _WIN32_
+#ifdef WIN32
 		if(!strcmp(argv[i],"-hideConsole"))
 		{
 			HWND hWnd = GetConsoleWindow();
@@ -710,7 +710,7 @@ int main(int argc, char **argv)
     festival_initialize(load_init_files,heap_size);
 
 
-#ifdef _WIN32_
+#ifdef WIN32
 	if (SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler,TRUE)==FALSE)
 	{
 		// unable to install handler... 
@@ -788,7 +788,7 @@ int main(int argc, char **argv)
 	printf( "Checking for Cache Directory\n");
 	// check to see if cache directory exists and if not create it
 	bool cacheDirExists = false;
-#ifdef _WIN32_
+#ifdef WIN32
 	if( (_access( cache_directory.c_str(), 0 ) == 0 ) )
 	{
 		cacheDirExists = true;
@@ -814,7 +814,7 @@ int main(int argc, char **argv)
 		printf( "Warning, audio cache directory, %s, does not exist. Creating directory...\n", cache_directory.c_str() );
 		for (unsigned int i = 0; i < tokens.size(); i++)
 		{
-#ifdef _WIN32_
+#ifdef WIN32
 		 temp += tokens.at( i ) + "\\";
 		 _mkdir( temp.c_str() );
 #else
