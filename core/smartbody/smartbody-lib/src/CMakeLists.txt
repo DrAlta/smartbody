@@ -3,6 +3,7 @@ include_directories( "/home/shapiro/smartbody/trunk/lib/festival/src/include" )
 include_directories( "/home/shapiro/smartbody/trunk/lib/festival/src/modules/VHDuration" )
 include_directories( "/home/shapiro/smartbody/trunk/lib/speech_tools/include" )
 
+
 ####
 
 set( SMARTBODY_LIB_EXT_ANN_SRC
@@ -242,6 +243,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/me_utilities.cpp
 	sbm/me_ct_breathing.cpp
 	sbm/me_ct_breathing_interface.cpp
+	sbm/me_ct_physics_controller.cpp
 	sbm/ParserBVH.cxx
 	sbm/ParserASFAMC.cxx
 	sbm/ParserFBX.cpp
