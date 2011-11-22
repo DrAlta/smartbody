@@ -118,7 +118,7 @@ class XStr
 XERCES_CPP_NAMESPACE_USE
 //#define FESTIVAL_HEAP_SIZE 999999
 
-bool done = false;
+bool isDone = false;
 extern SpeechRequestData xmlMetaData;
 
 std::string festivalLibDir = "";
@@ -144,9 +144,12 @@ void cleanString(std::string &message)
 		message.resize( message.length() - 1 );
 	}
 
-	unsigned int pos;
-	while ( (pos = message.find("  ")) != std::string::npos )
+	size_t pos;
+	while (1)
 	{
+		pos = message.find("  ");
+		if (pos == std::string::npos)
+			break;
 		//fprintf(stderr,"Debug: replacing 2 whitespaces at %d(%s) with 1 whitespace\n",pos, message.substr(pos,2).c_str());
 		message.replace( pos, 2, " " );
 	}
@@ -574,7 +577,7 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
               splitArgs[ 0 ].compare( "all" ) == 0 )
          {
 			vhmsg::ttu_notify2( "vrProcEnd", "tts festival" );
-			done =true;
+			isDone =true;
          }
       }
    }
@@ -828,7 +831,7 @@ int main(int argc, char **argv)
 	printf( "Done Initializing\n");
 
 	// poll for messages
-	while(!done)
+	while(!isDone)
 	{
 		vhmsg::ttu_wait(1.0);
 	}
