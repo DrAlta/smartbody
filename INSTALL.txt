@@ -178,6 +178,14 @@ https://sourceforge.net/projects/glew/files/glew/1.6.0/glew-1.6.0.tgz/download
 log4cxx
 http://www.apache.org/dyn/closer.cgi/logging/log4cxx/0.10.0/apache-log4cxx-0.10.0.tar.gz
 
+OpenAL
+http://connect.creativelabs.com/openal/Downloads/openal-soft-1.13.tbz2
+
+FreeALUT
+http://connect.creativelabs.com/openal/Downloads/ALUT/freealut-1.1.0-src.zip
+
+libsndfile
+http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.25.tar.gz
 
 Instructions for Android
 ----------------------
