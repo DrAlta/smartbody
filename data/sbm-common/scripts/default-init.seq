@@ -10,8 +10,9 @@
 0   path mesh ../../../../data/mesh
 
 0	seq common-init inline 
-0	seq init-general-parameters
-0	seq init-common-face
+0	seq init-general-parameters inline
+0	seq init-common-face inline
+0	seq init-utah-face inline
 0	panim enable
 
 ###  Common-sk assets are centered on the pelvis,
