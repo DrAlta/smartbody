@@ -50,7 +50,7 @@
 1	char utah init test_utah.sk utah
 1	set character utah world_offset x -135 y 0 h -17
 1	set character utah voice remote utah
-2	bml char utah <body posture="HandsAtSide_Motex"/>
+2	bml char utah <body posture="ChrUtah_Idle003"/>
 
 2 char utah mesh utah
 
