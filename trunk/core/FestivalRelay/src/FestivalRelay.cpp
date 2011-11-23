@@ -752,7 +752,7 @@ int main(int argc, char **argv)
 	}
 
 	printf("Festival lib directory (use -festivalLibDir): %s\n", festivalLibDir.c_str());
-	printf("Cache directory (use -festivalLibDir)       : %s\n", cache_directory.c_str());
+	printf("Cache directory (use -cacheDir)             : %s\n", cache_directory.c_str());
 	printf("Voice (use -voice)                          : %s\n", voice.c_str());
 	printf("Script (use -script)                        : %s\n", scriptFile.c_str());
 

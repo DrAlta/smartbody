@@ -69,8 +69,9 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
 	menubar->add("&Window/BML Creator", 0, LaunchBMLCreatorCB, this, NULL);
 	menubar->add("&Window/Face Viewer", 0, LaunchFaceViewerCB, this, NULL);
-	menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
-	menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, FL_MENU_DIVIDER);
+	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, NULL);
+	//menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
+	//menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, FL_MENU_DIVIDER);
 
 	// disable the commands that are not yet functional
 	/*
@@ -257,6 +258,16 @@ void BaseWindow::LaunchFaceViewerCB( Fl_Widget* widget, void* data )
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.execute((char*)"faceviewer open");
 	mcu.execute((char*)"faceviewer show");	
+}
+
+void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )
+{
+	// run the speech relay launcher script
+#ifdef WIN32
+	system("start ..\\..\\..\\..\\core\\FestivalRelay\\speechrelay.bat");
+#else
+	system("../../../../core/FestivalRelay/speechrelay.sh&");
+#endif
 }
 
 void BaseWindow::LaunchConsoleCB(Fl_Widget* widget, void* data)
