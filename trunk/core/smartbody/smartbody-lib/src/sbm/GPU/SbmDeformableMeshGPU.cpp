@@ -431,7 +431,7 @@ void SbmDeformableMeshGPU::initShaderProgram()
 	else if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_2_0)
 	{
 		SbmShaderManager::singleton().addShader(shadowShaderName.c_str(),shaderVS_2.c_str(),shaderBasicFS.c_str(),false);
-		SbmShaderManager::singleton().addShader(shaderName.c_str(),shaderVS.c_str(),shaderFS.c_str(),false);
+		SbmShaderManager::singleton().addShader(shaderName.c_str(),shaderVS_2.c_str(),shaderFS.c_str(),false);
 	}
 	else
 	{
