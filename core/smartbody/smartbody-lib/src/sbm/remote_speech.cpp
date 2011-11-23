@@ -396,6 +396,16 @@ std::vector<VisemeData*>* remote_speech::getVisemes( RequestId requestId, SbmCha
 		DOMNode* docElement= uttLookUp.lookup(Id);  
 		vector<VisemeData *> *visemeVector= new vector<VisemeData *>;  
 		visemeVector= extractVisemes(docElement, visemeVector, character); //recursively extracts visemes from domdocument
+
+		// make sure that the duration is at least as long as the rampin + rampout
+		for (std::vector<VisemeData*>::iterator iter = visemeVector->begin();
+			 iter != visemeVector->end();
+			 iter++)
+		{
+			if ((*iter)->rampout() + (*iter)->rampin() > (*iter)->duration())
+				(*iter)->setDuration((*iter)->rampout() + (*iter)->rampin());
+		}
+
 		return (visemeVector);
 	}
 	else //if viseme isn't found returns NULL
