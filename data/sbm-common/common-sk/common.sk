@@ -5,8 +5,6 @@ set_name common
 skeleton
 root base
 { offset 0 0 0
-  visgeo "geom/doctor_base_vis.srm"
-  colgeo "geom/doctor_base_col.srm"
   channel XPos 0 free
   channel YPos 0 free
   channel ZPos 0 free
@@ -14,44 +12,30 @@ root base
 
   joint spine1
   { offset 0 7.782680 0
-    visgeo "geom/doctor_spine1_vis.srm"
-    colgeo "geom/doctor_spine1_col.srm"
     channel Quat
 
     joint spine2
     { offset 0 9.925360 0
-      visgeo "geom/doctor_spine2_vis.srm"
-      colgeo "geom/doctor_spine2_col.srm"
       channel Quat
 
       joint spine3
       { offset 0 11.171900 0
-        visgeo "geom/doctor_spine3_vis.srm"
-        colgeo "geom/doctor_spine3_col.srm"
         channel Quat
 
         joint spine4
         { offset 0 27.120060 0
-          visgeo "geom/doctor_spine4_vis.srm"
-          colgeo "geom/doctor_spine4_col.srm"
           channel Quat
 
           joint spine5
           { offset 0 3.711200 0
-            visgeo "geom/doctor_spine5_vis.srm"
-            colgeo "geom/doctor_spine5_col.srm"
             channel Quat
 
             joint skullbase
             { offset 0 5 0
-              visgeo "geom/doctor_skullbase_vis.srm"
-              colgeo "geom/doctor_skullbase_col.srm"
               channel Quat
 
               joint face_top_parent
               { offset -0.038970 3.909850 -1.942020
-                visgeo "geom/doctor_face_top_parent_vis.srm"
-                colgeo "geom/doctor_face_top_parent_col.srm"
                 channel Quat
 
                 joint brow_parent_left
@@ -94,8 +78,6 @@ root base
 
                 joint eyeball_left
                 { offset 2.945130 2.035140 10.222710
-                  visgeo "geom/doctor_eyelaser_vis.srm"
-                  colgeo "geom/doctor_eyelaser_col.srm"
                   channel Quat
                 }
 
@@ -166,8 +148,6 @@ root base
 
                 joint eyeball_right
                 { offset -2.842170 2.036090 10.221480
-                  visgeo "geom/doctor_eyelaser_vis.srm"
-                  colgeo "geom/doctor_eyelaser_col.srm"
                   channel Quat
                 }
 
@@ -333,50 +313,34 @@ root base
 
           joint l_acromioclavicular
           { offset 7 -5.668830 -5.732900
-            visgeo "geom/doctor_l_acromioclavicular_vis.srm"
-            colgeo "geom/doctor_l_acromioclavicular_col.srm"
             channel Quat
 
             joint l_shoulder
             { offset 8 4 0
-              visgeo "geom/doctor_l_shoulder_vis.srm"
-              colgeo "geom/doctor_l_shoulder_col.srm"
               channel Quat
 
               joint l_elbow
               { offset 28 0.430660 -0.030480
-                visgeo "geom/doctor_l_elbow_vis.srm"
-                colgeo "geom/doctor_l_elbow_col.srm"
                 channel Quat
 
                 joint l_forearm
                 { offset 15.998100 0.246060 -0.017420
-                  visgeo "geom/doctor_l_forearm_vis.srm"
-                  colgeo "geom/doctor_l_forearm_col.srm"
                   channel Quat
 
                   joint l_wrist
                   { offset 11.998570 0.184540 -0.013060
-                    visgeo "geom/doctor_l_wrist_vis.srm"
-                    colgeo "geom/doctor_l_wrist_col.srm"
                     channel Quat
 
                     joint l_pinky1
                     { offset 6.580830 -0.692350 -3.343890
-                      visgeo "geom/doctor_l_pinky1_vis.srm"
-                      colgeo "geom/doctor_l_pinky1_col.srm"
                       channel Quat
 
                       joint l_pinky2
                       { offset 2.415330 0.037150 -0.002630
-                        visgeo "geom/doctor_l_pinky2_vis.srm"
-                        colgeo "geom/doctor_l_pinky2_col.srm"
                         channel Quat
 
                         joint l_pinky3
                         { offset 2.475000 0.038070 0.027130
-                          visgeo "geom/doctor_l_pinky3_vis.srm"
-                          colgeo "geom/doctor_l_pinky3_col.srm"
                           channel Quat
 
                           joint l_pinky4
@@ -389,20 +353,14 @@ root base
 
                     joint l_ring1
                     { offset 7.509180 -0.313580 -1.525730
-                      visgeo "geom/doctor_l_ring1_vis.srm"
-                      colgeo "geom/doctor_l_ring1_col.srm"
                       channel Quat
 
                       joint l_ring2
                       { offset 3.757020 0.057780 -0.153200
-                        visgeo "geom/doctor_l_ring2_vis.srm"
-                        colgeo "geom/doctor_l_ring2_col.srm"
                         channel Quat
 
                         joint l_ring3
                         { offset 3.190560 0.049070 -0.063120
-                          visgeo "geom/doctor_l_ring3_vis.srm"
-                          colgeo "geom/doctor_l_ring3_col.srm"
                           channel Quat
 
                           joint l_ring4
@@ -415,20 +373,14 @@ root base
 
                     joint l_middle1
                     { offset 8.219700 -0.013310 -0.008950
-                      visgeo "geom/doctor_l_middle1_vis.srm"
-                      colgeo "geom/doctor_l_middle1_col.srm"
                       channel Quat
 
                       joint l_middle2
                       { offset 3.999520 0.061510 -0.004350
-                        visgeo "geom/doctor_l_middle2_vis.srm"
-                        colgeo "geom/doctor_l_middle2_col.srm"
                         channel Quat
 
                         joint l_middle3
                         { offset 2.999640 0.046140 -0.003270
-                          visgeo "geom/doctor_l_middle3_vis.srm"
-                          colgeo "geom/doctor_l_middle3_col.srm"
                           channel Quat
 
                           joint l_middle4
@@ -441,20 +393,14 @@ root base
 
                     joint l_index1
                     { offset 7.761800 -0.167860 1.963990
-                      visgeo "geom/doctor_l_index1_vis.srm"
-                      colgeo "geom/doctor_l_index1_col.srm"
                       channel Quat
 
                       joint l_index2
                       { offset 4.204470 0.064670 -0.004580
-                        visgeo "geom/doctor_l_index2_vis.srm"
-                        colgeo "geom/doctor_l_index2_col.srm"
                         channel Quat
 
                         joint l_index3
                         { offset 3.071320 0.047240 -0.033170
-                          visgeo "geom/doctor_l_index3_vis.srm"
-                          colgeo "geom/doctor_l_index3_col.srm"
                           channel Quat
 
                           joint l_index4
@@ -467,20 +413,14 @@ root base
 
                     joint l_thumb1
                     { offset 2.405290 -0.229900 3.521100
-                      visgeo "geom/doctor_l_thumb1_vis.srm"
-                      colgeo "geom/doctor_l_thumb1_col.srm"
                       channel Quat
 
                       joint l_thumb2
                       { offset 0.003380 0.000050 3.105480
-                        visgeo "geom/doctor_l_thumb2_vis.srm"
-                        colgeo "geom/doctor_l_thumb2_col.srm"
                         channel Quat
 
                         joint l_thumb3
                         { offset 0.002610 0.000040 2.401110
-                          visgeo "geom/doctor_l_thumb3_vis.srm"
-                          colgeo "geom/doctor_l_thumb3_col.srm"
                           channel Quat
 
                           joint l_thumb4
@@ -503,50 +443,34 @@ root base
 
           joint r_acromioclavicular
           { offset -6.999990 -5.668980 -5.732890
-            visgeo "geom/doctor_r_acromioclavicular_vis.srm"
-            colgeo "geom/doctor_r_acromioclavicular_col.srm"
             channel Quat
 
             joint r_shoulder
             { offset -7.999990 4.000200 0
-              visgeo "geom/doctor_r_shoulder_vis.srm"
-              colgeo "geom/doctor_r_shoulder_col.srm"
               channel Quat
 
               joint r_elbow
               { offset -28.000031 0.430680 -0.030480
-                visgeo "geom/doctor_r_elbow_vis.srm"
-                colgeo "geom/doctor_r_elbow_col.srm"
                 channel Quat
 
                 joint r_forearm
                 { offset -15.998040 0.245970 -0.017420
-                  visgeo "geom/doctor_r_forearm_vis.srm"
-                  colgeo "geom/doctor_r_forearm_col.srm"
                   channel Quat
 
                   joint r_wrist
                   { offset -11.998760 0.184400 -0.013060
-                    visgeo "geom/doctor_r_wrist_vis.srm"
-                    colgeo "geom/doctor_r_wrist_col.srm"
                     channel Quat                    
                     
                     joint r_pinky1
                     { offset -6.580630 -0.692200 -3.343900
-                      visgeo "geom/doctor_r_pinky1_vis.srm"
-                      colgeo "geom/doctor_r_pinky1_col.srm"
                       channel Quat
 
                       joint r_pinky2
                       { offset -2.415540 0.037190 -0.002620
-                        visgeo "geom/doctor_r_pinky2_vis.srm"
-                        colgeo "geom/doctor_r_pinky2_col.srm"
                         channel Quat
 
                         joint r_pinky3
                         { offset -2.474980 0.038100 0.027130
-                          visgeo "geom/doctor_r_pinky3_vis.srm"
-                          colgeo "geom/doctor_r_pinky3_col.srm"
                           channel Quat
 
                           joint r_pinky4
@@ -559,20 +483,14 @@ root base
 
                     joint r_ring1
                     { offset -7.509050 -0.313330 -1.525730
-                      visgeo "geom/doctor_r_ring1_vis.srm"
-                      colgeo "geom/doctor_r_ring1_col.srm"
                       channel Quat
 
                       joint r_ring2
                       { offset -3.756960 0.057610 -0.153200
-                        visgeo "geom/doctor_r_ring2_vis.srm"
-                        colgeo "geom/doctor_r_ring2_col.srm"
                         channel Quat
 
                         joint r_ring3
                         { offset -3.190650 0.049070 -0.063120
-                          visgeo "geom/doctor_r_ring3_vis.srm"
-                          colgeo "geom/doctor_r_ring3_col.srm"
                           channel Quat
 
                           joint r_ring4
@@ -585,20 +503,14 @@ root base
 
                     joint r_middle1
                     { offset -8.219540 -0.013110 -0.008950
-                      visgeo "geom/doctor_r_middle1_vis.srm"
-                      colgeo "geom/doctor_r_middle1_col.srm"
                       channel Quat
 
                       joint r_middle2
                       { offset -3.999590 0.061570 -0.004350
-                        visgeo "geom/doctor_r_middle2_vis.srm"
-                        colgeo "geom/doctor_r_middle2_col.srm"
                         channel Quat
 
                         joint r_middle3
                         { offset -2.999540 0.046020 -0.003270
-                          visgeo "geom/doctor_r_middle3_vis.srm"
-                          colgeo "geom/doctor_r_middle3_col.srm"
                           channel Quat
 
                           joint r_middle4
@@ -611,20 +523,14 @@ root base
 
                     joint r_index1
                     { offset -7.761730 -0.167640 1.963990
-                      visgeo "geom/doctor_r_index1_vis.srm"
-                      colgeo "geom/doctor_r_index1_col.srm"
                       channel Quat
 
                       joint r_index2
                       { offset -4.204410 0.064620 -0.004580
-                        visgeo "geom/doctor_r_index2_vis.srm"
-                        colgeo "geom/doctor_r_index2_col.srm"
                         channel Quat
 
                         joint r_index3
                         { offset -3.071160 0.047240 -0.033170
-                          visgeo "geom/doctor_r_index3_vis.srm"
-                          colgeo "geom/doctor_r_index3_col.srm"
                           channel Quat
 
                           joint r_index4
@@ -637,20 +543,14 @@ root base
 
                     joint r_thumb1
                     { offset -2.405180 -0.229820 3.521110
-                      visgeo "geom/doctor_r_thumb1_vis.srm"
-                      colgeo "geom/doctor_r_thumb1_col.srm"
                       channel Quat
 
                       joint r_thumb2
                       { offset -0.003350 0 3.105490
-                        visgeo "geom/doctor_r_thumb2_vis.srm"
-                        colgeo "geom/doctor_r_thumb2_col.srm"
                         channel Quat
 
                         joint r_thumb3
                         { offset -0.002740 0.000300 2.401090
-                          visgeo "geom/doctor_r_thumb3_vis.srm"
-                          colgeo "geom/doctor_r_thumb3_col.srm"
                           channel Quat
 
                           joint r_thumb4
@@ -672,26 +572,18 @@ root base
 
   joint l_hip
   { offset 10 -5 0
-    visgeo "geom/doctor_l_hip_vis.srm"
-    colgeo "geom/doctor_l_hip_col.srm"
     channel Quat
 
     joint l_knee
     { offset 0 -43.999020 0.293680
-      visgeo "geom/doctor_l_knee_vis.srm"
-      colgeo "geom/doctor_l_knee_col.srm"
       channel Quat
 
       joint l_ankle
       { offset 0 -43.999020 0.293680
-        visgeo "geom/doctor_l_ankle_vis.srm"
-        colgeo "geom/doctor_l_ankle_col.srm"
         channel Quat
 
         joint l_forefoot
         { offset 0 -6.879700 18.046320
-          visgeo "geom/doctor_l_forefoot_vis.srm"
-          colgeo "geom/doctor_l_forefoot_col.srm"
           channel Quat
 
           joint l_toe
@@ -705,26 +597,18 @@ root base
 
   joint r_hip
   { offset -10 -5 0
-    visgeo "geom/doctor_r_hip_vis.srm"
-    colgeo "geom/doctor_r_hip_col.srm"
     channel Quat
 
     joint r_knee
     { offset 0 -43.999039 0.293680
-      visgeo "geom/doctor_r_knee_vis.srm"
-      colgeo "geom/doctor_r_knee_col.srm"
       channel Quat
 
       joint r_ankle
       { offset 0 -43.999100 0.293680
-        visgeo "geom/doctor_r_ankle_vis.srm"
-        colgeo "geom/doctor_r_ankle_col.srm"
         channel Quat
 
         joint r_forefoot
         { offset 0 -6.879640 18.046320
-          visgeo "geom/doctor_r_forefoot_vis.srm"
-          colgeo "geom/doctor_r_forefoot_col.srm"
           channel Quat
 
           joint r_toe
