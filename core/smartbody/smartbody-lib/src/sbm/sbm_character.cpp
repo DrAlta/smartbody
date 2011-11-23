@@ -1782,6 +1782,9 @@ void SbmCharacter::schedule_viseme_trapezoid(
 			}
 		}
 
+		// make sure that we never have a zero duration
+		if (duration <= 0.0)
+			duration = .05f;
 		curve_info[ 1 ] = weight * visemeWeight;
 		curve_info[ 2 ] = duration;
 		curve_info[ 3 ] = weight * visemeWeight;
