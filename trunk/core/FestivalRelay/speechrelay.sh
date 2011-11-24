@@ -6,4 +6,4 @@
 # -cacheDir          (location where generated .wav files will be placed)
 # -voice			   (voice to use)
 
-../../../../core/FestivalRelay/festivalrelay 
+../../../../core/FestivalRelay/festivalrelay -cacheDir ../../../../data/cache/festival/ -festivalLibDir ../../../../bin/FestivalRelay/lib/festival/festival/lib
