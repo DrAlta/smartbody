@@ -830,7 +830,6 @@ int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 				mirrorMotionName = refMotionName + "_mirror";
 			mirrorMotion->setName(mirrorMotionName.c_str());
 			map.insert(std::pair<std::string, SkMotion*>(mirrorMotionName, mirrorMotion));
-			mirrorMotion->ref();
 			return CMD_SUCCESS;
 		}		
 	}
@@ -894,7 +893,6 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					if (iter == mcu_p->motion_map.end())
 						return CMD_FAILURE;
 					newState->motions.push_back(iter->second);
-					iter->second->ref();
 				}
 				int numKeys = args.read_int();
 				for (int i = 0; i < numMotions; i++)

@@ -50,15 +50,9 @@ void MeCtFace::clear( void )	{
    _skeleton_ref_p = NULL;
 
 	if( _base_pose_p )	{
-		_base_pose_p->unref();
 		_base_pose_p = NULL;
 	}
-
-	SkMotion* key_pose_p;
 	_key_pose_map.reset();
-	while( key_pose_p = _key_pose_map.pull() )	{
-		key_pose_p->unref();
-	}
 
 	_visemeChannelMap.clear();
 	_baseChannelToBufferIndex.clear();
@@ -114,7 +108,6 @@ void MeCtFace::init(SmartBody::SBFaceDefinition* faceDefinition) {
 	SkMotion* faceNeutral = faceDefinition->getFaceNeutral();
 	if ( faceNeutral )	{
 		_base_pose_p = faceNeutral;
-		_base_pose_p->ref();
 		_base_pose_p->move_keytimes( 0.0 ); // make sure motion starts at 0
 
 		SkChannelArray& mchan_arr = _base_pose_p->channels();
@@ -196,7 +189,6 @@ void MeCtFace::add_key( const char *weight_key, SkMotion* key_pose_p ) {
 	
 	if (key_pose_p)
 	{
-		key_pose_p->ref();
 		key_pose_p->move_keytimes( 0.0 );
 	}
 	_key_pose_map.insert( weight_key, key_pose_p );

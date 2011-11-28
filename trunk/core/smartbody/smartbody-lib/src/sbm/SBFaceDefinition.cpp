@@ -28,17 +28,12 @@ void SBFaceDefinition::setName(const std::string& name)
 SBFaceDefinition::SBFaceDefinition(SBFaceDefinition* source)
 {
 	_faceNeutral = source->getFaceNeutral();
-	if (_faceNeutral)
-		_faceNeutral->ref();
-
 	int numVisemes = source->getNumVisemes();
 	for (int v = 0; v < numVisemes; v++)
 	{
 		std::string visemeName = source->getVisemeName(v);
 		SkMotion* motion = source->getVisemeMotion(visemeName);
 		_visemeMap.insert(std::pair<std::string, std::pair<SkMotion*, float> >(visemeName, std::pair<SkMotion*, float>(motion, 1.0f)));
-		if (motion)
-			motion->ref();
 	}
 
 	int numAUs = source->getNumAUs();
@@ -59,14 +54,9 @@ SBFaceDefinition::~SBFaceDefinition()
 		 iter++)
 	{
 		SkMotion* motion = (*iter).second.first;
-		if (motion)
-			motion->unref();
 	}
 
 	_visemeMap.clear();
-	if (_faceNeutral)
-		_faceNeutral->unref();
-
 
 	for (std::map<int, ActionUnit*>::iterator iter = _auMap.begin();
 		 iter != _auMap.end();
@@ -91,11 +81,7 @@ void SBFaceDefinition::setFaceNeutral(const std::string& motionName)
 		}
 	}
 
-	if (_faceNeutral)
-		_faceNeutral->unref();
 	_faceNeutral = motion;
-	if (_faceNeutral)
-		_faceNeutral->ref();
 
 	LOG("Face neutral motion is now '%s'.", motionName.c_str());
 }
@@ -275,7 +261,6 @@ void SBFaceDefinition::setViseme(const std::string& visemeName, const std::strin
 			return;
 		}
 
-		motion->ref();
 		_visemeMap.insert(std::pair<std::string, std::pair<SkMotion*, float> >(visemeName, std::pair<SkMotion*, float>(motion, 1.0f)));
 		LOG("Viseme '%s' added to face definition %s.", visemeName.c_str(), getName().c_str());
 		return;
@@ -288,7 +273,6 @@ void SBFaceDefinition::setViseme(const std::string& visemeName, const std::strin
 			// no motion given, add the viseme only
 			if (motionName == "")
 			{
-				motion->unref();
 				_visemeMap.erase(iter);
 				_visemeMap.insert(std::pair<std::string, std::pair<SkMotion*, float> >(visemeName, std::pair<SkMotion*, float>(NULL, 1.0f)));
 				LOG("Viseme '%s' with motion '%s' replaced with no motion.", visemeName.c_str(), motion->getName().c_str()); 
@@ -305,7 +289,6 @@ void SBFaceDefinition::setViseme(const std::string& visemeName, const std::strin
 				}
 				else
 				{
-					motion->unref();
 					_visemeMap.erase(iter);
 					_visemeMap.insert(std::pair<std::string, std::pair<SkMotion*, float> >(visemeName, std::pair<SkMotion*, float>(newMotion, 1.0f)));
 					LOG("Viseme '%s' with motion '%s' replaced with motion '%s'.", visemeName.c_str(), motion->getName().c_str(), motionName.c_str());

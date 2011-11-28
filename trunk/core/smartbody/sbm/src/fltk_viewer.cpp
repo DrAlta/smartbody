@@ -398,9 +398,9 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->displayaxis = false;
    _data->boundingbox = false;
    _data->scene_received_event = false;
-   _data->showgeometry = true;
+   _data->showgeometry = false;
    _data->showcollisiongeometry = false;
-   _data->showbones = false;
+   _data->showbones = true;
    _data->showaxis = false;
    _data->showmasses = false;
    _data->showlocomotionall = false;

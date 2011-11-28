@@ -60,7 +60,6 @@ MeCtBreathing::MeCtBreathing ()
 
 MeCtBreathing::~MeCtBreathing ()
 {
-	if ( _motion ) _motion->unref ();
 	for (std::list<BreathLayer*>::iterator iter = _breath_layers.begin();
 		iter != _breath_layers.end();
 		iter++)
@@ -69,9 +68,6 @@ MeCtBreathing::~MeCtBreathing ()
 	}
 	
 	delete _default_breath_cycle;
-
-	if (_blendChannelBreathingMotion)
-		_blendChannelBreathingMotion->unref();
 
 }
 
@@ -129,8 +125,6 @@ void MeCtBreathing::setUseBlendChannels(bool val)
 		}
 		_blendChannelBreathingMotion->synch_points.set_time(0, 0, totalTime / 2,  totalTime / 2, totalTime / 2, totalTime, totalTime);
 #endif
-		_blendChannelBreathingMotion->ref();
-
 		setMotion(_blendChannelBreathingMotion);
 	}
 	
@@ -252,13 +246,11 @@ void MeCtBreathing::immediate_motion(SkMotion* motion)
 			return;
 		}
 		// else new motion
-		_motion->unref();
 	}
 
 	_motion = motion;
 	_last_apply_frame = 0;
 
-	_motion->ref();
 	_motion->move_keytimes ( 0 ); // make sure motion starts at 0
 
 	MeController::init (NULL);

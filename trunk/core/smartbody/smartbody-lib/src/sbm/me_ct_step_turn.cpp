@@ -52,9 +52,6 @@ MeCtStepTurn::MeCtStepTurn( void )	{
 
 MeCtStepTurn::~MeCtStepTurn( void )	{
 
-	if ( _left_motion ) _left_motion->unref();
-	if ( _right_motion ) _right_motion->unref();
-
 	if( interim_pose_buff_p )	{
 		delete [] interim_pose_buff_p;
 		interim_pose_buff_p = NULL;
@@ -71,8 +68,6 @@ void MeCtStepTurn::init( SbmPawn* pawn, SkMotion* mot_p ) {
 			return;
 		}
 		// else new motion
-		_left_motion->unref();
-		_right_motion->unref();
 	}
 	_last_apply_frame = 0;
 	
@@ -90,9 +85,7 @@ void MeCtStepTurn::init( SbmPawn* pawn, SkMotion* mot_p ) {
 	}
 
 	_left_motion->move_keytimes( 0 ); // make sure motion starts at 0
-	_left_motion->ref();
 	_right_motion->move_keytimes( 0 ); 
-	_right_motion->ref();
 	_motion = _left_motion;
 
 //	set_time( raw_time );
