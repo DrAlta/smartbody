@@ -55,7 +55,7 @@ class SkPostureDfJoints : public SrSharedClass
     used by the distance function in the 'values' and 'joints' buffers.
     Two shareable classes are referenced: a channel array describing 'values',
     and a SkPostureDfJoints describing how to update 'points'. */
-class SkPosture : public SrSharedClass
+class SkPosture
  { public :
     SrBuffer<float> values; // values defining this posture
     SrBuffer<SrPnt> points; // articulation points used by the distance function

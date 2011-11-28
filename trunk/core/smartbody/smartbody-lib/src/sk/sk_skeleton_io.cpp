@@ -495,7 +495,6 @@ bool SkSkeleton::load ( SrInput& in, double skScale, const char* basedir )
 	{ if ( _channels->size()==0 ) make_active_channels ();
 	SkPosture* post = new SkPosture;
 	post->init(this);
-	post->ref();
 	_postures.push() = post;
 	in >> *post;
 	}
@@ -644,7 +643,6 @@ SkJoint* SkSkeleton::_loadjlist ( SrInput& in, float scale, SrStringArray& paths
 	// initial dof values:
 	make_active_channels ();
 	SkPosture* post = new SkPosture;
-	post->ref();
 	post->init ( this ); // save current posture
 	post->get();
 
@@ -659,7 +657,7 @@ SkJoint* SkSkeleton::_loadjlist ( SrInput& in, float scale, SrStringArray& paths
 	if ( j->_colgeo ) j->_colgeo->apply_transformation(mat);
 	}
 	post->apply();
-	post->unref();
+	delete post;
 
 	update_global_matrices ();
 

@@ -116,7 +116,7 @@ void SkSkeleton::init ()
 	while ( _postures.size()>0 ) 
 	{
 		SkPosture* posture = _postures.pop();
-		posture->unref();
+		delete posture;
 	}
 	while ( _joints.size()>0 ) 
 	{
