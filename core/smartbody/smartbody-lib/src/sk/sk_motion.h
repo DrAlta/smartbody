@@ -38,8 +38,8 @@ class MotionEvent;
 
 /*! Maintains a motion defined as a sequence of keyframes, each
 with a time stamp */
-class SkMotion : public SmartBody::SBObject, public SrSharedClass {
-//class SkMotion {
+class SkMotion : public SmartBody::SBObject
+{
 public:
 	struct Frame { 
 			float keytime; 

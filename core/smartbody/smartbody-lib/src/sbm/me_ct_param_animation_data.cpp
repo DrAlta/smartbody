@@ -43,7 +43,6 @@ PAStateData::PAStateData(PAStateData* data)
 	for (unsigned int i = 0; i < data->motions.size(); i++)
 	{
 		motions.push_back(data->motions[i]);
-		data->motions[i]->ref();
 	}
 
 	for (unsigned int i = 0; i < data->keys.size(); i++)
@@ -79,7 +78,6 @@ PAStateData::~PAStateData()
 {
 	for (unsigned int i = 0; i < motions.size(); i++)
 	{
-		motions[i]->unref();
 		motions[i] = NULL;
 	}
 	motions.clear();
@@ -955,7 +953,6 @@ int ParameterManager::PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c)
 MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)
 {
 	motion = m;
-	motion->ref();
 	skeleton = new SkSkeleton(skel);
 	skeleton->ref();
 	motion->connect(skeleton);
@@ -972,8 +969,6 @@ MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)
 MotionParameters::~MotionParameters()
 {
 	motion->disconnect();
-	if (motion)
-		motion->unref();
 	if (skeleton)
 		skeleton->unref();
 }

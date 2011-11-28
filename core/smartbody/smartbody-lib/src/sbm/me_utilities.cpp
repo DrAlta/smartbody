@@ -254,7 +254,6 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 
 		std::string ext = extension( pathname );
 		SkMotion* motion = new SmartBody::SBMotion();
-		motion->ref();
 		bool parseSuccessful = false;
 
 		if (ext == ".skm")
@@ -343,7 +342,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			std::map<std::string, SkMotion*>::iterator motionIter = map.find(filebase);
 			if (motionIter != map.end()) {
 				LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
-				motion->unref();
+				delete motion;
 				return CMD_FAILURE;
 			}
 			map.insert(std::pair<std::string, SkMotion*>(filebase, motion));
@@ -351,7 +350,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 		} else {
 			// SkMotion::load() already prints an error...
 			//strstr << error_prefix << "Failed to load motion \"" << pathname.string() << "\"." << endl;
-			motion->unref();
+			delete motion;
 			return CMD_FAILURE;
 		}
 		

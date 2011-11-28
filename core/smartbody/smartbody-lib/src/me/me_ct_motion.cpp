@@ -44,7 +44,6 @@ MeCtMotion::MeCtMotion ()
 
 MeCtMotion::~MeCtMotion ()
  {
-   if ( _motion ) _motion->unref ();
  }
 
 void MeCtMotion::init(SbmPawn* pawn, SkMotion* m_p, double time_offset, double time_scale)	{
@@ -57,13 +56,11 @@ void MeCtMotion::init(SbmPawn* pawn, SkMotion* m_p, double time_offset, double t
 			return;
 		}
 		// else new motion
-		_motion->unref();
 	}
 
 	_motion = m_p;
 	_last_apply_frame = 0;
 
-	_motion->ref();
 	_motion->move_keytimes ( 0 ); // make sure motion starts at 0
 //	_duration = _motion->duration() / _twarp;
 

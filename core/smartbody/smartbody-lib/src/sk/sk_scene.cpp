@@ -120,7 +120,7 @@ void SkScene::init ( SkSkeleton* s )
    if (scaleFactor == 0.0f)
 	   scaleFactor = 1.0f;
    sphere->shape().radius = scaleFactor * _cradius * _sfactor;
-   sphere->visible ( false );
+   sphere->visible ( true );
    sphere->ref();
 
    axis = new SrSnLines; // shared axis
@@ -164,7 +164,7 @@ void SkScene::init ( SkSkeleton* s )
          c->shape().a = SrPnt::null;
          c->shape().b = joints[i]->child(j)->offset();
          c->shape().radius = scaleFactor * _cradius;
-         c->visible ( false );
+         c->visible ( true );
          g->add ( c ); // starting at FirstCylPos
        }
 
@@ -174,7 +174,7 @@ void SkScene::init ( SkSkeleton* s )
 		 SrSnSphere* sphere = new SrSnSphere;
 		 sphere->color(SrColor::white);
 		 sphere->shape().radius = scaleFactor * _cradius * _sfactor * 0.75f;
-		 sphere->visible ( false );
+		 sphere->visible ( true );
 //		 sphere->ref();
          g->add ( sphere ); 	
 	  }

@@ -114,7 +114,6 @@ bool SBAnimationState::addSkMotion(std::string motion)
 	if (skMotion)
 	{
 		motions.push_back(skMotion);
-		skMotion->ref();
 	}
 	else
 	{

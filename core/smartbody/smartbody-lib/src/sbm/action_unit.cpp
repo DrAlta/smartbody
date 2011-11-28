@@ -27,19 +27,11 @@ ActionUnit::ActionUnit(ActionUnit* source)
 	if (source->is_bilateral())
 		set_bilateral();
 	left = source->left;
-	if (left)
-		left->ref();
 	right = source->right;
-	if (right)
-		right->ref();
 }
 
 ActionUnit::~ActionUnit()
 {
-	if (left)
-		left->unref();
-	if (right)
-		right->unref();
 }
 
 bool ActionUnit::is_bilateral() const
