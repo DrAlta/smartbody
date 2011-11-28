@@ -607,6 +607,8 @@ dGeomID SbmPhysicsSimODE::createODEGeometry( SbmPhysicsObj* obj, float mass )
 	else if (dynamic_cast<SbmGeomCapsule*>(geom))
 	{
 		SbmGeomCapsule* cap = dynamic_cast<SbmGeomCapsule*>(geom);		
+		if (cap->extent == 0.0)
+			cap->extent = 0.01f;
 		geomID = dCreateCapsule(odeSim->getSpaceID(),(dReal)cap->radius,(dReal)cap->extent);
 		//dMassSetCapsuleTotal(&odeMass,(dReal)mass,3,(dReal)cap->radius,(dReal)cap->extent);
 		dMassSetCapsule(&odeObj->odeMass,(dReal)mass,3,(dReal)cap->radius,(dReal)cap->extent);
