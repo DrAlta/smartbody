@@ -573,7 +573,7 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 			std::stringstream strstr;
 			strstr << error_prefix << "Failed to load posture \"" << pathname.string() << "\".";
 			LOG(strstr.str().c_str());
-			posture->unref();
+			delete posture;
 			return CMD_FAILURE;
 		} else {
 
@@ -612,7 +612,6 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 				return CMD_FAILURE;
 			}
 			map.insert(std::pair<std::string, SkPosture*>(filebase, posture));
-			posture->ref();
 		}
 	}
 	return CMD_SUCCESS;
