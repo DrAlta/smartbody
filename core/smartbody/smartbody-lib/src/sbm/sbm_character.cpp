@@ -514,14 +514,16 @@ void SbmCharacter::updateJointPhyObjs(bool phySim)
 			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
 			if (phySim)
 			{
+				phyObj->enablePhysicsSim(true);
 				phyObj->updateSbmObj();
 			}
 			else
-			{
-				SrMat pmat = curJoint->gmat();
-				if (curJoint->parent()) pmat = curJoint->parent()->gmat();
-				SrMat tranMat; tranMat.translation(curJoint->offset()*0.5f);
-				const SrMat& gmat = tranMat*pmat;
+			{				
+				SBJoint* curSBJoint = dynamic_cast<SBJoint*>(curJoint);
+				SrMat tranMat; tranMat.translation(SbmJointObj::computeJointObjLocalCenter(curSBJoint));	
+				phyObj->enablePhysicsSim(false);
+				//if (joint->parent()) 
+				SrMat gmat = tranMat*curSBJoint->gmat();		
 				phyObj->setGlobalTransform(gmat);
 				phyObj->updatePhySim();
 			}		
@@ -560,8 +562,8 @@ void SbmCharacter::buildJointPhyObjs()
 	excludeNameList.insert("r_wrist");
 	excludeNameList.insert("l_wrist");
 	excludeNameList.insert("spine5");
-	excludeNameList.insert("l_ankle");
-	excludeNameList.insert("r_ankle");
+	excludeNameList.insert("l_forefoot");
+	excludeNameList.insert("r_forefoot");
 	SkJoint* rootJoint = _skeleton->root();
 	jointNameList.push_back(rootJoint->name());
 	tempJointList.push(rootJoint->child(0));
@@ -571,6 +573,8 @@ void SbmCharacter::buildJointPhyObjs()
 	{
 		SkJoint* joint = tempJointList.front(); tempJointList.pop();
 		std::string jName = joint->name();
+		if (joint->num_children() == 0) // don't process leaves
+			continue;
 		jointNameList.push_back(jName);
 		if (excludeNameList.find(jName) != excludeNameList.end())
 			continue;
