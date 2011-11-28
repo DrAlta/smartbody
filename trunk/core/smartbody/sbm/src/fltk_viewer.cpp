@@ -101,7 +101,7 @@ std::string Std_FS =
 "uniform sampler2D tex;\n\
 uniform int useShadowMap;\n\
 varying vec4 vPos;\n\
-vec4 shadowCoef()\n\
+float shadowCoef()\n\
 {\n\
 	int index = 0;\n\
 	vec4 shadow_coord = vPos/vPos.w;//gl_TextureMatrix[1]*vPos;\n\
@@ -115,9 +115,9 @@ vec4 shadowCoef()\n\
 }\n\
 void main()\n\
 {\n\
-	const float shadow_ambient = 1.f;\n\
-	vec4 shadow_coef = 1.0;\n\
-	if (useShadowMap) \n\
+	const float shadow_ambient = 1.0;\n\
+	float shadow_coef = 1.0;\n\
+	if (useShadowMap == 1) \n\
 		shadow_coef = shadowCoef();\n\
 	gl_FragColor = gl_Color*shadow_ambient * shadow_coef;\n\
 }";

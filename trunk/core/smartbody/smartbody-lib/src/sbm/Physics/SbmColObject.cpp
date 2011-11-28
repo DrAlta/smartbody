@@ -165,6 +165,11 @@ SbmGeomBox::SbmGeomBox( const SrVec& ext )
 	extent = ext;	
 }
 
+SbmGeomBox::SbmGeomBox( SrBox& bbox )
+{
+	extent = (bbox.b - bbox.a)*0.5f;	
+}
+
 SbmGeomBox::~SbmGeomBox()
 {
 

@@ -82,6 +82,7 @@ public:
 	SrVec extent;
 public:
 	SbmGeomBox(const SrVec& ext);
+	SbmGeomBox(SrBox& bbox); 
 	virtual ~SbmGeomBox();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);

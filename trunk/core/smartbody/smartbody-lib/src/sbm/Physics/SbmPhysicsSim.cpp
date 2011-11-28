@@ -143,11 +143,10 @@ SbmJointObj::~SbmJointObj()
 }
 
 void SbmJointObj::initJoint( SBJoint* joint )
-{	
-	SrMat gmat = joint->gmat();		
-	SrMat tranMat; tranMat.translation(joint->offset()*0.5f);
-	if (joint->parent()) 
-		gmat = tranMat*joint->parent()->gmat();	
+{		
+	SrMat tranMat; tranMat.translation(computeJointObjLocalCenter(joint));	
+	//if (joint->parent()) 
+	SrMat gmat = tranMat*joint->gmat();		
 	setGlobalTransform(gmat);
 	sbmJoint = joint;
 }
@@ -163,6 +162,18 @@ SrMat SbmJointObj::getRelativeOrientation()
 	}
 }
 
+SrVec SbmJointObj::computeJointObjLocalCenter( SBJoint* joint )
+{
+	SrVec center = SrVec(0,0,0);
+	if (joint->getNumChildren() == 0) return center;
+
+	for (int i=0;i<joint->getNumChildren();i++)
+	{
+		center += joint->getChild(i)->offset()*0.5f;
+	}
+	center /= (float)joint->getNumChildren();
+	return center;
+}
 /************************************************************************/
 /* Physics Character                                                    */
 /************************************************************************/
@@ -193,12 +204,12 @@ std::map<std::string,SbmJointObj*>& SbmPhysicsCharacter::getJointObjMap()
 	return jointMap;
 }
 
-void SbmPhysicsCharacter::initPhysicsCharacter( std::string& characterName, std::vector<std::string>& jointNameList, bool buildGeometry )
+void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vector<std::string>& jointNameList, bool buildGeometry )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SBScene* scene = mcu._scene;
 	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
-	SBCharacter* character = scene->getCharacter(characterName);
+	SBCharacter* character = scene->getCharacter(charName);
 	if (!character) // no character
 		return;
 	characterName = character->getName();
@@ -213,7 +224,7 @@ void SbmPhysicsCharacter::initPhysicsCharacter( std::string& characterName, std:
 		if (buildGeometry)
 		{
 			SbmGeomObject* jointGeom = createJointGeometry(joint);
-			jointObj->setGeometry(jointGeom,10.f);
+			jointObj->setGeometry(jointGeom,0.01f);
 			jointGeometryMap[jointNameList[i]] = jointGeom;
 		}
 		jointObj->initJoint(joint);
@@ -257,23 +268,56 @@ SbmGeomObject* SbmPhysicsCharacter::createJointGeometry( SBJoint* joint, float r
 {
 	SbmGeomObject* newGeomObj = NULL;
 	SbmCharacter* curCharacter = mcuCBHandle::singleton().getCharacter(characterName);
-	if (joint->getParent())
+	if (radius < 0.0)
+		radius = curCharacter->getHeight()*0.01f;
+	float extend = curCharacter->getHeight()*0.002f;
+	if (joint->getNumChildren() > 1) // bounding box
 	{
-		SBJoint* parent = joint->getParent();
-		SrVec offset = joint->offset(); 
+		SrBox bbox;		
+		bbox.extend(SbmJointObj::computeJointObjLocalCenter(joint));			
+		bbox.grows(extend,extend,extend); 
+		bbox.extend(SrVec(0,0,0));
+		for (int i=0;i<joint->getNumChildren();i++)
+		{
+			bbox.extend(joint->getChild(i)->offset());
+		}
+		newGeomObj = new SbmGeomBox(bbox);		
+	}
+	else if (joint->getNumChildren() == 1)
+	{
+		SBJoint* child = joint->getChild(0);
+		SrVec offset = child->offset(); 
 		SrVec center = SrVec(0,0,0);//offset*0.5f;
 		SrVec dir = offset; dir.normalize();
 		float boneLen = offset.len();	
-		float len = boneLen+0.001f;	
-		if (radius <= 0.f)
-			radius = 8.0;//curCharacter->getHeight()*0.05f;//	
+		float len = boneLen+extend*0.1f;	
 		// generate new geometry
-		newGeomObj = new SbmGeomCapsule(center-dir*len*0.5f, center+dir*len*0.5f,radius);
-		//newGeomObj = new SbmGeomCapsule(SrVec(0,-len*0.3f,0), SrVec(0,len*0.3f,0),radius);
-	}
-	else 
-	{
-		newGeomObj = new SbmGeomSphere(2.f);
+		newGeomObj = new SbmGeomCapsule(center-dir*len*0.5f, center+dir*len*0.5f,radius);		
 	}
 	return newGeomObj;
 }
+
+// SbmGeomObject* SbmPhysicsCharacter::createJointGeometry( SBJoint* joint, float radius )
+// {
+// 	SbmGeomObject* newGeomObj = NULL;
+// 	SbmCharacter* curCharacter = mcuCBHandle::singleton().getCharacter(characterName);
+// 	if (joint->getParent() && joint->getParent()->getParent())
+// 	{
+// 		SBJoint* parent = joint->getParent();
+// 		SrVec offset = joint->offset(); 
+// 		SrVec center = SrVec(0,0,0);//offset*0.5f;
+// 		SrVec dir = offset; dir.normalize();
+// 		float boneLen = offset.len();	
+// 		float len = boneLen+0.001f;	
+// 		if (radius <= 0.f)
+// 			radius = 1.0;//curCharacter->getHeight()*0.05f;//	
+// 		// generate new geometry
+// 		newGeomObj = new SbmGeomCapsule(center-dir*len*0.5f, center+dir*len*0.5f,radius);
+// 		//newGeomObj = new SbmGeomCapsule(SrVec(0,-len*0.3f,0), SrVec(0,len*0.3f,0),radius);
+// 	}
+// 	else 
+// 	{
+// 		newGeomObj = new SbmGeomSphere(1.0f);//SbmGeomSphere(0.01f);
+// 	}
+// 	return newGeomObj;
+// }

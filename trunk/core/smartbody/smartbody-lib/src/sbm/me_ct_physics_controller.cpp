@@ -40,23 +40,26 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			SBJoint* joint = obj->getJoint();
 			if (!joint)	continue;
 			SrMat tran = obj->getRelativeOrientation();
+			//if (joint->getParent()) continue;
 			//if (joint->getName() == "base" || joint->getName() == "world_offset")
 			//	continue;
 			std::string jname = joint->getName();
-			//if (joint->getParent())
+			std::string jPosName = joint->getName();
+			//if (joint->getParent() && joint->getParent()->getParent()) 
 			//	jname = joint->getParent()->getName();
-
+			
 			int channelId = _context->channels().search(jname, SkChannel::Quat);
 			if (channelId < 0)	continue;
 			int bufferId = frame.toBufferIndex(channelId);
 			if (bufferId < 0)	continue;			
 			SrQuat quat = SrQuat(tran);
+			//if (joint->getParent()) quat = SrQuat();
 			frame.buffer()[bufferId + 0] = quat.w;
 			frame.buffer()[bufferId + 1] = quat.x;
 			frame.buffer()[bufferId + 2] = quat.y;
 			frame.buffer()[bufferId + 3] = quat.z;
 			
-			int positionChannelID = _context->channels().search(jname, SkChannel::XPos);
+			int positionChannelID = _context->channels().search(jPosName, SkChannel::XPos);
 			if (positionChannelID < 0) continue;
 			int posBufferID = frame.toBufferIndex(positionChannelID);
 			if (posBufferID < 0)	continue;

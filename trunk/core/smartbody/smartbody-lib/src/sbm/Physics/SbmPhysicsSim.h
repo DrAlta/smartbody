@@ -59,6 +59,7 @@ public:
 	SbmJointObj* getParentObj() { return parentObj; }
 	void setParentObj(SbmJointObj* parent) { parentObj = parent; }
 	virtual void initJoint(SBJoint* joint);
+	static SrVec computeJointObjLocalCenter(SBJoint* joint);
 };
 
 class SbmPhysicsCharacter : public SbmPhysicsObjInterface // interface for articulated dynamic character 
@@ -70,7 +71,7 @@ protected:
 	std::string characterName;
 public:
 	std::string getName() { return characterName; }
-	virtual void initPhysicsCharacter(std::string& characterName, std::vector<std::string>& jointNameList, bool buildGeometry = false);	
+	virtual void initPhysicsCharacter(std::string& charName, std::vector<std::string>& jointNameList, bool buildGeometry = false);	
 	SbmJointObj* getJointObj(std::string& jointName); // get body part associated with this joint
 	std::vector<SbmJointObj*> getJointObjList();
 	std::map<std::string,SbmJointObj*>& getJointObjMap();
