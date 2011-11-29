@@ -1882,10 +1882,13 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 		srSnModelDynamic->visible(false);
 		srSnModelStatic->shape().name = meshModelVec[i]->name;
 		srSnModelDynamic->shape().name = meshModelVec[i]->name;
-		char_p->dMesh_p->dMeshDynamic_p.push_back(srSnModelDynamic);
-		srSnModelDynamic->ref();
-		char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
-		srSnModelStatic->ref();
+		if (char_p->dMesh_p)
+		{
+			char_p->dMesh_p->dMeshDynamic_p.push_back(srSnModelDynamic);
+			char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
+			srSnModelDynamic->ref();
+			srSnModelStatic->ref();
+		}
 		mcu_p->root_group_p->add(srSnModelDynamic);
 	
 		delete meshModelVec[i];
@@ -2067,7 +2070,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 								}
 							}
 						}
-						if (char_p)
+						if (char_p && char_p->dMesh_p)
 							char_p->dMesh_p->skinWeights.push_back(skinWeight);
 					} // end of if (childName == "skin")
 					if (childName == "morph")	// parsing morph targets
@@ -2120,14 +2123,17 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 	}
 
 	// cache the joint names for each skin weight
-	for (size_t x = 0; x < char_p->dMesh_p->skinWeights.size(); x++)
+	if (char_p && char_p->dMesh_p)
 	{
-		SkinWeight* skinWeight = char_p->dMesh_p->skinWeights[x];
-		for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
+		for (size_t x = 0; x < char_p->dMesh_p->skinWeights.size(); x++)
 		{
-			std::string& jointName = skinWeight->infJointName[j];
-			SkJoint* curJoint = char_p->getSkeleton()->search_joint(jointName.c_str());
-			skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
+			SkinWeight* skinWeight = char_p->dMesh_p->skinWeights[x];
+			for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
+			{
+				std::string& jointName = skinWeight->infJointName[j];
+				SkJoint* curJoint = char_p->getSkeleton()->search_joint(jointName.c_str());
+				skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
+			}
 		}
 	}
 }

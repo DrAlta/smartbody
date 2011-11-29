@@ -2114,6 +2114,11 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 
 	if (cmd == "mesh")
 	{
+		if (!this->dMesh_p)
+		{
+			LOG("Character %s has no dynamic mesh, cannot perform mesh operations.", this->getName().c_str());
+			return CMD_FAILURE;
+		}
 		char* meshdir = args.read_token();
 		if (!meshdir)
 		{
@@ -2242,6 +2247,11 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 	}
 	else if (cmd == "meshstatus")
 	{
+		if (!this->dMesh_p)
+		{
+			LOG("Character %s has no dynamic mesh, cannot perform mesh operations.", this->getName().c_str());
+			return CMD_FAILURE;
+		}
 		LOG("Number of skinned meshes: %d", this->dMesh_p->skinWeights.size());
 		for (size_t i = 0; i < this->dMesh_p->skinWeights.size(); i++)
 		{
@@ -2260,12 +2270,22 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 	}
 	else if( cmd == "smoothbindmesh" )
 	{
+		if (!this->dMesh_p)
+		{
+			LOG("Character %s has no dynamic mesh, cannot perform mesh operations.", this->getName().c_str());
+			return CMD_FAILURE;
+		}
 		char* obj_file = args.read_token();
 		char* option = args.read_token();
 		return mcu_character_load_mesh( getName().c_str(), obj_file, mcu_p, option );
 	} 
 	else 
 		if( cmd == "smoothbindweight" ) {
+			if (!this->dMesh_p)
+			{
+				LOG("Character %s has no dynamic mesh, cannot perform mesh operations.", this->getName().c_str());
+				return CMD_FAILURE;
+			}
 			char* skin_file = args.read_token();
 			char* option = args.read_token();
 			char* prefixName = NULL;
