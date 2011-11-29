@@ -41,7 +41,7 @@ using namespace Util;
 #endif
 #endif
 
-#ifdef SBM_IPHONE
+#if defined(SBM_IPHONE) || defined(__ANDROID__)
 #include "PPRAIModule.h"
 #endif
 
@@ -665,7 +665,7 @@ SteerLib::ModuleMetaInformation * SimulationEngine::_loadModule(const std::strin
 
 	if (newModule == NULL) {
 		// In this case, the module was not built-in.
-#ifdef SBM_IPHONE
+#if defined(SBM_IPHONE) || defined(__ANDROID__)
         newModule = new PPRAIModule;
 #else
         
