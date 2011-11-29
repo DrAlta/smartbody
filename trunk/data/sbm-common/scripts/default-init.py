@@ -91,7 +91,10 @@ bml.execBML('utah', '<saccade mode="listen"/>')
 
 #scene.command("seq init-example-reach inline")
 scene.run("init-example-reach.py")
-reachSetup("doctor")
+names = scene.getCharacterNames()
+for n in range(0, len(names)):
+	reachSetup(names[n])
+
 
 sim.resume()
 
