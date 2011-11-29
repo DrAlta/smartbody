@@ -38,7 +38,7 @@
 #define makeDirectory(pathname) mkdir(pathname,0777)
 #endif
 
-#ifndef __ANDROID__
+#if 0
 #include <festival.h>
 #include <VHDuration.h>
 #endif
@@ -105,7 +105,7 @@ class XStr
 
 #define X( str ) XStr( str ).unicodeForm()
 XERCES_CPP_NAMESPACE_USE
-#ifndef __ANDROID__
+#if 0
 extern SpeechRequestData xmlMetaData;
 
 FestivalSpeechRelayLocal::FestivalSpeechRelayLocal()
