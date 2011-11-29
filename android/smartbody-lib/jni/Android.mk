@@ -14,6 +14,7 @@
 #  2. Unused or to be removed soon
 #   $(SBM_MY_DIR)/sbm/me_ct_reach.cpp \
 #   $(SBM_MY_DIR)/sbm/bml_reach.cpp \
+#   $(SBM_MY_DIR)/sbm/VisemeMap.cpp \
 
 
 SBM_LOCAL_PATH := $(call my-dir)
@@ -104,12 +105,13 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := sbm
 LOCAL_CFLAGS    := -g -O0 -DBUILD_ANDROID -frtti
 LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
+					$(SBM_LOCAL_PATH)/../../boost \
 					$(SBM_LOCAL_PATH)/../../../lib/boost \
 					$(SBM_LOCAL_PATH)/../../include \
 					$(SBM_LOCAL_PATH)/../../python_lib/include/python2.6 \
-					$(SBM_LOCAL_PATH)/../../../lib/vhcl/include \
+					$(SBM_LOCAL_PATH)/../../vhcl/vhcl_src \
 					$(SBM_LOCAL_PATH)/../../../lib/bonebus/include \
-					$(SBM_LOCAL_PATH)/../../../lib/vhmsg/vhmsg-c/include \
+					$(SBM_LOCAL_PATH)/../../vhmsg/vhmsg_src \
 					$(SBM_LOCAL_PATH)/../../../lib/wsp/wsp/include \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/external/ \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/steerlib/include \
@@ -238,6 +240,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/me_ct_data_driven_reach.cpp \
 	$(SBM_MY_DIR)/sbm/me_ct_data_interpolation.cpp \
 	$(SBM_MY_DIR)/sbm/me_ct_example_body_reach.cpp \
+	$(SBM_MY_DIR)/sbm/me_ct_physics_controller.cpp \
 	$(SBM_MY_DIR)/sbm/me_ct_examples.cpp \
 	$(SBM_MY_DIR)/sbm/me_ct_eyelid.cpp \
 	$(SBM_MY_DIR)/sbm/me_ct_face.cpp \
@@ -295,6 +298,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/ParserFBX.cpp \
 	$(SBM_MY_DIR)/sbm/ParserOpenCOLLADA.cpp \
 	$(SBM_MY_DIR)/sbm/remote_speech.cpp \
+	$(SBM_MY_DIR)/sbm/local_speech.cpp \
 	$(SBM_MY_DIR)/sbm/resource_cmds.cpp \
 	$(SBM_MY_DIR)/sbm/Resource.cpp \
 	$(SBM_MY_DIR)/sbm/ResourceManager.cpp \
@@ -325,28 +329,43 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/Physics/SbmPhysicsSimODE.cpp \
 	$(SBM_MY_DIR)/sbm/SteeringAgent.cpp \
 	$(SBM_MY_DIR)/sbm/SteerSuiteEnginerDriver.cpp \
-	$(SBM_MY_DIR)/sbm/DAttribute.cpp \
-	$(SBM_MY_DIR)/sbm/DAttributeManager.cpp \
-	$(SBM_MY_DIR)/sbm/DObject.cpp \
-	$(SBM_MY_DIR)/sbm/DObserver.cpp \
-	$(SBM_MY_DIR)/sbm/DSubject.cpp \
+	$(SBM_MY_DIR)/sbm/SBAttribute.cpp \
+	$(SBM_MY_DIR)/sbm/SBAttributeManager.cpp \
+	$(SBM_MY_DIR)/sbm/SBObject.cpp \
+	$(SBM_MY_DIR)/sbm/SBObserver.cpp \
+	$(SBM_MY_DIR)/sbm/SBSubject.cpp \
 	$(SBM_MY_DIR)/sbm/DefaultAttributeTable.cpp \
 	$(SBM_MY_DIR)/sbm/SBScene.cpp \
 	$(SBM_MY_DIR)/sbm/KinectProcessor.cpp \
 	$(SBM_MY_DIR)/sbm/me_ct_data_receiver.cpp \
 	$(SBM_MY_DIR)/sbm/SBCharacter.cpp \
+	$(SBM_MY_DIR)/sbm/SBPawn.cpp \
 	$(SBM_MY_DIR)/sbm/SBJoint.cpp \
 	$(SBM_MY_DIR)/sbm/SBSkeleton.cpp \
 	$(SBM_MY_DIR)/sbm/SBController.cpp \
-	$(SBM_MY_DIR)/sbm/VisemeMap.cpp \
 	$(SBM_MY_DIR)/sbm/sr_path_list.cpp \
-	$(SBM_MY_DIR)/sbm/SbmPython.cpp \
-	$(SBM_MY_DIR)/sbm/SbmPythonClass.cpp \
+	$(SBM_MY_DIR)/sbm/SBPython.cpp \
+	$(SBM_MY_DIR)/sbm/SBPythonClass.cpp \
+	$(SBM_MY_DIR)/sbm/SBSimulationManager.cpp \
+	$(SBM_MY_DIR)/sbm/SBBmlProcessor.cpp \
+	$(SBM_MY_DIR)/sbm/SBAnimationState.cpp \
+	$(SBM_MY_DIR)/sbm/SBAnimationTransition.cpp \
+	$(SBM_MY_DIR)/sbm/SBAnimationStateManager.cpp \
+	$(SBM_MY_DIR)/sbm/SBSteerManager.cpp \
+	$(SBM_MY_DIR)/sbm/SBSteerAgent.cpp \
+	$(SBM_MY_DIR)/sbm/SBReachManager.cpp \
+	$(SBM_MY_DIR)/sbm/SBReach.cpp \
+	$(SBM_MY_DIR)/sbm/SBMotion.cpp \
+	$(SBM_MY_DIR)/sbm/SBScript.cpp	\
+	$(SBM_MY_DIR)/sbm/SBFaceDefinition.cpp \
+	$(SBM_MY_DIR)/sbm/nvbg.cpp \
+	$(SBM_MY_DIR)/sbm/MiniBrain.cpp \
+	$(SBM_MY_DIR)/sbm/SBBehavior.cpp \
 	$(SBM_MY_DIR)/sbm/ParserBVH.cpp \
 	$(SBM_MY_DIR)/sbm/ParserASFAMC.cpp \
 	$(SBM_MY_DIR)/sbm/action_unit.cpp
 
-LOCAL_LDLIBS    := -llog -lsupc++ 		  
+LOCAL_LDLIBS    := -llog 	  
 LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
 #LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 

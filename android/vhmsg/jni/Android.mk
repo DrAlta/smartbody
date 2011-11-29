@@ -30,13 +30,13 @@ LOCAL_PATH = $(VHMSG_LOCAL_PATH)
 include $(CLEAR_VARS)
 LOCAL_MODULE := vhmsg
 TARGET_PLATFORM := android-9
-MY_VHMSG_DIR := ../../../lib/vhmsg/vhmsg-c/
+MY_VHMSG_DIR := ../vhmsg_src/
 LOCAL_CFLAGS    := -DBUILD_ANDROID
-LOCAL_C_INCLUDES := $(VHMSG_LOCAL_PATH)/$(MY_VHMSG_DIR)/include $(VHMSG_LOCAL_PATH)/$(MY_VHMSG_DIR)/../../vhcl/include \
+LOCAL_C_INCLUDES := $(VHMSG_LOCAL_PATH)/$(MY_VHMSG_DIR) $(VHMSG_LOCAL_PATH)/$(MY_VHMSG_DIR)/../../vhcl/vhcl_src \
 					$(VHMSG_LOCAL_PATH)/../../include/activemq-cpp/include
-LOCAL_SRC_FILES := $(MY_VHMSG_DIR)/src/HttpUtility.cpp \
-				   $(MY_VHMSG_DIR)/src/vhmsg-tt.cpp \
-				   $(MY_VHMSG_DIR)/src/vhmsg.cpp				   
+LOCAL_SRC_FILES := $(MY_VHMSG_DIR)/HttpUtility.cpp \
+				   $(MY_VHMSG_DIR)/vhmsg-tt.cpp \
+				   $(MY_VHMSG_DIR)/vhmsg.cpp				   
 
 LOCAL_STATIC_LIBRARIES := vhcl activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt
 include $(BUILD_STATIC_LIBRARY)
