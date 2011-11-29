@@ -13,6 +13,7 @@
 #include <boost/numeric/bindings/lapack/lapack.hpp>
 #include <boost/numeric/bindings/traits/ublas_matrix.hpp>
 #include <boost/numeric/bindings/traits/ublas_vector.hpp>
+
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/banded.hpp> 
 #include <boost/numeric/ublas/vector.hpp>

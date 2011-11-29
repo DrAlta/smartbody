@@ -842,6 +842,7 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 		GeneralParamMap::const_iterator pos = param_map->begin();
 		for ( ; pos != param_map->end(); pos++ )
 		{
+
 			bonebusCharacter->SetParams( pos->first.c_str(), index );
 		}
 	}
@@ -2034,6 +2035,7 @@ bool SbmCharacter::is_face_controller_enabled() {
 // HACK to initiate reholster on all QuickDraw controllers
 int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 	const double now = mcu_p->time;
+
 	double max_blend_dur = -1;
 
 	// Local convience typedefs
@@ -3440,6 +3442,18 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBH
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl_backup( mcu_p->speech_rvoice() );
+		string s( voice_id );
+		character->set_voice_code_backup( s );
+	} else if( _stricmp( impl_id, "local" )==0 ) {
+		const char* voice_id = args.read_token();
+		if( strlen( voice_id )==0 ) {
+			LOG("ERROR: Expected local voice id.");
+			return CMD_FAILURE;
+		}
+		LOG("set local voice");
+		character->set_speech_impl_backup( mcu_p->speech_localvoice() );
+		FestivalSpeechRelayLocal* relay = mcu_p->festivalRelay();
+		relay->setVoice(voice_id);
 		string s( voice_id );
 		character->set_voice_code_backup( s );
 	} else if( _stricmp( impl_id, "audiofile" )==0 ) {

@@ -100,6 +100,7 @@ RequestId remote_speech::requestSpeechAudio( const char* agentName, std::string 
 	//THis code is meant to replace the <tm id's> of generic BML type "text/plain" with "marks" that can be understood by remote speech process
 	string textOfUtt = text;
 	int typeTextPos=textOfUtt.find("text/plain"); //if type="text/plain". . . this kinda assumes that this would be the only reason for the string "text/plain" to be in the BML
+	
 	if(typeTextPos!= string::npos){
 		int tmIdPos=0;
 		int bckslshTmPos=0;
@@ -114,6 +115,7 @@ RequestId remote_speech::requestSpeechAudio( const char* agentName, std::string 
 				}
 		}
 	}
+	
 
 	//agent= agentName;  // Anm: What if multiple agents?  Need lookup table.
 	char timebuf[128];
@@ -155,8 +157,11 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 	string* soundFilePtr= new string(soundFile);
 	//mcu.character_map.lookup(agentName)->getVoice()-- gets the voice name from the character in meCharacter (it's a string pointer so the * dereferences it)
 	SbmCharacter* agent = mcuCBHandle::singleton().getCharacter(agentName);
+	
+	//LOG("sound file = %s",soundFile.c_str());
 	if( agent == NULL ) {
 		// TODO: Log: Unknown Agent
+		LOG("Unknown agent...");
 		return -1;  // TODO: Define error return value as a constant somewhere (or new exception type).
 	}
 	string command= "speak " + string(agentName) +" "+ myStream.str() + " " + voiceCode + " "+ soundFile +" "+ textOfUtt;// text; //concatenates the whole command to be sent to Remote speech process
@@ -173,24 +178,27 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 	char *callBackCopyCharStar= new char[callBackCopyString.length()+1];
 	strcpy(callBackCopyCharStar, callBackCopyString.c_str());
 	commandLookUp.insert(myStream.str().c_str(), callBackCopyCharStar); //similar to the sound, the callbackCmd must also be saved to globally accessable table for post procesing look up
-	
+	//LOG("before speech command");
 	sendSpeechCommand(cmd);
-	
+	//LOG("after sendSpeechCommand");
 	delete [] cmd;
-
+	//LOG("before send speech time out");
 	sendSpeechTimeout(myStream);
+	//LOG("msgNumber = %d",msgNumber);
 	
 	return (msgNumber); //returns the unique message number
 }
 
 void remote_speech::sendSpeechCommand(const char* cmd)
 {
+	//LOG("send speech command");
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.vhmsg_send( "RemoteSpeechCmd", cmd ); //sends the remote speech command using singleton* MCU_p
 }
 void remote_speech::sendSpeechTimeout(std::ostringstream& outStream)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
 	srCmdSeq *rVoiceTimeout= new srCmdSeq(); 
 	rVoiceTimeout->offset((float)(mcu.time));
 	string argumentString="RemoteSpeechTimeOut";
@@ -583,7 +591,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 		// TODO: Log / print error
 		return( CMD_FAILURE );  // known character but unknown message id
 	}
-	LOG("character = %s, status = %s, result = %s",character->getName().c_str(),status,result);
+	//LOG("character = %s, status = %s, result = %s",character->getName().c_str(),status,result);
 	try{
 		if( strcmp( status, "OK:" )==0 ) {
 			XercesDOMParser *Prser;  
