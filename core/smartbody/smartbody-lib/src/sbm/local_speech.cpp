@@ -38,7 +38,7 @@
 #define makeDirectory(pathname) mkdir(pathname,0777)
 #endif
 
-#if 0
+#ifndef __ANDROID__
 #include <festival.h>
 #include <VHDuration.h>
 #endif
@@ -105,7 +105,7 @@ class XStr
 
 #define X( str ) XStr( str ).unicodeForm()
 XERCES_CPP_NAMESPACE_USE
-#if 0
+#ifndef __ANDROID__
 extern SpeechRequestData xmlMetaData;
 
 FestivalSpeechRelayLocal::FestivalSpeechRelayLocal()
@@ -122,27 +122,29 @@ std::string FestivalSpeechRelayLocal::generateReply(const char * utterance,const
 	EST_Wave wave;
 
 	string spoken_text = storeXMLMetaData( utterance );
+	//LOG("after store XMLMetaData");
 	//printf("done first time\n");
 	if (!spoken_text.compare("") && spoken_text != "")
 	{
 		puts(spoken_text.append("\n").c_str());
 	}
 
+	//LOG("after spoken text compare");
 	if (xmlMetaData.tags.size() <= 0)
 	{
 		spoken_text = TransformTextWithTimes(utterance);
-		//printf("done transforming\n");
+		//LOG("done transforming\n");
 		if (!spoken_text.compare("") && spoken_text != "")
 		{
 			puts(spoken_text.append("\n").c_str());
 		}
 		spoken_text = storeXMLMetaData(spoken_text);
-		//printf("done second time\n");
+		//LOG("done second time\n");
 	}
-
+	//LOG("before remove tab");
 	removeTabsFromString(spoken_text);
 
-	LOG( "generateReply() - \nbefore: '%s'\nafter: '%s'\n'%s'\n", utterance, spoken_text.c_str(), soundFileName );
+	//LOG( "generateReply() - \nbefore: '%s'\nafter: '%s'\n'%s'\n", utterance, spoken_text.c_str(), soundFileName );
 
 	//festival_say_text(spoken_text.c_str());
 	festival_text_to_wave(spoken_text.c_str(),wave);
@@ -430,7 +432,7 @@ void FestivalSpeechRelayLocal::cleanString(std::string &message)
 	}
 
 	unsigned int pos;
-	while ( (pos = message.find("  ")) != std::string::npos )
+	while ( (pos = message.find("  ",message.size())) != std::string::npos && pos < message.size())
 	{
 		//fprintf(stderr,"Debug: replacing 2 whitespaces at %d(%s) with 1 whitespace\n",pos, message.substr(pos,2).c_str());
 		message.replace( pos, 2, " " );
@@ -474,9 +476,11 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	file_name = file_name.substr( pos2, pos - pos2 ) + ".wav";
 	std::string festival_file_name = cacheDirectory + file_name;
 	//Generate the audio
+	//LOG("before reply");
 	string replyXML = generateReply(utterance.c_str(),festival_file_name.c_str());
-
+	//LOG("after reply, replyXML = %s",replyXML.c_str());
 	string remoteSpeechReply = agent_name+" "+message_id+" OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?><speak><soundFile name=\"";
+	//LOG("remoteSpeechReply = %s",remoteSpeechReply.c_str());
 
 	char full[ _MAX_PATH ];
 	if ( getFullPath( full, const_cast<char*>(festival_file_name.c_str())) == NULL )
@@ -491,15 +495,16 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 
 	remoteSpeechReply += soundPathName+"\"/>";
 	remoteSpeechReply += replyXML + "</speak>";
-	LOG("replyXML = %s\n",replyXML.c_str());
-	LOG("Sound path name = %s\n",soundPathName.c_str());
+	//LOG("replyXML = %s\n",replyXML.c_str());
+	//LOG("Sound path name = %s\n",soundPathName.c_str());
 
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	char* cmdConst = const_cast<char*>(remoteSpeechReply.c_str());
 	string replyCmd = "RemoteSpeechReply ";
-	replyCmd = replyCmd + cmdConst;
+	replyCmd = replyCmd + remoteSpeechReply; //cmdConst;
 	//mcu.execute_later("RemoteSpeechReply", cmdConst ); //sends the remote speech command using singleton* MCU_p	
+	//LOG("replyCmd = %s",replyCmd.c_str());
 	mcu.execute_later(replyCmd.c_str());
 }
 
@@ -524,11 +529,11 @@ void FestivalSpeechRelayLocal::setVoice(std::string voice)
 void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string cacheDir)
 {
 	
-        freopen ("/sdcard/sbm/festivalLog.txt","w",stderr);
+        //freopen ("/sdcard/sbm/festivalLog.txt","w",stderr);
 
 	std::string scriptFile = "";
-	//std::string voice = "voice_kal_diphone";
-	std::string voice = "voice_roger_hts2010";
+	std::string voice = "voice_kal_diphone";
+	//std::string voice = "voice_roger_hts2010";
 	festivalLibDirectory = libPath;
 	cacheDirectory = cacheDir;
 	std::string festivalLibDir = libPath;
@@ -554,7 +559,7 @@ void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string 
 	//if (!scriptFileRead)
 	{
 		LOG("Running default Festival commands\n\n", voice.c_str());
-		festivalCommands.push_back("(voice_roger_hts2010)");
+		//festivalCommands.push_back("(voice_roger_hts2010)");
 		// setting the duration method to be used by festival
 		festivalCommands.push_back("(Parameter.set `Duration_Method Duration_Default)");
 		// this command hooks our virtual human method such that every time an utterance is synthesized, our method is called on it
@@ -665,6 +670,7 @@ local_speech::~local_speech()
 
 void local_speech::sendSpeechCommand(const char* cmd)
 {
+	//LOG("speech cmd = %s",cmd);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	char* cmdConst = const_cast<char*>(cmd);
 	mcu.execute("RemoteSpeechCmd", cmdConst ); //sends the remote speech command using singleton* MCU_p

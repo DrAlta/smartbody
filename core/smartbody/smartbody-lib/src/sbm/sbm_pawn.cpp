@@ -142,7 +142,7 @@ SbmPawn::SbmPawn() : SBObject()
 SbmPawn::SbmPawn( const char * name ) : SmartBody::SBObject(),
 scene_p( NULL ),
 #ifdef __ANDROID__ // don't use the GPU version in android
-dMesh_p( NULL) ),
+dMesh_p( NULL) ,
 #else
 dMesh_p( NULL ),
 #endif
