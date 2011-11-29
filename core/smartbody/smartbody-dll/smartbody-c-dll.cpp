@@ -233,14 +233,14 @@ SMARTBODY_C_DLL_API bool SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * pat
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_Init( SBMHANDLE sbmHandle )
+SMARTBODY_C_DLL_API bool SBM_Init( SBMHANDLE sbmHandle, const char* pythonLibPath )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
       return false;
    }
 
-   return g_smartbodyInstances[ sbmHandle ]->Init();
+   return g_smartbodyInstances[ sbmHandle ]->Init(pythonLibPath);
 }
 
 

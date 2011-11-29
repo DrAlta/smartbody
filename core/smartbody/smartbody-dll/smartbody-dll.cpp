@@ -14,6 +14,7 @@
 #include "sbm/sbm_test_cmds.hpp"
 #include "sbm/resource_cmds.h"
 #include "sbm/locomotion_cmds.hpp"
+#include "sbm/SBPython.h"
 
 
 #ifdef __APPLE__
@@ -163,7 +164,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetMediaPath( const std::string & path )
 }
 
 
-SMARTBODY_DLL_API bool Smartbody_dll::Init()
+SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath)
 {
    m_internalListener = new Smartbody_dll_SBMCharacterListener_Internal( this );
 
@@ -172,6 +173,8 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init()
    mcuCBHandle & mcu = mcuCBHandle::singleton();
    mcu.sbm_character_listener = m_internalListener;
    SetSpeechAudiofileBasePath( "../../" );
+
+   initPython(pythonLibPath);
 
    InitVHMsg();
    RegisterCallbacks();

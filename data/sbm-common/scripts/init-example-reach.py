@@ -1,5 +1,5 @@
 def reachSetup(characterName):
-	print "**Setup Reach Motions**"	
+	print "Setting up reach database for " + characterName
 	rightHandMotions = StringVec();
 	rightHandMotions.append("ChrHarmony_Relax001_ArmReachRtHigh")
 	rightHandMotions.append("ChrHarmony_Relax001_ArmReachRtMidHigh")
@@ -95,7 +95,16 @@ def reachSetup(characterName):
 #	scene.getEventManager();
 #2 registerevent reach "$1"
 
-#reachSetup("doctor")
+
+class GraspHandler(EventHandler):
+	def executeAction(this, event):
+		params = event.getParameters()
+		scene.command(params)
+
+graspHandler = GraspHandler()
+em = scene.getEventManager()
+em.addEventHandler("reach", graspHandler)
+
 
 
 
