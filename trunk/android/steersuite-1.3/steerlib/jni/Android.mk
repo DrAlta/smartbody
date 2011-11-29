@@ -8,7 +8,8 @@ LOCAL_MODULE := steerlib
 LOCAL_CFLAGS    := -DBUILD_ANDROID
 MY_DIR := ../../../../core/smartbody/steersuite-1.3/steerlib
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(MY_DIR)/include \
-					$(LOCAL_PATH)/$(MY_DIR)/../external
+		    $(LOCAL_PATH)/$(MY_DIR)/../external \
+    		    $(LOCAL_PATH)/$(MY_DIR)/../pprAI/include
 LOCAL_SRC_FILES := $(MY_DIR)/src/AgentMetricsCollector.cpp \
 		$(MY_DIR)/src/BenchmarkEngine.cpp \
 		$(MY_DIR)/src/BoxObstacle.cpp \
