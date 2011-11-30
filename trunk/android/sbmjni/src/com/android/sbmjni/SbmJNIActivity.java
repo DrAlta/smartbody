@@ -94,8 +94,7 @@ public class SbmJNIActivity extends Activity {
     	  ad.setTitle("Smartbody Log");   	    
     	  ad.setView(LayoutInflater.from(this).inflate(R.layout.custom_dialog,null));    	  
     	  ad.setPositiveButton("OK", new android.content.DialogInterface.OnClickListener() {
-    		@Override
-			public void onClick(DialogInterface dialog, int which) {
+    		public void onClick(DialogInterface dialog, int which) {
 				// TODO Auto-generated method stub
 				
 			}  }  );	    	  
