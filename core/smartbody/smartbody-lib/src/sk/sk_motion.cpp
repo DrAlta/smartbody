@@ -599,13 +599,13 @@ void SkMotion::registerAnimation()
 	
 	if (xPos == -1 || yPos == -1 || zPos == -1)
 	{
-		LOG("No base position found in motion %s, cannot register.", this->getName());
+		LOG("No base position found in motion %s, cannot register.", this->getName().c_str());
 		return;
 	}
 
 	if (qPos == -1)
 	{
-		LOG("No base orientation found in motion %s, cannot register.", this->getName());
+		LOG("No base orientation found in motion %s, cannot register.", this->getName().c_str());
 		return;
 	}
 
@@ -643,13 +643,13 @@ void SkMotion::registerAnimation()
 	
 	if (xPos == -1 || yPos == -1 || zPos == -1)
 	{
-		LOG("No base position found in motion %s, cannot register.", this->getName());
+		LOG("No base position found in motion %s, cannot register.", this->getName().c_str());
 		return;
 	}
 
 	if (qPos == -1)
 	{
-		LOG("No base orientation found in motion %s, cannot register.", this->getName());
+		LOG("No base orientation found in motion %s, cannot register.", this->getName().c_str());
 		return;
 	}
 
