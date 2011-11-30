@@ -15,6 +15,7 @@ class SBBmlProcessor
 		void vrAgentBML(std::string op, std::string agent, std::string msgId, std::string msg);
 		
 		void execBML(std::string character, std::string bml);
+		void execXML(std::string character, std::string xml);
 
 	protected:
 		void build_vrX(std::ostringstream& buffer, const std::string& cmd, const std::string& char_id, const std::string& recip_id, const std::string& content, bool for_seq );
