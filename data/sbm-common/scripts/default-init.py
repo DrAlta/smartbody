@@ -2,6 +2,8 @@ print "|--------------------------------------------|"
 print "|  data/sbm-common/scripts/default-init.py  |"
 print "|--------------------------------------------|"
 
+scene.run("default-viewer.py")
+
 ### Load data/sbm-common assets
 ### Assumes current directory is: core/smartbody/sbm/bin
 scene.addAssetPath("seq", "../../../../data/sbm-common/scripts")
@@ -68,16 +70,17 @@ utah.setStringAttribute("mesh", "utah")
 scene.setDefaultCharacter("doctor")
 scene.setDefaultRecipient("elder")
 
-scene.run("default-viewer.py")
-
 scene.run("init-param-animation.py")
 
 scene.run("init-steer-agents.py")
 
+scene.run("init-example-reach.py")
+names = scene.getCharacterNames()
+for n in range(0, len(names)):
+	reachSetup(names[n])
+
 # start the simulation
 sim.start()
-
-scene.command("seq init-example-reach inline")
 
 bml.execBML('doctor', '<body posture="LHandOnHip_Motex"/>')
 bml.execBML('elder', '<body posture="LHandOnHip_Motex"/>')
@@ -89,13 +92,7 @@ bml.execBML('elder', '<saccade mode="listen"/>')
 bml.execBML('brad', '<saccade mode="listen"/>')
 bml.execBML('utah', '<saccade mode="listen"/>')
 
-#scene.command("seq init-example-reach inline")
-scene.run("init-example-reach.py")
-names = scene.getCharacterNames()
-for n in range(0, len(names)):
-	reachSetup(names[n])
-
-
 sim.resume()
+
 
 

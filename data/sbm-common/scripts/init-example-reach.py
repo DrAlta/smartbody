@@ -91,16 +91,16 @@ def reachSetup(characterName):
 	reach.setReleaseHandMotion("left",scene.getMotion("ChrHarmony_Relax001_LHandGraspSmSphere_Release"));
 	
 	reach.build(scene.getCharacter(characterName))		
-# To-Do : handle the hand grasp event
-#	scene.getEventManager();
-#2 registerevent reach "$1"
 
-
+# handle grasp event
+# grasp event currently uses old-style command interface
+# by storing the command as the parameter of the event
 class GraspHandler(EventHandler):
 	def executeAction(this, event):
 		params = event.getParameters()
 		scene.command(params)
 
+# now create the event handler for the 'reach' event
 graspHandler = GraspHandler()
 em = scene.getEventManager()
 em.addEventHandler("reach", graspHandler)
