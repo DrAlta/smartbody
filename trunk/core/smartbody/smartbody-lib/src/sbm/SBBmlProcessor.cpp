@@ -159,3 +159,12 @@ void SBBmlProcessor::execBML(std::string character, std::string bml)
 				<< "</act>";	
 	send_vrX( "vrSpeak", character, "ALL", "", true, true, entireBml.str() );
 }
+
+
+void SBBmlProcessor::execXML(std::string character, std::string xml)
+{
+	std::ostringstream entireXML;
+	entireXML	<< "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+				<< xml;
+	send_vrX( "vrSpeak", character, "ALL", "", true, true, entireXML.str() );
+}

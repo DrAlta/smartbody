@@ -498,7 +498,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 		;
 
 	boost::python::class_<SBBmlProcessor>("BmlProcessor")
-		.def("execBML", &SBBmlProcessor::execBML, "Execute a generic bml to a given character. \n Input: character name, bml string \n Output: NULL")
+		.def("execBML", &SBBmlProcessor::execBML, "Execute a generic BML instruction to a given character. Adds the <?xml..> and <act><bml>...</bml></act> elements.")
+		.def("execXML", &SBBmlProcessor::execXML, "Execute a generic XML instruction to a given character. Adds the <?xml..> header.")
 		;
 
 	boost::python::class_<SBAnimationState>("SBAnimationState")
