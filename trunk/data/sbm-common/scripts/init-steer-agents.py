@@ -11,7 +11,5 @@ for i in range(0, numCharacters):
 	steerAgent.setSteerType("example")
 	sbCharacter = scene.getCharacter(charNames[i])
 	sbCharacter.setSteerAgent(steerAgent)
-
-	
 	
 steerManager.start()
