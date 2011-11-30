@@ -321,7 +321,9 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 		return continuing;
 	}
 	int nchan = base_channels.size();
-	float * base_pose_buff_p = _base_pose_p->posture( 0 );
+	float * base_pose_buff_p = NULL;
+	if (_base_pose_p->frames() > 0)
+		base_pose_buff_p = _base_pose_p->posture( 0 );
 
 	int pose_var_index = 0;
 	for( int i=0; i<nchan; i++ )	{
