@@ -192,6 +192,15 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			locoData->paramManager->setWeight(c->steeringAgent->desiredSpeed * 100.0f, 0.0);
 	}
 
+	// gain for braking
+	const char* brakingFactor = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_BRAKING));
+	if (strcmp(brakingFactor, "") != 0)
+	{
+		std::stringstream command;
+		command << "steer braking " << c->getName() << " " << (float)atof(brakingFactor);
+		mcu->execute((char*)command.str().c_str());	
+	}
+
 	// for facing angle, we need to execute with some delay
 	const char* facingAngle = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_FACING));
 	if (strcmp(facingAngle, "") != 0)

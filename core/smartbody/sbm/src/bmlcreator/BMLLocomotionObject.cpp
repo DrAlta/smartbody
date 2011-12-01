@@ -20,6 +20,7 @@ BMLLocomotionObject::BMLLocomotionObject() : BMLObject()
 	manners.push_back("sbm:jump");
 	mannerAttr->setValidValues(manners);
 	createStringAttribute("facing", "", "", "Basic", 40, false, false, false, "The global facing angle of the agent. To cancel a facing, enter a value that is larger than 180 or smaller than -180");
+	createDoubleAttribute("sbm:braking",1.2,true,"Basic", 45, false, false, false, "The braking factor agent. If it's larger, the agent would tend to slow down eariler when it's reaching the target. Default is 1.2");
 	createStringAttribute("sbm:follow", "", "", "Basic", 50, false, false, false, "The other agent that this agent would follow. To cancel the following, enter an empty agent or an invalid agent");
 	createStringAttribute("proximity", "", "", "Basic", 60, false, false, false, "How close would this agent approach the target position, default setting is 1.5");
 	createStringAttribute("sbm:accel", "", "", "Basic", 70, false, false, false, "The moving speed acceleration, default setting is 2");

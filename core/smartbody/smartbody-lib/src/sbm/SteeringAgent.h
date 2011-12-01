@@ -83,6 +83,7 @@ class SteeringAgent
 		float distThreshold;	
 		float distDownThreshold;
 		float desiredSpeed;
+		float brakingGain;
 		float facingAngle;
 		float facingAngleThreshold;
 		float acceleration;

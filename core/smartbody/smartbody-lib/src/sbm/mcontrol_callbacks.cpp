@@ -5724,6 +5724,20 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				return CMD_SUCCESS;
 			}				
 		}
+		else if (command == "braking")
+		{
+			std::string characterName = args.read_token();
+			SbmCharacter* character = mcu_p->getCharacter(characterName);
+			if (character)
+			{
+				character->steeringAgent->brakingGain = (float)args.read_double();
+				if (character->steeringAgent->brakingGain < 1.0f)
+					character->steeringAgent->brakingGain = 1.0f;
+				if (character->steeringAgent->brakingGain > 4.5f)
+					character->steeringAgent->brakingGain = 4.5f;
+				return CMD_SUCCESS;
+			}				
+		}
 		else if (command == "test")
 		{
 			std::string characterName = args.read_token();
