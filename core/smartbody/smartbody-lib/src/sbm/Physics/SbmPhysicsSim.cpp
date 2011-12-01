@@ -149,6 +149,16 @@ void SbmJointObj::initJoint( SBJoint* joint )
 	SrMat gmat = tranMat*joint->gmat();		
 	setGlobalTransform(gmat);
 	sbmJoint = joint;
+
+	// create physics attributes for the joint
+	if (!joint->getAttribute("type"))
+		joint->createStringAttribute("type","ball",true,"Basic",41,false,false,false,"joint type");	
+	if (!joint->getAttribute("axis0"))
+		joint->createVec3Attribute("axis0",1,0,0,true,"Basic",42,false,false,false,"rotation axis 0");
+	if (!joint->getAttribute("axis1"))
+		joint->createVec3Attribute("axis1",0,1,0,true,"Basic",42,false,false,false,"rotation axis 1");
+	if (!joint->getAttribute("axis2"))
+		joint->createVec3Attribute("axis2",0,0,1,true,"Basic",42,false,false,false,"rotation axis 2");
 }
 
 SrMat SbmJointObj::getRelativeOrientation()

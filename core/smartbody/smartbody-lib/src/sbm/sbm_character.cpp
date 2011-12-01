@@ -514,18 +514,18 @@ void SbmCharacter::updateJointPhyObjs(bool phySim)
 			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
 			if (phySim)
 			{
-				phyObj->enablePhysicsSim(true);
-				phyObj->updateSbmObj();
+				//phyObj->enablePhysicsSim(true);
+				//phyObj->updateSbmObj();
 			}
 			else
 			{				
 				SBJoint* curSBJoint = dynamic_cast<SBJoint*>(curJoint);
 				SrMat tranMat; tranMat.translation(SbmJointObj::computeJointObjLocalCenter(curSBJoint));	
-				phyObj->enablePhysicsSim(false);
+				//phyObj->enablePhysicsSim(false);
 				//if (joint->parent()) 
 				SrMat gmat = tranMat*curSBJoint->gmat();		
 				phyObj->setGlobalTransform(gmat);
-				phyObj->updatePhySim();
+				//phyObj->updatePhySim();
 			}		
 		}
 	}	
@@ -597,7 +597,7 @@ void SbmCharacter::buildJointPhyObjs()
 
 	std::string charName = getName();
 	phyChar->initPhysicsCharacter(charName,jointNameList,true);
-	phySim->addPhysicsCharacter(phyChar);
+	//phySim->addPhysicsCharacter(phyChar);
 }
 /*
 void SbmCharacter::setJointCollider( std::string jointName, float len, float radius )
