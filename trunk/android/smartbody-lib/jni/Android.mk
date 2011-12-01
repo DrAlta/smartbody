@@ -103,7 +103,7 @@ include $(SBM_LOCAL_PATH)/../../steersuite-1.3/jni/Android.mk
 LOCAL_PATH := $(SBM_LOCAL_PATH)
 include $(CLEAR_VARS)
 LOCAL_MODULE := sbm
-LOCAL_CFLAGS    := -g -O0 -DBUILD_ANDROID -frtti
+LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti
 LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/../../boost \
 					$(SBM_LOCAL_PATH)/../../../lib/boost \

@@ -96,6 +96,7 @@ namespace Log
          virtual ~AndroidListener();
 
          virtual void OnMessage( const std::string & message );
+	 std::string getLogs();
 
    };
 

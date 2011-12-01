@@ -23,6 +23,7 @@
 
 
 #include "vhcl_public.h"
+#include "vhcl_string.h"
 
 #include <string>
 #include <map>
