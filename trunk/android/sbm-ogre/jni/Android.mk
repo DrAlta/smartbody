@@ -65,10 +65,11 @@ LOCAL_PATH = $(SBM_ANDROID_LOCAL_PATH)
 include $(CLEAR_VARS)
 LOCAL_MODULE    := libsbmogre
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
+					$(LOCAL_PATH)/../../boost \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/boost \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/bonebus/include \
-					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/vhcl/include \
-					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/vhmsg/vhmsg-c/include \
+					$(LOCAL_PATH)/../../vhcl/vhcl_src \
+					$(LOCAL_PATH)/../../vhmsg/vhmsg_src \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/wsp/wsp/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../steersuite-1.3/external/ \
 					$(LOCAL_PATH)/$(SBM_PATH)/../steersuite-1.3/steerlib/include \
