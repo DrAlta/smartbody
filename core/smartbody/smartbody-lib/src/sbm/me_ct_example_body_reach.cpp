@@ -360,7 +360,13 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 
 	// blending the input frame with ikFrame based on current fading
 	bool finishFadeOut = updateFading(dt);
-	currentReachEngine->updateReach((float)t,dt,inputMotionFrame,blendWeight);
+	
+	if (currentReachEngine->getCurrentState()->curStateName() != "Idle" || currentReachData->startReach )
+	{
+		//LOG("update reach");
+		currentReachEngine->updateReach((float)t,dt,inputMotionFrame,blendWeight);
+	}
+	
 	//printf("blend weight = %f\n",blendWeight);
 	BodyMotionFrame outMotionFrame;
 	MotionExampleSet::blendMotionFrame(inputMotionFrame,currentReachEngine->outputMotion(),blendWeight,outMotionFrame);	
