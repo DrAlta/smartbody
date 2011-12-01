@@ -348,6 +348,20 @@ void AndroidListener::OnMessage( const std::string & message )
     logList.push_back(message);
 }
 
+std::string AndroidListener::getLogs()
+{
+    std::string strLog;
+    std::list<std::string>::iterator li;
+    for ( li  = logList.begin();
+          li != logList.end();
+	  li++)
+    {
+	strLog += (*li);
+        strLog += "\n";
+    } 
+    return strLog;
+}
+
 
 DebuggerListener::DebuggerListener()
 {
