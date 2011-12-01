@@ -23,7 +23,7 @@
 
 //XERCES_CPP_NAMESPACE_USE
 
-
+/*
 int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	
 {
     
@@ -52,11 +52,13 @@ int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
     }
     return CMD_SUCCESS;
 }
+*/
 
     void mcu_register_callbacks() 
     {
 
         mcuCBHandle& mcu = mcuCBHandle::singleton();
+/*
         mcu.insert( "sbm",			sbm_main_func );
         mcu.insert( "help",			mcu_help_func );
         
@@ -189,6 +191,7 @@ int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
         mcu.insert("vrQuery", mcu_vrQuery_func );
         
         mcu.insert( "text_speech", text_speech::text_speech_func ); // [BMLR]
+*/
     }    
   
 void sbm_vhmsg_callback( const char *op, const char *args, void * user_data )
@@ -263,7 +266,7 @@ void MCUInitialize()
         
 void SBMInitialize(const char* mediaPath)
 {
-	SBMExecuteCmd("path seq /sdcard/sbm/");
+	SBMExecuteCmd("path seq /sdcard/SbmOgre/");
 	SBMExecuteCmd("seq initOgre.seq");
 	/*
     SBMExecuteCmd("char brad init common.sk"); 

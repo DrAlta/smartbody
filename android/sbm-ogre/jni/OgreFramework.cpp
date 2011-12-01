@@ -32,7 +32,7 @@ OgreFramework::OgreFramework()
 	m_pMouse			= 0;
     
 #ifdef __ANDROID__
-    m_ResourcePath = "/sdcard/sbm/ogre/";
+    m_ResourcePath = "/sdcard/SbmOgre/ogre/";
 #else
     m_ResourcePath = "";
     m_pTrayMgr          = 0;
