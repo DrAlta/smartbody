@@ -40,6 +40,18 @@ public:
 	void cleanGeometry();
 };
 
+class SbmODEJoint
+{
+public:
+	dJointID jointID;
+	dJointID aMotorID;
+	dBodyID  body1ID, body2ID;
+	SBJoint* joint;
+public:
+	SbmODEJoint();
+	~SbmODEJoint();
+};
+
 typedef std::map<unsigned long,SbmODEObj*> SbmODEObjMap;
 
 class SbmPhysicsSimODE :

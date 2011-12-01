@@ -218,8 +218,8 @@ void SbmPhysicsSimODE::nearCallBack(void *data, dGeomID o1, dGeomID o2)
 			contact[i].surface.bounce     = 0.0f; // (0.0~1.0) restitution parameter
 			contact[i].surface.bounce_vel = 0.0;;
 			contact[i].surface.mu = 10.f;//1000.f;		
-			contact[i].surface.soft_cfm = 1e-7;
-			contact[i].surface.soft_erp = 0.5;
+			contact[i].surface.soft_cfm = 1e-5;
+			contact[i].surface.soft_erp = 0.4;
 		}
 		//contact[i].surface.bounce_vel = 1000.f; // minimum incoming velocity for bounce 
 		dJointID c = dJointCreateContact(phyODE->getWorldID(),phyODE->getContactGroupID(),&contact[i]);
@@ -237,8 +237,8 @@ void SbmPhysicsSimODE::initSimulation()
 	dWorldSetLinearDamping(worldID,0.001f);
 	dWorldSetAngularDamping(worldID,0.001f);
 
-	dWorldSetERP(worldID,0.8);
-	dWorldSetCFM(worldID,1e-6);	
+	//dWorldSetERP(worldID,0.8);
+	//dWorldSetCFM(worldID,1e-1);	
 
 	//spaceID = dHashSpaceCreate(0);
 	spaceID = dSimpleSpaceCreate(0);
@@ -290,7 +290,7 @@ void SbmPhysicsSimODE::linkJointObj( SbmJointObj* obj )
 	SbmODEObj* pode = getODEObj(parent);
 	std::string jname = obj->getJoint()->getName();
 	
-	if (parent && parent->getParentObj())//jname == "r_shoulder" || jname == "r_elbow" || jname == "r_forearm" || jname == "r_wrist")
+	if (1)//parent && parent->getParentObj())//jname == "r_shoulder" || jname == "r_elbow" || jname == "r_forearm" || jname == "r_wrist")
 	{
 		dJointID j = dJointCreateBall(worldID, 0);
 		dJointAttach(j, pode->bodyID, odeObj->bodyID);
@@ -322,15 +322,16 @@ void SbmPhysicsSimODE::linkJointObj( SbmJointObj* obj )
 		
 
 
-		dJointSetAMotorParam(aMotor, dParamStopCFM, 1e-4);
-		dJointSetAMotorParam(aMotor, dParamStopCFM1, 1e-4);
-		dJointSetAMotorParam(aMotor, dParamStopCFM2, 1e-4);
-		dJointSetAMotorParam(aMotor, dParamStopCFM3, 1e-4);
+		dJointSetAMotorParam(aMotor, dParamStopCFM, 1e-5);
+		dJointSetAMotorParam(aMotor, dParamStopCFM1, 1e-5);
+		dJointSetAMotorParam(aMotor, dParamStopCFM2, 1e-5);
+		dJointSetAMotorParam(aMotor, dParamStopCFM3, 1e-5);
 
-		dJointSetAMotorParam(aMotor, dParamStopERP, 0.1);
-		dJointSetAMotorParam(aMotor, dParamStopERP1, 0.1);
-		dJointSetAMotorParam(aMotor, dParamStopERP2, 0.1);
-		dJointSetAMotorParam(aMotor, dParamStopERP3, 0.1);
+		dJointSetAMotorParam(aMotor, dParamStopERP, 0.4);
+		dJointSetAMotorParam(aMotor, dParamStopERP1, 0.4);
+		dJointSetAMotorParam(aMotor, dParamStopERP2, 0.4);
+		dJointSetAMotorParam(aMotor, dParamStopERP3, 0.4);
+		
 
 
 		dJointSetAMotorAxis (aMotor, 0, 1, swingAxis.x, swingAxis.y, swingAxis.z);
@@ -661,4 +662,19 @@ void SbmODEObj::cleanGeometry()
 		dGeomTriMeshDataDestroy(meshdataID);	
 	geomID = 0;
 	meshdataID = 0;
+}
+
+
+
+SbmODEJoint::SbmODEJoint()
+{
+	jointID = 0;
+	aMotorID = 0;
+	body1ID = body2ID = 0;
+	joint = NULL;
+}
+
+SbmODEJoint::~SbmODEJoint()
+{
+	
 }
