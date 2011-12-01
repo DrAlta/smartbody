@@ -49,6 +49,7 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	distThreshold = 1.80f;			// exposed, unit: meter
 	distDownThreshold = 0.3f;
 
+	brakingGain = 1.2f;
 	desiredSpeed = 1.0f;			// exposed, unit: meter/sec
 	facingAngle = -200.0f;			// exposed, unit: deg
 	facingAngleThreshold = 10;
@@ -947,11 +948,8 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 
 	// slow down mechanism when close to the target
 	float targetSpeed = steeringCommand.targetSpeed;
-	float gain = 0.8f;
-	if (targetSpeed > 3)
-		gain = 1.1f;
-	if (distToTarget < targetSpeed * gain)
-		targetSpeed = distToTarget / gain;
+	if (distToTarget < targetSpeed * brakingGain)
+		targetSpeed = distToTarget / brakingGain;
 
 	if (stepAdjust)
 		if (!character->param_animation_ct->hasPAState(stepStateName.c_str()))
