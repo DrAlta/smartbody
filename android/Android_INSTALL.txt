@@ -23,7 +23,7 @@ sbmjni is a hello world project for SmartBody. It has very basic rendering and m
 i)   Go to (SmartBodyDir)/android/sbmjni/
 ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading). If the build is successful, there should be a libsbmjni.so in ./libs/armeabi.
 iii) copy the directroy ./sbmjniData/ and its files to the devices's sdcard. ( Should be copied to directory /sdcard/ in the android device. )
-iv)  Use Eclipse to open the project (SmartBodyDir)/android/sbm/. 
+iv)  Use Eclipse : File->New->Android Project. Create a project from existing source at : (SmartBodyDir)/android/sbm/. 
 v)   Select Project->Build Project. Connect the device and then run the program as "Android Application".
 
 2. sbm-ogre :
@@ -32,8 +32,8 @@ sbm-ogre combines SmartBody and ogre for high quality rendering. Currently, it i
 i)   Go to (SmartBodyDir)/android/sbm-ogre/
 ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading). If the build is successful, there should be a libsbmogre.so in ./libs/armeabi.
 iii) copy the directroy ./SbmOgre/ and its files to the devices's sdcard. ( Should be copied to directory /sdcard/ in the android device. )
-iv)  Use Eclipse to open the project (SmartBodyDir)/android/sbm-ogre/. 
-v)   Select Project->Build Project. ThConnect the device and then run the program as "Android Application".
+iv)  Use Eclipse : File->New->Android Project. Create a project from existing source at : (SmartBodyDir)/android/sbm-ogre/. 
+v)   Select Project->Build Project. Connect the device and then run the program as "Android Application".
 
 3. vh-wrapper
 
