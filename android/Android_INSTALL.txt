@@ -1,0 +1,89 @@
+Instructions for Android
+----------------------
+
+Download and install android-sdk, android-ndk from : http://developer.android.com/sdk/index.html
+
+(For windows platform, you also need to install cygwin 1.7 or higher : http://www.cygwin.com/ )
+
+Follow the installation instruction for both sdk/ndk. Be sure to set the correct path to android-sdk/bin, android-ndk/bin so the toolchain can be access correctly.
+
+For NDK, you also need to export the environment variable NDK_ROOT to the NDK installation directory ( for example, export NDK_ROOT= "path-to-ndk-directory" )
+
+Install Eclipse ( http://www.eclipse.org/ ) and its Android ADT plug-in ( http://developer.android.com/sdk/eclipse-adt.html )
+
+The Android build target needs to be 2.3.3 or higher, otherwise some of the code may not be built.
+
+**** If your target hardware is the Arm architecture, some dependency libraries are already prebuilt at SmartBodyDir)/android/lib. Therefore you can build the smartbody project directly : 
+
+There are 3 projects that can be built for android : 
+
+1. sbmjni :
+
+sbmjni is a hello world project for SmartBody. It has very basic rendering and minimal functionality, but it helps demonstarte the SmartBody port on android. 
+i)   Go to (SmartBodyDir)/android/sbm-jni/
+ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading).
+iii) Use Eclipse to open the project (SmartBodyDir)/android/sbm/. 
+iv)  Select Project->Build Project. Connect the device and then run the program as "Android Application".
+
+2. sbm-ogre :
+
+sbm-ogre combines SmartBody and ogre for high quality rendering. Currently, it is very slow when rendering in deformable model mode.
+i)   Go to (SmartBodyDir)/android/sbm-ogre/
+ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading).
+iii) Use Eclipse to open the project (SmartBodyDir)/android/sbm-ogre/. 
+iv)  Select Project->Build Project. ThConnect the device and then run the program as "Android Application".
+
+3. vh-wrapper
+
+vh-wrapper is a SmartBody interface to Unity3D. 
+i)   Go to (SmartBodyDir)/android/vh_wrapper/
+ii)  ndk-build
+iii) rename libvhwrapper.so to libvhwrapper-dll.so ( for some reason, Android does not accept a build target name with "-" )
+iv)  copy libvhwrapper-dll.so to the plug-in directory of Unity project. Build the Unity project for android.
+
+
+**** If you are targeting other hardware achitecture ( X86, etc ) or you prefer to rebuild all libraries from the source :
+
+1. Building boost :
+i) Download Boost library, extract it into $(SmartBodyDir)/lib/
+
+modify libs\filesystem\v2\src\v2_operations.cpp, change: 
+#   if !defined(__APPLE__) && !defined(__OpenBSD__) 
+#     include <sys/statvfs.h> 
+#     define BOOST_STATVFS statvfs 
+#     define BOOST_STATVFS_F_FRSIZE vfs.f_frsize 
+#   else 
+#ifdef __OpenBSD__ 
+#     include <sys/param.h> 
+#endif 
+
+to: 
+
+#   if !defined(__APPLE__) && !defined(__OpenBSD__) && !defined(__ANDROID__) 
+#     include <sys/statvfs.h> 
+#     define BOOST_STATVFS statvfs 
+#     define BOOST_STATVFS_F_FRSIZE vfs.f_frsize 
+#   else 
+#ifdef __OpenBSD__ 
+#     include <sys/param.h> 
+#elif defined(__ANDROID__) 
+#     include <sys/vfs.h> 
+#endif 
+
+ii) modifiy the file $(SmartBodyDir)/android/boost/userconfig.jam, look for :
+
+ANDROID_NDK = ../android-ndk ; and change the directory "../android-ndk" so it points to the android NDK directory
+
+You may also need to change all arm-linux-androideabi-xxx to the corresponding toolchain name based on your target architecture and platform.
+
+iii) (use cygwin in Windows platform )
+./bootstrap.sh
+./bjam --without-python --without-math --without-mpi --without- 
+iostreams toolset=gcc-android4.4.3 link=static runtime-link=static 
+target-os=linux --stagedir=android stage 
+
+2. Building iconv and xerces
+(To-Do)
+3. Building clapack
+(To-Do)
+
