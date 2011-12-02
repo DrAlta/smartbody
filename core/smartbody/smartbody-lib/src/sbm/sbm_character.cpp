@@ -509,9 +509,10 @@ void SbmCharacter::updateJointPhyObjs(bool phySim)
 	{
 		SkJoint* curJoint = joints[i]; 
 		const std::string& jointName = curJoint->name();
-		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
+		std::map<std::string, SbmJointObj*>::iterator iter = jointPhyObjMap.find(jointName);
+		if (iter != jointPhyObjMap.end())
 		{
-			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
+			SbmPhysicsObj* phyObj = (*iter).second;
 			if (phySim)
 			{
 				//phyObj->enablePhysicsSim(true);
@@ -520,7 +521,7 @@ void SbmCharacter::updateJointPhyObjs(bool phySim)
 			else
 			{				
 				SBJoint* curSBJoint = dynamic_cast<SBJoint*>(curJoint);
-				SrMat tranMat; tranMat.translation(SbmJointObj::computeJointObjLocalCenter(curSBJoint));	
+				SrMat tranMat; tranMat.translation(curSBJoint->getLocalCenter());	
 				//phyObj->enablePhysicsSim(false);
 				//if (joint->parent()) 
 				SrMat gmat = tranMat*curSBJoint->gmat();		

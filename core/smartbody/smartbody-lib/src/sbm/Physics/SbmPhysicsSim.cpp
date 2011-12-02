@@ -144,7 +144,8 @@ SbmJointObj::~SbmJointObj()
 
 void SbmJointObj::initJoint( SBJoint* joint )
 {		
-	SrMat tranMat; tranMat.translation(computeJointObjLocalCenter(joint));	
+	joint->calculateLocalCenter();
+	SrMat tranMat; tranMat.translation(joint->getLocalCenter());	
 	//if (joint->parent()) 
 	SrMat gmat = tranMat*joint->gmat();		
 	setGlobalTransform(gmat);
@@ -159,6 +160,8 @@ void SbmJointObj::initJoint( SBJoint* joint )
 		joint->createVec3Attribute("axis1",0,1,0,true,"Basic",42,false,false,false,"rotation axis 1");
 	if (!joint->getAttribute("axis2"))
 		joint->createVec3Attribute("axis2",0,0,1,true,"Basic",42,false,false,false,"rotation axis 2");
+
+	
 }
 
 SrMat SbmJointObj::getRelativeOrientation()
@@ -172,18 +175,7 @@ SrMat SbmJointObj::getRelativeOrientation()
 	}
 }
 
-SrVec SbmJointObj::computeJointObjLocalCenter( SBJoint* joint )
-{
-	SrVec center = SrVec(0,0,0);
-	if (joint->getNumChildren() == 0) return center;
 
-	for (int i=0;i<joint->getNumChildren();i++)
-	{
-		center += joint->getChild(i)->offset()*0.5f;
-	}
-	center /= (float)joint->getNumChildren();
-	return center;
-}
 /************************************************************************/
 /* Physics Character                                                    */
 /************************************************************************/
@@ -284,7 +276,7 @@ SbmGeomObject* SbmPhysicsCharacter::createJointGeometry( SBJoint* joint, float r
 	if (joint->getNumChildren() > 1) // bounding box
 	{
 		SrBox bbox;		
-		bbox.extend(SbmJointObj::computeJointObjLocalCenter(joint));			
+		bbox.extend(joint->getLocalCenter());			
 		bbox.grows(extend,extend,extend); 
 		bbox.extend(SrVec(0,0,0));
 		for (int i=0;i<joint->getNumChildren();i++)

@@ -8,6 +8,7 @@ namespace SmartBody {
 
 SBJoint::SBJoint() : SkJoint()
 {
+	_localCenter.set(0, 0, 0);
 }
 
 SBJoint::SBJoint( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i ) : SkJoint(sk, parent, rtype, i)
@@ -158,6 +159,24 @@ bool SBJoint::isUsePosition(int index)
 
 	return pos()->limits(index);
 
+}
+
+void SBJoint::calculateLocalCenter()
+{
+	_localCenter = SrVec(0,0,0);
+	if (this->getNumChildren() == 0) 
+		return;
+
+	for (int i=0;i<this->getNumChildren();i++)
+	{
+		_localCenter += this->getChild(i)->offset()*0.5f;
+	}
+	_localCenter /= (float)this->getNumChildren();
+}
+
+const SrVec& SBJoint::getLocalCenter()
+{
+	return _localCenter;
 }
 
 };

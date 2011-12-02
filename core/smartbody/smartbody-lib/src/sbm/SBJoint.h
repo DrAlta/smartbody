@@ -43,6 +43,13 @@ class SBJoint : public SkJoint
 		void setUsePosition(int index, bool val);
 		bool isUsePosition(int index);
 
+		void calculateLocalCenter();
+		const SrVec& getLocalCenter();
+
+	protected:
+		SrVec _localCenter;
+
+
 };
 
 };
