@@ -187,7 +187,7 @@ void MotionItemInfoWidget::updateWidget()
 	SkChannelArray& channels = motion->channels();
 	for (int i = 0; i < channels.size(); i++)
 	{
-		std::string chanName = channels.name(i).c_str();
+		const std::string& chanName = channels.name(i).c_str();
 		std::string typeName = channels[i].type_name();
 		channelBrowser->add((chanName+"."+typeName).c_str());
 	}
@@ -228,7 +228,7 @@ void MotionItemInfoWidget::updateChannelAttributes()
 	channelInfoObject->clearAttributes();	
 	attrWindow->cleanUpWidgets();
 	SkChannel& chan = channels[channelIndex];
-	std::string chanName = channels.name(channelIndex);
+	const std::string& chanName = channels.name(channelIndex);
 	std::string typeName = channels[channelIndex].type_name();	
 	int floatIdx = channels.float_position(channelIndex);
 	float* buffer = motion->posture(motionFrame);

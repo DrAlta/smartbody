@@ -517,7 +517,7 @@ public:
 			// MeControllerTreeRoot only takes skeletons,
 			// so all channels should be connected.
 			// Avoiding the check.
-			string name( channels.name(i) );
+			const std::string& name = channels.name(i);
 			if( _logged_joints.find(name)!=set_end )
 				_logged_channel_indices.insert(i);
 		}

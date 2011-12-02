@@ -454,7 +454,7 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 			}
 		}
 #else
-		std::string jointName = _channels.name(local_channel_index);
+		const std::string& jointName = _channels.name(local_channel_index);
 		SkJoint* channelJoint = frame.context()->channels().skeleton()->search_joint(jointName.c_str());
 		SrVec rotAxis;
 		if (_movementType == BML::HEAD_NOD )

@@ -163,7 +163,7 @@ void MotionProfile::computeVelocity( SkMotion* m, float t, float dt, std::vector
 	float aveargeVelocity = 0.f;
 	for (int i=0;i<channels.size();i++)
 	{
-		std::string chanName = channels.name(i);
+		const std::string& chanName = channels.name(i);
 		int chanType = channels.type(i);
 		if (chanType != SkChannel::Quat)
 			continue;
@@ -200,7 +200,7 @@ void MotionProfile::computeEulerVelocity( SkMotion* m, float t, float dt, std::v
 	SkChannelArray& channels = m->channels();
 	for (int i=0;i<channels.size();i++)
 	{
-		std::string chanName = channels.name(i);
+		const std::string& chanName = channels.name(i);
 		int chanType = channels.type(i);
 		if (chanType != SkChannel::Quat)
 			continue;

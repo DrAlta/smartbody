@@ -221,7 +221,7 @@ void MeController::remap() {
 	SkChannelArray& contextChnls = _context->channels();
 
 	for( int i=0; i<size; ++i ) {
-		std::string name = localChnls.name( i );
+		const std::string& name = localChnls.name( i );
 		SkChannel::Type type = localChnls.type( i );
 		_toContextCh[i] = contextChnls.search( name.c_str(), type );
 
@@ -280,7 +280,7 @@ void MeController::dumpChannelMap()
 
 	SkChannelArray& contextChnls = _context->channels();
 	for( int i=0; i<size; ++i ) {
-		std::string name = localChnls.name( i );
+		const std::string& name = localChnls.name( i );
 		SkChannel::Type type = localChnls.type( i );
 		//_toContextCh[i] = contextChnls.search( name, type );
 
