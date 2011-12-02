@@ -135,7 +135,7 @@ class PAInterpolator : public PAMotions
 		~PAInterpolator();
 
 	public:
-		void blending(std::vector<double> times, SrBuffer<float>& buff);
+		void blending(std::vector<double>& times, SrBuffer<float>& buff);
 
 	private:
 		void handleBaseMatForBuffer(SrBuffer<float>& buff);
