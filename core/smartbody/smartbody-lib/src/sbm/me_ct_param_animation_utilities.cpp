@@ -401,7 +401,7 @@ PAInterpolator::~PAInterpolator()
 {
 }
 
-void PAInterpolator::blending(std::vector<double> times, SrBuffer<float>& buff)
+void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 {
 	std::vector<int> indices;
 	for (int i = 0; i < getNumMotions(); i++)
@@ -429,12 +429,12 @@ void PAInterpolator::blending(std::vector<double> times, SrBuffer<float>& buff)
 		std::vector<SrBuffer<float> > buffers;
 		for (int i = 0; i < numMotions; i++)
 		{
-			SrBuffer<float> buffer;
+			buffers.push_back(SrBuffer<float>());
+			SrBuffer<float>& buffer = buffers[buffers.size() - 1];
 			buffer.size(buff.size());
 			buffer = buff;
 			getBuffer(motions[indices[i]], times[indices[i]], motionContextMaps[indices[i]], buffer);
 			handleBaseMatForBuffer(buffer);
-			buffers.push_back(buffer);
 		}
 		SrBuffer<float> tempBuffer;
 		tempBuffer.size(buff.size());
