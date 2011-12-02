@@ -785,7 +785,7 @@ SkMotion* SkMotion::buildMirrorMotion()
 		for (int k=0;k<mchan_arr.size();k++)
 		{
 			SkChannel& chan = mchan_arr[k];
-			std::string jointName = mchan_arr.name(k);
+			const std::string& jointName = mchan_arr.name(k);
 			int index = mchan_arr.float_position(k);
 			if (chan.type == SkChannel::XPos)
 			{
@@ -810,7 +810,7 @@ SkMotion* SkMotion::buildMirrorMotion()
 		for (int k=0;k<mchan_arr.size();k++)
 		{
 			SkChannel& chan = mchan_arr[k];
-			std::string jointName = mchan_arr.name(k);
+			const std::string& jointName = mchan_arr.name(k);
 			int index = mchan_arr.float_position(k);
 			if (boost::algorithm::starts_with(jointName,"l_"))
 			{

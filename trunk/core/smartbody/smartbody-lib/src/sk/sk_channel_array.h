@@ -126,7 +126,7 @@ public :
 
 	/*! Returns the declared joint name for the channel. It is the
 		user responsibility to ensure that 0<=i and i<size() */
-	std::string name ( int i ) const { 
+	const std::string& name ( int i ) const { 
 		const Channel& ch = _channelList[i];
 		return ch.name;
 	}

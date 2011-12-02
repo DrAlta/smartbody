@@ -241,7 +241,7 @@ void PAMotions::initPreRotation(const SrQuat& q)
 }
 
 
-void PAMotions::getBuffer(SkMotion* motion, double t, SrBuffer<int> map, SrBuffer<float>& buff)
+void PAMotions::getBuffer(SkMotion* motion, double t, SrBuffer<int>& map, SrBuffer<float>& buff)
 {
 	double deltaT = motion->duration() / double(motion->frames() - 1);
 	int lastFrame = int (t/deltaT);
@@ -443,7 +443,7 @@ void PAInterpolator::blending(std::vector<double> times, SrBuffer<float>& buff)
 		int chanSize = motionChan.size();
 		for (int i = 0; i < chanSize; i++)
 		{
-			std::string chanName = motionChan.name(i);
+			const std::string& chanName = motionChan.name(i);
 			for (int j = 1; j < numMotions; j++)
 			{
 				int id = motions[indices[j]]->channels().search(chanName.c_str(), motionChan[i].type);
@@ -530,9 +530,10 @@ PAWoManager::~PAWoManager()
 {
 }
 
-void PAWoManager::apply(std::vector<double> times, std::vector<double> timeDiffs, SrBuffer<float>& buffer)
+void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDiffs, SrBuffer<float>& buffer)
 {
-	std::vector<SrMat> currentBaseMats = getBaseMats(times, timeDiffs, buffer.size());
+	std::vector<SrMat> currentBaseMats;
+	getBaseMats(currentBaseMats, times, timeDiffs, buffer.size());
 	if (!firstTime)
 	{
 		std::vector<int> indices;
@@ -646,7 +647,7 @@ void PAWoManager::matInterp(SrMat& ret, SrMat& mat1, SrMat& mat2, float w)
 	ret.set(14, posZ);
 }
 
-std::vector<SrMat> PAWoManager::getBaseMats(std::vector<double> times, std::vector<double> timeDiffs, int bufferSize)
+void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& times, std::vector<double>& timeDiffs, int bufferSize)
 {
 	if (!intializeTransition)
 	{
@@ -668,7 +669,6 @@ std::vector<SrMat> PAWoManager::getBaseMats(std::vector<double> times, std::vect
 		intializeTransition = true;
 	}
 
-	std::vector<SrMat>	mats;
 	for (int i = 0; i < getNumMotions(); i++)
 	{
 		SrBuffer<float> buffer;
@@ -681,7 +681,6 @@ std::vector<SrMat> PAWoManager::getBaseMats(std::vector<double> times, std::vect
 		getUpdateMat(updateBaseMat, baseMat);
 		mats.push_back(updateBaseMat);
 	}
-	return mats;
 }
 
 PAStateModule::PAStateModule(PAStateData* stateData, bool l, bool pn)
@@ -938,7 +937,7 @@ void PATransitionManager::bufferBlending(SrBuffer<float>& buffer, SrBuffer<float
 	SkChannelArray& channels = _context->channels();
 	for (int i = 0; i < channels.size(); i++)
 	{
-		std::string chanName = channels.name(i);
+		const std::string& chanName = channels.name(i);
 		if (chanName == SbmPawn::WORLD_OFFSET_JOINT_NAME)
 			continue;
 

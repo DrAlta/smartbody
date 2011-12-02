@@ -444,7 +444,10 @@ PAStateModule* MeCtParamAnimation::createStateModule(PAStateData* stateData, boo
 	{
 		module->interpolator->setMotionContextMaps(_context);
 		module->interpolator->initChanId(_context, baseJointName);
-		module->interpolator->initPreRotation(character->getSkeleton()->search_joint(baseJointName.c_str())->quat()->prerot());
+		SkJoint* baseJoint = character->getSkeleton()->search_joint(baseJointName.c_str());
+		if (!baseJoint)
+			return NULL;
+		module->interpolator->initPreRotation(baseJoint->quat()->prerot());
 		module->woManager->setMotionContextMaps(_context);
 		module->woManager->initChanId(_context, baseJointName);
 		module->woManager->initPreRotation(character->getSkeleton()->search_joint(baseJointName.c_str())->quat()->prerot());

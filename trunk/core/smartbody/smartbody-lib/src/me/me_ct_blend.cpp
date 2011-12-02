@@ -104,7 +104,7 @@ void MeCtBlend::Context::remap_channels() {
 			set<int>::const_iterator i = context_logged_channels.begin();
 			for(; i!=context_logged_channels_end; ++i ) {
 				int index = *i;
-				std::string name = _context->channels().name(index);
+				const std::string& name = _context->channels().name(index);
 				SkChannel::Type type = _context->channels().type(index);
 				oss <<'['<<index<<']'<<name
 					<<'('<<SkChannel::type_name(type)<<"), ";
@@ -116,7 +116,7 @@ void MeCtBlend::Context::remap_channels() {
 
 		//  Iterate through parent_channels, looking for matching child_channels
 		for( int parent_index=0; parent_index<MAX_PARENT_CH; ++parent_index ) {
-			std::string     name = parent_channels.name( parent_index );
+			const std::string& name = parent_channels.name( parent_index );
 			SkChannel::Type type = parent_channels.type( parent_index );
 #if DEBUG_INSPECT_CHANNELS
 			SkChannel::Type parent_ch_type = type;

@@ -683,7 +683,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 			sr_euler_mat(order, M, rotx, roty, rotz);
 
 			// Matrix C
-			std::string jName = motion.channels().name(quatIndices[i]);
+			const std::string& jName = motion.channels().name(quatIndices[i]);
 			JointInfo* jointInfo = NULL;
 			for (unsigned int cnum = 0; cnum < jointInfoList.size(); cnum++)
 			{

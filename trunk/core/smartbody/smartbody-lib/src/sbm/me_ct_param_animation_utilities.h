@@ -98,7 +98,7 @@ class PAMotions
 		void initPreRotation(const SrQuat& q);
 
 	protected:
-		void getBuffer(SkMotion* motion, double t, SrBuffer<int> map, SrBuffer<float>& buff);
+		void getBuffer(SkMotion* motion, double t, SrBuffer<int>& map, SrBuffer<float>& buff);
 		SrMat getBaseMatFromBuffer(SrBuffer<float>& buffer);
 		void setBufferByBaseMat(SrMat& mat, SrBuffer<float>& buffer);
 		void getUpdateMat(SrMat& dest, SrMat& src);
@@ -119,12 +119,12 @@ class PAWoManager : public PAMotions
 		PAWoManager(std::vector<SkMotion*> m, std::vector<double> w);
 		~PAWoManager();
 
-		void apply(std::vector<double> times, std::vector<double> timeDiffs, SrBuffer<float>& buffer);
+		void apply(std::vector<double>& times, std::vector<double>& timeDiffs, SrBuffer<float>& buffer);
 		SrMat& getBaseTransformMat();
 		static void matInterp(SrMat& ret, SrMat& mat1, SrMat& mat2, float w);
 
 	private:
-		std::vector<SrMat> getBaseMats(std::vector<double> times, std::vector<double> timeDiffs, int bufferSize);
+		void getBaseMats(std::vector<SrMat>& mats, std::vector<double>& times, std::vector<double>& timeDiffs, int bufferSize);
 };	
 
 class PAInterpolator : public PAMotions
