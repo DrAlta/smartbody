@@ -1010,14 +1010,27 @@ int mcuCBHandle::remove_scene( SrSnGroup *scene_p )	{
 
 void mcuCBHandle::update( void )	{
 
+	// scripts
 	std::map<std::string, SBScript*>& scripts = _scene->getScripts();
-
 	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();
 		iter++)
 	{
-		(*iter).second->beforeUpdate();
+		if ((*iter).second->isEnable())
+			(*iter).second->beforeUpdate(this->time);
 	}
+
+	// services
+	std::map<std::string, SBService*>& services = _scene->getServiceManager()->getServices();
+	for (std::map<std::string, SBService*>::iterator iter = services.begin();
+		iter != services.end();
+		iter++)
+	{
+		if ((*iter).second->isEnable())
+			(*iter).second->beforeUpdate(this->time);
+	}
+
+
 
 
 #if 0
@@ -1246,11 +1259,22 @@ void mcuCBHandle::update( void )	{
 		(*iter).second->update(time);
 	}
 
+	// scripts
 	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();
 		iter++)
 	{
-		(*iter).second->afterUpdate();
+		if ((*iter).second->isEnable())
+			(*iter).second->afterUpdate(this->time);
+	}
+
+	// services
+	for (std::map<std::string, SBService*>::iterator iter = services.begin();
+		iter != services.end();
+		iter++)
+	{
+		if ((*iter).second->isEnable())
+			(*iter).second->afterUpdate(this->time);
 	}
 	
 }

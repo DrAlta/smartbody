@@ -85,21 +85,21 @@ struct SBScriptWrap :  SBScript, boost::python::wrapper<SBScript>
 		return SBScript::stop();
 	}
 
-	virtual void beforeUpdate()
+	virtual void beforeUpdate(double time)
 	{
 		if (boost::python::override o = this->get_override("beforeUpdate"))
 		{
 			try {
-				o();
+				o(time);
 			} catch (...) {
 				PyErr_Print();
 			}
 		}
 	}
 
-	void default_beforeUpdate()
+	void default_beforeUpdate(double time)
 	{
-		return SBScript::beforeUpdate();
+		return SBScript::beforeUpdate(time);
 	}
 
 	virtual void update(double time)
@@ -119,21 +119,21 @@ struct SBScriptWrap :  SBScript, boost::python::wrapper<SBScript>
 		return SBScript::update(time);
 	}
 
-	virtual void afterUpdate()
+	virtual void afterUpdate(double time)
 	{
 		if (boost::python::override o = this->get_override("afterUpdate"))
 		{
 			try {
-				o();
+				o(time);
 			} catch (...) {
 				PyErr_Print();
 			}
 		}
 	}
 
-	void default_afterUpdate()
+	void default_afterUpdate(double time)
 	{
-		return SBScript::afterUpdate();
+		return SBScript::afterUpdate(time);
 	}
 };
 
@@ -324,12 +324,13 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("run", &SBScene::runScript, "Runs a python script.")
 		// managers
 		.def("getEventManager", &SBScene::getEventManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event manager.")
-		.def("getSimulationManager", &SBScene::getSimulationManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the simulation manager object. \n Input: NULL \n Output: time manager object")
-		.def("getProfiler", &SBScene::getProfiler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the  profiler object. \n Input: NULL \n Output: time profiler object")
-		.def("getBmlProcessor", &SBScene::getBmlProcessor, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the bml processor object.\n Input: NULL \nOutput: bml processor object")
-		.def("getStateManager", &SBScene::getStateManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the state manager object.\n Input: NULL \nOutput: state manager object")
-		.def("getReachManager", &SBScene::getReachManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the reach manager object.\n Input: NULL \nOutput: state manager object")
-		.def("getSteerManager", &SBScene::getSteerManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the steer manager object.\n Input: NULL \nOutput: steer manager object")
+		.def("getSimulationManager", &SBScene::getSimulationManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the simulation manager object.")
+		.def("getProfiler", &SBScene::getProfiler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the  profiler object.")
+		.def("getBmlProcessor", &SBScene::getBmlProcessor, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the bml processor object.")
+		.def("getStateManager", &SBScene::getStateManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the state manager object.")
+		.def("getReachManager", &SBScene::getReachManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the reach manager object.")
+		.def("getSteerManager", &SBScene::getSteerManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the steer manager object.")
+		.def("getServiceManager", &SBScene::getServiceManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the service manager object.")
 	;
 
 	boost::python::def("createController", createController, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new controller given a controller type and a controller name.");
@@ -572,6 +573,19 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("setSteerStateNamePrefix", &SBSteerAgent::setSteerStateNamePrefix, "Set the animation state name prefix used for steering, only applies to steering type locomotion.")
 		.def("setSteerType", &SBSteerAgent::setSteerType, "Set the type of steering locomotion, can be one of the following: basic, example, procedural")
 		.def("getCurrentSBCharacter", &SBSteerAgent::getCurrentSBCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return SBCharacter that SBSteerAgent is attached to.")		
+		;
+
+	boost::python::class_<SBServiceManager>("SBServiceManager")
+		.def("addService", &SBServiceManager::addService, "Adds a service to the service manager.")
+		.def("removeService", &SBServiceManager::removeService, "Removes a service to the service manager.")
+		.def("getServiceNames", &SBServiceManager::getServiceNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of services available.")
+		.def("getNumServices", &SBServiceManager::getNumServices, "Returns the number of services present.")
+		.def("getService", &SBServiceManager::getService, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a service by name.")
+		;
+
+	boost::python::class_<SBService>("SBService")
+		.def("setEnable", &SBService::setEnable, "Enables or disables the service.")
+		.def("isEnable", &SBService::isEnable, "Is the service enabled?")
 		;
 
 /*

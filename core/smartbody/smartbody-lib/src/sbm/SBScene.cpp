@@ -11,6 +11,7 @@ SBScene::SBScene(void)
 	_stateManager = new SBAnimationStateManager();
 	_reachManager = new SBReachManager();
 	_steerManager = new SBSteerManager();
+	_serviceManager = new SBServiceManager();
 
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 }
@@ -410,6 +411,11 @@ SBReachManager* SBScene::getReachManager()
 SBSteerManager* SBScene::getSteerManager()
 {
 	return _steerManager;
+}
+
+SBServiceManager* SBScene::getServiceManager()
+{
+	return _serviceManager;
 }
 
 SmartBody::SBFaceDefinition* SBScene::createFaceDefinition(const std::string& name)

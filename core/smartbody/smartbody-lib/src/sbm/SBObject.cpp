@@ -438,5 +438,26 @@ IntAttribute* SBObject::createIntAttribute(const std::string& name, int value, b
 	  return defaultMatrix;
   }
 
-  };
+void SBObject::start()
+{
+}
+
+void SBObject::beforeUpdate(double time)
+{
+}
+
+void SBObject::update(double time)
+{
+}
+
+void SBObject::afterUpdate(double time)
+{
+}
+
+void SBObject::stop()
+{
+}
+
+
+};
   

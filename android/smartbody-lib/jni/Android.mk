@@ -355,6 +355,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/SBSteerAgent.cpp \
 	$(SBM_MY_DIR)/sbm/SBReachManager.cpp \
 	$(SBM_MY_DIR)/sbm/SBReach.cpp \
+	$(SBM_MY_DIR)/sbm/SBServiceManager.cpp \
+	$(SBM_MY_DIR)/sbm/SBService.cpp \
 	$(SBM_MY_DIR)/sbm/SBMotion.cpp \
 	$(SBM_MY_DIR)/sbm/SBScript.cpp	\
 	$(SBM_MY_DIR)/sbm/SBFaceDefinition.cpp \

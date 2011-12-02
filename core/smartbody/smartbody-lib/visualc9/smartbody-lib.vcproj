@@ -2880,6 +2880,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\SBService.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBService.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBServiceManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBServiceManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SBSimulationManager.cpp"
 				>
 			</File>
