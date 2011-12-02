@@ -59,7 +59,6 @@ public:
 	SbmJointObj* getParentObj() { return parentObj; }
 	void setParentObj(SbmJointObj* parent) { parentObj = parent; }
 	virtual void initJoint(SBJoint* joint);
-	static SrVec computeJointObjLocalCenter(SBJoint* joint);
 };
 
 class SbmPhysicsCharacter : public SbmPhysicsObjInterface // interface for articulated dynamic character 
