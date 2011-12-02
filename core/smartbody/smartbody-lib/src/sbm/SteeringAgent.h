@@ -118,6 +118,9 @@ class SteeringAgent
 		float prevZ;
 		float prevYaw;
 
+		// goal lists
+		std::list<float> goalList;
+
 		// low pass filter
 		int speedWindowSize;
 		int angleWindowSize;

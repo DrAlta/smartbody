@@ -2118,7 +2118,7 @@ int FltkViewer::handle ( int event )
 					SrVec dest = ground.intersect(p1, p2);
 					dest.y = _paLocoData->character->getHeight() / 100.0f;
 					std::stringstream command;
-					command << "steer move " << _paLocoData->character->getName() << " " << dest.x << " " << dest.y << " " << dest.z;
+					command << "steer move " << _paLocoData->character->getName() << " normal " << dest.x << " " << dest.y << " " << dest.z;
 					mcuCBHandle::singleton().execute((char*)command.str().c_str());
 				 }
 			 }

@@ -5438,7 +5438,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		if (command == "help")
 		{
 			LOG("Use: steer <start|stop>");
-			LOG("     steer move <character> <x> <y> <z>");
+			LOG("     steer move <character> <mode> <x> <y> <z>");
 			return CMD_SUCCESS;
 		}
 		else if (command == "unit")
@@ -5575,41 +5575,34 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		else if (command == "move")
 		{
+			std::string characterName = args.read_token();
+			std::string mode = args.read_token();
 			int num = args.calc_num_tokens();
-			if (num < 4)
+			if (num % 3 != 0)
 			{
-				LOG("Syntax: steer move <character> <x> <y> <z>");
+				LOG("Syntax: steer move <character> <mode> <x1> <y1> <z1> <x2> <y2> <z2> ...");
 				return CMD_FAILURE;
 			}
 			if (mcu_p->steerEngine.isInitialized())
 			{
-				std::string characterName = args.read_token();
 				SbmCharacter* character = mcu_p->getCharacter(characterName);
 				if (character)
 				{
-					float x, y, z;
-					std::string xpos = args.read_token();
-					x = float(atof(xpos.c_str()));
-					std::string ypos = args.read_token();
-					y = float(atof(ypos.c_str()));
-					std::string zpos = args.read_token();
-					z = float(atof(zpos.c_str()));
-
-					SteerLib::AgentInterface* agent = character->steeringAgent->getAgent();
-					if (agent)
+					if (character->steeringAgent)
 					{
-						character->steeringAgent->getAgent()->clearGoals();
-						SteerLib::AgentGoalInfo goal;
-						goal.desiredSpeed = character->steeringAgent->desiredSpeed;
-						goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
-						goal.targetIsRandom = false;
-						goal.targetLocation = Util::Point(x * mcu_p->steeringScale, 0.0f, z * mcu_p->steeringScale);
-						character->steeringAgent->getAgent()->addGoal(goal);
-					}
-					else
-					{
-						LOG("Character %s has no steering agent. Please run 'steer stop', then 'steer start'", character->getName().c_str());
-						return CMD_FAILURE;
+						if (mode == "normal")
+						{
+							character->steeringAgent->goalList.clear();
+							for (int i = 0; i < num; i++)
+								character->steeringAgent->goalList.push_back(args.read_float());
+						}
+						else if (mode == "additive")
+						{
+							for (int i = 0; i < num; i++)
+								character->steeringAgent->goalList.push_back(args.read_float());
+						}
+						else
+							LOG("steer move mode not recognized!");
 					}
 				}
 			}
