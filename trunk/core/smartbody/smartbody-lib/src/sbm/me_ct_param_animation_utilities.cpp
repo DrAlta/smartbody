@@ -662,9 +662,9 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 			getBuffer(motions[i], motions[i]->duration(), motionContextMaps[i], buffer);
 			dest = getBaseMatFromBuffer(buffer);
 			SrMat transition = src.inverse() * dest;
-			SrMat updateTransitionMat;
+			baseTransitionMats.push_back(SrMat());
+			SrMat& updateTransitionMat = baseTransitionMats[baseTransitionMats.size() - 1];
 			getUpdateMat(updateTransitionMat, transition);
-			baseTransitionMats.push_back(updateTransitionMat);
 		}
 		intializeTransition = true;
 	}
@@ -677,9 +677,9 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 		SrMat baseMat;
 		getBuffer(motions[i], time, motionContextMaps[i], buffer);
 		baseMat = getBaseMatFromBuffer(buffer);
-		SrMat updateBaseMat;
+		mats.push_back(SrMat());
+		SrMat& updateBaseMat = mats[mats.size() - 1];
 		getUpdateMat(updateBaseMat, baseMat);
-		mats.push_back(updateBaseMat);
 	}
 }
 
