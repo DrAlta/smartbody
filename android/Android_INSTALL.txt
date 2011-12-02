@@ -13,25 +13,27 @@ Install Eclipse ( http://www.eclipse.org/ ) and its Android ADT plug-in ( http:/
 
 The Android build target needs to be 2.3.3 or higher, otherwise some of the code may not be built.
 
-**** If your target hardware is the Arm architecture, some dependency libraries are already prebuilt at SmartBodyDir)/android/lib. Therefore you can build the smartbody project directly : 
+**** If your target hardware is the Arm architecture, all dependency libraries are already prebuilt at SmartBodyDir)/android/lib. Therefore you can build the smartbody project directly : 
 
 There are 3 projects that can be built for android : 
 
 1. sbmjni :
 
 sbmjni is a hello world project for SmartBody. It has very basic rendering and minimal functionality, but it helps demonstarte the SmartBody port on android. 
-i)   Go to (SmartBodyDir)/android/sbm-jni/
-ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading).
-iii) Use Eclipse to open the project (SmartBodyDir)/android/sbm/. 
-iv)  Select Project->Build Project. Connect the device and then run the program as "Android Application".
+i)   Go to (SmartBodyDir)/android/sbmjni/
+ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading). If the build is successful, there should be a libsbmjni.so in ./libs/armeabi.
+iii) copy the directroy ./sbmjniData/ and its files to the devices's sdcard. ( Should be copied to directory /sdcard/ in the android device. )
+iv)  Use Eclipse to open the project (SmartBodyDir)/android/sbm/. 
+v)   Select Project->Build Project. Connect the device and then run the program as "Android Application".
 
 2. sbm-ogre :
 
-sbm-ogre combines SmartBody and ogre for high quality rendering. Currently, it is very slow when rendering in deformable model mode.
+sbm-ogre combines SmartBody and ogre for high quality rendering. Currently, it is very slow when rendering in deformable model mode. 
 i)   Go to (SmartBodyDir)/android/sbm-ogre/
-ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading).
-iii) Use Eclipse to open the project (SmartBodyDir)/android/sbm-ogre/. 
-iv)  Select Project->Build Project. ThConnect the device and then run the program as "Android Application".
+ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading). If the build is successful, there should be a libsbmogre.so in ./libs/armeabi.
+iii) copy the directroy ./SbmOgre/ and its files to the devices's sdcard. ( Should be copied to directory /sdcard/ in the android device. )
+iv)  Use Eclipse to open the project (SmartBodyDir)/android/sbm-ogre/. 
+v)   Select Project->Build Project. ThConnect the device and then run the program as "Android Application".
 
 3. vh-wrapper
 
@@ -39,7 +41,8 @@ vh-wrapper is a SmartBody interface to Unity3D.
 i)   Go to (SmartBodyDir)/android/vh_wrapper/
 ii)  ndk-build
 iii) rename libvhwrapper.so to libvhwrapper-dll.so ( for some reason, Android does not accept a build target name with "-" )
-iv)  copy libvhwrapper-dll.so to the plug-in directory of Unity project. Build the Unity project for android.
+iv) copy directory (SmartBodyDir)/android/SbmUnityApp/SbmUnity and its content to sdcard ( directory : /sdcard/ in android device ). These are the related smartbody skeletons,motions, and scripts for Unity project.
+v)  copy libvhwrapper-dll.so to the plug-in directory of Unity project. Build the Unity project for android.
 
 
 **** If you are targeting other hardware achitecture ( X86, etc ) or you prefer to rebuild all libraries from the source :
