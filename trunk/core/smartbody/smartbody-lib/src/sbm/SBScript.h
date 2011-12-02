@@ -11,11 +11,11 @@ class SBScript : public SBObject
 		SBScript();
 		~SBScript();
 
-		virtual void start();
-		virtual void beforeUpdate();
-		virtual void update(double time);
-		virtual void afterUpdate();
-		virtual void stop();
+		virtual void setEnable(bool val);
+		virtual bool isEnable();
+
+	protected:
+		bool _enabled;
 
 };
 

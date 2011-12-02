@@ -166,6 +166,8 @@ wo_cache_timestamp( -std::numeric_limits<float>::max() )
 void SbmPawn::initData()
 {
 	bonebusCharacter = NULL;
+	if (_skeleton)
+		_skeleton->unref();
 	_skeleton = new SmartBody::SBSkeleton();
 	_skeleton->ref();
 	ct_tree_p = MeControllerTreeRoot::create();
@@ -213,6 +215,7 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 	}
 	//scene_p->init(_skeleton);
 	//int err = mcu.add_scene(scene_p);
+
 	dMesh_p->skeleton = _skeleton;
 	_skeleton->ref();
 }

@@ -318,6 +318,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SBSteerAgent.cpp
 	sbm/SBReachManager.cpp
 	sbm/SBReach.cpp
+	sbm/SBServiceManager.cpp
+	sbm/SBService.cpp
 	sbm/SBMotion.cpp
 	sbm/SBFaceDefinition.cpp
 	sbm/sr_path_list.cpp

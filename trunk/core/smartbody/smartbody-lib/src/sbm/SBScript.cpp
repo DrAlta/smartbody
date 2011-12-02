@@ -4,30 +4,21 @@ namespace SmartBody {
 
 SBScript::SBScript() : SBObject()
 {
+	_enabled = true;
 }
 
 SBScript::~SBScript()
 {
 }
 
-void SBScript::start()
+void SBScript::setEnable(bool val)
 {
+	_enabled = val;
 }
 
-void SBScript::beforeUpdate()
+bool SBScript::isEnable()
 {
-}
-
-void SBScript::update(double time)
-{
-}
-
-void SBScript::afterUpdate()
-{
-}
-
-void SBScript::stop()
-{
+	return _enabled;
 }
 
 }

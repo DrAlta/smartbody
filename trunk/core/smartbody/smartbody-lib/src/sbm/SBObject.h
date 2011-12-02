@@ -16,6 +16,12 @@ class SBObject : public SBObserver, public SBSubject
 		SBObject();
 		~SBObject();
 
+		virtual void start();
+		virtual void beforeUpdate(double time);
+		virtual void update(double time);
+		virtual void afterUpdate(double time);
+		virtual void stop();
+
 		void setName(const std::string& name);
 		const std::string& getName();
 		SBAttribute* getAttribute(const std::string& attrName);
