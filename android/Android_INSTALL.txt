@@ -1,54 +1,59 @@
-Instructions for Android
-----------------------
+12/1/11
 
-Download and install android-sdk, android-ndk from : http://developer.android.com/sdk/index.html
+Instructions to build a SmartBody application for Android
+---------------------------------------------------------
 
-(For windows platform, you also need to install cygwin 1.7 or higher : http://www.cygwin.com/ )
+The SmartBody code is cross-compiled for the Android platform using the native development kit (NDK), which allows you to use gcc-like tools to build Android applications. This means that SmartBody is nearly fully-functional as a mobile application, since it uses the same code base as the desktop version of SmartBody. Many of the supporting libraries (such as ActiveMQ, boost, Xerces, Python, Festival, etc.) have already been built as static libraries and exist in the smartbody/android/lib directory.
 
-Follow the installation instruction for both sdk/ndk. Be sure to set the correct path to android-sdk/bin, android-ndk/bin so the toolchain can be access correctly.
+(1) Download and install android-sdk from : http://developer.android.com/sdk/index.html
 
-For NDK, you also need to export the environment variable NDK_ROOT to the NDK installation directory ( for example, export NDK_ROOT= "path-to-ndk-directory" )
+(2) Download and install the android-ndk from:
+http://developer.android.com/sdk/ndk/index.html
+(Note that when building on the windows platform, you will also need to install cygwin 1.7 or higher from http://www.cygwin.com/ )
+
+Follow the installation instruction for both the SDK and the NDK. Be sure to set the correct path to android-sdk/bin, android-ndk/bin so the toolchain can be access correctly.
+
+For NDK, you also need to export the environment variable NDK_ROOT to the NDK installation directory ( for example, export NDK_ROOT= "/path/to/ndk/directory" )
 
 Install Eclipse ( http://www.eclipse.org/ ) and its Android ADT plug-in ( http://developer.android.com/sdk/eclipse-adt.html )
 
-The Android build target needs to be 2.3.3 or higher, otherwise some of the code may not be built.
+The supporting libraries have been built using Anroid version 2.3.3 or higher.
 
-**** If your target hardware is the Arm architecture, all dependency libraries are already prebuilt at SmartBodyDir)/android/lib. Therefore you can build the smartbody project directly : 
+**** If your target hardware is the Arm architecture, some dependency libraries are already prebuilt at SmartBodyDir)/android/lib. Therefore you can build the smartbody project directly : 
 
-There are 3 projects that can be built for android : 
+(3) Build the SmartBody Android application:
+Note that there are three different examples of Android applications using SmartBody that can be built: 
 
-1. sbmjni :
+(3A) sbmjni :
 
 sbmjni is a hello world project for SmartBody. It has very basic rendering and minimal functionality, but it helps demonstarte the SmartBody port on android. 
-i)   Go to (SmartBodyDir)/android/sbmjni/
-ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading). If the build is successful, there should be a libsbmjni.so in ./libs/armeabi.
-iii) copy the directroy ./sbmjniData/ and its files to the devices's sdcard. ( Should be copied to directory /sdcard/ in the android device. )
-iv)  Use Eclipse : File->New->Android Project. Create a project from existing source at : (SmartBodyDir)/android/sbm/. 
-v)   Select Project->Build Project. Connect the device and then run the program as "Android Application".
+i)   Go to (SmartBodyDir)/android/sbm-jni/
+ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading).
+iii) Use Eclipse to open the project (SmartBodyDir)/android/sbm/. 
+iv)  Select Project->Build Project. Connect the device and then run the program as "Android Application".
 
-2. sbm-ogre :
+(3B) sbm-ogre :
 
-sbm-ogre combines SmartBody and ogre for high quality rendering. Currently, it is very slow when rendering in deformable model mode. 
+sbm-ogre combines SmartBody and ogre for high quality rendering. Currently, it is very slow when rendering in deformable model mode.
 i)   Go to (SmartBodyDir)/android/sbm-ogre/
-ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading). If the build is successful, there should be a libsbmogre.so in ./libs/armeabi.
-iii) copy the directroy ./SbmOgre/ and its files to the devices's sdcard. ( Should be copied to directory /sdcard/ in the android device. )
-iv)  Use Eclipse : File->New->Android Project. Create a project from existing source at : (SmartBodyDir)/android/sbm-ogre/. 
-v)   Select Project->Build Project. Connect the device and then run the program as "Android Application".
+ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading).
+iii) Use Eclipse to open the project (SmartBodyDir)/android/sbm-ogre/. 
+iv)  Select Project->Build Project. ThConnect the device and then run the program as "Android Application".
 
-3. vh-wrapper
+(3C) vh-wrapper
 
-vh-wrapper is a SmartBody interface to Unity3D. 
-i)   Go to (SmartBodyDir)/android/vh_wrapper/
+vh-wrapper is a SmartBody interface to Unity3D. Note that SmartBody connects to Unity via Unity's native code plugin interface, which presently requires a Unity Pro license. In addition, the Unity project needs to be compiled for Android, so a Unity Android license is needed as well.
+
+i)   Go to SmartBody/android/vh_wrapper/
 ii)  ndk-build
 iii) rename libvhwrapper.so to libvhwrapper-dll.so ( for some reason, Android does not accept a build target name with "-" )
-iv) copy directory (SmartBodyDir)/android/SbmUnityApp/SbmUnity and its content to sdcard ( directory : /sdcard/ in android device ). These are the related smartbody skeletons,motions, and scripts for Unity project.
-v)  copy libvhwrapper-dll.so to the plug-in directory of Unity project. Build the Unity project for android.
+iv)  copy libvhwrapper-dll.so to the plug-in directory of Unity project. Build the Unity project for android.
 
 
-**** If you are targeting other hardware achitecture ( X86, etc ) or you prefer to rebuild all libraries from the source :
+**** If you are targeting other hardware achitecture ( x86, etc ) or you prefer to rebuild all libraries from their sources:
 
-1. Building boost :
-i) Download Boost library, extract it into $(SmartBodyDir)/lib/
+1. Building BOOST :
+i) Download BOOST library, extract it into SmartBody/lib/
 
 modify libs\filesystem\v2\src\v2_operations.cpp, change: 
 #   if !defined(__APPLE__) && !defined(__OpenBSD__) 
@@ -73,7 +78,7 @@ to:
 #     include <sys/vfs.h> 
 #endif 
 
-ii) modifiy the file $(SmartBodyDir)/android/boost/userconfig.jam, look for :
+ii) modifiy the file SmartBody/android/boost/userconfig.jam, look for :
 
 ANDROID_NDK = ../android-ndk ; and change the directory "../android-ndk" so it points to the android NDK directory
 
