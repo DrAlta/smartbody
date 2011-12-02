@@ -5592,6 +5592,8 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					{
 						if (mode == "normal")
 						{
+							if (character->steeringAgent->getAgent())
+								character->steeringAgent->getAgent()->clearGoals();
 							character->steeringAgent->goalList.clear();
 							for (int i = 0; i < num; i++)
 								character->steeringAgent->goalList.push_back(args.read_float());

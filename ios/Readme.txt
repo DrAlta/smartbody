@@ -36,7 +36,7 @@ Note: for smartbody iphone running on unity, we need to rename variables inside 
 	Change the SBROOT inside setup-iphoneos.sh and setup-iphonesimulator.sh to your trunk directory
 	Run both of the scripts
 	
-4) Cross compiling clapack
+4) Cross compiling clapack (Optional since you can add Acceleration framework from xcode project)
 	http://www.netlib.org/clapack/
 	Download clapack-3.2.1-CMAKE.tgz, unzip and copy toolchain-iphone*.cmake and setup-iphone*.sh from trunk/ios/activemq/activemq-cpp to that folder
 	To make a Unity compatible build, you need to modify the cmake file. If not used for Unity Iphone, you can skip the following step:
@@ -59,8 +59,8 @@ Note: for smartbody iphone running on unity, we need to rename variables inside 
 6) Cross compiling pocket sphinx(Optional)
 	http://www.rajeevan.co.uk/pocketsphinx_in_iphone/
 	The steps are on the website. Since the results are not that good on Unity and I don't have time fully test out, the code is not intergrated into smartbody yet.
-	When integrating pocketsphinx with Unity, it would have duplicated symbol problem(this might be the reason of bad recognizing result, it's under sphinx/src/util). I really built a library for Unity that can be used directly.
-	Also for Unity you may need buy prime31 iphone plugin AudioRecorder
+	When integrating pocketsphinx with Unity, it would have duplicated symbol problem(this might be the reason of bad recognizing result, it's under sphinx/src/util). I already built a library for Unity that can be used directly.
+	Also for Unity you may need get prime31 iphone plugin AudioRecorder
 	
 --------------------------------Compiling using Xcode4------------------------------
 1) Build bonebus
