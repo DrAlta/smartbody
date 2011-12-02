@@ -132,6 +132,24 @@ void SteeringAgent::evaluate()
 	if (numGoals == 0) {
 		newSpeed = 0.0f;
 	}
+
+	if (goalList.size() != 0 && numGoals == 0)
+	{
+		float goalx = goalList.front();
+		goalList.pop_front();
+		float goaly = goalList.front();
+		goalList.pop_front();
+		float goalz = goalList.front();
+		goalList.pop_front();
+		agent->clearGoals();
+		SteerLib::AgentGoalInfo goal;
+		goal.desiredSpeed = desiredSpeed;
+		goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
+		goal.targetIsRandom = false;
+		goal.targetLocation = Util::Point(goalx * mcu.steeringScale, 0.0f, goalz * mcu.steeringScale);
+		agent->addGoal(goal);
+	}
+
 	// Update Steering Engine (position, orientation, scalar speed)
 	Util::Point newPosition(x * mcu.steeringScale, 0.0f, z * mcu.steeringScale);
 	Util::Vector newOrientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
@@ -1071,7 +1089,26 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	//---end locomotion
 	if (character->_numSteeringGoal != 0 && numGoals == 0)
 	{
-		character->param_animation_ct->schedule(NULL, true, true);
+		if (goalList.size() == 0)
+		{
+			character->param_animation_ct->schedule(NULL, true, true);
+		}
+		else
+		{
+			float goalx = goalList.front();
+			goalList.pop_front();
+			float goaly = goalList.front();
+			goalList.pop_front();
+			float goalz = goalList.front();
+			goalList.pop_front();
+			agent->clearGoals();
+			SteerLib::AgentGoalInfo goal;
+			goal.desiredSpeed = desiredSpeed;
+			goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
+			goal.targetIsRandom = false;
+			goal.targetLocation = Util::Point(goalx * mcu.steeringScale, 0.0f, goalz * mcu.steeringScale);
+			agent->addGoal(goal);
+		}
 		return 0;
 	}
 

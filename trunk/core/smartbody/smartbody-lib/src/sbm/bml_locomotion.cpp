@@ -222,33 +222,27 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	std::string following = xml_parse_string(BMLDefs::ATTR_FOLLOW, elem);
 	SbmCharacter* followingC = mcu->getCharacter(following);
 	c->steeringAgent->setTargetAgent(followingC);
-	float* targetFloat = new float[2];
-	int targetParsing = xml_parse_float(targetFloat, 2, BMLDefs::ATTR_TARGET, elem);
-	if (targetParsing == 2)
-	{
-		if (stepMode)
-		{
-			stepTargetX = targetFloat[0];
-			stepTargetZ = targetFloat[1];
-			stepTargetMode = true;
-		}
-		else
-			command << "sbm steer move " << c->getName() << " " << targetFloat[0] << " 0 " << targetFloat[1];
-	}
-	else
-	{
-		if (targetParsing != 0)
-			LOG("Warning: target's format is X Z.");
 
-		std::string targetString = xml_parse_string(BMLDefs::ATTR_TARGET, elem);
-		if ((targetString == "forward" || targetString == "backward" || targetString == "left" || targetString == "right") && stepMode)
+	// parsing target
+	std::string targetString = xml_parse_string(BMLDefs::ATTR_TARGET, elem);
+	std::vector<std::string> tokens;
+	vhcl::Tokenize(targetString, tokens, " ");
+	int tokenSize = tokens.size();
+	if (tokenSize == 0)			// wrong
+	{
+		LOG("Warning: target's format is (X Z) | (X1 Z1 X2 Z2 X3 Z3...) | backward | forward | left | right.");
+	}
+	else if (tokenSize == 1)	// step mode or pawn name
+	{
+		std::string token = tokens[0];
+		if ((token == "forward" || token == "backward" || token == "left" || token == "right") && stepMode)
 		{
 			stepTargetMode = false;
 			stepDirection = targetString;
 		}
 		else
 		{
-			SbmPawn* pawn = mcu->getPawn(targetString);
+			SbmPawn* pawn = mcu->getPawn(token);
 			if (pawn)
 			{
 				// get the world offset x & z
@@ -261,11 +255,19 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 					stepTargetZ = z;
 				}
 				else
-					command << "sbm steer move " << c->getName() << " " << x << " 0 " << z;
+					command << "sbm steer move " << c->getName() << " normal " << x << " 0 " << z;
 			}
 		}
 	}
-	delete [] targetFloat;
+	else
+	{
+		command << "sbm steer move " << c->getName() << " normal ";
+		if (tokens.size() % 2 != 0)
+			LOG("Warning: target points are not paired");
+
+		for (size_t i = 0; i < (tokens.size() / 2); i++)
+			command << tokens[i * 2 + 0] << " 0 " << tokens[i * 2 + 1] << " ";
+	}
 
 	// step mode attributes
 	int numSteps = xml_parse_int(BMLDefs::ATTR_NUM_STEPS, elem);
