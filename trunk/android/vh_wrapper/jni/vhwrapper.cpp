@@ -13,9 +13,9 @@
 HINSTANCE g_SBM_HINST;
 #endif
 
-//#ifdef ENABLE_VHMSG_WRAPPER 
+#ifdef ENABLE_VHMSG_WRAPPER
 #include "vhmsg-tt.h"
-//#endif
+#endif
 
 
 #ifdef ENABLE_VHMSG_WRAPPER
@@ -38,7 +38,7 @@ typedef bool (__stdcall *SBM_SetSpeechAudiofileBasePath_DEF)(SBMHANDLE, const ch
 typedef bool (__stdcall *SBM_SetFacebone_DEF)(SBMHANDLE, bool);
 typedef bool (__stdcall *SBM_SetProcessId_DEF)( SBMHANDLE, const char * );
 typedef bool (__stdcall *SBM_SetMediaPath_DEF)( SBMHANDLE, const char * );
-typedef bool (__stdcall *SBM_Init_DEF)( SBMHANDLE );
+typedef bool (__stdcall *SBM_Init_DEF)( SBMHANDLE, const char * );
 typedef bool (__stdcall *SBM_Shutdown_DEF)( SBMHANDLE );
 typedef bool (__stdcall *SBM_SetListener_DEF)( SBMHANDLE, SBM_OnCreateCharacterCallback, SBM_OnCharacterDeleteCallback, SBM_OnCharacterChangeCallback, SBM_OnVisemeCallback, SBM_OnChannelCallback);
 typedef bool (__stdcall *SBM_Update_DEF)(SBMHANDLE, double);
@@ -183,16 +183,16 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_SetMediaPath( SBMHANDLE sbmHandle, const char 
 #endif
 }
 
-VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle )
+VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle,  const char* pythonLib )
 {
 #ifdef WIN32
    if (g_SBM_Init_DEF)
    {
-      return g_SBM_Init_DEF(sbmHandle);
+      return g_SBM_Init_DEF(sbmHandle, pythonLib);
    }
    return false;
 #else
-   return SBM_Init(sbmHandle,"./");
+   return SBM_Init(sbmHandle, pythonLib);
 #endif
 }
 
@@ -250,7 +250,6 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_Update( SBMHANDLE sbmHandle, double timeInSeco
    }
    return false;
 #else
-    vhmsg::ttu_poll();
    return SBM_Update(sbmHandle, timeInSeconds);
 #endif
 }
@@ -526,6 +525,50 @@ VHWRAPPERDLL_API bool WRAPPER_VHCL_AUDIO_StopSound(AUDIOHANDLE handle, const cha
 
    return true;
 }
+
+
+VHWRAPPERDLL_API void WRAPPER_VHCL_AUDIO_PauseAllSounds(AUDIOHANDLE handle)
+{
+   if (!VHCL_AUDIO_HandleExists(handle))
+   {
+      return;
+   }
+#ifndef __ANDROID__
+   g_audioInstances[handle]->PauseAllSounds();
+#endif
+
+}
+
+
+VHWRAPPERDLL_API void WRAPPER_VHCL_AUDIO_StopAllSounds(AUDIOHANDLE handle)
+{
+   if (!VHCL_AUDIO_HandleExists(handle))
+   {
+      return;
+   }
+#ifndef __ANDROID__
+   g_audioInstances[handle]->StopAllSounds();
+#endif
+
+}
+
+VHWRAPPERDLL_API void WRAPPER_VHCL_AUDIO_UnpauseAllSounds(AUDIOHANDLE handle)
+{
+   if (!VHCL_AUDIO_HandleExists(handle))
+   {
+      return;
+   }
+#ifndef __ANDROID__
+   g_audioInstances[handle]->UnpauseAllSounds();
+#endif
+
+}
+
+
+
+
+
+
 
 VHWRAPPERDLL_API Sound* WRAPPER_VHCL_AUDIO_CreateSoundLibSndFile(AUDIOHANDLE handle, const char* fileName, const char* name )
 {
@@ -813,7 +856,6 @@ char* ConvertWCharToChar(const wchar_t * wc)
 {
    size_t convertedChars = 0;
    size_t  sizeInBytes = ((wcslen(wc) + 1) * 2);
-
    errno_t err = 0;
    char    *ch = (char *)malloc(sizeInBytes);
    err = wcstombs_s(&convertedChars, ch, sizeInBytes, wc, sizeInBytes);
@@ -844,8 +886,6 @@ void WRAPPER_tt_client_callback(const char * op, const char * args, void * user_
    wchar_t* msgwc = ConvertCharToWChar(msg.c_str());
    queuedMessages->push_back(msgwc);
 }
-
 #endif
-
 
 //////////////////////////////////////////////////////////////
