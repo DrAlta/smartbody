@@ -15,5 +15,6 @@
 1	seq init-param-animation inline
 2	seq init-example-reach inline
 
+3 steer stateprefix billford all
 4 steer start
-5 steer type example
+5 steer type billford example
