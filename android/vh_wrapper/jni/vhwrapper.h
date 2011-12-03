@@ -24,6 +24,7 @@
 #define __stdcall
 #endif
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif 
@@ -38,7 +39,7 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandl
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetFacebone( SBMHANDLE sbmHandle, bool enabled );
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetProcessId( SBMHANDLE sbmHandle, const char * processId );
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * path );
-VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle );
+VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle, const char* pythonLib );
 VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle );
 #ifdef WIN32
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB,
@@ -80,6 +81,9 @@ VHWRAPPERDLL_API bool WRAPPER_VHCL_AUDIO_GetListenerRot(AUDIOHANDLE handle, floa
 VHWRAPPERDLL_API vhcl::Sound* WRAPPER_VHCL_AUDIO_CreateSound(AUDIOHANDLE handle, const char* fileName, const char* name );
 VHWRAPPERDLL_API vhcl::Sound* WRAPPER_VHCL_AUDIO_PlaySound(AUDIOHANDLE handle, const char* fileName, const char* name, float posX, float posY, float posZ, bool looping );
 VHWRAPPERDLL_API bool WRAPPER_VHCL_AUDIO_StopSound(AUDIOHANDLE handle, const char* fileName );
+VHWRAPPERDLL_API void WRAPPER_VHCL_AUDIO_PauseAllSounds(AUDIOHANDLE handle);
+VHWRAPPERDLL_API void WRAPPER_VHCL_AUDIO_UnpauseAllSounds(AUDIOHANDLE handle);
+VHWRAPPERDLL_API void WRAPPER_VHCL_AUDIO_StopAllSounds(AUDIOHANDLE handle);
 VHWRAPPERDLL_API vhcl::Sound* WRAPPER_VHCL_AUDIO_CreateSoundLibSndFile(AUDIOHANDLE handle, const char* fileName, const char* name );
 VHWRAPPERDLL_API bool WRAPPER_VHCL_AUDIO_DestroySound(AUDIOHANDLE handle, const char* name );
 VHWRAPPERDLL_API vhcl::Sound* WRAPPER_VHCL_AUDIO_FindSound(AUDIOHANDLE handle, const char* name );
@@ -92,29 +96,28 @@ VHWRAPPERDLL_API bool WRAPPER_VHCL_AUDIO_SoundExists(AUDIOHANDLE handle, const c
 
 #ifdef ENABLE_VHMSG_WRAPPER
 ///VHMSG c++ WRAPPER FUNCTIONS////////////////////////////////
-//typedef int/*intptr_t*/ VHMSGHANDLE;
-//VHWRAPPERDLL_API VHMSGHANDLE WRAPPER_VHMSG_CreateVHMsg();
-//VHWRAPPERDLL_API bool WRAPPER_VHMSG_OpenConnection(const VHMSGHANDLE handle );
-//VHWRAPPERDLL_API bool WRAPPER_VHMSG_OpenConnection2(const VHMSGHANDLE handle, const char * server, const char * port );
-//VHWRAPPERDLL_API void WRAPPER_VHMSG_CloseConnection(const VHMSGHANDLE handle );
-//VHWRAPPERDLL_API bool WRAPPER_VHMSG_Send( const VHMSGHANDLE handle, const char * message );
-//VHWRAPPERDLL_API bool WRAPPER_VHMSG_Send2( const VHMSGHANDLE handle, const wchar_t * message );
-//VHWRAPPERDLL_API void WRAPPER_VHMSG_EnablePollingMethod(const VHMSGHANDLE handle);
-//VHWRAPPERDLL_API void WRAPPER_VHMSG_EnableImmediateMethod(const VHMSGHANDLE handle);
-//VHWRAPPERDLL_API void WRAPPER_VHMSG_SetListener( const VHMSGHANDLE handle, vhmsg::Listener * listener );
-//VHWRAPPERDLL_API bool WRAPPER_VHMSG_Subscribe( const VHMSGHANDLE handle, const char * req );
-//VHWRAPPERDLL_API bool WRAPPER_VHMSG_Subscribe2( const VHMSGHANDLE handle, const wchar_t * req );
-//VHWRAPPERDLL_API bool WRAPPER_VHMSG_Unsubscribe( const VHMSGHANDLE handle, const wchar_t * req );
-//VHWRAPPERDLL_API void WRAPPER_VHMSG_Poll(const VHMSGHANDLE handle);
-//VHWRAPPERDLL_API void WRAPPER_VHMSG_WaitAndPoll( const VHMSGHANDLE handle, const double waitTimeSeconds );
-//VHWRAPPERDLL_API wchar_t* WRAPPER_VHMSG_GetMessages( );
-//VHWRAPPERDLL_API int WRAPPER_VHMSG_GetNumQueuedMessages( );
+typedef int/*intptr_t*/ VHMSGHANDLE;
+VHWRAPPERDLL_API VHMSGHANDLE WRAPPER_VHMSG_CreateVHMsg();
+VHWRAPPERDLL_API bool WRAPPER_VHMSG_OpenConnection(const VHMSGHANDLE handle );
+VHWRAPPERDLL_API bool WRAPPER_VHMSG_OpenConnection2(const VHMSGHANDLE handle, const char * server, const char * port );
+VHWRAPPERDLL_API void WRAPPER_VHMSG_CloseConnection(const VHMSGHANDLE handle );
+VHWRAPPERDLL_API bool WRAPPER_VHMSG_Send( const VHMSGHANDLE handle, const char * message );
+VHWRAPPERDLL_API bool WRAPPER_VHMSG_Send2( const VHMSGHANDLE handle, const wchar_t * message );
+VHWRAPPERDLL_API void WRAPPER_VHMSG_EnablePollingMethod(const VHMSGHANDLE handle);
+VHWRAPPERDLL_API void WRAPPER_VHMSG_EnableImmediateMethod(const VHMSGHANDLE handle);
+VHWRAPPERDLL_API void WRAPPER_VHMSG_SetListener( const VHMSGHANDLE handle, vhmsg::Listener * listener );
+VHWRAPPERDLL_API bool WRAPPER_VHMSG_Subscribe( const VHMSGHANDLE handle, const char * req );
+VHWRAPPERDLL_API bool WRAPPER_VHMSG_Subscribe2( const VHMSGHANDLE handle, const wchar_t * req );
+VHWRAPPERDLL_API bool WRAPPER_VHMSG_Unsubscribe( const VHMSGHANDLE handle, const wchar_t * req );
+VHWRAPPERDLL_API void WRAPPER_VHMSG_Poll(const VHMSGHANDLE handle);
+VHWRAPPERDLL_API void WRAPPER_VHMSG_WaitAndPoll( const VHMSGHANDLE handle, const double waitTimeSeconds );
+VHWRAPPERDLL_API wchar_t* WRAPPER_VHMSG_GetMessages( );
+VHWRAPPERDLL_API int WRAPPER_VHMSG_GetNumQueuedMessages( );
 
-//char* ConvertWCharToChar(const wchar_t * wc);
-//bool VHMSG_HandleExists( const VHMSGHANDLE handle );
-//void WRAPPER_tt_client_callback(const char * op, const char * args, void * user_data);
+char* ConvertWCharToChar(const wchar_t * wc);
+bool VHMSG_HandleExists( const VHMSGHANDLE handle );
+void WRAPPER_tt_client_callback(const char * op, const char * args, void * user_data);
 #endif
-
 //////////////////////////////////////////////////////////////
 
 #ifdef __cplusplus
