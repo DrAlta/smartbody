@@ -132,7 +132,46 @@ void ResourceWindow::update_viewer()
 
 int ResourceWindow::handle( int event )
 {
-	return Fl_Double_Window::handle(event);
+	int ret = Fl_Double_Window::handle(event);
+	switch ( event ) {
+		case FL_PUSH:  
+		{// do 'copy/dnd' when someone clicks on box
+			if (Fl::event_button() == 2)
+			{
+				LOG("press middle button");
+				LOG("lastClickedItemPath = %s",lastClickedItemPath.c_str());
+				Fl_Tree_Item* lastItem = resourceTree->find_item(lastClickedItemPath.c_str());	
+				if (lastItem)
+				{
+					long itemType = (long)lastItem->user_data();
+					bool sendDND = false;
+					std::string dndMsg = "";
+					if (itemType == ITEM_SKELETON)
+					{
+						std::string skName = lastItem->label();
+						dndMsg = "SKELETON:";
+						dndMsg += skName;
+						sendDND = true;
+					}
+					else if (itemType == ITEM_PAWN)
+					{
+						dndMsg = "PAWN:dummy";
+						sendDND = true;
+					}
+					
+					//Fl::copy("message",7,0);
+					if (sendDND)
+					{
+						Fl::copy(dndMsg.c_str(),dndMsg.length(),0);
+						Fl::dnd();
+					}					
+					ret = 1;
+				}			
+			}			
+			break;
+		}
+	}
+	return ret;
 }
 
 void ResourceWindow::show()
@@ -555,7 +594,11 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_PAWN)
 	{
-		widget = new PawnItemInfoWidget(x,y,w,h,name,treeItem,itemType,this);
+		SbmPawn* curPawn = mcuCBHandle::singleton().getPawn(treeItem->label());
+		if (curPawn)
+			widget = new PawnItemInfoWidget(x,y,w,h,name,treeItem,itemType,this);
+		else
+			widget = new TreeItemInfoWidget(x,y,w,h,name,treeItem,itemType);
 	}
 	else if (itemType == ITEM_CHARACTER)
 	{

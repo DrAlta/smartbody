@@ -2026,6 +2026,57 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 */
 
 
+void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
+{
+	static int characterCount = 0;
+	static int pawnCount = 0;
+	//LOG("dndMsg = %s",dndMsg.c_str());
+	std::vector<std::string> toks;
+	vhcl::Tokenize(dndMsg,toks,":");
+	if (toks.size() != 2)
+		return;
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SBScene* scene = mcu._scene;
+	char cmdStr[256];
+	SrVec p1;
+	SrVec p2;
+	_data->camera.get_ray(x,y, p1, p2);
+	SrPlane ground(SrVec(0,0,0), SrVec(0, 1, 0));
+	SrVec dest = ground.intersect(p1, p2);
+	//dest.y = _paLocoData->character->getHeight() / 100.0f;			
+	if (toks[0] == "SKELETON")
+	{
+		//dest.y = 102;		
+		std::string skelName = toks[1].c_str();
+		SBSkeleton* skel = mcu._scene->getSkeleton(skelName);
+		if (skel)
+		{
+			sprintf(cmdStr,"char defaultChar%d init %s",characterCount,toks[1].c_str());
+			mcu.execute(cmdStr);
+			float yOffset = -skel->getBoundingBox().a.y;
+			dest.y = yOffset;
+			sprintf(cmdStr,"set char defaultChar%d world_offset x %f y %f z %f",characterCount,dest.x,dest.y,dest.z);
+			//LOG("setCmd = %s",cmdStr);
+			mcu.execute(cmdStr);
+			characterCount++;
+		}
+		else
+		{
+			LOG("Error : Drag and drop,  skeleton %s not found",skelName.c_str());
+		}		
+	}	
+	else if (toks[0] == "PAWN")
+	{
+		dest.y = 10;
+		sprintf(cmdStr,"pawn defaultPawn%d init",pawnCount);
+		mcu.execute(cmdStr);
+		sprintf(cmdStr,"set pawn defaultPawn%d world_offset x %f y %f z %f",pawnCount,dest.x,dest.y,dest.z);
+		mcu.execute(cmdStr);
+		pawnCount++;
+	}
+}
+
 
 int FltkViewer::handle ( int event ) 
  {
@@ -2033,11 +2084,44 @@ int FltkViewer::handle ( int event )
 
    SrEvent &e = _data->event;
    e.type = SrEvent::EventNone;
-
-   translate_keyboard_state();   
   
+   translate_keyboard_state();   
+   int ret = 0;
+   std::string dndText;
+   static float dndX,dndY;
    switch ( event )
-   { case FL_PUSH:
+   {   
+	   case FL_DND_RELEASE:
+		   //LOG("DND Release");
+	       ret = 1;
+	       break;
+	   case FL_DND_ENTER:          // return(1) for these events to 'accept' dnd
+		   //LOG("DND Enter");
+		   Fl::belowmouse(this); // send the leave events first
+		   Fl::focus(this);
+		   handle(FL_FOCUS);		
+		   ret = 1;
+		   break;
+	   case FL_DND_DRAG:
+		   //LOG("DND Drag");
+		   translate_event ( e, SrEvent::EventPush, w(), h(), this );
+		   dndX = e.mouse.x;
+		   dndY = e.mouse.y;
+		   ret = 1;
+		   break;
+	   case FL_DND_LEAVE:
+		   //LOG("DND Leave");
+		   ret = 1;
+		   break;	  
+	   case FL_PASTE:              // handle actual drop (paste) operation		   
+		   label(Fl::event_text());
+		   //fprintf(stderr, "PASTE: %s\n", Fl::event_text());
+		   //LOG("PASTE: %s\n", Fl::event_text());
+		   dndText = Fl::event_text();
+		   processDragAndDrop(dndText,dndX,dndY);
+		   ret = 1;
+		   break;		
+       case FL_PUSH:
        { //SR_TRACE1 ( "Mouse Push : but="<<Fl::event_button()<<" ("<<Fl::event_x()<<", "<<Fl::event_y()<<")" <<" Ctrl:"<<Fl::event_state(FL_CTRL) );
          translate_event ( e, SrEvent::EventPush, w(), h(), this );
          if ( POPUP_MENU(e) ) { show_menu(); e.type=SrEvent::EventNone; }
@@ -2132,8 +2216,7 @@ int FltkViewer::handle ( int event )
 		// process picking
 		//if (!e.button1)	
 		//printf("Mouse Release\n");
-		
-		
+		//LOG("Mouse release");
         break;
 
       case FL_MOVE:
@@ -2179,8 +2262,7 @@ int FltkViewer::handle ( int event )
         //SR_TRACE1 ( "Show" );
         _data->iconized = false;
         show ();
-        break;
-
+        break;	 
       // Other events :
       case FL_ENTER:          
 		  //SR_TRACE2 ( "Enter" );         
@@ -2203,15 +2285,21 @@ int FltkViewer::handle ( int event )
       case FL_DEACTIVATE:     
 		  //SR_TRACE2 ( "Deactivate");     
 		  break;
-	  case FL_PASTE:          
+	  //case FL_PASTE:          
 		  //SR_TRACE2 ( "Paste");          
-		  break;
+		 // break;
  //     case FL_SELECTIONCLEAR: 
 		  //SR_TRACE2 ( "SelectionClear"); 
 	//	  break;
     }
 
    //SR_TRACE3 ( e );
+
+	if (ret == 1)  // a drag and drop event
+	{	
+		//LOG("ret == 1");
+		return ret;
+	}
 
    if ( e.type == SrEvent::EventNone ) return 0; // not an interesting event
 
@@ -2243,8 +2331,9 @@ int FltkViewer::handle ( int event )
        }
     }
 
-   return handle_event ( e );
- }
+   
+    return handle_event ( e );
+}
 
 //== handle sr event =======================================================
 
