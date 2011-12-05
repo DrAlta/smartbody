@@ -210,7 +210,6 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 
  private:
 	 Fl_Input* off_height_window;
-
    public : //----> public methods 
 
     /*! Constructor needs the size and location of the window. */
@@ -323,6 +322,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
        otherwise it passes the event to the scene graph. */
     virtual int handle_keyboard ( const SrEvent &e );
 
+	void processDragAndDrop(std::string dndMsg, float x, float y);
 	void initGridList();	
 	void drawAllGeometries(bool shadowPass = false); // draw all objects with geometry ( so no debug rendering included )
 	void drawGrid();

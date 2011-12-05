@@ -49,7 +49,8 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 	#else
 		character->dMesh_p =  new SbmDeformableMeshGPU();
 	#endif
-	character->dMesh_p->setSkeleton(character->getSkeleton());
+	SBSkeleton* sbSkel = character->getSkeleton();
+	character->dMesh_p->setSkeleton(sbSkel);
 
 }
 
