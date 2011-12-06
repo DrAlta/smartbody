@@ -5590,18 +5590,34 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				{
 					if (character->steeringAgent)
 					{
+						character->tranjectoryGoalList.clear();
+						float x, y, z;
+						float yaw, pitch, roll;
+						character->get_world_offset(x, y, z, yaw, pitch, roll);
+						character->tranjectoryGoalList.push_back(x);
+						character->tranjectoryGoalList.push_back(y);
+						character->tranjectoryGoalList.push_back(z);
+
 						if (mode == "normal")
 						{
 							if (character->steeringAgent->getAgent())
 								character->steeringAgent->getAgent()->clearGoals();
 							character->steeringAgent->goalList.clear();
 							for (int i = 0; i < num; i++)
-								character->steeringAgent->goalList.push_back(args.read_float());
+							{
+								float v = args.read_float();
+								character->steeringAgent->goalList.push_back(v);
+								character->tranjectoryGoalList.push_back(v);
+							}
 						}
 						else if (mode == "additive")
 						{
 							for (int i = 0; i < num; i++)
-								character->steeringAgent->goalList.push_back(args.read_float());
+							{
+								float v = args.read_float();
+								character->steeringAgent->goalList.push_back(v);
+								character->tranjectoryGoalList.push_back(v);
+							}
 						}
 						else
 							LOG("steer move mode not recognized!");

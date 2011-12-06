@@ -3680,6 +3680,7 @@ void FltkViewer::drawLocomotion()
 		}
 		if (_data->showtrajectory)
 		{
+			glDisable(GL_LIGHTING);
 			if (!character->param_animation_ct)
 				return;
 			std::string baseJointName = character->param_animation_ct->getBaseJointName();
@@ -3700,11 +3701,23 @@ void FltkViewer::drawLocomotion()
 				iter1++;
 				if (iter1 != character->trajectoryBuffer.end())
 				{
-					glVertex3f(iter->x, 0.0, iter->z);
-					glVertex3f(iter1->x, 0.0, iter1->z);
+					glVertex3f(iter->x, 0.2f, iter->z);
+					glVertex3f(iter1->x, 0.2f, iter1->z);
 				}
 			}
 			glEnd();
+
+			glColor3f(1.0f, 0.0f, 0.0f);
+			glBegin(GL_LINES);
+			int num = int(character->tranjectoryGoalList.size() / 3) - 1;
+			if (num >= 1)
+				for (int i = 0; i < num; i++)
+				{
+					glVertex3f(character->tranjectoryGoalList[(size_t)i * 3 + 0], 0.2f, character->tranjectoryGoalList[(size_t)i * 3 + 2]);
+					glVertex3f(character->tranjectoryGoalList[((size_t)i + 1) * 3 + 0], 0.2f, character->tranjectoryGoalList[((size_t)i + 1) * 3 + 2]);
+				}
+			glEnd();
+			glEnable(GL_LIGHTING);
 		}
 	}
 }
