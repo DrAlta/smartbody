@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 #endif
+#include "sbm/SBScene.h"
 #include "sbm/xercesc_utils.hpp"
 #include "sbm/mcontrol_util.h"
 #include "sbm/mcontrol_callbacks.h"
@@ -17,6 +18,10 @@
 #include "sbm/SBPython.h"
 
 
+using std::string;
+
+
+// TODO: this stuff should go in vhcl_platform.h
 #ifdef __APPLE__
 #include "TargetConditionals.h"
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
@@ -26,7 +31,7 @@
 #endif
 #endif
 
-using std::string;
+#define USE_SBSCENE  0
 
 
 #ifdef WIN_BUILD
@@ -135,32 +140,76 @@ SMARTBODY_DLL_API Smartbody_dll::~Smartbody_dll()
 
 SMARTBODY_DLL_API void Smartbody_dll::SetSpeechAudiofileBasePath( const std::string & basePath )
 {
+#if USE_SBSCENE
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   SBScene * scene = mcu._scene;
+
+   // TODO: need a scene->clearAssetPath("audio");
+   // TODO: need a scene->setPathPrefix(??);
+
+   mcu.audio_paths = srPathList();
+   mcu.audio_paths.setPathPrefix(mcu.getMediaPath());
+   scene->addAssetPath("audio", basePath);
+
+
+#else
    mcuCBHandle & mcu = mcuCBHandle::singleton();
    // clear the old audio path list
    mcu.audio_paths = srPathList();
    mcu.audio_paths.setPathPrefix(mcu.getMediaPath());
    mcu.audio_paths.insert((char*) basePath.c_str());
+#endif
 }
 
 
 SMARTBODY_DLL_API void Smartbody_dll::SetFacebone( const bool enabled )
 {
+#if USE_SBSCENE
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   SBScene * scene = mcu._scene;
+
+   // TODO: need a scene->setFacebone(enabled);
+   scene;
+   mcu.net_face_bones = enabled;
+
+
+#else
    mcuCBHandle & mcu = mcuCBHandle::singleton();
    mcu.net_face_bones = enabled;
+#endif
 }
 
 
 SMARTBODY_DLL_API void Smartbody_dll::SetProcessId( const std::string & processId )
 {
+#if USE_SBSCENE
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   SBScene * scene = mcu._scene;
+
+   // TODO: need a scene->setProcessId(processId);
+   scene;
+   mcu.set_process_id( processId.c_str() );
+
+
+#else
    mcuCBHandle & mcu = mcuCBHandle::singleton();
    mcu.set_process_id( processId.c_str() );
+#endif
 }
 
 
 SMARTBODY_DLL_API void Smartbody_dll::SetMediaPath( const std::string & path )
 {
+#if USE_SBSCENE
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   SBScene * scene = mcu._scene;
+   scene->setMediaPath(path);
+
+
+#else
    mcuCBHandle & mcu = mcuCBHandle::singleton();
    mcu.setMediaPath( path );
+#endif
 }
 
 
@@ -225,42 +274,77 @@ SMARTBODY_DLL_API void Smartbody_dll::SetListener( SmartbodyListener * listener 
 
 SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
 {
+#if USE_SBSCENE
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   SBScene * scene = mcu._scene;
+
+   // TODO: replace with SBScene->getSimulationManager()?
+   scene;
+   bool update_sim = mcu.update_timer( timeInSeconds );
+   if( update_sim ) mcu.update();
+   return true;
+
+
+#else
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
    bool update_sim = mcu.update_timer( timeInSeconds );
    if( update_sim ) mcu.update();
    return true;
+#endif
 }
 
 
 SMARTBODY_DLL_API bool Smartbody_dll::ProcessVHMsgs( const char * op, const char * args )
 {
+#if USE_SBSCENE
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   SBScene * scene = mcu._scene;
+
+   string s = string(op) + string(args);
+   scene->command( s.c_str() );
+
+   return true;
+
+
+#else
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
    mcu.execute( op, (char *)args );
 
    return true;
+#endif
 }
 
 
 SMARTBODY_DLL_API int Smartbody_dll::GetNumberOfCharacters()
 {
+#if USE_SBSCENE
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   SBScene * scene = mcu._scene;
+   return scene->getNumCharacters();
+
+
+#else
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
    return mcu.getNumCharacters();
+#endif
 }
 
 
 SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string & name )
 {
+#if USE_SBSCENE
    mcuCBHandle & mcu = mcuCBHandle::singleton();
+   SBScene * scene = mcu._scene;
 
-   SbmCharacter * char_p = mcu.getCharacter(name );
-   bool hasChar = false;
+   SBCharacter * char_p = scene->getCharacter(name);
    if ( char_p )
    {
       std::map<std::string,SmartbodyCharacter*>::iterator mi = m_characters.find(name);
       SmartbodyCharacter* pc = NULL;
+      bool hasChar = false;
       if (mi != m_characters.end())
       {
          pc = mi->second;
@@ -367,21 +451,154 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
    {
       return m_emptyCharacter;
    }
+
+#else
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+
+   SbmCharacter * char_p = mcu.getCharacter(name );
+   if ( char_p )
+   {
+      std::map<std::string,SmartbodyCharacter*>::iterator mi = m_characters.find(name);
+      SmartbodyCharacter* pc = NULL;
+      bool hasChar = false;
+      if (mi != m_characters.end())
+      {
+         pc = mi->second;
+         hasChar = true;
+      }
+      else
+      {
+         pc = new SmartbodyCharacter();
+         hasChar = false;
+         m_characters[name] = pc;
+      }
+
+      SmartbodyCharacter& c = *pc;
+
+      const SkJoint * joint = char_p->get_world_offset_joint();
+
+      const SkJointPos * pos = joint->const_pos();
+      float x = pos->value( SkJointPos::X );
+      float y = pos->value( SkJointPos::Y );
+      float z = pos->value( SkJointPos::Z );
+
+      SkJoint::RotType rot_type = joint->rot_type();
+      if ( rot_type != SkJoint::TypeQuat )
+      {
+         //cerr << "ERROR: Unsupported world_offset rotation type: " << rot_type << " (Expected TypeQuat, "<<SkJoint::TypeQuat<<")"<<endl;
+      }
+
+      // const_cast because the SrQuat does validation (no const version of value())
+      const SrQuat & q = ((SkJoint *)joint)->quat()->value();
+
+      c.m_name = char_p->getName();
+      c.x = x;
+      c.y = y;
+      c.z = z;
+      c.rw = q.w;
+      c.rx = q.x;
+      c.ry = q.y;
+      c.rz = q.z;
+
+
+      const std::vector<SkJoint *> & joints  = char_p->getSkeleton()->joints();
+
+      for ( size_t i = 0; i < joints.size(); i++ )
+      {
+         // const_cast because the SrQuat does validation (no const version of value())
+         SkJoint * j = joints[i];
+
+         SrQuat q = j->quat()->value();
+
+         //printf( "%s %f %f %f %f\n", (const char *)j->name(), q.w, q.x, q.y, q.z );
+
+         float posx = j->pos()->value( 0 );
+         float posy = j->pos()->value( 1 );
+         float posz = j->pos()->value( 2 );
+         if ( false )
+         {
+            posx += j->offset().x;
+            posy += j->offset().y;
+            posz += j->offset().z;
+         }
+
+         std::string jointName;
+         if (j->extName() != "")
+            jointName = j->extName();
+         else
+            jointName = j->name();
+
+         if (hasChar)
+         {
+            SmartbodyJoint& joint = c.m_joints[i];
+            joint.m_name = jointName;			
+            SrQuat jointQ = j->quat()->value();
+            // 			if (i==136)
+            // 			{
+            // 				//sr_out << "eyeball quat = " << jointQ << srnl;
+            // 				LOG("eyeball quat = %f %f %f %f\n",jointQ.x,jointQ.y,jointQ.z,jointQ.w);
+            // 			}
+
+            joint.x = posx;
+            joint.y = posy;
+            joint.z = posz;
+            joint.rw = q.w;
+            joint.rx = q.x;
+            joint.ry = q.y;
+            joint.rz = q.z;
+         }
+         else
+         {
+            SmartbodyJoint joint;
+            joint.m_name = jointName;
+            joint.x = posx;
+            joint.y = posy;
+            joint.z = posz;
+            joint.rw = q.w;
+            joint.rx = q.x;
+            joint.ry = q.y;
+            joint.rz = q.z;
+            c.m_joints.push_back( joint );
+         }
+      }
+      return c;
+   }
+   else
+   {
+      return m_emptyCharacter;
+   }
+#endif
 }
 
 
 bool Smartbody_dll::InitVHMsg()
 {
 #if !defined(__ANDROID__) && !defined(SBM_IPHONE)
+
+#if USE_SBSCENE
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   SBScene * scene = mcu._scene;
+
+   printf( "Starting VHMsg (DLL side)\n" );
+
+   // TODO: need scene->SetVhmsgEnabled(true)
+   scene;
+   int err = vhmsg::ttu_open();
+   if (err == vhmsg::TTU_SUCCESS)
+      mcu.vhmsg_enabled = true;
+
+
+#else
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
    printf( "Starting VHMsg (DLL side)\n" );
 
    int err = vhmsg::ttu_open();
    if (err == vhmsg::TTU_SUCCESS)
-		mcu.vhmsg_enabled = true;
+      mcu.vhmsg_enabled = true;
 #endif
 
+#endif
    return true;
 }
 
