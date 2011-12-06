@@ -219,8 +219,19 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath)
 
    XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
 
+#if USE_SBSCENE
+   // TODO: Replace with SBScene * g_scene = new SBScene();
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+
+   // TODO: Replace with g_scene->SetCharacterListener(m_internalListener)
+   mcu.sbm_character_listener = m_internalListener;
+
+
+#else
    mcuCBHandle & mcu = mcuCBHandle::singleton();
    mcu.sbm_character_listener = m_internalListener;
+#endif
+
    SetSpeechAudiofileBasePath( "../../" );
 
    initPython(pythonLibPath);
