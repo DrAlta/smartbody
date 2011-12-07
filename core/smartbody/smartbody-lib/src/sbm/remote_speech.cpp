@@ -257,15 +257,11 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 					VisemeData* origViseme = (*visemes)[visemeIndex];
 					while (fabs(prevViseme->time() - startTime) < .001)
 					{
-						if (visemeIndex <= 0)
-						{
-							prevViseme = origViseme;
-						}
-						else
-						{
-							visemeIndex--;
-							prevViseme = (*visemes)[visemeIndex];
-						}
+						if (visemeIndex == 0)
+							break;
+
+						visemeIndex--;
+						prevViseme = (*visemes)[visemeIndex];
 					}
 
 					if (prevViseme->time() > startTime)
