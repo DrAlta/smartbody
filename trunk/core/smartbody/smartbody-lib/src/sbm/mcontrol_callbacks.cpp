@@ -1828,7 +1828,9 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 			std::map<std::string,std::string> mtlTextBumpMap;
 			DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", obj_file);
 			if (effectNode)
+			{
 				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap);
+			}
 
 			// parsing geometry
 			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f);
@@ -1867,6 +1869,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 				}	
 			}
 		}
+//		delete geometryNode;
 	}	
 	for (unsigned int i = 0; i < meshModelVec.size(); i++)
 	{
@@ -4546,53 +4549,6 @@ int mcu_vrKillComponent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-
-int mcu_vrQuery_func( srArgBuffer& args, mcuCBHandle* mcu_p )
-{
-	string command = args.read_token();
-	if( strcmp(command.c_str(),"anims") && strcmp(command.c_str(),"poses") ) {
-		LOG("ERROR: Invalid query command");
-		return CMD_FAILURE;
-	}
-
-	if( !strcmp(command.c_str(),"anims") )
-	{
-		string message;
-		message.append("vrQueryAnimReply ");
-
-		for (std::map<std::string, SkMotion*>::iterator it = mcu_p->motion_map.begin(); it != mcu_p->motion_map.end(); ++it)
-		{
-			LOG("\n%s\n",(*it).first.c_str());
-			message.append((*it).first);
-			message.append(" ");
-		}
-
-		mcu_p->vhmsg_send(message.c_str());
-
-		return (CMD_SUCCESS);
-	}
-	else if( !strcmp(command.c_str(),"poses") )
-	{
-		string message;
-		message.append("vrQueryPoseReply ");
-
-		for (std::map<std::string, SkPosture*>::iterator it = mcu_p->pose_map.begin(); it != mcu_p->pose_map.end(); ++it)
-		{
-			LOG("\n%s\n",(*it).first.c_str());
-			message.append((*it).first);
-			message.append(" ");
-		}
-
-		mcu_p->vhmsg_send(message.c_str());
-
-		return (CMD_SUCCESS);
-	}
-
-	return CMD_FAILURE;
-
-}
-
-
 /*
    vrAllCall
      In response to this message, send out vrComponent to indicate that this component is running
@@ -6799,4 +6755,70 @@ int sbm_vhmsg_send_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	char* cmdName = args.read_token();
 	char* cmdArgs = args.read_remainder_raw();
 	return mcu_p->vhmsg_send( cmdName, cmdArgs );
+}
+
+int xmlcachedir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	return CMD_SUCCESS;
+}
+
+int xmlcache_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	std::string token = args.read_token();
+	if (token == "on")
+	{
+		mcu_p->useXmlCache = true;
+		LOG("XML caching is now on");
+		return CMD_SUCCESS;
+	}
+	else if (token == "off")
+	{
+		mcu_p->useXmlCache = false;
+		LOG("XML caching is now off");
+		return CMD_SUCCESS;
+	}
+	else if (token == "auto")
+	{
+		std::string token = args.read_token();
+		if (token == "on")
+		{
+			mcu_p->useXmlCacheAuto = true;
+			LOG("XML automatic caching is now on");
+			return CMD_SUCCESS;
+		}
+		else if (token == "off")
+		{
+			mcu_p->useXmlCacheAuto = false;
+			LOG("XML automatic caching is now off");
+			return CMD_SUCCESS;
+		}
+		else
+		{
+			LOG("XML automatic caching is %s", mcu_p->useXmlCacheAuto? "on" : "off");
+			return CMD_SUCCESS;
+		}
+	}
+	else if (token == "reset")
+	{
+		// delete the cache
+		for (std::map<std::string, DOMDocument*>::iterator iter = mcu_p->xmlCache.begin();
+			 iter != mcu_p->xmlCache.end();
+			 iter++)
+		{
+			(*iter).second->release();
+		}
+		LOG("XML cache cleared.");
+		return CMD_SUCCESS;
+	}
+	else
+	{
+		LOG("Current cache:");
+		for (std::map<std::string, DOMDocument*>::iterator iter = mcu_p->xmlCache.begin();
+			 iter != mcu_p->xmlCache.end();
+			 iter++)
+		{
+			LOG("%s", (*iter).first);
+		}
+		return CMD_SUCCESS;
+	}
 }

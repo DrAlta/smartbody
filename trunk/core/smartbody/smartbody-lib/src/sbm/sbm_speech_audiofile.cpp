@@ -81,7 +81,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 {
 	
     mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.mark("requestSpeechAudio", 4, "begin");
+	mcu.mark("requestSpeechAudio", 0, "begin");
 	rapidxml::xml_document<> doc;
 	std::vector<char> xml(text.begin(), text.end());
     xml.push_back('\0');
@@ -105,7 +105,8 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
 		m_speechRequestInfo[ m_requestIdCounter ].id = speechId;
 	} catch (...) {
-		LOG("Problem parsing XML speech request.");fullpath
+		LOG("Problem parsing XML speech request.");
+		mcu.mark("requestSpeechAudio");
 		return 0;
 	}
 
@@ -113,7 +114,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    if ( agent == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
-	    mcu.mark("requestSpeechAudio");
+	  mcu.mark("requestSpeechAudio");
       return 0;
    }
 
@@ -123,7 +124,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
-	    mcu.mark("requestSpeechAudio");
+	  mcu.mark("requestSpeechAudio");
       return 0;
    }
 
@@ -137,14 +138,14 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    //ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
    m_speechRequestInfo[ m_requestIdCounter ].visemeData.clear();
 
-   mcu.mark("requestSpeechAudio", 4, "lips");
+   mcu.mark("requestSpeechAudio", 0, "lips");
    rapidxml::file<char> bmlFile(bmlFilename.c_str());
-   mcu.mark("requestSpeechAudio", 4, "fileconstruction");
+   mcu.mark("requestSpeechAudio", 0, "fileconstruction");
    rapidxml::xml_document<> bmldoc;
-   mcu.mark("requestSpeechAudio", 4, "parse");
+   mcu.mark("requestSpeechAudio", 0, "parse");
    bmldoc.parse< rapidxml::parse_declaration_node>(bmlFile.data());
 
-   mcu.mark("requestSpeechAudio", 4, "traverse");
+   mcu.mark("requestSpeechAudio", 0, "traverse");
 
    bool useCurveMode = visemeCurveMode;
    if (useCurveMode)
@@ -260,7 +261,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
     m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.clear();
 
 
-	mcu.mark("requestSpeechAudio", 4, "sync");
+	mcu.mark("requestSpeechAudio", 0, "sync");
 	rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
 	rapidxml::xml_node<>* speechnode = bmlnode->first_node("speech");
 	if (speechnode)
@@ -305,7 +306,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    mcu.execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
 
 
-     mcu.mark("requestSpeechAudio");
+    mcu.mark("requestSpeechAudio");
    return m_requestIdCounter++;
 
 }
@@ -315,7 +316,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 {
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.mark("requestSpeechAudio", 4, "begin");
+	mcu.mark("requestSpeechAudio", 0, "begin");
    // TODO:  Does return 0 signify error code?
    // TODO:  Handle xerces exceptions?
 
@@ -323,7 +324,6 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    // parse text to get the name of the audio file
    // parse .bml file to get viseme timings
    // parse .bml file to get mark timings
-
 
    DOMDocument * doc = xml_utils::parseMessageXml( m_xmlParser, text.c_str() );
 
@@ -370,19 +370,21 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
 	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.native_directory_string().c_str();
 
-    mcu.mark("requestSpeechAudio", 4, "lips");
+   mcu.mark("requestSpeechAudio", 0, "lips");
    ReadVisemeDataBML( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
+	  mcu.mark("requestSpeechAudio");
       return 0;
    }
 
-   mcu.mark("requestSpeechAudio", 4, "sync");
+   mcu.mark("requestSpeechAudio", 0, "sync");
    ReadSpeechTiming( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
    if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.native_directory_string().c_str() );
+	  mcu.mark("requestSpeechAudio");
       return 0;
    }
 
@@ -393,6 +395,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    mcu.mark("requestSpeechAudio");
    return m_requestIdCounter++;
 }
+
 
 vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId, SbmCharacter* character )
 {
@@ -635,22 +638,54 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 {
    visemeData.clear();
 
-   DOMDocument * doc = xml_utils::parseMessageXml( m_xmlParser, filename );
-   if ( doc == NULL )
+    mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.mark("ReadVisemeDataBML", 0, "start");
+
+	DOMDocument* xmlDoc = NULL;
+	if (mcu.useXmlCache)
+	{
+		boost::filesystem::path path(filename);
+		boost::filesystem::path absPath = boost::filesystem::complete(path);
+		std::string absPathStr = absPath.string();
+		std::map<std::string, DOMDocument*>::iterator iter = mcu.xmlCache.find(absPathStr);
+		if (iter !=  mcu.xmlCache.end())
+		{
+			xmlDoc = (*iter).second;
+		}
+		else
+		{
+			xmlDoc = xml_utils::parseMessageXml( m_xmlParser, filename );
+			if (mcu.useXmlCacheAuto)
+			{
+				// add to the cache if in auto cache mode
+				mcu.xmlCache.insert(std::pair<std::string, DOMDocument*>(absPathStr, xmlDoc));
+			}
+		}
+	}
+	else
+	{
+		xmlDoc = xml_utils::parseMessageXml(m_xmlParser, filename);
+	}
+
+   if ( xmlDoc == NULL )
    {
+	  mcu.mark("ReadVisemeDataBML");
       return;
    }
 
-   DOMElement * bml = doc->getDocumentElement();
+   DOMElement * bml = xmlDoc->getDocumentElement();
 
    // TODO: make sure it's "bml"
 
+  
    // <lips viseme="Ih" articulation="1.0" start="0.17" ready="0.17" relax="0.31" end="0.31" />
    bool useVisemeCurveMode = visemeCurveMode;
    if (useVisemeCurveMode)
    {
+	   mcu.mark("ReadVisemeDataBML", 0, "curve mode");
 	   DOMNodeList* syncCurveList = bml->getElementsByTagName( BML::BMLDefs::TAG_CURVE );
-	   for (XMLSize_t i = 0; i < syncCurveList->getLength(); i++)
+	   XMLSize_t length = syncCurveList->getLength();
+	   for (XMLSize_t i = 0; i < length; i++)
 	   {
 		   DOMElement* e = (DOMElement*)syncCurveList->item(i);
 
@@ -663,23 +698,26 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 		   string curveInfo = "";
 		   xml_utils::xml_translate(&curveInfo, e->getTextContent());
 
-		   visemeData.push_back(VisemeData(visemeName.c_str(), atoi(numKeys.c_str()), curveInfo.c_str()));
+		   int num = atoi(numKeys.c_str());
+		   if (num > 0)
+			   visemeData.push_back(VisemeData(visemeName, num, curveInfo));
 	   }
 	   // revert to using normal viseme mode if curves are not found
-	   if (syncCurveList->getLength() == 0)
+	   if (length == 0)
 		   useVisemeCurveMode = false;
    }
    
    if (!useVisemeCurveMode)
    {
+	   mcu.mark("ReadVisemeDataBML", 0, "non-curve mode");
 	   DOMNodeList * syncList = bml->getElementsByTagName( BML::BMLDefs::TAG_LIPS );
-	   for ( XMLSize_t i = 0; i < syncList->getLength(); i++ )
+	   XMLSize_t length = syncList->getLength();
+	   for ( XMLSize_t i = 0; i < length; i++ )
 	   {
 		  DOMElement * e = (DOMElement *)syncList->item( i );
 
 		  std::string viseme = "";
 		  xml_utils::xml_translate(&viseme, e->getAttribute( BML::BMLDefs::TAG_VISEME ));
-
 
 		  std::string articulation = "";
 		  xml_utils::xml_translate(&articulation, e->getAttribute( BML::BMLDefs::TAG_ARTICULATION ));
@@ -709,7 +747,7 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 
 		  float weight = (float) atof( articulation.c_str());
 		  weight *= character->get_viseme_magnitude();
-		  VisemeData* curViseme = new VisemeData(viseme.c_str(), weight, startTime,  endTime - startTime, rampIn, rampOut);
+		  VisemeData* curViseme = new VisemeData(viseme, weight, startTime,  endTime - startTime, rampIn, rampOut);
 
 			if (visemeData.size() > 0)
 			{
@@ -777,6 +815,7 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 		   }
 	   }
    }
+   mcu.mark("ReadVisemeDataBML");
 }
 
 

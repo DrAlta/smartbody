@@ -64,6 +64,9 @@
 #include "me_ct_gaze.h"
 #include "BMLDefs.h"
 
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
+
 using namespace std;
 using namespace BML;
 using namespace SmartBody;
@@ -1138,7 +1141,8 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 			return bp.bml_end( BMLProcessorMsg( character_id, recipient_id, message_id, character, NULL, args ), mcu );
 #else
 			BMLProcessorMsg msg( character_id, message_id, character, NULL, args );
-			return bp.bml_end( msg, mcu );
+			int ret = bp.bml_end( msg, mcu );
+			return ret;
 #endif
 		} catch( BmlException& e ) {
 			std::stringstream strstr;
@@ -1226,7 +1230,32 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 			return CMD_FAILURE;
 		}
 
-        DOMDocument *xmlDoc = xml_utils::parseMessageXml( bp.xmlParser.get(), xml );
+		DOMDocument* xmlDoc = NULL;
+		// check the cache to see if it exists first
+		if (mcu->useXmlCache)
+		{
+			boost::filesystem::path path(xml);
+			boost::filesystem::path absPath = boost::filesystem::complete(path);
+			std::string absPathStr = absPath.string();
+			std::map<std::string, DOMDocument*>::iterator iter = mcu->xmlCache.find(absPathStr);
+			if (iter !=  mcu->xmlCache.end())
+			{
+				xmlDoc = (*iter).second;
+			}
+			else
+			{
+				xmlDoc = xml_utils::parseMessageXml( bp.xmlParser.get(), xml );
+				if (mcu->useXmlCacheAuto)
+				{
+					// add to the cache if in auto cache mode
+					mcu->xmlCache.insert(std::pair<std::string, DOMDocument*>(absPathStr, xmlDoc));
+				}
+			}
+		}
+		else
+		{
+			xmlDoc = xml_utils::parseMessageXml( bp.xmlParser.get(), xml );
+		}
 
 		if( xmlDoc == NULL ) {
 			bml_error( agent_id, message_id, "XML parser returned NULL document.", mcu );
