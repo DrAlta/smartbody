@@ -29,7 +29,7 @@ using namespace std;
 using namespace SmartBody;
 
 
-VisemeData::VisemeData( const char * id, int numKeys, const char * curveInfo )
+VisemeData::VisemeData( const std::string& id, int numKeys, const std::string& curveInfo )
 	: _id( id ), _weight( 1.0 ), _time( 0.0 ), _duration( 0.0 ), _numKeys( numKeys ), _curveInfo( curveInfo ), _curveMode(true), _trapezoidMode(false), _floatCurveMode(false)
 {
 	// NOTE: We are parsing twice - once here in order to extract the proper duration of the curve,

@@ -840,11 +840,10 @@ int main( int argc, char **argv )	{
 		bool update_sim = mcu.update_timer();
 //		bool update_sim = mcu.update_timer( SBM_get_real_time() );
 
-		mcu.mark( "main", 0, "fltk-check" );
+	//	mcu.mark( "main", 0, "fltk-check" );
 		Fl::check();
 
 #if LINK_VHMSG_CLIENT
-		mcu.mark( "main", 0, "ttu_poll" );
 		if( mcu.vhmsg_enabled )	{
 			err = vhmsg::ttu_poll();
 			if( err == vhmsg::TTU_ERROR )	{
@@ -853,13 +852,11 @@ int main( int argc, char **argv )	{
 		}
 #endif
 
-		mcu.mark( "main", 0, "bonebus" );
 		vector<string> commands;// = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
 			mcu.execute( (char *)commands[i].c_str() );
 		}
 
-		mcu.mark( "main", 0, "pending_cmd" );
 		if (mcu.getInteractive())
 		{
 			if( commandline.pending( "> " ) )	{
@@ -896,11 +893,9 @@ int main( int argc, char **argv )	{
 		}
 
 #if USE_WSP
-		mcu.mark( "main", 0, "broadcast_update" );
 		mcu.theWSP->broadcast_update();
 #endif
 
-		mcu.mark( "main", 0, "update_sim" );
 		if( update_sim )	{
 			mcu.update();
 		}
@@ -933,22 +928,18 @@ int main( int argc, char **argv )	{
 			mcu.viewer_p->set_camera(*( mcu.camera_p ));
 		}	
 
-		mcu.mark( "main", 0, "update_channel_buffer_viewer");
 		if((ChannelBufferWindow*)mcu.channelbufferviewer_p != NULL)
 		{
 			((ChannelBufferWindow*)mcu.channelbufferviewer_p)->update();
 		}
 
-		mcu.mark( "main", 0, "update_resource_viewer");
 		if((ResourceWindow*)mcu.resourceViewer_p != NULL)
 		{
 			((ResourceWindow*)mcu.resourceViewer_p)->update();
 		}
 
-		mcu.mark( "main", 0, "render" );
 		mcu.render();
 	
-		mcu.mark( "main" );
 	}	
 	cleanup();
 	//vhcl::Log::g_log.RemoveAllListeners();

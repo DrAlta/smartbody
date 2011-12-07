@@ -294,6 +294,10 @@ class mcuCBHandle {
 		
 		srHashMap <MeController>	controller_map;
 
+		std::map<std::string, DOMDocument*> xmlCache;
+		bool useXmlCache;
+		bool useXmlCacheAuto;
+
 
 		std::string getValidName(const std::string& name);
 		int registerCharacter(SbmCharacter* character);

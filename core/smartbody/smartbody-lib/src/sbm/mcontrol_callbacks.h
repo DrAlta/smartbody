@@ -164,6 +164,9 @@ int vhmsglog_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int skscale_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int skmscale_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
+int xmlcachedir_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int xmlcache_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+
 void mcu_vhmsg_callback( const char *op, const char *args, void * user_data );
 int mcuFestivalRemoteSpeechCmd_func( srArgBuffer& args, mcuCBHandle* mcu_p);
 

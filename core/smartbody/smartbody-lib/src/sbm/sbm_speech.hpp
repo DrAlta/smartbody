@@ -61,24 +61,24 @@ namespace SmartBody {
 		int _floatsPerKey;
 
 	public:
-		VisemeData( const char * id, float weight, float time )
+		VisemeData( const std::string& id, float weight, float time )
 			: _id( id ), _weight( weight ), _time( time ), _duration( 0 ),  _rampin(0), _rampout(0), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false), _trapezoidMode(false), _floatCurveMode(false)
 		{
 		}
 		
-		VisemeData( const char * id, float weight, float time, float duration )
+		VisemeData( const std::string& id, float weight, float time, float duration )
 			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _rampin(0), _rampout(0), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false), _trapezoidMode(false), _floatCurveMode(false)
 		{
 		}
 
-		VisemeData( const char * id, int numKeys, const char * curveInfo );
+		VisemeData( const std::string& id, int numKeys, const std::string& curveInfo );
 
-		VisemeData( const char * id, float startTime)
+		VisemeData( const std::string& id, float startTime)
 			: _id( id ), _weight( 1.0f ), _time( startTime ), _duration( 0.0f ), _rampin(0.0f), _rampout(0.0f),  _numKeys(0), _floatsPerKey(0), _curveMode(false), _trapezoidMode(false), _floatCurveMode(true)
 		{
 		}
 
-		VisemeData( const char * id, float weight, float time, float duration, float rampin, float rampout)
+		VisemeData( const std::string& id, float weight, float time, float duration, float rampin, float rampout)
 			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _rampin(rampin), _rampout(rampout), _numKeys( 0 ), _curveInfo( "" ), _trapezoidMode(true), _curveMode(false), _floatCurveMode(false)
 		{
 		}

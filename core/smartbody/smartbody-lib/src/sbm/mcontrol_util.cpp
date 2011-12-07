@@ -268,7 +268,9 @@ mcuCBHandle::mcuCBHandle()
 	media_path("."),
 	_interactive(true),
 	sendPawnUpdates(false),
-	logListener(NULL)
+	logListener(NULL),
+	useXmlCache(false),
+	useXmlCacheAuto(false)
 	//physicsEngine(NULL)
 {	
 	registerCallbacks();
@@ -437,6 +439,10 @@ void mcuCBHandle::registerCallbacks()
 	insert( "skscale",			   skscale_func);
 	insert( "skmscale",			   skmscale_func);
 
+	insert( "xmlcachedir",		   xmlcachedir_func);
+	insert( "xmlcache",			   xmlcache_func);
+
+
 #ifdef USE_GOOGLE_PROFILER
 	insert( "startprofile",			   startprofile_func );
 	insert( "stopprofile",			   stopprofile_func );
@@ -480,7 +486,6 @@ void mcuCBHandle::registerCallbacks()
 
 	insert( "vrKillComponent", mcu_vrKillComponent_func );
 	insert( "vrAllCall", mcu_vrAllCall_func );
-	insert("vrQuery", mcu_vrQuery_func );
 
 	insert( "text_speech", text_speech::text_speech_func ); // [BMLR]
 }
@@ -625,6 +630,14 @@ void mcuCBHandle::clear( void )	{
 		delete (*iter);
 	}
 	param_anim_transitions.clear();
+
+	// remove the XML cache
+	for (std::map<std::string, DOMDocument*>::iterator iter = xmlCache.begin();
+		 iter != xmlCache.end();
+		 iter++)
+	{
+		(*iter).second->release();
+	}
 	
 	/*
 	MeCtPose* pose_ctrl_p;
@@ -1276,7 +1289,6 @@ void mcuCBHandle::update( void )	{
 		if ((*iter).second->isEnable())
 			(*iter).second->afterUpdate(this->time);
 	}
-	
 }
 
 srCmdSeq* mcuCBHandle::lookup_seq( const char* name ) {
