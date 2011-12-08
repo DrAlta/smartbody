@@ -53,6 +53,7 @@ public:
 };
 
 typedef std::map<unsigned long,SbmODEObj*> SbmODEObjMap;
+typedef std::map<unsigned long, SbmODEJoint*> SbmODEJointMap;
 
 class SbmPhysicsSimODE :
 	public SbmPhysicsSim
@@ -65,6 +66,7 @@ protected:
 	dJointGroupID contactGroupID;
 	bool   hasInit;	
 	SbmODEObjMap odeObjMap;
+	SbmODEJointMap odeJointMap;
 public:
 	SbmPhysicsSimODE(void);
 	~SbmPhysicsSimODE(void);
@@ -84,6 +86,8 @@ public:
 	virtual SbmPhysicsObj* createPhyObj(); 
 	virtual SbmJointObj* createJointObj();
 
+	virtual SrVec getJointConstraintPos(SBJoint* joint);
+
 	virtual void updatePhyObjGeometry(SbmPhysicsObj* obj, SbmGeomObject* geom = NULL);
 	virtual void enablePhysicsSim(SbmPhysicsObj* obj, bool bSim);
 	virtual void enableCollisionSim(SbmPhysicsObj* obj, bool bCol);	
@@ -95,6 +99,7 @@ public:
 protected:
 	static void nearCallBack(void *data, dGeomID o1, dGeomID o2);
 	SbmODEObj* getODEObj(SbmPhysicsObj* obj);
+	SbmODEJoint* getODEJoint(SBJoint* joint);
 	dGeomID createODEGeometry(SbmPhysicsObj* obj, float mass);
 	void linkJointObj(SbmJointObj* obj);
 };

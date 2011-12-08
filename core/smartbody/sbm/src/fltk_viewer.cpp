@@ -1278,6 +1278,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		}
 		*/
 	}	
+	
 	static GLfloat mat_emissin[] = { 0.0,  0.0,    0.0,    1.0 };
 	static GLfloat mat_ambient[] = { 0.0,  0.0,    0.0,    1.0 };
 	static GLfloat mat_diffuse[] = { 1.0,  1.0,    1.0,    1.0 };
@@ -1289,22 +1290,24 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
 	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
 	float floorSize = 500;
+	float planeY = -0.1f;
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,0);
 	glNormal3f(0,1,0);
-	glVertex3f(-floorSize,0,floorSize);	
+	glVertex3f(-floorSize,planeY,floorSize);	
 	glTexCoord2f(0,1);
 	glNormal3f(0,1,0);
-	glVertex3f(floorSize,0,floorSize);
+	glVertex3f(floorSize,planeY,floorSize);
 	glTexCoord2f(1,1);
 	glNormal3f(0,1,0);
-	glVertex3f(floorSize,0,-floorSize);
+	glVertex3f(floorSize,planeY,-floorSize);
 	glTexCoord2f(1,0);
 	glNormal3f(0,1,0);
-	glVertex3f(-floorSize,0,-floorSize);	
+	glVertex3f(-floorSize,planeY,-floorSize);	
 	glEnd();
 	drawPawns();
 	glUseProgram(0);	
+	glDisable(GL_LIGHTING);
 }
 
    
@@ -1420,7 +1423,7 @@ void FltkViewer::draw()
 	
 
 	if (_data->showcollisiongeometry)
-		drawColliders();
+		drawCharacterPhysicsObjs();
 	drawInteractiveLocomotion();
 
 	//_posControl.Draw();
@@ -2128,9 +2131,10 @@ int FltkViewer::handle ( int event )
 		 // process picking
 		 //printf("Mouse Push\n");
 
-		 char exe_cmd[256];
+		 //char exe_cmd[256];
 		 if (e.button1)
 		 {
+			 /*
 			 if (Fl::event_clicks())
 			 {
 				 // pick-up object
@@ -2150,6 +2154,7 @@ int FltkViewer::handle ( int event )
 				 }
 			 }
 			 else
+			 */
 			 {				 			 
 				 makeGLContext();
 				 _objManipulator.picking(e.mouse.x, e.mouse.y, _data->camera);
@@ -2171,6 +2176,7 @@ int FltkViewer::handle ( int event )
 		 if (e.button3 && Fl::event_clicks() && e.alt)
 		 {
 			 // put-down object
+			 /*
 			 SbmCharacter* curChar = getCurrentCharacter();			 
 			 SrVec p1;
 			 SrVec p2;
@@ -2185,7 +2191,7 @@ int FltkViewer::handle ( int event )
 				 mcuCBHandle& mcu = mcuCBHandle::singleton();
 				 mcu.execute(exe_cmd);	 
 			 }
-
+			 */
 			
 		 }
 		 else if (mcuCBHandle::singleton().steerEngine.isInitialized() && e.button3 && !e.alt)
@@ -2954,7 +2960,7 @@ void FltkViewer::drawEyeLids()
 
 }
 
-void FltkViewer::drawColliders()
+void FltkViewer::drawCharacterPhysicsObjs()
 {
 	float pawnSize = 1.0;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -2967,6 +2973,16 @@ void FltkViewer::drawColliders()
 		if (!phyChar) continue;
 		std::map<std::string,SbmJointObj*>& jointPhyObjs = phyChar->getJointObjMap();
 		std::map<std::string,SbmJointObj*>::iterator mi;
+		float totalMass = 0.f;
+		for ( mi  = jointPhyObjs.begin();
+			  mi != jointPhyObjs.end();
+			  mi++)
+		{
+			SbmJointObj* obj = mi->second;
+			totalMass += obj->getMass();
+		}
+		if (totalMass == 0.f) totalMass = 1.f;
+
 		for ( mi  = jointPhyObjs.begin();
 			  mi != jointPhyObjs.end();
 			  mi++)
@@ -2974,7 +2990,44 @@ void FltkViewer::drawColliders()
 			SbmJointObj* obj = mi->second;
 			SrMat gmat = obj->getGlobalTransform().gmat();
 			this->drawColObject(obj->getColObj(), gmat);
+
+			SBJoint* joint = obj->getJoint();	
+			SbmPhysicsSim* physics = mcu.getPhysicsEngine();
+			if (physics)
+			{
+				SrVec jointPos = physics->getJointConstraintPos(joint);
+				SrSnSphere sphere;				
+				sphere.shape().center = jointPos;//SrVec(0,-cap->extent,0);
+				sphere.shape().radius = character->getHeight()*0.022f;
+				sphere.color(SrColor(1.f,0.f,0.f));
+				glEnable(GL_LIGHTING);
+				sphere.render_mode(srRenderModeSmooth);
+				SrGlRenderFuncs::render_sphere(&sphere);
+				glDisable(GL_LIGHTING);				
+			}			
+
+			if (_data->showmasses)
+			{
+				glPushAttrib(GL_LIGHTING_BIT);
+				glEnable(GL_LIGHTING);
+				glColor3f(1.0f, 1.0f, 0.0f);
+				SrSnSphere sphere;
+				float height = 200.0;
+				float mass = obj->getMass();
+				if (mass > 0)
+				{
+					float proportion = mass/totalMass;
+					// draw a sphere of proportionate size to entire character to show mass distribution
+					SrMat gmat = obj->getGlobalTransform().gmat();					
+					sphere.shape().center = SrPnt(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14));
+					sphere.shape().radius = proportion * character->getHeight();
+					sphere.color(SrColor(0.f,1.f,1.f));
+					SrGlRenderFuncs::render_sphere(&sphere);					
+				}
+				glPopAttrib();				
+			}
 		}		
+
 	}
 }
 
@@ -3001,17 +3054,13 @@ void FltkViewer::drawPawns()
 		iter++)
 	{
 		SbmPawn* pawn = (*iter).second;
-		if (!pawn->getSkeleton()) // wouldn't this will go into inf loop ?
+		if (!pawn->getSkeleton()) 
 			continue;
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
 		if (character)
 			continue;
-		pawn->getSkeleton()->update_global_matrices();
-		std::vector<SkJoint*>& joints = pawn->getSkeleton()->get_joint_array();		
-		//glColor3f(1.0f, 1.0f, 0.0f);
-		if (joints.size() == 0)
-			continue;
-		SrMat gmat = joints[0]->gmat();
+
+		SrMat gmat = pawn->get_world_offset();
 		
 		if (pawn->colObj_p && dynamic_cast<SbmGeomNullObject*>(pawn->colObj_p) == NULL)
 		{
@@ -3683,6 +3732,7 @@ void FltkViewer::drawLocomotion()
 			glDisable(GL_LIGHTING);
 			if (!character->param_animation_ct)
 				return;
+			glDisable(GL_LIGHTING);
 			std::string baseJointName = character->param_animation_ct->getBaseJointName();
 			SkJoint* baseJ = character->getSkeleton()->search_joint(baseJointName.c_str());
 			if (!baseJ) return;
@@ -3856,6 +3906,8 @@ void FltkViewer::drawDynamics()
 
 		}
 
+		// should be rendered based on physics geometry.
+		/*
 		if (_data->showmasses && totalMass > 0)
 		{
 			glPushAttrib(GL_LIGHTING_BIT);
@@ -3879,8 +3931,10 @@ void FltkViewer::drawDynamics()
 					glPopMatrix();
 				}
 			}
+			
 			glPopAttrib();
 		}
+		*/
 		
 		glPopAttrib();
 		glPopMatrix();

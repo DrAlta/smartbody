@@ -1058,6 +1058,7 @@ void mcuCBHandle::update( void )	{
 	{
 		if (!this->steerEngine.isDone())
 		{
+			this->mark("SteeringUpdate",0,"Update");
 			if (this->steerEngine.getStartTime() == 0.0f)
 
 				this->steerEngine.setStartTime(float(this->time));
@@ -1074,14 +1075,16 @@ void mcuCBHandle::update( void )	{
 			bool running = this->steerEngine._engine->update(false, true, float(this->time) - this->steerEngine.getStartTime());
 			if (!running)
 				this->steerEngine.setDone(true);
+			this->mark("SteeringUpdate");
 		}
 	}
 
 	if (physicsEngine && physicsEngine->getBoolAttribute("enable"))
 	{		
-		static float dt = 0.005f;//timeStep*0.03f;
+		static float dt = 0.01f;//timeStep*0.03f;
 		//elapseTime += time_dt;
 		while (physicsTime < this->time)		
+		//if (physicsTime < this->time)
 		{
 			//printf("elapse time = %f\n",elapseTime);
 			physicsEngine->updateSimulation(dt);
@@ -1196,7 +1199,7 @@ void mcuCBHandle::update( void )	{
 			//	char_p->scene_p->update();
 			//char_p->dMesh_p->update();
 			//char_p->updateJointPhyObjs();
-			bool hasPhySim = false;//physicsEngine->getBoolAttribute("enable");
+			bool hasPhySim = false; //physicsEngine->getBoolAttribute("enable");
 			char_p->updateJointPhyObjs(hasPhySim);
 			//char_p->updateJointPhyObjs(false);
 			char_p->_skeleton->update_global_matrices();

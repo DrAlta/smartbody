@@ -22,6 +22,7 @@
  *      Ed Fast, USC
  */
 
+#include "mcontrol_util.h"
 #include "me_ct_gaze.h"
 #include "lin_win.h"
 using namespace gwiz;
@@ -1116,6 +1117,8 @@ bool MeCtGaze::update_fading( float dt )	{
 
 bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.mark("Gaze",0,"controller_evaluate");
 	float dt;
 	if( getStart() ) {
 		setStart(0);
@@ -1258,10 +1261,11 @@ printf( "eyelim: %f %f %f %f\n",
 			frame.channelUpdated( i );
 		}
 	}
-
+	
 #if TEST_SENSOR
 	sensor_p->controller_evaluate( t, frame );
 #endif
+	mcu.mark("Gaze");
 	return( TRUE );
 }
 

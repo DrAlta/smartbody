@@ -30,6 +30,7 @@ class SbmPhysicsObj : public SbmPhysicsObjInterface// abstraction for rigid obje
 protected:
 	SbmGeomObject* colObj;	
 	float         objMass;	
+	float         objDensity;
 public:
 	SbmPhysicsObj();
 	~SbmPhysicsObj() {}	
@@ -42,7 +43,11 @@ public:
 	virtual void updatePhySim();
 
 	SbmGeomObject* getColObj() { return colObj; }
-	float         getMass() { return objMass; }			
+	float         getMass() { return objMass; }		
+	void          setMass(float mass) { objMass = mass; }
+	float         getDensity() { return objDensity; }
+	void          setDensity(float density) { objDensity = density; }
+
 };
 
 class SbmJointObj : public SbmPhysicsObj 
@@ -108,6 +113,8 @@ public:
 	virtual void updateSbmObj(SbmPhysicsObj* obj) = 0; // write sim data to colObj
 	virtual void updatePhySim(SbmPhysicsObj* obj) = 0; // read sim data from colObj	
 	virtual void updatePhyObjGeometry(SbmPhysicsObj* obj, SbmGeomObject* geom = NULL) = 0;
+
+	virtual SrVec getJointConstraintPos(SBJoint* joint) = 0;
 
 	virtual void initSimulation() = 0;		
 	virtual void updateSimulationInternal(float timeStep) = 0;
