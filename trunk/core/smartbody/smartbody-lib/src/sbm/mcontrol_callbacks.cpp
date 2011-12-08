@@ -1004,7 +1004,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			else
 				return CMD_FAILURE;
 		}
-		else if (operation == "schedule" || operation == "unschedule" || operation == "update" || operation == "basename")
+		else if (operation == "schedule" || operation == "unschedule" || operation == "update" ||  operation == "updatestate" || operation == "basename")
 		{
 			std::string charString = args.read_token();
 			if (charString != "char")
@@ -1068,6 +1068,33 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					character->param_animation_ct->updateWeights(w);
 				}
 			}
+			if (operation == "updatestate")
+			{
+				if (!character->param_animation_ct->getCurrentPAStateData())
+				{
+					LOG("No state available for character %s.", character->getName().c_str());
+					return CMD_FAILURE;
+				}
+
+				int type = character->param_animation_ct->getCurrentPAStateData()->paramManager->getType();
+				if (args.calc_num_tokens() != type + 1)
+				{
+					LOG("Cannot update state %s for character %s which has %d parameters, you sent %d.", character->param_animation_ct->getName().c_str(), character->getName().c_str(), (type + 1), args.calc_num_tokens());
+					return CMD_FAILURE;
+				}
+				std::vector<double> w;
+				for (int i = 0; i < (type + 1); i++)
+					w.push_back(args.read_double());
+				if (type == 0)
+					character->param_animation_ct->getCurrentPAStateData()->paramManager->setWeight(w[0]);
+				else if (type == 1)
+					character->param_animation_ct->getCurrentPAStateData()->paramManager->setWeight(w[0], w[1]);
+				else if (type == 2)
+					character->param_animation_ct->getCurrentPAStateData()->paramManager->setWeight(w[0], w[1], w[2]);
+				character->param_animation_ct->updateWeights();
+				return CMD_SUCCESS;
+			}
+
 
 			if (operation == "basename")
 				character->param_animation_ct->setBaseJointName(args.read_token());
