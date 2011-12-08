@@ -44,7 +44,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	while (tokenCounter < numTokens)
 	{
 		std::string op = tokenzied[tokenCounter];
-		if (op == "-seqpath")
+		if (op == "-seqpath" || op == "-scriptpath")
 		{
 			tokenCounter++;
 			if (tokenCounter < numTokens)
@@ -59,6 +59,15 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 			if (tokenCounter < numTokens)
 			{
 				std::string command = "seq " + tokenzied[tokenCounter];
+				app.m_initialCommands.push_back(command);
+			}
+		}
+		if (op == "-script")
+		{
+			tokenCounter++;
+			if (tokenCounter < numTokens)
+			{
+				std::string command = "pythonscript " + tokenzied[tokenCounter];
 				app.m_initialCommands.push_back(command);
 			}
 		}

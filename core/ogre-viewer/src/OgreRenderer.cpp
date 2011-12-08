@@ -98,7 +98,14 @@ void OgreRenderer::createDefaultScene()
           mBounceLight->setDirection(dir);
           mBounceLight->setDiffuseColour(0.37f, 0.37f, 0.36f);
           mBounceLight->setSpecularColour(0.37f, 0.37f, 0.36f);
-          
+
+		  Ogre::Light* directionalLight = mSceneMgr->createLight("directionalLight");
+		  directionalLight->setType(Ogre::Light::LT_DIRECTIONAL);
+		  directionalLight->setDiffuseColour(Ogre::ColourValue(.25, .25, 0));
+		  directionalLight->setSpecularColour(Ogre::ColourValue(.25, .25, 0));
+	 
+		  directionalLight->setDirection(Ogre::Vector3( 0, -1, 1 ));	
+	          
 #endif
 
 	// Position the camera
