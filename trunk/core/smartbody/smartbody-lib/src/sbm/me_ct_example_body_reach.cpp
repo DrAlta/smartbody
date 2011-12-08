@@ -328,7 +328,10 @@ void MeCtExampleBodyReach::setNewReachEngine( MeCtReachEngine* newEngine )
 
 bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 {	
-	//updateDefaultVariables(frame);
+	//updateDefaultVariables(frame);	
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.mark("Reach",0,"controller_evaluate");
+	
 	updateDt((float)t);	
 	updateChannelBuffer(frame,inputMotionFrame,true);	
 
@@ -363,8 +366,10 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	
 	if (currentReachEngine->getCurrentState()->curStateName() != "Idle" || currentReachData->startReach )
 	{
+		
 		//LOG("update reach");
 		currentReachEngine->updateReach((float)t,dt,inputMotionFrame,blendWeight);
+		
 	}
 	
 	//printf("blend weight = %f\n",blendWeight);
@@ -387,6 +392,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 		cons->targetJoint->update_gmat();
 	}
 	updateChannelBuffer(frame,outMotionFrame);
+	mcu.mark("Reach");
 	return true;
 }
 

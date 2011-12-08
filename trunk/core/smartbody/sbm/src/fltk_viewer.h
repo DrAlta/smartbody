@@ -333,7 +333,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	void drawReach();
 	void drawInteractiveLocomotion();
 	void drawPawns();
-	void drawColliders();
+	void drawCharacterPhysicsObjs();
 	void drawSteeringInfo();
 	static void drawColObject(SbmGeomObject* colObj, SrMat& gmat);
 	void drawTetra(SrVec vtxPos[4], SrVec& color);

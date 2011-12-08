@@ -4,7 +4,7 @@
 /************************************************************************/
 /* Physics Obj ODE                                                      */
 /************************************************************************/
-
+/*
 SbmPhysicsObjODE::SbmPhysicsObjODE()
 {
 	bodyID = 0;
@@ -92,7 +92,7 @@ void SbmPhysicsObjODE::initGeometry( SbmGeomObject* obj, float mass )
 
 		colObj = obj;
 		objMass = mass;		
-		createODEGeometry(obj,0.01f);
+		createODEGeometry(obj,0.01f);		
 		dBodySetMass(bodyID,&odeMass);
 		if (geomID)
 		{
@@ -162,6 +162,7 @@ void SbmPhysicsObjODE::createODEGeometry( SbmGeomObject* obj, float mass )
 		dMassAdjust(&odeMass,(dReal)mass);
 	}
 }
+*/
 
 /************************************************************************/
 /* Physics Sim ODE                                                      */
@@ -178,7 +179,7 @@ SbmPhysicsSimODE::~SbmPhysicsSimODE(void)
 
 void SbmPhysicsSimODE::nearCallBack(void *data, dGeomID o1, dGeomID o2)
 {		
-	const int N = 40;
+	const int N = 256;
 	SbmPhysicsSimODE* phyODE = static_cast<SbmPhysicsSimODE*>(data);
 	if (!phyODE)
 		return;
@@ -217,9 +218,9 @@ void SbmPhysicsSimODE::nearCallBack(void *data, dGeomID o1, dGeomID o2)
 		{
 			contact[i].surface.bounce     = 0.0f; // (0.0~1.0) restitution parameter
 			contact[i].surface.bounce_vel = 0.0;;
-			contact[i].surface.mu = 10.f;//1000.f;		
-			contact[i].surface.soft_cfm = 1e-5;
-			contact[i].surface.soft_erp = 0.4;
+			contact[i].surface.mu = 1.f;//1000.f;		
+			contact[i].surface.soft_cfm = 1e-4;
+			contact[i].surface.soft_erp = 0.1;
 		}
 		//contact[i].surface.bounce_vel = 1000.f; // minimum incoming velocity for bounce 
 		dJointID c = dJointCreateContact(phyODE->getWorldID(),phyODE->getContactGroupID(),&contact[i]);
@@ -238,7 +239,7 @@ void SbmPhysicsSimODE::initSimulation()
 	dWorldSetAngularDamping(worldID,0.001f);
 
 	//dWorldSetERP(worldID,0.8);
-	//dWorldSetCFM(worldID,1e-1);	
+	//dWorldSetCFM(worldID,1e-4);	
 
 	//spaceID = dHashSpaceCreate(0);
 	spaceID = dSimpleSpaceCreate(0);
@@ -290,10 +291,15 @@ void SbmPhysicsSimODE::linkJointObj( SbmJointObj* obj )
 	SbmODEObj* pode = getODEObj(parent);
 	std::string jname = obj->getJoint()->getName();
 	
-	if (1)//parent && parent->getParentObj())//jname == "r_shoulder" || jname == "r_elbow" || jname == "r_forearm" || jname == "r_wrist")
+	SBJoint* joint = obj->getJoint();
+	SbmODEJoint* odeJoint = new SbmODEJoint();	
+	odeJoint->joint = joint;
+	odeJoint->body1ID = pode->bodyID;
+	odeJoint->body2ID = odeObj->bodyID;
+	if (joint->getStringAttribute("type") == "ball")//parent && parent->getParentObj())//jname == "r_shoulder" || jname == "r_elbow" || jname == "r_forearm" || jname == "r_wrist")
 	{
 		dJointID j = dJointCreateBall(worldID, 0);
-		dJointAttach(j, pode->bodyID, odeObj->bodyID);
+		dJointAttach(j, pode->bodyID, odeObj->bodyID);		
 		SrVec apoint = obj->getJoint()->getMatrixGlobal().get_translation();
 		//now we'll set the world position of the ball-and-socket joint. It is important that the bodies are placed in the world
 		//properly at this point
@@ -303,24 +309,6 @@ void SbmPhysicsSimODE::linkJointObj( SbmJointObj* obj )
 		dJointID aMotor = dJointCreateAMotor(worldID, 0);
 		dJointAttach(aMotor, pode->bodyID, odeObj->bodyID);
 		dJointSetAMotorMode(aMotor, dAMotorEuler);
-		//SrMat rotMat = SrMat(parent->getGlobalTransform().rot());
-		SrVec twistAxis = obj->getJoint()->getMatrixGlobal().get_translation() - parent->getJoint()->getMatrixGlobal().get_translation();
-		twistAxis.normalize();
-		if (twistAxis.len() == 0) twistAxis = SrVec(0,1,0);
-		//twistAxis = SrVec(0,0,1);
-
-		//SrVec swingAxis = SrVec(0,0,1);		
-		SrVec swingAxis = SrVec(0.3f,0.3f,0.3f); SrVec newswingAxis = swingAxis - twistAxis*dot(twistAxis,swingAxis); newswingAxis.normalize();
-	
-		swingAxis = newswingAxis;
-		
-		//sr_out << "swing axis = " << swingAxis << srnl;
-		//sr_out << "twist axis = " << twistAxis << srnl;
-	
-		//if (fabs(dot(twistAxis,swingAxis)) < 0.1)
-		//	swingAxis = SrVec(1,0,0);
-		
-
 
 		dJointSetAMotorParam(aMotor, dParamStopCFM, 1e-5);
 		dJointSetAMotorParam(aMotor, dParamStopCFM1, 1e-5);
@@ -330,27 +318,30 @@ void SbmPhysicsSimODE::linkJointObj( SbmJointObj* obj )
 		dJointSetAMotorParam(aMotor, dParamStopERP, 0.4);
 		dJointSetAMotorParam(aMotor, dParamStopERP1, 0.4);
 		dJointSetAMotorParam(aMotor, dParamStopERP2, 0.4);
-		dJointSetAMotorParam(aMotor, dParamStopERP3, 0.4);
-		
+		dJointSetAMotorParam(aMotor, dParamStopERP3, 0.4);		
 
-
+		SrVec twistAxis = joint->getVec3Attribute("axis0");
+		SrVec swingAxis = joint->getVec3Attribute("axis1");
 		dJointSetAMotorAxis (aMotor, 0, 1, swingAxis.x, swingAxis.y, swingAxis.z);
 		dJointSetAMotorAxis (aMotor, 2, 2, twistAxis.x, twistAxis.y, twistAxis.z);
 
-		float jointLimit = 0.3f;
-		if (jname == "r_shoulder" || jname == "r_elbow" || jname == "r_forearm" || jname == "r_wrist")
+		//float jointLimit = 0.3f;
+		//if (jname == "r_shoulder" || jname == "r_elbow" || jname == "r_forearm" || jname == "r_wrist")
 		//if (jname == "r_knee" || jname == "r_ankle" || jname == "r_forefoot")// || jname == "r_toe" || \
 		//	jname == "l_knee" || jname == "l_ankle" || jname == "l_forefoot" || jname == "l_toe")
-			jointLimit = 0.5;
+		//	jointLimit = 0.5;
 
-		dJointSetAMotorParam(aMotor, dParamLoStop1, -jointLimit);
-		dJointSetAMotorParam(aMotor, dParamHiStop1, jointLimit);
+		dJointSetAMotorParam(aMotor, dParamLoStop1, joint->getDoubleAttribute("axis0LimitLow"));
+		dJointSetAMotorParam(aMotor, dParamHiStop1, joint->getDoubleAttribute("axis0LimitHigh"));
 
-		dJointSetAMotorParam(aMotor, dParamLoStop2, -jointLimit);
-		dJointSetAMotorParam(aMotor, dParamHiStop2, jointLimit);
+		dJointSetAMotorParam(aMotor, dParamLoStop2, joint->getDoubleAttribute("axis1LimitLow"));
+		dJointSetAMotorParam(aMotor, dParamHiStop2, joint->getDoubleAttribute("axis1LimitHigh"));
 
-		dJointSetAMotorParam(aMotor, dParamLoStop3, -jointLimit);
-		dJointSetAMotorParam(aMotor, dParamHiStop3, jointLimit);	
+		dJointSetAMotorParam(aMotor, dParamLoStop3, joint->getDoubleAttribute("axis2LimitLow"));
+		dJointSetAMotorParam(aMotor, dParamHiStop3, joint->getDoubleAttribute("axis2LimitHigh"));	
+
+		odeJoint->jointID = j;
+		odeJoint->aMotorID = aMotor;
 	}
 	else
 	{
@@ -360,10 +351,12 @@ void SbmPhysicsSimODE::linkJointObj( SbmJointObj* obj )
 		SrVec apoint = parent->getJoint()->getMatrixGlobal().get_translation();
 		//now we'll set the world position of the ball-and-socket joint. It is important that the bodies are placed in the world
 		//properly at this point
-		dJointSetFixed(j);//, apoint.x,apoint.y,apoint.z);			
+		dJointSetFixed(j);//, apoint.x,apoint.y,apoint.z);		
+		odeJoint->jointID = j;
 	}
-	
-	
+
+	unsigned long jID = (unsigned long)joint;
+	odeJointMap[jID] = odeJoint;	
 	
 	
 	
@@ -412,11 +405,13 @@ void SbmPhysicsSimODE::addPhysicsCharacter( SbmPhysicsCharacter* phyChar )
 		obj->updatePhySim();
 	}
 	// add joint constraints	
+	
 	for (unsigned int i=0;i<jointObjList.size();i++)
 	{
 		SbmJointObj* obj = jointObjList[i];		
 		linkJointObj(obj);
 	}
+	
 
 	//std::string jname = "world_offset";
 	//phyChar->getJointObj(jname)->enablePhysicsSim(false);
@@ -497,6 +492,28 @@ SbmODEObj* SbmPhysicsSimODE::getODEObj( SbmPhysicsObj* obj )
 }
 
 
+SbmODEJoint* SbmPhysicsSimODE::getODEJoint( SBJoint* joint )
+{
+	SbmODEJoint* odeJoint = NULL;
+	unsigned long jointID = (unsigned long)joint;
+	if (odeJointMap.find(jointID) != odeJointMap.end())
+	{
+		odeJoint = odeJointMap[jointID];
+	}	
+	return odeJoint;	
+}
+
+
+SrVec SbmPhysicsSimODE::getJointConstraintPos( SBJoint* joint )
+{
+	SbmODEJoint* odeJoint = getODEJoint(joint);
+	if (!odeJoint) return SrVec(0,0,0);
+
+	dVector3 jointPoint;
+	dJointGetBallAnchor(odeJoint->jointID,jointPoint);
+	return SrVec((float)jointPoint[0],(float)jointPoint[1],(float)jointPoint[2]);
+}
+
 void SbmPhysicsSimODE::updatePhyObjGeometry( SbmPhysicsObj* obj, SbmGeomObject* geom /*= NULL*/ )
 {
 	SbmPhysicsSimODE* odeSim = SbmPhysicsSimODE::getODESim();
@@ -510,7 +527,7 @@ void SbmPhysicsSimODE::updatePhyObjGeometry( SbmPhysicsObj* obj, SbmGeomObject* 
 			obj->setGeometry(geom,0.001f);		
 		}
 		odeObj->cleanGeometry();
-		odeObj->geomID = createODEGeometry(obj,obj->getMass());		
+		odeObj->geomID = createODEGeometry(obj,obj->getDensity());		
 		if (odeObj->geomID && obj->getColObj())
 		{			
 			dGeomSetBody(odeObj->geomID ,odeObj->bodyID);
@@ -523,8 +540,10 @@ void SbmPhysicsSimODE::updatePhyObjGeometry( SbmPhysicsObj* obj, SbmGeomObject* 
 			quat[3] = (dReal)offsetT.rot.z;
 			dGeomSetOffsetQuaternion(odeObj->geomID,quat);	
 			odeObj->odeMass.translate((dReal)offsetT.tran[0],(dReal)offsetT.tran[1],(dReal)offsetT.tran[2]);
+			obj->setMass((float)odeObj->odeMass.mass);
 		}
 		dBodySetMass(odeObj->bodyID,&odeObj->odeMass);
+		
 		//dBodySetAutoDisableFlag(bodyID,1);
 	}	
 }

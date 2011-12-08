@@ -214,10 +214,11 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 		mcuCBHandle::singleton().sbm_character_listener->OnCharacterChanged( getName() );
 	}
 	//scene_p->init(_skeleton);
-	//int err = mcu.add_scene(scene_p);
-
+	//int err = mcu.add_scene(scene_p);	
 	if (dMesh_p)
 		dMesh_p->skeleton = _skeleton;
+	float height = _skeleton->getCurrentHeight();
+	setHeight(height);
 	_skeleton->ref();
 }
 
@@ -507,6 +508,17 @@ void SbmPawn::get_world_offset( float& x, float& y, float& z,
 								   return;
 }
 
+SrMat SbmPawn::get_world_offset()
+{	
+	float x,y,z,h,r,p;
+	get_world_offset(x,y,z,h,r,p);
+	gwiz::quat_t q = gwiz::euler_t(h,r,p);	
+	SrQuat pawnQ = SrQuat((float)q.w(), (float)q.x(), (float)q.y(), (float)q.z());
+	SrMat gmat;
+	pawnQ.get_mat(gmat);
+	gmat.translation(SrVec(x,y,z));		
+	return gmat;
+}
 void SbmPawn::setWorldOffset( const SrMat& newWorld )
 {	
 	SrQuat quat = SrQuat(newWorld);

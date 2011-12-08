@@ -132,7 +132,7 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 	const IKTreeNodeList& nodeList = ikScenario.ikTreeNodes;	
 	idleMotionFrame.jointQuat.resize(nodeList.size());
 	inputMotionFrame.jointQuat.resize(nodeList.size());
-	ikMotionFrame.jointQuat.reserve(nodeList.size());
+	ikMotionFrame.jointQuat.resize(nodeList.size());
 
 	affectedJoints.clear();	
 	for (unsigned int i=0;i<nodeList.size();i++)
@@ -471,7 +471,8 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 		curReachState = nextState;
 	}
 
-	ikMaxOffset = ikDefaultVelocity*3.f*dt;
+	ikMaxOffset = ikDefaultVelocity*3.f*dt;	
+	mcu.mark("Reach",0,"reachIK");
 	if (footIKFix)
 	{
 		solveIK(reachData,ikMotionFrame);	

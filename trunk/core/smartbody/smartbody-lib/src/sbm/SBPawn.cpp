@@ -60,7 +60,7 @@ void SBPawn::setPosition(SrVec pos)
 {
 	float x, y, z, h, p, r;
 	get_world_offset(x, y, z, h, p, r);
-	set_world_offset(pos.x, pos.y, pos.z, h, p, r);
+	set_world_offset(pos.x, pos.y, pos.z, h, p, r);	
 }
 
 void SBPawn::setOrientation(SrQuat quat)

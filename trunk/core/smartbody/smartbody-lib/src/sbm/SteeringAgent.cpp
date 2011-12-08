@@ -112,6 +112,7 @@ void SteeringAgent::evaluate()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
+
 	if (!character)
 		return;
 
@@ -119,6 +120,8 @@ void SteeringAgent::evaluate()
 	float x, y, z;
 	float yaw, pitch, roll;
 	character->get_world_offset(x, y, z, yaw, pitch, roll);
+
+	//LOG("Character world offset : x = %f, y = %f, z = %f",x,y,z);
 
 	// parameter testing
 	if (paramTestFlag)
@@ -130,6 +133,7 @@ void SteeringAgent::evaluate()
 	if (!pprAgent)
 		return;
 
+	//mcu.mark("Steering",0,"Evaluate");
 	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
 	int numGoals = goalQueue.size();
 	if (numGoals == 0) {
@@ -237,6 +241,8 @@ void SteeringAgent::evaluate()
 		manager->handleEvent(&motionEvent, mcu.time);
 	}
 	character->_numSteeringGoal = goalQueue.size();
+
+	//mcu.mark("Steering");
 }
 
 void SteeringAgent::setAgent(SteerLib::AgentInterface* a)

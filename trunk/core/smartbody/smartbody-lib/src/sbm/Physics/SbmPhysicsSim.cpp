@@ -89,6 +89,7 @@ SbmPhysicsObj::SbmPhysicsObj()
 {
 	colObj = NULL;	
 	objMass = 0.f;
+	objDensity = 0.01f;
 	bHasPhysicsSim = true;
 	bHasCollisionSim = true;	
 }
@@ -157,9 +158,43 @@ void SbmJointObj::initJoint( SBJoint* joint )
 	if (!joint->getAttribute("axis0"))
 		joint->createVec3Attribute("axis0",1,0,0,true,"Basic",42,false,false,false,"rotation axis 0");
 	if (!joint->getAttribute("axis1"))
-		joint->createVec3Attribute("axis1",0,1,0,true,"Basic",42,false,false,false,"rotation axis 1");
+		joint->createVec3Attribute("axis1",0,1,0,true,"Basic",43,false,false,false,"rotation axis 1");
 	if (!joint->getAttribute("axis2"))
-		joint->createVec3Attribute("axis2",0,0,1,true,"Basic",42,false,false,false,"rotation axis 2");
+		joint->createVec3Attribute("axis2",0,0,1,true,"Basic",44,false,false,false,"rotation axis 2");
+
+	float defaultHigh = 0.3f, defaultLow = -0.3f;
+	if (!joint->getAttribute("axis0LimitHigh"))
+		joint->createDoubleAttribute("axis0LimitHigh", defaultHigh, true,"Basic",45,false,false,false,"upper limit for axis0 rotation" );
+	if (!joint->getAttribute("axis0LimitLow"))
+		joint->createDoubleAttribute("axis0LimitLow", defaultLow, true,"Basic",45,false,false,false,"lower limit for axis0 rotation" );
+
+	if (!joint->getAttribute("axis1LimitHigh"))
+		joint->createDoubleAttribute("axis1LimitHigh", defaultHigh, true,"Basic",45,false,false,false,"upper limit for axis1 rotation" );
+	if (!joint->getAttribute("axis1LimitLow"))
+		joint->createDoubleAttribute("axis1LimitLow", defaultLow, true,"Basic",45,false,false,false,"lower limit for axis1 rotation" );
+
+	if (!joint->getAttribute("axis2LimitHigh"))
+		joint->createDoubleAttribute("axis2LimitHigh", defaultHigh, true,"Basic",45,false,false,false,"upper limit for axis2 rotation" );
+	if (!joint->getAttribute("axis2LimitLow"))
+		joint->createDoubleAttribute("axis2LimitLow", defaultLow, true,"Basic",45,false,false,false,"lower limit for axis2 rotation" );
+	
+	SBJoint* parent = sbmJoint->getParent();
+	SrVec twistAxis = sbmJoint->getVec3Attribute("axis0");
+	SrVec swingAxis = sbmJoint->getVec3Attribute("axis1");
+	SrVec swingAxis2 = sbmJoint->getVec3Attribute("axis2");
+	if (parent)
+	{
+		twistAxis = sbmJoint->getMatrixGlobal().get_translation() - parent->getMatrixGlobal().get_translation();
+		twistAxis.normalize();
+		if (twistAxis.len() == 0) twistAxis = SrVec(0,1,0);	
+		swingAxis = SrVec(0.3f,0.3f,0.3f); SrVec newswingAxis = swingAxis - twistAxis*dot(twistAxis,swingAxis); newswingAxis.normalize();
+		swingAxis = newswingAxis;
+		swingAxis2 = cross(twistAxis,swingAxis);
+	}
+	joint->setVec3Attribute("axis0",twistAxis[0],twistAxis[1],twistAxis[2]);	
+	joint->setVec3Attribute("axis1",swingAxis[0],swingAxis[1],swingAxis[2]);
+	joint->setVec3Attribute("axis2",swingAxis2[0],swingAxis2[1],swingAxis2[2]);
+	
 
 	
 }
@@ -271,8 +306,8 @@ SbmGeomObject* SbmPhysicsCharacter::createJointGeometry( SBJoint* joint, float r
 	SbmGeomObject* newGeomObj = NULL;
 	SbmCharacter* curCharacter = mcuCBHandle::singleton().getCharacter(characterName);
 	if (radius < 0.0)
-		radius = curCharacter->getHeight()*0.01f;
-	float extend = curCharacter->getHeight()*0.002f;
+		radius = curCharacter->getHeight()*0.02f;
+	float extend = curCharacter->getHeight()*0.01f;
 	if (joint->getNumChildren() > 1) // bounding box
 	{
 		SrBox bbox;		
@@ -292,7 +327,7 @@ SbmGeomObject* SbmPhysicsCharacter::createJointGeometry( SBJoint* joint, float r
 		SrVec center = SrVec(0,0,0);//offset*0.5f;
 		SrVec dir = offset; dir.normalize();
 		float boneLen = offset.len();	
-		float len = boneLen+extend*0.1f;	
+		float len = boneLen+extend*0.1f;
 		// generate new geometry
 		newGeomObj = new SbmGeomCapsule(center-dir*len*0.5f, center+dir*len*0.5f,radius);		
 	}

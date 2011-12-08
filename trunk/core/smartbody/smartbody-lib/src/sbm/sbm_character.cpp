@@ -397,6 +397,8 @@ void SbmCharacter::initData()
 	param_animation_ct = NULL;
 	saccade_ct = NULL;
 
+	phyChar = NULL;
+
 	speech_impl = NULL;
 	speech_impl_backup = NULL;
 	locomotion_ct = NULL;
@@ -498,6 +500,7 @@ void SbmCharacter::locomotion_set_turning_mode(int mode)
 
 void SbmCharacter::updateJointPhyObjs(bool phySim)
 {
+	return;
 	if (!_skeleton)
 		return;
 	if (!phyChar) return;
@@ -565,6 +568,15 @@ void SbmCharacter::buildJointPhyObjs()
 	excludeNameList.insert("spine5");
 	excludeNameList.insert("l_forefoot");
 	excludeNameList.insert("r_forefoot");
+
+	excludeNameList.insert("r_sternoclavicular");
+	excludeNameList.insert("l_sternoclavicular");
+	//excludeNameList.insert("r_acromioclavicular");
+	//excludeNameList.insert("l_acromioclavicular");
+
+	//excludeNameList.insert("l_hip");
+	//excludeNameList.insert("r_hip");
+	excludeNameList.insert("spine4");
 	SkJoint* rootJoint = _skeleton->root();
 	jointNameList.push_back(rootJoint->name());
 	tempJointList.push(rootJoint->child(0));
@@ -598,7 +610,7 @@ void SbmCharacter::buildJointPhyObjs()
 
 	std::string charName = getName();
 	phyChar->initPhysicsCharacter(charName,jointNameList,true);
-	//phySim->addPhysicsCharacter(phyChar);
+	phySim->addPhysicsCharacter(phyChar);
 }
 /*
 void SbmCharacter::setJointCollider( std::string jointName, float len, float radius )
@@ -932,7 +944,7 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 	mcu.execute(reachCmd);
 #endif
 
-	buildJointPhyObjs();
+	//buildJointPhyObjs();
 
 
 	// get the default attributes from the default controllers

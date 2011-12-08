@@ -69,8 +69,9 @@ double MeCtParamAnimation::controller_duration()
 }
 
 bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
-{
+{	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.mark("locomotion",0,"controller_evaluate");
 	double timeStep = t - prevGlobalTime;
 	prevGlobalTime = t;
 	autoScheduling(t);
@@ -193,6 +194,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 					}
 				}
 #endif
+				mcu.mark("locomotion");
 				return true;
 			}
 			else
@@ -223,6 +225,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 			curStateModule = NULL;
 		}
 	}
+	mcu.mark("locomotion");
 	return true;
 }
 

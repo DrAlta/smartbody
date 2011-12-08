@@ -84,6 +84,7 @@ protected:
 	double wo_cache_timestamp;
 
 	MeCtChannelWriter*  world_offset_writer_p;
+	float	_height;
 
 #if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
 	// Map of pending controller clean-up callbacks
@@ -136,6 +137,9 @@ public:
 	void setCollision(bool enable);
 	bool hasPhysicsSim();
 
+	void setHeight( float height )	{ _height = height; }
+	float getHeight( void ) 		{ return _height; }
+
 	virtual int prune_controller_tree();  // removes unused or overwritten controllers
 	virtual void remove_from_scene();
 
@@ -145,6 +149,7 @@ public:
 	const SkJoint* get_world_offset_joint() const
 	{	return get_joint( WORLD_OFFSET_JOINT_NAME ); }
 
+	SrMat get_world_offset();
 	void get_world_offset( float& x, float& y, float& z,
 		                   float& yaw, float& pitch, float& roll );
 
