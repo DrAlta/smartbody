@@ -82,6 +82,9 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 
 	inControl = true;
 
+	lastMessage = "";
+	numMessageRepeats = 0;
+
 	updateSteerStateName();
 }
 
@@ -153,7 +156,24 @@ void SteeringAgent::evaluate()
 	// Update Steering Engine (position, orientation, scalar speed)
 	Util::Point newPosition(x * mcu.steeringScale, 0.0f, z * mcu.steeringScale);
 	Util::Vector newOrientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
-	pprAgent->updateAgentState(newPosition, newOrientation, newSpeed);
+	try {
+		pprAgent->updateAgentState(newPosition, newOrientation, newSpeed);
+	} catch (Util::GenericException& ge) {
+		std::string message = ge.what();
+		if (lastMessage == message)
+		{
+			numMessageRepeats++;
+			if (numMessageRepeats % 100 == 0)
+			{
+				LOG("Message repeated %d times", numMessageRepeats);
+			}
+			else
+			{
+				numMessageRepeats = 0;
+				LOG("Problem updating agent state: %s", ge.what());
+			}
+		}
+	}
 	pprAgent->updateAI((float)mcu.time, dt, (unsigned int)(mcu.time / dt));
 
 	// Prepare Data

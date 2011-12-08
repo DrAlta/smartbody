@@ -36,6 +36,7 @@ void SBSteerManager::start()
 	int numGridCellsX = dynamic_cast<SmartBody::IntAttribute*> (mcu.steerEngine.getAttribute("gridDatabaseOptions.numGridCellsX"))->getValue();
 	int numGridCellsZ = dynamic_cast<SmartBody::IntAttribute*> (mcu.steerEngine.getAttribute("gridDatabaseOptions.numGridCellsZ"))->getValue();
 	int maxItemsPerGridCell = dynamic_cast<SmartBody::IntAttribute*> (mcu.steerEngine.getAttribute("gridDatabaseOptions.maxItemsPerGridCell"))->getValue();
+	maxItemsPerGridCell = 30;
 	steerOptions->gridDatabaseOptions.numGridCellsX = numGridCellsX;
 	steerOptions->gridDatabaseOptions.numGridCellsZ = numGridCellsZ;
 	steerOptions->gridDatabaseOptions.maxItemsPerGridCell = maxItemsPerGridCell;
@@ -47,6 +48,11 @@ void SBSteerManager::start()
 	LOG("INIT STEERSIM");
 	try {
 		mcu.steerEngine.init(steerOptions);
+	} catch (Util::GenericException& ge) {
+		LOG("Problem starting steering engine: %s", ge.what()); 
+		mcu.steerEngine.finish();
+		delete steerOptions;
+		return;
 	} catch (exception& e) {
 		if (e.what())
 			LOG("Problem starting steering engine: %s", e.what()); 

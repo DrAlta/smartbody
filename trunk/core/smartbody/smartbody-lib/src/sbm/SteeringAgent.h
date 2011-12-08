@@ -138,6 +138,10 @@ class SteeringAgent
 		std::string startingRName;
 		std::string idleTurnName;
 		std::string jumpName;
+
+		protected:
+		std::string lastMessage;
+		int numMessageRepeats;
 };
 
 #endif
