@@ -26,7 +26,11 @@
 
 #include "OgreRenderer.h"
 
+#ifdef WIN32
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+#else
+int main(int argc, char* argv[])
+#endif
 {
 		// Create application object
 	OgreRenderer app;
@@ -34,8 +38,14 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	app.setUseBoneBus(true);
 
 	// Processing command line arguments, if there are, then use dll mode
+#ifdef WIN32
 	std::string commandLine = lpCmdLine;
 	std::stringstream strstr(commandLine);
+#else
+	std::stringstream strstr;
+	for (int i = 0; i < argc; i++)
+		strstr << argv[i];
+#endif
 	std::istream_iterator<std::string> it(strstr);
 	std::istream_iterator<std::string> end;
 	std::vector<std::string> tokenzied(it, end);
@@ -83,7 +93,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	}
 	catch ( Exception & e )
 	{
+#ifdef WIN32
 		MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
+#else
+		printf("An exception has occured: %s", e.getFullDescription().c_str());
+#endif
 	}
 
 	return 0;

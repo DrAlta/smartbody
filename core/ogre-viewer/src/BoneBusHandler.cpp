@@ -1,5 +1,6 @@
 #include "BoneBusHandler.h"
 #include "OgreRenderer.h"
+#include <sstream>
 
 void BoneBusHandler::OnClientConnect( const std::string & clientName, void * userData )
 {
@@ -15,11 +16,12 @@ void BoneBusHandler::OnCreateCharacter( const int characterID, const std::string
 		return;
 	OgreRenderer * app = (OgreRenderer *)userData;
 
-	char charIdStr[ 16 ];
-	_itoa( characterID, charIdStr, 10 );
+	std::stringstream strstr;
+	strstr << characterID;
+	std::string charID = strstr.str();
 	Entity * ent;
 
-	if (app->getSceneManager()->hasEntity(charIdStr))
+	if (app->getSceneManager()->hasEntity(charID.c_str()))
 	{
 		// id exists - remove it before creating the character again
 		OnDeleteCharacter(characterID, userData);
@@ -28,18 +30,18 @@ void BoneBusHandler::OnCreateCharacter( const int characterID, const std::string
 	try
 	{
 		//Create character from characterType
-		ent = app->getSceneManager()->createEntity( charIdStr, characterType + ".mesh" );
+		ent = app->getSceneManager()->createEntity( charID.c_str(), characterType + ".mesh" );
 	}
 	catch( Ogre::ItemIdentityException& )
 	{
 		//Default to existing Brad character
-		ent = app->getSceneManager()->createEntity( charIdStr, "Brad.mesh" );
+		ent = app->getSceneManager()->createEntity( charID.c_str(), "Brad.mesh" );
 	}
 	catch( Ogre::Exception& e )
 	{
 		if( e.getNumber() == Ogre::Exception::ERR_FILE_NOT_FOUND ) {
 			//Default to existing Brad character
-			ent = app->getSceneManager()->createEntity( charIdStr, "Brad.mesh" );
+			ent = app->getSceneManager()->createEntity( charID.c_str(), "Brad.mesh" );
 		} else {
 			// Re-throw exception for outer catch block
 			throw;
@@ -61,8 +63,8 @@ void BoneBusHandler::OnCreateCharacter( const int characterID, const std::string
 		(*lastPosTimes)[x] = -1;
 		(*lastRotTimes)[x] = -1;
 	}
-	app->m_lastPosTimes[charIdStr] = lastPosTimes;
-	app->m_lastRotTimes[charIdStr] = lastRotTimes;
+	app->m_lastPosTimes[charID.c_str()] = lastPosTimes;
+	app->m_lastRotTimes[charID.c_str()] = lastRotTimes;
 
 	Ogre::Skeleton* skel = NULL;
 
@@ -93,7 +95,7 @@ void BoneBusHandler::OnCreateCharacter( const int characterID, const std::string
 	
 
 	// Add entity to the scene node
-	SceneNode * mSceneNode = app->getSceneManager()->getRootSceneNode()->createChildSceneNode( charIdStr );
+	SceneNode * mSceneNode = app->getSceneManager()->getRootSceneNode()->createChildSceneNode( charID.c_str() );
 	mSceneNode->attachObject( ent );
 
 }
@@ -105,10 +107,11 @@ void BoneBusHandler::OnUpdateCharacter( const int characterID, const std::string
 
 	OgreRenderer * app = (OgreRenderer *)userData;
 
-	char charIdStr[ 16 ];
-	_itoa( characterID, charIdStr, 10 );
+	std::stringstream strstr;
+	strstr << characterID;
+	std::string charID = strstr.str();
 
-	if (!app->getSceneManager()->hasEntity(charIdStr))
+	if (!app->getSceneManager()->hasEntity(charID.c_str()))
 		OnCreateCharacter(characterID, characterType, characterName, skeletonType, userData);			
 }
 
@@ -118,12 +121,13 @@ void BoneBusHandler::OnDeleteCharacter( const int characterID, void * userData )
 
 	OgreRenderer * app = (OgreRenderer *)userData;
 
-	char charIdStr[ 16 ];
-	_itoa( characterID, charIdStr, 10 );
-	SceneNode * node = (SceneNode *)app->getSceneManager()->getRootSceneNode()->getChild( charIdStr );
+	std::stringstream strstr;
+	strstr << characterID;
+	std::string charID = strstr.str();
+	SceneNode * node = (SceneNode *)app->getSceneManager()->getRootSceneNode()->getChild( charID.c_str() );
 	node->detachAllObjects();
-	app->getSceneManager()->destroyEntity( charIdStr );
-	app->getSceneManager()->getRootSceneNode()->removeAndDestroyChild( charIdStr );
+	app->getSceneManager()->destroyEntity( charID.c_str() );
+	app->getSceneManager()->getRootSceneNode()->removeAndDestroyChild( charID.c_str() );
 	//Remove initial bone positions for the character
 	app->characterInitBonePosMap.erase(characterID);
 
@@ -144,17 +148,18 @@ void BoneBusHandler::OnSetCharacterPosition( const int characterID, const float 
 	}
 	else
 	{
-		char charIdStr[ 16 ];
-		_itoa( characterID, charIdStr, 10 );
+		std::stringstream strstr;
+		strstr << characterID;
+		std::string charID = strstr.str();
 		
 
-		if (!app->getSceneManager()->hasEntity(charIdStr))
+		if (!app->getSceneManager()->hasEntity(charID.c_str()))
 			return;
 		
 		SceneNode* sceneNode = app->getSceneManager()->getRootSceneNode();
 		if (sceneNode)
 		{
-			Node * node = sceneNode->getChild( charIdStr );
+			Node * node = sceneNode->getChild( charID.c_str() );
 			if (node)
 				node->setPosition( x, y, z );
 		}
@@ -175,16 +180,17 @@ void BoneBusHandler::OnSetCharacterRotation( const int characterID, const float 
 	}
 	else
 	{
-		char charIdStr[ 16 ];
-		_itoa( characterID, charIdStr, 10 );
+		std::stringstream strstr;
+		strstr << characterID;
+		std::string charID = strstr.str();
 
-		if (!app->getSceneManager()->hasEntity(charIdStr))
+		if (!app->getSceneManager()->hasEntity(charID.c_str()))
 			return;
 
 		SceneNode* sceneNode = app->getSceneManager()->getRootSceneNode();
 		if (sceneNode)
 		{
-			Node * node = sceneNode->getChild( charIdStr );
+			Node * node = sceneNode->getChild( charID.c_str() );
 			if (node)
 				node->setOrientation( Quaternion( w, x, y, z ) );
 		}
@@ -209,20 +215,22 @@ void BoneBusHandler::OnBoneRotations( const bonebus::BulkBoneRotations * bulkBon
 
 
 	char charIdStrBuff[ 36 ];
-	std::string charIdStr = std::string( _itoa( bulkBoneRotations->charId, charIdStrBuff, 10 ) );
+	std::stringstream strstr;
+	strstr << bulkBoneRotations->charId;
+	std::string charID = strstr.str();
 
 	SceneNode * n;
 
 	try
 	{
-		n = (SceneNode *)app->getSceneManager()->getRootSceneNode()->getChild( charIdStr );
+		n = (SceneNode *)app->getSceneManager()->getRootSceneNode()->getChild( charID.c_str() );
 	}
 	catch ( Exception )
 	{
 		return;
 	}
 
-	Entity * ent = (Entity *)n->getAttachedObject( charIdStr );
+	Entity * ent = (Entity *)n->getAttachedObject( charID.c_str() );
 	if ( ent == NULL )
 	{
 		return;
@@ -230,13 +238,13 @@ void BoneBusHandler::OnBoneRotations( const bonebus::BulkBoneRotations * bulkBon
 
 	Ogre::Skeleton* skel = ent->getSkeleton();
 
-	std::map<std::string, std::vector<int>*>::iterator iter = app->m_lastRotTimes.find(charIdStr);
+	std::map<std::string, std::vector<int>*>::iterator iter = app->m_lastRotTimes.find(charID.c_str());
 	if (iter == app->m_lastRotTimes.end())
 		return;
 	std::vector<int>* lastTimes = (*iter).second;
 
 
-	std::map<std::string, std::vector<std::string> >::iterator iter2 = app->m_skeletonMap.find(charIdStr);
+	std::map<std::string, std::vector<std::string> >::iterator iter2 = app->m_skeletonMap.find(charID.c_str());
 	if (iter2 == app->m_skeletonMap.end())
 		return;
 
@@ -292,21 +300,22 @@ void BoneBusHandler::OnBonePositions( const bonebus::BulkBonePositions * bulkBon
 	OgreRenderer * app = (OgreRenderer *)userData;
 
 
-	char charIdStrBuff[ 36 ];
-	std::string charIdStr = std::string( _itoa( bulkBonePositions->charId, charIdStrBuff, 10 ) );
+	std::stringstream strstr;
+	strstr << bulkBonePositions->charId;
+	std::string charID = strstr.str();
 
 	SceneNode * n;
 
 	try
 	{
-		n = (SceneNode *)app->getSceneManager()->getRootSceneNode()->getChild( charIdStr );
+		n = (SceneNode *)app->getSceneManager()->getRootSceneNode()->getChild( charID.c_str() );
 	}
 	catch ( Exception )
 	{
 		return;
 	}
 
-	Entity * ent = (Entity *)n->getAttachedObject( charIdStr );
+	Entity * ent = (Entity *)n->getAttachedObject( charID.c_str() );
 	if ( ent == NULL )
 	{
 		return;
@@ -314,12 +323,12 @@ void BoneBusHandler::OnBonePositions( const bonebus::BulkBonePositions * bulkBon
 
 	Ogre::Skeleton* skel = ent->getSkeleton();
 
-	std::map<std::string, std::vector<int>*>::iterator iter = app->m_lastPosTimes.find(charIdStr);
+	std::map<std::string, std::vector<int>*>::iterator iter = app->m_lastPosTimes.find(charID.c_str());
 	if (iter == app->m_lastPosTimes.end())
 		return;
 	std::vector<int>* lastTimes = (*iter).second;
 
-	std::map<std::string, std::vector<std::string> >::iterator iter2 = app->m_skeletonMap.find(charIdStr);
+	std::map<std::string, std::vector<std::string> >::iterator iter2 = app->m_skeletonMap.find(charID.c_str());
 	if (iter2 == app->m_skeletonMap.end())
 		return;
 	std::vector<std::string>& skeletonMap = (*iter2).second;
@@ -375,14 +384,15 @@ void BoneBusHandler::OnBoneId( const int characterID, const std::string boneName
 {
 	OgreRenderer * app = (OgreRenderer *)user_data;
 
-	char charIdStrBuff[ 36 ];
-	std::string charIdStr = std::string( _itoa( characterID, charIdStrBuff, 10 ) );
+	std::stringstream strstr;
+	strstr << characterID;
+	std::string charID = strstr.str();
 
-	std::map<std::string, std::vector<std::string> >::iterator iter = app->m_skeletonMap.find(charIdStr);
+	std::map<std::string, std::vector<std::string> >::iterator iter = app->m_skeletonMap.find(charID.c_str());
 	if (iter == app->m_skeletonMap.end())
 	{
-		app->m_skeletonMap[charIdStr] = std::vector<std::string>();
-		iter = app->m_skeletonMap.find(charIdStr);
+		app->m_skeletonMap[charID.c_str()] = std::vector<std::string>();
+		iter = app->m_skeletonMap.find(charID.c_str());
 		(*iter).second.resize(1000);
 	}
 	std::vector<std::string>& localSkeletonMap = (*iter).second;
@@ -398,14 +408,15 @@ void BoneBusHandler::OnVisemeId( const int characterID, const std::string viseme
 {
 	OgreRenderer * app = (OgreRenderer *)user_data;
 
-	char charIdStrBuff[ 36 ];
-	std::string charIdStr = std::string( _itoa( characterID, charIdStrBuff, 10 ) );
+	std::stringstream strstr;
+	strstr << characterID;
+	std::string charID = strstr.str();
 
-	std::map<std::string, std::vector<std::string> >::iterator iter = app->m_visemeMap.find(charIdStr);
+	std::map<std::string, std::vector<std::string> >::iterator iter = app->m_visemeMap.find(charID.c_str());
 	if (iter == app->m_visemeMap.end())
 	{
-		app->m_visemeMap[charIdStr] = std::vector<std::string>();
-		iter = app->m_visemeMap.find(charIdStr);
+		app->m_visemeMap[charID.c_str()] = std::vector<std::string>();
+		iter = app->m_visemeMap.find(charID.c_str());
 		(*iter).second.resize(1000);
 	}
 	std::vector<std::string>& localVisemeMap = (*iter).second;

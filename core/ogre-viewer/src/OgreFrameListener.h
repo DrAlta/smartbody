@@ -4,7 +4,7 @@
 #include "vhcl.h"
 #include "bonebus.h"
 #include "smartbody-dll.h"
-#include <ExampleApplication.h>
+#include "ExampleApplication.h"
 
 // Event handler to animate
 class OgreFrameListener : public ExampleFrameListener
