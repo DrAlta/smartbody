@@ -23,10 +23,22 @@ build-essential
 mono-devel
 mono-xbuild
 python-dev
+libopenal-dev
+libsndfile-dev
+libalut-dev
 
 To install the Festival text-to-speech engine, you need:
 
 festival-dev
+
+To run the Ogre3D renderer you need to install:
+libzzip-dev
+libxaw7-dev
+libxxf86vm-dev 
+libxrandr-dev 
+libfreeimage-dev
+nvidia-cg-toolkit
+libois-dev
 
 To run the test suite, you need:
 

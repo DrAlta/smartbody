@@ -1,5 +1,5 @@
 #include "SBListener.h"
-#include <ExampleApplication.h>
+#include "ExampleApplication.h"
 #include "OgreRenderer.h"
 #include "OgreFrameListener.h"
 
@@ -97,7 +97,7 @@ void SBListener::OnCharacterDelete( const  std::string & name )
 			frameListener->m_characterList.erase(frameListener->m_characterList.begin() + eraseId);
 
 		// delete from initial bone position map
-		std::map<std::string, std::map<std::string, Ogre::Vector3>>::iterator iter = frameListener->m_initialBonePositions.find(name);
+		std::map<std::string, std::map<std::string, Ogre::Vector3> >::iterator iter = frameListener->m_initialBonePositions.find(name);
 		if (iter != frameListener->m_initialBonePositions.end())
 			frameListener->m_initialBonePositions.erase(iter);
 	}

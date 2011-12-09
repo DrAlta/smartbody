@@ -9,7 +9,7 @@
 #include <map>
 
 #include <Ogre.h>
-#include <ExampleApplication.h>
+#include "ExampleApplication.h"
 #include "SBListener.h"
 #include "OgreFrameListener.h"
 
