@@ -7,7 +7,7 @@ SBAnimationState::SBAnimationState() : PAStateData()
 {
 }
 
-SBAnimationState::SBAnimationState(std::string name) : PAStateData(name)
+SBAnimationState::SBAnimationState(const std::string& name) : PAStateData(name)
 {
 }
 
@@ -15,7 +15,7 @@ SBAnimationState::~SBAnimationState()
 {
 }
 
-void SBAnimationState::addCorrespondancePoints(std::vector<std::string> motionNames, std::vector<double> points)
+void SBAnimationState::addCorrespondancePoints(const std::vector<std::string>& motionNames, const std::vector<double>& points)
 {
 	if (motions.size() == 0)
 	{
@@ -99,7 +99,7 @@ std::string SBAnimationState::getDimension()
 	return _dimension;
 }
 
-bool SBAnimationState::addSkMotion(std::string motion)
+bool SBAnimationState::addSkMotion(const std::string& motion)
 {
 	//TODO: remove weights from SBAnimationState
 	if (motions.size() == 0)
@@ -110,7 +110,7 @@ bool SBAnimationState::addSkMotion(std::string motion)
 
 	//TODO: remove skMotion maybe
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SkMotion* skMotion = mcu.lookUpMotion(motion.c_str());
+	SkMotion* skMotion = mcu.getMotion(motion);
 	if (skMotion)
 	{
 		motions.push_back(skMotion);
@@ -147,7 +147,7 @@ SBAnimationState0D::SBAnimationState0D() : SBAnimationState("unknown")
 {
 }
 
-SBAnimationState0D::SBAnimationState0D(std::string name) : SBAnimationState(name)
+SBAnimationState0D::SBAnimationState0D(const std::string& name) : SBAnimationState(name)
 {
 	_dimension = "0D";
 }
@@ -156,7 +156,7 @@ SBAnimationState0D::~SBAnimationState0D()
 {
 }
 
-void SBAnimationState0D::addMotion(std::string motion)
+void SBAnimationState0D::addMotion(const std::string& motion)
 {
 	addSkMotion(motion);
 }
@@ -166,7 +166,7 @@ SBAnimationState1D::SBAnimationState1D() : SBAnimationState("unknown")
 }
 
 
-SBAnimationState1D::SBAnimationState1D(std::string name) : SBAnimationState(name)
+SBAnimationState1D::SBAnimationState1D(const std::string& name) : SBAnimationState(name)
 {
 	_dimension = "1D";
 }
@@ -175,7 +175,7 @@ SBAnimationState1D::~SBAnimationState1D()
 {
 }
 
-void SBAnimationState1D::addMotion(std::string motion, float parameter)
+void SBAnimationState1D::addMotion(const std::string& motion, float parameter)
 {
 	addSkMotion(motion);
 
@@ -183,7 +183,7 @@ void SBAnimationState1D::addMotion(std::string motion, float parameter)
 	paramManager->setParameter(motion, parameter);
 }
 
-void SBAnimationState1D::setParameter(std::string motion, float parameter)
+void SBAnimationState1D::setParameter(const std::string& motion, float parameter)
 {
 	paramManager->setParameter(motion, parameter);
 }
@@ -192,7 +192,7 @@ SBAnimationState2D::SBAnimationState2D() : SBAnimationState("unknown")
 {
 }
 
-SBAnimationState2D::SBAnimationState2D(std::string name) : SBAnimationState(name)
+SBAnimationState2D::SBAnimationState2D(const std::string& name) : SBAnimationState(name)
 {
 	_dimension = "2D";
 }
@@ -201,7 +201,7 @@ SBAnimationState2D::~SBAnimationState2D()
 {
 }
 
-void SBAnimationState2D::addMotion(std::string motion, float parameter1, float parameter2)
+void SBAnimationState2D::addMotion(const std::string& motion, float parameter1, float parameter2)
 {
 	addSkMotion(motion);
 	
@@ -209,12 +209,12 @@ void SBAnimationState2D::addMotion(std::string motion, float parameter1, float p
 	paramManager->setParameter(motion, parameter1, parameter2);
 }
 
-void SBAnimationState2D::setParameter(std::string motion, float parameter1, float parameter2)
+void SBAnimationState2D::setParameter(const std::string& motion, float parameter1, float parameter2)
 {
 	paramManager->setParameter(motion, parameter1, parameter2);
 }
 
-void SBAnimationState2D::addTriangle(std::string motion1, std::string motion2, std::string motion3)
+void SBAnimationState2D::addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
 {
 	paramManager->addTriangle(motion1, motion2, motion3);
 }
@@ -224,7 +224,7 @@ SBAnimationState3D::SBAnimationState3D() : SBAnimationState("unknown")
 }
 
 
-SBAnimationState3D::SBAnimationState3D(std::string name) : SBAnimationState(name)
+SBAnimationState3D::SBAnimationState3D(const std::string& name) : SBAnimationState(name)
 {
 	_dimension = "3D";
 }
@@ -234,7 +234,7 @@ SBAnimationState3D::~SBAnimationState3D()
 }
 
 
-void SBAnimationState3D::addMotion(std::string motion, float parameter1, float parameter2, float parameter3)
+void SBAnimationState3D::addMotion(const std::string& motion, float parameter1, float parameter2, float parameter3)
 {
 	addSkMotion(motion);
 	
@@ -242,12 +242,12 @@ void SBAnimationState3D::addMotion(std::string motion, float parameter1, float p
 	paramManager->setParameter(motion, parameter1, parameter2, parameter3);
 }
 
-void SBAnimationState3D::setParameter(std::string motion, float parameter1, float parameter2, float parameter3)
+void SBAnimationState3D::setParameter(const std::string& motion, float parameter1, float parameter2, float parameter3)
 {
 	paramManager->setParameter(motion, parameter1, parameter2, parameter3);
 }
 
-void SBAnimationState3D::addTetrahedron(std::string motion1, std::string motion2, std::string motion3,std::string motion4)
+void SBAnimationState3D::addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
 {
 	paramManager->addTetrahedron(motion1, motion2, motion3, motion4);
 }

@@ -12,17 +12,17 @@ class SBAnimationStateManager
 		SBAnimationStateManager();
 		~SBAnimationStateManager();
 
-		SBAnimationState0D* createState0D(std::string name);
-		SBAnimationState1D* createState1D(std::string name);
-		SBAnimationState2D* createState2D(std::string name);
-		SBAnimationState3D* createState3D(std::string name);
-		SBAnimationTransition* createTransition(std::string source, std::string dest);
+		SBAnimationState0D* createState0D(const std::string& name);
+		SBAnimationState1D* createState1D(const std::string& name);
+		SBAnimationState2D* createState2D(const std::string& name);
+		SBAnimationState3D* createState3D(const std::string& name);
+		SBAnimationTransition* createTransition(const std::string& source, const std::string& dest);
 
-		SBAnimationState* getState(std::string name);
+		SBAnimationState* getState(const std::string&name);
 		int getNumStates();
 		std::vector<std::string> getStateNames();
 
-		SBAnimationTransition* getTransition(std::string source, std::string dest);
+		SBAnimationTransition* getTransition(const std::string& source, const std::string& dest);
 		int getNumTransitions();
 		std::vector<std::string> getTransitionNames();
 
