@@ -1006,8 +1006,8 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 		}
 
 	PAStateData* curState =  character->param_animation_ct->getCurrentPAStateData();
-	std::string curStateName = character->param_animation_ct->getCurrentStateName();
-	std::string nextStateName = character->param_animation_ct->getNextStateName();
+	const std::string& curStateName = character->param_animation_ct->getCurrentStateName();
+	const std::string& nextStateName = character->param_animation_ct->getNextStateName();
 
 	//---If you are close enough to the target when starting locomotion, use step adjust
 	if (character->param_animation_ct->isIdle() && (agentToTargetDist > distDownThreshold))

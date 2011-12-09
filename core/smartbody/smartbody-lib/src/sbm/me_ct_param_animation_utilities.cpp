@@ -446,7 +446,7 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 			const std::string& chanName = motionChan.name(i);
 			for (int j = 1; j < numMotions; j++)
 			{
-				int id = motions[indices[j]]->channels().search(chanName.c_str(), motionChan[i].type);
+				int id = motions[indices[j]]->channels().search(chanName, motionChan[i].type);
 				if (id < 0)
 					continue;
 				int buffId = motionContextMaps[indices[0]].get(i);

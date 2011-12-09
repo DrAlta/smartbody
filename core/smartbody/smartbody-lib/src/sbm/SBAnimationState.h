@@ -9,10 +9,10 @@ class SBAnimationState : public PAStateData
 {
 	public:
 		SBAnimationState();
-		SBAnimationState(std::string name);
+		SBAnimationState(const std::string& name);
 		~SBAnimationState();
 
-		void addCorrespondancePoints(std::vector<std::string> motions, std::vector<double> points);
+		void addCorrespondancePoints(const std::vector<std::string>& motions, const std::vector<double>& points);
 
 		virtual int getNumMotions();
 		virtual std::string getMotion(int num);
@@ -22,7 +22,7 @@ class SBAnimationState : public PAStateData
 		virtual std::string getDimension();
 
 	protected:
-		bool addSkMotion(std::string motionName);
+		bool addSkMotion(const std::string& motionName);
 		/*
 			This function make sure that all the correspondance points are in ascendant order
 		*/
@@ -38,45 +38,45 @@ class SBAnimationState0D : public SBAnimationState
 {
 	public:
 		SBAnimationState0D();
-		SBAnimationState0D(std::string name);
+		SBAnimationState0D(const std::string& name);
 		~SBAnimationState0D();
 
-		void addMotion(std::string motion);
+		void addMotion(const std::string& motion);
 };
 
 class SBAnimationState1D : public SBAnimationState
 {
 	public:
 		SBAnimationState1D();
-		SBAnimationState1D(std::string name);
+		SBAnimationState1D(const std::string& name);
 		~SBAnimationState1D();
 
-		void addMotion(std::string motion, float parameter);
-		void setParameter(std::string motion, float parameter);
+		void addMotion(const std::string& motion, float parameter);
+		void setParameter(const std::string& motion, float parameter);
 };
 
 class SBAnimationState2D : public SBAnimationState
 {
 	public:
 		SBAnimationState2D();
-		SBAnimationState2D(std::string name);
+		SBAnimationState2D(const std::string& name);
 		~SBAnimationState2D();
 
-		void addMotion(std::string motion, float parameter1, float paramter2);
-		void setParameter(std::string motion, float parameter1, float parameter2);
-		void addTriangle(std::string motion1, std::string motion2, std::string motion3);
+		void addMotion(const std::string& motion, float parameter1, float paramter2);
+		void setParameter(const std::string& motion, float parameter1, float parameter2);
+		void addTriangle(const std::string& motion1, const std::string& motion2, const std::string&motion3);
 };
 
 class SBAnimationState3D : public SBAnimationState
 {
 	public:
 		SBAnimationState3D();
-		SBAnimationState3D(std::string name);
+		SBAnimationState3D(const std::string& name);
 		~SBAnimationState3D();
 
-		void addMotion(std::string motion, float parameter1, float paramter2, float paramter3);
-		void setParameter(std::string motion, float parameter1, float parameter2, float parameter3);
-		void addTetrahedron(std::string motion1, std::string motion2, std::string motion3,std::string motion4);
+		void addMotion(const std::string& motion, float parameter1, float paramter2, float paramter3);
+		void setParameter(const std::string& motion, float parameter1, float parameter2, float parameter3);
+		void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
 
 };
 }

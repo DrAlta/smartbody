@@ -104,7 +104,8 @@ void TBOData::UpdateTBOData( float* pData )
 {
 	glBindBuffer(GL_TEXTURE_BUFFER_EXT, m_iTBO_ID);	
 	float* pPBOData = (float*) glMapBuffer(GL_TEXTURE_BUFFER_EXT,GL_WRITE_ONLY);
-	memcpy(pPBOData,pData,sizeof(float)*m_nDataSize);
+	if (pPBOData)
+		memcpy(pPBOData,pData,sizeof(float)*m_nDataSize);
 	glUnmapBuffer(GL_TEXTURE_BUFFER_EXT);
 }
 

@@ -11,7 +11,7 @@ SBAnimationStateManager::~SBAnimationStateManager()
 {
 }
 
-SBAnimationState0D* SBAnimationStateManager::createState0D(std::string name)
+SBAnimationState0D* SBAnimationStateManager::createState0D(const std::string& name)
 {
 	SBAnimationState0D* state = new SBAnimationState0D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -19,7 +19,7 @@ SBAnimationState0D* SBAnimationStateManager::createState0D(std::string name)
 	return state;
 }
 
-SBAnimationState1D* SBAnimationStateManager::createState1D(std::string name)
+SBAnimationState1D* SBAnimationStateManager::createState1D(const std::string& name)
 {
 	SBAnimationState1D* state = new SBAnimationState1D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -27,7 +27,7 @@ SBAnimationState1D* SBAnimationStateManager::createState1D(std::string name)
 	return state;
 }
 
-SBAnimationState2D* SBAnimationStateManager::createState2D(std::string name)
+SBAnimationState2D* SBAnimationStateManager::createState2D(const std::string& name)
 {
 	SBAnimationState2D* state = new SBAnimationState2D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -35,7 +35,7 @@ SBAnimationState2D* SBAnimationStateManager::createState2D(std::string name)
 	return state;
 }
 
-SBAnimationState3D* SBAnimationStateManager::createState3D(std::string name)
+SBAnimationState3D* SBAnimationStateManager::createState3D(const std::string& name)
 {
 	SBAnimationState3D* state = new SBAnimationState3D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -43,7 +43,7 @@ SBAnimationState3D* SBAnimationStateManager::createState3D(std::string name)
 	return state;
 }
 
-SBAnimationTransition* SBAnimationStateManager::createTransition(std::string source, std::string dest)
+SBAnimationTransition* SBAnimationStateManager::createTransition(const std::string& source, const std::string& dest)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SBAnimationState* sourceState = getState(source);
@@ -64,7 +64,7 @@ SBAnimationTransition* SBAnimationStateManager::createTransition(std::string sou
 	return transition;
 }
 
-SBAnimationState* SBAnimationStateManager::getState(std::string name)
+SBAnimationState* SBAnimationStateManager::getState(const std::string& name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
@@ -92,7 +92,7 @@ std::vector<std::string> SBAnimationStateManager::getStateNames()
 	return states;
 }
 
-SBAnimationTransition* SBAnimationStateManager::getTransition(std::string source, std::string dest)
+SBAnimationTransition* SBAnimationStateManager::getTransition(const std::string& source, const std::string& dest)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
