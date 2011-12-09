@@ -32,6 +32,7 @@ To install the Festival text-to-speech engine, you need:
 festival-dev
 
 To run the Ogre3D renderer you need to install:
+
 libzzip-dev
 libxaw7-dev
 libxxf86vm-dev 
@@ -40,9 +41,12 @@ libfreeimage-dev
 nvidia-cg-toolkit
 libois-dev
 
+The Ogre-based renderer is not built by default. To build it, you will need to download the 1.6.5 source (www.ogre3d.org/download/source), build and install it into /usr/local. Next, uncomment the core/ogre-viewer directory from the core/CMakeLists.txt file. This will add the ogreviewer to the build - it will be located in core/ogre-viewer/bin.
+
 To run the test suite, you need:
 
 imagemagick
+
 
 
 
