@@ -422,6 +422,7 @@ void mcuCBHandle::registerCallbacks()
 	insert( "unregisterevent",     unregisterevent_func );
 	insert( "setmap",			   setmap_func );
 	insert( "motionmap",		   motionmap_func );
+	insert( "motionmapdir",		   motionmapdir_func );
 	insert( "skeletonmap",		   skeletonmap_func );
 	insert( "steer",			   mcu_steer_func);	
 	insert( "characters",		   showcharacters_func );
