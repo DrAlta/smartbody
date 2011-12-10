@@ -5315,6 +5315,84 @@ int setmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
+int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	std::string directory = args.read_token();
+	if (directory.size() == 0 || directory == "help")
+	{
+		LOG("Use: motionmapdir <directory> <map>");
+		return CMD_SUCCESS;
+	}
+
+	std::string mapName = args.read_token();
+	if (mapName.size() == 0)
+	{
+		LOG("Use: motionmapdir <directory> <map>");
+		return CMD_SUCCESS;
+	}
+
+	BoneMap* boneMap = NULL;
+	std::map<std::string, BoneMap*>::iterator boneMapIter = mcu_p->boneMaps.find(mapName);
+	if (boneMapIter == mcu_p->boneMaps.end())
+	{
+		LOG("Cannot find bone map name '%s'.", mapName.c_str());
+		return CMD_FAILURE;
+	}
+
+	std::string mediaPath = mcuCBHandle::singleton().getMediaPath();
+
+	boost::filesystem::path path(directory);
+	boost::filesystem::path finalPath;
+	// include the media path in the pathname if applicable
+	std::string rootDir = path.root_directory();
+	if (rootDir.size() == 0)
+	{	
+		finalPath = operator/(mediaPath, path);
+	}
+	else
+	{
+		finalPath = path;
+	}
+	LOG("MOTIONMAPDIR TO %s", finalPath.string().c_str());
+
+	SBScene* scene = mcu_p->_scene;
+
+	std::vector<std::string> motionNames = scene->getMotionNames();
+	for (std::vector<std::string>::iterator iter = motionNames.begin();
+		 iter != motionNames.end();
+		 iter++)
+	{
+		SBMotion* motion = scene->getMotion((*iter));
+		const std::string& fileName = motion->getMotionFileName();
+		boost::filesystem::path motionPath(fileName);
+		std::string motionRootDir = motionPath.root_directory();
+		boost::filesystem::path finalMotionPath;
+		if (motionRootDir.size() == 0)
+		{
+			finalMotionPath = operator/(mediaPath, motionPath);
+		}
+		boost::filesystem::path currentPath = finalMotionPath;
+		while (currentPath.has_parent_path())
+		{
+			boost::filesystem::path parentPath = currentPath.parent_path();
+			if (boost::filesystem2::equivalent(parentPath, finalPath))
+			{
+				std::stringstream strstr;
+				strstr << "motionmap " << motion->getName() << " " << mapName;
+				mcu_p->execute((char*) strstr.str().c_str());
+				break;
+			}
+			else
+			{
+				currentPath = currentPath.parent_path();
+			}
+		}
+
+	}
+
+	return CMD_SUCCESS;
+
+}
 
 int motionmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
