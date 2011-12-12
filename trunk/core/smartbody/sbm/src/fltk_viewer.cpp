@@ -1279,18 +1279,18 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		*/
 	}	
 	
-	static GLfloat mat_emissin[] = { 0.0,  0.0,    0.0,    1.0 };
-	static GLfloat mat_ambient[] = { 0.0,  0.0,    0.0,    1.0 };
-	static GLfloat mat_diffuse[] = { 1.0,  1.0,    1.0,    1.0 };
-	static GLfloat mat_speclar[] = { 0.0,  0.0,    0.0,    1.0 };
+	static GLfloat mat_emissin[] = { 0.f,  0.f,    0.f,    1.f };
+	static GLfloat mat_ambient[] = { 0.f,  0.f,    0.f,    1.f };
+	static GLfloat mat_diffuse[] = { 0.1f,  0.3f,    0.1f,    1.f };
+	static GLfloat mat_speclar[] = { 0.f,  0.f,    0.f,    1.f };
 	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin );
 	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient );
 	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse );
 	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, mat_speclar );
 	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
 	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
-	float floorSize = 500;
-	float planeY = -0.1f;
+	float floorSize = 1200;
+	float planeY = -0.5f;
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,0);
 	glNormal3f(0,1,0);
@@ -2991,11 +2991,11 @@ void FltkViewer::drawCharacterPhysicsObjs()
 			SrMat gmat = obj->getGlobalTransform().gmat();
 			this->drawColObject(obj->getColObj(), gmat);
 
-			SBJoint* joint = obj->getJoint();	
+			SBJoint* joint = obj->getSBJoint();	
 			SbmPhysicsSim* physics = mcu.getPhysicsEngine();
 			if (physics)
 			{
-				SrVec jointPos = physics->getJointConstraintPos(joint);
+				SrVec jointPos = physics->getJointConstraintPos(obj->getPhyJoint());
 				SrSnSphere sphere;				
 				sphere.shape().center = jointPos;//SrVec(0,-cap->extent,0);
 				sphere.shape().radius = character->getHeight()*0.022f;
