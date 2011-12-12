@@ -1095,7 +1095,7 @@ void FltkViewer::updateLights()
 		SrLight light;
 		light.directional = false;
 		light.directional = true;
-		light.diffuse = SrColor( 1.0f, 0.95f, 0.8f );
+		light.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
 		light.position = SrVec( 100.0, 250.0, 400.0 );
 	//	light.constant_attenuation = 1.0f/cam.scale;
 		light.constant_attenuation = 1.0f;
@@ -1103,7 +1103,7 @@ void FltkViewer::updateLights()
 
 		SrLight light2 = light;
 		light2.directional = false;
-		light2.diffuse = SrColor( 0.8f, 0.85f, 1.0f );
+		light2.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
 		light2.position = SrVec( 100.0, 500.0, -200.0 );
 	//	light2.constant_attenuation = 1.0f;
 	//	light2.linear_attenuation = 2.0f;
@@ -1281,8 +1281,8 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	
 	static GLfloat mat_emissin[] = { 0.f,  0.f,    0.f,    1.f };
 	static GLfloat mat_ambient[] = { 0.f,  0.f,    0.f,    1.f };
-	static GLfloat mat_diffuse[] = { 0.1f,  0.3f,    0.1f,    1.f };
-	static GLfloat mat_speclar[] = { 0.f,  0.f,    0.f,    1.f };
+	static GLfloat mat_diffuse[] = { 0.8f,  0.8f,    0.8f,    1.f };
+	static GLfloat mat_speclar[] = { 0.f,  0.f,    0.f,    1.f }; 
 	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin );
 	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient );
 	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse );
@@ -1600,7 +1600,8 @@ void FltkViewer::translate_keyboard_state()
 				if (_paLocoData->character)
 					_paLocoData->character->unregisterObserver(this);
 				_paLocoData->character = actor;
-				_paLocoData->character->registerObserver(this);
+				if (_paLocoData->character)
+					_paLocoData->character->registerObserver(this);
 				break;
 			}
 
