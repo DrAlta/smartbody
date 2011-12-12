@@ -161,6 +161,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
+				AdditionalOptions="/Stack:10000000"
 				AdditionalDependencies="Smartbody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib fltk.lib fltkgl.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_44.lib boost_system-vc90-mt-1_44.lib boost_regex-vc90-mt-1_44.lib boost_python-vc90-mt-1_44.lib log4cxx.lib dbghelp.lib opengl32.lib glu32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAI.lib steerlib.lib ode_double.lib"
 				OutputFile="..\bin\sbm-fltk.exe"
 				LinkIncremental="1"

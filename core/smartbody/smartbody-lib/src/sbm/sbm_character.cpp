@@ -500,7 +500,7 @@ void SbmCharacter::locomotion_set_turning_mode(int mode)
 
 void SbmCharacter::updateJointPhyObjs(bool phySim)
 {
-	return;
+	//return;
 	if (!_skeleton)
 		return;
 	if (!phyChar) return;
@@ -569,8 +569,8 @@ void SbmCharacter::buildJointPhyObjs()
 	excludeNameList.insert("l_forefoot");
 	excludeNameList.insert("r_forefoot");
 
-	excludeNameList.insert("r_sternoclavicular");
-	excludeNameList.insert("l_sternoclavicular");
+	//excludeNameList.insert("r_sternoclavicular");
+	//excludeNameList.insert("l_sternoclavicular");
 	//excludeNameList.insert("r_acromioclavicular");
 	//excludeNameList.insert("l_acromioclavicular");
 
