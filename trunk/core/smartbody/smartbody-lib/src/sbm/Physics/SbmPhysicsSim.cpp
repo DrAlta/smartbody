@@ -130,12 +130,29 @@ void SbmPhysicsObj::updatePhySim()
 }
 
 /************************************************************************/
-/* SbmPhyiscJoint                                                       */
+/* Physics Joint                                                        */
 /************************************************************************/
-SbmJointObj::SbmJointObj()
+
+SbmPhysicsJoint::SbmPhysicsJoint( SBJoint* joint )
 {
-	sbmJoint = NULL;
-    parentObj = NULL;
+	sbmJoint = joint;
+	jointTorque = SrVec(0,0,0);
+	parentObj = NULL;
+	childObj = NULL;
+}
+
+unsigned long SbmPhysicsJoint::getID()
+{
+	return (unsigned long)(this);
+}
+/************************************************************************/
+/* SbmJointObj                                                          */
+/************************************************************************/
+
+SbmJointObj::SbmJointObj(SbmPhysicsCharacter* phyc)
+{
+	phyJoint = NULL;
+	phyChar = phyc;
 }
 
 SbmJointObj::~SbmJointObj()
@@ -143,78 +160,107 @@ SbmJointObj::~SbmJointObj()
 
 }
 
-void SbmJointObj::initJoint( SBJoint* joint )
-{		
+SbmPhysicsJoint* SbmJointObj::getChildJoint( int i )
+{
+	SBJoint* joint = getSBJoint();
+	if (i>=0 && i<joint->getNumChildren())
+	{	
+		return phyChar->getPhyJoint(joint->getChild(i)->getName());		
+	}
+	else
+		return NULL;
+}
+
+int SbmJointObj::getNumChildJoints()
+{
+	SBJoint* joint = getSBJoint();
+	return joint->getNumChildren();
+}
+
+void SbmJointObj::initJoint( SbmPhysicsJoint* phyj )
+{	
+	phyJoint = phyj;
+	SBJoint* joint = phyj->getSBJoint();
 	joint->calculateLocalCenter();
 	SrMat tranMat; tranMat.translation(joint->getLocalCenter());	
 	//if (joint->parent()) 
 	SrMat gmat = tranMat*joint->gmat();		
 	setGlobalTransform(gmat);
-	sbmJoint = joint;
 
 	// create physics attributes for the joint
-	if (!joint->getAttribute("type"))
-		joint->createStringAttribute("type","ball",true,"Basic",41,false,false,false,"joint type");	
-	if (!joint->getAttribute("axis0"))
-		joint->createVec3Attribute("axis0",1,0,0,true,"Basic",42,false,false,false,"rotation axis 0");
-	if (!joint->getAttribute("axis1"))
-		joint->createVec3Attribute("axis1",0,1,0,true,"Basic",43,false,false,false,"rotation axis 1");
-	if (!joint->getAttribute("axis2"))
-		joint->createVec3Attribute("axis2",0,0,1,true,"Basic",44,false,false,false,"rotation axis 2");
+	if (!phyJoint->getAttribute("type"))
+		phyJoint->createStringAttribute("type","ball",true,"Basic",41,false,false,false,"joint type");	
+	if (!phyJoint->getAttribute("axis0"))
+		phyJoint->createVec3Attribute("axis0",1,0,0,true,"Basic",42,false,false,false,"rotation axis 0");
+	if (!phyJoint->getAttribute("axis1"))
+		phyJoint->createVec3Attribute("axis1",0,1,0,true,"Basic",43,false,false,false,"rotation axis 1");
+	if (!phyJoint->getAttribute("axis2"))
+		phyJoint->createVec3Attribute("axis2",0,0,1,true,"Basic",44,false,false,false,"rotation axis 2");
 
 	float defaultHigh = 0.3f, defaultLow = -0.3f;
-	if (!joint->getAttribute("axis0LimitHigh"))
-		joint->createDoubleAttribute("axis0LimitHigh", defaultHigh, true,"Basic",45,false,false,false,"upper limit for axis0 rotation" );
-	if (!joint->getAttribute("axis0LimitLow"))
-		joint->createDoubleAttribute("axis0LimitLow", defaultLow, true,"Basic",45,false,false,false,"lower limit for axis0 rotation" );
+	if (!phyJoint->getAttribute("axis0LimitHigh"))
+		phyJoint->createDoubleAttribute("axis0LimitHigh", defaultHigh, true,"Basic",45,false,false,false,"upper limit for axis0 rotation" );
+	if (!phyJoint->getAttribute("axis0LimitLow"))
+		phyJoint->createDoubleAttribute("axis0LimitLow", defaultLow, true,"Basic",45,false,false,false,"lower limit for axis0 rotation" );
 
-	if (!joint->getAttribute("axis1LimitHigh"))
-		joint->createDoubleAttribute("axis1LimitHigh", defaultHigh, true,"Basic",45,false,false,false,"upper limit for axis1 rotation" );
-	if (!joint->getAttribute("axis1LimitLow"))
-		joint->createDoubleAttribute("axis1LimitLow", defaultLow, true,"Basic",45,false,false,false,"lower limit for axis1 rotation" );
+	if (!phyJoint->getAttribute("axis1LimitHigh"))
+		phyJoint->createDoubleAttribute("axis1LimitHigh", defaultHigh, true,"Basic",45,false,false,false,"upper limit for axis1 rotation" );
+	if (!phyJoint->getAttribute("axis1LimitLow"))
+		phyJoint->createDoubleAttribute("axis1LimitLow", defaultLow, true,"Basic",45,false,false,false,"lower limit for axis1 rotation" );
 
-	if (!joint->getAttribute("axis2LimitHigh"))
-		joint->createDoubleAttribute("axis2LimitHigh", defaultHigh, true,"Basic",45,false,false,false,"upper limit for axis2 rotation" );
-	if (!joint->getAttribute("axis2LimitLow"))
-		joint->createDoubleAttribute("axis2LimitLow", defaultLow, true,"Basic",45,false,false,false,"lower limit for axis2 rotation" );
+	if (!phyJoint->getAttribute("axis2LimitHigh"))
+		phyJoint->createDoubleAttribute("axis2LimitHigh", defaultHigh, true,"Basic",45,false,false,false,"upper limit for axis2 rotation" );
+	if (!phyJoint->getAttribute("axis2LimitLow"))
+		phyJoint->createDoubleAttribute("axis2LimitLow", defaultLow, true,"Basic",45,false,false,false,"lower limit for axis2 rotation" );
 	
-	SBJoint* parent = sbmJoint->getParent();
-	SrVec twistAxis = sbmJoint->getVec3Attribute("axis0");
-	SrVec swingAxis = sbmJoint->getVec3Attribute("axis1");
-	SrVec swingAxis2 = sbmJoint->getVec3Attribute("axis2");
+	SBJoint* parent = joint->getParent();
+	SrVec twistAxis = phyJoint->getVec3Attribute("axis0");
+	SrVec swingAxis = phyJoint->getVec3Attribute("axis1");
+	SrVec swingAxis2 = phyJoint->getVec3Attribute("axis2");
 	if (parent)
 	{
-		twistAxis = sbmJoint->getMatrixGlobal().get_translation() - parent->getMatrixGlobal().get_translation();
+		twistAxis = joint->getMatrixGlobal().get_translation() - parent->getMatrixGlobal().get_translation();
 		twistAxis.normalize();
 		if (twistAxis.len() == 0) twistAxis = SrVec(0,1,0);	
 		swingAxis = SrVec(0.3f,0.3f,0.3f); SrVec newswingAxis = swingAxis - twistAxis*dot(twistAxis,swingAxis); newswingAxis.normalize();
 		swingAxis = newswingAxis;
 		swingAxis2 = cross(twistAxis,swingAxis);
 	}
-	joint->setVec3Attribute("axis0",twistAxis[0],twistAxis[1],twistAxis[2]);	
-	joint->setVec3Attribute("axis1",swingAxis[0],swingAxis[1],swingAxis[2]);
-	joint->setVec3Attribute("axis2",swingAxis2[0],swingAxis2[1],swingAxis2[2]);
-	
+	phyJoint->setVec3Attribute("axis0",twistAxis[0],twistAxis[1],twistAxis[2]);	
+	phyJoint->setVec3Attribute("axis1",swingAxis[0],swingAxis[1],swingAxis[2]);
+	phyJoint->setVec3Attribute("axis2",swingAxis2[0],swingAxis2[1],swingAxis2[2]);	
 
-	
+	//if (joint->getName() == "r_shoulder")
+	//	setExternalForce(SrVec(0,100000,0));
 }
 
 SrMat SbmJointObj::getRelativeOrientation()
 {
 	updateSbmObj();
-	if (!parentObj)	
+	if (!getParentObj())	
 		return getGlobalTransform().gmat();
 	else
 	{
-		return getGlobalTransform().gmat()*parentObj->getGlobalTransform().gmat().inverse();
+		return getGlobalTransform().gmat()*getParentObj()->getGlobalTransform().gmat().inverse();
 	}
 }
+
 
 
 /************************************************************************/
 /* Physics Character                                                    */
 /************************************************************************/
-SbmJointObj* SbmPhysicsCharacter::getJointObj( std::string& jointName )
+SbmJointObj* SbmPhysicsCharacter::getJointObj(const std::string& jointName )
+{
+	if (jointObjMap.find(jointName) != jointObjMap.end())
+	{
+		return jointObjMap[jointName];
+	}
+	return NULL;
+}
+
+
+SbmPhysicsJoint* SbmPhysicsCharacter::getPhyJoint(const std::string& jointName )
 {
 	if (jointMap.find(jointName) != jointMap.end())
 	{
@@ -226,9 +272,9 @@ SbmJointObj* SbmPhysicsCharacter::getJointObj( std::string& jointName )
 std::vector<SbmJointObj*> SbmPhysicsCharacter::getJointObjList()
 {
 	std::vector<SbmJointObj*> jointObjList;
-	std::map<std::string, SbmJointObj*>::iterator mi = jointMap.begin();
-	for ( mi  = jointMap.begin();
-		 mi != jointMap.end();
+	std::map<std::string, SbmJointObj*>::iterator mi = jointObjMap.begin();
+	for ( mi  = jointObjMap.begin();
+		 mi != jointObjMap.end();
 		 mi++)
 	{
 		jointObjList.push_back(mi->second);
@@ -238,7 +284,7 @@ std::vector<SbmJointObj*> SbmPhysicsCharacter::getJointObjList()
 
 std::map<std::string,SbmJointObj*>& SbmPhysicsCharacter::getJointObjMap()
 {
-	return jointMap;
+	return jointObjMap;
 }
 
 void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vector<std::string>& jointNameList, bool buildGeometry )
@@ -252,36 +298,47 @@ void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vect
 	characterName = character->getName();
 	cleanUpJoints();
 	SBSkeleton* skel = character->getSkeleton();
+
 	for (unsigned int i=0;i<jointNameList.size();i++) // only process the joints that are in the name lists
 	{
 		SBJoint* joint = skel->getJointByName(jointNameList[i]);
 		if (!joint)
 			continue;
-		SbmJointObj* jointObj = phySim->createJointObj();		
+		SbmPhysicsJoint* phyJoint = new SbmPhysicsJoint(joint);
+		SbmJointObj* jointObj = new SbmJointObj(this);//phySim->createJointObj();		
 		if (buildGeometry)
 		{
 			SbmGeomObject* jointGeom = createJointGeometry(joint);
 			jointObj->setGeometry(jointGeom,0.01f);
 			jointGeometryMap[jointNameList[i]] = jointGeom;
 		}
-		jointObj->initJoint(joint);
-		jointMap[jointNameList[i]] = jointObj;		
+		jointObj->initJoint(phyJoint);
+		jointObjMap[jointNameList[i]] = jointObj;	
+		jointMap[jointNameList[i]] = phyJoint;
 		if (!joint->getParent()) // root joint
-			jointRoot = jointObj;
+			rootObj = jointObj;
 	}
 
 	// connect each adjacent joints
-	std::map<std::string, SbmJointObj*>::iterator mi = jointMap.begin();
-	for ( mi  = jointMap.begin();
-		  mi != jointMap.end();
+	std::map<std::string, SbmJointObj*>::iterator mi = jointObjMap.begin();
+	for ( mi  = jointObjMap.begin();
+		  mi != jointObjMap.end();
 		  mi++)
 	{
 		SbmJointObj* obj = mi->second;
-		SBJoint* pj = obj->getJoint()->getParent();
-		if (pj && jointMap.find(pj->getName()) != jointMap.end())
+		// set the child rigid body for the joint
+		SbmPhysicsJoint* oj = obj->getPhyJoint();
+		if (oj && jointObjMap.find(oj->getName()) != jointObjMap.end())
 		{
-			obj->setParentObj(jointMap[pj->getName()]);		 
+			oj->setChildObj(obj);	 
 		}
+		SBJoint* pj = oj->getSBJoint()->getParent();
+		if (pj)
+		{
+			SbmJointObj* pobj = getJointObj(pj->getName());
+			if (pobj)
+				oj->setParentObj(pobj);
+		}		
 	}
 }
 
@@ -290,15 +347,15 @@ void SbmPhysicsCharacter::cleanUpJoints()
 	std::map<std::string, SbmJointObj*>::iterator mi;
 	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
 	// remove all joint objs
-	for ( mi  = jointMap.begin();
-		  mi != jointMap.end();
+	for ( mi  = jointObjMap.begin();
+		  mi != jointObjMap.end();
 		  mi++)
 	{
 		SbmJointObj* jointObj = mi->second;
 		phySim->removePhysicsObj(jointObj);
 		delete jointObj;
 	}
-	jointMap.clear();	
+	jointObjMap.clear();	
 }
 
 SbmGeomObject* SbmPhysicsCharacter::createJointGeometry( SBJoint* joint, float radius )

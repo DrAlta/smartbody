@@ -2993,6 +2993,7 @@ void FltkViewer::drawCharacterPhysicsObjs()
 
 			SBJoint* joint = obj->getSBJoint();	
 			SbmPhysicsSim* physics = mcu.getPhysicsEngine();
+#if 0
 			if (physics)
 			{
 				SrVec jointPos = physics->getJointConstraintPos(obj->getPhyJoint());
@@ -3004,7 +3005,8 @@ void FltkViewer::drawCharacterPhysicsObjs()
 				sphere.render_mode(srRenderModeSmooth);
 				SrGlRenderFuncs::render_sphere(&sphere);
 				glDisable(GL_LIGHTING);				
-			}			
+			}
+#endif
 
 			if (_data->showmasses)
 			{

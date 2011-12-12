@@ -5,27 +5,6 @@
 #include <ode/common.h>
 #include "SbmPhysicsSim.h"
 
-class SbmPhysicsObjODE : public SbmPhysicsObj
-{
-protected:
-	dBodyID bodyID;
-	dGeomID geomID;
-	dMass   odeMass;
-	dTriMeshDataID meshdataID; // optional mesh data ID
-public:
-	SbmPhysicsObjODE();
-	~SbmPhysicsObjODE();
-
-	virtual void updateSbmObj();
-	virtual void updatePhySim();
-	virtual void setPhysicsSim(bool bSim);	
-	virtual void setCollisionSim(bool bCol);
-	virtual void initGeometry(SbmGeomObject* obj, float density);
-	virtual unsigned long  getID() { return (unsigned long)bodyID; }	
-protected:
-	void createODEGeometry(SbmGeomObject* obj, float mass);
-};
-
 class SbmODEObj
 {
 public:
@@ -45,8 +24,8 @@ class SbmODEJoint
 public:
 	dJointID jointID;
 	dJointID aMotorID;
-	dBodyID  body1ID, body2ID;
-	SBJoint* joint;
+	dBodyID  parentID, childID;
+	SbmPhysicsJoint* joint;
 public:
 	SbmODEJoint();
 	~SbmODEJoint();
@@ -83,10 +62,9 @@ public:
 	virtual void removePhysicsCharacter(SbmPhysicsCharacter* phyChar);
 
 	virtual void updateSimulationInternal(float timeStep);	
-	virtual SbmPhysicsObj* createPhyObj(); 
-	virtual SbmJointObj* createJointObj();
+	virtual SbmPhysicsObj* createPhyObj(); 	
 
-	virtual SrVec getJointConstraintPos(SBJoint* joint);
+	virtual SrVec getJointConstraintPos(SbmPhysicsJoint* joint);
 
 	virtual void updatePhyObjGeometry(SbmPhysicsObj* obj, SbmGeomObject* geom = NULL);
 	virtual void enablePhysicsSim(SbmPhysicsObj* obj, bool bSim);
@@ -99,7 +77,7 @@ public:
 protected:
 	static void nearCallBack(void *data, dGeomID o1, dGeomID o2);
 	SbmODEObj* getODEObj(SbmPhysicsObj* obj);
-	SbmODEJoint* getODEJoint(SBJoint* joint);
+	SbmODEJoint* getODEJoint(SbmPhysicsJoint* joint);
 	dGeomID createODEGeometry(SbmPhysicsObj* obj, float mass);
 	void linkJointObj(SbmJointObj* obj);
 };
