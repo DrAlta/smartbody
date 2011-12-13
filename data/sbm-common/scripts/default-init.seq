@@ -19,11 +19,11 @@
 ###  placed 102 units above the ground plane.
 1	char doctor init common.sk SasoBase.SasoDoctorPerez
 1	set character doctor world_offset x 35 y 102 h -17
-1	set character doctor voice remote M021
+1	set character doctor voice  Festival_voice_rab_diphone
 
 1	char elder init common.sk SasoBase.Mayor
 1	set character elder world_offset x -35 y 102 h -17
-1	set character elder voice remote M009
+1	set character elder voice remote Festival_voice_rab_diphone
 
 1	test bml character doctor noecho posture LHandOnHip_Motex
 1	test bml character elder noecho posture LHandOnHip_Motex
@@ -42,14 +42,14 @@
 
 1	char brad init common.sk Brad
 1	set character brad world_offset x 135 y 100 h -17
-1	set character brad voice remote brad
+1	set character brad voice remote Festival_voice_rab_diphone
 2	bml char brad <body posture="HandsAtSide_Motex"/>
 
 2 char brad mesh brad
 
 1	char utah init test_utah.sk utah
 1	set character utah world_offset x -135 y 0 h -17
-1	set character utah voice remote utah
+1	set character utah voice remote Festival_voice_rab_diphone
 2	bml char utah <body posture="ChrUtah_Idle003"/>
 
 2 char utah mesh utah

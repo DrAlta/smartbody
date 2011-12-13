@@ -4,6 +4,7 @@
  
 #include "genericAsyncTask.h"
 #include "asyncTaskManager.h"
+#include <vhcl.h>
 
 PandaRenderer::PandaRenderer(PandaFramework* framework, WindowFramework *window)
 {
