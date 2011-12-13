@@ -214,7 +214,6 @@ void BoneBusHandler::OnBoneRotations( const bonebus::BulkBoneRotations * bulkBon
 	}
 
 
-	char charIdStrBuff[ 36 ];
 	std::stringstream strstr;
 	strstr << bulkBoneRotations->charId;
 	std::string charID = strstr.str();
