@@ -23,10 +23,10 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 
 	menubar = new Fl_Menu_Bar(0, 0, w, 30); 
 	menubar->labelsize(10);
-	menubar->add("&File/Load...", 0, BaseWindow::LoadCB, 0, NULL);
+/*	menubar->add("&File/Load...", 0, BaseWindow::LoadCB, 0, NULL);
 	menubar->add("&File/Save Configuration...", 0, NULL, 0, NULL);
 	menubar->add("&File/Run Script...", 0, NULL, 0, NULL);
-	menubar->add("&View/Character/Bones", 0, ModeBonesCB, this, NULL);
+*/	menubar->add("&View/Character/Bones", 0, ModeBonesCB, this, NULL);
 	menubar->add("&View/Character/Geometry", 0, ModeGeometryCB, this, NULL);
 	menubar->add("&View/Character/Collision Geometry", 0, ModeCollisionGeometryCB, this, NULL);
 	menubar->add("&View/Character/Deformable Geometry", 0, ModeDeformableGeometryCB, this, NULL);
@@ -60,7 +60,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Camera/Face Camera", 0, FaceCameraCB, this, NULL);
 	menubar->add("&Camera/Track Character", 0, TrackCharacterCB, this, NULL);
 	menubar->add("&Camera/Rotate Around Selected", 0, RotateSelectedCB, this, NULL);
-	menubar->add("&Settings/Softeyes", 0, SettingsSofteyesToggleCB, this, NULL);
+//	menubar->add("&Settings/Softeyes", 0, SettingsSofteyesToggleCB, this, NULL);
 	menubar->add("&Settings/Internal Audio", 0, AudioCB, this, NULL);
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
 	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
@@ -264,7 +264,7 @@ void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )
 {
 	// run the speech relay launcher script
 #ifdef WIN32
-	system("start ..\\..\\..\\..\\core\\FestivalRelay\\speechrelay.bat");
+	system("start ..\\..\\..\\..\\core\\TtsRelay\\bin\\x86\\Release\\TtsRelayGui.exe");
 #else
 	system("../../../../core/FestivalRelay/speechrelay.sh&");
 #endif

@@ -1,5 +1,6 @@
 #include "SBListener.h"
 #include "PandaRenderer.h"
+#include <vhcl.h>
 
 SBListener::SBListener(PandaRenderer* app)
 {
