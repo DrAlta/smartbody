@@ -143,22 +143,12 @@ BaseWindow::~BaseWindow() {
 
 SbmCharacter* BaseWindow::getSelectedCharacter()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	LocomotionData* locoData = fltkViewer->getLocomotionData();
-	int charIndex = locoData->char_index;
+	 SbmPawn* selectedPawn = fltkViewer->getObjectManipulationHandle().get_selected_pawn();
+	 if (!selectedPawn)
+		 return NULL;
 
-	int index = 0;
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
-	{
-		SbmCharacter* character = (*iter).second;
-		if (index == charIndex)
-			return character;
-		index++;
-	}
-	
-	return NULL;
+	 SbmCharacter* character = dynamic_cast<SbmCharacter*> (selectedPawn);
+	 return character;
 }
 
 void BaseWindow::show_viewer()

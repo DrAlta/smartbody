@@ -2503,31 +2503,24 @@ void FltkViewer::set_reach_target( int itype, const char* targetname )
 
 void FltkViewer::set_gaze_target(int itype, const char* label)
 {
-	char exe_cmd[256];
-	SbmCharacter* actor = NULL;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	int counter = 0;
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
-	{
-		if (counter == _locoData->char_index)
-		{
-			 actor = (*iter).second;
-			 break;
-		}
-		counter++;
-	}	
 
-	if (actor && itype == -1)
+	SbmPawn* pawn = _objManipulator.get_selected_pawn();
+	if (!pawn)
+		return;
+
+	SbmCharacter* actor = dynamic_cast<SbmCharacter*>(pawn);
+	if (!pawn)
+		return;
+
+	if (itype == -1)
 	{
-		sprintf(exe_cmd,"char %s gazefade out 0",actor->getName().c_str());	
-		mcu.execute(exe_cmd);
+		std::stringstream strstr;
+		strstr << "char " << actor->getName() << "gazefade out 0";
+		mcu.execute((char*) strstr.str().c_str());
 		return;
 	}
-	
-	SbmPawn* pawn = _objManipulator.get_selected_pawn();
-	
+		
 	static char gaze_type[NUM_GAZE_TYPES][20] = { "EYES", "EYES NECK", "EYES CHEST", "EYES BACK" };
 	//if (actor)
 	//	printf("current char %s ", actor->name);
@@ -2547,8 +2540,9 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 		else
 			strcpy(pawn_name,label);
 
-		sprintf(exe_cmd,"bml char %s <gaze target=\"%s\" sbm:joint-range=\"%s\"/>",actor->getName().c_str(),pawn_name,gaze_type[itype]);
-		mcu.execute(exe_cmd);
+		std::stringstream strstr;
+		strstr << "bml char " << actor->getName() << " <gaze target=\"" << pawn_name << "\" sbm:joint-range=\"" << gaze_type[itype] << "\"/>";
+		mcu.execute((char*) strstr.str().c_str());
 	}
 }
 
@@ -3947,19 +3941,13 @@ void FltkViewer::drawDynamics()
 
 SbmCharacter* FltkViewer::getCurrentCharacter()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmCharacter* character = NULL;	
-	// get current character
-	int counter = 0;
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
-	{
-		if (counter == _locoData->char_index)
-			return (*iter).second;
-		counter++;
-	}
-	return NULL;
+
+	 SbmPawn* selectedPawn = getObjectManipulationHandle().get_selected_pawn();
+	 if (!selectedPawn)
+		 return NULL;
+
+	 SbmCharacter* character = dynamic_cast<SbmCharacter*> (selectedPawn);
+	 return character;
 }
 
 
