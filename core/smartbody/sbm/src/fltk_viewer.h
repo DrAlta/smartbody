@@ -140,8 +140,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 						ModeNoGrid
                 };
 
-    enum MenuCmd { CmdHelp,
-                   CmdViewAll,
+    enum MenuCmd { CmdViewAll,
                    CmdBackground,
                    CmdAsIs,
                    CmdDefault,
@@ -275,6 +274,8 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 
 	void updateLights();
 
+	std::string _lastSelectedCharacter;
+
    public : // virtual methods
 
     /*! When the window manager asks the window to close.
@@ -314,13 +315,6 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 
     /*! Events related to interactive object movement, rotation, etc */
 	virtual int handle_object_manipulation( const SrEvent& e);
-
-   /*! All keyboard events are passed to this method. The SrViewer
-       implementation checks if crtl+shift+m is pressed to display
-       the mouse menu, crtl+shift+x to exit the application, 
-       crtl+shift+e to call the eps export action;
-       otherwise it passes the event to the scene graph. */
-    virtual int handle_keyboard ( const SrEvent &e );
 
 	void processDragAndDrop(std::string dndMsg, float x, float y);
 	void initGridList();	
@@ -429,7 +423,6 @@ protected:
    SrSnLines* sceneaxis; // the current axis being displayed
 
    Fl_Menu_Button* menubut; // the ctrl+shift+m or button3 menu
-   Fl_Window* helpwin;
 
    SrSaGlRender render_action;
    SrSaBBox bbox_action;
