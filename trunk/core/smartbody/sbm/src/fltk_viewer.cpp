@@ -136,39 +136,6 @@ class srSaSetShapesChanged : public SrSa
     virtual bool shape_apply ( SrSnShapeBase* s ) { s->changed(true); return true; }
  };
 
-//================================= help window ===================================================
-
-
-
-Fl_Browser* make_help_browser ()
- {
-  Fl_Browser* b = new Fl_Browser ( 5, 5, 290, 190 );
-
-   b->add ( "Left Click: Select\n" );
-   b->add ( "Left Click + ALT: Rotate\n" );
-   b->add ( "Middle Click + ALT: Translate\n" );
-   b->add ( "Right Click + ALT: Zoom\n" );
-   b->add ( "Left Click + Alt: Y Rotation\n" );
-   b->add ( "Ctrl + Shift + m: Menu\n" );
-   b->add ( "Ctrl + Shift + x: Exit\n" );
-   b->add ( "Ctrl + Shift + c: Print camera\n" );
-   b->add ( "Ctrl + Shift + e: EPS export (2D only)\n" );
-   b->add ( "Ctrl + Shift + s: Snapshot current frame\n" );
-   b->add ( "Ctrl + Shift + a: All frames snapshot on/off\n" );
-   b->add ( "Ctrl + Shift + o: Export all models in scene\n" );
-
-   return b;
- }
-
-Fl_Window* make_help_window ()
- {
-   Fl_Window* win = new Fl_Double_Window ( 300, 200, "FltkViewer Help" );
-   win->set_non_modal();
-
-   Fl_Browser* browser = make_help_browser();
-   win->add(browser);
-   return win;
- }
 
 //================================= popup menu ===================================================
 
@@ -215,7 +182,6 @@ Fl_Menu_Item BodyReachMenuTable[] =
 
 Fl_Menu_Item MenuTable[] =
  { 
-   { "&help",       0, MCB, CMD(CmdHelp) },
    { "&view all",   0, MCB, CMD(CmdViewAll) },
    { "&background", 0, MCB, CMD(CmdBackground) }, // FL_FL_MENU_DIVIDER
 
@@ -438,6 +404,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _arrowTime = 0.0f;
 
    init_foot_print();
+   _lastSelectedCharacter = "";
 }
 
 void FltkViewer::create_popup_menus()
@@ -448,14 +415,12 @@ void FltkViewer::create_popup_menus()
 	_data->menubut->type(Fl_Menu_Button::POPUP23);
     _data->menubut->menu(MenuTable);   
     _data->menubut->textsize(12);	
-    _data->helpwin = make_help_window ();
     end();
 }
 
 FltkViewer::~FltkViewer ()
  {
    _data->root->unref ();
-   delete _data->helpwin;
    delete _data->scenebox;
    delete _data->sceneaxis;
    delete _data;
@@ -504,8 +469,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	 MeCtConstraint* constraintCt = getCurrentCharacterConstraintController();
 
    switch ( s )
-    { case CmdHelp : _data->helpwin->show(); _data->helpwin->active(); break;
-
+    { 
       case CmdViewAll : view_all (); break;
 
       case CmdAsIs   : _data->rendermode = ModeAsIs;
@@ -2165,6 +2129,7 @@ int FltkViewer::handle ( int event )
 					 SbmCharacter* isCharacter = dynamic_cast<SbmCharacter*> (selectedPawn);
 					 if (isCharacter)
 					 {
+						 _lastSelectedCharacter = isCharacter->getName();
 						 if (_paLocoData->character)
 							 _paLocoData->character->unregisterObserver(this);
 						 _paLocoData->character = isCharacter;
@@ -2369,10 +2334,6 @@ int FltkViewer::handle_event ( const SrEvent &e )
 
    if ( e.mouse_event() ) return handle_scene_event ( e );
 
-   if ( e.type == SrEvent::EventKeyboard )
-    { if ( handle_keyboard(e)==0 ) res = handle_scene_event ( e );
-      if ( res==0 && e.key==SrEvent::KeyEsc ) res=1; // to avoid exiting with ESC
-    }
 
    return res; // this point should not be reached
  }
@@ -2505,12 +2466,10 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	SbmPawn* pawn = _objManipulator.get_selected_pawn();
-	if (!pawn)
-		return;
+	SbmPawn* pawn = this->getObjectManipulationHandle().get_selected_pawn();
 
-	SbmCharacter* actor = dynamic_cast<SbmCharacter*>(pawn);
-	if (!pawn)
+	SbmCharacter* actor = this->getCurrentCharacter();
+	if (!actor)
 		return;
 
 	if (itype == -1)
@@ -2531,7 +2490,7 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 		if (strcmp(label,"selected pawn")==0)
 		{
 			if (pawn)
-				strcpy(pawn_name,pawn->getName().c_str());
+				strcpy(pawn_name, pawn->getName().c_str());
 			else
 			{
 				// handle user error : call set target command without selecting a pawn target.
@@ -2637,18 +2596,6 @@ int FltkViewer::handle_scene_event ( const SrEvent& e )
  }
 
 //== Keyboard ==============================================================
-
-int FltkViewer::handle_keyboard ( const SrEvent &e )
- {
-   if ( e.ctrl && e.shift )
-    { switch ( e.key )
-       { case 'm' : show_menu (); return 1;
-         case 'x' : hide (); return 1;
-	   }
-    }
-   return 0;
- }
-
 
 void FltkViewer::label_viewer(const char* str)
 {
@@ -3941,10 +3888,30 @@ void FltkViewer::drawDynamics()
 
 SbmCharacter* FltkViewer::getCurrentCharacter()
 {
-
+	 mcuCBHandle& mcu = mcuCBHandle::singleton();
 	 SbmPawn* selectedPawn = getObjectManipulationHandle().get_selected_pawn();
 	 if (!selectedPawn)
-		 return NULL;
+	 {
+		 SbmCharacter* character = mcu.getCharacter(_lastSelectedCharacter);
+		 if (character)
+			 return character;
+		 else
+		 {
+			 // get the first character
+			 std::map<std::string, SbmCharacter*>& characterMap = mcu.getCharacterMap();
+			 std::map<std::string, SbmCharacter*>::iterator iter = characterMap.begin();
+			 if (iter !=  characterMap.end())
+			 {
+				 _lastSelectedCharacter = (*iter).second->getName();
+				  SbmCharacter* character = mcu.getCharacter(_lastSelectedCharacter);
+				 return character;
+			 }
+			 else
+			 {
+				 return NULL;
+			 }
+		 }
+	 }
 
 	 SbmCharacter* character = dynamic_cast<SbmCharacter*> (selectedPawn);
 	 return character;
