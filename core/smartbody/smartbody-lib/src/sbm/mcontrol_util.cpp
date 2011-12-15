@@ -1082,7 +1082,7 @@ void mcuCBHandle::update( void )	{
 
 	if (physicsEngine && physicsEngine->getBoolAttribute("enable"))
 	{		
-		static float dt = 0.001f;//timeStep*0.03f;
+		float dt = (float)physicsEngine->getDoubleAttribute("dT");//timeStep*0.03f;
 		//elapseTime += time_dt;
 		while (physicsTime < this->time)		
 		//if (physicsTime < this->time)
@@ -1092,6 +1092,10 @@ void mcuCBHandle::update( void )	{
 			physicsTime += dt;
 			//curDt -= dt;
 		}		
+	}
+	else
+	{
+		physicsTime = this->time;
 	}
 
 	std::string seqName = "";
@@ -1201,7 +1205,7 @@ void mcuCBHandle::update( void )	{
 			//char_p->dMesh_p->update();
 			//char_p->updateJointPhyObjs();
 			bool hasPhySim = physicsEngine->getBoolAttribute("enable");
-			char_p->updateJointPhyObjs(false);
+			char_p->updateJointPhyObjs(hasPhySim);
 			//char_p->updateJointPhyObjs(false);
 			char_p->_skeleton->update_global_matrices();
 			char_p->forward_visemes( time );	

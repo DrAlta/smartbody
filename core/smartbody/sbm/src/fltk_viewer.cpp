@@ -2931,8 +2931,6 @@ void FltkViewer::drawCharacterPhysicsObjs()
 		{
 			SbmJointObj* obj = mi->second;
 			SrMat gmat = obj->getGlobalTransform().gmat();
-			this->drawColObject(obj->getColObj(), gmat);
-
 			SBJoint* joint = obj->getSBJoint();	
 			SbmPhysicsSim* physics = mcu.getPhysicsEngine();
 #if 0
@@ -2945,8 +2943,26 @@ void FltkViewer::drawCharacterPhysicsObjs()
 				sphere.color(SrColor(1.f,0.f,0.f));
 				glEnable(GL_LIGHTING);
 				sphere.render_mode(srRenderModeSmooth);
-				SrGlRenderFuncs::render_sphere(&sphere);
-				glDisable(GL_LIGHTING);				
+				//SrGlRenderFuncs::render_sphere(&sphere);
+				glDisable(GL_LIGHTING);		
+
+				glBegin(GL_LINES);
+				SrVec axis = physics->getJointRotationAxis(obj->getPhyJoint(),0);
+				glColor3f(1.f,0.f,0.f);
+				glVertex3f(jointPos[0],jointPos[1],jointPos[2]);
+				glVertex3f(jointPos[0]+axis[0],jointPos[1]+axis[1],jointPos[2]+axis[2]);
+
+				glColor3f(0.f,1.f,0.f);
+				axis = physics->getJointRotationAxis(obj->getPhyJoint(),1);
+				glVertex3f(jointPos[0],jointPos[1],jointPos[2]);
+				glVertex3f(jointPos[0]+axis[0],jointPos[1]+axis[1],jointPos[2]+axis[2]);
+
+				glColor3f(0.f,0.f,1.f);
+				axis = physics->getJointRotationAxis(obj->getPhyJoint(),2);
+				glVertex3f(jointPos[0],jointPos[1],jointPos[2]);
+				glVertex3f(jointPos[0]+axis[0],jointPos[1]+axis[1],jointPos[2]+axis[2]);
+				glEnd();
+				
 			}
 #endif
 
@@ -2970,6 +2986,7 @@ void FltkViewer::drawCharacterPhysicsObjs()
 				}
 				glPopAttrib();				
 			}
+			this->drawColObject(obj->getColObj(), gmat);
 		}		
 
 	}
@@ -4138,6 +4155,14 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 	//SrMat gMat = colObj->worldState.gmat();
 	SrColor objColor;
 	objColor.set(colObj->color.c_str());
+	objColor.a = (srbyte)64;
+	
+
+	glEnable ( GL_ALPHA_TEST );
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glAlphaFunc ( GL_GREATER, 0.1f ) ;
+	
 	SrMat gMat = gmat;
 	SrMat lMat = colObj->getLocalTransform().gmat();	
 	glMultMatrixf((const float*) gMat);
@@ -4198,6 +4223,8 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 	}
 	glPopMatrix();	
 	glDisable(GL_LIGHTING);
+	glDisable(GL_ALPHA_TEST) ;
+	glDisable(GL_BLEND);
 }
 
 

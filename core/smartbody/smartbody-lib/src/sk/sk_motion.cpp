@@ -768,7 +768,7 @@ std::vector<MotionEvent*>& SkMotion::getMotionEvents()
 	return _motionEvents;
 }
 
-SkMotion* SkMotion::buildMirrorMotion()
+SkMotion* SkMotion::buildMirrorMotion(SkSkeleton* skeleton)
 {	
 	SkChannelArray& mchan_arr = this->channels();
 	SkMotion *mirror_p = new SmartBody::SBMotion();
@@ -794,12 +794,59 @@ SkMotion* SkMotion::buildMirrorMotion()
 			else if (chan.type == SkChannel::Quat)
 			{
 				// flip rotation for y,z axis
-				euler_t ref_e = quat_t( ref_p[ index ], ref_p[ index + 1 ], ref_p[ index + 2 ], ref_p[ index + 3 ] );
-				quat_t new_q = euler_t( ref_e.x(), -ref_e.y(), -ref_e.z() );
-				new_p[ index + 0 ] = (float)new_q.w();
-				new_p[ index + 1 ] = (float)new_q.x();
-				new_p[ index + 2 ] = (float)new_q.y();
-				new_p[ index + 3 ] = (float)new_q.z();
+				SrQuat q_orig = SrQuat( ref_p[ index ], ref_p[ index + 1 ], ref_p[ index + 2 ], ref_p[ index + 3 ] );
+				SrVec qa = q_orig.axisAngle();
+				SkJoint* joint = skeleton->search_joint(jointName.c_str());
+				if (!joint)
+				{
+					//LOG("Joint %s not found")
+					// joint not found, simply write to channels
+					for (int n=0;n<chan.size();n++)
+						new_p[index+n] = ref_p[index+n];
+				}
+				else
+				{
+					SrQuat q_zero = SrQuat(joint->gmatZero());
+					SrQuat q_lzero = SrQuat(joint->gmatZero());
+					// map left to right joint
+					if (boost::algorithm::starts_with(jointName,"l_") || boost::algorithm::starts_with(jointName,"r_"))
+					{
+						std::string jointNameComp = jointName;
+						jointNameComp[0] = (jointNameComp[0]=='r') ? 'l' : 'r';  // get the mirror joint name	
+						SkJoint* jointComp = skeleton->search_joint(jointNameComp.c_str());
+						if (jointComp)
+							q_lzero = SrQuat(jointComp->gmatZero());
+
+					}
+
+					SrVec qa_rot = qa*q_zero;					
+					SrQuat qa_temp = SrQuat(qa_rot);
+					euler_t ref_e = euler_t(quat_t(qa_temp.w,qa_temp.x,qa_temp.y,qa_temp.z));														
+					quat_t new_q = euler_t( ref_e.x(), -ref_e.y(), -ref_e.z() );
+					vector3_t new_qv = new_q.axisangle();
+					//SrVec new_qa = SrVec(qa_rot.x,-qa_rot.y,-qa_rot.z)*q_lzero.inverse();//SrVec((float)new_qv.x(),(float)new_qv.y(),(float)new_qv.z())*q_zero.inverse();
+					SrVec new_qa = SrVec((float)new_qv.x(),(float)new_qv.y(),(float)new_qv.z())*q_lzero.inverse();				
+					SrQuat final_q = SrQuat(new_qa);										
+					
+#if 0 // print debug info 
+					if (joint->name() == "r_shoulder" || joint->name() == "l_shoulder")
+					{
+						euler_t ref_eorig = euler_t(quat_t(q_orig.w,q_orig.x,q_orig.y,q_orig.z));	
+						euler_t final_euler = euler_t(quat_t(final_q.w,final_q.x,final_q.y,final_q.z));
+						LOG("joint %s : ",joint->name().c_str());
+						sr_out << "qa before rot = " << qa << srnl;
+						sr_out << "qa after rot = " << qa_rot << srnl;
+						LOG("euler before rot = %f %f %f",ref_eorig.x(),ref_eorig.y(),ref_eorig.z());
+						LOG("euler after rot = %f %f %f",ref_e.x(),ref_e.y(),ref_e.z());
+						LOG("euler final = %f %f %f",final_euler.x(),final_euler.y(),final_euler.z());
+					}
+#endif
+					new_p[ index + 0 ] = (float)final_q.w;
+					new_p[ index + 1 ] = (float)final_q.x;
+					new_p[ index + 2 ] = (float)final_q.y;
+					new_p[ index + 3 ] = (float)final_q.z;
+				}
+				
 			}
 			else
 			{
@@ -807,6 +854,7 @@ SkMotion* SkMotion::buildMirrorMotion()
 					new_p[index+n] = ref_p[index+n];
 			}
 		}
+		
 		for (int k=0;k<mchan_arr.size();k++)
 		{
 			SkChannel& chan = mchan_arr[k];
@@ -826,7 +874,8 @@ SkMotion* SkMotion::buildMirrorMotion()
 					std::swap(new_p[rindex+n],new_p[index+n]);
 				}
 			}
-		}				
+		}
+		
 	}
 	return mirror_p;
 }

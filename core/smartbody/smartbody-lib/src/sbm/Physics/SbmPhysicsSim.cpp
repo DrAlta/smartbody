@@ -1,9 +1,14 @@
 #include "SbmPhysicsSim.h"
 #include <sbm/mcontrol_util.h>
+#include <sr/sr_output.h>
 
 SbmPhysicsSim::SbmPhysicsSim(void)
 {
 	SBObject::createDoubleAttribute("gravity",980, true, "Basic", 20, false, false, false, "?");
+	SBObject::createDoubleAttribute("dT",0.0002, true, "Basic", 20, false, false, false, "?");
+	SBObject::createDoubleAttribute("Ks",230000, true, "Basic", 20, false, false, false, "?");
+	SBObject::createDoubleAttribute("Kd",2000, true, "Basic", 20, false, false, false, "?");
+	SBObject::createDoubleAttribute("KScale",1, true, "Basic", 20, false, false, false, "?");
 	SBObject::createBoolAttribute("enable",false,true, "Basic", 20, false, false, false, "?");	
 }
 
@@ -16,6 +21,15 @@ void SbmPhysicsSim::updateSimulation( float timestep )
 	bool enableSim = SBObject::getBoolAttribute("enable");
 	if (enableSim)
 	{
+		// update PD torque for each physics character
+		SbmPhysicsCharacterMap::iterator ci;
+		for ( ci  = characterMap.begin();
+			  ci != characterMap.end();
+			  ci++)
+		{
+			SbmPhysicsCharacter* phyChar = ci->second;
+			phyChar->updatePDTorque();
+		}
 		updateSimulationInternal(timestep);
 	}
 }
@@ -88,7 +102,7 @@ unsigned long SbmPhysicsObjInterface::getID()
 SbmPhysicsObj::SbmPhysicsObj()
 {
 	colObj = NULL;	
-	objMass = 0.f;
+	objMass = 0.1f;
 	objDensity = 0.01f;
 	bHasPhysicsSim = true;
 	bHasCollisionSim = true;	
@@ -98,7 +112,7 @@ void SbmPhysicsObj::setGeometry( SbmGeomObject* obj, float density )
 {
 	colObj = obj;
 	colObj->attachToPhyObj(this);
-	objMass = density;
+	objDensity = density;
 }
 
 void SbmPhysicsObj::enablePhysicsSim( bool bPhy )
@@ -133,10 +147,11 @@ void SbmPhysicsObj::updatePhySim()
 /* Physics Joint                                                        */
 /************************************************************************/
 
-SbmPhysicsJoint::SbmPhysicsJoint( SBJoint* joint )
+SbmPhysicsJoint::SbmPhysicsJoint( SBJoint* joint ) 
 {
 	sbmJoint = joint;
 	jointTorque = SrVec(0,0,0);
+	totalSupportMass = 0.f;
 	parentObj = NULL;
 	childObj = NULL;
 }
@@ -145,11 +160,29 @@ unsigned long SbmPhysicsJoint::getID()
 {
 	return (unsigned long)(this);
 }
+
+void SbmPhysicsJoint::updateTotalSupportMass()
+{
+	totalSupportMass = 0.f;
+	SbmJointObj* obj = getChildObj();
+	totalSupportMass += obj->getMass();
+
+	for (int i=0;i<obj->getNumChildJoints();i++)
+	{
+		SbmPhysicsJoint* cj = obj->getChildJoint(i);
+		if (cj)
+		{
+			cj->updateTotalSupportMass();
+			totalSupportMass += cj->getTotalSupportMass();
+		}		
+	}
+	LOG("joint %s, total mass = %f",this->getSBJoint()->getName().c_str(),totalSupportMass);
+}
 /************************************************************************/
 /* SbmJointObj                                                          */
 /************************************************************************/
 
-SbmJointObj::SbmJointObj(SbmPhysicsCharacter* phyc)
+SbmJointObj::SbmJointObj(SbmPhysicsCharacter* phyc) : SbmPhysicsObj()
 {
 	phyJoint = NULL;
 	phyChar = phyc;
@@ -197,7 +230,7 @@ void SbmJointObj::initJoint( SbmPhysicsJoint* phyj )
 	if (!phyJoint->getAttribute("axis2"))
 		phyJoint->createVec3Attribute("axis2",0,0,1,true,"Basic",44,false,false,false,"rotation axis 2");
 
-	float defaultHigh = 0.3f, defaultLow = -0.3f;
+	float defaultHigh = 1.5f, defaultLow = -1.5f;
 	if (!phyJoint->getAttribute("axis0LimitHigh"))
 		phyJoint->createDoubleAttribute("axis0LimitHigh", defaultHigh, true,"Basic",45,false,false,false,"upper limit for axis0 rotation" );
 	if (!phyJoint->getAttribute("axis0LimitLow"))
@@ -212,26 +245,9 @@ void SbmJointObj::initJoint( SbmPhysicsJoint* phyj )
 		phyJoint->createDoubleAttribute("axis2LimitHigh", defaultHigh, true,"Basic",45,false,false,false,"upper limit for axis2 rotation" );
 	if (!phyJoint->getAttribute("axis2LimitLow"))
 		phyJoint->createDoubleAttribute("axis2LimitLow", defaultLow, true,"Basic",45,false,false,false,"lower limit for axis2 rotation" );
-	
-	SBJoint* parent = joint->getParent();
-	SrVec twistAxis = phyJoint->getVec3Attribute("axis0");
-	SrVec swingAxis = phyJoint->getVec3Attribute("axis1");
-	SrVec swingAxis2 = phyJoint->getVec3Attribute("axis2");
-	if (parent)
-	{
-		twistAxis = joint->getMatrixGlobal().get_translation() - parent->getMatrixGlobal().get_translation();
-		twistAxis.normalize();
-		if (twistAxis.len() == 0) twistAxis = SrVec(0,1,0);	
-		swingAxis = SrVec(0.3f,0.3f,0.3f); SrVec newswingAxis = swingAxis - twistAxis*dot(twistAxis,swingAxis); newswingAxis.normalize();
-		swingAxis = newswingAxis;
-		swingAxis2 = cross(twistAxis,swingAxis);
-	}
-	phyJoint->setVec3Attribute("axis0",twistAxis[0],twistAxis[1],twistAxis[2]);	
-	phyJoint->setVec3Attribute("axis1",swingAxis[0],swingAxis[1],swingAxis[2]);
-	phyJoint->setVec3Attribute("axis2",swingAxis2[0],swingAxis2[1],swingAxis2[2]);	
 
-	//if (joint->getName() == "r_shoulder")
-	//	setExternalForce(SrVec(0,100000,0));
+	//if (joint->getName() == "spine4")
+	//	setExternalForce(SrVec(0,18000,0));	
 }
 
 SrMat SbmJointObj::getRelativeOrientation()
@@ -306,6 +322,8 @@ void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vect
 			continue;
 		SbmPhysicsJoint* phyJoint = new SbmPhysicsJoint(joint);
 		SbmJointObj* jointObj = new SbmJointObj(this);//phySim->createJointObj();		
+		if (joint->mass() > 0)
+			jointObj->setMass(joint->mass()*0.01f);
 		if (buildGeometry)
 		{
 			SbmGeomObject* jointGeom = createJointGeometry(joint);
@@ -315,8 +333,7 @@ void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vect
 		jointObj->initJoint(phyJoint);
 		jointObjMap[jointNameList[i]] = jointObj;	
 		jointMap[jointNameList[i]] = phyJoint;
-		if (!joint->getParent()) // root joint
-			rootObj = jointObj;
+		
 	}
 
 	// connect each adjacent joints
@@ -328,7 +345,7 @@ void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vect
 		SbmJointObj* obj = mi->second;
 		// set the child rigid body for the joint
 		SbmPhysicsJoint* oj = obj->getPhyJoint();
-		if (oj && jointObjMap.find(oj->getName()) != jointObjMap.end())
+		if (oj && jointObjMap.find(oj->getSBJoint()->getName()) != jointObjMap.end())
 		{
 			oj->setChildObj(obj);	 
 		}
@@ -340,6 +357,17 @@ void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vect
 				oj->setParentObj(pobj);
 		}		
 	}
+
+	std::map<std::string, SbmPhysicsJoint*>::iterator ji = jointMap.begin();
+	for ( ji  = jointMap.begin();
+		  ji != jointMap.end();
+		  ji++)
+	{
+		SbmPhysicsJoint* phyJ = ji->second;
+		if (!phyJ->getParentObj()) root = phyJ;
+		updateJointAxis(phyJ);
+	}
+	root->updateTotalSupportMass();
 }
 
 void SbmPhysicsCharacter::cleanUpJoints()
@@ -391,6 +419,121 @@ SbmGeomObject* SbmPhysicsCharacter::createJointGeometry( SBJoint* joint, float r
 	return newGeomObj;
 }
 
+void SbmPhysicsCharacter::updateJointAxis( SbmPhysicsJoint* phyJoint )
+{
+	SBJoint* joint = phyJoint->getSBJoint();
+	SbmJointObj* childObj = phyJoint->getChildObj();
+
+	SrVec twistAxis = phyJoint->getVec3Attribute("axis0");
+	SrVec swingAxis = phyJoint->getVec3Attribute("axis1");
+	SrVec swingAxis2 = phyJoint->getVec3Attribute("axis2");
+	if (joint)
+	{
+		twistAxis = joint->getLocalCenter()*joint->getMatrixGlobal() -  joint->getMatrixGlobal().get_translation();
+		twistAxis.normalize();
+		sr_out << "twist axis = " << twistAxis << srnl;
+		if (twistAxis.len() == 0) twistAxis = SrVec(0,1,0);	
+		swingAxis = SrVec(0.3f,0.3f,0.3f); SrVec newswingAxis = swingAxis - twistAxis*dot(twistAxis,swingAxis); newswingAxis.normalize();
+		swingAxis = newswingAxis;
+		swingAxis2 = cross(twistAxis,swingAxis);
+	}
+	phyJoint->setVec3Attribute("axis2",twistAxis[0],twistAxis[1],twistAxis[2]);	
+	phyJoint->setVec3Attribute("axis1",swingAxis[0],swingAxis[1],swingAxis[2]);
+	phyJoint->setVec3Attribute("axis0",swingAxis2[0],swingAxis2[1],swingAxis2[2]);		
+
+}
+
+void SbmPhysicsCharacter::updatePDTorque()
+{
+	std::vector<SbmJointObj*> jointObjList = getJointObjList();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmPhysicsSim* phySim = mcu.physicsEngine;
+	float Ks = (float)phySim->getDoubleAttribute("Ks");
+	float Kd = (float)phySim->getDoubleAttribute("Kd");
+	float KScale = (float)phySim->getDoubleAttribute("KScale");
+
+	for (unsigned int i=0;i<jointObjList.size();i++)
+	{
+		SbmJointObj* obj = jointObjList[i];
+		SbmPhysicsJoint* phyJoint = obj->getPhyJoint();
+		SBJoint* joint = obj->getPhyJoint()->getSBJoint();
+		if (!joint)	continue;
+
+		if (joint->getName() == "base")
+		{			
+			SrMat tranMat; tranMat.translation(joint->getLocalCenter());				
+			SrMat gmat = tranMat*joint->gmat();		
+			obj->setGlobalTransform(gmat);			
+			obj->enablePhysicsSim(false);
+			obj->updatePhySim();
+			continue;
+		}
+
+		SrMat tran = obj->getRelativeOrientation();		
+		SrQuat phyQuat = SrQuat(tran);
+
+		SrQuat pQuat;			
+		if (obj->getParentObj())
+			pQuat = obj->getParentObj()->getGlobalTransform().rot;
+
+		SrQuat inQuat = phyJoint->getRefQuat();
+		SrVec relW = obj->getAngularVel()*pQuat.inverse() - obj->getParentObj()->getAngularVel()*pQuat.inverse(); 
+		//if (obj->getParentObj())
+		//	relW = relW - obj->getParentObj()->getAngularVel()*pQuat.inverse();
+		SrVec relWD = SrVec(0,0,0);
+		float scaleKs, scaleKd;
+		scaleKs = Ks*KScale*phyJoint->getTotalSupportMass();
+		scaleKd = Kd*KScale*phyJoint->getTotalSupportMass();//2.0 * sqrtf( scaleKs);//;
+
+		SrVec torque = computePDTorque(phyQuat,inQuat,relW,relWD,scaleKs,scaleKd)*pQuat;	
+		//if (jname == "r_hip")
+		//	sr_out << "torque = " << torque << srnl;
+		
+		if (obj->getParentObj())// && obj->getParentObj()->getParentObj())
+		{
+			SrVec oldTorque = phyJoint->getJointTorque();
+			SrVec torqueDiff = torque - oldTorque;
+
+			float maxTorqueRateOfChange = 2000*phyJoint->getTotalSupportMass();
+
+			torqueDiff.x = (torqueDiff.x<-maxTorqueRateOfChange)?(-maxTorqueRateOfChange):(torqueDiff.x);
+			torqueDiff.x = (torqueDiff.x>maxTorqueRateOfChange)?(maxTorqueRateOfChange):(torqueDiff.x);
+			torqueDiff.y = (torqueDiff.y<-maxTorqueRateOfChange)?(-maxTorqueRateOfChange):(torqueDiff.y);
+			torqueDiff.y = (torqueDiff.y>maxTorqueRateOfChange)?(maxTorqueRateOfChange):(torqueDiff.y);
+			torqueDiff.z = (torqueDiff.z<-maxTorqueRateOfChange)?(-maxTorqueRateOfChange):(torqueDiff.z);
+			torqueDiff.z = (torqueDiff.z>maxTorqueRateOfChange)?(maxTorqueRateOfChange):(torqueDiff.z);
+
+			//phyJoint->setJointTorque(oldTorque+torqueDiff);
+			phyJoint->setJointTorque(torque);
+		}
+	}
+}
+
+SrVec SbmPhysicsCharacter::computePDTorque( SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD, float Ks, float Kd )
+{
+	SrVec torque;	
+	SrQuat qErr = qD*q.inverse();
+	qErr.normalize();	
+	// torque for correcting the orientation to desired angle
+	SrVec v = SrVec(qErr.x,qErr.y,qErr.z);
+	float sinTheta = v.len();
+	if (sinTheta > 1) sinTheta = 1;
+
+	if (sinTheta > -gwiz::epsilon10() && sinTheta < gwiz::epsilon10())
+	{
+		//angle is too small
+	}
+	else
+	{
+		float qAngle = asin(v.len());//qErr.angle();
+		torque = v/sinTheta*qAngle*(-Ks)*(float)MeCtMath::sgn(qErr.w);
+	}
+	torque = torque*q; // rotate back to the parent frame
+
+	// torque for angular velocity damping
+	torque += (vD - w)*(-Kd);
+	return torque;
+}
 // SbmGeomObject* SbmPhysicsCharacter::createJointGeometry( SBJoint* joint, float radius )
 // {
 // 	SbmGeomObject* newGeomObj = NULL;
