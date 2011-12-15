@@ -482,6 +482,7 @@ SkJoint* ParserFBX::createJoint(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion&
    SrQuat jorientQ = SrQuat(jorientMat);
    SkJointQuat* jointQuat = joint->quat();
    jointQuat->prerot(quat);
+   jointQuat->postrot(jorientQ);
    jointQuat->orientation(jorientQ);
 
    return joint;
@@ -522,9 +523,8 @@ void ParserFBX::ParseMetaData(KFbxNode* pNode, FBxMetaData& out_metaData)
       prop.Get(&out_metaData.relaxTime, eDOUBLE1);
    }
 
-   const double oneOverThirty = 1.0 / 30.0;
    out_metaData -= 1.0f; // subtract 1 frame
-   out_metaData *= oneOverThirty;
+   out_metaData *= ONE_OVER_THIRTY;
 }
 
 void ParserFBX::AddAnimation(KFbxScene* pScene, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, const FBxMetaData& metaData)
@@ -582,7 +582,7 @@ void ParserFBX::ParseKeyData(const KFbxAnimCurve* pCurve, const SkChannel::Type 
    pNewAnimData->channelType = type;
   
    int numKeys = pCurve->KeyGetCount();
-   for (int i = 0; i < numKeys; i++)
+   for (int i = 1; i < numKeys; i++) // frame 0 holds the skeleton bind pose, so skip over it
    {
       KFbxAnimCurveKey key = pCurve->KeyGet(i);
       
@@ -593,7 +593,7 @@ void ParserFBX::ParseKeyData(const KFbxAnimCurve* pCurve, const SkChannel::Type 
       // the key channel transformation data
       float value = key.GetValue();
       pNewAnimData->keyFrameData[t] = value;
-      pNewAnimData->keyFrameDataFrame[i] = value;
+      pNewAnimData->keyFrameDataFrame[i - 1] = value;
    }
 
    fbxAnimData.push_back(pNewAnimData);
@@ -685,13 +685,16 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
 
    // create the frames and the times assoicated with them
    int numKeys = fbxAnimData[0]->keyFrameData.size();
-   std::map<kLongLong, float>::iterator it;
+   std::map<kLongLong, float>::iterator it = fbxAnimData[0]->keyFrameData.begin();
    int f = 0;
+   // need to offset by the first amount since we skipped frame 0. We do this to start at time 0
+   float timeOffset = (float)((it->first) / 46186158000.0f);
 
    for (it = fbxAnimData[0]->keyFrameData.begin(); it != fbxAnimData[0]->keyFrameData.end(); f++, it++)
    {
       // convert the way fbx stores the time into the way sbm does (in seconds)
-      motion.insert_frame(f, (float)(it->first) / 46186158000.0f);
+      float kt = (float)((it->first) / 46186158000.0f);
+      motion.insert_frame(f, (float)(kt - timeOffset));
 
       for (int j = 0; j < motion.posture_size(); j++)
       {

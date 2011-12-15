@@ -25,6 +25,7 @@
 
 
 #if ENABLE_FBX_PARSER   // defined in the project settings
+#define ONE_OVER_THIRTY (1.0f / 30.0f)
 
 #include <map>
 
