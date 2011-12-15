@@ -161,9 +161,16 @@ void SBMotion::disconnect()
 	SkMotion::disconnect();
 }
 
-SBMotion* SBMotion::mirror(std::string name)
+SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 {
-	SkMotion* motion = buildMirrorMotion();
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	SBSkeleton* skeleton = mcu._scene->getSkeleton(skeletonName);
+	if (!skeleton)
+	{
+		LOG("Skeleton %s not found. Mirror motion %s not built.",skeletonName.c_str(),name.c_str());
+		return NULL;
+	}
+	SkMotion* motion = buildMirrorMotion(skeleton);
 	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
 	if (sbmotion)
 	{
@@ -178,7 +185,7 @@ SBMotion* SBMotion::mirror(std::string name)
 			motionName = name;
 		sbmotion->setName(motionName.c_str());
 
-		mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+		
 		mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, motion));
 	}
 	return sbmotion;

@@ -65,6 +65,7 @@ public:
 	virtual SbmPhysicsObj* createPhyObj(); 	
 
 	virtual SrVec getJointConstraintPos(SbmPhysicsJoint* joint);
+	virtual SrVec getJointRotationAxis(SbmPhysicsJoint* joint, int axis);
 
 	virtual void updatePhyObjGeometry(SbmPhysicsObj* obj, SbmGeomObject* geom = NULL);
 	virtual void enablePhysicsSim(SbmPhysicsObj* obj, bool bSim);

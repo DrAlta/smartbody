@@ -71,20 +71,27 @@ protected:
 	SBJoint* sbmJoint;
 	SbmJointObj* parentObj;	
 	SbmJointObj* childObj;
+	SrQuat refQuat;	
 	SrVec jointTorque;
+	float totalSupportMass; // all 
 public:
 	SbmPhysicsJoint(SBJoint* joint);
 	~SbmPhysicsJoint();
 	SBJoint* getSBJoint() { return sbmJoint; }
-
+	SrQuat& getRefQuat() { return refQuat; }
+	void setRefQuat(SrQuat val) { refQuat = val; }
 	SrVec& getJointTorque() { return jointTorque; }
 	void   setJointTorque(SrVec val) { jointTorque = val; }	
-
 	SbmJointObj* getParentObj() const { return parentObj; }
 	void setParentObj(SbmJointObj* val) { parentObj = val; }
 	SbmJointObj* getChildObj() const { return childObj; }
 	void setChildObj(SbmJointObj* val) { childObj = val; }
+
 	unsigned long getID();
+
+public:
+	void updateTotalSupportMass();
+	float getTotalSupportMass() { return totalSupportMass; }
 };
 
 class SbmJointObj : public SbmPhysicsObj 
@@ -111,7 +118,7 @@ public:
 class SbmPhysicsCharacter : public SbmPhysicsObjInterface // interface for articulated dynamic character 
 {
 protected:	
-	SbmJointObj* rootObj;
+	SbmPhysicsJoint* root;
 	std::map<std::string, SbmPhysicsJoint*> jointMap;
 	std::map<std::string, SbmJointObj*>     jointObjMap;
 	std::map<std::string, SbmGeomObject*>   jointGeometryMap;
@@ -123,9 +130,13 @@ public:
 	SbmPhysicsJoint* getPhyJoint(const std::string& jointName);
 	std::vector<SbmJointObj*> getJointObjList();
 	std::map<std::string,SbmJointObj*>& getJointObjMap();
+
+	void updatePDTorque();
 protected:
 	void cleanUpJoints();
 	SbmGeomObject* createJointGeometry(SBJoint* joint, float radius = -1);
+	void updateJointAxis(SbmPhysicsJoint* phyJoint);
+	SrVec computePDTorque(SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD, float Ks, float Kd);
 };
 
 //typedef std::deque<SbmPhysicsObj*> SbmPhysicsObjList;
@@ -162,6 +173,7 @@ public:
 	//virtual void applyTorque(SBJoint* joint, )
 
 	virtual SrVec getJointConstraintPos(SbmPhysicsJoint* joint) = 0;
+	virtual SrVec getJointRotationAxis(SbmPhysicsJoint* joint, int axis) = 0;
 
 	virtual void initSimulation() = 0;		
 	virtual void updateSimulationInternal(float timeStep) = 0;

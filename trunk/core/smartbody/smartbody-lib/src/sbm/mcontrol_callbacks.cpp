@@ -820,16 +820,20 @@ int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 	if (mcu_p)
 	{
 		std::string refMotionName = args.read_token();
+		std::string skeletonName = args.read_token();
+		SkSkeleton* skeleton = mcu_p->_scene->getSkeleton(skeletonName);		
 		SkMotion* refMotion = mcu_p->lookUpMotion(refMotionName.c_str());
-		if (refMotion)
+		if (refMotion && skeleton)
 		{
+#if 1
 			std::map<std::string, SkMotion*>& map = mcu_p->motion_map;
-			SkMotion* mirrorMotion = refMotion->buildMirrorMotion();
+			SkMotion* mirrorMotion = refMotion->buildMirrorMotion(skeleton);
 			std::string mirrorMotionName = args.read_token();
 			if (mirrorMotionName == EMPTY_STRING)
 				mirrorMotionName = refMotionName + "_mirror";
 			mirrorMotion->setName(mirrorMotionName.c_str());
-			map.insert(std::pair<std::string, SkMotion*>(mirrorMotionName, mirrorMotion));
+			map.insert(std::pair<std::string, SkMotion*>(mirrorMotionName, mirrorMotion));			
+#endif
 			return CMD_SUCCESS;
 		}		
 	}

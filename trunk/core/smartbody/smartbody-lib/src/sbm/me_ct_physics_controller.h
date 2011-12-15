@@ -27,10 +27,7 @@ class MeCtPhysicsController : public SmartBody::SBController
 		virtual bool controller_evaluate(double t, MeFrameData& frame);
 		virtual SkChannelArray& controller_channels()	{ return(_channels); }
 		virtual double controller_duration()			{ return((double)_duration); }
-		virtual const std::string& controller_type() const		{ return(CONTROLLER_TYPE); }
-	protected:
-		SrVec computePDTorque(SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD);
-		
+		virtual const std::string& controller_type() const		{ return(CONTROLLER_TYPE); }		
 };
 
 #endif

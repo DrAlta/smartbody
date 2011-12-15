@@ -29,7 +29,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 		_prevTime = t;
 	}	
 	bool hasPhy = mcu.physicsEngine->getBoolAttribute("enable");
-#if 0
+#if 1
 	if (_valid && _context && hasPhy)
 	{
 		SbmPhysicsCharacter* phyChar = _character->getPhysicsCharacter();
@@ -42,6 +42,10 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			SbmJointObj* obj = jointObjList[i];
 			SbmPhysicsJoint* phyJoint = obj->getPhyJoint();
 			SBJoint* joint = obj->getPhyJoint()->getSBJoint();
+
+			if (joint->getName() == "base")
+				continue;
+
 			if (!joint)	continue;
 
 			SrMat tran = obj->getRelativeOrientation();					
@@ -53,10 +57,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			int bufferId = frame.toBufferIndex(channelId);
 			if (bufferId < 0)	continue;	
 
-			SrQuat pQuat;
 			
-			if (obj->getParentObj())
-				pQuat = obj->getParentObj()->getGlobalTransform().rot;
 
 			SrQuat phyQuat = SrQuat(tran);
 			SrQuat inQuat;
@@ -65,15 +66,38 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			inQuat.x = frame.buffer()[bufferId + 1];
 			inQuat.y = frame.buffer()[bufferId + 2];
 			inQuat.z = frame.buffer()[bufferId + 3];
-
+			phyJoint->setRefQuat(inQuat);
 			// compute current relative ang velocity	
+			/*
+			SrQuat pQuat;			
+			if (obj->getParentObj())
+				pQuat = obj->getParentObj()->getGlobalTransform().rot;
 			SrVec relW = obj->getAngularVel()*pQuat.inverse(); 
 			if (obj->getParentObj())
-				relW = relW - obj->getParentObj()->getAngularVel()*pQuat;
+				relW = relW - obj->getParentObj()->getAngularVel()*pQuat.inverse();
 			SrVec relWD = SrVec(0,0,0);
 
-			SrVec torque = computePDTorque(phyQuat,inQuat,relW,relWD);		
-			phyJoint->setJointTorque(torque);
+			SrVec torque = computePDTorque(phyQuat,inQuat,relW,relWD)*pQuat;	
+			//if (jname == "r_hip")
+			//	sr_out << "torque = " << torque << srnl;
+			if (obj->getParentObj())// && obj->getParentObj()->getParentObj())
+			{
+				SrVec oldTorque = phyJoint->getJointTorque();
+				SrVec torqueDiff = torque - oldTorque;
+
+				float maxTorqueRateOfChange = 2000;
+
+				torqueDiff.x = (torqueDiff.x<-maxTorqueRateOfChange)?(-maxTorqueRateOfChange):(torqueDiff.x);
+				torqueDiff.x = (torqueDiff.x>maxTorqueRateOfChange)?(maxTorqueRateOfChange):(torqueDiff.x);
+				torqueDiff.y = (torqueDiff.y<-maxTorqueRateOfChange)?(-maxTorqueRateOfChange):(torqueDiff.y);
+				torqueDiff.y = (torqueDiff.y>maxTorqueRateOfChange)?(maxTorqueRateOfChange):(torqueDiff.y);
+				torqueDiff.z = (torqueDiff.z<-maxTorqueRateOfChange)?(-maxTorqueRateOfChange):(torqueDiff.z);
+				torqueDiff.z = (torqueDiff.z>maxTorqueRateOfChange)?(maxTorqueRateOfChange):(torqueDiff.z);
+
+				//phyJoint->setJointTorque(oldTorque+torqueDiff);
+				phyJoint->setJointTorque(torque);
+			}
+			*/
 
 			//if (joint->getParent()) quat = SrQuat();
 			frame.buffer()[bufferId + 0] = phyQuat.w;
@@ -95,25 +119,3 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 	return true;
 }
 
-SrVec MeCtPhysicsController::computePDTorque( SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD )
-{
-	SrVec torque;
-	float Kd = 10.f, Kv = 1.f;
-	SrQuat qErr = qD*q.inverse();
-	float qAngle = qErr.angle();
-	// torque for correcting the orientation to desired angle
-	if (qAngle > -gwiz::epsilon10() && qAngle < gwiz::epsilon10())
-	{
-		//angle is too small
-	}
-	else
-	{
-		torque = qErr.axis()*qAngle*(-Kd)*(float)MeCtMath::sgn(qErr.w);
-	}
-	torque = torque*q; // rotate back to the parent frame
-
-	// torque for angular velocity damping
-	torque += (vD - w)*(-Kv);
-	
-	return torque;
-}

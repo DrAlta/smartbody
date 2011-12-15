@@ -28,7 +28,7 @@ class SBMotion : public SkMotion
 		virtual void connect(SBSkeleton* skel);
 		virtual void disconnect();
 
-		SBMotion* mirror(std::string name);
+		SBMotion* mirror(std::string name, std::string skeletonName);
 
 		float getJointSpeed(SBJoint* joint, float startTime, float endTime);
 		float getJointAngularSpeed(SBJoint* joint, float startTime, float endTime);

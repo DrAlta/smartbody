@@ -47,6 +47,7 @@
 #include <sbm/SBJoint.h>
 
 #define USE_REACH 1
+#define USE_PHYSICS_CHARACTER 0
 //#define USE_REACH_TEST 0
 
 
@@ -378,7 +379,9 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( head_sched_p );
 	ct_tree_p->add_controller( face_ct );
 	ct_tree_p->add_controller( param_sched_p );
+#if USE_PHYSICS_CHARACTER
 	ct_tree_p->add_controller( physics_ct );
+#endif
 	ct_tree_p->add_controller( motionplayer_ct );
 	ct_tree_p->add_controller( datareceiver_ct );
 
@@ -515,22 +518,32 @@ void SbmCharacter::updateJointPhyObjs(bool phySim)
 		std::map<std::string, SbmJointObj*>::iterator iter = jointPhyObjMap.find(jointName);
 		if (iter != jointPhyObjMap.end())
 		{
-			SbmPhysicsObj* phyObj = (*iter).second;
-			if (phySim)
+			SbmJointObj* phyObj = (*iter).second;
+
+#if USE_PHYSICS_CHARACTER			
+			if (phySim )
 			{
-				//phyObj->enablePhysicsSim(true);
-				//phyObj->updateSbmObj();
+				phyObj->enablePhysicsSim(true);
+				phyObj->updateSbmObj();
 			}
 			else
 			{				
 				SBJoint* curSBJoint = dynamic_cast<SBJoint*>(curJoint);
 				SrMat tranMat; tranMat.translation(curSBJoint->getLocalCenter());	
-				//phyObj->enablePhysicsSim(false);
+				phyObj->enablePhysicsSim(false);
 				//if (joint->parent()) 
 				SrMat gmat = tranMat*curSBJoint->gmat();		
 				phyObj->setGlobalTransform(gmat);
-				//phyObj->updatePhySim();
+				phyObj->updatePhySim();
 			}		
+#else
+			{
+				SBJoint* curSBJoint = dynamic_cast<SBJoint*>(curJoint);
+				SrMat tranMat; tranMat.translation(curSBJoint->getLocalCenter());					
+				SrMat gmat = tranMat*curSBJoint->gmat();		
+				phyObj->setGlobalTransform(gmat);
+			}			
+#endif
 		}
 	}	
 }
@@ -576,9 +589,11 @@ void SbmCharacter::buildJointPhyObjs()
 
 	//excludeNameList.insert("l_hip");
 	//excludeNameList.insert("r_hip");
-	excludeNameList.insert("spine4");
+	//excludeNameList.insert("spine3");
+	//excludeNameList.insert("r_elbow");
+	//excludeNameList.insert("l_elbow");
 	SkJoint* rootJoint = _skeleton->root();
-	jointNameList.push_back(rootJoint->name());
+	//jointNameList.push_back(rootJoint->name());
 	tempJointList.push(rootJoint->child(0));
 
 	
@@ -610,7 +625,9 @@ void SbmCharacter::buildJointPhyObjs()
 
 	std::string charName = getName();
 	phyChar->initPhysicsCharacter(charName,jointNameList,true);
+#if USE_PHYSICS_CHARACTER
 	phySim->addPhysicsCharacter(phyChar);
+#endif
 }
 /*
 void SbmCharacter::setJointCollider( std::string jointName, float len, float radius )
