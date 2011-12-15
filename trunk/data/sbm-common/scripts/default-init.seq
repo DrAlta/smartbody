@@ -19,7 +19,7 @@
 ###  placed 102 units above the ground plane.
 1	char doctor init common.sk SasoBase.SasoDoctorPerez
 1	set character doctor world_offset x 35 y 102 h -17
-1	set character doctor voice  Festival_voice_rab_diphone
+1	set character doctor voice remote Festival_voice_rab_diphone
 
 1	char elder init common.sk SasoBase.Mayor
 1	set character elder world_offset x -35 y 102 h -17
