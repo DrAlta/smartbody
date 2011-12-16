@@ -1,5 +1,5 @@
 mirrorMotion = scene.getMotion("ChrUtah_StopToWalkRt01")
-mirrorMotion.mirror("ChrUtah_StopToWalkLf01")
+mirrorMotion.mirror("ChrUtah_StopToWalkLf01", "test_utah.sk")
 
 stateManager = scene.getStateManager()
 

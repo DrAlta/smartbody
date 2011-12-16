@@ -35,7 +35,7 @@
 
 #1	seq default-dynamics
 1	seq init-param-animation inline
-#2	seq init-example-reach inline
+2	seq init-example-reach inline
 
 2 char doctor mesh doctor
 2 char elder mesh elder

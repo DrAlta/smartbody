@@ -820,15 +820,31 @@ int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 	if (mcu_p)
 	{
 		std::string refMotionName = args.read_token();
+		std::string mirrorMotionName = args.read_token();
 		std::string skeletonName = args.read_token();
-		SkSkeleton* skeleton = mcu_p->_scene->getSkeleton(skeletonName);		
+		if (refMotionName == "" || skeletonName == "")
+		{
+			LOG("Usage: mirror <from> <to> <skeleton>");
+			return CMD_FAILURE;
+		}
+		
+		SkSkeleton* skeleton = mcu_p->_scene->getSkeleton(skeletonName);	
+		if (!skeleton)
+		{
+			LOG("No skeleton named '%s' found. Cannot mirror motion %s.", skeletonName.c_str(), refMotionName.c_str());
+			return CMD_FAILURE;
+		}
 		SkMotion* refMotion = mcu_p->lookUpMotion(refMotionName.c_str());
+		if (!refMotion)
+		{
+			LOG("No motion named '%s' found. Cannot mirror motion %s.", refMotionName.c_str(), refMotionName.c_str());
+			return CMD_FAILURE;
+		}
 		if (refMotion && skeleton)
 		{
 #if 1
 			std::map<std::string, SkMotion*>& map = mcu_p->motion_map;
 			SkMotion* mirrorMotion = refMotion->buildMirrorMotion(skeleton);
-			std::string mirrorMotionName = args.read_token();
 			if (mirrorMotionName == EMPTY_STRING)
 				mirrorMotionName = refMotionName + "_mirror";
 			mirrorMotion->setName(mirrorMotionName.c_str());
