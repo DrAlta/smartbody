@@ -1,7 +1,7 @@
 print "** State: allCrouchProtectHead"
 
 mirrorMotion = scene.getMotion("ChrUtah_Relax001_CrouchProtectHead_right")
-mirrorMotion.mirror("ChrUtah_Relax001_CrouchProtectHead_left")
+mirrorMotion.mirror("ChrUtah_Relax001_CrouchProtectHead_left", "test_utah.sk")
 
 stateManager = scene.getStateManager()
 state1 = stateManager.createState1D("allCrouchProtectHead")

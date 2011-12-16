@@ -66,27 +66,29 @@ def reachSetup(characterName):
 	
 	scene = getScene()
 	
+	character = scene.getCharacter(characterName)
+	skeleton = character.getSkeleton()
 	reachManager = scene.getReachManager()
 	reach = reachManager.createReach(characterName)	
 	for i in range(0,len(rightHandMotions)):
 		mirrorMotion1 = scene.getMotion(rightHandMotions[i])
-		mirrorMotion1.mirror(leftHandMotions[i])
+		mirrorMotion1.mirror(leftHandMotions[i], skeleton.getName())
 		reach.addMotion("right",scene.getMotion(rightHandMotions[i]))
 		reach.addMotion("left",scene.getMotion(leftHandMotions[i]))
 		
 	
 	grabMirrorMotion = scene.getMotion("ChrHarmony_Relax001_HandGraspSmSphere_Grasp")
-	grabMirrorMotion.mirror("ChrHarmony_Relax001_LHandGraspSmSphere_Grasp")
+	grabMirrorMotion.mirror("ChrHarmony_Relax001_LHandGraspSmSphere_Grasp", skeleton.getName())
 	reach.setGrabHandMotion("right",scene.getMotion("ChrHarmony_Relax001_HandGraspSmSphere_Grasp"));
 	reach.setGrabHandMotion("left",scene.getMotion("ChrHarmony_Relax001_LHandGraspSmSphere_Grasp"));
 	
 	reachMirrorMotion = scene.getMotion("ChrHarmony_Relax001_HandGraspSmSphere_Reach")
-	reachMirrorMotion.mirror("ChrHarmony_Relax001_LHandGraspSmSphere_Reach")
+	reachMirrorMotion.mirror("ChrHarmony_Relax001_LHandGraspSmSphere_Reach", skeleton.getName())
 	reach.setReachHandMotion("right",scene.getMotion("ChrHarmony_Relax001_HandGraspSmSphere_Reach"));
 	reach.setReachHandMotion("left",scene.getMotion("ChrHarmony_Relax001_LHandGraspSmSphere_Reach"));
 	
 	releaseMirrorMotion = scene.getMotion("ChrHarmony_Relax001_HandGraspSmSphere_Release")
-	releaseMirrorMotion.mirror("ChrHarmony_Relax001_LHandGraspSmSphere_Release")
+	releaseMirrorMotion.mirror("ChrHarmony_Relax001_LHandGraspSmSphere_Release", skeleton.getName())
 	reach.setReleaseHandMotion("right",scene.getMotion("ChrHarmony_Relax001_HandGraspSmSphere_Release"));
 	reach.setReleaseHandMotion("left",scene.getMotion("ChrHarmony_Relax001_LHandGraspSmSphere_Release"));
 	
