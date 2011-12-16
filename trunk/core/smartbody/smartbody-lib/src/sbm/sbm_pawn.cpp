@@ -516,7 +516,9 @@ SrMat SbmPawn::get_world_offset()
 	SrQuat pawnQ = SrQuat((float)q.w(), (float)q.x(), (float)q.y(), (float)q.z());
 	SrMat gmat;
 	pawnQ.get_mat(gmat);
-	gmat.translation(SrVec(x,y,z));		
+	gmat.e41() = x;
+	gmat.e42() = y;
+	gmat.e43() = z;
 	return gmat;
 }
 void SbmPawn::setWorldOffset( const SrMat& newWorld )
