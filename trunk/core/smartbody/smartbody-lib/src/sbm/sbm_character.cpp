@@ -49,12 +49,9 @@
 #define USE_REACH 1
 #define USE_PHYSICS_CHARACTER 0
 //#define USE_REACH_TEST 0
-
-
 const bool LOG_PRUNE_CMD_TIME							= false;
 const bool LOG_CONTROLLER_TREE_PRUNING					= false;
 const bool LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS	= false;
-
 const bool ENABLE_EYELID_CORRECTIVE_CT					= false;
 
 using namespace std;

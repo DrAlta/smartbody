@@ -103,7 +103,7 @@
 #define ENABLE_DEFAULT_BOOTSTRAP	(1) 
 //#define DEFAULT_SEQUENCE_FILE		("ELITE-all.seq")
 #define DEFAULT_SEQUENCE_FILE		("default.seq")
-#define DEFAULT_PY_FILE				("default.py")
+#define DEFAULT_PY_FILE				("default-init.py")
 
 ///////////////////////////////////////////////////////////////////////////////////
 
