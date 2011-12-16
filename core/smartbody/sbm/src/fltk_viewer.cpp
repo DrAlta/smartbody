@@ -2933,7 +2933,51 @@ void FltkViewer::drawCharacterPhysicsObjs()
 			SrMat gmat = obj->getGlobalTransform().gmat();
 			SBJoint* joint = obj->getSBJoint();	
 			SbmPhysicsSim* physics = mcu.getPhysicsEngine();
-#if 0
+#if 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			if (physics)
 			{
 				SrVec jointPos = physics->getJointConstraintPos(obj->getPhyJoint());

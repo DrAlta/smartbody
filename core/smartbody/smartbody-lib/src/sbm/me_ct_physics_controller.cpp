@@ -29,7 +29,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 		_prevTime = t;
 	}	
 	bool hasPhy = mcu.physicsEngine->getBoolAttribute("enable");
-#if 1
+#if 0
 	if (_valid && _context && hasPhy)
 	{
 		SbmPhysicsCharacter* phyChar = _character->getPhysicsCharacter();
