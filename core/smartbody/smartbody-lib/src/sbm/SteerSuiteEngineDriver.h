@@ -9,11 +9,13 @@
 #include <PPRAgent.h>
 #include <sbm/SBObject.h>
 
-class SteerSuiteEngineDriver : public SteerLib::EngineControllerInterface, public SmartBody::SBObject
+class SteerSuiteEngineDriver :  public SmartBody::SBObject, public SteerLib::EngineControllerInterface
 {
 public:
 	SteerSuiteEngineDriver();
 	~SteerSuiteEngineDriver();
+
+
 	void init(SteerLib::SimulationOptions * options);
 	void finish();
 	void run();
@@ -21,8 +23,10 @@ public:
 	bool isInitialized();
 	bool isDone();
 	void setDone(bool val);
-	void setStartTime(float time);
-	float getStartTime();
+	void setStartTime(double time);
+	double getStartTime();
+	void setLastUpdateTime(double time);
+	double getLastUpdateTime();
 
 	/// @name The EngineControllerInterface
 	/// @brief The CommandLineEngineDriver does not support any of the engine controls.
@@ -42,17 +46,19 @@ public:
 
 	SteerLib::SimulationEngine * _engine;
 
+		// These functions are kept here to protect us from mangling the instance.
+	// Technically the CommandLineEngineDriver is not a singleton, though.
+//	SteerSuiteEngineDriver(const SteerSuiteEngineDriver & );  // not implemented, not copyable
+//	SteerSuiteEngineDriver& operator= (const SteerSuiteEngineDriver & );  // not implemented, not assignable
+
 protected:
 	bool _alreadyInitialized;
 	bool _done;
-	float _startTime;
+	double _startTime;
+	double _lastUpdateTime;
 	SteerLib::SimulationOptions * _options;
 
-private:
-	// These functions are kept here to protect us from mangling the instance.
-	// Technically the CommandLineEngineDriver is not a singleton, though.
-	SteerSuiteEngineDriver(const SteerSuiteEngineDriver & );  // not implemented, not copyable
-	SteerSuiteEngineDriver& operator= (const SteerSuiteEngineDriver & );  // not implemented, not assignable
+
 };
 
 #endif
