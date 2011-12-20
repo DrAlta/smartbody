@@ -43,6 +43,11 @@ class SteeringAgent
 		void startParameterTesting();
 		void updateSteerStateName();
 
+		void setSteerParamsDirty(bool val);
+		bool isSteerParamsDirty();
+		void initSteerParams();
+		void addSteeringAttributes();
+
 	private:
 		void normalizeAngle(float& angle);
 		inline float cmToM(float v)		{return (v / 100.0f);}
@@ -91,6 +96,7 @@ class SteeringAgent
 		float angleAcceleration;
 		SrVec targetLoc;
 		bool stepAdjust;
+		float pedMaxTurningRateMultiplier;
 
 		float newSpeed;
 		//----------------------------
@@ -142,6 +148,7 @@ class SteeringAgent
 		protected:
 		std::string lastMessage;
 		int numMessageRepeats;
+		bool _dirty;
 };
 
 #endif

@@ -119,12 +119,12 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	std::string localId;
 	xml_utils::xml_translate(&localId, attrID);
 
-	if (!mcu->steerEngine.isInitialized())
+	if (!mcu->_scene->getSteerManager()->getEngineDriver()->isInitialized())
 	{
 		LOG("Steering Engine not started. Call \"steer start\" first");
 		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
 	}
-	if (!mcu->steerEngine._engine)
+	if (!mcu->_scene->getSteerManager()->getEngineDriver()->_engine)
 	{
 		LOG("Steering Engine not started. Call \"steer start\" first");
 		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));

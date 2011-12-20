@@ -24,6 +24,7 @@ class SBObject : public SBObserver, public SBSubject
 
 		void setName(const std::string& name);
 		const std::string& getName();
+		bool hasAttribute(const std::string& attrName);
 		SBAttribute* getAttribute(const std::string& attrName);
 		std::map<std::string, SBAttribute*>& getAttributeList();
 		SBAttributeManager* getAttributeManager();

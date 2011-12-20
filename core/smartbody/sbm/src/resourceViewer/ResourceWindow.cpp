@@ -618,7 +618,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_STEERING)
 	{
-		widget = new AttributeItemWidget(&mcuCBHandle::singleton().steerEngine,x,y,w,h,name,treeItem,itemType,this);
+		widget = new AttributeItemWidget(mcuCBHandle::singleton()._scene->getSteerManager(),x,y,w,h,name,treeItem,itemType,this);
 	}
 	else if (itemType == ITEM_EVENT_HANDLERS)
 	{

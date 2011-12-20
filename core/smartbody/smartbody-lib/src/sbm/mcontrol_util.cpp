@@ -1055,28 +1055,36 @@ void mcuCBHandle::update( void )	{
 	}
 #endif
 	// updating steering engine
-	if (steerEngine.isInitialized())
+	if (_scene->getSteerManager()->getEngineDriver()->isInitialized())
 	{
-		if (!this->steerEngine.isDone())
+		if (!_scene->getSteerManager()->getEngineDriver()->isDone())
 		{
-			this->mark("SteeringUpdate",0,"Update");
-			if (this->steerEngine.getStartTime() == 0.0f)
-
-				this->steerEngine.setStartTime(float(this->time));
-	
-			for (std::map<std::string, SbmCharacter*>::iterator iter = getCharacterMap().begin();
-				iter != getCharacterMap().end();
-				iter++)
+			
+			if (_scene->getSteerManager()->getEngineDriver()->getStartTime() == 0.0)
 			{
-				SbmCharacter* character = (*iter).second;
-				if (character->steeringAgent)
-					character->steeringAgent->evaluate();
+				_scene->getSteerManager()->getEngineDriver()->setStartTime(this->time);
+				_scene->getSteerManager()->getEngineDriver()->setLastUpdateTime(this->time - .017);
 			}
 
-			bool running = this->steerEngine._engine->update(false, true, float(this->time) - this->steerEngine.getStartTime());
-			if (!running)
-				this->steerEngine.setDone(true);
-			this->mark("SteeringUpdate");
+			if (this->time - _scene->getSteerManager()->getEngineDriver()->getLastUpdateTime() >= .016)
+			{ // limit steering to 60 fps
+				this->mark("SteeringUpdate",0,"Update");
+				_scene->getSteerManager()->getEngineDriver()->setLastUpdateTime(this->time);
+				for (std::map<std::string, SbmCharacter*>::iterator iter = getCharacterMap().begin();
+					iter != getCharacterMap().end();
+					iter++)
+				{
+					SbmCharacter* character = (*iter).second;
+					if (character->steeringAgent)
+						character->steeringAgent->evaluate();
+				}
+
+				bool running = _scene->getSteerManager()->getEngineDriver()->_engine->update(false, true, (float) (this->time - _scene->getSteerManager()->getEngineDriver()->getStartTime()));
+				if (!running)
+					_scene->getSteerManager()->getEngineDriver()->setDone(true);
+				this->mark("SteeringUpdate");
+			}
+			
 		}
 	}
 

@@ -192,7 +192,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 	SrVec distanceVec(x, y, z);
 	float dist = currentReachData->XZDistanceToTarget(distanceVec);	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (dist > character->getHeight()*0.35f && !isMoving && startReach && mcu.steerEngine.isInitialized() )//currentReachData->startReach) 
+	if (dist > character->getHeight()*0.35f && !isMoving && startReach && mcu._scene->getSteerManager()->getEngineDriver()->isInitialized() )//currentReachData->startReach) 
 	{	
 		// if the target is far away, move the character first
 		//printf("idle to walk\n");
