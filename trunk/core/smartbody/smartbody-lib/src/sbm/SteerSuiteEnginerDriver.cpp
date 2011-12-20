@@ -28,24 +28,7 @@ SteerSuiteEngineDriver::SteerSuiteEngineDriver() : SBObject()
 	_options = NULL;
 	_startTime = 0;
 
-#ifdef WIN32
-			createStringAttribute("aimodule", "pprAI", true, "Basic", 60, false, false, false, "Agent module library");
-#endif
-#ifdef __linux__
-			createStringAttribute("aimodule", "libpprAI", true, "Basic", 60, false, false, false, "Agent module library");
-#endif
-#ifdef __APPLE__
-			createStringAttribute("aimodule", "libpprAI", true, "Basic", 60, false, false, false, "Agent module library");
-#endif
 
-	createStringAttribute("engineOptions.testCaseSearchPath", "../../../../core/smartbody/steersuite-1.3/testcases/", true, "Basic", 60, false, false, false, "Path to find agent shared libraries");
-	createStringAttribute("engineOptions.moduleSearchPath", "../../../../core/smartbody/sbm/bin/", true, "Basic", 60, false, false, false, "Path to find test cases");
-	createDoubleAttribute("gridDatabaseOptions.gridSizeX", 35, true, "Basic", 60, false, false, false, "Size of grid in x dimension.");
-	createDoubleAttribute("gridDatabaseOptions.gridSizeZ", 35, true, "Basic", 60, false, false, false, "Size of grid in z dimension.");
-	createIntAttribute("gridDatabaseOptions.numGridCellsX", 70, true, "Basic", 60, false, false, false, "Number of grid cells in x dimension.");
-	createIntAttribute("gridDatabaseOptions.numGridCellsZ", 70, true, "Basic", 60, false, false, false, "Number of grid cells in z dimension.");
-	createIntAttribute("gridDatabaseOptions.maxItemsPerGridCell", 7, true, "Basic", 60, false, false, false, "Max units per grid cell. If agent density is high, make sure increase this value.");
-	createDoubleAttribute("initialConditions.radius", 0.4, true, "Basic", 60, false, false, false, "Initial radius of agents in meters.");
 }
 
 SteerSuiteEngineDriver::~SteerSuiteEngineDriver()
@@ -70,13 +53,22 @@ void SteerSuiteEngineDriver::setDone(bool val)
 	_done = val;
 }
 
-void SteerSuiteEngineDriver::setStartTime(float time)
+void SteerSuiteEngineDriver::setStartTime(double time)
 {
 	_startTime = time;
 }
-float SteerSuiteEngineDriver::getStartTime()
+double SteerSuiteEngineDriver::getStartTime()
 {
 	return _startTime;
+}
+
+void SteerSuiteEngineDriver::setLastUpdateTime(double time)
+{
+	_lastUpdateTime = time;
+}
+double SteerSuiteEngineDriver::getLastUpdateTime()
+{
+	return _lastUpdateTime;
 }
 
 
@@ -166,3 +158,4 @@ void SteerSuiteEngineDriver::unloadSimulation()
 	_engine->cleanupSimulation();
 	std::cout << "Simulation unloaded.\n";
 }
+
