@@ -124,12 +124,13 @@ extern std::map<string,string> phonemeToViseme;
 extern std::string mapping;
 
 std::string festivalLibDir = "";
-//const char * FESTIVAL_RELAY_LIB_DIR = "..\\..\\lib\\festival\\festival\\lib";
 
 #ifdef WIN32
 string cache_directory = "..\\..\\data\\cache\\festival\\";
+const char * FESTIVAL_RELAY_LIB_DIR = "..\\..\\lib\\festival\\festival\\lib";
 #else
 string cache_directory = "../../data/cache/festival/";
+const char * FESTIVAL_RELAY_LIB_DIR = "../../lib/festival/festival/lib";
 #endif
 
 
@@ -704,7 +705,7 @@ int main(int argc, char **argv)
 #ifdef WIN32
 	std::string festivalLibDir = "..\\..\\lib\\festival\\festival\\lib";
 #else
-	std::string festivalLibDir = "../../lib/festival/lib";
+	std::string festivalLibDir = "../../lib/festival/festival/lib";
 #endif
 
 	for(int i=1; i<argc; ++i)
