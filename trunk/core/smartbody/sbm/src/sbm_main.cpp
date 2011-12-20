@@ -195,11 +195,11 @@ int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 	mcu_p->loop = false;
 
-	if (mcu_p->steerEngine.isInitialized())
+	if (mcu_p->_scene->getSteerManager()->getEngineDriver()->isInitialized())
 	{
-		mcu_p->steerEngine.stopSimulation();
-		mcu_p->steerEngine.unloadSimulation();
-		mcu_p->steerEngine.finish();
+		mcu_p->_scene->getSteerManager()->getEngineDriver()->stopSimulation();
+		mcu_p->_scene->getSteerManager()->getEngineDriver()->unloadSimulation();
+		mcu_p->_scene->getSteerManager()->getEngineDriver()->finish();
 	
 		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
 			iter != mcu_p->getCharacterMap().end();

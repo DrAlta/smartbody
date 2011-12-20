@@ -83,6 +83,18 @@ void SBObject::addAttribute( SBAttribute* attr, const std::string& groupName )
 	this->getAttributeManager()->notifyCreateAttribute(attr);
 }
 
+ bool SBObject::hasAttribute(const std::string& name)
+ {
+	std::map<std::string, SBAttribute*>::iterator iter = m_attributeList.find(name);
+	if (iter != m_attributeList.end()) // attribute exists, remove the old attribute 
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+ }
 
  SBAttribute* SBObject::getAttribute(const std::string& name)
  {

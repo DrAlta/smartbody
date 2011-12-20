@@ -3599,17 +3599,18 @@ void SbmCharacter::notify(SBSubject* subject)
 	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
 	if (attribute)
 	{
-		if (attribute->getName() == "visemecurve")
+		const std::string& attrName = attribute->getName();
+		if (attrName == "visemecurve")
 		{
 			SmartBody::BoolAttribute* curveAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
 			set_viseme_curve_mode(curveAttribute->getValue());
 		}
-		else if (attribute->getName() == "visemetimedelay")
+		else if (attrName == "visemetimedelay")
 		{
 			SmartBody::DoubleAttribute* timeDelayAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
 			set_viseme_time_delay((float) timeDelayAttribute->getValue());
 		}
-		else if (attribute->getName() == "mesh")
+		else if (attrName == "mesh")
 		{
 			SmartBody::StringAttribute* meshAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
 			std::stringstream strstr;
@@ -3621,10 +3622,16 @@ void SbmCharacter::notify(SBSubject* subject)
 				LOG("Problem setting attribute 'mesh' on character %s", getName().c_str());
 			}
 		}
-		if (attribute->getName() == "facebone")
+		if (attrName == "facebone")
 		{
 			SmartBody::BoolAttribute* faceBoneAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
-			// ...
+			// deprecated - face bones are now defined by the face definition
+		}
+		if (attrName.find("steering.") == 0)
+		{
+			// update the steering params on the next evaluation cycle
+			if (steeringAgent)
+				steeringAgent->setSteerParamsDirty(true);
 		}
 	}
 }

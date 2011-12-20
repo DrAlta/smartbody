@@ -2160,7 +2160,7 @@ int FltkViewer::handle ( int event )
 			 */
 			
 		 }
-		 else if (mcuCBHandle::singleton().steerEngine.isInitialized() && e.button3 && !e.alt)
+		 else if (mcuCBHandle::singleton()._scene->getSteerManager()->getEngineDriver()->isInitialized() && e.button3 && !e.alt)
 		 {
 			 if (_paLocoData->character)
 			 {
@@ -4277,7 +4277,7 @@ void FltkViewer::drawSteeringInfo()
 	if (_data->steerMode == ModeNoSteer)
 		return;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.steerEngine.isInitialized() || !mcu.steerEngine._engine)
+	if (!mcu._scene->getSteerManager()->getEngineDriver()->isInitialized() || !mcu._scene->getSteerManager()->getEngineDriver()->_engine)
 		return;
 
 	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
@@ -4286,14 +4286,14 @@ void FltkViewer::drawSteeringInfo()
 	glScalef(1 / mcu.steeringScale, 1 / mcu.steeringScale, 1 / mcu.steeringScale);
 
 	//comment out for now, have to take a look at the steering code
-	const std::vector<SteerLib::AgentInterface*>& agents = mcu.steerEngine._engine->getAgents();
+	const std::vector<SteerLib::AgentInterface*>& agents = mcu._scene->getSteerManager()->getEngineDriver()->_engine->getAgents();
 	for (size_t x = 0; x < agents.size(); x++)
 	{
-		mcu.steerEngine._engine->selectAgent(agents[x]);
+		mcu._scene->getSteerManager()->getEngineDriver()->_engine->selectAgent(agents[x]);
 		agents[x]->draw();
 	}
 
-	const std::set<SteerLib::ObstacleInterface*>& obstacles = mcu.steerEngine._engine->getObstacles();
+	const std::set<SteerLib::ObstacleInterface*>& obstacles = mcu._scene->getSteerManager()->getEngineDriver()->_engine->getObstacles();
 	for (std::set<SteerLib::ObstacleInterface*>::const_iterator iter = obstacles.begin();
 		iter != obstacles.end();
 		iter++)
@@ -4303,7 +4303,7 @@ void FltkViewer::drawSteeringInfo()
 	
 	if (_data->steerMode == ModeSteerAll)
 	{
-		mcu.steerEngine._engine->getSpatialDatabase()->draw();
+		mcu._scene->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->draw();
 	}
 
 	glPopMatrix();

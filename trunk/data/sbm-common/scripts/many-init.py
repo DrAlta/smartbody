@@ -39,7 +39,7 @@ scene.setDefaultRecipient("brad1")
 
 scene.run("init-param-animation.py")
 
-scene.run("init-steer-agents.py")
+#scene.run("init-steer-agents.py")
 
 #scene.run("init-example-reach.py")
 #names = scene.getCharacterNames()
@@ -51,7 +51,11 @@ sim.start()
 
 for i in range(0, numCharacters):
 	bml.execBML('brad' + str(i), '<body posture="ChrUtah_Idle003"/>')
-
+	
+	
+for i in range(0, numCharacters):
+	scene.command("panim schedule char brad" + str(i) + " state allLocomotion loop true playnow false")
+	#scene.commandAt(3, "panim updatestate char brad" + str(i) + " 0 100 0")
 sim.resume()
 
 

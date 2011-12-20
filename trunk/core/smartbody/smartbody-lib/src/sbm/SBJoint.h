@@ -46,6 +46,9 @@ class SBJoint : public SkJoint
 		void calculateLocalCenter();
 		const SrVec& getLocalCenter();
 
+		void setMass(float mass);
+		float getMass();
+
 	protected:
 		SrVec _localCenter;
 

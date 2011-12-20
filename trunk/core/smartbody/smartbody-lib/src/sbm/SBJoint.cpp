@@ -179,4 +179,14 @@ const SrVec& SBJoint::getLocalCenter()
 	return _localCenter;
 }
 
+void SBJoint::setMass(float m)
+{
+	mass(m);
+}
+
+float SBJoint::getMass()
+{
+	return mass();
+}
+
 };

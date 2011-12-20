@@ -17,7 +17,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="..\..\..\build\win32\Debug"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="..\..\..\build\win32\SteerSuiteBuildOptions.vsprops"
@@ -60,7 +60,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="&quot;$(SolutionDir)\$(ConfigurationName)\steerlib.lib&quot;"
+				AdditionalDependencies="steerlibd.lib"
+				OutputFile="$(OutDir)\$(ProjectName)d.dll"
+				AdditionalLibraryDirectories="..\..\..\build\win32\Debug"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -88,7 +90,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="..\..\..\build\win32\Release"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="..\..\..\build\win32\SteerSuiteBuildOptions.vsprops"
@@ -132,7 +134,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="&quot;$(SolutionDir)\$(ConfigurationName)\steerlib.lib&quot;"
+				AdditionalDependencies="steerlib.lib"
+				AdditionalLibraryDirectories="..\..\..\build\win32\Release"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

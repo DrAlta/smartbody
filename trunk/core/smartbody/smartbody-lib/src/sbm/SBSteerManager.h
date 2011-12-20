@@ -1,9 +1,16 @@
 #ifndef _STEERMANAGER_H_
 #define _STEERMANAGER_H_
 
+#include <vhcl.h>
 #include <sbm/SBSteerAgent.h>
+#include <SteerLib.h>
+#include <PPRAgent.h>
+#include <sbm/SBService.h>
+#include <sbm/SteerSuiteEngineDriver.h>
 
-class SBSteerManager
+namespace SmartBody {
+
+class SBSteerManager : public SmartBody::SBService
 {
 	public:
 		SBSteerManager();
@@ -13,7 +20,8 @@ class SBSteerManager
 		void stop();
 		void setSteerUnit(std::string unit);
 		std::string getSteerUnit();
-		
+
+		SteerSuiteEngineDriver* getEngineDriver();
 
 		SBSteerAgent* createSteerAgent(std::string name);
 		void removeSteerAgent(std::string name);
@@ -24,6 +32,12 @@ class SBSteerManager
 
 	private:
 		std::map<std::string, SBSteerAgent*> _steerAgents;
+
+		SteerSuiteEngineDriver _driver;
+
+
 };
+
+}
 
 #endif 

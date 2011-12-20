@@ -452,6 +452,58 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("abort", &Script::abort, "Abort this running script, this only works for seq script. \n Input: NULL \n Output: NULL")
 		;
 */
+boost::python::class_<SBAttribute>("SBAttribute")
+		.def("getName", &SBAttribute::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
+	;
+
+	boost::python::class_<BoolAttribute, boost::python::bases<SBAttribute> >("BoolAttribute")
+		.def("getValue", &BoolAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
+	;
+
+	boost::python::class_<StringAttribute, boost::python::bases<SBAttribute> >("StringAttribute")
+		.def("getValue", &StringAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
+	;
+
+	boost::python::class_<IntAttribute, boost::python::bases<SBAttribute> >("IntAttribute")
+		.def("getValue", &IntAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
+	;
+
+	boost::python::class_<DoubleAttribute, boost::python::bases<SBAttribute> >("DoubleAttribute")
+		.def("getValue", &DoubleAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
+	;
+
+	boost::python::class_<SBObject>("SBObject")
+		.def("getName", &SBObject::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the object.")
+		.def("getNumAttributes", &SBObject::getNumAttributes,  "Returns the number of attributes associated with this object.")
+		.def("getAttributeNames", &SBObject::getAttributeNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the attributes names associated with this object.")
+		.def("getAttribute", &SBObject::getAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns an attribute of a given name")
+		.def("createBoolAttribute", &SBObject::createBoolAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a boolean attribute.")
+		.def("createIntAttribute", &SBObject::createIntAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates an integer attribute.")
+		.def("createDoubleAttribute", &SBObject::createDoubleAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a double attribute.")
+		.def("createStringAttribute", &SBObject::createStringAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a string attribute.")
+		.def("setBoolAttribute", &SBObject::setBoolAttribute, "Sets a boolean attribute of a given name to the given value.")
+		.def("setIntAttribute", &SBObject::setIntAttribute, "Sets an integer attribute of a given name to the given value.")
+		.def("setDoubleAttribute", &SBObject::setDoubleAttribute, "Sets a floating point attribute of a given name to the given value.")
+		.def("setStringAttribute", &SBObject::setStringAttribute, "Sets a string attribute of a given name to the given value.")
+		.def("setVec3Attribute", &SBObject::setVec3Attribute, "Sets a vector attribute of a given name to the given value.")
+		.def("setMatrixAttribute", &SBObject::setMatrixAttribute, "Sets a matrix attribute of a given name to the given value.")
+		;
+
+
+	boost::python::class_<SBService, boost::python::bases<SBObject> >("SBService")
+		.def("setEnable", &SBService::setEnable, "Enables or disables the service.")
+		.def("isEnable", &SBService::isEnable, "Is the service enabled?")
+		;
+
+	boost::python::class_<SBServiceManager>("SBServiceManager")
+		.def("addService", &SBServiceManager::addService, "Adds a service to the service manager.")
+		.def("removeService", &SBServiceManager::removeService, "Removes a service to the service manager.")
+		.def("getServiceNames", &SBServiceManager::getServiceNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of services available.")
+		.def("getNumServices", &SBServiceManager::getNumServices, "Returns the number of services present.")
+		.def("getService", &SBServiceManager::getService, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a service by name.")
+		;
+
+
 	boost::python::class_<SBSimulationManager>("SBSimulationManager")
 		.def("isRunning", &SBSimulationManager::isRunning, "Returns true if the simulation is currently running.")
 		.def("isStarted", &SBSimulationManager::isStarted, "Returns true if the simulation has been started.")
@@ -556,8 +608,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getTransitionNames", &SBAnimationStateManager::getTransitionNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the state names.")
 		;
 
-
-	boost::python::class_<SBSteerManager>("SBSteerManager")
+	boost::python::class_<SBSteerManager, boost::python::bases<SBService> >("SBSteerManager")
 		.def("createSteerAgent", &SBSteerManager::createSteerAgent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a steer agent.")
 		.def("removeSteerAgent", &SBSteerManager::removeSteerAgent, "Remove a steer agent.")
 		.def("getNumSteerAgents", &SBSteerManager::getNumSteerAgents, "Return number of steer agents.")
@@ -575,18 +626,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getCurrentSBCharacter", &SBSteerAgent::getCurrentSBCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return SBCharacter that SBSteerAgent is attached to.")		
 		;
 
-	boost::python::class_<SBServiceManager>("SBServiceManager")
-		.def("addService", &SBServiceManager::addService, "Adds a service to the service manager.")
-		.def("removeService", &SBServiceManager::removeService, "Removes a service to the service manager.")
-		.def("getServiceNames", &SBServiceManager::getServiceNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of services available.")
-		.def("getNumServices", &SBServiceManager::getNumServices, "Returns the number of services present.")
-		.def("getService", &SBServiceManager::getService, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a service by name.")
-		;
-
-	boost::python::class_<SBService>("SBService")
-		.def("setEnable", &SBService::setEnable, "Enables or disables the service.")
-		.def("isEnable", &SBService::isEnable, "Is the service enabled?")
-		;
+	
 
 /*
 	boost::python::class_<Viseme>("Viseme")		
@@ -611,42 +651,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 		;
 
 
-	boost::python::class_<SBAttribute>("SBAttribute")
-		.def("getName", &SBAttribute::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
-	;
+	
 
-	boost::python::class_<BoolAttribute, boost::python::bases<SBAttribute> >("BoolAttribute")
-		.def("getValue", &BoolAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
-	;
-
-	boost::python::class_<StringAttribute, boost::python::bases<SBAttribute> >("StringAttribute")
-		.def("getValue", &StringAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
-	;
-
-	boost::python::class_<IntAttribute, boost::python::bases<SBAttribute> >("IntAttribute")
-		.def("getValue", &IntAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
-	;
-
-	boost::python::class_<DoubleAttribute, boost::python::bases<SBAttribute> >("DoubleAttribute")
-		.def("getValue", &DoubleAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
-	;
-
-	boost::python::class_<SBObject>("SBObject")
-		.def("getName", &SBObject::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the object.")
-		.def("getNumAttributes", &SBObject::getNumAttributes,  "Returns the number of attributes associated with this object.")
-		.def("getAttributeNames", &SBObject::getAttributeNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the attributes names associated with this object.")
-		.def("getAttribute", &SBObject::getAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns an attribute of a given name")
-		.def("createBoolAttribute", &SBObject::createBoolAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a boolean attribute.")
-		.def("createIntAttribute", &SBObject::createIntAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates an integer attribute.")
-		.def("createDoubleAttribute", &SBObject::createDoubleAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a double attribute.")
-		.def("createStringAttribute", &SBObject::createStringAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a string attribute.")
-		.def("setBoolAttribute", &SBObject::setBoolAttribute, "Sets a boolean attribute of a given name to the given value.")
-		.def("setIntAttribute", &SBObject::setIntAttribute, "Sets an integer attribute of a given name to the given value.")
-		.def("setDoubleAttribute", &SBObject::setDoubleAttribute, "Sets a floating point attribute of a given name to the given value.")
-		.def("setStringAttribute", &SBObject::setStringAttribute, "Sets a string attribute of a given name to the given value.")
-		.def("setVec3Attribute", &SBObject::setVec3Attribute, "Sets a vector attribute of a given name to the given value.")
-		.def("setMatrixAttribute", &SBObject::setMatrixAttribute, "Sets a matrix attribute of a given name to the given value.")
-		;
 
 	boost::python::class_<SBMotion, boost::python::bases<SBObject> >("SBMotion")
 		//.def(boost::python::init<std::string>())
@@ -736,6 +742,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getUseRotation", &SBJoint::isUseRotation, "Determines if the joint uses rotation channels.")	
 		.def("setUsePosition", &SBJoint::setUsePosition, "Allows the joint to use position channels.")	
 		.def("isUsePosition", &SBJoint::isUsePosition, "Determines if the joint uses position channels.")	
+		.def("getMass", &SBJoint::getMass, "Gets the mass of the joint.")
+		.def("setMass", &SBJoint::setMass, "Sets the mass of the joint.")
 		;
 
 	boost::python::class_<SBBehavior, boost::python::bases<SBObject> >("SBBehavior")

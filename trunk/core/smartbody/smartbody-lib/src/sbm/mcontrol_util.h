@@ -335,7 +335,6 @@ public:
 		SBResourceManager*			resource_manager;
 		std::vector<CameraTrack*>	cameraTracking;
 
-		SteerSuiteEngineDriver		steerEngine;
 		SbmPhysicsSim*              physicsEngine;
 
 	private:

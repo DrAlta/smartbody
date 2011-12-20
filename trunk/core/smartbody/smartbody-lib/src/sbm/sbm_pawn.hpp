@@ -35,6 +35,7 @@
 #include <me/me_ct_channel_writer.hpp>
 #include <me/me_ct_curve_writer.hpp>
 #include <sbm/SBObject.h>
+#include <SteerLib.h>
 
 #include "bonebus.h"
 
@@ -104,7 +105,7 @@ public:  // TODO - properly encapsulate / privatize the following
 	
 	//		float scale = 0.5f;
 //		SteerLib::BoxObstacle* box = new SteerLib::BoxObstacle(x / 100.0f - scale, x / 100.0f + scale, y / 100.0f - scale, y / 100.0f + scale, z / 100.0f - scale, z / 100.0f + scale);
-//		mcuCBHandle::singleton().steerEngine._engine->addObstacle(box);
+//		mcuCBHandle::singleton().steerEngine->_engine->addObstacle(box);
 
 	// Temporarily, until there is a unified multi-skeleton controller tree
 	MeControllerTreeRoot	*ct_tree_p;
