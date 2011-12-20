@@ -6942,7 +6942,7 @@ int xmlcache_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			 iter != mcu_p->xmlCache.end();
 			 iter++)
 		{
-			LOG("%s", (*iter).first);
+			LOG("%s", (*iter).first.c_str());
 		}
 		return CMD_SUCCESS;
 	}
