@@ -45,7 +45,7 @@ VisemeData::VisemeData( const std::string& id, int numKeys, const std::string& c
 		int index = 4 * (numKeys - 1);
 		if (tokens.size() <= (unsigned int) index)
 		{
-			LOG("Curve %s is not properly created - insufficient number of keys (%d) - expected %d.", id, tokens.size() / 4, numKeys * 4);
+			LOG("Curve %s is not properly created - insufficient number of keys (%d) - expected %d.", id.c_str(), tokens.size() / 4, numKeys * 4);
 		}
 		else
 		{
