@@ -120,6 +120,8 @@ XERCES_CPP_NAMESPACE_USE
 
 bool isDone = false;
 extern SpeechRequestData xmlMetaData;
+extern std::map<string,string> phonemeToViseme;
+extern std::string mapping;
 
 std::string festivalLibDir = "";
 //const char * FESTIVAL_RELAY_LIB_DIR = "..\\..\\lib\\festival\\festival\\lib";
@@ -585,6 +587,66 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
 
 
 
+//Phoneme to viseme mapping
+ void set_phonemes_to_visemes()
+{
+
+    if(mapping == "sbm")
+    {
+        phonemeToViseme[ "pau" ] = "_";  // SIL
+        phonemeToViseme[ "aa" ]  = "Ao"; // AA
+        phonemeToViseme[ "ae" ]  = "Ih"; // AE
+        phonemeToViseme[ "ah" ]  = "Ih"; // AH
+        phonemeToViseme[ "ao" ]  = "Ao"; // AO
+        phonemeToViseme[ "ax" ]  = "Ih"; // AX
+        phonemeToViseme[ "@" ]   = "Ih"; // 
+        phonemeToViseme[ "aw" ]  = "Ih"; // AW
+        phonemeToViseme[ "ay" ]  = "Ih"; // AY
+        phonemeToViseme[ "b" ]   = "BMP";//  B
+        phonemeToViseme[ "ch" ]  = "j";  // CH
+        phonemeToViseme[ "d" ]   = "D";  //  D
+        phonemeToViseme[ "dh" ]  = "Th"; // DH
+        phonemeToViseme[ "dx" ]  = "D";  // ??
+        phonemeToViseme[ "eh" ]  = "Ih"; // EH
+        phonemeToViseme[ "er" ]  = "Er"; // ER
+        phonemeToViseme[ "ey" ]  = "Ih"; // 
+        phonemeToViseme[ "f" ]   = "F";  //  F
+        phonemeToViseme[ "g" ]   = "KG"; //  G
+        phonemeToViseme[ "hh" ]  = "Ih"; // HH
+        phonemeToViseme[ "ih" ]  = "Ih"; // IH
+        phonemeToViseme[ "iy" ]  = "EE"; // IY
+        phonemeToViseme[ "jh" ]  = "j";  // JH
+        phonemeToViseme[ "k" ]   = "KG"; //  K
+        phonemeToViseme[ "l" ]   = "D";  //  L
+        phonemeToViseme[ "m" ]   = "BMP";//  M
+        phonemeToViseme[ "n" ]   = "NG"; //  N
+        phonemeToViseme[ "ng" ]  = "NG"; // NG
+        phonemeToViseme[ "ow" ]  = "Oh"; // OW
+        phonemeToViseme[ "oy" ]  = "Oh"; // OY
+        phonemeToViseme[ "p" ]   = "BMP";//  P
+        phonemeToViseme[ "r" ]   = "R";  //  R
+        phonemeToViseme[ "s" ]   = "Z";  //  S
+        phonemeToViseme[ "sh" ]  = "j";  // SH
+        phonemeToViseme[ "T" ]   = "D";  // T?
+        phonemeToViseme[ "t" ]   = "D";  // T?
+        phonemeToViseme[ "th" ]  = "Th"; // TH
+        phonemeToViseme[ "uh" ]  = "Oh"; // UH
+        phonemeToViseme[ "uw" ]  = "Oh"; // UW
+        phonemeToViseme[ "v" ]   = "F";  //  V
+        phonemeToViseme[ "w" ]   = "OO"; //  W
+        phonemeToViseme[ "y" ]   = "OO"; //  Y
+        phonemeToViseme[ "z" ]   = "Z";  //  Z
+        phonemeToViseme[ "zh" ]  = "J";  // ZH
+    }
+   
+}
+
+
+
+
+
+
+
 // initialize activeMQ
 bool open_activeMQ()
 {
@@ -711,6 +773,10 @@ int main(int argc, char **argv)
     int heap_size = FESTIVAL_HEAP_SIZE;  
     int load_init_files = 1; // we want the festival init files loaded
     festival_initialize(load_init_files,heap_size);
+
+
+    mapping = "sbm";
+    set_phonemes_to_visemes();
 
 
 #ifdef WIN32
