@@ -55,7 +55,7 @@ void srPathList::reset()
 	_curIndex = 0;
 }
 		
-std::string srPathList::next_path( void )
+std::string srPathList::next_path(bool withPrefix)
 {
 	if (size_t(_curIndex) >= _paths.size())
 		return "";
@@ -64,7 +64,7 @@ std::string srPathList::next_path( void )
 	// if the path is an absolute path, don't prepend the media path
 	const boost::filesystem::path p = _paths[_curIndex];
 	const std::string& pathPrefix = getPathPrefix();
-	if (pathPrefix.size() > 0 && !p.has_root_path())
+	if (withPrefix && (pathPrefix.size() > 0 && !p.has_root_path()))
 	{
 		boost::filesystem::path mediapath(pathPrefix);
 		mediapath /= p;

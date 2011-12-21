@@ -315,6 +315,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getNumScripts", &SBScene::getNumScripts, "Returns the number of scripts.")
 		.def("getScriptNames", &SBScene::getScriptNames, "Returns the names of all the scripts.")
 		.def("getScript", &SBScene::getScript, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a script.")
+		.def("getScale", &SBScene::getScale, "Returns the scene scale in meters (default is centimeters .01)")
+		.def("setScale", &SBScene::setScale, "Sets the scene scale in meters.")
 
 		// command processing
 		.def("command", &SBScene::command, "Runs an old-Style SmartBody command.")

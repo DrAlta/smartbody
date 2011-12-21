@@ -22,6 +22,9 @@ class SBScene : public SBObject
 		SBScene(void);
 		~SBScene(void);
 
+		void setScale(double val);
+		double getScale();
+
 		void command(const std::string& command);
 		void commandAt(float seconds, const std::string& command);
 		void sendVHMsg(std::string message);
@@ -82,7 +85,7 @@ class SBScene : public SBObject
 
 		void notify(SBSubject* subject);
 
-	private:
+	protected:
 		SBSimulationManager* _sim;
 		SBProfiler* _profiler;
 		SBBmlProcessor* _bml;
@@ -92,6 +95,7 @@ class SBScene : public SBObject
 		SBServiceManager* _serviceManager;
 
 		std::map<std::string, SBScript*> _scripts;
+		double _scale;
 };
 
 };
