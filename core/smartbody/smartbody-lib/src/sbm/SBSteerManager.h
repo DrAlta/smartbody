@@ -20,6 +20,7 @@ class SBSteerManager : public SmartBody::SBService
 		void stop();
 		void setSteerUnit(std::string unit);
 		std::string getSteerUnit();
+		float getSteerUnitValue();
 
 		SteerSuiteEngineDriver* getEngineDriver();
 

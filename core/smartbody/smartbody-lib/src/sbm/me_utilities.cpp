@@ -146,6 +146,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, SBResou
 	{
 		fclose(fp);
 		SkMotion motion;
+		//LOG("FBX parse load skeleton: %s", filename.c_str());
 		ParserFBX::parse(*skeleton_p, motion, filename, float(scale));
 		skeleton_p->skfilename(filename.c_str());
 		skeleton_p->name(skel_file);
@@ -312,6 +313,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 		else if (ext == ".fbx")
 		{
 			SkSkeleton skeleton;
+			//LOG("FBX motion parse: %s", pathname.string().c_str());
 			parseSuccessful = ParserFBX::parse(skeleton, *motion, pathname.string(), float(scale));	
 		}
 #endif
@@ -428,6 +430,8 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 				}
 				else
 				{
+					std::string fullName = filebase + ext;
+					skeleton->name(fullName.c_str());
 					map.insert(std::pair<std::string, SkSkeleton*>(filebase + ext, skeleton));
 				}
 			}
@@ -510,6 +514,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 			skeleton->skfilename(filebase.c_str());
 			skeleton->name(filebase.c_str());
 			SkMotion motion;
+			//LOG("FBX skeleton skeleton load: %s", pathname.string().c_str());
 			bool ok = ParserFBX::parse(*skeleton, motion, pathname.string(), float(scale));
 			if (ok)
 			{

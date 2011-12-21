@@ -381,6 +381,10 @@ void MeCtParamAnimation::autoScheduling(double time)
 			delete nextStateModule;
 		nextStateModule = NULL;
 		curStateModule = createStateModule(nextUnit.data, nextUnit.loop, nextUnit.playNow);
+		if (!curStateModule)
+		{
+			return;
+		}
 		curStateModule->active = true;
 #if PrintPADebugInfo
 		LOG("State %s being scheduled.[ACTIVE]", curStateModule->data->stateName.c_str());

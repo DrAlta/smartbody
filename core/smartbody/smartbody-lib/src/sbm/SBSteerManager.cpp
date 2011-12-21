@@ -23,6 +23,7 @@ SBSteerManager::SBSteerManager() : SBService()
 	createIntAttribute("gridDatabaseOptions.numGridCellsZ", 70, true, "Basic", 60, false, false, false, "Number of grid cells in z dimension.");
 	createIntAttribute("gridDatabaseOptions.maxItemsPerGridCell", 7, true, "Basic", 60, false, false, false, "Max units per grid cell. If agent density is high, make sure increase this value.");
 	createDoubleAttribute("initialConditions.radius", 0.4, true, "Basic", 60, false, false, false, "Initial radius of agents in meters.");
+	createBoolAttribute("addBoundaryWalls", true, true, "Basic", 60, false, false, false, "Adds boundaries around the perimeter of the grid to prevent agents from leaving grid area.");
 }
 
 SBSteerManager::~SBSteerManager()
@@ -62,7 +63,6 @@ void SBSteerManager::start()
 	int numGridCellsX = dynamic_cast<SmartBody::IntAttribute*> (mcu._scene->getSteerManager()->getAttribute("gridDatabaseOptions.numGridCellsX"))->getValue();
 	int numGridCellsZ = dynamic_cast<SmartBody::IntAttribute*> (mcu._scene->getSteerManager()->getAttribute("gridDatabaseOptions.numGridCellsZ"))->getValue();
 	int maxItemsPerGridCell = dynamic_cast<SmartBody::IntAttribute*> (mcu._scene->getSteerManager()->getAttribute("gridDatabaseOptions.maxItemsPerGridCell"))->getValue();
-	maxItemsPerGridCell = 30;
 	steerOptions->gridDatabaseOptions.numGridCellsX = numGridCellsX;
 	steerOptions->gridDatabaseOptions.numGridCellsZ = numGridCellsZ;
 	steerOptions->gridDatabaseOptions.maxItemsPerGridCell = maxItemsPerGridCell;
@@ -185,6 +185,12 @@ std::string SBSteerManager::getSteerUnit()
 		return "centimeter";
 
 	return "";
+}
+
+float SBSteerManager::getSteerUnitValue()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	return mcu.steeringScale;
 }
 
 SBSteerAgent* SBSteerManager::createSteerAgent(std::string name)

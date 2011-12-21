@@ -5362,6 +5362,11 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	std::string mediaPath = mcuCBHandle::singleton().getMediaPath();
 
 	boost::filesystem::path path(directory);
+	if (!boost::filesystem::is_directory(path))
+	{
+		LOG("Path %s is not a directory, so motion mapping will not occur.", path.string().c_str());
+		return CMD_FAILURE;
+	}
 	boost::filesystem::path finalPath;
 	// include the media path in the pathname if applicable
 	std::string rootDir = path.root_directory();
@@ -5607,9 +5612,13 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				initialConditions.goals.clear();
 				initialConditions.name = character->getName();
 				SteerLib::AgentInterface* agent = mcu_p->_scene->getSteerManager()->getEngineDriver()->_engine->createAgent( initialConditions, pprAIModule );
-				if (!character->steeringAgent)
-					character->steeringAgent = new SteeringAgent(character);
-				character->steeringAgent->setAgent(agent);
+				if (character)
+				{
+					if (!character->steeringAgent)
+						character->steeringAgent = new SteeringAgent(character);
+					character->steeringAgent->setAgent(agent);
+				}
+				
 				agent->reset(initialConditions, dynamic_cast<SteerLib::EngineInterface*>(pprAIModule));
 			}
 			// adding obstacles to the steering space

@@ -68,8 +68,11 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 	{
 		int order;
 		std::string filebasename = boost::filesystem::basename(pathName);
+		std::string fileextension = boost::filesystem::extension(pathName);
 		motion.setName(filebasename.c_str());
-		skeleton.name(filebasename.c_str());
+		std::stringstream strstr;
+		strstr << filebasename << "." << fileextension;
+		skeleton.name(strstr.str().c_str());
 		parser->parse(pathName.c_str());
 		DOMDocument* doc = parser->getDocument();
 		DOMNode* skNode = getNode("library_visual_scenes", doc);

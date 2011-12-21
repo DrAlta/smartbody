@@ -1496,14 +1496,16 @@ void SbmPawn::initSteeringSpaceObject()
 	if (!mcu._scene->getSteerManager()->getEngineDriver()->isInitialized())	return;
 	if (!mcu._scene->getSteerManager()->getEngineDriver()->_engine)	return;
 
+	float steerScale = 1.0f / mcu._scene->getSteerManager()->getSteerUnitValue();
+
 	float x, y, z, h, p, r;
 	this->get_world_offset(x, y, z, h, p, r);	
-	float xmin = (x - steeringSpaceObjSize.x) / 100.0f;
-	float xmax = (x + steeringSpaceObjSize.x) / 100.0f;
-	float ymin = (y - steeringSpaceObjSize.y) / 100.0f;
-	float ymax = (y + steeringSpaceObjSize.y) / 100.0f;
-	float zmin = (z - steeringSpaceObjSize.z) / 100.0f;
-	float zmax = (z + steeringSpaceObjSize.z) / 100.0f;
+	float xmin = (x - steeringSpaceObjSize.x) / steerScale;
+	float xmax = (x + steeringSpaceObjSize.x) / steerScale;
+	float ymin = (y - steeringSpaceObjSize.y) / steerScale;
+	float ymax = (y + steeringSpaceObjSize.y) / steerScale;
+	float zmin = (z - steeringSpaceObjSize.z) / steerScale;
+	float zmax = (z + steeringSpaceObjSize.z) / steerScale;
 
 	if (steeringSpaceObj_p)
 	{
