@@ -213,6 +213,8 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 			continue;
 
 		SkMotion* motion = tagMotion.second;
+		if (!motion)
+			continue;
 		if (motionData.find(tagMotion) != motionData.end())
 			continue; // we do not process example motions that are already used for this controller instance
 		if (!refMotion)

@@ -114,4 +114,4 @@ def locomotionSetup(skeleton, baseJoint):
 	state.addTetrahedron("ChrUtah_Shuffle01", "ChrUtah_StrafeSlowRt01", "ChrUtah_Idle001", "ChrUtah_Idle01_ToWalk01_Turn360Lf01")
 	state.addTetrahedron("ChrUtah_Shuffle01", "ChrUtah_StrafeSlowRt01", "ChrUtah_Idle001", "ChrUtah_Idle01_ToWalk01_Turn360Rt01")
 
-locomotionSetup("common.sk", "base")
+locomotionSetup("test_utah.sk", "base")

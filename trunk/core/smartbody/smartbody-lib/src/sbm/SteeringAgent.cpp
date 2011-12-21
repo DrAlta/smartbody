@@ -149,117 +149,117 @@ void SteeringAgent::addSteeringAttributes()
 
 void SteeringAgent::initSteerParams()
 {
-	if (character->hasAttribute("steering.basicLocoAngleGain"))
+	if (character && character->hasAttribute("steering.basicLocoAngleGain"))
 		basicLocoAngleGain = (float) character->getDoubleAttribute("steering.basicLocoAngleGain");
 	else
 		basicLocoAngleGain = 2.0f;
 
-	if (character->hasAttribute("steering.basicLocoScootGain"))
+	if (character && character->hasAttribute("steering.basicLocoScootGain"))
 		basicLocoScootGain = (float) character->getDoubleAttribute("steering.basicLocoScootGain");
 	else
 		basicLocoScootGain = 10.0f;
 
-	if (character->hasAttribute("steering.locoSpdGain"))
+	if (character && character->hasAttribute("steering.locoSpdGain"))
 		locoSpdGain = (float) character->getDoubleAttribute("steering.locoSpdGain");
 	else
 		locoSpdGain = 70.0f;
 
-	if (character->hasAttribute("steering.locoScootGain"))
+	if (character && character->hasAttribute("steering.locoScootGain"))
 		locoScootGain = (float) character->getDoubleAttribute("steering.locoScootGain");
 	else
 		locoScootGain =  2.0f;
 	
-	if (character->hasAttribute("steering.paLocoAngleGain"))
+	if (character && character->hasAttribute("steering.paLocoAngleGain"))
 		paLocoAngleGain = (float) character->getDoubleAttribute("steering.paLocoAngleGain");
 	else
 		paLocoAngleGain =  2.0f;
 	
-	if (character->hasAttribute("steering.paLocoScootGain"))
+	if (character && character->hasAttribute("steering.paLocoScootGain"))
 		paLocoScootGain = (float) character->getDoubleAttribute("steering.paLocoScootGain");
 	else
 		paLocoScootGain =  9.0f;
 
-	if (character->hasAttribute("steering.scootThreshold"))
+	if (character && character->hasAttribute("steering.scootThreshold"))
 		scootThreshold = (float) character->getDoubleAttribute("steering.scootThreshold");
 	else
 		scootThreshold = 0.1f;
 
-	if (character->hasAttribute("steering.speedThreshold"))
+	if (character && character->hasAttribute("steering.speedThreshold"))
 		speedThreshold = (float) character->getDoubleAttribute("steering.speedThreshold");
 	else
 		speedThreshold = 0.1f;
 	
-	if (character->hasAttribute("steering.angleSpeedThreshold"))
+	if (character && character->hasAttribute("steering.angleSpeedThreshold"))
 		angleSpeedThreshold = (float) character->getDoubleAttribute("steering.angleSpeedThreshold");
 	else
 		angleSpeedThreshold = 10.0f;
 
-	if (character->hasAttribute("steering.distThreshold"))
+	if (character && character->hasAttribute("steering.distThreshold"))
 		distThreshold = (float) character->getDoubleAttribute("steering.distThreshold");
 	else
 		distThreshold = 1.80f;	
 
-	if (character->hasAttribute("steering.distDownThreshold"))
+	if (character && character->hasAttribute("steering.distDownThreshold"))
 		distDownThreshold = (float) character->getDoubleAttribute("steering.distDownThreshold");
 	else
 		distDownThreshold = 0.3f;
 
-	if (character->hasAttribute("steering.brakingGain"))
+	if (character && character->hasAttribute("steering.brakingGain"))
 		brakingGain = (float) character->getDoubleAttribute("steering.brakingGain");
 	else
 		brakingGain = 1.2f;
 	
-	if (character->hasAttribute("steering.desiredSpeed"))
+	if (character && character->hasAttribute("steering.desiredSpeed"))
 		desiredSpeed = (float) character->getDoubleAttribute("steering.desiredSpeed");
 	else
 		desiredSpeed = 1.0f;	
 
-	if (character->hasAttribute("steering.facingAngle"))
+	if (character && character->hasAttribute("steering.facingAngle"))
 		facingAngle = (float) character->getDoubleAttribute("steering.facingAngle");
 	else
 		facingAngle = -200.0f;
 
-	if (character->hasAttribute("steering.facingAngleThreshold"))
+	if (character && character->hasAttribute("steering.facingAngleThreshold"))
 		facingAngleThreshold = (float) character->getDoubleAttribute("steering.facingAngleThreshold");
 	else
 		facingAngleThreshold = 10;
 	
-	if (character->hasAttribute("steering.acceleration"))
+	if (character && character->hasAttribute("steering.acceleration"))
 		acceleration = (float) character->getDoubleAttribute("steering.acceleration");
 	else
 		acceleration = 2.0f;	
 	
-	if (character->hasAttribute("steering.scootAcceleration"))
+	if (character && character->hasAttribute("steering.scootAcceleration"))
 		scootAcceleration = (float) character->getDoubleAttribute("steering.scootAcceleration");
 	else
 		scootAcceleration = 200.f;	
 
-	if (character->hasAttribute("steering.angleAcceleration"))
+	if (character && character->hasAttribute("steering.angleAcceleration"))
 		angleAcceleration = (float) character->getDoubleAttribute("steering.angleAcceleration");
 	else
 		angleAcceleration = 400.f;
 
-	if (character->hasAttribute("steering.stepAdjust"))
+	if (character && character->hasAttribute("steering.stepAdjust"))
 		stepAdjust = character->getBoolAttribute("steering.stepAdjust");
 	else
 		stepAdjust = false;
 	
-	if (character->hasAttribute("steering.speedWindowSize"))
+	if (character && character->hasAttribute("steering.speedWindowSize"))
 		speedWindowSize = character->getIntAttribute("steering.speedWindowSize");
 	else
 		speedWindowSize = 10;
 	
-	if (character->hasAttribute("steering.angleWindowSize"))
+	if (character && character->hasAttribute("steering.angleWindowSize"))
 		angleWindowSize = character->getIntAttribute("steering.angleWindowSize");
 	else
 		angleWindowSize = 3;
 
-	if (character->hasAttribute("steering.scootWindowSize"))
+	if (character && character->hasAttribute("steering.scootWindowSize"))
 		scootWindowSize = character->getIntAttribute("steering.scootWindowSize");
 	else
 		scootWindowSize = 3;
 
-	if (character->hasAttribute("steering.pedMaxTurningRateMultiplier"))
+	if (character && character->hasAttribute("steering.pedMaxTurningRateMultiplier"))
 		pedMaxTurningRateMultiplier = (float) character->getDoubleAttribute("steering.pedMaxTurningRateMultiplier");
 	else
 		pedMaxTurningRateMultiplier = 20.f;
@@ -300,12 +300,6 @@ void SteeringAgent::evaluate()
 	float yaw, pitch, roll;
 	character->get_world_offset(x, y, z, yaw, pitch, roll);
 
-	// make sure the character is within the grid
-	if (mcu._scene->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(x * mcu.steeringScale, z * mcu.steeringScale) == -1)
-	{
-		LOG("Character %s is out of range of grid (%f, %f).", character->getName().c_str(), x * mcu.steeringScale, z * mcu.steeringScale);
-	}
-
 	//LOG("Character world offset : x = %f, y = %f, z = %f",x,y,z);
 
 	// parameter testing
@@ -321,6 +315,17 @@ void SteeringAgent::evaluate()
 	//mcu.mark("Steering",0,"Evaluate");
 	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
 	int numGoals = goalQueue.size();
+
+	// make sure the character is within the grid
+	if (mcu._scene->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(x * mcu.steeringScale, z * mcu.steeringScale) == -1)
+	{
+		if (numGoals > 0)
+		{
+			LOG("Character %s is out of range of grid (%f, %f). All goals will be cancelled.", character->getName().c_str(), x * mcu.steeringScale, z * mcu.steeringScale);
+			agent->clearGoals();
+		}
+	}
+
 	if (numGoals == 0) {
 		newSpeed = 0.0f;
 	}
