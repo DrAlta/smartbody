@@ -42,7 +42,7 @@ class srPathList
 		bool insert(std::string path);
 		bool remove(std::string path);
 		void reset();
-		std::string next_path();
+		std::string next_path(bool addPrefix = true);
 		std::string next_filename(char *buffer, const char *name);
 
 	private:

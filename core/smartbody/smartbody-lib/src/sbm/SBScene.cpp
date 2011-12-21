@@ -12,6 +12,7 @@ SBScene::SBScene(void)
 	_reachManager = new SBReachManager();
 	_steerManager = new SBSteerManager();
 	_serviceManager = new SBServiceManager();
+	_scale = .01; // default scale is centimeters
 
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 }
@@ -31,6 +32,17 @@ SBScene::~SBScene(void)
 	delete _stateManager;
 	delete _reachManager;
 }
+
+void SBScene::setScale(double val)
+{
+	_scale = val;
+}
+
+double SBScene::getScale()
+{
+	return _scale;
+}
+
 
 void SBScene::notify( SBSubject* subject )
 {
@@ -300,12 +312,12 @@ void SBScene::loadAssets()
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	mcu.me_paths.reset();
 
-	std::string path = mcu.me_paths.next_path();
+	std::string path = mcu.me_paths.next_path(false);
 	while (path != "")
 	{
 		mcu.load_motions(path.c_str(), true);
 		mcu.load_skeletons(path.c_str(), true);
-		path = mcu.me_paths.next_path();
+		path = mcu.me_paths.next_path(false);
 	}
 }
 
