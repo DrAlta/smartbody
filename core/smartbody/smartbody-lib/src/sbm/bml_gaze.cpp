@@ -311,9 +311,9 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 			gaze_ct = dynamic_cast<MeCtGaze*>( controller );
 		}
 	}
-#if 0
+#if 1
 	const XMLCh* attrHandle = elem->getAttribute( BMLDefs::ATTR_HANDLE );
-	std::string handle = "";
+	//std::string handle = "";
 	if( attrHandle && XMLString::stringLen( attrHandle ) ) {
 		handle = asciiString(attrHandle);
 		// look for a gaze controller with that handle
