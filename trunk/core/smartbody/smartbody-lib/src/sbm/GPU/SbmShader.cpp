@@ -226,8 +226,11 @@ bool SbmShaderManager::initOpenGL()
 
 bool SbmShaderManager::initGLExtension()
 {	
-	if (shaderInit) // already initialize glew
+	if (shaderInit && shaderSupport != NO_GPU_SUPPORT) // already initialize glew
 		return true;
+
+    if (shaderInit && shaderSupport == NO_GPU_SUPPORT)
+        return false;
 
 	if (!viewer)
 		return false;
@@ -250,10 +253,12 @@ bool SbmShaderManager::initGLExtension()
 		return true;
 	}
 	else {
-		if (counter == 3)
-			LOG("OpenGL 3.0 not supported. Please check if the graphics card or driver supported OpenGL 3.0.\n");
+		//if (counter == 3)
+		LOG("OpenGL 2.0 not supported. GPU Shader will be disabled.\n");
 		//exit(1);
         counter++;
+        if (counter == 3)
+            shaderInit = true;
 		return false;
     }
     //return false;
@@ -261,6 +266,9 @@ bool SbmShaderManager::initGLExtension()
 
 void SbmShaderManager::addShader( const char* entryName,const char* vsName, const char* fsName, bool shaderFile )
 {
+    if (shaderSupport == NO_GPU_SUPPORT)
+        return;
+
 	std::string keyName = entryName;
 	if (shaderMap.find(keyName) != shaderMap.end())
 	{

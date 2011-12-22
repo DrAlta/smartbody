@@ -859,7 +859,7 @@ static void gl_draw_string ( const char* s, float x, float y )
 
 
 void FltkViewer::initShadowMap()
-{
+{    
 	// init basic shader for rendering 
 	SbmShaderManager::singleton().addShader("Basic",Std_VS.c_str(),Std_FS.c_str(),false);
 	SbmShaderManager::singleton().addShader("BasicShadow","",Shadow_FS.c_str(),false);
@@ -1100,9 +1100,9 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	// update deformable mesh
-
+    bool hasGPUSupport = SbmShaderManager::getShaderSupport() != SbmShaderManager::NO_GPU_SUPPORT;
 	SrMat shadowTexMatrix;
-	if (_data->shadowmode == ModeShadows && !shadowPass) // update the texture transform matrix
+	if (_data->shadowmode == ModeShadows && !shadowPass && hasGPUSupport) // update the texture transform matrix
 	{		
 		float cam_inverse_modelview[16];
 		const float bias[16] = {	0.5f, 0.0f, 0.0f, 0.0f, 
@@ -1149,98 +1149,36 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	if ( _data->displayaxis ) _data->render_action.apply ( _data->sceneaxis );
 	if ( _data->boundingbox ) _data->render_action.apply ( _data->scenebox );
 
-	std::string shaderName = _data->shadowmode == ModeShadows && !shadowPass ? "Basic" : "BasicShadow";
-	SbmShaderProgram* basicShader = SbmShaderManager::singleton().getShader(shaderName);
-	GLuint program = basicShader->getShaderProgram();
-	if (!shadowPass)
-		glUseProgram(program);		
-	GLuint useShadowMapLoc = glGetUniformLocation(program,"useShadowMap");
-	if (_data->shadowmode == ModeShadows && !shadowPass) // attach the texture
-	{		
-		
-		glActiveTexture(GL_TEXTURE7);
-		glBindTexture(GL_TEXTURE_2D, _data->depthMapID);
-		//glMatrixMode(GL_TEXTURE);
-		//glLoadMatrixf(shadowTexMatrix.pt(0));
-		glCullFace(GL_BACK);
-		//glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-		glUniform1i(glGetUniformLocation(program, "tex"), 7); 		
-		glMatrixMode(GL_MODELVIEW);			
-		glUniform1i(useShadowMapLoc,1);		
-	}
-	else
-	{
-		glUniform1i(useShadowMapLoc,0);		
-	}
+    if (hasGPUSupport)
+    {
+        std::string shaderName = _data->shadowmode == ModeShadows && !shadowPass ? "Basic" : "BasicShadow";
+	    SbmShaderProgram* basicShader = SbmShaderManager::singleton().getShader(shaderName);
+	    GLuint program = basicShader->getShaderProgram();
+	    if (!shadowPass)
+		    glUseProgram(program);		
+	    GLuint useShadowMapLoc = glGetUniformLocation(program,"useShadowMap");
+	    if (_data->shadowmode == ModeShadows && !shadowPass) // attach the texture
+	    {		
+    		
+		    glActiveTexture(GL_TEXTURE7);
+		    glBindTexture(GL_TEXTURE_2D, _data->depthMapID);
+		    //glMatrixMode(GL_TEXTURE);
+		    //glLoadMatrixf(shadowTexMatrix.pt(0));
+		    glCullFace(GL_BACK);
+		    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+		    glUniform1i(glGetUniformLocation(program, "tex"), 7); 		
+		    glMatrixMode(GL_MODELVIEW);			
+		    glUniform1i(useShadowMapLoc,1);		
+	    }
+	    else
+	    {
+		    glUniform1i(useShadowMapLoc,0);		
+	    }
+    }
+	
 
 	if( _data->root )	{		
 		_data->render_action.apply ( _data->root );
-//		glDisable( GL_LIGHTING );
-/*
-		if( _data->shadowmode == ModeShadows )
-			//		if ( 1 )
-		{
-			GLfloat shadow_plane_floor[3][3] = {
-				{ 0.0, 0.0, 0.0 }, 
-				{ 1.0, 0.0, 0.0 }, 
-				{ 1.0, 0.0, -1.0 }
-			};
-			GLfloat shadow_light_pos[4];
-			GLfloat shadow_matrix[4][4];
-
-			
-			shadow_light_pos[ 0 ] = light2.position.x;
-			shadow_light_pos[ 1 ] = light2.position.y;
-			shadow_light_pos[ 2 ] = light2.position.z;
-			shadow_light_pos[ 3 ] = light2.directional ? 0.0f : 1.0f;
-
-			MakeShadowMatrix( shadow_plane_floor, shadow_light_pos, shadow_matrix );
-			glPushMatrix();
-			glMultMatrixf( (GLfloat *)shadow_matrix );
-			glColor3f( 0.6f, 0.57f, 0.53f );
-			_data->render_action.apply ( _data->root );
-			glPopMatrix();
-
-			shadow_light_pos[ 0 ] = light.position.x;
-			shadow_light_pos[ 1 ] = light.position.y;
-			shadow_light_pos[ 2 ] = light.position.z;
-			shadow_light_pos[ 3 ] = light.directional ? 0.0f : 1.0f;
-
-			MakeShadowMatrix( shadow_plane_floor, shadow_light_pos, shadow_matrix );
-#if 0
-			glPushMatrix();
-			glTranslatef( 0.0, 0.25, 0.0 );
-			glMultMatrixf( (GLfloat *)shadow_matrix );
-			glColor3f( 0.4f, 0.45f, 0.55f );
-			_data->render_action.apply ( _data->root );
-			glPopMatrix();
-#else
-			glEnable( GL_CLIP_PLANE0 );
-
-			GLdouble plane_eq_wall[ 4 ] = { 0.0, 0.0, 1.0, gridSize };
-			glClipPlane( GL_CLIP_PLANE0, plane_eq_wall );
-
-			glPushMatrix();
-			glTranslatef( 0.0, 0.25, 0.0 );
-			glMultMatrixf( (GLfloat *)shadow_matrix );
-			glColor3f( 0.4f, 0.45f, 0.55f );
-			_data->render_action.apply ( _data->root );
-			glPopMatrix();
-
-			GLdouble plane_eq_floor[ 4 ] = { 0.0, 1.0, 0.0, 0.0 };
-			glClipPlane( GL_CLIP_PLANE0, plane_eq_floor );
-
-			glPushMatrix();
-			glTranslatef( 0.0, 0.25, 0.0 );
-			glMultMatrixf( (GLfloat *)shadow_matrix );
-			glColor3f( 0.4f, 0.45f, 0.55f );
-			_data->render_action.apply ( _data->root );
-			glPopMatrix();
-
-			glDisable( GL_CLIP_PLANE0 );
-#endif
-		}
-		*/
 	}	
 	
 	static GLfloat mat_emissin[] = { 0.f,  0.f,    0.f,    1.f };
@@ -1270,7 +1208,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	glVertex3f(-floorSize,planeY,-floorSize);	
 	glEnd();
 	drawPawns();
-	glUseProgram(0);	
+	//glUseProgram(0);	
 	glDisable(GL_LIGHTING);
 }
 
@@ -1284,8 +1222,9 @@ void FltkViewer::draw()
 
 	if (!context_valid())
 	{
-		ssm.initGLExtension();		
-		initShadowMap();
+		bool hasShaderSupport = ssm.initGLExtension();
+        if (hasShaderSupport)
+		    initShadowMap();
 	}
 	if ( !valid() ) 
 	{
@@ -1372,8 +1311,9 @@ void FltkViewer::draw()
    //----- Render user scene -------------------------------------------
 
 	//glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-	if (_data->shadowmode == ModeShadows)
+	if (_data->shadowmode == ModeShadows && hasShaderSupport)
 		makeShadowMap();
+
 	drawAllGeometries();		
    // draw the grid
 	//   if (gridList == -1)
