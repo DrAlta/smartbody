@@ -74,10 +74,10 @@ scene.run("init-param-animation.py")
 
 scene.run("init-steer-agents.py")
 
-scene.run("init-example-reach.py")
-names = scene.getCharacterNames()
-for n in range(0, len(names)):
-	reachSetup(names[n])
+#scene.run("init-example-reach.py")
+#names = scene.getCharacterNames()
+#for n in range(0, len(names)):
+#	reachSetup(names[n])
 
 # start the simulation
 sim.start()

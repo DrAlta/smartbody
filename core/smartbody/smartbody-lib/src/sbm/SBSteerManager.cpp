@@ -67,6 +67,27 @@ void SBSteerManager::start()
 	steerOptions->gridDatabaseOptions.numGridCellsZ = numGridCellsZ;
 	steerOptions->gridDatabaseOptions.maxItemsPerGridCell = maxItemsPerGridCell;
 
+	bool setBoundaries = mcu._scene->getSteerManager()->getBoolAttribute("addBoundaryWalls");
+	if (setBoundaries)
+	{
+		for (std::vector<SteerLib::BoxObstacle*>::iterator iter = _boundaryObstacles.begin();
+			 iter != _boundaryObstacles.end();
+			 iter++)
+		{
+			getEngineDriver()->_engine->removeObstacle((*iter));
+			getEngineDriver()->_engine->getSpatialDatabase()->removeObject((*iter), (*iter)->getBounds());
+			delete (*iter);
+		}
+		SteerLib::BoxObstacle* top = new SteerLib::BoxObstacle((float) -gridSizeX / 2.0f, (float) gridSizeX / 2.0f, 0.0f,  1.0f, (float) -gridSizeZ / 2.0f, (float) -gridSizeZ / 2.0f + 1.0f);
+		_boundaryObstacles.push_back(top);
+		SteerLib::BoxObstacle* bottom = new SteerLib::BoxObstacle((float) -gridSizeX / 2.0f, (float) gridSizeX / 2.0f, 0.0f,  1.0f, (float) gridSizeZ / 2.0f - 1.0f, (float) gridSizeZ / 2.0f);
+		_boundaryObstacles.push_back(bottom);
+		SteerLib::BoxObstacle* left = new SteerLib::BoxObstacle((float) -gridSizeX / 2.0f, (float) -gridSizeX / 2.0f + 1.0f, 0.0f,  1.0f, (float) -gridSizeZ / 2.0f, (float) gridSizeZ / 2.0f);
+		_boundaryObstacles.push_back(left);
+		SteerLib::BoxObstacle* right = new SteerLib::BoxObstacle((float) gridSizeX / 2.0f - 1.0f, (float) gridSizeX / 2.0f, 0.0f,  1.0f, (float) -gridSizeZ / 2.0f, (float) gridSizeZ / 2.0f);
+		_boundaryObstacles.push_back(right);
+	}
+
 	//	customize the item per grid cell
 	//	steerOptions->gridDatabaseOptions.maxItemsPerGridCell = maxItemPerCell;
 
@@ -130,6 +151,16 @@ void SBSteerManager::start()
 			(*iter).second->initSteeringSpaceObject();
 	}
 
+	// add any boundary walls, if applicable
+	for (std::vector<SteerLib::BoxObstacle*>::iterator iter = _boundaryObstacles.begin();
+			 iter != _boundaryObstacles.end();
+			 iter++)
+	{
+		getEngineDriver()->_engine->addObstacle((*iter));
+		getEngineDriver()->_engine->getSpatialDatabase()->addObject((*iter), (*iter)->getBounds());
+	}
+	
+
 	LOG("STARTING STEERSIM");
 	mcu._scene->getSteerManager()->getEngineDriver()->startSimulation();
 	mcu._scene->getSteerManager()->getEngineDriver()->setStartTime(0.0f);
@@ -162,6 +193,14 @@ void SBSteerManager::stop()
 				(*iter).second->steeringSpaceObj_p = NULL;
 			}
 		}
+
+		for (std::vector<SteerLib::BoxObstacle*>::iterator iter = _boundaryObstacles.begin();
+			 iter != _boundaryObstacles.end();
+			 iter++)
+		{
+			delete (*iter);
+		}
+		_boundaryObstacles.clear();
 	}
 }
 

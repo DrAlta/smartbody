@@ -31,8 +31,9 @@ class SBSteerManager : public SmartBody::SBService
 		std::vector<std::string> getSteerAgentNames();
 		std::map<std::string, SBSteerAgent*>& getSteerAgents();
 
-	private:
+	protected:
 		std::map<std::string, SBSteerAgent*> _steerAgents;
+		std::vector<SteerLib::BoxObstacle*> _boundaryObstacles;
 
 		SteerSuiteEngineDriver _driver;
 
