@@ -18,7 +18,6 @@
 
 // enum {
 // 	ITEM_PHYSICS = 0,
-// 	ITEM_STEERING,
 // 	ITEM_SEQ_PATH, 
 // 	ITEM_ME_PATH, 
 // 	ITEM_AUDIO_PATH, 
@@ -36,7 +35,7 @@
 // 	ITEM_VISEME_MAP,
 // 	ITEM_SIZE };
 
-std::string ResourceWindow::ItemNameList[ITEM_SIZE] = { "SCENE", "PHYSICS", "STEERING", 
+std::string ResourceWindow::ItemNameList[ITEM_SIZE] = { "SCENE", "SERVICES", "PHYSICS",  
 														"SEQ_PATH", "ME_PATH", "AUDIO_PATH", "MESH_PATH", "SEQ_FILES", 
 														"SKELETON", "BONE MAP", "MOTION",  
 														"FACE DEFINITION", "EVENT HANDLERS",
@@ -76,9 +75,8 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Doub
 	treeItemList[ITEM_CHARACTER] = resourceTree->add("Characters");
 
 	treeItemList[ITEM_SCENE] = resourceTree->add("Scene");
+	treeItemList[ITEM_SERVICES] = resourceTree->add("Services");
 	treeItemList[ITEM_PHYSICS] = resourceTree->add("Physics");
-	treeItemList[ITEM_STEERING] = resourceTree->add("Steering");
-
 
 	// set user_data to be the item enum ID
 	for (int i = 0; i <= ITEM_CHARACTER; i++)
@@ -208,6 +206,9 @@ void ResourceWindow::resize( int x, int y, int w, int h )
 void ResourceWindow::updateGUI()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	SBScene* scene = mcu._scene;
+
 	resourceTree->sortorder(FL_TREE_SORT_ASCENDING);	
 	// update path tree	
 	updatePath(treeItemList[ITEM_SEQ_PATH],mcu.seq_paths);	
@@ -308,6 +309,22 @@ void ResourceWindow::updateGUI()
 		resourceTree->sortorder(FL_TREE_SORT_ASCENDING);	
 		updateCharacter(treeItemList[ITEM_CHARACTER],character);
 	}			
+
+	// update services
+	SmartBody::SBServiceManager* serviceManager = scene->getServiceManager();
+	std::map<std::string, SmartBody::SBService*>& serviceMap = serviceManager->getServices();
+
+	resourceTree->clear_children(treeItemList[ITEM_SERVICES]);
+	for (std::map<std::string, SmartBody::SBService*>::iterator iter = serviceMap.begin();
+		iter != serviceMap.end();
+		iter++)
+	{
+		SmartBody::SBService* service = (*iter).second;
+		resourceTree->sortorder(FL_TREE_SORT_ASCENDING);	
+		updateService(treeItemList[ITEM_SERVICES], service);
+	}			
+
+
 	Fl_Tree_Item* lastItem = resourceTree->find_item(lastClickedItemPath.c_str());	
 	if (lastItem)
 	{		
@@ -506,6 +523,13 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* characte
 	}
 }
 
+void ResourceWindow::updateService( Fl_Tree_Item* tree, SmartBody::SBService* service )
+{
+	Fl_Tree_Item* item = resourceTree->add(tree, service->getName().c_str());
+	item->user_data((void*)ITEM_SERVICES);
+	resourceTree->sortorder(FL_TREE_SORT_NONE);	
+}
+
 void ResourceWindow::refreshUI( Fl_Widget* widget, void* data )
 {
 	ResourceWindow* window = (ResourceWindow*)data;
@@ -575,6 +599,9 @@ void ResourceWindow::clearInfoWidget()
 
 TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* treeItem, int itemType )
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SmartBody::SBScene* scene = mcu._scene;
+
 	TreeItemInfoWidget* widget = NULL;
 	if (itemType == ITEM_SKELETON)
 	{
@@ -616,9 +643,10 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	{
 		widget = new AttributeItemWidget(mcuCBHandle::singleton()._scene,x,y,w,h,name,treeItem,itemType,this);
 	}
-	else if (itemType == ITEM_STEERING)
+	else if (itemType == ITEM_SERVICES)
 	{
-		widget = new AttributeItemWidget(mcuCBHandle::singleton()._scene->getSteerManager(),x,y,w,h,name,treeItem,itemType,this);
+		SmartBody::SBService* service = scene->getServiceManager()->getService(treeItem->label());
+		widget = new AttributeItemWidget(service,x,y,w,h,name,treeItem,itemType,this);
 	}
 	else if (itemType == ITEM_EVENT_HANDLERS)
 	{

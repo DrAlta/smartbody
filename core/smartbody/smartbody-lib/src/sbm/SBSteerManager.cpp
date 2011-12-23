@@ -5,6 +5,7 @@ namespace SmartBody {
 
 SBSteerManager::SBSteerManager() : SBService()
 {
+	setName("steering");
 #ifdef WIN32
 			createStringAttribute("aimodule", "pprAI", true, "Basic", 60, false, false, false, "Agent module library");
 #endif
@@ -34,6 +35,62 @@ SBSteerManager::~SBSteerManager()
 SteerSuiteEngineDriver* SBSteerManager::getEngineDriver()
 {
 	return &_driver;
+}
+
+void SBSteerManager::setEnable(bool enable)
+{
+	SBService::setEnable(enable);
+	if (enable)
+		start();
+	else
+		stop();
+}
+
+void SBSteerManager::beforeUpdate(double time)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	SBScene* scene = mcu._scene;
+	if (getEngineDriver()->isInitialized())
+	{
+		if (!getEngineDriver()->isDone())
+		{
+			
+			if (getEngineDriver()->getStartTime() == 0.0)
+			{
+				getEngineDriver()->setStartTime(mcu.time);
+				getEngineDriver()->setLastUpdateTime(mcu.time - .017);
+			}
+
+			if (mcu.time - getEngineDriver()->getLastUpdateTime() >= .016)
+			{ // limit steering to 60 fps
+				mcu.mark("SteeringUpdate",0,"Update");
+				getEngineDriver()->setLastUpdateTime(mcu.time);
+				for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+					iter != mcu.getCharacterMap().end();
+					iter++)
+				{
+					SbmCharacter* character = (*iter).second;
+					if (character->steeringAgent)
+						character->steeringAgent->evaluate();
+				}
+
+				bool running = getEngineDriver()->_engine->update(false, true, (float) (mcu.time - getEngineDriver()->getStartTime()));
+				if (!running)
+					getEngineDriver()->setDone(true);
+				mcu.mark("SteeringUpdate");
+			}
+			
+		}
+	}
+}
+
+void SBSteerManager::update(double time)
+{
+}
+
+void SBSteerManager::afterUpdate(double time)
+{
 }
 
 void SBSteerManager::start()

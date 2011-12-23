@@ -11,6 +11,7 @@
 #include "TreeInfoObject.h"
 #include <sbm/GenericViewer.h>
 #include <sbm/SBFaceDefinition.h>
+#include <sbm/SBService.h>
 
 class srPathList;
 class SkSkeleton;
@@ -27,8 +28,8 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 	public:
 		enum {
 			   ITEM_SCENE = 0,
+			   ITEM_SERVICES,
 			   ITEM_PHYSICS,
-			   ITEM_STEERING,
 			   ITEM_SEQ_PATH, 
 			   ITEM_ME_PATH, 
 			   ITEM_AUDIO_PATH, 
@@ -88,6 +89,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 		void updateMotion(Fl_Tree_Item* tree, SkMotion* motion);
 		void updatePawn(Fl_Tree_Item* tree, SbmPawn* pawn);
 		void updateCharacter(Fl_Tree_Item* tree, SbmCharacter* character);	
+		void updateService(Fl_Tree_Item* tree, SmartBody::SBService* service);	
 		void updateFaceMotion(Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition);
 		void updateEventHandler(Fl_Tree_Item* tree, EventHandler* handler);
 		

@@ -81,6 +81,17 @@ bool PATimeManager::step(double timeStep)
 	prevLocalTime = localTime;
 	double newLocalTime = localTime + timeStep;
 	int loopcounter = 0;
+	double lastKey = key[key.size() - 1];
+	if (newLocalTime > lastKey && lastKey >= 0.0)
+	{
+		int times = (int) (newLocalTime / lastKey);
+		if (times > 0)
+		{
+			newLocalTime = newLocalTime - float(times) * lastKey;
+		}
+		notReachDuration = false;
+	}
+/*
 	while (newLocalTime > key[key.size() - 1])
 	{
 		loopcounter ++;
@@ -93,6 +104,7 @@ bool PATimeManager::step(double timeStep)
 		newLocalTime -= (key[key.size() - 1] - key[0]);
 		notReachDuration = false;
 	}
+	*/
 	localTime = newLocalTime;
 	getParallelTimes(localTime, localTimes);
 	if (localTimes.size() == 0)

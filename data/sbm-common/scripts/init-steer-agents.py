@@ -12,4 +12,4 @@ for i in range(0, numCharacters):
 	sbCharacter = scene.getCharacter(charNames[i])
 	sbCharacter.setSteerAgent(steerAgent)
 	
-steerManager.start()
+steerManager.setEnable(True)

@@ -24,8 +24,8 @@ void SBListener::OnCharacterCreate( const  std::string & name, const  std::strin
 	}
 	WindowFramework* window = m_app->getWindowFramework();
 	PandaFramework* framework = m_app->getPandaFramework();
-	NodePath actor = window->load_model(framework->get_models(), "panda-model");
-    actor.set_scale(0.005);
+	NodePath actor = window->load_model(framework->get_models(), "George.bam");
+	actor.set_scale(0.005);
     actor.reparent_to(window->get_render());
 
 	characters.insert(std::pair<std::string, NodePath>(name, actor));
