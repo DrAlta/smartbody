@@ -2506,129 +2506,6 @@ int mcu_character_ctrl_cmd(
 
 /////////////////////////////////////////////////////////////
 
-// EDF - Hack!  This is currently used by Rapport for sending bone data straight through to Unreal.
-//       It's only purpose is to be able to set a bone's rotation from an outside process (through VHMsg).
-
-// "sbm char doctor bone base w x y z"
-int mcu_character_bone_cmd(
-	const char * char_name,
-	srArgBuffer & args,
-	mcuCBHandle *mcu_p)
-{
-	char * bone = args.read_token();
-	float  w    = args.read_float();
-	float  x    = args.read_float();
-	float  y    = args.read_float();
-	float  z    = args.read_float();
-
-	SbmCharacter * actor = mcu_p->getCharacter( char_name );
-	if ( !actor || !actor->getSkeleton() )
-	{
-		return CMD_FAILURE;  // this should really be an ignore/out-of-domain result
-	}
-	else
-	{
-		actor->bonebusCharacter->StartSendBoneRotations();
-
-		for ( size_t i = 0; i < actor->getSkeleton()->joints().size(); i++ )
-		{
-			SkJoint * j = actor->getSkeleton()->joints()[ i ];
-
-			if ( _stricmp( j->name().c_str(), bone ) == 0 )
-			{
-				actor->bonebusCharacter->AddBoneRotation( j->extName().c_str(), w, x, y, z, mcu_p->time );
-
-				//LOG( "%s %f %f %f %f\n", (const char *)j->name(), w, x, y, z );
-			}
-		}
-
-		actor->bonebusCharacter->EndSendBoneRotations();
-
-
-		actor->bonebusCharacter->StartSendBonePositions();
-
-		for ( size_t i = 0; i < actor->getSkeleton()->joints().size(); i++ )
-		{
-			SkJoint * j = actor->getSkeleton()->joints()[ i ];
-
-			if ( _stricmp( j->name().c_str(), bone ) == 0 )
-			{
-				float posx = j->pos()->value( 0 );
-				float posy = j->pos()->value( 1 );
-				float posz = j->pos()->value( 2 );
-
-				actor->bonebusCharacter->AddBonePosition( j->extName().c_str(), posx, posy, posz, mcu_p->time );
-			}
-		}
-
-		actor->bonebusCharacter->EndSendBonePositions();
-	}
-
-	return CMD_SUCCESS;
-}
-
-// "sbm char doctor bonep base x y z"
-int mcu_character_bone_position_cmd(
-   const char* char_name,
-   srArgBuffer& args,
-   mcuCBHandle *mcu_p 
-) {
-   char * bone = args.read_token();
-   float  x    = args.read_float();
-   float  y    = args.read_float();
-   float  z    = args.read_float();
-
-   SbmCharacter * actor = mcu_p->getCharacter( char_name );
-   if ( !actor || !actor->getSkeleton() )
-   {
-      return CMD_FAILURE;  // this should really be an ignore/out-of-domain result
-   }
-   else
-   {
-      actor->bonebusCharacter->StartSendBonePositions();
-
-      for (size_t i = 0; i < actor->getSkeleton()->joints().size(); i++ )
-      {
-         SkJoint * j	= actor->getSkeleton()->joints()[ i ];
-
-		 if ( _stricmp( j->name().c_str(), bone ) == 0 )
-         {
-            float posx, posy, posz;
-
-            /*
-            if ( j->_ed == SrVec( 0, 0, 0 ) )
-            {
-               j->_ed = j->offset();
-            }
-
-            posx = j->_ed.x + x;
-            posy = j->_ed.y + y;
-            posz = j->_ed.z + z;
-            */
-
-            j->pos()->value( 0, x );
-            j->pos()->value( 1, y );
-            j->pos()->value( 2, z );
-
-            //j->offset( SrVec( posx, posy, posz ) );
-
-            posx = x;
-            posy = y;
-            posz = z;
-
-			actor->bonebusCharacter->AddBonePosition( j->extName().c_str(), posx, posy, posz, mcu_p->time );
-         }
-      }
-
-      actor->bonebusCharacter->EndSendBonePositions();
-   }
-
-   return CMD_SUCCESS; 
-}
-
-
-/////////////////////////////////////////////////////////////
-
 // Face pose mapping functions
 const char* SET_FACE_AU_SYNTAX_HELP        = "set face au <unit-number> [left|right] <motion-name>";
 const char* SET_FACE_VISEME_SYNTAX_HELP    = "set face viseme <viseme symbol> <motion-name>";
@@ -5540,12 +5417,12 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		else if (command == "start")
 		{
-			mcu_p->_scene->getSteerManager()->start();
+			mcu_p->_scene->getSteerManager()->setEnable(true);
 			return CMD_SUCCESS;
 		}
 		else if (command == "stop")
 		{
-			mcu_p->_scene->getSteerManager()->stop();
+			mcu_p->_scene->getSteerManager()->setEnable(false);
 			return CMD_SUCCESS;
 		}
 		else if (command == "move")

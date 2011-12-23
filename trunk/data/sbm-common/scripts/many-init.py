@@ -18,7 +18,7 @@ scene.command("panim enable")
 numCharacters = 50
 for i in range(0, numCharacters):
 
-	brad = scene.createCharacter("brad" + str(i), "")
+	brad = scene.createCharacter("brad" + str(i), "brad")
 	bradSkeleton = scene.createSkeleton("common.sk")
 	brad.setSkeleton(bradSkeleton)
 	brad.setFaceDefinition(defaultFace)
@@ -39,7 +39,7 @@ scene.setDefaultRecipient("brad1")
 
 scene.run("init-param-animation.py")
 
-#scene.run("init-steer-agents.py")
+scene.run("init-steer-agents.py")
 
 #scene.run("init-example-reach.py")
 #names = scene.getCharacterNames()
@@ -50,13 +50,13 @@ scene.run("init-param-animation.py")
 sim.start()
 
 for i in range(0, numCharacters):
-	bml.execBML('brad' + str(i), '<body posture="ChrUtah_Idle003"/>')
+	bml.execBML('brad' + str(i), '<body posture="ChrUtah_Idle003" start="' + str(.1 * i) + '"/>')
 	
 	
-for i in range(0, numCharacters):
-	scene.command("panim schedule char brad" + str(i) + " state allLocomotion loop true playnow false")
+#for i in range(0, numCharacters):
+#	scene.command("panim schedule char brad" + str(i) + " state allLocomotion loop true playnow false")
 	#scene.commandAt(3, "panim updatestate char brad" + str(i) + " 0 100 0")
-sim.resume()
+#sim.resume()
 
 
 

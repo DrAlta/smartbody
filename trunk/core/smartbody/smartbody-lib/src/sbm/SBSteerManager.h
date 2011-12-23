@@ -16,8 +16,13 @@ class SBSteerManager : public SmartBody::SBService
 		SBSteerManager();
 		~SBSteerManager();
 		
-		void start();
-		void stop();
+		virtual void setEnable(bool enable);
+		virtual void start();
+		virtual void beforeUpdate(double time);
+		virtual void update(double time);
+		virtual void afterUpdate(double time);
+		virtual void stop();
+
 		void setSteerUnit(std::string unit);
 		std::string getSteerUnit();
 		float getSteerUnitValue();

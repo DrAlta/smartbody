@@ -14,6 +14,9 @@ SBScene::SBScene(void)
 	_serviceManager = new SBServiceManager();
 	_scale = .01; // default scale is centimeters
 
+	// add the services
+	_serviceManager->addService(_steerManager);
+
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 }
 

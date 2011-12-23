@@ -1044,50 +1044,6 @@ void mcuCBHandle::update( void )	{
 			(*iter).second->beforeUpdate(this->time);
 	}
 
-
-
-
-#if 0
-	static int c = 3;
-	if( c )	{
-		test_map();
-		c--;
-	}
-#endif
-	// updating steering engine
-	if (_scene->getSteerManager()->getEngineDriver()->isInitialized())
-	{
-		if (!_scene->getSteerManager()->getEngineDriver()->isDone())
-		{
-			
-			if (_scene->getSteerManager()->getEngineDriver()->getStartTime() == 0.0)
-			{
-				_scene->getSteerManager()->getEngineDriver()->setStartTime(this->time);
-				_scene->getSteerManager()->getEngineDriver()->setLastUpdateTime(this->time - .017);
-			}
-
-			if (this->time - _scene->getSteerManager()->getEngineDriver()->getLastUpdateTime() >= .016)
-			{ // limit steering to 60 fps
-				this->mark("SteeringUpdate",0,"Update");
-				_scene->getSteerManager()->getEngineDriver()->setLastUpdateTime(this->time);
-				for (std::map<std::string, SbmCharacter*>::iterator iter = getCharacterMap().begin();
-					iter != getCharacterMap().end();
-					iter++)
-				{
-					SbmCharacter* character = (*iter).second;
-					if (character->steeringAgent)
-						character->steeringAgent->evaluate();
-				}
-
-				bool running = _scene->getSteerManager()->getEngineDriver()->_engine->update(false, true, (float) (this->time - _scene->getSteerManager()->getEngineDriver()->getStartTime()));
-				if (!running)
-					_scene->getSteerManager()->getEngineDriver()->setDone(true);
-				this->mark("SteeringUpdate");
-			}
-			
-		}
-	}
-
 	if (physicsEngine && physicsEngine->getBoolAttribute("enable"))
 	{		
 		float dt = (float)physicsEngine->getDoubleAttribute("dT");//timeStep*0.03f;

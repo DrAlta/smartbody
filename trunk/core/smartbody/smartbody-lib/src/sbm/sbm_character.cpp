@@ -2344,12 +2344,6 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			if( cmd == "ctrl" ) {
 				return mcu_character_ctrl_cmd( getName().c_str(), args, mcu_p );
 			} 
-else if( cmd == "bone" ) {
-		return mcu_character_bone_cmd( getName().c_str(), args, mcu_p );
-	} 
-	else if( cmd == "bonep" ) {
-			return mcu_character_bone_position_cmd( getName().c_str(), args, mcu_p );
-		} 
 		else if( cmd == "remove" ) {
 				int ret = SbmCharacter::remove_from_scene( getName().c_str() );
 				mcu_p->unregisterCharacter(this);
