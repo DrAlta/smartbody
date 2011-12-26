@@ -1,4 +1,4 @@
-#include <vhcl.h>
+
 #include "pandaFramework.h"
 #include "pandaSystem.h"
 
@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     //open a new window framework
   framework.open_framework(argc, argv);
     //set the window title to My Panda3D Window
-  framework.set_window_title("My Panda3D Window");
+  framework.set_window_title("SmartBody Panda3D");
     //open the window
   WindowFramework* window = framework.open_window();
   window->setup_trackball();

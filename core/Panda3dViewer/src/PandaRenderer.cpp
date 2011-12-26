@@ -86,7 +86,18 @@ AsyncTask::DoneStatus PandaRenderer::do_task()
 		SmartbodyCharacter& character = m_sbm->GetCharacter((*iter).first);
 
 		NodePath nodePath = (*iter).second;
+		
 		nodePath.set_pos(character.x, character.z, character.y);
+
+		// update the joints
+		size_t numJoints = character.m_joints.size();
+		for (int j = 0; j < numJoints; j++)
+		{
+			std::string& jointName = character.m_joints[j].m_name;
+			// find the corresponding joint in the actor and set the matrix accordingly
+			// ...
+			// ...			
+		}
 
 	}
 	
