@@ -25,6 +25,8 @@ SBSteerManager::SBSteerManager() : SBService()
 	createIntAttribute("gridDatabaseOptions.maxItemsPerGridCell", 7, true, "Basic", 60, false, false, false, "Max units per grid cell. If agent density is high, make sure increase this value.");
 	createDoubleAttribute("initialConditions.radius", 0.4, true, "Basic", 60, false, false, false, "Initial radius of agents in meters.");
 	createBoolAttribute("addBoundaryWalls", true, true, "Basic", 60, false, false, false, "Adds boundaries around the perimeter of the grid to prevent agents from leaving grid area.");
+	createBoolAttribute("useEnvironmentCollisions", true, true, "Basic", 60, false, false, false, "Determines whether to include the environment (pawns) when determining steering path. If set to false, objects in the environment will be ignored.");
+	createDoubleAttribute("maxUpdateFrequency", 60.0, true, "Basic", 60, false, false, false, "Maximum frequency of steering updates.");	
 }
 
 SBSteerManager::~SBSteerManager()
@@ -59,10 +61,10 @@ void SBSteerManager::beforeUpdate(double time)
 			if (getEngineDriver()->getStartTime() == 0.0)
 			{
 				getEngineDriver()->setStartTime(mcu.time);
-				getEngineDriver()->setLastUpdateTime(mcu.time - .017);
+				getEngineDriver()->setLastUpdateTime(mcu.time - _maxUpdateFrequency - .01);
 			}
 
-			if (mcu.time - getEngineDriver()->getLastUpdateTime() >= .016)
+			if (mcu.time - getEngineDriver()->getLastUpdateTime() >= _maxUpdateFrequency)
 			{ // limit steering to 60 fps
 				mcu.mark("SteeringUpdate",0,"Update");
 				getEngineDriver()->setLastUpdateTime(mcu.time);
@@ -190,8 +192,10 @@ void SBSteerManager::start()
 		Util::Vector orientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
 		initialConditions.direction = orientation;
 		double initialRadius = dynamic_cast<SmartBody::DoubleAttribute*>( mcu._scene->getSteerManager()->getAttribute("initialConditions.radius") )->getValue();
-		//initialConditions.radius = float(initialRadius);
-		initialConditions.radius = 0.3f;//0.2f;//0.4f;
+		if (initialRadius == 0.0)
+			initialConditions.radius = 0.3f;//0.2f;//0.4f;
+		else
+			initialConditions.radius = (float) initialRadius;
 		initialConditions.speed = 0.0f;
 		initialConditions.goals.clear();
 		initialConditions.name = character->getName();
@@ -199,13 +203,19 @@ void SBSteerManager::start()
 		character->steeringAgent->setAgent(agent);
 		agent->reset(initialConditions, dynamic_cast<SteerLib::EngineInterface*>(pprAIModule));
 	}
-	// adding obstacles to the steering space
-	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-		iter != mcu.getPawnMap().end();
-		iter++)
+
+	bool useEnvironment = getBoolAttribute("useEnvironmentCollisions");
+
+	if (useEnvironment)
 	{
-		if ((*iter).second->colObj_p)
-			(*iter).second->initSteeringSpaceObject();
+		// adding obstacles to the steering space
+		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+			iter != mcu.getPawnMap().end();
+			iter++)
+		{
+			if ((*iter).second->colObj_p)
+				(*iter).second->initSteeringSpaceObject();
+		}
 	}
 
 	// add any boundary walls, if applicable
@@ -216,12 +226,16 @@ void SBSteerManager::start()
 		getEngineDriver()->_engine->addObstacle((*iter));
 		getEngineDriver()->_engine->getSpatialDatabase()->addObject((*iter), (*iter)->getBounds());
 	}
-	
 
 	LOG("STARTING STEERSIM");
 	mcu._scene->getSteerManager()->getEngineDriver()->startSimulation();
 	mcu._scene->getSteerManager()->getEngineDriver()->setStartTime(0.0f);
-	return;
+
+	_maxUpdateFrequency = getDoubleAttribute("maxUpdateFrequency");
+	if (_maxUpdateFrequency != 0.0)
+		_maxUpdateFrequency = 1.0 / _maxUpdateFrequency;
+	else
+		_maxUpdateFrequency = .016;
 }
 
 void SBSteerManager::stop()

@@ -41,6 +41,7 @@ class SBSteerManager : public SmartBody::SBService
 		std::vector<SteerLib::BoxObstacle*> _boundaryObstacles;
 
 		SteerSuiteEngineDriver _driver;
+		double _maxUpdateFrequency;
 
 
 };
