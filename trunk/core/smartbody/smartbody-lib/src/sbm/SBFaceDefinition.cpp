@@ -27,6 +27,11 @@ void SBFaceDefinition::setName(const std::string& name)
 
 SBFaceDefinition::SBFaceDefinition(SBFaceDefinition* source)
 {
+	if (!source)
+	{
+		_faceNeutral = NULL;
+		return;
+	}
 	_faceNeutral = source->getFaceNeutral();
 	int numVisemes = source->getNumVisemes();
 	for (int v = 0; v < numVisemes; v++)
