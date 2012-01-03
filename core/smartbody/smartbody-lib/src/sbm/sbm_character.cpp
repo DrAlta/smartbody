@@ -3738,6 +3738,9 @@ SmartBody::SBFaceDefinition* SbmCharacter::getFaceDefinition()
 
 void SbmCharacter::setFaceDefinition(SmartBody::SBFaceDefinition* faceDefinition)
 {
+	if (!faceDefinition)
+		return;
+
 	if (_faceDefinition)
 	{
 		delete _faceDefinition;
