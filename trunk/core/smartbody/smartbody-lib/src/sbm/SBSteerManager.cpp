@@ -173,6 +173,7 @@ void SBSteerManager::start()
 	LOG("LOADING STEERSIM");
 	mcu._scene->getSteerManager()->getEngineDriver()->loadSimulation();
 
+	int numSetup = 0;
 	// create an agent based on the current characters and positions
 	SteerLib::ModuleInterface* pprAIModule = mcu._scene->getSteerManager()->getEngineDriver()->_engine->getModule(ai);
 	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
@@ -182,7 +183,10 @@ void SBSteerManager::start()
 		SbmCharacter* character = (*iter).second;
 
 		if (!character->steeringAgent)
+		{
+			LOG("No steering agent for character %s", character->getName().c_str());
 			continue;
+		}
 
 		float x, y, z;
 		float yaw, pitch, roll;
@@ -202,6 +206,12 @@ void SBSteerManager::start()
 		SteerLib::AgentInterface* agent = mcu._scene->getSteerManager()->getEngineDriver()->_engine->createAgent( initialConditions, pprAIModule );
 		character->steeringAgent->setAgent(agent);
 		agent->reset(initialConditions, dynamic_cast<SteerLib::EngineInterface*>(pprAIModule));
+		LOG("Setting up steering agent for character %s", character->getName().c_str());
+		numSetup++;
+	}
+	if (numSetup == 0)
+	{
+		LOG("No characters set up with steering. Steering will need to be restarted when new characters are available.");
 	}
 
 	bool useEnvironment = getBoolAttribute("useEnvironmentCollisions");

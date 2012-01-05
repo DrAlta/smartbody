@@ -5273,6 +5273,10 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		{
 			finalMotionPath = operator/(mediaPath, motionPath);
 		}
+		else
+		{
+			finalMotionPath = motionPath;
+		}
 		boost::filesystem::path currentPath = finalMotionPath;
 		while (currentPath.has_parent_path())
 		{
