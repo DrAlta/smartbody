@@ -42,15 +42,13 @@ void SBBmlProcessor::build_vrX(std::ostringstream& buffer, const std::string& cm
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	static int test_bml_id = 0;
-
 	buffer.str("");
 	if( for_seq )
 		buffer << "send " << cmd << " ";
 	buffer << char_id << " "<< recip_id << " sbm";
 	if( mcu.process_id != "" )  // Insert process_id if present.
 		buffer << '_' << mcu.process_id; 
-	buffer << "_test_bml_" << (++test_bml_id) << std::endl << content;
+	buffer << "_test_bml_" << (++mcu.testBMLId) << std::endl << content;
 }
 
 void SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_id, const std::string& recip_id,

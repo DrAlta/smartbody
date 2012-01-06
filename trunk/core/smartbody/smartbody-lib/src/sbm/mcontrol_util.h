@@ -204,6 +204,7 @@ class mcuCBHandle {
 		std::string process_id;
 		bool		play_internal_audio;	
 		SmartBody::SBScene*     _scene;
+		int testBMLId;
 
 		
 		
