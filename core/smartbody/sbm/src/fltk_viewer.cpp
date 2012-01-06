@@ -1602,7 +1602,7 @@ void FltkViewer::translate_keyboard_state()
 			sprintf(_locoData->t_direction, "forward ");
 			_locoData->upkey = true;
 		}
-		if (mcu.use_param_animation)
+		if (_paLocoData->character->locomotion_type == SbmCharacter::Example)
 		{
 			if (Fl::event_state(FL_ALT))
 				_paLocoData->starting = true;
@@ -1630,7 +1630,7 @@ void FltkViewer::translate_keyboard_state()
 			sprintf(_locoData->t_direction, "backward ");
 			_locoData->downkey = true;
 		}
-		if (mcu.use_param_animation)
+		if (_paLocoData->character->locomotion_type == SbmCharacter::Example)
 		{
 			if (Fl::event_state(FL_ALT))
 				_paLocoData->stopping = true;
@@ -1653,7 +1653,7 @@ void FltkViewer::translate_keyboard_state()
 			_locoData->rps_flag = -1;
 			_locoData->leftkey = true;
 		}
-		if (mcu.use_param_animation)
+		if (_paLocoData->character->locomotion_type == SbmCharacter::Example)
 		{
 			if (_paLocoData->w < -9990 && state)
 				state->paramManager->getParameter(_paLocoData->v, _paLocoData->w, scoot);
@@ -1673,7 +1673,7 @@ void FltkViewer::translate_keyboard_state()
 			_locoData->rps_flag = 1;
 			_locoData->rightkey = true;
 		}
-		if (mcu.use_param_animation)
+		if (_paLocoData->character->locomotion_type == SbmCharacter::Example)
 		{
 			if (_paLocoData->w < -9990 && state)
 				state->paramManager->getParameter(_paLocoData->v, _paLocoData->w, scoot);
@@ -1751,8 +1751,8 @@ void FltkViewer::translate_keyboard_state()
 	if(_locoData->kmode == 0) sprintf(tt, "spd 0 rps %f time 0.7", _locoData->rps_flag * _locoData->rps);
 	else sprintf(tt, "spd 0 lrps %f angle 3.14159265 time 1.0", _locoData->rps_flag * _locoData->rps);
 
-	if (mcu.use_param_animation)
-		locomotion_cmd = false;
+	if (_paLocoData->character->locomotion_type == SbmCharacter::Example)
+ 		locomotion_cmd = false;
 	if(locomotion_cmd) 
 	{
 		strcat(cmd, tt);

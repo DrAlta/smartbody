@@ -187,10 +187,7 @@ public:
 	int init( SkSkeleton* skeleton_p,
 			  SmartBody::SBFaceDefinition* faceDefinition,
 			  GeneralParamMap* param_map,
-			  const char* classType,
-			  bool use_locomotion,
-			  bool use_param_animation,
-			  bool use_data_receiver);
+			  const char* classType);
 
 	virtual int setup();
 
@@ -346,9 +343,6 @@ public:
 	 *  Handles commands beginning with "print character <character id> ...".
 	 */
 	static int print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-
-	int init_locomotion_skeleton(const char* skel_file, mcuCBHandle *mcu_p);
-	void automate_locomotion(bool automate);
 
 	//temp command process.............................
 	bool is_locomotion_controller_initialized();

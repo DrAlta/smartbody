@@ -889,9 +889,8 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		std::string operation = args.read_token();
 		if (operation == "enable")
 		{
-			mcu_p->use_param_animation = true;
-			//LOG("Parameterized Animation Enabled!");
-			return CMD_SUCCESS;
+			LOG("Command: 'panim enable' has been deprecated.");
+			return CMD_FAILURE;
 		}
 		if (operation == "state")
 		{
@@ -2329,16 +2328,10 @@ int mcu_character_init(
 		}
 	}
 
-	err = char_p->init( skeleton_p, faceDefinition, &mcu_p->param_map, className, mcu_p->net_face_bones, mcu_p->use_locomotion, mcu_p->use_param_animation );
+	err = char_p->init( skeleton_p, faceDefinition, &mcu_p->param_map, className );
 	if( err == CMD_SUCCESS ) {
 
-		if (mcu_p->use_locomotion) 
-		{
-			int locoSuccess = char_p->init_locomotion_skeleton(skel_file, mcu_p);//temp init for locomotion analyzer Jingqiao Fu Aug/07/09
-			if (locoSuccess != CMD_SUCCESS) {
-				LOG("init_character ERR: Failed to init locomotion analyzer\n"); 
-			}
-		}
+		char_p->locomotion_ct->init_skeleton(skeleton_p, skeleton_p);
 
 		char_p->ct_tree_p->set_evaluation_logger( mcu_p->logger_p );
 	}
@@ -5543,11 +5536,6 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				std::string type = args.read_token();
 				if (type == "example")
 				{
-					if (!mcu_p->use_param_animation)
-					{
-						LOG("Parameterized Animation Engine not enabled!");
-						return CMD_FAILURE;
-					}
 					if (character->checkExamples())
 						character->locomotion_type = character->Example;
 					else
@@ -5564,11 +5552,6 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				}
 				if (type == "procedural")
 				{
-					if (!mcu_p->use_locomotion)
-					{
-						LOG("Procedural Locomotion not enabled!");
-						return CMD_FAILURE;
-					}
 					character->locomotion_type = character->Procedural;
 					if (character->steeringAgent)
 						character->steeringAgent->desiredSpeed = 1.6f;
@@ -5771,8 +5754,6 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 	std::string operation = args.read_token();
 	if (operation == "echo")
 		LOG("%s", args.read_remainder_raw());
-	if (operation == "enable")
-		mcu->use_data_receiver = true;
 	if (operation == "skeleton")
 	{
 		std::string skelName = args.read_token();
