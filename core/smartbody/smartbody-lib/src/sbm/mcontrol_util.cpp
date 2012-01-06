@@ -273,6 +273,7 @@ mcuCBHandle::mcuCBHandle()
 	useXmlCacheAuto(false)
 	//physicsEngine(NULL)
 {	
+	testBMLId = 0;
 	registerCallbacks();
 	root_group_p->ref();
 	logger_p->ref();
