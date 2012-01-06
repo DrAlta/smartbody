@@ -230,6 +230,7 @@ void SbmCharacter::createStandardControllers()
 	std::string locomotionname = getName() + "'s locomotion controller";
 	this->locomotion_ct->setName( locomotionname.c_str() );
 	locomotion_ct->get_navigator()->setWordOffsetController(world_offset_writer_p);
+	locomotion_ct->init_skeleton(this->getSkeleton(), this->getSkeleton());
 	locomotion_ct->ref();
 
 	// example-based locomotion

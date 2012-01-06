@@ -132,6 +132,12 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		}
 	}
 
+	if (!actor->get_locomotion_ct())
+	{
+		LOG("Character %s does not have a semi-procedural locomotion controller. Command ignored.", actor->getName().c_str());
+		return CMD_FAILURE;
+	}
+
 	if( arg == "ground_height" )
 	{
 		actor->get_locomotion_ct()->get_terrain()->set_ground_height(args.read_float());
