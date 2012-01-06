@@ -2848,6 +2848,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\SBPhysicsManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBPhysicsManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SBReach.cpp"
 				>
 			</File>
