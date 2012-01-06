@@ -36,6 +36,12 @@ using namespace xml_utils;
 
 BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 
+	if (!request->actor->motion_sched_p)
+	{
+		LOG("Character %s does not have a motion scheduler, so cannot schedule motion.", request->actor->getName().c_str());
+		return BehaviorRequestPtr();
+	}
+
 	const XMLCh* animName = elem->getAttribute( BMLDefs::ATTR_NAME );
 
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);

@@ -299,6 +299,11 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	// determine if the requestor wants to use an existing gaze controller
 	// identified by the 'handle' attribute
 
+	if (!request->actor->gaze_sched_p)
+	{
+		LOG("Character %s does not have a gaze scheduler, so cannot use gaze.", request->actor->getName().c_str());
+		return BehaviorRequestPtr();
+	}
 
 	MeCtGaze* gaze_ct = NULL;
 

@@ -4899,7 +4899,24 @@ int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int mcu_python_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 {
-	mcu_p->use_python = true;
+	// executes Python code
+	std::string command = args.read_remainder_raw();
+	return mcu_p->executePython(command.c_str());
+}
+
+int mcu_interp_func( srArgBuffer& args, mcuCBHandle* mcu_p )
+{
+	if (mcu_p->use_python)
+	{
+		mcu_p->use_python = false;
+		LOG("Python interpreter is now active.");
+	}
+	else
+	{
+		mcu_p->use_python = true;
+		LOG("Command interpreter is now active.");
+	}
+
 
 	return CMD_SUCCESS;
 }

@@ -410,6 +410,8 @@ void mcuCBHandle::registerCallbacks()
 	insert( "check",			   mcu_check_func);		// check matching between .skm and .sk
 	insert( "pythonscript",		   mcu_pythonscript_func);
 	insert( "python",			   mcu_python_func);
+	insert( "p",				   mcu_python_func);
+	insert( "interp",		       mcu_interp_func);
 	insert( "adjustmotion",		   mcu_adjust_motion_function);
 	insert( "mediapath",		   mcu_mediapath_func);
 	insert( "bml",				   test_bml_func );

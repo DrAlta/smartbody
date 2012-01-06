@@ -574,6 +574,12 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 
 BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 	
+	if (!request->actor->head_sched_p)
+	{
+		LOG("Character %s does not have a head scheduler, so cannot access head movements.", request->actor->getName().c_str());
+		return BehaviorRequestPtr();
+	}
+
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	xml_utils::xml_translate(&localId, id);

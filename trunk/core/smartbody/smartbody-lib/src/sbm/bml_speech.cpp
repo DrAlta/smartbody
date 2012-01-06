@@ -68,6 +68,12 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	BML::BmlRequestPtr request,
 	mcuCBHandle *mcu )
 {
+	if (!request->actor->face_ct)
+	{
+		LOG("Character %s does not have a face controller, so cannot create speech.", request->actor->getName().c_str());
+		return SpeechRequestPtr();
+	}
+
 	const XMLCh* id = xml->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	xml_utils::xml_translate(&localId, id);

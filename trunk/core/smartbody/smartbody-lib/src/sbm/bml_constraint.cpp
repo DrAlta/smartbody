@@ -49,6 +49,12 @@ using namespace xml_utils;
 
 BehaviorRequestPtr BML::parse_bml_constraint( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 
+	if (!request->actor->constraint_sched_p)
+	{
+		LOG("Character %s does not have a constraint scheduler, so cannot create constraint.", request->actor->getName().c_str());
+		return BehaviorRequestPtr();
+	}
+
 	MeCtConstraint* constraintCt = NULL; 
 
 	std::string handle = xml_parse_string(BMLDefs::ATTR_HANDLE, elem, "", REQUIRED_ATTR);//"";
