@@ -40,6 +40,10 @@ PATimeManager::PATimeManager(std::vector<SkMotion*> m, std::vector<std::vector<d
 		if (keys[0].size() > 0)
 			for (size_t i = 0; i < keys.size(); i++)
 				localTimes.push_back(keys[i][0]);
+	if (weights.size() > localTimes.size())
+	{
+		LOG("Problem: fewer keys (%d) than weights (%d)", k.size(), w.size());
+	}
 	setMotionTimes();
 	setKey();
 	setLocalTime();
@@ -149,6 +153,11 @@ void PATimeManager::setKey()
 
 void PATimeManager::setLocalTime()
 {
+	if (localTimes.size() < weights.size())
+	{
+		LOG("Problem with number of local times (%d) versus number of weights (%d)", localTimes.size(), weights.size());
+		return;
+	}
 	localTime = 0.0;
 	for (int i = 0; i < getNumWeights(); i++)
 		localTime += weights[i] * localTimes[i];
