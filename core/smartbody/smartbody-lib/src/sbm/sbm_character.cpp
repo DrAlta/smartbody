@@ -274,21 +274,24 @@ void SbmCharacter::createStandardControllers()
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
 
-	SmartBody::SBJoint* breathingJointX = new SmartBody::SBJoint();
-	std::string breathNameX = "breathX"; // parametric breath time
-	breathingJointX->setName(breathNameX);
-	breathingJointX->setJointType(SkJoint::TypeOther);
-	breathingJointX->setUsePosition(0, true);
-	breathingJointX->pos()->limits(SkJointPos::X, -1000, 1000);  // Setting upper bound to 2 allows some exageration
-	rootJoint->addChild(breathingJointX);
+	if (rootJoint)
+	{
+		SmartBody::SBJoint* breathingJointX = new SmartBody::SBJoint();
+		std::string breathNameX = "breathX"; // parametric breath time
+		breathingJointX->setName(breathNameX);
+		breathingJointX->setJointType(SkJoint::TypeOther);
+		breathingJointX->setUsePosition(0, true);
+		breathingJointX->pos()->limits(SkJointPos::X, -1000, 1000);  // Setting upper bound to 2 allows some exageration
+		rootJoint->addChild(breathingJointX);
 
-	SmartBody::SBJoint* breathingJointY = new SmartBody::SBJoint();
-	std::string breathNameY = "breathY"; // breathing intensity
-	breathingJointY->setName(breathNameY);
-	breathingJointY->setJointType(SkJoint::TypeOther);
-	breathingJointY->setUsePosition(0, true);
-	breathingJointY->pos()->limits(SkJointPos::X, -1000, 1000);  // Setting upper bound to 2 allows some exageration
-	rootJoint->addChild(breathingJointY);
+		SmartBody::SBJoint* breathingJointY = new SmartBody::SBJoint();
+		std::string breathNameY = "breathY"; // breathing intensity
+		breathingJointY->setName(breathNameY);
+		breathingJointY->setJointType(SkJoint::TypeOther);
+		breathingJointY->setUsePosition(0, true);
+		breathingJointY->pos()->limits(SkJointPos::X, -1000, 1000);  // Setting upper bound to 2 allows some exageration
+		rootJoint->addChild(breathingJointY);
+	}
 
 	gaze_sched_p = CreateSchedulerCt( getName().c_str(), "gaze" );
 
@@ -3919,7 +3922,18 @@ void SbmCharacter::addVisemeChannel(std::string visemeName, SkMotion* motion)
 {
 	// add a corresponding channel for this viseme
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
+	if (!sbSkel)
+	{
+		LOG("No skeleton for character %s. Viseme %s cannot be added.", this->getName().c_str(), visemeName.c_str());
+		return;
+	}
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
+	if (!rootJoint)
+	{
+		LOG("No root joint for character %s. Viseme %s cannot be added.", this->getName().c_str(), visemeName.c_str());
+		return;
+	}
+
 	SmartBody::SBJoint* visemeJoint = new SmartBody::SBJoint();
 	visemeJoint->setName(visemeName);
 	visemeJoint->setJointType(SkJoint::TypeViseme);
@@ -3986,7 +4000,17 @@ void SbmCharacter::addActionUnitChannel(int auNum, ActionUnit* au)
 
 	// add a corresponding channel for this action unit
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
+	if (!sbSkel)
+	{
+		LOG("No skeleton for character %s. Action unit %d cannot be added.", this->getName().c_str(), auNum);
+		return;
+	}
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
+	if (!rootJoint)
+	{
+		LOG("No root joint for character %s. Action unit %d cannot be added.", this->getName().c_str(), auNum);
+		return;
+	}
 	for (size_t a = 0; a < allUnits.size(); a++)
 	{
 		SmartBody::SBJoint* auJoint = new SmartBody::SBJoint();
