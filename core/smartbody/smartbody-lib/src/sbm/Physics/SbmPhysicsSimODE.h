@@ -67,11 +67,13 @@ public:
 	virtual SrVec getJointConstraintPos(SbmPhysicsJoint* joint);
 	virtual SrVec getJointRotationAxis(SbmPhysicsJoint* joint, int axis);
 
+	virtual void updatePhysicsJoint(SbmPhysicsJoint* phyJoint); // update joint parameters		
+
 	virtual void updatePhyObjGeometry(SbmPhysicsObj* obj, SbmGeomObject* geom = NULL);
 	virtual void enablePhysicsSim(SbmPhysicsObj* obj, bool bSim);
 	virtual void enableCollisionSim(SbmPhysicsObj* obj, bool bCol);	
-	virtual void updateSbmObj(SbmPhysicsObj* obj); // write sim data to colObj
-	virtual void updatePhySim(SbmPhysicsObj* obj); // read sim data from colObj	
+	virtual void writeToPhysicsObj(SbmPhysicsObj* obj); // write sim data to colObj
+	virtual void readFromPhysicsObj(SbmPhysicsObj* obj); // read sim data from colObj	
 
 public:
 	static SbmPhysicsSimODE* getODESim();

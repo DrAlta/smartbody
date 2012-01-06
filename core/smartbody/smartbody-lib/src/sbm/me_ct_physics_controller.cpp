@@ -28,11 +28,16 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 		_dt = t - _prevTime;
 		_prevTime = t;
 	}	
-	bool hasPhy = mcu.physicsEngine->getBoolAttribute("enable");
+	float invDt = 1.f/0.016;
+	if (_dt > 1e-6)
+		invDt = 1.f/(float)_dt;	
 #if 0
-	if (_valid && _context && hasPhy)
+	if (_valid && _context )
 	{
 		SbmPhysicsCharacter* phyChar = _character->getPhysicsCharacter();
+		if (!phyChar) return true;
+
+		bool hasPhy = (mcu.physicsEngine->getBoolAttribute("enable") && phyChar->getBoolAttribute("enable"));		
 		std::vector<SbmJointObj*> jointObjList = phyChar->getJointObjList();
 
 		// recompute joint torque 
@@ -43,11 +48,13 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			SbmPhysicsJoint* phyJoint = obj->getPhyJoint();
 			SBJoint* joint = obj->getPhyJoint()->getSBJoint();
 
-			if (joint->getName() == "base")
+			bool kinematicRoot = (joint->getName() == "base" || joint->getName() == "JtPelvis") && phyChar->getBoolAttribute("kinematicRoot");
+			if (kinematicRoot)
 				continue;
 
 			if (!joint)	continue;
 
+			//obj->updateSbmObj();
 			SrMat tran = obj->getRelativeOrientation();					
 			std::string jname = joint->getName();
 			std::string jPosName = joint->getName();
@@ -58,61 +65,80 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			if (bufferId < 0)	continue;	
 
 			
+			SrMat preRot;
+			joint->quat()->prerot().inverse().get_mat(preRot);
 
-			SrQuat phyQuat = SrQuat(tran);
+			SrQuat oldPhyQuat = SrQuat(tran);
+			SrQuat phyQuat = SrQuat(tran*preRot);
 			SrQuat inQuat;
 			// input reference pose
 			inQuat.w = frame.buffer()[bufferId + 0];
 			inQuat.x = frame.buffer()[bufferId + 1];
 			inQuat.y = frame.buffer()[bufferId + 2];
 			inQuat.z = frame.buffer()[bufferId + 3];
-			phyJoint->setRefQuat(inQuat);
-			// compute current relative ang velocity	
-			/*
-			SrQuat pQuat;			
-			if (obj->getParentObj())
-				pQuat = obj->getParentObj()->getGlobalTransform().rot;
-			SrVec relW = obj->getAngularVel()*pQuat.inverse(); 
-			if (obj->getParentObj())
-				relW = relW - obj->getParentObj()->getAngularVel()*pQuat.inverse();
-			SrVec relWD = SrVec(0,0,0);
-
-			SrVec torque = computePDTorque(phyQuat,inQuat,relW,relWD)*pQuat;	
-			//if (jname == "r_hip")
-			//	sr_out << "torque = " << torque << srnl;
-			if (obj->getParentObj())// && obj->getParentObj()->getParentObj())
-			{
-				SrVec oldTorque = phyJoint->getJointTorque();
-				SrVec torqueDiff = torque - oldTorque;
-
-				float maxTorqueRateOfChange = 2000;
-
-				torqueDiff.x = (torqueDiff.x<-maxTorqueRateOfChange)?(-maxTorqueRateOfChange):(torqueDiff.x);
-				torqueDiff.x = (torqueDiff.x>maxTorqueRateOfChange)?(maxTorqueRateOfChange):(torqueDiff.x);
-				torqueDiff.y = (torqueDiff.y<-maxTorqueRateOfChange)?(-maxTorqueRateOfChange):(torqueDiff.y);
-				torqueDiff.y = (torqueDiff.y>maxTorqueRateOfChange)?(maxTorqueRateOfChange):(torqueDiff.y);
-				torqueDiff.z = (torqueDiff.z<-maxTorqueRateOfChange)?(-maxTorqueRateOfChange):(torqueDiff.z);
-				torqueDiff.z = (torqueDiff.z>maxTorqueRateOfChange)?(maxTorqueRateOfChange):(torqueDiff.z);
-
-				//phyJoint->setJointTorque(oldTorque+torqueDiff);
-				phyJoint->setJointTorque(torque);
-			}
-			*/
-
-			//if (joint->getParent()) quat = SrQuat();
-			frame.buffer()[bufferId + 0] = phyQuat.w;
-			frame.buffer()[bufferId + 1] = phyQuat.x;
-			frame.buffer()[bufferId + 2] = phyQuat.y;
-			frame.buffer()[bufferId + 3] = phyQuat.z;
 			
-			int positionChannelID = _context->channels().search(jPosName, SkChannel::XPos);
-			if (positionChannelID < 0) continue;
-			int posBufferID = frame.toBufferIndex(positionChannelID);
-			if (posBufferID < 0)	continue;
-			SrVec pos = tran.get_translation();
-			frame.buffer()[posBufferID + 0] = pos.x;
-			frame.buffer()[posBufferID + 1] = pos.y;
-			frame.buffer()[posBufferID + 2] = pos.z;			
+			SrQuat newQuat = (joint->quat()->prerot()*inQuat);
+
+			
+			SrMat newMat; newQuat.get_mat(newMat);						
+			SrQuat pQuat;			
+			if (joint->getParent())
+			{
+				pQuat = SrQuat(joint->getParent()->getMatrixGlobal());
+				newMat = newMat*joint->getParent()->getMatrixGlobal();
+			}
+			
+			SrQuat prevQuat = phyJoint->getRefQuat();
+ 			SrQuat quatDiff = (inQuat*prevQuat.inverse());
+			quatDiff.normalize();
+			SrVec angDiff = quatDiff.axisAngle();
+ 			angDiff = angDiff*prevQuat*pQuat;
+ 			angDiff = angDiff*invDt;	
+
+
+			SrQuat pQuatPhy;			
+			if (obj->getParentObj())
+				pQuatPhy = obj->getParentObj()->getGlobalTransform().rot;
+
+			SrQuat newGQuat = SrQuat(newMat);			
+			//LOG("joint name = %s",joint->getName().c_str());
+			//sr_out << "gmat Quat = " << SrQuat(joint->getMatrixGlobal()) << srnl;
+			//sr_out << "old phyQuat = " << pQuatPhy*oldPhyQuat << "  , newQuat = " << newQuat*pQuat << srnl;
+			//sr_out << "new GQuat = " << newGQuat << srnl;
+			
+			//LOG("joint name = %s",joint->getName().c_str());
+			//sr_out << "angVel = " << angDiff << srnl;
+ 			phyJoint->setRefAngularVel(angDiff);			
+			phyJoint->setRefQuat(inQuat);
+			if (hasPhy)
+			{
+				frame.buffer()[bufferId + 0] = phyQuat.w;
+				frame.buffer()[bufferId + 1] = phyQuat.x;
+				frame.buffer()[bufferId + 2] = phyQuat.y;
+				frame.buffer()[bufferId + 3] = phyQuat.z;
+
+				int positionChannelID = _context->channels().search(jPosName, SkChannel::XPos);
+				if (positionChannelID < 0) continue;
+				int posBufferID = frame.toBufferIndex(positionChannelID);
+				if (posBufferID < 0)	continue;
+				SrVec pos = tran.get_translation() - joint->offset(); // remove the joint offset in local space to get actual Pos channel values
+				//LOG("joint name = %s",joint->getName().c_str());
+				//sr_out << "Pos = " << pos << srnl;
+				frame.buffer()[posBufferID + 0] = pos.x;
+				frame.buffer()[posBufferID + 1] = pos.y;
+				frame.buffer()[posBufferID + 2] = pos.z;	
+			}
+			else
+			{
+				SbmTransform diffSRT = SbmTransform::diff(obj->getGlobalTransform(),obj->getRefTransform());
+				SrVec refAngVel = diffSRT.rot.axisAngle()*obj->getGlobalTransform().rot;
+				refAngVel = refAngVel*invDt;
+				SrVec refLinearVel = diffSRT.tran*invDt;
+				obj->setVec3Attribute("refLinearVelocity",refLinearVel[0],refLinearVel[1],refLinearVel[2]);
+				obj->setVec3Attribute("refAngularVelocity",refAngVel[0],refAngVel[1],refAngVel[2]);
+				obj->setLinearVel(refLinearVel);
+				obj->setAngularVel(refAngVel);
+			}
 		}				
 	}
 #endif

@@ -308,7 +308,19 @@ void ResourceWindow::updateGUI()
 		SbmCharacter* character = (*iter).second;
 		resourceTree->sortorder(FL_TREE_SORT_ASCENDING);	
 		updateCharacter(treeItemList[ITEM_CHARACTER],character);
-	}			
+	}		
+
+	SbmPhysicsSim* phySim = mcu.getPhysicsEngine();
+	resourceTree->clear_children(treeItemList[ITEM_PHYSICS]);
+	for (SbmPhysicsCharacterMap::iterator iter = phySim->getCharacterMap().begin();
+		 iter != phySim->getCharacterMap().end();
+		 iter++)
+	{
+		SbmPhysicsCharacter* phyChar = (*iter).second;
+		resourceTree->sortorder(FL_TREE_SORT_ASCENDING);
+		updatePhysicsCharacter(treeItemList[ITEM_PHYSICS],phyChar);
+
+	}
 
 	// update services
 	SmartBody::SBServiceManager* serviceManager = scene->getServiceManager();
@@ -503,6 +515,24 @@ void ResourceWindow::updatePawn( Fl_Tree_Item* tree, SbmPawn* pawn )
 	item->user_data((void*)ITEM_PAWN);
 }
 
+
+void ResourceWindow::updatePhysicsCharacter( Fl_Tree_Item* tree, SbmPhysicsCharacter* phyChar )
+{
+	Fl_Tree_Item* item = resourceTree->add(tree,phyChar->getPhysicsCharacterName().c_str());
+	item->user_data((void*)ITEM_PHYSICS);
+	resourceTree->sortorder(FL_TREE_SORT_NONE);	
+	std::vector<SbmPhysicsJoint*> jointList = phyChar->getPhyJointList();
+	for (unsigned int i=0;i<jointList.size();i++)
+	{
+		SbmPhysicsJoint* phyJoint = jointList[i];
+		Fl_Tree_Item* jointItem = resourceTree->add(item,phyJoint->getSBJoint()->getName().c_str());
+		jointItem->user_data((void*)ITEM_PHYSICS);
+		//Fl_Tree_Item* rigidBodyItem = resourceTree->add(jointItem,"body");
+		//rigidBodyItem->user_data((void*)ITEM_PHYSICS);
+	}
+
+}
+
 void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* character )
 {
 	Fl_Tree_Item* item = resourceTree->add(tree,character->getName().c_str());
@@ -600,8 +630,7 @@ void ResourceWindow::clearInfoWidget()
 TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* treeItem, int itemType )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SmartBody::SBScene* scene = mcu._scene;
-
+	SmartBody::SBScene* scene = mcu._scene;	
 	TreeItemInfoWidget* widget = NULL;
 	if (itemType == ITEM_SKELETON)
 	{
@@ -637,7 +666,39 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_PHYSICS)
 	{
-		widget = new AttributeItemWidget(mcuCBHandle::singleton().physicsEngine,x,y,w,h,name,treeItem,itemType,this);
+		SbmPhysicsSim* phySim = mcuCBHandle::singleton().getPhysicsEngine();
+		std::string itemName = treeItem->label();
+		std::string parentName = treeItem->parent()->label();
+		SbmPhysicsCharacter* phyChar = phySim->getPhysicsCharacter(itemName);
+		SbmPhysicsCharacter* phyParent = phySim->getPhysicsCharacter(parentName);
+		SmartBody::SBObject* phyObj = mcuCBHandle::singleton().physicsEngine;		
+		SmartBody::SBObject* phyObj2 = NULL;
+
+		static std::string name1 = "PHYSICS JOINT";
+		static std::string name2 = "RIGID BODY";	
+		std::vector<std::string> phyObjNameList;
+		std::vector<SmartBody::SBObject*> phyObjList;
+		if (phyChar)
+		{
+			phyObj = phyChar;
+		}
+		else if (phyParent)
+		{
+			SbmPhysicsJoint* phyJoint = phyParent->getPhyJoint(itemName);
+			phyObj = phyJoint;
+			phyObj2 = phyJoint->getChildObj();
+			phyObjNameList.push_back(name1);
+			phyObjNameList.push_back(name2);
+			phyObjList.push_back(phyObj);
+			phyObjList.push_back(phyObj2);
+		}
+		if (phyObjList.size() > 0)
+		{
+			//widget = new DoubleAttributeItemWidget(phyObj,phyObj2,x,y,w,h,h/2,name1.c_str(),name2.c_str(),treeItem,itemType,this);
+			widget = new MultiAttributeItemWidget(phyObjList,x,y,w,h,h/2,name,phyObjNameList,treeItem,itemType,this);
+		}
+		else if (phyObj)
+			widget = new AttributeItemWidget(phyObj,x,y,w,h,name,treeItem,itemType,this);
 	}
 	else if (itemType == ITEM_SCENE)
 	{

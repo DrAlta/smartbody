@@ -1444,7 +1444,7 @@ void SbmPawn::initPhysicsObj()
 	if (!phyObj_p)
 		phyObj_p = phySim->createPhyObj();
 	//phyObj_p-(colObj_p,1.f);	
-	phyObj_p->setGeometry(colObj_p,1.f);	
+	phyObj_p->setGeometry(colObj_p);	
 	phySim->addPhysicsObj(phyObj_p);
 	phySim->updatePhyObjGeometry(phyObj_p);				
 }
@@ -1475,6 +1475,7 @@ void SbmPawn::updateToColObject()
 		SRT newWorldState; 
 		newWorldState.gmat(get_world_offset_joint()->gmat());
 		//colObj_p->getWorldState().gmat();
+		phyObj_p->setRefTransform(phyObj_p->getGlobalTransform()); // save previous transform
 		phyObj_p->setGlobalTransform(newWorldState);
 		//colObj_p->updateGlobalTransform(get_world_offset_joint()->gmat());
 		phyObj_p->updatePhySim();					

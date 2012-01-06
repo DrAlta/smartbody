@@ -1192,7 +1192,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
 	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
 	float floorSize = 1200;
-	float planeY = -0.5f;
+	float planeY = -0.0f;
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,0);
 	glNormal3f(0,1,0);
@@ -2874,79 +2874,48 @@ void FltkViewer::drawCharacterPhysicsObjs()
 			SBJoint* joint = obj->getSBJoint();	
 			SbmPhysicsSim* physics = mcu.getPhysicsEngine();
 #if 1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 			if (physics)
 			{
 				SrVec jointPos = physics->getJointConstraintPos(obj->getPhyJoint());
 				SrSnSphere sphere;				
 				sphere.shape().center = jointPos;//SrVec(0,-cap->extent,0);
 				sphere.shape().radius = character->getHeight()*0.022f;
+				float axisScale = character->getHeight()*0.01f;
 				sphere.color(SrColor(1.f,0.f,0.f));
 				glEnable(GL_LIGHTING);
 				sphere.render_mode(srRenderModeSmooth);
 				//SrGlRenderFuncs::render_sphere(&sphere);
 				glDisable(GL_LIGHTING);		
 
+				
 				glBegin(GL_LINES);
-				SrVec axis = physics->getJointRotationAxis(obj->getPhyJoint(),0);
+				SrVec axis = physics->getJointRotationAxis(obj->getPhyJoint(),0)*axisScale;
+				//axis = SrVec(gmat.get(0),gmat.get(1),gmat.get(2))*axisScale;
 				glColor3f(1.f,0.f,0.f);
 				glVertex3f(jointPos[0],jointPos[1],jointPos[2]);
 				glVertex3f(jointPos[0]+axis[0],jointPos[1]+axis[1],jointPos[2]+axis[2]);
 
 				glColor3f(0.f,1.f,0.f);
-				axis = physics->getJointRotationAxis(obj->getPhyJoint(),1);
+				axis = physics->getJointRotationAxis(obj->getPhyJoint(),1)*axisScale;
+				//axis = SrVec(gmat.get(4),gmat.get(5),gmat.get(6))*axisScale;
 				glVertex3f(jointPos[0],jointPos[1],jointPos[2]);
 				glVertex3f(jointPos[0]+axis[0],jointPos[1]+axis[1],jointPos[2]+axis[2]);
 
-				glColor3f(0.f,0.f,1.f);
-				axis = physics->getJointRotationAxis(obj->getPhyJoint(),2);
+				glColor3f(0.f,0.f,1.f);				
+				axis = physics->getJointRotationAxis(obj->getPhyJoint(),2)*axisScale;
+				//axis = SrVec(gmat.get(8),gmat.get(9),gmat.get(10))*axisScale;
 				glVertex3f(jointPos[0],jointPos[1],jointPos[2]);
 				glVertex3f(jointPos[0]+axis[0],jointPos[1]+axis[1],jointPos[2]+axis[2]);
 				glEnd();
-				
+
+
+				// draw torque
+// 				glBegin(GL_LINES);
+// 				glColor3f(1.f,0.f,1.f);								
+// 				axis = obj->getPhyJoint()->getJointTorque()*1.f;
+// 				glVertex3f(jointPos[0],jointPos[1],jointPos[2]);
+// 				glVertex3f(jointPos[0]+axis[0],jointPos[1]+axis[1],jointPos[2]+axis[2]);
+// 				glEnd();				
 			}
 #endif
 

@@ -588,7 +588,72 @@ void AttributeItemWidget::updateWidget()
 }
 
 AttributeItemWidget::~AttributeItemWidget()
-{
-	
+{	
 	delete attrWindow;
+}
+
+DoubleAttributeItemWidget::DoubleAttributeItemWidget( SmartBody::SBObject* object1, SmartBody::SBObject* object2, int x, int y, int w, int h, int ySep, const char* name1, const char* name2, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow /*= NULL*/ )
+: TreeItemInfoWidget(x,y,w,h,name1,inputItem,type)
+{
+	attrWindow1 = NULL;
+	attrWindow2 = NULL;
+	if (!object1 && !object2)
+		return;
+
+	float speLen = 15;
+	infoObject1 = object1;	
+	infoObject2 = object2;
+	this->begin();
+	attrWindow1 = new AttributeWindow(infoObject1,x,y,w,(ySep-y)-speLen,name1);
+	attrWindow1->begin();
+	attrWindow1->end();
+	attrWindow2 = new AttributeWindow(infoObject2,x,ySep+speLen,w,h-(ySep-y)-speLen,name2);
+	attrWindow2->begin();
+	attrWindow2->end();
+	this->end();	
+}
+
+DoubleAttributeItemWidget::~DoubleAttributeItemWidget()
+{
+	if (attrWindow1)
+		delete attrWindow1;
+	if (attrWindow2)
+		delete attrWindow2;
+}
+
+void DoubleAttributeItemWidget::updateWidget()
+{
+	redraw();
+}
+
+MultiAttributeItemWidget::MultiAttributeItemWidget( std::vector<SmartBody::SBObject*>& objectList, int x, int y, int w, int h, int yStep, const char* name, std::vector<std::string>& objectNameList, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow /*= NULL*/ )
+:TreeItemInfoWidget(x,y,w,h,name,inputItem,type) 
+{
+	infoObjectList = objectList;
+	attrNameList = objectNameList;
+	float speLen = 15;
+	float yCur = y;
+	AttributeWindow* attrWin = NULL;
+	this->begin();
+	mainGroup = new Fl_Tabs( x,  y, w, h, name);
+	mainGroup->begin();
+	for (int i=0;i<infoObjectList.size();i++)
+	{
+		const char* attrWinName = (i<attrNameList.size())?attrNameList[i].c_str():NULL;
+		attrWin = new AttributeWindow(infoObjectList[i],x+speLen,y+speLen,w-speLen,h-speLen,attrWinName,false);
+		attrWin->begin();
+		attrWin->end();
+	}
+	mainGroup->end();
+	this->end();
+}
+
+MultiAttributeItemWidget::~MultiAttributeItemWidget()
+{
+
+}
+
+void MultiAttributeItemWidget::updateWidget()
+{
+	redraw();
 }

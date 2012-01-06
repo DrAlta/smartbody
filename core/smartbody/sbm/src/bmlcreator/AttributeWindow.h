@@ -58,7 +58,7 @@ class SBObject;
 class AttributeWindow : public Fl_Group, public SmartBody::SBObserver
 {
 public:
-	AttributeWindow(SmartBody::SBObject*, int,int,int,int,const char*);
+	AttributeWindow(SmartBody::SBObject*, int,int,int,int,const char*, bool upDownBox = true);
 	~AttributeWindow();
 
 	void setDirty(bool val);

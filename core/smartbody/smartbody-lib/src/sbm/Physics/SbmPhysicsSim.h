@@ -12,11 +12,21 @@ class SbmPhysicsObjInterface
 protected:
 	bool          bHasPhysicsSim;
 	bool          bHasCollisionSim;	
-	SbmTransform  globalTransform;
+	SbmTransform  globalTransform;	
+	SbmTransform  refTransform;
+	
 public:	
 	SbmTransform& getGlobalTransform() { return globalTransform; }
 	void setGlobalTransform(const SrMat& gmat);
 	void setGlobalTransform(SbmTransform& rt);	
+
+	SbmTransform& getRefTransform() { return refTransform; }
+	void setRefTransform(const SrMat& gmat);
+	void setRefTransform(SbmTransform& rt);
+
+	virtual void enablePhysicsSim(bool bPhy) = 0;
+	virtual void enableCollisionSim(bool bCol) = 0;
+
 	bool hasPhysicsSim() { return bHasPhysicsSim; }
 	bool hasCollisionSim() { return bHasCollisionSim; }	
 	void hasPhysicsSim(bool phySim) { bHasPhysicsSim = phySim; }
@@ -25,29 +35,29 @@ public:
 	
 };
 
-class SbmPhysicsObj : public SbmPhysicsObjInterface// abstraction for rigid objects in the physics engine
+class SbmPhysicsObj : public SbmPhysicsObjInterface, public SmartBody::SBObject// abstraction for rigid objects in the physics engine
 {
-protected:
-	SbmGeomObject* colObj;	
-	float         objMass;	
+protected:	
+	SbmGeomObject* colObj;		
 	float         objDensity;
 	SrVec         externalForce, externalTorque;
 	SrVec         linearVel, angularVel;	
-	
+	bool          initGeom;
 public:
 	SbmPhysicsObj();
 	~SbmPhysicsObj() {}	
 
 	virtual void enablePhysicsSim(bool bPhy);
-	virtual void enableCollisionSim(bool bCol);
-
-	virtual void setGeometry(SbmGeomObject* obj, float density);
+	virtual void enableCollisionSim(bool bCol);	
 	virtual void updateSbmObj();
 	virtual void updatePhySim();
 
+	void setGeometry(SbmGeomObject* obj);
+	void changeGeometry(std::string& geomType, SrVec extends);
+
 	SbmGeomObject* getColObj() { return colObj; }
-	float         getMass() { return objMass; }		
-	void          setMass(float mass) { objMass = mass; }
+	float         getMass();	
+	void          setMass(float mass);
 	float         getDensity() { return objDensity; }
 	void          setDensity(float density) { objDensity = density; }
 
@@ -56,10 +66,12 @@ public:
 	SrVec& getExternalForce() { return externalForce; }
 	void   setExternalForce(SrVec val) { externalForce = val; }
 
-	SrVec& getLinearVel() { return linearVel; }
-	void   setLinearVel(SrVec val) { linearVel = val; }
-	SrVec& getAngularVel() { return angularVel; }
-	void   setAngularVel(SrVec val) { angularVel = val; }
+	SrVec getLinearVel();
+	void  setLinearVel(SrVec val);
+	SrVec getAngularVel();
+	void  setAngularVel(SrVec val);
+
+	virtual void notify(SBSubject* subject);
 };
 
 class SbmJointObj;
@@ -72,14 +84,18 @@ protected:
 	SbmJointObj* parentObj;	
 	SbmJointObj* childObj;
 	SrQuat refQuat;	
+	SrVec  refAngularVel;	
 	SrVec jointTorque;
-	float totalSupportMass; // all 
+	float totalSupportMass; // all 	
 public:
 	SbmPhysicsJoint(SBJoint* joint);
 	~SbmPhysicsJoint();
 	SBJoint* getSBJoint() { return sbmJoint; }
 	SrQuat& getRefQuat() { return refQuat; }
 	void setRefQuat(SrQuat val) { refQuat = val; }
+	SrVec& getRefAngularVel() { return refAngularVel; }
+	void setRefAngularVel(SrVec val) { refAngularVel = val; }
+
 	SrVec& getJointTorque() { return jointTorque; }
 	void   setJointTorque(SrVec val) { jointTorque = val; }	
 	SbmJointObj* getParentObj() const { return parentObj; }
@@ -88,6 +104,8 @@ public:
 	void setChildObj(SbmJointObj* val) { childObj = val; }
 
 	unsigned long getID();
+
+	virtual void notify(SBSubject* subject);
 
 public:
 	void updateTotalSupportMass();
@@ -115,7 +133,7 @@ public:
 	virtual void initJoint(SbmPhysicsJoint* joint);
 };
 
-class SbmPhysicsCharacter : public SbmPhysicsObjInterface // interface for articulated dynamic character 
+class SbmPhysicsCharacter : public SbmPhysicsObjInterface, public SmartBody::SBObject // interface for articulated dynamic character 
 {
 protected:	
 	SbmPhysicsJoint* root;
@@ -124,12 +142,20 @@ protected:
 	std::map<std::string, SbmGeomObject*>   jointGeometryMap;
 	std::string characterName;
 public:
-	std::string getName() { return characterName; }
+	SbmPhysicsCharacter();
 	virtual void initPhysicsCharacter(std::string& charName, std::vector<std::string>& jointNameList, bool buildGeometry = false);	
+
+	virtual void enablePhysicsSim(bool bPhy);
+	virtual void enableCollisionSim(bool bCol);
+
+	std::string getPhysicsCharacterName() { return characterName; }		
 	SbmJointObj* getJointObj(const std::string& jointName); // get body part associated with this joint
 	SbmPhysicsJoint* getPhyJoint(const std::string& jointName);
+	SbmPhysicsJoint* getPhyJointRoot() { return root; }
 	std::vector<SbmJointObj*> getJointObjList();
+	std::vector<SbmPhysicsJoint*> getPhyJointList();
 	std::map<std::string,SbmJointObj*>& getJointObjMap();
+	virtual void notify(SBSubject* subject);
 
 	void updatePDTorque();
 protected:
@@ -137,6 +163,7 @@ protected:
 	SbmGeomObject* createJointGeometry(SBJoint* joint, float radius = -1);
 	void updateJointAxis(SbmPhysicsJoint* phyJoint);
 	SrVec computePDTorque(SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD, float Ks, float Kd);
+	SrVec computeSPDTorque(SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD, float Ks, float Kd, float dt, float mass);
 };
 
 //typedef std::deque<SbmPhysicsObj*> SbmPhysicsObjList;
@@ -158,16 +185,22 @@ public:
 	void setGravity(float gravity);	
 	virtual bool hasPhysicsObj(SbmPhysicsObj* obj);
 	virtual bool hasPhysicsCharacter(SbmPhysicsCharacter* phyChar);
+	SbmPhysicsCharacterMap& getCharacterMap() { return characterMap; }
+	SbmPhysicsCharacter* getPhysicsCharacter(std::string& charName);
 
 	virtual void addPhysicsObj(SbmPhysicsObj* obj);
 	virtual void removePhysicsObj(SbmPhysicsObj* obj);
-	virtual void addPhysicsCharacter(SbmPhysicsCharacter* phyChar) = 0;	
+	virtual void addPhysicsCharacter(SbmPhysicsCharacter* phyChar);	
 	virtual void removePhysicsCharacter(SbmPhysicsCharacter* phyChar) = 0;	
 
 	virtual void enablePhysicsSim(SbmPhysicsObj* obj, bool bSim) = 0;
 	virtual void enableCollisionSim(SbmPhysicsObj* obj, bool bCol) = 0;	
-	virtual void updateSbmObj(SbmPhysicsObj* obj) = 0; // write sim data to colObj
-	virtual void updatePhySim(SbmPhysicsObj* obj) = 0; // read sim data from colObj	
+
+	virtual void writeToPhysicsObj(SbmPhysicsObj* obj) = 0; // write sim data to colObj
+	virtual void readFromPhysicsObj(SbmPhysicsObj* obj) = 0; // read sim data from colObj	
+
+	void updateAllPhysicsJoints();
+	virtual void updatePhysicsJoint(SbmPhysicsJoint* phyJoint) = 0; // update joint parameters		
 	virtual void updatePhyObjGeometry(SbmPhysicsObj* obj, SbmGeomObject* geom = NULL) = 0;
 
 	//virtual void applyTorque(SBJoint* joint, )
@@ -178,6 +211,8 @@ public:
 	virtual void initSimulation() = 0;		
 	virtual void updateSimulationInternal(float timeStep) = 0;
 	virtual SbmPhysicsObj* createPhyObj() = 0;	
+
+	virtual void notify(SBSubject* subject);
 };
 
 
