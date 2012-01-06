@@ -44,7 +44,10 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 {
 	MeCtSaccade* saccade_ct = request->actor->saccade_ct;
 	if (!saccade_ct)
+	{
+		LOG("Character %s does not have a saccade controller, so cannot saccade.", request->actor->getName().c_str());
 		return BehaviorRequestPtr();
+	}
 
 	saccade_ct->setValid(true);
 	saccade_ct->setUseModel(true);	

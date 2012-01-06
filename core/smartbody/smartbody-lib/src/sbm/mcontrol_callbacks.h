@@ -133,6 +133,7 @@ int resetanim_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_interp_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 int mcu_python_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 int mcu_pythonscript_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );

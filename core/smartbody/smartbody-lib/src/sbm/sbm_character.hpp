@@ -141,10 +141,6 @@ protected:
 	VisemeMotionMap 		viseme_map;
 
 	//MeCtLocomotionAnalysis* locomotion_ct_analysis;
-	
-	MeCtEyeLidRegulator*	eyelid_reg_ct_p;
-	MeCtFace*				face_ct;
-	MeCtEyeLid*				eyelid_ct;
 
 
 	// The term "viseme" in the following variables is a misnomer,
@@ -259,6 +255,10 @@ public:
 	MeCtSchedulerClass*	grab_sched_p; // grabbing (temp)
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
 	MeCtSchedulerClass*	param_sched_p; // general parameters
+
+	MeCtEyeLidRegulator*	eyelid_reg_ct_p;
+	MeCtFace*				face_ct;
+	MeCtEyeLid*				eyelid_ct;
 
 	MeCtPhysicsController* physics_ct;
 	MeCtDataReceiver*	datareceiver_ct;
