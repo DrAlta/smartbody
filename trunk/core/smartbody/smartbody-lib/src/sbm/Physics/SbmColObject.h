@@ -33,10 +33,12 @@ typedef SbmTransform SRT;
 
 class SbmPhysicsObjInterface;
 
+enum { GEOM_NULL = 0, GEOM_SPHERE, GEOM_BOX, GEOM_CAPSULE, GEOM_MESH, NUM_OF_GEOMS };
+
 class SbmGeomObject
 {
 public:
-	std::string  color;
+	std::string  color;	
 protected:	
 	SbmPhysicsObjInterface* attachedPhyObj;
 	SbmTransform localTransform;	
@@ -46,12 +48,17 @@ public:
 	virtual ~SbmGeomObject(void);	
 	void attachToPhyObj(SbmPhysicsObjInterface* phyObj);
 	SbmTransform& getLocalTransform() { return localTransform; }	
+	void          setLocalTransform(SbmTransform& newLocalTran);
 	SbmTransform& getCombineTransform();
 	virtual SrVec getCenter();	
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) = 0; // check if a point is inside the object	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f) { return false; }; // check if a line segment is intersect with the object
 	// estimate the hand position and orientation
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist = 0.f) = 0;
+	virtual std::string geomType() = 0;
+	virtual SrVec       getGeomSize() = 0;
+
+	static SbmGeomObject* createGeometry(std::string& type, SrVec extends);
 };
 
 // a default null object with no geometry
@@ -61,7 +68,9 @@ public:
 	SbmGeomNullObject() {}
 	~SbmGeomNullObject() {}
 	virtual bool isInside(const SrVec& gPos, float offset = 0.f) { return false;}
-	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
+	virtual bool estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
+	virtual std::string  geomType() { return "null"; }
+	virtual SrVec        getGeomSize() { return SrVec(1,1,1); }
 };
 
 class SbmGeomSphere : public SbmGeomObject
@@ -74,6 +83,8 @@ public:
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
+	virtual std::string  geomType() { return "sphere"; }
+	virtual SrVec        getGeomSize() { return SrVec(radius,radius,radius); }
 };
 
 class SbmGeomBox : public SbmGeomObject
@@ -87,6 +98,8 @@ public:
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
+	virtual std::string  geomType() { return "box"; }
+	virtual SrVec        getGeomSize() { return extent; }
 };
 
 // assuming the length is along local y-axis
@@ -102,6 +115,8 @@ public:
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
+	virtual std::string  geomType() { return "capsule"; }
+	virtual SrVec        getGeomSize() { return SrVec(extent,radius,extent); }
 };
 
 // this is a adapting interface to integrate SrModel tri-mesh into physical simulation framework
@@ -116,6 +131,8 @@ public:
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) { return false; }
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f) { return false; }
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist) { return false;}
+	virtual std::string  geomType() { return "mesh"; }
+	virtual SrVec        getGeomSize() { return SrVec(1,1,1); }
 };
 
 typedef std::vector<SbmGeomObject*> VecOfSbmColObj;

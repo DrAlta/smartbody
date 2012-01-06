@@ -109,6 +109,32 @@ SbmTransform& SbmGeomObject::getCombineTransform()
 	return combineTransform;	
 }
 
+SbmGeomObject* SbmGeomObject::createGeometry(std::string& type, SrVec size )
+{
+	SbmGeomObject* geomObj = NULL;
+	if (type == "sphere")
+	{
+		geomObj = new SbmGeomSphere(size[0]);		
+	}
+	else if (type == "box")
+	{
+		geomObj = new SbmGeomBox(SrVec(size[0],size[1],size[2]));		
+	}
+	else if (type == "capsule")
+	{		
+		geomObj = new SbmGeomCapsule(size[0]*2.f,size[1]);		
+	}	
+	else
+	{
+		geomObj = new SbmGeomNullObject();
+	}
+	return geomObj;
+}
+
+void SbmGeomObject::setLocalTransform( SbmTransform& newLocalTran )
+{
+	localTransform = newLocalTran;
+}
 
 bool SbmGeomNullObject::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
 {

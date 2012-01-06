@@ -1,4 +1,4 @@
-/*
+                                                                                                                                                                                                                                                                                                   /*
  *  sk_joint.cpp - part of Motion Engine and SmartBody-lib
  *  Copyright (C) 2008  University of Southern California
  *

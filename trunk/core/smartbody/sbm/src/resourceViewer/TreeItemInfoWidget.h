@@ -7,6 +7,7 @@
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Tabs.H>
 #include <sk/sk_skeleton.h>
 
 class TreeItemInfoWidget : public Fl_Group
@@ -129,6 +130,34 @@ protected:
 public:
 	AttributeItemWidget(SmartBody::SBObject* object, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow = NULL);
 	~AttributeItemWidget();
+
+	virtual void updateWidget();
+};
+
+class DoubleAttributeItemWidget : public TreeItemInfoWidget
+{
+protected:
+	AttributeWindow* attrWindow1, *attrWindow2;
+	SmartBody::SBObject*         infoObject1;
+	SmartBody::SBObject*         infoObject2;
+public:
+	DoubleAttributeItemWidget(SmartBody::SBObject* object1, SmartBody::SBObject* object2, int x, int y, int w, int h, int ySep, const char* name1, const char* name2, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow = NULL);
+	~DoubleAttributeItemWidget();
+
+	virtual void updateWidget();
+};
+
+class MultiAttributeItemWidget : public TreeItemInfoWidget
+{
+protected:
+	//AttributeWindow* attrWindow1, *attrWindow2;
+	Fl_Tabs* mainGroup;
+	std::vector<AttributeWindow*> attrWindowList;
+	std::vector<SmartBody::SBObject*> infoObjectList;	
+	std::vector<std::string> attrNameList;
+public:
+	MultiAttributeItemWidget(std::vector<SmartBody::SBObject*>& objectList, int x, int y, int w, int h, int yStep, const char* name, std::vector<std::string>& objectNameList, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow /*= NULL*/ );
+	~MultiAttributeItemWidget();
 
 	virtual void updateWidget();
 };

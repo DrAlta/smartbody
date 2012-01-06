@@ -509,6 +509,7 @@ void SbmCharacter::updateJointPhyObjs(bool phySim)
 		return;
 	if (!phyChar) return;
 
+	bool charPhySim = phySim && phyChar->getBoolAttribute("enable");
 	std::map<std::string,SbmJointObj*> jointPhyObjMap = phyChar->getJointObjMap();
 	const std::vector<SkJoint*>& joints = _skeleton->joints();	
 	_skeleton->update_global_matrices();
@@ -517,12 +518,13 @@ void SbmCharacter::updateJointPhyObjs(bool phySim)
 		SkJoint* curJoint = joints[i]; 
 		const std::string& jointName = curJoint->name();
 		std::map<std::string, SbmJointObj*>::iterator iter = jointPhyObjMap.find(jointName);
+		bool kinematicRoot = (curJoint->name() == "base" || curJoint->name() == "JtPelvis") && phyChar->getBoolAttribute("kinematicRoot");
 		if (iter != jointPhyObjMap.end())
 		{
 			SbmJointObj* phyObj = (*iter).second;
 
 #if USE_PHYSICS_CHARACTER			
-			if (phySim )
+			if (charPhySim && !kinematicRoot)
 			{
 				phyObj->enablePhysicsSim(true);
 				phyObj->updateSbmObj();
@@ -534,7 +536,9 @@ void SbmCharacter::updateJointPhyObjs(bool phySim)
 				phyObj->enablePhysicsSim(false);
 				//if (joint->parent()) 
 				SrMat gmat = tranMat*curSBJoint->gmat();		
-				phyObj->setGlobalTransform(gmat);
+				phyObj->setRefTransform(phyObj->getGlobalTransform()); // save previous transform
+				phyObj->setGlobalTransform(gmat);				
+				phyObj->setAngularVel(phyObj->getPhyJoint()->getRefAngularVel());
 				phyObj->updatePhySim();
 			}		
 #else
@@ -583,19 +587,25 @@ void SbmCharacter::buildJointPhyObjs()
 	excludeNameList.insert("l_forefoot");
 	excludeNameList.insert("r_forefoot");
 
+	excludeNameList.insert("l_ankle");
+	excludeNameList.insert("r_ankle");
+
 	//excludeNameList.insert("r_sternoclavicular");
 	//excludeNameList.insert("l_sternoclavicular");
+	//excludeNameList.insert("r_shoulder");
+	//excludeNameList.insert("l_shoulder");
 	//excludeNameList.insert("r_acromioclavicular");
 	//excludeNameList.insert("l_acromioclavicular");
 
 	//excludeNameList.insert("l_hip");
-	//excludeNameList.insert("r_hip");
+	//excludeNameList.insert("r_hip");	
 	//excludeNameList.insert("spine3");
 	//excludeNameList.insert("r_elbow");
 	//excludeNameList.insert("l_elbow");
 	SkJoint* rootJoint = _skeleton->root();
 	//jointNameList.push_back(rootJoint->name());
 	tempJointList.push(rootJoint->child(0));
+	//tempJointList.push(_skeleton->search_joint("spine2"));
 
 	
 	while (!tempJointList.empty())

@@ -68,6 +68,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
+				AdditionalOptions="/Stack:10000000"
 				AdditionalDependencies="Smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_44.lib boost_system-vc90-mt-gd-1_44.lib boost_regex-vc90-mt-gd-1_44.lib boost_python-vc90-mt-gd-1_44.lib log4cxxd.lib OpenAL32.lib alut.lib libsndfile-1.lib fltkgld.lib fltkd.lib opengl32.lib glu32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAId.lib steerlibd.lib ode_doubled.lib"
 				OutputFile="..\bin\sbm-fltkd.exe"
 				LinkIncremental="2"

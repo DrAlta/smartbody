@@ -60,18 +60,21 @@ that is distributed: */
 #endif
 
 
-AttributeWindow::AttributeWindow(SmartBody::SBObject* obj, int x, int y, int w, int h, const char *s) : Fl_Group(x, y, w, h, s)
+AttributeWindow::AttributeWindow(SmartBody::SBObject* obj, int x, int y, int w, int h, const char *s, bool upDownBox) : Fl_Group(x, y, w, h, s)
 {
 	//this->type(VERTICAL);
 
 	setObject(obj);
-	this->begin();
-		mainGroup = new Fl_Scroll( x + 10,  y + 10, w -20, h -20);
+	this->begin();		
+		mainGroup = new Fl_Scroll( x + 10,  y + 10, w -20, h -20);	
+		//mainGroup->label(s);
 		mainGroup->type(Fl_Scroll::VERTICAL_ALWAYS);
-		mainGroup->box(FL_UP_BOX);
+		if (upDownBox)
+			mainGroup->box(FL_UP_BOX);
 		mainGroup->begin();
 		mainGroup->end();
-	this->box(FL_DOWN_BOX);
+	if (upDownBox)
+		this->box(FL_DOWN_BOX);
 	this->end();
 
 	dirty = true;
