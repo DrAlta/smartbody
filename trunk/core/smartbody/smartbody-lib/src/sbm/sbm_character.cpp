@@ -448,16 +448,6 @@ void SbmCharacter::initData()
 	createStringAttribute("mesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
 }
 
-int SbmCharacter::init_locomotion_skeleton(const char* skel_file, mcuCBHandle *mcu_p)
-{
-	SkSkeleton* walking_skeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager );
-	SkSkeleton* standing_skeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager );
-
-	locomotion_ct->init_skeleton(standing_skeleton, walking_skeleton);
-
-	return CMD_SUCCESS;
-}
-
 void SbmCharacter::locomotion_reset()
 {
 	locomotion_ct->reset = true;
@@ -689,10 +679,7 @@ void SbmCharacter::setJointCollider( std::string jointName, float len, float rad
 int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 					   SmartBody::SBFaceDefinition* faceDefinition,
 					   GeneralParamMap* param_map,
-					   const char* classType,
-					   bool use_locomotion,
-					   bool use_param_animation,
-					   bool use_data_receiver)
+					   const char* classType)
 {
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -859,7 +846,6 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 	}
 
 	// data receiver player
-	if (use_data_receiver)
 	ct_tree_p->add_controller(datareceiver_ct);
 
 	*/

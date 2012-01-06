@@ -261,7 +261,8 @@ void SBSteerManager::stop()
 			iter != mcu.getCharacterMap().end();
 			iter++)
 		{
-			(*iter).second->steeringAgent->setAgent(NULL);
+			if ((*iter).second->steeringAgent)
+				(*iter).second->steeringAgent->setAgent(NULL);
 		}
 
 		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();

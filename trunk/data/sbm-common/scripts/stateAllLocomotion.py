@@ -2,11 +2,6 @@
 def locomotionSetup(skeleton, baseJoint):
 	print "** State: allLocomotion"
 
-	mirrorMotion1 = scene.getMotion("ChrUtah_Idle01_ToWalk01_Turn90Lf01")
-	mirrorMotion1.mirror("ChrUtah_Idle01_ToWalk01_Turn90Rt01", "test_utah.sk")
-	mirrorMotion2 = scene.getMotion("ChrUtah_Idle01_ToWalk01_Turn180Lf01")
-	mirrorMotion2.mirror("ChrUtah_Idle01_ToWalk01_Turn180Rt01", "test_utah.sk")
-
 	stateManager = scene.getStateManager()
 	state = stateManager.createState3D("allLocomotion")
 

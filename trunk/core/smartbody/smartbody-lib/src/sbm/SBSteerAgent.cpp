@@ -35,11 +35,6 @@ void SBSteerAgent::setSteerType(std::string type)
 
 	if (_steerType == "example")
 	{
-		if (!mcu.use_param_animation)
-		{
-			LOG("Parameterized Animation Engine not enabled!");
-			return;
-		}
 		if (character->checkExamples())
 			character->locomotion_type = character->Example;
 		else
@@ -47,11 +42,6 @@ void SBSteerAgent::setSteerType(std::string type)
 	}
 	if (type == "procedural")
 	{
-		if (!mcu.use_locomotion)
-		{
-			LOG("Procedural Locomotion not enabled!");
-			return;
-		}
 		character->locomotion_type = character->Procedural;
 		if (character->steeringAgent)
 			character->steeringAgent->desiredSpeed = 1.6f;

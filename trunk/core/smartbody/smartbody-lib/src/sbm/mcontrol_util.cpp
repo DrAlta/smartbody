@@ -249,9 +249,6 @@ mcuCBHandle::mcuCBHandle()
 	test_character_default( "" ),
 	test_recipient_default( "ALL" ),
 	queued_cmds( 0 ),
-	use_locomotion( false ),
-	use_param_animation( false ),
-	use_data_receiver( false ),
 	updatePhysics( false ),
 	viewer_factory ( new SrViewerFactory() ),
 	bmlviewer_factory ( new GenericViewerFactory() ),
@@ -318,8 +315,6 @@ void mcuCBHandle::reset( void )	{
 	loop = true;
 	time = 0.0;
 	net_bone_updates = true;
-	use_locomotion = false;
-	use_data_receiver = false;
 	root_group_p = new SrSnGroup();
 	root_group_p->ref();
 	logger_p = new joint_logger::EvaluationLogger();

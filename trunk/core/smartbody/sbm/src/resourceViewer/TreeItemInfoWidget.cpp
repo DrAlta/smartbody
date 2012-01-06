@@ -600,11 +600,11 @@ DoubleAttributeItemWidget::DoubleAttributeItemWidget( SmartBody::SBObject* objec
 	if (!object1 && !object2)
 		return;
 
-	float speLen = 15;
+	int speLen = 15;
 	infoObject1 = object1;	
 	infoObject2 = object2;
 	this->begin();
-	attrWindow1 = new AttributeWindow(infoObject1,x,y,w,(ySep-y)-speLen,name1);
+	attrWindow1 = new AttributeWindow(infoObject1,x,y,w,(ySep-y)- speLen,name1);
 	attrWindow1->begin();
 	attrWindow1->end();
 	attrWindow2 = new AttributeWindow(infoObject2,x,ySep+speLen,w,h-(ySep-y)-speLen,name2);
@@ -631,13 +631,13 @@ MultiAttributeItemWidget::MultiAttributeItemWidget( std::vector<SmartBody::SBObj
 {
 	infoObjectList = objectList;
 	attrNameList = objectNameList;
-	float speLen = 15;
-	float yCur = y;
+	int speLen = 15;
+	int yCur = y;
 	AttributeWindow* attrWin = NULL;
 	this->begin();
 	mainGroup = new Fl_Tabs( x,  y, w, h, name);
 	mainGroup->begin();
-	for (int i=0;i<infoObjectList.size();i++)
+	for (size_t i = 0; i < infoObjectList.size(); i++)
 	{
 		const char* attrWinName = (i<attrNameList.size())?attrNameList[i].c_str():NULL;
 		attrWin = new AttributeWindow(infoObjectList[i],x+speLen,y+speLen,w-speLen,h-speLen,attrWinName,false);

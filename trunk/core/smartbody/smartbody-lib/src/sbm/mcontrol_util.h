@@ -191,9 +191,6 @@ class mcuCBHandle {
 		bool		net_bone_updates;
 		bool		net_world_offset_updates;
 		bool		net_face_bones;
-		bool		use_locomotion;
-		bool		use_param_animation;
-		bool		use_data_receiver;
 		bool        updatePhysics;
 		bool		sendPawnUpdates; // if true, sends the pawn information over bonebus in the same wasy as the characters
 		bool        resourceDataChanged;

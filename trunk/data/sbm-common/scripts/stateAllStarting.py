@@ -1,6 +1,11 @@
 mirrorMotion = scene.getMotion("ChrUtah_StopToWalkRt01")
 mirrorMotion.mirror("ChrUtah_StopToWalkLf01", "test_utah.sk")
 
+mirrorMotion1 = scene.getMotion("ChrUtah_Idle01_ToWalk01_Turn90Lf01")
+mirrorMotion1.mirror("ChrUtah_Idle01_ToWalk01_Turn90Rt01", "test_utah.sk")
+mirrorMotion2 = scene.getMotion("ChrUtah_Idle01_ToWalk01_Turn180Lf01")
+mirrorMotion2.mirror("ChrUtah_Idle01_ToWalk01_Turn180Rt01", "test_utah.sk")
+
 stateManager = scene.getStateManager()
 
 print "** State: allStartingLeft"

@@ -93,10 +93,8 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	
 	if(arg=="initialize")
 	{
-		mcu_p->use_locomotion = true;
-		LOG("Locomotion engine has been initialized.");
-
-		return CMD_SUCCESS;
+		LOG("Command: 'locomotion initialize' has been deprecated.");
+		return CMD_FAILURE;
 	}
 
 	SbmCharacter* actor = NULL;
