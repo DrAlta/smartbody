@@ -12,10 +12,12 @@ SBScene::SBScene(void)
 	_reachManager = new SBReachManager();
 	_steerManager = new SBSteerManager();
 	_serviceManager = new SBServiceManager();
+	_physicsManager = new SBPhysicsManager();
 	_scale = .01; // default scale is centimeters
 
 	// add the services
 	_serviceManager->addService(_steerManager);
+	_serviceManager->addService(_physicsManager);
 
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 }
@@ -432,6 +434,12 @@ SBServiceManager* SBScene::getServiceManager()
 {
 	return _serviceManager;
 }
+
+SBPhysicsManager* SBScene::getPhysicsManager()
+{
+	return _physicsManager;
+}
+
 
 SmartBody::SBFaceDefinition* SBScene::createFaceDefinition(const std::string& name)
 {

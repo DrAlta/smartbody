@@ -13,6 +13,7 @@
 #include <sbm/SBReachManager.h>
 #include <sbm/SBSteerManager.h>
 #include <sbm/SBServiceManager.h>
+#include <sbm/SBPhysicsManager.h>
 
 namespace SmartBody {
 
@@ -82,6 +83,7 @@ class SBScene : public SBObject
 		SBReachManager* getReachManager();
 		SBSteerManager* getSteerManager();
 		SBServiceManager* getServiceManager();
+		SBPhysicsManager* getPhysicsManager();
 
 		void notify(SBSubject* subject);
 
@@ -93,6 +95,7 @@ class SBScene : public SBObject
 		SBReachManager* _reachManager;
 		SBSteerManager* _steerManager;
 		SBServiceManager* _serviceManager;
+		SBPhysicsManager* _physicsManager;
 
 		std::map<std::string, SBScript*> _scripts;
 		double _scale;
