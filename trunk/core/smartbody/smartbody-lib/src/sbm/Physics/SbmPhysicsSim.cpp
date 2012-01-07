@@ -142,6 +142,12 @@ void SbmPhysicsSim::updateAllPhysicsJoints()
 	}
 }
 
+SbmPhysicsSim* SbmPhysicsSim::getPhysicsEngine()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	return mcu._scene->getPhysicsManager()->getPhysicsEngine();
+}
+
 /************************************************************************/
 /* SbmPhyObjInterface                                                   */
 /************************************************************************/
@@ -215,30 +221,26 @@ void SbmPhysicsObj::setGeometry( SbmGeomObject* obj)
 }
 
 void SbmPhysicsObj::enablePhysicsSim( bool bPhy )
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+{	
+	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	phySim->enablePhysicsSim(this,bPhy);	
 }
 
 void SbmPhysicsObj::enableCollisionSim( bool bCol )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	phySim->enableCollisionSim(this,bCol);
 }
 
 void SbmPhysicsObj::updateSbmObj()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	phySim->writeToPhysicsObj(this);
 }
 
 void SbmPhysicsObj::updatePhySim()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	phySim->readFromPhysicsObj(this);
 }
 
@@ -274,7 +276,7 @@ void SbmPhysicsObj::changeGeometry( std::string& geomType, SrVec extends )
 	colObj->attachToPhyObj(this);
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	phySim->updatePhyObjGeometry(this);
 }
 
@@ -347,7 +349,7 @@ void SbmPhysicsJoint::updateTotalSupportMass()
 void SbmPhysicsJoint::notify( SBSubject* subject )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	phySim->updatePhysicsJoint(this);	
 }
 
@@ -549,7 +551,7 @@ void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vect
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SBScene* scene = mcu._scene;
-	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	SBCharacter* character = scene->getCharacter(charName);
 	if (!character) // no character
 		return;
@@ -615,7 +617,7 @@ void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vect
 void SbmPhysicsCharacter::cleanUpJoints()
 {
 	std::map<std::string, SbmJointObj*>::iterator mi;
-	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	// remove all joint objs
 	for ( mi  = jointObjMap.begin();
 		  mi != jointObjMap.end();
@@ -734,7 +736,7 @@ void SbmPhysicsCharacter::updatePDTorque()
 	}
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPhysicsSim* phySim = mcu.physicsEngine;
+	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	float Ks = (float)phySim->getDoubleAttribute("Ks");
 	float Kd = (float)phySim->getDoubleAttribute("Kd");
 	

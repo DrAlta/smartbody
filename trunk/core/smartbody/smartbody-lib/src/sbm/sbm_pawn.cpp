@@ -1428,7 +1428,7 @@ bool SbmPawn::initGeomObj( const char* geomType, SrVec size, const char* color, 
 	}	
 	if (colObj)
 		colObj->color = color;
-	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	colObj_p = colObj;	
 	initPhysicsObj();	
 	updateToColObject();
@@ -1437,13 +1437,14 @@ bool SbmPawn::initGeomObj( const char* geomType, SrVec size, const char* color, 
 
 void SbmPawn::initPhysicsObj()
 {	
-	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	if (!phySim)
 		return;
 	//printf("init physics obj\n");
 	if (!phyObj_p)
 		phyObj_p = phySim->createPhyObj();
 	//phyObj_p-(colObj_p,1.f);	
+	phyObj_p->setName(getName());
 	phyObj_p->setGeometry(colObj_p);	
 	phySim->addPhysicsObj(phyObj_p);
 	phySim->updatePhyObjGeometry(phyObj_p);				
@@ -1451,7 +1452,7 @@ void SbmPawn::initPhysicsObj()
 
 void SbmPawn::removePhysicsObj()
 {
-	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine(); //mcuCBHandle::singleton().physicsEngine;
 	if (!phySim || !phyObj_p)
 		return;
 	phySim->removePhysicsObj(phyObj_p);

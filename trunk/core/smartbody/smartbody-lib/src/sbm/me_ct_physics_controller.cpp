@@ -37,7 +37,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 		SbmPhysicsCharacter* phyChar = _character->getPhysicsCharacter();
 		if (!phyChar) return true;
 
-		bool hasPhy = (mcu.physicsEngine->getBoolAttribute("enable") && phyChar->getBoolAttribute("enable"));		
+		bool hasPhy = (SbmPhysicsSim::getPhysicsEngine()->getBoolAttribute("enable") && phyChar->getBoolAttribute("enable"));		
 		std::vector<SbmJointObj*> jointObjList = phyChar->getJointObjList();
 
 		// recompute joint torque 

@@ -14,6 +14,7 @@ class SBPhysicsManager : public SBService
 		~SBPhysicsManager();
 
 		virtual void setEnable(bool enable);
+		virtual bool isEnable();
 		
 		virtual void start();
 		virtual void beforeUpdate(double time);
@@ -21,8 +22,11 @@ class SBPhysicsManager : public SBService
 		virtual void afterUpdate(double time);
 		virtual void stop();
 
+		SbmPhysicsSim* getPhysicsEngine();
+
 	protected:
 		SbmPhysicsSimODE* _ode;
+		double            physicsTime;
 
 };
 

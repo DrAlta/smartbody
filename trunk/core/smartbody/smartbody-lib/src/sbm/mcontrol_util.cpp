@@ -221,8 +221,7 @@ mcuCBHandle::mcuCBHandle()
 	external_timer_p( NULL ),
 	timer_p( NULL ),
 	time( 0.0 ),
-	time_dt( 0.0 ),
-	physicsTime(0.0),
+	time_dt( 0.0 ),	
 	internal_profiler_p( NULL ),
 	external_profiler_p( NULL ),
 	profiler_p( NULL ),
@@ -267,8 +266,7 @@ mcuCBHandle::mcuCBHandle()
 	sendPawnUpdates(false),
 	logListener(NULL),
 	useXmlCache(false),
-	useXmlCacheAuto(false)
-	//physicsEngine(NULL)
+	useXmlCacheAuto(false)	
 {	
 	testBMLId = 0;
 	registerCallbacks();
@@ -287,8 +285,8 @@ mcuCBHandle::mcuCBHandle()
 	SmartBody::SBFaceDefinition* faceDefinition = new SmartBody::SBFaceDefinition();
 	faceDefinition->setName("_default_");
 	face_map["_default_"] = faceDefinition;
-	physicsEngine = new SbmPhysicsSimODE();
-	physicsEngine->initSimulation();
+	//physicsEngine = new SbmPhysicsSimODE();
+	//physicsEngine->initSimulation();
 	steeringScale = 0.01f;
 	_scene = new SmartBody::SBScene();
 }
@@ -1042,23 +1040,23 @@ void mcuCBHandle::update( void )	{
 			(*iter).second->beforeUpdate(this->time);
 	}
 
-	if (physicsEngine && physicsEngine->getBoolAttribute("enable"))
-	{		
-		float dt = (float)physicsEngine->getDoubleAttribute("dT");//timeStep*0.03f;
-		//elapseTime += time_dt;
-		while (physicsTime < this->time)		
-		//if (physicsTime < this->time)
-		{
-			//printf("elapse time = %f\n",elapseTime);
-			physicsEngine->updateSimulation(dt);
-			physicsTime += dt;
-			//curDt -= dt;
-		}		
-	}
-	else
-	{
-		physicsTime = this->time;
-	}
+// 	if (physicsEngine && physicsEngine->getBoolAttribute("enable"))
+// 	{		
+// 		float dt = (float)physicsEngine->getDoubleAttribute("dT");//timeStep*0.03f;
+// 		//elapseTime += time_dt;
+// 		while (physicsTime < this->time)		
+// 		//if (physicsTime < this->time)
+// 		{
+// 			//printf("elapse time = %f\n",elapseTime);
+// 			physicsEngine->updateSimulation(dt);
+// 			physicsTime += dt;
+// 			//curDt -= dt;
+// 		}		
+// 	}
+// 	else
+// 	{
+// 		physicsTime = this->time;
+// 	}
 
 	std::string seqName = "";
 	std::vector<std::string> sequencesToDelete;
@@ -1117,7 +1115,7 @@ void mcuCBHandle::update( void )	{
 		pawn->ct_tree_p->evaluate( time );
 		pawn->ct_tree_p->applyBufferToAllSkeletons();
 
-		if (pawn->hasPhysicsSim() && physicsEngine->getBoolAttribute("enable"))
+		if (pawn->hasPhysicsSim() && SbmPhysicsSim::getPhysicsEngine()->getBoolAttribute("enable"))
 		{
 			pawn->updateFromColObject();
 		}
@@ -1166,9 +1164,11 @@ void mcuCBHandle::update( void )	{
 			//	char_p->scene_p->update();
 			//char_p->dMesh_p->update();
 			//char_p->updateJointPhyObjs();
+			/*
 			bool hasPhySim = physicsEngine->getBoolAttribute("enable");
 			char_p->updateJointPhyObjs(hasPhySim);
 			//char_p->updateJointPhyObjs(false);
+			*/
 			char_p->_skeleton->update_global_matrices();
 			char_p->forward_visemes( time );	
 			char_p->forward_parameters( time );	
@@ -1237,6 +1237,13 @@ void mcuCBHandle::update( void )	{
 
 	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();
+		iter++)
+	{
+		(*iter).second->update(time);
+	}
+
+	for (std::map<std::string, SBService*>::iterator iter = services.begin();
+		iter != services.end();
 		iter++)
 	{
 		(*iter).second->update(time);
@@ -1851,23 +1858,23 @@ bool mcuCBHandle::getInteractive()
     return _interactive;
 }
 
-void mcuCBHandle::setPhysicsEngine( bool start )
-{
-	if (start)
-	{
-		physicsTime = time;
-		//updatePhysics = true;		
-	}
-	else
-	{
-		//updatePhysics = false;
-	}
-
-	if (physicsEngine)
-	{
-		physicsEngine->setEnable(start);
-	}
-}
+// void mcuCBHandle::setPhysicsEngine( bool start )
+// {
+// 	if (start)
+// 	{
+// 		physicsTime = time;
+// 		//updatePhysics = true;		
+// 	}
+// 	else
+// 	{
+// 		//updatePhysics = false;
+// 	}
+// 
+// 	if (physicsEngine)
+// 	{
+// 		physicsEngine->setEnable(start);
+// 	}
+// }
 
 std::vector<MeController*>& mcuCBHandle::getDefaultControllers()
 {
