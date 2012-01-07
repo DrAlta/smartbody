@@ -35,11 +35,11 @@
 // 	ITEM_VISEME_MAP,
 // 	ITEM_SIZE };
 
-std::string ResourceWindow::ItemNameList[ITEM_SIZE] = { "SCENE", "SERVICES", "PHYSICS",  
+std::string ResourceWindow::ItemNameList[ITEM_SIZE] = { "SCENE", "SERVICES",  
 														"SEQ_PATH", "ME_PATH", "AUDIO_PATH", "MESH_PATH", "SEQ_FILES", 
 														"SKELETON", "BONE MAP", "MOTION",  
 														"FACE DEFINITION", "EVENT HANDLERS",
-														"PAWN", "CHARACTER", "CONTROLLER",
+														"PAWN", "CHARACTER", "CONTROLLER", "PHYSICS", 
 														"NEUTRAL MOTION", "AU MAP", "VISEME MAP", "DEFAULT"} ;
 
 ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
@@ -76,7 +76,7 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Doub
 
 	treeItemList[ITEM_SCENE] = resourceTree->add("Scene");
 	treeItemList[ITEM_SERVICES] = resourceTree->add("Services");
-	treeItemList[ITEM_PHYSICS] = resourceTree->add("Physics");
+	//treeItemList[ITEM_PHYSICS] = resourceTree->add("Physics");
 
 	// set user_data to be the item enum ID
 	for (int i = 0; i <= ITEM_CHARACTER; i++)
@@ -310,17 +310,17 @@ void ResourceWindow::updateGUI()
 		updateCharacter(treeItemList[ITEM_CHARACTER],character);
 	}		
 
-	SbmPhysicsSim* phySim = mcu.getPhysicsEngine();
-	resourceTree->clear_children(treeItemList[ITEM_PHYSICS]);
-	for (SbmPhysicsCharacterMap::iterator iter = phySim->getCharacterMap().begin();
-		 iter != phySim->getCharacterMap().end();
-		 iter++)
-	{
-		SbmPhysicsCharacter* phyChar = (*iter).second;
-		resourceTree->sortorder(FL_TREE_SORT_ASCENDING);
-		updatePhysicsCharacter(treeItemList[ITEM_PHYSICS],phyChar);
-
-	}
+	
+// 	for (SbmPhysicsObjMap::iterator iter = phySim->getPhysicsObjMap().begin();
+// 		 iter != phySim->getPhysicsObjMap().end();
+// 		 iter++)
+// 	{
+// 		SbmPhysicsObj* obj = (*iter).second;
+// 		if (dynamic_cast<SbmJointObj*>(obj) == NULL)
+// 		{
+// 
+// 		}
+// 	}
 
 	// update services
 	SmartBody::SBServiceManager* serviceManager = scene->getServiceManager();
@@ -333,7 +333,11 @@ void ResourceWindow::updateGUI()
 	{
 		SmartBody::SBService* service = (*iter).second;
 		resourceTree->sortorder(FL_TREE_SORT_ASCENDING);	
-		updateService(treeItemList[ITEM_SERVICES], service);
+		SmartBody::SBPhysicsManager* phyManager = dynamic_cast<SBPhysicsManager*>(service);
+		if (phyManager)
+			updatePhysicsManager(treeItemList[ITEM_SERVICES],phyManager);
+		else
+			updateService(treeItemList[ITEM_SERVICES], service);
 	}			
 
 
@@ -348,6 +352,25 @@ void ResourceWindow::updateGUI()
 		clearInfoWidget();
 	}
 }
+
+
+void ResourceWindow::updatePhysicsManager( Fl_Tree_Item* tree, SmartBody::SBPhysicsManager* phyService )
+{
+	SbmPhysicsSim* phySim = phyService->getPhysicsEngine();
+	Fl_Tree_Item* item = resourceTree->add(tree, phyService->getName().c_str());
+	item->user_data((void*)ITEM_PHYSICS);
+	resourceTree->sortorder(FL_TREE_SORT_NONE);
+
+	for (SbmPhysicsCharacterMap::iterator iter = phySim->getCharacterMap().begin();
+		iter != phySim->getCharacterMap().end();
+		iter++)
+	{
+		SbmPhysicsCharacter* phyChar = (*iter).second;
+		resourceTree->sortorder(FL_TREE_SORT_ASCENDING);
+		updatePhysicsCharacter(item,phyChar);
+	}
+}
+
 
 void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition )
 {
@@ -553,6 +576,7 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* characte
 	}
 }
 
+
 void ResourceWindow::updateService( Fl_Tree_Item* tree, SmartBody::SBService* service )
 {
 	Fl_Tree_Item* item = resourceTree->add(tree, service->getName().c_str());
@@ -666,12 +690,13 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_PHYSICS)
 	{
-		SbmPhysicsSim* phySim = mcuCBHandle::singleton().getPhysicsEngine();
+		SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 		std::string itemName = treeItem->label();
 		std::string parentName = treeItem->parent()->label();
 		SbmPhysicsCharacter* phyChar = phySim->getPhysicsCharacter(itemName);
 		SbmPhysicsCharacter* phyParent = phySim->getPhysicsCharacter(parentName);
-		SmartBody::SBObject* phyObj = mcuCBHandle::singleton().physicsEngine;		
+		SbmPawn*    phyBody = mcu.getPawn(itemName);
+		SmartBody::SBObject* phyObj = phySim;		
 		SmartBody::SBObject* phyObj2 = NULL;
 
 		static std::string name1 = "PHYSICS JOINT";
@@ -692,6 +717,11 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 			phyObjList.push_back(phyObj);
 			phyObjList.push_back(phyObj2);
 		}
+// 		else if (phyBody && phyBody->phyObj_p)
+// 		{
+// 			phyObj = phyBody->phyObj_p;			
+// 		}
+
 		if (phyObjList.size() > 0)
 		{
 			//widget = new DoubleAttributeItemWidget(phyObj,phyObj2,x,y,w,h,h/2,name1.c_str(),name2.c_str(),treeItem,itemType,this);

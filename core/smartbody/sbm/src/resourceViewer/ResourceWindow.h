@@ -13,6 +13,7 @@
 #include <sbm/SBFaceDefinition.h>
 #include <sbm/SBService.h>
 #include <sbm/Physics/SbmPhysicsSim.h>
+#include <sbm/SBPhysicsManager.h>
 
 class srPathList;
 class SkSkeleton;
@@ -29,8 +30,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 	public:
 		enum {
 			   ITEM_SCENE = 0,
-			   ITEM_SERVICES,
-			   ITEM_PHYSICS,
+			   ITEM_SERVICES,			   
 			   ITEM_SEQ_PATH, 
 			   ITEM_ME_PATH, 
 			   ITEM_AUDIO_PATH, 
@@ -44,6 +44,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 			   ITEM_PAWN, 
 			   ITEM_CHARACTER,   
 			   ITEM_CONTROLLER,
+			   ITEM_PHYSICS,
 			   ITEM_NETURAL_MOTION,
 			   ITEM_AU_MAP,
 			   ITEM_VISEME_MAP,			   
@@ -90,8 +91,9 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 		void updateMotion(Fl_Tree_Item* tree, SkMotion* motion);
 		void updatePawn(Fl_Tree_Item* tree, SbmPawn* pawn);
 		void updateCharacter(Fl_Tree_Item* tree, SbmCharacter* character);	
-		void updatePhysicsCharacter(Fl_Tree_Item* tree, SbmPhysicsCharacter* phyChar);
+		void updatePhysicsCharacter(Fl_Tree_Item* tree, SbmPhysicsCharacter* phyChar);		
 		void updateService(Fl_Tree_Item* tree, SmartBody::SBService* service);	
+		void updatePhysicsManager(Fl_Tree_Item* tree, SmartBody::SBPhysicsManager* phyService);
 		void updateFaceMotion(Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition);
 		void updateEventHandler(Fl_Tree_Item* tree, EventHandler* handler);
 		

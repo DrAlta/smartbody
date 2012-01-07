@@ -31,8 +31,7 @@ public:
 	bool hasCollisionSim() { return bHasCollisionSim; }	
 	void hasPhysicsSim(bool phySim) { bHasPhysicsSim = phySim; }
 	void hasCollisionSim(bool colSim) { bHasCollisionSim = colSim; }
-	unsigned long getID();
-	
+	unsigned long getID();	
 };
 
 class SbmPhysicsObj : public SbmPhysicsObjInterface, public SmartBody::SBObject// abstraction for rigid objects in the physics engine
@@ -71,7 +70,7 @@ public:
 	SrVec getAngularVel();
 	void  setAngularVel(SrVec val);
 
-	virtual void notify(SBSubject* subject);
+	virtual void notify(SBSubject* subject);	
 };
 
 class SbmJointObj;
@@ -186,6 +185,7 @@ public:
 	virtual bool hasPhysicsObj(SbmPhysicsObj* obj);
 	virtual bool hasPhysicsCharacter(SbmPhysicsCharacter* phyChar);
 	SbmPhysicsCharacterMap& getCharacterMap() { return characterMap; }
+	SbmPhysicsObjMap&       getPhysicsObjMap() { return physicsObjList; }
 	SbmPhysicsCharacter* getPhysicsCharacter(std::string& charName);
 
 	virtual void addPhysicsObj(SbmPhysicsObj* obj);
@@ -213,6 +213,7 @@ public:
 	virtual SbmPhysicsObj* createPhyObj() = 0;	
 
 	virtual void notify(SBSubject* subject);
+	static SbmPhysicsSim* getPhysicsEngine();
 };
 
 

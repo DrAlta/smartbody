@@ -563,7 +563,7 @@ void SbmCharacter::setJointPhyCollision( bool useCollision )
 void SbmCharacter::buildJointPhyObjs()
 {
 	const std::vector<SkJoint*>& joints = _skeleton->joints();
-	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	if (!phySim)
 		return;
 	//printf("init physics obj\n");	

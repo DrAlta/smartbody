@@ -864,19 +864,22 @@ int mcu_physics_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		std::string operation = args.read_token();
 		if (operation == "enable")
 		{
-			mcu_p->setPhysicsEngine(true);			
+			//mcu_p->setPhysicsEngine(true);
+			mcu_p->_scene->getPhysicsManager()->setEnable(true);
 			return CMD_SUCCESS;
 		}
 		else if (operation == "disable")
 		{
-			mcu_p->setPhysicsEngine(false);			
+			//mcu_p->setPhysicsEngine(false);	
+			mcu_p->_scene->getPhysicsManager()->setEnable(false);
 			return CMD_SUCCESS;
 		}
 		else if (operation == "gravity")
 		{
 			float gravity = args.read_float();
-			if (gravity > 0.f)
-				mcu_p->physicsEngine->setGravity(gravity);		
+			//if (gravity > 0.f)
+			//	mcu_p->physicsEngine->setGravity(gravity);		
+			mcu_p->_scene->getPhysicsManager()->getPhysicsEngine()->setGravity(gravity);
 		}
 	}
 	return CMD_SUCCESS;

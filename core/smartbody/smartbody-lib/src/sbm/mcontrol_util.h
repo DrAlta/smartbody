@@ -208,7 +208,7 @@ class mcuCBHandle {
 		// scale factor (used for SmartBody to handle unit convert, both sk and skm)
 		double		skScale;
 		double		skmScale;
-		double      physicsTime;
+		//double      physicsTime;
 
 		KinectProcessor*							kinectProcessor;
 
@@ -333,7 +333,7 @@ public:
 		SBResourceManager*			resource_manager;
 		std::vector<CameraTrack*>	cameraTracking;
 
-		SbmPhysicsSim*              physicsEngine;
+		//SbmPhysicsSim*              physicsEngine;
 
 	private:
 		// Constant
@@ -492,8 +492,8 @@ public:
 		void addPATransition(PATransitionData* transition);
 
 		SkMotion* addMirrorMotion(SkMotion* motion);
-		void setPhysicsEngine(bool start);
-		SbmPhysicsSim* getPhysicsEngine() { return physicsEngine; }
+// 		void setPhysicsEngine(bool start);
+// 		SbmPhysicsSim* getPhysicsEngine() { return physicsEngine; }
 
 
 		int execute( const char *key, srArgBuffer& args ) { 

@@ -154,7 +154,7 @@ void SbmPhysicsSimODE::updateSimulationInternal( float timeStep )
 
 SbmPhysicsSimODE* SbmPhysicsSimODE::getODESim()
 {
-	SbmPhysicsSimODE* odePhysics = dynamic_cast<SbmPhysicsSimODE*>(mcuCBHandle::singleton().physicsEngine);
+	SbmPhysicsSimODE* odePhysics = dynamic_cast<SbmPhysicsSimODE*>(SbmPhysicsSim::getPhysicsEngine());
 	return odePhysics;
 }
 
