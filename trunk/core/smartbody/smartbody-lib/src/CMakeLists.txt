@@ -25,6 +25,47 @@ set( SMARTBODY_LIB_EXT_ANN_SRC
 
 )
 
+set( SMARTBODY_LIB_EXT_PARSER_SRC
+	
+	external/parser/Bchart.C
+	external/parser/BchartSm.C
+	external/parser/Bst.C
+	external/parser/ChartBase.C
+	external/parser/ClassRule.C
+	external/parser/CntxArray.C
+	external/parser/CombineBests.C
+	external/parser/ECArgs.C
+	external/parser/Edge.C
+	external/parser/EdgeHeap.C
+	external/parser/edgeSubFns.C
+	external/parser/EgsFromTree.C
+	external/parser/ewDciTokStrm.C
+	external/parser/extraMain.C
+	external/parser/FBinaryArray.C
+	external/parser/Feat.C
+	external/parser/Feature.C
+	external/parser/FeatureTree.C
+	external/parser/fhSubFns.C
+	external/parser/Field.C
+	external/parser/FullHist.C
+	external/parser/GotIter.C
+	external/parser/headFinder.C
+	external/parser/headFinderCh.C
+	external/parser/InputTree.C
+	external/parser/Item.C
+	external/parser/Link.C
+	external/parser/MeChart.C
+	external/parser/Params.C
+	external/parser/ParseStats.C
+	external/parser/SentRep.C
+	external/parser/Term.C
+	external/parser/TimeIt.C
+	external/parser/UnitRules.C
+	external/parser/utils.C
+	external/parser/ValHeap.C
+
+)
+
 set( SMARTBODY_LIB_EXT_SOIL_SRC
 	
 	external/SOIL/image_DXT.c
@@ -344,6 +385,8 @@ add_library(
 	${SMARTBODY_LIB_EXT_ANN_SRC}
 
 	${SMARTBODY_LIB_EXT_SOIL_SRC}
+	
+	${SMARTBODY_LIB_EXT_PARSER_SRC}
 	
  	${SMARTBODY_LIB_ME_SRC}
 	
