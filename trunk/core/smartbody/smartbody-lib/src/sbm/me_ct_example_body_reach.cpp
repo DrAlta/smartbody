@@ -368,7 +368,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	{
 		
 		//LOG("update reach");
-		currentReachEngine->updateReach((float)t,dt,inputMotionFrame,blendWeight);
+		currentReachEngine->updateReach((float)t,dt*3.f,inputMotionFrame,blendWeight);
 		
 	}
 	

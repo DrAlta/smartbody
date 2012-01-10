@@ -65,6 +65,10 @@ void SBPhysicsManager::update(double time)
 			physicsTime += dt;
 		}	
 	}
+	else
+	{
+		physicsTime = time;
+	}
 
 	// update character
 	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
@@ -82,6 +86,38 @@ void SBPhysicsManager::afterUpdate(double time)
 
 void SBPhysicsManager::stop()
 {
+}
+
+SmartBody::SBObject* SBPhysicsManager::getPhysicsCharacter( std::string charName )
+{
+	return this->getPhysicsEngine()->getPhysicsCharacter(charName);
+}
+
+SmartBody::SBObject* SBPhysicsManager::getPhysicsJoint( std::string charName, std::string jointName )
+{
+	SbmPhysicsCharacter* phyChar = this->getPhysicsEngine()->getPhysicsCharacter(charName);
+	SbmPhysicsJoint* phyJoint = NULL;
+	if (phyChar)
+	{
+		phyJoint = phyChar->getPhyJoint(jointName);		
+	}
+	return phyJoint;
+}
+
+SmartBody::SBObject* SBPhysicsManager::getJointObj( std::string charName, std::string jointName )
+{
+	SbmPhysicsCharacter* phyChar = this->getPhysicsEngine()->getPhysicsCharacter(charName);
+	SbmJointObj* jointObj = NULL;
+	if (phyChar)
+	{
+		jointObj = phyChar->getJointObj(jointName);		
+	}
+	return jointObj;	
+}
+
+SmartBody::SBObject* SBPhysicsManager::getPhysicsPawn( std::string pawnName )
+{
+	return getPhysicsEngine()->getPhysicsPawn(pawnName);
 }
 
 }

@@ -54,6 +54,8 @@ void SbmPhysicsSim::addPhysicsObj( SbmPhysicsObj* obj )
 	if (physicsObjList.find(obj->getID()) == physicsObjList.end())
 	{
 		physicsObjList[obj->getID()] = obj;
+		if (dynamic_cast<SbmJointObj*>(obj) == NULL) // is not a joint obj
+			pawnObjMap[obj->getName()] = obj;
 	}
 }
 
@@ -72,6 +74,8 @@ void SbmPhysicsSim::removePhysicsObj( SbmPhysicsObj* obj )
 	if (physicsObjList.find(obj->getID()) != physicsObjList.end())
 	{
 		physicsObjList.erase(obj->getID());
+		if (dynamic_cast<SbmJointObj*>(obj) == NULL) // is not a joint obj
+			pawnObjMap.erase(obj->getName());
 	}
 }
 
@@ -89,6 +93,16 @@ bool SbmPhysicsSim::hasPhysicsCharacter( SbmPhysicsCharacter* phyChar )
 		return true;
 	else
 		return false;
+}
+
+
+SbmPhysicsObj* SbmPhysicsSim::getPhysicsPawn( std::string& pawnName )
+{
+	SbmPhysicsPawnMap::iterator iter = pawnObjMap.find(pawnName);
+	if (iter == pawnObjMap.end())
+		return NULL;
+	else
+		return (*iter).second;
 }
 
 SbmPhysicsCharacter* SbmPhysicsSim::getPhysicsCharacter( std::string& charName )
@@ -116,7 +130,7 @@ void SbmPhysicsSim::notify( SBSubject* subject )
 				  mi != physicsObjList.end();
 				  mi++)
 			{
-				SbmPhysicsObj* obj = mi->second;
+				SbmPhysicsObj* obj = mi->second;				
 				obj->setLinearVel(obj->getVec3Attribute("refLinearVelocity"));
 				obj->setAngularVel(obj->getVec3Attribute("refAngularVelocity"));
 				obj->updatePhySim();
@@ -187,7 +201,7 @@ SbmPhysicsObj::SbmPhysicsObj()
 {
 	colObj = NULL;		
 	objDensity = 0.01f;
-	bHasPhysicsSim = true;
+	bHasPhysicsSim = false;
 	bHasCollisionSim = true;	
 	initGeom = false;
 
@@ -251,7 +265,10 @@ void SbmPhysicsObj::notify( SBSubject* subject )
 	{
 		if (attribute->getName() == "enable")
 		{
-			bool val = this->getBoolAttribute(this->getName());
+			bool val = this->getBoolAttribute("enable");
+			this->setLinearVel(this->getVec3Attribute("refLinearVelocity"));
+			this->setAngularVel(this->getVec3Attribute("refAngularVelocity"));
+			this->updatePhySim();
 			enablePhysicsSim(val);
 		}		
 		else if (attribute->getName() == "geomType" || attribute->getName() == "geomSize" || attribute->getName() == "mass")
@@ -308,6 +325,11 @@ SrVec SbmPhysicsObj::getAngularVel()
 void SbmPhysicsObj::setAngularVel( SrVec val )
 {
 	angularVel = val;
+}
+
+void SbmPhysicsObj::handleCollision( SrVec contactPt, SbmPhysicsObj* colObj )
+{
+
 }
 /************************************************************************/
 /* Physics Joint                                                        */
@@ -482,6 +504,23 @@ SrMat SbmJointObj::getRelativeOrientation()
 	}	
 }
 
+void SbmJointObj::handleCollision( SrVec contactPt, SbmPhysicsObj* colObj )
+{
+	SbmJointObj* colJointObj = dynamic_cast<SbmJointObj*>(colObj);
+	if (colJointObj && colJointObj->getPhysicsCharacter() == phyChar) // do not handle self-collision
+		return;
+	std::vector<CollisionRecord>& colRecords = phyChar->getCollisionRecords();
+	if (colRecords.size() > 0) return;
+	CollisionRecord rec;
+	rec.collisionPt = contactPt;
+	rec.hitJointObj = this;
+	rec.collider = colObj;	
+	if (colObj)
+	{
+		rec.momentum = colObj->getLinearVel()*colObj->getMass();
+	}
+	colRecords.push_back(rec);	
+}
 
 
 /************************************************************************/
@@ -750,11 +789,6 @@ void SbmPhysicsCharacter::updatePDTorque()
 		bool kinematicRoot = (joint->getName() == "base" || joint->getName() == "JtPelvis") && this->getBoolAttribute("kinematicRoot");		
 		if (kinematicRoot)// || joint->getName() == "JtPelvis")
 		{			
-// 			SrMat tranMat; tranMat.translation(joint->getLocalCenter());				
-// 			SrMat gmat = tranMat*joint->gmat();		
-// 			obj->setGlobalTransform(gmat);			
-// 			obj->enablePhysicsSim(false);
-// 			obj->updatePhySim();
 			continue;
 		}
 		
@@ -964,3 +998,17 @@ void SbmPhysicsCharacter::notify( SBSubject* subject )
 // 	}
 // 	return newGeomObj;
 // }
+
+
+
+/************************************************************************/
+/* Collision Record                                                     */
+/************************************************************************/
+CollisionRecord& CollisionRecord::operator=( const CollisionRecord& rt )
+{
+	collisionPt = rt.collisionPt;
+	collider    = rt.collider;
+	hitJointObj = rt.hitJointObj;
+	momentum    = rt.momentum;
+	return *this;
+}

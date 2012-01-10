@@ -542,7 +542,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 					}
 					break;
 				}
-			}
+			} 
 		}
 	}
 

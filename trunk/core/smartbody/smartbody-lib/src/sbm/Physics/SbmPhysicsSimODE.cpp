@@ -25,6 +25,8 @@ void SbmPhysicsSimODE::nearCallBack(void *data, dGeomID o1, dGeomID o2)
 //  	if (o1 != phyODE->groundID && o2 != phyODE->groundID)
 //  		return;
 
+	bool collideFloor = (o1 == phyODE->groundID || o2 == phyODE->groundID);
+
 	dContact contact[N];
 	dBodyID b1,b2;
 	b1 = dGeomGetBody(o1);
@@ -41,18 +43,18 @@ void SbmPhysicsSimODE::nearCallBack(void *data, dGeomID o1, dGeomID o2)
  		return;	
  	}
 	int n =  dCollide(o1,o2,N,&contact[0].geom,sizeof(dContact));
-	for (int i = 0; i < n; i++) {	
-		contact[i].surface.mode = dContactSoftERP | dContactSoftCFM |dContactBounce | dContactApprox1;		
+	if (n > 0) // handle collision event
+	{
+		SbmPhysicsObj* obj1 = NULL; if (b1) obj1 = (SbmPhysicsObj*)(dBodyGetData(b1));
+		SbmPhysicsObj* obj2 = NULL; if (b2) obj2 = (SbmPhysicsObj*)(dBodyGetData(b2));
+ 		dVector3& hpos = contact[0].geom.pos;
+ 		SrVec hitPt = SrVec((float)hpos[0],(float)hpos[1],(float)hpos[2]);		
+ 		if (obj1 && !collideFloor) obj1->handleCollision(hitPt,obj2);		
+ 		if (obj2 && !collideFloor) obj2->handleCollision(hitPt,obj1);			
+	}
 
-// 		if (o1 == phyODE->groundID || o2 == phyODE->groundID)
-// 		{
-// 			contact[i].surface.bounce     = 0.1f; // (0.0~1.0) restitution parameter
-// 			contact[i].surface.bounce_vel = 1.0;;
-// 			contact[i].surface.mu = 1000.f;//1000.f;		
-// 			contact[i].surface.soft_cfm = 1e-5;
-// 			contact[i].surface.soft_erp = 0.5;
-// 		}
-// 		else
+	for (int i = 0; i < n; i++) {	
+		contact[i].surface.mode = dContactSoftERP | dContactSoftCFM |dContactBounce | dContactApprox1;			
 		{
 			contact[i].surface.bounce     = 0.0f; // (0.0~1.0) restitution parameter
 			contact[i].surface.bounce_vel = 0.0f;;
@@ -318,6 +320,7 @@ void SbmPhysicsSimODE::addPhysicsObj( SbmPhysicsObj* obj )
 
 	SbmODEObj* odeObj = getODEObj(obj);		
 	odeObj->bodyID = dBodyCreate(odeSim->getWorldID());
+	dBodySetData(odeObj->bodyID,obj); // attach physics obj with ode body
 	odeObj->physicsObj = obj;
 	if (obj)
 	{		

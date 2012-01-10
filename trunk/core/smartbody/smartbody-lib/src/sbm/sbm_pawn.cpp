@@ -1465,6 +1465,7 @@ void SbmPawn::updateFromColObject()
 	if (phyObj_p)
 	{
 		//setWorldOffset(colObj_p->getWorldState().gmat());
+		//phyObj_p->updateSbmObj();
 		setWorldOffset(phyObj_p->getGlobalTransform().gmat());
 	}
 }

@@ -40,6 +40,55 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 		bool hasPhy = (SbmPhysicsSim::getPhysicsEngine()->getBoolAttribute("enable") && phyChar->getBoolAttribute("enable"));		
 		std::vector<SbmJointObj*> jointObjList = phyChar->getJointObjList();
 
+		std::vector<CollisionRecord>& colRecords = phyChar->getCollisionRecords();
+		static bool hasGaze = false;
+		static bool hasPD = true;
+		static float fadeOutTime = 0.f;
+		if (colRecords.size() > 0 && !hasGaze)
+		{
+			CollisionRecord& col = colRecords[0];
+			SrVec hitPos = col.collisionPt;
+			char eventMsg[256];
+			
+			//start collision event
+			//sprintf(eventMsg,"start %s %f %f %f",_character->getName().c_str(),hitPos[0],hitPos[1],hitPos[2]);
+			sprintf(eventMsg,"start %s %s %f %f %f %f",_character->getName().c_str(),col.collider->getName().c_str(),hitPos[0],hitPos[1],hitPos[2], col.momentum.len());			
+			LOG("eventMsg = %s",eventMsg);
+			std::string cmd = eventMsg;
+			MotionEvent motionEvent;
+			std::string eventType = "collision";
+			motionEvent.setType(eventType);			
+			motionEvent.setParameters(cmd);
+			EventManager* manager = EventManager::getEventManager();		
+			manager->handleEvent(&motionEvent,t);
+			colRecords.clear();
+			hasGaze = true;
+			fadeOutTime = (float)t+2.f;
+		}
+		else if (hasGaze && t > fadeOutTime)
+		{
+			// end collision event
+			char eventMsg[256];
+			sprintf(eventMsg,"end %s",_character->getName().c_str());
+// 			if (!hasPD)
+// 				phyChar->setBoolAttribute("usePD",false);
+			std::string cmd = eventMsg;
+			MotionEvent motionEvent;
+			std::string eventType = "collision";
+			motionEvent.setType(eventType);						
+			motionEvent.setParameters(cmd);
+			EventManager* manager = EventManager::getEventManager();	
+			manager->handleEvent(&motionEvent,t);
+			hasGaze = false;
+			hasPD = true;
+			fadeOutTime = 0.f;
+		}
+		else
+		{
+			colRecords.clear();
+		}
+		
+
 		// recompute joint torque 
 		// update physics simulation results to character channel arrays
 		for (unsigned int i=0;i<jointObjList.size();i++)
