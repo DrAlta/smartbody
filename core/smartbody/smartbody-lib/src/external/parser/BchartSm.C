@@ -26,6 +26,8 @@
 #include "FeatureTree.h"
 #include "utils.h"
 #include "math.h"
+#include "string.h"
+#include "GotIter.h"
 
 extern LeftRightGotIter* globalGi;
 

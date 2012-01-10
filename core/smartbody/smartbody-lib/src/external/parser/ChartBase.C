@@ -23,6 +23,7 @@
 
 #include "ChartBase.h"
 #include <math.h>
+#include <string.h>
 #include "GotIter.h"
 
 const double ChartBase::badParse = -1.0L;
