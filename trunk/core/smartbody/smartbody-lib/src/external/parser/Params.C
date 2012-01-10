@@ -25,6 +25,7 @@
 #include "Bchart.h"
 #include "CntxArray.h"
 #include "ClassRule.h"
+#include <cstring>
 
 void
 Params::

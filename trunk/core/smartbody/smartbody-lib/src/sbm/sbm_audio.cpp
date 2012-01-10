@@ -27,6 +27,8 @@
 #include "sbm_audio.h"
 
 #include "vhcl_audio.h"
+#include <sstream>
+#include <cstdlib>
 
 
 vhcl::Audio * g_audio = NULL;

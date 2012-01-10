@@ -3,7 +3,7 @@
 
 #include <sbm/SBService.h>
 #include <sbm/SBService.h>
-#include <sbm/physics/SbmPhysicsSimODE.h>
+#include <sbm/Physics/SbmPhysicsSimODE.h>
 
 namespace SmartBody {
 

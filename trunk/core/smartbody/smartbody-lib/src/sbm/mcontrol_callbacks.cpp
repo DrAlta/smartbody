@@ -4567,7 +4567,11 @@ int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				  // Log the Gavam data
 				  LOG("Gavam Coordinates - %f %f %f %f %f %f", data->pos[0], data->pos[1], data->pos[2], data->rot[0], data->rot[1], data->rot[2]);
 				  char *messg = new char[1024];
+				  #ifdef WIN32
 				  sprintf_s(messg, 1024, "receiver skeleton brad generic rotation skullbase %f %f %f %f", quatW, quatX, quatY, quatZ);
+				  #else
+				  snprintf(messg, 1024, "receiver skeleton brad generic rotation skullbase %f %f %f %f", quatW, quatX, quatY, quatZ);
+				  #endif
 				  //log message before sending it
 				  //LOG(messg);
 				  //sending temp mesg just to make sure it works 
