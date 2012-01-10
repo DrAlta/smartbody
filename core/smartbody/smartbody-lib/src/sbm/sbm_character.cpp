@@ -2151,19 +2151,25 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		char* meshdir = args.read_token();
 		if (!meshdir)
 		{
-			LOG("Usage: mesh <meshdirectory> |-prefix|");
+			LOG("Usage: mesh <meshdirectory> |-prefix|-m|");
 			return CMD_FAILURE;
 		}
 
 		std::string prefix = "";
 		int numRemaining  = args.calc_num_tokens();
-		if (numRemaining > 0)
+		std::string scale = "";
+		while (numRemaining > 0)
 		{
 			std::string prefixCommand = args.read_token();
 			if (prefixCommand == "-prefix")
 			{
 				prefix = args.read_token();
 			}
+			else if (prefixCommand == "-m")
+			{
+				scale = "-m";
+			}
+			numRemaining = args.calc_num_tokens();
 		}
 		// remove any existing mesh for this character
 		// how do we do this???
@@ -2228,6 +2234,8 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 				strstr << "char " << getName() << " smoothbindweight " << fileName;
 				if (prefix != "")
 					strstr << " -prefix " << prefix;
+				if (scale != "")
+					strstr << " " << scale;
 				int successWeight = mcu_p->execute((char*) strstr.str().c_str());
 				if (successWeight == CMD_SUCCESS)
 				{
@@ -2236,7 +2244,9 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 				
 				// this could also be a file containing a mesh, so run that command as well
 				std::stringstream strstr2;
-				strstr2 << "char " << getName() << " smoothbindmesh " << fileName;
+				strstr2 << "char " << getName() << " smoothbindmesh " << fileName;				
+				if (scale != "")
+					strstr2 << " " << scale;
 				int successMesh = mcu_p->execute((char*) strstr2.str().c_str());
 				if (successMesh == CMD_SUCCESS)
 				{
@@ -2258,7 +2268,9 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 				{
 					std::string fileName = objFileList[i];
 					std::stringstream strstr;
-					strstr << "char " << getName() << " smoothbindmesh " << fileName;
+					strstr << "char " << getName() << " smoothbindmesh " << fileName;					
+					if (scale != "")
+						strstr << " " << scale;
 					int success = mcu_p->execute((char*) strstr.str().c_str());
 					if (success != CMD_SUCCESS)
 					{

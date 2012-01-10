@@ -484,6 +484,7 @@ void AttributeWindow::draw()
 				{
 					vec3Attr->registerObserver(this);
 					Fl_Group* vec3Group = new Fl_Group(mainGroup->x() + 100, mainGroup->y() + startY, 200, 20, _strdup(name.c_str()));
+					vec3Group->align(FL_ALIGN_LEFT);
 					vec3Group->end();
 					if (attrInfo->getDescription() != "")
 						vec3Group->tooltip(_strdup(attrInfo->getDescription().c_str()));

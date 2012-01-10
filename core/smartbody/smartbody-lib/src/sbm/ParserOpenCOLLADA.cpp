@@ -698,6 +698,7 @@ std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::vector<SrModel*>& meshModelVec, float scale)
 {
 	const DOMNodeList* list = node->getChildNodes();
+	std::map<std::string,bool> vertexSemantics;
 	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
 		DOMNode* node = list->item(c);
@@ -765,7 +766,23 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 							newModel->T.top().y = (float)atof(tokens[index++].c_str());
 						}
 					}
+				}			
+				if (nodeName1 == "vertices")
+				{
+					vertexSemantics.clear();
+					for (unsigned int c2 = 0; c2 < node1->getChildNodes()->getLength(); c2++)
+					{
+						DOMNode* inputNode = node1->getChildNodes()->item(c2);
+						if (XMLString::compareString(inputNode->getNodeName(), BML::BMLDefs::ATTR_INPUT) == 0)
+						{
+							DOMNamedNodeMap* inputNodeAttr = inputNode->getAttributes();
+							DOMNode* semanticNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_SEMANTIC);
+							std::string inputSemantic = getString(semanticNode->getNodeValue());
+							vertexSemantics[inputSemantic] = true;							
+						}						
+					}										
 				}
+
 				if (nodeName1 == "triangles" || nodeName1 == "polylist")
 				{
 					int curmtl = -1;
@@ -848,10 +865,16 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 							{
 								std::string semantic = inputMap[k];
 								if (semantic == "VERTEX")
-									fVec.push_back(atoi(tokens[index].c_str()));
+								{
+									if (vertexSemantics.find("POSITION") != vertexSemantics.end())																								
+										fVec.push_back(atoi(tokens[index].c_str()));
+									if (vertexSemantics.find("NORMAL") != vertexSemantics.end())
+										fnVec.push_back(atoi(tokens[index].c_str()));									
+								}
 								if (semantic == "TEXCOORD")
 									ftVec.push_back(atoi(tokens[index].c_str()));
-								if (semantic == "NORMAL")
+
+								if (semantic == "NORMAL" && vertexSemantics.find("NORMAL") == vertexSemantics.end())
 									fnVec.push_back(atoi(tokens[index].c_str()));
 								index++;
 							}

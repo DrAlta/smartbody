@@ -369,6 +369,15 @@ void ResourceWindow::updatePhysicsManager( Fl_Tree_Item* tree, SmartBody::SBPhys
 		resourceTree->sortorder(FL_TREE_SORT_ASCENDING);
 		updatePhysicsCharacter(item,phyChar);
 	}
+
+	for (SbmPhysicsPawnMap::iterator iter = phySim->getPawnObjMap().begin();
+		 iter != phySim->getPawnObjMap().end();
+		 iter++)
+	{
+		SbmPhysicsObj* phyObj = (*iter).second;
+		Fl_Tree_Item* phyObjItem = resourceTree->add(tree, phyObj->getName().c_str());
+		phyObjItem->user_data((void*)ITEM_PHYSICS);
+	}
 }
 
 
@@ -695,7 +704,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 		std::string parentName = treeItem->parent()->label();
 		SbmPhysicsCharacter* phyChar = phySim->getPhysicsCharacter(itemName);
 		SbmPhysicsCharacter* phyParent = phySim->getPhysicsCharacter(parentName);
-		SbmPawn*    phyBody = mcu.getPawn(itemName);
+		SbmPhysicsObj*    phyBody = phySim->getPhysicsPawn(itemName);
 		SmartBody::SBObject* phyObj = phySim;		
 		SmartBody::SBObject* phyObj2 = NULL;
 
@@ -717,10 +726,10 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 			phyObjList.push_back(phyObj);
 			phyObjList.push_back(phyObj2);
 		}
-// 		else if (phyBody && phyBody->phyObj_p)
-// 		{
-// 			phyObj = phyBody->phyObj_p;			
-// 		}
+		else if (phyBody)
+		{
+			phyObj = phyBody;			
+		}
 
 		if (phyObjList.size() > 0)
 		{

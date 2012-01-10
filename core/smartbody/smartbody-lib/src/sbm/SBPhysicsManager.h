@@ -23,6 +23,10 @@ class SBPhysicsManager : public SBService
 		virtual void stop();
 
 		SbmPhysicsSim* getPhysicsEngine();
+		SmartBody::SBObject* getPhysicsCharacter(std::string charName);
+		SmartBody::SBObject* getPhysicsJoint(std::string charName, std::string jointName);
+		SmartBody::SBObject* getJointObj(std::string charName, std::string jointName);
+		SmartBody::SBObject* getPhysicsPawn(std::string pawnName);
 
 	protected:
 		SbmPhysicsSimODE* _ode;
