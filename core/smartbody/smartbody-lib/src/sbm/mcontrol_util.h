@@ -172,6 +172,22 @@ class SequenceManager
 
 class VHMsgLog;
 
+class PerceptionData 
+{
+public:
+	
+	float pos[3];
+	float rot[3];
+
+	PerceptionData()
+	{
+	}
+
+	~PerceptionData()
+	{
+	}
+};
+
 // Motion Controller Utility Callback Handle (Yes, seriously.)
 class mcuCBHandle {
 	protected:
@@ -203,7 +219,8 @@ class mcuCBHandle {
 		SmartBody::SBScene*     _scene;
 		int testBMLId;
 
-		
+		//For Perception
+		PerceptionData* perceptionData;
 		
 		// scale factor (used for SmartBody to handle unit convert, both sk and skm)
 		double		skScale;
@@ -582,6 +599,7 @@ public:
 		int abortSequence( const char* command );
 		int deleteSequence( const char* command );
 
+
 		FestivalSpeechRelayLocal* festivalRelay() { return &_festivalRelayLocal; }
 		remote_speech* speech_rvoice() { return &_speech_rvoice; }
 		local_speech* speech_localvoice() { return &_speech_localvoice; }
@@ -665,6 +683,5 @@ class VHMsgLogger : public vhcl::Log::Listener
 		}
 };
 //////////////////////////////////////////////////////////////////
-
 
 #endif
