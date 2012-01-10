@@ -19,6 +19,8 @@ SBScene::SBScene(void)
 	_serviceManager->addService(_steerManager);
 	_serviceManager->addService(_physicsManager);
 
+	_parser = new SBParser();
+
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 }
 
@@ -36,6 +38,10 @@ SBScene::~SBScene(void)
 	delete _bml;
 	delete _stateManager;
 	delete _reachManager;
+	delete _steerManager;
+	delete _physicsManager;
+
+	delete _parser;
 }
 
 void SBScene::setScale(double val)
@@ -440,6 +446,10 @@ SBPhysicsManager* SBScene::getPhysicsManager()
 	return _physicsManager;
 }
 
+SBParser* SBScene::getParser()
+{
+	return _parser;
+}
 
 SmartBody::SBFaceDefinition* SBScene::createFaceDefinition(const std::string& name)
 {
