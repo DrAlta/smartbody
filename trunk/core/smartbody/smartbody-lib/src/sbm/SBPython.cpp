@@ -5,6 +5,7 @@
 #include "nvbg.h"
 #include "SBBehavior.h"
 #include <sbm/SBMotion.h>
+#include <sbm/SBParseNode.h>
 
 #ifdef USE_PYTHON
 
@@ -334,6 +335,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getSteerManager", &SBScene::getSteerManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the steer manager object.")
 		.def("getServiceManager", &SBScene::getServiceManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the service manager object.")
 		.def("getPhysicsManager", &SBScene::getPhysicsManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the physics manager object.")
+		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
 	;
 
 	boost::python::def("createController", createController, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new controller given a controller type and a controller name.");
@@ -860,6 +862,20 @@ boost::python::class_<SBReach>("SBReach")
 		.def("removeEventHandler", &EventManager::removeEventHandler, "Returns the event type.")
 		.def("getNumHandlers", &EventManager::getNumEventHandlers, "Gets the number of event handlers.")
 		.def("getEventHandler", &EventManager::getEventHandler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the number of event handlers.")
+		;
+
+	boost::python::class_<SBParseNode>("SBParseNode")
+		.def("getWord", &SBParseNode::getWord, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the word, empty word if not a terminal node.")
+		.def("getTerm", &SBParseNode::getTerm, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the terminal, empty word if not a terminal node.")
+		.def("isTerminal", &SBParseNode::isTerminal, "Is this node a terminal node.")
+		.def("getNumChildren", &SBParseNode::getNumChildren, "Deletes parse tree.")
+		.def("getChild", &SBParseNode::getChild, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a child node.")
+		;
+
+	boost::python::class_<SBParser>("SBParser")
+		.def("parse", &SBParser::parse, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Parses an utterance using the Charniak parser.")
+		.def("initialize", &SBParser::initialize, "Initializes the Charniak parser with parameters.")
+		.def("cleanUp", &SBParser::cleanUp, "Deletes parse tree.")
 		;
 
 #ifndef __ANDROID__
