@@ -914,7 +914,7 @@ boost::python::class_<SBReach>("SBReach")
 #endif
 
 #ifndef __ANDROID__
-	boost::python::class_<NvbgWrap, boost::noncopyable>("Nvbg")
+	boost::python::class_<NvbgWrap, boost::python::bases<SBObject>, boost::noncopyable>("Nvbg")
 		.def("objectEvent", &Nvbg::objectEvent, &NvbgWrap::default_objectEvent, "An event indicating that an object of interest is present.")
 		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor.")
 		;
