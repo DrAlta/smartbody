@@ -44,6 +44,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 			   ITEM_PAWN, 
 			   ITEM_CHARACTER,   
 			   ITEM_CONTROLLER,
+			   ITEM_NVBG,
 			   ITEM_PHYSICS,
 			   ITEM_NETURAL_MOTION,
 			   ITEM_AU_MAP,

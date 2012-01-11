@@ -14,6 +14,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <sbm/Nvbg.h>
 
 
 // enum {
@@ -583,6 +584,13 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* characte
 			ctrlItem->user_data((void*)ITEM_CONTROLLER);
 		}
 	}
+	// add NVBG
+	Nvbg* nvbg = character->getNvbg();
+	if (nvbg)
+	{
+		Fl_Tree_Item* ctrlItem = resourceTree->add(item, "NVBG");
+		ctrlItem->user_data((void*)ITEM_NVBG);
+	}
 }
 
 
@@ -769,6 +777,11 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 			widget = new AttributeItemWidget(ctrl,x,y,w,h,name,treeItem,itemType,this);
 		else
 			widget = new TreeItemInfoWidget(x,y,w,h,name,treeItem,itemType);
+	}
+	else if (itemType == ITEM_NVBG)
+	{
+		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->parent()->label()); // a controller's parent is its character name
+		widget = new AttributeItemWidget(curChar->getNvbg(),x,y,w,h,name,treeItem,itemType,this);
 	}
 	else
 	{

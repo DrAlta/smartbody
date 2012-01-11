@@ -5,7 +5,7 @@
 #include <sbm/SBObject.h>
 #include <string>
 
-class Nvbg 
+class Nvbg : public SmartBody::SBObject
 {
 public:
 		Nvbg();
