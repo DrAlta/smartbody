@@ -1,10 +1,10 @@
+import sys
+import os
 
 from NewNVBG.NVBG import *
 
 p = NVBG()
 class N(Nvbg):
-    #def __init__(self, pcfg_model_fname=None):
-     #   p = NVBG()
 
     def execute(self, character, recipient, messageId, xml):
         bmlstr = p.process_speech(character,recipient,messageId, xml)
@@ -19,17 +19,11 @@ class N(Nvbg):
             bml.execXML(character, str(bmlstr))
         return
 
-#    def eventOfInterest(self, character, objectName):
-#       bmlstr = p.process_event(character,objectName)
-#       bml.execBML(character, str(bmlstr))
-#       return True
- 
-
- 
 Mynvbg = N()
 d = scene.getCharacter("utah")
 d.setNvbg(Mynvbg)
-
+Mynvbg.createBoolAttribute("rule1", True, False,"Rules", 40, False, False, False, "This is the description of the attribute. This line creates a boolean attribute called 'rule1' that is True by default, will not notify the NVBG object when it is changed, has a priority value of 40, is not read-only, is not locked, and is not hidden.");
+  
 
 
 
