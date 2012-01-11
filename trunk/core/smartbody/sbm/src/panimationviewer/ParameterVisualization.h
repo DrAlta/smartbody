@@ -1,7 +1,7 @@
 #ifndef _PARAMETERVISUALIZATION_H_
 #define _PARAMETERVISUALIZATION_H_
 
-#include <FL/Fl_Group.h>
+#include <FL/Fl_Group.H>
 #include <sbm/me_ct_param_animation_data.h>
 #include "ParameterGroup.h"
 

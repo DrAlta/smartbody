@@ -1,8 +1,8 @@
 #ifndef _PARAMETER3DVISUALIZATION_H_
 #define _PARAMETER3DVISUALIZATION_H_
 
-#include <FL/Fl_Group.h>
-#include <FL/Fl_Gl_Window.h>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Gl_Window.H>
 #include <sbm/me_ct_param_animation_data.h>
 #include "ParameterGroup.h"
 
