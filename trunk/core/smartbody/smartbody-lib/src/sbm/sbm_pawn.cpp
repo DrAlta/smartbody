@@ -24,6 +24,7 @@
 
 #include "vhcl.h"
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBPythonClass.h>
 #include "sbm_pawn.hpp"
 
 #ifdef __APPLE__
@@ -178,8 +179,8 @@ void SbmPawn::initData()
 	wo_cache_timestamp = -std::numeric_limits<float>::max(); 
 	//skeleton_p->ref();
 	ct_tree_p->ref();
-	colObj_p = NULL;
-	phyObj_p = NULL;
+	//colObj_p = NULL;
+	//phyObj_p = NULL;
 	steeringSpaceObj_p = NULL;
 	steeringSpaceObjSize.x = 20.0f;
 	steeringSpaceObjSize.y = 20.0f;
@@ -460,11 +461,7 @@ SbmPawn::~SbmPawn()	{
 	if( _skeleton )
 		_skeleton->unref();
 	ct_tree_p->unref();
-
-	if (colObj_p)
-		delete colObj_p;
-	if (phyObj_p)
-		delete phyObj_p;
+	
 	if (steeringSpaceObj_p)
 	{
 		if (mcuCBHandle::singleton()._scene->getSteerManager()->getEngineDriver()->isInitialized())
@@ -511,8 +508,8 @@ void SbmPawn::get_world_offset( float& x, float& y, float& z,
 SrMat SbmPawn::get_world_offset()
 {	
 	float x,y,z,h,r,p;
-	get_world_offset(x,y,z,h,r,p);
-	gwiz::quat_t q = gwiz::euler_t(h,r,p);	
+	get_world_offset(x,y,z,h,p,r);
+	gwiz::quat_t q = gwiz::euler_t(p,h,r);	
 	SrQuat pawnQ = SrQuat((float)q.w(), (float)q.x(), (float)q.y(), (float)q.z());
 	SrMat gmat;
 	pawnQ.get_mat(gmat);
@@ -684,7 +681,9 @@ int SbmPawn::parse_pawn_command( std::string cmd, srArgBuffer& args, mcuCBHandle
 
 		if (has_geom)
 		{				
-			initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
+			//initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
+			SBPhysicsManager* phyManager = getScene()->getPhysicsManager();
+			phyManager->createPhysicsPawn(getName(),geom_str,size);
 			// init steering space
 			if (!setRec)
 				steeringSpaceObjSize = size;//SrVec(size, size, size);
@@ -710,7 +709,10 @@ int SbmPawn::parse_pawn_command( std::string cmd, srArgBuffer& args, mcuCBHandle
 		else
 			return CMD_FAILURE;
 
-		setPhysicsSim(turnOn);
+		SbmPhysicsObj* phyObj = getPhysicsObject();
+		if (phyObj) phyObj->enablePhysicsSim(turnOn);
+
+		//setPhysicsSim(turnOn);
 		return CMD_SUCCESS;
 	}
 	else if (cmd == "collision")
@@ -724,7 +726,10 @@ int SbmPawn::parse_pawn_command( std::string cmd, srArgBuffer& args, mcuCBHandle
 		else
 			return CMD_FAILURE;
 
-		setCollision(turnOn);			
+		SbmPhysicsObj* phyObj = getPhysicsObject();
+		if (phyObj) phyObj->enableCollisionSim(turnOn);
+
+		//setCollision(turnOn);			
 		return CMD_SUCCESS;
 	}
 	else
@@ -838,9 +843,11 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				for (int i=0;i<3;i++)
 					size[i] = uniformSize;
 			}			
-			pawn_p->initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
+			//pawn_p->initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
+			SBPhysicsManager* phyManager = getScene()->getPhysicsManager();
+			phyManager->createPhysicsPawn(pawn_p->getName(),geom_str,size);
 		}
-		if (pawn_p->colObj_p)
+		if (pawn_p->getGeomObject())
 		{
 			if (geom_str == "box")
 			{
@@ -872,9 +879,9 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 		*/
 
-		if (pawn_p->phyObj_p)
+		if (pawn_p->getPhysicsObject())
 		{
-			pawn_p->setWorldOffset(pawn_p->phyObj_p->getGlobalTransform().gmat());
+			pawn_p->setWorldOffset(pawn_p->getPhysicsObject()->getGlobalTransform().gmat());
 		}
 		// [BMLR] Send notification to the renderer that a pawn was created.
 		// NOTE: This is sent both for characters AND pawns
@@ -1371,6 +1378,21 @@ WSP_ERROR SbmPawn::wsp_rotation_accessor( const std::string id, const std::strin
 }
 #endif
 
+
+SbmGeomObject* SbmPawn::getGeomObject()
+{	
+	SbmPhysicsObj* phyObj = getPhysicsObject();
+	if (phyObj)
+		return phyObj->getColObj();
+	return NULL;
+}
+
+SbmPhysicsObj* SbmPawn::getPhysicsObject()
+{
+	SbmPhysicsSim* phyEngine = SbmPhysicsSim::getPhysicsEngine();
+	return phyEngine->getPhysicsPawn(getName());	
+}
+/*
 bool SbmPawn::initGeomObj( const char* geomType, SrVec size, const char* color, const char* meshName  )
 {
 	SbmGeomObject* colObj = NULL;
@@ -1449,38 +1471,37 @@ void SbmPawn::initPhysicsObj()
 	phySim->addPhysicsObj(phyObj_p);
 	phySim->updatePhyObjGeometry(phyObj_p);				
 }
+*/
 
-void SbmPawn::removePhysicsObj()
-{
-	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine(); //mcuCBHandle::singleton().physicsEngine;
-	if (!phySim || !phyObj_p)
-		return;
-	phySim->removePhysicsObj(phyObj_p);
-	delete phyObj_p;
-	phyObj_p = NULL;
-}
+// void SbmPawn::removePhysicsObj()
+// {
+// 	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine(); //mcuCBHandle::singleton().physicsEngine;
+// 	if (!phySim || !phyObj_p)
+// 		return;
+// 	phySim->removePhysicsObj(phyObj_p);
+// 	delete phyObj_p;
+// 	phyObj_p = NULL;
+// }
 
-void SbmPawn::updateFromColObject()
-{
-	if (phyObj_p)
-	{
-		//setWorldOffset(colObj_p->getWorldState().gmat());
-		//phyObj_p->updateSbmObj();
-		setWorldOffset(phyObj_p->getGlobalTransform().gmat());
-	}
-}
+// void SbmPawn::updateFromColObject()
+// {
+// // 	if (phyObj_p)
+// // 	{
+// // 		//setWorldOffset(colObj_p->getWorldState().gmat());
+// // 		//phyObj_p->updateSbmObj();
+// // 		setWorldOffset(phyObj_p->getGlobalTransform().gmat());
+// // 	}
+// }
 
 void SbmPawn::updateToColObject()
 {
-	if (phyObj_p)
+	SbmPhysicsObj* phyObj = getPhysicsObject();
+	if (phyObj)
 	{
 		SRT newWorldState; 
-		newWorldState.gmat(get_world_offset_joint()->gmat());
-		//colObj_p->getWorldState().gmat();
-		phyObj_p->setRefTransform(phyObj_p->getGlobalTransform()); // save previous transform
-		phyObj_p->setGlobalTransform(newWorldState);
-		//colObj_p->updateGlobalTransform(get_world_offset_joint()->gmat());
-		phyObj_p->updatePhySim();					
+		newWorldState.gmat(get_world_offset());		
+		phyObj->setGlobalTransform(newWorldState);		
+		phyObj->updatePhySim();					
 	}
 }
 
@@ -1551,29 +1572,29 @@ void SbmPawn::clearSteeringGoals()
 	character->steeringAgent->getAgent()->clearGoals();
 }
 
-void SbmPawn::setPhysicsSim( bool enable )
-{
-	if (!phyObj_p)
-		return;
-
-	phyObj_p->enablePhysicsSim(enable);	
-}
-
-bool SbmPawn::hasPhysicsSim()
-{
-	if (!phyObj_p)
-		return false;
-
-	return phyObj_p->hasPhysicsSim();
-}
-
-void SbmPawn::setCollision( bool enable )
-{
-	if (!phyObj_p)
-		return;
-
-	phyObj_p->enableCollisionSim(enable);
-}
+// void SbmPawn::setPhysicsSim( bool enable )
+// {
+// 	if (!phyObj_p)
+// 		return;
+// 
+// 	phyObj_p->enablePhysicsSim(enable);	
+// }
+// 
+// bool SbmPawn::hasPhysicsSim()
+// {
+// 	if (!phyObj_p)
+// 		return false;
+// 
+// 	return phyObj_p->hasPhysicsSim();
+// }
+// 
+// void SbmPawn::setCollision( bool enable )
+// {
+// 	if (!phyObj_p)
+// 		return;
+// 
+// 	phyObj_p->enableCollisionSim(enable);
+// }
 
 ///////////////////////////////////////////////////////////////////////////
 //  Private sbm_pawn functions
@@ -1606,8 +1627,9 @@ void SbmPawn::notify(SBSubject* subject)
 		if (attribute->getName() == "physics")
 		{
 			SmartBody::BoolAttribute* physicsAttr = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
-			setPhysicsSim(physicsAttr->getValue());
+			//setPhysicsSim(physicsAttr->getValue());
 		}
 	}
 }
+
 

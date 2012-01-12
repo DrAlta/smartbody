@@ -326,9 +326,9 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 
 
 	SbmPawn* grabTarget = getTargetObject();
-	if (grabTarget && grabTarget->colObj_p)
+	if (grabTarget && grabTarget->getGeomObject())
 	{
-		SbmGeomObject* geomObj = grabTarget->colObj_p;
+		SbmGeomObject* geomObj = grabTarget->getGeomObject();
 		for (int i=0;i<MeCtHand::F_NUM_FINGERS;i++)
 		{
 			FingerChain& fig = fingerChains[i];

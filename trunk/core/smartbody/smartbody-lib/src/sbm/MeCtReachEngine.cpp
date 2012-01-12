@@ -409,7 +409,7 @@ SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 
 DataInterpolator* MeCtReachEngine::createInterpolator()
 {
-	KNNInterpolator* interpolator = new KNNInterpolator(1000,ikReachRegion*1.f);
+	KNNInterpolator* interpolator = new KNNInterpolator(5000,ikReachRegion*1.f);
 	//RBFInterpolator* interpolator = new RBFInterpolator();
 	resampleData = &interpolator->resampleData;		
 	// 	InverseInterpolation* interpolator = new InverseInterpolation();

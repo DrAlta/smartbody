@@ -376,7 +376,7 @@ void ResourceWindow::updatePhysicsManager( Fl_Tree_Item* tree, SmartBody::SBPhys
 		 iter++)
 	{
 		SbmPhysicsObj* phyObj = (*iter).second;
-		Fl_Tree_Item* phyObjItem = resourceTree->add(tree, phyObj->getName().c_str());
+		Fl_Tree_Item* phyObjItem = resourceTree->add(item, phyObj->getName().c_str());
 		phyObjItem->user_data((void*)ITEM_PHYSICS);
 	}
 }

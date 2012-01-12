@@ -44,7 +44,7 @@ protected:
 	bool          initGeom;
 public:
 	SbmPhysicsObj();
-	~SbmPhysicsObj() {}	
+	~SbmPhysicsObj();
 
 	virtual void enablePhysicsSim(bool bPhy);
 	virtual void enableCollisionSim(bool bCol);	
@@ -152,7 +152,7 @@ protected:
 	SbmPhysicsJoint* root;
 	std::map<std::string, SbmPhysicsJoint*> jointMap;
 	std::map<std::string, SbmJointObj*>     jointObjMap;
-	std::map<std::string, SbmGeomObject*>   jointGeometryMap;
+	//std::map<std::string, SbmGeomObject*>   jointGeometryMap;
 	std::string characterName;	
 	std::vector<CollisionRecord> collisionRecords;
 public:
@@ -203,8 +203,8 @@ public:
 	virtual bool hasPhysicsCharacter(SbmPhysicsCharacter* phyChar);	
 	SbmPhysicsCharacterMap& getCharacterMap() { return characterMap; }
 	SbmPhysicsPawnMap&       getPawnObjMap() { return pawnObjMap; }
-	SbmPhysicsCharacter* getPhysicsCharacter(std::string& charName);
-	SbmPhysicsObj*       getPhysicsPawn(std::string& pawnName);
+	SbmPhysicsCharacter* getPhysicsCharacter(const std::string& charName);
+	SbmPhysicsObj*       getPhysicsPawn(const std::string& pawnName);
 
 	virtual void addPhysicsObj(SbmPhysicsObj* obj);
 	virtual void removePhysicsObj(SbmPhysicsObj* obj);

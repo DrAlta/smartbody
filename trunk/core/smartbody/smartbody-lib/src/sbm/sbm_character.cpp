@@ -47,7 +47,7 @@
 #include <sbm/SBJoint.h>
 
 #define USE_REACH 1
-#define USE_PHYSICS_CHARACTER 0
+#define USE_PHYSICS_CHARACTER 1
 //#define USE_REACH_TEST 0
 const bool LOG_PRUNE_CMD_TIME							= false;
 const bool LOG_CONTROLLER_TREE_PRUNING					= false;
@@ -136,8 +136,7 @@ _soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 	gaze_sched_p->ref();
 	head_sched_p->ref();
 	param_sched_p->ref();
-	eyelid_ct->ref();
-	phyChar = NULL;
+	eyelid_ct->ref();	
 }
 
 
@@ -399,9 +398,7 @@ void SbmCharacter::initData()
 	grab_sched_p = NULL;
 	constraint_sched_p = NULL;
 	param_animation_ct = NULL;
-	saccade_ct = NULL;
-
-	phyChar = NULL;
+	saccade_ct = NULL;	
 
 	speech_impl = NULL;
 	speech_impl_backup = NULL;
@@ -492,144 +489,98 @@ void SbmCharacter::locomotion_set_turning_mode(int mode)
 	}
 }
 
-void SbmCharacter::updateJointPhyObjs(bool phySim)
-{
-	//return;
-	if (!_skeleton)
-		return;
-	if (!phyChar) return;
+// void SbmCharacter::updateJointPhyObjs(bool phySim)
+// {
+// 	
+// }
 
-	bool charPhySim = phySim && phyChar->getBoolAttribute("enable");
-	std::map<std::string,SbmJointObj*> jointPhyObjMap = phyChar->getJointObjMap();
-	const std::vector<SkJoint*>& joints = _skeleton->joints();	
-	_skeleton->update_global_matrices();
-	for (size_t i=0;i<joints.size();i++)
-	{
-		SkJoint* curJoint = joints[i]; 
-		const std::string& jointName = curJoint->name();
-		std::map<std::string, SbmJointObj*>::iterator iter = jointPhyObjMap.find(jointName);
-		bool kinematicRoot = (curJoint->name() == "base" || curJoint->name() == "JtPelvis") && phyChar->getBoolAttribute("kinematicRoot");
-		if (iter != jointPhyObjMap.end())
-		{
-			SbmJointObj* phyObj = (*iter).second;
-
-#if USE_PHYSICS_CHARACTER			
-			if (charPhySim && !kinematicRoot)
-			{
-				phyObj->enablePhysicsSim(true);
-				phyObj->updateSbmObj();
-			}
-			else
-			{				
-				SBJoint* curSBJoint = dynamic_cast<SBJoint*>(curJoint);
-				SrMat tranMat; tranMat.translation(curSBJoint->getLocalCenter());	
-				phyObj->enablePhysicsSim(false);
-				//if (joint->parent()) 
-				SrMat gmat = tranMat*curSBJoint->gmat();		
-				phyObj->setRefTransform(phyObj->getGlobalTransform()); // save previous transform
-				phyObj->setGlobalTransform(gmat);				
-				phyObj->setAngularVel(phyObj->getPhyJoint()->getRefAngularVel());
-				phyObj->updatePhySim();
-			}		
-#else
-			{
-				SBJoint* curSBJoint = dynamic_cast<SBJoint*>(curJoint);
-				SrMat tranMat; tranMat.translation(curSBJoint->getLocalCenter());					
-				SrMat gmat = tranMat*curSBJoint->gmat();		
-				phyObj->setGlobalTransform(gmat);
-			}			
-#endif
-		}
-	}	
-}
-
-void SbmCharacter::setJointPhyCollision( bool useCollision )
-{	
-	if (!phyChar) return;
-	const std::vector<SkJoint*>& joints = _skeleton->joints();	
-	std::map<std::string,SbmJointObj*> jointPhyObjMap = phyChar->getJointObjMap();
-	for (size_t i=0;i<joints.size();i++)
-	{
-		SkJoint* curJoint = joints[i];
-		std::string jointName = curJoint->name();
-		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
-		{
-			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
-			phyObj->enableCollisionSim(useCollision);
-		}
-	}	
-}
-
-void SbmCharacter::buildJointPhyObjs()
-{
-	const std::vector<SkJoint*>& joints = _skeleton->joints();
-	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
-	if (!phySim)
-		return;
-	//printf("init physics obj\n");	
-	phyChar = new SbmPhysicsCharacter();
-	std::queue<SkJoint*> tempJointList;
-	std::vector<std::string> jointNameList;
-	std::set<std::string> excludeNameList; 
-	excludeNameList.insert("r_wrist");
-	excludeNameList.insert("l_wrist");
-	excludeNameList.insert("spine5");
-	excludeNameList.insert("l_forefoot");
-	excludeNameList.insert("r_forefoot");
-
-	excludeNameList.insert("l_ankle");
-	excludeNameList.insert("r_ankle");
-
-	//excludeNameList.insert("r_sternoclavicular");
-	//excludeNameList.insert("l_sternoclavicular");
-	//excludeNameList.insert("r_shoulder");
-	//excludeNameList.insert("l_shoulder");
-	//excludeNameList.insert("r_acromioclavicular");
-	//excludeNameList.insert("l_acromioclavicular");
-
-	//excludeNameList.insert("l_hip");
-	//excludeNameList.insert("r_hip");	
-	//excludeNameList.insert("spine3");
-	//excludeNameList.insert("r_elbow");
-	//excludeNameList.insert("l_elbow");
-	SkJoint* rootJoint = _skeleton->root();
-	//jointNameList.push_back(rootJoint->name());
-	tempJointList.push(rootJoint->child(0));
-	//tempJointList.push(_skeleton->search_joint("spine2"));
-
-	
-	while (!tempJointList.empty())
-	{
-		SkJoint* joint = tempJointList.front(); tempJointList.pop();
-		std::string jName = joint->name();
-		if (joint->num_children() == 0) // don't process leaves
-			continue;
-		jointNameList.push_back(jName);
-		if (excludeNameList.find(jName) != excludeNameList.end())
-			continue;
-		for (int i=0;i<joint->num_children();i++)
-		{
-			SkJoint* cj = joint->child(i);	
-			if (std::find(joints.begin(),joints.end(),cj) != joints.end())
-				tempJointList.push(cj);
-		}
-	}
-		
-	/*
-	for (size_t i=0;i<joints.size();i++)
-	{
-		SkJoint* curJoint = joints[i];
-		std::string jointName = curJoint->name();
-		jointNameList.push_back(jointName);				
-	}*/
-	
-
-	std::string charName = getName();
-	phyChar->initPhysicsCharacter(charName,jointNameList,true);
-#if USE_PHYSICS_CHARACTER
-	phySim->addPhysicsCharacter(phyChar);
-#endif
-}
+// void SbmCharacter::setJointPhyCollision( bool useCollision )
+// {	
+// 	if (!phyChar) return;
+// 	const std::vector<SkJoint*>& joints = _skeleton->joints();	
+// 	std::map<std::string,SbmJointObj*> jointPhyObjMap = phyChar->getJointObjMap();
+// 	for (size_t i=0;i<joints.size();i++)
+// 	{
+// 		SkJoint* curJoint = joints[i];
+// 		std::string jointName = curJoint->name();
+// 		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
+// 		{
+// 			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
+// 			phyObj->enableCollisionSim(useCollision);
+// 		}
+// 	}	
+// }
+// 
+// void SbmCharacter::buildJointPhyObjs()
+// {
+// 	const std::vector<SkJoint*>& joints = _skeleton->joints();
+// 	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
+// 	if (!phySim)
+// 		return;
+// 	//printf("init physics obj\n");	
+// 	phyChar = new SbmPhysicsCharacter();
+// 	std::queue<SkJoint*> tempJointList;
+// 	std::vector<std::string> jointNameList;
+// 	std::set<std::string> excludeNameList; 
+// 	excludeNameList.insert("r_wrist");
+// 	excludeNameList.insert("l_wrist");
+// 	excludeNameList.insert("spine5");
+// 	excludeNameList.insert("l_forefoot");
+// 	excludeNameList.insert("r_forefoot");
+// 
+// 	excludeNameList.insert("l_ankle");
+// 	excludeNameList.insert("r_ankle");
+// 
+// 	//excludeNameList.insert("r_sternoclavicular");
+// 	//excludeNameList.insert("l_sternoclavicular");
+// 	//excludeNameList.insert("r_shoulder");
+// 	//excludeNameList.insert("l_shoulder");
+// 	//excludeNameList.insert("r_acromioclavicular");
+// 	//excludeNameList.insert("l_acromioclavicular");
+// 
+// 	//excludeNameList.insert("l_hip");
+// 	//excludeNameList.insert("r_hip");	
+// 	//excludeNameList.insert("spine3");
+// 	//excludeNameList.insert("r_elbow");
+// 	//excludeNameList.insert("l_elbow");
+// 	SkJoint* rootJoint = _skeleton->root();
+// 	//jointNameList.push_back(rootJoint->name());
+// 	tempJointList.push(rootJoint->child(0));
+// 	//tempJointList.push(_skeleton->search_joint("spine2"));
+// 
+// 	
+// 	while (!tempJointList.empty())
+// 	{
+// 		SkJoint* joint = tempJointList.front(); tempJointList.pop();
+// 		std::string jName = joint->name();
+// 		if (joint->num_children() == 0) // don't process leaves
+// 			continue;
+// 		jointNameList.push_back(jName);
+// 		if (excludeNameList.find(jName) != excludeNameList.end())
+// 			continue;
+// 		for (int i=0;i<joint->num_children();i++)
+// 		{
+// 			SkJoint* cj = joint->child(i);	
+// 			if (std::find(joints.begin(),joints.end(),cj) != joints.end())
+// 				tempJointList.push(cj);
+// 		}
+// 	}
+// 		
+// 	/*
+// 	for (size_t i=0;i<joints.size();i++)
+// 	{
+// 		SkJoint* curJoint = joints[i];
+// 		std::string jointName = curJoint->name();
+// 		jointNameList.push_back(jointName);				
+// 	}*/
+// 	
+// 
+// 	std::string charName = getName();
+// 	phyChar->initPhysicsCharacter(charName,jointNameList,true);
+// #if USE_PHYSICS_CHARACTER
+// 	phySim->addPhysicsCharacter(phyChar);
+// #endif
+// }
 /*
 void SbmCharacter::setJointCollider( std::string jointName, float len, float radius )
 {
@@ -3048,53 +2999,34 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 										}
 										return CMD_SUCCESS;
 									}
-									else if ( cmd == "collision")
-									{
-										string phyCmd = args.read_token();
-										if (phyCmd == "on" || phyCmd == "ON")
-										{
-											this->setJointPhyCollision(true);
-											return CMD_SUCCESS;
-										}
-										else if (phyCmd == "off" || phyCmd == "OFF")
-										{
-											this->setJointPhyCollision(false);
-											return CMD_SUCCESS;
-										}
-										else
-										{
-											LOG( "SbmCharacter::parse_character_command ERR: incorrect parameter for collision = %s",phyCmd.c_str());
-											return CMD_FAILURE;
-										}
-									}
-									else if ( cmd == "collider" )
-									{
-										string colCmd = args.read_token();
-										if (colCmd == "build") // build all joint colliders automatically
-										{
-											this->buildJointPhyObjs();
-											return CMD_SUCCESS;
-										}
-										/*
-										else if (colCmd == "joint") // build 
-										{
-											string jointName = args.read_token();
-											float length = -1.f, width = -1.f;			
-											string nextCmd = args.read_token();
-											while (nextCmd != "")
-											{
-												float nextFloat = args.read_float();
-												if (nextCmd == "length")
-													length = nextFloat;
-												else if (nextCmd == "width")
-													width = nextFloat;
-												nextCmd = args.read_token();
-											}
-											this->setJointCollider(jointName,length,width);
-											return CMD_SUCCESS;
-										}	
-										*/
-									}
+// 									else if ( cmd == "collision")
+// 									{
+// 										string phyCmd = args.read_token();
+// 										if (phyCmd == "on" || phyCmd == "ON")
+// 										{
+// 											//this->setJointPhyCollision(true);
+// 											return CMD_SUCCESS;
+// 										}
+// 										else if (phyCmd == "off" || phyCmd == "OFF")
+// 										{
+// 											//this->setJointPhyCollision(false);
+// 											return CMD_SUCCESS;
+// 										}
+// 										else
+// 										{
+// 											LOG( "SbmCharacter::parse_character_command ERR: incorrect parameter for collision = %s",phyCmd.c_str());
+// 											return CMD_FAILURE;
+// 										}
+// 									}
+// 									else if ( cmd == "collider" )
+// 									{
+// 										string colCmd = args.read_token();
+// 										if (colCmd == "build") // build all joint colliders automatically
+// 										{
+// 											this->buildJointPhyObjs();
+// 											return CMD_SUCCESS;
+// 										}										
+// 									}
 									else if ( cmd == "handmotion")
 									{
 										string hand_cmd = args.read_token();	
@@ -3652,11 +3584,6 @@ SrVec SbmCharacter::getFacingDirection()
 	charDir = charDir*mat;
 	charDir.normalize();
 	return charDir;
-}
-
-void SbmCharacter::setJointCollider( std::string jointName, float size )
-{
-
 }
 
 int SbmCharacter::writeSkeletonHierarchy(std::string file, double scale)

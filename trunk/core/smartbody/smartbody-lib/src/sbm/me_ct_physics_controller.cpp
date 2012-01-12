@@ -31,13 +31,15 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 	float invDt = 1.f/0.016;
 	if (_dt > 1e-6)
 		invDt = 1.f/(float)_dt;	
-#if 0
+#if 1
 	if (_valid && _context )
 	{
-		SbmPhysicsCharacter* phyChar = _character->getPhysicsCharacter();
+		SbmPhysicsSim* phyEngine = SbmPhysicsSim::getPhysicsEngine();
+		std::string charName = _character->getName();
+		SbmPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(charName);//_character->getPhysicsCharacter();
 		if (!phyChar) return true;
 
-		bool hasPhy = (SbmPhysicsSim::getPhysicsEngine()->getBoolAttribute("enable") && phyChar->getBoolAttribute("enable"));		
+		bool hasPhy = (phyEngine->getBoolAttribute("enable") && phyChar->getBoolAttribute("enable"));		
 		std::vector<SbmJointObj*> jointObjList = phyChar->getJointObjList();
 
 		std::vector<CollisionRecord>& colRecords = phyChar->getCollisionRecords();

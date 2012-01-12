@@ -85,6 +85,7 @@ SbmTransform::SbmTransform()
 
 SbmGeomObject::SbmGeomObject(void)
 {
+	color = "r";
 		
 }
 
@@ -121,8 +122,10 @@ SbmGeomObject* SbmGeomObject::createGeometry(std::string& type, SrVec size )
 		geomObj = new SbmGeomBox(SrVec(size[0],size[1],size[2]));		
 	}
 	else if (type == "capsule")
-	{		
-		geomObj = new SbmGeomCapsule(size[0]*2.f,size[1]);		
+	{	
+		SrVec p1,p2;
+		p1 = SrVec(0,-size[0],0); p2 = SrVec(0,size[0],0);
+		geomObj = new SbmGeomCapsule(size[0]*2.f,size[1]);//new SbmGeomCapsule(p1,p2,size[1]);//new SbmGeomCapsule(size[0]*2.f,size[1]);		
 	}	
 	else
 	{
