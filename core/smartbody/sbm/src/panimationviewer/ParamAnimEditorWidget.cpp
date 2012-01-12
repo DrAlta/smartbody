@@ -91,15 +91,17 @@ void ParamAnimEditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int tra
 
 		// connect to the attached correspondance mark
 		// get the position of the other mark
-		/*
-		CorrespondenceMark* attached = cMark->getAttachedMark();
-		if (attached)
+		std::vector<CorrespondenceMark*>& attached = cMark->getAttachedMark();
+		for (size_t i = 0; i < attached.size(); i++)
 		{
-			int abounds[4];
-			attached->getBounds(abounds[0], abounds[1], abounds[2], abounds[3]);
-			fl_line(bounds[0], bounds[1], abounds[0], abounds[1]);
+			if (attached[i])
+			{
+				int abounds[4];
+				attached[i]->getBounds(abounds[0], abounds[1], abounds[2], abounds[3]);
+				fl_color(FL_BLUE);
+				fl_line(bounds[0], bounds[1], abounds[0], abounds[1]);
+			}
 		}
-		*/
 	}
 }
 

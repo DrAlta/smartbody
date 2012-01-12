@@ -33,9 +33,9 @@ class CorrespondenceMark : public nle::Mark
 		~CorrespondenceMark();
 
 		void attach(CorrespondenceMark* mark);
-		CorrespondenceMark* getAttachedMark();
+		std::vector<CorrespondenceMark*>& getAttachedMark();
 
-	CorrespondenceMark* _attached;
+		std::vector<CorrespondenceMark*> _attached;
 };
 
 
