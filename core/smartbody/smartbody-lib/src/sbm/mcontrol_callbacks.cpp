@@ -6475,28 +6475,29 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			return CMD_FAILURE;
 		}
 		float factor = args.read_float();
-		SkChannelArray& channels = motion->channels();
-		int numFrames = motion->frames();
-		for (int f = 0; f < numFrames; f++)
-		{
-			float* posture = motion->posture(f);
-			int index = 0;
-			for (int c = 0; c < channels.size(); c++)
-			{
-				SkChannel& channel = channels[c];
-				// only scale the positions
-				if (channel.type == SkChannel::XPos ||
-					channel.type == SkChannel::YPos ||
-					channel.type == SkChannel::ZPos)
-				{
-					posture[index] *= factor;
-				}
-				index += channel.size();
-			}
-		}
-		LOG("Motion %s with %d frames scaled by a factor of %f", motionName.c_str(), motion->frames(), factor);
-		return CMD_SUCCESS;
 
+		SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
+		bool result = sbMotion->scale(factor);
+		if (result)
+			return CMD_SUCCESS;
+		else
+			return CMD_FAILURE;
+	}
+	else if (command == "retime")
+	{
+		if (args.calc_num_tokens() == 0)
+		{
+			LOG("Usage: animation <motion> retime <factor>");
+			return CMD_FAILURE;
+		}
+		float factor = args.read_float();
+
+		SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
+		bool result = sbMotion->retime(factor);
+		if (result)
+			return CMD_SUCCESS;
+		else
+			return CMD_FAILURE;
 	}
 	else if (command == "translate")
 	{
@@ -6510,31 +6511,12 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		offset[1] = args.read_float();
 		offset[2] = args.read_float();
 
-		// get the base x, y, z
-		SkChannelArray& channels = motion->channels();
-		int pos[3];
-		pos[0] = channels.search("base", SkChannel::XPos);
-		pos[1] = channels.search("base", SkChannel::YPos);
-		pos[2] = channels.search("base", SkChannel::ZPos);
-		if (pos[0] == -1 || pos[1] == -1 || pos[2] == -1)
-		{
-			LOG("No joint named 'base' found in motion %s, cannot translate.", motionName.c_str());
+		SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
+		bool result = sbMotion->translate(offset[0], offset[1], offset[2], "base");
+		if (result)
+			return CMD_SUCCESS;
+		else
 			return CMD_FAILURE;
-		}
-
-		int numFrames = motion->frames();
-		for (int f = 0; f < numFrames; f++)
-		{
-			float* curFrame = motion->posture(f);
-			for (int p = 0; p < 3; p++)
-			{
-				curFrame[pos[p]] = curFrame[pos[p]] + offset[p];
-			}
-
-		}
-
-		LOG("Motion %s with %d frames offset by (%f, %f, %f)", motionName.c_str(), motion->frames(), offset[0], offset[1], offset[2]);
-		return CMD_SUCCESS;
 	}	
 	else if (command == "rotate")
 	{
@@ -6548,41 +6530,12 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		rotation[1] = args.read_float();
 		rotation[2] = args.read_float();
 
-		// get the base wuaternion
-		SkChannelArray& channels = motion->channels();
-		int pos = -1;
-		pos = channels.search("base", SkChannel::Quat);
-		if (pos == -1)
-		{
-			LOG("No joint named 'base' found in motion %s, cannot rotate.", motionName.c_str());
+		SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
+		bool result = sbMotion->rotate(rotation[0], rotation[1], rotation[2], "base");
+		if (result)
+			return CMD_SUCCESS;
+		else
 			return CMD_FAILURE;
-		}
-
-		SrMat xRot;
-		xRot.rotx(rotation[0] * (float) M_PI / 180.0f);
-		SrMat yRot;
-		yRot.roty(rotation[1] * (float) M_PI / 180.0f);
-		SrMat zRot;
-		zRot.rotz(rotation[2] * (float) M_PI / 180.0f);
-		SrMat finalMat = xRot * yRot * zRot;
-
-		int numFrames = motion->frames();
-		for (int f = 0; f < numFrames; f++)
-		{
-			float* curFrame = motion->posture(f);
-			SrQuat curQuat(curFrame[pos], curFrame[pos + 1], curFrame[pos + 2], curFrame[pos + 3]); 
-			SrMat currentMat;
-			curQuat.get_mat(currentMat);
-			currentMat *= finalMat;
-			SrQuat newQuat(currentMat);
-			curFrame[pos + 0] = newQuat.w;
-			curFrame[pos + 1] = newQuat.x;
-			curFrame[pos + 2] = newQuat.y;
-			curFrame[pos + 3] = newQuat.z;
-		}
-
-		LOG("Motion %s with %d frames rotated by (%f, %f, %f)", motionName.c_str(), motion->frames(), rotation[0], rotation[1], rotation[2]);
-		return CMD_SUCCESS;
 	}
 	else
 	{
@@ -6591,6 +6544,7 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		LOG("       animation <motion> translate <x> <y> <z>"); 
 		LOG("       animation <motion> rotate <x> <y> <z>");
 		LOG("       animation <motion> scale <factor>");
+		LOG("       animation <motion> retime <factor>");
 		//LOG("       animation <motion> trim <from> <to>");
 
 		return CMD_FAILURE;
