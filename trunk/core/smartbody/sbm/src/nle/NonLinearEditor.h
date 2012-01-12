@@ -30,6 +30,9 @@ class Mark
 		bool isSelected();
 		void setSelected(bool val);
 
+		void setBoundToBlock(bool val);
+		bool isBoundToBlock();
+
 		void setBounds(int x, int y, int w, int h);
 		void getBounds(int& x, int& y, int& w, int& h);
 
@@ -54,6 +57,7 @@ class Mark
 		Fl_Color color;
 		bool showName;
 		std::string info;
+		bool boundToBlock;
 };
 
 

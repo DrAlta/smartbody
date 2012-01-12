@@ -25,6 +25,7 @@
 CorrespondenceMark::CorrespondenceMark()
 {
 	_attached = NULL;
+	setBoundToBlock(false);
 }
 
 CorrespondenceMark::~CorrespondenceMark()

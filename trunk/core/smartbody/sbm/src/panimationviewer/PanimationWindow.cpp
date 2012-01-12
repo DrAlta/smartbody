@@ -45,7 +45,7 @@ PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_
 		int childGroupW = tabGroupW- 10;
 		int childGroupH = tabGroupH - 2 * yDis;
 
-		motionPlayerMode = new Fl_Check_Button(10, 3 * h / 4 + 10, 200, 20, "Motion Player Mode");
+		motionPlayerMode = new Fl_Check_Button(10, 3 * h / 4 + 10, 200, 20, "Play selected motion");
 		motionPlayerMode->value(0);
 		motionPlayerMode->callback(changeMotionPlayerMode, this);
 		characterList = new Fl_Choice(300, 3 * h / 4 + 10, 200, 20, "Character List");
@@ -77,9 +77,9 @@ PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_
 			transitionEditor = new PATransitionEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
 			transitionEditor->begin();
 			transitionEditor->end();
-			scriptEditor = new PAScriptEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
-			scriptEditor->begin();
-			scriptEditor->end();
+//			scriptEditor = new PAScriptEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
+//			scriptEditor->begin();
+//			scriptEditor->end();
 			runTimeEditor = new PARunTimeEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
 			runTimeEditor->begin();
 			runTimeEditor->end();
@@ -134,8 +134,8 @@ void PanimationWindow::update_viewer()
 	if (!character)
 		return;
 
-	if (tabGroup->value() == scriptEditor)
-		scriptEditor->update();
+//	if (tabGroup->value() == scriptEditor)
+//		scriptEditor->update();
 	if (tabGroup->value() ==runTimeEditor)
 		runTimeEditor->update();
 		
@@ -328,8 +328,8 @@ void PanimationWindow::refreshUI(Fl_Widget* widget, void* data)
 	PanimationWindow* window = (PanimationWindow*) data;
 	if (window->tabGroup->value() == window->stateEditor)
 		window->stateEditor->refresh();
-	if (window->tabGroup->value() == window->scriptEditor)
-		window->scriptEditor->refresh();
+//	if (window->tabGroup->value() == window->scriptEditor)
+//		window->scriptEditor->refresh();
 }
 
 void PanimationWindow::changeMotionPlayerMode(Fl_Widget* widget, void* data)
