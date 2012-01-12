@@ -88,10 +88,11 @@ bool PATimeManager::step(double timeStep)
 	double lastKey = key[key.size() - 1];
 	if (newLocalTime > lastKey && lastKey >= 0.0)
 	{
-		int times = (int) (newLocalTime / lastKey);
+		double d = key[key.size() - 1] - key[0];
+		int times = (int) (newLocalTime / d);
 		if (times > 0)
 		{
-			newLocalTime = newLocalTime - float(times) * lastKey;
+			newLocalTime = newLocalTime - float(times) * d;
 		}
 		notReachDuration = false;
 	}
