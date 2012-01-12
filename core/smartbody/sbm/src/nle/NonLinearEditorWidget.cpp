@@ -910,28 +910,40 @@ int EditorWidget::handle(int event)
                 bool okToMove = true;
                 if (okToMove)
                 {
-                    // make sure that the block doesn't go beyond the beginning
+                    // make sure that the mark doesn't go beyond the beginning
                     double startTime = selectedMark->getStartTime() + timeDiff;
                     double endTime = selectedMark->getEndTime() + timeDiff;
-					if (startTime >= selectedMark->getBlock()->getStartTime() && endTime <= selectedMark->getBlock()->getEndTime())
-                    {
-                        selectedMark->setStartTime(startTime);
-                        selectedMark->setEndTime(endTime);
+	
+					if (selectedMark->isBoundToBlock())
+					{
+						if (startTime >= selectedMark->getBlock()->getStartTime() && endTime <= selectedMark->getBlock()->getEndTime())
+						{
+							selectedMark->setStartTime(startTime);
+							selectedMark->setEndTime(endTime);
+							char buff[256];
+							sprintf(buff, "%6.2f", selectedMark->getStartTime());
+							selectedMark->setName(buff);
+						}       
+						if (startTime < selectedMark->getBlock()->getStartTime())
+						{
+							selectedMark->setStartTime(selectedMark->getBlock()->getStartTime());
+							selectedMark->setEndTime(selectedMark->getBlock()->getStartTime());
+						}
+						if (startTime > selectedMark->getBlock()->getEndTime())
+						{
+							selectedMark->setStartTime(selectedMark->getBlock()->getEndTime());
+							selectedMark->setEndTime(selectedMark->getBlock()->getEndTime());
+						}
+					}
+					else
+					{
+						selectedMark->setStartTime(startTime);
+						selectedMark->setEndTime(endTime);
 						char buff[256];
 						sprintf(buff, "%6.2f", selectedMark->getStartTime());
 						selectedMark->setName(buff);
-                    }       
-					if (startTime < selectedMark->getBlock()->getStartTime())
-					{
-						selectedMark->setStartTime(selectedMark->getBlock()->getStartTime());
-						selectedMark->setEndTime(selectedMark->getBlock()->getStartTime());
 					}
-					if (startTime > selectedMark->getBlock()->getEndTime())
-					{
-						selectedMark->setStartTime(selectedMark->getBlock()->getEndTime());
-						selectedMark->setEndTime(selectedMark->getBlock()->getEndTime());
-					}
-                        
+					
                     // reset the mouse position
                     clickPositionX = mousex;
                     model->setModelChanged(true);

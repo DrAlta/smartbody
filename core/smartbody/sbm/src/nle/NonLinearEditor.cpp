@@ -18,6 +18,7 @@ Mark::Mark()
 	
 	showName = true;
 	info = "";
+	boundToBlock = true;
 }
 
 Mark::~Mark()
@@ -118,6 +119,16 @@ void Mark::setInfo(std::string str)
 std::string Mark::getInfo()
 {
 	return info;
+}
+
+void Mark::setBoundToBlock(bool val)
+{
+	boundToBlock = val;
+}
+
+bool Mark::isBoundToBlock()
+{
+	return boundToBlock;
 }
 
 Block::Block()
