@@ -1116,13 +1116,13 @@ void mcuCBHandle::update( void )	{
 		pawn->ct_tree_p->evaluate( time );
 		pawn->ct_tree_p->applyBufferToAllSkeletons();
 
-		if (pawn->hasPhysicsSim() && SbmPhysicsSim::getPhysicsEngine()->getBoolAttribute("enable"))
-		{
-			pawn->updateFromColObject();
-		}
-		else
+// 		if (pawn->hasPhysicsSim() && SbmPhysicsSim::getPhysicsEngine()->getBoolAttribute("enable"))
+// 		{
+// 			//pawn->updateFromColObject();
+// 		}
+// 		else
 		{			
-			pawn->updateToColObject();
+			//pawn->updateToColObject();
 			pawn->updateToSteeringSpaceObject();
 		}
 		SbmCharacter* char_p = getCharacter(pawn->getName().c_str() );

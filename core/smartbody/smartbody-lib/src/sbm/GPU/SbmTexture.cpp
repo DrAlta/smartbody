@@ -104,9 +104,10 @@ void SbmTexture::buildTexture()
 		SbmShaderProgram::printOglError("SbmTexture.cpp:100");
 	}
 
+	//SbmShaderProgram::printOglError("SbmTexture.cpp:50");	
 	glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(iType, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:100");	
 	if (channels == 3)
@@ -119,7 +120,9 @@ void SbmTexture::buildTexture()
 		internal_format = GL_RGBA8;
 		texture_format = GL_RGBA;				
 	}
-	glTexImage2D(iType,0,internal_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);	
+	//glTexImage2D(iType,0,internal_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);	
+	gluBuild2DMipmaps(iType, channels, width, height, texture_format, GL_UNSIGNED_BYTE, buffer );
+	//glGenerateMipmap(iType);
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:200");
 
 	GLclampf iPrority = 1.0;

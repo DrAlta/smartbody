@@ -80,8 +80,8 @@ bool ReachTarget::targetHasGeometry()
 	//LOG("target pawn name = %s",targetPawn->getName().c_str());
 	SbmPawn* targetPawn = getTargetPawn();
 	if (!targetPawn) return false;
-	if (targetPawn->colObj_p == NULL) return false;
-	SbmGeomNullObject* nullObject = dynamic_cast<SbmGeomNullObject*>(targetPawn->colObj_p);
+	if (targetPawn->getGeomObject() == NULL) return false;
+	SbmGeomNullObject* nullObject = dynamic_cast<SbmGeomNullObject*>(targetPawn->getGeomObject());
 	if (nullObject) return false;
 	return true;
 }
@@ -113,9 +113,9 @@ SRT ReachTarget::getGrabTargetState( SRT& naturalState, float offset )
 	//st.tran = getTargetState().tran;
 	// if there is a collider object, estimate the correct hand position & orientation
 	SbmPawn* targetPawn = getTargetPawn();
-	if (useTargetPawn && targetPawn && targetPawn->colObj_p)
+	if (useTargetPawn && targetPawn && targetPawn->getGeomObject())
 	{
-		targetPawn->colObj_p->estimateHandPosture(naturalState.rot,st.tran,st.rot, offset);				
+		targetPawn->getGeomObject()->estimateHandPosture(naturalState.rot,st.tran,st.rot, offset);				
 	}
 	return st;
 }
@@ -196,7 +196,7 @@ void ReachHandAction::reachPreCompleteAction( ReachStateData* rd )
 	ReachTarget& rtarget = rd->reachTarget;
 	EffectorState& estate = rd->effectorState;	
 	SbmPawn* targetPawn = rtarget.getTargetPawn();
-	if (!targetPawn || !targetPawn->colObj_p)
+	if (!targetPawn || !targetPawn->getGeomObject())
 		return;
 	std::string cmd;
 	std::string charName = rd->charName;
@@ -219,7 +219,7 @@ void ReachHandAction::reachCompleteAction( ReachStateData* rd )
 {
 	ReachTarget& rtarget = rd->reachTarget;
 	SbmPawn* targetPawn = rtarget.getTargetPawn();
-	if (!targetPawn || !targetPawn->colObj_p)
+	if (!targetPawn || !targetPawn->getGeomObject())
 		return;
 
 	std::string cmd;
@@ -291,7 +291,7 @@ void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 	// send attachment to hand controller
 	rd->effectorState.setAttachedPawn(rd);
 	SbmPawn* attachedPawn = rd->effectorState.getAttachedPawn();
-	if (!attachedPawn || !attachedPawn->colObj_p)
+	if (!attachedPawn || !attachedPawn->getGeomObject())
 		return;	
 	std::string charName = rd->charName;
 	std::string targetName = attachedPawn->getName();
@@ -307,7 +307,7 @@ void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
 {
 	SbmPawn* attachedPawn = rd->effectorState.getAttachedPawn();
-	if (!attachedPawn || !attachedPawn->colObj_p)
+	if (!attachedPawn || !attachedPawn->getGeomObject())
 		return;
 
 	std::string charName = rd->charName;	

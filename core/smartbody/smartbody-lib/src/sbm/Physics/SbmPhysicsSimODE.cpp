@@ -78,7 +78,8 @@ void SbmPhysicsSimODE::initSimulation()
 	//dWorldSetLinearDamping(worldID,0.002f);
 	//dWorldSetAngularDamping(worldID,0.01f);
 	dWorldSetLinearDamping(worldID,0.0001f);
-	dWorldSetAngularDamping(worldID,0.03f);
+	//dWorldSetAngularDamping(worldID,0.03f);
+	dWorldSetAngularDamping(worldID,0.001f);
 
 	//dWorldSetERP(worldID,0.5);
 	//dWorldSetCFM(worldID,1e-3);	

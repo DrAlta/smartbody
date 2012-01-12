@@ -96,8 +96,8 @@ public:  // TODO - properly encapsulate / privatize the following
 	SkSkeleton*	_skeleton;;  // MAY BE NULL!!!
 	SkScene*		scene_p;	 // Skeleton Scene and Rigid Mesh		
 	DeformableMesh*	dMesh_p;	 // Deformable Mesh using smooth skinning
-	SbmGeomObject*  colObj_p;
-	SbmPhysicsObj*  phyObj_p;
+	//SbmGeomObject*  colObj_p;
+	//SbmPhysicsObj*  phyObj_p;
 	SteerLib::ObstacleInterface* steeringSpaceObj_p;
 	SrVec			steeringSpaceObjSize;
 	std::string _classType;
@@ -119,24 +119,24 @@ public:
 	virtual ~SbmPawn();
 
 	SkSkeleton* getSkeleton() const;
-	void setSkeleton(SkSkeleton* sk);
-
-
+	void setSkeleton(SkSkeleton* sk);	
 	virtual int init( SkSkeleton* skeleton_p );
 
-	void updateFromColObject();
-	void updateToColObject();
+	SbmGeomObject* getGeomObject(); // get geometry object associated with the pawn
+	SbmPhysicsObj* getPhysicsObject();
+// 	void updateFromColObject();
+ 	void updateToColObject();
 	void updateToSteeringSpaceObject();
 	void initSteeringSpaceObject();
 	void clearSteeringGoals();
 
 	bool is_initialized();
-	bool initGeomObj(const char* geomType, SrVec size, const char* color, const char* meshName = NULL);
-	void initPhysicsObj();
-	void removePhysicsObj();
-	void setPhysicsSim(bool enable);
-	void setCollision(bool enable);
-	bool hasPhysicsSim();
+// 	bool initGeomObj(const char* geomType, SrVec size, const char* color, const char* meshName = NULL);
+// 	void initPhysicsObj();
+// 	void removePhysicsObj();
+// 	void setPhysicsSim(bool enable);
+// 	void setCollision(bool enable);
+// 	bool hasPhysicsSim();
 
 	void setHeight( float height )	{ _height = height; }
 	float getHeight( void ) 		{ return _height; }

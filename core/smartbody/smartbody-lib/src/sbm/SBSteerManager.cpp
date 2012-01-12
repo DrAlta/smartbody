@@ -223,7 +223,7 @@ void SBSteerManager::start()
 			iter != mcu.getPawnMap().end();
 			iter++)
 		{
-			if ((*iter).second->colObj_p)
+			if ((*iter).second->getGeomObject())
 				(*iter).second->initSteeringSpaceObject();
 		}
 	}

@@ -719,11 +719,12 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 			{
 				DOMNode* node1 = meshNode->getChildNodes()->item(c1);
 				std::string nodeName1 = getString(node1->getNodeName());
+				
 				if (nodeName1 == "source")
 				{
 					DOMNamedNodeMap* sourceAttr = node1->getAttributes();
 					DOMNode* idNode = sourceAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
-					std::string idString = getString(idNode->getNodeValue());
+					std::string idString = getString(idNode->getNodeValue());					
 					size_t pos = idString.find_last_of("-");
 					std::string tempString = idString.substr(pos + 1);
 					idString = tempString;

@@ -105,7 +105,7 @@ public:
 	int	_numSteeringGoal;
 	bool _reachTarget;
 	bool _lastReachStatus;
-	SbmPhysicsCharacter* phyChar;
+	//SbmPhysicsCharacter* phyChar;
 
 	enum LocomotionType {Basic, Example, Procedural};
 	enum SteeringStateConfig { MINIMAL = 0, STANDARD};
@@ -368,11 +368,11 @@ public:
 	int   getCurrentReachType() { return currentReachType; }
 	void   setCurrentReachType(int type) { currentReachType = type; }
 
-	SbmPhysicsCharacter* getPhysicsCharacter() { return phyChar; }
-	void buildJointPhyObjs();
-	void setJointCollider(std::string jointName, float size);
-	void updateJointPhyObjs(bool phySim = false);
-	void setJointPhyCollision(bool useCollision);
+	//SbmPhysicsCharacter* getPhysicsCharacter() { return phyChar; }
+	//void buildJointPhyObjs();
+	//void updateJointPhyObjs(bool phySim = false);
+	//void setJointCollider(std::string jointName, float size);	
+	//void setJointPhyCollision(bool useCollision);
 	//void setJointCollider(std::string jointName, float len, float radius);
 		
 	// viseme curve related functions

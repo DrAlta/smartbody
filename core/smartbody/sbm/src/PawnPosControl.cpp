@@ -61,7 +61,7 @@ void PawnControl::set_pawn_pos(SbmPawn* pawn, SrVec& pos)
 	//printf("h = %f, p = %f, r = %f\n",h,p,r);
 	
 	pawn->set_world_offset(pos.x,pos.y,pos.z,h,p,r);
-	pawn->updateToColObject();
+	pawn->updateToColObject();	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
 	mcu.resourceDataChanged = true;
 }

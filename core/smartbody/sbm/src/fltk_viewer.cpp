@@ -881,7 +881,7 @@ void FltkViewer::initShadowMap()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, depth_size, depth_size, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, depth_size, depth_size, 0, GL_RGBA, GL_FLOAT, NULL);	
 	glBindTexture(GL_TEXTURE_2D,0);
 
 
@@ -2846,12 +2846,13 @@ void FltkViewer::drawCharacterPhysicsObjs()
 {
 	float pawnSize = 1.0;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmPhysicsSim* phyEngine = SbmPhysicsSim::getPhysicsEngine();
 	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
 		iter != mcu.getCharacterMap().end();
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		SbmPhysicsCharacter* phyChar = character->getPhysicsCharacter();				
+		SbmPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(character->getName());//character->getPhysicsCharacter();				
 		if (!phyChar) continue;
 		std::map<std::string,SbmJointObj*>& jointPhyObjs = phyChar->getJointObjMap();
 		std::map<std::string,SbmJointObj*>::iterator mi;
@@ -2974,13 +2975,13 @@ void FltkViewer::drawPawns()
 		if (character)
 			continue;
 
-		SrMat gmat = pawn->get_world_offset();
-		
-		if (pawn->colObj_p && dynamic_cast<SbmGeomNullObject*>(pawn->colObj_p) == NULL)
+		SrMat gmat = pawn->get_world_offset();//pawn->get_world_offset_joint()->gmat();		
+		if (pawn->getGeomObject() && dynamic_cast<SbmGeomNullObject*>(pawn->getGeomObject()) == NULL)
 		{
 			//pawn->colObj_p->updateTransform(gmat);
 			//gmat = pawn->colObj_p->worldState.gmat();
-			drawColObject(pawn->colObj_p,gmat);
+			SrMat gmatPhy = pawn->getPhysicsObject()->getGlobalTransform().gmat();
+			drawColObject(pawn->getGeomObject(),gmat);
 		}
 		else
 		{

@@ -109,10 +109,10 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera& c
 			//pawnPosControl.hitOPS(cam);
 			active_control->hitTest(cam);
 		}
-		else if (pawn->phyObj_p)
+		else if (pawn->getPhysicsObject())
 		{
-			SrMat gmat = pawn->phyObj_p->getGlobalTransform().gmat();
-			FltkViewer::drawColObject(pawn->colObj_p, gmat);
+			SrMat gmat = pawn->getPhysicsObject()->getGlobalTransform().gmat();
+			FltkViewer::drawColObject(pawn->getGeomObject(), gmat);
 		}
 		else
 		{

@@ -96,7 +96,7 @@ bool SbmPhysicsSim::hasPhysicsCharacter( SbmPhysicsCharacter* phyChar )
 }
 
 
-SbmPhysicsObj* SbmPhysicsSim::getPhysicsPawn( std::string& pawnName )
+SbmPhysicsObj* SbmPhysicsSim::getPhysicsPawn( const std::string& pawnName )
 {
 	SbmPhysicsPawnMap::iterator iter = pawnObjMap.find(pawnName);
 	if (iter == pawnObjMap.end())
@@ -105,7 +105,7 @@ SbmPhysicsObj* SbmPhysicsSim::getPhysicsPawn( std::string& pawnName )
 		return (*iter).second;
 }
 
-SbmPhysicsCharacter* SbmPhysicsSim::getPhysicsCharacter( std::string& charName )
+SbmPhysicsCharacter* SbmPhysicsSim::getPhysicsCharacter( const std::string& charName )
 {
 	SbmPhysicsCharacterMap::iterator iter = characterMap.find(charName);
 	if (iter == characterMap.end())
@@ -219,9 +219,14 @@ SbmPhysicsObj::SbmPhysicsObj()
 	geomTypes.push_back("capsule");	
 	geomTypeAttr->setValidValues(geomTypes);
 	SBObject::createVec3Attribute("geomSize",1.f,1.f,1.f,true, "Geom", 20, false, false, false, "?");
-
-
 }
+
+SbmPhysicsObj::~SbmPhysicsObj()
+{
+	if (colObj)
+		delete colObj;
+}
+
 
 void SbmPhysicsObj::setGeometry( SbmGeomObject* obj)
 {
@@ -282,6 +287,7 @@ void SbmPhysicsObj::notify( SBSubject* subject )
 
 void SbmPhysicsObj::changeGeometry( std::string& geomType, SrVec extends )
 {
+	initGeom = false;
 	SbmTransform localTran;	
 	if (colObj)
 	{
@@ -289,12 +295,16 @@ void SbmPhysicsObj::changeGeometry( std::string& geomType, SrVec extends )
 		delete colObj;
 	}
 	colObj = SbmGeomObject::createGeometry(geomType,extends);
-	colObj->setLocalTransform(localTran);
+	//colObj->setLocalTransform(localTran);
 	colObj->attachToPhyObj(this);
-
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	phySim->updatePhyObjGeometry(this);
+
+	setStringAttribute("geomType",colObj->geomType());
+	SrVec geomSize = colObj->getGeomSize();
+	setVec3Attribute("geomSize",geomSize[0],geomSize[1],geomSize[2]);
+	initGeom = true;
 }
 
 float SbmPhysicsObj::getMass()
@@ -611,7 +621,7 @@ void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vect
 		{
 			SbmGeomObject* jointGeom = createJointGeometry(joint);
 			jointObj->setGeometry(jointGeom);
-			jointGeometryMap[jointNameList[i]] = jointGeom;
+			//jointGeometryMap[jointNameList[i]] = jointGeom;
 		}
 		jointObj->initJoint(phyJoint);
 		jointObjMap[jointNameList[i]] = jointObj;	
