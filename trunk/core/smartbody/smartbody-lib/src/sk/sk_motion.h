@@ -138,7 +138,10 @@ public :
 
 	/*! Returns the keytime of frame f. It is the user
 	responsibility to ensure that 0<=f and f<frames() */
-	float keytime ( int f ) const { return _frames[f].keytime; }
+	const float& keytime ( int f ) const { return _frames[f].keytime; }
+
+	/* Sets the keytime of a particular frame */
+	void keytime ( int f, float time ) { if ((int) _frames.size() > f && f >= 0) _frames[f].keytime = time; }
 
 	/*! Returns the keytime of the last frame */
 	float last_keytime () const { return _frames[frames()-1].keytime; }

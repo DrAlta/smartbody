@@ -294,4 +294,126 @@ std::vector<float> SBMotion::getJointTransition(SBJoint* joint, float startTime,
 	return transitions;
 }
 
+
+bool SBMotion::translate(float x, float y, float z, const std::string& baseJointName)
+{
+	SrVec offset(x, y, z);
+	// get the base x, y, z
+	SkChannelArray& ch = channels();
+	int pos[3];
+	pos[0] = ch.search(baseJointName, SkChannel::XPos);
+	pos[1] = ch.search(baseJointName, SkChannel::YPos);
+	pos[2] = ch.search(baseJointName, SkChannel::ZPos);
+	if (pos[0] == -1 || pos[1] == -1 || pos[2] == -1)
+	{
+		LOG("No joint named '%s' found in motion %s, cannot translate.", baseJointName.c_str(), getName().c_str());
+		return false;
+	}
+
+	int numFrames = frames();
+	for (int f = 0; f < numFrames; f++)
+	{
+		float* curFrame = posture(f);
+		for (int p = 0; p < 3; p++)
+		{
+			curFrame[pos[p]] = curFrame[pos[p]] + offset[p];
+		}
+
+	}
+
+	LOG("Motion %s with %d frames offset by (%f, %f, %f)", getName().c_str(), frames(), offset[0], offset[1], offset[2]);
+	return true;
+}
+
+bool SBMotion::rotate(float xaxis, float yaxis, float zaxis, const std::string& baseJointName)
+{
+	SrVec rotation;
+	rotation[0] = xaxis;
+	rotation[1] = yaxis;
+	rotation[2] = zaxis;
+
+	// get the base quaternion
+	SkChannelArray& ch = channels();
+	int pos = -1;
+	pos = ch.search(baseJointName.c_str(), SkChannel::Quat);
+	if (pos == -1)
+	{
+		LOG("No joint named '%s' found in motion %s, cannot rotate.", baseJointName.c_str(), getName().c_str());
+		return false;
+	}
+
+	SrMat xRot;
+	xRot.rotx(rotation[0] * (float) M_PI / 180.0f);
+	SrMat yRot;
+	yRot.roty(rotation[1] * (float) M_PI / 180.0f);
+	SrMat zRot;
+	zRot.rotz(rotation[2] * (float) M_PI / 180.0f);
+	SrMat finalMat = xRot * yRot * zRot;
+
+	int numFrames = frames();
+	for (int f = 0; f < numFrames; f++)
+	{
+		float* curFrame = posture(f);
+		SrQuat curQuat(curFrame[pos], curFrame[pos + 1], curFrame[pos + 2], curFrame[pos + 3]); 
+		SrMat currentMat;
+		curQuat.get_mat(currentMat);
+		currentMat *= finalMat;
+		SrQuat newQuat(currentMat);
+		curFrame[pos + 0] = newQuat.w;
+		curFrame[pos + 1] = newQuat.x;
+		curFrame[pos + 2] = newQuat.y;
+		curFrame[pos + 3] = newQuat.z;
+	}
+
+	LOG("Motion %s with %d frames rotated by (%f, %f, %f)", getName().c_str(), frames(), rotation[0], rotation[1], rotation[2]);
+	return true;
+}
+
+bool SBMotion::scale(float factor)
+{
+	SkChannelArray& ch = channels();
+	int numFrames = frames();
+	for (int f = 0; f < numFrames; f++)
+	{
+		float* p = posture(f);
+		int index = 0;
+		for (int c = 0; c < ch.size(); c++)
+		{
+			SkChannel& channel = ch[c];
+			// only scale the positions
+			if (channel.type == SkChannel::XPos ||
+				channel.type == SkChannel::YPos ||
+				channel.type == SkChannel::ZPos)
+			{
+				p[index] *= factor;
+			}
+			index += channel.size();
+		}
+	}
+	LOG("Motion %s with %d frames scaled by a factor of %f", getName().c_str(), frames(), factor);
+	return true;
+}
+
+bool SBMotion::retime(float factor)
+{
+	for (int f = 0; f < frames(); f++)
+	{
+		keytime(f, keytime(f) * factor);
+	}
+
+	LOG("Motion %s with %d frames retimed by a factor of %f", getName().c_str(), frames(), factor);
+	return true;
+}
+
+/*
+bool SBMotion::trim(int numFramesFromFront, int numFramesFromBack)
+{
+	return true;
+}
+
+bool SBMotion::move(int startFrame, int endFrame, int position)
+{
+	return true;
+}
+*/
 };

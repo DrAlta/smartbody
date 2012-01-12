@@ -685,6 +685,10 @@ boost::python::class_<SBAttribute>("SBAttribute")
 		.def("getJointSpeed", &SBMotion::getJointSpeed, "Get the accumulative joint speed. \n Input: SBJoint, start time, end time \n Output: joint speed(unit: same with the skeleton)")
 		.def("getJointAngularSpeed", &SBMotion::getJointAngularSpeed, "Get the joint accumulative angular speed. \n Input: SBJoint, start time, end time \n Output: joint angular speed(unit: degree/sec)")		
 		.def("getJointTransition", &SBMotion::getJointTransition, "Get the joint transition vector. \n Input: SBJoint, start time, end time \n Output: joint transition vector containing x, y, z value (unit: same with the skeleton)")		
+		.def("translate", &SBMotion::translate, "Translates the base joint name by x,y,z values.")		
+		.def("rotate", &SBMotion::rotate, "Rotates the base joint name by x,y,z axis.")			
+		.def("scale", &SBMotion::scale, "Scales all translations in skeleton by scale factor.")		
+		.def("retime", &SBMotion::retime, "Retimes the motion by a factor (2 = twice as long, .5 = twice as fast.")		
 		;
 
 
