@@ -24,7 +24,6 @@
 
 CorrespondenceMark::CorrespondenceMark()
 {
-	_attached = NULL;
 	setBoundToBlock(false);
 }
 
@@ -35,10 +34,10 @@ CorrespondenceMark::~CorrespondenceMark()
 
 void CorrespondenceMark::attach(CorrespondenceMark* mark)
 {
-	_attached = mark;
+	_attached.push_back(mark);
 }
 
-CorrespondenceMark* CorrespondenceMark::getAttachedMark()
+std::vector<CorrespondenceMark*>& CorrespondenceMark::getAttachedMark()
 {
 	return _attached;
 }

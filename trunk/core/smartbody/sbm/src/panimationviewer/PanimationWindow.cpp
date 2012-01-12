@@ -276,8 +276,9 @@ void PanimationWindow::removeTimeMark(nle::NonLinearEditorModel* model)
 				if (mark->isSelected())
 				{
 					CorrespondenceMark* cMark = dynamic_cast<CorrespondenceMark*>(mark);
-					attachedMark = cMark->getAttachedMark();
-					if (attachedMark)	attachedMark->attach(NULL);
+					cMark->getAttachedMark().clear();
+				//	attachedMark = cMark->getAttachedMark();
+				//	if (attachedMark)	attachedMark = NULL;//attachedMark->attach(NULL);
 					block->removeMark(mark);
 				}
 			}
