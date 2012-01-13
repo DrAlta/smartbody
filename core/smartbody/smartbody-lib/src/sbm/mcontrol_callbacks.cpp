@@ -5353,11 +5353,7 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	std::string mediaPath = mcuCBHandle::singleton().getMediaPath();
 
 	boost::filesystem::path path(directory);
-	if (!boost::filesystem::is_directory(path))
-	{
-		LOG("Path %s is not a directory, so motion mapping will not occur.", path.string().c_str());
-		return CMD_FAILURE;
-	}
+	
 	boost::filesystem::path finalPath;
 	// include the media path in the pathname if applicable
 	std::string rootDir = path.root_directory();
@@ -5369,8 +5365,12 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		finalPath = path;
 	}
-	LOG("MOTIONMAPDIR TO %s", finalPath.string().c_str());
 
+    if (!boost::filesystem::is_directory(finalPath))
+	{
+		LOG("Path %s is not a directory, so motion mapping will not occur.", finalPath.string().c_str());
+		return CMD_FAILURE;
+	}
 	SBScene* scene = mcu_p->_scene;
 
 	std::vector<std::string> motionNames = scene->getMotionNames();
@@ -5383,14 +5383,14 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		boost::filesystem::path motionPath(fileName);
 		std::string motionRootDir = motionPath.root_directory();
 		boost::filesystem::path finalMotionPath;
-		if (motionRootDir.size() == 0)
-		{
-			finalMotionPath = operator/(mediaPath, motionPath);
-		}
-		else
-		{
+//		if (motionRootDir.size() == 0)
+//		{
+//			finalMotionPath = operator/(mediaPath, motionPath);
+//		}
+//		else
+//		{
 			finalMotionPath = motionPath;
-		}
+//		}
 		boost::filesystem::path currentPath = finalMotionPath;
 		while (currentPath.has_parent_path())
 		{
