@@ -2707,7 +2707,7 @@
 				Name="parser"
 				>
 				<File
-					RelativePath="..\src\external\parser\Bchart.C"
+					RelativePath="..\src\external\parser\Bchart.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2731,7 +2731,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\BchartSm.C"
+					RelativePath="..\src\external\parser\BchartSm.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2751,7 +2751,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\Bst.C"
+					RelativePath="..\src\external\parser\Bst.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2775,7 +2775,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\ChartBase.C"
+					RelativePath="..\src\external\parser\ChartBase.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2799,7 +2799,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\ClassRule.C"
+					RelativePath="..\src\external\parser\ClassRule.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2823,7 +2823,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\CntxArray.C"
+					RelativePath="..\src\external\parser\CntxArray.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2847,7 +2847,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\CombineBests.C"
+					RelativePath="..\src\external\parser\CombineBests.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2871,7 +2871,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\ECArgs.C"
+					RelativePath="..\src\external\parser\ECArgs.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2899,7 +2899,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\Edge.C"
+					RelativePath="..\src\external\parser\Edge.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2923,7 +2923,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\EdgeHeap.C"
+					RelativePath="..\src\external\parser\EdgeHeap.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2947,7 +2947,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\edgeSubFns.C"
+					RelativePath="..\src\external\parser\edgeSubFns.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2971,7 +2971,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\EgsFromTree.C"
+					RelativePath="..\src\external\parser\EgsFromTree.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -2991,7 +2991,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\ewDciTokStrm.C"
+					RelativePath="..\src\external\parser\ewDciTokStrm.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3015,7 +3015,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\extraMain.C"
+					RelativePath="..\src\external\parser\extraMain.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3039,7 +3039,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\FBinaryArray.C"
+					RelativePath="..\src\external\parser\FBinaryArray.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3063,7 +3063,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\Feat.C"
+					RelativePath="..\src\external\parser\Feat.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3087,7 +3087,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\Feature.C"
+					RelativePath="..\src\external\parser\Feature.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3111,7 +3111,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\FeatureTree.C"
+					RelativePath="..\src\external\parser\FeatureTree.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3135,7 +3135,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\fhSubFns.C"
+					RelativePath="..\src\external\parser\fhSubFns.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3159,7 +3159,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\Field.C"
+					RelativePath="..\src\external\parser\Field.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3183,7 +3183,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\FullHist.C"
+					RelativePath="..\src\external\parser\FullHist.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3207,7 +3207,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\GotIter.C"
+					RelativePath="..\src\external\parser\GotIter.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3231,7 +3231,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\headFinder.C"
+					RelativePath="..\src\external\parser\headFinder.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3255,7 +3255,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\headFinderCh.C"
+					RelativePath="..\src\external\parser\headFinderCh.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3279,7 +3279,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\InputTree.C"
+					RelativePath="..\src\external\parser\InputTree.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3303,7 +3303,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\Item.C"
+					RelativePath="..\src\external\parser\Item.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3327,7 +3327,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\Link.C"
+					RelativePath="..\src\external\parser\Link.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3351,7 +3351,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\MeChart.C"
+					RelativePath="..\src\external\parser\MeChart.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3375,7 +3375,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\Params.C"
+					RelativePath="..\src\external\parser\Params.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3399,7 +3399,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\ParseStats.C"
+					RelativePath="..\src\external\parser\ParseStats.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3423,7 +3423,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\SentRep.C"
+					RelativePath="..\src\external\parser\SentRep.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3447,7 +3447,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\Term.C"
+					RelativePath="..\src\external\parser\Term.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3471,7 +3471,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\TimeIt.C"
+					RelativePath="..\src\external\parser\TimeIt.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3495,7 +3495,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\UnitRules.C"
+					RelativePath="..\src\external\parser\UnitRules.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3519,7 +3519,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\utils.C"
+					RelativePath="..\src\external\parser\utils.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -3543,7 +3543,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\external\parser\ValHeap.C"
+					RelativePath="..\src\external\parser\ValHeap.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
