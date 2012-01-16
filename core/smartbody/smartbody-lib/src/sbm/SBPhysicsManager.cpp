@@ -135,7 +135,8 @@ SmartBody::SBObject* SBPhysicsManager::getPhysicsPawn( std::string pawnName )
 
 SmartBody::SBObject* SBPhysicsManager::createPhysicsPawn( std::string pawnName, std::string geomType, SrVec geomSize )
 {
-	SmartBody::SBScene* scene = getScene();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SmartBody::SBScene* scene = mcu._scene;
 	SmartBody::SBPawn* pawn = scene->getPawn(pawnName);
 	if (!pawn) return NULL;
 	SbmPhysicsObj* phyObj = pawn->getPhysicsObject();//new SbmPhysicsObj();
@@ -153,7 +154,8 @@ SmartBody::SBObject* SBPhysicsManager::createPhysicsPawn( std::string pawnName, 
 
 SmartBody::SBObject* SBPhysicsManager::createPhysicsCharacter( std::string charName)
 {
-	SmartBody::SBScene* scene = getScene();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SmartBody::SBScene* scene = mcu._scene;
 	SmartBody::SBCharacter* sbmChar = scene->getCharacter(charName);
 	if (!sbmChar) return NULL; // no character with the name
 	SbmPhysicsCharacter* phyChar = NULL;
@@ -203,9 +205,11 @@ SmartBody::SBObject* SBPhysicsManager::createPhysicsCharacter( std::string charN
 
 void SBPhysicsManager::updatePhysicsPawn( std::string pawnName )
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SmartBody::SBScene* scene = mcu._scene;
 	SbmPhysicsSim* phyEngine = getPhysicsEngine();
 	SbmPhysicsObj* phyObj = phyEngine->getPhysicsPawn(pawnName);
-	SBPawn* pawn = getScene()->getPawn(pawnName);
+	SBPawn* pawn = scene->getPawn(pawnName);
 	if (!phyObj || !pawn) return;
 
 	bool pawnPhySim = (phyEngine->getBoolAttribute("enable") && phyObj->getBoolAttribute("enable"));

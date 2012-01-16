@@ -682,7 +682,7 @@ int SbmPawn::parse_pawn_command( std::string cmd, srArgBuffer& args, mcuCBHandle
 		if (has_geom)
 		{				
 			//initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
-			SBPhysicsManager* phyManager = getScene()->getPhysicsManager();
+			SBPhysicsManager* phyManager = mcu_p->_scene->getPhysicsManager();
 			phyManager->createPhysicsPawn(getName(),geom_str,size);
 			// init steering space
 			if (!setRec)
@@ -844,7 +844,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 					size[i] = uniformSize;
 			}			
 			//pawn_p->initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
-			SBPhysicsManager* phyManager = getScene()->getPhysicsManager();
+			SBPhysicsManager* phyManager = mcu_p->_scene->getPhysicsManager();
 			phyManager->createPhysicsPawn(pawn_p->getName(),geom_str,size);
 		}
 		if (pawn_p->getGeomObject())

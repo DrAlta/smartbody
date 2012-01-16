@@ -91,7 +91,47 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/external/ANN/ANN.cpp \
 	$(SBM_MY_DIR)/external/ANN/kd_split.cpp \
 	$(SBM_MY_DIR)/external/ANN/kd_tree.cpp \
 	$(SBM_MY_DIR)/external/ANN/kd_util.cpp \
-	$(SBM_MY_DIR)/external/ANN/perf.cpp
+	$(SBM_MY_DIR)/external/ANN/perf.cpp \
+	$(SBM_MY_DIR)/external/parser/Bchart.cpp \
+	$(SBM_MY_DIR)/external/parser/BchartSm.cpp \
+	$(SBM_MY_DIR)/external/parser/Bst.cpp \
+	$(SBM_MY_DIR)/external/parser/ChartBase.cpp \
+	$(SBM_MY_DIR)/external/parser/ClassRule.cpp \
+	$(SBM_MY_DIR)/external/parser/CntxArray.cpp \
+	$(SBM_MY_DIR)/external/parser/CombineBests.cpp \
+	$(SBM_MY_DIR)/external/parser/ECArgs.cpp \
+	$(SBM_MY_DIR)/external/parser/Edge.cpp \
+	$(SBM_MY_DIR)/external/parser/EdgeHeap.cpp \
+	$(SBM_MY_DIR)/external/parser/extraMain.cpp \
+	$(SBM_MY_DIR)/external/parser/edgeSubFns.cpp \
+	$(SBM_MY_DIR)/external/parser/EgsFromTree.cpp \
+	$(SBM_MY_DIR)/external/parser/ewDciTokStrm.cpp \
+	$(SBM_MY_DIR)/external/parser/FBinaryArray.cpp \
+	$(SBM_MY_DIR)/external/parser/Feat.cpp \
+	$(SBM_MY_DIR)/external/parser/Feature.cpp \
+	$(SBM_MY_DIR)/external/parser/FeatureTree.cpp \
+	$(SBM_MY_DIR)/external/parser/fhSubFns.cpp \
+	$(SBM_MY_DIR)/external/parser/Field.cpp \
+	$(SBM_MY_DIR)/external/parser/FullHist.cpp \
+	$(SBM_MY_DIR)/external/parser/GotIter.cpp \
+	$(SBM_MY_DIR)/external/parser/headFinder.cpp \
+	$(SBM_MY_DIR)/external/parser/headFinderCh.cpp \
+	$(SBM_MY_DIR)/external/parser/InputTree.cpp \
+	$(SBM_MY_DIR)/external/parser/Item.cpp \
+	$(SBM_MY_DIR)/external/parser/Link.cpp \
+	$(SBM_MY_DIR)/external/parser/MeChart.cpp \
+	$(SBM_MY_DIR)/external/parser/Params.cpp \
+	$(SBM_MY_DIR)/external/parser/ParseStats.cpp \
+	$(SBM_MY_DIR)/external/parser/SentRep.cpp \
+	$(SBM_MY_DIR)/external/parser/Term.cpp \
+	$(SBM_MY_DIR)/external/parser/TimeIt.cpp \
+	$(SBM_MY_DIR)/external/parser/UnitRules.cpp \
+	$(SBM_MY_DIR)/external/parser/utils.cpp \
+	$(SBM_MY_DIR)/external/parser/ValHeap.cpp \
+	$(SBM_MY_DIR)/external/parser/SentRep.cpp 
+	
+	
+	
 include $(BUILD_STATIC_LIBRARY)
 
 include $(SBM_LOCAL_PATH)/../../ode/jni/Android.mk
@@ -114,6 +154,7 @@ LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/../../vhmsg/vhmsg_src \
 					$(SBM_LOCAL_PATH)/../../../lib/wsp/wsp/include \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/external/ \
+					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/external/parser/ \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/steerlib/include \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/pprAI/include \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/ode/include	
@@ -360,12 +401,19 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/SBMotion.cpp \
 	$(SBM_MY_DIR)/sbm/SBScript.cpp	\
 	$(SBM_MY_DIR)/sbm/SBFaceDefinition.cpp \
+	$(SBM_MY_DIR)/sbm/SBScene.cpp \
+	$(SBM_MY_DIR)/sbm/SBSteerManager.cpp \
+	$(SBM_MY_DIR)/sbm/SBPhysicsManager.cpp \
+	$(SBM_MY_DIR)/sbm/SBParser.cpp \
+	$(SBM_MY_DIR)/sbm/SBParseNode.cpp \
 	$(SBM_MY_DIR)/sbm/nvbg.cpp \
 	$(SBM_MY_DIR)/sbm/MiniBrain.cpp \
 	$(SBM_MY_DIR)/sbm/SBBehavior.cpp \
 	$(SBM_MY_DIR)/sbm/ParserBVH.cpp \
 	$(SBM_MY_DIR)/sbm/ParserASFAMC.cpp \
 	$(SBM_MY_DIR)/sbm/action_unit.cpp
+	
+	
 
 LOCAL_LDLIBS    := -llog 	  
 LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
