@@ -145,6 +145,8 @@ class SteeringAgent
 		std::string idleTurnName;
 		std::string jumpName;
 
+		bool fastInitial;	// whether to use the transition animation
+
 		protected:
 		std::string lastMessage;
 		int numMessageRepeats;

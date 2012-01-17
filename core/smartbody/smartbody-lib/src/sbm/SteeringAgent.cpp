@@ -54,6 +54,8 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 
 	inControl = true;
 
+	fastInitial = false;
+
 	lastMessage = "";
 	numMessageRepeats = 0;
 
@@ -1232,82 +1234,115 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	//---start locomotion
 	if (character->param_animation_ct->isIdle() && numGoals != 0 && nextStateName == "" && distToTarget > distDownThreshold)
 	{
-//		if (character->steeringConfig == character->STANDARD)
+		// check to see if there's anything obstacles around it
+		float targetAngle = radToDeg(atan2(pprAgent->getStartTargetPosition().x - x * mcu.steeringScale, pprAgent->getStartTargetPosition().z - z * mcu.steeringScale));
+		normalizeAngle(targetAngle);
+		normalizeAngle(yaw);
+		float diff = targetAngle - yaw;
+		normalizeAngle(diff);
+
+		// Improve on the starting angle by examining whether there's obstacles around
+		std::map<std::string, SbmPawn*>& cMap = mcu.getPawnMap();			
+		std::map<std::string, SbmPawn*>::iterator iter = cMap.begin();
+		std::vector<float> neigbors;
+		for (; iter != cMap.end(); iter++)
 		{
-			float targetAngle = radToDeg(atan2(pprAgent->getStartTargetPosition().x - x * mcu.steeringScale, pprAgent->getStartTargetPosition().z - z * mcu.steeringScale));
-			normalizeAngle(targetAngle);
-			float diff = targetAngle - yaw;
-			normalizeAngle(diff);
-/*			
-			float angleGlobal = radToDeg(atan2(forward.x, forward.z));
-			normalizeAngle(angleGlobal);
-			normalizeAngle(yaw);
-			float diff = angleGlobal - yaw;
-			normalizeAngle(diff);
-*/
-			double w;
-			if (diff > 0)
+			if (iter->second->getName() != character->getName())
 			{
-				if (diff > 90)
+				float cX, cY, cZ, cYaw, cRoll, cPitch;
+				iter->second->get_world_offset(cX, cY, cZ, cYaw, cPitch, cRoll);
+				float cDist = sqrt((x - cX) * (x - cX) + (z - cZ) * (z - cZ));
+				if (cDist < (1.5f / mcu.steeringScale))
 				{
-					w = (diff - 90) / 90;
-					std::stringstream command;
-					command << "panim schedule char " << character->getName();			
-					command << " state " << startingLName << " loop false playnow false " << " 0 " << 1 - w << " " << w;
-					mcu.execute((char*) command.str().c_str());
-				}
-				else
-				{
-					w = diff / 90;
-					std::stringstream command;
-					command << "panim schedule char " << character->getName();					
-					command << " state " << startingLName << " loop false playnow false " << 1 - w << " " << w << " " << " 0 ";
-					mcu.execute((char*) command.str().c_str());
+					float cAngle = radToDeg(atan2(pprAgent->getStartTargetPosition().x - x, pprAgent->getStartTargetPosition().z - z));
+					normalizeAngle(cAngle);
+					float cDiff = cAngle - yaw;
+					normalizeAngle(cDiff);
+					if (diff * cDiff > 0)
+						neigbors.push_back(cAngle);
 				}
 			}
-			else
-			{
-				if (diff < -90)
-				{
-					w = (diff + 180) / 90;
-					std::stringstream command;
-					command << "panim schedule char " << character->getName();
-					command << " state " << startingRName << " loop false playnow false " << " 0 " << w << " " << 1 - w;
-					mcu.execute((char*) command.str().c_str());
-				}
-				else
-				{
-					w = -diff / 90;
-					std::stringstream command;
-					command << "panim schedule char " << character->getName();
-					command << " state " << startingRName << " loop false playnow true " << 1 - w << " " << w << " 0 ";
-					mcu.execute((char*) command.str().c_str());
-				}				
-			}
-			PAStateData* locoState = mcu.lookUpPAState(locomotionName.c_str());
-			for (int i = 0; i < locoState->getNumMotions(); i++)
-			{
-				if (i == 0)
-					locoState->weights[i] = 1.0;
-				else
-					locoState->weights[i] = 0.0;
-			}
-			std::stringstream command1;
-			command1 << "panim schedule char " << character->getName();
-			command1 << " state " << locomotionName << " loop true playnow false";
-			mcu.execute((char*) command1.str().c_str());
 		}
-/*
-		if (character->steeringConfig == character->MINIMAL)
+		if (neigbors.size() > 0)
+			fastInitial = true;
+		else
+			fastInitial = false;
+		if (!fastInitial)
 		{
-			PAStateData* locoState = mcu.lookUpPAState(locomotionName.c_str());
-			locoState->paramManager->setWeight(0, 0, 0);
-			std::stringstream command;
-			command << "panim schedule char " << character->getName();
-			command << " state " << locomotionName << " loop true playnow true";
-			mcu.execute((char*) command.str().c_str());
+	//		if (character->steeringConfig == character->STANDARD)
+			{
+	/*			
+				float angleGlobal = radToDeg(atan2(forward.x, forward.z));
+				normalizeAngle(angleGlobal);
+				normalizeAngle(yaw);
+				float diff = angleGlobal - yaw;
+				normalizeAngle(diff);
+	*/
+				double w;
+				if (diff > 0)
+				{
+					if (diff > 90)
+					{
+						w = (diff - 90) / 90;
+						std::stringstream command;
+						command << "panim schedule char " << character->getName();			
+						command << " state " << startingLName << " loop false playnow false " << " 0 " << 1 - w << " " << w;
+						mcu.execute((char*) command.str().c_str());
+					}
+					else
+					{
+						w = diff / 90;
+						std::stringstream command;
+						command << "panim schedule char " << character->getName();					
+						command << " state " << startingLName << " loop false playnow false " << 1 - w << " " << w << " " << " 0 ";
+						mcu.execute((char*) command.str().c_str());
+					}
+				}
+				else
+				{
+					if (diff < -90)
+					{
+						w = (diff + 180) / 90;
+						std::stringstream command;
+						command << "panim schedule char " << character->getName();
+						command << " state " << startingRName << " loop false playnow false " << " 0 " << w << " " << 1 - w;
+						mcu.execute((char*) command.str().c_str());
+					}
+					else
+					{
+						w = -diff / 90;
+						std::stringstream command;
+						command << "panim schedule char " << character->getName();
+						command << " state " << startingRName << " loop false playnow true " << 1 - w << " " << w << " 0 ";
+						mcu.execute((char*) command.str().c_str());
+					}				
+				}
+				PAStateData* locoState = mcu.lookUpPAState(locomotionName.c_str());
+				for (int i = 0; i < locoState->getNumMotions(); i++)
+				{
+					if (i == 0)
+						locoState->weights[i] = 1.0;
+					else
+						locoState->weights[i] = 0.0;
+				}
+				std::stringstream command1;
+				command1 << "panim schedule char " << character->getName();
+				command1 << " state " << locomotionName << " loop true playnow false";
+				mcu.execute((char*) command1.str().c_str());
+			}
 		}
-*/
+		else
+		{
+	//		if (character->steeringConfig == character->MINIMAL)
+			{
+				PAStateData* locoState = mcu.lookUpPAState(locomotionName.c_str());
+				locoState->paramManager->setWeight(0, 0, 0);
+				std::stringstream command;
+				command << "panim schedule char " << character->getName();
+				command << " state " << locomotionName << " loop true playnow true";
+				mcu.execute((char*) command.str().c_str());
+			}
+		}
 		return 0;
 	}	
 

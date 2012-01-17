@@ -5606,6 +5606,20 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				return CMD_SUCCESS;
 			}
 		}
+		else if (command == "fastinitial")
+		{
+			std::string characterName = args.read_token();
+			SbmCharacter* character = mcu_p->getCharacter(characterName);
+			if (character)
+			{
+				std::string fastinitialString = args.read_token();
+				if (fastinitialString == "true")
+					character->steeringAgent->fastInitial = true;
+				else
+					character->steeringAgent->fastInitial = false;
+				return CMD_SUCCESS;
+			}
+		}
 		else if (command == "speed")
 		{
 			std::string characterName = args.read_token();
