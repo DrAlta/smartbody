@@ -251,11 +251,32 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				{
 					DOMNode* infoNode = infoList->item(j);
 					std::string infoNodeName = getString(infoNode->getNodeName());
+					if (infoNodeName == "matrix")
+					{
+						std::string matrixString = getString(infoNode->getTextContent());
+						std::vector<std::string> tokens;
+						vhcl::Tokenize(matrixString, tokens, " \n");
+						SrMat matrix;
+						for (int m = 0; m < 16; m++)
+							matrix[m] = (float)atof(tokens[m].c_str());
+						matrix.transpose();
+						offset.x = matrix[12];
+						offset.y = matrix[13];
+						offset.z = matrix[14];
+						SrQuat quat(matrix);
+						SrVec euler = quat.getEuler();
+						rotx = euler[0];
+						roty = euler[1];
+						rotz = euler[2];
+						orderVec.push_back("X");
+						orderVec.push_back("Y");
+						orderVec.push_back("Z");
+					}
 					if (infoNodeName == "translate")
 					{
 						std::string offsetString = getString(infoNode->getTextContent());
 						std::vector<std::string> tokens;
-						vhcl::Tokenize(offsetString, tokens, " ");
+						vhcl::Tokenize(offsetString, tokens, " \n");
 						offset.x = (float)atof(tokens[0].c_str()) * scale;
 						offset.y = (float)atof(tokens[1].c_str()) * scale;
 						offset.z = (float)atof(tokens[2].c_str()) * scale;
@@ -271,7 +292,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 						{
 							std::string jointOrientationString = getString(infoNode->getTextContent());
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(jointOrientationString, tokens, " ");
+							vhcl::Tokenize(jointOrientationString, tokens, " \n");
 							float finalValue;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
@@ -285,7 +306,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 						{
 							std::string rotationString = getString(infoNode->getTextContent());
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(rotationString, tokens, " ");
+							vhcl::Tokenize(rotationString, tokens, " \n");
 							float finalValue;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
@@ -420,7 +441,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 							int counter = atoi(getString(arrayCountNode->getNodeValue()).c_str());
 							std::string arrayString = getString(node3->getTextContent());
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(arrayString, tokens, " ");
+							vhcl::Tokenize(arrayString, tokens, " \n");
 						
 							if (op == "input")
 							{
@@ -742,7 +763,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 						count /= 2;
 					std::string floatString = getString(floatNode->getTextContent());
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(floatString, tokens, " ");
+					vhcl::Tokenize(floatString, tokens, " \n");
 					int index = 0;
 					for (int i = 0; i < count; i++)
 					{
@@ -835,7 +856,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 						{
 							std::string vcountString = getString(inputNode->getTextContent());
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(vcountString, tokens, " ");
+							vhcl::Tokenize(vcountString, tokens, " \n");
 							for (int i = 0; i < count; i++)
 								vcountList.push_back(atoi(tokens[i].c_str()));
 						}
@@ -852,7 +873,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 					DOMNode* pNode = ParserOpenCOLLADA::getNode("p", node1);
 					std::string pString = getString(pNode->getTextContent());
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(pString, tokens, " ");
+					vhcl::Tokenize(pString, tokens, " \n");
 					int index = 0;
 					pStride += 1;
 					for (int i = 0; i < count; i++)
@@ -1050,7 +1071,7 @@ void ParserOpenCOLLADA::parseLibraryEffects(DOMNode* node, std::map<std::string,
 				DOMNode* colorNode = ParserOpenCOLLADA::getNode("color", emissionNode);
 				std::string color = getString(colorNode->getTextContent());
 				std::vector<std::string> tokens;
-				vhcl::Tokenize(color, tokens, " ");
+				vhcl::Tokenize(color, tokens, " \n");
 				float w = 1;
 				if (tokens.size() == 4)
 					w = (float)atof(tokens[3].c_str());
@@ -1063,7 +1084,7 @@ void ParserOpenCOLLADA::parseLibraryEffects(DOMNode* node, std::map<std::string,
 				DOMNode* colorNode = ParserOpenCOLLADA::getNode("color", ambientNode);
 				std::string color = getString(colorNode->getTextContent());
 				std::vector<std::string> tokens;
-				vhcl::Tokenize(color, tokens, " ");
+				vhcl::Tokenize(color, tokens, " \n");
 				float w = 1;
 				if (tokens.size() == 4)
 					w = (float)atof(tokens[3].c_str());
