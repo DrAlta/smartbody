@@ -261,7 +261,7 @@ SrVec SrQuat::axisAngle() const
 
 SrVec SrQuat::getEuler() const
 {
-	return axisAngle();
+	//return axisAngle();
 
 	// Y, X, Z order
 	SrVec euler;

@@ -295,7 +295,7 @@ void SbmPhysicsObj::changeGeometry( std::string& geomType, SrVec extends )
 		delete colObj;
 	}
 	colObj = SbmGeomObject::createGeometry(geomType,extends);
-	//colObj->setLocalTransform(localTran);
+	colObj->setLocalTransform(localTran);
 	colObj->attachToPhyObj(this);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
@@ -437,8 +437,8 @@ void SbmJointObj::initJoint( SbmPhysicsJoint* phyj )
 	if (!phyJoint->getAttribute("axis2"))
 		phyJoint->createVec3Attribute("axis2",0,0,1,true,"Basic",44,false,false,false,"rotation axis 2");
 	
-	SrVec defaultHigh = SrVec(1.9f,1.9f,0.1f);
-	SrVec defaultLow  = SrVec(-1.9f,-1.9f,-0.1f);
+	SrVec defaultHigh = SrVec(1.9f,1.9f,1.9f);
+	SrVec defaultLow  = SrVec(-1.9f,-1.9f,-1.9f);
 	std::string jname = joint->getName();
 	if (jname.find("sternoclavicular") != std::string::npos || jname.find("acromioclavicular") != std::string::npos || jname.find("forefoot") != std::string::npos)
 	{
@@ -450,11 +450,11 @@ void SbmJointObj::initJoint( SbmPhysicsJoint* phyj )
 	}
 	else if (jname.find("shoulder") != std::string::npos)
 	{
-		defaultHigh = SrVec(1.4f,1.4f,0.9f); defaultLow = SrVec(-1.4f,-1.4f,-0.9f);
+		defaultHigh = SrVec(2.9f,2.9f,2.5f); defaultLow = SrVec(-1.9f,-2.9f,-2.5f);
 	}
 	else if (jname.find("elbow") != std::string::npos)
 	{
-		defaultHigh = SrVec(0.2f,1.4f,0.2f); defaultLow = SrVec(-0.2f,-0.1f,-0.2f);
+		defaultHigh = SrVec(0.2f,1.9f,0.2f); defaultLow = SrVec(-0.2f,-0.0f,-0.2f);
 	}
 	else if (jname.find("forearm") != std::string::npos)
 	{
@@ -685,8 +685,10 @@ SbmGeomObject* SbmPhysicsCharacter::createJointGeometry( SBJoint* joint, float r
 	SbmCharacter* curCharacter = mcuCBHandle::singleton().getCharacter(characterName);
 	if (radius < 0.0)
 		radius = curCharacter->getHeight()*0.03f;
+		//radius = curCharacter->getHeight()*0.01f;
 	if (joint->getName() == "spine1" || joint->getName() == "spine2" || joint->getName() == "spine3")
 		radius = curCharacter->getHeight()*0.06f;
+		//radius = curCharacter->getHeight()*0.02f;
 	if (joint->getName() == "l_sternoclavicular" || joint->getName() == "r_sternoclavicular" || joint->getName() == "l_acromioclavicular" || joint->getName() == "r_acromioclavicular")
 		radius = curCharacter->getHeight()*0.01f;
 	if (joint->getName() == "l_hip" || joint->getName() == "r_hip")

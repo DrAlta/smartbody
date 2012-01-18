@@ -265,9 +265,9 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 						offset.z = matrix[14];
 						SrQuat quat(matrix);
 						SrVec euler = quat.getEuler();
-						rotx = euler[0];
-						roty = euler[1];
-						rotz = euler[2];
+						rotx = 0.f;//euler[0];
+						roty = 0.f;//euler[1];
+						rotz = 0.f;//euler[2];
 						orderVec.push_back("X");
 						orderVec.push_back("Y");
 						orderVec.push_back("Z");
@@ -385,6 +385,9 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 	motion.init(skChannels);
 	SkChannelArray& motionChannels = motion.channels();
 	SkChannelArray channelsForAdjusting;
+	
+	typedef std::map<std::string,std::vector<SrMat>> JointNameTransformMap;
+	JointNameTransformMap jointTransformMap;
 
 	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int i = 0; i < list->getLength(); i++)
@@ -425,11 +428,15 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 				if (node2Name == "source")
 				{
 					DOMNamedNodeMap* sourceAttr = node2->getAttributes();
-					DOMNode* sourceIdNode = sourceAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
+					DOMNode* sourceIdNode = sourceAttr->getNamedItem(BML::BMLDefs::ATTR_ID);					
 					std::string sourceIdAttr = getString(sourceIdNode->getNodeValue());
 					size_t pos = sourceIdAttr.find_last_of("-");
 					std::string op = sourceIdAttr.substr(pos + 1);
+					if (sourceIdAttr.find("input") != std::string::npos) op = "input";
+					else if (sourceIdAttr.find("output") != std::string::npos) op = "output";
+
 					const DOMNodeList* list2 = node2->getChildNodes();
+					
 					for (unsigned int k = 0; k < list2->getLength(); k++)
 					{
 						DOMNode* node3 = list2->item(k);
@@ -446,14 +453,15 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 							if (op == "input")
 							{
 								numTimeInput = counter;
+								std::string jName = tokenize(sourceIdAttr, ".-");
 								if (motion.frames() == 0)
 								{
 									for (int frameCt = 0; frameCt < counter; frameCt++)
 									{
 										motion.insert_frame(frameCt, (float)atof(tokens[frameCt].c_str()));
 										for (int postureCt = 0; postureCt < motion.posture_size(); postureCt++)
-											motion.posture(frameCt)[postureCt] = 0.0f;
-									}
+											motion.posture(frameCt)[postureCt] = 0.0f;										
+									}								
 								}
 /*								if (motion.frames() < counter)
 								{
@@ -474,17 +482,63 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 
 							if (op == "output")
 							{
-								int channelId = getMotionChannelId(motionChannels, sourceIdAttr);
-								if (channelId >= 0)
+								if (sourceIdAttr.find("transform") != std::string::npos)
 								{
-									int stride = counter / numTimeInput;
+									// load a transform matrix
+									int stride = 16;
+									SrMat tran;
+									std::string jName = tokenize(sourceIdAttr, ".-");
+									SkJoint* joint = skeleton.search_joint(jName.c_str());
+									jointTransformMap[jName] = std::vector<SrMat>();
+									jointTransformMap[jName].resize(motion.frames());
 									for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
-										for (int strideCt = 0; strideCt < stride; strideCt++)
+									{
+										for (int m = 0; m < stride; m++)
 										{
-											float v = (float)atof(tokens[frameCt].c_str());
-											motion.posture(frameCt)[channelId + strideCt] = v * scale;
+											tran[m] = (float)atof(tokens[frameCt*stride+m].c_str());
 										}
+ 										tran.transpose();
+										jointTransformMap[jName][frameCt] = tran;
+										
+										SrVec offset;												
+										offset.x = tran[12];
+										offset.y = tran[13];
+										offset.z = tran[14];
+										if (joint)
+											offset -= joint->offset();
+										SrQuat quat(tran);
+										SrVec euler = quat.getEuler();		
+										int channelId = -1;
+										// put in translation
+										channelId = getMotionChannelId(motionChannels,jName+"-translate");
+										if (channelId >= 0)
+										{
+											for (int k=0;k<3;k++)
+												motion.posture(frameCt)[channelId+k] = offset[k];
+										}
+										// put in rotation
+										channelId = getMotionChannelId(motionChannels,jName+"-rotateX");
+										if (channelId >= 0)
+										{
+											for (int k=0;k<3;k++)
+												motion.posture(frameCt)[channelId+k] = euler[k];
+										}										
+									}
 								}
+								else
+								{
+									int channelId = getMotionChannelId(motionChannels, sourceIdAttr);
+									if (channelId >= 0)
+									{
+										int stride = counter / numTimeInput;
+										for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
+											for (int strideCt = 0; strideCt < stride; strideCt++)
+											{
+												float v = (float)atof(tokens[frameCt].c_str());
+												motion.posture(frameCt)[channelId + strideCt] = v * scale;
+											}
+									}
+								}								
 							}
 						}
 					}
@@ -493,6 +547,48 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 			}
 		}
 	}
+
+// 	for (JointNameTransformMap::iterator mi  = jointTransformMap.begin();
+// 		 mi != jointTransformMap.end();
+// 		 mi++)
+// 	{
+// 		std::string jName = mi->first;
+// 		std::vector<SrMat>& childMatList = mi->second;
+// 		SkJoint* joint = skeleton.search_joint(jName.c_str());
+// 		if (!joint) continue;
+// 		SkJoint* parent = joint->parent();
+// 		if (parent)
+// 		{
+// 			std::vector<SrMat>& parentMatList = jointTransformMap[parent->name()];
+// 			for (unsigned int i=0;i<childMatList.size();i++)
+// 			{
+// 				SrMat tran = childMatList[i];//*parentMatList[i].inverse();
+// 				SrVec offset;												
+// 				offset.x = 0;//tran[12];
+// 				offset.y = 0;//tran[13];
+// 				offset.z = 0;//tran[14];
+// 				SrQuat quat(tran);
+// 				SrVec euler = quat.getEuler();
+// 				int channelId = -1;
+// 				// put in translation
+// 				channelId = getMotionChannelId(motionChannels,jName+"-translate");
+// 				if (channelId >= 0)
+// 				{
+// 					for (int k=0;k<3;k++)
+// 						motion.posture(i)[channelId+k] = offset[k];
+// 				}
+// 				// put in rotation
+// 				channelId = getMotionChannelId(motionChannels,jName+"-rotateX");
+// 				if (channelId >= 0)
+// 				{
+// 					for (int k=0;k<3;k++)
+// 						motion.posture(i)[channelId+k] = euler[k];
+// 				}	
+// 			}
+// 		}
+// 	}
+
+
 
 	// now transfer the motion euler data to quaternion data
 	std::vector<int> quatIndices;
