@@ -146,6 +146,7 @@ class SteeringAgent
 		std::string jumpName;
 
 		bool fastInitial;	// whether to use the transition animation
+		bool smoothing;
 
 		protected:
 		std::string lastMessage;
