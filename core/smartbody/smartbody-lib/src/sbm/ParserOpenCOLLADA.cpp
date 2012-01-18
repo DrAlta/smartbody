@@ -207,6 +207,10 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 		if (nodeName == "node")
 		{
 			DOMNamedNodeMap* childAttr = childNode->getAttributes();
+			DOMNode* idNode = childAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
+			std::string idAttr = "";
+			if (idNode)
+				idAttr = getString(idNode->getNodeValue());
 
 			DOMNode* nameNode = childAttr->getNamedItem(BML::BMLDefs::ATTR_NAME);
 			std::string nameAttr = "";
@@ -224,6 +228,9 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, index);
 				joint->quat()->activate();
 				joint->name(nameAttr);
+				joint->extName(nameAttr);
+				joint->extID(idAttr);
+
 
 				skeleton.channels().add(joint->name(), SkChannel::XPos);
 				skeleton.channels().add(joint->name(), SkChannel::YPos);

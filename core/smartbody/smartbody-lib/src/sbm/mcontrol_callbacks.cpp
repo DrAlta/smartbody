@@ -2061,11 +2061,11 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 												jointName.erase(0, jointPrefix.size());
 											}
 											//cout << "joint name = " << jointName << endl;	
-// 											SBJoint* joint = char_p->getSkeleton()->getJointByName(jointName);
-// 											if (joint)
-// 												skinWeight->infJointName.push_back(joint->getName());
-// 											else
-											skinWeight->infJointName.push_back(jointName);
+											SBJoint* joint = char_p->getSkeleton()->getJointByName(jointName);
+											if (joint)
+												skinWeight->infJointName.push_back(joint->getName());
+											else
+												skinWeight->infJointName.push_back(jointName);
 											
 										}
 										if ( sourceId == bindWeightName && realNodeName == "float_array")

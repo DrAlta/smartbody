@@ -227,6 +227,16 @@ SkJoint* SkSkeleton::search_joint ( const char* n )
 		}
 	}
 
+	if (_extIDJointMap.size() == 0 &&
+		_joints.size() > 0)
+	{
+		int jointSize = _joints.size();
+		for (int i = 0; i < jointSize; i++)
+		{
+			_extIDJointMap.insert(std::pair<std::string, SkJoint*>(_joints[i]->extID(), _joints[i]));
+		}
+	}
+
 	std::map<std::string, SkJoint*>::iterator iter = _jointMap.find(n);
 	if (iter != _jointMap.end())
 	{
@@ -235,6 +245,10 @@ SkJoint* SkSkeleton::search_joint ( const char* n )
 	else if ( _extJointMap.find(n) != _extJointMap.end())
 	{
 		return (_extJointMap.find(n)->second);
+	}
+	else if ( _extIDJointMap.find(n) != _extIDJointMap.end())
+	{
+		return (_extIDJointMap.find(n)->second);
 	}
 	else
 	{
@@ -312,6 +326,7 @@ void SkSkeleton::copy_joint(SkJoint* dest, SkJoint* src)
 {
 	dest->name(src->name());
 	dest->extName(src->extName());
+	dest->extID(src->extID());
 	dest->visgeo(src->visgeo());
 	dest->colgeo(src->colgeo());
 
