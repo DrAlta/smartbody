@@ -55,6 +55,7 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	inControl = true;
 
 	fastInitial = false;
+	smoothing = false;
 
 	lastMessage = "";
 	numMessageRepeats = 0;
@@ -134,17 +135,20 @@ void SteeringAgent::addSteeringAttributes()
 	if (!character->hasAttribute("steering.stepAdjust"))
 		character->createBoolAttribute("steering.stepAdjust", false, true, "steering", 380, false, false, false, ""); 
 
+	if (!character->hasAttribute("steering.smoothing"))
+		character->createBoolAttribute("steering.smoothing", true, true, "steering", 390, false, false, false, ""); 
+
 	if (!character->hasAttribute("steering.speedWindowSize"))
-		character->createIntAttribute("steering.speedWindowSize", 10, true, "steering", 390, false, false, false, ""); 
+		character->createIntAttribute("steering.speedWindowSize", 10, true, "steering", 400, false, false, false, ""); 
 
 	if (!character->hasAttribute("steering.angleWindowSize"))
-		character->createIntAttribute("steering.angleWindowSize", 3, true, "steering", 400, false, false, false, ""); 
+		character->createIntAttribute("steering.angleWindowSize", 3, true, "steering", 410, false, false, false, ""); 
 
 	if (!character->hasAttribute("steering.scootWindowSize"))
-		character->createIntAttribute("steering.scootWindowSize", 3, true, "steering", 410, false, false, false, ""); 
+		character->createIntAttribute("steering.scootWindowSize", 3, true, "steering", 420, false, false, false, ""); 
 	
 	if (!character->hasAttribute("steering.pedMaxTurningRateMultiplier"))
-		character->createDoubleAttribute("steering.pedMaxTurningRateMultiplier", 20.f, true, "steering", 420, false, false, false, ""); 
+		character->createDoubleAttribute("steering.pedMaxTurningRateMultiplier", 20.f, true, "steering", 430, false, false, false, ""); 
 
 	setSteerParamsDirty(false);
 }
@@ -245,6 +249,11 @@ void SteeringAgent::initSteerParams()
 		stepAdjust = character->getBoolAttribute("steering.stepAdjust");
 	else
 		stepAdjust = false;
+
+	if (character && character->hasAttribute("steering.smoothing"))
+		smoothing = character->getBoolAttribute("steering.smoothing");
+	else
+		smoothing = true;
 	
 	if (character && character->hasAttribute("steering.speedWindowSize"))
 		speedWindowSize = character->getIntAttribute("steering.speedWindowSize");
@@ -1411,88 +1420,104 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	if (curStateName == locomotionName && numGoals != 0)
 	{
 		curState->paramManager->getParameter(curSpeed, curTurningAngle, curScoot);
-		float addOnScoot = steeringCommand.scoot * paLocoScootGain;
-		if (steeringCommand.scoot != 0.0)
+		if (smoothing)
 		{
-			if (curScoot < addOnScoot)
+			float addOnScoot = steeringCommand.scoot * paLocoScootGain;
+			if (steeringCommand.scoot != 0.0)
 			{
-				curScoot += scootAcceleration * dt;
-				if (curScoot > addOnScoot)
-					curScoot = addOnScoot;
-			}
-			else
-			{
-				curScoot -= scootAcceleration * dt;
 				if (curScoot < addOnScoot)
-					curScoot = addOnScoot;
-			}
-		}
-		else
-		{
-			if (fabs(curScoot) < scootThreshold)
-				curScoot = 0.0f;
-			else
-			{
-				if (curScoot > 0.0f)
-				{
-					curScoot -= scootAcceleration * dt;
-					if (curScoot < 0.0)	curScoot = 0.0;
-				}
-				else
 				{
 					curScoot += scootAcceleration * dt;
-					if (curScoot > 0.0)	curScoot = 0.0;
-				}
-			}
-		}
-		curSpeed = curSpeed * mcu.steeringScale;
-		if (steeringCommand.aimForTargetSpeed)
-		{
-			if (fabs(curSpeed - targetSpeed) > speedThreshold)
-			{
-				if (curSpeed < targetSpeed)
-				{
-					curSpeed += acceleration * dt;
-					if (curSpeed > targetSpeed)
-						curSpeed = targetSpeed;
+					if (curScoot > addOnScoot)
+						curScoot = addOnScoot;
 				}
 				else
 				{
-					curSpeed -= acceleration * dt;
-					if (curSpeed < targetSpeed)
-						curSpeed = targetSpeed;
+					curScoot -= scootAcceleration * dt;
+					if (curScoot < addOnScoot)
+						curScoot = addOnScoot;
 				}
 			}
-		}
-		else
-			curSpeed += acceleration * dt;
-
-		float angleGlobal = radToDeg(atan2(forward.x, forward.z));
-		normalizeAngle(angleGlobal);
-		normalizeAngle(yaw);
-		float angleDiff = angleGlobal - yaw;
-		normalizeAngle(angleDiff);
-
-		paLocoAngleGain = 2.0f;
-		float addOnTurning = angleDiff * paLocoAngleGain;
-		if (fabs(curTurningAngle - addOnTurning) > angleSpeedThreshold)
-		{
-			if (curTurningAngle < addOnTurning)
+			else
 			{
-				curTurningAngle += angleAcceleration * dt;
-				if (curTurningAngle > addOnTurning)
-					curTurningAngle = addOnTurning;
+				if (fabs(curScoot) < scootThreshold)
+					curScoot = 0.0f;
+				else
+				{
+					if (curScoot > 0.0f)
+					{
+						curScoot -= scootAcceleration * dt;
+						if (curScoot < 0.0)	curScoot = 0.0;
+					}
+					else
+					{
+						curScoot += scootAcceleration * dt;
+						if (curScoot > 0.0)	curScoot = 0.0;
+					}
+				}
 			}
-			else if (curTurningAngle > addOnTurning)
-			{					
-				curTurningAngle -= angleAcceleration * dt;
+			curSpeed = curSpeed * mcu.steeringScale;
+			if (steeringCommand.aimForTargetSpeed)
+			{
+				if (fabs(curSpeed - targetSpeed) > speedThreshold)
+				{
+					if (curSpeed < targetSpeed)
+					{
+						curSpeed += acceleration * dt;
+						if (curSpeed > targetSpeed)
+							curSpeed = targetSpeed;
+					}
+					else
+					{
+						curSpeed -= acceleration * dt;
+						if (curSpeed < targetSpeed)
+							curSpeed = targetSpeed;
+					}
+				}
+			}
+			else
+				curSpeed += acceleration * dt;
+
+			float angleGlobal = radToDeg(atan2(forward.x, forward.z));
+			normalizeAngle(angleGlobal);
+			normalizeAngle(yaw);
+			float angleDiff = angleGlobal - yaw;
+			normalizeAngle(angleDiff);
+
+			float addOnTurning = angleDiff * paLocoAngleGain;
+			if (fabs(curTurningAngle - addOnTurning) > angleSpeedThreshold)
+			{
 				if (curTurningAngle < addOnTurning)
-					curTurningAngle = addOnTurning;
+				{
+					curTurningAngle += angleAcceleration * dt;
+					if (curTurningAngle > addOnTurning)
+						curTurningAngle = addOnTurning;
+				}
+				else if (curTurningAngle > addOnTurning)
+				{					
+					curTurningAngle -= angleAcceleration * dt;
+					if (curTurningAngle < addOnTurning)
+						curTurningAngle = addOnTurning;
+				}
 			}
+			// update locomotion state
+			newSpeed = curSpeed;
+			curSpeed = curSpeed / mcu.steeringScale;
 		}
-		// update locomotion state
-		newSpeed = curSpeed;
-		curSpeed = curSpeed / mcu.steeringScale;
+		else	// direct gaining
+		{
+			float angleGlobal = radToDeg(atan2(forward.x, forward.z));
+			normalizeAngle(angleGlobal);
+			normalizeAngle(yaw);
+			float angleDiff = angleGlobal - yaw;
+			normalizeAngle(angleDiff);
+
+			curSpeed = targetSpeed / mcu.steeringScale;
+			curTurningAngle = angleDiff * paLocoAngleGain;
+			curScoot = steeringCommand.scoot * paLocoScootGain;
+			
+			newSpeed = targetSpeed;
+		}
 
 		if (inControl)
 		{
