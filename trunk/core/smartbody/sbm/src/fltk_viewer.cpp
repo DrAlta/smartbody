@@ -949,7 +949,7 @@ void FltkViewer::init_opengl ( int w, int h )
 
    SrCamera& cam = _data->camera;
    //cam.zfar = 1000000;
-   cam.znear = 5.f;
+   cam.znear = .05f;
 
 
    // init shader
