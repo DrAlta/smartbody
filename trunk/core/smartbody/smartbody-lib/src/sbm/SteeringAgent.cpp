@@ -1193,7 +1193,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 
 	// slow down mechanism when close to the target
 	float targetSpeed = steeringCommand.targetSpeed;
-	if (distToTarget < targetSpeed * brakingGain)
+	if (distToTarget < targetSpeed * brakingGain && goalList.size() == 0)
 		targetSpeed = distToTarget / brakingGain;
 
 	if (stepAdjust)
