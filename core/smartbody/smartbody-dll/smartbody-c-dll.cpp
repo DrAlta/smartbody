@@ -293,6 +293,17 @@ SMARTBODY_C_DLL_API bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
 }
 
 
+SMARTBODY_C_DLL_API void SBM_SetCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   g_smartbodyInstances[ sbmHandle ]->SetCameraValues( x, y, z, rx, ry, rz, rw, fov, aspect, zNear, zFar );
+}
+
+
 SMARTBODY_C_DLL_API bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
