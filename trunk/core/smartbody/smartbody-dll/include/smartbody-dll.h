@@ -63,6 +63,7 @@ class SmartbodyCharacter
 
 
 class Smartbody_dll_SBMCharacterListener_Internal;
+class SbmDebuggerServer;
 
 class Smartbody_dll
 {
@@ -71,6 +72,8 @@ class Smartbody_dll
       SmartbodyListener * m_listener;
       Smartbody_dll_SBMCharacterListener_Internal * m_internalListener;
       std::map<std::string, SmartbodyCharacter*> m_characters;
+
+      SbmDebuggerServer * m_sbmDebugger;
 
    public:
       SMARTBODY_DLL_API Smartbody_dll();
@@ -88,6 +91,7 @@ class Smartbody_dll
 
       SMARTBODY_DLL_API bool Update( const double timeInSeconds );
 
+      SMARTBODY_DLL_API void SetCameraValues( double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar );
 
       SMARTBODY_DLL_API bool ProcessVHMsgs( const char * op, const char * args );
 
