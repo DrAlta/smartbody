@@ -10,7 +10,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SbmDebuggerGui", "SbmDebugg
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vhcl", "..\..\..\..\lib\vhcl\vhcl.vcproj", "{662CF3EB-B816-4727-9D1D-4071C25A3312}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vhmsg", "..\..\..\..\lib\vh\vhmsg\vhmsg-c\vhmsg.vcproj", "{49840C67-5A25-4D7A-AF21-5976735F7D7D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vhmsg", "..\..\..\..\lib\vhmsg\vhmsg-c\vhmsg.vcproj", "{49840C67-5A25-4D7A-AF21-5976735F7D7D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{662CF3EB-B816-4727-9D1D-4071C25A3312} = {662CF3EB-B816-4727-9D1D-4071C25A3312}
 	EndProjectSection
