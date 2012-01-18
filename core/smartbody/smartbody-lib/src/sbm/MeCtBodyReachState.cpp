@@ -30,7 +30,8 @@ void EffectorState::setAttachedPawn( ReachStateData* rd )
 	{
 		SbmPawn* attachedPawn = target.getTargetPawn();
 		attachedPawnName = target.getTargetPawnName();
-		attachMat = attachedPawn->get_world_offset_joint()->gmat()*curState.gmat().inverse();	
+		//attachMat = attachedPawn->get_world_offset_joint()->gmat()*curState.gmat().inverse();	
+		attachMat = attachedPawn->get_world_offset()*curState.gmat().inverse();
 		//SRT state = target.getTargetState();
 		//target.setTargetState(state);
 	}

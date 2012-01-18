@@ -95,9 +95,7 @@ protected:
 public:  // TODO - properly encapsulate / privatize the following
 	SkSkeleton*	_skeleton;;  // MAY BE NULL!!!
 	SkScene*		scene_p;	 // Skeleton Scene and Rigid Mesh		
-	DeformableMesh*	dMesh_p;	 // Deformable Mesh using smooth skinning
-	//SbmGeomObject*  colObj_p;
-	//SbmPhysicsObj*  phyObj_p;
+	DeformableMesh*	dMesh_p;	 // Deformable Mesh using smooth skinning	
 	SteerLib::ObstacleInterface* steeringSpaceObj_p;
 	SrVec			steeringSpaceObjSize;
 	std::string _classType;
@@ -111,8 +109,7 @@ public:  // TODO - properly encapsulate / privatize the following
 	MeControllerTreeRoot	*ct_tree_p;
 	bonebus::BoneBusCharacter * bonebusCharacter;
 
-public:
-	
+public:	
 	//  Public Methods
 	SbmPawn();
 	SbmPawn( const char* name );
@@ -124,19 +121,13 @@ public:
 
 	SbmGeomObject* getGeomObject(); // get geometry object associated with the pawn
 	SbmPhysicsObj* getPhysicsObject();
-// 	void updateFromColObject();
+
  	void updateToColObject();
 	void updateToSteeringSpaceObject();
 	void initSteeringSpaceObject();
 	void clearSteeringGoals();
 
 	bool is_initialized();
-// 	bool initGeomObj(const char* geomType, SrVec size, const char* color, const char* meshName = NULL);
-// 	void initPhysicsObj();
-// 	void removePhysicsObj();
-// 	void setPhysicsSim(bool enable);
-// 	void setCollision(bool enable);
-// 	bool hasPhysicsSim();
 
 	void setHeight( float height )	{ _height = height; }
 	float getHeight( void ) 		{ return _height; }

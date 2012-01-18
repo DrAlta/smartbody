@@ -78,8 +78,8 @@ void SbmPhysicsSimODE::initSimulation()
 	//dWorldSetLinearDamping(worldID,0.002f);
 	//dWorldSetAngularDamping(worldID,0.01f);
 	dWorldSetLinearDamping(worldID,0.0001f);
-	//dWorldSetAngularDamping(worldID,0.03f);
-	dWorldSetAngularDamping(worldID,0.001f);
+	dWorldSetAngularDamping(worldID,0.03f);
+	//dWorldSetAngularDamping(worldID,0.001f);
 
 	//dWorldSetERP(worldID,0.5);
 	//dWorldSetCFM(worldID,1e-3);	
@@ -177,19 +177,19 @@ void SbmPhysicsSimODE::updatePhysicsJoint( SbmPhysicsJoint* phyJoint )
 		dReal erpValue = (Ks*dT)/(Ks*dT+Kd);
 
 		dJointSetAMotorParam(aMotor, dParamStopCFM, cfmValue);
-		//dJointSetAMotorParam(aMotor, dParamStopCFM1, cfmValue);
+		dJointSetAMotorParam(aMotor, dParamStopCFM1, cfmValue);
 		dJointSetAMotorParam(aMotor, dParamStopCFM2, cfmValue);
 		dJointSetAMotorParam(aMotor, dParamStopCFM3, cfmValue);
 
 		dJointSetAMotorParam(aMotor, dParamStopERP, erpValue);
-		//dJointSetAMotorParam(aMotor, dParamStopERP1, erpValue);
+		dJointSetAMotorParam(aMotor, dParamStopERP1, erpValue);
 		dJointSetAMotorParam(aMotor, dParamStopERP2, erpValue);
 		dJointSetAMotorParam(aMotor, dParamStopERP3, erpValue);	
 
 		dJointSetAMotorParam(aMotor, dParamLoStop, phyJoint->getDoubleAttribute("axis0LimitLow"));
 		dJointSetAMotorParam(aMotor, dParamHiStop, phyJoint->getDoubleAttribute("axis0LimitHigh"));
-		//dJointSetAMotorParam(aMotor, dParamLoStop1, phyJoint->getDoubleAttribute("axis0LimitLow"));
-		//dJointSetAMotorParam(aMotor, dParamHiStop1, phyJoint->getDoubleAttribute("axis0LimitHigh"));
+		dJointSetAMotorParam(aMotor, dParamLoStop1, phyJoint->getDoubleAttribute("axis0LimitLow"));
+		dJointSetAMotorParam(aMotor, dParamHiStop1, phyJoint->getDoubleAttribute("axis0LimitHigh"));
 		dJointSetAMotorParam(aMotor, dParamLoStop2, phyJoint->getDoubleAttribute("axis1LimitLow"));
 		dJointSetAMotorParam(aMotor, dParamHiStop2, phyJoint->getDoubleAttribute("axis1LimitHigh"));
 		dJointSetAMotorParam(aMotor, dParamLoStop3, phyJoint->getDoubleAttribute("axis2LimitLow"));

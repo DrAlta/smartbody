@@ -129,7 +129,8 @@ void MeCtHand::attachPawnTarget( SbmPawn* pawn, std::string jointName )
 		releasePawn();		
 		return;
 	}
-	attachMat = attachedPawn->get_world_offset_joint()->gmat()*attachJoint->gmat().inverse();		
+	//attachMat = attachedPawn->get_world_offset_joint()->gmat()*attachJoint->gmat().inverse();	
+	attachMat = attachedPawn->get_world_offset()*attachJoint->gmat().inverse();	
 }
 
 void MeCtHand::releasePawn()
