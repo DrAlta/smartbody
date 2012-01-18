@@ -73,6 +73,7 @@ private :
 	char  _lmat_uptodate;  // true if lmat is up to date
 	std::string _name;     // the given name
 	std::string _extName;  // external name for the bone
+	std::string _extID;    // external id from OpenCollada	
 	int   _index;          // its index in SkSkeleton::_joint_table
 	int   _coldetid;       // index used in collision detection
 	SkSkeleton* _skeleton; // pointer to the associated skeleton
@@ -135,6 +136,9 @@ public:
 	/*! Set the name of this joint */
 	void extName ( const std::string& jn ) { _extName=jn; }
 	const std::string& extName () const { return _extName; }
+	
+	void extID(std::string val) { _extID = val; }
+	const std::string& extID() const { return _extID; }
 
 	/*! Returns the index of this joint in the SkSkeleton list
 	of joints */
