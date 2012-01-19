@@ -27,42 +27,42 @@ set( SMARTBODY_LIB_EXT_ANN_SRC
 
 set( SMARTBODY_LIB_EXT_PARSER_SRC
 	
-	external/parser/Bchart.C
-	external/parser/BchartSm.C
-	external/parser/Bst.C
-	external/parser/ChartBase.C
-	external/parser/ClassRule.C
-	external/parser/CntxArray.C
-	external/parser/CombineBests.C
-	external/parser/ECArgs.C
-	external/parser/Edge.C
-	external/parser/EdgeHeap.C
-	external/parser/edgeSubFns.C
-	external/parser/EgsFromTree.C
-	external/parser/ewDciTokStrm.C
-	external/parser/extraMain.C
-	external/parser/FBinaryArray.C
-	external/parser/Feat.C
-	external/parser/Feature.C
-	external/parser/FeatureTree.C
-	external/parser/fhSubFns.C
-	external/parser/Field.C
-	external/parser/FullHist.C
-	external/parser/GotIter.C
-	external/parser/headFinder.C
-	external/parser/headFinderCh.C
-	external/parser/InputTree.C
-	external/parser/Item.C
-	external/parser/Link.C
-	external/parser/MeChart.C
-	external/parser/Params.C
-	external/parser/ParseStats.C
-	external/parser/SentRep.C
-	external/parser/Term.C
-	external/parser/TimeIt.C
-	external/parser/UnitRules.C
-	external/parser/utils.C
-	external/parser/ValHeap.C
+	external/parser/Bchart.cpp
+	external/parser/BchartSm.cpp
+	external/parser/Bst.cpp
+	external/parser/ChartBase.cpp
+	external/parser/ClassRule.cpp
+	external/parser/CntxArray.cpp
+	external/parser/CombineBests.cpp
+	external/parser/ECArgs.cpp
+	external/parser/Edge.cpp
+	external/parser/EdgeHeap.cpp
+	external/parser/edgeSubFns.cpp
+	external/parser/EgsFromTree.cpp
+	external/parser/ewDciTokStrm.cpp
+	external/parser/extraMain.cpp
+	external/parser/FBinaryArray.cpp
+	external/parser/Feat.cpp
+	external/parser/Feature.cpp
+	external/parser/FeatureTree.cpp
+	external/parser/fhSubFns.cpp
+	external/parser/Field.cpp
+	external/parser/FullHist.cpp
+	external/parser/GotIter.cpp
+	external/parser/headFinder.cpp
+	external/parser/headFinderCh.cpp
+	external/parser/InputTree.cpp
+	external/parser/Item.cpp
+	external/parser/Link.cpp
+	external/parser/MeChart.cpp
+	external/parser/Params.cpp
+	external/parser/ParseStats.cpp
+	external/parser/SentRep.cpp
+	external/parser/Term.cpp
+	external/parser/TimeIt.cpp
+	external/parser/UnitRules.cpp
+	external/parser/utils.cpp
+	external/parser/ValHeap.cpp
 
 )
 
@@ -374,6 +374,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/nvbg.cpp
 	sbm/MiniBrain.cpp
 	sbm/SBBehavior.cpp
+	sbm/SbmDebuggerServer.cpp
 
 )
 
