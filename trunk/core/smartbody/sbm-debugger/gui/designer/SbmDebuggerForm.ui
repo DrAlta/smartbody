@@ -23,6 +23,48 @@
       <height>761</height>
      </rect>
     </property>
+    <widget class="QLabel" name="rendererFpsLabel">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Renderer Fps:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="networkFpsLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Network Fps:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="cameraPositionLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>211</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Camera Pos:</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QTabWidget" name="sceneTab">
     <property name="geometry">

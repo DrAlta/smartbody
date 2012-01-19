@@ -11,6 +11,8 @@ Camera::Camera() :
    m_RotMatrix.setToIdentity();
    m_RotMatrix.translate(0, 0.2f, 3);
    m_CameraType = Follow_Renderer;
+   m_MovementSpeed = 0.05f;
+   m_RotationSpeed = 0.01f;
 }
 
 Camera::~Camera()

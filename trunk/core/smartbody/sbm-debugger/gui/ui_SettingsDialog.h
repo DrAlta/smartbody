@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SettingsDialog.ui'
 **
-** Created: Wed Jan 18 12:54:54 2012
+** Created: Thu Jan 19 13:49:32 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -31,11 +31,13 @@ public:
     QDialogButtonBox *buttonBox;
     QTabWidget *tabWidget;
     QWidget *general_tab;
-    QDoubleSpinBox *positionScaleBox;
-    QLabel *positionScaleLabel;
     QWidget *camera_tab;
     QComboBox *cameraControlBox;
     QLabel *cameraControlLabel;
+    QLabel *cameraMovementSpeedLabel;
+    QDoubleSpinBox *cameraMovementSpeedBox;
+    QLabel *cameraRotationSpeedLabel;
+    QDoubleSpinBox *cameraRotationSpeedBox;
 
     void setupUi(QDialog *SettingsDialog)
     {
@@ -52,14 +54,6 @@ public:
         tabWidget->setGeometry(QRect(10, 10, 361, 231));
         general_tab = new QWidget();
         general_tab->setObjectName(QString::fromUtf8("general_tab"));
-        positionScaleBox = new QDoubleSpinBox(general_tab);
-        positionScaleBox->setObjectName(QString::fromUtf8("positionScaleBox"));
-        positionScaleBox->setGeometry(QRect(10, 30, 62, 22));
-        positionScaleBox->setSingleStep(0.1);
-        positionScaleBox->setValue(0.01);
-        positionScaleLabel = new QLabel(general_tab);
-        positionScaleLabel->setObjectName(QString::fromUtf8("positionScaleLabel"));
-        positionScaleLabel->setGeometry(QRect(10, 10, 71, 16));
         tabWidget->addTab(general_tab, QString());
         camera_tab = new QWidget();
         camera_tab->setObjectName(QString::fromUtf8("camera_tab"));
@@ -69,6 +63,21 @@ public:
         cameraControlLabel = new QLabel(camera_tab);
         cameraControlLabel->setObjectName(QString::fromUtf8("cameraControlLabel"));
         cameraControlLabel->setGeometry(QRect(10, 10, 81, 16));
+        cameraMovementSpeedLabel = new QLabel(camera_tab);
+        cameraMovementSpeedLabel->setObjectName(QString::fromUtf8("cameraMovementSpeedLabel"));
+        cameraMovementSpeedLabel->setGeometry(QRect(10, 70, 91, 16));
+        cameraMovementSpeedBox = new QDoubleSpinBox(camera_tab);
+        cameraMovementSpeedBox->setObjectName(QString::fromUtf8("cameraMovementSpeedBox"));
+        cameraMovementSpeedBox->setGeometry(QRect(10, 90, 62, 22));
+        cameraMovementSpeedBox->setSingleStep(0.1);
+        cameraMovementSpeedBox->setValue(0.05);
+        cameraRotationSpeedLabel = new QLabel(camera_tab);
+        cameraRotationSpeedLabel->setObjectName(QString::fromUtf8("cameraRotationSpeedLabel"));
+        cameraRotationSpeedLabel->setGeometry(QRect(10, 120, 81, 16));
+        cameraRotationSpeedBox = new QDoubleSpinBox(camera_tab);
+        cameraRotationSpeedBox->setObjectName(QString::fromUtf8("cameraRotationSpeedBox"));
+        cameraRotationSpeedBox->setGeometry(QRect(10, 140, 62, 22));
+        cameraRotationSpeedBox->setValue(0.01);
         tabWidget->addTab(camera_tab, QString());
 
         retranslateUi(SettingsDialog);
@@ -84,10 +93,11 @@ public:
     void retranslateUi(QDialog *SettingsDialog)
     {
         SettingsDialog->setWindowTitle(QApplication::translate("SettingsDialog", "Settings", 0, QApplication::UnicodeUTF8));
-        positionScaleBox->setPrefix(QString());
-        positionScaleLabel->setText(QApplication::translate("SettingsDialog", "Position Scale", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(general_tab), QApplication::translate("SettingsDialog", "General", 0, QApplication::UnicodeUTF8));
         cameraControlLabel->setText(QApplication::translate("SettingsDialog", "Camera Control", 0, QApplication::UnicodeUTF8));
+        cameraMovementSpeedLabel->setText(QApplication::translate("SettingsDialog", "Movement Speed", 0, QApplication::UnicodeUTF8));
+        cameraMovementSpeedBox->setPrefix(QString());
+        cameraRotationSpeedLabel->setText(QApplication::translate("SettingsDialog", "Rotation Speed", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(camera_tab), QApplication::translate("SettingsDialog", "Camera", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 

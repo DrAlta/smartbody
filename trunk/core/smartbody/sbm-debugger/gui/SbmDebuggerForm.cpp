@@ -140,6 +140,7 @@ void SbmDebuggerForm::Update()
    c.Update();
 
    UpdateSceneTree();
+   UpdateLabels();
 }
 
 void SbmDebuggerForm::UpdateSceneTree()
@@ -164,8 +165,7 @@ void SbmDebuggerForm::UpdateSceneTree()
       if (!alreadyExistsInTree)
       {
          // the entity isn't represented in the tree view, add it
-         ui.sceneTree->insertTopLevelItem(Characters, 
-            new QTreeWidgetItem(ui.sceneTree->topLevelItem(i), QStringList(QString(entityName.c_str()))));
+         subTree->addChild(new QTreeWidgetItem(subTree, QStringList(QString(entityName.c_str()))));
       } 
    }
 
@@ -187,10 +187,15 @@ void SbmDebuggerForm::UpdateSceneTree()
       if (!alreadyExistsInTree)
       {
          // the entity isn't represented in the tree view, add it
-         ui.sceneTree->insertTopLevelItem(Pawns, 
-            new QTreeWidgetItem(ui.sceneTree->topLevelItem(i), QStringList(QString(entityName.c_str()))));
-      } 
+         subTree->addChild(new QTreeWidgetItem(subTree, QStringList(QString(entityName.c_str()))));
+       } 
    }
+}
+
+void SbmDebuggerForm::UpdateLabels()
+{
+   //ui.rendererFpsLabel->
+   ui.cameraPositionLabel->setText(("Camera Pos: " + m_pGLWidget->GetCameraPositionAsString()).c_str());
 }
 
 void SbmDebuggerForm::timerEvent(QTimerEvent * event)
