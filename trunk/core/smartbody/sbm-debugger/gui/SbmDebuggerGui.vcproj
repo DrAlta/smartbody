@@ -93,7 +93,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
@@ -116,9 +116,12 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				AdditionalOptions="/MP"
+				Optimization="3"
+				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="C:\Qt\4.8.0\include\QtGUI;C:\Qt\4.8.0\include"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="..\lib;designer;src;..;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\qt\include\QtGui;..\..\..\..\lib\qt\include\QtOpenGL;..\..\..\..\lib\qt\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -137,9 +140,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="QtCore4.lib qtmaind.lib QtGuid4.lib"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="C:\Qt\4.8.0\lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="SbmDebugger.lib vhcl.lib vhmsg.lib QtCore4.lib QtGui4.lib qtmain.lib QtOpenGL4.lib pthreadVSE2.lib activemq-cpp.lib opengl32.lib glu32.lib ws2_32.lib winmm.lib rpcrt4.lib"
+				AdditionalLibraryDirectories="..\lib\Release;..\..\..\..\lib\vhcl\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\qt\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
