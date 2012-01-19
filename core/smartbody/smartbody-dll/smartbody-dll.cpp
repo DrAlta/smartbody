@@ -18,7 +18,7 @@
 #include "sbm/locomotion_cmds.hpp"
 #include "sbm/SBPython.h"
 
-#include "SBMDebuggerServer.h"
+#include "sbm/SbmDebuggerServer.h"
 
 
 using std::string;
@@ -248,11 +248,6 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath)
    vhcl::Log::Listener* listener = new vhcl::Log::FileListener("./smartbody.log");
    vhcl::Log::g_log.AddListener(listener);
 
-
-   m_sbmDebugger = new SbmDebuggerServer();
-   m_sbmDebugger->Init();
-   m_sbmDebugger->SetSBScene(mcu._scene);
-
    return true;
 }
 
@@ -280,9 +275,6 @@ SMARTBODY_DLL_API bool Smartbody_dll::Shutdown()
 
    delete m_internalListener;
    m_internalListener = NULL;
-
-   delete m_sbmDebugger;
-   m_sbmDebugger = NULL;
 
    return true;
 }
@@ -313,11 +305,6 @@ SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
    bool update_sim = mcu.update_timer( timeInSeconds );
    if( update_sim ) mcu.update();
 
-
-
-   m_sbmDebugger->Update();
-
-
    return true;
 #endif
 }
@@ -325,17 +312,19 @@ SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
 
 SMARTBODY_DLL_API void Smartbody_dll::SetCameraValues( double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
 {
-   m_sbmDebugger->m_camera.pos.x = x;
-   m_sbmDebugger->m_camera.pos.y = y;
-   m_sbmDebugger->m_camera.pos.z = z;
-   m_sbmDebugger->m_camera.rot.x = rx;
-   m_sbmDebugger->m_camera.rot.y = ry;
-   m_sbmDebugger->m_camera.rot.z = rz;
-   m_sbmDebugger->m_camera.rot.w = rw;
-   m_sbmDebugger->m_camera.fovY   = fov;
-   m_sbmDebugger->m_camera.aspect = aspect;
-   m_sbmDebugger->m_camera.zNear  = zNear;
-   m_sbmDebugger->m_camera.zFar   = zFar;
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+
+   mcu._scene->getDebuggerServer()->m_camera.pos.x = x;
+   mcu._scene->getDebuggerServer()->m_camera.pos.y = y;
+   mcu._scene->getDebuggerServer()->m_camera.pos.z = z;
+   mcu._scene->getDebuggerServer()->m_camera.rot.x = rx;
+   mcu._scene->getDebuggerServer()->m_camera.rot.y = ry;
+   mcu._scene->getDebuggerServer()->m_camera.rot.z = rz;
+   mcu._scene->getDebuggerServer()->m_camera.rot.w = rw;
+   mcu._scene->getDebuggerServer()->m_camera.fovY   = fov;
+   mcu._scene->getDebuggerServer()->m_camera.aspect = aspect;
+   mcu._scene->getDebuggerServer()->m_camera.zNear  = zNear;
+   mcu._scene->getDebuggerServer()->m_camera.zFar   = zFar;
 }
 
 
@@ -357,7 +346,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::ProcessVHMsgs( const char * op, const char
    mcu.execute( op, (char *)args );
 
 
-   m_sbmDebugger->ProcessVHMsgs(op, args);
+   mcu._scene->getDebuggerServer()->ProcessVHMsgs(op, args);
 
 
    return true;

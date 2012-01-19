@@ -4598,6 +4598,11 @@ int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
+int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	return CMD_SUCCESS;
+}
+
 /////////////////////////////////////////////////////////////
 
 /*
@@ -6235,6 +6240,7 @@ int mcu_vhmsg_connect_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		err = vhmsg::ttu_register( "vrKillComponent" );
 		err = vhmsg::ttu_register( "wsp" );
 		err = vhmsg::ttu_register( "receiver" );
+		err = vhmsg::ttu_register( "sbmdebugger" );
 		err = vhmsg::ttu_register( "vrPerception" );
 		mcu_p->vhmsg_enabled = true;
 		return CMD_SUCCESS;

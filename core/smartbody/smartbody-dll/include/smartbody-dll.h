@@ -73,8 +73,6 @@ class Smartbody_dll
       Smartbody_dll_SBMCharacterListener_Internal * m_internalListener;
       std::map<std::string, SmartbodyCharacter*> m_characters;
 
-      SbmDebuggerServer * m_sbmDebugger;
-
    public:
       SMARTBODY_DLL_API Smartbody_dll();
       SMARTBODY_DLL_API virtual ~Smartbody_dll();
