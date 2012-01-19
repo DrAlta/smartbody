@@ -310,7 +310,15 @@ SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
 }
 
 
-SMARTBODY_DLL_API void Smartbody_dll::SetCameraValues( double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
+SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerId( const std::string & id )
+{
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+
+   mcu._scene->getDebuggerServer()->SetID( id );
+}
+
+
+SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerCameraValues( double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
 {
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 

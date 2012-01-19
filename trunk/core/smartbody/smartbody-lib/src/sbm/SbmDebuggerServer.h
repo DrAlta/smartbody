@@ -33,6 +33,7 @@ public:
    void Init() {}
 
    void SetSBScene(SmartBody::SBScene * scene) { m_scene = scene; }
+   void SetID(const std::string & id) { m_sbmId2 = id; }
 
    void Update();
 
