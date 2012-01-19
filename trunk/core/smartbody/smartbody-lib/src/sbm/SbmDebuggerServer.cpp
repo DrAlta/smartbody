@@ -4,7 +4,9 @@
 #include "SbmDebuggerServer.h"
 
 #include <stdio.h>
+#ifdef WIN32
 #include <conio.h>
+#endif
 
 #include "vhmsg-tt.h"
 
