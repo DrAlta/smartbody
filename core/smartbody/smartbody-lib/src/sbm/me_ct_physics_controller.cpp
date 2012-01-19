@@ -107,7 +107,9 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			if (!joint)	continue;
 
 			//obj->updateSbmObj();
-			SrMat tran = obj->getRelativeOrientation();					
+			SrMat tran = obj->getRelativeOrientation();		
+			//if (obj->getParentObj())
+			//	tran.setl4(SrVec(0,0,0));
 			std::string jname = joint->getName();
 			std::string jPosName = joint->getName();
 			
@@ -174,11 +176,14 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 				int posBufferID = frame.toBufferIndex(positionChannelID);
 				if (posBufferID < 0)	continue;
 				SrVec pos = tran.get_translation() - joint->offset(); // remove the joint offset in local space to get actual Pos channel values
+				if (!obj->getParentObj())
+				{
+					frame.buffer()[posBufferID + 0] = pos.x;
+					frame.buffer()[posBufferID + 1] = pos.y;
+					frame.buffer()[posBufferID + 2] = pos.z;	
+				}
 				//LOG("joint name = %s",joint->getName().c_str());
-				//sr_out << "Pos = " << pos << srnl;
-				frame.buffer()[posBufferID + 0] = pos.x;
-				frame.buffer()[posBufferID + 1] = pos.y;
-				frame.buffer()[posBufferID + 2] = pos.z;	
+				//sr_out << "Pos = " << pos << srnl;				
 			}
 			else
 			{

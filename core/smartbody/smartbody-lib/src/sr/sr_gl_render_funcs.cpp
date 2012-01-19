@@ -97,10 +97,12 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    for ( f=0; f<fsize; f++ )
     {
       
-      if ( f<fmsize )
-       { SrMaterial& mtl = M[Fm[f]];
-         if (mtl!=curmtl) { curmtl=mtl; glMaterial(mtl); }
-       }
+//       if ( f<fmsize )
+//        { 
+// 		 int fmIndex = Fm.size() > 0? Fm[0] : -1;
+// 		 SrMaterial& mtl = M[Fm[f]];
+//          if (mtl!=curmtl) { curmtl=mtl; glMaterial(mtl); }
+//        }
       
     
       if ( flat || f>=Fn.size() )

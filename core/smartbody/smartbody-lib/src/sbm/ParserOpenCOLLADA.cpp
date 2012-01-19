@@ -24,6 +24,7 @@
 #include "sr/sr_euler.h"
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/algorithm/string.hpp>    
 #include <algorithm>
 #include <cctype>
 #include <string>
@@ -218,8 +219,9 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				nameAttr = getString(nameNode->getNodeValue());
 			DOMNode* typeNode = childAttr->getNamedItem(BML::BMLDefs::ATTR_TYPE);
 			std::string typeAttr = "";
+			DOMNode* tempMaterialNode = ParserOpenCOLLADA::getNode("bind_material", childNode);
 			if (typeNode)
-				typeAttr = getString(typeNode->getNodeValue());
+				typeAttr = getString(typeNode->getNodeValue());			
 			if (typeAttr == "JOINT")
 			{
 				int index = -1;
@@ -348,7 +350,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				jointQuat->orientation(jorientQ);
 				parseJoints(list->item(i), skeleton, motion, scale, order, materialId2Name, joint);
 			}
-			else if (typeAttr == "NODE")
+			else if (typeAttr == "NODE" || tempMaterialNode)
 			{
 				DOMNode* materialNode = ParserOpenCOLLADA::getNode("bind_material", childNode);
 				if (materialNode)
@@ -795,6 +797,7 @@ int ParserOpenCOLLADA::getRotationOrder(std::vector<std::string> orderVec)
 
 std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 {
+	boost::algorithm::to_lower(idString);
 	size_t found = idString.find("position");
 	if (found != string::npos)
 		return "positions";
@@ -822,6 +825,7 @@ std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::vector<SrModel*>& meshModelVec, float scale)
 {
 	const DOMNodeList* list = node->getChildNodes();
+
 	std::map<std::string,bool> vertexSemantics;
 	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
@@ -834,9 +838,11 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 			DOMNamedNodeMap* nodeAttr = node->getAttributes();
 			DOMNode* nameNode = nodeAttr->getNamedItem(BML::BMLDefs::ATTR_NAME);
 			std::string nameAttr = "";
+			DOMNode* idNode = nodeAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
+			std::string idString = getString(idNode->getNodeValue());
 			if (nameNode)
 				nameAttr = getString(nameNode->getNodeValue());
-			newModel->name = SrString(nameAttr.c_str());
+			newModel->name = SrString(idString.c_str());
 			DOMNode* meshNode = ParserOpenCOLLADA::getNode("mesh", node);
 			if (!meshNode)	continue;
 			for (unsigned int c1 = 0; c1 < meshNode->getChildNodes()->getLength(); c1++)

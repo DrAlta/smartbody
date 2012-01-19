@@ -98,7 +98,7 @@ void DeformableMesh::update()
 						SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];	
 						double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
 						globalCounter ++;
-						finalVec = finalVec + (float(jointWeight) * (skinLocalVec * invBMat * gMat));						
+						finalVec = finalVec + (float(jointWeight) * (skinLocalVec * invBMat * skinWeight->bindShapeMat * gMat));						
 					}
 					dMeshDynamic->shape().V[i] = finalVec;
 				}
