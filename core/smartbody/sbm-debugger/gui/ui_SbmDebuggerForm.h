@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Tue Jan 17 11:14:09 2012
+** Created: Wed Jan 18 13:11:01 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -32,12 +32,14 @@ public:
     QAction *actionSettings;
     QAction *actionDisconnect;
     QAction *actionExit;
+    QAction *actionResource_Viewer;
     QWidget *centralwidget;
     QWidget *RenderView;
     QMenuBar *menubar;
     QMenu *menuFile;
     QMenu *menuEdit;
     QMenu *menuView;
+    QMenu *menuSbm;
     QStatusBar *statusbar;
     QToolBar *toolBar;
 
@@ -51,7 +53,7 @@ public:
         actionDebug = new QAction(MainWindow);
         actionDebug->setObjectName(QString::fromUtf8("actionDebug"));
         QIcon icon;
-        icon.addFile(QString::fromUtf8("../images/monkey_on_128x128.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8("C:/Users/reilly/.designer/images/monkey_on_128x128.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionDebug->setIcon(icon);
         actionSettings = new QAction(MainWindow);
         actionSettings->setObjectName(QString::fromUtf8("actionSettings"));
@@ -60,6 +62,8 @@ public:
         actionDisconnect->setEnabled(false);
         actionExit = new QAction(MainWindow);
         actionExit->setObjectName(QString::fromUtf8("actionExit"));
+        actionResource_Viewer = new QAction(MainWindow);
+        actionResource_Viewer->setObjectName(QString::fromUtf8("actionResource_Viewer"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         RenderView = new QWidget(centralwidget);
@@ -75,6 +79,8 @@ public:
         menuEdit->setObjectName(QString::fromUtf8("menuEdit"));
         menuView = new QMenu(menubar);
         menuView->setObjectName(QString::fromUtf8("menuView"));
+        menuSbm = new QMenu(menubar);
+        menuSbm->setObjectName(QString::fromUtf8("menuSbm"));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
@@ -86,10 +92,12 @@ public:
         menubar->addAction(menuFile->menuAction());
         menubar->addAction(menuEdit->menuAction());
         menubar->addAction(menuView->menuAction());
+        menubar->addAction(menuSbm->menuAction());
         menuFile->addAction(actionConnect);
         menuFile->addAction(actionDisconnect);
         menuFile->addAction(actionSettings);
         menuFile->addAction(actionExit);
+        menuSbm->addAction(actionResource_Viewer);
         toolBar->addAction(actionDebug);
 
         retranslateUi(MainWindow);
@@ -115,9 +123,12 @@ public:
         actionDisconnect->setShortcut(QApplication::translate("MainWindow", "Ctrl+D", 0, QApplication::UnicodeUTF8));
         actionExit->setText(QApplication::translate("MainWindow", "E&xit", 0, QApplication::UnicodeUTF8));
         actionExit->setShortcut(QApplication::translate("MainWindow", "Ctrl+Q", 0, QApplication::UnicodeUTF8));
+        actionResource_Viewer->setText(QApplication::translate("MainWindow", "&Resource Viewer", 0, QApplication::UnicodeUTF8));
+        actionResource_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0, QApplication::UnicodeUTF8));
         menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));
+        menuSbm->setTitle(QApplication::translate("MainWindow", "Sbm", 0, QApplication::UnicodeUTF8));
         toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 

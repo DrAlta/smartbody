@@ -53,9 +53,16 @@
      <string>View</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuSbm">
+    <property name="title">
+     <string>Sbm</string>
+    </property>
+    <addaction name="actionResource_Viewer"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
+   <addaction name="menuSbm"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -84,7 +91,7 @@
   <action name="actionDebug">
    <property name="icon">
     <iconset>
-     <normaloff>../images/monkey_on_128x128.png</normaloff>../images/monkey_on_128x128.png</iconset>
+     <normaloff>C:/Users/reilly/.designer/images/monkey_on_128x128.png</normaloff>C:/Users/reilly/.designer/images/monkey_on_128x128.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Debug</string>
@@ -118,6 +125,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionResource_Viewer">
+   <property name="text">
+    <string>&amp;Resource Viewer</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
  </widget>

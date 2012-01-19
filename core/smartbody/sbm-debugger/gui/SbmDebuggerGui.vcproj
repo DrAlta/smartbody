@@ -190,6 +190,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\moc_ResourceDialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\moc_SbmDebuggerForm.cpp"
 				>
 			</File>
@@ -199,6 +203,10 @@
 			</File>
 			<File
 				RelativePath=".\ui_ConnectDialog.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ui_ResourceDialog.h"
 				>
 			</File>
 			<File
@@ -240,6 +248,14 @@
 		</File>
 		<File
 			RelativePath=".\QtCrtDbgOn.h"
+			>
+		</File>
+		<File
+			RelativePath=".\ResourceDialog.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ResourceDialog.h"
 			>
 		</File>
 		<File

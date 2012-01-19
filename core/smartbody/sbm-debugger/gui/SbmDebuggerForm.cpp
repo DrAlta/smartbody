@@ -6,6 +6,9 @@
 #include "vhmsg-tt.h"
 #include "SbmDebuggerClient.h"
 
+#include "SettingsDialog.h"
+#include "ResourceDialog.h"
+
 
 using std::vector;
 using std::string;
@@ -52,6 +55,7 @@ void SbmDebuggerForm::InitSignalsSlots()
    connect(ui.actionDisconnect, SIGNAL(triggered()), this, SLOT(Disconnect()));
    connect(ui.actionSettings, SIGNAL(triggered()), this, SLOT(ShowSettingsDialog()));
    connect(ui.actionExit, SIGNAL(triggered()), m_pMainWindow, SLOT(close()));
+   connect(ui.actionResource_Viewer, SIGNAL(triggered()), this, SLOT(ShowResourceDialog()));
    timer.start(10, this);
 }
 
@@ -91,14 +95,27 @@ void SbmDebuggerForm::ShowSettingsDialog()
 {
    SettingsDialog dlg(this);
    connect(&dlg, SIGNAL(DialogFinished(const SettingsDialog*, int)), m_pGLWidget, SLOT(OnCloseSettingsDialog(const SettingsDialog*, int)));
-   //if (dlg.exec() == QDialog::Accepted)
-   //{
-   //   
-   //}
-   //else
-   //{
-   //   
-   //}
+   if (dlg.exec() == QDialog::Accepted)
+   {
+
+   }
+   else
+   {
+
+   }
+}
+
+void SbmDebuggerForm::ShowResourceDialog()
+{
+   ResourceDialog dlg(this);
+   if (dlg.exec() == QDialog::Accepted)
+   {
+
+   }
+   else
+   {
+
+   }
 }
 
 void SbmDebuggerForm::Disconnect()
