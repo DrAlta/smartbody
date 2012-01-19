@@ -393,7 +393,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 	SkChannelArray& motionChannels = motion.channels();
 	SkChannelArray channelsForAdjusting;
 	
-	typedef std::map<std::string,std::vector<SrMat>> JointNameTransformMap;
+	typedef std::map<std::string,std::vector<SrMat> > JointNameTransformMap;
 	JointNameTransformMap jointTransformMap;
 
 	const DOMNodeList* list = node->getChildNodes();
