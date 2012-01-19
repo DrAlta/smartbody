@@ -19,7 +19,7 @@ ConnectDialog::ConnectDialog(QWidget *parent)
 {
    ui.setupUi(this);
 
-   // TODO: Query processes that are using sbm here
+   //Query processes that are using sbm here
    c.QuerySbmProcessIds();
    vhmsg::ttu_wait(2);
    vhmsg::ttu_wait(2);
@@ -29,6 +29,8 @@ ConnectDialog::ConnectDialog(QWidget *parent)
    {
       ui.listWidget->addItem(ids[i].c_str());
    }
+
+   //connect(this, SIGNAL(mouseDoubleClickEvent(QMouseEvent*)), ui.listWidget, SLOT(mouseDoubleClickEvent(QMouseEvent*)));
 }
 
 void ConnectDialog::accept()
@@ -43,6 +45,7 @@ void ConnectDialog::reject()
 
 void ConnectDialog::keyPressEvent(QKeyEvent *key)
 {
+   QDialog::keyPressEvent(key);
    if ((key->key() == Qt::Key_Return || key->key() == Qt::Key_Enter)
       && ui.listWidget->currentIndex().row() > -1) 
    {

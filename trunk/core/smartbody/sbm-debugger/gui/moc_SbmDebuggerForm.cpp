@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'SbmDebuggerForm.h'
 **
-** Created: Tue Jan 17 12:00:12 2012
+** Created: Wed Jan 18 14:00:34 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       4,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -34,13 +34,15 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
       17,   16,   16,   16, 0x08,
       37,   16,   16,   16, 0x08,
       58,   16,   16,   16, 0x08,
+      79,   16,   16,   16, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_SbmDebuggerForm[] = {
     "SbmDebuggerForm\0\0ShowConnectDialog()\0"
-    "ShowSettingsDialog()\0Disconnect()\0"
+    "ShowSettingsDialog()\0ShowResourceDialog()\0"
+    "Disconnect()\0"
 };
 
 const QMetaObject SbmDebuggerForm::staticMetaObject = {
@@ -74,10 +76,11 @@ int SbmDebuggerForm::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         switch (_id) {
         case 0: ShowConnectDialog(); break;
         case 1: ShowSettingsDialog(); break;
-        case 2: Disconnect(); break;
+        case 2: ShowResourceDialog(); break;
+        case 3: Disconnect(); break;
         default: ;
         }
-        _id -= 3;
+        _id -= 4;
     }
     return _id;
 }

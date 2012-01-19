@@ -7,7 +7,6 @@
 #include "QtCrtDbgOn.h"
 
 #include "ConnectDialog.h"
-#include "SettingsDialog.h"
 #include "GLWidget.h"
 #include "ui_SbmDebuggerForm.h"
 #include "ui_ConnectDialog.h"
@@ -23,6 +22,7 @@ class SbmDebuggerForm : public QWidget
  private slots:
        void ShowConnectDialog();
        void ShowSettingsDialog();
+       void ShowResourceDialog();
        void Disconnect();
 
  private:
