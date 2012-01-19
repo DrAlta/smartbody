@@ -89,6 +89,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib\log4cxxd.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin\QtCored4.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin\QtGuid4.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin\QtOpenGLd4.dll $(TargetDir)&#x0D;&#x0A;if exist ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\msvcr90d.dll copy /Y ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.* $(TargetDir)&#x0D;&#x0A;copy /Y &quot;$(VS90COMNTOOLS)\..\IDE\dbghelp.dll&quot; $(TargetDir)&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -169,6 +170,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib\log4cxx.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin\QtCore4.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin\QtGui4.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin\QtOpenGL4.dll $(TargetDir)&#x0D;&#x0A;copy /Y &quot;$(VS90COMNTOOLS)\..\IDE\dbghelp.dll&quot; $(TargetDir)&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
