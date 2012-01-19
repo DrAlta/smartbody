@@ -64,7 +64,7 @@
 #include "SteeringAgent.h"
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
-#include <boost/algorithm/string/replace.hpp>
+#include <boost/algorithm/string.hpp>
 #include "ParserFBX.h"
 #include "SBCharacter.h"
 #include <sbm/BMLDefs.h>
@@ -1957,7 +1957,7 @@ void nodeStr(const XMLCh* s, std::string& out)
 
 void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFactor, std::string jointPrefix, mcuCBHandle* mcu_p)
 {
-	boost::char_separator<char> sep(" ");
+	boost::char_separator<char> sep(" \n");
 
 	SbmCharacter* char_p = mcu_p->getCharacter( char_name );
 	const DOMNodeList* list = node->getChildNodes();
@@ -1969,6 +1969,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 		nodeStr(node->getNodeName(), name);
 		std::string value;
 		nodeStr(node->getNodeValue(), value);
+		boost::algorithm::to_lower(name);
 		if (name == "controller")
 		{
 			DOMNamedNodeMap* attributes = node->getAttributes();
@@ -2035,6 +2036,11 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 								DOMNodeList* realContentNodeList = childNodeOfSkin->getChildNodes();
 								std::string sourceId;
 								nodeStr(sourceAttributes->getNamedItem(BML::BMLDefs::ATTR_ID)->getNodeValue(), sourceId);
+								boost::algorithm::to_lower(sourceId);
+								bool isBindJointName = (sourceId.find("joints") != std::string::npos);
+								bool isBindWeights = (sourceId.find("weights") != std::string::npos);
+								bool isBindPoseMatrices = (sourceId.find("bind_poses") != std::string::npos || sourceId.find("matrices") != std::string::npos);
+
 								for (unsigned int cSource = 0; cSource < realContentNodeList->getLength(); cSource++)
 								{
 									DOMNode* realContentNode = realContentNodeList->item(cSource);
@@ -2052,7 +2058,8 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 										 it != tokens.end();
 										 ++it)
 									{
-										if ( sourceId == bindJointName && realNodeName == "Name_array")
+										//if ( sourceId == bindJointName && realNodeName == "Name_array") // joint name
+										if ( isBindJointName && realNodeName == "Name_array") // joint name
 										{
 											std::string jointName = (*it);
 											// check if the joint name start with the pre-fix and remove the prefix
@@ -2068,9 +2075,11 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 												skinWeight->infJointName.push_back(jointName);
 											
 										}
-										if ( sourceId == bindWeightName && realNodeName == "float_array")
+										//if ( sourceId == bindWeightName && realNodeName == "float_array") // joint weights
+										if ( isBindWeights && realNodeName == "float_array") // joint weights
 											skinWeight->bindWeight.push_back((float)atof((*it).c_str()));
-										if ( sourceId == bindPoseMatName && realNodeName == "float_array")
+										//if ( sourceId == bindPoseMatName && realNodeName == "float_array") // bind pose matrices
+										if ( isBindPoseMatrices && realNodeName == "float_array") // bind pose matrices
 										{
 											bindPosMat[matCounter] = (float)atof((*it).c_str());
 											matCounter ++;

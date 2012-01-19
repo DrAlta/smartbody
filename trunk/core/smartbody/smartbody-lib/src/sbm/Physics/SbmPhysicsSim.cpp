@@ -500,19 +500,22 @@ void SbmJointObj::initJoint( SbmPhysicsJoint* phyj )
 SrMat SbmJointObj::getRelativeOrientation()
 {
 	updateSbmObj();	
+	SrMat gmat;
 	if (getParentObj())
 	{
-		return getGlobalTransform().gmat()*getParentObj()->getGlobalTransform().gmat().inverse();
+		gmat = getGlobalTransform().gmat()*getParentObj()->getGlobalTransform().gmat().inverse();		
 	}
 	else if (getSBJoint()->getParent())
 	{
-		return getGlobalTransform().gmat()*getSBJoint()->getParent()->getMatrixGlobal().inverse();
+		gmat = getGlobalTransform().gmat()*getSBJoint()->getParent()->getMatrixGlobal().inverse();
 	}
 	else
 	{
-		return getGlobalTransform().gmat();
+		gmat = getGlobalTransform().gmat();
 	}	
+	return gmat;
 }
+
 
 void SbmJointObj::handleCollision( SrVec contactPt, SbmPhysicsObj* colObj )
 {
