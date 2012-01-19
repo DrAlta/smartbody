@@ -40,6 +40,7 @@ class SbmDebuggerForm : public QWidget
     void InitSignalsSlots();
     void Update();
     void UpdateSceneTree();
+    void UpdateLabels();
 
     QBasicTimer timer;
     virtual void timerEvent(QTimerEvent * event);

@@ -50,6 +50,8 @@
 #include "SbmDebuggerCommon.h"
 #include "SettingsDialog.h"
 
+using std::string;
+
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
@@ -62,11 +64,8 @@ public:
     QSize sizeHint() const;
     virtual void Update();
 
-    void SetCameraMovementSpeed(float speed) { m_fCameraMovementSpeed = speed; }
     void SetScene(Scene* scene) { m_pScene = scene; }
-    void SetScaleFactor(float scale) { m_fScaleFactor = scale; }
-    float GetCameraMovementSpeed() { return m_fCameraMovementSpeed; }
-    float GetCameraRotationSpeed() { return m_fCameraRotationSpeed; }
+    string GetCameraPositionAsString();
 
 public slots:
     void setXRotation(float angle);
@@ -99,11 +98,8 @@ private:
     QColor qtGreen;
     QColor qtPurple;
     Camera m_Camera;
-    float m_fCameraMovementSpeed;
-    float m_fCameraRotationSpeed;
     float m_fPawnSize;
     float m_fJointRadius;
-    double m_fScaleFactor;
     Scene* m_pScene;
     GLUquadric* m_quadric;
 

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Thu Jan 19 10:57:59 2012
+** Created: Thu Jan 19 13:49:32 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -15,6 +15,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
 #include <QtGui/QHeaderView>
+#include <QtGui/QLabel>
 #include <QtGui/QMainWindow>
 #include <QtGui/QMenu>
 #include <QtGui/QMenuBar>
@@ -37,6 +38,9 @@ public:
     QAction *actionResource_Viewer;
     QWidget *centralwidget;
     QWidget *RenderView;
+    QLabel *rendererFpsLabel;
+    QLabel *networkFpsLabel;
+    QLabel *cameraPositionLabel;
     QTabWidget *sceneTab;
     QWidget *tab;
     QTreeWidget *sceneTree;
@@ -76,6 +80,16 @@ public:
         RenderView = new QWidget(centralwidget);
         RenderView->setObjectName(QString::fromUtf8("RenderView"));
         RenderView->setGeometry(QRect(10, 10, 1001, 761));
+        rendererFpsLabel = new QLabel(RenderView);
+        rendererFpsLabel->setObjectName(QString::fromUtf8("rendererFpsLabel"));
+        rendererFpsLabel->setEnabled(true);
+        rendererFpsLabel->setGeometry(QRect(10, 10, 121, 16));
+        networkFpsLabel = new QLabel(RenderView);
+        networkFpsLabel->setObjectName(QString::fromUtf8("networkFpsLabel"));
+        networkFpsLabel->setGeometry(QRect(10, 30, 71, 16));
+        cameraPositionLabel = new QLabel(RenderView);
+        cameraPositionLabel->setObjectName(QString::fromUtf8("cameraPositionLabel"));
+        cameraPositionLabel->setGeometry(QRect(10, 50, 211, 16));
         sceneTab = new QTabWidget(centralwidget);
         sceneTab->setObjectName(QString::fromUtf8("sceneTab"));
         sceneTab->setGeometry(QRect(1020, 10, 181, 771));
@@ -156,6 +170,9 @@ public:
         actionExit->setShortcut(QApplication::translate("MainWindow", "Ctrl+Q", 0, QApplication::UnicodeUTF8));
         actionResource_Viewer->setText(QApplication::translate("MainWindow", "&Resource Viewer", 0, QApplication::UnicodeUTF8));
         actionResource_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0, QApplication::UnicodeUTF8));
+        rendererFpsLabel->setText(QApplication::translate("MainWindow", "Renderer Fps:", 0, QApplication::UnicodeUTF8));
+        networkFpsLabel->setText(QApplication::translate("MainWindow", "Network Fps:", 0, QApplication::UnicodeUTF8));
+        cameraPositionLabel->setText(QApplication::translate("MainWindow", "Camera Pos:", 0, QApplication::UnicodeUTF8));
         sceneTab->setTabText(sceneTab->indexOf(tab), QApplication::translate("MainWindow", "Scene", 0, QApplication::UnicodeUTF8));
         sceneTab->setTabText(sceneTab->indexOf(tab_2), QApplication::translate("MainWindow", "Tab 2", 0, QApplication::UnicodeUTF8));
         sceneTab->setTabText(sceneTab->indexOf(tab_3), QApplication::translate("MainWindow", "Tab 3", 0, QApplication::UnicodeUTF8));

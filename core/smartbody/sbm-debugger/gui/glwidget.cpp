@@ -42,7 +42,7 @@
 #include <math.h>
 
 #include "glwidget.h"
-//#include "qtlogo.h"
+#include "vhcl.h"
 
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D
@@ -62,11 +62,9 @@ GLWidget::GLWidget(Scene* scene, QWidget *parent)
     xRot = 0;
     yRot = 0;
     zRot = 0;
-    m_fCameraMovementSpeed = 0.05f;
-    m_fCameraRotationSpeed = 0.01f;
-    m_fPawnSize = 0.1f;
-    m_fJointRadius = 0.05f;
-    m_fScaleFactor = 0.01f;
+    
+    m_fPawnSize = 1.0f;
+    m_fJointRadius = 1.25f;
 
     qtGreen = QColor::fromCmykF(0.40, 0.0, 1.0, 0.0);
     qtPurple = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
@@ -139,8 +137,9 @@ void GLWidget::OnCloseSettingsDialog(const SettingsDialog* dlg, int result)
 {
    if (result == QDialog::Accepted)
    {
-      m_fScaleFactor = dlg->ui.positionScaleBox->value();
       m_Camera.SetCameraType(dlg->ui.cameraControlBox->currentText().toStdString());
+      m_Camera.SetMovementSpeed(dlg->ui.cameraMovementSpeedBox->value());
+      m_Camera.SetRotationSpeed(dlg->ui.cameraRotationSpeedBox->value());
    }
 }
 
@@ -263,7 +262,7 @@ void GLWidget::DrawCharacter(const Character* character)
 void GLWidget::DrawJoint(Joint* joint)
 {
    glPushMatrix();
-   Vector3 jointPos = (joint->posOrig + joint->pos) * m_fScaleFactor;
+   Vector3 jointPos = (joint->posOrig + joint->pos);
 
    //if (joint->m_name == "l_shoulder")
    //{
@@ -274,13 +273,13 @@ void GLWidget::DrawJoint(Joint* joint)
    QMatrix4x4 rotationMat = GetLocalRotation(joint);
    glMultMatrixd(rotationMat.data());  
    
-   DrawSphere(0.0125f); 
+   DrawSphere(m_fJointRadius); 
 
    // draw a connecting bone between the 2 joints
    if (joint->m_parent)
    {
       glPushMatrix();
-      /*Vector3 parentJointPos = (joint->m_parent->posOrig + joint->m_parent->pos) * m_fScaleFactor;
+      /*Vector3 parentJointPos = (joint->m_parent->posOrig + joint->m_parent->pos);
       double jointLength = (jointPos - parentJointPos).Magnitude();
       // draw the bone
       DrawCylinder(0.01f, 0.01f, jointLength, 10, 10);*/
@@ -305,7 +304,7 @@ void GLWidget::DrawPawn(const Pawn* pawn)
 {
    glTranslated(pawn->pos.x, pawn->pos.y, pawn->pos.z);
    //glRotatef(); // TODO: Perform rotation, convert quat to euler angles
-   DrawSphere(0.1f);
+   DrawSphere(m_fPawnSize);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
@@ -322,11 +321,11 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 {
    if (event->delta() > 0)
    {
-      m_Camera.MoveZ(-GetCameraMovementSpeed());
+      m_Camera.MoveZ(-m_Camera.GetMovementSpeed());
    }
    else
    { 
-      m_Camera.MoveZ(GetCameraMovementSpeed());
+      m_Camera.MoveZ(m_Camera.GetMovementSpeed());
    }
    updateGL();
 }
@@ -339,7 +338,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     if (event->buttons() & Qt::LeftButton) 
     {
         //setXRotation(xRot + GetCameraRotationSpeed() * dy);
-        setYRotation(yRot + GetCameraRotationSpeed() * dx);
+        setYRotation(yRot + m_Camera.GetRotationSpeed() * dx);
     } 
     //else if (event->buttons() & Qt::RightButton) 
     //{
@@ -354,30 +353,30 @@ void GLWidget::keyPressEvent(QKeyEvent *key)
    if (key->key() == Qt::Key_A // left
       || key->key() == Qt::Key_Left) 
    {
-      m_Camera.MoveX(-GetCameraMovementSpeed());
+      m_Camera.MoveX(-m_Camera.GetMovementSpeed());
    }
    else if (key->key() == Qt::Key_D // right
       || key->key() == Qt::Key_Right) 
    {
-      m_Camera.MoveX(GetCameraMovementSpeed());
+      m_Camera.MoveX(m_Camera.GetMovementSpeed());
    }
    else if (key->key() == Qt::Key_W // forward
       || key->key() == Qt::Key_Up)  
    {
-      m_Camera.MoveZ(-GetCameraMovementSpeed());
+      m_Camera.MoveZ(-m_Camera.GetMovementSpeed());
    }
    else if (key->key() == Qt::Key_S // back
       || key->key() == Qt::Key_Down) 
    {
-      m_Camera.MoveZ(GetCameraMovementSpeed());
+      m_Camera.MoveZ(m_Camera.GetMovementSpeed());
    }
    else if (key->key() == Qt::Key_Q) // up
    {
-      m_Camera.MoveY(GetCameraMovementSpeed());
+      m_Camera.MoveY(m_Camera.GetMovementSpeed());
    }
    else if (key->key() == Qt::Key_E) // down
    {
-      m_Camera.MoveY(-GetCameraMovementSpeed());
+      m_Camera.MoveY(-m_Camera.GetMovementSpeed());
    }
 
    updateGL();
@@ -403,10 +402,16 @@ void GLWidget::Update()
       // and conversion from different types of vectors
       DebuggerCamera cam = m_pScene->m_camera;
       gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
-      m_Camera.SetPosition(QVector3D(-cam.pos.x, cam.pos.y, cam.pos.z));
+      m_Camera.SetPosition(QVector3D(cam.pos.x, cam.pos.y, cam.pos.z));
       Vector3 eulerAngles = Vector3::ConvertFromQuat(cam.rot.x, cam.rot.y, cam.rot.z, cam.rot.w);
-      m_Camera.SetRotation(QVector3D(-eulerAngles.x, -(eulerAngles.y + 180), eulerAngles.z));
+      m_Camera.SetRotation(QVector3D(eulerAngles.x, eulerAngles.y, eulerAngles.z));
    }
    
    updateGL();
+}
+
+string GLWidget::GetCameraPositionAsString()
+{
+  QVector3D pos = m_Camera.GetPosition();
+  return vhcl::Format("x: %.2f    y: %.2f    z: %.2f", pos.x(), pos.y(), pos.z());
 }
