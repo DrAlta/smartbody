@@ -293,14 +293,25 @@ SMARTBODY_C_DLL_API bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
 }
 
 
-SMARTBODY_C_DLL_API void SBM_SetCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
+SMARTBODY_C_DLL_API void SBM_SetDebuggerId( SBMHANDLE sbmHandle, const char * id )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
       return;
    }
 
-   g_smartbodyInstances[ sbmHandle ]->SetCameraValues( x, y, z, rx, ry, rz, rw, fov, aspect, zNear, zFar );
+   g_smartbodyInstances[ sbmHandle ]->SetDebuggerId( id );
+}
+
+
+SMARTBODY_C_DLL_API void SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   g_smartbodyInstances[ sbmHandle ]->SetDebuggerCameraValues( x, y, z, rx, ry, rz, rw, fov, aspect, zNear, zFar );
 }
 
 

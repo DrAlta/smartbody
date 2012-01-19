@@ -89,7 +89,8 @@ class Smartbody_dll
 
       SMARTBODY_DLL_API bool Update( const double timeInSeconds );
 
-      SMARTBODY_DLL_API void SetCameraValues( double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar );
+      SMARTBODY_DLL_API void SetDebuggerId( const std::string & id );
+      SMARTBODY_DLL_API void SetDebuggerCameraValues( double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar );
 
       SMARTBODY_DLL_API bool ProcessVHMsgs( const char * op, const char * args );
 

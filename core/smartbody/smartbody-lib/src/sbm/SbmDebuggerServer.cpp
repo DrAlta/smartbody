@@ -20,7 +20,7 @@ using std::vector;
 SbmDebuggerServer::SbmDebuggerServer()
 {
    m_sbmId = "123";
-   m_sbmId2 = "unity-123";
+   m_sbmId2 = "sbm-" + vhcl::ToString(rand());
    m_connectResult = false;
    m_updateFrequencyS = 0;
    m_lastUpdate = m_timer.GetTime();
