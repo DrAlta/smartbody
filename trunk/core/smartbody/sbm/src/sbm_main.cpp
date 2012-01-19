@@ -72,6 +72,7 @@
 #include "CommandWindow.h"
 #include <sbm/SBPython.h>
 #include "FLTKListener.h"
+#include "sbm/SbmDebuggerServer.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef WIN32_LEAN_AND_MEAN
@@ -129,6 +130,8 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
             LOG("SBM ERR: command FAILED: '%s' + '%s'", op, args );
             break;
     }
+
+	mcuCBHandle::singleton()._scene->getDebuggerServer()->ProcessVHMsgs(op, args);
 }
 
 int sbm_vhmsg_register_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
@@ -678,6 +681,8 @@ int main( int argc, char **argv )	{
 		err = vhmsg::ttu_register( "vrKillComponent" );
 		err = vhmsg::ttu_register( "wsp" );
 		err = vhmsg::ttu_register( "receiver" );
+		err = vhmsg::ttu_register( "sbmdebugger" );
+		err = vhmsg::ttu_register( "vrPerception" );
 
 		mcu.vhmsg_enabled = true;
 	} else {

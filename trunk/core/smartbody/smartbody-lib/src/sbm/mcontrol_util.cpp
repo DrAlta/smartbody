@@ -77,6 +77,9 @@
 #include <sbm/locomotion_cmds.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
+#include "SbmDebuggerServer.h"
+
+
 using namespace std;
 
 #if USE_WSP
@@ -289,6 +292,9 @@ mcuCBHandle::mcuCBHandle()
 	//physicsEngine->initSimulation();
 	steeringScale = 0.01f;
 	_scene = new SmartBody::SBScene();
+
+	_scene->getDebuggerServer()->Init();
+	_scene->getDebuggerServer()->SetSBScene(_scene);
 }
 
 /////////////////////////////////////////////////////////////
@@ -484,6 +490,7 @@ void mcuCBHandle::registerCallbacks()
 	insert( "vrKillComponent", mcu_vrKillComponent_func );
 	insert( "vrAllCall", mcu_vrAllCall_func );
 	insert( "vrPerception", mcu_vrPerception_func );
+	insert( "sbmdebugger", mcu_sbmdebugger_func );
 
 	insert( "text_speech", text_speech::text_speech_func ); // [BMLR]
 }
@@ -1230,6 +1237,24 @@ void mcuCBHandle::update( void )	{
 
 		bonebus.CloseConnection();
 	}
+
+
+	if (viewer_p && viewer_p->get_camera())
+	{
+		_scene->getDebuggerServer()->m_camera.pos.x = viewer_p->get_camera()->eye.x;
+		_scene->getDebuggerServer()->m_camera.pos.y = viewer_p->get_camera()->eye.y;
+		_scene->getDebuggerServer()->m_camera.pos.z = viewer_p->get_camera()->eye.z;
+		//_scene->getDebuggerServer()->m_camera.rot.x = viewer_p->get_camera()->eye.x;
+		//_scene->getDebuggerServer()->m_camera.rot.y = viewer_p->get_camera()->eye.x;
+		//_scene->getDebuggerServer()->m_camera.rot.z = viewer_p->get_camera()->eye.x;
+		//_scene->getDebuggerServer()->m_camera.rot.w = viewer_p->get_camera()->eye.x;
+		_scene->getDebuggerServer()->m_camera.fovY   = viewer_p->get_camera()->fovy;
+		_scene->getDebuggerServer()->m_camera.aspect = viewer_p->get_camera()->aspect;
+		_scene->getDebuggerServer()->m_camera.zNear  = viewer_p->get_camera()->znear;
+		_scene->getDebuggerServer()->m_camera.zFar   = viewer_p->get_camera()->zfar;
+	}
+
+	_scene->getDebuggerServer()->Update();
 
 
 	if (panimationviewer_p)

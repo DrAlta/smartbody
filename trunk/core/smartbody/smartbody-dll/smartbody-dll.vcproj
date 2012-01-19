@@ -370,14 +370,6 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\SbmDebuggerServer.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\SbmDebuggerServer.h"
-			>
-		</File>
-		<File
 			RelativePath=".\smartbody-c-dll.cpp"
 			>
 		</File>

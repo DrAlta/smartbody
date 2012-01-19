@@ -118,6 +118,8 @@ int mcu_vrQuery_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 //perception
 int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
+int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+
 int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p );

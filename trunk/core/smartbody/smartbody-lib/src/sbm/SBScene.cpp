@@ -1,5 +1,11 @@
+
+#include "vhcl.h"
+
 #include "SBScene.h"
-#include <sbm/mcontrol_util.h>
+#include "sbm/mcontrol_util.h"
+
+#include "SbmDebuggerServer.h"
+
 
 namespace SmartBody {
 
@@ -20,6 +26,8 @@ SBScene::SBScene(void)
 	_serviceManager->addService(_physicsManager);
 
 	_parser = new SBParser();
+
+	_debuggerServer = new SbmDebuggerServer();
 
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 }
@@ -42,6 +50,8 @@ SBScene::~SBScene(void)
 	delete _physicsManager;
 
 	delete _parser;
+
+	delete _debuggerServer;  // TODO: should delete these in reverse order?
 }
 
 void SBScene::setScale(double val)

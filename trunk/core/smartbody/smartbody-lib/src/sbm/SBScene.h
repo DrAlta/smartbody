@@ -16,6 +16,10 @@
 #include <sbm/SBPhysicsManager.h>
 #include <sbm/SBParser.h>
 
+
+class SbmDebuggerServer;
+
+
 namespace SmartBody {
 
 class SBScene : public SBObject
@@ -88,6 +92,8 @@ class SBScene : public SBObject
 
 		SBParser* getParser();
 
+		SbmDebuggerServer * getDebuggerServer() { return _debuggerServer; }
+
 		void notify(SBSubject* subject);
 
 	protected:
@@ -103,6 +109,8 @@ class SBScene : public SBObject
 
 		std::map<std::string, SBScript*> _scripts;
 		double _scale;
+
+		SbmDebuggerServer* _debuggerServer;
 };
 
 };
