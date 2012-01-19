@@ -31,8 +31,15 @@ class SbmDebuggerForm : public QWidget
      GLWidget* m_pGLWidget;
 
  protected:
+    enum SceneTreeIndex
+    {
+      Characters,
+      Pawns,
+    };
+
     void InitSignalsSlots();
     void Update();
+    void UpdateSceneTree();
 
     QBasicTimer timer;
     virtual void timerEvent(QTimerEvent * event);

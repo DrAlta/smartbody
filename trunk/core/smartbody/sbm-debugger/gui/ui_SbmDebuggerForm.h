@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Wed Jan 18 13:11:01 2012
+** Created: Thu Jan 19 10:57:59 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -19,7 +19,9 @@
 #include <QtGui/QMenu>
 #include <QtGui/QMenuBar>
 #include <QtGui/QStatusBar>
+#include <QtGui/QTabWidget>
 #include <QtGui/QToolBar>
+#include <QtGui/QTreeWidget>
 #include <QtGui/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -35,6 +37,11 @@ public:
     QAction *actionResource_Viewer;
     QWidget *centralwidget;
     QWidget *RenderView;
+    QTabWidget *sceneTab;
+    QWidget *tab;
+    QTreeWidget *sceneTree;
+    QWidget *tab_2;
+    QWidget *tab_3;
     QMenuBar *menubar;
     QMenu *menuFile;
     QMenu *menuEdit;
@@ -47,7 +54,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(1057, 817);
+        MainWindow->resize(1236, 817);
         actionConnect = new QAction(MainWindow);
         actionConnect->setObjectName(QString::fromUtf8("actionConnect"));
         actionDebug = new QAction(MainWindow);
@@ -69,10 +76,31 @@ public:
         RenderView = new QWidget(centralwidget);
         RenderView->setObjectName(QString::fromUtf8("RenderView"));
         RenderView->setGeometry(QRect(10, 10, 1001, 761));
+        sceneTab = new QTabWidget(centralwidget);
+        sceneTab->setObjectName(QString::fromUtf8("sceneTab"));
+        sceneTab->setGeometry(QRect(1020, 10, 181, 771));
+        tab = new QWidget();
+        tab->setObjectName(QString::fromUtf8("tab"));
+        sceneTree = new QTreeWidget(tab);
+        QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
+        __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
+        sceneTree->setHeaderItem(__qtreewidgetitem);
+        sceneTree->setObjectName(QString::fromUtf8("sceneTree"));
+        sceneTree->setGeometry(QRect(0, 0, 181, 741));
+        sceneTree->setRootIsDecorated(true);
+        sceneTree->setColumnCount(1);
+        sceneTree->header()->setVisible(true);
+        sceneTab->addTab(tab, QString());
+        tab_2 = new QWidget();
+        tab_2->setObjectName(QString::fromUtf8("tab_2"));
+        sceneTab->addTab(tab_2, QString());
+        tab_3 = new QWidget();
+        tab_3->setObjectName(QString::fromUtf8("tab_3"));
+        sceneTab->addTab(tab_3, QString());
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 1057, 21));
+        menubar->setGeometry(QRect(0, 0, 1236, 21));
         menuFile = new QMenu(menubar);
         menuFile->setObjectName(QString::fromUtf8("menuFile"));
         menuEdit = new QMenu(menubar);
@@ -102,6 +130,9 @@ public:
 
         retranslateUi(MainWindow);
 
+        sceneTab->setCurrentIndex(0);
+
+
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
 
@@ -125,6 +156,9 @@ public:
         actionExit->setShortcut(QApplication::translate("MainWindow", "Ctrl+Q", 0, QApplication::UnicodeUTF8));
         actionResource_Viewer->setText(QApplication::translate("MainWindow", "&Resource Viewer", 0, QApplication::UnicodeUTF8));
         actionResource_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0, QApplication::UnicodeUTF8));
+        sceneTab->setTabText(sceneTab->indexOf(tab), QApplication::translate("MainWindow", "Scene", 0, QApplication::UnicodeUTF8));
+        sceneTab->setTabText(sceneTab->indexOf(tab_2), QApplication::translate("MainWindow", "Tab 2", 0, QApplication::UnicodeUTF8));
+        sceneTab->setTabText(sceneTab->indexOf(tab_3), QApplication::translate("MainWindow", "Tab 3", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0, QApplication::UnicodeUTF8));
         menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));

@@ -31,17 +31,21 @@ SbmDebuggerForm::SbmDebuggerForm(QMainWindow* mainWindow, QWidget *parent)
   QSize rendererSize = ui.RenderView->size();
   m_pGLWidget->setGeometry(ui.RenderView->x() + 40, ui.RenderView->y() + 25,
      rendererSize.width(), rendererSize.height());
-
   m_pMainWindow->layout()->addWidget(m_pGLWidget);
 
-
-   vhmsg::ttu_set_client_callback(VHMsgCallback);
-   vhmsg::ttu_open();
-   vhmsg::ttu_register("sbmdebugger");
+  // set vhmsg
+  vhmsg::ttu_set_client_callback(VHMsgCallback);
+  vhmsg::ttu_open();
+  vhmsg::ttu_register("sbmdebugger");
 
   InitSignalsSlots();
 
   setUpdatesEnabled(true);
+
+  // setup scene tree
+  ui.sceneTree->insertTopLevelItem(Characters, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Characters"))));
+  ui.sceneTree->insertTopLevelItem(Pawns, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Pawns"))));
+  ui.sceneTree->setHeaderLabel(QString("Entities"));
 }
 
 SbmDebuggerForm::~SbmDebuggerForm()
@@ -134,8 +138,60 @@ void SbmDebuggerForm::Update()
    }
 
    c.Update();
+
+   UpdateSceneTree();
 }
 
+void SbmDebuggerForm::UpdateSceneTree()
+{
+   string entityName = "";
+
+   // character tree
+   for (unsigned int i = 0; i < c.GetScene()->m_characters.size(); i++)
+   {
+      entityName = c.GetScene()->m_characters[i].m_name;
+      QTreeWidgetItem* subTree = ui.sceneTree->topLevelItem(Characters);
+      bool alreadyExistsInTree = false;
+      for (int j = 0; j < subTree->childCount(); j++)
+      {
+         if (subTree->child(j)->text(Characters).toStdString() == entityName)
+         {
+            alreadyExistsInTree = true;
+            break;
+         }       
+      }
+
+      if (!alreadyExistsInTree)
+      {
+         // the entity isn't represented in the tree view, add it
+         ui.sceneTree->insertTopLevelItem(Characters, 
+            new QTreeWidgetItem(ui.sceneTree->topLevelItem(i), QStringList(QString(entityName.c_str()))));
+      } 
+   }
+
+   // pawn tree
+   for (unsigned int i = 0; i < c.GetScene()->m_pawns.size(); i++)
+   {
+      entityName = c.GetScene()->m_pawns[i].m_name;
+      QTreeWidgetItem* subTree = ui.sceneTree->topLevelItem(Pawns);
+      bool alreadyExistsInTree = false;
+      for (int j = 0; j < subTree->childCount(); j++)
+      {
+         if (subTree->child(j)->text(Pawns).toStdString() == entityName)
+         {
+            alreadyExistsInTree = true;
+            break;
+         }       
+      }
+
+      if (!alreadyExistsInTree)
+      {
+         // the entity isn't represented in the tree view, add it
+         ui.sceneTree->insertTopLevelItem(Pawns, 
+            new QTreeWidgetItem(ui.sceneTree->topLevelItem(i), QStringList(QString(entityName.c_str()))));
+      } 
+   }
+}
 
 void SbmDebuggerForm::timerEvent(QTimerEvent * event)
 {
