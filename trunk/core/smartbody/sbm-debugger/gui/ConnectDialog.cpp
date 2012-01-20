@@ -21,8 +21,8 @@ ConnectDialog::ConnectDialog(QWidget *parent)
 
    //Query processes that are using sbm here
    c.QuerySbmProcessIds();
-   vhmsg::ttu_wait(2);
-   vhmsg::ttu_wait(2);
+   vhcl::Sleep(2);
+   vhmsg::ttu_poll();
    vector<string> ids = c.GetSbmProcessIds();
 
    for (size_t i = 0; i < ids.size(); i++)
@@ -55,5 +55,5 @@ void ConnectDialog::keyPressEvent(QKeyEvent *key)
 
 void ConnectDialog::mouseDoubleClickEvent(QMouseEvent *event)
 {
-   
+
 }

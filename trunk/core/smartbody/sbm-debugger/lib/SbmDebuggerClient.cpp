@@ -7,12 +7,11 @@
 #include <vector>
 
 #include <stdio.h>
-#include <conio.h>
-//#include <windows.h>
 
 #include "vhmsg-tt.h"
 
 #include "SbmDebuggerCommon.h"
+
 
 using std::string;
 using std::vector;
@@ -39,6 +38,13 @@ void SbmDebuggerClient::Connect(const string & id)
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s connect", m_sbmId.c_str()).c_str());
 }
 
+void SbmDebuggerClient::Disconnect()
+{
+   vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s disconnect", m_sbmId.c_str()).c_str());
+   m_sbmId = "";
+   m_connectResult = false;
+}
+
 void SbmDebuggerClient::Init()
 {
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s send_init", m_sbmId.c_str()).c_str());
@@ -53,6 +59,11 @@ void SbmDebuggerClient::StartUpdates(double updateFrequencyS)
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s start_update %f", m_sbmId.c_str(), updateFrequencyS).c_str());
 }
 
+void SbmDebuggerClient::EndUpdates()
+{
+   vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s end_update", m_sbmId.c_str()).c_str());
+}
+
 void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
 {
    string message = string(op) + " " + string(args);
@@ -65,6 +76,14 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
       {
          if (split.size() > 1)
          {
+            if (split.size() > 2)
+            {
+               if (split[2] == "id")
+               {
+                  m_processIdList.push_back(split[1]);
+               }
+            }
+
             if (split[1] == m_sbmId)
             {
                if (split.size() > 2)
@@ -271,16 +290,6 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
                      //printf("Update Received\n");
                      //printf(message.c_str());
                      //printf("\n");
-                  }
-               }
-            }
-            else
-            {
-               if (split.size() > 2)
-               {
-                  if (split[2] == "id")
-                  {
-                     m_processIdList.push_back(split[1]);
                   }
                }
             }

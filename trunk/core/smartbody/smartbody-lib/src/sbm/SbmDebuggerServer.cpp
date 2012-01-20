@@ -4,9 +4,6 @@
 #include "SbmDebuggerServer.h"
 
 #include <stdio.h>
-#ifdef WIN32
-#include <conio.h>
-#endif
 
 #include "vhmsg-tt.h"
 
@@ -133,6 +130,11 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
                      m_connectResult = true;
                      vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s connect_success", m_sbmId2.c_str()).c_str());
                   }
+                  else if (split[2] == "disconnect")
+                  {
+                     m_updateFrequencyS = 0;
+                     m_connectResult = false;
+                  }
                   else if (split[2] == "send_init")
                   {
                      if (m_scene != NULL)
@@ -161,6 +163,10 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
                      {
                         m_updateFrequencyS = vhcl::ToDouble(split[3]);
                      }
+                  }
+                  else if (split[2] == "end_update")
+                  {
+                     m_updateFrequencyS = 0;
                   }
                }
             }
