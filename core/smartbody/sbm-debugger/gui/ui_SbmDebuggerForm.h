@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Thu Jan 19 13:49:32 2012
+** Created: Thu Jan 19 16:02:17 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -40,10 +40,10 @@ public:
     QWidget *RenderView;
     QLabel *rendererFpsLabel;
     QLabel *networkFpsLabel;
-    QLabel *cameraPositionLabel;
     QTabWidget *sceneTab;
     QWidget *tab;
     QTreeWidget *sceneTree;
+    QLabel *cameraPositionLabel;
     QWidget *tab_2;
     QWidget *tab_3;
     QMenuBar *menubar;
@@ -87,9 +87,6 @@ public:
         networkFpsLabel = new QLabel(RenderView);
         networkFpsLabel->setObjectName(QString::fromUtf8("networkFpsLabel"));
         networkFpsLabel->setGeometry(QRect(10, 30, 71, 16));
-        cameraPositionLabel = new QLabel(RenderView);
-        cameraPositionLabel->setObjectName(QString::fromUtf8("cameraPositionLabel"));
-        cameraPositionLabel->setGeometry(QRect(10, 50, 211, 16));
         sceneTab = new QTabWidget(centralwidget);
         sceneTab->setObjectName(QString::fromUtf8("sceneTab"));
         sceneTab->setGeometry(QRect(1020, 10, 181, 771));
@@ -104,6 +101,9 @@ public:
         sceneTree->setRootIsDecorated(true);
         sceneTree->setColumnCount(1);
         sceneTree->header()->setVisible(true);
+        cameraPositionLabel = new QLabel(tab);
+        cameraPositionLabel->setObjectName(QString::fromUtf8("cameraPositionLabel"));
+        cameraPositionLabel->setGeometry(QRect(-30, 490, 211, 16));
         sceneTab->addTab(tab, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName(QString::fromUtf8("tab_2"));

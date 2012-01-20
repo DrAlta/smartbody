@@ -68,16 +68,7 @@ public:
     string GetCameraPositionAsString();
 
 public slots:
-    void setXRotation(float angle);
-    void setYRotation(float angle);
-    void setZRotation(float angle);
     void OnCloseSettingsDialog(const SettingsDialog* dlg, int result);
-
-signals:
-    void xRotationChanged(int angle);
-    void yRotationChanged(int angle);
-    void zRotationChanged(int angle);
-
 
 Q_SIGNALS:
 protected:
@@ -91,9 +82,7 @@ protected:
     void keyPressEvent(QKeyEvent *key);
     
 private:
-    float xRot;
-    float yRot;
-    float zRot;
+
     QPoint lastPos;
     QColor qtGreen;
     QColor qtPurple;

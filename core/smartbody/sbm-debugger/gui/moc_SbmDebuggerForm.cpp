@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'SbmDebuggerForm.h'
 **
-** Created: Thu Jan 19 12:34:07 2012
+** Created: Thu Jan 19 18:10:53 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!

@@ -10,6 +10,7 @@
 #define LERP(a, b, t) (a + (b - a) * t)
 #define PIOVER180 3.14159265358979323846 / 180.0f
 #define RAD_TO_DEG 180.0f / 3.14159265358979323846f
+#define DEG_TO_RAD 3.14159265358979323846f / 180.0f
 
 class Vector3;
 class Vector4

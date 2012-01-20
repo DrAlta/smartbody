@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'glwidget.h'
 **
-** Created: Thu Jan 19 12:34:07 2012
+** Created: Thu Jan 19 18:10:53 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,32 +23,21 @@ static const uint qt_meta_data_GLWidget[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       7,   14, // methods
+       1,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       3,       // signalCount
-
- // signals: signature, parameters, type, tag, flags
-      16,   10,    9,    9, 0x05,
-      38,   10,    9,    9, 0x05,
-      60,   10,    9,    9, 0x05,
+       0,       // signalCount
 
  // slots: signature, parameters, type, tag, flags
-      82,   10,    9,    9, 0x0a,
-     102,   10,    9,    9, 0x0a,
-     122,   10,    9,    9, 0x0a,
-     153,  142,    9,    9, 0x0a,
+      21,   10,    9,    9, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_GLWidget[] = {
-    "GLWidget\0\0angle\0xRotationChanged(int)\0"
-    "yRotationChanged(int)\0zRotationChanged(int)\0"
-    "setXRotation(float)\0setYRotation(float)\0"
-    "setZRotation(float)\0dlg,result\0"
+    "GLWidget\0\0dlg,result\0"
     "OnCloseSettingsDialog(const SettingsDialog*,int)\0"
 };
 
@@ -81,38 +70,11 @@ int GLWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: xRotationChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 1: yRotationChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 2: zRotationChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 3: setXRotation((*reinterpret_cast< float(*)>(_a[1]))); break;
-        case 4: setYRotation((*reinterpret_cast< float(*)>(_a[1]))); break;
-        case 5: setZRotation((*reinterpret_cast< float(*)>(_a[1]))); break;
-        case 6: OnCloseSettingsDialog((*reinterpret_cast< const SettingsDialog*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 0: OnCloseSettingsDialog((*reinterpret_cast< const SettingsDialog*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         default: ;
         }
-        _id -= 7;
+        _id -= 1;
     }
     return _id;
-}
-
-// SIGNAL 0
-void GLWidget::xRotationChanged(int _t1)
-{
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 0, _a);
-}
-
-// SIGNAL 1
-void GLWidget::yRotationChanged(int _t1)
-{
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 1, _a);
-}
-
-// SIGNAL 2
-void GLWidget::zRotationChanged(int _t1)
-{
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
 QT_END_MOC_NAMESPACE

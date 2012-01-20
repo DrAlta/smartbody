@@ -52,19 +52,6 @@
       <string>Network Fps:</string>
      </property>
     </widget>
-    <widget class="QLabel" name="cameraPositionLabel">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>50</y>
-       <width>211</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Camera Pos:</string>
-     </property>
-    </widget>
    </widget>
    <widget class="QTabWidget" name="sceneTab">
     <property name="geometry">
@@ -105,6 +92,19 @@
         <string notr="true">1</string>
        </property>
       </column>
+     </widget>
+     <widget class="QLabel" name="cameraPositionLabel">
+      <property name="geometry">
+       <rect>
+        <x>-30</x>
+        <y>490</y>
+        <width>211</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Camera Pos:</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_2">

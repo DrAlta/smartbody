@@ -59,9 +59,6 @@ GLWidget::GLWidget(Scene* scene, QWidget *parent)
 {
     m_quadric = gluNewQuadric();
     SetScene(scene);
-    xRot = 0;
-    yRot = 0;
-    zRot = 0;
     
     m_fPawnSize = 1.0f;
     m_fJointRadius = 1.25f;
@@ -88,49 +85,6 @@ QSize GLWidget::sizeHint() const
 {
    QSize s = size();
    return QSize(s.width(), s.height());
-}
-
-static void qNormalizeAngle(float &angle)
-{
-    while (angle < 0)
-        angle += 360 /** 16*/;
-    while (angle > 360 * 16)
-        angle -= 360 /** 16*/;
-}
-
-void GLWidget::setXRotation(float angle)
-{
-    qNormalizeAngle(angle);
-    if (angle != xRot) 
-    {
-        m_Camera.Rotate(QVector3D(angle, 0, 0));
-        emit xRotationChanged(angle);
-        updateGL();
-    }
-}
-//! [5]
-
-void GLWidget::setYRotation(float angle)
-{
-    qNormalizeAngle(angle);
-    if (angle != yRot) 
-    {
-        m_Camera.Rotate(QVector3D(0, angle, 0));
-        yRot = angle;
-        emit yRotationChanged(angle);
-        updateGL();
-    }
-}
-
-void GLWidget::setZRotation(float angle)
-{
-    qNormalizeAngle(angle);
-    if (angle != zRot)
-    {
-        m_Camera.Rotate(QVector3D(0, 0, angle));
-        emit zRotationChanged(angle);
-        updateGL();
-    }
 }
 
 void GLWidget::OnCloseSettingsDialog(const SettingsDialog* dlg, int result)
@@ -337,14 +291,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     if (event->buttons() & Qt::LeftButton) 
     {
-        //setXRotation(xRot + GetCameraRotationSpeed() * dy);
-        setYRotation(yRot + m_Camera.GetRotationSpeed() * dx);
+       m_Camera.Rotate(QVector3D(m_Camera.GetRotationSpeed() * dy, 0, 0));
+       m_Camera.Rotate(QVector3D(0, (m_Camera.GetRotationSpeed() * dx), 0));
     } 
-    //else if (event->buttons() & Qt::RightButton) 
-    //{
-    //    setXRotation(xRot /*+ 8*/ * dy);
-    //    setZRotation(zRot /*+ 8*/ * dx);
-    //}
     lastPos = event->pos();
 }
 
@@ -360,7 +309,7 @@ void GLWidget::keyPressEvent(QKeyEvent *key)
    {
       m_Camera.MoveX(m_Camera.GetMovementSpeed());
    }
-   else if (key->key() == Qt::Key_W // forward
+   if (key->key() == Qt::Key_W // forward
       || key->key() == Qt::Key_Up)  
    {
       m_Camera.MoveZ(-m_Camera.GetMovementSpeed());
@@ -370,13 +319,19 @@ void GLWidget::keyPressEvent(QKeyEvent *key)
    {
       m_Camera.MoveZ(m_Camera.GetMovementSpeed());
    }
-   else if (key->key() == Qt::Key_Q) // up
+   if (key->key() == Qt::Key_Q) // up
    {
       m_Camera.MoveY(m_Camera.GetMovementSpeed());
    }
    else if (key->key() == Qt::Key_E) // down
    {
       m_Camera.MoveY(-m_Camera.GetMovementSpeed());
+   }
+
+   if (key->key() == Qt::Key_0)
+   {
+      //m_Camera.LookAt(QVector3D(0, 1, -1));
+      m_Camera.LookAt(QVector3D(0, 0, 0));
    }
 
    updateGL();
@@ -398,13 +353,10 @@ void GLWidget::Update()
 {
    if (m_Camera.FollowRenderer())
    {
-      // TODO: this needs to be refactored to remove conversions between coordinate systems
-      // and conversion from different types of vectors
       DebuggerCamera cam = m_pScene->m_camera;
       gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
       m_Camera.SetPosition(QVector3D(cam.pos.x, cam.pos.y, cam.pos.z));
-      Vector3 eulerAngles = Vector3::ConvertFromQuat(cam.rot.x, cam.rot.y, cam.rot.z, cam.rot.w);
-      m_Camera.SetRotation(QVector3D(eulerAngles.x, eulerAngles.y, eulerAngles.z));
+      m_Camera.SetRotation(QQuaternion(cam.rot.w, cam.rot.x, cam.rot.y, cam.rot.z));
    }
    
    updateGL();
