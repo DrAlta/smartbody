@@ -26,11 +26,13 @@ public:
    const std::vector<std::string> & GetSbmProcessIds() const { return m_processIdList; }
 
    void Connect(const std::string & id);
+   void Disconnect();
    bool GetConnectResult() { return m_connectResult; }
 
    void Init();
    void Update();
    void StartUpdates(double updateFrequencyS);
+   void EndUpdates();
 
    void ProcessVHMsgs(const char * op, const char * args);
 };

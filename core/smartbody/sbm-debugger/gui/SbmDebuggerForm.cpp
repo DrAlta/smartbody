@@ -72,10 +72,12 @@ void SbmDebuggerForm::ShowConnectDialog()
       QListWidget * listWidget = dlg.GetListWidget();
       if (listWidget->currentItem())
       {
+         Disconnect();
+
          string sbmId = listWidget->currentItem()->text().toStdString();
          c.Connect(sbmId);
-         vhmsg::ttu_wait(2);
-         vhmsg::ttu_wait(2);
+         vhcl::Sleep(2);
+         vhmsg::ttu_poll();
          if (c.GetConnectResult())
          {
              printf("Connect succeeded to id: %s\n", sbmId.c_str());
@@ -126,7 +128,7 @@ void SbmDebuggerForm::Disconnect()
 {
    ui.actionDisconnect->setEnabled(false);
 
-   // TODO: send a disconnect message to the renderer
+   c.Disconnect();
 }
 
 void SbmDebuggerForm::Update()
