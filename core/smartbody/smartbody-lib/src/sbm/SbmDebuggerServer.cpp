@@ -22,6 +22,7 @@ SbmDebuggerServer::SbmDebuggerServer()
    m_updateFrequencyS = 0;
    m_lastUpdate = m_timer.GetTime();
    m_scene = NULL;
+   m_rendererIsRightHanded = true;
 }
 
 
@@ -153,6 +154,11 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 
                            GenerateInitHierarchyMsg(root, msg, 4);
 
+                           vhmsg::ttu_notify1(msg.c_str());
+
+
+                           msg = vhcl::Format("sbmdebugger %s init", m_sbmId2.c_str());
+                           msg += vhcl::Format(" renderer right_handed %d\n", m_rendererIsRightHanded ? 1 : 0);
                            vhmsg::ttu_notify1(msg.c_str());
                         }
                      }

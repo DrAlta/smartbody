@@ -94,73 +94,88 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
                   }
                   else if (split[2] == "init")
                   {
-                     // handle init
-                     Character character;
-
-                     if (split.size() > 4)
+                     if (split.size() > 3)
                      {
-                        string character_string = split[3];
-                        string name = split[4];
-
-                        character.m_name = name;
-                     }
-
-                     if (split.size() > 6)
-                     {
-                        string bones_string = split[5];
-                        int numBones = vhcl::ToInt(split[6]);
-                     }
-
-                     Joint * parent = NULL;
-                     for (size_t i = 7; i < split.size(); i++)
-                     {
-                        if (split[i] == "{")
+                        if (split[3] == "character")
                         {
-                           string name = split[i + 1];
-                           string pos  = split[i + 2];
-                           double posX = vhcl::ToDouble(split[i + 3]);
-                           double posY = vhcl::ToDouble(split[i + 4]);
-                           double posZ = vhcl::ToDouble(split[i + 5]);
-                           string prerot  = split[i + 6];
-                           double rotX = vhcl::ToDouble(split[i + 7]);
-                           double rotY = vhcl::ToDouble(split[i + 8]);
-                           double rotZ = vhcl::ToDouble(split[i + 9]);
-                           double rotW = vhcl::ToDouble(split[i + 10]);
-                           i += 10;
+                           Character character;
 
-                           Joint * j = new Joint();
-                           j->m_name = name;
-                           j->posOrig.x = posX;
-                           j->posOrig.y = posY;
-                           j->posOrig.z = posZ;
-                           j->rotOrig.x = rotX;
-                           j->rotOrig.y = rotY;
-                           j->rotOrig.z = rotZ;
-                           j->rotOrig.w = rotW;
-                           j->m_parent = parent;
-
-                           if (parent == NULL)
+                           if (split.size() > 4)
                            {
-                              character.m_joints.push_back(j);
-                              parent = *(character.m_joints.end() - 1);
+                              string character_string = split[3];
+                              string name = split[4];
+
+                              character.m_name = name;
                            }
-                           else
+
+                           if (split.size() > 6)
                            {
-                              parent->m_joints.push_back(j);
-                              parent = *(parent->m_joints.end() - 1);
+                              string bones_string = split[5];
+                              int numBones = vhcl::ToInt(split[6]);
+                           }
+
+                           Joint * parent = NULL;
+                           for (size_t i = 7; i < split.size(); i++)
+                           {
+                              if (split[i] == "{")
+                              {
+                                 string name = split[i + 1];
+                                 string pos  = split[i + 2];
+                                 double posX = vhcl::ToDouble(split[i + 3]);
+                                 double posY = vhcl::ToDouble(split[i + 4]);
+                                 double posZ = vhcl::ToDouble(split[i + 5]);
+                                 string prerot  = split[i + 6];
+                                 double rotX = vhcl::ToDouble(split[i + 7]);
+                                 double rotY = vhcl::ToDouble(split[i + 8]);
+                                 double rotZ = vhcl::ToDouble(split[i + 9]);
+                                 double rotW = vhcl::ToDouble(split[i + 10]);
+                                 i += 10;
+
+                                 Joint * j = new Joint();
+                                 j->m_name = name;
+                                 j->posOrig.x = posX;
+                                 j->posOrig.y = posY;
+                                 j->posOrig.z = posZ;
+                                 j->rotOrig.x = rotX;
+                                 j->rotOrig.y = rotY;
+                                 j->rotOrig.z = rotZ;
+                                 j->rotOrig.w = rotW;
+                                 j->m_parent = parent;
+
+                                 if (parent == NULL)
+                                 {
+                                    character.m_joints.push_back(j);
+                                    parent = *(character.m_joints.end() - 1);
+                                 }
+                                 else
+                                 {
+                                    parent->m_joints.push_back(j);
+                                    parent = *(parent->m_joints.end() - 1);
+                                 }
+                              }
+                              else if (split[i] == "}")
+                              {
+                                 if (parent != NULL)
+                                 {
+                                    parent = parent->m_parent;
+                                 }
+                              }
+                           }
+
+                           m_scene.m_characters.push_back(character);
+                        }
+                        else if (split[3] == "renderer")
+                        {
+                           if (split.size() > 5)
+                           {
+                              if (split[4] == "right_handed")
+                              {
+                                 string value = split[5];
+                                 m_scene.m_rendererIsRightHanded = vhcl::ToInt(value) != 0;
+                              }
                            }
                         }
-                        else if (split[i] == "}")
-                        {
-                           if (parent != NULL)
-                           {
-                              parent = parent->m_parent;
-                           }
-                        }
                      }
-
-
-                     m_scene.m_characters.push_back(character);
 
 
                      //printf("Init Received\n");

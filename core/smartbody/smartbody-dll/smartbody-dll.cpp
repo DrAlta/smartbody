@@ -336,6 +336,14 @@ SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerCameraValues( double x, double 
 }
 
 
+SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerRendererRightHanded( bool enabled )
+{
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+
+   mcu._scene->getDebuggerServer()->m_rendererIsRightHanded = enabled;
+}
+
+
 SMARTBODY_DLL_API bool Smartbody_dll::ProcessVHMsgs( const char * op, const char * args )
 {
 #if USE_SBSCENE
