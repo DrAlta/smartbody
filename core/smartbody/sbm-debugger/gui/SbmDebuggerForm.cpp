@@ -196,8 +196,8 @@ void SbmDebuggerForm::UpdateSceneTree()
 
 void SbmDebuggerForm::UpdateLabels()
 {
-   //ui.rendererFpsLabel->
-   ui.cameraPositionLabel->setText(("Camera Pos: " + m_pGLWidget->GetCameraPositionAsString()).c_str());
+   ui.rendererFpsLabel->setText(m_pGLWidget->GetFpsAsString().c_str());
+   ui.cameraPositionLabel->setText(m_pGLWidget->GetCameraPositionAsString().c_str());
 }
 
 void SbmDebuggerForm::timerEvent(QTimerEvent * event)

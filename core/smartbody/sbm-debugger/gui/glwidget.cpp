@@ -1,8 +1,7 @@
 
-#include "vhcl.h"
+
 
 #include <math.h>
-
 #include "glwidget.h"
 
 
@@ -31,6 +30,8 @@ GLWidget::GLWidget(Scene* scene, QWidget *parent)
     setFocusPolicy(Qt::StrongFocus);
 
     timer.start(100, this);
+
+    m_msSinceLastFrame = m_StopWatch.GetTime();
 }
 
 GLWidget::~GLWidget()
@@ -320,12 +321,25 @@ void GLWidget::Update()
       m_Camera.SetPosition(QVector3D(cam.pos.x, cam.pos.y, cam.pos.z));
       m_Camera.SetRotation(QQuaternion(cam.rot.w, cam.rot.x, cam.rot.y, cam.rot.z));
    }
-   
+
+   // calculate fps
+   m_msSinceLastFramePrev = m_msSinceLastFrame;
+   m_msSinceLastFrame = m_StopWatch.GetTime();
    updateGL();
 }
 
 string GLWidget::GetCameraPositionAsString()
 {
   QVector3D pos = m_Camera.GetPosition();
-  return vhcl::Format("x: %.2f    y: %.2f    z: %.2f", pos.x(), pos.y(), pos.z());
+  return vhcl::Format("Camera Position:\nx: %.2f   y: %.2f   z: %.2f", pos.x(), pos.y(), pos.z());
+}
+
+double GLWidget::GetFps()
+{
+   return (1 / (m_msSinceLastFrame - m_msSinceLastFramePrev)); 
+}
+
+string GLWidget::GetFpsAsString()
+{
+   return vhcl::Format("Renderer Fps: %.2f", GetFps());
 }

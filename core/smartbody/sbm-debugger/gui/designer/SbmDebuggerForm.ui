@@ -23,35 +23,6 @@
       <height>761</height>
      </rect>
     </property>
-    <widget class="QLabel" name="rendererFpsLabel">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>121</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Renderer Fps:</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="networkFpsLabel">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>71</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Network Fps:</string>
-     </property>
-    </widget>
    </widget>
    <widget class="QTabWidget" name="sceneTab">
     <property name="geometry">
@@ -63,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -85,7 +56,7 @@
        <number>1</number>
       </property>
       <attribute name="headerVisible">
-       <bool>true</bool>
+       <bool>false</bool>
       </attribute>
       <column>
        <property name="text">
@@ -93,24 +64,53 @@
        </property>
       </column>
      </widget>
+    </widget>
+    <widget class="QWidget" name="statisticsTab">
+     <attribute name="title">
+      <string>Statistics</string>
+     </attribute>
      <widget class="QLabel" name="cameraPositionLabel">
       <property name="geometry">
        <rect>
-        <x>-30</x>
-        <y>490</y>
+        <x>10</x>
+        <y>50</y>
         <width>211</width>
-        <height>16</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="text">
        <string>Camera Pos:</string>
       </property>
      </widget>
-    </widget>
-    <widget class="QWidget" name="tab_2">
-     <attribute name="title">
-      <string>Tab 2</string>
-     </attribute>
+     <widget class="QLabel" name="networkFpsLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Network Fps:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="rendererFpsLabel">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Renderer Fps:</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
