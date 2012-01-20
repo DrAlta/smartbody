@@ -165,7 +165,7 @@ SBPawn* SBScene::getPawn(std::string name)
 	}
 	else
 	{
-		LOG("pawn %s does not exist.", name.c_str());
+		//LOG("pawn %s does not exist.", name.c_str());
 		return NULL;
 	}
 }

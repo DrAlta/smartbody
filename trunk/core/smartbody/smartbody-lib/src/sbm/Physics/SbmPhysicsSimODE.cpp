@@ -186,14 +186,14 @@ void SbmPhysicsSimODE::updatePhysicsJoint( SbmPhysicsJoint* phyJoint )
 		dJointSetAMotorParam(aMotor, dParamStopERP2, erpValue);
 		dJointSetAMotorParam(aMotor, dParamStopERP3, erpValue);	
 
-// 		dJointSetAMotorParam(aMotor, dParamLoStop, phyJoint->getDoubleAttribute("axis0LimitLow"));
-// 		dJointSetAMotorParam(aMotor, dParamHiStop, phyJoint->getDoubleAttribute("axis0LimitHigh"));
-// 		dJointSetAMotorParam(aMotor, dParamLoStop1, phyJoint->getDoubleAttribute("axis0LimitLow"));
-// 		dJointSetAMotorParam(aMotor, dParamHiStop1, phyJoint->getDoubleAttribute("axis0LimitHigh"));
-// 		dJointSetAMotorParam(aMotor, dParamLoStop2, phyJoint->getDoubleAttribute("axis1LimitLow"));
-// 		dJointSetAMotorParam(aMotor, dParamHiStop2, phyJoint->getDoubleAttribute("axis1LimitHigh"));
-// 		dJointSetAMotorParam(aMotor, dParamLoStop3, phyJoint->getDoubleAttribute("axis2LimitLow"));
-// 		dJointSetAMotorParam(aMotor, dParamHiStop3, phyJoint->getDoubleAttribute("axis2LimitHigh"));
+		dJointSetAMotorParam(aMotor, dParamLoStop, phyJoint->getDoubleAttribute("axis0LimitLow"));
+		dJointSetAMotorParam(aMotor, dParamHiStop, phyJoint->getDoubleAttribute("axis0LimitHigh"));
+		dJointSetAMotorParam(aMotor, dParamLoStop1, phyJoint->getDoubleAttribute("axis0LimitLow"));
+		dJointSetAMotorParam(aMotor, dParamHiStop1, phyJoint->getDoubleAttribute("axis0LimitHigh"));
+		dJointSetAMotorParam(aMotor, dParamLoStop2, phyJoint->getDoubleAttribute("axis1LimitLow"));
+		dJointSetAMotorParam(aMotor, dParamHiStop2, phyJoint->getDoubleAttribute("axis1LimitHigh"));
+		dJointSetAMotorParam(aMotor, dParamLoStop3, phyJoint->getDoubleAttribute("axis2LimitLow"));
+		dJointSetAMotorParam(aMotor, dParamHiStop3, phyJoint->getDoubleAttribute("axis2LimitHigh"));
 	}
 	else // fixed joint
 	{
