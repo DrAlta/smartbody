@@ -232,10 +232,12 @@ public:
    std::vector<Pawn> m_pawns;
    std::vector<Character> m_characters;
    DebuggerCamera m_camera;
+   bool m_rendererIsRightHanded;
 
 public:
    Scene()
    {
+      m_rendererIsRightHanded = true;
    }
 
    virtual ~Scene()
