@@ -64,7 +64,7 @@ void SbmDebuggerServer::Update()
                   float rotz = joint->getQuaternion().z;
                   float rotw = joint->getQuaternion().w;
 
-                  msg += vhcl::Format("  %s pos %f %f %f rot %f %f %f %f\n", joint->getName().c_str(), posx, posy, posz, rotx, roty, rotz, rotw);
+                  msg += vhcl::Format("  %s pos %5.2f %5.2f %5.2f rot %5.2f %5.2f %5.2f %5.2f\n", joint->getName().c_str(), posx, posy, posz, rotx, roty, rotz, rotw);
                }
 
                vhmsg::ttu_notify1(msg.c_str());
@@ -74,9 +74,9 @@ void SbmDebuggerServer::Update()
             {
                string msg = vhcl::Format("sbmdebugger %s update camera\n", m_sbmId2.c_str());
 
-               msg += vhcl::Format("pos %f %f %f\n", m_camera.pos.x, m_camera.pos.y, m_camera.pos.z);
-               msg += vhcl::Format("rot %f %f %f %f\n", m_camera.rot.x, m_camera.rot.y, m_camera.rot.z, m_camera.rot.w);
-               msg += vhcl::Format("persp %f %f %f %f\n", m_camera.fovY, m_camera.aspect, m_camera.zNear, m_camera.zFar);
+               msg += vhcl::Format("pos %5.2f %5.2f %5.2f\n", m_camera.pos.x, m_camera.pos.y, m_camera.pos.z);
+               msg += vhcl::Format("rot %5.2f %5.2f %5.2f %5.2f\n", m_camera.rot.x, m_camera.rot.y, m_camera.rot.z, m_camera.rot.w);
+               msg += vhcl::Format("persp %5.2f %5.2f %5.2f %5.2f\n", m_camera.fovY, m_camera.aspect, m_camera.zNear, m_camera.zFar);
 
                vhmsg::ttu_notify1(msg.c_str());
             }
