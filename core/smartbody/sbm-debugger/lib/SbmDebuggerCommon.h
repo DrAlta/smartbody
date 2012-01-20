@@ -153,32 +153,25 @@ class Pawn
 //private:
 public:
    std::string m_name;
-   Vector3 pos;
-   Vector4 rot;
+   std::vector<Joint *> m_joints;
 
 public:
    Pawn()
    {
-      pos.x = 0;
-      pos.y = 0;
-      pos.z = 0;
-      rot.x = 0;
-      rot.y = 0;
-      rot.z = 0;
-      rot.w = 0;
    }
 
    virtual ~Pawn()
    {
    }
+
+   Vector3 GetWorldPosition() const;
+   Joint * FindJoint(const std::string & name) const { return FindJoint(name, m_joints); } 
+   static Joint * FindJoint(const std::string & name, const std::vector<Joint *> & joints);
 };
 
 
 class Character : public Pawn
 {
-public:
-   std::vector<Joint *> m_joints;
-
 public:
    Character() : Pawn()
    {
@@ -187,10 +180,6 @@ public:
    virtual ~Character()
    {
    }
-
-   Joint * FindJoint(const std::string & name) { return FindJoint(name, m_joints); }
-
-   static Joint * FindJoint(const std::string & name, const std::vector<Joint *> & joints);
 };
 
 
@@ -243,6 +232,8 @@ public:
    virtual ~Scene()
    {
    }
+
+   Character* FindCharacter(const std::string & name);
 };
 
 

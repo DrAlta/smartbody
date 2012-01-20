@@ -196,7 +196,7 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
                            {
                               if (split.size() > 5)
                               {
-                                 if (split[5] == "position")
+                                 /*if (split[5] == "position")
                                  {
                                     if (split.size() > 12)
                                     {
@@ -217,7 +217,7 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
                                        character->rot.w = rotW;
                                     }
                                  }
-                                 else if (split[5] == "bones")
+                                 else*/ if (split[5] == "bones")
                                  {
                                     if (split.size() > 6)
                                     {

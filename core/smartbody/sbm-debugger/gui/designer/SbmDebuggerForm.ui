@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -56,7 +56,7 @@
        <number>1</number>
       </property>
       <attribute name="headerVisible">
-       <bool>false</bool>
+       <bool>true</bool>
       </attribute>
       <column>
        <property name="text">
@@ -167,9 +167,9 @@
     <enum>LeftToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>false</bool>
+    <bool>true</bool>
    </attribute>
-   <addaction name="actionDebug"/>
+   <addaction name="actionToggleFreeLookCamera"/>
   </widget>
   <action name="actionConnect">
    <property name="text">
@@ -182,16 +182,16 @@
     <string>Ctrl+C</string>
    </property>
   </action>
-  <action name="actionDebug">
+  <action name="actionToggleFreeLookCamera">
    <property name="icon">
     <iconset>
-     <normaloff>C:/Users/reilly/.designer/images/monkey_on_128x128.png</normaloff>C:/Users/reilly/.designer/images/monkey_on_128x128.png</iconset>
+     <normaloff>../images/monkey_on_128x128.png</normaloff>../images/monkey_on_128x128.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Debug</string>
+    <string>Toggle Free Look</string>
    </property>
    <property name="toolTip">
-    <string>Simple Test</string>
+    <string>Toggle Free Look</string>
    </property>
   </action>
   <action name="actionSettings">

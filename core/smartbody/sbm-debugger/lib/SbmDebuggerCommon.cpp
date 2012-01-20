@@ -94,7 +94,13 @@ Vector4 Joint::GetWorldRotation()
    return worldRotation;
 }
 
-Joint * Character::FindJoint(const string & name, const vector<Joint *> & joints)
+Vector3 Pawn::GetWorldPosition() const
+{
+   Joint* joint = FindJoint("world_offset");
+   return joint ? joint->pos : Vector3();
+}
+
+Joint * Pawn::FindJoint(const string & name, const vector<Joint *> & joints)
 {
    for (size_t i = 0; i < joints.size(); i++)
    {
@@ -112,6 +118,20 @@ Joint * Character::FindJoint(const string & name, const vector<Joint *> & joints
       if (ret)
       {
          return ret;
+      }
+   }
+
+   return NULL;
+}
+
+
+Character* Scene::FindCharacter(const std::string & name)
+{
+   for (unsigned int i = 0; i < m_characters.size(); i++)
+   {
+      if (name == m_characters[i].m_name)
+      {
+         return &m_characters[i];
       }
    }
 

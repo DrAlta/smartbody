@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Fri Jan 20 10:06:34 2012
+** Created: Fri Jan 20 12:16:19 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -31,7 +31,7 @@ class Ui_MainWindow
 {
 public:
     QAction *actionConnect;
-    QAction *actionDebug;
+    QAction *actionToggleFreeLookCamera;
     QAction *actionSettings;
     QAction *actionDisconnect;
     QAction *actionExit;
@@ -61,11 +61,11 @@ public:
         MainWindow->resize(1236, 817);
         actionConnect = new QAction(MainWindow);
         actionConnect->setObjectName(QString::fromUtf8("actionConnect"));
-        actionDebug = new QAction(MainWindow);
-        actionDebug->setObjectName(QString::fromUtf8("actionDebug"));
+        actionToggleFreeLookCamera = new QAction(MainWindow);
+        actionToggleFreeLookCamera->setObjectName(QString::fromUtf8("actionToggleFreeLookCamera"));
         QIcon icon;
-        icon.addFile(QString::fromUtf8("C:/Users/reilly/.designer/images/monkey_on_128x128.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionDebug->setIcon(icon);
+        icon.addFile(QString::fromUtf8("../images/monkey_on_128x128.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionToggleFreeLookCamera->setIcon(icon);
         actionSettings = new QAction(MainWindow);
         actionSettings->setObjectName(QString::fromUtf8("actionSettings"));
         actionDisconnect = new QAction(MainWindow);
@@ -93,7 +93,7 @@ public:
         sceneTree->setGeometry(QRect(0, 0, 181, 741));
         sceneTree->setRootIsDecorated(true);
         sceneTree->setColumnCount(1);
-        sceneTree->header()->setVisible(false);
+        sceneTree->header()->setVisible(true);
         sceneTab->addTab(tab, QString());
         statisticsTab = new QWidget();
         statisticsTab->setObjectName(QString::fromUtf8("statisticsTab"));
@@ -102,7 +102,7 @@ public:
         cameraPositionLabel->setGeometry(QRect(10, 50, 211, 31));
         networkFpsLabel = new QLabel(statisticsTab);
         networkFpsLabel->setObjectName(QString::fromUtf8("networkFpsLabel"));
-        networkFpsLabel->setGeometry(QRect(10, 30, 71, 16));
+        networkFpsLabel->setGeometry(QRect(10, 30, 121, 16));
         rendererFpsLabel = new QLabel(statisticsTab);
         rendererFpsLabel->setObjectName(QString::fromUtf8("rendererFpsLabel"));
         rendererFpsLabel->setEnabled(true);
@@ -130,6 +130,7 @@ public:
         toolBar = new QToolBar(MainWindow);
         toolBar->setObjectName(QString::fromUtf8("toolBar"));
         MainWindow->addToolBar(Qt::LeftToolBarArea, toolBar);
+        MainWindow->insertToolBarBreak(toolBar);
 
         menubar->addAction(menuFile->menuAction());
         menubar->addAction(menuEdit->menuAction());
@@ -140,11 +141,11 @@ public:
         menuFile->addAction(actionSettings);
         menuFile->addAction(actionExit);
         menuSbm->addAction(actionResource_Viewer);
-        toolBar->addAction(actionDebug);
+        toolBar->addAction(actionToggleFreeLookCamera);
 
         retranslateUi(MainWindow);
 
-        sceneTab->setCurrentIndex(1);
+        sceneTab->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -158,9 +159,9 @@ public:
         actionConnect->setToolTip(QApplication::translate("MainWindow", "Connect to a Smartbody Process", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_TOOLTIP
         actionConnect->setShortcut(QApplication::translate("MainWindow", "Ctrl+C", 0, QApplication::UnicodeUTF8));
-        actionDebug->setText(QApplication::translate("MainWindow", "&Debug", 0, QApplication::UnicodeUTF8));
+        actionToggleFreeLookCamera->setText(QApplication::translate("MainWindow", "Toggle Free Look", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_TOOLTIP
-        actionDebug->setToolTip(QApplication::translate("MainWindow", "Simple Test", 0, QApplication::UnicodeUTF8));
+        actionToggleFreeLookCamera->setToolTip(QApplication::translate("MainWindow", "Toggle Free Look", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_TOOLTIP
         actionSettings->setText(QApplication::translate("MainWindow", "&Settings", 0, QApplication::UnicodeUTF8));
         actionSettings->setShortcut(QApplication::translate("MainWindow", "Ctrl+S", 0, QApplication::UnicodeUTF8));

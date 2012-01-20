@@ -37,6 +37,8 @@ public:
 
 public slots:
     void OnCloseSettingsDialog(const SettingsDialog* dlg, int result);
+    void ToggleFreeLook();
+    void itemDoubleClicked(QTreeWidgetItem * item, int column);
 
 Q_SIGNALS:
 protected:
@@ -52,7 +54,6 @@ protected:
 private:
 
     QPoint lastPos;
-    QColor qtGreen;
     QColor qtPurple;
     Camera m_Camera;
     float m_fPawnSize;
