@@ -12,7 +12,7 @@
 #include "Camera.h"
 #include "SbmDebuggerCommon.h"
 #include "SettingsDialog.h"
-
+#include "vhcl.h"
 
 using std::string;
 
@@ -30,7 +30,9 @@ public:
     virtual void Update();
 
     void SetScene(Scene* scene) { m_pScene = scene; }
+    double GetFps();
     string GetCameraPositionAsString();
+    string GetFpsAsString();
 
 public slots:
     void OnCloseSettingsDialog(const SettingsDialog* dlg, int result);
@@ -57,7 +59,12 @@ private:
     Scene* m_pScene;
     GLUquadric* m_quadric;
 
+    double m_msSinceLastFrame;
+    double m_msSinceLastFramePrev;
+
     QBasicTimer timer;
+    vhcl::Timer m_StopWatch;
+
     virtual void timerEvent(QTimerEvent * event);
 
     void DrawFloor();
