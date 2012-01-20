@@ -9,10 +9,11 @@
 
 #include <gl\GLU.h>
 
+#include "vhcl_timer.h"
 #include "Camera.h"
 #include "SbmDebuggerCommon.h"
 #include "SettingsDialog.h"
-#include "vhcl.h"
+
 
 using std::string;
 
