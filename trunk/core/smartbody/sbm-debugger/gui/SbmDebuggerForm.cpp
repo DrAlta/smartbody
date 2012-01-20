@@ -50,7 +50,7 @@ SbmDebuggerForm::SbmDebuggerForm(QMainWindow* mainWindow, QWidget *parent)
 
 SbmDebuggerForm::~SbmDebuggerForm()
 {
-
+   vhmsg::ttu_close();
 }
 
 void SbmDebuggerForm::InitSignalsSlots()
