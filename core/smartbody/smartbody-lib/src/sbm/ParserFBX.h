@@ -29,11 +29,11 @@
 
 #include <map>
 
-#include "fbxsdk.h"
-
 #include "sk/sk_skeleton.h"
 #include "sk/sk_motion.h"
 #include "mcontrol_util.h"
+
+#include "fbxsdk.h"
 
 
 class ParserFBX
