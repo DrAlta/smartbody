@@ -315,6 +315,17 @@ SMARTBODY_C_DLL_API void SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, doubl
 }
 
 
+SMARTBODY_C_DLL_API void SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmHandle, bool enabled )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   g_smartbodyInstances[ sbmHandle ]->SetDebuggerRendererRightHanded( enabled );
+}
+
+
 SMARTBODY_C_DLL_API bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args )
 {
    if ( !SBM_HandleExists( sbmHandle ) )

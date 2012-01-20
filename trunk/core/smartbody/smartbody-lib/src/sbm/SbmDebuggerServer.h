@@ -23,6 +23,7 @@ private:
 
 public:
    DebuggerCamera m_camera;
+   bool m_rendererIsRightHanded;
 
 
 public:
