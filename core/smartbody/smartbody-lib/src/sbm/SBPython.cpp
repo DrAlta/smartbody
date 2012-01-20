@@ -6,6 +6,7 @@
 #include "SBBehavior.h"
 #include <sbm/SBMotion.h>
 #include <sbm/SBParseNode.h>
+#include <sbm/mcontrol_util.h>
 
 #ifdef USE_PYTHON
 
@@ -961,11 +962,12 @@ void initPython(std::string pythonLibPath)
 	Py_SetProgramName("../../../../core/smartbody/Python26/");
 #endif	
 	Py_Initialize();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
 	try {
-		//LOG("Before import __main__");
-		boost::python::object objectMain = boost::python::import("__main__");
-		boost::python::object objectDict = objectMain.attr("__dict__");
-		//LOG("Before import sys");
+		mcu.mainModule = boost::python::import("__main__");
+		mcu.mainDict = mcu.mainModule.attr("__dict__");
+	
 		PyRun_SimpleString("import sys");
 		// set the proper python path
 		std::stringstream strstr;
@@ -982,13 +984,8 @@ void initPython(std::string pythonLibPath)
 		strstr << "\");";
 		PyRun_SimpleString(strstr.str().c_str());
 
-		//LOG("PyGetPath = %s\")
-
-
-		//LOG("Before initSmartBody");
 		SmartBody::initSmartBody();
 
-		//LOG("After initSmartBody");
 		if (PyErr_Occurred())
 			PyErr_Print();
 		// redirect stdout

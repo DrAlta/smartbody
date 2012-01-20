@@ -269,7 +269,7 @@ mcuCBHandle::mcuCBHandle()
 	sendPawnUpdates(false),
 	logListener(NULL),
 	useXmlCache(false),
-	useXmlCacheAuto(false)	
+	useXmlCacheAuto(false)
 {	
 	testBMLId = 0;
 	registerCallbacks();

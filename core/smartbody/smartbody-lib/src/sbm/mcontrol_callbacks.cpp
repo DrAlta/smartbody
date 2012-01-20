@@ -4609,7 +4609,156 @@ int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
+	std::string instanceId = args.read_token();
+	// make sure this instance id matches
+	// ...
+	// ...
+
+	std::string messageId = args.read_token();
+	std::string type = args.read_token();
+	if (type == "response")
+		return CMD_SUCCESS;
+
+	if (type != "request")
+		return CMD_SUCCESS;
+
+	std::string returnType = args.read_token();
+	std::string code = args.read_token();
+	if (code.size() == 0)
+	{
+		std::stringstream strstr;
+		strstr << instanceId << " " << messageId << " response-fail ";
+		strstr << "No Python code sent.";
+		mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+		return CMD_FAILURE;
+	}
+	
+	PyObject* pyResult = NULL;
+	if (returnType == "void")
+	{
+		try {
+			boost::python::exec(code.c_str(), *mcu_p->mainDict);
+		} catch (...) {
+			PyErr_Print();
+		}
+		return CMD_SUCCESS;
+	}
+	else if (returnType == "int")
+	{
+		try {
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
+			int result = boost::python::extract<int>(mcu_p->mainDict["ret"]);
+			std::stringstream strstr;
+			strstr << instanceId << " " << messageId << " response ";
+			strstr << result;
+			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			return CMD_SUCCESS;
+		} catch (...) {
+			PyErr_Print();
+		}
+	}
+	else if (returnType == "float")
+	{
+		try {
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
+			float result = boost::python::extract<float>(mcu_p->mainDict["ret"]);
+			std::stringstream strstr;
+			strstr << instanceId << " " << messageId << " response ";
+			strstr << result;
+			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			return CMD_SUCCESS;
+		} catch (...) {
+			PyErr_Print();
+		}
+	}
+	else if (returnType == "string")
+	{
+		try {
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
+			std::string result = boost::python::extract<std::string>(mcu_p->mainDict["ret"]);
+			std::stringstream strstr;
+			strstr << instanceId << " " << messageId << " response ";
+			strstr << result;
+			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			return CMD_SUCCESS;
+		} catch (...) {
+			PyErr_Print();
+		}
+	}
+	else if (returnType == "int-array")
+	{
+		try {
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
+			boost::python::object obj2 = boost::python::exec("size = len(ret)", mcu_p->mainDict);
+			int size =  boost::python::extract<int>(mcu_p->mainDict["size"]);
+			std::stringstream strstr;
+			strstr << instanceId << " " << messageId << " response ";
+			for (int x = 0; x < size; x++)
+			{
+				int val =  boost::python::extract<int>(mcu_p->mainDict["ret"][x]);
+				strstr << " " << val;
+			}
+			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			return CMD_SUCCESS;
+		} catch (...) {
+			PyErr_Print();
+		}
+	}
+	else if (returnType == "float-array")
+	{
+		try {
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
+			boost::python::object obj2 = boost::python::exec("size = len(ret)", mcu_p->mainDict);
+			int size =  boost::python::extract<int>(mcu_p->mainDict["size"]);
+			std::stringstream strstr;
+			strstr << instanceId << " " << messageId << " response ";
+			for (int x = 0; x < size; x++)
+			{
+				float val =  boost::python::extract<float>(mcu_p->mainDict["ret"][x]);
+				strstr << " " << val;
+			}
+			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			return CMD_SUCCESS;
+		} catch (...) {
+			PyErr_Print();
+		}
+	}
+	else if (returnType == "string-array")
+	{
+		try {
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
+			boost::python::object obj2 = boost::python::exec("size = len(ret)", mcu_p->mainDict);
+			int size =  boost::python::extract<int>(mcu_p->mainDict["size"]);
+			std::stringstream strstr;
+			strstr << instanceId << " " << messageId << " response ";
+			for (int x = 0; x < size; x++)
+			{
+				std::string val =  boost::python::extract<std::string>(mcu_p->mainDict["ret"][x]);
+				strstr << " " << val;
+			}
+			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			return CMD_SUCCESS;
+		} catch (...) {
+			PyErr_Print();
+		}
+	}
+	else
+	{
+		std::stringstream strstr;
+		strstr << instanceId << " " << messageId << " response-fail ";
+		strstr << "Unknown return type: " << returnType;
+		mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+		return CMD_FAILURE;
+	}
+
+	std::stringstream strstr;
+	strstr << instanceId << " " << messageId << " response-fail ";
+	strstr << "Problem executing code." << returnType;
+	mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+	return CMD_FAILURE;
+	
 	return CMD_SUCCESS;
+
 }
 
 /////////////////////////////////////////////////////////////
