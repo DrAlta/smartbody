@@ -1241,13 +1241,16 @@ void mcuCBHandle::update( void )	{
 
 	if (viewer_p && viewer_p->get_camera())
 	{
+		SrMat m;
+		SrQuat quat = SrQuat(viewer_p->get_camera()->get_view_mat(m).get_rotation());
+
 		_scene->getDebuggerServer()->m_camera.pos.x = viewer_p->get_camera()->eye.x;
 		_scene->getDebuggerServer()->m_camera.pos.y = viewer_p->get_camera()->eye.y;
 		_scene->getDebuggerServer()->m_camera.pos.z = viewer_p->get_camera()->eye.z;
-		//_scene->getDebuggerServer()->m_camera.rot.x = viewer_p->get_camera()->eye.x;
-		//_scene->getDebuggerServer()->m_camera.rot.y = viewer_p->get_camera()->eye.x;
-		//_scene->getDebuggerServer()->m_camera.rot.z = viewer_p->get_camera()->eye.x;
-		//_scene->getDebuggerServer()->m_camera.rot.w = viewer_p->get_camera()->eye.x;
+		_scene->getDebuggerServer()->m_camera.rot.x = quat.x;
+		_scene->getDebuggerServer()->m_camera.rot.y = quat.y;
+		_scene->getDebuggerServer()->m_camera.rot.z = quat.z;
+		_scene->getDebuggerServer()->m_camera.rot.w = quat.w;
 		_scene->getDebuggerServer()->m_camera.fovY   = viewer_p->get_camera()->fovy;
 		_scene->getDebuggerServer()->m_camera.aspect = viewer_p->get_camera()->aspect;
 		_scene->getDebuggerServer()->m_camera.zNear  = viewer_p->get_camera()->znear;
