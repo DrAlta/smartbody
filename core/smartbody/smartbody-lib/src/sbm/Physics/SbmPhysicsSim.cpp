@@ -206,10 +206,13 @@ SbmPhysicsObj::SbmPhysicsObj()
 	initGeom = false;
 
 	SBObject::createBoolAttribute("enable",false,true, "Basic", 20, false, false, false, "?");		
+	SBObject::createBoolAttribute("constraint",false,true, "Basic", 20, false, false, false, "?");
+	
 	SBObject::createDoubleAttribute("mass",1.f,true, "Basic", 20, false, false, false, "?");
 	SBObject::createVec3Attribute("refLinearVelocity",0.f,0.f,0.f,true, "Physics", 20, false, false, false, "?");
 	SBObject::createVec3Attribute("refAngularVelocity",0.f,0.f,0.f,true, "Physics", 20, false, false, false, "?");
 
+	SBObject::createStringAttribute("constraintTarget","none",true, "Basic", 80, false, false, false, "?");
 	
 	SmartBody::StringAttribute* geomTypeAttr = createStringAttribute("geomType","box",true,"Geom", 80, false, false, false,"the geometry type");	
 	std::vector<std::string> geomTypes;

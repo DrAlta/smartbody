@@ -245,8 +245,18 @@ void SBPhysicsManager::updatePhysicsCharacter( std::string charName )
 		SBJoint* joint = phyObj->getSBJoint();
 		const std::string& jointName = joint->name();		
 		bool kinematicRoot = (jointName == "base" || jointName == "JtPelvis") && phyChar->getBoolAttribute("kinematicRoot");	
-#if USE_PHYSICS_CHARACTER			
-		if (charPhySim && !kinematicRoot)
+#if USE_PHYSICS_CHARACTER		
+		bool constraintObj = false;
+		SBPawn* constraintPawn = getScene()->getPawn(phyObj->getStringAttribute("constraintTarget"));
+		if (constraintPawn && phyObj->getBoolAttribute("constraint"))
+		{				
+			phyObj->enablePhysicsSim(false);				
+			phyObj->setRefTransform(phyObj->getGlobalTransform()); // save previous transform
+			phyObj->setGlobalTransform(constraintPawn->get_world_offset());					
+			phyObj->setAngularVel(phyObj->getPhyJoint()->getRefAngularVel());
+			phyObj->updatePhySim();						
+		}
+		else if (charPhySim && !kinematicRoot && !constraintObj)
 		{
 			phyObj->enablePhysicsSim(true);
 			phyObj->updateSbmObj();
