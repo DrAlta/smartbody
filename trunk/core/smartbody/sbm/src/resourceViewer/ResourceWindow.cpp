@@ -14,7 +14,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
-#include <sbm/Nvbg.h>
+#include <sbm/nvbg.h>
 
 
 // enum {

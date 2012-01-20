@@ -19,7 +19,7 @@ SBScene::SBScene(void)
 	_steerManager = new SBSteerManager();
 	_serviceManager = new SBServiceManager();
 	_physicsManager = new SBPhysicsManager();
-	_scale = .01; // default scale is centimeters
+	_scale = .01f; // default scale is centimeters
 
 	// add the services
 	_serviceManager->addService(_steerManager);
@@ -30,6 +30,7 @@ SBScene::SBScene(void)
 	_debuggerServer = new SbmDebuggerServer();
 
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
+	createDoubleAttribute("scale",false,true,"",10,false,false,false,"The scale of scene (1 = meters, .01 = centimeters, etc).");
 }
 
 SBScene::~SBScene(void)
@@ -54,12 +55,12 @@ SBScene::~SBScene(void)
 	delete _debuggerServer;  // TODO: should delete these in reverse order?
 }
 
-void SBScene::setScale(double val)
+void SBScene::setScale(float val)
 {
 	_scale = val;
 }
 
-double SBScene::getScale()
+float SBScene::getScale()
 {
 	return _scale;
 }
@@ -68,10 +69,19 @@ double SBScene::getScale()
 void SBScene::notify( SBSubject* subject )
 {
 	BoolAttribute* boolAttr = dynamic_cast<BoolAttribute*>(subject);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
 	if (boolAttr && boolAttr->getName() == "internalAudio")
 	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		mcu.play_internal_audio = boolAttr->getValue();		
+		return;
+	}
+
+	DoubleAttribute* doubleAttr = dynamic_cast<DoubleAttribute*>(subject);
+	if (doubleAttr && doubleAttr->getName() == "scale")
+	{
+		setScale((float) doubleAttr->getValue());
+		return;
 	}
 }
 

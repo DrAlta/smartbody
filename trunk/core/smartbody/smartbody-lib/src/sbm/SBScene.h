@@ -28,8 +28,8 @@ class SBScene : public SBObject
 		SBScene(void);
 		~SBScene(void);
 
-		void setScale(double val);
-		double getScale();
+		void setScale(float val);
+		float getScale();
 
 		void command(const std::string& command);
 		void commandAt(float seconds, const std::string& command);
@@ -108,7 +108,7 @@ class SBScene : public SBObject
 		SBParser* _parser;
 
 		std::map<std::string, SBScript*> _scripts;
-		double _scale;
+		float _scale;
 
 		SbmDebuggerServer* _debuggerServer;
 };

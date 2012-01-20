@@ -65,6 +65,7 @@
 # include <sbm/Physics/SbmColObject.h>
 # include <sbm/me_ct_param_animation_data.h>
 # include <sbm/GPU/SbmDeformableMeshGPU.h>
+# include <sbm/SBScene.h>
 
 #if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support
 #include "sbm/GPU/SbmShader.h"
@@ -2590,7 +2591,15 @@ void FltkViewer::drawGrid()
 	glLineWidth(1);
 //	glLineStipple(1, 0xAAAA);
 	glBegin(GL_LINES);
-	for (float x = -gridSize; x <= gridSize; x += gridStep)
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	float sceneScale =  mcu._scene->getScale();
+	float adjustedGridStep = gridStep;
+	if (sceneScale > 0.f)
+	{
+		adjustedGridStep *= adjustedGridStep / .01f;
+	}
+
+	for (float x = -gridSize; x <= gridSize; x += adjustedGridStep)
 	{
 		if (x == 0.0) {
 			colorChanged = true;

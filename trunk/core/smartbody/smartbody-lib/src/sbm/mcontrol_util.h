@@ -99,6 +99,7 @@ class mcuCBHandle;
 #include <sbm/SteerSuiteEngineDriver.h>
 #include <sbm/Physics/SbmPhysicsSim.h>
 #include <sbm/KinectProcessor.h>
+#include <boost/python.hpp>
 
 #include BML_PROCESSOR_INCLUDE
 
@@ -333,6 +334,8 @@ class mcuCBHandle {
 		int getNumCharacters();
 
 		SkMotion* getMotion(const std::string& motionName);
+		boost::python::object mainModule;
+		boost::python::object mainDict;
 
 protected:
 		std::map<std::string, SbmPawn*>	pawn_map;
