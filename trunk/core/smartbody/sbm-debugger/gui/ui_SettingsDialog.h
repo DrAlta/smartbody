@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SettingsDialog.ui'
 **
-** Created: Thu Jan 19 13:49:32 2012
+** Created: Fri Jan 20 12:16:19 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -77,7 +77,7 @@ public:
         cameraRotationSpeedBox = new QDoubleSpinBox(camera_tab);
         cameraRotationSpeedBox->setObjectName(QString::fromUtf8("cameraRotationSpeedBox"));
         cameraRotationSpeedBox->setGeometry(QRect(10, 140, 62, 22));
-        cameraRotationSpeedBox->setValue(0.01);
+        cameraRotationSpeedBox->setValue(0.05);
         tabWidget->addTab(camera_tab, QString());
 
         retranslateUi(SettingsDialog);

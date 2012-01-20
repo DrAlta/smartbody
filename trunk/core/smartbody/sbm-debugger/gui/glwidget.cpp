@@ -25,7 +25,6 @@ GLWidget::GLWidget(Scene* scene, QWidget *parent)
     m_fPawnSize = 1.0f;
     m_fJointRadius = 1.25f;
 
-    qtGreen = QColor::fromCmykF(0.40, 0.0, 1.0, 0.0);
     qtPurple = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
 
     setFocusPolicy(Qt::StrongFocus);
@@ -58,6 +57,24 @@ void GLWidget::OnCloseSettingsDialog(const SettingsDialog* dlg, int result)
       m_Camera.SetCameraType(dlg->ui.cameraControlBox->currentText().toStdString());
       m_Camera.SetMovementSpeed(dlg->ui.cameraMovementSpeedBox->value());
       m_Camera.SetRotationSpeed(dlg->ui.cameraRotationSpeedBox->value());
+   }
+}
+
+void GLWidget::ToggleFreeLook()
+{
+   m_Camera.SetCameraType(m_Camera.FollowRenderer() ? Camera::Free_Look : Camera::Follow_Renderer);
+}
+
+void GLWidget::itemDoubleClicked (QTreeWidgetItem * item, int column)
+{
+   if (!item)
+      return;
+   
+   Character* chr = m_pScene->FindCharacter(item->text(column).toStdString());
+   if (chr)
+   {
+      Vector3 pos = chr->GetWorldPosition();
+      m_Camera.LookAt(QVector3D(pos.x, pos.y, pos.z));
    }
 }
 
@@ -169,7 +186,8 @@ QMatrix4x4 GetLocalRotation(Joint* joint)
 
 void GLWidget::DrawCharacter(const Character* character)
 {
-   glTranslated(character->pos.x, character->pos.y, character->pos.z);
+   // world_offset joint handles this
+   //glTranslated(character->pos.x, character->pos.y, character->pos.z);
 
    for (unsigned int i = 0; i < character->m_joints.size(); i++)
    {
@@ -220,7 +238,8 @@ void GLWidget::DrawJoint(Joint* joint)
 
 void GLWidget::DrawPawn(const Pawn* pawn)
 {
-   glTranslated(pawn->pos.x, pawn->pos.y, pawn->pos.z);
+   Vector3 pos = pawn->GetWorldPosition();
+   glTranslated(pos.x, pos.y, pos.z);
    //glRotatef(); // TODO: Perform rotation, convert quat to euler angles
    DrawSphere(m_fPawnSize);
 }
@@ -318,6 +337,7 @@ void GLWidget::Update()
    if (m_Camera.FollowRenderer())
    {
       DebuggerCamera cam = m_pScene->m_camera;
+      m_Camera.SetRightHanded(m_pScene->m_rendererIsRightHanded);
       gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
       m_Camera.SetPosition(QVector3D(cam.pos.x, cam.pos.y, cam.pos.z));
       m_Camera.SetRotation(QQuaternion(cam.rot.w, cam.rot.x, cam.rot.y, cam.rot.z));

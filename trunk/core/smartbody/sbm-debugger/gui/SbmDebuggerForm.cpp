@@ -38,14 +38,14 @@ SbmDebuggerForm::SbmDebuggerForm(QMainWindow* mainWindow, QWidget *parent)
   vhmsg::ttu_open();
   vhmsg::ttu_register("sbmdebugger");
 
-  InitSignalsSlots();
-
-  setUpdatesEnabled(true);
-
   // setup scene tree
   ui.sceneTree->insertTopLevelItem(Characters, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Characters"))));
   ui.sceneTree->insertTopLevelItem(Pawns, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Pawns"))));
   ui.sceneTree->setHeaderLabel(QString("Entities"));
+
+  InitSignalsSlots();
+
+  setUpdatesEnabled(true);
 }
 
 SbmDebuggerForm::~SbmDebuggerForm()
@@ -55,11 +55,24 @@ SbmDebuggerForm::~SbmDebuggerForm()
 
 void SbmDebuggerForm::InitSignalsSlots()
 {
+   // File Menu
    connect(ui.actionConnect, SIGNAL(triggered()), this, SLOT(ShowConnectDialog()));
    connect(ui.actionDisconnect, SIGNAL(triggered()), this, SLOT(Disconnect()));
    connect(ui.actionSettings, SIGNAL(triggered()), this, SLOT(ShowSettingsDialog()));
    connect(ui.actionExit, SIGNAL(triggered()), m_pMainWindow, SLOT(close()));
+
+   // Tool bar
+   connect(ui.actionToggleFreeLookCamera, SIGNAL(triggered()), m_pGLWidget, SLOT(ToggleFreeLook()));
+
+   // Sbm Menu
    connect(ui.actionResource_Viewer, SIGNAL(triggered()), this, SLOT(ShowResourceDialog()));
+
+   // Scene Tree
+   //selection changes shall trigger a slot
+   
+   connect(ui.sceneTree, SIGNAL(itemDoubleClicked (QTreeWidgetItem*, int)),
+             m_pGLWidget, SLOT(itemDoubleClicked (QTreeWidgetItem*, int)));
+
    timer.start(10, this);
 }
 
