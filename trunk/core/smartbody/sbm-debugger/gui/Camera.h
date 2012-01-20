@@ -31,7 +31,7 @@ public:
    QVector3D GetPosition() { return QVector3D(m_RotMatrix.column(3)); }
 
    void SetPosition(const QVector3D& pos) { m_RotMatrix.setColumn(3, QVector4D(pos, 1.0f)); }
-   void SetRotation(const QVector3D& rot) { m_Rotation = rot; }   
+   void SetRotation(const QQuaternion& rot);  
    CameraControlType GetCameraType() { return m_CameraType; }
    bool FollowRenderer() { return m_CameraType == Follow_Renderer; }
 
@@ -39,6 +39,8 @@ public:
    void SetRotationSpeed(double rotationSpeed) { m_RotationSpeed = rotationSpeed; } 
    double GetMovementSpeed() { return m_MovementSpeed; }
    double GetRotationSpeed() { return m_RotationSpeed; }
+
+   void LookAt(const QVector3D& pos);
 
 private:
    QVector3D m_Position;
