@@ -15,6 +15,8 @@ int main(int argc, char *argv[])
 {
    vhcl::Crash::EnableExceptionHandling(true);
    //vhcl::Memory::EnableDebugFlags();   // not working due to ttu_open(), VH-345
+   vhcl::Log::g_log.AddListener( new vhcl::Log::DebuggerListener() );
+   vhcl::Log::g_log.AddListener( new vhcl::Log::StdoutListener() );
 
    QApplication app(argc, argv);
    QMainWindow *widget = new QMainWindow;
