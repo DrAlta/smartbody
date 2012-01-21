@@ -1,3 +1,3 @@
-pushd debug
+pushd Release
 SbmDebuggerGui.exe
 popd
