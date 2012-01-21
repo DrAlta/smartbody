@@ -30,7 +30,8 @@ ConnectDialog::ConnectDialog(QWidget *parent)
       ui.listWidget->addItem(ids[i].c_str());
    }
 
-   //connect(this, SIGNAL(mouseDoubleClickEvent(QMouseEvent*)), ui.listWidget, SLOT(mouseDoubleClickEvent(QMouseEvent*)));
+   connect(ui.listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
+      this, SLOT(itemDoubleClicked(QListWidgetItem*)));
 }
 
 void ConnectDialog::accept()
@@ -53,7 +54,10 @@ void ConnectDialog::keyPressEvent(QKeyEvent *key)
    }
 }
 
-void ConnectDialog::mouseDoubleClickEvent(QMouseEvent *event)
+void ConnectDialog::itemDoubleClicked(QListWidgetItem * item)
 {
+   if (!item)
+      return;
 
+   done(Accepted);
 }

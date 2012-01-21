@@ -36,12 +36,12 @@ void Camera::Rotate(const QVector3D& offset)
 {
    if (offset.x() != 0)
    {
-      m_RotMatrix.rotate(offset.x(), QVector3D(1, 0, 0)/*QVector3D(m_RotMatrix.column(0))*/);
+      m_RotMatrix.rotate(offset.x(), QVector3D(1, 0, 0));
    }
    
    if (offset.y() != 0)
    {
-      m_RotMatrix.rotate(offset.y(), QVector3D(0, 1, 0)/*QVector3D(m_RotMatrix.column(1))*/);
+      m_RotMatrix.rotate(offset.y(), QVector3D(0, 1, 0));
    }
 }
 

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'SettingsDialog.h'
 **
-** Created: Fri Jan 20 14:34:11 2012
+** Created: Fri Jan 20 17:13:54 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
