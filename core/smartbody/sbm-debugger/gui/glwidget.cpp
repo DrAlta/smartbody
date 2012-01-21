@@ -338,7 +338,15 @@ void GLWidget::Update()
    {
       DebuggerCamera cam = m_pScene->m_camera;
       m_Camera.SetRightHanded(m_pScene->m_rendererIsRightHanded);
+
+      glMatrixMode(GL_PROJECTION);
+      glLoadIdentity();
       gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
+      //gluPerspective(20, 2.0059f, 1, 1000);
+      glMatrixMode(GL_MODELVIEW);
+
+      //gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
+
       m_Camera.SetPosition(QVector3D(cam.pos.x, cam.pos.y, cam.pos.z));
       m_Camera.SetRotation(QQuaternion(cam.rot.w, cam.rot.x, cam.rot.y, cam.rot.z));
    }

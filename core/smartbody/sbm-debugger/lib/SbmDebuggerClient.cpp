@@ -184,6 +184,7 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
                   }
                   else if (split[2] == "update")
                   {
+                     double converter = m_scene.m_rendererIsRightHanded ? 1 : -1;
                      // handle updates
 
                      if (split.size() > 3)

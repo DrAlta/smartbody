@@ -20,7 +20,7 @@ class ConnectDialog : public QDialog
 
 public Q_SLOTS:
    void keyPressEvent(QKeyEvent *key);
-   void mouseDoubleClickEvent(QMouseEvent *event);
+   void itemDoubleClicked(QListWidgetItem * item);
 
  private slots:
      void accept();

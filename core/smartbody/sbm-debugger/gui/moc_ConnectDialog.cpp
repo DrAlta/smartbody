@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'ConnectDialog.h'
 **
-** Created: Fri Jan 20 14:34:11 2012
+** Created: Fri Jan 20 17:13:54 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -32,16 +32,16 @@ static const uint qt_meta_data_ConnectDialog[] = {
 
  // slots: signature, parameters, type, tag, flags
       19,   15,   14,   14, 0x0a,
-      51,   45,   14,   14, 0x0a,
-      87,   14,   14,   14, 0x08,
-      96,   14,   14,   14, 0x08,
+      50,   45,   14,   14, 0x0a,
+      86,   14,   14,   14, 0x08,
+      95,   14,   14,   14, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_ConnectDialog[] = {
     "ConnectDialog\0\0key\0keyPressEvent(QKeyEvent*)\0"
-    "event\0mouseDoubleClickEvent(QMouseEvent*)\0"
+    "item\0itemDoubleClicked(QListWidgetItem*)\0"
     "accept()\0reject()\0"
 };
 
@@ -75,7 +75,7 @@ int ConnectDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
         case 0: keyPressEvent((*reinterpret_cast< QKeyEvent*(*)>(_a[1]))); break;
-        case 1: mouseDoubleClickEvent((*reinterpret_cast< QMouseEvent*(*)>(_a[1]))); break;
+        case 1: itemDoubleClicked((*reinterpret_cast< QListWidgetItem*(*)>(_a[1]))); break;
         case 2: accept(); break;
         case 3: reject(); break;
         default: ;
