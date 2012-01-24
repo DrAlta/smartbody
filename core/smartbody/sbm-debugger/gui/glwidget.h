@@ -18,6 +18,7 @@
 using std::string;
 
 #define SELECT_BUFF_SIZE 1024
+#define PICKING_OFFSET 1000
 
 class GLWidget : public QGLWidget
 {
@@ -75,6 +76,7 @@ private:
     vhcl::Timer m_StopWatch;
 
     GLMode m_GLMode;
+    int m_nPickingOffset;
     GLuint selectBuf[SELECT_BUFF_SIZE];
 
     virtual void timerEvent(QTimerEvent * event);
