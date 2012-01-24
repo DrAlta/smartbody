@@ -1251,7 +1251,7 @@ void mcuCBHandle::update( void )	{
 		_scene->getDebuggerServer()->m_camera.rot.y = quat.y;
 		_scene->getDebuggerServer()->m_camera.rot.z = quat.z;
 		_scene->getDebuggerServer()->m_camera.rot.w = quat.w;
-		_scene->getDebuggerServer()->m_camera.fovY   = viewer_p->get_camera()->fovy;
+		_scene->getDebuggerServer()->m_camera.fovY   = sr_todeg(viewer_p->get_camera()->fovy);
 		_scene->getDebuggerServer()->m_camera.aspect = viewer_p->get_camera()->aspect;
 		_scene->getDebuggerServer()->m_camera.zNear  = viewer_p->get_camera()->znear;
 		_scene->getDebuggerServer()->m_camera.zFar   = viewer_p->get_camera()->zfar;
