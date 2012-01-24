@@ -19,7 +19,7 @@ public:
    Camera();
    ~Camera();
 
-   void Update();
+   void Draw();
    void Offset(const QVector3D& offset);
    void Rotate(const QVector3D& offset);
 
@@ -41,6 +41,7 @@ public:
    void SetRotationSpeed(double rotationSpeed) { m_RotationSpeed = rotationSpeed; } 
    double GetMovementSpeed() { return m_MovementSpeed; }
    double GetRotationSpeed() { return m_RotationSpeed; }
+   double CoordConverter() { return -m_Scale.z(); }
 
    void LookAt(const QVector3D& pos);
 

@@ -17,6 +17,7 @@
 
 using std::string;
 
+#define SELECT_BUFF_SIZE 1024
 
 class GLWidget : public QGLWidget
 {
@@ -48,10 +49,16 @@ protected:
     void wheelEvent(QWheelEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    //void mouseReleaseEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *key);
     
 private:
+
+    enum GLMode
+    {
+      RENDER,
+      SELECT,
+    };
 
     QPoint lastPos;
     QColor qtPurple;
@@ -67,8 +74,17 @@ private:
     QBasicTimer timer;
     vhcl::Timer m_StopWatch;
 
+    GLMode m_GLMode;
+    GLuint selectBuf[SELECT_BUFF_SIZE];
+
     virtual void timerEvent(QTimerEvent * event);
 
+    // picking Functions
+    void StartPicking();
+    void ProcessHits(GLint hits, GLuint buffer[]);
+    void StopPicking();
+
+    // Drawing Functions
     void DrawFloor();
     void DrawScene();
     void DrawCharacter(const Character* character);
