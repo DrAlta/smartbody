@@ -377,12 +377,12 @@ void GLWidget::keyPressEvent(QKeyEvent *key)
    if (key->key() == Qt::Key_A // left
       || key->key() == Qt::Key_Left) 
    {
-      m_Camera.MoveX(-m_Camera.GetMovementSpeed() * -m_Camera.CoordConverter());
+      m_Camera.MoveX(-m_Camera.GetMovementSpeed());
    }
    else if (key->key() == Qt::Key_D // right
       || key->key() == Qt::Key_Right) 
    {
-      m_Camera.MoveX(m_Camera.GetMovementSpeed() * -m_Camera.CoordConverter());
+      m_Camera.MoveX(m_Camera.GetMovementSpeed());
    }
    if (key->key() == Qt::Key_W // forward
       || key->key() == Qt::Key_Up)  
@@ -427,11 +427,21 @@ void GLWidget::Update()
      
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
+
+      if (!m_pScene->m_rendererIsRightHanded)
+      {
+         // this fixes the mirroring problem in left handed coordinate systems
+         QMatrix4x4 mat;
+         mat.setToIdentity();
+         mat.setColumn(0, QVector4D(-1, 0, 0, 0));
+         glMultMatrixd(mat.data());
+      }
+      
       gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
       glMatrixMode(GL_MODELVIEW);
 
-      m_Camera.SetPosition(QVector3D(cam.pos.x, cam.pos.y, cam.pos.z));
-      m_Camera.SetRotation(QQuaternion(cam.rot.w, cam.rot.x * m_Camera.CoordConverter(), cam.rot.y * m_Camera.CoordConverter(), cam.rot.z));
+      m_Camera.SetPosition(QVector3D(cam.pos.x * m_Camera.CoordConverter(), cam.pos.y, cam.pos.z));
+      m_Camera.SetRotation(QQuaternion(cam.rot.w * m_Camera.CoordConverter(), cam.rot.x, cam.rot.y, cam.rot.z));
    }
 
    // calculate fps
