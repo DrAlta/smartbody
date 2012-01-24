@@ -25,6 +25,7 @@ GLWidget::GLWidget(Scene* scene, QWidget *parent)
     
     m_fPawnSize = 1.0f;
     m_fJointRadius = 1.25f;
+    m_nPickingOffset = 0;
 
     qtPurple = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
 
@@ -143,7 +144,7 @@ void GLWidget::StartPicking()
 
 void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
 {
-   GLint i, numberOfNames;
+   GLint i, j, numberOfNames;
    GLuint names, *ptr, minZ, *ptrNames;
 
    ptr = (GLuint *) buffer;
@@ -166,10 +167,12 @@ void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
    {
 	  // hit
 	  ptr = ptrNames;
-	/*  for (j = 0; j < numberOfNames; j++,ptr++) 
+     int closestHit = *ptr / PICKING_OFFSET;
+      
+	  for (j = 0; j < numberOfNames; j++,ptr++) 
      { 
         printf ("%d ", *ptr);
-	  }*/
+	  }
 	}
    else
    {
@@ -233,6 +236,7 @@ void GLWidget::DrawScene()
    {
       glPushName(i);
       glPushMatrix();
+      m_nPickingOffset = i * PICKING_OFFSET;
       DrawCharacter(&characters[i]);
       glPopMatrix();
       glPopName();
@@ -273,18 +277,16 @@ void GLWidget::DrawCharacter(const Character* character)
 void GLWidget::DrawJoint(Joint* joint)
 {
    glPushMatrix();
-   Vector3 jointPos = (joint->posOrig + joint->pos);
 
-   //if (joint->m_name == "l_shoulder")
-   //{
-   //   int x = 10;
-   //}
-  
+   // calulate position and rotation
+   Vector3 jointPos = (joint->posOrig + joint->pos);
    glTranslated(jointPos.x, jointPos.y, jointPos.z);
    QMatrix4x4 rotationMat = GetLocalRotation(joint);
    glMultMatrixd(rotationMat.data());  
-   
-   DrawSphere(m_fJointRadius); 
+ 
+   glPushName(m_nPickingOffset++);  // for picking
+   DrawSphere(m_fJointRadius);  
+   glPopName();
 
    // draw a connecting bone between the 2 joints
    if (joint->m_parent)
