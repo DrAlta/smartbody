@@ -6,7 +6,7 @@ SBService::SBService() : SBObject()
 {
 	_enabled = false;
 
-	//createBoolAttribute("enable", false, true, "basic", 5, false, false, false, "Enables or disables the service.");
+	createBoolAttribute("enable", false, true, "basic", 5, false, false, false, "Enables or disables the service.");
 }
 
 SBService::~SBService()
