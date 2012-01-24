@@ -16,6 +16,7 @@ class MeCtPhysicsController : public SmartBody::SBController
 		float 			_duration;
 		SkChannelArray	_channels;
 		SbmCharacter* 	_character;
+		SBSkeleton*     _skeletonCopy;
 		bool			_valid;	
 	public:
 		MeCtPhysicsController(SbmCharacter* character);
@@ -23,11 +24,13 @@ class MeCtPhysicsController : public SmartBody::SBController
 
 		bool getValid()						{return _valid;}
 		void setValid(bool v)				{_valid = v;}		
+	protected:
+		void getJointChannelValues(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat, SrVec& outPos);
 	private:
 		virtual bool controller_evaluate(double t, MeFrameData& frame);
 		virtual SkChannelArray& controller_channels()	{ return(_channels); }
 		virtual double controller_duration()			{ return((double)_duration); }
-		virtual const std::string& controller_type() const		{ return(CONTROLLER_TYPE); }		
+		virtual const std::string& controller_type() const		{ return(CONTROLLER_TYPE); }			
 };
 
 #endif

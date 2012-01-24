@@ -59,14 +59,24 @@ void SBPhysicsManager::update(double time)
 {
 	SbmPhysicsSim* physicsEngine = getPhysicsEngine();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	static double prevTime = -1;
 	if (isEnable())
 	{
 		float dt = (float)physicsEngine->getDoubleAttribute("dT");//timeStep*0.03f;	
-		while (physicsTime < time)			
+		float simLimit = (float)physicsEngine->getDoubleAttribute("MaxSimTime");
+		double timeDiff = time - physicsTime;
+		double timeElapse = 0.0;
+		vhcl::Timer timer;
+		vhcl::StopWatch watch(timer);			
+		while (physicsTime < time && timeElapse < simLimit)			
 		{	
+			watch.Start();
 			physicsEngine->updateSimulation(dt);
 			physicsTime += dt;
+			watch.Stop();
+			timeElapse += watch.GetTime();
 		}	
+		physicsTime = time;		
 	}
 	else
 	{
@@ -248,11 +258,21 @@ void SBPhysicsManager::updatePhysicsCharacter( std::string charName )
 #if USE_PHYSICS_CHARACTER		
 		bool constraintObj = false;
 		SBPawn* constraintPawn = getScene()->getPawn(phyObj->getStringAttribute("constraintTarget"));
-		if (constraintPawn && phyObj->getBoolAttribute("constraint"))
+		if (charPhySim && constraintPawn && phyObj->getBoolAttribute("constraint"))
 		{				
 			phyObj->enablePhysicsSim(false);				
 			phyObj->setRefTransform(phyObj->getGlobalTransform()); // save previous transform
 			phyObj->setGlobalTransform(constraintPawn->get_world_offset());					
+			phyObj->setAngularVel(phyObj->getPhyJoint()->getRefAngularVel());
+			phyObj->updatePhySim();						
+		}
+		else if (charPhySim && phyObj->getBoolAttribute("constraint"))
+		{
+			SrMat tranMat; tranMat.translation(joint->getLocalCenter());	
+			phyObj->enablePhysicsSim(false);					
+			SrMat gmat = tranMat*phyObj->getRefTransform().gmat();		
+			phyObj->setRefTransform(phyObj->getGlobalTransform()); // save previous transform
+			phyObj->setGlobalTransform(gmat);					
 			phyObj->setAngularVel(phyObj->getPhyJoint()->getRefAngularVel());
 			phyObj->updatePhySim();						
 		}

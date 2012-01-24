@@ -571,7 +571,8 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* characte
 	Fl_Tree_Item* item = resourceTree->add(tree,character->getName().c_str());
 	item->user_data((void*)ITEM_CHARACTER);
 	resourceTree->sortorder(FL_TREE_SORT_NONE);	
-
+	Fl_Tree_Item* controllerFolder = resourceTree->add(item,"controllers");	
+	controllerFolder->user_data((void*)-1);
 	// add controllers
 	MeControllerTreeRoot* ctTree = character->ct_tree_p ;
 	if( ctTree )
@@ -580,7 +581,7 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* characte
 		for (int c = 0; c < n; c++)
 		{
 			//LOG( "%s", ctTree->controller(c)->name() );
-			Fl_Tree_Item* ctrlItem = resourceTree->add(item,ctTree->controller(c)->getName().c_str());
+			Fl_Tree_Item* ctrlItem = resourceTree->add(controllerFolder,ctTree->controller(c)->getName().c_str());
 			ctrlItem->user_data((void*)ITEM_CONTROLLER);
 		}
 	}
@@ -588,7 +589,7 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* characte
 	Nvbg* nvbg = character->getNvbg();
 	if (nvbg)
 	{
-		Fl_Tree_Item* ctrlItem = resourceTree->add(item, "NVBG");
+		Fl_Tree_Item* ctrlItem = resourceTree->add(controllerFolder, "NVBG");
 		ctrlItem->user_data((void*)ITEM_NVBG);
 	}
 }
@@ -762,7 +763,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_CONTROLLER)
 	{
-		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->parent()->label()); // a controller's parent is its character name
+		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->parent()->parent()->label()); // a controller's parent is its character name
 		MeController* ctrl = NULL;
 		if (curChar)
 		{			
@@ -780,7 +781,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_NVBG)
 	{
-		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->parent()->label()); // a controller's parent is its character name
+		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->parent()->parent()->label()); // a controller's parent is its character name
 		widget = new AttributeItemWidget(curChar->getNvbg(),x,y,w,h,name,treeItem,itemType,this);
 	}
 	else
