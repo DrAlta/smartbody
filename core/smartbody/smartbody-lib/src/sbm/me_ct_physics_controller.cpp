@@ -7,6 +7,8 @@ std::string MeCtPhysicsController::CONTROLLER_TYPE = "PhysicsController";
 MeCtPhysicsController::MeCtPhysicsController(SbmCharacter* character) : SmartBody::SBController()
 {
 	_character = character;
+	_skeletonCopy = new SBSkeleton();
+	_skeletonCopy->copy(_character->getSkeleton());
 	_valid = true;
 	_prevTime = 0.0;
 	_duration = 0.0;
@@ -17,6 +19,35 @@ MeCtPhysicsController::~MeCtPhysicsController()
 	
 }
 
+
+void MeCtPhysicsController::getJointChannelValues( const std::string& jointName, MeFrameData& frame, SrQuat& outQuat, SrVec& outPos )
+{
+	bool hasRotation = true;
+	int channelId = _context->channels().search(jointName, SkChannel::Quat);
+	if (channelId < 0)	hasRotation = false;
+	int bufferId = frame.toBufferIndex(channelId);
+	if (bufferId < 0)	hasRotation = false;	
+
+	bool hasTranslation = true;
+	int positionChannelID = _context->channels().search(jointName, SkChannel::XPos);
+	if (positionChannelID < 0) hasTranslation = false;
+	int posBufferID = frame.toBufferIndex(positionChannelID);
+	if (posBufferID < 0) hasTranslation = false;		
+	// input reference pose
+	if (hasRotation)
+	{
+		outQuat.w = frame.buffer()[bufferId + 0];
+		outQuat.x = frame.buffer()[bufferId + 1];
+		outQuat.y = frame.buffer()[bufferId + 2];
+		outQuat.z = frame.buffer()[bufferId + 3];
+	}
+	if (hasTranslation)
+	{
+		outPos.x = frame.buffer()[posBufferID + 0];
+		outPos.y = frame.buffer()[posBufferID + 1];
+		outPos.z = frame.buffer()[posBufferID + 2];				
+	}
+}
 
 bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 {
@@ -90,7 +121,27 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 		{
 			colRecords.clear();
 		}
-		
+
+		// update world-offset
+		std::string wname = "world_offset";
+		SrQuat wquat;
+		SrVec wpos;
+		getJointChannelValues(wname,frame,wquat,wpos);
+
+		SBJoint* wjoint = _skeletonCopy->getJointByName(wname);
+		if (wjoint)
+		{
+			if (wjoint->pos())
+			{					
+				wjoint->pos()->value(0,wpos[0]);
+				wjoint->pos()->value(1,wpos[1]);
+				wjoint->pos()->value(2,wpos[2]);
+			}
+			if (wjoint->quat())
+			{					
+				wjoint->quat()->value(wquat);					
+			}
+		}		
 
 		// recompute joint torque 
 		// update physics simulation results to character channel arrays
@@ -99,24 +150,33 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			SbmJointObj* obj = jointObjList[i];
 			SbmPhysicsJoint* phyJoint = obj->getPhyJoint();
 			SBJoint* joint = obj->getPhyJoint()->getSBJoint();
+			if (!joint)	continue;
+			
+			SrMat tran = obj->getRelativeOrientation();				
+			std::string jname = joint->getName();
+			SrQuat inQuat;
+			SrVec inPos;
+			getJointChannelValues(jname,frame,inQuat,inPos);
+			
+			
+			SBJoint* jointCopy = _skeletonCopy->getJointByName(jname);
+			if (jointCopy)
+			{
+				if (jointCopy->pos())
+				{					
+					jointCopy->pos()->value(0,inPos[0]);
+					jointCopy->pos()->value(1,inPos[1]);
+					jointCopy->pos()->value(2,inPos[2]);
+				}
+				if (jointCopy->quat())
+				{					
+					jointCopy->quat()->value(inQuat);					
+				}
+			}
 
 			bool kinematicRoot = (joint->getName() == "base" || joint->getName() == "JtPelvis") && phyChar->getBoolAttribute("kinematicRoot");
 			if (kinematicRoot)
 				continue;
-
-			if (!joint)	continue;
-
-			//obj->updateSbmObj();
-			SrMat tran = obj->getRelativeOrientation();		
-			//if (obj->getParentObj())
-			//	tran.setl4(SrVec(0,0,0));
-			std::string jname = joint->getName();
-			std::string jPosName = joint->getName();
-			
-			int channelId = _context->channels().search(jname, SkChannel::Quat);
-			if (channelId < 0)	continue;
-			int bufferId = frame.toBufferIndex(channelId);
-			if (bufferId < 0)	continue;	
 
 			
 			SrMat preRot;
@@ -124,12 +184,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 
 			SrQuat oldPhyQuat = SrQuat(tran);
 			SrQuat phyQuat = SrQuat(tran*preRot);
-			SrQuat inQuat;
-			// input reference pose
-			inQuat.w = frame.buffer()[bufferId + 0];
-			inQuat.x = frame.buffer()[bufferId + 1];
-			inQuat.y = frame.buffer()[bufferId + 2];
-			inQuat.z = frame.buffer()[bufferId + 3];
+			
 			
 			SrQuat newQuat = (joint->quat()->prerot()*inQuat);
 
@@ -162,16 +217,22 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			
 			//LOG("joint name = %s",joint->getName().c_str());
 			//sr_out << "angVel = " << angDiff << srnl;
- 			phyJoint->setRefAngularVel(angDiff);			
+ 			//phyJoint->setRefAngularVel(angDiff);			
 			phyJoint->setRefQuat(inQuat);
 			if (hasPhy)
 			{
+
+				int channelId = _context->channels().search(jname, SkChannel::Quat);
+				if (channelId < 0)	continue;
+				int bufferId = frame.toBufferIndex(channelId);
+				if (bufferId < 0)	continue;	
+
 				frame.buffer()[bufferId + 0] = phyQuat.w;
 				frame.buffer()[bufferId + 1] = phyQuat.x;
 				frame.buffer()[bufferId + 2] = phyQuat.y;
 				frame.buffer()[bufferId + 3] = phyQuat.z;
 
-				int positionChannelID = _context->channels().search(jPosName, SkChannel::XPos);
+				int positionChannelID = _context->channels().search(jname, SkChannel::XPos);
 				if (positionChannelID < 0) continue;
 				int posBufferID = frame.toBufferIndex(positionChannelID);
 				if (posBufferID < 0)	continue;
@@ -196,8 +257,23 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 				obj->setLinearVel(refLinearVel);
 				obj->setAngularVel(refAngVel);
 			}
-		}				
-	}
+		}
+
+		_skeletonCopy->update_global_matrices();
+		for (unsigned int i=0;i<jointObjList.size();i++)
+		{
+			SbmJointObj* obj = jointObjList[i];
+			SbmPhysicsJoint* phyJoint = obj->getPhyJoint();
+			SBJoint* sbJoint = phyJoint->getSBJoint();
+			SBJoint* joint = NULL; 
+			if (sbJoint)
+				joint = _skeletonCopy->getJointByName(sbJoint->getName());
+			if (joint)
+			{
+				obj->setRefTransform(joint->gmat());
+			}
+		}
+	}	
 #endif
 	return true;
 }

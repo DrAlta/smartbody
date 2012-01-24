@@ -10,6 +10,7 @@ SbmPhysicsSim::SbmPhysicsSim(void)
 	SBObject::createDoubleAttribute("gravity",980, true, "Basic", 20, false, false, false, "?");
 	SBObject::createDoubleAttribute("Ks",230000, true, "Basic", 20, false, false, false, "?");
 	SBObject::createDoubleAttribute("Kd",2000, true, "Basic", 20, false, false, false, "?");
+	SBObject::createDoubleAttribute("MaxSimTime",0.01,true,"Basic", 20, false, false, false, "?");
 	//SBObject::createDoubleAttribute("gravity",9.8, true, "Basic", 20, false, false, false, "?");
 	//SBObject::createDoubleAttribute("Ks",30.0, true, "Basic", 20, false, false, false, "?");
 	//SBObject::createDoubleAttribute("Kd",0.0, true, "Basic", 20, false, false, false, "?");	
@@ -757,19 +758,19 @@ void SbmPhysicsCharacter::updateJointAxis( SbmPhysicsJoint* phyJoint )
 	SrVec twistAxis = phyJoint->getVec3Attribute("axis0");
 	SrVec swingAxis = phyJoint->getVec3Attribute("axis1");
 	SrVec swingAxis2 = phyJoint->getVec3Attribute("axis2");
-	if (joint)
-	{
-		twistAxis = joint->getLocalCenter()*joint->getMatrixGlobal() -  joint->getMatrixGlobal().get_translation();
-		twistAxis.normalize();
-		sr_out << "twist axis = " << twistAxis << srnl;
-		if (twistAxis.len() == 0) twistAxis = SrVec(0,1,0);	
-		swingAxis = SrVec(1.f,0.f,0.f); 		
-
-		SrVec newswingAxis = swingAxis - twistAxis*dot(twistAxis,swingAxis); 		
-		newswingAxis.normalize();
-		swingAxis = newswingAxis;
-		swingAxis2 = cross(twistAxis,swingAxis);
-	}
+// 	if (joint)
+// 	{
+// 		twistAxis = joint->getLocalCenter()*joint->getMatrixGlobal() -  joint->getMatrixGlobal().get_translation();
+// 		twistAxis.normalize();
+// 		sr_out << "twist axis = " << twistAxis << srnl;
+// 		if (twistAxis.len() == 0) twistAxis = SrVec(0,1,0);	
+// 		swingAxis = SrVec(1.f,0.f,0.f); 		
+// 
+// 		SrVec newswingAxis = swingAxis - twistAxis*dot(twistAxis,swingAxis); 		
+// 		newswingAxis.normalize();
+// 		swingAxis = newswingAxis;
+// 		swingAxis2 = cross(twistAxis,swingAxis);
+// 	}
 	phyJoint->setVec3Attribute("axis2",twistAxis[0],twistAxis[1],twistAxis[2]);	
 	phyJoint->setVec3Attribute("axis1",swingAxis[0],swingAxis[1],swingAxis[2]);
 	phyJoint->setVec3Attribute("axis0",swingAxis2[0],swingAxis2[1],swingAxis2[2]);		
@@ -805,7 +806,7 @@ void SbmPhysicsCharacter::updatePDTorque()
 		SBJoint* joint = obj->getPhyJoint()->getSBJoint();
 		if (!joint)	continue;		
 		bool kinematicRoot = (joint->getName() == "base" || joint->getName() == "JtPelvis") && this->getBoolAttribute("kinematicRoot");		
-		if (kinematicRoot)// || joint->getName() == "JtPelvis")
+		if (kinematicRoot || obj->getBoolAttribute("constraint"))// || joint->getName() == "JtPelvis")
 		{			
 			continue;
 		}
