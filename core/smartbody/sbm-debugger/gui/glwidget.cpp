@@ -142,6 +142,14 @@ void GLWidget::StartPicking()
 	glMatrixMode(GL_MODELVIEW);
 }
 
+Joint* GLWidget::FindPickedJoint(int pickIndex)
+{
+   int characterIndex = (pickIndex + 1) / PICKING_OFFSET;
+   m_pScene->m_characters[characterIndex];
+
+   return NULL;
+}
+
 void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
 {
    GLint i, j, numberOfNames;
@@ -167,12 +175,15 @@ void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
    {
 	  // hit
 	  ptr = ptrNames;
-     int closestHit = *ptr / PICKING_OFFSET;
+     while (*ptr == 0)
+         ptr++;
+     
+     //FindPickedJoint(*ptr);
       
-	  for (j = 0; j < numberOfNames; j++,ptr++) 
-     { 
-        printf ("%d ", *ptr);
-	  }
+	  //for (j = 0; j < numberOfNames; j++,ptr++) 
+   //  { 
+   //     printf ("%d ", *ptr);
+	  //}
 	}
    else
    {
@@ -236,7 +247,7 @@ void GLWidget::DrawScene()
    {
       glPushName(i);
       glPushMatrix();
-      m_nPickingOffset = i * PICKING_OFFSET;
+      m_nPickingOffset = (i + 1)* PICKING_OFFSET;
       DrawCharacter(&characters[i]);
       glPopMatrix();
       glPopName();
@@ -304,7 +315,7 @@ void GLWidget::DrawJoint(Joint* joint)
          glVertex3f(-jointPos.x, -jointPos.y, -jointPos.z);  
       glEnd();
       glPopMatrix();
-   }   
+   } 
 
    for (unsigned int i = 0; i < joint->m_joints.size(); i++)
    {   
@@ -417,11 +428,10 @@ void GLWidget::Update()
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
       gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
-      //gluPerspective(60, cam.aspect, cam.zNear, cam.zFar);
       glMatrixMode(GL_MODELVIEW);
 
       m_Camera.SetPosition(QVector3D(cam.pos.x, cam.pos.y, cam.pos.z));
-      m_Camera.SetRotation(QQuaternion(cam.rot.w, cam.rot.x, cam.rot.y * m_Camera.CoordConverter(), cam.rot.z));
+      m_Camera.SetRotation(QQuaternion(cam.rot.w, cam.rot.x * m_Camera.CoordConverter(), cam.rot.y * m_Camera.CoordConverter(), cam.rot.z));
    }
 
    // calculate fps

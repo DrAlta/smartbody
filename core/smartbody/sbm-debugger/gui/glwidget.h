@@ -83,6 +83,8 @@ private:
 
     // picking Functions
     void StartPicking();
+    Joint* FindPickedJoint(int pickIndex);
+    //Joint* FindPickedJointRecursive(int pickIndex);
     void ProcessHits(GLint hits, GLuint buffer[]);
     void StopPicking();
 
