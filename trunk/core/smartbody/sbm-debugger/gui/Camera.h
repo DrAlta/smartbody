@@ -41,7 +41,7 @@ public:
    void SetRotationSpeed(double rotationSpeed) { m_RotationSpeed = rotationSpeed; } 
    double GetMovementSpeed() { return m_MovementSpeed; }
    double GetRotationSpeed() { return m_RotationSpeed; }
-   double CoordConverter() { return -m_Scale.z(); }
+   double CoordConverter() { return -1; }
 
    void LookAt(const QVector3D& pos);
 
