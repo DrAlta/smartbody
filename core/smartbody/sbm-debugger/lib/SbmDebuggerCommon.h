@@ -198,8 +198,8 @@ public:
    DebuggerCamera()
    {
       pos.x = 0;
-      pos.y = 0;
-      pos.z = 0;
+      pos.y = 0.2f;
+      pos.z = 3;
       rot.x = 0;
       rot.y = 0;
       rot.z = 0;
@@ -207,7 +207,7 @@ public:
       fovY = 45;
       aspect = 1.5;
       zNear = 0.1;
-      zFar = 100;
+      zFar = 1000;
    }
 
    virtual ~DebuggerCamera() {}

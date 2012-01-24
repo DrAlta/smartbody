@@ -19,6 +19,7 @@ using std::vector;
 GLWidget::GLWidget(Scene* scene, QWidget *parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
+    m_GLMode = RENDER;
     m_quadric = gluNewQuadric();
     SetScene(scene);
     
@@ -97,7 +98,7 @@ void GLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     glPushMatrix();
-       m_Camera.Update(); 
+       m_Camera.Draw(); 
        DrawFloor();
        DrawScene();
     glPopMatrix();
@@ -114,6 +115,80 @@ void GLWidget::resizeGL(int width, int height)
     gluPerspective(60, (double)width / (double)height, 0.1f, 1000);
 
     glMatrixMode(GL_MODELVIEW);
+}
+
+void GLWidget::StartPicking()
+{
+   GLint viewport[4];
+	float ratio;
+
+	glSelectBuffer(SELECT_BUFF_SIZE, selectBuf);
+
+	glGetIntegerv(GL_VIEWPORT, viewport);
+
+	glRenderMode(GL_SELECT);
+
+	glInitNames();
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+	gluPickMatrix(lastPos.x(), viewport[3] - lastPos.y(), 5, 5, viewport);
+	ratio = (viewport[2] + 0.0) / viewport[3];
+   DebuggerCamera cam = m_pScene->m_camera;
+	gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
+{
+   GLint i, numberOfNames;
+   GLuint names, *ptr, minZ, *ptrNames;
+
+   ptr = (GLuint *) buffer;
+   minZ = 0xffffffff;
+   for (i = 0; i < hits; i++)
+   {	
+     names = *ptr;
+	  ptr++;
+	  if (*ptr < minZ)
+     {
+		  numberOfNames = names;
+		  minZ = *ptr;
+		  ptrNames = ptr+2;
+	  }
+	  
+	  ptr += names+2;
+	}
+
+   if (numberOfNames > 0) 
+   {
+	  // hit
+	  ptr = ptrNames;
+	/*  for (j = 0; j < numberOfNames; j++,ptr++) 
+     { 
+        printf ("%d ", *ptr);
+	  }*/
+	}
+   else
+   {
+	   // no hit
+   }
+}
+
+void GLWidget::StopPicking()
+{
+   glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glFlush();
+	GLint hits = glRenderMode(GL_RENDER);
+	if (hits != 0)
+   {
+		ProcessHits(hits, selectBuf);
+	}
+	m_GLMode = RENDER;
 }
 
 void GLWidget::DrawCylinder(float baseRadius, float topRadius, float height, int slices, int stacks)
@@ -149,13 +224,18 @@ void GLWidget::DrawFloor()
 
 void GLWidget::DrawScene()
 {
+   if (m_GLMode == SELECT)
+      StartPicking();
+
    // draw characters
    vector<Character> characters = m_pScene->m_characters;
    for (unsigned int i = 0; i < characters.size(); i++)
    {
+      glPushName(i);
       glPushMatrix();
       DrawCharacter(&characters[i]);
       glPopMatrix();
+      glPopName();
    }
    
    // draw pawns
@@ -166,29 +246,24 @@ void GLWidget::DrawScene()
       DrawPawn(&pawns[i]);
       glPopMatrix();
    }
+
+   if (m_GLMode == SELECT)
+      StopPicking(); 
 }
 
-//Vector3 GetLocalRotation(Joint* joint)
 QMatrix4x4 GetLocalRotation(Joint* joint)
 {
-   QQuaternion worldRotation = QQuaternion(joint->rotOrig.w, joint->rotOrig.x, joint->rotOrig.y, joint->rotOrig.z) 
+   QQuaternion locationRotation = QQuaternion(joint->rotOrig.w, joint->rotOrig.x, joint->rotOrig.y, joint->rotOrig.z) 
       * QQuaternion(joint->rot.w, joint->rot.x, joint->rot.y, joint->rot.z);
 
    QMatrix4x4 mat;
    mat.setToIdentity();
-   mat.rotate(worldRotation);
-   //mat = mat.transposed();
-   //mat.rotate(180, QVector3D(0, 1, 0));
+   mat.rotate(locationRotation);
    return mat;
-   /*Vector4 convertedRotation(worldRotation.x(), worldRotation.y(), worldRotation.z(), worldRotation.scalar());
-   return Vector3::ConvertFromQuat(convertedRotation);*/
 }
 
 void GLWidget::DrawCharacter(const Character* character)
 {
-   // world_offset joint handles this
-   //glTranslated(character->pos.x, character->pos.y, character->pos.z);
-
    for (unsigned int i = 0; i < character->m_joints.size(); i++)
    {
       DrawJoint(character->m_joints[i]);
@@ -240,19 +315,23 @@ void GLWidget::DrawPawn(const Pawn* pawn)
 {
    Vector3 pos = pawn->GetWorldPosition();
    glTranslated(pos.x, pos.y, pos.z);
-   //glRotatef(); // TODO: Perform rotation, convert quat to euler angles
+   
+   QMatrix4x4 rotationMat = GetLocalRotation(pawn->m_joints[0]);
+   glMultMatrixd(rotationMat.data());  
+
    DrawSphere(m_fPawnSize);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     lastPos = event->pos();
+    m_GLMode = SELECT;
 }
 
-void GLWidget::mouseReleaseEvent(QMouseEvent *event)
-{
-   lastPos.setX(0); lastPos.setY(0);
-}
+//void GLWidget::mouseReleaseEvent(QMouseEvent *event)
+//{
+//   //lastPos.setX(0); lastPos.setY(0);
+//}
 
 void GLWidget::wheelEvent(QWheelEvent *event)
 {
@@ -285,12 +364,12 @@ void GLWidget::keyPressEvent(QKeyEvent *key)
    if (key->key() == Qt::Key_A // left
       || key->key() == Qt::Key_Left) 
    {
-      m_Camera.MoveX(-m_Camera.GetMovementSpeed());
+      m_Camera.MoveX(-m_Camera.GetMovementSpeed() * -m_Camera.CoordConverter());
    }
    else if (key->key() == Qt::Key_D // right
       || key->key() == Qt::Key_Right) 
    {
-      m_Camera.MoveX(m_Camera.GetMovementSpeed());
+      m_Camera.MoveX(m_Camera.GetMovementSpeed() * -m_Camera.CoordConverter());
    }
    if (key->key() == Qt::Key_W // forward
       || key->key() == Qt::Key_Up)  
@@ -309,12 +388,6 @@ void GLWidget::keyPressEvent(QKeyEvent *key)
    else if (key->key() == Qt::Key_E) // down
    {
       m_Camera.MoveY(-m_Camera.GetMovementSpeed());
-   }
-
-   if (key->key() == Qt::Key_0)
-   {
-      //m_Camera.LookAt(QVector3D(0, 1, -1));
-      m_Camera.LookAt(QVector3D(0, 0, 0));
    }
 
    updateGL();
@@ -338,17 +411,15 @@ void GLWidget::Update()
    {
       DebuggerCamera cam = m_pScene->m_camera;
       m_Camera.SetRightHanded(m_pScene->m_rendererIsRightHanded);
-
+     
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
       gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
-      //gluPerspective(20, 2.0059f, 1, 1000);
+      //gluPerspective(60, cam.aspect, cam.zNear, cam.zFar);
       glMatrixMode(GL_MODELVIEW);
 
-      //gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
-
       m_Camera.SetPosition(QVector3D(cam.pos.x, cam.pos.y, cam.pos.z));
-      m_Camera.SetRotation(QQuaternion(cam.rot.w, cam.rot.x, cam.rot.y, cam.rot.z));
+      m_Camera.SetRotation(QQuaternion(cam.rot.w, cam.rot.x, cam.rot.y * m_Camera.CoordConverter(), cam.rot.z));
    }
 
    // calculate fps

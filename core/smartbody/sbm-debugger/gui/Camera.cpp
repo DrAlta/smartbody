@@ -20,7 +20,7 @@ Camera::~Camera()
   
 }
 
-void Camera::Update()
+void Camera::Draw()
 {
    glScaled(m_Scale.x(), m_Scale.y(), m_Scale.z());
    QMatrix4x4 mat = m_RotMatrix.inverted();
@@ -87,7 +87,7 @@ void Camera::LookAt(const QVector3D& pos)
    //m_RotMatrix.lookAt(
    // set the forward vector
    QVector3D forward = (pos - GetPosition()).normalized();
-   m_RotMatrix.setColumn(2, -forward);
+   m_RotMatrix.setColumn(2, forward * CoordConverter());
 
    // set right vector
    QVector3D right = QVector3D::crossProduct(forward, QVector3D(0, 1, 0));
