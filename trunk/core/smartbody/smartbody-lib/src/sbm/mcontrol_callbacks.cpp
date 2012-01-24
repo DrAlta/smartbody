@@ -6325,7 +6325,7 @@ int mcu_vrExpress_func( srArgBuffer& args, mcuCBHandle *mcu )
 	std::string actor = args.read_token();
 	std::string to = args.read_token();
 	std::string messageId = args.read_token();
-	std::string xml = args.read_token();
+	std::string xml = args.read_remainder_raw();
 
 	// get the NVBG process for the character, if available
 	SbmCharacter* character = mcu->getCharacter(actor);
