@@ -14,110 +14,25 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="RenderView" native="true">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>1001</width>
-      <height>761</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QTabWidget" name="sceneTab">
-    <property name="geometry">
-     <rect>
-      <x>1020</x>
-      <y>10</y>
-      <width>181</width>
-      <height>771</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="tab">
-     <attribute name="title">
-      <string>Scene</string>
-     </attribute>
-     <widget class="QTreeWidget" name="sceneTree">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>181</width>
-        <height>741</height>
-       </rect>
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <item>
+     <widget class="QWidget" name="RenderView" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>500</width>
+        <height>500</height>
+       </size>
       </property>
-      <property name="rootIsDecorated">
-       <bool>true</bool>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
       </property>
-      <property name="columnCount">
-       <number>1</number>
-      </property>
-      <attribute name="headerVisible">
-       <bool>true</bool>
-      </attribute>
-      <column>
-       <property name="text">
-        <string notr="true">1</string>
-       </property>
-      </column>
+      <layout class="QHBoxLayout" name="horizontalLayout_2"/>
      </widget>
-    </widget>
-    <widget class="QWidget" name="statisticsTab">
-     <attribute name="title">
-      <string>Statistics</string>
-     </attribute>
-     <widget class="QLabel" name="cameraPositionLabel">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>50</y>
-        <width>211</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Camera Pos:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="networkFpsLabel">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>121</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Network Fps:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="rendererFpsLabel">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>121</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Renderer Fps:</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tab_3">
-     <attribute name="title">
-      <string>Tab 3</string>
-     </attribute>
-    </widget>
-   </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -167,9 +82,147 @@
     <enum>LeftToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
    <addaction name="actionToggleFreeLookCamera"/>
+  </widget>
+  <widget class="QDockWidget" name="sceneDockWidget">
+   <property name="maximumSize">
+    <size>
+     <width>230</width>
+     <height>524287</height>
+    </size>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QTabWidget" name="sceneTab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>Scene</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QTreeWidget" name="sceneTree">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="rootIsDecorated">
+            <bool>true</bool>
+           </property>
+           <property name="columnCount">
+            <number>1</number>
+           </property>
+           <attribute name="headerVisible">
+            <bool>true</bool>
+           </attribute>
+           <column>
+            <property name="text">
+             <string notr="true">1</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="statisticsTab">
+        <attribute name="title">
+         <string>Statistics</string>
+        </attribute>
+        <widget class="QLabel" name="cameraPositionLabel">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>50</y>
+           <width>211</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Camera Pos:</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="networkFpsLabel">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>121</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Network Fps:</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="rendererFpsLabel">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>121</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Renderer Fps:</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="tab_3">
+        <attribute name="title">
+         <string>Tab 3</string>
+        </attribute>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <action name="actionConnect">
    <property name="text">

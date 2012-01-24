@@ -17,21 +17,22 @@ using std::string;
 SbmDebuggerClient c;
 
 
-SbmDebuggerForm::SbmDebuggerForm(QMainWindow* mainWindow, QWidget *parent)
-  : QWidget(parent)
+SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
+  : QMainWindow(parent)
 {
-  m_pMainWindow = mainWindow;
-  ui.setupUi(mainWindow);
-  m_pMainWindow->show();
+  m_pMainWindow = this;
+  ui.setupUi(MainWindow());
+  MainWindow()->show();
 
   m_pGLWidget = new GLWidget(c.GetScene(), this);
 
   // setup renderer size and positioning
   QPoint rendererPosition = ui.RenderView->pos();
   QSize rendererSize = ui.RenderView->size();
-  m_pGLWidget->setGeometry(ui.RenderView->x() + 40, ui.RenderView->y() + 25,
+  MainWindow()->setGeometry(ui.RenderView->x() + 40, ui.RenderView->y() + 25,
      rendererSize.width(), rendererSize.height());
-  m_pMainWindow->layout()->addWidget(m_pGLWidget);
+  MainWindow()->setCentralWidget(m_pGLWidget); 
+  //MainWindow()->layout()->addWidget(m_pGLWidget);
 
   // set vhmsg
   vhmsg::ttu_set_client_callback(VHMsgCallback);
@@ -59,7 +60,7 @@ void SbmDebuggerForm::InitSignalsSlots()
    connect(ui.actionConnect, SIGNAL(triggered()), this, SLOT(ShowConnectDialog()));
    connect(ui.actionDisconnect, SIGNAL(triggered()), this, SLOT(Disconnect()));
    connect(ui.actionSettings, SIGNAL(triggered()), this, SLOT(ShowSettingsDialog()));
-   connect(ui.actionExit, SIGNAL(triggered()), m_pMainWindow, SLOT(close()));
+   connect(ui.actionExit, SIGNAL(triggered()), MainWindow(), SLOT(close()));
 
    // Tool bar
    connect(ui.actionToggleFreeLookCamera, SIGNAL(triggered()), m_pGLWidget, SLOT(ToggleFreeLook()));
@@ -211,6 +212,12 @@ void SbmDebuggerForm::UpdateLabels()
 {
    ui.rendererFpsLabel->setText(m_pGLWidget->GetFpsAsString().c_str());
    ui.cameraPositionLabel->setText(m_pGLWidget->GetCameraPositionAsString().c_str());
+}
+
+void SbmDebuggerForm::closeEvent(QCloseEvent *event)
+{
+   Disconnect();
+   event->accept();
 }
 
 void SbmDebuggerForm::timerEvent(QTimerEvent * event)

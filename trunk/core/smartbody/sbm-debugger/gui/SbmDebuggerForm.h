@@ -11,12 +11,12 @@
 #include "ui_SbmDebuggerForm.h"
 #include "ui_ConnectDialog.h"
 
-class SbmDebuggerForm : public QWidget
+class SbmDebuggerForm : public QMainWindow
  {
      Q_OBJECT
 
  public:
-     SbmDebuggerForm(QMainWindow* mainWindow, QWidget *parent = 0);
+     SbmDebuggerForm(QWidget *parent = 0);
      ~SbmDebuggerForm();
 
  private slots:
@@ -29,6 +29,7 @@ class SbmDebuggerForm : public QWidget
      Ui::MainWindow ui;
      QMainWindow* m_pMainWindow;
      GLWidget* m_pGLWidget;
+     QMainWindow* MainWindow() { return m_pMainWindow; }
 
  protected:
     enum SceneTreeIndex
@@ -41,6 +42,7 @@ class SbmDebuggerForm : public QWidget
     void Update();
     void UpdateSceneTree();
     void UpdateLabels();
+    void closeEvent(QCloseEvent *event);
 
     QBasicTimer timer;
     virtual void timerEvent(QTimerEvent * event);
