@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Fri Jan 20 12:16:19 2012
+** Created: Tue Jan 24 14:23:49 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -14,6 +14,8 @@
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
+#include <QtGui/QDockWidget>
+#include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
 #include <QtGui/QMainWindow>
@@ -37,15 +39,9 @@ public:
     QAction *actionExit;
     QAction *actionResource_Viewer;
     QWidget *centralwidget;
+    QHBoxLayout *horizontalLayout_3;
     QWidget *RenderView;
-    QTabWidget *sceneTab;
-    QWidget *tab;
-    QTreeWidget *sceneTree;
-    QWidget *statisticsTab;
-    QLabel *cameraPositionLabel;
-    QLabel *networkFpsLabel;
-    QLabel *rendererFpsLabel;
-    QWidget *tab_3;
+    QHBoxLayout *horizontalLayout_2;
     QMenuBar *menubar;
     QMenu *menuFile;
     QMenu *menuEdit;
@@ -53,6 +49,18 @@ public:
     QMenu *menuSbm;
     QStatusBar *statusbar;
     QToolBar *toolBar;
+    QDockWidget *sceneDockWidget;
+    QWidget *dockWidgetContents;
+    QHBoxLayout *horizontalLayout;
+    QTabWidget *sceneTab;
+    QWidget *tab;
+    QHBoxLayout *horizontalLayout_4;
+    QTreeWidget *sceneTree;
+    QWidget *statisticsTab;
+    QLabel *cameraPositionLabel;
+    QLabel *networkFpsLabel;
+    QLabel *rendererFpsLabel;
+    QWidget *tab_3;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -77,40 +85,17 @@ public:
         actionResource_Viewer->setObjectName(QString::fromUtf8("actionResource_Viewer"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
+        horizontalLayout_3 = new QHBoxLayout(centralwidget);
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         RenderView = new QWidget(centralwidget);
         RenderView->setObjectName(QString::fromUtf8("RenderView"));
-        RenderView->setGeometry(QRect(10, 10, 1001, 761));
-        sceneTab = new QTabWidget(centralwidget);
-        sceneTab->setObjectName(QString::fromUtf8("sceneTab"));
-        sceneTab->setGeometry(QRect(1020, 10, 181, 771));
-        tab = new QWidget();
-        tab->setObjectName(QString::fromUtf8("tab"));
-        sceneTree = new QTreeWidget(tab);
-        QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
-        __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
-        sceneTree->setHeaderItem(__qtreewidgetitem);
-        sceneTree->setObjectName(QString::fromUtf8("sceneTree"));
-        sceneTree->setGeometry(QRect(0, 0, 181, 741));
-        sceneTree->setRootIsDecorated(true);
-        sceneTree->setColumnCount(1);
-        sceneTree->header()->setVisible(true);
-        sceneTab->addTab(tab, QString());
-        statisticsTab = new QWidget();
-        statisticsTab->setObjectName(QString::fromUtf8("statisticsTab"));
-        cameraPositionLabel = new QLabel(statisticsTab);
-        cameraPositionLabel->setObjectName(QString::fromUtf8("cameraPositionLabel"));
-        cameraPositionLabel->setGeometry(QRect(10, 50, 211, 31));
-        networkFpsLabel = new QLabel(statisticsTab);
-        networkFpsLabel->setObjectName(QString::fromUtf8("networkFpsLabel"));
-        networkFpsLabel->setGeometry(QRect(10, 30, 121, 16));
-        rendererFpsLabel = new QLabel(statisticsTab);
-        rendererFpsLabel->setObjectName(QString::fromUtf8("rendererFpsLabel"));
-        rendererFpsLabel->setEnabled(true);
-        rendererFpsLabel->setGeometry(QRect(10, 10, 121, 16));
-        sceneTab->addTab(statisticsTab, QString());
-        tab_3 = new QWidget();
-        tab_3->setObjectName(QString::fromUtf8("tab_3"));
-        sceneTab->addTab(tab_3, QString());
+        RenderView->setMinimumSize(QSize(500, 500));
+        RenderView->setMaximumSize(QSize(16777215, 16777215));
+        horizontalLayout_2 = new QHBoxLayout(RenderView);
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+
+        horizontalLayout_3->addWidget(RenderView);
+
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
@@ -130,7 +115,64 @@ public:
         toolBar = new QToolBar(MainWindow);
         toolBar->setObjectName(QString::fromUtf8("toolBar"));
         MainWindow->addToolBar(Qt::LeftToolBarArea, toolBar);
-        MainWindow->insertToolBarBreak(toolBar);
+        sceneDockWidget = new QDockWidget(MainWindow);
+        sceneDockWidget->setObjectName(QString::fromUtf8("sceneDockWidget"));
+        sceneDockWidget->setMaximumSize(QSize(230, 524287));
+        sceneDockWidget->setLayoutDirection(Qt::LeftToRight);
+        dockWidgetContents = new QWidget();
+        dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
+        horizontalLayout = new QHBoxLayout(dockWidgetContents);
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        sceneTab = new QTabWidget(dockWidgetContents);
+        sceneTab->setObjectName(QString::fromUtf8("sceneTab"));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(sceneTab->sizePolicy().hasHeightForWidth());
+        sceneTab->setSizePolicy(sizePolicy);
+        sceneTab->setMinimumSize(QSize(0, 0));
+        sceneTab->setMaximumSize(QSize(16777215, 16777215));
+        sceneTab->setLayoutDirection(Qt::LeftToRight);
+        tab = new QWidget();
+        tab->setObjectName(QString::fromUtf8("tab"));
+        horizontalLayout_4 = new QHBoxLayout(tab);
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        sceneTree = new QTreeWidget(tab);
+        QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
+        __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
+        sceneTree->setHeaderItem(__qtreewidgetitem);
+        sceneTree->setObjectName(QString::fromUtf8("sceneTree"));
+        sceneTree->setMinimumSize(QSize(0, 0));
+        sceneTree->setMaximumSize(QSize(16777215, 16777215));
+        sceneTree->setLayoutDirection(Qt::LeftToRight);
+        sceneTree->setRootIsDecorated(true);
+        sceneTree->setColumnCount(1);
+        sceneTree->header()->setVisible(true);
+
+        horizontalLayout_4->addWidget(sceneTree);
+
+        sceneTab->addTab(tab, QString());
+        statisticsTab = new QWidget();
+        statisticsTab->setObjectName(QString::fromUtf8("statisticsTab"));
+        cameraPositionLabel = new QLabel(statisticsTab);
+        cameraPositionLabel->setObjectName(QString::fromUtf8("cameraPositionLabel"));
+        cameraPositionLabel->setGeometry(QRect(10, 50, 211, 31));
+        networkFpsLabel = new QLabel(statisticsTab);
+        networkFpsLabel->setObjectName(QString::fromUtf8("networkFpsLabel"));
+        networkFpsLabel->setGeometry(QRect(10, 30, 121, 16));
+        rendererFpsLabel = new QLabel(statisticsTab);
+        rendererFpsLabel->setObjectName(QString::fromUtf8("rendererFpsLabel"));
+        rendererFpsLabel->setEnabled(true);
+        rendererFpsLabel->setGeometry(QRect(10, 10, 121, 16));
+        sceneTab->addTab(statisticsTab, QString());
+        tab_3 = new QWidget();
+        tab_3->setObjectName(QString::fromUtf8("tab_3"));
+        sceneTab->addTab(tab_3, QString());
+
+        horizontalLayout->addWidget(sceneTab);
+
+        sceneDockWidget->setWidget(dockWidgetContents);
+        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), sceneDockWidget);
 
         menubar->addAction(menuFile->menuAction());
         menubar->addAction(menuEdit->menuAction());
@@ -171,17 +213,17 @@ public:
         actionExit->setShortcut(QApplication::translate("MainWindow", "Ctrl+Q", 0, QApplication::UnicodeUTF8));
         actionResource_Viewer->setText(QApplication::translate("MainWindow", "&Resource Viewer", 0, QApplication::UnicodeUTF8));
         actionResource_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0, QApplication::UnicodeUTF8));
+        menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
+        menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0, QApplication::UnicodeUTF8));
+        menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));
+        menuSbm->setTitle(QApplication::translate("MainWindow", "Sbm", 0, QApplication::UnicodeUTF8));
+        toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", 0, QApplication::UnicodeUTF8));
         sceneTab->setTabText(sceneTab->indexOf(tab), QApplication::translate("MainWindow", "Scene", 0, QApplication::UnicodeUTF8));
         cameraPositionLabel->setText(QApplication::translate("MainWindow", "Camera Pos:", 0, QApplication::UnicodeUTF8));
         networkFpsLabel->setText(QApplication::translate("MainWindow", "Network Fps:", 0, QApplication::UnicodeUTF8));
         rendererFpsLabel->setText(QApplication::translate("MainWindow", "Renderer Fps:", 0, QApplication::UnicodeUTF8));
         sceneTab->setTabText(sceneTab->indexOf(statisticsTab), QApplication::translate("MainWindow", "Statistics", 0, QApplication::UnicodeUTF8));
         sceneTab->setTabText(sceneTab->indexOf(tab_3), QApplication::translate("MainWindow", "Tab 3", 0, QApplication::UnicodeUTF8));
-        menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
-        menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0, QApplication::UnicodeUTF8));
-        menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));
-        menuSbm->setTitle(QApplication::translate("MainWindow", "Sbm", 0, QApplication::UnicodeUTF8));
-        toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

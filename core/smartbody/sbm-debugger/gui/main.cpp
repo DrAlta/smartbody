@@ -19,8 +19,7 @@ int main(int argc, char *argv[])
    vhcl::Log::g_log.AddListener( new vhcl::Log::StdoutListener() );
 
    QApplication app(argc, argv);
-   QMainWindow *widget = new QMainWindow;
-   SbmDebuggerForm sbmDebugger(widget, widget);
+   SbmDebuggerForm sbmDebugger;
 
    return app.exec();
 }
