@@ -459,7 +459,7 @@ void glInit (int * pargc, char ** argv)
 	glutInit(pargc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(GL_WIN_SIZE_X, GL_WIN_SIZE_Y);
-	glutCreateWindow ("Prime Sense User Tracker Viewer");
+	glutCreateWindow ("Kinect Tracker for SmartBody");
 	//glutFullScreen();
 	glutSetCursor(GLUT_CURSOR_NONE);
 
