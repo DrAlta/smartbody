@@ -110,6 +110,11 @@ void SBPhysicsManager::stop()
 {
 }
 
+SmartBody::SBObject* SBPhysicsManager::getPhysicsSimulationEngine()
+{
+	return getPhysicsEngine();
+}
+
 SmartBody::SBObject* SBPhysicsManager::getPhysicsCharacter( std::string charName )
 {
 	return this->getPhysicsEngine()->getPhysicsCharacter(charName);
