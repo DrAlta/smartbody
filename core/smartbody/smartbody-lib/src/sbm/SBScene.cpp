@@ -275,6 +275,45 @@ std::vector<std::string> SBScene::getCharacterNames()
 	return ret;
 }
 
+std::vector<std::string> SBScene::getAssetPaths(std::string type)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	std::vector<std::string> list;
+	srPathList* path = NULL;
+	if (type == "seq")
+	{
+		path = &mcu.seq_paths;
+	}
+	else if (type == "me" || type == "ME")
+	{
+		path = &mcu.me_paths;
+	}
+	else if (type == "audio")
+	{
+		path = &mcu.audio_paths;
+	}
+	else if (type == "mesh")
+	{
+		path = &mcu.mesh_paths;
+	}
+	else
+	{
+		LOG("Unknown path type: %s", type.c_str());
+		return list;
+	}
+	
+	path->reset();
+	std::string nextPath = path->next_path();
+	while (nextPath != "")
+	{
+		list.push_back(nextPath);
+		nextPath = path->next_path();
+	}
+	return list;
+}
+
+
 void SBScene::addAssetPath(std::string type, std::string path)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 

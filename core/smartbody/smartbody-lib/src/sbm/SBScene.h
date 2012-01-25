@@ -62,6 +62,7 @@ class SBScene : public SBObject
 
 		void setMediaPath(std::string path);
 		void addAssetPath(std::string type, std::string path);
+		std::vector<std::string> getAssetPaths(std::string type);
 		void removeAssetPath(std::string type, std::string path);
 		void loadAssets();
 		void loadMotions();
