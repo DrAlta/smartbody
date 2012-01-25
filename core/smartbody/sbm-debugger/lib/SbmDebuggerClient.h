@@ -34,5 +34,9 @@ public:
    void StartUpdates(double updateFrequencyS);
    void EndUpdates();
 
+   void GetResourcePaths();
+
+   void SendSBMCommand(const std::string & command);
+
    void ProcessVHMsgs(const char * op, const char * args);
 };

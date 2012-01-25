@@ -41,8 +41,17 @@ void SbmDebuggerClient::Connect(const string & id)
 void SbmDebuggerClient::Disconnect()
 {
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s disconnect", m_sbmId.c_str()).c_str());
+   m_processIdList.clear();
    m_sbmId = "";
    m_connectResult = false;
+   m_scene.m_pawns.clear();
+   m_scene.m_characters.clear();
+   m_scene.m_camera = DebuggerCamera();
+   m_scene.m_rendererIsRightHanded = true;
+   m_scene.m_sequencePaths.clear();
+   m_scene.m_mePaths.clear();
+   m_scene.m_audioPaths.clear();
+   m_scene.m_meshPaths.clear();
 }
 
 void SbmDebuggerClient::Init()
@@ -62,6 +71,27 @@ void SbmDebuggerClient::StartUpdates(double updateFrequencyS)
 void SbmDebuggerClient::EndUpdates()
 {
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s end_update", m_sbmId.c_str()).c_str());
+}
+
+void SbmDebuggerClient::GetResourcePaths()
+{
+   // store query ids
+   // send queries
+   // wait for responses
+   // update vectors
+   int pid = 42;
+
+   //scene.getAssetPaths("seq")
+   //sbmdebugger 123 455 request void "DoSomething(42)" 
+
+   //vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s %d request string-array \"ret = scene.getAssetPaths("seq")\"", m_sbmId.c_str(), 42).c_str());
+}
+
+void SbmDebuggerClient::SendSBMCommand(const std::string & command)
+{
+   // send a void command, not expecting a return
+
+   vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s %d request void \"%s\"", m_sbmId.c_str(), 42, command.c_str()).c_str());
 }
 
 void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
