@@ -443,6 +443,7 @@ void SbmCharacter::initData()
 	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
 	timeDelayAttr->setMin(0.0);
 	createStringAttribute("mesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
+	createStringAttribute("receiverName", "kinect1", true, "Basic", 220, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
 }
 
 void SbmCharacter::locomotion_reset()
