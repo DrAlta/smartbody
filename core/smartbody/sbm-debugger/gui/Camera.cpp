@@ -84,10 +84,10 @@ void Camera::SetRotation(const QQuaternion& rot)
 
 void Camera::LookAt(const QVector3D& pos)
 {
-   //m_RotMatrix.lookAt(
+ 
    // set the forward vector
    QVector3D forward = (pos - GetPosition()).normalized();
-   m_RotMatrix.setColumn(2, forward * CoordConverter());
+   m_RotMatrix.setColumn(2, forward * -m_Scale.z());
 
    // set right vector
    QVector3D right = QVector3D::crossProduct(forward, QVector3D(0, 1, 0));

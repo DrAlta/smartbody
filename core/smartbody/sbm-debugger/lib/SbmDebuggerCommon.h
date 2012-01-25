@@ -165,6 +165,7 @@ public:
    }
 
    Vector3 GetWorldPosition() const;
+   Joint* GetWorldOffset() const;
    Joint * FindJoint(const std::string & name) const { return FindJoint(name, m_joints); } 
    static Joint * FindJoint(const std::string & name, const std::vector<Joint *> & joints);
 };
@@ -234,6 +235,8 @@ public:
    }
 
    Character* FindCharacter(const std::string & name);
+   Pawn* FindPawn(const std::string & name);
+   Pawn* FindSbmObject(const std::string & name);
 };
 
 
