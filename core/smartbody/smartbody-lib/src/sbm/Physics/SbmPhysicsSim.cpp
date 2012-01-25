@@ -210,6 +210,7 @@ SbmPhysicsObj::SbmPhysicsObj()
 	SBObject::createBoolAttribute("constraint",false,true, "Basic", 20, false, false, false, "?");
 	
 	SBObject::createDoubleAttribute("mass",1.f,true, "Basic", 20, false, false, false, "?");
+	//SBObject::createVec3Attribute("geomOffset",0.f,0.f,0.f,true, "Physics", 20, false, false, false, "?");
 	SBObject::createVec3Attribute("refLinearVelocity",0.f,0.f,0.f,true, "Physics", 20, false, false, false, "?");
 	SBObject::createVec3Attribute("refAngularVelocity",0.f,0.f,0.f,true, "Physics", 20, false, false, false, "?");
 
