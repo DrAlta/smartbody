@@ -16,6 +16,7 @@
 
 
 using std::string;
+using std::vector;
 
 #define SELECT_BUFF_SIZE 1024
 #define PICKING_OFFSET 1000
@@ -40,7 +41,8 @@ public:
 public slots:
     void OnCloseSettingsDialog(const SettingsDialog* dlg, int result);
     void ToggleFreeLook();
-    void itemDoubleClicked(QTreeWidgetItem * item, int column);
+    void sceneTreeItemSingleClicked(QTreeWidgetItem * item, int column);
+    void sceneTreeItemDoubleClicked(QTreeWidgetItem * item, int column);
 
 Q_SIGNALS:
 protected:
@@ -61,6 +63,13 @@ private:
       SELECT,
     };
 
+    struct SelectionData
+    {
+         Pawn* m_pObj;
+         Joint* m_pJoint;
+         SelectionData() { m_pObj = NULL; m_pJoint = NULL; }
+    };
+
     QPoint lastPos;
     QColor qtPurple;
     Camera m_Camera;
@@ -76,6 +85,7 @@ private:
     vhcl::Timer m_StopWatch;
 
     GLMode m_GLMode;
+    SelectionData m_SelData;
     int m_nPickingOffset;
     GLuint selectBuf[SELECT_BUFF_SIZE];
 
@@ -84,9 +94,10 @@ private:
     // picking Functions
     void StartPicking();
     Joint* FindPickedJoint(int pickIndex);
-    //Joint* FindPickedJointRecursive(int pickIndex);
+    Joint* FindPickedJointRecursive(const Joint* joint);
     void ProcessHits(GLint hits, GLuint buffer[]);
     void StopPicking();
+    void SetSelectedObject(Pawn* obj);
 
     // Drawing Functions
     void DrawFloor();

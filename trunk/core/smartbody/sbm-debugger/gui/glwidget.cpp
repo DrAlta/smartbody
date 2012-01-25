@@ -42,14 +42,12 @@ GLWidget::~GLWidget()
 
 QSize GLWidget::minimumSizeHint() const
 {
-   return size();
-   //return QSize(400, 400);
+   return QSize(50, 50);
 }
 
 QSize GLWidget::sizeHint() const
 {
-   QSize s = size();
-   return QSize(s.width(), s.height());
+   return QSize(1183, 758);
 }
 
 void GLWidget::OnCloseSettingsDialog(const SettingsDialog* dlg, int result)
@@ -67,15 +65,23 @@ void GLWidget::ToggleFreeLook()
    m_Camera.SetCameraType(m_Camera.FollowRenderer() ? Camera::Free_Look : Camera::Follow_Renderer);
 }
 
-void GLWidget::itemDoubleClicked (QTreeWidgetItem * item, int column)
+void GLWidget::sceneTreeItemSingleClicked(QTreeWidgetItem * item, int column)
+{
+   if (!item)
+      return;
+
+   SetSelectedObject(m_pScene->FindSbmObject(item->text(column).toStdString()));
+}
+
+void GLWidget::sceneTreeItemDoubleClicked(QTreeWidgetItem * item, int column)
 {
    if (!item)
       return;
    
-   Character* chr = m_pScene->FindCharacter(item->text(column).toStdString());
-   if (chr)
+   SetSelectedObject(m_pScene->FindSbmObject(item->text(column).toStdString()));
+   if (m_SelData.m_pObj)
    {
-      Vector3 pos = chr->GetWorldPosition();
+      Vector3 pos = m_SelData.m_pObj->GetWorldPosition();
       m_Camera.LookAt(QVector3D(pos.x, pos.y, pos.z));
    }
 }
@@ -144,17 +150,42 @@ void GLWidget::StartPicking()
 
 Joint* GLWidget::FindPickedJoint(int pickIndex)
 {
-   int characterIndex = (pickIndex + 1) / PICKING_OFFSET;
-   m_pScene->m_characters[characterIndex];
+   unsigned int characterIndex = pickIndex / PICKING_OFFSET;
+
+   if (characterIndex >= 0 && characterIndex< m_pScene->m_characters.size())
+   {
+      SetSelectedObject(&m_pScene->m_characters[characterIndex]);
+      m_nPickingOffset = pickIndex % PICKING_OFFSET;
+      return FindPickedJointRecursive(m_SelData.m_pObj->m_joints[0]);
+   }
+   
+   return NULL;
+}
+
+//Joint* GLWidget::FindPickedJointRecursive(const vector<Joint *> & joints)
+Joint* GLWidget::FindPickedJointRecursive(const Joint* joint)
+{
+   if (m_nPickingOffset-- == 0)
+   {
+      return const_cast<Joint*>(joint);
+   }
+
+   for (unsigned int i = 0; i < joint->m_joints.size(); i++)
+   {
+      Joint* j = FindPickedJointRecursive(joint->m_joints[i]);
+      if (j)
+         return j;
+   }
 
    return NULL;
 }
 
 void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
 {
-   GLint i, j, numberOfNames;
+   GLint i, numberOfNames;
    GLuint names, *ptr, minZ, *ptrNames;
 
+   // sort the picked objects closest to furthest
    ptr = (GLuint *) buffer;
    minZ = 0xffffffff;
    for (i = 0; i < hits; i++)
@@ -175,15 +206,19 @@ void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
    {
 	  // hit
 	  ptr = ptrNames;
-     while (*ptr == 0)
+     while (*ptr == 0/*UINT_MAX*/ || *ptr == -1)
          ptr++;
      
-     //FindPickedJoint(*ptr);
+     m_SelData.m_pJoint = FindPickedJoint(*ptr);
+     if (m_SelData.m_pJoint)
+     {
+        printf("Picked Joint: %s\n", m_SelData.m_pJoint->m_name.c_str());
+     }
       
-	  //for (j = 0; j < numberOfNames; j++,ptr++) 
-   //  { 
-   //     printf ("%d ", *ptr);
-	  //}
+	/* for (int j = 0; j < numberOfNames; j++,ptr++) 
+     { 
+        printf ("%d ", *ptr);
+	  }*/
 	}
    else
    {
@@ -203,6 +238,12 @@ void GLWidget::StopPicking()
 		ProcessHits(hits, selectBuf);
 	}
 	m_GLMode = RENDER;
+}
+
+void GLWidget::SetSelectedObject(Pawn* obj)
+{
+   m_SelData.m_pObj = obj;
+   m_SelData.m_pJoint = m_SelData.m_pObj ? m_SelData.m_pObj->GetWorldOffset() : NULL;
 }
 
 void GLWidget::DrawCylinder(float baseRadius, float topRadius, float height, int slices, int stacks)
@@ -247,7 +288,7 @@ void GLWidget::DrawScene()
    {
       glPushName(i);
       glPushMatrix();
-      m_nPickingOffset = (i + 1)* PICKING_OFFSET;
+      m_nPickingOffset = i* PICKING_OFFSET;
       DrawCharacter(&characters[i]);
       glPopMatrix();
       glPopName();
@@ -303,6 +344,7 @@ void GLWidget::DrawJoint(Joint* joint)
    if (joint->m_parent)
    {
       glPushMatrix();
+      glPushName(UINT_MAX);
       /*Vector3 parentJointPos = (joint->m_parent->posOrig + joint->m_parent->pos);
       double jointLength = (jointPos - parentJointPos).Magnitude();
       // draw the bone
@@ -314,6 +356,7 @@ void GLWidget::DrawJoint(Joint* joint)
          glVertex3f(0, 0, 0);
          glVertex3f(-jointPos.x, -jointPos.y, -jointPos.z);  
       glEnd();
+      glPopName();
       glPopMatrix();
    } 
 

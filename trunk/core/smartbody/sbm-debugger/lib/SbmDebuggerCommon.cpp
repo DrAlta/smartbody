@@ -100,6 +100,11 @@ Vector3 Pawn::GetWorldPosition() const
    return joint ? joint->pos : Vector3();
 }
 
+Joint* Pawn::GetWorldOffset() const
+{
+   return FindJoint("world_offset");
+}
+
 Joint * Pawn::FindJoint(const string & name, const vector<Joint *> & joints)
 {
    for (size_t i = 0; i < joints.size(); i++)
@@ -136,4 +141,23 @@ Character* Scene::FindCharacter(const std::string & name)
    }
 
    return NULL;
+}
+
+Pawn* Scene::FindPawn(const std::string & name)
+{
+   for (unsigned int i = 0; i < m_pawns.size(); i++)
+   {
+      if (name == m_pawns[i].m_name)
+      {
+         return &m_pawns[i];
+      }
+   }
+
+   return NULL;
+}
+
+Pawn* Scene::FindSbmObject(const std::string & name)
+{
+   Pawn* object = FindCharacter(name);
+   return object ? object : FindPawn(name);
 }

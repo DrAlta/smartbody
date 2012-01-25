@@ -70,9 +70,10 @@ void SbmDebuggerForm::InitSignalsSlots()
 
    // Scene Tree
    //selection changes shall trigger a slot
-   
    connect(ui.sceneTree, SIGNAL(itemDoubleClicked (QTreeWidgetItem*, int)),
-             m_pGLWidget, SLOT(itemDoubleClicked (QTreeWidgetItem*, int)));
+             m_pGLWidget, SLOT(sceneTreeItemSingleClicked(QTreeWidgetItem*, int)));
+   connect(ui.sceneTree, SIGNAL(itemDoubleClicked (QTreeWidgetItem*, int)),
+             m_pGLWidget, SLOT(sceneTreeItemDoubleClicked(QTreeWidgetItem*, int)));
 
    timer.start(10, this);
 }
