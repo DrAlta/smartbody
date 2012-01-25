@@ -54,12 +54,6 @@ class SBCharacter : public SbmCharacter
 		SBController* getControllerByIndex(int i);
 		SBController* getControllerByName(std::string name);
 
-		void addController(SBController* controller);
-		bool isFaceNeutral();
-		bool initFaceController(MeCtFace* faceCtrl);
-		void initLocomotion(MeCtLocomotion* locoCtrl);
-		void linkControllers(SBController* ctrl);
-
 		int getNumBehaviors();
 		SBBehavior* getBehavior(int num);
 		std::vector<SBBehavior*>& getBehaviors();

@@ -6054,7 +6054,27 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			float x = args.read_float() * scale;
 			float y = args.read_float() * scale;
 			float z = args.read_float() * scale;
-			SbmCharacter* character = mcu->getCharacter(skelName);	
+			SbmCharacter* character = mcu->getCharacter(skelName);
+			if (!character)
+			{
+				std::map<std::string, SbmCharacter*>& characterMap = mcu->getCharacterMap();
+				for (std::map<std::string, SbmCharacter*>::iterator iter = characterMap.begin();
+					iter != characterMap.end();
+					iter++)
+				{
+					SbmCharacter* ch = (*iter).second;
+					std::string mappedName = ch->getStringAttribute("receiverName");
+					if (mappedName == skelName)
+					{
+						character = ch;
+						break;
+					}
+				}
+			}
+			if (!character)
+			{
+				return CMD_SUCCESS;
+			}
 			SrVec vec(x, y, z);
 			character->datareceiver_ct->setGlobalPosition(jName, vec);
 		}
