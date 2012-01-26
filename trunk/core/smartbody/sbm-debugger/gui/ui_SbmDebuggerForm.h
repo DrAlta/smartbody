@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Wed Jan 25 11:29:53 2012
+** Created: Thu Jan 26 12:46:13 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -142,6 +142,8 @@ public:
         __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
         sceneTree->setHeaderItem(__qtreewidgetitem);
         sceneTree->setObjectName(QString::fromUtf8("sceneTree"));
+        sizePolicy.setHeightForWidth(sceneTree->sizePolicy().hasHeightForWidth());
+        sceneTree->setSizePolicy(sizePolicy);
         sceneTree->setMinimumSize(QSize(0, 0));
         sceneTree->setMaximumSize(QSize(16777215, 16777215));
         sceneTree->setLayoutDirection(Qt::LeftToRight);

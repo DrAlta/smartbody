@@ -115,6 +115,8 @@ void GLWidget::initializeGL()
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_MULTISAMPLE);
+    glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE );
+    glEnable ( GL_COLOR_MATERIAL );
     static GLfloat lightPosition[4] = { 0.5, 5.0, 7.0, 1.0 };
     glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 }
@@ -160,7 +162,7 @@ void GLWidget::StartPicking()
 	glPushMatrix();
 	glLoadIdentity();
 
-	gluPickMatrix(lastPos.x(), viewport[3] - lastPos.y(), 5, 5, viewport);
+	gluPickMatrix(lastPos.x(), viewport[3] - lastPos.y(), 10, 10, viewport);
 	ratio = (viewport[2] + 0.0) / viewport[3];
    DebuggerCamera cam = m_pScene->m_camera;
 	gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
@@ -179,7 +181,7 @@ Joint* GLWidget::FindPickedJoint(int pickIndex)
       emit JointPicked(m_SelData.m_pObj, m_SelData.m_pJoint);
    }
    
-   return NULL;
+   return m_SelData.m_pJoint;
 }
 
 Joint* GLWidget::FindPickedJointRecursive(const Joint* joint)
@@ -225,7 +227,7 @@ void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
    {
 	  // hit
 	  ptr = ptrNames;
-     while (*ptr == 0/*UINT_MAX*/ || *ptr == -1)
+     while (*ptr == 0/*UINT_MAX*/ || *ptr == -1 || *ptr == 1) // TODO: figure out why these are bad numbers
          ptr++;
      
      m_SelData.m_pJoint = FindPickedJoint(*ptr);
@@ -234,10 +236,10 @@ void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
         printf("Picked Joint: %s\n", m_SelData.m_pJoint->m_name.c_str());
      }
       
-	/* for (int j = 0; j < numberOfNames; j++,ptr++) 
+	 for (int j = 0; j < numberOfNames; j++,ptr++) 
      { 
         printf ("%d ", *ptr);
-	  }*/
+	  }
 	}
    else
    {
@@ -356,7 +358,7 @@ void GLWidget::DrawCharacter(const Character* character)
 void GLWidget::DrawJoint(Joint* joint)
 {
    glPushMatrix();
-
+            
    // calulate position and rotation
    Vector3 jointPos = (joint->posOrig + joint->pos);
    glTranslated(jointPos.x, jointPos.y, jointPos.z);
@@ -364,9 +366,36 @@ void GLWidget::DrawJoint(Joint* joint)
    glMultMatrixd(rotationMat.data());  
  
    glPushName(m_nPickingOffset++);  // for picking
+   glColor3f(0.5f, 0.5f, 0.5f);
    DrawSphere(m_fJointRadius);  
    glPopName();
 
+   if (joint == m_SelData.m_pJoint)
+   {
+      // axis drawing
+      // orientation gizmo
+      glBegin(GL_LINES);
+         // x axis
+         glColor3f(255, 0, 0);
+         glVertex3f(0, 0, 0);
+         glVertex3f(10, 0, 0); 
+      glEnd();
+
+      glBegin(GL_LINES);
+         // y axis
+         glColor3f(0, 255, 0);
+         glVertex3f(0, 0, 0);
+         glVertex3f(0, 10, 0); 
+      glEnd();
+
+      glBegin(GL_LINES);
+         // z axis
+         glColor3f(0, 0, 255);
+         glVertex3f(0, 0, 0);
+         glVertex3f(0, 0, 10); 
+       glEnd();
+   }
+            
    // draw a connecting bone between the 2 joints
    if (joint->m_parent)
    {
@@ -383,6 +412,7 @@ void GLWidget::DrawJoint(Joint* joint)
          glVertex3f(0, 0, 0);
          glVertex3f(-jointPos.x, -jointPos.y, -jointPos.z);  
       glEnd();
+
       glPopName();
       glPopMatrix();
    } 
