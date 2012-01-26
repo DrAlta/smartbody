@@ -43,7 +43,8 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
   ui.sceneTree->insertTopLevelItem(Characters, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Characters"))));
   ui.sceneTree->insertTopLevelItem(Pawns, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Pawns"))));
   ui.sceneTree->setHeaderLabel(QString("Entities"));
-
+  //ui.sceneTree->setHeaderLabels(QStringList(QString("Pawns"));
+  
   InitSignalsSlots();
 
   setUpdatesEnabled(true);
@@ -70,10 +71,16 @@ void SbmDebuggerForm::InitSignalsSlots()
 
    // Scene Tree
    //selection changes shall trigger a slot
-   connect(ui.sceneTree, SIGNAL(itemDoubleClicked (QTreeWidgetItem*, int)),
-             m_pGLWidget, SLOT(sceneTreeItemSingleClicked(QTreeWidgetItem*, int)));
+   connect(ui.sceneTree, SIGNAL(currentItemChanged (QTreeWidgetItem*, QTreeWidgetItem *)),
+             m_pGLWidget, SLOT(sceneTreeCurrentItemChanged(QTreeWidgetItem*, QTreeWidgetItem *)));
    connect(ui.sceneTree, SIGNAL(itemDoubleClicked (QTreeWidgetItem*, int)),
              m_pGLWidget, SLOT(sceneTreeItemDoubleClicked(QTreeWidgetItem*, int)));
+   //connect(ui.sceneTree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
+   //          this, SLOT(sceneTreeItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
+
+   // Renderer
+   connect(m_pGLWidget, SIGNAL(JointPicked(const Pawn*, const Joint*)),
+      this, SLOT(SetSelectedSceneTreeItem(const Pawn*, const Joint*)));
 
    timer.start(10, this);
 }
@@ -146,6 +153,56 @@ void SbmDebuggerForm::Disconnect()
    c.Disconnect();
 }
 
+void SbmDebuggerForm::SetSelectedSceneTreeItem(const Pawn* selectedObj, const Joint* selectedJoint)
+{
+   if (!selectedObj)
+      return;
+
+   // check if it's a pawn or a character so we search in the correct tree sub-section
+   QTreeWidgetItem* subTree = ui.sceneTree->topLevelItem(dynamic_cast<const Character*>(selectedObj) ? Characters : Pawns);
+   QTreeWidgetItem* rootNameItem = FindTreeWidgetItemByName(subTree, selectedObj->m_name.c_str());
+   if (rootNameItem && selectedJoint)
+   {
+      // try to find the joint that is selected under this specific character
+      QTreeWidgetItem* joint = FindTreeWidgetItemByName(rootNameItem, selectedJoint->m_name);
+      if (joint)
+      {
+         // select the specific joint
+         ui.sceneTree->setCurrentItem(joint);
+      }
+      else
+      {
+         // there is no joint, so just select the entity's name in the tree view
+         ui.sceneTree->setCurrentItem(rootNameItem);
+      }
+   }
+   else
+   {
+      // there is no joint, so just select the entity's name in the tree view
+      ui.sceneTree->setCurrentItem(rootNameItem);
+   }
+}
+
+QTreeWidgetItem* SbmDebuggerForm::FindTreeWidgetItemByName(const QTreeWidgetItem* subTree, const std::string& name)
+{
+   QTreeWidgetItem* retVal = NULL;
+   for (int i = 0; i < subTree->childCount(); i++)
+   {
+      if (subTree->child(i)->text(0) == name.c_str())
+      {
+         return subTree->child(i);
+      }
+
+      retVal = FindTreeWidgetItemByName(subTree->child(i), name);
+      if (retVal)
+      {
+         return retVal;
+      }
+   }
+
+   return NULL;
+}
+
 void SbmDebuggerForm::Update()
 {
    int err = vhmsg::ttu_poll();
@@ -158,6 +215,17 @@ void SbmDebuggerForm::Update()
 
    UpdateSceneTree();
    UpdateLabels();
+}
+
+void SbmDebuggerForm::AddJointToSceneTree(QTreeWidgetItem* parent, const Joint* joint)
+{
+   QTreeWidgetItem* newParent = new QTreeWidgetItem(parent, QStringList(QString(joint->m_name.c_str())));
+   parent->addChild(newParent);
+
+   for (unsigned int i = 0; i < joint->m_joints.size(); i++)
+   {
+      AddJointToSceneTree(newParent, joint->m_joints[i]);
+   }
 }
 
 void SbmDebuggerForm::UpdateSceneTree()
@@ -181,8 +249,15 @@ void SbmDebuggerForm::UpdateSceneTree()
 
       if (!alreadyExistsInTree)
       {
+         // add character name
+         QTreeWidgetItem* characterTreeRoot = new QTreeWidgetItem(subTree, QStringList(QString(entityName.c_str())));
+         subTree->addChild(characterTreeRoot);
+
          // the entity isn't represented in the tree view, add it
-         subTree->addChild(new QTreeWidgetItem(subTree, QStringList(QString(entityName.c_str()))));
+         for (unsigned int j = 0; j < c.GetScene()->m_characters[i].m_joints.size(); j++)
+         {
+            AddJointToSceneTree(characterTreeRoot, c.GetScene()->m_characters[i].m_joints[j]);
+         }
       } 
    }
 
@@ -203,8 +278,15 @@ void SbmDebuggerForm::UpdateSceneTree()
 
       if (!alreadyExistsInTree)
       {
+         // add pawn name
+         QTreeWidgetItem* pawnTreeRoot = new QTreeWidgetItem(subTree, QStringList(QString(entityName.c_str())));
+         subTree->addChild(pawnTreeRoot);
+
          // the entity isn't represented in the tree view, add it
-         subTree->addChild(new QTreeWidgetItem(subTree, QStringList(QString(entityName.c_str()))));
+         for (unsigned int j = 0; j < c.GetScene()->m_pawns[i].m_joints.size(); j++)
+         {
+            AddJointToSceneTree(pawnTreeRoot, c.GetScene()->m_pawns[i].m_joints[j]);
+         }
        } 
    }
 }

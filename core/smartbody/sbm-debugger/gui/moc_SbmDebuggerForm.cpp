@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'SbmDebuggerForm.h'
 **
-** Created: Tue Jan 24 16:37:29 2012
+** Created: Wed Jan 25 17:59:58 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       4,   14, // methods
+       5,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -35,6 +35,7 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
       37,   16,   16,   16, 0x08,
       58,   16,   16,   16, 0x08,
       79,   16,   16,   16, 0x08,
+     118,   92,   16,   16, 0x08,
 
        0        // eod
 };
@@ -42,7 +43,8 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
 static const char qt_meta_stringdata_SbmDebuggerForm[] = {
     "SbmDebuggerForm\0\0ShowConnectDialog()\0"
     "ShowSettingsDialog()\0ShowResourceDialog()\0"
-    "Disconnect()\0"
+    "Disconnect()\0selectedObj,selectedJoint\0"
+    "SetSelectedSceneTreeItem(const Pawn*,const Joint*)\0"
 };
 
 const QMetaObject SbmDebuggerForm::staticMetaObject = {
@@ -78,9 +80,10 @@ int SbmDebuggerForm::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 1: ShowSettingsDialog(); break;
         case 2: ShowResourceDialog(); break;
         case 3: Disconnect(); break;
+        case 4: SetSelectedSceneTreeItem((*reinterpret_cast< const Pawn*(*)>(_a[1])),(*reinterpret_cast< const Joint*(*)>(_a[2]))); break;
         default: ;
         }
-        _id -= 4;
+        _id -= 5;
     }
     return _id;
 }

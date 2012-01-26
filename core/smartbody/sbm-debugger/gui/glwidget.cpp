@@ -65,12 +65,14 @@ void GLWidget::ToggleFreeLook()
    m_Camera.SetCameraType(m_Camera.FollowRenderer() ? Camera::Free_Look : Camera::Follow_Renderer);
 }
 
-void GLWidget::sceneTreeItemSingleClicked(QTreeWidgetItem * item, int column)
+void GLWidget::sceneTreeCurrentItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous)
 {
-   if (!item)
+   if (!current)
       return;
 
-   SetSelectedObject(m_pScene->FindSbmObject(item->text(column).toStdString()));
+   Character* character = FindCharacterFromTreeSelection(current);
+   if (character)
+      SetSelectedObject(character, character->FindJoint(current->text(0).toStdString()));
 }
 
 void GLWidget::sceneTreeItemDoubleClicked(QTreeWidgetItem * item, int column)
@@ -78,12 +80,29 @@ void GLWidget::sceneTreeItemDoubleClicked(QTreeWidgetItem * item, int column)
    if (!item)
       return;
    
-   SetSelectedObject(m_pScene->FindSbmObject(item->text(column).toStdString()));
-   if (m_SelData.m_pObj)
+   Character* character = FindCharacterFromTreeSelection(item);
+   if (character)
    {
-      Vector3 pos = m_SelData.m_pObj->GetWorldPosition();
+      SetSelectedObject(character, character->FindJoint(item->text(0).toStdString()));
+      Vector3 pos = character->GetWorldPosition();
       m_Camera.LookAt(QVector3D(pos.x, pos.y, pos.z));
    }
+}
+
+Character* GLWidget::FindCharacterFromTreeSelection(QTreeWidgetItem* treeWidget)
+{
+   QTreeWidgetItem* parent = treeWidget;
+   while (parent)
+   {
+      for (unsigned int i = 0; i < m_pScene->m_characters.size(); i++)
+      {
+         if (parent->text(0).toStdString() == m_pScene->m_characters[i].m_name)
+            return &m_pScene->m_characters[i];     
+      }
+      parent = parent->parent();
+   }
+
+   return NULL;
 }
 
 void GLWidget::initializeGL()
@@ -154,15 +173,15 @@ Joint* GLWidget::FindPickedJoint(int pickIndex)
 
    if (characterIndex >= 0 && characterIndex< m_pScene->m_characters.size())
    {
-      SetSelectedObject(&m_pScene->m_characters[characterIndex]);
       m_nPickingOffset = pickIndex % PICKING_OFFSET;
-      return FindPickedJointRecursive(m_SelData.m_pObj->m_joints[0]);
+      Joint* retVal = FindPickedJointRecursive(m_pScene->m_characters[characterIndex].m_joints[0]);
+      SetSelectedObject(&m_pScene->m_characters[characterIndex], retVal);
+      emit JointPicked(m_SelData.m_pObj, m_SelData.m_pJoint);
    }
    
    return NULL;
 }
 
-//Joint* GLWidget::FindPickedJointRecursive(const vector<Joint *> & joints)
 Joint* GLWidget::FindPickedJointRecursive(const Joint* joint)
 {
    if (m_nPickingOffset-- == 0)
@@ -240,10 +259,18 @@ void GLWidget::StopPicking()
 	m_GLMode = RENDER;
 }
 
-void GLWidget::SetSelectedObject(Pawn* obj)
+void GLWidget::SetSelectedObject(Pawn* obj, Joint* joint)
 {
-   m_SelData.m_pObj = obj;
-   m_SelData.m_pJoint = m_SelData.m_pObj ? m_SelData.m_pObj->GetWorldOffset() : NULL;
+   if (!obj)
+   {
+      m_SelData.m_pObj = NULL;
+      m_SelData.m_pJoint = NULL;
+   }
+   else
+   {
+      m_SelData.m_pObj = obj;
+      m_SelData.m_pJoint = joint ? joint : m_SelData.m_pObj->GetWorldOffset();
+   }
 }
 
 void GLWidget::DrawCylinder(float baseRadius, float topRadius, float height, int slices, int stacks)

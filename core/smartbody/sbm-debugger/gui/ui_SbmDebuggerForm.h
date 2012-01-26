@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Tue Jan 24 14:23:49 2012
+** Created: Wed Jan 25 11:29:53 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -145,6 +145,9 @@ public:
         sceneTree->setMinimumSize(QSize(0, 0));
         sceneTree->setMaximumSize(QSize(16777215, 16777215));
         sceneTree->setLayoutDirection(Qt::LeftToRight);
+        sceneTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        sceneTree->setEditTriggers(QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed);
+        sceneTree->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
         sceneTree->setRootIsDecorated(true);
         sceneTree->setColumnCount(1);
         sceneTree->header()->setVisible(true);
