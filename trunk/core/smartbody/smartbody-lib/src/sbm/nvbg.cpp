@@ -1,5 +1,10 @@
 #include "nvbg.h"
 
+Nvbg::Nvbg()
+{
+
+}
+
 Nvbg::~Nvbg()
 {
 }
@@ -15,10 +20,13 @@ bool Nvbg::execute(std::string character, std::string to, std::string messageId,
 	return true;
 }
 
-Nvbg::Nvbg()
-{
 
+void Nvbg::notify(SmartBody::SBSubject* subject)
+{
+	SmartBody::SBObject::notify(subject);
 }
+
+
 
 
 

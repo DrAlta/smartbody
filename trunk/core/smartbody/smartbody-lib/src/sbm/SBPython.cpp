@@ -482,21 +482,41 @@ boost::python::class_<SBAttribute>("SBAttribute")
 		.def("getName", &SBAttribute::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
 	;
 
+	boost::python::class_<ActionAttribute, boost::python::bases<SBAttribute> >("ActionAttribute")
+		.def("setValue", &ActionAttribute::setValue, "Activates action attribute.")
+	;
+
 	boost::python::class_<BoolAttribute, boost::python::bases<SBAttribute> >("BoolAttribute")
-		.def("getValue", &BoolAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
+		.def("getValue", &BoolAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the bool attribute.")
+		.def("setValue", &BoolAttribute::setValue, "Sets the value of the boolean attribute.")
 	;
 
 	boost::python::class_<StringAttribute, boost::python::bases<SBAttribute> >("StringAttribute")
-		.def("getValue", &StringAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
+		.def("getValue", &StringAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the string attribute.")
+		.def("setValue", &StringAttribute::setValue, "Sets the value of the string attribute.")
+		.def("setValidValues", &StringAttribute::setValidValues, "Sets the valid values of the string attribute.")
 	;
 
 	boost::python::class_<IntAttribute, boost::python::bases<SBAttribute> >("IntAttribute")
-		.def("getValue", &IntAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
+		.def("getValue", &IntAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the int attribute.")
+		.def("setValue", &IntAttribute::setValue, "Sets the value of the integer attribute.")
 	;
 
 	boost::python::class_<DoubleAttribute, boost::python::bases<SBAttribute> >("DoubleAttribute")
-		.def("getValue", &DoubleAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
+		.def("getValue", &DoubleAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the double attribute.")
+		.def("setValue", &DoubleAttribute::setValue, "Sets the value of the double attribute.")
 	;
+
+	boost::python::class_<Vec3Attribute, boost::python::bases<SBAttribute> >("Vec3Attribute")
+		.def("getValue", &Vec3Attribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the vec3 attribute.")
+		.def("setValue", &Vec3Attribute::setValue, "Sets the value of the vec3 attribute.")
+	;
+
+	boost::python::class_<MatrixAttribute, boost::python::bases<SBAttribute> >("MatrixAttribute")
+		.def("getValue", &MatrixAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the matrix attribute.")
+		.def("setValue", &MatrixAttribute::setValue, "Sets the value of the matrix attribute.")
+	;
+
 
 	boost::python::class_<SBObject>("SBObject")
 		.def("getName", &SBObject::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the object.")
@@ -946,6 +966,7 @@ boost::python::class_<SBReach>("SBReach")
 	boost::python::class_<NvbgWrap, boost::python::bases<SBObject>, boost::noncopyable>("Nvbg")
 		.def("objectEvent", &Nvbg::objectEvent, &NvbgWrap::default_objectEvent, "An event indicating that an object of interest is present.")
 		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor.")
+		.def("notify", &Nvbg::notify, &NvbgWrap::default_notify, "Notifies NVBG processor.")
 		;
 
 	boost::python::class_<SBScriptWrap, boost::noncopyable>("SBScript")
