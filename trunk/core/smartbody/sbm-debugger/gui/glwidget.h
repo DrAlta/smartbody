@@ -41,8 +41,11 @@ public:
 public slots:
     void OnCloseSettingsDialog(const SettingsDialog* dlg, int result);
     void ToggleFreeLook();
-    void sceneTreeItemSingleClicked(QTreeWidgetItem * item, int column);
+    void sceneTreeCurrentItemChanged ( QTreeWidgetItem * current, QTreeWidgetItem * previous );
     void sceneTreeItemDoubleClicked(QTreeWidgetItem * item, int column);
+
+signals:
+    void JointPicked(const Pawn* jointOwner, const Joint* jointSelected);
 
 Q_SIGNALS:
 protected:
@@ -90,6 +93,7 @@ private:
     GLuint selectBuf[SELECT_BUFF_SIZE];
 
     virtual void timerEvent(QTimerEvent * event);
+    Character* FindCharacterFromTreeSelection(QTreeWidgetItem* treeWidget);
 
     // picking Functions
     void StartPicking();
@@ -97,7 +101,7 @@ private:
     Joint* FindPickedJointRecursive(const Joint* joint);
     void ProcessHits(GLint hits, GLuint buffer[]);
     void StopPicking();
-    void SetSelectedObject(Pawn* obj);
+    void SetSelectedObject(Pawn* obj, Joint* joint);
 
     // Drawing Functions
     void DrawFloor();

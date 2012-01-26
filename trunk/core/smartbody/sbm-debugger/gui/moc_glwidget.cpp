@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'glwidget.h'
 **
-** Created: Tue Jan 24 16:37:29 2012
+** Created: Wed Jan 25 17:59:58 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,27 +23,32 @@ static const uint qt_meta_data_GLWidget[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       4,   14, // methods
+       5,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       0,       // signalCount
+       1,       // signalCount
+
+ // signals: signature, parameters, type, tag, flags
+      35,   10,    9,    9, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-      21,   10,    9,    9, 0x0a,
-      70,    9,    9,    9, 0x0a,
-      99,   87,    9,    9, 0x0a,
-     148,   87,    9,    9, 0x0a,
+      84,   73,    9,    9, 0x0a,
+     133,    9,    9,    9, 0x0a,
+     167,  150,    9,    9, 0x0a,
+     242,  230,    9,    9, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_GLWidget[] = {
-    "GLWidget\0\0dlg,result\0"
-    "OnCloseSettingsDialog(const SettingsDialog*,int)\0"
-    "ToggleFreeLook()\0item,column\0"
-    "sceneTreeItemSingleClicked(QTreeWidgetItem*,int)\0"
+    "GLWidget\0\0jointOwner,jointSelected\0"
+    "JointPicked(const Pawn*,const Joint*)\0"
+    "dlg,result\0OnCloseSettingsDialog(const SettingsDialog*,int)\0"
+    "ToggleFreeLook()\0current,previous\0"
+    "sceneTreeCurrentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)\0"
+    "item,column\0"
     "sceneTreeItemDoubleClicked(QTreeWidgetItem*,int)\0"
 };
 
@@ -76,14 +81,22 @@ int GLWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: OnCloseSettingsDialog((*reinterpret_cast< const SettingsDialog*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 1: ToggleFreeLook(); break;
-        case 2: sceneTreeItemSingleClicked((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 3: sceneTreeItemDoubleClicked((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 0: JointPicked((*reinterpret_cast< const Pawn*(*)>(_a[1])),(*reinterpret_cast< const Joint*(*)>(_a[2]))); break;
+        case 1: OnCloseSettingsDialog((*reinterpret_cast< const SettingsDialog*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 2: ToggleFreeLook(); break;
+        case 3: sceneTreeCurrentItemChanged((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< QTreeWidgetItem*(*)>(_a[2]))); break;
+        case 4: sceneTreeItemDoubleClicked((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         default: ;
         }
-        _id -= 4;
+        _id -= 5;
     }
     return _id;
+}
+
+// SIGNAL 0
+void GLWidget::JointPicked(const Pawn * _t1, const Joint * _t2)
+{
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_END_MOC_NAMESPACE

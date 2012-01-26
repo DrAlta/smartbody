@@ -18,12 +18,15 @@ class SbmDebuggerForm : public QMainWindow
  public:
      SbmDebuggerForm(QWidget *parent = 0);
      ~SbmDebuggerForm();
+     static QTreeWidgetItem* FindTreeWidgetItemByName(const QTreeWidgetItem* subTree, const std::string& name);
 
  private slots:
        void ShowConnectDialog();
        void ShowSettingsDialog();
        void ShowResourceDialog();
        void Disconnect();
+       //void sceneTreeItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous);
+       void SetSelectedSceneTreeItem(const Pawn* selectedObj, const Joint* selectedJoint);
 
  private:
      Ui::MainWindow ui;
@@ -43,6 +46,7 @@ class SbmDebuggerForm : public QMainWindow
     void UpdateSceneTree();
     void UpdateLabels();
     void closeEvent(QCloseEvent *event);
+    void AddJointToSceneTree(QTreeWidgetItem* parent, const Joint* joint);
 
     QBasicTimer timer;
     virtual void timerEvent(QTimerEvent * event);
