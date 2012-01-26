@@ -12,6 +12,25 @@ public:
    ~ResourceDialog();
 
    Ui::ResourceDialog ui;
+
+public slots:
+   void Refresh();
+
+private:
+   enum ResourceHeaders
+   {
+      Paths,
+      Seq_Files,
+      Skeletons,
+      Bone_Map,
+      Motions,
+      Face_Definition,
+      Event_Handlers,
+      Pawns,
+      Characters,
+      Scene,
+      Services
+   };
 };
 
 #endif
