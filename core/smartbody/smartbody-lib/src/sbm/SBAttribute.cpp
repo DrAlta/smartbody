@@ -727,5 +727,37 @@ SBAttribute* MatrixAttribute::copy()
 	return a;
 }
 
+ActionAttribute::ActionAttribute()
+{
+}
+
+ActionAttribute::ActionAttribute(const std::string& name)
+{
+}
+
+ActionAttribute::~ActionAttribute()
+{
+}
+
+void ActionAttribute::setValue()
+{
+	notifyObservers();
+}
+
+std::string ActionAttribute::write()
+{
+	// TODO:
+	return "";
+}
+
+void ActionAttribute::read()
+{
+}
+
+SBAttribute* ActionAttribute::copy()
+{
+	ActionAttribute* a = new ActionAttribute();
+	return a;
+}
 
 };

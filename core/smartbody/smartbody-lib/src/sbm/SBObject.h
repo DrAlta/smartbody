@@ -49,6 +49,8 @@ class SBObject : public SBObserver, public SBSubject
 													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
 		MatrixAttribute* createMatrixAttribute(const std::string& name, SrMat& value, bool notifySelf, const std::string& groupName, int priority, 
 													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
+		ActionAttribute* createActionAttribute(const std::string& name, bool notifySelf, const std::string& groupName, int priority, 
+													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
 
 		void setBoolAttribute(const std::string& name, bool value);
 		void setIntAttribute(const std::string& name, int value);
@@ -56,6 +58,7 @@ class SBObject : public SBObserver, public SBSubject
 		void setVec3Attribute(const std::string& name, float val1, float val2, float val3);
 		void setStringAttribute(const std::string& name, std::string value);
 		void setMatrixAttribute(const std::string& name, SrMat& value);
+		void setActionAttribute(const std::string& name);
 
 		const bool& getBoolAttribute(const std::string& name) ;
 		const int&  getIntAttribute(const std::string& name) ;

@@ -308,6 +308,30 @@ IntAttribute* SBObject::createIntAttribute(const std::string& name, int value, b
 	  return matrixAttr;
 }
 
+ ActionAttribute* SBObject::createActionAttribute(const std::string& name, bool notifySelf, const std::string& groupName, int priority, 
+											  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
+ {
+	 ActionAttribute* actionAttr = new ActionAttribute();
+	 actionAttr->setName(name);
+
+	 actionAttr->getAttributeInfo()->setPriority(priority);
+	 actionAttr->getAttributeInfo()->setReadOnly(isReadOnly);
+	 actionAttr->getAttributeInfo()->setLocked(isLocked);
+	 actionAttr->getAttributeInfo()->setHidden(isHidden);
+	 actionAttr->getAttributeInfo()->setDescription(description);
+ 	
+	 this->addAttribute(actionAttr);
+
+	 SBAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	 actionAttr->getAttributeInfo()->setGroup(group);
+
+	 if (notifySelf)
+	 	actionAttr->registerObserver(this);
+
+	 return actionAttr;
+ }
+
+
   std::map<std::string, SBAttribute*>& SBObject::getAttributeList()
  {
 	return m_attributeList;
@@ -381,6 +405,16 @@ IntAttribute* SBObject::createIntAttribute(const std::string& name, int value, b
 	  if (mattr)
 	  {
 		  mattr->setValue(value);
+	  }
+  }
+
+  void SBObject::setActionAttribute(const std::string& name)
+  {
+	  SBAttribute* attr = getAttribute(name);
+	  ActionAttribute* aattr = dynamic_cast<ActionAttribute*>(attr);
+	  if (aattr)
+	  {
+		  aattr->setValue();
 	  }
   }
 

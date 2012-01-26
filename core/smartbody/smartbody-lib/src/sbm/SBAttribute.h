@@ -230,6 +230,20 @@ class MatrixAttribute : public SBAttribute
 		SrMat m_defaultValue;
 };
 
+class ActionAttribute : public SBAttribute
+{
+	public:
+		ActionAttribute();
+		ActionAttribute(const std::string& name);
+		~ActionAttribute();
+
+		void setValue();
+
+		virtual std::string write();
+		virtual void read();
+		virtual SBAttribute* copy();		
+};
+
 };
 
 
