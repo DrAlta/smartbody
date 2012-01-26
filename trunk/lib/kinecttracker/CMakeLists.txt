@@ -4,6 +4,14 @@ include_directories(
 	../OpenNI/Include
 )
 
+IF(APPLE)
+	INCLUDE_DIRECTORIES (   /System/Library/Frameworks 
+				/usr/include/ni )
+	FIND_LIBRARY (GLUT_LIBRARY GLUT)
+	MARK_AS_ADVANCED(GLUT_LIBRARY)
+	SET(EXTRA_LIBS ${GLUT_LIBRARY})
+ENDIF(APPLE)
+
 find_package(OpenGL REQUIRED)
 
 
@@ -28,7 +36,8 @@ target_link_libraries( kinecttracker
 	activemq-cpp
 	OpenNI
 	${OPENGL_LIBRARIES}
-	glut
+	${EXTRA_LIBS}
+	#glut
 	vhmsg
 
 )
@@ -41,6 +50,8 @@ set( EXEC_LIST
 set( APP_LIBRARY_BINARY_PATHS
 
         ${PROJECT_BINARY_DIR}/core/smartbody/sbm/bin
+	/usr/local/lib
+	/opt/local/lib
 )
 	
 
