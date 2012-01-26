@@ -48,6 +48,25 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 	{
 		return Nvbg::execute(character, to, messageId, xml);
 	}
+
+	virtual void notify(SBSubject* subject)
+	{
+		if (boost::python::override o = this->get_override("notify"))
+		{
+			try {
+				o(subject);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		return Nvbg::notify(subject);
+	}
+
+	void default_notify(SBSubject* subject)
+	{
+		Nvbg::notify(subject);
+	}
 };
 
 
