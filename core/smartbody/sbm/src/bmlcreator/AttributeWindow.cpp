@@ -314,6 +314,23 @@ void AttributeWindow::draw()
 
 				SmartBody::SBAttributeInfo* attrInfo = attr->getAttributeInfo();
 
+				// action -> button
+				SmartBody::ActionAttribute* actionAttr = dynamic_cast<SmartBody::ActionAttribute*>(attr);
+				if (actionAttr) 
+				{
+					actionAttr->registerObserver(this);
+					Fl_Button* button = new Fl_Button(mainGroup->x() + 100, mainGroup->y() + startY, 40, 20, ".."));
+					if (attrInfo->getDescription() != "")
+						button->tooltip(_strdup(attrInfo->getDescription().c_str()));
+					button->align(FL_ALIGN_LEFT);
+					startY += widgetHeight; // make sure the next widget starts lower
+					button->callback(ActionCB, this);
+					setAttributeInfo(button, attrInfo);
+					mainGroup->add(button);
+					widgetMap[name] = button;
+					reverseWidgetMap[button] = name;
+					continue;
+				}
 				// bool -> checkbox
 				SmartBody::BoolAttribute* boolAttr = dynamic_cast<SmartBody::BoolAttribute*>(attr);
 				if (boolAttr) 
@@ -592,6 +609,37 @@ void AttributeWindow::setObject(SmartBody::SBObject* g)
 	object->getAttributeManager()->registerObserver(this);
 }
 
+void AttributeWindow::ActionCB(Fl_Widget *w, void *data)
+{
+	AttributeWindow *cw = (AttributeWindow*) data;
+	
+	Fl_Button* check = (Fl_Button*) w;
+	SmartBody::SBObject* obj = cw->getObject();
+	
+	std::string name = "";
+	std::map<Fl_Widget*, std::string>::iterator iter = cw->reverseWidgetMap.find(w);
+	if (iter !=  cw->reverseWidgetMap.end())
+		name = iter->second;
+		
+	if (name != "")
+	{
+		SmartBody::SBAttribute* attr = obj->getAttribute(name);
+		SmartBody::ActionAttribute* aattr = dynamic_cast<SmartBody::ActionAttribute*>(attr);
+		if (aattr)
+		{
+			aattr->setValue();
+		}
+		else
+		{
+			LOG("Attribute with name %s.%s is not an action attribute. Please check code.", obj->getName().c_str(), check->label());
+		}
+	}
+	else
+	{
+		LOG("Attribute with name %s.%s is no longer present.", obj->getName().c_str(), check->label());
+	}
+}
+
 void AttributeWindow::BoolCB(Fl_Widget *w, void *data)
 {
 	AttributeWindow *cw = (AttributeWindow*) data;
@@ -833,6 +881,15 @@ void AttributeWindow::notify(SmartBody::SBSubject* subject)
 			LOG("Widget for attribute %s.%s was not found. Please check code.", this->object->getName().c_str(), attr->getName().c_str());
 			return;
 		}
+		SmartBody::ActionAttribute* aattr = dynamic_cast<SmartBody::ActionAttribute*>(attr);
+		if (aattr)
+		{
+			Fl_Button* button = (Fl_Button*) iter->second;
+			button->value();
+			setAttributeInfo(button, attrInfo);
+			return;
+		}
+
 		SmartBody::BoolAttribute* battr = dynamic_cast<SmartBody::BoolAttribute*>(attr);
 		if (battr)
 		{

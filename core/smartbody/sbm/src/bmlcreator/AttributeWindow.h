@@ -80,6 +80,7 @@ public:
 	static void DoubleCB(Fl_Widget* w, void *data);
 	static void StringCB(Fl_Widget* w, void *data);
 	static void Vec3CB(Fl_Widget* w, void *data);
+	static void ActionCB(Fl_Widget* w, void *data);
 
 	static const uchar ATTRIBUTEWINDOWTYPE = (uchar)240;
 
