@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'SbmDebuggerForm.h'
 **
-** Created: Thu Jan 26 14:05:47 2012
+** Created: Thu Jan 26 15:54:51 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       5,   14, // methods
+       6,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -35,7 +35,8 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
       37,   16,   16,   16, 0x08,
       58,   16,   16,   16, 0x08,
       79,   16,   16,   16, 0x08,
-     118,   92,   16,   16, 0x08,
+      99,   16,   16,   16, 0x08,
+     138,  112,   16,   16, 0x08,
 
        0        // eod
 };
@@ -43,7 +44,8 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
 static const char qt_meta_stringdata_SbmDebuggerForm[] = {
     "SbmDebuggerForm\0\0ShowConnectDialog()\0"
     "ShowSettingsDialog()\0ShowResourceDialog()\0"
-    "Disconnect()\0selectedObj,selectedJoint\0"
+    "ShowCommandDialog()\0Disconnect()\0"
+    "selectedObj,selectedJoint\0"
     "SetSelectedSceneTreeItem(const Pawn*,const Joint*)\0"
 };
 
@@ -79,11 +81,12 @@ int SbmDebuggerForm::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 0: ShowConnectDialog(); break;
         case 1: ShowSettingsDialog(); break;
         case 2: ShowResourceDialog(); break;
-        case 3: Disconnect(); break;
-        case 4: SetSelectedSceneTreeItem((*reinterpret_cast< const Pawn*(*)>(_a[1])),(*reinterpret_cast< const Joint*(*)>(_a[2]))); break;
+        case 3: ShowCommandDialog(); break;
+        case 4: Disconnect(); break;
+        case 5: SetSelectedSceneTreeItem((*reinterpret_cast< const Pawn*(*)>(_a[1])),(*reinterpret_cast< const Joint*(*)>(_a[2]))); break;
         default: ;
         }
-        _id -= 5;
+        _id -= 6;
     }
     return _id;
 }

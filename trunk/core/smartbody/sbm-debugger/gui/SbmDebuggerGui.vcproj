@@ -187,6 +187,10 @@
 			Name="Generated"
 			>
 			<File
+				RelativePath=".\moc_CommandDialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\moc_ConnectDialog.cpp"
 				>
 			</File>
@@ -207,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ui_CommandDialog.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ui_ConnectDialog.h"
 				>
 			</File>
@@ -218,6 +226,10 @@
 				RelativePath=".\ui_SbmDebuggerForm.h"
 				>
 			</File>
+			<File
+				RelativePath=".\ui_SettingsDialog.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\Camera.cpp"
@@ -225,6 +237,14 @@
 		</File>
 		<File
 			RelativePath=".\Camera.h"
+			>
+		</File>
+		<File
+			RelativePath=".\CommandDialog.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\CommandDialog.h"
 			>
 		</File>
 		<File

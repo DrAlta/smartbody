@@ -67,6 +67,7 @@
      <string>Sbm</string>
     </property>
     <addaction name="actionResource_Viewer"/>
+    <addaction name="actionCommand_Window"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -295,6 +296,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionCommand_Window">
+   <property name="text">
+    <string>Command Window</string>
    </property>
   </action>
  </widget>
