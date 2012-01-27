@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "elbenchcs", "lib\vhmsg\samp
 		{DE4240A9-DBBA-410F-888F-462384A5B280} = {DE4240A9-DBBA-410F-888F-462384A5B280}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "elsender", "lib\elsender\elsender.csproj", "{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "elsender", "tools\elsender\elsender.csproj", "{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DE4240A9-DBBA-410F-888F-462384A5B280} = {DE4240A9-DBBA-410F-888F-462384A5B280}
 	EndProjectSection
