@@ -3594,6 +3594,14 @@
 						AdditionalOptions="/bigobj"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="DebugFBX|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/bigobj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\sbm\SBPython.h"
