@@ -279,6 +279,11 @@ void BoolAttribute::setValue(const bool& val)
 	notifyObservers();
 }
 
+void BoolAttribute::setValueFast(const bool& val)
+{
+	m_value = val;
+}
+
 void BoolAttribute::setDefaultValue(const bool& defaultVal)
 {
 	m_defaultValue = defaultVal;
@@ -352,6 +357,16 @@ void IntAttribute::setValue(const int& val)
 		m_value = val;
 	
 	notifyObservers();
+}
+
+void IntAttribute::setValueFast(const int& val)
+{
+	if (val < getMin())
+		m_value = getMin();
+	else if (val > getMax())
+		m_value = getMax();
+	else
+		m_value = val;
 }
 
 int IntAttribute::getMin()
@@ -449,6 +464,16 @@ void DoubleAttribute::setValue(const double& val)
 	notifyObservers();
 }
 
+void DoubleAttribute::setValueFast(const double& val)
+{
+	if (val < getMin())
+		m_value = getMin();
+	else if (val > getMax())
+		m_value = getMax();
+	else
+		m_value = val;
+}
+
 void DoubleAttribute::setDefaultValue(const double& defaultVal)
 {
 	m_defaultValue = defaultVal;
@@ -531,6 +556,11 @@ void StringAttribute::setValue(const std::string& val)
 {
 	m_value = val;
 	notifyObservers();
+}
+
+void StringAttribute::setValueFast(const std::string& val)
+{
+	m_value = val;
 }
 
 void StringAttribute::setDefaultValue(const std::string& defaultVal)
@@ -618,6 +648,11 @@ void Vec3Attribute::setValue(const SrVec& val)
 	notifyObservers();
 }
 
+void Vec3Attribute::setValueFast(const SrVec& val)
+{
+	m_value = val;
+}
+
 void Vec3Attribute::setDefaultValue(const SrVec& defaultVal)
 {
 	m_defaultValue = defaultVal;
@@ -683,6 +718,11 @@ void MatrixAttribute::setValue(const SrMat& matrix)
 {
 	m_value = matrix;
 	notifyObservers();
+}
+
+void MatrixAttribute::setValueFast(const SrMat& matrix)
+{
+	m_value = matrix;
 }
 
 void MatrixAttribute::setDefaultValue(const SrMat& matrix)

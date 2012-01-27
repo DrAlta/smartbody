@@ -100,6 +100,7 @@ class BoolAttribute : public SBAttribute
 		void setValue(const bool& val);
 		void setDefaultValue(const bool& defaultVal);
 		const bool& getDefaultValue();
+		void setValueFast(const bool& val);
 
 		virtual std::string write();
 		virtual void read();
@@ -121,6 +122,7 @@ class IntAttribute : public SBAttribute
 		void setValue(const int& val);
 		void setDefaultValue(const int& defaultVal);
 		const int& getDefaultValue();
+		void setValueFast(const int& val);
 		int getMin();
 		int getMax();
 		void setMin(int val);
@@ -148,6 +150,7 @@ class DoubleAttribute : public SBAttribute
 		void setValue(const double& val);
 		void setDefaultValue(const double& defaultVal);
 		const double& getDefaultValue();
+		void setValueFast(const double& val);
 		double getMin();
 		double getMax();
 		void setMin(double val);
@@ -177,6 +180,7 @@ class StringAttribute : public SBAttribute
 		const std::string& getDefaultValue();
 		void setValidValues(const std::vector<std::string>& values);
 		const std::vector<std::string>& getValidValues();
+		void setValueFast(const std::string& val);
 
 		virtual std::string write();
 		virtual void read();
@@ -199,6 +203,7 @@ class Vec3Attribute : public SBAttribute
 		void setValue(const SrVec& val);
 		void setDefaultValue(const SrVec& defaultVal);
 		const SrVec& getDefaultValue();
+		void setValueFast(const SrVec& val);
 
 		virtual std::string write();
 		virtual void read();
@@ -220,6 +225,7 @@ class MatrixAttribute : public SBAttribute
 		void setValue(const SrMat& matrix);
 		void setDefaultValue(const SrMat& matrix);
 		const SrMat& getDefaultValue();
+		void setValueFast(const SrMat& val);
 
 		virtual std::string write();
 		virtual void read();
