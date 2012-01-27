@@ -49,7 +49,7 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 		return Nvbg::execute(character, to, messageId, xml);
 	}
 
-	virtual void notify(SBSubject* subject)
+	virtual void notify(SmartBody::SBSubject* subject)
 	{
 		if (boost::python::override o = this->get_override("notify"))
 		{
@@ -60,10 +60,10 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 			}
 		}
 
-		return Nvbg::notify(subject);
+		Nvbg::notify(subject);
 	}
 
-	void default_notify(SBSubject* subject)
+	void default_notify(SmartBody::SBSubject* subject)
 	{
 		Nvbg::notify(subject);
 	}
@@ -478,7 +478,22 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("abort", &Script::abort, "Abort this running script, this only works for seq script. \n Input: NULL \n Output: NULL")
 		;
 */
-boost::python::class_<SBAttribute>("SBAttribute")
+
+	
+boost::python::class_<SBSubject>("SBSubject")
+		.def("notifyObservers", &SBSubject::notifyObservers,"Notifies all observers of this subject.")
+		.def("registerObserver", &SBSubject::registerObserver,"Registers an observer to this subject.")
+		.def("unregisterObserver", &SBSubject::unregisterObserver,"Unregisters an observer from this subject.")
+		;
+
+boost::python::class_<SBObserver>("SBObserver")
+		.def("addDependency", &SBObserver::addDependency,"Adds a dependency on a subject.")
+		.def("removeDependency", &SBObserver::removeDependency,"Removes a dependency on a subject.")
+		.def("notify", &SBObserver::notify, "Notifies the observer of the subject.")
+		;
+
+
+boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribute")
 		.def("getName", &SBAttribute::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
 	;
 

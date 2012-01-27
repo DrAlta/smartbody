@@ -573,6 +573,7 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* characte
 	resourceTree->sortorder(FL_TREE_SORT_NONE);	
 	Fl_Tree_Item* controllerFolder = resourceTree->add(item,"controllers");	
 	controllerFolder->user_data((void*)-1);
+	controllerFolder->close();
 	// add controllers
 	MeControllerTreeRoot* ctTree = character->ct_tree_p ;
 	if( ctTree )
@@ -585,11 +586,12 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* characte
 			ctrlItem->user_data((void*)ITEM_CONTROLLER);
 		}
 	}
+
 	// add NVBG
 	Nvbg* nvbg = character->getNvbg();
 	if (nvbg)
 	{
-		Fl_Tree_Item* ctrlItem = resourceTree->add(controllerFolder, "NVBG");
+		Fl_Tree_Item* ctrlItem = resourceTree->add(item, "NVBG");
 		ctrlItem->user_data((void*)ITEM_NVBG);
 	}
 }
@@ -781,7 +783,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_NVBG)
 	{
-		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->parent()->parent()->label()); // a controller's parent is its character name
+		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->parent()->label());
 		widget = new AttributeItemWidget(curChar->getNvbg(),x,y,w,h,name,treeItem,itemType,this);
 	}
 	else

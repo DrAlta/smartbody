@@ -20,11 +20,11 @@ bool Nvbg::execute(std::string character, std::string to, std::string messageId,
 	return true;
 }
 
-
 void Nvbg::notify(SmartBody::SBSubject* subject)
 {
 	SmartBody::SBObject::notify(subject);
 }
+
 
 
 

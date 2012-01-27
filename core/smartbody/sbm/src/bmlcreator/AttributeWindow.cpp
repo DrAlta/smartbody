@@ -319,7 +319,7 @@ void AttributeWindow::draw()
 				if (actionAttr) 
 				{
 					actionAttr->registerObserver(this);
-					Fl_Button* button = new Fl_Button(mainGroup->x() + 100, mainGroup->y() + startY, 40, 20, "..");
+					Fl_Button* button = new Fl_Button(mainGroup->x() + 100, mainGroup->y() + startY, 40, 20, _strdup(name.c_str()));
 					if (attrInfo->getDescription() != "")
 						button->tooltip(_strdup(attrInfo->getDescription().c_str()));
 					button->align(FL_ALIGN_LEFT);

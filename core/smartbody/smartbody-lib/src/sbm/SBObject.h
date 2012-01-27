@@ -4,9 +4,12 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "SBAttribute.h"
-#include "SBAttributeManager.h"
 #include "SBObserver.h"
+#include "SBSubject.h"
+#include <sr/sr_mat.h>
+#include <sbm/SBAttribute.h>
+#include <sbm/SBAttributeManager.h>
+
 
 namespace SmartBody {
 
