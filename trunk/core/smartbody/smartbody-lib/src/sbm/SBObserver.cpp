@@ -44,4 +44,8 @@ void SBObserver::removeDependency(SBSubject* subject)
 	}
 }
 
+void SBObserver::notify(SBSubject* subject)
+{
+}
+
 };
