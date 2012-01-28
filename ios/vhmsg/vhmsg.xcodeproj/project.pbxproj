@@ -210,7 +210,7 @@
 				DSTROOT = /tmp/vhmsg.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "vhmsg/vhmsg-Prefix.pch";
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = (
 					"../../lib/vhmsg/vhmsg-c/include",
 					../../lib/vhcl/include,
@@ -232,7 +232,7 @@
 				DSTROOT = /tmp/vhmsg.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "vhmsg/vhmsg-Prefix.pch";
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = (
 					"../../lib/vhmsg/vhmsg-c/include",
 					../../lib/vhcl/include,

@@ -7,6 +7,63 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA563C4414D39CC000D4A91D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9CD1ED141FCD7A0064C27A /* Foundation.framework */; };
+		AA563E6014D39E3F00D4A91D /* arg_to_python_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7214D39E3E00D4A91D /* arg_to_python_base.cpp */; };
+		AA563E6114D39E3F00D4A91D /* builtin_converters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7314D39E3E00D4A91D /* builtin_converters.cpp */; };
+		AA563E6214D39E3F00D4A91D /* from_python.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7414D39E3E00D4A91D /* from_python.cpp */; };
+		AA563E6314D39E3F00D4A91D /* registry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7514D39E3E00D4A91D /* registry.cpp */; };
+		AA563E6414D39E3F00D4A91D /* type_id.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7614D39E3E00D4A91D /* type_id.cpp */; };
+		AA563E6514D39E3F00D4A91D /* dict.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7714D39E3E00D4A91D /* dict.cpp */; };
+		AA563E6614D39E3F00D4A91D /* errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7814D39E3E00D4A91D /* errors.cpp */; };
+		AA563E6714D39E3F00D4A91D /* exec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7914D39E3E00D4A91D /* exec.cpp */; };
+		AA563E6814D39E3F00D4A91D /* import.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7A14D39E3E00D4A91D /* import.cpp */; };
+		AA563E6914D39E3F00D4A91D /* list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7B14D39E3E00D4A91D /* list.cpp */; };
+		AA563E6A14D39E3F00D4A91D /* long.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7C14D39E3E00D4A91D /* long.cpp */; };
+		AA563E6B14D39E3F00D4A91D /* module.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7D14D39E3E00D4A91D /* module.cpp */; };
+		AA563E6C14D39E3F00D4A91D /* numeric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7E14D39E3E00D4A91D /* numeric.cpp */; };
+		AA563E6D14D39E3F00D4A91D /* class.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8014D39E3E00D4A91D /* class.cpp */; };
+		AA563E6E14D39E3F00D4A91D /* enum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8114D39E3E00D4A91D /* enum.cpp */; };
+		AA563E6F14D39E3F00D4A91D /* function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8214D39E3E00D4A91D /* function.cpp */; };
+		AA563E7014D39E3F00D4A91D /* function_doc_signature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8314D39E3E00D4A91D /* function_doc_signature.cpp */; };
+		AA563E7114D39E3F00D4A91D /* inheritance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8414D39E3E00D4A91D /* inheritance.cpp */; };
+		AA563E7214D39E3F00D4A91D /* iterator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8514D39E3E00D4A91D /* iterator.cpp */; };
+		AA563E7314D39E3F00D4A91D /* life_support.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8614D39E3E00D4A91D /* life_support.cpp */; };
+		AA563E7414D39E3F00D4A91D /* pickle_support.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8714D39E3E00D4A91D /* pickle_support.cpp */; };
+		AA563E7514D39E3F00D4A91D /* stl_iterator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8814D39E3E00D4A91D /* stl_iterator.cpp */; };
+		AA563E7614D39E3F00D4A91D /* object_operators.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8914D39E3E00D4A91D /* object_operators.cpp */; };
+		AA563E7714D39E3F00D4A91D /* object_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8A14D39E3E00D4A91D /* object_protocol.cpp */; };
+		AA563E7814D39E3F00D4A91D /* slice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8B14D39E3E00D4A91D /* slice.cpp */; };
+		AA563E7914D39E3F00D4A91D /* str.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8C14D39E3E00D4A91D /* str.cpp */; };
+		AA563E7A14D39E3F00D4A91D /* tuple.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8D14D39E3E00D4A91D /* tuple.cpp */; };
+		AA563E7B14D39E3F00D4A91D /* wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8E14D39E3E00D4A91D /* wrapper.cpp */; };
+		AA563EDE14D39E6A00D4A91D /* arg_to_python_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7214D39E3E00D4A91D /* arg_to_python_base.cpp */; };
+		AA563EDF14D39E6A00D4A91D /* builtin_converters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7314D39E3E00D4A91D /* builtin_converters.cpp */; };
+		AA563EE014D39E6A00D4A91D /* from_python.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7414D39E3E00D4A91D /* from_python.cpp */; };
+		AA563EE114D39E6A00D4A91D /* registry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7514D39E3E00D4A91D /* registry.cpp */; };
+		AA563EE214D39E6A00D4A91D /* type_id.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7614D39E3E00D4A91D /* type_id.cpp */; };
+		AA563EE314D39E6A00D4A91D /* dict.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7714D39E3E00D4A91D /* dict.cpp */; };
+		AA563EE414D39E6A00D4A91D /* errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7814D39E3E00D4A91D /* errors.cpp */; };
+		AA563EE514D39E6A00D4A91D /* exec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7914D39E3E00D4A91D /* exec.cpp */; };
+		AA563EE614D39E6A00D4A91D /* import.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7A14D39E3E00D4A91D /* import.cpp */; };
+		AA563EE714D39E6A00D4A91D /* list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7B14D39E3E00D4A91D /* list.cpp */; };
+		AA563EE814D39E6A00D4A91D /* long.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7C14D39E3E00D4A91D /* long.cpp */; };
+		AA563EE914D39E6A00D4A91D /* module.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7D14D39E3E00D4A91D /* module.cpp */; };
+		AA563EEA14D39E6A00D4A91D /* numeric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D7E14D39E3E00D4A91D /* numeric.cpp */; };
+		AA563EEB14D39E6A00D4A91D /* class.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8014D39E3E00D4A91D /* class.cpp */; };
+		AA563EEC14D39E6A00D4A91D /* enum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8114D39E3E00D4A91D /* enum.cpp */; };
+		AA563EED14D39E6A00D4A91D /* function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8214D39E3E00D4A91D /* function.cpp */; };
+		AA563EEE14D39E6A00D4A91D /* function_doc_signature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8314D39E3E00D4A91D /* function_doc_signature.cpp */; };
+		AA563EEF14D39E6A00D4A91D /* inheritance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8414D39E3E00D4A91D /* inheritance.cpp */; };
+		AA563EF014D39E6A00D4A91D /* iterator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8514D39E3E00D4A91D /* iterator.cpp */; };
+		AA563EF114D39E6A00D4A91D /* life_support.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8614D39E3E00D4A91D /* life_support.cpp */; };
+		AA563EF214D39E6A00D4A91D /* pickle_support.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8714D39E3E00D4A91D /* pickle_support.cpp */; };
+		AA563EF314D39E6A00D4A91D /* stl_iterator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8814D39E3E00D4A91D /* stl_iterator.cpp */; };
+		AA563EF414D39E6A00D4A91D /* object_operators.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8914D39E3E00D4A91D /* object_operators.cpp */; };
+		AA563EF514D39E6A00D4A91D /* object_protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8A14D39E3E00D4A91D /* object_protocol.cpp */; };
+		AA563EF614D39E6A00D4A91D /* slice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8B14D39E3E00D4A91D /* slice.cpp */; };
+		AA563EF714D39E6A00D4A91D /* str.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8C14D39E3E00D4A91D /* str.cpp */; };
+		AA563EF814D39E6A00D4A91D /* tuple.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8D14D39E3E00D4A91D /* tuple.cpp */; };
+		AA563EF914D39E6A00D4A91D /* wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA563D8E14D39E3E00D4A91D /* wrapper.cpp */; };
 		AA9CD58F141FCFCD0064C27A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9CD1ED141FCD7A0064C27A /* Foundation.framework */; };
 		AA9CD598141FCFD70064C27A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9CD1ED141FCD7A0064C27A /* Foundation.framework */; };
 		AA9CD5A1141FCFE00064C27A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9CD1ED141FCD7A0064C27A /* Foundation.framework */; };
@@ -44,6 +101,35 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AA563C4A14D39CC000D4A91D /* libboost_python.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libboost_python.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA563D7214D39E3E00D4A91D /* arg_to_python_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = arg_to_python_base.cpp; sourceTree = "<group>"; };
+		AA563D7314D39E3E00D4A91D /* builtin_converters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = builtin_converters.cpp; sourceTree = "<group>"; };
+		AA563D7414D39E3E00D4A91D /* from_python.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = from_python.cpp; sourceTree = "<group>"; };
+		AA563D7514D39E3E00D4A91D /* registry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = registry.cpp; sourceTree = "<group>"; };
+		AA563D7614D39E3E00D4A91D /* type_id.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = type_id.cpp; sourceTree = "<group>"; };
+		AA563D7714D39E3E00D4A91D /* dict.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dict.cpp; sourceTree = "<group>"; };
+		AA563D7814D39E3E00D4A91D /* errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = errors.cpp; sourceTree = "<group>"; };
+		AA563D7914D39E3E00D4A91D /* exec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exec.cpp; sourceTree = "<group>"; };
+		AA563D7A14D39E3E00D4A91D /* import.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = import.cpp; sourceTree = "<group>"; };
+		AA563D7B14D39E3E00D4A91D /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list.cpp; sourceTree = "<group>"; };
+		AA563D7C14D39E3E00D4A91D /* long.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = long.cpp; sourceTree = "<group>"; };
+		AA563D7D14D39E3E00D4A91D /* module.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = module.cpp; sourceTree = "<group>"; };
+		AA563D7E14D39E3E00D4A91D /* numeric.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = numeric.cpp; sourceTree = "<group>"; };
+		AA563D8014D39E3E00D4A91D /* class.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = class.cpp; sourceTree = "<group>"; };
+		AA563D8114D39E3E00D4A91D /* enum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = enum.cpp; sourceTree = "<group>"; };
+		AA563D8214D39E3E00D4A91D /* function.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = function.cpp; sourceTree = "<group>"; };
+		AA563D8314D39E3E00D4A91D /* function_doc_signature.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = function_doc_signature.cpp; sourceTree = "<group>"; };
+		AA563D8414D39E3E00D4A91D /* inheritance.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = inheritance.cpp; sourceTree = "<group>"; };
+		AA563D8514D39E3E00D4A91D /* iterator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = iterator.cpp; sourceTree = "<group>"; };
+		AA563D8614D39E3E00D4A91D /* life_support.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = life_support.cpp; sourceTree = "<group>"; };
+		AA563D8714D39E3E00D4A91D /* pickle_support.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pickle_support.cpp; sourceTree = "<group>"; };
+		AA563D8814D39E3E00D4A91D /* stl_iterator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stl_iterator.cpp; sourceTree = "<group>"; };
+		AA563D8914D39E3E00D4A91D /* object_operators.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = object_operators.cpp; sourceTree = "<group>"; };
+		AA563D8A14D39E3E00D4A91D /* object_protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = object_protocol.cpp; sourceTree = "<group>"; };
+		AA563D8B14D39E3E00D4A91D /* slice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = slice.cpp; sourceTree = "<group>"; };
+		AA563D8C14D39E3E00D4A91D /* str.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = str.cpp; sourceTree = "<group>"; };
+		AA563D8D14D39E3E00D4A91D /* tuple.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tuple.cpp; sourceTree = "<group>"; };
+		AA563D8E14D39E3E00D4A91D /* wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wrapper.cpp; sourceTree = "<group>"; };
 		AA9CD1ED141FCD7A0064C27A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		AA9CD1F1141FCD7A0064C27A /* boost-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "boost-Prefix.pch"; sourceTree = "<group>"; };
 		AA9CD2B2141FCF570064C27A /* error_code.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = error_code.cpp; sourceTree = "<group>"; };
@@ -83,6 +169,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		AA563C4314D39CC000D4A91D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA563C4414D39CC000D4A91D /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA9CD58E141FCFCD0064C27A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -110,6 +204,66 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AA563C4B14D39E3E00D4A91D /* python */ = {
+			isa = PBXGroup;
+			children = (
+				AA563D7014D39E3E00D4A91D /* src */,
+			);
+			name = python;
+			path = boost_1_44_0/libs/python;
+			sourceTree = SOURCE_ROOT;
+		};
+		AA563D7014D39E3E00D4A91D /* src */ = {
+			isa = PBXGroup;
+			children = (
+				AA563D7114D39E3E00D4A91D /* converter */,
+				AA563D7714D39E3E00D4A91D /* dict.cpp */,
+				AA563D7814D39E3E00D4A91D /* errors.cpp */,
+				AA563D7914D39E3E00D4A91D /* exec.cpp */,
+				AA563D7A14D39E3E00D4A91D /* import.cpp */,
+				AA563D7B14D39E3E00D4A91D /* list.cpp */,
+				AA563D7C14D39E3E00D4A91D /* long.cpp */,
+				AA563D7D14D39E3E00D4A91D /* module.cpp */,
+				AA563D7E14D39E3E00D4A91D /* numeric.cpp */,
+				AA563D7F14D39E3E00D4A91D /* object */,
+				AA563D8914D39E3E00D4A91D /* object_operators.cpp */,
+				AA563D8A14D39E3E00D4A91D /* object_protocol.cpp */,
+				AA563D8B14D39E3E00D4A91D /* slice.cpp */,
+				AA563D8C14D39E3E00D4A91D /* str.cpp */,
+				AA563D8D14D39E3E00D4A91D /* tuple.cpp */,
+				AA563D8E14D39E3E00D4A91D /* wrapper.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		AA563D7114D39E3E00D4A91D /* converter */ = {
+			isa = PBXGroup;
+			children = (
+				AA563D7214D39E3E00D4A91D /* arg_to_python_base.cpp */,
+				AA563D7314D39E3E00D4A91D /* builtin_converters.cpp */,
+				AA563D7414D39E3E00D4A91D /* from_python.cpp */,
+				AA563D7514D39E3E00D4A91D /* registry.cpp */,
+				AA563D7614D39E3E00D4A91D /* type_id.cpp */,
+			);
+			path = converter;
+			sourceTree = "<group>";
+		};
+		AA563D7F14D39E3E00D4A91D /* object */ = {
+			isa = PBXGroup;
+			children = (
+				AA563D8014D39E3E00D4A91D /* class.cpp */,
+				AA563D8114D39E3E00D4A91D /* enum.cpp */,
+				AA563D8214D39E3E00D4A91D /* function.cpp */,
+				AA563D8314D39E3E00D4A91D /* function_doc_signature.cpp */,
+				AA563D8414D39E3E00D4A91D /* inheritance.cpp */,
+				AA563D8514D39E3E00D4A91D /* iterator.cpp */,
+				AA563D8614D39E3E00D4A91D /* life_support.cpp */,
+				AA563D8714D39E3E00D4A91D /* pickle_support.cpp */,
+				AA563D8814D39E3E00D4A91D /* stl_iterator.cpp */,
+			);
+			path = object;
+			sourceTree = "<group>";
+		};
 		AA9CD1DF141FCD7A0064C27A = {
 			isa = PBXGroup;
 			children = (
@@ -125,6 +279,7 @@
 				AA9CD594141FCFCD0064C27A /* libboost_system.a */,
 				AA9CD59D141FCFD70064C27A /* libboost_filesystem.a */,
 				AA9CD5A6141FCFE00064C27A /* libboost_regex.a */,
+				AA563C4A14D39CC000D4A91D /* libboost_python.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -140,6 +295,7 @@
 		AA9CD1EF141FCD7A0064C27A /* boost */ = {
 			isa = PBXGroup;
 			children = (
+				AA563C4B14D39E3E00D4A91D /* python */,
 				AA9CD2AA141FCF570064C27A /* system */,
 				AA9CD2C2141FCF570064C27A /* regex */,
 				AA9CD400141FCF570064C27A /* filesystem */,
@@ -262,6 +418,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		AA563C4514D39CC000D4A91D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA9CD590141FCFCD0064C27A /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -287,6 +450,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		AA563C3014D39CC000D4A91D /* boost_python */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA563C4714D39CC000D4A91D /* Build configuration list for PBXNativeTarget "boost_python" */;
+			buildPhases = (
+				AA563C3114D39CC000D4A91D /* Sources */,
+				AA563C4314D39CC000D4A91D /* Frameworks */,
+				AA563C4514D39CC000D4A91D /* Headers */,
+				AA563C4614D39CC000D4A91D /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = boost_python;
+			productName = boost;
+			productReference = AA563C4A14D39CC000D4A91D /* libboost_python.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		AA9CD58C141FCFCD0064C27A /* boost_system */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA9CD591141FCFCD0064C27A /* Build configuration list for PBXNativeTarget "boost_system" */;
@@ -361,6 +542,7 @@
 				AA9CD58C141FCFCD0064C27A /* boost_system */,
 				AA9CD595141FCFD70064C27A /* boost_filesystem */,
 				AA9CD59E141FCFE00064C27A /* boost_regex */,
+				AA563C3014D39CC000D4A91D /* boost_python */,
 			);
 		};
 /* End PBXProject section */
@@ -405,14 +587,90 @@
 			shellPath = /bin/sh;
 			shellScript = "cp $PROJECT_DIR/build/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
 		};
+		AA563C4614D39CC000D4A91D /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp $PROJECT_DIR/build/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		AA563C3114D39CC000D4A91D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA563EDE14D39E6A00D4A91D /* arg_to_python_base.cpp in Sources */,
+				AA563EDF14D39E6A00D4A91D /* builtin_converters.cpp in Sources */,
+				AA563EE014D39E6A00D4A91D /* from_python.cpp in Sources */,
+				AA563EE114D39E6A00D4A91D /* registry.cpp in Sources */,
+				AA563EE214D39E6A00D4A91D /* type_id.cpp in Sources */,
+				AA563EE314D39E6A00D4A91D /* dict.cpp in Sources */,
+				AA563EE414D39E6A00D4A91D /* errors.cpp in Sources */,
+				AA563EE514D39E6A00D4A91D /* exec.cpp in Sources */,
+				AA563EE614D39E6A00D4A91D /* import.cpp in Sources */,
+				AA563EE714D39E6A00D4A91D /* list.cpp in Sources */,
+				AA563EE814D39E6A00D4A91D /* long.cpp in Sources */,
+				AA563EE914D39E6A00D4A91D /* module.cpp in Sources */,
+				AA563EEA14D39E6A00D4A91D /* numeric.cpp in Sources */,
+				AA563EEB14D39E6A00D4A91D /* class.cpp in Sources */,
+				AA563EEC14D39E6A00D4A91D /* enum.cpp in Sources */,
+				AA563EED14D39E6A00D4A91D /* function.cpp in Sources */,
+				AA563EEE14D39E6A00D4A91D /* function_doc_signature.cpp in Sources */,
+				AA563EEF14D39E6A00D4A91D /* inheritance.cpp in Sources */,
+				AA563EF014D39E6A00D4A91D /* iterator.cpp in Sources */,
+				AA563EF114D39E6A00D4A91D /* life_support.cpp in Sources */,
+				AA563EF214D39E6A00D4A91D /* pickle_support.cpp in Sources */,
+				AA563EF314D39E6A00D4A91D /* stl_iterator.cpp in Sources */,
+				AA563EF414D39E6A00D4A91D /* object_operators.cpp in Sources */,
+				AA563EF514D39E6A00D4A91D /* object_protocol.cpp in Sources */,
+				AA563EF614D39E6A00D4A91D /* slice.cpp in Sources */,
+				AA563EF714D39E6A00D4A91D /* str.cpp in Sources */,
+				AA563EF814D39E6A00D4A91D /* tuple.cpp in Sources */,
+				AA563EF914D39E6A00D4A91D /* wrapper.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA9CD58D141FCFCD0064C27A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				AA9CD5A7141FD0240064C27A /* error_code.cpp in Sources */,
+				AA563E6014D39E3F00D4A91D /* arg_to_python_base.cpp in Sources */,
+				AA563E6114D39E3F00D4A91D /* builtin_converters.cpp in Sources */,
+				AA563E6214D39E3F00D4A91D /* from_python.cpp in Sources */,
+				AA563E6314D39E3F00D4A91D /* registry.cpp in Sources */,
+				AA563E6414D39E3F00D4A91D /* type_id.cpp in Sources */,
+				AA563E6514D39E3F00D4A91D /* dict.cpp in Sources */,
+				AA563E6614D39E3F00D4A91D /* errors.cpp in Sources */,
+				AA563E6714D39E3F00D4A91D /* exec.cpp in Sources */,
+				AA563E6814D39E3F00D4A91D /* import.cpp in Sources */,
+				AA563E6914D39E3F00D4A91D /* list.cpp in Sources */,
+				AA563E6A14D39E3F00D4A91D /* long.cpp in Sources */,
+				AA563E6B14D39E3F00D4A91D /* module.cpp in Sources */,
+				AA563E6C14D39E3F00D4A91D /* numeric.cpp in Sources */,
+				AA563E6D14D39E3F00D4A91D /* class.cpp in Sources */,
+				AA563E6E14D39E3F00D4A91D /* enum.cpp in Sources */,
+				AA563E6F14D39E3F00D4A91D /* function.cpp in Sources */,
+				AA563E7014D39E3F00D4A91D /* function_doc_signature.cpp in Sources */,
+				AA563E7114D39E3F00D4A91D /* inheritance.cpp in Sources */,
+				AA563E7214D39E3F00D4A91D /* iterator.cpp in Sources */,
+				AA563E7314D39E3F00D4A91D /* life_support.cpp in Sources */,
+				AA563E7414D39E3F00D4A91D /* pickle_support.cpp in Sources */,
+				AA563E7514D39E3F00D4A91D /* stl_iterator.cpp in Sources */,
+				AA563E7614D39E3F00D4A91D /* object_operators.cpp in Sources */,
+				AA563E7714D39E3F00D4A91D /* object_protocol.cpp in Sources */,
+				AA563E7814D39E3F00D4A91D /* slice.cpp in Sources */,
+				AA563E7914D39E3F00D4A91D /* str.cpp in Sources */,
+				AA563E7A14D39E3F00D4A91D /* tuple.cpp in Sources */,
+				AA563E7B14D39E3F00D4A91D /* wrapper.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -462,6 +720,52 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		AA563C4814D39CC000D4A91D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DSTROOT = /tmp/boost.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				HEADER_SEARCH_PATHS = (
+					"$PROJECT_DIR/../python/Python-2.6.5/_install/include/python2.6",
+					"$PROJECT_DIR/../python/Python-2.6.5",
+					$PROJECT_DIR/boost_1_44_0,
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = boost_python;
+				SYMROOT = $PROJECT_DIR/build;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA563C4914D39CC000D4A91D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DSTROOT = /tmp/boost.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				HEADER_SEARCH_PATHS = (
+					"$PROJECT_DIR/../python/Python-2.6.5/_install/include/python2.6",
+					"$PROJECT_DIR/../python/Python-2.6.5",
+					$PROJECT_DIR/boost_1_44_0,
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = boost_python;
+				SYMROOT = $PROJECT_DIR/build;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		AA9CD1F2141FCD7A0064C27A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -509,7 +813,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -527,7 +831,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -545,7 +849,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -563,7 +867,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -581,7 +885,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -599,7 +903,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -612,6 +916,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		AA563C4714D39CC000D4A91D /* Build configuration list for PBXNativeTarget "boost_python" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA563C4814D39CC000D4A91D /* Debug */,
+				AA563C4914D39CC000D4A91D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		AA9CD1E4141FCD7A0064C27A /* Build configuration list for PBXProject "boost" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
