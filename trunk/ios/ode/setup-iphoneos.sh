@@ -24,7 +24,7 @@ export ac_cv_func_realloc_0_nonnull=yes
 if [ ! -d "$SBROOT" ]; then
     echo "smartbody trunk location $SBROOT not set correctly"
 else
-    ./configure --with-drawstuff=none --with-pic --host="arm-apple-darwin" --prefix=$PREFIX --disable-dependency-tracking
+    ./configure --with-drawstuff=none --with-trimesh=none --with-pic --host="arm-apple-darwin" --prefix=$PREFIX --disable-dependency-tracking
     make clean
     make
     make install

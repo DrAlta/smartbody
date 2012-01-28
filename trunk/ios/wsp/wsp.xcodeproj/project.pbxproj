@@ -218,7 +218,7 @@
 				DSTROOT = /tmp/wsp.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "wsp/wsp-Prefix.pch";
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = (
 					../../lib/wsp/wsp/include,
 					../../lib/vhcl/include,
@@ -240,7 +240,7 @@
 				DSTROOT = /tmp/wsp.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "wsp/wsp-Prefix.pch";
-				GCC_VERSION = 4.2;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = (
 					../../lib/wsp/wsp/include,
 					../../lib/vhcl/include,

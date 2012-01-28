@@ -213,11 +213,14 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
+					"../python/Python-2.6.5",
+					"../python/Python-2.6.5/_install/include/python2.6",
 					../boost/boost_1_44_0,
 					"../boost/boost-numeric-bindings",
 					"../xerces-c/iphoneos/include",
 					../ode/iphoneos/include,
 					"../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0",
+					"../../core/smartbody/sbm-debugger/lib",
 					"../../core/smartbody/smartbody-lib/src",
 					"../../core/smartbody/steersuite-1.3/pprAI/include",
 					"../../core/smartbody/steersuite-1.3/steerlib/include",
@@ -228,11 +231,14 @@
 					../../lib/bonebus/include,
 				);
 				"HEADER_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = (
+					"../python/Python-2.6.5",
+					"../python/Python-2.6.5/_install/include/python2.6",
 					../boost/boost_1_44_0,
 					"../boost/boost-numeric-bindings",
 					"../xerces-c/iphonesimulator/include",
 					../ode/iphonesimulator/include,
 					"../activemq/activemq-cpp/iphonesimulator/include/activemq-cpp-3.4.0",
+					"../../core/smartbody/sbm-debugger/lib",
 					"../../core/smartbody/smartbody-lib/src",
 					"../../core/smartbody/steersuite-1.3/pprAI/include",
 					"../../core/smartbody/steersuite-1.3/steerlib/include",
@@ -261,11 +267,14 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
+					"../python/Python-2.6.5",
+					"../python/Python-2.6.5/_install/include/python2.6",
 					../boost/boost_1_44_0,
 					"../boost/boost-numeric-bindings",
 					"../xerces-c/iphoneos/include",
 					../ode/iphoneos/include,
 					"../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0",
+					"../../core/smartbody/sbm-debugger/lib",
 					"../../core/smartbody/smartbody-lib/src",
 					"../../core/smartbody/steersuite-1.3/pprAI/include",
 					"../../core/smartbody/steersuite-1.3/steerlib/include",
@@ -276,11 +285,14 @@
 					../../lib/bonebus/include,
 				);
 				"HEADER_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = (
+					"../python/Python-2.6.5",
+					"../python/Python-2.6.5/_install/include/python2.6",
 					../boost/boost_1_44_0,
 					"../boost/boost-numeric-bindings",
 					"../xerces-c/iphonesimulator/include",
 					../ode/iphonesimulator/include,
 					"../activemq/activemq-cpp/iphonesimulator/include/activemq-cpp-3.4.0",
+					"../../core/smartbody/sbm-debugger/lib",
 					"../../core/smartbody/smartbody-lib/src",
 					"../../core/smartbody/steersuite-1.3/pprAI/include",
 					"../../core/smartbody/steersuite-1.3/steerlib/include",

@@ -38,10 +38,13 @@ typedef bool (__stdcall *SBM_SetSpeechAudiofileBasePath_DEF)(SBMHANDLE, const ch
 typedef bool (__stdcall *SBM_SetFacebone_DEF)(SBMHANDLE, bool);
 typedef bool (__stdcall *SBM_SetProcessId_DEF)( SBMHANDLE, const char * );
 typedef bool (__stdcall *SBM_SetMediaPath_DEF)( SBMHANDLE, const char * );
-typedef bool (__stdcall *SBM_Init_DEF)( SBMHANDLE );
+typedef bool (__stdcall *SBM_Init_DEF)( SBMHANDLE, const char * );
 typedef bool (__stdcall *SBM_Shutdown_DEF)( SBMHANDLE );
 typedef bool (__stdcall *SBM_SetListener_DEF)( SBMHANDLE, SBM_OnCreateCharacterCallback, SBM_OnCharacterDeleteCallback, SBM_OnCharacterChangeCallback, SBM_OnVisemeCallback, SBM_OnChannelCallback);
 typedef bool (__stdcall *SBM_Update_DEF)(SBMHANDLE, double);
+typedef bool (__stdcall *SBM_SetDebuggerId_DEF)(SBMHANDLE, const char * );
+typedef bool (__stdcall *SBM_SetDebuggerCameraValues_DEF)(SBMHANDLE, double, double, double, double, double, double, double, double, double, double, double );
+typedef bool (__stdcall *SBM_SetDebuggerRendererRightHanded_DEF)(SBMHANDLE, bool );
 typedef bool (__stdcall *SBM_ProcessVHMsgs_DEF)(SBMHANDLE, const char*, const char*);
 typedef int  (__stdcall *SBM_GetNumberOfCharacters_DEF)(SBMHANDLE sbmHandle);
 typedef bool (__stdcall *SBM_GetCharacter_DEF)( SBMHANDLE sbmHandle, const char*, SBM_SmartbodyCharacter* );
@@ -64,6 +67,9 @@ SBM_Init_DEF                       g_SBM_Init_DEF = NULL;
 SBM_Shutdown_DEF                   g_SBM_Shutdown_DEF = NULL;
 SBM_SetListener_DEF                g_SBM_SetListener_DEF = NULL;
 SBM_Update_DEF                     g_SBM_Update_DEF = NULL;
+SBM_SetDebuggerId_DEF              g_SBM_SetDebuggerId_DEF = NULL;
+SBM_SetDebuggerCameraValues_DEF    g_SBM_SetDebuggerCameraValues_DEF = NULL;
+SBM_SetDebuggerRendererRightHanded_DEF  g_SBM_SetDebuggerRendererRightHanded_DEF = NULL;
 SBM_ProcessVHMsgs_DEF              g_SBM_ProcessVHMsgs_DEF = NULL;
 SBM_GetNumberOfCharacters_DEF      g_SBM_GetNumberOfCharacters_DEF = NULL;
 SBM_GetCharacter_DEF               g_SBM_GetCharacter_DEF = NULL;
@@ -107,6 +113,9 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
    g_SBM_Shutdown_DEF                   = (SBM_Shutdown_DEF)GetProcAddress(g_SBM_HINST, "SBM_Shutdown");
    g_SBM_SetListener_DEF                = (SBM_SetListener_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetListener");
    g_SBM_Update_DEF                     = (SBM_Update_DEF)GetProcAddress(g_SBM_HINST, "SBM_Update");
+   g_SBM_SetDebuggerId_DEF              = (SBM_SetDebuggerId_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerId");
+   g_SBM_SetDebuggerCameraValues_DEF    = (SBM_SetDebuggerCameraValues_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerCameraValues");
+   g_SBM_SetDebuggerRendererRightHanded_DEF  = (SBM_SetDebuggerRendererRightHanded_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerRendererRightHanded");
    g_SBM_ProcessVHMsgs_DEF              = (SBM_ProcessVHMsgs_DEF)GetProcAddress(g_SBM_HINST, "SBM_ProcessVHMsgs");
    g_SBM_GetNumberOfCharacters_DEF      = (SBM_GetNumberOfCharacters_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetNumberOfCharacters");
    g_SBM_GetCharacter_DEF               = (SBM_GetCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetCharacter");
@@ -183,16 +192,16 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_SetMediaPath( SBMHANDLE sbmHandle, const char 
 #endif
 }
 
-VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle )
+VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle, const char * pythonPath )
 {
 #ifdef WIN32
    if (g_SBM_Init_DEF)
    {
-      return g_SBM_Init_DEF(sbmHandle);
+      return g_SBM_Init_DEF(sbmHandle, pythonPath);
    }
    return false;
 #else
-   return SBM_Init(sbmHandle);
+   return SBM_Init(sbmHandle, pythonPath);
 #endif
 }
 
@@ -251,6 +260,39 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_Update( SBMHANDLE sbmHandle, double timeInSeco
    return false;
 #else
    return SBM_Update(sbmHandle, timeInSeconds);
+#endif
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerId( SBMHANDLE sbmHandle, const char * id )
+{
+#ifdef WIN32
+   if (g_SBM_SetDebuggerId_DEF)
+   {
+      g_SBM_SetDebuggerId_DEF(sbmHandle, id );
+   }
+#else
+#endif
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
+{
+#ifdef WIN32
+   if (g_SBM_SetDebuggerCameraValues_DEF)
+   {
+      g_SBM_SetDebuggerCameraValues_DEF(sbmHandle, x, y, z, rx, ry, rz, rw, fov, aspect, zNear, zFar );
+   }
+#else
+#endif
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmHandle, bool enabled )
+{
+#ifdef WIN32
+   if (g_SBM_SetDebuggerRendererRightHanded_DEF)
+   {
+      g_SBM_SetDebuggerRendererRightHanded_DEF(sbmHandle, enabled );
+   }
+#else
 #endif
 }
 
@@ -393,7 +435,7 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_IsChannelSet( SBMHANDLE sbmHandle, int * numCh
 ////////////////////////////////////////////////////////////////////////////
 
 
-
+#if 0
 VHWRAPPERDLL_API AUDIOHANDLE WRAPPER_VHCL_AUDIO_CreateAudio()
 {
    g_audioHandleId++;
@@ -526,6 +568,47 @@ VHWRAPPERDLL_API bool WRAPPER_VHCL_AUDIO_StopSound(AUDIOHANDLE handle, const cha
    return true;
 }
 
+
+VHWRAPPERDLL_API void WRAPPER_VHCL_AUDIO_PauseAllSounds(AUDIOHANDLE handle)
+{
+   if (!VHCL_AUDIO_HandleExists(handle))
+   {
+      return;
+   }
+
+   g_audioInstances[handle]->PauseAllSounds();
+
+}
+
+
+VHWRAPPERDLL_API void WRAPPER_VHCL_AUDIO_StopAllSounds(AUDIOHANDLE handle)
+{
+   if (!VHCL_AUDIO_HandleExists(handle))
+   {
+      return;
+   }
+
+   g_audioInstances[handle]->StopAllSounds();
+
+}
+
+VHWRAPPERDLL_API void WRAPPER_VHCL_AUDIO_UnpauseAllSounds(AUDIOHANDLE handle)
+{
+   if (!VHCL_AUDIO_HandleExists(handle))
+   {
+      return;
+   }
+
+   g_audioInstances[handle]->UnpauseAllSounds();
+
+}
+
+
+
+
+
+
+
 VHWRAPPERDLL_API Sound* WRAPPER_VHCL_AUDIO_CreateSoundLibSndFile(AUDIOHANDLE handle, const char* fileName, const char* name )
 {
    if (!VHCL_AUDIO_HandleExists(handle))
@@ -623,6 +706,7 @@ bool VHCL_AUDIO_HandleExists( const AUDIOHANDLE handle )
 {
    return g_audioInstances.find( handle ) != g_audioInstances.end();
 }
+#endif
 
 #ifdef ENABLE_VHMSG_WRAPPER
 ///VHMSG c++ WRAPPER FUNCTIONS////////////////////////////////

@@ -316,8 +316,11 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Chases_Prefix.pch;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
+					"../../python/Python-2.6.5",
+					"../../python/Python-2.6.5/_install/include/python2.6",
 					../../boost/boost_1_44_0,
 					"../../boost/boost-numeric-bindings",
 					"../../xerces-c/iphoneos/include",
@@ -333,6 +336,8 @@
 					../../../lib/bonebus/include,
 				);
 				"HEADER_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = (
+					"../../python/Python-2.6.5",
+					"../../python/Python-2.6.5/_install/include/python2.6",
 					../../boost/boost_1_44_0,
 					"../../boost/boost-numeric-bindings",
 					"../../xerces-c/iphonesimulator/include",
@@ -371,8 +376,11 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Chases_Prefix.pch;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
+					"../../python/Python-2.6.5",
+					"../../python/Python-2.6.5/_install/include/python2.6",
 					../../boost/boost_1_44_0,
 					"../../boost/boost-numeric-bindings",
 					"../../xerces-c/iphoneos/include",
@@ -388,6 +396,8 @@
 					../../../lib/bonebus/include,
 				);
 				"HEADER_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = (
+					"../../python/Python-2.6.5",
+					"../../python/Python-2.6.5/_install/include/python2.6",
 					../../boost/boost_1_44_0,
 					"../../boost/boost-numeric-bindings",
 					"../../xerces-c/iphonesimulator/include",
