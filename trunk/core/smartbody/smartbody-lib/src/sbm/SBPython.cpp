@@ -49,23 +49,23 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 		return Nvbg::execute(character, to, messageId, xml);
 	}
 
-	virtual void notify(SmartBody::SBSubject* subject)
+	virtual void notifyLocal(SmartBody::SBAttribute* attribute)
 	{
-		if (boost::python::override o = this->get_override("notify"))
+		if (boost::python::override o = this->get_override("notifyLocal"))
 		{
 			try {
-				o(subject);
+				o(attribute);
 			} catch (...) {
 				PyErr_Print();
 			}
 		}
 
-		Nvbg::notify(subject);
+		Nvbg::notify(attribute);
 	}
 
-	void default_notify(SmartBody::SBSubject* subject)
+	void default_notifyLocal(SmartBody::SBAttribute* attribute)
 	{
-		Nvbg::notify(subject);
+		Nvbg::notifyLocal(attribute);
 	}
 };
 
@@ -987,7 +987,7 @@ boost::python::class_<SBReach>("SBReach")
 	boost::python::class_<NvbgWrap, boost::python::bases<SBObject>, boost::noncopyable>("Nvbg")
 		.def("objectEvent", &Nvbg::objectEvent, &NvbgWrap::default_objectEvent, "An event indicating that an object of interest is present.")
 		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor.")
-		.def("notify", &Nvbg::notify, &NvbgWrap::default_notify, "Notifies NVBG processor.")
+		.def("notifyLocal", &Nvbg::notifyLocal, &NvbgWrap::default_notifyLocal, "Notifies NVBG processor.")
 		;
 
 	boost::python::class_<SBScriptWrap, boost::noncopyable>("SBScript")

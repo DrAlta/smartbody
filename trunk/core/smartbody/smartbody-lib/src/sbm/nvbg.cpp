@@ -22,7 +22,16 @@ bool Nvbg::execute(std::string character, std::string to, std::string messageId,
 
 void Nvbg::notify(SmartBody::SBSubject* subject)
 {
-	SmartBody::SBObject::notify(subject);
+	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
+	if (attribute)
+		notifyLocal(attribute);
+	else
+		SmartBody::SBObject::notify(subject);
+}
+
+void Nvbg::notifyLocal(SmartBody::SBAttribute* attribute)
+{
+	SmartBody::SBObject::notify(attribute);
 }
 
 
