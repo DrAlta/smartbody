@@ -59,8 +59,6 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 				PyErr_Print();
 			}
 		}
-
-		Nvbg::notify(attribute);
 	}
 
 	void default_notifyLocal(SmartBody::SBAttribute* attribute)
