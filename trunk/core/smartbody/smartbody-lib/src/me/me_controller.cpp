@@ -60,7 +60,7 @@ MeController::MeController ()
 	_startTime(-1),
 	_stopTime(-1),
 	_initialized(false),
-	_passThrough(false)
+	_enable(true)
 	//_handle("")
 {
 	setName("");
@@ -77,7 +77,7 @@ MeController::MeController ()
 	_buffer_changes_toggle = false;
 	_buffer_changes_toggle_reset = true;
 
-	SBObject::createBoolAttribute("pass_through", false, true, "Basic", 220, false, false, false, "whether to evaluate this controller");
+	SBObject::createBoolAttribute("enable", true, true, "Basic", 220, false, false, false, "whether to evaluate this controller");
 	SBObject::createStringAttribute("handle", "", true, "Basic", 220, false, false, false, "handle for this controller");
 }
 
@@ -325,7 +325,7 @@ void MeController::evaluate ( double time, MeFrameData& frame ) {
 		logger->controller_pre_evaluate( time, *_context, *this, frame );
 
 	// Reevaluate controller. Even for the same evaluation time as _lastEval, results may be influenced by differing buffer values
-	if (!is_pass_through())
+	if (isEnabled())
 		_active = controller_evaluate ( time, frame );
 
 	if (this->is_record_buffer_changes())
@@ -808,14 +808,15 @@ void MeController::handle( std::string handle )
 	_handle = handle;
 }
 
-bool MeController::is_pass_through() const
+bool MeController::isEnabled() const
 {
-	return _passThrough;
+	return _enable;
 }
 
-void MeController::set_pass_through( bool val )
+void MeController::setEnable( bool val )
 {
-	_passThrough = val;
+	_enable = val;
+
 }
 
 void MeController::updateDefaultVariables(SbmPawn* pawn)
@@ -841,9 +842,9 @@ void MeController::notify(SmartBody::SBSubject* subject)
 	SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(subject);
 	if (boolAttribute)
 	{
-		if (boolAttribute->getName() == "pass_through")
+		if (boolAttribute->getName() == "enable")
 		{
-			set_pass_through(boolAttribute->getValue());
+			setEnable(boolAttribute->getValue());
 		}
 	}
 

@@ -3307,7 +3307,12 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		char *ctrl_name = args.read_token();
 		char *ctrl_cmd = args.read_token();
 	
-		if( strcmp(ctrl_cmd, "passthrough" ) == 0 )	{
+		if( strcmp(ctrl_cmd, "passthrough" ) == 0 || strcmp(ctrl_cmd, "enable" ) == 0)
+		{
+			bool reverseMeaning = false;
+			if (strcmp(ctrl_cmd, "passthrough" ) == 0)
+				reverseMeaning = true;
+
 			bool allControllers = false;
 			if (strcmp(ctrl_name, "*") == 0)
 				allControllers = true;
@@ -3332,7 +3337,7 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				}
 				else
 				{
-					LOG("Use syntax: ctrl %s passthrough <true|false|status>, or ctrl %s passthrough ", ctrl_name, ctrl_name);
+					LOG("Use syntax: ctrl %s enable <true|false|status>, or ctrl %s enable ", ctrl_name, ctrl_name);
 					return CMD_FAILURE;
 				}
 			}
@@ -3340,6 +3345,9 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			{
 				toggleValue = true;
 			}
+
+			if (reverseMeaning)
+				passThroughValue = !passThroughValue;
 
 		
 			int numControllersAffected = 0;
@@ -3355,24 +3363,24 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				{
 					if (checkStatus)
 					{
-						std::string passThroughStr = (controllerTree->controller(c)->is_pass_through())? " true " : " false";							
+						std::string passThroughStr = (controllerTree->controller(c)->isEnabled())? " true " : " false";							
 						LOG("[%s] %s = %s", character->getName().c_str(), controllerTree->controller(c)->getName().c_str(), passThroughStr.c_str());
 						numControllersAffected = numControllers;	// just so it won't generate error
 					}
 					else if (allControllers)
 					{
 						if (toggleValue)
-							controllerTree->controller(c)->set_pass_through(!controllerTree->controller(c)->is_pass_through());
+							controllerTree->controller(c)->setEnable(!controllerTree->controller(c)->isEnabled());
 						else
-							controllerTree->controller(c)->set_pass_through(passThroughValue);
+							controllerTree->controller(c)->setEnable(passThroughValue);
 						numControllersAffected++;
 					}
 					else if (controllerTree->controller(c)->getName() == ctrl_name)
 					{
 						if (toggleValue)
-							controllerTree->controller(c)->set_pass_through(!controllerTree->controller(c)->is_pass_through());
+							controllerTree->controller(c)->setEnable(!controllerTree->controller(c)->isEnabled());
 						else
-							controllerTree->controller(c)->set_pass_through(passThroughValue);
+							controllerTree->controller(c)->setEnable(passThroughValue);
 						numControllersAffected++;
 					}
 				}

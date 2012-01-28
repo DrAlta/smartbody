@@ -23,12 +23,12 @@ const std::string& SBController::getType()
 
 void SBController::setIgnore(bool val)
 {
-	set_pass_through(val);
+	setEnable(!val);
 }
 
 bool SBController::isIgnore()
 {
-	return is_pass_through();
+	return !isEnabled();
 }
 
 void SBController::setDebug(bool val)
