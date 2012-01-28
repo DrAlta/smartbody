@@ -64,6 +64,7 @@ AttributeWindow::AttributeWindow(SmartBody::SBObject* obj, int x, int y, int w, 
 {
 	//this->type(VERTICAL);
 
+	setOffset(100);
 	setObject(obj);
 	this->begin();		
 		mainGroup = new Fl_Scroll( x + 10,  y + 10, w -20, h -20);	
@@ -87,6 +88,15 @@ AttributeWindow::~AttributeWindow()
 		
 }
 
+void AttributeWindow::setOffset(int pixels)
+{
+	_offset = pixels;
+}
+
+int AttributeWindow::getOffset()
+{
+	return _offset;
+}
 
 void AttributeWindow::cleanUpAttributesInfo()
 {
@@ -319,7 +329,7 @@ void AttributeWindow::draw()
 				if (actionAttr) 
 				{
 					actionAttr->registerObserver(this);
-					Fl_Button* button = new Fl_Button(mainGroup->x() + 100, mainGroup->y() + startY, 40, 20, _strdup(name.c_str()));
+					Fl_Button* button = new Fl_Button(mainGroup->x() + _offset, mainGroup->y() + startY, 40, 20, _strdup(name.c_str()));
 					if (attrInfo->getDescription() != "")
 						button->tooltip(_strdup(attrInfo->getDescription().c_str()));
 					button->align(FL_ALIGN_LEFT);
@@ -336,7 +346,7 @@ void AttributeWindow::draw()
 				if (boolAttr) 
 				{
 					boolAttr->registerObserver(this);
-					Fl_Check_Button* check = new Fl_Check_Button(mainGroup->x() + 100, mainGroup->y() + startY, 150, 20, _strdup(name.c_str()));
+					Fl_Check_Button* check = new Fl_Check_Button(mainGroup->x() + _offset, mainGroup->y() + startY, 150, 20, _strdup(name.c_str()));
 					if (attrInfo->getDescription() != "")
 						check->tooltip(_strdup(attrInfo->getDescription().c_str()));
 					check->align(FL_ALIGN_LEFT);
@@ -357,7 +367,7 @@ void AttributeWindow::draw()
 					Fl_Group* intGroup = new Fl_Group(mainGroup->x() + 0, mainGroup->y() + startY, 300, 20);
 					intGroup->end();
 					intGroup->align(FL_ALIGN_LEFT);
-					Fl_Float_Input* input = new Fl_Float_Input(mainGroup->x() + 100 + 0, mainGroup->y() + startY, 60, 20, _strdup(name.c_str()));
+					Fl_Float_Input* input = new Fl_Float_Input(mainGroup->x() + _offset + 0, mainGroup->y() + startY, 60, 20, _strdup(name.c_str()));
 					if (attrInfo->getDescription() != "")
 						input->tooltip(_strdup(attrInfo->getDescription().c_str()));
 					std::stringstream str;
@@ -370,7 +380,7 @@ void AttributeWindow::draw()
 					if (intAttr->getMin() == -std::numeric_limits<int>::max() || 
 						intAttr->getMax() == std::numeric_limits<int>::max())
 					{
-						Fl_Roller* wheel = new Fl_Roller(mainGroup->x() + 100 + 70, mainGroup->y() + startY, 100, 20);
+						Fl_Roller* wheel = new Fl_Roller(mainGroup->x() + _offset + 70, mainGroup->y() + startY, 100, 20);
 						if (attrInfo->getDescription() != "")
 							wheel->tooltip(_strdup(attrInfo->getDescription().c_str()));
 						wheel->type(FL_HORIZONTAL);
@@ -409,7 +419,7 @@ void AttributeWindow::draw()
 					Fl_Group* doubleGroup = new Fl_Group(mainGroup->x() + 0, mainGroup->y() + startY, 300, 20);
 					doubleGroup->end();
 					//doubleGroup->flags(FL_ALIGN_LEFT);
-					Fl_Float_Input* input = new Fl_Float_Input(mainGroup->x() + 100, mainGroup->y() + startY, 60, 20, _strdup(name.c_str()));
+					Fl_Float_Input* input = new Fl_Float_Input(mainGroup->x() +  _offset, mainGroup->y() + startY, 60, 20, _strdup(name.c_str()));
 					if (attrInfo->getDescription() != "")
 						input->tooltip(_strdup(attrInfo->getDescription().c_str()));
 					std::stringstream strstr;
@@ -422,7 +432,7 @@ void AttributeWindow::draw()
 					if (doubleAttr->getMin() == -std::numeric_limits<double>::max() ||
 						doubleAttr->getMax() == std::numeric_limits<double>::max())
 					{
-						Fl_Roller* wheel = new Fl_Roller(mainGroup->x() + 100 + 70, mainGroup->y() + startY, 100, 20);
+						Fl_Roller* wheel = new Fl_Roller(mainGroup->x() + _offset + 70, mainGroup->y() + startY, 100, 20);
 						if (attrInfo->getDescription() != "")
 							wheel->tooltip(_strdup(attrInfo->getDescription().c_str()));
 						wheel->type(FL_HORIZONTAL);
@@ -460,7 +470,7 @@ void AttributeWindow::draw()
 					stringAttr->registerObserver(this);
 					if (stringAttr->getValidValues().size() == 0)
 					{
-						Fl_Input* input = new Fl_Input(mainGroup->x() + 100, mainGroup->y() + startY, 150, 20, _strdup(name.c_str()));
+						Fl_Input* input = new Fl_Input(mainGroup->x() + _offset, mainGroup->y() + startY, 150, 20, _strdup(name.c_str()));
 						if (attrInfo->getDescription() != "")
 							input->tooltip(_strdup(attrInfo->getDescription().c_str()));
 						input->value(stringAttr->getValue().c_str());
@@ -472,7 +482,7 @@ void AttributeWindow::draw()
 					}
 					else
 					{
-						Fl_Choice* choice = new Fl_Choice(mainGroup->x() + 100, mainGroup->y() + startY, 150, 20, _strdup(name.c_str()));
+						Fl_Choice* choice = new Fl_Choice(mainGroup->x() + _offset, mainGroup->y() + startY, 150, 20, _strdup(name.c_str()));
 						if (attrInfo->getDescription() != "")
 							choice->tooltip(_strdup(attrInfo->getDescription().c_str()));
 						// add all the options
@@ -500,7 +510,7 @@ void AttributeWindow::draw()
 				if (vec3Attr) 
 				{
 					vec3Attr->registerObserver(this);
-					Fl_Group* vec3Group = new Fl_Group(mainGroup->x() + 100, mainGroup->y() + startY, 200, 20, _strdup(name.c_str()));
+					Fl_Group* vec3Group = new Fl_Group(mainGroup->x() + _offset, mainGroup->y() + startY, 200, 20, _strdup(name.c_str()));
 					vec3Group->align(FL_ALIGN_LEFT);
 					vec3Group->end();
 					if (attrInfo->getDescription() != "")
@@ -509,7 +519,7 @@ void AttributeWindow::draw()
 					SrVec val = vec3Attr->getValue();
 					for (int c = 0; c < 3; c++)
 					{
-						Fl_Float_Input* finput = new Fl_Float_Input(mainGroup->x() + 100 + c * 50, mainGroup->y() +  startY, 60, 20);
+						Fl_Float_Input* finput = new Fl_Float_Input(mainGroup->x() + _offset + c * 50, mainGroup->y() +  startY, 60, 20);
 						if (attrInfo->getDescription() != "")
 							finput->tooltip(_strdup(attrInfo->getDescription().c_str()));
 						std::stringstream strstr;

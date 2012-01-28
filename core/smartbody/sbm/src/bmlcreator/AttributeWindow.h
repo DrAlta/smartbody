@@ -66,6 +66,8 @@ public:
 	//void show();
 	//void layout();
 
+	void setOffset(int pixels);
+	int getOffset();
 	void setObject(SmartBody::SBObject* g);
 	SmartBody::SBObject* getObject();
 	
@@ -90,6 +92,7 @@ public:
 	std::map<std::string, Fl_Widget*> widgetMap;
 	std::map<Fl_Widget*, std::string> reverseWidgetMap;
 	Fl_Scroll* mainGroup;
+	int _offset;
 };
 
 #endif

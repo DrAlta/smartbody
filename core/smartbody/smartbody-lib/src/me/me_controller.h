@@ -128,7 +128,7 @@ protected :
 	bool		_buffer_changes_toggle;			// toggle, whenever it's being called, recording the changes that evaluation make
 	std::vector<float>	_bufferRecord;              // data containing the changes made each time inside the controller evaluation
 	bool		_buffer_changes_toggle_reset;	// flag to initialize the buffer_changes
-	bool		_passThrough;						// determines if this controller does not get evaluated. 	
+	bool		_enable;						// determines if this controller does not get evaluated. 	
 	std::string	_handle;
 
 protected :
@@ -291,8 +291,8 @@ public :
 	std::vector<float>& get_buffer_changes();
 	bool is_record_buffer_changes() { return _buffer_changes_toggle; }
 
-	bool is_pass_through() const;// { return _pass_through; }
-	void set_pass_through(bool val);// { _pass_through = val; }
+	bool isEnabled() const;
+	void setEnable(bool val);
 
 	void dumpChannelMap();	
 

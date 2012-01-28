@@ -34,6 +34,7 @@ SkeletonItemInfoWidget::SkeletonItemInfoWidget( int x, int y, int w, int h, cons
 	skeletonTree = new Fl_TreeHorizontal(Pad*2+x,Pad*2+y,w-30,h-400);//new Fl_Tree(10,10,w - 300, h - 30);			
 	skeletonTree->callback(treeCallBack,this);	
 	attrWindow = new AttributeWindow(jointInfoObject,Pad*2+x,Pad*2+y+h-380,w-30,360,"Joint Attributes");
+	attrWindow->setOffset(150);
 	attrWindow->begin();
 	attrWindow->end();
 	this->end();	
@@ -164,6 +165,7 @@ MotionItemInfoWidget::MotionItemInfoWidget( int x, int y, int w, int h, const ch
 	frameSlider->type(FL_HORIZONTAL);
 	frameSlider->callback(sliderCallBack,this);
 	attrWindow = new AttributeWindow(channelInfoObject,Pad*2+x,Pad*2+y+h-310,w-30,280,"");
+	attrWindow->setOffset(150);
 	attrWindow->begin();
 	attrWindow->end();
 	this->end();	
@@ -430,6 +432,7 @@ EventItemInfoWidget::EventItemInfoWidget( int x, int y, int w, int h, const char
 	eventInfoObject->registerObserver(this);
 	this->begin();
 		attrWindow = new AttributeWindow(eventInfoObject,x,y,w,h,name);
+		attrWindow->setOffset(150);
 		attrWindow->begin();
 		attrWindow->end();			
 		Fl_Button* eventButton = new Fl_Button( x + 20 , y + 80 , 100, 20, "Remove Event");
@@ -523,6 +526,7 @@ PawnItemInfoWidget::PawnItemInfoWidget( int x, int y, int w, int h, const char* 
 		if (pawn)
 			pawn->registerObserver(this);
 		attrWindow = new AttributeWindow(pawn,x,y,w,h,name);
+		attrWindow->setOffset(150);
 		attrWindow->begin();
 		attrWindow->end();
 	this->end();
@@ -577,6 +581,7 @@ AttributeItemWidget::AttributeItemWidget( SmartBody::SBObject* object, int x, in
 		return;
 	this->begin();
 	attrWindow = new AttributeWindow(infoObject,x,y,w,h,name);
+	attrWindow->setOffset(150);
 	attrWindow->begin();
 	attrWindow->end();
 	this->end();	
@@ -605,9 +610,11 @@ DoubleAttributeItemWidget::DoubleAttributeItemWidget( SmartBody::SBObject* objec
 	infoObject2 = object2;
 	this->begin();
 	attrWindow1 = new AttributeWindow(infoObject1,x,y,w,(ySep-y)- speLen,name1);
+	attrWindow1->setOffset(150);
 	attrWindow1->begin();
 	attrWindow1->end();
 	attrWindow2 = new AttributeWindow(infoObject2,x,ySep+speLen,w,h-(ySep-y)-speLen,name2);
+	attrWindow2->setOffset(150);
 	attrWindow2->begin();
 	attrWindow2->end();
 	this->end();	
@@ -641,6 +648,7 @@ MultiAttributeItemWidget::MultiAttributeItemWidget( std::vector<SmartBody::SBObj
 	{
 		const char* attrWinName = (i<attrNameList.size())?attrNameList[i].c_str():NULL;
 		attrWin = new AttributeWindow(infoObjectList[i],x+speLen,y+speLen,w-speLen,h-speLen,attrWinName,false);
+		attrWin->setOffset(150);
 		attrWin->begin();
 		attrWin->end();
 	}

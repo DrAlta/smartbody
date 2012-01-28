@@ -388,7 +388,7 @@ public:
 	void setSoftEyes( bool val )	{
 		_soft_eyes_enabled = val;
 		if( eyelid_ct )	{
-			eyelid_ct->set_pass_through(!val);
+			eyelid_ct->setEnable(!val);
 		}
 	}
 	bool isSoftEyes( void ) const { return _soft_eyes_enabled; }

@@ -58,18 +58,18 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Doub
 	resourceTree->showroot(0);
 	pathTree = resourceTree->add("Paths");	
 	pathTree->user_data((void*)ITEM_DEFAULT);
-	treeItemList[ITEM_SEQ_PATH] = resourceTree->add(pathTree,"Sequence Paths");
-	treeItemList[ITEM_ME_PATH] = resourceTree->add(pathTree,"ME Paths");
+	treeItemList[ITEM_SEQ_PATH] = resourceTree->add(pathTree,"Script Paths");
+	treeItemList[ITEM_ME_PATH] = resourceTree->add(pathTree,"Motion Paths");
 	treeItemList[ITEM_AUDIO_PATH] = resourceTree->add(pathTree,"Audio Paths");
 	treeItemList[ITEM_MESH_PATH] = resourceTree->add(pathTree,"Mesh Paths");
 
-	treeItemList[ITEM_SEQ_FILES] = resourceTree->add("Seq Files");
+	treeItemList[ITEM_SEQ_FILES] = resourceTree->add("Scripts");
 
 	treeItemList[ITEM_SKELETON] = resourceTree->add("Skeletons");
-	treeItemList[ITEM_BONE_MAP] = resourceTree->add("Bone Map");
+	treeItemList[ITEM_BONE_MAP] = resourceTree->add("Character Maps");
 	treeItemList[ITEM_MOTION] =  resourceTree->add("Motions");	
 
-	treeItemList[ITEM_FACE_DEFINITION] = resourceTree->add("Face Definition");
+	treeItemList[ITEM_FACE_DEFINITION] = resourceTree->add("Face Definitions");
 	treeItemList[ITEM_EVENT_HANDLERS] = resourceTree->add("Event Handlers");
 
 	treeItemList[ITEM_PAWN] = resourceTree->add("Pawns");
@@ -389,14 +389,16 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefi
 	{
 		neutralMotionName = faceDefinition->getFaceNeutral()->getName();		
 	}
-	Fl_Tree_Item* neutralMotionTree = resourceTree->add(tree,"Neutral Motion");
+	Fl_Tree_Item* neutralMotionTree = resourceTree->add(tree,"Neutral Expression");
+	neutralMotionTree->close();
 	neutralMotionTree->user_data((void*)ITEM_NETURAL_MOTION);
 
 	Fl_Tree_Item* item = resourceTree->add(neutralMotionTree,neutralMotionName.c_str());
 	item->user_data((void*)ITEM_NETURAL_MOTION);
 
 	// update action unit tree
-	Fl_Tree_Item* auTree = resourceTree->add(tree,"AU Map");
+	Fl_Tree_Item* auTree = resourceTree->add(tree,"Action Units (AUs)");
+	auTree->close();
 	auTree->user_data((void*)ITEM_AU_MAP);
 	int numAUs = faceDefinition->getNumAUs();
 	for (int a = 0; a < numAUs; a++)
@@ -406,6 +408,7 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefi
 		std::string auName = "Au " + boost::lexical_cast<std::string>(faceDefinition->getAUNum(a));
 		
 		Fl_Tree_Item* auItem = resourceTree->add(auTree,auName.c_str());
+		auItem->close();
 		auItem->user_data((void*)ITEM_AU_MAP);
 		std::string auType = "bilateral:";
 		if (au->is_bilateral())
@@ -451,7 +454,8 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefi
 	}
 
 	// update viseme tree
-	Fl_Tree_Item* visemeTree = resourceTree->add(tree,"Viseme Map");	
+	Fl_Tree_Item* visemeTree = resourceTree->add(tree,"Visemes");	
+	visemeTree->close();
 	visemeTree->user_data((void*)ITEM_VISEME_MAP);
 	int numVisemes = faceDefinition->getNumVisemes();
 	for (int v = 0; v < numVisemes; v++)
