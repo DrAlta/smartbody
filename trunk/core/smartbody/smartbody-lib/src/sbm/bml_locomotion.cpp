@@ -203,10 +203,43 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 	// for facing angle, we need to execute with some delay
 	const char* facingAngle = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_FACING));
+	float facingAngleVal = (float) atof(facingAngle);
 	if (strcmp(facingAngle, "") != 0)
 	{
+		std::string facingAngleStr = facingAngle;
+		float facingOffset = 0.f;
+		// are there any offsets in the facing angle?
+		int posPos = facingAngleStr.find_last_of("+");
+		if (posPos != std::string::npos)
+		{
+			std::string facingOffsetStr = facingAngleStr.substr(posPos + 1);
+			facingOffset = (float) atof(facingOffsetStr.c_str());
+			facingAngleStr = facingAngleStr.substr(0, posPos);
+		}
+		else
+		{
+			int negPos = facingAngleStr.find_last_of("-");
+			if (negPos != std::string::npos)
+			{
+				std::string facingOffsetStr = facingAngleStr.substr(negPos + 1);
+				facingOffset = (float) -atof(facingOffsetStr.c_str());
+				facingAngleStr = facingAngleStr.substr(0, negPos);
+			}
+		}
+
+		// does the facing angle match a pawn?
+		SbmPawn* facingPawn = mcu->getPawn(facingAngleStr);
+		if (facingPawn)
+		{
+			float x, y, z, h, p, r;
+			facingPawn->get_world_offset(x, y, z, h, p, r);
+			facingAngleVal = h + facingOffset;
+		}	
+
 		std::stringstream command;
-		command << "steer facing " << c->getName() << " " << (float)atof(facingAngle);
+
+		
+		command << "steer facing " << c->getName() << " " << facingAngleVal;
 		srCmdSeq *seq = new srCmdSeq();
 		seq->insert(float(mcu->time + mcu->time_dt), command.str().c_str());
 		mcu->execute_seq(seq);
