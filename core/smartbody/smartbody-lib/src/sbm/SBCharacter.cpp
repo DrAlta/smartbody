@@ -263,6 +263,8 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 						gazeBehavior->setFadingIn(gazeCt->isFadingIn());
 						gazeBehavior->setFadingOut(gazeCt->isFadingOut());
 						gazeBehavior->setFadedOut(gazeCt->isFadedOut());
+						gazeBehavior->setHandle(gazeCt->handle());
+
 						_curBehaviors.push_back(gazeBehavior);
 						break;
 					}

@@ -49,12 +49,15 @@ class GazeBehavior : public SBBehavior
 		bool isFadingIn();
 		bool isFadingOut();
 		bool isFadedOut();
+		void setHandle(const std::string& handle);
+		const std::string& getHandle();
 
 	protected:
 		std::string _target;
 		bool _fadingIn;
 		bool _fadingOut;
 		bool _fadedOut;
+		std::string _handle;
 
 };
 

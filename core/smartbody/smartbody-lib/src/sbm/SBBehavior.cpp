@@ -84,6 +84,15 @@ bool GazeBehavior::isFadedOut()
 	return _fadedOut;
 }
 
+void GazeBehavior::setHandle(const std::string& handle)
+{
+	_handle = handle;
+}
+
+const std::string& GazeBehavior::getHandle()
+{
+	return _handle;
+}
 
 
 LocomotionBehavior::LocomotionBehavior()
