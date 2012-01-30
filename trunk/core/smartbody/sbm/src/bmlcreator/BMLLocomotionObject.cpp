@@ -27,7 +27,8 @@ BMLLocomotionObject::BMLLocomotionObject() : BMLObject()
 	createStringAttribute("sbm:scootaccel", "", "", "Basic", 80, false, false, false, "The scooting acceleration, default setting is 200");
 	createStringAttribute("sbm:angleaccel", "", "", "Basic", 90, false, false, false, "The angle speed acceleration, default setting is 450");
 	createStringAttribute("sbm:numsteps", "", "", "Basic", 100, false, false, false, "Number of steps, only available if manner is sbm:step, default setting is 1");
-}
+	createStringAttribute("start", "", "", "Basic", 200, false, false, false, "Time when locomotion starts.");
+	}
 
 BMLLocomotionObject::~BMLLocomotionObject()
 {
