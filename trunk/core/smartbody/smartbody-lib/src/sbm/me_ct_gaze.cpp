@@ -1288,3 +1288,18 @@ void MeCtGaze::setStart(int value)
 //	LOG("START SET TO %d ON %s", value, this->name());
 	foostart = value;
 }
+
+bool MeCtGaze::isFadingIn()
+{
+	return fading_mode ==FADING_MODE_IN;
+}
+
+bool MeCtGaze::isFadingOut()
+{
+	return fading_mode == FADING_MODE_OUT;
+}
+
+bool MeCtGaze::isFadedOut()
+{
+	return fading_normal == 0.0f;
+}

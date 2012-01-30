@@ -837,7 +837,10 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 	boost::python::class_<GazeBehavior, boost::python::bases<SBBehavior> >("GazeBehavior")
 		//.def(boost::python::init<std::string, std::string>())
 		.def("getGazeTarget", &GazeBehavior::getGazeTarget, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the gaze target.")
-	;
+		.def("isFadingIn", &GazeBehavior::isFadingIn, "Returns true if the gaze controller is currently fading in.")
+		.def("isFadingOut", &GazeBehavior::isFadingOut, "Returns true if the gaze controller is currently fading out.")
+		.def("isFadedOut", &GazeBehavior::isFadedOut, "Returns true if the gaze controller is currently faded out and thus not active.")
+;
 
 	boost::python::class_<LocomotionBehavior, boost::python::bases<SBBehavior> >("LocomotionBehavior")
 		//.def(boost::python::init<std::string, std::string>())

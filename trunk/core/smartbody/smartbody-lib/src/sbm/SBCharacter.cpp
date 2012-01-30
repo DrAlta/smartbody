@@ -260,6 +260,9 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 					{
 						GazeBehavior* gazeBehavior = new GazeBehavior();
 						gazeBehavior->setGazeTarget(pawn->getName());
+						gazeBehavior->setFadingIn(gazeCt->isFadingIn());
+						gazeBehavior->setFadingOut(gazeCt->isFadingOut());
+						gazeBehavior->setFadedOut(gazeCt->isFadedOut());
 						_curBehaviors.push_back(gazeBehavior);
 						break;
 					}
