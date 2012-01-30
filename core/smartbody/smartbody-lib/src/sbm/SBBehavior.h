@@ -43,10 +43,18 @@ class GazeBehavior : public SBBehavior
 
 		virtual void setGazeTarget(const std::string& target);
 		virtual const std::string& getGazeTarget();
+		void setFadingIn(bool val);
+		void setFadingOut(bool val);
+		void setFadedOut(bool val);
+		bool isFadingIn();
+		bool isFadingOut();
+		bool isFadedOut();
 
 	protected:
 		std::string _target;
-
+		bool _fadingIn;
+		bool _fadingOut;
+		bool _fadedOut;
 
 };
 

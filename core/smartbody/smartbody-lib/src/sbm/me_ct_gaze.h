@@ -404,6 +404,10 @@ class MeCtGaze : public SmartBody::SBController	{
 public:
 		int getStart();
 		void setStart(int val);
+
+		bool isFadingIn();
+		bool isFadingOut();
+		bool isFadedOut();
 };
 
 

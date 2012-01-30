@@ -54,6 +54,38 @@ const std::string& GazeBehavior::getGazeTarget()
 	return _target;
 }
 
+void GazeBehavior::setFadingIn(bool val)
+{
+	_fadingIn = val;
+}
+
+void GazeBehavior::setFadingOut(bool val)
+{
+	_fadingOut = val;
+}
+
+void GazeBehavior::setFadedOut(bool val)
+{
+	_fadedOut = val;
+}
+
+bool GazeBehavior::isFadingIn()
+{
+	return _fadingIn;
+}
+
+bool GazeBehavior::isFadingOut()
+{
+	return _fadingOut;
+}
+
+bool GazeBehavior::isFadedOut()
+{
+	return _fadedOut;
+}
+
+
+
 LocomotionBehavior::LocomotionBehavior()
 {
 	_type = "locomotion";
