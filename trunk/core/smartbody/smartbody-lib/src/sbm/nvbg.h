@@ -14,7 +14,15 @@ public:
 		virtual void objectEvent(std::string character, std::string name, bool isAnimate, SrVec position, SrVec velocity, SrVec relativePosition, SrVec relativeVelocity);
 		virtual bool execute(std::string character, std::string to, std::string messageId, std::string xml);
 		virtual void notify(SmartBody::SBSubject* subject);
-		virtual void notifyLocal(SmartBody::SBAttribute* atribute);
+		virtual void notifyLocal(std::string name);
+
+		virtual void notifyAction(std::string name);
+		virtual void notifyBool(std::string name, bool val);
+		virtual void notifyInt(std::string name, int val);
+		virtual void notifyDouble(std::string name, double val);
+		virtual void notifyString(std::string name, std::string val);
+		virtual void notifyVec3(std::string name, SrVec val);
+		virtual void notifyMatrix(std::string name, SrMat val);
 
 };
 
