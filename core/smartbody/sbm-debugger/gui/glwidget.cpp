@@ -2,6 +2,7 @@
 #include "vhcl.h"
 
 #include "glwidget.h"
+#include "SbmDebuggerForm.h"
 
 #include <math.h>
 
@@ -70,9 +71,9 @@ void GLWidget::sceneTreeCurrentItemChanged(QTreeWidgetItem * current, QTreeWidge
    if (!current)
       return;
 
-   Character* character = FindCharacterFromTreeSelection(current);
-   if (character)
-      SetSelectedObject(character, character->FindJoint(current->text(0).toStdString()));
+   Pawn* entity = SbmDebuggerForm::FindSbmEntityFromTreeSelection(current, m_pScene);
+   if (entity)
+      SetSelectedObject(entity, entity->FindJoint(current->text(0).toStdString()));
 }
 
 void GLWidget::sceneTreeItemDoubleClicked(QTreeWidgetItem * item, int column)
@@ -80,29 +81,13 @@ void GLWidget::sceneTreeItemDoubleClicked(QTreeWidgetItem * item, int column)
    if (!item)
       return;
    
-   Character* character = FindCharacterFromTreeSelection(item);
-   if (character)
+   Pawn* entity = SbmDebuggerForm::FindSbmEntityFromTreeSelection(item, m_pScene);
+   if (entity)
    {
-      SetSelectedObject(character, character->FindJoint(item->text(0).toStdString()));
-      Vector3 pos = character->GetWorldPosition();
+      SetSelectedObject(entity, entity->FindJoint(item->text(0).toStdString()));
+      Vector3 pos = entity->GetWorldPosition();
       m_Camera.LookAt(QVector3D(pos.x, pos.y, pos.z));
    }
-}
-
-Character* GLWidget::FindCharacterFromTreeSelection(QTreeWidgetItem* treeWidget)
-{
-   QTreeWidgetItem* parent = treeWidget;
-   while (parent)
-   {
-      for (unsigned int i = 0; i < m_pScene->m_characters.size(); i++)
-      {
-         if (parent->text(0).toStdString() == m_pScene->m_characters[i].m_name)
-            return &m_pScene->m_characters[i];     
-      }
-      parent = parent->parent();
-   }
-
-   return NULL;
 }
 
 void GLWidget::initializeGL()
@@ -161,6 +146,15 @@ void GLWidget::StartPicking()
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
+
+   //if (!m_pScene->m_rendererIsRightHanded)
+   //{
+   //   // this fixes the mirroring problem in left handed coordinate systems
+   //   QMatrix4x4 mat;
+   //   mat.setToIdentity();
+   //   mat.setColumn(0, QVector4D(-1, 0, 0, 0));
+   //   glMultMatrixd(mat.data());
+   //}
 
 	gluPickMatrix(lastPos.x(), viewport[3] - lastPos.y(), 10, 10, viewport);
 	ratio = (viewport[2] + 0.0) / viewport[3];
@@ -409,6 +403,7 @@ void GLWidget::DrawJoint(Joint* joint)
       rotationMat = rotationMat.transposed();
       glMultMatrixd(rotationMat.data());
       glBegin(GL_LINES);
+         glColor3f(0, 0, 0);
          glVertex3f(0, 0, 0);
          glVertex3f(-jointPos.x, -jointPos.y, -jointPos.z);  
       glEnd();

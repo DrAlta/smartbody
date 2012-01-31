@@ -93,7 +93,6 @@ private:
     GLuint selectBuf[SELECT_BUFF_SIZE];
 
     virtual void timerEvent(QTimerEvent * event);
-    Character* FindCharacterFromTreeSelection(QTreeWidgetItem* treeWidget);
 
     // picking Functions
     void StartPicking();

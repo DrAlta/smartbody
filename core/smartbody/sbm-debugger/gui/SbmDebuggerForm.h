@@ -19,6 +19,7 @@ class SbmDebuggerForm : public QMainWindow
      SbmDebuggerForm(QWidget *parent = 0);
      ~SbmDebuggerForm();
      static QTreeWidgetItem* FindTreeWidgetItemByName(const QTreeWidgetItem* subTree, const std::string& name);
+     static Pawn* FindSbmEntityFromTreeSelection(const QTreeWidgetItem* treeWidget, Scene* pScene);
 
  private slots:
        void ShowConnectDialog();
@@ -26,7 +27,7 @@ class SbmDebuggerForm : public QMainWindow
        void ShowResourceDialog();
        void ShowCommandDialog();
        void Disconnect();
-       //void sceneTreeItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous);
+       void sceneTreeItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous);
        void SetSelectedSceneTreeItem(const Pawn* selectedObj, const Joint* selectedJoint);
 
  private:
@@ -40,6 +41,13 @@ class SbmDebuggerForm : public QMainWindow
     {
       Characters,
       Pawns,
+    };
+
+    enum SceneTreeColumns
+    {
+      Entity,
+      Position,
+      Rotation,
     };
 
     void InitSignalsSlots();
