@@ -26,7 +26,7 @@ public:
    Vector4(double _x, double _y, double _z, double _w);
    virtual ~Vector4() {}
 
-   Vector4 operator*(const Vector4& other)
+   Vector4 operator*(const Vector4& other) const
    {
       Vector4 retval;
       retval.x = x * other.x;
@@ -60,7 +60,7 @@ public:
    Vector3() {}
    virtual ~Vector3() {}
 
-   Vector3 operator+(const Vector3& other)
+   Vector3 operator+(const Vector3& other) const
    {
       Vector3 retval;
       retval.x = x + other.x;
@@ -86,7 +86,7 @@ public:
       return retval;
    }
 
-   Vector3 operator*(float multiplier)
+   Vector3 operator*(float multiplier) const
    {
       Vector3 retval;
       retval.x = x * multiplier;
@@ -143,8 +143,13 @@ public:
    Joint();
    virtual ~Joint();
 
-   Vector3 GetWorldPosition();
-   Vector4 GetWorldRotation();
+   Vector3 GetWorldPosition() const;
+   Vector3 GetLocalPosition() const;
+   Vector4 GetWorldRotation() const;
+   Vector4 GetLocalRotation() const;
+
+   std::string GetPositionAsString(bool worldPos) const;
+   std::string GetRotationAsString(bool worldRot) const;
 };
 
 

@@ -43,8 +43,13 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
   // setup scene tree
   ui.sceneTree->insertTopLevelItem(Characters, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Characters"))));
   ui.sceneTree->insertTopLevelItem(Pawns, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Pawns"))));
-  ui.sceneTree->setHeaderLabel(QString("Entities"));
-  //ui.sceneTree->setHeaderLabels(QStringList(QString("Pawns"));
+  //ui.sceneTree->setHeaderLabel(QString("Entities"));
+
+  QStringList headers;
+  headers.append("Entities");
+  headers.append("Position");
+  headers.append("Rotation");
+  ui.sceneTree->setHeaderLabels(headers);
   
   InitSignalsSlots();
 
@@ -77,8 +82,8 @@ void SbmDebuggerForm::InitSignalsSlots()
              m_pGLWidget, SLOT(sceneTreeCurrentItemChanged(QTreeWidgetItem*, QTreeWidgetItem *)));
    connect(ui.sceneTree, SIGNAL(itemDoubleClicked (QTreeWidgetItem*, int)),
              m_pGLWidget, SLOT(sceneTreeItemDoubleClicked(QTreeWidgetItem*, int)));
-   //connect(ui.sceneTree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
-   //          this, SLOT(sceneTreeItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
+   connect(ui.sceneTree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
+             this, SLOT(sceneTreeItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 
    // Renderer
    connect(m_pGLWidget, SIGNAL(JointPicked(const Pawn*, const Joint*)),
@@ -161,6 +166,30 @@ void SbmDebuggerForm::Disconnect()
    c.Disconnect();
 }
 
+void SbmDebuggerForm::sceneTreeItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous)
+{
+   // clear out the unselected data
+   if (previous)
+   {
+      previous->setText(Position, "");
+      previous->setText(Rotation, "");
+   } 
+
+   if (current)
+   {
+      Pawn* entity = FindSbmEntityFromTreeSelection(current, c.GetScene());
+      if (entity)
+      {
+         Joint* selectedJoint = entity->FindJoint(current->text(Entity).toStdString());
+         if (selectedJoint)
+         {
+            current->setText(Position, selectedJoint->GetPositionAsString(false).c_str());
+            current->setText(Rotation, selectedJoint->GetRotationAsString(false).c_str());
+         }
+      }
+   }
+}
+
 void SbmDebuggerForm::SetSelectedSceneTreeItem(const Pawn* selectedObj, const Joint* selectedJoint)
 {
    if (!selectedObj)
@@ -172,11 +201,11 @@ void SbmDebuggerForm::SetSelectedSceneTreeItem(const Pawn* selectedObj, const Jo
    if (rootNameItem && selectedJoint)
    {
       // try to find the joint that is selected under this specific character
-      QTreeWidgetItem* joint = FindTreeWidgetItemByName(rootNameItem, selectedJoint->m_name);
-      if (joint)
-      {
+      QTreeWidgetItem* jointWidget = FindTreeWidgetItemByName(rootNameItem, selectedJoint->m_name);
+      if (jointWidget)
+      {  
          // select the specific joint
-         ui.sceneTree->setCurrentItem(joint);
+         ui.sceneTree->setCurrentItem(jointWidget);
       }
       else
       {
@@ -206,6 +235,27 @@ QTreeWidgetItem* SbmDebuggerForm::FindTreeWidgetItemByName(const QTreeWidgetItem
       {
          return retVal;
       }
+   }
+
+   return NULL;
+}
+
+Pawn* SbmDebuggerForm::FindSbmEntityFromTreeSelection(const QTreeWidgetItem* treeWidget, Scene* pScene)
+{
+   const QTreeWidgetItem* parent = treeWidget;
+   while (parent)
+   {
+      for (unsigned int i = 0; i < pScene->m_characters.size(); i++)
+      {
+         if (parent->text(0).toStdString() == pScene->m_characters[i].m_name)
+            return &pScene->m_characters[i];
+      }
+      for (unsigned int i = 0; i < pScene->m_pawns.size(); i++)
+      {
+         if (parent->text(0).toStdString() == pScene->m_pawns[i].m_name)
+            return &pScene->m_pawns[i];
+      }
+      parent = parent->parent();
    }
 
    return NULL;

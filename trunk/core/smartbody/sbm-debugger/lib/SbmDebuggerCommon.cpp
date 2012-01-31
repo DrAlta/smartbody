@@ -68,7 +68,7 @@ void Vector4::ToAxisAngle(Vector3& axis, float& angle)
 }
 
 
-Vector3 Joint::GetWorldPosition()
+Vector3 Joint::GetWorldPosition() const
 {
    Vector3 worldPosition = posOrig + pos;
    Joint* parent = m_parent;
@@ -81,7 +81,12 @@ Vector3 Joint::GetWorldPosition()
    return worldPosition;
 }
 
-Vector4 Joint::GetWorldRotation()
+Vector3 Joint::GetLocalPosition()  const
+{
+   return posOrig + pos;
+}
+
+Vector4 Joint::GetWorldRotation()  const
 {
    Vector4 worldRotation = rotOrig * rot;
    Joint* parent = m_parent;
@@ -92,6 +97,23 @@ Vector4 Joint::GetWorldRotation()
    }
 
    return worldRotation;
+}
+
+Vector4 Joint::GetLocalRotation()  const
+{
+   return rotOrig * rot;
+}
+
+std::string Joint::GetPositionAsString(bool worldPos)  const
+{
+   Vector3 pos = worldPos ? GetWorldPosition() : GetLocalPosition();
+   return vhcl::Format("x: %.2f y: %.2f z: %.2f", pos.x, pos.y, pos.z);
+}
+
+std::string Joint::GetRotationAsString(bool worldRot)  const
+{
+   Vector4 rot = worldRot ? GetWorldRotation() : GetLocalRotation();
+   return vhcl::Format("w: %.2f x: %.2f y: %.2f z: %.2f", rot.w, rot.x, rot.y, rot.z);
 }
 
 Vector3 Pawn::GetWorldPosition() const

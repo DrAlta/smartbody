@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Thu Jan 26 15:06:46 2012
+** Created: Thu Jan 26 18:29:51 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -142,6 +142,8 @@ public:
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         sceneTree = new QTreeWidget(tab);
         QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
+        __qtreewidgetitem->setText(2, QString::fromUtf8("3"));
+        __qtreewidgetitem->setText(1, QString::fromUtf8("2"));
         __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
         sceneTree->setHeaderItem(__qtreewidgetitem);
         sceneTree->setObjectName(QString::fromUtf8("sceneTree"));
@@ -154,8 +156,9 @@ public:
         sceneTree->setEditTriggers(QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed);
         sceneTree->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
         sceneTree->setRootIsDecorated(true);
-        sceneTree->setColumnCount(1);
+        sceneTree->setColumnCount(3);
         sceneTree->header()->setVisible(true);
+        sceneTree->header()->setCascadingSectionResizes(false);
 
         horizontalLayout_4->addWidget(sceneTree);
 
