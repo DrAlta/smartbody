@@ -6,15 +6,24 @@ from NewNVBG.NVBG import *
 p = NVBG()
 class N(Nvbg):
 
-	def notify(self, subject):
-		if (subject is SBAttribute):
-                        attrName = subject.getName()
-                        if (name == "enable"):
-                                if (subject.getValue()):
-                                        print "enabled!"
-                                else:
-                                        print "disabled!"
+        def notifyAction(self, name):
+                print "In notifyAction, attribute is " + name
 		return
+
+	def notifyBool(self, name, val):
+                print "In notifyBool, attribute is " + name
+                if (name == "enable"):
+                        if (val is True):
+                                print "enabled!"
+                        else:
+                                print "disabled!"
+		return
+
+	def notifyString(self, name, val):
+                print "In notifyString, attribute is " + name
+                if (name == "mylist"):
+                        print val
+		return	
 
 	def execute(self, character, recipient, messageId, xml):
 		bmlstr = p.process_speech(character,recipient,messageId, xml)

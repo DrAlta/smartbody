@@ -49,22 +49,126 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 		return Nvbg::execute(character, to, messageId, xml);
 	}
 
-	virtual void notifyLocal(SmartBody::SBAttribute* attribute)
+	virtual void notifyAction(std::string name)
 	{
-		if (boost::python::override o = this->get_override("notifyLocal"))
+		if (boost::python::override o = this->get_override("notifyAction"))
 		{
 			try {
-				o(attribute);
+				o(name);
 			} catch (...) {
 				PyErr_Print();
 			}
 		}
 	}
 
-	void default_notifyLocal(SmartBody::SBAttribute* attribute)
+	void default_notifyAction(std::string name)
 	{
-		Nvbg::notifyLocal(attribute);
+		notifyLocal(name);
 	}
+
+	virtual void notifyBool(std::string name, bool val)
+	{
+		if (boost::python::override o = this->get_override("notifyBool"))
+		{
+			try {
+				o(name, val);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+	}
+
+	void default_notifyBool(std::string name, bool val)
+	{
+		notifyLocal(name);
+	}
+
+	virtual void notifyInt(std::string name, int val)
+	{
+		if (boost::python::override o = this->get_override("notifyInt"))
+		{
+			try {
+				o(name, val);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+	}
+
+	void default_notifyInt(std::string name, int val)
+	{
+		notifyLocal(name);
+	}
+
+	virtual void notifyDouble(std::string name, double val)
+	{
+		if (boost::python::override o = this->get_override("notifyDouble"))
+		{
+			try {
+				o(name, val);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+	}
+
+	void default_notifyDouble(std::string name, double val)
+	{
+		notifyLocal(name);
+	}
+
+	virtual void notifyString(std::string name, std::string val)
+	{
+		if (boost::python::override o = this->get_override("notifyString"))
+		{
+			try {
+				o(name, val);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+	}
+
+	void default_notifyString(std::string name, std::string val)
+	{
+		notifyLocal(name);
+	}
+
+	virtual void notifyVec3(std::string name, SrVec val)
+	{
+		if (boost::python::override o = this->get_override("notifyVec3"))
+		{
+			try {
+				o(name, val);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+	}
+
+	void default_notifyVec3(std::string name, SrVec val)
+	{
+		notifyLocal(name);
+	}
+
+	virtual void notifyMatrix(std::string name, SrMat val)
+	{
+		if (boost::python::override o = this->get_override("notifyMatrix"))
+		{
+			try {
+				o(name, val);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+	}
+
+	void default_notifyMatrix(std::string name, SrMat val)
+	{
+		notifyLocal(name);
+	}
+
+
 };
 
 
@@ -988,8 +1092,14 @@ boost::python::class_<SBReach>("SBReach")
 #ifndef __ANDROID__
 	boost::python::class_<NvbgWrap, boost::python::bases<SBObject>, boost::noncopyable>("Nvbg")
 		.def("objectEvent", &Nvbg::objectEvent, &NvbgWrap::default_objectEvent, "An event indicating that an object of interest is present.")
-		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor.")
-		.def("notifyLocal", &Nvbg::notifyLocal, &NvbgWrap::default_notifyLocal, "Notifies NVBG processor.")
+		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor of an action attribute")
+		.def("notifyAction", &Nvbg::notifyAction, &NvbgWrap::default_notifyAction, "Notifies NVBG processor of a bool attribute.")
+		.def("notifyBool", &Nvbg::notifyBool, &NvbgWrap::default_notifyBool, "Notifies NVBG processor of a bool attribute")
+		.def("notifyInt", &Nvbg::notifyInt, &NvbgWrap::default_notifyInt, "Notifies NVBG processor of an int attribute")
+		.def("notifyDouble", &Nvbg::notifyDouble, &NvbgWrap::default_notifyDouble, "Notifies NVBG processor of a double attribute")
+		.def("notifyString", &Nvbg::notifyString, &NvbgWrap::default_notifyString, "Notifies NVBG processor of a string attribute")
+		.def("notifyVec3", &Nvbg::notifyVec3, &NvbgWrap::default_notifyVec3, "Notifies NVBG processor of a vec3 attribute.")
+		.def("notifyMatrix", &Nvbg::notifyMatrix, &NvbgWrap::default_notifyMatrix, "Notifies NVBG processor of a matrix attribute.")
 		;
 
 	boost::python::class_<SBScriptWrap, boost::noncopyable>("SBScript")
