@@ -101,6 +101,7 @@ void SBSteerManager::start()
 	if (mcu._scene->getSteerManager()->getEngineDriver()->isInitialized())
 	{
 		LOG("STEERSIM ALREADY STARTED");
+		return;
 	}
 
 	SteerLib::SimulationOptions* steerOptions = new SteerLib::SimulationOptions();
