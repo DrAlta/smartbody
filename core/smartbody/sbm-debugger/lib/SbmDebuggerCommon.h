@@ -32,7 +32,7 @@ public:
       retval.x = x * other.x;
       retval.y = y * other.y;
       retval.z = z * other.z;
-      retval.w = z * other.w;
+      retval.w = w * other.w;
       return retval;
    }
 
