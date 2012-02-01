@@ -29,6 +29,7 @@
 #include <xercesc/util/XMLStringTokenizer.hpp>
 
 #include "bml_gaze.hpp"
+#include "bml_event.hpp"
 
 #include "mcontrol_util.h"
 #include "me_ct_gaze.h"
@@ -572,14 +573,24 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		// assuming we are freeing this little angel...
 		// gaze_ct->recurrent = false...
 		if (gaze_ct)
-			gaze_ct->set_fade_out( gaze_fade_out_ival );
+		{
+			if (!gaze_ct->isFadingOut())
+				gaze_ct->set_fade_out( gaze_fade_out_ival );
+			else	// silence ignore if it's already fading out now
+				return BehaviorRequestPtr( new EventRequest(unique_id, "", "", behav_syncs, ""));
+		}
 	}
 
 	if( gaze_fade_in_ival >= 0.0f )	{
 		// assuming we are freeing this little angel...
 		// gaze_ct->recurrent = false...
 		if (gaze_ct)
-			gaze_ct->set_fade_in( gaze_fade_in_ival );
+		{
+			if (!gaze_ct->isFadingIn())
+				gaze_ct->set_fade_in( gaze_fade_in_ival );
+			else	// silence ignore if it's already fading in now
+				return BehaviorRequestPtr( new EventRequest(unique_id, "", "", behav_syncs, ""));
+		}
 	}
 
 	if( LOG_GAZE_PARAMS ) {
