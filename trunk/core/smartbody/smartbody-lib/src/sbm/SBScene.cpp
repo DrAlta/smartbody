@@ -120,6 +120,10 @@ SBPawn* SBScene::createPawn(std::string pawnName)
 	else
 	{
 		SBPawn* pawn = new SBPawn(pawnName.c_str());
+		SBSkeleton* skeleton = new SBSkeleton();
+		pawn->setSkeleton(skeleton);
+		SkJoint* joint = skeleton->add_joint(SkJoint::TypeQuat);
+		joint->setName("world_offset");
 		mcu.registerPawn(pawn);
 		return pawn;
 	}
@@ -132,7 +136,7 @@ void SBScene::removeCharacter(std::string charName)
 	if (character)
 	{
 		mcu.unregisterCharacter(character);
-		SbmCharacter::remove_from_scene(charName.c_str());
+		delete character;
 	}	
 }
 
