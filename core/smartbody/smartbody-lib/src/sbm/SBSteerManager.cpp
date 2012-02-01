@@ -31,7 +31,14 @@ SBSteerManager::SBSteerManager() : SBService()
 
 SBSteerManager::~SBSteerManager()
 {
+	std::map<std::string, SBSteerAgent*>::iterator iter = _steerAgents.begin();
+	for (; iter != _steerAgents.end(); iter++)
+	{
+		delete iter->second;
+	}
+	_steerAgents.clear();
 
+	// TODO: boundaryObstacles
 }
 
 SteerSuiteEngineDriver* SBSteerManager::getEngineDriver()
@@ -322,7 +329,7 @@ SBSteerAgent* SBSteerManager::createSteerAgent(std::string name)
 	if (iter != _steerAgents.end())
 	{
 		LOG("Steer agent with name %s already exists.", name.c_str());
-		return NULL;
+		return iter->second;
 	}
 	_steerAgents.insert(std::pair<std::string, SBSteerAgent*>(name, agent));
 	return agent;

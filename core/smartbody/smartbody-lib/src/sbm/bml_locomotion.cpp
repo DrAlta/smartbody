@@ -131,7 +131,11 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	}
 	std::stringstream command;
 	SbmCharacter* c = mcu->getCharacter(request->actor->getName());
-
+	if (!c->steeringAgent)
+	{
+		LOG("Steering Agent not attached. Check initialization");
+		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));	
+	}
 	c->steeringAgent->steppingMode = false;
 	bool stepMode = false;
 	bool stepTargetMode = false;
