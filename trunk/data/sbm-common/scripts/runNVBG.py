@@ -8,6 +8,19 @@ class N(Nvbg):
 
         def notifyAction(self, name):
                 print "In notifyAction, attribute is " + name
+                if (name == "play"):
+                        dialogStr = Mynvbg.getAttribute("dialog").getValue()
+                        if (dialogStr == ""):
+                                print "dialog not selected, play default one"
+                                p.speak()
+                        else:
+                                p.speak(dialogStr)
+
+                if (name == "reset"):
+                        import NewNVBG.nvbg
+                        import NewNVBG.brainstem
+                        nvbg_engine = knowledge_engine.engine(NewNVBG.nvbg)
+                        brainstem_engine = knowledge_engine.engine(NewNVBG.brainstem)
 		return
 
 	def notifyBool(self, name, val):
@@ -43,15 +56,15 @@ Mynvbg = N()
 d = scene.getCharacter("utah")
 d.setNvbg(Mynvbg)
 Mynvbg.createBoolAttribute("enable", True, True, "nvbgs", 10, False, False, False, "Enables or disables NVBG.")
-Mynvbg.createActionAttribute("doSomething", True, "nvbgs", 20, False, False, False, "Does something...")
-a = Mynvbg.createStringAttribute("mylist", "", True, "nvbgs", 50, False, False, False, "Does something...")
+Mynvbg.createActionAttribute("reset", True, "nvbgs", 20, False, False, False, "Reload pyke")
+a = Mynvbg.createStringAttribute("dialog", "", True, "nvbgs", 50, False, False, False, "Dialog")
 v = StringVec()
-v.append("one")
-v.append("two")
-v.append("three")
-v.append("four")
-v.append("five")
+v.append("yes")
+v.append("yes this is a good idea")
+v.append("no i do not like it")
 a.setValidValues(v)
+Mynvbg.createActionAttribute("play", True, "nvbgs", 60, False, False, False, "Play the chosen dialog")
+
 
 
  
