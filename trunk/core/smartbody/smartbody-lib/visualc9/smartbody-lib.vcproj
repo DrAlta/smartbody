@@ -1800,6 +1800,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\bml_gesture.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\bml_gesture.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\bml_grab.cpp"
 				>
 			</File>
@@ -3713,6 +3721,22 @@
 			</File>
 			<File
 				RelativePath="..\src\sbm\SBFaceDefinition.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBGestureMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBGestureMap.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBGestureMapManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBGestureMapManager.h"
 				>
 			</File>
 			<File
