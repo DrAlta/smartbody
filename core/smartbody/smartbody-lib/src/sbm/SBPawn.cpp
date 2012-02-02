@@ -1,4 +1,7 @@
 #include "SBPawn.h"
+#include <sbm/mcontrol_util.h>
+#include <sbm/mcontrol_callbacks.h>
+
 
 namespace SmartBody {
 
@@ -24,6 +27,13 @@ SBPawn::SBPawn(const char* name) : SbmPawn(name)
 
 SBPawn::~SBPawn()
 {
+}
+
+
+void SBPawn::addMesh(std::string mesh)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	mcu_load_mesh( getName().c_str(), mesh.c_str(), &mcu );
 }
 
 SBSkeleton* SBPawn::getSkeleton()

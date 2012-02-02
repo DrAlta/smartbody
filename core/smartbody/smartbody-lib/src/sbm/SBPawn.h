@@ -12,6 +12,8 @@ class SBPawn : public SbmPawn
 		SBPawn();
 		SBPawn( const char* name );
 		~SBPawn();
+
+		virtual void addMesh(std::string mesh);
 		
 		virtual SBSkeleton* getSkeleton();
 		virtual void setSkeleton(SBSkeleton* skel);
