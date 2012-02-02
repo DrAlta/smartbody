@@ -143,6 +143,11 @@ void SBScene::removeCharacter(std::string charName)
 		vrProcEnd_msg += getName();
 		mcu.vhmsg_send( vrProcEnd_msg.c_str() );
 
+
+		// remove the connected steering object for steering space
+		if (this->getSteerManager())
+			this->getSteerManager()->removeSteerAgent(charName);
+
 		delete character;
 	}	
 }

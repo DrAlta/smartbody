@@ -1810,6 +1810,83 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	return( CMD_FAILURE );
 }
 
+
+int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p, const char* option)
+{
+	// make sure the pawn exists
+	SbmPawn* pawn = mcu_p->_scene->getPawn(pawnName);
+	if (!pawn)
+	{
+		LOG("No pawn named '%s' found, mesh from '%s' not loaded.", pawnName, obj_file);
+		return CMD_FAILURE;
+	}
+	// Here, detect which type of file it is
+	std::string ext = boost::filesystem2::extension(obj_file);
+	std::string file = boost::filesystem::basename(obj_file);	
+	std::vector<SrModel*> meshModelVec;
+	if (ext == ".obj" || ext == ".OBJ")
+	{
+		SrModel* objModel = new SrModel();
+		if (!objModel->import_obj(obj_file))
+		{
+			LOG( "Could not load mesh from file '%s'", obj_file);
+			delete objModel;
+			return( CMD_FAILURE );
+		}
+		meshModelVec.push_back(objModel);
+	}
+	if (ext == ".dae" || ext == ".DAE" || ext == ".xml" || ext == ".XML")
+	{
+		DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file);
+		if (geometryNode)
+		{
+			// first from library visual scene retrieve the material id to name mapping (TODO: needs reorganizing the assets management)
+			std::map<std::string, std::string> materialId2Name;
+			DOMNode* visualSceneNode = ParserOpenCOLLADA::getNode("library_visual_scenes", obj_file);
+			if (!visualSceneNode)
+				LOG("mcu_character_load_mesh ERR: .dae file doesn't contain correct geometry information.");
+			SkSkeleton skeleton;
+			SkMotion motion;
+			int order;
+			ParserOpenCOLLADA::parseLibraryVisualScenes(visualSceneNode, skeleton, motion, 1.0, order, materialId2Name);
+
+			// get picture id to file mapping
+			std::map<std::string, std::string> pictureId2File;
+			DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", obj_file);
+			if (imageNode)
+				ParserOpenCOLLADA::parseLibraryImages(imageNode, pictureId2File);
+
+			// start parsing mateiral
+			std::map<std::string, std::string> effectId2MaterialId;
+			DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", obj_file);
+			if (materialNode)
+				ParserOpenCOLLADA::parseLibraryMaterials(materialNode, effectId2MaterialId);
+
+			// start parsing effect
+			SrArray<SrMaterial> M;
+			SrStringArray mnames;
+			std::map<std::string,std::string> mtlTextMap;
+			std::map<std::string,std::string> mtlTextBumpMap;
+			DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", obj_file);
+			if (effectNode)
+			{
+				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap);
+			}
+
+			// parsing geometry
+			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f);
+		}
+		else
+		{
+			LOG( "Could not load mesh from file '%s'", obj_file);
+			return CMD_FAILURE;
+		}
+	}
+
+	return CMD_SUCCESS;
+
+}
+
 ///////////////////////////////////////////////////////////////////
 
 int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHandle *mcu_p, const char* option)
