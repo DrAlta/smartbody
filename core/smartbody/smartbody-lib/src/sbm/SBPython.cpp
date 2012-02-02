@@ -458,6 +458,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getSteerManager", &SBScene::getSteerManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the steer manager object.")
 		.def("getServiceManager", &SBScene::getServiceManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the service manager object.")
 		.def("getPhysicsManager", &SBScene::getPhysicsManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the physics manager object.")
+		.def("getGestureMapManager", &SBScene::getGestureMapManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the gesture map manager object.")
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
 	;
 
@@ -952,6 +953,11 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getLocomotionTarget", &LocomotionBehavior::getLocomotionTarget, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the locomotion target as a vector.")
 	;
 
+	boost::python::class_<PostureBehavior, boost::python::bases<SBBehavior> >("PostureBehavior")
+		//.def(boost::python::init<std::string, std::string>())
+		.def("getPosture", &PostureBehavior::getPosture, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the current posture.")
+	;
+
 	boost::python::class_<SpeechBehavior, boost::python::bases<SBBehavior> >("SpeechBehavior")
 		//.def(boost::python::init<std::string, std::string>())
 		.def("getUtterance", &SpeechBehavior::getUtterance, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the current utterance.")
@@ -1034,6 +1040,22 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getReach", &SBReachManager::getReach, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a reach engine for a given character.")
 		;
 
+	boost::python::class_<SBGestureMap>("SBGestureMap")
+		.def("addGestureMapping", &SBGestureMap::addGestureMapping, "Add a gesture mapping. Input: name of the animation/state, type, posture, hand. Output: null")
+		.def("getGestureByInfo", &SBGestureMap::getGestureByInfo, "Return a gesture given the type and hand of the gesture. Input: type, hand. Output: corresponding gesture name")
+		.def("getGestureByIndex", &SBGestureMap::getGestureByIndex, "Return a gesture given the index inside the map.")
+		.def("getNumMappings", &SBGestureMap::getNumMappings, "Return a number of entries inside the map.")
+		.def("getGesturePosture", &SBGestureMap::getGesturePosture, "Return the gesture posture given the name.")
+		.def("getGestureHand", &SBGestureMap::getGestureHand, "Return the gesture hand given the name.")
+		.def("getGestureType", &SBGestureMap::getGestureType, "Return the gesture type given the name.")
+		;
+
+	boost::python::class_<SBGestureMapManager>("SBGestureMapManager")
+		.def("createGestureMap", &SBGestureMapManager::createGestureMap, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a gesture map for a character.")
+		.def("removeGestureMap", &SBGestureMapManager::removeGestureMap, "Remove a gesture map for a character given character name.")
+		.def("getNumGestureMaps", &SBGestureMapManager::getNumGestureMaps, "Return number of gesture maps in the scene.")
+		.def("getGestureMap", &SBGestureMapManager::getGestureMap, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return gesture map given character name.")
+		;
 
 	boost::python::class_<Event>("Event")
 		.def("getType", &Event::getType, "Returns the event type.")

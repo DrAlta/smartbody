@@ -227,6 +227,23 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
+	// posture
+	if (this->posture_sched_p)
+	{
+		MeCtScheduler2::VecOfTrack tracks = gaze_sched_p->tracks();
+		for (size_t t = 0; t < tracks.size(); t++)
+		{
+			MeCtMotion* motionCt = dynamic_cast<MeCtMotion*>(tracks[t]->animation_ct());
+			if (motionCt)
+			{
+				const std::string& motionName = motionCt->motion()->getName();
+				PostureBehavior* postureBehavior = new PostureBehavior();
+				postureBehavior->setPosture(motionName);
+				_curBehaviors.push_back(postureBehavior);
+			}
+		}
+	}
+
 	// locomotion
 	if (this->steeringAgent)
 	{
@@ -238,6 +255,7 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 		_curBehaviors.push_back(locoBehavior);
 	}
 
+	// gaze
 	if (this->gaze_sched_p)
 	{
 		MeCtScheduler2::VecOfTrack tracks = gaze_sched_p->tracks();

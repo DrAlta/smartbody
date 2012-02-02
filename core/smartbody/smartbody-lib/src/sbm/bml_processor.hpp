@@ -34,7 +34,8 @@
 #include <boost/weak_ptr.hpp>
 
 
-#define BMLR_BML2ANIM  0
+//deprecated, using bml gesture directly
+//#define BMLR_BML2ANIM  0
 
 
 // Forward Declaration

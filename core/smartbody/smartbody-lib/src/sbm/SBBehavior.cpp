@@ -114,5 +114,24 @@ const SrVec& LocomotionBehavior::getLocomotionTarget()
 	return _target;
 }
 
+PostureBehavior::PostureBehavior()
+{
+	_type = "posture";
+}
+
+PostureBehavior::~PostureBehavior()
+{
+}
+
+void PostureBehavior::setPosture(const std::string& posture)
+{
+	_posture = posture;
+}
+
+const std::string& PostureBehavior::getPosture()
+{
+	return _posture;
+}
+
 };
 

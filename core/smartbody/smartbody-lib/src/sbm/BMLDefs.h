@@ -19,6 +19,7 @@ class BMLDefs
 		static XMLCh* ATTR_NAME;
 		static XMLCh* ATTR_LEVEL;
 		static XMLCh* ATTR_HANDLE;
+		static XMLCh* ATTR_LEXEME;
 
 		static XMLCh* ATTR_START;
 		static XMLCh* ATTR_READY;
@@ -84,6 +85,7 @@ class BMLDefs
 		static XMLCh* TAG_BODY;
 		static XMLCh* TAG_TORSO;
 		static XMLCh* TAG_REQUIRED;
+		static XMLCh* TAG_GESTURE;
 		#ifdef BMLR_BML2ANIM
 		static XMLCh* TAG_POSTURE;
 		#endif

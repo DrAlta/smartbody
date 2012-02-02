@@ -45,6 +45,7 @@
 #include "bml_xml_consts.hpp"
 
 #include "bml_animation.hpp"
+#include "bml_gesture.hpp"
 #include "bml_event.hpp"
 #include "bml_face.hpp"
 #include "bml_gaze.hpp"
@@ -428,6 +429,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				behavior = parse_bml_states( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_EXAMPLE_LOCOMOTION )==0 ) {
 				behavior = parse_bml_example_locomotion( child, unique_id, behav_syncs, required, request, mcu );
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_GESTURE )==0 ) {
+				behavior = parse_bml_gesture( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_INTERRUPT )==0 ) {
 				behavior = parse_bml_interrupt( child, unique_id, behav_syncs, required, request, mcu );
 #ifdef BMLR_BML2ANIM

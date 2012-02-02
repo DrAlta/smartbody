@@ -75,6 +75,20 @@ class LocomotionBehavior : public SBBehavior
 
 
 };
+
+class PostureBehavior : public SBBehavior
+{
+	public:
+		PostureBehavior();
+		~PostureBehavior();
+
+		virtual void setPosture(const std::string& posture);
+		virtual const std::string& getPosture();
+	
+	protected:
+		std::string _posture;
+};
+
 };
 
 #endif

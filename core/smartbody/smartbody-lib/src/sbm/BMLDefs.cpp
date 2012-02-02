@@ -9,6 +9,7 @@ XMLCh* BMLDefs::ATTR_TYPE = NULL;
 XMLCh* BMLDefs::ATTR_NAME = NULL;
 XMLCh* BMLDefs::ATTR_LEVEL = NULL;
 XMLCh* BMLDefs::ATTR_HANDLE = NULL;
+XMLCh* BMLDefs::ATTR_LEXEME = NULL;
 
 XMLCh* BMLDefs::ATTR_START = NULL;
 XMLCh* BMLDefs::ATTR_READY = NULL;
@@ -67,6 +68,7 @@ XMLCh* BMLDefs::ATTR_TARGET	= NULL;
 	// XMLStrings (utf-16 character arrays) for parsing vrSpeak's XML
 XMLCh* BMLDefs::TAG_ACT = NULL;
 XMLCh* BMLDefs::TAG_BODY  = NULL;
+XMLCh* BMLDefs::TAG_GESTURE = NULL;
 XMLCh* BMLDefs::TAG_TORSO  = NULL;
 XMLCh* BMLDefs::TAG_REQUIRED = NULL;
 	#ifdef BMLR_BML2ANIM
@@ -309,6 +311,7 @@ BMLDefs::BMLDefs()
 	ATTR_NAME = XMLString::transcode("name");
 	ATTR_LEVEL = XMLString::transcode("level");
 	ATTR_HANDLE = XMLString::transcode("sbm:handle");
+	ATTR_LEXEME = XMLString::transcode("lexeme");
 
 	ATTR_START = XMLString::transcode("start");
 	ATTR_READY = XMLString::transcode("ready");
@@ -377,6 +380,7 @@ BMLDefs::BMLDefs()
 	#ifdef BMLR_BML2ANIM
 	TAG_POSTURE   = XMLString::transcode("posture"); // [BMLR] For bml2anim postures
 	#endif
+	TAG_GESTURE = XMLString::transcode("gesture");
 	TAG_HEAD      = XMLString::transcode("head");
 	TAG_TM        = XMLString::transcode("tm");
 	TAG_MARK      = XMLString::transcode("mark");

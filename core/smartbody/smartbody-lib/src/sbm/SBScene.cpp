@@ -19,6 +19,7 @@ SBScene::SBScene(void)
 	_steerManager = new SBSteerManager();
 	_serviceManager = new SBServiceManager();
 	_physicsManager = new SBPhysicsManager();
+	_gestureMapManager = new SBGestureMapManager();
 	_scale = .01f; // default scale is centimeters
 
 	// add the services
@@ -49,6 +50,7 @@ SBScene::~SBScene(void)
 	delete _reachManager;
 	delete _steerManager;
 	delete _physicsManager;
+	delete _gestureMapManager;
 
 	delete _parser;
 
@@ -512,6 +514,11 @@ SBServiceManager* SBScene::getServiceManager()
 SBPhysicsManager* SBScene::getPhysicsManager()
 {
 	return _physicsManager;
+}
+
+SBGestureMapManager* SBScene::getGestureMapManager()
+{
+	return _gestureMapManager;
 }
 
 SBParser* SBScene::getParser()

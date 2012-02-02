@@ -4,19 +4,28 @@ BMLGestureObject::BMLGestureObject() : BMLObject()
 {
 	setName("gesture");
 
+	// TODO: align the bml specification
+/*
 	std::vector<std::string> gestures;
 	gestures.push_back("POINT");
 	gestures.push_back("REACH");
 	gestures.push_back("BEAT");
 	gestures.push_back("DEPICT");
 	gestures.push_back("SIGNAL");
-	SmartBody::StringAttribute* typeAttr = createStringAttribute("type", "", "", "Basic", 50, false, false, false, "Type of gesture");
-	typeAttr->setValidValues(gestures);
-
+*/
+	SmartBody::StringAttribute* typeAttr = createStringAttribute("lexeme", "", "", "Basic", 50, false, false, false, "Type of gesture");
+//	typeAttr->setValidValues(gestures);
 
 	createStringAttribute("name", "", "", "Basic", 60, false, false, false, "Name of the gesture for DEPICT or SIGNAL gestures.");
-	createStringAttribute("target", "", "", "Basic", 70, false, false, false, "Target for POINT and REACH gestures.");
 
+	std::vector<std::string> modes;
+	modes.push_back("LEFT_HAND");
+	modes.push_back("RIGHT_HAND");
+	modes.push_back("BOTH_HANDS");
+	SmartBody::StringAttribute* modeAttr = createStringAttribute("mode", "", "", "Basic", 70, false, false, false, "Which hand is involved. Should be one of the following: left, right, both.");
+	modeAttr->setValidValues(modes);
+
+	createStringAttribute("target", "", "", "Basic", 80, false, false, false, "Target for POINT and REACH gestures.");
 	createStringAttribute("start", "", "", "Basic", 100, false, false, false, "Time when gesture starts.");
 	createStringAttribute("ready", "", "", "Basic", 110, false, false, false, "Time when gesture is fully blended in.");
 	createStringAttribute("stroke", "", "", "Basic", 120, false, false, false, "Time of gesture's stroke.");
