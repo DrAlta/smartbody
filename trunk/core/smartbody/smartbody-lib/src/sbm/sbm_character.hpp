@@ -196,8 +196,6 @@ public:
 	//* Overrides SbmPawn::prune_controller_tree()
 	virtual int prune_controller_tree( mcuCBHandle *mcu_p );
 
-	//* Overrides SbmPawn::remove_from_scene()
-	virtual void remove_from_scene();
 
 	/**
 	 *  Sets the character's speech implementation.
@@ -327,12 +325,6 @@ public:
 	static int character_init_cmd( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 	static int character_ctrl_cmd( srArgBuffer& args, mcuCBHandle *mcu_p );
-
-	/**
-	 *  Removes a character from the scene by name.
-	 *  Using "*" as a character name will remove all pawns.
-	 */
-	static int remove_from_scene( const char* char_name );
 
 	/**
 	 *  Handles commands beginning with "set character <character id> ...".

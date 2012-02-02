@@ -133,8 +133,7 @@ public:
 	float getHeight( void ) 		{ return _height; }
 
 	virtual int prune_controller_tree();  // removes unused or overwritten controllers
-	virtual void remove_from_scene();
-
+	
 	void reset_all_channels();
 
 	const SkJoint* get_joint( const char* joint_name ) const;
@@ -206,12 +205,6 @@ public:
 	 *  Handles commands beginning with "pawn ...".
 	 */
 	static int pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-
-	/**
-	 *  Removes a pawn from the scene by name.
-	 *  Using "*" as a pawn name will remove all pawns.
-	 */
-	static int remove_from_scene( const char* pawn_name );
 
 	/**
 	 *  Handles commands beginning with "set pawn <pawn id> ...".

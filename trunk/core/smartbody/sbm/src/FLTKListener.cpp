@@ -2,6 +2,7 @@
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #include <sbm/SBPawn.h>
 #include <fltk_viewer.h>
+#include <RootWindow.h>
 
 FLTKListener::FLTKListener()
 {
@@ -80,6 +81,20 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 		character->dMesh_p = NULL;
 	}
 
+	// make sure the character isn't associated with the viewer
+	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	if (window)
+	{
+		if (window->fltkViewer->_paLocoData && 
+			window->fltkViewer->_paLocoData->character == character)
+			window->fltkViewer->_paLocoData->character = NULL;
+		if (window->fltkViewer->_objManipulator.get_selected_pawn() == character)
+		{
+			window->fltkViewer->_objManipulator.set_selected_pawn(NULL);
+			window->fltkViewer->_objManipulator.get_active_control()->detach_pawn();
+			window->fltkViewer->_objManipulator.removeActiveControl();
+		}
+	}
 }
 
 void FLTKListener::OnCharacterUpdate( const std::string & name, const std::string & objectClass )
@@ -107,21 +122,29 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		SbmPawn* pawn = mcu.getPawn(name);
 		pawn->registerObserver(this);
-		FltkViewer* viewer = dynamic_cast<FltkViewer*>(mcu.viewer_p);
-		if (viewer)
+		BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+		if (window)
 		{
-			viewer->updateLights();
+			window->fltkViewer->updateLights();
 		}
 	}
 }
 
 void FLTKListener::OnPawnDelete( const std::string & name )
 {
-	if (name.find("light") == 0)
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmPawn* pawn = mcu.getPawn(name);
+	pawn->unregisterObserver(this);
+
+	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	if (window)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		SbmPawn* pawn = mcu.getPawn(name);
-		pawn->unregisterObserver(this);
+		if (window->fltkViewer->_objManipulator.get_selected_pawn() == pawn)
+		{
+			window->fltkViewer->_objManipulator.set_selected_pawn(NULL);
+			window->fltkViewer->_objManipulator.get_active_control()->detach_pawn();
+			window->fltkViewer->_objManipulator.removeActiveControl();
+		}
 	}
 }
 
@@ -151,10 +174,10 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 		{
 			// adjust the lights based on the new position and color
 			mcuCBHandle& mcu = mcuCBHandle::singleton();
-			FltkViewer* viewer = dynamic_cast<FltkViewer*>(mcu.viewer_p);
-			if (viewer)
+			BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+			if (window)
 			{
-				viewer->updateLights();
+				window->fltkViewer->updateLights();
 			}
 
 

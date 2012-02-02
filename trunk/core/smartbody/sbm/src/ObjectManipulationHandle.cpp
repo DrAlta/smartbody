@@ -52,6 +52,15 @@ void ObjectManipulationHandle::drag(SrCamera& cam,  float fx, float fy, float tx
 		active_control->updateControl(cam,fx,fy,tx,ty);
 }
 
+void ObjectManipulationHandle::set_selected_pawn( SbmPawn* pawn )
+{
+	if (active_control)
+	{
+		active_control->detach_pawn();
+		active_control->attach_pawn(pawn);
+	}
+}
+
 SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera& cam, std::vector<int>& hitNames)
 {
 	GLint viewport[4];

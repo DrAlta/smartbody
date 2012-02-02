@@ -1576,19 +1576,6 @@ int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
 	return CMD_SUCCESS;
 }
 
-
-void SbmCharacter::remove_from_scene() {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	string vrProcEnd_msg = "vrProcEnd sbm ";
-	vrProcEnd_msg += getName();
-	mcu.vhmsg_send( vrProcEnd_msg.c_str() );
-
-	mcu.removeCharacter(getName());
-
-	SbmPawn::remove_from_scene();
-}
-
 int SbmCharacter::set_speech_impl( SmartBody::SpeechInterface *speech_impl ) {
 	this->speech_impl = speech_impl;
 
@@ -2309,9 +2296,8 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 				return mcu_character_ctrl_cmd( getName().c_str(), args, mcu_p );
 			} 
 		else if( cmd == "remove" ) {
-				int ret = SbmCharacter::remove_from_scene( getName().c_str() );
-				mcu_p->unregisterCharacter(this);
-				return ret;
+				mcu_p->_scene->removeCharacter(getName());
+				return CMD_SUCCESS;
 
 			} 
 			else if( cmd == "inspect" ) {
@@ -3263,39 +3249,6 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 		LOG( "SbmCharacter::character_cmd_func ERR: char '%s' or cmd '%s' NOT FOUND", char_name.c_str(), char_cmd.c_str() );
 		return( CMD_FAILURE );
-}
-
-int SbmCharacter::remove_from_scene( const char* char_name ) {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	if( strcmp( char_name, "*" )==0 ) {
-		std::vector<SbmCharacter*> charsToDelete;
-		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-			iter != mcu.getCharacterMap().end();
-			iter++)
-		{
-			charsToDelete.push_back(iter->second);
-		}
-		for (size_t c = 0; c < charsToDelete.size(); c++)
-		{
-			charsToDelete[c]->remove_from_scene();	
-			delete charsToDelete[c];
-		}
-		return CMD_SUCCESS;
-	} else {
-		SbmCharacter* char_p = mcu.getCharacter( char_name );
-
-		if ( char_p ) {
-			char_p->notifyObservers();
-			char_p->remove_from_scene();
-			delete char_p;
-
-			return CMD_SUCCESS;
-		} else {
-			LOG( "ERROR: Unknown character \"%s\".\n", char_name );
-			return CMD_FAILURE;
-		}
-	}
 }
 
 int SbmCharacter::set_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {

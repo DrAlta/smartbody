@@ -32,7 +32,8 @@ void PawnControl::init_font()
 void PawnControl::attach_pawn(SbmPawn* ap)
 {
 	pawn = ap;
-	pawn->registerObserver(this);
+	if (pawn)
+		pawn->registerObserver(this);
 }
 
 void PawnControl::detach_pawn()

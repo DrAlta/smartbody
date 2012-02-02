@@ -25,7 +25,9 @@ public:
 
 	//bool has_active_control() { return (active_control!=NULL); }
 	PawnControl* get_active_control() { return active_control; }
+	void removeActiveControl() { active_control = NULL; }
 	SbmPawn* get_selected_pawn();
+	void set_selected_pawn(SbmPawn* pawn);
 
 	SbmPawn* getPickingPawn(float x, float y, SrCamera& cam, std::vector<int>& hitNames);
 	void picking(float x,float y,SrCamera& cam);

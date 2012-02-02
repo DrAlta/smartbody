@@ -199,14 +199,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 				   CmdSteerAll,
                  };
 
-   private : // internal data
-
-    FltkViewerData* _data;
-	LocomotionData* _locoData;
-	float _arrowTime;
-	PALocomotionData* _paLocoData;
-	ObjectManipulationHandle _objManipulator; // a hack for testing. 
-
+  
  private:
 	 Fl_Input* off_height_window;
    public : //----> public methods 
@@ -356,6 +349,13 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	virtual void show_viewer();
 	virtual void hide_viewer();
 	virtual void makeGLContext();
+
+    FltkViewerData* _data;
+	LocomotionData* _locoData;
+	float _arrowTime;
+	PALocomotionData* _paLocoData;
+	ObjectManipulationHandle _objManipulator; // a hack for testing. 
+
 
 protected:
 	

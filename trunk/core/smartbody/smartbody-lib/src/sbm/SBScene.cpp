@@ -136,6 +136,11 @@ void SBScene::removeCharacter(std::string charName)
 	if (character)
 	{
 		mcu.unregisterCharacter(character);
+
+		string vrProcEnd_msg = "vrProcEnd sbm ";
+		vrProcEnd_msg += getName();
+		mcu.vhmsg_send( vrProcEnd_msg.c_str() );
+
 		delete character;
 	}	
 }
@@ -150,7 +155,7 @@ void SBScene::removePawn(std::string pawnName)
 		if (!character)
 		{
 			mcu.unregisterPawn(pawn);
-			SbmPawn::remove_from_scene(pawnName.c_str());
+			delete pawn;
 		}
 	}	
 }

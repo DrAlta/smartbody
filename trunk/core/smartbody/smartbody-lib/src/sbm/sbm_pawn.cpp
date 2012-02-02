@@ -383,35 +383,6 @@ int SbmPawn::prune_controller_tree() {
 	return CMD_SUCCESS;
 }
 
-void SbmPawn::remove_from_scene() {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	if ( scene_p  )
-		mcu.remove_scene( scene_p );
-	if ( dMesh_p)
-	{
-		for (size_t i = 0; i < dMesh_p->dMeshDynamic_p.size(); i++)
-		{
-			mcu.root_group_p->remove( dMesh_p->dMeshDynamic_p[i] );
-		}
-	}
-	mcu.removePawn( getName() );
-	// remove the connected steering object for steering space
-	if (steeringSpaceObj_p)
-	{
-		if (mcu._scene->getSteerManager()->getEngineDriver()->isInitialized())
-		{
-			if (mcu._scene->getSteerManager()->getEngineDriver()->_engine)
-			{
-				mcu._scene->getSteerManager()->getEngineDriver()->_engine->removeObstacle(steeringSpaceObj_p);
-				mcu._scene->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
-			}
-		}
-		delete steeringSpaceObj_p;
-		steeringSpaceObj_p = NULL;
-	}
-}
-
 #if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
 void SbmPawn::register_controller_cleanup( MeController* ct, controller_cleanup_callback_fp func ) {
 	ct_cleanup_funcs.insert( make_pair( ct, func ) );
@@ -619,8 +590,7 @@ int SbmPawn::parse_pawn_command( std::string cmd, srArgBuffer& args, mcuCBHandle
 {
 	if (cmd == "remove")
 	{	
-		remove_from_scene();
-		mcu_p->unregisterPawn(this);
+		mcu_p->_scene->removePawn(this->getName());
 		return CMD_SUCCESS;
 	}
 	else if (cmd == "prune")
@@ -942,34 +912,6 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 }
 
-int SbmPawn::remove_from_scene( const char* pawn_name ) {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	if( strcmp( pawn_name, "*" )==0 ) {
-		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-			iter != mcu.getPawnMap().end();
-			iter++)
-		{
-			SbmPawn* pawn = (*iter).second;
-			pawn->remove_from_scene();
-			delete pawn;
-		}
-		return CMD_SUCCESS;
-	} else {
-		SbmPawn* pawn_p = mcu.getPawn( pawn_name );
-
-		if ( pawn_p ) {
-			pawn_p->remove_from_scene();
-			delete pawn_p;
-
-			return CMD_SUCCESS;
-		} else {
-			LOG( "ERROR: Unknown pawn \"%s\".\n", pawn_name );
-			return CMD_FAILURE;
-		}
-	}
-}
-
 int SbmPawn::set_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string pawn_id = args.read_token();
 	if( pawn_id.length()==0 ) {
@@ -1247,7 +1189,7 @@ int SbmPawn::remove_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		mcu_p->theWSP->unsubscribe( pawn_name, "position", 1 );
 #endif
 
-		pawn_p->remove_from_scene();
+		mcu_p->_scene->removePawn(pawn_p->getName());
 
 		return CMD_SUCCESS;
 	} else {
