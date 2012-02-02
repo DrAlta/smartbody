@@ -2046,16 +2046,14 @@ int mcuCBHandle::registerPawn(SbmPawn* pawn)
 
 int mcuCBHandle::unregisterPawn(SbmPawn* pawn)
 {
+	if ( mcuCBHandle::singleton().sbm_character_listener )
+		mcuCBHandle::singleton().sbm_character_listener->OnPawnDelete( pawn->getName().c_str() );
+
 	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(pawn->getName());
 	if (iter != pawn_map.end())
 	{
 		pawn_map.erase(iter);
 	}
-
-	if ( mcuCBHandle::singleton().sbm_character_listener )
-		mcuCBHandle::singleton().sbm_character_listener->OnPawnDelete( pawn->getName().c_str() );
-
-
 	return CMD_SUCCESS;
 }
 
@@ -2090,6 +2088,9 @@ int mcuCBHandle::registerCharacter(SbmCharacter* character)
 
 int mcuCBHandle::unregisterCharacter(SbmCharacter* character)
 {
+	if ( mcuCBHandle::singleton().sbm_character_listener )
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( character->getName().c_str() );
+
 	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(character->getName());
 	if (iter != pawn_map.end())
 	{
@@ -2101,9 +2102,6 @@ int mcuCBHandle::unregisterCharacter(SbmCharacter* character)
 	{
 		character_map.erase(citer);
 	}
-
-	if ( mcuCBHandle::singleton().sbm_character_listener )
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( character->getName().c_str() );
 
 	return 1;
 }

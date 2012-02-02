@@ -274,9 +274,6 @@ void cleanup( void )	{
 			AUDIO_Close();
 		}
 
-
-		// Shutdown notifications
-		SbmCharacter::remove_from_scene( "*" );
 		mcu.vhmsg_send( "vrProcEnd sbm" );
 
 #if LINK_VHMSG_CLIENT
