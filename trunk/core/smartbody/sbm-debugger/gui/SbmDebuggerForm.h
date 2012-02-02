@@ -18,6 +18,7 @@ class SbmDebuggerForm : public QMainWindow
  public:
      SbmDebuggerForm(QWidget *parent = 0);
      ~SbmDebuggerForm();
+     QSize sizeHint() const;
      static QTreeWidgetItem* FindTreeWidgetItemByName(const QTreeWidgetItem* subTree, const std::string& name);
      static Pawn* FindSbmEntityFromTreeSelection(const QTreeWidgetItem* treeWidget, Scene* pScene);
 
@@ -34,7 +35,14 @@ class SbmDebuggerForm : public QMainWindow
      Ui::MainWindow ui;
      QMainWindow* m_pMainWindow;
      GLWidget* m_pGLWidget;
+     std::string GetFpsAsString();
      QMainWindow* MainWindow() { return m_pMainWindow; }
+
+     double m_msSinceLastFrame;
+     double m_msSinceLastFramePrev;
+
+     QBasicTimer timer;
+     vhcl::Timer m_StopWatch;
 
  protected:
     enum SceneTreeIndex
@@ -57,7 +65,6 @@ class SbmDebuggerForm : public QMainWindow
     void closeEvent(QCloseEvent *event);
     void AddJointToSceneTree(QTreeWidgetItem* parent, const Joint* joint);
 
-    QBasicTimer timer;
     virtual void timerEvent(QTimerEvent * event);
 
     static void VHMsgCallback( const char * op, const char * args, void * userData );

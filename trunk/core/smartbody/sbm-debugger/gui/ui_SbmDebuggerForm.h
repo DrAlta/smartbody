@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Thu Jan 26 18:29:51 2012
+** Created: Tue Jan 31 13:32:56 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -67,7 +67,8 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(1236, 817);
+        MainWindow->resize(1274, 830);
+        MainWindow->setBaseSize(QSize(1274, 830));
         actionConnect = new QAction(MainWindow);
         actionConnect->setObjectName(QString::fromUtf8("actionConnect"));
         actionToggleFreeLookCamera = new QAction(MainWindow);
@@ -102,7 +103,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 1236, 21));
+        menubar->setGeometry(QRect(0, 0, 1274, 21));
         menuFile = new QMenu(menubar);
         menuFile->setObjectName(QString::fromUtf8("menuFile"));
         menuEdit = new QMenu(menubar);
@@ -120,7 +121,7 @@ public:
         MainWindow->addToolBar(Qt::LeftToolBarArea, toolBar);
         sceneDockWidget = new QDockWidget(MainWindow);
         sceneDockWidget->setObjectName(QString::fromUtf8("sceneDockWidget"));
-        sceneDockWidget->setMaximumSize(QSize(230, 524287));
+        sceneDockWidget->setMaximumSize(QSize(524287, 524287));
         sceneDockWidget->setLayoutDirection(Qt::LeftToRight);
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));

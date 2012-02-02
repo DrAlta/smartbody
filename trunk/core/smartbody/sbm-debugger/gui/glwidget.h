@@ -34,6 +34,7 @@ public:
     virtual void Update();
 
     void SetScene(Scene* scene) { m_pScene = scene; }
+    void SetMinimumSize(int w, int h) { m_MinSize.setWidth(w); m_MinSize.setHeight(h); }
     double GetFps();
     string GetCameraPositionAsString();
     string GetFpsAsString();
@@ -80,6 +81,7 @@ private:
     float m_fJointRadius;
     Scene* m_pScene;
     GLUquadric* m_quadric;
+    QSize m_MinSize;
 
     double m_msSinceLastFrame;
     double m_msSinceLastFramePrev;
