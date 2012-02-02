@@ -24,23 +24,22 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
   m_pMainWindow = this;
   ui.setupUi(MainWindow());
   MainWindow()->show();
-
   m_pGLWidget = new GLWidget(c.GetScene(), this);
 
   // setup renderer size and positioning
   QPoint rendererPosition = ui.RenderView->pos();
   QSize rendererSize = ui.RenderView->size();
-  MainWindow()->setGeometry(ui.RenderView->x() + 40, ui.RenderView->y() + 25,
+  m_pGLWidget->setGeometry(ui.RenderView->x() + 40, ui.RenderView->y() + 25,
      rendererSize.width(), rendererSize.height());
   MainWindow()->setCentralWidget(m_pGLWidget); 
-  //MainWindow()->layout()->addWidget(m_pGLWidget);
-
+  
   // set vhmsg
   vhmsg::ttu_set_client_callback(VHMsgCallback);
   vhmsg::ttu_open();
   vhmsg::ttu_register("sbmdebugger");
 
   // setup scene tree
+  ui.sceneDockWidget->setBaseSize(220, 767);
   ui.sceneTree->insertTopLevelItem(Characters, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Characters"))));
   ui.sceneTree->insertTopLevelItem(Pawns, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Pawns"))));
   //ui.sceneTree->setHeaderLabel(QString("Entities"));
@@ -54,11 +53,18 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
   InitSignalsSlots();
 
   setUpdatesEnabled(true);
+
+  m_msSinceLastFrame = m_StopWatch.GetTime();
 }
 
 SbmDebuggerForm::~SbmDebuggerForm()
 {
    vhmsg::ttu_close();
+}
+
+QSize SbmDebuggerForm::sizeHint() const
+{
+   return QSize(1274, 830);
 }
 
 void SbmDebuggerForm::InitSignalsSlots()
@@ -351,8 +357,18 @@ void SbmDebuggerForm::UpdateSceneTree()
 
 void SbmDebuggerForm::UpdateLabels()
 {
+   // calculate fps
+   m_msSinceLastFramePrev = m_msSinceLastFrame;
+   m_msSinceLastFrame = m_StopWatch.GetTime();
+
    ui.rendererFpsLabel->setText(m_pGLWidget->GetFpsAsString().c_str());
+   ui.networkFpsLabel->setText(GetFpsAsString().c_str());
    ui.cameraPositionLabel->setText(m_pGLWidget->GetCameraPositionAsString().c_str());
+}
+
+std::string SbmDebuggerForm::GetFpsAsString()
+{
+   return vhcl::Format("Network Fps: %.2f", (1 / (m_msSinceLastFrame - m_msSinceLastFramePrev)));
 }
 
 void SbmDebuggerForm::closeEvent(QCloseEvent *event)

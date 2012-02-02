@@ -35,6 +35,8 @@ GLWidget::GLWidget(Scene* scene, QWidget *parent)
     timer.start(100, this);
 
     m_msSinceLastFrame = m_StopWatch.GetTime();
+
+    SetMinimumSize(400, 400);
 }
 
 GLWidget::~GLWidget()
@@ -43,12 +45,12 @@ GLWidget::~GLWidget()
 
 QSize GLWidget::minimumSizeHint() const
 {
-   return QSize(50, 50);
+   return m_MinSize;
 }
 
 QSize GLWidget::sizeHint() const
 {
-   return QSize(1183, 758);
+   return QSize(400, 400);
 }
 
 void GLWidget::OnCloseSettingsDialog(const SettingsDialog* dlg, int result)
