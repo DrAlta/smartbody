@@ -632,6 +632,12 @@
 		AAB20E7C145393C9001542D3 /* SBBehavior.h in Headers */ = {isa = PBXBuildFile; fileRef = AAB20E78145393C9001542D3 /* SBBehavior.h */; };
 		AAC99D13143AA3270098208A /* local_speech.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC99D11143AA3270098208A /* local_speech.cpp */; };
 		AAC99D14143AA3270098208A /* local_speech.h in Headers */ = {isa = PBXBuildFile; fileRef = AAC99D12143AA3270098208A /* local_speech.h */; };
+		AAF8C71214DA2D970075F2C2 /* SBGestureMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAF8C70E14DA2D970075F2C2 /* SBGestureMap.cpp */; };
+		AAF8C71314DA2D970075F2C2 /* SBGestureMap.h in Headers */ = {isa = PBXBuildFile; fileRef = AAF8C70F14DA2D970075F2C2 /* SBGestureMap.h */; };
+		AAF8C71414DA2D970075F2C2 /* SBGestureMapManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAF8C71014DA2D970075F2C2 /* SBGestureMapManager.cpp */; };
+		AAF8C71514DA2D970075F2C2 /* SBGestureMapManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AAF8C71114DA2D970075F2C2 /* SBGestureMapManager.h */; };
+		AAF8C71914DA2DA20075F2C2 /* bml_gesture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAF8C71714DA2DA20075F2C2 /* bml_gesture.cpp */; };
+		AAF8C71A14DA2DA20075F2C2 /* bml_gesture.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AAF8C71814DA2DA20075F2C2 /* bml_gesture.hpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1262,6 +1268,12 @@
 		AAB20E78145393C9001542D3 /* SBBehavior.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBBehavior.h; path = sbm/SBBehavior.h; sourceTree = "<group>"; };
 		AAC99D11143AA3270098208A /* local_speech.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = local_speech.cpp; sourceTree = "<group>"; };
 		AAC99D12143AA3270098208A /* local_speech.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = local_speech.h; sourceTree = "<group>"; };
+		AAF8C70E14DA2D970075F2C2 /* SBGestureMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBGestureMap.cpp; path = sbm/SBGestureMap.cpp; sourceTree = "<group>"; };
+		AAF8C70F14DA2D970075F2C2 /* SBGestureMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBGestureMap.h; path = sbm/SBGestureMap.h; sourceTree = "<group>"; };
+		AAF8C71014DA2D970075F2C2 /* SBGestureMapManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBGestureMapManager.cpp; path = sbm/SBGestureMapManager.cpp; sourceTree = "<group>"; };
+		AAF8C71114DA2D970075F2C2 /* SBGestureMapManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBGestureMapManager.h; path = sbm/SBGestureMapManager.h; sourceTree = "<group>"; };
+		AAF8C71714DA2DA20075F2C2 /* bml_gesture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bml_gesture.cpp; path = sbm/bml_gesture.cpp; sourceTree = "<group>"; };
+		AAF8C71814DA2DA20075F2C2 /* bml_gesture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bml_gesture.hpp; path = sbm/bml_gesture.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1371,6 +1383,8 @@
 		AA73BC87146C633A00B199A1 /* BML */ = {
 			isa = PBXGroup;
 			children = (
+				AAF8C71714DA2DA20075F2C2 /* bml_gesture.cpp */,
+				AAF8C71814DA2DA20075F2C2 /* bml_gesture.hpp */,
 				AA9CD650141FF8D00064C27A /* behavior_scheduler.cpp */,
 				AA9CD651141FF8D00064C27A /* behavior_scheduler.hpp */,
 				AA9CD652141FF8D00064C27A /* behavior_scheduler_constant_speed.cpp */,
@@ -1504,6 +1518,10 @@
 		AA73BC8B146C637E00B199A1 /* SB */ = {
 			isa = PBXGroup;
 			children = (
+				AAF8C70E14DA2D970075F2C2 /* SBGestureMap.cpp */,
+				AAF8C70F14DA2D970075F2C2 /* SBGestureMap.h */,
+				AAF8C71014DA2D970075F2C2 /* SBGestureMapManager.cpp */,
+				AAF8C71114DA2D970075F2C2 /* SBGestureMapManager.h */,
 				AA07BDF314D245480073B99A /* SBReachManager.cpp */,
 				AA07BDF414D245480073B99A /* SBReachManager.h */,
 				AA07BDF514D245480073B99A /* SBService.cpp */,
@@ -2673,6 +2691,9 @@
 				AA563FA614D3AF2900D4A91D /* utils.h in Headers */,
 				AA563FA814D3AF2900D4A91D /* ValHeap.h in Headers */,
 				AA563FA914D3AF2900D4A91D /* Wrd.h in Headers */,
+				AAF8C71314DA2D970075F2C2 /* SBGestureMap.h in Headers */,
+				AAF8C71514DA2D970075F2C2 /* SBGestureMapManager.h in Headers */,
+				AAF8C71A14DA2DA20075F2C2 /* bml_gesture.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3048,6 +3069,9 @@
 				AA563FA314D3AF2900D4A91D /* UnitRules.cpp in Sources */,
 				AA563FA514D3AF2900D4A91D /* utils.cpp in Sources */,
 				AA563FA714D3AF2900D4A91D /* ValHeap.cpp in Sources */,
+				AAF8C71214DA2D970075F2C2 /* SBGestureMap.cpp in Sources */,
+				AAF8C71414DA2D970075F2C2 /* SBGestureMapManager.cpp in Sources */,
+				AAF8C71914DA2DA20075F2C2 /* bml_gesture.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
