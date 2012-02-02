@@ -191,6 +191,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/behavior_scheduler_fixed.cpp
 	sbm/behavior_span.cpp
 	sbm/bml_animation.cpp
+	sbm/bml_gesture.cpp
 	sbm/bml_bodyreach.cpp
 	sbm/bml_constraint.cpp
 	sbm/bml.cpp
@@ -359,6 +360,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SBSteerAgent.cpp
 	sbm/SBReachManager.cpp
 	sbm/SBReach.cpp
+	sbm/SBGestureMapManager.cpp
+	sbm/SBGestureMap.cpp
 	sbm/SBServiceManager.cpp
 	sbm/SBService.cpp
 	sbm/SBMotion.cpp
