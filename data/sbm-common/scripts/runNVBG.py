@@ -3,7 +3,7 @@ import os
 
 from NewNVBG.NVBG import *
 
-p = NVBG()
+p = NVBG("utah")
 class N(Nvbg):
 
         def notifyAction(self, name):
@@ -17,10 +17,7 @@ class N(Nvbg):
                                 p.speak(dialogStr)
 
                 if (name == "reset"):
-                        import NewNVBG.nvbg
-                        import NewNVBG.brainstem
-                        nvbg_engine = knowledge_engine.engine(NewNVBG.nvbg)
-                        brainstem_engine = knowledge_engine.engine(NewNVBG.brainstem)
+                       scene.run("resetNVBG.py")
 		return
 
 	def notifyBool(self, name, val):
