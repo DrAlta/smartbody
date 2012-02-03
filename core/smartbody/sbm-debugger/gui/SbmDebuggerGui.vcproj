@@ -195,6 +195,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\moc_DataViewerDialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\moc_glwidget.cpp"
 				>
 			</File>
@@ -216,6 +220,10 @@
 			</File>
 			<File
 				RelativePath=".\ui_ConnectDialog.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ui_DataViewerDialog.h"
 				>
 			</File>
 			<File
@@ -253,6 +261,14 @@
 		</File>
 		<File
 			RelativePath=".\ConnectDialog.h"
+			>
+		</File>
+		<File
+			RelativePath=".\DataViewerDialog.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\DataViewerDialog.h"
 			>
 		</File>
 		<File

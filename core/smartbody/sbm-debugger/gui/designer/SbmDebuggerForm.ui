@@ -72,6 +72,7 @@
     <property name="title">
      <string>Sbm</string>
     </property>
+    <addaction name="actionData_Viewer"/>
     <addaction name="actionResource_Viewer"/>
     <addaction name="actionCommand_Window"/>
    </widget>
@@ -320,6 +321,14 @@
   <action name="actionCommand_Window">
    <property name="text">
     <string>Command Window</string>
+   </property>
+  </action>
+  <action name="actionData_Viewer">
+   <property name="text">
+    <string>Data Viewer</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
  </widget>
