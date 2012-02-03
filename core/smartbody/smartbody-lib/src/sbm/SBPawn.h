@@ -25,9 +25,16 @@ class SBPawn : public SbmPawn
 		void setHPR(SrVec hpr);
 		SrVec getHPR();
 
+		virtual void afterUpdate(double time);
 		virtual void notify(SBSubject* subject);
 
-
+	private:
+		SmartBody::DoubleAttribute* _posX;
+		SmartBody::DoubleAttribute* _posY;
+		SmartBody::DoubleAttribute* _posZ;
+		SmartBody::DoubleAttribute* _rotX;
+		SmartBody::DoubleAttribute* _rotY;
+		SmartBody::DoubleAttribute* _rotZ;
 };
 
 };

@@ -1238,6 +1238,14 @@ void mcuCBHandle::update( void )	{
 		bonebus.CloseConnection();
 	}
 
+	for (std::map<std::string, SbmPawn*>::iterator iter = getPawnMap().begin();
+			iter != getPawnMap().end();
+		iter++)
+	{
+		SbmPawn* pawn = (*iter).second;
+		pawn->afterUpdate(time);
+	}
+
 
 	if (viewer_p && viewer_p->get_camera())
 	{
