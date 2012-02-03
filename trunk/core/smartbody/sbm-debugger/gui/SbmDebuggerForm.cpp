@@ -9,6 +9,7 @@
 #include "SettingsDialog.h"
 #include "ResourceDialog.h"
 #include "CommandDialog.h"
+#include "DataViewerDialog.h"
 
 
 using std::vector;
@@ -81,6 +82,7 @@ void SbmDebuggerForm::InitSignalsSlots()
    // Sbm Menu
    connect(ui.actionResource_Viewer, SIGNAL(triggered()), this, SLOT(ShowResourceDialog()));
    connect(ui.actionCommand_Window, SIGNAL(triggered()), this, SLOT(ShowCommandDialog()));
+   connect(ui.actionData_Viewer, SIGNAL(triggered()), this, SLOT(ShowDataViewerDialog()));
 
    // Scene Tree
    //selection changes shall trigger a slot
@@ -162,6 +164,12 @@ void SbmDebuggerForm::ShowResourceDialog()
 void SbmDebuggerForm::ShowCommandDialog()
 {
    CommandDialog dlg(this);
+   dlg.exec();
+}
+
+void SbmDebuggerForm::ShowDataViewerDialog()
+{
+   DataViewerDialog dlg(c.GetScene(), this);
    dlg.exec();
 }
 

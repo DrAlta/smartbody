@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Tue Jan 31 13:32:56 2012
+** Created: Thu Feb 2 15:15:53 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -39,6 +39,7 @@ public:
     QAction *actionExit;
     QAction *actionResource_Viewer;
     QAction *actionCommand_Window;
+    QAction *actionData_Viewer;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout_3;
     QWidget *RenderView;
@@ -87,6 +88,8 @@ public:
         actionResource_Viewer->setObjectName(QString::fromUtf8("actionResource_Viewer"));
         actionCommand_Window = new QAction(MainWindow);
         actionCommand_Window->setObjectName(QString::fromUtf8("actionCommand_Window"));
+        actionData_Viewer = new QAction(MainWindow);
+        actionData_Viewer->setObjectName(QString::fromUtf8("actionData_Viewer"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout_3 = new QHBoxLayout(centralwidget);
@@ -194,6 +197,7 @@ public:
         menuFile->addAction(actionDisconnect);
         menuFile->addAction(actionSettings);
         menuFile->addAction(actionExit);
+        menuSbm->addAction(actionData_Viewer);
         menuSbm->addAction(actionResource_Viewer);
         menuSbm->addAction(actionCommand_Window);
         toolBar->addAction(actionToggleFreeLookCamera);
@@ -208,7 +212,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0, QApplication::UnicodeUTF8));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "Smartbody Debugger", 0, QApplication::UnicodeUTF8));
         actionConnect->setText(QApplication::translate("MainWindow", "&Connect", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_TOOLTIP
         actionConnect->setToolTip(QApplication::translate("MainWindow", "Connect to a Smartbody Process", 0, QApplication::UnicodeUTF8));
@@ -227,6 +231,8 @@ public:
         actionResource_Viewer->setText(QApplication::translate("MainWindow", "&Resource Viewer", 0, QApplication::UnicodeUTF8));
         actionResource_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0, QApplication::UnicodeUTF8));
         actionCommand_Window->setText(QApplication::translate("MainWindow", "Command Window", 0, QApplication::UnicodeUTF8));
+        actionData_Viewer->setText(QApplication::translate("MainWindow", "Data Viewer", 0, QApplication::UnicodeUTF8));
+        actionData_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+D", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0, QApplication::UnicodeUTF8));
         menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));
