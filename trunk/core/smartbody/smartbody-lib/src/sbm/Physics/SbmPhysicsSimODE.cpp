@@ -68,8 +68,17 @@ void SbmPhysicsSimODE::nearCallBack(void *data, dGeomID o1, dGeomID o2)
 	}
 }
 
+static void myMessageFunction(int errnum, const char* msg, va_list ap)
+{
+	LOG("ODE Error %d %s", errnum, msg);
+}
+
 void SbmPhysicsSimODE::initSimulation()
 {	
+	dSetErrorHandler(&myMessageFunction);
+	dSetDebugHandler(&myMessageFunction);
+	dSetMessageHandler(&myMessageFunction);
+
 	dInitODE();
 
 	worldID = dWorldCreate();

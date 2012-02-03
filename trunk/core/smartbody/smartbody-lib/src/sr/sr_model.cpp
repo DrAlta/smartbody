@@ -612,14 +612,20 @@ void SrModel::get_bounding_box ( SrBox &box ) const
 
 void SrModel::translate ( const SrVec &tr )
  {
+   saveOriginalVertices();
+
    int i, s=V.size();
-   for ( i=0; i<s; i++ ) V[i]+=tr;
+   for ( i=0; i<s; i++ ) 
+	   V[i] = VOrig[i] + tr;
  }
 
 void SrModel::scale ( float factor )
  {
+   saveOriginalVertices();
+
    int i, s=V.size();
-   for ( i=0; i<s; i++ ) V[i]*=factor;
+   for ( i=0; i<s; i++ ) 
+	   V[i] = VOrig[i] * factor;
  }
 
 void SrModel::centralize ()
@@ -1106,5 +1112,28 @@ int SrModel::pick_face ( const SrLine& line ) const
    if ( closest>=0 ) return (int)faces[closest];
    return closest;
  }
+
+void SrModel::saveOriginalVertices()
+{
+	if (VOrig.size() != V.size())
+	{
+		VOrig.capacity(V.capacity());
+		for (int x = 0; x < V.size(); x++)
+		{
+			VOrig[x] = V[x];
+		}
+	}
+}
+
+void SrModel::restoreOriginalVertices()
+{
+	if (VOrig.size() == V.size())
+	{
+		for (int x = 0; x < V.size(); x++)
+		{
+			V[x] = VOrig[x];
+		}
+	}
+}
 
 //================================ End of File =================================================

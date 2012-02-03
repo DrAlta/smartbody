@@ -75,6 +75,8 @@ class SrModel : public SrSharedClass
     SrArray<Face>      Fn;  //!< Indices to the normals in N (size can be<F.size())
     SrArray<Face>      Ft;  //!< Indices to the texture coordinates in T
 
+	SrArray<SrPnt>      VOrig;  //!< Vertices original (if changed)
+
 	std::map<std::string,std::string> mtlTextureNameMap; // map from material name to texture name
 	std::map<std::string,std::string> mtlNormalTexNameMap;
 
@@ -207,6 +209,9 @@ class SrModel : public SrSharedClass
         no face is found. In case several intersections are found, the closest
         to line.p1 is returned */
     int pick_face ( const SrLine& line ) const;
+
+	void saveOriginalVertices();
+	void restoreOriginalVertices();
  };
 
 //================================ End of File =================================================
