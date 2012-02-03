@@ -699,10 +699,12 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	else if (itemType == ITEM_PAWN)
 	{
 		SbmPawn* curPawn = mcuCBHandle::singleton().getPawn(treeItem->label());
-		if (curPawn)
+		/*if (curPawn)
 			widget = new PawnItemInfoWidget(x,y,w,h,name,treeItem,itemType,this);
-		else
+		else 
 			widget = new TreeItemInfoWidget(x,y,w,h,name,treeItem,itemType);
+		*/
+		widget = new AttributeItemWidget(curPawn, x, y, w, h, name, treeItem, itemType, this);
 	}
 	else if (itemType == ITEM_CHARACTER)
 	{

@@ -7,12 +7,12 @@ namespace SmartBody {
 
 SBPawn::SBPawn() : SbmPawn()
 {
-	createDoubleAttribute("posX", 0.0, true, "transform", 10, false, false, false, "X position");
-	createDoubleAttribute("posY", 0.0, true, "transform", 20, false, false, false, "Y position");
-	createDoubleAttribute("posZ", 0.0, true, "transform", 30, false, false, false, "Z position");
-	createDoubleAttribute("rotX", 0.0, true, "transform", 40, false, false, false, "X rotation");
-	createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
-	createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
+	_posX = createDoubleAttribute("posX", 0.0, true, "transform", 10, false, false, false, "X position");
+	_posY = createDoubleAttribute("posY", 0.0, true, "transform", 20, false, false, false, "Y position");
+	_posZ = createDoubleAttribute("posZ", 0.0, true, "transform", 30, false, false, false, "Z position");
+	_rotX = createDoubleAttribute("rotX", 0.0, true, "transform", 40, false, false, false, "X rotation");
+	_rotY = createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
+	_rotZ = createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
 	createBoolAttribute("physics", false, true, "Basic", 300, false, false, "is the pawn physics enabled");
 	createStringAttribute("mesh", "", true, "Basic", 400, false, false, "Geometry/mesh");
 	createDoubleAttribute("meshScale", 1.0, true, "Basic", 410, false, false, "Scale of geometry/mesh");
@@ -20,12 +20,12 @@ SBPawn::SBPawn() : SbmPawn()
 
 SBPawn::SBPawn(const char* name) : SbmPawn(name)
 {
-	createDoubleAttribute("posX", 0.0, true, "transform", 10, false, false, false, "X position");
-	createDoubleAttribute("posY", 0.0, true, "transform", 20, false, false, false, "Y position");
-	createDoubleAttribute("posZ", 0.0, true, "transform", 30, false, false, false, "Z position");
-	createDoubleAttribute("rotX", 0.0, true, "transform", 40, false, false, false, "X rotation");
-	createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
-	createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
+	_posX = createDoubleAttribute("posX", 0.0, true, "transform", 10, false, false, false, "X position");
+	_posY = createDoubleAttribute("posY", 0.0, true, "transform", 20, false, false, false, "Y position");
+	_posZ = createDoubleAttribute("posZ", 0.0, true, "transform", 30, false, false, false, "Z position");
+	_rotX = createDoubleAttribute("rotX", 0.0, true, "transform", 40, false, false, false, "X rotation");
+	_rotY = createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
+	_rotZ = createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
 	createBoolAttribute("physics", false, true, "Basic", 300, false, false, "is the pawn physics enabled");
 	createStringAttribute("mesh", "", true, "Basic", 300, false, false, "Geometry/mesh");
 	createDoubleAttribute("meshScale", 1.0, true, "Basic", 410, false, false, "Scale of geometry/mesh");
@@ -104,6 +104,17 @@ SrVec SBPawn::getHPR()
 	return hpr;
 }
 
+void SBPawn::afterUpdate(double time)
+{
+	float x, y, z, h, p, r;
+	get_world_offset(x, y, z, h, p, r);
+	_posX->setValueFast(x);
+	_posY->setValueFast(y);
+	_posZ->setValueFast(z);
+	_rotX->setValueFast(p);
+	_rotY->setValueFast(h);
+	_rotZ->setValueFast(r);
+}
 
 void SBPawn::notify(SBSubject* subject)
 {
@@ -112,24 +123,45 @@ void SBPawn::notify(SBSubject* subject)
 	{
 		if (attribute->getName() == "posX")
 		{
-			double val = this->getDoubleAttribute(this->getName());
+			double val = this->getDoubleAttribute(attribute->getName());
 			SrVec position = this->getPosition();
 			position.x = (float) val;
 			this->setPosition(position);
 		}
 		else if (attribute->getName() == "posY")
 		{
-			double val = this->getDoubleAttribute(this->getName());
+			double val = this->getDoubleAttribute(attribute->getName());
 			SrVec position = this->getPosition();
 			position.y = (float) val;
 			this->setPosition(position);
 		}
 		else if (attribute->getName() == "posZ")
 		{
-			double val = this->getDoubleAttribute(this->getName());
+			double val = this->getDoubleAttribute(attribute->getName());
 			SrVec position = this->getPosition();
 			position.z = (float) val;
 			this->setPosition(position);
+		}
+		if (attribute->getName() == "rotX")
+		{
+			double val = this->getDoubleAttribute(attribute->getName());
+			SrVec hpr = this->getHPR();
+			hpr.y = (float) val;
+			this->setHPR(hpr);
+		}
+		else if (attribute->getName() == "rotY")
+		{
+			double val = this->getDoubleAttribute(attribute->getName());
+			SrVec hpr = this->getHPR();
+			hpr.x = (float) val;
+			this->setHPR(hpr);
+		}
+		else if (attribute->getName() == "rotZ")
+		{
+			double val = this->getDoubleAttribute(attribute->getName());
+			SrVec hpr = this->getHPR();
+			hpr.z = (float) val;
+			this->setHPR(hpr);
 		}
 		else if (attribute->getName() == "physics")
 		{
