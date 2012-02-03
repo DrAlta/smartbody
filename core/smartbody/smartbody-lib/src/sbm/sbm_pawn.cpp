@@ -160,8 +160,6 @@ wo_cache_timestamp( -std::numeric_limits<float>::max() )
 	_skeleton->ref();
 
 	SbmPawn::initData();
-
-	this->createBoolAttribute("physics", false, true, "Basic", 300, false, false, "is the pawn physics enabled");
 }
 
 void SbmPawn::initData()
@@ -1463,15 +1461,7 @@ void SbmPawn::setClassType(std::string classType)
 
 void SbmPawn::notify(SBSubject* subject)
 {
-	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
-	if (attribute)
-	{
-		if (attribute->getName() == "physics")
-		{
-			SmartBody::BoolAttribute* physicsAttr = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
-			//setPhysicsSim(physicsAttr->getValue());
-		}
-	}
+
 }
 
 

@@ -1875,6 +1875,38 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p
 
 			// parsing geometry
 			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f);
+
+			float factor = 1.0f;
+			for (unsigned int i = 0; i < meshModelVec.size(); i++)
+			{
+				for (int j = 0; j < meshModelVec[i]->V.size(); j++)
+				{
+					meshModelVec[i]->V[j] *= factor;
+				}
+
+				SrSnModel* srSnModelStatic = new SrSnModel();
+				srSnModelStatic->shape(*meshModelVec[i]);
+				srSnModelStatic->shape().name = meshModelVec[i]->name;
+				if (pawn->dMesh_p)
+				{
+					pawn->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
+					srSnModelStatic->ref();
+				}
+				SrSnGroup* meshGroup = new SrSnGroup();
+				meshGroup->separator(true);
+				meshGroup->add(srSnModelStatic);
+				// find the group of the root joint
+				SrSn* node = pawn->scene_p->get(0);
+				if (node)
+				{
+					SrSnGroup* srSnGroup = dynamic_cast<SrSnGroup*>(node);
+					if (srSnGroup)
+						srSnGroup->add(meshGroup);
+				}
+			
+				delete meshModelVec[i];
+			}
+
 		}
 		else
 		{

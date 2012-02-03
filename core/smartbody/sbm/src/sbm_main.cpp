@@ -904,13 +904,21 @@ int main( int argc, char **argv )	{
 			mcu.update();
 		}
 
-		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		/*for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
 			 iter != mcu.getCharacterMap().end();
 			 iter++)
 		{
 			SbmCharacter* character = (*iter).second;
 			if (character->scene_p)
 				character->scene_p->update();	
+		}*/
+		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+			 iter != mcu.getPawnMap().end();
+			 iter++)
+		{
+			SbmPawn* pawn = (*iter).second;
+			if (pawn->scene_p)
+				pawn->scene_p->update();	
 		}
 
 		// update any tracked cameras

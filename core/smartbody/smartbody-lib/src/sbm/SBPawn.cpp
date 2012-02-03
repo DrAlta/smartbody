@@ -13,6 +13,9 @@ SBPawn::SBPawn() : SbmPawn()
 	createDoubleAttribute("rotX", 0.0, true, "transform", 40, false, false, false, "X rotation");
 	createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
 	createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
+	createBoolAttribute("physics", false, true, "Basic", 300, false, false, "is the pawn physics enabled");
+	createStringAttribute("mesh", "", true, "Basic", 400, false, false, "Geometry/mesh");
+	createDoubleAttribute("meshScale", 1.0, true, "Basic", 410, false, false, "Scale of geometry/mesh");
 }
 
 SBPawn::SBPawn(const char* name) : SbmPawn(name)
@@ -23,7 +26,11 @@ SBPawn::SBPawn(const char* name) : SbmPawn(name)
 	createDoubleAttribute("rotX", 0.0, true, "transform", 40, false, false, false, "X rotation");
 	createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
 	createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
+	createBoolAttribute("physics", false, true, "Basic", 300, false, false, "is the pawn physics enabled");
+	createStringAttribute("mesh", "", true, "Basic", 300, false, false, "Geometry/mesh");
+	createDoubleAttribute("meshScale", 1.0, true, "Basic", 410, false, false, "Scale of geometry/mesh");
 }
+
 
 SBPawn::~SBPawn()
 {
@@ -123,6 +130,30 @@ void SBPawn::notify(SBSubject* subject)
 			SrVec position = this->getPosition();
 			position.z = (float) val;
 			this->setPosition(position);
+		}
+		else if (attribute->getName() == "physics")
+		{
+			SmartBody::BoolAttribute* physicsAttr = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			//setPhysicsSim(physicsAttr->getValue());
+		}
+		else if (attribute->getName() == "mesh")
+		{
+			SmartBody::StringAttribute* meshAttr = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+			mcuCBHandle& mcu = mcuCBHandle::singleton();
+			mcu_load_mesh(getName().c_str(), meshAttr->getValue().c_str(), &mcu, "");
+		}
+		else if (attribute->getName() == "meshScale")
+		{
+			SmartBody::DoubleAttribute* meshAttr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			if (this->dMesh_p)
+			{
+				for (size_t x = 0; x < this->dMesh_p->dMeshStatic_p.size(); x++)
+				{
+					SrSnModel* srSnmodel = this->dMesh_p->dMeshStatic_p[x];
+					SrModel& model = srSnmodel->shape();
+					model.scale((float) meshAttr->getValue());
+				}
+			}
 		}
 	}
 }

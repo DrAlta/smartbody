@@ -1138,10 +1138,9 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		iter++)
 	{
 		SbmPawn* pawn = (*iter).second;
-		SbmCharacter* char_p = dynamic_cast<SbmCharacter*>(pawn);
-		if( char_p && char_p->dMesh_p)
+		if(pawn->dMesh_p)
 		{
-			char_p->dMesh_p->update();
+			pawn->dMesh_p->update();
 		}
 	}
 	
@@ -1269,6 +1268,7 @@ void FltkViewer::draw()
 
    //----- Set Projection ----------------------------------------------
    cam.aspect = (float)w()/(float)h();
+
    glMatrixMode ( GL_PROJECTION );
    glLoadMatrix ( cam.get_perspective_mat(mat) );
 

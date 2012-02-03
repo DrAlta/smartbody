@@ -117,10 +117,13 @@ void FLTKListener::OnCharacterChanged( const std::string& name )
 
 void FLTKListener::OnPawnCreate( const std::string & name )
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmPawn* pawn = mcu.getPawn(name);
+	if (!pawn)
+		return;
+
 	if (name.find("light") == 0)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		SbmPawn* pawn = mcu.getPawn(name);
 		pawn->registerObserver(this);
 		BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
 		if (window)
@@ -128,12 +131,35 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 			window->fltkViewer->updateLights();
 		}
 	}
+
+	// remove any existing scene
+	if (pawn->scene_p)
+	{
+		mcu.remove_scene(pawn->scene_p);
+		pawn->scene_p->unref();
+		pawn->scene_p = NULL;
+	}
+	// remove any existing deformable mesh
+	if (pawn->dMesh_p)
+	{
+		delete pawn->dMesh_p;
+		pawn->dMesh_p = NULL;
+	}
+
+	pawn->dMesh_p =  new SbmDeformableMeshGPU();
+
+	pawn->scene_p = new SkScene();
+	pawn->scene_p->ref();
+	pawn->scene_p->init(pawn->getSkeleton());
+	mcu.add_scene(pawn->scene_p);
 }
 
 void FLTKListener::OnPawnDelete( const std::string & name )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmPawn* pawn = mcu.getPawn(name);
+	if (!pawn)
+		return;
 	pawn->unregisterObserver(this);
 
 	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
@@ -145,6 +171,14 @@ void FLTKListener::OnPawnDelete( const std::string & name )
 			window->fltkViewer->_objManipulator.get_active_control()->detach_pawn();
 			window->fltkViewer->_objManipulator.removeActiveControl();
 		}
+	}
+
+	// remove any existing scene
+	if (pawn->scene_p)
+	{
+		mcu.remove_scene(pawn->scene_p);
+		pawn->scene_p->unref();
+		pawn->scene_p = NULL;
 	}
 }
 
