@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'DataViewerDialog.ui'
 **
-** Created: Thu Feb 2 17:10:33 2012
+** Created: Fri Feb 3 11:48:56 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -23,7 +23,6 @@
 #include <QtGui/QListWidget>
 #include <QtGui/QPushButton>
 #include <QtGui/QSpinBox>
-#include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -31,7 +30,6 @@ QT_BEGIN_NAMESPACE
 class Ui_DataViewerDialog
 {
 public:
-    QVBoxLayout *verticalLayout;
     QFrame *frame;
     QLabel *characterNameLabel;
     QComboBox *characterNameBox;
@@ -53,17 +51,16 @@ public:
     QPushButton *freezeButton;
     QListWidget *channelListBox;
     QListWidget *monitoredListBox;
-    QWidget *widget;
+    QWidget *renderSize;
 
     void setupUi(QDialog *DataViewerDialog)
     {
         if (DataViewerDialog->objectName().isEmpty())
             DataViewerDialog->setObjectName(QString::fromUtf8("DataViewerDialog"));
         DataViewerDialog->resize(806, 599);
-        verticalLayout = new QVBoxLayout(DataViewerDialog);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         frame = new QFrame(DataViewerDialog);
         frame->setObjectName(QString::fromUtf8("frame"));
+        frame->setGeometry(QRect(9, 9, 788, 211));
         frame->setFrameShape(QFrame::StyledPanel);
         frame->setFrameShadow(QFrame::Raised);
         characterNameLabel = new QLabel(frame);
@@ -142,14 +139,9 @@ public:
         monitoredListBox->setObjectName(QString::fromUtf8("monitoredListBox"));
         monitoredListBox->setGeometry(QRect(530, 10, 251, 141));
         monitoredListBox->setSelectionMode(QAbstractItemView::MultiSelection);
-
-        verticalLayout->addWidget(frame);
-
-        widget = new QWidget(DataViewerDialog);
-        widget->setObjectName(QString::fromUtf8("widget"));
-
-        verticalLayout->addWidget(widget);
-
+        renderSize = new QWidget(DataViewerDialog);
+        renderSize->setObjectName(QString::fromUtf8("renderSize"));
+        renderSize->setGeometry(QRect(9, 229, 788, 361));
 
         retranslateUi(DataViewerDialog);
 

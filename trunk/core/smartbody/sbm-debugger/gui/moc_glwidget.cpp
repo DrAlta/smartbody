@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'glwidget.h'
 **
-** Created: Thu Feb 2 16:50:21 2012
+** Created: Fri Feb 3 18:51:51 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_GLWidget[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       5,   14, // methods
+       8,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -38,6 +38,9 @@ static const uint qt_meta_data_GLWidget[] = {
      133,    9,    9,    9, 0x0a,
      167,  150,    9,    9, 0x0a,
      242,  230,    9,    9, 0x0a,
+     299,  291,    9,    9, 0x0a,
+     320,  291,    9,    9, 0x0a,
+     345,  291,    9,    9, 0x0a,
 
        0        // eod
 };
@@ -50,6 +53,9 @@ static const char qt_meta_stringdata_GLWidget[] = {
     "sceneTreeCurrentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)\0"
     "item,column\0"
     "sceneTreeItemDoubleClicked(QTreeWidgetItem*,int)\0"
+    "enabled\0ToggleShowAxes(bool)\0"
+    "ToggleShowEyeBeams(bool)\0"
+    "ToggleAllowBoneUpdates(bool)\0"
 };
 
 const QMetaObject GLWidget::staticMetaObject = {
@@ -86,9 +92,12 @@ int GLWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 2: ToggleFreeLook(); break;
         case 3: sceneTreeCurrentItemChanged((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< QTreeWidgetItem*(*)>(_a[2]))); break;
         case 4: sceneTreeItemDoubleClicked((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 5: ToggleShowAxes((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 6: ToggleShowEyeBeams((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 7: ToggleAllowBoneUpdates((*reinterpret_cast< bool(*)>(_a[1]))); break;
         default: ;
         }
-        _id -= 5;
+        _id -= 8;
     }
     return _id;
 }

@@ -3,6 +3,7 @@
 DataViewerDialog::DataViewerDialog(Scene* scene, QWidget* parent) : QDialog(parent)
 {
    ui.setupUi(this);
+   m_pGraphWidget = new GLGraphWidget(ui.renderSize->geometry(), scene, this);
    m_pScene = scene;
 
    for (unsigned int i = 0; i < m_pScene->m_characters.size(); i++)
@@ -29,7 +30,7 @@ DataViewerDialog::DataViewerDialog(Scene* scene, QWidget* parent) : QDialog(pare
 
 DataViewerDialog::~DataViewerDialog()
 {
-   
+   delete m_pGraphWidget;
 }
 
 //void DataViewerDialog::AddAllJointsToList(QListWidget* list, std::vector<Joint*>& joints)

@@ -75,6 +75,7 @@
     <addaction name="actionData_Viewer"/>
     <addaction name="actionResource_Viewer"/>
     <addaction name="actionCommand_Window"/>
+    <addaction name="actionUtils_Window"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -325,10 +326,18 @@
   </action>
   <action name="actionData_Viewer">
    <property name="text">
-    <string>Data Viewer</string>
+    <string>D&amp;ata Viewer</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+D</string>
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionUtils_Window">
+   <property name="text">
+    <string>U&amp;tils Window</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
  </widget>

@@ -3,6 +3,7 @@
 
 #include "ui_DataViewerDialog.h"
 #include "SbmDebuggerCommon.h"
+#include "GLGraphWidget.h"
 
 class DataViewerDialog : public QDialog
 {
@@ -20,6 +21,7 @@ private slots:
 private:
    Ui::DataViewerDialog ui;
    Scene* m_pScene;
+   GLGraphWidget* m_pGraphWidget;
 
    //void AddAllJointsToList(QListWidget* list, std::vector<Joint*>& joints);
 };

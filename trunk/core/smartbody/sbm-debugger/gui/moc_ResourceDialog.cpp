@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'ResourceDialog.h'
 **
-** Created: Thu Feb 2 16:50:21 2012
+** Created: Fri Feb 3 18:51:51 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
