@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Thu Feb 2 15:15:53 2012
+** Created: Fri Feb 3 18:47:22 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -40,6 +40,7 @@ public:
     QAction *actionResource_Viewer;
     QAction *actionCommand_Window;
     QAction *actionData_Viewer;
+    QAction *actionUtils_Window;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout_3;
     QWidget *RenderView;
@@ -90,6 +91,8 @@ public:
         actionCommand_Window->setObjectName(QString::fromUtf8("actionCommand_Window"));
         actionData_Viewer = new QAction(MainWindow);
         actionData_Viewer->setObjectName(QString::fromUtf8("actionData_Viewer"));
+        actionUtils_Window = new QAction(MainWindow);
+        actionUtils_Window->setObjectName(QString::fromUtf8("actionUtils_Window"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout_3 = new QHBoxLayout(centralwidget);
@@ -200,6 +203,7 @@ public:
         menuSbm->addAction(actionData_Viewer);
         menuSbm->addAction(actionResource_Viewer);
         menuSbm->addAction(actionCommand_Window);
+        menuSbm->addAction(actionUtils_Window);
         toolBar->addAction(actionToggleFreeLookCamera);
 
         retranslateUi(MainWindow);
@@ -231,8 +235,10 @@ public:
         actionResource_Viewer->setText(QApplication::translate("MainWindow", "&Resource Viewer", 0, QApplication::UnicodeUTF8));
         actionResource_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0, QApplication::UnicodeUTF8));
         actionCommand_Window->setText(QApplication::translate("MainWindow", "Command Window", 0, QApplication::UnicodeUTF8));
-        actionData_Viewer->setText(QApplication::translate("MainWindow", "Data Viewer", 0, QApplication::UnicodeUTF8));
-        actionData_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+D", 0, QApplication::UnicodeUTF8));
+        actionData_Viewer->setText(QApplication::translate("MainWindow", "D&ata Viewer", 0, QApplication::UnicodeUTF8));
+        actionData_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+A", 0, QApplication::UnicodeUTF8));
+        actionUtils_Window->setText(QApplication::translate("MainWindow", "U&tils Window", 0, QApplication::UnicodeUTF8));
+        actionUtils_Window->setShortcut(QApplication::translate("MainWindow", "Ctrl+T", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0, QApplication::UnicodeUTF8));
         menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));

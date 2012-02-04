@@ -92,6 +92,21 @@ void GLWidget::sceneTreeItemDoubleClicked(QTreeWidgetItem * item, int column)
    }
 }
 
+void GLWidget::ToggleShowAxes(bool enabled)
+{
+   
+}
+
+void GLWidget::ToggleShowEyeBeams(bool enabled)
+{
+   
+}
+
+void GLWidget::ToggleAllowBoneUpdates(bool enabled)
+{
+   
+}
+
 void GLWidget::initializeGL()
 {
     qglClearColor(qtPurple.dark());

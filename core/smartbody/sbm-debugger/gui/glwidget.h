@@ -44,6 +44,9 @@ public slots:
     void ToggleFreeLook();
     void sceneTreeCurrentItemChanged ( QTreeWidgetItem * current, QTreeWidgetItem * previous );
     void sceneTreeItemDoubleClicked(QTreeWidgetItem * item, int column);
+    void ToggleShowAxes(bool enabled);
+    void ToggleShowEyeBeams(bool enabled);
+    void ToggleAllowBoneUpdates(bool enabled);
 
 signals:
     void JointPicked(const Pawn* jointOwner, const Joint* jointSelected);

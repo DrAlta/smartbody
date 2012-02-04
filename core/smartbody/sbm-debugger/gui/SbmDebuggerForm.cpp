@@ -10,6 +10,7 @@
 #include "ResourceDialog.h"
 #include "CommandDialog.h"
 #include "DataViewerDialog.h"
+#include "UtilsDialog.h"
 
 
 using std::vector;
@@ -61,6 +62,7 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
 SbmDebuggerForm::~SbmDebuggerForm()
 {
    vhmsg::ttu_close();
+   delete m_pGLWidget;
 }
 
 QSize SbmDebuggerForm::sizeHint() const
@@ -83,6 +85,7 @@ void SbmDebuggerForm::InitSignalsSlots()
    connect(ui.actionResource_Viewer, SIGNAL(triggered()), this, SLOT(ShowResourceDialog()));
    connect(ui.actionCommand_Window, SIGNAL(triggered()), this, SLOT(ShowCommandDialog()));
    connect(ui.actionData_Viewer, SIGNAL(triggered()), this, SLOT(ShowDataViewerDialog()));
+   connect(ui.actionUtils_Window, SIGNAL(triggered()), this, SLOT(ShowUtilDialog()));
 
    // Scene Tree
    //selection changes shall trigger a slot
@@ -170,6 +173,12 @@ void SbmDebuggerForm::ShowCommandDialog()
 void SbmDebuggerForm::ShowDataViewerDialog()
 {
    DataViewerDialog dlg(c.GetScene(), this);
+   dlg.exec();
+}
+
+void SbmDebuggerForm::ShowUtilDialog()
+{
+   UtilsDialog dlg(c.GetScene(), m_pGLWidget, this);
    dlg.exec();
 }
 
