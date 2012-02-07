@@ -5,10 +5,10 @@ BMLSpeechObject::BMLSpeechObject() : BMLObject()
 {
 	setName("speech");
 
-	typeAttr = createStringAttribute("type", "text\\/plain", "", "Basic", 10, false, false, false, "Format of speech content.");
+	typeAttr = createStringAttribute("type", "text/plain", "", "Basic", 10, false, false, false, "Format of speech content.");
 	std::vector<std::string> types;
-	types.push_back("text\\/plain");
-	types.push_back("application\\/ssml+xml");
+	types.push_back("text/plain");
+	types.push_back("application/ssml+xml");
 	typeAttr->setValidValues(types);
 
 	refAttr = createStringAttribute("ref", "", "", "Basic", 100, false, false, false, "Reference .xml file that contains speech information. Either set this attribute, or enter the content.");

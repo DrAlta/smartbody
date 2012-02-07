@@ -15,6 +15,7 @@ scene.run("init-common-assets.py")
 scene.run("init-common-face.py")
 scene.command("panim enable")
 
+
 doctor = scene.createCharacter("doctor", "SasoBase.SasoDoctorPerez")
 doctorSkeleton = scene.createSkeleton("common.sk")
 doctor.setSkeleton(doctorSkeleton)
@@ -73,6 +74,9 @@ scene.setDefaultRecipient("elder")
 scene.run("init-param-animation.py")
 
 scene.run("init-steer-agents.py")
+
+scene.setBoolAttribute("internalAudio", True)
+
 
 #scene.run("init-example-reach.py")
 #names = scene.getCharacterNames()

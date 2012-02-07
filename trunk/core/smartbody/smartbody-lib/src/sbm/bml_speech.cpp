@@ -84,6 +84,8 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 
 	// Parse <speech> for sync points
 	const XMLCh* type = xml->getAttribute( BMLDefs::ATTR_TYPE );
+	std::string typeStr;
+	xml_utils::xml_translate(&typeStr, type);
 	if( type ) {
 #if ENABLE_BMLR_SPEECH_REQUEST_CODE
 		// [BMLR] text/plain as default type
@@ -92,7 +94,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 		}
 #endif
 
-		if( XMLString::compareString( type, BML::BMLDefs::VALUE_TEXT_PLAIN )==0 ) {
+		if( XMLString::compareString( type, BML::BMLDefs::VALUE_TEXT_PLAIN )==0 || typeStr.size() == 0) {
 			if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): <speech type=\"" << BML::BMLDefs::VALUE_TEXT_PLAIN << "\">" << endl;
 			// Search for <tm> sync_points
 			DOMElement* child = xml_utils::getFirstChildElement( xml );

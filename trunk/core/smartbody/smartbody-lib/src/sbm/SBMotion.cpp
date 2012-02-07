@@ -416,4 +416,45 @@ bool SBMotion::move(int startFrame, int endFrame, int position)
 	return true;
 }
 */
+
+double SBMotion::getTimeStart()
+{
+	return time_start();
+}
+
+double SBMotion::getTimeReady()
+{
+	return time_ready();
+}
+
+double SBMotion::getTimeStrokeStart()
+{
+	return time_stroke_start();
+}
+
+double SBMotion::getTimeStroke()
+{
+	return time_stroke_emphasis();
+}
+
+double SBMotion::getTimeStrokeEnd()
+{
+	return time_stroke_end();
+}
+
+double SBMotion::getTimeRelax()
+{
+	return time_relax();
+}
+
+double SBMotion::getTimeStop()
+{
+	return time_stop();
+}
+
+
+
+
+
+
 };

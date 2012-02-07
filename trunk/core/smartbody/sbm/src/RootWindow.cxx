@@ -766,17 +766,9 @@ void BaseWindow::AudioCB(Fl_Widget* w, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	if (mcu.play_internal_audio)
-	{
-		mcu.play_internal_audio = false;
-		AUDIO_Close();
-	}
-	else
-	{
-		mcu.play_internal_audio = true;
-		AUDIO_Init();
-	}
+	SmartBody::SBScene* scene = mcu._scene;
+	const bool val = scene->getBoolAttribute("internalAudio");
+	scene->setBoolAttribute("internalAudio", !val);
 }
 
 void BaseWindow::CreateCharacterCB(Fl_Widget* w, void* data)
