@@ -4628,97 +4628,120 @@ int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 /*
-* Callback function for vrPerception message
-*/
+ * Callback function for vrPerception message
+ * vrPerception kinect/gavam ...
+ * vrPerception <userid> <recipientid> <messageid> <pml>
+ */
 int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
-	LOG("coordinates received");
 	if (mcu_p)
 	{
 		char * command = args.read_token();
-
+		
 		//only considering kinect or gavam or both
-
-      if ( _stricmp( command, "kinect" ) == 0 ||
-           _stricmp( command, "gavam" ) == 0 )
-      {
+		if (_stricmp(command, "kinect") == 0 || _stricmp(command, "gavam") == 0)
+		{
+			LOG("coordinates received");
 		  //if the message contains kinect data
-		  if (_stricmp( command, "kinect" ) == 0)
-		  {
-			  string stringId = args.read_token();
-			  int kinectId = args.read_int();
-			  string stringFailed = args.read_token();
-			  int kinectFailed = args.read_int();
-			  string stringUsers = args.read_token();
-			  int kinectUsers = args.read_int();
+			if (_stricmp(command, "kinect") == 0)
+			{
+				string stringId = args.read_token();
+				int kinectId = args.read_int();
+				string stringFailed = args.read_token();
+				int kinectFailed = args.read_int();
+				string stringUsers = args.read_token();
+				int kinectUsers = args.read_int();
 
-			  for (int indexUsers = 0; indexUsers < kinectUsers; ++indexUsers)
-			  {
-				string stringPosition = args.read_token();
-				float x = args.read_float();
-				float y = args.read_float();
-				float z = args.read_float();
-			  }
+				for (int indexUsers = 0; indexUsers < kinectUsers; ++indexUsers)
+				{
+					string stringPosition = args.read_token();
+					float x = args.read_float();
+					float y = args.read_float();
+					float z = args.read_float();
+				}
 
-			  //currently not doing anything with the Kinect data
+				//currently not doing anything with the Kinect data
+				command = args.read_token();
 
-			  command = args.read_token();
+				//if message contains gavam after kinect
+				//ideally  this parsing should be a separate method so that the message can contain gavam / kinect in any order
+				if (_stricmp( command, "gavam" ) == 0)
+				{
+					PerceptionData* data = new PerceptionData();
 
-			  //if message contains gavam after kinect
-			  //ideally  this parsing should be a separate method so that the message can contain gavam / kinect in any order
-			  if (_stricmp( command, "gavam" ) == 0)
-			  {
-				  PerceptionData* data = new PerceptionData();
+					//parse float data
+					data->pos[0] = args.read_float();
+					data->pos[1] = args.read_float();
+					data->pos[2] = args.read_float();
+					data->rot[0] = args.read_float();
+					data->rot[1] = args.read_float();
+					data->rot[2] = args.read_float();
 
-				  //parse float data
-				  data->pos[0] = args.read_float();
-				  data->pos[1] = args.read_float();
-				  data->pos[2] = args.read_float();
-				  data->rot[0] = args.read_float();
-				  data->rot[1] = args.read_float();
-				  data->rot[2] = args.read_float();
+					//For converting data from euler to quaternion
 
-				  //For converting data from euler to quaternion
+					float cos_z_2 = cosf((float)0.5*data->rot[2]);
+					float cos_y_2 = cosf((float)0.5*data->rot[1]);
+					float cos_x_2 = cosf((float)0.5*data->rot[0]);
 
-				  float cos_z_2 = cosf((float)0.5*data->rot[2]);
-				  float cos_y_2 = cosf((float)0.5*data->rot[1]);
-				  float cos_x_2 = cosf((float)0.5*data->rot[0]);
+					float sin_z_2 = sinf((float)0.5*data->rot[2]);
+					float sin_y_2 = sinf((float)0.5*data->rot[1]);
+					float sin_x_2 = sinf((float)0.5*data->rot[0]);
 
-				  float sin_z_2 = sinf((float)0.5*data->rot[2]);
-				  float sin_y_2 = sinf((float)0.5*data->rot[1]);
-				  float sin_x_2 = sinf((float)0.5*data->rot[0]);
+					// and now compute quaternion
+					float quatW = cos_z_2*cos_y_2*cos_x_2 + sin_z_2*sin_y_2*sin_x_2;
+					float quatX = cos_z_2*cos_y_2*sin_x_2 - sin_z_2*sin_y_2*cos_x_2;
+					float quatY = cos_z_2*sin_y_2*cos_x_2 + sin_z_2*cos_y_2*sin_x_2;
+					float quatZ = sin_z_2*cos_y_2*cos_x_2 - cos_z_2*sin_y_2*sin_x_2;
 
-				  // and now compute quaternion
-				  float quatW = cos_z_2*cos_y_2*cos_x_2 + sin_z_2*sin_y_2*sin_x_2;
-				  float quatX = cos_z_2*cos_y_2*sin_x_2 - sin_z_2*sin_y_2*cos_x_2;
-				  float quatY = cos_z_2*sin_y_2*cos_x_2 + sin_z_2*cos_y_2*sin_x_2;
-				  float quatZ = sin_z_2*cos_y_2*cos_x_2 - cos_z_2*sin_y_2*sin_x_2;
+					// Log the Gavam data
+					LOG("Gavam Coordinates - %f %f %f %f %f %f", data->pos[0], data->pos[1], data->pos[2], data->rot[0], data->rot[1], data->rot[2]);
+					char *messg = new char[1024];
+					#ifdef WIN32
+					sprintf_s(messg, 1024, "receiver skeleton brad generic rotation skullbase %f %f %f %f", quatW, quatX, quatY, quatZ);
+					#else
+					snprintf(messg, 1024, "receiver skeleton brad generic rotation skullbase %f %f %f %f", quatW, quatX, quatY, quatZ);
+					#endif
+					//log message before sending it
+					//LOG(messg);
+					//sending temp mesg just to make sure it works 
+					//mcu_p->vhmsg_send("test", messg);
+					//send the receiver message to orient the skullbase of brad as per the user's head orientation as detected by Gavam
+					mcu_p->vhmsg_send("sbm", messg);
+					//after sending the message, send a test message as confirmation
+					//mcu_p->vhmsg_send("testconfirmed", messg);
+				}
+			}
 
-				  // Log the Gavam data
-				  LOG("Gavam Coordinates - %f %f %f %f %f %f", data->pos[0], data->pos[1], data->pos[2], data->rot[0], data->rot[1], data->rot[2]);
-				  char *messg = new char[1024];
-				  #ifdef WIN32
-				  sprintf_s(messg, 1024, "receiver skeleton brad generic rotation skullbase %f %f %f %f", quatW, quatX, quatY, quatZ);
-				  #else
-				  snprintf(messg, 1024, "receiver skeleton brad generic rotation skullbase %f %f %f %f", quatW, quatX, quatY, quatZ);
-				  #endif
-				  //log message before sending it
-				  //LOG(messg);
-				  //sending temp mesg just to make sure it works 
-				  //mcu_p->vhmsg_send("test", messg);
-				  //send the receiver message to orient the skullbase of brad as per the user's head orientation as detected by Gavam
-				  mcu_p->vhmsg_send("sbm", messg);
-				  //after sending the message, send a test message as confirmation
-				  //mcu_p->vhmsg_send("testconfirmed", messg);
-			  }
-		  }
-		  
-		  else if (_stricmp( command, "gavam" ) == 0)
-		  {
+			else if (_stricmp( command, "gavam" ) == 0)
+			{
 			  //this is only when only gavam is detected (which is not the case right now)
 			  //right now vrPerception send kinect and the gavam coordinates.
-		  }
-	  }
+			}
+		}
+		else
+		{
+			std::string from = std::string(command);
+			std::string to = args.read_token();
+			std::string messageId = args.read_token();
+			std::string pml = args.read_remainder_raw();
+
+			// get the NVBG process for the receiver character, if available
+			SbmCharacter* character = mcu_p->getCharacter(to);
+			if (!character)
+				return CMD_SUCCESS;
+
+			Nvbg* nvbg = character->getNvbg();
+			if (!nvbg)
+				return CMD_SUCCESS;
+
+			bool ok = nvbg->execute(from, to, messageId, pml);
+
+			if (!ok)
+			{
+				LOG("NVBG for perception receiver character %s did not handle message %s.", to.c_str(), messageId.c_str());
+			}
+			return CMD_SUCCESS;	
+		}
 	}
 
 	return CMD_SUCCESS;
@@ -6481,7 +6504,6 @@ int mcu_vrExpress_func( srArgBuffer& args, mcuCBHandle *mcu )
 	}
 	return CMD_SUCCESS;
 }
-
 
 int mcu_vhmsg_connect_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {

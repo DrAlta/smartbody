@@ -201,6 +201,7 @@ void OgreRenderer::createScene()
     vhmsg::ttu_register( "vrAgentBML" );
     vhmsg::ttu_register( "vrSpeak" );
     vhmsg::ttu_register( "vrExpress" );
+	vhmsg::ttu_register( "vrPerception" );
     vhmsg::ttu_register( "vrSpoke" );
     vhmsg::ttu_register( "RemoteSpeechReply" );
     vhmsg::ttu_register( "PlaySound" );
