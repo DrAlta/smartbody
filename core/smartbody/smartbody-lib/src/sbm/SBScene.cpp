@@ -5,7 +5,7 @@
 #include "sbm/mcontrol_util.h"
 
 #include "SbmDebuggerServer.h"
-
+#include <sbm/sbm_audio.h>
 
 namespace SmartBody {
 
@@ -75,7 +75,16 @@ void SBScene::notify( SBSubject* subject )
 	if (boolAttr && boolAttr->getName() == "internalAudio")
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		mcu.play_internal_audio = boolAttr->getValue();		
+		if (mcu.play_internal_audio)
+		{
+			mcu.play_internal_audio = false;
+			AUDIO_Close();
+		}
+		else
+		{
+			mcu.play_internal_audio = true;
+			AUDIO_Init();
+		}
 		return;
 	}
 

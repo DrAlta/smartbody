@@ -51,7 +51,7 @@ that is distributed: */
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Group.H>
-
+#include <FL/Fl_Choice.H>
 
 class SBObject;
 
@@ -70,6 +70,8 @@ public:
 	int getOffset();
 	void setObject(SmartBody::SBObject* g);
 	SmartBody::SBObject* getObject();
+
+	void addChoice(Fl_Choice* choice, const std::string& val);
 	
 	void setAttributeInfo(Fl_Widget* widget, SmartBody::SBAttributeInfo* attrInfo);
 	void reorderAttributes();

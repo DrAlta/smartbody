@@ -491,7 +491,7 @@ void AttributeWindow::draw()
 						int selected = -1;
 						for (size_t i = 0; i < values.size(); i++)
 						{
-							choice->add(values[i].c_str());
+							addChoice(choice, values[i]);
 							if (stringAttr->getValue() == values[i])
 								choice->value(i + 1);
 						}
@@ -575,7 +575,7 @@ void AttributeWindow::draw()
 								choice->add("-----");
 								for (size_t i = 0; i < validValues.size(); i++)
 								{
-									choice->add(validValues[i].c_str());
+									addChoice(choice, validValues[i]);
 									if (stringAttr->getValue() == validValues[i])
 										choice->value(i + 1);
 								}
@@ -1125,7 +1125,7 @@ void AttributeWindow::notify(SmartBody::SBSubject* subject)
 					int selected = -1;
 					for (size_t i = 0; i < values.size(); i++)
 					{
-						choice->add(values[i].c_str());
+						addChoice(choice, values[i]);
 						if (sattr->getValue() == values[i])
 							choice->value(i + 1);
 					}
@@ -1188,4 +1188,21 @@ void AttributeWindow::cleanUpWidgets()
 	}
 	widgetMap.clear();
 	reverseWidgetMap.clear();	
+}
+
+void AttributeWindow::addChoice(Fl_Choice* choice, const std::string& val)
+{
+	// if a choice includes a slash character, then it will automatically 
+	// create a submenu. To get around this, we need to first add the choice item,
+	// then later rename it with the slash character.
+	int pos = val.find_first_of("/");
+	if (pos == std::string::npos)
+	{
+		choice->add(val.c_str());
+		return;
+	}
+
+	int i = choice->add("xxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	Fl_Menu_Item* m = (Fl_Menu_Item*) choice->menu();
+	m[i].label(val.c_str());
 }
