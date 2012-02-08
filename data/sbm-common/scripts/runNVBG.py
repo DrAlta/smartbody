@@ -42,12 +42,14 @@ class N(Nvbg):
                 xmlRoot = ET.XML(xml)
                 rootTag = xmlRoot.tag
                 if (rootTag == "pml-nvbg"):     # if it's pml-nvbg, then process percepts
-                        bmlStr = p.process_percepts(recipient, character, xml)
+                        # for perception, character is the speaker, recipient is the character
+                        bmlstr = p.process_percepts(character, recipient, xml)
+                        if (len(bmlstr) != 0):
+                                bml.execXML(recipient, str(bmlstr))
                 else:
-                        bmlStr = p.process_speech(character,recipient,messageId, xml)
-                if (len(bmlstr) != 0):
-                    bml.execBML(character, str(bmlstr))
-                    print str(bmlstr)
+                        bmlstr = p.process_speech(character,recipient,messageId, xml)
+                        if (len(bmlstr) != 0):
+                                bml.execBML(character, str(bmlstr))
                 return True
 
 	def objectEvent(self, character, name, isAnimate, position, velocity, relativePosition, relativeVelocity):
