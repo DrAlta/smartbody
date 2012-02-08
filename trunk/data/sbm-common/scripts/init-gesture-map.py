@@ -10,3 +10,4 @@ for i in range(0, numCharacters):
     gMap.addGestureMapping("LHandOnHip_Arms_GestureWhy", "WHY", "LHandOnHip_Motex", "BOTH_HANDS")
     gMap.addGestureMapping("LHandOnHip_RArm_GestureOffer", "OFFER", "LHandOnHip_Motex", "RIGHT_HAND")
     gMap.addGestureMapping("LHandOnHip_RArm_SweepRight", "SWEEP", "LHandOnHip_Motex", "RIGHT_HAND")
+    gMap.addGestureMapping("LHandOnHip_RArm_SweepRight", "YOU", "ChrUtah_Idle003", "RIGHT_HAND")
