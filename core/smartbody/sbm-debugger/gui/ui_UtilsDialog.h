@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'UtilsDialog.ui'
 **
-** Created: Fri Feb 3 18:47:22 2012
+** Created: Thu Feb 9 14:01:24 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -36,11 +36,12 @@ public:
     QPushButton *SpeakButton;
     QFrame *line_2;
     QLabel *speechLabel;
+    QPushButton *runBmlButton;
     QFrame *frame_2;
     QLabel *animationNamesLabel;
     QFrame *line;
     QPushButton *QueryAnimButton;
-    QComboBox *comboBox;
+    QComboBox *animationNamesBox;
     QLabel *animationsLabel;
     QPlainTextEdit *plainTextEdit;
     QLabel *filterLabel;
@@ -55,11 +56,15 @@ public:
     QFrame *frame_4;
     QPushButton *GazeAtButton;
     QLabel *gazeTargetLabel;
-    QComboBox *comboBox_2;
+    QComboBox *gazeTargetBox;
     QFrame *line_5;
     QLabel *controlLabel;
     QFrame *line_6;
-    QPushButton *runBmlButton;
+    QComboBox *selectedCharacterBox;
+    QLabel *selectedCharacterLabel;
+    QFrame *line_7;
+    QFrame *line_8;
+    QPushButton *refreshButton;
 
     void setupUi(QDialog *UtilsDialog)
     {
@@ -68,7 +73,7 @@ public:
         UtilsDialog->resize(488, 498);
         frame = new QFrame(UtilsDialog);
         frame->setObjectName(QString::fromUtf8("frame"));
-        frame->setGeometry(QRect(260, 10, 211, 191));
+        frame->setGeometry(QRect(250, 70, 211, 221));
         frame->setFrameShape(QFrame::StyledPanel);
         frame->setFrameShadow(QFrame::Raised);
         bmlFilesBox = new QComboBox(frame);
@@ -98,9 +103,12 @@ public:
         QFont font;
         font.setPointSize(10);
         speechLabel->setFont(font);
+        runBmlButton = new QPushButton(frame);
+        runBmlButton->setObjectName(QString::fromUtf8("runBmlButton"));
+        runBmlButton->setGeometry(QRect(10, 190, 61, 23));
         frame_2 = new QFrame(UtilsDialog);
         frame_2->setObjectName(QString::fromUtf8("frame_2"));
-        frame_2->setGeometry(QRect(10, 10, 211, 181));
+        frame_2->setGeometry(QRect(10, 70, 211, 181));
         frame_2->setFrameShape(QFrame::StyledPanel);
         frame_2->setFrameShadow(QFrame::Raised);
         animationNamesLabel = new QLabel(frame_2);
@@ -115,9 +123,9 @@ public:
         QueryAnimButton = new QPushButton(frame_2);
         QueryAnimButton->setObjectName(QString::fromUtf8("QueryAnimButton"));
         QueryAnimButton->setGeometry(QRect(80, 150, 75, 23));
-        comboBox = new QComboBox(frame_2);
-        comboBox->setObjectName(QString::fromUtf8("comboBox"));
-        comboBox->setGeometry(QRect(10, 120, 191, 22));
+        animationNamesBox = new QComboBox(frame_2);
+        animationNamesBox->setObjectName(QString::fromUtf8("animationNamesBox"));
+        animationNamesBox->setGeometry(QRect(10, 120, 191, 22));
         animationsLabel = new QLabel(frame_2);
         animationsLabel->setObjectName(QString::fromUtf8("animationsLabel"));
         animationsLabel->setGeometry(QRect(10, 10, 71, 16));
@@ -133,36 +141,36 @@ public:
         PlayAnimButton->setGeometry(QRect(10, 150, 61, 23));
         frame_3 = new QFrame(UtilsDialog);
         frame_3->setObjectName(QString::fromUtf8("frame_3"));
-        frame_3->setGeometry(QRect(260, 250, 141, 101));
+        frame_3->setGeometry(QRect(250, 310, 141, 91));
         frame_3->setFrameShape(QFrame::StyledPanel);
         frame_3->setFrameShadow(QFrame::Raised);
         renderingLabel = new QLabel(frame_3);
         renderingLabel->setObjectName(QString::fromUtf8("renderingLabel"));
-        renderingLabel->setGeometry(QRect(10, 10, 71, 16));
+        renderingLabel->setGeometry(QRect(10, 0, 71, 16));
         renderingLabel->setFont(font);
         showAxesBox = new QCheckBox(frame_3);
         showAxesBox->setObjectName(QString::fromUtf8("showAxesBox"));
-        showAxesBox->setGeometry(QRect(10, 40, 81, 17));
+        showAxesBox->setGeometry(QRect(10, 30, 81, 17));
         line_3 = new QFrame(frame_3);
         line_3->setObjectName(QString::fromUtf8("line_3"));
-        line_3->setGeometry(QRect(10, 30, 118, 3));
+        line_3->setGeometry(QRect(10, 20, 118, 3));
         line_3->setLineWidth(1);
         line_3->setFrameShape(QFrame::HLine);
         line_3->setFrameShadow(QFrame::Sunken);
         showEyeBeamsBox = new QCheckBox(frame_3);
         showEyeBeamsBox->setObjectName(QString::fromUtf8("showEyeBeamsBox"));
-        showEyeBeamsBox->setGeometry(QRect(10, 60, 111, 17));
+        showEyeBeamsBox->setGeometry(QRect(10, 50, 111, 17));
         allowBoneUpdatesBox = new QCheckBox(frame_3);
         allowBoneUpdatesBox->setObjectName(QString::fromUtf8("allowBoneUpdatesBox"));
-        allowBoneUpdatesBox->setGeometry(QRect(10, 80, 121, 17));
+        allowBoneUpdatesBox->setGeometry(QRect(10, 70, 121, 17));
         line_4 = new QFrame(UtilsDialog);
         line_4->setObjectName(QString::fromUtf8("line_4"));
-        line_4->setGeometry(QRect(230, 10, 20, 231));
+        line_4->setGeometry(QRect(230, 70, 20, 231));
         line_4->setFrameShape(QFrame::VLine);
         line_4->setFrameShadow(QFrame::Sunken);
         frame_4 = new QFrame(UtilsDialog);
         frame_4->setObjectName(QString::fromUtf8("frame_4"));
-        frame_4->setGeometry(QRect(20, 250, 141, 111));
+        frame_4->setGeometry(QRect(20, 310, 141, 111));
         frame_4->setFrameShape(QFrame::StyledPanel);
         frame_4->setFrameShadow(QFrame::Raised);
         GazeAtButton = new QPushButton(frame_4);
@@ -171,9 +179,9 @@ public:
         gazeTargetLabel = new QLabel(frame_4);
         gazeTargetLabel->setObjectName(QString::fromUtf8("gazeTargetLabel"));
         gazeTargetLabel->setGeometry(QRect(0, 30, 61, 16));
-        comboBox_2 = new QComboBox(frame_4);
-        comboBox_2->setObjectName(QString::fromUtf8("comboBox_2"));
-        comboBox_2->setGeometry(QRect(0, 50, 121, 22));
+        gazeTargetBox = new QComboBox(frame_4);
+        gazeTargetBox->setObjectName(QString::fromUtf8("gazeTargetBox"));
+        gazeTargetBox->setGeometry(QRect(0, 50, 121, 22));
         line_5 = new QFrame(frame_4);
         line_5->setObjectName(QString::fromUtf8("line_5"));
         line_5->setGeometry(QRect(0, 20, 118, 3));
@@ -186,13 +194,30 @@ public:
         controlLabel->setFont(font);
         line_6 = new QFrame(UtilsDialog);
         line_6->setObjectName(QString::fromUtf8("line_6"));
-        line_6->setGeometry(QRect(20, 230, 441, 16));
+        line_6->setGeometry(QRect(20, 290, 441, 16));
         line_6->setLineWidth(1);
         line_6->setFrameShape(QFrame::HLine);
         line_6->setFrameShadow(QFrame::Sunken);
-        runBmlButton = new QPushButton(UtilsDialog);
-        runBmlButton->setObjectName(QString::fromUtf8("runBmlButton"));
-        runBmlButton->setGeometry(QRect(270, 200, 61, 23));
+        selectedCharacterBox = new QComboBox(UtilsDialog);
+        selectedCharacterBox->setObjectName(QString::fromUtf8("selectedCharacterBox"));
+        selectedCharacterBox->setGeometry(QRect(10, 30, 131, 22));
+        selectedCharacterLabel = new QLabel(UtilsDialog);
+        selectedCharacterLabel->setObjectName(QString::fromUtf8("selectedCharacterLabel"));
+        selectedCharacterLabel->setGeometry(QRect(10, 10, 91, 16));
+        line_7 = new QFrame(UtilsDialog);
+        line_7->setObjectName(QString::fromUtf8("line_7"));
+        line_7->setGeometry(QRect(20, 60, 441, 16));
+        line_7->setLineWidth(1);
+        line_7->setFrameShape(QFrame::HLine);
+        line_7->setFrameShadow(QFrame::Sunken);
+        line_8 = new QFrame(UtilsDialog);
+        line_8->setObjectName(QString::fromUtf8("line_8"));
+        line_8->setGeometry(QRect(230, 300, 20, 121));
+        line_8->setFrameShape(QFrame::VLine);
+        line_8->setFrameShadow(QFrame::Sunken);
+        refreshButton = new QPushButton(UtilsDialog);
+        refreshButton->setObjectName(QString::fromUtf8("refreshButton"));
+        refreshButton->setGeometry(QRect(150, 30, 61, 23));
 
         retranslateUi(UtilsDialog);
 
@@ -206,6 +231,7 @@ public:
         bmlFilesLabel->setText(QApplication::translate("UtilsDialog", "BML Files", 0, QApplication::UnicodeUTF8));
         SpeakButton->setText(QApplication::translate("UtilsDialog", "Speak", 0, QApplication::UnicodeUTF8));
         speechLabel->setText(QApplication::translate("UtilsDialog", "Speech", 0, QApplication::UnicodeUTF8));
+        runBmlButton->setText(QApplication::translate("UtilsDialog", "Run", 0, QApplication::UnicodeUTF8));
         animationNamesLabel->setText(QApplication::translate("UtilsDialog", "Animation Names", 0, QApplication::UnicodeUTF8));
         QueryAnimButton->setText(QApplication::translate("UtilsDialog", "Query Anims", 0, QApplication::UnicodeUTF8));
         animationsLabel->setText(QApplication::translate("UtilsDialog", "Animations", 0, QApplication::UnicodeUTF8));
@@ -218,7 +244,8 @@ public:
         GazeAtButton->setText(QApplication::translate("UtilsDialog", "Gaze At", 0, QApplication::UnicodeUTF8));
         gazeTargetLabel->setText(QApplication::translate("UtilsDialog", "Gaze Target", 0, QApplication::UnicodeUTF8));
         controlLabel->setText(QApplication::translate("UtilsDialog", "Control", 0, QApplication::UnicodeUTF8));
-        runBmlButton->setText(QApplication::translate("UtilsDialog", "Run", 0, QApplication::UnicodeUTF8));
+        selectedCharacterLabel->setText(QApplication::translate("UtilsDialog", "Selected Character", 0, QApplication::UnicodeUTF8));
+        refreshButton->setText(QApplication::translate("UtilsDialog", "Refresh", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

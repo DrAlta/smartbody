@@ -2,13 +2,14 @@
 #define RESOURCE_DIALOG_H_
 
 #include "ui_ResourceDialog.h"
+#include "SbmDebuggerCommon.h"
 
 class ResourceDialog : public QDialog
 {
    Q_OBJECT
 
 public:
-   ResourceDialog(QWidget *parent = 0);
+   ResourceDialog(Scene* pScene, QWidget *parent = 0);
    ~ResourceDialog();
 
    Ui::ResourceDialog ui;
@@ -28,9 +29,11 @@ private:
       Event_Handlers,
       Pawns,
       Characters,
-      Scene,
+      _Scene,
       Services
    };
+
+   Scene* m_pScene;
 };
 
 #endif

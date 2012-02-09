@@ -13,9 +13,17 @@ public:
    ~UtilsDialog();
 
 private:
+   std::string GetSelectedChar();
+
    Ui::UtilsDialog ui;
    Scene* m_pScene;
    GLWidget* m_pRenderView;
+
+private slots:
+   void GazeAtPressed();
+   void RunBmlPressed();
+   void PlayAnimPressed();
+   void Refresh();
 };
 
 #endif
