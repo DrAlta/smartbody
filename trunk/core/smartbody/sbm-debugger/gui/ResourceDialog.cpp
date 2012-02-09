@@ -2,9 +2,10 @@
 
 #include "vhmsg-tt.h"
 
-ResourceDialog::ResourceDialog(QWidget *parent) 
+ResourceDialog::ResourceDialog(Scene* pScene, QWidget *parent) 
 : QDialog(parent)
 {
+   m_pScene = pScene;
    ui.setupUi(this);
 
    connect(ui.refreshButton, SIGNAL(pressed()), this, SLOT(Refresh()));
@@ -26,8 +27,10 @@ ResourceDialog::ResourceDialog(QWidget *parent)
    ui.resourceTree->insertTopLevelItem(Event_Handlers, new QTreeWidgetItem(ui.resourceTree, QStringList(QString("Event Handlers"))));
    ui.resourceTree->insertTopLevelItem(Pawns, new QTreeWidgetItem(ui.resourceTree, QStringList(QString("Pawns"))));
    ui.resourceTree->insertTopLevelItem(Characters, new QTreeWidgetItem(ui.resourceTree, QStringList(QString("Characters"))));
-   ui.resourceTree->insertTopLevelItem(Scene, new QTreeWidgetItem(ui.resourceTree, QStringList(QString("Scene"))));
+   ui.resourceTree->insertTopLevelItem(_Scene, new QTreeWidgetItem(ui.resourceTree, QStringList(QString("Scene"))));
    ui.resourceTree->insertTopLevelItem(Services, new QTreeWidgetItem(ui.resourceTree, QStringList(QString("Services"))));
+
+   Refresh();
 }
 
 ResourceDialog::~ResourceDialog()
@@ -37,5 +40,38 @@ ResourceDialog::~ResourceDialog()
 
 void ResourceDialog::Refresh()
 {
-   
+   //Path
+   QTreeWidgetItem* widget = ui.resourceTree->topLevelItem(Paths);
+   for (int i = 0; i < widget->childCount(); i++)
+   {
+      QTreeWidgetItem* child = widget->child(i);
+      if (child->text(0) == "Sequence Paths")
+      {
+         for (unsigned int j = 0; j < m_pScene->m_sequencePaths.size(); j++)
+         {
+            child->addChild(new QTreeWidgetItem(QStringList(QString(m_pScene->m_sequencePaths[i].c_str()))));
+         }
+      }
+      else if (child->text(0) == "ME Paths")
+      {
+         for (unsigned int j = 0; j < m_pScene->m_mePaths.size(); j++)
+         {
+            child->addChild(new QTreeWidgetItem(QStringList(QString(m_pScene->m_mePaths[i].c_str()))));
+         }
+      }
+      else if (child->text(0) == "Audio Paths")
+      {
+         for (unsigned int j = 0; j < m_pScene->m_audioPaths.size(); j++)
+         {
+            child->addChild(new QTreeWidgetItem(QStringList(QString(m_pScene->m_audioPaths[i].c_str()))));
+         }
+      }
+      else if (child->text(0) == "Mesh Paths")
+      {
+         for (unsigned int j = 0; j < m_pScene->m_meshPaths.size(); j++)
+         {
+            child->addChild(new QTreeWidgetItem(QStringList(QString(m_pScene->m_meshPaths[i].c_str()))));
+         }
+      }
+   }
 }
