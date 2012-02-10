@@ -39,6 +39,7 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
   vhmsg::ttu_set_client_callback(VHMsgCallback);
   vhmsg::ttu_open();
   vhmsg::ttu_register("sbmdebugger");
+  vhmsg::ttu_register("sbmlog");
 
   // setup scene tree
   ui.sceneDockWidget->setBaseSize(220, 767);

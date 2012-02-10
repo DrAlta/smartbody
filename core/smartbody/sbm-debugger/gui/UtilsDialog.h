@@ -4,6 +4,9 @@
 #include "ui_UtilsDialog.h"
 #include "GLWidget.h"
 
+using std::string;
+using std::vector;
+
 class UtilsDialog : public QDialog
 {
    Q_OBJECT
@@ -23,6 +26,9 @@ private slots:
    void GazeAtPressed();
    void RunBmlPressed();
    void PlayAnimPressed();
+   void SpeakButtonPressed();
+   void QueryAnimsPressed();
+   void FilterAnims();
    void Refresh();
 };
 

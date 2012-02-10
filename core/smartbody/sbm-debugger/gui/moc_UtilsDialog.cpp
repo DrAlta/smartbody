@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'UtilsDialog.h'
 **
-** Created: Thu Feb 9 14:21:44 2012
+** Created: Thu Feb 9 17:22:32 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_UtilsDialog[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       7,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -34,6 +34,10 @@ static const uint qt_meta_data_UtilsDialog[] = {
       13,   12,   12,   12, 0x08,
       29,   12,   12,   12, 0x08,
       45,   12,   12,   12, 0x08,
+      63,   12,   12,   12, 0x08,
+      84,   12,   12,   12, 0x08,
+     104,   12,   12,   12, 0x08,
+     118,   12,   12,   12, 0x08,
 
        0        // eod
 };
@@ -41,6 +45,8 @@ static const uint qt_meta_data_UtilsDialog[] = {
 static const char qt_meta_stringdata_UtilsDialog[] = {
     "UtilsDialog\0\0GazeAtPressed()\0"
     "RunBmlPressed()\0PlayAnimPressed()\0"
+    "SpeakButtonPressed()\0QueryAnimsPressed()\0"
+    "FilterAnims()\0Refresh()\0"
 };
 
 const QMetaObject UtilsDialog::staticMetaObject = {
@@ -75,9 +81,13 @@ int UtilsDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 0: GazeAtPressed(); break;
         case 1: RunBmlPressed(); break;
         case 2: PlayAnimPressed(); break;
+        case 3: SpeakButtonPressed(); break;
+        case 4: QueryAnimsPressed(); break;
+        case 5: FilterAnims(); break;
+        case 6: Refresh(); break;
         default: ;
         }
-        _id -= 3;
+        _id -= 7;
     }
     return _id;
 }

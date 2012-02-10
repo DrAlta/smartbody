@@ -233,6 +233,7 @@ public:
    std::vector<std::string> m_mePaths;
    std::vector<std::string> m_audioPaths;
    std::vector<std::string> m_meshPaths;
+   std::vector<std::string> m_animations;
 
 public:
    Scene()
