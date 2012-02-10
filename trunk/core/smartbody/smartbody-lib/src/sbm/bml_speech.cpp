@@ -244,6 +244,30 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 //	createStandardSyncPoint( TM_RELAX,        behav_syncs.sp_relax );
 //	createStandardSyncPoint( TM_END,          behav_syncs.sp_end );
 
+	// convert any <sync id=""/> to synch points
+
+	AudioFileSpeech* audioSpeech = dynamic_cast<AudioFileSpeech*>(cur_speech_impl);
+	if (audioSpeech)		
+	{
+		std::map< SmartBody::RequestId, SmartBody::AudioFileSpeech::SpeechRequestInfo >& speechRequestInfo = 
+			audioSpeech->getSpeechRequestInfo();
+
+		std::map< SmartBody::RequestId, SmartBody::AudioFileSpeech::SpeechRequestInfo >::iterator iter = speechRequestInfo.find(speech_request_id);
+		if (iter != speechRequestInfo.end())
+		{
+			SmartBody::AudioFileSpeech::SpeechRequestInfo& info = (*iter).second;
+			for(std::map< std::string, float >::iterator markerIter = info.timeMarkers.begin();
+				markerIter != info.timeMarkers.end();
+				markerIter++)
+			{
+				std::string markerName = (*markerIter).first;
+				float time = (*markerIter).second;
+				SpeechMark speechMark(xml_utils::xml_s2w(markerName), time);
+				marks.push_back(speechMark);
+			}
+		}
+	}
+	
 	SpeechRequestPtr speechResult( new SpeechRequest( unique_id, localId, behav_syncs, cur_speech_impl, cur_speech_impl_backup, speech_request_id, marks, request ) );
 	return speechResult;
 
