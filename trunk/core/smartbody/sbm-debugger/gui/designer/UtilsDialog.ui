@@ -37,6 +37,9 @@
       <height>22</height>
      </rect>
     </property>
+    <property name="editable">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QLabel" name="ttsLabel">
     <property name="geometry">
@@ -220,7 +223,7 @@
      <string>Animations</string>
     </property>
    </widget>
-   <widget class="QPlainTextEdit" name="plainTextEdit">
+   <widget class="QPlainTextEdit" name="animFilterBox">
     <property name="geometry">
      <rect>
       <x>10</x>

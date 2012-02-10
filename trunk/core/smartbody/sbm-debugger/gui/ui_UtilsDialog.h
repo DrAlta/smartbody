@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'UtilsDialog.ui'
 **
-** Created: Thu Feb 9 14:01:24 2012
+** Created: Thu Feb 9 17:13:12 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -43,7 +43,7 @@ public:
     QPushButton *QueryAnimButton;
     QComboBox *animationNamesBox;
     QLabel *animationsLabel;
-    QPlainTextEdit *plainTextEdit;
+    QPlainTextEdit *animFilterBox;
     QLabel *filterLabel;
     QPushButton *PlayAnimButton;
     QFrame *frame_3;
@@ -79,6 +79,7 @@ public:
         bmlFilesBox = new QComboBox(frame);
         bmlFilesBox->setObjectName(QString::fromUtf8("bmlFilesBox"));
         bmlFilesBox->setGeometry(QRect(10, 160, 191, 22));
+        bmlFilesBox->setEditable(true);
         ttsLabel = new QLabel(frame);
         ttsLabel->setObjectName(QString::fromUtf8("ttsLabel"));
         ttsLabel->setGeometry(QRect(10, 40, 91, 16));
@@ -130,9 +131,9 @@ public:
         animationsLabel->setObjectName(QString::fromUtf8("animationsLabel"));
         animationsLabel->setGeometry(QRect(10, 10, 71, 16));
         animationsLabel->setFont(font);
-        plainTextEdit = new QPlainTextEdit(frame_2);
-        plainTextEdit->setObjectName(QString::fromUtf8("plainTextEdit"));
-        plainTextEdit->setGeometry(QRect(10, 60, 191, 31));
+        animFilterBox = new QPlainTextEdit(frame_2);
+        animFilterBox->setObjectName(QString::fromUtf8("animFilterBox"));
+        animFilterBox->setGeometry(QRect(10, 60, 191, 31));
         filterLabel = new QLabel(frame_2);
         filterLabel->setObjectName(QString::fromUtf8("filterLabel"));
         filterLabel->setGeometry(QRect(10, 40, 71, 16));
