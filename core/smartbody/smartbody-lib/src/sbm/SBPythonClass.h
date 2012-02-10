@@ -26,7 +26,7 @@
 #endif
 #endif
 
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined (__ANDROID__)
 #ifndef USE_PYTHON
 #define USE_PYTHON
 #endif
