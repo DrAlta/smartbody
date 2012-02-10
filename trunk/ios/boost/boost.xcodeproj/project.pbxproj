@@ -814,6 +814,11 @@
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				HEADER_SEARCH_PATHS = (
+					"$PROJECT_DIR/../python/Python-2.6.5",
+					"$PROJECT_DIR/../python/Python-2.6.5/_install/include/python2.6",
+					$PROJECT_DIR/boost_1_44_0,
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -832,6 +837,11 @@
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				HEADER_SEARCH_PATHS = (
+					"$PROJECT_DIR/../python/Python-2.6.5",
+					"$PROJECT_DIR/../python/Python-2.6.5/_install/include/python2.6",
+					$PROJECT_DIR/boost_1_44_0,
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -850,6 +860,11 @@
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				HEADER_SEARCH_PATHS = (
+					"$PROJECT_DIR/../python/Python-2.6.5",
+					"$PROJECT_DIR/../python/Python-2.6.5/_install/include/python2.6",
+					$PROJECT_DIR/boost_1_44_0,
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -868,6 +883,11 @@
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				HEADER_SEARCH_PATHS = (
+					"$PROJECT_DIR/../python/Python-2.6.5",
+					"$PROJECT_DIR/../python/Python-2.6.5/_install/include/python2.6",
+					$PROJECT_DIR/boost_1_44_0,
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -886,6 +906,11 @@
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				HEADER_SEARCH_PATHS = (
+					"$PROJECT_DIR/../python/Python-2.6.5",
+					"$PROJECT_DIR/../python/Python-2.6.5/_install/include/python2.6",
+					$PROJECT_DIR/boost_1_44_0,
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -904,6 +929,11 @@
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				HEADER_SEARCH_PATHS = (
+					"$PROJECT_DIR/../python/Python-2.6.5",
+					"$PROJECT_DIR/../python/Python-2.6.5/_install/include/python2.6",
+					$PROJECT_DIR/boost_1_44_0,
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
