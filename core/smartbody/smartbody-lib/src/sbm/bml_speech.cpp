@@ -244,8 +244,9 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 //	createStandardSyncPoint( TM_RELAX,        behav_syncs.sp_relax );
 //	createStandardSyncPoint( TM_END,          behav_syncs.sp_end );
 
-	// convert any <sync id=""/> to synch points
+	/* Removed by AS 2/10/12 - add this if <sync id=""/> from the audiofiles ever needs to be added directly to the sync points
 
+	// convert any <sync id=""/> to synch points
 	AudioFileSpeech* audioSpeech = dynamic_cast<AudioFileSpeech*>(cur_speech_impl);
 	if (audioSpeech)		
 	{
@@ -267,6 +268,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 			}
 		}
 	}
+	*/
 	
 	SpeechRequestPtr speechResult( new SpeechRequest( unique_id, localId, behav_syncs, cur_speech_impl, cur_speech_impl_backup, speech_request_id, marks, request ) );
 	return speechResult;
