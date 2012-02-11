@@ -1471,9 +1471,9 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	time_sec relaxAt  = behav_syncs.sync_relax()->time();
 	time_sec endAt    = behav_syncs.sync_end()->time();
 
-	if (rampup > 0 || rampdown > 0 && 
-		startAt == readyAt && 
-		relaxAt == endAt)
+	if ((rampup > 0 || rampdown > 0) && 
+		(startAt == readyAt && 
+		relaxAt == endAt))
 	{
 		readyAt += rampup;
 		relaxAt = endAt - rampdown;
