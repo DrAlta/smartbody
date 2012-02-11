@@ -42,6 +42,12 @@ void UtilsDialog::RunBmlPressed()
    string message = vhcl::Format("sbm bml char %s file %s", GetSelectedChar().c_str(),
       ui.bmlFilesBox->currentText().toStdString().c_str());
    vhmsg::ttu_notify1(message.c_str());
+   
+   if (ui.bmlFilesBox->findText(ui.bmlFilesBox->currentText()) == -1)
+   {
+      // it's not already in the list, so add it
+      ui.bmlFilesBox->insertItem(0, ui.bmlFilesBox->currentText());
+   }
 }
 
 void UtilsDialog::PlayAnimPressed()
@@ -101,11 +107,7 @@ void UtilsDialog::Refresh()
       ui.gazeTargetBox->addItem(m_pScene->m_pawns[i].m_name.c_str());
    }
 
-   // animations
-   for (unsigned int i = 0; i < m_pScene->m_animations.size(); i++)
-   {
-      ui.animationNamesBox->addItem(m_pScene->m_animations[i].c_str());
-   }
+   FilterAnims();
 }
 
 std::string UtilsDialog::GetSelectedChar()

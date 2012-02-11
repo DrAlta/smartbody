@@ -1,11 +1,15 @@
 #include "GLGraphwidget.h"
 
+#ifndef GL_MULTISAMPLE
+#define GL_MULTISAMPLE  0x809D
+#endif
+
 GLGraphWidget::GLGraphWidget(const QRect& renderSize, Scene* scene, QWidget* parent) : QGLWidget(parent)
 {
    setGeometry(renderSize);
 
-   qtClearColor = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
-   //qtClearColor.setRgb(0, 0, 0);
+   //qtClearColor = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
+   qtClearColor.setRgb(0, 0, 0);
 
    timer.start(100, this);
 }
@@ -38,22 +42,19 @@ void GLGraphWidget::initializeGL()
 	glEnable(GL_DEPTH_TEST);
 
    QRect renderSize = geometry();
-	glViewport ( 0, 0, renderSize.width(), renderSize.height() );
+	//glViewport ( 0, 0, renderSize.width(), renderSize.height() );
+   glViewport(geometry().x() - 50, 0, renderSize.width() + 50, renderSize.height());
 
-	//glCullFace ( GL_BACK );
-	//glDepthFunc ( GL_LEQUAL );
-	//glFrontFace ( GL_CCW );
-
-	//glEnable ( GL_POLYGON_SMOOTH );
-
-	//glEnable ( GL_POINT_SMOOTH );
-	//glPointSize ( 1.0 );
-
-	//glShadeModel ( GL_SMOOTH );
-
- //  glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
-	//glEnable( GL_COLOR_MATERIAL );
-	//glEnable( GL_NORMALIZE );
+	/*      glCullFace ( GL_BACK );
+	      glDepthFunc ( GL_LEQUAL );
+	      glFrontFace ( GL_CCW );
+	      glEnable ( GL_POLYGON_SMOOTH );
+	      glEnable ( GL_POINT_SMOOTH );
+	      glPointSize ( 1.0 );
+	      glShadeModel ( GL_SMOOTH );
+         glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
+	      glEnable( GL_COLOR_MATERIAL );
+	      glEnable( GL_NORMALIZE );*/
 
     
     glEnable(GL_DEPTH_TEST);
@@ -61,7 +62,7 @@ void GLGraphWidget::initializeGL()
     glShadeModel(GL_SMOOTH);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT1);
-    //glEnable(GL_MULTISAMPLE);
+    glEnable(GL_MULTISAMPLE);
     glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE );
     glEnable ( GL_COLOR_MATERIAL );
     static GLfloat lightPosition[4] = { 0.5, 5.0, 7.0, 1.0 };
@@ -70,8 +71,8 @@ void GLGraphWidget::initializeGL()
 
    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //glOrtho(-0.5, +0.5, -0.5, +0.5, 4.0, 15.0);
-    glOrtho(renderSize.x(), renderSize.x() + renderSize.width(), renderSize.y() + renderSize.height(), renderSize.y(), 1, 1000);
+    glOrtho(-0.5, +0.5, -10.5, +10.5, 0.1, 15.0);
+    //glOrtho(renderSize.x(), renderSize.x() + renderSize.width(), -20, 20, 0.1f, 1000);
 
     glMatrixMode(GL_MODELVIEW);
 }
@@ -88,14 +89,14 @@ void GLGraphWidget::paintGL()
 void GLGraphWidget::resizeGL(int width, int height)
 {
     int side = qMin(width, height);
+    QRect renderSize = geometry();
     //glViewport((width - side) / 2, (height - side) / 2, side, side);
-    glViewport(geometry().x() - 50, geometry().y() - 35, width, height);
+    glViewport(geometry().x() - 50, 0, width + 50, height);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    QRect renderSize = geometry();
-    //glOrtho(-0.5, +0.5, -0.5, +0.5, 4.0, 15.0);
-    glOrtho(renderSize.x(), renderSize.x() + renderSize.width(), renderSize.y() + renderSize.height(), renderSize.y(), 0.1, 1000);
+    glOrtho(-0.5, +0.5, -10.5, +10.5, 0.1, 15.0);
+    //glOrtho(renderSize.x(), renderSize.x() + renderSize.width(), -20, 20, 0.1, 1000);
 
     glMatrixMode(GL_MODELVIEW);
 }
@@ -107,16 +108,20 @@ void GLGraphWidget::Draw()
    const float x_size = 800.0f;
 	const float y_size = 1.0f;
 
-   float y_length = 1.0f;//GetYScale()*y_size;
-	float x_length = 1.0f;//GetXScale();
-	glColor4f(1.0f, 0.1f, 0.1f, 1.f);	
+   glTranslatef(-5.5f, 0, 0);
+
+   //float y_length = 1.0f;//GetYScale()*y_size;
+	//float x_length = 1.0f;//GetXScale();
+   float y_length = 4;//GetYScale()*y_size;
+	float x_length = 11.65f;//GetXScale();
+	glColor3f(0.1f, 0.1f, 0.1f);	
 	float x;
 	glBegin(GL_LINES);
 		for(int i = y_label_num; i > 0; --i)
 		{
-			glVertex3f(1.0f, i*y_length/y_label_num, -10.0f);
+			glVertex3f(0, i*y_length/y_label_num, -10.0f);
 			glVertex3f(x_length, i*y_length/y_label_num, -10.0f);
-			glVertex3f(1.0f, -i*y_length/y_label_num, -10.0f);
+			glVertex3f(0, -i*y_length/y_label_num, -10.0f);
 			glVertex3f(x_length, -i*y_length/y_label_num, -10.0f);
 
 		}
@@ -124,17 +129,18 @@ void GLGraphWidget::Draw()
 		{
 			x = i*x_length/x_label_num;
 			x = x*((int)(i*x_size/x_label_num))/(i*x_size/x_label_num);
-			glVertex3f(x, y_length, 0.0f);
-			glVertex3f(x, -y_length, 0.0f);
+			glVertex3f(x, y_length, -10.0f);
+			glVertex3f(x, -y_length, -10.0f);
 		}
 	glEnd();
 
+   glColor3f(0.5f, 0.5f, 0.5f);
 	glBegin(GL_LINES);
-		glVertex3f(0.0f, 0.0f, 0.0f);
-		glVertex3f(x_length, 0.0f, 0.0f);
+		glVertex3f(0.0f, 0.0f, -10.0f);
+		glVertex3f(x_length, 0.0f, -10.0f);
 
-		glVertex3f(0.0f, y_length, 0.0f);
-		glVertex3f(0.0f, -y_length, 0.0f);
+		glVertex3f(0.0f, y_length, -10.0f);
+		glVertex3f(0.0f, -y_length, -10.0f);
 	glEnd();
 }
 
