@@ -23,6 +23,9 @@ SbmDebuggerClient c;
 SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
   : QMainWindow(parent)
 {
+  m_pSelectedSceneJointItem = NULL;
+  m_pSelectedSceneJoint = NULL;
+
   m_pMainWindow = this;
   ui.setupUi(MainWindow());
   MainWindow()->show();
@@ -201,6 +204,7 @@ void SbmDebuggerForm::sceneTreeItemChanged(QTreeWidgetItem * current, QTreeWidge
 
    if (current)
    {
+      m_pSelectedSceneJointItem = current;
       Pawn* entity = FindSbmEntityFromTreeSelection(current, c.GetScene());
       if (entity)
       {
@@ -209,6 +213,7 @@ void SbmDebuggerForm::sceneTreeItemChanged(QTreeWidgetItem * current, QTreeWidge
          {
             current->setText(Position, selectedJoint->GetPositionAsString(false).c_str());
             current->setText(Rotation, selectedJoint->GetRotationAsString(false).c_str());
+            m_pSelectedSceneJoint = selectedJoint;
          }
       }
    }
@@ -218,6 +223,8 @@ void SbmDebuggerForm::SetSelectedSceneTreeItem(const Pawn* selectedObj, const Jo
 {
    if (!selectedObj)
       return;
+
+   m_pSelectedSceneJoint = const_cast<Joint*>(selectedJoint);
 
    // check if it's a pawn or a character so we search in the correct tree sub-section
    QTreeWidgetItem* subTree = ui.sceneTree->topLevelItem(dynamic_cast<const Character*>(selectedObj) ? Characters : Pawns);
@@ -230,17 +237,20 @@ void SbmDebuggerForm::SetSelectedSceneTreeItem(const Pawn* selectedObj, const Jo
       {  
          // select the specific joint
          ui.sceneTree->setCurrentItem(jointWidget);
+         m_pSelectedSceneJointItem = jointWidget;
       }
       else
       {
          // there is no joint, so just select the entity's name in the tree view
          ui.sceneTree->setCurrentItem(rootNameItem);
+         m_pSelectedSceneJointItem = rootNameItem;
       }
    }
    else
    {
       // there is no joint, so just select the entity's name in the tree view
       ui.sceneTree->setCurrentItem(rootNameItem);
+      m_pSelectedSceneJointItem = rootNameItem;
    }
 }
 
@@ -370,6 +380,12 @@ void SbmDebuggerForm::UpdateSceneTree()
             AddJointToSceneTree(pawnTreeRoot, c.GetScene()->m_pawns[i].m_joints[j]);
          }
        } 
+   }
+
+   if (m_pSelectedSceneJointItem && m_pSelectedSceneJoint)
+   {
+      m_pSelectedSceneJointItem->setText(Position, m_pSelectedSceneJoint->GetPositionAsString(false).c_str());
+      m_pSelectedSceneJointItem->setText(Rotation, m_pSelectedSceneJoint->GetRotationAsString(false).c_str());
    }
 }
 

@@ -38,6 +38,8 @@ class SbmDebuggerForm : public QMainWindow
      QMainWindow* m_pMainWindow;
      GLWidget* m_pGLWidget;
      std::string GetFpsAsString();
+     QTreeWidgetItem* m_pSelectedSceneJointItem;
+     Joint* m_pSelectedSceneJoint;
      QMainWindow* MainWindow() { return m_pMainWindow; }
 
      double m_msSinceLastFrame;
