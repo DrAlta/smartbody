@@ -13,9 +13,9 @@ SBPawn::SBPawn() : SbmPawn()
 	_rotX = createDoubleAttribute("rotX", 0.0, true, "transform", 40, false, false, false, "X rotation");
 	_rotY = createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
 	_rotZ = createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
-	createBoolAttribute("physics", false, true, "Basic", 300, false, false, "is the pawn physics enabled");
-	createStringAttribute("mesh", "", true, "Basic", 400, false, false, "Geometry/mesh");
-	createDoubleAttribute("meshScale", 1.0, true, "Basic", 410, false, false, "Scale of geometry/mesh");
+	createBoolAttribute("physics", false, true, "Basic", 300, false, false, false, "is the pawn physics enabled");
+	createStringAttribute("mesh", "", true, "Basic", 400, false, false, false, "Geometry/mesh");
+	createDoubleAttribute("meshScale", 1.0, true, "Basic", 410, false, false, false, "Scale of geometry/mesh");
 }
 
 SBPawn::SBPawn(const char* name) : SbmPawn(name)
@@ -26,9 +26,9 @@ SBPawn::SBPawn(const char* name) : SbmPawn(name)
 	_rotX = createDoubleAttribute("rotX", 0.0, true, "transform", 40, false, false, false, "X rotation");
 	_rotY = createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
 	_rotZ = createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
-	createBoolAttribute("physics", false, true, "Basic", 300, false, false, "is the pawn physics enabled");
-	createStringAttribute("mesh", "", true, "Basic", 300, false, false, "Geometry/mesh");
-	createDoubleAttribute("meshScale", 1.0, true, "Basic", 410, false, false, "Scale of geometry/mesh");
+	createBoolAttribute("physics", false, true, "Basic", 300, false, false, false, "is the pawn physics enabled");
+	createStringAttribute("mesh", "", true, "Basic", 300, false, false, false, "Geometry/mesh");
+	createDoubleAttribute("meshScale", 1.0, true, "Basic", 410, false, false, false, "Scale of geometry/mesh");
 }
 
 
