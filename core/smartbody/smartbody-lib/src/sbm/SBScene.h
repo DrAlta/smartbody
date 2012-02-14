@@ -14,6 +14,7 @@
 #include <sbm/SBSteerManager.h>
 #include <sbm/SBServiceManager.h>
 #include <sbm/SBPhysicsManager.h>
+#include <sbm/SBBoneBusManager.h>
 #include <sbm/SBGestureMapManager.h>
 #include <sbm/SBParser.h>
 
@@ -91,6 +92,7 @@ class SBScene : public SBObject
 		SBSteerManager* getSteerManager();
 		SBServiceManager* getServiceManager();
 		SBPhysicsManager* getPhysicsManager();
+		SBBoneBusManager* getBoneBusManager();
 		SBGestureMapManager* getGestureMapManager();
 
 		SBParser* getParser();
@@ -108,6 +110,7 @@ class SBScene : public SBObject
 		SBSteerManager* _steerManager;
 		SBServiceManager* _serviceManager;
 		SBPhysicsManager* _physicsManager;
+		SBBoneBusManager* _boneBusManager;
 		SBGestureMapManager* _gestureMapManager;
 		SBParser* _parser;
 

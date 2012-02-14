@@ -3904,6 +3904,14 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\src\sbm\SBBoneBusManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\src\sbm\SBBoneBusManager.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

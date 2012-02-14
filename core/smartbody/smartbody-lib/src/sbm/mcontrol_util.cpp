@@ -231,7 +231,6 @@ mcuCBHandle::mcuCBHandle()
 	net_bone_updates( true ),
 	net_world_offset_updates( true ),
 	net_face_bones( false ),
-	net_host( NULL ),
 	sbm_character_listener( NULL ),
 	play_internal_audio( false ),
 	resourceDataChanged( false ),
@@ -330,8 +329,8 @@ void mcuCBHandle::reset( void )	{
 	theWSP->init( "SMARTBODY" );
 #endif
 
-	if ( net_host )
-		bonebus.OpenConnection( net_host );
+	if ( _scene->getBoneBusManager()->getHost() != "" )
+		_scene->getBoneBusManager()->setEnable(true);
 }
 
  void mcuCBHandle::createDefaultControllers()
@@ -718,8 +717,8 @@ void mcuCBHandle::clear( void )	{
 
 	close_viewer();
 
-	if ( net_host )
-		bonebus.CloseConnection();
+	if (_scene->getBoneBusManager()->getBoneBus().IsOpen())
+		_scene->getBoneBusManager()->getBoneBus().CloseConnection();
 
 #if USE_WSP
 	theWSP->shutdown();
@@ -1137,10 +1136,10 @@ void mcuCBHandle::update( void )	{
 		{
 			if (net_bone_updates)
 			{
-				if (!isClosingBoneBus && !pawn->bonebusCharacter && bonebus.IsOpen() && sendPawnUpdates)
+				if (!isClosingBoneBus && !pawn->bonebusCharacter && _scene->getBoneBusManager()->getBoneBus().IsOpen() && sendPawnUpdates)
 				{
 					// bonebus was connected after character creation, create it now
-					pawn->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn->getName().c_str(), pawn->getClassType().c_str() , false );
+					pawn->bonebusCharacter = _scene->getBoneBusManager()->getBoneBus().CreateCharacter( pawn->getName().c_str(), pawn->getClassType().c_str() , false );
 				}
 				if (sendPawnUpdates)
 					NetworkSendSkeleton( pawn->bonebusCharacter, pawn->getSkeleton(), &param_map );
@@ -1148,12 +1147,12 @@ void mcuCBHandle::update( void )	{
 				{
 					// connection is bad, remove the bonebus character 
 					LOG("BoneBus cannot connect to server. Removing pawn %s", pawn->getName().c_str());
-					bool success = bonebus.DeleteCharacter(pawn->bonebusCharacter);
+					bool success = _scene->getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
 					char_p->bonebusCharacter = NULL;
 					isClosingBoneBus = true;
-					if (bonebus.GetNumCharacters() == 0)
+					if (_scene->getBoneBusManager()->getBoneBus().GetNumCharacters() == 0)
 					{
-						bonebus.CloseConnection();
+						_scene->getBoneBusManager()->getBoneBus().CloseConnection();
 					}
 				}
 			}
@@ -1213,10 +1212,10 @@ void mcuCBHandle::update( void )	{
 					}
 				}
 			}
-			else if (!isClosingBoneBus && !char_p->bonebusCharacter && bonebus.IsOpen())
+			else if (!isClosingBoneBus && !char_p->bonebusCharacter && _scene->getBoneBusManager()->getBoneBus().IsOpen())
 			{
 				// bonebus was connected after character creation, create it now
-				char_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( char_p->getName().c_str(), char_p->getClassType().c_str(), this->net_face_bones );
+				char_p->bonebusCharacter = _scene->getBoneBusManager()->getBoneBus().CreateCharacter( char_p->getName().c_str(), char_p->getClassType().c_str(), this->net_face_bones );
 			}
 		}  // end of char_p processing
 	} // end of loop
@@ -1230,12 +1229,12 @@ void mcuCBHandle::update( void )	{
 			SbmPawn* pawn = (*iter).second;
 			if (pawn->bonebusCharacter)
 			{
-				bool success = bonebus.DeleteCharacter(pawn->bonebusCharacter);
+				bool success = _scene->getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
 				pawn->bonebusCharacter = NULL;
 			}
 		}
 
-		bonebus.CloseConnection();
+		_scene->getBoneBusManager()->getBoneBus().CloseConnection();
 	}
 
 	for (std::map<std::string, SbmPawn*>::iterator iter = getPawnMap().begin();
@@ -1481,9 +1480,9 @@ void mcuCBHandle::set_net_host( const char * net_host )
 {
 	// EDF
 	// Sets up the network connection for sending bone rotations over to Unreal
-	this->net_host = net_host;
-	bonebus.OpenConnection( net_host );
-	bonebus.UpdateAllCharacters();
+	_scene->getBoneBusManager()->setHost(net_host);
+	_scene->getBoneBusManager()->setEnable(true);
+	_scene->getBoneBusManager()->getBoneBus().UpdateAllCharacters();
 }
 
 void mcuCBHandle::set_process_id( const char * process_id )
@@ -2087,7 +2086,7 @@ int mcuCBHandle::registerCharacter(SbmCharacter* character)
 	character_map.insert(std::pair<std::string, SbmCharacter*>(character->getName(), character));
 
 	if (net_bone_updates)
-		mcuCBHandle::singleton().bonebus.CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), mcuCBHandle::singleton().net_face_bones );
+		_scene->getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), mcuCBHandle::singleton().net_face_bones );
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 		mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
 
