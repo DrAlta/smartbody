@@ -198,14 +198,16 @@ SbmCharacter::~SbmCharacter( void )	{
 	}
 	reachEngineMap.clear();
 
-	if ( mcuCBHandle::singleton().sbm_character_listener )
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if ( mcu.sbm_character_listener )
 	{
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( getName() );
+		mcu.sbm_character_listener->OnCharacterDelete( getName() );
 	}
 
 	if ( bonebusCharacter )
 	{
-		mcuCBHandle::singleton().bonebus.DeleteCharacter( bonebusCharacter );
+		mcu._scene->getBoneBusManager()->getBoneBus().DeleteCharacter( bonebusCharacter );
 		bonebusCharacter = NULL;
 	}
 
@@ -807,7 +809,7 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 	steeringAgent = new SteeringAgent(this);
 
 	if (mcuCBHandle::singleton().net_bone_updates)
-		bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( getName().c_str(), classType, mcuCBHandle::singleton().net_face_bones );
+		bonebusCharacter = mcuCBHandle::singleton()._scene->getBoneBusManager()->getBoneBus().CreateCharacter( getName().c_str(), classType, mcuCBHandle::singleton().net_face_bones );
 
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{		

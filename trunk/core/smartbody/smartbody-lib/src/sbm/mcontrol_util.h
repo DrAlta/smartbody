@@ -46,8 +46,6 @@ class mcuCBHandle;
 #include "vhmsg-tt.h"
 #endif
 
-#include "bonebus.h"
-
 #include <sbm/GenericViewer.h>
 #include <sr/sr_viewer.h>
 #include <sr/sr_camera.h>
@@ -211,8 +209,6 @@ class mcuCBHandle {
 		bool        updatePhysics;
 		bool		sendPawnUpdates; // if true, sends the pawn information over bonebus in the same wasy as the characters
 		bool        resourceDataChanged;
-		const char* net_host;
-		bonebus::BoneBusClient bonebus;
 		SBMCharacterListener * sbm_character_listener;   // only one listener possible, must be set manually
 		std::string speech_audiofile_base_path;
 		std::string process_id;

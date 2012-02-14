@@ -367,6 +367,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SBMotion.cpp
 	sbm/SBFaceDefinition.cpp
 	sbm/SBPhysicsManager.cpp
+	sbm/SBBoneBusManager.cpp
 	sbm/SBParser.cpp
 	sbm/SBParseNode.cpp
 	sbm/sr_path_list.cpp

@@ -750,6 +750,9 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("stop", &SBPhysicsManager::stop, "Stop the physics simulation.(not implemented yet)")		
 		;
 
+	boost::python::class_<SBBoneBusManager, boost::python::bases<SBService> >("SBBoneBusManager")
+		;
+
 	boost::python::class_<SBSteerAgent>("SBSteerAgent")
 		.def("setSteerStateNamePrefix", &SBSteerAgent::setSteerStateNamePrefix, "Set the animation state name prefix used for steering, only applies to steering type locomotion.")
 		.def("setSteerType", &SBSteerAgent::setSteerType, "Set the type of steering locomotion, can be one of the following: basic, example, procedural")
@@ -1149,6 +1152,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getSteerManager", &SBScene::getSteerManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the steer manager object.")
 		.def("getServiceManager", &SBScene::getServiceManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the service manager object.")
 		.def("getPhysicsManager", &SBScene::getPhysicsManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the physics manager object.")
+		.def("getBoneBusManager", &SBScene::getBoneBusManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Bone Bus manager object.")
 		.def("getGestureMapManager", &SBScene::getGestureMapManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the gesture map manager object.")
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
 	;

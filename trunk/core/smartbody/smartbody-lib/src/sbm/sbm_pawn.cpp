@@ -416,7 +416,7 @@ SbmPawn::~SbmPawn()	{
 	{
 		
 		if (mcu.sendPawnUpdates)
-			mcu.bonebus.DeleteCharacter( bonebusCharacter );
+			mcu._scene->getBoneBusManager()->getBoneBus().DeleteCharacter( bonebusCharacter );
 		bonebusCharacter = NULL;
 	}
 
@@ -853,7 +853,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 		// [BMLR] Send notification to the renderer that a pawn was created.
 		// NOTE: This is sent both for characters AND pawns
-		mcu_p->bonebus.SendCreatePawn( pawn_name.c_str(), loc[ 0 ], loc[ 1 ], loc[ 2 ] );
+		mcu_p->_scene->getBoneBusManager()->getBoneBus().SendCreatePawn( pawn_name.c_str(), loc[ 0 ], loc[ 1 ], loc[ 2 ] );
 		float x,y,z,h,p,r;
 		pawn_p->get_world_offset(x,y,z,h,p,r);
 		//printf("h = %f, p = %f, r = %f\n",h,p,r);	
@@ -861,7 +861,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		pawn_p->wo_cache_update();
 
 		if (mcu_p->sendPawnUpdates)
-			pawn_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn_name.c_str(), pawn_p->getClassType().c_str(), false );
+			pawn_p->bonebusCharacter = mcu_p->_scene->getBoneBusManager()->getBoneBus().CreateCharacter( pawn_name.c_str(), pawn_p->getClassType().c_str(), false );
 
 		if ( mcuCBHandle::singleton().sbm_character_listener )
 		{

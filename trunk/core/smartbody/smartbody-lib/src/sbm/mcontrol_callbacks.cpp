@@ -4246,25 +4246,17 @@ int mcu_load_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 int mcu_net_reset( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	bool ret = CMD_SUCCESS;
-	mcu_p->bonebus.CloseConnection();
-	if (mcu_p->net_host)
-	{
-		ret = mcu_p->bonebus.OpenConnection(mcu_p->net_host);
-		mcu_p->bonebus.UpdateAllCharacters();
-	}
+	mcu_p->_scene->getBoneBusManager()->getBoneBus().CloseConnection();
+	mcu_p->_scene->getBoneBusManager()->setEnable(true);
+	mcu_p->_scene->getBoneBusManager()->getBoneBus().UpdateAllCharacters();
 	
-	if (ret)
-		return (CMD_SUCCESS);
-	else
-		return (CMD_FAILURE);
+	return (CMD_SUCCESS);
 }
 
 int mcu_net_check( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
-	if (!mcu_p->bonebus.IsOpen())
+	if (!mcu_p->_scene->getBoneBusManager()->getBoneBus().IsOpen())
 	{
-		if (!mcu_p->net_host)
-			mcu_p->net_host = "localhost";
 		return mcu_net_reset(args, mcu_p);
 	}
 	else
@@ -4387,7 +4379,7 @@ int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          }
          else
          {
-            mcu_p->bonebus.SendPlaySound( soundFile.c_str(), characterName.c_str() );
+            mcu_p->_scene->getBoneBusManager()->getBoneBus().SendPlaySound( soundFile.c_str(), characterName.c_str() );
          }
 
          return CMD_SUCCESS;
@@ -4479,7 +4471,7 @@ int mcu_stop_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          }
 #endif
 
-         mcu_p->bonebus.SendStopSound( soundFile.c_str() );
+         mcu_p->_scene->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() );
 
          return CMD_SUCCESS;
       }
@@ -4517,7 +4509,7 @@ int mcu_uscriptexec_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          }
 
          //SendWinsockExecScript( command.c_str() );
-         mcu_p->bonebus.ExecScript( command.c_str() );
+         mcu_p->_scene->getBoneBusManager()->getBoneBus().ExecScript( command.c_str() );
 
          return CMD_SUCCESS;
       }
@@ -4551,7 +4543,7 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          float y = args.read_float();
          float z = args.read_float();
 
-         mcu_p->bonebus.SetCameraPosition( x, y, z );
+         mcu_p->_scene->getBoneBusManager()->getBoneBus().SetCameraPosition( x, y, z );
 
          return CMD_SUCCESS;
       }
@@ -4563,7 +4555,7 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
          gwiz::quat_t q = gwiz::euler_t( x, y, z );
 
-         mcu_p->bonebus.SetCameraRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() );
+         mcu_p->_scene->getBoneBusManager()->getBoneBus().SetCameraRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() );
 
          return CMD_SUCCESS;
       }
