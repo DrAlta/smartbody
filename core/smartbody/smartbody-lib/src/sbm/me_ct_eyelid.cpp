@@ -24,6 +24,7 @@
 using namespace gwiz;
 
 #include "me_ct_eyelid.h"
+#include <sbm/sbm_pawn.hpp>
 #include <vhcl_log.h>
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -210,6 +211,8 @@ MeCtEyeLidRegulator::MeCtEyeLidRegulator( void )	{
 	addDefaultAttributeFloat("eyelid.rangeUpperMax", 30.0f);
 	addDefaultAttributeFloat("eyelid.tightWeightUpper", 30.0f);
 	addDefaultAttributeFloat("eyelid.delayUpper", 30.0f);
+	addDefaultAttributeFloat("eyelid.blinkPeriodMin", 4.0f);
+	addDefaultAttributeFloat("eyelid.blinkPeriodMax", 8.0f);
 }
 
 MeCtEyeLidRegulator::~MeCtEyeLidRegulator( void )	{
@@ -251,8 +254,12 @@ void MeCtEyeLidRegulator::init(SbmPawn* pawn,  bool tracking_pitch)	{
 	
 	new_blink = false;
 	
-	blink_period_min = 4.0f;
-	blink_period_max = 8.0f;
+	blink_period_min = (float) pawn->getDoubleAttribute("eyelid.blinkPeriodMin");
+	blink_period_max = (float) pawn->getDoubleAttribute("eyelid.blinkPeriodMax");
+	if (blink_period_min == 0.0)
+		blink_period_min = 4.0f;
+	if (blink_period_max == 0.0)
+		blink_period_max = 8.0f;
 	blink_period = blink_period_min;
 	prev_blink = 0.0f;
 	
@@ -512,7 +519,42 @@ bool MeCtEyeLidRegulator::get_use_blink_viseme()
 
 void MeCtEyeLidRegulator::notify(SBSubject* subject)
 {
-	
+	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
+	if (attribute)
+	{
+		const std::string& name = attribute->getName();
+		if (name == "eyelid.blinkPeriodMin")
+		{
+			blink_period_min = (float) getDoubleAttribute("eyelid.blinkPeriodMin");
+			blink_period = blink_period_min;
+		}
+		else if (name == "eyelid.blinkPeriodMax")
+		{
+			blink_period_max = (float) getDoubleAttribute("eyelid.blinkPeriodMax");
+		}
+		else if (name == "eyelid.pitch")
+		{
+		//	eye_pitch = (float) getDoubleAttribute("eyelid.pitch");
+		}
+		else if (name == "eyelid.rangeUpperMin")
+		{
+		//	float low, high;
+		//	get_upper_range(low, high);
+		//	set_upper_range((float) getDoubleAttribute("eyelid.rangeUpperMin"), high);
+		}
+		else if (name == "eyelid.rangeUpperMax")
+		{
+		//	float low, high;
+		//	get_upper_range(low, high);
+		//	set_upper_range(low, (float) getDoubleAttribute("eyelid.rangeUpperMax");
+		}
+		else if (name == "eyelid.tightWeightUpper")
+		{
+		}
+		else if (name == "eyelid.delayUpper")
+		{
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////

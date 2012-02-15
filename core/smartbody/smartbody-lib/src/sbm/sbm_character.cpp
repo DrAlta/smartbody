@@ -387,6 +387,28 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( motionplayer_ct );
 	ct_tree_p->add_controller( datareceiver_ct );
 
+	// get the default attributes from the default controllers
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::vector<MeController*>& defaultControllers = mcu.getDefaultControllers();
+	for (size_t x = 0; x < defaultControllers.size(); x++)
+	{
+		MeController* controller = defaultControllers[x];
+		const std::vector<AttributeVarPair>& defaultAttributes = controller->getDefaultAttributes();
+		std::string groupName = controller->getName();		
+		for (size_t a = 0; a < defaultAttributes.size(); a++)
+		{
+			SmartBody::SBAttribute* attribute = defaultAttributes[a].first;
+			SmartBody::SBAttribute* attributeCopy = attribute->copy();
+			this->addAttribute(attributeCopy);
+			// if the controller isn't a scheduler, then add the controller as an observer
+			MeCtScheduler2* scheduler = dynamic_cast<MeCtScheduler2*>(controller);
+			if (!scheduler)
+			{
+				attributeCopy->registerObserver(controller);
+			}
+		}
+	}
+
 }
 void SbmCharacter::initData()
 {
@@ -927,6 +949,12 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 			SmartBody::SBAttribute* attribute = defaultAttributes[a].first;
 			SmartBody::SBAttribute* attributeCopy = attribute->copy();
 			this->addAttribute(attributeCopy);
+			// if the controller isn't a scheduler, then add the controller as an observer
+			MeCtScheduler2* scheduler = dynamic_cast<MeCtScheduler2*>(controller);
+			if (!scheduler)
+			{
+				attributeCopy->registerObserver(controller);
+			}
 		}
 	}
 

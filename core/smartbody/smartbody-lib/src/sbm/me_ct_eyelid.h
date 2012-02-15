@@ -116,14 +116,14 @@ class MeCtEyeLidRegulator : public SmartBody::SBController	{
 			UL_set.set_range( mn, mx );
 			UR_set.set_range( mn, mx );
 		}
-		
+	
 		void set_lower_range( float fr, float to )	{
 			float mn = minval( fr, to );
 			float mx = maxval( fr, to );
 			LL_set.set_range( mx, mn );
 			LR_set.set_range( mx, mn );
 		}
-
+		
 		void set_close_angle( float angle )	{
 			LL_set.set_close( angle );
 			LR_set.set_close( angle );
