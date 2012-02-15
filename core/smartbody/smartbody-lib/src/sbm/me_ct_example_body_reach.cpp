@@ -369,8 +369,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	{
 		
 		//LOG("update reach");
-		currentReachEngine->updateReach((float)t,dt,inputMotionFrame,blendWeight);
-		
+		currentReachEngine->updateReach((float)t,dt,inputMotionFrame,blendWeight);		
 	}
 	
 	//printf("blend weight = %f\n",blendWeight);
@@ -498,16 +497,16 @@ bool MeCtExampleBodyReach::isValidReachEngine( int reachType )
 
 void MeCtExampleBodyReach::notify(SBSubject* subject)
 {
-	SbmPawn* pawn = dynamic_cast<SbmPawn*>(subject);
-	if (pawn)
-	{
-		ReachTarget& t = currentReachData->reachTarget;
-		SbmPawn* targetPawn = t.getTargetPawn();
-		if (targetPawn == pawn)
-		{
-			// pawn is being removed, let go of it
-			t.setTargetPawnName("");
-			currentReachData->endReach = true;
-		}
-	}
+// 	SbmPawn* pawn = dynamic_cast<SbmPawn*>(subject);
+// 	if (pawn)
+// 	{
+// 		ReachTarget& t = currentReachData->reachTarget;
+// 		SbmPawn* targetPawn = t.getTargetPawn();
+// 		if (targetPawn == pawn)
+// 		{
+// 			// pawn is being removed, let go of it
+// 			t.setTargetPawnName("");
+// 			currentReachData->endReach = true;
+// 		}
+// 	}
 }

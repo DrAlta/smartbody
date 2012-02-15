@@ -316,7 +316,7 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 
 	ikScenario.setTreeNodeQuat(currentFrame.jointQuat,QUAT_CUR);
 	ikScenario.ikTreeRoot->lock = true;
-	updateFingerChains(curTargetFrame,0.02f);
+	updateFingerChains(curTargetFrame,0.01f);
 
 	skeletonRef->invalidate_global_matrices();
 	skeletonRef->update_global_matrices();
