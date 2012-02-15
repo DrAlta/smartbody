@@ -7,6 +7,7 @@
 #include <sbm/SBMotion.h>
 #include <sbm/SBParseNode.h>
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBScene.h>
 
 #ifdef USE_PYTHON
 

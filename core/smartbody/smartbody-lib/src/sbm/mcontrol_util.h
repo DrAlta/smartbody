@@ -109,6 +109,7 @@ namespace SmartBody
     class SBScene;
 };
 
+
 #if USE_WSP
 namespace WSP
 {
