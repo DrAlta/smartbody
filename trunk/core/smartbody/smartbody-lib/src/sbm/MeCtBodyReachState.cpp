@@ -54,12 +54,12 @@ SRT ReachTarget::getTargetState()
 		//LOG("target is pawn");
 		SbmPawn* targetPawn = getTargetPawn();
 		
-		SkJoint* worldJoint = const_cast<SkJoint*>(targetPawn->get_world_offset_joint());
-		worldJoint->set_lmat_changed();
-		worldJoint->update_gmat();
-		st.gmat(targetPawn->get_world_offset_joint()->gmat());
+//  		SkJoint* worldJoint = const_cast<SkJoint*>(targetPawn->get_world_offset_joint());
+//  		worldJoint->set_lmat_changed();
+//  		worldJoint->update_gmat();
+//  		st.gmat(targetPawn->get_world_offset_joint()->gmat());
 		
-		//st.gmat(targetPawn->get_world_offset());
+		st.gmat(targetPawn->get_world_offset());
 	}
 	else if (targetIsJoint())
 	{
@@ -213,7 +213,7 @@ void ReachHandAction::reachPreCompleteAction( ReachStateData* rd )
 
 	cmd = generateGrabCmd(charName,targetName,"start",rd->reachType);
 	sendReachEvent("reach",cmd);
-	LOG("Reach Pre Complete Action");
+	//LOG("Reach Pre Complete Action");
 }
 
 void ReachHandAction::reachCompleteAction( ReachStateData* rd )
@@ -238,7 +238,7 @@ void ReachHandAction::reachCompleteAction( ReachStateData* rd )
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:wrist=\"" + wristName + "\"sbm:grab-type=\"" + reachType + "\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
 
 	sendReachEvent("reach",cmd);	
-	LOG("Reach Complete Action");
+	//LOG("Reach Complete Action");
 }
 
 void ReachHandAction::reachNewTargetAction( ReachStateData* rd )
@@ -255,7 +255,7 @@ void ReachHandAction::reachNewTargetAction( ReachStateData* rd )
 	if (rtarget.targetHasGeometry())
 		sendReachEvent("reach",cmd);
 	//rd->effectorState.removeAttachedPawn(rd);
-	LOG("Reach New Target Action");	
+	//LOG("Reach New Target Action");	
 }
 
 void ReachHandAction::reachReturnAction( ReachStateData* rd )
@@ -273,6 +273,7 @@ void ReachHandAction::reachReturnAction( ReachStateData* rd )
 	cmd = "char " + charName + " gazefade out 0.5";
 	
 	sendReachEvent("reach",cmd);
+	//LOG("Reach Return Action");	
 	//rd->effectorState.removeAttachedPawn(rd);
 }
 
@@ -299,6 +300,7 @@ void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 	std::string cmd;
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:source-joint=\"" + "r_wrist" + "\" sbm:attach-pawn=\"" + targetName + "\"/>";
 	cmd = generateAttachCmd(charName,targetName,rd->reachType);
+	LOG("attach pawn %s",targetName.c_str());
 	rd->curHandAction->sendReachEvent("reach",cmd);
 	cmd = "pawn " + targetName + " physics off";
 	rd->curHandAction->sendReachEvent("reach",cmd);
@@ -314,11 +316,12 @@ void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
 	std::string charName = rd->charName;	
 	std::string cmd;
 	cmd = generateAttachCmd(charName,"",rd->reachType);
-	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:release-pawn=\"true\"/>";
+	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:release-pawn=\"true\"/>";	
 	rd->curHandAction->sendReachEvent("reach",cmd);
 	std::string targetName = "";	
 	if (attachedPawn)
 		targetName = attachedPawn->getName();
+	LOG("release pawn %s",targetName.c_str());
 	cmd = "pawn " + targetName + " physics on";
 	rd->curHandAction->sendReachEvent("reach",cmd);
 	rd->effectorState.removeAttachedPawn(rd);
@@ -563,6 +566,7 @@ void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
 	SRT ts = rtarget.getTargetState();
 	SRT tsBlend = rd->getPoseState(rd->targetRefFrame);
 
+
 	if (rd->useInterpolation())
 	{
 		float stime = (float)rd->interpMotion->strokeEmphasisTime();
@@ -783,7 +787,7 @@ std::string ReachStateStart::nextState( ReachStateData* rd )
 		rd->ikReachTarget = ikTargetReached(rd,2.f);
 		{
 			rd->curHandAction->reachCompleteAction(rd);
-			rd->curHandAction->sendReachEvent("reachstate","complete");
+			//rd->curHandAction->sendReachEvent("reachstate","complete");
 			nextStateName = "Complete";
 			//rd->startReach = false;		
 		}
@@ -802,7 +806,7 @@ std::string ReachStateStart::nextState( ReachStateData* rd )
 /************************************************************************/
 void ReachStateComplete::updateEffectorTargetState( ReachStateData* rd )
 {
-	ReachStateInterface::updateReachToTarget(rd);
+	//ReachStateInterface::updateReachToTarget(rd);
 	if (rd->useInterpolation())
 		rd->curRefTime = (float)rd->interpMotion->strokeEmphasisTime();
 }
@@ -817,6 +821,7 @@ std::string ReachStateComplete::nextState( ReachStateData* rd )
 {
 	std::string nextStateName = "Complete";	
 	bool toNextState = rd->autoReturnTime > 0.f ? rd->autoReturnTime < rd->stateTime : rd->endReach;
+	//LOG("ReachComplete:rd->stateTime = %f",rd->stateTime);
 	if (rd->endReach)
 		toNextState = true;
 
@@ -850,8 +855,8 @@ void ReachStateNewTarget::updateEffectorTargetState( ReachStateData* rd )
 
 void ReachStateNewTarget::update( ReachStateData* rd )
 {
-	//ReachStateInterface::updateMotionIK(rd);	
-	ReachStateInterface::updateMotionPoseInterpolation(rd);
+	ReachStateInterface::updateMotionIK(rd);	
+	//ReachStateInterface::updateMotionPoseInterpolation(rd);
 }
 std::string ReachStateNewTarget::nextState( ReachStateData* rd )
 {
@@ -861,7 +866,7 @@ std::string ReachStateNewTarget::nextState( ReachStateData* rd )
 	{
 		rd->curHandAction->reachCompleteAction(rd);
 		rd->startReach = false;
-		rd->curHandAction->sendReachEvent("reachstate","newtarget");
+		//rd->curHandAction->sendReachEvent("reachstate","newtarget");
 		nextStateName = "Complete";
 	}
 	else if (rd->endReach)
@@ -878,7 +883,7 @@ std::string ReachStateNewTarget::nextState( ReachStateData* rd )
 std::string ReachStatePreReturn::nextState( ReachStateData* rd )
 {
 	std::string nextStateName = "PreReturn";
-	bool toNextState = rd->stateTime > 0.1;
+	bool toNextState = rd->stateTime > 0.1f;
 	if (toNextState)
 	{
 		completeTime = 0.f; // reset complete time
@@ -939,7 +944,7 @@ std::string ReachStateReturn::nextState( ReachStateData* rd )
 		rd->endReach = false;
 		rd->reachControl->setFadeOut(0.5f);
 		rd->blendWeight = 0.f;
-		rd->curHandAction->sendReachEvent("reachstate","return");
+		//rd->curHandAction->sendReachEvent("reachstate","return");
 		nextStateName = "Idle";		
 	}
 	return nextStateName;

@@ -313,12 +313,21 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 
 	EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachPosConstraint[reachEndEffector->name().c_str()]);
 	cons->targetPos = estate.curIKTargetState.tran;	
+	
+// 	if (curReachState->curStateName() == "Start" || curReachState->curStateName() == "Complete" )
+// 	{
+// 		SrVec ikTarget = rd->reachTarget.getTargetState().tran;
+// 		//LOG("state time = %f",rd->stateTime);
+// 		//LOG("ikTarget = %f %f %f",ikTarget[0],ikTarget[1],ikTarget[2]);
+// 		//LOG("targetPos = %f %f %f",cons->targetPos[0],cons->targetPos[1],cons->targetPos[2]);	
+// 	}
 
 	ikScenario.ikGlobalMat = rd->gmat;//skeletonRef->search_joint(rootName)->gmat();//ikScenario.ikTreeRoot->joint->parent()->gmat();	
 	ikScenario.ikTreeRootPos = refFrame.rootPos;
 	ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_REF);		
 	ikScenario.ikPosEffectors = &reachPosConstraint;
 
+	
 	{
 		EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachRotConstraint[reachEndEffector->name().c_str()]);		
 		cons->targetRot = estate.curIKTargetState.rot;//ikRotTrajectory;//ikRotTarget;//motionParameter->getMotionFrameJoint(interpMotionFrame,reachEndEffector->name().get_string())->gmat();//ikRotTarget;	
@@ -336,7 +345,7 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 	ik.maxOffset = ikMaxOffset;
 	ik.dampJ = ikDamp;
 	ik.refDampRatio = 0.05;
-	for (int i=0;i<2;i++)
+	for (int i=0;i<10;i++)
 	{
 		ik.update(&ikScenario);		
 		ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);		
@@ -465,7 +474,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	ReachStateInterface* nextState = getState(curReachState->nextState(reachData));
 	if (nextState != curReachState)
 	{
-		//printf("engine type = %s,  cur State = %s\n",this->getReachTypeTag().c_str(), nextState->curStateName().c_str());
+		//LOG("engine type = %s,  cur State = %s\n",this->getReachTypeTag().c_str(), nextState->curStateName().c_str());
 		reachData->stateTime = 0.f;
 		reachData->effectorState.startTargetState = reachData->effectorState.curIKTargetState;
 		reachData->effectorState.curBlendState = reachData->effectorState.startTargetState;
@@ -475,11 +484,11 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 
 	ikMaxOffset = ikDefaultVelocity*3.f*dt;	
 	mcu.mark("Reach",0,"reachIK");
-	if (footIKFix)
-	{
-		solveIK(reachData,ikMotionFrame);	
-	}
-	else
+ 	if (1)//(footIKFix)
+ 	{
+ 		solveIK(reachData,ikMotionFrame);	
+ 	}
+ 	else
 	{
 		ikMotionFrame = reachData->currentRefFrame;
 	}
