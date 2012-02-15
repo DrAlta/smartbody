@@ -82,7 +82,7 @@ class Smartbody_dll
       SMARTBODY_DLL_API void SetProcessId( const std::string & processId );
       SMARTBODY_DLL_API void SetMediaPath( const std::string & path );
 
-      SMARTBODY_DLL_API bool Init(const std::string& pythonLibPath);
+      SMARTBODY_DLL_API bool Init(const std::string& pythonLibPath, bool logToFile);
       SMARTBODY_DLL_API bool Shutdown();
 
       SMARTBODY_DLL_API void SetListener( SmartbodyListener * listener );

@@ -216,7 +216,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetMediaPath( const std::string & path )
 }
 
 
-SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath)
+SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath, bool logToFile)
 {
    m_internalListener = new Smartbody_dll_SBMCharacterListener_Internal( this );
 
@@ -245,8 +245,11 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath)
    srArgBuffer arg_buf( "" );
    mcu_vrAllCall_func( arg_buf, &mcu );
 
-   vhcl::Log::Listener* listener = new vhcl::Log::FileListener("./smartbody.log");
-   vhcl::Log::g_log.AddListener(listener);
+   if (logToFile)
+   {
+      vhcl::Log::Listener* listener = new vhcl::Log::FileListener("./smartbody.log");
+      vhcl::Log::g_log.AddListener(listener);
+   }
 
    return true;
 }
