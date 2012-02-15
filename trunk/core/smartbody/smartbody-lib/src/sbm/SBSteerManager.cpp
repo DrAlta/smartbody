@@ -1,5 +1,6 @@
 #include "SBSteerManager.h"
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBScene.h>
 
 namespace SmartBody {
 

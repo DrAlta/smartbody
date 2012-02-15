@@ -1,3 +1,5 @@
+#ifndef MCONTROL_UTIL_H
+#define MCONTROL_UTIL_H
 /*
  *  mcontrol_util.h - part of SmartBody-lib
  *  Copyright (C) 2008  University of Southern California
@@ -24,8 +26,6 @@
  *      Eric Forbell, USC
  *      Thomas Amundsen, USC
  */
-#ifndef MCONTROL_UTIL_H
-#define MCONTROL_UTIL_H
 //  Declare classes defined by this file
 //  (prevents include recursion)
 class mcuCBHandle;
@@ -86,7 +86,7 @@ class mcuCBHandle;
 #include <sbm/action_unit.hpp>
 #include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
-#include <sbm/SBScene.h>
+
 #include "sbm/BoneMap.h"
 #include <sbm/nvbg.h>
 
@@ -97,10 +97,17 @@ class mcuCBHandle;
 #include <sbm/SteerSuiteEngineDriver.h>
 #include <sbm/Physics/SbmPhysicsSim.h>
 #include <sbm/KinectProcessor.h>
+
+#ifndef __ANDROID__
 #include <boost/python.hpp>
+#endif
 
 #include BML_PROCESSOR_INCLUDE
 
+namespace SmartBody
+{
+    class SBScene;
+};
 
 #if USE_WSP
 namespace WSP
@@ -330,8 +337,10 @@ class mcuCBHandle {
 		int getNumCharacters();
 
 		SkMotion* getMotion(const std::string& motionName);
+#ifndef __ANDROID__
 		boost::python::object mainModule;
 		boost::python::object mainDict;
+#endif
 
 protected:
 		std::map<std::string, SbmPawn*>	pawn_map;

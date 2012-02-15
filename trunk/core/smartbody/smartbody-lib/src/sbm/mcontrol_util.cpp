@@ -54,8 +54,9 @@
 #endif
 
 #include "sbm_audio.h"
-
+#include "SBScene.h"
 #include "me_utilities.hpp"
+
 
 #if USE_WSP
 #include "wsp.h"
@@ -335,6 +336,7 @@ void mcuCBHandle::reset( void )	{
 
  void mcuCBHandle::createDefaultControllers()
  {
+
 	 _defaultControllers.push_back(new MeCtEyeLidRegulator());
 	 _defaultControllers.push_back(new MeCtSaccade(NULL));
 	 std::map<int, MeCtReachEngine*> reachMap;
@@ -1177,6 +1179,7 @@ void mcuCBHandle::update( void )	{
 			//char_p->updateJointPhyObjs(false);
 			*/
 			char_p->_skeleton->update_global_matrices();
+
 			char_p->forward_visemes( time );	
 			char_p->forward_parameters( time );	
 			
@@ -1707,6 +1710,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 		{
 			SkJoint* joint = joints[otherJoints[i]];
 			character->AddGeneralParameters(i, 1, joint->pos()->value( 0 ), i, time);
+
 		}
 		character->EndSendGeneralParameters();
 	}

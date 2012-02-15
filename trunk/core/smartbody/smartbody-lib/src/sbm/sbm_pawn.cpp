@@ -24,6 +24,7 @@
 
 #include "vhcl.h"
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBScene.h>
 #include <sbm/SBPythonClass.h>
 #include "sbm_pawn.hpp"
 

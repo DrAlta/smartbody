@@ -35,6 +35,7 @@
 #include "bml_event.hpp"
 
 #include "mcontrol_util.h"
+#include "SBScene.h"
 #include "me_ct_locomotion.hpp"
 
 #include "bml_xml_consts.hpp"

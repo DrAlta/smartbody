@@ -53,13 +53,13 @@ SRT ReachTarget::getTargetState()
 	{
 		//LOG("target is pawn");
 		SbmPawn* targetPawn = getTargetPawn();
-		/*
+		
 		SkJoint* worldJoint = const_cast<SkJoint*>(targetPawn->get_world_offset_joint());
 		worldJoint->set_lmat_changed();
 		worldJoint->update_gmat();
 		st.gmat(targetPawn->get_world_offset_joint()->gmat());
-		*/
-		st.gmat(targetPawn->get_world_offset());
+		
+		//st.gmat(targetPawn->get_world_offset());
 	}
 	else if (targetIsJoint())
 	{

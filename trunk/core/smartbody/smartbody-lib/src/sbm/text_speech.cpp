@@ -13,6 +13,7 @@
 
 #include "xercesc_utils.hpp"
 #include "text_speech.h"
+#include <sbm/SBScene.h>
 #include "BMLDefs.h"
 
 

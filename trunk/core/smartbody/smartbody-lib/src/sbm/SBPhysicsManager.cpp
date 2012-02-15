@@ -1,8 +1,13 @@
 #include "SBPhysicsManager.h"
 #include <sbm/SBPythonClass.h>
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBScene.h>
 
+#ifdef __ANDROID__
+#define USE_PHYSICS_CHARACTER 0
+#else
 #define USE_PHYSICS_CHARACTER 1	
+#endif
 
 namespace SmartBody {
 
@@ -271,6 +276,7 @@ void SBPhysicsManager::updatePhysicsCharacter( std::string charName )
 			phyObj->setAngularVel(phyObj->getPhyJoint()->getRefAngularVel());
 			phyObj->updatePhySim();						
 		}
+
 		else if (charPhySim && phyObj->getBoolAttribute("constraint"))
 		{
 			SrMat tranMat; tranMat.translation(joint->getLocalCenter());	
