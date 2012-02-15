@@ -56,15 +56,19 @@ class MeCtEyeLidRegulator : public SmartBody::SBController	{
 
 			// specify normalized range in degrees
 			void set_range( float fr, float to );
+			void get_range(float& from, float& to);
 			
 			// specify closed/blink angle in degrees
 			void set_close( float angle );
+			float get_close();
 			
 			// modifier: 0.0: wide; 0.5: neutral; 0.9: squinting
 			void set_tighten( float tighten ); 
+			float get_tighten();
 
 			// specify eyeball pitch in degrees
 			void set_pitch( float pitch );
+			float get_pitch();
 
 			// convert normalized weight (0..1) to output weight with tigthener/eye-pitch
 			float get_mapped_weight( float in_weight );

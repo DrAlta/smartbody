@@ -65,12 +65,23 @@ void MeCtEyeLidRegulator::LidSet::set_range( float fr, float to )	{
 	}
 }
 
+void MeCtEyeLidRegulator::LidSet::get_range( float& fr, float& to )
+{
+	fr = base_angle;
+	to = full_angle;
+}
+
 void MeCtEyeLidRegulator::LidSet::set_close( float angle )	{
 	
 	if( close_angle != angle )	{
 		close_angle = angle;
 		dirty_bit = true;
 	}
+}
+
+float MeCtEyeLidRegulator::LidSet::get_close()
+{
+	return close_angle;
 }
 
 void MeCtEyeLidRegulator::LidSet::set_tighten( float tighten )	{
@@ -83,12 +94,23 @@ void MeCtEyeLidRegulator::LidSet::set_tighten( float tighten )	{
 	}
 }
 
+
+float MeCtEyeLidRegulator::LidSet::get_tighten( )
+{
+	return lid_tight;
+}
+
 void MeCtEyeLidRegulator::LidSet::set_pitch( float pitch )	{
 
 	if( eye_pitch != pitch )	{
 		eye_pitch = pitch;
 		dirty_bit = true;
 	}
+}
+
+float MeCtEyeLidRegulator::LidSet::get_pitch()
+{
+	return eye_pitch;
 }
 
 void MeCtEyeLidRegulator::LidSet::update( void )	{
@@ -206,13 +228,18 @@ MeCtEyeLidRegulator::MeCtEyeLidRegulator( void )	{
 	lower_lid_smooth = 0.9f;
 
 
-	addDefaultAttributeBool("eyelid.pitch", true);
-	addDefaultAttributeFloat("eyelid.rangeUpperMin", -30.0f);
-	addDefaultAttributeFloat("eyelid.rangeUpperMax", 30.0f);
-	addDefaultAttributeFloat("eyelid.tightWeightUpper", 30.0f);
-	addDefaultAttributeFloat("eyelid.delayUpper", 30.0f);
+	// blinking settings
 	addDefaultAttributeFloat("eyelid.blinkPeriodMin", 4.0f);
 	addDefaultAttributeFloat("eyelid.blinkPeriodMax", 8.0f);
+
+	// softeyes settings
+	addDefaultAttributeBool("eyelid.softeyes", true);
+	addDefaultAttributeFloat("eyelid.rangeUpperMin", -30.0f);
+	addDefaultAttributeFloat("eyelid.rangeUpperMax", 30.0f);
+	addDefaultAttributeFloat("eyelid.tightWeightUpper", 0.f);
+	addDefaultAttributeFloat("eyelid.delayUpper", .3f);
+	addDefaultAttributeFloat("eyelid.closeAngle", 30.0f);
+
 }
 
 MeCtEyeLidRegulator::~MeCtEyeLidRegulator( void )	{
@@ -234,20 +261,24 @@ void MeCtEyeLidRegulator::init(SbmPawn* pawn,  bool tracking_pitch)	{
 
 	MeController::init(pawn);
 	
-	set_upper_range( -30.0f, 30.0f );
+	float upperMin = (float) pawn->getDoubleAttribute("eyelid.rangeUpperMin");
+	float upperMax = (float) pawn->getDoubleAttribute("eyelid.rangeUpperMax");
+	set_upper_range( upperMin, upperMax );
 	set_lower_range( 20.0f, 20.0f ); // non existent...
-	set_close_angle( 30.0 );
+	float closeAngle = (float) pawn->getDoubleAttribute("eyelid.closeAngle");
+	set_close_angle( closeAngle );
 	
 	curve.insert( 0.0, 0.0 );
 	curve.insert( 0.05, 1.0 );
 	curve.insert( 0.2, 0.33 );
 	curve.insert( 0.25, 0.0 );
 	
-	pitch_tracking = tracking_pitch;
+	bool usePitchTracking = pawn->getBoolAttribute("eyelid.softeyes");
+	pitch_tracking = usePitchTracking;
 	
 	prev_time = -1.0f;
 	
-	hard_upper_tighten = 0.0f;
+	hard_upper_tighten = (float) pawn->getDoubleAttribute("eyelid.tightWeightUpper");
 	hard_lower_tighten = 0.0f;
 	soft_upper_tighten = 0.0f;
 	soft_lower_tighten = 0.0f;
@@ -273,7 +304,8 @@ void MeCtEyeLidRegulator::init(SbmPawn* pawn,  bool tracking_pitch)	{
 	UR_value = 0.0f;
 	LR_value = 0.0f;
 
-	upper_lid_delay = .3f;
+	float upperDelay = (float) pawn->getDoubleAttribute("eyelid.delayUpper");
+	upper_lid_delay = upperDelay;
 	lower_lid_delay = .3f;
 
 	
@@ -525,34 +557,48 @@ void MeCtEyeLidRegulator::notify(SBSubject* subject)
 		const std::string& name = attribute->getName();
 		if (name == "eyelid.blinkPeriodMin")
 		{
-			blink_period_min = (float) getDoubleAttribute("eyelid.blinkPeriodMin");
+			SmartBody::DoubleAttribute* minAttr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			blink_period_min = (float) minAttr->getValue();
 			blink_period = blink_period_min;
 		}
 		else if (name == "eyelid.blinkPeriodMax")
 		{
-			blink_period_max = (float) getDoubleAttribute("eyelid.blinkPeriodMax");
+			SmartBody::DoubleAttribute* maxAttr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			blink_period_max = (float)  maxAttr->getValue();
 		}
-		else if (name == "eyelid.pitch")
+		else if (name == "eyelid.softeyes")
 		{
-		//	eye_pitch = (float) getDoubleAttribute("eyelid.pitch");
+			SmartBody::BoolAttribute* pitchAttr = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			set_eyeball_tracking(pitchAttr->getValue());
 		}
 		else if (name == "eyelid.rangeUpperMin")
 		{
-		//	float low, high;
-		//	get_upper_range(low, high);
-		//	set_upper_range((float) getDoubleAttribute("eyelid.rangeUpperMin"), high);
+			SmartBody::DoubleAttribute* attr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			float min, max;
+			UL_set.get_range(min, max);
+			set_upper_range((float) attr->getValue(), max);
 		}
 		else if (name == "eyelid.rangeUpperMax")
 		{
-		//	float low, high;
-		//	get_upper_range(low, high);
-		//	set_upper_range(low, (float) getDoubleAttribute("eyelid.rangeUpperMax");
+			SmartBody::DoubleAttribute* attr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			float min, max;
+			UL_set.get_range(min, max);
+			set_upper_range(min, (float) attr->getValue());
 		}
 		else if (name == "eyelid.tightWeightUpper")
 		{
+			SmartBody::DoubleAttribute* attr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			set_upper_tighten((float) attr->getValue());
 		}
 		else if (name == "eyelid.delayUpper")
 		{
+			SmartBody::DoubleAttribute* attr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			set_upper_delay((float) attr->getValue());
+		}
+		else if (name == "eyelid.closeAngle")
+		{
+			SmartBody::DoubleAttribute* attr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			set_close_angle((float) attr->getValue());
 		}
 	}
 }
