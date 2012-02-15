@@ -1,7 +1,10 @@
-#include "UtilsDialog.h"
-#include "vhmsg-tt.h"
 #include "vhcl.h"
+
+#include "UtilsDialog.h"
+
 #include <algorithm>
+
+#include "vhmsg-tt.h"
 
 
 UtilsDialog::UtilsDialog(Scene* pScene, GLWidget* pRenderView, QWidget* parent) : QDialog(parent)
