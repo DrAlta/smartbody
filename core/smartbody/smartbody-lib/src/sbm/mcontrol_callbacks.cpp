@@ -29,6 +29,7 @@
 
 #include "vhcl.h"
 #include "mcontrol_callbacks.h"
+#include "SBScene.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -4741,6 +4742,7 @@ int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
+#ifndef __ANDROID__
 	std::string instanceId = args.read_token();
 	// make sure this instance id matches
 	// ...
@@ -4888,7 +4890,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	strstr << "Problem executing code." << returnType;
 	mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
 	return CMD_FAILURE;
-	
+#endif	
 	return CMD_SUCCESS;
 
 }

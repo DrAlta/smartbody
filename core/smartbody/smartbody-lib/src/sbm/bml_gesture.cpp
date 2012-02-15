@@ -6,6 +6,7 @@
 
 #include "bml_gesture.hpp"
 #include "mcontrol_util.h"
+#include "SBScene.h"
 #include "bml_xml_consts.hpp"
 
 using namespace std;

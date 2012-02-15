@@ -1,5 +1,6 @@
 #include "SBSimulationManager.h"
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBScene.h>
 
 SBProfiler::SBProfiler()
 {

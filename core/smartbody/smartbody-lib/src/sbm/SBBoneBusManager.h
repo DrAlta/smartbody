@@ -13,7 +13,7 @@ class SBBoneBusManager : public SmartBody::SBService
 		~SBBoneBusManager();
 
 		virtual void setEnable(bool val);
-		void SBBoneBusManager::setHost(const std::string& host);
+		void setHost(const std::string& host);
 		const std::string& getHost();
 
 		virtual void start();

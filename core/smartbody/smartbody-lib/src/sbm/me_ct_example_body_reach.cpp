@@ -6,6 +6,7 @@
 #include <boost/lexical_cast.hpp>
 #include <sr/sr_timer.h>
 #include "mcontrol_util.h"
+#include "SBScene.h"
 #include "me_ct_example_body_reach.hpp"
 #include "me_ct_barycentric_interpolation.h"
 #include "sbm/Event.h"
@@ -368,7 +369,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	{
 		
 		//LOG("update reach");
-		currentReachEngine->updateReach((float)t,dt*3.f,inputMotionFrame,blendWeight);
+		currentReachEngine->updateReach((float)t,dt,inputMotionFrame,blendWeight);
 		
 	}
 	

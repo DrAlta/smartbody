@@ -1,5 +1,6 @@
 #include "SBMotion.h"
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBScene.h>
 #include <sbm/me_utilities.hpp>
 #include <sr/sr_euler.h>
 

@@ -1,5 +1,6 @@
 #include "SbmPhysicsSim.h"
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBScene.h>
 #include <sr/sr_output.h>
 //#include <boost/math/special_functions/fpclassify.hpp>
 

@@ -157,6 +157,7 @@ LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/external/parser/ \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/steerlib/include \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/pprAI/include \
+					$(SBM_LOCAL_PATH)/../../../core/smartbody/sbm-debugger/lib \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/ode/include	
 LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sr/sr_array.cpp \
@@ -253,6 +254,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/bml_face.cpp \
 	$(SBM_MY_DIR)/sbm/bml_gaze.cpp \
 	$(SBM_MY_DIR)/sbm/bml_general_param.cpp \
+	$(SBM_MY_DIR)/sbm/bml_gesture.cpp \
 	$(SBM_MY_DIR)/sbm/bml_grab.cpp \
 	$(SBM_MY_DIR)/sbm/bml_interrupt.cpp \
 	$(SBM_MY_DIR)/sbm/bml_locomotion.cpp \
@@ -401,8 +403,6 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/SBMotion.cpp \
 	$(SBM_MY_DIR)/sbm/SBScript.cpp	\
 	$(SBM_MY_DIR)/sbm/SBFaceDefinition.cpp \
-	$(SBM_MY_DIR)/sbm/SBScene.cpp \
-	$(SBM_MY_DIR)/sbm/SBSteerManager.cpp \
 	$(SBM_MY_DIR)/sbm/SBPhysicsManager.cpp \
 	$(SBM_MY_DIR)/sbm/SBParser.cpp \
 	$(SBM_MY_DIR)/sbm/SBParseNode.cpp \
@@ -411,6 +411,10 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/SBBehavior.cpp \
 	$(SBM_MY_DIR)/sbm/ParserBVH.cpp \
 	$(SBM_MY_DIR)/sbm/ParserASFAMC.cpp \
+	$(SBM_MY_DIR)/sbm/SBBoneBusManager.cpp \
+	$(SBM_MY_DIR)/sbm/SBGestureMapManager.cpp \
+	$(SBM_MY_DIR)/sbm/SBGestureMap.cpp \
+	$(SBM_MY_DIR)/sbm/SbmDebuggerServer.cpp \
 	$(SBM_MY_DIR)/sbm/action_unit.cpp
 	
 	
@@ -420,6 +424,7 @@ LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system
 #LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
 include $(BUILD_STATIC_LIBRARY)
+#include $(BUILD_SHARED_LIBRARY)
 
 
 

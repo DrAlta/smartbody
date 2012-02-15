@@ -1,9 +1,7 @@
 
 #include "vhcl.h"
-
-#include "SBScene.h"
 #include "sbm/mcontrol_util.h"
-
+#include "SBScene.h"
 #include "SbmDebuggerServer.h"
 #include <sbm/sbm_audio.h>
 
