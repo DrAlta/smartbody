@@ -404,7 +404,20 @@ void SbmCharacter::createStandardControllers()
 			MeCtScheduler2* scheduler = dynamic_cast<MeCtScheduler2*>(controller);
 			if (!scheduler)
 			{
-				attributeCopy->registerObserver(controller);
+				if (dynamic_cast<MeCtEyeLidRegulator*>(controller))
+					attributeCopy->registerObserver(eyelid_reg_ct_p);
+				else if (dynamic_cast<MeCtBreathing*>(controller))
+					attributeCopy->registerObserver(breathing_p);
+				else if (dynamic_cast<MeCtSaccade*>(controller))
+					attributeCopy->registerObserver(saccade_ct);
+				else if (dynamic_cast<MeCtFace*>(controller))
+					attributeCopy->registerObserver(face_ct);
+				else if (dynamic_cast<MeCtParamAnimation*>(controller))
+					attributeCopy->registerObserver(param_animation_ct);
+				else if (dynamic_cast<MeCtLocomotion*>(controller))
+					attributeCopy->registerObserver(locomotion_ct);
+				else if (dynamic_cast<MeCtBasicLocomotion*>(controller))
+					attributeCopy->registerObserver(basic_locomotion_ct);
 			}
 		}
 	}
@@ -953,7 +966,20 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 			MeCtScheduler2* scheduler = dynamic_cast<MeCtScheduler2*>(controller);
 			if (!scheduler)
 			{
-				attributeCopy->registerObserver(controller);
+				if (dynamic_cast<MeCtEyeLidRegulator*>(controller))
+					attributeCopy->registerObserver(eyelid_reg_ct_p);
+				else if (dynamic_cast<MeCtBreathing*>(controller))
+					attributeCopy->registerObserver(breathing_p);
+				else if (dynamic_cast<MeCtSaccade*>(controller))
+					attributeCopy->registerObserver(saccade_ct);
+				else if (dynamic_cast<MeCtFace*>(controller))
+					attributeCopy->registerObserver(face_ct);
+				else if (dynamic_cast<MeCtParamAnimation*>(controller))
+					attributeCopy->registerObserver(param_animation_ct);
+				else if (dynamic_cast<MeCtLocomotion*>(controller))
+					attributeCopy->registerObserver(locomotion_ct);
+				else if (dynamic_cast<MeCtBasicLocomotion*>(controller))
+					attributeCopy->registerObserver(basic_locomotion_ct);
 			}
 		}
 	}
