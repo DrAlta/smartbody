@@ -213,7 +213,7 @@ int main( int argc, char ** argv )
    //sbm->SetListener( &listener );
    
    SBMHANDLE sbmHandle = SBM_CreateSBM();
-   SBM_Init(sbmHandle, "../../Python26/Lib");
+   SBM_Init(sbmHandle, "../../Python26/Lib", true);
    SBM_SetListener(sbmHandle, 
 	   (SBM_OnCreateCharacterCallback) OnCreateCharacterCallback, 
 	   (SBM_OnCharacterDeleteCallback) OnCharacterDeleteCallback, 
