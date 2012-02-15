@@ -57,6 +57,7 @@
 #include <sbm/sbm_constants.h>
 #include <sbm/xercesc_utils.hpp>
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBScene.h>
 #include <sbm/mcontrol_callbacks.h>
 #include <sbm/sbm_test_cmds.hpp>
 #include BML_PROCESSOR_INCLUDE
@@ -105,6 +106,10 @@
 //#define DEFAULT_SEQUENCE_FILE		("ELITE-all.seq")
 #define DEFAULT_SEQUENCE_FILE		("default.seq")
 #define DEFAULT_PY_FILE				("default-init.py")
+//#define DEFAULT_PY_FILE				("default-init-collada.py")
+//#define DEFAULT_PY_FILE				("default-init-collada-2.py")
+//#define DEFAULT_PY_FILE				("default-init-reach.py")
+//#define DEFAULT_PY_FILE				("default-init-physics.py")
 
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -397,7 +402,6 @@ int main( int argc, char **argv )	{
 
  // 808: undefined reference to `bonebus::BoneBusCharacter::StartSendBoneRotations()'
 //	return( 0 );
-
 #if SBM_REPORT_MEMORY_LEAKS
 	// CRT Debugging flags - Search help:
 	//   _CrtSetDbgFlag

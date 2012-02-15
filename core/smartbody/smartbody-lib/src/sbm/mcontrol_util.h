@@ -97,6 +97,7 @@ class mcuCBHandle;
 #include <sbm/SteerSuiteEngineDriver.h>
 #include <sbm/Physics/SbmPhysicsSim.h>
 #include <sbm/KinectProcessor.h>
+#include <sbm/SBScene.h>
 
 #ifndef __ANDROID__
 #include <boost/python.hpp>
