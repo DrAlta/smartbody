@@ -188,7 +188,7 @@ void OgreRenderer::createScene()
 	{
 		m_sbListener = new SBListener(this);
 		m_sbm = new Smartbody_dll;
-		m_sbm->Init("../../../Python26/Lib");
+		m_sbm->Init("../../../Python26/Lib", true);
 		m_sbm->SetListener(m_sbListener);
 	}
 
