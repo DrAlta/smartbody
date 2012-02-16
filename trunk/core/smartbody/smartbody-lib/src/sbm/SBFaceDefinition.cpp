@@ -159,7 +159,7 @@ void SBFaceDefinition::setAU(int auNum, const std::string& side, const std::stri
 		}
 
 		addAU(auNum, au);
-		LOG("AU '%d' added to face definition %s.", auNum, getName().c_str());
+		//LOG("AU '%d' added to face definition %s.", auNum, getName().c_str());
 		
 	} 
 	else
@@ -267,7 +267,7 @@ void SBFaceDefinition::setViseme(const std::string& visemeName, const std::strin
 		}
 
 		_visemeMap.insert(std::pair<std::string, std::pair<SkMotion*, float> >(visemeName, std::pair<SkMotion*, float>(motion, 1.0f)));
-		LOG("Viseme '%s' added to face definition %s.", visemeName.c_str(), getName().c_str());
+		//LOG("Viseme '%s' added to face definition %s.", visemeName.c_str(), getName().c_str());
 		return;
 	}
 	else // viseme already exists - replace it with the new definition
