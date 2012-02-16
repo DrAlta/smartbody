@@ -8,3 +8,4 @@ set MOC=..\..\..\..\lib\qt\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT
 %MOC% CommandDialog.h -o moc_CommandDialog.cpp
 %MOC% DataViewerDialog.h -o moc_DataViewerDialog.cpp
 %MOC% UtilsDialog.h -o moc_UtilsDialog.cpp
+%MOC% FaceDialog.h -o moc_FaceDialog.cpp

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Fri Feb 3 18:47:22 2012
+** Created: Wed Feb 15 16:33:17 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -41,6 +41,7 @@ public:
     QAction *actionCommand_Window;
     QAction *actionData_Viewer;
     QAction *actionUtils_Window;
+    QAction *actionFace_Viewer;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout_3;
     QWidget *RenderView;
@@ -63,7 +64,6 @@ public:
     QLabel *cameraPositionLabel;
     QLabel *networkFpsLabel;
     QLabel *rendererFpsLabel;
-    QWidget *tab_3;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -93,6 +93,8 @@ public:
         actionData_Viewer->setObjectName(QString::fromUtf8("actionData_Viewer"));
         actionUtils_Window = new QAction(MainWindow);
         actionUtils_Window->setObjectName(QString::fromUtf8("actionUtils_Window"));
+        actionFace_Viewer = new QAction(MainWindow);
+        actionFace_Viewer->setObjectName(QString::fromUtf8("actionFace_Viewer"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout_3 = new QHBoxLayout(centralwidget);
@@ -183,9 +185,6 @@ public:
         rendererFpsLabel->setEnabled(true);
         rendererFpsLabel->setGeometry(QRect(10, 10, 121, 16));
         sceneTab->addTab(statisticsTab, QString());
-        tab_3 = new QWidget();
-        tab_3->setObjectName(QString::fromUtf8("tab_3"));
-        sceneTab->addTab(tab_3, QString());
 
         horizontalLayout->addWidget(sceneTab);
 
@@ -204,6 +203,7 @@ public:
         menuSbm->addAction(actionResource_Viewer);
         menuSbm->addAction(actionCommand_Window);
         menuSbm->addAction(actionUtils_Window);
+        menuSbm->addAction(actionFace_Viewer);
         toolBar->addAction(actionToggleFreeLookCamera);
 
         retranslateUi(MainWindow);
@@ -239,6 +239,8 @@ public:
         actionData_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+A", 0, QApplication::UnicodeUTF8));
         actionUtils_Window->setText(QApplication::translate("MainWindow", "U&tils Window", 0, QApplication::UnicodeUTF8));
         actionUtils_Window->setShortcut(QApplication::translate("MainWindow", "Ctrl+T", 0, QApplication::UnicodeUTF8));
+        actionFace_Viewer->setText(QApplication::translate("MainWindow", "Face Viewer", 0, QApplication::UnicodeUTF8));
+        actionFace_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+F", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0, QApplication::UnicodeUTF8));
         menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));
@@ -249,7 +251,6 @@ public:
         networkFpsLabel->setText(QApplication::translate("MainWindow", "Network Fps:", 0, QApplication::UnicodeUTF8));
         rendererFpsLabel->setText(QApplication::translate("MainWindow", "Renderer Fps:", 0, QApplication::UnicodeUTF8));
         sceneTab->setTabText(sceneTab->indexOf(statisticsTab), QApplication::translate("MainWindow", "Statistics", 0, QApplication::UnicodeUTF8));
-        sceneTab->setTabText(sceneTab->indexOf(tab_3), QApplication::translate("MainWindow", "Tab 3", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

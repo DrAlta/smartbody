@@ -3,7 +3,7 @@
 
 #include "glwidget.h"
 #include "SbmDebuggerForm.h"
-
+#include "vhmsg-tt.h"
 #include <math.h>
 
 
@@ -125,6 +125,9 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
+   if (m_GLMode == SELECT)
+      StartPicking();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     glPushMatrix();
@@ -132,6 +135,9 @@ void GLWidget::paintGL()
        DrawFloor();
        DrawScene();
     glPopMatrix();
+
+    if (m_GLMode == SELECT)
+      StopPicking(); 
 }
 
 void GLWidget::resizeGL(int width, int height)
@@ -240,22 +246,96 @@ void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
 	  ptr = ptrNames;
      while (*ptr == 0/*UINT_MAX*/ || *ptr == -1 || *ptr == 1) // TODO: figure out why these are bad numbers
          ptr++;
-     
-     m_SelData.m_pJoint = FindPickedJoint(*ptr);
-     if (m_SelData.m_pJoint)
+
+     // first check if we are picking the floor
+     if (*ptr == FLOOR_LAYER /*&& m_SelData.m_pObj != NULL*/)
      {
-        printf("Picked Joint: %s\n", m_SelData.m_pJoint->m_name.c_str());
+        return;
+        //std::string msg = vhcl::Format("sbm bml char %s <locomotion target=\"100 100\" type=\"basic\"/>", m_SelData.m_pObj->m_name.c_str());
+        //vhmsg::ttu_notify1(msg.c_str());
+
+         //glPushMatrix();
+         //glLoadIdentity();
+
+        //QMatrix4x4 projMat, mvMat;
+
+         GLdouble modelMatrix[16];
+         glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
+         GLdouble projMatrix[16]; 
+         glGetDoublev(GL_PROJECTION_MATRIX,projMatrix);
+         int viewport[4];
+         glGetIntegerv(GL_VIEWPORT,viewport);
+         Vector3 np;
+         Vector3 fp;
+
+         /*GLenum error = glGetError();
+         float winZ = 0;
+         glReadPixels( lastPos.x(), viewport[3] - lastPos.y(), 1,1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
+         error = glGetError();*/
+
+         gluUnProject( lastPos.x(), viewport[3] - lastPos.y(), 0, modelMatrix, projMatrix, viewport, &np.x, &np.y, &np.z);
+         gluUnProject( lastPos.x(), viewport[3] - lastPos.y(), 1, modelMatrix, projMatrix, viewport, &fp.x, &fp.y, &fp.z);
+
+         Vector3 rayDirection = fp - np;
+         rayDirection.Normalize();
+
+         QVector3D nearPlane(np.x, np.y, np.z);
+         QVector3D farPlane(fp.x, fp.y, fp.z);
+
+         QVector3D dir(rayDirection.x, rayDirection.y, rayDirection.z);
+         QVector3D planeNormal = QVector3D(0, 1, 0);
+         QVector3D planeVertex = QVector3D(-1000, 0, 1000);
+
+        /* QVector3D direction = nearPlane - planeVertex;
+         double numerator = QVector3D::dotProduct(planeNormal, planeVertex - nearPlane);
+         double denom = QVector3D::dotProduct(planeNormal, direction);
+         QVector3D intersectionPoint = nearPlane + (direction) * (numerator / denom);*/
+
+         double t = -QVector3D::dotProduct(planeNormal, nearPlane) / QVector3D::dotProduct(planeNormal, (farPlane - nearPlane));
+         QVector3D intersectionPoint = nearPlane + (farPlane - nearPlane) * t;
+         
+
+         //float fact = QVector3D::dotProduct( planeNormal, direction);
+         //if ( fact==0.0 ) return;
+         //float k = (QVector3D::dotProduct(planeNormal, nearPlane)) / fact;
+         //intersectionPoint = LERP(nearPlane, farPlane, k);
+
+         printf("\nintersectionPoint: x: %.2f,   y: %.2f,   z: %.2f", intersectionPoint.x(), intersectionPoint.y(), intersectionPoint.z());
+
+
+        QVector3D camPos = m_Camera.GetPosition();
+        QVector3D endPos = camPos + (dir * 1000);
+
+        glPushMatrix();
+        glLoadIdentity();
+        glColor3d(1.0, 1.0, 1.0);
+        glBegin(GL_LINES);
+         glVertex3d(camPos.x(), camPos.y(), camPos.z());
+         glVertex3d(endPos.x(), endPos.y(), endPos.z());
+        glEnd();
+        glPopMatrix();
+
+        //glPopMatrix();
      }
-      
-	 for (int j = 0; j < numberOfNames; j++,ptr++) 
-     { 
-        printf ("%d ", *ptr);
-	  }
-	}
+     else
+     {
+         m_SelData.m_pJoint = FindPickedJoint(*ptr);
+         if (m_SelData.m_pJoint)
+         {
+            printf("Picked Joint: %s\n", m_SelData.m_pJoint->m_name.c_str());
+         }
+
+         for (int j = 0; j < numberOfNames; j++,ptr++) 
+         { 
+            printf ("%d ", *ptr);
+         }
+	   }
+   }
    else
    {
 	   // no hit
    }
+   
 }
 
 void GLWidget::StopPicking()
@@ -298,30 +378,44 @@ void GLWidget::DrawSphere(double radius, int slices, int stacks)
 
 void GLWidget::DrawFloor()
 {
+   const float Size = 1000;
+   const float LineHeightOffset = 1.0;
    glPushMatrix();
+   glPushName(FLOOR_LAYER);
+
+   // draw axis
+   glColor3f(0.1f, 0.1f, 0.1f);
+   glBegin(GL_LINES);
+      glVertex3f(-Size, LineHeightOffset, 0); // x
+      glVertex3f(Size, LineHeightOffset, 0);
+
+      glVertex3f(0, LineHeightOffset, -Size); // z
+      glVertex3f(0, LineHeightOffset, Size);
+   glEnd();
+
+   // draw floor
+   glColor3f(0.5f, 0.5f, 0.5f);
    glTranslated(0, 0, 0);
    glRotated(180, 1, 0, 0);
    glBegin(GL_QUADS);  
-      glVertex3f(-1, 0, 1);
+      glVertex3f(-Size, 0, Size);
       glNormal3f(0, 1, 0);
       
-	   glVertex3f(-1, 0, -1);
+	   glVertex3f(-Size, 0, -Size);
       glNormal3f(0, 1, 0);
       
-	   glVertex3f(1, 0, -1);
+	   glVertex3f(Size, 0, -Size);
       glNormal3f(0, 1, 0);
       
-	   glVertex3f(1, 0, 1);
+	   glVertex3f(Size, 0, Size);
       glNormal3f(0, 1, 0);
+   glPopName();
    glEnd();
    glPopMatrix();
 }
 
 void GLWidget::DrawScene()
 {
-   if (m_GLMode == SELECT)
-      StartPicking();
-
    // draw characters
    vector<Character> characters = m_pScene->m_characters;
    for (unsigned int i = 0; i < characters.size(); i++)
@@ -342,9 +436,6 @@ void GLWidget::DrawScene()
       DrawPawn(&pawns[i]);
       glPopMatrix();
    }
-
-   if (m_GLMode == SELECT)
-      StopPicking(); 
 }
 
 QMatrix4x4 GetLocalRotation(Joint* joint)
@@ -450,6 +541,13 @@ void GLWidget::DrawPawn(const Pawn* pawn)
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     lastPos = event->pos();
+
+    /*int viewport[4];
+    glGetIntegerv(GL_VIEWPORT,viewport);
+    float winZ = 0;
+    glReadPixels( lastPos.x(), viewport[3] - lastPos.y(), 1,1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
+    GLenum error = glGetError();*/
+
     m_GLMode = SELECT;
 }
 
