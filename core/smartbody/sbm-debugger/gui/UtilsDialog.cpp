@@ -5,6 +5,11 @@
 #include <algorithm>
 
 #include "vhmsg-tt.h"
+#include "SbmDebuggerCommon.h"
+#include "glwidget.h"
+
+
+using std::string;
 
 
 UtilsDialog::UtilsDialog(Scene* pScene, GLWidget* pRenderView, QWidget* parent) : QDialog(parent)

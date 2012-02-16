@@ -1,11 +1,14 @@
 #ifndef UTILS_DIALOG_H_
 #define UTILS_DIALOG_H_
 
-#include "ui_UtilsDialog.h"
-#include "GLWidget.h"
+#include "QtCrtDbgOff.h"
+#include <QtGui>
+#include "QtCrtDbgOn.h"
 
-using std::string;
-using std::vector;
+#include "ui_UtilsDialog.h"
+
+class Scene;
+class GLWidget;
 
 class UtilsDialog : public QDialog
 {
