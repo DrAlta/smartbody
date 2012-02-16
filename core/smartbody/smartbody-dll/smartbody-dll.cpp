@@ -34,7 +34,7 @@ using std::string;
 #endif
 #endif
 
-#define USE_SBSCENE  0
+#define USE_SBSCENE  1
 
 
 #ifdef WIN_BUILD
@@ -353,7 +353,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::ProcessVHMsgs( const char * op, const char
    mcuCBHandle & mcu = mcuCBHandle::singleton();
    SBScene * scene = mcu._scene;
 
-   string s = string(op) + string(args);
+   string s = string(op) + string(" ") + string(args);
    scene->command( s.c_str() );
 
    return true;
