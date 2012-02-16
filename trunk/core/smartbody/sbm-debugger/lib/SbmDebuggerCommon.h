@@ -97,7 +97,15 @@ public:
 
    double Magnitude()
    {
-      return (x*x) + (y*y) + (z*z);
+      return sqrt((x*x) + (y*y) + (z*z));
+   }
+
+   void Normalize()
+   {
+      double mag = Magnitude();
+      x /= mag;
+      y /= mag;
+      z /= mag;
    }
 
    static Vector3 ConvertFromQuat(double x, double y, double z, double w)
@@ -204,12 +212,12 @@ public:
    DebuggerCamera()
    {
       pos.x = 0;
-      pos.y = 0.2f;
-      pos.z = 3;
-      rot.x = 0;
-      rot.y = 0;
+      pos.y = 200;
+      pos.z = 350;
+      rot.x = 0.12f;
+      rot.y = 0.004f;
       rot.z = 0;
-      rot.w = 1;
+      rot.w = 0.992999f;
       fovY = 45;
       aspect = 1.5;
       zNear = 0.1;

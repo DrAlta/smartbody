@@ -11,7 +11,7 @@
 #include "CommandDialog.h"
 #include "DataViewerDialog.h"
 #include "UtilsDialog.h"
-
+#include "FaceDialog.h"
 
 using std::vector;
 using std::string;
@@ -90,6 +90,7 @@ void SbmDebuggerForm::InitSignalsSlots()
    connect(ui.actionCommand_Window, SIGNAL(triggered()), this, SLOT(ShowCommandDialog()));
    connect(ui.actionData_Viewer, SIGNAL(triggered()), this, SLOT(ShowDataViewerDialog()));
    connect(ui.actionUtils_Window, SIGNAL(triggered()), this, SLOT(ShowUtilDialog()));
+   connect(ui.actionFace_Viewer, SIGNAL(triggered()), this, SLOT(ShowFaceDialog()));
 
    // Scene Tree
    //selection changes shall trigger a slot
@@ -183,6 +184,12 @@ void SbmDebuggerForm::ShowDataViewerDialog()
 void SbmDebuggerForm::ShowUtilDialog()
 {
    UtilsDialog dlg(c.GetScene(), m_pGLWidget, this);
+   dlg.exec();
+}
+
+void SbmDebuggerForm::ShowFaceDialog()
+{
+   FaceDialog dlg(c.GetScene(), this);
    dlg.exec();
 }
 

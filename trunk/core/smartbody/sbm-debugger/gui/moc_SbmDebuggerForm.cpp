@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'SbmDebuggerForm.h'
 **
-** Created: Thu Feb 9 17:22:32 2012
+** Created: Wed Feb 15 11:11:39 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       9,   14, // methods
+      10,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -38,8 +38,9 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
       99,   16,   16,   16, 0x08,
      122,   16,   16,   16, 0x08,
      139,   16,   16,   16, 0x08,
-     169,  152,   16,   16, 0x08,
-     251,  225,   16,   16, 0x08,
+     156,   16,   16,   16, 0x08,
+     186,  169,   16,   16, 0x08,
+     268,  242,   16,   16, 0x08,
 
        0        // eod
 };
@@ -48,8 +49,8 @@ static const char qt_meta_stringdata_SbmDebuggerForm[] = {
     "SbmDebuggerForm\0\0ShowConnectDialog()\0"
     "ShowSettingsDialog()\0ShowResourceDialog()\0"
     "ShowCommandDialog()\0ShowDataViewerDialog()\0"
-    "ShowUtilDialog()\0Disconnect()\0"
-    "current,previous\0"
+    "ShowUtilDialog()\0ShowFaceDialog()\0"
+    "Disconnect()\0current,previous\0"
     "sceneTreeItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)\0"
     "selectedObj,selectedJoint\0"
     "SetSelectedSceneTreeItem(const Pawn*,const Joint*)\0"
@@ -90,12 +91,13 @@ int SbmDebuggerForm::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 3: ShowCommandDialog(); break;
         case 4: ShowDataViewerDialog(); break;
         case 5: ShowUtilDialog(); break;
-        case 6: Disconnect(); break;
-        case 7: sceneTreeItemChanged((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< QTreeWidgetItem*(*)>(_a[2]))); break;
-        case 8: SetSelectedSceneTreeItem((*reinterpret_cast< const Pawn*(*)>(_a[1])),(*reinterpret_cast< const Joint*(*)>(_a[2]))); break;
+        case 6: ShowFaceDialog(); break;
+        case 7: Disconnect(); break;
+        case 8: sceneTreeItemChanged((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< QTreeWidgetItem*(*)>(_a[2]))); break;
+        case 9: SetSelectedSceneTreeItem((*reinterpret_cast< const Pawn*(*)>(_a[1])),(*reinterpret_cast< const Joint*(*)>(_a[2]))); break;
         default: ;
         }
-        _id -= 9;
+        _id -= 10;
     }
     return _id;
 }

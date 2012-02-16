@@ -76,6 +76,7 @@
     <addaction name="actionResource_Viewer"/>
     <addaction name="actionCommand_Window"/>
     <addaction name="actionUtils_Window"/>
+    <addaction name="actionFace_Viewer"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -251,11 +252,6 @@
          </property>
         </widget>
        </widget>
-       <widget class="QWidget" name="tab_3">
-        <attribute name="title">
-         <string>Tab 3</string>
-        </attribute>
-       </widget>
       </widget>
      </item>
     </layout>
@@ -338,6 +334,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionFace_Viewer">
+   <property name="text">
+    <string>Face Viewer</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>

@@ -29,6 +29,7 @@ class SbmDebuggerForm : public QMainWindow
        void ShowCommandDialog();
        void ShowDataViewerDialog();
        void ShowUtilDialog();
+       void ShowFaceDialog();
        void Disconnect();
        void sceneTreeItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous);
        void SetSelectedSceneTreeItem(const Pawn* selectedObj, const Joint* selectedJoint);

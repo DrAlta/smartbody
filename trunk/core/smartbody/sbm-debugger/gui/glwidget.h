@@ -20,6 +20,7 @@ using std::vector;
 
 #define SELECT_BUFF_SIZE 1024
 #define PICKING_OFFSET 1000
+#define FLOOR_LAYER 100
 
 class GLWidget : public QGLWidget
 {
