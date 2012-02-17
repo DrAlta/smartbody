@@ -31,6 +31,7 @@
 # include <sr/sr_output.h>
 #include <cstdio>
 #include <sbm/SBMotion.h>
+#include <sbm/mcontrol_util.h>
 
 std::string MeCtBreathing::type_name = "Breathing";
 
@@ -56,6 +57,11 @@ MeCtBreathing::MeCtBreathing ()
 
 	_incremental = true;
 	_blendChannelBreathingMotion = NULL;
+
+	// breathing settings
+	addDefaultAttributeString("breathing.motion", "");
+	addDefaultAttributeBool("breathing.useBlendChannels", false);
+	addDefaultAttributeDouble("breathing.bpm", 15);
 }
 
 MeCtBreathing::~MeCtBreathing ()
@@ -387,3 +393,41 @@ const std::string& MeCtBreathing::controller_type () const
 {
 	return type_name;
 }
+
+void MeCtBreathing::notify(SBSubject* subject)
+{
+	addDefaultAttributeString("breathing.motion", "");
+	addDefaultAttributeBool("breathing.useBlendChannels", false);
+	addDefaultAttributeFloat("breathing.bpm", 15);
+
+	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
+	if (attribute)
+	{
+		const std::string& name = attribute->getName();
+		if (name == "breathing.motion")
+		{
+			SmartBody::StringAttribute* attr = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+			mcuCBHandle& mcu = mcuCBHandle::singleton();
+			SBMotion* motion = mcu._scene->getMotion(attr->getValue());
+			if (!motion)
+			{
+				LOG("No motion named %s found.", motion->getName());
+			}
+			else
+			{
+				this->motion(motion);
+			}
+		}
+		else if (name == "breathing.useBlendChannels")
+		{
+			SmartBody::BoolAttribute* attr = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			setUseBlendChannels(attr->getValue());		
+		}
+		else if (name == "breathing.bpm")
+		{
+			SmartBody::DoubleAttribute* attr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			breaths_per_minute((float) attr->getValue());
+		}
+	}
+}
+
