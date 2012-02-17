@@ -34,7 +34,7 @@
 # include <sk/sk_motion.h>
 # include <me/me_controller.h>
 # include <sbm/me_ct_breathing_interface.h>
-
+#include <sbm/SBSubject.h>
 #include <list>
 using std::list;
 
@@ -320,6 +320,8 @@ public :
 	* \brief Check whether channels are used control breathing parameters, rather than using an animation.
 	*/
 	virtual bool getUseBlendChannels();
+
+	virtual void notify(SBSubject* subject);
 
 
 private:

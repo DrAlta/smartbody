@@ -419,6 +419,8 @@ void SbmCharacter::createStandardControllers()
 					attributeCopy->registerObserver(locomotion_ct);
 				else if (dynamic_cast<MeCtBasicLocomotion*>(controller))
 					attributeCopy->registerObserver(basic_locomotion_ct);
+				else if (dynamic_cast<MeCtBreathing*>(controller))
+					attributeCopy->registerObserver(breathing_p);
 			}
 		}
 	}
@@ -981,6 +983,8 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 					attributeCopy->registerObserver(locomotion_ct);
 				else if (dynamic_cast<MeCtBasicLocomotion*>(controller))
 					attributeCopy->registerObserver(basic_locomotion_ct);
+				else if (dynamic_cast<MeCtBreathing*>(controller))
+					attributeCopy->registerObserver(breathing_p);
 			}
 		}
 	}
