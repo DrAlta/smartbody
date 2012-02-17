@@ -218,6 +218,27 @@ Joint* GLWidget::FindPickedJointRecursive(const Joint* joint)
    return NULL;
 }
 
+QVector3D GLWidget::GetWorldPositionFromScreenCoords(int x, int y)
+{
+    GLint viewport[4];
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLfloat winX, winY, winZ;
+    GLdouble posX, posY, posZ;
+ 
+    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+    glGetDoublev( GL_PROJECTION_MATRIX, projection );
+    glGetIntegerv( GL_VIEWPORT, viewport );
+ 
+    winX = (float)x;
+    winY = (float)viewport[3] - (float)y;
+    glReadPixels( x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
+ 
+    gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+ 
+    return QVector3D(posX, posY, posZ);
+}
+
 void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
 {
    GLint i, numberOfNames;
@@ -248,74 +269,28 @@ void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
          ptr++;
 
      // first check if we are picking the floor
-     if (*ptr == FLOOR_LAYER /*&& m_SelData.m_pObj != NULL*/)
-     {
-        return;
-        //std::string msg = vhcl::Format("sbm bml char %s <locomotion target=\"100 100\" type=\"basic\"/>", m_SelData.m_pObj->m_name.c_str());
-        //vhmsg::ttu_notify1(msg.c_str());
+     if (*ptr == FLOOR_LAYER && m_SelData.m_pObj != NULL)
+     { 
+         QVector3D camPos = m_Camera.GetPosition();
+         QVector3D endPoint = GetWorldPositionFromScreenCoords(lastPos.x(), lastPos.y());
+         QVector3D intersection = camPos + endPoint;
+         //printf("\nintersectionPoint: x: %.2f,   y: %.2f,   z: %.2f", intersection.x(), intersection.y(), intersection.z());
 
-         //glPushMatrix();
-         //glLoadIdentity();
+         // draw ray
+         glPushMatrix();
+            glLoadIdentity();
+            glColor3d(1.0, 1.0, 1.0);
+            glBegin(GL_LINES);
+            glVertex3d(camPos.x(), camPos.y(), camPos.z());
+            glVertex3d(endPoint.x(), endPoint.y(), endPoint.z());
+            glEnd();
+         glPopMatrix();
 
-        //QMatrix4x4 projMat, mvMat;
+         std::string msg = vhcl::Format("sbm bml char %s <locomotion target=\"%d %d\" type=\"basic\"/>",
+            m_SelData.m_pObj->m_name.c_str(), (int)intersection.x(), (int)intersection.z());
 
-         GLdouble modelMatrix[16];
-         glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
-         GLdouble projMatrix[16]; 
-         glGetDoublev(GL_PROJECTION_MATRIX,projMatrix);
-         int viewport[4];
-         glGetIntegerv(GL_VIEWPORT,viewport);
-         Vector3 np;
-         Vector3 fp;
-
-         /*GLenum error = glGetError();
-         float winZ = 0;
-         glReadPixels( lastPos.x(), viewport[3] - lastPos.y(), 1,1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
-         error = glGetError();*/
-
-         gluUnProject( lastPos.x(), viewport[3] - lastPos.y(), 0, modelMatrix, projMatrix, viewport, &np.x, &np.y, &np.z);
-         gluUnProject( lastPos.x(), viewport[3] - lastPos.y(), 1, modelMatrix, projMatrix, viewport, &fp.x, &fp.y, &fp.z);
-
-         Vector3 rayDirection = fp - np;
-         rayDirection.Normalize();
-
-         QVector3D nearPlane(np.x, np.y, np.z);
-         QVector3D farPlane(fp.x, fp.y, fp.z);
-
-         QVector3D dir(rayDirection.x, rayDirection.y, rayDirection.z);
-         QVector3D planeNormal = QVector3D(0, 1, 0);
-         QVector3D planeVertex = QVector3D(-1000, 0, 1000);
-
-        /* QVector3D direction = nearPlane - planeVertex;
-         double numerator = QVector3D::dotProduct(planeNormal, planeVertex - nearPlane);
-         double denom = QVector3D::dotProduct(planeNormal, direction);
-         QVector3D intersectionPoint = nearPlane + (direction) * (numerator / denom);*/
-
-         double t = -QVector3D::dotProduct(planeNormal, nearPlane) / QVector3D::dotProduct(planeNormal, (farPlane - nearPlane));
-         QVector3D intersectionPoint = nearPlane + (farPlane - nearPlane) * t;
-         
-
-         //float fact = QVector3D::dotProduct( planeNormal, direction);
-         //if ( fact==0.0 ) return;
-         //float k = (QVector3D::dotProduct(planeNormal, nearPlane)) / fact;
-         //intersectionPoint = LERP(nearPlane, farPlane, k);
-
-         printf("\nintersectionPoint: x: %.2f,   y: %.2f,   z: %.2f", intersectionPoint.x(), intersectionPoint.y(), intersectionPoint.z());
-
-
-        QVector3D camPos = m_Camera.GetPosition();
-        QVector3D endPos = camPos + (dir * 1000);
-
-        glPushMatrix();
-        glLoadIdentity();
-        glColor3d(1.0, 1.0, 1.0);
-        glBegin(GL_LINES);
-         glVertex3d(camPos.x(), camPos.y(), camPos.z());
-         glVertex3d(endPos.x(), endPos.y(), endPos.z());
-        glEnd();
-        glPopMatrix();
-
-        //glPopMatrix();
+         // currently locomotion is disabled
+         //vhmsg::ttu_notify1(msg.c_str());
      }
      else
      {

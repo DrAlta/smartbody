@@ -107,6 +107,7 @@ private:
     void ProcessHits(GLint hits, GLuint buffer[]);
     void StopPicking();
     void SetSelectedObject(Pawn* obj, Joint* joint);
+    QVector3D GetWorldPositionFromScreenCoords(int x, int y);
 
     // Drawing Functions
     void DrawFloor();
