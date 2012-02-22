@@ -147,6 +147,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\NetRequest.h"
+			>
+		</File>
+		<File
 			RelativePath=".\SbmDebuggerClient.cpp"
 			>
 		</File>

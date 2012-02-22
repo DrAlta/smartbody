@@ -161,17 +161,17 @@ void SbmDebuggerForm::ShowResourceDialog()
    ResourceDialog dlg(c.GetScene(), this);
    if (dlg.exec() == QDialog::Accepted)
    {
-
+      
    }
    else
    {
-
+      
    }
 }
 
 void SbmDebuggerForm::ShowCommandDialog()
 {
-   CommandDialog dlg(this);
+   CommandDialog dlg(&c, this);
    dlg.exec();
 }
 
@@ -189,7 +189,7 @@ void SbmDebuggerForm::ShowUtilDialog()
 
 void SbmDebuggerForm::ShowFaceDialog()
 {
-   FaceDialog dlg(c.GetScene(), this);
+   FaceDialog dlg(&c, this);
    dlg.exec();
 }
 

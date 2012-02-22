@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FaceDialog.h'
 **
-** Created: Wed Feb 15 11:11:39 2012
+** Created: Wed Feb 22 11:17:35 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_FaceDialog[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       2,   14, // methods
+       3,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -33,12 +33,14 @@ static const uint qt_meta_data_FaceDialog[] = {
  // slots: signature, parameters, type, tag, flags
       12,   11,   11,   11, 0x08,
       24,   20,   11,   11, 0x08,
+      58,   48,   11,   11, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_FaceDialog[] = {
     "FaceDialog\0\0Reset()\0val\0SliderValueChanged(int)\0"
+    "selection\0CharacterSelectionChanged(QString)\0"
 };
 
 const QMetaObject FaceDialog::staticMetaObject = {
@@ -72,9 +74,10 @@ int FaceDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         switch (_id) {
         case 0: Reset(); break;
         case 1: SliderValueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 2: CharacterSelectionChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         default: ;
         }
-        _id -= 2;
+        _id -= 3;
     }
     return _id;
 }

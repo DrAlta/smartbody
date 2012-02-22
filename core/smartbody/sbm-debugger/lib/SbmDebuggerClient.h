@@ -1,9 +1,10 @@
-
+#ifndef SBM_DEBUGGER_CLIENT_H_
+#define SBM_DEBUGGER_CLIENT_H_
 #include <string>
 #include <vector>
 
 #include "SbmDebuggerCommon.h"
-
+#include "NetRequest.h"
 
 class SbmDebuggerClient
 {
@@ -15,6 +16,7 @@ private:
 
 
    Scene m_scene;
+   NetRequestManager m_netRequestManager;
 
 public:
    SbmDebuggerClient();
@@ -36,7 +38,11 @@ public:
 
    void GetResourcePaths();
 
-   void SendSBMCommand(const std::string & command);
+   void SendSBMCommand(int requestId, const std::string & command);
+   void SendSBMCommand(int requestId, const std::string & returnValue, const std::string & functionNameandParams,
+      NetRequest::RequestCallback cb, void* callbackOwner = NULL);
 
    void ProcessVHMsgs(const char * op, const char * args);
 };
+
+#endif

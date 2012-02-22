@@ -85,14 +85,27 @@ void SbmDebuggerClient::GetResourcePaths()
    //sbmdebugger 123 455 request void "DoSomething(42)" 
 
    //vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s %d request string-array \"ret = scene.getAssetPaths("seq")\"", m_sbmId.c_str(), 42).c_str());
+
+   //NetRequest* req = new NetRequest();
 }
 
-void SbmDebuggerClient::SendSBMCommand(const std::string & command)
+void SbmDebuggerClient::SendSBMCommand(int requestId, const std::string & command)
 {
    // send a void command, not expecting a return
+   vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s %d request void \"ret = %s\"", m_sbmId.c_str(), 42, command.c_str()).c_str());
 
-   vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s %d request void \"%s\"", m_sbmId.c_str(), 42, command.c_str()).c_str());
+   m_netRequestManager.CreateNetRequest(requestId, NULL, NULL);
 }
+
+void SbmDebuggerClient::SendSBMCommand(int requestId, const std::string & returnValue, const std::string & functionNameandParams,
+                                       NetRequest::RequestCallback cb,  void* callbackOwner)
+{
+   vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s %d request %s \"ret = %s\"", m_sbmId.c_str(),
+      requestId, returnValue.c_str(), functionNameandParams.c_str()).c_str());
+
+   m_netRequestManager.CreateNetRequest(requestId, cb, callbackOwner);
+}
+
 
 void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
 {
@@ -116,6 +129,19 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
 
             if (split[1] == m_sbmId)
             {
+               if (split.size() >= 4 && split[3] == "response")
+               {
+                  NetRequest::RequestId rid = (NetRequest::RequestId)atoi(split[2].c_str());
+                  split.erase(split.begin(), split.begin() + 4); // erase first 4 elements
+                  m_netRequestManager.ProcessRequest(rid, split);
+               }
+               else if (split.size() >= 5 && split[3] == "response-fail")
+               {
+                  NetRequest::RequestId rid = (NetRequest::RequestId)atoi(split[2].c_str());
+                  m_netRequestManager.RemoveRequest(rid);
+                  printf("Error: response-fail on on net request %d. Reason: %s", (int)rid, split[4].c_str());
+               }
+
                if (split.size() > 2)
                {
                   if (split[2] == "connect_success")
