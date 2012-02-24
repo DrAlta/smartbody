@@ -82,7 +82,7 @@ std::vector<std::string> SBMotion::getChannels()
 			default:
 				chanTypeString = "Others";
 		}
-		std::string name = chanName + " " + chanTypeString;
+		std::string name = chanName + "_" + chanTypeString;
 		ret.push_back(name);
 	}
 	return ret;
