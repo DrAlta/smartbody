@@ -60,7 +60,9 @@ std::vector<std::string> SBMotion::getChannels()
 	std::vector<std::string> ret;
 	for (int i = 0; i < channels().size(); i++)
 	{
-		std::string chanName = channels()[i].joint->name().c_str();
+		std::string chanName = channels().name(i);
+		//if (channels()[i].joint)
+		//	chanName = channels()[i].joint->name().c_str();
 		int	chanType = channels()[i].type;
 		std::string chanTypeString;
 		switch (chanType)
