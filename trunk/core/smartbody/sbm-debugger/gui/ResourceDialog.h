@@ -3,16 +3,20 @@
 
 #include "ui_ResourceDialog.h"
 #include "SbmDebuggerCommon.h"
+#include "SbmDebuggerClient.h"
+
+using std::string;
 
 class ResourceDialog : public QDialog
 {
    Q_OBJECT
 
 public:
-   ResourceDialog(Scene* pScene, QWidget *parent = 0);
+   ResourceDialog(SbmDebuggerClient* client, QWidget *parent = 0);
    ~ResourceDialog();
 
    Ui::ResourceDialog ui;
+   void AddEntry(const QString& pathType, QStringList& paths);
 
 public slots:
    void Refresh();
@@ -33,7 +37,10 @@ private:
       Services
    };
 
+   SbmDebuggerClient* m_client;
    Scene* m_pScene;
+
+   void SendGetAssetPathCommand(string assetType, NetRequest::RequestId rid);
 };
 
 #endif
