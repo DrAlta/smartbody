@@ -254,7 +254,11 @@ void SbmCharacter::createStandardControllers()
 	{
 		MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
 		rengine->init(MeCtReachEngine::RIGHT_ARM,effector);
-		this->reachEngineMap[MeCtReachEngine::RIGHT_ARM] = rengine;		
+		this->reachEngineMap[MeCtReachEngine::RIGHT_ARM] = rengine;	
+
+		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,this->_skeleton);
+		rengineJump->init(MeCtReachEngine::RIGHT_JUMP,effector);
+		this->reachEngineMap[MeCtReachEngine::RIGHT_JUMP] = rengineJump;	
 	}	
 
 	SkJoint* leftEffector = this->_skeleton->search_joint("l_middle1");
@@ -262,7 +266,11 @@ void SbmCharacter::createStandardControllers()
 	{
 		MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
 		rengine->init(MeCtReachEngine::LEFT_ARM,leftEffector);
-		this->reachEngineMap[MeCtReachEngine::LEFT_ARM] = rengine;		
+		this->reachEngineMap[MeCtReachEngine::LEFT_ARM] = rengine;	
+
+		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,this->_skeleton);
+		rengineJump->init(MeCtReachEngine::LEFT_JUMP,effector);
+		this->reachEngineMap[MeCtReachEngine::LEFT_JUMP] = rengineJump;
 	}
 
 	

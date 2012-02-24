@@ -190,6 +190,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 	SrVec curPos = SrVec(x,y,z);
 
 	SrVec targetXZ = currentReachData->reachTarget.getTargetState().tran; targetXZ.y = 0.f;
+	SrVec targetPos = currentReachData->reachTarget.getTargetState().tran;
 	SrVec distanceVec(x, y, z);
 	float dist = currentReachData->XZDistanceToTarget(distanceVec);	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -218,7 +219,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 	else if (!isMoving && startReach)//currentReachData->startReach) // the object is already close to character, no need to move
 	{		
 		LOG("reach in place\n");
-		updateReachType(targetXZ);
+		updateReachType(targetPos);
 		//setFadeIn(0.5f);
 		return true;
 	}
@@ -229,7 +230,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 		{			
 			// choose the correct hand
 			LOG("reach after locomotion\n");
-			updateReachType(targetXZ);
+			updateReachType(targetPos);
 			//currentReachData->startReach = true;
 			startReach = true;
 			isMoving = false;
@@ -260,13 +261,33 @@ int  MeCtExampleBodyReach::determineReachType(SrVec& targetPos)
 	MeCtReachEngine* newEngine = currentReachEngine;	
 	SrVec crossDir = cross(targetDir,charDir);
 
+#define USE_JUMP_MOTION 0
+
 	if (dot(crossDir,SrVec(0,1,0)) > 0 && isValidReachEngine(MeCtReachEngine::RIGHT_ARM)) // right hand
 	{
-		reachType = MeCtReachEngine::RIGHT_ARM;
+#if USE_JUMP_MOTION
+		if (targetPos.y < character->getHeight()*1.1)
+#else
+		if (1)
+#endif
+		{
+			reachType = MeCtReachEngine::RIGHT_ARM;
+		}
+		else
+			reachType = MeCtReachEngine::RIGHT_JUMP;
 	}	
 	else if (isValidReachEngine(MeCtReachEngine::LEFT_ARM))
 	{
-		reachType = MeCtReachEngine::LEFT_ARM;
+#if USE_JUMP_MOTION
+		if (targetPos.y < character->getHeight()*1.1)
+#else
+		if (1)
+#endif
+		{
+			reachType = MeCtReachEngine::LEFT_ARM;
+		}
+		else
+			reachType = MeCtReachEngine::LEFT_JUMP;
 	}
 	return reachType;
 }
