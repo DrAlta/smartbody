@@ -53,6 +53,7 @@ class SBCharacter : public SbmCharacter
 
 		SBController* getControllerByIndex(int i);
 		SBController* getControllerByName(std::string name);
+		std::vector<std::string> getControllerNames();
 
 		int getNumBehaviors();
 		SBBehavior* getBehavior(int num);

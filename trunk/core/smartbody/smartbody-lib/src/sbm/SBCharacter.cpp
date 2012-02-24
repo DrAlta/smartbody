@@ -129,6 +129,17 @@ SBController* SBCharacter::getControllerByName(std::string name)
 	return NULL;
 }
 
+std::vector<std::string> SBCharacter::getControllerNames()
+{
+	std::vector<std::string> ret;
+	for (int i = 0; i < (int)ct_tree_p->count_controllers(); i++)
+	{
+		const std::string& cName = ct_tree_p->controller(i)->getName();
+		ret.push_back(cName);
+	}	
+	return ret;
+}
+
 void SBCharacter::setVoice(std::string type)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
