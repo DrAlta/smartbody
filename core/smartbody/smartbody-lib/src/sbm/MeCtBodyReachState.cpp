@@ -336,7 +336,7 @@ std::string ReachHandAction::generateGrabCmd( const std::string& charName, const
 {
 	std::string wristName = "r_wrist";
 	std::string reachType = "right";
-	if (type == MeCtReach::REACH_LEFT_ARM)
+	if (type == MeCtReachEngine::LEFT_ARM || type == MeCtReachEngine::LEFT_JUMP)
 	{
 		wristName = "l_wrist";
 		reachType = "left";
@@ -356,7 +356,7 @@ std::string ReachHandAction::generateAttachCmd( const std::string& charName, con
 {
 	std::string wristName = "r_wrist";
 	std::string reachType = "right";
-	if (type == MeCtReach::REACH_LEFT_ARM)
+	if (type == MeCtReachEngine::LEFT_ARM || type == MeCtReachEngine::LEFT_JUMP)
 	{
 		wristName = "l_wrist";
 		reachType = "left";
@@ -447,7 +447,7 @@ ReachStateData::ReachStateData()
 	useProfileInterpolation = false;
 	useRetiming = false;
 	autoReturnTime = -1.f;
-	reachType = MeCtReach::REACH_RIGHT_ARM;
+	reachType = MeCtReachEngine::RIGHT_ARM;
 
 	interpMotion = NULL;
 	motionParameter = NULL; 
@@ -787,7 +787,7 @@ std::string ReachStateStart::nextState( ReachStateData* rd )
 		rd->ikReachTarget = ikTargetReached(rd,2.f);
 		{
 			rd->curHandAction->reachCompleteAction(rd);
-			//rd->curHandAction->sendReachEvent("reachstate","complete");
+			rd->curHandAction->sendReachEvent("reachstate","complete");
 			nextStateName = "Complete";
 			//rd->startReach = false;		
 		}
@@ -806,7 +806,7 @@ std::string ReachStateStart::nextState( ReachStateData* rd )
 /************************************************************************/
 void ReachStateComplete::updateEffectorTargetState( ReachStateData* rd )
 {
-	//ReachStateInterface::updateReachToTarget(rd);
+	ReachStateInterface::updateReachToTarget(rd);
 	if (rd->useInterpolation())
 		rd->curRefTime = (float)rd->interpMotion->strokeEmphasisTime();
 }
@@ -866,7 +866,7 @@ std::string ReachStateNewTarget::nextState( ReachStateData* rd )
 	{
 		rd->curHandAction->reachCompleteAction(rd);
 		rd->startReach = false;
-		//rd->curHandAction->sendReachEvent("reachstate","newtarget");
+		rd->curHandAction->sendReachEvent("reachstate","newtarget");
 		nextStateName = "Complete";
 	}
 	else if (rd->endReach)
@@ -883,7 +883,7 @@ std::string ReachStateNewTarget::nextState( ReachStateData* rd )
 std::string ReachStatePreReturn::nextState( ReachStateData* rd )
 {
 	std::string nextStateName = "PreReturn";
-	bool toNextState = rd->stateTime > 0.1f;
+	bool toNextState = rd->stateTime > 0.0f;
 	if (toNextState)
 	{
 		completeTime = 0.f; // reset complete time
@@ -944,7 +944,7 @@ std::string ReachStateReturn::nextState( ReachStateData* rd )
 		rd->endReach = false;
 		rd->reachControl->setFadeOut(0.5f);
 		rd->blendWeight = 0.f;
-		//rd->curHandAction->sendReachEvent("reachstate","return");
+		rd->curHandAction->sendReachEvent("reachstate","return");
 		nextStateName = "Idle";		
 	}
 	return nextStateName;

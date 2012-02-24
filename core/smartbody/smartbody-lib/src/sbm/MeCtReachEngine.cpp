@@ -28,7 +28,7 @@ EffectorConstantConstraint& EffectorConstantConstraint::operator=( const Effecto
 const std::string lFootName[] = {"l_forefoot", "l_ankle" };
 const std::string rFootName[] = {"r_forefoot", "r_ankle" };
 
-std::string MeCtReachEngine::ReachTypeTag[REACH_TYPE_SIZE] = { "Right", "Left" };
+std::string MeCtReachEngine::ReachTypeTag[REACH_TYPE_SIZE] = { "Right", "Left", "RightJump", "LeftJump" };
 
 MeCtReachEngine::MeCtReachEngine( SbmCharacter* sbmChar, SkSkeleton* sk)
 {
@@ -100,7 +100,7 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 	EffectorConstantConstraint* cons = new EffectorConstantConstraint();
 	cons->efffectorName = reachEndEffector->name().c_str();
 	std::string consRootName = "r_sternoclavicular";
-	if (reachType == LEFT_ARM)
+	if (reachType == LEFT_ARM || reachType == LEFT_JUMP)
 		consRootName = "l_sternoclavicular";
 	cons->rootName = consRootName;
 	reachPosConstraint[cons->efffectorName] = cons;
