@@ -158,7 +158,7 @@ void SbmDebuggerForm::ShowSettingsDialog()
 
 void SbmDebuggerForm::ShowResourceDialog()
 {
-   ResourceDialog dlg(c.GetScene(), this);
+   ResourceDialog dlg(&c, this);
    if (dlg.exec() == QDialog::Accepted)
    {
       

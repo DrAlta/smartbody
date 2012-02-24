@@ -1,11 +1,16 @@
 #include "ResourceDialog.h"
 
 #include "vhmsg-tt.h"
+#include "vhcl.h"
 
-ResourceDialog::ResourceDialog(Scene* pScene, QWidget *parent) 
+// callbacks
+bool GetPathsCB(void* caller, NetRequest* req);
+
+ResourceDialog::ResourceDialog(SbmDebuggerClient* client, QWidget *parent) 
 : QDialog(parent)
 {
-   m_pScene = pScene;
+   m_client = client;
+   m_pScene = client->GetScene();
    ui.setupUi(this);
 
    connect(ui.refreshButton, SIGNAL(pressed()), this, SLOT(Refresh()));
@@ -14,10 +19,10 @@ ResourceDialog::ResourceDialog(Scene* pScene, QWidget *parent)
 
    QTreeWidgetItem* paths = new QTreeWidgetItem(ui.resourceTree, QStringList(QString("Paths")));
    ui.resourceTree->insertTopLevelItem(Paths, paths);
-   paths->addChild(new QTreeWidgetItem(ui.resourceTree, QStringList(QString("Sequence Paths"))));
-   paths->addChild(new QTreeWidgetItem(ui.resourceTree, QStringList(QString("ME Paths"))));
-   paths->addChild(new QTreeWidgetItem(ui.resourceTree, QStringList(QString("Audio Paths"))));
-   paths->addChild(new QTreeWidgetItem(ui.resourceTree, QStringList(QString("Mesh Paths"))));
+   paths->addChild(new QTreeWidgetItem(paths, QStringList(QString("Sequence Paths"))));
+   paths->addChild(new QTreeWidgetItem(paths, QStringList(QString("ME Paths"))));
+   paths->addChild(new QTreeWidgetItem(paths, QStringList(QString("Audio Paths"))));
+   paths->addChild(new QTreeWidgetItem(paths, QStringList(QString("Mesh Paths"))));
 
    ui.resourceTree->insertTopLevelItem(Seq_Files, new QTreeWidgetItem(ui.resourceTree, QStringList(QString("Seq Files"))));
    ui.resourceTree->insertTopLevelItem(Skeletons, new QTreeWidgetItem(ui.resourceTree, QStringList(QString("Skeletons"))));
@@ -38,40 +43,75 @@ ResourceDialog::~ResourceDialog()
    
 }
 
+void ResourceDialog::SendGetAssetPathCommand(string assetType, NetRequest::RequestId rid)
+{
+   string command = vhcl::Format("scene.getAssetPaths(\'%s\')", assetType.c_str());
+   m_client->SendSBMCommand(rid, "string-array", command, GetPathsCB, this);
+}
+
 void ResourceDialog::Refresh()
 {
-   //Path
+   SendGetAssetPathCommand("seq", NetRequest::Get_Seq_Asset_Paths);
+   SendGetAssetPathCommand("me", NetRequest::Get_ME_Asset_Paths);
+   SendGetAssetPathCommand("audio", NetRequest::Get_Audio_Asset_Paths);
+   SendGetAssetPathCommand("mesh", NetRequest::Get_Mesh_Asset_Paths);
+}
+
+void ResourceDialog::AddEntry(const QString& pathType, QStringList& paths)
+{
    QTreeWidgetItem* widget = ui.resourceTree->topLevelItem(Paths);
+
+   // find the specified path
    for (int i = 0; i < widget->childCount(); i++)
    {
       QTreeWidgetItem* child = widget->child(i);
-      if (child->text(0) == "Sequence Paths")
+      if (child->text(0) == pathType)
       {
-         for (unsigned int j = 0; j < m_pScene->m_sequencePaths.size(); j++)
+         // remove all old children first
+         while (child->childCount() > 0)
          {
-            child->addChild(new QTreeWidgetItem(QStringList(QString(m_pScene->m_sequencePaths[i].c_str()))));
+            child->removeChild(child->child(0));
          }
-      }
-      else if (child->text(0) == "ME Paths")
-      {
-         for (unsigned int j = 0; j < m_pScene->m_mePaths.size(); j++)
+
+         // add new children
+         for (int j = 0; j < paths.size(); j++)
          {
-            child->addChild(new QTreeWidgetItem(QStringList(QString(m_pScene->m_mePaths[i].c_str()))));
+            child->addChild(new QTreeWidgetItem(QStringList(paths[j])));
          }
-      }
-      else if (child->text(0) == "Audio Paths")
-      {
-         for (unsigned int j = 0; j < m_pScene->m_audioPaths.size(); j++)
-         {
-            child->addChild(new QTreeWidgetItem(QStringList(QString(m_pScene->m_audioPaths[i].c_str()))));
-         }
-      }
-      else if (child->text(0) == "Mesh Paths")
-      {
-         for (unsigned int j = 0; j < m_pScene->m_meshPaths.size(); j++)
-         {
-            child->addChild(new QTreeWidgetItem(QStringList(QString(m_pScene->m_meshPaths[i].c_str()))));
-         }
+         return;
       }
    }
+}
+
+bool GetPathsCB(void* caller, NetRequest* req)
+{
+   ResourceDialog* dlg = req->getCaller<ResourceDialog*>();
+   vector<string> args = req->Args();
+   QStringList list;
+
+   for (unsigned int i = 0; i < args.size(); i++)
+   {
+      list.append(args[i].c_str());
+   }
+
+   switch (req->Rid())
+   {
+   case NetRequest::Get_Seq_Asset_Paths:
+      dlg->AddEntry("Sequence Paths", list);
+      break;
+
+   case NetRequest::Get_ME_Asset_Paths:
+      dlg->AddEntry("ME Paths", list);
+      break;
+
+   case NetRequest::Get_Audio_Asset_Paths:
+      dlg->AddEntry("Audio Paths", list);
+      break;
+
+   case NetRequest::Get_Mesh_Asset_Paths:
+      dlg->AddEntry("Mesh Paths", list);
+      break;
+   }
+   
+   return true;
 }
