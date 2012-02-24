@@ -4620,10 +4620,11 @@ int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 	return CMD_SUCCESS;
 }
+
 /*
  * Callback function for vrPerception message
  * vrPerception kinect/gavam ...
- * vrPerception <userid> <recipientid> <messageid> <pml>
+ * vrPerception pml-nvbg <pml>
  */
 int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
@@ -4711,29 +4712,35 @@ int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			  //right now vrPerception send kinect and the gavam coordinates.
 			}
 		}
-		else
+		else if (_stricmp(command, "pml-nvbg") == 0)
 		{
-			std::string from = std::string(command);
-			std::string to = args.read_token();
-			std::string messageId = args.read_token();
 			std::string pml = args.read_remainder_raw();
 
-			// get the NVBG process for the receiver character, if available
-			SbmCharacter* character = mcu_p->getCharacter(to);
-			if (!character)
-				return CMD_SUCCESS;
-
-			Nvbg* nvbg = character->getNvbg();
-			if (!nvbg)
-				return CMD_SUCCESS;
-
-			bool ok = nvbg->execute(from, to, messageId, pml);
-
-			if (!ok)
+			// all characters should be receiving the perception message
+			std::map<std::string, SbmCharacter*>& cMap = mcu_p->getCharacterMap();
+			std::map<std::string, SbmCharacter*>::iterator iter = cMap.begin();
+			for (; iter!= cMap.end(); iter++)
 			{
-				LOG("NVBG for perception receiver character %s did not handle message %s.", to.c_str(), messageId.c_str());
-			}
+				SbmCharacter* character = iter->second;
+				if (!character)
+					continue;
+
+				Nvbg* nvbg = character->getNvbg();
+				if (!nvbg)
+					continue;
+
+				bool ok = nvbg->execute(iter->first, "", "", pml);
+				if (!ok)
+				{
+					LOG("NVBG for perception did not handle message %s.", pml.c_str());
+				}
+			}			
 			return CMD_SUCCESS;	
+		}
+		else
+		{
+			LOG("mcu_vrPerception_func ERR: message not recognized!");
+			return CMD_FAILURE;
 		}
 	}
 
