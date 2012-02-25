@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'CommandDialog.ui'
 **
-** Created: Thu Jan 26 15:57:35 2012
+** Created: Fri Feb 24 16:23:21 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -35,17 +35,19 @@ public:
     QHBoxLayout *horizontalLayout;
     QPushButton *runButton;
     QPushButton *clearTopButton;
-    QTabWidget *tabWidget;
+    QTabWidget *languageTab;
     QWidget *sbmTab;
     QPlainTextEdit *sbmTextEdit;
     QWidget *pythonTab;
     QPlainTextEdit *pythonTextEdit;
+    QWidget *tab;
+    QPlainTextEdit *vhmsgTextEdit;
 
     void setupUi(QDialog *CommandDialog)
     {
         if (CommandDialog->objectName().isEmpty())
             CommandDialog->setObjectName(QString::fromUtf8("CommandDialog"));
-        CommandDialog->resize(747, 539);
+        CommandDialog->resize(788, 539);
         CommandDialog->setLayoutDirection(Qt::LeftToRight);
         verticalLayout = new QVBoxLayout(CommandDialog);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
@@ -79,27 +81,33 @@ public:
 
         verticalLayout->addWidget(frame);
 
-        tabWidget = new QTabWidget(CommandDialog);
-        tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
+        languageTab = new QTabWidget(CommandDialog);
+        languageTab->setObjectName(QString::fromUtf8("languageTab"));
         sbmTab = new QWidget();
         sbmTab->setObjectName(QString::fromUtf8("sbmTab"));
         sbmTextEdit = new QPlainTextEdit(sbmTab);
         sbmTextEdit->setObjectName(QString::fromUtf8("sbmTextEdit"));
-        sbmTextEdit->setGeometry(QRect(0, 0, 731, 241));
-        tabWidget->addTab(sbmTab, QString());
+        sbmTextEdit->setGeometry(QRect(0, 0, 771, 241));
+        languageTab->addTab(sbmTab, QString());
         pythonTab = new QWidget();
         pythonTab->setObjectName(QString::fromUtf8("pythonTab"));
         pythonTextEdit = new QPlainTextEdit(pythonTab);
         pythonTextEdit->setObjectName(QString::fromUtf8("pythonTextEdit"));
-        pythonTextEdit->setGeometry(QRect(0, 0, 731, 211));
-        tabWidget->addTab(pythonTab, QString());
+        pythonTextEdit->setGeometry(QRect(0, 0, 771, 211));
+        languageTab->addTab(pythonTab, QString());
+        tab = new QWidget();
+        tab->setObjectName(QString::fromUtf8("tab"));
+        vhmsgTextEdit = new QPlainTextEdit(tab);
+        vhmsgTextEdit->setObjectName(QString::fromUtf8("vhmsgTextEdit"));
+        vhmsgTextEdit->setGeometry(QRect(0, 0, 771, 211));
+        languageTab->addTab(tab, QString());
 
-        verticalLayout->addWidget(tabWidget);
+        verticalLayout->addWidget(languageTab);
 
 
         retranslateUi(CommandDialog);
 
-        tabWidget->setCurrentIndex(1);
+        languageTab->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(CommandDialog);
@@ -110,8 +118,9 @@ public:
         CommandDialog->setWindowTitle(QApplication::translate("CommandDialog", "Dialog", 0, QApplication::UnicodeUTF8));
         runButton->setText(QApplication::translate("CommandDialog", "Run", 0, QApplication::UnicodeUTF8));
         clearTopButton->setText(QApplication::translate("CommandDialog", "Clear", 0, QApplication::UnicodeUTF8));
-        tabWidget->setTabText(tabWidget->indexOf(sbmTab), QApplication::translate("CommandDialog", "Sbm", 0, QApplication::UnicodeUTF8));
-        tabWidget->setTabText(tabWidget->indexOf(pythonTab), QApplication::translate("CommandDialog", "Python", 0, QApplication::UnicodeUTF8));
+        languageTab->setTabText(languageTab->indexOf(sbmTab), QApplication::translate("CommandDialog", "Sbm", 0, QApplication::UnicodeUTF8));
+        languageTab->setTabText(languageTab->indexOf(pythonTab), QApplication::translate("CommandDialog", "Python", 0, QApplication::UnicodeUTF8));
+        languageTab->setTabText(languageTab->indexOf(tab), QApplication::translate("CommandDialog", "VHMsg", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

@@ -177,7 +177,7 @@ void SbmDebuggerForm::ShowCommandDialog()
 
 void SbmDebuggerForm::ShowDataViewerDialog()
 {
-   DataViewerDialog dlg(c.GetScene(), this);
+   DataViewerDialog dlg(&c, this);
    dlg.exec();
 }
 

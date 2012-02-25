@@ -49,9 +49,9 @@
    <widget class="QComboBox" name="characterNameBox">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>10</y>
-      <width>111</width>
+      <x>10</x>
+      <y>30</y>
+      <width>181</width>
       <height>22</height>
      </rect>
     </property>
@@ -60,7 +60,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>50</y>
+      <y>60</y>
       <width>61</width>
       <height>16</height>
      </rect>
@@ -77,9 +77,9 @@
    <widget class="QComboBox" name="controllerBox">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>50</y>
-      <width>111</width>
+      <x>10</x>
+      <y>80</y>
+      <width>181</width>
       <height>22</height>
      </rect>
     </property>
@@ -87,8 +87,8 @@
    <widget class="QLabel" name="motionLabel">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>90</y>
+      <x>10</x>
+      <y>110</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -105,9 +105,9 @@
    <widget class="QComboBox" name="motionBox">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>90</y>
-      <width>111</width>
+      <x>10</x>
+      <y>130</y>
+      <width>181</width>
       <height>22</height>
      </rect>
     </property>
