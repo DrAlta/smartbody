@@ -48,10 +48,6 @@ void SbmDebuggerClient::Disconnect()
    m_scene.m_characters.clear();
    m_scene.m_camera = DebuggerCamera();
    m_scene.m_rendererIsRightHanded = true;
-   m_scene.m_sequencePaths.clear();
-   m_scene.m_mePaths.clear();
-   m_scene.m_audioPaths.clear();
-   m_scene.m_meshPaths.clear();
 }
 
 void SbmDebuggerClient::Init()
@@ -369,15 +365,15 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
       }
       else if (split[0] == "sbmlog")
       {
-         if (split.size() > 2 && split[1] == "MotionFile")
-         {
-            std::string ext = ".skm";
-            std::string animNameWithoutExt = "";
-            std::string animPath = "";
-            vhcl::StripPath(split[split.size() - 1], animPath, animPath);
-            vhcl::StripExt(animPath, animNameWithoutExt, ext);
-            m_scene.m_animations.push_back(animNameWithoutExt);
-         }
+         //if (split.size() > 2 && split[1] == "MotionFile")
+         //{
+         //   std::string ext = ".skm";
+         //   std::string animNameWithoutExt = "";
+         //   std::string animPath = "";
+         //   vhcl::StripPath(split[split.size() - 1], animPath, animPath);
+         //   vhcl::StripExt(animPath, animNameWithoutExt, ext);
+         //   m_scene.m_animations.push_back(animNameWithoutExt);
+         //}
       }
    }
 }

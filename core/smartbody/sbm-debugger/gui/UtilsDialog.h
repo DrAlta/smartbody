@@ -6,22 +6,27 @@
 #include "QtCrtDbgOn.h"
 
 #include "ui_UtilsDialog.h"
+#include "SbmDebuggerClient.h"
 
 class Scene;
 class GLWidget;
+
+using std::vector;
+using std::string;
 
 class UtilsDialog : public QDialog
 {
    Q_OBJECT
 
 public:
-   UtilsDialog(Scene* pScene, GLWidget* pRenderView, QWidget* parent = 0);
+   UtilsDialog(SbmDebuggerClient* client, GLWidget* pRenderView, QWidget* parent = 0);
    ~UtilsDialog();
+   vector<string> m_animations;
+   Ui::UtilsDialog ui;
 
 private:
    std::string GetSelectedChar();
-
-   Ui::UtilsDialog ui;
+   SbmDebuggerClient* m_client;
    Scene* m_pScene;
    GLWidget* m_pRenderView;
 

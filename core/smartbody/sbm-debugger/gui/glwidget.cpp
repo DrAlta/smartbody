@@ -27,6 +27,9 @@ GLWidget::GLWidget(Scene* scene, QWidget *parent)
     m_fPawnSize = 1.0f;
     m_fJointRadius = 1.25f;
     m_nPickingOffset = 0;
+    m_fAxisLength = 5;
+    m_fEyeBeamLength = 100;
+    m_RenderFlags = 0;
 
     qtPurple = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
 
@@ -94,12 +97,12 @@ void GLWidget::sceneTreeItemDoubleClicked(QTreeWidgetItem * item, int column)
 
 void GLWidget::ToggleShowAxes(bool enabled)
 {
-   
+   m_RenderFlags ^= Show_Axes;
 }
 
 void GLWidget::ToggleShowEyeBeams(bool enabled)
 {
-   
+   m_RenderFlags ^= Show_EyeBeams;
 }
 
 void GLWidget::ToggleAllowBoneUpdates(bool enabled)
@@ -447,7 +450,8 @@ void GLWidget::DrawJoint(Joint* joint)
    DrawSphere(m_fJointRadius);  
    glPopName();
 
-   if (joint == m_SelData.m_pJoint)
+   if (joint == m_SelData.m_pJoint
+      || (m_RenderFlags & Show_Axes))
    {
       // axis drawing
       // orientation gizmo
@@ -455,24 +459,37 @@ void GLWidget::DrawJoint(Joint* joint)
          // x axis
          glColor3f(255, 0, 0);
          glVertex3f(0, 0, 0);
-         glVertex3f(10, 0, 0); 
+         glVertex3f(m_fAxisLength, 0, 0); 
       glEnd();
 
       glBegin(GL_LINES);
          // y axis
          glColor3f(0, 255, 0);
          glVertex3f(0, 0, 0);
-         glVertex3f(0, 10, 0); 
+         glVertex3f(0, m_fAxisLength, 0); 
       glEnd();
 
       glBegin(GL_LINES);
          // z axis
          glColor3f(0, 0, 255);
          glVertex3f(0, 0, 0);
-         glVertex3f(0, 0, 10); 
+         glVertex3f(0, 0, m_fAxisLength); 
        glEnd();
    }
-            
+
+   if (m_RenderFlags & Show_EyeBeams)
+   {
+      if (joint->m_name.find("eyeball") != string::npos)
+      {
+         glBegin(GL_LINES);
+            // z axis
+            glColor3f(255, 0, 0);
+            glVertex3f(0, 0, 0);
+            glVertex3f(0, 0, m_fEyeBeamLength); 
+         glEnd();
+      }
+   }
+        
    // draw a connecting bone between the 2 joints
    if (joint->m_parent)
    {

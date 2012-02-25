@@ -11,11 +11,15 @@
 
 using std::string;
 
+//callbacks
+bool GetAnimationNames(void* caller, NetRequest* req);
 
-UtilsDialog::UtilsDialog(Scene* pScene, GLWidget* pRenderView, QWidget* parent) : QDialog(parent)
+
+UtilsDialog::UtilsDialog(SbmDebuggerClient* client, GLWidget* pRenderView, QWidget* parent) : QDialog(parent)
 {
+   m_client = client;
    ui.setupUi(this);
-   m_pScene = pScene;
+   m_pScene = m_client->GetScene();
    m_pRenderView = pRenderView;
 
    connect(ui.showAxesBox, SIGNAL(toggled(bool)), pRenderView, SLOT(ToggleShowAxes(bool)));
@@ -30,6 +34,7 @@ UtilsDialog::UtilsDialog(Scene* pScene, GLWidget* pRenderView, QWidget* parent) 
    connect(ui.animFilterBox, SIGNAL(textChanged()), this, SLOT(FilterAnims()));
 
    Refresh();
+   QueryAnimsPressed();
 }
 
 UtilsDialog::~UtilsDialog()
@@ -75,8 +80,7 @@ void UtilsDialog::SpeakButtonPressed()
 
 void UtilsDialog::QueryAnimsPressed()
 {
-   vhmsg::ttu_notify1("sbm vhmsglog on");
-   vhmsg::ttu_notify1("sbm resource motion");
+   m_client->SendSBMCommand(NetRequest::Get_Motion_Names, "string-array", "scene.getMotionNames()", GetAnimationNames, this);
 }
 
 void UtilsDialog::FilterAnims()
@@ -87,13 +91,13 @@ void UtilsDialog::FilterAnims()
    string filterText = ui.animFilterBox->toPlainText().toStdString();
    transform(filterText.begin(), filterText.end(), filterText.begin(), ::tolower);
 
-   for (unsigned int i = 0; i < m_pScene->m_animations.size(); i++)
+   for (unsigned int i = 0; i < m_animations.size(); i++)
    {
-      temp = m_pScene->m_animations[i];
+      temp = m_animations[i];
       transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
       if (temp.find(filterText) != string::npos)
       {
-         ui.animationNamesBox->addItem(m_pScene->m_animations[i].c_str());
+         ui.animationNamesBox->addItem(m_animations[i].c_str());
       }
    }
 }
@@ -121,4 +125,26 @@ void UtilsDialog::Refresh()
 std::string UtilsDialog::GetSelectedChar()
 {
    return ui.selectedCharacterBox->currentText().toStdString();
+}
+
+bool GetAnimationNames(void* caller, NetRequest* req)
+{
+   UtilsDialog* dlg = req->getCaller<UtilsDialog*>();
+
+   dlg->m_animations = req->Args();
+   QStringList names;
+   for (unsigned int i = 0; i < dlg->m_animations.size(); i++)
+   {
+      names.append(dlg->m_animations[i].c_str());
+   }
+
+   switch (req->Rid())
+   {
+   case NetRequest::Get_Motion_Names:
+      dlg->ui.animationNamesBox->clear();
+      dlg->ui.animationNamesBox->addItems(names);
+      break;
+   }
+
+   return true;
 }

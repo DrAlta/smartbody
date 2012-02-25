@@ -237,12 +237,6 @@ public:
    DebuggerCamera m_camera;
    bool m_rendererIsRightHanded;
 
-   std::vector<std::string> m_sequencePaths;
-   std::vector<std::string> m_mePaths;
-   std::vector<std::string> m_audioPaths;
-   std::vector<std::string> m_meshPaths;
-   std::vector<std::string> m_animations;
-
 public:
    Scene()
    {
