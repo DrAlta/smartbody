@@ -71,6 +71,12 @@ private:
       SELECT,
     };
 
+    enum RenderFlags
+    {
+      Show_EyeBeams = 1,
+      Show_Axes = 1 << 1,
+    };
+
     struct SelectionData
     {
          Pawn* m_pObj;
@@ -83,9 +89,12 @@ private:
     Camera m_Camera;
     float m_fPawnSize;
     float m_fJointRadius;
+    float m_fAxisLength;
+    float m_fEyeBeamLength;
     Scene* m_pScene;
     GLUquadric* m_quadric;
     QSize m_MinSize;
+    int m_RenderFlags;
 
     double m_msSinceLastFrame;
     double m_msSinceLastFramePrev;

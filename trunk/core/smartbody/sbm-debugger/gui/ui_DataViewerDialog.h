@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'DataViewerDialog.ui'
 **
-** Created: Fri Feb 3 11:48:56 2012
+** Created: Fri Feb 24 16:23:21 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -71,21 +71,21 @@ public:
         characterNameLabel->setFont(font);
         characterNameBox = new QComboBox(frame);
         characterNameBox->setObjectName(QString::fromUtf8("characterNameBox"));
-        characterNameBox->setGeometry(QRect(70, 10, 111, 22));
+        characterNameBox->setGeometry(QRect(10, 30, 181, 22));
         controllerLabel = new QLabel(frame);
         controllerLabel->setObjectName(QString::fromUtf8("controllerLabel"));
-        controllerLabel->setGeometry(QRect(10, 50, 61, 16));
+        controllerLabel->setGeometry(QRect(10, 60, 61, 16));
         controllerLabel->setFont(font);
         controllerBox = new QComboBox(frame);
         controllerBox->setObjectName(QString::fromUtf8("controllerBox"));
-        controllerBox->setGeometry(QRect(70, 50, 111, 22));
+        controllerBox->setGeometry(QRect(10, 80, 181, 22));
         motionLabel = new QLabel(frame);
         motionLabel->setObjectName(QString::fromUtf8("motionLabel"));
-        motionLabel->setGeometry(QRect(20, 90, 41, 16));
+        motionLabel->setGeometry(QRect(10, 110, 41, 16));
         motionLabel->setFont(font);
         motionBox = new QComboBox(frame);
         motionBox->setObjectName(QString::fromUtf8("motionBox"));
-        motionBox->setGeometry(QRect(70, 90, 111, 22));
+        motionBox->setGeometry(QRect(10, 130, 181, 22));
         addChannelButton = new QPushButton(frame);
         addChannelButton->setObjectName(QString::fromUtf8("addChannelButton"));
         addChannelButton->setGeometry(QRect(460, 20, 61, 23));

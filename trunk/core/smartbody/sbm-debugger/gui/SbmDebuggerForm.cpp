@@ -183,7 +183,7 @@ void SbmDebuggerForm::ShowDataViewerDialog()
 
 void SbmDebuggerForm::ShowUtilDialog()
 {
-   UtilsDialog dlg(c.GetScene(), m_pGLWidget, this);
+   UtilsDialog dlg(&c, m_pGLWidget, this);
    dlg.exec();
 }
 
