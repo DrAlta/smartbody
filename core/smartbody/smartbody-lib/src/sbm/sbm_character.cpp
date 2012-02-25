@@ -85,9 +85,10 @@ MeCtSchedulerClass* CreateSchedulerCt( const char* character_name, const char* s
 	MeCtSchedulerClass* sched_p = new MeCtSchedulerClass();
 	sched_p->active_when_empty( true );
 	string sched_name( character_name );
-	sched_name += "'s ";
+	//sched_name += "'s ";
+	sched_name += "_";
 	sched_name += sched_type_name;
-	sched_name += " schedule";
+	sched_name += "Schedule";
 	sched_p->setName( sched_name.c_str() );
 	return sched_p;
 }
@@ -229,7 +230,7 @@ void SbmCharacter::createStandardControllers()
 
 	// procedural locomotion
 	this->locomotion_ct =  new MeCtLocomotionClass();
-	std::string locomotionname = getName() + "'s locomotion controller";
+	std::string locomotionname = getName() + "_locomotionController";
 	this->locomotion_ct->setName( locomotionname.c_str() );
 	locomotion_ct->get_navigator()->setWordOffsetController(world_offset_writer_p);
 	locomotion_ct->init_skeleton(this->getSkeleton(), this->getSkeleton());
@@ -237,13 +238,13 @@ void SbmCharacter::createStandardControllers()
 
 	// example-based locomotion
 	this->param_animation_ct = new MeCtParamAnimation(this, world_offset_writer_p);
-	std::string paramAnimationName = getName() + "'s param animation controller";
+	std::string paramAnimationName = getName() + "_paramAnimationController";
 	this->param_animation_ct->setName(paramAnimationName.c_str());
 	param_sched_p = CreateSchedulerCt( getName().c_str(), "param" );
 
 	// basic locomotion
 	this->basic_locomotion_ct = new MeCtBasicLocomotion(this);
-	std::string bLocoName = getName() + "'s basic locomotion controller";
+	std::string bLocoName = getName() + "_basicLocomotionController";
 	this->basic_locomotion_ct->setName(bLocoName.c_str());
 	//this->basic_locomotion_ct->set_pass_through(false);
 
@@ -280,7 +281,7 @@ void SbmCharacter::createStandardControllers()
 	grab_sched_p = CreateSchedulerCt( getName().c_str(), "grab" );
 
 	breathing_p = new MeCtBreathing();
-	breathing_p->setName(getName() + "'s breathing controller");
+	breathing_p->setName(getName() + "_breathingController");
 	// add two channels for blendshape-based breathing
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
@@ -309,7 +310,7 @@ void SbmCharacter::createStandardControllers()
 	head_sched_p = CreateSchedulerCt( getName().c_str(), "head" );
 	face_ct = new MeCtFace();
 	string faceCtName( getName() );
-	faceCtName += "'s face_ct";
+	faceCtName += "_faceController";
 	face_ct->setName(faceCtName);
 
 	eyelid_reg_ct_p = new MeCtEyeLidRegulator();
@@ -327,28 +328,28 @@ void SbmCharacter::createStandardControllers()
 	eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
 	eyelid_reg_ct_p->set_close_angle( 30.0 );
 	ostringstream ct_name;
-	ct_name << getName() << "'s eyelid controller";
+	ct_name << getName() << "_eyelidController";
 	eyelid_reg_ct_p->setName( ct_name.str().c_str() );
 
 	this->saccade_ct = new MeCtSaccade(this->_skeleton);
 	this->saccade_ct->init(this);
-	std::string saccadeCtName = getName() + "'s eye saccade controller";
+	std::string saccadeCtName = getName() + "_eyeSaccadeController";
 	this->saccade_ct->setName(saccadeCtName.c_str());
 
 	// motion player
 	motionplayer_ct = new MeCtMotionPlayer(this);
 	//	motionplayer_ct->ref();
 	std::string mpName = getName();
-	mpName += "'s motion player";
+	mpName += "_motionPlayer";
 	motionplayer_ct->setName(mpName.c_str());
 	motionplayer_ct->setActive(false);
 
 	this->datareceiver_ct = new MeCtDataReceiver(this->_skeleton);
-	std::string datareceiverCtName = getName() + "'s data receiver controller";
+	std::string datareceiverCtName = getName() + "_dataReceiverController";
 	this->datareceiver_ct->setName(datareceiverCtName.c_str());
 
 	this->physics_ct = new MeCtPhysicsController(this);
-	std::string physicsCtName = getName() + "'s physics controller";
+	std::string physicsCtName = getName() + "_physicsController";
 	this->physics_ct->setName(physicsCtName.c_str());
 
 	

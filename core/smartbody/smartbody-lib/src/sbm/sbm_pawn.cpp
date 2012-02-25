@@ -173,7 +173,7 @@ void SbmPawn::initData()
 	ct_tree_p = MeControllerTreeRoot::create();
 	world_offset_writer_p = new MeCtChannelWriter();
 	std::string controllerName = this->getName();
-	controllerName += "'s world offset writer";
+	controllerName += "_worldOffsetWriter";
 	world_offset_writer_p->setName( controllerName.c_str() );
 	wo_cache_timestamp = -std::numeric_limits<float>::max(); 
 	//skeleton_p->ref();
