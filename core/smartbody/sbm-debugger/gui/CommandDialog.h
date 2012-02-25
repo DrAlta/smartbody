@@ -22,11 +22,18 @@ public:
    CommandDialog(SbmDebuggerClient* client, QWidget *parent = 0);
    ~CommandDialog();
 
-   QPlainTextEdit* CurrentTextEditor() { return ui.tabWidget->currentIndex() == 0 ? ui.sbmTextEdit : ui.pythonTextEdit; }
+   QPlainTextEdit* CurrentTextEditor();
 
    Ui::CommandDialog ui;
 
 private:
+   enum TabType
+   {
+      Sbm,
+      Python,
+      VHMsg,
+   };
+
    SbmDebuggerClient* m_client;
    vector<string> m_previousCommands;
 

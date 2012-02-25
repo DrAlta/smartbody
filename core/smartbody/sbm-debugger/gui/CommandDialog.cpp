@@ -1,5 +1,6 @@
 #include "CommandDialog.h"
 #include "vhcl.h"
+#include "vhmsg-tt.h"
 
 CommandDialog::CommandDialog(SbmDebuggerClient* client, QWidget *parent) : QDialog(parent)
 {
@@ -21,30 +22,33 @@ void CommandDialog::RunCode()
    QString codeToRun = CurrentTextEditor()->toPlainText();
    ui.outputTextEdit->appendPlainText(codeToRun);
 
-   /*"scene.getNumCharacters()"*/
-   vector<string> split;
-   vhcl::Tokenize(codeToRun.toStdString(), split, " ");
-
-
-   string entireCommand = codeToRun.toStdString();
-   string retVal = "";
-   int firstSpace = entireCommand.find_first_of(" ");
-   if (firstSpace != string::npos)
+   if (ui.languageTab->currentIndex() == Python)
    {
-      retVal = entireCommand.substr(0, firstSpace);
-      entireCommand = entireCommand.erase(0, firstSpace);
-   }
+      vector<string> split;
+      vhcl::Tokenize(codeToRun.toStdString(), split, " ");
 
-   if (retVal != "")
-   {
-      m_client->SendSBMCommand(455, retVal, entireCommand, SbmCommandReturned, this);
+      string entireCommand = codeToRun.toStdString();
+      string retVal = "";
+      int firstSpace = entireCommand.find_first_of(" ");
+      if (firstSpace != string::npos)
+      {
+         retVal = entireCommand.substr(0, firstSpace);
+         entireCommand = entireCommand.erase(0, firstSpace);
+      }
+
+      if (retVal != "")
+         m_client->SendSBMCommand(455, retVal, entireCommand, SbmCommandReturned, this);
+      else
+         m_client->SendSBMCommand(455, "void", entireCommand, SbmCommandReturned, this);
+      
    }
    else
    {
-      m_client->SendSBMCommand(455, "void", entireCommand, SbmCommandReturned, this);
-   }
+      if (ui.languageTab->currentIndex() == Sbm)
+         codeToRun.insert(0, "sbm ");
 
-   //SaveCommand(command);
+      vhmsg::ttu_notify1(codeToRun.toStdString().c_str());
+   }
 }
 
 void CommandDialog::ClearOutputBox()
@@ -61,6 +65,26 @@ void CommandDialog::SaveCommand(string& command)
    }
 
    m_previousCommands.push_back(command);
+}
+
+QPlainTextEdit* CommandDialog::CurrentTextEditor()
+{
+   switch (ui.languageTab->currentIndex())
+   {
+   case Sbm:
+      return ui.sbmTextEdit;
+      break;
+
+   case Python:
+      return ui.pythonTextEdit;
+      break;
+
+   case VHMsg:
+      return ui.vhmsgTextEdit;
+      break;
+   }
+
+   return NULL;
 }
 
 // callbacks

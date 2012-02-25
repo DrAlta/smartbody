@@ -319,6 +319,9 @@
    <property name="text">
     <string>Command Window</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
+   </property>
   </action>
   <action name="actionData_Viewer">
    <property name="text">

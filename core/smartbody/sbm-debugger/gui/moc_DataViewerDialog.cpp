@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'DataViewerDialog.h'
 **
-** Created: Wed Feb 22 11:17:35 2012
+** Created: Fri Feb 24 15:16:38 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_DataViewerDialog[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       6,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -34,6 +34,9 @@ static const uint qt_meta_data_DataViewerDialog[] = {
       18,   17,   17,   17, 0x08,
       40,   17,   17,   17, 0x08,
       65,   17,   17,   17, 0x08,
+      96,   17,   17,   17, 0x08,
+     130,   17,   17,   17, 0x08,
+     162,   17,   17,   17, 0x08,
 
        0        // eod
 };
@@ -41,7 +44,10 @@ static const uint qt_meta_data_DataViewerDialog[] = {
 static const char qt_meta_stringdata_DataViewerDialog[] = {
     "DataViewerDialog\0\0AddSelectedChannels()\0"
     "RemoveSelectedChannels()\0"
+    "ChangedSelectedMotion(QString)\0"
+    "ChangedSelectedCharacter(QString)\0"
     "ChangedRotationDisplay(QString)\0"
+    "Refresh()\0"
 };
 
 const QMetaObject DataViewerDialog::staticMetaObject = {
@@ -75,10 +81,13 @@ int DataViewerDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         switch (_id) {
         case 0: AddSelectedChannels(); break;
         case 1: RemoveSelectedChannels(); break;
-        case 2: ChangedRotationDisplay((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 2: ChangedSelectedMotion((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 3: ChangedSelectedCharacter((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 4: ChangedRotationDisplay((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 5: Refresh(); break;
         default: ;
         }
-        _id -= 3;
+        _id -= 6;
     }
     return _id;
 }

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Wed Feb 15 16:33:17 2012
+** Created: Fri Feb 24 14:27:14 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -235,6 +235,7 @@ public:
         actionResource_Viewer->setText(QApplication::translate("MainWindow", "&Resource Viewer", 0, QApplication::UnicodeUTF8));
         actionResource_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0, QApplication::UnicodeUTF8));
         actionCommand_Window->setText(QApplication::translate("MainWindow", "Command Window", 0, QApplication::UnicodeUTF8));
+        actionCommand_Window->setShortcut(QApplication::translate("MainWindow", "Ctrl+M", 0, QApplication::UnicodeUTF8));
         actionData_Viewer->setText(QApplication::translate("MainWindow", "D&ata Viewer", 0, QApplication::UnicodeUTF8));
         actionData_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+A", 0, QApplication::UnicodeUTF8));
         actionUtils_Window->setText(QApplication::translate("MainWindow", "U&tils Window", 0, QApplication::UnicodeUTF8));
