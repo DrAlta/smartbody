@@ -130,7 +130,7 @@ void SbmDebuggerForm::ShowConnectDialog()
 
          c.Init();
 
-         c.StartUpdates(0.10f);
+         c.StartUpdates(0.01f);
 
          // since you're connected, enable the disconnect button
          ui.actionDisconnect->setEnabled(true);
