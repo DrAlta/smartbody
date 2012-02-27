@@ -35,7 +35,7 @@ GLWidget::GLWidget(Scene* scene, QWidget *parent)
 
     setFocusPolicy(Qt::StrongFocus);
 
-    timer.start(100, this);
+    timer.start(10, this);
 
     m_msSinceLastFrame = m_StopWatch.GetTime();
 
