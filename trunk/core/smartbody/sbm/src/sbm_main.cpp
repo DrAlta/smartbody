@@ -725,7 +725,7 @@ int main( int argc, char **argv )	{
 
 	mcu.speech_audiofile_base_path = "../../../../";
 
-	mcu._scene->getDebuggerServer()->SetID("sbm-fltk-" + vhcl::ToString(rand()));  // TODO:  populate with process id
+	mcu._scene->getDebuggerServer()->SetID("sbm-fltk");
 
 //	(void)signal( SIGABRT, signal_handler );
 //	(void)signal( SIGFPE, signal_handler );

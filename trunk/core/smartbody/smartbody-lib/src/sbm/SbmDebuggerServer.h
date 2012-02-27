@@ -15,6 +15,9 @@ private:
    std::vector<std::string> m_processIdList;
    std::string m_sbmId;
    std::string m_sbmId2;
+   std::string m_hostname;
+   int m_port;
+   std::string m_fullId;
    bool m_connectResult;
    double m_updateFrequencyS;
    double m_lastUpdate;
@@ -31,7 +34,8 @@ public:
    virtual ~SbmDebuggerServer();
 
 
-   void Init() {}
+   void Init();
+   void Close();
 
    void SetSBScene(SmartBody::SBScene * scene) { m_scene = scene; }
    void SetID(const std::string & id) { m_sbmId2 = id; }
