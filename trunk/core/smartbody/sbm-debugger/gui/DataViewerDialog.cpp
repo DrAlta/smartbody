@@ -1,5 +1,6 @@
-#include "DataViewerDialog.h"
 #include "vhcl.h"
+
+#include "DataViewerDialog.h"
 
 //callbacks
 bool GetStringList(void* caller, NetRequest* req);

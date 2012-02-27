@@ -1,7 +1,10 @@
 #ifndef DATA_VIEWER_DIALOG_H_
 #define DATA_VIEWER_DIALOG_H_
 
+#include "QtCrtDbgOff.h"
 #include "ui_DataViewerDialog.h"
+#include "QtCrtDbgOn.h"
+
 #include "SbmDebuggerCommon.h"
 #include "GLGraphWidget.h"
 #include "SbmDebuggerClient.h"
