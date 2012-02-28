@@ -61,7 +61,7 @@ void SbmDebuggerServer::Init()
 
 
    int portToTry = NETWORK_PORT_TCP;
-   int portMax = NETWORK_PORT_TCP + 10;
+   int portMax = NETWORK_PORT_TCP + 100;
 
    while (portToTry < portMax)
    {
@@ -194,7 +194,7 @@ void SbmDebuggerServer::Update()
    }
 
 
-   for ( int i = 0; i < (int)m_sockConnectionsTCP.size(); i++ )
+   for ( size_t i = 0; i < m_sockConnectionsTCP.size(); i++ )
    {
       void * s = m_sockConnectionsTCP[i];
 
@@ -233,6 +233,12 @@ void SbmDebuggerServer::Update()
                   }
                }
             }
+         }
+         else if (bytesReceived < 0)
+         {
+            m_sockConnectionsTCP.erase(m_sockConnectionsTCP.begin() + i);
+            tcpDataPending = false;
+            continue;
          }
 
          tcpDataPending = SocketIsDataPending(s);
