@@ -6,9 +6,12 @@
 #include <string>
 #include <vector>
 
+#if WIN_BUILD
 #include <winsock.h>
+#endif
+
 #include <stdio.h>
-#include <conio.h>
+#include <stdlib.h>
 
 #include "vhmsg-tt.h"
 
@@ -30,15 +33,20 @@ bool g_wsaStartupCalled = false;
 
 string SocketGetHostname()
 {
+#if WIN_BUILD
    char * hostname = new char [256];
    int ret = gethostname(hostname, 256);  // 256 is guaranteed to be long enough  http://msdn.microsoft.com/en-us/library/windows/desktop/ms738527(v=vs.85).aspx
    string hostnameStr = hostname;
    delete [] hostname;
    return hostnameStr;
+#else
+   return "";
+#endif
 }
 
 bool SocketStartup()
 {
+#if WIN_BUILD
    WSADATA wsaData;
    int err = WSAStartup( MAKEWORD(2,2), &wsaData );
    if ( err != 0 )
@@ -49,20 +57,28 @@ bool SocketStartup()
 
    g_wsaStartupCalled = true;
    return true;
+#else
+   return true;
+#endif
 }
 
 bool SocketShutdown()
 {
+#if WIN_BUILD
    if ( g_wsaStartupCalled )
    {
       WSACleanup();
       g_wsaStartupCalled = false;
    }
    return true;
+#else
+   return true;
+#endif
 }
 
 void * SocketOpenTcp()
 {
+#if WIN_BUILD
    SOCKET sockTCP = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
    if ( sockTCP == INVALID_SOCKET )
    {
@@ -73,10 +89,14 @@ void * SocketOpenTcp()
    }
 
    return (void *)sockTCP;
+#else
+   return NULL;
+#endif
 }
 
 void * SocketAccept(void * socket)
 {
+#if WIN_BUILD
    SOCKET sockTCP;
    sockaddr_in newToAddr;
 
@@ -87,22 +107,33 @@ void * SocketAccept(void * socket)
    //string clientIP = inet_ntoa( newToAddr.sin_addr );
 
    return (void *)sockTCP;  // TODO - check for errors
+#else
+   return NULL;
+#endif
 }
 
 void SocketClose(void * socket)
 {
+#if WIN_BUILD
    closesocket((SOCKET)socket);
+#else
+#endif
 }
 
 bool SocketSetReuseAddress(void * socket, bool reuse)
 {
+#if WIN_BUILD
    int reuseAddr = 1;
    setsockopt((SOCKET)socket, SOL_SOCKET, SO_REUSEADDR, (char *)&reuseAddr, sizeof(int));
    return true;  // TODO - check return code
+#else
+   return true;
+#endif
 }
 
 bool SocketBind(void * socket, int port)
 {
+#if WIN_BUILD
    sockaddr_in m_addrTCP;
    m_addrTCP.sin_family      = AF_INET;
    m_addrTCP.sin_addr.s_addr = INADDR_ANY;
@@ -118,10 +149,14 @@ bool SocketBind(void * socket, int port)
    }
 
    return true;
+#else
+   return true;
+#endif
 }
 
 bool SocketConnect(void * socket, const std::string & server, int port)
 {
+#if WIN_BUILD
    sockaddr_in toAddrTCP;
 
    // see if we're specifying a host by name or by number
@@ -159,23 +194,35 @@ bool SocketConnect(void * socket, const std::string & server, int port)
    }
 
    return true;
+#else
+   return true;
+#endif
 }
 
 bool SocketSetBlocking(void * socket, bool blocking)
 {
+#if WIN_BUILD
    u_long nonBlocking = blocking ? 0 : 1;
    ioctlsocket((SOCKET)socket, FIONBIO, &nonBlocking);
    return true;  // TODO - check return code
+#else
+   return true;
+#endif
 }
 
 bool SocketListen(void * socket, int numBackLog)
 {
+#if WIN_BUILD
    listen((SOCKET)socket, numBackLog);
    return true;  // TODO - check return code
+#else
+   return true;
+#endif
 }
 
 bool SocketIsDataPending(void * socket)
 {
+#if WIN_BUILD
    fd_set readfds;
    FD_ZERO(&readfds);
    FD_SET((SOCKET)socket, &readfds);
@@ -193,10 +240,14 @@ bool SocketIsDataPending(void * socket)
    {
       return true;
    }
+#else
+   return false;
+#endif
 }
 
 bool SocketSend(void * socket, const string & msg)
 {
+#if WIN_BUILD
    int bytesSent = send((SOCKET)socket, msg.c_str(), msg.length(), 0);
    if (bytesSent < 0)
    {
@@ -213,10 +264,14 @@ bool SocketSend(void * socket, const string & msg)
    }
 
    return true;
+#else
+   return true;
+#endif
 }
 
 int SocketReceive(void * socket, char * buffer, int bufferSize)
 {
+#if WIN_BUILD
    int bytesReceived = recv((SOCKET)socket, buffer, bufferSize - 1, 0);
    if (bytesReceived > 0)
    {
@@ -224,7 +279,12 @@ int SocketReceive(void * socket, char * buffer, int bufferSize)
    }
 
    return bytesReceived;
+#else
+   return 0;
+#endif
 }
+
+
 
 
 Joint::Joint()
