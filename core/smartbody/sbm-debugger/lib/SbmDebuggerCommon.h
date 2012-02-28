@@ -12,7 +12,25 @@
 #define RAD_TO_DEG 180.0f / 3.14159265358979323846f
 #define DEG_TO_RAD 3.14159265358979323846f / 180.0f
 
+
+std::string SocketGetHostname();
+bool SocketStartup();
+bool SocketShutdown();
+void * SocketOpenTcp();
+void * SocketAccept(void * socket);
+void SocketClose(void * socket);
+bool SocketSetReuseAddress(void * socket, bool reuse);
+bool SocketBind(void * socket, int port);
+bool SocketSetBlocking(void * socket, bool blocking);
+bool SocketListen(void * socket, int numBackLog = 10);
+bool SocketIsDataPending(void * socket);
+bool SocketSend(void * socket, const std::string & msg);
+int SocketReceive(void * socket, char * buffer, int bufferSize);
+
+
+
 class Vector3;
+
 class Vector4
 {
 public:
