@@ -16,8 +16,7 @@ using std::vector;
 
 SbmDebuggerServer::SbmDebuggerServer()
 {
-   m_sbmId = "123";
-   m_sbmId2 = "sbm";
+   m_sbmFriendlyName = "sbm";
    m_connectResult = false;
    m_updateFrequencyS = 0;
    m_lastUpdate = m_timer.GetTime();
@@ -76,13 +75,28 @@ void SbmDebuggerServer::Init()
    int reuseAddr = 1;
    setsockopt( m_sockTCP, SOL_SOCKET, SO_REUSEADDR, (char *)&reuseAddr, sizeof( int ) );
 
+   int portToTry = NETWORK_PORT_TCP;
+   int portMax = NETWORK_PORT_TCP + 10;
 
-   m_addrTCP.sin_family      = AF_INET;
-   m_addrTCP.sin_addr.s_addr = INADDR_ANY;
-   m_addrTCP.sin_port        = htons( NETWORK_PORT_TCP );
-   memset( m_addrTCP.sin_zero, 0, sizeof( m_addrTCP.sin_zero ) );
+   while (portToTry < portMax)
+   {
+      m_addrTCP.sin_family      = AF_INET;
+      m_addrTCP.sin_addr.s_addr = INADDR_ANY;
+      m_addrTCP.sin_port        = htons( portToTry );
+      memset( m_addrTCP.sin_zero, 0, sizeof( m_addrTCP.sin_zero ) );
 
-   if ( bind( m_sockTCP, (sockaddr *)&m_addrTCP, sizeof( m_addrTCP ) ) == SOCKET_ERROR )
+      if ( bind( m_sockTCP, (sockaddr *)&m_addrTCP, sizeof( m_addrTCP ) ) == 0 )
+      {
+         break;
+      }
+
+      printf( "bind() failed. Trying next port up.\n" );
+      int errnum = WSAGetLastError();
+      printf( "socket error: %d\n", errnum );
+      portToTry++;
+   }
+
+   if (portToTry >= portMax)
    {
       printf( "bind() failed.\n" );
       int errnum = WSAGetLastError();
@@ -95,9 +109,9 @@ void SbmDebuggerServer::Init()
    }
 
 
-   m_port = NETWORK_PORT_TCP;
+   m_port = portToTry;
 
-   m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmId2.c_str());
+   m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
 
 
    {
@@ -126,6 +140,12 @@ void SbmDebuggerServer::Close()
       WSACleanup();
       m_wsaStartupCalled = false;
    }
+}
+
+void SbmDebuggerServer::SetID(const std::string & id)
+{
+   m_sbmFriendlyName = id;
+   m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
 }
 
 void SbmDebuggerServer::Update()
