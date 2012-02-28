@@ -1,6 +1,8 @@
 #ifndef NETREQUEST_H_
 #define NETREQUEST_H_
 
+#include <stdio.h>
+
 using std::vector;
 using std::string;
 
@@ -152,7 +154,6 @@ private:
       m_requests.push_back(req);
    }
 };
-
 
 
 #endif
