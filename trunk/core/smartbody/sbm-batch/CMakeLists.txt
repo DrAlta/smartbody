@@ -19,6 +19,7 @@ target_link_libraries( sbm-batch
 
 	smartbody-dll
 	activemq-cpp
+	SbmDebugger
 	#tcmalloc
 	#profiler
 #	${CMAKE_REQUIRED_LIBRARIES} 
