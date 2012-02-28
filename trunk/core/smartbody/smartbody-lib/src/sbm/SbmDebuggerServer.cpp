@@ -30,82 +30,58 @@ SbmDebuggerServer::~SbmDebuggerServer()
 }
 
 
-#include <winsock.h>
-
 static const int NETWORK_PORT_TCP = 15104;
 
-bool m_wsaStartupCalled = false;
-SOCKET m_sockTCP;
-sockaddr_in m_addrTCP;
-vector< SOCKET > m_sockConnectionsTCP;
+void * m_sockTCP;
+vector< void * > m_sockConnectionsTCP;
 
 
 void SbmDebuggerServer::Init()
 {
-   WSADATA wsaData;
-   int err = WSAStartup( MAKEWORD(2,2), &wsaData );
-   if ( err != 0 )
+   bool ret = SocketStartup();
+   if (!ret)
    {
-      printf( "WSAStartup failed. Code: %d\n", err );
-      //return false;
-   }
-
-   m_wsaStartupCalled = true;
-
-
-   char * hostname = new char [256];
-   int ret = gethostname(hostname, 256);  // 256 is guaranteed to be long enough  http://msdn.microsoft.com/en-us/library/windows/desktop/ms738527(v=vs.85).aspx
-   m_hostname = hostname;
-   delete [] hostname;
-
-
-   m_sockTCP = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
-   if ( m_sockTCP == INVALID_SOCKET )
-   {
-      printf( "Couldn't create socket tcp.\n" );
-      int errnum = WSAGetLastError();
-      printf( "socket error: %d\n", errnum );
-      m_sockTCP = NULL;
-      WSACleanup();
-      m_wsaStartupCalled = false;
-      //return false;
+      printf("SocketStartup() failed\n");
    }
 
 
-   int reuseAddr = 1;
-   setsockopt( m_sockTCP, SOL_SOCKET, SO_REUSEADDR, (char *)&reuseAddr, sizeof( int ) );
+   m_hostname = SocketGetHostname();
+
+
+   m_sockTCP = SocketOpenTcp();
+   if (m_sockTCP == NULL)
+   {
+      printf( "SocketOpenTcp() failed\n" );
+      SocketShutdown();
+      return;
+   }
+
+
+   ret = SocketSetReuseAddress(m_sockTCP, true);
+
 
    int portToTry = NETWORK_PORT_TCP;
    int portMax = NETWORK_PORT_TCP + 10;
 
    while (portToTry < portMax)
    {
-      m_addrTCP.sin_family      = AF_INET;
-      m_addrTCP.sin_addr.s_addr = INADDR_ANY;
-      m_addrTCP.sin_port        = htons( portToTry );
-      memset( m_addrTCP.sin_zero, 0, sizeof( m_addrTCP.sin_zero ) );
-
-      if ( bind( m_sockTCP, (sockaddr *)&m_addrTCP, sizeof( m_addrTCP ) ) == 0 )
+      ret = SocketBind(m_sockTCP, portToTry);
+      if (ret)
       {
          break;
       }
 
-      printf( "bind() failed. Trying next port up.\n" );
-      int errnum = WSAGetLastError();
-      printf( "socket error: %d\n", errnum );
+      printf( "SocketBind() failed. Trying next port up.\n" );
       portToTry++;
    }
 
    if (portToTry >= portMax)
    {
-      printf( "bind() failed.\n" );
-      int errnum = WSAGetLastError();
-      printf( "socket error: %d\n", errnum );
-      closesocket( m_sockTCP );
+      printf( "SocketBind() failed.\n" );
+      SocketClose(m_sockTCP);
       m_sockTCP = NULL;
-      WSACleanup();
-      m_wsaStartupCalled = false;
-      //return false;
+      SocketShutdown();
+      return;
    }
 
 
@@ -114,13 +90,9 @@ void SbmDebuggerServer::Init()
    m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
 
 
-   {
-   u_long nonBlocking = 1;
-   ioctlsocket( m_sockTCP, FIONBIO, &nonBlocking );
-   }
+   SocketSetBlocking(m_sockTCP, false);
 
-
-   listen( m_sockTCP, 10 );
+   SocketListen(m_sockTCP);
 
 
    //return true;
@@ -130,16 +102,11 @@ void SbmDebuggerServer::Close()
 {
    if ( m_sockTCP )
    {
-      closesocket( m_sockTCP );
+      SocketClose(m_sockTCP);
       m_sockTCP = NULL;
    }
 
-
-   if ( m_wsaStartupCalled )
-   {
-      WSACleanup();
-      m_wsaStartupCalled = false;
-   }
+   SocketShutdown();
 }
 
 void SbmDebuggerServer::SetID(const std::string & id)
@@ -191,24 +158,11 @@ void SbmDebuggerServer::Update()
                //vhmsg::ttu_notify1(msg.c_str());
                for ( size_t i = 0; i < m_sockConnectionsTCP.size(); i++ )
                {
-                   //static int c = 0;
-                   //printf("TCP Send %d\n", c++);
+                  //static int c = 0;
+                  //printf("TCP Send %d\n", c++);
 
-
-                  int bytesSent = send( m_sockConnectionsTCP[ i ], msg.c_str(), msg.length(), 0 );
-                  if ( bytesSent < 0 )
-                  {
-                     int errnum = WSAGetLastError();
-                     //printf( "socket error: %d\n", errnum );
-                     //fprintf( fp, "socket error: %d\n", errnum );
-                  }
-                  if ( bytesSent > 0 )
-                  {
-                     //printf( "send: %ld\n", bytesSent );
-                     //fprintf( fp, "send: %ld\n", bytesSent );
-                  }
+                  SocketSend(m_sockConnectionsTCP[ i ], msg);
                }
-
             }
 
 
@@ -229,66 +183,23 @@ void SbmDebuggerServer::Update()
 
 
 
-
+   if (SocketIsDataPending(m_sockTCP))
    {
-      fd_set readfds;
-      FD_ZERO( &readfds );
-      FD_SET( m_sockTCP, &readfds );
-      timeval timeout = { 0, 0 };  // return immediately
-      int error = select( 0, &readfds, 0, 0, &timeout );   // 1st parameter ignored by winsock
-      if ( error == SOCKET_ERROR )
+      void * socket = SocketAccept(m_sockTCP);
+      if (socket)
       {
-         printf( "TCP - Error checking status\n" );
-      }
-      else if ( error != 0 )
-      {
-         SOCKET newSock;
-         sockaddr_in newToAddr;
-
-         int i = sizeof( sockaddr_in );
-         newSock = accept( m_sockTCP, (sockaddr *)&newToAddr, &i );
-
-         u_long nonBlocking = 1;
-         ioctlsocket( newSock, FIONBIO, &nonBlocking );
-
-         m_sockConnectionsTCP.push_back( newSock );
-
-         //printf( "New Connection!\n" );
-
-         //if ( m_onClientConnectFunc )
-         {
-            string clientIP = inet_ntoa( newToAddr.sin_addr );
-            //m_onClientConnectFunc( clientIP, m_onClientConnectUserData );
-         }
+         SocketSetBlocking(socket, false);
+         m_sockConnectionsTCP.push_back(socket);
       }
    }
 
 
    for ( int i = 0; i < (int)m_sockConnectionsTCP.size(); i++ )
    {
-      int tcpDataPending;
+      void * s = m_sockConnectionsTCP[i];
 
-      SOCKET s = m_sockConnectionsTCP[ i ];
-
-      fd_set readfds;
-      FD_ZERO( &readfds );
-      FD_SET( s, &readfds );
-      timeval timeout = { 0, 0 };  // return immediately
-      int error = select( 0, &readfds, 0, 0, &timeout );   // 1st parameter ignored by winsock
-      if ( error == SOCKET_ERROR )
-      {
-         //printf( "TCP - Error checking status\n" );
-         tcpDataPending = 0;
-      }
-      else if ( error == 0 )
-      {
-         tcpDataPending = 0;
-      }
-      else
-      {
-         tcpDataPending = 1;
-      }
-
+      bool tcpDataPending;
+      tcpDataPending = SocketIsDataPending(s);
 
       std::string overflowData = "";
       while ( tcpDataPending )
@@ -298,39 +209,10 @@ void SbmDebuggerServer::Update()
          char str[ 1000 ];
          memset( str, 0, sizeof( char ) * 1000 );
 
-         int bytesReceived = recv( (SOCKET)s, str, sizeof( str ) - 1, 0 );
+         int bytesReceived = SocketReceive(s, str, sizeof( str ) - 1);
          if ( bytesReceived > 0 )
          {
-            str[ bytesReceived ] = 0;
-
             string recvStr = overflowData + str;
-
-            //OutputDebugString( string( recvStr + "\n" ).c_str() );
-
-
-            int lastFullCommandIndex = -1;
-            if (recvStr.size() > 0 && recvStr[recvStr.size() - 1] != ';')
-            {
-               // retain all the characters up to the last semicolon
-               for (int x = recvStr.size() - 1; x >= 0; x--)
-               {
-                  if (recvStr[x] == ';')
-                  {
-                     lastFullCommandIndex = x;
-                     break;
-                  }
-
-                  if (x == 0)
-                     lastFullCommandIndex = -1;
-               }
-
-               if (lastFullCommandIndex >= 0)
-               {
-                  overflowData = recvStr.substr(lastFullCommandIndex + 1);
-                  recvStr = recvStr.substr(0, lastFullCommandIndex + 1);
-                  tcpDataPending = 1;
-               }
-            }
 
             vector< string > tokens;
             vhcl::Tokenize( recvStr, tokens, ";" );
@@ -342,32 +224,20 @@ void SbmDebuggerServer::Update()
 
                if ( msgTokens.size() > 0 )
                {
-                  if ( msgTokens[ 0 ] == "CreateActor" )
+                  if ( msgTokens[ 0 ] == "TestMessage" )
                   {
                      if ( msgTokens.size() > 4 )
                      {
-                        string charIdStr = msgTokens[ 1 ];
-                        int charId       = atoi( charIdStr.c_str() );
-                        string uClass    = msgTokens[ 2 ];
-                        string name      = msgTokens[ 3 ];
-                        int skeletonType = atoi( msgTokens[ 4 ].c_str() );
-
-                        //if ( m_onCreateCharacterFunc )
-                        {
-                           //m_onCreateCharacterFunc( charId, uClass, name, skeletonType, m_onClientConnectUserData );
-                        }
+                        string s = msgTokens[ 1 ];
                      }
                   }
                }
             }
          }
+
+         tcpDataPending = SocketIsDataPending(s);
       }
    }
-
-
-
-
-
 }
 
 

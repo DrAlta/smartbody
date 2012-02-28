@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include <winsock.h>
 #include <stdio.h>
 #include <conio.h>
 
@@ -18,6 +19,171 @@ using std::vector;
 //#define TOLERANCE 0.00001f
 
 //3.14159265358979323846
+
+
+
+
+
+//http://tangentsoft.net/wskfaq/articles/bsd-compatibility.html
+
+bool g_wsaStartupCalled = false;
+
+string SocketGetHostname()
+{
+   char * hostname = new char [256];
+   int ret = gethostname(hostname, 256);  // 256 is guaranteed to be long enough  http://msdn.microsoft.com/en-us/library/windows/desktop/ms738527(v=vs.85).aspx
+   string hostnameStr = hostname;
+   delete [] hostname;
+   return hostnameStr;
+}
+
+bool SocketStartup()
+{
+   WSADATA wsaData;
+   int err = WSAStartup( MAKEWORD(2,2), &wsaData );
+   if ( err != 0 )
+   {
+      printf( "WSAStartup failed. Code: %d\n", err );
+      return false;
+   }
+
+   g_wsaStartupCalled = true;
+   return true;
+}
+
+bool SocketShutdown()
+{
+   if ( g_wsaStartupCalled )
+   {
+      WSACleanup();
+      g_wsaStartupCalled = false;
+   }
+   return true;
+}
+
+void * SocketOpenTcp()
+{
+   SOCKET sockTCP = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
+   if ( sockTCP == INVALID_SOCKET )
+   {
+      printf( "Couldn't create socket tcp.\n" );
+      int errnum = WSAGetLastError();
+      printf( "socket error: %d\n", errnum );
+      return NULL;
+   }
+
+   return (void *)sockTCP;
+}
+
+void * SocketAccept(void * socket)
+{
+   SOCKET sockTCP;
+   sockaddr_in newToAddr;
+
+   int i = sizeof( sockaddr_in );
+   sockTCP = accept( (SOCKET)socket, (sockaddr *)&newToAddr, &i );
+
+   //printf( "New Connection!\n" );
+   //string clientIP = inet_ntoa( newToAddr.sin_addr );
+
+   return (void *)sockTCP;  // TODO - check for errors
+}
+
+void SocketClose(void * socket)
+{
+   closesocket((SOCKET)socket);
+}
+
+bool SocketSetReuseAddress(void * socket, bool reuse)
+{
+   int reuseAddr = 1;
+   setsockopt((SOCKET)socket, SOL_SOCKET, SO_REUSEADDR, (char *)&reuseAddr, sizeof(int));
+   return true;  // TODO - check return code
+}
+
+bool SocketBind(void * socket, int port)
+{
+   sockaddr_in m_addrTCP;
+   m_addrTCP.sin_family      = AF_INET;
+   m_addrTCP.sin_addr.s_addr = INADDR_ANY;
+   m_addrTCP.sin_port        = htons( port );
+   memset(m_addrTCP.sin_zero, 0, sizeof(m_addrTCP.sin_zero));
+
+   if (bind((SOCKET)socket, (sockaddr *)&m_addrTCP, sizeof(m_addrTCP)) == SOCKET_ERROR)
+   {
+      printf("bind() failed.\n");
+      int errnum = WSAGetLastError();
+      printf("socket error: %d\n", errnum);
+      return false;
+   }
+
+   return true;
+}
+
+bool SocketSetBlocking(void * socket, bool blocking)
+{
+   u_long nonBlocking = blocking ? 0 : 1;
+   ioctlsocket((SOCKET)socket, FIONBIO, &nonBlocking);
+   return true;  // TODO - check return code
+}
+
+bool SocketListen(void * socket, int numBackLog)
+{
+   listen((SOCKET)socket, numBackLog);
+   return true;  // TODO - check return code
+}
+
+bool SocketIsDataPending(void * socket)
+{
+   fd_set readfds;
+   FD_ZERO(&readfds);
+   FD_SET((SOCKET)socket, &readfds);
+   timeval timeout = { 0, 0 };  // return immediately
+   int error = select(0, &readfds, 0, 0, &timeout);   // 1st parameter ignored by winsock
+   if ( error == SOCKET_ERROR )
+   {
+      return false;
+   }
+   else if ( error == 0 )
+   {
+      return false;
+   }
+   else
+   {
+      return true;
+   }
+}
+
+bool SocketSend(void * socket, const string & msg)
+{
+   int bytesSent = send((SOCKET)socket, msg.c_str(), msg.length(), 0);
+   if (bytesSent < 0)
+   {
+      int errnum = WSAGetLastError();
+      //printf( "socket error: %d\n", errnum );
+      //fprintf( fp, "socket error: %d\n", errnum );
+
+      return false;
+   }
+   else if ( bytesSent > 0 )
+   {
+      //printf( "send: %ld\n", bytesSent );
+      //fprintf( fp, "send: %ld\n", bytesSent );
+   }
+
+   return true;
+}
+
+int SocketReceive(void * socket, char * buffer, int bufferSize)
+{
+   int bytesReceived = recv((SOCKET)socket, buffer, bufferSize - 1, 0);
+   if (bytesReceived > 0)
+   {
+      buffer[bytesReceived] = 0;  // null terminate the buffer, since recv() doesn't
+   }
+
+   return bytesReceived;
+}
 
 
 Joint::Joint()
