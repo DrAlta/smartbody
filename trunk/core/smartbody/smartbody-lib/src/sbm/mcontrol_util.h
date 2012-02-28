@@ -333,6 +333,10 @@ class mcuCBHandle {
 		int getNumPawns();
 
 		std::map<std::string, SbmCharacter*>& getCharacterMap();
+		std::map<std::string, SkSkeleton*>& getSkeletonMap();
+		std::map<std::string, BoneMap*>& getBoneMaps();
+
+
 		bool addCharacter(SbmCharacter* character);
 		void removeCharacter(const std::string& name);
 		SbmCharacter* getCharacter(const std::string& name);
