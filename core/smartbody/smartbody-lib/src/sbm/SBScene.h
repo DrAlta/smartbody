@@ -55,12 +55,16 @@ class SBScene : public SBObject
 
 		std::vector<std::string> getPawnNames();
 		std::vector<std::string> getCharacterNames();
+		
 
 		SBSkeleton* createSkeleton(std::string char_name);
 
 		SBMotion* getMotion(std::string name);
 		int getNumMotions();
 		std::vector<std::string> getMotionNames();
+		std::vector<std::string> getSkeletonNames();
+		std::vector<std::string> getBoneMapNames();
+		std::vector<std::string> getEventHandlerNames();
 
 		void setMediaPath(std::string path);
 		void addAssetPath(std::string type, std::string path);

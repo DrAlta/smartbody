@@ -300,6 +300,55 @@ std::vector<std::string> SBScene::getCharacterNames()
 	return ret;
 }
 
+
+std::vector<std::string> SBScene::getSkeletonNames()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::vector<std::string> ret;
+
+	for(std::map<std::string, SkSkeleton*>::iterator iter = mcu.getSkeletonMap().begin();
+		iter != mcu.getSkeletonMap().end();
+		iter++)
+	{
+		SkSkeleton* skeleton = (*iter).second;
+		ret.push_back(std::string(skeleton->name()));
+	}
+
+	return ret;	
+}
+
+std::vector<std::string> SBScene::getBoneMapNames()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::vector<std::string> ret;
+
+	for(std::map<std::string, BoneMap*>::iterator iter = mcu.getBoneMaps().begin();
+		iter != mcu.getBoneMaps().end();
+		iter++)
+	{
+		
+		ret.push_back(std::string(iter->first));
+	}
+
+	return ret;	
+}
+
+std::vector<std::string> SBScene::getEventHandlerNames()
+{
+	EventManager* eventManager = getEventManager();
+	
+	std::vector<std::string> ret;
+
+	for(EventHandlerMap::iterator iter = eventManager->getEventHandlers().begin();
+		iter != eventManager->getEventHandlers().end();
+		iter++)
+	{
+
+		ret.push_back(std::string(iter->first));
+	}
+	return ret;
+}
+
 std::vector<std::string> SBScene::getAssetPaths(std::string type)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -657,5 +706,6 @@ std::map<std::string, SBScript*>& SBScene::getScripts()
 {
 	return _scripts;
 }
+
 
 };

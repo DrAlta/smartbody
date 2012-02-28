@@ -1970,6 +1970,16 @@ std::map<std::string, SbmCharacter*>& mcuCBHandle::getCharacterMap()
 	return character_map;
 }
 
+std::map<std::string, SkSkeleton*>& mcuCBHandle::getSkeletonMap()
+{
+	return skeleton_map;
+}
+
+std::map<std::string, BoneMap*>& mcuCBHandle::getBoneMaps()
+{
+	return boneMaps;
+}
+
 bool mcuCBHandle::addCharacter(SbmCharacter* character)
 {
 	SbmCharacter* c = getCharacter(character->getName());
