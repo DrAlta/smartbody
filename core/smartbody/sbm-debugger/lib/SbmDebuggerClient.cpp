@@ -33,13 +33,10 @@ void SbmDebuggerClient::QuerySbmProcessIds()
 
 
 
-#include <winsock.h>
 
-//static const int NETWORK_PORT_TCP = 15104;
 
-bool m_wsaStartupCalled = false;
-SOCKET m_sockTCP = NULL;
-sockaddr_in m_toAddrTCP;
+
+void * m_sockTCP = NULL;
 
 
 void SbmDebuggerClient::Connect(const string & id)
@@ -51,77 +48,35 @@ void SbmDebuggerClient::Connect(const string & id)
 
 
 
+   // id == host:port:friendlyName
    vector<string> idSplit;
    vhcl::Tokenize(id, idSplit, ":");
    const char * server = idSplit[0].c_str();
    int port = vhcl::ToInt(idSplit[1]);
 
 
-   WSADATA wsaData;
-   int err = WSAStartup( MAKEWORD(2,2), &wsaData );
-   if ( err != 0 )
+   bool ret = SocketStartup();
+   if (!ret)
    {
-      printf( "WSAStartup failed. Code: %d\n", err );
-      //return false;
-   }
-
-   m_wsaStartupCalled = true;
-
-   m_sockTCP = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
-   if ( m_sockTCP == INVALID_SOCKET )
-   {
-      printf( "Couldn't create socket2.\n" );
-      int errnum = WSAGetLastError();
-      printf( "socket error: %d\n", errnum );
-      m_sockTCP = NULL;
-      WSACleanup();
-      m_wsaStartupCalled = false;
-      //return false;
+      printf("SocketStartup() failed\n");
    }
 
 
-   // see if we're specifying a host by name or by number
-   if ( isalpha( server[ 0 ] ) )
+   m_sockTCP = SocketOpenTcp();
+   if (m_sockTCP == NULL)
    {
-      hostent * host = gethostbyname( server );
-      if ( host == NULL )
-      {
-         printf( "gethostbyname() failed.\n" );
-         int errnum = WSAGetLastError();
-         printf( "socket error: %d\n", errnum );
-         closesocket( m_sockTCP );
-         m_sockTCP = NULL;
-         WSACleanup();
-         m_wsaStartupCalled = false;
-         //return false;
-      }
-
-      m_toAddrTCP.sin_family = AF_INET;
-      m_toAddrTCP.sin_addr = *( (in_addr *)host->h_addr );
-      m_toAddrTCP.sin_port = htons( port );
-   }
-   else
-   {
-      m_toAddrTCP.sin_family = AF_INET;
-      m_toAddrTCP.sin_addr.s_addr = inet_addr( server );
-      m_toAddrTCP.sin_port = htons( port );
+      printf( "SocketOpenTcp() failed\n" );
+      SocketShutdown();
+      return;
    }
 
-
+   ret = SocketConnect(m_sockTCP, server, port);
+   if (!ret)
    {
-      int ret;
-      ret = connect( m_sockTCP, (SOCKADDR*)&m_toAddrTCP, sizeof( m_toAddrTCP ) );
-      if ( ret < 0 )
-      {
-         printf( "connect() failed.\n" );
-         int errnum = WSAGetLastError();
-         printf( "socket error: %d\n", errnum );
-         closesocket( m_sockTCP );
-         m_sockTCP = NULL;
-         WSACleanup();
-         m_wsaStartupCalled = false;
-         //return false;
-      }
+      printf( "SocketConnect() failed\n" );
+      SocketClose(m_sockTCP);
+      SocketShutdown();
+      return;
    }
 }
 
@@ -129,15 +84,11 @@ void SbmDebuggerClient::Disconnect()
 {
    if ( m_sockTCP )
    {
-      closesocket( m_sockTCP );
+      SocketClose(m_sockTCP);
       m_sockTCP = NULL;
    }
 
-   if ( m_wsaStartupCalled )
-   {
-      WSACleanup();
-      m_wsaStartupCalled = false;
-   }
+   SocketShutdown();
 
 
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s disconnect", m_sbmId.c_str()).c_str());
@@ -155,39 +106,21 @@ void SbmDebuggerClient::Init()
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s send_init", m_sbmId.c_str()).c_str());
 }
 
+
+
+
+
+
 string m_tcpData;
 int m_tcpDataCount = 0;
 
 void SbmDebuggerClient::Update()
 {
-
    {
+      void * s = m_sockTCP;
 
       int tcpDataPending;
-
-      SOCKET s = m_sockTCP;
-
-      fd_set readfds;
-      FD_ZERO( &readfds );
-      FD_SET( s, &readfds );
-      timeval timeout = { 0, 0 };  // return immediately
-      int error = select( 0, &readfds, 0, 0, &timeout );   // 1st parameter ignored by winsock
-      if ( error == SOCKET_ERROR )
-      {
-         //printf( "TCP - Error checking status\n" );
-         tcpDataPending = 0;
-      }
-      else if ( error == 0 )
-      {
-         tcpDataPending = 0;
-      }
-      else
-      {
-         tcpDataPending = 1;
-      }
-
-
-
+      tcpDataPending = SocketIsDataPending(s);
 
       while ( tcpDataPending )
       {
@@ -196,53 +129,25 @@ void SbmDebuggerClient::Update()
          // TODO - preallocate this
          char str[ 1000 ] = { 0 };
 
-         int bytesReceived = recv( (SOCKET)s, str, sizeof( str ) - 1, 0 );
+         int bytesReceived = SocketReceive(s, str, sizeof( str ) - 1);
          if ( bytesReceived > 0 )
          {
-            str[ bytesReceived ] = 0;
-
-            //string recvStr = overflowData + str;
             m_tcpData.append(str);
             m_tcpDataCount += m_tcpData.length();
 
-            //tcpDataPending = 1;
-
             //printf("TCP %d\n", m_tcpDataCount);
 
-
-                {
-                  fd_set readfds;
-                  FD_ZERO( &readfds );
-                  FD_SET( s, &readfds );
-                  timeval timeout = { 0, 0 };  // return immediately
-                  int error = select( 0, &readfds, 0, 0, &timeout );   // 1st parameter ignored by winsock
-                  if ( error == SOCKET_ERROR )
-                  {
-                     //printf( "TCP - Error checking status\n" );
-                     tcpDataPending = 0;
-                  }
-                  else if ( error == 0 )
-                  {
-                     tcpDataPending = 0;
-                  }
-                  else
-                  {
-                     tcpDataPending = 1;
-                  }
-                }
-
+            tcpDataPending = SocketIsDataPending(s);
          }
 
          // sanity check for spamming too much data
          if (m_tcpData.length() > 500000)
          {
-            static int i = 0;
-            printf("TCP Overflow %d - %d\n", i++);
+            //static int i = 0;
+            //printf("TCP Overflow %d - %d\n", i++);
             tcpDataPending = 0;
          }
       }
-
-      //m_tcpData.clear();
 
 
       // if m_tcpData contains a ;, then we have a full command, extract it and process it
@@ -408,87 +313,7 @@ void SbmDebuggerClient::Update()
 
          marker = m_tcpData.find_first_of(';');
       }
-
-
-#if 0
-      std::string overflowData = "";
-      while ( tcpDataPending )
-      {
-         tcpDataPending = 0;
-
-         char str[ 1000 ];
-         memset( str, 0, sizeof( char ) * 1000 );
-
-         int bytesReceived = recv( (SOCKET)s, str, sizeof( str ) - 1, 0 );
-         if ( bytesReceived > 0 )
-         {
-            str[ bytesReceived ] = 0;
-
-            string recvStr = overflowData + str;
-
-            LOG( string( recvStr + "\n" ).c_str() );
-
-
-            int lastFullCommandIndex = -1;
-            if (recvStr.size() > 0 && recvStr[recvStr.size() - 1] != ';')
-            {
-               // retain all the characters up to the last semicolon
-               for (int x = recvStr.size() - 1; x >= 0; x--)
-               {
-                  if (recvStr[x] == ';')
-                  {
-                     lastFullCommandIndex = x;
-                     break;
-                  }
-
-                  if (x == 0)
-                     lastFullCommandIndex = -1;
-               }
-
-               if (lastFullCommandIndex >= 0)
-               {
-                  overflowData = recvStr.substr(lastFullCommandIndex + 1);
-                  recvStr = recvStr.substr(0, lastFullCommandIndex + 1);
-                  tcpDataPending = 1;
-               }
-            }
-
-            vector< string > tokens;
-            vhcl::Tokenize( recvStr, tokens, ";" );
-
-            for ( int t = 0; t < (int)tokens.size(); t++ )
-            {
-               vector< string > msgTokens;
-               vhcl::Tokenize( tokens[ t ], msgTokens, "|" );
-
-               if ( msgTokens.size() > 0 )
-               {
-                  if ( msgTokens[ 0 ] == "CreateActor" )
-                  {
-                     if ( msgTokens.size() > 4 )
-                     {
-                        string charIdStr = msgTokens[ 1 ];
-                        int charId       = atoi( charIdStr.c_str() );
-                        string uClass    = msgTokens[ 2 ];
-                        string name      = msgTokens[ 3 ];
-                        int skeletonType = atoi( msgTokens[ 4 ].c_str() );
-
-                        //if ( m_onCreateCharacterFunc )
-                        {
-                           //m_onCreateCharacterFunc( charId, uClass, name, skeletonType, m_onClientConnectUserData );
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-#endif
-
-
    }
-
-
 }
 
 void SbmDebuggerClient::StartUpdates(double updateFrequencyS)

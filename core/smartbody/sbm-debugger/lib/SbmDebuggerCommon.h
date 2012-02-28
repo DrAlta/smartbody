@@ -21,6 +21,7 @@ void * SocketAccept(void * socket);
 void SocketClose(void * socket);
 bool SocketSetReuseAddress(void * socket, bool reuse);
 bool SocketBind(void * socket, int port);
+bool SocketConnect(void * socket, const std::string & server, int port);
 bool SocketSetBlocking(void * socket, bool blocking);
 bool SocketListen(void * socket, int numBackLog = 10);
 bool SocketIsDataPending(void * socket);

@@ -120,6 +120,47 @@ bool SocketBind(void * socket, int port)
    return true;
 }
 
+bool SocketConnect(void * socket, const std::string & server, int port)
+{
+   sockaddr_in toAddrTCP;
+
+   // see if we're specifying a host by name or by number
+   if (isalpha(server[0]))
+   {
+      hostent * host = gethostbyname(server.c_str());
+      if (host == NULL)
+      {
+         printf( "gethostbyname() failed.\n" );
+         int errnum = WSAGetLastError();
+         printf( "socket error: %d\n", errnum );
+         return false;
+      }
+
+      toAddrTCP.sin_family = AF_INET;
+      toAddrTCP.sin_addr = *((in_addr *)host->h_addr);
+      toAddrTCP.sin_port = htons(port);
+   }
+   else
+   {
+      toAddrTCP.sin_family = AF_INET;
+      toAddrTCP.sin_addr.s_addr = inet_addr(server.c_str());
+      toAddrTCP.sin_port = htons(port);
+   }
+
+
+   int ret;
+   ret = connect((SOCKET)socket, (SOCKADDR*)&toAddrTCP, sizeof(toAddrTCP));
+   if (ret < 0)
+   {
+      printf( "connect() failed.\n" );
+      int errnum = WSAGetLastError();
+      printf( "socket error: %d\n", errnum );
+      return false;
+   }
+
+   return true;
+}
+
 bool SocketSetBlocking(void * socket, bool blocking)
 {
    u_long nonBlocking = blocking ? 0 : 1;
