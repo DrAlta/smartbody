@@ -57,7 +57,7 @@ void SbmDebuggerServer::Init()
    }
 
 
-   ret = SocketSetReuseAddress(m_sockTCP, true);
+   //ret = SocketSetReuseAddress(m_sockTCP, true);
 
 
    int portToTry = NETWORK_PORT_TCP;
