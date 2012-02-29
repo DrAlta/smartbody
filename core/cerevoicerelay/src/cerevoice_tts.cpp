@@ -298,7 +298,8 @@ std::string removeXMLTagsAndNewLines( const std::string & txt , SpeechRequestMes
 					   std::string markString(t1 = XMLString::transcode(mark));
 					   std::string speechString(t2 = (speech)?XMLString::transcode(speech): " ");
 					   XMLString::release(&t1);
-					   XMLString::release(&t2);
+                       if(speech)
+					    XMLString::release(&t2);
 					   /// This code is still not watertight with regards to memory, needs some knowledge of Xerces memory management
 					   //if ( mark ) XMLString::release(&mark);
 					   //if ( speech ) XMLString::release(&speech);
