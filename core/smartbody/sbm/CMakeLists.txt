@@ -103,6 +103,7 @@ target_link_libraries( sbm-fltk
 	pprAI
 	ode
 	python2.6
+	SbmDebugger
 )
 
 set( EXEC_LIST
