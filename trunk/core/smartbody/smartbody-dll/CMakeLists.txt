@@ -34,4 +34,5 @@ target_link_libraries( smartbody-dll
 	pprAI
 	ode
 	python2.6
+	SbmDebugger
 )
