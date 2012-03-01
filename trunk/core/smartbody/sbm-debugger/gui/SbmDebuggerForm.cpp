@@ -34,7 +34,7 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
   // setup renderer size and positioning
   QPoint rendererPosition = ui.RenderView->pos();
   QSize rendererSize = ui.RenderView->size();
-  m_pGLWidget->setGeometry(ui.RenderView->x() + 40, ui.RenderView->y() + 25,
+  m_pGLWidget->setGeometry(ui.RenderView->x() /*+ 40*/, ui.RenderView->y() + 25,
      rendererSize.width(), rendererSize.height());
   MainWindow()->setCentralWidget(m_pGLWidget); 
   
@@ -55,7 +55,11 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
   headers.append("Position");
   headers.append("Rotation");
   ui.sceneTree->setHeaderLabels(headers);
-  
+
+  ui.sceneTree->setColumnWidth(Entity, 400);
+  ui.sceneTree->setColumnWidth(Position, 170);
+  ui.sceneTree->setColumnWidth(Rotation, 190);
+
   InitSignalsSlots();
 
   setUpdatesEnabled(true);

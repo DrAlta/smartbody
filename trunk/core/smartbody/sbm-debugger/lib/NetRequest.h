@@ -17,10 +17,15 @@ public:
       Get_ME_Asset_Paths,
       Get_Audio_Asset_Paths,
       Get_Mesh_Asset_Paths,
-
+      Get_Script_Names,
+      Get_Service_Names,
+      Get_Skeleton_Names,
+      Get_BoneMap_Names,
+      Get_EventHandler_Names,
       Get_Motion_Names,
       Get_Channel_Names,
       Get_Controller_Names,
+      Send_Python_Command,
    };
 
    NetRequest(RequestId _rid, RequestCallback _cb, void* _callbackOwner = NULL) { rid = _rid; cb = _cb; callbackOwner = _callbackOwner; }

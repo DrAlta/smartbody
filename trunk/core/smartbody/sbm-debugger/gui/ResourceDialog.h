@@ -12,16 +12,6 @@ class ResourceDialog : public QDialog
    Q_OBJECT
 
 public:
-   ResourceDialog(SbmDebuggerClient* client, QWidget *parent = 0);
-   ~ResourceDialog();
-
-   Ui::ResourceDialog ui;
-   void AddEntry(const QString& pathType, QStringList& paths);
-
-public slots:
-   void Refresh();
-
-private:
    enum ResourceHeaders
    {
       Paths,
@@ -37,6 +27,17 @@ private:
       Services
    };
 
+   ResourceDialog(SbmDebuggerClient* client, QWidget *parent = 0);
+   ~ResourceDialog();
+
+   Ui::ResourceDialog ui;
+   void AddEntry(ResourceHeaders topLevelItem, const QString& pathType, QStringList& paths);
+   void AddChildWidgets(QTreeWidgetItem* parent, const QStringList& paths, bool removePreviousChildren);
+
+public slots:
+   void Refresh();
+
+private:
    SbmDebuggerClient* m_client;
    Scene* m_pScene;
 
