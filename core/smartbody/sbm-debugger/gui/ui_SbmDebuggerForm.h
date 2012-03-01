@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Fri Feb 24 14:27:14 2012
+** Created: Fri Feb 24 18:10:36 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -168,6 +168,7 @@ public:
         sceneTree->setColumnCount(3);
         sceneTree->header()->setVisible(true);
         sceneTree->header()->setCascadingSectionResizes(false);
+        sceneTree->header()->setDefaultSectionSize(300);
 
         horizontalLayout_4->addWidget(sceneTree);
 

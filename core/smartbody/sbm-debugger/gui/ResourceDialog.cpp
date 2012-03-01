@@ -55,11 +55,41 @@ void ResourceDialog::Refresh()
    SendGetAssetPathCommand("me", NetRequest::Get_ME_Asset_Paths);
    SendGetAssetPathCommand("audio", NetRequest::Get_Audio_Asset_Paths);
    SendGetAssetPathCommand("mesh", NetRequest::Get_Mesh_Asset_Paths);
+
+   m_client->SendSBMCommand(NetRequest::Get_Script_Names, "string-array", "scene.getScriptNames()", GetPathsCB, this);
+   m_client->SendSBMCommand(NetRequest::Get_Service_Names, "string-array", "scene.getServiceManager().getServiceNames()", GetPathsCB, this);
+   m_client->SendSBMCommand(NetRequest::Get_Motion_Names, "string-array", "scene.getMotionNames()", GetPathsCB, this);
+
+   m_client->SendSBMCommand(NetRequest::Get_Skeleton_Names, "string-array", "scene.getSkeletonNames()", GetPathsCB, this);
+   m_client->SendSBMCommand(NetRequest::Get_BoneMap_Names, "string-array", "scene.getBoneMapNames()", GetPathsCB, this);
+   m_client->SendSBMCommand(NetRequest::Get_EventHandler_Names, "string-array", "scene.getEventHandlerNames()", GetPathsCB, this);
+
+   QStringList names;
+   for (unsigned int i = 0; i < m_pScene->m_characters.size(); i++)
+   {
+      names.append(m_pScene->m_characters[i].m_name.c_str());
+   }
+   AddEntry(Characters, "Characters", names);
+   names.clear();
+
+   for (unsigned int i = 0; i < m_pScene->m_pawns.size(); i++)
+   {
+      names.append(m_pScene->m_pawns[i].m_name.c_str());
+   }
+   AddEntry(Pawns, "Pawns", names);
+   names.clear();
 }
 
-void ResourceDialog::AddEntry(const QString& pathType, QStringList& paths)
+void ResourceDialog::AddEntry(ResourceHeaders topLevelItem, const QString& pathType, QStringList& paths)
 {
-   QTreeWidgetItem* widget = ui.resourceTree->topLevelItem(Paths);
+   QTreeWidgetItem* widget = ui.resourceTree->topLevelItem(topLevelItem);
+
+   // first check the top level item before going to the children
+   if (widget->text(0) == pathType)
+   {
+      AddChildWidgets(widget, paths, true);
+      return;
+   }
 
    // find the specified path
    for (int i = 0; i < widget->childCount(); i++)
@@ -67,19 +97,27 @@ void ResourceDialog::AddEntry(const QString& pathType, QStringList& paths)
       QTreeWidgetItem* child = widget->child(i);
       if (child->text(0) == pathType)
       {
-         // remove all old children first
-         while (child->childCount() > 0)
-         {
-            child->removeChild(child->child(0));
-         }
-
-         // add new children
-         for (int j = 0; j < paths.size(); j++)
-         {
-            child->addChild(new QTreeWidgetItem(QStringList(paths[j])));
-         }
+         AddChildWidgets(child, paths, true);
          return;
       }
+   }
+}
+
+void ResourceDialog::AddChildWidgets(QTreeWidgetItem* parent, const QStringList& paths, bool removePreviousChildren)
+{
+   if (removePreviousChildren)
+   {
+      // remove all old children first
+      while (parent->childCount() > 0)
+      {
+         parent->removeChild(parent->child(0));
+      }
+   }
+
+   // add new children
+   for (int j = 0; j < paths.size(); j++)
+   {
+      parent->addChild(new QTreeWidgetItem(QStringList(paths[j])));
    }
 }
 
@@ -97,19 +135,43 @@ bool GetPathsCB(void* caller, NetRequest* req)
    switch (req->Rid())
    {
    case NetRequest::Get_Seq_Asset_Paths:
-      dlg->AddEntry("Sequence Paths", list);
+      dlg->AddEntry(ResourceDialog::Paths, "Sequence Paths", list);
       break;
 
    case NetRequest::Get_ME_Asset_Paths:
-      dlg->AddEntry("ME Paths", list);
+      dlg->AddEntry(ResourceDialog::Paths,"ME Paths", list);
       break;
 
    case NetRequest::Get_Audio_Asset_Paths:
-      dlg->AddEntry("Audio Paths", list);
+      dlg->AddEntry(ResourceDialog::Paths,"Audio Paths", list);
       break;
 
    case NetRequest::Get_Mesh_Asset_Paths:
-      dlg->AddEntry("Mesh Paths", list);
+      dlg->AddEntry(ResourceDialog::Paths, "Mesh Paths", list);
+      break;
+
+   case NetRequest::Get_Script_Names:
+      dlg->AddEntry(ResourceDialog::Seq_Files, "Sequence Paths", list);
+      break;
+
+   case NetRequest::Get_Service_Names:
+      dlg->AddEntry(ResourceDialog::Services, "Services", list);
+      break;
+
+   case NetRequest::Get_Motion_Names:
+      dlg->AddEntry(ResourceDialog::Motions, "Motions", list);
+      break;
+
+   case NetRequest::Get_Skeleton_Names:
+      dlg->AddEntry(ResourceDialog::Skeletons, "Skeletons", list);
+      break;
+
+   case NetRequest::Get_BoneMap_Names:
+      dlg->AddEntry(ResourceDialog::Bone_Map, "Bone Map", list);
+      break;
+
+   case NetRequest::Get_EventHandler_Names:
+      dlg->AddEntry(ResourceDialog::Event_Handlers, "Event Handlers", list);
       break;
    }
    

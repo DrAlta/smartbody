@@ -9,7 +9,6 @@ CommandDialog::CommandDialog(SbmDebuggerClient* client, QWidget *parent) : QDial
 
    connect(ui.runButton, SIGNAL(pressed()), this, SLOT(RunCode()));
    connect(ui.clearTopButton, SIGNAL(pressed()), this, SLOT(ClearOutputBox()));
-   //client.SendSBMCommand(455, "", "", , this);
 }
    
 CommandDialog::~CommandDialog()
@@ -37,9 +36,9 @@ void CommandDialog::RunCode()
       }
 
       if (retVal != "")
-         m_client->SendSBMCommand(455, retVal, entireCommand, SbmCommandReturned, this);
+         m_client->SendSBMCommand(NetRequest::Send_Python_Command, retVal, entireCommand, SbmCommandReturned, this);
       else
-         m_client->SendSBMCommand(455, "void", entireCommand, SbmCommandReturned, this);
+         m_client->SendSBMCommand(NetRequest::Send_Python_Command, "void", entireCommand, SbmCommandReturned, this);
       
    }
    else

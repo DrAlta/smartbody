@@ -147,7 +147,7 @@ void GLWidget::resizeGL(int width, int height)
 {
     int side = qMin(width, height);
     //glViewport((width - side) / 2, (height - side) / 2, side, side);
-    glViewport(geometry().x() - 50, geometry().y() - 35, width, height);
+    glViewport(geometry().x() - 50, geometry().y() - 35, width + 40, height);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -268,7 +268,7 @@ void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
    {
 	  // hit
 	  ptr = ptrNames;
-     while (*ptr == 0/*UINT_MAX*/ || *ptr == -1 || *ptr == 1) // TODO: figure out why these are bad numbers
+     while (*ptr == 0/*UINT_MAX*/ || *ptr == -1 || *ptr == 1 || *ptr == FLOOR_LAYER) // TODO: figure out why these are bad numbers
          ptr++;
 
      // first check if we are picking the floor
