@@ -50,6 +50,25 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 		return Nvbg::execute(character, to, messageId, xml);
 	}
 
+	virtual bool executeEvent(std::string character, std::string messageId, std::string state)
+	{
+		if (boost::python::override o = this->get_override("executeEvent"))
+		{
+			try {
+				return o(character, messageId, state);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		return Nvbg::executeEvent(character, messageId, state);
+	}
+
+	bool default_executeEvent(std::string character, std::string messageId, std::string state)
+	{
+		return Nvbg::executeEvent(character, messageId, state);
+	}
+
 	virtual void notifyAction(std::string name)
 	{
 		if (boost::python::override o = this->get_override("notifyAction"))
@@ -670,8 +689,8 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		;
 
 	boost::python::class_<SBBmlProcessor>("BmlProcessor")
-		.def("execBML", &SBBmlProcessor::execBML, "Execute a generic BML instruction to a given character. Adds the <?xml..> and <act><bml>...</bml></act> elements.")
-		.def("execXML", &SBBmlProcessor::execXML, "Execute a generic XML instruction to a given character. Adds the <?xml..> header.")
+		.def("execBML", &SBBmlProcessor::execBML, boost::python::return_value_policy<boost::python::return_by_value>(), "Execute a generic BML instruction to a given character. Adds the <?xml..> and <act><bml>...</bml></act> elements.")
+		.def("execXML", &SBBmlProcessor::execXML, boost::python::return_value_policy<boost::python::return_by_value>(), "Execute a generic XML instruction to a given character. Adds the <?xml..> header.")
 		;
 
 	boost::python::class_<SBAnimationState>("SBAnimationState")
@@ -1071,7 +1090,8 @@ boost::python::class_<SBReach>("SBReach")
 #ifndef __ANDROID__
 	boost::python::class_<NvbgWrap, boost::python::bases<SBObject>, boost::noncopyable>("Nvbg")
 		.def("objectEvent", &Nvbg::objectEvent, &NvbgWrap::default_objectEvent, "An event indicating that an object of interest is present.")
-		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor of an action attribute")
+		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor of an action attribute.")
+		.def("executeEvent", &Nvbg::executeEvent, &NvbgWrap::default_executeEvent, "Execute the NVBG processor of an action attribute.")
 		.def("notifyAction", &Nvbg::notifyAction, &NvbgWrap::default_notifyAction, "Notifies NVBG processor of a bool attribute.")
 		.def("notifyBool", &Nvbg::notifyBool, &NvbgWrap::default_notifyBool, "Notifies NVBG processor of a bool attribute")
 		.def("notifyInt", &Nvbg::notifyInt, &NvbgWrap::default_notifyInt, "Notifies NVBG processor of an int attribute")

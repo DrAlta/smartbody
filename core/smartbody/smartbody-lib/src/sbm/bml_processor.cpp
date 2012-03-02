@@ -1143,6 +1143,12 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		}
 	} else if( _stricmp( command, "start" )==0 ) {
 		// TODO: Mark act as started
+			Nvbg* nvbg = character->getNvbg();
+			if (nvbg)
+			{
+				nvbg->executeEvent(character_id, message_id, "start");
+			}
+
 		return CMD_SUCCESS;
 	} else if( _stricmp( command, "end" )==0 ) {
 		try {
@@ -1151,6 +1157,13 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 #else
 			BMLProcessorMsg msg( character_id, message_id, character, NULL, args );
 			int ret = bp.bml_end( msg, mcu );
+
+			Nvbg* nvbg = character->getNvbg();
+			if (nvbg)
+			{
+				nvbg->executeEvent(character_id, message_id, "end");
+			}
+
 			return ret;
 #endif
 		} catch( BmlException& e ) {

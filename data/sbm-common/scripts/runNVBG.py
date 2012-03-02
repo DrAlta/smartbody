@@ -35,18 +35,46 @@ class N(Nvbg):
                         print val
 		return	
 
+        # entry point for vrAgentBML message which indicate the status of bml execution
+        def executeEvent(self, character, messageId, state):
+                if (state == "start"):
+                        #print "NVBG executeEvent: start executing msg " + messageId
+                        return True
+                if (state == "end"):
+                        #print "NVBG executeEvent: end executing msg " + messageId
+                        p.reset_feedback_msgId(character, messageId)
+                return True
+                
+
+        # entry point for all the xml vrX messages
 	def execute(self, character, recipient, messageId, xml):
                 xmlRoot = ET.XML(xml)
                 rootTag = xmlRoot.tag
-                # pml is for 
+                # processing PML
                 if (rootTag == "pml"):
                         bmlstr = p.process_percepts(character, xml)
                         if (len(bmlstr) != 0):
                                 bml.execXML(character, str(bmlstr))
                 else:
-                        bmlstr = p.process_speech(character,recipient,messageId, xml)
-                        if (len(bmlstr) != 0):
-                                bml.execBML(character, str(bmlstr))
+                        actElem = ET.XML(xml)
+                        bmlElem = actElem.find('bml')
+                        fmlElem = actElem.find('fml')
+                        # processing BML Speech
+                        if (bmlElem != None):
+                                print "process speech bml"
+                                bmlstr = p.process_speech(character,recipient,messageId, xml)
+                                if (len(bmlstr) != 0):
+                                        bml.execBML(character, str(bmlstr))
+
+                        # processing FML
+                        if (fmlElem != None):
+                                print "process back channel fml"
+                                bmlstr = p.process_feedback(character, xml)
+                                if (len(bmlstr) != 0):
+                                        msgId = bml.execBML(character, str(bmlstr))
+                                        print "Keep track of msgId for vrBCFeedback " + msgId        
+                                        if (msgId != ""):
+                                                p.set_feedback_msgId(character, msgId)
                 return True
 
 	def objectEvent(self, character, name, isAnimate, position, velocity, relativePosition, relativeVelocity):
