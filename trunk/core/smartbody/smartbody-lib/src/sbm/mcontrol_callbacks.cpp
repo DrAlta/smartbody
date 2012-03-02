@@ -4747,6 +4747,42 @@ int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
+/*
+ * Callback function for vrBCFeedback message
+ * vrBCFeedback <feedback agent name> <xml>
+ */
+int mcu_vrBCFeedback_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if (mcu_p)
+	{
+		std::string cName = args.read_token();
+		std::string xml = args.read_remainder_raw();
+		SbmCharacter* character = mcu_p->getCharacter(cName);
+		if (character)
+		{
+			Nvbg* nvbg = character->getNvbg();
+			if (!nvbg)
+			{
+				LOG("mcu_vrBCFeedback_func ERR: character %s doesn't has NVBG attached", cName.c_str());
+				return CMD_FAILURE;
+			}
+			bool ok = nvbg->execute(cName, "", "", xml);
+			if (!ok)
+			{
+				LOG("NVBG for perception did not handle message %s.", xml.c_str());
+				return CMD_FAILURE;
+			}			
+		}
+		else
+		{
+			LOG("mcu_vrBCFeedback_func ERR: character %s not found.", cName.c_str());
+			return CMD_FAILURE;
+		}
+
+	}
+	return CMD_SUCCESS;
+}
+
 int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 #ifndef __ANDROID__

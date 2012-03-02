@@ -20,6 +20,12 @@ bool Nvbg::execute(std::string character, std::string to, std::string messageId,
 	return true;
 }
 
+bool Nvbg::executeEvent(std::string character, std::string messageId, std::string state)
+{
+	LOG("Executing NVBG action %s's status for %s is %s", messageId.c_str(), character.c_str(), state.c_str());
+	return true;
+}
+
 void Nvbg::notify(SmartBody::SBSubject* subject)
 {
 	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
