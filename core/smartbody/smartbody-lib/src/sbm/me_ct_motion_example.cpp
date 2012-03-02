@@ -84,7 +84,7 @@ double BodyMotion::motionPercent( float time )
 void BodyMotion::updateRootOffset(SkSkeleton* skel, SkJoint* rootJoint)
 {
 	motion->connect(skel);		
-	motion->apply(0.f);
+	motion->apply(0.001f);
 	SrQuat tempQ = rootJoint->quat()->value();
 	SrMat src, mat;
 	src = tempQ.get_mat(src);
