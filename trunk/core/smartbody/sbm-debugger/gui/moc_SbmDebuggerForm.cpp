@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'SbmDebuggerForm.h'
 **
-** Created: Fri Feb 24 15:16:38 2012
+** Created: Tue Mar 6 16:45:20 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -39,8 +39,9 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
      122,   16,   16,   16, 0x08,
      139,   16,   16,   16, 0x08,
      156,   16,   16,   16, 0x08,
-     186,  169,   16,   16, 0x08,
-     268,  242,   16,   16, 0x08,
+     179,   16,   16,   16, 0x08,
+     209,  192,   16,   16, 0x08,
+     291,  265,   16,   16, 0x08,
 
        0        // eod
 };
@@ -50,7 +51,8 @@ static const char qt_meta_stringdata_SbmDebuggerForm[] = {
     "ShowSettingsDialog()\0ShowResourceDialog()\0"
     "ShowCommandDialog()\0ShowDataViewerDialog()\0"
     "ShowUtilDialog()\0ShowFaceDialog()\0"
-    "Disconnect()\0current,previous\0"
+    "ShowBmlCreatorDialog()\0Disconnect()\0"
+    "current,previous\0"
     "sceneTreeItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)\0"
     "selectedObj,selectedJoint\0"
     "SetSelectedSceneTreeItem(const Pawn*,const Joint*)\0"
@@ -92,12 +94,13 @@ int SbmDebuggerForm::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 4: ShowDataViewerDialog(); break;
         case 5: ShowUtilDialog(); break;
         case 6: ShowFaceDialog(); break;
-        case 7: Disconnect(); break;
-        case 8: sceneTreeItemChanged((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< QTreeWidgetItem*(*)>(_a[2]))); break;
-        case 9: SetSelectedSceneTreeItem((*reinterpret_cast< const Pawn*(*)>(_a[1])),(*reinterpret_cast< const Joint*(*)>(_a[2]))); break;
+        case 7: ShowBmlCreatorDialog(); break;
+        case 8: Disconnect(); break;
+        case 9: sceneTreeItemChanged((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< QTreeWidgetItem*(*)>(_a[2]))); break;
+        case 10: SetSelectedSceneTreeItem((*reinterpret_cast< const Pawn*(*)>(_a[1])),(*reinterpret_cast< const Joint*(*)>(_a[2]))); break;
         default: ;
         }
-        _id -= 10;
+        _id -= 11;
     }
     return _id;
 }
