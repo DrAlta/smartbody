@@ -77,6 +77,7 @@
     <addaction name="actionCommand_Window"/>
     <addaction name="actionUtils_Window"/>
     <addaction name="actionFace_Viewer"/>
+    <addaction name="actionBML_Creator"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -185,6 +186,9 @@
            </attribute>
            <attribute name="headerCascadingSectionResizes">
             <bool>false</bool>
+           </attribute>
+           <attribute name="headerDefaultSectionSize">
+            <number>300</number>
            </attribute>
            <column>
             <property name="text">
@@ -345,6 +349,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionBML_Creator">
+   <property name="text">
+    <string>&amp;BML Creator</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
    </property>
   </action>
  </widget>

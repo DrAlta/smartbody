@@ -12,6 +12,7 @@
 #include "DataViewerDialog.h"
 #include "UtilsDialog.h"
 #include "FaceDialog.h"
+#include "BmlCreatorDialog.h"
 
 using std::vector;
 using std::string;
@@ -95,6 +96,7 @@ void SbmDebuggerForm::InitSignalsSlots()
    connect(ui.actionData_Viewer, SIGNAL(triggered()), this, SLOT(ShowDataViewerDialog()));
    connect(ui.actionUtils_Window, SIGNAL(triggered()), this, SLOT(ShowUtilDialog()));
    connect(ui.actionFace_Viewer, SIGNAL(triggered()), this, SLOT(ShowFaceDialog()));
+   connect(ui.actionBML_Creator, SIGNAL(triggered()), this, SLOT(ShowBmlCreatorDialog()));
 
    // Scene Tree
    //selection changes shall trigger a slot
@@ -194,6 +196,12 @@ void SbmDebuggerForm::ShowUtilDialog()
 void SbmDebuggerForm::ShowFaceDialog()
 {
    FaceDialog dlg(&c, this);
+   dlg.exec();
+}
+
+void SbmDebuggerForm::ShowBmlCreatorDialog()
+{
+   BmlCreatorDialog dlg(&c, this);
    dlg.exec();
 }
 

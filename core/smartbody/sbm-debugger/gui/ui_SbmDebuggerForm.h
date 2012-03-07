@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Fri Feb 24 18:10:36 2012
+** Created: Fri Mar 2 17:35:36 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -42,6 +42,7 @@ public:
     QAction *actionData_Viewer;
     QAction *actionUtils_Window;
     QAction *actionFace_Viewer;
+    QAction *actionBML_Creator;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout_3;
     QWidget *RenderView;
@@ -95,6 +96,8 @@ public:
         actionUtils_Window->setObjectName(QString::fromUtf8("actionUtils_Window"));
         actionFace_Viewer = new QAction(MainWindow);
         actionFace_Viewer->setObjectName(QString::fromUtf8("actionFace_Viewer"));
+        actionBML_Creator = new QAction(MainWindow);
+        actionBML_Creator->setObjectName(QString::fromUtf8("actionBML_Creator"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout_3 = new QHBoxLayout(centralwidget);
@@ -205,6 +208,7 @@ public:
         menuSbm->addAction(actionCommand_Window);
         menuSbm->addAction(actionUtils_Window);
         menuSbm->addAction(actionFace_Viewer);
+        menuSbm->addAction(actionBML_Creator);
         toolBar->addAction(actionToggleFreeLookCamera);
 
         retranslateUi(MainWindow);
@@ -243,6 +247,8 @@ public:
         actionUtils_Window->setShortcut(QApplication::translate("MainWindow", "Ctrl+T", 0, QApplication::UnicodeUTF8));
         actionFace_Viewer->setText(QApplication::translate("MainWindow", "Face Viewer", 0, QApplication::UnicodeUTF8));
         actionFace_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+F", 0, QApplication::UnicodeUTF8));
+        actionBML_Creator->setText(QApplication::translate("MainWindow", "&BML Creator", 0, QApplication::UnicodeUTF8));
+        actionBML_Creator->setShortcut(QApplication::translate("MainWindow", "Ctrl+B", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0, QApplication::UnicodeUTF8));
         menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));
