@@ -37,6 +37,7 @@ private:
    void BuildConnections(QObject* widget);
    QString GetSelectedChar();
    void AppendBml(const QString& name, const QString& attribute);
+   void SetupComboBoxes();
 };
 
 #endif

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Fri Mar 2 17:35:36 2012
+** Created: Fri Mar 9 15:53:37 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -43,6 +43,7 @@ public:
     QAction *actionUtils_Window;
     QAction *actionFace_Viewer;
     QAction *actionBML_Creator;
+    QAction *actionEnity_Creator;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout_3;
     QWidget *RenderView;
@@ -98,6 +99,8 @@ public:
         actionFace_Viewer->setObjectName(QString::fromUtf8("actionFace_Viewer"));
         actionBML_Creator = new QAction(MainWindow);
         actionBML_Creator->setObjectName(QString::fromUtf8("actionBML_Creator"));
+        actionEnity_Creator = new QAction(MainWindow);
+        actionEnity_Creator->setObjectName(QString::fromUtf8("actionEnity_Creator"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout_3 = new QHBoxLayout(centralwidget);
@@ -209,6 +212,7 @@ public:
         menuSbm->addAction(actionUtils_Window);
         menuSbm->addAction(actionFace_Viewer);
         menuSbm->addAction(actionBML_Creator);
+        menuSbm->addAction(actionEnity_Creator);
         toolBar->addAction(actionToggleFreeLookCamera);
 
         retranslateUi(MainWindow);
@@ -249,10 +253,12 @@ public:
         actionFace_Viewer->setShortcut(QApplication::translate("MainWindow", "Ctrl+F", 0, QApplication::UnicodeUTF8));
         actionBML_Creator->setText(QApplication::translate("MainWindow", "&BML Creator", 0, QApplication::UnicodeUTF8));
         actionBML_Creator->setShortcut(QApplication::translate("MainWindow", "Ctrl+B", 0, QApplication::UnicodeUTF8));
+        actionEnity_Creator->setText(QApplication::translate("MainWindow", "Entity Creator", 0, QApplication::UnicodeUTF8));
+        actionEnity_Creator->setShortcut(QApplication::translate("MainWindow", "Ctrl+E", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0, QApplication::UnicodeUTF8));
         menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));
-        menuSbm->setTitle(QApplication::translate("MainWindow", "Sbm", 0, QApplication::UnicodeUTF8));
+        menuSbm->setTitle(QApplication::translate("MainWindow", "Tools", 0, QApplication::UnicodeUTF8));
         toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", 0, QApplication::UnicodeUTF8));
         sceneTab->setTabText(sceneTab->indexOf(tab), QApplication::translate("MainWindow", "Scene", 0, QApplication::UnicodeUTF8));
         cameraPositionLabel->setText(QApplication::translate("MainWindow", "Camera Pos:", 0, QApplication::UnicodeUTF8));

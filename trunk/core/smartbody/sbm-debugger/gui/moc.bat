@@ -10,3 +10,4 @@ set MOC=..\..\..\..\lib\qt\bin\moc.exe  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT
 %MOC% UtilsDialog.h -o moc_UtilsDialog.cpp
 %MOC% FaceDialog.h -o moc_FaceDialog.cpp
 %MOC% BMLCreatorDialog.h -o moc_BMLCreatorDialog.cpp
+%MOC% EntityCreatorDialog.h -o moc_EntityCreatorDialog.cpp
