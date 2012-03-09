@@ -8,7 +8,7 @@ Camera::Camera() :
    m_Rotation(0, 0, 0),
    m_Scale(1, 1, 1),
    m_CameraType(Follow_Renderer),
-   m_MovementSpeed(0.05f),
+   m_MovementSpeed(5),
    m_RotationSpeed(0.05f)
 {
    m_RotMatrix.setToIdentity();

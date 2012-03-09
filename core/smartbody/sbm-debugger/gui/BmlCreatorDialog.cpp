@@ -2,11 +2,15 @@
 #include "vhcl.h"
 #include "vhmsg-tt.h"
 
+static const QString UnSelected = "-----";
+
 BmlCreatorDialog::BmlCreatorDialog(SbmDebuggerClient* client, QWidget *parent)
 {
    m_client = client;
    m_pScene = client->GetScene();
    ui.setupUi(this);
+
+   SetupComboBoxes();
 
    for (int i = 0; i < children().length(); i++)
    {
@@ -31,6 +35,78 @@ BmlCreatorDialog::~BmlCreatorDialog()
 {
    
 }  
+
+void BmlCreatorDialog::SetupComboBoxes()
+{
+   // setup combo box options
+   QStringList items;
+
+   items << UnSelected << "basic" << "example" << "procedural";
+   ui.locomotionTypeBox->addItems(items);
+   items.clear();
+
+   items << UnSelected << "walk" << "jog" << "run" << "sbm:step" << "sbm:jump";
+   ui.locomotionMannerBox->addItems(items);
+   items.clear();
+
+   items << UnSelected << "LEFT_HAND" << "RIGHT_HAND" << "BOTH_HANDS";
+   ui.gestureModeBox->addItems(items);
+   items.clear();
+
+   items << UnSelected << "pick-up" << "put-down" << "touch";
+   ui.sbmReachSbmAction->addItems(items);
+   items.clear();
+
+   items << UnSelected << "EYES" << "NECK" << "CHEST" << "BACK" << "EYES NECK" <<
+      "EYES CHEST" << "EYES BACK" << "HEAD CHEST" << "HEAD BACK" << "CHEST BACK";
+   ui.gazeSbmJointRange->addItems(items);
+   items.clear();
+
+   items << UnSelected << "LEFT" << "RIGHT" << "UP" << "DOWN" << "UPLEFT" <<
+      "UPRIGHT" << "DOWNLEFT" << "DOWNRIGHT" << "POLAR";
+   ui.gazeDirection->addItems(items);
+   items.clear();
+
+   items << UnSelected << "EYES" << "NECK" << "CHEST" << "BACK";
+   ui.gazeSbmPriorityJoint->addItems(items);
+   items.clear();
+
+   items << UnSelected << "pos" << "rot";
+   ui.sbmConstraintSbmConstraintType->addItems(items);
+   items.clear();
+
+   items << UnSelected << "facs";
+   ui.faceType->addItems(items);
+   items.clear();
+
+   items << UnSelected << "BOTH" << "LEFT" << "RIGHT";
+   ui.faceSide->addItems(items);
+   items.clear();
+
+   items << UnSelected << "text/plain" << "application/ssml+xml";
+   ui.speech->addItems(items);
+   items.clear();
+
+   items << UnSelected << "true" << "false";
+   ui.saccadeFinish->addItems(items);
+   items.clear();
+
+   items << UnSelected << "talk" << "listen" << "think";
+   ui.saccadeMode->addItems(items);
+   items.clear();
+
+   items << UnSelected << "schedule" << "update";
+   ui.sbmStatesMode->addItems(items);
+   items.clear();
+
+   items << UnSelected << "true" << "false";
+   ui.sbmStatesLoop->addItems(items);
+   items.clear();
+
+   items << UnSelected << "true" << "false";
+   ui.sbmStatesSbmStartNow->addItems(items);
+   items.clear();
+}
 
 void BmlCreatorDialog::BuildConnections(QObject* widget)
 {
@@ -85,7 +161,14 @@ void BmlCreatorDialog::ComboCurrentIndexChanged(const QString & text)
    if (!sender)
       return;
 
-   AppendBml(sender->accessibleName(), text);
+   if (text == UnSelected)
+   {
+      AppendBml(sender->accessibleName(), "");
+   }
+   else
+   {
+      AppendBml(sender->accessibleName(), text);
+   }   
 }
 
 void BmlCreatorDialog::CharacterSelectionChanged(const QString & text)

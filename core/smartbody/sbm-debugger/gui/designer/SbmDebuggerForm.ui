@@ -70,7 +70,7 @@
    </widget>
    <widget class="QMenu" name="menuSbm">
     <property name="title">
-     <string>Sbm</string>
+     <string>Tools</string>
     </property>
     <addaction name="actionData_Viewer"/>
     <addaction name="actionResource_Viewer"/>
@@ -78,6 +78,7 @@
     <addaction name="actionUtils_Window"/>
     <addaction name="actionFace_Viewer"/>
     <addaction name="actionBML_Creator"/>
+    <addaction name="actionEnity_Creator"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -357,6 +358,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="actionEnity_Creator">
+   <property name="text">
+    <string>Entity Creator</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
    </property>
   </action>
  </widget>

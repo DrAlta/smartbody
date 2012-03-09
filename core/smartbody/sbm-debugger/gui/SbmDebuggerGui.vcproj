@@ -203,6 +203,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\moc_EntityCreatorDialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\moc_FaceDialog.cpp"
 				>
 			</File>
@@ -240,6 +244,10 @@
 			</File>
 			<File
 				RelativePath=".\ui_DataViewerDialog.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ui_EntityCreatorDialog.h"
 				>
 			</File>
 			<File
@@ -301,6 +309,14 @@
 		</File>
 		<File
 			RelativePath=".\DataViewerDialog.h"
+			>
+		</File>
+		<File
+			RelativePath=".\EntityCreatorDialog.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\EntityCreatorDialog.h"
 			>
 		</File>
 		<File
