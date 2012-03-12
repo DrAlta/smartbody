@@ -127,6 +127,10 @@ void BmlCreatorDialog::BuildConnections(QObject* widget)
    {
       connect(widget, SIGNAL(valueChanged(const QString&)), this, SLOT(SpinValueChanged(const QString&)));
    }
+   else if (dynamic_cast<QCheckBox*>(widget))
+   {
+      connect(widget, SIGNAL(stateChanged(int)), this, SLOT(CheckBoxStateChanged(int)));
+   }
 
    for (int i = 0; i < widget->children().length(); i++)
    {
@@ -207,6 +211,15 @@ void BmlCreatorDialog::SpinValueChanged(const QString & text)
 
    AppendBml(sender->accessibleName(), text);
 } 
+
+void BmlCreatorDialog::CheckBoxStateChanged(int state)
+{
+   QCheckBox* sender = dynamic_cast<QCheckBox*>(QObject::sender());
+   if (!sender)
+      return;
+
+   AppendBml(sender->accessibleName(), state == Qt::Checked ? "true" : "false");
+}
 
 QString BmlCreatorDialog::GetSelectedChar()
 {

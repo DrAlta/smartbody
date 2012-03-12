@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'BMLCreatorDialog.ui'
 **
-** Created: Tue Mar 6 14:02:14 2012
+** Created: Mon Mar 12 10:33:52 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -80,6 +80,8 @@ public:
     QPlainTextEdit *locomotionNumStepsBox;
     QPlainTextEdit *locomotionStartBox;
     QPlainTextEdit *locomotionIdBox;
+    QSlider *locomotionSbmBreakingSlider;
+    QDoubleSpinBox *locomotionSbmBreakingBox;
     QWidget *animationTab;
     QLabel *idLabel_14;
     QFrame *line_3;
@@ -98,6 +100,8 @@ public:
     QPlainTextEdit *animationsEndBox;
     QLabel *postureLabel_10;
     QPlainTextEdit *animationIdBox;
+    QSlider *animationSpeedSlider;
+    QDoubleSpinBox *animationSpeedBox;
     QWidget *gestureTab;
     QLabel *postureLabel_11;
     QPlainTextEdit *gestureLexemeBox;
@@ -563,6 +567,16 @@ public:
         locomotionIdBox = new QPlainTextEdit(locomotionTab);
         locomotionIdBox->setObjectName(QString::fromUtf8("locomotionIdBox"));
         locomotionIdBox->setGeometry(QRect(320, 180, 131, 31));
+        locomotionSbmBreakingSlider = new QSlider(locomotionTab);
+        locomotionSbmBreakingSlider->setObjectName(QString::fromUtf8("locomotionSbmBreakingSlider"));
+        locomotionSbmBreakingSlider->setGeometry(QRect(170, 70, 71, 19));
+        locomotionSbmBreakingSlider->setMinimum(0);
+        locomotionSbmBreakingSlider->setValue(0);
+        locomotionSbmBreakingSlider->setOrientation(Qt::Horizontal);
+        locomotionSbmBreakingBox = new QDoubleSpinBox(locomotionTab);
+        locomotionSbmBreakingBox->setObjectName(QString::fromUtf8("locomotionSbmBreakingBox"));
+        locomotionSbmBreakingBox->setGeometry(QRect(250, 70, 51, 22));
+        locomotionSbmBreakingBox->setMinimum(-99);
         tabWidget->addTab(locomotionTab, QString());
         animationTab = new QWidget();
         animationTab->setObjectName(QString::fromUtf8("animationTab"));
@@ -637,6 +651,14 @@ public:
         animationIdBox = new QPlainTextEdit(animationTab);
         animationIdBox->setObjectName(QString::fromUtf8("animationIdBox"));
         animationIdBox->setGeometry(QRect(170, 240, 131, 31));
+        animationSpeedSlider = new QSlider(animationTab);
+        animationSpeedSlider->setObjectName(QString::fromUtf8("animationSpeedSlider"));
+        animationSpeedSlider->setGeometry(QRect(20, 130, 71, 19));
+        animationSpeedSlider->setOrientation(Qt::Horizontal);
+        animationSpeedBox = new QDoubleSpinBox(animationTab);
+        animationSpeedBox->setObjectName(QString::fromUtf8("animationSpeedBox"));
+        animationSpeedBox->setGeometry(QRect(100, 130, 51, 22));
+        animationSpeedBox->setMinimum(-99);
         tabWidget->addTab(animationTab, QString());
         gestureTab = new QWidget();
         gestureTab->setObjectName(QString::fromUtf8("gestureTab"));
@@ -812,9 +834,11 @@ public:
         doubleSpinBox = new QDoubleSpinBox(sbmreachTab);
         doubleSpinBox->setObjectName(QString::fromUtf8("doubleSpinBox"));
         doubleSpinBox->setGeometry(QRect(250, 70, 51, 22));
+        doubleSpinBox->setMinimum(-99);
         doubleSpinBox_2 = new QDoubleSpinBox(sbmreachTab);
         doubleSpinBox_2->setObjectName(QString::fromUtf8("doubleSpinBox_2"));
         doubleSpinBox_2->setGeometry(QRect(250, 130, 51, 22));
+        doubleSpinBox_2->setMinimum(-99);
         tabWidget->addTab(sbmreachTab, QString());
         gazeTab = new QWidget();
         gazeTab->setObjectName(QString::fromUtf8("gazeTab"));
@@ -880,9 +904,11 @@ public:
         gazeAngleBox = new QDoubleSpinBox(gazeTab);
         gazeAngleBox->setObjectName(QString::fromUtf8("gazeAngleBox"));
         gazeAngleBox->setGeometry(QRect(250, 190, 51, 22));
+        gazeAngleBox->setMinimum(-99);
         gazeSbmTimeHintBox = new QDoubleSpinBox(gazeTab);
         gazeSbmTimeHintBox->setObjectName(QString::fromUtf8("gazeSbmTimeHintBox"));
         gazeSbmTimeHintBox->setGeometry(QRect(250, 130, 51, 22));
+        gazeSbmTimeHintBox->setMinimum(-99);
         postureLabel_106 = new QLabel(gazeTab);
         postureLabel_106->setObjectName(QString::fromUtf8("postureLabel_106"));
         postureLabel_106->setGeometry(QRect(170, 100, 141, 20));
@@ -920,6 +946,7 @@ public:
         gazeSbmFadeInBox = new QDoubleSpinBox(gazeTab);
         gazeSbmFadeInBox->setObjectName(QString::fromUtf8("gazeSbmFadeInBox"));
         gazeSbmFadeInBox->setGeometry(QRect(250, 250, 51, 22));
+        gazeSbmFadeInBox->setMinimum(-99);
         postureLabel_149 = new QLabel(gazeTab);
         postureLabel_149->setObjectName(QString::fromUtf8("postureLabel_149"));
         postureLabel_149->setGeometry(QRect(20, 280, 61, 20));
@@ -944,6 +971,7 @@ public:
         gazeSbmFadeOutBox = new QDoubleSpinBox(gazeTab);
         gazeSbmFadeOutBox->setObjectName(QString::fromUtf8("gazeSbmFadeOutBox"));
         gazeSbmFadeOutBox->setGeometry(QRect(250, 310, 51, 22));
+        gazeSbmFadeOutBox->setMinimum(-99);
         gazeSbmFadeOutSlider = new QSlider(gazeTab);
         gazeSbmFadeOutSlider->setObjectName(QString::fromUtf8("gazeSbmFadeOutSlider"));
         gazeSbmFadeOutSlider->setGeometry(QRect(170, 310, 71, 19));
@@ -1037,6 +1065,8 @@ public:
         sbmConstraintRotZBox = new QDoubleSpinBox(sbmconstraintTab);
         sbmConstraintRotZBox->setObjectName(QString::fromUtf8("sbmConstraintRotZBox"));
         sbmConstraintRotZBox->setGeometry(QRect(550, 180, 51, 22));
+        sbmConstraintRotZBox->setMinimum(-1000);
+        sbmConstraintRotZBox->setMaximum(1000);
         sbmConstraintSbmFadeOutSlider = new QSlider(sbmconstraintTab);
         sbmConstraintSbmFadeOutSlider->setObjectName(QString::fromUtf8("sbmConstraintSbmFadeOutSlider"));
         sbmConstraintSbmFadeOutSlider->setGeometry(QRect(320, 120, 71, 19));
@@ -1063,6 +1093,8 @@ public:
         sbmConstraintPosYBox = new QDoubleSpinBox(sbmconstraintTab);
         sbmConstraintPosYBox->setObjectName(QString::fromUtf8("sbmConstraintPosYBox"));
         sbmConstraintPosYBox->setGeometry(QRect(400, 240, 51, 22));
+        sbmConstraintPosYBox->setMinimum(-1000);
+        sbmConstraintPosYBox->setMaximum(1000);
         sbmConstraintRotYSlider = new QSlider(sbmconstraintTab);
         sbmConstraintRotYSlider->setObjectName(QString::fromUtf8("sbmConstraintRotYSlider"));
         sbmConstraintRotYSlider->setGeometry(QRect(470, 120, 71, 19));
@@ -1070,6 +1102,8 @@ public:
         sbmConstraintSbmFadeInBox = new QDoubleSpinBox(sbmconstraintTab);
         sbmConstraintSbmFadeInBox->setObjectName(QString::fromUtf8("sbmConstraintSbmFadeInBox"));
         sbmConstraintSbmFadeInBox->setGeometry(QRect(400, 60, 51, 22));
+        sbmConstraintSbmFadeInBox->setMinimum(-1000);
+        sbmConstraintSbmFadeInBox->setMaximum(1000);
         sbmConstraintSbmFadeInSlider = new QSlider(sbmconstraintTab);
         sbmConstraintSbmFadeInSlider->setObjectName(QString::fromUtf8("sbmConstraintSbmFadeInSlider"));
         sbmConstraintSbmFadeInSlider->setGeometry(QRect(320, 60, 71, 19));
@@ -1094,12 +1128,18 @@ public:
         sbmConstraintPosXBox = new QDoubleSpinBox(sbmconstraintTab);
         sbmConstraintPosXBox->setObjectName(QString::fromUtf8("sbmConstraintPosXBox"));
         sbmConstraintPosXBox->setGeometry(QRect(400, 180, 51, 22));
+        sbmConstraintPosXBox->setMinimum(-1000);
+        sbmConstraintPosXBox->setMaximum(1000);
         sbmConstraintRotXBox = new QDoubleSpinBox(sbmconstraintTab);
         sbmConstraintRotXBox->setObjectName(QString::fromUtf8("sbmConstraintRotXBox"));
         sbmConstraintRotXBox->setGeometry(QRect(550, 60, 51, 22));
+        sbmConstraintRotXBox->setMinimum(-1000);
+        sbmConstraintRotXBox->setMaximum(1000);
         sbmConstraintPosZBox = new QDoubleSpinBox(sbmconstraintTab);
         sbmConstraintPosZBox->setObjectName(QString::fromUtf8("sbmConstraintPosZBox"));
         sbmConstraintPosZBox->setGeometry(QRect(400, 300, 51, 22));
+        sbmConstraintPosZBox->setMinimum(-1000);
+        sbmConstraintPosZBox->setMaximum(1000);
         postureLabel_221 = new QLabel(sbmconstraintTab);
         postureLabel_221->setObjectName(QString::fromUtf8("postureLabel_221"));
         postureLabel_221->setGeometry(QRect(320, 30, 121, 20));
@@ -1113,6 +1153,8 @@ public:
         sbmConstraintRotYBox = new QDoubleSpinBox(sbmconstraintTab);
         sbmConstraintRotYBox->setObjectName(QString::fromUtf8("sbmConstraintRotYBox"));
         sbmConstraintRotYBox->setGeometry(QRect(550, 120, 51, 22));
+        sbmConstraintRotYBox->setMinimum(-1000);
+        sbmConstraintRotYBox->setMaximum(1000);
         sbmConstraintRotXSlider = new QSlider(sbmconstraintTab);
         sbmConstraintRotXSlider->setObjectName(QString::fromUtf8("sbmConstraintRotXSlider"));
         sbmConstraintRotXSlider->setGeometry(QRect(470, 60, 71, 19));
@@ -1120,6 +1162,8 @@ public:
         sbmConstraintSbmFadeOutBox = new QDoubleSpinBox(sbmconstraintTab);
         sbmConstraintSbmFadeOutBox->setObjectName(QString::fromUtf8("sbmConstraintSbmFadeOutBox"));
         sbmConstraintSbmFadeOutBox->setGeometry(QRect(400, 120, 51, 22));
+        sbmConstraintSbmFadeOutBox->setMinimum(-1000);
+        sbmConstraintSbmFadeOutBox->setMaximum(1000);
         postureLabel_223 = new QLabel(sbmconstraintTab);
         postureLabel_223->setObjectName(QString::fromUtf8("postureLabel_223"));
         postureLabel_223->setGeometry(QRect(320, 210, 121, 20));
@@ -1202,6 +1246,7 @@ public:
         headRepeatsBox = new QDoubleSpinBox(headTab);
         headRepeatsBox->setObjectName(QString::fromUtf8("headRepeatsBox"));
         headRepeatsBox->setGeometry(QRect(250, 190, 51, 22));
+        headRepeatsBox->setMinimum(-99);
         postureLabel_198 = new QLabel(headTab);
         postureLabel_198->setObjectName(QString::fromUtf8("postureLabel_198"));
         postureLabel_198->setGeometry(QRect(170, 160, 121, 20));
@@ -1214,6 +1259,7 @@ public:
         headAmountBox = new QDoubleSpinBox(headTab);
         headAmountBox->setObjectName(QString::fromUtf8("headAmountBox"));
         headAmountBox->setGeometry(QRect(250, 250, 51, 22));
+        headAmountBox->setMinimum(-99);
         postureLabel_200 = new QLabel(headTab);
         postureLabel_200->setObjectName(QString::fromUtf8("postureLabel_200"));
         postureLabel_200->setGeometry(QRect(170, 220, 121, 20));
@@ -1226,6 +1272,7 @@ public:
         headSbmSmoothBox = new QDoubleSpinBox(headTab);
         headSbmSmoothBox->setObjectName(QString::fromUtf8("headSbmSmoothBox"));
         headSbmSmoothBox->setGeometry(QRect(250, 310, 51, 22));
+        headSbmSmoothBox->setMinimum(-99);
         postureLabel_202 = new QLabel(headTab);
         postureLabel_202->setObjectName(QString::fromUtf8("postureLabel_202"));
         postureLabel_202->setGeometry(QRect(170, 280, 121, 20));
@@ -1243,9 +1290,11 @@ public:
         headSbmWarpBox = new QDoubleSpinBox(headTab);
         headSbmWarpBox->setObjectName(QString::fromUtf8("headSbmWarpBox"));
         headSbmWarpBox->setGeometry(QRect(400, 130, 51, 22));
+        headSbmWarpBox->setMinimum(-99);
         headSbmPeriodBox = new QDoubleSpinBox(headTab);
         headSbmPeriodBox->setObjectName(QString::fromUtf8("headSbmPeriodBox"));
         headSbmPeriodBox->setGeometry(QRect(400, 70, 51, 22));
+        headSbmPeriodBox->setMinimum(-99);
         postureLabel_204 = new QLabel(headTab);
         postureLabel_204->setObjectName(QString::fromUtf8("postureLabel_204"));
         postureLabel_204->setGeometry(QRect(320, 40, 121, 20));
@@ -1267,6 +1316,7 @@ public:
         headSbmAccelBox = new QDoubleSpinBox(headTab);
         headSbmAccelBox->setObjectName(QString::fromUtf8("headSbmAccelBox"));
         headSbmAccelBox->setGeometry(QRect(400, 190, 51, 22));
+        headSbmAccelBox->setMinimum(-99);
         headSbmAccelSlider = new QSlider(headTab);
         headSbmAccelSlider->setObjectName(QString::fromUtf8("headSbmAccelSlider"));
         headSbmAccelSlider->setGeometry(QRect(320, 190, 71, 19));
@@ -1284,6 +1334,7 @@ public:
         headSbmPitchBox = new QDoubleSpinBox(headTab);
         headSbmPitchBox->setObjectName(QString::fromUtf8("headSbmPitchBox"));
         headSbmPitchBox->setGeometry(QRect(400, 250, 51, 22));
+        headSbmPitchBox->setMinimum(-99);
         headSbmPitchSlider = new QSlider(headTab);
         headSbmPitchSlider->setObjectName(QString::fromUtf8("headSbmPitchSlider"));
         headSbmPitchSlider->setGeometry(QRect(320, 250, 71, 19));
@@ -1295,6 +1346,7 @@ public:
         headSbmDecayBox = new QDoubleSpinBox(headTab);
         headSbmDecayBox->setObjectName(QString::fromUtf8("headSbmDecayBox"));
         headSbmDecayBox->setGeometry(QRect(400, 310, 51, 22));
+        headSbmDecayBox->setMinimum(-99);
         tabWidget->addTab(headTab, QString());
         faceTab = new QWidget();
         faceTab->setObjectName(QString::fromUtf8("faceTab"));
@@ -1344,6 +1396,7 @@ public:
         faceAmountBox = new QDoubleSpinBox(faceTab);
         faceAmountBox->setObjectName(QString::fromUtf8("faceAmountBox"));
         faceAmountBox->setGeometry(QRect(400, 130, 51, 22));
+        faceAmountBox->setMinimum(-99);
         postureLabel_185 = new QLabel(faceTab);
         postureLabel_185->setObjectName(QString::fromUtf8("postureLabel_185"));
         postureLabel_185->setGeometry(QRect(20, 220, 61, 20));
@@ -1801,6 +1854,12 @@ public:
 #ifndef QT_NO_ACCESSIBILITY
         locomotionIdBox->setAccessibleName(QApplication::translate("BMLCreator", "id", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_ACCESSIBILITY
+#ifndef QT_NO_ACCESSIBILITY
+        locomotionSbmBreakingSlider->setAccessibleName(QApplication::translate("BMLCreator", "sbm:breaking", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_ACCESSIBILITY
+#ifndef QT_NO_ACCESSIBILITY
+        locomotionSbmBreakingBox->setAccessibleName(QApplication::translate("BMLCreator", "sbm:breaking", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_ACCESSIBILITY
         tabWidget->setTabText(tabWidget->indexOf(locomotionTab), QApplication::translate("BMLCreator", "locomotion", 0, QApplication::UnicodeUTF8));
         idLabel_14->setText(QApplication::translate("BMLCreator", "animation", 0, QApplication::UnicodeUTF8));
         postureLabel_3->setText(QApplication::translate("BMLCreator", "name", 0, QApplication::UnicodeUTF8));
@@ -1831,6 +1890,12 @@ public:
         postureLabel_10->setText(QApplication::translate("BMLCreator", "id", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_ACCESSIBILITY
         animationIdBox->setAccessibleName(QApplication::translate("BMLCreator", "id", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_ACCESSIBILITY
+#ifndef QT_NO_ACCESSIBILITY
+        animationSpeedSlider->setAccessibleName(QApplication::translate("BMLCreator", "speed", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_ACCESSIBILITY
+#ifndef QT_NO_ACCESSIBILITY
+        animationSpeedBox->setAccessibleName(QApplication::translate("BMLCreator", "speed", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_ACCESSIBILITY
         tabWidget->setTabText(tabWidget->indexOf(animationTab), QApplication::translate("BMLCreator", "animation", 0, QApplication::UnicodeUTF8));
         postureLabel_11->setText(QApplication::translate("BMLCreator", "lexeme", 0, QApplication::UnicodeUTF8));
