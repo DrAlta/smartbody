@@ -25,6 +25,7 @@ public slots:
    void CharacterSelectionChanged(const QString & text);
    void SliderMoved(int value);
    void SpinValueChanged ( const QString & text );
+   void CheckBoxStateChanged(int state);
    void Refresh();
    void RunBml();
    void ResetBml();

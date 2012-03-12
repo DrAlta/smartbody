@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'BMLCreatorDialog.h'
 **
-** Created: Fri Mar 9 15:55:55 2012
+** Created: Mon Mar 12 10:28:20 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_BmlCreatorDialog[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -37,10 +37,11 @@ static const uint qt_meta_data_BmlCreatorDialog[] = {
      102,   63,   17,   17, 0x0a,
      143,  137,   17,   17, 0x0a,
      160,   63,   17,   17, 0x0a,
-     186,   17,   17,   17, 0x0a,
-     196,   17,   17,   17, 0x0a,
-     205,   17,   17,   17, 0x0a,
-     224,  216,   17,   17, 0x0a,
+     192,  186,   17,   17, 0x0a,
+     218,   17,   17,   17, 0x0a,
+     228,   17,   17,   17, 0x0a,
+     237,   17,   17,   17, 0x0a,
+     256,  248,   17,   17, 0x0a,
 
        0        // eod
 };
@@ -51,6 +52,7 @@ static const char qt_meta_stringdata_BmlCreatorDialog[] = {
     "ComboCurrentIndexChanged(QString)\0"
     "CharacterSelectionChanged(QString)\0"
     "value\0SliderMoved(int)\0SpinValueChanged(QString)\0"
+    "state\0CheckBoxStateChanged(int)\0"
     "Refresh()\0RunBml()\0ResetBml()\0currTab\0"
     "ChangedTab(int)\0"
 };
@@ -90,13 +92,14 @@ int BmlCreatorDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 3: CharacterSelectionChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 4: SliderMoved((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 5: SpinValueChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 6: Refresh(); break;
-        case 7: RunBml(); break;
-        case 8: ResetBml(); break;
-        case 9: ChangedTab((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 6: CheckBoxStateChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 7: Refresh(); break;
+        case 8: RunBml(); break;
+        case 9: ResetBml(); break;
+        case 10: ChangedTab((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
-        _id -= 10;
+        _id -= 11;
     }
     return _id;
 }

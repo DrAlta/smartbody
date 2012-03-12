@@ -773,6 +773,44 @@
        <string>id</string>
       </property>
      </widget>
+     <widget class="QSlider" name="locomotionSbmBreakingSlider">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>70</y>
+        <width>71</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="accessibleName">
+       <string>sbm:breaking</string>
+      </property>
+      <property name="minimum">
+       <number>0</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="locomotionSbmBreakingBox">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>70</y>
+        <width>51</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="accessibleName">
+       <string>sbm:breaking</string>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="animationTab">
      <attribute name="title">
@@ -1069,6 +1107,38 @@
       </property>
       <property name="accessibleName">
        <string>id</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="animationSpeedSlider">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>130</y>
+        <width>71</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="accessibleName">
+       <string>speed</string>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="animationSpeedBox">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>130</y>
+        <width>51</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="accessibleName">
+       <string>speed</string>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
       </property>
      </widget>
     </widget>
@@ -1783,6 +1853,9 @@
       <property name="accessibleName">
        <string>sbm:reach-velocity</string>
       </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
       <property name="geometry">
@@ -1795,6 +1868,9 @@
       </property>
       <property name="accessibleName">
        <string>sbm:reach-duration</string>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
       </property>
      </widget>
     </widget>
@@ -2055,6 +2131,9 @@
       <property name="accessibleName">
        <string>angle</string>
       </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="gazeSbmTimeHintBox">
       <property name="geometry">
@@ -2067,6 +2146,9 @@
       </property>
       <property name="accessibleName">
        <string>sbm:time-hint</string>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="postureLabel_106">
@@ -2223,6 +2305,9 @@
       <property name="accessibleName">
        <string>sbm:fade-in</string>
       </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
      </widget>
      <widget class="QLabel" name="postureLabel_149">
       <property name="geometry">
@@ -2324,6 +2409,9 @@
       </property>
       <property name="accessibleName">
        <string>sbm:fade-out</string>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
       </property>
      </widget>
      <widget class="QSlider" name="gazeSbmFadeOutSlider">
@@ -2702,6 +2790,12 @@
       <property name="accessibleName">
        <string>rot-z</string>
       </property>
+      <property name="minimum">
+       <double>-1000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>1000.000000000000000</double>
+      </property>
      </widget>
      <widget class="QSlider" name="sbmConstraintSbmFadeOutSlider">
       <property name="geometry">
@@ -2810,6 +2904,12 @@
       <property name="accessibleName">
        <string>pos-y</string>
       </property>
+      <property name="minimum">
+       <double>-1000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>1000.000000000000000</double>
+      </property>
      </widget>
      <widget class="QSlider" name="sbmConstraintRotYSlider">
       <property name="geometry">
@@ -2838,6 +2938,12 @@
       </property>
       <property name="accessibleName">
        <string>sbm:fade-in</string>
+      </property>
+      <property name="minimum">
+       <double>-1000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>1000.000000000000000</double>
       </property>
      </widget>
      <widget class="QSlider" name="sbmConstraintSbmFadeInSlider">
@@ -2937,6 +3043,12 @@
       <property name="accessibleName">
        <string>pos-x</string>
       </property>
+      <property name="minimum">
+       <double>-1000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>1000.000000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="sbmConstraintRotXBox">
       <property name="geometry">
@@ -2950,6 +3062,12 @@
       <property name="accessibleName">
        <string>rot-x</string>
       </property>
+      <property name="minimum">
+       <double>-1000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>1000.000000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="sbmConstraintPosZBox">
       <property name="geometry">
@@ -2962,6 +3080,12 @@
       </property>
       <property name="accessibleName">
        <string>pos-z</string>
+      </property>
+      <property name="minimum">
+       <double>-1000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>1000.000000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="postureLabel_221">
@@ -3018,6 +3142,12 @@
       <property name="accessibleName">
        <string>rot-y</string>
       </property>
+      <property name="minimum">
+       <double>-1000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>1000.000000000000000</double>
+      </property>
      </widget>
      <widget class="QSlider" name="sbmConstraintRotXSlider">
       <property name="geometry">
@@ -3046,6 +3176,12 @@
       </property>
       <property name="accessibleName">
        <string>sbm:fade-out</string>
+      </property>
+      <property name="minimum">
+       <double>-1000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>1000.000000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="postureLabel_223">
@@ -3379,6 +3515,9 @@
       <property name="accessibleName">
        <string>repeats</string>
       </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
      </widget>
      <widget class="QLabel" name="postureLabel_198">
       <property name="geometry">
@@ -3429,6 +3568,9 @@
       <property name="accessibleName">
        <string>amount</string>
       </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
      </widget>
      <widget class="QLabel" name="postureLabel_200">
       <property name="geometry">
@@ -3478,6 +3620,9 @@
       </property>
       <property name="accessibleName">
        <string>sbm:smooth</string>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="postureLabel_202">
@@ -3550,6 +3695,9 @@
       <property name="accessibleName">
        <string>sbm:warp</string>
       </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="headSbmPeriodBox">
       <property name="geometry">
@@ -3562,6 +3710,9 @@
       </property>
       <property name="accessibleName">
        <string>sbm:period</string>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="postureLabel_204">
@@ -3650,6 +3801,9 @@
       <property name="accessibleName">
        <string>sbm:accel</string>
       </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
      </widget>
      <widget class="QSlider" name="headSbmAccelSlider">
       <property name="geometry">
@@ -3721,6 +3875,9 @@
       <property name="accessibleName">
        <string>sbm:pitch</string>
       </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
      </widget>
      <widget class="QSlider" name="headSbmPitchSlider">
       <property name="geometry">
@@ -3765,6 +3922,9 @@
       </property>
       <property name="accessibleName">
        <string>sbm:decay</string>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
       </property>
      </widget>
     </widget>
@@ -3956,6 +4116,9 @@
       </property>
       <property name="accessibleName">
        <string>amount</string>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="postureLabel_185">
