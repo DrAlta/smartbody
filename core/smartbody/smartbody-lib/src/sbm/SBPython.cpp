@@ -403,6 +403,8 @@ namespace SmartBody
 #ifdef USE_PYTHON
 BOOST_PYTHON_MODULE(SmartBody)
 {
+	boost::python::docstring_options local_docstring_options(true, true, false);
+
     boost::python::class_<std::vector<std::string> >("StringVec")
         .def(boost::python::vector_indexing_suite<std::vector<std::string> >())
     ;
