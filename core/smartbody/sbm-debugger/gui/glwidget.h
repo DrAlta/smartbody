@@ -19,8 +19,12 @@ using std::string;
 using std::vector;
 
 #define SELECT_BUFF_SIZE 1024
-#define PICKING_OFFSET 1000
+#define ENTITY_PICKING_OFFSET 1000
 #define FLOOR_LAYER 100
+
+#define ENTITY_TO_PICK(index) index * ENTITY_PICKING_OFFSET + ENTITY_PICKING_OFFSET
+#define PICK_TO_CHARACTER(pick) pick / ENTITY_PICKING_OFFSET - 1
+#define PICK_TO_JOINT(pick) pick % ENTITY_PICKING_OFFSET
 
 class GLWidget : public QGLWidget
 {
@@ -124,8 +128,10 @@ private:
     void DrawCharacter(const Character* character);
     void DrawJoint(Joint* joint);
     void DrawPawn(const Pawn* pawn);
-    void DrawCylinder(const float baseRadius, const float topRadius, const float height, const int slices, const int stacks);
+    void DrawCylinder(const float baseRadius, const float topRadius, const float height, const int slices = 10, const int stacks = 10);
     void DrawSphere(double radius, int slices = 10, int stacks = 10);
+    void DrawBox(double width, double height, double depth);
+    void DrawAxis(float axisLength);
 };
 
 

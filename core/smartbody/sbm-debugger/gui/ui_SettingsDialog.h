@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SettingsDialog.ui'
 **
-** Created: Fri Jan 20 12:16:19 2012
+** Created: Wed Mar 14 09:57:51 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -31,6 +31,8 @@ public:
     QDialogButtonBox *buttonBox;
     QTabWidget *tabWidget;
     QWidget *general_tab;
+    QComboBox *unitsBox;
+    QLabel *label;
     QWidget *camera_tab;
     QComboBox *cameraControlBox;
     QLabel *cameraControlLabel;
@@ -54,6 +56,12 @@ public:
         tabWidget->setGeometry(QRect(10, 10, 361, 231));
         general_tab = new QWidget();
         general_tab->setObjectName(QString::fromUtf8("general_tab"));
+        unitsBox = new QComboBox(general_tab);
+        unitsBox->setObjectName(QString::fromUtf8("unitsBox"));
+        unitsBox->setGeometry(QRect(10, 30, 61, 22));
+        label = new QLabel(general_tab);
+        label->setObjectName(QString::fromUtf8("label"));
+        label->setGeometry(QRect(10, 10, 61, 16));
         tabWidget->addTab(general_tab, QString());
         camera_tab = new QWidget();
         camera_tab->setObjectName(QString::fromUtf8("camera_tab"));
@@ -84,7 +92,7 @@ public:
         QObject::connect(buttonBox, SIGNAL(accepted()), SettingsDialog, SLOT(accept()));
         QObject::connect(buttonBox, SIGNAL(rejected()), SettingsDialog, SLOT(reject()));
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(SettingsDialog);
@@ -93,6 +101,7 @@ public:
     void retranslateUi(QDialog *SettingsDialog)
     {
         SettingsDialog->setWindowTitle(QApplication::translate("SettingsDialog", "Settings", 0, QApplication::UnicodeUTF8));
+        label->setText(QApplication::translate("SettingsDialog", "Units", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(general_tab), QApplication::translate("SettingsDialog", "General", 0, QApplication::UnicodeUTF8));
         cameraControlLabel->setText(QApplication::translate("SettingsDialog", "Camera Control", 0, QApplication::UnicodeUTF8));
         cameraMovementSpeedLabel->setText(QApplication::translate("SettingsDialog", "Movement Speed", 0, QApplication::UnicodeUTF8));

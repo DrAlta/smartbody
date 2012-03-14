@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <algorithm>
 
 #include "vhmsg-tt.h"
 
@@ -381,6 +382,18 @@ std::string Joint::GetRotationAsString(bool worldRot)  const
 {
    Vector4 rot = worldRot ? GetWorldRotation() : GetLocalRotation();
    return vhcl::Format("w: %.2f x: %.2f y: %.2f z: %.2f", rot.w, rot.x, rot.y, rot.z);
+}
+
+PawnShape Pawn::StringToPawnShape(std::string& s)
+{
+   std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+
+   if (s == "box")
+      return Box;
+   else if (s == "capsule")
+      return Capsule;
+   else
+      return Sphere;
 }
 
 Vector3 Pawn::GetWorldPosition() const

@@ -24,7 +24,6 @@ GLWidget::GLWidget(Scene* scene, QWidget *parent)
     m_quadric = gluNewQuadric();
     SetScene(scene);
     
-    m_fPawnSize = 1.0f;
     m_fJointRadius = 1.25f;
     m_nPickingOffset = 0;
     m_fAxisLength = 5;
@@ -63,6 +62,11 @@ void GLWidget::OnCloseSettingsDialog(const SettingsDialog* dlg, int result)
       m_Camera.SetCameraType(dlg->ui.cameraControlBox->currentText().toStdString());
       m_Camera.SetMovementSpeed(dlg->ui.cameraMovementSpeedBox->value());
       m_Camera.SetRotationSpeed(dlg->ui.cameraRotationSpeedBox->value());
+      
+      float scale = vhcl::ToDouble(dlg->ui.unitsBox->currentText().toStdString());
+      m_fJointRadius = 1.25 * scale; 
+      m_fAxisLength = 5 * scale;
+      m_fEyeBeamLength = 100 * scale;
    }
 }
 
@@ -191,11 +195,11 @@ void GLWidget::StartPicking()
 
 Joint* GLWidget::FindPickedJoint(int pickIndex)
 {
-   unsigned int characterIndex = pickIndex / PICKING_OFFSET;
+   unsigned int characterIndex = PICK_TO_CHARACTER(pickIndex);
 
    if (characterIndex >= 0 && characterIndex< m_pScene->m_characters.size())
    {
-      m_nPickingOffset = pickIndex % PICKING_OFFSET;
+      m_nPickingOffset = PICK_TO_JOINT(pickIndex);
       Joint* retVal = FindPickedJointRecursive(m_pScene->m_characters[characterIndex].m_joints[0]);
       SetSelectedObject(&m_pScene->m_characters[characterIndex], retVal);
       emit JointPicked(m_SelData.m_pObj, m_SelData.m_pJoint);
@@ -268,7 +272,7 @@ void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
    {
 	  // hit
 	  ptr = ptrNames;
-     while (*ptr == 0/*UINT_MAX*/ || *ptr == -1 || *ptr == 1 || *ptr == FLOOR_LAYER) // TODO: figure out why these are bad numbers
+     while (*ptr < m_pScene->m_characters.size() || *ptr == FLOOR_LAYER)
          ptr++;
 
      // first check if we are picking the floor
@@ -354,12 +358,89 @@ void GLWidget::DrawSphere(double radius, int slices, int stacks)
    gluSphere(m_quadric, radius, slices, stacks);
 }
 
+void GLWidget::DrawBox(double width, double height, double depth)
+{
+   width *= 0.5f;
+   height *= 0.5f;
+   depth *= 0.5f;
+
+   glBegin(GL_QUADS);
+      // front
+      glVertex3d(-width, height, depth);   
+      glVertex3d(-width, -height, depth);
+      glVertex3d(width, -height, depth);
+      glVertex3d(width, height, depth);
+      glNormal3f(0, 0, 1);
+
+      // back
+      glVertex3d(width, height, -depth);
+      glVertex3d(width, -height, -depth);
+      glVertex3d(-width, -height, -depth);
+      glVertex3d(-width, height, -depth);   
+      glNormal3f(0, 0, -1);
+
+      // top
+      glVertex3d(width, height, depth);
+      glVertex3d(width, height, -depth);
+      glVertex3d(-width, height, -depth);
+      glVertex3d(-width, height, depth);   
+      glNormal3f(0, 1, 0);
+      
+      // bottom
+      glVertex3d(-width, -height, depth);
+      glVertex3d(-width, -height, -depth);
+      glVertex3d(width, -height, -depth);
+      glVertex3d(width, -height, depth);
+      glNormal3f(0, -1, 0);
+      
+      // left
+      glVertex3d(-width, height, depth);
+      glVertex3d(-width, height, -depth);
+      glVertex3d(-width, -height, -depth);
+      glVertex3d(-width, -height, depth);   
+      glNormal3f(-1, 0, 0);
+
+      // right
+      glVertex3d(width, -height, depth); 
+      glVertex3d(width, -height, -depth);
+      glVertex3d(width, height, -depth);
+      glVertex3d(width, height, depth);
+      glNormal3f(1, 0, 0);
+      
+   glEnd();
+}
+
+void GLWidget::DrawAxis(float axisLength)
+{
+   // orientation gizmo
+   glBegin(GL_LINES);
+      // x axis
+      glColor3f(255, 0, 0);
+      glVertex3f(0, 0, 0);
+      glVertex3f(m_fAxisLength, 0, 0); 
+   glEnd();
+
+   glBegin(GL_LINES);
+      // y axis
+      glColor3f(0, 255, 0);
+      glVertex3f(0, 0, 0);
+      glVertex3f(0, m_fAxisLength, 0); 
+   glEnd();
+
+   glBegin(GL_LINES);
+      // z axis
+      glColor3f(0, 0, 255);
+      glVertex3f(0, 0, 0);
+      glVertex3f(0, 0, m_fAxisLength); 
+    glEnd();
+}
+
 void GLWidget::DrawFloor()
 {
    const float Size = 1000;
    const float LineHeightOffset = 1.0;
    glPushMatrix();
-   glPushName(FLOOR_LAYER);
+   //glPushName(FLOOR_LAYER);
 
    // draw axis
    glColor3f(0.1f, 0.1f, 0.1f);
@@ -387,7 +468,7 @@ void GLWidget::DrawFloor()
       
 	   glVertex3f(Size, 0, Size);
       glNormal3f(0, 1, 0);
-   glPopName();
+   //glPopName();
    glEnd();
    glPopMatrix();
 }
@@ -400,7 +481,7 @@ void GLWidget::DrawScene()
    {
       glPushName(i);
       glPushMatrix();
-      m_nPickingOffset = i* PICKING_OFFSET;
+      m_nPickingOffset = ENTITY_TO_PICK(i);//i * PICKING_OFFSET;
       DrawCharacter(&characters[i]);
       glPopMatrix();
       glPopName();
@@ -450,31 +531,9 @@ void GLWidget::DrawJoint(Joint* joint)
    DrawSphere(m_fJointRadius);  
    glPopName();
 
-   if (joint == m_SelData.m_pJoint
-      || (m_RenderFlags & Show_Axes))
+   if (joint == m_SelData.m_pJoint || (m_RenderFlags & Show_Axes))
    {
-      // axis drawing
-      // orientation gizmo
-      glBegin(GL_LINES);
-         // x axis
-         glColor3f(255, 0, 0);
-         glVertex3f(0, 0, 0);
-         glVertex3f(m_fAxisLength, 0, 0); 
-      glEnd();
-
-      glBegin(GL_LINES);
-         // y axis
-         glColor3f(0, 255, 0);
-         glVertex3f(0, 0, 0);
-         glVertex3f(0, m_fAxisLength, 0); 
-      glEnd();
-
-      glBegin(GL_LINES);
-         // z axis
-         glColor3f(0, 0, 255);
-         glVertex3f(0, 0, 0);
-         glVertex3f(0, 0, m_fAxisLength); 
-       glEnd();
+      DrawAxis(m_fAxisLength);
    }
 
    if (m_RenderFlags & Show_EyeBeams)
@@ -495,10 +554,6 @@ void GLWidget::DrawJoint(Joint* joint)
    {
       glPushMatrix();
       glPushName(UINT_MAX);
-      /*Vector3 parentJointPos = (joint->m_parent->posOrig + joint->m_parent->pos);
-      double jointLength = (jointPos - parentJointPos).Magnitude();
-      // draw the bone
-      DrawCylinder(0.01f, 0.01f, jointLength, 10, 10);*/
 
       rotationMat = rotationMat.transposed();
       glMultMatrixd(rotationMat.data());
@@ -527,7 +582,25 @@ void GLWidget::DrawPawn(const Pawn* pawn)
    QMatrix4x4 rotationMat = GetLocalRotation(pawn->m_joints[0]);
    glMultMatrixd(rotationMat.data());  
 
-   DrawSphere(m_fPawnSize);
+   switch (pawn->m_shape)
+   {
+   case Box:
+      DrawBox(pawn->m_size, pawn->m_size, pawn->m_size);
+      break;
+
+   case Capsule:
+      DrawCylinder(pawn->m_size * 0.5f, pawn->m_size * 0.5f, pawn->m_size);
+      break;
+
+   default:
+      DrawSphere(pawn->m_size);
+      break;
+   }
+
+   if (pawn->FindJoint("world_offset") == m_SelData.m_pJoint || (m_RenderFlags & Show_Axes))
+   {
+      DrawAxis(m_fAxisLength);
+   }
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
@@ -603,6 +676,12 @@ void GLWidget::keyPressEvent(QKeyEvent *key)
    else if (key->key() == Qt::Key_E) // down
    {
       m_Camera.MoveY(-m_Camera.GetMovementSpeed());
+   }
+   
+   if (key->key() == Qt::Key_F && m_SelData.m_pJoint) //focus
+   {
+      Vector3 jointPos = m_SelData.m_pJoint->GetWorldPosition();
+      m_Camera.MoveLookAt(QVector3D(jointPos.x, jointPos.y, jointPos.z));
    }
 
    updateGL();

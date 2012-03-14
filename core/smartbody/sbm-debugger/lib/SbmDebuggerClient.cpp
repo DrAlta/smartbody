@@ -272,6 +272,24 @@ void SbmDebuggerClient::Update()
                         }
                      }
                   }
+                  else if (split[3] == "pawn")
+                  {
+                      // sbmdebugger <sbmid> update pawn <name> pos <x y z> rot <x y z w> geom <s> size <s> 
+                     Pawn* pawn = m_scene.FindPawn(split[4]);
+                     if (pawn)
+                     {
+                         Joint* worldOffset = pawn->FindJoint("world_offset");
+                         worldOffset->pos.x = vhcl::ToDouble(split[6]);
+                         worldOffset->pos.y = vhcl::ToDouble(split[7]);
+                         worldOffset->pos.z = vhcl::ToDouble(split[8]);
+                         worldOffset->rot.x = vhcl::ToDouble(split[10]);
+                         worldOffset->rot.y = vhcl::ToDouble(split[11]);
+                         worldOffset->rot.z = vhcl::ToDouble(split[12]);
+                         worldOffset->rot.w = vhcl::ToDouble(split[13]);
+                         pawn->m_shape = Pawn::StringToPawnShape(split[15]);
+                         pawn->m_size = vhcl::ToDouble(split[17]);
+                     }                  
+                  }
                   else if (split[3] == "camera")
                   {
                      int i = 4;
@@ -473,6 +491,26 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
                            }
 
                            m_scene.m_characters.push_back(character);
+                        }
+                        else if (split[3] == "pawn")
+                        {
+                           // sbmdebugger <sbmid> update pawn <name> pos <x y z> rot <x y z w> geom <s> size <s> 
+                           Pawn p;
+                           p.m_name = split[4];
+                           Joint* worldOffset = new Joint();
+                           worldOffset->m_name = "world_offset";
+                           worldOffset->posOrig.x = vhcl::ToDouble(split[6]);
+                           worldOffset->posOrig.y = vhcl::ToDouble(split[7]);
+                           worldOffset->posOrig.z = vhcl::ToDouble(split[8]);
+                           worldOffset->rotOrig.x = vhcl::ToDouble(split[10]);
+                           worldOffset->rotOrig.y = vhcl::ToDouble(split[11]);
+                           worldOffset->rotOrig.z = vhcl::ToDouble(split[12]);
+                           worldOffset->rotOrig.w = vhcl::ToDouble(split[13]);
+                           p.m_joints.push_back(worldOffset);
+                           p.m_shape = Pawn::StringToPawnShape(split[15]);
+                           p.m_size = vhcl::ToDouble(split[17]);
+                           
+                           m_scene.m_pawns.push_back(p);
                         }
                         else if (split[3] == "renderer")
                         {

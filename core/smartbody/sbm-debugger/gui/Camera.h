@@ -44,6 +44,7 @@ public:
    double CoordConverter() { return -1; }
 
    void LookAt(const QVector3D& pos);
+   void MoveLookAt(const QVector3D lookAtPos);
 
 private:
    QVector3D m_Position;
@@ -55,6 +56,7 @@ private:
    CameraControlType m_CameraType;
    double m_MovementSpeed;
    double m_RotationSpeed;
+   double m_LookAtOffset;
 };
 
 #endif
