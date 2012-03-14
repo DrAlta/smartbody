@@ -25,22 +25,22 @@ copy /Y %OGRE_BIN%\RenderSystem_Direct3D9.dll %BIN_DIR%
 copy /Y %OGRE_BIN%\RenderSystem_GL.dll %BIN_DIR%
 
 copy /Y ..\..\..\core\smartbody\smartbody-dll\lib\smartbody-dll.dll %BIN_DIR%
-copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll %BIN_DIR%
+copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\alut.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll %BIN_DIR%
-copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll %BIN_DIR%
-copy /Y ..\..\..\lib\xerces-c\bin\xerces-c_3_0.dll %BIN_DIR%
+copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\OpenAL32.dll %BIN_DIR%
+copy /Y ..\..\..\lib\xerces-c\bin9\xerces-c_3_1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-1_44.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_system-vc90-mt-1_44.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_regex-vc90-mt-1_44.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_python-vc90-mt-1_44.dll %BIN_DIR%
-copy /Y ..\..\..\lib\vhcl\log4cxx\lib\log4cxx.dll %BIN_DIR%
+copy /Y ..\..\..\lib\vhcl\log4cxx\lib9\log4cxx.dll %BIN_DIR%
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll %BIN_DIR%
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll %BIN_DIR%
 copy /Y ..\..\..\core\smartbody\python26\python26.dll %BIN_DIR%
-copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll %BIN_DIR%
-copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll %BIN_DIR%
-copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll %BIN_DIR%
-copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll %BIN_DIR%
+copy /Y ..\..\..\lib\pthreads\lib9\pthreadVSE2.dll %BIN_DIR%
+copy /Y ..\..\..\lib\activemq\apr\apr\lib9\libapr-1.dll %BIN_DIR%
+copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll %BIN_DIR%
+copy /Y ..\..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll %BIN_DIR%
 
 if not exist ..\media\packs   mkdir ..\media\packs
@@ -78,22 +78,22 @@ copy /Y %OGRE_BIN%\RenderSystem_Direct3D9_d.dll %BIN_DIR%
 copy /Y %OGRE_BIN%\RenderSystem_GL_d.dll %BIN_DIR%
 
 copy /Y ..\..\..\core\smartbody\smartbody-dll\lib\smartbody-dll_d.dll %BIN_DIR%
-copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll %BIN_DIR%
+copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\alut.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll %BIN_DIR%
-copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll %BIN_DIR%
-copy /Y ..\..\..\lib\xerces-c\bin\xerces-c_3_0D.dll %BIN_DIR%
+copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\OpenAL32.dll %BIN_DIR%
+copy /Y ..\..\..\lib\xerces-c\bin9\xerces-c_3_1D.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-gd-1_44.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_system-vc90-mt-gd-1_44.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_regex-vc90-mt-gd-1_44.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_python-vc90-mt-gd-1_44.dll %BIN_DIR%
-copy /Y ..\..\..\lib\vhcl\log4cxx\lib\log4cxxd.dll %BIN_DIR%
+copy /Y ..\..\..\lib\vhcl\log4cxx\lib9\log4cxxd.dll %BIN_DIR%
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll %BIN_DIR%
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\pprAId.dll %BIN_DIR%
 copy /Y ..\..\..\core\smartbody\python26\python26.dll %BIN_DIR%
-copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll %BIN_DIR%
-copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll %BIN_DIR%
-copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll %BIN_DIR%
-copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll %BIN_DIR%
+copy /Y ..\..\..\lib\pthreads\lib9\pthreadVSE2.dll %BIN_DIR%
+copy /Y ..\..\..\lib\activemq\apr\apr\lib9\libapr-1.dll %BIN_DIR%
+copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll %BIN_DIR%
+copy /Y ..\..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll %BIN_DIR%
 
 if not exist ..\media\packs   mkdir ..\media\packs

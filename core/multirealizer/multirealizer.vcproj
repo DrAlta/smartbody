@@ -62,7 +62,7 @@
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="vhcl_d.lib vhmsg_d.lib pthreadVSE2.lib activemq-cppd.lib ws2_32.lib winmm.lib rpcrt4.lib"
 				OutputFile="bin\multirealizerd.exe"
-				AdditionalLibraryDirectories="..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\\vhmsg-c\lib&quot;;..\..\lib\pthreads\lib;&quot;..\..\lib\activemq\activemq-cpp\vs2008-build\debugdll&quot;"
+				AdditionalLibraryDirectories="..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\lib\pthreads\lib9;&quot;..\..\lib\activemq\activemq-cpp\vs2008-build\debugdll&quot;"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -86,7 +86,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll bin&#x0D;&#x0A;&#x0D;&#x0A;"
+				CommandLine="copy /Y ..\..\lib\pthreads\lib9\pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib9\libapr-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll bin&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -137,7 +137,7 @@
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="vhcl.lib vhmsg.lib pthreadVSE2.lib activemq-cpp.lib ws2_32.lib winmm.lib rpcrt4.lib"
 				OutputFile="bin\multirealizer.exe"
-				AdditionalLibraryDirectories="..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\\vhmsg-c\lib&quot;;..\..\lib\pthreads\lib;&quot;..\..\lib\activemq\activemq-cpp\vs2008-build\releasedll&quot;"
+				AdditionalLibraryDirectories="..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\lib\pthreads\lib9;&quot;..\..\lib\activemq\activemq-cpp\vs2008-build\releasedll&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -163,7 +163,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll bin&#x0D;&#x0A;"
+				CommandLine="copy /Y ..\..\lib\pthreads\lib9\pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib9\libapr-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll bin&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
