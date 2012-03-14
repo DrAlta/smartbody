@@ -359,7 +359,7 @@ void SbmDebuggerForm::UpdateSceneTree()
       bool alreadyExistsInTree = false;
       for (int j = 0; j < subTree->childCount(); j++)
       {
-         if (subTree->child(j)->text(Characters).toStdString() == entityName)
+         if (subTree->child(j)->text(0).toStdString() == entityName)
          {
             alreadyExistsInTree = true;
             break;
@@ -388,7 +388,7 @@ void SbmDebuggerForm::UpdateSceneTree()
       bool alreadyExistsInTree = false;
       for (int j = 0; j < subTree->childCount(); j++)
       {
-         if (subTree->child(j)->text(Pawns).toStdString() == entityName)
+         if (subTree->child(j)->text(0).toStdString() == entityName)
          {
             alreadyExistsInTree = true;
             break;

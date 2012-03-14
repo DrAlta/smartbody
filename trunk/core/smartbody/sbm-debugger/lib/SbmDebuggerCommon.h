@@ -179,6 +179,12 @@ public:
    std::string GetRotationAsString(bool worldRot) const;
 };
 
+enum PawnShape
+{
+   Box,
+   Capsule,
+   Sphere,
+};
 
 class Pawn
 {
@@ -186,6 +192,8 @@ class Pawn
 public:
    std::string m_name;
    std::vector<Joint *> m_joints;
+   double m_size;
+   PawnShape m_shape;
 
 public:
    Pawn()
@@ -196,6 +204,7 @@ public:
    {
    }
 
+   static PawnShape StringToPawnShape(std::string& s);
    Vector3 GetWorldPosition() const;
    Joint* GetWorldOffset() const;
    Joint * FindJoint(const std::string & name) const { return FindJoint(name, m_joints); } 

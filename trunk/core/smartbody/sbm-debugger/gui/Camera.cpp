@@ -9,7 +9,8 @@ Camera::Camera() :
    m_Scale(1, 1, 1),
    m_CameraType(Follow_Renderer),
    m_MovementSpeed(5),
-   m_RotationSpeed(0.05f)
+   m_RotationSpeed(0.05f),
+   m_LookAtOffset(100)
 {
    m_RotMatrix.setToIdentity();
    m_RotMatrix.translate(0, 0.2f, 3);
@@ -84,7 +85,6 @@ void Camera::SetRotation(const QQuaternion& rot)
 
 void Camera::LookAt(const QVector3D& pos)
 {
- 
    // set the forward vector
    QVector3D forward = (pos - GetPosition()).normalized();
    m_RotMatrix.setColumn(2, forward * -m_Scale.z());
@@ -95,4 +95,12 @@ void Camera::LookAt(const QVector3D& pos)
 
    QVector3D up = QVector3D::crossProduct(right, forward);
    m_RotMatrix.setColumn(1, up);
+}
+
+void Camera::MoveLookAt(const QVector3D lookAtPos)
+{
+   // get forward vector
+   QVector4D vec = m_RotMatrix.column(2); 
+   SetPosition(lookAtPos + ((QVector3D)vec * m_LookAtOffset));
+   LookAt(lookAtPos);
 }

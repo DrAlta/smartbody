@@ -39,12 +39,35 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="general_tab">
     <attribute name="title">
      <string>General</string>
     </attribute>
+    <widget class="QComboBox" name="unitsBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>61</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>61</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Units</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="camera_tab">
     <attribute name="title">

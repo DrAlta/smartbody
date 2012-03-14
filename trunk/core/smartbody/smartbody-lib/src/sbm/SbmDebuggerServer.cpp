@@ -124,6 +124,10 @@ void SbmDebuggerServer::Update()
       {
          m_lastUpdate = currentTime;
 
+         // I have to send pawn, camera, and character updates all on one SocketSend
+         // call otherwise there is a massive delay on the receiving end
+         bool sentCamUpdate = false;
+         bool sentPawnUpdates = false;
          if (m_scene)
          {
             vector<string> charNames = m_scene->getCharacterNames();
@@ -154,26 +158,49 @@ void SbmDebuggerServer::Update()
 
                msg += ";";
 
+               if (!sentCamUpdate)
+               {
+                  // camera update
+                  msg += vhcl::Format("sbmdebugger %s update camera\n", m_fullId.c_str());
 
-               //vhmsg::ttu_notify1(msg.c_str());
+                  msg += vhcl::Format("pos %.3f %.3f %.3f\n", m_camera.pos.x, m_camera.pos.y, m_camera.pos.z);
+                  msg += vhcl::Format("rot %.3f %.3f %.3f %.3f\n", m_camera.rot.x, m_camera.rot.y, m_camera.rot.z, m_camera.rot.w);
+                  msg += vhcl::Format("persp %.3f %.3f %.3f %.3f\n", m_camera.fovY, m_camera.aspect, m_camera.zNear, m_camera.zFar);
+                  msg += ";";
+                  sentCamUpdate = true;
+               }
+
+               if (!sentPawnUpdates)
+               {
+                  // sbmdebugger <sbmid> update pawn <name> pos <x y z> rot <x y z w> geom <s> size <s> 
+                  vector<string> pawnNames = m_scene->getPawnNames();
+                  for (size_t i = 0; i < pawnNames.size(); i++)
+                  {
+                     SBPawn* p = m_scene->getPawn(pawnNames[i]);
+                     msg += vhcl::Format("sbmdebugger %s update pawn %s", m_fullId.c_str(), p->getName().c_str());
+                     SrVec pos = p->getPosition();
+                     SrQuat rot = p->getOrientation();
+                     
+                     msg += vhcl::Format(" pos %.3f %.3f %.3f rot %.3f %.3f %.3f %.3f", 
+                        pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w); 
+
+                     SbmGeomObject* geom = p->getGeomObject();
+                     if (geom)
+                        msg += vhcl::Format(" geom %s size %.3f", geom->geomType(), geom->getGeomSize().x);    
+                     else 
+                        msg += vhcl::Format(" geom %s size %.3f", "sphere", 10.0f);
+                                        
+                     msg += ";";
+                  }
+                  sentPawnUpdates = true;
+               }
+
                for ( size_t i = 0; i < m_sockConnectionsTCP.size(); i++ )
                {
                   //static int c = 0;
                   //printf("TCP Send %d\n", c++);
-
                   SocketSend(m_sockConnectionsTCP[ i ], msg);
                }
-            }
-
-
-            {
-               string msg = vhcl::Format("sbmdebugger %s update camera\n", m_fullId.c_str());
-
-               msg += vhcl::Format("pos %.3f %.3f %.3f\n", m_camera.pos.x, m_camera.pos.y, m_camera.pos.z);
-               msg += vhcl::Format("rot %.3f %.3f %.3f %.3f\n", m_camera.rot.x, m_camera.rot.y, m_camera.rot.z, m_camera.rot.w);
-               msg += vhcl::Format("persp %.3f %.3f %.3f %.3f\n", m_camera.fovY, m_camera.aspect, m_camera.zNear, m_camera.zFar);
-
-               vhmsg::ttu_notify1(msg.c_str());
             }
          }
       }
@@ -321,6 +348,19 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 
                            msg = vhcl::Format("sbmdebugger %s init", m_fullId.c_str());
                            msg += vhcl::Format(" renderer right_handed %d\n", m_rendererIsRightHanded ? 1 : 0);
+                           vhmsg::ttu_notify1(msg.c_str());
+                        }
+
+                        vector<string> pawnNames = m_scene->getPawnNames();
+                        for (size_t i = 0; i < pawnNames.size(); i++)
+                        {
+                           SBPawn* p = m_scene->getPawn(pawnNames[i]);
+                           string msg = vhcl::Format("sbmdebugger %s init pawn %s", m_fullId.c_str(), p->getName().c_str());
+                           SrVec pos = p->getPosition();
+                           SrQuat rot = p->getOrientation();
+                           msg += vhcl::Format(" pos %.3f %.3f %.3f rot %.3f %.3f %.3f %.3f geom %s size %.3f", 
+                              pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w, "sphere", 10.0f);
+
                            vhmsg::ttu_notify1(msg.c_str());
                         }
                      }
