@@ -5,12 +5,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "elbench", "lib\vhmsg\sample
 		{49840C67-5A25-4D7A-AF21-5976735F7D7D} = {49840C67-5A25-4D7A-AF21-5976735F7D7D}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "elbenchcs", "lib\vhmsg\samples\elbench\cs\elbenchcs.csproj", "{1532040E-331E-41E4-989D-87EC4C8E57D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "elbenchcs", "lib\vhmsg\samples\elbench\cs\elbenchcs2008.csproj", "{1532040E-331E-41E4-989D-87EC4C8E57D3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DE4240A9-DBBA-410F-888F-462384A5B280} = {DE4240A9-DBBA-410F-888F-462384A5B280}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "elsender", "tools\elsender\elsender.csproj", "{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "elsender", "tools\elsender\elsender2008.csproj", "{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DE4240A9-DBBA-410F-888F-462384A5B280} = {DE4240A9-DBBA-410F-888F-462384A5B280}
 	EndProjectSection
@@ -29,7 +29,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vhmsg", "lib\vhmsg\vhmsg-c\
 		{662CF3EB-B816-4727-9D1D-4071C25A3312} = {662CF3EB-B816-4727-9D1D-4071C25A3312}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vhmsg-net", "lib\vhmsg\vhmsg-net\vhmsg-net.csproj", "{DE4240A9-DBBA-410F-888F-462384A5B280}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vhmsg-net", "lib\vhmsg\vhmsg-net\vhmsg-net-2008.csproj", "{DE4240A9-DBBA-410F-888F-462384A5B280}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bonebus", "lib\bonebus\bonebus.vcproj", "{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -67,7 +67,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smartbody-dll", "core\smart
 		{D41370B8-B1B9-430D-8813-C296D7935F2B} = {D41370B8-B1B9-430D-8813-C296D7935F2B}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsSpeechRelay", "core\MsSpeechRelay\MsSpeechRelay.csproj", "{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsSpeechRelay", "core\MsSpeechRelay\MsSpeechRelay2008.csproj", "{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sbm-fltk-1.3", "core\smartbody\sbm\visualc9\sbm-fltk.vcproj", "{2C18CD04-407B-420A-8CDC-1C6325F87072}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -96,12 +96,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FestivalDLL", "core\TtsRela
 		{662CF3EB-B816-4727-9D1D-4071C25A3312} = {662CF3EB-B816-4727-9D1D-4071C25A3312}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TtsRelay", "core\TtsRelay\TtsRelay.csproj", "{20C3D8FC-B1E9-49B4-9BBB-485AA95F56D2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TtsRelay", "core\TtsRelay\TtsRelay2008.csproj", "{20C3D8FC-B1E9-49B4-9BBB-485AA95F56D2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{451F912C-9774-4473-9E9B-363560B2695E} = {451F912C-9774-4473-9E9B-363560B2695E}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TtsRelayGui", "core\TtsRelay\gui\TtsRelayGui.csproj", "{8337A68C-24FE-4572-B6BE-FB3696F8F87E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TtsRelayGui", "core\TtsRelay\gui\TtsRelayGui2008.csproj", "{8337A68C-24FE-4572-B6BE-FB3696F8F87E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FestivalRelay", "core\FestivalRelay\FestivalRelay.vcproj", "{2E2A44E1-D441-4A88-9125-E6DA9BCA5352}"
 	ProjectSection(ProjectDependencies) = postProject
