@@ -1,0 +1,336 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="viewer">
+      <UniqueIdentifier>{1bd7e2de-8fb3-42cb-8fc5-7f04e3167f3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="bmlviewer">
+      <UniqueIdentifier>{64aecdde-9411-4a3f-a918-c6cc8c347d13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="nle">
+      <UniqueIdentifier>{b727a71a-b28b-4825-a79d-05ab588582f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="panimationviewer">
+      <UniqueIdentifier>{d187f1d8-7feb-45ef-9a30-c7a698f13b76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="channelbufferviewer">
+      <UniqueIdentifier>{10560945-c3f1-4ef6-a345-64e254284bf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="commandwindow">
+      <UniqueIdentifier>{ff1b1c37-9aac-4d39-b69d-642094e8703b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resourceViewer">
+      <UniqueIdentifier>{0788b2c9-2d1c-4d2d-a5e9-7c3d2f9c90ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="faceviewer">
+      <UniqueIdentifier>{75a3bc51-6c6b-4525-aa1a-7dd25cd03160}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="bmlcreator">
+      <UniqueIdentifier>{fbaae2c9-1e25-4b03-b1cf-0b767bb24300}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\fltk_viewer.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FLTKListener.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ObjectManipulationHandle.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PawnPosControl.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PositionControl.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RootWindow.cxx">
+      <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RotationControl.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlviewer\BehaviorBlock.cpp">
+      <Filter>bmlviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlviewer\BehaviorEditorWidget.cpp">
+      <Filter>bmlviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlviewer\BehaviorWindow.cpp">
+      <Filter>bmlviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nle\NonLinearEditor.cpp">
+      <Filter>nle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nle\NonLinearEditorWidget.cpp">
+      <Filter>nle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\PanimationWindow.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ParamAnimBlock.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ParamAnimEditorWidget.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ParamAnimRunTimeEditor.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ParamAnimScriptEditor.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ParamAnimStateEditor.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ParamAnimTransitionEditor.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\Parameter3DVisualization.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ParameterGroup.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ParameterVisualization.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\channelbufferviewer\channelbufferWindow.cpp">
+      <Filter>channelbufferviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\channelbufferviewer\GlChartView.cpp">
+      <Filter>channelbufferviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\channelbufferviewer\GlChartViewArchive.cpp">
+      <Filter>channelbufferviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\channelbufferviewer\GlChartViewCoordinate.cpp">
+      <Filter>channelbufferviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CommandWindow.cpp">
+      <Filter>commandwindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\resourceViewer\Fl_Tree_Horizontal.cpp">
+      <Filter>resourceViewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\resourceViewer\ResourceWindow.cpp">
+      <Filter>resourceViewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\resourceViewer\TreeInfoObject.cpp">
+      <Filter>resourceViewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\resourceViewer\TreeItemInfoWidget.cpp">
+      <Filter>resourceViewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\faceviewer\FaceViewer.cpp">
+      <Filter>faceviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\AttributeWindow.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLAnimationObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLBodyObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLConstraintObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLCreatorWindow.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLEventObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLFaceObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLGazeObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLGestureObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLHeadObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLLocomotionObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLReachObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLSaccadeObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLSpeechObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLStateObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\glfont2.cpp" />
+    <ClCompile Include="..\src\pic.cpp" />
+    <ClCompile Include="..\src\ppm.cpp" />
+    <ClCompile Include="..\src\sbm_main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\CharacterCreatorWindow.h">
+      <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\fltk_viewer.h">
+      <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FLTKListener.h">
+      <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ObjectManipulationHandle.h">
+      <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PawnPosControl.h">
+      <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PositionControl.h">
+      <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RootWindow.h">
+      <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RotationControl.h">
+      <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlviewer\BehaviorBlock.h">
+      <Filter>bmlviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlviewer\BehaviorEditorWidget.h">
+      <Filter>bmlviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlviewer\BehaviorWindow.h">
+      <Filter>bmlviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nle\NonLinearEditor.h">
+      <Filter>nle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nle\NonLinearEditorWidget.h">
+      <Filter>nle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\PanimationWindow.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ParamAnimBlock.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ParamAnimEditorWidget.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ParamAnimRunTimeEditor.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ParamAnimScriptEditor.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ParamAnimStateEditor.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ParamAnimTransitionEditor.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\Parameter3DVisualization.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ParameterGroup.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ParameterVisualization.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\channelbufferviewer\channelbufferWindow.hpp">
+      <Filter>channelbufferviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\channelbufferviewer\GlChartView.hpp">
+      <Filter>channelbufferviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\channelbufferviewer\GlChartViewArchive.hpp">
+      <Filter>channelbufferviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\channelbufferviewer\GlChartViewCoordinate.hpp">
+      <Filter>channelbufferviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CommandWindow.h">
+      <Filter>commandwindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resourceViewer\Fl_Tree_Horizontal.h">
+      <Filter>resourceViewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resourceViewer\ResourceWindow.h">
+      <Filter>resourceViewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resourceViewer\TreeInfoObject.h">
+      <Filter>resourceViewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resourceViewer\TreeItemInfoWidget.h">
+      <Filter>resourceViewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\faceviewer\FaceViewer.h">
+      <Filter>faceviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\AttributeWindow.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLAnimationObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLBodyObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLConstraintObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLCreatorWindow.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLEventObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLFaceObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLGazeObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLGestureObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLHeadObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLLocomotionObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLReachObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLSaccadeObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLSpeechObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLStateObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\glfont2.h" />
+    <ClInclude Include="..\src\pic.h" />
+  </ItemGroup>
+</Project>

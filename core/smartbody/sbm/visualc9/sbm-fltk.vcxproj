@@ -1,0 +1,611 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugFBX|Win32">
+      <Configuration>DebugFBX</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Lint|Win32">
+      <Configuration>Lint</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseFBX|Win32">
+      <Configuration>ReleaseFBX</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>sbm-fltk-1.3</ProjectName>
+    <ProjectGuid>{2C18CD04-407B-420A-8CDC-1C6325F87072}</ProjectGuid>
+    <RootNamespace>sbm-fltk-1.3</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\obj\sbm_debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\obj\sbm_debug\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\obj\sbm_release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\obj\sbm_release\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">.\obj\sbm_debugfbx\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">.\obj\sbm_debugfbx\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">.\obj\sbm_releasefbx\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">.\obj\sbm_releasefbx\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <TypeLibraryName>.\obj\sbm_debug/sbm.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\src;..\..\smartbody-lib\src;..\..\sbm-debugger\lib;..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk-1.3.0rc6;..\..\..\..\lib\xerces-c\include;..\..\..\..\lib\boost;..\..\sbm-ui\panimationviewer\src;..\..\sbm-ui\bmlviewer\src;..\..\sbm\src\channelbufferviewer;..\..\..\..\lib\ANN;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python26\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>Smartbodyd.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc100-mt-gd-1_44.lib;boost_system-vc100-mt-gd-1_44.lib;boost_regex-vc100-mt-gd-1_44.lib;boost_python-vc100-mt-gd-1_44.lib;log4cxxd.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;fltkgld.lib;fltkd.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAId.lib;steerlibd.lib;ode_doubled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\bin\sbm-fltkd.exe</OutputFile>
+      <AdditionalLibraryDirectories>..\..\smartbody-lib\lib;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk-1.3.0rc6\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\sbm-ui\panimationviewer\lib;..\..\sbm-ui\bmlviewer\lib;..\..\ode\lib;..\..\clapack\lib;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug;..\..\..\..\core\smartbody\Python26\libs;C:\ICT\vh\trunk\core\nvb_generator\charniak-windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>
+      </ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\alut.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib\log4cxxd.dll ..\bin
+copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll ..\bin
+copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_0D.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-gd-1_44.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc90-mt-gd-1_44.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc90-mt-gd-1_44.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc90-mt-gd-1_44.dll ..\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll  ..\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\pprAId.dll  ..\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\simpleAId.dll  ..\bin
+copy /Y ..\..\..\..\core\smartbody\python26\python26.dll  ..\bin
+if exist ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\msvcr90d.dll copy /Y ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.* ..\bin
+copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" ..\bin
+copy /Y ..\bin\default.seq .
+
+if not exist ..\..\..\..\bin\smartbody\sbm\bin mkdir ..\..\..\..\bin\smartbody\sbm\bin
+copy "$(TargetPath)" ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\alut.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib\log4cxxd.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_0D.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-gd-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc90-mt-gd-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc90-mt-gd-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc90-mt-gd-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\pprAId.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\simpleAId.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\core\smartbody\python26\python26.dll ..\..\..\..\bin\smartbody\sbm\bin
+if exist ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\msvcr90d.dll copy /Y ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.* ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\bin\default.seq ..\..\..\..\bin\smartbody\sbm\bin
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <TypeLibraryName>.\obj\sbm_release/sbm.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>..\src;..\..\smartbody-lib\src;..\..\sbm-debugger\lib;..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk-1.3.0rc6;..\..\..\..\lib\xerces-c\include;..\..\..\..\lib\boost;..\..\sbm-ui\panimationviewer\src;..\..\sbm-ui\bmlviewer\src;..\..\sbm-ui\channelbufferviewer\src;..\..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python26\include;C:\ICT\vh\trunk\core\nvb_generator\charniak-windows\PARSE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>Smartbody.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;fltk.lib;fltkgl.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_44.lib;boost_system-vc100-mt-1_44.lib;boost_regex-vc100-mt-1_44.lib;boost_python-vc100-mt-1_44.lib;log4cxx.lib;dbghelp.lib;opengl32.lib;glu32.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAI.lib;steerlib.lib;ode_double.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\bin\sbm-fltk.exe</OutputFile>
+      <AdditionalLibraryDirectories>..\..\smartbody-lib\lib;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk-1.3.0rc6\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\..\..\lib\festival\speech_tools\lib;..\..\..\..\lib\festival\festival\src\lib;..\..\sbm-ui\panimationviewer\lib;..\..\sbm-ui\bmlviewer\lib;..\..\sbm-ui\channelbufferviewer\lib;..\..\clapack\lib;..\..\ode\lib;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release;..\..\..\..\core\smartbody\Python26\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\alut.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib\log4cxx.dll ..\bin
+copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll ..\bin
+copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_0.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-1_44.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc90-mt-1_44.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc90-mt-1_44.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc90-mt-1_44.dll ..\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll  ..\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll  ..\bin
+copy /Y ..\..\..\..\core\smartbody\python26\python26.dll  ..\bin
+copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" ..\bin
+
+if not exist ..\..\..\..\bin\smartbody\sbm\bin mkdir ..\..\..\..\bin\smartbody\sbm\bin
+copy "$(TargetPath)" ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\alut.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib\log4cxx.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_0.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc90-mt-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc90-mt-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc90-mt-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\core\smartbody\python26\python26.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\bin\default.seq ..\..\..\..\bin\smartbody\sbm\bin
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'">
+    <Midl>
+      <TypeLibraryName>.\obj\sbm_release/sbm.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Command>if exist ..\..\..\..\tools\pc-lint\lint-post-build.bat call ..\..\..\..\tools\pc-lint\lint-post-build.bat ..\..\..\..\tools\pc-lint $(ProjectFileName)
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">
+    <Midl>
+      <TypeLibraryName>.\obj\sbm_debug/sbm.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\src;..\..\smartbody-lib\src;..\..\sbm-debugger\lib;..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk-1.3.0rc6;..\..\..\..\lib\xerces-c\include;..\..\..\..\lib\boost;..\..\sbm-ui\panimationviewer\src;..\..\sbm-ui\bmlviewer\src;..\..\sbm\src\channelbufferviewer;..\..\..\..\lib\ANN;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python26\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ENABLE_FBX_PARSER;WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>Smartbodyd.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc90-mt-gd-1_44.lib;boost_system-vc90-mt-gd-1_44.lib;boost_regex-vc90-mt-gd-1_44.lib;boost_python-vc90-mt-gd-1_44.lib;log4cxxd.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;fltkgld.lib;fltkd.lib;pprAId.lib;steerlibd.lib;ode_doubled.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wininet.lib;fbxsdk-2012.1-mdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\bin\sbm-fltkd.exe</OutputFile>
+      <AdditionalLibraryDirectories>..\..\smartbody-lib\lib;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\fltk-1.3.0rc6\lib;..\..\ode\lib;..\..\clapack\lib;..\..\steersuite-1.3\build\win32\Debug;..\..\Python26\libs;..\..\..\..\lib\fbxsdk\lib\vs2008\x86;$(ProgramW6432)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86;$(FBXSDK)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>
+      </ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\alut.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib\log4cxxd.dll ..\bin
+copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll ..\bin
+copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_0D.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-gd-1_44.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc90-mt-gd-1_44.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc90-mt-gd-1_44.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc90-mt-gd-1_44.dll ..\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll  ..\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\pprAId.dll  ..\bin
+copy /Y ..\..\..\..\core\smartbody\python26\python26.dll  ..\bin
+if exist ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\msvcr90d.dll copy /Y ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.* ..\bin
+copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" ..\bin
+copy /Y ..\bin\default.seq .
+
+if not exist ..\..\..\..\bin\smartbody\sbm\bin mkdir ..\..\..\..\bin\smartbody\sbm\bin
+copy "$(TargetPath)" ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\alut.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib\log4cxxd.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_0D.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-gd-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc90-mt-gd-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc90-mt-gd-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc90-mt-gd-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\pprAId.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\core\smartbody\python26\python26.dll  ..\..\..\..\bin\smartbody\sbm\bin
+if exist ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\msvcr90d.dll copy /Y ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.* ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\bin\default.seq ..\..\..\..\bin\smartbody\sbm\bin
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">
+    <Midl>
+      <TypeLibraryName>.\obj\sbm_release/sbm.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>..\src;..\..\smartbody-lib\src;..\..\sbm-debugger\lib;..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk-1.3.0rc6;..\..\..\..\lib\xerces-c\include;..\..\..\..\lib\boost;..\..\sbm-ui\panimationviewer\src;..\..\sbm-ui\bmlviewer\src;..\..\sbm-ui\channelbufferviewer\src;..\..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python26\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ENABLE_FBX_PARSER;WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>Smartbody.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;fltk.lib;fltkgl.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc90-mt-1_44.lib;boost_system-vc90-mt-1_44.lib;boost_regex-vc90-mt-1_44.lib;boost_python-vc90-mt-1_44.lib;log4cxx.lib;dbghelp.lib;opengl32.lib;glu32.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;ode_double.lib;steerlib.lib;pprAI.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wininet.lib;fbxsdk-2012.1-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\bin\sbm-fltk.exe</OutputFile>
+      <AdditionalLibraryDirectories>..\..\smartbody-lib\lib;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\fltk-1.3.0rc6\lib;..\..\clapack\lib;..\..\ode\lib;..\..\steersuite-1.3\build\win32\Release;..\..\Python26\libs;..\..\..\..\lib\fbxsdk\lib\vs2008\x86;$(ProgramW6432)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86;$(FBXSDK)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\alut.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib\log4cxx.dll ..\bin
+copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll ..\bin
+copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_0.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-1_44.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc90-mt-1_44.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc90-mt-1_44.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc90-mt-1_44.dll ..\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll  ..\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll  ..\bin
+copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" ..\bin
+
+if not exist ..\..\..\..\bin\smartbody\sbm\bin mkdir ..\..\..\..\bin\smartbody\sbm\bin
+copy "$(TargetPath)" ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\alut.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib\log4cxx.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_0.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc90-mt-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc90-mt-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc90-mt-1_44.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\bin\default.seq ..\..\..\..\bin\smartbody\sbm\bin
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\CharacterCreatorWindow.cpp" />
+    <ClCompile Include="..\src\fltk_viewer.cpp" />
+    <ClCompile Include="..\src\FLTKListener.cpp" />
+    <ClCompile Include="..\src\ObjectManipulationHandle.cpp" />
+    <ClCompile Include="..\src\PawnPosControl.cpp" />
+    <ClCompile Include="..\src\PositionControl.cpp" />
+    <ClCompile Include="..\src\RootWindow.cxx" />
+    <ClCompile Include="..\src\RotationControl.cpp" />
+    <ClCompile Include="..\src\bmlviewer\BehaviorBlock.cpp" />
+    <ClCompile Include="..\src\bmlviewer\BehaviorEditorWidget.cpp" />
+    <ClCompile Include="..\src\bmlviewer\BehaviorWindow.cpp" />
+    <ClCompile Include="..\src\nle\NonLinearEditor.cpp" />
+    <ClCompile Include="..\src\nle\NonLinearEditorWidget.cpp" />
+    <ClCompile Include="..\src\panimationviewer\PanimationWindow.cpp" />
+    <ClCompile Include="..\src\panimationviewer\ParamAnimBlock.cpp" />
+    <ClCompile Include="..\src\panimationviewer\ParamAnimEditorWidget.cpp" />
+    <ClCompile Include="..\src\panimationviewer\ParamAnimRunTimeEditor.cpp" />
+    <ClCompile Include="..\src\panimationviewer\ParamAnimScriptEditor.cpp" />
+    <ClCompile Include="..\src\panimationviewer\ParamAnimStateEditor.cpp" />
+    <ClCompile Include="..\src\panimationviewer\ParamAnimTransitionEditor.cpp" />
+    <ClCompile Include="..\src\panimationviewer\Parameter3DVisualization.cpp" />
+    <ClCompile Include="..\src\panimationviewer\ParameterGroup.cpp" />
+    <ClCompile Include="..\src\panimationviewer\ParameterVisualization.cpp" />
+    <ClCompile Include="..\src\channelbufferviewer\channelbufferWindow.cpp" />
+    <ClCompile Include="..\src\channelbufferviewer\GlChartView.cpp" />
+    <ClCompile Include="..\src\channelbufferviewer\GlChartViewArchive.cpp" />
+    <ClCompile Include="..\src\channelbufferviewer\GlChartViewCoordinate.cpp" />
+    <ClCompile Include="..\src\CommandWindow.cpp" />
+    <ClCompile Include="..\src\resourceViewer\Fl_Tree_Horizontal.cpp" />
+    <ClCompile Include="..\src\resourceViewer\ResourceWindow.cpp" />
+    <ClCompile Include="..\src\resourceViewer\TreeInfoObject.cpp" />
+    <ClCompile Include="..\src\resourceViewer\TreeItemInfoWidget.cpp" />
+    <ClCompile Include="..\src\faceviewer\FaceViewer.cpp" />
+    <ClCompile Include="..\src\bmlcreator\AttributeWindow.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLAnimationObject.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLBodyObject.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLConstraintObject.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLCreatorWindow.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLEventObject.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLFaceObject.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLGazeObject.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLGestureObject.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLHeadObject.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLLocomotionObject.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLObject.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLReachObject.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLSaccadeObject.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLSpeechObject.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLStateObject.cpp" />
+    <ClCompile Include="..\src\glfont2.cpp" />
+    <ClCompile Include="..\src\pic.cpp" />
+    <ClCompile Include="..\src\ppm.cpp" />
+    <ClCompile Include="..\src\sbm_main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\CharacterCreatorWindow.h" />
+    <ClInclude Include="..\src\fltk_viewer.h" />
+    <ClInclude Include="..\src\FLTKListener.h" />
+    <ClInclude Include="..\src\ObjectManipulationHandle.h" />
+    <ClInclude Include="..\src\PawnPosControl.h" />
+    <ClInclude Include="..\src\PositionControl.h" />
+    <ClInclude Include="..\src\RootWindow.h" />
+    <ClInclude Include="..\src\RotationControl.h" />
+    <ClInclude Include="..\src\bmlviewer\BehaviorBlock.h" />
+    <ClInclude Include="..\src\bmlviewer\BehaviorEditorWidget.h" />
+    <ClInclude Include="..\src\bmlviewer\BehaviorWindow.h" />
+    <ClInclude Include="..\src\nle\NonLinearEditor.h" />
+    <ClInclude Include="..\src\nle\NonLinearEditorWidget.h" />
+    <ClInclude Include="..\src\panimationviewer\PanimationWindow.h" />
+    <ClInclude Include="..\src\panimationviewer\ParamAnimBlock.h" />
+    <ClInclude Include="..\src\panimationviewer\ParamAnimEditorWidget.h" />
+    <ClInclude Include="..\src\panimationviewer\ParamAnimRunTimeEditor.h" />
+    <ClInclude Include="..\src\panimationviewer\ParamAnimScriptEditor.h" />
+    <ClInclude Include="..\src\panimationviewer\ParamAnimStateEditor.h" />
+    <ClInclude Include="..\src\panimationviewer\ParamAnimTransitionEditor.h" />
+    <ClInclude Include="..\src\panimationviewer\Parameter3DVisualization.h" />
+    <ClInclude Include="..\src\panimationviewer\ParameterGroup.h" />
+    <ClInclude Include="..\src\panimationviewer\ParameterVisualization.h" />
+    <ClInclude Include="..\src\channelbufferviewer\channelbufferWindow.hpp" />
+    <ClInclude Include="..\src\channelbufferviewer\GlChartView.hpp" />
+    <ClInclude Include="..\src\channelbufferviewer\GlChartViewArchive.hpp" />
+    <ClInclude Include="..\src\channelbufferviewer\GlChartViewCoordinate.hpp" />
+    <ClInclude Include="..\src\CommandWindow.h" />
+    <ClInclude Include="..\src\resourceViewer\Fl_Tree_Horizontal.h" />
+    <ClInclude Include="..\src\resourceViewer\ResourceWindow.h" />
+    <ClInclude Include="..\src\resourceViewer\TreeInfoObject.h" />
+    <ClInclude Include="..\src\resourceViewer\TreeItemInfoWidget.h" />
+    <ClInclude Include="..\src\faceviewer\FaceViewer.h" />
+    <ClInclude Include="..\src\bmlcreator\AttributeWindow.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLAnimationObject.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLBodyObject.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLConstraintObject.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLCreatorWindow.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLEventObject.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLFaceObject.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLGazeObject.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLGestureObject.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLHeadObject.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLLocomotionObject.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLObject.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLReachObject.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLSaccadeObject.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLSpeechObject.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLStateObject.h" />
+    <ClInclude Include="..\src\glfont2.h" />
+    <ClInclude Include="..\src\pic.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\lib\bonebus\bonebus.vcxproj">
+      <Project>{bfc6e348-dbea-4118-94e6-bb7fcd8ec7f6}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\lib\vhmsg\vhmsg-c\vhmsg.vcxproj">
+      <Project>{49840c67-5a25-4d7a-af21-5976735f7d7d}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\lib\wsp\wsp\visualc9\wsp.vcxproj">
+      <Project>{3939e85d-f2b0-465a-8ef4-a33812d76aa0}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\smartbody-lib\visualc9\smartbody-lib.vcxproj">
+      <Project>{d41370b8-b1b9-430d-8813-c296d7935f2b}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

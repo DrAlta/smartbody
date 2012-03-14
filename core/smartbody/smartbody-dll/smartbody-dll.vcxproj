@@ -1,0 +1,272 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugFBX|Win32">
+      <Configuration>DebugFBX</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Lint|Win32">
+      <Configuration>Lint</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseFBX|Win32">
+      <Configuration>ReleaseFBX</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5C9A5F23-D57B-4B7A-A3E3-0489F9A4F147}</ProjectGuid>
+    <RootNamespace>smartbodydll</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">obj\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">obj\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">obj\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">obj\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">obj\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">obj\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">obj\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">obj\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.\include;..\smartbody-lib\src;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\sbm-debugger\lib;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python26\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>dDOUBLE;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;4239;4244;4512;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>smartbodyd.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc90-mt-gd-1_44.lib;boost_system-vc90-mt-gd-1_44.lib;boost_regex-vc90-mt-gd-1_44.lib;boost_python-vc90-mt-gd-1_44.lib;log4cxxd.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\smartbody-lib\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhcl\log4cxx\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;..\clapack\lib;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug;..\..\..\core\smartbody\ode\lib;..\..\..\core\smartbody\Python26\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>if not exist lib mkdir lib
+copy /Y "$(TargetPath)" lib
+copy /Y "$(OutDir)$(ProjectName)_d.lib" lib
+copy /Y "$(OutDir)$(ProjectName)_d.pdb" lib
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>.\include;..\smartbody-lib\src;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\sbm-debugger\lib;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python26\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;4239;4244;4512;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>smartbody.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc90-mt-1_44.lib;boost_system-vc90-mt-1_44.lib;boost_regex-vc90-mt-1_44.lib;boost_python-vc90-mt-1_44.lib;log4cxx.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\smartbody-lib\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhcl\log4cxx\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;..\..\..\lib\festival\festival\src\lib;..\..\..\lib\festival\speech_tools\lib;..\ode\lib;..\clapack\lib;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release;..\..\..\core\smartbody\Python26\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>if not exist lib mkdir lib
+copy /Y "$(TargetPath)" lib
+copy /Y "$(OutDir)$(ProjectName).lib" lib
+copy /Y "$(OutDir)$(ProjectName).pdb" lib
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'">
+    <Midl>
+      <TypeLibraryName>.\obj\sbm_release/sbm.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Command>if exist ..\..\..\tools\pc-lint\lint-post-build.bat call ..\..\..\tools\pc-lint\lint-post-build.bat ..\..\..\tools\pc-lint $(ProjectFileName)
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.\include;..\smartbody-lib\src;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\sbm-debugger\lib;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python26\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>dDOUBLE;ENABLE_FBX_PARSER;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;4239;4244;4512;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>smartbodyd.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc90-mt-gd-1_44.lib;boost_system-vc90-mt-gd-1_44.lib;boost_regex-vc90-mt-gd-1_44.lib;boost_python-vc90-mt-gd-1_44.lib;log4cxxd.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;wininet.lib;fbxsdk-2012.1-mdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName)_d.dll</OutputFile>
+      <AdditionalLibraryDirectories>..\smartbody-lib\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhcl\log4cxx\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;..\clapack\lib;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug;..\..\..\core\smartbody\ode\lib;..\..\..\core\smartbody\Python26\libs;..\..\..\lib\fbxsdk\lib\vs2008\x86;$(ProgramW6432)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86;$(FBXSDK)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>if not exist lib mkdir lib
+copy /Y "$(TargetPath)" lib
+copy /Y "$(OutDir)$(ProjectName)_d.lib" lib
+copy /Y "$(OutDir)$(ProjectName)_d.pdb" lib
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>.\include;..\smartbody-lib\src;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\sbm-debugger\lib;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python26\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>dDOUBLE;ENABLE_FBX_PARSER;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;4239;4244;4512;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>smartbody.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc90-mt-1_44.lib;boost_system-vc90-mt-1_44.lib;boost_regex-vc90-mt-1_44.lib;boost_python-vc90-mt-1_44.lib;log4cxx.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;wininet.lib;fbxsdk-2012.1-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\smartbody-lib\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhcl\log4cxx\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;..\ode\lib;..\clapack\lib;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release;..\..\..\core\smartbody\Python26\libs;..\..\..\lib\fbxsdk\lib\vs2008\x86;$(ProgramW6432)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86;$(FBXSDK)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>if not exist lib mkdir lib
+copy /Y "$(TargetPath)" lib
+copy /Y "$(OutDir)$(ProjectName).lib" lib
+copy /Y "$(OutDir)$(ProjectName).pdb" lib
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="smartbody-c-dll.cpp" />
+    <ClCompile Include="smartbody-dll.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\smartbody-c-dll.h" />
+    <ClInclude Include="include\smartbody-dll.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\smartbody-lib\visualc9\smartbody-lib.vcxproj">
+      <Project>{d41370b8-b1b9-430d-8813-c296d7935f2b}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
