@@ -449,7 +449,7 @@ int KNNInterpolator::linearKNN( const VecOfInterpExample& sampleList, const dVec
 	int nK = uKNN < sampleList.size() ? uKNN : sampleList.size();
 
 	outWeight.resize(nK+1);	
-	outWeight.assign(outWeight.size(),InterpWeight(-1,1e10));
+	outWeight.assign(outWeight.size(),InterpWeight(-1,1e10f));
 	int nCurK = 0;
 	for (size_t i=0;i<sampleList.size();i++)
 	{
