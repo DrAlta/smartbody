@@ -93,9 +93,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\lib\vhmsg\vhmsg-net\vhmsg-net.csproj">
+    <ProjectReference Include="..\..\lib\vhmsg\vhmsg-net\vhmsg-net-2008.csproj">
       <Project>{DE4240A9-DBBA-410F-888F-462384A5B280}</Project>
-      <Name>vhmsg-net</Name>
+      <Name>vhmsg-net-2008</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
