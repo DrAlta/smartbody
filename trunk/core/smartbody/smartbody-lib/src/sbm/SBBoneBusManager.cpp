@@ -67,6 +67,9 @@ void SBBoneBusManager::setEnable(bool val)
 void SBBoneBusManager::setHost(const std::string& host)
 {
 	_host = host;
+	SmartBody::StringAttribute* hostAttribute = dynamic_cast<SmartBody::StringAttribute*>(getAttribute("host"));
+	if (hostAttribute)
+		hostAttribute->setValueFast(host);
 }
 
 const std::string& SBBoneBusManager::getHost()

@@ -50,6 +50,6 @@ set_target_properties(
 
 install(
 	TARGETS ogreviewer
-	RUNTIME DESTINATION core/ogre-viewer/bin
+	RUNTIME DESTINATION core/ogre-viewer
 )
 	
