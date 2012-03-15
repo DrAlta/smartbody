@@ -261,6 +261,7 @@
     <ClCompile Include="..\src\sbm\Resource.cpp" />
     <ClCompile Include="..\src\sbm\resource_cmds.cpp" />
     <ClCompile Include="..\src\sbm\ResourceManager.cpp" />
+    <ClCompile Include="..\src\sbm\SBBoneBusManager.cpp" />
     <ClCompile Include="..\src\sbm\sbm_audio.cpp" />
     <ClCompile Include="..\src\sbm\sbm_character.cpp" />
     <ClCompile Include="..\src\sbm\sbm_deformable_mesh.cpp" />
@@ -707,6 +708,7 @@
     <ClInclude Include="..\src\sbm\Resource.h" />
     <ClInclude Include="..\src\sbm\resource_cmds.h" />
     <ClInclude Include="..\src\sbm\ResourceManager.h" />
+    <ClInclude Include="..\src\sbm\SBBoneBusManager.h" />
     <ClInclude Include="..\src\sbm\sbm_audio.h" />
     <ClInclude Include="..\src\sbm\sbm_character.hpp" />
     <ClInclude Include="..\src\sbm\sbm_constants.h" />

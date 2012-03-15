@@ -1170,6 +1170,7 @@
     <ClCompile Include="..\src\sbm\nvbg.cpp">
       <Filter>nvbg</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sbm\SBBoneBusManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\action_unit.hpp">
@@ -2213,6 +2214,7 @@
     <ClInclude Include="..\src\sbm\nvbg.h">
       <Filter>nvbg</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\sbm\SBBoneBusManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag">
