@@ -1138,7 +1138,7 @@ void mcuCBHandle::update( void )	{
 		SbmCharacter* char_p = getCharacter(pawn->getName().c_str() );
 		if (!char_p)
 		{
-			if (net_bone_updates)
+			if (_scene->getBoneBusManager()->isEnable())
 			{
 				if (!isClosingBoneBus && !pawn->bonebusCharacter && _scene->getBoneBusManager()->getBoneBus().IsOpen() && sendPawnUpdates)
 				{
@@ -1194,7 +1194,7 @@ void mcuCBHandle::update( void )	{
 
 			
 
-			if ( net_bone_updates && char_p->getSkeleton() && char_p->bonebusCharacter ) {
+			if ( _scene->getBoneBusManager()->isEnable() && char_p->getSkeleton() && char_p->bonebusCharacter ) {
 				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->getSkeleton(), &param_map );
 
 				if ( net_world_offset_updates ) {
@@ -2109,7 +2109,7 @@ int mcuCBHandle::registerCharacter(SbmCharacter* character)
 	}
 	character_map.insert(std::pair<std::string, SbmCharacter*>(character->getName(), character));
 
-	if (net_bone_updates)
+	if (_scene->getBoneBusManager()->isEnable())
 		_scene->getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), mcuCBHandle::singleton().net_face_bones );
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 		mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
