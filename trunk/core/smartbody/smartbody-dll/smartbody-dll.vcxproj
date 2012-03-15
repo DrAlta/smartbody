@@ -261,6 +261,10 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib
     <ClInclude Include="include\smartbody-dll.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\sbm-debugger\lib\SbmDebugger.vcxproj">
+      <Project>{776dde76-f251-46b4-8148-7b3c085fc26f}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\smartbody-lib\visualc9\smartbody-lib.vcxproj">
       <Project>{d41370b8-b1b9-430d-8813-c296d7935f2b}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
