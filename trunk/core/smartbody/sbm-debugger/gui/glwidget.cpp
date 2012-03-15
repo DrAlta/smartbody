@@ -499,8 +499,8 @@ void GLWidget::DrawScene()
 
 QMatrix4x4 GetLocalRotation(Joint* joint)
 {
-   QQuaternion locationRotation = QQuaternion(joint->rotOrig.w, joint->rotOrig.x, joint->rotOrig.y, joint->rotOrig.z) 
-      * QQuaternion(joint->rot.w, joint->rot.x, joint->rot.y, joint->rot.z);
+   QQuaternion locationRotation = /*QQuaternion(joint->rotOrig.w, joint->rotOrig.x, joint->rotOrig.y, joint->rotOrig.z) 
+      **/ QQuaternion(joint->rot.w, joint->rot.x, joint->rot.y, joint->rot.z);
 
    QMatrix4x4 mat;
    mat.setToIdentity();
@@ -582,6 +582,7 @@ void GLWidget::DrawPawn(const Pawn* pawn)
    QMatrix4x4 rotationMat = GetLocalRotation(pawn->m_joints[0]);
    glMultMatrixd(rotationMat.data());  
 
+   glColor3f(255, 0, 0);
    switch (pawn->m_shape)
    {
    case Box:
@@ -593,7 +594,7 @@ void GLWidget::DrawPawn(const Pawn* pawn)
       break;
 
    default:
-      DrawSphere(pawn->m_size);
+      DrawSphere(0.01f/*pawn->m_size*/);
       break;
    }
 
