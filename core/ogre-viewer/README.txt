@@ -23,7 +23,7 @@ greatly appreciated.
 
 For detailed documentation on the SmartBody project, please see the
 SmartBody website:
-  http://www.smartbody-anim.org/
+  http://smartbody.ict.usc.edu/
 
 
 SmartBody was built by University of Southern California's Institute for
