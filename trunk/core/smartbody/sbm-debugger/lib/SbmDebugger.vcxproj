@@ -86,6 +86,10 @@
     <ClInclude Include="SbmDebuggerCommon.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\lib\vhcl\vhcl.vcxproj">
+      <Project>{662cf3eb-b816-4727-9d1d-4071c25a3312}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\lib\vhmsg\vhmsg-c\vhmsg.vcxproj">
       <Project>{49840c67-5a25-4d7a-af21-5976735f7d7d}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
