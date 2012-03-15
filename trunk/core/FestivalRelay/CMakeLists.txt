@@ -1,11 +1,11 @@
-include_directories( ../../lib/festival/src/include )
-include_directories( ../../lib/festival/src/modules/VHDuration)
-include_directories( ../../lib/speech_tools/include )
+include_directories( ../../lib/festival/festival/src/include )
+include_directories( ../../lib/festival/festival/src/modules/VHDuration)
+include_directories( ../../lib/festival/speech_tools/include )
 
-find_library(FESTIVALLIB Festival ../../lib/festival/src/lib )
-find_library(ESTTOOLS estools ../../lib/speech_tools/lib )
-find_library(ESTSTRING eststring ../../lib/speech_tools/lib )
-find_library(ESTBASE estbase ../../lib/speech_tools/lib )
+find_library(FESTIVALLIB Festival ../../lib/festival/festival/src/lib )
+find_library(ESTTOOLS estools ../../lib/festival/speech_tools/lib )
+find_library(ESTSTRING eststring ../../lib/festival/speech_tools/lib )
+find_library(ESTBASE estbase ../../lib/festival/speech_tools/lib )
 
 add_executable( festivalrelay
 
