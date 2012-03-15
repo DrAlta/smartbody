@@ -229,7 +229,7 @@ mcuCBHandle::mcuCBHandle()
 	internal_profiler_p( NULL ),
 	external_profiler_p( NULL ),
 	profiler_p( NULL ),
-	net_bone_updates( true ),
+	net_bone_updates( false ),
 	net_world_offset_updates( true ),
 	net_face_bones( false ),
 	sbm_character_listener( NULL ),
@@ -318,7 +318,7 @@ void mcuCBHandle::reset( void )	{
 	// reset initial variables to match the constructor.
 	loop = true;
 	time = 0.0;
-	net_bone_updates = true;
+	net_bone_updates = false;
 	root_group_p = new SrSnGroup();
 	root_group_p->ref();
 	logger_p = new joint_logger::EvaluationLogger();
@@ -1184,6 +1184,14 @@ void mcuCBHandle::update( void )	{
 
 			char_p->forward_visemes( time );	
 			char_p->forward_parameters( time );	
+
+			if (char_p->bonebusCharacter && char_p->bonebusCharacter->GetNumErrors() > 3)
+			{
+				// connection is bad, remove the bonebus character
+				isClosingBoneBus = true;
+				LOG("BoneBus cannot connect to server after visemes sent. Removing all characters.");
+			}
+
 			
 
 			if ( net_bone_updates && char_p->getSkeleton() && char_p->bonebusCharacter ) {
