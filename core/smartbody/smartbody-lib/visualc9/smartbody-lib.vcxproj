@@ -1047,6 +1047,10 @@
       <Project>{3939e85d-f2b0-465a-8ef4-a33812d76aa0}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\..\sbm-debugger\lib\SbmDebugger.vcxproj">
+      <Project>{776dde76-f251-46b4-8148-7b3c085fc26f}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\..\steersuite-1.3\pprAI\build\win32\pprAI.vcxproj">
       <Project>{a8e03e2e-b9ae-4574-81a2-f661819322e1}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
