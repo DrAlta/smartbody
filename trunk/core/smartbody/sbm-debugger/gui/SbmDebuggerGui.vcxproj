@@ -132,6 +132,9 @@ copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" $(TargetDir)
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BmlCreatorDialog.cpp" />
+    <ClCompile Include="EntityCreatorDialog.cpp" />
+    <ClCompile Include="FaceDialog.cpp" />
     <ClCompile Include="moc_CommandDialog.cpp" />
     <ClCompile Include="moc_ConnectDialog.cpp" />
     <ClCompile Include="moc_DataViewerDialog.cpp" />
@@ -153,6 +156,9 @@ copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" $(TargetDir)
     <ClCompile Include="UtilsDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BmlCreatorDialog.h" />
+    <ClInclude Include="EntityCreatorDialog.h" />
+    <ClInclude Include="FaceDialog.h" />
     <ClInclude Include="ui_CommandDialog.h" />
     <ClInclude Include="ui_ConnectDialog.h" />
     <ClInclude Include="ui_DataViewerDialog.h" />
