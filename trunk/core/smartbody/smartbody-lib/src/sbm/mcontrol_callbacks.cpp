@@ -5937,7 +5937,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 						std::vector<float>& trajList = character->trajectoryGoalList;
 						std::vector<SrVec> trajPtList;
 						// add steering path
-						for (int i=0;i<trajList.size()/3;i++)
+						for (size_t i=0; i < trajList.size() / 3; i++)
 						{
 							SrVec trajPt = SrVec(trajList[i*3],trajList[i*3+1],trajList[i*3+2]);
 							trajPtList.push_back(trajPt);

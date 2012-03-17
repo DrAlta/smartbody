@@ -56,7 +56,7 @@ SrVec SteerPath::pathPoint( float length )
 {
 	float remain = length;
 	SrVec outPt;
-	for (int i=0;i<pathSegLength.size();i++)
+	for (size_t i=0; i < pathSegLength.size(); i++)
 	{
 		float pathSegLen = pathSegLength[i];
 		if (remain < pathSegLength[i])
@@ -77,7 +77,7 @@ float SteerPath::pathDistance( const SrVec& pt )
 	float minDist = FLT_MAX;
 	float totalSegDist = 0.f;
 	float outDist = 0.f;
-	for (int i=0;i<pathSegLength.size();i++)
+	for (size_t i=0; i < pathSegLength.size(); i++)
 	{
 		SrLine line(pathPts[i],pathPts[i+1]);
 		SrVec linePt = line.closestpt(pt);

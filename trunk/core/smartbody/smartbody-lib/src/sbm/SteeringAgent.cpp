@@ -490,9 +490,9 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 		command << " state " << locomotionName << " loop true playnow true";
 		mcu.execute((char*) command.str().c_str());           		
 		counter = 0;
-		float curSpeed;
-		float curTurningAngle;
-		float curScoot;
+//		float curSpeed;
+//		float curTurningAngle;
+//		float curScoot;
 		//curState->paramManager->getParameter(curSpeed, curTurningAngle, curScoot);
 		//curSpeed = 100;
 		//curState->paramManager->setWeight(curSpeed, curTurningAngle, curScoot);		
