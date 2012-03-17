@@ -26,6 +26,7 @@
 
 #include <sbm/sbm_character.hpp>
 #include <sbm/SteerSuiteEngineDriver.h>
+#include <sbm/SteerPath.h>
 
 class SteeringAgent
 {
@@ -60,6 +61,7 @@ class SteeringAgent
 		float evaluateExampleLoco(float x, float y, float z, float yaw);
 
 		float evaluateSteppingLoco(float x, float y, float z, float yaw);
+		void  evaluatePathFollowing(float x, float y, float z, float yaw);
 
 		void parameterTesting();
 		void cacheParameter(std::list<float>& sampleData, float data, int size);
@@ -98,6 +100,10 @@ class SteeringAgent
 		bool stepAdjust;
 		float pedMaxTurningRateMultiplier;
 
+
+		SrVec curSteerPos, curSteerDir, nextSteerDir, nextSteerPos, nextPtOnPath;
+
+
 		float newSpeed;
 		//----------------------------
 		// WJ added start
@@ -126,6 +132,7 @@ class SteeringAgent
 
 		// goal lists
 		std::list<float> goalList;
+		SteerPath        steerPath;
 
 		// low pass filter
 		int speedWindowSize;
@@ -147,6 +154,7 @@ class SteeringAgent
 
 		bool fastInitial;	// whether to use the transition animation
 		bool smoothing;
+		bool pathFollowing;
 
 		protected:
 		std::string lastMessage;

@@ -106,10 +106,6 @@
 //#define DEFAULT_SEQUENCE_FILE		("ELITE-all.seq")
 #define DEFAULT_SEQUENCE_FILE		("default.seq")
 #define DEFAULT_PY_FILE				("default-init.py")
-//#define DEFAULT_PY_FILE				("default-init-collada.py")
-//#define DEFAULT_PY_FILE				("default-init-collada-2.py")
-//#define DEFAULT_PY_FILE				("default-init-reach.py")
-//#define DEFAULT_PY_FILE				("default-init-physics.py")
 
 ///////////////////////////////////////////////////////////////////////////////////
 

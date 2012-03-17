@@ -1321,6 +1321,8 @@ void FltkViewer::draw()
 	//	   initGridList();
 	drawGrid();
 
+	drawSteeringInfo();
+
 	drawEyeBeams();
 	drawEyeLids();
 	drawDynamics();
@@ -1335,7 +1337,7 @@ void FltkViewer::draw()
 	_objManipulator.draw(cam);
 	// feng : debugging draw for reach controller
 	drawReach();
-	drawSteeringInfo();
+	
 
 
 	_data->fcounter.stop();
@@ -3664,8 +3666,10 @@ void FltkViewer::drawLocomotion()
 			SrMat baseGM = baseJ->gmat();
 			SrVec baseVec = SrVec(baseGM.get(12), baseGM.get(13), baseGM.get(14));
 			if (character->trajectoryBuffer.size() >= SbmCharacter::trajectoryLength)
-				character->trajectoryBuffer.pop_front();
-			character->trajectoryBuffer.push_back(baseVec);
+				character->trajectoryBuffer.pop_front();			
+			SrVec prevBaseVec = character->trajectoryBuffer.back();
+			if ((baseVec-prevBaseVec).len() > character->getHeight()*0.01f)
+				character->trajectoryBuffer.push_back(baseVec);
 			std::list<SrVec>::iterator iter = character->trajectoryBuffer.begin();
 			glColor3f(1.0f, 1.0f, 0.0f);
 			glBegin(GL_LINES);
@@ -3675,22 +3679,39 @@ void FltkViewer::drawLocomotion()
 				iter1++;
 				if (iter1 != character->trajectoryBuffer.end())
 				{
-					glVertex3f(iter->x, 0.2f, iter->z);
-					glVertex3f(iter1->x, 0.2f, iter1->z);
+					glVertex3f(iter->x, 0.5f, iter->z);
+					glVertex3f(iter1->x, 0.5f, iter1->z);
 				}
 			}
 			glEnd();
 
 			glColor3f(1.0f, 0.0f, 0.0f);
 			glBegin(GL_LINES);
-			int num = int(character->tranjectoryGoalList.size() / 3) - 1;
+			int num = int(character->trajectoryGoalList.size() / 3) - 1;
 			if (num >= 1)
 				for (int i = 0; i < num; i++)
 				{
-					glVertex3f(character->tranjectoryGoalList[(size_t)i * 3 + 0], 0.2f, character->tranjectoryGoalList[(size_t)i * 3 + 2]);
-					glVertex3f(character->tranjectoryGoalList[((size_t)i + 1) * 3 + 0], 0.2f, character->tranjectoryGoalList[((size_t)i + 1) * 3 + 2]);
+					glVertex3f(character->trajectoryGoalList[(size_t)i * 3 + 0], 0.5f, character->trajectoryGoalList[(size_t)i * 3 + 2]);
+					glVertex3f(character->trajectoryGoalList[((size_t)i + 1) * 3 + 0], 0.5f, character->trajectoryGoalList[((size_t)i + 1) * 3 + 2]);
 				}
 			glEnd();
+			glEnable(GL_LIGHTING);
+
+			glDisable(GL_LIGHTING);
+			if (character->steeringAgent)
+			{
+				SteeringAgent* agent = character->steeringAgent;
+
+				SrVec color1(0.1f, 0.3f, 1.0f);
+				drawArrow(agent->curSteerPos, agent->curSteerPos+agent->curSteerDir*50, 15, color1);
+
+				SrVec color2(0.f,1.f,0.f);
+				drawCircle(agent->nextSteerPos.x,agent->nextSteerPos.y,agent->nextSteerPos.z, 30, 72, color2);
+				drawArrow(agent->nextSteerPos, agent->nextSteerPos+agent->nextSteerDir*50, 15, color2);
+
+				SrVec color3(1.f,0.f,0.f);
+				drawCircle(agent->nextPtOnPath.x, agent->nextPtOnPath.y, agent->nextPtOnPath.z, 30, 72, color3);											
+			}
 			glEnable(GL_LIGHTING);
 		}
 	}

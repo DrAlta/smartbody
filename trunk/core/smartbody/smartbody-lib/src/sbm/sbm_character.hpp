@@ -99,7 +99,7 @@ class SbmCharacter : public SmartBody::SBPawn	{
 	// Locomotion + steering
 public:
 	std::list<SrVec> trajectoryBuffer;
-	std::vector<float> tranjectoryGoalList;
+	std::vector<float> trajectoryGoalList;
 	static const int trajectoryLength = 1000;
 	SteeringAgent* steeringAgent;
 	int	_numSteeringGoal;
