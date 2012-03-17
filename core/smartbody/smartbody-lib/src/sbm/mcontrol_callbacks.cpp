@@ -5900,13 +5900,15 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				{
 					if (character->steeringAgent)
 					{
-						character->tranjectoryGoalList.clear();
+						character->trajectoryGoalList.clear();
+						SteerPath& steerPath = character->steeringAgent->steerPath;
+						float pathRadius = 1.f;												
 						float x, y, z;
 						float yaw, pitch, roll;
 						character->get_world_offset(x, y, z, yaw, pitch, roll);
-						character->tranjectoryGoalList.push_back(x);
-						character->tranjectoryGoalList.push_back(y);
-						character->tranjectoryGoalList.push_back(z);
+						character->trajectoryGoalList.push_back(x);
+						character->trajectoryGoalList.push_back(y);
+						character->trajectoryGoalList.push_back(z);
 
 						if (mode == "normal")
 						{
@@ -5917,7 +5919,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 							{
 								float v = args.read_float();
 								character->steeringAgent->goalList.push_back(v);
-								character->tranjectoryGoalList.push_back(v);
+								character->trajectoryGoalList.push_back(v);
 							}
 						}
 						else if (mode == "additive")
@@ -5926,11 +5928,22 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 							{
 								float v = args.read_float();
 								character->steeringAgent->goalList.push_back(v);
-								character->tranjectoryGoalList.push_back(v);
+								character->trajectoryGoalList.push_back(v);
 							}
 						}
 						else
 							LOG("steer move mode not recognized!");
+
+						std::vector<float>& trajList = character->trajectoryGoalList;
+						std::vector<SrVec> trajPtList;
+						// add steering path
+						for (int i=0;i<trajList.size()/3;i++)
+						{
+							SrVec trajPt = SrVec(trajList[i*3],trajList[i*3+1],trajList[i*3+2]);
+							trajPtList.push_back(trajPt);
+						}
+						steerPath.clearPath();
+						steerPath.initPath(trajPtList,pathRadius);
 					}
 				}
 			}

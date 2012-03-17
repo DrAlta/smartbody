@@ -847,6 +847,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\sbm\SteerPath.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\SteerPath.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\sbm\SteerSuiteEngineDriver.h"
 					>
 				</File>

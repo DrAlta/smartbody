@@ -177,7 +177,8 @@ SrPnt SrLine::closestpt ( SrPnt p, float* k ) const
                ( (p.y-p1.y) * (v.y) ) +
                ( (p.z-p1.z) * (v.z) ) ) / ( v.norm2() );
  
-   //if( u<0.0f || u>1.0f ) // closest point does not fall within the line segment
+   if( u<0.0f) u = 0.f;
+   if (u>1.f ) u = 1.f; // closest point does not fall within the line segment
    if ( k ) *k=u;
    
    return p1 + u*v;
