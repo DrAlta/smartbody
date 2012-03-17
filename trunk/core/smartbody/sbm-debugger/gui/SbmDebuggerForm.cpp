@@ -50,7 +50,6 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
   ui.sceneDockWidget->setBaseSize(220, 767);
   ui.sceneTree->insertTopLevelItem(Characters, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Characters"))));
   ui.sceneTree->insertTopLevelItem(Pawns, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Pawns"))));
-  //ui.sceneTree->setHeaderLabel(QString("Entities"));
 
   QStringList headers;
   headers.append("Entities");
@@ -217,6 +216,10 @@ void SbmDebuggerForm::Disconnect()
 {
    ui.actionDisconnect->setEnabled(false);
 
+   ui.sceneTree->clear();
+   ui.sceneTree->insertTopLevelItem(Characters, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Characters"))));
+   ui.sceneTree->insertTopLevelItem(Pawns, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Pawns"))));
+   
    c.Disconnect();
 }
 

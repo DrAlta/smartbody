@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'UtilsDialog.h'
 **
-** Created: Mon Mar 12 10:28:20 2012
-**      by: The Qt Meta Object Compiler version 62 (Qt 4.7.4)
+** Created: Fri Mar 16 17:54:30 2012
+**      by: The Qt Meta Object Compiler version 63 (Qt 4.8.0)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -10,8 +10,8 @@
 #include "UtilsDialog.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'UtilsDialog.h' doesn't include <QObject>."
-#elif Q_MOC_OUTPUT_REVISION != 62
-#error "This file was generated using the moc from 4.7.4. It"
+#elif Q_MOC_OUTPUT_REVISION != 63
+#error "This file was generated using the moc from 4.8.0. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -20,7 +20,7 @@ QT_BEGIN_MOC_NAMESPACE
 static const uint qt_meta_data_UtilsDialog[] = {
 
  // content:
-       5,       // revision
+       6,       // revision
        0,       // classname
        0,    0, // classinfo
        7,   14, // methods
@@ -49,9 +49,32 @@ static const char qt_meta_stringdata_UtilsDialog[] = {
     "FilterAnims()\0Refresh()\0"
 };
 
+void UtilsDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        Q_ASSERT(staticMetaObject.cast(_o));
+        UtilsDialog *_t = static_cast<UtilsDialog *>(_o);
+        switch (_id) {
+        case 0: _t->GazeAtPressed(); break;
+        case 1: _t->RunBmlPressed(); break;
+        case 2: _t->PlayAnimPressed(); break;
+        case 3: _t->SpeakButtonPressed(); break;
+        case 4: _t->QueryAnimsPressed(); break;
+        case 5: _t->FilterAnims(); break;
+        case 6: _t->Refresh(); break;
+        default: ;
+        }
+    }
+    Q_UNUSED(_a);
+}
+
+const QMetaObjectExtraData UtilsDialog::staticMetaObjectExtraData = {
+    0,  qt_static_metacall 
+};
+
 const QMetaObject UtilsDialog::staticMetaObject = {
     { &QDialog::staticMetaObject, qt_meta_stringdata_UtilsDialog,
-      qt_meta_data_UtilsDialog, 0 }
+      qt_meta_data_UtilsDialog, &staticMetaObjectExtraData }
 };
 
 #ifdef Q_NO_DATA_RELOCATION
@@ -77,16 +100,8 @@ int UtilsDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        switch (_id) {
-        case 0: GazeAtPressed(); break;
-        case 1: RunBmlPressed(); break;
-        case 2: PlayAnimPressed(); break;
-        case 3: SpeakButtonPressed(); break;
-        case 4: QueryAnimsPressed(); break;
-        case 5: FilterAnims(); break;
-        case 6: Refresh(); break;
-        default: ;
-        }
+        if (_id < 7)
+            qt_static_metacall(this, _c, _id, _a);
         _id -= 7;
     }
     return _id;
