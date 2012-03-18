@@ -1,4 +1,5 @@
 include_directories( "." )
+include_directories( "/home/shapiro/smartbody/trunk/core/smartbody/sbm-debugger/lib" )
 include_directories( "/home/shapiro/smartbody/trunk/lib/festival/src/include" )
 include_directories( "/home/shapiro/smartbody/trunk/lib/festival/src/modules/VHDuration" )
 include_directories( "/home/shapiro/smartbody/trunk/lib/speech_tools/include" )
@@ -379,6 +380,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/MiniBrain.cpp
 	sbm/SBBehavior.cpp
 	sbm/SbmDebuggerServer.cpp
+	sbm/SteerPath.cpp
 
 )
 

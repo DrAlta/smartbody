@@ -3703,11 +3703,13 @@ void FltkViewer::drawLocomotion()
 				SteeringAgent* agent = character->steeringAgent;
 
 				SrVec color1(0.1f, 0.3f, 1.0f);
-				drawArrow(agent->curSteerPos, agent->curSteerPos+agent->curSteerDir*50, 15, color1);
+				SrVec steerDir = agent->curSteerPos + agent->curSteerDir * 50;
+				drawArrow(agent->curSteerPos, steerDir, 15, color1);
 
 				SrVec color2(0.f,1.f,0.f);
 				drawCircle(agent->nextSteerPos.x,agent->nextSteerPos.y,agent->nextSteerPos.z, 30, 72, color2);
-				drawArrow(agent->nextSteerPos, agent->nextSteerPos+agent->nextSteerDir*50, 15, color2);
+				SrVec nextSteerPos = agent->nextSteerPos + agent->nextSteerDir * 50;
+				drawArrow(agent->nextSteerPos, nextSteerPos, 15, color2);
 
 				SrVec color3(1.f,0.f,0.f);
 				drawCircle(agent->nextPtOnPath.x, agent->nextPtOnPath.y, agent->nextPtOnPath.z, 30, 72, color3);											
