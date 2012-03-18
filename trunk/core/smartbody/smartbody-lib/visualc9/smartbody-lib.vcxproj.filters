@@ -1171,6 +1171,9 @@
       <Filter>nvbg</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\SBBoneBusManager.cpp" />
+    <ClCompile Include="..\src\sbm\SteerPath.cpp">
+      <Filter>sbm\steering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\action_unit.hpp">
@@ -2215,6 +2218,9 @@
       <Filter>nvbg</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\SBBoneBusManager.h" />
+    <ClInclude Include="..\src\sbm\SteerPath.h">
+      <Filter>sbm\steering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag">

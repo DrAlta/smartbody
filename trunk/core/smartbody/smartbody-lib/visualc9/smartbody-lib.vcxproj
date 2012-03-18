@@ -278,6 +278,7 @@
     <ClCompile Include="..\src\sbm\sr_path_list.cpp" />
     <ClCompile Include="..\src\sbm\sr_spline_curve.cpp" />
     <ClCompile Include="..\src\sbm\sr_synch_points.cpp" />
+    <ClCompile Include="..\src\sbm\SteerPath.cpp" />
     <ClCompile Include="..\src\sbm\text_speech.cpp" />
     <ClCompile Include="..\src\sbm\time_profiler.cpp" />
     <ClCompile Include="..\src\sbm\time_regulator.cpp" />
@@ -728,6 +729,7 @@
     <ClInclude Include="..\src\sbm\sr_path_list.h" />
     <ClInclude Include="..\src\sbm\sr_spline_curve.h" />
     <ClInclude Include="..\src\sbm\sr_synch_points.h" />
+    <ClInclude Include="..\src\sbm\SteerPath.h" />
     <ClInclude Include="..\src\sbm\text_speech.h" />
     <ClInclude Include="..\src\sbm\time_profiler.h" />
     <ClInclude Include="..\src\sbm\time_regulator.h" />
