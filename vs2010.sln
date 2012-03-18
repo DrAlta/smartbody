@@ -90,6 +90,7 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9E9B80AE-5A0E-45CB-9E88-1734F2527D5E}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{9E9B80AE-5A0E-45CB-9E88-1734F2527D5E}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{9E9B80AE-5A0E-45CB-9E88-1734F2527D5E}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{9E9B80AE-5A0E-45CB-9E88-1734F2527D5E}.Debug|Win32.ActiveCfg = Debug|Win32
 		{9E9B80AE-5A0E-45CB-9E88-1734F2527D5E}.Debug|Win32.Build.0 = Debug|Win32
 		{9E9B80AE-5A0E-45CB-9E88-1734F2527D5E}.Debug|x64.ActiveCfg = Debug|x64
@@ -130,6 +131,7 @@ Global
 		{9E9B80AE-5A0E-45CB-9E88-1734F2527D5E}.ReleaseFBX|x86.ActiveCfg = Release|x64
 		{1532040E-331E-41E4-989D-87EC4C8E57D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1532040E-331E-41E4-989D-87EC4C8E57D3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1532040E-331E-41E4-989D-87EC4C8E57D3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{1532040E-331E-41E4-989D-87EC4C8E57D3}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{1532040E-331E-41E4-989D-87EC4C8E57D3}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{1532040E-331E-41E4-989D-87EC4C8E57D3}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -163,6 +165,7 @@ Global
 		{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -923,6 +926,7 @@ Global
 		{3E31370E-CC73-4741-93A3-4009EB972A2C}.Lint|x86.ActiveCfg = Release|Win32
 		{3E31370E-CC73-4741-93A3-4009EB972A2C}.Release|Any CPU.ActiveCfg = Release|Win32
 		{3E31370E-CC73-4741-93A3-4009EB972A2C}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{3E31370E-CC73-4741-93A3-4009EB972A2C}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{3E31370E-CC73-4741-93A3-4009EB972A2C}.Release|Win32.ActiveCfg = Release|Win32
 		{3E31370E-CC73-4741-93A3-4009EB972A2C}.Release|Win32.Build.0 = Release|Win32
 		{3E31370E-CC73-4741-93A3-4009EB972A2C}.Release|x64.ActiveCfg = Release|Win32
