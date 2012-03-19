@@ -116,7 +116,7 @@ void RecFileWriter::startRecording(unsigned int numAgents, const std::string & f
 	assert(_playbackFile.tellp()%4 == 0);
 
 
-	_header->firstFrameOffset = _playbackFile.tellp();
+	_header->firstFrameOffset = (unsigned int)_playbackFile.tellp();
 
 	// the rest of the header variables are unknown until after we know the number of frames.
 	_header->numFrames = 0;
@@ -164,13 +164,13 @@ void RecFileWriter::finishRecording()
 	//
 	// write the camera list, obstacle list, and frame table at the end of the file
 	//
-	_header->cameraListOffset = _playbackFile.tellp();
+	_header->cameraListOffset = (unsigned int)_playbackFile.tellp();
 	if (_header->cameraListSize != 0) _playbackFile.write((char*)(&(_cameraList[0])), _header->cameraListSize);
 
-	_header->obstacleListOffset = _playbackFile.tellp();
+	_header->obstacleListOffset = (unsigned int)_playbackFile.tellp();
 	if (_header->obstacleListSize != 0) _playbackFile.write((char*)(&(_obstacleList[0])), _header->obstacleListSize);
 
-	_header->frameTableOffset = _playbackFile.tellp();
+	_header->frameTableOffset = (unsigned int)_playbackFile.tellp();
 	_playbackFile.write((char*)(&(_frameTable[0])), _header->frameTableSize);
 
 	//
@@ -234,7 +234,7 @@ void RecFileWriter::startFrame( float timeStamp, float timePassedSinceLastFrame 
 	//
 	RecFileFrameInfo currentFrame;
 	currentFrame.timeStamp = timeStamp;
-	currentFrame.frameOffset = _playbackFile.tellp();
+	currentFrame.frameOffset = (unsigned int)_playbackFile.tellp();
 	currentFrame.dtToNextFrame = 0.0f; // unknown until the next frame is started;  for the very last frame, this remains 0.0.
 
 	//
