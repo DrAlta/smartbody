@@ -1,6 +1,7 @@
 #include "SteerPath.h"
 #include <sr/sr_line.h>
 #include <float.h>
+#include <math.h>
 
 SteerPath::SteerPath(void)
 {
@@ -27,6 +28,8 @@ void SteerPath::initPath( std::vector<SrPnt>& pts, float radius )
 void SteerPath::clearPath()
 {
 	pathPts.clear();
+	pathSegLength.clear();
+	pathSegDir.clear();
 	pathRadius = 0.f;
 }
 
@@ -52,14 +55,38 @@ SrVec SteerPath::closestPointOnPath( const SrVec& pt, SrVec& tangent, float& dis
 	return closePt;
 }
 
+SrVec SteerPath::pathTangent( float length )
+{
+	float remain = length;
+	if (remain > pathLength())
+		remain = pathLength() - 0.01f;	
+	SrVec outDir;
+	for (int i=0;i<pathSegLength.size();i++)
+	{
+		float pathSegLen = pathSegLength[i];
+		if (remain <= pathSegLength[i])
+		{
+			outDir = pathSegDir[i];
+			break;
+		}
+		else
+		{
+			remain -= pathSegLength[i];
+		}
+	}
+	return outDir;
+}
+
 SrVec SteerPath::pathPoint( float length )
 {
 	float remain = length;
+	if (remain > pathLength())
+		remain = pathLength() - 0.01f;
 	SrVec outPt;
 	for (size_t i=0; i < pathSegLength.size(); i++)
 	{
 		float pathSegLen = pathSegLength[i];
-		if (remain < pathSegLength[i])
+		if (remain <= pathSegLength[i])
 		{
 			outPt = pathPts[i] + pathSegDir[i]*remain;
 			break;
@@ -71,6 +98,8 @@ SrVec SteerPath::pathPoint( float length )
 	}
 	return outPt;
 }
+
+
 
 float SteerPath::pathDistance( const SrVec& pt )
 {
@@ -91,4 +120,23 @@ float SteerPath::pathDistance( const SrVec& pt )
 		totalSegDist += pathSegLength[i];
 	}
 	return outDist;
+}
+
+float SteerPath::pathLength()
+{
+	float totalLength = 0.f;
+	for (int i=0;i<pathSegLength.size();i++)
+	{
+		totalLength += pathSegLength[i];
+	}
+	return totalLength;
+}
+
+float SteerPath::pathCurvature( float start, float end )
+{
+	SrVec dir1 = pathTangent(start);
+	SrVec dir2 = pathTangent(end);
+	float dotValue = dot(dir1,dir2);
+	if (dotValue > 1) dotValue = 1; if (dotValue < -1) dotValue = -1;
+	return fabs(acos(dotValue));	
 }

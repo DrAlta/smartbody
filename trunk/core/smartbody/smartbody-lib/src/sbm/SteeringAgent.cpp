@@ -24,6 +24,7 @@
 #include "SteeringAgent.h"
 #include <sbm/mcontrol_util.h>
 #include <sbm/SBScene.h>
+#include <sbm/SBPythonClass.h>
 #include <sbm/me_ct_param_animation_data.h>
 #define DebugInfo 0
 #define FastStart 1
@@ -118,6 +119,12 @@ void SteeringAgent::addSteeringAttributes()
 	if (!character->hasAttribute("steering.desiredSpeed"))
 		character->createDoubleAttribute("steering.desiredSpeed", 1.0f, true, "steering", 310, false, false, false, ""); 
 
+	if (!character->hasAttribute("steering.pathMaxSpeed"))
+		character->createDoubleAttribute("steering.pathMaxSpeed", 0.5f, true, "steering", 310, false, false, false, "");
+
+	if (!character->hasAttribute("steering.pathMinSpeed"))
+		character->createDoubleAttribute("steering.pathMinSpeed", 0.2f, true, "steering", 310, false, false, false, "");
+	
 	if (!character->hasAttribute("steering.facingAngle"))
 		character->createDoubleAttribute("steering.facingAngle", -200.f, true, "steering", 330, false, false, false, ""); 
 	
@@ -140,7 +147,7 @@ void SteeringAgent::addSteeringAttributes()
 		character->createBoolAttribute("steering.smoothing", true, true, "steering", 390, false, false, false, ""); 
 
 	if (!character->hasAttribute("steering.pathFollowingMode"))
-		character->createBoolAttribute("steering.pathFollowingMode", true, true, "steering", 390, false, false, false, "");
+		character->createBoolAttribute("steering.pathFollowingMode", false, true, "steering", 390, false, false, false, "");
 
 	if (!character->hasAttribute("steering.speedWindowSize"))
 		character->createIntAttribute("steering.speedWindowSize", 10, true, "steering", 400, false, false, false, ""); 
@@ -262,7 +269,7 @@ void SteeringAgent::initSteerParams()
 	if (character && character->hasAttribute("steering.pathFollowingMode"))
 		pathFollowing = character->getBoolAttribute("steering.pathFollowingMode");
 	else
-		pathFollowing = true;
+		pathFollowing = false;
 	
 	if (character && character->hasAttribute("steering.speedWindowSize"))
 		speedWindowSize = character->getIntAttribute("steering.speedWindowSize");
@@ -283,6 +290,7 @@ void SteeringAgent::initSteerParams()
 		pedMaxTurningRateMultiplier = (float) character->getDoubleAttribute("steering.pedMaxTurningRateMultiplier");
 	else
 		pedMaxTurningRateMultiplier = 20.f;
+
 
 	setSteerParamsDirty(false);
 
@@ -446,8 +454,8 @@ void SteeringAgent::evaluate()
 		if (!character->param_animation_ct)
 			return;
 
-		//if (!pathFollowing)
-		if (1)
+		if (!pathFollowing)
+		//if (1)
 		{
 			newSpeed = evaluateExampleLoco(x, y, z, yaw);
 		}
@@ -479,9 +487,9 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 	const std::string& curStateName = character->param_animation_ct->getCurrentStateName();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
 	bool locomotionEnd = false;
-	static int counter = 0;	
+	static int counter = 0;		
 	
-	if (character->param_animation_ct->isIdle() && character->trajectoryGoalList.size() > 0)    // need to define when you want to start the locomotion
+	if (character->param_animation_ct->isIdle() && steerPath.pathLength() > 0)    // need to define when you want to start the locomotion
 	{
 		PAStateData* locoState = mcu.lookUpPAState(locomotionName.c_str());
 		locoState->paramManager->setWeight(0, 0, 0);
@@ -493,6 +501,7 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 //		float curSpeed;
 //		float curTurningAngle;
 //		float curScoot;
+		//locomotionEnd = false;
 		//curState->paramManager->getParameter(curSpeed, curTurningAngle, curScoot);
 		//curSpeed = 100;
 		//curState->paramManager->setWeight(curSpeed, curTurningAngle, curScoot);		
@@ -511,27 +520,49 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 		SrMat rotMat; rotMat.roty(curTurningAngle*dt);
 		nextSteerDir = curSteerDir*rotMat;
 		float radius = fabs(curSpeed/curTurningAngle);
-		nextSteerPos = curSteerPos + curSteerDir*curSpeed*dt;//curSteerPos - curSteerDir*radius + nextSteerDir*radius; //
+		nextSteerPos = curSteerPos;// + curSteerDir*curSpeed*dt;//curSteerPos - curSteerDir*radius + nextSteerDir*radius; //
 		//SrVec nextPos = curPos + (curDir+nextDir)*0.5f*curSpeed*dt;
 		SrVec pathDir;
 		float pathDist;
 		nextPtOnPath = steerPath.closestPointOnPath(nextSteerPos,pathDir,pathDist);
+		float distOnPath = steerPath.pathDistance(nextPtOnPath);
+		nextPtOnPath = steerPath.pathPoint(distOnPath+curSpeed*dt*80.f);
 		SrVec ptDir = nextPtOnPath - curSteerPos; ptDir.normalize();
 		
-		
-		
+		float sceneScale = 1.f/getScene()->getScale();
+		float maxSpeed = character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
+		float minSpeed = character->getDoubleAttribute("steering.pathMinSpeed")*sceneScale;
+		float detectSeg = maxSpeed;
+		const float maxAcc = (maxSpeed-minSpeed)/2.f;
+
+		float pathCurvature = steerPath.pathCurvature(distOnPath-detectSeg*0.2f,distOnPath+detectSeg*0.8f)*2.0f;
+		if (pathCurvature > M_PI) pathCurvature = M_PI;
+		static int counter = 0;		
+		float curvSpeed = (1.f - pathCurvature/M_PI)*(maxSpeed-minSpeed) + minSpeed;
+		float acc = (curSpeed > curvSpeed) ? -maxAcc : maxAcc;
 		// do whatever you need to calculate
- 		float newSpeed =50.f;
+ 		float newSpeed = curSpeed + acc*dt; 
+
+		float distToTarget = (curSteerPos - steerPath.pathPoint(steerPath.pathLength()-0.01f)).len();		
+		if (distToTarget < curSpeed * brakingGain ) // if close to target, slow down directly
+			newSpeed = distToTarget / brakingGain;
+		
+		
+		if (distToTarget < 5.f && newSpeed < 5.f)
+			locomotionEnd = true;
+
+		if (counter > 100)
+		{
+			counter = 0;
+			LOG("path curvature = %f, curveSpeed = %f, newSpeed = %f, distToTarget = %f",pathCurvature,curvSpeed,newSpeed,distToTarget);			
+		}
+		counter++;
+
 		float newTurningAngle = asin(cross(curSteerDir,ptDir).y)/dt;
 		float newScoot =0.f;
 		// update locomotion state
 		curState->paramManager->setWeight(newSpeed, newTurningAngle, newScoot);
-		character->param_animation_ct->updateWeights();
-		counter++;
-		if (counter > 10000)
-		{
-			locomotionEnd = true;
-		}
+		character->param_animation_ct->updateWeights();		
 	}
 	if (locomotionEnd)      // need to define when you want to end the locomotion
 	{
@@ -539,6 +570,7 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 		character->trajectoryGoalList.clear();
 		agent->clearGoals();
 		goalList.clear();
+		steerPath.clearPath();		
 	}
 }
 
