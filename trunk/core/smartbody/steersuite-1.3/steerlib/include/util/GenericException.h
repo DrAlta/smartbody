@@ -47,7 +47,7 @@ namespace Util {
 	 *  - The toString() helper function converts other data types into strings, nice for dynamic helpful
 	 *    error messages.
 	 */
-	class UTIL_API GenericException : public std::exception
+	class GenericException : public std::exception
 	{
 	public:
 		/// When throwing the exception, a useful error message must be specified.
