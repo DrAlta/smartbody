@@ -73,15 +73,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\obj\sbm-lib_debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\lib\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\obj\sbm-lib_debug\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\obj\sbm-lib_release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\lib\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\obj\sbm-lib_release\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'">$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'">$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">.\obj\sbm-lib_debugfbx\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">..\lib\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">.\obj\sbm-lib_debugfbx\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">.\obj\sbm-lib_releasefbx\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">..\lib\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">.\obj\sbm-lib_releasefbx\</IntDir>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" />
@@ -95,6 +95,10 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Smartbodyd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">Smartbodyd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Smartbody</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">Smartbody</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -122,7 +126,6 @@
     </ResourceCompile>
     <Lib>
       <AdditionalDependencies>glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\lib\Smartbodyd.lib</OutputFile>
       <AdditionalLibraryDirectories>..\..\clapack\lib;..\..\ode\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -156,7 +159,6 @@
     </ResourceCompile>
     <Lib>
       <AdditionalDependencies>glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\lib\Smartbody.lib</OutputFile>
       <AdditionalLibraryDirectories>..\..\clapack\lib;..\..\ode\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -197,7 +199,6 @@
     </ResourceCompile>
     <Lib>
       <AdditionalDependencies>glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\lib\Smartbodyd.lib</OutputFile>
       <AdditionalLibraryDirectories>..\..\clapack\lib;..\..\ode\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -231,7 +232,6 @@
     </ResourceCompile>
     <Lib>
       <AdditionalDependencies>glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\lib\Smartbody.lib</OutputFile>
       <AdditionalLibraryDirectories>..\..\clapack\lib;..\..\ode\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
