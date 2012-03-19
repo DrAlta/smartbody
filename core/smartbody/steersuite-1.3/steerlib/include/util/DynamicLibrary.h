@@ -27,7 +27,7 @@ namespace Util {
      * This class wraps Windows and Linux dynamic library functionality so that it is works the same on both platforms.
      *
      */
-    class UTIL_API DynamicLibrary
+    class DynamicLibrary
 	{
 	public:
 	    DynamicLibrary();

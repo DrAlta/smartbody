@@ -30,7 +30,7 @@ namespace Util {
 	 * are done.
 	 *
 	 */
-	class UTIL_API MemoryMapper {
+	class MemoryMapper {
 	public:
 		MemoryMapper();
 		~MemoryMapper();
