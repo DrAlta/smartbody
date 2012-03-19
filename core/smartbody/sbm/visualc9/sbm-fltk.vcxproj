@@ -77,18 +77,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\obj\sbm_debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\obj\sbm_debug\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\obj\sbm_release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\bin\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\obj\sbm_release\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'">$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'">$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">.\obj\sbm_debugfbx\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">..\bin\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">.\obj\sbm_debugfbx\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">.\obj\sbm_releasefbx\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">..\bin\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">.\obj\sbm_releasefbx\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">false</LinkIncremental>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
@@ -103,6 +103,10 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sbm-fltkd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">sbm-fltkd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sbm-fltk</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">sbm-fltk</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -133,7 +137,6 @@
     <Link>
       <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>Smartbodyd.lib;SbmDebugger.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc100-mt-gd-1_44.lib;boost_system-vc100-mt-gd-1_44.lib;boost_regex-vc100-mt-gd-1_44.lib;boost_python-vc100-mt-gd-1_44.lib;log4cxxd.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;fltkgld.lib;fltkd.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAId.lib;steerlibd.lib;ode_doubled.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\bin\sbm-fltkd.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\smartbody-lib\lib;..\..\sbm-debugger\lib\Debug;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk-1.3.0rc6\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\sbm-ui\panimationviewer\lib;..\..\sbm-ui\bmlviewer\lib;..\..\ode\lib;..\..\clapack\lib;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug;..\..\..\..\core\smartbody\Python26\libs;C:\ICT\vh\trunk\core\nvb_generator\charniak-windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -229,7 +232,6 @@ copy /Y ..\bin\default.seq ..\..\..\..\bin\smartbody\sbm\bin
     <Link>
       <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>Smartbody.lib;SbmDebugger.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;fltk.lib;fltkgl.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_44.lib;boost_system-vc100-mt-1_44.lib;boost_regex-vc100-mt-1_44.lib;boost_python-vc100-mt-1_44.lib;log4cxx.lib;dbghelp.lib;opengl32.lib;glu32.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAI.lib;steerlib.lib;ode_double.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\bin\sbm-fltk.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\smartbody-lib\lib;..\..\sbm-debugger\lib\Release;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk-1.3.0rc6\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\..\..\lib\festival\speech_tools\lib;..\..\..\..\lib\festival\festival\src\lib;..\..\sbm-ui\panimationviewer\lib;..\..\sbm-ui\bmlviewer\lib;..\..\sbm-ui\channelbufferviewer\lib;..\..\clapack\lib;..\..\ode\lib;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release;..\..\..\..\core\smartbody\Python26\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -326,7 +328,6 @@ copy /Y ..\bin\default.seq ..\..\..\..\bin\smartbody\sbm\bin
     </ProjectReference>
     <Link>
       <AdditionalDependencies>Smartbodyd.lib;SbmDebugger.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc90-mt-gd-1_44.lib;boost_system-vc90-mt-gd-1_44.lib;boost_regex-vc90-mt-gd-1_44.lib;boost_python-vc90-mt-gd-1_44.lib;log4cxxd.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;fltkgld.lib;fltkd.lib;pprAId.lib;steerlibd.lib;ode_doubled.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wininet.lib;fbxsdk-2012.1-mdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\bin\sbm-fltkd.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\smartbody-lib\lib;..\..\sbm-debugger\lib\Debug;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\fltk-1.3.0rc6\lib;..\..\ode\lib;..\..\clapack\lib;..\..\steersuite-1.3\build\win32\Debug;..\..\Python26\libs;..\..\..\..\lib\fbxsdk\lib\vs2010\x86;$(ProgramW6432)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2010\x86;$(FBXSDK)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2010\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -421,7 +422,6 @@ copy /Y ..\bin\default.seq ..\..\..\..\bin\smartbody\sbm\bin
     </ProjectReference>
     <Link>
       <AdditionalDependencies>Smartbody.lib;SbmDebugger.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;fltk.lib;fltkgl.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc90-mt-1_44.lib;boost_system-vc90-mt-1_44.lib;boost_regex-vc90-mt-1_44.lib;boost_python-vc90-mt-1_44.lib;log4cxx.lib;dbghelp.lib;opengl32.lib;glu32.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;ode_double.lib;steerlib.lib;pprAI.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wininet.lib;fbxsdk-2012.1-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\bin\sbm-fltk.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\smartbody-lib\lib;..\..\sbm-debugger\lib\Release;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\fltk-1.3.0rc6\lib;..\..\clapack\lib;..\..\ode\lib;..\..\steersuite-1.3\build\win32\Release;..\..\Python26\libs;..\..\..\..\lib\fbxsdk\lib\vs2010\x86;$(ProgramW6432)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2010\x86;$(FBXSDK)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2010\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
