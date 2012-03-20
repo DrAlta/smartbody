@@ -530,15 +530,15 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 		SrVec ptDir = nextPtOnPath - curSteerPos; ptDir.normalize();
 		
 		float sceneScale = 1.f/getScene()->getScale();
-		float maxSpeed = character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
-		float minSpeed = character->getDoubleAttribute("steering.pathMinSpeed")*sceneScale;
+		float maxSpeed = (float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
+		float minSpeed = (float)character->getDoubleAttribute("steering.pathMinSpeed")*sceneScale;
 		float detectSeg = maxSpeed;
 		const float maxAcc = (maxSpeed-minSpeed)/2.f;
 
 		float pathCurvature = steerPath.pathCurvature(distOnPath-detectSeg*0.2f,distOnPath+detectSeg*0.8f)*2.0f;
-		if (pathCurvature > M_PI) pathCurvature = M_PI;
+		if (pathCurvature > M_PI) pathCurvature = (float)M_PI;
 		static int counter = 0;		
-		float curvSpeed = (1.f - pathCurvature/M_PI)*(maxSpeed-minSpeed) + minSpeed;
+		float curvSpeed = (1.f - pathCurvature/(float)M_PI)*(maxSpeed-minSpeed) + minSpeed;
 		float acc = (curSpeed > curvSpeed) ? -maxAcc : maxAcc;
 		// do whatever you need to calculate
  		float newSpeed = curSpeed + acc*dt; 
