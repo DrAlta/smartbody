@@ -5,22 +5,26 @@ link_directories(	/Users/shapiro/smartbody/trunk/lib/festival/festival/src/lib
 			/Users/shapiro/smartbody/trunk/lib/festival/speech_tools/lib
 		)
 find_package(OpenGL REQUIRED)
+link_directories( /home/shapiro/smartbody/trunk/lib/festival/src/lib
+		  /home/shapiro/smartbody/trunk/lib/speech_tools/lib
+		)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 find_library (COREAUDIO_LIBRARY CoreAudio)
 find_library (AUDIOUNIT_LIBRARY AudioUnit)
 find_library (CORESERVICES_LIBRARY CoreServices)
-find_library (LIBSNDFILE sndfile )
-find_library (ALUT alut )
-find_library (OPENAL openal)
 find_library (FESTIVAL Festival ../../../lib/festival/festival/src/lib)
 find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
 find_library (ESTSTRING eststring ../../../lib/festival/speech_tools/lib)
 find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
 endif()
 
+find_library (LIBSNDFILE sndfile )
+find_library (ALUT alut )
+find_library (OPENAL openal)
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-set( OSX_LIBS
+set( MORE_LIBS
         ${COREAUDIO_LIBRARY}
         ${AUDIOUNIT_LIBRARY}
         ${CORESERVICES_LIBRARY}
@@ -32,6 +36,13 @@ set( OSX_LIBS
         ${ESTSTRING}
         ${ESTOOLS}
 )
+else()
+set( MORE_LIBS
+        ${LIBSNDFILE}
+        ${ALUT}
+        ${OPENAL}
+)
+
 endif()
 
 
@@ -110,9 +121,10 @@ endif()
 
 target_link_libraries( sbm-fltk
 
-	#tcmalloc
-	#profiler
+	tcmalloc
+	profiler
 	smartbody-lib
+	SbmDebugger
 	bonebus
 	vhmsg
 	vhcl
@@ -139,7 +151,7 @@ target_link_libraries( sbm-fltk
         ncurses
 	SbmDebugger
 
-	${OSX_LIBS}
+	${MORE_LIBS}
 )
 
 set( EXEC_LIST
@@ -183,3 +195,4 @@ install(
   	TARGETS ${EXEC_LIST}
 	RUNTIME DESTINATION core/smartbody/sbm/bin
 )
+

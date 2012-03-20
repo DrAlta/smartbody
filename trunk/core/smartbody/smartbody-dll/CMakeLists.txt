@@ -16,7 +16,7 @@ endif()
 
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-set( OSX_LIBS
+set( MORE_LIBS
 	${COREAUDIO_LIBRARY}
 	${AUDIOUNIT_LIBRARY}
 	${CORESERVICES_LIBRARY}
@@ -28,6 +28,12 @@ set( OSX_LIBS
 	${ESTSTRING}
 	${ESTOOLS}
 )
+else()
+set( MORE_LIBS
+	${LIBSNDFILE}
+	${ALUT}
+	${OPENAL}
+)       
 endif()
 
 
@@ -66,7 +72,7 @@ target_link_libraries( smartbody-dll
 	python2.6
 	SbmDebugger
 	ncurses
-	${OSX_LIBS}
+	${MORE_LIBS}
 )
 
 set( EXEC_LIST
