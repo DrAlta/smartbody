@@ -1,6 +1,36 @@
 include_directories( include )
 include_directories( ../smartbody-lib/src )
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
+find_library (COREAUDIO_LIBRARY CoreAudio)
+find_library (AUDIOUNIT_LIBRARY AudioUnit)
+find_library (CORESERVICES_LIBRARY CoreServices)
+find_library (LIBSNDFILE sndfile )
+find_library (ALUT alut )
+find_library (OPENAL openal)
+find_library (FESTIVAL Festival ../../../lib/festival/festival/src/lib)
+find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
+find_library (ESTSTRING eststring ../../..//lib/festival/speech_tools/lib)
+find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
+endif()
+
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set( OSX_LIBS
+	${COREAUDIO_LIBRARY}
+	${AUDIOUNIT_LIBRARY}
+	${CORESERVICES_LIBRARY}
+	${LIBSNDFILE}
+	${ALUT}
+	${OPENAL}
+	${FESTIVAL}
+	${ESTBASE}
+	${ESTSTRING}
+	${ESTOOLS}
+)
+endif()
+
+
 find_package(OpenGL REQUIRED)
 add_library(
 	smartbody-dll
@@ -12,8 +42,8 @@ add_library(
 
 target_link_libraries( smartbody-dll
 
-	tcmalloc
-	profiler
+#	tcmalloc
+#	profiler
 	smartbody-lib
 	bonebus
 	vhmsg
@@ -35,6 +65,8 @@ target_link_libraries( smartbody-dll
 	ode
 	python2.6
 	SbmDebugger
+	ncurses
+	${OSX_LIBS}
 )
 
 set( EXEC_LIST
