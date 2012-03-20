@@ -61,7 +61,7 @@ SrVec SteerPath::pathTangent( float length )
 	if (remain > pathLength())
 		remain = pathLength() - 0.01f;	
 	SrVec outDir;
-	for (int i=0;i<pathSegLength.size();i++)
+	for (size_t i=0;i<pathSegLength.size();i++)
 	{
 		float pathSegLen = pathSegLength[i];
 		if (remain <= pathSegLength[i])
@@ -125,7 +125,7 @@ float SteerPath::pathDistance( const SrVec& pt )
 float SteerPath::pathLength()
 {
 	float totalLength = 0.f;
-	for (int i=0;i<pathSegLength.size();i++)
+	for (size_t i=0;i<pathSegLength.size();i++)
 	{
 		totalLength += pathSegLength[i];
 	}
