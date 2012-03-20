@@ -68,7 +68,7 @@
     </ProjectReference>
     <Link>
       <AdditionalDependencies>vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;smartbody-dll_d.lib;OIS_d.lib;OgreMain_d.lib;pthreadVSE2.lib;activemq-cppd.lib;ws2_32.lib;rpcrt4.lib;log4cxxd.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\lib\vhcl\log4cxx\lib9;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\core\smartbody\smartbody-dll\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib;..\..\..\..\lib\pthreads\lib9;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\lib\vhcl\log4cxx\lib;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\core\smartbody\smartbody-dll\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)OgreViewer_d.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -100,7 +100,7 @@
     </ProjectReference>
     <Link>
       <AdditionalDependencies>vhcl.lib;vhmsg.lib;bonebus.lib;smartbody-dll.lib;OIS.lib;OgreMain.lib;pthreadVSE2.lib;activemq-cpp.lib;ws2_32.lib;rpcrt4.lib;log4cxx.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\lib\vhcl\log4cxx\lib9;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\core\smartbody\smartbody-dll\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib;..\..\..\..\lib\pthreads\lib9;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\lib\vhcl\log4cxx\lib;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\core\smartbody\smartbody-dll\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
