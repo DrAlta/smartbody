@@ -411,7 +411,7 @@ void MeCtBreathing::notify(SBSubject* subject)
 			SBMotion* motion = mcu._scene->getMotion(attr->getValue());
 			if (!motion)
 			{
-				LOG("No motion named %s found.", motion->getName());
+				LOG("No motion named %s found.", motion->getName().c_str());
 			}
 			else
 			{
