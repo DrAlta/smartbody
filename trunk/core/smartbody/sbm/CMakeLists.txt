@@ -1,6 +1,39 @@
 include_directories( ./src )
 include_directories( ../smartbody-lib/src )
+
+link_directories(	/Users/shapiro/smartbody/trunk/lib/festival/festival/src/lib
+			/Users/shapiro/smartbody/trunk/lib/festival/speech_tools/lib
+		)
 find_package(OpenGL REQUIRED)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+find_library (COREAUDIO_LIBRARY CoreAudio)
+find_library (AUDIOUNIT_LIBRARY AudioUnit)
+find_library (CORESERVICES_LIBRARY CoreServices)
+find_library (LIBSNDFILE sndfile )
+find_library (ALUT alut )
+find_library (OPENAL openal)
+find_library (FESTIVAL Festival ../../../lib/festival/festival/src/lib)
+find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
+find_library (ESTSTRING eststring ../../../lib/festival/speech_tools/lib)
+find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set( OSX_LIBS
+        ${COREAUDIO_LIBRARY}
+        ${AUDIOUNIT_LIBRARY}
+        ${CORESERVICES_LIBRARY}
+        ${LIBSNDFILE}
+        ${ALUT}
+        ${OPENAL}
+        ${FESTIVAL}
+        ${ESTBASE}
+        ${ESTSTRING}
+        ${ESTOOLS}
+)
+endif()
+
 
 set( SBM_FLTK_SRC
 
@@ -103,7 +136,10 @@ target_link_libraries( sbm-fltk
 	pprAI
 	ode
 	python2.6
+        ncurses
 	SbmDebugger
+
+	${OSX_LIBS}
 )
 
 set( EXEC_LIST
