@@ -56,7 +56,10 @@ void SBSteerManager::setEnable(bool enable)
 		stop();
 	SmartBody::SBAttribute* attribute = getAttribute("enable");
 	if (attribute)
-		setBoolAttribute("enable", enable);
+	{
+		SmartBody::BoolAttribute* enableAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+		enableAttribute->setValueFast(enable);
+	}
 }
 
 void SBSteerManager::beforeUpdate(double time)
