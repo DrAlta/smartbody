@@ -25,6 +25,7 @@ class SBSimulationManager
 		void printInfo();
 		void printPerf(float v);
 		double getTime();
+		void setTime(double time);
 		void start();
 		void stop();
 		void reset();
