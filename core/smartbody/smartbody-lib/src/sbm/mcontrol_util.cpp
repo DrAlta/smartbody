@@ -342,6 +342,7 @@ void mcuCBHandle::reset( void )	{
 	 std::map<int, MeCtReachEngine*> reachMap;
 	 _defaultControllers.push_back(new MeCtExampleBodyReach(reachMap));
 	 _defaultControllers.push_back(new MeCtBreathing());
+	 _defaultControllers.push_back(new MeCtGaze());
 
 	 for (size_t x = 0; x < _defaultControllers.size(); x++)
 		 _defaultControllers[x]->ref();

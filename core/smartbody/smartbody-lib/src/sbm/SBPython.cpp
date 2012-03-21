@@ -563,9 +563,20 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("notify", &SBObserver::notify, "Notifies the observer of the subject.")
 		;
 
+boost::python::class_<SBAttributeInfo>("SBAttributeInfo")
+		.def("getPriority", &SBAttributeInfo::getPriority, "Returns the priority of the attribute. Used for display purposes.")
+		.def("setPriority", &SBAttributeInfo::setPriority, "Sets the priority of the attribute. Used for display purposes.")
+		.def("getReadOnly", &SBAttributeInfo::getReadOnly, "Determines if the attribute is read-only and cannot be changed.")
+		.def("setReadOnly", &SBAttributeInfo::setReadOnly, "Sets the read-only status of the attribute. Attributes marked read-only cannot have their value's changed.")
+		.def("getHidden", &SBAttributeInfo::getHidden, "Determines if the attribute is hidden from view.")
+		.def("setHidden", &SBAttributeInfo::setHidden, "Sets the hidden status of the attribute. Hidden attributes typically aren't visible to the user.")
+		.def("setDescription", &SBAttributeInfo::setDescription, "Sets the description or help text associated with this attribute.")
+		.def("getDescription", &SBAttributeInfo::getDescription, "Gets the description or help text associated with this attribute.")
+	;
 
 boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribute")
 		.def("getName", &SBAttribute::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
+		.def("getAttributeInfo", &SBAttribute::getAttributeInfo, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the information associated with this attribute.")
 	;
 
 	boost::python::class_<ActionAttribute, boost::python::bases<SBAttribute> >("ActionAttribute")

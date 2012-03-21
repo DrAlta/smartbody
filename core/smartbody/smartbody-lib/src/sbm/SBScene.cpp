@@ -355,11 +355,11 @@ std::vector<std::string> SBScene::getAssetPaths(std::string type)
 
 	std::vector<std::string> list;
 	srPathList* path = NULL;
-	if (type == "seq")
+	if (type == "seq" || type == "script")
 	{
 		path = &mcu.seq_paths;
 	}
-	else if (type == "me" || type == "ME")
+	else if (type == "me" || type == "ME" || type == "motion")
 	{
 		path = &mcu.me_paths;
 	}
@@ -393,12 +393,12 @@ void SBScene::addAssetPath(std::string type, std::string path)
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	PathResource* pres = new PathResource();
 	pres->setPath(path);
-	if (type == "seq")
+	if (type == "seq" || type == "script")
 	{
 		pres->setType("seq");
 		mcu.seq_paths.insert(const_cast<char *>(path.c_str()));
 	}
-	else if (type == "me" || type == "ME")
+	else if (type == "me" || type == "ME" || type == "motion")
 	{
 		pres->setType("me");
 		mcu.me_paths.insert(const_cast<char *>(path.c_str()));
@@ -427,11 +427,11 @@ void SBScene::removeAssetPath(std::string type, std::string path)
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 
 	bool ret = false;
-	if (type == "seq")
+	if (type == "seq" || type == "script")
 	{
 		ret = mcu.seq_paths.remove(const_cast<char *>(path.c_str()));
 	}
-	else if (type == "me" || type == "ME")
+	else if (type == "me" || type == "ME" || type == "motion")
 	{
 		ret = mcu.me_paths.remove(const_cast<char *>(path.c_str()));
 	}
