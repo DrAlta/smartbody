@@ -66,6 +66,8 @@ class SteeringAgent
 		void parameterTesting();
 		void cacheParameter(std::list<float>& sampleData, float data, int size);
 		float getFilteredParameter(std::list<float>& sampleData);
+		void startLocomotion(float angleDiff);
+		void adjustFacingAngle(float angleDiff);
 
 	private:
 		SteerLib::AgentInterface* agent;
