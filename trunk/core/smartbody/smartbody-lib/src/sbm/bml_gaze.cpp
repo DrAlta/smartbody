@@ -497,9 +497,18 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	
 	float gaze_speed_head      = BML::Gaze::speed_head;
 	float gaze_speed_eyeball   = BML::Gaze::speed_eyeball;
+
+	if (request->actor->getAttribute("gaze.speedNeck"))
+		gaze_speed_head = (float) request->actor->getDoubleAttribute("gaze.speedNeck");
+
+	if (request->actor->getAttribute("gaze.speedEyes"))
+		gaze_speed_eyeball = (float) request->actor->getDoubleAttribute("gaze.speedEyes");
+
 	float gaze_smooth_lumbar   = BML::Gaze::smooth_lumbar;
 	float gaze_smooth_cervical = BML::Gaze::smooth_cervical;
 	float gaze_smooth_eyeball  = BML::Gaze::smooth_eyeball;
+
+
 //	float gaze_fade_out_ival   = BML::Gaze::fade_out_ival;
 //	float gaze_fade_in_ival    = BML::Gaze::fade_in_ival;
 //	float gaze_time_hint = -1.0;

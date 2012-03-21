@@ -220,6 +220,26 @@ MeCtGaze::MeCtGaze( void )	: SmartBody::SBController() {
 	
 	joint_count = 0;
 	joint_arr = NULL;
+
+	// gaze settings
+	addDefaultAttributeDouble("gaze.speedEyes", 1000);
+	addDefaultAttributeDouble("gaze.speedNeck", 1000);
+	addDefaultAttributeDouble("gaze.limitPitchUpEyes", -35.0);
+	addDefaultAttributeDouble("gaze.limitPitchDownEyes", 35.0);
+	addDefaultAttributeDouble("gaze.limitHeadingEyes", 40.0);
+	addDefaultAttributeDouble("gaze.limitRollEyes", 0.0);
+	addDefaultAttributeDouble("gaze.limitPitchUpNeck", -45.0);
+	addDefaultAttributeDouble("gaze.limitPitchDownNeck", 45.0);
+	addDefaultAttributeDouble("gaze.limitHeadingNeck",  90.0);
+	addDefaultAttributeDouble("gaze.limitRollNeck", 35.0);
+	addDefaultAttributeDouble("gaze.limitPitchUpChest", -6.0);
+	addDefaultAttributeDouble("gaze.limitPitchDownChest", 6.0);
+	addDefaultAttributeDouble("gaze.limitHeadingChest", 15.0);
+	addDefaultAttributeDouble("gaze.limitRollChest", 5.0);
+	addDefaultAttributeDouble("gaze.limitPitchUpBack", -15.0);
+	addDefaultAttributeDouble("gaze.limitPitchDownBack", 15.0);
+	addDefaultAttributeDouble("gaze.limitHeadingBack", 30.0);
+	addDefaultAttributeDouble("gaze.limitRollBack", 10.0);
 }
 
 MeCtGaze::~MeCtGaze( void )	{
@@ -325,7 +345,15 @@ void MeCtGaze::init( SbmPawn* pawn, int key_fr, int key_to )	{
 	
 	set_task_priority( key_max );
 	//set_speed( DFL_GAZE_HEAD_SPEED, DFL_GAZE_EYE_SPEED ); // initializes timing_mode = TASK_SPEED;
-	set_speed( DEFAULT_SPEED_HEAD, DEFAULT_SPEED_EYES );
+	float speedEyes = DEFAULT_SPEED_EYES;
+	float speedNeck = DEFAULT_SPEED_HEAD;
+
+	if (pawn->getAttribute("gaze.speedEyes") != NULL)
+		speedEyes = (float) pawn->getDoubleAttribute("gaze.speedEyes");
+	if (pawn->getAttribute("gaze.speedNeck") != NULL)
+		speedNeck = (float) pawn->getDoubleAttribute("gaze.speedNeck");
+	
+	set_speed( speedNeck, speedEyes );
 
 	//set_smooth( 0.3f, 0.1f, 0.0f );
 	set_smooth( DEFAULT_SMOOTHING_LUMBAR, DEFAULT_SMOOTHING_CERVICAL, DEFAULT_SMOOTHING_EYEBALL );
@@ -336,21 +364,76 @@ void MeCtGaze::init( SbmPawn* pawn, int key_fr, int key_to )	{
 	set_limit( GAZE_KEY_HEAD,     20.0, 45.0, 15.0 );
 	set_limit( GAZE_KEY_EYES,     50.0, 75.0, 0.0 );
 	*/
+	float limitPitchUp, limitPitchDown, limitHeading, limitRoll;
 
-	set_limit( GAZE_KEY_BACK,   DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_BACK],
-								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_BACK],
-								  DEFAULT_LIMIT_HEADING[GAZE_KEY_BACK],
-								  DEFAULT_LIMIT_ROLL[GAZE_KEY_BACK]);
+	if (pawn->getAttribute("gaze.limitPitchUpBack") != NULL)
+		limitPitchUp = (float) pawn->getDoubleAttribute("gaze.limitPitchUpBack");
+	else
+		limitPitchUp = DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_BACK];
+	if (pawn->getAttribute("gaze.limitPitchDownBack") != NULL)
+		limitPitchDown = (float) pawn->getDoubleAttribute("gaze.limitPitchDownBack");
+	else
+		limitPitchDown = DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_BACK];
+	if (pawn->getAttribute("gaze.limitHeadingBack") != NULL)
+		limitHeading = (float) pawn->getDoubleAttribute("gaze.limitHeadingBack");
+	else
+		limitHeading = DEFAULT_LIMIT_HEADING[GAZE_KEY_BACK];
+	if (pawn->getAttribute("gaze.limitRollBack") != NULL)
+		limitRoll = (float) pawn->getDoubleAttribute("gaze.limitRollBack");
+	else
+		limitRoll = DEFAULT_LIMIT_ROLL[GAZE_KEY_BACK];
 
-	set_limit( GAZE_KEY_CHEST,   DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_CHEST],
-								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_CHEST],
-								  DEFAULT_LIMIT_HEADING[GAZE_KEY_CHEST],
-								  DEFAULT_LIMIT_ROLL[GAZE_KEY_CHEST]);
+	set_limit( GAZE_KEY_BACK,   limitPitchUp,
+								limitPitchDown,
+								limitHeading,
+								limitRoll);
 
-	set_limit( GAZE_KEY_NECK, DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_NECK],
-								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_NECK],
-								  DEFAULT_LIMIT_HEADING[GAZE_KEY_NECK],
-								  DEFAULT_LIMIT_ROLL[GAZE_KEY_NECK]);
+	
+	if (pawn->getAttribute("gaze.limitPitchUpChest") != NULL)
+		limitPitchUp = (float) pawn->getDoubleAttribute("gaze.limitPitchUpChest");
+	else
+		limitPitchUp = DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_BACK];
+	if (pawn->getAttribute("gaze.limitPitchDownChest") != NULL)
+		limitPitchDown = (float) pawn->getDoubleAttribute("gaze.limitPitchDownChest");
+	else
+		limitPitchDown = DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_BACK];
+	if (pawn->getAttribute("gaze.limitHeadingChest") != NULL)
+		limitHeading = (float) pawn->getDoubleAttribute("gaze.limitHeadingChest");
+	else
+		limitHeading = DEFAULT_LIMIT_HEADING[GAZE_KEY_BACK];
+	if (pawn->getAttribute("gaze.limitRollChest") != NULL)
+		limitRoll = (float) pawn->getDoubleAttribute("gaze.limitRollChest");
+	else
+		limitRoll = DEFAULT_LIMIT_ROLL[GAZE_KEY_CHEST];
+
+	set_limit( GAZE_KEY_CHEST,  limitPitchUp,
+								limitPitchDown,
+								limitHeading,
+								limitRoll);
+
+	
+
+	if (pawn->getAttribute("gaze.limitPitchUpNeck") != NULL)
+		limitPitchUp = (float) pawn->getDoubleAttribute("gaze.limitPitchUpNeck");
+	else
+		limitPitchUp = DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_BACK];
+	if (pawn->getAttribute("gaze.limitPitchDownNeck") != NULL)
+		limitPitchDown = (float) pawn->getDoubleAttribute("gaze.limitPitchDownNeck");
+	else
+		limitPitchDown = DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_BACK];
+	if (pawn->getAttribute("gaze.limitHeadingNeck") != NULL)
+		limitHeading = (float) pawn->getDoubleAttribute("gaze.limitHeadingNeck");
+	else
+		limitHeading = DEFAULT_LIMIT_HEADING[GAZE_KEY_BACK];
+	if (pawn->getAttribute("gaze.limitRollNeck") != NULL)
+		limitRoll = (float) pawn->getDoubleAttribute("gaze.limitRollNeck");
+	else
+		limitRoll = DEFAULT_LIMIT_ROLL[GAZE_KEY_NECK];
+
+	set_limit( GAZE_KEY_NECK,   limitPitchUp,
+								limitPitchDown,
+								limitHeading,
+								limitRoll);
 
 #if GAZE_KEY_COMBINE_HEAD_AND_NECK
 #else
@@ -360,10 +443,28 @@ void MeCtGaze::init( SbmPawn* pawn, int key_fr, int key_to )	{
 								  DEFAULT_LIMIT_ROLL[GAZE_KEY_HEAD]);
 #endif
 
-	set_limit( GAZE_KEY_EYES,  DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_EYES],
-								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_EYES],
-								  DEFAULT_LIMIT_HEADING[GAZE_KEY_EYES],
-								  DEFAULT_LIMIT_ROLL[GAZE_KEY_EYES]);
+	
+	if (pawn->getAttribute("gaze.limitPitchUpEyes") != NULL)
+		limitPitchUp = (float) pawn->getDoubleAttribute("gaze.limitPitchUpEyes");
+	else
+		limitPitchUp = DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_BACK];
+	if (pawn->getAttribute("gaze.limitPitchDownEyes") != NULL)
+		limitPitchDown = (float) pawn->getDoubleAttribute("gaze.limitPitchDownEyes");
+	else
+		limitPitchDown = DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_BACK];
+	if (pawn->getAttribute("gaze.limitHeadingEyes") != NULL)
+		limitHeading = (float) pawn->getDoubleAttribute("gaze.limitHeadingEyes");
+	else
+		limitHeading = DEFAULT_LIMIT_HEADING[GAZE_KEY_BACK];
+	if (pawn->getAttribute("gaze.limitRollEyes") != NULL)
+		limitRoll = (float) pawn->getDoubleAttribute("gaze.limitRollEyes");
+	else
+		limitRoll = DEFAULT_LIMIT_ROLL[GAZE_KEY_NECK];
+
+	set_limit( GAZE_KEY_EYES,   limitPitchUp,
+								limitPitchDown,
+								limitHeading,
+								limitRoll);
 
 	for( i = 0; i < NUM_GAZE_KEYS; i++ )	{
 		set_bias( i, 0.0f, 0.0f, 0.0f );

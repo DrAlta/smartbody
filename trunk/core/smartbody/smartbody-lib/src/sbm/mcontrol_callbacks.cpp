@@ -192,13 +192,16 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 		PathResource* pres = new PathResource();
 		pres->setPath(path);
-		if( strcmp( path_tok, "seq" ) == 0 )
+		if( strcmp( path_tok, "seq" ) == 0 ||
+			strcmp( path_tok, "script" ) == 0)
 		{	
 			pres->setType("seq");
 			mcu_p->seq_paths.insert( path );
 		}
 		else if( (strcmp( path_tok, "me" ) == 0 ) ||
-			   ( strcmp( path_tok, "ME" ) == 0 ))
+			   ( strcmp( path_tok, "ME" ) == 0 ) ||
+			   ( strcmp( path_tok, "motion" ) == 0 )
+			   )
 		{
 			pres->setType("me");
 			mcu_p->me_paths.insert( path );
