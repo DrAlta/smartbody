@@ -523,20 +523,20 @@ BOOST_PYTHON_MODULE(SmartBody)
 	
 
 	// resource access
-	boost::python::def("showCommandResources", showCommandResources, "Returns the command resources. \n Input: NULL \n Output: NULL");
-	boost::python::def("showMotionResources", showMotionResources, "Returns the motion resources. \n Input: NULL \n Output: NULL");
-	boost::python::def("showSkeletonResources", showSkeletonResources, "Returns the motion resources. \n Input: NULL \n Output: NULL");
-	boost::python::def("showPathResources", showPathResources, "Returns the path resources. \n Input: NULL \n Output: NULL");
-	boost::python::def("showScriptResources", showScriptResources, "Returns the seq file resources. \n Input: NULL \n Output: NULL");
-	boost::python::def("showControllerResources", showControllerResources, "Returns the controller resources. \n Input: NULL \n Output: NULL");
+	boost::python::def("showCommandResources", showCommandResources, "Returns the command resources. ");
+	boost::python::def("showMotionResources", showMotionResources, "Returns the motion resources. ");
+	boost::python::def("showSkeletonResources", showSkeletonResources, "Returns the motion resources. ");
+	boost::python::def("showPathResources", showPathResources, "Returns the path resources. ");
+	boost::python::def("showScriptResources", showScriptResources, "Returns the seq file resources. ");
+	boost::python::def("showControllerResources", showControllerResources, "Returns the controller resources. ");
 	boost::python::def("getResourceLimit", getResourceLimit, "Returns resource up limit. \n Input: NULL \n Output: resource display up limit");
 	boost::python::def("setResourceLimit", setResourceLimit, "Set resource up limit. \n Input: resource display up limit \n Output: NULL");	
 
 
 	// system
-	boost::python::def("pythonexit", pythonExit, "Exits the Python interpreter. \n Input: NULL \n Output: NULL");
-	boost::python::def("reset", reset, "Reset SBM. \n Input: NULL \n Output: NULL");
-	boost::python::def("quit", quitSbm, "Quit SBM. \n Input: NULL \n Output: NULL");
+	boost::python::def("pythonexit", pythonExit, "Exits the Python interpreter. ");
+	boost::python::def("reset", reset, "Reset SBM. ");
+	boost::python::def("quit", quitSbm, "Quit SBM. ");
 	boost::python::def("printlog", printLog, "Write to the log. \n Input: message string \n Output: NULL");
 	boost::python::def("getScene", getScene, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the SmartBody scene object.");
 
@@ -544,9 +544,9 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 	// class interface
 /*	boost::python::class_<Script>("Script")
-		.def("printInfo", &Script::print, "Print the content inside this script, this only works for seq script. \n Input: NULL \n Output: NULL")
-		.def("run", &Script::run, "Run the script immediately. \n Input: NULL \n Output: NULL")
-		.def("abort", &Script::abort, "Abort this running script, this only works for seq script. \n Input: NULL \n Output: NULL")
+		.def("printInfo", &Script::print, "Print the content inside this script, this only works for seq script. ")
+		.def("run", &Script::run, "Run the script immediately. ")
+		.def("abort", &Script::abort, "Abort this running script, this only works for seq script. ")
 		;
 */
 
@@ -658,14 +658,15 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 	boost::python::class_<SBSimulationManager>("SBSimulationManager")
 		.def("isRunning", &SBSimulationManager::isRunning, "Returns true if the simulation is currently running.")
 		.def("isStarted", &SBSimulationManager::isStarted, "Returns true if the simulation has been started.")
-		.def("printInfo", &SBSimulationManager::printInfo, "Print all the timing statistics. \n Input: NULL \n Output: NULL")
-		.def("printPerf", &SBSimulationManager::printPerf, "Print performance statistics calculated real time given a time period as input. \n Input: NULL \n Output: NULL")
-		.def("getTime", &SBSimulationManager::getTime, "Get the current simulation time. \n Input: NULL \n Output: current simulation time")
+		.def("printInfo", &SBSimulationManager::printInfo, "Print all the timing statistics. ")
+		.def("printPerf", &SBSimulationManager::printPerf, "Print performance statistics calculated real time given a time period as input.")
+		.def("getTime", &SBSimulationManager::getTime, "Returns the current simulation time.")
+		.def("setTime", &SBSimulationManager::setTime, "Sets the current simulation time.")
 		.def("start", &SBSimulationManager::start, "Start the simulation.")
 		.def("stop", &SBSimulationManager::stop, "Stop the simulation.")
-		.def("reset", &SBSimulationManager::reset, "Set the clock time to 0. \n Input: NULL \n Output: NULL")
-		.def("pause", &SBSimulationManager::pause, "Pause the clock. \n Input: NULL \n Output: NULL")
-		.def("resume", &SBSimulationManager::resume, "Resume the clock. \n Input: NULL \n Output: NULL")
+		.def("reset", &SBSimulationManager::reset, "Set the clock time to 0. ")
+		.def("pause", &SBSimulationManager::pause, "Pause the clock. ")
+		.def("resume", &SBSimulationManager::resume, "Resume the clock. ")
 		.def("step", &SBSimulationManager::step, "Running the system in the step mode, user can input how many steps they want to run. \n Input: number of steps at a time \n Output: NULL")
 		.def("setSleepFps", &SBSimulationManager::setSleepFps, "Set the sleep fps. Sleep fps defines the target loop rate. \n Input: sleep fps \n Output: NULL")
 		.def("setEvalFps", &SBSimulationManager::setEvalFps, "Set the eval fps. Define the minimum interval to evaluate the frame. \n Input: evaluation fps \n Output: NULL")
@@ -677,18 +678,18 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		;
 
 	boost::python::class_<SBProfiler>("Profiler")
-		.def("printLegend", &SBProfiler::printLegend, "Print time profiler legend. \n Input: NULL \n Output: NULL")
-		.def("printStats", &SBProfiler::printStats, "Print time profiler statistics. \n Input: NULL \n Output: NULL")
+		.def("printLegend", &SBProfiler::printLegend, "Print time profiler legend. ")
+		.def("printStats", &SBProfiler::printStats, "Print time profiler statistics. ")
 		;
 
 	boost::python::class_<Camera>("Camera")
-		.def("printInfo", &Camera::printInfo, "Prints all the camera statistics. \n Input: NULL \n Output: NULL")
-		.def("reset", &Camera::reset, "Reset camera with camera eye (0 166 185), camera center (0 92 0). \n Input: NULL \n Output: NULL")
+		.def("printInfo", &Camera::printInfo, "Prints all the camera statistics. ")
+		.def("reset", &Camera::reset, "Reset camera with camera eye (0 166 185), camera center (0 92 0). ")
 		.def("setEye", &Camera::setEye, "Set camera eye position. \n Input: camera eye position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
 		.def("setCenter", &Camera::setCenter, "Set camera center. \n Input: camera center position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
 		.def("setScale", &Camera::setScale, "Set camera scale. \n camera scale: NULL \n Output: NULL")
 		.def("setTrack", &Camera::setTrack, "Set camera track. \n Input: character name, joint name \n Output: NULL")
-		.def("removeTrack", &Camera::removeTrack, "Remove camera track. \n Input: NULL \n Output: NULL")
+		.def("removeTrack", &Camera::removeTrack, "Remove camera track. ")
 		;
 
 	boost::python::class_<SrViewer>("Viewer")
@@ -830,7 +831,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getChannels", &SBMotion::getChannels, "Returns the channels + type inside the skeleton. \n Input: NULL \n Output: channel name and type")
 		.def("checkSkeleton", &SBMotion::checkSkeleton, "Print out all the motion channels and compare it with the given skeleton channels. Mark '+' in front if the skeleton channel exists in the motion. \n Input: skeleton file name \n Output: NULL")
 		.def("connect", &SBMotion::connect, "Connect current motion to a skeleton object so the channels inside the motion are mapped to the channels inside skeleton. \n Input: Skeleton Object \n Output: NULL")
-		.def("disconnect", &SBMotion::disconnect, "Disconnect current motion with current skeleton object. \n Input: NULL \n Output: NULL")
+		.def("disconnect", &SBMotion::disconnect, "Disconnect current motion with current skeleton object. ")
 		.def("mirror", &SBMotion::mirror, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Mirrors the motion.")
 		.def("getJointSpeed", &SBMotion::getJointSpeed, "Get the accumulative joint speed. \n Input: SBJoint, start time, end time \n Output: joint speed(unit: same with the skeleton)")
 		.def("getJointAngularSpeed", &SBMotion::getJointAngularSpeed, "Get the joint accumulative angular speed. \n Input: SBJoint, start time, end time \n Output: joint angular speed(unit: degree/sec)")		
