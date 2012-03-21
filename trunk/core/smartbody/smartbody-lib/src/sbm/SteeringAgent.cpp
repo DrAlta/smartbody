@@ -610,9 +610,13 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 		character->param_animation_ct->schedule(NULL, true, true);
 
 		// adjust facing angle 
-		//float diff = facingAngle - yaw;
-		//normalizeAngle(diff);
-		//adjustFacingAngle(diff);
+		if (fabs(facingAngle) <= 180)
+		{
+			float diff = facingAngle - yaw;
+			normalizeAngle(diff);
+			adjustFacingAngle(diff);
+		}
+		
 		//LOG("path following end");
 
 		character->trajectoryGoalList.clear();
