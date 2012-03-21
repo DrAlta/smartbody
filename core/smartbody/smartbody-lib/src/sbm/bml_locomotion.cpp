@@ -300,11 +300,38 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	else
 	{
 		command << "sbm steer move " << c->getName() << " normal ";
+#define PAWN_WAY_POINTS 1
+#ifndef PAWN_WAY_POINTS
 		if (tokens.size() % 2 != 0)
 			LOG("Warning: target points are not paired");
 
 		for (size_t i = 0; i < (tokens.size() / 2); i++)
 			command << tokens[i * 2 + 0] << " 0 " << tokens[i * 2 + 1] << " ";
+#else
+		unsigned int icount = 0;
+		while (icount < tokens.size())
+		{			
+			std::string tok1 = tokens[icount];
+			SbmPawn* pawn = mcu->getPawn(tok1);
+			if (pawn) // use pawn position as way point
+			{				
+				float x,y,z,h,p,r;
+				pawn->get_world_offset(x,y,z,h,p,r);
+				command << boost::lexical_cast<std::string>(x) << " 0 " << boost::lexical_cast<std::string>(z) << " ";
+				icount += 1;
+			}
+			else if (icount + 1 < tokens.size() ) // or use two coordinates
+			{
+				std::string tok2 = tokens[icount+1];
+				command << tok1 << " 0 " << tok2 << " ";				
+				icount+= 2;								
+			}
+			else
+			{
+				icount++;
+			}
+		}
+#endif
 	}
 
 	// step mode attributes

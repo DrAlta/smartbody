@@ -124,9 +124,12 @@ void SteeringAgent::addSteeringAttributes()
 
 	if (!character->hasAttribute("steering.pathMinSpeed"))
 		character->createDoubleAttribute("steering.pathMinSpeed", 0.2f, true, "steering", 310, false, false, false, "");
+
+	if (!character->hasAttribute("steering.pathMinSpeed"))
+		character->createDoubleAttribute("steering.pathMinSpeed", 0.2f, true, "steering", 310, false, false, false, "");
 	
-	if (!character->hasAttribute("steering.facingAngle"))
-		character->createDoubleAttribute("steering.facingAngle", -200.f, true, "steering", 330, false, false, false, ""); 
+	if (!character->hasAttribute("steering.pathStartStep"))
+		character->createBoolAttribute("steering.pathStartStep", true, true, "steering", 330, false, false, false, ""); 
 	
 	if (!character->hasAttribute("steering.facingAngleThreshold"))
 		character->createDoubleAttribute("steering.facingAngleThreshold", 10.f, true, "steering", 340, false, false, false, ""); 
@@ -492,23 +495,39 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 	if (character->param_animation_ct->isIdle() && steerPath.pathLength() > 0)    // need to define when you want to start the locomotion
 	{
 		PAStateData* locoState = mcu.lookUpPAState(locomotionName.c_str());
-		locoState->paramManager->setWeight(0, 0, 0);
-		std::stringstream command;
-		command << "panim schedule char " << character->getName();
-		command << " state " << locomotionName << " loop true playnow true";
-		mcu.execute((char*) command.str().c_str());           		
-		counter = 0;
-//		float curSpeed;
-//		float curTurningAngle;
-//		float curScoot;
-		//locomotionEnd = false;
-		//curState->paramManager->getParameter(curSpeed, curTurningAngle, curScoot);
-		//curSpeed = 100;
-		//curState->paramManager->setWeight(curSpeed, curTurningAngle, curScoot);		
+		SrVec pathDir;
+		float pathDist;
+		SrVec targetPos = steerPath.closestPointOnPath(SrVec(x,0,z),pathDir,pathDist);
+		float distOnPath = steerPath.pathDistance(targetPos);
+		float sceneScale = 1.f/getScene()->getScale();
+		float maxSpeed = (float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
+		nextPtOnPath = steerPath.pathPoint(distOnPath+maxSpeed);		
+		float targetAngle = radToDeg(atan2(nextPtOnPath.x - x, nextPtOnPath.z - z));
+		normalizeAngle(targetAngle);
+		normalizeAngle(yaw);
+		float diff = targetAngle - yaw;
+		normalizeAngle(diff);
+		
+		// using the transition motion with different direction
+		if (character->getBoolAttribute("steering.pathStartStep"))
+		//if (0)
+		{
+			startLocomotion(diff);
+		}
+		else
+		{
+			locoState->paramManager->setWeight(0, 0, 0);
+			std::stringstream command;
+			command << "panim schedule char " << character->getName();
+			command << " state " << locomotionName << " loop true playnow true";
+			mcu.execute((char*) command.str().c_str());  
+		}		
+		counter = 0;	
 	}
 
 	if (curStateName == locomotionName)
 	{
+		//locomotionEnd = true;
 		float curSpeed;
 		float curTurningAngle;
 		float curScoot;
@@ -532,14 +551,15 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 		float sceneScale = 1.f/getScene()->getScale();
 		float maxSpeed = (float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
 		float minSpeed = (float)character->getDoubleAttribute("steering.pathMinSpeed")*sceneScale;
-		float detectSeg = maxSpeed;
-		const float maxAcc = (maxSpeed-minSpeed)/2.f;
+		float detectSeg = maxSpeed*1.5f;
+		const float maxAcc = (maxSpeed)/2.f;//-minSpeed);///2.f;
+		const float maxDcc = -(maxSpeed)/2.f;
 
 		float pathCurvature = steerPath.pathCurvature(distOnPath-detectSeg*0.2f,distOnPath+detectSeg*0.8f)*2.0f;
 		if (pathCurvature > M_PI) pathCurvature = (float)M_PI;
 		static int counter = 0;		
 		float curvSpeed = (1.f - pathCurvature/(float)M_PI)*(maxSpeed-minSpeed) + minSpeed;
-		float acc = (curSpeed > curvSpeed) ? -maxAcc : maxAcc;
+		float acc = (curSpeed > curvSpeed) ? maxDcc : maxAcc;
 		// do whatever you need to calculate
  		float newSpeed = curSpeed + acc*dt; 
 
@@ -547,26 +567,36 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 		if (distToTarget < curSpeed * brakingGain ) // if close to target, slow down directly
 			newSpeed = distToTarget / brakingGain;
 		
-		
-		if (distToTarget < 5.f && newSpeed < 5.f)
+		float distThreshold = 0.05f*sceneScale;
+		float speedThreshold = 0.05f*sceneScale;
+		if (distToTarget < distThreshold && newSpeed < speedThreshold)
 			locomotionEnd = true;
-
+#if 0 // output debug info
 		if (counter > 100)
 		{
 			counter = 0;
 			LOG("path curvature = %f, curveSpeed = %f, newSpeed = %f, distToTarget = %f",pathCurvature,curvSpeed,newSpeed,distToTarget);			
 		}
 		counter++;
+#endif
 
 		float newTurningAngle = asin(cross(curSteerDir,ptDir).y)/dt;
 		float newScoot =0.f;
 		// update locomotion state
 		curState->paramManager->setWeight(newSpeed, newTurningAngle, newScoot);
-		character->param_animation_ct->updateWeights();		
+		character->param_animation_ct->updateWeights();	
+		
 	}
 	if (locomotionEnd)      // need to define when you want to end the locomotion
 	{
 		character->param_animation_ct->schedule(NULL, true, true);
+
+		// adjust facing angle 
+		//float diff = facingAngle - yaw;
+		//normalizeAngle(diff);
+		//adjustFacingAngle(diff);
+		//LOG("path following end");
+
 		character->trajectoryGoalList.clear();
 		agent->clearGoals();
 		goalList.clear();
@@ -1399,67 +1429,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			fastInitial = false;
 		if (!fastInitial)
 		{
-	//		if (character->steeringConfig == character->STANDARD)
-			{
-	/*			
-				float angleGlobal = radToDeg(atan2(forward.x, forward.z));
-				normalizeAngle(angleGlobal);
-				normalizeAngle(yaw);
-				float diff = angleGlobal - yaw;
-				normalizeAngle(diff);
-	*/
-				double w;
-				if (diff > 0)
-				{
-					if (diff > 90)
-					{
-						w = (diff - 90) / 90;
-						std::stringstream command;
-						command << "panim schedule char " << character->getName();			
-						command << " state " << startingLName << " loop false playnow false " << " 0 " << 1 - w << " " << w;
-						mcu.execute((char*) command.str().c_str());
-					}
-					else
-					{
-						w = diff / 90;
-						std::stringstream command;
-						command << "panim schedule char " << character->getName();					
-						command << " state " << startingLName << " loop false playnow false " << 1 - w << " " << w << " " << " 0 ";
-						mcu.execute((char*) command.str().c_str());
-					}
-				}
-				else
-				{
-					if (diff < -90)
-					{
-						w = (diff + 180) / 90;
-						std::stringstream command;
-						command << "panim schedule char " << character->getName();
-						command << " state " << startingRName << " loop false playnow false " << " 0 " << w << " " << 1 - w;
-						mcu.execute((char*) command.str().c_str());
-					}
-					else
-					{
-						w = -diff / 90;
-						std::stringstream command;
-						command << "panim schedule char " << character->getName();
-						command << " state " << startingRName << " loop false playnow true " << 1 - w << " " << w << " 0 ";
-						mcu.execute((char*) command.str().c_str());
-					}				
-				}
-				PAStateData* locoState = mcu.lookUpPAState(locomotionName.c_str());
-				for (int i = 0; i < locoState->getNumMotions(); i++)
-				{
-					if (i == 0)
-						locoState->weights[i] = 1.0;
-					else
-						locoState->weights[i] = 0.0;
-				}
-				std::stringstream command1;
-				command1 << "panim schedule char " << character->getName();
-				command1 << " state " << locomotionName << " loop true playnow false";
-				mcu.execute((char*) command1.str().c_str());
-			}
+			startLocomotion(diff);	
 		}
 		else
 		{
@@ -1508,22 +1478,8 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	{
 		float diff = facingAngle - yaw;
 		normalizeAngle(diff);
-		std::string playNow;
-		if (fabs(diff) > facingAngleThreshold && !character->param_animation_ct->hasPAState(idleTurnName.c_str()))
-		{
-			PAStateData* idleTurnState = mcu.lookUpPAState(idleTurnName.c_str());
-			idleTurnState->paramManager->setWeight(-diff);
-			std::stringstream command;
-			command << "panim schedule char " << character->getName();			
-			command << " state " << idleTurnName << " loop false playnow false ";
-			for (int i = 0; i < idleTurnState->getNumMotions(); i++)
-				command << idleTurnState->weights[i] << " ";
-			mcu.execute((char*) command.str().c_str());
-		}
-		else
-		{
-			facingAngle = -200;
-		}
+		adjustFacingAngle(diff);
+		
 		return 0;
 	}
 
@@ -1648,6 +1604,94 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	}
 #endif
 	return newSpeed;
+}
+
+
+void SteeringAgent::startLocomotion( float angleDiff )
+{
+	//		if (character->steeringConfig == character->STANDARD)
+	{
+		/*			
+		float angleGlobal = radToDeg(atan2(forward.x, forward.z));
+		normalizeAngle(angleGlobal);
+		normalizeAngle(yaw);
+		float diff = angleGlobal - yaw;
+		normalizeAngle(diff);
+		*/
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		double w;
+		if (angleDiff > 0)
+		{
+			if (angleDiff > 90)
+			{
+				w = (angleDiff - 90) / 90;
+				std::stringstream command;
+				command << "panim schedule char " << character->getName();			
+				command << " state " << startingLName << " loop false playnow false " << " 0 " << 1 - w << " " << w;
+				mcu.execute((char*) command.str().c_str());
+			}
+			else
+			{
+				w = angleDiff / 90;
+				std::stringstream command;
+				command << "panim schedule char " << character->getName();					
+				command << " state " << startingLName << " loop false playnow false " << 1 - w << " " << w << " " << " 0 ";
+				mcu.execute((char*) command.str().c_str());
+			}
+		}
+		else
+		{
+			if (angleDiff < -90)
+			{
+				w = (angleDiff + 180) / 90;
+				std::stringstream command;
+				command << "panim schedule char " << character->getName();
+				command << " state " << startingRName << " loop false playnow false " << " 0 " << w << " " << 1 - w;
+				mcu.execute((char*) command.str().c_str());
+			}
+			else
+			{
+				w = -angleDiff / 90;
+				std::stringstream command;
+				command << "panim schedule char " << character->getName();
+				command << " state " << startingRName << " loop false playnow true " << 1 - w << " " << w << " 0 ";
+				mcu.execute((char*) command.str().c_str());
+			}				
+		}
+		PAStateData* locoState = mcu.lookUpPAState(locomotionName.c_str());
+		for (int i = 0; i < locoState->getNumMotions(); i++)
+		{
+			if (i == 0)
+				locoState->weights[i] = 1.0;
+			else
+				locoState->weights[i] = 0.0;
+		}
+		std::stringstream command1;
+		command1 << "panim schedule char " << character->getName();
+		command1 << " state " << locomotionName << " loop true playnow false";
+		mcu.execute((char*) command1.str().c_str());
+	}
+}
+
+void SteeringAgent::adjustFacingAngle( float angleDiff )
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();	
+	std::string playNow;
+	if (fabs(angleDiff) > facingAngleThreshold && !character->param_animation_ct->hasPAState(idleTurnName.c_str()))
+	{
+		PAStateData* idleTurnState = mcu.lookUpPAState(idleTurnName.c_str());
+		idleTurnState->paramManager->setWeight(-angleDiff);
+		std::stringstream command;
+		command << "panim schedule char " << character->getName();			
+		command << " state " << idleTurnName << " loop false playnow false ";
+		for (int i = 0; i < idleTurnState->getNumMotions(); i++)
+			command << idleTurnState->weights[i] << " ";
+		mcu.execute((char*) command.str().c_str());
+	}
+	else
+	{
+		facingAngle = -200;
+	}
 }
 
 float SteeringAgent::evaluateSteppingLoco(float x, float y, float z, float yaw)
