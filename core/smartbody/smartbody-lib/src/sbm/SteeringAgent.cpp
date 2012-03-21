@@ -117,16 +117,16 @@ void SteeringAgent::addSteeringAttributes()
 		character->createDoubleAttribute("steering.brakingGain", 1.2f, true, "steering", 310, false, false, false, ""); 
 	
 	if (!character->hasAttribute("steering.desiredSpeed"))
-		character->createDoubleAttribute("steering.desiredSpeed", 1.0f, true, "steering", 310, false, false, false, ""); 
+		character->createDoubleAttribute("steering.desiredSpeed", 1.0f, true, "steering", 310, false, false, false, ""); 	
+
+	if (!character->hasAttribute("steering.pathAngleAcc"))
+		character->createDoubleAttribute("steering.pathAngleAcc", 1000.f, true, "steering", 310, false, false, false, "");
 
 	if (!character->hasAttribute("steering.pathMaxSpeed"))
-		character->createDoubleAttribute("steering.pathMaxSpeed", 0.5f, true, "steering", 310, false, false, false, "");
+		character->createDoubleAttribute("steering.pathMaxSpeed", 1.5f, true, "steering", 310, false, false, false, "");	
 
 	if (!character->hasAttribute("steering.pathMinSpeed"))
-		character->createDoubleAttribute("steering.pathMinSpeed", 0.2f, true, "steering", 310, false, false, false, "");
-
-	if (!character->hasAttribute("steering.pathMinSpeed"))
-		character->createDoubleAttribute("steering.pathMinSpeed", 0.2f, true, "steering", 310, false, false, false, "");
+		character->createDoubleAttribute("steering.pathMinSpeed", 0.6f, true, "steering", 310, false, false, false, "");
 	
 	if (!character->hasAttribute("steering.pathStartStep"))
 		character->createBoolAttribute("steering.pathStartStep", true, true, "steering", 330, false, false, false, ""); 
@@ -545,12 +545,13 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 		float pathDist;
 		nextPtOnPath = steerPath.closestPointOnPath(nextSteerPos,pathDir,pathDist);
 		float distOnPath = steerPath.pathDistance(nextPtOnPath);
-		nextPtOnPath = steerPath.pathPoint(distOnPath+curSpeed*dt*80.f);
+		nextPtOnPath = steerPath.pathPoint(distOnPath+curSpeed);
 		SrVec ptDir = nextPtOnPath - curSteerPos; ptDir.normalize();
 		
 		float sceneScale = 1.f/getScene()->getScale();
 		float maxSpeed = (float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
 		float minSpeed = (float)character->getDoubleAttribute("steering.pathMinSpeed")*sceneScale;
+		float angAcc = (float)character->getDoubleAttribute("steering.pathAngleAcc");
 		float detectSeg = maxSpeed*1.5f;
 		const float maxAcc = (maxSpeed)/2.f;//-minSpeed);///2.f;
 		const float maxDcc = -(maxSpeed)/2.f;
@@ -571,19 +572,36 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 		float speedThreshold = 0.05f*sceneScale;
 		if (distToTarget < distThreshold && newSpeed < speedThreshold)
 			locomotionEnd = true;
+
+		float newTurningAngle = radToDeg(asin(cross(curSteerDir,ptDir).y));
+		normalizeAngle(newTurningAngle);
+		newTurningAngle = newTurningAngle * (float)character->getDoubleAttribute("steering.paLocoAngleGain");
+		float nextTurningAngle;		
+		if (newTurningAngle > curTurningAngle)
+		{
+			nextTurningAngle = curTurningAngle + angAcc*dt;
+			if (nextTurningAngle > newTurningAngle) nextTurningAngle = newTurningAngle;
+		}
+		else
+		{
+			nextTurningAngle = curTurningAngle - angAcc*dt;
+			if (nextTurningAngle < newTurningAngle) nextTurningAngle = newTurningAngle;
+		}
+				
+		//float newTurningAngle = normalizeAngle();//dt;
+		//float newTurningAngle = (asin(cross(curSteerDir,ptDir).y))/dt;
+		float newScoot =0.f;
+
 #if 0 // output debug info
 		if (counter > 100)
 		{
 			counter = 0;
-			LOG("path curvature = %f, curveSpeed = %f, newSpeed = %f, distToTarget = %f",pathCurvature,curvSpeed,newSpeed,distToTarget);			
+			LOG("path curvature = %f, curveSpeed = %f, newSpeed = %f, distToTarget = %f, newTurningAngle = %f",pathCurvature,curvSpeed,newSpeed,distToTarget, newTurningAngle);			
 		}
 		counter++;
 #endif
-
-		float newTurningAngle = asin(cross(curSteerDir,ptDir).y)/dt;
-		float newScoot =0.f;
 		// update locomotion state
-		curState->paramManager->setWeight(newSpeed, newTurningAngle, newScoot);
+		curState->paramManager->setWeight(newSpeed, nextTurningAngle, newScoot);
 		character->param_animation_ct->updateWeights();	
 		
 	}

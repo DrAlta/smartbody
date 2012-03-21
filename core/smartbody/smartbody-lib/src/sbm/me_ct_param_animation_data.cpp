@@ -995,9 +995,9 @@ double MotionParameters::getParameter(int type)
 	if (type == 1)
 		return getAccSpeed();
 	if (type == 2)
-		return getAvgAngularSpeed(); // return radian ?
+		return getAvgAngularSpeed()*(180.0/ (M_PI)); // return radian ?
 	if (type == 3)
-		return getAccAngularSpeed();
+		return getAccAngularSpeed()*(180.0/ (M_PI));
 	if (type == 4)
 		return getTransitionX();
 	if (type == 5)
