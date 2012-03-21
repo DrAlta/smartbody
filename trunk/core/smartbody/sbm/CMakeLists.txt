@@ -1,13 +1,7 @@
 include_directories( ./src )
 include_directories( ../smartbody-lib/src )
 
-link_directories(	/Users/shapiro/smartbody/trunk/lib/festival/festival/src/lib
-			/Users/shapiro/smartbody/trunk/lib/festival/speech_tools/lib
-		)
 find_package(OpenGL REQUIRED)
-link_directories( /home/shapiro/smartbody/trunk/lib/festival/src/lib
-		  /home/shapiro/smartbody/trunk/lib/speech_tools/lib
-		)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 find_library (COREAUDIO_LIBRARY CoreAudio)
@@ -121,8 +115,8 @@ endif()
 
 target_link_libraries( sbm-fltk
 
-	tcmalloc
-	profiler
+	#tcmalloc
+	#profiler
 	smartbody-lib
 	SbmDebugger
 	bonebus
