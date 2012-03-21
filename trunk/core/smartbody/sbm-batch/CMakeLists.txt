@@ -5,9 +5,41 @@ include_directories(
 	../smartbody-dll/include
 )
 
-link_directories( /home/shapiro/smartbody/trunk/lib/festival/src/lib
-                  /home/shapiro/smartbody/trunk/lib/speech_tools/lib
-		                  )
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+find_library (COREAUDIO_LIBRARY CoreAudio)
+find_library (AUDIOUNIT_LIBRARY AudioUnit)
+find_library (CORESERVICES_LIBRARY CoreServices)
+find_library (LIBSNDFILE sndfile )
+find_library (ALUT alut )
+find_library (OPENAL openal)
+find_library (FESTIVAL Festival ../../lib/festival/festival/src/lib)
+find_library (ESTBASE estbase ../../lib/festival/speech_tools/lib)
+find_library (ESTSTRING eststring ../../lib/festival/speech_tools/lib)
+find_library (ESTOOLS estools ../../lib/festival/speech_tools/lib)
+endif()
+
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set( MORE_LIBS
+        ${COREAUDIO_LIBRARY}
+        ${AUDIOUNIT_LIBRARY}
+        ${CORESERVICES_LIBRARY}
+        ${LIBSNDFILE}
+        ${ALUT}
+        ${OPENAL}
+        ${FESTIVAL}
+        ${ESTBASE}
+        ${ESTSTRING}
+        ${ESTOOLS}
+)
+else()
+set( MORE_LIBS
+        ${LIBSNDFILE}
+        ${ALUT}
+        ${OPENAL}
+)
+endif()
+
 
 
 set( SBM_BATCH_SRC
@@ -24,17 +56,11 @@ target_link_libraries( sbm-batch
 
 	smartbody-dll
 	activemq-cpp
-	tcmalloc
-	profiler
+#	tcmalloc
+#	profiler
 #	${CMAKE_REQUIRED_LIBRARIES} 
-	#Festival
-        estools
-	estbase
-	eststring
 	ncurses
-	sndfile
-	openal
-	alut
+	${MORE_LIBS}
 )
 
 set( EXEC_LIST
