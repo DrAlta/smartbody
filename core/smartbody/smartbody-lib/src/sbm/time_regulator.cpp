@@ -111,8 +111,7 @@ void SBM_sleep_msec( int msec )	{
 	}
 	Sleep( msec );
 #else
-	sleep(msec * 1000);
-	LOG( "SBM_sleep_msec ERR: not implemented" );
+	sleep(msec * .001);
 #endif
 }
 
