@@ -56,11 +56,17 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	std::string startingNow = xml_parse_string(BMLDefs::ATTR_STARTINGNOW, elem);
 	if (startingNow == "")
 		startingNow = "false";
+	std::string blendingMode = xml_parse_string(BMLDefs::ATTR_ADDITIVE, elem);
+	if (blendingMode == "")
+		blendingMode = "false";
+	std::string joint = xml_parse_string(BMLDefs::ATTR_PARTIALJOINT, elem);
+	if (joint == "")
+		joint = "null";
 	if (mode == "schedule")
 	{
 		std::stringstream command1;
 		command1 << "panim schedule char " << characterName;
-		command1 << " state " << stateName << " loop " << loopMode << " playnow " << startingNow;
+		command1 << " state " << stateName << " loop " << loopMode << " playnow " << startingNow << " additive " << blendingMode << " joint " << joint;
 		if (state)
 			for (int i = 0; i < state->getNumMotions(); i++)
 				command1 << " " << state->weights[i];

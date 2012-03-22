@@ -300,14 +300,14 @@ void PARunTimeEditor::run(Fl_Widget* widget, void* data)
 	if (transitionState != "")
 	{
 		std::stringstream command1;
-		command1 << "panim schedule char " << charName << " state " << transitionState << " loop false playnow false";
+		command1 << "panim schedule char " << charName << " state " << transitionState << " loop false playnow false additive false joint null";
 		editor->paWindow->execCmd(editor->paWindow, command1.str(), timeoffset);
 		timeoffset += 0.1;
 	}
 	if (nextCycleState != PseudoIdleState && nextCycleState != "")
 	{
 		std::stringstream command2;
-		command2 << "panim schedule char " << charName << " state " << nextCycleState << " loop true playnow false";
+		command2 << "panim schedule char " << charName << " state " << nextCycleState << " loop true playnow false additive false joint null";
 		editor->paWindow->execCmd(editor->paWindow, command2.str(), timeoffset);
 	}
 	
@@ -315,7 +315,7 @@ void PARunTimeEditor::run(Fl_Widget* widget, void* data)
 	if (nextCycleState == PseudoIdleState)
 	{
 		std::stringstream command3;
-		command3 << "panim schedule char " << charName << " state " << "PseudoIdle" << " loop true playnow true";
+		command3 << "panim schedule char " << charName << " state " << "PseudoIdle" << " loop true playnow true additive false joint null";
 		editor->paWindow->execCmd(editor->paWindow, command3.str(), timeoffset);
 	}
 }

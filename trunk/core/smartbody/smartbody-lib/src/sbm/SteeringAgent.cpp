@@ -1405,7 +1405,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			stepState->paramManager->setWeight(x, y);
 			std::stringstream command;
 			command << "panim schedule char " << character->getName();			
-			command << " state " << stepStateName << " loop false playnow false ";
+			command << " state " << stepStateName << " loop false playnow false additive false joint null ";
 			for (int i = 0; i < stepState->getNumMotions(); i++)
 				command << stepState->weights[i] << " ";
 			mcu.execute((char*) command.str().c_str());
@@ -1461,7 +1461,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 				locoState->paramManager->setWeight(0, 0, 0);
 				std::stringstream command;
 				command << "panim schedule char " << character->getName();
-				command << " state " << locomotionName << " loop true playnow true";
+				command << " state " << locomotionName << " loop true playnow true additive false joint null";
 				mcu.execute((char*) command.str().c_str());
 			}
 		}
@@ -1649,7 +1649,7 @@ void SteeringAgent::startLocomotion( float angleDiff )
 				w = (angleDiff - 90) / 90;
 				std::stringstream command;
 				command << "panim schedule char " << character->getName();			
-				command << " state " << startingLName << " loop false playnow false " << " 0 " << 1 - w << " " << w;
+				command << " state " << startingLName << " loop false playnow false additive false joint null " << " 0 " << 1 - w << " " << w;
 				mcu.execute((char*) command.str().c_str());
 			}
 			else
@@ -1657,7 +1657,7 @@ void SteeringAgent::startLocomotion( float angleDiff )
 				w = angleDiff / 90;
 				std::stringstream command;
 				command << "panim schedule char " << character->getName();					
-				command << " state " << startingLName << " loop false playnow false " << 1 - w << " " << w << " " << " 0 ";
+				command << " state " << startingLName << " loop false playnow false additive false joint null " << 1 - w << " " << w << " " << " 0 ";
 				mcu.execute((char*) command.str().c_str());
 			}
 		}
@@ -1668,7 +1668,7 @@ void SteeringAgent::startLocomotion( float angleDiff )
 				w = (angleDiff + 180) / 90;
 				std::stringstream command;
 				command << "panim schedule char " << character->getName();
-				command << " state " << startingRName << " loop false playnow false " << " 0 " << w << " " << 1 - w;
+				command << " state " << startingRName << " loop false playnow false additive false joint null " << " 0 " << w << " " << 1 - w;
 				mcu.execute((char*) command.str().c_str());
 			}
 			else
@@ -1676,7 +1676,7 @@ void SteeringAgent::startLocomotion( float angleDiff )
 				w = -angleDiff / 90;
 				std::stringstream command;
 				command << "panim schedule char " << character->getName();
-				command << " state " << startingRName << " loop false playnow true " << 1 - w << " " << w << " 0 ";
+				command << " state " << startingRName << " loop false playnow true additive false joint null " << 1 - w << " " << w << " 0 ";
 				mcu.execute((char*) command.str().c_str());
 			}				
 		}
@@ -1690,7 +1690,7 @@ void SteeringAgent::startLocomotion( float angleDiff )
 		}
 		std::stringstream command1;
 		command1 << "panim schedule char " << character->getName();
-		command1 << " state " << locomotionName << " loop true playnow false";
+		command1 << " state " << locomotionName << " loop true playnow false additive false joint null";
 		mcu.execute((char*) command1.str().c_str());
 	}
 }
@@ -1705,7 +1705,7 @@ void SteeringAgent::adjustFacingAngle( float angleDiff )
 		idleTurnState->paramManager->setWeight(-angleDiff);
 		std::stringstream command;
 		command << "panim schedule char " << character->getName();			
-		command << " state " << idleTurnName << " loop false playnow false ";
+		command << " state " << idleTurnName << " loop false playnow false additive false joint null ";
 		for (int i = 0; i < idleTurnState->getNumMotions(); i++)
 			command << idleTurnState->weights[i] << " ";
 		mcu.execute((char*) command.str().c_str());
@@ -1738,7 +1738,7 @@ float SteeringAgent::evaluateSteppingLoco(float x, float y, float z, float yaw)
 			stepState->paramManager->setWeight(x, y);
 			std::stringstream command;
 			command << "panim schedule char " << character->getName();			
-			command << " state " << stepStateName << " loop false playnow false ";
+			command << " state " << stepStateName << " loop false playnow false additive false joint null ";
 			for (int i = 0; i < stepState->getNumMotions(); i++)
 				command << stepState->weights[i] << " ";
 			mcu.execute((char*) command.str().c_str());

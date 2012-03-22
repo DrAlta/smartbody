@@ -41,6 +41,8 @@ struct ScheduleUnit
 	double time;
 	bool loop;
 	bool playNow;
+	bool additive;
+	std::string partialJoint;
 };
 /*
 	MeCtParamAnimation's task:	schedule in states
@@ -80,7 +82,7 @@ class MeCtParamAnimation : public MeCtContainer
 		const std::string& getBaseJointName();
 		
 		void dumpScheduling();
-		void schedule(PAStateData* state, bool l, bool pn = false);
+		void schedule(PAStateData* state, bool l, bool pn = false, bool additive = false, std::string jName = "");
 		void unschedule();
 		void updateWeights(std::vector<double> w);
 		void updateWeights();
@@ -94,7 +96,7 @@ class MeCtParamAnimation : public MeCtContainer
 
 	private:
 		void autoScheduling(double time);
-		PAStateModule* createStateModule(PAStateData* state, bool l, bool pn = false);
+		PAStateModule* createStateModule(ScheduleUnit su);
 		void reset();
 		void updateWo(SrMat&mat, MeCtChannelWriter* wo, SrBuffer<float>& buffer);
 		void controllerEaseOut(double t);

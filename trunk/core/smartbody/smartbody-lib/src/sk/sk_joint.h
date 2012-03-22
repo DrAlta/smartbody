@@ -129,6 +129,9 @@ public:
 	SkJoint* child ( int i ) const { return _children[i]; }
 	int num_children () const { return _children.size(); }
 
+	/* Recursively get all the child joint of current joint */
+	static void recursive_children(std::vector<SkJoint*>& joints, SkJoint* root);
+
 	/*! Set the name of this joint */
 	void name ( const std::string& jn ) { _name=jn; }
 	const std::string& name () const { return _name; }

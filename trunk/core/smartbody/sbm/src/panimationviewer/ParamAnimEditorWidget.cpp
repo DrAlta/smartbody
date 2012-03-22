@@ -130,6 +130,25 @@ bool ParamAnimEditorWidget::getBlockSelectionChanged()
 	return blockSelectionChanged;
 }
 
+void ParamAnimEditorWidget::setup()
+{
+	EditorWidget::setup();
+	
+	double maxEndTime = 0.0f;
+	// adjust the viewable end time
+	for (int t = 0; t < model->getNumTracks(); t++)
+	{
+		nle::Track* track = model->getTrack(t);
+		for (int b = 0; b < track->getNumBlocks(); b++)
+		{
+			nle::Block* block = track->getBlock(b);
+			double endTime = block->getEndTime();
+			if (maxEndTime < endTime)
+				maxEndTime = endTime;
+		}
+	}
+	this->setViewableTimeEnd(maxEndTime + 1.0);
+}
 
 void ParamAnimEditorWidget::setTrackSelectionChanged(bool val)
 {
