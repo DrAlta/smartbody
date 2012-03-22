@@ -7,6 +7,23 @@ find_library(ESTTOOLS estools ../../lib/festival/speech_tools/lib )
 find_library(ESTSTRING eststring ../../lib/festival/speech_tools/lib )
 find_library(ESTBASE estbase ../../lib/festival/speech_tools/lib )
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+find_library (COREAUDIO_LIBRARY CoreAudio)
+find_library (AUDIOUNIT_LIBRARY AudioUnit)
+find_library (CORESERVICES_LIBRARY CoreServices)
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set( MORE_LIBS
+        ${COREAUDIO_LIBRARY}
+        ${AUDIOUNIT_LIBRARY}
+        ${CORESERVICES_LIBRARY}
+)
+else()
+set( MORE_LIBS
+)
+endif()
+
 add_executable( festivalrelay
 
 	src/FestivalRelay.cpp
@@ -22,6 +39,8 @@ target_link_libraries( festivalrelay
 	vhcl
 	vhmsg	
 	activemq-cpp
+	ncurses
+	${MORE_LIBS}
 )
 
 install(

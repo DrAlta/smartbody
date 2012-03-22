@@ -1,2 +1,2 @@
 add_subdirectory( smartbody )
-#add_subdirectory( FestivalRelay )
+add_subdirectory( FestivalRelay )
