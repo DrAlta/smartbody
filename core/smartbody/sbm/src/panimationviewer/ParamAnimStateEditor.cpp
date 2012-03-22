@@ -286,7 +286,7 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 		}
 		editor->updateCorrespondenceMarks(currentState);
 	}
-//	editor->stateTimeMarkWidget->setup();
+	editor->stateTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
 
@@ -294,7 +294,7 @@ void PAStateEditor::addStateTimeMark(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	editor->paWindow->addTimeMark(editor->stateEditorNleModel);
-//	editor->stateTimeMarkWidget->setup();
+	editor->stateTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
 
@@ -302,7 +302,7 @@ void PAStateEditor::removeStateTimeMark(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	editor->paWindow->removeTimeMark(editor->stateEditorNleModel);
-//	editor->stateTimeMarkWidget->setup();
+	editor->stateTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
 
@@ -406,7 +406,7 @@ void PAStateEditor::updateCorrespondenceMarks(PAStateData* state)
 void PAStateEditor::refresh()
 {
 	stateEditorNleModel->removeAllTracks();
-//	stateTimeMarkWidget->setup();
+	stateTimeMarkWidget->setup();
 	stateAnimationList->clear();
 	animationList->clear();
 	loadMotions();

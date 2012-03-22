@@ -231,6 +231,7 @@ void PAMotions::setMotionContextMaps(MeControllerContext* context)
 		}
 		motionContextMaps.push_back(map);
 	}
+	_context = context;
 }
 
 int PAMotions::getNumMotions()
@@ -413,10 +414,12 @@ void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 
 PAInterpolator::PAInterpolator()
 {
+	additive = false;
 }
 
 PAInterpolator::PAInterpolator(std::vector<SkMotion*> m, std::vector<double> w) : PAMotions(m, w)
 {
+	additive = false;
 }
 
 PAInterpolator::~PAInterpolator()
@@ -430,16 +433,15 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 		if (weights[i] != 0.0)
 			indices.push_back(i);
 
+	SrBuffer<float> buffer;
+	buffer.size(buff.size());
 	if (indices.size() == 1)
 	{
-		SrBuffer<float> buffer;
-		buffer.size(buff.size());
 		buffer = buff;
 		int id = indices[0];
 		double time = times[id];
 		getBuffer(motions[id], time, motionContextMaps[id], buffer);
 		handleBaseMatForBuffer(buffer);
-		buff = buffer;
 	}
 
 #if MultiBlending
@@ -452,15 +454,13 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 		for (int i = 0; i < numMotions; i++)
 		{
 			buffers.push_back(SrBuffer<float>());
-			SrBuffer<float>& buffer = buffers[buffers.size() - 1];
-			buffer.size(buff.size());
-			buffer = buff;
-			getBuffer(motions[indices[i]], times[indices[i]], motionContextMaps[indices[i]], buffer);
-			handleBaseMatForBuffer(buffer);
+			SrBuffer<float>& b = buffers[buffers.size() - 1];
+			b.size(buff.size());
+			b = buff;
+			getBuffer(motions[indices[i]], times[indices[i]], motionContextMaps[indices[i]], b);
+			handleBaseMatForBuffer(b);
 		}
-		SrBuffer<float> tempBuffer;
-		tempBuffer.size(buff.size());
-		tempBuffer = buffers[0];
+		buffer = buffers[0];
 		SkChannelArray& motionChan = motions[indices[0]]->channels();
 		int chanSize = motionChan.size();
 		for (int i = 0; i < chanSize; i++)
@@ -478,12 +478,49 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 					for (int k = 0; k < j; k++)
 						prevWeight += weights[indices[k]];
 					double w = prevWeight / (weights[indices[j]] + prevWeight);
-					motions[indices[0]]->channels()[i].interp(&tempBuffer[buffId], &tempBuffer[buffId], &buffers[j][buffId], (float)(1 - w));
+					motions[indices[0]]->channels()[i].interp(&buffer[buffId], &buffer[buffId], &buffers[j][buffId], (float)(1 - w));
 				}
 			}
 		}
-		buff = tempBuffer;
 	}
+
+	if (joints.size() > 0)
+	{
+		for (size_t i = 0; i < joints.size(); i++)
+		{
+			JointChannelId chanId;
+			JointChannelId buffId;
+			chanId.q = _context->channels().search(joints[i].c_str(), SkChannel::Quat);
+			if (chanId.q < 0)
+				continue;
+
+			buffId.q = _context->toBufferIndex(chanId.q);
+			if (buffId.q < 0)
+				continue;
+			
+			SrQuat origQ;
+			origQ.w = buff[buffId.q + 0];
+			origQ.x = buff[buffId.q + 1];
+			origQ.y = buff[buffId.q + 2];
+			origQ.z = buff[buffId.q + 3];
+			SrQuat currQ;
+			currQ.w = buffer[buffId.q + 0];
+			currQ.x = buffer[buffId.q + 1];
+			currQ.y = buffer[buffId.q + 2];
+			currQ.z = buffer[buffId.q + 3];
+			SrQuat finalQ;
+			if (additive)
+				finalQ = origQ * currQ;
+			else
+				finalQ = currQ;
+			buff[buffId.q + 0] = finalQ.w;
+			buff[buffId.q + 1] = finalQ.x;
+			buff[buffId.q + 2] = finalQ.y;
+			buff[buffId.q + 3] = finalQ.z;
+		}
+	}
+	else
+		buff = buffer;
 #else
 	else if (indices.size() == 2)
 	{
@@ -524,6 +561,23 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 	}
 #endif
 }
+
+
+void PAInterpolator::setAdditiveMode(bool flag)
+{
+	additive = flag;	
+}
+
+void PAInterpolator::clearBlendingJoints()
+{
+	joints.clear();
+}
+
+void PAInterpolator::setBlendingJoints(std::vector<std::string>& j)
+{
+	joints = j;
+}
+
 
 void PAInterpolator::handleBaseMatForBuffer(SrBuffer<float>& buffer)
 {
@@ -742,7 +796,9 @@ void PAStateModule::evaluate(double timeStep, SrBuffer<float>& buffer)
 	if (loop || (!loop && notReachCycle))
 	{
 		interpolator->blending(timeManager->motionTimes, buffer);
-		woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffer);
+		if (interpolator->joints.size() == 0)
+			woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffer);
+
 		active = true;
 	}
 	else

@@ -23,6 +23,12 @@ BMLStateObject::BMLStateObject() : BMLObject()
 	startNow.push_back("true");
 	startNow.push_back("false");
 	startNowAttr->setValidValues(startNow);
+	SmartBody::StringAttribute* additiveAttr = createStringAttribute("sbm:additive", "", "", "Basic", 20, false, false, false, "The state being scheduled is in additive blending mode or not. Only used for scheduling, default is false");
+	std::vector<std::string> additive;
+	additive.push_back("true");
+	additive.push_back("false");
+	additiveAttr->setValidValues(additive);
+	createStringAttribute("sbm:partial-joint", "", "", "Basic", 20, false, false, false, "The state being scheduled is partially blended or not?");
 }
 
 BMLStateObject::~BMLStateObject()

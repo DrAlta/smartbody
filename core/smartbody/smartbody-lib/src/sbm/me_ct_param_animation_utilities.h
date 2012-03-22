@@ -80,6 +80,7 @@ class PAMotions
 	public:
 		std::vector<SkMotion*> motions;
 		std::vector<double> weights;
+		MeControllerContext* _context;
 	
 	protected:
 		std::vector<SrBuffer<int> > motionContextMaps;
@@ -134,8 +135,14 @@ class PAInterpolator : public PAMotions
 		PAInterpolator(std::vector<SkMotion*> m, std::vector<double> w);
 		~PAInterpolator();
 
+		std::vector<std::string> joints;	// joints to be blended, if this is defined which means partial, world offset would be ignored
+		bool additive;
+
 	public:
 		void blending(std::vector<double>& times, SrBuffer<float>& buff);
+		void setAdditiveMode(bool flag);
+		void clearBlendingJoints();
+		void setBlendingJoints(std::vector<std::string>& j);
 
 	private:
 		void handleBaseMatForBuffer(SrBuffer<float>& buff);

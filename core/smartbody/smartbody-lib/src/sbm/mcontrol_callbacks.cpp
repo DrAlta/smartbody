@@ -1070,6 +1070,19 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				else if (playNow == "false") pn = false;
 				else 
 					return CMD_FAILURE;
+				bool ad = false;
+				std::string additiveString = args.read_token();
+				if (additiveString != "additive")
+					return CMD_FAILURE;
+				std::string addtive = args.read_token();
+				if (addtive == "true") ad = true;
+				else if (addtive == "false") ad = false;
+				else
+					return CMD_FAILURE;
+				std::string jointString = args.read_token();
+				if (jointString != "joint")
+					return CMD_FAILURE;
+				std::string joint = args.read_token();
 				int numWeights = args.calc_num_tokens();
 				if (numWeights > 0)
 				{
@@ -1079,7 +1092,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 							state->weights[i] = args.read_double();
 					}
 				}
-				character->param_animation_ct->schedule(state, l, pn);
+				character->param_animation_ct->schedule(state, l, pn, ad, joint);
 			}
 
 			if (operation == "unschedule")

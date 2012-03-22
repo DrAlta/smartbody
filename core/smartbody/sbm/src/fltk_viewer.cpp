@@ -1768,9 +1768,9 @@ void FltkViewer::translate_keyboard_state()
 		if (_paLocoData->starting && _paLocoData->prevStarting && state && state->stateName == PseudoIdleState)
 		{
 			std::stringstream command1;
-			command1 << "panim schedule char " << _paLocoData->character->getName() << " state UtahStopToWalk loop false playnow false";
+			command1 << "panim schedule char " << _paLocoData->character->getName() << " state UtahStopToWalk loop false playnow false additive false joint null";
 			std::stringstream command2;
-			command2 << "panim schedule char " << _paLocoData->character->getName() << " state UtahLocomotion loop true playnow false";
+			command2 << "panim schedule char " << _paLocoData->character->getName() << " state UtahLocomotion loop true playnow false additive false joint null";
 			mcu.execute((char*)command1.str().c_str());
 			mcu.execute((char*)command2.str().c_str());
 			_paLocoData->starting = false;
@@ -1778,17 +1778,17 @@ void FltkViewer::translate_keyboard_state()
 		else if (_paLocoData->stopping && _paLocoData->prevStopping && state && state->stateName == "UtahLocomotion")
 		{
 			std::stringstream command;
-			command << "panim schedule char " << _paLocoData->character->getName() << " state UtahWalkToStop loop false playnow false";
+			command << "panim schedule char " << _paLocoData->character->getName() << " state UtahWalkToStop loop false playnow false additive false joint null ";
 			mcu.execute((char*)command.str().c_str());
 			_paLocoData->stopping = false;
 		}
 		else if (_paLocoData->jumping && _paLocoData->prevJumping && state && state->stateName == "UtahLocomotion")
 		{
 			std::stringstream command1;
-			command1 << "panim schedule char " << _paLocoData->character->getName() << " state UtahJump loop false playnow false";
+			command1 << "panim schedule char " << _paLocoData->character->getName() << " state UtahJump loop false playnow false additive false joint null ";
 			mcu.execute((char*)command1.str().c_str());	
 			std::stringstream command2;
-			command2 << "panim schedule char " << _paLocoData->character->getName() << " state UtahLocomotion loop true playnow false ";
+			command2 << "panim schedule char " << _paLocoData->character->getName() << " state UtahLocomotion loop true playnow false additive false joint null ";
 			for (int i = 0; i < state->getNumMotions(); i++)
 				command2 << state->weights[i] << " ";
 			mcu.execute((char*)command2.str().c_str());
@@ -3666,9 +3666,11 @@ void FltkViewer::drawLocomotion()
 			SrMat baseGM = baseJ->gmat();
 			SrVec baseVec = SrVec(baseGM.get(12), baseGM.get(13), baseGM.get(14));
 			if (character->trajectoryBuffer.size() >= SbmCharacter::trajectoryLength)
-				character->trajectoryBuffer.pop_front();			
-			SrVec prevBaseVec = character->trajectoryBuffer.back();
-			if ((baseVec-prevBaseVec).len() > character->getHeight()*0.01f)
+				character->trajectoryBuffer.pop_front();
+			SrVec prevBaseVec = baseVec;
+			if (character->trajectoryBuffer.size())
+				prevBaseVec = character->trajectoryBuffer.back();
+			//if ((baseVec-prevBaseVec).len() > character->getHeight()*0.01f)
 				character->trajectoryBuffer.push_back(baseVec);
 			std::list<SrVec>::iterator iter = character->trajectoryBuffer.begin();
 			glColor3f(1.0f, 1.0f, 0.0f);

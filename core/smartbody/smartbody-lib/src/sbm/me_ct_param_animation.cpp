@@ -256,13 +256,15 @@ void MeCtParamAnimation::dumpScheduling()
 	}
 }
 
-void MeCtParamAnimation::schedule(PAStateData* stateData, bool l, bool pn)
+void MeCtParamAnimation::schedule(PAStateData* stateData, bool l, bool pn, bool a, std::string name)
 {
 	ScheduleUnit unit;
 	unit.data = stateData;
 	unit.loop = l;
 	unit.playNow = pn;
 	unit.time = mcuCBHandle::singleton().time;
+	unit.additive = a;
+	unit.partialJoint = name;
 	waitingList.push_back(unit);
 }
 
@@ -380,7 +382,7 @@ void MeCtParamAnimation::autoScheduling(double time)
 		if (nextStateModule)
 			delete nextStateModule;
 		nextStateModule = NULL;
-		curStateModule = createStateModule(nextUnit.data, nextUnit.loop, nextUnit.playNow);
+		curStateModule = createStateModule(nextUnit);
 		if (!curStateModule)
 		{
 			return;
@@ -392,7 +394,10 @@ void MeCtParamAnimation::autoScheduling(double time)
 		waitingList.pop_front();
 		if (controllerBlending)
 		{
-			controllerBlending->addKey(time, 1.0);			controllerBlending->addKey(time + defaultTransition, 0.0);		}	}
+			controllerBlending->addKey(time, 1.0);			
+			controllerBlending->addKey(time + defaultTransition, 0.0);		
+		}	
+	}
 	else
 	{
 		if (transitionManager)
@@ -400,7 +405,7 @@ void MeCtParamAnimation::autoScheduling(double time)
 		PATransitionData* data = NULL;
 		if (nextUnit.data)
 			data = mcuCBHandle::singleton().lookUpPATransition(curStateModule->data->stateName, nextUnit.data->stateName);
-		nextStateModule = createStateModule(nextUnit.data, nextUnit.loop, nextUnit.playNow);
+		nextStateModule = createStateModule(nextUnit);
 		nextStateModule->active = false;
 		if (!data)
 		{
@@ -437,15 +442,31 @@ void MeCtParamAnimation::autoScheduling(double time)
 	}
 }
 
-PAStateModule* MeCtParamAnimation::createStateModule(PAStateData* stateData, bool l, bool pn)
+PAStateModule* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 {
 	PAStateModule* module = NULL;
-	if (stateData)
-		module = new PAStateModule(stateData, l, pn);
+	if (su.data)
+	{
+		module = new PAStateModule(su.data, su.loop, su.playNow);
+		module->interpolator->setAdditiveMode(su.additive);
+		std::vector<std::string> joints;
+		SkJoint* j = character->getSkeleton()->search_joint(su.partialJoint.c_str());
+		if (j)
+		{
+			std::vector<SkJoint*> jVec;
+			SkJoint::recursive_children(jVec, j);
+			for (size_t i = 0; i < jVec.size(); i++)
+			{
+				joints.push_back(jVec[i]->name());
+			}
+		}
+
+		module->interpolator->setBlendingJoints(joints);
+	}
 	else
 	{
 		module = new PseudoPAStateModule();
-		module->playNow = pn;
+		module->playNow = su.playNow;
 	}
 	if (_context)
 	{
