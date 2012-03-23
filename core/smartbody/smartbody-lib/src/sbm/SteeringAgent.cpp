@@ -492,6 +492,9 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 	bool locomotionEnd = false;
 	static int counter = 0;		
 	
+	if (steerPath.pathLength() == 0) // do nothing if there is no steer path
+		return; 
+
 	if (character->param_animation_ct->isIdle() && steerPath.pathLength() > 0)    // need to define when you want to start the locomotion
 	{
 		PAStateData* locoState = mcu.lookUpPAState(locomotionName.c_str());

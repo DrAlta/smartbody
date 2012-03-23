@@ -68,6 +68,7 @@ class PanimationWindow : public Fl_Double_Window, public GenericViewer
 		void draw();
         void show();  
 
+		SBCharacter* getCurrentCharacter();
 		bool checkCommand(std::string command);
 		static void execCmd(PanimationWindow* window, std::string command, double tOffset = 0.0);
 		std::vector<std::string> tokenize(const std::string& str,const std::string& delimiters);

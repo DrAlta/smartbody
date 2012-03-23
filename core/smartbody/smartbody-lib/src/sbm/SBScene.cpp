@@ -5,6 +5,12 @@
 #include "SbmDebuggerServer.h"
 #include <sbm/sbm_audio.h>
 
+SBScene* getScene()
+{	
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	return mcu._scene;
+}
+
 namespace SmartBody {
 
 SBScene::SBScene(void)

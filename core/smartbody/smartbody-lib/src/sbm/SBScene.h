@@ -21,7 +21,6 @@
 
 class SbmDebuggerServer;
 
-
 namespace SmartBody {
 
 class SBScene : public SBObject
@@ -125,5 +124,7 @@ class SBScene : public SBObject
 };
 
 };
+
+SBScene* getScene();
 
 #endif

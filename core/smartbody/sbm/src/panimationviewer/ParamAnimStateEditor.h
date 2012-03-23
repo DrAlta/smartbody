@@ -45,6 +45,7 @@ class PAStateEditor : public Fl_Group
 		static void removeMotion(Fl_Widget* widget, void* data);
 		static void changeStateList(Fl_Widget* widget, void* data);
 		static void addStateTimeMark(Fl_Widget* widget, void* data);
+		static void addFootStepMark(Fl_Widget* widget, void* data);
 		static void removeStateTimeMark(Fl_Widget* widget, void* data);
 		static void updateStateTimeMark(Fl_Widget* widget, void* data);
 		void updateCorrespondenceMarks(PAStateData* state);
@@ -65,6 +66,7 @@ class PAStateEditor : public Fl_Group
 		Fl_Button*		addMark;
 		Fl_Button*		removeMark;
 		Fl_Button*		updateMark;
+		Fl_Button*		autoFootStepMarks;
 		ParamAnimEditorWidget* stateTimeMarkWidget;
 		nle::NonLinearEditorModel* stateEditorNleModel;
 };

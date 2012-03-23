@@ -20,6 +20,7 @@ class SBAnimationState : public PAStateData
 		virtual std::vector<double> getCorrespondancePoints(int num);
 
 		virtual std::string getDimension();
+		bool validateState();
 
 	protected:
 		bool addSkMotion(const std::string& motionName);
@@ -30,6 +31,7 @@ class SBAnimationState : public PAStateData
 
 	protected:
 		std::string _dimension;
+		bool _isFinalized;
 
 };
 

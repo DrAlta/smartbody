@@ -393,6 +393,13 @@ PanimationWindow* PanimationWindow::getPAnimationWindow( Fl_Widget* w )
 	return panimWindow;
 }
 
+SBCharacter* PanimationWindow::getCurrentCharacter()
+{
+	std::string charName = characterList->menu()[characterList->value()].label();
+	SBScene* _scene = getScene();
+	return _scene->getCharacter(charName);
+}
+
 PanimationViewerFactory::PanimationViewerFactory()
 {
 }

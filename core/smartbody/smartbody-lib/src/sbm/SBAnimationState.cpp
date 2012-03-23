@@ -5,10 +5,12 @@ namespace SmartBody {
 
 SBAnimationState::SBAnimationState() : PAStateData()
 {
+	_isFinalized = false;
 }
 
 SBAnimationState::SBAnimationState(const std::string& name) : PAStateData(name)
 {
+	_isFinalized = false;
 }
 
 SBAnimationState::~SBAnimationState()
@@ -39,18 +41,17 @@ void SBAnimationState::addCorrespondancePoints(const std::vector<std::string>& m
 	{
 		LOG("Add correspondance points error, input motion number is not the same with points number!");
 		return;
-	}
+	}	
 	int num = motionNames.size();
-
 	// first time
-	if (keys.size() == 0)
-	{
-		for (int i = 0; i < num; i++)
-		{
-			std::vector<double> keyVec;
-			keys.push_back(keyVec);
-		}
-	}
+// 	if (keys.size() == 0)
+// 	{
+// 		for (int i = 0; i < num; i++)
+// 		{
+// 			std::vector<double> keyVec;
+// 			keys.push_back(keyVec);
+// 		}
+// 	}
 
 	for (int i = 0; i < num; i++)
 	{
@@ -101,19 +102,22 @@ std::string SBAnimationState::getDimension()
 
 bool SBAnimationState::addSkMotion(const std::string& motion)
 {
-	//TODO: remove weights from SBAnimationState
-	if (motions.size() == 0)
-		weights.push_back(1.0);
-	else
-		weights.push_back(0.0);
+	//TODO: remove weights from SBAnimationState	
 	//---
-
 	//TODO: remove skMotion maybe
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SkMotion* skMotion = mcu.getMotion(motion);
 	if (skMotion)
-	{
+	{		
+		if (motions.size() == 0)
+			weights.push_back(1.0);
+		else
+			weights.push_back(0.0);
+
 		motions.push_back(skMotion);
+
+		std::vector<double> keyVec;
+		keys.push_back(keyVec);
 	}
 	else
 	{
@@ -143,6 +147,30 @@ void SBAnimationState::validateCorrespondancePoints()
 	}
 }
 
+bool SBAnimationState::validateState()
+{
+	if (_isFinalized)
+		return true;
+
+	for (int i=0; i < getNumMotions(); i++)
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		SkMotion* skMotion = mcu.lookUpMotion(motions[i]->getName().c_str());		
+		if ((int)keys.size() < i) // no keys for this state
+		{			
+			keys.push_back(std::vector<double>());			
+		}		
+		std::vector<double>& keyVec = keys[i];
+		if (keyVec.size() == 0) // if no keys for the motion, automatically set up this based on motion duration
+		{
+			keyVec.push_back(0.0);
+			keyVec.push_back(skMotion->duration());
+		}
+	}
+	_isFinalized = true;
+	return true;
+}
+
 SBAnimationState0D::SBAnimationState0D() : SBAnimationState("unknown")
 {
 }
@@ -158,7 +186,7 @@ SBAnimationState0D::~SBAnimationState0D()
 
 void SBAnimationState0D::addMotion(const std::string& motion)
 {
-	addSkMotion(motion);
+	addSkMotion(motion);	
 }
 
 SBAnimationState1D::SBAnimationState1D() : SBAnimationState("unknown")
