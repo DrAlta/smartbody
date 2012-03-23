@@ -62,6 +62,10 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 			removeMark->callback(removeStateTimeMark, this);
 			updateMark = new Fl_Button(14 * xDis + 300+ esx, yDis + esy, 100, 2 * yDis, "Update Mark");
 			updateMark->callback(updateStateTimeMark, this);
+#ifdef AUTO_FOOTSTEP_MARK
+			autoFootStepMarks = new Fl_Button(15 * xDis + 400+ esx, yDis + esy, 100, 2 * yDis, "Auto Footsteps");
+			autoFootStepMarks->callback(addFootStepMark, this);
+#endif
 		buttonGroup->end();
 
 		editStateTimeMarkGroup = new Fl_Scroll(esx, esy + 3 * yDis + 10, w - 2 * xDis, h / 2 - 5 * yDis - 10);
@@ -290,6 +294,13 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 	editor->paWindow->redraw();
 }
 
+void PAStateEditor::addFootStepMark( Fl_Widget* widget, void* data )
+{
+	LOG("Automatically add foot step marks");
+	PAStateEditor* editor = (PAStateEditor*) data;
+
+}
+
 void PAStateEditor::addStateTimeMark(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
@@ -412,3 +423,4 @@ void PAStateEditor::refresh()
 	loadMotions();
 	loadStates();
 }
+

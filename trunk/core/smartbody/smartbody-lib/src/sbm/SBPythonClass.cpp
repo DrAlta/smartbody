@@ -151,11 +151,7 @@ void printLog(const std::string& message)
 	LOG(message.c_str());
 }
 
-SBScene* getScene()
-{	
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	return mcu._scene;
-}
+
 
 SBController* createController(std::string controllerType, std::string controllerName)
 {

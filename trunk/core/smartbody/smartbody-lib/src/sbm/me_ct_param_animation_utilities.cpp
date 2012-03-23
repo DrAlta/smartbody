@@ -329,7 +329,13 @@ void PAMotions::getUpdateMat(SrMat& dest, SrMat& src)
 	SrQuat quatP = SrQuat(mat);
 */
 	SrVec vec = quat.axis() * quat.angle();
-	SrVec vec1 = vec * prerotMat.inverse();
+	SrVec vec1 = vec * basePrerot;//prerotMat.inverse();
+// 	if (quat.angle() > 0.01)
+// 	{		
+// 		sr_out << "prerot = " << basePrerot << srnl;	
+// 		sr_out << "vec = " << vec << srnl;
+// 		sr_out << "vec1 = " << vec1 << srnl;
+// 	}
 	quat = SrQuat(vec1);
 	SrMat mat;
 	quat.get_mat(mat);
@@ -388,7 +394,7 @@ void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 	*/
 	
 	SrVec vec = quat.axis() * quat.angle();
-	SrVec vec1 = vec * prerotMat.inverse();
+	SrVec vec1 = vec * prerotMat;//prerotMat.inverse();
 	quat = SrQuat(vec1);
 	SrMat mat;
 	quat.get_mat(mat);
@@ -398,7 +404,7 @@ void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 	sr_euler_mat(rotType, mat, rx, ry, rz);
 	SrQuat quatP = SrQuat(mat);
 	vec1 = quatP.axis() * quatP.angle();
-	SrVec vec2 = vec1 * prerotMat;
+	SrVec vec2 = vec1 * prerotMat.inverse();
 	quatP = SrQuat(vec2);
 
 /*

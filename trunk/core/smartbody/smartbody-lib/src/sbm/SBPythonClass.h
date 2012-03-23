@@ -126,8 +126,6 @@ class Camera
 void pythonExit();
 void quitSbm();
 void reset();
-SBScene* getScene();
-
 void printLog(const std::string& message);
 
 SBController* createController(std::string controllerType, std::string controllerName);

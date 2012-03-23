@@ -259,6 +259,11 @@ void MeCtParamAnimation::dumpScheduling()
 void MeCtParamAnimation::schedule(PAStateData* stateData, bool l, bool pn, bool a, std::string name)
 {
 	ScheduleUnit unit;
+	SBAnimationState* animState = dynamic_cast<SBAnimationState*>(stateData);
+	if (animState)
+	{
+		animState->validateState(); // to make sure the animaion state is valid before schedule it
+	}
 	unit.data = stateData;
 	unit.loop = l;
 	unit.playNow = pn;
@@ -478,7 +483,9 @@ PAStateModule* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 		module->interpolator->initPreRotation(baseJoint->quat()->prerot());
 		module->woManager->setMotionContextMaps(_context);
 		module->woManager->initChanId(_context, baseJointName);
-		module->woManager->initPreRotation(character->getSkeleton()->search_joint(baseJointName.c_str())->quat()->prerot());
+		SrQuat preRot = character->getSkeleton()->search_joint(baseJointName.c_str())->quat()->prerot();
+		//LOG("prerot axis = %f %f %f, angle = %f",preRot.axis()[0],preRot.axis()[1],preRot.axis()[2], preRot.angle());
+		module->woManager->initPreRotation(preRot);
 	}
 	else
 		return NULL;
