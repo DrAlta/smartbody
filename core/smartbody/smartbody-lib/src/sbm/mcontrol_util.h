@@ -214,7 +214,6 @@ class mcuCBHandle {
 		vhcl::Log::Listener* logListener;
 		bool		net_bone_updates;
 		bool		net_world_offset_updates;
-		bool		net_face_bones;
 		bool        updatePhysics;
 		bool		sendPawnUpdates; // if true, sends the pawn information over bonebus in the same wasy as the characters
 		bool        resourceDataChanged;

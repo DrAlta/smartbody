@@ -4456,7 +4456,7 @@ void PALocomotionData::updateKeys(float dt)
 			state = character->param_animation_ct->getCurrentPAStateData();	
 
 	if (!state) return;
-	float unitScale = 1.f/getScene()->getScale();
+	float unitScale = 1.f/SmartBody::SBScene::getScene()->getScale();
 	float scale = 0.05f;
 	if (state->stateName == locoStateName)
 		scale = 1.f;

@@ -538,7 +538,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::def("reset", reset, "Reset SBM. ");
 	boost::python::def("quit", quitSbm, "Quit SBM. ");
 	boost::python::def("printlog", printLog, "Write to the log. \n Input: message string \n Output: NULL");
-	boost::python::def("getScene", getScene, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the SmartBody scene object.");
+	boost::python::def("getScene", SBScene::getScene, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the SmartBody scene object.");
 
 
 

@@ -231,7 +231,6 @@ mcuCBHandle::mcuCBHandle()
 	profiler_p( NULL ),
 	net_bone_updates( false ),
 	net_world_offset_updates( true ),
-	net_face_bones( false ),
 	sbm_character_listener( NULL ),
 	play_internal_audio( false ),
 	resourceDataChanged( false ),
@@ -1229,7 +1228,7 @@ void mcuCBHandle::update( void )	{
 			else if (!isClosingBoneBus && !char_p->bonebusCharacter && _scene->getBoneBusManager()->getBoneBus().IsOpen())
 			{
 				// bonebus was connected after character creation, create it now
-				char_p->bonebusCharacter = _scene->getBoneBusManager()->getBoneBus().CreateCharacter( char_p->getName().c_str(), char_p->getClassType().c_str(), this->net_face_bones );
+				char_p->bonebusCharacter = _scene->getBoneBusManager()->getBoneBus().CreateCharacter( char_p->getName().c_str(), char_p->getClassType().c_str(), true );
 			}
 		}  // end of char_p processing
 	} // end of loop
@@ -2111,7 +2110,7 @@ int mcuCBHandle::registerCharacter(SbmCharacter* character)
 	character_map.insert(std::pair<std::string, SbmCharacter*>(character->getName(), character));
 
 	if (_scene->getBoneBusManager()->isEnable())
-		_scene->getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), mcuCBHandle::singleton().net_face_bones );
+		_scene->getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true );
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 		mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
 

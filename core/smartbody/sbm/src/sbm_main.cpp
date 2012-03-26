@@ -619,7 +619,7 @@ int main( int argc, char **argv )	{
 		}
 		else if ( s.search( "-facebone" ) == 0 )
 		{
-			mcu.net_face_bones = true;
+			LOG("-facebone option has been deprecated.");
 		}
 		else if ( s.search( "-skscale=" ) == 0 )
 		{
