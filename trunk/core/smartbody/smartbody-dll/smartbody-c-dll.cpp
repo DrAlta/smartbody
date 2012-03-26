@@ -196,19 +196,6 @@ SMARTBODY_C_DLL_API bool SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandle, co
    return true;
 }
 
-
-SMARTBODY_C_DLL_API bool SBM_SetFacebone( SBMHANDLE sbmHandle, bool enabled )
-{
-   if ( !SBM_HandleExists( sbmHandle ) )
-   {
-      return false;
-   }
-
-   g_smartbodyInstances[ sbmHandle ]->SetFacebone( enabled );
-   return true;
-}
-
-
 SMARTBODY_C_DLL_API bool SBM_SetProcessId( SBMHANDLE sbmHandle, const char * processId )
 {
    if ( !SBM_HandleExists( sbmHandle ) )

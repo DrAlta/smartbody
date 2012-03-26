@@ -296,7 +296,6 @@ int main( int argc, char ** argv )
 	printf( "Starting SBM\n" );
 
 	Init();
-	SetFacebone();
 
 	printf( "Starting main loop, hit 'q' to quit\n" );
 

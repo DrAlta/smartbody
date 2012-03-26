@@ -23,11 +23,14 @@ class SbmDebuggerServer;
 
 namespace SmartBody {
 
+
 class SBScene : public SBObject
 {
 	public:
 		SBScene(void);
 		~SBScene(void);
+
+		static SBScene* getScene();
 
 		void setScale(float val);
 		float getScale();
@@ -125,6 +128,6 @@ class SBScene : public SBObject
 
 };
 
-SBScene* getScene();
+
 
 #endif

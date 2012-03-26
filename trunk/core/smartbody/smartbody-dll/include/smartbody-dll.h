@@ -78,7 +78,6 @@ class Smartbody_dll
       SMARTBODY_DLL_API virtual ~Smartbody_dll();
 
       SMARTBODY_DLL_API void SetSpeechAudiofileBasePath( const std::string & basePath );
-      SMARTBODY_DLL_API void SetFacebone( const bool enabled );
       SMARTBODY_DLL_API void SetProcessId( const std::string & processId );
       SMARTBODY_DLL_API void SetMediaPath( const std::string & path );
 
@@ -94,7 +93,6 @@ class Smartbody_dll
       SMARTBODY_DLL_API void SetDebuggerRendererRightHanded( bool enabled );
 
       SMARTBODY_DLL_API bool ProcessVHMsgs( const char * op, const char * args );
-
 
       SMARTBODY_DLL_API int GetNumberOfCharacters();
 

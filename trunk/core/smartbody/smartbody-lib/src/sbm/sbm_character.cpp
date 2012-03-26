@@ -487,7 +487,6 @@ void SbmCharacter::initData()
 	locomotion_type = Basic;
 	statePrefix = "";
 
-	createBoolAttribute("facebone", false, true, "Basic", 200, false, false, false, "Use bones for facial animation. If false, blendshapes will be used. If true, face will be animated via face definitions.");
 	createBoolAttribute("visemecurve", false, true, "Basic", 200, false, false, false, "Use curve-based visemes instead of discrete visemes.");
 	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
 	timeDelayAttr->setMin(0.0);
@@ -856,7 +855,7 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 	steeringAgent = new SteeringAgent(this);
 
 	if (mcuCBHandle::singleton().net_bone_updates)
-		bonebusCharacter = mcuCBHandle::singleton()._scene->getBoneBusManager()->getBoneBus().CreateCharacter( getName().c_str(), classType, mcuCBHandle::singleton().net_face_bones );
+		bonebusCharacter = mcuCBHandle::singleton()._scene->getBoneBusManager()->getBoneBus().CreateCharacter( getName().c_str(), classType, true );
 
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{		
@@ -3583,11 +3582,6 @@ void SbmCharacter::notify(SBSubject* subject)
 			{
 				LOG("Problem setting attribute 'mesh' on character %s", getName().c_str());
 			}
-		}
-		if (attrName == "facebone")
-		{
-			SmartBody::BoolAttribute* faceBoneAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
-			// deprecated - face bones are now defined by the face definition
 		}
 		if (attrName.find("steering.") == 0)
 		{

@@ -153,18 +153,6 @@ SMARTBODY_DLL_API void Smartbody_dll::SetSpeechAudiofileBasePath( const std::str
    scene->addAssetPath("audio", basePath);
 }
 
-
-SMARTBODY_DLL_API void Smartbody_dll::SetFacebone( const bool enabled )
-{
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
-   SBScene * scene = mcu._scene;
-
-   // TODO: need a scene->setFacebone(enabled);
-   scene;
-   mcu.net_face_bones = enabled;
-}
-
-
 SMARTBODY_DLL_API void Smartbody_dll::SetProcessId( const std::string & processId )
 {
    mcuCBHandle & mcu = mcuCBHandle::singleton();
