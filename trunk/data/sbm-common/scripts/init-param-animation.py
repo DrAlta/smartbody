@@ -9,3 +9,5 @@ scene.run("stateAllStep.py")
 
 # transitions
 scene.run("transitions.py")
+
+scene.run("stateSimple.py")

@@ -267,7 +267,7 @@ void SBPhysicsManager::updatePhysicsCharacter( std::string charName )
 		bool kinematicRoot = (jointName == "base" || jointName == "JtPelvis") && phyChar->getBoolAttribute("kinematicRoot");	
 #if USE_PHYSICS_CHARACTER		
 		bool constraintObj = false;
-		SBPawn* constraintPawn = getScene()->getPawn(phyObj->getStringAttribute("constraintTarget"));
+		SBPawn* constraintPawn = SmartBody::SBScene::getScene()->getPawn(phyObj->getStringAttribute("constraintTarget"));
 		if (charPhySim && constraintPawn && phyObj->getBoolAttribute("constraint"))
 		{				
 			phyObj->enablePhysicsSim(false);				

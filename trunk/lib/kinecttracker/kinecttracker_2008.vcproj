@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./include;./;..\vhcl\include;&quot;..\vhmsg\vhmsg-c\include&quot;"
+				AdditionalIncludeDirectories=".;&quot;C:\Program Files (x86)\OpenNI\Include&quot;;&quot;C:\Program Files (x86)\OpenNI\Include\Win32&quot;;..\vhcl\include;&quot;..\vhmsg\vhmsg-c\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -65,10 +65,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="openNI.lib glut32.lib vhcl_d.lib vhmsg_d.lib activemq-cppd.lib pthreadVSE2.lib"
+				AdditionalDependencies="OpenNI.lib glut32.lib vhcl_d.lib vhmsg_d.lib activemq-cppd.lib pthreadVSE2.lib"
 				OutputFile="./bin/$(ProjectName)d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="./libs;..\vhcl\lib;&quot;..\vhmsg\vhmsg-c\lib&quot;;&quot;..\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;..\pthreads\lib"
+				AdditionalLibraryDirectories="./libs;..\vhcl\lib;&quot;..\vhmsg\vhmsg-c\lib&quot;;&quot;..\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;..\pthreads\lib;;&quot;C:\Program Files (x86)\OpenNI\Lib&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="1"
@@ -94,7 +94,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y activemq-cppd.dll bin&#x0D;&#x0A;copy /Y libapr-1.dll bin&#x0D;&#x0A;copy /Y libapriconv-1.dll bin&#x0D;&#x0A;copy /Y libaprutil-1.dll bin&#x0D;&#x0A;copy /Y glut32.dll bin&#x0D;&#x0A;"
+				CommandLine="copy /Y &quot;C:\Program Files (x86)\OpenNI\Bin\OpenNI.dll&quot;  bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll  bin&#x0D;&#x0A;copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll bin&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -175,7 +175,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y activemq-cpp.dll bin&#x0D;&#x0A;copy /Y libapr-1.dll bin&#x0D;&#x0A;copy /Y libapriconv-1.dll bin&#x0D;&#x0A;copy /Y libaprutil-1.dll bin&#x0D;&#x0A;copy /Y glut32.dll bin&#x0D;&#x0A;"
+				CommandLine="copy /Y &quot;C:\Program Files (x86)\OpenNI\Bin\OpenNI.dll&quot;  bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll  bin&#x0D;&#x0A;copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll bin&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
