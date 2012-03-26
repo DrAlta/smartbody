@@ -406,6 +406,9 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
    init_foot_print();
    _lastSelectedCharacter = "";
+
+   // init timer update for keyboard
+   Fl::add_timeout(0.01,timerUpdate,_paLocoData);
 }
 
 void FltkViewer::create_popup_menus()
@@ -1593,6 +1596,8 @@ void FltkViewer::translate_keyboard_state()
 	if (_paLocoData->character && _paLocoData->character->param_animation_ct)
 		if (_paLocoData->character->param_animation_ct)
 			state = _paLocoData->character->param_animation_ct->getCurrentPAStateData();
+
+#ifdef OLD_LOCOMOTION_CONTROL
 	if(Fl::event_key(FL_Up))
 	{
 		if(!_locoData->upkey)
@@ -1607,6 +1612,7 @@ void FltkViewer::translate_keyboard_state()
 		}
 		if (_paLocoData->character->locomotion_type == SbmCharacter::Example)
 		{
+
 			if (Fl::event_state(FL_ALT))
 				_paLocoData->starting = true;
 			if (!_paLocoData->starting)
@@ -1765,24 +1771,25 @@ void FltkViewer::translate_keyboard_state()
 	if (paLocomotionCmd)
 	{
 		// p.s. quite confused about the logic here: _paLocoData->starting && _paLocoData->prevStarting? why this works?
-		if (_paLocoData->starting && _paLocoData->prevStarting && state && state->stateName == PseudoIdleState)
+		//if (_paLocoData->starting && _paLocoData->prevStarting && state && state->stateName == PseudoIdleState)
+		if (_paLocoData->starting && state && state->stateName == PseudoIdleState)
 		{
-			std::stringstream command1;
-			command1 << "panim schedule char " << _paLocoData->character->getName() << " state UtahStopToWalk loop false playnow false additive false joint null";
-			std::stringstream command2;
-			command2 << "panim schedule char " << _paLocoData->character->getName() << " state UtahLocomotion loop true playnow false additive false joint null";
+			std::stringstream command1;			
+			command1 << "panim schedule char " << _paLocoData->character->getName() << " state allLocomotion loop true playnow false additive false joint null";
+			//std::stringstream command2;
+			//command2 << "panim schedule char " << _paLocoData->character->getName() << " state UtahLocomotion loop true playnow false additive false joint null";
 			mcu.execute((char*)command1.str().c_str());
-			mcu.execute((char*)command2.str().c_str());
+			//mcu.execute((char*)command2.str().c_str());			
 			_paLocoData->starting = false;
 		}
-		else if (_paLocoData->stopping && _paLocoData->prevStopping && state && state->stateName == "UtahLocomotion")
+		else if (_paLocoData->stopping && _paLocoData->prevStopping && state && state->stateName == "allLocomotion")
 		{
 			std::stringstream command;
 			command << "panim schedule char " << _paLocoData->character->getName() << " state UtahWalkToStop loop false playnow false additive false joint null ";
 			mcu.execute((char*)command.str().c_str());
 			_paLocoData->stopping = false;
 		}
-		else if (_paLocoData->jumping && _paLocoData->prevJumping && state && state->stateName == "UtahLocomotion")
+		else if (_paLocoData->jumping && _paLocoData->prevJumping && state && state->stateName == "allLocomotion")
 		{
 			std::stringstream command1;
 			command1 << "panim schedule char " << _paLocoData->character->getName() << " state UtahJump loop false playnow false additive false joint null ";
@@ -1816,6 +1823,34 @@ void FltkViewer::translate_keyboard_state()
 			}
 		}
 	}
+#else
+	
+	static std::map<int,int> keyMap;
+	if (keyMap.size() == 0)
+	{
+		keyMap['w'] = PALocomotionData::KEY_UP;
+		keyMap['s'] = PALocomotionData::KEY_DOWN;
+		keyMap['a'] = PALocomotionData::KEY_LEFT;
+ 		keyMap['d'] = PALocomotionData::KEY_RIGHT;
+		keyMap['q'] = PALocomotionData::KEY_TURNLEFT;
+		keyMap['e'] = PALocomotionData::KEY_TURNRIGHT;
+	}
+
+	std::map<int,int>::iterator mi;
+	for ( mi  = keyMap.begin();
+		  mi != keyMap.end();
+		  mi++)
+	{
+		if (Fl::event_key(mi->first))
+		{
+			_paLocoData->pressKey(mi->second);
+		}
+		else
+		{
+			_paLocoData->releaseKey(mi->second);
+		}
+	}	
+#endif
 }
 
 
@@ -4352,10 +4387,18 @@ void FltkViewer::makeShadowMap()
 
 }
 
+void FltkViewer::timerUpdate( void* data )
+{
+	PALocomotionData* paLocoData = (PALocomotionData*)data;	
+	paLocoData->updateKeys(0.01f);
+	Fl::repeat_timeout(0.01,timerUpdate,paLocoData);	
+}
+
 PALocomotionData::PALocomotionData()
 {
-	w = -9999;
-	v = -9999;
+	w = 0;
+	v = 0;
+	s = 0;
 	character = NULL;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
@@ -4373,10 +4416,199 @@ PALocomotionData::PALocomotionData()
 	prevStopping = false;
 	prevJumping = false;
 	linearVelocityIncrement = 5.0f;
-	angularVelocityIncrement = 10.0f;
+	angularVelocityIncrement = 10.0f;	
+	keyControl = false;
+
+	keyPressMap[KEY_LEFT] = false;
+	keyPressMap[KEY_RIGHT] = false;
+	keyPressMap[KEY_TURNLEFT] = false;
+	keyPressMap[KEY_TURNRIGHT] = false;
+	keyPressMap[KEY_UP] = false;
+	keyPressMap[KEY_DOWN] = false;
+	keyPressMap[KEY_SHIFT] = false;
 }
 
 PALocomotionData::~PALocomotionData()
 {
 }
+
+void PALocomotionData::pressKey( int keyID )
+{
+	keyPressMap[keyID] = true;	
+	keyControl = true;
+}
+
+void PALocomotionData::releaseKey( int keyID )
+{
+	keyPressMap[keyID] = false;
+}
+
+void PALocomotionData::updateKeys(float dt)
+{
+	//LOG("paLocomotionUpdateKeys");
+	// acceleration when the key is pressed
+	if (!keyControl) return;
+
+	std::string locoStateName = "allLocomotion";
+	PAStateData* state = NULL;
+	if (character && character->param_animation_ct)
+		if (character->param_animation_ct)
+			state = character->param_animation_ct->getCurrentPAStateData();	
+
+	if (!state) return;
+	float unitScale = 1.f/getScene()->getScale();
+	float scale = 0.05f;
+	if (state->stateName == locoStateName)
+		scale = 1.f;
+	
+	float linearAcc = 1.f*scale*unitScale;
+	float angularAcc = 200.f*scale;
+	float strifeAcc = 1.f*scale*unitScale;
+
+	// automatic de-acceleration when the key is not pressed
+	float linearDcc = linearAcc*2.5f;
+	float angularDcc = angularAcc*2.0f;
+	float straifeDc = strifeAcc*2.5f;
+	
+	if (keyPressMap[KEY_UP] || keyPressMap[KEY_DOWN])
+	{
+		if (keyPressMap[KEY_UP])
+		{
+			v += linearAcc*dt;
+		}
+		else if (keyPressMap[KEY_DOWN])
+		{
+			v -= linearAcc*dt;
+		}
+	}
+	else // gradually de-accelerate
+	{
+		if (v > 0)
+		{
+			v -= linearDcc*dt; 			
+		}		
+	}
+
+	if (keyPressMap[KEY_LEFT] || keyPressMap[KEY_RIGHT])
+	{
+		if (keyPressMap[KEY_RIGHT])
+		{
+			s += strifeAcc*dt;
+		}
+		else if (keyPressMap[KEY_LEFT])
+		{
+			s -= strifeAcc*dt;
+		}
+	}
+	else // gradually de-accelerate
+	{
+		if (s > 0) 
+		{
+			s -= straifeDc*dt; 
+			if (s < 0) s = 0;
+		}
+		else if (s < 0) 
+		{
+			s += straifeDc*dt;
+			if (s > 0) w =s;
+		}	
+	}
+
+	if (keyPressMap[KEY_TURNLEFT] || keyPressMap[KEY_TURNRIGHT])
+	{
+		if (keyPressMap[KEY_TURNLEFT])
+		{
+			w += angularAcc*dt;		
+		}
+		else 
+		{
+			w -= angularAcc*dt;
+		}
+	}
+	else // gradually de-accelerate
+	{
+		if (w > 0) 
+		{
+			w -= angularDcc*dt; 
+			if (w < 0) w = 0;
+		}
+		else if (w < 0) 
+		{
+			w += angularDcc*dt;
+			if (w > 0) w =0;
+		}
+	}
+
+	// speed limits	
+	float runSpeedLimit = 4.f*unitScale;
+	float walkSpeedLimit = 1.2f*unitScale;
+	float angSpeedLimit = 200.f;
+	float strifeSpeedLimit = 1.f*unitScale;
+	// make sure the control parameter does not exceed limits
+	
+
+	if (w > angSpeedLimit) w = angSpeedLimit;
+	if (w < -angSpeedLimit) w = -angSpeedLimit;
+
+	if (s > strifeSpeedLimit) s = strifeSpeedLimit;
+	if (s < -strifeSpeedLimit) s = -strifeSpeedLimit;
+	//if (v > runSpeedLimit) v = runSpeedLimit;		
+	if (keyPressMap[KEY_SHIFT])
+	{
+		if (v > runSpeedLimit)
+			v = runSpeedLimit;
+
+		if (v <= runSpeedLimit && v > walkSpeedLimit)
+		{
+			v -= (linearAcc*dt+linearDcc*dt);	
+			if (v < walkSpeedLimit)
+				v = walkSpeedLimit;
+		}
+	}
+	else
+	{
+		if (v > runSpeedLimit)
+			v = runSpeedLimit;
+	}
+	if (v < 0) v = 0; // we don't allow backward walking....yet 
+	
+	// update speed 	
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	//float pv, pw, ps;
+	//state->paramManager->getParameter(pv,pw,ps);
+	float speedEps = 0.001f*unitScale;	
+	float angleEps = 0.01f;
+	if ( (fabs(v) > 0 || fabs(w) > 0 || fabs(s)) && state->stateName == PseudoIdleState && !starting)
+	{
+		std::stringstream command1;			
+		PAStateData* locoState = mcu.lookUpPAState("allLocomotion");
+		locoState->paramManager->setWeight(0, 0, 0);
+		command1 << "panim schedule char " << character->getName() << " state allLocomotion loop true playnow false additive false joint null ";		
+		for (int i = 0; i < locoState->getNumMotions(); i++)
+			command1 << locoState->weights[i] << " ";
+		//LOG("startLocomotion, %s",command1.str().c_str());
+		mcu.execute((char*)command1.str().c_str());	
+		starting = true;
+		stopping = false;
+	}
+	else if (fabs(v) < speedEps && fabs(w) < angleEps && fabs(s) < speedEps && state->stateName == locoStateName && !stopping)
+	{
+		v = w = 0;
+		bool success = state->paramManager->setWeight(0,0,0);
+		std::stringstream command;
+		command << "panim schedule char " << character->getName() << " state " << PseudoIdleState << " loop true playnow true additive false joint null ";
+		//LOG("stopLocomotion, %s",command.str().c_str());
+		mcu.execute((char*)command.str().c_str());				
+		stopping = true;
+		starting = false;
+		keyControl = false;
+	}
+	else // update moving parameter
+	{		
+		bool success = state->paramManager->setWeight(v, w, s);		
+ 		character->param_animation_ct->updateWeights();
+	}	
+		
+}
+
 //================================ End of File =================================================

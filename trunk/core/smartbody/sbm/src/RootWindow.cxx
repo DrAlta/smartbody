@@ -61,7 +61,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Camera/Track Character", 0, TrackCharacterCB, this, NULL);
 	menubar->add("&Camera/Rotate Around Selected", 0, RotateSelectedCB, this, NULL);
 //	menubar->add("&Settings/Softeyes", 0, SettingsSofteyesToggleCB, this, NULL);
-	menubar->add("&Settings/Internal Audio", 0, AudioCB, this, NULL);
+	menubar->add("&Settings/Internal Audio", 0, AudioCB, this, NULL);	
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
 	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
 	menubar->add("&Window/Parameterized Animation Viewer", 0, LaunchParamAnimViewerCB, this, NULL);

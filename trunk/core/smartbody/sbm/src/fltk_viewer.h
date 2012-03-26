@@ -264,9 +264,6 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	FltkViewerData* getData() { return _data; };
 	LocomotionData* getLocomotionData() { return _locoData; };
 	ObjectManipulationHandle& getObjectManipulationHandle() { return _objManipulator; };
-
-	void updateLights();
-
 	std::string _lastSelectedCharacter;
 
    public : // virtual methods
@@ -333,6 +330,9 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	void drawKinematicFootprints(int index);
 	void newPrints(bool newprint, int index, SrVec& pos, SrVec& orientation, SrVec& normal, SrVec& color, int side, int type);
 	static void ChangeOffGroundHeight(Fl_Widget* widget, void* data);
+	static void timerUpdate(void* data);
+	void updateLights();
+
 	void create_pawn();
 
 	int gridList;
@@ -488,11 +488,14 @@ class LocomotionData
 
 class PALocomotionData
 {
-	public:
-		PALocomotionData();
-		~PALocomotionData();
+public:
+	enum KeyID { KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, KEY_TURNLEFT, KEY_TURNRIGHT , KEY_SHIFT };
+public:
+	PALocomotionData();
+	~PALocomotionData();
 	float w;	// angular velocity
 	float v;	// velocity
+	float s;    // strife velocity
 	SbmCharacter* character;
 	bool jumping;
 	bool starting;
@@ -500,8 +503,14 @@ class PALocomotionData
 	bool prevJumping;
 	bool prevStarting;
 	bool prevStopping;
+	bool keyControl;
 	float linearVelocityIncrement;
-	float angularVelocityIncrement;
+	float angularVelocityIncrement;	
+	std::map<int,bool> keyPressMap;
+public:	
+	void pressKey(int keyID);
+	void releaseKey(int keyID);
+	void updateKeys(float dt);
 };
 //================================ End of File =================================================
 
