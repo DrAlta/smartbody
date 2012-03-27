@@ -1,12 +1,13 @@
-#reset NVBG, it's a hack, need better handle
-del p
+"""
+Reset NVBG, This script is used for debugging
+"""
+
+''' Reset NVBG.py '''
 reload(NewNVBG.NVBG)
-# why you still need to import * after reload it ??????
-from NewNVBG.NVBG import *
-p = NVBG("utah")
+from NewNVBG.NVBG import *	# why simply reload doesn't work???
 
-
-# import pyke
+''' Reset Pyke '''
+from pyke import knowledge_engine
 import NewNVBG.nvbg
 import NewNVBG.brainstem
 nvbg_engine = knowledge_engine.engine(NewNVBG.nvbg)
