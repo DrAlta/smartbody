@@ -66,15 +66,14 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>SbmDebugger.lib;vhcl_d.lib;vhmsg_d.lib;QtCored4.lib;QtGuid4.lib;qtmaind.lib;QtOpenGLd4.lib;log4cxxd.lib;pthreadVSE2.lib;activemq-cppd.lib;opengl32.lib;glu32.lib;ws2_32.lib;dbghelp.lib;winmm.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\lib\Debug;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\qt\lib;..\..\..\..\lib\vhcl\log4cxx\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SbmDebugger.lib;vhcl_d.lib;vhmsg_d.lib;QtCored4.lib;QtGuid4.lib;qtmaind.lib;QtOpenGLd4.lib;pthreadVSE2.lib;activemq-cppd.lib;opengl32.lib;glu32.lib;ws2_32.lib;dbghelp.lib;winmm.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\lib\Debug;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\qt\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll $(TargetDir)
-copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib\log4cxxd.dll $(TargetDir)
 copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll $(TargetDir)
 copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll $(TargetDir)
 copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll $(TargetDir)
@@ -108,8 +107,8 @@ copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" $(TargetDir)
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>SbmDebugger.lib;vhcl.lib;vhmsg.lib;QtCore4.lib;QtGui4.lib;qtmain.lib;QtOpenGL4.lib;log4cxx.lib;pthreadVSE2.lib;activemq-cpp.lib;opengl32.lib;glu32.lib;ws2_32.lib;dbghelp.lib;winmm.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\lib\Release;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\qt\lib;..\..\..\..\lib\vhcl\log4cxx\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SbmDebugger.lib;vhcl.lib;vhmsg.lib;QtCore4.lib;QtGui4.lib;qtmain.lib;QtOpenGL4.lib;pthreadVSE2.lib;activemq-cpp.lib;opengl32.lib;glu32.lib;ws2_32.lib;dbghelp.lib;winmm.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\lib\Release;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\qt\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -118,7 +117,6 @@ copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" $(TargetDir)
     </Link>
     <PostBuildEvent>
       <Command>copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll $(TargetDir)
-copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib\log4cxx.dll $(TargetDir)
 copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll $(TargetDir)
 copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll $(TargetDir)
 copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll $(TargetDir)
