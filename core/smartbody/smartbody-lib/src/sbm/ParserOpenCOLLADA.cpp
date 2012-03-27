@@ -274,11 +274,11 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 						offset.z = matrix[14];
 						SrQuat quat(matrix);
 						SrVec euler = quat.getEuler();
-						rotx = 0.f;//euler[0];
-						roty = 0.f;//euler[1];
-						rotz = 0.f;//euler[2];
-						orderVec.push_back("X");
+						rotx = euler[0];
+						roty = euler[1];
+						rotz = euler[2];
 						orderVec.push_back("Y");
+						orderVec.push_back("X");
 						orderVec.push_back("Z");
 					}
 					if (infoNodeName == "translate")
@@ -784,7 +784,7 @@ int ParserOpenCOLLADA::getRotationOrder(std::vector<std::string> orderVec)
 		if (orderVec[0] == "X" && orderVec[1] == "Z" && orderVec[2] == "Y")
 			return 231;
 		if (orderVec[0] == "Y" && orderVec[1] == "X" && orderVec[2] == "Z")
-			return 213;
+			return 312;
 		if (orderVec[0] == "Y" && orderVec[1] == "Z" && orderVec[2] == "X")
 			return 132;
 		if (orderVec[0] == "Z" && orderVec[1] == "X" && orderVec[2] == "Y")
