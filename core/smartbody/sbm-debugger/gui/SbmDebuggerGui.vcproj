@@ -62,9 +62,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="SbmDebugger.lib vhcl_d.lib vhmsg_d.lib QtCored4.lib QtGuid4.lib qtmaind.lib QtOpenGLd4.lib log4cxxd.lib pthreadVSE2.lib activemq-cppd.lib opengl32.lib glu32.lib ws2_32.lib dbghelp.lib winmm.lib rpcrt4.lib"
+				AdditionalDependencies="SbmDebugger.lib vhcl_d.lib vhmsg_d.lib QtCored4.lib QtGuid4.lib qtmaind.lib QtOpenGLd4.lib pthreadVSE2.lib activemq-cppd.lib opengl32.lib glu32.lib ws2_32.lib dbghelp.lib winmm.lib rpcrt4.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\lib\Debug;..\..\..\..\lib\vhcl\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\qt\lib;..\..\..\..\lib\vhcl\log4cxx\lib9;..\..\..\..\lib\pthreads\lib9;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;"
+				AdditionalLibraryDirectories="..\lib\Debug;..\..\..\..\lib\vhcl\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\qt\lib;..\..\..\..\lib\pthreads\lib9;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -89,7 +89,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y ..\..\..\..\lib\vhcl\blat\vc9\blat.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib9\log4cxxd.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\pthreads\lib9\pthreadVSE2.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr\lib9\libapr-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin9\QtCored4.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin9\QtGuid4.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin9\QtOpenGLd4.dll $(TargetDir)&#x0D;&#x0A;if exist ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\msvcr90d.dll copy /Y ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.* $(TargetDir)&#x0D;&#x0A;copy /Y &quot;$(VS90COMNTOOLS)\..\IDE\dbghelp.dll&quot; $(TargetDir)&#x0D;&#x0A;"
+				CommandLine="copy /Y ..\..\..\..\lib\vhcl\blat\vc9\blat.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\pthreads\lib9\pthreadVSE2.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr\lib9\libapr-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin9\QtCored4.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin9\QtGuid4.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin9\QtOpenGLd4.dll $(TargetDir)&#x0D;&#x0A;if exist ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\msvcr90d.dll copy /Y ..\..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.* $(TargetDir)&#x0D;&#x0A;copy /Y &quot;$(VS90COMNTOOLS)\..\IDE\dbghelp.dll&quot; $(TargetDir)&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -142,8 +142,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="SbmDebugger.lib vhcl.lib vhmsg.lib QtCore4.lib QtGui4.lib qtmain.lib QtOpenGL4.lib log4cxx.lib pthreadVSE2.lib activemq-cpp.lib opengl32.lib glu32.lib ws2_32.lib dbghelp.lib winmm.lib rpcrt4.lib"
-				AdditionalLibraryDirectories="..\lib\Release;..\..\..\..\lib\vhcl\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\qt\lib;..\..\..\..\lib\vhcl\log4cxx\lib9;..\..\..\..\lib\pthreads\lib9;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;"
+				AdditionalDependencies="SbmDebugger.lib vhcl.lib vhmsg.lib QtCore4.lib QtGui4.lib qtmain.lib QtOpenGL4.lib pthreadVSE2.lib activemq-cpp.lib opengl32.lib glu32.lib ws2_32.lib dbghelp.lib winmm.lib rpcrt4.lib"
+				AdditionalLibraryDirectories="..\lib\Release;..\..\..\..\lib\vhcl\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\qt\lib;..\..\..\..\lib\pthreads\lib9;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -170,7 +170,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y ..\..\..\..\lib\vhcl\blat\vc9\blat.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\vhcl\log4cxx\lib9\log4cxx.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\pthreads\lib9\pthreadVSE2.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr\lib9\libapr-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin9\QtCore4.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin9\QtGui4.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin9\QtOpenGL4.dll $(TargetDir)&#x0D;&#x0A;copy /Y &quot;$(VS90COMNTOOLS)\..\IDE\dbghelp.dll&quot; $(TargetDir)&#x0D;&#x0A;"
+				CommandLine="copy /Y ..\..\..\..\lib\vhcl\blat\vc9\blat.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\pthreads\lib9\pthreadVSE2.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr\lib9\libapr-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin9\QtCore4.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin9\QtGui4.dll $(TargetDir)&#x0D;&#x0A;copy /Y ..\..\..\..\lib\qt\bin9\QtOpenGL4.dll $(TargetDir)&#x0D;&#x0A;copy /Y &quot;$(VS90COMNTOOLS)\..\IDE\dbghelp.dll&quot; $(TargetDir)&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
