@@ -168,40 +168,28 @@
 
         <!-- filter out compiler errors and warnings -->
 
-        <!-- (C++)  2>vhcl - 0 error(s), 0 warning(s)         -->
-        <!-- (C#)   Compile complete -<>- 2 errors, 0 warnings  -->
+        <!-- ": warning " -->
+        <!-- ": error " -->
 
-        <loadresource property="build.compile.result">
+        <loadresource property="build.compile.errors" failonerror="false">
             <propertyresource name="build.compile.output"/>
             <filterchain>
                 <linecontainsregexp>
-                    <regexp pattern="(.*)- (\d+)(\s?)error(.*)(\d+)(\s?)warning(.*)"/>
+                    <regexp pattern="(.*): error (.*)"/>
                 </linecontainsregexp>
                 <prefixlines prefix="   "/>
+                <countfilter property="build.compile.errors.count" />
             </filterchain>
         </loadresource>
 
-        <loadresource property="build.compile.errors">
-            <propertyresource name="build.compile.result"/>
+        <loadresource property="build.compile.warnings" failonerror="false">
+            <propertyresource name="build.compile.output"/>
             <filterchain>
-                <countfilter property="build.compile.errors.count" match="(.*)- ([1-9]+[0-9]*)(\s?)error(.*?)(\d+)(\s?)warning(.*)">
-                    <sum property="build.compile.errors.sum" select="\2"/>
-                </countfilter>
                 <linecontainsregexp>
-                    <regexp pattern="(.*)- ([1-9]+[0-9]*)(\s?)error(.*)(\d+)(\s?)warning(.*)"/>
+                    <regexp pattern="(.*): warning (.*)"/>
                 </linecontainsregexp>
-            </filterchain>
-        </loadresource>
-
-        <loadresource property="build.compile.warnings">
-            <propertyresource name="build.compile.result"/>
-            <filterchain>
-                <countfilter property="build.compile.warnings.count" match="(.*)- (\d+)(\s?)error(.*?)([1-9]+[0-9]*)(\s?)warning(.*)">
-                    <sum property="build.compile.warnings.sum" select="\5"/>
-                </countfilter>
-                <linecontainsregexp>
-                    <regexp pattern="(.*)- (\d+)(\s?)error(.*)([1-9]+[0-9]*)(\s?)warning(.*)"/>
-                </linecontainsregexp>
+                <prefixlines prefix="   "/>
+                <countfilter property="build.compile.warnings.count" />
             </filterchain>
         </loadresource>
 
