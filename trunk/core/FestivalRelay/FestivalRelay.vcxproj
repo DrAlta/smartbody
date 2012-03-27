@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2E2A44E1-D441-4A88-9125-E6DA9BCA5352}</ProjectGuid>
+    <RootNamespace>FestivalRelay</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\lib\festival\festival\src\include;..\..\lib\festival\speech_tools\include;..\..\lib\festival\festival\src\modules\VHDuration;..\..\lib\xerces-c\include;..\..\lib\vhmsg\vhmsg-c\include;..\..\lib\vhcl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;SYSTEM_IS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>libFestival.lib;libestbase.lib;libestools.lib;libeststring.lib;Ws2_32.lib;winmm.lib;vhcl_d.lib;xerces-c_3D.lib;vhmsg_d.lib;pthreadVSE2.lib;activemq-cppd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName)d.exe</OutputFile>
+      <AdditionalLibraryDirectories>..\..\lib\festival\festival\src\lib;..\..\lib\festival\speech_tools\lib;..\..\lib\vhcl\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\xerces-c\lib;..\..\lib\pthreads\lib9;..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetPath)" .
+copy /Y ..\..\lib\pthreads\lib9\pthreadVSE2.dll .
+copy /Y ..\..\lib\activemq\apr\apr\lib9\libapr-1.dll .
+copy /Y ..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll .
+copy /Y ..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll .
+copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll .
+copy /Y ..\..\lib\xerces-c\bin9\xerces-c_3_1D.dll .
+
+
+if not exist ..\..\bin\FestivalRelay\bin\Release mkdir ..\..\bin\FestivalRelay\bin\bin
+copy /Y "$(TargetPath)" ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\pthreads\lib9\pthreadVSE2.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\xerces-c\bin9\xerces-c_3_1.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\apr\apr\lib9\libapr-1.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll ..\..\bin\FestivalRelay\bin\bin
+
+if not exist ..\..\bin\FestivalRelay\lib\festival\festival\lib mkdir ..\..\bin\FestivalRelay\lib\festival\festival\lib
+xcopy /Y /S ..\..\lib\festival\festival\lib ..\..\bin\FestivalRelay\lib\festival\festival\lib
+
+if not exist ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib\siod mkdir ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib\siod
+copy /Y ..\..\lib\festival\speech_tools\lib\siod\cstr.scm ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib
+copy /Y ..\..\lib\festival\speech_tools\lib\siod\fringe.scm ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib
+copy /Y ..\..\lib\festival\speech_tools\lib\siod\siod.scm ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib
+copy /Y ..\..\lib\festival\speech_tools\lib\siod\siod_client.scm ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib
+copy /Y ..\..\lib\festival\speech_tools\lib\siod\siod_server.scm ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib
+copy /Y ..\..\lib\festival\speech_tools\lib\siod\web.scm ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\..\lib\festival\festival\src\include;..\..\lib\festival\speech_tools\include;..\..\lib\festival\festival\src\modules\VHDuration;..\..\lib\xerces-c\include;..\..\lib\vhmsg\vhmsg-c\include;..\..\lib\vhcl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;SYSTEM_IS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>libFestival.lib;libestbase.lib;libestools.lib;libeststring.lib;Ws2_32.lib;winmm.lib;xerces-c_3.lib;vhcl.lib;vhmsg.lib;pthreadVSE2.lib;activemq-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\lib\festival\festival\src\lib;..\..\lib\festival\speech_tools\lib;..\..\lib\xerces-c\lib9;..\..\lib\vhcl\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL;..\..\lib\pthreads\lib9;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>
+      </OptimizeReferences>
+      <EnableCOMDATFolding>
+      </EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetPath)" .
+copy /Y ..\..\lib\pthreads\lib9\pthreadVSE2.dll .
+copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll .
+copy /Y ..\..\lib\xerces-c\bin9\xerces-c_3_1.dll .
+copy /Y ..\..\lib\activemq\apr\apr\lib9\libapr-1.dll .
+copy /Y ..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll .
+copy /Y ..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll .
+
+if not exist ..\..\bin\FestivalRelay\bin\Release mkdir ..\..\bin\FestivalRelay\bin\bin
+copy /Y "$(TargetPath)" ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\pthreads\lib9\pthreadVSE2.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\xerces-c\bin9\xerces-c_3_1.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\apr\apr\lib9\libapr-1.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll ..\..\bin\FestivalRelay\bin\bin
+
+if not exist ..\..\bin\FestivalRelay\lib\festival\festival\lib mkdir ..\..\bin\FestivalRelay\lib\festival\festival\lib
+xcopy /Y /S ..\..\lib\festival\festival\lib ..\..\bin\FestivalRelay\lib\festival\festival\lib
+
+if not exist ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib\siod mkdir ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib\siod
+copy /Y ..\..\lib\festival\speech_tools\lib\siod\cstr.scm ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib
+copy /Y ..\..\lib\festival\speech_tools\lib\siod\fringe.scm ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib
+copy /Y ..\..\lib\festival\speech_tools\lib\siod\siod.scm ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib
+copy /Y ..\..\lib\festival\speech_tools\lib\siod\siod_client.scm ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib
+copy /Y ..\..\lib\festival\speech_tools\lib\siod\siod_server.scm ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib
+copy /Y ..\..\lib\festival\speech_tools\lib\siod\web.scm ..\..\bin\FestivalRelay\lib\festival\speech_tools\lib
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\FestivalRelay.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\lib\vhcl\vhcl.vcxproj">
+      <Project>{662cf3eb-b816-4727-9d1d-4071c25a3312}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\vhmsg\vhmsg-c\vhmsg.vcxproj">
+      <Project>{49840c67-5a25-4d7a-af21-5976735f7d7d}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
