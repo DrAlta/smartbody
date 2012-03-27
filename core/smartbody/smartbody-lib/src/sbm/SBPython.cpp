@@ -594,6 +594,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("setValue", &StringAttribute::setValue, "Sets the value of the string attribute.")
 		.def("setValueFast", &StringAttribute::setValueFast, "Sets the value of the string attribute without notifying observers.")
 		.def("setValidValues", &StringAttribute::setValidValues, "Sets the valid values of the string attribute.")
+		.def("getValidValues", &StringAttribute::getValidValues, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the valid values of the string attribute.")
 	;
 
 	boost::python::class_<IntAttribute, boost::python::bases<SBAttribute> >("IntAttribute")
