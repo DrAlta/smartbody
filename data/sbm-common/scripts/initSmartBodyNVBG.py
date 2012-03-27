@@ -11,9 +11,17 @@ SmartBodyNVBG serves as an connection to the real NVBG to smartbody
 """
 class SmartBodyNVBG(Nvbg):
         def setNvbg(self, n):
+                """
+                Necessary
+                Set the NVBG to SmartBodyNVBG
+                """
                 self.nvbg = n
 
         def reset(self):
+                """
+                Optional
+                Reset NVBG and Pyke
+                """
                 nvbgCharName = ""
                 if hasattr(self, 'nvbg') is False:
                         return
@@ -27,13 +35,14 @@ class SmartBodyNVBG(Nvbg):
         
         def notifyAction(self, name):
                 """
+                Optional
                 Override the C++ notifiyAction function.
                 """
                 if hasattr(self, 'nvbg') is False:
                         return
                 
                 #print "In notifyAction, attribute is " + name
-                if (name == "play"):
+                if (name == "play dialog"):
                         dialogStr = self.getAttribute("dialog").getValue()
                         if (dialogStr == ""):
                                 #print "dialog not selected, play default one"
@@ -41,12 +50,25 @@ class SmartBodyNVBG(Nvbg):
                         else:
                                 self.nvbg.speak(dialogStr)
 
+                if (name == "play behavior"):
+                        selectedBml = self.getAttribute("bml").getValue()
+                        bml.execBML(self.nvbg.characterName, selectedBml)
+                
                 if (name == "reset"):
                        self.reset()
+
+                if (name == "add dialog"):
+                        dialogStr = self.getAttribute("more dialog").getValue()
+                        if (dialogStr == ""):
+                                return
+                        dialogVec = self.getAttribute("dialog").getValidValues()
+                        dialogVec.append(dialogStr)
+                        self.getAttribute("dialog").setValidValues(dialogVec)
 		return
 
 	def notifyBool(self, name, val):
                 """
+                Optional
                 Override the C++ notifyBool function.
                 """
                 if hasattr(self, 'nvbg') is False:
@@ -61,17 +83,25 @@ class SmartBodyNVBG(Nvbg):
 
 	def notifyString(self, name, val):
                 """
+                Optional
                 Override the C++ notifyString function.
                 """
                 if hasattr(self, 'nvbg') is False:
                         return
                 
-                if (name == "mylist"):
-                        print val
-		return	
+                if (name == "behavior"):
+                        behVec = self.getAttribute("behavior").getValidValues()
+                        bmlVec = self.getAttribute("bml hidden").getValidValues()
+                        for i in range(0, len(behVec)):
+                                if (behVec[i] == val):
+                                        bmlStr = bmlVec[i]
+                                        self.getAttribute("bml").setValue(bmlStr)
+                                        return
+		return
 
         def executeEvent(self, character, messageId, state):
                 """
+                Necessary
                 Override the C++ executeEvent function
                 Event Handler for vrX message
                 Process vrAgentBML message which indicate the status of bml execution
@@ -89,6 +119,7 @@ class SmartBodyNVBG(Nvbg):
                 
 	def execute(self, character, recipient, messageId, xml):
                 """
+                Necessary
                 Override the C++ execute function
                 Execute all xml vrX messages
                 """
@@ -124,6 +155,7 @@ class SmartBodyNVBG(Nvbg):
 
 	def objectEvent(self, character, name, isAnimate, position, velocity, relativePosition, relativeVelocity):
                 """
+                Necessary
                 Override the C++ objectEvent function
                 Process events from virtual world (SmartBody)
                 """
@@ -137,13 +169,16 @@ class SmartBodyNVBG(Nvbg):
 
         def setupTool(self):
                 """
+                Optional
                 Debugging options and tools
                 """
                 if hasattr(self, 'nvbg') is False:
                         return
-                
-                self.createBoolAttribute("enable", True, True, "nvbgs", 10, False, False, False, "Enables or disables NVBG.")
+
+                ''' reset '''                
                 self.createActionAttribute("reset", True, "nvbgs", 20, False, False, False, "Reload pyke")
+
+                ''' dialogs '''
                 dialog = self.createStringAttribute("dialog", "", True, "nvbgs", 50, False, False, False, "Dialog")
                 dialogVec = StringVec()
                 dialogVec.append("yes")
@@ -151,4 +186,27 @@ class SmartBodyNVBG(Nvbg):
                 dialogVec.append("no i do not like it")
                 dialogVec.append("this is a big one but i prefer a small one")
                 dialog.setValidValues(dialogVec)
-                self.createActionAttribute("play", True, "nvbgs", 60, False, False, False, "Play the chosen dialog")    
+                self.createActionAttribute("play dialog", True, "nvbgs", 60, False, False, False, "Play the chosen dialog")
+                self.createStringAttribute("more dialog", "", True, "nvbgs", 70, False, False, False, "Addtional line that is added")
+                self.createActionAttribute("add dialog", True, "nvbgs", 80, False, False, False, "Add more dialog to the list")
+
+                ''' nvbg behaviors '''
+                behavior = self.createStringAttribute("behavior", "", True, "nvbgs", 100, False, False, False, "Universal behaviors availabe")
+                bmlHidden = self.createStringAttribute("bml hidden", "", True, "nvbgs", 110, False, False, True, "Hidden bml drop list")
+                factList = nvbg_engine.get_kb('nvbg').entity_lists['dict']
+                universalFact = factList.universal_facts[0]
+                numBehaviors = len(universalFact[1])    #universalFact[0] is bmlPatterns
+                behaviorVec = StringVec()
+                bmlHiddenVec = StringVec()
+                for i in range(0, numBehaviors):
+                        behaviorUnit = universalFact[1][i]
+                        behaviorVec.append(behaviorUnit[0])
+                        bmlTuple = behaviorUnit[1]
+                        bmlStr = ""
+                        for j in range(0, len(bmlTuple)):
+                                bmlStr = bmlStr + bmlTuple[j]
+                        bmlHiddenVec.append(bmlStr)
+                behavior.setValidValues(behaviorVec)
+                bmlHidden.setValidValues(bmlHiddenVec)
+                self.createStringAttribute("bml", "", True, "nvbgs", 120, False, False, False, "BML corresponding to the behavior")
+                self.createActionAttribute("play behavior", True, "nvbgs", 130, False, False, False, "Play the chosen behavior")
