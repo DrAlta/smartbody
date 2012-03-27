@@ -529,8 +529,8 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 										channelId = getMotionChannelId(motionChannels,jName+"-rotateX");
 										if (channelId >= 0)
 										{
-											for (int k=0;k<3;k++)
-												motion.posture(frameCt)[channelId+k] = euler[k];
+											for (int k=0;k<4;k++)
+												motion.posture(frameCt)[channelId+k] = quat.getData(k);
 										}										
 									}
 								}
@@ -601,7 +601,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 
 	// now transfer the motion euler data to quaternion data
 	std::vector<int> quatIndices;
-	for (int i = 0; i < motionChannels.size(); i++)
+/*	for (int i = 0; i < motionChannels.size(); i++)
 	{
 		SkChannel& chan = motionChannels[i];
 		if (chan.type == SkChannel::Quat)
@@ -610,6 +610,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 			quatIndices.push_back(id);
 		}
 	}
+	
 	for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
 		for (size_t i = 0; i < quatIndices.size(); i++)
 		{
@@ -628,7 +629,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 			motion.posture(frameCt)[quatId + 2] = quat.y;
 			motion.posture(frameCt)[quatId + 3] = quat.z;
 		}
-
+*/
 	double duration = double(motion.duration());
 	motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration / 2.0, duration / 2.0, duration * 2.0/3.0, duration);
 	motion.compress();
