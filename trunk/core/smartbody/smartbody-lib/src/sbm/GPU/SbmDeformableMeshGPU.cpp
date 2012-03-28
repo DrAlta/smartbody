@@ -555,7 +555,7 @@ bool SbmDeformableMeshGPU::initBuffer()
 				{
 					boneIdxMap[jointName] = nTotalBones++;
 					boneJointList.push_back(curJoint);
-					bindPoseMatList.push_back(skinWeight->bindPoseMat[k]*skinWeight->bindShapeMat);
+					bindPoseMatList.push_back(skinWeight->bindShapeMat*skinWeight->bindPoseMat[k]);
 				}
 			}
 			int numTris = dMeshStatic->shape().F.size();
