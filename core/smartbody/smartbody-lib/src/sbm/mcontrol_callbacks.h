@@ -53,6 +53,7 @@ int mcu_panimationviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_channelbufferviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_resourceViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_faceViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_ogreViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_terrain_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p );

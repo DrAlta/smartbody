@@ -221,6 +221,12 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 			std::string nameAttr = "";
 			if (nameNode)
 				xml_utils::xml_translate(&nameAttr, nameNode->getNodeValue());
+
+			DOMNode* sidNode = childAttr->getNamedItem(BML::BMLDefs::ATTR_SID);
+			std::string sidAttr = "";
+			if (sidNode)
+				xml_utils::xml_translate(&sidAttr, sidNode->getNodeValue());
+
 			DOMNode* typeNode = childAttr->getNamedItem(BML::BMLDefs::ATTR_TYPE);
 			std::string typeAttr = "";
 			DOMNode* tempMaterialNode = ParserOpenCOLLADA::getNode("bind_material", childNode);
@@ -236,7 +242,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				joint->name(nameAttr);
 				joint->extName(nameAttr);
 				joint->extID(idAttr);
-
+				joint->extSID(sidAttr);
 
 				skeleton.channels().add(joint->name(), SkChannel::XPos);
 				skeleton.channels().add(joint->name(), SkChannel::YPos);
@@ -846,10 +852,11 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 	{
 		DOMNode* node = list->item(c);
 		std::string nodeName;
-		xml_utils::xml_translate(&nodeName ,node->getNodeName());
-
+		xml_utils::xml_translate(&nodeName ,node->getNodeName());	
 		if (nodeName == "geometry")
 		{
+			std::map<std::string, std::string> verticesArrayMap;
+			std::map<std::string, std::vector<SrVec>> floatArrayMap;	
 
 			SrModel* newModel = new SrModel();
 			DOMNamedNodeMap* nodeAttr = node->getAttributes();
@@ -877,18 +884,38 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 					DOMNode* idNode = sourceAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
 					std::string idString;
 					xml_utils::xml_translate(&idString, idNode->getNodeValue());
-					
+					std::string sourceID = idString;
 					size_t pos = idString.find_last_of("-");
 					std::string tempString = idString.substr(pos + 1);
 					idString = tempString;
 					std::transform(idString.begin(), idString.end(), idString.begin(), ::tolower);
 					std::string idType = getGeometryType(idString);
 					// below is a faster way to parse all the data, have potential bug
-					DOMNode* floatNode = ParserOpenCOLLADA::getNode("float_array", node1);
-					DOMNode* countNode = floatNode->getAttributes()->getNamedItem(BML::BMLDefs::ATTR_COUNT);
-					std::string temp;
-					xml_utils::xml_translate(&temp, countNode->getNodeValue());
-					int count = atoi(temp.c_str());
+					DOMNode* floatNode = ParserOpenCOLLADA::getNode("float_array", node1);					
+					DOMNode* countNode = floatNode->getAttributes()->getNamedItem(BML::BMLDefs::ATTR_COUNT);				
+					DOMNode* accessorNode = ParserOpenCOLLADA::getNode("accessor", node1);	
+					DOMNode* strideNode = accessorNode->getAttributes()->getNamedItem(BML::BMLDefs::ATTR_STRIDE);
+					int count = xml_utils::xml_translate_int(countNode->getNodeValue());
+					int stride = xml_utils::xml_translate_int(strideNode->getNodeValue());				
+					//int strde = atoi()		
+					std::string floatString;
+					xml_utils::xml_translate(&floatString, floatNode->getTextContent());
+					std::vector<std::string> tokens;
+					vhcl::Tokenize(floatString, tokens, " \n");
+					floatArrayMap[sourceID] = std::vector<SrVec>();					
+					for (int i=0; i< count ; i+= stride)
+					{
+						int nstep = stride > 3 ? 3 : stride;		
+						SrVec tempV;
+						for (int k=0;k<nstep;k++)
+						{
+							tempV[k] = (float)atof(tokens[i+k].c_str());
+						}
+						floatArrayMap[sourceID].push_back(tempV);
+					}
+
+
+#if 0
 					if (idType == "positions")
 						count /= 3;
 					if (idType == "normals")
@@ -923,6 +950,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 							newModel->T.top().y = (float)atof(tokens[index++].c_str());
 						}
 					}
+#endif
 				}			
 				if (nodeName1 == "vertices")
 				{
@@ -936,7 +964,11 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 							DOMNode* semanticNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_SEMANTIC);
 							std::string inputSemantic;
 							xml_utils::xml_translate(&inputSemantic, semanticNode->getNodeValue());
-							vertexSemantics[inputSemantic] = true;							
+							vertexSemantics[inputSemantic] = true;
+
+							DOMNode* sourceNameNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_SOURCE);
+							std::string sourceName = xml_utils::xml_translate_string(sourceNameNode->getNodeValue());
+							setModelVertexSource(sourceName,inputSemantic,newModel,floatArrayMap);
 						}						
 					}										
 				}
@@ -968,6 +1000,8 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 							DOMNode* offsetNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_OFFSET);
 							std::string temp;
 							xml_utils::xml_translate(&temp, offsetNode->getNodeValue());
+							DOMNode* sourceNameNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_SOURCE);
+							std::string sourceName = xml_utils::xml_translate_string(sourceNameNode->getNodeValue());
 							int offset = atoi(temp.c_str());
 							if (pStride <= offset)	pStride = offset;
 							if (inputMap.find(offset) != inputMap.end())	// same offset is wrong
@@ -977,6 +1011,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 							}
 							else
 							{
+								setModelVertexSource(sourceName,inputSemantic,newModel,floatArrayMap);
 								// should not allow same input semantic
 								bool hasDuplicate = false;
 								std::map<int, std::string>::iterator iter = inputMap.begin();
@@ -1099,6 +1134,41 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 #endif
 		}
 	}	
+}
+
+void ParserOpenCOLLADA::setModelVertexSource( std::string& sourceName, std::string& semanticName, SrModel* model, VecListMap& vecMap )
+{
+	std::string srcName = sourceName;
+	std::vector<SrVec>* sourceArray = NULL;
+	if (srcName[0] == '#') 
+	{
+		srcName.erase(0,1);
+		if (vecMap.find(srcName) != vecMap.end())
+			sourceArray = &vecMap[srcName];
+	}
+
+	if ( semanticName == "POSITION" && sourceArray && model->V.size() == 0)
+	{
+		for (unsigned int i=0;i<sourceArray->size();i++)
+		{
+			model->V.push((*sourceArray)[i]);										
+		}
+	}
+	else if (semanticName == "NORMAL" && sourceArray && model->N.size() == 0)
+	{
+		for (unsigned int i=0;i<sourceArray->size();i++)
+		{
+			model->N.push((*sourceArray)[i]);										
+		}
+	}
+	else if (semanticName == "TEXCOORD" && sourceArray && model->T.size() == 0)
+	{
+		for (unsigned int i=0;i<sourceArray->size();i++)
+		{
+			SrVec ts = (*sourceArray)[i];
+			model->T.push(SrVec2(ts[0],ts[1]));										
+		}
+	}
 }
 
 void ParserOpenCOLLADA::load_texture(int type, const char* file, const SrStringArray& paths)

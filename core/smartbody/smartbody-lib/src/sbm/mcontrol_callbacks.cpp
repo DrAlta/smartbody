@@ -753,6 +753,49 @@ int mcu_faceViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return( CMD_FAILURE );
 }
 
+int mcu_ogreViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if( mcu_p )	{
+		char *ogreViewerCmd = args.read_token();
+		if( strcmp( ogreViewerCmd, "open" ) == 0 )	{
+
+			if( mcu_p->ogreViewer_p == NULL )	{
+				int argc = args.calc_num_tokens();
+				if( argc >= 4 )	{
+
+					int width = args.read_int();
+					int height = args.read_int();
+					int px = args.read_int();
+					int py = args.read_int();
+					int err = mcu_p->openOgreViewer( width, height, px, py );
+					return( err );
+				} else {
+					int err = mcu_p->openOgreViewer( 1024, 768, 50, 50 );
+					return( err );
+				}
+			}
+		}
+		else
+			if( strcmp( ogreViewerCmd, "show" ) == 0 )	{
+				if( mcu_p->ogreViewer_p )	{
+					mcu_p->ogreViewer_p->show_viewer();
+					return( CMD_SUCCESS );
+				}
+			}
+			else
+				if( strcmp( ogreViewerCmd, "hide" ) == 0 )	{
+					if( mcu_p->ogreViewer_p )	{
+						mcu_p->ogreViewer_p->hide_viewer();
+						return( CMD_SUCCESS );
+					}
+				}
+				else	{
+					return( CMD_NOT_FOUND );
+				}
+	}
+	return( CMD_FAILURE );
+}
+
 std::string tokenize( std::string& str,
 					  const std::string& delimiters = " ",
 					  int mode = 1 )

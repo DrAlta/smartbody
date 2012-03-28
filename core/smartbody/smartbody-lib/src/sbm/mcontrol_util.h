@@ -253,13 +253,17 @@ class mcuCBHandle {
 		bool		use_python;
 
 		SrViewerFactory *viewer_factory;
+		SrViewerFactory *ogreViewerFactory;
 		SrViewer	*viewer_p;
+		SrViewer    *ogreViewer_p;
+
 		GenericViewer	*bmlviewer_p;
 		GenericViewer	*panimationviewer_p;
 		GenericViewer	*channelbufferviewer_p;
 		GenericViewer   *resourceViewer_p;
 		GenericViewer   *velocityViewer_p;
 		GenericViewer   *faceViewer_p;
+		
 
 		GenericViewerFactory *bmlviewer_factory;
 		GenericViewerFactory *panimationviewer_factory;
@@ -268,6 +272,7 @@ class mcuCBHandle {
 		GenericViewerFactory *resourceViewerFactory;
 		GenericViewerFactory *velocityViewerFactory;
 		GenericViewerFactory *faceViewerFactory;
+		
 		
 		SrCamera	*camera_p;
 		SrSnGroup	*root_group_p;
@@ -459,6 +464,9 @@ public:
 		int openFaceViewer( int width, int height, int px, int py );
 		void closeFaceViewer( void );
 
+		int openOgreViewer( int width, int height, int px, int py );
+		void closeOgreViewer( void );
+
 
 		int add_scene( SrSnGroup *scene_p );
 		int remove_scene( SrSnGroup *scene_p );
@@ -625,6 +633,12 @@ public:
 				if (viewer_factory != NULL) delete viewer_factory;
 				viewer_factory = factory;
 		}
+		
+		void register_OgreViewer_factory(SrViewerFactory* factory) { 
+			if (ogreViewerFactory != NULL) delete ogreViewerFactory;
+			ogreViewerFactory = factory;
+		}
+
 		void register_bmlviewer_factory(GenericViewerFactory* factory) { 
 				if (bmlviewer_factory != NULL) delete bmlviewer_factory;
 				bmlviewer_factory = factory;
@@ -656,7 +670,9 @@ public:
 		void register_FaceViewer_factory(GenericViewerFactory* factory) { 
 			if (faceViewerFactory != NULL) delete faceViewerFactory;
 			faceViewerFactory = factory;
-		}		
+		}	
+
+		
 
 		void registerCallbacks();
 
