@@ -243,6 +243,7 @@ mcuCBHandle::mcuCBHandle()
 	resourceViewer_p( NULL ),
 	velocityViewer_p( NULL ),
 	faceViewer_p( NULL ),
+	ogreViewer_p( NULL ),
 	camera_p( NULL ),
 	root_group_p( new SrSnGroup() ),
 	height_field_p( NULL ),
@@ -252,13 +253,14 @@ mcuCBHandle::mcuCBHandle()
 	queued_cmds( 0 ),
 	updatePhysics( false ),
 	viewer_factory ( new SrViewerFactory() ),
+	ogreViewerFactory ( new SrViewerFactory() ),
 	bmlviewer_factory ( new GenericViewerFactory() ),
 	panimationviewer_factory ( new GenericViewerFactory() ),
 	channelbufferviewer_factory ( new GenericViewerFactory() ),
 	commandviewer_factory ( new GenericViewerFactory() ),
 	resourceViewerFactory ( new GenericViewerFactory() ),
 	velocityViewerFactory ( new GenericViewerFactory() ),
-	faceViewerFactory ( new GenericViewerFactory() ),
+	faceViewerFactory ( new GenericViewerFactory() ),	
 	resource_manager(SBResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
 	use_python( false ),
@@ -1000,9 +1002,35 @@ int mcuCBHandle::openFaceViewer( int width, int height, int px, int py )
 void mcuCBHandle::closeFaceViewer( void )
 {
 	if( resourceViewer_p )	{
-		faceViewerFactory->destroy(resourceViewer_p);
+		faceViewerFactory->destroy(faceViewer_p);
 		faceViewer_p = NULL;
 	}
+}
+
+int mcuCBHandle::openOgreViewer( int width, int height, int px, int py )	{	
+
+	if( ogreViewer_p == NULL )	{
+		if (!ogreViewerFactory)
+			return CMD_FAILURE;
+		ogreViewer_p = ogreViewerFactory->create( px, py, width, height );
+		ogreViewer_p->label_viewer( "SBM Ogre Viewer" );
+		camera_p = new SrCamera;
+		ogreViewer_p->set_camera( *camera_p );		
+		ogreViewer_p->show_viewer();
+		if( root_group_p )	{
+			ogreViewer_p->root( root_group_p );
+		}
+		return( CMD_SUCCESS );
+	}
+	return( CMD_FAILURE );
+}
+
+void mcuCBHandle::closeOgreViewer( void )	{
+
+	if( ogreViewer_p )	{
+		ogreViewerFactory->remove(ogreViewer_p);
+		ogreViewer_p = NULL;
+	}	
 }
 
 

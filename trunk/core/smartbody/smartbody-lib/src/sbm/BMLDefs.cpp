@@ -293,6 +293,7 @@ XMLCh* BMLDefs::ATTR_SACCADE_INTERVAL_VARIANT = NULL;
 
 // OpenCollada
 XMLCh* BMLDefs::ATTR_SID = NULL;
+XMLCh* BMLDefs::ATTR_STRIDE = NULL;
 XMLCh* BMLDefs::ATTR_COUNT = NULL;
 XMLCh* BMLDefs::ATTR_INPUT = NULL;
 XMLCh* BMLDefs::ATTR_SEMANTIC = NULL;
@@ -613,6 +614,7 @@ BMLDefs::BMLDefs()
 
 	// OpenCollada
 	ATTR_SID = XMLString::transcode("sid");
+	ATTR_STRIDE = XMLString::transcode("stride");
 	ATTR_COUNT = XMLString::transcode("count");
 	ATTR_INPUT = XMLString::transcode("input");
 	ATTR_SEMANTIC = XMLString::transcode("semantic");

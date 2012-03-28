@@ -30,6 +30,8 @@
 #include "mcontrol_util.h"
 #include "gwiz_math.h"
 
+typedef std::map<std::string, std::vector<SrVec>> VecListMap;
+
 class ParserOpenCOLLADA
 {
 	public:
@@ -52,6 +54,7 @@ class ParserOpenCOLLADA
 		static std::string tokenize(std::string& str,const std::string& delimiters = " ", int mode = 1);
 		static int getRotationOrder(std::vector<std::string> orderVec);
 		static std::string getGeometryType(std::string s);
+		static void setModelVertexSource(std::string& sourceName, std::string& semanticName, SrModel* model, VecListMap& vecMap);
 };
 
 #endif

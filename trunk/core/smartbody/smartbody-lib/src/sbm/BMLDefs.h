@@ -14,7 +14,7 @@ class BMLDefs
 		static XMLCh* DTYPE_SBM;
 
 		static XMLCh* TAG_DESCRIPTION;
-		static XMLCh* ATTR_ID;
+		static XMLCh* ATTR_ID;		
 		static XMLCh* ATTR_TYPE;
 		static XMLCh* ATTR_NAME;
 		static XMLCh* ATTR_LEVEL;
@@ -291,6 +291,7 @@ class BMLDefs
 		// OpenCollada
 		static XMLCh* ATTR_SID;
 		static XMLCh* ATTR_COUNT;
+		static XMLCh* ATTR_STRIDE;
 		static XMLCh* ATTR_INPUT;
 		static XMLCh* ATTR_SEMANTIC;
 		static XMLCh* ATTR_VCOUNT;

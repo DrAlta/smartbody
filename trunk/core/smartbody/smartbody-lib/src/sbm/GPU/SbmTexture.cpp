@@ -1,6 +1,7 @@
 #include "SbmTexture.h"
 #include "SbmShader.h"
 #include "external/SOIL/SOIL.h"
+//#include "external/imdebug/imdebug.h"
 
 /************************************************************************/
 /* Sbm Texture Manager                                                  */
@@ -88,11 +89,15 @@ SbmTexture::~SbmTexture(void)
 
 void SbmTexture::loadImage( const char* fileName )
 {
-	buffer = SOIL_load_image(fileName,&width,&height,&channels,SOIL_LOAD_AUTO);			
+	buffer = SOIL_load_image(fileName,&width,&height,&channels,SOIL_LOAD_AUTO);	
+	std::string testOutFileName = fileName;
+	//testOutFileName += ".bmp";
+	//SOIL_save_image(testOutFileName.c_str(),SOIL_SAVE_TYPE_BMP,width,height,channels,buffer);
 }
 
 void SbmTexture::buildTexture()
 {	
+	//SbmShaderProgram::printOglError("SbmTexture.cpp:10");	
 	GLuint iType = GL_TEXTURE_2D;
 	glEnable(GL_TEXTURE);
 	glEnable(iType);	
@@ -130,6 +135,8 @@ void SbmTexture::buildTexture()
 	//TextureDebug();	
 	glBindTexture(iType,0);	
 	finishBuild = true;
+	//SbmShaderProgram::printOglError("SbmTexture.cpp:300");
 	//printf("Texture name = %s, texture ID = %d\n",textureName.c_str(),texID);	
+	//imdebug("rgb w=%d h=%d %p", width, height, buffer);
 }
 
