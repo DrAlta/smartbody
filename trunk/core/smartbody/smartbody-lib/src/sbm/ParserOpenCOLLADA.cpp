@@ -119,8 +119,10 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, DOMNode* node)
 {
 	int type = node->getNodeType();
-	std::string name = getString(node->getNodeName());
-	std::string value = getString(node->getNodeValue());
+	std::string name;
+	xml_utils::xml_translate(&name, node->getNodeName());
+	std::string value;
+	xml_utils::xml_translate(&value, node->getNodeValue());
 	if (name == nodeName && node->getNodeType() ==  DOMNode::ELEMENT_NODE)
 		return node;
 
@@ -192,7 +194,8 @@ void ParserOpenCOLLADA::parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skel
 	for (unsigned int c = 0; c < list1->getLength(); c++)
 	{
 		DOMNode* node1 = list1->item(c);
-		std::string nodeName = getString(node1->getNodeName());
+		std::string nodeName;
+		xml_utils::xml_translate(&nodeName, node1->getNodeName());
 		if (nodeName == "visual_scene")
 			parseJoints(node1, skeleton, motion, scale, order, materialId2Name, NULL);
 	}
@@ -204,24 +207,25 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 	for (unsigned int i = 0; i < list->getLength(); i++)
 	{
 		DOMNode* childNode = list->item(i);
-		std::string nodeName = getString(childNode->getNodeName());
+		std::string nodeName;
+		xml_utils::xml_translate(&nodeName, childNode->getNodeName());
 		if (nodeName == "node")
 		{
 			DOMNamedNodeMap* childAttr = childNode->getAttributes();
 			DOMNode* idNode = childAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
 			std::string idAttr = "";
 			if (idNode)
-				idAttr = getString(idNode->getNodeValue());
+				xml_utils::xml_translate(&idAttr, idNode->getNodeValue());
 
 			DOMNode* nameNode = childAttr->getNamedItem(BML::BMLDefs::ATTR_NAME);
 			std::string nameAttr = "";
 			if (nameNode)
-				nameAttr = getString(nameNode->getNodeValue());
+				xml_utils::xml_translate(&nameAttr, nameNode->getNodeValue());
 			DOMNode* typeNode = childAttr->getNamedItem(BML::BMLDefs::ATTR_TYPE);
 			std::string typeAttr = "";
 			DOMNode* tempMaterialNode = ParserOpenCOLLADA::getNode("bind_material", childNode);
 			if (typeNode)
-				typeAttr = getString(typeNode->getNodeValue());			
+				xml_utils::xml_translate(&typeAttr, typeNode->getNodeValue());
 			if (typeAttr == "JOINT")
 			{
 				int index = -1;
@@ -259,10 +263,12 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				for (unsigned int j = 0; j < infoList->getLength(); j++)
 				{
 					DOMNode* infoNode = infoList->item(j);
-					std::string infoNodeName = getString(infoNode->getNodeName());
+					std::string infoNodeName;
+					xml_utils::xml_translate(&infoNodeName, infoNode->getNodeName());
 					if (infoNodeName == "matrix")
 					{
-						std::string matrixString = getString(infoNode->getTextContent());
+						std::string matrixString;
+						xml_utils::xml_translate(&matrixString, infoNode->getTextContent());
 						std::vector<std::string> tokens;
 						vhcl::Tokenize(matrixString, tokens, " \n");
 						SrMat matrix;
@@ -283,7 +289,8 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 					}
 					if (infoNodeName == "translate")
 					{
-						std::string offsetString = getString(infoNode->getTextContent());
+						std::string offsetString;
+						xml_utils::xml_translate(&offsetString, infoNode->getTextContent());
 						std::vector<std::string> tokens;
 						vhcl::Tokenize(offsetString, tokens, " \n");
 						offset.x = (float)atof(tokens[0].c_str()) * scale;
@@ -295,11 +302,13 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 						DOMNamedNodeMap* rotateAttr = infoNode->getAttributes();
 						
 						DOMNode* sidNode = rotateAttr->getNamedItem(BML::BMLDefs::ATTR_SID);
-						std::string sidAttr = getString(sidNode->getNodeValue());
+						std::string sidAttr;
+						xml_utils::xml_translate(&sidAttr, sidNode->getNodeValue());
 
 						if (sidAttr.substr(0, 11) == "jointOrient")
 						{
-							std::string jointOrientationString = getString(infoNode->getTextContent());
+							std::string jointOrientationString;
+							xml_utils::xml_translate(&jointOrientationString, infoNode->getTextContent());
 							std::vector<std::string> tokens;
 							vhcl::Tokenize(jointOrientationString, tokens, " \n");
 							float finalValue;
@@ -313,7 +322,8 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 						}
 						if (sidAttr.substr(0, 6) == "rotate")
 						{
-							std::string rotationString = getString(infoNode->getTextContent());
+							std::string rotationString;
+							xml_utils::xml_translate(&rotationString, infoNode->getTextContent());
 							std::vector<std::string> tokens;
 							vhcl::Tokenize(rotationString, tokens, " \n");
 							float finalValue;
@@ -362,15 +372,18 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 						for (unsigned int ml = 0; ml < materialList->getLength(); ml++)
 						{
 							DOMNode* childNode = materialList->item(ml);
-							std::string nodeName = getString(childNode->getNodeName());	
+							std::string nodeName;
+							xml_utils::xml_translate(&nodeName, childNode->getNodeName());
 							if (nodeName == "instance_material")
 							{
 								DOMNamedNodeMap* materialAttr = childNode->getAttributes();
 								DOMNode* symbolNode = materialAttr->getNamedItem(BML::BMLDefs::ATTR_SYMBOL);
-								std::string materialName = getString(symbolNode->getNodeValue());
+								std::string materialName;
+								xml_utils::xml_translate(&materialName, symbolNode->getNodeValue());
 
 								DOMNode* targetNode = materialAttr->getNamedItem(BML::BMLDefs::ATTR_TARGET);
-								std::string targetNameString = getString(targetNode->getNodeValue());
+								std::string targetNameString;
+								xml_utils::xml_translate(&targetNameString, targetNode->getNodeValue());
 								std::string targetName = "";
 								if (targetNameString.length() > 0)
 									targetName = targetNameString.substr(1);
@@ -402,12 +415,14 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 	for (unsigned int i = 0; i < list->getLength(); i++)
 	{
 		DOMNode* node1 = list->item(i);
-		std::string node1Name = getString(node1->getNodeName());
+		std::string node1Name;
+		xml_utils::xml_translate(&node1Name, node1->getNodeName());
 		if (node1Name == "animation")
 		{
 			DOMNamedNodeMap* animationAttr = node1->getAttributes();
 			DOMNode* idNode = animationAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
-			std::string idAttr = getString(idNode->getNodeValue()); // these three variables have no use
+			std::string idAttr;
+			xml_utils::xml_translate(&idAttr, idNode->getNodeValue());
 			std::string jointName = tokenize(idAttr, ".-");	
 			std::string channelType = tokenize(idAttr, "_");
 			int numTimeInput = -1;
@@ -433,12 +448,14 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 			for (unsigned int j = 0; j < list1->getLength(); j++)
 			{
 				DOMNode* node2 = list1->item(j);
-				std::string node2Name = getString(node2->getNodeName());
+				std::string node2Name;
+				xml_utils::xml_translate(&node2Name, node2->getNodeName());
 				if (node2Name == "source")
 				{
 					DOMNamedNodeMap* sourceAttr = node2->getAttributes();
 					DOMNode* sourceIdNode = sourceAttr->getNamedItem(BML::BMLDefs::ATTR_ID);					
-					std::string sourceIdAttr = getString(sourceIdNode->getNodeValue());
+					std::string sourceIdAttr;
+					xml_utils::xml_translate(&sourceIdAttr, sourceIdNode->getNodeValue());
 					size_t pos = sourceIdAttr.find_last_of("-");
 					std::string op = sourceIdAttr.substr(pos + 1);
 					if (sourceIdAttr.find("input") != std::string::npos) op = "input";
@@ -449,13 +466,17 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 					for (unsigned int k = 0; k < list2->getLength(); k++)
 					{
 						DOMNode* node3 = list2->item(k);
-						std::string node3Name = getString(node3->getNodeName());
+						std::string node3Name;
+						xml_utils::xml_translate(&node3Name, node3->getNodeName());
 						if (node3Name == "float_array")
 						{
 							DOMNamedNodeMap* arrayAttr = node3->getAttributes();
 							DOMNode* arrayCountNode = arrayAttr->getNamedItem(BML::BMLDefs::ATTR_COUNT);
-							int counter = atoi(getString(arrayCountNode->getNodeValue()).c_str());
-							std::string arrayString = getString(node3->getTextContent());
+							std::string temp;
+							xml_utils::xml_translate(&temp, arrayCountNode->getNodeValue());
+							int counter = atoi(temp.c_str());
+							std::string arrayString;
+							xml_utils::xml_translate(&arrayString, node3->getTextContent());
 							std::vector<std::string> tokens;
 							vhcl::Tokenize(arrayString, tokens, " \n");
 						
@@ -747,13 +768,6 @@ int ParserOpenCOLLADA::getMotionChannelId(SkChannelArray& mChannels, std::string
 	return dataId;
 }
 
-std::string ParserOpenCOLLADA::getString(const XMLCh* s)
-{
-	std::string temp;
-	xml_utils::xml_translate(&temp, s);
-	return temp;
-}
-
 std::string ParserOpenCOLLADA::tokenize(std::string& str, const std::string& delimiters, int mode)
 {
 	// Skip delimiters at beginning.
@@ -831,7 +845,9 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
 		DOMNode* node = list->item(c);
-		std::string nodeName = getString(node->getNodeName());
+		std::string nodeName;
+		xml_utils::xml_translate(&nodeName ,node->getNodeName());
+
 		if (nodeName == "geometry")
 		{
 
@@ -840,22 +856,28 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 			DOMNode* nameNode = nodeAttr->getNamedItem(BML::BMLDefs::ATTR_NAME);
 			std::string nameAttr = "";
 			DOMNode* idNode = nodeAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
-			std::string idString = getString(idNode->getNodeValue());
+			std::string idString;
+			xml_utils::xml_translate(&idString, idNode->getNodeValue());
+
 			if (nameNode)
-				nameAttr = getString(nameNode->getNodeValue());
+				xml_utils::xml_translate(&nameAttr, nameNode->getNodeValue());
+
 			newModel->name = SrString(idString.c_str());
 			DOMNode* meshNode = ParserOpenCOLLADA::getNode("mesh", node);
 			if (!meshNode)	continue;
 			for (unsigned int c1 = 0; c1 < meshNode->getChildNodes()->getLength(); c1++)
 			{
 				DOMNode* node1 = meshNode->getChildNodes()->item(c1);
-				std::string nodeName1 = getString(node1->getNodeName());
+				std::string nodeName1;
+				xml_utils::xml_translate(&nodeName1, node1->getNodeName());
 				
 				if (nodeName1 == "source")
 				{
 					DOMNamedNodeMap* sourceAttr = node1->getAttributes();
 					DOMNode* idNode = sourceAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
-					std::string idString = getString(idNode->getNodeValue());					
+					std::string idString;
+					xml_utils::xml_translate(&idString, idNode->getNodeValue());
+					
 					size_t pos = idString.find_last_of("-");
 					std::string tempString = idString.substr(pos + 1);
 					idString = tempString;
@@ -864,14 +886,17 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 					// below is a faster way to parse all the data, have potential bug
 					DOMNode* floatNode = ParserOpenCOLLADA::getNode("float_array", node1);
 					DOMNode* countNode = floatNode->getAttributes()->getNamedItem(BML::BMLDefs::ATTR_COUNT);
-					int count = atoi(getString(countNode->getNodeValue()).c_str());
+					std::string temp;
+					xml_utils::xml_translate(&temp, countNode->getNodeValue());
+					int count = atoi(temp.c_str());
 					if (idType == "positions")
 						count /= 3;
 					if (idType == "normals")
 						count /= 3;
 					if (idType == "texcoords")
 						count /= 2;
-					std::string floatString = getString(floatNode->getTextContent());
+					std::string floatString;
+					xml_utils::xml_translate(&floatString, floatNode->getTextContent());
 					std::vector<std::string> tokens;
 					vhcl::Tokenize(floatString, tokens, " \n");
 					int index = 0;
@@ -909,7 +934,8 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 						{
 							DOMNamedNodeMap* inputNodeAttr = inputNode->getAttributes();
 							DOMNode* semanticNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_SEMANTIC);
-							std::string inputSemantic = getString(semanticNode->getNodeValue());
+							std::string inputSemantic;
+							xml_utils::xml_translate(&inputSemantic, semanticNode->getNodeValue());
 							vertexSemantics[inputSemantic] = true;							
 						}						
 					}										
@@ -920,9 +946,12 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 					int curmtl = -1;
 					DOMNamedNodeMap* nodeAttr1 = node1->getAttributes();
 					DOMNode* countNode = nodeAttr1->getNamedItem(BML::BMLDefs::ATTR_COUNT);
-					int count = atoi(getString(countNode->getNodeValue()).c_str());
+					std::string temp;
+					xml_utils::xml_translate(&temp, countNode->getNodeValue());
+					int count = atoi(temp.c_str());
 					DOMNode* materialNode = nodeAttr1->getNamedItem(BML::BMLDefs::ATTR_MATERIAL);
-					std::string materialName = getString(materialNode->getNodeValue());
+					std::string materialName;
+					xml_utils::xml_translate(&materialName, materialNode->getNodeValue());
 					curmtl = mnames.lsearch(materialName.c_str());
 					std::map<int, std::string> inputMap;
 					int pStride = 0;
@@ -934,9 +963,12 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 						{
 							DOMNamedNodeMap* inputNodeAttr = inputNode->getAttributes();
 							DOMNode* semanticNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_SEMANTIC);
-							std::string inputSemantic = getString(semanticNode->getNodeValue());
+							std::string inputSemantic;
+							xml_utils::xml_translate(&inputSemantic, semanticNode->getNodeValue());
 							DOMNode* offsetNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_OFFSET);
-							int offset = atoi(getString(offsetNode->getNodeValue()).c_str());
+							std::string temp;
+							xml_utils::xml_translate(&temp, offsetNode->getNodeValue());
+							int offset = atoi(temp.c_str());
 							if (pStride <= offset)	pStride = offset;
 							if (inputMap.find(offset) != inputMap.end())	// same offset is wrong
 							{
@@ -964,7 +996,8 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 						}
 						if (XMLString::compareString(inputNode->getNodeName(), BML::BMLDefs::ATTR_VCOUNT) == 0)
 						{
-							std::string vcountString = getString(inputNode->getTextContent());
+							std::string vcountString;
+							xml_utils::xml_translate(&vcountString, inputNode->getTextContent());
 							std::vector<std::string> tokens;
 							vhcl::Tokenize(vcountString, tokens, " \n");
 							for (int i = 0; i < count; i++)
@@ -981,7 +1014,8 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 							vcountList.push_back(3);
 					}
 					DOMNode* pNode = ParserOpenCOLLADA::getNode("p", node1);
-					std::string pString = getString(pNode->getTextContent());
+					std::string pString;
+					xml_utils::xml_translate(&pString, pNode->getTextContent());
 					std::vector<std::string> tokens;
 					vhcl::Tokenize(pString, tokens, " \n");
 					int index = 0;
@@ -1095,18 +1129,21 @@ void ParserOpenCOLLADA::parseLibraryMaterials(DOMNode* node, std::map<std::strin
 	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
 		DOMNode* node = list->item(c);
-		std::string nodeName = getString(node->getNodeName());
+		std::string nodeName;
+		xml_utils::xml_translate(&nodeName, node->getNodeName());
 		if (nodeName == "material")
 		{
 			DOMNamedNodeMap* sourceAttr = node->getAttributes();
 			DOMNode* idNode = sourceAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
-			std::string materialId = getString(idNode->getNodeValue());
+			std::string materialId;
+			xml_utils::xml_translate(&materialId, idNode->getNodeValue());
 			DOMNode* meshNode = ParserOpenCOLLADA::getNode("instance_effect", node);
 			if (!meshNode)	continue;
 			DOMNamedNodeMap* materialSourceAttr = meshNode->getAttributes();
 			DOMNode* urlNode = materialSourceAttr->getNamedItem(BML::BMLDefs::ATTR_URL);
 			if (!urlNode)	continue;
-			std::string urlString = getString(urlNode->getNodeValue());
+			std::string urlString;
+			xml_utils::xml_translate(&urlString, urlNode->getNodeValue());
 			// get ride of the "#" in front, potential bug here if other file has different format
 			if (urlString != "")
 			{
@@ -1126,14 +1163,17 @@ void ParserOpenCOLLADA::parseLibraryImages(DOMNode* node, std::map<std::string, 
 	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
 		DOMNode* node = list->item(c);
-		std::string nodeName = getString(node->getNodeName());
+		std::string nodeName;
+		xml_utils::xml_translate(&nodeName, node->getNodeName());
 		if (nodeName == "image")
 		{
 			DOMNamedNodeMap* imageAttr = node->getAttributes();
 			DOMNode* idNode = imageAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
-			std::string imageId = getString(idNode->getNodeValue());
+			std::string imageId;
+			xml_utils::xml_translate(&imageId, idNode->getNodeValue());
 			DOMNode* initFromNode = ParserOpenCOLLADA::getNode("init_from", node);
-			std::string imageFile = getString(initFromNode->getTextContent());
+			std::string imageFile;
+			xml_utils::xml_translate(&imageFile, initFromNode->getTextContent());
 			if (pictureId2File.find(imageId) == pictureId2File.end())
 				pictureId2File.insert(std::make_pair(imageId, imageFile));
 			else
@@ -1148,12 +1188,14 @@ void ParserOpenCOLLADA::parseLibraryEffects(DOMNode* node, std::map<std::string,
 	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
 		DOMNode* node = list->item(c);
-		std::string nodeName = getString(node->getNodeName());
+		std::string nodeName;
+		xml_utils::xml_translate(&nodeName, node->getNodeName());
 		if (nodeName == "effect")
 		{
 			DOMNamedNodeMap* effectAttr = node->getAttributes();
 			DOMNode* idNode = effectAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
-			std::string effectId = getString(idNode->getNodeValue());
+			std::string effectId;
+			xml_utils::xml_translate(&effectId, idNode->getNodeValue());
 			std::string materialId = effectId2MaterialId[effectId];
 			std::string materialName = materialId2Name[materialId];
 			SrMaterial material;
@@ -1165,7 +1207,8 @@ void ParserOpenCOLLADA::parseLibraryEffects(DOMNode* node, std::map<std::string,
 			DOMNode* initFromNode = ParserOpenCOLLADA::getNode("init_from", node);
 			if (initFromNode)
 			{
-				std::string imageId = getString(initFromNode->getTextContent());
+				std::string imageId;
+				xml_utils::xml_translate(&imageId, initFromNode->getTextContent());
 				std::string imageFile = pictureId2File[imageId];
 				SrString mapKaName(imageFile.c_str());
 				std::string texFile = (const char*) mapKaName;
@@ -1179,7 +1222,8 @@ void ParserOpenCOLLADA::parseLibraryEffects(DOMNode* node, std::map<std::string,
 			if (emissionNode)
 			{
 				DOMNode* colorNode = ParserOpenCOLLADA::getNode("color", emissionNode);
-				std::string color = getString(colorNode->getTextContent());
+				std::string color;
+				xml_utils::xml_translate(&color, colorNode->getTextContent());
 				std::vector<std::string> tokens;
 				vhcl::Tokenize(color, tokens, " \n");
 				float w = 1;
@@ -1192,7 +1236,8 @@ void ParserOpenCOLLADA::parseLibraryEffects(DOMNode* node, std::map<std::string,
 			if (ambientNode)
 			{
 				DOMNode* colorNode = ParserOpenCOLLADA::getNode("color", ambientNode);
-				std::string color = getString(colorNode->getTextContent());
+				std::string color;
+				xml_utils::xml_translate(&color, colorNode->getTextContent());
 				std::vector<std::string> tokens;
 				vhcl::Tokenize(color, tokens, " \n");
 				float w = 1;

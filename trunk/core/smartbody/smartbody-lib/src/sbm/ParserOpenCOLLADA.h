@@ -49,7 +49,6 @@ class ParserOpenCOLLADA
 
 	private:
 		static int getMotionChannelId(SkChannelArray& channels, std::string sourceName);
-		static std::string getString(const XMLCh* s);
 		static std::string tokenize(std::string& str,const std::string& delimiters = " ", int mode = 1);
 		static int getRotationOrder(std::vector<std::string> orderVec);
 		static std::string getGeometryType(std::string s);
