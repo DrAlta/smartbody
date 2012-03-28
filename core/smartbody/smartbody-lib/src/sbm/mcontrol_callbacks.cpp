@@ -2060,6 +2060,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 			return CMD_FAILURE;
 		}
 
+#if 0 // feng : I don't know why the following codes are necessary, but it causes incorrect skinning results. Remove it for now.
 		// below code is to adjust the mesh if there's orientation in the joints. potential bug too because here only detect the first joint
 		SkSkeleton* skel = char_p->getSkeleton();
 		SkJoint* firstJ = skel->root()->child(0);
@@ -2088,6 +2089,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 				}	
 			}
 		}
+#endif
 //		delete geometryNode;
 	}	
 	for (unsigned int i = 0; i < meshModelVec.size(); i++)
@@ -2257,6 +2259,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 												matCounter = 0;
 												newMat.set(bindPosMat);													
 												newMat.transpose();
+												//newMat = skinWeight->bindShapeMat.inverse()*newMat;
 												SrVec newTran = newMat.get_translation()*scaleFactor;
 												newMat.setl4(newTran);
 												skinWeight->bindPoseMat.push_back(newMat);
