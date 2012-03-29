@@ -35,7 +35,11 @@
 # include <sbm/SBController.h>
 #include <queue>
 
-class SmartBody::MotionEvent;
+namespace SmartBody {
+
+class MotionEvent;
+}
+
 
 /*! This motion controller provides a controller interface to play
     an attached SkMotion. Besides few extra functionality such as
