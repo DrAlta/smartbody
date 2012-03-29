@@ -2,6 +2,22 @@
 #include "vhcl.h"
 #include "sbm/mcontrol_util.h"
 #include "SBScene.h"
+#include <sbm/SBObject.h>
+#include <sbm/SBCharacter.h>
+#include <sbm/SBMotion.h>
+#include <sbm/SBScript.h>
+#include <sbm/Event.h>
+#include <sbm/SBSimulationManager.h>
+#include <sbm/SBBmlProcessor.h>
+#include <sbm/SBAnimationStateManager.h>
+#include <sbm/SBReachManager.h>
+#include <sbm/SBSteerManager.h>
+#include <sbm/SBServiceManager.h>
+#include <sbm/SBPhysicsManager.h>
+#include <sbm/SBBoneBusManager.h>
+#include <sbm/SBGestureMapManager.h>
+#include <sbm/SBJointMapManager.h>
+#include <sbm/SBParser.h>
 #include "SbmDebuggerServer.h"
 #include <sbm/sbm_audio.h>
 
@@ -18,6 +34,7 @@ SBScene::SBScene(void)
 	_serviceManager = new SBServiceManager();
 	_physicsManager = new SBPhysicsManager();
 	_gestureMapManager = new SBGestureMapManager();
+	_jointMapManager = new SBJointMapManager();
 	_boneBusManager = new SBBoneBusManager();
 	_scale = .01f; // default scale is centimeters
 
@@ -51,6 +68,7 @@ SBScene::~SBScene(void)
 	delete _steerManager;
 	delete _physicsManager;
 	delete _gestureMapManager;
+	delete _jointMapManager;
 
 	delete _parser;
 
@@ -324,22 +342,6 @@ std::vector<std::string> SBScene::getSkeletonNames()
 	return ret;	
 }
 
-std::vector<std::string> SBScene::getBoneMapNames()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::vector<std::string> ret;
-
-	for(std::map<std::string, BoneMap*>::iterator iter = mcu.getBoneMaps().begin();
-		iter != mcu.getBoneMaps().end();
-		iter++)
-	{
-		
-		ret.push_back(std::string(iter->first));
-	}
-
-	return ret;	
-}
-
 std::vector<std::string> SBScene::getEventHandlerNames()
 {
 	EventManager* eventManager = getEventManager();
@@ -594,6 +596,11 @@ SBBoneBusManager* SBScene::getBoneBusManager()
 SBGestureMapManager* SBScene::getGestureMapManager()
 {
 	return _gestureMapManager;
+}
+
+SBJointMapManager* SBScene::getJointMapManager()
+{
+	return _jointMapManager;
 }
 
 SBParser* SBScene::getParser()

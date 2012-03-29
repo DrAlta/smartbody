@@ -41,6 +41,7 @@
 #include "bml_xml_consts.hpp"
 #include "xercesc_utils.hpp"
 #include "BMLDefs.h"
+#include <sbm/SBSteerManager.h>
 
 ////// XML ATTRIBUTES
 

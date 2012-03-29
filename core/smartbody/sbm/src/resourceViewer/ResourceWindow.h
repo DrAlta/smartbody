@@ -14,6 +14,8 @@
 #include <sbm/SBService.h>
 #include <sbm/Physics/SbmPhysicsSim.h>
 #include <sbm/SBPhysicsManager.h>
+#include <sbm/Event.h>
+#include <sbm/SBJointMap.h>
 
 class srPathList;
 class SkSkeleton;
@@ -37,7 +39,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 			   ITEM_MESH_PATH, 
 			   ITEM_SEQ_FILES,
 			   ITEM_SKELETON, 
-			   ITEM_BONE_MAP,
+			   ITEM_JOINT_MAP,
 			   ITEM_MOTION, 			   
 			   ITEM_FACE_DEFINITION,
 			   ITEM_EVENT_HANDLERS,
@@ -88,7 +90,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 		void updatePath(Fl_Tree_Item* tree, srPathList& pathList);
 		void updateSeqFiles(Fl_Tree_Item* tree, std::string pathName);
 		void updateSkeleton(Fl_Tree_Item* tree, SkSkeleton* skel);
-		void updateBoneMap(Fl_Tree_Item* tree, BoneMap* boneMap);
+		void updateJointMap(Fl_Tree_Item* tree, SmartBody::SBJointMap* jointMap);
 		void updateMotion(Fl_Tree_Item* tree, SkMotion* motion);
 		void updatePawn(Fl_Tree_Item* tree, SbmPawn* pawn);
 		void updateCharacter(Fl_Tree_Item* tree, SbmCharacter* character);	
@@ -96,7 +98,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 		void updateService(Fl_Tree_Item* tree, SmartBody::SBService* service);	
 		void updatePhysicsManager(Fl_Tree_Item* tree, SmartBody::SBPhysicsManager* phyService);
 		void updateFaceMotion(Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition);
-		void updateEventHandler(Fl_Tree_Item* tree, EventHandler* handler);
+		void updateEventHandler(Fl_Tree_Item* tree, SmartBody::EventHandler* handler);
 		
 		int  findTreeItemType(Fl_Tree_Item* treeItem);
 		void clearInfoWidget();

@@ -87,7 +87,7 @@ class mcuCBHandle;
 #include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
 
-#include "sbm/BoneMap.h"
+#include <sbm/SBJointMap.h>
 #include <sbm/nvbg.h>
 
 #include <me/me_ct_interpolator.h>
@@ -303,7 +303,6 @@ class mcuCBHandle {
 		std::map<std::string, SkPosture*> pose_map;
 		std::map<std::string, SkMotion*> motion_map;
 		std::map<std::string, SkSkeleton*> skeleton_map;
-		std::map<std::string, BoneMap*> boneMaps;
 
 		GeneralParamMap				param_map;			// map that contains the information of shader parameters
 
@@ -338,8 +337,6 @@ class mcuCBHandle {
 
 		std::map<std::string, SbmCharacter*>& getCharacterMap();
 		std::map<std::string, SkSkeleton*>& getSkeletonMap();
-		std::map<std::string, BoneMap*>& getBoneMaps();
-
 
 		bool addCharacter(SbmCharacter* character);
 		void removeCharacter(const std::string& name);

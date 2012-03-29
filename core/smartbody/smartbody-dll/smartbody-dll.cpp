@@ -17,6 +17,7 @@
 #include "sbm/resource_cmds.h"
 #include "sbm/locomotion_cmds.hpp"
 #include "sbm/SBPython.h"
+#include "sbm/SBCharacter.h"
 
 #include "sbm/SbmDebuggerServer.h"
 

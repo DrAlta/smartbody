@@ -8,6 +8,8 @@
 #include "vhmsg-tt.h"
 
 #include "sbm/SBScene.h"
+#include "sbm/SBCharacter.h"
+
 
 
 using std::string;
@@ -133,7 +135,7 @@ void SbmDebuggerServer::Update()
             vector<string> charNames = m_scene->getCharacterNames();
             for (size_t i = 0; i < charNames.size(); i++)
             {
-               SBCharacter * c = m_scene->getCharacter(charNames[i]);
+				SmartBody::SBCharacter * c = m_scene->getCharacter(charNames[i]);
 
                size_t numBones = c->getSkeleton()->getNumJoints();
 

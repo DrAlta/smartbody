@@ -36,6 +36,8 @@
 #include <string>
 #include <boost/tokenizer.hpp>
 #include <sbm/SBSkeleton.h>
+#include <sbm/SBPhysicsManager.h>
+#include <sbm/SBBoneBusManager.h>
 
 #ifdef WIN32
 #include <direct.h>
@@ -69,6 +71,9 @@
 #include "ParserFBX.h"
 #include "SBCharacter.h"
 #include <sbm/BMLDefs.h>
+#include <sbm/SBSteerManager.h>
+#include <sbm/SBJointMapManager.h>
+#include <sbm/SBJointMap.h>
 #include <math.h>
 
 
@@ -5698,33 +5703,19 @@ int setmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		return CMD_FAILURE;
 	}
 
-	BoneMap* boneMap = NULL;
-	std::map<std::string, BoneMap*>::iterator iter = mcu_p->boneMaps.find(mapname);
-	if (iter != mcu_p->boneMaps.end())
+	SmartBody::SBJointMapManager* manager = SmartBody::SBScene::getScene()->getJointMapManager();
+
+
+	SmartBody::SBJointMap* jointMap = manager->getJointMap(mapname);
+	if (!jointMap)
 	{
-		boneMap = (*iter).second;
-	}
-	else
-	{
-		boneMap = new BoneMap();
-		mcu_p->boneMaps.insert(std::pair<std::string, BoneMap*>(mapname, boneMap));
+		jointMap = manager->createJointMap(mapname);
 	}
 
-	bool found = false;
-	for (size_t x = 0; x < boneMap->map.size(); x++)
-	{
-		if (from == boneMap->map[x].first)
-		{
-			boneMap->map[x].second = to;
-			found = true;
-		}
-	}
-	if (!found)
-	{
-		boneMap->map.push_back(std::pair<std::string, std::string>(from, to));
-	}
+	jointMap->setMapping(from, to);
 
-	LOG("Mapping %s -> %s on bone map %s", from, to, mapname);
+	LOG("Mapping %s -> %s on joint map %s", from, to, mapname);
+	
 	return CMD_SUCCESS;
 }
 
@@ -5744,11 +5735,10 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		return CMD_SUCCESS;
 	}
 
-	BoneMap* boneMap = NULL;
-	std::map<std::string, BoneMap*>::iterator boneMapIter = mcu_p->boneMaps.find(mapName);
-	if (boneMapIter == mcu_p->boneMaps.end())
+	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(mapName);
+	if (!jointMap)
 	{
-		LOG("Cannot find bone map name '%s'.", mapName.c_str());
+		LOG("Cannot find joint map name '%s'.", mapName.c_str());
 		return CMD_FAILURE;
 	}
 
@@ -5813,7 +5803,6 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	return CMD_SUCCESS;
-
 }
 
 int motionmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
@@ -5825,7 +5814,7 @@ int motionmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		return CMD_SUCCESS;
 	}
 
-	SkMotion* skmotion = NULL;
+	SmartBody::SBMotion* sbmotion = NULL;
 	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motion);
 	if (iter == mcu_p->motion_map.end())
 	{
@@ -5834,7 +5823,7 @@ int motionmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 	else
 	{
-		 skmotion = (*iter).second;
+		 sbmotion = dynamic_cast<SmartBody::SBMotion*>((*iter).second);
 	}
 
 	char* mapname =  args.read_token();
@@ -5845,22 +5834,18 @@ int motionmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	// find the bone map name
-	BoneMap* boneMap = NULL;
-	std::map<std::string, BoneMap*>::iterator boneMapIter = mcu_p->boneMaps.find(mapname);
-	if (boneMapIter == mcu_p->boneMaps.end())
+	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(mapname);
+	if (!jointMap)
 	{
 		LOG("Cannot find bone map name '%s'.", mapname);
 		return CMD_FAILURE;
 	}
-	else
-	{
-		boneMap = (*boneMapIter).second;
-	}
 
 	// apply the map
-	boneMap->apply(skmotion);
+	jointMap->applyMotion(sbmotion);
 
 	LOG("Applied bone map %s to motion %s.", mapname, motion);
+	
 	return CMD_SUCCESS;
 }
 
@@ -5873,7 +5858,7 @@ int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		return CMD_SUCCESS;
 	}
 
-	SkSkeleton* skskeleton = NULL;
+	SmartBody::SBSkeleton* sbskeleton = NULL;
 	std::map<std::string, SkSkeleton*>::iterator iter = mcu_p->skeleton_map.find(skeleton);
 	if (iter == mcu_p->skeleton_map.end())
 	{
@@ -5882,7 +5867,7 @@ int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 	else
 	{
-		 skskeleton = (*iter).second;
+		 sbskeleton = dynamic_cast<SmartBody::SBSkeleton*>((*iter).second);
 	}
 
 	char* mapname =  args.read_token();
@@ -5893,22 +5878,18 @@ int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	// find the bone map name
-	BoneMap* boneMap = NULL;
-	std::map<std::string, BoneMap*>::iterator boneMapIter = mcu_p->boneMaps.find(mapname);
-	if (boneMapIter == mcu_p->boneMaps.end())
+	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(mapname);
+	if (!jointMap)
 	{
-		LOG("Cannot find bone map name '%s'.", mapname);
+		LOG("Cannot find joint map name '%s'.", mapname);
 		return CMD_FAILURE;
-	}
-	else
-	{
-		boneMap = (*boneMapIter).second;
 	}
 
 	// apply the map
-	boneMap->apply(skskeleton);
+	jointMap->applySkeleton(sbskeleton);
 
-	LOG("Applied bone map %s to skeleton %s.", mapname, skeleton);
+	LOG("Applied joint map %s to skeleton %s.", mapname, skeleton);
+	
 	return CMD_SUCCESS;
 }
 

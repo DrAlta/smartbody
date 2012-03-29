@@ -3,26 +3,31 @@
 
 #include <vhcl.h>
 #include <sbm/SBObject.h>
-#include <sbm/SBCharacter.h>
-#include <sbm/SBMotion.h>
-#include <sbm/SBScript.h>
-#include <sbm/Event.h>
-#include <sbm/SBSimulationManager.h>
-#include <sbm/SBBmlProcessor.h>
-#include <sbm/SBAnimationStateManager.h>
-#include <sbm/SBReachManager.h>
-#include <sbm/SBSteerManager.h>
-#include <sbm/SBServiceManager.h>
-#include <sbm/SBPhysicsManager.h>
-#include <sbm/SBBoneBusManager.h>
-#include <sbm/SBGestureMapManager.h>
-#include <sbm/SBParser.h>
-
 
 class SbmDebuggerServer;
 
 namespace SmartBody {
 
+class SBPawn;
+class SBCharacter;
+class SBSkeleton;
+class SBFaceDefinition;
+class SBMotion;
+class EventManager;
+class SBSimulationManager;
+class SBProfiler;
+class SBBmlProcessor;
+class SBAnimationStateManager;
+class SBReachManager;
+class SBSteerManager;
+class SBServiceManager;
+class SBPhysicsManager;
+class SBBoneBusManager;
+class SBGestureMapManager;
+class SBJointMapManager;
+class SBParser;
+class SBScript;
+class SBSubject;
 
 class SBScene : public SBObject
 {
@@ -65,7 +70,6 @@ class SBScene : public SBObject
 		int getNumMotions();
 		std::vector<std::string> getMotionNames();
 		std::vector<std::string> getSkeletonNames();
-		std::vector<std::string> getBoneMapNames();
 		std::vector<std::string> getEventHandlerNames();
 
 		void setMediaPath(std::string path);
@@ -100,6 +104,7 @@ class SBScene : public SBObject
 		SBPhysicsManager* getPhysicsManager();
 		SBBoneBusManager* getBoneBusManager();
 		SBGestureMapManager* getGestureMapManager();
+		SBJointMapManager* getJointMapManager();
 
 		SBParser* getParser();
 
@@ -118,6 +123,7 @@ class SBScene : public SBObject
 		SBPhysicsManager* _physicsManager;
 		SBBoneBusManager* _boneBusManager;
 		SBGestureMapManager* _gestureMapManager;
+		SBJointMapManager* _jointMapManager;
 		SBParser* _parser;
 
 		std::map<std::string, SBScript*> _scripts;

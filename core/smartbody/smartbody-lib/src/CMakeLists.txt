@@ -211,7 +211,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/bml_target.cpp
 	sbm/bml_saccade.cpp
 	sbm/bml_states.cpp
-	sbm/BoneMap.cpp
+	sbm/SBJointMap.cpp
 	sbm/Event.cpp
 	sbm/GenericViewer.cpp
 	sbm/gwiz_cmdl.cpp

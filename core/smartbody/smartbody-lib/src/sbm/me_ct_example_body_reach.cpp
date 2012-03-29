@@ -11,6 +11,7 @@
 #include "me_ct_barycentric_interpolation.h"
 #include "sbm/Event.h"
 #include "MeCtBodyReachState.h"
+#include <sbm/SBSteerManager.h>
 
 
 using namespace boost;

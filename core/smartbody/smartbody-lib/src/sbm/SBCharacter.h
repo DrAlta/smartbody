@@ -2,15 +2,13 @@
 #define _SBCHARACTER_H_
 
 #include <sbm/sbm_character.hpp>
-#include "sbm/SBController.h"
-#include <sbm/SBSteerAgent.h>
-
 
 namespace SmartBody {
 
 class SBSkeleton;
 class SBBehavior;
 class SBSteerAgent;
+class SBController;
 
 class SBCharacter : public SbmCharacter
 {

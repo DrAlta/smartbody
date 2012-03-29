@@ -15,6 +15,9 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <sbm/nvbg.h>
+#include <sbm/SBServiceManager.h>
+#include <sbm/SBJointMapManager.h>
+#include <sbm/SBJointMap.h>
 
 
 // enum {
@@ -25,7 +28,7 @@
 // 	ITEM_MESH_PATH, 
 // 	ITEM_SEQ_FILES,
 // 	ITEM_SKELETON, 
-// 	ITEM_BONE_MAP,
+// 	ITEM_JOINT_MAP,
 // 	ITEM_MOTION, 			   
 // 	ITEM_FACE_DEFINITION,
 // 	ITEM_EVENT_HANDLERS,
@@ -66,7 +69,7 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Doub
 	treeItemList[ITEM_SEQ_FILES] = resourceTree->add("Scripts");
 
 	treeItemList[ITEM_SKELETON] = resourceTree->add("Skeletons");
-	treeItemList[ITEM_BONE_MAP] = resourceTree->add("Character Maps");
+	treeItemList[ITEM_JOINT_MAP] = resourceTree->add("Character Maps");
 	treeItemList[ITEM_MOTION] =  resourceTree->add("Motions");	
 
 	treeItemList[ITEM_FACE_DEFINITION] = resourceTree->add("Face Definitions");
@@ -238,15 +241,16 @@ void ResourceWindow::updateGUI()
 		updateSkeleton(treeItemList[ITEM_SKELETON],ski->second);
 	}
 
-	// update bone map
-	std::map<std::string, BoneMap*>::iterator bi;
-	resourceTree->clear_children(treeItemList[ITEM_BONE_MAP]);	
-	for ( bi  = mcu.boneMaps.begin();
-		bi != mcu.boneMaps.end();
-		bi++)
+	// update joint maps
+	resourceTree->clear_children(treeItemList[ITEM_JOINT_MAP]);	
+	SmartBody::SBJointMapManager* jointMapManager = SmartBody::SBScene::getScene()->getJointMapManager();
+	std::vector<std::string> jointMapNames = jointMapManager->getJointMapNames();
+	for (std::vector<std::string>::iterator iter = jointMapNames.begin();
+		 iter != jointMapNames.end(); 
+		 iter++)
 	{
-		Fl_Tree_Item* boneMapItem = resourceTree->add(treeItemList[ITEM_BONE_MAP],bi->first.c_str());
-		updateBoneMap(boneMapItem,bi->second);
+		Fl_Tree_Item* boneMapItem = resourceTree->add(treeItemList[ITEM_JOINT_MAP], (*iter).c_str());
+		updateJointMap(boneMapItem, jointMapManager->getJointMap((*iter)));
 	}
 
 	// update motion map
@@ -509,21 +513,21 @@ void ResourceWindow::updateSeqFiles( Fl_Tree_Item* tree, std::string pname )
 }
 
 
-void ResourceWindow::updateBoneMap( Fl_Tree_Item* tree, BoneMap* boneMap )
+void ResourceWindow::updateJointMap( Fl_Tree_Item* tree, SmartBody::SBJointMap* jointMap )
 {
-	for (unsigned int i=0;i<boneMap->map.size();i++)
+	for (int i=0;i<jointMap->getNumMappings();i++)
 	{
-		std::string key = boneMap->map[i].first;
-		std::string target = boneMap->map[i].second;
+		std::string key = jointMap->getSource(i);
+		std::string target = jointMap->getTarget(i);
 
 		
 		Fl_Tree_Item* item = resourceTree->add(tree,(key+"-->"+target).c_str());	
-		item->user_data((void*)ITEM_BONE_MAP);
+		item->user_data((void*)ITEM_JOINT_MAP);
 		//resourceTree->add(item,target.c_str());
 	}
 }
 
-void ResourceWindow::updateEventHandler( Fl_Tree_Item* tree, EventHandler* handler )
+void ResourceWindow::updateEventHandler( Fl_Tree_Item* tree, SmartBody::EventHandler* handler )
 {
 	//Fl_Tree_Item* item = resourceTree->add(tree,(handler->getType() + ":" + "\""+ handler->getAction() + "\"").c_str());
 	//item->user_data((void*)ITEM_EVENT_HANDLERS);

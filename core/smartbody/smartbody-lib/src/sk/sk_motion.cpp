@@ -751,19 +751,19 @@ void SkMotion::equalize_frames ( SrArray<SkMotion*> motions )
 
 //============================ End of File ===========================
 
-const bool ascendingTime(MotionEvent* a, MotionEvent* b)
+const bool ascendingTime(SmartBody::MotionEvent* a, SmartBody::MotionEvent* b)
 {
 	return (a->getTime() < b->getTime());
 }
 
-void SkMotion::addMotionEvent(MotionEvent* motionEvent)
+void SkMotion::addMotionEvent(SmartBody::MotionEvent* motionEvent)
 {
 	_motionEvents.push_back(motionEvent);
 	// make sure that the motion events are ordered by time
 	std::sort(_motionEvents.begin(), _motionEvents.end(), ascendingTime);
 }
 
-std::vector<MotionEvent*>& SkMotion::getMotionEvents()
+std::vector<SmartBody::MotionEvent*>& SkMotion::getMotionEvents()
 {
 	return _motionEvents;
 }
