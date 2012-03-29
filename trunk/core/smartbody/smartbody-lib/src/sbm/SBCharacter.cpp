@@ -5,6 +5,8 @@
 #include "sbm/SBController.h"
 #include "sbm/me_utilities.hpp"
 #include "sbm/SBBehavior.h"
+#include <sbm/SBSteerAgent.h>
+
 
 namespace SmartBody {
 

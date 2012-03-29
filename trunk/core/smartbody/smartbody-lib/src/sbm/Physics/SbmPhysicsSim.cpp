@@ -1,7 +1,10 @@
 #include "SbmPhysicsSim.h"
 #include <sbm/mcontrol_util.h>
 #include <sbm/SBScene.h>
+#include <sbm/SBPhysicsManager.h>
+#include <sbm/SBCharacter.h>
 #include <sr/sr_output.h>
+
 //#include <boost/math/special_functions/fpclassify.hpp>
 
 SbmPhysicsSim::SbmPhysicsSim(void)

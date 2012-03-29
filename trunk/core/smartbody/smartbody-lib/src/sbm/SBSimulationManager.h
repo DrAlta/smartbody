@@ -1,6 +1,8 @@
 #ifndef _SIMULATIONMANAGER_H
 #define _SIMULATIONMANAGER_H
 
+namespace SmartBody {
+
 class SBProfiler
 {
 	public:
@@ -39,6 +41,8 @@ class SBSimulationManager
 		void setEvalDt(float v);
 		void setSimDt(float v);
 		void setSpeed(float v);
+};
+
 };
 
 #endif

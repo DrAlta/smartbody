@@ -35,6 +35,8 @@
 # include <sbm/SBController.h>
 #include <queue>
 
+class SmartBody::MotionEvent;
+
 /*! This motion controller provides a controller interface to play
     an attached SkMotion. Besides few extra functionality such as
     time warping, loop, etc; it also efficiently supports the
@@ -51,7 +53,7 @@ class MeCtMotion : public SmartBody::SBController
     bool                 _loop;      // if the motion is to be played in loop
     int                  _last_apply_frame; // to optimize shared motion evaluation
 	SrBuffer<int>        _mChan_to_buff; // motion's channels to context's buffer index
-	std::queue<MotionEvent*> _events;
+	std::queue<SmartBody::MotionEvent*> _events;
 	int					 _lastCycle;
 
    public :

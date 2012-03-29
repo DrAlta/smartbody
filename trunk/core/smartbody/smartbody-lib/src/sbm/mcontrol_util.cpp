@@ -77,7 +77,9 @@
 #include "sbm/Physics/SbmPhysicsSimODE.h"
 #include <sbm/locomotion_cmds.hpp>
 #include <boost/algorithm/string/replace.hpp>
-
+#include <sbm/SBBoneBusManager.h>
+#include <sbm/SBScript.h>
+#include <sbm/SBServiceManager.h>
 #include "SbmDebuggerServer.h"
 
 
@@ -1060,8 +1062,8 @@ int mcuCBHandle::remove_scene( SrSnGroup *scene_p )	{
 void mcuCBHandle::update( void )	{
 
 	// scripts
-	std::map<std::string, SBScript*>& scripts = _scene->getScripts();
-	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
+	std::map<std::string, SmartBody::SBScript*>& scripts = _scene->getScripts();
+	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();
 		iter++)
 	{
@@ -1070,8 +1072,8 @@ void mcuCBHandle::update( void )	{
 	}
 
 	// services
-	std::map<std::string, SBService*>& services = _scene->getServiceManager()->getServices();
-	for (std::map<std::string, SBService*>::iterator iter = services.begin();
+	std::map<std::string, SmartBody::SBService*>& services = _scene->getServiceManager()->getServices();
+	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
 		iter != services.end();
 		iter++)
 	{
@@ -1312,14 +1314,14 @@ void mcuCBHandle::update( void )	{
 		panimationviewer_p->update_viewer();
 
 
-	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
+	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();
 		iter++)
 	{
 		(*iter).second->update(time);
 	}
 
-	for (std::map<std::string, SBService*>::iterator iter = services.begin();
+	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
 		iter != services.end();
 		iter++)
 	{
@@ -1327,7 +1329,7 @@ void mcuCBHandle::update( void )	{
 	}
 
 	// scripts
-	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
+	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();
 		iter++)
 	{
@@ -1336,7 +1338,7 @@ void mcuCBHandle::update( void )	{
 	}
 
 	// services
-	for (std::map<std::string, SBService*>::iterator iter = services.begin();
+	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
 		iter != services.end();
 		iter++)
 	{
@@ -2010,11 +2012,6 @@ std::map<std::string, SbmCharacter*>& mcuCBHandle::getCharacterMap()
 std::map<std::string, SkSkeleton*>& mcuCBHandle::getSkeletonMap()
 {
 	return skeleton_map;
-}
-
-std::map<std::string, BoneMap*>& mcuCBHandle::getBoneMaps()
-{
-	return boneMaps;
 }
 
 bool mcuCBHandle::addCharacter(SbmCharacter* character)

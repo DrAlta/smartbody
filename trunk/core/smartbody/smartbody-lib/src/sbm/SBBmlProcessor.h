@@ -4,6 +4,7 @@
 #include <string>
 #include <ostream>
 
+namespace SmartBody {
 
 class SBBmlProcessor
 {
@@ -22,5 +23,7 @@ class SBBmlProcessor
 		std::string send_vrX( const char* cmd, const std::string& char_id, const std::string& recip_id,
 			const std::string& seq_id, bool echo, bool send, const std::string& bml );
 };
+
+}
 
 #endif

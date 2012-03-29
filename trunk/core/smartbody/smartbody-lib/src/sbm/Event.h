@@ -4,6 +4,8 @@
 #include <map>
 #include <string>
 
+namespace SmartBody {
+
 class Event
 {
 	public:
@@ -84,5 +86,7 @@ class MotionEvent : public Event
 		bool m_isOnce;
 		bool m_enabled;
 };
+
+}
 
 #endif

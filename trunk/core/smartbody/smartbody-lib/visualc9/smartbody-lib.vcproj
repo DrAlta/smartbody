@@ -356,14 +356,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\BoneMap.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\BoneMap.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\DefaultAttributeTable.cpp"
 				>
 			</File>
@@ -3761,6 +3753,22 @@
 			</File>
 			<File
 				RelativePath="..\src\sbm\SBJoint.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBJointMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBJointMap.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBJointMapManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBJointMapManager.h"
 				>
 			</File>
 			<File

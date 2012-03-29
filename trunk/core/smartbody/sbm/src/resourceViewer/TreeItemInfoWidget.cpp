@@ -450,7 +450,7 @@ void EventItemInfoWidget::updateWidget()
 	EventHandlerMap::iterator mi = eventMap.find(eventName);
 	if (mi != eventMap.end())
 	{
-		EventHandler* handler = mi->second;
+		SmartBody::EventHandler* handler = mi->second;
 		eventInfoObject->setStringAttribute("EventType", mi->first);
 		BasicHandler* basicHandler = dynamic_cast<BasicHandler*>(handler);
 		if (basicHandler)
@@ -467,7 +467,7 @@ void EventItemInfoWidget::notify( SmartBody::SBSubject* subject )
 	EventHandlerMap::iterator mi = eventMap.find(eventName);
 	if (mi != eventMap.end())
 	{
-		EventHandler* handler = mi->second;
+		SmartBody::EventHandler* handler = mi->second;
 		BasicHandler* basicHandler = dynamic_cast<BasicHandler*>(handler);
 		if (basicHandler)
 			basicHandler->setAction(eventInfoObject->getStringAttribute("Action"));		

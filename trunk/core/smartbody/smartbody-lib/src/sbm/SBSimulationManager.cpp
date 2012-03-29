@@ -1,6 +1,10 @@
 #include "SBSimulationManager.h"
 #include <sbm/mcontrol_util.h>
 #include <sbm/SBScene.h>
+#include <sbm/SBScript.h>
+
+
+namespace SmartBody {
 
 SBProfiler::SBProfiler()
 {
@@ -251,3 +255,6 @@ void SBSimulationManager::setSpeed(float v)
 	else
 		LOG("Time regulator not exist!");
 }
+
+}
+

@@ -34,7 +34,11 @@
 
 class SkPosture;
 class SkSkeleton;
-class MotionEvent;
+
+namespace SmartBody {
+	class MotionEvent;
+}
+
 
 /*! Maintains a motion defined as a sequence of keyframes, each
 with a time stamp */
@@ -55,7 +59,7 @@ public:
 	SkChannelArray _channels; // channels
 	int _last_apply_frame;    // used to speed up playing with monotone time
 
-	std::vector<MotionEvent*> _motionEvents;
+	std::vector<SmartBody::MotionEvent*> _motionEvents;
 
 	// Unset times are given a value of -1
 #if 0
@@ -286,8 +290,8 @@ public :
 	void unregisterAnimation();
 	bool isRegistered();
 
-	void addMotionEvent(MotionEvent* motionEvent);
-	std::vector<MotionEvent*>& getMotionEvents();
+	void addMotionEvent(SmartBody::MotionEvent* motionEvent);
+	std::vector<SmartBody::MotionEvent*>& getMotionEvents();
 
 private : 
 	bool _load_bvh ( SrInput& in );

@@ -8,6 +8,8 @@
 #include "mcontrol_util.h"
 #include "SBScene.h"
 #include "bml_xml_consts.hpp"
+#include <sbm/SBGestureMap.h>
+#include <sbm/SBGestureMapManager.h>
 
 using namespace std;
 using namespace BML;
@@ -30,7 +32,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 
 	if (animationName == "")	// If you have assigned the animation name, do not look for the map
 	{
-		SBGestureMap* gestureMap = mcu->_scene->getGestureMapManager()->getGestureMap(request->actor->getName());
+		SmartBody::SBGestureMap* gestureMap = mcu->_scene->getGestureMapManager()->getGestureMap(request->actor->getName());
 		if (!gestureMap)
 		{
 			LOG("WARNING: BML::parse_bml_gesture(): gesture map for character %s doesn't exist.", request->actor->getName().c_str());

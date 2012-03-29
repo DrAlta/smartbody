@@ -14,6 +14,7 @@
 #include "xercesc_utils.hpp"
 #include "text_speech.h"
 #include <sbm/SBScene.h>
+#include <sbm/SBBoneBusManager.h>
 #include "BMLDefs.h"
 
 

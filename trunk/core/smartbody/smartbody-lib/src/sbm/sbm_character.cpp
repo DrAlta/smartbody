@@ -46,6 +46,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <sbm/SBSkeleton.h>
 #include <sbm/SBJoint.h>
+#include <sbm/SBBoneBusManager.h>
 
 #define USE_REACH 1
 #define USE_PHYSICS_CHARACTER 1

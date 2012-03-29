@@ -8,6 +8,25 @@
 #include <sbm/SBParseNode.h>
 #include <sbm/mcontrol_util.h>
 #include <sbm/SBScene.h>
+#include <sbm/SBScript.h>
+#include <sbm/SBService.h>
+#include <sbm/SBServiceManager.h>
+#include <sbm/SBSimulationManager.h>
+#include <sbm/SBBMLProcessor.h>
+#include <sbm/SBAnimationState.h>
+#include <sbm/SBAnimationTransition.h>
+#include <sbm/SBAnimationStateManager.h>
+#include <sbm/SBSteerManager.h>
+#include <sbm/SBPhysicsManager.h>
+#include <sbm/SBReach.h>
+#include <sbm/SBReachManager.h>
+#include <sbm/SBGestureMap.h>
+#include <sbm/SBGestureMapManager.h>
+#include <sbm/SBJointMap.h>
+#include <sbm/SBJointMapManager.h>
+#include <sbm/SBParser.h>
+#include <sbm/SBBoneBusManager.h>
+
 
 #ifdef USE_PYTHON
 
@@ -1048,6 +1067,24 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getGestureMap", &SBGestureMapManager::getGestureMap, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return gesture map given character name.")
 		;
 
+	boost::python::class_<SBJointMap>("SBJointMap")
+		.def("setMapping", &SBJointMap::setMapping, "Sets the mapping from one joint name to another.")
+		.def("removeMapping", &SBJointMap::removeMapping, "Removes a mapping from a given joint to whichever joint is mapped.")
+		.def("getMapTarget", &SBJointMap::getMapTarget, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the target joint for a given mapping.")
+		.def("getMapSource", &SBJointMap::getMapSource, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the source joint for a given mapping.")
+		.def("getNumMappings", &SBJointMap::getNumMappings, "Returns the number of joint mappings.")
+		.def("getSource", &SBJointMap::getSource, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the source joint of the nth mapping.")
+		.def("getTarget", &SBJointMap::getTarget, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the target joint of the nth mapping.")
+		.def("applyMotion", &SBJointMap::applyMotion, "Applies the current joint mapping to a motion.")
+		.def("applySkeleton", &SBJointMap::applySkeleton, "Applies the current skeleton mapping to a motion.")
+		;
+
+	boost::python::class_<SBJointMapManager>("SBJointMapManager")
+		.def("getJointMap", &SBJointMapManager::getJointMap, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the joint map associated with a given name.")
+		.def("createJointMap", &SBJointMapManager::createJointMap, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a joint map with a given name. Returns null is the map already exists.")
+		.def("getJointMapNames", &SBJointMapManager::getJointMapNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the names of all joint maps.")
+		;
+
 	boost::python::class_<Event>("Event")
 		.def("getType", &Event::getType, "Returns the event type.")
 		.def("setType", &Event::setType, "Sets the event type.")
@@ -1157,7 +1194,6 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getCharacterNames", &SBScene::getCharacterNames, "Returns a list of all character names.\n Input: NULL \nOutput: list of character names")
 		.def("getSkeletonNames", &SBScene::getSkeletonNames, "Returns a list of all skeleton names.\n Input: NULL \nOutput: list of skeleton names")
 		.def("getEventHandlerNames", &SBScene::getEventHandlerNames, "Returns a list of names of all event handlers.\n Input: NULL \nOutput: list of event handler names")
-		.def("getBoneMapNames", &SBScene::getBoneMapNames, "Returns a list of names of bone maps.\n Input: NULL \nOutput: list of bone map names")
 		.def("addMotion", &SBScene::addMotion, "Add motion resource given filepath and recursive flag. \n Input: path, recursive flag(boolean variable indicating whether to tranverse all the children directories) \n Output: NULL")
 		.def("addPose", &SBScene::addPose, "Add pose resource given filepath and recursive flag. \n Input: path, recursive flag(boolean variable indicating whether to tranverse all the children directories) \n Output: NULL")
 		.def("addAssetPath", &SBScene::addAssetPath, "Add path resource given path type and actual path string. \n Input: type(can be seq|me|ME), path \n Output: NULL")
@@ -1194,7 +1230,9 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getPhysicsManager", &SBScene::getPhysicsManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the physics manager object.")
 		.def("getBoneBusManager", &SBScene::getBoneBusManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Bone Bus manager object.")
 		.def("getGestureMapManager", &SBScene::getGestureMapManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the gesture map manager object.")
+		.def("getJointMapManager", &SBScene::getJointMapManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the joint mapping manager object.")
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
+
 	;
 	}
 #endif

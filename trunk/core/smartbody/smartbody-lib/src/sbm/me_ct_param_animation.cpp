@@ -22,6 +22,7 @@
 
 #include "me_ct_param_animation.h"
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBAnimationState.h>
 
 std::string MeCtParamAnimation::Context::CONTEXT_TYPE = "MeCtParamAnimation::Context";
 std::string MeCtParamAnimation::CONTROLLER_TYPE = "MeCtParamAnimation";
@@ -259,7 +260,7 @@ void MeCtParamAnimation::dumpScheduling()
 void MeCtParamAnimation::schedule(PAStateData* stateData, bool l, bool pn, bool a, std::string name)
 {
 	ScheduleUnit unit;
-	SBAnimationState* animState = dynamic_cast<SBAnimationState*>(stateData);
+	SmartBody::SBAnimationState* animState = dynamic_cast<SmartBody::SBAnimationState*>(stateData);
 	if (animState)
 	{
 		animState->validateState(); // to make sure the animaion state is valid before schedule it

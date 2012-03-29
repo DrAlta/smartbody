@@ -51,8 +51,8 @@ void ResourceDialog::SendGetAssetPathCommand(string assetType, NetRequest::Reque
 
 void ResourceDialog::Refresh()
 {
-   SendGetAssetPathCommand("seq", NetRequest::Get_Seq_Asset_Paths);
-   SendGetAssetPathCommand("me", NetRequest::Get_ME_Asset_Paths);
+   SendGetAssetPathCommand("script", NetRequest::Get_Seq_Asset_Paths);
+   SendGetAssetPathCommand("motion", NetRequest::Get_ME_Asset_Paths);
    SendGetAssetPathCommand("audio", NetRequest::Get_Audio_Asset_Paths);
    SendGetAssetPathCommand("mesh", NetRequest::Get_Mesh_Asset_Paths);
 

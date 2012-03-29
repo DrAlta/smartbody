@@ -26,6 +26,9 @@
 #include <sbm/mcontrol_util.h>
 #include <sbm/SBScene.h>
 #include <sbm/SBPythonClass.h>
+#include <sbm/SBBoneBusManager.h>
+#include <sbm/SBSteerManager.h>
+#include <sbm/SBPhysicsManager.h>
 #include "sbm_pawn.hpp"
 
 #ifdef __APPLE__

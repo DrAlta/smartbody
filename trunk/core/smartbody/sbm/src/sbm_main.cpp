@@ -72,6 +72,7 @@
 //#include "SBMWindow.h"
 #include "CommandWindow.h"
 #include <sbm/SBPython.h>
+#include <sbm/SBSteerManager.h>
 #include "FLTKListener.h"
 #include "sbm/SbmDebuggerServer.h"
 

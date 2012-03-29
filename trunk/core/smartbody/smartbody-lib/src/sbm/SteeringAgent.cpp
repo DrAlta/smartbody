@@ -26,6 +26,8 @@
 #include <sbm/SBScene.h>
 #include <sbm/SBPythonClass.h>
 #include <sbm/me_ct_param_animation_data.h>
+#include <sbm/SBSteerManager.h>
+
 #define DebugInfo 0
 #define FastStart 1
 

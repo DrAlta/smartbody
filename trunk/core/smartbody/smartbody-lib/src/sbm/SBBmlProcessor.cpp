@@ -1,6 +1,8 @@
 #include "SBBmlProcessor.h"
 #include <sbm/mcontrol_util.h>
 
+namespace SmartBody {
+
 SBBmlProcessor::SBBmlProcessor()
 {
 }
@@ -170,3 +172,6 @@ std::string SBBmlProcessor::execXML(std::string character, std::string xml)
 				<< xml;
 	return send_vrX( "vrSpeak", character, "ALL", "", true, true, entireXML.str() );
 }
+
+}
+

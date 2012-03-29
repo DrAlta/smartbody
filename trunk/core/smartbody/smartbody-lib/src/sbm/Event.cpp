@@ -4,6 +4,8 @@
 
 #include <boost/algorithm/string/replace.hpp>
 
+namespace SmartBody {
+
 BasicHandler::BasicHandler() : EventHandler() 
 {
 }
@@ -117,3 +119,4 @@ EventHandler* EventManager::getEventHandler(const std::string& type)
 	return NULL;
 }
 
+}
