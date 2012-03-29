@@ -860,7 +860,6 @@
     <ClInclude Include="..\src\sbm\bml_reach.hpp" />
     <ClInclude Include="..\src\sbm\bml_saccade.hpp" />
     <ClInclude Include="..\src\sbm\bml_schedule.hpp" />
-    <ClInclude Include="..\src\sbm\bml_scheduler.hpp" />
     <ClInclude Include="..\src\sbm\bml_speech.hpp" />
     <ClInclude Include="..\src\sbm\bml_states.hpp" />
     <ClInclude Include="..\src\sbm\bml_sync_point.hpp" />
