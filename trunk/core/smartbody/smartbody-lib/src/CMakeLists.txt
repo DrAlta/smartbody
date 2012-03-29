@@ -212,6 +212,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/bml_saccade.cpp
 	sbm/bml_states.cpp
 	sbm/SBJointMap.cpp
+	sbm/SBJointMapManager.cpp
 	sbm/Event.cpp
 	sbm/GenericViewer.cpp
 	sbm/gwiz_cmdl.cpp
