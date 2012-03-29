@@ -237,7 +237,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\sbm\action_unit.cpp" />
-    <ClCompile Include="..\src\sbm\BoneMap.cpp" />
     <ClCompile Include="..\src\sbm\DefaultAttributeTable.cpp" />
     <ClCompile Include="..\src\sbm\Event.cpp" />
     <ClCompile Include="..\src\sbm\GenericViewer.cpp" />
@@ -262,6 +261,8 @@
     <ClCompile Include="..\src\sbm\resource_cmds.cpp" />
     <ClCompile Include="..\src\sbm\ResourceManager.cpp" />
     <ClCompile Include="..\src\sbm\SBBoneBusManager.cpp" />
+    <ClCompile Include="..\src\sbm\SBJointMap.cpp" />
+    <ClCompile Include="..\src\sbm\SBJointMapManager.cpp" />
     <ClCompile Include="..\src\sbm\sbm_audio.cpp" />
     <ClCompile Include="..\src\sbm\sbm_character.cpp" />
     <ClCompile Include="..\src\sbm\sbm_deformable_mesh.cpp" />
@@ -685,7 +686,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\action_unit.hpp" />
-    <ClInclude Include="..\src\sbm\BoneMap.h" />
     <ClInclude Include="..\src\sbm\DefaultAttributeTable.h" />
     <ClInclude Include="..\src\sbm\Event.h" />
     <ClInclude Include="..\src\sbm\general_param_setting.h" />
@@ -710,6 +710,8 @@
     <ClInclude Include="..\src\sbm\resource_cmds.h" />
     <ClInclude Include="..\src\sbm\ResourceManager.h" />
     <ClInclude Include="..\src\sbm\SBBoneBusManager.h" />
+    <ClInclude Include="..\src\sbm\SBJointMap.h" />
+    <ClInclude Include="..\src\sbm\SBJointMapManager.h" />
     <ClInclude Include="..\src\sbm\sbm_audio.h" />
     <ClInclude Include="..\src\sbm\sbm_character.hpp" />
     <ClInclude Include="..\src\sbm\sbm_constants.h" />
