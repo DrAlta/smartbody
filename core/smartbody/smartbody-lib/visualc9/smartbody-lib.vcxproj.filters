@@ -180,9 +180,6 @@
     <ClCompile Include="..\src\sbm\action_unit.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\BoneMap.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\DefaultAttributeTable.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
@@ -1174,12 +1171,15 @@
     <ClCompile Include="..\src\sbm\SteerPath.cpp">
       <Filter>sbm\steering</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sbm\SBJointMap.cpp">
+      <Filter>SB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\SBJointMapManager.cpp">
+      <Filter>SB</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\action_unit.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\BoneMap.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\DefaultAttributeTable.h">
@@ -2217,6 +2217,12 @@
     <ClInclude Include="..\src\sbm\SBBoneBusManager.h" />
     <ClInclude Include="..\src\sbm\SteerPath.h">
       <Filter>sbm\steering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\SBJointMap.h">
+      <Filter>SB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\SBJointMapManager.h">
+      <Filter>SB</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
