@@ -856,7 +856,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 		if (nodeName == "geometry")
 		{
 			std::map<std::string, std::string> verticesArrayMap;
-			std::map<std::string, std::vector<SrVec>> floatArrayMap;	
+			std::map<std::string, std::vector<SrVec> > floatArrayMap;	
 
 			SrModel* newModel = new SrModel();
 			DOMNamedNodeMap* nodeAttr = node->getAttributes();

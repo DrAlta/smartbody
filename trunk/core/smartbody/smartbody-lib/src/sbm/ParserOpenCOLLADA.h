@@ -30,7 +30,7 @@
 #include "mcontrol_util.h"
 #include "gwiz_math.h"
 
-typedef std::map<std::string, std::vector<SrVec>> VecListMap;
+typedef std::map<std::string, std::vector<SrVec> > VecListMap;
 
 class ParserOpenCOLLADA
 {
