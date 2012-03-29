@@ -170,12 +170,13 @@
 
         <!-- ": warning " -->
         <!-- ": error " -->
+        <!-- ": fatal error " -->
 
         <loadresource property="build.compile.errors" failonerror="false">
             <propertyresource name="build.compile.output"/>
             <filterchain>
                 <linecontainsregexp>
-                    <regexp pattern="(.*): error (.*)"/>
+                    <regexp pattern="(.*)(: error |: fatal error )(.*)"/>
                 </linecontainsregexp>
                 <prefixlines prefix="   "/>
                 <countfilter property="build.compile.errors.count" />
