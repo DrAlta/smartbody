@@ -1698,9 +1698,6 @@
     <ClInclude Include="..\src\sbm\bml_schedule.hpp">
       <Filter>BML</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_scheduler.hpp">
-      <Filter>BML</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\bml_speech.hpp">
       <Filter>BML</Filter>
     </ClInclude>
