@@ -12,7 +12,7 @@
 #include <sbm/SBService.h>
 #include <sbm/SBServiceManager.h>
 #include <sbm/SBSimulationManager.h>
-#include <sbm/SBBMLProcessor.h>
+#include <sbm/SBBmlProcessor.h>
 #include <sbm/SBAnimationState.h>
 #include <sbm/SBAnimationTransition.h>
 #include <sbm/SBAnimationStateManager.h>
