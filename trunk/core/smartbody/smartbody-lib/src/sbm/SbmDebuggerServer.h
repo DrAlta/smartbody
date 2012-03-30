@@ -2,8 +2,6 @@
 #include <string>
 #include <vector>
 
-#include "SbmDebuggerCommon.h"
-
 
 namespace SmartBody { class SBScene; }
 namespace SmartBody { class SBJoint; }
@@ -24,7 +22,12 @@ private:
    SmartBody::SBScene * m_scene;
 
 public:
-   DebuggerCamera m_camera;
+   vhcl::Vector3 m_cameraPos;
+   vhcl::Vector4 m_cameraRot;
+   double m_cameraFovY;
+   double m_cameraAspect;
+   double m_cameraZNear;
+   double m_cameraZFar;
    bool m_rendererIsRightHanded;
 
 

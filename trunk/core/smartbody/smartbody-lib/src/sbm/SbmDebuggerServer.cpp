@@ -1,5 +1,6 @@
 
 #include "vhcl.h"
+#include "vhcl_socket.h"
 
 #include "SbmDebuggerServer.h"
 
@@ -40,21 +41,21 @@ vector< void * > m_sockConnectionsTCP;
 
 void SbmDebuggerServer::Init()
 {
-   bool ret = SocketStartup();
+   bool ret = vhcl::SocketStartup();
    if (!ret)
    {
       printf("SocketStartup() failed\n");
    }
 
 
-   m_hostname = SocketGetHostname();
+   m_hostname = vhcl::SocketGetHostname();
 
 
-   m_sockTCP = SocketOpenTcp();
+   m_sockTCP = vhcl::SocketOpenTcp();
    if (m_sockTCP == NULL)
    {
       printf( "SocketOpenTcp() failed\n" );
-      SocketShutdown();
+      vhcl::SocketShutdown();
       return;
    }
 
@@ -67,7 +68,7 @@ void SbmDebuggerServer::Init()
 
    while (portToTry < portMax)
    {
-      ret = SocketBind(m_sockTCP, portToTry);
+      ret = vhcl::SocketBind(m_sockTCP, portToTry);
       if (ret)
       {
          break;
@@ -80,9 +81,9 @@ void SbmDebuggerServer::Init()
    if (portToTry >= portMax)
    {
       printf( "SocketBind() failed.\n" );
-      SocketClose(m_sockTCP);
+      vhcl::SocketClose(m_sockTCP);
       m_sockTCP = NULL;
-      SocketShutdown();
+      vhcl::SocketShutdown();
       return;
    }
 
@@ -92,9 +93,9 @@ void SbmDebuggerServer::Init()
    m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
 
 
-   SocketSetBlocking(m_sockTCP, false);
+   vhcl::SocketSetBlocking(m_sockTCP, false);
 
-   SocketListen(m_sockTCP);
+   vhcl::SocketListen(m_sockTCP);
 
 
    //return true;
@@ -104,11 +105,11 @@ void SbmDebuggerServer::Close()
 {
    if ( m_sockTCP )
    {
-      SocketClose(m_sockTCP);
+      vhcl::SocketClose(m_sockTCP);
       m_sockTCP = NULL;
    }
 
-   SocketShutdown();
+   vhcl::SocketShutdown();
 }
 
 void SbmDebuggerServer::SetID(const std::string & id)
@@ -165,9 +166,9 @@ void SbmDebuggerServer::Update()
                   // camera update
                   msg += vhcl::Format("sbmdebugger %s update camera\n", m_fullId.c_str());
 
-                  msg += vhcl::Format("pos %.3f %.3f %.3f\n", m_camera.pos.x, m_camera.pos.y, m_camera.pos.z);
-                  msg += vhcl::Format("rot %.3f %.3f %.3f %.3f\n", m_camera.rot.x, m_camera.rot.y, m_camera.rot.z, m_camera.rot.w);
-                  msg += vhcl::Format("persp %.3f %.3f %.3f %.3f\n", m_camera.fovY, m_camera.aspect, m_camera.zNear, m_camera.zFar);
+                  msg += vhcl::Format("pos %.3f %.3f %.3f\n", m_cameraPos.x, m_cameraPos.y, m_cameraPos.z);
+                  msg += vhcl::Format("rot %.3f %.3f %.3f %.3f\n", m_cameraRot.x, m_cameraRot.y, m_cameraRot.z, m_cameraRot.w);
+                  msg += vhcl::Format("persp %.3f %.3f %.3f %.3f\n", m_cameraFovY, m_cameraAspect, m_cameraZNear, m_cameraZFar);
                   msg += ";";
                   sentCamUpdate = true;
                }
@@ -201,7 +202,7 @@ void SbmDebuggerServer::Update()
                {
                   //static int c = 0;
                   //printf("TCP Send %d\n", c++);
-                  SocketSend(m_sockConnectionsTCP[ i ], msg);
+                  vhcl::SocketSend(m_sockConnectionsTCP[ i ], msg);
                }
             }
          }
@@ -212,12 +213,12 @@ void SbmDebuggerServer::Update()
 
 
 
-   if (SocketIsDataPending(m_sockTCP))
+   if (vhcl::SocketIsDataPending(m_sockTCP))
    {
-      void * socket = SocketAccept(m_sockTCP);
+      void * socket = vhcl::SocketAccept(m_sockTCP);
       if (socket)
       {
-         SocketSetBlocking(socket, false);
+         vhcl::SocketSetBlocking(socket, false);
          m_sockConnectionsTCP.push_back(socket);
       }
    }
@@ -228,7 +229,7 @@ void SbmDebuggerServer::Update()
       void * s = m_sockConnectionsTCP[i];
 
       bool tcpDataPending;
-      tcpDataPending = SocketIsDataPending(s);
+      tcpDataPending = vhcl::SocketIsDataPending(s);
 
       std::string overflowData = "";
       while ( tcpDataPending )
@@ -238,7 +239,7 @@ void SbmDebuggerServer::Update()
          char str[ 1000 ];
          memset( str, 0, sizeof( char ) * 1000 );
 
-         int bytesReceived = SocketReceive(s, str, sizeof( str ) - 1);
+         int bytesReceived = vhcl::SocketReceive(s, str, sizeof( str ) - 1);
          if ( bytesReceived > 0 )
          {
             string recvStr = overflowData + str;
@@ -270,7 +271,7 @@ void SbmDebuggerServer::Update()
             continue;
          }
 
-         tcpDataPending = SocketIsDataPending(s);
+         tcpDataPending = vhcl::SocketIsDataPending(s);
       }
    }
 }
