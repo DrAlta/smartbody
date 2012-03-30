@@ -1,5 +1,6 @@
 
 #include "vhcl.h"
+#include "vhcl_socket.h"
 
 #include "SbmDebuggerClient.h"
 
@@ -56,27 +57,27 @@ void SbmDebuggerClient::Connect(const string & id)
    int port = vhcl::ToInt(idSplit[1]);
 
 
-   bool ret = SocketStartup();
+   bool ret = vhcl::SocketStartup();
    if (!ret)
    {
       printf("SocketStartup() failed\n");
    }
 
 
-   m_sockTCP = SocketOpenTcp();
+   m_sockTCP = vhcl::SocketOpenTcp();
    if (m_sockTCP == NULL)
    {
       printf( "SocketOpenTcp() failed\n" );
-      SocketShutdown();
+      vhcl::SocketShutdown();
       return;
    }
 
-   ret = SocketConnect(m_sockTCP, server, port);
+   ret = vhcl::SocketConnect(m_sockTCP, server, port);
    if (!ret)
    {
       printf( "SocketConnect() failed\n" );
-      SocketClose(m_sockTCP);
-      SocketShutdown();
+      vhcl::SocketClose(m_sockTCP);
+      vhcl::SocketShutdown();
       return;
    }
 }
@@ -85,11 +86,11 @@ void SbmDebuggerClient::Disconnect()
 {
    if ( m_sockTCP )
    {
-      SocketClose(m_sockTCP);
+      vhcl::SocketClose(m_sockTCP);
       m_sockTCP = NULL;
    }
 
-   SocketShutdown();
+   vhcl::SocketShutdown();
 
 
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s disconnect", m_sbmId.c_str()).c_str());
@@ -121,7 +122,7 @@ void SbmDebuggerClient::Update()
       void * s = m_sockTCP;
 
       int tcpDataPending;
-      tcpDataPending = SocketIsDataPending(s);
+      tcpDataPending = vhcl::SocketIsDataPending(s);
 
       while ( tcpDataPending )
       {
@@ -130,7 +131,7 @@ void SbmDebuggerClient::Update()
          // TODO - preallocate this
          char str[ 1000 ] = { 0 };
 
-         int bytesReceived = SocketReceive(s, str, sizeof( str ) - 1);
+         int bytesReceived = vhcl::SocketReceive(s, str, sizeof( str ) - 1);
          if ( bytesReceived > 0 )
          {
             m_tcpData.append(str);
@@ -138,7 +139,7 @@ void SbmDebuggerClient::Update()
 
             //printf("TCP %d\n", m_tcpDataCount);
 
-            tcpDataPending = SocketIsDataPending(s);
+            tcpDataPending = vhcl::SocketIsDataPending(s);
          }
 
          // sanity check for spamming too much data

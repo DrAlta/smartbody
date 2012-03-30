@@ -9,6 +9,8 @@
 
 using std::string;
 using std::vector;
+using vhcl::Vector3;
+using vhcl::Vector4;
 
 
 #ifndef GL_MULTISAMPLE
