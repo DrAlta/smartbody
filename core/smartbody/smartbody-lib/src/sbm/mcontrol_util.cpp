@@ -497,6 +497,7 @@ void mcuCBHandle::registerCallbacks()
 	insert( "vrAllCall", mcu_vrAllCall_func );
 	insert( "vrPerception", mcu_vrPerception_func );
 	insert( "vrBCFeedback", mcu_vrBCFeedback_func );
+	insert( "vrSpeech", mcu_vrSpeech_func );
 	insert( "sbmdebugger", mcu_sbmdebugger_func );
 
 	insert( "text_speech", text_speech::text_speech_func ); // [BMLR]

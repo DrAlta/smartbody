@@ -123,6 +123,9 @@ int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 // listening feedback
 int mcu_vrBCFeedback_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
+//speech
+int mcu_vrSpeech_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+
 int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p );

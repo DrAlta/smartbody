@@ -26,6 +26,12 @@ bool Nvbg::executeEvent(std::string character, std::string messageId, std::strin
 	return true;
 }
 
+bool Nvbg::executeSpeech(std::string character, std::string speechStatus, std::string speechId, std::string speaker)
+{
+	LOG("Executing NVBG vrSpeech");
+	return true;
+}
+
 void Nvbg::notify(SmartBody::SBSubject* subject)
 {
 	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
