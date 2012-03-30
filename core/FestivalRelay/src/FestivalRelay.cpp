@@ -70,8 +70,7 @@
 #include <sstream>
 #include <string>
 
-
-
+XERCES_CPP_NAMESPACE_USE
 
 // class is taken from somewhere, unsure of it's origins.  Here is one of many examples of use across the net:
 //    http://mail-archives.apache.org/mod_mbox/xerces-c-dev/200210.mbox/%3C7C78B8615661D311B15500A0C9AB28C1915E40@earth.telestream.net%3E
@@ -84,12 +83,12 @@ class XStr
       XStr( const char * const toTranscode )
       {
          // Call the private transcoding method
-         fUnicodeForm = xercesc::XMLString::transcode( toTranscode );
+         fUnicodeForm = XMLString::transcode( toTranscode );
       }
 
       ~XStr()
       {
-         xercesc::XMLString::release( &fUnicodeForm );
+         XMLString::release( &fUnicodeForm );
       }
 
 
@@ -115,7 +114,6 @@ class XStr
 
 
 #define X( str ) XStr( str ).unicodeForm()
-XERCES_CPP_NAMESPACE_USE
 //#define FESTIVAL_HEAP_SIZE 999999
 
 bool isDone = false;
@@ -174,8 +172,8 @@ std::string storeXMLMetaData( const std::string & txt)
    xmlMetaData.tags.clear();
    xmlMetaData.words.clear();
    /// Start an XML parser to parse the message we have received
-   xercesc::XMLPlatformUtils::Initialize();
-   xercesc::XercesDOMParser *parser = new XercesDOMParser();
+   XMLPlatformUtils::Initialize();
+   XercesDOMParser *parser = new XercesDOMParser();
 
    std::string truncatedTxt = txt.substr(txt.find_first_of(">")+1);
    char * message = (char*)truncatedTxt.c_str();
@@ -183,7 +181,7 @@ std::string storeXMLMetaData( const std::string & txt)
    std::string actualText = "";
 
    /// Set up a parser for XML message in memory - code sourced from unknown online reference for Xerces XML library
-   xercesc::MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
+   MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
    parser->parse(memIS);
    DOMDocument *doc = parser->getDocument();
    if ( doc )
