@@ -682,6 +682,7 @@ int main( int argc, char **argv )	{
 		err = vhmsg::ttu_register( "sbmdebugger" );
 		err = vhmsg::ttu_register( "vrPerception" );
 		err = vhmsg::ttu_register( "vrBCFeedback" );
+		err = vhmsg::ttu_register( "vrSpeech" );
 
 		mcu.vhmsg_enabled = true;
 	} else {

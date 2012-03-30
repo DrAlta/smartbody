@@ -88,6 +88,26 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 		return Nvbg::executeEvent(character, messageId, state);
 	}
 
+	virtual bool executeSpeech(std::string character, std::string speechStatus, std::string speechId, std::string speaker)
+	{
+		if (boost::python::override o = this->get_override("executeSpeech"))
+		{
+			try {
+				return o(character, speechStatus, speechId, speaker);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		return Nvbg::executeSpeech(character, speechStatus, speechId, speaker);
+	}
+
+
+	bool default_executeSpeech(std::string character, std::string speechStatus, std::string speechId, std::string speaker)
+	{
+		return Nvbg::executeSpeech(character, speechStatus, speechId, speaker);
+	}
+
 	virtual void notifyAction(std::string name)
 	{
 		if (boost::python::override o = this->get_override("notifyAction"))
@@ -1142,8 +1162,9 @@ boost::python::class_<SBReach>("SBReach")
 #ifndef __ANDROID__
 	boost::python::class_<NvbgWrap, boost::python::bases<SBObject>, boost::noncopyable>("Nvbg")
 		.def("objectEvent", &Nvbg::objectEvent, &NvbgWrap::default_objectEvent, "An event indicating that an object of interest is present.")
-		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor of an action attribute.")
-		.def("executeEvent", &Nvbg::executeEvent, &NvbgWrap::default_executeEvent, "Execute the NVBG processor of an action attribute.")
+		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the xml vrX message.")
+		.def("executeEvent", &Nvbg::executeEvent, &NvbgWrap::default_executeEvent, "Execute the vrAgent message.")
+		.def("executeSpeech", &Nvbg::executeSpeech, &NvbgWrap::default_executeSpeech, "Execute the vrSpeech message.")
 		.def("notifyAction", &Nvbg::notifyAction, &NvbgWrap::default_notifyAction, "Notifies NVBG processor of a bool attribute.")
 		.def("notifyBool", &Nvbg::notifyBool, &NvbgWrap::default_notifyBool, "Notifies NVBG processor of a bool attribute")
 		.def("notifyInt", &Nvbg::notifyInt, &NvbgWrap::default_notifyInt, "Notifies NVBG processor of an int attribute")
@@ -1315,7 +1336,7 @@ void initPython(std::string pythonLibPath)
 		//LOG("before import Smartbody");
 		PyRun_SimpleString("from SmartBody import *");
 		//LOG("before import pydoc");
-		//PyRun_SimpleString("from pydoc import *");
+		PyRun_SimpleString("from pydoc import *");
 #ifndef __ANDROID__
 		PyRun_SimpleString("scene = getScene()");
 		PyRun_SimpleString("bml = scene.getBmlProcessor()");

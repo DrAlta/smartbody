@@ -99,11 +99,27 @@ class SmartBodyNVBG(Nvbg):
                                         return
 		return
 
+        def executeSpeech(self, character, speechStatus, speechId, speaker):
+                """
+                Necessary
+                Override the C++ executeSpeech function
+                Process vrSpeech message used to indicate push-to-talk status
+                """
+                if hasattr(self, 'nvbg') is False:
+                        return
+                
+                if (speechStatus == "start"):
+                        self.nvbg.set_push_to_talk(True)
+
+                if (speechStatus == "finished-speaking"):
+                        self.nvbg.set_push_to_talk(False)
+                return True
+
         def executeEvent(self, character, messageId, state):
                 """
                 Necessary
                 Override the C++ executeEvent function
-                Event Handler for vrX message
+                Event Handler for bml execution
                 Process vrAgentBML message which indicate the status of bml execution
                 """
                 if hasattr(self, 'nvbg') is False:
@@ -132,7 +148,7 @@ class SmartBodyNVBG(Nvbg):
                 if (rootTag == "pml"):
                         bmlstr = self.nvbg.process_percepts(character, xml)
                         if (len(bmlstr) != 0):
-                                bml.execXML(character, str(bmlstr))
+                                bml.execBML(character, str(bmlstr))
                 else:
                         actElem = ET.XML(xml)
                         bmlElem = actElem.find('bml')
@@ -141,7 +157,7 @@ class SmartBodyNVBG(Nvbg):
                         if (bmlElem != None):
                                 bmlstr = self.nvbg.process_speech(character,recipient,messageId, xml)
                                 if (len(bmlstr) != 0):
-                                        bml.execBML(character, str(bmlstr))
+                                        bml.execXML(character, str(bmlstr))
 
                         ''' processing FML '''
                         if (fmlElem != None):

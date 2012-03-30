@@ -4850,6 +4850,43 @@ int mcu_vrBCFeedback_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
+/*
+ * Callback function for vrSpeech message
+ * vrSpeech start id speaker
+ * vrSpeech finish-speaking id
+ * This message goes into NVBG
+ */
+int mcu_vrSpeech_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if (mcu_p)
+	{
+		std::string status = args.read_token();
+		std::string id = args.read_token();
+		std::string speaker = args.read_token();
+
+		// all characters should be receiving the perception message
+		std::map<std::string, SbmCharacter*>& cMap = mcu_p->getCharacterMap();
+		std::map<std::string, SbmCharacter*>::iterator iter = cMap.begin();
+		for (; iter!= cMap.end(); iter++)
+		{
+			SbmCharacter* character = iter->second;
+			if (!character)
+				continue;
+
+			Nvbg* nvbg = character->getNvbg();
+			if (!nvbg)
+				continue;
+
+			bool ok = nvbg->executeSpeech(iter->first, status, id, speaker);
+			if (!ok)
+			{
+				LOG("NVBG cannot handle vrSpeech message");
+			}
+		}			
+	}
+	return CMD_SUCCESS;
+}
+
 int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 #ifndef __ANDROID__
