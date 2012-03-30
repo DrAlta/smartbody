@@ -1295,17 +1295,17 @@ void mcuCBHandle::update( void )	{
 		SrMat m;
 		SrQuat quat = SrQuat(viewer_p->get_camera()->get_view_mat(m).get_rotation());
 
-		_scene->getDebuggerServer()->m_camera.pos.x = viewer_p->get_camera()->eye.x;
-		_scene->getDebuggerServer()->m_camera.pos.y = viewer_p->get_camera()->eye.y;
-		_scene->getDebuggerServer()->m_camera.pos.z = viewer_p->get_camera()->eye.z;
-		_scene->getDebuggerServer()->m_camera.rot.x = quat.x;
-		_scene->getDebuggerServer()->m_camera.rot.y = quat.y;
-		_scene->getDebuggerServer()->m_camera.rot.z = quat.z;
-		_scene->getDebuggerServer()->m_camera.rot.w = quat.w;
-		_scene->getDebuggerServer()->m_camera.fovY   = sr_todeg(viewer_p->get_camera()->fovy);
-		_scene->getDebuggerServer()->m_camera.aspect = viewer_p->get_camera()->aspect;
-		_scene->getDebuggerServer()->m_camera.zNear  = viewer_p->get_camera()->znear;
-		_scene->getDebuggerServer()->m_camera.zFar   = viewer_p->get_camera()->zfar;
+		_scene->getDebuggerServer()->m_cameraPos.x = viewer_p->get_camera()->eye.x;
+		_scene->getDebuggerServer()->m_cameraPos.y = viewer_p->get_camera()->eye.y;
+		_scene->getDebuggerServer()->m_cameraPos.z = viewer_p->get_camera()->eye.z;
+		_scene->getDebuggerServer()->m_cameraRot.x = quat.x;
+		_scene->getDebuggerServer()->m_cameraRot.y = quat.y;
+		_scene->getDebuggerServer()->m_cameraRot.z = quat.z;
+		_scene->getDebuggerServer()->m_cameraRot.w = quat.w;
+		_scene->getDebuggerServer()->m_cameraFovY   = sr_todeg(viewer_p->get_camera()->fovy);
+		_scene->getDebuggerServer()->m_cameraAspect = viewer_p->get_camera()->aspect;
+		_scene->getDebuggerServer()->m_cameraZNear  = viewer_p->get_camera()->znear;
+		_scene->getDebuggerServer()->m_cameraZFar   = viewer_p->get_camera()->zfar;
 	}
 
 	_scene->getDebuggerServer()->Update();

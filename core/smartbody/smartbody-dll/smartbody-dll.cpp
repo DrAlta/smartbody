@@ -266,17 +266,17 @@ SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerCameraValues( double x, double 
 {
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
-   mcu._scene->getDebuggerServer()->m_camera.pos.x = x;
-   mcu._scene->getDebuggerServer()->m_camera.pos.y = y;
-   mcu._scene->getDebuggerServer()->m_camera.pos.z = z;
-   mcu._scene->getDebuggerServer()->m_camera.rot.x = rx;
-   mcu._scene->getDebuggerServer()->m_camera.rot.y = ry;
-   mcu._scene->getDebuggerServer()->m_camera.rot.z = rz;
-   mcu._scene->getDebuggerServer()->m_camera.rot.w = rw;
-   mcu._scene->getDebuggerServer()->m_camera.fovY   = fov;
-   mcu._scene->getDebuggerServer()->m_camera.aspect = aspect;
-   mcu._scene->getDebuggerServer()->m_camera.zNear  = zNear;
-   mcu._scene->getDebuggerServer()->m_camera.zFar   = zFar;
+   mcu._scene->getDebuggerServer()->m_cameraPos.x = x;
+   mcu._scene->getDebuggerServer()->m_cameraPos.y = y;
+   mcu._scene->getDebuggerServer()->m_cameraPos.z = z;
+   mcu._scene->getDebuggerServer()->m_cameraRot.x = rx;
+   mcu._scene->getDebuggerServer()->m_cameraRot.y = ry;
+   mcu._scene->getDebuggerServer()->m_cameraRot.z = rz;
+   mcu._scene->getDebuggerServer()->m_cameraRot.w = rw;
+   mcu._scene->getDebuggerServer()->m_cameraFovY   = fov;
+   mcu._scene->getDebuggerServer()->m_cameraAspect = aspect;
+   mcu._scene->getDebuggerServer()->m_cameraZNear  = zNear;
+   mcu._scene->getDebuggerServer()->m_cameraZFar   = zFar;
 }
 
 
