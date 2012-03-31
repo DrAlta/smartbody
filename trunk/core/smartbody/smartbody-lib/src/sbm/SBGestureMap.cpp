@@ -1,5 +1,6 @@
 #include "SBGestureMap.h"
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBCharacter.h>
 
 namespace SmartBody {
 

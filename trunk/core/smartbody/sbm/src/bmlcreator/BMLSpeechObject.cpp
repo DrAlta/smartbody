@@ -14,7 +14,7 @@ BMLSpeechObject::BMLSpeechObject() : BMLObject()
 #endif
 
 	refAttr = createStringAttribute("ref", "", "", "Basic", 100, false, false, false, "Reference .xml file that contains speech information. Either set this attribute, or enter the content.");
-	contentAttr = createStringAttribute("content", "", "", "Basic", 100, false, false, false, "Content of speech, such as 'hello, my name is John'. When using ssml, tags (such as <emphasis>) can be used.");
+	contentAttr = createStringAttribute("content", "", "", "Basic", 110, false, false, false, "Content of speech, such as 'hello, my name is John'. When using ssml, tags (such as <emphasis>) can be used.");
 }
 
 BMLSpeechObject::~BMLSpeechObject()

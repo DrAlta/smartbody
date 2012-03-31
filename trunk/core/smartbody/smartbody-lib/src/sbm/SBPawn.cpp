@@ -1,7 +1,7 @@
 #include "SBPawn.h"
 #include <sbm/mcontrol_util.h>
 #include <sbm/mcontrol_callbacks.h>
-
+#include <sbm/SBSkeleton.h>
 
 namespace SmartBody {
 

@@ -1,9 +1,13 @@
 #ifndef _SBREACH_H_
 #define _SBREACH_H_
 
-#include <sbm/SBCharacter.h>
+#include <string>
+#include <vector>
 
 namespace SmartBody {
+
+class SBCharacter;
+class SBMotion;
 
 class SBReach
 {

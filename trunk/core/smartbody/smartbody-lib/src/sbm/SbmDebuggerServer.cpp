@@ -8,10 +8,9 @@
 
 #include "vhmsg-tt.h"
 
-#include "sbm/SBScene.h"
-#include "sbm/SBCharacter.h"
-
-
+#include <sbm/SBScene.h>
+#include <sbm/SBCharacter.h>
+#include <sbm/SBSkeleton.h>
 
 using std::string;
 using std::vector;

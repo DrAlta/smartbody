@@ -2,9 +2,10 @@
 #define _SBPAWN_H_
 
 #include <sbm/sbm_pawn.hpp>
-#include <sbm/SBSkeleton.h>
 
 namespace SmartBody {
+
+class SBSkeleton;
 
 class SBPawn : public SbmPawn
 {

@@ -1,6 +1,7 @@
 #include "SBReachManager.h"
 #include <sbm/mcontrol_util.h>
 #include <sbm/SBScene.h>
+#include <sbm/SBReach.h>
 
 namespace SmartBody {
 

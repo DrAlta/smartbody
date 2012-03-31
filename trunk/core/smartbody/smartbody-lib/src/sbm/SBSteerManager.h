@@ -4,7 +4,7 @@
 #include <vhcl.h>
 #include <sbm/SBSteerAgent.h>
 #include <SteerLib.h>
-#include <PPRAgent.h>
+
 #include <sbm/SBService.h>
 #include <sbm/SteerSuiteEngineDriver.h>
 

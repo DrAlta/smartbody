@@ -1,5 +1,6 @@
 #include "SBAttributeManager.h"
 #include <algorithm>
+#include "SBAttribute.h"
 
 namespace SmartBody {
 

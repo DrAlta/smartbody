@@ -2,9 +2,12 @@
 #define _SBSERVICEMANAGER_H_
 
 #include <vhcl.h>
-#include <sbm/SBService.h>
+#include <sbm/SBObject.h>
 
 namespace SmartBody {
+
+class SBObject;
+class SBService;
 
 class SBServiceManager : public SBObject
 {

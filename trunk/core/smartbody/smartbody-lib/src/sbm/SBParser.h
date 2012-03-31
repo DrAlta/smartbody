@@ -3,8 +3,9 @@
 
 #include <vhcl.h>
 #include <external/parser/Params.h>
-#include <external/parser/InputTree.h>
 #include <sbm/SBParseNode.h>
+
+class InputTree;
 
 namespace SmartBody {
 

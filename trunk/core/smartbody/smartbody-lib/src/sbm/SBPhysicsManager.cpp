@@ -2,6 +2,7 @@
 #include <sbm/SBPythonClass.h>
 #include <sbm/mcontrol_util.h>
 #include <sbm/SBScene.h>
+#include <sbm/Physics/SbmPhysicsSimODE.h>
 
 #ifdef __ANDROID__
 #define USE_PHYSICS_CHARACTER 0

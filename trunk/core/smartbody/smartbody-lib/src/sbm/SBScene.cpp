@@ -17,6 +17,7 @@
 #include <sbm/SBBoneBusManager.h>
 #include <sbm/SBGestureMapManager.h>
 #include <sbm/SBJointMapManager.h>
+#include <sbm/SBSkeleton.h>
 #include <sbm/SBParser.h>
 #include "SbmDebuggerServer.h"
 #include <sbm/sbm_audio.h>

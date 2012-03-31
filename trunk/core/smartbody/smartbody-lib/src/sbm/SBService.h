@@ -1,10 +1,11 @@
 #ifndef _SBSERVICE_H_
 #define _SBSERVICE_H_
 
-#include <sbm/SBSubject.h>
 #include <sbm/SBObject.h>
 
 namespace SmartBody {
+
+class SBSubject;
 
 class SBService : public SBObject
 {

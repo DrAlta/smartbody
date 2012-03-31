@@ -1,9 +1,13 @@
 #ifndef _SBTRANSITION_H_
 #define _SBTRANSITION_H_
 
+#include <vector>
+
 #include <sbm/me_ct_param_animation_data.h>
-#include <sbm/SBAnimationState.h>
+
 namespace SmartBody {
+
+class SBAnimationState;
 
 class SBAnimationTransition : public PATransitionData
 {
