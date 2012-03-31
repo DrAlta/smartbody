@@ -1,10 +1,18 @@
 #ifndef _SBSTATEMANAGER_H
 #define _SBSTATEMANAGER_H
 
-#include <sbm/SBAnimationState.h>
-#include <sbm/SBAnimationTransition.h>
+#include <string>
+#include <vector>
 
 namespace SmartBody {
+
+class SBAnimationState;
+class SBAnimationState0D;
+class SBAnimationState1D;
+class SBAnimationState2D;
+class SBAnimationState3D;
+
+class SBAnimationTransition;
 
 class SBAnimationStateManager
 {

@@ -2,10 +2,13 @@
 #define DATTRIBUTEMANAGER_H
 
 #include "SBSubject.h"
-#include "SBAttribute.h"
 #include <map>
+#include <vector>
 
 namespace SmartBody {
+
+class SBAttribute;
+class SBAttributeGroup;
 
 class SBAttributeManager : public SBSubject
 {

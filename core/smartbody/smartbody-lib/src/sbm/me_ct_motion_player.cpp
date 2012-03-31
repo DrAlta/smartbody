@@ -21,7 +21,7 @@
  */
 
 #include <sbm/me_ct_motion_player.h>
-
+#include <sbm/SBSkeleton.h>
 
 std::string MeCtMotionPlayer::Context::CONTEXT_TYPE = "MeCtMotionPlayer::Context";
 std::string MeCtMotionPlayer::CONTROLLER_TYPE = "MeCtMotionPlayer";

@@ -1,11 +1,12 @@
 #ifndef _SBREACHMANAGER_H_
 #define _SBREACHMANAGER_H_
 
-#include <sbm/SBReach.h>
+#include <string>
+#include <map>
 
 namespace SmartBody {
 
-
+class SBReach;
 
 class SBReachManager
 {

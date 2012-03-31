@@ -12,8 +12,7 @@
 #include "sbm/sbm_audio.h"
 #include <fstream>
 #include "CommandWindow.h"
-
-
+#include <sbm/SBSkeleton.h>
 
 BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
 {

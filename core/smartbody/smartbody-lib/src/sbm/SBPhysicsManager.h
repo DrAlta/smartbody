@@ -2,8 +2,9 @@
 #define _SBPHYSICSMANAGER_H_
 
 #include <sbm/SBService.h>
-#include <sbm/SBService.h>
-#include <sbm/Physics/SbmPhysicsSimODE.h>
+
+class SbmPhysicsSim;
+class SbmPhysicsSimODE;
 
 namespace SmartBody {
 class SBPhysicsManager : public SBService

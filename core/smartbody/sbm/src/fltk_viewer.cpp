@@ -66,6 +66,7 @@
 # include <sbm/me_ct_param_animation_data.h>
 # include <sbm/GPU/SbmDeformableMeshGPU.h>
 # include <sbm/SBScene.h>
+# include <sbm/SBSkeleton.h>
 # include <sbm/SBSteerManager.h>
 
 #if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support

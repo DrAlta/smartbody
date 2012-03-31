@@ -1,6 +1,7 @@
 #include "me_ct_physics_controller.h"
 #include <sr/sr_euler.h>
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBSkeleton.h>
 
 std::string MeCtPhysicsController::CONTROLLER_TYPE = "PhysicsController";
 

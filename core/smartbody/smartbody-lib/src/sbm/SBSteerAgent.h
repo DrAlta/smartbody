@@ -2,9 +2,12 @@
 #define _STEERAGENT_H_
 
 #include <sbm/SteeringAgent.h>
-#include <sbm/SBCharacter.h>
+
+class SteeringAgent;
 
 namespace SmartBody {
+
+class SBCharacter;
 
 class SBSteerAgent : public SteeringAgent
 {

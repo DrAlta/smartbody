@@ -1,4 +1,6 @@
 #include "SBAnimationTransition.h"
+#include <sbm/SBAnimationState.h>
+
 namespace SmartBody {
 
 SBAnimationTransition::SBAnimationTransition() : PATransitionData()

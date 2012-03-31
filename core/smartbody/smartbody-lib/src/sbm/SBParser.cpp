@@ -18,6 +18,7 @@
 #include <external/parser/TimeIt.h>
 #include <external/parser/ewDciTokStrm.h>
 #include <external/parser/Link.h>
+#include <external/parser/InputTree.h>
 
 #include <sbm/SBParseNode.h>
 

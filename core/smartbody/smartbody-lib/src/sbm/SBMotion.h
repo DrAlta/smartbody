@@ -2,11 +2,13 @@
 #define _SBMOTION_H
 
 #include <vector>
-#include <sbm/SBSkeleton.h>
+#include <string>
 #include <sk/sk_motion.h>
-#include <sbm/SBJoint.h>
 
 namespace SmartBody {
+
+class SBJoint;
+class SBSkeleton;
 
 class SBMotion : public SkMotion
 {

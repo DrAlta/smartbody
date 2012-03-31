@@ -1,5 +1,7 @@
 #include "SBAnimationStateManager.h"
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBAnimationState.h>
+#include <sbm/SBAnimationTransition.h>
 
 namespace SmartBody {
 

@@ -3,6 +3,8 @@
 #include <sbm/SBScene.h>
 #include <sbm/me_utilities.hpp>
 #include <sr/sr_euler.h>
+#include <sbm/SBSkeleton.h>
+#include <sbm/SBJoint.h>
 
 namespace SmartBody {
 
