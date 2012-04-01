@@ -52,6 +52,12 @@ SkSkeleton::SkSkeleton (SkSkeleton* origSkel)
 	SkJoint* origParent = origSkel->root();
 	SkJoint* thisParent = _root;
 	create_joints(origParent, thisParent);
+	// reset the joint indices since the original skeleton might not match if 
+	// it contained nodes not connected to the root
+	for (size_t j = 0; j < _joints.size(); j++)
+	{
+		_joints[j]->set_index(j);
+	}
 
 	_gmat_uptodate = origSkel->global_matrices_uptodate();
 	_channels = new SkChannelArray;
