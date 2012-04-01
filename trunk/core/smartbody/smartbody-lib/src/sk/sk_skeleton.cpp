@@ -106,6 +106,8 @@ void SkSkeleton::copy(SkSkeleton* origSkel)
 	{
 		SkChannel& origChannel = origChannels.get(c);
 		SkJoint* origJoint = origChannels.joint(c);
+		if (!origJoint)
+			continue;
 		SkJoint* joint = this->search_joint(origJoint->name().c_str());
 		_channels->add(joint, origChannel.type, true);
 	}
