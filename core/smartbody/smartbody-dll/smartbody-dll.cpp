@@ -18,6 +18,8 @@
 #include "sbm/locomotion_cmds.hpp"
 #include "sbm/SBPython.h"
 #include "sbm/SBCharacter.h"
+#include "sbm/SBSkeleton.h"
+
 
 #include "sbm/SbmDebuggerServer.h"
 
