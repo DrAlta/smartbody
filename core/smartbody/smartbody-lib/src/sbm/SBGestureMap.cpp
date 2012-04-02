@@ -34,9 +34,9 @@ SBGestureMap* SBGestureMap::copy()
 	return NULL;
 }
 
-void SBGestureMap::addGestureMapping(const std::string& name, const std::string& type, const std::string& posture, const std::string& hand)
+void SBGestureMap::addGestureMapping(const std::string& name, const std::string& type, const std::string& posture, const std::string& hand, const std::string& style)
 {
-	SBGestureInfo* gestureInfo = new SBGestureInfo(type, posture, hand);
+	SBGestureInfo* gestureInfo = new SBGestureInfo(type, posture, hand, style);
 	std::map<std::string, SBGestureInfo*>::iterator iter = _gestureMap.find(name);
 	if (iter != _gestureMap.end())
 	{
@@ -46,13 +46,18 @@ void SBGestureMap::addGestureMapping(const std::string& name, const std::string&
 	_gestureMap.insert(std::make_pair(name, gestureInfo));
 }
 
-std::string SBGestureMap::getGestureByInfo(const std::string& type, const std::string& posture, const std::string& hand)
+std::string SBGestureMap::getGestureByInfo(const std::string& type, const std::string& posture, const std::string& hand, const std::string& style)
 {
 	std::map<std::string, SBGestureInfo*>::iterator iter = _gestureMap.begin();
 	for (; iter != _gestureMap.end(); iter++)
 	{
-		if (iter->second->matchingAll(type, posture, hand))
+		if (iter->second->getType() == type &&
+			iter->second->getPosture() == posture &&
+			iter->second->getHand() == hand &&
+			iter->second->getStyle() == style)
+		{
 			return iter->first;
+		}
 	}
 	LOG("Character %s cannot find gesture with type %s, posture %s, hand %s.", _character->getName().c_str(), type.c_str(), posture.c_str(), hand.c_str());
 	return "";
@@ -105,11 +110,21 @@ std::string SBGestureMap::getGestureHand(const std::string& name)
 	return "";
 }
 
-SBGestureInfo::SBGestureInfo(const std::string& type, const std::string& posture, const std::string& hand)
+std::string SBGestureMap::getGestureStyle(const std::string& name)
+{
+	std::map<std::string, SBGestureInfo*>::iterator iter = _gestureMap.find(name);
+	if (iter != _gestureMap.end())
+		return iter->second->getStyle();
+	LOG("Gesture %s doesn't exist", name.c_str());
+	return "";
+}
+
+SBGestureInfo::SBGestureInfo(const std::string& type, const std::string& posture, const std::string& hand, const std::string& style)
 {
 	_type = type;
 	_posture = posture;
 	_hand = hand;
+	_style = style;
 }
 
 SBGestureInfo::~SBGestureInfo()
@@ -146,11 +161,13 @@ const std::string& SBGestureInfo::getHand()
 	return _hand;
 }
 
-bool SBGestureInfo::matchingAll(const std::string& type, const std::string& posture, const std::string& hand)
+void SBGestureInfo::setStyle(const std::string& style)
 {
-	if (type == _type && _posture == posture && _hand == hand)
-		return true;
-	return false;
+	_style = style;
+}
+const std::string& SBGestureInfo::getStyle()
+{
+	return _style;
 }
 
 }

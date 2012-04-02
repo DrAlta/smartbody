@@ -21,14 +21,17 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	const XMLCh* typeAttr = elem->getAttribute(BMLDefs::ATTR_LEXEME);
 	const XMLCh* modeAttr = elem->getAttribute(BMLDefs::ATTR_MODE);
+	const XMLCh* styleAttr = elem->getAttribute(BMLDefs::ATTR_STYLE);
 	std::string animationName;
 	std::string localId;
 	std::string type;
 	std::string mode;
+	std::string style;
 	xml_utils::xml_translate(&localId, id);
 	xml_utils::xml_translate(&animationName, animName);
 	xml_utils::xml_translate(&type, typeAttr);
 	xml_utils::xml_translate(&mode, modeAttr);
+	xml_utils::xml_translate(&style, styleAttr);
 
 	if (animationName == "")	// If you have assigned the animation name, do not look for the map
 	{
@@ -55,7 +58,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 			}
 		}
 
-		animationName = gestureMap->getGestureByInfo(type, posture, mode);
+		animationName = gestureMap->getGestureByInfo(type, posture, mode, style);
 	}
 
 	if (animationName == "")

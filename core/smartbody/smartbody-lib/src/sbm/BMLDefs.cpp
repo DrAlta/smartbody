@@ -307,6 +307,8 @@ XMLCh* BMLDefs::ATTR_MATERIAL = NULL;
 // locomotion
 XMLCh* BMLDefs::ATTR_BRAKING = NULL;
 
+XMLCh* BMLDefs::ATTR_STYLE = NULL;
+
 BMLDefs::BMLDefs()
 {
 	ATTR_ID = XMLString::transcode("id");
@@ -627,6 +629,8 @@ BMLDefs::BMLDefs()
 
 	// locomotion
 	ATTR_BRAKING = XMLString::transcode("sbm:braking");
+
+	ATTR_STYLE = XMLString::transcode("sbm:style");
 }
 
 }

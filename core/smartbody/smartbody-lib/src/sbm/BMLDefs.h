@@ -303,6 +303,8 @@ class BMLDefs
 
 		// locomotion
 		static XMLCh* ATTR_BRAKING;
+
+		static XMLCh* ATTR_STYLE;
 };
 
 

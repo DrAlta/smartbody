@@ -25,7 +25,9 @@ BMLGestureObject::BMLGestureObject() : BMLObject()
 	SmartBody::StringAttribute* modeAttr = createStringAttribute("mode", "", "", "Basic", 70, false, false, false, "Which hand is involved. Should be one of the following: left, right, both.");
 	modeAttr->setValidValues(modes);
 
-	createStringAttribute("target", "", "", "Basic", 80, false, false, false, "Target for POINT and REACH gestures.");
+	createStringAttribute("sbm:style", "", "", "Basic", 80, false, false, false, "Style of the gestures. Used to differentiate gestures with same type, posture and mode.");
+
+	createStringAttribute("target", "", "", "Basic", 90, false, false, false, "Target for POINT and REACH gestures.");
 	createStringAttribute("start", "", "", "Basic", 100, false, false, false, "Time when gesture starts.");
 	createStringAttribute("ready", "", "", "Basic", 110, false, false, false, "Time when gesture is fully blended in.");
 	createStringAttribute("stroke", "", "", "Basic", 120, false, false, false, "Time of gesture's stroke.");
