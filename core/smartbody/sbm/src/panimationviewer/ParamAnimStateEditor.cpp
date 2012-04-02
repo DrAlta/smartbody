@@ -62,6 +62,8 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 			removeMark->callback(removeStateTimeMark, this);
 			updateMark = new Fl_Button(14 * xDis + 300+ esx, yDis + esy, 100, 2 * yDis, "Update Mark");
 			updateMark->callback(updateStateTimeMark, this);
+			maxTimeInput = new Fl_Float_Input(14 * xDis + 500+ esx, yDis + esy, 100, 2 * yDis, "Max Time");
+			maxTimeInput->callback(updateMaxTime, this);
 #ifdef AUTO_FOOTSTEP_MARK
 			autoFootStepMarks = new Fl_Button(15 * xDis + 400+ esx, yDis + esy, 100, 2 * yDis, "Auto Footsteps");
 			autoFootStepMarks->callback(addFootStepMark, this);
@@ -300,6 +302,14 @@ void PAStateEditor::addFootStepMark( Fl_Widget* widget, void* data )
 	PAStateEditor* editor = (PAStateEditor*) data;
 
 }
+
+void PAStateEditor::updateMaxTime(Fl_Widget* widget, void* data)
+{
+	PAStateEditor* editor = (PAStateEditor*) data;
+	editor->stateTimeMarkWidget->setViewableTimeEnd(atof(editor->maxTimeInput->value()));
+	editor->paWindow->redraw();
+}
+
 
 void PAStateEditor::addStateTimeMark(Fl_Widget* widget, void* data)
 {

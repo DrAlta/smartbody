@@ -65,6 +65,8 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 	ErrorHandler* errHandler = (ErrorHandler*) new HandlerBase();
 	parser->setErrorHandler(errHandler);
 
+	bool zaxis = false;
+
 	try 
 	{
 		int order;
@@ -76,6 +78,25 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		skeleton.name(strstr.str().c_str());
 		parser->parse(pathName.c_str());
 		DOMDocument* doc = parser->getDocument();
+
+
+		DOMNode* asset = getNode("asset", doc);
+		if (asset)
+		{
+			DOMNode* upNode = getNode("up_axis", asset);
+			if (upNode)
+			{
+				std::string upAxisName;
+				xml_utils::xml_translate(&upAxisName, upNode->getTextContent());
+				if (upAxisName == "Z_UP" || upAxisName == "z_up")
+				{
+					// rotate the skeleton by -90 around the x-axis
+					zaxis = true;
+				}
+
+			}
+		}
+
 		DOMNode* skNode = getNode("library_visual_scenes", doc);
 		if (!skNode)
 		{
@@ -84,6 +105,23 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		}
 		std::map<std::string, std::string> materialId2Name;
 		parseLibraryVisualScenes(skNode, skeleton, motion, scale, order, materialId2Name);
+
+		if (zaxis)
+		{
+			// get the root node
+			SkJoint* root = skeleton.root();
+			if (root)
+			{
+				if (root->quat())
+				{
+					SrQuat prerot = root->quat()->prerot();
+					SrVec xaxis(1, 0, 0);
+					SrQuat adjust(xaxis, 3.14159f / -2.0f);
+					SrQuat final = adjust * prerot;
+					root->quat()->prerot(final);
+				}
+			}
+		}
 		DOMNode* skmNode = getNode("library_animations", doc);
 		if (!skmNode)
 		{
@@ -92,6 +130,8 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		}
 		parseLibraryAnimations(skmNode, skeleton, motion, scale, order);
 	//	animationPostProcess(skeleton, motion);
+		
+
 	}
 	catch (const XMLException& toCatch) 
 	{

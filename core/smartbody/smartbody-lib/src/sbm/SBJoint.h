@@ -49,6 +49,12 @@ class SBJoint : public SkJoint
 		void setMass(float mass);
 		float getMass();
 
+		void setPrerotation(SrQuat& quat);
+		SrQuat getPrerotation();
+		void setPostrotation(SrQuat& quat);
+		SrQuat getPostrotation();
+
+
 	protected:
 		SrVec _localCenter;
 

@@ -961,7 +961,10 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("isUsePosition", &SBJoint::isUsePosition, "Determines if the joint uses position channels.")	
 		.def("getMass", &SBJoint::getMass, "Gets the mass of the joint.")
 		.def("setMass", &SBJoint::setMass, "Sets the mass of the joint.")
-		;
+		.def("getPrerotation", &SBJoint::getPrerotation, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the prerotation values for the joint.")
+		.def("setPrerotation", &SBJoint::setPrerotation, "Sets the prerotation values for the joint.")
+		.def("getPostrotation", &SBJoint::getPostrotation, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the postrotation values for the joint.")
+		.def("setPostrotation", &SBJoint::setPostrotation, "Sets the postrotation values for the joint.")		;
 
 	boost::python::class_<SBBehavior, boost::python::bases<SBObject> >("SBBehavior")
 		//.def(boost::python::init<std::string, std::string>())

@@ -154,7 +154,15 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	c->steeringAgent->acceleration = xml_parse_float(BMLDefs::ATTR_STEERACCEL, elem, c->steeringAgent->acceleration);
 	c->steeringAgent->scootAcceleration = xml_parse_float(BMLDefs::ATTR_STEERSCOOTACCEL, elem, c->steeringAgent->scootAcceleration);
 	c->steeringAgent->angleAcceleration = xml_parse_float(BMLDefs::ATTR_STEERANGLEACCEL, elem, c->steeringAgent->angleAcceleration);
+
+
+	float speed = xml_parse_float( BMLDefs::ATTR_SPEED, elem, -1.0f );
+	
 	std::string manner = xml_parse_string(BMLDefs::ATTR_MANNER, elem);
+
+	if (speed > 0.0f)
+		c->steeringAgent->desiredSpeed = speed;
+
 	if (manner != "")
 	{
 		if (c->locomotion_type == c->Procedural)
@@ -162,11 +170,11 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			LOG("This mode does not support Procedural Locomotion currently!");
 			return BehaviorRequestPtr();
 		}
-		if (manner == "walk")
+		if (manner == "walk" && speed <= 0.0f)
 			c->steeringAgent->desiredSpeed = 1.2f;
-		else if (manner == "jog")
+		else if (manner == "jog" && speed <= 0.0f)
 			c->steeringAgent->desiredSpeed = 2.5f;
-		else if (manner == "run")
+		else if (manner == "run" && speed <= 0.0f)
 			c->steeringAgent->desiredSpeed = 3.5f;
 		else if (manner == "sbm:step")
 			stepMode = true;
@@ -192,6 +200,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		}
 		else 
 			return BehaviorRequestPtr();
+
 		// also has to update state weight
 		PAStateData* locoData = mcu->lookUpPAState(c->steeringAgent->locomotionName);
 		if (locoData)
