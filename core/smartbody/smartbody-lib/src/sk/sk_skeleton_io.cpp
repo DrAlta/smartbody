@@ -569,11 +569,7 @@ bool SkSkeleton::load ( SrInput& in, double skScale, const char* basedir )
 
 	compress ();
 
-	this->update_global_matrices();
-	for (unsigned int i=0;i<_joints.size();i++)
-	{
-		_joints[i]->updateGmatZero(_joints[i]->gmat());
-	}
+	updateGlobalMatricesZero();
 
 	//SR_TRACE1 ( "DONE." );
 

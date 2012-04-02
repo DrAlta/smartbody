@@ -239,6 +239,7 @@ void ParserOpenCOLLADA::parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skel
 		if (nodeName == "visual_scene")
 			parseJoints(node1, skeleton, motion, scale, order, materialId2Name, NULL);
 	}
+	skeleton.compress();
 }
 
 void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent)
