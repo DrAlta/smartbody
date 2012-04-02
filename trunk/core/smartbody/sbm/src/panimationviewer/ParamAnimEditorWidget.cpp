@@ -147,7 +147,8 @@ void ParamAnimEditorWidget::setup()
 				maxEndTime = endTime;
 		}
 	}
-	this->setViewableTimeEnd(maxEndTime + 1.0);
+
+	//	this->setViewableTimeEnd(maxEndTime + 1.0);
 }
 
 void ParamAnimEditorWidget::setTrackSelectionChanged(bool val)

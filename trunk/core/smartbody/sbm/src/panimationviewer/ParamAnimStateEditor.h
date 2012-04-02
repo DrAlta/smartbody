@@ -25,6 +25,7 @@
 
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Scroll.H>
+#include <FL/Fl_Float_Input.H>
 #include <vhcl.h>
 #include <FL/Fl_Multi_Browser.H>
 #include "PanimationWindow.h"
@@ -48,6 +49,7 @@ class PAStateEditor : public Fl_Group
 		static void addFootStepMark(Fl_Widget* widget, void* data);
 		static void removeStateTimeMark(Fl_Widget* widget, void* data);
 		static void updateStateTimeMark(Fl_Widget* widget, void* data);
+		static void updateMaxTime(Fl_Widget* widget, void* data);
 		void updateCorrespondenceMarks(PAStateData* state);
 		void refresh();
 
@@ -67,6 +69,7 @@ class PAStateEditor : public Fl_Group
 		Fl_Button*		removeMark;
 		Fl_Button*		updateMark;
 		Fl_Button*		autoFootStepMarks;
+		Fl_Float_Input*		maxTimeInput;
 		ParamAnimEditorWidget* stateTimeMarkWidget;
 		nle::NonLinearEditorModel* stateEditorNleModel;
 };

@@ -189,4 +189,36 @@ float SBJoint::getMass()
 	return mass();
 }
 
+void SBJoint::setPrerotation(SrQuat& q)
+{
+	SkJointQuat* jointQuat = quat();
+	if (jointQuat)
+		jointQuat->prerot(q);
+}
+
+SrQuat SBJoint::getPrerotation()
+{
+	SkJointQuat* jointQuat = quat();
+	if (jointQuat)
+		return jointQuat->prerot();
+	else
+		return SrQuat();
+}
+
+void SBJoint::setPostrotation(SrQuat& q)
+{
+	SkJointQuat* jointQuat = quat();
+	if (jointQuat)
+		jointQuat->postrot(q);
+}
+
+SrQuat SBJoint::getPostrotation()
+{
+	SkJointQuat* jointQuat = quat();
+	if (jointQuat)
+		return jointQuat->postrot();
+	else
+		return SrQuat();
+}
+
 };
