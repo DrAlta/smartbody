@@ -299,6 +299,16 @@ void SkSkeleton::compress ()
 	for ( i=0; i<_joints.size(); i++ )
 	_joints[i]->_children.compress();
 	*/
+	updateGlobalMatricesZero();
+}
+
+void SkSkeleton::updateGlobalMatricesZero()
+{
+	this->update_global_matrices();
+	for (unsigned int i=0;i<_joints.size();i++)
+	{
+		_joints[i]->updateGmatZero(_joints[i]->gmat());
+	}
 }
 
 void SkSkeleton::set_geo_local ()

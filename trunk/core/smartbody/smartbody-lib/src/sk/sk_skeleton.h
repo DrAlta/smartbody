@@ -144,6 +144,8 @@ class SkSkeleton : public SrSharedClass
         changes to the local matrices in joints */
     void update_global_matrices ();
 
+	void updateGlobalMatricesZero();
+
     /*! Returns true if all global matrices are up to date */
     bool global_matrices_uptodate () { return _gmat_uptodate; }
 
