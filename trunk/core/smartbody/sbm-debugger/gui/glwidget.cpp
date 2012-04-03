@@ -97,7 +97,9 @@ void GLWidget::sceneTreeItemDoubleClicked(QTreeWidgetItem * item, int column)
    if (entity)
    {
       SetSelectedObject(entity, entity->FindJoint(item->text(0).toStdString()));
-      Vector3 pos = entity->GetWorldPosition();
+      Vector3 pos = m_SelData.m_pJoint->GetWorldPosition();
+      m_Camera.SetCameraType(Camera::Free_Look);
+      //m_Camera.MoveLookAt(QVector3D(pos.x, pos.y, pos.z));
       m_Camera.LookAt(QVector3D(pos.x, pos.y, pos.z));
    }
 }
@@ -183,9 +185,9 @@ void GLWidget::StartPicking()
 	glPushMatrix();
 	glLoadIdentity();
 
+	gluPickMatrix(lastPos.x(), viewport[3] - lastPos.y(), 10, 10, viewport);
    CheckCoordinateSystem();
 
-	gluPickMatrix(lastPos.x(), viewport[3] - lastPos.y(), 10, 10, viewport);
 	ratio = (viewport[2] + 0.0) / viewport[3];
    DebuggerCamera cam = m_pScene->m_camera;
 	gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
@@ -720,9 +722,8 @@ void GLWidget::Update()
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
 
-      CheckCoordinateSystem();
-      
       gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
+      CheckCoordinateSystem();
       glMatrixMode(GL_MODELVIEW);
 
       m_Camera.SetPosition(QVector3D(cam.pos.x * m_Camera.CoordConverter(), cam.pos.y, cam.pos.z));
