@@ -4648,11 +4648,14 @@ int mcu_vrKillComponent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
    {
       char * command = args.read_token();
 
-      if ( _stricmp( command, "sbm" ) == 0 ||
+      if ( _stricmp( command, "sb" ) == 0 ||
+		   _stricmp( command, "sbm" ) == 0 ||
            _stricmp( command, "all" ) == 0 )
       {
 	      mcu_p->loop = false;
-		  mcu_p->vhmsg_send( "vrProcEnd sbm" );
+		  std::stringstream strstr;
+		  strstr << "vrProcEnd " << command;
+		  mcu_p->vhmsg_send( strstr.str().c_str() );
 	      return CMD_SUCCESS;
       }
    }
@@ -6674,6 +6677,7 @@ int mcu_vhmsg_connect_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		vhmsg::ttu_set_client_callback( mcu_vhmsg_callback );
 		int err = vhmsg::TTU_SUCCESS;
+		err = vhmsg::ttu_register( "sb" );
 		err = vhmsg::ttu_register( "sbm" );
 		err = vhmsg::ttu_register( "vrAgentBML" );
 		err = vhmsg::ttu_register( "vrExpress" );
@@ -7139,6 +7143,42 @@ int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	
     LOG("%s ", echoStr.c_str() );
 	return( CMD_SUCCESS );
+}
+
+int sb_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
+{
+   const char * token = args.read_token();
+   if ( strcmp( token, "id" ) == 0 )
+   {  // Process specific
+      token = args.read_token(); // Process id
+      const char * process_id = mcu_p->process_id.c_str();
+      if( ( mcu_p->process_id == "" )         // If process id unassigned
+         || strcmp( token, process_id ) !=0 ) // or doesn't match
+         return CMD_SUCCESS;                  // Ignore.
+      token = args.read_token(); // Sub-command
+   }
+
+   const char * args_raw = args.read_remainder_raw();
+   std::stringstream strstr;
+   strstr << token;
+   if (args_raw)
+	   strstr << " " << args_raw;
+   int result = mcu_p->executePython( strstr.str().c_str() );
+   switch( result )
+   {
+      case CMD_NOT_FOUND:
+         LOG( "Python error: command NOT FOUND: '%s %s'> ", token, args_raw );
+         break;
+      case CMD_FAILURE:
+         LOG( "Python error: command FAILED: '%s %s'> ", token, args_raw );
+         break;
+      case CMD_SUCCESS:
+         break;
+      default:
+         break;
+   }
+
+   return CMD_SUCCESS;
 }
 
 int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )

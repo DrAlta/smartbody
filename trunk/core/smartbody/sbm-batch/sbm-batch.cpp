@@ -189,6 +189,7 @@ int main( int argc, char ** argv )
    vhmsg::ttu_open();
 
    // sbm related vhmsgs
+   vhmsg::ttu_register( "sb" );
    vhmsg::ttu_register( "sbm" );
    vhmsg::ttu_register( "vrAgentBML" );
    vhmsg::ttu_register( "vrSpeak" );
@@ -271,90 +272,5 @@ int main( int argc, char ** argv )
    delete sbm;
 }
 
-/*
-// Batch processing using experimental DLL interface
-int main( int argc, char ** argv )
-{
-	printf( "Starting VHMsg\n" );
 
-	vhmsg::ttu_set_client_callback( tt_client_callback );
-	vhmsg::ttu_open();
-
-	// sbm related vhmsgs
-	vhmsg::ttu_register( "sbm" );
-	vhmsg::ttu_register( "vrAgentBML" );
-	vhmsg::ttu_register( "vrSpeak" );
-	vhmsg::ttu_register( "RemoteSpeechReply" );
-	vhmsg::ttu_register( "PlaySound" );
-	vhmsg::ttu_register( "StopSound" );
-	vhmsg::ttu_register( "CommAPI" );
-	vhmsg::ttu_register( "object-data" );
-	vhmsg::ttu_register( "wsp" );
-
-	vhmsg::ttu_report_version( "sbm-batch", "all", "all" );
-
-	printf( "Starting SBM\n" );
-
-	Init();
-
-	printf( "Starting main loop, hit 'q' to quit\n" );
-
-	std::set<std::string> characters;
-
-	bool loop = true;
-	while ( loop )
-	{
-		Update( get_time() );
-		vhmsg::ttu_poll();
-
-
-		std::string characterName;
-		std::string objectClass;
-		bool hasNew =  HasCharacterCreated(characterName, objectClass);
-		if (hasNew)
-		{
-			std::cout << "Character created with name: " << characterName << std::endl;
-			characters.insert(characterName);
-		}
-
-		bool hasDeleted = HasCharacterDeleted(characterName);
-		if (hasDeleted)
-		{
-			std::cout << "Character deleted with name: " << characterName << std::endl;
-			characters.erase(characterName);
-		}
-
-
-		for (std::set<std::string>::iterator iter = characters.begin();
-			iter != characters.end();
-			iter++)
-		{
-			// get the character information
-			float x;
-			float y;
-			float z;
-			float rw;
-			float rx;
-			float ry;
-			float rz;
-			GetCharacterInfo((*iter), x, y, z, rw, rx, ry, rz);
-			std::cout << "Character : " << (*iter) << " " << x << " " << y << " " << z << std::endl;
-
-			// get the joint information
-			int numJoints = GetNumJoints((*iter));
-			std::string jointName;
-			for (int j = 0; j < numJoints; j++)
-			{
-				GetCharacterJointInfo((*iter), j, jointName, x, y, z, rw, rx, ry, rz);
-			}
-		}
-		
-		if ( _kbhit() && _getch() == 'q' )
-			loop = false;
-	}
-
-	vhmsg::ttu_close();
-	Shutdown();
-}
-*/
 

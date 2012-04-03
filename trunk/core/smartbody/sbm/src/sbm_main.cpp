@@ -106,7 +106,7 @@
 #define ENABLE_DEFAULT_BOOTSTRAP	(1) 
 //#define DEFAULT_SEQUENCE_FILE		("ELITE-all.seq")
 #define DEFAULT_SEQUENCE_FILE		("default.seq")
-#define DEFAULT_PY_FILE				("default-init.py")
+#define DEFAULT_PY_FILE				("default.py")
 
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -501,18 +501,10 @@ int main( int argc, char **argv )	{
 				// return -1
 			}
 		}
-		else if( s == "-python" )  // argument -python
-		{
-			mcu.use_python = true;
-		}
 		else if( s.search(	"-host=" ) == 0 )  // argument starts with -host=
 		{
 			net_host = s;
 			net_host.remove( 0, 6 );
-		}
-		else if( s == "-python" )  // argument -python
-		{
-			mcu.use_python = true;
 		}
 		else if( s == "-mepath" )  // -mepath <dirpath> to specify where Motion Engine files (.sk, .skm) should be loaded from
 		{
@@ -574,12 +566,12 @@ int main( int argc, char **argv )	{
 					{
 						LOG( "    Loading Python scrypt '%s'\n", argv[i] );
 						init_pys.push_back( argv[i] );
-						mcu.use_python = true;
 					}
 					else
 					{
 						LOG( "    Loading sequence '%s'\n", argv[i] );
 						init_seqs.push_back( argv[i] );
+						mcu.use_python = false;
 					}
 				}
 				else
@@ -666,6 +658,7 @@ int main( int argc, char **argv )	{
 		vhmsg::ttu_open()==vhmsg::TTU_SUCCESS )
 	{
 		vhmsg::ttu_set_client_callback( sbm_vhmsg_callback );
+		err = vhmsg::ttu_register( "sb" );
 		err = vhmsg::ttu_register( "sbm" );
 		err = vhmsg::ttu_register( "vrAgentBML" );
 		err = vhmsg::ttu_register( "vrExpress" );
@@ -840,6 +833,9 @@ int main( int argc, char **argv )	{
 #endif
 //	commandline.render_prompt( "> " );
 
+	std::string pythonPrompt = "# ";
+	std::string commandPrompt = "> ";
+
 	while( mcu.loop )	{
 
 		mcu.update_profiler();
@@ -866,7 +862,14 @@ int main( int argc, char **argv )	{
 
 		if (mcu.getInteractive())
 		{
-			if( commandline.pending( "> " ) )	{
+			bool hasCommands = false;
+			if (mcu.use_python)
+				hasCommands =  commandline.pending( pythonPrompt );
+			else
+				hasCommands =  commandline.pending( commandPrompt );
+
+			if ( hasCommands )
+			{
 				std::string cmd_str = commandline.read();
 				char *cmd = (char*)cmd_str.c_str();
 
