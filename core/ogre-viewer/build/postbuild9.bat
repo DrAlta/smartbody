@@ -13,7 +13,7 @@ goto RELEASE_VARS
 :RELEASE_VARS
 set BIN_DIR=..\bin\win32
 set PLUGINS_FILE=..\src\plugins-win32.cfg
-set OGRE_BIN=%OGRE_HOME%\bin\release
+set OGRE_BIN=%OGRE_HOME%\bin9\release
 set FINAL_BIN_DIR=..\..\..\bin\ogre-viewer\bin\win32
 set FINAL_MEDIA_DIR=..\..\..\bin\ogre-viewer\media
 
@@ -48,9 +48,11 @@ copy /Y %OGRE_HOME%\media\packs\cubemap.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\cubemapsJS.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\dragon.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\fresneldemo.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\ogredance.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\ogretestmap.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\SdkTrays.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\Sinbad.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\skybox.zip  ..\media\packs
-copy /Y %OGRE_HOME%\media\packs\OgreCore.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\models\cube.mesh    ..\media\models
 copy /Y %OGRE_HOME%\media\models\sphere.mesh  ..\media\models
 
@@ -65,7 +67,7 @@ xcopy /Y /Q /E /I /D ..\media %FINAL_MEDIA_DIR%
 :DEBUG_VARS
 set BIN_DIR=..\bin\win32_debug
 set PLUGINS_FILE=..\src\plugins-win32_debug.cfg
-set OGRE_BIN=%OGRE_HOME%\bin\debug
+set OGRE_BIN=%OGRE_HOME%\bin9\debug
 set FINAL_BIN_DIR=..\..\..\bin\ogre-viewer\bin\win32_debug
 set FINAL_MEDIA_DIR=..\..\..\bin\ogre-viewer\media
 
@@ -100,13 +102,15 @@ copy /Y %OGRE_HOME%\media\packs\cubemap.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\cubemapsJS.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\dragon.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\fresneldemo.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\ogredance.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\ogretestmap.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\SdkTrays.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\Sinbad.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\skybox.zip  ..\media\packs
-copy /Y %OGRE_HOME%\media\packs\OgreCore.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\models\cube.mesh    ..\media\models
 copy /Y %OGRE_HOME%\media\models\sphere.mesh  ..\media\models
 
-copy /Y %OGRE_BIN%\resources.cfg  %BIN_DIR%
+copy /Y %OGRE_BIN%\resources_d.cfg  %BIN_DIR%\resources.cfg
 
 xcopy /Y /Q /E /I /D %BIN_DIR% %FINAL_BIN_DIR%
 xcopy /Y /Q /E /I /D ..\media %FINAL_MEDIA_DIR%
