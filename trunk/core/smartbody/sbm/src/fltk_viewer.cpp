@@ -1196,6 +1196,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, mat_speclar );
 	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
 	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
+	glEnable(GL_LIGHTING);
 	float floorSize = 1200;
 	float planeY = -0.0f;
 	glBegin(GL_QUADS);

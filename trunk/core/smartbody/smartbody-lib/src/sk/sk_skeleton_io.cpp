@@ -570,7 +570,6 @@ bool SkSkeleton::load ( SrInput& in, double skScale, const char* basedir )
 	compress ();
 
 	updateGlobalMatricesZero();
-
 	//SR_TRACE1 ( "DONE." );
 
 	return _root? true:false;
