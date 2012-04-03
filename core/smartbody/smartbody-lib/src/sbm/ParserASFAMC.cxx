@@ -513,6 +513,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 	}
 	skeleton.compress();
 	skeleton.make_active_channels();
+	skeleton.updateGlobalMatricesZero();
 
 	// parse .amc files
 	if (!dataFile.good())

@@ -121,7 +121,8 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 					root->quat()->prerot(final);
 				}
 			}
-		}
+		}		
+		skeleton.updateGlobalMatricesZero();
 		DOMNode* skmNode = getNode("library_animations", doc);
 		if (!skmNode)
 		{
@@ -131,7 +132,6 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		parseLibraryAnimations(skmNode, skeleton, motion, scale, order);
 	//	animationPostProcess(skeleton, motion);
 		
-
 	}
 	catch (const XMLException& toCatch) 
 	{
@@ -238,8 +238,7 @@ void ParserOpenCOLLADA::parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skel
 		xml_utils::xml_translate(&nodeName, node1->getNodeName());
 		if (nodeName == "visual_scene")
 			parseJoints(node1, skeleton, motion, scale, order, materialId2Name, NULL);
-	}
-	skeleton.compress();
+	}	
 }
 
 void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent)

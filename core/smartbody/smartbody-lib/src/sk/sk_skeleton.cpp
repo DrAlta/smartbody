@@ -299,7 +299,7 @@ void SkSkeleton::compress ()
 	for ( i=0; i<_joints.size(); i++ )
 	_joints[i]->_children.compress();
 	*/
-	updateGlobalMatricesZero();
+	//updateGlobalMatricesZero();
 }
 
 void SkSkeleton::updateGlobalMatricesZero()
