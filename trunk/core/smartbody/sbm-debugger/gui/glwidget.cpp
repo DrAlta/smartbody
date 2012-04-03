@@ -69,6 +69,7 @@ void GLWidget::OnCloseSettingsDialog(const SettingsDialog* dlg, int result)
       m_fJointRadius = 1.25 * scale; 
       m_fAxisLength = 5 * scale;
       m_fEyeBeamLength = 100 * scale;
+      m_Camera.SetLookAtOffset(100 * scale);
    }
 }
 
@@ -139,8 +140,9 @@ void GLWidget::paintGL()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
+    m_Camera.Draw(); 
     glPushMatrix();
-       m_Camera.Draw(); 
+       
        DrawFloor();
        DrawScene();
     glPopMatrix();
@@ -157,7 +159,9 @@ void GLWidget::resizeGL(int width, int height)
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, (double)width / (double)height, 0.1f, 1000);
+    CheckCoordinateSystem();
+    DebuggerCamera cam = m_pScene->m_camera;
+    gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
 
     glMatrixMode(GL_MODELVIEW);
 }
@@ -179,14 +183,7 @@ void GLWidget::StartPicking()
 	glPushMatrix();
 	glLoadIdentity();
 
-   //if (!m_pScene->m_rendererIsRightHanded)
-   //{
-   //   // this fixes the mirroring problem in left handed coordinate systems
-   //   QMatrix4x4 mat;
-   //   mat.setToIdentity();
-   //   mat.setColumn(0, QVector4D(-1, 0, 0, 0));
-   //   glMultMatrixd(mat.data());
-   //}
+   CheckCoordinateSystem();
 
 	gluPickMatrix(lastPos.x(), viewport[3] - lastPos.y(), 10, 10, viewport);
 	ratio = (viewport[2] + 0.0) / viewport[3];
@@ -644,8 +641,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     if (event->buttons() & Qt::LeftButton) 
     {
-       m_Camera.Rotate(QVector3D(m_Camera.GetRotationSpeed() * dy, 0, 0));
-       m_Camera.Rotate(QVector3D(0, (m_Camera.GetRotationSpeed() * dx), 0));
+       m_Camera.Rotate(QVector3D(m_Camera.GetRotationSpeed() * dy, m_Camera.GetRotationSpeed() * dx, 0));
     } 
     lastPos = event->pos();
 }
@@ -702,6 +698,18 @@ void GLWidget::timerEvent(QTimerEvent * event)
    }
 }
 
+void GLWidget::CheckCoordinateSystem()
+{
+   if (!m_pScene->m_rendererIsRightHanded)
+   {
+      // this fixes the mirroring problem in left handed coordinate systems
+      QMatrix4x4 mat;
+      mat.setToIdentity();
+      mat.setColumn(0, QVector4D(-1, 0, 0, 0));
+      glMultMatrixd(mat.data());
+   }
+}
+
 void GLWidget::Update()
 {
    if (m_Camera.FollowRenderer())
@@ -712,14 +720,7 @@ void GLWidget::Update()
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
 
-      if (!m_pScene->m_rendererIsRightHanded)
-      {
-         // this fixes the mirroring problem in left handed coordinate systems
-         QMatrix4x4 mat;
-         mat.setToIdentity();
-         mat.setColumn(0, QVector4D(-1, 0, 0, 0));
-         glMultMatrixd(mat.data());
-      }
+      CheckCoordinateSystem();
       
       gluPerspective(cam.fovY, cam.aspect, cam.zNear, cam.zFar);
       glMatrixMode(GL_MODELVIEW);

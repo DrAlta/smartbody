@@ -660,17 +660,20 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
             }
          }
       }
-      else if (split[0] == "sbmlog")
+      else if (split[0] == "vrAllCall")
       {
-         //if (split.size() > 2 && split[1] == "MotionFile")
-         //{
-         //   std::string ext = ".skm";
-         //   std::string animNameWithoutExt = "";
-         //   std::string animPath = "";
-         //   vhcl::StripPath(split[split.size() - 1], animPath, animPath);
-         //   vhcl::StripExt(animPath, animNameWithoutExt, ext);
-         //   m_scene.m_animations.push_back(animNameWithoutExt);
-         //}
+         vhmsg::ttu_notify1("vrComponent sbmdebugger");
+      }
+      else if (split[0] == "vrKillComponent")
+      {
+         if (split.size() > 1 && split[1] == "sbmdebugger")
+         {
+            
+         }
+      }
+      else if (split[0] == "vrKillAll")
+      {
+         
       }
    }
 }
