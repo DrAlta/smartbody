@@ -1,25 +1,13 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SbmDebuggerGui", "SbmDebuggerGui.vcproj", "{3E31370E-CC73-4741-93A3-4009EB972A2C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{49840C67-5A25-4D7A-AF21-5976735F7D7D} = {49840C67-5A25-4D7A-AF21-5976735F7D7D}
-		{776DDE76-F251-46B4-8148-7B3C085FC26F} = {776DDE76-F251-46B4-8148-7B3C085FC26F}
-		{662CF3EB-B816-4727-9D1D-4071C25A3312} = {662CF3EB-B816-4727-9D1D-4071C25A3312}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SbmDebuggerGui", "SbmDebuggerGui.vcxproj", "{3E31370E-CC73-4741-93A3-4009EB972A2C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vhcl", "..\..\..\..\lib\vhcl\vhcl.vcproj", "{662CF3EB-B816-4727-9D1D-4071C25A3312}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vhcl", "..\..\..\lib\vhcl\vhcl.vcxproj", "{662CF3EB-B816-4727-9D1D-4071C25A3312}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vhmsg", "..\..\..\..\lib\vhmsg\vhmsg-c\vhmsg.vcproj", "{49840C67-5A25-4D7A-AF21-5976735F7D7D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{662CF3EB-B816-4727-9D1D-4071C25A3312} = {662CF3EB-B816-4727-9D1D-4071C25A3312}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vhmsg", "..\..\..\lib\vhmsg\vhmsg-c\vhmsg.vcxproj", "{49840C67-5A25-4D7A-AF21-5976735F7D7D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SbmDebugger", "..\lib\SbmDebugger.vcproj", "{776DDE76-F251-46B4-8148-7B3C085FC26F}"
-	ProjectSection(ProjectDependencies) = postProject
-		{49840C67-5A25-4D7A-AF21-5976735F7D7D} = {49840C67-5A25-4D7A-AF21-5976735F7D7D}
-		{662CF3EB-B816-4727-9D1D-4071C25A3312} = {662CF3EB-B816-4727-9D1D-4071C25A3312}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SbmDebugger", "..\lib\SbmDebugger.vcxproj", "{776DDE76-F251-46B4-8148-7B3C085FC26F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
