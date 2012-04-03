@@ -54,7 +54,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\core\smartbody\smartbody-dll\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\OgreSDK\include;..\..\..\..\lib\OgreSDK\samples\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\core\smartbody\smartbody-dll\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\OgreSDK\include\OGRE;..\..\..\..\lib\OgreSDK\include;..\..\..\..\lib\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -68,7 +68,7 @@
     </ProjectReference>
     <Link>
       <AdditionalDependencies>vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;smartbody-dll_d.lib;OIS_d.lib;OgreMain_d.lib;pthreadVSE2.lib;activemq-cppd.lib;ws2_32.lib;rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\core\smartbody\smartbody-dll\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\core\smartbody\smartbody-dll\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib\debug;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)OgreViewer_d.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -86,7 +86,7 @@
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\core\smartbody\smartbody-dll\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\OgreSDK\include;..\..\..\..\lib\OgreSDK\samples\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\core\smartbody\smartbody-dll\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\OgreSDK\include\OGRE;..\..\..\..\lib\OgreSDK\include;..\..\..\..\lib\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -100,7 +100,7 @@
     </ProjectReference>
     <Link>
       <AdditionalDependencies>vhcl.lib;vhmsg.lib;bonebus.lib;smartbody-dll.lib;OIS.lib;OgreMain.lib;pthreadVSE2.lib;activemq-cpp.lib;ws2_32.lib;rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\core\smartbody\smartbody-dll\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\core\smartbody\smartbody-dll\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib\release;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -123,6 +123,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\BoneBusHandler.h" />
+    <ClInclude Include="..\..\src\ExampleApplication.h" />
+    <ClInclude Include="..\..\src\ExampleFrameListener.h" />
     <ClInclude Include="..\..\src\OgreFrameListener.h" />
     <ClInclude Include="..\..\src\OgreRenderer.h" />
     <ClInclude Include="..\..\src\SBListener.h" />
