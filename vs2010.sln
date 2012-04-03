@@ -55,9 +55,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TtsRelayGui", "core\TtsRela
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FestivalRelay", "core\FestivalRelay\FestivalRelay.vcxproj", "{2E2A44E1-D441-4A88-9125-E6DA9BCA5352}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SbmDebuggerGui", "core\smartbody\sbm-debugger\gui\SbmDebuggerGui.vcxproj", "{3E31370E-CC73-4741-93A3-4009EB972A2C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SbmDebuggerGui", "core\sbmonitor\gui\SbmDebuggerGui.vcxproj", "{3E31370E-CC73-4741-93A3-4009EB972A2C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SbmDebugger", "core\smartbody\sbm-debugger\lib\SbmDebugger.vcxproj", "{776DDE76-F251-46B4-8148-7B3C085FC26F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SbmDebugger", "core\sbmonitor\lib\SbmDebugger.vcxproj", "{776DDE76-F251-46B4-8148-7B3C085FC26F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
