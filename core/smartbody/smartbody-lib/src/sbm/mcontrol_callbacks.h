@@ -185,6 +185,7 @@ int mcuFestivalRemoteSpeechCmd_func( srArgBuffer& args, mcuCBHandle* mcu_p);
 
 int mcu_reset_func( srArgBuffer& args, mcuCBHandle *mcu_p  );
 int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  );
+int sb_main_func( srArgBuffer & args, mcuCBHandle * mcu_p );
 int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p );
 int sbm_vhmsg_send_func( srArgBuffer& args, mcuCBHandle *mcu_p  );
 

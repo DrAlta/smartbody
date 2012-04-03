@@ -265,7 +265,7 @@ mcuCBHandle::mcuCBHandle()
 	faceViewerFactory ( new GenericViewerFactory() ),	
 	resource_manager(SBResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
-	use_python( false ),
+	use_python( true ),
 	delay_behaviors(true),
 	media_path("."),
 	_interactive(true),
@@ -353,6 +353,7 @@ void mcuCBHandle::reset( void )	{
 
 void mcuCBHandle::registerCallbacks()
 {
+	insert( "sb",			sb_main_func );
 	insert( "sbm",			sbm_main_func );
 	insert( "help",			mcu_help_func );
 
