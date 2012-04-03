@@ -20,7 +20,6 @@ public:
    ~Camera();
 
    void Draw();
-   void Offset(const QVector3D& offset);
    void Rotate(const QVector3D& offset);
 
    // used for moving the camera along it's orientation vectors
@@ -30,10 +29,11 @@ public:
    void SetCameraType(const string& type);
    void SetCameraType(CameraControlType type) { m_CameraType = type; }
    void SetRightHanded(bool val) { m_Scale.setZ(val ? 1 : -1); }
-   QVector3D GetPosition() { return QVector3D(m_RotMatrix.column(3)); }
+   void SetLookAtOffset(double offset) { m_LookAtOffset = offset; }
+   QVector3D GetPosition() { return QVector3D(m_CameraTransformation.column(3)); }
 
-   void SetPosition(const QVector3D& pos) { m_RotMatrix.setColumn(3, QVector4D(pos, 1.0f)); }
-   void SetRotation(const QQuaternion& rot);  
+   void SetPosition(const QVector3D& pos) { m_CameraTransformation.setColumn(3, QVector4D(pos, 1.0f)); }
+   void SetRotation(const QQuaternion& rot); 
    CameraControlType GetCameraType() { return m_CameraType; }
    bool FollowRenderer() { return m_CameraType == Follow_Renderer; }
 
@@ -48,15 +48,14 @@ public:
 
 private:
    QVector3D m_Position;
-   QVector3D m_Rotation;
    QVector3D m_Scale;
-
-   QMatrix4x4 m_RotMatrix;
+   QMatrix4x4 m_CameraTransformation;
 
    CameraControlType m_CameraType;
    double m_MovementSpeed;
    double m_RotationSpeed;
    double m_LookAtOffset;
+   double m_RotX, m_RotY, m_RotZ;
 };
 
 #endif

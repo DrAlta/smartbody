@@ -1,19 +1,21 @@
 #include "Camera.h"
 #include <QtOpenGL>
+#include <gl\GLU.h>
 
 QVector3D WorldUp(0, 1, 0);
 
 Camera::Camera() :
-   m_Position(0, 0.2f, 3),
-   m_Rotation(0, 0, 0),
    m_Scale(1, 1, 1),
+   m_RotX(0),
+   m_RotY(0),
+   m_RotZ(0),
    m_CameraType(Follow_Renderer),
    m_MovementSpeed(5),
    m_RotationSpeed(0.05f),
    m_LookAtOffset(100)
 {
-   m_RotMatrix.setToIdentity();
-   m_RotMatrix.translate(0, 0.2f, 3);
+   m_CameraTransformation.setToIdentity();
+   m_CameraTransformation.translate(0, 0.2f, 3);
 }
 
 Camera::~Camera()
@@ -24,44 +26,52 @@ Camera::~Camera()
 void Camera::Draw()
 {
    glScaled(m_Scale.x(), m_Scale.y(), m_Scale.z());
-   QMatrix4x4 mat = m_RotMatrix.inverted();
-   glMultMatrixd(mat.data());
+   QMatrix4x4 viewMat = m_CameraTransformation.inverted();
+   glMultMatrixd(viewMat.data());  
 }
 
-void Camera::Offset(const QVector3D& offset)
-{
-   m_Position += offset;
-}
 
 void Camera::Rotate(const QVector3D& offset)
 {
-   if (offset.x() != 0)
-   {
-      m_RotMatrix.rotate(offset.x(), QVector3D(1, 0, 0));
-   }
-   
-   if (offset.y() != 0)
-   {
-      m_RotMatrix.rotate(offset.y(), QVector3D(0, 1, 0));
-   }
+   m_RotX = offset.x();
+   m_RotY = offset.y();
+   m_RotZ = offset.z();
+
+   QVector3D pos = GetPosition();
+   //m_CameraTransformation.setToIdentity();
+
+   QVector4D col0 = m_CameraTransformation.column(0);
+   QVector4D col1 = m_CameraTransformation.column(1);
+
+   QVector3D side(col0.x(), col0.y(), col0.z());
+   QVector3D up(col1.x(), col1.y(), col1.z());
+
+   // create quats from axis angles
+   QQuaternion xQuat = QQuaternion::fromAxisAndAngle(side, m_RotX);
+   QQuaternion yQuat = QQuaternion::fromAxisAndAngle(up, m_RotY);
+
+   // perform rotation
+   QQuaternion combined = xQuat * yQuat;
+   m_CameraTransformation.rotate(combined);
+   SetPosition(pos);
 }
 
 void Camera::MoveX(float offset)
 {
-   QVector3D right(m_RotMatrix.column(0));
-   m_RotMatrix.translate(right * offset);
+   QVector3D right(m_CameraTransformation.column(0));
+   m_CameraTransformation.translate(right * offset);
 }
 
 void Camera::MoveY(float offset)
 {
-   QVector3D up(m_RotMatrix.column(1));
-   m_RotMatrix.translate(up * offset);
+   QVector3D up(m_CameraTransformation.column(1));
+   m_CameraTransformation.translate(up * offset);
 }
 
 void Camera::MoveZ(float offset)
 {
-   QVector3D forward(m_RotMatrix.column(2));
-   m_RotMatrix.translate(forward * offset);
+   QVector3D forward(m_CameraTransformation.column(2));
+   m_CameraTransformation.translate(forward * offset);
 }
 
 void Camera::SetCameraType(const string& type)
@@ -80,27 +90,31 @@ void Camera::SetRotation(const QQuaternion& rot)
    newMat.setToIdentity();
    newMat.translate(GetPosition());
    newMat.rotate(rot);
-   m_RotMatrix = newMat;
+   m_CameraTransformation = newMat;
 }
 
 void Camera::LookAt(const QVector3D& pos)
 {
    // set the forward vector
    QVector3D forward = (pos - GetPosition()).normalized();
-   m_RotMatrix.setColumn(2, forward * -m_Scale.z());
+   m_CameraTransformation.setColumn(2, forward * -m_Scale.z());
 
    // set right vector
    QVector3D right = QVector3D::crossProduct(forward, QVector3D(0, 1, 0));
-   m_RotMatrix.setColumn(0, right);
+   m_CameraTransformation.setColumn(0, right);
 
    QVector3D up = QVector3D::crossProduct(right, forward);
-   m_RotMatrix.setColumn(1, up);
+   //up.setX(up.x() * m_Scale.z()); // convert for left handed systems
+   //up.setZ(up.z() * m_Scale.z()); // convert for left handed systems
+   m_CameraTransformation.setColumn(1, up);
+
+   //m_CameraTransformation.column(1).setX(m_CameraTransformation.column(1).x() * -1);
 }
 
 void Camera::MoveLookAt(const QVector3D lookAtPos)
 {
    // get forward vector
-   QVector4D vec = m_RotMatrix.column(2); 
+   QVector4D vec = m_CameraTransformation.column(2); 
    SetPosition(lookAtPos + ((QVector3D)vec * m_LookAtOffset));
    LookAt(lookAtPos);
 }
