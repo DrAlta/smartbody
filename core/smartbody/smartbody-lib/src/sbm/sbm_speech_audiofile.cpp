@@ -384,8 +384,8 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.native_directory_string().c_str() );
-	  mcu.mark("requestSpeechAudio");
-      return 0;
+	  //mcu.mark("requestSpeechAudio");
+      //return 0;
    }
 
 
