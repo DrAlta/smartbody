@@ -118,7 +118,6 @@ target_link_libraries( sbm-fltk
 	#tcmalloc
 	#profiler
 	smartbody-lib
-	SbmDebugger
 	bonebus
 	vhmsg
 	vhcl
@@ -142,8 +141,7 @@ target_link_libraries( sbm-fltk
 	pprAI
 	ode
 	python2.6
-        ncurses
-	SbmDebugger
+    ncurses
 
 	${MORE_LIBS}
 )
