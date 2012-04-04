@@ -829,7 +829,9 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 
 	boost::python::class_<SBSteerAgent>("SBSteerAgent")
 		.def("setSteerStateNamePrefix", &SBSteerAgent::setSteerStateNamePrefix, "Set the animation state name prefix used for steering, only applies to steering type locomotion.")
-		.def("setSteerType", &SBSteerAgent::setSteerType, "Set the type of steering locomotion, can be one of the following: basic, example, procedural")
+		.def("getSteerStateNamePrefix", &SBSteerAgent::getSteerStateNamePrefix, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the animation state name prefix used for steering, only applies to steering type locomotion.")
+		.def("setSteerType", &SBSteerAgent::setSteerType, "Sets the type of steering locomotion, can be one of the following: basic, example, procedural")
+		.def("getSteerType", &SBSteerAgent::getSteerType, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the type of steering locomotion, is one of the following: basic, example, procedural")
 		.def("getCurrentSBCharacter", &SBSteerAgent::getCurrentSBCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return SBCharacter that SBSteerAgent is attached to.")		
 		;
 

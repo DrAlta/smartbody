@@ -17,7 +17,9 @@ class SBSteerAgent : public SteeringAgent
 		~SBSteerAgent();
 
 		void setSteerStateNamePrefix(std::string prefix);
+		const std::string& getSteerStateNamePrefix();
 		void setSteerType(std::string type);
+		const std::string& getSteerType();
 
 		void setCurrentSBCharacter(SBCharacter* sbCharacter);
 		SBCharacter* getCurrentSBCharacter();

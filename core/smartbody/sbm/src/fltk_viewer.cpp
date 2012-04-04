@@ -68,6 +68,7 @@
 # include <sbm/SBScene.h>
 # include <sbm/SBSkeleton.h>
 # include <sbm/SBSteerManager.h>
+# include <sbm/SBAnimationStateManager.h>
 
 #if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support
 #include "sbm/GPU/SbmShader.h"
@@ -4446,13 +4447,26 @@ void PALocomotionData::releaseKey( int keyID )
 	keyPressMap[keyID] = false;
 }
 
+std::string PALocomotionData::getLocomotionStateName()
+{
+	SmartBody::SBSteerManager* manager = SmartBody::SBScene::getScene()->getSteerManager();
+	SmartBody::SBSteerAgent* steerAgent = manager->getSteerAgent(character->getName());
+	if (!steerAgent)
+		return "";
+	const std::string& prefix = steerAgent->getSteerStateNamePrefix();
+	std::string stateName = prefix + "Locomotion";
+	return stateName;
+}
+
 void PALocomotionData::updateKeys(float dt)
 {
 	//LOG("paLocomotionUpdateKeys");
 	// acceleration when the key is pressed
 	if (!keyControl) return;
 
-	std::string locoStateName = "allLocomotion";
+	std::string locoStateName = getLocomotionStateName();
+	if (locoStateName == "")
+		return;
 	PAStateData* state = NULL;
 	if (character && character->param_animation_ct)
 		if (character->param_animation_ct)
@@ -4583,10 +4597,13 @@ void PALocomotionData::updateKeys(float dt)
 	float angleEps = 0.01f;
 	if ( (fabs(v) > 0 || fabs(w) > 0 || fabs(s)) && state->stateName == PseudoIdleState && !starting)
 	{
+		std::string locomotionStateName =  getLocomotionStateName();
 		std::stringstream command1;			
-		PAStateData* locoState = mcu.lookUpPAState("allLocomotion");
+		PAStateData* locoState = mcu.lookUpPAState(locomotionStateName);
+		if (!locoState)
+			return;
 		locoState->paramManager->setWeight(0, 0, 0);
-		command1 << "panim schedule char " << character->getName() << " state allLocomotion loop true playnow false additive false joint null ";		
+		command1 << "panim schedule char " << character->getName() << " state " <<  locomotionStateName << " loop true playnow false additive false joint null ";		
 		for (int i = 0; i < locoState->getNumMotions(); i++)
 			command1 << locoState->weights[i] << " ";
 		//LOG("startLocomotion, %s",command1.str().c_str());
