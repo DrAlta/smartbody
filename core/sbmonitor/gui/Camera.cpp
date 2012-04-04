@@ -95,26 +95,24 @@ void Camera::SetRotation(const QQuaternion& rot)
 
 void Camera::LookAt(const QVector3D& pos)
 {
+   // this function handles both left and right handed coordinate systems
    // set the forward vector
    QVector3D forward = (pos - GetPosition()).normalized();
    m_CameraTransformation.setColumn(2, forward * -m_Scale.z());
 
    // set right vector
    QVector3D right = QVector3D::crossProduct(forward, QVector3D(0, 1, 0));
-   m_CameraTransformation.setColumn(0, right);
+   m_CameraTransformation.setColumn(0, right * m_Scale.z());
 
    QVector3D up = QVector3D::crossProduct(right, forward);
-   //up.setX(up.x() * m_Scale.z()); // convert for left handed systems
-   //up.setZ(up.z() * m_Scale.z()); // convert for left handed systems
    m_CameraTransformation.setColumn(1, up);
-
-   //m_CameraTransformation.column(1).setX(m_CameraTransformation.column(1).x() * -1);
 }
 
 void Camera::MoveLookAt(const QVector3D lookAtPos)
 {
+   LookAt(lookAtPos);
+
    // get forward vector
    QVector4D vec = m_CameraTransformation.column(2); 
    SetPosition(lookAtPos + ((QVector3D)vec * m_LookAtOffset));
-   LookAt(lookAtPos);
 }
