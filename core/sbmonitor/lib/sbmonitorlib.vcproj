@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="SbmDebugger"
+	Name="sbmonitorlib"
 	ProjectGUID="{776DDE76-F251-46B4-8148-7B3C085FC26F}"
-	RootNamespace="SbmDebugger"
+	RootNamespace="sbmonitorlib"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
