@@ -3030,7 +3030,11 @@ void FltkViewer::drawPawns()
 		{
 			//pawn->colObj_p->updateTransform(gmat);
 			//gmat = pawn->colObj_p->worldState.gmat();
-			SrMat gmatPhy = pawn->getPhysicsObject()->getGlobalTransform().gmat();
+			//if (pawn->getPhysicsObject())
+			//{
+			//	gmat = pawn->getPhysicsObject()->getGlobalTransform().gmat();
+			//}
+			//SrMat gmatPhy = pawn->getPhysicsObject()->getGlobalTransform().gmat();
 			drawColObject(pawn->getGeomObject(),gmat);
 		}
 		else

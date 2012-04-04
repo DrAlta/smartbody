@@ -7,7 +7,7 @@
 
 using namespace SmartBody;
 
-class SbmPhysicsObjInterface
+class SbmPhysicsObjInterface : public SbmTransformObjInterface
 {
 protected:
 	bool          bHasPhysicsSim;
@@ -16,7 +16,7 @@ protected:
 	SbmTransform  refTransform;
 
 public:	
-	SbmTransform& getGlobalTransform() { return globalTransform; }
+	virtual SbmTransform& getGlobalTransform() { return globalTransform; }
 	void setGlobalTransform(const SrMat& gmat);
 	void setGlobalTransform(SbmTransform& rt);	
 

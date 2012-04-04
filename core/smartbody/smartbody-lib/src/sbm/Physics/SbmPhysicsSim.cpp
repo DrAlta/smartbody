@@ -242,7 +242,7 @@ void SbmPhysicsObj::setGeometry( SbmGeomObject* obj)
 {
 	initGeom = false;
 	colObj = obj;
-	colObj->attachToPhyObj(this);
+	colObj->attachToObj(this);
 	setStringAttribute("geomType",colObj->geomType());
 	SrVec geomSize = colObj->getGeomSize();
 	setVec3Attribute("geomSize",geomSize[0],geomSize[1],geomSize[2]);
@@ -306,7 +306,7 @@ void SbmPhysicsObj::changeGeometry( std::string& geomType, SrVec extends )
 	}
 	colObj = SbmGeomObject::createGeometry(geomType,extends);
 	colObj->setLocalTransform(localTran);
-	colObj->attachToPhyObj(this);
+	colObj->attachToObj(this);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
 	phySim->updatePhyObjGeometry(this);

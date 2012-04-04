@@ -61,6 +61,8 @@ class SBCharacter : public SbmCharacter
 		virtual void setFaceDefinition(SBFaceDefinition* face);
 
 		void setSteerAgent(SBSteerAgent* agent);
+	
+		void notify(SBSubject* subject);
 
 	protected:
 		std::vector<SBBehavior*> _curBehaviors;

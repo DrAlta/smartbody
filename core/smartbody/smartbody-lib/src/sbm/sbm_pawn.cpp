@@ -192,6 +192,9 @@ void SbmPawn::initData()
 	world_offset_writer_p->ref();
 	ct_tree_p->add_controller( world_offset_writer_p );
 
+	_collisionObject = new SbmGeomNullObject();
+	_collisionObject->attachToObj(this);
+
 }
 
 SkSkeleton* SbmPawn::getSkeleton() const
@@ -452,6 +455,9 @@ SbmPawn::~SbmPawn()	{
 	{
 		delete dMesh_p;
 	}
+
+	if (_collisionObject)
+		delete _collisionObject;
 }
 
 
@@ -491,6 +497,13 @@ SrMat SbmPawn::get_world_offset()
 	gmat.e43() = z;
 	return gmat;
 }
+
+SbmTransform& SbmPawn::getGlobalTransform()
+{	
+	globalTransform.gmat(get_world_offset());
+	return globalTransform;
+}
+
 void SbmPawn::setWorldOffset( const SrMat& newWorld )
 {	
 	SrQuat quat = SrQuat(newWorld);
@@ -667,7 +680,7 @@ int SbmPawn::parse_pawn_command( std::string cmd, srArgBuffer& args, mcuCBHandle
 		{
 			LOG("Pawn %s, fail to setshape. Incorrect parameters.", getName().c_str());
 			return CMD_FAILURE;
-		}
+		} 
 	}
 	else if (cmd == "physics")
 	{
@@ -1325,11 +1338,18 @@ WSP_ERROR SbmPawn::wsp_rotation_accessor( const std::string id, const std::strin
 
 SbmGeomObject* SbmPawn::getGeomObject()
 {	
-	SbmPhysicsObj* phyObj = getPhysicsObject();
-	if (phyObj)
-		return phyObj->getColObj();
-	return NULL;
+	return _collisionObject;
+} 
+
+void SbmPawn::setGeomObject(SbmGeomObject* object)
+{	
+	if (_collisionObject)
+		delete _collisionObject;
+
+	_collisionObject = object;
+	_collisionObject->attachToObj(this);
 }
+
 
 SbmPhysicsObj* SbmPawn::getPhysicsObject()
 {
