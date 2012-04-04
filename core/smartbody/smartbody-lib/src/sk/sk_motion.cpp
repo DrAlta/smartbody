@@ -292,7 +292,7 @@ void SkMotion::apply ( float t,
 	int fsize=_frames.size();
 	if ( fsize<=0 )
 		return;
-	if ( t<=_frames[0].keytime )	{
+	if ( t!= 0.f && t<=_frames[0].keytime )	{
 #if DEBUG_T
 		LOG("SkMotion::apply NOTICE: t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
 #endif
