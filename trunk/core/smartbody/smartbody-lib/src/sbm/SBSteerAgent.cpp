@@ -25,6 +25,11 @@ void SBSteerAgent::setSteerStateNamePrefix(std::string prefix)
 		character->statePrefix = _stateNamePrefix;
 }
 
+const std::string& SBSteerAgent::getSteerStateNamePrefix()
+{
+	return _stateNamePrefix;
+}
+
 void SBSteerAgent::setSteerType(std::string type)
 {
 	_steerType = type;
@@ -51,6 +56,11 @@ void SBSteerAgent::setSteerType(std::string type)
 	{
 		character->locomotion_type = character->Basic;
 	}
+}
+
+const std::string& SBSteerAgent::getSteerType()
+{
+	return _steerType;
 }
 
 void SBSteerAgent::setCurrentSBCharacter(SBCharacter* sbCharacter)

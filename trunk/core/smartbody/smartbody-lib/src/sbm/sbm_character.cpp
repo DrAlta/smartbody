@@ -492,7 +492,8 @@ void SbmCharacter::initData()
 	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
 	timeDelayAttr->setMin(0.0);
 	createStringAttribute("deformableMesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
-	createStringAttribute("receiverName", "kinect1", true, "Basic", 220, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
+	createDoubleAttribute("deformableMeshScale", 1, true, "Basic", 230, false, false, false, "Scale factor when loading mesh.");
+	createStringAttribute("receiverName", "kinect1", true, "Basic", 300, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
 }
 
 void SbmCharacter::locomotion_reset()
@@ -2169,14 +2170,20 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		std::string scale = "";
 		while (numRemaining > 0)
 		{
-			std::string prefixCommand = args.read_token();
-			if (prefixCommand == "-prefix")
+			std::string addtlCommand = args.read_token();
+			if (addtlCommand == "-prefix")
 			{
 				prefix = args.read_token();
 			}
-			else if (prefixCommand == "-m")
+			else if (addtlCommand == "-m")
 			{
 				scale = "-m";
+			}
+			else if (addtlCommand == "-scale")
+			{
+				std::string value = args.read_token();
+				scale = "-scale ";
+				scale += value;
 			}
 			numRemaining = args.calc_num_tokens();
 		}
@@ -2326,7 +2333,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			return CMD_FAILURE;
 		}
 		char* obj_file = args.read_token();
-		char* option = args.read_token();
+		char* option = args.read_remainder_raw();
 		return mcu_character_load_mesh( getName().c_str(), obj_file, mcu_p, option );
 	} 
 	else 
@@ -3577,6 +3584,12 @@ void SbmCharacter::notify(SBSubject* subject)
 			SmartBody::StringAttribute* meshAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
 			std::stringstream strstr;
 			strstr << "char " << getName() << " mesh " << meshAttribute->getValue();
+			SmartBody::DoubleAttribute* meshScaleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("deformableMeshScale"));
+			if (meshScaleAttribute && meshScaleAttribute->getValue() !=  1.0)
+			{
+				strstr << " -scale " << meshScaleAttribute->getValue();
+			}
+
 			mcuCBHandle& mcu = mcuCBHandle::singleton();
 			int success = mcu.execute((char*) strstr.str().c_str());
 			if (success != CMD_SUCCESS)

@@ -493,6 +493,9 @@ public:
 public:
 	PALocomotionData();
 	~PALocomotionData();
+
+	std::string getLocomotionStateName();
+
 	float w;	// angular velocity
 	float v;	// velocity
 	float s;    // strife velocity

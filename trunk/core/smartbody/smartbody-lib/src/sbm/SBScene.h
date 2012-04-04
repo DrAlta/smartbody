@@ -34,6 +34,7 @@ class SBScene : public SBObject
 	public:
 		SBScene(void);
 		~SBScene(void);
+		void update();
 
 		static SBScene* getScene();
 
@@ -131,6 +132,8 @@ class SBScene : public SBObject
 
 		SbmDebuggerServer* _debuggerServer;
 };
+
+SBScene* getScene();
 
 };
 

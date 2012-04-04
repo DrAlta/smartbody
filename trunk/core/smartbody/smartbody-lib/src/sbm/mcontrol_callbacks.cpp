@@ -2001,6 +2001,16 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 		{
 			factor = 0.01f;
 		}
+		else
+		{
+			std::string optionStr = option;
+			if (optionStr.find("-scale ") == 0)
+			{
+				std::string scaleFactor = optionStr.substr(7);
+				factor = (float) atof(scaleFactor.c_str());
+			}
+		}
+			 
 	}
 
 	// Here, detect which type of file it is
