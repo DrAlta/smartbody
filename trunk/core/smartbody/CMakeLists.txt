@@ -10,7 +10,6 @@ include_directories(
 
 add_subdirectory( smartbody-lib/src )
 add_subdirectory( smartbody-dll )
-add_subdirectory( vhwrapper )
 add_subdirectory( steersuite-1.3 )
 
 add_subdirectory( sbm-batch )
