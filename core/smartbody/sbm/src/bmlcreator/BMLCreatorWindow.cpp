@@ -123,10 +123,11 @@ void BMLCreatorWindow::updateBMLBuffer()
 	_editor->buffer()->remove(0, _editor->buffer()->length());
 	std::stringstream strstr;
 	if (_curBML.size() > 0)
-		strstr << "bml char " << _curCharacter << " ";
+		strstr << "bml.execBML('" << _curCharacter << "', '";
 	
 	_editor->buffer()->insert(0, strstr.str().c_str());
 	_editor->buffer()->insert(_editor->buffer()->length(), _curBML.c_str());
+	_editor->buffer()->insert(_editor->buffer()->length(), "')");
 }
 
 void BMLCreatorWindow::notify(SmartBody::SBSubject* subject)
@@ -144,7 +145,7 @@ void BMLCreatorWindow::RunBMLCB(Fl_Widget* w, void *data)
 	BMLCreatorWindow* window = (BMLCreatorWindow*) data;
 	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute(window->_editor->buffer()->text());
+	mcu.executePython(window->_editor->buffer()->text());
 }
 
 void BMLCreatorWindow::RefreshCharactersCB(Fl_Widget* w, void *data)
