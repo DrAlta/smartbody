@@ -8,11 +8,10 @@ include_directories(
 	/usr/include/python2.6
 )
 
-add_subdirectory( sbm-debugger/lib )
 add_subdirectory( smartbody-lib/src )
 add_subdirectory( smartbody-dll )
+add_subdirectory( vhwrapper )
 add_subdirectory( steersuite-1.3 )
 
 add_subdirectory( sbm-batch )
 add_subdirectory( sbm )
-#add_subdirectory( sbm2 )
