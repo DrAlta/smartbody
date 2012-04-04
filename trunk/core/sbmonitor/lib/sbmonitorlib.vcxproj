@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{776DDE76-F251-46B4-8148-7B3C085FC26F}</ProjectGuid>
-    <RootNamespace>SbmDebugger</RootNamespace>
+    <RootNamespace>sbmonitorlib</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

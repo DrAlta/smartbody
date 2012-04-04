@@ -1,3 +1,3 @@
 pushd Release
-SbmDebuggerGui.exe
+sbmonitor.exe
 popd

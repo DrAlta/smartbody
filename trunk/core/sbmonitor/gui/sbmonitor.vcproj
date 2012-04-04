@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="SbmDebuggerGui"
+	Name="sbmonitor"
 	ProjectGUID="{3E31370E-CC73-4741-93A3-4009EB972A2C}"
-	RootNamespace="SbmDebuggerGui"
+	RootNamespace="sbmonitor"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -62,7 +62,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="SbmDebugger.lib vhcl_d.lib vhmsg_d.lib QtCored4.lib QtGuid4.lib qtmaind.lib QtOpenGLd4.lib pthreadVSE2.lib activemq-cppd.lib opengl32.lib glu32.lib ws2_32.lib dbghelp.lib winmm.lib rpcrt4.lib"
+				AdditionalDependencies="sbmonitorlib.lib vhcl_d.lib vhmsg_d.lib QtCored4.lib QtGuid4.lib qtmaind.lib QtOpenGLd4.lib pthreadVSE2.lib activemq-cppd.lib opengl32.lib glu32.lib ws2_32.lib dbghelp.lib winmm.lib rpcrt4.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\lib\Debug;..\..\..\lib\vhcl\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\qt\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;"
 				GenerateDebugInformation="true"
@@ -142,7 +142,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="SbmDebugger.lib vhcl.lib vhmsg.lib QtCore4.lib QtGui4.lib qtmain.lib QtOpenGL4.lib pthreadVSE2.lib activemq-cpp.lib opengl32.lib glu32.lib ws2_32.lib dbghelp.lib winmm.lib rpcrt4.lib"
+				AdditionalDependencies="sbmonitorlib.lib vhcl.lib vhmsg.lib QtCore4.lib QtGui4.lib qtmain.lib QtOpenGL4.lib pthreadVSE2.lib activemq-cpp.lib opengl32.lib glu32.lib ws2_32.lib dbghelp.lib winmm.lib rpcrt4.lib"
 				AdditionalLibraryDirectories="..\lib\Release;..\..\..\lib\vhcl\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\qt\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"

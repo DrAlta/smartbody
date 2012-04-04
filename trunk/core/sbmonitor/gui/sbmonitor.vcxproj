@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3E31370E-CC73-4741-93A3-4009EB972A2C}</ProjectGuid>
-    <RootNamespace>SbmDebuggerGui</RootNamespace>
+    <RootNamespace>sbmonitor</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -66,7 +66,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>SbmDebugger.lib;vhcl_d.lib;vhmsg_d.lib;QtCored4.lib;QtGuid4.lib;qtmaind.lib;QtOpenGLd4.lib;pthreadVSE2.lib;activemq-cppd.lib;opengl32.lib;glu32.lib;ws2_32.lib;dbghelp.lib;winmm.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sbmonitorlib.lib;vhcl_d.lib;vhmsg_d.lib;QtCored4.lib;QtGuid4.lib;qtmaind.lib;QtOpenGLd4.lib;pthreadVSE2.lib;activemq-cppd.lib;opengl32.lib;glu32.lib;ws2_32.lib;dbghelp.lib;winmm.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib\Debug;..\..\..\lib\vhcl\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\qt\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -107,7 +107,7 @@ copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" $(TargetDir)
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>SbmDebugger.lib;vhcl.lib;vhmsg.lib;QtCore4.lib;QtGui4.lib;qtmain.lib;QtOpenGL4.lib;pthreadVSE2.lib;activemq-cpp.lib;opengl32.lib;glu32.lib;ws2_32.lib;dbghelp.lib;winmm.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sbmonitorlib.lib;vhcl.lib;vhmsg.lib;QtCore4.lib;QtGui4.lib;qtmain.lib;QtOpenGL4.lib;pthreadVSE2.lib;activemq-cpp.lib;opengl32.lib;glu32.lib;ws2_32.lib;dbghelp.lib;winmm.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib\Release;..\..\..\lib\vhcl\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\qt\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -192,7 +192,7 @@ copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" $(TargetDir)
       <Project>{49840c67-5a25-4d7a-af21-5976735f7d7d}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\lib\SbmDebugger.vcxproj">
+    <ProjectReference Include="..\lib\sbmonitorlib.vcxproj">
       <Project>{776dde76-f251-46b4-8148-7b3c085fc26f}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
