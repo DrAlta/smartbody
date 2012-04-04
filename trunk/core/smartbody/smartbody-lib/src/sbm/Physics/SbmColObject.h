@@ -35,18 +35,24 @@ class SbmPhysicsObjInterface;
 
 enum { GEOM_NULL = 0, GEOM_SPHERE, GEOM_BOX, GEOM_CAPSULE, GEOM_MESH, NUM_OF_GEOMS };
 
+class SbmTransformObjInterface
+{	
+public:
+	virtual SbmTransform& getGlobalTransform() = 0;
+};
+
 class SbmGeomObject
 {
 public:
 	std::string  color;	
 protected:	
-	SbmPhysicsObjInterface* attachedPhyObj;
+	SbmTransformObjInterface* attachedObj;
 	SbmTransform localTransform;	
 	SbmTransform combineTransform;	
 public:
 	SbmGeomObject(void);	
 	virtual ~SbmGeomObject(void);	
-	void attachToPhyObj(SbmPhysicsObjInterface* phyObj);
+	void attachToObj(SbmTransformObjInterface* phyObj);
 	SbmTransform& getLocalTransform() { return localTransform; }	
 	void          setLocalTransform(SbmTransform& newLocalTran);
 	SbmTransform& getCombineTransform();
@@ -57,6 +63,7 @@ public:
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist = 0.f) = 0;
 	virtual std::string geomType() = 0;
 	virtual SrVec       getGeomSize() = 0;
+	virtual void	    setGeomSize(SrVec& size) = 0;
 
 	static SbmGeomObject* createGeometry(std::string& type, SrVec extends);
 };
@@ -71,6 +78,7 @@ public:
 	virtual bool estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
 	virtual std::string  geomType() { return "null"; }
 	virtual SrVec        getGeomSize() { return SrVec(1,1,1); }
+	virtual void         setGeomSize(SrVec& size) {}
 };
 
 class SbmGeomSphere : public SbmGeomObject
@@ -85,6 +93,10 @@ public:
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
 	virtual std::string  geomType() { return "sphere"; }
 	virtual SrVec        getGeomSize() { return SrVec(radius,radius,radius); }
+	virtual void         setGeomSize(SrVec& size) { radius = size[0]; }
+	virtual float getRadius();
+	virtual void setRadius(float val);
+
 };
 
 class SbmGeomBox : public SbmGeomObject
@@ -100,6 +112,7 @@ public:
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
 	virtual std::string  geomType() { return "box"; }
 	virtual SrVec        getGeomSize() { return extent; }
+	virtual void         setGeomSize(SrVec& size) { extent = size; }
 };
 
 // assuming the length is along local y-axis
@@ -117,6 +130,7 @@ public:
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
 	virtual std::string  geomType() { return "capsule"; }
 	virtual SrVec        getGeomSize() { return SrVec(extent,radius,extent); }
+	virtual void         setGeomSize(SrVec& size);
 };
 
 // this is a adapting interface to integrate SrModel tri-mesh into physical simulation framework
@@ -133,6 +147,7 @@ public:
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist) { return false;}
 	virtual std::string  geomType() { return "mesh"; }
 	virtual SrVec        getGeomSize() { return SrVec(1,1,1); }
+	virtual void         setGeomSize(SrVec& size) { }
 };
 
 typedef std::vector<SbmGeomObject*> VecOfSbmColObj;

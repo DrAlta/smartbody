@@ -233,7 +233,7 @@ void SBPhysicsManager::updatePhysicsPawn( std::string pawnName )
 	SBPawn* pawn = scene->getPawn(pawnName);
 	if (!phyObj || !pawn) return;
 
-	bool pawnPhySim = (phyEngine->getBoolAttribute("enable") && phyObj->getBoolAttribute("enable"));
+	bool pawnPhySim = (phyEngine->getBoolAttribute("enable") && pawn->getBoolAttribute("enablePhysics"));
 	if (pawnPhySim)
 	{
 		phyObj->updateSbmObj();

@@ -2,6 +2,10 @@
 #include <sbm/mcontrol_util.h>
 #include <sbm/mcontrol_callbacks.h>
 #include <sbm/SBSkeleton.h>
+#include <sbm/SBScene.h>
+#include <sbm/SBPhysicsManager.h>
+#include <sbm/Physics/SbmColObject.h>
+
 
 namespace SmartBody {
 
@@ -13,9 +17,19 @@ SBPawn::SBPawn() : SbmPawn()
 	_rotX = createDoubleAttribute("rotX", 0.0, true, "transform", 40, false, false, false, "X rotation");
 	_rotY = createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
 	_rotZ = createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
-	createBoolAttribute("physics", false, true, "Basic", 300, false, false, false, "is the pawn physics enabled");
 	createStringAttribute("mesh", "", true, "Basic", 400, false, false, false, "Geometry/mesh");
 	createDoubleAttribute("meshScale", 1.0, true, "Basic", 410, false, false, false, "Scale of geometry/mesh");
+	createActionAttribute("createPhysics", true, "Physics", 300, false, false, false, "Initializes the pawn as a physics object.");
+	createBoolAttribute("enablePhysics", false, true, "Physics", 310, false, false, false, "Enables or disables physics for this pawn.");
+	std::vector<std::string> shapes;
+	shapes.push_back("null");
+	shapes.push_back("sphere");
+	shapes.push_back("box");
+	shapes.push_back("capsule");
+	SmartBody::StringAttribute* shapeAttr = createStringAttribute("collisionShape", "null", true, "Physics", 350, false, false, false, "Initializes the pawn as a physics object.");
+	shapeAttr->setValidValues(shapes);
+	SrVec defaultScale(1.0f, 1.0f, 1.0f);
+	createVec3Attribute("collisionShapeScale", defaultScale[0], defaultScale[1], defaultScale[2], true, "Physics", 360, false, false, false, "Scaling of physics-based shape.");
 }
 
 SBPawn::SBPawn(const char* name) : SbmPawn(name)
@@ -26,11 +40,20 @@ SBPawn::SBPawn(const char* name) : SbmPawn(name)
 	_rotX = createDoubleAttribute("rotX", 0.0, true, "transform", 40, false, false, false, "X rotation");
 	_rotY = createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
 	_rotZ = createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
-	createBoolAttribute("physics", false, true, "Basic", 300, false, false, false, "is the pawn physics enabled");
-	createStringAttribute("mesh", "", true, "Basic", 300, false, false, false, "Geometry/mesh");
+	createStringAttribute("mesh", "", true, "Basic", 400, false, false, false, "Geometry/mesh");
 	createDoubleAttribute("meshScale", 1.0, true, "Basic", 410, false, false, false, "Scale of geometry/mesh");
+	createActionAttribute("createPhysics", true, "Physics", 300, false, false, false, "Initializes the pawn as a physics object.");
+	createBoolAttribute("enablePhysics", false, true, "Physics", 310, false, false, false, "Enables or disables physics for this pawn.");
+	std::vector<std::string> shapes;
+	shapes.push_back("null");
+	shapes.push_back("sphere");
+	shapes.push_back("box");
+	shapes.push_back("capsule");
+	SmartBody::StringAttribute* shapeAttr = createStringAttribute("collisionShape", "null", true, "Physics", 350, false, false, false, "Initializes the pawn as a physics object.");
+	shapeAttr->setValidValues(shapes);
+	SrVec defaultScale(1.0f, 1.0f, 1.0f);
+	createVec3Attribute("collisionShapeScale", defaultScale[0], defaultScale[1], defaultScale[2], true, "Physics", 360, false, false, false, "Scaling of physics-based shape.");
 }
-
 
 SBPawn::~SBPawn()
 {
@@ -163,8 +186,55 @@ void SBPawn::notify(SBSubject* subject)
 			hpr.z = (float) val;
 			this->setHPR(hpr);
 		}
-		else if (attribute->getName() == "physics")
+		else if (attribute->getName() == "collisionShape")
 		{
+			SbmGeomObject* object = getGeomObject();
+			std::string shapeName = getStringAttribute("collisionShape");
+			if (shapeName != object->geomType())
+			{
+				SrVec size = getVec3Attribute("collisionShapeScale");
+				SbmGeomObject* obj = NULL;
+				if (shapeName == "null")
+				{
+					obj = new SbmGeomNullObject();
+				}
+				else if (shapeName == "sphere")
+				{
+					obj = new SbmGeomSphere(size[0]);
+				}
+				else if (shapeName == "box")
+				{
+					obj = new SbmGeomBox(size);
+				}
+				else if (shapeName == "capsule")
+				{
+					obj = new SbmGeomCapsule(size[0],size[1]);
+				}
+				if (obj)
+					this->setGeomObject(obj);
+
+			}
+			else
+			{
+				// do nothing, already is the shape
+			}
+		}
+		else if (attribute->getName() == "collisionShapeScale")
+		{
+			SrVec scale = getVec3Attribute("collisionShapeScale");
+			SbmGeomObject* object = getGeomObject();
+			object->setGeomSize(scale);
+		}
+		else if (attribute->getName() == "enablePhysics")
+		{
+			SmartBody::BoolAttribute* physicsAttr = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			if (getPhysicsObject())
+				getPhysicsObject()->enablePhysicsSim(physicsAttr->getValue());
+		}
+		else if (attribute->getName() == "createPhysics")
+		{
+			SmartBody::SBPhysicsManager* manager = SmartBody::SBScene::getScene()->getPhysicsManager();
+			manager->createPhysicsPawn(this->getName(), this->getStringAttribute("collisionShape"), this->getVec3Attribute("collisionShapeScale"));
 			SmartBody::BoolAttribute* physicsAttr = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
 			//setPhysicsSim(physicsAttr->getValue());
 		}

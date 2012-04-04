@@ -6,7 +6,7 @@
 #include "sbm/me_utilities.hpp"
 #include "sbm/SBBehavior.h"
 #include <sbm/SBSteerAgent.h>
-
+#include <sbm/SBPhysicsManager.h>
 
 namespace SmartBody {
 
@@ -321,6 +321,22 @@ void SBCharacter::setFaceDefinition(SBFaceDefinition* face)
 void SBCharacter::setSteerAgent(SBSteerAgent* sbAgent)
 {
 	sbAgent->setCurrentSBCharacter(this);
+}
+
+void SBCharacter::notify(SBSubject* subject)
+{
+	SBAttribute* attribute = dynamic_cast<SBAttribute*>(subject);
+	if (attribute)
+	{
+		if (attribute->getName() == "createPhysics")
+		{
+			SmartBody::SBPhysicsManager* manager = SmartBody::SBScene::getScene()->getPhysicsManager();
+			manager->createPhysicsCharacter(this->getName());
+			return;
+		}
+	}
+
+	SbmCharacter::notify(subject);
 }
 
 };

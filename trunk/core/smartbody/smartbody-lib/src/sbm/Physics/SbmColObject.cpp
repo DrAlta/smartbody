@@ -99,14 +99,14 @@ SrVec SbmGeomObject::getCenter()
 	return getCombineTransform().tran;
 }
 
-void SbmGeomObject::attachToPhyObj( SbmPhysicsObjInterface* phyObj )
+void SbmGeomObject::attachToObj(SbmTransformObjInterface* phyObj)
 {
-	attachedPhyObj = phyObj;	
+	attachedObj = phyObj;	
 }
 
 SbmTransform& SbmGeomObject::getCombineTransform()
 {
-	combineTransform = SbmTransform::mult(localTransform,attachedPhyObj->getGlobalTransform());
+	combineTransform = SbmTransform::mult(localTransform,attachedObj->getGlobalTransform());
 	return combineTransform;	
 }
 
@@ -183,6 +183,16 @@ bool SbmGeomSphere::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHan
 	outHandPos = getCenter() + SrVec(0,radius+offsetDist,0)*naturalRot;
 	outHandRot = naturalRot;
 	return true;
+}
+
+float SbmGeomSphere::getRadius()
+{
+	return radius;
+}
+
+void SbmGeomSphere::setRadius(float val)
+{
+	radius = val;
 }
 
 /************************************************************************/
@@ -385,6 +395,13 @@ SbmGeomCapsule::SbmGeomCapsule( const SrVec& p1, const SrVec& p2, float r )
 SbmGeomCapsule::~SbmGeomCapsule()
 {
 
+}
+
+void SbmGeomCapsule::setGeomSize(SrVec& size) 
+{ 
+	extent = size[0]; radius = size[1]; 
+	endPts[0] = SrVec(0,0,-extent);
+	endPts[1]   = SrVec(0,0,extent);
 }
 
 bool SbmGeomCapsule::isInside( const SrVec& gPos, float offset)
