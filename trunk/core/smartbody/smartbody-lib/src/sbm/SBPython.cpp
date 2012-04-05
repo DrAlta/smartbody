@@ -888,6 +888,8 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getTimeStrokeEnd", &SBMotion::retime, "Returns the stroke end time of the motion.")
 		.def("getTimeRelax", &SBMotion::retime, "Returns the relax time of the motion.")
 		.def("getTimeStop", &SBMotion::retime, "Returns the stop time of the motion.")
+		.def("addEvent", &SBMotion::addEvent, "Adds an event associated with this motion that will be triggered at the given time. The last paramter determines if the event will be triggered only once, or every time the motion is looped.")
+
 		;
 
 
@@ -1112,6 +1114,7 @@ boost::python::class_<SBReach>("SBReach")
 		;
 
 	boost::python::class_<Event>("Event")
+		.def(boost::python::init<>())
 		.def("getType", &Event::getType, "Returns the event type.")
 		.def("setType", &Event::setType, "Sets the event type.")
 		.def("getParameters", &Event::getParameters, "Returns the event parameters.")
@@ -1119,10 +1122,12 @@ boost::python::class_<SBReach>("SBReach")
 		;
 
 	boost::python::class_<EventManager>("EventManager")
+		.def("handleEvent", &EventManager::handleEvent, "Processes an event by the appropriate event handler.")
 		.def("addEventHandler", &EventManager::addEventHandler, "Returns the event type.")
 		.def("removeEventHandler", &EventManager::removeEventHandler, "Returns the event type.")
 		.def("getNumHandlers", &EventManager::getNumEventHandlers, "Gets the number of event handlers.")
 		.def("getEventHandler", &EventManager::getEventHandler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the number of event handlers.")
+		.def("createEvent", &EventManager::createEvent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates an event of a given type with given parameters.")
 		;
 
 	boost::python::class_<SBParseNode>("SBParseNode")
