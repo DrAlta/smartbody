@@ -59,6 +59,8 @@ class MeCtSaccade : public SmartBody::SBController
 		SrQuat			_lastFixedRotation;
 		SrQuat			_fixedRotation;
 		SrQuat			_rotation;
+		SrQuat          _leftRightRot; // transformation from left eye to right eye
+		SrVec           _localAxis[3];
 
 		//--- saccade statistics
 		// direction stat

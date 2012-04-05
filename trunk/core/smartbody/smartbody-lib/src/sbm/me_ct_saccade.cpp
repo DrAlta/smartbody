@@ -34,7 +34,7 @@ std::string eyeballR = "eyeball_right";
 MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : SmartBody::SBController()
 {
 	_skeleton = skel;
-	if (skel)
+	if (skel) 
 		skel->ref();
 
 	_useModel = true;
@@ -108,6 +108,7 @@ MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : SmartBody::SBController()
 	//addDefaultAttributeDouble("saccade.talkingLimit", 5, &_talkingLimit);	
 	//addDefaultAttributeFloat("saccade.talkingLimit", 5.f, &_talkingLimit);
 	//addDefaultAttributeFloat("saccade.talkingPercentMutual", 41.0f, &_talkingPercentMutual);
+	
 }
 
 MeCtSaccade::~MeCtSaccade()
@@ -120,13 +121,16 @@ void MeCtSaccade::spawnOnce(float dir, float amplitude, float dur)
 {
 //	if ((float)mcuCBHandle::singleton().time < (_time + _dur))
 //		return;
+
+	
 	_direction = dir;
 	_magnitude = amplitude;
 	_dur = dur;
 
-	SrVec vec1 = SrVec(0, 0, 1);
+	//SrVec vec1 = SrVec(0, 0, 1);
+	SrVec vec1 = _localAxis[2];
 	float direction = (_direction - 90.0f) * (float)M_PI / 180.0f;		// 90.0f here is for adjustment
-	SrVec vec2 = SrVec(sin(direction), cos(direction), 0);
+	SrVec vec2 = _localAxis[0]*sin(direction) + _localAxis[1]*cos(direction);//SrVec(sin(direction), cos(direction), 0);
 	_axis = cross(vec1, vec2);
 	_lastFixedRotation = _rotation;
 	_fixedRotation = SrQuat(_axis, _magnitude * (float)M_PI / 180.0f);
@@ -142,9 +146,11 @@ void MeCtSaccade::spawning(double t)
 		_direction = directionRandom();			// degree
 		_magnitude = magnitudeRandom();			// degree
 
-		SrVec vec1 = SrVec(0, 0, 1);
+		//SrVec vec1 = SrVec(0, 0, 1);
+		SrVec vec1 = _localAxis[2];
 		float direction = (_direction - 90.0f) * (float)M_PI / 180.0f;		// 90.0f here is for adjustment
-		SrVec vec2 = SrVec(sin(direction), cos(direction), 0);
+		//SrVec vec2 = SrVec(sin(direction), cos(direction), 0);
+		SrVec vec2 = _localAxis[0]*sin(direction) + _localAxis[1]*cos(direction);
 		_axis = cross(vec1, vec2);
 		_lastFixedRotation = _fixedRotation;
 		_fixedRotation = SrQuat(_axis, _magnitude * (float)M_PI / 180.0f);
@@ -203,7 +209,11 @@ void MeCtSaccade::processing(double t, MeFrameData& frame)
 	SrQuat actualRot = temp * _rotation;
 //	SrQuat outQL = QL * actualRot;
 	SrQuat outQL = QL * _rotation;
-	SrQuat outQR = outQL;
+	
+	SrVec rotL = outQL.axisAngle();
+	rotL = rotL*_leftRightRot;
+	
+	SrQuat outQR = SrQuat(rotL);
 
 	//---
 	frame.buffer()[_idL + 0] = outQL.w;
@@ -366,6 +376,14 @@ void MeCtSaccade::initSaccade(MeFrameData& frame)
 
 	if (!_initialized)
 	{
+
+		SkJoint* lEyeJoint = _skeleton->search_joint(eyeballL.c_str());
+		SkJoint* rEyeJoint = _skeleton->search_joint(eyeballR.c_str());
+		_leftRightRot = SrQuat(lEyeJoint->gmatZero().inverse()*rEyeJoint->gmatZero());
+		for (int i=0;i<3;i++)
+			_localAxis[i] = lEyeJoint->localGlobalAxis(i);
+
+
 		int idL = _context->channels().search(eyeballL, SkChannel::Quat);
 		_idL = frame.toBufferIndex(idL);
 		int idR = _context->channels().search(eyeballR, SkChannel::Quat);
