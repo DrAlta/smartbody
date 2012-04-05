@@ -285,8 +285,19 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 #endif
 		try {
  			parseBML( bmlElem, request, mcu );
-			bml_requests.insert( make_pair( bpMsg.requestId, request ) );
-			
+			// make sure that the request id isn't in the pending interrupt list
+			std::map<std::string, double>::iterator isPendingInterruptIter = pendingInterrupts.find(bpMsg.requestId);
+			if (isPendingInterruptIter != pendingInterrupts.end())
+			{
+				LOG("BML with id %s will not be processed because a recent interrupt request was made.", bpMsg.requestId.c_str());
+				bml_requests.erase( bpMsg.requestId ); 
+				// now remove that pending interrupt request
+				pendingInterrupts.erase(isPendingInterruptIter);
+			}
+			else
+			{
+				bml_requests.insert( make_pair( bpMsg.requestId, request ) );
+			}
 		
 			if( !( request->speech_request ) ) {
 				// realize immediately
@@ -1000,6 +1011,27 @@ int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performan
 		request->unschedule( this, mcu, duration );
 		bml_requests.erase( result );
 	} else {
+		// add this interrupt requests to a map of pending interrupt requests
+		pendingInterrupts[request_id] = mcu->time;
+		// clean up any old requests that have expired
+		std::vector<std::string> interruptsToDelete;
+		for (std::map<std::string, double>::iterator iter = pendingInterrupts.begin();
+			 iter != pendingInterrupts.end();
+			 iter++)
+		{
+			double lastTime = (*iter).second;
+			if (lastTime - mcu->time > 60.0) // has a minute elapsed?
+			{
+				interruptsToDelete.push_back(request_id);
+			}
+		}
+		for (size_t d = 0; d < interruptsToDelete.size(); d++)
+		{
+			std::map<std::string, double>::iterator iterToDelete = pendingInterrupts.find(request_id);
+			if (iterToDelete !=  pendingInterrupts.end())
+				 pendingInterrupts.erase(iterToDelete);
+		}
+
 		// Probably already cleaned up
 		LOG("WARNING: BML::Processor::interrupt(..): No such BmlRequest for actor \"%s\" and performance_id %s.", actor->getName().c_str(), performance_id.c_str());
 		// ignore without error

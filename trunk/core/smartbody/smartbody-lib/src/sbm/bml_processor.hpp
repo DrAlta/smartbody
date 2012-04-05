@@ -87,6 +87,7 @@ namespace BML {
 		HandlerBase*       xmlErrorHandler;
 		MapOfSpeechRequest speeches; // indexed by buildSpeechKey(..) string
 		MapOfBmlRequest    bml_requests;    // indexed by buildRequestId(..) string
+		std::map<std::string, double> pendingInterrupts;
 
 		bool auto_print_controllers;
 		bool auto_print_sequence;
