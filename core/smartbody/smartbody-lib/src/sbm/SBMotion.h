@@ -50,6 +50,8 @@ class SBMotion : public SkMotion
 		double getTimeRelax();
 		double getTimeStop();
 
+		void addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly);
+
 	protected:
 		std::string _motionFile;
 		std::string _emptyString;

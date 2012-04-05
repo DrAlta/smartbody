@@ -457,9 +457,14 @@ double SBMotion::getTimeStop()
 	return time_stop();
 }
 
-
-
-
-
+void SBMotion::addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly)
+{
+	MotionEvent* motionEvent = new MotionEvent();
+	motionEvent->setIsOnceOnly(onceOnly);
+	motionEvent->setTime(time);
+	motionEvent->setType(type);
+	motionEvent->setParameters(parameters);
+	addMotionEvent(motionEvent);
+}
 
 };

@@ -68,6 +68,15 @@ void EventManager::handleEvent(Event* e, double time)
 	handler->executeAction(e);	
 }
 
+Event* EventManager::createEvent(const std::string& type, const std::string parameters)
+{
+	Event* event = new Event();
+	event->setType(type);
+	event->setParameters(parameters);
+
+	return event;
+}
+
 void EventManager::addEventHandler(const std::string& type, EventHandler* handler)
 {
 	removeEventHandler(type);

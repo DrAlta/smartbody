@@ -54,6 +54,7 @@ class EventManager
 		~EventManager();
 
 		void handleEvent(Event* e, double time);
+		Event* createEvent(const std::string& type, const std::string parameters);
 		void addEventHandler(const std::string& type, EventHandler* handle);
 		void removeEventHandler(const std::string& type);
 		int getNumEventHandlers();
