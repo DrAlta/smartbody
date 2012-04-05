@@ -724,7 +724,7 @@
       <skin source="#ShirtsShape2Deformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="ShirtsShape2Deformed-skin-joints" name="ShirtsShape2Deformed-skin-joints">
-          <Name_array id="ShirtsShape2Deformed-skin-joints-array" count="43">Skl_base Skl_l_hip Skl_r_hip Skl_spine1 Skl_spine2 Skl_spine3 Skl_spine4 Skl_spine5 Skl_skullbase Skl_ear_left Skl_ear_right Skl_Jaw Skl_Lip_bttm_mid Skl_Lip_bttm_left Skl_Lip_bttm_right Skl_Tongue_back Skl_Tongue_mid Skl_cheek_low_left Skl_Lip_out_left Skl_cheek_low_right Skl_Lip_out_right Skl_l_sternoclavicular Skl_l_shoulder Skl_l_elbow Skl_l_forearm Skl_l_wrist Skl_r_sternoclavicular Skl_r_shoulder Skl_r_elbow Skl_r_forearm Skl_r_wrist Skl_l_index1 Skl_l_ring1 Skl_l_pinky1 Skl_l_thumb1 Skl_l_thumb2 Skl_l_thumb3 Skl_r_index1 Skl_r_ring1 Skl_r_pinky1 Skl_r_thumb1 Skl_r_thumb2 Skl_r_thumb3</Name_array>
+          <Name_array id="ShirtsShape2Deformed-skin-joints-array" count="43">base l_hip r_hip spine1 spine2 spine3 spine4 spine5 skullbase ear_left ear_right Jaw Lip_bttm_mid Lip_bttm_left Lip_bttm_right Tongue_back Tongue_mid cheek_low_left Lip_out_left cheek_low_right Lip_out_right l_sternoclavicular l_shoulder l_elbow l_forearm l_wrist r_sternoclavicular r_shoulder r_elbow r_forearm r_wrist l_index1 l_ring1 l_pinky1 l_thumb1 l_thumb2 l_thumb3 r_index1 r_ring1 r_pinky1 r_thumb1 r_thumb2 r_thumb3</Name_array>
           <technique_common>
             <accessor source="#ShirtsShape2Deformed-skin-joints-array" count="43" stride="1">
               <param name="JOINT" type="name"/>
@@ -768,7 +768,7 @@
       <skin source="#pantsShapeDeformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="pantsShapeDeformed-skin-joints" name="pantsShapeDeformed-skin-joints">
-          <Name_array id="pantsShapeDeformed-skin-joints-array" count="14">Skl_base Skl_l_hip Skl_l_knee Skl_l_ankle Skl_l_forefoot Skl_l_toe Skl_r_hip Skl_r_knee Skl_r_ankle Skl_r_forefoot Skl_r_toe Skl_spine1 Skl_spine2 Skl_spine3</Name_array>
+          <Name_array id="pantsShapeDeformed-skin-joints-array" count="14">base l_hip l_knee l_ankle l_forefoot l_toe r_hip r_knee r_ankle r_forefoot r_toe spine1 spine2 spine3</Name_array>
           <technique_common>
             <accessor source="#pantsShapeDeformed-skin-joints-array" count="14" stride="1">
               <param name="JOINT" type="name"/>
@@ -812,7 +812,7 @@
       <skin source="#shoesShapeDeformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="shoesShapeDeformed-skin-joints" name="shoesShapeDeformed-skin-joints">
-          <Name_array id="shoesShapeDeformed-skin-joints-array" count="8">Skl_l_knee Skl_l_ankle Skl_l_forefoot Skl_l_toe Skl_r_knee Skl_r_ankle Skl_r_forefoot Skl_r_toe</Name_array>
+          <Name_array id="shoesShapeDeformed-skin-joints-array" count="8">l_knee l_ankle l_forefoot l_toe r_knee r_ankle r_forefoot r_toe</Name_array>
           <technique_common>
             <accessor source="#shoesShapeDeformed-skin-joints-array" count="8" stride="1">
               <param name="JOINT" type="name"/>
@@ -856,7 +856,7 @@
       <skin source="#ringShapeDeformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="ringShapeDeformed-skin-joints" name="ringShapeDeformed-skin-joints">
-          <Name_array id="ringShapeDeformed-skin-joints-array" count="7">Skl_l_wrist Skl_l_middle1 Skl_l_middle2 Skl_l_ring1 Skl_l_ring2 Skl_l_pinky1 Skl_l_pinky2</Name_array>
+          <Name_array id="ringShapeDeformed-skin-joints-array" count="7">l_wrist l_middle1 l_middle2 l_ring1 l_ring2 l_pinky1 l_pinky2</Name_array>
           <technique_common>
             <accessor source="#ringShapeDeformed-skin-joints-array" count="7" stride="1">
               <param name="JOINT" type="name"/>
@@ -900,7 +900,7 @@
       <skin source="#L_handShapeDeformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="L_handShapeDeformed-skin-joints" name="L_handShapeDeformed-skin-joints">
-          <Name_array id="L_handShapeDeformed-skin-joints-array" count="18">Skl_l_elbow Skl_l_forearm Skl_l_wrist Skl_l_index1 Skl_l_index2 Skl_l_index3 Skl_l_middle1 Skl_l_middle2 Skl_l_middle3 Skl_l_ring1 Skl_l_ring2 Skl_l_ring3 Skl_l_pinky1 Skl_l_pinky2 Skl_l_pinky3 Skl_l_thumb1 Skl_l_thumb2 Skl_l_thumb3</Name_array>
+          <Name_array id="L_handShapeDeformed-skin-joints-array" count="18">l_elbow l_forearm l_wrist l_index1 l_index2 l_index3 l_middle1 l_middle2 l_middle3 l_ring1 l_ring2 l_ring3 l_pinky1 l_pinky2 l_pinky3 l_thumb1 l_thumb2 l_thumb3</Name_array>
           <technique_common>
             <accessor source="#L_handShapeDeformed-skin-joints-array" count="18" stride="1">
               <param name="JOINT" type="name"/>
@@ -944,7 +944,7 @@
       <skin source="#R_handShapeDeformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="R_handShapeDeformed-skin-joints" name="R_handShapeDeformed-skin-joints">
-          <Name_array id="R_handShapeDeformed-skin-joints-array" count="18">Skl_r_elbow Skl_r_forearm Skl_r_wrist Skl_r_index1 Skl_r_index2 Skl_r_index3 Skl_r_middle1 Skl_r_middle2 Skl_r_middle3 Skl_r_ring1 Skl_r_ring2 Skl_r_ring3 Skl_r_pinky1 Skl_r_pinky2 Skl_r_pinky3 Skl_r_thumb1 Skl_r_thumb2 Skl_r_thumb3</Name_array>
+          <Name_array id="R_handShapeDeformed-skin-joints-array" count="18">r_elbow r_forearm r_wrist r_index1 r_index2 r_index3 r_middle1 r_middle2 r_middle3 r_ring1 r_ring2 r_ring3 r_pinky1 r_pinky2 r_pinky3 r_thumb1 r_thumb2 r_thumb3</Name_array>
           <technique_common>
             <accessor source="#R_handShapeDeformed-skin-joints-array" count="18" stride="1">
               <param name="JOINT" type="name"/>
@@ -988,7 +988,7 @@
       <skin source="#LEyeLashShapeDeformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="LEyeLashShapeDeformed-skin-joints" name="LEyeLashShapeDeformed-skin-joints">
-          <Name_array id="LEyeLashShapeDeformed-skin-joints-array" count="7">Skl_brow02_left Skl_brow03_left Skl_brow04_left Skl_eyeball_left Skl_upper_nose_left Skl_lower_eyelid_left Skl_upper_eyelid_left</Name_array>
+          <Name_array id="LEyeLashShapeDeformed-skin-joints-array" count="7">brow02_left brow03_left brow04_left eyeball_left upper_nose_left lower_eyelid_left upper_eyelid_left</Name_array>
           <technique_common>
             <accessor source="#LEyeLashShapeDeformed-skin-joints-array" count="7" stride="1">
               <param name="JOINT" type="name"/>
@@ -1032,7 +1032,7 @@
       <skin source="#REyelashShapeDeformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="REyelashShapeDeformed-skin-joints" name="REyelashShapeDeformed-skin-joints">
-          <Name_array id="REyelashShapeDeformed-skin-joints-array" count="7">Skl_brow02_right Skl_brow03_right Skl_brow04_right Skl_eyeball_right Skl_upper_nose_right Skl_lower_eyelid_right Skl_upper_eyelid_right</Name_array>
+          <Name_array id="REyelashShapeDeformed-skin-joints-array" count="7">brow02_right brow03_right brow04_right eyeball_right upper_nose_right lower_eyelid_right upper_eyelid_right</Name_array>
           <technique_common>
             <accessor source="#REyelashShapeDeformed-skin-joints-array" count="7" stride="1">
               <param name="JOINT" type="name"/>
@@ -1076,7 +1076,7 @@
       <skin source="#UpperTeethShapeDeformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="UpperTeethShapeDeformed-skin-joints" name="UpperTeethShapeDeformed-skin-joints">
-          <Name_array id="UpperTeethShapeDeformed-skin-joints-array" count="21">Skl_skullbase Skl_upper_nose_left Skl_lower_nose_left Skl_upper_nose_right Skl_lower_nose_right Skl_Jaw Skl_Lip_bttm_mid Skl_Lip_bttm_left Skl_Lip_bttm_right Skl_Tongue_back Skl_Tongue_mid Skl_Tongue_front Skl_Lip_top_left Skl_cheek_low_left Skl_Cheek_up_left Skl_Lip_out_left Skl_Lip_top_mid Skl_Cheek_up_right Skl_cheek_low_right Skl_Lip_top_right Skl_Lip_out_right</Name_array>
+          <Name_array id="UpperTeethShapeDeformed-skin-joints-array" count="21">skullbase upper_nose_left lower_nose_left upper_nose_right lower_nose_right Jaw Lip_bttm_mid Lip_bttm_left Lip_bttm_right Tongue_back Tongue_mid Tongue_front Lip_top_left cheek_low_left Cheek_up_left Lip_out_left Lip_top_mid Cheek_up_right cheek_low_right Lip_top_right Lip_out_right</Name_array>
           <technique_common>
             <accessor source="#UpperTeethShapeDeformed-skin-joints-array" count="21" stride="1">
               <param name="JOINT" type="name"/>
@@ -1120,7 +1120,7 @@
       <skin source="#LowerTeethShapeDeformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="LowerTeethShapeDeformed-skin-joints" name="LowerTeethShapeDeformed-skin-joints">
-          <Name_array id="LowerTeethShapeDeformed-skin-joints-array" count="14">Skl_Jaw Skl_Lip_bttm_mid Skl_Lip_bttm_left Skl_Lip_bttm_right Skl_Tongue_back Skl_Tongue_mid Skl_Tongue_front Skl_Lip_top_left Skl_cheek_low_left Skl_Lip_out_left Skl_Lip_top_mid Skl_cheek_low_right Skl_Lip_top_right Skl_Lip_out_right</Name_array>
+          <Name_array id="LowerTeethShapeDeformed-skin-joints-array" count="14">Jaw Lip_bttm_mid Lip_bttm_left Lip_bttm_right Tongue_back Tongue_mid Tongue_front Lip_top_left cheek_low_left Lip_out_left Lip_top_mid cheek_low_right Lip_top_right Lip_out_right</Name_array>
           <technique_common>
             <accessor source="#LowerTeethShapeDeformed-skin-joints-array" count="14" stride="1">
               <param name="JOINT" type="name"/>
@@ -1164,7 +1164,7 @@
       <skin source="#TongueShapeDeformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="TongueShapeDeformed-skin-joints" name="TongueShapeDeformed-skin-joints">
-          <Name_array id="TongueShapeDeformed-skin-joints-array" count="14">Skl_skullbase Skl_Jaw Skl_Lip_bttm_mid Skl_Lip_bttm_left Skl_Lip_bttm_right Skl_Tongue_back Skl_Tongue_mid Skl_Tongue_front Skl_Lip_top_left Skl_cheek_low_left Skl_Lip_out_left Skl_cheek_low_right Skl_Lip_top_right Skl_Lip_out_right</Name_array>
+          <Name_array id="TongueShapeDeformed-skin-joints-array" count="14">skullbase Jaw Lip_bttm_mid Lip_bttm_left Lip_bttm_right Tongue_back Tongue_mid Tongue_front Lip_top_left cheek_low_left Lip_out_left cheek_low_right Lip_top_right Lip_out_right</Name_array>
           <technique_common>
             <accessor source="#TongueShapeDeformed-skin-joints-array" count="14" stride="1">
               <param name="JOINT" type="name"/>
@@ -1208,7 +1208,7 @@
       <skin source="#L_eyeballShapeDeformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="L_eyeballShapeDeformed-skin-joints" name="L_eyeballShapeDeformed-skin-joints">
-          <Name_array id="L_eyeballShapeDeformed-skin-joints-array" count="8">Skl_brow02_left Skl_brow03_left Skl_brow04_left Skl_eyeball_left Skl_upper_nose_left Skl_lower_eyelid_left Skl_upper_eyelid_left Skl_Cheek_up_left</Name_array>
+          <Name_array id="L_eyeballShapeDeformed-skin-joints-array" count="8">brow02_left brow03_left brow04_left eyeball_left upper_nose_left lower_eyelid_left upper_eyelid_left Cheek_up_left</Name_array>
           <technique_common>
             <accessor source="#L_eyeballShapeDeformed-skin-joints-array" count="8" stride="1">
               <param name="JOINT" type="name"/>
@@ -1252,7 +1252,7 @@
       <skin source="#R_eyeballShapeDeformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="R_eyeballShapeDeformed-skin-joints" name="R_eyeballShapeDeformed-skin-joints">
-          <Name_array id="R_eyeballShapeDeformed-skin-joints-array" count="8">Skl_brow02_right Skl_brow03_right Skl_brow04_right Skl_eyeball_right Skl_upper_nose_right Skl_lower_eyelid_right Skl_upper_eyelid_right Skl_Cheek_up_right</Name_array>
+          <Name_array id="R_eyeballShapeDeformed-skin-joints-array" count="8">brow02_right brow03_right brow04_right eyeball_right upper_nose_right lower_eyelid_right upper_eyelid_right Cheek_up_right</Name_array>
           <technique_common>
             <accessor source="#R_eyeballShapeDeformed-skin-joints-array" count="8" stride="1">
               <param name="JOINT" type="name"/>
@@ -1296,7 +1296,7 @@
       <skin source="#HeadShape1Deformed">
         <bind_shape_matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</bind_shape_matrix>
         <source id="HeadShape1Deformed-skin-joints" name="HeadShape1Deformed-skin-joints">
-          <Name_array id="HeadShape1Deformed-skin-joints-array" count="44">Skl_spine3 Skl_spine4 Skl_spine5 Skl_skullbase Skl_brow01_left Skl_brow02_left Skl_brow03_left Skl_brow04_left Skl_ear_left Skl_eyeball_left Skl_upper_nose_left Skl_lower_nose_left Skl_lower_eyelid_left Skl_upper_eyelid_left Skl_brow01_right Skl_brow02_right Skl_brow03_right Skl_brow04_right Skl_ear_right Skl_eyeball_right Skl_upper_nose_right Skl_lower_nose_right Skl_lower_eyelid_right Skl_upper_eyelid_right Skl_Jaw Skl_Lip_bttm_mid Skl_Lip_bttm_left Skl_Lip_bttm_right Skl_Tongue_back Skl_Tongue_mid Skl_Tongue_front Skl_Lip_top_left Skl_cheek_low_left Skl_Cheek_up_left Skl_Lip_out_left Skl_Lip_top_mid Skl_Cheek_up_right Skl_cheek_low_right Skl_Lip_top_right Skl_Lip_out_right Skl_l_sternoclavicular Skl_l_shoulder Skl_r_sternoclavicular Skl_r_shoulder</Name_array>
+          <Name_array id="HeadShape1Deformed-skin-joints-array" count="44">spine3 spine4 spine5 skullbase brow01_left brow02_left brow03_left brow04_left ear_left eyeball_left upper_nose_left lower_nose_left lower_eyelid_left upper_eyelid_left brow01_right brow02_right brow03_right brow04_right ear_right eyeball_right upper_nose_right lower_nose_right lower_eyelid_right upper_eyelid_right Jaw Lip_bttm_mid Lip_bttm_left Lip_bttm_right Tongue_back Tongue_mid Tongue_front Lip_top_left cheek_low_left Cheek_up_left Lip_out_left Lip_top_mid Cheek_up_right cheek_low_right Lip_top_right Lip_out_right l_sternoclavicular l_shoulder r_sternoclavicular r_shoulder</Name_array>
           <technique_common>
             <accessor source="#HeadShape1Deformed-skin-joints-array" count="44" stride="1">
               <param name="JOINT" type="name"/>
@@ -1349,78 +1349,78 @@
         <translate sid="scalePivot">0 89.14041 3.798531</translate>
         <scale sid="scale">1 1 1</scale>
         <translate sid="scalePivotInverse">0 -89.14041 -3.798531</translate>
-        <node id="Skl_CharacterRoot" name="CharacterRoot" type="NODE">
+        <node id="CharacterRoot" name="CharacterRoot" type="NODE">
           <translate sid="translate">0 0 0</translate>
           <translate sid="rotatePivot">0 89.50292 3.798531</translate>
           <translate sid="rotatePivotInverse">0 -89.50292 -3.798531</translate>
           <translate sid="scalePivot">0 89.50292 3.798531</translate>
           <scale sid="scale">1 1 1</scale>
           <translate sid="scalePivotInverse">0 -89.50292 -3.798531</translate>
-          <node id="Skl_AccumulationRoot" name="AccumulationRoot" type="NODE">
+          <node id="AccumulationRoot" name="AccumulationRoot" type="NODE">
             <translate sid="translate">0 0 0</translate>
             <translate sid="rotatePivot">0 89.50292 3.798531</translate>
             <translate sid="rotatePivotInverse">0 -89.50292 -3.798531</translate>
             <translate sid="scalePivot">0 89.50292 3.798531</translate>
             <scale sid="scale">1 1 1</scale>
             <translate sid="scalePivotInverse">0 -89.50292 -3.798531</translate>
-            <node id="Skl_initial_base" name="initial_base" type="NODE">
+            <node id="initial_base" name="initial_base" type="NODE">
               <translate sid="translate">0 0 0</translate>
               <scale sid="scale">1 1 1</scale>
-              <node id="Skl_base" name="base" sid="Skl_base" type="JOINT">
+              <node id="base" name="base" sid="base" type="JOINT">
                 <translate sid="translate">0 95.25681 0</translate>
                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                 <rotate sid="jointOrientY">0 1 0 0</rotate>
                 <rotate sid="jointOrientX">1 0 0 0</rotate>
                 <scale sid="scale">1 1 1</scale>
-                <node id="Skl_spine1" name="spine1" sid="Skl_spine1" type="JOINT">
+                <node id="spine1" name="spine1" sid="spine1" type="JOINT">
                   <translate sid="translate">0 4.687415 -5.259306</translate>
                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                   <rotate sid="jointOrientY">0 1 0 0</rotate>
                   <rotate sid="jointOrientX">1 0 0 0</rotate>
                   <scale sid="scale">1 1 1</scale>
-                  <node id="Skl_spine2" name="spine2" sid="Skl_spine2" type="JOINT">
+                  <node id="spine2" name="spine2" sid="spine2" type="JOINT">
                     <translate sid="translate">0 9.878189 2.269838</translate>
                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                     <scale sid="scale">1 1 1</scale>
-                    <node id="Skl_spine3" name="spine3" sid="Skl_spine3" type="JOINT">
+                    <node id="spine3" name="spine3" sid="spine3" type="JOINT">
                       <translate sid="translate">0 11.89698 -3.706664</translate>
                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                       <rotate sid="jointOrientY">0 1 0 0</rotate>
                       <rotate sid="jointOrientX">1 0 0 0</rotate>
                       <scale sid="scale">1 1 1</scale>
-                      <node id="Skl_spine4" name="spine4" sid="Skl_spine4" type="JOINT">
+                      <node id="spine4" name="spine4" sid="spine4" type="JOINT">
                         <translate sid="translate">0 26.27408 1.840568</translate>
                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                         <scale sid="scale">1 1 1</scale>
-                        <node id="Skl_spine5" name="spine5" sid="Skl_spine5" type="JOINT">
+                        <node id="spine5" name="spine5" sid="spine5" type="JOINT">
                           <translate sid="translate">0 6.416729 1.020154</translate>
                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                           <rotate sid="jointOrientY">0 1 0 0</rotate>
                           <rotate sid="jointOrientX">1 0 0 0</rotate>
                           <scale sid="scale">1 1 1</scale>
-                          <node id="Skl_skullbase" name="skullbase" sid="Skl_skullbase" type="JOINT">
+                          <node id="skullbase" name="skullbase" sid="skullbase" type="JOINT">
                             <translate sid="translate">0 4.700324 -0.1970631</translate>
                             <rotate sid="jointOrientZ">0 0 1 0</rotate>
                             <rotate sid="jointOrientY">0 1 0 0</rotate>
                             <rotate sid="jointOrientX">1 0 0 0</rotate>
                             <scale sid="scale">1 1 1</scale>
-                            <node id="Skl_face_top_parent" name="face_top_parent" sid="Skl_face_top_parent" type="JOINT">
+                            <node id="face_top_parent" name="face_top_parent" sid="face_top_parent" type="JOINT">
                               <translate sid="translate">0 4.76728 2.090454</translate>
                               <rotate sid="jointOrientZ">0 0 1 0</rotate>
                               <rotate sid="jointOrientY">0 1 0 0</rotate>
                               <rotate sid="jointOrientX">1 0 0 0</rotate>
                               <scale sid="scale">1 1 1</scale>
-                              <node id="Skl_brow_parent_left" name="brow_parent_left" sid="Skl_brow_parent_left" type="JOINT">
+                              <node id="brow_parent_left" name="brow_parent_left" sid="brow_parent_left" type="JOINT">
                                 <translate sid="translate">2.781032 3.196102 9.095749</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
                                 <rotate sid="jointOrientX">1 0 0 0</rotate>
                                 <scale sid="scale">1 1 1</scale>
-                                <node id="Skl_brow01_left" name="brow01_left" sid="Skl_brow01_left" type="JOINT">
+                                <node id="brow01_left" name="brow01_left" sid="brow01_left" type="JOINT">
                                   <translate sid="translate">-1.780867 0.0240135 3.15223</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1432,7 +1432,7 @@
                                     </technique>
                                   </extra>
                                 </node>
-                                <node id="Skl_brow02_left" name="brow02_left" sid="Skl_brow02_left" type="JOINT">
+                                <node id="brow02_left" name="brow02_left" sid="brow02_left" type="JOINT">
                                   <translate sid="translate">-0.3536312 0.06559281 3.083363</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1444,7 +1444,7 @@
                                     </technique>
                                   </extra>
                                 </node>
-                                <node id="Skl_brow03_left" name="brow03_left" sid="Skl_brow03_left" type="JOINT">
+                                <node id="brow03_left" name="brow03_left" sid="brow03_left" type="JOINT">
                                   <translate sid="translate">1.143108 -0.2242738 2.475618</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1456,7 +1456,7 @@
                                     </technique>
                                   </extra>
                                 </node>
-                                <node id="Skl_brow04_left" name="brow04_left" sid="Skl_brow04_left" type="JOINT">
+                                <node id="brow04_left" name="brow04_left" sid="brow04_left" type="JOINT">
                                   <translate sid="translate">2.499992 -0.4538564 1.558251</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1474,13 +1474,13 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_brow_parent_right" name="brow_parent_right" sid="Skl_brow_parent_right" type="JOINT">
+                              <node id="brow_parent_right" name="brow_parent_right" sid="brow_parent_right" type="JOINT">
                                 <translate sid="translate">-2.781032 3.196102 9.095749</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
                                 <rotate sid="jointOrientX">1 0 0 0</rotate>
                                 <scale sid="scale">1 1 1</scale>
-                                <node id="Skl_brow01_right" name="brow01_right" sid="Skl_brow01_right" type="JOINT">
+                                <node id="brow01_right" name="brow01_right" sid="brow01_right" type="JOINT">
                                   <translate sid="translate">1.780867 0.0240135 3.15223</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1492,7 +1492,7 @@
                                     </technique>
                                   </extra>
                                 </node>
-                                <node id="Skl_brow02_right" name="brow02_right" sid="Skl_brow02_right" type="JOINT">
+                                <node id="brow02_right" name="brow02_right" sid="brow02_right" type="JOINT">
                                   <translate sid="translate">0.3536313 0.06559281 3.083363</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1504,7 +1504,7 @@
                                     </technique>
                                   </extra>
                                 </node>
-                                <node id="Skl_brow03_right" name="brow03_right" sid="Skl_brow03_right" type="JOINT">
+                                <node id="brow03_right" name="brow03_right" sid="brow03_right" type="JOINT">
                                   <translate sid="translate">-1.143108 -0.2242738 2.475618</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1516,7 +1516,7 @@
                                     </technique>
                                   </extra>
                                 </node>
-                                <node id="Skl_brow04_right" name="brow04_right" sid="Skl_brow04_right" type="JOINT">
+                                <node id="brow04_right" name="brow04_right" sid="brow04_right" type="JOINT">
                                   <translate sid="translate">-2.499992 -0.4538564 1.558251</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1534,7 +1534,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_ear_left" name="ear_left" sid="Skl_ear_left" type="JOINT">
+                              <node id="ear_left" name="ear_left" sid="ear_left" type="JOINT">
                                 <translate sid="translate">8.451627 -1.662823 -0.4437742</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1546,7 +1546,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_ear_right" name="ear_right" sid="Skl_ear_right" type="JOINT">
+                              <node id="ear_right" name="ear_right" sid="ear_right" type="JOINT">
                                 <translate sid="translate">-8.451627 -1.662823 -0.4437742</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1558,7 +1558,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_eyeball_left" name="eyeball_left" sid="Skl_eyeball_left" type="JOINT">
+                              <node id="eyeball_left" name="eyeball_left" sid="eyeball_left" type="JOINT">
                                 <translate sid="translate">3.443668 1.36155 8.473792</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1570,7 +1570,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_lower_eyelid_left" name="lower_eyelid_left" sid="Skl_lower_eyelid_left" type="JOINT">
+                              <node id="lower_eyelid_left" name="lower_eyelid_left" sid="lower_eyelid_left" type="JOINT">
                                 <translate sid="translate">3.443668 0.3615496 9.973792</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1582,7 +1582,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_upper_eyelid_left" name="upper_eyelid_left" sid="Skl_upper_eyelid_left" type="JOINT">
+                              <node id="upper_eyelid_left" name="upper_eyelid_left" sid="upper_eyelid_left" type="JOINT">
                                 <translate sid="translate">3.443668 2.181258 10.42697</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1594,7 +1594,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_eyeball_right" name="eyeball_right" sid="Skl_eyeball_right" type="JOINT">
+                              <node id="eyeball_right" name="eyeball_right" sid="eyeball_right" type="JOINT">
                                 <translate sid="translate">-3.443668 1.36155 8.473792</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1606,7 +1606,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_lower_eyelid_right" name="lower_eyelid_right" sid="Skl_lower_eyelid_right" type="JOINT">
+                              <node id="lower_eyelid_right" name="lower_eyelid_right" sid="lower_eyelid_right" type="JOINT">
                                 <translate sid="translate">-3.443668 0.3615496 9.973792</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1618,7 +1618,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_upper_eyelid_right" name="upper_eyelid_right" sid="Skl_upper_eyelid_right" type="JOINT">
+                              <node id="upper_eyelid_right" name="upper_eyelid_right" sid="upper_eyelid_right" type="JOINT">
                                 <translate sid="translate">-3.443668 2.181258 10.42697</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1630,13 +1630,13 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_upper_nose_left" name="upper_nose_left" sid="Skl_upper_nose_left" type="JOINT">
+                              <node id="upper_nose_left" name="upper_nose_left" sid="upper_nose_left" type="JOINT">
                                 <translate sid="translate">1.366 -0.7099079 11.48615</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
                                 <rotate sid="jointOrientX">1 0 0 0</rotate>
                                 <scale sid="scale">1 1 1</scale>
-                                <node id="Skl_lower_nose_left" name="lower_nose_left" sid="Skl_lower_nose_left" type="JOINT">
+                                <node id="lower_nose_left" name="lower_nose_left" sid="lower_nose_left" type="JOINT">
                                   <translate sid="translate">0.9722136 -2.310934 -0.1459275</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1654,13 +1654,13 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_upper_nose_right" name="upper_nose_right" sid="Skl_upper_nose_right" type="JOINT">
+                              <node id="upper_nose_right" name="upper_nose_right" sid="upper_nose_right" type="JOINT">
                                 <translate sid="translate">-1.366 -0.7099079 11.48615</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
                                 <rotate sid="jointOrientX">1 0 0 0</rotate>
                                 <scale sid="scale">1 1 1</scale>
-                                <node id="Skl_lower_nose_right" name="lower_nose_right" sid="Skl_lower_nose_right" type="JOINT">
+                                <node id="lower_nose_right" name="lower_nose_right" sid="lower_nose_right" type="JOINT">
                                   <translate sid="translate">-0.9722136 -2.310934 -0.1459275</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1684,7 +1684,7 @@
                                 </technique>
                               </extra>
                             </node>
-                            <node id="Skl_joint18" name="joint18" sid="Skl_joint18" type="JOINT">
+                            <node id="joint18" name="joint18" sid="joint18" type="JOINT">
                               <translate sid="translate">0 18.30428 4.034722</translate>
                               <rotate sid="jointOrientZ">0 0 1 0</rotate>
                               <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1696,25 +1696,25 @@
                                 </technique>
                               </extra>
                             </node>
-                            <node id="Skl_face_bottom_parent" name="face_bottom_parent" sid="Skl_face_bottom_parent" type="JOINT">
+                            <node id="face_bottom_parent" name="face_bottom_parent" sid="face_bottom_parent" type="JOINT">
                               <translate sid="translate">0 0.1451865 1.289574</translate>
                               <rotate sid="jointOrientZ">0 0 1 0</rotate>
                               <rotate sid="jointOrientY">0 1 0 0</rotate>
                               <rotate sid="jointOrientX">1 0 0 0</rotate>
                               <scale sid="scale">1 1 1</scale>
-                              <node id="Skl_Jaw" name="Jaw" sid="Skl_Jaw" type="JOINT">
+                              <node id="Jaw" name="Jaw" sid="Jaw" type="JOINT">
                                 <translate sid="translate">0 -0.6400056 2.582669</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
                                 <rotate sid="jointOrientX">1 0 0 0</rotate>
                                 <scale sid="scale">1 1 1</scale>
-                                <node id="Skl_Jaw_back" name="Jaw_back" sid="Skl_Jaw_back" type="JOINT">
+                                <node id="Jaw_back" name="Jaw_back" sid="Jaw_back" type="JOINT">
                                   <translate sid="translate">0 -2.155443 0.5235362</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
                                   <rotate sid="jointOrientX">1 0 0 0</rotate>
                                   <scale sid="scale">1 1 1</scale>
-                                  <node id="Skl_Jaw_front" name="Jaw_front" sid="Skl_Jaw_front" type="JOINT">
+                                  <node id="Jaw_front" name="Jaw_front" sid="Jaw_front" type="JOINT">
                                     <translate sid="translate">0 -3.087154 9.709191</translate>
                                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                     <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1732,19 +1732,19 @@
                                     </technique>
                                   </extra>
                                 </node>
-                                <node id="Skl_Tongue_back" name="Tongue_back" sid="Skl_Tongue_back" type="JOINT">
+                                <node id="Tongue_back" name="Tongue_back" sid="Tongue_back" type="JOINT">
                                   <translate sid="translate">0 -1.176238 4.433361</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
                                   <rotate sid="jointOrientX">1 0 0 0</rotate>
                                   <scale sid="scale">1 1 1</scale>
-                                  <node id="Skl_Tongue_mid" name="Tongue_mid" sid="Skl_Tongue_mid" type="JOINT">
+                                  <node id="Tongue_mid" name="Tongue_mid" sid="Tongue_mid" type="JOINT">
                                     <translate sid="translate">0 0.005837747 1.816395</translate>
                                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                                     <scale sid="scale">1 1 1</scale>
-                                    <node id="Skl_Tongue_front" name="Tongue_front" sid="Skl_Tongue_front" type="JOINT">
+                                    <node id="Tongue_front" name="Tongue_front" sid="Tongue_front" type="JOINT">
                                       <translate sid="translate">0 -0.05015918 2.452916</translate>
                                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                       <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1774,7 +1774,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_cheek_low_left" name="cheek_low_left" sid="Skl_cheek_low_left" type="JOINT">
+                              <node id="cheek_low_left" name="cheek_low_left" sid="cheek_low_left" type="JOINT">
                                 <translate sid="translate">6.621758 -0.7390173 7.54182</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1786,7 +1786,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_Cheek_up_left" name="Cheek_up_left" sid="Skl_Cheek_up_left" type="JOINT">
+                              <node id="Cheek_up_left" name="Cheek_up_left" sid="Cheek_up_left" type="JOINT">
                                 <translate sid="translate">4.773704 2.378586 11.26381</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1798,7 +1798,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_cheek_low_right" name="cheek_low_right" sid="Skl_cheek_low_right" type="JOINT">
+                              <node id="cheek_low_right" name="cheek_low_right" sid="cheek_low_right" type="JOINT">
                                 <translate sid="translate">-6.621758 -0.7390173 7.54182</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1810,7 +1810,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_Cheek_up_right" name="Cheek_up_right" sid="Skl_Cheek_up_right" type="JOINT">
+                              <node id="Cheek_up_right" name="Cheek_up_right" sid="Cheek_up_right" type="JOINT">
                                 <translate sid="translate">-4.773705 2.378586 11.26381</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1822,7 +1822,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_Lip_bttm_mid" name="Lip_bttm_mid" sid="Skl_Lip_bttm_mid" type="JOINT">
+                              <node id="Lip_bttm_mid" name="Lip_bttm_mid" sid="Lip_bttm_mid" type="JOINT">
                                 <translate sid="translate">0 -2.537048 13.1031</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1834,7 +1834,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_Lip_top_mid" name="Lip_top_mid" sid="Skl_Lip_top_mid" type="JOINT">
+                              <node id="Lip_top_mid" name="Lip_top_mid" sid="Lip_top_mid" type="JOINT">
                                 <translate sid="translate">0 -0.8346031 13.23584</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1846,7 +1846,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_Lip_top_left" name="Lip_top_left" sid="Skl_Lip_top_left" type="JOINT">
+                              <node id="Lip_top_left" name="Lip_top_left" sid="Lip_top_left" type="JOINT">
                                 <translate sid="translate">1.851791 -1.105928 12.34231</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1858,7 +1858,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_Lip_out_left" name="Lip_out_left" sid="Skl_Lip_out_left" type="JOINT">
+                              <node id="Lip_out_left" name="Lip_out_left" sid="Lip_out_left" type="JOINT">
                                 <translate sid="translate">3.163256 -1.497165 11.42645</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1870,7 +1870,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_Lip_bttm_left" name="Lip_bttm_left" sid="Skl_Lip_bttm_left" type="JOINT">
+                              <node id="Lip_bttm_left" name="Lip_bttm_left" sid="Lip_bttm_left" type="JOINT">
                                 <translate sid="translate">1.85135 -2.27046 12.47704</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1882,7 +1882,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_Lip_top_right" name="Lip_top_right" sid="Skl_Lip_top_right" type="JOINT">
+                              <node id="Lip_top_right" name="Lip_top_right" sid="Lip_top_right" type="JOINT">
                                 <translate sid="translate">-1.851791 -1.105928 12.34231</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1894,7 +1894,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_Lip_out_right" name="Lip_out_right" sid="Skl_Lip_out_right" type="JOINT">
+                              <node id="Lip_out_right" name="Lip_out_right" sid="Lip_out_right" type="JOINT">
                                 <translate sid="translate">-3.163256 -1.497165 11.42645</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1906,7 +1906,7 @@
                                   </technique>
                                 </extra>
                               </node>
-                              <node id="Skl_Lip_bttm_right" name="Lip_bttm_right" sid="Skl_Lip_bttm_right" type="JOINT">
+                              <node id="Lip_bttm_right" name="Lip_bttm_right" sid="Lip_bttm_right" type="JOINT">
                                 <translate sid="translate">-1.85135 -2.27046 12.47704</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -1942,61 +1942,61 @@
                           </technique>
                         </extra>
                       </node>
-                      <node id="Skl_l_sternoclavicular" name="l_sternoclavicular" sid="Skl_l_sternoclavicular" type="JOINT">
+                      <node id="l_sternoclavicular" name="l_sternoclavicular" sid="l_sternoclavicular" type="JOINT">
                         <translate sid="translate">1.963161 20.39841 10.23889</translate>
                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                         <scale sid="scale">1 1 1</scale>
-                        <node id="Skl_l_acromioclavicular" name="l_acromioclavicular" sid="Skl_l_acromioclavicular" type="JOINT">
+                        <node id="l_acromioclavicular" name="l_acromioclavicular" sid="l_acromioclavicular" type="JOINT">
                           <translate sid="translate">6.036839 -5.285859 -3.864512</translate>
                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                           <rotate sid="jointOrientY">0 1 0 0</rotate>
                           <rotate sid="jointOrientX">1 0 0 0</rotate>
                           <scale sid="scale">1 1 1</scale>
-                          <node id="Skl_l_shoulder" name="l_shoulder" sid="Skl_l_shoulder" type="JOINT">
+                          <node id="l_shoulder" name="l_shoulder" sid="l_shoulder" type="JOINT">
                             <translate sid="translate">8.359774 4.433381 -5.300919</translate>
                             <rotate sid="jointOrientZ">0 0 1 0</rotate>
                             <rotate sid="jointOrientY">0 1 0 0</rotate>
                             <rotate sid="jointOrientX">1 0 0 0</rotate>
                             <scale sid="scale">1 1 1</scale>
-                            <node id="Skl_l_elbow" name="l_elbow" sid="Skl_l_elbow" type="JOINT">
+                            <node id="l_elbow" name="l_elbow" sid="l_elbow" type="JOINT">
                               <translate sid="translate">29.48872 -6.83584e-4 0</translate>
                               <rotate sid="jointOrientZ">0 0 1 0</rotate>
                               <rotate sid="jointOrientY">0 1 0 0</rotate>
                               <rotate sid="jointOrientX">1 0 0 0</rotate>
                               <scale sid="scale">1 1 1</scale>
-                              <node id="Skl_l_forearm" name="l_forearm" sid="Skl_l_forearm" type="JOINT">
+                              <node id="l_forearm" name="l_forearm" sid="l_forearm" type="JOINT">
                                 <translate sid="translate">12.74685 -3.28768e-4 0.7420969</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
                                 <rotate sid="jointOrientX">1 0 0 0</rotate>
                                 <scale sid="scale">1 1 1</scale>
-                                <node id="Skl_l_wrist" name="l_wrist" sid="Skl_l_wrist" type="JOINT">
+                                <node id="l_wrist" name="l_wrist" sid="l_wrist" type="JOINT">
                                   <translate sid="translate">12.74685 -3.28768e-4 0.7420969</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
                                   <rotate sid="jointOrientX">1 0 0 0</rotate>
                                   <scale sid="scale">1 1 1</scale>
-                                  <node id="Skl_l_pinky1" name="l_pinky1" sid="Skl_l_pinky1" type="JOINT">
+                                  <node id="l_pinky1" name="l_pinky1" sid="l_pinky1" type="JOINT">
                                     <translate sid="translate">8.820055 -0.1954087 -3.526401</translate>
                                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                                     <scale sid="scale">1 1 1</scale>
-                                    <node id="Skl_l_pinky2" name="l_pinky2" sid="Skl_l_pinky2" type="JOINT">
+                                    <node id="l_pinky2" name="l_pinky2" sid="l_pinky2" type="JOINT">
                                       <translate sid="translate">3.168087 0 0</translate>
                                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                       <rotate sid="jointOrientY">0 1 0 0</rotate>
                                       <rotate sid="jointOrientX">1 0 0 0</rotate>
                                       <scale sid="scale">1 1 1</scale>
-                                      <node id="Skl_l_pinky3" name="l_pinky3" sid="Skl_l_pinky3" type="JOINT">
+                                      <node id="l_pinky3" name="l_pinky3" sid="l_pinky3" type="JOINT">
                                         <translate sid="translate">1.732289 0 0</translate>
                                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                                         <scale sid="scale">1 1 1</scale>
-                                        <node id="Skl_l_pinky4" name="l_pinky4" sid="Skl_l_pinky4" type="JOINT">
+                                        <node id="l_pinky4" name="l_pinky4" sid="l_pinky4" type="JOINT">
                                           <translate sid="translate">1.841627 0 0</translate>
                                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                           <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -2026,25 +2026,25 @@
                                       </technique>
                                     </extra>
                                   </node>
-                                  <node id="Skl_l_ring1" name="l_ring1" sid="Skl_l_ring1" type="JOINT">
+                                  <node id="l_ring1" name="l_ring1" sid="l_ring1" type="JOINT">
                                     <translate sid="translate">9.067156 0.181519 -1.199405</translate>
                                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                                     <scale sid="scale">1 1 1</scale>
-                                    <node id="Skl_l_ring2" name="l_ring2" sid="Skl_l_ring2" type="JOINT">
+                                    <node id="l_ring2" name="l_ring2" sid="l_ring2" type="JOINT">
                                       <translate sid="translate">4.181276 0 0</translate>
                                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                       <rotate sid="jointOrientY">0 1 0 0</rotate>
                                       <rotate sid="jointOrientX">1 0 0 0</rotate>
                                       <scale sid="scale">1 1 1</scale>
-                                      <node id="Skl_l_ring3" name="l_ring3" sid="Skl_l_ring3" type="JOINT">
+                                      <node id="l_ring3" name="l_ring3" sid="l_ring3" type="JOINT">
                                         <translate sid="translate">2.611861 0 0</translate>
                                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                                         <scale sid="scale">1 1 1</scale>
-                                        <node id="Skl_l_ring4" name="l_ring4" sid="Skl_l_ring4" type="JOINT">
+                                        <node id="l_ring4" name="l_ring4" sid="l_ring4" type="JOINT">
                                           <translate sid="translate">2.161063 0 0</translate>
                                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                           <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -2074,25 +2074,25 @@
                                       </technique>
                                     </extra>
                                   </node>
-                                  <node id="Skl_l_middle1" name="l_middle1" sid="Skl_l_middle1" type="JOINT">
+                                  <node id="l_middle1" name="l_middle1" sid="l_middle1" type="JOINT">
                                     <translate sid="translate">9.637847 0.365887 1.177792</translate>
                                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                                     <scale sid="scale">1 1 1</scale>
-                                    <node id="Skl_l_middle2" name="l_middle2" sid="Skl_l_middle2" type="JOINT">
+                                    <node id="l_middle2" name="l_middle2" sid="l_middle2" type="JOINT">
                                       <translate sid="translate">4.667621 -1.08201e-4 0</translate>
                                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                       <rotate sid="jointOrientY">0 1 0 0</rotate>
                                       <rotate sid="jointOrientX">1 0 0 0</rotate>
                                       <scale sid="scale">1 1 1</scale>
-                                      <node id="Skl_l_middle3" name="l_middle3" sid="Skl_l_middle3" type="JOINT">
+                                      <node id="l_middle3" name="l_middle3" sid="l_middle3" type="JOINT">
                                         <translate sid="translate">2.596526 0 0</translate>
                                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                                         <scale sid="scale">1 1 1</scale>
-                                        <node id="Skl_l_middle4" name="l_middle4" sid="Skl_l_middle4" type="JOINT">
+                                        <node id="l_middle4" name="l_middle4" sid="l_middle4" type="JOINT">
                                           <translate sid="translate">2.162634 0 0</translate>
                                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                           <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -2122,25 +2122,25 @@
                                       </technique>
                                     </extra>
                                   </node>
-                                  <node id="Skl_l_index1" name="l_index1" sid="Skl_l_index1" type="JOINT">
+                                  <node id="l_index1" name="l_index1" sid="l_index1" type="JOINT">
                                     <translate sid="translate">9.374007 -0.02691955 3.534425</translate>
                                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                                     <scale sid="scale">1 1 1</scale>
-                                    <node id="Skl_l_index2" name="l_index2" sid="Skl_l_index2" type="JOINT">
+                                    <node id="l_index2" name="l_index2" sid="l_index2" type="JOINT">
                                       <translate sid="translate">4.122684 0 0</translate>
                                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                       <rotate sid="jointOrientY">0 1 0 0</rotate>
                                       <rotate sid="jointOrientX">1 0 0 0</rotate>
                                       <scale sid="scale">1 1 1</scale>
-                                      <node id="Skl_l_index3" name="l_index3" sid="Skl_l_index3" type="JOINT">
+                                      <node id="l_index3" name="l_index3" sid="l_index3" type="JOINT">
                                         <translate sid="translate">2.201157 0 0</translate>
                                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                                         <scale sid="scale">1 1 1</scale>
-                                        <node id="Skl_l_index4" name="l_index4" sid="Skl_l_index4" type="JOINT">
+                                        <node id="l_index4" name="l_index4" sid="l_index4" type="JOINT">
                                           <translate sid="translate">1.977637 0 0</translate>
                                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                           <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -2170,25 +2170,25 @@
                                       </technique>
                                     </extra>
                                   </node>
-                                  <node id="Skl_l_thumb1" name="l_thumb1" sid="Skl_l_thumb1" type="JOINT">
+                                  <node id="l_thumb1" name="l_thumb1" sid="l_thumb1" type="JOINT">
                                     <translate sid="translate">1.939799 0.3059035 3.151169</translate>
                                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                                     <scale sid="scale">1 1 1</scale>
-                                    <node id="Skl_l_thumb2" name="l_thumb2" sid="Skl_l_thumb2" type="JOINT">
+                                    <node id="l_thumb2" name="l_thumb2" sid="l_thumb2" type="JOINT">
                                       <translate sid="translate">3.366628 -1.686356 2.995358</translate>
                                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                       <rotate sid="jointOrientY">0 1 0 0</rotate>
                                       <rotate sid="jointOrientX">1 0 0 0</rotate>
                                       <scale sid="scale">1 1 1</scale>
-                                      <node id="Skl_l_thumb3" name="l_thumb3" sid="Skl_l_thumb3" type="JOINT">
+                                      <node id="l_thumb3" name="l_thumb3" sid="l_thumb3" type="JOINT">
                                         <translate sid="translate">1.992573 -1.022891 1.789524</translate>
                                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                                         <scale sid="scale">1 1 1</scale>
-                                        <node id="Skl_l_thumb4" name="l_thumb4" sid="Skl_l_thumb4" type="JOINT">
+                                        <node id="l_thumb4" name="l_thumb4" sid="l_thumb4" type="JOINT">
                                           <translate sid="translate">1.825994 -0.9654677 1.625828</translate>
                                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                           <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -2254,61 +2254,61 @@
                           </technique>
                         </extra>
                       </node>
-                      <node id="Skl_r_sternoclavicular" name="r_sternoclavicular" sid="Skl_r_sternoclavicular" type="JOINT">
+                      <node id="r_sternoclavicular" name="r_sternoclavicular" sid="r_sternoclavicular" type="JOINT">
                         <translate sid="translate">-1.963161 20.39841 10.23889</translate>
                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                         <scale sid="scale">1 1 1</scale>
-                        <node id="Skl_r_acromioclavicular" name="r_acromioclavicular" sid="Skl_r_acromioclavicular" type="JOINT">
+                        <node id="r_acromioclavicular" name="r_acromioclavicular" sid="r_acromioclavicular" type="JOINT">
                           <translate sid="translate">-6.036839 -5.285859 -3.864512</translate>
                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                           <rotate sid="jointOrientY">0 1 0 0</rotate>
                           <rotate sid="jointOrientX">1 0 0 0</rotate>
                           <scale sid="scale">1 1 1</scale>
-                          <node id="Skl_r_shoulder" name="r_shoulder" sid="Skl_r_shoulder" type="JOINT">
+                          <node id="r_shoulder" name="r_shoulder" sid="r_shoulder" type="JOINT">
                             <translate sid="translate">-8.359774 4.433381 -5.300919</translate>
                             <rotate sid="jointOrientZ">0 0 1 0</rotate>
                             <rotate sid="jointOrientY">0 1 0 0</rotate>
                             <rotate sid="jointOrientX">1 0 0 0</rotate>
                             <scale sid="scale">1 1 1</scale>
-                            <node id="Skl_r_elbow" name="r_elbow" sid="Skl_r_elbow" type="JOINT">
+                            <node id="r_elbow" name="r_elbow" sid="r_elbow" type="JOINT">
                               <translate sid="translate">-29.48872 -6.83584e-4 0</translate>
                               <rotate sid="jointOrientZ">0 0 1 0</rotate>
                               <rotate sid="jointOrientY">0 1 0 0</rotate>
                               <rotate sid="jointOrientX">1 0 0 0</rotate>
                               <scale sid="scale">1 1 1</scale>
-                              <node id="Skl_r_forearm" name="r_forearm" sid="Skl_r_forearm" type="JOINT">
+                              <node id="r_forearm" name="r_forearm" sid="r_forearm" type="JOINT">
                                 <translate sid="translate">-12.74686 -3.28768e-4 0.7420969</translate>
                                 <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                 <rotate sid="jointOrientY">0 1 0 0</rotate>
                                 <rotate sid="jointOrientX">1 0 0 0</rotate>
                                 <scale sid="scale">1 1 1</scale>
-                                <node id="Skl_r_wrist" name="r_wrist" sid="Skl_r_wrist" type="JOINT">
+                                <node id="r_wrist" name="r_wrist" sid="r_wrist" type="JOINT">
                                   <translate sid="translate">-12.74686 -3.28768e-4 0.7420969</translate>
                                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                   <rotate sid="jointOrientY">0 1 0 0</rotate>
                                   <rotate sid="jointOrientX">1 0 0 0</rotate>
                                   <scale sid="scale">1 1 1</scale>
-                                  <node id="Skl_r_pinky1" name="r_pinky1" sid="Skl_r_pinky1" type="JOINT">
+                                  <node id="r_pinky1" name="r_pinky1" sid="r_pinky1" type="JOINT">
                                     <translate sid="translate">-8.820053 -0.1954087 -3.526401</translate>
                                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                                     <scale sid="scale">1 1 1</scale>
-                                    <node id="Skl_r_pinky2" name="r_pinky2" sid="Skl_r_pinky2" type="JOINT">
+                                    <node id="r_pinky2" name="r_pinky2" sid="r_pinky2" type="JOINT">
                                       <translate sid="translate">-3.168087 0 0</translate>
                                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                       <rotate sid="jointOrientY">0 1 0 0</rotate>
                                       <rotate sid="jointOrientX">1 0 0 0</rotate>
                                       <scale sid="scale">1 1 1</scale>
-                                      <node id="Skl_r_pinky3" name="r_pinky3" sid="Skl_r_pinky3" type="JOINT">
+                                      <node id="r_pinky3" name="r_pinky3" sid="r_pinky3" type="JOINT">
                                         <translate sid="translate">-1.732289 0 0</translate>
                                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                                         <scale sid="scale">1 1 1</scale>
-                                        <node id="Skl_r_pinky4" name="r_pinky4" sid="Skl_r_pinky4" type="JOINT">
+                                        <node id="r_pinky4" name="r_pinky4" sid="r_pinky4" type="JOINT">
                                           <translate sid="translate">-1.841627 0 0</translate>
                                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                           <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -2338,25 +2338,25 @@
                                       </technique>
                                     </extra>
                                   </node>
-                                  <node id="Skl_r_ring1" name="r_ring1" sid="Skl_r_ring1" type="JOINT">
+                                  <node id="r_ring1" name="r_ring1" sid="r_ring1" type="JOINT">
                                     <translate sid="translate">-9.067154 0.181519 -1.199405</translate>
                                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                                     <scale sid="scale">1 1 1</scale>
-                                    <node id="Skl_r_ring2" name="r_ring2" sid="Skl_r_ring2" type="JOINT">
+                                    <node id="r_ring2" name="r_ring2" sid="r_ring2" type="JOINT">
                                       <translate sid="translate">-4.181275 0 0</translate>
                                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                       <rotate sid="jointOrientY">0 1 0 0</rotate>
                                       <rotate sid="jointOrientX">1 0 0 0</rotate>
                                       <scale sid="scale">1 1 1</scale>
-                                      <node id="Skl_r_ring3" name="r_ring3" sid="Skl_r_ring3" type="JOINT">
+                                      <node id="r_ring3" name="r_ring3" sid="r_ring3" type="JOINT">
                                         <translate sid="translate">-2.611861 0 0</translate>
                                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                                         <scale sid="scale">1 1 1</scale>
-                                        <node id="Skl_r_ring4" name="r_ring4" sid="Skl_r_ring4" type="JOINT">
+                                        <node id="r_ring4" name="r_ring4" sid="r_ring4" type="JOINT">
                                           <translate sid="translate">-2.161063 0 0</translate>
                                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                           <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -2386,25 +2386,25 @@
                                       </technique>
                                     </extra>
                                   </node>
-                                  <node id="Skl_r_middle1" name="r_middle1" sid="Skl_r_middle1" type="JOINT">
+                                  <node id="r_middle1" name="r_middle1" sid="r_middle1" type="JOINT">
                                     <translate sid="translate">-9.637848 0.365887 1.177792</translate>
                                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                                     <scale sid="scale">1 1 1</scale>
-                                    <node id="Skl_r_middle2" name="r_middle2" sid="Skl_r_middle2" type="JOINT">
+                                    <node id="r_middle2" name="r_middle2" sid="r_middle2" type="JOINT">
                                       <translate sid="translate">-4.667621 -1.08201e-4 0</translate>
                                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                       <rotate sid="jointOrientY">0 1 0 0</rotate>
                                       <rotate sid="jointOrientX">1 0 0 0</rotate>
                                       <scale sid="scale">1 1 1</scale>
-                                      <node id="Skl_r_middle3" name="r_middle3" sid="Skl_r_middle3" type="JOINT">
+                                      <node id="r_middle3" name="r_middle3" sid="r_middle3" type="JOINT">
                                         <translate sid="translate">-2.596526 0 0</translate>
                                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                                         <scale sid="scale">1 1 1</scale>
-                                        <node id="Skl_r_middle4" name="r_middle4" sid="Skl_r_middle4" type="JOINT">
+                                        <node id="r_middle4" name="r_middle4" sid="r_middle4" type="JOINT">
                                           <translate sid="translate">-2.162634 0 0</translate>
                                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                           <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -2434,25 +2434,25 @@
                                       </technique>
                                     </extra>
                                   </node>
-                                  <node id="Skl_r_index1" name="r_index1" sid="Skl_r_index1" type="JOINT">
+                                  <node id="r_index1" name="r_index1" sid="r_index1" type="JOINT">
                                     <translate sid="translate">-9.374008 -0.02691955 3.534425</translate>
                                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                                     <scale sid="scale">1 1 1</scale>
-                                    <node id="Skl_r_index2" name="r_index2" sid="Skl_r_index2" type="JOINT">
+                                    <node id="r_index2" name="r_index2" sid="r_index2" type="JOINT">
                                       <translate sid="translate">-4.122684 0 0</translate>
                                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                       <rotate sid="jointOrientY">0 1 0 0</rotate>
                                       <rotate sid="jointOrientX">1 0 0 0</rotate>
                                       <scale sid="scale">1 1 1</scale>
-                                      <node id="Skl_r_index3" name="r_index3" sid="Skl_r_index3" type="JOINT">
+                                      <node id="r_index3" name="r_index3" sid="r_index3" type="JOINT">
                                         <translate sid="translate">-2.201157 0 0</translate>
                                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                                         <scale sid="scale">1 1 1</scale>
-                                        <node id="Skl_r_index4" name="r_index4" sid="Skl_r_index4" type="JOINT">
+                                        <node id="r_index4" name="r_index4" sid="r_index4" type="JOINT">
                                           <translate sid="translate">-1.977636 0 0</translate>
                                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                           <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -2482,25 +2482,25 @@
                                       </technique>
                                     </extra>
                                   </node>
-                                  <node id="Skl_r_thumb1" name="r_thumb1" sid="Skl_r_thumb1" type="JOINT">
+                                  <node id="r_thumb1" name="r_thumb1" sid="r_thumb1" type="JOINT">
                                     <translate sid="translate">-1.939796 0.3059035 3.151169</translate>
                                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                                     <scale sid="scale">1 1 1</scale>
-                                    <node id="Skl_r_thumb2" name="r_thumb2" sid="Skl_r_thumb2" type="JOINT">
+                                    <node id="r_thumb2" name="r_thumb2" sid="r_thumb2" type="JOINT">
                                       <translate sid="translate">-3.366628 -1.686356 2.995358</translate>
                                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                       <rotate sid="jointOrientY">0 1 0 0</rotate>
                                       <rotate sid="jointOrientX">1 0 0 0</rotate>
                                       <scale sid="scale">1 1 1</scale>
-                                      <node id="Skl_r_thumb3" name="r_thumb3" sid="Skl_r_thumb3" type="JOINT">
+                                      <node id="r_thumb3" name="r_thumb3" sid="r_thumb3" type="JOINT">
                                         <translate sid="translate">-1.992573 -1.022891 1.789524</translate>
                                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                                         <scale sid="scale">1 1 1</scale>
-                                        <node id="Skl_r_thumb4" name="r_thumb4" sid="Skl_r_thumb4" type="JOINT">
+                                        <node id="r_thumb4" name="r_thumb4" sid="r_thumb4" type="JOINT">
                                           <translate sid="translate">-1.825994 -0.9654677 1.625828</translate>
                                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                                           <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -2584,31 +2584,31 @@
                     </technique>
                   </extra>
                 </node>
-                <node id="Skl_l_hip" name="l_hip" sid="Skl_l_hip" type="JOINT">
+                <node id="l_hip" name="l_hip" sid="l_hip" type="JOINT">
                   <translate sid="translate">10.2108 -1.86684 0</translate>
                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                   <rotate sid="jointOrientY">0 1 0 0</rotate>
                   <rotate sid="jointOrientX">1 0 0 0</rotate>
                   <scale sid="scale">1 1 1</scale>
-                  <node id="Skl_l_knee" name="l_knee" sid="Skl_l_knee" type="JOINT">
+                  <node id="l_knee" name="l_knee" sid="l_knee" type="JOINT">
                     <translate sid="translate">0 -45.55863 -0.6968281</translate>
                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                     <scale sid="scale">1 1 1</scale>
-                    <node id="Skl_l_ankle" name="l_ankle" sid="Skl_l_ankle" type="JOINT">
+                    <node id="l_ankle" name="l_ankle" sid="l_ankle" type="JOINT">
                       <translate sid="translate">0 -36.44824 -6.768485</translate>
                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                       <rotate sid="jointOrientY">0 1 0 0</rotate>
                       <rotate sid="jointOrientX">1 0 0 0</rotate>
                       <scale sid="scale">1 1 1</scale>
-                      <node id="Skl_l_forefoot" name="l_forefoot" sid="Skl_l_forefoot" type="JOINT">
+                      <node id="l_forefoot" name="l_forefoot" sid="l_forefoot" type="JOINT">
                         <translate sid="translate">0 -9.76908 14.06842</translate>
                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                         <scale sid="scale">1 1 1</scale>
-                        <node id="Skl_l_toe" name="l_toe" sid="Skl_l_toe" type="JOINT">
+                        <node id="l_toe" name="l_toe" sid="l_toe" type="JOINT">
                           <translate sid="translate">0 -0.02301114 8.658841</translate>
                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                           <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -2644,31 +2644,31 @@
                     </technique>
                   </extra>
                 </node>
-                <node id="Skl_r_hip" name="r_hip" sid="Skl_r_hip" type="JOINT">
+                <node id="r_hip" name="r_hip" sid="r_hip" type="JOINT">
                   <translate sid="translate">-10.2108 -1.86684 0</translate>
                   <rotate sid="jointOrientZ">0 0 1 0</rotate>
                   <rotate sid="jointOrientY">0 1 0 0</rotate>
                   <rotate sid="jointOrientX">1 0 0 0</rotate>
                   <scale sid="scale">1 1 1</scale>
-                  <node id="Skl_r_knee" name="r_knee" sid="Skl_r_knee" type="JOINT">
+                  <node id="r_knee" name="r_knee" sid="r_knee" type="JOINT">
                     <translate sid="translate">0 -45.55863 -0.6968281</translate>
                     <rotate sid="jointOrientZ">0 0 1 0</rotate>
                     <rotate sid="jointOrientY">0 1 0 0</rotate>
                     <rotate sid="jointOrientX">1 0 0 0</rotate>
                     <scale sid="scale">1 1 1</scale>
-                    <node id="Skl_r_ankle" name="r_ankle" sid="Skl_r_ankle" type="JOINT">
+                    <node id="r_ankle" name="r_ankle" sid="r_ankle" type="JOINT">
                       <translate sid="translate">0 -36.44824 -6.768485</translate>
                       <rotate sid="jointOrientZ">0 0 1 0</rotate>
                       <rotate sid="jointOrientY">0 1 0 0</rotate>
                       <rotate sid="jointOrientX">1 0 0 0</rotate>
                       <scale sid="scale">1 1 1</scale>
-                      <node id="Skl_r_forefoot" name="r_forefoot" sid="Skl_r_forefoot" type="JOINT">
+                      <node id="r_forefoot" name="r_forefoot" sid="r_forefoot" type="JOINT">
                         <translate sid="translate">0 -9.76908 14.06842</translate>
                         <rotate sid="jointOrientZ">0 0 1 0</rotate>
                         <rotate sid="jointOrientY">0 1 0 0</rotate>
                         <rotate sid="jointOrientX">1 0 0 0</rotate>
                         <scale sid="scale">1 1 1</scale>
-                        <node id="Skl_r_toe" name="r_toe" sid="Skl_r_toe" type="JOINT">
+                        <node id="r_toe" name="r_toe" sid="r_toe" type="JOINT">
                           <translate sid="translate">0 -0.02301114 8.658841</translate>
                           <rotate sid="jointOrientZ">0 0 1 0</rotate>
                           <rotate sid="jointOrientY">0 1 0 0</rotate>
@@ -2722,10 +2722,10 @@
               </technique>
             </extra>
           </node>
-          <node id="Skl_Mesh" name="Mesh" type="NODE">
+          <node id="Mesh" name="Mesh" type="NODE">
             <translate sid="translate">0 0 0</translate>
             <scale sid="scale">1 1 1</scale>
-            <node id="Skl_SkinnedMesh" name="SkinnedMesh" type="NODE">
+            <node id="SkinnedMesh" name="SkinnedMesh" type="NODE">
               <translate sid="translate">0 0 0</translate>
               <scale sid="scale">1 1 1</scale>
               <node id="MshRef" name="MshRef" type="NODE">
@@ -2738,49 +2738,49 @@
                 <node id="Msh_Shirts2" name="Shirts2" type="NODE">
                   <translate sid="translate">0 0 0</translate>
                   <instance_controller url="#ShirtsShape2Deformed-skin">
-                    <skeleton>#Skl_Jaw</skeleton>
-                    <skeleton>#Skl_Lip_bttm_left</skeleton>
-                    <skeleton>#Skl_Lip_bttm_mid</skeleton>
-                    <skeleton>#Skl_Lip_bttm_right</skeleton>
-                    <skeleton>#Skl_Lip_out_left</skeleton>
-                    <skeleton>#Skl_Lip_out_right</skeleton>
-                    <skeleton>#Skl_Tongue_back</skeleton>
-                    <skeleton>#Skl_Tongue_mid</skeleton>
-                    <skeleton>#Skl_base</skeleton>
-                    <skeleton>#Skl_cheek_low_left</skeleton>
-                    <skeleton>#Skl_cheek_low_right</skeleton>
-                    <skeleton>#Skl_ear_left</skeleton>
-                    <skeleton>#Skl_ear_right</skeleton>
-                    <skeleton>#Skl_l_elbow</skeleton>
-                    <skeleton>#Skl_l_forearm</skeleton>
-                    <skeleton>#Skl_l_hip</skeleton>
-                    <skeleton>#Skl_l_index1</skeleton>
-                    <skeleton>#Skl_l_pinky1</skeleton>
-                    <skeleton>#Skl_l_ring1</skeleton>
-                    <skeleton>#Skl_l_shoulder</skeleton>
-                    <skeleton>#Skl_l_sternoclavicular</skeleton>
-                    <skeleton>#Skl_l_thumb1</skeleton>
-                    <skeleton>#Skl_l_thumb2</skeleton>
-                    <skeleton>#Skl_l_thumb3</skeleton>
-                    <skeleton>#Skl_l_wrist</skeleton>
-                    <skeleton>#Skl_r_elbow</skeleton>
-                    <skeleton>#Skl_r_forearm</skeleton>
-                    <skeleton>#Skl_r_hip</skeleton>
-                    <skeleton>#Skl_r_index1</skeleton>
-                    <skeleton>#Skl_r_pinky1</skeleton>
-                    <skeleton>#Skl_r_ring1</skeleton>
-                    <skeleton>#Skl_r_shoulder</skeleton>
-                    <skeleton>#Skl_r_sternoclavicular</skeleton>
-                    <skeleton>#Skl_r_thumb1</skeleton>
-                    <skeleton>#Skl_r_thumb2</skeleton>
-                    <skeleton>#Skl_r_thumb3</skeleton>
-                    <skeleton>#Skl_r_wrist</skeleton>
-                    <skeleton>#Skl_skullbase</skeleton>
-                    <skeleton>#Skl_spine1</skeleton>
-                    <skeleton>#Skl_spine2</skeleton>
-                    <skeleton>#Skl_spine3</skeleton>
-                    <skeleton>#Skl_spine4</skeleton>
-                    <skeleton>#Skl_spine5</skeleton>
+                    <skeleton>#Jaw</skeleton>
+                    <skeleton>#Lip_bttm_left</skeleton>
+                    <skeleton>#Lip_bttm_mid</skeleton>
+                    <skeleton>#Lip_bttm_right</skeleton>
+                    <skeleton>#Lip_out_left</skeleton>
+                    <skeleton>#Lip_out_right</skeleton>
+                    <skeleton>#Tongue_back</skeleton>
+                    <skeleton>#Tongue_mid</skeleton>
+                    <skeleton>#base</skeleton>
+                    <skeleton>#cheek_low_left</skeleton>
+                    <skeleton>#cheek_low_right</skeleton>
+                    <skeleton>#ear_left</skeleton>
+                    <skeleton>#ear_right</skeleton>
+                    <skeleton>#l_elbow</skeleton>
+                    <skeleton>#l_forearm</skeleton>
+                    <skeleton>#l_hip</skeleton>
+                    <skeleton>#l_index1</skeleton>
+                    <skeleton>#l_pinky1</skeleton>
+                    <skeleton>#l_ring1</skeleton>
+                    <skeleton>#l_shoulder</skeleton>
+                    <skeleton>#l_sternoclavicular</skeleton>
+                    <skeleton>#l_thumb1</skeleton>
+                    <skeleton>#l_thumb2</skeleton>
+                    <skeleton>#l_thumb3</skeleton>
+                    <skeleton>#l_wrist</skeleton>
+                    <skeleton>#r_elbow</skeleton>
+                    <skeleton>#r_forearm</skeleton>
+                    <skeleton>#r_hip</skeleton>
+                    <skeleton>#r_index1</skeleton>
+                    <skeleton>#r_pinky1</skeleton>
+                    <skeleton>#r_ring1</skeleton>
+                    <skeleton>#r_shoulder</skeleton>
+                    <skeleton>#r_sternoclavicular</skeleton>
+                    <skeleton>#r_thumb1</skeleton>
+                    <skeleton>#r_thumb2</skeleton>
+                    <skeleton>#r_thumb3</skeleton>
+                    <skeleton>#r_wrist</skeleton>
+                    <skeleton>#skullbase</skeleton>
+                    <skeleton>#spine1</skeleton>
+                    <skeleton>#spine2</skeleton>
+                    <skeleton>#spine3</skeleton>
+                    <skeleton>#spine4</skeleton>
+                    <skeleton>#spine5</skeleton>
                     <bind_material>
                       <technique_common>
                         <instance_material symbol="blinn5SG" target="#Shirts">
@@ -2800,20 +2800,20 @@
                 <node id="Msh_pants" name="pants" type="NODE">
                   <translate sid="translate">0 0 0</translate>
                   <instance_controller url="#pantsShapeDeformed-skin">
-                    <skeleton>#Skl_base</skeleton>
-                    <skeleton>#Skl_l_ankle</skeleton>
-                    <skeleton>#Skl_l_forefoot</skeleton>
-                    <skeleton>#Skl_l_hip</skeleton>
-                    <skeleton>#Skl_l_knee</skeleton>
-                    <skeleton>#Skl_l_toe</skeleton>
-                    <skeleton>#Skl_r_ankle</skeleton>
-                    <skeleton>#Skl_r_forefoot</skeleton>
-                    <skeleton>#Skl_r_hip</skeleton>
-                    <skeleton>#Skl_r_knee</skeleton>
-                    <skeleton>#Skl_r_toe</skeleton>
-                    <skeleton>#Skl_spine1</skeleton>
-                    <skeleton>#Skl_spine2</skeleton>
-                    <skeleton>#Skl_spine3</skeleton>
+                    <skeleton>#base</skeleton>
+                    <skeleton>#l_ankle</skeleton>
+                    <skeleton>#l_forefoot</skeleton>
+                    <skeleton>#l_hip</skeleton>
+                    <skeleton>#l_knee</skeleton>
+                    <skeleton>#l_toe</skeleton>
+                    <skeleton>#r_ankle</skeleton>
+                    <skeleton>#r_forefoot</skeleton>
+                    <skeleton>#r_hip</skeleton>
+                    <skeleton>#r_knee</skeleton>
+                    <skeleton>#r_toe</skeleton>
+                    <skeleton>#spine1</skeleton>
+                    <skeleton>#spine2</skeleton>
+                    <skeleton>#spine3</skeleton>
                     <bind_material>
                       <technique_common>
                         <instance_material symbol="blinn3SG" target="#Pants">
@@ -2832,14 +2832,14 @@
                 <node id="Msh_shoes" name="shoes" type="NODE">
                   <translate sid="translate">0 0 0</translate>
                   <instance_controller url="#shoesShapeDeformed-skin">
-                    <skeleton>#Skl_l_ankle</skeleton>
-                    <skeleton>#Skl_l_forefoot</skeleton>
-                    <skeleton>#Skl_l_knee</skeleton>
-                    <skeleton>#Skl_l_toe</skeleton>
-                    <skeleton>#Skl_r_ankle</skeleton>
-                    <skeleton>#Skl_r_forefoot</skeleton>
-                    <skeleton>#Skl_r_knee</skeleton>
-                    <skeleton>#Skl_r_toe</skeleton>
+                    <skeleton>#l_ankle</skeleton>
+                    <skeleton>#l_forefoot</skeleton>
+                    <skeleton>#l_knee</skeleton>
+                    <skeleton>#l_toe</skeleton>
+                    <skeleton>#r_ankle</skeleton>
+                    <skeleton>#r_forefoot</skeleton>
+                    <skeleton>#r_knee</skeleton>
+                    <skeleton>#r_toe</skeleton>
                     <bind_material>
                       <technique_common>
                         <instance_material symbol="blinn3SG" target="#Pants">
@@ -2858,13 +2858,13 @@
                 <node id="Msh_ring" name="ring" type="NODE">
                   <translate sid="translate">0 0 0</translate>
                   <instance_controller url="#ringShapeDeformed-skin">
-                    <skeleton>#Skl_l_middle1</skeleton>
-                    <skeleton>#Skl_l_middle2</skeleton>
-                    <skeleton>#Skl_l_pinky1</skeleton>
-                    <skeleton>#Skl_l_pinky2</skeleton>
-                    <skeleton>#Skl_l_ring1</skeleton>
-                    <skeleton>#Skl_l_ring2</skeleton>
-                    <skeleton>#Skl_l_wrist</skeleton>
+                    <skeleton>#l_middle1</skeleton>
+                    <skeleton>#l_middle2</skeleton>
+                    <skeleton>#l_pinky1</skeleton>
+                    <skeleton>#l_pinky2</skeleton>
+                    <skeleton>#l_ring1</skeleton>
+                    <skeleton>#l_ring2</skeleton>
+                    <skeleton>#l_wrist</skeleton>
                     <bind_material>
                       <technique_common>
                         <instance_material symbol="blinn5SG" target="#Shirts">
@@ -2884,24 +2884,24 @@
                 <node id="Msh_L_hand" name="L_hand" type="NODE">
                   <translate sid="translate">0 0 0</translate>
                   <instance_controller url="#L_handShapeDeformed-skin">
-                    <skeleton>#Skl_l_elbow</skeleton>
-                    <skeleton>#Skl_l_forearm</skeleton>
-                    <skeleton>#Skl_l_index1</skeleton>
-                    <skeleton>#Skl_l_index2</skeleton>
-                    <skeleton>#Skl_l_index3</skeleton>
-                    <skeleton>#Skl_l_middle1</skeleton>
-                    <skeleton>#Skl_l_middle2</skeleton>
-                    <skeleton>#Skl_l_middle3</skeleton>
-                    <skeleton>#Skl_l_pinky1</skeleton>
-                    <skeleton>#Skl_l_pinky2</skeleton>
-                    <skeleton>#Skl_l_pinky3</skeleton>
-                    <skeleton>#Skl_l_ring1</skeleton>
-                    <skeleton>#Skl_l_ring2</skeleton>
-                    <skeleton>#Skl_l_ring3</skeleton>
-                    <skeleton>#Skl_l_thumb1</skeleton>
-                    <skeleton>#Skl_l_thumb2</skeleton>
-                    <skeleton>#Skl_l_thumb3</skeleton>
-                    <skeleton>#Skl_l_wrist</skeleton>
+                    <skeleton>#l_elbow</skeleton>
+                    <skeleton>#l_forearm</skeleton>
+                    <skeleton>#l_index1</skeleton>
+                    <skeleton>#l_index2</skeleton>
+                    <skeleton>#l_index3</skeleton>
+                    <skeleton>#l_middle1</skeleton>
+                    <skeleton>#l_middle2</skeleton>
+                    <skeleton>#l_middle3</skeleton>
+                    <skeleton>#l_pinky1</skeleton>
+                    <skeleton>#l_pinky2</skeleton>
+                    <skeleton>#l_pinky3</skeleton>
+                    <skeleton>#l_ring1</skeleton>
+                    <skeleton>#l_ring2</skeleton>
+                    <skeleton>#l_ring3</skeleton>
+                    <skeleton>#l_thumb1</skeleton>
+                    <skeleton>#l_thumb2</skeleton>
+                    <skeleton>#l_thumb3</skeleton>
+                    <skeleton>#l_wrist</skeleton>
                     <bind_material>
                       <technique_common>
                         <instance_material symbol="blinn3SG" target="#Pants">
@@ -2920,24 +2920,24 @@
                 <node id="Msh_R_hand" name="R_hand" type="NODE">
                   <translate sid="translate">0 0 0</translate>
                   <instance_controller url="#R_handShapeDeformed-skin">
-                    <skeleton>#Skl_r_elbow</skeleton>
-                    <skeleton>#Skl_r_forearm</skeleton>
-                    <skeleton>#Skl_r_index1</skeleton>
-                    <skeleton>#Skl_r_index2</skeleton>
-                    <skeleton>#Skl_r_index3</skeleton>
-                    <skeleton>#Skl_r_middle1</skeleton>
-                    <skeleton>#Skl_r_middle2</skeleton>
-                    <skeleton>#Skl_r_middle3</skeleton>
-                    <skeleton>#Skl_r_pinky1</skeleton>
-                    <skeleton>#Skl_r_pinky2</skeleton>
-                    <skeleton>#Skl_r_pinky3</skeleton>
-                    <skeleton>#Skl_r_ring1</skeleton>
-                    <skeleton>#Skl_r_ring2</skeleton>
-                    <skeleton>#Skl_r_ring3</skeleton>
-                    <skeleton>#Skl_r_thumb1</skeleton>
-                    <skeleton>#Skl_r_thumb2</skeleton>
-                    <skeleton>#Skl_r_thumb3</skeleton>
-                    <skeleton>#Skl_r_wrist</skeleton>
+                    <skeleton>#r_elbow</skeleton>
+                    <skeleton>#r_forearm</skeleton>
+                    <skeleton>#r_index1</skeleton>
+                    <skeleton>#r_index2</skeleton>
+                    <skeleton>#r_index3</skeleton>
+                    <skeleton>#r_middle1</skeleton>
+                    <skeleton>#r_middle2</skeleton>
+                    <skeleton>#r_middle3</skeleton>
+                    <skeleton>#r_pinky1</skeleton>
+                    <skeleton>#r_pinky2</skeleton>
+                    <skeleton>#r_pinky3</skeleton>
+                    <skeleton>#r_ring1</skeleton>
+                    <skeleton>#r_ring2</skeleton>
+                    <skeleton>#r_ring3</skeleton>
+                    <skeleton>#r_thumb1</skeleton>
+                    <skeleton>#r_thumb2</skeleton>
+                    <skeleton>#r_thumb3</skeleton>
+                    <skeleton>#r_wrist</skeleton>
                     <bind_material>
                       <technique_common>
                         <instance_material symbol="blinn3SG" target="#Pants">
@@ -2959,13 +2959,13 @@
                   <node id="Msh_LEyeLash" name="LEyeLash" type="NODE">
                     <translate sid="translate">0 0 0</translate>
                     <instance_controller url="#LEyeLashShapeDeformed-skin">
-                      <skeleton>#Skl_brow02_left</skeleton>
-                      <skeleton>#Skl_brow03_left</skeleton>
-                      <skeleton>#Skl_brow04_left</skeleton>
-                      <skeleton>#Skl_eyeball_left</skeleton>
-                      <skeleton>#Skl_lower_eyelid_left</skeleton>
-                      <skeleton>#Skl_upper_eyelid_left</skeleton>
-                      <skeleton>#Skl_upper_nose_left</skeleton>
+                      <skeleton>#brow02_left</skeleton>
+                      <skeleton>#brow03_left</skeleton>
+                      <skeleton>#brow04_left</skeleton>
+                      <skeleton>#eyeball_left</skeleton>
+                      <skeleton>#lower_eyelid_left</skeleton>
+                      <skeleton>#upper_eyelid_left</skeleton>
+                      <skeleton>#upper_nose_left</skeleton>
                       <bind_material>
                         <technique_common>
                           <instance_material symbol="lambert2SG" target="#Eyelash">
@@ -2985,13 +2985,13 @@
                   <node id="Msh_REyelash" name="REyelash" type="NODE">
                     <translate sid="translate">0 0 0</translate>
                     <instance_controller url="#REyelashShapeDeformed-skin">
-                      <skeleton>#Skl_brow02_right</skeleton>
-                      <skeleton>#Skl_brow03_right</skeleton>
-                      <skeleton>#Skl_brow04_right</skeleton>
-                      <skeleton>#Skl_eyeball_right</skeleton>
-                      <skeleton>#Skl_lower_eyelid_right</skeleton>
-                      <skeleton>#Skl_upper_eyelid_right</skeleton>
-                      <skeleton>#Skl_upper_nose_right</skeleton>
+                      <skeleton>#brow02_right</skeleton>
+                      <skeleton>#brow03_right</skeleton>
+                      <skeleton>#brow04_right</skeleton>
+                      <skeleton>#eyeball_right</skeleton>
+                      <skeleton>#lower_eyelid_right</skeleton>
+                      <skeleton>#upper_eyelid_right</skeleton>
+                      <skeleton>#upper_nose_right</skeleton>
                       <bind_material>
                         <technique_common>
                           <instance_material symbol="lambert2SG" target="#Eyelash">
@@ -3011,27 +3011,27 @@
                   <node id="Msh_UpperTeeth" name="UpperTeeth" type="NODE">
                     <translate sid="translate">0 0 0</translate>
                     <instance_controller url="#UpperTeethShapeDeformed-skin">
-                      <skeleton>#Skl_Cheek_up_left</skeleton>
-                      <skeleton>#Skl_Cheek_up_right</skeleton>
-                      <skeleton>#Skl_Jaw</skeleton>
-                      <skeleton>#Skl_Lip_bttm_left</skeleton>
-                      <skeleton>#Skl_Lip_bttm_mid</skeleton>
-                      <skeleton>#Skl_Lip_bttm_right</skeleton>
-                      <skeleton>#Skl_Lip_out_left</skeleton>
-                      <skeleton>#Skl_Lip_out_right</skeleton>
-                      <skeleton>#Skl_Lip_top_left</skeleton>
-                      <skeleton>#Skl_Lip_top_mid</skeleton>
-                      <skeleton>#Skl_Lip_top_right</skeleton>
-                      <skeleton>#Skl_Tongue_back</skeleton>
-                      <skeleton>#Skl_Tongue_front</skeleton>
-                      <skeleton>#Skl_Tongue_mid</skeleton>
-                      <skeleton>#Skl_cheek_low_left</skeleton>
-                      <skeleton>#Skl_cheek_low_right</skeleton>
-                      <skeleton>#Skl_lower_nose_left</skeleton>
-                      <skeleton>#Skl_lower_nose_right</skeleton>
-                      <skeleton>#Skl_skullbase</skeleton>
-                      <skeleton>#Skl_upper_nose_left</skeleton>
-                      <skeleton>#Skl_upper_nose_right</skeleton>
+                      <skeleton>#Cheek_up_left</skeleton>
+                      <skeleton>#Cheek_up_right</skeleton>
+                      <skeleton>#Jaw</skeleton>
+                      <skeleton>#Lip_bttm_left</skeleton>
+                      <skeleton>#Lip_bttm_mid</skeleton>
+                      <skeleton>#Lip_bttm_right</skeleton>
+                      <skeleton>#Lip_out_left</skeleton>
+                      <skeleton>#Lip_out_right</skeleton>
+                      <skeleton>#Lip_top_left</skeleton>
+                      <skeleton>#Lip_top_mid</skeleton>
+                      <skeleton>#Lip_top_right</skeleton>
+                      <skeleton>#Tongue_back</skeleton>
+                      <skeleton>#Tongue_front</skeleton>
+                      <skeleton>#Tongue_mid</skeleton>
+                      <skeleton>#cheek_low_left</skeleton>
+                      <skeleton>#cheek_low_right</skeleton>
+                      <skeleton>#lower_nose_left</skeleton>
+                      <skeleton>#lower_nose_right</skeleton>
+                      <skeleton>#skullbase</skeleton>
+                      <skeleton>#upper_nose_left</skeleton>
+                      <skeleton>#upper_nose_right</skeleton>
                       <bind_material>
                         <technique_common>
                           <instance_material symbol="blinn1SG" target="#Head">
@@ -3051,20 +3051,20 @@
                   <node id="Msh_LowerTeeth" name="LowerTeeth" type="NODE">
                     <translate sid="translate">0 0 0</translate>
                     <instance_controller url="#LowerTeethShapeDeformed-skin">
-                      <skeleton>#Skl_Jaw</skeleton>
-                      <skeleton>#Skl_Lip_bttm_left</skeleton>
-                      <skeleton>#Skl_Lip_bttm_mid</skeleton>
-                      <skeleton>#Skl_Lip_bttm_right</skeleton>
-                      <skeleton>#Skl_Lip_out_left</skeleton>
-                      <skeleton>#Skl_Lip_out_right</skeleton>
-                      <skeleton>#Skl_Lip_top_left</skeleton>
-                      <skeleton>#Skl_Lip_top_mid</skeleton>
-                      <skeleton>#Skl_Lip_top_right</skeleton>
-                      <skeleton>#Skl_Tongue_back</skeleton>
-                      <skeleton>#Skl_Tongue_front</skeleton>
-                      <skeleton>#Skl_Tongue_mid</skeleton>
-                      <skeleton>#Skl_cheek_low_left</skeleton>
-                      <skeleton>#Skl_cheek_low_right</skeleton>
+                      <skeleton>#Jaw</skeleton>
+                      <skeleton>#Lip_bttm_left</skeleton>
+                      <skeleton>#Lip_bttm_mid</skeleton>
+                      <skeleton>#Lip_bttm_right</skeleton>
+                      <skeleton>#Lip_out_left</skeleton>
+                      <skeleton>#Lip_out_right</skeleton>
+                      <skeleton>#Lip_top_left</skeleton>
+                      <skeleton>#Lip_top_mid</skeleton>
+                      <skeleton>#Lip_top_right</skeleton>
+                      <skeleton>#Tongue_back</skeleton>
+                      <skeleton>#Tongue_front</skeleton>
+                      <skeleton>#Tongue_mid</skeleton>
+                      <skeleton>#cheek_low_left</skeleton>
+                      <skeleton>#cheek_low_right</skeleton>
                       <bind_material>
                         <technique_common>
                           <instance_material symbol="blinn1SG" target="#Head">
@@ -3084,20 +3084,20 @@
                   <node id="Msh_Tongue" name="Tongue" type="NODE">
                     <translate sid="translate">0 0 0</translate>
                     <instance_controller url="#TongueShapeDeformed-skin">
-                      <skeleton>#Skl_Jaw</skeleton>
-                      <skeleton>#Skl_Lip_bttm_left</skeleton>
-                      <skeleton>#Skl_Lip_bttm_mid</skeleton>
-                      <skeleton>#Skl_Lip_bttm_right</skeleton>
-                      <skeleton>#Skl_Lip_out_left</skeleton>
-                      <skeleton>#Skl_Lip_out_right</skeleton>
-                      <skeleton>#Skl_Lip_top_left</skeleton>
-                      <skeleton>#Skl_Lip_top_right</skeleton>
-                      <skeleton>#Skl_Tongue_back</skeleton>
-                      <skeleton>#Skl_Tongue_front</skeleton>
-                      <skeleton>#Skl_Tongue_mid</skeleton>
-                      <skeleton>#Skl_cheek_low_left</skeleton>
-                      <skeleton>#Skl_cheek_low_right</skeleton>
-                      <skeleton>#Skl_skullbase</skeleton>
+                      <skeleton>#Jaw</skeleton>
+                      <skeleton>#Lip_bttm_left</skeleton>
+                      <skeleton>#Lip_bttm_mid</skeleton>
+                      <skeleton>#Lip_bttm_right</skeleton>
+                      <skeleton>#Lip_out_left</skeleton>
+                      <skeleton>#Lip_out_right</skeleton>
+                      <skeleton>#Lip_top_left</skeleton>
+                      <skeleton>#Lip_top_right</skeleton>
+                      <skeleton>#Tongue_back</skeleton>
+                      <skeleton>#Tongue_front</skeleton>
+                      <skeleton>#Tongue_mid</skeleton>
+                      <skeleton>#cheek_low_left</skeleton>
+                      <skeleton>#cheek_low_right</skeleton>
+                      <skeleton>#skullbase</skeleton>
                       <bind_material>
                         <technique_common>
                           <instance_material symbol="blinn1SG" target="#Head">
@@ -3117,14 +3117,14 @@
                   <node id="Msh_L_eyeball" name="L_eyeball" type="NODE">
                     <translate sid="translate">0 0 0</translate>
                     <instance_controller url="#L_eyeballShapeDeformed-skin">
-                      <skeleton>#Skl_Cheek_up_left</skeleton>
-                      <skeleton>#Skl_brow02_left</skeleton>
-                      <skeleton>#Skl_brow03_left</skeleton>
-                      <skeleton>#Skl_brow04_left</skeleton>
-                      <skeleton>#Skl_eyeball_left</skeleton>
-                      <skeleton>#Skl_lower_eyelid_left</skeleton>
-                      <skeleton>#Skl_upper_eyelid_left</skeleton>
-                      <skeleton>#Skl_upper_nose_left</skeleton>
+                      <skeleton>#Cheek_up_left</skeleton>
+                      <skeleton>#brow02_left</skeleton>
+                      <skeleton>#brow03_left</skeleton>
+                      <skeleton>#brow04_left</skeleton>
+                      <skeleton>#eyeball_left</skeleton>
+                      <skeleton>#lower_eyelid_left</skeleton>
+                      <skeleton>#upper_eyelid_left</skeleton>
+                      <skeleton>#upper_nose_left</skeleton>
                       <bind_material>
                         <technique_common>
                           <instance_material symbol="phong1SG" target="#Eyeball">
@@ -3143,14 +3143,14 @@
                   <node id="Msh_R_eyeball" name="R_eyeball" type="NODE">
                     <translate sid="translate">0 0 0</translate>
                     <instance_controller url="#R_eyeballShapeDeformed-skin">
-                      <skeleton>#Skl_Cheek_up_right</skeleton>
-                      <skeleton>#Skl_brow02_right</skeleton>
-                      <skeleton>#Skl_brow03_right</skeleton>
-                      <skeleton>#Skl_brow04_right</skeleton>
-                      <skeleton>#Skl_eyeball_right</skeleton>
-                      <skeleton>#Skl_lower_eyelid_right</skeleton>
-                      <skeleton>#Skl_upper_eyelid_right</skeleton>
-                      <skeleton>#Skl_upper_nose_right</skeleton>
+                      <skeleton>#Cheek_up_right</skeleton>
+                      <skeleton>#brow02_right</skeleton>
+                      <skeleton>#brow03_right</skeleton>
+                      <skeleton>#brow04_right</skeleton>
+                      <skeleton>#eyeball_right</skeleton>
+                      <skeleton>#lower_eyelid_right</skeleton>
+                      <skeleton>#upper_eyelid_right</skeleton>
+                      <skeleton>#upper_nose_right</skeleton>
                       <bind_material>
                         <technique_common>
                           <instance_material symbol="phong1SG" target="#Eyeball">
@@ -3169,50 +3169,50 @@
                   <node id="Msh_Head1" name="Head1" type="NODE">
                     <translate sid="translate">0 0 0</translate>
                     <instance_controller url="#HeadShape1Deformed-skin">
-                      <skeleton>#Skl_Cheek_up_left</skeleton>
-                      <skeleton>#Skl_Cheek_up_right</skeleton>
-                      <skeleton>#Skl_Jaw</skeleton>
-                      <skeleton>#Skl_Lip_bttm_left</skeleton>
-                      <skeleton>#Skl_Lip_bttm_mid</skeleton>
-                      <skeleton>#Skl_Lip_bttm_right</skeleton>
-                      <skeleton>#Skl_Lip_out_left</skeleton>
-                      <skeleton>#Skl_Lip_out_right</skeleton>
-                      <skeleton>#Skl_Lip_top_left</skeleton>
-                      <skeleton>#Skl_Lip_top_mid</skeleton>
-                      <skeleton>#Skl_Lip_top_right</skeleton>
-                      <skeleton>#Skl_Tongue_back</skeleton>
-                      <skeleton>#Skl_Tongue_front</skeleton>
-                      <skeleton>#Skl_Tongue_mid</skeleton>
-                      <skeleton>#Skl_brow01_left</skeleton>
-                      <skeleton>#Skl_brow01_right</skeleton>
-                      <skeleton>#Skl_brow02_left</skeleton>
-                      <skeleton>#Skl_brow02_right</skeleton>
-                      <skeleton>#Skl_brow03_left</skeleton>
-                      <skeleton>#Skl_brow03_right</skeleton>
-                      <skeleton>#Skl_brow04_left</skeleton>
-                      <skeleton>#Skl_brow04_right</skeleton>
-                      <skeleton>#Skl_cheek_low_left</skeleton>
-                      <skeleton>#Skl_cheek_low_right</skeleton>
-                      <skeleton>#Skl_ear_left</skeleton>
-                      <skeleton>#Skl_ear_right</skeleton>
-                      <skeleton>#Skl_eyeball_left</skeleton>
-                      <skeleton>#Skl_eyeball_right</skeleton>
-                      <skeleton>#Skl_l_shoulder</skeleton>
-                      <skeleton>#Skl_l_sternoclavicular</skeleton>
-                      <skeleton>#Skl_lower_eyelid_left</skeleton>
-                      <skeleton>#Skl_lower_eyelid_right</skeleton>
-                      <skeleton>#Skl_lower_nose_left</skeleton>
-                      <skeleton>#Skl_lower_nose_right</skeleton>
-                      <skeleton>#Skl_r_shoulder</skeleton>
-                      <skeleton>#Skl_r_sternoclavicular</skeleton>
-                      <skeleton>#Skl_skullbase</skeleton>
-                      <skeleton>#Skl_spine3</skeleton>
-                      <skeleton>#Skl_spine4</skeleton>
-                      <skeleton>#Skl_spine5</skeleton>
-                      <skeleton>#Skl_upper_eyelid_left</skeleton>
-                      <skeleton>#Skl_upper_eyelid_right</skeleton>
-                      <skeleton>#Skl_upper_nose_left</skeleton>
-                      <skeleton>#Skl_upper_nose_right</skeleton>
+                      <skeleton>#Cheek_up_left</skeleton>
+                      <skeleton>#Cheek_up_right</skeleton>
+                      <skeleton>#Jaw</skeleton>
+                      <skeleton>#Lip_bttm_left</skeleton>
+                      <skeleton>#Lip_bttm_mid</skeleton>
+                      <skeleton>#Lip_bttm_right</skeleton>
+                      <skeleton>#Lip_out_left</skeleton>
+                      <skeleton>#Lip_out_right</skeleton>
+                      <skeleton>#Lip_top_left</skeleton>
+                      <skeleton>#Lip_top_mid</skeleton>
+                      <skeleton>#Lip_top_right</skeleton>
+                      <skeleton>#Tongue_back</skeleton>
+                      <skeleton>#Tongue_front</skeleton>
+                      <skeleton>#Tongue_mid</skeleton>
+                      <skeleton>#brow01_left</skeleton>
+                      <skeleton>#brow01_right</skeleton>
+                      <skeleton>#brow02_left</skeleton>
+                      <skeleton>#brow02_right</skeleton>
+                      <skeleton>#brow03_left</skeleton>
+                      <skeleton>#brow03_right</skeleton>
+                      <skeleton>#brow04_left</skeleton>
+                      <skeleton>#brow04_right</skeleton>
+                      <skeleton>#cheek_low_left</skeleton>
+                      <skeleton>#cheek_low_right</skeleton>
+                      <skeleton>#ear_left</skeleton>
+                      <skeleton>#ear_right</skeleton>
+                      <skeleton>#eyeball_left</skeleton>
+                      <skeleton>#eyeball_right</skeleton>
+                      <skeleton>#l_shoulder</skeleton>
+                      <skeleton>#l_sternoclavicular</skeleton>
+                      <skeleton>#lower_eyelid_left</skeleton>
+                      <skeleton>#lower_eyelid_right</skeleton>
+                      <skeleton>#lower_nose_left</skeleton>
+                      <skeleton>#lower_nose_right</skeleton>
+                      <skeleton>#r_shoulder</skeleton>
+                      <skeleton>#r_sternoclavicular</skeleton>
+                      <skeleton>#skullbase</skeleton>
+                      <skeleton>#spine3</skeleton>
+                      <skeleton>#spine4</skeleton>
+                      <skeleton>#spine5</skeleton>
+                      <skeleton>#upper_eyelid_left</skeleton>
+                      <skeleton>#upper_eyelid_right</skeleton>
+                      <skeleton>#upper_nose_left</skeleton>
+                      <skeleton>#upper_nose_right</skeleton>
                       <bind_material>
                         <technique_common>
                           <instance_material symbol="blinn1SG" target="#Head">
@@ -3247,7 +3247,7 @@
                 </technique>
               </extra>
             </node>
-            <node id="Skl_MorphTargets" name="MorphTargets" type="NODE">
+            <node id="MorphTargets" name="MorphTargets" type="NODE">
               <translate sid="translate">0 0 0</translate>
               <scale sid="scale">1 1 1</scale>
               <extra>
