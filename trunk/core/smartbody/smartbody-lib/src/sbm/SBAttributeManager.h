@@ -4,6 +4,7 @@
 #include "SBSubject.h"
 #include <map>
 #include <vector>
+#include <string>
 
 namespace SmartBody {
 
