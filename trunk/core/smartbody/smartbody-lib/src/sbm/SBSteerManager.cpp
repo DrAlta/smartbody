@@ -1,6 +1,7 @@
 #include "SBSteerManager.h"
 #include <sbm/mcontrol_util.h>
 #include <sbm/SBScene.h>
+#include <sbm/SBCharacter.h>
 #include <PPRAgent.h>
 
 namespace SmartBody {
@@ -239,9 +240,15 @@ void SBSteerManager::start()
 			iter != mcu.getPawnMap().end();
 			iter++)
 		{
-			if ((*iter).second->getGeomObject())
-				(*iter).second->initSteeringSpaceObject();
+			SBPawn* pawn = dynamic_cast<SBPawn*>(iter->second);
+			SBCharacter* character = dynamic_cast<SBCharacter*>(iter->second);
+			if (character) continue; // do not set obstacle for the character, it will mess up the steering
+// 			if ((*iter).second->getGeomObject())
+// 				(*iter).second->initSteeringSpaceObject();
+			if (pawn && pawn->getGeomObject()->geomType() != "null")
+				pawn->initSteeringSpaceObject();
 		}
+
 	}
 
 	// add any boundary walls, if applicable
