@@ -188,7 +188,7 @@ void SbmDebuggerServer::Update()
 
                      SbmGeomObject* geom = p->getGeomObject();
                      if (geom)
-                        msg += vhcl::Format(" geom %s size %.3f", geom->geomType(), geom->getGeomSize().x);    
+                        msg += vhcl::Format(" geom %s size %.3f", geom->geomType().c_str(), geom->getGeomSize().x);    
                      else 
                         msg += vhcl::Format(" geom %s size %.3f", "sphere", 10.0f);
                                         
