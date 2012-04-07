@@ -117,9 +117,16 @@ class XStr
 //#define FESTIVAL_HEAP_SIZE 999999
 
 bool isDone = false;
+
+#ifdef WIN32
 extern SpeechRequestData xmlMetaData;
 extern std::map<string,string> phonemeToViseme;
 extern std::string mapping;
+#else
+SpeechRequestData xmlMetaData;
+std::map<string,string> phonemeToViseme;
+std::string mapping;
+#endif
 
 std::string festivalLibDir = "";
 
