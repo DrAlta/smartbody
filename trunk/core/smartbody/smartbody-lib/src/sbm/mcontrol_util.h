@@ -98,6 +98,7 @@ class mcuCBHandle;
 #include <sbm/Physics/SbmPhysicsSim.h>
 #include <sbm/KinectProcessor.h>
 #include <sbm/SBScene.h>
+#include <sbm/SbmCharacterListener.h>
 
 #ifndef __ANDROID__
 #include <boost/python.hpp>
@@ -120,21 +121,6 @@ namespace WSP
 
 
 //////////////////////////////////////////////////////////////////
-
-// This class is meant for listening to specific events that could be handled externally from smartbody
-// Currently being used by smartbody-dll
-class SBMCharacterListener
-{
-   public:
-      virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass ) {}
-      virtual void OnCharacterDelete( const std::string & name ) {}
-	  virtual void OnCharacterUpdate( const std::string & name, const std::string & objectClass ) {}
-	  virtual void OnCharacterChanged( const std::string& name ) {}
-	  virtual void OnPawnCreate( const std::string & name ) {}
-      virtual void OnPawnDelete( const std::string & name ) {}
-      virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime ) {}
-	  virtual void OnChannel( const std::string & name, const std::string & channelName, const float value) {}
-};
 
 class CameraTrack
 {
@@ -303,6 +289,7 @@ class mcuCBHandle {
 		std::map<std::string, SkPosture*> pose_map;
 		std::map<std::string, SkMotion*> motion_map;
 		std::map<std::string, SkSkeleton*> skeleton_map;
+		std::map<std::string, DeformableMesh*> deformableMeshMap;
 
 		GeneralParamMap				param_map;			// map that contains the information of shader parameters
 
@@ -335,6 +322,10 @@ class mcuCBHandle {
 		SbmPawn* getPawn(const std::string& name);
 		int getNumPawns();
 
+		std::map<std::string, DeformableMesh*>& getDeformableMeshMap();
+		DeformableMesh* getDeformableMesh(const std::string& name);
+
+		
 		std::map<std::string, SbmCharacter*>& getCharacterMap();
 		std::map<std::string, SkSkeleton*>& getSkeletonMap();
 
@@ -467,7 +458,7 @@ public:
 
 		int add_scene( SrSnGroup *scene_p );
 		int remove_scene( SrSnGroup *scene_p );
-		void render()	{ if( viewer_p ) { viewer_p->render(); } }
+		void render();
 		
 		void render_terrain( int renderMode ) {
 			if( height_field_p )	{

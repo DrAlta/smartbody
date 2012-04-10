@@ -534,7 +534,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 		}
 #endif
 
-		skeleton->skfilename(pathname.string().c_str());
+		skeleton->skfilename(pathname.string().c_str());		
 		SBResourceManager* manager = SBResourceManager::getResourceManager();
 		SkeletonResource* skelRes = new SkeletonResource();
 		skelRes->setType("skm");

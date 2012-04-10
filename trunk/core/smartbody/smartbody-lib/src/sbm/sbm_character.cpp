@@ -2164,6 +2164,21 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			LOG("Usage: mesh <meshdirectory> |-prefix|-m|");
 			return CMD_FAILURE;
 		}
+		std::string meshName = meshdir;
+
+		DeformableMesh* deformableMesh = mcu_p->getDeformableMesh(meshName);
+		if (deformableMesh)
+		{
+			// mesh already exist, 
+			LOG("Mesh %s already exist, using mesh instance.",meshName.c_str());
+			dMesh_p = deformableMesh;		
+			dMeshInstance_p->setDeformableMesh(deformableMesh);
+			if ( mcuCBHandle::singleton().sbm_character_listener )
+			{		
+				mcuCBHandle::singleton().sbm_character_listener->OnCharacterChangeMesh( getName() );
+			}		
+			return CMD_SUCCESS;
+		}
 
 		std::string prefix = "";
 		int numRemaining  = args.calc_num_tokens();
@@ -2298,9 +2313,22 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 					}
 				}
 			}
+		}	
+
+		if (dMesh_p->dMeshDynamic_p.size() > 0 && dMesh_p->skinWeights.size() > 0) // successfully loaded all skin mesh data
+		{
+			// insert mesh map
+			dMesh_p->meshName = meshName;
+			mcu_p->deformableMeshMap[meshName] = dMesh_p;
+			dMeshInstance_p->setDeformableMesh(dMesh_p);
+
+		}
+
+		if ( mcuCBHandle::singleton().sbm_character_listener )
+		{		
+			mcuCBHandle::singleton().sbm_character_listener->OnCharacterChangeMesh( getName() );
 		}
 		return CMD_SUCCESS;
-
 	}
 	else if (cmd == "meshstatus")
 	{

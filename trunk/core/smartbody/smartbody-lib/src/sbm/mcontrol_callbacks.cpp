@@ -481,8 +481,8 @@ int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 			if( mcu_p->viewer_p == NULL )	{
 				int argc = args.calc_num_tokens();
-				int width = 640;
-				int height = 480;
+				int width = 1024;
+				int height = 768;
 				int px = 100;
 				int py = 100;
 				if( argc >= 4 )	{
@@ -2128,7 +2128,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 			srSnModelDynamic->ref();
 			srSnModelStatic->ref();
 		}
-		mcu_p->root_group_p->add(srSnModelDynamic);
+		//mcu_p->root_group_p->add(srSnModelDynamic);
 	
 		delete meshModelVec[i];
 	}

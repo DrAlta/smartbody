@@ -93,6 +93,20 @@ void SbmTexture::loadImage( const char* fileName )
 	std::string testOutFileName = fileName;
 	//testOutFileName += ".bmp";
 	//SOIL_save_image(testOutFileName.c_str(),SOIL_SAVE_TYPE_BMP,width,height,channels,buffer);
+	// invert the image in y-axis
+	for(int j = 0; j*2 < height; ++j )
+	{
+		int index1 = j * width * channels;
+		int index2 = (height - 1 - j) * width * channels;
+		for(int i = width * channels ; i > 0; --i )
+		{
+			unsigned char temp = buffer[index1];
+			buffer[index1] = buffer[index2];
+			buffer[index2] = temp;
+			++index1;
+			++index2;
+		}
+	}
 }
 
 void SbmTexture::buildTexture()

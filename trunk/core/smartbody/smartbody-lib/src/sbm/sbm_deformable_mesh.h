@@ -26,22 +26,50 @@ public:
 	~SkinWeight();
 };
 
+class SbmSubMesh
+{
+public:
+	SrMaterial  material;
+	std::string texName;
+	std::string normalMapName;
+	int numTri;
+	std::vector<SrVec3i> triBuf;
+};
+
+class DeformableMeshInstance;
+
 /* This class is used to simulate and represent deformed mesh
    for Smartbody Characters.
 */
 class DeformableMesh
 {
 public:
+	std::string                 meshName;
 	std::vector<SrSnModel*>		dMeshDynamic_p;
 	std::vector<SrSnModel*>		dMeshStatic_p;
 	std::vector<SkinWeight*>	skinWeights;
 	std::map<std::string, std::vector<std::string> > morphTargets;
 	SkSkeleton*					skeleton;			// pointer to current skeleton
-	bool						binding;			// whether in deformable mesh mode
+	bool						binding;			// whether in deformable mesh mode		
+	// unrolled all vertices into a single buffer for faster GPU rendering
+	bool initVertexBuffer;	
+	std::vector<SrVec>          posBuf;	
+	std::vector<SrVec>          normalBuf;
+	std::vector<SrVec>          tangentBuf;
+	std::vector<SrVec>          binormalBuf;
+	std::vector<SrVec2>         texCoordBuf;	
+	std::vector<SrVec3i>        triBuf;
+	std::vector<SbmSubMesh*>    subMeshList;
+
+	std::vector<SrVec4i>        boneIDBuf[2];
+	std::vector<SrVec4>         boneWeightBuf[2];
+	std::map<std::string,int>   boneJointIdxMap;
+	std::vector<SkJoint*>       boneJointList;	
+	std::vector<SrMat>          bindPoseMatList;
 
 public:
 	DeformableMesh();
-	~DeformableMesh();
+	~DeformableMesh();	
 	void setSkeleton(SkSkeleton* skel);
 	virtual void update();
 	SkinWeight* getSkinWeight(const std::string& skinSourceName);
@@ -49,6 +77,27 @@ public:
     /*! Set the visibility state of the deformable geometry,
         The integers mean 1:show, 0:hide, and -1:don't change the visibility state. */
 	void set_visibility(int deformableMesh);
+	virtual bool buildVertexBuffer(); // unrolled all models inside this deformable mesh into a GPU-friendly format
+};
+
+class DeformableMeshInstance
+{
+protected:
+	DeformableMesh* _mesh;
+	std::vector<SrSnModel*> dynamicMesh; 
+	SkSkeleton*			  _skeleton;
+	bool				  _updateMesh;
+public:
+	DeformableMeshInstance();
+	~DeformableMeshInstance();
+
+	virtual void setDeformableMesh(DeformableMesh* mesh);
+	virtual void setSkeleton(SkSkeleton* skel);	
+	virtual void setVisibility(int deformableMesh);
+	virtual void update();
+
+protected:
+	void cleanUp();
 };
 
 #endif

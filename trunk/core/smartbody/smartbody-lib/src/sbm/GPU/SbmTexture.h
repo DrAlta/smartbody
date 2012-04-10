@@ -43,7 +43,7 @@ class SbmTexture // simple place holder for OpenGL texture
 protected:
 	std::string textureName;
 	int width, height;
-	int channels; // num of channels in the iamge
+	int channels; // num of channels in the iamge	
 	unsigned char* buffer;
 	bool finishBuild;
 
@@ -57,4 +57,9 @@ public:
 	GLuint getID() { return texID; }
 	void loadImage(const char* fileName);
 	void buildTexture();
+
+	unsigned char* getBuffer() { return buffer; }
+	int getWidth() const { return width; }	
+	int getHeight() const { return height; }
+	int getNumChannels() const { return channels; }	
 };
