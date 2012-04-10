@@ -66,6 +66,11 @@ void SBSteerManager::setEnable(bool enable)
 
 void SBSteerManager::beforeUpdate(double time)
 {
+	
+}
+
+void SBSteerManager::update(double time)
+{
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	SBScene* scene = mcu._scene;
@@ -73,7 +78,7 @@ void SBSteerManager::beforeUpdate(double time)
 	{
 		if (!getEngineDriver()->isDone())
 		{
-			
+
 			if (getEngineDriver()->getStartTime() == 0.0)
 			{
 				getEngineDriver()->setStartTime(mcu.time);
@@ -98,13 +103,9 @@ void SBSteerManager::beforeUpdate(double time)
 					getEngineDriver()->setDone(true);
 				mcu.mark("SteeringUpdate");
 			}
-			
+
 		}
 	}
-}
-
-void SBSteerManager::update(double time)
-{
 }
 
 void SBSteerManager::afterUpdate(double time)

@@ -1646,21 +1646,22 @@ void SteeringAgent::startLocomotion( float angleDiff )
 		normalizeAngle(diff);
 		*/
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		std::stringstream command;
 		double w;
+		float maxRotAngle = 180;
 		if (angleDiff > 0)
 		{
 			if (angleDiff > 90)
 			{
-				w = (angleDiff - 90) / 90;
-				std::stringstream command;
+				if (angleDiff > maxRotAngle) angleDiff = maxRotAngle;
+				w = (angleDiff - 90) / (maxRotAngle-90);				
 				command << "panim schedule char " << character->getName();			
 				command << " state " << startingLName << " loop false playnow false additive false joint null " << " 0 " << 1 - w << " " << w;
 				mcu.execute((char*) command.str().c_str());
 			}
 			else
 			{
-				w = angleDiff / 90;
-				std::stringstream command;
+				w = angleDiff / 90;				
 				command << "panim schedule char " << character->getName();					
 				command << " state " << startingLName << " loop false playnow false additive false joint null " << 1 - w << " " << w << " " << " 0 ";
 				mcu.execute((char*) command.str().c_str());
@@ -1670,21 +1671,21 @@ void SteeringAgent::startLocomotion( float angleDiff )
 		{
 			if (angleDiff < -90)
 			{
-				w = (angleDiff + 180) / 90;
-				std::stringstream command;
+				if (angleDiff < -maxRotAngle) angleDiff = -maxRotAngle;
+				w = (angleDiff + maxRotAngle) / (maxRotAngle-90);				
 				command << "panim schedule char " << character->getName();
 				command << " state " << startingRName << " loop false playnow false additive false joint null " << " 0 " << w << " " << 1 - w;
 				mcu.execute((char*) command.str().c_str());
 			}
 			else
 			{
-				w = -angleDiff / 90;
-				std::stringstream command;
+				w = -angleDiff / 90;					
 				command << "panim schedule char " << character->getName();
 				command << " state " << startingRName << " loop false playnow true additive false joint null " << 1 - w << " " << w << " 0 ";
 				mcu.execute((char*) command.str().c_str());
 			}				
 		}
+		//LOG("Ang diff = %f, start command = %s",angleDiff, command.str().c_str());
 		PAStateData* locoState = mcu.lookUpPAState(locomotionName.c_str());
 		for (int i = 0; i < locoState->getNumMotions(); i++)
 		{
