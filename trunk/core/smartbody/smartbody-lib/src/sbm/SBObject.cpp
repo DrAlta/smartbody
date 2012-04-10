@@ -1,5 +1,6 @@
 #include "SBObject.h"
 #include <sr/sr_vec.h>
+#include <vhcl.h>
 
 namespace SmartBody {
 
@@ -356,6 +357,10 @@ IntAttribute* SBObject::createIntAttribute(const std::string& name, int value, b
 	  {
 		  battr->setValue(value);
 	  }
+	  else
+	  {
+		  LOG("Warning, Bool Attribute %s does not exist.",name.c_str());
+	  }
   }
 
   void SBObject::setIntAttribute( const std::string& name, int value )
@@ -365,6 +370,10 @@ IntAttribute* SBObject::createIntAttribute(const std::string& name, int value, b
 	  if (iattr)
 	  {
 		  iattr->setValue(value);
+	  }
+	  else
+	  {
+		  LOG("Warning, Int Attribute %s does not exist.",name.c_str());
 	  }
   }
 
@@ -376,6 +385,10 @@ IntAttribute* SBObject::createIntAttribute(const std::string& name, int value, b
 	  {
 		  dattr->setValue(value);
 	  }
+	  else
+	  {
+		  LOG("Warning, Double Attribute %s does not exist.",name.c_str());
+	  }
   }
 
   void SBObject::setVec3Attribute( const std::string& name, float val1, float val2, float val3 )
@@ -385,6 +398,10 @@ IntAttribute* SBObject::createIntAttribute(const std::string& name, int value, b
 	  if (vattr)
 	  {
 		  vattr->setValue(SrVec(val1,val2,val3));
+	  }
+	  else
+	  {
+		  LOG("Warning, Vec3 Attribute %s does not exist.",name.c_str());
 	  }
   }
 
@@ -396,6 +413,10 @@ IntAttribute* SBObject::createIntAttribute(const std::string& name, int value, b
 	  {
 		  sattr->setValue(value);
 	  }
+	  else
+	  {
+		  LOG("Warning, String Attribute %s does not exist.",name.c_str());
+	  }
   }
 
   void SBObject::setMatrixAttribute( const std::string& name, SrMat& value )
@@ -406,6 +427,10 @@ IntAttribute* SBObject::createIntAttribute(const std::string& name, int value, b
 	  {
 		  mattr->setValue(value);
 	  }
+	  else
+	  {
+		  LOG("Warning, Matrix Attribute %s does not exist.",name.c_str());
+	  }
   }
 
   void SBObject::setActionAttribute(const std::string& name)
@@ -415,6 +440,10 @@ IntAttribute* SBObject::createIntAttribute(const std::string& name, int value, b
 	  if (aattr)
 	  {
 		  aattr->setValue();
+	  }
+	  else
+	  {
+		  LOG("Warning, Action Attribute %s does not exist.",name.c_str());
 	  }
   }
 

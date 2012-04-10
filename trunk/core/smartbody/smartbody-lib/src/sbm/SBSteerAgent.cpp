@@ -71,6 +71,9 @@ void SBSteerAgent::setCurrentSBCharacter(SBCharacter* sbCharacter)
 
 	setSteerStateNamePrefix(_stateNamePrefix);
 	setSteerType(_steerType);
+	// reset steering parameters based on current new character
+	setSteerParamsDirty(true);
+	initSteerParams();
 }
 
 SBCharacter* SBSteerAgent::getCurrentSBCharacter()

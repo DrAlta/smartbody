@@ -43,7 +43,7 @@ public:
 public:	
 	virtual void getMotionParameter(dVector& outPara);	
 	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame) = 0;
-
+	
 	virtual double strokeEmphasisTime() = 0;
 	virtual double motionDuration(DurationType durType) = 0;
 	virtual double motionPercent(float time) = 0; // compute how much percentage of time has elapsed until the motion reach its end
@@ -64,7 +64,7 @@ public:
 	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame);
 	virtual double motionDuration(DurationType durType);	
 	virtual double motionPercent(float time);
-	virtual double getRefDeltaTime(float u, float dt);
+	virtual double getRefDeltaTime(float u, float dt);	
 
 	void updateRootOffset(SkSkeleton* skel, SkJoint* rootJoint);
 };
