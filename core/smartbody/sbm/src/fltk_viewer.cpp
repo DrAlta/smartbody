@@ -469,6 +469,26 @@ void FltkViewer::show_menu ()
 	//MenuTable->popup();	
  }
 
+void FltkViewer::applyToCharacters()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
+	{
+		SbmCharacter* character = (*iter).second;
+		// set the visibility parameters of the scene
+		//character->scene_p->set_visibility(_data->showbones,_data->showgeometry, _data->showcollisiongeometry, _data->showaxis);
+
+		// feng : never show the collision mesh, instead we will show the bounding volumes as capsules
+		if (character->scene_p && character->dMeshInstance_p)
+		{
+			character->scene_p->set_visibility(_data->showbones,_data->showgeometry, false, _data->showaxis);
+			character->dMeshInstance_p->setVisibility(_data->showdeformablegeometry);
+		}
+	}
+}
+
 void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
  {
 	 bool applyToCharacter = false; 	 
@@ -683,23 +703,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	
 	if (applyToCharacter)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-			iter != mcu.getCharacterMap().end();
-			iter++)
-		{
-			SbmCharacter* character = (*iter).second;
-			// set the visibility parameters of the scene
-			//character->scene_p->set_visibility(_data->showbones,_data->showgeometry, _data->showcollisiongeometry, _data->showaxis);
-
-			// feng : never show the collision mesh, instead we will show the bounding volumes as capsules
-			if (character->scene_p && character->dMesh_p)
-			{
-				character->scene_p->set_visibility(_data->showbones,_data->showgeometry, false, _data->showaxis);
-				character->dMesh_p->set_visibility(_data->showdeformablegeometry);
-			}
-		}
-						
+		applyToCharacters();						
 	}
 
    render ();
@@ -1144,9 +1148,9 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		iter++)
 	{
 		SbmPawn* pawn = (*iter).second;
-		if(pawn->dMesh_p)
+		if(pawn->dMesh_p && pawn->dMeshInstance_p)
 		{
-			pawn->dMesh_p->update();
+			pawn->dMeshInstance_p->update();
 		}
 	}
 	

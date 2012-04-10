@@ -516,6 +516,7 @@ void DeformableMeshInstance::setSkeleton( SkSkeleton* skel )
 		_skeleton->unref();
 	_skeleton = skel;
 	skel->ref();
+	updateJointList();
 }
 
 void DeformableMeshInstance::cleanUp()
@@ -546,7 +547,27 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 		dynamicMesh.push_back(srSnModelDynamic);
 		srSnModelDynamic->ref();
 		mcu.root_group_p->add(dynamicMesh[i]);
-	}			
+	}	
+	updateJointList();
+}
+
+void DeformableMeshInstance::updateJointList()
+{
+	if (!_skeleton || !_mesh) return;
+	std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;
+	_boneJointList.clear();
+	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
+	{
+		SkinWeight* skinWeight = skinWeights[skinCounter];
+		SkJointList jlist;
+		for (unsigned int k=0;k<skinWeight->infJointName.size();k++)
+		{
+			std::string jname = skinWeight->infJointName[k];
+			SkJoint* joint = _skeleton->search_joint(jname.c_str());
+			jlist.push_back(joint);				
+		}
+		_boneJointList.push_back(jlist);
+	}
 }
 
 void DeformableMeshInstance::setVisibility(int deformableMesh)
@@ -563,13 +584,15 @@ void DeformableMeshInstance::update()
 {	
 	//return;
 	if (!_updateMesh)	return;
-	if (!_skeleton) return;
+	if (!_skeleton) return;	
 	_skeleton->update_global_matrices();
 	int maxJoint = -1;
 	std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;
+	if (skinWeights.size() != _boneJointList.size()) updateJointList();
 	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 	{
 		SkinWeight* skinWeight = skinWeights[skinCounter];
+		SkJointList& jointList = _boneJointList[skinCounter];
 		std::map<std::string, std::vector<std::string> >::iterator iter = _mesh->morphTargets.find(skinWeight->sourceMesh);
 		size_t morphSize = 1;
 		if (iter != _mesh->morphTargets.end())	morphSize = iter->second.size();	
@@ -596,9 +619,9 @@ void DeformableMeshInstance::update()
 					//printf("Vtx bind pose = \n");
 					for (int j = 0; j < numOfInfJoints; j++)
 					{
-						std::string jointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];
-						const SkJoint* curJoint = _skeleton->search_joint(jointName.c_str());//skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
-						if (curJoint == NULL) continue;
+						//std::string jointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];						
+						const SkJoint* curJoint = jointList[skinWeight->jointNameIndex[globalCounter]];//skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
+						//if (curJoint == NULL) continue;
 						const SrMat& gMat = curJoint->gmat();
 						SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];	
 						double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
