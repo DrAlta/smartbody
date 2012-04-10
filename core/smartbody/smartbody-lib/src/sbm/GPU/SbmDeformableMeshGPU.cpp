@@ -18,7 +18,8 @@ const char* FSName = "fs_skin_render.frag";
 const std::string shaderName = "Skin_Basic";
 const std::string shadowShaderName = "Skin_Shadow";
 bool SbmDeformableMeshGPU::initShader = false;
-bool SbmDeformableMeshGPU::useGPUDeformableMesh = true;
+bool SbmDeformableMeshGPU::useGPUDeformableMesh = false;
+bool SbmDeformableMeshGPU::disableRendering = false;
 bool SbmDeformableMeshGPU::useShadowPass = false;
 GLuint SbmDeformableMeshGPU::shadowMapID = -1;
 
@@ -26,16 +27,16 @@ std::string shaderVS =
 "#version 120 \n\
 #extension GL_EXT_gpu_shader4 : require \n\
 uniform samplerBuffer Transform; \n\
-attribute vec4 BoneID1,BoneID2;   \n\
+attribute ivec4 BoneID1,BoneID2;   \n\
 attribute vec4 BoneWeight1,BoneWeight2;\n \
 attribute vec3 tangent, binormal;\n\
 varying vec4 vPos;\n\
 varying vec3 normal,lightDir[2],halfVector[2];\n\
 varying vec3 tv,bv;\n\
 varying float dist[2];\n\
-mat3 GetTransformation(float id)\n \
+mat3 GetTransformation(int id)\n \
 { \n\
-	int idx = int(id);\n \
+	int idx = id;\n \
 	mat3 rot;\n  \
 	for (int i=0;i<3;i++)\n \
 	{ \n  \
@@ -44,16 +45,16 @@ mat3 GetTransformation(float id)\n \
 	}\n	\
 	return rot;\n \
 }\n \
-vec3 GetTranslation(float id)\n \
+vec3 GetTranslation(int id)\n \
 {\n  \
-	int idx = int(id);\n \
+	int idx = id;\n \
 	vec3 tran;\n \
 	tran[0] = texelFetchBuffer(Transform,(idx*16+12)).x;\n \
     tran[1] = texelFetchBuffer(Transform,(idx*16+13)).x;\n \
 	tran[2] = texelFetchBuffer(Transform,(idx*16+14)).x;\n \
 	return tran;\n	\
 }\n  \
-mat4 TransformPos(vec3 position, vec3 normal, vec3 tang, vec3 binorm, vec4 boneid, vec4 boneweight)\n\
+mat4 TransformPos(vec3 position, vec3 normal, vec3 tang, vec3 binorm, ivec4 boneid, vec4 boneweight)\n\
 {\n\
 	vec3 pos = vec3(0,0,0);\n\
 	vec3 n = vec3(0,0,0);\n\
@@ -83,6 +84,7 @@ void main()\n \
 	vec3 pos = vec3(gl_Vertex.xyz);\n \
 	mat4 skin = TransformPos(pos,gl_Normal,tangent,binormal,BoneID1,BoneWeight1) + TransformPos(pos,gl_Normal,tangent,binormal,BoneID2,BoneWeight2);\n\
 	vPos = gl_TextureMatrix[7]* gl_ModelViewMatrix*vec4(skin[0].xyz,1.0);\n\
+	//vPos = gl_TextureMatrix[7]* gl_ModelViewMatrix*vec4(gl_Vertex.xyz,1.0);\n\
 	gl_Position = gl_ModelViewProjectionMatrix*vec4(skin[0].xyz,1.0);\n\
 	lightDir[0] = normalize(vec3(gl_LightSource[0].position));\n\
 	halfVector[0] = normalize(gl_LightSource[0].halfVector.xyz);\n\
@@ -231,9 +233,7 @@ typedef std::pair<int,int> IntPair;
 
 SbmDeformableMeshGPU::SbmDeformableMeshGPU(void)
 {
-	useGPU = false;
-	numTotalVtxs = 0;
-	numTotalTris = 0;
+	useGPU = false;	
 }
 
 SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
@@ -241,27 +241,25 @@ SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
 
 }
 
-void SbmDeformableMeshGPU::skinTransformGPU()
+void SbmDeformableMeshGPU::skinTransformGPU(ublas::vector<SrMat>& tranBuffer, TBOData* tranTBO)
 {
 	std::string activeShader = shaderName;//SbmDeformableMeshGPU::useShadowPass ? shadowShaderName : shaderName;
-	GLuint program = SbmShaderManager::singleton().getShader(activeShader)->getShaderProgram();
-
-	updateTransformBuffer();
+	GLuint program = SbmShaderManager::singleton().getShader(activeShader)->getShaderProgram();		
 	glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );	
- 	
+
 	glDisable(GL_POLYGON_SMOOTH);
-	
- 	glEnable ( GL_ALPHA_TEST );
+
+	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glAlphaFunc ( GL_GREATER, 0.3f ) ;
-	
+
 	glEnable(GL_TEXTURE);
 	glDisable(GL_COLOR_MATERIAL);
 	glUseProgram(program);	
 
 	int iActiveTex = 0;	
- 	
+
 	GLuint diffuse_sampler_location = glGetUniformLocation(program,"diffuseTexture");	
 	GLuint normal_sampler_location = glGetUniformLocation(program,"normalTexture");	
 	GLuint shadow_sampler_location = glGetUniformLocation(program,"tex");	
@@ -285,33 +283,33 @@ void SbmDeformableMeshGPU::skinTransformGPU()
 	if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_3_0)
 	{
 		GLuint my_sampler_uniform_location = glGetUniformLocation(program,"Transform");	
-		TBOTran->UpdateTBOData((float*)getPtr(transformBuffer));
- 		glActiveTexture(GL_TEXTURE0_ARB);
- 		TBOTran->BindBufferToTexture();
- 		glUniform1i(my_sampler_uniform_location, iActiveTex);
+		tranTBO->UpdateTBOData((float*)getPtr(tranBuffer));
+		glActiveTexture(GL_TEXTURE0_ARB);
+		tranTBO->BindBufferToTexture();
+		glUniform1i(my_sampler_uniform_location, iActiveTex);
 	}
 	else
 	{
 		GLuint transformLocation = glGetUniformLocation(program,"Transform");
-		glUniformMatrix4fv(transformLocation,transformBuffer.size(),true,(GLfloat*)getPtr(transformBuffer));
+		glUniformMatrix4fv(transformLocation,tranBuffer.size(),true,(GLfloat*)getPtr(tranBuffer));
 	}
 	glEnableClientState(GL_VERTEX_ARRAY);	
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	VBOPos->VBO()->BindBuffer();
 	//SbmShaderProgram::printOglError("after bind buffer\n");
-	glVertexPointer( 4, GL_FLOAT, 0, 0);
+	glVertexPointer( 3, GL_FLOAT, 0, 0);
 	//SbmShaderProgram::printOglError("after vertex pointer\n");
-  	
+
 	glEnableVertexAttribArray(weight_loc1);
-   	VBOWeight1->VBO()->BindBuffer();
+	VBOWeight1->VBO()->BindBuffer();
 	glVertexAttribPointer(weight_loc1,4,GL_FLOAT,0,0,0);	
 	//glBindAttribLocation(program,VBOWeight1->VBO()->m_ArrayType,"BoneWeight1");
-   	//glVertexAttribPointer(VBOWeight1->VBO()->m_ArrayType,4,GL_FLOAT,0,0,0);	
+	//glVertexAttribPointer(VBOWeight1->VBO()->m_ArrayType,4,GL_FLOAT,0,0,0);	
 
 	glEnableVertexAttribArray(bone_loc1);
 	VBOBoneID1->VBO()->BindBuffer();
-	glVertexAttribPointer(bone_loc1,4,GL_FLOAT,0,0,0);	
+	glVertexAttribIPointer(bone_loc1,4,GL_INT,0,0);	
 	//glBindAttribLocation(program,VBOBoneID1->VBO()->m_ArrayType,"BoneID1");
 	//glVertexAttribPointer(VBOBoneID1->VBO()->m_ArrayType,4,GL_FLOAT,0,0,0);	
 
@@ -320,10 +318,10 @@ void SbmDeformableMeshGPU::skinTransformGPU()
 	glVertexAttribPointer(weight_loc2,4,GL_FLOAT,0,0,0);	
 	//glBindAttribLocation(program,VBOWeight2->VBO()->m_ArrayType,"BoneWeight2");
 	//glVertexAttribPointer(VBOWeight2->VBO()->m_ArrayType,4,GL_FLOAT,0,0,0);
-// 
+	// 
 	glEnableVertexAttribArray(bone_loc2);
 	VBOBoneID2->VBO()->BindBuffer();
-	glVertexAttribPointer(bone_loc2,4,GL_FLOAT,0,0,0);	
+	glVertexAttribIPointer(bone_loc2,4,GL_INT,0,0);	
 
 	glEnableVertexAttribArray(tangent_loc);
 	VBOTangent->VBO()->BindBuffer();
@@ -337,10 +335,10 @@ void SbmDeformableMeshGPU::skinTransformGPU()
 	VBONormal->VBO()->BindBuffer();
 	glNormalPointer(GL_FLOAT,0,0);
 	VBOTexCoord->VBO()->BindBuffer();
-	glTexCoordPointer(3,GL_FLOAT,0,0);
-	for (unsigned int i=0;i<meshSubset.size();i++)
+	glTexCoordPointer(2,GL_FLOAT,0,0);
+	for (unsigned int i=0;i<subMeshList.size();i++)
 	{	
-		MeshSubset* mesh = meshSubset[i];
+		SbmSubMesh* mesh = subMeshList[i];
 		float color[4];
 		mesh->material.diffuse.get(color);		
 		glUniform3f(diffuseLoc,color[0],color[1],color[2]);
@@ -390,27 +388,34 @@ void SbmDeformableMeshGPU::skinTransformGPU()
 		{
 			glUniform1i(useShadowMapLoc,0);
 		}
-		mesh->VBOTri->VBO()->BindBuffer();
+
+		subMeshTris[i]->VBO()->BindBuffer();
 		glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
-		mesh->VBOTri->VBO()->UnbindBuffer();
+		subMeshTris[i]->VBO()->UnbindBuffer();
 		glBindTexture(GL_TEXTURE_2D,0);
 	}	
+
+	// 	VBOTri->VBO()->BindBuffer();
+	// 	glDrawElements(GL_TRIANGLES,3*numTotalTris,GL_UNSIGNED_INT,0);
+	// 	VBOTri->VBO()->UnbindBuffer();
+
 
 	VBOTexCoord->VBO()->UnbindBuffer();
 	VBONormal->VBO()->UnbindBuffer();
 	VBOBiNormal->VBO()->UnbindBuffer();
 	VBOTangent->VBO()->UnbindBuffer();
- 	VBOBoneID2->VBO()->UnbindBuffer();
- 	VBOWeight2->VBO()->UnbindBuffer();
- 	VBOBoneID1->VBO()->UnbindBuffer();
- 	VBOWeight1->VBO()->UnbindBuffer();
+	VBOBoneID2->VBO()->UnbindBuffer();
+	VBOWeight2->VBO()->UnbindBuffer();
+	VBOBoneID1->VBO()->UnbindBuffer();
+	VBOWeight1->VBO()->UnbindBuffer();
 	VBOPos->VBO()->UnbindBuffer();
 
- 	glUseProgram(0);		
+	glUseProgram(0);		
 	glDisable(GL_TEXTURE);
 	glDisable(GL_ALPHA_TEST) ;
 	glDisable(GL_BLEND);
 }
+
 
 void SbmDeformableMeshGPU::initShaderProgram()
 {
@@ -441,11 +446,11 @@ void SbmDeformableMeshGPU::initShaderProgram()
 
 
 
-bool SbmDeformableMeshGPU::initBuffer()
+bool SbmDeformableMeshGPU::initBuffer1()
 {
+#if 0
 	// feng : the CPU version of deformable mesh consists of some mesh segments, with their corresponding bone weights loosely stored.
 	// this is very bad for GPU processing. Thus I reorganize the data into a single array, to avoid redundancy in memory storage.
-
 	if (skinWeights.size() == 0 )
 		return false;
 
@@ -489,6 +494,7 @@ bool SbmDeformableMeshGPU::initBuffer()
 			SrArray<SrMaterial>& matList = dMeshDynamic->shape().M; 	
 			std::map<std::string,std::string> mtlTexMap = dMeshDynamic->shape().mtlTextureNameMap;
 			std::map<std::string,std::string> mtlNormalTexMap = dMeshDynamic->shape().mtlNormalTexNameMap;
+			printf("meshName = %s, material list = %d\n", &dMeshDynamic->shape().name.get(0), matList.size());
 			for (int j=0;j<matList.size();j++)
 			{			
 				SrMaterial& mat = matList[j];	
@@ -781,6 +787,7 @@ bool SbmDeformableMeshGPU::initBuffer()
 		mesh->numTri = faceIdxList.size();
 		meshSubset.push_back(mesh);
 	}
+	printf("meshSubset size = %d\n",meshSubset.size());
 	// initial GPU buffer memory
 	// Vertex Buffer Object	
 	VBOPos = new VBOVec4f((char*)"RestPos",VERTEX_POSITION,posBuffer);		
@@ -802,6 +809,7 @@ bool SbmDeformableMeshGPU::initBuffer()
 		int colorSize = DeformableMesh::dMeshDynamic_p.size()*3;
 		TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
 	}
+#endif
 	return true;
 }
 
@@ -809,6 +817,8 @@ void SbmDeformableMeshGPU::update()
 {	
 //#define USE_GPU_TRANSFORM 1
 //#if USE_GPU_TRANSFORM
+	if (disableRendering) return; // do nothing
+
 	if (!useGPUDeformableMesh)
 	{
 		DeformableMesh::update();
@@ -825,7 +835,7 @@ void SbmDeformableMeshGPU::update()
 	if (!useGPU && hasGLContext && program && program->finishBuild())
 	{
 		// initialize 
-		useGPU = initBuffer();
+		useGPU = buildGPUVertexBuffer();
 	}
 
 	if (!useGPU || !hasGLContext)
@@ -845,7 +855,8 @@ void SbmDeformableMeshGPU::update()
 			dMeshDynamic_p[i]->visible(false);
 		}
 		skeleton->update_global_matrices();
-		skinTransformGPU();
+		updateTransformBuffer();
+		skinTransformGPU(transformBuffer,TBOTran);
 	}
 //#else
 	
@@ -863,4 +874,175 @@ void SbmDeformableMeshGPU::updateTransformBuffer()
 			continue;
 		transformBuffer(i) = bindPoseMatList[i]*joint->gmat();		
 	}
+}
+
+
+
+bool SbmDeformableMeshGPU::buildGPUVertexBuffer()
+{
+	if (skinWeights.size() == 0 )
+		return false;
+	if (initVertexBuffer) return true;
+
+	DeformableMesh::buildVertexBuffer();
+	GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();	
+	VBOPos = new VBOVec3f((char*)"RestPos",VERTEX_POSITION,posBuf);		
+	VBOTangent = new VBOVec3f((char*)"Tangent",VERTEX_TANGENT, tangentBuf);
+	VBOBiNormal = new VBOVec3f((char*)"BiNormal",VERTEX_BINORMAL, binormalBuf);
+	VBONormal  =  new VBOVec3f((char*)"Normal",VERTEX_VBONORMAL, normalBuf);
+	VBOTexCoord = new VBOVec2f((char*)"TexCoord",VERTEX_TEXCOORD, texCoordBuf);
+	VBOWeight1 = new VBOVec4f((char*)"Weight1",VERTEX_BONE_WEIGHT_1,boneWeightBuf[0]);
+	VBOWeight2 = new VBOVec4f((char*)"Weight2",VERTEX_BONE_WEIGHT_2,boneWeightBuf[1]);
+	//VBOOutPos  = new VBOVec4f((char*)"OutPos",VERTEX_POSITION,posBuffer);
+	VBOTri     = new VBOVec3i((char*)"TriIdx",GL_ELEMENT_ARRAY_BUFFER,triBuf);
+	VBOBoneID1 = new VBOVec4i((char*)"BoneID1",VERTEX_BONE_ID_1,boneIDBuf[0]);
+	VBOBoneID2 = new VBOVec4i((char*)"BoneID2",VERTEX_BONE_ID_2,boneIDBuf[1]);
+	for (unsigned int i=0;i<subMeshList.size();i++)
+	{
+		SbmSubMesh* subMesh = subMeshList[i];
+		VBOVec3i* subMeshTriBuf = new VBOVec3i((char*)"TriIdx",GL_ELEMENT_ARRAY_BUFFER,subMesh->triBuf);
+		subMeshTris.push_back(subMeshTriBuf);
+	}
+	// Texture Buffer Object
+	if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_3_0)
+	{
+		int tranSize = boneJointList.size()*16;
+		int colorSize = DeformableMesh::dMeshDynamic_p.size()*3;
+		TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
+	}
+	return true;
+}
+
+bool SbmDeformableMeshGPU::initBuffer()
+{
+	this->buildVertexBuffer();
+
+	GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();	
+
+	VBOPos = new VBOVec3f((char*)"RestPos",VERTEX_POSITION,posBuf);		
+	VBOTangent = new VBOVec3f((char*)"Tangent",VERTEX_TANGENT, tangentBuf);
+	VBOBiNormal = new VBOVec3f((char*)"BiNormal",VERTEX_BINORMAL, binormalBuf);
+	VBONormal  =  new VBOVec3f((char*)"Normal",VERTEX_VBONORMAL, normalBuf);
+	VBOTexCoord = new VBOVec2f((char*)"TexCoord",VERTEX_TEXCOORD, texCoordBuf);
+	VBOWeight1 = new VBOVec4f((char*)"Weight1",VERTEX_BONE_WEIGHT_1,boneWeightBuf[0]);
+	VBOWeight2 = new VBOVec4f((char*)"Weight2",VERTEX_BONE_WEIGHT_2,boneWeightBuf[1]);
+	//VBOOutPos  = new VBOVec4f((char*)"OutPos",VERTEX_POSITION,posBuffer);
+	VBOTri     = new VBOVec3i((char*)"TriIdx",GL_ELEMENT_ARRAY_BUFFER,triBuf);
+	VBOBoneID1 = new VBOVec4i((char*)"BoneID1",VERTEX_BONE_ID_1,boneIDBuf[0]);
+	VBOBoneID2 = new VBOVec4i((char*)"BoneID2",VERTEX_BONE_ID_2,boneIDBuf[1]);
+
+	for (unsigned int i=0;i<subMeshList.size();i++)
+	{
+		SbmSubMesh* subMesh = subMeshList[i];
+		VBOVec3i* subMeshTriBuf = new VBOVec3i((char*)"TriIdx",GL_ELEMENT_ARRAY_BUFFER,subMesh->triBuf);
+		subMeshTris.push_back(subMeshTriBuf);
+	}
+
+	// Texture Buffer Object
+	if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_3_0)
+	{
+		int tranSize = boneJointList.size()*16;
+		int colorSize = DeformableMesh::dMeshDynamic_p.size()*3;
+		TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
+	}
+	return true;
+}
+
+SbmDeformableMeshGPUInstance::SbmDeformableMeshGPUInstance()
+{
+	_mesh = NULL;
+	TBOTran = NULL;
+	bufferReady = false;
+}
+
+SbmDeformableMeshGPUInstance::~SbmDeformableMeshGPUInstance()
+{
+
+}
+
+void SbmDeformableMeshGPUInstance::updateTransformBuffer()
+{
+	if (!_mesh) return;
+
+	if (transformBuffer.size() != _mesh->boneJointIdxMap.size())
+		transformBuffer.resize(_mesh->boneJointIdxMap.size());
+	std::map<std::string,int>& boneIdxMap = _mesh->boneJointIdxMap;
+	std::map<std::string,int>::iterator mi;
+	for ( mi  = boneIdxMap.begin();
+		  mi != boneIdxMap.end();
+		  mi++)	
+	{
+		int idx = mi->second;
+		SkJoint* joint = _skeleton->search_joint(mi->first.c_str());//boneJointList[i];		
+		if (!joint)
+			continue;
+		transformBuffer(idx) = _mesh->bindPoseMatList[idx]*joint->gmat();		
+	}
+}
+
+void SbmDeformableMeshGPUInstance::update()
+{	
+	if (SbmDeformableMeshGPU::disableRendering) return; // do nothing
+	if (!_skeleton) return;
+
+	if (!SbmDeformableMeshGPU::useGPUDeformableMesh)
+	{
+		DeformableMeshInstance::update();
+		return;
+	}	
+
+	if (!SbmDeformableMeshGPU::initShader)
+	{
+		SbmDeformableMeshGPU::initShaderProgram();
+	}
+
+	SbmShaderProgram* program = SbmShaderManager::singleton().getShader(shaderName);	
+	bool hasGLContext = SbmShaderManager::singleton().initOpenGL() && SbmShaderManager::singleton().initGLExtension();	
+	if (!bufferReady && hasGLContext && program && program->finishBuild())
+	{
+		// initialize 
+		bufferReady = initBuffer();
+	}
+
+	if (!bufferReady || !hasGLContext)
+	{	
+		DeformableMeshInstance::setVisibility(true);
+		DeformableMeshInstance::update();		
+	}	
+	else if (dynamic_cast<SbmDeformableMeshGPU*>(_mesh))
+	{
+		SbmDeformableMeshGPU* gpuMesh = dynamic_cast<SbmDeformableMeshGPU*>(_mesh);
+		// GPU update and rendering
+		//printf("GPU Deformable Model Update\n");
+		DeformableMeshInstance::setVisibility(false);
+		_skeleton->update_global_matrices();
+		updateTransformBuffer();
+		gpuMesh->skinTransformGPU(transformBuffer,TBOTran);
+	}
+}
+
+bool SbmDeformableMeshGPUInstance::initBuffer()
+{	
+	SbmDeformableMeshGPU* gpuMesh = dynamic_cast<SbmDeformableMeshGPU*>(_mesh);
+	bool hasVertexBuffer = gpuMesh->buildGPUVertexBuffer();	
+	if (!hasVertexBuffer) return false;
+	if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_3_0)
+	{
+		cleanBuffer();
+		int tranSize = _mesh->boneJointIdxMap.size()*16;
+		int colorSize = dynamicMesh.size()*3;
+		TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
+	}
+	return true;
+}
+
+void SbmDeformableMeshGPUInstance::cleanBuffer()
+{
+	if (TBOTran) delete TBOTran;	
+}
+
+void SbmDeformableMeshGPUInstance::setDeformableMesh( DeformableMesh* mesh )
+{
+	DeformableMeshInstance::setDeformableMesh(mesh);
+	bufferReady = false;
 }

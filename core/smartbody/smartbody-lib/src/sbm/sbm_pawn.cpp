@@ -150,7 +150,8 @@ scene_p( NULL ),
 dMesh_p( NULL) ,
 #else
 dMesh_p( NULL ),
-#endif
+#endif,
+dMeshInstance_p(NULL),
 ct_tree_p( MeControllerTreeRoot::create() ),
 world_offset_writer_p( NULL ),
 wo_cache_timestamp( -std::numeric_limits<float>::max() )
@@ -223,6 +224,9 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 	//int err = mcu.add_scene(scene_p);	
 	if (dMesh_p)
 		dMesh_p->skeleton = _skeleton;
+	if (dMeshInstance_p)
+		dMeshInstance_p->setSkeleton(_skeleton);
+
 	float height = _skeleton->getCurrentHeight();
 	setHeight(height);
 	_skeleton->ref();

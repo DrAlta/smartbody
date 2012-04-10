@@ -15,37 +15,57 @@ public:
 public:	
 };
 
+class SbmDeformableMeshGPUInstance;
+
 class SbmDeformableMeshGPU : public DeformableMesh
 {
 public:
+	static bool disableRendering;
 	static bool useGPUDeformableMesh;
 	static bool useShadowPass;	
 	static GLuint shadowMapID;
-protected:
 	static bool initShader;
+protected:	
 	bool useGPU;	
-	int numTotalVtxs, numTotalTris;
-	VBOVec4f *VBOPos;
+	VBOVec3f *VBOPos;
 	VBOVec3f *VBOTangent, *VBOBiNormal;
 	VBOVec3f *VBONormal, *VBOOutPos;
-	VBOVec3f *VBOTexCoord;
+	VBOVec2f *VBOTexCoord;
 	VBOVec3i *VBOTri;
 	std::vector<MeshSubset*> meshSubset;
-	VBOVec4f *VBOBoneID1,*VBOBoneID2, *VBOWeight1, *VBOWeight2;
+	VBOVec4i *VBOBoneID1,*VBOBoneID2;
+	VBOVec4f *VBOWeight1, *VBOWeight2;
 	TBOData  *TBOTran; // bone transformation	
-	std::vector<SkJoint*> boneJointList;
-	std::vector<SrMat>    bindPoseMatList;
+	std::vector<VBOVec3i*> subMeshTris;
 	ublas::vector<SrMat>  transformBuffer;	
 public:
 	SbmDeformableMeshGPU(void);
-	~SbmDeformableMeshGPU(void);
-
+	~SbmDeformableMeshGPU(void);	
 public:
 	virtual void update();
+	bool buildGPUVertexBuffer();	
+	void skinTransformGPU(ublas::vector<SrMat>& tranBuffer, TBOData* tranTBO);
+	static void initShaderProgram();	
 protected:
 	bool initBuffer(); // initialize VBO and related GPU data buffer	
-	static void initShaderProgram();
-	void skinTransformGPU();
+	bool initBuffer1();	
 	void updateTransformBuffer();	
+};
+
+class SbmDeformableMeshGPUInstance : public DeformableMeshInstance
+{
+protected:
+	ublas::vector<SrMat>  transformBuffer;	
+	TBOData  *TBOTran; // bone transformation	
+	bool     bufferReady;
+public:
+	SbmDeformableMeshGPUInstance();
+	~SbmDeformableMeshGPUInstance();
+	void updateTransformBuffer();
+	virtual void update();			
+	virtual void setDeformableMesh(DeformableMesh* mesh);
+protected:
+	bool initBuffer();	
+	void cleanBuffer();	
 };
 

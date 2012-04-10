@@ -1,7 +1,6 @@
 #ifndef SBSCENE_H
 #define SBSCENE_H
 
-#include <vhcl.h>
 #include <sbm/SBObject.h>
 
 class SbmDebuggerServer;

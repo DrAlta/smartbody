@@ -2016,6 +2016,11 @@ std::map<std::string, SkSkeleton*>& mcuCBHandle::getSkeletonMap()
 	return skeleton_map;
 }
 
+std::map<std::string, DeformableMesh*>& mcuCBHandle::getDeformableMeshMap()
+{
+	return deformableMeshMap;
+}
+
 bool mcuCBHandle::addCharacter(SbmCharacter* character)
 {
 	SbmCharacter* c = getCharacter(character->getName());
@@ -2051,6 +2056,15 @@ SbmCharacter* mcuCBHandle::getCharacter(const std::string& name)
 int mcuCBHandle::getNumCharacters()
 {
 	return character_map.size();
+}
+
+DeformableMesh* mcuCBHandle::getDeformableMesh( const std::string& name )
+{
+	std::map<std::string, DeformableMesh*>::iterator iter = deformableMeshMap.find(name);
+	if (iter == deformableMeshMap.end())
+		return NULL;
+	else
+		return (*iter).second;
 }
 
 SkMotion* mcuCBHandle::getMotion(const std::string& motionName)
@@ -2196,6 +2210,11 @@ Nvbg* mcuCBHandle::getNvbg(std::string id)
 	}
 }
 
+void mcuCBHandle::render()
+{
+	if( viewer_p ) { viewer_p->render(); }
+	if (ogreViewer_p) { ogreViewer_p->render(); }
+}
 
 
 /////////////////////////////////////////////////////////////

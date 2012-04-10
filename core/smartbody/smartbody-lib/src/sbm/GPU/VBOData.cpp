@@ -13,7 +13,7 @@ VBOData::~VBOData(void)
 
 void VBOData::BindBuffer()
 {	
-	if (data_Vec4f || data_Vec3f || data_float || data_Vec2f){
+	if (data_Vec4f || data_Vec3f || data_float || data_Vec2f || data_Vec4i){
 		//printf("Enable Client\n");
 		//glEnableClientState(m_ArrayType);
 		//printf("Array Type = %d\n",m_ArrayType);		
@@ -29,7 +29,7 @@ void VBOData::BindBuffer()
 
 void VBOData::UnbindBuffer()
 {
-	if (data_Vec4f || data_Vec3f || data_float){
+	if (data_Vec4f || data_Vec3f || data_float || data_Vec2f || data_Vec4i){
 		//glDisableClientState(m_ArrayType);
 		//printf("Array Type = %d\n",m_ArrayType);
 		//DisableClient(m_ArrayType);
@@ -68,19 +68,28 @@ void VBOData::Update()
 				getPtr(*data_Vec4f),GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER,0);
 		}
+		else if (data_Vec4i) {
+			//printf("Bind 4f\n");
+			glBindBuffer(GL_ARRAY_BUFFER,m_iVBO_ID);
+			//printf("VBO attrib dim = %d\n",data_Vec4f->dim(0));
+			glBufferData(GL_ARRAY_BUFFER,data_Vec4i->size()*4*sizeof(int),
+				getPtr(*data_Vec4i),GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER,0);
+		}
 		else if (data_Vec2f) {
 			//printf("Bind 4f\n");
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,m_iVBO_ID);
+			glBindBuffer(GL_ARRAY_BUFFER,m_iVBO_ID);
 			//printf("VBO attrib dim = %d\n",data_Vec4f->dim(0));
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER,data_Vec2f->size()*2*sizeof(float),
+			glBufferData(GL_ARRAY_BUFFER,data_Vec2f->size()*2*sizeof(float),
 				getPtr(*data_Vec2f),GL_STATIC_DRAW);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+			glBindBuffer(GL_ARRAY_BUFFER,0);
 		}
+		
 		m_bUpdate = false;
 	}
 }
 
-VBOData::VBOData( char* name, int type, ublas::vector<Vec2f>& Data )
+VBOData::VBOData( char* name, int type, std::vector<SrVec2>& Data )
 {
 	m_ArrayType=type;
 	strcpy(m_Name,name);
@@ -89,13 +98,14 @@ VBOData::VBOData( char* name, int type, ublas::vector<Vec2f>& Data )
 	data_Vec3f = NULL;
 	data_Vec3i = NULL;
 	data_Vec4f = NULL;
+	data_Vec4i = NULL;
 	data_float = NULL;
 
 	m_bUpdate = true;
 	m_iVBO_ID = 0;
 }
 
-VBOData::VBOData( char* name, int type, ublas::vector<float>& Data )
+VBOData::VBOData( char* name, int type, std::vector<float>& Data )
 {
 	m_ArrayType=type;
 	strcpy(m_Name,name);
@@ -103,13 +113,14 @@ VBOData::VBOData( char* name, int type, ublas::vector<float>& Data )
 	data_Vec3f = NULL;
 	data_Vec3i = NULL;
 	data_Vec4f = NULL;
+	data_Vec4i = NULL;
 	data_Vec2f = NULL;
 
 	m_bUpdate = true;
 	m_iVBO_ID = 0;
 }
 
-VBOData::VBOData( char* name, int type, ublas::vector<Vec3f>& Data )
+VBOData::VBOData( char* name, int type, std::vector<SrVec>& Data )
 {
 	m_ArrayType=type;
 	strcpy(m_Name,name);
@@ -117,13 +128,14 @@ VBOData::VBOData( char* name, int type, ublas::vector<Vec3f>& Data )
 	data_Vec3f = &Data;
 	data_Vec3i = NULL;
 	data_Vec4f = NULL;
+	data_Vec4i = NULL;
 	data_float = NULL;
 
 	m_bUpdate = true;
 	m_iVBO_ID = 0;
 }
 
-VBOData::VBOData( char* name, int type, ublas::vector<Vec3i>& Data )
+VBOData::VBOData( char* name, int type, std::vector<SrVec3i>& Data )
 {
 	m_ArrayType=type;
 	strcpy(m_Name,name);
@@ -131,13 +143,14 @@ VBOData::VBOData( char* name, int type, ublas::vector<Vec3i>& Data )
 	data_Vec3f = NULL;
 	data_Vec3i = &Data;
 	data_Vec4f = NULL;
+	data_Vec4i = NULL;
 	data_float = NULL;
 
 	m_bUpdate = true;
 	m_iVBO_ID = 0;
 }
 
-VBOData::VBOData( char* name, int type, ublas::vector<Vec4f>& Data )
+VBOData::VBOData( char* name, int type, std::vector<SrVec4>& Data )
 {
 	m_ArrayType=type;
 	strcpy(m_Name,name);
@@ -145,11 +158,27 @@ VBOData::VBOData( char* name, int type, ublas::vector<Vec4f>& Data )
 	data_Vec3f = NULL;
 	data_Vec3i = NULL;
 	data_Vec4f = &Data;
+	data_Vec4i = NULL;
 	data_float = NULL;
 
 	m_bUpdate = true;
 	m_iVBO_ID = 0;
+}
 
+
+VBOData::VBOData( char* name, int type, std::vector<SrVec4i>& Data )
+{
+	m_ArrayType=type;
+	strcpy(m_Name,name);
+	data_Vec2f = NULL;
+	data_Vec3f = NULL;
+	data_Vec3i = NULL;
+	data_Vec4f = NULL;
+	data_Vec4i = &Data;
+	data_float = NULL;
+
+	m_bUpdate = true;
+	m_iVBO_ID = 0;
 }
 
 

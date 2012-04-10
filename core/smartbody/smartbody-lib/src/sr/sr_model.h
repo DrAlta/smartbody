@@ -40,6 +40,7 @@ class SrSphere;
 # include <sr/sr_shared_class.h>
 #include <map>
 #include <string>
+#include <vector>
 
 /*! \class SrModel sr_model.h
     \brief a model composed of triangular faces
@@ -61,6 +62,7 @@ class SrModel : public SrSharedClass
      { int a, b, c;
        void set ( int i, int j, int k ) { a=i; b=j; c=k; }
        void validate () { if (a<0) a=-a; if (b<0) b=-b; if (c<0) c=-c; }
+	   int& operator[] ( int i ) { return *((&a)+i); }
        friend SrOutput& operator<< ( SrOutput& o, const Face& f ) { return o<<f.a<<srspc<<f.b<<srspc<<f.c; }
        friend SrInput& operator>> ( SrInput& i, Face& f ) { return i>>f.a>>f.b>>f.c; }
      };
@@ -89,7 +91,7 @@ class SrModel : public SrSharedClass
     SrStringArray mtlnames;
     
     /*! May contain any desired name for the model. */
-    SrString name;
+	SrString name;
 
     /*! Constructor lets all internal arrays as empty and culling is set to true */
     SrModel ();

@@ -1,10 +1,8 @@
 #pragma once
 #include "SbmShader.h"
-#include <sbm/me_ct_ublas.hpp>
-#include "gfx/vec3.h"
-#include "gfx/vec4.h"
+#include <sr/sr_vec.h>
+#include <sr/sr_vec2.h>
 
-using namespace gfx;
 
 enum
 {	
@@ -40,17 +38,19 @@ public:
 	GLuint m_ArrayType;
 
 	char m_Name[20];		
-	ublas::vector<Vec2f> *data_Vec2f;
-	ublas::vector<Vec3f> *data_Vec3f;
-	ublas::vector<Vec3i> *data_Vec3i;
-	ublas::vector<Vec4f> *data_Vec4f;	
-	ublas::vector<float> *data_float;
+	std::vector<SrVec2> *data_Vec2f;
+	std::vector<SrVec> *data_Vec3f;
+	std::vector<SrVec3i> *data_Vec3i;
+	std::vector<SrVec4> *data_Vec4f;
+	std::vector<SrVec4i> *data_Vec4i;	
+	std::vector<float> *data_float;
 public:	
-	VBOData(char* name, int type, ublas::vector<Vec2f>& Data);
-	VBOData(char* name, int type, ublas::vector<Vec3f>& Data);
-	VBOData(char* name, int type, ublas::vector<Vec3i>& Data);
-	VBOData(char* name, int type, ublas::vector<Vec4f>& Data);	
-	VBOData(char* name, int type, ublas::vector<float>& Data);
+	VBOData(char* name, int type, std::vector<SrVec2>& Data);
+	VBOData(char* name, int type, std::vector<SrVec>& Data);
+	VBOData(char* name, int type, std::vector<SrVec3i>& Data);
+	VBOData(char* name, int type, std::vector<SrVec4>& Data);	
+	VBOData(char* name, int type, std::vector<SrVec4i>& Data);
+	VBOData(char* name, int type, std::vector<float>& Data);
 public:
 	~VBOData(void);
 	
@@ -69,10 +69,10 @@ template<class S>
 class VBODataArray
 {	
 protected:
-	ublas::vector<S> m_Data;
+	std::vector<S> m_Data;
 	VBOData*   m_pVBO;	
 public:
-	VBODataArray(char* name, int type, ublas::vector<S>& data);
+	VBODataArray(char* name, int type, std::vector<S>& data);
 	VBODataArray(char* name, int type, int nSize);
 	~VBODataArray();
 	VBOData* VBO() const { return m_pVBO; }
@@ -94,7 +94,7 @@ VBODataArray<S>::~VBODataArray()
 }
 
 template<class S>
-VBODataArray<S>::VBODataArray( char* name, int type, ublas::vector<S>& data )
+VBODataArray<S>::VBODataArray( char* name, int type, std::vector<S>& data )
 {
 	m_Data.resize(data.size());
 	//copy(data,m_Data);
@@ -103,6 +103,16 @@ VBODataArray<S>::VBODataArray( char* name, int type, ublas::vector<S>& data )
 	m_pVBO->Update();
 }
 
-typedef VBODataArray<Vec3f> VBOVec3f;
-typedef VBODataArray<Vec4f> VBOVec4f;
-typedef VBODataArray<Vec3i> VBOVec3i;
+template <class S>
+S* getPtr(std::vector<S>& data)
+{
+	if (data.size() == 0) return NULL;
+	return &data[0];
+}
+
+typedef VBODataArray<SrVec2> VBOVec2f;
+typedef VBODataArray<SrVec> VBOVec3f;
+typedef VBODataArray<SrVec4> VBOVec4f;
+typedef VBODataArray<SrVec3i> VBOVec3i;
+typedef VBODataArray<SrVec4i> VBOVec4i;
+

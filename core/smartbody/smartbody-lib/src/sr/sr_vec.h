@@ -287,6 +287,48 @@ class SrVec
 
  SrVec rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle);
 
+
+ class SrVec4i 
+ {
+ public:
+	 int data[4];
+	 SrVec4i() {}
+	 SrVec4i(int a, int b, int c, int d) { data[0] = a; data[1] = b; data[2] = c; data[3] = d; }
+	 int& operator[] ( int i ) { return data[i]; }
+	 void operator = ( const SrVec4i& v )
+	 {
+		 for (int i=0;i<4;i++)
+			 data[i] = v.data[i];
+	 }
+ };
+
+ class SrVec3i 
+ {
+ public:
+	 int data[3];
+	 SrVec3i() {}
+	 SrVec3i(int a, int b, int c) { data[0] = a; data[1] = b; data[2] = c; }
+	 int& operator[] ( int i ) { return data[i]; }
+	 void operator = ( const SrVec4i& v )
+	 {
+		 for (int i=0;i<3;i++)
+			 data[i] = v.data[i];
+	 }
+ };
+
+ class SrVec4
+ {
+ public:
+	 float data[4];
+	 SrVec4() {}
+	 SrVec4(float a, float b, float c, float d) { data[0] = a; data[1] = b; data[2] = c; data[3] = d; }
+	 float& operator[] ( int i ) { return data[i]; }
+	 void operator = ( const SrVec4& v )
+	 {
+		 for (int i=0;i<4;i++)
+			 data[i] = v.data[i];
+	 }
+ };
 //============================== end of file ===============================
 
 # endif // SR_VEC_H

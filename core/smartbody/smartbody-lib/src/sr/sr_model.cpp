@@ -26,6 +26,7 @@
 # include <sr/sr_sphere.h>
 # include <sr/sr_cylinder.h>
 # include <sr/sr_string_array.h>
+#include <set>
 
 //# define SR_USE_TRACE1 // IO
 //# define SR_USE_TRACE2 // Validation of normals materials, etc
@@ -1135,5 +1136,4 @@ void SrModel::restoreOriginalVertices()
 		}
 	}
 }
-
 //================================ End of File =================================================
