@@ -8,6 +8,8 @@
 #include <sk/sk_skeleton.h>
 #include <sr/sr_model.h>
 
+typedef std::vector<SkJoint*> SkJointList;
+
 class SkinWeight
 {
 public:
@@ -64,7 +66,7 @@ public:
 	std::vector<SrVec4i>        boneIDBuf[2];
 	std::vector<SrVec4>         boneWeightBuf[2];
 	std::map<std::string,int>   boneJointIdxMap;
-	std::vector<SkJoint*>       boneJointList;	
+	std::vector<SkJoint*>    boneJointList;	
 	std::vector<SrMat>          bindPoseMatList;
 
 public:
@@ -87,11 +89,14 @@ protected:
 	std::vector<SrSnModel*> dynamicMesh; 
 	SkSkeleton*			  _skeleton;
 	bool				  _updateMesh;
+	std::vector<SkJointList> _boneJointList;
 public:
 	DeformableMeshInstance();
 	~DeformableMeshInstance();
 
 	virtual void setDeformableMesh(DeformableMesh* mesh);
+
+	void updateJointList();
 	virtual void setSkeleton(SkSkeleton* skel);	
 	virtual void setVisibility(int deformableMesh);
 	virtual void update();

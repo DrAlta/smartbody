@@ -50,10 +50,11 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 		character->dMesh_p = new DeformableMesh();
 	#else
 		character->dMesh_p =  new SbmDeformableMeshGPU();
+		character->dMeshInstance_p =  new SbmDeformableMeshGPUInstance();
 	#endif
 	SBSkeleton* sbSkel = character->getSkeleton();
 	character->dMesh_p->setSkeleton(sbSkel);
-
+	character->dMeshInstance_p->setSkeleton(sbSkel);
 }
 
 void FLTKListener::OnCharacterDelete( const std::string & name )
@@ -140,14 +141,20 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 		pawn->scene_p->unref();
 		pawn->scene_p = NULL;
 	}
-	// remove any existing deformable mesh
+	// remove any existing deformable mesh	
 	if (pawn->dMesh_p)
 	{
 		delete pawn->dMesh_p;
 		pawn->dMesh_p = NULL;
+	}	
+	if (pawn->dMeshInstance_p)
+	{
+		delete pawn->dMeshInstance_p;
+		pawn->dMeshInstance_p = NULL;
 	}
 
 	pawn->dMesh_p =  new SbmDeformableMeshGPU();
+	pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
 
 	pawn->scene_p = new SkScene();
 	pawn->scene_p->ref();

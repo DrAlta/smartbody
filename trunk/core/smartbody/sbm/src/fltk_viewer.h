@@ -229,6 +229,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
     /*! Activates an option available from the right button mouse menu of the viewer. */
     void menu_cmd ( MenuCmd c, const char* label );
 
+	void applyToCharacters();
     /*! Returns true if the cmd is currently activated. */
     bool menu_cmd_activated ( MenuCmd c );
 
