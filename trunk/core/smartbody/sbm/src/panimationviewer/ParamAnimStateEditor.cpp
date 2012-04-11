@@ -25,7 +25,7 @@
 #include "ParamAnimBlock.h"
 #include <sbm/SBAnimationState.h>
 #include <sbm/SBAnimationStateManager.h>
-#include <FL/fl_file_chooser.H>
+#include <FL/Fl_File_Chooser.H>
 #include "ParamAnimStateCreatorWidget.h"
 
 PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
