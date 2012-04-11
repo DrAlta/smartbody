@@ -981,9 +981,10 @@ void SbmDeformableMeshGPUInstance::updateTransformBuffer()
 }
 
 void SbmDeformableMeshGPUInstance::update()
-{	
-	if (SbmDeformableMeshGPU::disableRendering) return; // do nothing
+{		
 	if (!_skeleton || !_mesh) return; // do nothing if there is no mesh or skeleton in the instance
+	if (SbmDeformableMeshGPU::disableRendering) return; // do nothing
+	if (!_updateMesh) return;
 
 	if (!SbmDeformableMeshGPU::useGPUDeformableMesh)
 	{
@@ -1015,6 +1016,7 @@ void SbmDeformableMeshGPUInstance::update()
 		// GPU update and rendering
 		//printf("GPU Deformable Model Update\n");
 		DeformableMeshInstance::setVisibility(false);
+		_updateMesh = true;
 		_skeleton->update_global_matrices();
 		updateTransformBuffer();
 		gpuMesh->skinTransformGPU(transformBuffer,TBOTran);
