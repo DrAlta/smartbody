@@ -83,7 +83,6 @@ class PanimationWindow : public Fl_Double_Window, public GenericViewer
 
 		static void loadCharacters(Fl_Choice* characterList);
 		static void refreshUI(Fl_Widget* widget, void* data);
-		static void clearTextDisplay(Fl_Widget* widget, void* data);
 		static void changeMotionPlayerMode(Fl_Widget* widget, void* data);
 		void motionPlayerUpdate();
 		void getSelectedMarkInfo(nle::NonLinearEditorModel* model, std::string& blockName, double& time);
@@ -115,9 +114,6 @@ class PanimationWindow : public Fl_Double_Window, public GenericViewer
 		Fl_Choice*		characterList;
 		Fl_Button*		refresh;
 		Fl_Button*		resetCharacter;
-		Fl_Text_Display*	textDisplay;
-		Fl_Text_Buffer*	textBuffer;
-		Fl_Button*		clearHistoryButton;
 };
 
  class PanimationViewerFactory : public GenericViewerFactory

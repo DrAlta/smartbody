@@ -73,9 +73,13 @@ class PAState
 		void getParameter(const std::string& motion, double& x, double& y, double& z);
 		void removeParameter(const std::string& motion);
 		void addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3);
+		int getTriangleIndex(const std::string& motion1, const std::string& motion2, const std::string& motion3);
+		void removeTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3);
 		void removeTriangles(const std::string& motion);
 		void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
+		void removeTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
 		void removeTetrahedrons(const std::string& motion);
+		int getTetrahedronIndex(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
 		void buildTetrahedron();
 		int getType();
 		void setType(int typ);
@@ -111,20 +115,20 @@ class PAState
 		virtual int getNumMotions();
 		virtual int getNumKeys();
 
-		private:
-			bool insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
-			void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, double& w2, double& w3);
-			void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrVec& v4, double& w1, double& w2, double& w3, double& w4);
-			SrVec closestPtPointTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
-			int PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c);
+	private:
+		bool insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
+		void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, double& w2, double& w3);
+		void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrVec& v4, double& w1, double& w2, double& w3, double& w4);
+		SrVec closestPtPointTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
+		int PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c);
 
-			int type;
-			//std::vector<std::string> motionNames;
-			std::vector<SrVec> parameters;
-			SrVec previousParam;
-			std::vector<TriangleInfo> triangles;
-			std::vector<TetrahedronInfo> tetrahedrons;
-			std::string emptyString;
+		int type;
+		//std::vector<std::string> motionNames;
+		std::vector<SrVec> parameters;
+		SrVec previousParam;
+		std::vector<TriangleInfo> triangles;
+		std::vector<TetrahedronInfo> tetrahedrons;
+		std::string emptyString;
 };
 
 //There are PATransition stored inside mcu

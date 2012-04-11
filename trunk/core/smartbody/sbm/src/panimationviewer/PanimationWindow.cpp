@@ -39,35 +39,22 @@ PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_
 		int tabGroupX = 10;
 		int tabGroupY = 30;
 		int tabGroupW = w - 20;
-		int tabGroupH = 3 * h / 4 - 40;
+		int tabGroupH = h - 100;
 		int childGroupX = 0;
 		int childGroupY = 2 * yDis ;
 		int childGroupW = tabGroupW- 10;
 		int childGroupH = tabGroupH - 2 * yDis;
 
-		motionPlayerMode = new Fl_Check_Button(10, 3 * h / 4 + 10, 200, 20, "Play selected motion");
+		motionPlayerMode = new Fl_Check_Button(10, h - 40, 200, 20, "Play selected motion");
 		motionPlayerMode->value(0);
 		motionPlayerMode->callback(changeMotionPlayerMode, this);
-		characterList = new Fl_Choice(300, 3 * h / 4 + 10, 200, 20, "Character List");
+		characterList = new Fl_Choice(300, h - 40, 200, 20, "Character List");
 		loadCharacters(characterList);
 		
-		refresh = new Fl_Button(550, 3 * h / 4 + 10, 100, 20, "Refresh");
+		refresh = new Fl_Button(550, h - 40, 100, 20, "Refresh");
 		refresh->callback(refreshUI, this);
-		resetCharacter = new Fl_Button(670, 3 * h / 4 + 10, 100, 20, "Reset");
+		resetCharacter = new Fl_Button(670, h - 40, 100, 20, "Reset");
 		resetCharacter->callback(reset, this);
-		textDisplay = new Fl_Text_Display(10, 3 * h / 4 + 40, w - 120, h / 4 - 60);
-		textDisplay->color(FL_WHITE);
-		textDisplay->textcolor(FL_BLUE);
-		textBuffer = new Fl_Text_Buffer();
-		textDisplay->buffer(textBuffer);
-		
-		// for some reason, this line causes fltk 1.3 to slow down significantly when many lines of commands are inserted into display text.				
-		// this does not happen in fltk 2.0. Need to find out the correct way of doing this.
-		//textDisplay->wrap_mode(true, 0);
-
-		this->resizable(textDisplay);
-		clearHistoryButton = new Fl_Button(w - 100, h - 90, 80, 20, "Clear");
-		clearHistoryButton->callback(clearTextDisplay, this);
 
 		tabGroup = new Fl_Tabs(tabGroupX, tabGroupY, tabGroupW, tabGroupH);
 		tabGroup->begin();
@@ -206,7 +193,6 @@ void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	Fl_Text_Display* display = window->textDisplay;	
 	BML::SbmCommand* command = new BML::SbmCommand(cmd, (float)(mcu.time + tOffset));
 	bool success = true;
 	srCmdSeq *seq = new srCmdSeq(); //sequence that holds the commands
@@ -226,17 +212,6 @@ void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double
 	{
 		if( mcu.execute_seq(seq) != CMD_SUCCESS ) 
 			LOG("ERROR: PanimationWindow::generateBML: Failed to execute sequence.");
-		else
-		{
-			bool shouldAppend = window->checkCommand(cmd);
-			if (shouldAppend)
-			{				
-				display->insert(cmd.c_str());
-				display->insert("\n");
-			}
-		}
-		display->redraw();
-		display->show_insert_position();
 	}
 }
 
@@ -357,14 +332,6 @@ void PanimationWindow::loadCharacters(Fl_Choice* characterList)
 	}
 	characterList->value(0);
 }
-
-void PanimationWindow::clearTextDisplay(Fl_Widget* widget, void* data)
-{
-	PanimationWindow* window = (PanimationWindow*) data;
-	window->textDisplay->buffer()->remove(0, window->textDisplay->buffer()->length());
-	window->textDisplay->redraw();
-}
-
 
 void PanimationWindow::reset(Fl_Widget* widget, void* data)
 {	

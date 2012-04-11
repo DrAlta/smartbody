@@ -667,6 +667,13 @@ void PAState::removeParameter(const std::string& motion)
 
 void PAState::addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
 {
+	if (getTriangleIndex(motion1, motion2, motion3) >= 0)
+	{
+		LOG("PAState::addTriangle ERR: triangle with motion %s, %s, %s already exist!", motion1.c_str(), motion2.c_str(), motion3.c_str());
+		return;
+	}
+
+	// add triangle
 	TriangleInfo tInfo;
 	SrVec v1 = getVec(motion1);
 	SrVec v2 = getVec(motion2);
@@ -677,6 +684,46 @@ void PAState::addTriangle(const std::string& motion1, const std::string& motion2
 	tInfo.motion3 = motion3;
 	triangles.push_back(tInfo);
 }
+
+int PAState::getTriangleIndex(const std::string& motion1, const std::string& motion2, const std::string& motion3)
+{
+	for (size_t i = 0; i < triangles.size(); i++)
+	{
+		std::vector<std::string> inputTriangle;
+		inputTriangle.push_back(motion1);
+		inputTriangle.push_back(motion2);
+		inputTriangle.push_back(motion3);
+		std::vector<std::string> triangle;
+		triangle.push_back(triangles[i].motion1);
+		triangle.push_back(triangles[i].motion2);
+		triangle.push_back(triangles[i].motion3);
+		std::sort(inputTriangle.begin(), inputTriangle.end());
+		std::sort(triangle.begin(), triangle.end());
+
+		bool isEqual = true;
+		for (int j = 0; j < 3; j++)
+		{
+			if (inputTriangle[j] != triangle[j])
+			{
+				isEqual = false;
+				break;
+			}
+		}
+		if (isEqual)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void PAState::removeTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
+{
+	int id = getTriangleIndex(motion1, motion2, motion3);
+	if (id >= 0)
+		triangles.erase(triangles.begin() + id);
+}
+
 
 void PAState::removeTriangles(const std::string& motion)
 {
@@ -697,6 +744,13 @@ void PAState::removeTriangles(const std::string& motion)
 
 void PAState::addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
 {
+	if (getTetrahedronIndex(motion1, motion2, motion3, motion4) >= 0)
+	{
+		LOG("PAState::addTetrahedron ERR: triangle with motion %s, %s, %s, %s already exist!", motion1.c_str(), motion2.c_str(), motion3.c_str(), motion4.c_str());
+		return;
+	}
+
+	// add tetrahedron
 	TetrahedronInfo tetraInfo;
 	tetraInfo.v1 = getVec(motion1);
 	tetraInfo.v2 = getVec(motion2);
@@ -707,6 +761,47 @@ void PAState::addTetrahedron(const std::string& motion1, const std::string& moti
 	tetraInfo.motion3 = motion3;
 	tetraInfo.motion4 = motion4;
 	tetrahedrons.push_back(tetraInfo);
+}
+
+int PAState::getTetrahedronIndex(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
+{
+	for (size_t i = 0; i < tetrahedrons.size(); i++)
+	{
+		std::vector<std::string> inputTetra;
+		inputTetra.push_back(motion1);
+		inputTetra.push_back(motion2);
+		inputTetra.push_back(motion3);
+		inputTetra.push_back(motion4);
+		std::vector<std::string> tetra;
+		tetra.push_back(tetrahedrons[i].motion1);
+		tetra.push_back(tetrahedrons[i].motion2);
+		tetra.push_back(tetrahedrons[i].motion3);
+		tetra.push_back(tetrahedrons[i].motion4);
+		std::sort(inputTetra.begin(), inputTetra.end());
+		std::sort(tetra.begin(), tetra.end());
+
+		bool isEqual = true;
+		for (int j = 0; j < 4; j++)
+		{
+			if (inputTetra[j] != tetra[j])
+			{
+				isEqual = false;
+				break;
+			}
+		}
+		if (isEqual)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void PAState::removeTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
+{
+	int id = getTetrahedronIndex(motion1, motion2, motion3, motion4);
+	if (id >= 0)
+		tetrahedrons.erase(tetrahedrons.begin() + id);
 }
 
 void PAState::removeTetrahedrons(const std::string& motion)
