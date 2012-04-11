@@ -152,16 +152,17 @@ void PAScriptEditor::updateStateInfo(Fl_Widget* widget, void* data)
 					iter->second = offset;
 				}
 			}
-			PAStateData* state = mcuCBHandle::singleton().lookUpPAState(selectedState);
+			PAState* state = mcuCBHandle::singleton().lookUpPAState(selectedState);
 			if (state->getNumMotions() > 1)
 			{
-				const char* ws = fl_input("weights (separate by white space)", "");
+/*				const char* ws = fl_input("weights (separate by white space)", "");
 				if (ws == NULL)	return;
 				std::string weights = ws;
 				std::vector<std::string> weight = editor->paWindow->tokenize(weights, " ");
 				if (state->getNumMotions() == weight.size())
 					for (int i = 0; i < state->getNumMotions(); i++)
 						state->weights[i] = (float)atof(weight[i].c_str());	
+						*/
 			}
 		}
 	}	
@@ -185,11 +186,13 @@ void PAScriptEditor::run(Fl_Widget* widget, void* data)
 			offset += iter1->second;
 		std::stringstream command;
 		command << "panim schedule char " << charName << " state " << stateName << " loop " << loopString <<  " playnow false additive false joint null ";
-		PAStateData* state = mcuCBHandle::singleton().lookUpPAState(stateName);
+		PAState* state = mcuCBHandle::singleton().lookUpPAState(stateName);
 		int wNumber = state->getNumMotions();
+		/*
 		for (int j = 0; j < wNumber; j++)
 			command << " " << state->weights[j];
 		editor->paWindow->execCmd(editor->paWindow, command.str(), offset);
+		*/
 	}
 }
 
@@ -201,7 +204,7 @@ void PAScriptEditor::changeCurrentStateWeight(Fl_Widget* widget, void* data)
 	std::string stateName = editor->currentStatePanel->value();
 	std::stringstream command;
 	command << "panim update char " << charName;
-	PAStateData* state = mcuCBHandle::singleton().lookUpPAState(stateName);
+	PAState* state = mcuCBHandle::singleton().lookUpPAState(stateName);
 	if (!state)
 		return;
 	int wNumber = state->getNumMotions();
@@ -256,7 +259,7 @@ void PAScriptEditor::update()
 		return;
 	if (!character->param_animation_ct)
 		return;
-	std::string curStateName = character->param_animation_ct->getCurrentStateName();
+	std::string curStateName = character->param_animation_ct->getCurrentPAStateData()->state->stateName;
 	std::string nextStateName = character->param_animation_ct->getNextStateName();
 	currentStatePanel->value(curStateName.c_str());
 	nextStatePanel->value(nextStateName.c_str());

@@ -185,7 +185,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 				if (c->param_animation_ct->hasPAState(c->steeringAgent->jumpName))
 					return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
 				std::stringstream command1;
-				if (c->param_animation_ct->getCurrentStateName() == c->steeringAgent->locomotionName)
+				if (c->param_animation_ct->getCurrentPAStateData()->state->stateName == c->steeringAgent->locomotionName)
 				{
 					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"" << c->steeringAgent->jumpName << "\" sbm:startnow=\"true\"/>";
 					command1 << "<sbm:states loop=\"true\" name=\"" << c->steeringAgent->locomotionName << "\" sbm:startnow=\"false\"/>";
@@ -202,9 +202,9 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			return BehaviorRequestPtr();
 
 		// also has to update state weight
-		PAStateData* locoData = mcu->lookUpPAState(c->steeringAgent->locomotionName);
-		if (locoData)
-			locoData->paramManager->setWeight(c->steeringAgent->desiredSpeed * 100.0f, 0.0);
+	//	PAState* locoData = mcu->lookUpPAState(c->steeringAgent->locomotionName);
+	//	if (locoData)
+	//		locoData->setWeight(c->steeringAgent->desiredSpeed * 100.0f, 0.0);
 	}
 
 	// gain for braking
@@ -493,54 +493,3 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 	nav_circle->set( pos[0], pos[1], pos[2], g_angular_speed, l_angular_speed, 0, id, 0, 0, 0, -1 );
 }
 
-BehaviorRequestPtr BML::parse_bml_example_locomotion( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu )
-{
-	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
-	std::string localId;
-	xml_utils::xml_translate(&localId, id);
-	SbmCharacter* c = mcu->getCharacter(request->actor->getName());
-	if (!c->param_animation_ct)
-	{
-		LOG("Parameterized Animation not enabled!");
-		return BehaviorRequestPtr();
-	}
-	const XMLCh* forwardSpd = elem->getAttribute(BMLDefs::ATTR_SPD);
-	const XMLCh* turningSpd = elem->getAttribute(BMLDefs::ATTR_RPS);
-	double spd = 0.0;
-	double rps = 0.0;
-	if (forwardSpd)
-		spd = xml_utils::xml_translate_float(forwardSpd);
-	if (turningSpd)
-		rps = xml_utils::xml_translate_float(turningSpd);
-
-	if (spd == 0 && rps == 0)
-	{
-		if (c->param_animation_ct->getCurrentStateName() == "UtahLocomotion")
-		{
-			std::stringstream command;
-			command << "panim schedule char " << c->getName();
-			command << " state UtahWalkToStop loop false playnow false";	
-			mcu->execute((char*) command.str().c_str());
-		}
-	}
-	if (c->param_animation_ct->getCurrentPAStateData() == NULL)
-	{
-		std::stringstream command;
-		command << "panim schedule char " << c->getName();
-		command << " state UtahStopToWalk loop false playnow false";
-		mcu->execute((char*) command.str().c_str());
-		std::stringstream command1;
-		command1 << "panim schedule char " << c->getName();
-		command1 << " state UtahLocomotion loop true playnow false";
-		mcu->execute((char*) command1.str().c_str());
-	}
-	else
-	{
-		if (c->param_animation_ct->getCurrentStateName() == "UtahLocomotion")
-		{
-			c->param_animation_ct->getCurrentPAStateData()->paramManager->setWeight(spd, rps);
-			c->param_animation_ct->updateWeights();			
-		}
-	}
-	return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
-}

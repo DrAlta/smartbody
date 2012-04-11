@@ -5,7 +5,7 @@
 
 namespace SmartBody {
 
-class SBAnimationState : public PAStateData
+class SBAnimationState : public PAState
 {
 	public:
 		SBAnimationState();
@@ -19,11 +19,14 @@ class SBAnimationState : public PAStateData
 		virtual int getNumCorrespondancePoints();
 		virtual std::vector<double> getCorrespondancePoints(int num);
 
+		virtual void removeMotion(const std::string& motionName);
+
 		virtual std::string getDimension();
 		bool validateState();
 
 	protected:
 		bool addSkMotion(const std::string& motionName);
+		bool removeSkMotion(const std::string& motionName);
 		/*
 			This function make sure that all the correspondance points are in ascendant order
 		*/
@@ -43,7 +46,9 @@ class SBAnimationState0D : public SBAnimationState
 		SBAnimationState0D(const std::string& name);
 		~SBAnimationState0D();
 
-		void addMotion(const std::string& motion);
+		virtual void addMotion(const std::string& motion);
+		virtual void removeMotion(const std::string& motionName);
+		
 };
 
 class SBAnimationState1D : public SBAnimationState
@@ -53,7 +58,8 @@ class SBAnimationState1D : public SBAnimationState
 		SBAnimationState1D(const std::string& name);
 		~SBAnimationState1D();
 
-		void addMotion(const std::string& motion, float parameter);
+		virtual void addMotion(const std::string& motion, float parameter);
+		virtual void removeMotion(const std::string& motionName);
 		void setParameter(const std::string& motion, float parameter);
 };
 
@@ -64,7 +70,8 @@ class SBAnimationState2D : public SBAnimationState
 		SBAnimationState2D(const std::string& name);
 		~SBAnimationState2D();
 
-		void addMotion(const std::string& motion, float parameter1, float paramter2);
+		virtual void addMotion(const std::string& motion, float parameter1, float paramter2);
+		virtual void removeMotion(const std::string& motionName);
 		void setParameter(const std::string& motion, float parameter1, float parameter2);
 		void addTriangle(const std::string& motion1, const std::string& motion2, const std::string&motion3);
 };
@@ -76,7 +83,8 @@ class SBAnimationState3D : public SBAnimationState
 		SBAnimationState3D(const std::string& name);
 		~SBAnimationState3D();
 
-		void addMotion(const std::string& motion, float parameter1, float paramter2, float paramter3);
+		virtual void addMotion(const std::string& motion, float parameter1, float paramter2, float paramter3);
+		virtual void removeMotion(const std::string& motionName);
 		void setParameter(const std::string& motion, float parameter1, float parameter2, float parameter3);
 		void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
 

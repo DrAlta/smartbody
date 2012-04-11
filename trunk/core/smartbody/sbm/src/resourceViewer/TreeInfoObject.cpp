@@ -1,4 +1,5 @@
 #include "TreeInfoObject.h"
+#include <sbm/SBAttribute.h>
 
 TreeInfoObject::TreeInfoObject(void)
 {

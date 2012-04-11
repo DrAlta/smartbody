@@ -438,8 +438,6 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				behavior = parse_bml_locomotion( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_STATES )==0 ) {
 				behavior = parse_bml_states( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, BMLDefs::TAG_EXAMPLE_LOCOMOTION )==0 ) {
-				behavior = parse_bml_example_locomotion( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_GESTURE )==0 ) {
 				behavior = parse_bml_gesture( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_INTERRUPT )==0 ) {

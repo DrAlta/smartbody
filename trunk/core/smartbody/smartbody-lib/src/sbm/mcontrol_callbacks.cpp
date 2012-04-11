@@ -74,6 +74,7 @@
 #include <sbm/SBSteerManager.h>
 #include <sbm/SBJointMapManager.h>
 #include <sbm/SBJointMap.h>
+#include <sbm/SBAnimationState.h>
 #include <math.h>
 
 
@@ -951,7 +952,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		if (operation == "state")
 		{
 			std::string stateName = args.read_token();
-			PAStateData* newState = new PAStateData(stateName);
+			PAState* newState = new PAState(stateName);
 			std::string nextString = args.read_token();
 			if (nextString == "cycle")
 			{
@@ -993,23 +994,17 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					}
 					newState->keys.push_back(keysForOneMotion);
 				}
-				for (int i = 0; i < numMotions; i++)
-				{
-					if (i == 0)
-						newState->weights.push_back(1.0);
-					else
-						newState->weights.push_back(0.0);
-				}
+
 				mcu_p->addPAState(newState);
 			}
 			else if (nextString == "parameter")
 			{
-				PAStateData* state = mcu_p->lookUpPAState(stateName);
+				PAState* state = mcu_p->lookUpPAState(stateName);
 				if (!state) return CMD_FAILURE;
 				std::string type = args.read_token();
-				if (type == "1D") state->paramManager->setType(0);
-				else if (type == "2D") state->paramManager->setType(1);
-				else if (type == "3D") state->paramManager->setType(2);
+				if (type == "1D") state->setType(0);
+				else if (type == "2D") state->setType(1);
+				else if (type == "3D") state->setType(2);
 				else return CMD_FAILURE;
 				int num = args.read_int();
 				for (int i = 0; i < num; i++)
@@ -1022,7 +1017,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 						if (motionId < 0) return CMD_FAILURE;
 						double param = parseMotionParameters(m, parameter, state->keys[motionId][0], state->keys[motionId][state->getNumKeys() - 1]);
 						if (param < -9000) param = atof(parameter.c_str());
-						state->paramManager->setParameter(m, param);
+						state->setParameter(m, param);
 					}
 					else if (type == "2D")
 					{
@@ -1032,7 +1027,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 						double paramY = parseMotionParameters(m, parameterY, state->keys[state->getMotionId(m)][0], state->keys[state->getMotionId(m)][state->getNumKeys() - 1]);
 						if (paramX < -9000) paramX = atof(parameterX.c_str());
 						if (paramY < -9000) paramY = atof(parameterY.c_str());
-						state->paramManager->setParameter(m, paramX, paramY);
+						state->setParameter(m, paramX, paramY);
 					}
 					else if (type == "3D")
 					{
@@ -1043,15 +1038,15 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 							param[pc] = parseMotionParameters(m, para, state->keys[state->getMotionId(m)][0], state->keys[state->getMotionId(m)][state->getNumKeys() - 1]);
 							if (param[pc] < -9000) param[pc] = atof(para.c_str());
 						}
-						state->paramManager->setParameter(m, param[0], param[1], param[2]);
+						state->setParameter(m, param[0], param[1], param[2]);
 					}
 				}
 //				if (type == "3D")
-//					state->paramManager->buildTetrahedron();
+//					state->buildTetrahedron();
 			}
 			else if (nextString == "triangle")
 			{
-				PAStateData* state = mcu_p->lookUpPAState(stateName);
+				PAState* state = mcu_p->lookUpPAState(stateName);
 				if (!state) return CMD_FAILURE;
 				int numTriangles = args.read_int();
 				for (int i = 0; i < numTriangles; i++)
@@ -1059,12 +1054,12 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					std::string motion1 = args.read_token();
 					std::string motion2 = args.read_token();
 					std::string motion3 = args.read_token();
-					state->paramManager->addTriangle(motion1, motion2, motion3);
+					state->addTriangle(motion1, motion2, motion3);
 				}
 			}
 			else if (nextString == "tetrahedron")
 			{ 
-				PAStateData* state = mcu_p->lookUpPAState(stateName);
+				PAState* state = mcu_p->lookUpPAState(stateName);
 				if (!state) return CMD_FAILURE;
 				int numTetrahedrons = args.read_int();
 				for (int i = 0; i < numTetrahedrons; i++)
@@ -1073,7 +1068,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					std::string motion2 = args.read_token();
 					std::string motion3 = args.read_token();
 					std::string motion4 = args.read_token();
-					state->paramManager->addTetrahedron(motion1, motion2, motion3, motion4);
+					state->addTetrahedron(motion1, motion2, motion3, motion4);
 				}				
 			}
 			else
@@ -1099,7 +1094,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				if (stateString != "state")
 					return CMD_FAILURE;
 				std::string stateName = args.read_token();
-				PAStateData* state = mcu_p->lookUpPAState(stateName);
+				PAState* state = mcu_p->lookUpPAState(stateName);
 				if (!state)
 					LOG("State %s not exist, schedule Idle State.", stateName.c_str());
 				std::string loopString = args.read_token();
@@ -1130,6 +1125,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				std::string jointString = args.read_token();
 				if (jointString != "joint")
 					return CMD_FAILURE;
+				std::vector<double> weights;
 				std::string joint = args.read_token();
 				int numWeights = args.calc_num_tokens();
 				if (numWeights > 0)
@@ -1137,10 +1133,48 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					if (state)
 					{
 						for (int i = 0; i < state->getNumMotions(); i++)
-							state->weights[i] = args.read_double();
+							weights.push_back(args.read_double());
 					}
 				}
-				character->param_animation_ct->schedule(state, l, pn, ad, joint);
+				if (numWeights < state->getNumMotions())
+				{
+					weights.resize(state->getNumMotions());
+					SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(state);
+					if (state0D)
+					{
+						if (state->getNumMotions() > 0)
+							weights[0] = 1.0f;
+					}
+					else
+					{
+						SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(state);
+						if (state1D)
+						{
+							state->getWeightsFromParameters(0, weights);
+						}
+						else
+						{
+							SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(state);
+							if (state2D)
+							{
+								state->getWeightsFromParameters(0, 0, weights);
+							}
+							else
+							{
+								SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(state);
+								if (state3D)
+								{
+									state->getWeightsFromParameters(0, 0, 0, weights);
+								}
+								else
+								{
+									LOG("Unknown state type. What is this?");
+								}
+							}
+						}
+					}
+				}
+				character->param_animation_ct->schedule(state, weights, l, pn, ad, joint);
 			}
 
 			if (operation == "unschedule")
@@ -1164,22 +1198,24 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					return CMD_FAILURE;
 				}
 
-				int type = character->param_animation_ct->getCurrentPAStateData()->paramManager->getType();
+				int type = character->param_animation_ct->getCurrentPAStateData()->state->getType();
 				if (args.calc_num_tokens() != type + 1)
 				{
 					LOG("Cannot update state %s for character %s which has %d parameters, you sent %d.", character->param_animation_ct->getName().c_str(), character->getName().c_str(), (type + 1), args.calc_num_tokens());
 					return CMD_FAILURE;
 				}
-				std::vector<double> w;
+				std::vector<double> p;
 				for (int i = 0; i < (type + 1); i++)
-					w.push_back(args.read_double());
+					p.push_back(args.read_double());
+				std::vector<double> weights;
+				weights.resize(character->param_animation_ct->getCurrentPAStateData()->state->getNumMotions());
 				if (type == 0)
-					character->param_animation_ct->getCurrentPAStateData()->paramManager->setWeight(w[0]);
+					character->param_animation_ct->getCurrentPAStateData()->state->getWeightsFromParameters(p[0], weights);
 				else if (type == 1)
-					character->param_animation_ct->getCurrentPAStateData()->paramManager->setWeight(w[0], w[1]);
+					character->param_animation_ct->getCurrentPAStateData()->state->getWeightsFromParameters(p[0], p[1], weights);
 				else if (type == 2)
-					character->param_animation_ct->getCurrentPAStateData()->paramManager->setWeight(w[0], w[1], w[2]);
-				character->param_animation_ct->updateWeights();
+					character->param_animation_ct->getCurrentPAStateData()->state->getWeightsFromParameters(p[0], p[1], p[2], weights);
+				character->param_animation_ct->updateWeights(weights);
 				return CMD_SUCCESS;
 			}
 
@@ -1189,18 +1225,18 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		else if (operation == "transition")
 		{
-			PATransitionData* newTransition = new PATransitionData();
+			PATransition* newTransition = new PATransition();
 			std::string fromStateString = args.read_token();
 			if (fromStateString != "fromstate")
 				return CMD_FAILURE;
-			PAStateData* fromState = mcu_p->lookUpPAState(args.read_token());
+			PAState* fromState = mcu_p->lookUpPAState(args.read_token());
 			if (!fromState)
 				return CMD_FAILURE;
 			newTransition->fromState = fromState;
 			std::string toStateString = args.read_token();
 			if (toStateString != "tostate")
 				return CMD_FAILURE;
-			PAStateData* toState = mcu_p->lookUpPAState(args.read_token());
+			PAState* toState = mcu_p->lookUpPAState(args.read_token());
 			if (!toState)
 				return CMD_FAILURE;
 			newTransition->toState = toState;

@@ -64,7 +64,12 @@ void PARunTimeEditor::update()
 		return;
 	if (!character->param_animation_ct)
 		return;
-	std::string currentState = character->param_animation_ct->getCurrentStateName();
+
+	std::string currentState = "";
+	if (character->param_animation_ct->getCurrentPAStateData())
+	{
+		currentState = character->param_animation_ct->getCurrentPAStateData()->state->stateName;
+	}
 	if (prevCycleState != currentState)
 	{
 		updateRunTimeStates(currentState);
@@ -75,17 +80,17 @@ void PARunTimeEditor::update()
 
 	if (paramGroup)
 	{
-		PAStateData* curState = character->param_animation_ct->getCurrentPAStateData();
-		if (!curState)
+		PAStateData* curStateData = character->param_animation_ct->getCurrentPAStateData();
+		if (!curStateData)
 			return;
-		if (curState)
+		if (curStateData)
 		{
 	//		if (curState->cycle)
 			{
 				if (paramGroup->paramVisualization)
 				{
 					float x = 0.0f, y = 0.0f;
-					curState->paramManager->getParameter(x, y);
+					curStateData->state->getParametersFromWeights(x, y, curStateData->weights);
 					int actualPixelX = 0;
 					int actualPixelY = 0;
 					paramGroup->paramVisualization->getActualPixel(x, y, actualPixelX, actualPixelY);
@@ -95,7 +100,7 @@ void PARunTimeEditor::update()
 				if (paramGroup->param3DVisualization)
 				{
 					float x = 0.0f, y = 0.0f, z = 0.0f;
-					curState->paramManager->getParameter(x, y, z);
+					curStateData->state->getParametersFromWeights(x, y, z, curStateData->weights);
 					paramGroup->xAxis->value(x);
 					paramGroup->yAxis->value(y);
 					paramGroup->zAxis->value(z);
@@ -110,7 +115,7 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 {
 	nextCycleStates->clear();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	PAStateData* stateData = mcu.lookUpPAState(currentState);
+	PAState* state = mcu.lookUpPAState(currentState);
 
 //	if (stateData)
 //		if (!stateData->cycle)
@@ -131,9 +136,9 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 	{
 //		if (stateData->toStates.size() == 0)
 			addItem(nextCycleStates, PseudoIdleState);
-		for (size_t i = 0; i < stateData->toStates.size(); i++)
-			for (size_t j = 0; j < stateData->toStates[i]->toStates.size(); j++)
-				addItem(nextCycleStates, stateData->toStates[i]->toStates[j]->stateName.c_str());
+		for (size_t i = 0; i < state->toStates.size(); i++)
+			for (size_t j = 0; j < state->toStates[i]->toStates.size(); j++)
+				addItem(nextCycleStates, state->toStates[i]->toStates[j]->stateName.c_str());
 	}
 	for (int i = 0; i < nextCycleStates->size(); i++)
 		nextCycleStates->select(i+1, false);
@@ -145,8 +150,11 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 		delete paramGroup;
 		paramGroup = NULL;
 	}
-	if (stateData)
+	if (state)
 	{
+		std::vector<double> weights;
+		PAStateData* stateData = new PAStateData(state, weights);
+		// memory leak!
 		paramGroup = new ParameterGroup(this->parameterGroup->x(), this->parameterGroup->y(), parameterGroup->w(), parameterGroup->h(), (char*)"", stateData, paWindow);
 		parameterGroup->add(paramGroup);
 		paramGroup->show();
@@ -176,7 +184,7 @@ void PARunTimeEditor::initializeRunTimeEditor()
 	{
 		if (character->param_animation_ct == NULL)
 			return;
-		currentCycleState->value(character->param_animation_ct->getCurrentStateName().c_str());
+		currentCycleState->value(character->param_animation_ct->getCurrentPAStateData()->state->stateName.c_str());
 
 		nextCycleStates->clear();
 		availableTransitions->clear();
@@ -195,8 +203,8 @@ void PARunTimeEditor::updateNonCycleState(Fl_Widget* widget, void* data)
 		if (editor->availableTransitions->selected(i+1))
 			nonCycleState = editor->availableTransitions->text(i+1);
 	}
-	PAStateData* paStateData = mcuCBHandle::singleton().lookUpPAState(nonCycleState);
-	if (paStateData && paStateData->paramManager->getNumParameters() > 0)
+	PAState* state = mcuCBHandle::singleton().lookUpPAState(nonCycleState);
+	if (state && state->getNumParameters() > 0)
 	{
 		if (editor->paramGroup)
 		{
@@ -205,7 +213,10 @@ void PARunTimeEditor::updateNonCycleState(Fl_Widget* widget, void* data)
 			editor->paramGroup = NULL;
 		}
 		
-		editor->paramGroup = new ParameterGroup(editor->parameterGroup->x(), editor->parameterGroup->y(), editor->parameterGroup->w(), editor->parameterGroup->h(), (char*)"", mcuCBHandle::singleton().lookUpPAState(nonCycleState), editor->paWindow);
+		std::vector<double> weights;
+		PAStateData* stateData = new PAStateData(state, weights);
+		// memory leak here!
+		editor->paramGroup = new ParameterGroup(editor->parameterGroup->x(), editor->parameterGroup->y(), editor->parameterGroup->w(), editor->parameterGroup->h(), (char*)"", stateData, editor->paWindow);
 		editor->parameterGroup->add(editor->paramGroup);
 		editor->paramGroup->show();
 		editor->paramGroup->redraw();		

@@ -15,10 +15,12 @@ class ParameterVisualization : public Fl_Group
 		virtual int handle(int event);
 		virtual void setup();
 		virtual void resize(int x, int y, int w, int h);
-		void setSlider(int x, int y);
 		void getActualPixel(float paramX, float paramY, int& x, int& y);
 		void getActualParam(float& paramX, float& paramY, int x, int y);
 		void setPoint(int x, int y);
+
+		void updateSlider(float param1, float param2);
+		void updateStateData(float param1, float param2);
 
 	private:
 		void getBound(int ptX, int ptY, int& x, int& y, int& w, int& h);
@@ -36,7 +38,7 @@ class ParameterVisualization : public Fl_Group
 		int height;
 		int paramX;
 		int paramY;
-		PAStateData* state;					// !!!Careful about this state, this PAState is a pointer to mcu state pool, not the current state to specific character
+		PAStateData* stateData;
 		ParameterGroup* paramGroup;
 };
 

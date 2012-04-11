@@ -32,12 +32,12 @@
 
 const double changeLimit = 20;
 
-PAStateData::PAStateData()
+PAState::PAState()
 {
 	stateName = "unknown";
 }
 
-PAStateData::PAStateData(PAStateData* data)
+PAState::PAState(PAState* data)
 {
 	stateName = data->stateName;
 	for (unsigned int i = 0; i < data->motions.size(); i++)
@@ -53,9 +53,6 @@ PAStateData::PAStateData(PAStateData* data)
 		keys.push_back(tempVec);
 	}
 
-	for (unsigned int i = 0; i < data->weights.size(); i++)
-		weights.push_back(data->weights[i]);
-
 	for (unsigned int i = 0; i < data->toStates.size(); i++)
 		toStates.push_back(data->toStates[i]);
 
@@ -63,18 +60,26 @@ PAStateData::PAStateData(PAStateData* data)
 		fromStates.push_back(data->fromStates[i]);
 	
 	cycle = data->cycle;
-	paramManager = new ParameterManager(data->paramManager, this);
+
+	type = data->getType();
+	
+	for (unsigned int i = 0; i < data->getParameters().size(); i++)
+		parameters.push_back(data->getParameters()[i]);
+
+	for (unsigned int i = 0; i < data->getTriangles().size(); i++)
+		triangles.push_back(data->getTriangles()[i]);
+	for (unsigned int i = 0; i < data->getTetrahedrons().size(); i++)
+		tetrahedrons.push_back(data->getTetrahedrons()[i]);
 }
 
 
-PAStateData::PAStateData(const std::string& name)
+PAState::PAState(const std::string& name)
 {
 	stateName = name;
 	cycle = false;
-	paramManager = new ParameterManager(this);
 }
 
-PAStateData::~PAStateData()
+PAState::~PAState()
 {
 	for (unsigned int i = 0; i < motions.size(); i++)
 	{
@@ -87,16 +92,15 @@ PAStateData::~PAStateData()
 	for (unsigned int i = 0; i < fromStates.size(); i++)
 		fromStates[i] = NULL;
 	fromStates.clear();
-
-	delete paramManager;
 }
 
-int PAStateData::getNumMotions()
+
+int PAState::getNumMotions()
 {
 	return motions.size();
 }
 
-int PAStateData::getNumKeys()
+int PAState::getNumKeys()
 {
 	if (getNumMotions() > 0)
 		return keys[0].size();
@@ -104,7 +108,7 @@ int PAStateData::getNumKeys()
 		return 0;
 }
 
-int PAStateData::getMotionId(const std::string& motion)
+int PAState::getMotionId(const std::string& motion)
 {
 	for (int i = 0; i < getNumMotions(); i++)
 	{
@@ -112,15 +116,16 @@ int PAStateData::getMotionId(const std::string& motion)
 		if (motion == mName)
 			return i;
 	}
+	LOG("PAState::getMotionId Warning: cannot get motion with name %s", motion.c_str());
 	return -1;
 }
 
 
-PATransitionData::PATransitionData()
+PATransition::PATransition()
 {
 }
 
-PATransitionData::PATransitionData(PATransitionData* data, PAStateData* from, PAStateData* to)
+PATransition::PATransition(PATransition* data, PAState* from, PAState* to)
 {
 	this->fromState = from;
 	this->toState = to;
@@ -134,44 +139,18 @@ PATransitionData::PATransitionData(PATransitionData* data, PAStateData* from, PA
 	this->easeInEnd = data->easeInEnd;
 }
 
-PATransitionData::~PATransitionData()
+PATransition::~PATransition()
 {
 	fromState = NULL;
 	toState = NULL;
 }
 
-int PATransitionData::getNumEaseOut()
+int PATransition::getNumEaseOut()
 {
 	return easeOutStart.size();
 }
 
-ParameterManager::ParameterManager(ParameterManager* pm, PAStateData* s)
-{
-	state = s;
-	type = pm->getType();
-	for (unsigned int i = 0; i < pm->getMotionNames().size(); i++)
-		motionNames.push_back(pm->getMotionNames()[i]);
-	for (unsigned int i = 0; i < pm->getParameters().size(); i++)
-		parameters.push_back(pm->getParameters()[i]);
-
-	for (unsigned int i = 0; i < pm->getTriangles().size(); i++)
-		triangles.push_back(pm->getTriangles()[i]);
-	for (unsigned int i = 0; i < pm->getTetrahedrons().size(); i++)
-		tetrahedrons.push_back(pm->getTetrahedrons()[i]);
-}
-
-ParameterManager::ParameterManager(PAStateData* s)
-{
-	state = s;
-	type = 0;
-}
-
-ParameterManager::~ParameterManager()
-{
-	state = NULL;
-}
-
-bool ParameterManager::setWeight(double x)
+bool PAState::getWeightsFromParameters(double x, std::vector<double>& weights)
 {
 	if (type != 0)
 		return false;
@@ -189,45 +168,45 @@ bool ParameterManager::setWeight(double x)
 			if (parameters[i].x >= left)	
 			{
 				left = parameters[i].x;
-				leftMotion = motionNames[i];
+				leftMotion = motions[i]->getName();
 			}
 		if (parameters[i].x >= x)
 			if (parameters[i].x <= right) 
 			{
 				right = parameters[i].x;
-				rightMotion = motionNames[i];
+				rightMotion =  motions[i]->getName();
 			}
 	}
-	for (int i = 0; i < state->getNumMotions(); i++)
-		state->weights[i] = 0.0;
+	for (int i = 0; i < getNumMotions(); i++)
+		weights[i] = 0.0;
 	if (right == left)
 	{
-		int id = state->getMotionId(leftMotion);
-		state->weights[id] = 1.0;
+		int id = getMotionId(leftMotion);
+		weights[id] = 1.0;
 		SrVec tmp_vec((float)x, 0.0f, 0.0f);
 		setPrevVec( tmp_vec );
 	}
 	else
 	{
 		double weight = (x - left) / (right - left);
-		int leftId = state->getMotionId(leftMotion);
-		int rightId = state->getMotionId(rightMotion);
+		int leftId = getMotionId(leftMotion);
+		int rightId = getMotionId(rightMotion);
 		if (leftId >= 0 && rightId >= 0)
 		{
-			state->weights[leftId] = 1 - weight;
-			state->weights[rightId] = weight;
+			weights[leftId] = 1 - weight;
+			weights[rightId] = weight;
 			SrVec tmp_vec((float)x, 0.0, 0.0);
 			setPrevVec( tmp_vec );
 		}
 		if (leftId >=0 && rightId < 0)
 		{
-			state->weights[leftId] = 1.0;
+			weights[leftId] = 1.0;
 			SrVec tmp_vec((float)left, 0.0, 0.0);
 			setPrevVec( tmp_vec );
 		}
 		if (rightId >=0 && leftId < 0)
 		{
-			state->weights[rightId] = 1.0;
+			weights[rightId] = 1.0;
 			SrVec tmp_vec((float)right, 0.0, 0.0);
 			setPrevVec( tmp_vec );
 		}
@@ -235,7 +214,7 @@ bool ParameterManager::setWeight(double x)
 	return true;
 }
 
-bool ParameterManager::setWeight(double x, double y)
+bool PAState::getWeightsFromParameters(double x, double y, std::vector<double>& weights)
 {
 	if (type != 1)
 		return false;
@@ -253,15 +232,15 @@ bool ParameterManager::setWeight(double x, double y)
 		SrVec v1 = triangles[i].triangle.a;
 		SrVec v2 = triangles[i].triangle.b;
 		SrVec v3 = triangles[i].triangle.c;
-		int id1 = state->getMotionId(triangles[i].motion1);
-		int id2 = state->getMotionId(triangles[i].motion2);
-		int id3 = state->getMotionId(triangles[i].motion3);
+		int id1 = getMotionId(triangles[i].motion1);
+		int id2 = getMotionId(triangles[i].motion2);
+		int id3 = getMotionId(triangles[i].motion3);
 		bool in = insideTriangle(pt, v1, v2, v3);
 		if (in)
 		{
-			for (int i = 0; i < state->getNumMotions(); i++)
-				state->weights[i] = 0.0;
-			getWeight(pt, v1, v2, v3, state->weights[id1], state->weights[id2], state->weights[id3]);
+			for (int i = 0; i < getNumMotions(); i++)
+				weights[i] = 0.0;
+			getWeight(pt, v1, v2, v3, weights[id1], weights[id2], weights[id3]);
 			setPrevVec(pt);
 			return true;
 		}
@@ -302,22 +281,22 @@ bool ParameterManager::setWeight(double x, double y)
 
 	if (triangleId >= 0)
 	{
-		for (int i = 0; i < state->getNumMotions(); i++)
-			state->weights[i] = 0.0;
+		for (int i = 0; i < getNumMotions(); i++)
+			weights[i] = 0.0;
 
 		SrVec v1 = triangles[triangleId].triangle.a;
 		SrVec v2 = triangles[triangleId].triangle.b;
 		SrVec v3 = triangles[triangleId].triangle.c;
-		int id1 = state->getMotionId(triangles[triangleId].motion1);
-		int id2 = state->getMotionId(triangles[triangleId].motion2);
-		int id3 = state->getMotionId(triangles[triangleId].motion3);
-		getWeight(param, v1, v2, v3, state->weights[id1], state->weights[id2], state->weights[id3]);
+		int id1 = getMotionId(triangles[triangleId].motion1);
+		int id2 = getMotionId(triangles[triangleId].motion2);
+		int id3 = getMotionId(triangles[triangleId].motion3);
+		getWeight(param, v1, v2, v3, weights[id1], weights[id2], weights[id3]);
 		setPrevVec(param);
 	}
 	return true;
 }
 
-bool ParameterManager::setWeight(double x, double y, double z)
+bool PAState::getWeightsFromParameters(double x, double y, double z, std::vector<double>& weights)
 {
 	if (type != 2)
 		return false;
@@ -342,10 +321,10 @@ bool ParameterManager::setWeight(double x, double y, double z)
 		SrVec v2 = tetrahedrons[i].v2;
 		SrVec v3 = tetrahedrons[i].v3;
 		SrVec v4 = tetrahedrons[i].v4;
-		int id1 = state->getMotionId(tetrahedrons[i].motion1);
-		int id2 = state->getMotionId(tetrahedrons[i].motion2);
-		int id3 = state->getMotionId(tetrahedrons[i].motion3);
-		int id4 = state->getMotionId(tetrahedrons[i].motion4);
+		int id1 = getMotionId(tetrahedrons[i].motion1);
+		int id2 = getMotionId(tetrahedrons[i].motion2);
+		int id3 = getMotionId(tetrahedrons[i].motion3);
+		int id4 = getMotionId(tetrahedrons[i].motion4);
 		double w1 = 0.0;	
 		double w2 = 0.0;
 		double w3 = 0.0;
@@ -354,14 +333,14 @@ bool ParameterManager::setWeight(double x, double y, double z)
 		if (w1 >= 0 && w2 >= 0 && w3 >= 0 && w4 >= 0)
 		{
 			setPrevVec(pt);
-	//		std::cout << state->motions[id1]->name() << " " << state->motions[id2]->name() << " " << state->motions[id3]->name() << " " << state->motions[id4]->name() << std::endl;
-			for (int i = 0; i < state->getNumMotions(); i++)
-				state->weights[i] = 0.0;
+	//		std::cout << motions[id1]->name() << " " << motions[id2]->name() << " " << motions[id3]->name() << " " << motions[id4]->name() << std::endl;
+			for (int i = 0; i < getNumMotions(); i++)
+				weights[i] = 0.0;
 
-			state->weights[id1] = w1;
-			state->weights[id2] = w2;
-			state->weights[id3] = w3;
-			state->weights[id4] = w4;
+			weights[id1] = w1;
+			weights[id2] = w2;
+			weights[id3] = w3;
+			weights[id4] = w4;
 			return true;
 		} 
 	}
@@ -436,10 +415,10 @@ bool ParameterManager::setWeight(double x, double y, double z)
 		SrVec v2 = tetrahedrons[id].v2;
 		SrVec v3 = tetrahedrons[id].v3;
 		SrVec v4 = tetrahedrons[id].v4;
-		int id1 = state->getMotionId(tetrahedrons[id].motion1);
-		int id2 = state->getMotionId(tetrahedrons[id].motion2);
-		int id3 = state->getMotionId(tetrahedrons[id].motion3);
-		int id4 = state->getMotionId(tetrahedrons[id].motion4);
+		int id1 = getMotionId(tetrahedrons[id].motion1);
+		int id2 = getMotionId(tetrahedrons[id].motion2);
+		int id3 = getMotionId(tetrahedrons[id].motion3);
+		int id4 = getMotionId(tetrahedrons[id].motion4);
 		double w1 = 0.0;	
 		double w2 = 0.0;
 		double w3 = 0.0;
@@ -448,13 +427,13 @@ bool ParameterManager::setWeight(double x, double y, double z)
 		if (w1 >= 0 && w2 >= 0 && w3 >= 0 && w4 >= 0)
 		{
 			setPrevVec(param);
-	//		std::cout << state->motions[id1]->name() << " " << state->motions[id2]->name() << " " << state->motions[id3]->name() << " " << state->motions[id4]->name() << std::endl;
-			for (int i = 0; i < state->getNumMotions(); i++)
-				state->weights[i] = 0.0;
-			state->weights[id1] = w1;
-			state->weights[id2] = w2;
-			state->weights[id3] = w3;
-			state->weights[id4] = w4;
+	//		std::cout << motions[id1]->name() << " " << motions[id2]->name() << " " << motions[id3]->name() << " " << motions[id4]->name() << std::endl;
+			for (int i = 0; i < getNumMotions(); i++)
+				weights[i] = 0.0;
+			weights[id1] = w1;
+			weights[id2] = w2;
+			weights[id3] = w3;
+			weights[id4] = w4;
 
 			return true;
 		}
@@ -466,33 +445,33 @@ bool ParameterManager::setWeight(double x, double y, double z)
 	return false;
 }
 
-void ParameterManager::getParameter(float& x)
+void PAState::getParametersFromWeights(float& x, std::vector<double>& weights)
 {
 	x = 0.0f;
 	for (int i = 0; i < getNumParameters(); i++)
 	{
-		int id = state->getMotionId(motionNames[i]);
-		x += (float)state->weights[id] * parameters[i].x;
+		int id = getMotionId(motions[i]->getName());
+		x += (float)weights[id] * parameters[i].x;
 	}
 }
 
-void ParameterManager::getParameter(float& x, float& y)
+void PAState::getParametersFromWeights(float& x, float& y, std::vector<double>& weights)
 {
 	std::vector<int> indices;
-	for (int i = 0; i < state->getNumMotions(); i++)
+	for (int i = 0; i < getNumMotions(); i++)
 	{
-		if (state->weights[i] > 0.0)
+		if (weights[i] > 0.0)
 			indices.push_back(i);
 	}
 	if (indices.size() == 0)
 		return;
 	else if (indices.size() == 1)
 	{
-		int id = state->paramManager->getMotionId(state->motions[indices[0]]->getName());
+		int id = getMotionId(motions[indices[0]]->getName());
 		if (id >= 0)
 		{
-			x = state->paramManager->getVec(id).x;
-			y = state->paramManager->getVec(id).y;
+			x = getVec(id).x;
+			y = getVec(id).y;
 		}
 		else
 			return;
@@ -502,38 +481,38 @@ void ParameterManager::getParameter(float& x, float& y)
 		std::vector<SrVec> vecs;
 		for (size_t i = 0; i < indices.size(); i++)
 		{
-			int id = state->paramManager->getMotionId(state->motions[indices[i]]->getName());
+			int id = getMotionId(motions[indices[i]]->getName());
 			if (id >= 0)
-				vecs.push_back(state->paramManager->getVec(id));
+				vecs.push_back(getVec(id));
 			else
 				return;
 		}
 		SrVec vec;
 		for (size_t i = 0; i < indices.size(); i++)
-			vec = vec + vecs[i] * (float)state->weights[indices[i]];
+			vec = vec + vecs[i] * (float)weights[indices[i]];
 		x = vec.x;
 		y = vec.y;
 	}
 }
 
-void ParameterManager::getParameter(float& x, float& y, float& z)
+void PAState::getParametersFromWeights(float& x, float& y, float& z, std::vector<double>& weights)
 {
 	std::vector<int> indices;
-	for (int i = 0; i < state->getNumMotions(); i++)
+	for (int i = 0; i < getNumMotions(); i++)
 	{
-		if (state->weights[i] > 0.0)
+		if (weights[i] > 0.0)
 			indices.push_back(i);
 	}
 	if (indices.size() == 0)
 		return;
 	else if (indices.size() == 1)
 	{
-		int id = state->paramManager->getMotionId(state->motions[indices[0]]->getName());
+		int id = getMotionId(motions[indices[0]]->getName());
 		if (id >= 0)
 		{
-			x = state->paramManager->getVec(id).x;
-			y = state->paramManager->getVec(id).y;
-			z = state->paramManager->getVec(id).z;
+			x = getVec(id).x;
+			y = getVec(id).y;
+			z = getVec(id).z;
 		}
 		else
 			return;
@@ -543,77 +522,150 @@ void ParameterManager::getParameter(float& x, float& y, float& z)
 		std::vector<SrVec> vecs;
 		for (size_t i = 0; i < indices.size(); i++)
 		{
-			int id = state->paramManager->getMotionId(state->motions[indices[i]]->getName());
+			int id = getMotionId(motions[indices[i]]->getName());
 			if (id >= 0)
-				vecs.push_back(state->paramManager->getVec(id));
+				vecs.push_back(getVec(id));
 			else
 				return;
 		}
 		SrVec vec;
 		for (size_t i = 0; i < indices.size(); i++)
-			vec = vec + vecs[i] * (float)state->weights[indices[i]];
+			vec = vec + vecs[i] * (float)weights[indices[i]];
 		x = vec.x;
 		y = vec.y;
 		z = vec.z;
 	}
 }
 
-void ParameterManager::setParameter(const std::string& motion, double x)
+void PAState::setParameter(const std::string& motion, double x)
 {
 	type = 0;
 	SrVec vec;
 	vec.x = (float)x;
-	for (size_t i = 0; i < motionNames.size(); i++)
+	for (size_t i = 0; i <  motions.size(); i++)
 	{
-		if (motionNames[i] == motion)
+		if ( motions[i]->getName() == motion)
 		{
+			if (parameters.size() <= i)
+				parameters.push_back(vec);
+			else
 			parameters[i] = vec;
 			return;
 		}
 	} 
-	motionNames.push_back(motion);
 	parameters.push_back(vec);
 }
 
-void ParameterManager::setParameter(const std::string& motion, double x, double y)
+void PAState::setParameter(const std::string& motion, double x, double y)
 {
 	type = 1;
 	SrVec vec;
 	vec.x = (float)x;
 	vec.y = (float)y;
-	for (size_t i = 0; i < motionNames.size(); i++)
+	for (size_t i = 0; i < motions.size(); i++)
 	{
-		if (motionNames[i] == motion)
+		if (motions[i]->getName() == motion)
 		{
-			parameters[i] = vec;
+			if (parameters.size() <= i)
+				parameters.push_back(vec);
+			else
+				parameters[i] = vec;
 			return;
 		}
 	}
-	motionNames.push_back(motion);
 	parameters.push_back(vec);
 
 }
 
-void ParameterManager::setParameter(const std::string& motion, double x, double y, double z)
+void PAState::setParameter(const std::string& motion, double x, double y, double z)
 {
 	type = 2;
 	SrVec vec;
 	vec.x = (float)x;
 	vec.y = (float)y;
 	vec.z = (float)z;
-	for (size_t i = 0; i < motionNames.size(); i++)
+	for (size_t i = 0; i  <motions.size(); i++)
 	{
-		if (motionNames[i] == motion)
+		if (motions[i]->getName() == motion)
 		{
-			parameters[i] = vec;
+			if (parameters.size() <= i)
+				parameters.push_back(vec);
+			else
+				parameters[i] = vec;
 			return;
 		}
 	}
-	motionNames.push_back(motion);
+
 	parameters.push_back(vec);
+	
 }
 
-void ParameterManager::addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
+void PAState::getParameter(const std::string& motion, double& x)
+{
+	type = 0;
+	SrVec vec;
+	vec.x = (float)x;
+	for (size_t i = 0; i <  motions.size(); i++)
+	{
+		if ( motions[i]->getName() == motion)
+		{
+			x = parameters[i].x;
+			return;
+		}
+	}
+}
+
+void PAState::getParameter(const std::string& motion, double& x, double& y)
+{
+	type = 1;
+	SrVec vec;
+	vec.x = (float)x;
+	vec.y = (float)y;
+	for (size_t i = 0; i < motions.size(); i++)
+	{
+		if (motions[i]->getName() == motion)
+		{
+			x = parameters[i].x;
+			y = parameters[i].y;
+			return;
+		}
+	}
+}
+
+void PAState::getParameter(const std::string& motion, double& x, double& y, double& z)
+{
+	type = 2;
+	SrVec vec;
+	vec.x = (float)x;
+	vec.y = (float)y;
+	vec.z = (float)z;
+	for (size_t i = 0; i  <motions.size(); i++)
+	{
+		if (motions[i]->getName() == motion)
+		{
+			x = parameters[i].x;
+			y = parameters[i].y;
+			z = parameters[i].z;
+			return;
+		}
+	}
+}
+
+void PAState::removeParameter(const std::string& motion)
+{
+	for (size_t i = 0; i < motions.size(); i++)
+	{
+		if (motions[i]->getName() == motion)
+		{
+			if (parameters.size() > i)
+				parameters.erase(parameters.begin() + i);
+			return;
+		}
+	}	
+}
+
+
+void PAState::addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
 {
 	TriangleInfo tInfo;
 	SrVec v1 = getVec(motion1);
@@ -626,7 +678,24 @@ void ParameterManager::addTriangle(const std::string& motion1, const std::string
 	triangles.push_back(tInfo);
 }
 
-void ParameterManager::addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
+void PAState::removeTriangles(const std::string& motion)
+{
+	// what is a good way to reconstruct triangles?
+
+	for (size_t i = 0; i < triangles.size(); i++)
+	{
+		TriangleInfo tInfo = triangles[i];
+		if (tInfo.motion1 == motion ||
+			tInfo.motion2 == motion ||
+			tInfo.motion3 == motion)
+		{
+			triangles.erase(triangles.begin() + i);
+			i--;
+		}
+	}
+}
+
+void PAState::addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
 {
 	TetrahedronInfo tetraInfo;
 	tetraInfo.v1 = getVec(motion1);
@@ -640,7 +709,25 @@ void ParameterManager::addTetrahedron(const std::string& motion1, const std::str
 	tetrahedrons.push_back(tetraInfo);
 }
 
-void ParameterManager::buildTetrahedron()
+void PAState::removeTetrahedrons(const std::string& motion)
+{
+	// what is a good way to reconstruct tetrahedrons?
+
+	for (size_t i = 0; i < tetrahedrons.size(); i++)
+	{
+		TetrahedronInfo tetraInfo = tetrahedrons[i];
+		if (tetraInfo.motion1 == motion ||
+			tetraInfo.motion2 == motion ||
+			tetraInfo.motion3 == motion ||
+			tetraInfo.motion4 == motion)
+		{
+			tetrahedrons.erase(tetrahedrons.begin() + i);
+			i--;
+		}
+	}	
+}
+
+void PAState::buildTetrahedron()
 {
 #if USE_TETGEN
 	tetgenio ptIn, tetOut;
@@ -669,22 +756,22 @@ void ParameterManager::buildTetrahedron()
 #endif
 }
 
-int ParameterManager::getType()
+int PAState::getType()
 {
 	return type;
 }
 
-void ParameterManager::setType(int typ)
+void PAState::setType(int typ)
 {
 	type = typ;
 }
 
-int ParameterManager::getNumParameters()
+int PAState::getNumParameters()
 {
 	return parameters.size();
 }
 
-int ParameterManager::getMinVecX()
+int PAState::getMinVecX()
 {
 	float min = 9999;
 	int ret = -1;
@@ -699,7 +786,7 @@ int ParameterManager::getMinVecX()
 	return ret;
 }
 
-int ParameterManager::getMinVecY()
+int PAState::getMinVecY()
 {
 	float min = 9999;
 	int ret = -1;
@@ -714,7 +801,7 @@ int ParameterManager::getMinVecY()
 	return ret;
 }
 
-int ParameterManager::getMaxVecX()
+int PAState::getMaxVecX()
 {
 	float max = -9999;
 	int ret = -1;
@@ -729,7 +816,7 @@ int ParameterManager::getMaxVecX()
 	return ret;
 }
 
-int ParameterManager::getMaxVecY()
+int PAState::getMaxVecY()
 {
 	float max = -9999;
 	int ret = -1;
@@ -744,62 +831,52 @@ int ParameterManager::getMaxVecY()
 	return ret;
 }
 
-SrVec ParameterManager::getVec(const std::string& motion)
+SrVec PAState::getVec(const std::string& motion)
 {
 	for (int i = 0; i < getNumParameters(); i++)
 	{
-		if (motionNames[i] == motion)
+		if (motions[i]->getName() == motion)
 			return parameters[i];
 	}
 	return SrVec();
 }
 
-SrVec ParameterManager::getVec(int id)
+SrVec PAState::getVec(int id)
 {
 	if (id < 0 || id > getNumParameters())
 		return SrVec();
 	return parameters[id];
 }
 
-SrVec ParameterManager::getPrevVec()
+SrVec PAState::getPrevVec()
 {
 	return previousParam;
 }
 
-void ParameterManager::setPrevVec(SrVec& vec)
+void PAState::setPrevVec(SrVec& vec)
 {
 	previousParam = vec;
 }
 
-const std::string& ParameterManager::getMotionName(int id)
+const std::string& PAState::getMotionName(int id)
 {
 	if (id < 0 || id > getNumParameters())
 		return emptyString;
 
-	return motionNames[id];	
+	return motions[id]->getName();	
 }
 
-int ParameterManager::getMotionId(const std::string& name)
-{
-	for (int i = 0; i < getNumParameters(); i++)
-	{
-		if (motionNames[i] == name)
-			return i;
-	}
-	return -1;
-}
-
-int ParameterManager::getNumTriangles()
+int PAState::getNumTriangles()
 {
 	return triangles.size();
 }
 
-SrTriangle& ParameterManager::getTriangle(int id)
+SrTriangle& PAState::getTriangle(int id)
 {
 	return triangles[id].triangle;
 }
 
-float ParameterManager::getMinimumDist(SrVec& c, SrVec& a, SrVec& b, SrVec& minimumPt)
+float PAState::getMinimumDist(SrVec& c, SrVec& a, SrVec& b, SrVec& minimumPt)
 {
 	SrVec ab = b - a;
 	SrVec ac = c - a;
@@ -820,7 +897,7 @@ float ParameterManager::getMinimumDist(SrVec& c, SrVec& a, SrVec& b, SrVec& mini
 	return dist(c, minimumPt);
 }
 
-bool ParameterManager::insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3)
+bool PAState::insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3)
 {
 	SrVec ptToV1 = v1 - pt;
 	SrVec ptToV2 = v2 - pt;
@@ -837,7 +914,7 @@ bool ParameterManager::insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3
 		return false;
 }
 
-void ParameterManager::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, double& w2, double& w3)
+void PAState::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, double& w2, double& w3)
 {
 	SrVec ptToV1 = v1 - pt;
 	SrVec ptToV2 = v2 - pt;
@@ -864,7 +941,7 @@ void ParameterManager::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, dou
 	}
 }
 
-void ParameterManager::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrVec& v4, double& w1, double& w2, double& w3, double& w4)
+void PAState::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrVec& v4, double& w1, double& w2, double& w3, double& w4)
 {
 	dMatrix mat(3, 3);
 	mat(0, 0) = v1.x - v4.x;
@@ -899,7 +976,7 @@ void ParameterManager::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrV
 }
 
 
-SrVec ParameterManager::closestPtPointTriangle(SrVec& p, SrVec& a, SrVec& b, SrVec& c)
+SrVec PAState::closestPtPointTriangle(SrVec& p, SrVec& a, SrVec& b, SrVec& c)
 {
 	SrVec ab = b - a;
 	SrVec ac = c - a;
@@ -945,7 +1022,7 @@ SrVec ParameterManager::closestPtPointTriangle(SrVec& p, SrVec& a, SrVec& b, SrV
 	return a + ab * v + ac * w;
 }
 
-int ParameterManager::PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c)
+int PAState::PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c)
 {
 	return dot(p - a, cross(b - a, c - a)) >= 0.0f;
 }

@@ -1,4 +1,5 @@
 #include "BMLSaccadeObject.h"
+#include <sbm/SBAttribute.h>
 
 BMLSaccadeObject::BMLSaccadeObject() : BMLObject()
 {

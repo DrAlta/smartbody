@@ -247,7 +247,6 @@ XMLCh* BMLDefs::ATTR_GRAB_STATE = NULL;
 XMLCh* BMLDefs::ATTR_REACH_ACTION = NULL;
 XMLCh* BMLDefs::ATTR_REACH_DURATION = NULL;
 
-XMLCh* BMLDefs::TAG_EXAMPLE_LOCOMOTION = NULL;
 XMLCh* BMLDefs::ATTR_PROXIMITY = NULL;
 XMLCh* BMLDefs::ATTR_MANNER = NULL;
 XMLCh* BMLDefs::ATTR_FACING = NULL;
@@ -570,7 +569,6 @@ BMLDefs::BMLDefs()
 	ATTR_OBSTACLE = XMLString::transcode("sbm:obstacle");
 	ATTR_GRAB_STATE = XMLString::transcode("sbm:grab-state");
 	ATTR_REACH_ACTION = XMLString::transcode("sbm:action");
-	TAG_EXAMPLE_LOCOMOTION =  XMLString::transcode("sbm:loco");
 	ATTR_PROXIMITY = XMLString::transcode("proximity");
 	ATTR_MANNER = XMLString::transcode("manner");
 	ATTR_FACING= XMLString::transcode("facing");

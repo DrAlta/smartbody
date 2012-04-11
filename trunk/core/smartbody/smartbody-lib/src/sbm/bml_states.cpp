@@ -31,7 +31,9 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	std::string xString = xml_parse_string(BMLDefs::ATTR_X, elem);
 	std::string yString = xml_parse_string(BMLDefs::ATTR_Y, elem);
 	std::string zString = xml_parse_string(BMLDefs::ATTR_Z, elem);
-	PAStateData* state = mcu->lookUpPAState(stateName);
+	PAState* state = mcu->lookUpPAState(stateName);
+	std::vector<double> weights;
+	weights.resize(state->getNumMotions());
 	if (xString != "" || yString != "" || zString != "")
 	{
 		if (state)
@@ -39,13 +41,13 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 			double x = atof(xString.c_str());
 			double y = atof(yString.c_str());
 			double z = atof(zString.c_str());
-			int parameterType = state->paramManager->getType();
+			int parameterType = state->getType();
 			if (parameterType == 0)
-				state->paramManager->setWeight(x);
+				state->getWeightsFromParameters(x, weights);
 			if (parameterType == 1)
-				state->paramManager->setWeight(x, y);
+				state->getWeightsFromParameters(x, y, weights);
 			if (parameterType == 2)
-				state->paramManager->setWeight(x, y, z);
+				state->getWeightsFromParameters(x, y, z, weights);
 		}
 	}
 
@@ -69,7 +71,7 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 		command1 << " state " << stateName << " loop " << loopMode << " playnow " << startingNow << " additive " << blendingMode << " joint " << joint;
 		if (state)
 			for (int i = 0; i < state->getNumMotions(); i++)
-				command1 << " " << state->weights[i];
+				command1 << " " << weights[i];
 		mcu->execute((char*) command1.str().c_str());	
 	}
 
@@ -80,7 +82,7 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 		command1 << "panim update char " << characterName;
 		if (state)
 			for (int i = 0; i < state->getNumMotions(); i++)
-				command1 << " " << state->weights[i];
+				command1 << " " << weights[i];
 		mcu->execute((char*) command1.str().c_str());	
 	}
 

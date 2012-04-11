@@ -1,4 +1,5 @@
 #include "BMLLocomotionObject.h"
+#include <sbm/SBAttribute.h>
 
 BMLLocomotionObject::BMLLocomotionObject() : BMLObject()
 {

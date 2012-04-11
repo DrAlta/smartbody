@@ -151,7 +151,7 @@ void PATransitionEditor::changeStateList1(Fl_Widget* widget, void* data)
 	editor->loadStates();	
 	editor->stateList1->value(stateValue);
 	editor->stateList2->value(stateValueP);
-	PAStateData* state1 = mcuCBHandle::singleton().lookUpPAState(editor->stateList1->text(stateValue));
+	PAState* state1 = mcuCBHandle::singleton().lookUpPAState(editor->stateList1->text(stateValue));
 	editor->animForTransition1->clear();
 	if (state1)
 	{
@@ -168,7 +168,7 @@ void PATransitionEditor::changeStateList2(Fl_Widget* widget, void* data)
 	int stateValue = editor->stateList2->value();
 	int stateValueP = editor->stateList1->value();
 	editor->loadStates();
-	PAStateData* state2 = mcuCBHandle::singleton().lookUpPAState(editor->stateList2->menu()[stateValue].label());
+	PAState* state2 = mcuCBHandle::singleton().lookUpPAState(editor->stateList2->menu()[stateValue].label());
 	editor->stateList2->value(stateValue);
 	editor->stateList1->value(stateValueP);
 	editor->animForTransition2->clear();
@@ -229,8 +229,8 @@ void PATransitionEditor::changeAnimForTransition(Fl_Widget* widget, void* data)
 		nle::Block* block2 = editor->transitionEditorNleModel->getTrack(1)->getBlock(0);
 		std::string stateName1 = editor->stateList1->menu()[editor->stateList1->value()].label();
 		std::string stateName2 = editor->stateList2->menu()[editor->stateList2->value()].label();
-		PAStateData* fromState = mcu.lookUpPAState(stateName1);
-		PAStateData* toState = mcu.lookUpPAState(stateName2);
+		PAState* fromState = mcu.lookUpPAState(stateName1);
+		PAState* toState = mcu.lookUpPAState(stateName2);
 		for (int i = 0; i < fromState->getNumMotions(); i++)
 		{
 			if (motionName1 == fromState->motions[i]->getName())
@@ -273,7 +273,7 @@ void PATransitionEditor::removeTransitionTimeMark(Fl_Widget* widget, void* data)
 void PATransitionEditor::updateTransitionTimeMark(Fl_Widget* widget, void* data)
 {
 	PATransitionEditor* editor = (PATransitionEditor*) data;
-	PATransitionData* transition = NULL;
+	PATransition* transition = NULL;
 	std::string fromStateName = "";
 	std::string toStateName = "";
 	if (!editor->transitionList->active())
@@ -300,8 +300,8 @@ void PATransitionEditor::updateTransitionTimeMark(Fl_Widget* widget, void* data)
 	{
 		nle::Block* block1 = editor->transitionEditorNleModel->getTrack(0)->getBlock(0);
 		nle::Block* block2 = editor->transitionEditorNleModel->getTrack(1)->getBlock(0);		
-		PAStateData* fromState = mcuCBHandle::singleton().lookUpPAState(fromStateName);
-		PAStateData* toState = mcuCBHandle::singleton().lookUpPAState(toStateName);
+		PAState* fromState = mcuCBHandle::singleton().lookUpPAState(fromStateName);
+		PAState* toState = mcuCBHandle::singleton().lookUpPAState(toStateName);
 		transition->fromState = fromState;
 		transition->toState = toState;
 		transition->fromMotionName = block1->getName();
@@ -347,17 +347,17 @@ void PATransitionEditor::createNewTransition(Fl_Widget* widget, void* data)
 	std::string fromStateName = editor->stateList1->menu()[editor->stateList1->value()].label();
 	std::string toStateName = editor->stateList2->menu()[editor->stateList2->value()].label();
 
-	PATransitionData* transition = mcu.lookUpPATransition(fromStateName, toStateName);
+	PATransition* transition = mcu.lookUpPATransition(fromStateName, toStateName);
 	if (transition != NULL)
 	{
 		LOG("Transition %s to %s already exist.", fromStateName.c_str(), toStateName.c_str());
 		return;
 	}
-	PAStateData* fromState = mcuCBHandle::singleton().lookUpPAState(fromStateName);
-	PAStateData* toState = mcuCBHandle::singleton().lookUpPAState(toStateName);
+	PAState* fromState = mcuCBHandle::singleton().lookUpPAState(fromStateName);
+	PAState* toState = mcuCBHandle::singleton().lookUpPAState(toStateName);
 	if (fromState != NULL && toState != NULL)
 	{
-		transition = new PATransitionData();
+		transition = new PATransition();
 		transition->fromState = fromState;
 		transition->toState = toState;
 		mcu.addPATransition(transition);
@@ -411,7 +411,7 @@ void PATransitionEditor::changeTransitionList(Fl_Widget* widget, void* data)
 		return;
 	std::string fromStateName = fullName.substr(0, seperateMarkPos - 1);
 	std::string toStateName = fullName.substr(seperateMarkPos + 2, fullName.size() - 1);
-	PATransitionData* transition = mcu.lookUpPATransition(fromStateName, toStateName);
+	PATransition* transition = mcu.lookUpPATransition(fromStateName, toStateName);
 
 	block1->removeAllMarks();
 	block1->setName(transition->fromMotionName);

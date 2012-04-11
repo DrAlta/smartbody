@@ -1,4 +1,5 @@
 #include "BMLFaceObject.h"
+#include <sbm/SBAttribute.h>
 
 BMLFaceObject::BMLFaceObject() : BMLObject()
 {

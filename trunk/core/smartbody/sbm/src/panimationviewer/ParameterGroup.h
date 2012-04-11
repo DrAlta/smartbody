@@ -8,6 +8,9 @@
 class ParameterVisualization;
 class Parameter3DVisualization;
 
+namespace SmartBody {
+	class SBCharacter;
+}
 class ParameterGroup : public Fl_Group
 {
 	public:
@@ -21,11 +24,11 @@ class ParameterGroup : public Fl_Group
 		static void updateXYZAxisValue(Fl_Widget* widget, void* data);
 		void updateWeight();
 		PAStateData* getCurrentPAStateData();
-		SbmCharacter* getCurrentCharacter();
+		SmartBody::SBCharacter* getCurrentCharacter();
 
 	public:
 		PanimationWindow* paWindow;
-		PAStateData* state;
+		PAStateData* stateData;
 		ParameterVisualization* paramVisualization;
 		Parameter3DVisualization* param3DVisualization;
 		bool exec;

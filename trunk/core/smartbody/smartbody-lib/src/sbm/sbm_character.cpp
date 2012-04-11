@@ -4066,7 +4066,7 @@ bool SbmCharacter::checkExamples()
 	int numMissing = 0;
 	for (size_t x = 0; x < standardRequiredStates.size(); x++)
 	{
-		PAStateData* state = mcu.lookUpPAState(standardRequiredStates[x]);
+		PAState* state = mcu.lookUpPAState(standardRequiredStates[x]);
 		if (!state)
 		{
 			numMissing++;
@@ -4089,7 +4089,7 @@ bool SbmCharacter::checkExamples()
 	int numMissing1 = 0;
 	for (size_t x = 0; x < minimalRequiredStates.size(); x++)
 	{
-		PAStateData* state = mcu.lookUpPAState(minimalRequiredStates[x]);
+		PAState* state = mcu.lookUpPAState(minimalRequiredStates[x]);
 		if (!state)
 		{
 			numMissing1++;

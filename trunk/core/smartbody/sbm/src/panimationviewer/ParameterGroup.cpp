@@ -2,14 +2,15 @@
 #include <sbm/mcontrol_util.h>
 #include "ParameterVisualization.h"
 #include "Parameter3DVisualization.h"
+#include <sbm/SBScene.h>
+#include <sbm/SBCharacter.h>
 
-
-ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateData* s, PanimationWindow* window, bool ex) : Fl_Group(x, y, w, h, name), state(s), paWindow(window), exec(ex)
+ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateData* s, PanimationWindow* window, bool ex) : Fl_Group(x, y, w, h, name), stateData(s), paWindow(window), exec(ex)
 {
 	//printf("Create parameter group, x = %d, y = %d\n",x,y);
-	this->label(s->stateName.c_str());
+	this->label(stateData->state->stateName.c_str());
 	this->begin();
-		int type = state->paramManager->getType();
+		int type = stateData->state->getType();
 		if (type == 0)
 		{			
 			int paraH =  h - 5 * yDis;
@@ -20,31 +21,30 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			this->resizable(paramVisualization);
 			yAxis = NULL;
 			zAxis = NULL;
-			double min = state->paramManager->getVec(state->paramManager->getMinVecX()).x;
-			double max = state->paramManager->getVec(state->paramManager->getMaxVecX()).x;
+			double min = stateData->state->getVec(stateData->state->getMinVecX()).x;
+			double max = stateData->state->getVec(stateData->state->getMaxVecX()).x;
 			xAxis = new Fl_Value_Slider(4 * xDis + x, h - 4 * yDis + y, w - 5 * xDis, 2 * yDis, "X");
 			xAxis->minimum(min);
 			xAxis->maximum(max);			
 			xAxis->type(FL_HORIZONTAL);			
 			xAxis->callback(updateXAxisValue, this);
 			float actualValue;
-			s->paramManager->getParameter(actualValue);
+			stateData->state->getParametersFromWeights(actualValue, stateData->weights);
 			int actualX = 0;
 			int actualY = 0;
 			paramVisualization->getActualPixel(actualValue, 0.0f, actualX, actualY);
-			paramVisualization->setSlider(actualX, actualY);
 			param3DVisualization = NULL;
 		}
-		if (type == 1)
+		else if (type == 1)
 		{
 			int paraH =  h - 5 * yDis;
 			paramVisualization = new ParameterVisualization(4 * xDis + x, yDis + y, w - 5 * xDis, h - 5 * yDis, (char*)"", s, this);
 			paramVisualization->end();
 			this->resizable(paramVisualization);
-			double minX = state->paramManager->getVec(state->paramManager->getMinVecX()).x;
-			double maxX = state->paramManager->getVec(state->paramManager->getMaxVecX()).x;
-			double minY = state->paramManager->getVec(state->paramManager->getMinVecY()).y;
-			double maxY = state->paramManager->getVec(state->paramManager->getMaxVecY()).y;
+			double minX = stateData->state->getVec(stateData->state->getMinVecX()).x;
+			double maxX = stateData->state->getVec(stateData->state->getMaxVecX()).x;
+			double minY = stateData->state->getVec(stateData->state->getMinVecY()).y;
+			double maxY = stateData->state->getVec(stateData->state->getMaxVecY()).y;
 			xAxis = new Fl_Value_Slider(4 * xDis + x, h - 4 * yDis + y, w - 5 * xDis, 2 * yDis, "X");
 			xAxis->minimum(minX);
 			xAxis->maximum(maxX);
@@ -56,23 +56,22 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			yAxis->callback(updateXYAxisValue, this);
 			yAxis->type(FL_VERTICAL);
 			float actualValueX, actualValueY;
-			s->paramManager->getParameter(actualValueX, actualValueY);
+			stateData->state->getParametersFromWeights(actualValueX, actualValueY, stateData->weights);
 			int actualX = 0;
 			int actualY = 0;
 			paramVisualization->getActualPixel(actualValueX, actualValueY, actualX, actualY);
-			paramVisualization->setSlider(actualX, actualY);
 			param3DVisualization = NULL;
 		}
-		if (type == 2)
+		else if (type == 2)
 		{
 			param3DVisualization = new Parameter3DVisualization(4 * xDis + x, 4 * yDis + y, w - 5 * xDis, h - 8 * yDis, (char*)"", s, this);
 			param3DVisualization->end();
 			this->resizable(param3DVisualization);	
 			paramVisualization = NULL;
-			double minX = state->paramManager->getVec(state->paramManager->getMinVecX()).x;
-			double maxX = state->paramManager->getVec(state->paramManager->getMaxVecX()).x;
-			double minY = state->paramManager->getVec(state->paramManager->getMinVecY()).y;
-			double maxY = state->paramManager->getVec(state->paramManager->getMaxVecY()).y;
+			double minX = stateData->state->getVec(stateData->state->getMinVecX()).x;
+			double maxX = stateData->state->getVec(stateData->state->getMaxVecX()).x;
+			double minY = stateData->state->getVec(stateData->state->getMinVecY()).y;
+			double maxY = stateData->state->getVec(stateData->state->getMaxVecY()).y;
 			xAxis = new Fl_Value_Slider(4 * xDis + x, h - 4 * yDis + y, w - 5 * xDis, 2 * yDis, "X");
 			xAxis->minimum(minX);
 			xAxis->maximum(maxX);
@@ -88,6 +87,11 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			zAxis->maximum(90);
 			zAxis->type(FL_HORIZONTAL);
 			zAxis->callback(updateXYZAxisValue, this);
+		}
+		else
+		{
+			param3DVisualization = NULL;
+			paramVisualization = NULL;
 		}
 	this->end();	
 	this->redraw();
@@ -107,39 +111,43 @@ ParameterGroup::~ParameterGroup()
 void ParameterGroup::updateXAxisValue(Fl_Widget* widget, void* data)
 {
 	ParameterGroup* group = (ParameterGroup*) data;
-	PAStateData* state = group->getCurrentPAStateData();
+	PAStateData* stateData = group->getCurrentPAStateData();
 	double w = group->xAxis->value();
 	bool success = false;
-	success = state->paramManager->setWeight(w);
+	success = stateData->state->getWeightsFromParameters(w, stateData->weights);
 	if (success)
-		group->getCurrentCharacter()->param_animation_ct->updateWeights();
+		group->getCurrentCharacter()->param_animation_ct->updateWeights(stateData->weights);
 	group->redraw();
 }
 
 void ParameterGroup::updateXYAxisValue(Fl_Widget* widget, void* data)
 {
 	ParameterGroup* group = (ParameterGroup*) data;
-	PAStateData* state = group->getCurrentPAStateData();
+	PAStateData* stateData = group->getCurrentPAStateData();
 	double x = group->xAxis->value();
 	double y = group->yAxis->value();
 	bool success = false;
-	success = state->paramManager->setWeight(x, y);
+	std::vector<double> weights;
+	weights.resize(stateData->state->getNumMotions());
+	success = stateData->state->getWeightsFromParameters(x, y, weights);
 	if (success)
-		group->getCurrentCharacter()->param_animation_ct->updateWeights();
+		group->getCurrentCharacter()->param_animation_ct->updateWeights(weights);
 	group->redraw();
 }
 
 void ParameterGroup::updateXYZAxisValue(Fl_Widget* widget, void* data)
 {		
 	ParameterGroup* group = (ParameterGroup*) data;
-	PAStateData* state = group->getCurrentPAStateData();
+	PAStateData* stateData = group->getCurrentPAStateData();
 	double x = group->xAxis->value();
 	double y = group->yAxis->value();
 	double z = group->zAxis->value();
 	bool success = false;
-	success = state->paramManager->setWeight(x, y, z);
+	std::vector<double> weights;
+	weights.resize(stateData->state->getNumMotions());
+	success = stateData->state->getWeightsFromParameters(x, y, z, weights);
 	if (success)
-		group->getCurrentCharacter()->param_animation_ct->updateWeights();
+		group->getCurrentCharacter()->param_animation_ct->updateWeights(weights);
 	group->redraw();	
 }
 
@@ -147,15 +155,14 @@ void ParameterGroup::updateWeight()
 {
 //	if (!state->cycle)
 //		return;
-	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
+/*	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
 	std::stringstream command;
 	command << "panim update char " << charName;
-	int wNumber = state->getNumMotions();
-	if (wNumber == 1)
-		state->weights[0] = 1.0;
+	int wNumber = stateData->state->getNumMotions();
 	for (int j = 0; j < wNumber; j++)
-		command << " " << state->weights[j];
+		command << " " << stateData->weights[j];
 	paWindow->execCmd(paWindow, command.str());
+	*/
 }
 
 PAStateData* ParameterGroup::getCurrentPAStateData()
@@ -169,8 +176,8 @@ PAStateData* ParameterGroup::getCurrentPAStateData()
 	return character->param_animation_ct->getCurrentPAStateData();
 }
 
-SbmCharacter* ParameterGroup::getCurrentCharacter()
+SmartBody::SBCharacter* ParameterGroup::getCurrentCharacter()
 {
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
-	return mcuCBHandle::singleton().getCharacter(charName);	
+	return SmartBody::SBScene::getScene()->getCharacter(charName);
 }

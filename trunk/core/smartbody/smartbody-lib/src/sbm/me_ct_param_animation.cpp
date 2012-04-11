@@ -43,8 +43,8 @@ MeCtParamAnimation::MeCtParamAnimation() : MeCtContainer(new MeCtParamAnimation:
 MeCtParamAnimation::MeCtParamAnimation(SbmCharacter* c, MeCtChannelWriter* wo) : MeCtContainer(new MeCtParamAnimation::Context(this)), character(c), woWriter(wo)
 {
 	baseJointName = "base";
-	curStateModule = NULL;
-	nextStateModule = NULL;
+	curStateData = NULL;
+	nextStateData = NULL;
 	transitionManager = NULL;
 	controllerBlending = new PAControllerBlending();
 	waitingList.clear();
@@ -80,45 +80,58 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	if (controllerBlending)
 		controllerBlending->updateBuffer(frame.buffer());
 	//--make sure there is always a pseudo idle state running in the system
-	if (!curStateModule && !nextStateModule)
-		schedule(NULL, true, true);
-	if (curStateModule)
+	if ((!curStateData && !nextStateData) ||
+		!curStateData)
 	{
-		if (curStateModule->data->stateName != PseudoIdleState && nextStateModule == NULL && !curStateModule->loop)
-			schedule(NULL, true);
+		std::vector<double> weights;
+		schedule(NULL, weights, true, true);
+		mcu.mark("locomotion");
+		return true;
+	}
+		
+	if (curStateData)
+	{
+		if (curStateData->state &&
+			curStateData->state->stateName != PseudoIdleState && 
+			nextStateData == NULL && !curStateData->loop)
+		{
+			std::vector<double> weights;
+			schedule(NULL, weights, true);
+		}
+			
 	}
 	//------
 
 	if (transitionManager)
 	{
-		if (curStateModule == NULL || nextStateModule == NULL)
+		if (curStateData == NULL || nextStateData == NULL)
 		{
 			std::string errorInfo;
 			errorInfo = character->getName() + "'s animation state transition warning. ";
-			if (curStateModule)
-				if (curStateModule->data)
-					errorInfo += "current state: " + curStateModule->data->stateName;
+			if (curStateData)
+				if (curStateData->state)
+					errorInfo += "current state: " + curStateData->state->stateName;
 			else
 				errorInfo += "current state: null ";
-			if (nextStateModule)
-				if (nextStateModule->data)
-					errorInfo += "next state: " + nextStateModule->data->stateName;
+			if (nextStateData)
+				if (nextStateData->state)
+					errorInfo += "next state: " + nextStateData->state->stateName;
 			else 
 				errorInfo += "next state: null ";
 			LOG("%s", errorInfo.c_str());
-			if (curStateModule == NULL && nextStateModule != NULL)
+			if (curStateData == NULL && nextStateData != NULL)
 			{
-				if (nextStateModule->data)
-					LOG("would start state %s now", nextStateModule->data->stateName.c_str());
+				if (nextStateData->state)
+					LOG("would start state %s now", nextStateData->state->stateName.c_str());
 				// should not delete, just swap the pointers
-				curStateModule = nextStateModule;
-				curStateModule->active = true;
-				nextStateModule = NULL;
+				curStateData = nextStateData;
+				curStateData->active = true;
+				nextStateData = NULL;
 				delete transitionManager;
 				transitionManager = NULL;
 				return true;
 			}
-			if (curStateModule != NULL && nextStateModule == NULL)
+			if (curStateData != NULL && nextStateData == NULL)
 			{
 				LOG("scheduling problem, please check the corresponding time marks for two states.");
 				reset();
@@ -127,7 +140,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 		}
 
 		if (!transitionManager->blendingMode)
-			transitionManager->align(curStateModule, nextStateModule);
+			transitionManager->align(curStateData, nextStateData);
 		else
 		{
 			if (transitionManager->active)
@@ -139,14 +152,14 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 				buffer2.size(frame.buffer().size());
 				buffer2 = frame.buffer();
 				SrMat transformMat;
-				curStateModule->evaluate(timeStep * transitionManager->getSlope(), buffer1);
-				nextStateModule->evaluate(timeStep, buffer2);
-				transitionManager->blending(frame.buffer(), buffer1, buffer2, transformMat, curStateModule->woManager->getBaseTransformMat(), nextStateModule->woManager->getBaseTransformMat(), timeStep, _context);
+				curStateData->evaluate(timeStep * transitionManager->getSlope(), buffer1);
+				nextStateData->evaluate(timeStep, buffer2);
+				transitionManager->blending(frame.buffer(), buffer1, buffer2, transformMat, curStateData->woManager->getBaseTransformMat(), nextStateData->woManager->getBaseTransformMat(), timeStep, _context);
 				updateWo(transformMat, woWriter, frame.buffer());
 
 #if debug
-				std::cout << "current state " << curStateModule->data->stateName << " " << curStateModule->timeManager->localTime << std::endl;
-				std::cout << "next state " << nextStateModule->data->stateName << " " << nextStateModule->timeManager->localTime << std::endl;
+				std::cout << "current state " << curStateData->data->stateName << " " << curStateData->timeManager->localTime << std::endl;
+				std::cout << "next state " << nextStateData->data->stateName << " " << nextStateData->timeManager->localTime << std::endl;
 
 				// creating two extra characters just to check out the blending
 				std::string name1 = std::string(character->getName()) + "1";
@@ -203,28 +216,28 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 			{
 				delete transitionManager;
 				transitionManager = NULL;
-				delete curStateModule;
-				curStateModule = nextStateModule;
-				nextStateModule = NULL;
+				delete curStateData;
+				curStateData = nextStateData;
+				nextStateData = NULL;
 			}			
 		}
 	}
 
-	if (curStateModule)
+	if (curStateData && curStateData->state->stateName != "PseudoIdle")
 	{
-		if (curStateModule->active)
+		if (curStateData->active)
 		{
-//			if (curStateModule->data->stateName != PseudoIdleState)
-//				std::cout << "current state " << curStateModule->data->stateName << " " << curStateModule->timeManager->localTime << std::endl;
-			curStateModule->evaluate(timeStep, frame.buffer());
-			updateWo(curStateModule->woManager->getBaseTransformMat(), woWriter, frame.buffer());
+//			if (curStateData->data->stateName != PseudoIdleState)
+//				std::cout << "current state " << curStateData->data->stateName << " " << curStateData->timeManager->localTime << std::endl;
+			curStateData->evaluate(timeStep, frame.buffer());
+			updateWo(curStateData->woManager->getBaseTransformMat(), woWriter, frame.buffer());
 			if (controllerBlending)
 				if (controllerBlending->getKey(t) > 0.0)					PATransitionManager::bufferBlending(frame.buffer(), controllerBlending->getBuffer(), frame.buffer(), controllerBlending->getKey(t), _context);			return true;
 		}
 		else
 		{
-			delete curStateModule;
-			curStateModule = NULL;
+			delete curStateData;
+			curStateData = NULL;
 		}
 	}
 	mcu.mark("locomotion");
@@ -243,10 +256,10 @@ const std::string& MeCtParamAnimation::getBaseJointName()
 
 void MeCtParamAnimation::dumpScheduling()
 {
-	if (curStateModule)
-		LOG("Current State: %s", curStateModule->data->stateName.c_str());
-	if (nextStateModule)
-		LOG("Next State: %s", nextStateModule->data->stateName.c_str());
+	if (curStateData)
+		LOG("Current State: %s", curStateData->state->stateName.c_str());
+	if (nextStateData)
+		LOG("Next State: %s", nextStateData->state->stateName.c_str());
 	LOG("Number of states to be scheduled: %d", waitingList.size());
 	std::list<ScheduleUnit>::iterator iter = waitingList.begin();
 	for (; iter != waitingList.end(); iter++)
@@ -258,7 +271,7 @@ void MeCtParamAnimation::dumpScheduling()
 	}
 }
 
-void MeCtParamAnimation::schedule(PAStateData* stateData, bool l, bool pn, bool a, std::string name)
+void MeCtParamAnimation::schedule(PAState* stateData, const std::vector<double>& weights, bool l, bool pn, bool a, std::string name)
 {
 	ScheduleUnit unit;
 	SmartBody::SBAnimationState* animState = dynamic_cast<SmartBody::SBAnimationState*>(stateData);
@@ -266,6 +279,7 @@ void MeCtParamAnimation::schedule(PAStateData* stateData, bool l, bool pn, bool 
 	{
 		animState->validateState(); // to make sure the animaion state is valid before schedule it
 	}
+	unit.weights = weights;
 	unit.data = stateData;
 	unit.loop = l;
 	unit.playNow = pn;
@@ -280,11 +294,11 @@ void MeCtParamAnimation::unschedule()
 	reset();
 }
 
-void MeCtParamAnimation::updateWeights(std::vector<double> w)
+void MeCtParamAnimation::updateWeights(std::vector<double>& w)
 {
-	if (curStateModule == NULL)
+	if (curStateData == NULL)
 		return;
-	if (curStateModule->data->getNumMotions() != w.size())
+	if (curStateData->state->getNumMotions() != w.size())
 		return;
 
 	double wCheck = 0.0;
@@ -297,50 +311,52 @@ void MeCtParamAnimation::updateWeights(std::vector<double> w)
 			else		w[i] = 0.0;
 	}
 
-	curStateModule->timeManager->updateWeights(w);
-	curStateModule->interpolator->weights = w;
-	curStateModule->woManager->weights = w;
-	curStateModule->data->weights = w;
+	curStateData->weights = w;
+	curStateData->timeManager->updateWeights();
+	
 	if (transitionManager)
 		transitionManager->update();
 }
 
 void MeCtParamAnimation::updateWeights()
 {
-	if (curStateModule == NULL)
+	if (curStateData == NULL)
 		return;
-	std::vector<double> w = curStateModule->data->weights;
+	std::vector<double>& w = curStateData->weights;
 	updateWeights(w);
 }
 
 int MeCtParamAnimation::getNumWeights()
 {
-	if (curStateModule)
-		return curStateModule->interpolator->getNumMotions();
+	if (curStateData)
+		return curStateData->interpolator->getNumMotions();
 	else
 		return 0;
 }
 
-const std::string& MeCtParamAnimation::getCurrentStateName()
+const std::string& MeCtParamAnimation::getNextStateName()
 {
-	if (curStateModule)
-		return curStateModule->data->stateName;
+	if (nextStateData)
+		return nextStateData->state->stateName;
 	else
 		return m_emptyString;
 }
 
-const std::string& MeCtParamAnimation::getNextStateName()
+const std::string& MeCtParamAnimation::getCurrentStateName()
 {
-	if (nextStateModule)
-		return nextStateModule->data->stateName;
+	if (curStateData)
+		if (curStateData->state)
+			return curStateData->state->stateName;
+		else
+			return m_emptyString;
 	else
 		return m_emptyString;
 }
 
 PAStateData* MeCtParamAnimation::getCurrentPAStateData()
 {
-	if (curStateModule)
-		return curStateModule->data;
+	if (curStateData)
+		return curStateData;
 	else
 		return NULL;
 }
@@ -363,7 +379,9 @@ bool MeCtParamAnimation::hasPAState(const std::string& name)
 
 bool MeCtParamAnimation::isIdle()
 {
-	if (getCurrentStateName() != PseudoIdleState)
+	if (getCurrentPAStateData() && 
+		getCurrentPAStateData()->state &&
+		getCurrentPAStateData()->state->stateName != PseudoIdleState)
 		return false;
 	if (getNextStateName() != "")
 		return false;
@@ -384,19 +402,19 @@ void MeCtParamAnimation::autoScheduling(double time)
 	if (time < nextUnit.time)
 		return;
 
-	if (curStateModule == NULL)
+	if (curStateData == NULL)
 	{
-		if (nextStateModule)
-			delete nextStateModule;
-		nextStateModule = NULL;
-		curStateModule = createStateModule(nextUnit);
-		if (!curStateModule)
+		if (nextStateData)
+			delete nextStateData;
+		nextStateData = NULL;
+		curStateData = createStateModule(nextUnit);
+		if (!curStateData)
 		{
 			return;
 		}
-		curStateModule->active = true;
+		curStateData->active = true;
 #if PrintPADebugInfo
-		LOG("State %s being scheduled.[ACTIVE]", curStateModule->data->stateName.c_str());
+		LOG("State %s being scheduled.[ACTIVE]", curStateData->data->stateName.c_str());
 #endif
 		waitingList.pop_front();
 		if (controllerBlending)
@@ -409,52 +427,51 @@ void MeCtParamAnimation::autoScheduling(double time)
 	{
 		if (transitionManager)
 			delete transitionManager;
-		PATransitionData* data = NULL;
+		PATransition* data = NULL;
 		if (nextUnit.data)
-			data = mcuCBHandle::singleton().lookUpPATransition(curStateModule->data->stateName, nextUnit.data->stateName);
-		nextStateModule = createStateModule(nextUnit);
-		nextStateModule->active = false;
+			data = mcuCBHandle::singleton().lookUpPATransition(curStateData->state->stateName, nextUnit.data->stateName);
+		nextStateData = createStateModule(nextUnit);
+		nextStateData->active = false;
 		if (!data)
 		{
-			PseudoPAStateModule* pseudo = dynamic_cast<PseudoPAStateModule*> (curStateModule);
-			if (pseudo)
+			if (curStateData->state->stateName == "PseudoIdle")
 				transitionManager = new PATransitionManager();
 			else
 			{
-				if (nextStateModule->playNow)
+				if (nextStateData->playNow)
 					transitionManager = new PATransitionManager();
 				else
 				{
 					// check to see if the current local time cannot afford the defaultTransition time
 					double actualTransitionTime = defaultTransition;
-					if (curStateModule->timeManager->localTime >= (curStateModule->timeManager->getDuration() - defaultTransition))
-						actualTransitionTime = curStateModule->timeManager->getDuration() - curStateModule->timeManager->localTime;
-					transitionManager = new PATransitionManager(curStateModule->timeManager->getDuration() - actualTransitionTime, actualTransitionTime);	
-//					transitionManager = new PATransitionManager(curStateModule->timeManager->getDuration() - defaultTransition);					
+					if (curStateData->timeManager->localTime >= (curStateData->timeManager->getDuration() - defaultTransition))
+						actualTransitionTime = curStateData->timeManager->getDuration() - curStateData->timeManager->localTime;
+					transitionManager = new PATransitionManager(curStateData->timeManager->getDuration() - actualTransitionTime, actualTransitionTime);	
+//					transitionManager = new PATransitionManager(curStateData->timeManager->getDuration() - defaultTransition);					
 				}
 			}
 #if PrintPADebugInfo
-		LOG("State %s being scheduled.[ACTIVE]", curStateModule->data->stateName.c_str());
+		LOG("State %s being scheduled.[ACTIVE]", curStateData->data->stateName.c_str());
 #endif
 		}
 		else
 		{
-			transitionManager = new PATransitionManager(data, curStateModule->data, nextStateModule->data);
-			nextStateModule->timeManager->updateLocalTimes(transitionManager->s2);
+			transitionManager = new PATransitionManager(data, curStateData, nextStateData);
+			nextStateData->timeManager->updateLocalTimes(transitionManager->s2);
 #if PrintPADebugInfo
-		LOG("State %s being scheduled.[NOT ACTIVE]", nextStateModule->data->stateName.c_str());
+		LOG("State %s being scheduled.[NOT ACTIVE]", nextStateData->data->stateName.c_str());
 #endif
 		}
 		waitingList.pop_front();
 	}
 }
 
-PAStateModule* MeCtParamAnimation::createStateModule(ScheduleUnit su)
+PAStateData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 {
-	PAStateModule* module = NULL;
+	PAStateData* module = NULL;
 	if (su.data)
 	{
-		module = new PAStateModule(su.data, su.loop, su.playNow);
+		module = new PAStateData(su.data,  su.weights, su.loop, su.playNow);
 		module->interpolator->setAdditiveMode(su.additive);
 		std::vector<std::string> joints;
 		SkJoint* j = character->getSkeleton()->search_joint(su.partialJoint.c_str());
@@ -472,7 +489,7 @@ PAStateModule* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	}
 	else
 	{
-		module = new PseudoPAStateModule();
+		module = new PAStateData("PseudoIdle",  su.weights, su.loop, su.playNow);
 		module->playNow = su.playNow;
 	}
 	if (_context)
@@ -496,12 +513,12 @@ PAStateModule* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 
 void MeCtParamAnimation::reset()
 {
-	if (curStateModule)
-		delete curStateModule;
-	curStateModule = NULL;
-	if (nextStateModule)
-		delete nextStateModule;
-	nextStateModule = NULL;
+	if (curStateData)
+		delete curStateData;
+	curStateData = NULL;
+	if (nextStateData)
+		delete nextStateData;
+	nextStateData = NULL;
 	transitionManager = NULL;
 	waitingList.clear();	
 	delete controllerBlending;
@@ -553,13 +570,13 @@ void MeCtParamAnimation::updateWo(SrMat&mat, MeCtChannelWriter* woWriter, SrBuff
 
 void MeCtParamAnimation::controllerEaseOut(double t)
 {
-	if (curStateModule->data->cycle)
+	if (curStateData->state->cycle)
 		return;
 
 	if (controllerBlending->getKey(t) > 0.0)
 		return;
 
-	double toStateEnd = curStateModule->timeManager->getDuration() - curStateModule->timeManager->localTime;
+	double toStateEnd = curStateData->timeManager->getDuration() - curStateData->timeManager->localTime;
 	if (toStateEnd < defaultTransition)
 	{
 		controllerBlending->addKey(t, 1.0);

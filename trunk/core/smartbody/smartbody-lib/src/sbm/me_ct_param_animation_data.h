@@ -24,61 +24,9 @@
 #ifndef _ME_CT_PARAM_ANIMATION_DATA_H_
 #define _ME_CT_PARAM_ANIMATION_DATA_H_
 #include "me_ct_param_animation_utilities.h"
-#include <sbm/sbm_character.hpp>
 #include <sr/sr_triangle.h>
 
 const std::string PseudoIdleState = "PseudoIdle";
-class ParameterManager;
-
-//There are PAStateData stored inside mcu.
-//Everytime PAStateModule is created, it would copy the data from mcu.param_animation_states. 
-//toStates and fromStates are just pointers and they are not that useful
-class PAStateData
-{
-	public:
-		PAStateData();
-		PAStateData(PAStateData* data);
-		PAStateData(const std::string& name);
-		~PAStateData();
-
-		std::string stateName;
-		std::vector<SkMotion*> motions;
-		std::vector<std::vector<double> > keys;
-		std::vector<double> weights;
-		std::vector<PAStateData*> toStates;				
-		std::vector<PAStateData*> fromStates;
-		bool cycle;
-		ParameterManager* paramManager;
-
-
-		virtual int getNumMotions();
-		virtual int getNumKeys();
-		int getMotionId(const std::string& motion);
-};
-
-//There are PATransitionData stored inside mcu
-//Everytime PATransitionManager is created, it would copy the data from mcu.param_animation_transitions.
-//fromState and toState are just pointers and they have to be changed when PATransitionManager is created.
-class PATransitionData
-{
-	public:
-		PATransitionData();
-		PATransitionData(PATransitionData* data, PAStateData* from, PAStateData* to);
-		~PATransitionData();
-
-	public:
-		PAStateData* fromState;
-		PAStateData* toState;
-		std::string fromMotionName;
-		std::string toMotionName;
-		std::vector<double> easeOutStart;
-		std::vector<double> easeOutEnd;
-		double easeInStart;
-		double easeInEnd;
-		
-	public:
-		virtual int getNumEaseOut();
-};
 
 struct TriangleInfo
 {
@@ -100,24 +48,34 @@ struct TetrahedronInfo
 	std::string motion4;
 };
 
-class ParameterManager
+//There are PAState stored inside mcu.
+//Everytime PAStateData is created, it would copy the data from mcu.param_animation_states. 
+//toStates and fromStates are just pointers and they are not that useful
+class PAState
 {
 	public:
-		ParameterManager(ParameterManager* pm, PAStateData* s);
-		ParameterManager(PAStateData* s);
-		~ParameterManager();
+		PAState();
+		PAState(PAState* data);
+		PAState(const std::string& name);
+		~PAState();
 
-		bool setWeight(double x);
-		bool setWeight(double x, double y);
-		bool setWeight(double x, double y, double z);
-		void getParameter(float& x);
-		void getParameter(float& x, float& y);
-		void getParameter(float& x, float& y, float& z);
+		bool getWeightsFromParameters(double x, std::vector<double>& weights);
+		bool getWeightsFromParameters(double x, double y, std::vector<double>& weights);
+		bool getWeightsFromParameters(double x, double y, double z, std::vector<double>& weights);
+		void getParametersFromWeights(float& x, std::vector<double>& weights);
+		void getParametersFromWeights(float& x, float& y, std::vector<double>& weights);
+		void getParametersFromWeights(float& x, float& y, float& z, std::vector<double>& weights);
 		void setParameter(const std::string& motion, double x);
 		void setParameter(const std::string& motion, double x, double y);
 		void setParameter(const std::string& motion, double x, double y, double z);
+		void getParameter(const std::string& motion, double& x);
+		void getParameter(const std::string& motion, double& x, double& y);
+		void getParameter(const std::string& motion, double& x, double& y, double& z);
+		void removeParameter(const std::string& motion);
 		void addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3);
+		void removeTriangles(const std::string& motion);
 		void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
+		void removeTetrahedrons(const std::string& motion);
 		void buildTetrahedron();
 		int getType();
 		void setType(int typ);
@@ -138,30 +96,62 @@ class ParameterManager
 		SrTriangle& getTriangle(int id);
 		float getMinimumDist(SrVec& pt, SrVec& a, SrVec& b, SrVec& minimumPt);
 
-		// access data
-		PAStateData* getState() {return state;}
-		std::vector<std::string>& getMotionNames() {return motionNames;}
 		std::vector<SrVec>& getParameters() {return parameters;}
 		std::vector<TriangleInfo>& getTriangles() {return triangles;}
 		std::vector<TetrahedronInfo> & getTetrahedrons() {return tetrahedrons;}
 
-	private:
-		bool insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
-		void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, double& w2, double& w3);
-		void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrVec& v4, double& w1, double& w2, double& w3, double& w4);
-		SrVec closestPtPointTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
-		int PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c);
+		std::string stateName;
+		std::vector<SkMotion*> motions;
+		std::vector<std::vector<double> > keys;
 
-	private:
-		int type;
-		PAStateData* state;
-		std::vector<std::string> motionNames;
-		std::vector<SrVec> parameters;
-		SrVec previousParam;
-		std::vector<TriangleInfo> triangles;
-		std::vector<TetrahedronInfo> tetrahedrons;
-		std::string emptyString;
+		std::vector<PAState*> toStates;				
+		std::vector<PAState*> fromStates;
+		bool cycle;
+
+		virtual int getNumMotions();
+		virtual int getNumKeys();
+
+		private:
+			bool insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
+			void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, double& w2, double& w3);
+			void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrVec& v4, double& w1, double& w2, double& w3, double& w4);
+			SrVec closestPtPointTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
+			int PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c);
+
+			int type;
+			//std::vector<std::string> motionNames;
+			std::vector<SrVec> parameters;
+			SrVec previousParam;
+			std::vector<TriangleInfo> triangles;
+			std::vector<TetrahedronInfo> tetrahedrons;
+			std::string emptyString;
 };
+
+//There are PATransition stored inside mcu
+//Everytime PATransitionManager is created, it would copy the data from mcu.param_animation_transitions.
+//fromState and toState are just pointers and they have to be changed when PATransitionManager is created.
+class PATransition
+{
+	public:
+		PATransition();
+		PATransition(PATransition* data, PAState* from, PAState* to);
+		~PATransition();
+
+	public:
+		PAState* fromState;
+		PAState* toState;
+		std::string fromMotionName;
+		std::string toMotionName;
+		std::vector<double> easeOutStart;
+		std::vector<double> easeOutEnd;
+		double easeInStart;
+		double easeInEnd;
+		
+	public:
+		virtual int getNumEaseOut();
+};
+
+
 
 class MotionParameters
 {

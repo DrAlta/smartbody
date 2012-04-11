@@ -91,8 +91,6 @@ class mcuCBHandle;
 #include <sbm/nvbg.h>
 
 #include <me/me_ct_interpolator.h>
-#include <sbm/me_ct_param_animation_utilities.h>
-#include <sbm/me_ct_param_animation_data.h>
 
 #include <sbm/SteerSuiteEngineDriver.h>
 #include <sbm/Physics/SbmPhysicsSim.h>
@@ -220,8 +218,8 @@ class mcuCBHandle {
 
 		KinectProcessor*							kinectProcessor;
 
-		std::vector<PAStateData*>					param_anim_states;
-		std::vector<PATransitionData*>				param_anim_transitions;
+		std::vector<PAState*>					param_anim_states;
+		std::vector<PATransition*>				param_anim_transitions;
 		float										steeringScale;
 
 		TimeRegulator	*internal_timer_p;
@@ -512,10 +510,10 @@ public:
 
 		SkMotion* lookUpMotion(const char* motionName);
 
-		PAStateData* lookUpPAState(std::string stateName);
-		void addPAState(PAStateData* state);
-		PATransitionData* lookUpPATransition(std::string fromStateName, std::string toStateName);
-		void addPATransition(PATransitionData* transition);
+		PAState* lookUpPAState(std::string stateName);
+		void addPAState(PAState* state);
+		PATransition* lookUpPATransition(std::string fromStateName, std::string toStateName);
+		void addPATransition(PATransition* transition);
 
 		SkMotion* addMirrorMotion(SkMotion* motion);
 // 		void setPhysicsEngine(bool start);

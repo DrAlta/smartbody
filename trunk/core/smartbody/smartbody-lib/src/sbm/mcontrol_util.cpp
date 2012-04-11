@@ -80,7 +80,10 @@
 #include <sbm/SBBoneBusManager.h>
 #include <sbm/SBScript.h>
 #include <sbm/SBServiceManager.h>
+#include <sbm/SBAnimationState.h>
 #include "SbmDebuggerServer.h"
+#include <sbm/me_ct_param_animation_utilities.h>
+#include <sbm/me_ct_param_animation_data.h>
 
 
 using namespace std;
@@ -298,6 +301,11 @@ mcuCBHandle::mcuCBHandle()
 
 	_scene->getDebuggerServer()->Init();
 	_scene->getDebuggerServer()->SetSBScene(_scene);
+
+	SmartBody::SBAnimationState0D* idleState = new SmartBody::SBAnimationState0D("PseudoIdle");
+	addPAState(idleState);
+
+
 }
 
 /////////////////////////////////////////////////////////////
@@ -628,7 +636,7 @@ void mcuCBHandle::clear( void )	{
 	}
 
 	// remove the parameterized animation states
-	for (std::vector<PAStateData*>::iterator iter = param_anim_states.begin();
+	for (std::vector<PAState*>::iterator iter = param_anim_states.begin();
 	     iter != param_anim_states.end();
 	     iter++)
 	{
@@ -637,7 +645,7 @@ void mcuCBHandle::clear( void )	{
 	param_anim_states.clear();
 
 	// remove the transition maps
-	for (std::vector<PATransitionData*>::iterator iter = param_anim_transitions.begin();
+	for (std::vector<PATransition*>::iterator iter = param_anim_transitions.begin();
 	     iter != param_anim_transitions.end();
 	     iter++)
 	{
@@ -1898,7 +1906,7 @@ SkMotion* mcuCBHandle::lookUpMotion( const char* motionName )
 	return anim_p;
 }
 
-PAStateData* mcuCBHandle::lookUpPAState(std::string stateName)
+PAState* mcuCBHandle::lookUpPAState(std::string stateName)
 {
 	for (size_t i = 0; i < param_anim_states.size(); i++)
 	{
@@ -1908,13 +1916,13 @@ PAStateData* mcuCBHandle::lookUpPAState(std::string stateName)
 	return NULL;
 }
 
-void mcuCBHandle::addPAState(PAStateData* state)
+void mcuCBHandle::addPAState(PAState* state)
 {
 	if (!lookUpPAState(state->stateName))
 		param_anim_states.push_back(state);
 }
 
-PATransitionData* mcuCBHandle::lookUpPATransition(std::string fromStateName, std::string toStateName)
+PATransition* mcuCBHandle::lookUpPATransition(std::string fromStateName, std::string toStateName)
 {
 	for (size_t i = 0; i < param_anim_transitions.size(); i++)
 	{
@@ -1924,7 +1932,7 @@ PATransitionData* mcuCBHandle::lookUpPATransition(std::string fromStateName, std
 	return NULL;	
 }
 
-void mcuCBHandle::addPATransition(PATransitionData* transition)
+void mcuCBHandle::addPATransition(PATransition* transition)
 {
 	if (!lookUpPATransition(transition->fromState->stateName, transition->toState->stateName))
 		param_anim_transitions.push_back(transition);
