@@ -1423,8 +1423,14 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				}
 			}
 			else if (strcmp( cam_cmd, "reset" ) == 0 ) {
-				mcu_p->execute((char*)"camera eye 0 166 185");
-				mcu_p->execute((char*)"camera center 0 92 0");
+				float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
+				SrVec camEye = SrVec(0,1.66f,1.85f)*scale;
+				SrVec camCenter = SrVec(0,0.92f,0)*scale;
+				char camCommand[256];
+				sprintf(camCommand,"camera eye %f %f %f",camEye[0],camEye[1],camEye[2]);				
+				mcu_p->execute((char*)camCommand);
+				sprintf(camCommand,"camera center %f %f %f",camCenter[0],camCenter[1],camCenter[2]);
+				mcu_p->execute((char*)camCommand);
 			}
 			else if (strcmp( cam_cmd, "frame" ) == 0 ) {
 				SrBox sceneBox;

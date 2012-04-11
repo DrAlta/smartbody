@@ -610,6 +610,8 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 										for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
 											for (int strideCt = 0; strideCt < stride; strideCt++)
 											{
+												if (tokens.size() <= (unsigned int)frameCt) continue;
+
 												float v = (float)atof(tokens[frameCt].c_str());
 												motion.posture(frameCt)[channelId + strideCt] = v * scale;
 											}
