@@ -363,27 +363,6 @@ void PATransitionEditor::createNewTransition(Fl_Widget* widget, void* data)
 		mcu.addPATransition(transition);
 		updateTransitionTimeMark(widget, data);
 	}
-
-	if (transition)
-	{
-		std::stringstream createTransitionCommand;
-		createTransitionCommand << "panim transition fromstate " << transition->fromState->stateName << " tostate " << transition->toState->stateName << " ";
-		for (int i = 0; i < editor->animForTransition1->size(); i++)
-			if (editor->animForTransition1->selected(i+1))
-				createTransitionCommand << editor->animForTransition1->text(i+1) << " ";
-		createTransitionCommand << transition->getNumEaseOut() << " ";
-		for (int i = 0; i < transition->getNumEaseOut(); i++)
-			createTransitionCommand << transition->easeOutStart[i] << " " << transition->easeOutEnd[i] << " ";
-		
-		for (int i = 0; i < editor->animForTransition2->size(); i++)
-			if (editor->animForTransition2->selected(i+1))
-				createTransitionCommand << editor->animForTransition2->text(i+1) << " ";
-		createTransitionCommand << transition->easeInStart << " " << transition->easeInEnd << " ";
-
-		editor->paWindow->textDisplay->buffer()->append(createTransitionCommand.str().c_str());	
-		editor->paWindow->textDisplay->buffer()->append("\n");
-		editor->paWindow->textDisplay->redraw();
-	}
 }
 
 void PATransitionEditor::changeTransitionList(Fl_Widget* widget, void* data)

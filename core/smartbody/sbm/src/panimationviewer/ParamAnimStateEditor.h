@@ -53,6 +53,9 @@ class PAStateEditor : public Fl_Group
 		static void updateMaxTime(Fl_Widget* widget, void* data);
 		static void save(Fl_Widget* widget, void* data);
 		static void selectStateAnimations(Fl_Widget* widget, void* data);
+		static void addShape(Fl_Widget* widget, void* data);
+		static void removeShape(Fl_Widget* widget, void* data);
+		static void selectShape(Fl_Widget* widget, void* data);
 		static void updateParameters(Fl_Widget* widget, void* data);
 		static void scrub(Fl_Widget* widget, void* data);
 		static void playmotion(Fl_Widget* widget, void* data);
@@ -67,8 +70,8 @@ class PAStateEditor : public Fl_Group
 		Fl_Input*		newStateName;
 		Fl_Multi_Browser*		stateAnimationList;
 		Fl_Multi_Browser*		shapeList;
-		Fl_Button*		animationAdd;
-		Fl_Button*		animationRemove;
+		Fl_Button*		shapeAdd;
+		Fl_Button*		shapeRemove;
 		Fl_Scroll*		editStateTimeMarkGroup;
 		Fl_Choice*		stateList;
 		Fl_Choice*		choiceStateType;

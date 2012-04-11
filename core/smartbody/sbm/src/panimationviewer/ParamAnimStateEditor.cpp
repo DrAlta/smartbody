@@ -37,7 +37,7 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 
 		int csx = xDis + x;
 		int csy = 4 * yDis + y;
-		stateSelectionGroup = new Fl_Group(csx, csy, w - 2 * xDis, h /2 - 4 * yDis, "Create States");
+		stateSelectionGroup = new Fl_Group(csx, csy, w - 2 * xDis, h /2 - 4 * yDis, "");
 		int stateSelectionGroupW = w - 2 * xDis;
 		int stateSelectionGroupH = h /2 - 3 * yDis;
 		stateSelectionGroup->begin();
@@ -53,25 +53,26 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 			choiceStateType->value(0);
 			choiceStateType->deactivate();
 
-			createStateButton = new Fl_Button(xDis + 400 + csx, yDis + csy, 10 * xDis, 2 * yDis, "Create");
+			createStateButton = new Fl_Button(xDis + 600 + csx, yDis + csy, 10 * xDis, 2 * yDis, "Create");
 			createStateButton->callback(editStateMotions, this);
-			stateAnimationList = new Fl_Multi_Browser(xDis + csx, 4 * yDis + csy, stateSelectionGroupW / 2 - 5 * xDis, stateSelectionGroupH - 5 * yDis - 30, "State Motions");
+			stateAnimationList = new Fl_Multi_Browser(xDis + csx, 5 * yDis + csy, stateSelectionGroupW / 2 - 5 * xDis, stateSelectionGroupH - 5 * yDis - 30, "State Motions");
 			stateAnimationList->align(FL_ALIGN_TOP);
 			stateAnimationList->when(FL_WHEN_CHANGED);
 			stateAnimationList->callback(selectStateAnimations, this);
-			animationAdd = new Fl_Button(stateSelectionGroupW / 2 - 3 * xDis + csx, stateSelectionGroupH / 2 + csy, 6 * xDis, 2 * yDis, ">>>");
-//			animationAdd->callback(addMotion, this);
-			animationRemove = new Fl_Button(stateSelectionGroupW / 2 - 3 * xDis + csx, stateSelectionGroupH / 2 + 5 * yDis + csy, 6 * xDis, 2 * yDis, "<<<");
-//			animationRemove->callback(removeMotion, this);
-			shapeList = new Fl_Multi_Browser(stateSelectionGroupW / 2 + 4 * xDis + csx, 4 * yDis + csy, stateSelectionGroupW / 2 - 5 * xDis, stateSelectionGroupH - 5 * yDis, "Parameterization");
+			shapeAdd = new Fl_Button(stateSelectionGroupW / 2 - 3 * xDis + csx, stateSelectionGroupH / 2 + csy, 6 * xDis, 2 * yDis, "+");
+			shapeAdd->callback(addShape, this);
+			shapeAdd->deactivate();
+			shapeRemove = new Fl_Button(stateSelectionGroupW / 2 - 3 * xDis + csx, stateSelectionGroupH / 2 + 5 * yDis + csy, 6 * xDis, 2 * yDis, "-");
+			shapeRemove->callback(removeShape, this);
+			shapeRemove->deactivate();
+			shapeList = new Fl_Multi_Browser(stateSelectionGroupW / 2 + 4 * xDis + csx, 5 * yDis + csy, stateSelectionGroupW / 2 - 5 * xDis, stateSelectionGroupH - 5 * yDis - 30, "Parameterization");
 			shapeList->align(FL_ALIGN_TOP);
-		//	shapeList->when(FL_WHEN_CHANGED);
-		//	shapeList->callback(selectStateAnimations, this);
+			shapeList->when(FL_WHEN_CHANGED);
+			shapeList->callback(selectShape, this);
 
-			inputParameterX = new Fl_Float_Input(xDis + 80 + csx, 4 *yDis + csy + stateSelectionGroupH - 5 * yDis - 30 + 10, 60, 2* yDis - 5, "Parameters");
-			
-			inputParameterY = new Fl_Float_Input(xDis + 150 + csx, 4 *yDis + csy + stateSelectionGroupH - 5 * yDis - 30 + 10, 60, 2* yDis - 5, "");
-			inputParameterZ = new Fl_Float_Input(xDis + 220 + csx, 4 *yDis + csy + stateSelectionGroupH - 5 * yDis - 30 + 10, 60, 2* yDis - 5, "");
+			inputParameterX = new Fl_Float_Input(xDis + 80 + csx, 4 * yDis + csy + stateSelectionGroupH - 5 * yDis - 30 + 10, 60, 2* yDis - 5, "Parameters");
+			inputParameterY = new Fl_Float_Input(xDis + 150 + csx, 4 * yDis + csy + stateSelectionGroupH - 5 * yDis - 30 + 10, 60, 2* yDis - 5, "");
+			inputParameterZ = new Fl_Float_Input(xDis + 220 + csx, 4 * yDis + csy + stateSelectionGroupH - 5 * yDis - 30 + 10, 60, 2* yDis - 5, "");
 			inputParameterX->callback(updateParameters, this);
 			inputParameterY->callback(updateParameters, this);
 			inputParameterZ->callback(updateParameters, this);
@@ -90,7 +91,7 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 		stateSelectionGroup->end();
 		stateSelectionGroup->box(FL_BORDER_BOX);
 
-		int esx = xDis;
+		int esx = xDis + x;
 		int esy = h / 2 + yDis + y;
 		Fl_Group* buttonGroup = new Fl_Group(esx, esy, w - 2 * xDis, 3 * yDis);
 		buttonGroup->begin();
@@ -126,7 +127,6 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 	stateTimeMarkWidget->setModel(stateEditorNleModel);
 	stateTimeMarkWidget->setup();
 
-	stateList->activate();
 	loadStates();
 
 	creator = NULL;
@@ -216,41 +216,6 @@ void PAStateEditor::editStateMotions(Fl_Widget* widget, void* data)
 	}
 	editor->creator = new PAStateCreator(editor, isCreateMode, stateName, editor->x() + 50, editor->y() + 50, 600, 600);
 	editor->creator->show();
-	/*
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::string stateName = editor->newStateName->value();
-	if (stateName == "")
-	{
-		fl_message("Please input new state name");
-		return;
-	}
-	if (mcu.lookUpPAState(stateName))
-	{
-		LOG("State %s already exists. Please choose another name, or remove the other state first.", stateName.c_str());
-		return;
-	}
-	std::stringstream createStateCommand;
-	int numMotion = editor->stateEditorNleModel->getNumTracks();
-	//int cycleWindow = fl_choice((char*) "This is a Cycle State?", "yes", "no", NULL);
-	//std::string cycle = "true";
-	//if (cycleWindow == 1) cycle = "false";
-	//createStateCommand << "panim state " << stateName << " cycle " << cycle << " " << numMotion << " ";
-	for (int i = 0; i < numMotion; i++)
-		createStateCommand << editor->stateEditorNleModel->getTrack(i)->getName() << " ";
-	if (numMotion == 0)
-		return;
-	int numKeys = editor->stateEditorNleModel->getTrack(0)->getBlock(0)->getNumMarks();
-	createStateCommand << numKeys << " ";
-	for (int i = 0; i < numMotion; i++)
-		for (int j = 0; j < numKeys; j++)
-			createStateCommand << editor->stateEditorNleModel->getTrack(i)->getBlock(0)->getMark(j)->getStartTime() << " ";
-	editor->paWindow->execCmd(editor->paWindow, createStateCommand.str());
-
-	PAState* newStateData = new PAState(stateName);
-	editor->updateCorrespondenceMarks(newStateData);
-	editor->stateTimeMarkWidget->setup();
-	editor->paWindow->redraw();
-	*/
 }
 
 void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
@@ -309,6 +274,26 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 		{
 			SkMotion* motion = currentState->motions[i];
 			editor->stateAnimationList->add(motion->getName().c_str());
+		}
+
+		// add the shapes to the shape list accordingly
+		if (state2d) //triangles
+		{
+			std::vector<TriangleInfo>& triangles = state2d->getTriangles();
+			for (size_t i = 0; i < triangles.size(); i++)
+			{
+				std::string triString = triangles[i].motion1 + "|" + triangles[i].motion2 + "|" + triangles[i].motion3;
+				editor->shapeList->add(triString.c_str());
+			}
+		}
+		if (state3d) //tetrahedrons
+		{
+			std::vector<TetrahedronInfo>& tetrahedrons = state3d->getTetrahedrons();
+			for (size_t i = 0; i < tetrahedrons.size(); i++)
+			{
+				std::string tetraString = tetrahedrons[i].motion1 + "|" + tetrahedrons[i].motion2 + "|" + tetrahedrons[i].motion3 + "|" + tetrahedrons[i].motion4;
+				editor->shapeList->add(tetraString.c_str());
+			}
 		}
 	}
 	else
@@ -382,8 +367,7 @@ void PAStateEditor::updateStateTimeMark(Fl_Widget* widget, void* data)
 	const char* stateText = editor->stateList->text();
 	std::string currentStateName = editor->stateList->text(stateIdx);
 	PAState* currentState = NULL;
-	if (editor->stateList->active())
-		currentState = mcuCBHandle::singleton().lookUpPAState(currentStateName);
+	currentState = mcuCBHandle::singleton().lookUpPAState(currentStateName);
 	if (currentState)
 	{
 		for (int i = 0; i < editor->stateEditorNleModel->getNumTracks(); i++)
@@ -642,6 +626,17 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 		}
 	}
 
+	const char* stateText = editor->stateList->text();
+	PAState* currentState = NULL;
+	currentState = mcuCBHandle::singleton().lookUpPAState(stateText);
+	if (!currentState)
+		return;
+
+	SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(currentState);
+	SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(currentState);
+	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(currentState);
+	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(currentState);
+
 	if (selectedMotions.size() == 1)
 	{
 		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[0]);
@@ -657,18 +652,6 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 			}
 			editor->sliderScrub->range(0, motion->duration());
 		}
-		
-		const char* stateText = editor->stateList->text();
-		PAState* currentState = NULL;
-		if (editor->stateList->active())
-			currentState = mcuCBHandle::singleton().lookUpPAState(stateText);
-		if (!currentState)
-			return;
-
-		SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(currentState);
-		SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(currentState);
-		SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(currentState);
-		SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(currentState);
 		
 		char buff[32];
 		if (state0D)
@@ -729,6 +712,109 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 		editor->inputParameterZ->deactivate();
 	}
 
+	if ((selectedMotions.size() == 3 && state2D) ||
+		(selectedMotions.size() == 4 && state3D))
+	
+	{
+		editor->shapeAdd->activate();
+	}
+	else
+	{
+		editor->shapeAdd->deactivate();
+	}
+
+}
+
+void PAStateEditor::addShape(Fl_Widget* widget, void* data)
+{
+	PAStateEditor* editor = (PAStateEditor*) data;
+	const char* stateText = editor->stateList->text();
+	PAState* currentState = NULL;
+	currentState = mcuCBHandle::singleton().lookUpPAState(stateText);
+	if (!currentState)
+		return;
+
+	std::vector<std::string> selectedMotions;
+	for (int i = 0; i < editor->stateAnimationList->size(); i++)
+	{
+		if (editor->stateAnimationList->selected(i+1))
+		{
+			selectedMotions.push_back(editor->stateAnimationList->text(i + 1));
+		}
+	}
+
+	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(currentState);
+	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(currentState);
+	if (state2D && selectedMotions.size() == 3)
+	{
+		state2D->addTriangle(selectedMotions[0], selectedMotions[1], selectedMotions[2]);
+	}
+	if (state3D && selectedMotions.size() == 4)
+	{
+		state3D->addTetrahedron(selectedMotions[0], selectedMotions[1], selectedMotions[2], selectedMotions[3]);
+	}
+	editor->refresh();
+}
+
+void PAStateEditor::removeShape(Fl_Widget* widget, void* data)
+{
+	PAStateEditor* editor = (PAStateEditor*) data;
+	const char* stateText = editor->stateList->text();
+	PAState* currentState = NULL;
+	currentState = mcuCBHandle::singleton().lookUpPAState(stateText);
+	if (!currentState)
+		return;
+
+	std::vector<std::string> selectedShapes;
+	for (int i = 0; i < editor->shapeList->size(); i++)
+	{
+		if (editor->shapeList->selected(i + 1))
+		{
+			selectedShapes.push_back(editor->shapeList->text(i + 1));
+			editor->shapeList->remove(i + 1);
+			i--;
+		}
+	}
+
+	for (size_t i = 0; i < selectedShapes.size(); i++)
+	{
+		// remove from state
+		std::vector<std::string> motions;
+		vhcl::Tokenize(selectedShapes[i], motions, "|");		
+		SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(currentState);
+		SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(currentState);
+		if (state2D && motions.size() == 3)
+		{
+			state2D->removeTriangle(motions[0], motions[1], motions[2]);
+		}
+		if (state3D && motions.size() == 4)
+		{
+			state3D->removeTetrahedron(motions[0], motions[1], motions[2], motions[3]);
+		}	
+	}
+	editor->refresh();
+}
+
+void PAStateEditor::selectShape(Fl_Widget* widget, void* data)
+{
+	PAStateEditor* editor = (PAStateEditor*) data;
+	std::vector<std::string> selectedShapes;
+	for (int i = 0; i < editor->shapeList->size(); i++)
+	{
+		if (editor->shapeList->selected(i + 1))
+		{
+			selectedShapes.push_back(editor->shapeList->text(i + 1));
+		}
+	}
+
+	if (selectedShapes.size() > 0)
+	{
+		editor->shapeRemove->activate();
+	}
+	else
+	{
+		editor->shapeRemove->deactivate();
+	}
 }
 
 void PAStateEditor::updateParameters(Fl_Widget* widget, void* data)
@@ -747,8 +833,7 @@ void PAStateEditor::updateParameters(Fl_Widget* widget, void* data)
 
 	const char* stateText = editor->stateList->text();
 	PAState* currentState = NULL;
-	if (editor->stateList->active())
-		currentState = mcuCBHandle::singleton().lookUpPAState(stateText);
+	currentState = mcuCBHandle::singleton().lookUpPAState(stateText);
 	if (!currentState)
 		return;
 
