@@ -488,6 +488,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClCompile Include="..\src\panimationviewer\PanimationWindow.cpp" />
     <ClCompile Include="..\src\panimationviewer\ParamAnimBlock.cpp" />
     <ClCompile Include="..\src\panimationviewer\ParamAnimEditorWidget.cpp" />
+	<ClCompile Include="..\src\panimationviewer\ParamAnimStateCreatorWidget.cpp" />
     <ClCompile Include="..\src\panimationviewer\ParamAnimRunTimeEditor.cpp" />
     <ClCompile Include="..\src\panimationviewer\ParamAnimScriptEditor.cpp" />
     <ClCompile Include="..\src\panimationviewer\ParamAnimStateEditor.cpp" />
@@ -543,6 +544,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClInclude Include="..\src\panimationviewer\PanimationWindow.h" />
     <ClInclude Include="..\src\panimationviewer\ParamAnimBlock.h" />
     <ClInclude Include="..\src\panimationviewer\ParamAnimEditorWidget.h" />
+    <ClInclude Include="..\src\panimationviewer\ParamAnimStateCreatorWidget.h" />
     <ClInclude Include="..\src\panimationviewer\ParamAnimRunTimeEditor.h" />
     <ClInclude Include="..\src\panimationviewer\ParamAnimScriptEditor.h" />
     <ClInclude Include="..\src\panimationviewer\ParamAnimStateEditor.h" />

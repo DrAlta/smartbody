@@ -451,6 +451,57 @@ bool Smartbody_dll::InitVHMsg()
    return true;
 }
 
+bool Smartbody_dll::PythonCommandBool( const std::string & command )
+{
+	mcuCBHandle & mcu = mcuCBHandle::singleton();
+	try {
+		boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
+		bool result = boost::python::extract<bool>(mcu.mainDict["ret"]);
+		return result;
+	} catch (...) {
+		PyErr_Print();
+		return false;
+	}
+}
+
+int Smartbody_dll::PythonCommandInt( const std::string & command )
+{
+	mcuCBHandle & mcu = mcuCBHandle::singleton();
+	try {
+		boost::python::object obj = boost::python::exec(command.c_str(),mcu.mainDict);
+		int result = boost::python::extract<int>(mcu.mainDict["ret"]);
+		return result;
+	} catch (...) {
+		PyErr_Print();
+		return 0;
+	}
+}
+
+float Smartbody_dll::PythonCommandFloat( const std::string & command )
+{
+	mcuCBHandle & mcu = mcuCBHandle::singleton();
+	try {
+		boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
+		float result = boost::python::extract<float>(mcu.mainDict["ret"]);
+		return result;
+	} catch (...) {
+		PyErr_Print();
+		return 0.;
+	}
+}
+
+std::string Smartbody_dll::PythonCommandString( const std::string & command )
+{
+	mcuCBHandle & mcu = mcuCBHandle::singleton();
+	try {
+		boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
+		std::string result = boost::python::extract<std::string>(mcu.mainDict["ret"]);
+		return result;
+	} catch (...) {
+		PyErr_Print();
+		return "";
+	}
+}
 
 void Smartbody_dll::RegisterCallbacks()
 {
