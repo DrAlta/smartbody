@@ -125,6 +125,12 @@ SMARTBODY_C_DLL_API bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * ch
 SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb);
 SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType);
 
+SMARTBODY_C_DLL_API bool SBM_PythonCommandBool( SBMHANDLE sbmHandle,  const char * command );
+SMARTBODY_C_DLL_API int SBM_PythonCommandInt( SBMHANDLE sbmHandle,  const char * command );
+SMARTBODY_C_DLL_API float SBM_PythonCommandFloat( SBMHANDLE sbmHandle,  const char * command );
+SMARTBODY_C_DLL_API const char* SBM_PythonCommandString( SBMHANDLE sbmHandle, const char * command, char* temp );
+
+
 // used for polling on iOS since callbacks aren't allowed
 SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** objectClass );
 SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, int * numCharacters, char *** name );

@@ -68,7 +68,6 @@ SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType)
    }
 }
 
-
 class SBM_SmartbodyListener : public SmartbodyListener
 {
 private:
@@ -608,3 +607,46 @@ void DeleteCallbacks(SBMHANDLE sbmHandle, std::map< int, std::vector<SBM_Callbac
 
     callbackData.clear();
 }
+
+SMARTBODY_C_DLL_API bool SBM_PythonCommandBool( SBMHANDLE sbmHandle,  const char * command )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   return g_smartbodyInstances[ sbmHandle ]->PythonCommandBool( command );
+}
+
+SMARTBODY_C_DLL_API int SBM_PythonCommandInt( SBMHANDLE sbmHandle,  const char * command )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return 0;
+   }
+
+   return g_smartbodyInstances[ sbmHandle ]->PythonCommandInt( command );
+}
+
+SMARTBODY_C_DLL_API float SBM_PythonCommandFloat( SBMHANDLE sbmHandle,  const char * command )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return 0;
+   }
+
+   return g_smartbodyInstances[ sbmHandle ]->PythonCommandFloat( command );
+}
+
+SMARTBODY_C_DLL_API const char* SBM_PythonCommandString( SBMHANDLE sbmHandle,  const char * command, char* ret)
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return 0;
+   }
+
+   std::string temp = g_smartbodyInstances[ sbmHandle ]->PythonCommandString( command ).c_str();
+   strcpy(ret, temp.c_str());
+   return ret;
+}
+

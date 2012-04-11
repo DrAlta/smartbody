@@ -134,6 +134,10 @@ SBCharacter* SBScene::createCharacter(std::string charName, std::string metaInfo
 	else
 	{
 		SBCharacter* character = new SBCharacter(charName, metaInfo);
+		SBSkeleton* skeleton = new SBSkeleton();
+		character->setSkeleton(skeleton);
+		SkJoint* joint = skeleton->add_joint(SkJoint::TypeQuat);
+		joint->setName("world_offset");
 		mcu.registerCharacter(character);
 		return character;
 	}

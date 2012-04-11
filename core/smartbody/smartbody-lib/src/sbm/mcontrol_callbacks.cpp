@@ -4973,6 +4973,20 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		return CMD_SUCCESS;
 	}
+	else if (returnType == "bool")
+	{
+		try {
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
+			bool result = boost::python::extract<bool>(mcu_p->mainDict["ret"]);
+			std::stringstream strstr;
+			strstr << instanceId << " " << messageId << " response ";
+			strstr << result;
+			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			return CMD_SUCCESS;
+		} catch (...) {
+			PyErr_Print();
+		}
+	}
 	else if (returnType == "int")
 	{
 		try {
