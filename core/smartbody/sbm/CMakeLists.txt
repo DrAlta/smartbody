@@ -74,6 +74,7 @@ set( SBM_FLTK_SRC
 	src/panimationviewer/ParameterGroup.cpp
 	src/panimationviewer/ParameterVisualization.cpp
 	src/panimationviewer/Parameter3DVisualization.cpp
+	src/panimationviewer/ParamAnimStateCreatorWidget.cpp
 	src/CharacterCreatorWindow.cpp
 	src/bmlcreator/AttributeWindow.cpp
 	src/bmlcreator/BMLAnimationObject.cpp

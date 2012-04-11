@@ -33,7 +33,7 @@ class Parameter3DVisualization : public Fl_Gl_Window
 		float floorHeight;
 
 	private:
-		PAStateData* state;
+		PAStateData* stateData;
 		ParameterGroup* paramGroup;
 		std::vector<SrVec> tet;
 };

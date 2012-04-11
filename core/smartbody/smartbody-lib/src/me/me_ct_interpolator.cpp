@@ -165,7 +165,7 @@ void MeCtInterpolator::initKeys()
 	key1.clear();
 	key2.clear();
 
-	PAStateData* state = mcu.lookUpPAState(this->getName());
+	PAState* state = mcu.lookUpPAState(this->getName());
 	if (state != NULL)
 	{
 		for (int i = 0; i < state->getNumMotions(); i++)

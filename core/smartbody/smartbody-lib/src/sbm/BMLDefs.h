@@ -244,7 +244,6 @@ class BMLDefs
 		static XMLCh* ATTR_GRAB_STATE;
 		static XMLCh* ATTR_REACH_ACTION;
 		static XMLCh* ATTR_REACH_DURATION;
-		static XMLCh* TAG_EXAMPLE_LOCOMOTION;
 		static XMLCh* ATTR_PROXIMITY;
 		static XMLCh* ATTR_MANNER;
 		static XMLCh* ATTR_FACING;

@@ -24,6 +24,7 @@
 #include <sbm/gwiz_math.h>
 #include <sbm/mcontrol_util.h>
 #include <sr/sr_euler.h>
+#include <sbm/SBAnimationState.h>
 
 const double timeThreshold = 0.05;
 
@@ -31,18 +32,36 @@ PATimeManager::PATimeManager()
 {
 }
 
-PATimeManager::PATimeManager(std::vector<SkMotion*> m, std::vector<std::vector<double> > k, std::vector<double> w)
+PATimeManager::PATimeManager(PAStateData* data)
 {
-	motions = m;
-	keys = k;
-	weights = w;
-	if (keys.size() > 0)
-		if (keys[0].size() > 0)
-			for (size_t i = 0; i < keys.size(); i++)
-				localTimes.push_back(keys[i][0]);
-	if (weights.size() > localTimes.size())
+	stateData = data;
+
+	if (stateData->state->keys.size() > 0)
 	{
-		LOG("Problem: fewer keys (%d) than weights (%d)", k.size(), w.size());
+		if (stateData->state->keys[0].size() > 0)
+			for (size_t i = 0; i < stateData->state->keys.size(); i++)
+				localTimes.push_back(stateData->state->keys[i][0]);
+	}
+	else
+	{
+		SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(stateData->state);
+		if (state0D)
+		{
+			localTimes.push_back(0);
+		}
+		else
+		{
+			LOG("State %s has no keys, setting all local times to zero.", stateData->state->stateName.c_str());
+			for (int x = 0; x < stateData->state->getNumMotions(); x++)
+			{
+				localTimes.push_back(0);
+			}
+
+		}
+	}
+	if (stateData->weights.size() > localTimes.size())
+	{
+		LOG("Problem: fewer keys (%d) than weights (%d)", stateData->state->keys.size(), stateData->weights.size());
 	}
 	setMotionTimes();
 	setKey();
@@ -60,12 +79,7 @@ int PATimeManager::getNumKeys()
 
 int PATimeManager::getNumWeights()
 {
-	return weights.size();
-}
-
-int PATimeManager::getNumMotions()
-{
-	return motions.size();
+	return stateData->weights.size();
 }
 
 void PATimeManager::updateLocalTimes(double time)
@@ -80,13 +94,18 @@ void PATimeManager::updateLocalTimes(double time)
 bool PATimeManager::step(double timeStep)
 {
 	bool notReachDuration = true;
-	std::vector<double> prevMotionTimes = motionTimes;
+	std::vector<double> prevMotionTimes;
+	prevMotionTimes.resize(motionTimes.size());
+	std::copy(motionTimes.begin(),motionTimes.end(),prevMotionTimes.begin());
 
 	prevLocalTime = localTime;
 	double newLocalTime = localTime + timeStep;
 	int loopcounter = 0;
-	double lastKey = key[key.size() - 1];
-	if (newLocalTime > lastKey && lastKey >= 0.0)
+	double lastKey = 0;
+	if (stateData->state->keys.size() > 0)
+		lastKey = key[key.size() - 1];
+	if (stateData->state->keys.size() > 0 && 
+		(newLocalTime > lastKey && lastKey >= 0.0))
 	{
 		double d = key[key.size() - 1] - key[0];
 		int times = (int) (newLocalTime / d);
@@ -117,18 +136,25 @@ bool PATimeManager::step(double timeStep)
 		LOG("PATimeManager::step ERROR: Miss the timing.");
 		return notReachDuration;
 	}
-	setMotionTimes();
 
-	timeDiffs.clear();
-	for (int i = 0; i < getNumWeights(); i++)
-		timeDiffs.push_back(motionTimes[i] - prevMotionTimes[i]);
+	int numMotionTimes = motionTimes.size();
+	setMotionTimes();
+	if (motionTimes.size() == numMotionTimes)
+	{
+		timeDiffs.clear();
+		for (int i = 0; i < getNumWeights(); i++)
+			timeDiffs.push_back(motionTimes[i] - prevMotionTimes[i]);
+	}
+	else
+	{
+		LOG("Motion times do not match! Please check!");
+	}
 
 	return notReachDuration;
 }
 
-void PATimeManager::updateWeights(std::vector<double>& w)
+void PATimeManager::updateWeights()
 {
-	weights = w;
 	setKey();
 	setLocalTime();
 }
@@ -142,39 +168,43 @@ void PATimeManager::setKey()
 {
 	key.clear();
 	int numKeys = 0;
-	if (getNumWeights() > 0) numKeys = keys[0].size();
+	if (getNumWeights() > 0) numKeys = stateData->state->keys[0].size();
 	for (int i = 0; i < numKeys; i++)
 	{
 		double tempK = 0.0;
 		for (int j = 0; j < getNumWeights(); j++)
-			tempK += weights[j] * keys[j][i];
+			tempK += stateData->weights[j] * stateData->state->keys[j][i];
 		key.push_back(tempK);
 	}
 }
 
 void PATimeManager::setLocalTime()
 {
-	if (localTimes.size() < weights.size())
+	if (localTimes.size() < stateData->weights.size())
 	{
-		LOG("Problem with number of local times (%d) versus number of weights (%d)", localTimes.size(), weights.size());
+		LOG("Problem with number of local times (%d) versus number of weights (%d)", localTimes.size(), stateData->weights.size());
 		return;
 	}
 	localTime = 0.0;
 	for (int i = 0; i < getNumWeights(); i++)
-		localTime += weights[i] * localTimes[i];
+		localTime += stateData->weights[i] * localTimes[i];
 	prevLocalTime = localTime;
 }
 
 void PATimeManager::setMotionTimes()
 {
 	motionTimes.clear();
-	for (int i = 0; i < getNumWeights(); i++)
+	if (localTimes.size() > 0)
 	{
-		if (localTimes[i] >= motions[i]->duration())
-			motionTimes.push_back(localTimes[i] - motions[i]->duration());
-		else
-			motionTimes.push_back(localTimes[i]);
+		for (int i = 0; i < getNumWeights(); i++)
+		{
+			if (localTimes[i] >= stateData->state->motions[i]->duration())
+				motionTimes.push_back(localTimes[i] - stateData->state->motions[i]->duration());
+			else
+				motionTimes.push_back(localTimes[i]);
+		}
 	}
+	
 }
 
 int PATimeManager::getSection(double time)
@@ -195,7 +225,7 @@ void PATimeManager::getParallelTimes(double time, std::vector<double>& times)
 		return;
 	for (int i = 0; i < getNumWeights(); i++)
 	{
-		double t = keys[i][section] + (keys[i][section + 1] - keys[i][section]) * (time - key[section]) / (key[section + 1] - key[section]);
+		double t = stateData->state->keys[i][section] + (stateData->state->keys[i][section + 1] - stateData->state->keys[i][section]) * (time - key[section]) / (key[section + 1] - key[section]);
 		times.push_back(t);
 	}
 }
@@ -204,10 +234,9 @@ PAMotions::PAMotions()
 {
 }
 
-PAMotions::PAMotions(std::vector<SkMotion*> m, std::vector<double> w)
+PAMotions::PAMotions(PAStateData* data)
 {
-	motions = m;
-	weights = w;
+	stateData = data;
 }
 
 PAMotions::~PAMotions()
@@ -218,9 +247,9 @@ PAMotions::~PAMotions()
 void PAMotions::setMotionContextMaps(MeControllerContext* context)
 {
 	SkChannelArray& cChannels = context->channels();
-	for (size_t mId = 0; mId < motions.size(); mId++)
+	for (size_t mId = 0; mId < stateData->state->motions.size(); mId++)
 	{
-		SkChannelArray& mChannels = motions[mId]->channels();
+		SkChannelArray& mChannels = stateData->state->motions[mId]->channels();
 		const int size = mChannels.size();
 		SrBuffer<int> map;
 		map.size(size);
@@ -236,7 +265,7 @@ void PAMotions::setMotionContextMaps(MeControllerContext* context)
 
 int PAMotions::getNumMotions()
 {
-	return motions.size();
+	return stateData->state->motions.size();
 }
 
 
@@ -423,7 +452,7 @@ PAInterpolator::PAInterpolator()
 	additive = false;
 }
 
-PAInterpolator::PAInterpolator(std::vector<SkMotion*> m, std::vector<double> w) : PAMotions(m, w)
+PAInterpolator::PAInterpolator(PAStateData* data) : PAMotions(data)
 {
 	additive = false;
 }
@@ -435,9 +464,12 @@ PAInterpolator::~PAInterpolator()
 void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 {
 	std::vector<int> indices;
-	for (int i = 0; i < getNumMotions(); i++)
-		if (weights[i] != 0.0)
+	int numMotions = getNumMotions();
+	for (int i = 0; i < numMotions; i++)
+	{
+		if (stateData->weights[i] != 0.0)
 			indices.push_back(i);
+	}
 
 	SrBuffer<float> buffer;
 	buffer.size(buff.size());
@@ -446,7 +478,7 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 		buffer = buff;
 		int id = indices[0];
 		double time = times[id];
-		getBuffer(motions[id], time, motionContextMaps[id], buffer);
+		getBuffer(stateData->state->motions[id], time, motionContextMaps[id], buffer);
 		handleBaseMatForBuffer(buffer);
 	}
 
@@ -463,18 +495,18 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 			SrBuffer<float>& b = buffers[buffers.size() - 1];
 			b.size(buff.size());
 			b = buff;
-			getBuffer(motions[indices[i]], times[indices[i]], motionContextMaps[indices[i]], b);
+			getBuffer(stateData->state->motions[indices[i]], times[indices[i]], motionContextMaps[indices[i]], b);
 			handleBaseMatForBuffer(b);
 		}
 		buffer = buffers[0];
-		SkChannelArray& motionChan = motions[indices[0]]->channels();
+		SkChannelArray& motionChan = stateData->state->motions[indices[0]]->channels();
 		int chanSize = motionChan.size();
 		for (int i = 0; i < chanSize; i++)
 		{
 			const std::string& chanName = motionChan.name(i);
 			for (int j = 1; j < numMotions; j++)
 			{
-				int id = motions[indices[j]]->channels().search(chanName, motionChan[i].type);
+				int id = stateData->state->motions[indices[j]]->channels().search(chanName, motionChan[i].type);
 				if (id < 0)
 					continue;
 				int buffId = motionContextMaps[indices[0]].get(i);
@@ -482,9 +514,9 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 				{
 					double prevWeight = 0.0;
 					for (int k = 0; k < j; k++)
-						prevWeight += weights[indices[k]];
-					double w = prevWeight / (weights[indices[j]] + prevWeight);
-					motions[indices[0]]->channels()[i].interp(&buffer[buffId], &buffer[buffId], &buffers[j][buffId], (float)(1 - w));
+						prevWeight += stateData->weights[indices[k]];
+					double w = prevWeight / (stateData->weights[indices[j]] + prevWeight);
+					stateData->state->motions[indices[0]]->channels()[i].interp(&buffer[buffId], &buffer[buffId], &buffers[j][buffId], (float)(1 - w));
 				}
 			}
 		}
@@ -597,7 +629,7 @@ PAWoManager::PAWoManager()
 {
 }
 
-PAWoManager::PAWoManager(std::vector<SkMotion*> m, std::vector<double> w) : PAMotions(m, w)
+PAWoManager::PAWoManager(PAStateData* data) : PAMotions(data)
 {
 	firstTime = true;
 	for (int i = 0; i < getNumMotions(); i++)
@@ -620,7 +652,7 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 	{
 		std::vector<int> indices;
 		for (int i = 0; i < getNumMotions(); i++)
-			if (weights[i] != 0.0)
+			if (stateData->weights[i] != 0.0)
 				indices.push_back(i);
 
 		if (indices.size() == 1)
@@ -662,8 +694,8 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 			{
 				double prevWeight = 0.0;
 				for (int j = 0; j < i; j++)
-					prevWeight += weights[indices[j]];
-				double w = prevWeight / (weights[indices[i]] + prevWeight);
+					prevWeight += stateData->weights[indices[j]];
+				double w = prevWeight / (stateData->weights[indices[i]] + prevWeight);
 				SrMat mat = tempMat;
 				matInterp(tempMat, mat, mats[i], (float)(w));
 			}
@@ -733,15 +765,15 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 {
 	if (!intializeTransition)
 	{
+		SrBuffer<float> buffer;
+		buffer.size(bufferSize);
 		for (int i = 0; i < getNumMotions(); i++)
-		{
-			SrBuffer<float> buffer;
-			buffer.size(bufferSize);
+		{	
 			SrMat src;
-			getBuffer(motions[i], 0.0, motionContextMaps[i], buffer);
+			getBuffer(stateData->state->motions[i], 0.0, motionContextMaps[i], buffer);
 			src = getBaseMatFromBuffer(buffer);
 			SrMat dest;
-			getBuffer(motions[i], motions[i]->duration(), motionContextMaps[i], buffer);
+			getBuffer(stateData->state->motions[i], stateData->state->motions[i]->duration(), motionContextMaps[i], buffer);
 			dest = getBaseMatFromBuffer(buffer);
 			SrMat transition = src.inverse() * dest;
 			baseTransitionMats.push_back(SrMat());
@@ -751,39 +783,73 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 		intializeTransition = true;
 	}
 
-	for (int i = 0; i < getNumMotions(); i++)
+	SrBuffer<float> buffer;
+	buffer.size(bufferSize);
+	int numMotions = getNumMotions();
+	if (numMotions == times.size())
 	{
-		SrBuffer<float> buffer;
-		buffer.size(bufferSize);
-		double time = times[i];
-		SrMat baseMat;
-		getBuffer(motions[i], time, motionContextMaps[i], buffer);
-		baseMat = getBaseMatFromBuffer(buffer);
-		mats.push_back(SrMat());
-		SrMat& updateBaseMat = mats[mats.size() - 1];
-		getUpdateMat(updateBaseMat, baseMat);
+		for (int i = 0; i < getNumMotions(); i++)
+		{
+			
+			double time = times[i];
+			SrMat baseMat;
+			getBuffer(stateData->state->motions[i], time, motionContextMaps[i], buffer);
+			baseMat = getBaseMatFromBuffer(buffer);
+			mats.push_back(SrMat());
+			SrMat& updateBaseMat = mats[mats.size() - 1];
+			getUpdateMat(updateBaseMat, baseMat);
+		}
 	}
+	
 }
 
-PAStateModule::PAStateModule(PAStateData* stateData, bool l, bool pn)
+PAStateData::PAStateData(const std::string& stateName, std::vector<double>& w, bool l, bool pn)
 {
-	timeManager = new PATimeManager(stateData->motions, stateData->keys, stateData->weights);
-	interpolator = new PAInterpolator(stateData->motions, stateData->weights);
-	woManager = new PAWoManager(stateData->motions, stateData->weights);
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	PAState* s = mcu.lookUpPAState(stateName);
+	state = s;
+	if (state)
+	{
+		weights.resize(s->getNumMotions());
+		for (size_t x = 0; x < w.size(); x++)
+			weights[x] = w[x];
+		timeManager = new PATimeManager(this);
+		interpolator = new PAInterpolator(this);
+		woManager = new PAWoManager(this);
+	}
+	else
+	{
+		std::vector<SkMotion*> motions;
+		std::vector<std::vector<double> > keys;
+		timeManager = new PATimeManager(this);
+		interpolator = new PAInterpolator(this);
+		woManager = new PAWoManager(this);
+	}
+	
 
-//	data = stateData;
-	data = new PAStateData(stateData);
 	loop = l;
 	active = false;
 	playNow = pn;
 }
 
-PAStateModule::~PAStateModule()
+PAStateData::PAStateData(PAState* s, std::vector<double>& w, bool l, bool pn)
 {
-//	data = NULL;
-	if (data)
-		delete data;
-	data = NULL;
+	state = s;
+	weights.resize(s->getNumMotions());
+	for (size_t x = 0; x < w.size(); x++)
+		weights[x] = w[x];
+	timeManager = new PATimeManager(this);
+	interpolator = new PAInterpolator(this);
+	woManager = new PAWoManager(this);
+
+
+	loop = l;
+	active = false;
+	playNow = pn;
+}
+
+PAStateData::~PAStateData()
+{
 	if (timeManager)
 		delete timeManager;
 	timeManager = NULL;
@@ -795,8 +861,15 @@ PAStateModule::~PAStateModule()
 	woManager = NULL;
 }
 
-void PAStateModule::evaluate(double timeStep, SrBuffer<float>& buffer)
+void PAStateData::evaluate(double timeStep, SrBuffer<float>& buffer)
 {
+	if (state && state->stateName == "PseudoIdle")
+	{
+		if (!active)
+			active = true;
+		return;
+	}
+
 	bool notReachCycle = true;
 	notReachCycle = timeManager->step(timeStep);
 	if (loop || (!loop && notReachCycle))
@@ -811,25 +884,27 @@ void PAStateModule::evaluate(double timeStep, SrBuffer<float>& buffer)
 		active = false;
 }
 
-
-PseudoPAStateModule::PseudoPAStateModule() : PAStateModule(new PAStateData(PseudoIdleState))
+/*
+PseudoPAStateData::PseudoPAStateData() : PAStateData(PseudoIdleState, std::vector<double>())
 {
 }
 
-PseudoPAStateModule::~PseudoPAStateModule()
+PseudoPAStateData::~PseudoPAStateData()
 {
 }
 
-void PseudoPAStateModule::evaluate(double timeStep, SrBuffer<float>& buffer)
+void PseudoPAStateData::evaluate(double timeStep, SrBuffer<float>& buffer)
 {
 	if (!active) active = true;
 }
-
+*/
 PATransitionManager::PATransitionManager()
 {
+	from = NULL;
+	to = NULL;
 	blendingMode = true;
 	active = true;
-	data = NULL;
+	transition = NULL;
 	curve = new srLinearCurve();
 	curve->insert(0.0, 1.0);
 	curve->insert(defaultTransition, 0.0);
@@ -845,7 +920,7 @@ PATransitionManager::PATransitionManager(double easeOutStart, double dur)
 {
 	blendingMode = false;
 	active = true;
-	data = NULL;
+	transition = NULL;
 	curve = new srLinearCurve();
 	duration = dur;
 	localTime = 0.0;
@@ -860,9 +935,12 @@ PATransitionManager::PATransitionManager(double easeOutStart, double dur)
 #endif
 }
 
-PATransitionManager::PATransitionManager(PATransitionData* transitionData, PAStateData* from, PAStateData* to)
+PATransitionManager::PATransitionManager(PATransition* trans, PAStateData* f, PAStateData* t)
 {
-	data = new PATransitionData(transitionData, from, to);
+	from = f;
+	to = t;
+	//transition = trans;
+	transition = new PATransition(trans, f->state, to->state);
 	update();
 	localTime = 0.0;
 	blendingMode = false;
@@ -874,9 +952,6 @@ PATransitionManager::PATransitionManager(PATransitionData* transitionData, PASta
 
 PATransitionManager::~PATransitionManager()
 {
-	if (data)
-		delete data;
-	data = NULL;
 }
 
 
@@ -884,7 +959,7 @@ PATransitionManager::~PATransitionManager()
 	This function activate next state module according to current module.
 	PATransitionManager has two mode: align mode and blending mode, it starts with align mode, after aligning, switch to blending mode
 */
-void PATransitionManager::align(PAStateModule* current, PAStateModule* next)
+void PATransitionManager::align(PAStateData* current, PAStateData* next)
 {
 
 	// possible bug spot, although for now, the result seems better
@@ -951,51 +1026,50 @@ void PATransitionManager::blending(SrBuffer<float>& buffer, SrBuffer<float>&buff
 
 void PATransitionManager::update()
 {
-	if (data == NULL)
+	if (!transition)
 		return;
 	std::vector<double> fromKey;
 	int id;
-	if (!data)
-		return;
+	
 
-	for (int i = 0; i < data->fromState->getNumMotions(); i++)
+	for (int i = 0; i < transition->fromState->getNumMotions(); i++)
 	{
-		std::string motionName = data->fromState->motions[i]->getName();
-		if (motionName == data->fromMotionName)
+		std::string motionName = transition->fromState->motions[i]->getName();
+		if (motionName == transition->fromMotionName)
 		{
-			fromKey = data->fromState->keys[i];
+			fromKey = transition->fromState->keys[i];
 			id = i;
 		}
 	}
 	
-	for (int i = 0; i < data->getNumEaseOut(); i++)
+	for (int i = 0; i < transition->getNumEaseOut(); i++)
 	{
-		if (data->easeOutStart[i] < fromKey[0])
+		if (transition->easeOutStart[i] < fromKey[0])
 		{
-			data->easeOutStart[i] += data->fromState->motions[id]->duration();
-			data->easeOutEnd[i] += data->fromState->motions[id]->duration();
+			transition->easeOutStart[i] += transition->fromState->motions[id]->duration();
+			transition->easeOutEnd[i] += transition->fromState->motions[id]->duration();
 		}
-		easeOutStarts.push_back(getTime(data->easeOutStart[i], fromKey, data->fromState->keys, data->fromState->weights));
-		easeOutEnds.push_back(getTime(data->easeOutEnd[i], fromKey, data->fromState->keys, data->fromState->weights));
+		easeOutStarts.push_back(getTime(transition->easeOutStart[i], fromKey, transition->fromState->keys, from->weights));
+		easeOutEnds.push_back(getTime(transition->easeOutEnd[i], fromKey, transition->fromState->keys, from->weights));
 	}
 
 	std::vector<double> toKey;
-	for (int i = 0; i < data->toState->getNumMotions(); i++)
+	for (int i = 0; i < transition->toState->getNumMotions(); i++)
 	{
-		std::string motionName = data->toState->motions[i]->getName();
-		if (motionName == data->toMotionName)
+		std::string motionName = transition->toState->motions[i]->getName();
+		if (motionName == transition->toMotionName)
 		{
-			toKey = data->toState->keys[i];
+			toKey = transition->toState->keys[i];
 			id = i;
 		}
 	}
-	if (data->easeInStart < toKey[0])
+	if (transition->easeInStart < toKey[0])
 	{
-		data->easeInStart += data->toState->motions[id]->duration();
-		data->easeInEnd += data->toState->motions[id]->duration();
+		transition->easeInStart += transition->toState->motions[id]->duration();
+		transition->easeInEnd += transition->toState->motions[id]->duration();
 	}
-	s2 = getTime(data->easeInStart, toKey, data->toState->keys, data->toState->weights);
-	e2 = getTime(data->easeInEnd, toKey, data->toState->keys, data->toState->weights);
+	s2 = getTime(transition->easeInStart, toKey, transition->toState->keys, to->weights);
+	e2 = getTime(transition->easeInEnd, toKey, transition->toState->keys, to->weights);
 
 	duration = e2 - s2;
 }
@@ -1051,7 +1125,7 @@ void PATransitionManager::bufferBlending(SrBuffer<float>& buffer, SrBuffer<float
 }
 
 
-double PATransitionManager::getTime(double time, std::vector<double> key, std::vector<std::vector<double> > keys, std::vector<double> w)
+double PATransitionManager::getTime(double time, const std::vector<double>& key, const std::vector<std::vector<double> >& keys, const std::vector<double>& w)
 {
 	double ret = 0.0;
 	int section = -1;

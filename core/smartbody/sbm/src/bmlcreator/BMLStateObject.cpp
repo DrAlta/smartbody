@@ -1,4 +1,5 @@
 #include "BMLStateObject.h"
+#include <sbm/SBAttribute.h>
 
 BMLStateObject::BMLStateObject() : BMLObject()
 {

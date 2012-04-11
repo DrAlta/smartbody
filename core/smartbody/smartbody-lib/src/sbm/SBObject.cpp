@@ -1,5 +1,7 @@
 #include "SBObject.h"
 #include <sr/sr_vec.h>
+#include <sbm/SBAttribute.h>
+#include <sbm/SBAttributeManager.h>
 #include <vhcl.h>
 
 namespace SmartBody {

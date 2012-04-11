@@ -1,4 +1,5 @@
 #include "BMLReachObject.h"
+#include <sbm/SBAttribute.h>
 
 BMLReachObject::BMLReachObject() : BMLObject()
 {

@@ -1,5 +1,6 @@
 #include "SBService.h"
 #include <sbm/SBSubject.h>
+#include <sbm/SBAttribute.h>
 
 namespace SmartBody {
 

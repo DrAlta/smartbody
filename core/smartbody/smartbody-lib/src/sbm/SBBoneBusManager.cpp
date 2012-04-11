@@ -1,5 +1,6 @@
 #include "SBBoneBusManager.h"
 #include "vhcl.h"
+#include <sbm/SBAttribute.h>
 
 namespace SmartBody {
 

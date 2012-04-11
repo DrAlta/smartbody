@@ -1,4 +1,5 @@
 #include "BMLGazeObject.h"
+#include <sbm/SBAttribute.h>
 
 BMLGazeObject::BMLGazeObject() : BMLObject()
 {

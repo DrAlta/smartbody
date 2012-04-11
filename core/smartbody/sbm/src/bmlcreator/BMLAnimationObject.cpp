@@ -1,4 +1,5 @@
 #include "BMLAnimationObject.h"
+#include <sbm/SBAttribute.h>
 
 BMLAnimationObject::BMLAnimationObject() : BMLObject()
 {

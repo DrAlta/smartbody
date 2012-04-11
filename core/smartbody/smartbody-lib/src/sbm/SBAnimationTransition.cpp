@@ -3,11 +3,11 @@
 
 namespace SmartBody {
 
-SBAnimationTransition::SBAnimationTransition() : PATransitionData()
+SBAnimationTransition::SBAnimationTransition() : PATransition()
 {
 }
 
-SBAnimationTransition::SBAnimationTransition(std::string name) : PATransitionData()
+SBAnimationTransition::SBAnimationTransition(std::string name) : PATransition()
 {
 }
 

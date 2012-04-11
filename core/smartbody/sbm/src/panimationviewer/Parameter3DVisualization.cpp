@@ -4,7 +4,7 @@
 # define DOLLYING(e)	(e.alt && e.button3)
 # define TRANSLATING(e)	(e.alt && e.button2)
 
-Parameter3DVisualization::Parameter3DVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* window) : Fl_Gl_Window(x, y, w, h, ""), state(s), paramGroup(window)
+Parameter3DVisualization::Parameter3DVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* window) : Fl_Gl_Window(x, y, w, h, ""), stateData(s), paramGroup(window)
 {	
 	cam.center.set(0, 0, 0);
 	cam.eye.set(300, -300, 400);
@@ -328,9 +328,9 @@ SrVec Parameter3DVisualization::determineScale()
 	SrVec max(-99999, -99999, -99999);
 
 	// determine the tetrahedron scale
-	for (unsigned int i = 0; i < state->paramManager->getParameters().size(); i++)
+	for (unsigned int i = 0; i < stateData->state->getParameters().size(); i++)
 	{
-		SrVec& param = state->paramManager->getParameters()[i];
+		SrVec& param = stateData->state->getParameters()[i];
 		for (int x = 0; x < 3; x++)
 		{
 			if (param[x] < min[x])
@@ -393,9 +393,9 @@ void Parameter3DVisualization::drawTetrahedrons()
 	glColor3f(1.0f, 1.0f, 0.0f);
 	glPointSize(5.0f);
 	glBegin(GL_POINTS);
-	for (unsigned int i = 0; i < state->paramManager->getParameters().size(); i++)
+	for (unsigned int i = 0; i < stateData->state->getParameters().size(); i++)
 	{
-		SrVec& param = state->paramManager->getParameters()[i];
+		SrVec& param = stateData->state->getParameters()[i];
 		SrVec scaledParam;
 		for (int i = 0; i < 3; i++)
 			scaledParam[i] = param[i] * scale[i];
@@ -407,7 +407,7 @@ void Parameter3DVisualization::drawTetrahedrons()
 	glBegin(GL_LINES);
 	glLineWidth(0.8f);
 
-	std::vector<TetrahedronInfo>& tetrahedrons = state->paramManager->getTetrahedrons();
+	std::vector<TetrahedronInfo>& tetrahedrons = stateData->state->getTetrahedrons();
 	int numTetrahedrons = tetrahedrons.size();
 	for (int i = 0; i < numTetrahedrons; i++)
 	{
@@ -445,9 +445,9 @@ void Parameter3DVisualization::drawTetrahedrons()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor3f(0.2f, 0.5f, 0.9f);
 	glBegin(GL_TRIANGLES);
-	for (unsigned int i = 0; i < state->paramManager->getTetrahedrons().size(); i++)
+	for (unsigned int i = 0; i < state->getTetrahedrons().size(); i++)
 	{
-		TetrahedronInfo info = state->paramManager->getTetrahedrons()[i];
+		TetrahedronInfo info = state->getTetrahedrons()[i];
 		glVertex(info.v1);
 		glVertex(info.v2);
 		glVertex(info.v3);
@@ -503,7 +503,7 @@ void Parameter3DVisualization::drawParameter()
 	SrVec scale = determineScale();
 
 	SrVec vec;
-	paramGroup->getCurrentPAStateData()->paramManager->getParameter(vec.x, vec.y, vec.z);
+	paramGroup->getCurrentPAStateData()->state->getParametersFromWeights(vec.x, vec.y, vec.z, paramGroup->getCurrentPAStateData()->weights);
 	for (int s = 0; s < 3; s++)
 		vec[s] = vec[s] * scale[s];
 	glColor3f(1.0f, 0.0f, 0.0f);

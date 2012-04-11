@@ -9,7 +9,7 @@ namespace SmartBody {
 
 class SBAnimationState;
 
-class SBAnimationTransition : public PATransitionData
+class SBAnimationTransition : public PATransition
 {
 	public:
 		SBAnimationTransition();

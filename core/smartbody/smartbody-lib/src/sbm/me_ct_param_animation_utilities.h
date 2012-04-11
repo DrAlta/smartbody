@@ -41,12 +41,22 @@ struct JointChannelId
 	int x, y, z, q;
 };
 
+class PAStateData;
+
 class PATimeManager
 {
 	public:
-		std::vector<SkMotion*> motions;
-		std::vector<std::vector<double> > keys;	//always in ascending order
-		std::vector<double> weights;		
+		PATimeManager();
+		PATimeManager(PAStateData* data);
+		~PATimeManager();
+
+		int getNumKeys();
+		int getNumWeights();
+		void updateLocalTimes(double time);
+		bool step(double timeStep);
+		void updateWeights();
+		double getDuration();
+	
 		std::vector<double> localTimes;			//always in ascending order
 		std::vector<double> motionTimes;		//actual motion times get from localTimes
 		std::vector<double> timeDiffs;			//time steps from last evaluation to this evaluation, get from motionTimes
@@ -54,20 +64,10 @@ class PATimeManager
 		double localTime;
 		double prevLocalTime;
 
+		PAStateData* stateData;
+
 	public:
-		PATimeManager();
-		PATimeManager(std::vector<SkMotion*> m, std::vector<std::vector<double> > k, std::vector<double> w);
-		~PATimeManager();
-
-		int getNumKeys();
-		int getNumWeights();
-		int getNumMotions();
-		void updateLocalTimes(double time);
-		bool step(double timeStep);
-		void updateWeights(std::vector<double>& w);
-		double getDuration();
-
-	private:
+	protected:
 		void setKey();
 		void setLocalTime();
 		void setMotionTimes();
@@ -78,8 +78,6 @@ class PATimeManager
 class PAMotions
 {
 	public:
-		std::vector<SkMotion*> motions;
-		std::vector<double> weights;
 		MeControllerContext* _context;
 	
 	protected:
@@ -90,7 +88,7 @@ class PAMotions
 
 	public:
 		PAMotions();
-		PAMotions(std::vector<SkMotion*> m, std::vector<double> w);
+		PAMotions(PAStateData* data);
 		~PAMotions();
 
 		int getNumMotions();
@@ -104,6 +102,7 @@ class PAMotions
 		void setBufferByBaseMat(SrMat& mat, SrBuffer<float>& buffer);
 		void getUpdateMat(SrMat& dest, SrMat& src);
 		void getProcessedMat(SrMat& dest, SrMat& src);
+		PAStateData* stateData;
 };
 
 class PAWoManager : public PAMotions
@@ -117,7 +116,7 @@ class PAWoManager : public PAMotions
 
 	public:
 		PAWoManager();
-		PAWoManager(std::vector<SkMotion*> m, std::vector<double> w);
+		PAWoManager(PAStateData* data);
 		~PAWoManager();
 
 		void apply(std::vector<double>& times, std::vector<double>& timeDiffs, SrBuffer<float>& buffer);
@@ -132,7 +131,7 @@ class PAInterpolator : public PAMotions
 {
 	public:
 		PAInterpolator();
-		PAInterpolator(std::vector<SkMotion*> m, std::vector<double> w);
+		PAInterpolator(PAStateData* data);
 		~PAInterpolator();
 
 		std::vector<std::string> joints;	// joints to be blended, if this is defined which means partial, world offset would be ignored
@@ -148,42 +147,63 @@ class PAInterpolator : public PAMotions
 		void handleBaseMatForBuffer(SrBuffer<float>& buff);
 };
 
-class PAStateData;
-class PAStateModule
+class PAState;
+class PAStateData
 {
 	public:
+		PAStateData();
+		PAStateData(const std::string& stateName, std::vector<double>& w, bool l = true, bool pn = false);
+		PAStateData(PAState* state, std::vector<double>& w, bool l = true, bool pn = false);
+		~PAStateData();
+		virtual void evaluate(double timeStep, SrBuffer<float>& buffer);
+
+		std::vector<double> weights;
+
 		PATimeManager* timeManager;
 		PAWoManager* woManager;
 		PAInterpolator* interpolator;
-		
+
 		bool loop;
 		bool active;
 		bool playNow;
-		PAStateData* data;
-		
-	public:
-		PAStateModule(PAStateData* stateData, bool l = true, bool pn = false);
-		~PAStateModule();
-		virtual void evaluate(double timeStep, SrBuffer<float>& buffer);
-};
+		PAState* state;
 
-class PseudoPAStateModule : public PAStateModule
+
+
+
+	
+};
+/*
+class PseudoPAStateData : public PAStateData
 {
 	public:
-		PseudoPAStateModule();
-		~PseudoPAStateModule();
+		PseudoPAStateData();
+		~PseudoPAStateData();
 
 		void evaluate(double timeStep, SrBuffer<float>& buffer);
 };
-
-class PATransitionData;
+*/
+class PATransition;
 class PATransitionManager
 {
 	public:
+		
+		PATransitionManager();
+		PATransitionManager(double easeOutStart, double duration);
+		PATransitionManager(PATransition* transition, PAStateData* from, PAStateData* to);
+		~PATransitionManager();
+
+		void align(PAStateData* current, PAStateData* next);
+		void blending(SrBuffer<float>& buffer, SrBuffer<float>&buffer1, SrBuffer<float>&buffer2, SrMat& mat, SrMat& mat1, SrMat& mat2, double timeStep, MeControllerContext* context);
+		void update();
+		double getSlope();
+		int getNumEaseOut();
 		bool blendingMode;
 		bool active;
 
-		PATransitionData* data;
+		PAStateData* from;
+		PAStateData* to;
+		PATransition* transition;
 		srLinearCurve* curve;
 		double duration;
 		double localTime;
@@ -194,22 +214,12 @@ class PATransitionManager
 		double s2;
 		double e2;
 		
-	public:
-		PATransitionManager();
-		PATransitionManager(double easeOutStart, double duration);
-		PATransitionManager(PATransitionData* transitionData, PAStateData* from, PAStateData* to);
-		~PATransitionManager();
 
-		void align(PAStateModule* current, PAStateModule* next);
-		void blending(SrBuffer<float>& buffer, SrBuffer<float>&buffer1, SrBuffer<float>&buffer2, SrMat& mat, SrMat& mat1, SrMat& mat2, double timeStep, MeControllerContext* context);
-		void update();
-		double getSlope();
-		int getNumEaseOut();
 
 		static void bufferBlending(SrBuffer<float>& buffer, SrBuffer<float>& buffer1, SrBuffer<float>& buffer2, double w, MeControllerContext* context);
 
 	private:
-		double getTime(double time, std::vector<double> key, std::vector<std::vector<double> > keys, std::vector<double> w);
+		double getTime(double time, const std::vector<double>& key, const std::vector<std::vector<double> >& keys, const std::vector<double>& w);
 };
 
 class PAControllerBlending

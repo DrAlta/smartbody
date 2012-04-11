@@ -23,55 +23,71 @@
 #ifndef _PARAM_ANIM_STATE_EDITOR_H_
 #define _PARAM_ANIM_STATE_EDITOR_H_
 
+#include <vhcl.h>
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Float_Input.H>
 #include <vhcl.h>
 #include <FL/Fl_Multi_Browser.H>
+#include <FL/Fl_Check_Button.H>
 #include "PanimationWindow.h"
 
+class PAStateCreator;
 class PanimationWindow;
 class PAStateEditor : public Fl_Group
 {
 	public:
 		PAStateEditor(int x, int y, int w, int h, PanimationWindow* window);
 		~PAStateEditor();
-
-		void loadMotions();
+	
 		void loadStates();
 		static void changeStateEditorMode(Fl_Widget* widget, void* data);
 		static void updateStateTimeMarkEditor(Fl_Widget* widget, void* data, bool toAdd);
-		static void createNewState(Fl_Widget* widget, void* data);
-		static void addMotion(Fl_Widget* widget, void* data);
-		static void removeMotion(Fl_Widget* widget, void* data);
+		static void editStateMotions(Fl_Widget* widget, void* data);
 		static void changeStateList(Fl_Widget* widget, void* data);
+		static void changeStateType(Fl_Widget* widget, void* data);
 		static void addStateTimeMark(Fl_Widget* widget, void* data);
 		static void addFootStepMark(Fl_Widget* widget, void* data);
 		static void removeStateTimeMark(Fl_Widget* widget, void* data);
 		static void updateStateTimeMark(Fl_Widget* widget, void* data);
 		static void updateMaxTime(Fl_Widget* widget, void* data);
-		void updateCorrespondenceMarks(PAStateData* state);
+		static void save(Fl_Widget* widget, void* data);
+		static void selectStateAnimations(Fl_Widget* widget, void* data);
+		static void updateParameters(Fl_Widget* widget, void* data);
+		static void scrub(Fl_Widget* widget, void* data);
+		static void playmotion(Fl_Widget* widget, void* data);
+		void updateCorrespondenceMarks(PAState* state);
 		void refresh();
 
 	public:
 		PanimationWindow* paWindow;
 		Fl_Check_Button*	stateEditorMode;
-		Fl_Group*		createStateGroup;
+		Fl_Group*		stateSelectionGroup;
 		Fl_Button*		createStateButton;
 		Fl_Input*		newStateName;
-		Fl_Multi_Browser*		animationList;
 		Fl_Multi_Browser*		stateAnimationList;
+		Fl_Multi_Browser*		shapeList;
 		Fl_Button*		animationAdd;
 		Fl_Button*		animationRemove;
 		Fl_Scroll*		editStateTimeMarkGroup;
 		Fl_Choice*		stateList;
+		Fl_Choice*		choiceStateType;
 		Fl_Button*		addMark;
 		Fl_Button*		removeMark;
 		Fl_Button*		updateMark;
+		Fl_Button*		buttonSave;
 		Fl_Button*		autoFootStepMarks;
 		Fl_Float_Input*		maxTimeInput;
+		Fl_Float_Input* inputParameterX;
+		Fl_Float_Input* inputParameterY;
+		Fl_Float_Input* inputParameterZ;
+		Fl_Value_Slider* sliderScrub;
+		Fl_Check_Button* checkPlay;
 		ParamAnimEditorWidget* stateTimeMarkWidget;
 		nle::NonLinearEditorModel* stateEditorNleModel;
+		PAStateCreator* creator;
+
+		int lastNameIndex;
 };
 
 #endif

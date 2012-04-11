@@ -1,4 +1,5 @@
 #include "BMLHeadObject.h"
+#include <sbm/SBAttribute.h>
 
 BMLHeadObject::BMLHeadObject() : BMLObject()
 {

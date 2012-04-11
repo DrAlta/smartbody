@@ -3,10 +3,11 @@
 
 #include <vhcl.h>
 #include <sbm/SBObject.h>
+#include <string>
+#include <map>
 
 namespace SmartBody {
 
-class SBObject;
 class SBService;
 
 class SBServiceManager : public SBObject

@@ -70,7 +70,7 @@ SBAnimationState* SBAnimationStateManager::getState(const std::string& name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	PAStateData* stateData = mcu.lookUpPAState(name);
+	PAState* stateData = mcu.lookUpPAState(name);
 	SBAnimationState* state = dynamic_cast<SBAnimationState*>(stateData);
 	return state;
 }
@@ -98,10 +98,10 @@ SBAnimationTransition* SBAnimationStateManager::getTransition(const std::string&
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	PATransitionData* transitionData = mcu.lookUpPATransition(source, dest);
-	SBAnimationTransition* transition = dynamic_cast<SBAnimationTransition*>(transitionData);
+	PATransition* transition = mcu.lookUpPATransition(source, dest);
+	SBAnimationTransition* animTransition = dynamic_cast<SBAnimationTransition*>(transition);
 
-	return transition;
+	return animTransition;
 }
 
 int SBAnimationStateManager::getNumTransitions()

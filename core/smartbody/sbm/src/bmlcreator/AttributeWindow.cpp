@@ -54,6 +54,8 @@ that is distributed: */
 #include <algorithm>
 #include <sstream>
 #include <cstring>
+#include <sbm/SBAttribute.h>
+#include <sbm/SBAttributeManager.h>
 
 #ifndef WIN32
 #define _strdup strdup

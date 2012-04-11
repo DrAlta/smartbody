@@ -3,12 +3,12 @@
 
 namespace SmartBody {
 
-SBAnimationState::SBAnimationState() : PAStateData()
+SBAnimationState::SBAnimationState() : PAState()
 {
 	_isFinalized = false;
 }
 
-SBAnimationState::SBAnimationState(const std::string& name) : PAStateData(name)
+SBAnimationState::SBAnimationState(const std::string& name) : PAState(name)
 {
 	_isFinalized = false;
 }
@@ -100,30 +100,77 @@ std::string SBAnimationState::getDimension()
 	return _dimension;
 }
 
+void SBAnimationState::removeMotion(const std::string& motionName)
+{
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(motionName);
+	if (!motion)
+	{
+		LOG("No motion named %s found, cannot remove from state %s.", motionName.c_str(), this->stateName.c_str());
+	}
+}
+
 bool SBAnimationState::addSkMotion(const std::string& motion)
 {
-	//TODO: remove weights from SBAnimationState	
-	//---
-	//TODO: remove skMotion maybe
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SkMotion* skMotion = mcu.getMotion(motion);
 	if (skMotion)
-	{		
-		if (motions.size() == 0)
-			weights.push_back(1.0);
-		else
-			weights.push_back(0.0);
-
+	{
 		motions.push_back(skMotion);
 
+
+		// add a zero-correspondance point for this new motion
+		int numPoints = 0;
+		if (keys.size() > 0)
+			numPoints  = keys[keys.size() - 1].size();
 		std::vector<double> keyVec;
+		if (numPoints > 0)
+		{
+			keyVec.resize(numPoints);
+			// uniformly space the correspondance points
+			double time = skMotion->duration();
+			double step = time / double(numPoints);
+			for (int i = 0; i < numPoints; i++)
+			{
+				keyVec[i] = double(i) * step;
+			}
+		}
 		keys.push_back(keyVec);
+	
+		getParameters().push_back(SrVec());
 	}
 	else
 	{
 		LOG("SBAnimationState add sk motion failure, %s doesn't exist", motion.c_str());
 		return false;
 	}
+	return true;
+}
+
+bool SBAnimationState::removeSkMotion(const std::string& motionName)
+{
+	// find the index of the motion
+	int index = -1;
+	for (int i = 0; i < getNumMotions(); i++)
+	{
+		SkMotion* m = motions[i];
+		if (m->getName() == motionName)
+		{
+			index = i;
+			break;
+		}
+	}
+	if (index < 0)
+	{
+		LOG("SBAnimationState delete motion failure, %s doesn't exist", motionName.c_str());
+		return false;
+	}
+
+	// first delete corresponding time markers
+	removeParameter(motionName);
+
+	// delete the motion and correspondence point
+	motions.erase(motions.begin() + index);
+	keys.erase(keys.begin() + index);
 	return true;
 }
 
@@ -189,6 +236,14 @@ void SBAnimationState0D::addMotion(const std::string& motion)
 	addSkMotion(motion);	
 }
 
+void SBAnimationState0D::removeMotion(const std::string& motion)
+{
+	SBAnimationState::removeMotion(motion);
+
+	// remove correspondance points
+	removeSkMotion(motion);
+}
+
 SBAnimationState1D::SBAnimationState1D() : SBAnimationState("unknown")
 {
 }
@@ -207,13 +262,21 @@ void SBAnimationState1D::addMotion(const std::string& motion, float parameter)
 {
 	addSkMotion(motion);
 
-	paramManager->setType(0);
-	paramManager->setParameter(motion, parameter);
+	setType(0);
+	setParameter(motion, parameter);
+}
+
+void SBAnimationState1D::removeMotion(const std::string& motionName)
+{
+	SBAnimationState::removeMotion(motionName);
+
+	// remove correspondance points
+	removeSkMotion(motionName);
 }
 
 void SBAnimationState1D::setParameter(const std::string& motion, float parameter)
 {
-	paramManager->setParameter(motion, parameter);
+	PAState::setParameter(motion, parameter);
 }
 
 SBAnimationState2D::SBAnimationState2D() : SBAnimationState("unknown")
@@ -233,18 +296,29 @@ void SBAnimationState2D::addMotion(const std::string& motion, float parameter1, 
 {
 	addSkMotion(motion);
 	
-	paramManager->setType(1);
-	paramManager->setParameter(motion, parameter1, parameter2);
+	setType(1);
+	PAState::setParameter(motion, parameter1, parameter2);
+}
+
+void SBAnimationState2D::removeMotion(const std::string& motionName)
+{
+	SBAnimationState::removeMotion(motionName);
+
+	// remove correspondance points
+	removeSkMotion(motionName);
+
+	// do something about triangle
+	removeTriangles(motionName);
 }
 
 void SBAnimationState2D::setParameter(const std::string& motion, float parameter1, float parameter2)
 {
-	paramManager->setParameter(motion, parameter1, parameter2);
+	PAState::setParameter(motion, parameter1, parameter2);
 }
 
 void SBAnimationState2D::addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
 {
-	paramManager->addTriangle(motion1, motion2, motion3);
+	PAState::addTriangle(motion1, motion2, motion3);
 }
 
 SBAnimationState3D::SBAnimationState3D() : SBAnimationState("unknown")
@@ -266,18 +340,29 @@ void SBAnimationState3D::addMotion(const std::string& motion, float parameter1, 
 {
 	addSkMotion(motion);
 	
-	paramManager->setType(1);
-	paramManager->setParameter(motion, parameter1, parameter2, parameter3);
+	setType(1);
+	setParameter(motion, parameter1, parameter2, parameter3);
+}
+
+void SBAnimationState3D::removeMotion(const std::string& motionName)
+{
+	SBAnimationState::removeMotion(motionName);
+
+	// remove correspondance points
+	removeSkMotion(motionName);
+
+	// do something about tetrahedrons
+	removeTetrahedrons(motionName);
 }
 
 void SBAnimationState3D::setParameter(const std::string& motion, float parameter1, float parameter2, float parameter3)
 {
-	paramManager->setParameter(motion, parameter1, parameter2, parameter3);
+	PAState::setParameter(motion, parameter1, parameter2, parameter3);
 }
 
 void SBAnimationState3D::addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
 {
-	paramManager->addTetrahedron(motion1, motion2, motion3, motion4);
+	PAState::addTetrahedron(motion1, motion2, motion3, motion4);
 }
 
 }

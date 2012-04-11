@@ -7,11 +7,18 @@
 #include "SBObserver.h"
 #include "SBSubject.h"
 #include <sr/sr_mat.h>
-#include <sbm/SBAttribute.h>
-#include <sbm/SBAttributeManager.h>
-
 
 namespace SmartBody {
+
+class SBAttribute;
+class ActionAttribute;
+class BoolAttribute;
+class IntAttribute;
+class StringAttribute;
+class DoubleAttribute;
+class Vec3Attribute;
+class MatrixAttribute;
+class SBAttributeManager;
 
 class SBObject : public SBObserver, public SBSubject
 {

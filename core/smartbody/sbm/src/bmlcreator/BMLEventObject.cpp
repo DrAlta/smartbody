@@ -1,4 +1,5 @@
 #include "BMLEventObject.h"
+#include <sbm/SBAttribute.h>
 
 BMLEventObject::BMLEventObject() : BMLObject()
 {

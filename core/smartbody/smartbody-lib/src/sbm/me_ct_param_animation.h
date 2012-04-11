@@ -29,15 +29,16 @@
 #include <sbm/me_ct_param_animation_data.h>
 
 
+class PAState;
+class PATransition;
 class PAStateData;
-class PATransitionData;
-class PAStateModule;
 class PATransitionManager;
 class PAControllerBlending;
 
 struct ScheduleUnit
 {
-	PAStateData* data;
+	PAState* data;
+	std::vector<double> weights;
 	double time;
 	bool loop;
 	bool playNow;
@@ -82,21 +83,22 @@ class MeCtParamAnimation : public MeCtContainer
 		const std::string& getBaseJointName();
 		
 		void dumpScheduling();
-		void schedule(PAStateData* state, bool l, bool pn = false, bool additive = false, std::string jName = "");
+		void schedule(PAState* state, const std::vector<double>& weights, bool l, bool pn = false, bool additive = false, std::string jName = "");
 		void unschedule();
-		void updateWeights(std::vector<double> w);
+		void updateWeights(std::vector<double>& w);
 		void updateWeights();
 		
 		int getNumWeights();
-		const std::string& getCurrentStateName();
+		
 		const std::string& getNextStateName();
+		const std::string& getCurrentStateName();
 		PAStateData* getCurrentPAStateData();
 		bool hasPAState(const std::string& stateName);
 		bool isIdle();
 
 	private:
 		void autoScheduling(double time);
-		PAStateModule* createStateModule(ScheduleUnit su);
+		PAStateData* createStateModule(ScheduleUnit su);
 		void reset();
 		void updateWo(SrMat&mat, MeCtChannelWriter* wo, SrBuffer<float>& buffer);
 		void controllerEaseOut(double t);
@@ -111,8 +113,8 @@ class MeCtParamAnimation : public MeCtContainer
 		PAControllerBlending* controllerBlending;
 		double			prevGlobalTime;
 
-		PAStateModule*	curStateModule;
-		PAStateModule*	nextStateModule;
+		PAStateData*	curStateData;
+		PAStateData*	nextStateData;
 		std::list<ScheduleUnit> waitingList;
 };
 #endif

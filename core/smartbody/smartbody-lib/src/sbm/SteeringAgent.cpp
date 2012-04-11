@@ -27,6 +27,9 @@
 #include <sbm/SBPythonClass.h>
 #include <sbm/me_ct_param_animation_data.h>
 #include <sbm/SBSteerManager.h>
+#include <sbm/SBAnimationStateManager.h>
+#include <sbm/SBAnimationState.h>
+
 
 #define DebugInfo 0
 #define FastStart 1
@@ -488,8 +491,8 @@ void SteeringAgent::evaluate()
 
 void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 {
-	PAStateData* curState = character->param_animation_ct->getCurrentPAStateData();
-	const std::string& curStateName = character->param_animation_ct->getCurrentStateName();
+	PAStateData* curStateData = character->param_animation_ct->getCurrentPAStateData();
+	const std::string& curStateName = curStateData->state->stateName;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
 	bool locomotionEnd = false;
 	static int counter = 0;		
@@ -499,7 +502,7 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 
 	if (character->param_animation_ct->isIdle() && steerPath.pathLength() > 0)    // need to define when you want to start the locomotion
 	{
-		PAStateData* locoState = mcu.lookUpPAState(locomotionName.c_str());
+		PAState* locoState = mcu.lookUpPAState(locomotionName.c_str());
 		SrVec pathDir;
 		float pathDist;
 		SrVec targetPos = steerPath.closestPointOnPath(SrVec(x,0,z),pathDir,pathDist);
@@ -521,7 +524,6 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 		}
 		else
 		{
-			locoState->paramManager->setWeight(0, 0, 0);
 			std::stringstream command;
 			command << "panim schedule char " << character->getName();
 			command << " state " << locomotionName << " loop true playnow true";
@@ -536,7 +538,7 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 		float curSpeed;
 		float curTurningAngle;
 		float curScoot;
-		curState->paramManager->getParameter(curSpeed, curTurningAngle, curScoot);
+		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);
 		curSteerPos = SrVec(x,0,z);
 		curSteerDir = SrVec(sin(degToRad(yaw)), 0, cos(degToRad(yaw)));
 		// predict next position
@@ -606,13 +608,16 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 		counter++;
 #endif
 		// update locomotion state
-		curState->paramManager->setWeight(newSpeed, nextTurningAngle, newScoot);
-		character->param_animation_ct->updateWeights();	
+		std::vector<double> weights;
+		weights.resize(curStateData->state->getNumMotions());
+		curStateData->state->getWeightsFromParameters(newSpeed, nextTurningAngle, newScoot, weights);
+		character->param_animation_ct->updateWeights(weights);	
 		
 	}
 	if (locomotionEnd)      // need to define when you want to end the locomotion
 	{
-		character->param_animation_ct->schedule(NULL, true, true);
+		std::vector<double> weights;
+		character->param_animation_ct->schedule(NULL, weights, true, true);
 
 		// adjust facing angle 
 		if (fabs(facingAngle) <= 180)
@@ -1057,7 +1062,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			agentToTargetVec.z = targetLoc.z - z;
 		}
 
-	PAStateData* curState =  character->param_animation_ct->getCurrentPAStateData();
+	PAState* curState =  character->param_animation_ct->getCurrentPAStateData();
 	std::string curStateName = character->param_animation_ct->getCurrentStateName();
 	std::string nextStateName = character->param_animation_ct->getNextStateName();
 	//---end locomotion and macro control and step control
@@ -1069,13 +1074,13 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 				|| nextStateName == "UtahStopToWalk" || nextStateName == "UtahStartingLeft" || nextStateName == "UtahStartingRight"
 				)
 			{
-				PAStateData* state = mcu.lookUpPAState("UtahWalkToStop");
+				PAState* state = mcu.lookUpPAState("UtahWalkToStop");
 				character->param_animation_ct->schedule(state, false);
 			}
 			if (nextStateName == "" && (curStateName == "UtahStopToWalk" || curStateName == "UtahStartingLeft" || curStateName == "UtahStartingRight"))
 			{
 				std::cout << character->getName() << " schedule stop" << std::endl;
-				PAStateData* state = mcu.lookUpPAState("UtahLocomotion");
+				PAState* state = mcu.lookUpPAState("UtahLocomotion");
 				character->param_animation_ct->schedule(state, true);
 				state = mcu.lookUpPAState("UtahWalkToStop");
 				character->param_animation_ct->schedule(state, false);
@@ -1098,13 +1103,13 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			else
 				facingAngle = -200.0f;
 		}
-		PAStateData* stepState = mcu.lookUpPAState("UtahStep");
-		stepState->paramManager->setWeight(x, y, z);
+		PAState* stepState = mcu.lookUpPAState("UtahStep");
+		stepState->setWeight(x, y, z);
 */
 		if (!character->param_animation_ct->hasPAState("UtahStep"))
 		{
-			PAStateData* stepState = mcu.lookUpPAState("UtahStep");
-			stepState->paramManager->setWeight(x, y);
+			PAState* stepState = mcu.lookUpPAState("UtahStep");
+			stepState->setWeight(x, y);
 			std::stringstream command;
 			command << "panim schedule char " << character->getName();			
 			command << " state UtahStep loop false playnow false ";
@@ -1222,7 +1227,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 					mcu.execute((char*) command.str().c_str());
 				}				
 			}
-			PAStateData* locoState = mcu.lookUpPAState("UtahLocomotion");
+			PAState* locoState = mcu.lookUpPAState("UtahLocomotion");
 
 			for (int i = 0; i < locoState->getNumMotions(); i++)
 			{
@@ -1240,8 +1245,8 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	if (curState)
 		if (curState->stateName == PseudoIdleState && numGoals != 0 && nextStateName == "")
 		{
-			PAStateData* locoState = mcu.lookUpPAState("UtahLocomotion");
-			locoState->paramManager->setWeight(0, 0, 0);
+			PAState* locoState = mcu.lookUpPAState("UtahLocomotion");
+			locoState->setWeight(0, 0, 0);
 			std::stringstream command;
 			command << "panim schedule char " << character->name;
 			command << " state UtahLocomotion loop true playnow true";
@@ -1261,7 +1266,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	if (curState)
 		if (curState->stateName == "UtahLocomotion" && numGoals != 0)
 		{
-			curState->paramManager->getParameter(curSpeed, curTurningAngle, curScoot);
+			curState->getParameter(curSpeed, curTurningAngle, curScoot);
 			float addOnScoot = steeringCommand.scoot * paLocoScootGain;
 			if (steeringCommand.scoot != 0.0)
 			{
@@ -1347,7 +1352,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			//std::cout << curSpeed << " " << curTurningAngle << " " << curScoot << std::endl;
 			if (inControl)
 			{
-				curState->paramManager->setWeight(curSpeed, curTurningAngle, curScoot);
+				curState->setWeight(curSpeed, curTurningAngle, curScoot);
 				character->param_animation_ct->updateWeights();
 			}
 		}
@@ -1393,7 +1398,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			agentToTargetVec /= mcu.steeringScale;
 		}
 
-	PAStateData* curState =  character->param_animation_ct->getCurrentPAStateData();
+	PAStateData* curStateData =  character->param_animation_ct->getCurrentPAStateData();
 	const std::string& curStateName = character->param_animation_ct->getCurrentStateName();
 	const std::string& nextStateName = character->param_animation_ct->getNextStateName();
 
@@ -1406,13 +1411,15 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 		float x = dot(agentToTargetVec, verticalHeading);
 		if (!character->param_animation_ct->hasPAState(stepStateName.c_str()))
 		{
-			PAStateData* stepState = mcu.lookUpPAState(stepStateName.c_str());
-			stepState->paramManager->setWeight(x, y);
+			PAState* stepState = mcu.lookUpPAState(stepStateName.c_str());
+			std::vector<double> weights;
+			weights.resize(stepState->getNumMotions());
+			stepState->getWeightsFromParameters(x, y, weights);
 			std::stringstream command;
 			command << "panim schedule char " << character->getName();			
 			command << " state " << stepStateName << " loop false playnow false additive false joint null ";
 			for (int i = 0; i < stepState->getNumMotions(); i++)
-				command << stepState->weights[i] << " ";
+				command << weights[i] << " ";
 			mcu.execute((char*) command.str().c_str());
 		}		
 		return 0;
@@ -1462,8 +1469,6 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 		{
 	//		if (character->steeringConfig == character->MINIMAL)
 			{
-				PAStateData* locoState = mcu.lookUpPAState(locomotionName.c_str());
-				locoState->paramManager->setWeight(0, 0, 0);
 				std::stringstream command;
 				command << "panim schedule char " << character->getName();
 				command << " state " << locomotionName << " loop true playnow true additive false joint null";
@@ -1478,7 +1483,8 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	{
 		if (goalList.size() == 0)
 		{
-			character->param_animation_ct->schedule(NULL, true, true);
+			std::vector<double> weights;
+			character->param_animation_ct->schedule(NULL, weights, true, true);
 		}
 		else
 		{
@@ -1523,7 +1529,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	float curScoot = 0.0f;
 	if (curStateName == locomotionName && numGoals != 0)
 	{
-		curState->paramManager->getParameter(curSpeed, curTurningAngle, curScoot);
+		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);
 		if (smoothing)
 		{
 			float addOnScoot = steeringCommand.scoot * paLocoScootGain;
@@ -1625,8 +1631,10 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 
 		if (inControl)
 		{
-			curState->paramManager->setWeight(curSpeed, curTurningAngle, curScoot);
-			character->param_animation_ct->updateWeights();
+			std::vector<double> weights;
+			weights.resize(curStateData->state->getNumMotions());
+			curStateData->state->getWeightsFromParameters(curSpeed, curTurningAngle, curScoot, weights);
+			character->param_animation_ct->updateWeights(weights);
 		}
 	}
 #endif
@@ -1685,18 +1693,23 @@ void SteeringAgent::startLocomotion( float angleDiff )
 				mcu.execute((char*) command.str().c_str());
 			}				
 		}
-		//LOG("Ang diff = %f, start command = %s",angleDiff, command.str().c_str());
-		PAStateData* locoState = mcu.lookUpPAState(locomotionName.c_str());
-		for (int i = 0; i < locoState->getNumMotions(); i++)
-		{
-			if (i == 0)
-				locoState->weights[i] = 1.0;
-			else
-				locoState->weights[i] = 0.0;
-		}
+		PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
+		const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
+		float desiredSpeed = steeringCommand.targetSpeed;
+		desiredSpeed *= 1.0f / SmartBody::SBScene::getScene()->getScale();
+
+		std::vector<double> weights;
+		SmartBody::SBAnimationStateManager* stateManager = SmartBody::SBScene::getScene()->getStateManager();
+		SmartBody::SBAnimationState* state = stateManager->getState(locomotionName);
+		weights.resize(state->getNumMotions());
+		state->getWeightsFromParameters(desiredSpeed, 0, 0, weights);
 		std::stringstream command1;
 		command1 << "panim schedule char " << character->getName();
 		command1 << " state " << locomotionName << " loop true playnow false additive false joint null";
+		for (size_t x = 0; x < weights.size(); x++)
+		{
+			command1 << " " << weights[x];
+		}
 		mcu.execute((char*) command1.str().c_str());
 	}
 }
@@ -1707,13 +1720,16 @@ void SteeringAgent::adjustFacingAngle( float angleDiff )
 	std::string playNow;
 	if (fabs(angleDiff) > facingAngleThreshold && !character->param_animation_ct->hasPAState(idleTurnName.c_str()))
 	{
-		PAStateData* idleTurnState = mcu.lookUpPAState(idleTurnName.c_str());
-		idleTurnState->paramManager->setWeight(-angleDiff);
+		PAState* idleTurnState = mcu.lookUpPAState(idleTurnName.c_str());
+		std::vector<double> weights;
+		weights.resize(idleTurnState->getNumMotions());
+
+		idleTurnState->getWeightsFromParameters(-angleDiff, weights);
 		std::stringstream command;
 		command << "panim schedule char " << character->getName();			
 		command << " state " << idleTurnName << " loop false playnow false additive false joint null ";
 		for (int i = 0; i < idleTurnState->getNumMotions(); i++)
-			command << idleTurnState->weights[i] << " ";
+			command << weights[i] << " ";
 		mcu.execute((char*) command.str().c_str());
 	}
 	else
@@ -1740,13 +1756,15 @@ float SteeringAgent::evaluateSteppingLoco(float x, float y, float z, float yaw)
 		float offsetx = dot(agentToTargetVec, verticalHeading);
 		if (!character->param_animation_ct->hasPAState(stepStateName.c_str()))
 		{
-			PAStateData* stepState = mcu.lookUpPAState(stepStateName.c_str());
-			stepState->paramManager->setWeight(x, y);
+			PAState* stepState = mcu.lookUpPAState(stepStateName.c_str());
+			std::vector<double> weights;
+			weights.resize(stepState->getNumMotions());
+			stepState->getWeightsFromParameters(x, y, weights);
 			std::stringstream command;
 			command << "panim schedule char " << character->getName();			
 			command << " state " << stepStateName << " loop false playnow false additive false joint null ";
 			for (int i = 0; i < stepState->getNumMotions(); i++)
-				command << stepState->weights[i] << " ";
+				command << weights[i] << " ";
 			mcu.execute((char*) command.str().c_str());
 		}	
 	}
