@@ -196,7 +196,8 @@ void SkScene::update ( int j )
    if ( !_skeleton ) return;
    SkJoint* joint = _skeleton->joints()[j];
    joint->update_lmat();
-   ((SrSnMatrix*)_jgroup[j]->get(MatrixPos))->set ( joint->lmat() );
+   SrSnMatrix* mat =  ((SrSnMatrix*)_jgroup[j]->get(MatrixPos));
+   if (mat)  mat->set ( joint->lmat() );
  }
 
 void SkScene::rebuild ()

@@ -983,7 +983,7 @@ void SbmDeformableMeshGPUInstance::updateTransformBuffer()
 void SbmDeformableMeshGPUInstance::update()
 {	
 	if (SbmDeformableMeshGPU::disableRendering) return; // do nothing
-	if (!_skeleton) return;
+	if (!_skeleton || !_mesh) return; // do nothing if there is no mesh or skeleton in the instance
 
 	if (!SbmDeformableMeshGPU::useGPUDeformableMesh)
 	{

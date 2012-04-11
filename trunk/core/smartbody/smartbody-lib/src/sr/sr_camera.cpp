@@ -60,7 +60,7 @@ void SrCamera::init ()
    center = SrVec::null;
    up = SrVec::j;
    fovy  = SR_TORAD(60);
-   znear = .1f; 
+   znear = 1.f; 
    zfar  = 10000.0f; 
    aspect = 1.0f;
    scale = 1.0f;
@@ -125,8 +125,9 @@ void SrCamera::view_all ( const SrBox &box, float fovy_radians )
    float dist = (h/2)/tanf(fovy/2);
    eye.z = box.b.z + dist;
 
-   float delta = box.max_size() + 0.0001f;
-   zfar = SR_ABS(eye.z)+delta;
+   // do not update z-far
+   //float delta = box.max_size() + 0.0001f;
+   //zfar = SR_ABS(eye.z)+delta;
 
    scale = 1.0f;
  }

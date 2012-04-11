@@ -584,7 +584,7 @@ void DeformableMeshInstance::update()
 {	
 	//return;
 	if (!_updateMesh)	return;
-	if (!_skeleton) return;	
+	if (!_skeleton || !_mesh) return;	
 	_skeleton->update_global_matrices();
 	int maxJoint = -1;
 	std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;

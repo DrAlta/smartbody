@@ -960,7 +960,11 @@ void FltkViewer::init_opengl ( int w, int h )
 
    SrCamera& cam = _data->camera;
    //cam.zfar = 1000000;
-   cam.znear = .05f;
+   float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
+   
+   // camera near = 0.1 m, camera far plane is 100 m
+   cam.znear = 0.1f*scale;
+   cam.zfar  = 100.f*scale;
 
 
    // init shader
@@ -1228,6 +1232,12 @@ void FltkViewer::draw()
 {	
 	if ( !visible() ) return;
 
+	if ( !valid() ) 
+	{
+		init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
+		//hasShaderSupport = SbmShaderManager::initGLExtension();	   
+	} 	
+
 	SbmShaderManager& ssm = SbmShaderManager::singleton();
 	SbmTextureManager& texm = SbmTextureManager::singleton();
 
@@ -1237,11 +1247,7 @@ void FltkViewer::draw()
         if (hasShaderSupport)
 		    initShadowMap();
 	}
-	if ( !valid() ) 
-	{
-		init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
-		//hasShaderSupport = SbmShaderManager::initGLExtension();	   
-	} 	
+	
    
    bool hasOpenGL        = ssm.initOpenGL();
    bool hasShaderSupport = false;
