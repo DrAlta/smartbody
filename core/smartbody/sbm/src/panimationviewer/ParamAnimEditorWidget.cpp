@@ -28,7 +28,6 @@ ParamAnimEditorWidget::ParamAnimEditorWidget(int x, int y, int w, int h, char* n
 	blockSelectionChanged = false;
 	trackSelectionChanged = false;
 	this->lockBlockFunc(true);
-	scrubTime = 0.;
 	showScrubLine = false;
 }
 	
@@ -180,26 +179,24 @@ void ParamAnimEditorWidget::draw()
 	// draw scrub line if applicable
 	if (showScrubLine)
 	{
-		int xPos = convertTimeToPosition(scrubTime);
+		if (scrubTimes.size() != model->getNumTracks())
+			return;
+		fl_color(FL_BLACK);
 		// draw the scrub line
-		int numTracks = model->getNumTracks();
-		if (numTracks > 0)
+		for (int t = 0; t < model->getNumTracks(); t++)
 		{
-			nle::Track* firstTrack = model->getTrack(0);
-			nle::Track* lastTrack = model->getTrack(numTracks - 1);
+			int xPos = convertTimeToPosition(scrubTimes[t]);
+			nle::Track* track = model->getTrack(t);
 			int x1, y1, w1, h1;
-			firstTrack->getBounds(x1, y1, w1, h1);
-			int x2, y2, w2, h2;
-			lastTrack->getBounds(x2, y2, w2, h2);
-			fl_color(FL_RED);
-			fl_line(xPos, y1, xPos, y2 + h2);	
+			track->getBounds(x1, y1, w1, h1);
+			fl_line(xPos, y1, xPos, y1 + h1);	
 		}
 	}
 }
 
-void ParamAnimEditorWidget::setTime(double t)
+void ParamAnimEditorWidget::setLocalTimes(std::vector<double>& t)
 {
-	scrubTime = t;
+	scrubTimes = t;
 }
 
 void ParamAnimEditorWidget::setShowScrubLine(bool val)

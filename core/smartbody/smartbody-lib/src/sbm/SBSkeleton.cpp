@@ -72,7 +72,7 @@ int SBSkeleton::getNumJoints()
 	return joints().size();
 }
 
-SBJoint* SBSkeleton::getJointByName(std::string jointName)
+SBJoint* SBSkeleton::getJointByName(const std::string& jointName)
 {
 	SkJoint* j = search_joint(jointName.c_str());
 	if (j)

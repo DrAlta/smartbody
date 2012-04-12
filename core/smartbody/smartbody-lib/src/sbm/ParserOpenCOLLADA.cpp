@@ -468,7 +468,8 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 			DOMNamedNodeMap* animationAttr = node1->getAttributes();
 			DOMNode* idNode = animationAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
 			std::string idAttr;
-			xml_utils::xml_translate(&idAttr, idNode->getNodeValue());
+			if (idNode)
+				xml_utils::xml_translate(&idAttr, idNode->getNodeValue());
 			std::string jointName = tokenize(idAttr, ".-");	
 			std::string channelType = tokenize(idAttr, "_");
 			int numTimeInput = -1;

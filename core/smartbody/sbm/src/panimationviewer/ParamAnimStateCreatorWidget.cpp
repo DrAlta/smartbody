@@ -57,11 +57,11 @@ PAStateCreator::PAStateCreator(PAStateEditor* editor, bool createMode, std::stri
 		choiceStateType->deactivate();
 	}
 
-	animationList = new Fl_Multi_Browser(xDis + csx, 4 * yDis + csy, 150, 250, "All Motions");
-	stateAnimationList = new Fl_Multi_Browser(xDis + csx + 250, 4 * yDis + csy, 150, 250, "Motions in State");
-	animationAdd = new Fl_Button(xDis + csx + 160, 4 * yDis + csy + 50, 50, 20, ">>>");
+	animationList = new Fl_Multi_Browser(xDis + csx, 4 * yDis + csy, 350, 250, "All Motions");
+	stateAnimationList = new Fl_Multi_Browser(xDis + csx + 450, 4 * yDis + csy, 350, 250, "Motions in State");
+	animationAdd = new Fl_Button(xDis + csx + 360, 4 * yDis + csy + 50, 50, 20, ">>>");
 	animationAdd->callback(addMotion, this);
-	animationRemove = new Fl_Button(xDis + csx + 160, 4 * yDis + csy + 100, 50, 20,  "<<<");
+	animationRemove = new Fl_Button(xDis + csx + 360, 4 * yDis + csy + 100, 50, 20,  "<<<");
 	animationRemove->callback(removeMotion, this);
 
 	if (isCreateMode)

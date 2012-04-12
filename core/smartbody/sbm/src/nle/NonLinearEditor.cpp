@@ -850,6 +850,7 @@ void NonLinearEditorModel::switchTracks(unsigned int num1, unsigned int num2)
 void NonLinearEditorModel::setModelChanged(bool val)
 {
     changed = val;
+	notifyModelListeners();
 }
 
 bool NonLinearEditorModel::isModelChanged()
@@ -1066,5 +1067,57 @@ void NonLinearEditorModel::update()
 	this->setEndTime(maxTime);
 }
 
+void NonLinearEditorModel::addModelListener(NonLinearEditorModelListener* listener)
+{
+	for (std::vector<NonLinearEditorModelListener*>::iterator iter = listeners.begin();
+		 iter != listeners.end();
+		 iter++)
+	{
+		if (listener == (*iter))
+			return;
+	}
+	listeners.push_back(listener);
+}
+
+void NonLinearEditorModel::removeModelListener(NonLinearEditorModelListener* listener)
+{
+	for (std::vector<NonLinearEditorModelListener*>::iterator iter = listeners.begin();
+		 iter != listeners.end();
+		 iter++)
+	{
+		if (listener == (*iter))
+		{
+			listeners.erase(iter);
+			return;
+		}
+	}
+}
+
+void NonLinearEditorModel::removeAllModelListeners()
+{
+	listeners.clear();
+}
+
+void NonLinearEditorModel::notifyModelListeners()
+{
+	for (std::vector<NonLinearEditorModelListener*>::iterator iter = listeners.begin();
+		 iter != listeners.end();
+		 iter++)
+	{
+		(*iter)->notifyModelChanged(this);
+	}
+}
+
+NonLinearEditorModelListener::NonLinearEditorModelListener()
+{
+}
+
+NonLinearEditorModelListener::~NonLinearEditorModelListener()
+{
+}
+
+void NonLinearEditorModelListener::notifyModelChanged(NonLinearEditorModel* model)
+{	
+}
 
 }

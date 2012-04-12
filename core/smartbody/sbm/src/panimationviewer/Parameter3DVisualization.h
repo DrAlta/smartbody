@@ -20,6 +20,7 @@ class Parameter3DVisualization : public Fl_Gl_Window
 		void mouse_event(SrEvent& e);
 
 		// user data
+		void setSelectedTetrahedrons(std::vector<bool>& selected);
 		void drawTetrahedrons();
 		void drawGrid();
 		void drawParameter();
@@ -31,6 +32,9 @@ class Parameter3DVisualization : public Fl_Gl_Window
 		float gridSize;
 		float gridStep;
 		float floorHeight;
+		std::vector<bool> selectedTetrahedrons;
+		int lastMouseX;
+		int lastMouseY;
 
 	private:
 		PAStateData* stateData;
