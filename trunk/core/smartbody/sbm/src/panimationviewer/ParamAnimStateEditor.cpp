@@ -456,17 +456,88 @@ void PAStateEditor::updateMinTime(Fl_Widget* widget, void* data)
 void PAStateEditor::addStateTimeMark(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
-	editor->paWindow->addTimeMark(editor->stateEditorNleModel);
+
+	// determine where to add the time marks
+	std::string stateName = editor->stateList->text();
+
+	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	if (!state)
+		return;
+	std::vector<double> localTimes = editor->stateTimeMarkWidget->getLocalTimes();
+	if (localTimes.size() != state->getNumMotions())
+	{
+		localTimes.resize(state->getNumMotions());
+		for (int x = 0; x < state->getNumMotions(); x++)
+		{
+			localTimes[x] = 0.0;
+		}
+	}
+
+	SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(state);
+	SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(state);
+	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(state);
+	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(state);
+
+	std::vector<std::string> motionNames;
+	for (int x = 0; x < state->getNumMotions(); x++)
+	{
+		motionNames.push_back(state->getMotion(x));
+	}
+
+	state->addCorrespondencePoints(motionNames, localTimes);
+
+	editor->updateCorrespondenceMarks(state);
+	
+//	editor->paWindow->addTimeMark(editor->stateEditorNleModel);
 	editor->stateTimeMarkWidget->setup();
+	editor->selectStateAnimations(editor->stateAnimationList, editor);
+	editor->scrub(editor->sliderScrub, editor);
 	editor->paWindow->redraw();
 }
 
 void PAStateEditor::removeStateTimeMark(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
-	editor->paWindow->removeTimeMark(editor->stateEditorNleModel);
-	editor->stateTimeMarkWidget->setup();
-	editor->paWindow->redraw();
+
+	// determine where to add the time marks
+	std::string stateName = editor->stateList->text();
+
+	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	if (!state)
+		return;
+
+	// which correspondence point has been selected?
+	int keyIndex = -1;
+	CorrespondenceMark* attachedMark = NULL;
+	for (int t = 0; t < editor->stateEditorNleModel->getNumTracks(); t++)
+	{
+		nle::Track* track = editor->stateEditorNleModel->getTrack(t);
+		for (int b = 0; b < track->getNumBlocks(); b++)
+		{
+			nle::Block* block = track->getBlock(b);
+			for (int m = 0; m < block->getNumMarks(); m++)
+			{
+				nle::Mark* mark = block->getMark(m);
+				if (mark->isSelected())
+				{
+					keyIndex = m;
+					break;
+				}
+			}
+		}
+	}
+	if (keyIndex > -1 && keyIndex < state->getNumKeys())
+	{
+		state->removeCorrespondencePoints(keyIndex);
+		editor->updateCorrespondenceMarks(state);
+
+		editor->stateTimeMarkWidget->setup();
+		editor->selectStateAnimations(editor->stateAnimationList, editor);
+		editor->scrub(editor->sliderScrub, editor);
+		editor->paWindow->redraw();
+	}
+
+	
 }
 
 void PAStateEditor::updateCorrespondenceMarks(PAState* state)
@@ -636,7 +707,7 @@ void PAStateEditor::save(Fl_Widget* widget, void* data)
 		{
 			strstr << "\t" << stateNameVariable << ".addMotion(motions[i], paramsX[i], paramsY[i], paramsZ[i])\n";
 		}
-		// add the correspondance points
+		// add the correspondence points
 		strstr << "\n";
 		for (int c = 0; c < state->getNumKeys(); c++)
 		{
@@ -645,7 +716,7 @@ void PAStateEditor::save(Fl_Widget* widget, void* data)
 			{
 				strstr << "points" << c << ".append(" << state->keys[m][c] << ")\n";
 			}
-			strstr << stateNameVariable << ".addCorrespondancePoints(motions, points" << c << ")\n";
+			strstr << stateNameVariable << ".addCorrespondencePoints(motions, points" << c << ")\n";
 		}
 
 	}

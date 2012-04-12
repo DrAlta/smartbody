@@ -21,7 +21,7 @@ void SBAnimationTransition::set(SBAnimationState* source, SBAnimationState* dest
 	toState = dest;
 }
 
-void SBAnimationTransition::addCorrespondancePoint(std::string  sourceMotion, std::string destMotion, float sourceFromTime, float sourceToTime, float destFromTime, float destToTime)
+void SBAnimationTransition::addCorrespondencePoint(std::string  sourceMotion, std::string destMotion, float sourceFromTime, float sourceToTime, float destFromTime, float destToTime)
 {
 	fromMotionName = sourceMotion;
 	toMotionName = destMotion;
@@ -32,12 +32,12 @@ void SBAnimationTransition::addCorrespondancePoint(std::string  sourceMotion, st
 	easeInEnd = destToTime;
 }
 
-int SBAnimationTransition::getNumCorrespondancePoints()
+int SBAnimationTransition::getNumCorrespondencePoints()
 {
 	return 0;
 }
 
-std::vector<float> SBAnimationTransition::getCorrespondancePoint(int num)
+std::vector<float> SBAnimationTransition::getCorrespondencePoint(int num)
 {
 	return std::vector<float>();
 }
