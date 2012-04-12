@@ -492,6 +492,8 @@ void SteeringAgent::evaluate()
 void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 {
 	PAStateData* curStateData = character->param_animation_ct->getCurrentPAStateData();
+	if (!curStateData)
+		return;
 	const std::string& curStateName = curStateData->state->stateName;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
 	bool locomotionEnd = false;
