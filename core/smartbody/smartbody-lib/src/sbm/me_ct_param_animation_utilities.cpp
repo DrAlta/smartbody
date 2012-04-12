@@ -77,11 +77,6 @@ int PATimeManager::getNumKeys()
 	return key.size();
 }
 
-int PATimeManager::getNumWeights()
-{
-	return stateData->weights.size();
-}
-
 void PATimeManager::updateLocalTimes(double time)
 {
 	localTime = time;
@@ -142,7 +137,7 @@ bool PATimeManager::step(double timeStep)
 	if (motionTimes.size() == numMotionTimes)
 	{
 		timeDiffs.clear();
-		for (int i = 0; i < getNumWeights(); i++)
+		for (size_t i = 0; i < stateData->weights.size(); i++)
 			timeDiffs.push_back(motionTimes[i] - prevMotionTimes[i]);
 	}
 	else
@@ -168,11 +163,11 @@ void PATimeManager::setKey()
 {
 	key.clear();
 	int numKeys = 0;
-	if (getNumWeights() > 0) numKeys = stateData->state->keys[0].size();
+	if (stateData->weights.size() > 0) numKeys = stateData->state->keys[0].size();
 	for (int i = 0; i < numKeys; i++)
 	{
 		double tempK = 0.0;
-		for (int j = 0; j < getNumWeights(); j++)
+		for (size_t j = 0; j < stateData->weights.size(); j++)
 			tempK += stateData->weights[j] * stateData->state->keys[j][i];
 		key.push_back(tempK);
 	}
@@ -186,7 +181,7 @@ void PATimeManager::setLocalTime()
 		return;
 	}
 	localTime = 0.0;
-	for (int i = 0; i < getNumWeights(); i++)
+	for (size_t i = 0; i < stateData->weights.size(); i++)
 		localTime += stateData->weights[i] * localTimes[i];
 	prevLocalTime = localTime;
 }
@@ -196,7 +191,7 @@ void PATimeManager::setMotionTimes()
 	motionTimes.clear();
 	if (localTimes.size() > 0)
 	{
-		for (int i = 0; i < getNumWeights(); i++)
+		for (size_t i = 0; i < stateData->weights.size(); i++)
 		{
 			if (localTimes[i] >= stateData->state->motions[i]->duration())
 				motionTimes.push_back(localTimes[i] - stateData->state->motions[i]->duration());
@@ -222,8 +217,14 @@ void PATimeManager::getParallelTimes(double time, std::vector<double>& times)
 	times.clear();
 	int section = getSection(time);
 	if (section < 0)
+	{
+		for (size_t i = 0; i < stateData->weights.size(); i++)
+		{
+			times.push_back(0);
+		}
 		return;
-	for (int i = 0; i < getNumWeights(); i++)
+	}
+	for (size_t i = 0; i < stateData->weights.size(); i++)
 	{
 		double t = stateData->state->keys[i][section] + (stateData->state->keys[i][section + 1] - stateData->state->keys[i][section]) * (time - key[section]) / (key[section + 1] - key[section]);
 		times.push_back(t);

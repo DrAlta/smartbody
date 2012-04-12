@@ -51,11 +51,12 @@ class PATimeManager
 		~PATimeManager();
 
 		int getNumKeys();
-		int getNumWeights();
 		void updateLocalTimes(double time);
 		bool step(double timeStep);
 		void updateWeights();
 		double getDuration();
+		double getLocalTime(double motionTime, int motionIndex);
+		void getParallelTimes(double time, std::vector<double>& times);
 	
 		std::vector<double> localTimes;			//always in ascending order
 		std::vector<double> motionTimes;		//actual motion times get from localTimes
@@ -72,7 +73,6 @@ class PATimeManager
 		void setLocalTime();
 		void setMotionTimes();
 		int getSection(double time);
-		void getParallelTimes(double time, std::vector<double>& times);
 };
 
 class PAMotions

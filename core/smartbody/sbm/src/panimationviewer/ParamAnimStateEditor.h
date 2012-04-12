@@ -34,6 +34,8 @@
 
 class PAStateCreator;
 class PanimationWindow;
+class ParameterVisualization;
+class Parameter3DVisualization;
 class PAStateEditor : public Fl_Group
 {
 	public:
@@ -89,6 +91,12 @@ class PAStateEditor : public Fl_Group
 		ParamAnimEditorWidget* stateTimeMarkWidget;
 		nle::NonLinearEditorModel* stateEditorNleModel;
 		PAStateCreator* creator;
+		std::string lastSelectedMotion;
+
+		Fl_Group*				visualizationGroup;
+		ParameterVisualization* triangleVisualization;
+		Parameter3DVisualization* tetraVisualization;
+		PAStateData*	stateData;
 
 		int lastNameIndex;
 };

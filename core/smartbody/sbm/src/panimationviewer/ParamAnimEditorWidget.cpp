@@ -28,6 +28,8 @@ ParamAnimEditorWidget::ParamAnimEditorWidget(int x, int y, int w, int h, char* n
 	blockSelectionChanged = false;
 	trackSelectionChanged = false;
 	this->lockBlockFunc(true);
+	scrubTime = 0.;
+	showScrubLine = false;
 }
 	
 void ParamAnimEditorWidget::drawBlock(nle::Block* block, int trackNum, int blockNum)
@@ -169,4 +171,38 @@ void ParamAnimEditorWidget::setMarkSelectionChanged(bool val)
 bool ParamAnimEditorWidget::getMarkSelectionChanged()
 {
 	return markSelectionChanged;
+}
+
+void ParamAnimEditorWidget::draw()
+{
+	nle::EditorWidget::draw();
+
+	// draw scrub line if applicable
+	if (showScrubLine)
+	{
+		int xPos = convertTimeToPosition(scrubTime);
+		// draw the scrub line
+		int numTracks = model->getNumTracks();
+		if (numTracks > 0)
+		{
+			nle::Track* firstTrack = model->getTrack(0);
+			nle::Track* lastTrack = model->getTrack(numTracks - 1);
+			int x1, y1, w1, h1;
+			firstTrack->getBounds(x1, y1, w1, h1);
+			int x2, y2, w2, h2;
+			lastTrack->getBounds(x2, y2, w2, h2);
+			fl_color(FL_RED);
+			fl_line(xPos, y1, xPos, y2 + h2);	
+		}
+	}
+}
+
+void ParamAnimEditorWidget::setTime(double t)
+{
+	scrubTime = t;
+}
+
+void ParamAnimEditorWidget::setShowScrubLine(bool val)
+{
+	showScrubLine = val;
 }

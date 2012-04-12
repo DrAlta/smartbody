@@ -27,6 +27,8 @@
 #include <sbm/SBAnimationStateManager.h>
 #include <FL/Fl_File_Chooser.H>
 #include "ParamAnimStateCreatorWidget.h"
+#include "ParameterVisualization.h"
+#include "Parameter3DVisualization.h"
 
 PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
 {
@@ -36,15 +38,17 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 	this->begin();
 
 		int csx = xDis + x;
-		int csy = 4 * yDis + y;
-		stateSelectionGroup = new Fl_Group(csx, csy, w - 2 * xDis, h /2 - 4 * yDis, "");
+		int csy = yDis + y;
+		int workspaceWidth = w - 2 * xDis;
+		int workspaceHeight = h - csy;
+		stateSelectionGroup = new Fl_Group(csx, csy, workspaceWidth, workspaceHeight / 3, "");
 		int stateSelectionGroupW = w - 2 * xDis;
 		int stateSelectionGroupH = h /2 - 3 * yDis;
 		stateSelectionGroup->begin();
-			stateList = new Fl_Choice(xDis + 50 + csx, yDis + csy, 150, 2 * yDis, "State");
+			stateList = new Fl_Choice(csx + 50, csy + 5, 150, 20, "State");
 //			stateList->when(FL_WHEN_ENTER_KEY);
 			stateList->callback(changeStateList, this);
-			choiceStateType = new Fl_Choice(xDis + 300 + csx, yDis + csy, 10 * xDis, 2 * yDis, "Type");
+			choiceStateType = new Fl_Choice(csx + 250, csy + 5, 80, 20, "Type");
 			choiceStateType->add("---");
 			choiceStateType->add("0D");
 			choiceStateType->add("1D");
@@ -52,27 +56,27 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 			choiceStateType->add("3D");
 			choiceStateType->value(0);
 			choiceStateType->deactivate();
-
-			createStateButton = new Fl_Button(xDis + 600 + csx, yDis + csy, 10 * xDis, 2 * yDis, "Create");
+			createStateButton = new Fl_Button(csx + 400, csy + 5, 80, 20, "Create");
 			createStateButton->callback(editStateMotions, this);
-			stateAnimationList = new Fl_Multi_Browser(xDis + csx, 5 * yDis + csy, stateSelectionGroupW / 2 - 5 * xDis, stateSelectionGroupH - 5 * yDis - 30, "State Motions");
+			
+			stateAnimationList = new Fl_Multi_Browser(csx + 50, csy + 40, 290, 100, "State Motions");
 			stateAnimationList->align(FL_ALIGN_TOP);
 			stateAnimationList->when(FL_WHEN_CHANGED);
 			stateAnimationList->callback(selectStateAnimations, this);
-			shapeAdd = new Fl_Button(stateSelectionGroupW / 2 - 3 * xDis + csx, stateSelectionGroupH / 2 + csy, 6 * xDis, 2 * yDis, "+");
+			shapeAdd = new Fl_Button(csx + 360, csy + 60, 60, 20, "+");
 			shapeAdd->callback(addShape, this);
 			shapeAdd->deactivate();
-			shapeRemove = new Fl_Button(stateSelectionGroupW / 2 - 3 * xDis + csx, stateSelectionGroupH / 2 + 5 * yDis + csy, 6 * xDis, 2 * yDis, "-");
+			shapeRemove = new Fl_Button(csx + 360, csy + 100, 60, 20, "-");
 			shapeRemove->callback(removeShape, this);
 			shapeRemove->deactivate();
-			shapeList = new Fl_Multi_Browser(stateSelectionGroupW / 2 + 4 * xDis + csx, 5 * yDis + csy, stateSelectionGroupW / 2 - 5 * xDis, stateSelectionGroupH - 5 * yDis - 30, "Parameterization");
+			shapeList = new Fl_Multi_Browser(csx + 440, csy + 40, 290, 100,  "Parameterization");
 			shapeList->align(FL_ALIGN_TOP);
 			shapeList->when(FL_WHEN_CHANGED);
 			shapeList->callback(selectShape, this);
 
-			inputParameterX = new Fl_Float_Input(xDis + 80 + csx, 4 * yDis + csy + stateSelectionGroupH - 5 * yDis - 30 + 10, 60, 2* yDis - 5, "Parameters");
-			inputParameterY = new Fl_Float_Input(xDis + 150 + csx, 4 * yDis + csy + stateSelectionGroupH - 5 * yDis - 30 + 10, 60, 2* yDis - 5, "");
-			inputParameterZ = new Fl_Float_Input(xDis + 220 + csx, 4 * yDis + csy + stateSelectionGroupH - 5 * yDis - 30 + 10, 60, 2* yDis - 5, "");
+			inputParameterX = new Fl_Float_Input(csx + 80, csy + 150, 60, 20,  "Parameters");
+			inputParameterY = new Fl_Float_Input(csx + 150, csy + 150, 60, 20, "");
+			inputParameterZ = new Fl_Float_Input(csx + 220, csy + 150, 60, 20, "");
 			inputParameterX->callback(updateParameters, this);
 			inputParameterY->callback(updateParameters, this);
 			inputParameterZ->callback(updateParameters, this);
@@ -80,9 +84,9 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 			inputParameterY->deactivate();
 			inputParameterZ->deactivate();
 
-			checkPlay = new Fl_Check_Button(xDis + 360 + csx,  4 *yDis + csy + stateSelectionGroupH - 5 * yDis - 30 + 10, 30, 2* yDis - 5, "Play");
+			checkPlay = new Fl_Check_Button(csx + 350, csy + 150, 60, 20, "Play");
 			checkPlay->callback(playmotion, this);
-			sliderScrub = new Fl_Value_Slider(xDis + 400 + csx,  4 *yDis + csy + stateSelectionGroupH - 5 * yDis - 30 + 10, 300, 2* yDis - 5, "");
+			sliderScrub = new Fl_Value_Slider(csx + 420, csy + 150, 300, 20, "");
 			sliderScrub->type(FL_HORIZONTAL);
 			sliderScrub->range(0, 1);
 			sliderScrub->callback(scrub, this);
@@ -92,15 +96,13 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 		stateSelectionGroup->box(FL_BORDER_BOX);
 
 		int esx = xDis + x;
-		int esy = h / 2 + yDis + y;
+		int esy = h / 3  + yDis + y;
 		Fl_Group* buttonGroup = new Fl_Group(esx, esy, w - 2 * xDis, 3 * yDis);
 		buttonGroup->begin();
 			addMark = new Fl_Button(xDis + esx, yDis + esy, 50, 2 * yDis, "+");
 			addMark->callback(addStateTimeMark, this);
 			removeMark = new Fl_Button(xDis + 50 + esx, yDis + esy, 50, 2 * yDis, "-");
 			removeMark->callback(removeStateTimeMark, this);
-			updateMark = new Fl_Button(xDis + 100 + esx, yDis + esy, 100, 2 * yDis, "Update");
-			updateMark->callback(updateStateTimeMark, this);
 			buttonSave = new Fl_Button(xDis + 300 + esx, yDis + esy, 100, 2 * yDis, "Save");
 			buttonSave->callback(save, this);
 			maxTimeInput = new Fl_Float_Input(xDis + 600 + esx, yDis + esy, 100, 2 * yDis, "Max Time");
@@ -111,16 +113,24 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 #endif
 		buttonGroup->end();
 
-		editStateTimeMarkGroup = new Fl_Scroll(esx, esy + 3 * yDis + 10, w - 2 * xDis, h / 2 - 5 * yDis - 10);
+		editStateTimeMarkGroup = new Fl_Scroll(esx, esy + 3 * yDis + 10, w - 2 * xDis, h / 3 - 5 * yDis - 10);
 		editStateTimeMarkGroup->type(Fl_Scroll::VERTICAL_ALWAYS);
 		editStateTimeMarkGroup->begin();
-			stateTimeMarkWidget = new ParamAnimEditorWidget(2 * xDis + esx, 5 * yDis + esy, w - 5 * xDis, h / 2 - 6 * yDis, (char*) "");
+			stateTimeMarkWidget = new ParamAnimEditorWidget(2 * xDis + esx, 5 * yDis + esy, w - 5 * xDis, h / 3 - 6 * yDis, (char*) "");
 			stateTimeMarkWidget->begin();
 			stateTimeMarkWidget->end();
 		editStateTimeMarkGroup->end();
 		editStateTimeMarkGroup->resizable(stateTimeMarkWidget);
 		editStateTimeMarkGroup->box(FL_BORDER_BOX);
 		this->resizable(editStateTimeMarkGroup);
+
+		int vgx = xDis + x;
+		int vgy = 2 * h / 3  + yDis + y;
+		visualizationGroup = new Fl_Group(vgx, vgy, w - 2 * xDis, h / 3 - 3 * yDis);
+		visualizationGroup->box(FL_BORDER_BOX);
+		visualizationGroup->begin();
+		visualizationGroup->end();
+		
 	this->end();
 
 	stateEditorNleModel = new nle::NonLinearEditorModel();
@@ -130,6 +140,10 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 	loadStates();
 
 	creator = NULL;
+	lastSelectedMotion = "";
+	triangleVisualization = NULL;
+	tetraVisualization = NULL;
+	stateData = NULL;
 }
 
 PAStateEditor::~PAStateEditor()
@@ -214,7 +228,7 @@ void PAStateEditor::editStateMotions(Fl_Widget* widget, void* data)
 		isCreateMode = false;
 		stateName = editor->stateList->menu()[editor->stateList->value()].label();
 	}
-	editor->creator = new PAStateCreator(editor, isCreateMode, stateName, editor->x() + 50, editor->y() + 50, 600, 600);
+	editor->creator = new PAStateCreator(editor, isCreateMode, stateName, editor->paWindow->x() + 50, editor->paWindow->y() + 50, 600, 600);
 	editor->creator->show();
 }
 
@@ -230,26 +244,116 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 	PAState* currentState = mcu.lookUpPAState(currentStateName);
 	if (currentState)
 	{
+		if (editor->stateData)
+			delete editor->stateData;
+		editor->stateData = NULL;
+
+		editor->shapeList->clear();
+
 		editor->createStateButton->label("Edit State");
 		// determine the state type
 		SBAnimationState0D* state0d = dynamic_cast<SBAnimationState0D*>(currentState);
 		if (state0d)
+		{
 			editor->choiceStateType->value(1);
+			editor->shapeList->activate();
+			editor->shapeList->label("Triangles");
+			if (editor->triangleVisualization != NULL)
+			{
+				editor->visualizationGroup->remove(editor->triangleVisualization);
+				delete editor->triangleVisualization;
+				editor->triangleVisualization = NULL;
+			}
+			std::vector<double> weights;
+			editor->stateData = new PAStateData(currentState, weights);
+			editor->triangleVisualization = new ParameterVisualization(false, editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->stateData, NULL);
+			editor->visualizationGroup->add(editor->triangleVisualization);
+			editor->triangleVisualization->show();
+			editor->triangleVisualization->redraw();
+		}
 		SBAnimationState1D* state1d = dynamic_cast<SBAnimationState1D*>(currentState);
 		if (state1d)
+		{
 			editor->choiceStateType->value(2);
+			editor->shapeList->activate();
+			editor->shapeList->label("Triangles");
+			if (editor->triangleVisualization != NULL)
+			{
+				editor->visualizationGroup->remove(editor->triangleVisualization);
+				delete editor->triangleVisualization;
+				editor->triangleVisualization = NULL;
+			}
+			if (editor->tetraVisualization != NULL)
+			{
+				editor->tetraVisualization->remove(editor->triangleVisualization);
+				delete editor->tetraVisualization;
+				editor->tetraVisualization = NULL;
+			}
+			std::vector<double> weights;
+			editor->stateData = new PAStateData(currentState, weights);
+			editor->triangleVisualization = new ParameterVisualization(false, editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->stateData, NULL);
+			editor->visualizationGroup->add(editor->triangleVisualization);
+			editor->triangleVisualization->show();
+			editor->triangleVisualization->redraw();
+		}
 		SBAnimationState2D* state2d = dynamic_cast<SBAnimationState2D*>(currentState);
 		if (state2d)
+		{
 			editor->choiceStateType->value(3);
+			editor->shapeList->activate();
+			editor->shapeList->label("Triangles");
+			if (editor->triangleVisualization != NULL)
+			{
+				editor->visualizationGroup->remove(editor->triangleVisualization);
+				delete editor->triangleVisualization;
+				editor->triangleVisualization = NULL;
+			}
+			if (editor->tetraVisualization != NULL)
+			{
+				editor->tetraVisualization->remove(editor->triangleVisualization);
+				delete editor->tetraVisualization;
+				editor->tetraVisualization = NULL;
+			}
+			std::vector<double> weights;
+			editor->stateData = new PAStateData(currentState, weights);
+			editor->triangleVisualization = new ParameterVisualization(false, editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->stateData, NULL);
+			editor->visualizationGroup->add(editor->triangleVisualization);
+			editor->triangleVisualization->show();
+			editor->triangleVisualization->redraw();
+		}
 		SBAnimationState3D* state3d = dynamic_cast<SBAnimationState3D*>(currentState);
 		if (state3d)
+		{
 			editor->choiceStateType->value(4);
+			editor->shapeList->activate();
+			editor->shapeList->label("Tetrahedrons");
+			if (editor->triangleVisualization != NULL)
+			{
+				editor->visualizationGroup->remove(editor->triangleVisualization);
+				delete editor->triangleVisualization;
+				editor->triangleVisualization = NULL;
+			}
+			if (editor->tetraVisualization != NULL)
+			{
+				editor->tetraVisualization->remove(editor->triangleVisualization);
+				delete editor->tetraVisualization;
+				editor->tetraVisualization = NULL;
+			}
+			std::vector<double> weights;
+			editor->stateData = new PAStateData(currentState, weights);
+			editor->tetraVisualization = new Parameter3DVisualization(editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->stateData, NULL);
+			editor->visualizationGroup->add(editor->tetraVisualization);
+			editor->tetraVisualization->show();
+			editor->tetraVisualization->redraw();
+		}
 
 		editor->inputParameterX->deactivate();
 		editor->inputParameterY->deactivate();
 		editor->inputParameterZ->deactivate();
 
 		editor->sliderScrub->deactivate();
+		editor->shapeAdd->deactivate();
+		editor->shapeRemove->deactivate();
 
 
 		for (int i = 0; i < currentState->getNumMotions(); i++)
@@ -300,6 +404,21 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 	{
 		editor->createStateButton->label("Create State");
 		editor->choiceStateType->value(0);
+
+		// remove any visualizations
+		if (editor->triangleVisualization != NULL)
+		{
+			editor->visualizationGroup->remove(editor->triangleVisualization);
+			delete editor->triangleVisualization;
+			editor->triangleVisualization = NULL;
+		}
+		if (editor->tetraVisualization != NULL)
+		{
+			editor->tetraVisualization->remove(editor->triangleVisualization);
+			delete editor->tetraVisualization;
+			editor->tetraVisualization = NULL;
+		}
+
 	}
 	editor->stateTimeMarkWidget->setup();
 	editor->paWindow->redraw();
@@ -334,55 +453,6 @@ void PAStateEditor::removeStateTimeMark(Fl_Widget* widget, void* data)
 	editor->paWindow->removeTimeMark(editor->stateEditorNleModel);
 	editor->stateTimeMarkWidget->setup();
 	editor->paWindow->redraw();
-}
-
-void PAStateEditor::updateStateTimeMark(Fl_Widget* widget, void* data)
-{
-	PAStateEditor* editor = (PAStateEditor*) data;
-	
-	// check validation first
-	int numOfMarks = -1;
-	for (int i = 0; i < editor->stateEditorNleModel->getNumTracks(); i++)
-	{
-		nle::Block* block = editor->stateEditorNleModel->getTrack(i)->getBlock(0);
-		if (i == 0)	numOfMarks = block->getNumMarks();
-		else		
-		{
-			if (numOfMarks != block->getNumMarks())
-			{
-				LOG("PanimationWindow::updateStateTimeMark ERR: mark number for each block is not equal!");
-				return;
-			}
-		}
-	}
-
-	int stateIdx = editor->stateList->value();
-
-	if (stateIdx < 0)
-	{
-		LOG("PanimationWindow::updateStateTimeMark WARNING: no state selected.");
-		return;
-	}
-
-	const char* stateText = editor->stateList->text();
-	std::string currentStateName = editor->stateList->text(stateIdx);
-	PAState* currentState = NULL;
-	currentState = mcuCBHandle::singleton().lookUpPAState(currentStateName);
-	if (currentState)
-	{
-		for (int i = 0; i < editor->stateEditorNleModel->getNumTracks(); i++)
-		{
-			nle::Block* block = editor->stateEditorNleModel->getTrack(i)->getBlock(0);
-			currentState->keys[i].clear();
-			for (int j = 0; j < numOfMarks; j++)
-			{
-				double keyTime = block->getMark(j)->getStartTime();
-				currentState->keys[i].push_back(keyTime);
-			}
-		}
-		editor->updateCorrespondenceMarks(currentState);
-		editor->paWindow->redraw();
-	}
 }
 
 void PAStateEditor::updateCorrespondenceMarks(PAState* state)
@@ -645,12 +715,43 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 			if (editor->checkPlay->value())
 			{
 				editor->sliderScrub->activate();
+				editor->stateTimeMarkWidget->setShowScrubLine(true);
+				editor->stateTimeMarkWidget->setTime(editor->sliderScrub->value());
 			}
 			else
 			{
 				editor->sliderScrub->activate();
+				editor->stateTimeMarkWidget->setShowScrubLine(false);
 			}
 			editor->sliderScrub->range(0, motion->duration());
+			if (editor->lastSelectedMotion != "")
+			{
+				int lastMotionIndex = currentState->getMotionId(editor->lastSelectedMotion);
+				double curTime = editor->sliderScrub->value();
+				double localTime = currentState->getLocalTime(curTime, lastMotionIndex);
+				std::vector<double> weights(currentState->getNumMotions());
+				for (size_t x = 0; x < weights.size(); x++)
+				{
+					weights[x] = 0.;
+				}
+				if (lastMotionIndex > -1)
+				{
+					weights[lastMotionIndex] = 1.;
+				}
+				PAStateData stateData(currentState, weights);
+				stateData.timeManager->updateWeights();
+				std::vector<double> times(stateData.state->getNumMotions());
+				stateData.timeManager->getParallelTimes(localTime, times);
+
+				int index = currentState->getMotionId(motion->getName());
+				if (index > -1)
+				{
+					double newScrubTime = currentState->getMotionTime(times[index], index);
+					editor->sliderScrub->value(newScrubTime);
+					scrub(editor->sliderScrub, editor);
+				}
+			}
+			editor->lastSelectedMotion = motion->getName();
 		}
 		
 		char buff[32];
@@ -879,6 +980,8 @@ void PAStateEditor::scrub(Fl_Widget* widget, void* data)
 
 	if (selectedMotions.size() == 1)
 	{
+		editor->stateTimeMarkWidget->setTime(editor->sliderScrub->value());
+
 		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[0]);
 		double time = editor->sliderScrub->value();
 		double delta = motion->duration() / double(motion->frames() - 1);
@@ -887,8 +990,10 @@ void PAStateEditor::scrub(Fl_Widget* widget, void* data)
 		std::stringstream command;
 		command << "motionplayer " << charName << " " << selectedMotions[0] << " " << frameNumber;
 		SmartBody::SBScene::getScene()->command(command.str());
-	}
 
+		editor->stateTimeMarkWidget->redraw();
+	}
+	
 }
 
 void PAStateEditor::playmotion(Fl_Widget* widget, void* data)
@@ -901,9 +1006,15 @@ void PAStateEditor::playmotion(Fl_Widget* widget, void* data)
 
 	std::stringstream command;
 	if (editor->checkPlay->value())
+	{
 		command << "motionplayer " << charName << " on";
+		editor->stateTimeMarkWidget->setShowScrubLine(true);
+	}
 	else
+	{
 		command << "motionplayer " << charName << " off";
+		editor->stateTimeMarkWidget->setShowScrubLine(false);
+	}
 	SmartBody::SBScene::getScene()->command(command.str());
 }
 

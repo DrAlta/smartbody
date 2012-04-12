@@ -15,6 +15,8 @@ Parameter3DVisualization::Parameter3DVisualization(int x, int y, int w, int h, c
 
 	for (int t = 0; t < 4; t++)
 		tet.push_back(SrVec());
+
+	stateData = s;
 }
 
 Parameter3DVisualization::~Parameter3DVisualization()
@@ -500,10 +502,16 @@ void Parameter3DVisualization::drawGrid()
 
 void Parameter3DVisualization::drawParameter()
 {
+	if (!paramGroup)
+		return;
+
 	SrVec scale = determineScale();
 
 	SrVec vec;
-	paramGroup->getCurrentPAStateData()->state->getParametersFromWeights(vec.x, vec.y, vec.z, paramGroup->getCurrentPAStateData()->weights);
+	PAStateData* curStateData = paramGroup->getCurrentPAStateData();
+	if (!curStateData)
+		return;
+	curStateData->state->getParametersFromWeights(vec.x, vec.y, vec.z, curStateData->weights);
 	for (int s = 0; s < 3; s++)
 		vec[s] = vec[s] * scale[s];
 	glColor3f(1.0f, 0.0f, 0.0f);

@@ -44,6 +44,11 @@ class ParamAnimEditorWidget : public nle::EditorWidget
 		void setMarkSelectionChanged(bool val);
 		bool getMarkSelectionChanged();
 
+		virtual void draw();
+
+		void setTime(double t);
+		void setShowScrubLine(bool val);
+
 
 protected:
 		virtual void drawBlock(nle::Block* block, int trackNum, int blockNum);
@@ -52,6 +57,9 @@ protected:
 		bool blockSelectionChanged;
 		bool trackSelectionChanged;
 		bool markSelectionChanged;
+
+		double scrubTime;
+		bool showScrubLine;
 
 };
 
