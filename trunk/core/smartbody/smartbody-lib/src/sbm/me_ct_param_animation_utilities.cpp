@@ -1133,10 +1133,13 @@ double PATransitionManager::getTime(double time, const std::vector<double>& key,
 {
 	double ret = 0.0;
 	int section = -1;
-	for (size_t i = 0; i < key.size() - 1; i++)
+	if (key.size() > 0)
 	{
-		if (key[i] <= time && key[i + 1] >= time)
-			section = i;
+		for (size_t i = 0; i < key.size() - 1; i++)
+		{
+			if (key[i] <= time && key[i + 1] >= time)
+				section = i;
+		}
 	}
 
 	if (section < 0)
