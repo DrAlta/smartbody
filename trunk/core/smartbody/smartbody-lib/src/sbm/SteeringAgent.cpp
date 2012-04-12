@@ -626,6 +626,14 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 			normalizeAngle(diff);
 			adjustFacingAngle(diff);
 		}
+
+		std::string eventType = "locomotion";
+		MotionEvent motionEvent;
+		motionEvent.setType(eventType);			
+		std::string param = std::string(character->getName()) + " success";
+		motionEvent.setParameters(param);
+		EventManager* manager = EventManager::getEventManager();		
+		manager->handleEvent(&motionEvent, mcu.time);
 		
 		//LOG("path following end");
 
