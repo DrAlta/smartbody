@@ -1064,10 +1064,13 @@ void PATransitionManager::update()
 			id = i;
 		}
 	}
-	if (transition->easeInStart < toKey[0])
+	if (toKey.size() > 0)
 	{
-		transition->easeInStart += transition->toState->motions[id]->duration();
-		transition->easeInEnd += transition->toState->motions[id]->duration();
+		if (transition->easeInStart < toKey[0])
+		{
+			transition->easeInStart += transition->toState->motions[id]->duration();
+			transition->easeInEnd += transition->toState->motions[id]->duration();
+		}
 	}
 	s2 = getTime(transition->easeInStart, toKey, transition->toState->keys, to->weights);
 	e2 = getTime(transition->easeInEnd, toKey, transition->toState->keys, to->weights);
