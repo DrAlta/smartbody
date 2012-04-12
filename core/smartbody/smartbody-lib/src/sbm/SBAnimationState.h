@@ -12,12 +12,13 @@ class SBAnimationState : public PAState
 		SBAnimationState(const std::string& name);
 		~SBAnimationState();
 
-		void addCorrespondancePoints(const std::vector<std::string>& motions, const std::vector<double>& points);
+		void addCorrespondencePoints(const std::vector<std::string>& motions, const std::vector<double>& points);
+		void removeCorrespondencePoints(int index);
 
 		virtual int getNumMotions();
 		virtual std::string getMotion(int num);
-		virtual int getNumCorrespondancePoints();
-		virtual std::vector<double> getCorrespondancePoints(int num);
+		virtual int getNumCorrespondencePoints();
+		virtual std::vector<double> getCorrespondencePoints(int num);
 
 		virtual void removeMotion(const std::string& motionName);
 
@@ -28,9 +29,9 @@ class SBAnimationState : public PAState
 		bool addSkMotion(const std::string& motionName);
 		bool removeSkMotion(const std::string& motionName);
 		/*
-			This function make sure that all the correspondance points are in ascendant order
+			This function make sure that all the correspondence points are in ascendant order
 		*/
-		void validateCorrespondancePoints();
+		void validateCorrespondencePoints();
 
 	protected:
 		std::string _dimension;

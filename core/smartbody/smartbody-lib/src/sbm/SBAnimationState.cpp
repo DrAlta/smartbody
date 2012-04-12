@@ -17,29 +17,29 @@ SBAnimationState::~SBAnimationState()
 {
 }
 
-void SBAnimationState::addCorrespondancePoints(const std::vector<std::string>& motionNames, const std::vector<double>& points)
+void SBAnimationState::addCorrespondencePoints(const std::vector<std::string>& motionNames, const std::vector<double>& points)
 {
 	if (motions.size() == 0)
 	{
-		LOG("Add motions before add correspondance points for state");
+		LOG("Add motions before add correspondence points for state");
 		return;
 	}
 	if (motionNames.size() != motions.size())
 	{
-		LOG("Add correspondance points error, input motion number is not the same with that when adding motions");
+		LOG("Add correspondence points error, input motion number is not the same with that when adding motions");
 		return;		
 	}
 	for (size_t i = 0; i < motionNames.size(); i++)
 	{
 		if (motionNames[i] != motions[i]->getName())
 		{
-			LOG("Add correspondance points error, input motion names are not in the same order with that when adding motions");
+			LOG("Add correspondence points error, input motion names are not in the same order with that when adding motions");
 			return;
 		}
 	}
 	if (motionNames.size() != points.size())
 	{
-		LOG("Add correspondance points error, input motion number is not the same with points number!");
+		LOG("Add correspondence points error, input motion number is not the same with points number!");
 		return;
 	}	
 	int num = motionNames.size();
@@ -53,12 +53,44 @@ void SBAnimationState::addCorrespondancePoints(const std::vector<std::string>& m
 // 		}
 // 	}
 
-	for (int i = 0; i < num; i++)
+	// find the right place to insert the keys
+	int insertPosition = -1;
+	if (keys.size() > 0)
 	{
-		keys[i].push_back(points[i]);
+		for (size_t i = 0; i < keys[0].size(); i++)
+		{
+			if (points[0] <= keys[0][i])
+			{
+				insertPosition = i;
+				break;
+			}
+		}
+		if (insertPosition == -1)
+		{
+			insertPosition = keys[0].size();
+		}
 	}
 
-	validateCorrespondancePoints();
+	for (int i = 0; i < num; i++)
+	{
+		keys[i].insert(keys[i].begin() + insertPosition, points[i]);
+	}
+
+	validateCorrespondencePoints();
+}
+
+void SBAnimationState::removeCorrespondencePoints(int index)
+{
+	if (index < 0 || (keys.size() == 0) || (index >= (int) keys[0].size()))
+		return;
+
+	for (std::vector< std::vector<double> >::iterator iter = keys.begin();
+		 iter != keys.end();
+		 iter++)
+	{
+		std::vector<double>& keyArray = (*iter);
+		keyArray.erase(keyArray.begin() + index);
+	}	
 }
 
 int SBAnimationState::getNumMotions()
@@ -78,12 +110,12 @@ std::string SBAnimationState::getMotion(int num)
 	}
 }
 
-int SBAnimationState::getNumCorrespondancePoints()
+int SBAnimationState::getNumCorrespondencePoints()
 {
 	return getNumKeys();
 }
 
-std::vector<double> SBAnimationState::getCorrespondancePoints(int num)
+std::vector<double> SBAnimationState::getCorrespondencePoints(int num)
 {
 	if (keys.size() > (size_t) num && num >= 0)
 	{
@@ -118,7 +150,7 @@ bool SBAnimationState::addSkMotion(const std::string& motion)
 		motions.push_back(skMotion);
 
 
-		// add a zero-correspondance point for this new motion
+		// add a zero-correspondence point for this new motion
 		int numPoints = 0;
 		if (keys.size() > 0)
 			numPoints  = keys[keys.size() - 1].size();
@@ -126,7 +158,7 @@ bool SBAnimationState::addSkMotion(const std::string& motion)
 		if (numPoints > 0)
 		{
 			keyVec.resize(numPoints);
-			// uniformly space the correspondance points
+			// uniformly space the correspondence points
 			double time = skMotion->duration();
 			double step = time / double(numPoints);
 			for (int i = 0; i < numPoints; i++)
@@ -177,17 +209,17 @@ bool SBAnimationState::removeSkMotion(const std::string& motionName)
 /*
 	P.S. This is organized way, but is not a efficient way to do it
 */
-void SBAnimationState::validateCorrespondancePoints()
+void SBAnimationState::validateCorrespondencePoints()
 {
 	for (int i = 0; i < getNumMotions(); i++)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		SkMotion* skMotion = mcu.lookUpMotion(motions[i]->getName().c_str());		
-		for (int j = 1; j < getNumCorrespondancePoints(); j++)
+		for (int j = 1; j < getNumCorrespondencePoints(); j++)
 		{
 			if (keys[i][j] < keys[i][j - 1])
 			{
-				for (int k = j; k < getNumCorrespondancePoints(); k++)
+				for (int k = j; k < getNumCorrespondencePoints(); k++)
 					keys[i][k] += skMotion->duration();
 			}
 		}
@@ -240,7 +272,7 @@ void SBAnimationState0D::removeMotion(const std::string& motion)
 {
 	SBAnimationState::removeMotion(motion);
 
-	// remove correspondance points
+	// remove correspondence points
 	removeSkMotion(motion);
 }
 
@@ -270,7 +302,7 @@ void SBAnimationState1D::removeMotion(const std::string& motionName)
 {
 	SBAnimationState::removeMotion(motionName);
 
-	// remove correspondance points
+	// remove correspondnce points
 	removeSkMotion(motionName);
 }
 
@@ -304,7 +336,7 @@ void SBAnimationState2D::removeMotion(const std::string& motionName)
 {
 	SBAnimationState::removeMotion(motionName);
 
-	// remove correspondance points
+	// remove correspondence points
 	removeSkMotion(motionName);
 
 	// do something about triangle
@@ -348,7 +380,7 @@ void SBAnimationState3D::removeMotion(const std::string& motionName)
 {
 	SBAnimationState::removeMotion(motionName);
 
-	// remove correspondance points
+	// remove correspondence points
 	removeSkMotion(motionName);
 
 	// do something about tetrahedrons

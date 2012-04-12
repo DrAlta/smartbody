@@ -748,11 +748,14 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		;
 
 	boost::python::class_<SBAnimationState>("SBAnimationState")
-		.def("addCorrespondancePoints", &SBAnimationState::addCorrespondancePoints, "Correspondance points for motions inside the state.")
+		.def("addCorrespondencePoints", &SBAnimationState::addCorrespondencePoints, "Correspondence points for motions inside the state.")
+		.def("addCorrespondancePoints", &SBAnimationState::addCorrespondencePoints, "Correspondence points for motions inside the state.")
 		.def("getNumMotions", &SBAnimationState::getNumMotions, "Number of motions inside the state.")
 		.def("getMotion", &SBAnimationState::getMotion, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the motion name given index. \n Input: index of motion \n Output: motion name")
-		.def("getNumCorrespondancePoints", &SBAnimationState::getNumCorrespondancePoints, "Number of correspondance points for the motions in the state")
-		.def("getCorrespondancePoints", &SBAnimationState::getCorrespondancePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the correspondance points in one motion given the index. \n Input: index of motion \n Output: correspondance points vector of this motion")
+		.def("getNumCorrespondancePoints", &SBAnimationState::getNumCorrespondencePoints, "Number of correspondence points for the motions in the state")
+		.def("getCorrespondancePoints", &SBAnimationState::getCorrespondencePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the correspondence points in one motion given the index. \n Input: index of motion \n Output: correspondence points vector of this motion")
+		.def("getNumCorrespondencePoints", &SBAnimationState::getNumCorrespondencePoints, "Number of correspondence points for the motions in the state")
+		.def("getCorrespondencePoints", &SBAnimationState::getCorrespondencePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the correspondence points in one motion given the index. \n Input: index of motion \n Output: correspondence points vector of this motion")
 		.def("getDimension", &SBAnimationState::getDimension, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the dimension of the state. Dimension represents the number of parameter for each motion. 0D means no parameter, 1D means one parameter for each motion etc.")
 		;
 
@@ -779,9 +782,9 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 
 	boost::python::class_<SBAnimationTransition>("SBAnimationTransition")
 		.def("set", &SBAnimationTransition::set, "")
-		.def("addCorrespondancePoint", &SBAnimationTransition::addCorrespondancePoint, "")
-		.def("getNumCorrespondancePoints", &SBAnimationTransition::getNumCorrespondancePoints, "")
-		.def("getCorrespondancePoint", &SBAnimationTransition::getCorrespondancePoint, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		.def("addCorrespondencePoint", &SBAnimationTransition::addCorrespondencePoint, "")
+		.def("getNumCorrespondencePoints", &SBAnimationTransition::getNumCorrespondencePoints, "")
+		.def("getCorrespondencePoint", &SBAnimationTransition::getCorrespondencePoint, boost::python::return_value_policy<boost::python::return_by_value>(), "")
 		.def("getFromState", &SBAnimationTransition::getFromState, boost::python::return_value_policy<boost::python::reference_existing_object>(), "")
 		.def("getToState", &SBAnimationTransition::getToState, boost::python::return_value_policy<boost::python::reference_existing_object>(), "")
 		;

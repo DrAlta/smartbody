@@ -47,6 +47,7 @@ class ParamAnimEditorWidget : public nle::EditorWidget
 		virtual void draw();
 
 		void setLocalTimes(std::vector<double>& t);
+		std::vector<double>& getLocalTimes();
 		void setShowScrubLine(bool val);
 
 

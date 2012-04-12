@@ -17,9 +17,9 @@ class SBAnimationTransition : public PATransition
 		~SBAnimationTransition();
 
 		void set(SBAnimationState* source, SBAnimationState* dest);
-		void addCorrespondancePoint(std::string sourceMotion, std::string destMotion, float sourceFromTime, float sourceToTime, float destFromTime, float destToTime);
-		int getNumCorrespondancePoints();
-		std::vector<float> getCorrespondancePoint(int num);
+		void addCorrespondencePoint(std::string sourceMotion, std::string destMotion, float sourceFromTime, float sourceToTime, float destFromTime, float destToTime);
+		int getNumCorrespondencePoints();
+		std::vector<float> getCorrespondencePoint(int num);
 
 		SBAnimationState* getFromState();
 		SBAnimationState* getToState();

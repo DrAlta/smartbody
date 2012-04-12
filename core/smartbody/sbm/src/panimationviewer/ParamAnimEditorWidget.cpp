@@ -90,7 +90,7 @@ void ParamAnimEditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int tra
 			}
 		}
 
-		// connect to the attached correspondance mark
+		// connect to the attached correspondence mark
 		// get the position of the other mark
 		std::vector<CorrespondenceMark*>& attached = cMark->getAttachedMark();
 		for (size_t i = 0; i < attached.size(); i++)
@@ -197,6 +197,11 @@ void ParamAnimEditorWidget::draw()
 void ParamAnimEditorWidget::setLocalTimes(std::vector<double>& t)
 {
 	scrubTimes = t;
+}
+
+std::vector<double>& ParamAnimEditorWidget::getLocalTimes()
+{
+	return scrubTimes;
 }
 
 void ParamAnimEditorWidget::setShowScrubLine(bool val)
