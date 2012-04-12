@@ -438,7 +438,6 @@ void SBM_CharToCSbmChar( const::SmartbodyCharacter * sbmChar, SBM_SmartbodyChara
    }
 }
 
-
 SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** objectClass )
 {
     if ( !SBM_HandleExists( sbmHandle ) || g_CreateCallbackInfo[sbmHandle].size() == 0)
@@ -593,6 +592,7 @@ SMARTBODY_C_DLL_API bool SBM_IsChannelSet( SBMHANDLE sbmHandle, int * numCharact
     return true;
 }
 
+
 void DeleteCallbacks(SBMHANDLE sbmHandle, std::map< int, std::vector<SBM_CallbackInfo*> >& callbackData)
 {
     if ( !SBM_HandleExists( sbmHandle ) )
@@ -606,6 +606,16 @@ void DeleteCallbacks(SBMHANDLE sbmHandle, std::map< int, std::vector<SBM_Callbac
     }
 
     callbackData.clear();
+}
+
+SMARTBODY_C_DLL_API bool SBM_PythonCommandVoid( SBMHANDLE sbmHandle, const char * command)
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   return g_smartbodyInstances[ sbmHandle ]->PythonCommandVoid( command );
 }
 
 SMARTBODY_C_DLL_API bool SBM_PythonCommandBool( SBMHANDLE sbmHandle,  const char * command )
@@ -638,7 +648,7 @@ SMARTBODY_C_DLL_API float SBM_PythonCommandFloat( SBMHANDLE sbmHandle,  const ch
    return g_smartbodyInstances[ sbmHandle ]->PythonCommandFloat( command );
 }
 
-SMARTBODY_C_DLL_API const char* SBM_PythonCommandString( SBMHANDLE sbmHandle,  const char * command, char* ret)
+SMARTBODY_C_DLL_API char* SBM_PythonCommandString( SBMHANDLE sbmHandle,  const char * command, char* output, int maxLen)
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -646,7 +656,7 @@ SMARTBODY_C_DLL_API const char* SBM_PythonCommandString( SBMHANDLE sbmHandle,  c
    }
 
    std::string temp = g_smartbodyInstances[ sbmHandle ]->PythonCommandString( command ).c_str();
-   strcpy(ret, temp.c_str());
-   return ret;
+   strcpy_s(output, maxLen, temp.c_str());
+   return output;
 }
 

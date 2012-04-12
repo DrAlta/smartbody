@@ -431,7 +431,6 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
    }
 }
 
-
 bool Smartbody_dll::InitVHMsg()
 {
 #if !defined(__ANDROID__) && !defined(SBM_IPHONE)
@@ -449,6 +448,12 @@ bool Smartbody_dll::InitVHMsg()
 
 #endif
    return true;
+}
+
+SMARTBODY_DLL_API bool Smartbody_dll::PythonCommandVoid( const std::string & command )
+{
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   return mcu.executePython(command.c_str()) == 1 ? true : false;
 }
 
 bool Smartbody_dll::PythonCommandBool( const std::string & command )
