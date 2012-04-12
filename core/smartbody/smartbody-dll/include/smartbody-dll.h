@@ -98,6 +98,7 @@ class Smartbody_dll
 
       SMARTBODY_DLL_API SmartbodyCharacter& GetCharacter( const std::string & name );
 
+      SMARTBODY_DLL_API bool PythonCommandVoid( const std::string & command );
       SMARTBODY_DLL_API bool PythonCommandBool( const std::string & command );
       SMARTBODY_DLL_API int PythonCommandInt( const std::string & command );
       SMARTBODY_DLL_API float PythonCommandFloat( const std::string & command );
