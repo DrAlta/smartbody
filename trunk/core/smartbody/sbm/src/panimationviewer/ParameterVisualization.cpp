@@ -1,10 +1,11 @@
 #include "ParameterVisualization.h"
 #include <sbm/SBCharacter.h>
 
-ParameterVisualization::ParameterVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* group) : Fl_Group(x, y, w, h, name), stateData(s), paramGroup(group)
+ParameterVisualization::ParameterVisualization(bool isInteractive, int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* group) : Fl_Group(x, y, w, h, name), stateData(s), paramGroup(group)
 {
 	paramX = -9999;
 	paramY = -9999;
+	interactiveMode = isInteractive;
 	setup();
 }
 
@@ -102,6 +103,9 @@ void ParameterVisualization::draw()
 
 int ParameterVisualization::handle(int event)
 {
+	if (!interactiveMode)
+		return Fl_Group::handle(event);
+
 	int mousex = Fl::event_x();
 	int mousey = Fl::event_y();
 	switch (event)

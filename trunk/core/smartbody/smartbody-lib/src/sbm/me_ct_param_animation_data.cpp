@@ -1122,6 +1122,47 @@ int PAState::PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c)
 	return dot(p - a, cross(b - a, c - a)) >= 0.0f;
 }
 
+double PAState::getLocalTime(double motionTime, int motionIndex)
+{
+	if (keys.size() <= (size_t) motionIndex)
+	{
+		LOG("Only %d motions for state %s, cannot find local time at index %d.", getNumMotions(), stateName.c_str(), motionIndex);
+		return motionTime;
+	}
+	if (keys[motionIndex].size() == 0)
+	{
+		return motionTime;
+	}
+	double localTime = motionTime;
+	if (localTime < keys[motionIndex][0])
+		localTime = motions[motionIndex]->duration() + localTime;
+
+	return localTime;
+}
+
+double PAState::getMotionTime(double localTime, int motionIndex)
+{
+	if (keys.size() <= (size_t) motionIndex)
+	{
+		LOG("Only %d motions for state %s, cannot find local time at index %d.", getNumMotions(), stateName.c_str(), motionIndex);
+		return localTime;
+	}
+	if (keys[motionIndex].size() == 0)
+	{
+		return localTime;
+	}	
+	double motionTime = localTime;
+
+	double d = motions[motionIndex]->duration();
+	int times = (int) (motionTime / d);
+	if (times > 0)
+	{
+		motionTime = motionTime - float(times) * d;
+	}
+	return motionTime;
+}
+
+
 MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)
 {
 	motion = m;

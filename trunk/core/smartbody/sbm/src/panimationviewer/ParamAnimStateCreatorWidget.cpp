@@ -29,7 +29,7 @@ PAStateCreator::PAStateCreator(PAStateEditor* editor, bool createMode, std::stri
 		inputStateName->value(stateName.c_str());
 	}
 
-	choiceStateType = new Fl_Choice(xDis + csx, 2 * yDis + csy, 150, 25, "State Type");
+	choiceStateType = new Fl_Choice(xDis + csx, 2 * yDis + csy, 150, 20, "State Type");
 	choiceStateType->add("0D");
 	choiceStateType->add("1D");
 	choiceStateType->add("2D");
@@ -59,18 +59,18 @@ PAStateCreator::PAStateCreator(PAStateEditor* editor, bool createMode, std::stri
 
 	animationList = new Fl_Multi_Browser(xDis + csx, 4 * yDis + csy, 150, 250, "All Motions");
 	stateAnimationList = new Fl_Multi_Browser(xDis + csx + 250, 4 * yDis + csy, 150, 250, "Motions in State");
-	animationAdd = new Fl_Button(xDis + csx + 160, 4 * yDis + csy + 50, 50, 25, ">>>");
+	animationAdd = new Fl_Button(xDis + csx + 160, 4 * yDis + csy + 50, 50, 20, ">>>");
 	animationAdd->callback(addMotion, this);
-	animationRemove = new Fl_Button(xDis + csx + 160, 4 * yDis + csy + 100, 50, 25,  "<<<");
+	animationRemove = new Fl_Button(xDis + csx + 160, 4 * yDis + csy + 100, 50, 20,  "<<<");
 	animationRemove->callback(removeMotion, this);
 
 	if (isCreateMode)
-		buttonCreateState = new Fl_Button(xDis + csx, 4 * yDis + csy + 300, 60, 25, "Create State");
+		buttonCreateState = new Fl_Button(xDis + csx, 4 * yDis + csy + 300, 100, 20, "Create State");
 	else
-		buttonCreateState = new Fl_Button(xDis + csx, 4 * yDis + csy + 300, 60, 25, "Save Changes");
+		buttonCreateState = new Fl_Button(xDis + csx, 4 * yDis + csy + 300, 100, 20, "Save Changes");
 
 	buttonCreateState->callback(createState, this);
-	buttonCancelState = new Fl_Button(xDis + csx + 100, 4 * yDis + csy + 300, 60, 25, "Cancel");
+	buttonCancelState = new Fl_Button(xDis + csx + 100, 4 * yDis + csy + 300, 60, 20, "Cancel");
 	buttonCancelState->callback(cancelState, this);
 
 	this->end();
@@ -317,6 +317,11 @@ void PAStateCreator::createState(Fl_Widget* widget, void* data)
 		}
 	}
 
+	// bug in FLTK? Cannot set value to the last choice item.
+	//int numStates = creator->stateEditor->stateList->size();
+	//creator->stateEditor->stateList->value(numStates - 1);
+	
+	creator->stateEditor->stateList->value(0);
 	creator->stateEditor->refresh();
 	creator->hide();
 	

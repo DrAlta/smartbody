@@ -83,6 +83,8 @@ class PAState
 		void buildTetrahedron();
 		int getType();
 		void setType(int typ);
+		double getLocalTime(double motionTime, int motionIndex);
+		double getMotionTime(double localTime, int motionIndex);
 
 		int getNumParameters();
 		int getMinVecX();

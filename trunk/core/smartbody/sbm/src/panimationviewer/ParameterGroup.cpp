@@ -14,7 +14,7 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 		if (type == 0)
 		{			
 			int paraH =  h - 5 * yDis;
-			paramVisualization = new ParameterVisualization(4 * xDis + x, yDis + y, w - 5 * xDis, paraH, (char*)"", s, this);
+			paramVisualization = new ParameterVisualization(true, 4 * xDis + x, yDis + y, w - 5 * xDis, paraH, (char*)"", s, this);
 			// since begin() is automatically called by the constructor for Fl_Group
 			paramVisualization->end();
 
@@ -38,7 +38,7 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 		else if (type == 1)
 		{
 			int paraH =  h - 5 * yDis;
-			paramVisualization = new ParameterVisualization(4 * xDis + x, yDis + y, w - 5 * xDis, h - 5 * yDis, (char*)"", s, this);
+			paramVisualization = new ParameterVisualization(true, 4 * xDis + x, yDis + y, w - 5 * xDis, h - 5 * yDis, (char*)"", s, this);
 			paramVisualization->end();
 			this->resizable(paramVisualization);
 			double minX = stateData->state->getVec(stateData->state->getMinVecX()).x;
@@ -155,14 +155,14 @@ void ParameterGroup::updateWeight()
 {
 //	if (!state->cycle)
 //		return;
-/*	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
+	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
 	std::stringstream command;
 	command << "panim update char " << charName;
 	int wNumber = stateData->state->getNumMotions();
 	for (int j = 0; j < wNumber; j++)
 		command << " " << stateData->weights[j];
 	paWindow->execCmd(paWindow, command.str());
-	*/
+	
 }
 
 PAStateData* ParameterGroup::getCurrentPAStateData()
