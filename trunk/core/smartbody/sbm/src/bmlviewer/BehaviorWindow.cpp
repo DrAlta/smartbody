@@ -50,8 +50,7 @@ BehaviorWindow::BehaviorWindow(int x, int y, int w, int h, char* name) : Fl_Doub
 
 			nleWidget = new BehaviorEditorWidget(0 + leftGroup->x(), 20 + leftGroup->y(), leftGroup->w(), leftGroup->h() - 20, (char*)"");		
 			nleWidget->box(FL_BORDER_BOX);	
-			nleWidget->begin();
-			nleWidget->end();
+			
 
 		leftGroup->end();
 		leftGroup->resizable(nleWidget);
@@ -86,6 +85,7 @@ BehaviorWindow::BehaviorWindow(int x, int y, int w, int h, char* name) : Fl_Doub
 	nleModel = new nle::NonLinearEditorModel();
 	nle::EditorWidget* behaviorEditorWidget = this->getEditorWidget();
 	behaviorEditorWidget->setModel(nleModel);
+	nleModel->addModelListener(behaviorEditorWidget);
 
 	this->size_range(800, 480);
 	updateGUI();

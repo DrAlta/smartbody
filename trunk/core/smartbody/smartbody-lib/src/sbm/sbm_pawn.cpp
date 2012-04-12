@@ -207,6 +207,11 @@ SkSkeleton* SbmPawn::getSkeleton() const
 
 void SbmPawn::setSkeleton(SkSkeleton* sk)
 {
+	if (!sk)
+	{
+		LOG("Cannot set a null skeleton on object %s", getName().c_str());
+		return;
+	}
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 
 	if (_skeleton)

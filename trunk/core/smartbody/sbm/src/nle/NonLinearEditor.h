@@ -161,6 +161,16 @@ class Track
 		NonLinearEditorModel* model;
 };
 
+class NonLinearEditorModelListener
+{
+	public:
+		NonLinearEditorModelListener();
+		~NonLinearEditorModelListener();
+
+		virtual void notifyModelChanged(NonLinearEditorModel* model);
+
+};
+
 class NonLinearEditorModel
 {
 	public:
@@ -202,6 +212,11 @@ class NonLinearEditorModel
 
 		void update();
 
+		void addModelListener(NonLinearEditorModelListener* listener);
+		void removeModelListener(NonLinearEditorModelListener* listener);
+		void removeAllModelListeners();
+		void notifyModelListeners();
+
 	protected:
 		std::vector<Track*> tracks;
 		double time;
@@ -210,6 +225,8 @@ class NonLinearEditorModel
         bool changed;
 		std::vector<std::pair<std::string, std::vector<Track*> > > contexts;
 		std::string currentContext;
+		std::vector<NonLinearEditorModelListener*> listeners;
+
 };
 
 }

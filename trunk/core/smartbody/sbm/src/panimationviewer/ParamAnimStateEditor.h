@@ -47,12 +47,12 @@ class PAStateEditor : public Fl_Group
 		static void updateStateTimeMarkEditor(Fl_Widget* widget, void* data, bool toAdd);
 		static void editStateMotions(Fl_Widget* widget, void* data);
 		static void changeStateList(Fl_Widget* widget, void* data);
-		static void changeStateType(Fl_Widget* widget, void* data);
 		static void addStateTimeMark(Fl_Widget* widget, void* data);
 		static void addFootStepMark(Fl_Widget* widget, void* data);
 		static void removeStateTimeMark(Fl_Widget* widget, void* data);
 		static void updateStateTimeMark(Fl_Widget* widget, void* data);
 		static void updateMaxTime(Fl_Widget* widget, void* data);
+		static void updateMinTime(Fl_Widget* widget, void* data);
 		static void save(Fl_Widget* widget, void* data);
 		static void selectStateAnimations(Fl_Widget* widget, void* data);
 		static void addShape(Fl_Widget* widget, void* data);
@@ -82,6 +82,7 @@ class PAStateEditor : public Fl_Group
 		Fl_Button*		updateMark;
 		Fl_Button*		buttonSave;
 		Fl_Button*		autoFootStepMarks;
+		Fl_Float_Input*		minTimeInput;
 		Fl_Float_Input*		maxTimeInput;
 		Fl_Float_Input* inputParameterX;
 		Fl_Float_Input* inputParameterY;

@@ -107,6 +107,8 @@ void SkeletonItemInfoWidget::updateJointAttributes(std::string jointName)
 void SkeletonItemInfoWidget::updateSkeletonTree( Fl_Tree_Item* root, SkSkeleton* skel )
 {
 	SkJoint* skelRoot = skel->root();	
+	if (!root)
+		return;
 	root->label(skelRoot->name().c_str());	
 	for (int i=0;i<skelRoot->num_children();i++)
 	{

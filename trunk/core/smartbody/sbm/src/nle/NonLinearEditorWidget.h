@@ -18,7 +18,7 @@
 namespace nle
 {
 
-class EditorWidget : public Fl_Group
+class EditorWidget : public NonLinearEditorModelListener, public Fl_Widget
 {
 	public:
 		EditorWidget(int x, int y, int w, int h, char* name);
@@ -64,6 +64,8 @@ class EditorWidget : public Fl_Group
 
 		virtual void lockBlockFunc(bool val);
 		virtual bool getBlockLockedStatus();
+
+		virtual void notifyModelChanged(NonLinearEditorModel* model);
 
 
 protected:

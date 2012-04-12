@@ -57,6 +57,7 @@ void ParameterVisualization::draw()
 		fl_rectf(recX, recY, recW, recH);
 	}
 
+	bool selectedColor = false;
 	// draw lines connecting parameters
 	for (int i = 0; i <  stateData->state->getNumTriangles(); i++)
 	{
@@ -67,6 +68,26 @@ void ParameterVisualization::draw()
 		getActualPixel(vec1.x, vec1.y, x1, y1);
 		getActualPixel(vec2.x, vec2.y, x2, y2);
 		getActualPixel(vec3.x, vec3.y, x3, y3);
+
+		if (selectedTriangles.size() == stateData->state->getNumTriangles())
+		{
+			if (selectedTriangles[i])
+			{
+				if (!selectedColor)
+				{
+					fl_color(FL_MAGENTA);
+					selectedColor = true;
+				}
+			}
+			else
+			{
+				if (selectedColor)
+				{
+					fl_color(FL_GREEN);
+					selectedColor = false;
+				}
+			}
+		}
 		fl_line(x1, y1, x2, y2);
 		fl_line(x1, y1, x3, y3);
 		fl_line(x3, y3, x2, y2);
@@ -214,4 +235,9 @@ void ParameterVisualization::updateStateData(float param1, float param2)
 	character->param_animation_ct->updateWeights(stateData->weights);
 }
 
+void ParameterVisualization::setSelectedTriangles(std::vector<bool>& selected)
+{
+	selectedTriangles = selected;
+	redraw();
+}
 

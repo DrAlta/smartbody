@@ -17,6 +17,9 @@ Parameter3DVisualization::Parameter3DVisualization(int x, int y, int w, int h, c
 		tet.push_back(SrVec());
 
 	stateData = s;
+
+	lastMouseX = -1;
+	lastMouseY = -1;
 }
 
 Parameter3DVisualization::~Parameter3DVisualization()
@@ -388,6 +391,12 @@ SrVec Parameter3DVisualization::determineScale()
 	return scale;
 }
 
+void Parameter3DVisualization::setSelectedTetrahedrons(std::vector<bool>& selected)
+{
+	selectedTetrahedrons = selected;
+	redraw();
+}
+
 void Parameter3DVisualization::drawTetrahedrons()
 {
 	SrVec scale = determineScale();
@@ -409,6 +418,8 @@ void Parameter3DVisualization::drawTetrahedrons()
 	glBegin(GL_LINES);
 	glLineWidth(0.8f);
 
+	bool selectedColor = false;
+
 	std::vector<TetrahedronInfo>& tetrahedrons = stateData->state->getTetrahedrons();
 	int numTetrahedrons = tetrahedrons.size();
 	for (int i = 0; i < numTetrahedrons; i++)
@@ -424,6 +435,32 @@ void Parameter3DVisualization::drawTetrahedrons()
 			for (int y = 0; y < 3; y++)
 			{
 				tet[x][y] = tet[x][y] * scale[y];
+			}
+		}
+		if (selectedTetrahedrons.size() == numTetrahedrons)
+		{
+			if (selectedTetrahedrons[i])
+			{
+				if (!selectedColor)
+				{
+					glEnd();
+					glLineWidth(1.5f);
+					glColor3f(1.0f, 0.5f, 0.9f);
+					selectedColor = true;
+					glBegin(GL_LINES);
+					
+				}
+			}
+			else
+			{
+				if (selectedColor)
+				{
+					glEnd();
+					glLineWidth(0.8f);
+					glColor3f(0.2f, 0.5f, 0.9f);
+					selectedColor = false;
+					glBegin(GL_LINES);
+				}
 			}
 		}
 

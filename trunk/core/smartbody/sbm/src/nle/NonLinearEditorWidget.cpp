@@ -7,7 +7,7 @@ namespace nle
 {
 
 EditorWidget::EditorWidget(int x, int y, int w, int h, char* name) :
-									Fl_Group(x, y, w, h, name)
+									Fl_Widget(x, y, w, h, name)
 {
 	model = NULL;
 	//xOffset = x;
@@ -20,6 +20,12 @@ EditorWidget::EditorWidget(int x, int y, int w, int h, char* name) :
 	cameraState = CAMERASTATE_NORMAL;
 	setBlockCandidate(NULL, true);
 	blockOpLocked = false;
+
+	padding = 20;
+	trackHeight = 30;
+    activationSize = 8;
+	labelWidth = 100;
+	timeWindowHeight = 10;
 }
 
 EditorWidget::~EditorWidget()
@@ -28,18 +34,13 @@ EditorWidget::~EditorWidget()
 
 void EditorWidget::setup()
 {
-	padding = 20;
-	trackHeight = 30;
-    activationSize = 8;
 	left = padding + x();
 	right = w() - padding + x();
 	width = right - left;
 	top = padding + y();
-	bottom = h() - padding + y();
-	height = bottom - top;
-	labelWidth = 100;
+
 	trackStart = left + labelWidth;
-	timeWindowHeight = 10;
+	
 
 	// set up the tracks
 	if (!model)
@@ -169,7 +170,8 @@ void EditorWidget::setup()
 
 	trackBottom = currentTrackLocation + trackHeight;
 	// make sure that the widget can accomodate all the tracks
-	this->h(currentTrackLocation + trackHeight);
+	int curHeight = this->h();
+	//this->h(currentTrackLocation + trackHeight);
 
 	// time window
 	// viewable time window bar will be proportional to the model time
@@ -215,21 +217,21 @@ void EditorWidget::setup()
 	sliderLeft = int(ratioStart * double(timeWindowWidth)) + timeWindowLeft;
 	sliderRight = int(ratioEnd* double(timeWindowWidth)) + timeWindowLeft;
 	this->setTimeSliderBounds(sliderLeft, timeWindowTop, sliderRight - sliderLeft, timeWindowHeight);
+	damage(FL_DAMAGE_ALL);
 }
 
 void EditorWidget::resize(int x, int y, int w, int h)
 {	
-	Fl_Group::resize(x, y, w, h);
-	//printf("w = %d, h = %d\n",w,h);
-	//printf("w() = %d, h() = %d\n",this->w(),this->h());
-// 	xOffset = x;
-// 	yOffset = y;
+	Fl_Widget::resize(x, y, w, h);
+	
 	setup();
 }
 
 void EditorWidget::setModel(nle::NonLinearEditorModel* m)
 {
 	this->model = m;
+	if (m)
+		notifyModelChanged(m);
 }
 
 nle::NonLinearEditorModel* EditorWidget::getModel()
@@ -274,11 +276,11 @@ double EditorWidget::getViewableTimeEnd()
 
 void EditorWidget::draw()
 {
-	setup();
-
-	Fl_Group::draw();
 	if (!model)
 		return;
+
+	fl_font(FL_COURIER, 8);
+	//setup();
 	
 	// draw the work area
 	drawBackground();
@@ -611,7 +613,7 @@ int EditorWidget::handle(int event)
 
 	if (!model)
 	{
-		return Fl_Group::handle(event);
+		return Fl_Widget::handle(event);
 	}
 
 	int mousex = Fl::event_x();
@@ -1385,7 +1387,7 @@ int EditorWidget::handle(int event)
 	}
 
 
-	return Fl_Group::handle(event);
+	return Fl_Widget::handle(event);
 }
 
 int EditorWidget::convertTimeToPosition(double time)
@@ -1533,6 +1535,17 @@ void EditorWidget::changeTrackSelectionEvent(Track* track)
 
 void EditorWidget::changeMarkSelectionEvent(Mark* mark)
 {
+}
+
+void EditorWidget::notifyModelChanged(NonLinearEditorModel* model)
+{
+	int numTracks = 0;
+	if (model)
+		numTracks = model->getNumTracks();
+	int widgetHeight = padding + (numTracks * trackHeight) + timeWindowHeight + 10 + 50;
+	if (widgetHeight != h())
+		h(widgetHeight);
+	setup();
 }
 
 
