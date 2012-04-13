@@ -322,6 +322,16 @@ SMARTBODY_C_DLL_API bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op
    return g_smartbodyInstances[ sbmHandle ]->ProcessVHMsgs( op, args );
 }
 
+SMARTBODY_C_DLL_API bool SBM_ExecutePython( SBMHANDLE sbmHandle, const char * command )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   return g_smartbodyInstances[ sbmHandle ]->ExecutePython( command );
+}
+
 
 SMARTBODY_C_DLL_API int SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle )
 {

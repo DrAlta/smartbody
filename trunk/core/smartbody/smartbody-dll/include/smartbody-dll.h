@@ -93,7 +93,8 @@ class Smartbody_dll
       SMARTBODY_DLL_API void SetDebuggerRendererRightHanded( bool enabled );
 
       SMARTBODY_DLL_API bool ProcessVHMsgs( const char * op, const char * args );
-
+	  SMARTBODY_DLL_API bool ExecutePython( const char * command);
+	 
       SMARTBODY_DLL_API int GetNumberOfCharacters();
 
       SMARTBODY_DLL_API SmartbodyCharacter& GetCharacter( const std::string & name );
