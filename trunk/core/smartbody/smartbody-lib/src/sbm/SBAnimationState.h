@@ -19,6 +19,7 @@ class SBAnimationState : public PAState
 		virtual std::string getMotion(int num);
 		virtual int getNumCorrespondencePoints();
 		virtual std::vector<double> getCorrespondencePoints(int num);
+		virtual void setCorrespondencePoints(int motionIndex, int pointIndex, double value);
 
 		virtual void removeMotion(const std::string& motionName);
 

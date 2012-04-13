@@ -79,6 +79,15 @@ void SBAnimationState::addCorrespondencePoints(const std::vector<std::string>& m
 	validateCorrespondencePoints();
 }
 
+void SBAnimationState::setCorrespondencePoints(int motionIndex, int pointIndex, double value)
+{
+	if (motionIndex < 0 || pointIndex < 0 || (keys.size() == 0) || (pointIndex >= (int) keys[0].size()))
+		return;
+
+	keys[motionIndex][pointIndex] = value;
+	validateCorrespondencePoints();
+}
+
 void SBAnimationState::removeCorrespondencePoints(int index)
 {
 	if (index < 0 || (keys.size() == 0) || (index >= (int) keys[0].size()))

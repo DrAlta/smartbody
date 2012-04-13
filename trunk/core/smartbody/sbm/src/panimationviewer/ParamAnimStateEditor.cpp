@@ -103,6 +103,8 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 			addMark->callback(addStateTimeMark, this);
 			removeMark = new Fl_Button(xDis + 50 + esx, yDis + esy, 50, 2 * yDis, "-");
 			removeMark->callback(removeStateTimeMark, this);
+			snapMark = new Fl_Button(xDis + 100 + esx, yDis + esy, 50, 2 * yDis, "Snap");
+			snapMark->callback(snapTimeMark, this);
 			buttonSave = new Fl_Button(xDis + 300 + esx, yDis + esy, 100, 2 * yDis, "Save");
 			buttonSave->callback(save, this);
 			minTimeInput = new Fl_Float_Input(xDis + 550 + esx, yDis + esy, 60, 2 * yDis, "Min Time");
@@ -118,7 +120,7 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 		editStateTimeMarkGroup = new Fl_Scroll(csx, esy + 3 * yDis + 10, workspaceWidth, workspaceHeight / 3 - 5 * yDis - 10);
 		editStateTimeMarkGroup->type(Fl_Scroll::VERTICAL_ALWAYS);
 		editStateTimeMarkGroup->begin();
-			stateTimeMarkWidget = new ParamAnimEditorWidget(csx + 10, 5 * yDis + esy, workspaceWidth - 10, workspaceHeight / 3 - 7 * yDis, (char*) "");
+			stateTimeMarkWidget = new ParamAnimEditorWidget(this, csx + 10, 5 * yDis + esy, workspaceWidth - 10, workspaceHeight / 3 - 7 * yDis, (char*) "");
 		editStateTimeMarkGroup->end();
 		editStateTimeMarkGroup->resizable(stateTimeMarkWidget);
 		editStateTimeMarkGroup->box(FL_BORDER_BOX);
@@ -542,6 +544,57 @@ void PAStateEditor::removeStateTimeMark(Fl_Widget* widget, void* data)
 	}
 
 	
+}
+
+void PAStateEditor::snapTimeMark(Fl_Widget* widget, void* data)
+{
+	PAStateEditor* editor = (PAStateEditor*) data;
+
+	// determine where to add the time marks
+	std::string stateName = editor->stateList->text();
+
+	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	if (!state)
+		return;
+
+	// which correspondence point has been selected?
+	int keyIndex = -1;
+	CorrespondenceMark* attachedMark = NULL;
+	int motionIndex = -1;
+	for (int t = 0; t < editor->stateEditorNleModel->getNumTracks(); t++)
+	{
+		nle::Track* track = editor->stateEditorNleModel->getTrack(t);
+		for (int b = 0; b < track->getNumBlocks(); b++)
+		{
+			nle::Block* block = track->getBlock(b);
+			for (int m = 0; m < block->getNumMarks(); m++)
+			{
+				nle::Mark* mark = block->getMark(m);
+				if (mark->isSelected())
+				{
+					keyIndex = m;
+					motionIndex = t;
+					break;
+				}
+			}
+		}
+	}
+	if (keyIndex > -1 && keyIndex < state->getNumKeys())
+	{
+		// get the local times
+		std::vector<double> localTimes = editor->stateTimeMarkWidget->getLocalTimes();
+		state->setCorrespondencePoints(motionIndex, keyIndex, localTimes[motionIndex]);
+		editor->updateCorrespondenceMarks(state);
+
+		editor->stateTimeMarkWidget->setup();
+		editor->selectStateAnimations(editor->stateAnimationList, editor);
+		// reselect the equivalent mark
+		editor->stateTimeMarkWidget->getModel()->getTrack(motionIndex)->getBlock(0)->getMark(keyIndex)->setSelected(true);
+
+
+		editor->scrub(editor->sliderScrub, editor);
+		editor->paWindow->redraw();
+	}
 }
 
 void PAStateEditor::updateCorrespondenceMarks(PAState* state)

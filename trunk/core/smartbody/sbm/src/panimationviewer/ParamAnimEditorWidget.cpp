@@ -22,13 +22,20 @@
 
 #include "ParamAnimEditorWidget.h"
 #include "ParamAnimBlock.h"
+#include "ParamAnimStateEditor.h"
+#include "ParamAnimTransitionEditor.h"
+#include <sbm/SBAnimationState.h>
+#include <sbm/SBAnimationStateManager.h>
+#include <sbm/SBScene.h>
 
-ParamAnimEditorWidget::ParamAnimEditorWidget(int x, int y, int w, int h, char* name) : EditorWidget(x, y, w, h, name)
+ParamAnimEditorWidget::ParamAnimEditorWidget(Fl_Group* g, int x, int y, int w, int h, char* name) : EditorWidget(x, y, w, h, name)
 {
 	blockSelectionChanged = false;
 	trackSelectionChanged = false;
 	this->lockBlockFunc(true);
 	showScrubLine = false;
+	parentGroup = g;
+
 }
 	
 void ParamAnimEditorWidget::drawBlock(nle::Block* block, int trackNum, int blockNum)
@@ -119,6 +126,31 @@ void ParamAnimEditorWidget::changeTrackSelectionEvent(nle::Track* track)
 void ParamAnimEditorWidget::changeMarkSelectionEvent(nle::Mark* mark)
 {
 	markSelectionChanged = true;
+	// a mark was moved should also result in a moved 
+	// correspandence point associated with that point
+	CorrespondenceMark* cMark = dynamic_cast<CorrespondenceMark*>(mark);
+	nle::Block* block = mark->getBlock();
+	nle::Track* track = block->getTrack();
+	int trackIndex = model->getTrackIndex(track);
+	int markIndex = block->getMarkIndex(cMark);
+	// update that correspondance point on the state
+	PAStateEditor* stateEditor = dynamic_cast<PAStateEditor*>(parentGroup);
+	if (stateEditor)
+	{
+		std::string currentStateName = stateEditor->stateList->menu()[stateEditor->stateList->value()].label();
+		SmartBody::SBAnimationState* currentState = SmartBody::SBScene::getScene()->getStateManager()->getState(currentStateName);
+		if (currentState)
+		{
+			currentState->setCorrespondencePoints(trackIndex, markIndex, cMark->getStartTime());
+		}
+	}
+	else
+	{
+		PATransitionEditor* transEditor = dynamic_cast<PATransitionEditor*>(parentGroup);
+		if (transEditor)
+		{
+		}
+	}
 }
 
 void ParamAnimEditorWidget::setBlockSelectionChanged(bool val)

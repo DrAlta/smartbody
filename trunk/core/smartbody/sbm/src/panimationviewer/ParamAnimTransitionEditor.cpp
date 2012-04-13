@@ -67,7 +67,7 @@ PATransitionEditor::PATransitionEditor(int x, int y, int w, int h, PanimationWin
 			removeMark1->callback(removeTransitionTimeMark, this);
 			updateMark1 = new Fl_Button(14 * xDis + 300 + etx, yDis + ety, 100 , 2 * yDis, "Update Mark");
 			updateMark1->callback(updateTransitionTimeMark, this);
-			transitionTimeMarkWidget = new ParamAnimEditorWidget(2 * xDis+ etx, 5 * yDis + ety, w - 5 * xDis, h / 2 - 6 * yDis, (char*) "");
+			transitionTimeMarkWidget = new ParamAnimEditorWidget(this, 2 * xDis+ etx, 5 * yDis + ety, w - 5 * xDis, h / 2 - 6 * yDis, (char*) "");
 		editTransitionTimeMarkGroup->end();
 	transitionEditorNleModel = new nle::NonLinearEditorModel();
 	transitionTimeMarkWidget->setModel(transitionEditorNleModel);
