@@ -303,6 +303,17 @@ SMARTBODY_DLL_API bool Smartbody_dll::ProcessVHMsgs( const char * op, const char
    return true;
 }
 
+SMARTBODY_DLL_API bool Smartbody_dll::ExecutePython( const char * command )
+{
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   int ret = mcu.executePython(command);
+   if (ret == CMD_SUCCESS)
+	   return true;
+   else
+	   return false;
+}
+
+
 
 SMARTBODY_DLL_API int Smartbody_dll::GetNumberOfCharacters()
 {
