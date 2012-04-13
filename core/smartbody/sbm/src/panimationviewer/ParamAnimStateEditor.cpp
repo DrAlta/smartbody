@@ -156,8 +156,12 @@ void PAStateEditor::loadStates()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	stateList->clear();
 	stateList->add("---");
+	// states may have names that conflict with FLTK's parsing, such as a '@'
 	for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
+	{
 		stateList->add(mcu.param_anim_states[i]->stateName.c_str());
+	}
+	
 	stateList->value(0);
 }
 
@@ -677,20 +681,20 @@ void PAStateEditor::save(Fl_Widget* widget, void* data)
 			if (state1D)
 			{
 				state->getParameter(state->getMotion(x), p1);
-				strstr << "paramsX.append(" << p1 << ")\n";
+				strstr << "paramsX.append(" << p1 << ") # " << state->getMotion(x) << " X\n";
 			}
 			else if (state2D)
 			{
 				state->getParameter(state->getMotion(x), p1, p2);
-				strstr << "paramsX.append(" << p1 << ")\n";
-				strstr << "paramsY.append(" << p2 << ")\n";
+				strstr << "paramsX.append(" << p1 << ") # " << state->getMotion(x) << " X\n";
+				strstr << "paramsY.append(" << p2 << ") # " << state->getMotion(x) << " Y\n";
 			}
 			else if (state3D)
 			{
 				state->getParameter(state->getMotion(x), p1, p2, p3);
-				strstr << "paramsX.append(" << p1 << ")\n";
-				strstr << "paramsY.append(" << p2 << ")\n";
-				strstr << "paramsZ.append(" << p3 << ")\n";
+				strstr << "paramsX.append(" << p1 << ") # " << state->getMotion(x) << " X\n";
+				strstr << "paramsY.append(" << p2 << ") # " << state->getMotion(x) << " Y\n";
+				strstr << "paramsZ.append(" << p3 << ") # " << state->getMotion(x) << " Z\n";
 			}
 			
 		}
@@ -714,7 +718,7 @@ void PAStateEditor::save(Fl_Widget* widget, void* data)
 			strstr << "points" << c << " = DoubleVec()\n";
 			for (int m = 0; m < state->getNumMotions(); m++)
 			{
-				strstr << "points" << c << ".append(" << state->keys[m][c] << ")\n";
+				strstr << "points" << c << ".append(" << state->keys[m][c] << ") # " << state->getMotion(m) << " " << c << "\n";
 			}
 			strstr << stateNameVariable << ".addCorrespondencePoints(motions, points" << c << ")\n";
 		}
@@ -791,6 +795,7 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[0]);
 		if (motion)
 		{
+			int index = currentState->getMotionId(motion->getName());
 			editor->sliderScrub->range(0, motion->duration());
 			if (editor->lastSelectedMotion != "")
 			{
@@ -812,7 +817,7 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 				stateData.timeManager->getParallelTimes(localTime, times);
 				editor->stateTimeMarkWidget->setLocalTimes(times);
 
-				int index = currentState->getMotionId(motion->getName());
+				
 				if (index > -1)
 				{
 					double newScrubTime = currentState->getMotionTime(times[index], index);
@@ -831,6 +836,20 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 			{
 				editor->sliderScrub->activate();
 				editor->stateTimeMarkWidget->setShowScrubLine(false);
+			}
+			// if a correspondence point was selected on the last motion track, select the 
+			// equivalent point on the new motion track
+			int selectedIndex;
+			nle::Mark* mark = editor->stateTimeMarkWidget->getSelectedCorrespondancePointIndex(selectedIndex);
+			if (mark)
+			{
+				mark->setSelected(false);
+				nle::Track* nextTrack = editor->stateEditorNleModel->getTrack(index);
+				nle::Block* nextBlock = nextTrack->getBlock(0);
+				nle::Mark* nextMark = nextBlock->getMark(selectedIndex);
+				nextMark->setSelected(true);
+				editor->stateTimeMarkWidget->setup();
+				editor->stateTimeMarkWidget->redraw();
 			}
 			editor->lastSelectedMotion = motion->getName();
 		}

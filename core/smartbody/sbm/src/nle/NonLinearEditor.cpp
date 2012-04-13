@@ -253,6 +253,16 @@ Mark* Block::getMark(int num)
 	return marks[num];
 }
 
+int Block::getMarkIndex(Mark* mark)
+{
+	for (unsigned int b = 0; b < marks.size(); b++)
+	{
+		if (marks[b] == mark)
+			return b;
+	}
+	return -1;
+}
+
 void Block::removeMark(int num)
 {
 	int counter = 0;
@@ -427,6 +437,17 @@ Block* Track::getBlock(std::string name)
 	}
 	return NULL;
 }
+
+int Track::getBlockIndex(Block* block)
+{
+	for (unsigned int b = 0; b < blocks.size(); b++)
+	{
+		if (blocks[b] == block)
+			return b;
+	}
+	return -1;
+}
+
 
 Block* Track::getBlock(int num)
 {

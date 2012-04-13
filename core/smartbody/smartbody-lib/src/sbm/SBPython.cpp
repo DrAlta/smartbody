@@ -782,6 +782,9 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 
 	boost::python::class_<SBAnimationTransition>("SBAnimationTransition")
 		.def("set", &SBAnimationTransition::set, "")
+		.def("addCorrespondancePoint", &SBAnimationTransition::addCorrespondencePoint, "")
+		.def("getNumCorrespondancePoints", &SBAnimationTransition::getNumCorrespondencePoints, "")
+		.def("getCorrespondancePoint", &SBAnimationTransition::getCorrespondencePoint, boost::python::return_value_policy<boost::python::return_by_value>(), "")
 		.def("addCorrespondencePoint", &SBAnimationTransition::addCorrespondencePoint, "")
 		.def("getNumCorrespondencePoints", &SBAnimationTransition::getNumCorrespondencePoints, "")
 		.def("getCorrespondencePoint", &SBAnimationTransition::getCorrespondencePoint, boost::python::return_value_policy<boost::python::return_by_value>(), "")

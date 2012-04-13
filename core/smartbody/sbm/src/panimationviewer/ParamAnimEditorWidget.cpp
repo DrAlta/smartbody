@@ -208,3 +208,28 @@ void ParamAnimEditorWidget::setShowScrubLine(bool val)
 {
 	showScrubLine = val;
 }
+
+nle::Mark* ParamAnimEditorWidget::getSelectedCorrespondancePointIndex(int& selectedIndex)
+{
+	selectedIndex = -1;
+	for (int t = 0; t < model->getNumTracks(); t++)
+	{
+		nle::Track* track = model->getTrack(t);
+		for (int b = 0; b < track->getNumBlocks(); b++)
+		{
+			nle::Block* block = track->getBlock(b);
+			for (int m = 0; m < block->getNumMarks(); m++)
+			{
+				nle::Mark* mark = block->getMark(m);
+				if (mark->isSelected())
+				{
+					selectedIndex = m;
+					return mark;
+				}
+			}
+		}
+	}
+
+	return NULL;
+}
+
