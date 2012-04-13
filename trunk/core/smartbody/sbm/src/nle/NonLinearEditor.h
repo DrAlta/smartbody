@@ -88,6 +88,7 @@ class Block
 		virtual Mark* getMark(std::string name);
 		Mark* getMark(double time);
 		virtual Mark* getMark(int num);
+		virtual int getMarkIndex(Mark* mark);
 		virtual void removeMark(int num);
 		virtual void removeMark(std::string name);
 		virtual void removeMark(Mark* mark);
@@ -130,6 +131,7 @@ class Track
 		virtual int getNumBlocks();
 		virtual Block* getBlock(std::string name);
 		virtual Block* getBlock(int num);
+		virtual int getBlockIndex(Block* block);
 		virtual void removeBlock(int num);
 		virtual void removeBlock(std::string name);
 		virtual void removeBlock(Block* block);

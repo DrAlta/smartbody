@@ -50,6 +50,7 @@ class ParamAnimEditorWidget : public nle::EditorWidget
 		std::vector<double>& getLocalTimes();
 		void setShowScrubLine(bool val);
 
+		nle::Mark* getSelectedCorrespondancePointIndex(int& index);
 
 protected:
 		virtual void drawBlock(nle::Block* block, int trackNum, int blockNum);
