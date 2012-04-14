@@ -507,7 +507,14 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 			const std::string& chanName = motionChan.name(i);
 			for (int j = 1; j < numMotions; j++)
 			{
-				int id = stateData->state->motions[indices[j]]->channels().search(chanName, motionChan[i].type);
+				if (stateData->motionIndex.size() != stateData->state->motions.size())
+				{
+					stateData->updateMotionIndices();
+				}
+				if (stateData->motionIndex.size() == 0)
+					continue;
+				int id = stateData->motionIndex[indices[j]][i];
+				//int id = stateData->state->motions[indices[j]]->channels().search(chanName, motionChan[i].type);
 				if (id < 0)
 					continue;
 				int buffId = motionContextMaps[indices[0]].get(i);
@@ -885,6 +892,27 @@ void PAStateData::evaluate(double timeStep, SrBuffer<float>& buffer)
 		active = false;
 }
 
+void PAStateData::updateMotionIndices()
+{
+	motionIndex.clear();
+
+	if (!state)
+		return;
+
+	for (size_t m = 0; m < state->motions.size(); m++)
+	{
+		motionIndex.push_back(std::vector<int>());
+		SkMotion* motion = state->motions[m];
+		SkChannelArray& motionChan = state->motions[m]->channels();
+		int chanSize = motionChan.size();
+		for (int c = 0; c < chanSize; c++)
+		{
+			const std::string& chanName = motionChan.name(c);
+			motionIndex[m].push_back(motionChan.search(chanName, motionChan[c].type));
+		}
+	}
+}
+
 /*
 PseudoPAStateData::PseudoPAStateData() : PAStateData(PseudoIdleState, std::vector<double>())
 {
@@ -1185,3 +1213,5 @@ SrBuffer<float>& PAControllerBlending::getBuffer()
 {
 	return buffer;
 }
+
+
