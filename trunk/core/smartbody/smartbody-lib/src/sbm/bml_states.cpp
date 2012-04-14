@@ -34,6 +34,8 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	PAState* state = mcu->lookUpPAState(stateName);
 	std::vector<double> weights;
 	weights.resize(state->getNumMotions());
+	if (weights.size() > 0)
+		weights[0] = 1.0f;
 	if (xString != "" || yString != "" || zString != "")
 	{
 		if (state)
