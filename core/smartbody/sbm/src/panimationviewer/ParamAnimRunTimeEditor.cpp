@@ -184,7 +184,9 @@ void PARunTimeEditor::initializeRunTimeEditor()
 	{
 		if (character->param_animation_ct == NULL)
 			return;
-		currentCycleState->value(character->param_animation_ct->getCurrentPAStateData()->state->stateName.c_str());
+		PAStateData* stateData = character->param_animation_ct->getCurrentPAStateData();
+		if (stateData)
+			currentCycleState->value(stateData->state->stateName.c_str());
 
 		nextCycleStates->clear();
 		availableTransitions->clear();
