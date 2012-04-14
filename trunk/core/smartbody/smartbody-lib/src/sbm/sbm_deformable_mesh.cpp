@@ -619,9 +619,10 @@ void DeformableMeshInstance::update()
 					//printf("Vtx bind pose = \n");
 					for (int j = 0; j < numOfInfJoints; j++)
 					{
-						//std::string jointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];						
-						const SkJoint* curJoint = jointList[skinWeight->jointNameIndex[globalCounter]];//skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
-						//if (curJoint == NULL) continue;
+						//std::string jointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];	
+						int jointIndex = skinWeight->jointNameIndex[globalCounter];
+						const SkJoint* curJoint = jointList[jointIndex];//skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
+						if (curJoint == NULL) continue;
 						const SrMat& gMat = curJoint->gmat();
 						SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];	
 						double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];

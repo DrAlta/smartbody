@@ -109,6 +109,8 @@ void SkeletonItemInfoWidget::updateSkeletonTree( Fl_Tree_Item* root, SkSkeleton*
 	SkJoint* skelRoot = skel->root();	
 	if (!root)
 		return;
+	if (!skelRoot)
+		return;
 	root->label(skelRoot->name().c_str());	
 	for (int i=0;i<skelRoot->num_children();i++)
 	{

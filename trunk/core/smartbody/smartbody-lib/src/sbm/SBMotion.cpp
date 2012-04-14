@@ -198,6 +198,8 @@ SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 
 float SBMotion::getJointSpeed(SBJoint* joint, float startTime, float endTime)
 {
+	if (!joint)
+		return 0.f;
 	if (connected_skeleton() == NULL)
 	{
 		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
@@ -226,6 +228,10 @@ float SBMotion::getJointSpeed(SBJoint* joint, float startTime, float endTime)
 
 float SBMotion::getJointAngularSpeed(SBJoint* joint, float startTime, float endTime)
 {
+	if (!joint)
+	{
+		return 0.f;
+	}
 	if (connected_skeleton() == NULL)
 	{
 		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
@@ -262,6 +268,8 @@ float SBMotion::getJointAngularSpeed(SBJoint* joint, float startTime, float endT
 
 std::vector<float> SBMotion::getJointTransition(SBJoint* joint, float startTime, float endTime)
 {
+	if (!joint)
+		return std::vector<float>();
 	std::vector<float> transitions;
 	if (connected_skeleton() == NULL)
 	{
