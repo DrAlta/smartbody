@@ -168,6 +168,9 @@ class PAStateData
 		bool playNow;
 		PAState* state;
 
+		std::vector<std::vector<int> > motionIndex;
+		void updateMotionIndices();
+
 
 
 
