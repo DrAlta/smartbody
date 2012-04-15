@@ -13,9 +13,8 @@ scene.addAssetPath("mesh", "../../../../data/mesh")
 scene.run("init-common-assets.py")
 #0	seq init-general-parameters
 scene.run("init-common-face.py")
-scene.command("panim enable")
 
-numCharacters = 50
+numCharacters = 20
 for i in range(0, numCharacters):
 
 	brad = scene.createCharacter("brad" + str(i), "brad")
@@ -32,7 +31,7 @@ for i in range(0, numCharacters):
 	brad.setVoice("remote")
 	brad.setVoiceCode("star")
 	brad.createStandardControllers()
-	#utah.setStringAttribute("mesh", "utah")
+	brad.setStringAttribute("deformableMesh", "brad")
 
 scene.setDefaultCharacter("brad0")
 scene.setDefaultRecipient("brad1")
@@ -50,13 +49,8 @@ scene.run("init-steer-agents.py")
 sim.start()
 
 for i in range(0, numCharacters):
-	bml.execBML('brad' + str(i), '<body posture="ChrUtah_Idle003" start="' + str(.1 * i) + '"/>')
+	bml.execBML('brad' + str(i), '<body posture="HandsAtSide_Motex" start="' + str(.1 * i) + '"/>')
 	
-	
-#for i in range(0, numCharacters):
-#	scene.command("panim schedule char brad" + str(i) + " state allLocomotion loop true playnow false")
-	#scene.commandAt(3, "panim updatestate char brad" + str(i) + " 0 100 0")
-#sim.resume()
 
 
 
