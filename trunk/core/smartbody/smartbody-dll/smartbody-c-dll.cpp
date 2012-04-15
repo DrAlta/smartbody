@@ -666,7 +666,11 @@ SMARTBODY_C_DLL_API char* SBM_PythonCommandString( SBMHANDLE sbmHandle,  const c
    }
 
    std::string temp = g_smartbodyInstances[ sbmHandle ]->PythonCommandString( command ).c_str();
+   #ifdef WIN32
    strcpy_s(output, maxLen, temp.c_str());
+   #else
+   strncpy(output, temp.c_str(), maxLen);
+   #endif
    return output;
 }
 
