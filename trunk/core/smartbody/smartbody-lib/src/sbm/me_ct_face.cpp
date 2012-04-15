@@ -26,6 +26,7 @@
 #include "me_ct_face.h"
 #include <vhcl_log.h>
 #include <sstream>
+#include <sbm/action_unit.hpp>
 
 //////////////////////////////////////////////////////////////////////////////////
 

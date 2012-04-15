@@ -75,6 +75,7 @@
 #include <sbm/SBJointMapManager.h>
 #include <sbm/SBJointMap.h>
 #include <sbm/SBAnimationState.h>
+#include <sbm/SBMotion.h>
 #include <math.h>
 
 
@@ -2109,7 +2110,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 			}
 
 			// parsing geometry
-			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f);
+			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f); 
 		}
 		else
 		{

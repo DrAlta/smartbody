@@ -25,6 +25,7 @@
 #include "ParamAnimBlock.h"
 #include <sbm/SBAnimationState.h>
 #include <sbm/SBAnimationStateManager.h>
+#include <sbm/SBMotion.h>
 #include <FL/Fl_File_Chooser.H>
 #include "ParamAnimStateCreatorWidget.h"
 #include "ParameterVisualization.h"

@@ -1,5 +1,8 @@
 #include "SBFaceDefinition.h"
 #include "mcontrol_util.h"
+#include <sk/sk_motion.h>
+#include "action_unit.hpp"
+#include <sbm/SBMotion.h>
 
 
 namespace SmartBody {
