@@ -3,6 +3,7 @@
 #include <sbm/SBScene.h>
 #include <sbm/SBCharacter.h>
 #include <PPRAgent.h>
+#include <sbm/SBSteerAgent.h>
 
 namespace SmartBody {
 

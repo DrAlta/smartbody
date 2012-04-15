@@ -68,6 +68,7 @@
 # include <sbm/SBScene.h>
 # include <sbm/SBSkeleton.h>
 # include <sbm/SBSteerManager.h>
+# include <sbm/SBSteerAgent.h>
 # include <sbm/SBAnimationStateManager.h>
 
 #if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support

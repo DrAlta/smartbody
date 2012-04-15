@@ -1,5 +1,6 @@
 #include "SBReach.h"
 #include <sbm/SBCharacter.h>
+#include <sbm/SBMotion.h>
 
 namespace SmartBody {
 

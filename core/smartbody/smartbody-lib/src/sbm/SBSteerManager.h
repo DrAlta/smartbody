@@ -2,13 +2,14 @@
 #define _STEERMANAGER_H_
 
 #include <vhcl.h>
-#include <sbm/SBSteerAgent.h>
 #include <SteerLib.h>
 
 #include <sbm/SBService.h>
 #include <sbm/SteerSuiteEngineDriver.h>
 
 namespace SmartBody {
+
+class SBSteerAgent;
 
 class SBSteerManager : public SmartBody::SBService
 {

@@ -1,9 +1,11 @@
 #ifndef _SBGESTUREMAPMANAGER_H_
 #define _SBGESTUREMAPMANAGER_H_
 
-#include <sbm/SBGestureMap.h>
-
+#include <string>
+#include <map>
 namespace SmartBody {
+
+class SBGestureMap;
 
 class SBGestureMapManager
 {

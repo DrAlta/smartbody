@@ -1,7 +1,7 @@
 #ifndef _SBATTRIBUTE_H
 #define _SBATTRIBUTE_H
 
-#include "SBSubject.h"
+#include <sbm/SBSubject.h>
 #include <string>
 #include <vector>
 #include <limits>

@@ -26,6 +26,7 @@
 #include <sbm/SBJointMapManager.h>
 #include <sbm/SBParser.h>
 #include <sbm/SBBoneBusManager.h>
+#include <sbm/SBSteerAgent.h>
 
 
 #ifdef USE_PYTHON

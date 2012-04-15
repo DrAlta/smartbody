@@ -24,15 +24,19 @@
 #define _SBFACEDEFINITION_H_
 
 #include <map>
-#include <sk/sk_motion.h>
-#include "action_unit.hpp"
-#include <sbm/SBMotion.h>
+#include <vector>
 
 /**
  *  Maps viseme ids to the related motion.
  */
 //typedef std::map< std::string, SkMotion* > VisemeMotionMap;
+
+class ActionUnit;
+class SkMotion;
+
 namespace SmartBody {
+
+class SBMotion;
 
 class SBFaceDefinition
 {
