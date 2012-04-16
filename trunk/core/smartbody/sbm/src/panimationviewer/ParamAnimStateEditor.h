@@ -51,6 +51,8 @@ class PAStateEditor : public Fl_Group
 		static void addFootStepMark(Fl_Widget* widget, void* data);
 		static void removeStateTimeMark(Fl_Widget* widget, void* data);
 		static void snapTimeMark(Fl_Widget* widget, void* data);
+		static void snapStartTimeMark(Fl_Widget* widget, void* data);
+		static void snapEndTimeMark(Fl_Widget* widget, void* data);
 		static void updateStateTimeMark(Fl_Widget* widget, void* data);
 		static void updateMaxTime(Fl_Widget* widget, void* data);
 		static void updateMinTime(Fl_Widget* widget, void* data);
@@ -81,6 +83,8 @@ class PAStateEditor : public Fl_Group
 		Fl_Button*		addMark;
 		Fl_Button*		removeMark;
 		Fl_Button*		snapMark;
+		Fl_Button*		snapStartMark;
+		Fl_Button*		snapEndMark;
 		Fl_Button*		updateMark;
 		Fl_Button*		buttonSave;
 		Fl_Button*		autoFootStepMarks;
@@ -90,7 +94,7 @@ class PAStateEditor : public Fl_Group
 		Fl_Float_Input* inputParameterY;
 		Fl_Float_Input* inputParameterZ;
 		Fl_Value_Slider* sliderScrub;
-		Fl_Check_Button* checkPlay;
+		Fl_Button* buttonPlay;
 		Fl_Choice*		choiceAutoParameter;
 		ParamAnimEditorWidget* stateTimeMarkWidget;
 		nle::NonLinearEditorModel* stateEditorNleModel;
@@ -103,6 +107,7 @@ class PAStateEditor : public Fl_Group
 		PAStateData*	stateData;
 
 		int lastNameIndex;
+		bool isPlaying;
 };
 
 #endif

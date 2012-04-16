@@ -34,6 +34,7 @@
 PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
 {
 	lastNameIndex = 0;
+	isPlaying = false;
 
 	this->label("State Editor");
 	this->begin();
@@ -85,9 +86,9 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 			inputParameterY->deactivate();
 			inputParameterZ->deactivate();
 
-			checkPlay = new Fl_Check_Button(csx + 400, csy + 150, 60, 20, "Play");
-			checkPlay->align(FL_ALIGN_LEFT);
-			checkPlay->callback(playmotion, this);
+			buttonPlay = new Fl_Button(csx + 380, csy + 150, 30, 20, "@>");
+			buttonPlay->callback(playmotion, this);
+			buttonPlay->deactivate();
 			sliderScrub = new Fl_Value_Slider(csx + 420, csy + 150, 300, 20, "");
 			sliderScrub->type(FL_HORIZONTAL);
 			sliderScrub->range(0, 1);
@@ -107,6 +108,10 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 			removeMark->callback(removeStateTimeMark, this);
 			snapMark = new Fl_Button(xDis + 100 + esx, yDis + esy, 50, 2 * yDis, "Snap");
 			snapMark->callback(snapTimeMark, this);
+			snapStartMark = new Fl_Button(xDis + 150 + esx, yDis + esy, 50, 2 * yDis, "@|< Snap");
+			snapStartMark->callback(snapStartTimeMark, this);
+			snapEndMark = new Fl_Button(xDis + 200 + esx, yDis + esy, 50, 2 * yDis, "Snap @>|");
+			snapEndMark->callback(snapEndTimeMark, this);
 			buttonSave = new Fl_Button(xDis + 300 + esx, yDis + esy, 100, 2 * yDis, "Save");
 			buttonSave->callback(save, this);
 			minTimeInput = new Fl_Float_Input(xDis + 580 + esx, yDis + esy, 60, 2 * yDis, "Show Times");
@@ -142,13 +147,14 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 	stateEditorNleModel->addModelListener(stateTimeMarkWidget);
 	stateTimeMarkWidget->setup();
 
-	loadStates();
-
 	creator = NULL;
 	lastSelectedMotion = "";
 	triangleVisualization = NULL;
 	tetraVisualization = NULL;
 	stateData = NULL;
+
+	loadStates();
+	changeStateList(stateList, this);
 }
 
 PAStateEditor::~PAStateEditor()
@@ -363,6 +369,8 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 		editor->inputParameterY->deactivate();
 		editor->inputParameterZ->deactivate();
 
+		editor->buttonPlay->deactivate();
+		editor->isPlaying = false;
 		editor->sliderScrub->deactivate();
 		editor->shapeAdd->deactivate();
 		editor->shapeRemove->deactivate();
@@ -411,15 +419,19 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 				editor->shapeList->add(tetraString.c_str());
 			}
 		}
-		editor->checkPlay->activate();
+		editor->buttonPlay->activate();
 	}
 	else
 	{
 		editor->createStateButton->label("Create State");
 		editor->choiceStateType->value(0);
 
+		editor->buttonPlay->deactivate();
+		editor->isPlaying = false;
+		editor->sliderScrub->deactivate();
+
 		editor->stateAnimationList->clear();
-		editor->checkPlay->deactivate();
+		editor->buttonPlay->deactivate();
 
 		// remove any visualizations
 		if (editor->triangleVisualization != NULL)
@@ -597,6 +609,108 @@ void PAStateEditor::snapTimeMark(Fl_Widget* widget, void* data)
 		editor->stateTimeMarkWidget->getModel()->getTrack(motionIndex)->getBlock(0)->getMark(keyIndex)->setSelected(true);
 
 		editor->sliderScrub->value(localTimes[motionIndex]);
+		editor->scrub(editor->sliderScrub, editor);
+		editor->paWindow->redraw();
+	}
+}
+
+void PAStateEditor::snapStartTimeMark(Fl_Widget* widget, void* data)
+{
+	PAStateEditor* editor = (PAStateEditor*) data;
+
+	std::string stateName = editor->stateList->text();
+
+	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	if (!state)
+		return;
+
+	// which correspondence point has been selected?
+	int keyIndex = -1;
+	CorrespondenceMark* attachedMark = NULL;
+	int motionIndex = -1;
+	for (int t = 0; t < editor->stateEditorNleModel->getNumTracks(); t++)
+	{
+		nle::Track* track = editor->stateEditorNleModel->getTrack(t);
+		for (int b = 0; b < track->getNumBlocks(); b++)
+		{
+			nle::Block* block = track->getBlock(b);
+			for (int m = 0; m < block->getNumMarks(); m++)
+			{
+				nle::Mark* mark = block->getMark(m);
+				if (mark->isSelected())
+				{
+					keyIndex = m;
+					motionIndex = t;
+					break;
+				}
+			}
+		}
+	}
+	if (keyIndex > -1 && keyIndex < state->getNumKeys())
+	{
+		// get the local times
+		std::vector<double> localTimes = editor->stateTimeMarkWidget->getLocalTimes();
+		state->setCorrespondencePoints(motionIndex, keyIndex, 0.0);
+		editor->updateCorrespondenceMarks(state);
+
+		editor->stateTimeMarkWidget->setup();
+		editor->selectStateAnimations(editor->stateAnimationList, editor);
+		// reselect the equivalent mark
+		editor->stateTimeMarkWidget->getModel()->getTrack(motionIndex)->getBlock(0)->getMark(keyIndex)->setSelected(true);
+
+		editor->sliderScrub->value(0.0);
+		editor->scrub(editor->sliderScrub, editor);
+		editor->paWindow->redraw();
+	}
+}
+
+void PAStateEditor::snapEndTimeMark(Fl_Widget* widget, void* data)
+{
+	PAStateEditor* editor = (PAStateEditor*) data;
+
+	std::string stateName = editor->stateList->text();
+
+	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	if (!state)
+		return;
+
+	// which correspondence point has been selected?
+	int keyIndex = -1;
+	CorrespondenceMark* attachedMark = NULL;
+	int motionIndex = -1;
+	for (int t = 0; t < editor->stateEditorNleModel->getNumTracks(); t++)
+	{
+		nle::Track* track = editor->stateEditorNleModel->getTrack(t);
+		for (int b = 0; b < track->getNumBlocks(); b++)
+		{
+			nle::Block* block = track->getBlock(b);
+			for (int m = 0; m < block->getNumMarks(); m++)
+			{
+				nle::Mark* mark = block->getMark(m);
+				if (mark->isSelected())
+				{
+					keyIndex = m;
+					motionIndex = t;
+					break;
+				}
+			}
+		}
+	}
+	if (keyIndex > -1 && keyIndex < state->getNumKeys())
+	{
+		// get the local times
+		std::vector<double> localTimes = editor->stateTimeMarkWidget->getLocalTimes();
+		// get the end time of the motion
+		double endTime = SmartBody::SBScene::getScene()->getMotion(state->getMotion(motionIndex))->duration();
+		state->setCorrespondencePoints(motionIndex, keyIndex, endTime);
+		editor->updateCorrespondenceMarks(state);
+
+		editor->stateTimeMarkWidget->setup();
+		editor->selectStateAnimations(editor->stateAnimationList, editor);
+		// reselect the equivalent mark
+		editor->stateTimeMarkWidget->getModel()->getTrack(motionIndex)->getBlock(0)->getMark(keyIndex)->setSelected(true);
+
+		editor->sliderScrub->value(endTime);
 		editor->scrub(editor->sliderScrub, editor);
 		editor->paWindow->redraw();
 	}
@@ -854,6 +968,8 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 
 	if (selectedMotions.size() == 1)
 	{
+		editor->buttonPlay->activate();
+		editor->sliderScrub->deactivate();
 		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[0]);
 		if (motion)
 		{
@@ -887,16 +1003,16 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 					scrub(editor->sliderScrub, editor);
 				}
 			}
-			if (editor->checkPlay->value())
+			if (editor->isPlaying)
 			{
 				editor->sliderScrub->activate();
+				editor->buttonPlay->label("@square");
 				editor->stateTimeMarkWidget->setShowScrubLine(true);
-
-				
 			}
 			else
 			{
 				editor->sliderScrub->activate();
+				editor->buttonPlay->label("@>");
 				editor->stateTimeMarkWidget->setShowScrubLine(false);
 			}
 			// if a correspondence point was selected on the last motion track, select the 
@@ -965,6 +1081,7 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 	}
 	else
 	{
+		editor->buttonPlay->deactivate();
 		editor->sliderScrub->deactivate();
 		
 		editor->inputParameterX->value(0);
@@ -1197,13 +1314,19 @@ void PAStateEditor::playmotion(Fl_Widget* widget, void* data)
 	std::string charName = editor->paWindow->characterList->menu()[editor->paWindow->characterList->value()].label();
 
 	std::stringstream command;
-	if (editor->checkPlay->value())
+	if (editor->isPlaying == false)
 	{
+		editor->isPlaying = true;
+		editor->buttonPlay->label("@square");
+		editor->sliderScrub->activate();
 		command << "motionplayer " << charName << " on";
 		editor->stateTimeMarkWidget->setShowScrubLine(true);
 	}
 	else
 	{
+		editor->isPlaying = false;
+		editor->buttonPlay->label("@>");
+		editor->sliderScrub->deactivate();
 		command << "motionplayer " << charName << " off";
 		editor->stateTimeMarkWidget->setShowScrubLine(false);
 	}
