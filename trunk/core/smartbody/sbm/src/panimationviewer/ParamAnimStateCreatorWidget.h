@@ -13,11 +13,13 @@
 class PAStateCreator : public Fl_Window
 {
 	public:
-		PAStateCreator(PAStateEditor* editor, bool isCreateMode, std::string stateName, int x, int y, int w, int h);
+		PAStateCreator(PAStateEditor* editor, int x, int y, int w, int h);
 		~PAStateCreator();
 
 		std::string getUniqueStateName(std::string prefix);
 		void loadMotions();
+		
+		void setInfo(bool isCreateMode, const std::string& stateName);
 
 		static void addMotion(Fl_Widget* widget, void* data);
 		static void removeMotion(Fl_Widget* widget, void* data);

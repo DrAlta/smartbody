@@ -5,10 +5,10 @@
 
 int PAStateCreator::lastNameIndex = 0;
 
-PAStateCreator::PAStateCreator(PAStateEditor* editor, bool createMode, std::string stateName, int x, int y, int w, int h) : Fl_Window(x, y, w, h)
+PAStateCreator::PAStateCreator(PAStateEditor* editor, int x, int y, int w, int h) : Fl_Window(x, y, w, h)
 {
 	set_modal();
-	isCreateMode = createMode;
+	isCreateMode = true;
 	stateEditor = editor;
 	xDis = 10;
 	yDis = 10;
@@ -19,44 +19,14 @@ PAStateCreator::PAStateCreator(PAStateEditor* editor, bool createMode, std::stri
 	int csy = 4 * yDis;
 
 	inputStateName = new Fl_Input(xDis + csx + 20, yDis, 10 * xDis, 2 * yDis, "Name");
-	if (isCreateMode)
-	{
-		inputStateName->value(getUniqueStateName("state").c_str());
-		
-	}
-	else
-	{
-		inputStateName->value(stateName.c_str());
-	}
-
 	choiceStateType = new Fl_Choice(xDis + csx + 60, 2 * yDis + csy, 150, 20, "State Type");
 	choiceStateType->add("0D");
 	choiceStateType->add("1D");
 	choiceStateType->add("2D");
 	choiceStateType->add("3D");
 	choiceStateType->value(0);
-	if (!isCreateMode)
-	{
-		SmartBody::SBAnimationStateManager* stateManager = SmartBody::SBScene::getScene()->getStateManager();
-		SmartBody::SBAnimationState* currentState = stateManager->getState(stateName);
-		if (currentState)
-		{
-			SBAnimationState0D* state0d = dynamic_cast<SBAnimationState0D*>(currentState);
-			if (state0d)
-				choiceStateType->value(0);
-			SBAnimationState1D* state1d = dynamic_cast<SBAnimationState1D*>(currentState);
-			if (state1d)
-				choiceStateType->value(1);
-			SBAnimationState2D* state2d = dynamic_cast<SBAnimationState2D*>(currentState);
-			if (state2d)
-				choiceStateType->value(2);
-			SBAnimationState3D* state3d = dynamic_cast<SBAnimationState3D*>(currentState);
-			if (state3d)
-				choiceStateType->value(3);
-		}
-		choiceStateType->deactivate();
-	}
 
+	
 	animationList = new Fl_Multi_Browser(xDis + csx, 4 * yDis + csy, 350, 250, "All Motions");
 	stateAnimationList = new Fl_Multi_Browser(xDis + csx + 420, 4 * yDis + csy, 350, 250, "Motions in State");
 	animationAdd = new Fl_Button(xDis + csx + 360, 4 * yDis + csy + 50, 50, 20, ">>>");
@@ -64,16 +34,33 @@ PAStateCreator::PAStateCreator(PAStateEditor* editor, bool createMode, std::stri
 	animationRemove = new Fl_Button(xDis + csx + 360, 4 * yDis + csy + 100, 50, 20,  "<<<");
 	animationRemove->callback(removeMotion, this);
 
-	if (isCreateMode)
-		buttonCreateState = new Fl_Button(xDis + csx, 4 * yDis + csy + 300, 100, 20, "Create State");
-	else
-		buttonCreateState = new Fl_Button(xDis + csx, 4 * yDis + csy + 300, 100, 20, "Save Changes");
-
+	buttonCreateState = new Fl_Button(xDis + csx, 4 * yDis + csy + 300, 100, 20, "Create State");
 	buttonCreateState->callback(createState, this);
+	
 	buttonCancelState = new Fl_Button(xDis + csx + 100, 4 * yDis + csy + 300, 60, 20, "Cancel");
 	buttonCancelState->callback(cancelState, this);
 
 	this->end();
+}
+
+PAStateCreator::~PAStateCreator()
+{
+}
+
+void PAStateCreator::setInfo(bool isCreateMode, const std::string& stateName)
+{
+	if (isCreateMode)
+	{
+		inputStateName->value(getUniqueStateName("state").c_str());
+		inputStateName->activate();
+		buttonCreateState->label(strdup("Create State"));
+	}
+	else
+	{
+		inputStateName->value(stateName.c_str());
+		inputStateName->deactivate();
+		buttonCreateState->label(strdup("Save Changes"));
+	}
 
 	loadMotions();
 	if (!isCreateMode)
@@ -84,6 +71,7 @@ PAStateCreator::PAStateCreator(PAStateEditor* editor, bool createMode, std::stri
 		{
 			fl_alert("State %s does not exist.", stateName.c_str());
 			cancelState(this, NULL);
+			return;
 		}
 		std::vector<SkMotion*>& motions = state->motions;
 		for (std::vector<SkMotion*>::iterator iter = motions.begin();
@@ -92,11 +80,23 @@ PAStateCreator::PAStateCreator(PAStateEditor* editor, bool createMode, std::stri
 		{
 			stateAnimationList->add((*iter)->getName().c_str());
 		}
-	}
-}
 
-PAStateCreator::~PAStateCreator()
-{
+
+		SBAnimationState0D* state0d = dynamic_cast<SBAnimationState0D*>(state);
+		if (state0d)
+			choiceStateType->value(0);
+		SBAnimationState1D* state1d = dynamic_cast<SBAnimationState1D*>(state);
+		if (state1d)
+			choiceStateType->value(1);
+		SBAnimationState2D* state2d = dynamic_cast<SBAnimationState2D*>(state);
+		if (state2d)
+			choiceStateType->value(2);
+		SBAnimationState3D* state3d = dynamic_cast<SBAnimationState3D*>(state);
+		if (state3d)
+			choiceStateType->value(3);
+
+
+	}
 }
 
 void PAStateCreator::loadMotions()

@@ -6,6 +6,9 @@ ParameterVisualization::ParameterVisualization(bool isInteractive, int x, int y,
 	paramX = -9999;
 	paramY = -9999;
 	interactiveMode = isInteractive;
+	this->begin();
+	this->end();
+
 	setup();
 }
 
