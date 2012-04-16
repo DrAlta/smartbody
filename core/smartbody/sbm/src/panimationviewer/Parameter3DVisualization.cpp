@@ -6,12 +6,16 @@
 
 Parameter3DVisualization::Parameter3DVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* window) : Fl_Gl_Window(x, y, w, h, ""), stateData(s), paramGroup(window)
 {	
+	this->begin();
+	this->end();
+	
 	cam.center.set(0, 0, 0);
 	cam.eye.set(300, -300, 400);
 	cam.up.set(0, 0, 1);
 	gridSize = 700;
 	gridStep = 40;
 	floorHeight = 0;
+
 
 	for (int t = 0; t < 4; t++)
 		tet.push_back(SrVec());

@@ -228,8 +228,6 @@ void PAStateEditor::editStateMotions(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 
-	if (editor->creator)
-		delete editor->creator;
 	bool isCreateMode = true;
 	std::string stateName = "";
 	if (std::string("Edit State") == editor->createStateButton->label())
@@ -237,7 +235,12 @@ void PAStateEditor::editStateMotions(Fl_Widget* widget, void* data)
 		isCreateMode = false;
 		stateName = editor->stateList->menu()[editor->stateList->value()].label();
 	}
-	editor->creator = new PAStateCreator(editor, isCreateMode, stateName, editor->paWindow->x() + 50, editor->paWindow->y() + 50, 800, 600);
+	if (!editor->creator)
+	{
+		editor->creator = new PAStateCreator(editor, editor->paWindow->x() + 50, editor->paWindow->y() + 50, 800, 600);
+	}
+	editor->creator->setInfo(isCreateMode, stateName);
+	
 	editor->creator->show();
 }
 
