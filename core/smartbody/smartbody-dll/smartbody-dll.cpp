@@ -8,6 +8,8 @@
 #include <mmsystem.h>
 #endif
 
+#pragma warning(push)
+#pragma warning(disable:4121)  // needed for boost::python::extract<std::string>() below
 #include "sbm/SBScene.h"
 #include "sbm/xercesc_utils.hpp"
 #include "sbm/mcontrol_util.h"
@@ -19,6 +21,7 @@
 #include "sbm/SBPython.h"
 #include "sbm/SBCharacter.h"
 #include "sbm/SBSkeleton.h"
+#pragma warning(pop)
 
 
 #include "sbm/SbmDebuggerServer.h"
