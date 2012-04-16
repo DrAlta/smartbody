@@ -25,6 +25,7 @@
 
 #include <map>
 #include <vector>
+#include <string>
 
 /**
  *  Maps viseme ids to the related motion.
