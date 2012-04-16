@@ -805,6 +805,9 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getTransition", &SBAnimationStateManager::getTransition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a transition with a given name.")
 		.def("getNumTransitions", &SBAnimationStateManager::getNumTransitions, "Returns the state names.")
 		.def("getTransitionNames", &SBAnimationStateManager::getTransitionNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the state names.")
+		.def("getCurrentState", &SBAnimationStateManager::getCurrentState, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the character's current state name.")
+		.def("getCurrentStateParameters", &SBAnimationStateManager::getCurrentStateParameters, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the character's current state name.")
+		
 		;
 
 	boost::python::class_<SBSteerManager, boost::python::bases<SBService> >("SBSteerManager")
