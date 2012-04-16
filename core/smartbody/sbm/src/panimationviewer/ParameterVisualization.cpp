@@ -57,8 +57,8 @@ void ParameterVisualization::draw()
 		fl_rectf(recX, recY, recW, recH);
 	}
 
-	bool selectedColor = false;
 	// draw lines connecting parameters
+	fl_color(FL_GREEN);
 	for (int i = 0; i <  stateData->state->getNumTriangles(); i++)
 	{
 		SrVec vec1 = stateData->state->getTriangle(i).a;
@@ -69,28 +69,31 @@ void ParameterVisualization::draw()
 		getActualPixel(vec2.x, vec2.y, x2, y2);
 		getActualPixel(vec3.x, vec3.y, x3, y3);
 
-		if (selectedTriangles.size() == stateData->state->getNumTriangles())
-		{
-			if (selectedTriangles[i])
-			{
-				if (!selectedColor)
-				{
-					fl_color(FL_MAGENTA);
-					selectedColor = true;
-				}
-			}
-			else
-			{
-				if (selectedColor)
-				{
-					fl_color(FL_GREEN);
-					selectedColor = false;
-				}
-			}
-		}
 		fl_line(x1, y1, x2, y2);
 		fl_line(x1, y1, x3, y3);
 		fl_line(x3, y3, x2, y2);
+	}
+
+	if (selectedTriangles.size() == stateData->state->getNumTriangles())
+	{
+		fl_color(FL_MAGENTA);
+		for (int i = 0; i <  stateData->state->getNumTriangles(); i++)
+		{
+			SrVec vec1 = stateData->state->getTriangle(i).a;
+			SrVec vec2 = stateData->state->getTriangle(i).b;
+			SrVec vec3 = stateData->state->getTriangle(i).c;
+			int x1, y1, x2, y2, x3, y3;
+			getActualPixel(vec1.x, vec1.y, x1, y1);
+			getActualPixel(vec2.x, vec2.y, x2, y2);
+			getActualPixel(vec3.x, vec3.y, x3, y3);
+
+			if (selectedTriangles[i])
+			{
+				fl_line(x1, y1, x2, y2);
+				fl_line(x1, y1, x3, y3);
+				fl_line(x3, y3, x2, y2);
+			}
+		}
 	}
 
 	// draw parameters info
