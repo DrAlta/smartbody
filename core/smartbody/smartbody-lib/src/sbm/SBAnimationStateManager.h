@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <sr/sr_vec.h>
 
 namespace SmartBody {
 
@@ -33,6 +34,9 @@ class SBAnimationStateManager
 		SBAnimationTransition* getTransition(const std::string& source, const std::string& dest);
 		int getNumTransitions();
 		std::vector<std::string> getTransitionNames();
+
+		std::string getCurrentState(const std::string& characterName);
+		SrVec getCurrentStateParameters(const std::string& characterName);
 
 };
 }

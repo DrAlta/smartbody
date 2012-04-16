@@ -2,6 +2,7 @@
 #include <sbm/mcontrol_util.h>
 #include <sbm/SBAnimationState.h>
 #include <sbm/SBAnimationTransition.h>
+#include <sbm/SBCharacter.h>
 
 namespace SmartBody {
 
@@ -122,6 +123,58 @@ std::vector<std::string> SBAnimationStateManager::getTransitionNames()
 								  "/" + mcu.param_anim_transitions[i]->toState->stateName );
 	}
 	return transitionNames;
+}
+
+std::string SBAnimationStateManager::getCurrentState(const std::string& characterName)
+{
+	SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+	if (!character)
+		return "";
+
+	if (!character->param_animation_ct)
+		return "";
+
+	return character->param_animation_ct->getCurrentPAStateData()->state->stateName;
+}
+
+SrVec SBAnimationStateManager::getCurrentStateParameters(const std::string& characterName)
+{
+	SrVec params;
+	SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+	if (!character)
+		return params;
+
+	if (!character->param_animation_ct)
+		return params;
+
+	
+	PAStateData* stateData = character->param_animation_ct->getCurrentPAStateData();
+	if (!stateData)
+		return params;
+
+	SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(stateData->state);
+	if (state0D)
+		return params;
+
+	SmartBody::SBAnimationState0D* state1D = dynamic_cast<SmartBody::SBAnimationState0D*>(stateData->state);
+	SmartBody::SBAnimationState0D* state2D = dynamic_cast<SmartBody::SBAnimationState0D*>(stateData->state);
+	SmartBody::SBAnimationState0D* state3D = dynamic_cast<SmartBody::SBAnimationState0D*>(stateData->state);
+	if (state1D)
+	{
+		stateData->state->getParametersFromWeights(params[0], stateData->weights);
+		return params;
+	}
+	if (state2D)
+	{
+		stateData->state->getParametersFromWeights(params[0], params[1], stateData->weights);
+		return params;
+	}
+	if (state3D)
+	{
+		stateData->state->getParametersFromWeights(params[0], params[1], params[2], stateData->weights);
+		return params;
+	}
+	return params;
 }
 
 }
