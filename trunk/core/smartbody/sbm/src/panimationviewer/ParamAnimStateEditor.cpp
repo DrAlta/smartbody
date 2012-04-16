@@ -85,7 +85,8 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 			inputParameterY->deactivate();
 			inputParameterZ->deactivate();
 
-			checkPlay = new Fl_Check_Button(csx + 350, csy + 150, 60, 20, "Play");
+			checkPlay = new Fl_Check_Button(csx + 400, csy + 150, 60, 20, "Play");
+			checkPlay->align(FL_ALIGN_LEFT);
 			checkPlay->callback(playmotion, this);
 			sliderScrub = new Fl_Value_Slider(csx + 420, csy + 150, 300, 20, "");
 			sliderScrub->type(FL_HORIZONTAL);
@@ -108,9 +109,9 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 			snapMark->callback(snapTimeMark, this);
 			buttonSave = new Fl_Button(xDis + 300 + esx, yDis + esy, 100, 2 * yDis, "Save");
 			buttonSave->callback(save, this);
-			minTimeInput = new Fl_Float_Input(xDis + 550 + esx, yDis + esy, 60, 2 * yDis, "Min Time");
+			minTimeInput = new Fl_Float_Input(xDis + 580 + esx, yDis + esy, 60, 2 * yDis, "Show Times");
 			minTimeInput->callback(updateMinTime, this);
-			maxTimeInput = new Fl_Float_Input(xDis + 630 + esx, yDis + esy, 60, 2 * yDis, "Max Time");
+			maxTimeInput = new Fl_Float_Input(xDis + 640 + esx, yDis + esy, 60, 2 * yDis, "");
 			maxTimeInput->callback(updateMaxTime, this);
 #ifdef AUTO_FOOTSTEP_MARK
 			autoFootStepMarks = new Fl_Button(15 * xDis + 400+ esx, yDis + esy, 100, 2 * yDis, "Auto Footsteps");
@@ -236,7 +237,7 @@ void PAStateEditor::editStateMotions(Fl_Widget* widget, void* data)
 		isCreateMode = false;
 		stateName = editor->stateList->menu()[editor->stateList->value()].label();
 	}
-	editor->creator = new PAStateCreator(editor, isCreateMode, stateName, editor->paWindow->x() + 50, editor->paWindow->y() + 50, 600, 600);
+	editor->creator = new PAStateCreator(editor, isCreateMode, stateName, editor->paWindow->x() + 50, editor->paWindow->y() + 50, 800, 600);
 	editor->creator->show();
 }
 
@@ -592,7 +593,7 @@ void PAStateEditor::snapTimeMark(Fl_Widget* widget, void* data)
 		// reselect the equivalent mark
 		editor->stateTimeMarkWidget->getModel()->getTrack(motionIndex)->getBlock(0)->getMark(keyIndex)->setSelected(true);
 
-
+		editor->sliderScrub->value(localTimes[motionIndex]);
 		editor->scrub(editor->sliderScrub, editor);
 		editor->paWindow->redraw();
 	}
@@ -753,7 +754,11 @@ void PAStateEditor::save(Fl_Widget* widget, void* data)
 			
 		}
 		strstr << "for i in range(0, len(motions)):\n";
-		if (state1D)
+		if (state0D)
+		{
+			strstr << "\t" << stateNameVariable << ".addMotion(motions[i], paramsX[i])\n";
+		}
+		else if (state1D)
 		{
 			strstr << "\t" << stateNameVariable << ".addMotion(motions[i], paramsX[i])\n";
 		}

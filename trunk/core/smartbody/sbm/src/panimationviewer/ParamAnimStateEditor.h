@@ -91,6 +91,7 @@ class PAStateEditor : public Fl_Group
 		Fl_Float_Input* inputParameterZ;
 		Fl_Value_Slider* sliderScrub;
 		Fl_Check_Button* checkPlay;
+		Fl_Choice*		choiceAutoParameter;
 		ParamAnimEditorWidget* stateTimeMarkWidget;
 		nle::NonLinearEditorModel* stateEditorNleModel;
 		PAStateCreator* creator;

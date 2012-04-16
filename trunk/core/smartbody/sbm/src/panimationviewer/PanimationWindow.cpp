@@ -45,9 +45,6 @@ PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_
 		int childGroupW = tabGroupW- 10;
 		int childGroupH = tabGroupH - 2 * yDis;
 
-		motionPlayerMode = new Fl_Check_Button(10, h - 40, 200, 20, "Play selected motion");
-		motionPlayerMode->value(0);
-		motionPlayerMode->callback(changeMotionPlayerMode, this);
 		characterList = new Fl_Choice(300, h - 40, 200, 20, "Character List");
 		loadCharacters(characterList);
 		
@@ -90,7 +87,6 @@ PanimationWindow::~PanimationWindow()
 
 void PanimationWindow::draw()
 {
-	motionPlayerUpdate();	
 	Fl_Double_Window::draw();   
 }
 
@@ -131,32 +127,6 @@ void PanimationWindow::update_viewer()
 void PanimationWindow::show()
 {    
     Fl_Double_Window::show();   
-}
-
-void PanimationWindow::motionPlayerUpdate()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (motionPlayerMode->value())
-	{
-		std::string charName = characterList->menu()[characterList->value()].label();
-		std::string motionName = "";
-		std::stringstream command;
-		double time = 0.0;
-		if (tabGroup->value() == stateEditor)
-			getSelectedMarkInfo(stateEditor->stateEditorNleModel, motionName, time);
-		if (tabGroup->value() == transitionEditor)
-			getSelectedMarkInfo(transitionEditor->transitionEditorNleModel, motionName, time);
-		if (motionName != "")
-		{
-			std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(motionName);
-			if (time > iter->second->duration())
-				time -= iter->second->duration();
-			double delta = iter->second->duration() / double(iter->second->frames() - 1);
-			int frameNumber = int(time / delta);
-			command << "motionplayer " << charName << " " << motionName << " " << frameNumber;
-			execCmd(this, command.str(), 0);
-		}
-	}
 }
 
 void PanimationWindow::getSelectedMarkInfo(nle::NonLinearEditorModel* model, std::string& blockName, double& time)
@@ -306,18 +276,6 @@ void PanimationWindow::refreshUI(Fl_Widget* widget, void* data)
 		window->stateEditor->refresh();
 //	if (window->tabGroup->value() == window->scriptEditor)
 //		window->scriptEditor->refresh();
-}
-
-void PanimationWindow::changeMotionPlayerMode(Fl_Widget* widget, void* data)
-{
-	PanimationWindow* window = (PanimationWindow*) data;
-	std::string charName = window->characterList->menu()[window->characterList->value()].label();
-	std::stringstream command;
-	if (window->motionPlayerMode->value())
-		command << "motionplayer " << charName << " on";
-	else
-		command << "motionplayer " << charName << " off";
-	execCmd(window, command.str(), 0);
 }
 
 void PanimationWindow::loadCharacters(Fl_Choice* characterList)

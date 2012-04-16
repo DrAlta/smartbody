@@ -29,7 +29,7 @@ PAStateCreator::PAStateCreator(PAStateEditor* editor, bool createMode, std::stri
 		inputStateName->value(stateName.c_str());
 	}
 
-	choiceStateType = new Fl_Choice(xDis + csx, 2 * yDis + csy, 150, 20, "State Type");
+	choiceStateType = new Fl_Choice(xDis + csx + 60, 2 * yDis + csy, 150, 20, "State Type");
 	choiceStateType->add("0D");
 	choiceStateType->add("1D");
 	choiceStateType->add("2D");
@@ -58,7 +58,7 @@ PAStateCreator::PAStateCreator(PAStateEditor* editor, bool createMode, std::stri
 	}
 
 	animationList = new Fl_Multi_Browser(xDis + csx, 4 * yDis + csy, 350, 250, "All Motions");
-	stateAnimationList = new Fl_Multi_Browser(xDis + csx + 450, 4 * yDis + csy, 350, 250, "Motions in State");
+	stateAnimationList = new Fl_Multi_Browser(xDis + csx + 420, 4 * yDis + csy, 350, 250, "Motions in State");
 	animationAdd = new Fl_Button(xDis + csx + 360, 4 * yDis + csy + 50, 50, 20, ">>>");
 	animationAdd->callback(addMotion, this);
 	animationRemove = new Fl_Button(xDis + csx + 360, 4 * yDis + csy + 100, 50, 20,  "<<<");
@@ -330,6 +330,7 @@ void PAStateCreator::createState(Fl_Widget* widget, void* data)
 void PAStateCreator::cancelState(Fl_Widget* widget, void* data)
 {
 	PAStateCreator* creator = (PAStateCreator*) data;
-	creator->stateEditor->refresh();
+	creator->stateEditor->creator = NULL;
 	creator->hide();
+	delete creator;
 }
