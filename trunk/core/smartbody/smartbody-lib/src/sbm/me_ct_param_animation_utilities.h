@@ -95,11 +95,11 @@ class PAMotions
 		void setMotionContextMaps(MeControllerContext* context);
 		void initChanId(MeControllerContext* context, std::string baseJointName);
 		void initPreRotation(const SrQuat& q);
-
-	protected:
-		void getBuffer(SkMotion* motion, double t, SrBuffer<int>& map, SrBuffer<float>& buff);
 		SrMat getBaseMatFromBuffer(SrBuffer<float>& buffer);
 		void setBufferByBaseMat(SrMat& mat, SrBuffer<float>& buffer);
+
+	protected:
+		void getBuffer(SkMotion* motion, double t, SrBuffer<int>& map, SrBuffer<float>& buff);				
 		void getUpdateMat(SrMat& dest, SrMat& src);
 		void getProcessedMat(SrMat& dest, SrMat& src);
 		PAStateData* stateData;
@@ -113,7 +113,8 @@ class PAWoManager : public PAMotions
 		std::vector<SrMat>	baseTransitionMats;
 		bool intializeTransition;
 		SrMat baseTransformMat;
-
+		SrMat firstBaseTransformMat;
+		SrMat currentBaseTransformMat;
 	public:
 		PAWoManager();
 		PAWoManager(PAStateData* data);
@@ -121,10 +122,12 @@ class PAWoManager : public PAMotions
 
 		void apply(std::vector<double>& times, std::vector<double>& timeDiffs, SrBuffer<float>& buffer);
 		SrMat& getBaseTransformMat();
+		SrMat& getFirstBaseTransformMat();
+		SrMat& getCurrentBaseTransformMat();
 		static void matInterp(SrMat& ret, SrMat& mat1, SrMat& mat2, float w);
 
 	private:
-		void getBaseMats(std::vector<SrMat>& mats, std::vector<double>& times, std::vector<double>& timeDiffs, int bufferSize);
+		void getBaseMats(std::vector<SrMat>& mats, std::vector<double>& times, std::vector<double>& timeDiffs, int bufferSize, SrBuffer<float>& inBuff);
 };	
 
 class PAInterpolator : public PAMotions
@@ -156,7 +159,9 @@ class PAStateData
 		PAStateData(PAState* state, std::vector<double>& w, bool l = true, bool pn = false);
 		~PAStateData();
 		virtual void evaluate(double timeStep, SrBuffer<float>& buffer);
+		virtual void evaluateTransition(double timeStep, SrBuffer<float>& buffer, bool tranIn);
 
+		std::string getStateName();
 		std::vector<double> weights;
 
 		PATimeManager* timeManager;
@@ -169,12 +174,7 @@ class PAStateData
 		PAState* state;
 
 		std::vector<std::vector<int> > motionIndex;
-		void updateMotionIndices();
-
-
-
-
-	
+		void updateMotionIndices();	
 };
 /*
 class PseudoPAStateData : public PAStateData
@@ -203,6 +203,7 @@ class PATransitionManager
 		int getNumEaseOut();
 		bool blendingMode;
 		bool active;
+		bool startTransition;
 
 		PAStateData* from;
 		PAStateData* to;

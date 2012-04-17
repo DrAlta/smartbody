@@ -338,5 +338,4 @@ void SBCharacter::notify(SBSubject* subject)
 
 	SbmCharacter::notify(subject);
 }
-
 };

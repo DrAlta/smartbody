@@ -552,7 +552,7 @@ void Parameter3DVisualization::drawParameter()
 	PAStateData* curStateData = paramGroup->getCurrentPAStateData();
 	if (!curStateData)
 		return;
-	curStateData->state->getParametersFromWeights(vec.x, vec.y, vec.z, curStateData->weights);
+	curStateData->state->getParametersFromWeights(vec.x, vec.y, vec.z, curStateData->weights);	
 	for (int s = 0; s < 3; s++)
 		vec[s] = vec[s] * scale[s];
 	glColor3f(1.0f, 0.0f, 0.0f);
