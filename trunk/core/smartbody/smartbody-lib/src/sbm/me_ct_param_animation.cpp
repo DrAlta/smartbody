@@ -333,7 +333,7 @@ void MeCtParamAnimation::schedule(PAState* stateData, const std::vector<double>&
 	// make sure the weights are valid for non-pseudoidle state
 	if (unit.weights.size() == 0 && unit.data != NULL)
 	{
-		if (unit.data->stateName != PseudoIdle)
+		if (unit.data->stateName != PseudoIdleState)
 		{
 			LOG("MeCtParamAnimation::schedule Warning: state %s has no weights assigned.", unit.data->stateName.c_str());
 			unit.weights.resize(unit.data->getNumMotions());
