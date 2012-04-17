@@ -302,7 +302,7 @@ mcuCBHandle::mcuCBHandle()
 	_scene->getDebuggerServer()->Init();
 	_scene->getDebuggerServer()->SetSBScene(_scene);
 
-	SmartBody::SBAnimationState0D* idleState = new SmartBody::SBAnimationState0D("PseudoIdle");
+	SmartBody::SBAnimationState0D* idleState = new SmartBody::SBAnimationState0D(PseudoIdleState);
 	addPAState(idleState);
 
 

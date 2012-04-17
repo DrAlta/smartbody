@@ -619,7 +619,7 @@ void SteeringAgent::evaluatePathFollowing(float x, float y, float z, float yaw)
 	if (locomotionEnd)      // need to define when you want to end the locomotion
 	{
 		std::vector<double> weights;
-		character->param_animation_ct->schedule(NULL, weights, true, true);
+		character->param_animation_ct->schedule(NULL, weights);
 
 		// adjust facing angle 
 		if (fabs(facingAngle) <= 180)
@@ -1494,7 +1494,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 		if (goalList.size() == 0)
 		{
 			std::vector<double> weights;
-			character->param_animation_ct->schedule(NULL, weights, true, true);
+			character->param_animation_ct->schedule(NULL, weights);
 		}
 		else
 		{

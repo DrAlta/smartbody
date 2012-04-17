@@ -30,8 +30,6 @@
 #include <sbm/sbm_pawn.hpp>
 #include <sbm/me_ct_param_animation_data.h>
 
-#define PrintPADebugInfo 0
-#define MultiBlending 1
 #define LoopHandle 0
 const int rotType = 132;
 const double defaultTransition = 0.3;
@@ -138,11 +136,9 @@ class PAInterpolator : public PAMotions
 		~PAInterpolator();
 
 		std::vector<std::string> joints;	// joints to be blended, if this is defined which means partial, world offset would be ignored
-		bool additive;
 
 	public:
 		void blending(std::vector<double>& times, SrBuffer<float>& buff);
-		void setAdditiveMode(bool flag);
 		void clearBlendingJoints();
 		void setBlendingJoints(std::vector<std::string>& j);
 
@@ -154,9 +150,14 @@ class PAState;
 class PAStateData
 {
 	public:
+		enum WrapMode { Loop, Once };
+		enum BlendMode { Overwrite, Additive };
+		enum ScheduleMode { Now, Queued };
+
+	public:
 		PAStateData();
-		PAStateData(const std::string& stateName, std::vector<double>& w, bool l = true, bool pn = false);
-		PAStateData(PAState* state, std::vector<double>& w, bool l = true, bool pn = false);
+		PAStateData(const std::string& stateName, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued);
+		PAStateData(PAState* state, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued);
 		~PAStateData();
 		virtual void evaluate(double timeStep, SrBuffer<float>& buffer);
 		virtual void evaluateTransition(double timeStep, SrBuffer<float>& buffer, bool tranIn);
@@ -168,24 +169,17 @@ class PAStateData
 		PAWoManager* woManager;
 		PAInterpolator* interpolator;
 
-		bool loop;
-		bool active;
-		bool playNow;
+		WrapMode wrapMode;
+		BlendMode blendMode;
+		ScheduleMode scheduleMode;
 		PAState* state;
 
+		bool active;
 		std::vector<std::vector<int> > motionIndex;
-		void updateMotionIndices();	
+		void updateMotionIndices();
 };
-/*
-class PseudoPAStateData : public PAStateData
-{
-	public:
-		PseudoPAStateData();
-		~PseudoPAStateData();
 
-		void evaluate(double timeStep, SrBuffer<float>& buffer);
-};
-*/
+
 class PATransition;
 class PATransitionManager
 {
@@ -224,22 +218,6 @@ class PATransitionManager
 
 	private:
 		double getTime(double time, const std::vector<double>& key, const std::vector<std::vector<double> >& keys, const std::vector<double>& w);
-};
-
-class PAControllerBlending
-{
-	public:
-		PAControllerBlending();
-		~PAControllerBlending();
-
-		double getKey(double t);
-		void addKey(double t, double weight);
-		void updateBuffer(SrBuffer<float>& buff);
-		SrBuffer<float>& getBuffer();
-
-	private:
-		SrBuffer<float> buffer;
-		srLinearCurve* curve;
 };
 
 #endif

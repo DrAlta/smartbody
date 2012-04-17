@@ -110,20 +110,7 @@ bool PATimeManager::step(double timeStep)
 		}
 		notReachDuration = false;
 	}
-/*
-	while (newLocalTime > key[key.size() - 1])
-	{
-		loopcounter ++;
-		if (loopcounter > 10)
-		{
-			newLocalTime = localTime;
-			LOG("time step %f, local time %f, motion last key %f, motion key size: %d", timeStep, localTime, key[key.size() - 1], key.size());
-			return true;
-		}
-		newLocalTime -= (key[key.size() - 1] - key[0]);
-		notReachDuration = false;
-	}
-	*/
+
 	localTime = newLocalTime;
 	getParallelTimes(localTime, localTimes);
 	if (localTimes.size() == 0)
@@ -450,12 +437,10 @@ void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 
 PAInterpolator::PAInterpolator()
 {
-	additive = false;
 }
 
 PAInterpolator::PAInterpolator(PAStateData* data) : PAMotions(data)
 {
-	additive = false;
 }
 
 PAInterpolator::~PAInterpolator()
@@ -488,8 +473,6 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 		getBuffer(stateData->state->motions[id], time, motionContextMaps[id], buffer);
 		handleBaseMatForBuffer(buffer);
 	}
-
-#if MultiBlending
 	else
 	{
 		int numMotions = indices.size();
@@ -519,6 +502,10 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 				}
 				if (stateData->motionIndex.size() == 0)
 					continue;
+
+				if ((int)stateData->motionIndex[indices[j]].size() <= i)
+					continue;
+
 				int id = stateData->motionIndex[indices[j]][i];
 				//int id = stateData->state->motions[indices[j]]->channels().search(chanName, motionChan[i].type);
 				if (id < 0)
@@ -561,7 +548,7 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 			currQ.y = buffer[buffId.q + 2];
 			currQ.z = buffer[buffId.q + 3];
 			SrQuat finalQ;
-			if (additive)
+			if (stateData->blendMode == PAStateData::Additive)
 				finalQ = origQ * currQ;
 			else
 				finalQ = currQ;
@@ -573,51 +560,6 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 	}
 	else
 		buff = buffer;
-#else
-	else if (indices.size() == 2)
-	{
-		SrBuffer<float> buffer1;
-		SrBuffer<float> buffer2;
-		buffer1.size(buff.size());
-		buffer2.size(buff.size());
-		buffer1 = buff;
-		buffer2 = buff;
-		int motionId1 = indices[0];
-		int motionId2 = indices[1];
-		double time1 = times[motionId1];
-		double time2 = times[motionId2];
-		getBuffer(motions[motionId1], time1, motionContextMaps[motionId1], buffer1);
-		handleBaseMatForBuffer(buffer1);
-		getBuffer(motions[motionId2], time2, motionContextMaps[motionId2], buffer2);
-		handleBaseMatForBuffer(buffer2);
-		SkChannelArray& motion1Chan = motions[motionId1]->channels();
-		SkChannelArray& motion2Chan = motions[motionId2]->channels();
-		int chanSize = motion1Chan.size();
-		for (int i = 0; i < chanSize; i++)
-		{
-			SkJointName chanName = motion1Chan.name(i);
-			int idMotion2 = motion2Chan.search(chanName, motion1Chan[i].type);
-			if (idMotion2 < 0)
-				continue;
-
-			int index1 = motionContextMaps[indices[0]].get(i);
-			int index2 = motionContextMaps[indices[1]].get(idMotion2);
-			if (index1 >= 0 && index2 >= 0)
-				motions[motionId2]->channels()[i].interp(&buff[index1], &buffer1[index1], &buffer2[index2], (float)(1 - weights[motionId1]));
-		}
-	}
-	else
-	{
-		LOG("more than three motions, not valid");
-		return;
-	}
-#endif
-}
-
-
-void PAInterpolator::setAdditiveMode(bool flag)
-{
-	additive = flag;	
 }
 
 void PAInterpolator::clearBlendingJoints()
@@ -687,7 +629,6 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 			}
 	#endif
 		}
-#if MultiBlending
 		else
 		{
 			std::vector<SrMat> mats;
@@ -720,40 +661,6 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 			}
 			baseTransformMat = tempMat;
 		}
-#else
-		else if (indices.size() == 2)
-		{
-			int id1 = indices[0];
-			int id2 = indices[1];
-			SrMat mat1;
-			SrMat mat2;
-			if (timeDiffs[id1] > 0)
-				mat1 = currentBaseMats[id1] * baseMats[id1].inverse();
-	#if LoopHandle
-			else
-			{
-				SrMat newCurrentBase = currentBaseMats[id1] * baseTransitionMats[id1];
-				mat1 = newCurrentBase * baseMats[id1].inverse();				
-			}
-	#endif
-			double time2 = times[id2];
-			if (timeDiffs[id2] > 0)
-				mat2 = currentBaseMats[id2] * baseMats[id2].inverse();
-	#if LoopHandle
-			else
-			{
-				SrMat newCurrentBase = currentBaseMats[id2] * baseTransitionMats[id2];
-				mat2 = newCurrentBase * baseMats[id2].inverse();				
-			}
-	#endif
-			matInterp(baseTransformMat, mat1, mat2, (float)(weights[id1]));
-		}
-		else
-		{
-			LOG("Error! Not supporting more than two motions");
-			return;
-		}
-#endif
 	}
 	else
 	{
@@ -845,7 +752,7 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 	
 }
 
-PAStateData::PAStateData(const std::string& stateName, std::vector<double>& w, bool l, bool pn)
+PAStateData::PAStateData(const std::string& stateName, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	PAState* s = mcu.lookUpPAState(stateName);
@@ -868,13 +775,14 @@ PAStateData::PAStateData(const std::string& stateName, std::vector<double>& w, b
 		woManager = new PAWoManager(this);
 	}
 	
+	blendMode = blend;
+	wrapMode = wrap;
+	scheduleMode = schedule;
 
-	loop = l;
 	active = false;
-	playNow = pn;
 }
 
-PAStateData::PAStateData(PAState* s, std::vector<double>& w, bool l, bool pn)
+PAStateData::PAStateData(PAState* s, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule)
 {
 	state = s;
 	weights.resize(s->getNumMotions());
@@ -884,10 +792,11 @@ PAStateData::PAStateData(PAState* s, std::vector<double>& w, bool l, bool pn)
 	interpolator = new PAInterpolator(this);
 	woManager = new PAWoManager(this);
 
+	blendMode = blend;
+	wrapMode = wrap;
+	scheduleMode = schedule;
 
-	loop = l;
 	active = false;
-	playNow = pn;
 }
 
 PAStateData::~PAStateData()
@@ -928,7 +837,7 @@ void PAStateData::evaluateTransition( double timeStep, SrBuffer<float>& buffer, 
 
 void PAStateData::evaluate(double timeStep, SrBuffer<float>& buffer)
 {
-	if (state && state->stateName == "PseudoIdle")
+	if (state && state->stateName == PseudoIdleState)
 	{
 		if (!active)
 			active = true;		
@@ -938,7 +847,7 @@ void PAStateData::evaluate(double timeStep, SrBuffer<float>& buffer)
 	bool notReachCycle = true;
 	notReachCycle = timeManager->step(timeStep);
 	SrBuffer<float> buffCopy = buffer;
-	if (loop || (!loop && notReachCycle))
+	if (wrapMode == Loop || ((wrapMode != Loop) && notReachCycle))
 	{
 		interpolator->blending(timeManager->motionTimes, buffer);
 		if (interpolator->joints.size() == 0)
@@ -975,7 +884,6 @@ void PAStateData::updateMotionIndices()
 		}
 	}
 }
-
 
 PATransitionManager::PATransitionManager()
 {
@@ -1071,7 +979,6 @@ void PATransitionManager::align(PAStateData* current, PAStateData* next)
 	int numEaseOut = getNumEaseOut();
 	for (int i = 0; i < numEaseOut; i++)
 	{
-//		std::cout << "transition align" << i << " " << current->timeManager->prevLocalTime << " " << easeOutStarts[i] << " " << current->timeManager->localTime << std::endl;
 		if (current->timeManager->prevLocalTime <= easeOutStarts[i] && current->timeManager->localTime >= easeOutStarts[i]) 
 		{
 			s1 = easeOutStarts[i];
@@ -1088,9 +995,6 @@ void PATransitionManager::align(PAStateData* current, PAStateData* next)
 		duration += (current->timeManager->prevLocalTime - current->timeManager->localTime);
 		curve->insert(0.0, 1.0);
 		curve->insert(duration, 0.0);
-#if PrintPADebugInfo
-		LOG("State %s being scheduled.[ACTIVE]", next->data->stateName.c_str());
-#endif
 	}
 #endif
 }
@@ -1235,36 +1139,3 @@ double PATransitionManager::getTime(double time, const std::vector<double>& key,
 	}
 	return ret;
 }
-
-PAControllerBlending::PAControllerBlending()
-{
-	curve = new srLinearCurve();
-}
-
-PAControllerBlending::~PAControllerBlending()
-{
-}
-
-double PAControllerBlending::getKey(double t)
-{
-	return curve->evaluate(t);
-}
-
-void PAControllerBlending::addKey(double t, double weight)
-{
-	curve->insert(t, weight);
-}
-
-void PAControllerBlending::updateBuffer(SrBuffer<float>& buff)
-{
-	if (buffer.size() != buff.size())
-		buffer.size(buff.size());
-	buffer = buff;
-}
-
-SrBuffer<float>& PAControllerBlending::getBuffer()
-{
-	return buffer;
-}
-
-

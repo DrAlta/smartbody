@@ -1102,25 +1102,25 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				if (loopString != "loop")
 					return CMD_FAILURE;
 				std::string loop = args.read_token();
-				bool l = true;
-				if (loop == "true") l = true;
-				if (loop == "false") l = false;
+				PAStateData::WrapMode wrap = PAStateData::Loop;
+				if (loop == "true") wrap = PAStateData::Loop;
+				if (loop == "false") wrap = PAStateData::Once;
 				std::string playNowString = args.read_token();
 				if (playNowString != "playnow")
 					return CMD_FAILURE;
-				bool pn = false;
+				PAStateData::ScheduleMode schedule = PAStateData::Queued;
 				std::string playNow = args.read_token();
-				if (playNow == "true") pn = true;
-				else if (playNow == "false") pn = false;
+				if (playNow == "true") schedule = PAStateData::Now;
+				else if (playNow == "false") schedule = PAStateData::Queued;
 				else 
 					return CMD_FAILURE;
-				bool ad = false;
+				PAStateData::BlendMode blend = PAStateData::Overwrite;
 				std::string additiveString = args.read_token();
 				if (additiveString != "additive")
 					return CMD_FAILURE;
 				std::string addtive = args.read_token();
-				if (addtive == "true") ad = true;
-				else if (addtive == "false") ad = false;
+				if (addtive == "true") blend = PAStateData::Overwrite;
+				else if (addtive == "false") blend = PAStateData::Additive;
 				else
 					return CMD_FAILURE;
 				std::string jointString = args.read_token();
@@ -1139,43 +1139,12 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				}
 				if (numWeights < state->getNumMotions())
 				{
-					weights.resize(state->getNumMotions());
-					SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(state);
-					if (state0D)
-					{
-						if (state->getNumMotions() > 0)
-							weights[0] = 1.0f;
-					}
-					else
-					{
-						SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(state);
-						if (state1D)
-						{
-							state->getWeightsFromParameters(0, weights);
-						}
-						else
-						{
-							SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(state);
-							if (state2D)
-							{
-								state->getWeightsFromParameters(0, 0, weights);
-							}
-							else
-							{
-								SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(state);
-								if (state3D)
-								{
-									state->getWeightsFromParameters(0, 0, 0, weights);
-								}
-								else
-								{
-									LOG("Unknown state type. What is this?");
-								}
-							}
-						}
-					}
+					character->param_animation_ct->schedule(state, 0, 0, 0, wrap, schedule, blend, joint);
 				}
-				character->param_animation_ct->schedule(state, weights, l, pn, ad, joint);
+				else
+				{
+					character->param_animation_ct->schedule(state, weights, wrap, schedule, blend, joint);
+				}
 			}
 
 			if (operation == "unschedule")
