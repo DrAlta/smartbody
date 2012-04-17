@@ -206,6 +206,9 @@ XMLCh* BMLDefs::ATTR_AIM_OFFSET = NULL;
 XMLCh* BMLDefs::ATTR_ANIM1 = NULL;
 XMLCh* BMLDefs::ATTR_ANIM2 = NULL;
 XMLCh* BMLDefs::ATTR_LOOP = NULL;
+XMLCh* BMLDefs::ATTR_WRAPMODE = NULL;
+XMLCh* BMLDefs::ATTR_SCHEDULEMODE = NULL;
+XMLCh* BMLDefs::ATTR_BLENDMODE = NULL;
 
 ////// XML ATTRIBUTES
 XMLCh* BMLDefs::ATTR_VALUE = NULL;
@@ -529,6 +532,9 @@ BMLDefs::BMLDefs()
 	ATTR_ANIM1  = XMLString::transcode("anim1");
 	ATTR_ANIM2  = XMLString::transcode("anim2");
 	ATTR_LOOP  = XMLString::transcode("loop");
+	ATTR_WRAPMODE = XMLString::transcode("sbm:wrap-mode");
+	ATTR_BLENDMODE = XMLString::transcode("sbm:blend-mode");
+	ATTR_SCHEDULEMODE = XMLString::transcode("sbm:schedule-mode");
 
 	////// XML ATTRIBUTES
 	ATTR_VALUE   = XMLString::transcode("value");
