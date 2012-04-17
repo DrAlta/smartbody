@@ -212,6 +212,9 @@ class BMLDefs
 		static XMLCh* ATTR_ANIM1;
 		static XMLCh* ATTR_ANIM2;
 		static XMLCh* ATTR_LOOP;
+		static XMLCh* ATTR_WRAPMODE;
+		static XMLCh* ATTR_BLENDMODE;
+		static XMLCh* ATTR_SCHEDULEMODE;
 
 		static XMLCh* ATTR_VALUE;
 
