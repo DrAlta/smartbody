@@ -1175,6 +1175,7 @@ boost::python::class_<SBReach>("SBReach")
 
 	boost::python::class_<SrQuat>("SrQuat")
 		.def(boost::python::init<>())
+		.def(boost::python::init<float, float, float, float>())
 		.def("getData", &SrQuat::getData, "gets the data in the quaterion at location indicated by the index w,x,y,z")
 		.def("setData", &SrQuat::setData, "sets the data in the quaterion at location indicated by the index w,x,y,z")
 		;
