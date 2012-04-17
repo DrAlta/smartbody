@@ -474,7 +474,13 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 
 	SrBuffer<float> buffer;
 	buffer.size(buff.size());
-	if (indices.size() == 1)
+
+	if (indices.size() == 0 && stateData->getStateName() == PseudoIdleState)
+	{
+		handleBaseMatForBuffer(buff);
+		return;
+	}
+	else if (indices.size() == 1)
 	{
 		buffer = buff;
 		int id = indices[0];
@@ -655,7 +661,7 @@ PAWoManager::~PAWoManager()
 void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDiffs, SrBuffer<float>& buffer)
 {
 	std::vector<SrMat> currentBaseMats;
-	getBaseMats(currentBaseMats, times, timeDiffs, buffer.size());
+	getBaseMats(currentBaseMats, times, timeDiffs, buffer.size(), buffer);
 	if (!firstTime)
 	{
 		std::vector<int> indices;
@@ -663,7 +669,12 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 			if (stateData->weights[i] != 0.0)
 				indices.push_back(i);
 
-		if (indices.size() == 1)
+		if (indices.size() == 0 && stateData->state->stateName == PseudoIdleState)
+		{
+			//baseTransformMat = currentBaseMats[0] * baseMats[0].inverse();
+			currentBaseTransformMat = currentBaseMats[0];
+		}
+		else if (indices.size() == 1)
 		{
 			int id = indices[0];
 			if (timeDiffs[id] > 0)
@@ -745,13 +756,28 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 #endif
 	}
 	else
+	{
+		firstBaseTransformMat = currentBaseMats[0];
+		currentBaseTransformMat = currentBaseMats[0];
 		firstTime = false;
+	}
 	baseMats = currentBaseMats;
 }
 
 SrMat& PAWoManager::getBaseTransformMat()
 {
 	return baseTransformMat;
+}
+
+
+SrMat& PAWoManager::getFirstBaseTransformMat()
+{
+	return firstBaseTransformMat;
+}
+
+SrMat& PAWoManager::getCurrentBaseTransformMat()
+{
+	return currentBaseTransformMat;
 }
 
 void PAWoManager::matInterp(SrMat& ret, SrMat& mat1, SrMat& mat2, float w)
@@ -769,7 +795,7 @@ void PAWoManager::matInterp(SrMat& ret, SrMat& mat1, SrMat& mat2, float w)
 	ret.set(14, posZ);
 }
 
-void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& times, std::vector<double>& timeDiffs, int bufferSize)
+void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& times, std::vector<double>& timeDiffs, int bufferSize, SrBuffer<float>& inBuff)
 {
 	if (!intializeTransition)
 	{
@@ -794,7 +820,15 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 	SrBuffer<float> buffer;
 	buffer.size(bufferSize);
 	int numMotions = getNumMotions();
-	if (numMotions == times.size())
+	if ( getNumMotions() == 0 && stateData->state->stateName == PseudoIdleState)
+	{
+		SrMat baseMat;			
+		baseMat = getBaseMatFromBuffer(inBuff);
+		mats.push_back(SrMat());
+		SrMat& updateBaseMat = mats[mats.size() - 1];
+		getUpdateMat(updateBaseMat, baseMat);		
+	}	
+	else if (numMotions == times.size())
 	{
 		for (int i = 0; i < getNumMotions(); i++)
 		{
@@ -869,27 +903,56 @@ PAStateData::~PAStateData()
 	woManager = NULL;
 }
 
+void PAStateData::evaluateTransition( double timeStep, SrBuffer<float>& buffer, bool tranIn )
+{
+	if (state && getStateName() == PseudoIdleState) // transition 
+	{
+		SrBuffer<float> buffCopy = buffer;		
+		if (tranIn) // PseudoIdle ----> Animation State
+		{
+			interpolator->blending(timeManager->motionTimes, buffer); // remove (x,z) & ry from buffer
+			woManager->apply(timeManager->motionTimes,timeManager->timeDiffs, buffCopy); // add (x,z) & ry to world offset
+			active = true;
+		}
+		else // Animation State ----> PseudoIdle		
+		{				
+			woManager->apply(timeManager->motionTimes,timeManager->timeDiffs,buffCopy); // add (x,z) & ry to world offset
+			active = true;
+		}
+	}
+	else // if not Pseudo Idle, just proceed as usual
+	{
+		evaluate(timeStep,buffer);
+	}
+}
+
 void PAStateData::evaluate(double timeStep, SrBuffer<float>& buffer)
 {
 	if (state && state->stateName == "PseudoIdle")
 	{
 		if (!active)
-			active = true;
+			active = true;		
 		return;
 	}
 
 	bool notReachCycle = true;
 	notReachCycle = timeManager->step(timeStep);
+	SrBuffer<float> buffCopy = buffer;
 	if (loop || (!loop && notReachCycle))
 	{
 		interpolator->blending(timeManager->motionTimes, buffer);
 		if (interpolator->joints.size() == 0)
-			woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffer);
+			woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffCopy);
 
 		active = true;
 	}
 	else
 		active = false;
+}
+
+std::string PAStateData::getStateName()
+{
+	return state->stateName;	
 }
 
 void PAStateData::updateMotionIndices()
@@ -913,24 +976,12 @@ void PAStateData::updateMotionIndices()
 	}
 }
 
-/*
-PseudoPAStateData::PseudoPAStateData() : PAStateData(PseudoIdleState, std::vector<double>())
-{
-}
 
-PseudoPAStateData::~PseudoPAStateData()
-{
-}
-
-void PseudoPAStateData::evaluate(double timeStep, SrBuffer<float>& buffer)
-{
-	if (!active) active = true;
-}
-*/
 PATransitionManager::PATransitionManager()
 {
 	from = NULL;
 	to = NULL;
+	startTransition = false;
 	blendingMode = true;
 	active = true;
 	transition = NULL;
@@ -947,6 +998,7 @@ PATransitionManager::PATransitionManager()
 
 PATransitionManager::PATransitionManager(double easeOutStart, double dur)
 {
+	startTransition = false;
 	blendingMode = false;
 	active = true;
 	transition = NULL;
@@ -972,6 +1024,7 @@ PATransitionManager::PATransitionManager(PATransition* trans, PAStateData* f, PA
 	transition = new PATransition(trans, f->state, to->state);
 	update();
 	localTime = 0.0;
+	startTransition = false;
 	blendingMode = false;
 	active = true;
 	curve = new srLinearCurve();

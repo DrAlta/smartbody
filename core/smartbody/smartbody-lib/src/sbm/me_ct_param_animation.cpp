@@ -24,6 +24,7 @@
 #include <sbm/mcontrol_util.h>
 #include <sbm/SBAnimationState.h>
 #include <sbm/SBSkeleton.h>
+#include <sr/sr_euler.h>
 
 std::string MeCtParamAnimation::Context::CONTEXT_TYPE = "MeCtParamAnimation::Context";
 std::string MeCtParamAnimation::CONTROLLER_TYPE = "MeCtParamAnimation";
@@ -151,10 +152,81 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 				SrBuffer<float> buffer2;
 				buffer2.size(frame.buffer().size());
 				buffer2 = frame.buffer();
-				SrMat transformMat;
-				curStateData->evaluate(timeStep * transitionManager->getSlope(), buffer1);
-				nextStateData->evaluate(timeStep, buffer2);
-				transitionManager->blending(frame.buffer(), buffer1, buffer2, transformMat, curStateData->woManager->getBaseTransformMat(), nextStateData->woManager->getBaseTransformMat(), timeStep, _context);
+				SrMat transformMat;		
+
+				SrMat curBaseMat;
+				SrMat nextBaseMat;
+
+				bool pseudoTransition = (curStateData->getStateName() == PseudoIdleState || nextStateData->getStateName() == PseudoIdleState);								
+				if (pseudoTransition) // first time
+				{
+					bool transitionIn = (curStateData->getStateName() == PseudoIdleState);
+					curStateData->evaluateTransition(timeStep * transitionManager->getSlope(), buffer1, transitionIn);
+					nextStateData->evaluateTransition(timeStep, buffer2, transitionIn);
+					curBaseMat = curStateData->woManager->getBaseTransformMat();
+					nextBaseMat = nextStateData->woManager->getBaseTransformMat();
+
+					if (!transitionIn) // update base rotation & translation
+					{
+						SrMat origBase = curStateData->woManager->getBaseMatFromBuffer(buffer1);//combineMat(curStateData->woManager->getBaseMatFromBuffer(buffer1),curBaseMat);
+// 						float rx,ry,rz;
+// 						sr_euler_angles(132,origBase,rx,ry,rz);
+// 						float rnx,rny,rnz;
+// 						sr_euler_angles(132,nextStateData->woManager->getCurrentBaseTransformMat(),rnx,rny,rnz);						
+ 						
+// 						sr_euler_mat(132,newBuffBase,(rx+rnx),(ry+rny),(rz+rnz));
+// 						SrVec origTran = origBase.get_translation();
+// 						//SrMat rot = nextStateData->woManager->getFirstBaseTransformMat().get_rotation();
+// 						//rot.transpose();
+//  						SrVec newTran = origBase.get_translation() + nextStateData->woManager->getCurrentBaseTransformMat().get_translation(); 						
+// 						newBuffBase = combineMat(origBase,nextStateData->woManager->getCurrentBaseTransformMat());
+// 						newBuffBase.set_translation(newTran);
+						SrMat newBuffBase = origBase;
+						newBuffBase = origBase*nextStateData->woManager->getCurrentBaseTransformMat();
+
+						//if (!transitionManager->startTransition)
+						//	sr_out << "nextBaseTransform = " << nextStateData->woManager->getCurrentBaseTransformMat() << srnl;
+						//LOG("orig base = %f %f %f",origTran[0],origTran[1],origTran[2]);						
+						//LOG("newBase = %f %f %f",newTran[0],newTran[1],newTran[2]);
+
+						curStateData->woManager->setBufferByBaseMat(newBuffBase,buffer1);	
+						curBaseMat = SrMat();//nextBaseMat.inverse();//SrMat();//curBaseMat*nextStateData->woManager->getBaseTransformMat().inverse();
+						nextBaseMat = SrMat();//nextBaseMat.inverse();//SrMat();//nextBaseMat.inverse();
+					}
+
+					if (!transitionManager->startTransition)
+					{
+						SrVec pos;
+						if (transitionIn)
+						{
+							// update base transform mat
+							curBaseMat = curStateData->woManager->getCurrentBaseTransformMat();
+							pos = curBaseMat.get_translation();
+							//LOG("startTransistion In, curBase = %f %f %f",pos[0],pos[1],pos[2]);
+						}
+						else
+						{							
+							
+							curBaseMat = nextStateData->woManager->getCurrentBaseTransformMat().inverse();//SrMat();//nbMat.inverse();							
+							pos = curBaseMat.get_translation();
+							SrVec origPos = nextStateData->woManager->getCurrentBaseTransformMat().get_translation();
+// 							sr_out << "woUpdate nextBaseTransform = " << nextStateData->woManager->getCurrentBaseTransformMat() << srnl;
+// 							LOG("rotation = %f %f %f",rotAa[0],rotAa[1],rotAa[2]);
+// 							LOG("startTransistion Out, curBase = %f %f %f",pos[0],pos[1],pos[2]);
+// 							LOG("startTransistion Out, origBase = %f %f %f",origPos[0],origPos[1],origPos[2]);
+						}
+						transitionManager->startTransition = true;
+					}					
+				}
+				else // proceed as usual
+				{
+					curStateData->evaluate(timeStep * transitionManager->getSlope(), buffer1);
+					nextStateData->evaluate(timeStep, buffer2);
+					curBaseMat = curStateData->woManager->getBaseTransformMat();
+					nextBaseMat = nextStateData->woManager->getBaseTransformMat();
+				}			
+
+				transitionManager->blending(frame.buffer(), buffer1, buffer2, transformMat, curBaseMat, nextBaseMat, timeStep, _context);
 				updateWo(transformMat, woWriter, frame.buffer());
 
 #if debug
@@ -221,9 +293,9 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 				nextStateData = NULL;
 			}			
 		}
-	}
+	} 
 
-	if (curStateData && curStateData->state->stateName != "PseudoIdle")
+	if (curStateData && curStateData->state->stateName != PseudoIdleState)
 	{
 		if (curStateData->active)
 		{
@@ -550,22 +622,60 @@ void MeCtParamAnimation::updateWo(SrMat&mat, MeCtChannelWriter* woWriter, SrBuff
 	// apply rotation and transition matrix perspectively
 	SrQuat woQuat = SrQuat(currentWoMat);
 	SrMat currentRot;
-	woQuat.get_mat(currentRot);
-	SrMat newTranslate = translate * currentRot;
-	SrMat newWoMat =  rot * currentRot;
+	woQuat.get_mat(currentRot);		
 
+	SkJoint* baseJ = character->_skeleton->search_joint(baseJointName.c_str());
+	SrVec offset;
+	if (baseJ) offset = baseJ->offset(); offset.y = 0.f;
+	SrMat negOffset; negOffset.set_translation(-offset);
+	SrMat posOffset; posOffset.set_translation(offset);
+	//posOffset.set_translation()
+	//SrMat newWoMat =  rot * currentRot;
+	//SrMat newTranslate = translate * currentRot;	
+	//SrMat newTranslate = translate * newWoMat;	
+	SrMat nextMat = negOffset*mat*posOffset*currentWoMat;
+
+
+	SrVec newTran = nextMat.get_translation();
+// 	if (transitionManager && transitionManager->active && transitionManager->blendingMode)
+// 	{
+// 		SkJoint* cjoint = character->_skeleton->search_joint("base");
+// 		cjoint->update_gmat();
+// 		LOG("WO new translation offset = %f %f %f",newTran[0],newTran[1],newTran[2]);
+// 		SrVec base = cjoint->gmat().get_translation();
+// 		LOG("Base joint translation = %f %f %f",base[0],base[1],base[2]);
+// 	}
 	// set new wo mat back to skeleton and woWriter
-	quat = SrQuat(newWoMat);
+	SrVec bufferTran = newTran;
+	quat = SrQuat(nextMat);
 	woValue[3] = quat.w;
 	woValue[4] = quat.x;
 	woValue[5] = quat.y;
 	woValue[6] = quat.z;
-	woValue[0] = newTranslate.get(12) + currentWoMat.get(12);
-	woValue[1] = newTranslate.get(13) + currentWoMat.get(13);
-	woValue[2] = newTranslate.get(14) + currentWoMat.get(14);
+	woValue[0] = bufferTran[0];
+	woValue[1] = bufferTran[1];
+	woValue[2] = bufferTran[2];
 	gwiz::quat_t skelQ = gwiz::quat_t(woValue[3], woValue[4], woValue[5], woValue[6]);
-	gwiz::euler_t skelE = gwiz::euler_t(skelQ);
+	gwiz::euler_t skelE = gwiz::euler_t(skelQ);	
 	character->set_world_offset(woValue[0], woValue[1], woValue[2], (float)skelE.h(), (float)skelE.p(), (float)skelE.r());
+
+	JointChannelId baseChanID, baseBuffId;
+	baseChanID.x = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::XPos);
+	baseChanID.y = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::YPos);
+	baseChanID.z = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::ZPos);
+	baseChanID.q = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::Quat);
+
+	baseBuffId.x = _context->toBufferIndex(baseChanID.x);
+	baseBuffId.y = _context->toBufferIndex(baseChanID.y);
+	baseBuffId.z = _context->toBufferIndex(baseChanID.z);	
+	baseBuffId.q = _context->toBufferIndex(baseChanID.q);	
+
+	buffer[baseBuffId.x] = bufferTran[0];
+	buffer[baseBuffId.y] = bufferTran[1];
+	buffer[baseBuffId.z] = bufferTran[2];	
+	for (int k=0;k<4;k++)
+		buffer[baseBuffId.q+k] = quat.getData(k);
+
 }
 
 void MeCtParamAnimation::controllerEaseOut(double t)
@@ -583,4 +693,12 @@ void MeCtParamAnimation::controllerEaseOut(double t)
 		controllerBlending->addKey(t + toStateEnd, 0.0);
 	}
 	
+}
+
+SrMat MeCtParamAnimation::combineMat( SrMat& mat1, SrMat& mat2 )
+{
+	SrMat newMat = mat1*mat2;
+	SrVec newTranslation = mat1.get_translation() + mat2.get_translation();
+	newMat.set_translation(newTranslation);
+	return newMat;	
 }

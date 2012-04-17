@@ -3754,21 +3754,22 @@ void FltkViewer::drawLocomotion()
 			glEnable(GL_LIGHTING);
 
 			glDisable(GL_LIGHTING);
+			float scale = (float)1.0/SmartBody::SBScene::getScene()->getScale(); // if it's in meter
 			if (character->steeringAgent)
 			{
 				SteeringAgent* agent = character->steeringAgent;
 
 				SrVec color1(0.1f, 0.3f, 1.0f);
-				SrVec steerDir = agent->curSteerPos + agent->curSteerDir * 50;
-				drawArrow(agent->curSteerPos, steerDir, 15, color1);
+				SrVec steerDir = agent->curSteerPos + agent->curSteerDir * 0.5*scale;
+				drawArrow(agent->curSteerPos, steerDir, 0.15*scale, color1);
 
 				SrVec color2(0.f,1.f,0.f);
-				drawCircle(agent->nextSteerPos.x,agent->nextSteerPos.y,agent->nextSteerPos.z, 30, 72, color2);
-				SrVec nextSteerPos = agent->nextSteerPos + agent->nextSteerDir * 50;
-				drawArrow(agent->nextSteerPos, nextSteerPos, 15, color2);
+				drawCircle(agent->nextSteerPos.x,agent->nextSteerPos.y,agent->nextSteerPos.z, 0.3*scale, 72, color2);
+				SrVec nextSteerPos = agent->nextSteerPos + agent->nextSteerDir * 0.5*scale;
+				drawArrow(agent->nextSteerPos, nextSteerPos, 0.15*scale, color2);
 
 				SrVec color3(1.f,0.f,0.f);
-				drawCircle(agent->nextPtOnPath.x, agent->nextPtOnPath.y, agent->nextPtOnPath.z, 30, 72, color3);											
+				drawCircle(agent->nextPtOnPath.x, agent->nextPtOnPath.y, agent->nextPtOnPath.z, 0.3*scale, 72, color3);											
 			}
 			glEnable(GL_LIGHTING);
 		}

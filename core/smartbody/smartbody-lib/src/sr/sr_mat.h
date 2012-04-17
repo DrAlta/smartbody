@@ -182,7 +182,8 @@ class SrMat
     /*! Makes SrMat be a translation transformation, that can be applied to a vector x as xM. */
     void translation ( const SrVec &v ) { translation(v.x,v.y,v.z); }
 
-	SrVec get_translation() const { return SrVec(e[12],e[13],e[14]); } 
+	SrVec get_translation() const { return SrVec(e[12],e[13],e[14]); }
+	void  set_translation(const SrVec& v) { set(12,v[0]); set(13,v[1]); set(14,v[2]); }
 	SrMat get_rotation() const;
 	void get_double(double mat[16]) { for (int i=0;i<16;i++) mat[i] = e[i]; }
 

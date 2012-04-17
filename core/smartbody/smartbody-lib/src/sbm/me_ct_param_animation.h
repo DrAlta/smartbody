@@ -102,6 +102,7 @@ class MeCtParamAnimation : public MeCtContainer
 		void reset();
 		void updateWo(SrMat&mat, MeCtChannelWriter* wo, SrBuffer<float>& buffer);
 		void controllerEaseOut(double t);
+		SrMat combineMat(SrMat& mat1, SrMat& mat2);
 
 	private:
 
