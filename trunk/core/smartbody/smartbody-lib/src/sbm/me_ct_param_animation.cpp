@@ -320,14 +320,33 @@ void MeCtParamAnimation::schedule(PAState* stateData, const std::vector<double>&
 	{
 		animState->validateState(); // to make sure the animaion state is valid before schedule it
 	}
+
+	// schedule
 	unit.weights = weights;
 	unit.data = stateData;
 	unit.wrap = wrap;
 	unit.schedule = schedule;
 	unit.blend = blend;
 	unit.partialJoint = jName;
-
 	unit.time = mcuCBHandle::singleton().time + timeOffset;
+
+	// make sure the weights are valid for non-pseudoidle state
+	if (unit.weights.size() == 0 && unit.data != NULL)
+	{
+		if (unit.data->stateName != PseudoIdle)
+		{
+			LOG("MeCtParamAnimation::schedule Warning: state %s has no weights assigned.", unit.data->stateName.c_str());
+			unit.weights.resize(unit.data->getNumMotions());
+			for (int i = 0; i < unit.data->getNumMotions(); i++)
+			{
+				if (i == 0)
+					unit.weights[i] = 1.0;
+				else
+					unit.weights[i] = 0.0;
+			}
+		}
+	}
+
 	waitingList.push_back(unit);
 }
 
