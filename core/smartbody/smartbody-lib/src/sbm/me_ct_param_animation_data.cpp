@@ -928,6 +928,8 @@ int PAState::getMaxVecY()
 
 SrVec PAState::getVec(const std::string& motion)
 {
+	if (motions.size() < (size_t) getNumParameters())
+		return SrVec();
 	for (int i = 0; i < getNumParameters(); i++)
 	{
 		if (motions[i]->getName() == motion)
