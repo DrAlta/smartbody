@@ -30,6 +30,7 @@ public:
    void SetCameraType(CameraControlType type) { m_CameraType = type; }
    void SetRightHanded(bool val) { m_Scale.setZ(val ? 1 : -1); }
    void SetLookAtOffset(double offset) { m_LookAtOffset = offset; }
+   void SetMouseRotation(bool tf) { m_MouseRotation = tf; }
    QVector3D GetPosition() { return QVector3D(m_CameraTransformation.column(3)); }
 
    void SetPosition(const QVector3D& pos) { m_CameraTransformation.setColumn(3, QVector4D(pos, 1.0f)); }
@@ -42,6 +43,7 @@ public:
    double GetMovementSpeed() { return m_MovementSpeed; }
    double GetRotationSpeed() { return m_RotationSpeed; }
    double CoordConverter() { return -1; }
+   bool GetMouseRotation() { return m_MouseRotation; } 
 
    void LookAt(const QVector3D& pos);
    void MoveLookAt(const QVector3D lookAtPos);
@@ -56,6 +58,7 @@ private:
    double m_RotationSpeed;
    double m_LookAtOffset;
    double m_RotX, m_RotY, m_RotZ;
+   bool m_MouseRotation;
 };
 
 #endif

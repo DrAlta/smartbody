@@ -110,6 +110,7 @@ void FaceDialog::CharacterSelectionChanged(const QString& selection)
       delete m_scrollListChildren[i];
    }
    m_scrollListChildren.clear(); 
+   m_Sliders.clear();
 }
 
 void FaceDialog::SliderValueChanged(int val)

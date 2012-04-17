@@ -11,8 +11,9 @@ Camera::Camera() :
    m_RotZ(0),
    m_CameraType(Follow_Renderer),
    m_MovementSpeed(5),
-   m_RotationSpeed(0.05f),
-   m_LookAtOffset(100)
+   m_RotationSpeed(0.2f),
+   m_LookAtOffset(100),
+   m_MouseRotation(false)
 {
    m_CameraTransformation.setToIdentity();
    m_CameraTransformation.translate(0, 0.2f, 3);

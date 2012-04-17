@@ -219,7 +219,7 @@ void SbmDebuggerForm::Disconnect()
    ui.sceneTree->clear();
    ui.sceneTree->insertTopLevelItem(Characters, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Characters"))));
    ui.sceneTree->insertTopLevelItem(Pawns, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Pawns"))));
-   
+   m_pSelectedSceneJointItem = NULL;
    c.Disconnect();
 }
 
