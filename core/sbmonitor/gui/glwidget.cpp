@@ -34,6 +34,7 @@ GLWidget::GLWidget(Scene* scene, QWidget *parent)
 
     qtPurple = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
 
+    setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
 
     timer.start(10, this);
@@ -641,10 +642,11 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     int dx = event->x() - lastPos.x();
     int dy = event->y() - lastPos.y();
 
-    if (event->buttons() & Qt::LeftButton) 
+    if (m_Camera.GetMouseRotation())
     {
-       m_Camera.Rotate(QVector3D(m_Camera.GetRotationSpeed() * dy, m_Camera.GetRotationSpeed() * dx, 0));
-    } 
+      m_Camera.Rotate(QVector3D(m_Camera.GetRotationSpeed() * dy, m_Camera.GetRotationSpeed() * dx, 0));
+    }
+
     lastPos = event->pos();
 }
 
@@ -683,6 +685,12 @@ void GLWidget::keyPressEvent(QKeyEvent *key)
    {
       Vector3 jointPos = m_SelData.m_pJoint->GetWorldPosition();
       m_Camera.MoveLookAt(QVector3D(jointPos.x, jointPos.y, jointPos.z));
+   }
+
+   if (key->key() == Qt::Key_J)
+   {
+      // toggle mouse look
+      m_Camera.SetMouseRotation(!m_Camera.GetMouseRotation());
    }
 
    updateGL();
