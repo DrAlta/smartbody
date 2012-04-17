@@ -32,11 +32,11 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	std::string yString = xml_parse_string(BMLDefs::ATTR_Y, elem);
 	std::string zString = xml_parse_string(BMLDefs::ATTR_Z, elem);
 	PAState* state = mcu->lookUpPAState(stateName);
-   if (!state)
-   {
-      LOG("parse_bml_states ERROR: Can't find state name %s", stateName.c_str());
-      return BehaviorRequestPtr();
-   }
+	if (!state)
+	{
+		LOG("parse_bml_states ERROR: Can't find state name %s", stateName.c_str());
+		return BehaviorRequestPtr();
+	}
 	std::vector<double> weights;
 	weights.resize(state->getNumMotions());
 

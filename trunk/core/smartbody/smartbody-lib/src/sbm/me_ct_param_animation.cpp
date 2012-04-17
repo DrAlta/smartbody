@@ -47,7 +47,6 @@ MeCtParamAnimation::MeCtParamAnimation(SbmCharacter* c, MeCtChannelWriter* wo) :
 	curStateData = NULL;
 	nextStateData = NULL;
 	transitionManager = NULL;
-	controllerBlending = new PAControllerBlending();
 	waitingList.clear();
 	prevGlobalTime = mcuCBHandle::singleton().time;
 }
@@ -75,34 +74,36 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 {	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.mark("locomotion",0,"controller_evaluate");
+
 	double timeStep = t - prevGlobalTime;
 	prevGlobalTime = t;
+
+	// auto scheduling
 	autoScheduling(t);
-	if (controllerBlending)
-		controllerBlending->updateBuffer(frame.buffer());
-	//--make sure there is always a pseudo idle state running in the system
+	
+	// make sure there is always a pseudo idle state running in the system
 	if ((!curStateData && !nextStateData) ||
 		!curStateData)
 	{
 		std::vector<double> weights;
-		schedule(NULL, weights, true, true);
+		schedule(NULL, weights);
 		mcu.mark("locomotion");
 		return true;
-	}
-		
+	}	
 	if (curStateData)
 	{
 		if (curStateData->state &&
 			curStateData->state->stateName != PseudoIdleState && 
-			nextStateData == NULL && !curStateData->loop)
+			nextStateData == NULL && (curStateData->wrapMode == PAStateData::Once))
 		{
 			std::vector<double> weights;
-			schedule(NULL, weights, true);
+			schedule(NULL, weights);
 		}
 			
 	}
 	//------
 
+	// dealing with transition
 	if (transitionManager)
 	{
 		if (curStateData == NULL || nextStateData == NULL)
@@ -120,11 +121,11 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 			else 
 				errorInfo += "next state: null ";
 			LOG("%s", errorInfo.c_str());
+
 			if (curStateData == NULL && nextStateData != NULL)
 			{
 				if (nextStateData->state)
 					LOG("would start state %s now", nextStateData->state->stateName.c_str());
-				// should not delete, just swap the pointers
 				curStateData = nextStateData;
 				curStateData->active = true;
 				nextStateData = NULL;
@@ -225,62 +226,8 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 					curBaseMat = curStateData->woManager->getBaseTransformMat();
 					nextBaseMat = nextStateData->woManager->getBaseTransformMat();
 				}			
-
 				transitionManager->blending(frame.buffer(), buffer1, buffer2, transformMat, curBaseMat, nextBaseMat, timeStep, _context);
 				updateWo(transformMat, woWriter, frame.buffer());
-
-#if debug
-				std::cout << "current state " << curStateData->data->stateName << " " << curStateData->timeManager->localTime << std::endl;
-				std::cout << "next state " << nextStateData->data->stateName << " " << nextStateData->timeManager->localTime << std::endl;
-
-				// creating two extra characters just to check out the blending
-				std::string name1 = std::string(character->getName()) + "1";
-				SbmCharacter* c1 = mcu.getCharacter(name1);
-				if (!c1)
-				{
-					std::string command = "char " + name1 + " init common.sk";
-					mcu.execute((char *)command.c_str());
-					std::string command1 = "char " + name1 + " mesh brad";
-					mcu.execute((char *)command1.c_str());
-				}
-				std::string name2 = std::string(character->getName()) + "2";
-				SbmCharacter* c2 = mcu.getCharacter(name2);
-				if (!c2)
-				{
-					std::string command = "char " + name2 + " init common.sk";
-					mcu.execute((char *)command.c_str());
-					std::string command1 = "char " + name2 + " mesh brad";
-					mcu.execute((char *)command1.c_str());
-				}
-				if (c1 && c2)
-				{
-					// world offset translation
-					int woPosChanId = _context->channels().search("world_offset", SkChannel::XPos);
-					int woPosBufferId = _context->toBufferIndex(woPosChanId);
-
-					std::stringstream command1;
-					command1 << "set character " << c1->getName() << " world_offset x " << woWriter->get_data()[0] + 100 << " y " << woWriter->get_data()[1] << " z " << woWriter->get_data()[2];
-					std::stringstream command2;
-					command2 << "set character " << c2->getName() << " world_offset x " << woWriter->get_data()[0] + 200 << " y " << woWriter->get_data()[1] << " z " << woWriter->get_data()[2];
-					mcu.execute((char *)command1.str().c_str());
-					mcu.execute((char *)command2.str().c_str());				
-
-					// other joints
-					for (int i = 0; i < (int)character->getSkeleton()->joints().size(); i++)
-					{
-						int chanId = _context->channels().search(character->getSkeleton()->joints()[i]->name(), SkChannel::Quat);
-						int bufferId = _context->toBufferIndex(chanId);
-						std::stringstream command1;
-						command1 << "receiver skeleton " << c1->getName() << " other rotation " << character->getSkeleton()->joints()[i]->name() << " " 
-								 << buffer1[bufferId + 0] << " " << buffer1[bufferId + 1] << " " << buffer1[bufferId + 2] << " " << buffer1[bufferId + 3];
-						std::stringstream command2;
-						command2 << "receiver skeleton " << c2->getName() << " other rotation " << character->getSkeleton()->joints()[i]->name() << " " 
-								 << buffer2[bufferId + 0] << " " << buffer2[bufferId + 1] << " " << buffer2[bufferId + 2] << " " << buffer2[bufferId + 3];
-						mcu.execute((char *)command1.str().c_str());
-						mcu.execute((char *)command2.str().c_str());
-					}
-				}
-#endif
 				mcu.mark("locomotion");
 				return true;
 			}
@@ -295,16 +242,14 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 		}
 	} 
 
+	// if there's only one state, update current state
 	if (curStateData && curStateData->state->stateName != PseudoIdleState)
 	{
 		if (curStateData->active)
 		{
-//			if (curStateData->data->stateName != PseudoIdleState)
-//				std::cout << "current state " << curStateData->data->stateName << " " << curStateData->timeManager->localTime << std::endl;
 			curStateData->evaluate(timeStep, frame.buffer());
 			updateWo(curStateData->woManager->getBaseTransformMat(), woWriter, frame.buffer());
-			if (controllerBlending)
-				if (controllerBlending->getKey(t) > 0.0)					PATransitionManager::bufferBlending(frame.buffer(), controllerBlending->getBuffer(), frame.buffer(), controllerBlending->getKey(t), _context);			return true;
+			return true;
 		}
 		else
 		{
@@ -326,24 +271,48 @@ const std::string& MeCtParamAnimation::getBaseJointName()
 	return baseJointName;
 }
 
-void MeCtParamAnimation::dumpScheduling()
+void MeCtParamAnimation::schedule(PAState* state, double x, double y, double z, PAStateData::WrapMode wrap, PAStateData::ScheduleMode schedule, PAStateData::BlendMode blend, std::string jName, double timeOffset)
 {
-	if (curStateData)
-		LOG("Current State: %s", curStateData->state->stateName.c_str());
-	if (nextStateData)
-		LOG("Next State: %s", nextStateData->state->stateName.c_str());
-	LOG("Number of states to be scheduled: %d", waitingList.size());
-	std::list<ScheduleUnit>::iterator iter = waitingList.begin();
-	for (; iter != waitingList.end(); iter++)
+	std::vector<double> weights;
+	weights.resize(state->getNumMotions());
+	SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(state);
+	if (state0D)
 	{
-		if (iter->data)
-			LOG("* %s", iter->data->stateName.c_str());
-		else
-			LOG("* Idle State");
+		if (state->getNumMotions() > 0)
+			weights[0] = 1.0f;
 	}
+	else
+	{
+		SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(state);
+		if (state1D)
+		{
+			state->getWeightsFromParameters(x, weights);
+		}
+		else
+		{
+			SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(state);
+			if (state2D)
+			{
+				state->getWeightsFromParameters(x, y, weights);
+			}
+			else
+			{
+				SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(state);
+				if (state3D)
+				{
+					state->getWeightsFromParameters(x, y, z, weights);
+				}
+				else
+				{
+					LOG("Unknown state type. What is this?");
+				}
+			}
+		}
+	}
+	this->schedule(state, weights, wrap, schedule, blend, jName, timeOffset);
 }
 
-void MeCtParamAnimation::schedule(PAState* stateData, const std::vector<double>& weights, bool l, bool pn, bool a, std::string name)
+void MeCtParamAnimation::schedule(PAState* stateData, const std::vector<double>& weights, PAStateData::WrapMode wrap, PAStateData::ScheduleMode schedule, PAStateData::BlendMode blend, std::string jName, double timeOffset)
 {
 	ScheduleUnit unit;
 	SmartBody::SBAnimationState* animState = dynamic_cast<SmartBody::SBAnimationState*>(stateData);
@@ -353,11 +322,12 @@ void MeCtParamAnimation::schedule(PAState* stateData, const std::vector<double>&
 	}
 	unit.weights = weights;
 	unit.data = stateData;
-	unit.loop = l;
-	unit.playNow = pn;
-	unit.time = mcuCBHandle::singleton().time;
-	unit.additive = a;
-	unit.partialJoint = name;
+	unit.wrap = wrap;
+	unit.schedule = schedule;
+	unit.blend = blend;
+	unit.partialJoint = jName;
+
+	unit.time = mcuCBHandle::singleton().time + timeOffset;
 	waitingList.push_back(unit);
 }
 
@@ -485,15 +455,7 @@ void MeCtParamAnimation::autoScheduling(double time)
 			return;
 		}
 		curStateData->active = true;
-#if PrintPADebugInfo
-		LOG("State %s being scheduled.[ACTIVE]", curStateData->data->stateName.c_str());
-#endif
 		waitingList.pop_front();
-		if (controllerBlending)
-		{
-			controllerBlending->addKey(time, 1.0);			
-			controllerBlending->addKey(time + defaultTransition, 0.0);		
-		}	
 	}
 	else
 	{
@@ -506,11 +468,11 @@ void MeCtParamAnimation::autoScheduling(double time)
 		nextStateData->active = false;
 		if (!data)
 		{
-			if (curStateData->state->stateName == "PseudoIdle")
+			if (curStateData->state->stateName == PseudoIdleState)
 				transitionManager = new PATransitionManager();
 			else
 			{
-				if (nextStateData->playNow)
+				if (nextStateData->scheduleMode == PAStateData::Now)
 					transitionManager = new PATransitionManager();
 				else
 				{
@@ -519,20 +481,13 @@ void MeCtParamAnimation::autoScheduling(double time)
 					if (curStateData->timeManager->localTime >= (curStateData->timeManager->getDuration() - defaultTransition))
 						actualTransitionTime = curStateData->timeManager->getDuration() - curStateData->timeManager->localTime;
 					transitionManager = new PATransitionManager(curStateData->timeManager->getDuration() - actualTransitionTime, actualTransitionTime);	
-//					transitionManager = new PATransitionManager(curStateData->timeManager->getDuration() - defaultTransition);					
 				}
 			}
-#if PrintPADebugInfo
-		LOG("State %s being scheduled.[ACTIVE]", curStateData->data->stateName.c_str());
-#endif
 		}
 		else
 		{
 			transitionManager = new PATransitionManager(data, curStateData, nextStateData);
 			nextStateData->timeManager->updateLocalTimes(transitionManager->s2);
-#if PrintPADebugInfo
-		LOG("State %s being scheduled.[NOT ACTIVE]", nextStateData->data->stateName.c_str());
-#endif
 		}
 		waitingList.pop_front();
 	}
@@ -543,8 +498,7 @@ PAStateData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	PAStateData* module = NULL;
 	if (su.data)
 	{
-		module = new PAStateData(su.data,  su.weights, su.loop, su.playNow);
-		module->interpolator->setAdditiveMode(su.additive);
+		module = new PAStateData(su.data, su.weights, su.blend, su.wrap, su.schedule);
 		std::vector<std::string> joints;
 		SkJoint* j = character->getSkeleton()->search_joint(su.partialJoint.c_str());
 		if (j)
@@ -561,8 +515,7 @@ PAStateData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	}
 	else
 	{
-		module = new PAStateData("PseudoIdle",  su.weights, su.loop, su.playNow);
-		module->playNow = su.playNow;
+		module = new PAStateData(PseudoIdleState, su.weights);
 	}
 	if (_context)
 	{
@@ -575,7 +528,6 @@ PAStateData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 		module->woManager->setMotionContextMaps(_context);
 		module->woManager->initChanId(_context, baseJointName);
 		SrQuat preRot = character->getSkeleton()->search_joint(baseJointName.c_str())->quat()->prerot();
-		//LOG("prerot axis = %f %f %f, angle = %f",preRot.axis()[0],preRot.axis()[1],preRot.axis()[2], preRot.angle());
 		module->woManager->initPreRotation(preRot);
 	}
 	else
@@ -592,11 +544,10 @@ void MeCtParamAnimation::reset()
 		delete nextStateData;
 	nextStateData = NULL;
 	transitionManager = NULL;
-	waitingList.clear();	
-	delete controllerBlending;
-	controllerBlending = NULL;}
+	waitingList.clear();
+}
 
-void MeCtParamAnimation::updateWo(SrMat&mat, MeCtChannelWriter* woWriter, SrBuffer<float>& buffer)
+void MeCtParamAnimation::updateWo(SrMat& mat, MeCtChannelWriter* woWriter, SrBuffer<float>& buffer)
 {
 	// get current woMat
 	SrBuffer<float>& woValue = woWriter->get_data();
@@ -629,22 +580,12 @@ void MeCtParamAnimation::updateWo(SrMat&mat, MeCtChannelWriter* woWriter, SrBuff
 	if (baseJ) offset = baseJ->offset(); offset.y = 0.f;
 	SrMat negOffset; negOffset.set_translation(-offset);
 	SrMat posOffset; posOffset.set_translation(offset);
-	//posOffset.set_translation()
 	//SrMat newWoMat =  rot * currentRot;
 	//SrMat newTranslate = translate * currentRot;	
 	//SrMat newTranslate = translate * newWoMat;	
-	SrMat nextMat = negOffset*mat*posOffset*currentWoMat;
-
-
+	SrMat nextMat = negOffset * mat * posOffset * currentWoMat;
 	SrVec newTran = nextMat.get_translation();
-// 	if (transitionManager && transitionManager->active && transitionManager->blendingMode)
-// 	{
-// 		SkJoint* cjoint = character->_skeleton->search_joint("base");
-// 		cjoint->update_gmat();
-// 		LOG("WO new translation offset = %f %f %f",newTran[0],newTran[1],newTran[2]);
-// 		SrVec base = cjoint->gmat().get_translation();
-// 		LOG("Base joint translation = %f %f %f",base[0],base[1],base[2]);
-// 	}
+
 	// set new wo mat back to skeleton and woWriter
 	SrVec bufferTran = newTran;
 	quat = SrQuat(nextMat);
@@ -673,27 +614,10 @@ void MeCtParamAnimation::updateWo(SrMat&mat, MeCtChannelWriter* woWriter, SrBuff
 	buffer[baseBuffId.x] = bufferTran[0];
 	buffer[baseBuffId.y] = bufferTran[1];
 	buffer[baseBuffId.z] = bufferTran[2];	
-	for (int k=0;k<4;k++)
-		buffer[baseBuffId.q+k] = quat.getData(k);
-
+	for (int k = 0; k < 4; k++)
+		buffer[baseBuffId.q + k] = quat.getData(k);
 }
 
-void MeCtParamAnimation::controllerEaseOut(double t)
-{
-	if (curStateData->state->cycle)
-		return;
-
-	if (controllerBlending->getKey(t) > 0.0)
-		return;
-
-	double toStateEnd = curStateData->timeManager->getDuration() - curStateData->timeManager->localTime;
-	if (toStateEnd < defaultTransition)
-	{
-		controllerBlending->addKey(t, 1.0);
-		controllerBlending->addKey(t + toStateEnd, 0.0);
-	}
-	
-}
 
 SrMat MeCtParamAnimation::combineMat( SrMat& mat1, SrMat& mat2 )
 {

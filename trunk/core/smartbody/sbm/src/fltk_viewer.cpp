@@ -3760,16 +3760,16 @@ void FltkViewer::drawLocomotion()
 				SteeringAgent* agent = character->steeringAgent;
 
 				SrVec color1(0.1f, 0.3f, 1.0f);
-				SrVec steerDir = agent->curSteerPos + agent->curSteerDir * 0.5*scale;
-				drawArrow(agent->curSteerPos, steerDir, 0.15*scale, color1);
+				SrVec steerDir = agent->curSteerPos + agent->curSteerDir * 0.5f*scale;
+				drawArrow(agent->curSteerPos, steerDir, 0.15f*scale, color1);
 
 				SrVec color2(0.f,1.f,0.f);
-				drawCircle(agent->nextSteerPos.x,agent->nextSteerPos.y,agent->nextSteerPos.z, 0.3*scale, 72, color2);
+				drawCircle(agent->nextSteerPos.x,agent->nextSteerPos.y,agent->nextSteerPos.z, 0.3f*scale, 72, color2);
 				SrVec nextSteerPos = agent->nextSteerPos + agent->nextSteerDir * 0.5*scale;
-				drawArrow(agent->nextSteerPos, nextSteerPos, 0.15*scale, color2);
+				drawArrow(agent->nextSteerPos, nextSteerPos, 0.15f*scale, color2);
 
 				SrVec color3(1.f,0.f,0.f);
-				drawCircle(agent->nextPtOnPath.x, agent->nextPtOnPath.y, agent->nextPtOnPath.z, 0.3*scale, 72, color3);											
+				drawCircle(agent->nextPtOnPath.x, agent->nextPtOnPath.y, agent->nextPtOnPath.z, 0.3f*scale, 72, color3);											
 			}
 			glEnable(GL_LIGHTING);
 		}

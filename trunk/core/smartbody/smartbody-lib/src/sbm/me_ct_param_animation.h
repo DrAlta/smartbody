@@ -40,11 +40,13 @@ struct ScheduleUnit
 	PAState* data;
 	std::vector<double> weights;
 	double time;
-	bool loop;
-	bool playNow;
-	bool additive;
+	PAStateData::WrapMode wrap;
+	PAStateData::ScheduleMode schedule;
+	PAStateData::BlendMode blend;
 	std::string partialJoint;
 };
+
+
 /*
 	MeCtParamAnimation's task:	schedule in states
 								controller the transitions between states
@@ -82,8 +84,8 @@ class MeCtParamAnimation : public MeCtContainer
 		void setBaseJointName(const std::string& name);
 		const std::string& getBaseJointName();
 		
-		void dumpScheduling();
-		void schedule(PAState* state, const std::vector<double>& weights, bool l, bool pn = false, bool additive = false, std::string jName = "");
+		void schedule(PAState* state, double x, double y, double z, PAStateData::WrapMode wrap = PAStateData::Loop, PAStateData::ScheduleMode schedule = PAStateData::Queued, PAStateData::BlendMode blend = PAStateData::Overwrite, std::string jName = "", double timeOffset = 0.0);
+		void schedule(PAState* state, const std::vector<double>& weights, PAStateData::WrapMode wrap = PAStateData::Loop, PAStateData::ScheduleMode schedule = PAStateData::Queued, PAStateData::BlendMode blend = PAStateData::Overwrite, std::string jName = "", double timeOffset = 0.0);
 		void unschedule();
 		void updateWeights(std::vector<double>& w);
 		void updateWeights();
@@ -100,8 +102,7 @@ class MeCtParamAnimation : public MeCtContainer
 		void autoScheduling(double time);
 		PAStateData* createStateModule(ScheduleUnit su);
 		void reset();
-		void updateWo(SrMat&mat, MeCtChannelWriter* wo, SrBuffer<float>& buffer);
-		void controllerEaseOut(double t);
+		void updateWo(SrMat& mat, MeCtChannelWriter* wo, SrBuffer<float>& buffer);
 		SrMat combineMat(SrMat& mat1, SrMat& mat2);
 
 	private:
@@ -111,7 +112,6 @@ class MeCtParamAnimation : public MeCtContainer
 		std::string baseJointName;
 		MeCtChannelWriter* woWriter;
 		PATransitionManager* transitionManager;
-		PAControllerBlending* controllerBlending;
 		double			prevGlobalTime;
 
 		PAStateData*	curStateData;
