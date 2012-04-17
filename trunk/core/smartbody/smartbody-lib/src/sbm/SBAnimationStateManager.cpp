@@ -156,9 +156,9 @@ SrVec SBAnimationStateManager::getCurrentStateParameters(const std::string& char
 	if (state0D)
 		return params;
 
-	SmartBody::SBAnimationState0D* state1D = dynamic_cast<SmartBody::SBAnimationState0D*>(stateData->state);
-	SmartBody::SBAnimationState0D* state2D = dynamic_cast<SmartBody::SBAnimationState0D*>(stateData->state);
-	SmartBody::SBAnimationState0D* state3D = dynamic_cast<SmartBody::SBAnimationState0D*>(stateData->state);
+	SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(stateData->state);
+	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(stateData->state);
+	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(stateData->state);
 	if (state1D)
 	{
 		stateData->state->getParametersFromWeights(params[0], stateData->weights);
