@@ -276,7 +276,7 @@
   <action name="actionToggleFreeLookCamera">
    <property name="icon">
     <iconset>
-     <normaloff>../images/monkey_on_128x128.png</normaloff>../images/monkey_on_128x128.png</iconset>
+     <normaloff>images/monkey_on_128x128.png</normaloff>images/monkey_on_128x128.png</iconset>
    </property>
    <property name="text">
     <string>Toggle Free Look</string>

@@ -48,6 +48,7 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -73,17 +74,39 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y ..\..\..\lib\vhcl\blat\blat.dll $(TargetDir)
-copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll $(TargetDir)
-copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll $(TargetDir)
-copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll $(TargetDir)
-copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll $(TargetDir)
-copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll $(TargetDir)
-copy /Y ..\..\..\lib\qt\bin\QtCored4.dll $(TargetDir)
-copy /Y ..\..\..\lib\qt\bin\QtGuid4.dll $(TargetDir)
-copy /Y ..\..\..\lib\qt\bin\QtOpenGLd4.dll $(TargetDir)
-if exist ..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\msvcr90d.dll copy /Y ..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.* $(TargetDir)
-copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" $(TargetDir)
+      <Command>copy "$(TargetPath)" ..
+copy /Y ..\..\..\lib\vhcl\blat\blat.dll ..
+copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..
+copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..
+copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..
+copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..
+copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll ..
+copy /Y ..\..\..\lib\qt\bin\QtCored4.dll ..
+copy /Y ..\..\..\lib\qt\bin\QtGuid4.dll ..
+copy /Y ..\..\..\lib\qt\bin\QtOpenGLd4.dll ..
+if exist ..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\msvcr90d.dll copy /Y ..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.* ..
+copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" ..
+
+if not exist ..\images mkdir ..\images
+copy /Y images\*.* ..\images
+
+
+if not exist ..\..\..\bin\sbmonitor mkdir ..\..\..\bin\sbmonitor
+copy "$(TargetPath)" ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\vhcl\blat\blat.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\qt\bin\QtCored4.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\qt\bin\QtGuid4.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\qt\bin\QtOpenGLd4.dll ..\..\..\bin\sbmonitor
+if exist ..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\msvcr90d.dll copy /Y ..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.* ..\..\..\bin\sbmonitor
+copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\bin\sbmonitor
+
+if not exist ..\..\..\bin\sbmonitor\images mkdir ..\..\..\bin\sbmonitor\images
+copy /Y images\*.* ..\..\..\bin\sbmonitor\images
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -116,16 +139,37 @@ copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" $(TargetDir)
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y ..\..\..\lib\vhcl\blat\blat.dll $(TargetDir)
-copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll $(TargetDir)
-copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll $(TargetDir)
-copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll $(TargetDir)
-copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll $(TargetDir)
-copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll $(TargetDir)
-copy /Y ..\..\..\lib\qt\bin\QtCore4.dll $(TargetDir)
-copy /Y ..\..\..\lib\qt\bin\QtGui4.dll $(TargetDir)
-copy /Y ..\..\..\lib\qt\bin\QtOpenGL4.dll $(TargetDir)
-copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" $(TargetDir)
+      <Command>copy "$(TargetPath)" ..
+copy /Y ..\..\..\lib\vhcl\blat\blat.dll ..
+copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..
+copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..
+copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..
+copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..
+copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll ..
+copy /Y ..\..\..\lib\qt\bin\QtCore4.dll ..
+copy /Y ..\..\..\lib\qt\bin\QtGui4.dll ..
+copy /Y ..\..\..\lib\qt\bin\QtOpenGL4.dll ..
+copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" ..
+
+if not exist ..\images mkdir ..\images
+copy /Y images\*.* ..\images
+
+
+if not exist ..\..\..\bin\sbmonitor mkdir ..\..\..\bin\sbmonitor
+copy "$(TargetPath)" ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\vhcl\blat\blat.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\qt\bin\QtCore4.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\qt\bin\QtGui4.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\qt\bin\QtOpenGL4.dll ..\..\..\bin\sbmonitor
+copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\bin\sbmonitor
+
+if not exist ..\..\..\bin\sbmonitor\images mkdir ..\..\..\bin\sbmonitor\images
+copy /Y images\*.* ..\..\..\bin\sbmonitor\images
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
