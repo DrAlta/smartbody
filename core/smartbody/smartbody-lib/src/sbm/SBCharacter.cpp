@@ -162,6 +162,14 @@ void SBCharacter::setVoice(std::string type)
 	{
 		set_speech_impl(mcu.speech_text());
 	}
+	else if (type == "local")
+	{
+		set_speech_impl(mcu.speech_localvoice());
+	}
+	else
+	{
+		LOG("Unknown voice setting '%s'.", type.c_str());
+	}
 }
 
 const std::string& SBCharacter::getVoice()
@@ -199,6 +207,15 @@ void SBCharacter::setVoiceBackup(std::string type)
 	{
 		set_speech_impl_backup(mcu.speech_text());
 	}
+	else if (type == "local")
+	{
+		set_speech_impl_backup(mcu.speech_localvoice());
+	}
+	else
+	{
+		LOG("Unknown voice backup setting '%s'.", type.c_str());
+	}
+
 }
 
 const std::string& SBCharacter::getVoiceBackup()
