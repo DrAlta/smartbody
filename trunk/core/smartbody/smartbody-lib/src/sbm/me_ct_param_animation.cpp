@@ -326,6 +326,16 @@ void MeCtParamAnimation::schedule(PAState* stateData, const std::vector<double>&
 		}
 	}
 
+	// make sure there's motion for non-pseudoidle state
+	if (unit.data != NULL)
+	{
+		if (unit.data->getNumMotions() == 0)
+		{
+			LOG("MeCtParamAnimation::schedule ERR: state %s has no motions attached.", unit.data->stateName.c_str());
+			return;
+		}
+	}
+
 	waitingList.push_back(unit);
 }
 
