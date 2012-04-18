@@ -4450,7 +4450,12 @@ int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
          if ( !absolutePath )
          {
-			boost::filesystem::path p( "../../../../.." );
+			 std::string soundCacheDir = "../../../../..";
+			 std::string soundDir = SmartBody::SBScene::getScene()->getStringAttribute("speechRelaySoundCacheDir");
+			 if (soundDir != "")
+				 soundCacheDir = soundDir;
+
+			boost::filesystem::path p( soundCacheDir );
 			boost::filesystem::path abs_p = boost::filesystem::complete( p );
 
 //            char full[ _MAX_PATH ];
