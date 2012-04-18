@@ -1711,6 +1711,11 @@ void SteeringAgent::startLocomotion( float angleDiff )
 		std::vector<double> weights;
 		SmartBody::SBAnimationStateManager* stateManager = SmartBody::SBScene::getScene()->getStateManager();
 		SmartBody::SBAnimationState* state = stateManager->getState(locomotionName);
+		if (!state)
+		{
+			LOG("No state named %s found for character %s. Cannot start locomotion.", locomotionName.c_str(), character->getName().c_str());
+			return;
+		}
 		weights.resize(state->getNumMotions());
 		state->getWeightsFromParameters(desiredSpeed, 0, 0, weights);
 		std::stringstream command1;
