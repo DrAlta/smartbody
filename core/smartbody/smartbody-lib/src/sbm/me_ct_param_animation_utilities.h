@@ -55,7 +55,8 @@ class PATimeManager
 		double getDuration();
 		double getLocalTime(double motionTime, int motionIndex);
 		void getParallelTimes(double time, std::vector<double>& times);
-	
+		std::vector<double>& getKey();
+
 		std::vector<double> localTimes;			//always in ascending order
 		std::vector<double> motionTimes;		//actual motion times get from localTimes
 		std::vector<double> timeDiffs;			//time steps from last evaluation to this evaluation, get from motionTimes
@@ -163,6 +164,7 @@ class PAStateData
 		virtual void evaluateTransition(double timeStep, SrBuffer<float>& buffer, bool tranIn);
 
 		std::string getStateName();
+		bool isPartialBlending();
 		std::vector<double> weights;
 
 		PATimeManager* timeManager;

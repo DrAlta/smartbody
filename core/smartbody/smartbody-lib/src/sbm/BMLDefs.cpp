@@ -276,6 +276,7 @@ XMLCh* BMLDefs::ATTR_NODPITCH = NULL;
 XMLCh* BMLDefs::ATTR_NODDECAY = NULL;
 XMLCh* BMLDefs::ATTR_WIGGLE = NULL;
 XMLCh* BMLDefs::ATTR_WAGGLE = NULL;
+XMLCh* BMLDefs::ATTR_PARAMETERIZED = NULL;
 
 XMLCh* BMLDefs::TAG_STATES = NULL;
 XMLCh* BMLDefs::ATTR_STARTINGNOW = NULL;
@@ -310,6 +311,8 @@ XMLCh* BMLDefs::ATTR_MATERIAL = NULL;
 XMLCh* BMLDefs::ATTR_BRAKING = NULL;
 
 XMLCh* BMLDefs::ATTR_STYLE = NULL;
+
+XMLCh* BMLDefs::ATTR_STATENAME = NULL;
 
 BMLDefs::BMLDefs()
 {
@@ -548,6 +551,7 @@ BMLDefs::BMLDefs()
 	ATTR_NOD   = XMLString::transcode("nod");
 	ATTR_WIGGLE   = XMLString::transcode("wiggle");
 	ATTR_WAGGLE   = XMLString::transcode("waggle");
+	ATTR_PARAMETERIZED = XMLString::transcode("parameterized");
 
 	ATTR_ARMLEFT   = XMLString::transcode("left");
 	ATTR_ARMRIGHT   = XMLString::transcode("right");
@@ -635,6 +639,8 @@ BMLDefs::BMLDefs()
 	ATTR_BRAKING = XMLString::transcode("sbm:braking");
 
 	ATTR_STYLE = XMLString::transcode("sbm:style");
+
+	ATTR_STATENAME = XMLString::transcode("sbm:state-name");
 }
 
 }

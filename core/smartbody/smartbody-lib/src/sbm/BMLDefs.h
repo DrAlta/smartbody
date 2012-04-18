@@ -273,6 +273,7 @@ class BMLDefs
 		static XMLCh* ATTR_NODDECAY;
 		static XMLCh* ATTR_WIGGLE;
 		static XMLCh* ATTR_WAGGLE;
+		static XMLCh* ATTR_PARAMETERIZED;
 
 		static XMLCh* TAG_STATES;
 		static XMLCh* ATTR_STARTINGNOW;
@@ -307,6 +308,8 @@ class BMLDefs
 		static XMLCh* ATTR_BRAKING;
 
 		static XMLCh* ATTR_STYLE;
+
+		static XMLCh* ATTR_STATENAME;
 };
 
 

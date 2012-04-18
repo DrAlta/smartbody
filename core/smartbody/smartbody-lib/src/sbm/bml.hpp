@@ -81,7 +81,7 @@ namespace BML {
 
 
 	// Enumerations
-	enum HeadBehaviorType { HEAD_NOD, HEAD_SHAKE, HEAD_TOSS, HEAD_ORIENT, HEAD_WIGGLE, HEAD_WAGGLE };
+	enum HeadBehaviorType { HEAD_NOD, HEAD_SHAKE, HEAD_TOSS, HEAD_ORIENT, HEAD_WIGGLE, HEAD_WAGGLE, HEAD_PARAMETERIZED };
 
 
 

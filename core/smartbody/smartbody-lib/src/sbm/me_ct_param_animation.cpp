@@ -159,7 +159,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 				SrMat nextBaseMat;
 
 				bool pseudoTransition = (curStateData->getStateName() == PseudoIdleState || nextStateData->getStateName() == PseudoIdleState);								
-				if (pseudoTransition) // first time
+				if (pseudoTransition && (!curStateData->isPartialBlending() && !nextStateData->isPartialBlending())) // first time && not partial blending case
 				{
 					bool transitionIn = (curStateData->getStateName() == PseudoIdleState);
 					curStateData->evaluateTransition(timeStep * transitionManager->getSlope(), buffer1, transitionIn);
@@ -170,26 +170,8 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 					if (!transitionIn) // update base rotation & translation
 					{
 						SrMat origBase = curStateData->woManager->getBaseMatFromBuffer(buffer1);//combineMat(curStateData->woManager->getBaseMatFromBuffer(buffer1),curBaseMat);
-// 						float rx,ry,rz;
-// 						sr_euler_angles(132,origBase,rx,ry,rz);
-// 						float rnx,rny,rnz;
-// 						sr_euler_angles(132,nextStateData->woManager->getCurrentBaseTransformMat(),rnx,rny,rnz);						
- 						
-// 						sr_euler_mat(132,newBuffBase,(rx+rnx),(ry+rny),(rz+rnz));
-// 						SrVec origTran = origBase.get_translation();
-// 						//SrMat rot = nextStateData->woManager->getFirstBaseTransformMat().get_rotation();
-// 						//rot.transpose();
-//  						SrVec newTran = origBase.get_translation() + nextStateData->woManager->getCurrentBaseTransformMat().get_translation(); 						
-// 						newBuffBase = combineMat(origBase,nextStateData->woManager->getCurrentBaseTransformMat());
-// 						newBuffBase.set_translation(newTran);
 						SrMat newBuffBase = origBase;
 						newBuffBase = origBase*nextStateData->woManager->getCurrentBaseTransformMat();
-
-						//if (!transitionManager->startTransition)
-						//	sr_out << "nextBaseTransform = " << nextStateData->woManager->getCurrentBaseTransformMat() << srnl;
-						//LOG("orig base = %f %f %f",origTran[0],origTran[1],origTran[2]);						
-						//LOG("newBase = %f %f %f",newTran[0],newTran[1],newTran[2]);
-
 						curStateData->woManager->setBufferByBaseMat(newBuffBase,buffer1);	
 						curBaseMat = SrMat();//nextBaseMat.inverse();//SrMat();//curBaseMat*nextStateData->woManager->getBaseTransformMat().inverse();
 						nextBaseMat = SrMat();//nextBaseMat.inverse();//SrMat();//nextBaseMat.inverse();
@@ -207,14 +189,9 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 						}
 						else
 						{							
-							
 							curBaseMat = nextStateData->woManager->getCurrentBaseTransformMat().inverse();//SrMat();//nbMat.inverse();							
 							pos = curBaseMat.get_translation();
 							SrVec origPos = nextStateData->woManager->getCurrentBaseTransformMat().get_translation();
-// 							sr_out << "woUpdate nextBaseTransform = " << nextStateData->woManager->getCurrentBaseTransformMat() << srnl;
-// 							LOG("rotation = %f %f %f",rotAa[0],rotAa[1],rotAa[2]);
-// 							LOG("startTransistion Out, curBase = %f %f %f",pos[0],pos[1],pos[2]);
-// 							LOG("startTransistion Out, origBase = %f %f %f",origPos[0],origPos[1],origPos[2]);
 						}
 						transitionManager->startTransition = true;
 					}					
@@ -227,7 +204,8 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 					nextBaseMat = nextStateData->woManager->getBaseTransformMat();
 				}			
 				transitionManager->blending(frame.buffer(), buffer1, buffer2, transformMat, curBaseMat, nextBaseMat, timeStep, _context);
-				updateWo(transformMat, woWriter, frame.buffer());
+				if (!curStateData->isPartialBlending() && !nextStateData->isPartialBlending())
+					updateWo(transformMat, woWriter, frame.buffer());
 				mcu.mark("locomotion");
 				return true;
 			}
@@ -248,7 +226,8 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 		if (curStateData->active)
 		{
 			curStateData->evaluate(timeStep, frame.buffer());
-			updateWo(curStateData->woManager->getBaseTransformMat(), woWriter, frame.buffer());
+			if (!curStateData->isPartialBlending())
+				updateWo(curStateData->woManager->getBaseTransformMat(), woWriter, frame.buffer());
 			return true;
 		}
 		else

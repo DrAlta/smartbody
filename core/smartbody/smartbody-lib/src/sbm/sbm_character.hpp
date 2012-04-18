@@ -258,6 +258,8 @@ public:
 	MeCtPhysicsController* physics_ct;
 	MeCtDataReceiver*	datareceiver_ct;
 	MeCtParamAnimation* param_animation_ct;
+	MeCtParamAnimation* head_param_anim_ct;
+	
 	MeCtMotionPlayer*	motionplayer_ct;
 	MeCtSaccade*		saccade_ct;
 	//MeCtReachEngine*	reachEngine[2];	

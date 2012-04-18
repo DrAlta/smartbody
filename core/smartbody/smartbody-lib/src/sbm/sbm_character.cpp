@@ -127,6 +127,7 @@ reach_sched_p( NULL ),
 head_sched_p( CreateSchedulerCt( character_name, "head" ) ),
 param_sched_p( CreateSchedulerCt( character_name, "param" ) ),
 param_animation_ct( NULL ),
+head_param_anim_ct( NULL ),
 face_ct( NULL ),
 eyelid_ct( new MeCtEyeLid() ),
 motionplayer_ct( NULL ),	
@@ -186,6 +187,8 @@ SbmCharacter::~SbmCharacter( void )	{
 		locomotion_ct->unref();
 	if (param_animation_ct)
 		param_animation_ct->unref();
+	if (head_param_anim_ct)
+		head_param_anim_ct->unref();
 	if (motionplayer_ct)
 		motionplayer_ct->unref();
 	if (saccade_ct)
@@ -241,7 +244,7 @@ void SbmCharacter::createStandardControllers()
 	this->param_animation_ct = new MeCtParamAnimation(this, world_offset_writer_p);
 	std::string paramAnimationName = getName() + "_paramAnimationController";
 	this->param_animation_ct->setName(paramAnimationName.c_str());
-	param_sched_p = CreateSchedulerCt( getName().c_str(), "param" );
+	this->param_animation_ct->ref();
 
 	// basic locomotion
 	this->basic_locomotion_ct = new MeCtBasicLocomotion(this);
@@ -249,7 +252,11 @@ void SbmCharacter::createStandardControllers()
 	this->basic_locomotion_ct->setName(bLocoName.c_str());
 	//this->basic_locomotion_ct->set_pass_through(false);
 
-
+	// example-based head movement
+	this->head_param_anim_ct = new MeCtParamAnimation(this, world_offset_writer_p);
+	std::string headParamAnimName = getName() + "_paramAnimHeadController";
+	this->head_param_anim_ct->setName(headParamAnimName.c_str());
+	this->head_param_anim_ct->ref();
 
 	SkJoint* effector = this->_skeleton->search_joint("r_middle1");
 	if (effector)
@@ -280,6 +287,7 @@ void SbmCharacter::createStandardControllers()
 	constraint_sched_p = CreateSchedulerCt( getName().c_str(), "constraint" );
 	reach_sched_p = CreateSchedulerCt( getName().c_str(), "reach" );
 	grab_sched_p = CreateSchedulerCt( getName().c_str(), "grab" );
+	param_sched_p = CreateSchedulerCt( getName().c_str(), "param" );
 
 	breathing_p = new MeCtBreathing();
 	breathing_p->setName(getName() + "_breathingController");
@@ -389,6 +397,7 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( saccade_ct );
 	ct_tree_p->add_controller( constraint_sched_p );	
 	ct_tree_p->add_controller( eyelid_reg_ct_p );
+	ct_tree_p->add_controller( head_param_anim_ct );
 	ct_tree_p->add_controller( head_sched_p );
 	ct_tree_p->add_controller( face_ct );
 	ct_tree_p->add_controller( param_sched_p );
@@ -424,7 +433,11 @@ void SbmCharacter::createStandardControllers()
 				else if (dynamic_cast<MeCtFace*>(controller))
 					attributeCopy->registerObserver(face_ct);
 				else if (dynamic_cast<MeCtParamAnimation*>(controller))
-					attributeCopy->registerObserver(param_animation_ct);
+				{
+					attributeCopy->registerObserver(controller);
+					//attributeCopy->registerObserver(head_param_anim_ct);
+					//attributeCopy->registerObserver(param_animation_ct);
+				}
 				else if (dynamic_cast<MeCtLocomotion*>(controller))
 					attributeCopy->registerObserver(locomotion_ct);
 				else if (dynamic_cast<MeCtBasicLocomotion*>(controller))
@@ -448,6 +461,7 @@ void SbmCharacter::initData()
 	grab_sched_p = NULL;
 	constraint_sched_p = NULL;
 	param_animation_ct = NULL;
+	head_param_anim_ct = NULL;
 	saccade_ct = NULL;	
 
 	speech_impl = NULL;
@@ -988,7 +1002,11 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 				else if (dynamic_cast<MeCtFace*>(controller))
 					attributeCopy->registerObserver(face_ct);
 				else if (dynamic_cast<MeCtParamAnimation*>(controller))
-					attributeCopy->registerObserver(param_animation_ct);
+				{
+					attributeCopy->registerObserver(controller);
+					//attributeCopy->registerObserver(param_animation_ct);
+					//attributeCopy->registerObserver(head_param_anim_ct);
+				}
 				else if (dynamic_cast<MeCtLocomotion*>(controller))
 					attributeCopy->registerObserver(locomotion_ct);
 				else if (dynamic_cast<MeCtBasicLocomotion*>(controller))
