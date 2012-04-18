@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Fri Mar 9 15:53:37 2012
+** Created: Tue Apr 17 17:23:24 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -78,7 +78,7 @@ public:
         actionToggleFreeLookCamera = new QAction(MainWindow);
         actionToggleFreeLookCamera->setObjectName(QString::fromUtf8("actionToggleFreeLookCamera"));
         QIcon icon;
-        icon.addFile(QString::fromUtf8("../images/monkey_on_128x128.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8("images/monkey_on_128x128.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionToggleFreeLookCamera->setIcon(icon);
         actionSettings = new QAction(MainWindow);
         actionSettings->setObjectName(QString::fromUtf8("actionSettings"));
