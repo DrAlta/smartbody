@@ -134,7 +134,10 @@ std::string SBAnimationStateManager::getCurrentState(const std::string& characte
 	if (!character->param_animation_ct)
 		return "";
 
-	return character->param_animation_ct->getCurrentPAStateData()->state->stateName;
+	PAStateData* stateData = character->param_animation_ct->getCurrentPAStateData();
+	if (!stateData)
+		return "";
+	return stateData->state->stateName;
 }
 
 SrVec SBAnimationStateManager::getCurrentStateParameters(const std::string& characterName)
