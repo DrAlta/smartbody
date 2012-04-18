@@ -17,6 +17,8 @@ class SBAnimationTransition;
 
 class SBAnimationStateManager
 {
+	protected:
+		
 	public:
 		SBAnimationStateManager();
 		~SBAnimationStateManager();

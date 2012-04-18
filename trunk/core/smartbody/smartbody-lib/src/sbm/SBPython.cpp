@@ -897,7 +897,8 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getTimeStroke", &SBMotion::retime, "Returns the stroke time of the motion.")
 		.def("getTimeStrokeEnd", &SBMotion::retime, "Returns the stroke end time of the motion.")
 		.def("getTimeRelax", &SBMotion::retime, "Returns the relax time of the motion.")
-		.def("getTimeStop", &SBMotion::retime, "Returns the stop time of the motion.")
+		.def("getTimeStop", &SBMotion::retime, "Returns the stop time of the motion.")	
+		.def("getDuration", &SBMotion::getDuration, "Return the duration of the motion")
 		.def("addEvent", &SBMotion::addEvent, "Adds an event associated with this motion that will be triggered at the given time. The last paramter determines if the event will be triggered only once, or every time the motion is looped.")
 
 		;
