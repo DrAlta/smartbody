@@ -218,6 +218,11 @@ void PATimeManager::getParallelTimes(double time, std::vector<double>& times)
 	}
 }
 
+std::vector<double>& PATimeManager::getKey()
+{
+	return key;
+}
+
 PAMotions::PAMotions()
 {
 }
@@ -850,8 +855,7 @@ void PAStateData::evaluate(double timeStep, SrBuffer<float>& buffer)
 	if (wrapMode == Loop || ((wrapMode != Loop) && notReachCycle))
 	{
 		interpolator->blending(timeManager->motionTimes, buffer);
-		if (interpolator->joints.size() == 0)
-			woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffCopy);
+		woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffCopy);
 
 		active = true;
 	}
@@ -862,6 +866,14 @@ void PAStateData::evaluate(double timeStep, SrBuffer<float>& buffer)
 std::string PAStateData::getStateName()
 {
 	return state->stateName;	
+}
+
+bool PAStateData::isPartialBlending()
+{
+	if (interpolator->joints.size() != 0)
+		return true;
+	else
+		return false;
 }
 
 void PAStateData::updateMotionIndices()
