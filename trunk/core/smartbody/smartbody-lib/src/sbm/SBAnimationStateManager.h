@@ -37,7 +37,7 @@ class SBAnimationStateManager
 
 		std::string getCurrentState(const std::string& characterName);
 		SrVec getCurrentStateParameters(const std::string& characterName);
-
+		bool hasPAStateData(const std::string& characterName, const std::string& stateName);
 };
 }
 #endif

@@ -180,4 +180,16 @@ SrVec SBAnimationStateManager::getCurrentStateParameters(const std::string& char
 	return params;
 }
 
+bool SBAnimationStateManager::hasPAStateData(const std::string& characterName, const std::string& stateName)
+{
+	SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+	if (!character)
+		return false;
+
+	if (!character->param_animation_ct)
+		return false;
+
+	return character->param_animation_ct->hasPAState(stateName);
+}
+
 }

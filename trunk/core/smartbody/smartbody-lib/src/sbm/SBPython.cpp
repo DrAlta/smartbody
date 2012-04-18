@@ -807,7 +807,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getTransitionNames", &SBAnimationStateManager::getTransitionNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the state names.")
 		.def("getCurrentState", &SBAnimationStateManager::getCurrentState, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the character's current state name.")
 		.def("getCurrentStateParameters", &SBAnimationStateManager::getCurrentStateParameters, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the character's current state name.")
-		
+		.def("hasPAStateData", &SBAnimationStateManager::hasPAStateData, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns whether the character has the state scheduled. Used to avoid scheduling the same state.")
 		;
 
 	boost::python::class_<SBSteerManager, boost::python::bases<SBService> >("SBSteerManager")
