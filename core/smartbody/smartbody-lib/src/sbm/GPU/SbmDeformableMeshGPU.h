@@ -33,18 +33,18 @@ protected:
 	VBOVec2f *VBOTexCoord;
 	VBOVec3i *VBOTri;
 	std::vector<MeshSubset*> meshSubset;
-	VBOVec4i *VBOBoneID1,*VBOBoneID2;
+	VBOVec4f *VBOBoneID1,*VBOBoneID2;
 	VBOVec4f *VBOWeight1, *VBOWeight2;
-	TBOData  *TBOTran; // bone transformation	
+	TBOData  *TBOTran; // bone transformation		
 	std::vector<VBOVec3i*> subMeshTris;
-	ublas::vector<SrMat>  transformBuffer;	
+	std::vector<SrMat>  transformBuffer;	
 public:
 	SbmDeformableMeshGPU(void);
 	~SbmDeformableMeshGPU(void);	
 public:
 	virtual void update();
 	bool buildGPUVertexBuffer();	
-	void skinTransformGPU(ublas::vector<SrMat>& tranBuffer, TBOData* tranTBO);
+	void skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOData* tranTBO);
 	static void initShaderProgram();	
 protected:
 	bool initBuffer(); // initialize VBO and related GPU data buffer	
@@ -55,7 +55,7 @@ protected:
 class SbmDeformableMeshGPUInstance : public DeformableMeshInstance
 {
 protected:
-	ublas::vector<SrMat>  transformBuffer;	
+	std::vector<SrMat>  transformBuffer;	
 	TBOData  *TBOTran; // bone transformation	
 	bool     bufferReady;
 public:

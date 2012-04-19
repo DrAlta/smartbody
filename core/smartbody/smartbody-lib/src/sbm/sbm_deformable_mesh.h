@@ -64,6 +64,7 @@ public:
 	std::vector<SbmSubMesh*>    subMeshList;
 
 	std::vector<SrVec4i>        boneIDBuf[2];
+	std::vector<SrVec4>         boneIDBuf_f[2];
 	std::vector<SrVec4>         boneWeightBuf[2];
 	std::map<std::string,int>   boneJointIdxMap;
 	std::vector<SkJoint*>    boneJointList;	
