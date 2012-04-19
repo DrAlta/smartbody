@@ -1137,7 +1137,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 							weights.push_back(args.read_double());
 					}
 				}
-				if (numWeights < state->getNumMotions())
+				if (state && numWeights < state->getNumMotions())
 				{
 					character->param_animation_ct->schedule(state, 0, 0, 0, wrap, schedule, blend, joint);
 				}

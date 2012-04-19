@@ -160,8 +160,13 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	
 	std::string manner = xml_parse_string(BMLDefs::ATTR_MANNER, elem);
 
+	if (!c->hasAttribute("steering.pathMaxSpeed"))
+		c->createDoubleAttribute("steering.pathMaxSpeed", 1.5f, true, "steering", 310, false, false, false, "");
 	if (speed > 0.0f)
+	{
 		c->steeringAgent->desiredSpeed = speed;
+		c->setDoubleAttribute("steering.pathMaxSpeed",(double)speed);
+	}
 
 	if (manner != "")
 	{
@@ -169,13 +174,24 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		{
 			LOG("This mode does not support Procedural Locomotion currently!");
 			return BehaviorRequestPtr();
-		}
+		}		
+		
+
 		if (manner == "walk" && speed <= 0.0f)
-			c->steeringAgent->desiredSpeed = 1.2f;
+		{
+			c->steeringAgent->desiredSpeed = 1.2f;			
+			c->setDoubleAttribute("steering.pathMaxSpeed",1.2);
+		}
 		else if (manner == "jog" && speed <= 0.0f)
+		{
 			c->steeringAgent->desiredSpeed = 2.5f;
+			c->setDoubleAttribute("steering.pathMaxSpeed",2.5);
+		}
 		else if (manner == "run" && speed <= 0.0f)
+		{
 			c->steeringAgent->desiredSpeed = 3.5f;
+			c->setDoubleAttribute("steering.pathMaxSpeed",3.5);
+		}
 		else if (manner == "sbm:step")
 			stepMode = true;
 		else if (manner == "sbm:jump")
