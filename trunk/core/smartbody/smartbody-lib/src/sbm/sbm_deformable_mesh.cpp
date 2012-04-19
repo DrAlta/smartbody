@@ -334,6 +334,7 @@ bool DeformableMesh::buildVertexBuffer()
 	for (int i=0;i<2;i++)
 	{
 		boneIDBuf[i].resize(nTotalVtxs);
+		boneIDBuf_f[i].resize(nTotalVtxs);
 		boneWeightBuf[i].resize(nTotalVtxs);
 	}
 
@@ -371,6 +372,7 @@ bool DeformableMesh::buildVertexBuffer()
 				for (int k=0;k<2;k++)
 				{
 					boneIDBuf[k][iVtx] = SrVec4i(0,0,0,0);
+					boneIDBuf_f[k][iVtx] = SrVec4(0,0,0,0);
 					boneWeightBuf[k][iVtx] = SrVec4(0,0,0,0);
 				}
 				std::vector<IntFloatPair> weightList;
@@ -396,11 +398,13 @@ bool DeformableMesh::buildVertexBuffer()
 					if ( j < 4)
 					{
 						boneIDBuf[0][iVtx][j] = w.first;
+						boneIDBuf_f[0][iVtx][j] = (float)w.first;
 						boneWeightBuf[0][iVtx][j] = w.second;
 					}
 					else if (j < 8)
 					{
 						boneIDBuf[1][iVtx][j-4] = w.first;
+						boneIDBuf_f[1][iVtx][j-4] = (float)w.first;
 						boneWeightBuf[1][iVtx][j-4] = w.second;
 					}	
 				}
@@ -421,6 +425,8 @@ bool DeformableMesh::buildVertexBuffer()
 						binormalBuf[idxMap[k]] = binormalBuf[iVtx];
 						boneIDBuf[0][idxMap[k]] = boneIDBuf[0][iVtx];
 						boneIDBuf[1][idxMap[k]] = boneIDBuf[1][iVtx];
+						boneIDBuf_f[0][idxMap[k]] = boneIDBuf_f[0][iVtx];
+						boneIDBuf_f[1][idxMap[k]] = boneIDBuf_f[1][iVtx];
 						boneWeightBuf[0][idxMap[k]] = boneWeightBuf[0][iVtx];
 						boneWeightBuf[1][idxMap[k]] = boneWeightBuf[1][iVtx];
 					}

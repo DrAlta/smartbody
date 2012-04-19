@@ -27,16 +27,16 @@ std::string shaderVS =
 "#version 120 \n\
 #extension GL_EXT_gpu_shader4 : require \n\
 uniform samplerBuffer Transform; \n\
-attribute ivec4 BoneID1,BoneID2;   \n\
+attribute vec4 BoneID1,BoneID2;   \n\
 attribute vec4 BoneWeight1,BoneWeight2;\n \
 attribute vec3 tangent, binormal;\n\
 varying vec4 vPos;\n\
 varying vec3 normal,lightDir[2],halfVector[2];\n\
 varying vec3 tv,bv;\n\
 varying float dist[2];\n\
-mat3 GetTransformation(int id)\n \
+mat3 GetTransformation(float id)\n \
 { \n\
-	int idx = id;\n \
+	int idx = int(id);\n \
 	mat3 rot;\n  \
 	for (int i=0;i<3;i++)\n \
 	{ \n  \
@@ -45,16 +45,16 @@ mat3 GetTransformation(int id)\n \
 	}\n	\
 	return rot;\n \
 }\n \
-vec3 GetTranslation(int id)\n \
+vec3 GetTranslation(float id)\n \
 {\n  \
-	int idx = id;\n \
+	int idx = int(id);\n \
 	vec3 tran;\n \
 	tran[0] = texelFetchBuffer(Transform,(idx*16+12)).x;\n \
     tran[1] = texelFetchBuffer(Transform,(idx*16+13)).x;\n \
 	tran[2] = texelFetchBuffer(Transform,(idx*16+14)).x;\n \
 	return tran;\n	\
 }\n  \
-mat4 TransformPos(vec3 position, vec3 normal, vec3 tang, vec3 binorm, ivec4 boneid, vec4 boneweight)\n\
+mat4 TransformPos(vec3 position, vec3 normal, vec3 tang, vec3 binorm, vec4 boneid, vec4 boneweight)\n\
 {\n\
 	vec3 pos = vec3(0,0,0);\n\
 	vec3 n = vec3(0,0,0);\n\
@@ -241,7 +241,7 @@ SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
 
 }
 
-void SbmDeformableMeshGPU::skinTransformGPU(ublas::vector<SrMat>& tranBuffer, TBOData* tranTBO)
+void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOData* tranTBO)
 {
 	std::string activeShader = shaderName;//SbmDeformableMeshGPU::useShadowPass ? shadowShaderName : shaderName;
 	GLuint program = SbmShaderManager::singleton().getShader(activeShader)->getShaderProgram();		
@@ -309,7 +309,8 @@ void SbmDeformableMeshGPU::skinTransformGPU(ublas::vector<SrMat>& tranBuffer, TB
 
 	glEnableVertexAttribArray(bone_loc1);
 	VBOBoneID1->VBO()->BindBuffer();
-	glVertexAttribIPointer(bone_loc1,4,GL_INT,0,0);	
+	//glVertexAttribIPointer(bone_loc1,4,GL_INT,0,0);	
+	glVertexAttribPointer(bone_loc1,4,GL_FLOAT,0,0,0);	
 	//glBindAttribLocation(program,VBOBoneID1->VBO()->m_ArrayType,"BoneID1");
 	//glVertexAttribPointer(VBOBoneID1->VBO()->m_ArrayType,4,GL_FLOAT,0,0,0);	
 
@@ -321,7 +322,8 @@ void SbmDeformableMeshGPU::skinTransformGPU(ublas::vector<SrMat>& tranBuffer, TB
 	// 
 	glEnableVertexAttribArray(bone_loc2);
 	VBOBoneID2->VBO()->BindBuffer();
-	glVertexAttribIPointer(bone_loc2,4,GL_INT,0,0);	
+	//glVertexAttribIPointer(bone_loc2,4,GL_INT,0,0);	
+	glVertexAttribPointer(bone_loc2,4,GL_FLOAT,0,0,0);	
 
 	glEnableVertexAttribArray(tangent_loc);
 	VBOTangent->VBO()->BindBuffer();
@@ -872,7 +874,7 @@ void SbmDeformableMeshGPU::updateTransformBuffer()
 		SkJoint* joint = boneJointList[i];		
 		if (!joint)
 			continue;
-		transformBuffer(i) = bindPoseMatList[i]*joint->gmat();		
+		transformBuffer[i] = bindPoseMatList[i]*joint->gmat();		
 	}
 }
 
@@ -895,8 +897,9 @@ bool SbmDeformableMeshGPU::buildGPUVertexBuffer()
 	VBOWeight2 = new VBOVec4f((char*)"Weight2",VERTEX_BONE_WEIGHT_2,boneWeightBuf[1]);
 	//VBOOutPos  = new VBOVec4f((char*)"OutPos",VERTEX_POSITION,posBuffer);
 	VBOTri     = new VBOVec3i((char*)"TriIdx",GL_ELEMENT_ARRAY_BUFFER,triBuf);
-	VBOBoneID1 = new VBOVec4i((char*)"BoneID1",VERTEX_BONE_ID_1,boneIDBuf[0]);
-	VBOBoneID2 = new VBOVec4i((char*)"BoneID2",VERTEX_BONE_ID_2,boneIDBuf[1]);
+
+	VBOBoneID1 = new VBOVec4f((char*)"BoneID1",VERTEX_BONE_ID_1,boneIDBuf_f[0]);
+	VBOBoneID2 = new VBOVec4f((char*)"BoneID2",VERTEX_BONE_ID_2,boneIDBuf_f[1]);
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{
 		SbmSubMesh* subMesh = subMeshList[i];
@@ -928,8 +931,8 @@ bool SbmDeformableMeshGPU::initBuffer()
 	VBOWeight2 = new VBOVec4f((char*)"Weight2",VERTEX_BONE_WEIGHT_2,boneWeightBuf[1]);
 	//VBOOutPos  = new VBOVec4f((char*)"OutPos",VERTEX_POSITION,posBuffer);
 	VBOTri     = new VBOVec3i((char*)"TriIdx",GL_ELEMENT_ARRAY_BUFFER,triBuf);
-	VBOBoneID1 = new VBOVec4i((char*)"BoneID1",VERTEX_BONE_ID_1,boneIDBuf[0]);
-	VBOBoneID2 = new VBOVec4i((char*)"BoneID2",VERTEX_BONE_ID_2,boneIDBuf[1]);
+	VBOBoneID1 = new VBOVec4f((char*)"BoneID1",VERTEX_BONE_ID_1,boneIDBuf_f[0]);
+	VBOBoneID2 = new VBOVec4f((char*)"BoneID2",VERTEX_BONE_ID_2,boneIDBuf_f[1]);
 
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{
@@ -976,7 +979,7 @@ void SbmDeformableMeshGPUInstance::updateTransformBuffer()
 		SkJoint* joint = _skeleton->search_joint(mi->first.c_str());//boneJointList[i];		
 		if (!joint)
 			continue;
-		transformBuffer(idx) = _mesh->bindPoseMatList[idx]*joint->gmat();		
+		transformBuffer[idx] = _mesh->bindPoseMatList[idx]*joint->gmat();		
 	}
 }
 
