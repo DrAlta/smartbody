@@ -450,6 +450,8 @@ std::string SBFaceDefinition::getAUSide(int num)
 
 	if ((*iter).second->is_bilateral())
 		return "BOTH";
+	else if ((*iter).second->is_left() && (*iter).second->is_right())
+		return "LEFTRIGHT";
 	else if ((*iter).second->is_left())
 		return "LEFT";
 	else 
