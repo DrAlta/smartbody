@@ -397,20 +397,28 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 		int R_eye_quat_idx =  _context->channels().search( "eyeball_right", SkChannel::Quat );
 
 		int buff_idx = _context->toBufferIndex( L_eye_quat_idx );
-		euler_t L_eye_e = quat_t(
-								fbuffer[ buff_idx ],
-								fbuffer[ buff_idx + 1 ],
-								fbuffer[ buff_idx + 2 ],
-								fbuffer[ buff_idx + 3 ]
-		);
+		euler_t L_eye_e;
+		if (buff_idx >= 0)
+		{
+			L_eye_e = quat_t(
+									fbuffer[ buff_idx ],
+									fbuffer[ buff_idx + 1 ],
+									fbuffer[ buff_idx + 2 ],
+									fbuffer[ buff_idx + 3 ]
+			);
+		}
 
 		buff_idx = _context->toBufferIndex( R_eye_quat_idx );
-		euler_t R_eye_e = quat_t(
-								fbuffer[ buff_idx ],
-								fbuffer[ buff_idx + 1 ],
-								fbuffer[ buff_idx + 2 ],
-								fbuffer[ buff_idx + 3 ]
-		);
+		euler_t R_eye_e;
+		if (buff_idx >= 0)
+		{
+			R_eye_e = quat_t(
+									fbuffer[ buff_idx ],
+									fbuffer[ buff_idx + 1 ],
+									fbuffer[ buff_idx + 2 ],
+									fbuffer[ buff_idx + 3 ]
+			);
+		}
 
 		UL_set.set_pitch( (float)( L_eye_e.p() ) );
 		UR_set.set_pitch( (float)( R_eye_e.p() ) );
@@ -835,12 +843,16 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 	int i_map;
 	
 	i_map = _context->toBufferIndex( L_eye_quat_chan_index );
-	euler_t L_eye_e = quat_t(
-		fbuffer[ i_map ],
-		fbuffer[ i_map + 1 ],
-		fbuffer[ i_map + 2 ],
-		fbuffer[ i_map + 3 ]
-	);
+	euler_t L_eye_e;
+	if (i_map >= 0)
+	{
+		L_eye_e = quat_t(
+			fbuffer[ i_map ],
+			fbuffer[ i_map + 1 ],
+			fbuffer[ i_map + 2 ],
+			fbuffer[ i_map + 3 ]
+		);
+	}
 
 	int UL_lid_y_map = _context->toBufferIndex( UL_lid_posy_chan_index );
 	int UR_lid_y_map = _context->toBufferIndex( UR_lid_posy_chan_index );
