@@ -41,6 +41,7 @@
 #include "me/me_ct_blend.hpp"
 #include "me/me_ct_blend.hpp"
 #include "BMLDefs.h"
+#include <sbm/SBAnimationState.h>
 
 
 using namespace std;
@@ -1055,26 +1056,92 @@ void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu 
 	// TODO: set sync point times
 }
 
-void ParameterizedMotionRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
+void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 {
-	// Get times from BehaviorSyncPoints
-	time_sec startAt  = behav_syncs.sync_start()->time();
-	time_sec readyAt  = behav_syncs.sync_ready()->time();
-	time_sec strokeAt = behav_syncs.sync_stroke()->time();
-	time_sec relaxAt  = behav_syncs.sync_relax()->time();
-	time_sec endAt    = behav_syncs.sync_end()->time();
+	double startAt  = (double)behav_syncs.sync_start()->time();
+	double readyAt  = (double)behav_syncs.sync_ready()->time();
+	double strokeAt = (double)behav_syncs.sync_stroke()->time();
+	double relaxAt  = (double)behav_syncs.sync_relax()->time();
+	double endAt    = (double)behav_syncs.sync_end()->time();
 
-	if( LOG_METHODS || LOG_CONTROLLER_SCHEDULE )
-	 	cout << "DEBUG: MeControllerRequest::schedule(): startAt=" << startAt << ",  readyAt=" << readyAt << ",  strokeAt=" << strokeAt << ",  relaxAt=" << relaxAt << ",  endAt=" << endAt << endl;
+	if (behaviorType == BML::PARAM_HEAD_TILT)
+	{
+		// assumption:	1 - headnod state is 3D, z is the hold time
+		//				2 - partial joint affected are spine4 and on
+		//				3 - headnod animations exported are from T-pose
+		// behaviors:	1 - defining x, y, z and stroke time		--> calculate start time
+		//				2 - defining x, y, stroke and relax time	--> calculate z and start time
+		//				3 - defining x, y, z and start time
+		//				4 - others ?
 
-	time_sec indt  = readyAt-startAt;
-	time_sec outdt = endAt-relaxAt;
 
-	if(LOG_CONTROLLER_SCHEDULE)
-		cout << "MeControllerRequest::schedule(..): \"" << motion1Ct->getName() << " and " << motion2Ct->getName() << "\" startAt=" << startAt << ",  indt=" << indt << ",  outdt=" << outdt << endl;
+		// error check: 1 - state name not empty 2 - state does exist 3 - it's a 3D state(x: tilt right y: tilt forward z: duration) 4 - it has 4 corresponding points (start stroke relax end)
+		// TODO: Add more flexibility later
+		PAState* state = mcu->lookUpPAState(stateName);
+		if (!state)
+		{
+			LOG("ParameterizedAnimationRequest::realize_impl ERR: Can't find state name %s", stateName.c_str());
+			return;
+		}
+		SBAnimationState3D* state3D = dynamic_cast<SBAnimationState3D*> (state);
+		if (!state3D)
+		{
+			LOG("ParameterizedAnimationRequest::realize_impl ERR: state %s is not a 3D state.", stateName.c_str());
+			return;
+		}
+		if (state3D->getNumKeys() != 4)
+		{
+			LOG("ParameterizedAnimationRequest::realize_impl ERR: state %s has % keys. Parameterized animation state need 4 keys (start, stroke, relax, end).", stateName.c_str(), state3D->getNumKeys());
+			return;				
+		}
+		std::vector<double> weights;
+		weights.resize(state->getNumMotions());
 
-	if (motion1Ct && motion2Ct)
-		schedule_ct->schedule( motion1Ct, motion2Ct, paramValue, loop, behav_syncs);
+		double curTime = mcu->time;
+		double startTime = startAt - startAt;
+		double strokeTime = strokeAt - startAt;
+		double relaxTime = relaxAt - startAt;
+
+		// Here I need to figure out the priority of processing the sync times
+		// 1: stroke + relax
+		// 2: stroke
+		// 3: start
+
+		// stroke & relax defined (reset z parameter, get weights, and get start time)
+		if (strokeTime > 0 && relaxTime > 0 && relaxTime >= strokeTime)
+		{
+			z = relaxTime - strokeTime;
+		}
+
+		// relax time defined (get start time from weights)
+		if (relaxTime > 0)
+		{
+			if (strokeTime == 0)	// if stroke time not defined, put duration to 0, else using (duration = relaxTime - strokeTime)
+				z = 0;
+
+			state3D->getWeightsFromParameters(x, y, z, weights);
+			PAStateData* stateData = new PAStateData(state, weights);
+			stateData->timeManager->updateWeights();
+			std::vector<double> blendedKey = stateData->timeManager->getKey();
+			startTime = relaxTime - (blendedKey[2] - blendedKey[0]);
+			if (startTime < 0)
+			{
+				LOG("parse_bml_head Warning: parameterized head nod stroke time %f is not big enough for current parameter setting, it needs %f to arrive relax. Put startTime to 0 now.", relaxTime, (blendedKey[2] - blendedKey[0]));
+				startTime = 0;
+			}
+		}
+
+		// get partial joint name (mainly skullbase or spine4) Hack for now
+		std::string jointName = "spine4";	
+		// schedule the state
+		paramAnimCt->schedule(state, x, y, z, PAStateData::Once, PAStateData::Now, PAStateData::Additive, jointName, startTime);			
+	}
+}
+
+
+void ParameterizedAnimationRequest::unschedule( mcuCBHandle* mcu, BmlRequestPtr request, time_sec duration )
+{
+	// TODO: ... ???
 }
 
 /**
@@ -1147,19 +1214,21 @@ MotionRequest::MotionRequest( const std::string& unique_id, const std::string& l
 						 syncs_in )
 {}
 
-// Parameterized Motion Request
-ParameterizedMotionRequest::ParameterizedMotionRequest( const std::string& unique_id, const std::string& localId, MeCtMotion* ct1, MeCtMotion* ct2, MeCtSchedulerClass* schedule_ct,
-			           const BehaviorSyncPoints& syncs_in, float value, bool inLoop)
-:	MeControllerRequest( unique_id,
-						 localId,
-                         ct1,		// here ct1 does nothing, just to keep the same format
-						 schedule_ct,
-						 syncs_in )
+// Parameterized Animation Request
+ParameterizedAnimationRequest::ParameterizedAnimationRequest( MeCtParamAnimation* param_anim_ct, const std::string& sName, double paramX, double paramY, double paramZ, BML::ParamAnimBehaviorType type,
+															  const std::string& unique_id, const std::string& localId, const BehaviorSyncPoints& syncs_in)
+:	BehaviorRequest(unique_id,
+					localId,
+					syncs_in)
 {
-	motion1Ct = ct1;
-	motion2Ct = ct2;
-	paramValue = value;
-	loop = inLoop;
+	paramAnimCt = param_anim_ct;
+	stateName = sName;
+	x = paramX;
+	y = paramY;
+	z = paramZ;
+	behaviorType = type;
+
+	set_scheduler(BehaviorSchedulerPtr(new BehaviorSchedulerConstantSpeed(0, 0, 0, 0, 0, 0, 0, 1)));
 }
 
 //  NodRequest

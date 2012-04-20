@@ -28,7 +28,6 @@ XMLCh* BMLDefs::TM_RELAX = NULL;
 XMLCh* BMLDefs::TM_END = NULL;
 
 XMLCh* BMLDefs::TAG_SBM_ANIMATION = NULL;
-XMLCh* BMLDefs::TAG_SBM_PANIMATION = NULL;
 XMLCh* BMLDefs::ATTR_SPEED = NULL;
 XMLCh* BMLDefs::ATTR_PVALUE = NULL;
 
@@ -340,7 +339,6 @@ BMLDefs::BMLDefs()
 	TM_END = XMLString::transcode("end");
 
 	TAG_SBM_ANIMATION		= XMLString::transcode("sbm:animation");
-	TAG_SBM_PANIMATION		= XMLString::transcode("sbm:panimation");
 	ATTR_TWARP       		= XMLString::transcode("ME:twarp");
 	ATTR_PVALUE				= XMLString::transcode("sbm:value");
 

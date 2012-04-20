@@ -85,10 +85,13 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	if ((!curStateData && !nextStateData) ||
 		!curStateData)
 	{
-		std::vector<double> weights;
-		schedule(NULL, weights);
-		mcu.mark("locomotion");
-		return true;
+		if (!hasPAState(PseudoIdleState))
+		{
+			std::vector<double> weights;
+			schedule(NULL, weights);
+			mcu.mark("locomotion");
+			return true;
+		}
 	}	
 	if (curStateData)
 	{
@@ -96,8 +99,12 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 			curStateData->state->stateName != PseudoIdleState && 
 			nextStateData == NULL && (curStateData->wrapMode == PAStateData::Once))
 		{
-			std::vector<double> weights;
-			schedule(NULL, weights);
+			if (!hasPAState(PseudoIdleState))
+			{
+				std::vector<double> weights;
+				schedule(NULL, weights);
+				return true;
+			}
 		}
 			
 	}
@@ -329,7 +336,7 @@ void MeCtParamAnimation::schedule(PAState* stateData, const std::vector<double>&
 	// make sure there's motion for non-pseudoidle state
 	if (unit.data != NULL)
 	{
-		if (unit.data->getNumMotions() == 0)
+		if (unit.data->stateName != PseudoIdleState && unit.data->getNumMotions() == 0)
 		{
 			LOG("MeCtParamAnimation::schedule ERR: state %s has no motions attached.", unit.data->stateName.c_str());
 			return;
@@ -421,8 +428,16 @@ bool MeCtParamAnimation::hasPAState(const std::string& name)
 	for (; iter!= waitingList.end(); iter++)
 	{
 		if (iter->data)
+		{
 			if (iter->data->stateName == name)
 				return true;
+		}
+		else
+		{
+			if (name == PseudoIdleState)
+				return true;
+		}
+
 	}
 	return false;
 }
@@ -451,6 +466,19 @@ void MeCtParamAnimation::autoScheduling(double time)
 	ScheduleUnit nextUnit = waitingList.front();
 	if (time < nextUnit.time)
 		return;
+
+	// if current state is pseudo idle & next state is also pseudo idle, ignore
+	if (curStateData != NULL)
+	{
+		if (curStateData->getStateName() == PseudoIdleState)
+		{
+			if (nextUnit.data == NULL)
+				return;
+			else
+				if (nextUnit.data->stateName == PseudoIdleState)
+					return;
+		}
+	}
 
 	if (curStateData == NULL)
 	{
