@@ -180,7 +180,7 @@ void PATimeManager::setMotionTimes()
 	{
 		for (size_t i = 0; i < stateData->weights.size(); i++)
 		{
-			int d = localTimes[i] / stateData->state->motions[i]->duration();
+			int d = (int) (localTimes[i] / stateData->state->motions[i]->duration());
 			motionTimes.push_back(localTimes[i] - d * stateData->state->motions[i]->duration());
 		}
 	}
