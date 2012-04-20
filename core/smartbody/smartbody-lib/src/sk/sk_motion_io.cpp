@@ -244,27 +244,27 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				if( parse_timing_metadata( in, token, _time_ready ) )
 					metadata_flags |= READY;
 				else
-					return false;
+					continue;
 			} else if( token=="stroke_start" ) {
 				if( parse_timing_metadata( in, token, _time_stroke_start ) )
 					metadata_flags |= STROKE_START;
 				else
-					return false;
+					continue;
 			} else if( token=="stroke_emphasis" ) {
 				if( parse_timing_metadata( in, token, _time_stroke_emphasis ) )
 					metadata_flags |= STROKE_EMPH;
 				else
-					return false;
+					continue;
 			} else if( token=="stroke_end" ) {
 				if( parse_timing_metadata( in, token, _time_stroke_end ) )
 					metadata_flags |= STROKE_END;
 				else
-					return false;
+					continue;
 			} else if( token=="relax" ) {
 				if( parse_timing_metadata( in, token, _time_relax ) )
 					metadata_flags |= RELAX;
 				else
-					return false;
+					continue;
 			} else if( token=="strokeStart" ) {
 				if( DEPRECATE_BAD_METADATA_NAMES )
 				{
@@ -275,7 +275,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				if( parse_timing_metadata( in, token, _time_stroke_start ) )
 					metadata_flags |= STROKE_START;
 				else
-					return false;
+					continue;
 			} else if( token=="emphasis" ) {
 				if( DEPRECATE_BAD_METADATA_NAMES )
 				{
@@ -286,7 +286,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				if( parse_timing_metadata( in, token, _time_stroke_emphasis ) )
 					metadata_flags |= STROKE_EMPH;
 				else
-					return false;
+					continue;
 			} else if( token=="stroke" ) {
 				if( DEPRECATE_BAD_METADATA_NAMES )
 				{
@@ -297,7 +297,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				if( parse_timing_metadata( in, token, _time_stroke_end ) )
 					metadata_flags |= STROKE_END;
 				else
-					return false;
+					continue;
 			} else if( token=="strokeEnd" ) {
 				if( DEPRECATE_BAD_METADATA_NAMES )
 				{
@@ -308,7 +308,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				if( parse_timing_metadata( in, token, _time_stroke_end ) )
 					metadata_flags |= STROKE_END;
 				else
-					return false;
+					continue;
 			} else {
 				std::stringstream strstr;
 				strstr << "ERROR: SkMotion::load(): ";
@@ -322,7 +322,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				}
 				strstr <<": Expected metadata name, but recieved \"" << token << "\".";
 				LOG(strstr.str().c_str());
-				return false;
+				continue;
 			}
 		} while( in.get_token() != SrInput::EndOfFile );
 
