@@ -50,7 +50,7 @@ SBScene::SBScene(void)
 
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 	createStringAttribute("speechRelaySoundCacheDir","../../../..",true,"",10,false,false,false,"Directory where sound files from speech relays will be placed. ");
-	createDoubleAttribute("scale",false,true,"",10,false,false,false,"The scale of scene (1 = meters, .01 = centimeters, etc).");
+	createDoubleAttribute("scale",.01,true,"",10,false,false,false,"The scale of scene (1 = meters, .01 = centimeters, etc).");
 }
 
 SBScene::~SBScene(void)
