@@ -214,13 +214,21 @@ bool validate_path( path& result, const char* pathname ) {
 }
 
 int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, SBResourceManager* manager, double scale, const char* error_prefix ) {
-		
 	if( !exists( pathname ) ) {
 		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
 		return CMD_FAILURE;
 	}
 
 	if( is_directory( pathname ) ) {
+		// ignore any '.' diretories
+		std::string filebase = pathname.leaf();
+		if (filebase.find(".") == 0)
+		{
+			// ignore hidden directories
+			return CMD_SUCCESS;
+		}
+		LOG("Attempting to load motions from path '%s'...", pathname.string().c_str());	
+	
 
 		directory_iterator end;
 		for( directory_iterator i( pathname ); i!=end; ++i ) {
