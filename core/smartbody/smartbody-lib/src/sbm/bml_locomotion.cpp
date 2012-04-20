@@ -161,7 +161,8 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	std::string manner = xml_parse_string(BMLDefs::ATTR_MANNER, elem);
 
 	if (!c->hasAttribute("steering.pathMaxSpeed"))
-		c->createDoubleAttribute("steering.pathMaxSpeed", 1.5f, true, "steering", 310, false, false, false, "");
+		c->createDoubleAttribute("steering.pathMaxSpeed", 1.5f, true, "steering", 310, false, false, false, "");	
+
 	if (speed > 0.0f)
 	{
 		c->steeringAgent->desiredSpeed = speed;
