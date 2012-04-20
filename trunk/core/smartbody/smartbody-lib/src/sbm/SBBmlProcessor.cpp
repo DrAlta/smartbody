@@ -68,7 +68,8 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 	if( seq_id.length()==0 ) {
 		if( echo ) {
 			msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false );
-			LOG("%s %s", cmd, msg.str().c_str());
+			// don't log a vrX message
+			//LOG("%s %s", cmd, msg.str().c_str());
 		}
 
 		if( send ) {
