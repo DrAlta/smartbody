@@ -48,7 +48,7 @@ class SmartBodyNVBG(Nvbg):
                                 #print "dialog not selected, play default one"
                                 self.nvbg.speak()
                         else:
-                                self.nvbg.speak(dialogStr)
+                                self.nvbg.speak(dialogStr, self.nvbg.characterName)
 
                 if (name == "play behavior"):
                         selectedBml = self.getAttribute("bml").getValue()

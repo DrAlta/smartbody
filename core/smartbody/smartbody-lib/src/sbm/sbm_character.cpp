@@ -361,8 +361,6 @@ void SbmCharacter::createStandardControllers()
 	std::string physicsCtName = getName() + "_physicsController";
 	this->physics_ct->setName(physicsCtName.c_str());
 
-	
-
 	posture_sched_p->ref();
 	motion_sched_p->ref();
 	gaze_sched_p->ref();
@@ -397,8 +395,8 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( saccade_ct );
 	ct_tree_p->add_controller( constraint_sched_p );	
 	ct_tree_p->add_controller( eyelid_reg_ct_p );
-	ct_tree_p->add_controller( head_param_anim_ct );
 	ct_tree_p->add_controller( head_sched_p );
+	ct_tree_p->add_controller( head_param_anim_ct );
 	ct_tree_p->add_controller( face_ct );
 	ct_tree_p->add_controller( param_sched_p );
 #if USE_PHYSICS_CHARACTER

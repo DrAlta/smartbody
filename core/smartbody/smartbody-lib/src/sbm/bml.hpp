@@ -69,7 +69,6 @@ extern wostream &wcout;
 extern wostream &wcerr;
 #endif
 
-
 namespace BML {
 	//  Helper Function
 	std::wstring buildBmlId( const std::wstring& behavior_id, const std::wstring& sync_id );
@@ -83,6 +82,8 @@ namespace BML {
 	// Enumerations
 	enum HeadBehaviorType { HEAD_NOD, HEAD_SHAKE, HEAD_TOSS, HEAD_ORIENT, HEAD_WIGGLE, HEAD_WAGGLE, HEAD_PARAMETERIZED };
 
+	// This Enumeration defines all the behavior type current being parameterized (keep expanding)
+	enum ParamAnimBehaviorType { PARAM_HEAD_TILT };
 
 
 	// Class Definitions
@@ -344,18 +345,22 @@ namespace BML {
 			           const BehaviorSyncPoints& behav_syncs );
 	};
 
-	class ParameterizedMotionRequest : public MeControllerRequest {
+	class ParameterizedAnimationRequest : public BehaviorRequest 
+	{
 	public:
-		ParameterizedMotionRequest( const std::string& unique_id, const std::string& localId, MeCtMotion* motion1ct, MeCtMotion* motion2ct, MeCtSchedulerClass* schedule_ct,
-			           const BehaviorSyncPoints& behav_syncs, float value, bool inLoop);
+		ParameterizedAnimationRequest( MeCtParamAnimation* param_anim_ct, const std::string& sName, double x, double y, double z, BML::ParamAnimBehaviorType type, const std::string& unique_id, const std::string& localId, const BehaviorSyncPoints& behav_syncs);
 
 		virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
+		
+		virtual void unschedule( mcuCBHandle* mcu, BmlRequestPtr request, time_sec duration );
 
 	private:
-		MeCtMotion* motion1Ct;
-		MeCtMotion* motion2Ct;
-		float paramValue;
-		bool loop;
+		std::string stateName;
+		double x;
+		double y;
+		double z;
+		BML::ParamAnimBehaviorType behaviorType;
+		MeCtParamAnimation* paramAnimCt;
 	};
 
 	class NodRequest : public MeControllerRequest {

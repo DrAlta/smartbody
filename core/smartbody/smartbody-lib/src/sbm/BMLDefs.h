@@ -38,7 +38,6 @@ class BMLDefs
 		static XMLCh* TM_END;
 
 		static XMLCh* TAG_SBM_ANIMATION;
-		static XMLCh* TAG_SBM_PANIMATION;
 		static XMLCh* ATTR_SPEED;
 		static XMLCh* ATTR_PVALUE;
 

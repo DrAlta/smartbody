@@ -405,8 +405,6 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				behavior = parse_bml_animation( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_SBM_ANIMATION )==0 ) {
 				behavior = parse_bml_animation( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, BMLDefs::TAG_SBM_PANIMATION )==0 ) {
-				behavior = parse_bml_panimation( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_BODY )==0 ) {
 				behavior = parse_bml_body( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_TORSO )==0 ) {
@@ -681,33 +679,9 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 				);
             }
 
-			case BML::HEAD_PARAMETERIZED: 
+			case BML::HEAD_PARAMETERIZED:	// we can keep renaming things once we get more parameterized case, for now it's fine
 			{
-				// error check: 1 - state name not empty 2 - state does exist 3 - it's a 3D state(x: tilt right y: tilt forward z: duration) 4 - it has 4 corresponding points (start stroke relax end)
-				// TODO: Add more flexibility later
 				std::string stateName = xml_utils::xml_parse_string(BMLDefs::ATTR_STATENAME, elem);
-				if (stateName == "")
-				{
-					LOG("parse_bml_head ERR: expecting a state name under parameterized head movement type.");
-					return BehaviorRequestPtr();
-				}
-				PAState* state = mcu->lookUpPAState(stateName);
-				if (!state)
-				{
-					LOG("parse_bml_head ERR: Can't find state name %s", stateName.c_str());
-					return BehaviorRequestPtr();
-				}
-				SBAnimationState3D* state3D = dynamic_cast<SBAnimationState3D*> (state);
-				if (!state3D)
-				{
-					LOG("parse_bml_head ERR: state %s is not a 3D state.", stateName.c_str());
-					return BehaviorRequestPtr();
-				}
-				if (state3D->getNumKeys() != 4)
-				{
-					LOG("parse_bml_head ERR: state %s has % keys. Parameterized animation state need 4 keys (start, stroke, relax, end).", stateName.c_str(), state3D->getNumKeys());
-					return BehaviorRequestPtr();				
-				}
 				std::string characterName = request->actor->getName();
 				SbmCharacter* character = mcu->getCharacter(characterName);
 				if (character == NULL)
@@ -715,63 +689,19 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 					LOG("parse_bml_states ERR: cannot find character with name %s.", characterName.c_str());
 					return BehaviorRequestPtr();
 				}
+				if (character->head_param_anim_ct == NULL)
+				{
+					LOG("parse_bml_states ERR: cannot find head_param_anim_ct inside character %s.", characterName.c_str());
+					return BehaviorRequestPtr();					
+				}
 
-				// assumption:	1 - headnod state is 3D, z is the hold time
-				//				2 - partial joint affected are spine4 and on
-				//				3 - headnod animations exported are from T-pose
-				// behaviors:	1 - defining x, y, z and stroke time		--> calculate start time
-				//				2 - defining x, y, stroke and relax time	--> calculate z and start time
-				//				3 - defining x, y, z and start time
-				//				4 - others ?
-
-				// get parameters
-				std::vector<double> weights;
-				weights.resize(state->getNumMotions());
 				std::string xString = xml_utils::xml_parse_string(BMLDefs::ATTR_X, elem);
 				std::string yString = xml_utils::xml_parse_string(BMLDefs::ATTR_Y, elem);
 				std::string zString = xml_utils::xml_parse_string(BMLDefs::ATTR_DURATION, elem);
 				double x = atof(xString.c_str());
 				double y = atof(yString.c_str());
 				double z = atof(zString.c_str());
-
-				// get sync points
-				std::string startString = xml_utils::xml_parse_string(BMLDefs::ATTR_START, elem);
-				std::string strokeString = xml_utils::xml_parse_string(BMLDefs::ATTR_STROKE, elem);
-				std::string relaxString = xml_utils::xml_parse_string(BMLDefs::ATTR_RELAX, elem);
-				double startTime = atof(startString.c_str());
-				double strokeTime = atof(strokeString.c_str());
-				double relaxTime = atof(relaxString.c_str());
-
-				// stroke & relax defined (reset z parameter, get weights, and get start time)
-				if (strokeString != "" && relaxString != "")
-				{
-					z = relaxTime - strokeTime;
-				}
-
-				// stroke defined (get start time from weights)
-				if (strokeString != "")
-				{
-					state3D->getWeightsFromParameters(x, y, z, weights);
-					PAStateData* stateData = new PAStateData(state, weights);
-					stateData->timeManager->updateWeights();
-					std::vector<double> blendedKey = stateData->timeManager->getKey();
-					strokeTime = atof(strokeString.c_str());
-					startTime = strokeTime - (blendedKey[1] - blendedKey[0]);
-					if (startTime < 0)
-					{
-						LOG("parse_bml_head Warning: parameterized head nod stroke time %f is not big enough for current parameter setting. Put startTime to 0 now.", strokeTime);
-						startTime = 0;
-					}
-				}
-
-				// get partial joint name (mainly skullbase or spine4) Hack for now
-				//std::string jointName = xml_utils::xml_parse_string(BMLDefs::ATTR_PARTIALJOINT, elem);
-				std::string jointName = "spine4";
-				
-				// schedule the state
-				character->param_animation_ct->schedule(state, x, y, z, PAStateData::Once, PAStateData::Queued, PAStateData::Additive, jointName, startTime);
-
-				return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
+				return BehaviorRequestPtr( new ParameterizedAnimationRequest(character->head_param_anim_ct, stateName, x, y, z, BML::PARAM_HEAD_TILT, unique_id, localId, behav_syncs));
 			}
 			case BML::HEAD_ORIENT: {
 				const XMLCh* direction = elem->getAttribute( BMLDefs::ATTR_DIRECTION );
