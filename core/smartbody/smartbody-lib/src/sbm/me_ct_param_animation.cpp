@@ -103,7 +103,6 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 			{
 				std::vector<double> weights;
 				schedule(NULL, weights);
-				return true;
 			}
 		}
 			
@@ -233,14 +232,6 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 		if (curStateData->active)
 		{
 			curStateData->evaluate(timeStep, frame.buffer());
-			/*
-			if (curStateData->getStateName() == "ChrUsaMleAdultLocomotion")
-			{
-				int motionId = curStateData->state->getMotionId("ChrUsaMleAdult@WalkTightCircleLf01");
-				LOG("local time = %f",curStateData->state->getMotionTime(curStateData->timeManager->localTime, motionId)); 
-			}
-			*/
-
 			if (!curStateData->isPartialBlending())
 				updateWo(curStateData->woManager->getBaseTransformMat(), woWriter, frame.buffer());
 			return true;
