@@ -22,6 +22,10 @@ public:
    ~FaceDialog();
    void AddFacialExpression(const string& name, double weight);
    Ui::FaceDialog ui;
+   SbmDebuggerClient* m_client;
+
+   // used for storage until the sides ("left", "right", "both") of the au's are obtained
+   vector<string> m_AUNums;
 
 private slots:
    void Reset();
@@ -29,10 +33,9 @@ private slots:
    void CharacterSelectionChanged(const QString& selection);
 
 private:
-   SbmDebuggerClient* m_client;
+   
    Scene* m_pScene;
    vector<QSlider*> m_Sliders;
-
    vector<QObject*> m_scrollListChildren;
 };
 

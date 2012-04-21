@@ -8,7 +8,7 @@
 // callbacks
 bool GetVisemeNames(void* caller, NetRequest* req);
 bool GetAUNumbers(void* caller, NetRequest* req);
-//bool GetNumVisemes(void* caller, NetRequest* req);
+bool GetAUSide(void* caller, NetRequest* req);
 
 
 FaceDialog::FaceDialog(SbmDebuggerClient* client, QWidget* parent ) : QDialog(parent)
@@ -111,6 +111,7 @@ void FaceDialog::CharacterSelectionChanged(const QString& selection)
    }
    m_scrollListChildren.clear(); 
    m_Sliders.clear();
+   m_AUNums.clear();
 }
 
 void FaceDialog::SliderValueChanged(int val)
@@ -129,34 +130,9 @@ void FaceDialog::SliderValueChanged(int val)
    spinBox->setValue(weight);
 
    // inform smartbody
-   if (visemeName.contains("au"))
-   {
-      QStringList split = visemeName.split("_");
-      if (split.length() >= 3)
-      {
-         string msg = vhcl::Format("sbm test bml char %s <face type=\"facs\" %s=\"%s\" side=\"%s\" amount=\"%.2f\" />",
-            ui.characterNameBox->currentText().toStdString().c_str(), split[0].toStdString().c_str(),
-            split[1].toStdString().c_str(), split[2].toStdString().c_str(), weight); 
-         vhmsg::ttu_notify1(msg.c_str());
-      }
-      else if (split.length() == 2)
-      {
-         string msg = vhcl::Format("sbm test bml char %s <face type=\"facs\" %s=\"%s\" amount=\"%.2f\" />",
-            ui.characterNameBox->currentText().toStdString().c_str(), split[0].toStdString().c_str(),
-            split[1].toStdString().c_str(), weight); 
-         vhmsg::ttu_notify1(msg.c_str());
-      }
-      else
-      {
-         printf("Error: failed to manipulate %s", visemeName.toStdString().c_str());
-      }
-   }
-   else
-   {
-      string msg = vhcl::Format("sbm char %s viseme %s %.2f 1",
-         ui.characterNameBox->currentText().toStdString().c_str(), visemeName.toStdString().c_str(), weight); 
-      vhmsg::ttu_notify1(msg.c_str());
-   }
+   string msg = vhcl::Format("sbm char %s viseme %s %.2f",
+      ui.characterNameBox->currentText().toStdString().c_str(), visemeName.toStdString().c_str(), weight); 
+   vhmsg::ttu_notify1(msg.c_str());
 }
 
 bool GetVisemeNames(void* caller, NetRequest* req)
@@ -176,11 +152,43 @@ bool GetAUNumbers(void* caller, NetRequest* req)
 {
    FaceDialog* dlg = req->getCaller<FaceDialog*>();
    
-   vector<string> auNums = req->Args();
-   for (unsigned int i = 0; i < auNums.size(); i++)
+   // save au's for later use
+   dlg->m_AUNums = req->Args();
+   for (unsigned int i = 0; i < dlg->m_AUNums.size(); i++)
    {
-      auNums[i].insert(0, "au_");
-      dlg->AddFacialExpression(auNums[i].c_str(), 0);
+      // i need to know the side that the au is on, so this command is sent
+      string commandAUSide = vhcl::Format("scene.getCharacter(\'%s\').getFaceDefinition().getAUSide(%s)",
+         dlg->ui.characterNameBox->currentText().toStdString().c_str(), dlg->m_AUNums[i].c_str());
+      dlg->m_client->SendSBMCommand(NetRequest::Get_AU_Side, "string", commandAUSide, GetAUSide, dlg); 
+
+      dlg->m_AUNums[i].insert(0, "au_");
+   }
+
+   return true;
+}
+
+bool GetAUSide(void* caller, NetRequest* req)
+{
+   FaceDialog* dlg = req->getCaller<FaceDialog*>();
+   if (dlg->m_AUNums.size() == 0)
+   {
+      return false;
+   }
+
+   string side = req->ArgsAsString();
+   std::transform(side.begin(), side.end(), side.begin(), ::tolower);
+   string auName = dlg->m_AUNums[0];
+   dlg->m_AUNums.erase(dlg->m_AUNums.begin());
+
+   if (side == "leftright")
+   {
+      dlg->AddFacialExpression(auName + "_left", 0);
+      dlg->AddFacialExpression(auName + "_right", 0);
+   }
+   else
+   {
+      side.insert(side.begin(), '_');
+      dlg->AddFacialExpression(auName + side, 0);
    }
 
    return true;
