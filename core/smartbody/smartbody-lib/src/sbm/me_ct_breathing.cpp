@@ -35,7 +35,7 @@
 
 std::string MeCtBreathing::type_name = "Breathing";
 
-MeCtBreathing::MeCtBreathing ()
+MeCtBreathing::MeCtBreathing () : SmartBody::SBController()
 {
 	_motion = 0;
 	_last_apply_frame = 0;

@@ -24,6 +24,12 @@ const std::string& SBController::getType()
 void SBController::setIgnore(bool val)
 {
 	setEnable(!val);
+	BoolAttribute* enableAttribute = dynamic_cast<BoolAttribute*>(getAttribute("enable"));
+
+	if (enableAttribute)
+	{
+		enableAttribute->setValueFast(!val);
+	}
 }
 
 bool SBController::isIgnore()
