@@ -35,6 +35,9 @@ const double changeLimit = 20;
 PAState::PAState()
 {
 	stateName = "unknown";
+	parameterScale.x = 1.0f;
+	parameterScale.y = 1.0f;
+	parameterScale.z = 1.0f;
 }
 
 PAState::PAState(PAState* data)
@@ -70,6 +73,11 @@ PAState::PAState(PAState* data)
 		triangles.push_back(data->getTriangles()[i]);
 	for (unsigned int i = 0; i < data->getTetrahedrons().size(); i++)
 		tetrahedrons.push_back(data->getTetrahedrons()[i]);
+
+	
+	parameterScale.x = 1.0f;
+	parameterScale.y = 1.0f;
+	parameterScale.z = 1.0f;
 }
 
 
@@ -77,6 +85,10 @@ PAState::PAState(const std::string& name)
 {
 	stateName = name;
 	cycle = false;
+
+	parameterScale.x = 1.0f;
+	parameterScale.y = 1.0f;
+	parameterScale.z = 1.0f;
 }
 
 PAState::~PAState()
@@ -183,8 +195,6 @@ bool PAState::getWeightsFromParameters(double x, std::vector<double>& weights)
 	{
 		int id = getMotionId(leftMotion);
 		weights[id] = 1.0;
-		SrVec tmp_vec((float)x, 0.0f, 0.0f);
-		setPrevVec( tmp_vec );
 	}
 	else
 	{
@@ -195,20 +205,14 @@ bool PAState::getWeightsFromParameters(double x, std::vector<double>& weights)
 		{
 			weights[leftId] = 1 - weight;
 			weights[rightId] = weight;
-			SrVec tmp_vec((float)x, 0.0, 0.0);
-			setPrevVec( tmp_vec );
 		}
 		if (leftId >=0 && rightId < 0)
 		{
 			weights[leftId] = 1.0;
-			SrVec tmp_vec((float)left, 0.0, 0.0);
-			setPrevVec( tmp_vec );
 		}
 		if (rightId >=0 && leftId < 0)
 		{
 			weights[rightId] = 1.0;
-			SrVec tmp_vec((float)right, 0.0, 0.0);
-			setPrevVec( tmp_vec );
 		}
 	}
 	return true;
@@ -219,14 +223,7 @@ bool PAState::getWeightsFromParameters(double x, double y, std::vector<double>& 
 	if (type != 1)
 		return false;
 	
-	//double xDiff = fabs(previousParam.x - x);
-	//if (xDiff > changeLimit)
-	//	x = (previousParam.x + x) * 0.5;
-	//double yDiff = fabs(previousParam.y - y);
-	//if (yDiff > changeLimit)
-	//	y = (previousParam.y + y) * 0.5;
-
-	SrVec pt = SrVec((float)x, (float)y, 0);
+	SrVec point = SrVec((float)x, (float)y, 0);
 	for (int i = 0; i < getNumTriangles(); i++)
 	{
 		SrVec v1 = triangles[i].triangle.a;
@@ -235,13 +232,13 @@ bool PAState::getWeightsFromParameters(double x, double y, std::vector<double>& 
 		int id1 = getMotionId(triangles[i].motion1);
 		int id2 = getMotionId(triangles[i].motion2);
 		int id3 = getMotionId(triangles[i].motion3);
-		bool in = insideTriangle(pt, v1, v2, v3);
+		bool in = insideTriangle(point, v1, v2, v3);
 		if (in)
 		{
 			for (int i = 0; i < getNumMotions(); i++)
 				weights[i] = 0.0;
-			getWeight(pt, v1, v2, v3, weights[id1], weights[id2], weights[id3]);
-			setPrevVec(pt);
+			
+			getWeight(point, v1, v2, v3, weights[id1], weights[id2], weights[id3]);
 			return true;
 		}
 	}
@@ -255,6 +252,12 @@ bool PAState::getWeightsFromParameters(double x, double y, std::vector<double>& 
 		SrVec v1 = triangles[i].triangle.a;
 		SrVec v2 = triangles[i].triangle.b;
 		SrVec v3 = triangles[i].triangle.c;
+		SrVec pt = point;
+		v1 = vecMultiply(v1, parameterScale);
+		v2 = vecMultiply(v2, parameterScale);
+		v3 = vecMultiply(v3, parameterScale);
+		pt = vecMultiply(pt, parameterScale);
+
 		SrVec vec;
 		float dist = getMinimumDist(pt, v1, v2, vec);
 		if (dist <= minDist)
@@ -290,8 +293,14 @@ bool PAState::getWeightsFromParameters(double x, double y, std::vector<double>& 
 		int id1 = getMotionId(triangles[triangleId].motion1);
 		int id2 = getMotionId(triangles[triangleId].motion2);
 		int id3 = getMotionId(triangles[triangleId].motion3);
+
+		SrVec invParameterScale(1.f / parameterScale.x, 1.f / parameterScale.y, 1.f / parameterScale.z);
+		param = vecMultiply(param, invParameterScale);
 		getWeight(param, v1, v2, v3, weights[id1], weights[id2], weights[id3]);
-		setPrevVec(param);
+	}
+	else
+	{
+		LOG("Not inside triangle.");
 	}
 	return true;
 }
@@ -301,20 +310,7 @@ bool PAState::getWeightsFromParameters(double x, double y, double z, std::vector
 	if (type != 2)
 		return false;
 
-	// parameter sudden change detect
-	//double zDiff = fabs(previousParam.z - z);
-	//if (zDiff > changeLimit)
-	//	z = (previousParam.z + z) * 0.5;
-	//
-	//double xDiff = fabs(previousParam.x - x);
-	//if (xDiff > changeLimit)
-	//	x = (previousParam.x + x) * 0.5;
-	//double yDiff = fabs(previousParam.y - y);
-	//if (yDiff > changeLimit)
-	//	y = (previousParam.y + y) * 0.5;
-
-
-	SrVec pt = SrVec((float)x, (float)y, (float)z);
+	SrVec point = SrVec((float)x, (float)y, (float)z);
 	for (unsigned int i = 0; i < tetrahedrons.size(); i++)
 	{
 		SrVec v1 = tetrahedrons[i].v1;
@@ -329,11 +325,11 @@ bool PAState::getWeightsFromParameters(double x, double y, double z, std::vector
 		double w2 = 0.0;
 		double w3 = 0.0;
 		double w4 = 0.0;
-		getWeight(pt, v1, v2, v3, v4, w1, w2, w3, w4);
+
+		getWeight(point, v1, v2, v3, v4, w1, w2, w3, w4);
+
 		if (w1 >= 0 && w2 >= 0 && w3 >= 0 && w4 >= 0)
 		{
-			setPrevVec(pt);
-	//		std::cout << motions[id1]->name() << " " << motions[id2]->name() << " " << motions[id3]->name() << " " << motions[id4]->name() << std::endl;
 			for (int i = 0; i < getNumMotions(); i++)
 				weights[i] = 0.0;
 
@@ -350,7 +346,6 @@ bool PAState::getWeightsFromParameters(double x, double y, double z, std::vector
 	int id = -1;
 	float min = 99999;
 	SrVec param;
-
 	for (unsigned int i = 0; i < tetrahedrons.size(); i++)
 	{
 		float bestSqDist = 9999;
@@ -358,6 +353,14 @@ bool PAState::getWeightsFromParameters(double x, double y, double z, std::vector
 		SrVec b = tetrahedrons[i].v2;
 		SrVec c = tetrahedrons[i].v3;
 		SrVec d = tetrahedrons[i].v4;
+		SrVec pt = point;
+
+		a = vecMultiply(a, parameterScale);
+		b = vecMultiply(b, parameterScale);
+		c = vecMultiply(c, parameterScale);
+		d = vecMultiply(d, parameterScale);
+		pt = vecMultiply(pt, parameterScale);
+
 		SrVec closestPt = a;
 
 		if (PointOutsideOfPlane(pt, a, b, c))
@@ -423,18 +426,20 @@ bool PAState::getWeightsFromParameters(double x, double y, double z, std::vector
 		double w2 = 0.0;
 		double w3 = 0.0;
 		double w4 = 0.0;
+
+		// scale back
+		SrVec invParameterScale(1.f / parameterScale.x, 1.f / parameterScale.y, 1.f / parameterScale.z);
+		param = vecMultiply(param, invParameterScale);
 		getWeight(param, v1, v2, v3, v4, w1, w2, w3, w4);
+
 		if (w1 >= 0 && w2 >= 0 && w3 >= 0 && w4 >= 0)
 		{
-			setPrevVec(param);
-	//		std::cout << motions[id1]->name() << " " << motions[id2]->name() << " " << motions[id3]->name() << " " << motions[id4]->name() << std::endl;
 			for (int i = 0; i < getNumMotions(); i++)
 				weights[i] = 0.0;
 			weights[id1] = w1;
 			weights[id2] = w2;
 			weights[id3] = w3;
 			weights[id4] = w4;
-
 			return true;
 		}
 		else
@@ -537,6 +542,49 @@ void PAState::getParametersFromWeights(float& x, float& y, float& z, std::vector
 	}
 }
 
+void PAState::updateParameterScale()
+{
+	float xMin = 9999.0f;
+	float xMax = -9999.0f;
+	float yMin = 9999.0f;
+	float yMax = -9999.0f;
+	float zMin = 9999.0f;
+	float zMax = -9999.0f;
+
+	// find the min and max values
+	for (size_t i = 0; i < parameters.size(); i++)
+	{
+		if (parameters[i].x < xMin)
+			xMin = parameters[i].x;
+		if (parameters[i].y < yMin)
+			yMin = parameters[i].y;
+		if (parameters[i].z < zMin)
+			zMin = parameters[i].z;
+
+		if (parameters[i].x > xMax)
+			xMax = parameters[i].x;
+		if (parameters[i].y > yMax)
+			yMax = parameters[i].y;
+		if (parameters[i].z > zMax)
+			zMax = parameters[i].z;
+	}
+	float xSpan = xMax - xMin;
+	float ySpan = yMax - yMin;
+	float zSpan = zMax - zMin;
+	if (xSpan > 0)
+	{
+		parameterScale.x = 1.f / xSpan;
+	}
+	if (ySpan > 0)
+	{
+		parameterScale.y = 1.f / ySpan;
+	}
+	if (zSpan > 0)
+	{
+		parameterScale.z = 1.f / zSpan;
+	}
+}
+
 void PAState::setParameter(const std::string& motion, double x)
 {
 	type = 0;
@@ -550,10 +598,12 @@ void PAState::setParameter(const std::string& motion, double x)
 				parameters.push_back(vec);
 			else
 			parameters[i] = vec;
+			updateParameterScale();
 			return;
 		}
 	} 
 	parameters.push_back(vec);
+	updateParameterScale();
 }
 
 void PAState::setParameter(const std::string& motion, double x, double y)
@@ -570,11 +620,12 @@ void PAState::setParameter(const std::string& motion, double x, double y)
 				parameters.push_back(vec);
 			else
 				parameters[i] = vec;
+			updateParameterScale();
 			return;
 		}
 	}
 	parameters.push_back(vec);
-
+	updateParameterScale();
 }
 
 void PAState::setParameter(const std::string& motion, double x, double y, double z)
@@ -592,12 +643,13 @@ void PAState::setParameter(const std::string& motion, double x, double y, double
 				parameters.push_back(vec);
 			else
 				parameters[i] = vec;
+			updateParameterScale();
 			return;
 		}
 	}
 
 	parameters.push_back(vec);
-	
+	updateParameterScale();
 }
 
 void PAState::getParameter(const std::string& motion, double& x)
@@ -945,16 +997,6 @@ SrVec PAState::getVec(int id)
 	return parameters[id];
 }
 
-SrVec PAState::getPrevVec()
-{
-	return previousParam;
-}
-
-void PAState::setPrevVec(SrVec& vec)
-{
-	previousParam = vec;
-}
-
 const std::string& PAState::getMotionName(int id)
 {
 	if (id < 0 || id > getNumParameters())
@@ -1122,6 +1164,15 @@ SrVec PAState::closestPtPointTriangle(SrVec& p, SrVec& a, SrVec& b, SrVec& c)
 int PAState::PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c)
 {
 	return dot(p - a, cross(b - a, c - a)) >= 0.0f;
+}
+
+SrVec PAState::vecMultiply(SrVec& vec1, SrVec& vec2)
+{
+	SrVec retVec;
+	retVec.x = vec1.x * vec2.x;
+	retVec.y = vec1.y * vec2.y;
+	retVec.z = vec1.z * vec2.z;
+	return retVec;
 }
 
 double PAState::getLocalTime(double motionTime, int motionIndex)

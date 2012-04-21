@@ -93,8 +93,6 @@ class PAState
 		int getMaxVecY();
 		SrVec getVec(const std::string& motion);
 		SrVec getVec(int id);
-		SrVec getPrevVec();
-		void setPrevVec(SrVec& vec);
 		const std::string& getMotionName(int id);
 		int getMotionId(const std::string& name);
 
@@ -118,16 +116,18 @@ class PAState
 		virtual int getNumKeys();
 
 	private:
+		void updateParameterScale();
 		bool insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
 		void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, double& w2, double& w3);
 		void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrVec& v4, double& w1, double& w2, double& w3, double& w4);
 		SrVec closestPtPointTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
 		int PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c);
+		SrVec vecMultiply(SrVec& vec1, SrVec& vec2);
 
 		int type;
 		//std::vector<std::string> motionNames;
 		std::vector<SrVec> parameters;
-		SrVec previousParam;
+		SrVec parameterScale;
 		std::vector<TriangleInfo> triangles;
 		std::vector<TetrahedronInfo> tetrahedrons;
 		std::string emptyString;
