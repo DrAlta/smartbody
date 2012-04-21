@@ -13,6 +13,7 @@ public:
    enum RequestId
    {
       Get_Viseme_Names,
+      Get_AU_Side,
       Get_Seq_Asset_Paths,
       Get_ME_Asset_Paths,
       Get_Audio_Asset_Paths,
@@ -66,6 +67,9 @@ public:
          ret += args[i];
          ret.insert(ret.length(), " ");
       }
+
+      // get rid of ending space
+      ret.erase(ret.end() - 1);
 
       return ret;
    }
