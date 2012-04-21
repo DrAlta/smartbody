@@ -35,6 +35,7 @@
 # include <me/me_controller.h>
 # include <sbm/me_ct_breathing_interface.h>
 #include <sbm/SBSubject.h>
+#include <sbm/SBController.h>
 #include <list>
 using std::list;
 
@@ -83,7 +84,7 @@ using std::list;
 *
 * SBM sequence file: test-breathing.seq
 */
-class MeCtBreathing : public MeCtBreathingInterface, public MeController
+class MeCtBreathing : public MeCtBreathingInterface, public SmartBody::SBController
 {
 private :
 	/**
