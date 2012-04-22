@@ -168,6 +168,8 @@ int pawnbonebus_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 #ifdef USE_GOOGLE_PROFILER
 int startprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int stopprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int startheapprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int stopheapprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 #endif
 
 int mcu_joint_datareceiver_func(srArgBuffer& args, mcuCBHandle *mcu_p);

@@ -168,6 +168,7 @@ BML::Processor::BMLProcessorMsg::~BMLProcessorMsg() {
 	// *xml memory may still be in use (?)
 	// agent is just a pointer to mcu managed SbmCharacter
 	// requestId has its own destructor
+
 }
 
 
@@ -188,7 +189,7 @@ BML::Processor::Processor()
 {
 	BMLDefs* bmlDefs = new BMLDefs();
 	try {
-		xmlParser = boost::shared_ptr<XercesDOMParser>( new XercesDOMParser() );
+		xmlParser = new XercesDOMParser();
 
 		xmlErrorHandler = new HandlerBase();
 		xmlParser->setErrorHandler( xmlErrorHandler );
@@ -214,8 +215,9 @@ void BML::Processor::registerRequestCallback(void (*cb)(BmlRequest* request, voi
 
 BML::Processor::~Processor()
 {
-	delete xmlErrorHandler;
-	xmlErrorHandler = NULL;
+//	xmlErrorHandler->release();
+//	delete xmlErrorHandler;
+//	xmlErrorHandler = NULL;
 }
 
 
@@ -486,7 +488,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 						if (i == 6) option = "end";
 						msg << "<sbm:event message=\"sbm triggerevent bmlstatus &quot;syncpointprogress " << request->actorId << " " << request->msgId << ":" << localId << " " << option << " $time&quot;" << "\" stroke=\"" << localId << ":" << option << "\"/>";
 						std::string newId = unique_id + "_" + option;
-						DOMElement* textXml = xml_utils::parseMessageXml( mcu->bml_processor.xmlParser.get(),  msg.str().c_str())->getDocumentElement();
+						DOMElement* textXml = xml_utils::parseMessageXml( mcu->bml_processor.xmlParser,  msg.str().c_str())->getDocumentElement();
 						feedbackSyncStart.parseStandardSyncPoints( textXml, request, newId );
 						BehaviorRequestPtr startRequestBehavior = parse_bml_event(textXml, newId, feedbackSyncStart, required, request, mcu);
 						startRequestBehavior->required = false;
@@ -1167,7 +1169,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		}
 
 		try {
-			DOMDocument *xmlDoc = xml_utils::parseMessageXml( bp.xmlParser.get(), xml );
+			DOMDocument *xmlDoc = xml_utils::parseMessageXml( bp.xmlParser, xml );
 			if( xmlDoc == NULL ) {
 				bml_error( character_id, message_id, "XML parser returned NULL document.", mcu );
 				return CMD_FAILURE;
@@ -1179,6 +1181,8 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 			BMLProcessorMsg bpMsg( character_id, message_id, character, xmlDoc, args );
 #endif
 			bp.bml_request( bpMsg, mcu );
+			if (xmlDoc)
+				xmlDoc->release();
 
 			return( CMD_SUCCESS );
 		} catch( BML::BmlException& e ) {
@@ -1322,7 +1326,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 			}
 			else
 			{
-				xmlDoc = xml_utils::parseMessageXml( bp.xmlParser.get(), xml );
+				xmlDoc = xml_utils::parseMessageXml( bp.xmlParser, xml );
 				if (mcu->useXmlCacheAuto)
 				{
 					// add to the cache if in auto cache mode
@@ -1332,7 +1336,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		}
 		else
 		{
-			xmlDoc = xml_utils::parseMessageXml( bp.xmlParser.get(), xml );
+			xmlDoc = xml_utils::parseMessageXml( bp.xmlParser, xml );
 		}
 
 		if( xmlDoc == NULL ) {
@@ -1346,6 +1350,8 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		BMLProcessorMsg bpMsg( agent_id, message_id, agent, xmlDoc, args );
 #endif
 		bp.bml_request( bpMsg, mcu );
+		if (xmlDoc)
+			xmlDoc->release();
 
 		return( CMD_SUCCESS );
 	} catch( BmlException& e ) {
