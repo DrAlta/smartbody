@@ -321,6 +321,9 @@ bool PAState::getWeightsFromParameters(double x, double y, double z, std::vector
 		int id2 = getMotionId(tetrahedrons[i].motion2);
 		int id3 = getMotionId(tetrahedrons[i].motion3);
 		int id4 = getMotionId(tetrahedrons[i].motion4);
+
+		if (id1 < 0 || id2 < 0 || id3 < 0 || id4 < 0)
+			return false;
 		double w1 = 0.0;	
 		double w2 = 0.0;
 		double w3 = 0.0;
