@@ -464,6 +464,8 @@ void mcuCBHandle::registerCallbacks()
 #ifdef USE_GOOGLE_PROFILER
 	insert( "startprofile",			   startprofile_func );
 	insert( "stopprofile",			   stopprofile_func );
+	insert( "startheapprofile",			   startheapprofile_func );
+	insert( "stopheapprofile",			   stopheapprofile_func );
 #endif
 	insert_set_cmd( "bp",             BML_PROCESSOR::set_func );
 	insert_set_cmd( "pawn",           SbmPawn::set_cmd_func );

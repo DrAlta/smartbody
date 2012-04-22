@@ -81,6 +81,7 @@
 
 #ifdef USE_GOOGLE_PROFILER
 #include <google/profiler.h>
+#include <google/heap-profiler.h>
 #endif
 
 using namespace std;
@@ -6330,6 +6331,19 @@ int stopprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	LOG("Stopping the CPU Profiler...");
 	ProfilerStop();
+	return CMD_SUCCESS;
+}
+int startheapprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	LOG("Starting the heap Profiler...");
+	HeapProfilerStart("/tmp/smartbodyheapprofile");
+	return CMD_SUCCESS;
+}
+
+int stopheapprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	LOG("Stopping the heap Profiler...");
+	HeapProfilerStop();
 	return CMD_SUCCESS;
 }
 #endif

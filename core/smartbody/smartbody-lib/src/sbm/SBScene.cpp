@@ -59,7 +59,7 @@ SBScene::~SBScene(void)
 		 iter != _scripts.end();
 		 iter++)
 	{
-		delete (*iter).second;
+	//	delete (*iter).second;
 	}
 
 	delete _sim;

@@ -98,7 +98,7 @@ namespace BML {
 		std::string bml2animText; // [BMLR] Stores the bml 2 animation mapping file
 #endif
 
-		boost::shared_ptr<XercesDOMParser> xmlParser;
+		XercesDOMParser* xmlParser;
 
 		float ct_speed_min;
 		float ct_speed_max;
