@@ -181,7 +181,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetMediaPath( const std::string & path )
 SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath, bool logToFile)
 {
    m_internalListener = new Smartbody_dll_SBMCharacterListener_Internal( this );
-
+   
    XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
 
 
@@ -190,8 +190,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath, boo
 
    // TODO: Replace with g_scene->SetCharacterListener(m_internalListener)
    mcu.sbm_character_listener = m_internalListener;
-
-
+   
    SetSpeechAudiofileBasePath( "../../" );
 
    initPython(pythonLibPath);

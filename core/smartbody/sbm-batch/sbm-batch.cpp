@@ -49,7 +49,7 @@ using std::vector;
 Smartbody_dll * sbm = NULL;
 vector< string > characters;
 vector<SBM_SmartbodyCharacter*> instances;
-
+SBMHANDLE sbmHandle = NULL;
 
 class SBMListener : public SmartbodyListener
 {
@@ -158,9 +158,10 @@ class SBMListener : public SmartbodyListener
 
 static void tt_client_callback( const char * op, const char * args, void * user_data )
 {
-   printf( "received - '%s %s'\n", op, args );
+   printf( "tt_client callback received - '%s %s'\n", op, args );
 
    sbm->ProcessVHMsgs( op, args );
+   //SBM_ProcessVHMsgs(sbmHandle,op,args);
 }
 
 #ifdef WIN32_LEAN_AND_MEAN
@@ -191,6 +192,7 @@ int main( int argc, char ** argv )
    // sbm related vhmsgs
    vhmsg::ttu_register( "sb" );
    vhmsg::ttu_register( "sbm" );
+   vhmsg::ttu_register( "sbmdebugger" );
    vhmsg::ttu_register( "vrAgentBML" );
    vhmsg::ttu_register( "vrSpeak" );
    vhmsg::ttu_register( "RemoteSpeechReply" );
@@ -213,7 +215,8 @@ int main( int argc, char ** argv )
    //sbm->Init();
    //sbm->SetListener( &listener );
    
-   SBMHANDLE sbmHandle = SBM_CreateSBM();
+   //SBMHANDLE sbmHandle = SBM_CreateSBM();
+   sbmHandle = SBM_CreateSBM();
    SBM_Init(sbmHandle, "../../Python26/Lib", true);
    SBM_SetListener(sbmHandle, 
 	   (SBM_OnCreateCharacterCallback) OnCreateCharacterCallback, 
@@ -221,7 +224,7 @@ int main( int argc, char ** argv )
 	   (SBM_OnCharacterChangeCallback) OnCharacterChangeCallback, 
 	   (SBM_OnVisemeCallback) OnVisemeCallback,
 	   (SBM_OnChannelCallback) OnChannelCallback);
-
+   
    printf( "Starting main loop...\n");
 #if WIN32
 	printf("Hit 'q' to quit\n");
