@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
-			IntermediateDirectory="Debug"
+			OutputDirectory=".\obj\sbm_debug"
+			IntermediateDirectory=".\obj\sbm_debug"
 			ConfigurationType="1"
 			CharacterSet="2"
 			>
@@ -64,7 +64,7 @@
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="smartbody-dll_d.lib vhcl_d.lib vhmsg_d.lib pthreadVSE2.lib activemq-cppd.lib dbghelp.lib opengl32.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
-				OutputFile="$(OutDir)\$(ProjectName)d.exe"
+				OutputFile=".\bin\sbm-batchd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;..\smartbody-dll\lib&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib"
 				GenerateDebugInformation="true"
@@ -98,8 +98,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			OutputDirectory=".\obj\sbm_release"
+			IntermediateDirectory=".\obj\sbm_release"
 			ConfigurationType="1"
 			CharacterSet="2"
 			>
@@ -143,9 +143,11 @@
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="smartbody-dll.lib vhcl.lib vhmsg.lib pthreadVSE2.lib activemq-cpp.lib dbghelp.lib opengl32.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
+				OutputFile=".\bin\sbm-batch.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;..\smartbody-dll\lib&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib"
 				GenerateDebugInformation="false"
+				ProgramDatabaseFile=""
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -173,7 +175,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if not exist .\bin mkdir .\bin&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; .\bin&#x0D;&#x0A;copy /Y ..\smartbody-dll\lib\smartbody-dll.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\OpenAL32.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\wrap_oal.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\alut.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\pthreads\lib9\pthreadVSE2.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr\lib9\libapr-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\xerces-c\bin9\xerces-c_3_1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-1_44.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_system-vc90-mt-1_44.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_regex-vc90-mt-1_44.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_python-vc90-mt-1_44.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll  .\bin&#x0D;&#x0A;copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll  .\bin&#x0D;&#x0A;copy /Y ..\..\..\core\smartbody\Python26\python26.dll .\bin&#x0D;&#x0A;copy /Y &quot;$(VS90COMNTOOLS)\..\IDE\dbghelp.dll&quot; .\bin&#x0D;&#x0A;"
+				CommandLine="if not exist .\bin mkdir .\bin&#x0D;&#x0A;copy /Y ..\smartbody-dll\lib\smartbody-dll.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\OpenAL32.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\wrap_oal.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\alut.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\pthreads\lib9\pthreadVSE2.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr\lib9\libapr-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\xerces-c\bin9\xerces-c_3_1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-1_44.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_system-vc90-mt-1_44.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_regex-vc90-mt-1_44.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_python-vc90-mt-1_44.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll  .\bin&#x0D;&#x0A;copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll  .\bin&#x0D;&#x0A;copy /Y ..\..\..\core\smartbody\Python26\python26.dll .\bin&#x0D;&#x0A;copy /Y &quot;$(VS90COMNTOOLS)\..\IDE\dbghelp.dll&quot; .\bin&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
