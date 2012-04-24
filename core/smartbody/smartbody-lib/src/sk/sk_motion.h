@@ -225,6 +225,9 @@ public :
 	// Build and return a mirror motion from the motion. The mirror axis is assumed to be y-z plane with the character center at origin.
 	SkMotion* buildMirrorMotion(SkSkeleton* skeleton);
 
+	// smooth out the window between [0,timeInterval] and [duration-timeInterval, duration] so the motion will look smooth when cycling
+	SkMotion* buildSmoothMotionCycle(float timeInterval);
+
 	/*! Change the angle values of all channels in euler angles type by
 	adding +-2PI, in order to have the smallest distance between frames,
 	e.g., to obtain interpolation from 0 to -60, instead of 0 to 300.

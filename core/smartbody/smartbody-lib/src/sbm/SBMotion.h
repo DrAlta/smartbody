@@ -31,6 +31,7 @@ class SBMotion : public SkMotion
 		virtual void disconnect();
 
 		SBMotion* mirror(std::string name, std::string skeletonName);
+		SBMotion* smoothCycle(std::string name, float timeInterval);
 		bool translate(float x, float y, float z, const std::string& baseJointName);
 		bool rotate(float xaxis, float yaxis, float zaxis, const std::string& baseJointName);
 		bool scale(float factor);

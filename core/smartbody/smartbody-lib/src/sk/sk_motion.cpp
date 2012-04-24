@@ -768,6 +768,83 @@ std::vector<SmartBody::MotionEvent*>& SkMotion::getMotionEvents()
 	return _motionEvents;
 }
 
+SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
+{
+	SkChannelArray& mchan_arr = this->channels();
+	SkMotion *smooth_p = new SmartBody::SBMotion();
+	srSynchPoints sp(synch_points);
+	smooth_p->synch_points = sp;
+	smooth_p->init( mchan_arr );
+	int num_f = this->frames();	
+	int intervalFrames = (int)(this->frames()*timeInterval/duration());
+	std::vector<float> discontinuity;
+	// copy the motion
+	for (int i = 0; i < num_f; i++)
+	{
+		smooth_p->insert_frame( i, this->keytime( i ) );
+		float *ref_p = this->posture( i );
+		float *new_p = smooth_p->posture( i );
+		// go through each channel, and flip the channel value when necessary
+		for (int k=0;k<mchan_arr.size();k++)
+		{
+			SkChannel& chan = mchan_arr[k];
+			const std::string& jointName = mchan_arr.name(k);
+			int index = mchan_arr.float_position(k);			
+			{
+				for (int n=0;n<chan.size();n++)
+					new_p[index+n] = ref_p[index+n];
+			}
+		}
+	}
+
+	// smooth the first and last s frames
+	float *first_p = this->posture( 0 );
+	float *last_p  = this->posture( num_f - 1 );	
+	for (int i = 0; i< num_f; i++)
+	{
+		if (i > intervalFrames && i < num_f - intervalFrames)
+			continue;	
+		float *new_p = smooth_p->posture( i );
+		int curFrame = (i <= intervalFrames) ? i + intervalFrames : ( i + intervalFrames - num_f );
+		float ratio = ((float)curFrame)/intervalFrames;
+		float yf = curFrame < intervalFrames ? 0.5f*ratio*ratio : -0.5f*ratio*ratio + 2.f*ratio - 2.f;
+		for (int k=0;k<mchan_arr.size();k++)
+		{
+			SkChannel& chan = mchan_arr[k];
+			const std::string& jointName = mchan_arr.name(k);
+			bool isPos = chan.type <= SkChannel::ZPos; 
+			if (jointName == "base") // we ignore the base when smoothing
+				continue;
+			int index = mchan_arr.float_position(k);		
+			if (chan.type == SkChannel::Quat) // not sure if this is the best way of doing this
+			{
+				SrQuat q1 = SrQuat( first_p[ index ], first_p[ index + 1 ], first_p[ index + 2 ], first_p[ index + 3 ] );
+				SrQuat q2 = SrQuat( last_p[ index ], last_p[ index + 1 ], last_p[ index + 2 ], last_p[ index + 3 ] );
+				//SrVec diff = curFrame < intervalFrames ? (q2.inverse()*q1).axisAngle()*yf : (q1.inverse()*q2).axisAngle()*(yf);
+				SrQuat targetQ = curFrame < intervalFrames ? q1 : q2;
+				SrQuat curQ = SrQuat( new_p[ index ], new_p[ index + 1 ], new_p[ index + 2 ], new_p[ index + 3 ] );
+				SrQuat finalQ = slerp(curQ,targetQ,fabs(yf));			
+				new_p[ index + 0 ] = (float)finalQ.w;
+				new_p[ index + 1 ] = (float)finalQ.x;
+				new_p[ index + 2 ] = (float)finalQ.y;
+				new_p[ index + 3 ] = (float)finalQ.z;
+			}
+			else
+			{
+				for (int j=0;j<chan.size();j++)
+				{
+					float diff = first_p[index + j] - last_p[index + j]; // difference between posture			
+					new_p[index+j] += yf*diff;
+				}	
+			}					
+		}
+	}
+
+
+	return smooth_p;
+
+}
+
 SkMotion* SkMotion::buildMirrorMotion(SkSkeleton* skeleton)
 {	
 	SkChannelArray& mchan_arr = this->channels();
