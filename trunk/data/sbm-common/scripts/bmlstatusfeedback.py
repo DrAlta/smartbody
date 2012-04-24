@@ -34,5 +34,5 @@ class FeedbackHandler(EventHandler):
 		
 
 f = FeedbackHandler()
-em = getEventManager()
+em = scene.getEventManager()
 em.addEventHandler("bmlstatus", f)

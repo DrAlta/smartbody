@@ -27,6 +27,7 @@
 #include <sbm/SBParser.h>
 #include <sbm/SBBoneBusManager.h>
 #include <sbm/SBSteerAgent.h>
+#include <sr/sr_box.h>
 
 
 #ifdef USE_PYTHON
@@ -1051,6 +1052,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("setFaceDefinition", &SBCharacter::setFaceDefinition, "Sets face definition (visemes, action units) for a character.")
 		.def("getFaceDefinition", &SBCharacter::getFaceDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets face definition (visemes, action units) for a character.")
 		.def("getHeight", &SBCharacter::getHeight, "Gets the height of the character.")
+		.def("getBoundingBox", &SBCharacter::getBoundingBox, "Gets the boundary dimensions of the character.")
 		.def("getNumBehaviors", &SBCharacter::getNumBehaviors, "Returns the number of behaviors of the character.")
 		.def("getBehavior", &SBCharacter::getBehavior, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the ith behavior of the character.")
 		.def("setSteerAgent", &SBCharacter::setSteerAgent, "Set the steer agent of the character")
@@ -1179,6 +1181,24 @@ boost::python::class_<SBReach>("SBReach")
 		.def(boost::python::init<float, float, float, float>())
 		.def("getData", &SrQuat::getData, "gets the data in the quaterion at location indicated by the index w,x,y,z")
 		.def("setData", &SrQuat::setData, "sets the data in the quaterion at location indicated by the index w,x,y,z")
+		;
+	
+	boost::python::class_<SrBox>("SrBox")
+		.def(boost::python::init<>())
+		.def(boost::python::init<SrVec, SrVec>())
+		.def(boost::python::init<SrBox>())
+		.def("setMinimum", &SrBox::setMinimum, "sets the minimum values of the box")
+		.def("setMaximum", &SrBox::setMaximum,  "sets the maximum values of the box")
+		.def("getMinimum", &SrBox::getMinimum, boost::python::return_value_policy<boost::python::return_by_value>(), "gets the minimum values of the box")
+		.def("getMaximum", &SrBox::getMaximum, boost::python::return_value_policy<boost::python::return_by_value>(), "gets the maximum values of the box")
+		.def("getCenter", &SrBox::getCenter, boost::python::return_value_policy<boost::python::return_by_value>(), "gets center of the box")
+		.def("getMinSize", &SrBox::min_size, "gets the minimum dimension of the box")
+		.def("getMaxSize", &SrBox::max_size, "gets the maximum dimension of the box")
+		.def("getSize", &SrBox::getSize, boost::python::return_value_policy<boost::python::return_by_value>(), "returns the size of each dimension")
+		.def("doesContain", &SrBox::contains, "returns the center of the box")
+		.def("doesIntersect", &SrBox::intersects, "returns the center of the box")
+		.def("getVolume", &SrBox::volume, "returns the volume of the box")
+		.def("isEmpty", &SrBox::empty, "returns true if the box is empty")
 		;
 #endif
 

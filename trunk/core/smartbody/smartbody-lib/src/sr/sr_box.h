@@ -64,7 +64,15 @@ class SrBox
     /* Constructs SrBox containing the two given boxes. */
     SrBox ( const SrBox& x, const SrBox& y );
 
-    /*! Init the box as (0,0,0)(0,0,0). */
+	SrPnt& getMinimum() { return a;}
+
+	SrPnt& getMaximum() { return b;}
+
+	void setMinimum(SrPnt& pt) { a = pt;}
+
+	void setMaximum(SrPnt& pt) { b = pt;}
+
+	/*! Init the box as (0,0,0)(0,0,0). */
     void set_null () { a=SrPnt::null; b=SrPnt::null; }
 
     /*! Sets the minimum and maximum vertices of the box. */
@@ -85,6 +93,9 @@ class SrBox
     /*! Returns the center point of the box (b+a)/2. */
     SrPnt center () const;
 
+	 /*! Returns the center point of the box (b+a)/2. */
+    SrPnt getCenter () const;
+
     /*! Translates SrBox to have its center in p. */
     void center ( const SrPnt& p );
 
@@ -94,6 +105,9 @@ class SrBox
 
     /*! Returns the dimensions in each axis (b-a). */
     SrVec size () const;
+
+	/*! Returns the dimensions in each axis (b-a). */
+    SrVec getSize () const;
 
     /*! Returns the maximum dimension of the box. */
     float max_size () const;

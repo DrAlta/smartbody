@@ -135,6 +135,7 @@ public:
 
 	void setHeight( float height )	{ _height = height; }
 	float getHeight( void ) 		{ return _height; }
+	SrBox getBoundingBox( void ) 		{ if (_skeleton) return _skeleton->getBoundingBox(); return SrBox(); }
 
 	virtual int prune_controller_tree();  // removes unused or overwritten controllers
 	
