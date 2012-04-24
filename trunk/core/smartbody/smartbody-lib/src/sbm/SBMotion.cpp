@@ -196,6 +196,28 @@ SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 	return sbmotion;
 }
 
+SBMotion* SBMotion::smoothCycle( std::string name, float timeInterval )
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 	
+	SkMotion* motion = buildSmoothMotionCycle(timeInterval);
+	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
+	if (sbmotion)
+	{
+		std::string motionName = "";
+		if (name == "")
+		{
+			motionName = sbmotion->getName();
+			if (motionName == EMPTY_STRING)
+				motionName = getName() + "_smoothCycle";
+		}
+		else
+			motionName = name;
+		sbmotion->setName(motionName.c_str());
+		mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, motion));
+	}
+	return sbmotion;
+}
+
 float SBMotion::getJointSpeed(SBJoint* joint, float startTime, float endTime)
 {
 	if (!joint)
