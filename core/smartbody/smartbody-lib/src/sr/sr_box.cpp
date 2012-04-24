@@ -49,6 +49,11 @@ SrVec SrBox::center () const
    return (a+b)/2.0f; // == a + (b-a)/2 == a + b/2 - a/2
  }
 
+SrVec SrBox::getCenter () const 
+ { 
+   return (a+b)/2.0f; // == a + (b-a)/2 == a + b/2 - a/2
+ }
+
 void SrBox::center ( const SrVec& p )
  {
    (*this) += p-center();
@@ -60,6 +65,12 @@ void SrBox::size ( const SrVec& v )
  }
 
 SrVec SrBox::size () const 
+ { 
+   return b-a; 
+ }
+
+
+SrVec SrBox::getSize () const 
  { 
    return b-a; 
  }
