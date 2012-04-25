@@ -3720,6 +3720,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\SBCollisionManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBCollisionManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SBController.cpp"
 				>
 			</File>

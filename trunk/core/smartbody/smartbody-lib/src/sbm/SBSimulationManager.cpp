@@ -76,6 +76,12 @@ double SBSimulationManager::getTime()
 	return mcu.time;
 }
 
+double SBSimulationManager::getTimeDt()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	return mcu.time_dt;
+}
+
 void SBSimulationManager::setTime(double time)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();

@@ -24,6 +24,7 @@ class SBPhysicsManager;
 class SBBoneBusManager;
 class SBGestureMapManager;
 class SBJointMapManager;
+class SBCollisionManager;
 class SBParser;
 class SBScript;
 class SBSubject;
@@ -105,6 +106,7 @@ class SBScene : public SBObject
 		SBBoneBusManager* getBoneBusManager();
 		SBGestureMapManager* getGestureMapManager();
 		SBJointMapManager* getJointMapManager();
+		SBCollisionManager* getCollsionManager();
 
 		SBParser* getParser();
 
@@ -124,6 +126,7 @@ class SBScene : public SBObject
 		SBBoneBusManager* _boneBusManager;
 		SBGestureMapManager* _gestureMapManager;
 		SBJointMapManager* _jointMapManager;
+		SBCollisionManager* _collisionManager;
 		SBParser* _parser;
 
 		std::map<std::string, SBScript*> _scripts;
