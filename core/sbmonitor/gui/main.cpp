@@ -18,6 +18,20 @@ int main(int argc, char *argv[])
    vhcl::Log::g_log.AddListener( new vhcl::Log::DebuggerListener() );
    vhcl::Log::g_log.AddListener( new vhcl::Log::StdoutListener() );
 
+
+   // Get the exe's path and manually set the working dir.
+   // We do this so that the .exe can find the asset path correctly,
+   // no matter where the .exe was launched from.
+   // We normally handle this with a .bat file that does a pushd/popd,
+   // but if the .exe is on a network share, you can't pushd to a network share
+   wchar_t lpFilename[MAX_PATH];
+   GetModuleFileName(NULL, lpFilename, MAX_PATH);
+   std::wstring path;
+   std::wstring file;
+   vhcl::StripPath(std::wstring(lpFilename), path, file);
+   SetCurrentDirectory(path.c_str());
+
+
    QApplication app(argc, argv);
    SbmDebuggerForm sbmDebugger;
 
