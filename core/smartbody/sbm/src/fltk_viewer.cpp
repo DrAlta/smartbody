@@ -2705,12 +2705,13 @@ void FltkViewer::drawEyeBeams()
 		if (eyeRight)
 		{
 			SrMat gmat = eyeRight->gmat();
+			SrVec localAxis = eyeRight->localGlobalAxis(2)*eyebeamLength;
 			glPushMatrix();
 			glMultMatrixf((const float*) gmat);
 			glColor3f(1.0, 0.0, 0.0);
 			glBegin(GL_LINES);
 			glVertex3f(0, 0, 0);
-			glVertex3f(0, 0, eyebeamLength);
+			glVertex3f(localAxis[0],localAxis[1],localAxis[2]);
 			glEnd();
 			glPopMatrix();
 		}
@@ -2718,12 +2719,14 @@ void FltkViewer::drawEyeBeams()
 		if (eyeLeft)
 		{
 			SrMat gmat = eyeLeft->gmat();
+			SrVec localAxis = eyeLeft->localGlobalAxis(2)*eyebeamLength;
 			glPushMatrix();
 			glMultMatrixf((const float*) gmat);
 			glColor3f(1.0, 0.0, 0.0);
 			glBegin(GL_LINES);
 			glVertex3f(0, 0, 0);
-			glVertex3f(0, 0, eyebeamLength);
+			//glVertex3f(0, 0, eyebeamLength);
+			glVertex3f(localAxis[0],localAxis[1],localAxis[2]);
 			glEnd();
 			glPopMatrix();
 		}
@@ -4468,11 +4471,12 @@ std::string PALocomotionData::getLocomotionStateName()
 	if (!character)
 		return "";
 	SmartBody::SBSteerManager* manager = SmartBody::SBScene::getScene()->getSteerManager();
-	SmartBody::SBSteerAgent* steerAgent = manager->getSteerAgent(character->getName());
-	if (!steerAgent)
-		return "";
-	const std::string& prefix = steerAgent->getSteerStateNamePrefix();
-	std::string stateName = prefix + "Locomotion";
+// 	SmartBody::SBSteerAgent* steerAgent = manager->getSteerAgent(character->getName());
+// 	if (!steerAgent)
+// 		return "";
+// 	const std::string& prefix = steerAgent->getSteerStateNamePrefix();
+	//std::string stateName = prefix + "Locomotion";
+	std::string stateName = "ChrMarineLocomotion";
 	return stateName;
 }
 
@@ -4577,7 +4581,7 @@ void PALocomotionData::updateKeys(float dt)
 	// speed limits	
 	float runSpeedLimit = 4.f*unitScale;
 	float walkSpeedLimit = 1.2f*unitScale;
-	float angSpeedLimit = 200.f;
+	float angSpeedLimit = 140.f;
 	float strifeSpeedLimit = 1.f*unitScale;
 	// make sure the control parameter does not exceed limits
 	
@@ -4637,13 +4641,15 @@ void PALocomotionData::updateKeys(float dt)
 			 fabs(s) < speedEps && 
 			 stateData->state->stateName == locoStateName && 
 			 !stopping)
-	{
+	{	
+		//LOG("stop, v = %f, w = %f, s = %f",v,w,s);
 		v = w = 0;
 		std::vector<double> weights;
 		weights.resize(stateData->state->getNumMotions());
 		bool success = stateData->state->getWeightsFromParameters(0,0,0, weights);
 		std::stringstream command;
-		command << "panim schedule char " << character->getName() << " state " << PseudoIdleState << " loop true playnow true additive false joint null ";
+		command << "panim schedule char " << character->getName() << " state " << "null" << " loop true playnow true additive false joint null ";
+		
 		//LOG("stopLocomotion, %s",command.str().c_str());
 		mcu.execute((char*)command.str().c_str());				
 		stopping = true;
