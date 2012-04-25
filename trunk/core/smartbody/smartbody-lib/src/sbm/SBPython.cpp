@@ -759,6 +759,11 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getNumCorrespondencePoints", &SBAnimationState::getNumCorrespondencePoints, "Number of correspondence points for the motions in the state")
 		.def("getCorrespondencePoints", &SBAnimationState::getCorrespondencePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the correspondence points in one motion given the index. \n Input: index of motion \n Output: correspondence points vector of this motion")
 		.def("getDimension", &SBAnimationState::getDimension, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the dimension of the state. Dimension represents the number of parameter for each motion. 0D means no parameter, 1D means one parameter for each motion etc.")
+		.def("addEvent", &SBAnimationState::addEvent, "Adds an event to the state at a specific local time for the given motion.")
+		.def("removeAllEvents", &SBAnimationState::removeAllEvents, "Removes all events from the state at a specific local time for the given motion.")
+		.def("getNumEvents", &SBAnimationState::getNumEvents, "Returns the number of events associated with this state.")
+		.def("getEvent", &SBAnimationState::getEvent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event of a given index.")
+		.def("removeEvent", &SBAnimationState::removeEvent, "Removes the event of a given index.")
 		;
 
 	boost::python::class_<SBAnimationState0D, boost::python::bases<SBAnimationState> >("SBAnimationState0D")
@@ -784,14 +789,17 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 
 	boost::python::class_<SBAnimationTransition>("SBAnimationTransition")
 		.def("set", &SBAnimationTransition::set, "")
-		.def("addCorrespondancePoint", &SBAnimationTransition::addCorrespondencePoint, "")
-		.def("getNumCorrespondancePoints", &SBAnimationTransition::getNumCorrespondencePoints, "")
-		.def("getCorrespondancePoint", &SBAnimationTransition::getCorrespondencePoint, boost::python::return_value_policy<boost::python::return_by_value>(), "")
-		.def("addCorrespondencePoint", &SBAnimationTransition::addCorrespondencePoint, "")
-		.def("getNumCorrespondencePoints", &SBAnimationTransition::getNumCorrespondencePoints, "")
-		.def("getCorrespondencePoint", &SBAnimationTransition::getCorrespondencePoint, boost::python::return_value_policy<boost::python::return_by_value>(), "")
-		.def("getFromState", &SBAnimationTransition::getFromState, boost::python::return_value_policy<boost::python::reference_existing_object>(), "")
-		.def("getToState", &SBAnimationTransition::getToState, boost::python::return_value_policy<boost::python::reference_existing_object>(), "")
+		.def("setEaseInInterval", &SBAnimationTransition::setEaseInInterval, "")
+		.def("addEaseOutInterval", &SBAnimationTransition::addEaseOutInterval, "")
+		.def("removeEaseOutInterval", &SBAnimationTransition::removeEaseOutInterval, "")
+		.def("getNumEaseOutIntervals", &SBAnimationTransition::getNumEaseOutIntervals, "")
+		.def("getEaseOutInterval", &SBAnimationTransition::getEaseOutInterval, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		.def("getSourceState", &SBAnimationTransition::getSourceState, boost::python::return_value_policy<boost::python::reference_existing_object>(), "")
+		.def("getDestinationState", &SBAnimationTransition::getDestinationState, boost::python::return_value_policy<boost::python::reference_existing_object>(), "")
+		.def("getSourceMotionName", &SBAnimationTransition::getSourceMotionName, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		.def("getDestinationMotionName", &SBAnimationTransition::getDestinationMotionName, boost::python::return_value_policy<boost::python::return_by_value>(), "")
+		.def("getEaseInStart", &SBAnimationTransition::getEaseInStart, "")
+		.def("getEaseInEnd", &SBAnimationTransition::getEaseInEnd, "")
 		;
 
 	boost::python::class_<SBAnimationStateManager>("SBAnimationStateManager")

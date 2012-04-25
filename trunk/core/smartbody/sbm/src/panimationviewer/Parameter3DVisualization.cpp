@@ -1,4 +1,6 @@
 #include "Parameter3DVisualization.h"
+#include <sr/sr_gl.h>
+#include <sr/sr_light.h>
 
 # define ROTATING2(e)	(e.alt && e.button1)
 # define DOLLYING(e)	(e.alt && e.button3)

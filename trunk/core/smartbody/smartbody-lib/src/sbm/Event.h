@@ -81,11 +81,14 @@ class MotionEvent : public Event
 
 		bool isEnabled() { return m_enabled; }
 		void setEnabled(bool val) { m_enabled = val; }
+		void setMotionName(const std::string& name) { m_name = name; }
+		const std::string& getMotionName() { return m_name; }
 
 	protected:
 		double m_time;
 		bool m_isOnce;
 		bool m_enabled;
+		std::string m_name;
 };
 
 }

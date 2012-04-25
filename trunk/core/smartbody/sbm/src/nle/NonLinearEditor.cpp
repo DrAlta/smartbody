@@ -10,6 +10,9 @@ Mark::Mark()
 	endTime = -1;
 	block = NULL;
 	setSelected(false);
+	selectedBeginTime = false;
+	selectedEndTime = false;
+	selectedBothTime = false;
 
 	for (int i = 0; i < 4; i++)
 		bounds[i] = 0;
@@ -19,6 +22,7 @@ Mark::Mark()
 	showName = true;
 	info = "";
 	boundToBlock = true;
+	interval = true;
 }
 
 Mark::~Mark()
@@ -129,6 +133,46 @@ void Mark::setBoundToBlock(bool val)
 bool Mark::isBoundToBlock()
 {
 	return boundToBlock;
+}
+
+void Mark::setInterval(bool val)
+{
+	interval = val;
+}
+
+bool Mark::isInterval()
+{
+	return interval;
+}
+
+void Mark::setSelectedStartTime(bool val)
+{
+	selectedBeginTime = val;
+}
+
+bool Mark::isSelectedStartTime()
+{
+	return selectedBeginTime;
+}
+
+bool Mark::isSelectedEndTime()
+{
+	return selectedEndTime;
+}
+
+void Mark::setSelectedEndTime(bool val)
+{
+	selectedEndTime = val;
+}
+
+bool Mark::isSelectedBothTime()
+{
+	return selectedBothTime;
+}
+
+void Mark::setSelectedBothTime(bool val)
+{
+	selectedBothTime = val;
 }
 
 Block::Block()

@@ -15,43 +15,78 @@ SBAnimationTransition::~SBAnimationTransition()
 {
 }
 
+double SBAnimationTransition::getEaseInStart()
+{
+	return easeInStart;
+}
+
+double SBAnimationTransition::getEaseInEnd()
+{
+	return easeInEnd;
+}
+
+
 void SBAnimationTransition::set(SBAnimationState* source, SBAnimationState* dest)
 {
 	fromState = source;
 	toState = dest;
 }
 
-void SBAnimationTransition::addCorrespondencePoint(std::string  sourceMotion, std::string destMotion, float sourceFromTime, float sourceToTime, float destFromTime, float destToTime)
+void SBAnimationTransition::setEaseInInterval(std::string destMotion, float start, float end)
+{
+	toMotionName = destMotion;
+	easeInStart = start;
+	easeInEnd = end;
+}
+
+int SBAnimationTransition::getNumEaseOutIntervals()
+{
+	return easeOutStart.size();
+}
+
+std::vector<double> SBAnimationTransition::getEaseOutInterval(int num)
+{
+	std::vector<double> interval;
+	if (num <0 || num >= (int) easeOutStart.size())
+		return interval;
+
+	interval.push_back((float) easeOutStart[num]);
+	interval.push_back((float) easeOutEnd[num]);
+
+	return interval;
+}
+
+void SBAnimationTransition::addEaseOutInterval(std::string sourceMotion, float start, float end)
 {
 	fromMotionName = sourceMotion;
-	toMotionName = destMotion;
-
-	easeOutStart.push_back(sourceFromTime);
-	easeOutEnd.push_back(sourceToTime);
-	easeInStart = destFromTime;
-	easeInEnd = destToTime;
+	easeOutStart.push_back(start);
+	easeOutEnd.push_back(end);
 }
 
-int SBAnimationTransition::getNumCorrespondencePoints()
+void SBAnimationTransition::removeEaseOutInterval(int num)
 {
-	return 0;
 }
 
-std::vector<float> SBAnimationTransition::getCorrespondencePoint(int num)
-{
-	return std::vector<float>();
-}
-
-SBAnimationState* SBAnimationTransition::getFromState()
+SBAnimationState* SBAnimationTransition::getSourceState()
 {
 	SBAnimationState* from = dynamic_cast<SBAnimationState*>(fromState);
 	return from;
 }
 
-SBAnimationState* SBAnimationTransition::getToState()
+SBAnimationState* SBAnimationTransition::getDestinationState()
 {
 	SBAnimationState* to = dynamic_cast<SBAnimationState*>(toState);
 	return to;
+}
+
+const std::string& SBAnimationTransition::getSourceMotionName()
+{
+	return fromMotionName;
+}
+
+const std::string& SBAnimationTransition::getDestinationMotionName()
+{
+	return toMotionName;
 }
 
 }

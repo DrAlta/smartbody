@@ -26,6 +26,11 @@
 #include "me_ct_param_animation_utilities.h"
 #include <sr/sr_triangle.h>
 
+namespace SmartBody {
+	class MotionEvent;
+}
+
+
 const std::string PseudoIdleState = "PseudoIdle";
 
 struct TriangleInfo
@@ -48,9 +53,6 @@ struct TetrahedronInfo
 	std::string motion4;
 };
 
-//There are PAState stored inside mcu.
-//Everytime PAStateData is created, it would copy the data from mcu.param_animation_states. 
-//toStates and fromStates are just pointers and they are not that useful
 class PAState
 {
 	public:
@@ -104,18 +106,19 @@ class PAState
 		std::vector<TriangleInfo>& getTriangles() {return triangles;}
 		std::vector<TetrahedronInfo> & getTetrahedrons() {return tetrahedrons;}
 
+		std::vector<std::pair<SmartBody::MotionEvent*, int> >& getEvents();
+		void addEventToMotion(const std::string& motion, SmartBody::MotionEvent* motionEvent);
+
 		std::string stateName;
 		std::vector<SkMotion*> motions;
 		std::vector<std::vector<double> > keys;
 
-		std::vector<PAState*> toStates;				
-		std::vector<PAState*> fromStates;
 		bool cycle;
 
 		virtual int getNumMotions();
 		virtual int getNumKeys();
 
-	private:
+	protected:
 		void updateParameterScale();
 		bool insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
 		void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, double& w2, double& w3);
@@ -131,6 +134,7 @@ class PAState
 		std::vector<TriangleInfo> triangles;
 		std::vector<TetrahedronInfo> tetrahedrons;
 		std::string emptyString;
+		std::vector<std::pair<SmartBody::MotionEvent*, int> > _events;
 };
 
 //There are PATransition stored inside mcu

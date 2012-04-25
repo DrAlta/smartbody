@@ -46,7 +46,8 @@ void ParamAnimEditorWidget::drawBlock(nle::Block* block, int trackNum, int block
 void ParamAnimEditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int trackNum, int blockNum, int markNum)
 {
 	CorrespondenceMark* cMark = dynamic_cast<CorrespondenceMark*>(mark);
-	if (cMark)
+	IntervalMark* iMark = dynamic_cast<IntervalMark*>(mark);
+	if (cMark || iMark)
 	{
 		int viewableStart = this->convertTimeToPosition(getViewableTimeStart());
 		int viewableEnd = this->convertTimeToPosition(getViewableTimeEnd());	
@@ -76,7 +77,7 @@ void ParamAnimEditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int tra
 			drawText = false;
 		}
 		//fltk::Rectangle rec(bounds[0] - 2, bounds[1], bounds[2] + 4, bounds[3]);
-		fl_rectf(bounds[0] - 2, bounds[1], bounds[2] + 4, bounds[3]);
+		fl_rect(bounds[0] - 2, bounds[1], bounds[2] + 4, bounds[3]);
 
 		
 		if (mark->isShowName())
@@ -97,17 +98,48 @@ void ParamAnimEditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int tra
 			}
 		}
 
-		// connect to the attached correspondence mark
-		// get the position of the other mark
-		std::vector<CorrespondenceMark*>& attached = cMark->getAttachedMark();
-		for (size_t i = 0; i < attached.size(); i++)
+		if (cMark)
 		{
-			if (attached[i])
+			// connect to the attached correspondence mark
+			// get the position of the other mark
+			
+			std::vector<CorrespondenceMark*>& attached = cMark->getAttachedMark();
+			for (size_t i = 0; i < attached.size(); i++)
 			{
-				int abounds[4];
-				attached[i]->getBounds(abounds[0], abounds[1], abounds[2], abounds[3]);
-				fl_color(FL_BLUE);
-				fl_line(bounds[0], bounds[1], abounds[0], abounds[1]);
+				if (attached[i])
+				{
+					int abounds[4];
+					attached[i]->getBounds(abounds[0], abounds[1], abounds[2], abounds[3]);
+					fl_color(FL_BLUE);
+					fl_line(bounds[0], bounds[1], abounds[0], abounds[1]);
+				}
+			}
+		}
+		else if (iMark)
+		{
+			if (trackNum == 0)
+			{
+				// connect to ease in mark
+				nle::Track* secondTrack = model->getTrack(1);
+				if (block)
+				{
+					nle::Block* block = secondTrack->getBlock(0);
+					if (block)
+					{
+						nle::Mark* easeInMark = block->getMark(0);
+						if (easeInMark)
+						{
+							int outBounds[4];
+							iMark->getBounds(outBounds[0], outBounds[1], outBounds[2], outBounds[3]);
+							int inBounds[4];
+							easeInMark->getBounds(inBounds[0], inBounds[1], inBounds[2], inBounds[3]);
+							fl_color(FL_BLUE);
+							fl_line(outBounds[0], outBounds[1] + outBounds[3], inBounds[0], inBounds[1]);
+							fl_line(outBounds[0] + outBounds[2], outBounds[1] + outBounds[3], inBounds[0] + inBounds[2], inBounds[1]);
+						}
+					}
+				}
+				
 			}
 		}
 	}

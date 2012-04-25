@@ -71,6 +71,8 @@ set( SBM_FLTK_SRC
 	src/panimationviewer/ParamAnimScriptEditor.cpp
 	src/panimationviewer/ParamAnimStateEditor.cpp
 	src/panimationviewer/ParamAnimTransitionEditor.cpp
+	src/panimationviewer/ParamAnimTransitionEditor2.cpp
+	src/panimationviewer/ParamAnimTransitionCreatorWidget.cpp
 	src/panimationviewer/ParameterGroup.cpp
 	src/panimationviewer/ParameterVisualization.cpp
 	src/panimationviewer/Parameter3DVisualization.cpp

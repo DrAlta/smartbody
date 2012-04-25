@@ -5,6 +5,7 @@
 #include <FL/Fl_Gl_Window.H>
 #include <sbm/me_ct_param_animation_data.h>
 #include "ParameterGroup.h"
+#include <sr/sr_camera.h>
 
 class Parameter3DVisualization : public Fl_Gl_Window
 {

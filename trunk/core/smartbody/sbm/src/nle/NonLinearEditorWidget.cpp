@@ -308,6 +308,17 @@ void EditorWidget::draw()
 		{
 			nle::Block* block = track->getBlock(b);
 			drawBlock(block, t, b);
+		}
+	}
+
+	// draw each mark 
+	for (int t = 0; t < numTracks; t++)
+	{
+		nle::Track* track = model->getTrack(t);
+		// draw each block
+		for (int b = 0; b < track->getNumBlocks(); b++)
+		{
+			nle::Block* block = track->getBlock(b);
 			// draw the marks on the track
 			for (int m = 0; m < block->getNumMarks(); m++)
 			{
@@ -476,7 +487,8 @@ void EditorWidget::drawTrack(nle::Track* track, int trackNum)
 	fl_draw(track->getName().c_str(), left + 15, (bounds[1] + (bounds[1] + bounds[3])) / 2);
 
 	if (track->isSelected())
-		fl_color(FL_DARK2);
+		//fl_color(FL_DARK2);
+		fl_color(FL_YELLOW);
 	else
 		fl_color(FL_LIGHT1);
 	fl_rectf(bounds[0], bounds[1], bounds[2], bounds[3]);
@@ -902,29 +914,62 @@ int EditorWidget::handle(int event)
 				}
 			}
 			
-			if (selectedMark) // mark is selected and user clicked on the middle of the block
+			if (selectedMark) // mark is selected 
 			{
                 // determine where to move the block
                 double origTime = this->convertViewablePositionToTime(clickPositionX);
                 double newTime = this->convertViewablePositionToTime(mousex);
                 double timeDiff = newTime - origTime; // adjust block start/end by this amount
                                 
-                bool okToMove = true;
-                if (okToMove)
-                {
-                    // make sure that the mark doesn't go beyond the beginning
-                    double startTime = selectedMark->getStartTime() + timeDiff;
-                    double endTime = selectedMark->getEndTime() + timeDiff;
-	
+				if (true)
+				{
+					double startTime = selectedMark->getStartTime();
+                    double endTime = selectedMark->getEndTime();
+					if (selectedMark->isSelectedBothTime())
+					{
+						startTime = selectedMark->getStartTime() + timeDiff;
+						endTime = selectedMark->getEndTime() + timeDiff;
+					}
+					else if (selectedMark->isSelectedStartTime())
+					{
+						startTime = selectedMark->getStartTime() + timeDiff;
+					}
+					else if (selectedMark->isSelectedEndTime())
+					{
+						endTime = selectedMark->getEndTime() + timeDiff;
+					}
+                    
+                    // make sure that the mark doesn't go beyond the beginning	
 					if (selectedMark->isBoundToBlock())
 					{
-						if (startTime >= selectedMark->getBlock()->getStartTime() && endTime <= selectedMark->getBlock()->getEndTime())
+						if (startTime >= selectedMark->getBlock()->getStartTime() && 
+							endTime <= selectedMark->getBlock()->getEndTime())
 						{
-							selectedMark->setStartTime(startTime);
-							selectedMark->setEndTime(endTime);
+							if (selectedMark->isSelectedBothTime())
+							{
+								selectedMark->setStartTime(startTime);
+								selectedMark->setEndTime(endTime);
+							}
+							else if (selectedMark->isSelectedStartTime())
+							{
+								selectedMark->setStartTime(startTime);
+							}
+							else if (selectedMark->isSelectedEndTime())
+							{
+								selectedMark->setEndTime(endTime);
+							}
+
 							char buff[256];
-							sprintf(buff, "%6.2f", selectedMark->getStartTime());
-							selectedMark->setName(buff);
+							if (selectedMark->getStartTime() != selectedMark->getEndTime())
+							{
+								sprintf(buff, "%6.2f %6.2f", selectedMark->getStartTime(), selectedMark->getEndTime());
+								selectedMark->setName(buff);
+							}
+							else
+							{
+								sprintf(buff, "%6.2f", selectedMark->getStartTime());
+								selectedMark->setName(buff);
+							}							
 						}       
 						if (startTime < selectedMark->getBlock()->getStartTime())
 						{
@@ -939,11 +984,37 @@ int EditorWidget::handle(int event)
 					}
 					else
 					{
-						selectedMark->setStartTime(startTime);
-						selectedMark->setEndTime(endTime);
+						if (selectedMark->isSelectedBothTime())
+						{
+							selectedMark->setStartTime(startTime);
+							selectedMark->setEndTime(endTime);
+						}
+						else if (selectedMark->isSelectedStartTime())
+						{
+							selectedMark->setStartTime(startTime);
+						}
+						else if (selectedMark->isSelectedEndTime())
+						{
+							selectedMark->setEndTime(endTime);
+						}
+						
 						char buff[256];
 						sprintf(buff, "%6.2f", selectedMark->getStartTime());
 						selectedMark->setName(buff);
+					}
+
+					// make sure the beginning doesn't go past the ending or vice versa
+					if (selectedMark->isSelectedStartTime())
+					{
+						if (selectedMark->getStartTime() > selectedMark->getEndTime())
+							selectedMark->setStartTime(selectedMark->getEndTime());
+
+					}
+					else if (selectedMark->isSelectedEndTime())
+					{
+						if (selectedMark->getEndTime() < selectedMark->getStartTime())
+							selectedMark->setEndTime(selectedMark->getStartTime());
+
 					}
 					
                     // reset the mouse position
@@ -1107,23 +1178,61 @@ int EditorWidget::handle(int event)
 							(mousey >= minY && mousey <= maxY))
 						{
 							mark->setSelected(!mark->isSelected());
+							if (mark->isSelected() && mark->isInterval())
+							{
+								// how to manipulate this mark? 
+								// first third = start time
+								// middle third = move entire mark
+								// last third = end time
+								int denom = maxX - minX;
+								if (denom != 0)
+								{
+									int numerator = mousex - minX;
+									float d = (float) denom;
+									float n = (float) numerator;
+									float param = n / d;
+									if (param < .33)
+									{
+										mark->setSelectedStartTime(true);
+										mark->setSelectedEndTime(false);
+										mark->setSelectedBothTime(false);
+									}
+									else if (param > .67)
+									{
+										mark->setSelectedStartTime(false);
+										mark->setSelectedEndTime(true);
+										mark->setSelectedBothTime(false);
+									}
+									else
+									{
+										mark->setSelectedStartTime(false);
+										mark->setSelectedEndTime(false);
+										mark->setSelectedBothTime(true);
+									}
+								}
+							}
+
 							changeMarkSelectionEvent(mark);
 							// modify track selection according to mark hit
 							for (int t1 = 0; t1 < model->getNumTracks(); t1++)
 							{
 								nle::Track* selectTrack = model->getTrack(t1);
 								if (selectTrack != mark->getBlock()->getTrack())
+								{
 									if (selectTrack->isSelected())
 									{
 										selectTrack->setSelected(false);
 										changeTrackSelectionEvent(selectTrack);
 									}
+								}
 								else
+								{
 									if (!selectTrack->isSelected())
 									{
 										selectTrack->setSelected(true);
 										changeTrackSelectionEvent(selectTrack);
 									}
+								}
 							}
 			
 							// modify block selection according to mark hit
@@ -1255,17 +1364,21 @@ int EditorWidget::handle(int event)
 						{
 							nle::Track* selectTrack = model->getTrack(t);
 							if (selectTrack != track)
+							{
 								if (selectTrack->isSelected())
 								{
 									selectTrack->setSelected(false);
 									changeTrackSelectionEvent(selectTrack);
 								}
+							}
 							else
+							{
 								if (!selectTrack->isSelected())
 								{
 									selectTrack->setSelected(true);
 									changeTrackSelectionEvent(selectTrack);
 								}
+							}
 						}
 						mouseHit = true;
 					}

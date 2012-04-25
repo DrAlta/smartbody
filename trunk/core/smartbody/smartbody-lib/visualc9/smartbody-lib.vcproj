@@ -1508,7 +1508,7 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="general"
+	Name="general"
 				>
 				<Filter
 					Name="MotionInterpolation"

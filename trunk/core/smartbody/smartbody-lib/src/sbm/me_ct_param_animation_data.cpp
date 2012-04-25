@@ -25,6 +25,7 @@
 #include <sbm/me_ct_ublas.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
+#include <sbm/Event.h>
 
 #ifdef USE_TETGEN
 #include <external/tetgen/tetgen.h>
@@ -55,12 +56,6 @@ PAState::PAState(PAState* data)
 			tempVec.push_back(data->keys[i][j]);
 		keys.push_back(tempVec);
 	}
-
-	for (unsigned int i = 0; i < data->toStates.size(); i++)
-		toStates.push_back(data->toStates[i]);
-
-	for (unsigned int i = 0; i < data->fromStates.size(); i++)
-		fromStates.push_back(data->fromStates[i]);
 	
 	cycle = data->cycle;
 
@@ -98,12 +93,6 @@ PAState::~PAState()
 		motions[i] = NULL;
 	}
 	motions.clear();
-	for (unsigned int i = 0; i < toStates.size(); i++)
-		toStates[i] = NULL;
-	toStates.clear();
-	for (unsigned int i = 0; i < fromStates.size(); i++)
-		fromStates[i] = NULL;
-	fromStates.clear();
 }
 
 
@@ -1218,6 +1207,31 @@ double PAState::getMotionTime(double localTime, int motionIndex)
 	return motionTime;
 }
 
+const bool ascendingTime2(std::pair<SmartBody::MotionEvent*, int>* a, std::pair<SmartBody::MotionEvent*, int>* b)
+{
+	return (a->first->getTime() < b->first->getTime());
+}
+
+std::vector<std::pair<SmartBody::MotionEvent*, int> >& PAState::getEvents()
+{
+	return _events;
+}
+
+void PAState::addEventToMotion(const std::string& motion, SmartBody::MotionEvent* motionEvent)
+{
+	// determine the motion index
+	int index = getMotionId(motion);
+	if (index == -1)
+	{
+		LOG("Could not add event to state %s: no motion named %s found.", stateName.c_str(), motion.c_str());
+	}
+
+	_events.push_back(std::pair<SmartBody::MotionEvent*, int>(motionEvent, index));
+	// make sure that the motion events are ordered by time
+//	std::sort(_events.begin(), _events.end(), ascendingTime2);
+}
+
+
 
 MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)
 {
@@ -1427,3 +1441,5 @@ double MotionParameters::getAvgRootJointY()
 	y = y / (double)numFrames;
 	return y;
 }
+
+

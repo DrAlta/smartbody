@@ -259,6 +259,46 @@ bool SBAnimationState::validateState()
 	return true;
 }
 
+void SBAnimationState::addEvent(const std::string& motion, double time, const std::string& type, const std::string& parameters, bool onceOnly)
+{
+	MotionEvent* motionEvent = new MotionEvent();
+	motionEvent->setIsOnceOnly(onceOnly);
+	motionEvent->setTime(time);
+	motionEvent->setType(type);
+	motionEvent->setParameters(parameters);
+	addEventToMotion(motion, motionEvent);
+}
+
+void SBAnimationState::removeEvent(int index)
+{
+	if (index < 0 || (int) _events.size() > index)
+		return;
+}
+
+MotionEvent* SBAnimationState::getEvent(int index)
+{
+	if (index < 0 || (int) _events.size() > index)
+		return NULL;
+
+	return _events[index].first;
+}
+
+void SBAnimationState::removeAllEvents()
+{
+	for (std::vector<std::pair<MotionEvent*, int> >::iterator iter = _events.begin();
+		 iter != _events.end();
+		 iter++)
+	{
+		delete (*iter).first;
+	}
+	_events.clear();
+}
+
+int SBAnimationState::getNumEvents()
+{
+	return _events.size();
+}
+
 SBAnimationState0D::SBAnimationState0D() : SBAnimationState("unknown")
 {
 }

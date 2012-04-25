@@ -22,6 +22,11 @@ class SBAnimationState : public PAState
 		virtual void setCorrespondencePoints(int motionIndex, int pointIndex, double value);
 
 		virtual void removeMotion(const std::string& motionName);
+		virtual void addEvent(const std::string& motion, double time, const std::string& type, const std::string& parameters, bool onceOnly);
+		virtual void removeEvent(int index);
+		virtual MotionEvent* getEvent(int index);
+		virtual void removeAllEvents();
+		virtual int getNumEvents();
 
 		virtual std::string getDimension();
 		bool validateState();

@@ -136,10 +136,12 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 	{
 //		if (stateData->toStates.size() == 0)
 			addItem(nextCycleStates, PseudoIdleState);
-		for (size_t i = 0; i < state->toStates.size(); i++)
+		std::vector<std::string> nextStates;
+
+/*		for (size_t i = 0; i < state->toStates.size(); i++)
 			for (size_t j = 0; j < state->toStates[i]->toStates.size(); j++)
 				addItem(nextCycleStates, state->toStates[i]->toStates[j]->stateName.c_str());
-	}
+*/	}
 	for (int i = 0; i < nextCycleStates->size(); i++)
 		nextCycleStates->select(i+1, false);
 	availableTransitions->clear();
@@ -243,6 +245,7 @@ void PARunTimeEditor::updateTransitionStates(Fl_Widget* widget, void* data)
 		bool toHit = false;
 		if (currentState == PseudoIdleState)
 		{
+			/*
 			if (mcu.param_anim_states[i]->fromStates.size() == 0)
 			{
 				for (size_t j = 0; j < mcu.param_anim_states[i]->toStates.size(); j++)
@@ -254,9 +257,11 @@ void PARunTimeEditor::updateTransitionStates(Fl_Widget* widget, void* data)
 					}
 				}
 			}
+			*/
 		}
 		else if (nextState == PseudoIdleState)
 		{
+			/*
 			if (mcu.param_anim_states[i]->toStates.size() == 0)
 			{
 				for (size_t j = 0; j < mcu.param_anim_states[i]->fromStates.size(); j++)
@@ -268,9 +273,11 @@ void PARunTimeEditor::updateTransitionStates(Fl_Widget* widget, void* data)
 					}
 				}
 			}
+			*/
 		}
 		else
 		{
+			/*
 			for (size_t j = 0; j < mcu.param_anim_states[i]->fromStates.size(); j++)
 				if (mcu.param_anim_states[i]->fromStates[j]->stateName == currentState)
 				{
@@ -283,6 +290,7 @@ void PARunTimeEditor::updateTransitionStates(Fl_Widget* widget, void* data)
 					toHit = true;
 					break;
 				}
+				*/
 
 			if (fromHit && toHit)
 				editor->availableTransitions->add(mcu.param_anim_states[i]->stateName.c_str());	

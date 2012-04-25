@@ -42,19 +42,24 @@
 #include <sbm/me_ct_param_animation_utilities.h>
 #include <sbm/me_ct_param_animation_data.h>
 #include <map>
-#include "ParamAnimEditorWidget.h"
-#include "ParamAnimStateEditor.h"
-#include "ParamAnimTransitionEditor.h"
-#include "ParamAnimRunTimeEditor.h"
-#include "ParamAnimScriptEditor.h"
+
 
 
 const static int yDis = 10;
 const static int xDis = 10;
 class PAStateEditor;
 class PATransitionEditor;
+class PATransitionEditor2;
 class PAScriptEditor;
 class PARunTimeEditor;
+
+namespace nle {
+	class NonLinearEditorModel;
+	class Block;
+	class Mark;
+	class Track;
+}
+
 
 namespace SmartBody {
 	class SBCharacter;
@@ -104,6 +109,7 @@ class PanimationWindow : public Fl_Double_Window, public GenericViewer
 	
 		Fl_Tabs*		tabGroup;
 		PATransitionEditor* transitionEditor;
+		PATransitionEditor2* transitionEditor2;
 		PAStateEditor*		stateEditor;
 		PAScriptEditor*		scriptEditor;
 		PARunTimeEditor*	runTimeEditor;

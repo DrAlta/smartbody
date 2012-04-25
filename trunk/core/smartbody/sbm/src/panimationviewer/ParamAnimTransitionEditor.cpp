@@ -23,10 +23,13 @@
 #include "ParamAnimTransitionEditor.h"
 #include <sbm/mcontrol_util.h>
 #include "ParamAnimBlock.h"
+#include "ParamAnimEditorWidget.h"
+#include <FL/Fl_Hold_Browser.H>
 
 
 PATransitionEditor::PATransitionEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
 {
+	
 	this->label("Transition Editor");
 	this->begin();
 		transitionEditorMode = new Fl_Check_Button(xDis + x, yDis + y, 200, 2 * yDis, "Create Transition Mode");
