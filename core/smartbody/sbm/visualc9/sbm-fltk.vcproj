@@ -583,11 +583,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\panimationviewer\ParamAnimTransitionCreatorWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimTransitionCreatorWidget.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\panimationviewer\ParamAnimTransitionEditor.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\src\panimationviewer\ParamAnimTransitionEditor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimTransitionEditor2.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimTransitionEditor2.h"
 				>
 			</File>
 			<File

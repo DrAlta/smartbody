@@ -17,6 +17,7 @@
 #include <sbm/SBBoneBusManager.h>
 #include <sbm/SBGestureMapManager.h>
 #include <sbm/SBJointMapManager.h>
+#include <sbm/SBCollisionManager.h>
 #include <sbm/SBSkeleton.h>
 #include <sbm/SBParser.h>
 #include "SbmDebuggerServer.h"
@@ -37,12 +38,14 @@ SBScene::SBScene(void)
 	_gestureMapManager = new SBGestureMapManager();
 	_jointMapManager = new SBJointMapManager();
 	_boneBusManager = new SBBoneBusManager();
+	_collisionManager = new SBCollisionManager();
 	_scale = .01f; // default scale is centimeters
 
 	// add the services
 	_serviceManager->addService(_steerManager);
 	_serviceManager->addService(_physicsManager);
 	_serviceManager->addService(_boneBusManager);
+	_serviceManager->addService(_collisionManager);
 
 	_parser = new SBParser();
 

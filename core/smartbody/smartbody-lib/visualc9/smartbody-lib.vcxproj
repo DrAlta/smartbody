@@ -681,6 +681,7 @@
     <ClCompile Include="..\src\sbm\SBSkeleton.cpp" />
     <ClCompile Include="..\src\sbm\SBSteerAgent.cpp" />
     <ClCompile Include="..\src\sbm\SBSteerManager.cpp" />
+	<ClCompile Include="..\src\sbm\SBCollisionManager.cpp" />
     <ClCompile Include="..\src\sbm\SBSubject.cpp" />
     <ClCompile Include="..\src\sbm\nvbg.cpp" />
   </ItemGroup>
@@ -1032,6 +1033,7 @@
     <ClInclude Include="..\src\sbm\SBSkeleton.h" />
     <ClInclude Include="..\src\sbm\SBSteerAgent.h" />
     <ClInclude Include="..\src\sbm\SBSteerManager.h" />
+    <ClInclude Include="..\src\sbm\SBCollisionManager.h" />
     <ClInclude Include="..\src\sbm\SBSubject.h" />
     <ClInclude Include="..\src\sbm\nvbg.h" />
   </ItemGroup>
