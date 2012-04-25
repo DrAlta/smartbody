@@ -381,7 +381,7 @@ void MeCtSaccade::initSaccade(MeFrameData& frame)
 		SkJoint* rEyeJoint = _skeleton->search_joint(eyeballR.c_str());
 		if (lEyeJoint && rEyeJoint)
 		{
-			_leftRightRot = SrQuat(lEyeJoint->gmatZero().inverse()*rEyeJoint->gmatZero());
+			_leftRightRot = SrQuat(lEyeJoint->gmatZero()*rEyeJoint->gmatZero().inverse());
 		for (int i=0;i<3;i++)
 			_localAxis[i] = lEyeJoint->localGlobalAxis(i);
 		}
