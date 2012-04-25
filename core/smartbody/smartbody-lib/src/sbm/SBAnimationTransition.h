@@ -16,12 +16,18 @@ class SBAnimationTransition : public PATransition
 		~SBAnimationTransition();
 
 		void set(SBAnimationState* source, SBAnimationState* dest);
-		void addCorrespondencePoint(std::string sourceMotion, std::string destMotion, float sourceFromTime, float sourceToTime, float destFromTime, float destToTime);
-		int getNumCorrespondencePoints();
-		std::vector<float> getCorrespondencePoint(int num);
-
-		SBAnimationState* getFromState();
-		SBAnimationState* getToState();
+		double getEaseInStart();
+		double getEaseInEnd();
+		void setEaseInInterval(std::string destMotion, float start, float end);
+		void addEaseOutInterval(std::string sourceMotion, float start, float end);
+		const std::string& getSourceMotionName();
+		const std::string& getDestinationMotionName();
+		void removeEaseOutInterval(int num);
+		int getNumEaseOutIntervals();
+		std::vector<double> getEaseOutInterval(int num);
+		
+		SBAnimationState* getSourceState();
+		SBAnimationState* getDestinationState();
 
 	protected:
 

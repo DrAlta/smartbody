@@ -57,6 +57,10 @@ class PATimeManager
 		void getParallelTimes(double time, std::vector<double>& times);
 		std::vector<double>& getKey();
 
+		void loadEvents();
+		void checkEvents();
+
+
 		std::vector<double> localTimes;			//always in ascending order
 		std::vector<double> motionTimes;		//actual motion times get from localTimes
 		std::vector<double> timeDiffs;			//time steps from last evaluation to this evaluation, get from motionTimes
@@ -72,6 +76,8 @@ class PATimeManager
 		void setLocalTime();
 		void setMotionTimes();
 		int getSection(double time);
+
+		std::queue<std::pair<SmartBody::MotionEvent*, int> > _events;
 };
 
 class PAMotions

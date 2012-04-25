@@ -32,6 +32,12 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include "ParamAnimEditorWidget.h"
+#include "ParamAnimStateEditor.h"
+#include "ParamAnimTransitionEditor.h"
+#include "ParamAnimTransitionEditor2.h"
+#include "ParamAnimRunTimeEditor.h"
+#include "ParamAnimScriptEditor.h"
 
 PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
 {
@@ -61,6 +67,9 @@ PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_
 			transitionEditor = new PATransitionEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
 			transitionEditor->begin();
 			transitionEditor->end();
+//			transitionEditor2 = new PATransitionEditor2(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
+//			transitionEditor->begin();
+//			transitionEditor->end();
 //			scriptEditor = new PAScriptEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
 //			scriptEditor->begin();
 //			scriptEditor->end();

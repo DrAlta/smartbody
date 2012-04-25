@@ -29,6 +29,12 @@ class Mark
 		virtual void setBlock(Block* b);
 		bool isSelected();
 		void setSelected(bool val);
+		bool isSelectedStartTime();
+		void setSelectedStartTime(bool val);
+		bool isSelectedEndTime();
+		void setSelectedEndTime(bool val);
+		bool isSelectedBothTime();
+		void setSelectedBothTime(bool val);
 
 		void setBoundToBlock(bool val);
 		bool isBoundToBlock();
@@ -40,6 +46,8 @@ class Mark
 		virtual double getStartTime();
 		virtual void setEndTime(double time);
 		virtual double getEndTime();
+		virtual void setInterval(bool val);
+		virtual bool isInterval();
 
 		void setColor(Fl_Color c);
 		Fl_Color getColor();
@@ -53,11 +61,15 @@ class Mark
 		std::string name;
 		Block* block;
 		bool selected;
+		bool selectedBeginTime;
+		bool selectedEndTime;
+		bool selectedBothTime;
 		int bounds[4];
 		Fl_Color color;
 		bool showName;
 		std::string info;
 		bool boundToBlock;
+		bool interval;
 };
 
 

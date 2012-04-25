@@ -25,6 +25,7 @@
 CorrespondenceMark::CorrespondenceMark()
 {
 	setBoundToBlock(false);
+	setInterval(false);
 }
 
 CorrespondenceMark::~CorrespondenceMark()
@@ -53,4 +54,10 @@ ParamAnimBlock::ParamAnimBlock()
 ParamAnimTrack::ParamAnimTrack()
 {
 }
+
+IntervalMark::IntervalMark()
+{
+	setInterval(true);
+}
+
 

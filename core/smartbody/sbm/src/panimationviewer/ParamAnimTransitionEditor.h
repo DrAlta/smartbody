@@ -26,7 +26,9 @@
 #include <FL/Fl_Slider.H>
 #include "PanimationWindow.h"
 
+class ParamAnimEditorWidget;
 class PanimationWindow;
+
 class PATransitionEditor : public Fl_Group
 {
 	public:

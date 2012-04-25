@@ -58,5 +58,12 @@ class ParamAnimTrack : public nle::Track
 		ParamAnimTrack();
 };
 
+class IntervalMark : public nle::Mark
+{
+	public:
+		IntervalMark();
+
+};
+
 
 #endif

@@ -20,8 +20,8 @@
  *      Yuyu Xu, USC
  */
 
-#ifndef _PARAM_ANIM_STATE_EDITOR_H_
-#define _PARAM_ANIM_STATE_EDITOR_H_
+#ifndef _PARAM_ANIM_TRANSITION_EDITOR2_H_
+#define _PARAM_ANIM_TRANSITION_EDITOR2_H_
 
 #include <vhcl.h>
 #include <FL/Fl_Slider.H>
@@ -32,56 +32,53 @@
 #include <FL/Fl_Check_Button.H>
 #include "PanimationWindow.h"
 
-class PAStateCreator;
+class PATransitionCreator;
 class PanimationWindow;
-class ParameterVisualization;
-class Parameter3DVisualization;
 class ParamAnimEditorWidget;
+namespace SmartBody {
+	class SBAnimationTransition;
+}
 
-class PAStateEditor : public Fl_Group
+class PATransitionEditor2 : public Fl_Group
 {
 	public:
-		PAStateEditor(int x, int y, int w, int h, PanimationWindow* window);
-		~PAStateEditor();
+		PATransitionEditor2(int x, int y, int w, int h, PanimationWindow* window);
+		~PATransitionEditor2();
 	
 		void loadStates();
 		static void changeStateEditorMode(Fl_Widget* widget, void* data);
-		static void updateStateTimeMarkEditor(Fl_Widget* widget, void* data, bool toAdd);
+		static void updateTransitionTimeMarkEditor(Fl_Widget* widget, void* data, bool toAdd);
 		static void editStateMotions(Fl_Widget* widget, void* data);
-		static void changeStateList(Fl_Widget* widget, void* data);
-		static void addStateTimeMark(Fl_Widget* widget, void* data);
-		static void addFootStepMark(Fl_Widget* widget, void* data);
-		static void removeStateTimeMark(Fl_Widget* widget, void* data);
+		static void changeState1List(Fl_Widget* widget, void* data);
+		static void changeState2List(Fl_Widget* widget, void* data);
+		static void addTransitionTimeMark(Fl_Widget* widget, void* data);
+		static void removeTransitionTimeMark(Fl_Widget* widget, void* data);
 		static void snapTimeMark(Fl_Widget* widget, void* data);
 		static void snapStartTimeMark(Fl_Widget* widget, void* data);
 		static void snapEndTimeMark(Fl_Widget* widget, void* data);
-		static void updateStateTimeMark(Fl_Widget* widget, void* data);
+		static void updateTransitionTimeMark(Fl_Widget* widget, void* data);
 		static void updateMaxTime(Fl_Widget* widget, void* data);
 		static void updateMinTime(Fl_Widget* widget, void* data);
 		static void save(Fl_Widget* widget, void* data);
-		static void selectStateAnimations(Fl_Widget* widget, void* data);
-		static void addShape(Fl_Widget* widget, void* data);
-		static void removeShape(Fl_Widget* widget, void* data);
-		static void selectShape(Fl_Widget* widget, void* data);
-		static void updateParameters(Fl_Widget* widget, void* data);
+		static void selectState1Animations(Fl_Widget* widget, void* data);
+		static void selectState2Animations(Fl_Widget* widget, void* data);
 		static void scrub(Fl_Widget* widget, void* data);
 		static void playmotion(Fl_Widget* widget, void* data);
-		void updateCorrespondenceMarks(PAState* state);
+
+		void updateIntervalMarks(SmartBody::SBAnimationTransition* transition);
 		void refresh();
 
 	public:
 		PanimationWindow* paWindow;
 		Fl_Check_Button*	stateEditorMode;
 		Fl_Group*		stateSelectionGroup;
-		Fl_Button*		createStateButton;
+		Fl_Button*		createTransitionButton;
 		Fl_Input*		newStateName;
-		Fl_Multi_Browser*		stateAnimationList;
-		Fl_Multi_Browser*		shapeList;
-		Fl_Button*		shapeAdd;
-		Fl_Button*		shapeRemove;
-		Fl_Scroll*		editStateTimeMarkGroup;
-		Fl_Choice*		stateList;
-		Fl_Choice*		choiceStateType;
+		Fl_Choice*		state1List;
+		Fl_Browser*		state1AnimationList;
+		Fl_Choice*		state2List;
+		Fl_Browser*		state2AnimationList;
+		Fl_Scroll*		editTransitionTimeMarkGroup;
 		Fl_Button*		addMark;
 		Fl_Button*		removeMark;
 		Fl_Button*		snapMark;
@@ -89,7 +86,6 @@ class PAStateEditor : public Fl_Group
 		Fl_Button*		snapEndMark;
 		Fl_Button*		updateMark;
 		Fl_Button*		buttonSave;
-		Fl_Button*		autoFootStepMarks;
 		Fl_Float_Input*		minTimeInput;
 		Fl_Float_Input*		maxTimeInput;
 		Fl_Float_Input* inputParameterX;
@@ -98,15 +94,12 @@ class PAStateEditor : public Fl_Group
 		Fl_Value_Slider* sliderScrub;
 		Fl_Button* buttonPlay;
 		Fl_Choice*		choiceAutoParameter;
-		ParamAnimEditorWidget* stateTimeMarkWidget;
-		nle::NonLinearEditorModel* stateEditorNleModel;
-		PAStateCreator* creator;
+		ParamAnimEditorWidget* transitionTimeMarkWidget;
+		nle::NonLinearEditorModel* transitionEditorNleModel;
+		PATransitionCreator* creator;
 		std::string lastSelectedMotion;
-
-		Fl_Group*				visualizationGroup;
-		ParameterVisualization* triangleVisualization;
-		Parameter3DVisualization* tetraVisualization;
-		PAStateData*	stateData;
+		double precisionCompensate;
+		SmartBody::SBAnimationTransition* curTransition;
 
 		int lastNameIndex;
 		bool isPlaying;

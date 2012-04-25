@@ -1234,8 +1234,6 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				newTransition->easeInEnd = args.read_double();
 				mcu_p->addPATransition(newTransition);
 			}
-			fromState->toStates.push_back(toState);
-			toState->fromStates.push_back(fromState);
 		}
 		else
 		{

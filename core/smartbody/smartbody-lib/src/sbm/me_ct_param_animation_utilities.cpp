@@ -66,6 +66,7 @@ PATimeManager::PATimeManager(PAStateData* data)
 	setMotionTimes();
 	setKey();
 	setLocalTime();
+	loadEvents();
 }
 
 PATimeManager::~PATimeManager()
@@ -107,6 +108,7 @@ bool PATimeManager::step(double timeStep)
 		if (times > 0)
 		{
 			newLocalTime = newLocalTime - float(times) * d;
+			loadEvents();
 		}
 		notReachDuration = false;
 	}
@@ -121,6 +123,7 @@ bool PATimeManager::step(double timeStep)
 
 	int numMotionTimes = motionTimes.size();
 	setMotionTimes();
+	checkEvents();
 	if (motionTimes.size() == numMotionTimes)
 	{
 		timeDiffs.clear();
@@ -134,6 +137,48 @@ bool PATimeManager::step(double timeStep)
 
 	return notReachDuration;
 }
+
+
+void PATimeManager::loadEvents()
+{
+	// add the event instances to this controller
+	while (!_events.empty())
+		_events.pop();
+
+
+	std::vector<std::pair<SmartBody::MotionEvent*, int> >& events = stateData->state->getEvents();
+	for (size_t x = 0; x < events.size(); x++)
+	{
+		_events.push(events[x]);
+	}
+}
+
+void PATimeManager::checkEvents()
+{
+	int motionIndex = 0;
+	if (motionIndex >= (int) localTimes.size())
+		return;
+
+	while (!_events.empty())
+	{
+		std::pair<SmartBody::MotionEvent*, int>& event = _events.front();
+		// localTime is the parameterized time, determine the local time of the event
+		if (event.first->isEnabled() && localTimes[motionIndex] >= event.first->getTime())
+		{
+			SmartBody::EventManager* manager = EventManager::getEventManager();
+			manager->handleEvent(event.first, localTimes[motionIndex]);
+			std::string type = event.first->getType();
+			std::string params = event.first->getParameters();
+			//LOG("EVENT: %f %s %s", time, type.c_str(), params.c_str());
+			_events.pop();
+		}
+		else
+		{
+			return;
+		}
+	}
+}
+
 
 void PATimeManager::updateWeights()
 {

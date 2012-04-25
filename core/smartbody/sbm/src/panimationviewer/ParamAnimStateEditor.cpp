@@ -30,6 +30,7 @@
 #include "ParamAnimStateCreatorWidget.h"
 #include "ParameterVisualization.h"
 #include "Parameter3DVisualization.h"
+#include "ParamAnimEditorWidget.h"
 
 PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
 {
