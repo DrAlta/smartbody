@@ -40,7 +40,9 @@ class SBMotion : public SkMotion
 	//	bool move(int startFrame, int endFrame, int position);
 
 		float getJointSpeed(SBJoint* joint, float startTime, float endTime);
+		float getJointSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);
 		float getJointAngularSpeed(SBJoint* joint, float startTime, float endTime);
+		float getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);
 		std::vector<float> getJointTransition(SBJoint* joint, float startTime, float endTime);
 
 		double getDuration();
