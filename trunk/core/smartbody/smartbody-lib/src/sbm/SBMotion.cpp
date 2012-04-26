@@ -248,6 +248,48 @@ float SBMotion::getJointSpeed(SBJoint* joint, float startTime, float endTime)
 	return accSpd;
 }
 
+float SBMotion::getJointSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime)
+{
+	int axisIndex = 0;
+	if (axis == "X" || axis == "x")
+		axisIndex = 0;
+	else if (axis == "Y" || axis == "y")
+		axisIndex = 1;
+	else if (axis == "Z" || axis == "z")
+		axisIndex = 2;
+	else
+	{
+		LOG("Bad axis specified '%s', defaulting to use the X-axis.", axis.c_str());
+	}
+
+	if (!joint)
+		return 0.f;
+	if (connected_skeleton() == NULL)
+	{
+		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
+		return 0;
+	}
+
+	float dt = duration() / float(frames() - 1);
+	int minFrameId = int(startTime / dt);
+	int maxFrameId = int(endTime / dt);
+	float distance = 0;
+	for (int i = minFrameId; i < maxFrameId - 1; i++)
+	{
+		apply_frame(i);
+		connected_skeleton()->update_global_matrices();
+		const SrMat& srcMat = joint->gmat();
+		SrVec srcPt = SrVec(srcMat.get(12), srcMat.get(13), srcMat.get(14));
+		apply_frame(i + 1);
+		connected_skeleton()->update_global_matrices();
+		const SrMat& destMat = joint->gmat();
+		SrVec destPt = SrVec(destMat.get(12), destMat.get(13), destMat.get(14));
+		distance += destPt[axisIndex] - srcPt[axisIndex];
+	}
+	float accSpd = distance / (endTime - startTime);
+	return accSpd;
+}
+
 float SBMotion::getJointAngularSpeed(SBJoint* joint, float startTime, float endTime)
 {
 	if (!joint)
@@ -284,6 +326,72 @@ float SBMotion::getJointAngularSpeed(SBJoint* joint, float startTime, float endT
 		diffRotY += diff;
 	}
 	float accAngularSpd = diffRotY / (endTime - startTime);
+	accAngularSpd *= (180.0f/ float(M_PI));
+	return accAngularSpd;
+}
+
+float SBMotion::getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime)
+{	
+	int axisIndex = 0;
+	if (axis == "X" || axis == "x")
+		axisIndex = 0;
+	else if (axis == "Y" || axis == "y")
+		axisIndex = 1;
+	else if (axis == "Z" || axis == "z")
+		axisIndex = 2;
+	else
+	{
+		LOG("Bad axis specified '%s', defaulting to use the X-axis.", axis.c_str());
+	}
+
+	if (!joint)
+	{
+		return 0.f;
+	}
+	if (connected_skeleton() == NULL)
+	{
+		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
+		return 0;
+	}
+	float dt = duration() / float(frames() - 1);
+	int minFrameId = int(startTime / dt);
+	int maxFrameId = int(endTime / dt);
+	float diffRot = 0.0f;
+	for (int i = minFrameId; i < maxFrameId - 1; i++)
+	{
+		apply_frame(i);
+		connected_skeleton()->update_global_matrices();
+		const SrMat& srcMat = joint->gmat();
+		float rx, ry, rz;
+		sr_euler_angles(rotType, srcMat, rx, ry, rz);
+		float srcRot = rx;
+		if (axisIndex == 0)
+			srcRot = rx;
+		else if (axisIndex == 1)
+			srcRot = ry;
+		else if (axisIndex == 2)
+			srcRot = rz;
+		
+		apply_frame(i + 1);
+		connected_skeleton()->update_global_matrices();
+		const SrMat& destMat = joint->gmat();
+		sr_euler_angles(rotType, destMat, rx, ry, rz);
+
+		float destRot = rx;
+		if (axisIndex == 0)
+			destRot = rx;
+		else if (axisIndex == 1)
+			destRot = ry;
+		else if (axisIndex == 2)
+			destRot = rz;
+		float diff;
+		if (destRot * srcRot < 0 && fabs(destRot) > 1.0f)
+			diff = - destRot - srcRot;
+		else
+			diff = destRot - srcRot;
+		diffRot += diff;
+	}
+	float accAngularSpd = diffRot / (endTime - startTime);
 	accAngularSpd *= (180.0f/ float(M_PI));
 	return accAngularSpd;
 }
