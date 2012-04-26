@@ -31,9 +31,10 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Character/Deformable Geometry", 0, ModeDeformableGeometryCB, this, NULL);
 	menubar->add("&View/Character/GPU Deformable Geometry", 0, ModeGPUDeformableGeometryCB, this, NULL);
 	menubar->add("&View/Character/Axis", 0, ModeAxisCB, this, NULL);
-	menubar->add("&View/Character/Show Selected", 0, ShowSelectedCB, this, NULL);
+	menubar->add("&View/Character/Show Selected", 0, ShowSelectedCB, this, NULL);	
 	menubar->add("&View/Character/Eyebeams", 0, ModeEyebeamsCB, this, NULL);
 	menubar->add("&View/Character/Eyelid calibration", 0, ModeEyelidCalibrationCB, this, NULL);
+	menubar->add("&View/Character/Bounding Volumes", 0, ShowBoundingVolumeCB, this, NULL);
 	menubar->add("&View/Character/Dynamics/COM", 0, ModeDynamicsCOMCB, this, NULL);
 	menubar->add("&View/Character/Dynamics/Support Polygon", 0, ModeDynamicsSupportPolygonCB, this, NULL);
 	menubar->add("&View/Character/Dynamics/Masses", 0, ModeDynamicsMassesCB, this, NULL);
@@ -744,6 +745,14 @@ void BaseWindow::ModeDynamicsMassesCB(Fl_Widget* w, void* data)
 	if (rootWindow->fltkViewer->getData()->dynamicsMode != FltkViewer::ModeShowMasses)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowMasses, NULL);
 }
+
+
+void BaseWindow::ShowBoundingVolumeCB( Fl_Widget* w, void* data )
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowBoundingVolume, NULL);
+}
+
 
 
 void BaseWindow::SettingsSofteyesToggleCB(Fl_Widget* w, void* data)

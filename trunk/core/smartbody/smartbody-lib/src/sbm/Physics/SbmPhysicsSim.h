@@ -17,9 +17,9 @@ protected:
 
 public:	
 	virtual SbmTransform& getGlobalTransform() { return globalTransform; }
-	void setGlobalTransform(const SrMat& gmat);
-	void setGlobalTransform(SbmTransform& rt);	
+	virtual void setGlobalTransform(SbmTransform& rt);	
 
+	void setGlobalTransform(const SrMat& gmat);
 	SbmTransform& getRefTransform() { return refTransform; }
 	void setRefTransform(const SrMat& gmat);
 	void setRefTransform(SbmTransform& rt);

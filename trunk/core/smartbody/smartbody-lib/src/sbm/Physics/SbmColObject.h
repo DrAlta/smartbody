@@ -6,6 +6,8 @@
 #include <sr/sr_vec.h>
 #include <sr/sr_model.h>
 #include <vector>
+#include <list>
+#include <map>
 #include <string>
 
 class SbmTransform
@@ -39,6 +41,7 @@ class SbmTransformObjInterface
 {	
 public:
 	virtual SbmTransform& getGlobalTransform() = 0;
+	virtual void setGlobalTransform(SbmTransform& newGlobalTransform) = 0;
 };
 
 class SbmGeomObject
@@ -46,15 +49,22 @@ class SbmGeomObject
 public:
 	std::string  color;	
 protected:	
+	// a SbmGeomObject can be attached to a pawn or physics object as needed
 	SbmTransformObjInterface* attachedObj;
+	SbmTransform globalTransform;
 	SbmTransform localTransform;	
 	SbmTransform combineTransform;	
 public:
 	SbmGeomObject(void);	
 	virtual ~SbmGeomObject(void);	
 	void attachToObj(SbmTransformObjInterface* phyObj);
+	SbmTransformObjInterface* getAttachObj();
+
 	SbmTransform& getLocalTransform() { return localTransform; }	
-	void          setLocalTransform(SbmTransform& newLocalTran);
+	void          setLocalTransform(SbmTransform& newLocalTran);	
+	SbmTransform& getGlobalTransform();
+	void          setGlobalTransform(SbmTransform& newGlobalTran);
+
 	SbmTransform& getCombineTransform();
 	virtual SrVec getCenter();	
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) = 0; // check if a point is inside the object	
@@ -65,7 +75,7 @@ public:
 	virtual SrVec       getGeomSize() = 0;
 	virtual void	    setGeomSize(SrVec& size) = 0;
 
-	static SbmGeomObject* createGeometry(std::string& type, SrVec extends);
+	static SbmGeomObject* createGeometry(const std::string& type, SrVec extends, SrVec from = SrVec(), SrVec to = SrVec() );
 };
 
 // a default null object with no geometry
@@ -86,7 +96,7 @@ class SbmGeomSphere : public SbmGeomObject
 public:
 	float radius;
 public:
-	SbmGeomSphere(float r) { radius = r; }
+	SbmGeomSphere(float r);
 	virtual ~SbmGeomSphere();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
@@ -152,11 +162,38 @@ public:
 
 typedef std::vector<SbmGeomObject*> VecOfSbmColObj;
 
+// struct for contact point
+class SbmGeomContact 
+{
+public:
+	SrVec contactPoint;
+	SrVec contactNormal;
+	float penetrationDepth;	
+public:
+	SbmGeomContact& operator= (const SbmGeomContact& rt);
+};
+
+typedef std::pair<std::string,std::string> SbmCollisionPair;
+typedef std::vector<SbmCollisionPair> SbmCollisionPairList;
+
+class SbmCollisionSpace
+{
+protected:
+	//std::list<SbmGeomObject*> collisionObjs;
+	std::map<std::string,SbmGeomObject*> collsionObjMap;
+public:
+	SbmCollisionSpace();
+	~SbmCollisionSpace();
+	virtual void addCollisionObjects(const std::string& objName);
+	virtual void removeCollisionObjects(const std::string& objName);
+	virtual void getPotentialCollisionPairs(std::vector<SbmCollisionPair>& collisionPairs) = 0;
+};
 
 class SbmCollisionUtil
 {
 public:
 	static bool checkIntersection(SbmGeomObject* obj1, SbmGeomObject* obj2);
+	static void collisionDetection(SbmGeomObject* obj1, SbmGeomObject* obj2, std::vector<SbmGeomContact>& contactPts);
 };
 
 #endif

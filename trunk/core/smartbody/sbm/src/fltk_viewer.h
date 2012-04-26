@@ -180,6 +180,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 				   CmdShowCOM,
 				   CmdShowCOMSupportPolygon,
 				   CmdShowMasses,
+				   CmdShowBoundingVolume,
 				   CmdEnableLocomotion,
 				   CmdShowLocomotionAll,
 				   CmdShowVelocity,
@@ -319,6 +320,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	void drawInteractiveLocomotion();
 	void drawPawns();
 	void drawCharacterPhysicsObjs();
+	void drawCharacterBoundingVolumes();
 	void drawSteeringInfo();
 	static void drawColObject(SbmGeomObject* colObj, SrMat& gmat);
 	void drawTetra(SrVec vtxPos[4], SrVec& color);
@@ -385,7 +387,7 @@ protected:
    FltkViewer::LocomotionMode locomotionMode;   // locomotion mode
    FltkViewer::ReachRenderMode reachRenderMode;
    FltkViewer::SteerMode steerMode;
-	FltkViewer::GridMode gridMode;
+   FltkViewer::GridMode gridMode;
 
 
    bool iconized;      // to stop processing while the window is iconized
@@ -400,6 +402,7 @@ protected:
    bool showbones;
    bool showaxis;
    bool showmasses;
+   bool showBoundingVolume;
 
    bool locomotionenabled;
    bool showlocomotionall;

@@ -1,5 +1,7 @@
 #include "SbmPhysicsSimODE.h"
 #include <sbm/mcontrol_util.h>
+#include <sbm/SBScene.h>
+#include <sbm/SBCollisionManager.h>
 
 /************************************************************************/
 /* Physics Sim ODE                                                      */
@@ -78,6 +80,7 @@ void SbmPhysicsSimODE::initSimulation()
 	dSetErrorHandler(&myMessageFunction);
 	dSetDebugHandler(&myMessageFunction);
 	dSetMessageHandler(&myMessageFunction);
+
 
 	dInitODE();
 
@@ -333,7 +336,7 @@ void SbmPhysicsSimODE::addPhysicsObj( SbmPhysicsObj* obj )
 	dBodySetData(odeObj->bodyID,obj); // attach physics obj with ode body
 	odeObj->physicsObj = obj;
 	if (obj)
-	{		
+	{	
 		SbmTransform& curT = obj->getGlobalTransform();
 		dQuaternion quat;
 		quat[0] = (dReal)curT.rot.w;	
@@ -346,6 +349,21 @@ void SbmPhysicsSimODE::addPhysicsObj( SbmPhysicsObj* obj )
 	if (obj->getColObj())
 		updatePhyObjGeometry(obj,obj->getColObj());
 }
+
+
+void SbmPhysicsSimODE::updateODEGeometryTransform( SbmGeomObject* geomObj, dGeomID geomID )
+{	
+	SbmTransform& curT = geomObj->getCombineTransform();
+	dQuaternion quat; 
+	quat[0] = (dReal)curT.rot.w;	
+	quat[1] = (dReal)curT.rot.x;
+	quat[2] = (dReal)curT.rot.y;
+	quat[3] = (dReal)curT.rot.z;
+
+	dGeomSetQuaternion(geomID,quat);
+	dGeomSetPosition(geomID,(dReal)curT.tran[0],(dReal)curT.tran[1],(dReal)curT.tran[2]);	
+}
+
 
 void SbmPhysicsSimODE::removePhysicsObj( SbmPhysicsObj* obj )
 {
@@ -514,36 +532,90 @@ void SbmPhysicsSimODE::readFromPhysicsObj( SbmPhysicsObj* obj )
  	dBodySetAngularVel(odeObj->bodyID,(dReal)avel[0],(dReal)avel[1],(dReal)avel[2]);	
 }
 
+dGeomID SbmPhysicsSimODE::createODERawGeometry( SbmGeomObject* geomObj )
+{
+	if (!geomObj) return 0;
+	dGeomID geomID = 0;
+	if (geomObj->geomType() == "sphere")
+	{
+		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(geomObj);
+		geomID = dCreateSphere(0,(dReal)sph->radius);
+	}
+	else if (geomObj->geomType() == "box")
+	{
+		SbmGeomBox* box = dynamic_cast<SbmGeomBox*>(geomObj);
+		SrVec extent = box->extent*2.f;
+		geomID = dCreateBox(0,(dReal)extent.x,(dReal)extent.y,(dReal)extent.z);
+	}
+	else if (geomObj->geomType() == "capsule")
+	{
+		SbmGeomCapsule* cap = dynamic_cast<SbmGeomCapsule*>(geomObj);		
+		if (cap->extent == 0.0)
+			cap->extent = 0.01f;
+		geomID = dCreateCapsule(0,(dReal)cap->radius,(dReal)cap->extent);
+	}
+	dGeomSetData(geomID,geomObj);
+	return geomID;
+}
+
+void SbmPhysicsSimODE::updateODEMass( dMass& odeMass, SbmGeomObject* geomObj, float mass )
+{
+	if (!geomObj)
+	{
+		dMassAdjust(&odeMass,(dReal)mass);
+		return;
+	}  
+
+	if (geomObj->geomType() == "sphere")
+	{
+		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(geomObj);
+		dMassSetSphereTotal(&odeMass,(dReal)mass,(dReal)sph->radius);
+	}
+	else if (geomObj->geomType() == "box")
+	{
+		SbmGeomBox* box = dynamic_cast<SbmGeomBox*>(geomObj);
+		SrVec extent = box->extent*2.f;
+		dMassSetBoxTotal(&odeMass,(dReal)mass,(dReal)extent.x,(dReal)extent.y,(dReal)extent.z);
+	}
+	else if (geomObj->geomType() == "capsule")
+	{
+		SbmGeomCapsule* cap = dynamic_cast<SbmGeomCapsule*>(geomObj);		
+		if (cap->extent == 0.0)
+			cap->extent = 0.01f;
+		dMassSetCapsuleTotal(&odeMass,(dReal)mass,3,(dReal)cap->radius,(dReal)cap->extent);
+	}
+	else
+	{
+		dMassAdjust(&odeMass,(dReal)mass);
+	}
+}
+
 dGeomID SbmPhysicsSimODE::createODEGeometry( SbmPhysicsObj* obj, float mass )
 {
-
-#define USE_TOTAL_MASS 1
 	SbmPhysicsSimODE* odeSim = SbmPhysicsSimODE::getODESim();
 	if (!odeSim)	return 0;
 	if (!odeSim->systemIsInit())   return 0;
 	SbmODEObj* odeObj = getODEObj(obj);	
 	SbmGeomObject* geom = obj->getColObj();
+	dGeomID geomID = SbmPhysicsSimODE::createODERawGeometry(geom);
+	if (geomID) dSpaceAdd(odeSim->getSpaceID(),geomID);
+	SbmPhysicsSimODE::updateODEMass(odeObj->odeMass,geom,mass);	
+	return geomID;
+
+/*
 	dGeomID geomID = 0;
 	if (dynamic_cast<SbmGeomSphere*>(geom))
 	{
 		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(geom);
-		geomID = dCreateSphere(odeSim->getSpaceID(),(dReal)sph->radius);		
-#if USE_TOTAL_MASS
+		geomID = dCreateSphere(odeSim->getSpaceID(),(dReal)sph->radius);
 		dMassSetSphereTotal(&odeObj->odeMass,(dReal)mass,(dReal)sph->radius);
-#else
-		dMassSetSphere(&odeObj->odeMass,(dReal)mass,(dReal)sph->radius);
-#endif
 	}
 	else if (dynamic_cast<SbmGeomBox*>(geom))
 	{
 		SbmGeomBox* box = dynamic_cast<SbmGeomBox*>(geom);
 		SrVec extent = box->extent*2.f;
 		geomID = dCreateBox(odeSim->getSpaceID(),(dReal)extent.x,(dReal)extent.y,(dReal)extent.z);
-#if USE_TOTAL_MASS
 		dMassSetBoxTotal(&odeObj->odeMass,(dReal)mass,(dReal)extent.x,(dReal)extent.y,(dReal)extent.z);
-#else
-		dMassSetBox(&odeObj->odeMass,(dReal)mass,(dReal)extent.x,(dReal)extent.y,(dReal)extent.z);
-#endif
 	}
 	else if (dynamic_cast<SbmGeomCapsule*>(geom))
 	{
@@ -551,12 +623,9 @@ dGeomID SbmPhysicsSimODE::createODEGeometry( SbmPhysicsObj* obj, float mass )
 		if (cap->extent == 0.0)
 			cap->extent = 0.01f;
 		geomID = dCreateCapsule(odeSim->getSpaceID(),(dReal)cap->radius,(dReal)cap->extent);
-#if USE_TOTAL_MASS
 		dMassSetCapsuleTotal(&odeObj->odeMass,(dReal)mass,3,(dReal)cap->radius,(dReal)cap->extent);
-#else
-		dMassSetCapsule(&odeObj->odeMass,(dReal)mass,3,(dReal)cap->radius,(dReal)cap->extent);
-#endif
 	}
+#if USE_ODE_MESH
 	else if (dynamic_cast<SbmGeomTriMesh*>(geom))
 	{
 		SbmGeomTriMesh* tri = dynamic_cast<SbmGeomTriMesh*>(geom);
@@ -574,14 +643,14 @@ dGeomID SbmPhysicsSimODE::createODEGeometry( SbmPhysicsObj* obj, float mass )
 		//dGeomSetPosition(geomID,-odeMass.c[0], -odeMass.c[1], -odeMass.c[2]);
 		dMassTranslate( &odeObj->odeMass, -odeObj->odeMass.c[0], -odeObj->odeMass.c[1], -odeObj->odeMass.c[2]);		
 	}
+#endif
 	else // no geoemtry
 	{
 		//dMassSetZero(&odeMass);			
 		dMassAdjust(&odeObj->odeMass,(dReal)mass);
 	}
-	return geomID;
+	*/	
 }
-
 
 
 SbmODEObj::SbmODEObj()
@@ -622,4 +691,107 @@ SbmODEJoint::SbmODEJoint()
 SbmODEJoint::~SbmODEJoint()
 {
 	
+}
+
+/************************************************************************/
+/* Collision Space ODE                                                  */
+/************************************************************************/
+
+SbmCollisionSpaceODE::SbmCollisionSpaceODE()
+{
+	// in case ode is not yet initialized
+	dInitODE();	
+	spaceID = dSimpleSpaceCreate(0);	
+}
+
+void SbmCollisionSpaceODE::addCollisionObjects( const std::string& objName )
+{
+	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
+	SbmGeomObject* obj = colManager->getCollisionObject(objName);
+	if (obj)
+	{
+		SbmCollisionSpace::addCollisionObjects(objName);
+		dGeomID geomID = SbmPhysicsSimODE::createODERawGeometry(obj);
+		SbmPhysicsSimODE::updateODEGeometryTransform(obj,geomID);
+		odeGeomMap[objName] = geomID;
+		odeGeomNameMap[geomID] = objName;
+		dSpaceAdd(spaceID,geomID);		
+	}	
+}
+
+void SbmCollisionSpaceODE::removeCollisionObjects( const std::string& objName )
+{
+	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
+	SbmGeomObject* obj = colManager->getCollisionObject(objName);
+	if (!obj) return;
+
+	dGeomID geomID = getODEGeomID(objName);
+	if (geomID) 
+	{
+		odeGeomMap.erase(objName);
+		odeGeomNameMap.erase(geomID);
+
+		dSpaceRemove(spaceID,geomID);
+		dGeomDestroy(geomID);		
+	}
+	SbmCollisionSpace::removeCollisionObjects(objName);
+}
+
+dGeomID SbmCollisionSpaceODE::getODEGeomID( const std::string& geomName )
+{
+	dGeomID geomID = NULL;
+	if (odeGeomMap.find(geomName) != odeGeomMap.end())
+	{
+		geomID = odeGeomMap[geomName];
+	}
+	return geomID;
+}
+
+void SbmCollisionSpaceODE::getPotentialCollisionPairs( SbmCollisionPairList& collisionPairs )
+{
+	std::map<std::string,SbmGeomObject*>::iterator vi;
+	for ( vi  = collsionObjMap.begin();
+		  vi != collsionObjMap.end();
+		  vi++)
+	{
+		std::string geomName = (*vi).first;
+		SbmGeomObject* geomObj = (*vi).second;
+		dGeomID geomID = getODEGeomID(geomName);
+		if (geomID)
+		{
+			SbmPhysicsSimODE::updateODEGeometryTransform(geomObj,geomID);
+		}
+	}
+	curCollisionPairs.clear();
+	dSpaceCollide(spaceID,this,SbmCollisionSpaceODE::collisionSpaceNearCallBack);
+	collisionPairs = curCollisionPairs;
+}
+
+void SbmCollisionSpaceODE::collisionSpaceNearCallBack( void *data, dGeomID o1, dGeomID o2 )
+{
+	SbmCollisionSpaceODE* colSpace = (SbmCollisionSpaceODE*)data;
+	SbmCollisionPairList& curColPairs = colSpace->getCurrentCollisionPairList();
+	//SbmGeomObject* g1 = (SbmGeomObject*)dGeomGetData(o1);
+	//SbmGeomObject* g2 = (SbmGeomObject*)dGeomGetData(o2);
+	curColPairs.push_back(SbmCollisionPair(colSpace->getODEGeomName(o1),colSpace->getODEGeomName(o2)));
+}
+
+SbmCollisionSpaceODE::~SbmCollisionSpaceODE()
+{
+
+}
+
+std::string SbmCollisionSpaceODE::getODEGeomName( dGeomID geomID )
+{
+	std::string geomName = "";
+	if (odeGeomNameMap.find(geomID) != odeGeomNameMap.end())
+	{
+		geomName = odeGeomNameMap[geomID];
+	}
+	return geomName;
+}
+
+SbmCollisionPairList& SbmCollisionSpaceODE::getCurrentCollisionPairList()
+{
+	return curCollisionPairs;
 }
