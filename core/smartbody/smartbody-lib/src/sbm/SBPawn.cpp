@@ -4,6 +4,7 @@
 #include <sbm/SBSkeleton.h>
 #include <sbm/SBScene.h>
 #include <sbm/SBPhysicsManager.h>
+#include <sbm/SBCollisionManager.h>
 #include <sbm/Physics/SbmColObject.h>
 
 
@@ -192,27 +193,10 @@ void SBPawn::notify(SBSubject* subject)
 			std::string shapeName = getStringAttribute("collisionShape");
 			if (shapeName != object->geomType())
 			{
+				SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
 				SrVec size = getVec3Attribute("collisionShapeScale");
-				SbmGeomObject* obj = NULL;
-				if (shapeName == "null")
-				{
-					obj = new SbmGeomNullObject();
-				}
-				else if (shapeName == "sphere")
-				{
-					obj = new SbmGeomSphere(size[0]);
-				}
-				else if (shapeName == "box")
-				{
-					obj = new SbmGeomBox(size);
-				}
-				else if (shapeName == "capsule")
-				{
-					obj = new SbmGeomCapsule(size[0],size[1]);
-				}
-				if (obj)
-					this->setGeomObject(obj);
-
+				SbmGeomObject* obj = colManager->createCollisionObject(collisionObjName,shapeName,size);
+				if (obj) obj->attachToObj(this);
 			}
 			else
 			{

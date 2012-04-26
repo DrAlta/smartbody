@@ -1,6 +1,10 @@
 #include "SbmColObject.h"
 #include "SbmPhysicsSim.h"
 #include <sbm/gwiz_math.h>
+#include "SbmPhysicsSimODE.h"
+#include <ode/collision.h>
+#include <sbm/SBCollisionManager.h>
+#include <sbm/SBScene.h>
 
 SrVec SbmTransform::localToGlobal( const SrVec& vLocal )
 {
@@ -104,13 +108,21 @@ void SbmGeomObject::attachToObj(SbmTransformObjInterface* phyObj)
 	attachedObj = phyObj;	
 }
 
+SbmTransformObjInterface* SbmGeomObject::getAttachObj()
+{
+	return attachedObj;
+}
+
 SbmTransform& SbmGeomObject::getCombineTransform()
 {
-	combineTransform = SbmTransform::mult(localTransform,attachedObj->getGlobalTransform());
+	if (attachedObj)
+		combineTransform = SbmTransform::mult(localTransform,attachedObj->getGlobalTransform());
+	else
+		combineTransform = SbmTransform::mult(localTransform,globalTransform);
 	return combineTransform;	
 }
 
-SbmGeomObject* SbmGeomObject::createGeometry(std::string& type, SrVec size )
+SbmGeomObject* SbmGeomObject::createGeometry(const std::string& type, SrVec size, SrVec from, SrVec to)
 {
 	SbmGeomObject* geomObj = NULL;
 	if (type == "sphere")
@@ -124,8 +136,15 @@ SbmGeomObject* SbmGeomObject::createGeometry(std::string& type, SrVec size )
 	else if (type == "capsule")
 	{	
 		SrVec p1,p2;
-		p1 = SrVec(0,-size[0],0); p2 = SrVec(0,size[0],0);
-		geomObj = new SbmGeomCapsule(size[0]*2.f,size[1]);//new SbmGeomCapsule(p1,p2,size[1]);//new SbmGeomCapsule(size[0]*2.f,size[1]);		
+		if (from == to && from == SrVec())
+		{
+			p1 = SrVec(0,-size[0],0); p2 = SrVec(0,size[0],0);
+			geomObj = new SbmGeomCapsule(size[0]*2.f,size[1]);//new SbmGeomCapsule(p1,p2,size[1]);//new SbmGeomCapsule(size[0]*2.f,size[1]);
+		}
+		else
+		{
+			geomObj = new SbmGeomCapsule(from, to, size[1]);
+		}				
 	}	
 	else
 	{
@@ -137,6 +156,23 @@ SbmGeomObject* SbmGeomObject::createGeometry(std::string& type, SrVec size )
 void SbmGeomObject::setLocalTransform( SbmTransform& newLocalTran )
 {
 	localTransform = newLocalTran;
+}
+
+SbmTransform& SbmGeomObject::getGlobalTransform()
+{
+	if (attachedObj) 
+		return attachedObj->getGlobalTransform();
+	else
+		return globalTransform;
+}
+
+void SbmGeomObject::setGlobalTransform( SbmTransform& newGlobalTran )
+{
+	if (attachedObj) 
+		attachedObj->setGlobalTransform(newGlobalTran);
+	else
+		globalTransform = newGlobalTran;
+
 }
 
 bool SbmGeomNullObject::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
@@ -195,6 +231,10 @@ void SbmGeomSphere::setRadius(float val)
 	radius = val;
 }
 
+SbmGeomSphere::SbmGeomSphere( float r )
+{
+	radius = r;
+}
 /************************************************************************/
 /* Box collider                                                         */
 /************************************************************************/
@@ -454,6 +494,16 @@ bool SbmGeomCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHa
 }
 
 
+
+SbmGeomContact& SbmGeomContact::operator=( const SbmGeomContact& rt )
+{
+	contactPoint  = rt.contactPoint;
+	contactNormal = rt.contactNormal;
+	penetrationDepth = rt.penetrationDepth;	
+	return *this;
+}
+
+
 bool SbmCollisionUtil::checkIntersection( SbmGeomObject* obj1, SbmGeomObject* obj2 )
 {
 	if (dynamic_cast<SbmGeomSphere*>(obj1))
@@ -477,4 +527,66 @@ bool SbmCollisionUtil::checkIntersection( SbmGeomObject* obj1, SbmGeomObject* ob
 	{
 		return false;
 	}
+}
+
+
+void SbmCollisionUtil::collisionDetection( SbmGeomObject* obj1, SbmGeomObject* obj2, std::vector<SbmGeomContact>& contactPts )
+{
+	dGeomID odeGeom1 = SbmPhysicsSimODE::createODERawGeometry(obj1);
+	dGeomID odeGeom2 = SbmPhysicsSimODE::createODERawGeometry(obj2);
+
+	SbmPhysicsSimODE::updateODEGeometryTransform(obj1,odeGeom1);
+	SbmPhysicsSimODE::updateODEGeometryTransform(obj2,odeGeom2);
+
+	const int N = 1;
+	dContact contact[N];
+	contactPts.clear();
+	int nContact = dCollide(odeGeom1,odeGeom2,N,&contact[0].geom,sizeof(dContact));
+	for (int i=0;i<nContact;i++)
+	{
+		SbmGeomContact geomContact;
+		dContactGeom& ct = contact[i].geom;
+		geomContact.contactPoint = SrVec((float)ct.pos[0],(float)ct.pos[1],(float)ct.pos[2]);	
+		geomContact.contactNormal = SrVec((float)ct.normal[0],(float)ct.normal[1],(float)ct.normal[2]);
+		geomContact.penetrationDepth = (float)ct.depth;
+		contactPts.push_back(geomContact);
+	}
+	dGeomDestroy(odeGeom1);
+	dGeomDestroy(odeGeom2);
+}
+
+/************************************************************************/
+/* Collision Space                                                      */
+/************************************************************************/
+
+SbmCollisionSpace::SbmCollisionSpace()
+{
+
+}
+
+SbmCollisionSpace::~SbmCollisionSpace()
+{
+
+}
+
+void SbmCollisionSpace::addCollisionObjects( const std::string& objName )
+{	
+	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
+	SbmGeomObject* obj = colManager->getCollisionObject(objName);
+	// remove the old one if it exists
+	if (collsionObjMap.find(objName) != collsionObjMap.end())
+	{
+		removeCollisionObjects(objName);		
+	}	
+	collsionObjMap[objName] = obj;
+}
+
+void SbmCollisionSpace::removeCollisionObjects( const std::string& objName  )
+{
+	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
+	SbmGeomObject* obj = colManager->getCollisionObject(objName);
+	if (collsionObjMap.find(objName) != collsionObjMap.end())
+	{
+		collsionObjMap.erase(objName);					
+	}		
 }

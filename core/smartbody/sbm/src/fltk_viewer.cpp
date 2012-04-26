@@ -245,6 +245,7 @@ Fl_Menu_Item MenuTable[] =
          { "&show COM",  0, MCB, CMD(CmdShowCOM),  FL_MENU_RADIO },
          { "&show COM and support polygon",  0, MCB, CMD(CmdShowCOMSupportPolygon),  FL_MENU_RADIO },
 		 { "&show masses",   0, MCB, CMD(CmdShowMasses),  FL_MENU_TOGGLE },
+		 { "&show bounding volume",   0, MCB, CMD(CmdShowBoundingVolume),  FL_MENU_TOGGLE },
          { 0 },
 	{ "&locomotion", 0, 0, 0, FL_SUBMENU },
          { "&enable locomotion",   0, MCB, CMD(CmdEnableLocomotion),    FL_MENU_TOGGLE },
@@ -374,6 +375,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->showbones = true;
    _data->showaxis = false;
    _data->showmasses = false;
+   _data->showBoundingVolume = false;
    _data->showlocomotionall = false;
    _data->showvelocity = false;
    _data->showorientation = false;
@@ -554,6 +556,8 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
                        break;
 	  case CmdShowMasses: _data->showmasses =  !_data->showmasses;
                        break;
+	  case CmdShowBoundingVolume: _data->showBoundingVolume =  !_data->showBoundingVolume;
+					   break;
 	  case CmdEnableLocomotion  : _data->locomotionenabled = !_data->locomotionenabled;             
                        break;
 	  case CmdShowLocomotionAll  : _data->showlocomotionall = !_data->showlocomotionall;
@@ -734,6 +738,7 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
       case CmdShowCOM   : return _data->dynamicsMode==ModeShowCOM? true:false;
 	  case CmdShowCOMSupportPolygon   : return _data->dynamicsMode==ModeShowCOMSupportPolygon? true:false;
 	  case CmdShowMasses : return _data->showmasses? true:false;
+	  case CmdShowBoundingVolume : return _data->showBoundingVolume? true:false;
 	  case CmdEnableLocomotion : return _data->locomotionenabled? true:false;
 	  case CmdShowLocomotionAll : return _data->showlocomotionall? true:false;
 	  case CmdShowVelocity : return _data->showvelocity? true:false;
@@ -1349,6 +1354,9 @@ void FltkViewer::draw()
 
 	if (_data->showcollisiongeometry)
 		drawCharacterPhysicsObjs();
+	if (_data->showBoundingVolume)
+		drawCharacterBoundingVolumes();
+
 	drawInteractiveLocomotion();
 
 	//_posControl.Draw();
@@ -2906,6 +2914,20 @@ void FltkViewer::drawEyeLids()
 
 }
 
+
+void FltkViewer::drawCharacterBoundingVolumes()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
+	{
+		SbmCharacter* character = (*iter).second;
+		if (character && character->getGeomObject())
+			drawColObject(character->getGeomObject(),character->getGeomObject()->getGlobalTransform().gmat());
+	}
+}
+
 void FltkViewer::drawCharacterPhysicsObjs()
 {
 	float pawnSize = 1.0;
@@ -2917,7 +2939,12 @@ void FltkViewer::drawCharacterPhysicsObjs()
 	{
 		SbmCharacter* character = (*iter).second;
 		SbmPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(character->getName());//character->getPhysicsCharacter();				
-		if (!phyChar) continue;
+		if (!phyChar) 
+		{			
+			continue;
+		}
+
+
 		std::map<std::string,SbmJointObj*>& jointPhyObjs = phyChar->getJointObjMap();
 		std::map<std::string,SbmJointObj*>::iterator mi;
 		float totalMass = 0.f;

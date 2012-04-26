@@ -63,12 +63,9 @@ public:
 
 	virtual void updateSimulationInternal(float timeStep);	
 	virtual SbmPhysicsObj* createPhyObj(); 	
-
 	virtual SrVec getJointConstraintPos(SbmPhysicsJoint* joint);
 	virtual SrVec getJointRotationAxis(SbmPhysicsJoint* joint, int axis);
-
 	virtual void updatePhysicsJoint(SbmPhysicsJoint* phyJoint); // update joint parameters		
-
 	virtual void updatePhyObjGeometry(SbmPhysicsObj* obj, SbmGeomObject* geom = NULL);
 	virtual void enablePhysicsSim(SbmPhysicsObj* obj, bool bSim);
 	virtual void enableCollisionSim(SbmPhysicsObj* obj, bool bCol);	
@@ -76,13 +73,38 @@ public:
 	virtual void readFromPhysicsObj(SbmPhysicsObj* obj); // read sim data from colObj	
 
 public:
+	static dGeomID createODERawGeometry(SbmGeomObject* geomObj); 	
+	static void updateODEGeometryTransform(SbmGeomObject* geomObj, dGeomID geomID);
 	static SbmPhysicsSimODE* getODESim();
 protected:
+	static void updateODEMass(dMass& odeMass, SbmGeomObject* geomObj, float mass);
 	static void nearCallBack(void *data, dGeomID o1, dGeomID o2);
 	SbmODEObj* getODEObj(SbmPhysicsObj* obj);
 	SbmODEJoint* getODEJoint(SbmPhysicsJoint* joint);
 	dGeomID createODEGeometry(SbmPhysicsObj* obj, float mass);
 	void linkJointObj(SbmJointObj* obj);
 };
+
+class SbmCollisionSpaceODE : public SbmCollisionSpace
+{
+protected:
+	dSpaceID spaceID;	
+	std::map<std::string,dGeomID> odeGeomMap;
+	std::map<dGeomID, std::string> odeGeomNameMap;	
+	SbmCollisionPairList curCollisionPairs;
+public:
+	SbmCollisionSpaceODE();
+	~SbmCollisionSpaceODE();
+
+	virtual void addCollisionObjects(const std::string& objName);
+	virtual void removeCollisionObjects(const std::string& objName);
+	virtual void getPotentialCollisionPairs(SbmCollisionPairList& collisionPairs);
+	static  void collisionSpaceNearCallBack(void *data, dGeomID o1, dGeomID o2);
+	std::string getODEGeomName(dGeomID geomID);
+	SbmCollisionPairList& getCurrentCollisionPairList();
+protected:
+	dGeomID getODEGeomID(const std::string& geomName);	
+};
+
 #endif
 

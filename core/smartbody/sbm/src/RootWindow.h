@@ -90,6 +90,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void ModeDynamicsCOMCB(Fl_Widget* w, void* data);
 		static void ModeDynamicsSupportPolygonCB(Fl_Widget* w, void* data);
 		static void ModeDynamicsMassesCB(Fl_Widget* w, void* data);
+		static void ShowBoundingVolumeCB(Fl_Widget* w, void* data);
 		static void SettingsSofteyesToggleCB(Fl_Widget* w, void* data);
 		static void TrackCharacterCB(Fl_Widget* w, void* data);
 		static void AudioCB(Fl_Widget* w, void* data);

@@ -527,6 +527,8 @@ EventManager* SBScene::getEventManager()
 }
 
 
+
+
 void SBScene::command(const std::string& command)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
@@ -590,6 +592,12 @@ SBSteerManager* SBScene::getSteerManager()
 SBServiceManager* SBScene::getServiceManager()
 {
 	return _serviceManager;
+}
+
+
+SBCollisionManager* SBScene::getCollsionManager()
+{
+	return _collisionManager;
 }
 
 SBPhysicsManager* SBScene::getPhysicsManager()

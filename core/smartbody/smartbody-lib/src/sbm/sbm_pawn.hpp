@@ -86,7 +86,8 @@ protected:
 
 	MeCtChannelWriter*  world_offset_writer_p;
 	float	_height;
-	SbmGeomObject* _collisionObject;
+	//SbmGeomObject* _collisionObject;
+	std::string collisionObjName;
 
 #if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
 	// Map of pending controller clean-up callbacks
@@ -122,8 +123,9 @@ public:
 	void setSkeleton(SkSkeleton* sk);	
 	virtual int init( SkSkeleton* skeleton_p );
 
+	const std::string& getGeomObjectName();
 	SbmGeomObject* getGeomObject(); // get geometry object associated with the pawn
-	void setGeomObject(SbmGeomObject* obj);
+	//void setGeomObject(SbmGeomObject* obj);
 	SbmPhysicsObj* getPhysicsObject();
 
  	void updateToColObject();
@@ -146,6 +148,8 @@ public:
 	{	return get_joint( WORLD_OFFSET_JOINT_NAME ); }
 
 	virtual SbmTransform& getGlobalTransform();
+	virtual void setGlobalTransform(SbmTransform& newGlobalTransform);
+
 	SrMat get_world_offset();
 	void get_world_offset( float& x, float& y, float& z,
 		                   float& yaw, float& pitch, float& roll );

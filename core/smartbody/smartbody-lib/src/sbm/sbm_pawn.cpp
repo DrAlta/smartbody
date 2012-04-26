@@ -29,6 +29,7 @@
 #include <sbm/SBBoneBusManager.h>
 #include <sbm/SBSteerManager.h>
 #include <sbm/SBPhysicsManager.h>
+#include <sbm/SBCollisionManager.h>
 #include "sbm_pawn.hpp"
 
 #ifdef __APPLE__
@@ -194,10 +195,13 @@ void SbmPawn::initData()
 	//   and therefore needs to evaluate before other controllers
 	world_offset_writer_p->ref();
 	ct_tree_p->add_controller( world_offset_writer_p );
+	
+	collisionObjName = this->getName();
+	collisionObjName += "_BV"; // bounding volume
 
-	_collisionObject = new SbmGeomNullObject();
-	_collisionObject->attachToObj(this);
-
+	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();	
+	SbmGeomObject* geomObj = colManager->createCollisionObject(collisionObjName,"null",SrVec());
+	geomObj->attachToObj(this);
 }
 
 SkSkeleton* SbmPawn::getSkeleton() const
@@ -467,8 +471,10 @@ SbmPawn::~SbmPawn()	{
 		delete dMesh_p;
 	}
 
-	if (_collisionObject)
-		delete _collisionObject;
+	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
+	colManager->removeCollisionObject(collisionObjName);
+// 	if (_collisionObject)
+// 		delete _collisionObject;
 }
 
 
@@ -513,6 +519,12 @@ SbmTransform& SbmPawn::getGlobalTransform()
 {	
 	globalTransform.gmat(get_world_offset());
 	return globalTransform;
+}
+
+void SbmPawn::setGlobalTransform( SbmTransform& newGlobalTransform )
+{
+	SrMat gmat = globalTransform.gmat();
+	setWorldOffset(gmat);
 }
 
 void SbmPawn::setWorldOffset( const SrMat& newWorld )
@@ -1347,19 +1359,27 @@ WSP_ERROR SbmPawn::wsp_rotation_accessor( const std::string id, const std::strin
 #endif
 
 
+const std::string& SbmPawn::getGeomObjectName()
+{
+	return collisionObjName;
+}
+
 SbmGeomObject* SbmPawn::getGeomObject()
 {	
-	return _collisionObject;
+	//return _collisionObject;
+	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
+	SbmGeomObject* geomObj = colManager->getCollisionObject(collisionObjName);
+	return geomObj;
 } 
 
-void SbmPawn::setGeomObject(SbmGeomObject* object)
-{	
-	if (_collisionObject)
-		delete _collisionObject;
-
-	_collisionObject = object;
-	_collisionObject->attachToObj(this);
-}
+// void SbmPawn::setGeomObject(SbmGeomObject* object)
+// {	
+// 	if (_collisionObject)
+// 		delete _collisionObject;
+// 
+// 	_collisionObject = object;
+// 	_collisionObject->attachToObj(this);
+// }
 
 
 SbmPhysicsObj* SbmPawn::getPhysicsObject()

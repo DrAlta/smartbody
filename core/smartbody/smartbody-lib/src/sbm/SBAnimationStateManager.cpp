@@ -14,10 +14,46 @@ SBAnimationStateManager::~SBAnimationStateManager()
 {
 }
 
+std::vector<std::string> SBAnimationStateManager::getAutoStateTransitions( const std::string& characterName, const std::string& targetState )
+{
+	std::vector<std::string> pathVec;
+	
+
+	return pathVec;		
+}
+
+bool SBAnimationStateManager::addStateToGraph( const std::string& name )
+{
+	BoostGraph::vertex_descriptor v = stateGraph.vertex(name);
+	
+	if (v == BoostGraph::null_vertex()) // the state does not exist in the graph
+	{		
+		stateGraph.add_vertex(name);	
+		//boost::put(boost::get(boost::vertex_name_t,stateGraph),stateGraph,name,name);
+		//boost::put(boost::vertex_name_t,)
+		
+	}
+	return true;
+}
+
+bool SBAnimationStateManager::addTransitionEdgeToGraph( const std::string& source, const std::string& dest )
+{
+	BoostGraph::vertex_descriptor vs = stateGraph.vertex(source), vd = stateGraph.vertex(dest);
+	
+	if (vs == BoostGraph::null_vertex() || vd == BoostGraph::null_vertex()) return false;
+	std::pair<BoostGraph::edge_descriptor,bool> transitionEdge = boost::edge_by_label(source,dest,stateGraph);
+	// edge already exist
+	if (transitionEdge.second) return false;
+
+	// otherwise add transition edge
+	boost::add_edge_by_label(source,dest,stateGraph); return true;
+}
+
 SBAnimationState0D* SBAnimationStateManager::createState0D(const std::string& name)
 {
 	SBAnimationState0D* state = new SBAnimationState0D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	addStateToGraph(name);
 	mcu.addPAState(state);
 	return state;
 }
@@ -26,6 +62,7 @@ SBAnimationState1D* SBAnimationStateManager::createState1D(const std::string& na
 {
 	SBAnimationState1D* state = new SBAnimationState1D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	addStateToGraph(name);
 	mcu.addPAState(state);
 	return state;
 }
@@ -34,6 +71,7 @@ SBAnimationState2D* SBAnimationStateManager::createState2D(const std::string& na
 {
 	SBAnimationState2D* state = new SBAnimationState2D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	addStateToGraph(name);
 	mcu.addPAState(state);
 	return state;
 }
@@ -42,12 +80,14 @@ SBAnimationState3D* SBAnimationStateManager::createState3D(const std::string& na
 {
 	SBAnimationState3D* state = new SBAnimationState3D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	addStateToGraph(name);
 	mcu.addPAState(state);
 	return state;
 }
 
 SBAnimationTransition* SBAnimationStateManager::createTransition(const std::string& source, const std::string& dest)
-{
+{	
+	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SBAnimationState* sourceState = getState(source);
 	if (!sourceState)
@@ -63,6 +103,7 @@ SBAnimationTransition* SBAnimationStateManager::createTransition(const std::stri
 	}
 	SBAnimationTransition* transition = new SBAnimationTransition(source + "/" + dest);
 	transition->set(sourceState, destState);
+
 	mcu.addPATransition(transition);
 	return transition;
 }
