@@ -67,6 +67,16 @@ void SBAnimationTransition::removeEaseOutInterval(int num)
 {
 }
 
+void SBAnimationTransition::setSourceState(SBAnimationState* source)
+{
+	fromState = source;
+}
+
+void SBAnimationTransition::setDestinationState(SBAnimationState* dest)
+{
+	toState = dest;
+}
+
 SBAnimationState* SBAnimationTransition::getSourceState()
 {
 	SBAnimationState* from = dynamic_cast<SBAnimationState*>(fromState);

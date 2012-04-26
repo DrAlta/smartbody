@@ -131,6 +131,7 @@ class PAState
 		//std::vector<std::string> motionNames;
 		std::vector<SrVec> parameters;
 		SrVec parameterScale;
+		SrVec invParameterScale;
 		std::vector<TriangleInfo> triangles;
 		std::vector<TetrahedronInfo> tetrahedrons;
 		std::string emptyString;

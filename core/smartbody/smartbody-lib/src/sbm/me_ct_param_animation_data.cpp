@@ -420,7 +420,6 @@ bool PAState::getWeightsFromParameters(double x, double y, double z, std::vector
 		double w4 = 0.0;
 
 		// scale back
-		SrVec invParameterScale(1.f / parameterScale.x, 1.f / parameterScale.y, 1.f / parameterScale.z);
 		param = vecMultiply(param, invParameterScale);
 		getWeight(param, v1, v2, v3, v4, w1, w2, w3, w4);
 
@@ -575,6 +574,13 @@ void PAState::updateParameterScale()
 	{
 		parameterScale.z = 1.f / zSpan;
 	}
+
+	if (parameterScale.x != 0.0f)
+		invParameterScale.x = 1.f / parameterScale.x;
+	if (parameterScale.y != 0.0f)
+		invParameterScale.y = 1.f / parameterScale.y;
+	if (parameterScale.z != 0.0f)
+		invParameterScale.z = 1.f / parameterScale.z;
 }
 
 void PAState::setParameter(const std::string& motion, double x)

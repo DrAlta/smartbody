@@ -15,6 +15,11 @@ class SBAnimationTransition : public PATransition
 		SBAnimationTransition(std::string name);
 		~SBAnimationTransition();
 
+		void setSourceState(SBAnimationState* source);
+		void setDestinationState(SBAnimationState* dest);
+		SBAnimationState* getSourceState();
+		SBAnimationState* getDestinationState();
+
 		void set(SBAnimationState* source, SBAnimationState* dest);
 		double getEaseInStart();
 		double getEaseInEnd();
@@ -26,8 +31,7 @@ class SBAnimationTransition : public PATransition
 		int getNumEaseOutIntervals();
 		std::vector<double> getEaseOutInterval(int num);
 		
-		SBAnimationState* getSourceState();
-		SBAnimationState* getDestinationState();
+		
 
 	protected:
 
