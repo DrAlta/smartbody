@@ -946,6 +946,22 @@ int PAState::getMinVecY()
 	return ret;
 }
 
+int PAState::getMinVecZ()
+{
+	float min = 9999;
+	int ret = -1;
+	for (int i = 0; i < getNumParameters(); i++)
+	{
+		if (parameters[i].z < min)
+		{
+			min = parameters[i].z;
+			ret = i;
+		}
+	}
+	return ret;
+}
+
+
 int PAState::getMaxVecX()
 {
 	float max = -9999;
@@ -970,6 +986,21 @@ int PAState::getMaxVecY()
 		if (parameters[i].y > max)
 		{
 			max = parameters[i].y;
+			ret = i;
+		}
+	}
+	return ret;
+}
+
+int PAState::getMaxVecZ()
+{
+	float max = -9999;
+	int ret = -1;
+	for (int i = 0; i < getNumParameters(); i++)
+	{
+		if (parameters[i].z > max)
+		{
+			max = parameters[i].z;
 			ret = i;
 		}
 	}
