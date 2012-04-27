@@ -2924,7 +2924,10 @@ void FltkViewer::drawCharacterBoundingVolumes()
 	{
 		SbmCharacter* character = (*iter).second;
 		if (character && character->getGeomObject())
-			drawColObject(character->getGeomObject(),character->getGeomObject()->getGlobalTransform().gmat());
+		{
+			SrMat gmat = character->getGeomObject()->getGlobalTransform().gmat();
+			this->drawColObject(character->getGeomObject(), gmat);
+		}
 	}
 }
 
