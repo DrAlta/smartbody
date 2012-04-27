@@ -260,7 +260,7 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 	// posture
 	if (this->posture_sched_p)
 	{
-		MeCtScheduler2::VecOfTrack tracks = gaze_sched_p->tracks();
+		MeCtScheduler2::VecOfTrack tracks = posture_sched_p->tracks();
 		for (size_t t = 0; t < tracks.size(); t++)
 		{
 			MeCtMotion* motionCt = dynamic_cast<MeCtMotion*>(tracks[t]->animation_ct());
