@@ -34,6 +34,7 @@ private slots:
    void GazeAtPressed();
    void RunBmlPressed();
    void PlayAnimPressed();
+   void SetPosturePressed();
    void SpeakButtonPressed();
    void QueryAnimsPressed();
    void FilterAnims();

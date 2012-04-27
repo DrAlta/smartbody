@@ -28,6 +28,7 @@ UtilsDialog::UtilsDialog(SbmDebuggerClient* client, GLWidget* pRenderView, QWidg
    connect(ui.GazeAtButton, SIGNAL(pressed()), this, SLOT(GazeAtPressed()));
    connect(ui.runBmlButton, SIGNAL(pressed()), this, SLOT(RunBmlPressed()));
    connect(ui.PlayAnimButton, SIGNAL(pressed()), this, SLOT(PlayAnimPressed()));
+   connect(ui.SetPostureButton, SIGNAL(pressed()), this, SLOT(SetPosturePressed()));
    connect(ui.SpeakButton, SIGNAL(pressed()), this, SLOT(SpeakButtonPressed()));
    connect(ui.QueryAnimButton, SIGNAL(pressed()), this, SLOT(QueryAnimsPressed()));
    connect(ui.refreshButton, SIGNAL(pressed()), this, SLOT(Refresh()));
@@ -66,6 +67,13 @@ void UtilsDialog::RunBmlPressed()
 void UtilsDialog::PlayAnimPressed()
 {
    string message = vhcl::Format("sbm test bml char %s anim %s", GetSelectedChar().c_str(),
+      ui.animationNamesBox->currentText().toStdString().c_str());
+   vhmsg::ttu_notify1(message.c_str());
+}
+
+void UtilsDialog::SetPosturePressed()
+{
+   string message = vhcl::Format("sbm test bml char %s <body posture=\"%s\"/>", GetSelectedChar().c_str(),
       ui.animationNamesBox->currentText().toStdString().c_str());
    vhmsg::ttu_notify1(message.c_str());
 }

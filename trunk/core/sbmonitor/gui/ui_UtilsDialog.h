@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'UtilsDialog.ui'
 **
-** Created: Thu Feb 9 17:13:12 2012
+** Created: Fri Apr 27 11:08:57 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -46,6 +46,7 @@ public:
     QPlainTextEdit *animFilterBox;
     QLabel *filterLabel;
     QPushButton *PlayAnimButton;
+    QPushButton *SetPostureButton;
     QFrame *frame_3;
     QLabel *renderingLabel;
     QCheckBox *showAxesBox;
@@ -109,7 +110,7 @@ public:
         runBmlButton->setGeometry(QRect(10, 190, 61, 23));
         frame_2 = new QFrame(UtilsDialog);
         frame_2->setObjectName(QString::fromUtf8("frame_2"));
-        frame_2->setGeometry(QRect(10, 70, 211, 181));
+        frame_2->setGeometry(QRect(10, 70, 211, 221));
         frame_2->setFrameShape(QFrame::StyledPanel);
         frame_2->setFrameShadow(QFrame::Raised);
         animationNamesLabel = new QLabel(frame_2);
@@ -123,7 +124,7 @@ public:
         line->setFrameShadow(QFrame::Sunken);
         QueryAnimButton = new QPushButton(frame_2);
         QueryAnimButton->setObjectName(QString::fromUtf8("QueryAnimButton"));
-        QueryAnimButton->setGeometry(QRect(80, 150, 75, 23));
+        QueryAnimButton->setGeometry(QRect(10, 180, 75, 23));
         animationNamesBox = new QComboBox(frame_2);
         animationNamesBox->setObjectName(QString::fromUtf8("animationNamesBox"));
         animationNamesBox->setGeometry(QRect(10, 120, 191, 22));
@@ -139,7 +140,10 @@ public:
         filterLabel->setGeometry(QRect(10, 40, 71, 16));
         PlayAnimButton = new QPushButton(frame_2);
         PlayAnimButton->setObjectName(QString::fromUtf8("PlayAnimButton"));
-        PlayAnimButton->setGeometry(QRect(10, 150, 61, 23));
+        PlayAnimButton->setGeometry(QRect(10, 150, 71, 23));
+        SetPostureButton = new QPushButton(frame_2);
+        SetPostureButton->setObjectName(QString::fromUtf8("SetPostureButton"));
+        SetPostureButton->setGeometry(QRect(90, 150, 71, 23));
         frame_3 = new QFrame(UtilsDialog);
         frame_3->setObjectName(QString::fromUtf8("frame_3"));
         frame_3->setGeometry(QRect(250, 310, 141, 91));
@@ -238,6 +242,7 @@ public:
         animationsLabel->setText(QApplication::translate("UtilsDialog", "Animations", 0, QApplication::UnicodeUTF8));
         filterLabel->setText(QApplication::translate("UtilsDialog", "Search Filter", 0, QApplication::UnicodeUTF8));
         PlayAnimButton->setText(QApplication::translate("UtilsDialog", "Play", 0, QApplication::UnicodeUTF8));
+        SetPostureButton->setText(QApplication::translate("UtilsDialog", "Set Posture", 0, QApplication::UnicodeUTF8));
         renderingLabel->setText(QApplication::translate("UtilsDialog", "Rendering", 0, QApplication::UnicodeUTF8));
         showAxesBox->setText(QApplication::translate("UtilsDialog", "Show Axes", 0, QApplication::UnicodeUTF8));
         showEyeBeamsBox->setText(QApplication::translate("UtilsDialog", "Show Eye Beams", 0, QApplication::UnicodeUTF8));

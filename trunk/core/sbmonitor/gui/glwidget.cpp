@@ -250,7 +250,7 @@ QVector3D GLWidget::GetWorldPositionFromScreenCoords(int x, int y)
 
 void GLWidget::ProcessHits(GLint hits, GLuint buffer[])
 {
-   GLint i, numberOfNames;
+   GLint i = 0, numberOfNames = 0;
    GLuint names, *ptr, minZ, *ptrNames;
 
    // sort the picked objects closest to furthest
