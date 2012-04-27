@@ -91,8 +91,10 @@ class PAState
 		int getNumParameters();
 		int getMinVecX();
 		int getMinVecY();
+		int getMinVecZ();
 		int getMaxVecX();
 		int getMaxVecY();
+		int getMaxVecZ();
 		SrVec getVec(const std::string& motion);
 		SrVec getVec(int id);
 		const std::string& getMotionName(int id);

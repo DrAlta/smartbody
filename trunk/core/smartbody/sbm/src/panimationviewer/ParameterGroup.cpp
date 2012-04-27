@@ -72,6 +72,8 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			double maxX = stateData->state->getVec(stateData->state->getMaxVecX()).x;
 			double minY = stateData->state->getVec(stateData->state->getMinVecY()).y;
 			double maxY = stateData->state->getVec(stateData->state->getMaxVecY()).y;
+			double minZ = stateData->state->getVec(stateData->state->getMinVecZ()).z;
+			double maxZ = stateData->state->getVec(stateData->state->getMaxVecZ()).z;
 			xAxis = new Fl_Value_Slider(4 * xDis + x, h - 4 * yDis + y, w - 5 * xDis, 2 * yDis, "X");
 			xAxis->minimum(minX);
 			xAxis->maximum(maxX);
@@ -83,8 +85,8 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			yAxis->callback(updateXYZAxisValue, this);
 			yAxis->type(FL_VERTICAL);
 			zAxis = new Fl_Value_Slider(4 * xDis + x, yDis + y, w - 5 * xDis, 2 * yDis, "Z");
-			zAxis->minimum(-90);	// TODO: remove this hard code part
-			zAxis->maximum(90);
+			zAxis->minimum(minZ);
+			zAxis->maximum(maxZ);
 			zAxis->type(FL_HORIZONTAL);
 			zAxis->callback(updateXYZAxisValue, this);
 		}
