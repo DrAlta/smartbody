@@ -16,7 +16,8 @@ Camera::Camera() :
    m_MouseRotation(false)
 {
    m_CameraTransformation.setToIdentity();
-   m_CameraTransformation.translate(0, 0.2f, 3);
+   m_BaseOrientation.setToIdentity();
+   SetPosition(QVector3D(0, 0.2f, 3));
 }
 
 Camera::~Camera()
@@ -34,13 +35,13 @@ void Camera::Draw()
 
 void Camera::Rotate(const QVector3D& offset)
 {
-   m_RotX = offset.x();
-   m_RotY = offset.y();
-   m_RotZ = offset.z();
+   m_RotX += offset.x();
+   m_RotY += offset.y();
+   m_RotZ += offset.z();
 
    QVector3D pos = GetPosition();
-   //m_CameraTransformation.setToIdentity();
-
+   m_CameraTransformation = m_BaseOrientation;
+   
    QVector4D col0 = m_CameraTransformation.column(0);
    QVector4D col1 = m_CameraTransformation.column(1);
 
@@ -52,35 +53,46 @@ void Camera::Rotate(const QVector3D& offset)
    QQuaternion yQuat = QQuaternion::fromAxisAndAngle(up, m_RotY);
 
    // perform rotation
-   QQuaternion combined = xQuat * yQuat;
+   QQuaternion combined = yQuat * xQuat;
    m_CameraTransformation.rotate(combined);
    SetPosition(pos);
 }
 
 void Camera::MoveX(float offset)
 {
-   QVector3D right(m_CameraTransformation.column(0));
-   m_CameraTransformation.translate(right * offset);
+   QVector3D right(m_BaseOrientation.column(0));
+   Translate(right * offset);
 }
 
 void Camera::MoveY(float offset)
 {
-   QVector3D up(m_CameraTransformation.column(1));
-   m_CameraTransformation.translate(up * offset);
+   QVector3D up(m_BaseOrientation.column(1));
+   Translate(up * offset);
 }
 
 void Camera::MoveZ(float offset)
 {
-   QVector3D forward(m_CameraTransformation.column(2));
-   m_CameraTransformation.translate(forward * offset);
+   QVector3D forward(m_BaseOrientation.column(2));
+   Translate(forward * offset);
+}
+
+void Camera::Translate(const QVector3D& vec)
+{
+   m_CameraTransformation.translate(vec);
+   m_BaseOrientation.translate(vec);
 }
 
 void Camera::SetCameraType(const string& type)
 {
    if (type == "Follow Renderer")
+   {
       m_CameraType = Follow_Renderer;
+   }
    else if (type == "Free Look")
+   {
       m_CameraType = Free_Look;
+      m_RotX = m_RotY = m_RotZ = 0;
+   }
    else
       printf("Camera type %s doesn't exist", type.c_str());
 }
@@ -91,7 +103,8 @@ void Camera::SetRotation(const QQuaternion& rot)
    newMat.setToIdentity();
    newMat.translate(GetPosition());
    newMat.rotate(rot);
-   m_CameraTransformation = newMat;
+   m_BaseOrientation = m_CameraTransformation = newMat;
+   m_RotX = m_RotY = m_RotZ = 0;
 }
 
 void Camera::LookAt(const QVector3D& pos)
@@ -107,6 +120,8 @@ void Camera::LookAt(const QVector3D& pos)
 
    QVector3D up = QVector3D::crossProduct(right, forward);
    m_CameraTransformation.setColumn(1, up);
+   //m_BaseOrientation = m_CameraTransformation;
+   m_RotX = m_RotY = m_RotZ = 0;
 }
 
 void Camera::MoveLookAt(const QVector3D lookAtPos)

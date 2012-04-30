@@ -100,10 +100,14 @@ public:
       pos.x = 0;
       pos.y = 200;
       pos.z = 350;
-      rot.x = 0.12f;
-      rot.y = 0.004f;
+      //rot.x = 0.12f;
+      //rot.y = 0.004f;
+      //rot.z = 0;
+      //rot.w = 0.992999f;
+      rot.x = 0;
+      rot.y = 0;
       rot.z = 0;
-      rot.w = 0.992999f;
+      rot.w = 1.0f;
       fovY = 45;
       aspect = 1.5;
       zNear = 0.1;
