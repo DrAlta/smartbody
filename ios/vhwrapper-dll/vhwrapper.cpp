@@ -33,34 +33,38 @@ std::map<AUDIOHANDLE, Audio*> g_audioInstances;
 int g_audioHandleId = 0;
 
 
-typedef SBMHANDLE (__stdcall *SBM_CreateSBM_DEF)();
-typedef bool (__stdcall *SBM_SetSpeechAudiofileBasePath_DEF)(SBMHANDLE, const char *);
-typedef bool (__stdcall *SBM_SetFacebone_DEF)(SBMHANDLE, bool);
-typedef bool (__stdcall *SBM_SetProcessId_DEF)( SBMHANDLE, const char * );
-typedef bool (__stdcall *SBM_SetMediaPath_DEF)( SBMHANDLE, const char * );
-typedef bool (__stdcall *SBM_Init_DEF)( SBMHANDLE, const char * );
-typedef bool (__stdcall *SBM_Shutdown_DEF)( SBMHANDLE );
-typedef bool (__stdcall *SBM_SetListener_DEF)( SBMHANDLE, SBM_OnCreateCharacterCallback, SBM_OnCharacterDeleteCallback, SBM_OnCharacterChangeCallback, SBM_OnVisemeCallback, SBM_OnChannelCallback);
-typedef bool (__stdcall *SBM_Update_DEF)(SBMHANDLE, double);
-typedef bool (__stdcall *SBM_SetDebuggerId_DEF)(SBMHANDLE, const char * );
-typedef bool (__stdcall *SBM_SetDebuggerCameraValues_DEF)(SBMHANDLE, double, double, double, double, double, double, double, double, double, double, double );
-typedef bool (__stdcall *SBM_SetDebuggerRendererRightHanded_DEF)(SBMHANDLE, bool );
-typedef bool (__stdcall *SBM_ProcessVHMsgs_DEF)(SBMHANDLE, const char*, const char*);
-typedef int  (__stdcall *SBM_GetNumberOfCharacters_DEF)(SBMHANDLE sbmHandle);
-typedef bool (__stdcall *SBM_GetCharacter_DEF)( SBMHANDLE sbmHandle, const char*, SBM_SmartbodyCharacter* );
-typedef bool (__stdcall *SBM_ReleaseCharacter_DEF)(SBM_SmartbodyCharacter *);
-typedef bool (__stdcall *SBM_ReleaseCharacterJoints_DEF)(SBM_SmartbodyCharacter *);
-typedef bool (__stdcall *SBM_SetLogMessageCallback_DEF)(LogMessageCallback);
-typedef void (__stdcall *SBM_LogMessage_DEF)(const char*, int);
-typedef bool (__stdcall *SBM_IsCharacterCreated_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** objectClass );
-typedef bool (__stdcall *SBM_IsCharacterDeleted_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name );
-typedef bool (__stdcall *SBM_IsCharacterChanged_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name );
-typedef bool (__stdcall *SBM_IsVisemeSet_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** visemeName, float** weight, float** blendTime );
-typedef bool (__stdcall *SBM_IsChannelSet_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** channelName, float ** value );
+typedef SBMHANDLE (*SBM_CreateSBM_DEF)();
+typedef bool (*SBM_SetSpeechAudiofileBasePath_DEF)(SBMHANDLE, const char *);
+typedef bool (*SBM_SetProcessId_DEF)( SBMHANDLE, const char * );
+typedef bool (*SBM_SetMediaPath_DEF)( SBMHANDLE, const char * );
+typedef bool (*SBM_Init_DEF)( SBMHANDLE, const char *, bool );
+typedef bool (*SBM_Shutdown_DEF)( SBMHANDLE );
+typedef bool (*SBM_SetListener_DEF)( SBMHANDLE, SBM_OnCreateCharacterCallback, SBM_OnCharacterDeleteCallback, SBM_OnCharacterChangeCallback, SBM_OnVisemeCallback, SBM_OnChannelCallback);
+typedef bool (*SBM_Update_DEF)(SBMHANDLE, double);
+typedef bool (*SBM_SetDebuggerId_DEF)(SBMHANDLE, const char * );
+typedef bool (*SBM_SetDebuggerCameraValues_DEF)(SBMHANDLE, double, double, double, double, double, double, double, double, double, double, double );
+typedef bool (*SBM_SetDebuggerRendererRightHanded_DEF)(SBMHANDLE, bool );
+typedef bool (*SBM_ProcessVHMsgs_DEF)(SBMHANDLE, const char*, const char*);
+typedef int  (*SBM_GetNumberOfCharacters_DEF)(SBMHANDLE sbmHandle);
+typedef bool (*SBM_GetCharacter_DEF)( SBMHANDLE sbmHandle, const char*, SBM_SmartbodyCharacter* );
+typedef bool (*SBM_ReleaseCharacter_DEF)(SBM_SmartbodyCharacter *);
+typedef bool (*SBM_ReleaseCharacterJoints_DEF)(SBM_SmartbodyCharacter *);
+typedef bool (*SBM_SetLogMessageCallback_DEF)(LogMessageCallback);
+typedef void (*SBM_LogMessage_DEF)(const char*, int);
+typedef bool (*SBM_IsCharacterCreated_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** objectClass );
+typedef bool (*SBM_IsCharacterDeleted_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name );
+typedef bool (*SBM_IsCharacterChanged_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name );
+typedef bool (*SBM_IsVisemeSet_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** visemeName, float** weight, float** blendTime );
+typedef bool (*SBM_IsChannelSet_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** channelName, float ** value );
+
+typedef bool (*SBM_PythonCommandVoid_DEF)(SBMHANDLE sbmHandle, const char * command);
+typedef bool (*SBM_PythonCommandBool_DEF)(SBMHANDLE sbmHandle, const char * command);
+typedef int (*SBM_PythonCommandInt_DEF)(SBMHANDLE sbmHandle, const char *command);
+typedef float (*SBM_PythonCommandFloat_DEF)(SBMHANDLE sbmHandle, const char * command);
+typedef char* (*SBM_PythonCommandString_DEF)(SBMHANDLE sbmHandle, const char * command, char* output, int maxLen);
 
 SBM_CreateSBM_DEF                  g_SBM_CreateSBM_DEF = NULL;
 SBM_SetSpeechAudiofileBasePath_DEF g_SBM_SetSpeechAudiofileBasePath_DEF = NULL;
-SBM_SetFacebone_DEF                g_SBM_SetFacebone_DEF = NULL;
 SBM_SetProcessId_DEF               g_SBM_SetProcessId_DEF = NULL;
 SBM_SetMediaPath_DEF               g_SBM_SetMediaPath_DEF = NULL;
 SBM_Init_DEF                       g_SBM_Init_DEF = NULL;
@@ -82,9 +86,11 @@ SBM_IsCharacterDeleted_DEF           g_SBM_IsCharacterDeleted_DEF = NULL;
 SBM_IsCharacterChanged_DEF         g_SBM_IsCharacterChanged_DEF = NULL;
 SBM_IsVisemeSet_DEF                g_SBM_IsVisemeSet_DEF = NULL;
 SBM_IsChannelSet_DEF               g_SBM_IsChannelSet_DEF = NULL;
-
-
-
+SBM_PythonCommandVoid_DEF          g_SBM_PythonCommandVoid = NULL;
+SBM_PythonCommandBool_DEF          g_SBM_PythonCommandBool = NULL;
+SBM_PythonCommandInt_DEF           g_SBM_PythonCommandInt = NULL;
+SBM_PythonCommandFloat_DEF         g_SBM_PythonCommandFloat = NULL;
+SBM_PythonCommandString_DEF        g_SBM_PythonCommandString = NULL;
 
 VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
 {
@@ -106,7 +112,6 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
 
    g_SBM_CreateSBM_DEF                  = (SBM_CreateSBM_DEF)GetProcAddress(g_SBM_HINST, "SBM_CreateSBM");
    g_SBM_SetSpeechAudiofileBasePath_DEF = (SBM_SetSpeechAudiofileBasePath_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetSpeechAudiofileBasePath");
-   g_SBM_SetFacebone_DEF                = (SBM_SetFacebone_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetFacebone");
    g_SBM_SetProcessId_DEF               = (SBM_SetProcessId_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetProcessId");
    g_SBM_SetMediaPath_DEF               = (SBM_SetMediaPath_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetMediaPath");
    g_SBM_Init_DEF                       = (SBM_Init_DEF)GetProcAddress(g_SBM_HINST, "SBM_Init");
@@ -128,6 +133,11 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
    g_SBM_IsCharacterChanged_DEF         = (SBM_IsCharacterChanged_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsCharacterChanged");
    g_SBM_IsVisemeSet_DEF                = (SBM_IsVisemeSet_DEF )GetProcAddress(g_SBM_HINST, "SBM_IsVisemeSet");
    g_SBM_IsChannelSet_DEF               = (SBM_IsChannelSet_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsChannelSet");
+   g_SBM_PythonCommandVoid              = (SBM_PythonCommandVoid_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandVoid");
+   g_SBM_PythonCommandBool              = (SBM_PythonCommandBool_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandBool");
+   g_SBM_PythonCommandInt               = (SBM_PythonCommandInt_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandInt");
+   g_SBM_PythonCommandFloat             = (SBM_PythonCommandFloat_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandFloat");
+   g_SBM_PythonCommandString            = (SBM_PythonCommandString_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandString");
 
    if (g_SBM_CreateSBM_DEF)
    {
@@ -150,19 +160,6 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandl
    return false;
 #else
    return SBM_SetSpeechAudiofileBasePath(sbmHandle, basePath); 
-#endif
-}
-
-VHWRAPPERDLL_API bool WRAPPER_SBM_SetFacebone( SBMHANDLE sbmHandle, bool enabled )
-{
-#ifdef WIN32
-   if (g_SBM_SetFacebone_DEF)
-   {
-      return g_SBM_SetFacebone_DEF(sbmHandle, enabled);
-   }
-   return false;
-#else
-   return SBM_SetFacebone(sbmHandle, enabled);
 #endif
 }
 
@@ -192,16 +189,16 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_SetMediaPath( SBMHANDLE sbmHandle, const char 
 #endif
 }
 
-VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle, const char * pythonPath )
+VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle, const char * pythonPath, bool logToFile )
 {
 #ifdef WIN32
    if (g_SBM_Init_DEF)
    {
-      return g_SBM_Init_DEF(sbmHandle, pythonPath);
+      return g_SBM_Init_DEF(sbmHandle, pythonPath, logToFile);
    }
    return false;
 #else
-   return SBM_Init(sbmHandle, pythonPath);
+   return SBM_Init(sbmHandle, pythonPath, logToFile);
 #endif
 }
 
@@ -427,15 +424,59 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_IsChannelSet( SBMHANDLE sbmHandle, int * numCh
 #ifdef WIN32
    return g_SBM_IsChannelSet_DEF(sbmHandle, numCharacters, name, channelName, value);
 #else
-    return SBM_IsChannelSet(sbmHandle, numCharacters, name, channelName, value);
+   return SBM_IsChannelSet(sbmHandle, numCharacters, name, channelName, value);
 #endif
 }
 
+VHWRAPPERDLL_API bool WRAPPER_SBM_PythonCommandVoid(SBMHANDLE sbmHandle, const char * command)
+{
+#ifdef WIN32
+   return g_SBM_PythonCommandVoid(sbmHandle, command);
+#else
+    return SBM_PythonCommandVoid(sbmHandle, command);
+#endif
+}
+
+VHWRAPPERDLL_API bool WRAPPER_SBM_PythonCommandBool(SBMHANDLE sbmHandle, const char * command)
+{
+#ifdef WIN32
+   return g_SBM_PythonCommandBool(sbmHandle, command);
+#else
+    return SBM_PythonCommandBool(sbmHandle, command);
+#endif
+}
+
+VHWRAPPERDLL_API int WRAPPER_SBM_PythonCommandInt(SBMHANDLE sbmHandle, const char * command)
+{
+#ifdef WIN32
+   return g_SBM_PythonCommandInt(sbmHandle, command);
+#else
+    return SBM_PythonCommandInt(sbmHandle, command);
+#endif
+}
+
+VHWRAPPERDLL_API float WRAPPER_SBM_PythonCommandFloat(SBMHANDLE sbmHandle, const char *command)
+{
+#ifdef WIN32
+   return g_SBM_PythonCommandFloat(sbmHandle, command);
+#else
+    return SBM_PythonCommandFloat(sbmHandle, command);
+#endif
+}
+
+VHWRAPPERDLL_API char* WRAPPER_SBM_PythonCommandString(SBMHANDLE sbmHandle, const char * command, char* output, int maxLen)
+{
+#ifdef WIN32
+   return g_SBM_PythonCommandString(sbmHandle, command, output, maxLen);
+#else
+    return SBM_PythonCommandString(sbmHandle, command, output, maxLen);
+#endif
+}
 
 ////////////////////////////////////////////////////////////////////////////
 
 
-#if 0
+
 VHWRAPPERDLL_API AUDIOHANDLE WRAPPER_VHCL_AUDIO_CreateAudio()
 {
    g_audioHandleId++;
@@ -706,7 +747,6 @@ bool VHCL_AUDIO_HandleExists( const AUDIOHANDLE handle )
 {
    return g_audioInstances.find( handle ) != g_audioInstances.end();
 }
-#endif
 
 #ifdef ENABLE_VHMSG_WRAPPER
 ///VHMSG c++ WRAPPER FUNCTIONS////////////////////////////////
