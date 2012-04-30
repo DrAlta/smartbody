@@ -8,16 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		AAC9ACA2142012EC00F56F9C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9ACA1142012EC00F56F9C /* Foundation.framework */; };
-		AAC9ACB71420136800F56F9C /* vhwrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC9ACB51420136800F56F9C /* vhwrapper.cpp */; };
-		AAC9ACB81420136800F56F9C /* vhwrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = AAC9ACB61420136800F56F9C /* vhwrapper.h */; };
+		AADDAE9A154E224500A86087 /* vhwrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = AADDAE98154E224500A86087 /* vhwrapper.h */; };
+		AADDAE9B154E224500A86087 /* vhwrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AADDAE99154E224500A86087 /* vhwrapper.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		AAC9AC9E142012EC00F56F9C /* libvhwrapper-dll.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libvhwrapper-dll.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAC9ACA1142012EC00F56F9C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		AAC9ACA5142012EC00F56F9C /* vhwrapper-dll-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vhwrapper-dll-Prefix.pch"; sourceTree = "<group>"; };
-		AAC9ACB51420136800F56F9C /* vhwrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhwrapper.cpp; sourceTree = SOURCE_ROOT; };
-		AAC9ACB61420136800F56F9C /* vhwrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhwrapper.h; sourceTree = SOURCE_ROOT; };
+		AADDAE98154E224500A86087 /* vhwrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhwrapper.h; sourceTree = SOURCE_ROOT; };
+		AADDAE99154E224500A86087 /* vhwrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhwrapper.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,8 +60,8 @@
 		AAC9ACA3142012EC00F56F9C /* vhwrapper-dll */ = {
 			isa = PBXGroup;
 			children = (
-				AAC9ACB51420136800F56F9C /* vhwrapper.cpp */,
-				AAC9ACB61420136800F56F9C /* vhwrapper.h */,
+				AADDAE98154E224500A86087 /* vhwrapper.h */,
+				AADDAE99154E224500A86087 /* vhwrapper.cpp */,
 				AAC9ACA4142012EC00F56F9C /* Supporting Files */,
 			);
 			path = "vhwrapper-dll";
@@ -82,7 +82,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AAC9ACB81420136800F56F9C /* vhwrapper.h in Headers */,
+				AADDAE9A154E224500A86087 /* vhwrapper.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,7 +151,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AAC9ACB71420136800F56F9C /* vhwrapper.cpp in Sources */,
+				AADDAE9B154E224500A86087 /* vhwrapper.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

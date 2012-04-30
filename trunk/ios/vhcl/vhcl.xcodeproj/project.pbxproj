@@ -15,6 +15,8 @@
 		AA9CD068141EE26B0064C27A /* vhcl_memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD058141EE26B0064C27A /* vhcl_memory.cpp */; };
 		AA9CD069141EE26B0064C27A /* vhcl_string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD059141EE26B0064C27A /* vhcl_string.cpp */; };
 		AA9CD06A141EE26B0064C27A /* vhcl_timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD05A141EE26B0064C27A /* vhcl_timer.cpp */; };
+		AADDAE94154DD01900A86087 /* vhcl_socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AADDAE92154DD01900A86087 /* vhcl_socket.cpp */; };
+		AADDAE95154DD01900A86087 /* vhcl_math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AADDAE93154DD01900A86087 /* vhcl_math.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +30,8 @@
 		AA9CD058141EE26B0064C27A /* vhcl_memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhcl_memory.cpp; sourceTree = "<group>"; };
 		AA9CD059141EE26B0064C27A /* vhcl_string.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhcl_string.cpp; sourceTree = "<group>"; };
 		AA9CD05A141EE26B0064C27A /* vhcl_timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhcl_timer.cpp; sourceTree = "<group>"; };
+		AADDAE92154DD01900A86087 /* vhcl_socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhcl_socket.cpp; sourceTree = "<group>"; };
+		AADDAE93154DD01900A86087 /* vhcl_math.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhcl_math.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +91,8 @@
 		AA9CD044141EE26B0064C27A /* src */ = {
 			isa = PBXGroup;
 			children = (
+				AADDAE92154DD01900A86087 /* vhcl_socket.cpp */,
+				AADDAE93154DD01900A86087 /* vhcl_math.cpp */,
 				AA9CD054141EE26B0064C27A /* Pow2Assert.cpp */,
 				AA9CD055141EE26B0064C27A /* vhcl_audio.cpp */,
 				AA9CD056141EE26B0064C27A /* vhcl_crash.cpp */,
@@ -180,6 +186,8 @@
 				AA9CD068141EE26B0064C27A /* vhcl_memory.cpp in Sources */,
 				AA9CD069141EE26B0064C27A /* vhcl_string.cpp in Sources */,
 				AA9CD06A141EE26B0064C27A /* vhcl_timer.cpp in Sources */,
+				AADDAE94154DD01900A86087 /* vhcl_socket.cpp in Sources */,
+				AADDAE95154DD01900A86087 /* vhcl_math.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

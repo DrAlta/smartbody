@@ -258,8 +258,6 @@
 		AA9CD8CD141FF8D10064C27A /* bml_xml_consts.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD681141FF8D00064C27A /* bml_xml_consts.hpp */; };
 		AA9CD8CE141FF8D10064C27A /* BMLDefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD682141FF8D00064C27A /* BMLDefs.cpp */; };
 		AA9CD8CF141FF8D10064C27A /* BMLDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD683141FF8D00064C27A /* BMLDefs.h */; };
-		AA9CD8D0141FF8D10064C27A /* BoneMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD684141FF8D00064C27A /* BoneMap.cpp */; };
-		AA9CD8D1141FF8D10064C27A /* BoneMap.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD685141FF8D00064C27A /* BoneMap.h */; };
 		AA9CD8D6141FF8D10064C27A /* DefaultAttributeTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD68A141FF8D00064C27A /* DefaultAttributeTable.cpp */; };
 		AA9CD8D7141FF8D10064C27A /* DefaultAttributeTable.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD68B141FF8D00064C27A /* DefaultAttributeTable.h */; };
 		AA9CD8DE141FF8D10064C27A /* Event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD692141FF8D00064C27A /* Event.cpp */; };
@@ -632,6 +630,17 @@
 		AAB20E7C145393C9001542D3 /* SBBehavior.h in Headers */ = {isa = PBXBuildFile; fileRef = AAB20E78145393C9001542D3 /* SBBehavior.h */; };
 		AAC99D13143AA3270098208A /* local_speech.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC99D11143AA3270098208A /* local_speech.cpp */; };
 		AAC99D14143AA3270098208A /* local_speech.h in Headers */ = {isa = PBXBuildFile; fileRef = AAC99D12143AA3270098208A /* local_speech.h */; };
+		AADDAE7E154DCE3D00A86087 /* SbmCharacterListener.h in Headers */ = {isa = PBXBuildFile; fileRef = AADDAE7A154DCE3D00A86087 /* SbmCharacterListener.h */; };
+		AADDAE80154DCE3D00A86087 /* SteerPath.h in Headers */ = {isa = PBXBuildFile; fileRef = AADDAE7C154DCE3D00A86087 /* SteerPath.h */; };
+		AADDAE81154DCE3D00A86087 /* SteerPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AADDAE7D154DCE3D00A86087 /* SteerPath.cpp */; };
+		AADDAE89154DCEB900A86087 /* SBCollisionManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AADDAE82154DCEB900A86087 /* SBCollisionManager.h */; };
+		AADDAE8A154DCEB900A86087 /* SBCollisionManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AADDAE83154DCEB900A86087 /* SBCollisionManager.cpp */; };
+		AADDAE8B154DCEB900A86087 /* SBBoneBusManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AADDAE84154DCEB900A86087 /* SBBoneBusManager.cpp */; };
+		AADDAE8C154DCEB900A86087 /* SBBoneBusManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AADDAE85154DCEB900A86087 /* SBBoneBusManager.h */; };
+		AADDAE8D154DCEB900A86087 /* SBJointMapManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AADDAE86154DCEB900A86087 /* SBJointMapManager.h */; };
+		AADDAE8E154DCEB900A86087 /* SBJointMapManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AADDAE87154DCEB900A86087 /* SBJointMapManager.cpp */; };
+		AADDAE8F154DCEB900A86087 /* SBJointMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AADDAE88154DCEB900A86087 /* SBJointMap.cpp */; };
+		AADDAE91154DCED800A86087 /* SBJointMap.h in Headers */ = {isa = PBXBuildFile; fileRef = AADDAE90154DCED800A86087 /* SBJointMap.h */; };
 		AAF8C71214DA2D970075F2C2 /* SBGestureMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAF8C70E14DA2D970075F2C2 /* SBGestureMap.cpp */; };
 		AAF8C71314DA2D970075F2C2 /* SBGestureMap.h in Headers */ = {isa = PBXBuildFile; fileRef = AAF8C70F14DA2D970075F2C2 /* SBGestureMap.h */; };
 		AAF8C71414DA2D970075F2C2 /* SBGestureMapManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAF8C71014DA2D970075F2C2 /* SBGestureMapManager.cpp */; };
@@ -890,8 +899,6 @@
 		AA9CD681141FF8D00064C27A /* bml_xml_consts.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bml_xml_consts.hpp; path = sbm/bml_xml_consts.hpp; sourceTree = "<group>"; };
 		AA9CD682141FF8D00064C27A /* BMLDefs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BMLDefs.cpp; path = sbm/BMLDefs.cpp; sourceTree = "<group>"; };
 		AA9CD683141FF8D00064C27A /* BMLDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BMLDefs.h; path = sbm/BMLDefs.h; sourceTree = "<group>"; };
-		AA9CD684141FF8D00064C27A /* BoneMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BoneMap.cpp; sourceTree = "<group>"; };
-		AA9CD685141FF8D00064C27A /* BoneMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoneMap.h; sourceTree = "<group>"; };
 		AA9CD68A141FF8D00064C27A /* DefaultAttributeTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DefaultAttributeTable.cpp; sourceTree = "<group>"; };
 		AA9CD68B141FF8D00064C27A /* DefaultAttributeTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultAttributeTable.h; sourceTree = "<group>"; };
 		AA9CD692141FF8D00064C27A /* Event.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Event.cpp; sourceTree = "<group>"; };
@@ -1268,6 +1275,17 @@
 		AAB20E78145393C9001542D3 /* SBBehavior.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBBehavior.h; path = sbm/SBBehavior.h; sourceTree = "<group>"; };
 		AAC99D11143AA3270098208A /* local_speech.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = local_speech.cpp; sourceTree = "<group>"; };
 		AAC99D12143AA3270098208A /* local_speech.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = local_speech.h; sourceTree = "<group>"; };
+		AADDAE7A154DCE3D00A86087 /* SbmCharacterListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmCharacterListener.h; sourceTree = "<group>"; };
+		AADDAE7C154DCE3D00A86087 /* SteerPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SteerPath.h; sourceTree = "<group>"; };
+		AADDAE7D154DCE3D00A86087 /* SteerPath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SteerPath.cpp; sourceTree = "<group>"; };
+		AADDAE82154DCEB900A86087 /* SBCollisionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBCollisionManager.h; path = sbm/SBCollisionManager.h; sourceTree = "<group>"; };
+		AADDAE83154DCEB900A86087 /* SBCollisionManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBCollisionManager.cpp; path = sbm/SBCollisionManager.cpp; sourceTree = "<group>"; };
+		AADDAE84154DCEB900A86087 /* SBBoneBusManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBBoneBusManager.cpp; path = sbm/SBBoneBusManager.cpp; sourceTree = "<group>"; };
+		AADDAE85154DCEB900A86087 /* SBBoneBusManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBBoneBusManager.h; path = sbm/SBBoneBusManager.h; sourceTree = "<group>"; };
+		AADDAE86154DCEB900A86087 /* SBJointMapManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJointMapManager.h; path = sbm/SBJointMapManager.h; sourceTree = "<group>"; };
+		AADDAE87154DCEB900A86087 /* SBJointMapManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBJointMapManager.cpp; path = sbm/SBJointMapManager.cpp; sourceTree = "<group>"; };
+		AADDAE88154DCEB900A86087 /* SBJointMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBJointMap.cpp; path = sbm/SBJointMap.cpp; sourceTree = "<group>"; };
+		AADDAE90154DCED800A86087 /* SBJointMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJointMap.h; path = sbm/SBJointMap.h; sourceTree = "<group>"; };
 		AAF8C70E14DA2D970075F2C2 /* SBGestureMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBGestureMap.cpp; path = sbm/SBGestureMap.cpp; sourceTree = "<group>"; };
 		AAF8C70F14DA2D970075F2C2 /* SBGestureMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBGestureMap.h; path = sbm/SBGestureMap.h; sourceTree = "<group>"; };
 		AAF8C71014DA2D970075F2C2 /* SBGestureMapManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBGestureMapManager.cpp; path = sbm/SBGestureMapManager.cpp; sourceTree = "<group>"; };
@@ -1518,6 +1536,14 @@
 		AA73BC8B146C637E00B199A1 /* SB */ = {
 			isa = PBXGroup;
 			children = (
+				AADDAE82154DCEB900A86087 /* SBCollisionManager.h */,
+				AADDAE83154DCEB900A86087 /* SBCollisionManager.cpp */,
+				AADDAE84154DCEB900A86087 /* SBBoneBusManager.cpp */,
+				AADDAE85154DCEB900A86087 /* SBBoneBusManager.h */,
+				AADDAE86154DCEB900A86087 /* SBJointMapManager.h */,
+				AADDAE87154DCEB900A86087 /* SBJointMapManager.cpp */,
+				AADDAE90154DCED800A86087 /* SBJointMap.h */,
+				AADDAE88154DCEB900A86087 /* SBJointMap.cpp */,
 				AAF8C70E14DA2D970075F2C2 /* SBGestureMap.cpp */,
 				AAF8C70F14DA2D970075F2C2 /* SBGestureMap.h */,
 				AAF8C71014DA2D970075F2C2 /* SBGestureMapManager.cpp */,
@@ -1587,6 +1613,8 @@
 		AA73BC8C146C641500B199A1 /* steering */ = {
 			isa = PBXGroup;
 			children = (
+				AADDAE7C154DCE3D00A86087 /* SteerPath.h */,
+				AADDAE7D154DCE3D00A86087 /* SteerPath.cpp */,
 				AA9CD797141FF8D10064C27A /* SteeringAgent.cpp */,
 				AA9CD798141FF8D10064C27A /* SteeringAgent.h */,
 				AA9CD799141FF8D10064C27A /* SteerSuiteEngineDriver.h */,
@@ -2115,8 +2143,6 @@
 				AA73BC8C146C641500B199A1 /* steering */,
 				AA9CD64F141FF8D00064C27A /* action_unit.hpp */,
 				AA2193CC143147D400187A71 /* action_unit.cpp */,
-				AA9CD684141FF8D00064C27A /* BoneMap.cpp */,
-				AA9CD685141FF8D00064C27A /* BoneMap.h */,
 				AA9CD68A141FF8D00064C27A /* DefaultAttributeTable.cpp */,
 				AA9CD68B141FF8D00064C27A /* DefaultAttributeTable.h */,
 				AA9CD692141FF8D00064C27A /* Event.cpp */,
@@ -2178,6 +2204,7 @@
 				AA9CD774141FF8D10064C27A /* sbm_speech_audiofile.hpp */,
 				AA9CD777141FF8D10064C27A /* sbm_test_cmds.cpp */,
 				AA9CD778141FF8D10064C27A /* sbm_test_cmds.hpp */,
+				AADDAE7A154DCE3D00A86087 /* SbmCharacterListener.h */,
 				AA07BE0C14D245FC0073B99A /* SbmDebuggerServer.cpp */,
 				AA07BE0D14D245FC0073B99A /* SbmDebuggerServer.h */,
 				AA9CD785141FF8D10064C27A /* sr_arg_buff.cpp */,
@@ -2439,7 +2466,6 @@
 				AA9CD8CC141FF8D10064C27A /* bml_types.hpp in Headers */,
 				AA9CD8CD141FF8D10064C27A /* bml_xml_consts.hpp in Headers */,
 				AA9CD8CF141FF8D10064C27A /* BMLDefs.h in Headers */,
-				AA9CD8D1141FF8D10064C27A /* BoneMap.h in Headers */,
 				AA9CD8D7141FF8D10064C27A /* DefaultAttributeTable.h in Headers */,
 				AA9CD8DF141FF8D10064C27A /* Event.h in Headers */,
 				AA9CD8E0141FF8D10064C27A /* general_param_setting.h in Headers */,
@@ -2694,6 +2720,12 @@
 				AAF8C71314DA2D970075F2C2 /* SBGestureMap.h in Headers */,
 				AAF8C71514DA2D970075F2C2 /* SBGestureMapManager.h in Headers */,
 				AAF8C71A14DA2DA20075F2C2 /* bml_gesture.hpp in Headers */,
+				AADDAE7E154DCE3D00A86087 /* SbmCharacterListener.h in Headers */,
+				AADDAE80154DCE3D00A86087 /* SteerPath.h in Headers */,
+				AADDAE89154DCEB900A86087 /* SBCollisionManager.h in Headers */,
+				AADDAE8C154DCEB900A86087 /* SBBoneBusManager.h in Headers */,
+				AADDAE8D154DCEB900A86087 /* SBJointMapManager.h in Headers */,
+				AADDAE91154DCED800A86087 /* SBJointMap.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2820,7 +2852,6 @@
 				AA9CD8C8141FF8D10064C27A /* bml_sync_point.cpp in Sources */,
 				AA9CD8CA141FF8D10064C27A /* bml_target.cpp in Sources */,
 				AA9CD8CE141FF8D10064C27A /* BMLDefs.cpp in Sources */,
-				AA9CD8D0141FF8D10064C27A /* BoneMap.cpp in Sources */,
 				AA9CD8D6141FF8D10064C27A /* DefaultAttributeTable.cpp in Sources */,
 				AA9CD8DE141FF8D10064C27A /* Event.cpp in Sources */,
 				AA9CD8E1141FF8D10064C27A /* GenericViewer.cpp in Sources */,
@@ -3072,6 +3103,11 @@
 				AAF8C71214DA2D970075F2C2 /* SBGestureMap.cpp in Sources */,
 				AAF8C71414DA2D970075F2C2 /* SBGestureMapManager.cpp in Sources */,
 				AAF8C71914DA2DA20075F2C2 /* bml_gesture.cpp in Sources */,
+				AADDAE81154DCE3D00A86087 /* SteerPath.cpp in Sources */,
+				AADDAE8A154DCEB900A86087 /* SBCollisionManager.cpp in Sources */,
+				AADDAE8B154DCEB900A86087 /* SBBoneBusManager.cpp in Sources */,
+				AADDAE8E154DCEB900A86087 /* SBJointMapManager.cpp in Sources */,
+				AADDAE8F154DCEB900A86087 /* SBJointMap.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
