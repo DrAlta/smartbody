@@ -26,6 +26,7 @@ public:
    void MoveX(float offset);
    void MoveY(float offset);
    void MoveZ(float offset);
+   void Translate(const QVector3D& vec);
    void SetCameraType(const string& type);
    void SetCameraType(CameraControlType type) { m_CameraType = type; }
    void SetRightHanded(bool val) { m_Scale.setZ(val ? 1 : -1); }
@@ -33,7 +34,11 @@ public:
    void SetMouseRotation(bool tf) { m_MouseRotation = tf; }
    QVector3D GetPosition() { return QVector3D(m_CameraTransformation.column(3)); }
 
-   void SetPosition(const QVector3D& pos) { m_CameraTransformation.setColumn(3, QVector4D(pos, 1.0f)); }
+   void SetPosition(const QVector3D& pos) 
+   { 
+      m_CameraTransformation.setColumn(3, QVector4D(pos, 1.0f));
+      m_BaseOrientation.setColumn(3, QVector4D(pos, 1.0f));
+   }
    void SetRotation(const QQuaternion& rot); 
    CameraControlType GetCameraType() { return m_CameraType; }
    bool FollowRenderer() { return m_CameraType == Follow_Renderer; }
@@ -52,6 +57,7 @@ private:
    QVector3D m_Position;
    QVector3D m_Scale;
    QMatrix4x4 m_CameraTransformation;
+   QMatrix4x4 m_BaseOrientation;
 
    CameraControlType m_CameraType;
    double m_MovementSpeed;

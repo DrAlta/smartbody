@@ -644,7 +644,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     if (m_Camera.GetMouseRotation())
     {
-      m_Camera.Rotate(QVector3D(m_Camera.GetRotationSpeed() * dy, m_Camera.GetRotationSpeed() * dx, 0));
+      m_Camera.Rotate(QVector3D(-m_Camera.GetRotationSpeed() * dy, -m_Camera.GetRotationSpeed() * dx, 0));
     }
 
     lastPos = event->pos();
