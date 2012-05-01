@@ -5851,6 +5851,11 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		 iter++)
 	{
 		SBMotion* motion = scene->getMotion((*iter));
+		if (!motion)
+		{
+			LOG("Motion not found for name '%s'.", (*iter));
+			continue;
+		}
 		const std::string& fileName = motion->getMotionFileName();
 		boost::filesystem::path motionPath(fileName);
 		std::string motionRootDir = motionPath.root_directory();
