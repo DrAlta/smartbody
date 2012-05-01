@@ -454,10 +454,8 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 	SkChannelArray& motionChannels = motion.channels();
 	SkChannelArray channelsForAdjusting;
 	
-	typedef std::map<std::string,std::vector<SrMat> > JointNameTransformMap;
-	typedef std::map<std::string, std::vector<std::string>> JointNameRotationOrder;
-	JointNameTransformMap jointTransformMap;
-	JointNameRotationOrder jointRotationOrderMap;
+	std::map<std::string,std::vector<SrMat> > jointTransformMap;
+	std::map<std::string,std::vector<std::string> > jointRotationOrderMap;
 
 	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int i = 0; i < list->getLength(); i++)
@@ -481,7 +479,10 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 				if (channelsForAdjusting.search(jointName.c_str(), SkChannel::Quat) < 0)
 					channelsForAdjusting.add(jointName.c_str(), SkChannel::Quat);
 				if (jointRotationOrderMap.find(jointName) == jointRotationOrderMap.end())
-					jointRotationOrderMap[jointName] = std::vector<std::string>();
+				{
+					std::vector<std::string> emptyString;
+					jointRotationOrderMap[jointName] = emptyString;
+				}
 				std::string rotationOrder = channelType.substr(channelType.size()-1,1);
 				jointRotationOrderMap[jointName].push_back(rotationOrder);
 			}
@@ -636,7 +637,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 		}
 	}
 
-// 	for (JointNameTransformMap::iterator mi  = jointTransformMap.begin();
+// 	for (std::map<std::string,std::vector<SrMat> >::iterator mi  = jointTransformMap.begin();
 // 		 mi != jointTransformMap.end();
 // 		 mi++)
 // 	{
@@ -693,7 +694,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 		}
 	}
 	*/
-	JointNameRotationOrder::iterator vi;
+	std::map<std::string,std::vector<std::string> >::iterator vi;
 	for (vi  = jointRotationOrderMap.begin();
 		 vi != jointRotationOrderMap.end();
 		 vi++)

@@ -22,7 +22,7 @@
 
 #include "ParamAnimScriptEditor.h"
 #include <sbm/mcontrol_util.h>
-#include <FL/Fl_Hold_Browser.h>
+#include <FL/Fl_Hold_Browser.H>
 
 #define transitionTrace 0
 
