@@ -361,8 +361,8 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
         argv[argc] = _tcstok( 0, TEXT(" \t") ) ;
     }
 
-	int w = 320;
-	int h = 240;
+	int w = 640;
+	int h = 480;
 	int x = 200;
 	int y = 150;
 

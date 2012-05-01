@@ -329,6 +329,7 @@ bool PAState::getWeightsFromParameters(double x, double y, double z, std::vector
 			weights[id2] = w2;
 			weights[id3] = w3;
 			weights[id4] = w4;
+			//LOG("weight = %f %f %f %f",w1,w2,w3,w4);
 			return true;
 		} 
 	}
