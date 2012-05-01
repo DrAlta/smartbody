@@ -321,7 +321,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 		else if (ext == ".fbx")
 		{
 			SkSkeleton skeleton;
-			//LOG("FBX motion parse: %s", pathname.string().c_str());
+			LOG("FBX motion parse: %s", pathname.string().c_str());
 			parseSuccessful = ParserFBX::parse(skeleton, *motion, pathname.string(), float(scale));	
 		}
 #endif

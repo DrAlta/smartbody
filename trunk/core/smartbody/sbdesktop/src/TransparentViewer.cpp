@@ -423,7 +423,7 @@ void TransparentViewer::CreateDIB(int cx, int cy)
     if(pdcDIB) 
         verify(DeleteDC(pdcDIB));
 
-    pdcDIB = CreateCompatibleDC(NULL);
+    pdcDIB = CreateCompatibleDC(NULL);	
     assert(pdcDIB);
 
     if(hbmpDIB) 
@@ -445,8 +445,8 @@ void TransparentViewer::CreateDIB(int cx, int cy)
 }
 
 BOOL TransparentViewer::CreateHGLRC()
-{
-    DWORD dwFlags = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_BITMAP;
+{	 
+    DWORD dwFlags = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_BITMAP | PFD_GENERIC_ACCELERATED;// | PFD_DOUBLEBUFFER;
 
     PIXELFORMATDESCRIPTOR pfd ;
     memset(&pfd,0, sizeof(PIXELFORMATDESCRIPTOR)) ;
