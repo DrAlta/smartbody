@@ -1,6 +1,5 @@
 
 #include "vhcl.h"
-
 #include "SbmDebuggerForm.h"
 
 #include "vhmsg-tt.h"
@@ -20,6 +19,8 @@ using std::string;
 
 
 SbmDebuggerClient c;
+
+bool GetSceneScale(void* caller, NetRequest* req);
 
 
 SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
@@ -141,6 +142,8 @@ void SbmDebuggerForm::ShowConnectDialog()
 
          // since you're connected, enable the disconnect button
          ui.actionDisconnect->setEnabled(true);
+
+         c.SendSBMCommand(NetRequest::Get_Scene_Scale, "float", "scene.getScale()", GetSceneScale, this);
       }
    }
    else 
@@ -334,7 +337,6 @@ void SbmDebuggerForm::Update()
    }
 
    c.Update();
-
    UpdateSceneTree();
    UpdateLabels();
 }
@@ -453,8 +455,20 @@ void SbmDebuggerForm::timerEvent(QTimerEvent * event)
    }
 }
 
-
 void SbmDebuggerForm::VHMsgCallback( const char * op, const char * args, void * userData )
 {
    c.ProcessVHMsgs(op, args);
+}
+
+bool GetSceneScale(void* caller, NetRequest* req)
+{
+   SbmDebuggerForm* dlg = req->getCaller<SbmDebuggerForm*>();
+   float scale = vhcl::ToDouble(req->ArgsAsString());
+
+   if (scale == 0)
+      return false;
+
+   dlg->GetGLWidget()->SetObjectScale(1 / scale);
+
+   return true;
 }

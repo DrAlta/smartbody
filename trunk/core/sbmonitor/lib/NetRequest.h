@@ -26,6 +26,8 @@ public:
       Get_Motion_Names,
       Get_Channel_Names,
       Get_Controller_Names,
+      Get_Character_Height,
+      Get_Scene_Scale,
       Send_Python_Command,
    };
 

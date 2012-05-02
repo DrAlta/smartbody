@@ -44,6 +44,7 @@ public:
     double GetFps();
     string GetCameraPositionAsString();
     string GetFpsAsString();
+    void SetObjectScale(float scale);
 
 public slots:
     void OnCloseSettingsDialog(const SettingsDialog* dlg, int result);

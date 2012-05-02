@@ -21,6 +21,7 @@ class SbmDebuggerForm : public QMainWindow
      QSize sizeHint() const;
      static QTreeWidgetItem* FindTreeWidgetItemByName(const QTreeWidgetItem* subTree, const std::string& name);
      static Pawn* FindSbmEntityFromTreeSelection(const QTreeWidgetItem* treeWidget, Scene* pScene);
+     GLWidget* GetGLWidget() { return m_pGLWidget; }
 
  private slots:
        void ShowConnectDialog();
