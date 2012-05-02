@@ -12,15 +12,15 @@
 
 TransparencyRenders::TransparencyRenders(TransparentViewer* viewer)
 {
-	gridColor[0] = 0.5;
-   gridColor[1] = 0.5;
-   gridColor[2] = 0.5;
-   gridColor[3] = 0.5;
+	gridColor[0] = 0.5f;
+   gridColor[1] = 0.5f;
+   gridColor[2] = 0.5f;
+   gridColor[3] = 1.0f;
    gridHighlightColor[0] = .3f;
    gridHighlightColor[1] = .3f;
    gridHighlightColor[2] = .3f;
-   gridSize = 200.0;
-   gridStep = 20.0;
+   gridSize = 200.f;
+   gridStep = 20.f;
 //   gridSize = 400.0;
 //   gridStep = 50.0;
    gridList = -1;
@@ -127,9 +127,13 @@ void TransparencyRenders::drawCharacters(bool shadowPass)
 		if(cur->dMesh_p && cur->dMeshInstance_p)
 		{
 			//cur->dMeshInstance_p->update();
-			cur->dMeshInstance_p->update();
-			cur->scene_p->set_visibility(0,0,0,0);
 			cur->dMeshInstance_p->setVisibility(true);
+			cur->dMeshInstance_p->update();
+			cur->scene_p->set_visibility(0,0,0,0);			
+// 			if (SbmDeformableMeshGPU::useGPUDeformableMesh)
+// 				cur->dMeshInstance_p->setVisibility(false);
+// 			else
+			//cur->dMeshInstance_p->setVisibility(true);
 		}
 	}
 

@@ -361,8 +361,8 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
         argv[argc] = _tcstok( 0, TEXT(" \t") ) ;
     }
 
-	int w = 640;
-	int h = 480;
+	int w = 320;
+	int h = 240;
 	int x = 200;
 	int y = 150;
 
@@ -643,8 +643,10 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	TransparentViewer* viewer = dynamic_cast<TransparentViewer*>(viewerFactory->create(x, y, w, h));
 	SbmShaderManager::singleton().setViewer(viewer);
 	viewer->init(hThisInst, hPrevInst, str, nWinMode);
+	viewer->resizeViewer();
 	viewer->root( mcu.root_group_p );
 	mcu.camera_p = viewer->get_camera();
+	mcu.viewer_p = viewer;
 
 	// initialize python
 	initPython(python_lib_path);
@@ -848,7 +850,13 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 //		Fl::check();
 		MSG msg;
 
-		 while (PeekMessage(&msg,NULL,0,0,PM_NOREMOVE)){
+		 while (PeekMessage(&msg,NULL,0,0,PM_NOREMOVE))
+		 {
+			if (msg.message == WM_QUIT)
+			{
+				mcu.loop = false;
+				break;
+			}
             if (GetMessage(&msg, NULL, 0, 0))
             {
                 TranslateMessage(&msg);
@@ -966,6 +974,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 //			((ResourceWindow*)mcu.resourceViewer_p)->update();
 //		}
 
+		//LOG("mcu.render");
 		mcu.render();
 	
 	}	

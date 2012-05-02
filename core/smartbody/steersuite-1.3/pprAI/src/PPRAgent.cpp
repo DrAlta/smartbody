@@ -219,7 +219,7 @@ void PPRAgent::addGoal(const SteerLib::AgentGoalInfo & newGoal) {
 			unsigned int numTries = 0;
 			while (!succeed) {
 				// find a postion that is free of static obstacles and agents
-				Util::Point pos = gSpatialDatabase->randomPositionInRegionWithoutCollisions(aab, 0.3f, false, succeed, this);
+				Util::Point pos = gSpatialDatabase->randomPositionInRegionWithoutCollisions(aab, 0.3f, false, succeed);
 				// check if this is also other agents' goal
 				if (succeed) {
 					for (std::set<SpatialDatabaseItemPtr>::iterator object = allObjects.begin(); object != allObjects.end(); ++object) {

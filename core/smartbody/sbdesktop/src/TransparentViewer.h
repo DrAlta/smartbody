@@ -96,6 +96,13 @@ class TransparentViewer : public SrViewer, public SmartBody::SBObserver
 	void resizeSC(int width,int height);
 	BOOL initSC();
 	BOOL renderSC();
+	void resizeViewer();
+
+	void copyPBufferToImage();
+	void RedrawLayeredWindow();
+
+	bool initGLExtension();
+	bool initPBuffer();
 	void CreateDIB(int cx, int cy);
 	BOOL CreateHGLRC();
 	void draw(HDC pdcDest);
@@ -114,6 +121,7 @@ class TransparentViewer : public SrViewer, public SmartBody::SBObserver
 
 	TransparencyRenders* _renders;
 	std::vector<SrLight> _lights;
+	std::vector<BYTE> imageBuffer;
 	int width;
 	int height;
 
