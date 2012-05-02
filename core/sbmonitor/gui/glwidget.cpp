@@ -17,6 +17,15 @@ using vhcl::Vector4;
 #define GL_MULTISAMPLE  0x809D
 #endif
 
+// these will be settings from a dialog eventually. 
+// For now, have them as constants
+#define DEFAULT_PAWN_RADIUS 0.01f
+#define DEFAULT_JOINT_RADIUS 0.0125f
+#define DEFAULT_AXIS_LENGTH 0.05f
+#define DEFAULT_EYE_BEAM_LENGTH 1
+#define DEFAULT_CAM_MOVE_SPEED 0.05f
+#define DEFAULT_CAM_LOOK_OFFSET 1
+
 
 //! [0]
 GLWidget::GLWidget(Scene* scene, QWidget *parent)
@@ -26,11 +35,14 @@ GLWidget::GLWidget(Scene* scene, QWidget *parent)
     m_quadric = gluNewQuadric();
     SetScene(scene);
     
-    m_fJointRadius = 1.25f;
+    m_fPawnSize = DEFAULT_PAWN_RADIUS;
+    m_fJointRadius = DEFAULT_JOINT_RADIUS;
     m_nPickingOffset = 0;
-    m_fAxisLength = 5;
-    m_fEyeBeamLength = 100;
+    m_fAxisLength = DEFAULT_AXIS_LENGTH;
+    m_fEyeBeamLength = DEFAULT_EYE_BEAM_LENGTH;
     m_RenderFlags = 0;
+    m_Camera.SetLookAtOffset(DEFAULT_CAM_LOOK_OFFSET);
+    m_Camera.SetMovementSpeed(DEFAULT_CAM_MOVE_SPEED);
 
     qtPurple = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
 
@@ -67,11 +79,18 @@ void GLWidget::OnCloseSettingsDialog(const SettingsDialog* dlg, int result)
       m_Camera.SetRotationSpeed(dlg->ui.cameraRotationSpeedBox->value());
       
       float scale = vhcl::ToDouble(dlg->ui.unitsBox->currentText().toStdString());
-      m_fJointRadius = 1.25 * scale; 
-      m_fAxisLength = 5 * scale;
-      m_fEyeBeamLength = 100 * scale;
-      m_Camera.SetLookAtOffset(100 * scale);
+      SetObjectScale(scale);
    }
+}
+
+void GLWidget::SetObjectScale(float scale)
+{
+   m_fPawnSize = DEFAULT_PAWN_RADIUS * scale;
+   m_fJointRadius = DEFAULT_JOINT_RADIUS * scale; 
+   m_fAxisLength = DEFAULT_AXIS_LENGTH * scale;
+   m_fEyeBeamLength = DEFAULT_EYE_BEAM_LENGTH * scale;
+   m_Camera.SetLookAtOffset(DEFAULT_CAM_LOOK_OFFSET * scale);
+   m_Camera.SetMovementSpeed(DEFAULT_CAM_MOVE_SPEED * scale);
 }
 
 void GLWidget::ToggleFreeLook()
@@ -596,7 +615,7 @@ void GLWidget::DrawPawn(const Pawn* pawn)
       break;
 
    default:
-      DrawSphere(0.01f/*pawn->m_size*/);
+      DrawSphere(m_fPawnSize * pawn->m_size);
       break;
    }
 

@@ -6,8 +6,8 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent)
 
    ui.cameraControlBox->addItem("Free Look");
    ui.cameraControlBox->addItem("Follow Renderer");
-   ui.unitsBox->addItem("0.01");
-   ui.unitsBox->addItem("1.0");
+   ui.unitsBox->addItem("1");
+   ui.unitsBox->addItem("100");
    ui.unitsBox->setCurrentIndex(1);
 }
 

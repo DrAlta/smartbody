@@ -8,6 +8,7 @@
 #include "SbmDebuggerCommon.h"
 #include "glwidget.h"
 
+//#include <QtUiTools>
 
 using std::string;
 
@@ -17,6 +18,12 @@ bool GetAnimationNames(void* caller, NetRequest* req);
 
 UtilsDialog::UtilsDialog(SbmDebuggerClient* client, GLWidget* pRenderView, QWidget* parent) : QDialog(parent)
 {
+   //QUiLoader loader;
+   //QFile file("designer/UtilsDialog.ui");
+   //file.open(QFile::ReadOnly);
+   //QWidget *formWidget = loader.load(&file, this);
+   //file.close();
+
    m_client = client;
    ui.setupUi(this);
    m_pScene = m_client->GetScene();

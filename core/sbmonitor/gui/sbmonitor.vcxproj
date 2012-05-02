@@ -54,7 +54,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\lib;designer;src;..;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\qt\include\QtGui;..\..\..\lib\qt\include\QtOpenGL;..\..\..\lib\qt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\lib;designer;src;..;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\qt\include\QtGui;..\..\..\lib\qt\include\QtOpenGL;..\..\..\lib\qt\include;..\..\..\lib\qt\include\QtUiTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -67,7 +67,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>sbmonitorlib.lib;vhcl_d.lib;vhmsg_d.lib;QtCored4.lib;QtGuid4.lib;qtmaind.lib;QtOpenGLd4.lib;pthreadVSE2.lib;activemq-cppd.lib;opengl32.lib;glu32.lib;ws2_32.lib;dbghelp.lib;winmm.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sbmonitorlib.lib;vhcl_d.lib;vhmsg_d.lib;QtCored4.lib;QtGuid4.lib;qtmaind.lib;QtOpenGLd4.lib;pthreadVSE2.lib;activemq-cppd.lib;opengl32.lib;glu32.lib;ws2_32.lib;dbghelp.lib;winmm.lib;rpcrt4.lib;QtUiToolsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib\Debug;..\..\..\lib\vhcl\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\qt\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
