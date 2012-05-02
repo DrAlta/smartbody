@@ -90,7 +90,6 @@ public:
 	void updateAI(float timeStamp, float dt, unsigned int frameNumber);
 	void draw();
 
-
 	bool enabled() { return _enabled; }
 	Util::Point& position() { return _position; }
 	Util::Vector& forward() { return _forward; }
@@ -138,6 +137,9 @@ public:
 	void updateDesiredForward(const Util::Vector & desiredForward) {_desiredForward = desiredForward;};
 	void updateMagnifiedDesiredForward(const Util::Vector & magnifiedDesiredForward) {_magnifiedDesiredForward = magnifiedDesiredForward;}
 	Util::Point& getStartTargetPosition() {return _startTargetPosition;}
+
+	void setUseCollisionFreeGoals(bool val);
+	bool isUseCollisionFreeGoals();
 
 protected:
 	//========================
@@ -260,6 +262,7 @@ protected:
 
 	bool _isNewGoal;
 	Util::Point _startTargetPosition;
+	bool _useCollisionFreeGoals;
 
 	//
 	// NOTE CAREFULLY these annotation varibales have TWO UNDERSCORES prefix.
