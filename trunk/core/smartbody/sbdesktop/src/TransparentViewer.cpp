@@ -1,7 +1,5 @@
 #include "TransparentViewer.h"
-
 #include <windowsx.h>
-
 //#include <GL/glaux.h>
 
 
@@ -23,10 +21,12 @@
 #include <sr/sr_light.h>
 #include <sr/sr_gl.h>
 # include <sr/sr_sn_group.h>
+#include <external/glew/wglew.h>
 #include <vector>
 #include <sbm/GPU/SbmShader.h>
 #include <sbm/GPU/SbmTexture.h>
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
+#include <strsafe.h>
 
 std::string Std_VS =
 "varying vec4 vPos;\n\
@@ -77,45 +77,44 @@ const int SHADOW_MAP_RES = 2048;
 const TCHAR szAppName[]=_T("TransparentGL");
 const TCHAR wcWndName[]=_T("WS_EX_LAYERED OpenGL");
 
-HDC hDC;            
-HGLRC m_hrc;        
+HDC hDC = 0;            
+HGLRC m_hrc = 0;        
 int w(320);
 int h(240); 
 int x(200);
 int y(150);
 
-HDC pdcDIB;                 
-HBITMAP hbmpDIB;            
-void *bmp_cnt(NULL);        
+HDC pdcDIB = 0;                 
+HBITMAP hbmpDIB = 0;            
+BYTE *bmp_cnt(NULL);        
 int cxDIB(0); 
 int cyDIB(0);   
-BITMAPINFOHEADER BIH;       
+int pitchDIB = 0;
+BITMAPINFOHEADER BIH;   
 
-
-
-
-HWND curhWnd;
+HDC   g_hPBufferDC = 0;
+HGLRC g_hPBufferRC = 0;
+HPBUFFERARB g_hPBuffer = 0;
+HWND curhWnd = 0;
 
 TransparentViewer* TransparentViewer::viewer = NULL;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void TransparentViewer::resizeViewer()
+{
+	if (!curhWnd) return;
+	TransparentViewer::viewer->CreateDIB(TransparentViewer::viewer->width, TransparentViewer::viewer->height);			
+	TransparentViewer::viewer->CreateHGLRC();			
+	//verify(wglMakeCurrent(pdcDIB, m_hrc));			
+	TransparentViewer::viewer->initSC();
+	TransparentViewer::viewer->resizeSC(TransparentViewer::viewer->width, TransparentViewer::viewer->height);
+	TransparentViewer::viewer->init_opengl ( TransparentViewer::viewer->width, TransparentViewer::viewer->height); 
+	TransparentViewer::viewer->renderSC();
+	SbmDeformableMeshGPU::useGPUDeformableMesh = true;
+}
 
 LRESULT CALLBACK WindowFunc(HWND hWnd,UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    PAINTSTRUCT ps;
+    //PAINTSTRUCT ps;
 
     switch(msg) 
     {
@@ -126,40 +125,39 @@ LRESULT CALLBACK WindowFunc(HWND hWnd,UINT msg, WPARAM wParam, LPARAM lParam)
         case WM_CREATE:
         break;
 
+		case WM_NCHITTEST:
+			return HTCAPTION;   // allows dragging of the window
+
         case WM_DESTROY:
             if(m_hrc)
             {
                 wglMakeCurrent(NULL, NULL);
                 wglDeleteContext(m_hrc) ;
-            }
+            }			
             PostQuitMessage(0) ;
         break;
 
+		case WM_KEYDOWN:
+			if (wParam == VK_ESCAPE)
+			{
+				SendMessage(curhWnd, WM_CLOSE, 0, 0);				
+				return 0;
+			}
+			break;
+
         case WM_PAINT:
-            hDC = BeginPaint(hWnd, &ps);
-            TransparentViewer::viewer->renderSC(); // OpenGL -> DIB
-            TransparentViewer::viewer->draw(hDC);  // DIB -> hDC
-            EndPaint(hWnd, &ps);
+            //hDC = BeginPaint(hWnd, &ps);
+            
+            //EndPaint(hWnd, &ps);
         break;
 
         case WM_SIZE:
             TransparentViewer::viewer->width = LOWORD(lParam); 
 			TransparentViewer::viewer->height = HIWORD(lParam);         
-            wglMakeCurrent(NULL, NULL);
-            wglDeleteContext(m_hrc);
+//             wglMakeCurrent(NULL, NULL);
+//             wglDeleteContext(m_hrc);
 
-            TransparentViewer::viewer->CreateDIB(TransparentViewer::viewer->width, TransparentViewer::viewer->height);
-			
-            TransparentViewer::viewer->CreateHGLRC();
-			
-            verify(wglMakeCurrent(pdcDIB, m_hrc));
-
-
-			
-			TransparentViewer::viewer->initSC();
-            TransparentViewer::viewer->resizeSC(TransparentViewer::viewer->width, TransparentViewer::viewer->height);
-			TransparentViewer::viewer->init_opengl ( TransparentViewer::viewer->width, TransparentViewer::viewer->height); 
-            TransparentViewer::viewer->renderSC();
+			//TransparentViewer::viewer->resizeViewer();
         break;
 
         default: 
@@ -202,8 +200,7 @@ BOOL TransparentViewer::init(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str
 {
 	WNDCLASSEX wc;
     memset(&wc, 0, sizeof(wc));
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+    wc.cbSize = sizeof(WNDCLASSEX);    
     wc.style = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc = (WNDPROC)WindowFunc;
     wc.cbClsExtra  = 0;
@@ -213,6 +210,7 @@ BOOL TransparentViewer::init(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = (HBRUSH) (COLOR_WINDOW);
     wc.lpszClassName = szAppName;
+	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 
     if(!RegisterClassEx(&wc))
     {
@@ -220,15 +218,15 @@ BOOL TransparentViewer::init(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str
         return FALSE;
     }
 
-    curhWnd = CreateWindowEx(WS_EX_LAYERED, szAppName, wcWndName,
-                    WS_VISIBLE | WS_POPUP, x, y, w, h,
+    curhWnd = CreateWindowEx(WS_EX_LAYERED , szAppName, wcWndName,
+                    WS_POPUP|WS_VISIBLE, x, y, w, h,
                     NULL, NULL, hThisInst, NULL);
     if(!curhWnd){
         MessageBox(NULL, _T("CreateWindowEx - failed"), _T("Error"), MB_OK | MB_ICONERROR);
         return FALSE;
     }
 
-    verify(SetLayeredWindowAttributes(curhWnd, 0x0, 0, LWA_COLORKEY));
+    //verify(SetLayeredWindowAttributes(curhWnd, 0x0, 0, LWA_COLORKEY));
 
 	isInitted = true;
 
@@ -253,8 +251,14 @@ void TransparentViewer::view_all ()
 
 void TransparentViewer::render ()
 {
+ //InvalidateRect(curhWnd, NULL, TRUE);
+ //hDC = GetDC(curhWnd); 
+ //wglMakeCurrent(g_hPBufferDC, g_hPBufferRC);
+ TransparentViewer::viewer->renderSC(); // OpenGL -> DIB
+ TransparentViewer::viewer->copyPBufferToImage();
+ //TransparentViewer::viewer->draw(hDC);  // DIB -> hDC
+ TransparentViewer::viewer->RedrawLayeredWindow();
 
-InvalidateRect(curhWnd, NULL, TRUE);       
 } 
 
 void TransparentViewer::makeGLContext()
@@ -295,7 +299,8 @@ BOOL TransparentViewer::initSC()
 
     glEnable(GL_BLEND);             
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glClearColor(0, 0, 0, 0);
+    glClearColor(0.f, 0.f, 0.f, 0.f);
+	//glClearColor(0.3, 0.3, 0.3, 1.0);
 
     return 0;
 }
@@ -312,37 +317,17 @@ void TransparentViewer::resizeSC(int width,int height)
 
 BOOL TransparentViewer::renderSC()
 {
-	SbmShaderManager& ssm = SbmShaderManager::singleton();
-	SbmTextureManager& texm = SbmTextureManager::singleton();
+	bool hasShaderSupport = initGLExtension();
 
-	if (!isValid)
-	{
-		bool hasShaderSupport = ssm.initGLExtension();
-        if (hasShaderSupport)
-		    initShadowMap();
-		isValid = true;
-	}
+//  	SbmShaderManager& ssm = SbmShaderManager::singleton();	
+//  	bool hasShaderSupport = false;
+//  	hasShaderSupport = ssm.initGLExtension();				
 
-	   bool hasOpenGL        = ssm.initOpenGL();
-   bool hasShaderSupport = false;
-   // init OpenGL extension
-   if (hasOpenGL)
-   {
-	   hasShaderSupport = ssm.initGLExtension();		
-   }
-   // update the shader map
-   if (hasShaderSupport)
-   {
-	   ssm.buildShaders();
-	   texm.updateTexture();
-   }	
-
-
-	 glViewport ( 0, 0, viewer->width, viewer->width );
+	//glViewport ( 0, 0, viewer->width, viewer->height );
 	SrMat mat ( SrMat::NotInitialized );
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );	
 
-	_data.camera.aspect = (float)640/(float)480;
+	_data.camera.aspect = (float)viewer->width/(float)viewer->height;
 	glMatrixMode ( GL_PROJECTION );
     glLoadMatrix ( _data.camera.get_perspective_mat(mat) );
 
@@ -397,9 +382,64 @@ BOOL TransparentViewer::renderSC()
 	_renders->drawGrid();
 	_renders->drawCharacters();
 
-    glFlush();
+    //glFlush();
 
     return 0;
+}
+
+void TransparentViewer::copyPBufferToImage()
+{
+	// Copy the contents of the framebuffer - which in our case is our pbuffer -
+	// to our bitmap image in local system memory. Notice that we also need
+	// to invert the pbuffer's pixel data since OpenGL by default orients the
+	// bitmap image bottom up. Our Windows DIB wrapper expects images to be
+	// top down in orientation.
+	if (imageBuffer.size() != viewer->width*viewer->height*4)
+		imageBuffer.resize(viewer->width*viewer->height*4);
+
+// 	static BYTE pixels[IMAGE_WIDTH * IMAGE_HEIGHT * 4] = {0};
+// 
+	
+ 	glPixelStorei(GL_PACK_ALIGNMENT, 1);	
+ 	glReadPixels(0, 0, viewer->width, viewer->height, GL_BGRA_EXT, GL_UNSIGNED_BYTE, &imageBuffer[0]);
+ 	for (int i = 0; i < viewer->height; ++i)
+ 	{
+//  		memcpy(&bmp_cnt[pitchDIB * i],
+//  			&imageBuffer[((viewer->height - 1) - i) * (viewer->width * 4)],
+//  			viewer->width * 4);
+
+		memcpy(&bmp_cnt[pitchDIB * i],
+			&imageBuffer[i * (viewer->width * 4)],
+			viewer->width * 4);
+ 	}
+	
+}
+
+void TransparentViewer::RedrawLayeredWindow()
+{
+	// The call to UpdateLayeredWindow() is what makes a non-rectangular
+	// window possible. To enable per pixel alpha blending we pass in the
+	// argument ULW_ALPHA, and provide a BLENDFUNCTION structure filled in
+	// to do per pixel alpha blending.	
+	HDC hdc = GetDC(curhWnd);
+
+	if (hdc)
+	{
+		HGDIOBJ hPrevObj = 0;
+		POINT ptDest = {0, 0};
+		POINT ptSrc = {0, 0};
+		SIZE client = {viewer->width, viewer->height};
+		BLENDFUNCTION blendFunc = {AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
+
+		hPrevObj = SelectObject(pdcDIB, hbmpDIB);
+		ClientToScreen(curhWnd, &ptDest);
+
+		UpdateLayeredWindow(curhWnd, hdc, &ptDest, &client,
+			pdcDIB, &ptSrc, 0, &blendFunc, ULW_ALPHA);
+
+		SelectObject(pdcDIB, hPrevObj);
+ 		ReleaseDC(curhWnd, hdc);
+	}
 }
 
 void TransparentViewer::CreateDIB(int cx, int cy)
@@ -417,8 +457,10 @@ void TransparentViewer::CreateDIB(int cx, int cy)
     BIH.biWidth = cx;   
     BIH.biHeight = cy;  
     BIH.biPlanes = 1;   
-    BIH.biBitCount = 24;    
+    BIH.biBitCount = 32;    
     BIH.biCompression = BI_RGB;
+
+	pitchDIB = ((viewer->width * 32 + 31) & ~31) >> 3;
 
     if(pdcDIB) 
         verify(DeleteDC(pdcDIB));
@@ -433,7 +475,7 @@ void TransparentViewer::CreateDIB(int cx, int cy)
         pdcDIB,         
         (BITMAPINFO*)&BIH,  
         DIB_RGB_COLORS,     
-        &bmp_cnt,       
+        (void**)&bmp_cnt,       
         NULL,
         0);
 
@@ -445,7 +487,8 @@ void TransparentViewer::CreateDIB(int cx, int cy)
 }
 
 BOOL TransparentViewer::CreateHGLRC()
-{	 
+{
+#if 0 // render to bitmap memory with software openGL
     DWORD dwFlags = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_BITMAP | PFD_GENERIC_ACCELERATED;// | PFD_DOUBLEBUFFER;
 
     PIXELFORMATDESCRIPTOR pfd ;
@@ -475,9 +518,138 @@ BOOL TransparentViewer::CreateHGLRC()
       assert(0);
       return FALSE;
    }
+#else // use frame buffer object with hardware acceleration instead of render to bitmap
+	DWORD dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL;
 
+	PIXELFORMATDESCRIPTOR pfd = {0} ;
+	memset(&pfd,0, sizeof(PIXELFORMATDESCRIPTOR)) ;
+	pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR); 
+	pfd.nVersion = 1;                       
+	pfd.dwFlags =  dwFlags ;                
+	pfd.iPixelType = PFD_TYPE_RGBA ;        
+	pfd.cColorBits = 24 ;                   
+	pfd.cDepthBits = 16 ;                   
+	pfd.iLayerType = PFD_MAIN_PLANE ;  
+
+	if (!curhWnd) 
+		return false;
+
+	if ( !(hDC = GetDC(curhWnd)) ) 
+		return false;
+
+	int PixelFormat = ChoosePixelFormat(hDC, &pfd);
+	if (PixelFormat == 0){
+		assert(0);
+		return FALSE ;
+	}
+
+	BOOL bResult = SetPixelFormat(hDC, PixelFormat, &pfd);
+	if (bResult==FALSE){		
+		DWORD dw =  GetLastError();
+		assert(0);
+		return FALSE ;
+	}
+
+	m_hrc = wglCreateContext(hDC);
+	if (!m_hrc){
+		assert(0);
+		return FALSE;
+	}
+	if (!wglMakeCurrent(hDC, m_hrc))
+		return FALSE;
+
+	if (!initGLExtension()) return FALSE;
+	if (!initPBuffer()) return FALSE;
+
+	// release dummy dc
+	wglMakeCurrent(hDC, 0);
+	ReleaseDC(curhWnd, hDC);
+	hDC = 0;
+	// We are only doing off-screen rendering. So activate our pbuffer once.
+	wglMakeCurrent(g_hPBufferDC, g_hPBufferRC);
+#endif
    return TRUE;
 }
+
+bool TransparentViewer::initGLExtension()
+{
+	SbmShaderManager& ssm = SbmShaderManager::singleton();
+	SbmTextureManager& texm = SbmTextureManager::singleton();
+
+	if (!isValid)
+	{
+		bool hasShaderSupport = ssm.initGLExtension();		
+		if (hasShaderSupport)
+			initShadowMap();
+		isValid = true;
+	}
+
+	bool hasOpenGL        = ssm.initOpenGL();
+	bool hasShaderSupport = false;
+	// init OpenGL extension
+	if (hasOpenGL)
+	{
+		hasShaderSupport = ssm.initGLExtension();			
+	}
+	// update the shader map
+	if (hasShaderSupport)
+	{
+		ssm.buildShaders();
+		texm.updateTexture();
+	}
+	return hasShaderSupport;
+}
+
+bool TransparentViewer::initPBuffer()
+{
+	// Create a pbuffer for off-screen rendering. Notice that since we aren't
+	// going to be using the pbuffer for dynamic texturing (i.e., using the
+	// pbuffer containing our rendered scene as a texture) we don't need to
+	// request for WGL_BIND_TO_TEXTURE_RGBA_ARB support in the attribute list.
+
+	int attribList[] =
+	{
+		WGL_DRAW_TO_PBUFFER_ARB, TRUE,      // allow rendering to the pbuffer
+		WGL_SUPPORT_OPENGL_ARB,  TRUE,      // associate with OpenGL
+		WGL_DOUBLE_BUFFER_ARB,   FALSE,     // single buffered
+		WGL_RED_BITS_ARB,   8,              // minimum 8-bits for red channel
+		WGL_GREEN_BITS_ARB, 8,              // minimum 8-bits for green channel
+		WGL_BLUE_BITS_ARB, 8,              // minimum 8-bits for blue channel
+		WGL_ALPHA_BITS_ARB, 8,              // minimum 8-bits for alpha channel
+		WGL_DEPTH_BITS_ARB, 16,             // minimum 16-bits for depth buffer
+		0
+	};
+
+	int format = 0;
+	UINT matchingFormats = 0;
+
+	if (!wglChoosePixelFormatARB(hDC, attribList, 0, 1, &format, &matchingFormats))
+	{
+		MessageBox(0, _T("wglChoosePixelFormatARB() failed"), _T("Error"), MB_ICONSTOP);
+		return false;
+	}
+
+	if (!(g_hPBuffer = wglCreatePbufferARB(hDC, format, viewer->width, viewer->height, 0)))
+	{
+		MessageBox(0, _T("wglCreatePbufferARB() failed"), _T("Error"), MB_ICONSTOP);
+		return false;
+	}
+
+	if (!(g_hPBufferDC = wglGetPbufferDCARB(g_hPBuffer)))
+	{
+		MessageBox(0, _T("wglGetPbufferDCARB() failed"), _T("Error"), MB_ICONSTOP);
+		return false;
+	}
+
+	if (!(g_hPBufferRC = wglCreateContext(g_hPBufferDC)))
+	{
+		MessageBox(0, _T("wglCreateContext() failed for PBuffer"), _T("Error"), MB_ICONSTOP);
+		return false;
+	}
+
+	return true;
+}
+
 
 // DIB -> hDC
 void TransparentViewer::draw(HDC pdcDest)
@@ -742,3 +914,4 @@ void TransparentViewer::makeShadowMap()
 	//SbmShaderProgram::printOglError("shadowMapError");
 
 }
+
