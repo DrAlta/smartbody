@@ -652,7 +652,7 @@ Point GridDatabase2D::randomPositionInRegionWithoutCollisions(const AxisAlignedB
 	return randomPositionInRegionWithoutCollisions(region, radius, excludeAgents, _randomNumberGenerator);
 }
 
-Point GridDatabase2D::randomPositionInRegionWithoutCollisions(const Util::AxisAlignedBox & region, float radius, bool excludeAgents, bool &succeed)
+Point GridDatabase2D::randomPositionInRegionWithoutCollisions(const Util::AxisAlignedBox & region, float radius, bool excludeAgents, bool &succeed, SteerLib::SpatialDatabaseItem* excludedItem)
 {
 	static MTRand _randomNumberGenerator(2);
 	Point ret(0.0f, 0.0f, 0.0f);
@@ -681,6 +681,8 @@ Point GridDatabase2D::randomPositionInRegionWithoutCollisions(const Util::AxisAl
 			if ((excludeAgents) && ((*neighbor)->isAgent())) {
 				continue;
 			}
+			if (excludedItem && excludedItem == *neighbor)
+				continue;
 			notFoundYet = (*neighbor)->overlaps(ret, radius);
 			if (notFoundYet) {
 				break;
