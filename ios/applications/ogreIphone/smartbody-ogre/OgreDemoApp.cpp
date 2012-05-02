@@ -262,7 +262,7 @@ void DemoApp::setupSmartbody()
 	vhmsg::ttu_notify2( "vrComponent", "renderer Ogre" );   
 	vhmsg::ttu_notify2( "vrComponent", "Lauching Ogre" );
     vhmsg::ttu_register( "vrAllCall" );
-    vhmsg::ttu_register( "vrKillComponent" );
+    vhmsg::ttu_register( "vrKillComponent" ); 
     vhmsg::ttu_register( "sbm" );
     vhmsg::ttu_register( "vrAgentBML" );
     vhmsg::ttu_register( "vrSpeak" );
@@ -278,7 +278,7 @@ void DemoApp::setupSmartbody()
     
     m_sbListener = new SBListener(this);
     m_sbm = new Smartbody_dll;
-    m_sbm->Init();
+    m_sbm->Init("", true);
     m_sbm->SetListener(m_sbListener);
     
     
