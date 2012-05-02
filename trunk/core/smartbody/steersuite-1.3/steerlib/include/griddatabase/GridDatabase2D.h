@@ -178,7 +178,7 @@ namespace SteerLib {
 		/// Finds a random 2D point, within the specified region, that has no other objects within the requested radius, using an exising (already seeded) Mersenne Twister random number generator.
 		Util::Point randomPositionInRegionWithoutCollisions(const Util::AxisAlignedBox & region, float radius, bool excludeAgents, MTRand & randomNumberGenerator);
 		// check if the radom position can be found or not
-		Util::Point randomPositionInRegionWithoutCollisions(const Util::AxisAlignedBox & region, float radius, bool excludeAgents, bool &succeed);		
+		Util::Point randomPositionInRegionWithoutCollisions(const Util::AxisAlignedBox & region, float radius, bool excludeAgents, bool &succeed, SteerLib::SpatialDatabaseItem* excludedItem = NULL);		
 		/// Uses openGL and DrawLib to visualize the grid.
 		void draw();
 		//@}
