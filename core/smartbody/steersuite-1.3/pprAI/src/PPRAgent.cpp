@@ -28,6 +28,7 @@ using std::min;
 PPRAgent::PPRAgent()
 {
 	_enabled = false;
+	setUseCollisionFreeGoals(false);
 }
 
 
@@ -174,16 +175,32 @@ void PPRAgent::reset(const SteerLib::AgentInitialConditions & initialConditions,
 
 }
 
+void PPRAgent::setUseCollisionFreeGoals(bool val)
+{
+	_useCollisionFreeGoals = val;
+}
+
+bool PPRAgent::isUseCollisionFreeGoals()
+{
+	return _useCollisionFreeGoals;
+}
 
 //
 // addGoal()
 //
-void PPRAgent::addGoal(const SteerLib::AgentGoalInfo & newGoal) { 
+void PPRAgent::addGoal(const SteerLib::AgentGoalInfo & newGoal) {
+
 	if (newGoal.goalType != SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET) {
 		throw Util::GenericException("Currently the PPR agent does not support goal types other than GOAL_TYPE_SEEK_STATIC_TARGET.");
 	}
 
 	_landmarkQueue.push(newGoal); 
+
+	if (!isUseCollisionFreeGoals())
+	{
+		return;
+	}
+
 	if (_landmarkQueue.size()==1) {
 		_currentGoal = newGoal;
 		_isNewGoal = true;
@@ -202,7 +219,7 @@ void PPRAgent::addGoal(const SteerLib::AgentGoalInfo & newGoal) {
 			unsigned int numTries = 0;
 			while (!succeed) {
 				// find a postion that is free of static obstacles and agents
-				Util::Point pos = gSpatialDatabase->randomPositionInRegionWithoutCollisions(aab, 0.3f, false, succeed);
+				Util::Point pos = gSpatialDatabase->randomPositionInRegionWithoutCollisions(aab, 0.3f, false, succeed, this);
 				// check if this is also other agents' goal
 				if (succeed) {
 					for (std::set<SpatialDatabaseItemPtr>::iterator object = allObjects.begin(); object != allObjects.end(); ++object) {
