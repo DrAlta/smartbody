@@ -163,8 +163,22 @@ bool PAState::getWeightsFromParameters(double x, std::vector<double>& weights)
 	double right = 9999.0;
 	std::string leftMotion = "";
 	std::string rightMotion = "";
+	int minIndex = -1;
+	int maxIndex = -1;
+	double minValue = 9999999;
+	double maxValue = -999999;
 	for (int i = 0; i < getNumParameters(); i++)
 	{
+		if (parameters[i].x < minValue)
+		{
+			minValue = parameters[i].x;
+			minIndex = i;
+		}
+		if (parameters[i].x > maxValue)
+		{
+			maxValue = parameters[i].x;
+			maxIndex = i;
+		}
 		if (parameters[i].x <= x)
 			if (parameters[i].x >= left)	
 			{
@@ -177,6 +191,16 @@ bool PAState::getWeightsFromParameters(double x, std::vector<double>& weights)
 				right = parameters[i].x;
 				rightMotion =  motions[i]->getName();
 			}
+	}
+	if (leftMotion == "")
+	{
+		if (minIndex != -1)
+			leftMotion = motions[minIndex]->getName();
+	}
+	if (rightMotion == "")
+	{
+		if (minIndex != -1)
+			rightMotion = motions[maxIndex]->getName();
 	}
 	for (int i = 0; i < getNumMotions(); i++)
 		weights[i] = 0.0;
@@ -436,7 +460,7 @@ bool PAState::getWeightsFromParameters(double x, double y, double z, std::vector
 		}
 		else
 		{
-			LOG("Not inside tetrahedron.");
+			//LOG("Not inside tetrahedron.");
 		}
 	}
 	return false;

@@ -37,7 +37,7 @@ class ParserOpenCOLLADA
 	public:
 		static DOMNode* getNode(std::string nodeName, DOMNode* node);
 		static DOMNode* getNode(std::string nodeName, std::string fileName);
-		static bool parse(SkSkeleton& skeleton, SkMotion& motion, std::string fileName, float scale);
+		static bool parse(SkSkeleton& skeleton, SkMotion& motion, std::string fileName, float scale, bool doParseSkeleton, bool doParseMotion);
 		static void parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name);
 		static void parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent = NULL);
 		static void parseLibraryAnimations(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);

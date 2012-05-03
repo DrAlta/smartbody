@@ -1083,16 +1083,20 @@ void PATransitionManager::update()
 		}
 	}
 	
-	for (int i = 0; i < transition->getNumEaseOut(); i++)
+	if (fromKey.size() > 0)
 	{
-		if (transition->easeOutStart[i] < fromKey[0])
+		for (int i = 0; i < transition->getNumEaseOut(); i++)
 		{
-			transition->easeOutStart[i] += transition->fromState->motions[id]->duration();
-			transition->easeOutEnd[i] += transition->fromState->motions[id]->duration();
+			if (transition->easeOutStart[i] < fromKey[0])
+			{
+				transition->easeOutStart[i] += transition->fromState->motions[id]->duration();
+				transition->easeOutEnd[i] += transition->fromState->motions[id]->duration();
+			}
+			easeOutStarts.push_back(getTime(transition->easeOutStart[i], fromKey, transition->fromState->keys, from->weights));
+			easeOutEnds.push_back(getTime(transition->easeOutEnd[i], fromKey, transition->fromState->keys, from->weights));
 		}
-		easeOutStarts.push_back(getTime(transition->easeOutStart[i], fromKey, transition->fromState->keys, from->weights));
-		easeOutEnds.push_back(getTime(transition->easeOutEnd[i], fromKey, transition->fromState->keys, from->weights));
 	}
+	
 
 	std::vector<double> toKey;
 	for (int i = 0; i < transition->toState->getNumMotions(); i++)

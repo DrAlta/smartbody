@@ -44,7 +44,7 @@
 #endif
 
 
-bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::string pathName, float scale)
+bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::string pathName, float scale, bool doParseSkeleton, bool doParseMotion)
 {
 	try 
 	{
@@ -74,7 +74,10 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		std::string fileextension = boost::filesystem::extension(pathName);
 		motion.setName(filebasename.c_str());
 		std::stringstream strstr;
-		strstr << filebasename << "." << fileextension;
+		if (fileextension.size() > 0 && fileextension[0] == '.')
+			strstr << filebasename << fileextension;
+		else
+			strstr << filebasename << "." << fileextension;
 		skeleton.name(strstr.str().c_str());
 		parser->parse(pathName.c_str());
 		DOMDocument* doc = parser->getDocument();
@@ -104,7 +107,8 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 			return false;
 		}
 		std::map<std::string, std::string> materialId2Name;
-		parseLibraryVisualScenes(skNode, skeleton, motion, scale, order, materialId2Name);
+		if (doParseSkeleton)
+			parseLibraryVisualScenes(skNode, skeleton, motion, scale, order, materialId2Name);
 
 		if (zaxis)
 		{
@@ -129,7 +133,8 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		//	LOG("ParserOpenCOLLADA::parse WARNING: no motion info contained in this file");
 			return true;
 		}
-		parseLibraryAnimations(skmNode, skeleton, motion, scale, order);
+		if (doParseMotion)
+			parseLibraryAnimations(skmNode, skeleton, motion, scale, order);
 	//	animationPostProcess(skeleton, motion);
 		
 	}
@@ -745,12 +750,36 @@ void ParserOpenCOLLADA::animationPostProcess(SkSkeleton& skeleton, SkMotion& mot
 void ParserOpenCOLLADA::animationPostProcessByChannels(SkSkeleton& skeleton, SkMotion& motion, SkChannelArray& motionChannels)
 {
 	int numChannel = motionChannels.size(); 
+	std::vector<std::pair<SkJoint*, int> > jointIndexMap;
+	for (int j = 0; j < numChannel; j++)
+	{
+		SkChannel& chan = motionChannels[j];
+		const std::string chanName = motionChannels.name(j);
+		SkChannel::Type chanType = chan.type;
+		SkJoint* joint = skeleton.search_joint(chanName.c_str());
+		if (!joint)
+		{
+			jointIndexMap.push_back(std::pair<SkJoint*, int>());
+			continue;
+		}
+
+		int id = motion.channels().search(chanName.c_str(), chanType);
+		int dataId = motion.channels().float_position(id);
+		if (dataId < 0)
+		{
+			jointIndexMap.push_back(std::pair<SkJoint*, int>());
+			continue;
+		}
+		jointIndexMap.push_back(std::pair<SkJoint*, int>(joint, dataId));
+	}
+
+	
 	for (int i = 0; i < motion.frames(); i++)
 	{
 		for (int j = 0; j < numChannel; j++)
 		{
 			SkChannel& chan = motionChannels[j];
-			std::string chanName = motionChannels.name(j);
+		/*	const std::string chanName = motionChannels.name(j);
 			SkChannel::Type chanType = chan.type;
 			SkJoint* joint = skeleton.search_joint(chanName.c_str());
 			if (!joint)
@@ -760,6 +789,12 @@ void ParserOpenCOLLADA::animationPostProcessByChannels(SkSkeleton& skeleton, SkM
 			int dataId = motion.channels().float_position(id);
 			if (dataId < 0)
 				continue;
+				*/
+			SkJoint* joint = jointIndexMap[j].first;
+			int dataId = jointIndexMap[j].second;
+			if (!joint || dataId < 0)
+				continue;
+			SkChannel::Type chanType = chan.type;
 
 			if (chanType == SkChannel::XPos)
 			{
