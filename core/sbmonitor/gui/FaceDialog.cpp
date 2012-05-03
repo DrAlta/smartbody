@@ -13,8 +13,9 @@ bool GetAUSide(void* caller, NetRequest* req);
 
 FaceDialog::FaceDialog(SbmDebuggerClient* client, QWidget* parent ) : QDialog(parent)
 {
+   m_BlockSending = false;
    m_client = client;
-   m_pScene = m_client->GetScene();;
+   m_pScene = m_client->GetScene();
    ui.setupUi(this);
    QVBoxLayout *scrollViewLayout = new QVBoxLayout;
    ui.scrollArea->setLayout(scrollViewLayout);
@@ -33,6 +34,8 @@ FaceDialog::FaceDialog(SbmDebuggerClient* client, QWidget* parent ) : QDialog(pa
    {
       CharacterSelectionChanged(m_pScene->m_characters[0].m_name.c_str());
    }
+
+   timer.start(10, this);
 }
 
 FaceDialog::~FaceDialog()
@@ -129,10 +132,52 @@ void FaceDialog::SliderValueChanged(int val)
    double weight = (double)val / sender->maximum();
    spinBox->setValue(weight);
 
-   // inform smartbody
-   string msg = vhcl::Format("sbm char %s viseme %s %.2f",
-      ui.characterNameBox->currentText().toStdString().c_str(), visemeName.toStdString().c_str(), weight); 
-   vhmsg::ttu_notify1(msg.c_str());
+   if (!m_BlockSending)
+   {
+      // inform smartbody
+      string msg = vhcl::Format("sbm char %s viseme %s %.2f",
+         ui.characterNameBox->currentText().toStdString().c_str(), visemeName.toStdString().c_str(), weight); 
+      vhmsg::ttu_notify1(msg.c_str());
+   }
+   
+}
+
+void FaceDialog::Update()
+{
+   if (!ui.interactiveModeCheckBox->isChecked())
+      return;
+
+   // we're setting the sliders based off values from smartbody  
+   m_BlockSending = true;
+   Character* selectedChar = m_pScene->FindCharacter(ui.characterNameBox->currentText().toStdString());
+   if (selectedChar)
+   {
+      QString visemeName;
+      Joint* visemeJoint = NULL;
+      for (unsigned int i = 0; i < m_Sliders.size(); i++)
+      {
+         // find the au channel in the character's skeleton
+         visemeName = m_Sliders[i]->objectName();
+         visemeJoint = selectedChar->FindJoint(visemeName.toStdString());
+         if (visemeJoint)
+         {
+            m_Sliders[i]->setValue(visemeJoint->pos.x * m_Sliders[i]->maximum());
+         }
+      }
+   }
+   m_BlockSending = false;
+}
+
+void FaceDialog::timerEvent(QTimerEvent * event)
+{
+   if (event->timerId() == timer.timerId())
+   {
+      Update();
+   }
+   else
+   {
+      QWidget::timerEvent(event);
+   }
 }
 
 bool GetVisemeNames(void* caller, NetRequest* req)
@@ -185,6 +230,10 @@ bool GetAUSide(void* caller, NetRequest* req)
       dlg->AddFacialExpression(auName + "_left", 0);
       dlg->AddFacialExpression(auName + "_right", 0);
    }
+   else if (side == "both")
+   {
+      dlg->AddFacialExpression(auName, 0);
+   }
    else
    {
       side.insert(side.begin(), '_');
@@ -193,3 +242,4 @@ bool GetAUSide(void* caller, NetRequest* req)
 
    return true;
 }
+

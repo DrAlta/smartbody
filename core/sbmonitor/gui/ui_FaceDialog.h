@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'FaceDialog.ui'
 **
-** Created: Wed Feb 15 09:42:39 2012
+** Created: Wed May 2 17:28:02 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -14,6 +14,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
+#include <QtGui/QCheckBox>
 #include <QtGui/QComboBox>
 #include <QtGui/QDialog>
 #include <QtGui/QFrame>
@@ -32,6 +33,7 @@ public:
     QComboBox *characterNameBox;
     QPushButton *resetButton;
     QLabel *characterLabel;
+    QCheckBox *interactiveModeCheckBox;
     QScrollArea *scrollArea;
     QWidget *scrollAreaWidgetContents;
     QLabel *facialExpressionsLabel;
@@ -40,10 +42,10 @@ public:
     {
         if (FaceDialog->objectName().isEmpty())
             FaceDialog->setObjectName(QString::fromUtf8("FaceDialog"));
-        FaceDialog->resize(354, 652);
+        FaceDialog->resize(370, 652);
         frame_2 = new QFrame(FaceDialog);
         frame_2->setObjectName(QString::fromUtf8("frame_2"));
-        frame_2->setGeometry(QRect(10, 10, 231, 51));
+        frame_2->setGeometry(QRect(10, 10, 341, 51));
         frame_2->setFrameShape(QFrame::StyledPanel);
         frame_2->setFrameShadow(QFrame::Raised);
         characterNameBox = new QComboBox(frame_2);
@@ -58,13 +60,17 @@ public:
         characterLabel->setObjectName(QString::fromUtf8("characterLabel"));
         characterLabel->setGeometry(QRect(10, 0, 48, 16));
         characterLabel->setMaximumSize(QSize(50, 16777215));
+        interactiveModeCheckBox = new QCheckBox(frame_2);
+        interactiveModeCheckBox->setObjectName(QString::fromUtf8("interactiveModeCheckBox"));
+        interactiveModeCheckBox->setGeometry(QRect(230, 10, 101, 41));
+        interactiveModeCheckBox->setChecked(true);
         scrollArea = new QScrollArea(FaceDialog);
         scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
-        scrollArea->setGeometry(QRect(10, 90, 331, 551));
+        scrollArea->setGeometry(QRect(10, 90, 341, 551));
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 329, 549));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 339, 549));
         scrollArea->setWidget(scrollAreaWidgetContents);
         facialExpressionsLabel = new QLabel(FaceDialog);
         facialExpressionsLabel->setObjectName(QString::fromUtf8("facialExpressionsLabel"));
@@ -83,6 +89,11 @@ public:
         FaceDialog->setWindowTitle(QApplication::translate("FaceDialog", "Face Dialog", 0, QApplication::UnicodeUTF8));
         resetButton->setText(QApplication::translate("FaceDialog", "Reset", 0, QApplication::UnicodeUTF8));
         characterLabel->setText(QApplication::translate("FaceDialog", "Character", 0, QApplication::UnicodeUTF8));
+#ifndef QT_NO_TOOLTIP
+        interactiveModeCheckBox->setToolTip(QString());
+#endif // QT_NO_TOOLTIP
+        interactiveModeCheckBox->setText(QApplication::translate("FaceDialog", "Receive Updates\n"
+"From Smartbody", 0, QApplication::UnicodeUTF8));
         facialExpressionsLabel->setText(QApplication::translate("FaceDialog", "Facial Expressions", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
