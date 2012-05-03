@@ -115,7 +115,7 @@ class IntAttribute : public SBAttribute
 {
 	public:
 		IntAttribute();
-		IntAttribute(const std::string& name, int val = 0, int min = -std::numeric_limits<int>::max(), int max = std::numeric_limits<int>::max());
+		IntAttribute(const std::string& name, int val = 0, int minn = -std::numeric_limits<int>::max(), int maxx = std::numeric_limits<int>::max());
 		~IntAttribute();
 
 		const int& getValue();

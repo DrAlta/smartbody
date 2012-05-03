@@ -6041,7 +6041,14 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 						if (mode == "normal")
 						{
 							if (character->steeringAgent->getAgent())
+							{
+								const SteerLib::AgentGoalInfo& curGoal = character->steeringAgent->getAgent()->currentGoal();
 								character->steeringAgent->getAgent()->clearGoals();
+							}
+							if (character->steeringAgent->goalList.size() > 0)
+							{
+								character->steeringAgent->sendLocomotionEvent("interrupt");
+							}
 							character->steeringAgent->goalList.clear();
 							for (int i = 0; i < num; i++)
 							{
