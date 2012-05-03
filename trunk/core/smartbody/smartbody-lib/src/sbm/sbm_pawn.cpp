@@ -1455,18 +1455,6 @@ void SbmPawn::initSteeringSpaceObject()
 	}
 }
 
-void SbmPawn::clearSteeringGoals()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu._scene->getSteerManager()->getEngineDriver()->isInitialized())	return;
-	if (!mcu._scene->getSteerManager()->getEngineDriver()->_engine)	return;
-
-	SbmCharacter* character = dynamic_cast<SbmCharacter*> (this);
-	if (!character)	return;
-	if (!character->steeringAgent)	return;
-	character->steeringAgent->getAgent()->clearGoals();
-}
-
 // void SbmPawn::setPhysicsSim( bool enable )
 // {
 // 	if (!phyObj_p)
