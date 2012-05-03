@@ -14,10 +14,6 @@
 		AA03674B142A80BC00DDDCA2 /* libblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA036748142A80BC00DDDCA2 /* libblas.a */; };
 		AA03674C142A80BC00DDDCA2 /* libf2c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA036749142A80BC00DDDCA2 /* libf2c.a */; };
 		AA03674D142A80BC00DDDCA2 /* liblapack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA03674A142A80BC00DDDCA2 /* liblapack.a */; };
-		AA12CA2814007FFE0017A491 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA12CA2714007FFE0017A491 /* QuartzCore.framework */; };
-		AA12CA2C140080210017A491 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA12CA29140080210017A491 /* Foundation.framework */; };
-		AA12CA2D140080210017A491 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA12CA2A140080210017A491 /* OpenGLES.framework */; };
-		AA12CA2E140080210017A491 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA12CA2B140080210017A491 /* UIKit.framework */; };
 		AA12CB1914031DD50017A491 /* Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA12CB1814031DD50017A491 /* Window.xib */; };
 		AA12CB1C14031E040017A491 /* ApplicationViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = AA12CB1B14031E040017A491 /* ApplicationViewer.m */; };
 		AA38C2F413FD8DAD00233019 /* common.sk in Resources */ = {isa = PBXBuildFile; fileRef = AA38C2F313FD8DAD00233019 /* common.sk */; };
@@ -45,6 +41,12 @@
 		AAC9AC5D142010C000F56F9C /* libvhmsg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC4D142010C000F56F9C /* libvhmsg.a */; };
 		AAC9AC5E142010C000F56F9C /* libwsp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC4E142010C000F56F9C /* libwsp.a */; };
 		AAC9AC5F142010C000F56F9C /* libxerces-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC4F142010C000F56F9C /* libxerces-c.a */; };
+		AAD2C3FA1551FFF30053C478 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD2C3F91551FFF30053C478 /* Foundation.framework */; };
+		AAD2C3FC155200040053C478 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD2C3FB155200040053C478 /* OpenGLES.framework */; };
+		AAD2C3FE1552000C0053C478 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD2C3FD1552000C0053C478 /* UIKit.framework */; };
+		AAD2C400155200120053C478 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD2C3FF155200120053C478 /* QuartzCore.framework */; };
+		AAD2C402155201450053C478 /* libpython2.6.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD2C401155201450053C478 /* libpython2.6.a */; };
+		AAD2C404155201510053C478 /* libboost_python.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD2C403155201510053C478 /* libboost_python.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,10 +62,6 @@
 		AA036748142A80BC00DDDCA2 /* libblas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libblas.a; path = ../../libs/iphoneos/libblas.a; sourceTree = "<group>"; };
 		AA036749142A80BC00DDDCA2 /* libf2c.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libf2c.a; path = ../../libs/iphoneos/libf2c.a; sourceTree = "<group>"; };
 		AA03674A142A80BC00DDDCA2 /* liblapack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblapack.a; path = ../../libs/iphoneos/liblapack.a; sourceTree = "<group>"; };
-		AA12CA2714007FFE0017A491 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
-		AA12CA29140080210017A491 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		AA12CA2A140080210017A491 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks/OpenGLES.framework; sourceTree = DEVELOPER_DIR; };
-		AA12CA2B140080210017A491 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		AA12CB1814031DD50017A491 /* Window.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Window.xib; sourceTree = "<group>"; };
 		AA12CB1A14031E040017A491 /* ApplicationViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApplicationViewer.h; sourceTree = "<group>"; };
 		AA12CB1B14031E040017A491 /* ApplicationViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplicationViewer.m; sourceTree = "<group>"; };
@@ -93,6 +91,12 @@
 		AAC9AC4D142010C000F56F9C /* libvhmsg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvhmsg.a; path = ../../libs/iphoneos/libvhmsg.a; sourceTree = "<group>"; };
 		AAC9AC4E142010C000F56F9C /* libwsp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwsp.a; path = ../../libs/iphoneos/libwsp.a; sourceTree = "<group>"; };
 		AAC9AC4F142010C000F56F9C /* libxerces-c.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libxerces-c.a"; path = "../../libs/iphoneos/libxerces-c.a"; sourceTree = "<group>"; };
+		AAD2C3F91551FFF30053C478 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		AAD2C3FB155200040053C478 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		AAD2C3FD1552000C0053C478 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		AAD2C3FF155200120053C478 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		AAD2C401155201450053C478 /* libpython2.6.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpython2.6.a; path = ../../libs/iphoneos/libpython2.6.a; sourceTree = "<group>"; };
+		AAD2C403155201510053C478 /* libboost_python.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_python.a; path = ../../libs/iphoneos/libboost_python.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,10 +104,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA12CA2814007FFE0017A491 /* QuartzCore.framework in Frameworks */,
-				AA12CA2C140080210017A491 /* Foundation.framework in Frameworks */,
-				AA12CA2D140080210017A491 /* OpenGLES.framework in Frameworks */,
-				AA12CA2E140080210017A491 /* UIKit.framework in Frameworks */,
 				AAC9AC50142010C000F56F9C /* libactivemq-cpp.a in Frameworks */,
 				AAC9AC51142010C000F56F9C /* libapr-1.a in Frameworks */,
 				AAC9AC52142010C000F56F9C /* libaprutil-1.a in Frameworks */,
@@ -123,6 +123,12 @@
 				AA03674B142A80BC00DDDCA2 /* libblas.a in Frameworks */,
 				AA03674C142A80BC00DDDCA2 /* libf2c.a in Frameworks */,
 				AA03674D142A80BC00DDDCA2 /* liblapack.a in Frameworks */,
+				AAD2C3FA1551FFF30053C478 /* Foundation.framework in Frameworks */,
+				AAD2C3FC155200040053C478 /* OpenGLES.framework in Frameworks */,
+				AAD2C3FE1552000C0053C478 /* UIKit.framework in Frameworks */,
+				AAD2C400155200120053C478 /* QuartzCore.framework in Frameworks */,
+				AAD2C402155201450053C478 /* libpython2.6.a in Frameworks */,
+				AAD2C404155201510053C478 /* libboost_python.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -194,6 +200,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AAD2C403155201510053C478 /* libboost_python.a */,
+				AAD2C401155201450053C478 /* libpython2.6.a */,
 				AA036748142A80BC00DDDCA2 /* libblas.a */,
 				AA036749142A80BC00DDDCA2 /* libf2c.a */,
 				AA03674A142A80BC00DDDCA2 /* liblapack.a */,
@@ -213,10 +221,10 @@
 				AAC9AC4D142010C000F56F9C /* libvhmsg.a */,
 				AAC9AC4E142010C000F56F9C /* libwsp.a */,
 				AAC9AC4F142010C000F56F9C /* libxerces-c.a */,
-				AA12CA29140080210017A491 /* Foundation.framework */,
-				AA12CA2A140080210017A491 /* OpenGLES.framework */,
-				AA12CA2B140080210017A491 /* UIKit.framework */,
-				AA12CA2714007FFE0017A491 /* QuartzCore.framework */,
+				AAD2C3FF155200120053C478 /* QuartzCore.framework */,
+				AAD2C3F91551FFF30053C478 /* Foundation.framework */,
+				AAD2C3FD1552000C0053C478 /* UIKit.framework */,
+				AAD2C3FB155200040053C478 /* OpenGLES.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
