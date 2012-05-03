@@ -46,6 +46,10 @@ SkSkeleton::SkSkeleton (SkSkeleton* origSkel)
 {
 	_name = origSkel->name();
 	_skfilename = origSkel->skfilename();
+	if (!origSkel->root())
+	{
+		return;
+	}
 	_root = new SmartBody::SBJoint(this, 0, origSkel->root()->rot_type(), origSkel->root()->index());
 	copy_joint(_root, origSkel->root());
 	_joints.push_back(_root);
