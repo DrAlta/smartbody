@@ -5,6 +5,8 @@
 #include "SbmDebuggerCommon.h"
 #include "SbmDebuggerClient.h"
 
+#include <QtGui>
+#include <QWidget>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QSlider>
 #include <QtGui/QHBoxLayout>
@@ -33,10 +35,15 @@ private slots:
    void CharacterSelectionChanged(const QString& selection);
 
 private:
-   
    Scene* m_pScene;
    vector<QSlider*> m_Sliders;
    vector<QObject*> m_scrollListChildren;
+   QBasicTimer timer;
+   bool m_BlockSending;
+
+protected:
+   virtual void timerEvent(QTimerEvent * event);
+   void Update();
 };
 
 #endif
