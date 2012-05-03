@@ -131,7 +131,6 @@ public:
  	void updateToColObject();
 	void updateToSteeringSpaceObject();
 	void initSteeringSpaceObject();
-	void clearSteeringGoals();
 
 	bool is_initialized();
 
