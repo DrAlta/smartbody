@@ -86,7 +86,8 @@ void SBSteerManager::update(double time)
 				getEngineDriver()->setLastUpdateTime(mcu.time - _maxUpdateFrequency - .01);
 			}
 
-			if (mcu.time - getEngineDriver()->getLastUpdateTime() >= _maxUpdateFrequency)
+			double timeDiff = mcu.time - getEngineDriver()->getLastUpdateTime();
+			if (timeDiff >= _maxUpdateFrequency)
 			{ // limit steering to 60 fps
 				mcu.mark("SteeringUpdate",0,"Update");
 				getEngineDriver()->setLastUpdateTime(mcu.time);
@@ -96,7 +97,7 @@ void SBSteerManager::update(double time)
 				{
 					SbmCharacter* character = (*iter).second;
 					if (character->steeringAgent)
-						character->steeringAgent->evaluate();
+						character->steeringAgent->evaluate(timeDiff);
 				}
 
 				bool running = getEngineDriver()->_engine->update(false, true, (float) (mcu.time - getEngineDriver()->getStartTime()));

@@ -34,7 +34,7 @@ class SteeringAgent
 		SteeringAgent(SbmCharacter* c);
 		~SteeringAgent();
 
-		void evaluate();
+		void evaluate(double dt);
 		void setAgent(SteerLib::AgentInterface* a);
 		SteerLib::AgentInterface* getAgent();
 		void setCharacter(SbmCharacter* c);
@@ -48,6 +48,7 @@ class SteeringAgent
 		bool isSteerParamsDirty();
 		void initSteerParams();
 		void addSteeringAttributes();
+		void sendLocomotionEvent(const std::string& status);
 
 	private:
 		void normalizeAngle(float& angle);
@@ -56,12 +57,12 @@ class SteeringAgent
 		inline float degToRad(float v)	{return (v * float(M_PI) / 180.0f);}
 		inline float radToDeg(float v)	{return (v * 180.0f / float(M_PI));}
 
-		float evaluateBasicLoco(float x, float y, float z, float yaw);
-		float evaluateProceduralLoco(float x, float y, float z, float yaw);
-		float evaluateExampleLoco(float x, float y, float z, float yaw);
+		float evaluateBasicLoco(float dt, float x, float y, float z, float yaw);
+		float evaluateProceduralLoco(float dt, float x, float y, float z, float yaw);
+		float evaluateExampleLoco(float dt, float x, float y, float z, float yaw);
 
-		float evaluateSteppingLoco(float x, float y, float z, float yaw);
-		void  evaluatePathFollowing(float x, float y, float z, float yaw);
+		float evaluateSteppingLoco(float dt, float x, float y, float z, float yaw);
+		void  evaluatePathFollowing(float dt, float x, float y, float z, float yaw);
 
 		void parameterTesting();
 		void cacheParameter(std::list<float>& sampleData, float data, int size);
@@ -73,7 +74,6 @@ class SteeringAgent
 		SteerLib::AgentInterface* agent;
 		SbmCharacter* character;
 		SbmCharacter* target;
-		float dt;
 
 	public:
 		// basic param
@@ -162,6 +162,7 @@ class SteeringAgent
 		std::string lastMessage;
 		int numMessageRepeats;
 		bool _dirty;
+		int _curFrame;
 };
 
 #endif

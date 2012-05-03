@@ -472,10 +472,16 @@ void MeCtParamAnimation::autoScheduling(double time)
 		if (curStateData->getStateName() == PseudoIdleState)
 		{
 			if (nextUnit.data == NULL)
+			{
+				waitingList.pop_front();
 				return;
+			}
 			else
 				if (nextUnit.data->stateName == PseudoIdleState)
+				{
+					waitingList.pop_front();
 					return;
+				}
 		}
 	}
 
