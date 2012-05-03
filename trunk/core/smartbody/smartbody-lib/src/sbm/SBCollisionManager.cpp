@@ -14,6 +14,13 @@ SBCollisionManager::SBCollisionManager()
 
 	createIntAttribute("maxNumIterations", 5, true, "Basic", 60, false, false, false, "Max number collision response iterations.");
 
+	std::vector<std::string> collisionHandles;
+	collisionHandles.push_back("none");
+	collisionHandles.push_back("default");	
+	SmartBody::StringAttribute* collisionHandleAttr = createStringAttribute("collisionResolutionType", "none", true, "Physics", 350, false, false, false, "Set the collision resolution method");
+	collisionHandleAttr->setValidValues(collisionHandles);
+
+
 	_maxIterations = 5;
 	collisionSpace = NULL;
 }
@@ -102,16 +109,17 @@ void SBCollisionManager::afterUpdate(double time)
 		SBCharacter* character =  scene->getCharacter((*iter));
 		SrVec position = character->getPosition();
 		position[1] = 0.0;
-		SrVec& oldPosition = _positions[(*iter)];
+		SrVec& oldPosition = _positions[(*iter)];		
+		_velocities[(*iter)] = (position - oldPosition) / (float) timeDt;		
 		_positions[(*iter)] = position;
-		_velocities[(*iter)] = (position - oldPosition) / (float) timeDt;
-
 	}
 
 	int curIteration = 0;
 	bool needMoreIterations = true;	
 
 	EventManager* eventManager = EventManager::getEventManager();	
+
+	std::string collisionResMethod = getStringAttribute("collisionResolutionType");	
 
 	while (needMoreIterations && curIteration < _maxIterations)
 	{
@@ -140,14 +148,26 @@ void SBCollisionManager::afterUpdate(double time)
 					delete collisionEvent; // free the memory
 
 					// collision resolution
-					SrVec v1 = _velocities[c1->getName()];
-					SrVec v2 = _velocities[c2->getName()];
-					SBCharacter* cMove = (v1.len() > v2.len()) ? c1 : c2;				
-					SbmGeomContact& contact = contactPts[0];
-					SrVec normalDir = (v1.len() > v2.len()) ? contact.contactNormal : -contact.contactNormal;
-					
-					SrVec newPos = cMove->getPosition() + normalDir*contact.penetrationDepth;
-					cMove->setPosition(newPos);
+					if (collisionResMethod == "default")
+					{						
+						SrVec v1 = _velocities[c1->getName()];
+						SrVec v2 = _velocities[c2->getName()];
+						//LOG("v1 len = %f, v2 len = %f",v1.len(),v2.len());
+						SBCharacter* cMove = (v1.len() > v2.len()) ? c1 : c2;				
+						SbmGeomContact& contact = contactPts[0];
+						SrVec normalDir = (v1.len() > v2.len()) ? contact.contactNormal : -contact.contactNormal;
+
+						SrVec newPos = cMove->getPosition() + normalDir*contact.penetrationDepth;
+						cMove->setPosition(newPos);
+					}
+					else if (collisionResMethod == "none")
+					{
+						// no collision resolution
+					}
+					else
+					{
+						// default ? 
+					}					
 				}
 				needMoreIterations = true;
 			}
