@@ -138,6 +138,16 @@ void SBCollisionManager::afterUpdate(double time)
 					eventManager->handleEvent(collisionEvent, time);
 					//LOG("Collision detected between character %s and character %s",c1->getName().c_str(), c2->getName().c_str());
 					delete collisionEvent; // free the memory
+
+					// collision resolution
+					SrVec v1 = _velocities[c1->getName()];
+					SrVec v2 = _velocities[c2->getName()];
+					SBCharacter* cMove = (v1.len() > v2.len()) ? c1 : c2;				
+					SbmGeomContact& contact = contactPts[0];
+					SrVec normalDir = (v1.len() > v2.len()) ? contact.contactNormal : -contact.contactNormal;
+					
+					SrVec newPos = cMove->getPosition() + normalDir*contact.penetrationDepth;
+					cMove->setPosition(newPos);
 				}
 				needMoreIterations = true;
 			}

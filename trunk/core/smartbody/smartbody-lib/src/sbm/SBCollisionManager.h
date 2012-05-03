@@ -32,7 +32,7 @@ class SBCollisionManager : public SBService
 		int _maxIterations;
 		std::map<std::string, SrVec> _velocities;
 		std::map<std::string, SrVec> _positions;
-		std::map<std::string, SbmGeomObject*> geomObjectMap;
+		std::map<std::string, SbmGeomObject*> geomObjectMap;		
 };
 
 
