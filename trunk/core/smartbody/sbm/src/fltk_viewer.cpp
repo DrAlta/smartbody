@@ -4308,14 +4308,17 @@ void FltkViewer::drawSteeringInfo()
 {
 	if (_data->steerMode == ModeNoSteer)
 		return;
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu._scene->getSteerManager()->getEngineDriver()->isInitialized() || !mcu._scene->getSteerManager()->getEngineDriver()->_engine)
+	if (!scene->getSteerManager()->getEngineDriver()->isInitialized() || 
+		!scene->getSteerManager()->getEngineDriver()->_engine)
 		return;
 
 	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
 	glPushMatrix();
 
-	glScalef(1 / mcu.steeringScale, 1 / mcu.steeringScale, 1 / mcu.steeringScale);
+	glScalef(1 / scene->getScale(), 1 / scene->getScale(), 1 / scene->getScale());
 
 	//comment out for now, have to take a look at the steering code
 	const std::vector<SteerLib::AgentInterface*>& agents = mcu._scene->getSteerManager()->getEngineDriver()->_engine->getAgents();

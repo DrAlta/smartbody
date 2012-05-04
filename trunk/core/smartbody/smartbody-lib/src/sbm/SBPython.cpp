@@ -829,8 +829,6 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getSteerAgentNames", &SBSteerManager::getSteerAgentNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Return steer agent names.")
 		.def("start", &SBSteerManager::start, "Start the steer simulation.")
 		.def("stop", &SBSteerManager::stop, "Stop the steer simulation.")
-		.def("setSteerUnit", &SBSteerManager::setSteerUnit, "Set the steer unit, only supporting meter or centimeter now.")
-		.def("getSteerUnit", &SBSteerManager::getSteerUnit, "Return the steer unit.")
 		;
 
 	boost::python::class_<SBPhysicsManager, boost::python::bases<SBService> >("SBPhysicsManager")

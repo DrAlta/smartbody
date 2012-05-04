@@ -24,10 +24,6 @@ class SBSteerManager : public SmartBody::SBService
 		virtual void afterUpdate(double time);
 		virtual void stop();
 
-		void setSteerUnit(std::string unit);
-		std::string getSteerUnit();
-		float getSteerUnitValue();
-
 		SteerSuiteEngineDriver* getEngineDriver();
 
 		SBSteerAgent* createSteerAgent(std::string name);

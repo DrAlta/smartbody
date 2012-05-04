@@ -198,6 +198,9 @@ void PPRAgent::addGoal(const SteerLib::AgentGoalInfo & newGoal) {
 
 	if (!isUseCollisionFreeGoals())
 	{
+		_currentGoal = newGoal;
+		_landmarkQueue.front().targetLocation = newGoal.targetLocation;
+		_isNewGoal = true;
 		return;
 	}
 

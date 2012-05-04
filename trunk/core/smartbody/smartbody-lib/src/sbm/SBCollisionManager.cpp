@@ -323,7 +323,8 @@ bool SBCollisionManager::removeObjectFromCollisionSpace( const std::string& geom
 	SbmGeomObject* geomObj = getCollisionObject(geomName);
 	if (geomObj)
 	{
-		collisionSpace->removeCollisionObjects(geomName);
+		if (collisionSpace)
+			collisionSpace->removeCollisionObjects(geomName);
 		return true;
 	}
 	return false;
