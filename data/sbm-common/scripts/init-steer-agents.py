@@ -2,7 +2,6 @@ print "Init Steer Agent"
 
 steerManager = scene.getSteerManager()
 
-steerManager.setSteerUnit("centimeter")
 numCharacters = scene.getNumCharacters()
 charNames = scene.getCharacterNames()
 for i in range(0, numCharacters):
