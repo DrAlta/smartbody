@@ -108,7 +108,7 @@ class PanimationWindow : public Fl_Double_Window, public GenericViewer
 		std::string lastCommand;
 	
 		Fl_Tabs*		tabGroup;
-		PATransitionEditor* transitionEditor;
+		//PATransitionEditor* transitionEditor;
 		PATransitionEditor2* transitionEditor2;
 		PAStateEditor*		stateEditor;
 		PAScriptEditor*		scriptEditor;
