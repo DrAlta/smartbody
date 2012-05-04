@@ -199,7 +199,7 @@ void SbmPawn::initData()
 	collisionObjName = this->getName();
 	collisionObjName += "_BV"; // bounding volume
 
-	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();	
+	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();	
 	SbmGeomObject* geomObj = colManager->createCollisionObject(collisionObjName,"null",SrVec());
 	geomObj->attachToObj(this);
 }
@@ -471,7 +471,7 @@ SbmPawn::~SbmPawn()	{
 		delete dMesh_p;
 	}
 
-	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
+	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
 	colManager->removeCollisionObject(collisionObjName);
 // 	if (_collisionObject)
 // 		delete _collisionObject;
@@ -1367,7 +1367,7 @@ const std::string& SbmPawn::getGeomObjectName()
 SbmGeomObject* SbmPawn::getGeomObject()
 {	
 	//return _collisionObject;
-	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
+	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
 	SbmGeomObject* geomObj = colManager->getCollisionObject(collisionObjName);
 	return geomObj;
 } 
