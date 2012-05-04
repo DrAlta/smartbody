@@ -5981,6 +5981,7 @@ int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	if ( mcu_p )
 	{
 		std::string command = args.read_token();
@@ -5992,13 +5993,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		else if (command == "unit")
 		{
-			std::string unit = args.read_token();
-			if (unit == "meter")
-				mcu_p->steeringScale = 1.0f;
-			else if (unit == "centimeter")
-				mcu_p->steeringScale = 0.01f;
-			else
-				LOG("Unit %s not supported yet", unit.c_str());
+			LOG("Unit no longer supported. Use scene.setScale()");
 			return CMD_SUCCESS;
 		}
 		else if (command == "start")
@@ -6090,7 +6085,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			SbmCharacter* character = mcu_p->getCharacter(characterName);
 			if (character)
 			{
-				character->steeringAgent->distThreshold = (float)args.read_double() / mcu_p->steeringScale;
+				character->steeringAgent->distThreshold = (float)args.read_double() / scene->getScale();
 				return CMD_SUCCESS;
 			}
 		}

@@ -323,6 +323,8 @@ void SteeringAgent::updateSteerStateName()
 
 void SteeringAgent::evaluate(double dtime)
 {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBSteerManager* manager = scene->getSteerManager();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	float dt = (float) dtime;
 
@@ -354,11 +356,11 @@ void SteeringAgent::evaluate(double dtime)
 	int numGoals = goalQueue.size();
 
 	// make sure the character is within the grid
-	if (mcu._scene->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(x * mcu.steeringScale, z * mcu.steeringScale) == -1)
+	if (manager->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(x * scene->getScale(), z * scene->getScale()) == -1)
 	{
 		if (numGoals > 0)
 		{
-			LOG("Character %s is out of range of grid (%f, %f). All goals will be cancelled.", character->getName().c_str(), x * mcu.steeringScale, z * mcu.steeringScale);
+			LOG("Character %s is out of range of grid (%f, %f). All goals will be cancelled.", character->getName().c_str(), x * scene->getScale(), z * scene->getScale());
 			agent->clearGoals();
 			sendLocomotionEvent("failure");
 		}
@@ -381,9 +383,9 @@ void SteeringAgent::evaluate(double dtime)
 		goal.desiredSpeed = desiredSpeed;
 		goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
 		goal.targetIsRandom = false;
-		goal.targetLocation = Util::Point(goalx * mcu.steeringScale, 0.0f, goalz * mcu.steeringScale);
+		goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
 		// make sure that the desired goal is within the bounds of the steering grid
-		if (mcu._scene->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(goal.targetLocation.x, goal.targetLocation.z) == -1)
+		if (manager->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(goal.targetLocation.x, goal.targetLocation.z) == -1)
 		{
 			LOG("Goal (%f, %f) for character %s is out of range of grid.", goal.targetLocation.x, goal.targetLocation.z, character->getName().c_str());
 		}
@@ -393,8 +395,10 @@ void SteeringAgent::evaluate(double dtime)
 		}
 	}
 
+	numGoals = goalQueue.size();
+
 	// Update Steering Engine (position, orientation, scalar speed)
-	Util::Point newPosition(x * mcu.steeringScale, 0.0f, z * mcu.steeringScale);
+	Util::Point newPosition(x * scene->getScale(), 0.0f, z * scene->getScale());
 	Util::Vector newOrientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
 	try {
 		pprAgent->updateAgentState(newPosition, newOrientation, newSpeed);
@@ -415,6 +419,12 @@ void SteeringAgent::evaluate(double dtime)
 			}
 		}
 	}
+	int remainingGoals = goalQueue.size();
+	if (remainingGoals < numGoals)
+	{
+		// AI satisfied the goals, send message
+		sendLocomotionEvent("success");
+	}
 
 	
 	// Prepare Data
@@ -432,7 +442,7 @@ void SteeringAgent::evaluate(double dtime)
 			goal.desiredSpeed = desiredSpeed;
 			goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
 			goal.targetIsRandom = false;
-			goal.targetLocation = Util::Point(x1 * mcu.steeringScale, 0.0f, (z1 * mcu.steeringScale - 100.0f * mcu.steeringScale));
+			goal.targetLocation = Util::Point(x1 * scene->getScale(), 0.0f, (z1 * scene->getScale() - 100.0f * scene->getScale()));
 			agent->addGoal(goal);
 		}
 	}
@@ -692,7 +702,7 @@ void SteeringAgent::normalizeAngle(float& angle)
 */
 float SteeringAgent::evaluateBasicLoco(float dt, float x, float y, float z, float yaw)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	
  	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
 	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
@@ -802,7 +812,7 @@ float SteeringAgent::evaluateBasicLoco(float dt, float x, float y, float z, floa
 	else
 	{
 		character->basic_locomotion_ct->setValid(true);
-		float curSpeed = character->basic_locomotion_ct->getMovingSpd() * mcu.steeringScale;
+		float curSpeed = character->basic_locomotion_ct->getMovingSpd() * scene->getScale();
 		if (steeringCommand.aimForTargetSpeed)
 		{
 			if (curSpeed < steeringCommand.targetSpeed)
@@ -821,7 +831,7 @@ float SteeringAgent::evaluateBasicLoco(float dt, float x, float y, float z, floa
 		else
 			curSpeed += acceleration * dt;
 		newSpeed = curSpeed;
-		curSpeed = curSpeed / mcu.steeringScale;
+		curSpeed = curSpeed / scene->getScale();
 		character->basic_locomotion_ct->setMovingSpd(curSpeed);	
 
 
@@ -839,7 +849,7 @@ float SteeringAgent::evaluateBasicLoco(float dt, float x, float y, float z, floa
 		angleGlobal = radToDeg(atan2(forward.x, forward.z));
 		normalizeAngle(angleGlobal);
 
-		curSpeed = currentSpeed / mcu.steeringScale;
+		curSpeed = currentSpeed / scene->getScale();
 		newSpeed = currentSpeed;
 		character->basic_locomotion_ct->setMovingSpd(curSpeed);
 		character->basic_locomotion_ct->setDesiredHeading(angleGlobal); // affective setting
@@ -978,7 +988,7 @@ float SteeringAgent::evaluateProceduralLoco(float dt, float x, float y, float z,
 */
 float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, float yaw)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	
 	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
 	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
@@ -1039,335 +1049,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 	pprAgent->updateDesiredForward(forward);
 	// WJ added end
 	//---------------------------------------------------------------------------
-#if 0
-	bool reachTarget = false;
-	float agentToTargetDist = 0.0f;
-	SrVec agentToTargetVec;
-	if (goalQueue.size() > 0)
-	{
-		stepAdjust = false; 
-		targetLoc.x = mToCm(goalQueue.front().targetLocation.x);
-		targetLoc.y = mToCm(goalQueue.front().targetLocation.y);
-		targetLoc.z = mToCm(goalQueue.front().targetLocation.z);
-		float dist = sqrt((x - mToCm(goalQueue.front().targetLocation.x)) * (x - mToCm(goalQueue.front().targetLocation.x)) + 
-					  	//  (y - mToCm(goalQueue.front().targetLocation.y)) * (y - mToCm(goalQueue.front().targetLocation.y)) + 
-						  (z - mToCm(goalQueue.front().targetLocation.z)) * (z - mToCm(goalQueue.front().targetLocation.z)));
-		if (dist < distThreshold)
-		{
-			stepAdjust = true;
-			character->steeringAgent->getAgent()->clearGoals();
-		}
-	}
-	int numGoals = goalQueue.size();
-	if (numGoals == 0 && character->_numSteeringGoal > 0)
-		reachTarget = true;
 
-	if (stepAdjust)
-		if (!character->param_animation_ct->hasPAState("UtahStep"))
-		{
-			agentToTargetDist = sqrt((x - targetLoc.x) * (x - targetLoc.x) + 
-				  					 //(y - targetLoc.y) * (y - targetLoc.y) + 
-									 (z - targetLoc.z) * (z - targetLoc.z));
-			agentToTargetVec.x = targetLoc.x - x;
-			agentToTargetVec.y = targetLoc.y - y;
-			agentToTargetVec.z = targetLoc.z - z;
-		}
-
-	PAState* curState =  character->param_animation_ct->getCurrentPAStateData();
-	std::string curStateName = character->param_animation_ct->getCurrentStateName();
-	std::string nextStateName = character->param_animation_ct->getNextStateName();
-	//---end locomotion and macro control and step control
-	if (reachTarget)
-	{
-		if (!character->param_animation_ct->hasPAState("UtahWalkToStop"))
-		{
-			if (curStateName == "UtahLocomotion" || nextStateName == "UtahLocomotion"
-				|| nextStateName == "UtahStopToWalk" || nextStateName == "UtahStartingLeft" || nextStateName == "UtahStartingRight"
-				)
-			{
-				PAState* state = mcu.lookUpPAState("UtahWalkToStop");
-				character->param_animation_ct->schedule(state, false);
-			}
-			if (nextStateName == "" && (curStateName == "UtahStopToWalk" || curStateName == "UtahStartingLeft" || curStateName == "UtahStartingRight"))
-			{
-				std::cout << character->getName() << " schedule stop" << std::endl;
-				PAState* state = mcu.lookUpPAState("UtahLocomotion");
-				character->param_animation_ct->schedule(state, true);
-				state = mcu.lookUpPAState("UtahWalkToStop");
-				character->param_animation_ct->schedule(state, false);
-			}
-		}
-	}
-	else if (character->param_animation_ct->isIdle() && (agentToTargetDist > distDownThreshold))// || fabs(facingAngle) <= 180))
-	{
-		SrVec heading = SrVec(sin(degToRad(yaw)), 0, cos(degToRad(yaw)));
-		float y = dot(agentToTargetVec, heading);
-		SrVec verticalHeading = SrVec(sin(degToRad(yaw - 90)), 0, cos(degToRad(yaw - 90)));
-		float x = dot(agentToTargetVec, verticalHeading);
-/*		float z = 0.0f;
-		if (fabs(facingAngle) <= 180)
-		{
-			float diff = yaw - facingAngle;
-			normalizeAngle(diff);
-			if (fabs(diff) > facingAngleThreshold)
-				z = diff;
-			else
-				facingAngle = -200.0f;
-		}
-		PAState* stepState = mcu.lookUpPAState("UtahStep");
-		stepState->setWeight(x, y, z);
-*/
-		if (!character->param_animation_ct->hasPAState("UtahStep"))
-		{
-			PAState* stepState = mcu.lookUpPAState("UtahStep");
-			stepState->setWeight(x, y);
-			std::stringstream command;
-			command << "panim schedule char " << character->getName();			
-			command << " state UtahStep loop false playnow false ";
-			for (int i = 0; i < stepState->getNumMotions(); i++)
-				command << stepState->weights[i] << " ";
-			mcu.execute((char*) command.str().c_str());
-		}
-	}
-	else if (character->param_animation_ct->isIdle() && fabs(facingAngle) <= 180)
-	{
-		float diff = facingAngle - yaw;
-		normalizeAngle(diff);
-		std::string playNow;
-		if (fabs(diff) > facingAngleThreshold)
-		{
-			double w = 0;
-			playNow = "false";
-			if (diff <= -90)
-			{
-				w = (diff + 180) / 180;
-				std::stringstream command1;
-				command1 << "panim schedule char " << character->getName();
-				command1 << " state UtahIdleTurnRight loop false playnow " << playNow << " 0 " << w << " " << 1 - w;
-				mcu.execute((char*) command1.str().c_str());						
-			}
-			else if (diff >= 90)
-			{
-				w = (diff - 90) / 90;
-				std::stringstream command1;
-				command1 << "panim schedule char " << character->getName();
-				command1 << " state UtahIdleTurnLeft loop false playnow " << playNow << " 0 " << 1 - w << " " << w;
-				mcu.execute((char*) command1.str().c_str());												
-			}
-			else if (diff <= 0)
-			{
-				w = fabs(diff / 90);
-				std::stringstream command1;
-				command1 << "panim schedule char " << character->getName();
-				command1 << " state UtahIdleTurnRight loop false playnow " << playNow << " " << 1 - w << " " << w << " 0 ";
-				mcu.execute((char*) command1.str().c_str());
-			}
-			else if (diff >= 0)
-			{
-				w = diff / 90;
-				std::stringstream command1;
-				command1 << "panim schedule char " << character->getName();
-				command1 << " state UtahIdleTurnLeft loop false playnow " << playNow << " " << 1 - w << " " << w << " 0 ";
-				mcu.execute((char*) command1.str().c_str());	
-			}
-		}
-		else
-		{
-			character->_reachTarget = true;
-			facingAngle = -200;
-		}
-	}
-	else if (character->param_animation_ct->isIdle())
-	{
-		character->_reachTarget = true;
-		speedCache.clear();
-		angleCache.clear();
-		scootCache.clear();
-	}
-
-	if (character->param_animation_ct->isIdle() && (agentToTargetDist < distDownThreshold))
-		stepAdjust = false;
-
-	//---start locomotion
-#if !FastStart	// starting with angle transition
-	if (curState)
-		if (curState->stateName == PseudoIdleState && numGoals != 0 && nextStateName == "")
-//		if (character->_numSteeringGoal == 0 && numGoals != 0)
-		{
-			//float targetAngle = radToDeg(atan2(mToCm(goalQueue.front().targetLocation.x) - x, mToCm(goalQueue.front().targetLocation.z) - z));
-			float targetAngle = radToDeg(atan2(mToCm(pprAgent->getStartTargetPosition().x) - x, mToCm(pprAgent->getStartTargetPosition().z) - z));
-			normalizeAngle(targetAngle);
-			float diff = targetAngle - yaw;
-			normalizeAngle(diff);
-			double w;
-			if (diff > 0)
-			{
-				if (diff > 90)
-				{
-					w = (diff - 90) / 90;
-					std::stringstream command;
-					command << "panim schedule char " << character->getName();			
-					command << " state UtahStartingLeft loop false playnow false " << " 0 " << 1 - w << " " << w;
-					mcu.execute((char*) command.str().c_str());
-				}
-				else
-				{
-					w = diff / 90;
-					std::stringstream command;
-					command << "panim schedule char " << character->getName();					
-					command << " state UtahStartingLeft loop false playnow false " << 1 - w << " " << w << " " << " 0 ";
-					mcu.execute((char*) command.str().c_str());
-				}
-			}
-			else
-			{
-				if (diff < -90)
-				{
-					w = (diff + 180) / 90;
-					std::stringstream command;
-					command << "panim schedule char " << character->getName();
-					command << " state UtahStartingRight loop false playnow false " << " 0 " << w << " " << 1 - w;
-					mcu.execute((char*) command.str().c_str());
-				}
-				else
-				{
-					w = -diff / 90;
-					std::stringstream command;
-					command << "panim schedule char " << character->getName();
-					command << " state UtahStartingRight loop false playnow true " << 1 - w << " " << w << " 0 ";
-					mcu.execute((char*) command.str().c_str());
-				}				
-			}
-			PAState* locoState = mcu.lookUpPAState("UtahLocomotion");
-
-			for (int i = 0; i < locoState->getNumMotions(); i++)
-			{
-				if (i == 0)
-					locoState->weights[i] = 1.0;
-				else
-					locoState->weights[i] = 0.0;
-			}
-			std::stringstream command1;
-			command1 << "panim schedule char " << character->getName();
-			command1 << " state UtahLocomotion loop true playnow false";
-			mcu.execute((char*) command1.str().c_str());
-		}	
-#else	// starting without transition
-	if (curState)
-		if (curState->stateName == PseudoIdleState && numGoals != 0 && nextStateName == "")
-		{
-			PAState* locoState = mcu.lookUpPAState("UtahLocomotion");
-			locoState->setWeight(0, 0, 0);
-			std::stringstream command;
-			command << "panim schedule char " << character->name;
-			command << " state UtahLocomotion loop true playnow true";
-			mcu.execute((char*) command.str().c_str());
-		}
-#endif
-	//---Need a better way to handle the control between steering and Parameterized Animation Controller
-	if (character->param_animation_ct->hasPAState("UtahJump"))
-		inControl = false;
-	else
-		inControl = true;
-
-	//---update locomotion
-	float curSpeed = 0.0f;
-	float curTurningAngle = 0.0f;
-	float curScoot = 0.0f;
-	if (curState)
-		if (curState->stateName == "UtahLocomotion" && numGoals != 0)
-		{
-			curState->getParameter(curSpeed, curTurningAngle, curScoot);
-			float addOnScoot = steeringCommand.scoot * paLocoScootGain;
-			if (steeringCommand.scoot != 0.0)
-			{
-				if (curScoot < addOnScoot)
-					curScoot += scootAcceleration * dt;
-				else
-					curScoot -= scootAcceleration * dt;
-			}
-			else
-			{
-				if (fabs(curScoot) < scootThreshold)
-					curScoot = 0.0f;
-				else
-				{
-					if (curScoot > 0.0f)
-					{
-						curScoot -= scootAcceleration * dt;
-						if (curScoot < 0.0)	curScoot = 0.0;
-					}
-					else
-					{
-						curScoot += scootAcceleration * dt;
-						if (curScoot > 0.0)	curScoot = 0.0;
-					}
-				}
-			}
-			curSpeed = cmToM(curSpeed);
-			if (steeringCommand.aimForTargetSpeed)
-			{
-				if (fabs(curSpeed - steeringCommand.targetSpeed) > speedThreshold)
-				{
-					if (curSpeed < steeringCommand.targetSpeed)
-					{
-						curSpeed += acceleration * dt;
-						if (curSpeed > steeringCommand.targetSpeed)
-							curSpeed = steeringCommand.targetSpeed;
-					}
-					else
-					{
-						curSpeed -= acceleration * dt;
-						if (curSpeed < steeringCommand.targetSpeed)
-							curSpeed = steeringCommand.targetSpeed;
-					}
-				}
-			}
-			else
-				curSpeed += acceleration * dt;
-
-			float angleGlobal = radToDeg(atan2(forward.x, forward.z));
-			normalizeAngle(angleGlobal);
-			normalizeAngle(yaw);
-			float angleDiff = angleGlobal - yaw;
-			normalizeAngle(angleDiff);
-
-			// address the problem of obstacle avoiding failure during high speed movement
-			//if (curSpeed > 200.0f)				
-			//	paLocoAngleGain = 4.0f;
-			//else if (curSpeed > 300.0f)			
-			//	paLocoAngleGain = 7.0f;
-			//else
-			//	paLocoAngleGain = 2.5f;
-
-			paLocoAngleGain = 2.0f;
-			float addOnTurning = angleDiff * paLocoAngleGain;
-			if (fabs(curTurningAngle - addOnTurning) > angleSpeedThreshold)
-			{
-				if (curTurningAngle < addOnTurning)
-					curTurningAngle += angleAcceleration * dt;
-				else if (curTurningAngle > addOnTurning)
-					curTurningAngle -= angleAcceleration * dt;
-			}
-			// update locomotion state
-			newSpeed = curSpeed;
-			curSpeed = mToCm(curSpeed);
-
-			//std::cout << curSpeed << " " << curTurningAngle << " " << curScoot << "   ";
-			//cacheParameter(speedCache, curSpeed, speedWindowSize);
-			//curSpeed = getFilteredParameter(speedCache);
-			//cacheParameter(angleCache, curTurningAngle, angleWindowSize);
-			//curTurningAngle = getFilteredParameter(angleCache);
-			//cacheParameter(scootCache, curScoot, scootWindowSize);
-			//curScoot = getFilteredParameter(scootCache);
-			//std::cout << curSpeed << " " << curTurningAngle << " " << curScoot << std::endl;
-			if (inControl)
-			{
-				curState->setWeight(curSpeed, curTurningAngle, curScoot);
-				character->param_animation_ct->updateWeights();
-			}
-		}
-#else
 	bool reachTarget = false;
 	float agentToTargetDist = 0.0f;
 	SrVec agentToTargetVec;
@@ -1377,8 +1059,8 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		targetLoc.x = goalQueue.front().targetLocation.x;
 		targetLoc.y = goalQueue.front().targetLocation.y;
 		targetLoc.z = goalQueue.front().targetLocation.z;
-		distToTarget = sqrt((x * mcu.steeringScale - targetLoc.x) * (x * mcu.steeringScale - targetLoc.x) + 
-							(z * mcu.steeringScale - targetLoc.z) * (z * mcu.steeringScale - targetLoc.z));
+		distToTarget = sqrt((x * scene->getScale() - targetLoc.x) * (x * scene->getScale() - targetLoc.x) + 
+							(z * scene->getScale() - targetLoc.z) * (z * scene->getScale() - targetLoc.z));
 
 		if (distToTarget < distDownThreshold)
 		{
@@ -1405,11 +1087,11 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 	if (stepAdjust)
 		if (!character->param_animation_ct->hasPAState(stepStateName.c_str()))
 		{
-			agentToTargetDist = distToTarget / mcu.steeringScale;
-			agentToTargetVec.x = targetLoc.x - x * mcu.steeringScale;
-			agentToTargetVec.y = targetLoc.y - y * mcu.steeringScale;
-			agentToTargetVec.z = targetLoc.z - z * mcu.steeringScale;
-			agentToTargetVec /= mcu.steeringScale;
+			agentToTargetDist = distToTarget / scene->getScale();
+			agentToTargetVec.x = targetLoc.x - x * scene->getScale();
+			agentToTargetVec.y = targetLoc.y - y * scene->getScale();
+			agentToTargetVec.z = targetLoc.z - z * scene->getScale();
+			agentToTargetVec /= scene->getScale();
 		}
 
 	PAStateData* curStateData =  character->param_animation_ct->getCurrentPAStateData();
@@ -1425,7 +1107,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		float x = dot(agentToTargetVec, verticalHeading);
 		if (character->param_animation_ct->hasPAState(stepStateName.c_str()))
 		{
-			PAState* stepState = mcu.lookUpPAState(stepStateName.c_str());
+			PAState* stepState = scene->getStateManager()->getState(stepStateName);
 			std::vector<double> weights;
 			weights.resize(stepState->getNumMotions());
 			stepState->getWeightsFromParameters(x, y, weights);
@@ -1434,7 +1116,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 			command << " state " << stepStateName << " loop false playnow false additive false joint null ";
 			for (int i = 0; i < stepState->getNumMotions(); i++)
 				command << weights[i] << " ";
-			mcu.execute((char*) command.str().c_str());
+			scene->command((char*) command.str().c_str());
 		}		
 		return 0;
 	}
@@ -1443,14 +1125,16 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 	if (character->param_animation_ct->isIdle() && numGoals != 0 && nextStateName == "" && distToTarget > distDownThreshold)
 	{
 		// check to see if there's anything obstacles around it
-		float targetAngle = radToDeg(atan2(pprAgent->getStartTargetPosition().x - x * mcu.steeringScale, pprAgent->getStartTargetPosition().z - z * mcu.steeringScale));
+		float targetAngle = radToDeg(atan2(pprAgent->getStartTargetPosition().x - x * scene->getScale(), pprAgent->getStartTargetPosition().z - z * scene->getScale()));
 		normalizeAngle(targetAngle);
 		normalizeAngle(yaw);
 		float diff = targetAngle - yaw;
 		normalizeAngle(diff);
 
 		// Improve on the starting angle by examining whether there's obstacles around
-		std::map<std::string, SbmPawn*>& cMap = mcu.getPawnMap();			
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+		std::map<std::string, SbmPawn*>& cMap = mcu.getPawnMap();
 		std::map<std::string, SbmPawn*>::iterator iter = cMap.begin();
 		std::vector<float> neigbors;
 		for (; iter != cMap.end(); iter++)
@@ -1460,7 +1144,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 				float cX, cY, cZ, cYaw, cRoll, cPitch;
 				iter->second->get_world_offset(cX, cY, cZ, cYaw, cPitch, cRoll);
 				float cDist = sqrt((x - cX) * (x - cX) + (z - cZ) * (z - cZ));
-				if (cDist < (1.5f / mcu.steeringScale))
+				if (cDist < (1.5f / scene->getScale()))
 				{
 					float cAngle = radToDeg(atan2(pprAgent->getStartTargetPosition().x - x, pprAgent->getStartTargetPosition().z - z));
 					normalizeAngle(cAngle);
@@ -1486,7 +1170,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 				std::stringstream command;
 				command << "panim schedule char " << character->getName();
 				command << " state " << locomotionName << " loop true playnow true additive false joint null";
-				mcu.execute((char*) command.str().c_str());
+				scene->command((char*) command.str().c_str());
 			}
 		}
 		return 0;
@@ -1514,7 +1198,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 			goal.desiredSpeed = desiredSpeed;
 			goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
 			goal.targetIsRandom = false;
-			goal.targetLocation = Util::Point(goalx * mcu.steeringScale, 0.0f, goalz * mcu.steeringScale);
+			goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
 			agent->addGoal(goal);
 		}
 		
@@ -1582,7 +1266,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 					}
 				}
 			}
-			curSpeed = curSpeed * mcu.steeringScale;
+			curSpeed = curSpeed * scene->getScale();
 			if (steeringCommand.aimForTargetSpeed)
 			{
 				if (fabs(curSpeed - targetSpeed) > speedThreshold)
@@ -1628,7 +1312,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 			}
 			// update locomotion state
 			newSpeed = curSpeed;
-			curSpeed = curSpeed / mcu.steeringScale;
+			curSpeed = curSpeed / scene->getScale();
 		}
 		else	// direct gaining
 		{
@@ -1638,7 +1322,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 			float angleDiff = angleGlobal - yaw;
 			normalizeAngle(angleDiff);
 
-			curSpeed = targetSpeed / mcu.steeringScale;
+			curSpeed = targetSpeed / scene->getScale();
 			curTurningAngle = angleDiff * paLocoAngleGain;
 			curScoot = steeringCommand.scoot * paLocoScootGain;
 			
@@ -1653,7 +1337,6 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 			character->param_animation_ct->updateWeights(weights);
 		}
 	}
-#endif
 	return newSpeed;
 }
 

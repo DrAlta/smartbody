@@ -296,7 +296,6 @@ mcuCBHandle::mcuCBHandle()
 	face_map["_default_"] = faceDefinition;
 	//physicsEngine = new SbmPhysicsSimODE();
 	//physicsEngine->initSimulation();
-	steeringScale = 0.01f;
 	_scene = new SmartBody::SBScene();
 
 	_scene->getDebuggerServer()->Init();

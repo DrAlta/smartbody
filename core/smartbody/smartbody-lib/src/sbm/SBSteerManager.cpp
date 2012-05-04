@@ -116,8 +116,10 @@ void SBSteerManager::afterUpdate(double time)
 
 void SBSteerManager::start()
 {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu._scene->getSteerManager()->getEngineDriver()->isInitialized())
+	if (scene->getSteerManager()->getEngineDriver()->isInitialized())
 	{
 		LOG("STEERSIM ALREADY STARTED");
 		return;
@@ -213,7 +215,7 @@ void SBSteerManager::start()
 		float yaw, pitch, roll;
 		character->get_world_offset(x, y, z, yaw, pitch, roll);
 		SteerLib::AgentInitialConditions initialConditions;
-		initialConditions.position = Util::Point( x * mcu.steeringScale, 0.0f, z * mcu.steeringScale );
+		initialConditions.position = Util::Point( x * scene->getScale(), 0.0f, z * scene->getScale() );
 		Util::Vector orientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
 		initialConditions.direction = orientation;
 		double initialRadius = dynamic_cast<SmartBody::DoubleAttribute*>( mcu._scene->getSteerManager()->getAttribute("initialConditions.radius") )->getValue();
@@ -311,34 +313,6 @@ void SBSteerManager::stop()
 		}
 		_boundaryObstacles.clear();
 	}
-}
-
-void SBSteerManager::setSteerUnit(std::string unit)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (unit == "meter")
-		mcu.steeringScale = 1.0f;
-	else if (unit == "centimeter")
-		mcu.steeringScale = 0.01f;
-	else
-		LOG("Unit %s not supported yet", unit.c_str());
-}
-
-std::string SBSteerManager::getSteerUnit()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.steeringScale == 1.0)
-		return "meter";
-	if (mcu.steeringScale == 0.01)
-		return "centimeter";
-
-	return "";
-}
-
-float SBSteerManager::getSteerUnitValue()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	return mcu.steeringScale;
 }
 
 SBSteerAgent* SBSteerManager::createSteerAgent(std::string name)

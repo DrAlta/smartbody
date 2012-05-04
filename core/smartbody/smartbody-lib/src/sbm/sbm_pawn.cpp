@@ -1411,11 +1411,12 @@ void SbmPawn::updateToSteeringSpaceObject()
 
 void SbmPawn::initSteeringSpaceObject()
 {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu._scene->getSteerManager()->getEngineDriver()->isInitialized())	return;
-	if (!mcu._scene->getSteerManager()->getEngineDriver()->_engine)	return;
+	if (!scene->getSteerManager()->getEngineDriver()->isInitialized())	return;
+	if (!scene->getSteerManager()->getEngineDriver()->_engine)	return;
 
-	float steerScale = 1.0f / mcu._scene->getSteerManager()->getSteerUnitValue();
+	float steerScale = 1.0f / scene->getScale();
 
 	float x, y, z, h, p, r;
 	this->get_world_offset(x, y, z, h, p, r);	
