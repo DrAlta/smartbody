@@ -151,11 +151,14 @@ void SBCollisionManager::afterUpdate(double time)
 					if (collisionResMethod == "default")
 					{						
 						SrVec v1 = _velocities[c1->getName()];
+						v1[1] = 0.0;
 						SrVec v2 = _velocities[c2->getName()];
+						v2[1] = 0.0;
 						//LOG("v1 len = %f, v2 len = %f",v1.len(),v2.len());
 						SBCharacter* cMove = (v1.len() > v2.len()) ? c1 : c2;				
 						SbmGeomContact& contact = contactPts[0];
 						SrVec normalDir = (v1.len() > v2.len()) ? contact.contactNormal : -contact.contactNormal;
+						normalDir[1] = 0.0;
 
 						SrVec newPos = cMove->getPosition() + normalDir*contact.penetrationDepth;
 						cMove->setPosition(newPos);
