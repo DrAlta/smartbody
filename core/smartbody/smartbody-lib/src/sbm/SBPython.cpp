@@ -26,6 +26,7 @@
 #include <sbm/SBJointMapManager.h>
 #include <sbm/SBParser.h>
 #include <sbm/SBBoneBusManager.h>
+#include <sbm/SBCollisionManager.h>
 #include <sbm/SBSteerAgent.h>
 #include <sr/sr_box.h>
 
@@ -831,6 +832,12 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("stop", &SBSteerManager::stop, "Stop the steer simulation.")
 		;
 
+	boost::python::class_<SBCollisionManager, boost::python::bases<SBService> >("SBCollisionManager")
+		.def("start", &SBCollisionManager::start, "Starts the collision manager.")
+		.def("stop", &SBCollisionManager::stop, "Stops the collision manager.")
+		;
+
+
 	boost::python::class_<SBPhysicsManager, boost::python::bases<SBService> >("SBPhysicsManager")
 		.def("createPhysicsCharacter", &SBPhysicsManager::createPhysicsCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a physics character.")
 		.def("createPhysicsPawn", &SBPhysicsManager::createPhysicsPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a physics rigid body and attach it to the pawn.")
@@ -1306,6 +1313,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getBoneBusManager", &SBScene::getBoneBusManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Bone Bus manager object.")
 		.def("getGestureMapManager", &SBScene::getGestureMapManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the gesture map manager object.")
 		.def("getJointMapManager", &SBScene::getJointMapManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the joint mapping manager object.")
+		.def("getCollisionManager", &SBScene::getCollisionManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the collision manager object.")
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
 
 	;

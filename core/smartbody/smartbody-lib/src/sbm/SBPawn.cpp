@@ -193,7 +193,7 @@ void SBPawn::notify(SBSubject* subject)
 			std::string shapeName = getStringAttribute("collisionShape");
 			if (shapeName != object->geomType())
 			{
-				SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
+				SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
 				SrVec size = getVec3Attribute("collisionShapeScale");
 				SbmGeomObject* obj = colManager->createCollisionObject(collisionObjName,shapeName,size);
 				if (obj) obj->attachToObj(this);

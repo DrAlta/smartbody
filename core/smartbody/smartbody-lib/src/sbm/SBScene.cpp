@@ -595,7 +595,7 @@ SBServiceManager* SBScene::getServiceManager()
 }
 
 
-SBCollisionManager* SBScene::getCollsionManager()
+SBCollisionManager* SBScene::getCollisionManager()
 {
 	return _collisionManager;
 }

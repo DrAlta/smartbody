@@ -106,7 +106,7 @@ class SBScene : public SBObject
 		SBBoneBusManager* getBoneBusManager();
 		SBGestureMapManager* getGestureMapManager();
 		SBJointMapManager* getJointMapManager();
-		SBCollisionManager* getCollsionManager();
+		SBCollisionManager* getCollisionManager();
 
 		SBParser* getParser();
 

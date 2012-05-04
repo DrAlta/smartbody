@@ -571,7 +571,7 @@ SbmCollisionSpace::~SbmCollisionSpace()
 
 void SbmCollisionSpace::addCollisionObjects( const std::string& objName )
 {	
-	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
+	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
 	SbmGeomObject* obj = colManager->getCollisionObject(objName);
 	// remove the old one if it exists
 	if (collsionObjMap.find(objName) != collsionObjMap.end())
@@ -583,7 +583,7 @@ void SbmCollisionSpace::addCollisionObjects( const std::string& objName )
 
 void SbmCollisionSpace::removeCollisionObjects( const std::string& objName  )
 {
-	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
+	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
 	SbmGeomObject* obj = colManager->getCollisionObject(objName);
 	if (collsionObjMap.find(objName) != collsionObjMap.end())
 	{

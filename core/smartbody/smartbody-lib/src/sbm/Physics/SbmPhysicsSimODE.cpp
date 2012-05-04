@@ -706,7 +706,7 @@ SbmCollisionSpaceODE::SbmCollisionSpaceODE()
 
 void SbmCollisionSpaceODE::addCollisionObjects( const std::string& objName )
 {
-	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
+	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
 	SbmGeomObject* obj = colManager->getCollisionObject(objName);
 	if (obj)
 	{
@@ -721,7 +721,7 @@ void SbmCollisionSpaceODE::addCollisionObjects( const std::string& objName )
 
 void SbmCollisionSpaceODE::removeCollisionObjects( const std::string& objName )
 {
-	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollsionManager();
+	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
 	SbmGeomObject* obj = colManager->getCollisionObject(objName);
 	if (!obj) return;
 
