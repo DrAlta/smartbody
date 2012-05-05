@@ -181,6 +181,15 @@
     <ClCompile Include="..\src\pic.cpp" />
     <ClCompile Include="..\src\ppm.cpp" />
     <ClCompile Include="..\src\sbm_main.cpp" />
+    <ClCompile Include="..\src\panimationviewer\ParamAnimStateCreatorWidget.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ParamAnimTransitionEditor2.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ParamAnimTransitionCreatorWidget.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -332,5 +341,14 @@
     </ClInclude>
     <ClInclude Include="..\src\glfont2.h" />
     <ClInclude Include="..\src\pic.h" />
+    <ClInclude Include="..\src\panimationviewer\ParamAnimStateCreatorWidget.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ParamAnimTransitionEditor2.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ParamAnimTransitionCreatorWidget.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
