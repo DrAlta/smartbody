@@ -2,7 +2,7 @@
 #include <sbm/mcontrol_util.h>
 #include <FL/Fl_Value_Slider.H>
 #include <sstream>
-#include <sbm/SBSkeleton.h>
+#include <sb/SBSkeleton.h>
 
 FaceViewer::FaceViewer(int x, int y, int w, int h, char* name) : GenericViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
 {

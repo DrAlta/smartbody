@@ -54,15 +54,15 @@
 #endif
 
 #include "sbm_audio.h"
-#include "SBScene.h"
+#include "sb/SBScene.h"
 #include "me_utilities.hpp"
 
 
 #if USE_WSP
 #include "wsp.h"
 #endif
-#include <sbm/SBPythonClass.h>
-#include <sbm/SBPython.h>
+#include <sb/SBPythonClass.h>
+#include <sb/SBPython.h>
 #ifdef USE_PYTHON
 #include <boost/python.hpp> // boost python support
 #endif
@@ -77,10 +77,10 @@
 #include "sbm/Physics/SbmPhysicsSimODE.h"
 #include <sbm/locomotion_cmds.hpp>
 #include <boost/algorithm/string/replace.hpp>
-#include <sbm/SBBoneBusManager.h>
-#include <sbm/SBScript.h>
-#include <sbm/SBServiceManager.h>
-#include <sbm/SBAnimationState.h>
+#include <sb/SBBoneBusManager.h>
+#include <sb/SBScript.h>
+#include <sb/SBServiceManager.h>
+#include <sb/SBAnimationState.h>
 #include "SbmDebuggerServer.h"
 #include <sbm/me_ct_param_animation_utilities.h>
 #include <sbm/me_ct_param_animation_data.h>

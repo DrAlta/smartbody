@@ -1,9 +1,9 @@
 #include "SbmPhysicsSim.h"
 #include <sbm/mcontrol_util.h>
-#include <sbm/SBScene.h>
-#include <sbm/SBPhysicsManager.h>
-#include <sbm/SBCharacter.h>
-#include <sbm/SBSkeleton.h>
+#include <sb/SBScene.h>
+#include <sb/SBPhysicsManager.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBSkeleton.h>
 #include <sr/sr_output.h>
 
 //#include <boost/math/special_functions/fpclassify.hpp>

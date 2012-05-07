@@ -23,7 +23,7 @@
 #ifndef ME_CT_LOCOMOTION_SIMPLE_HPP
 #define ME_CT_LOCOMOTION_SIMPLE_HPP
 
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 
 /**
  *  Calculate new world_offset each frame, given the

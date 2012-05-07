@@ -36,7 +36,7 @@
 #include <sbm/gwiz_math.h>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
-#include <sbm/SBMotion.h>
+#include <sb/SBMotion.h>
 
 using namespace gwiz;
 

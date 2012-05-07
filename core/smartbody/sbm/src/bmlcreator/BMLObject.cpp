@@ -1,6 +1,6 @@
 #include "BMLObject.h"
 #include <sstream>
-#include <sbm/SBAttribute.h>
+#include <sb/SBAttribute.h>
 
 BMLObject::BMLObject()
 {

@@ -34,7 +34,7 @@
 # include <sk/sk_joint_quat.h>
 # include <sk/sk_joint_euler.h>
 # include <sk/sk_joint_swing_twist.h>
-#include <sbm/SBObject.h>
+#include <sb/SBObject.h>
 
 #include <string>
 #include <vector>

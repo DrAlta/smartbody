@@ -87,7 +87,7 @@ class mcuCBHandle;
 #include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
 
-#include <sbm/SBJointMap.h>
+#include <sb/SBJointMap.h>
 #include <sbm/nvbg.h>
 
 #include <me/me_ct_interpolator.h>
@@ -95,7 +95,7 @@ class mcuCBHandle;
 #include <sbm/SteerSuiteEngineDriver.h>
 #include <sbm/Physics/SbmPhysicsSim.h>
 #include <sbm/KinectProcessor.h>
-#include <sbm/SBScene.h>
+#include <sb/SBScene.h>
 #include <sbm/SbmCharacterListener.h>
 
 #ifndef __ANDROID__

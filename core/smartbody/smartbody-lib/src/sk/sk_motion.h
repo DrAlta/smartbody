@@ -30,7 +30,7 @@
 # include <sr/sr_shared_class.h>
 # include <sk/sk_channel_array.h>
 # include <sbm/sr_synch_points.h>
-#include <sbm/SBObject.h>
+#include <sb/SBObject.h>
 
 class SkPosture;
 class SkSkeleton;

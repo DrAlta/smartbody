@@ -1,7 +1,7 @@
 #include "ParamAnimTransitionCreatorWidget.h"
-#include <sbm/SBAnimationState.h>
-#include <sbm/SBAnimationStateManager.h>
-#include <sbm/SBScene.h>
+#include <sb/SBAnimationState.h>
+#include <sb/SBAnimationStateManager.h>
+#include <sb/SBScene.h>
 
 int PATransitionCreator::lastNameIndex = 0;
 

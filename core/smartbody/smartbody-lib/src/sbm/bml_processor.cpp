@@ -67,8 +67,8 @@
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
-#include <sbm/SBAnimationState.h>
-#include <sbm/SBAnimationStateManager.h>
+#include <sb/SBAnimationState.h>
+#include <sb/SBAnimationStateManager.h>
 
 using namespace std;
 using namespace BML;

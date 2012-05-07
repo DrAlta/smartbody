@@ -1,5 +1,5 @@
 #include "BMLConstraintObject.h"
-#include <sbm/SBAttribute.h>
+#include <sb/SBAttribute.h>
 
 BMLConstraintObject::BMLConstraintObject() : BMLObject()
 {

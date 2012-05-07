@@ -25,7 +25,7 @@
 #define ME_CT_TETHER_H
 
 #include <sk/sk_skeleton.h>
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 
 //////////////////////////////////////////////////////////////////////////////////
 

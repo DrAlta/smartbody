@@ -1,5 +1,5 @@
 #include "BMLGestureObject.h"
-#include <sbm/SBAttribute.h>
+#include <sb/SBAttribute.h>
 
 BMLGestureObject::BMLGestureObject() : BMLObject()
 {

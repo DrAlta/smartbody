@@ -1,7 +1,7 @@
 #include "MiniBrain.h"
 #include <sbm/mcontrol_util.h>
-#include <sbm/SBCharacter.h>
-#include <sbm/SBSkeleton.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBSkeleton.h>
 
 MiniBrain::MiniBrain()
 {

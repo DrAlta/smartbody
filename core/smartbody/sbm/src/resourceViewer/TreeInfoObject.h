@@ -1,6 +1,6 @@
 #pragma once
-#include <sbm/SBObject.h>
-#include <sbm/SBSubject.h>
+#include <sb/SBObject.h>
+#include <sb/SBSubject.h>
 
 class TreeInfoObject : public SmartBody::SBObject
 {

@@ -57,7 +57,7 @@
 #include <sbm/sbm_constants.h>
 #include <sbm/xercesc_utils.hpp>
 #include <sbm/mcontrol_util.h>
-#include <sbm/SBScene.h>
+#include <sb/SBScene.h>
 #include <sbm/mcontrol_callbacks.h>
 #include <sbm/sbm_test_cmds.hpp>
 #include BML_PROCESSOR_INCLUDE
@@ -70,8 +70,8 @@
 #include <sbm/resource_cmds.h>
 #include <sbm/time_regulator.h>
 //#include "SBMWindow.h"
-#include <sbm/SBPython.h>
-#include <sbm/SBSteerManager.h>
+#include <sb/SBPython.h>
+#include <sb/SBSteerManager.h>
 #include "TransparentListener.h"
 #include "TransparentViewer.h"
 #include "sbm/SbmDebuggerServer.h"

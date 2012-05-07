@@ -23,7 +23,7 @@
 #ifndef ME_CT_CURVE_WRITER_HPP
 #define ME_CT_CURVE_WRITER_HPP
 
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 #include <sbm/sr_linear_curve.h>
 #include <sbm/sr_curve_builder.h>
 

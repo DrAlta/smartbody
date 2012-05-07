@@ -39,7 +39,7 @@
 #include "bml_xml_consts.hpp"
 #include "xercesc_utils.hpp"
 #include "BMLDefs.h"
-#include <sbm/SBSkeleton.h>
+#include <sb/SBSkeleton.h>
 
 #define TEST_GAZE_LOCOMOTION 0 // set to 1 if want to test gaze+locomotion control when reaching
 

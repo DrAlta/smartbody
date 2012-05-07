@@ -1,10 +1,10 @@
 #include "TransparencyRenders.h"
 
 
-#include <sbm/SBScene.h>
-#include <sbm/SBCharacter.h>
-#include <sbm/SBSkeleton.h>
-#include <sbm/SBJoint.h>
+#include <sb/SBScene.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBJoint.h>
 #include "TransparentViewer.h"
 #include <sbm/GPU/SbmShader.h>
 

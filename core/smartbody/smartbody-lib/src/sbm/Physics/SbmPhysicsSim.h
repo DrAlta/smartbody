@@ -2,8 +2,8 @@
 #define _SBMPHYSICSSIM_H_ 
 #include <deque>
 #include "SbmColObject.h"
-#include <sbm/SBObject.h>
-#include <sbm/SBJoint.h>
+#include <sb/SBObject.h>
+#include <sb/SBJoint.h>
 
 using namespace SmartBody;
 

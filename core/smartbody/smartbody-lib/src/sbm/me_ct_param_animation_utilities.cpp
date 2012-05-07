@@ -24,7 +24,7 @@
 #include <sbm/gwiz_math.h>
 #include <sbm/mcontrol_util.h>
 #include <sr/sr_euler.h>
-#include <sbm/SBAnimationState.h>
+#include <sb/SBAnimationState.h>
 
 const double timeThreshold = 0.05;
 

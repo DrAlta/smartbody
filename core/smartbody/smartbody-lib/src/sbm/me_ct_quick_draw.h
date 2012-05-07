@@ -29,7 +29,7 @@
 #include <sr/sr_buffer.h>
 #include <sk/sk_motion.h>
 #include <sk/sk_skeleton.h>
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 
 #include "gwiz_math.h"
 

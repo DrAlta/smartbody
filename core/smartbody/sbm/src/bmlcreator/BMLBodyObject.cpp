@@ -1,5 +1,5 @@
 #include "BMLBodyObject.h"
-#include <sbm/SBAttribute.h>
+#include <sb/SBAttribute.h>
 
 BMLBodyObject::BMLBodyObject() : BMLObject()
 {

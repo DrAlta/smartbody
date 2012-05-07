@@ -15,7 +15,7 @@
 #include <sbm/sbm_pawn.hpp>
 
 #include <sbm/MeCtReachEngine.h>
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 
 class ReachStateData;
 class ReachStateInterface;

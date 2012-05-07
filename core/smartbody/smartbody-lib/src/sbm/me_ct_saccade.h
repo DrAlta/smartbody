@@ -23,7 +23,7 @@
 #ifndef _ME_CT_SACCADE_H_
 #define _ME_CT_SACCADE_H_
 
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 #include <sk/sk_skeleton.h>
 #include "gwiz_math.h"
 #include "sr_linear_curve.h"

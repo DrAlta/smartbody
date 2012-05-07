@@ -41,7 +41,7 @@ that is distributed: */
 
 #include "AttributeWindow.h"
 
-#include "sbm/SBObject.h"
+#include "sb/SBObject.h"
 #include <FL/Fl_Color_Chooser.H>
 //#include <FL/Fl_Color.H>
 //#include <FL/ask.h>
@@ -54,8 +54,8 @@ that is distributed: */
 #include <algorithm>
 #include <sstream>
 #include <cstring>
-#include <sbm/SBAttribute.h>
-#include <sbm/SBAttributeManager.h>
+#include <sb/SBAttribute.h>
+#include <sb/SBAttributeManager.h>
 
 #ifndef WIN32
 #define _strdup strdup

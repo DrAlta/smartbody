@@ -1,11 +1,11 @@
 #include "ParamAnimAutoMarkingEditor.h"
 #include "ParamAnimEditorWidget.h"
 #include "ParamAnimStateEditor.h"
-#include <sbm/SBCharacter.h>
-#include <sbm/SBJoint.h>
-#include <sbm/SBScene.h>
-#include <sbm/SBSkeleton.h>
-#include <sbm/SBMotion.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBJoint.h>
+#include <sb/SBScene.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBMotion.h>
 
 PAAutoFootStepsEditor::PAAutoFootStepsEditor(PAStateEditor* editor, int x, int y, int w, int h) : Fl_Window(x, y, w, h)
 {

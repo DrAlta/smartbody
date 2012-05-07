@@ -10,12 +10,12 @@
 #include "TreeItemInfoWidget.h"
 #include "TreeInfoObject.h"
 #include <sbm/GenericViewer.h>
-#include <sbm/SBFaceDefinition.h>
-#include <sbm/SBService.h>
+#include <sb/SBFaceDefinition.h>
+#include <sb/SBService.h>
 #include <sbm/Physics/SbmPhysicsSim.h>
-#include <sbm/SBPhysicsManager.h>
+#include <sb/SBPhysicsManager.h>
 #include <sbm/Event.h>
-#include <sbm/SBJointMap.h>
+#include <sb/SBJointMap.h>
 
 class srPathList;
 class SkSkeleton;

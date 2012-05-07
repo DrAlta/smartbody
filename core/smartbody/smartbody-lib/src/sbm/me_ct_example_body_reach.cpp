@@ -6,12 +6,12 @@
 #include <boost/lexical_cast.hpp>
 #include <sr/sr_timer.h>
 #include "mcontrol_util.h"
-#include "SBScene.h"
+#include "sb/SBScene.h"
 #include "me_ct_example_body_reach.hpp"
 #include "me_ct_barycentric_interpolation.h"
 #include "sbm/Event.h"
 #include "MeCtBodyReachState.h"
-#include <sbm/SBSteerManager.h>
+#include <sb/SBSteerManager.h>
 
 
 using namespace boost;

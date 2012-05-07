@@ -23,10 +23,10 @@
 #include "ParamAnimTransitionEditor2.h"
 #include <sbm/mcontrol_util.h>
 #include "ParamAnimBlock.h"
-#include <sbm/SBAnimationState.h>
-#include <sbm/SBAnimationStateManager.h>
-#include <sbm/SBAnimationTransition.h>
-#include <sbm/SBMotion.h>
+#include <sb/SBAnimationState.h>
+#include <sb/SBAnimationStateManager.h>
+#include <sb/SBAnimationTransition.h>
+#include <sb/SBMotion.h>
 #include <FL/Fl_File_Chooser.H>
 #include <FL/Fl_Hold_Browser.H>
 #include "ParamAnimTransitionCreatorWidget.h"

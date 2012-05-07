@@ -30,7 +30,7 @@
 # include <sbm/gwiz_math.h>
 # include <sr/sr_output.h>
 #include <cstdio>
-#include <sbm/SBMotion.h>
+#include <sb/SBMotion.h>
 #include <sbm/mcontrol_util.h>
 
 std::string MeCtBreathing::type_name = "Breathing";

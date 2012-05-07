@@ -25,7 +25,7 @@
 #include "me_ct_step_turn.h"
 using namespace gwiz;
 
-#include <sbm/SBMotion.h>
+#include <sb/SBMotion.h>
 #include <vhcl_log.h>
 
 //////////////////////////////////////////////////////////////////////////////////

@@ -3596,7 +3596,7 @@
 			Name="python"
 			>
 			<File
-				RelativePath="..\src\sbm\SBPython.cpp"
+				RelativePath="..\src\sb\SBPython.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -3632,299 +3632,299 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBPython.h"
+				RelativePath="..\src\sb\SBPython.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBPythonClass.cpp"
+				RelativePath="..\src\sb\SBPythonClass.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBPythonClass.h"
+				RelativePath="..\src\sb\SBPythonClass.h"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="SB"
+			Name="sb"
 			>
 			<File
-				RelativePath="..\src\sbm\SBAnimationState.cpp"
+				RelativePath="..\src\sb\SBAnimationState.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBAnimationState.h"
+				RelativePath="..\src\sb\SBAnimationState.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBAnimationStateManager.cpp"
+				RelativePath="..\src\sb\SBAnimationStateManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBAnimationStateManager.h"
+				RelativePath="..\src\sb\SBAnimationStateManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBAnimationTransition.cpp"
+				RelativePath="..\src\sb\SBAnimationTransition.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBAnimationTransition.h"
+				RelativePath="..\src\sb\SBAnimationTransition.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBAttribute.cpp"
+				RelativePath="..\src\sb\SBAttribute.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBAttribute.h"
+				RelativePath="..\src\sb\SBAttribute.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBAttributeManager.cpp"
+				RelativePath="..\src\sb\SBAttributeManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBAttributeManager.h"
+				RelativePath="..\src\sb\SBAttributeManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBBehavior.cpp"
+				RelativePath="..\src\sb\SBBehavior.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBBehavior.h"
+				RelativePath="..\src\sb\SBBehavior.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBBmlProcessor.cpp"
+				RelativePath="..\src\sb\SBBmlProcessor.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBBmlProcessor.h"
+				RelativePath="..\src\sb\SBBmlProcessor.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBBoneBusManager.cpp"
+				RelativePath="..\src\sb\SBBoneBusManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBBoneBusManager.h"
+				RelativePath="..\src\sb\SBBoneBusManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBCharacter.cpp"
+				RelativePath="..\src\sb\SBCharacter.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBCharacter.h"
+				RelativePath="..\src\sb\SBCharacter.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBCollisionManager.cpp"
+				RelativePath="..\src\sb\SBCollisionManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBCollisionManager.h"
+				RelativePath="..\src\sb\SBCollisionManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBController.cpp"
+				RelativePath="..\src\sb\SBController.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBController.h"
+				RelativePath="..\src\sb\SBController.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBFaceDefinition.cpp"
+				RelativePath="..\src\sb\SBFaceDefinition.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBFaceDefinition.h"
+				RelativePath="..\src\sb\SBFaceDefinition.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBGestureMap.cpp"
+				RelativePath="..\src\sb\SBGestureMap.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBGestureMap.h"
+				RelativePath="..\src\sb\SBGestureMap.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBGestureMapManager.cpp"
+				RelativePath="..\src\sb\SBGestureMapManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBGestureMapManager.h"
+				RelativePath="..\src\sb\SBGestureMapManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBJoint.cpp"
+				RelativePath="..\src\sb\SBJoint.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBJoint.h"
+				RelativePath="..\src\sb\SBJoint.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBJointMap.cpp"
+				RelativePath="..\src\sb\SBJointMap.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBJointMap.h"
+				RelativePath="..\src\sb\SBJointMap.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBJointMapManager.cpp"
+				RelativePath="..\src\sb\SBJointMapManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBJointMapManager.h"
+				RelativePath="..\src\sb\SBJointMapManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBMotion.cpp"
+				RelativePath="..\src\sb\SBMotion.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBMotion.h"
+				RelativePath="..\src\sb\SBMotion.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBObject.cpp"
+				RelativePath="..\src\sb\SBObject.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBObject.h"
+				RelativePath="..\src\sb\SBObject.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBObserver.cpp"
+				RelativePath="..\src\sb\SBObserver.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBObserver.h"
+				RelativePath="..\src\sb\SBObserver.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBParseNode.cpp"
+				RelativePath="..\src\sb\SBParseNode.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBParseNode.h"
+				RelativePath="..\src\sb\SBParseNode.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBParser.cpp"
+				RelativePath="..\src\sb\SBParser.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBParser.h"
+				RelativePath="..\src\sb\SBParser.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBPawn.cpp"
+				RelativePath="..\src\sb\SBPawn.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBPawn.h"
+				RelativePath="..\src\sb\SBPawn.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBPhysicsManager.cpp"
+				RelativePath="..\src\sb\SBPhysicsManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBPhysicsManager.h"
+				RelativePath="..\src\sb\SBPhysicsManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBReach.cpp"
+				RelativePath="..\src\sb\SBReach.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBReach.h"
+				RelativePath="..\src\sb\SBReach.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBReachManager.cpp"
+				RelativePath="..\src\sb\SBReachManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBReachManager.h"
+				RelativePath="..\src\sb\SBReachManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBScene.cpp"
+				RelativePath="..\src\sb\SBScene.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBScene.h"
+				RelativePath="..\src\sb\SBScene.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBScript.cpp"
+				RelativePath="..\src\sb\SBScript.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBScript.h"
+				RelativePath="..\src\sb\SBScript.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBService.cpp"
+				RelativePath="..\src\sb\SBService.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBService.h"
+				RelativePath="..\src\sb\SBService.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBServiceManager.cpp"
+				RelativePath="..\src\sb\SBServiceManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBServiceManager.h"
+				RelativePath="..\src\sb\SBServiceManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBSimulationManager.cpp"
+				RelativePath="..\src\sb\SBSimulationManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBSimulationManager.h"
+				RelativePath="..\src\sb\SBSimulationManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBSkeleton.cpp"
+				RelativePath="..\src\sb\SBSkeleton.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBSkeleton.h"
+				RelativePath="..\src\sb\SBSkeleton.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBSteerAgent.cpp"
+				RelativePath="..\src\sb\SBSteerAgent.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBSteerAgent.h"
+				RelativePath="..\src\sb\SBSteerAgent.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBSteerManager.cpp"
+				RelativePath="..\src\sb\SBSteerManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBSteerManager.h"
+				RelativePath="..\src\sb\SBSteerManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBSubject.cpp"
+				RelativePath="..\src\sb\SBSubject.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SBSubject.h"
+				RelativePath="..\src\sb\SBSubject.h"
 				>
 			</File>
 		</Filter>

@@ -26,7 +26,7 @@
 #define ME_CT_GAZE_H
 
 #include <sk/sk_skeleton.h>
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 
 #include "gwiz_math.h"
 #include "me_ct_gaze_joint.h"

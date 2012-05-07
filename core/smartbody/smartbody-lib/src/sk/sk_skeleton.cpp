@@ -27,7 +27,7 @@
 # include <sk/sk_skeleton.h>
 # include <sk/sk_posture.h>
 #include <queue>
-#include <sbm/SBJoint.h>
+#include <sb/SBJoint.h>
 
 //============================ SkSkeleton ============================
 

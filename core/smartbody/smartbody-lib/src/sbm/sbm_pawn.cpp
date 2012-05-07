@@ -24,12 +24,12 @@
 
 #include "vhcl.h"
 #include <sbm/mcontrol_util.h>
-#include <sbm/SBScene.h>
-#include <sbm/SBPythonClass.h>
-#include <sbm/SBBoneBusManager.h>
-#include <sbm/SBSteerManager.h>
-#include <sbm/SBPhysicsManager.h>
-#include <sbm/SBCollisionManager.h>
+#include <sb/SBScene.h>
+#include <sb/SBPythonClass.h>
+#include <sb/SBBoneBusManager.h>
+#include <sb/SBSteerManager.h>
+#include <sb/SBPhysicsManager.h>
+#include <sb/SBCollisionManager.h>
 #include "sbm_pawn.hpp"
 
 #ifdef __APPLE__
@@ -60,7 +60,7 @@
 #include "me_utilities.hpp"
 #include "sr/sr_model.h"
 #include "sr/sr_euler.h"
-#include <sbm/SBSkeleton.h>
+#include <sb/SBSkeleton.h>
 
 using namespace std;
 

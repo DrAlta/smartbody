@@ -1,5 +1,5 @@
 #include "ParameterVisualization.h"
-#include <sbm/SBCharacter.h>
+#include <sb/SBCharacter.h>
 
 ParameterVisualization::ParameterVisualization(bool isInteractive, int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* group) : Fl_Group(x, y, w, h, name), stateData(s), paramGroup(group)
 {

@@ -3,8 +3,8 @@
 #include <sbm/gwiz_math.h>
 #include "SbmPhysicsSimODE.h"
 #include <ode/collision.h>
-#include <sbm/SBCollisionManager.h>
-#include <sbm/SBScene.h>
+#include <sb/SBCollisionManager.h>
+#include <sb/SBScene.h>
 
 SrVec SbmTransform::localToGlobal( const SrVec& vLocal )
 {

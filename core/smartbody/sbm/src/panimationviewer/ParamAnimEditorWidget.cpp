@@ -24,9 +24,9 @@
 #include "ParamAnimBlock.h"
 #include "ParamAnimStateEditor.h"
 #include "ParamAnimTransitionEditor.h"
-#include <sbm/SBAnimationState.h>
-#include <sbm/SBAnimationStateManager.h>
-#include <sbm/SBScene.h>
+#include <sb/SBAnimationState.h>
+#include <sb/SBAnimationStateManager.h>
+#include <sb/SBScene.h>
 
 ParamAnimEditorWidget::ParamAnimEditorWidget(Fl_Group* g, int x, int y, int w, int h, char* name) : EditorWidget(x, y, w, h, name)
 {

@@ -34,7 +34,7 @@
 #include <me/me_controller_tree_root.hpp>
 #include <me/me_ct_channel_writer.hpp>
 #include <me/me_ct_curve_writer.hpp>
-#include <sbm/SBObject.h>
+#include <sb/SBObject.h>
 #include <SteerLib.h>
 
 #include "bonebus.h"
