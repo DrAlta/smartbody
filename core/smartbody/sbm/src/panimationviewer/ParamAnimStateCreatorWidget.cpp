@@ -47,8 +47,9 @@ PAStateCreator::~PAStateCreator()
 {
 }
 
-void PAStateCreator::setInfo(bool isCreateMode, const std::string& stateName)
+void PAStateCreator::setInfo(bool createModeFlag, const std::string& stateName)
 {
+	isCreateMode = createModeFlag;
 	if (isCreateMode)
 	{
 		inputStateName->value(getUniqueStateName("state").c_str());
@@ -101,6 +102,7 @@ void PAStateCreator::setInfo(bool isCreateMode, const std::string& stateName)
 
 void PAStateCreator::loadMotions()
 {
+	animationList->clear();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::vector<std::string> motionNames = scene->getMotionNames();
 	std::map<std::string, SkMotion*>::iterator iter;
@@ -229,6 +231,20 @@ void PAStateCreator::createState(Fl_Widget* widget, void* data)
 				animState->addMotion(creator->stateAnimationList->text(i + 1), 0, 0, 0);
 			}
 		}
+
+		// Insert 2 corresponding points by default
+		state = stateManager->getState(stateName);
+		std::vector<std::string> motionNames;
+		std::vector<double> startingPoints;
+		std::vector<double> endingPoints;
+		for (int i = 0; i < state->getNumMotions(); i++)
+		{
+			motionNames.push_back(state->getMotionName(i));
+			startingPoints.push_back(0);
+			endingPoints.push_back(state->motions[i]->duration());
+		}
+		state->addCorrespondencePoints(motionNames, startingPoints);
+		state->addCorrespondencePoints(motionNames, endingPoints);
 	}
 	else // edit mode
 	{

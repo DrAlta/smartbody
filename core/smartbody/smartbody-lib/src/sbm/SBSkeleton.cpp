@@ -92,7 +92,7 @@ std::vector<std::string> SBSkeleton::getJointNames()
 	const std::vector<SkJoint*>& alljoints = joints();
 	for (size_t i = 0; i < alljoints.size(); i++)
 	{
-		jointNames.push_back(alljoints[i]->getName());
+		jointNames.push_back(alljoints[i]->name());
 	}
 	return jointNames;
 }

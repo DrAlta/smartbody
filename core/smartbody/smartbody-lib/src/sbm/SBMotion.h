@@ -45,6 +45,7 @@ class SBMotion : public SkMotion
 		float getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);
 		std::vector<float> getJointTransition(SBJoint* joint, float startTime, float endTime);
 
+		double getFrameRate();
 		double getDuration();
 		double getTimeStart();
 		double getTimeReady();

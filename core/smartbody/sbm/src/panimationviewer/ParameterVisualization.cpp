@@ -45,9 +45,18 @@ void ParameterVisualization::draw()
 		fl_line(xmin, centerY + i * gridSizeY, xmax, centerY + i * gridSizeY);
 
 	// draw parameters
+	bool highLight = false;
+	if (selectedParameters.size() == stateData->state->getNumParameters())
+		highLight = true;
+
 	fl_color(FL_GREEN);
 	for (int i = 0; i < stateData->state->getNumParameters(); i++)
 	{
+		if (highLight && selectedParameters[i])
+			fl_color(FL_RED);
+		else
+			fl_color(FL_GREEN);
+
 		int recX, recY, recW, recH;
 		SrVec vec =  stateData->state->getVec(i);
 		int x = 0;
@@ -103,6 +112,11 @@ void ParameterVisualization::draw()
 	fl_color(FL_BLACK);
 	for (int i = 0; i < stateData->state->getNumParameters(); i++)
 	{
+		if (highLight && selectedParameters[i])
+			fl_color(FL_BLUE);
+		else
+			fl_color(FL_BLACK);
+
 		SrVec vec = stateData->state->getVec(i);
 		int x = int(vec.x / scaleX);
 		int y = int(vec.y / scaleY);
@@ -113,7 +127,7 @@ void ParameterVisualization::draw()
 		Fl_Fontsize prevSize = fl_size();
 
 		fl_font(FL_COURIER,12);		
-		fl_draw(buff, centerX + x, centerY - 10);
+		fl_draw(buff, centerX + x, centerY - y - 10);
 		// restore the previous font size
 		fl_font(prevFont,prevSize);
 	}
@@ -247,3 +261,9 @@ void ParameterVisualization::setSelectedTriangles(std::vector<bool>& selected)
 	redraw();
 }
 
+
+void ParameterVisualization::setSelectedParameters(std::vector<bool>& selected)
+{
+	selectedParameters = selected;
+	redraw();
+}

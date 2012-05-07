@@ -403,6 +403,12 @@ void Parameter3DVisualization::setSelectedTetrahedrons(std::vector<bool>& select
 	redraw();
 }
 
+void Parameter3DVisualization::setSelectedParameters(std::vector<bool>& selected)
+{
+	selectedParameters = selected;
+	redraw();
+}
+
 void Parameter3DVisualization::drawTetrahedrons()
 {
 	SrVec scale = determineScale();
@@ -410,8 +416,18 @@ void Parameter3DVisualization::drawTetrahedrons()
 	glColor3f(1.0f, 1.0f, 0.0f);
 	glPointSize(5.0f);
 	glBegin(GL_POINTS);
+
+	bool highLight = false;
+	if (stateData->state->getNumParameters() == selectedParameters.size())
+		highLight = true;
+
 	for (unsigned int i = 0; i < stateData->state->getParameters().size(); i++)
 	{
+		if (highLight && selectedParameters[i])
+			glColor3f(1.0f, 0.0f, 0.0f);
+		else
+			glColor3f(1.0f, 1.0f, 0.0f);
+
 		SrVec& param = stateData->state->getParameters()[i];
 		SrVec scaledParam;
 		for (int i = 0; i < 3; i++)
@@ -557,7 +573,8 @@ void Parameter3DVisualization::drawParameter()
 	curStateData->state->getParametersFromWeights(vec.x, vec.y, vec.z, curStateData->weights);	
 	for (int s = 0; s < 3; s++)
 		vec[s] = vec[s] * scale[s];
-	glColor3f(1.0f, 0.0f, 0.0f);
+
+	fl_color(FL_RED);
 	glPointSize(7.0f);
 	glBegin(GL_POINTS);
 		glVertex(vec);

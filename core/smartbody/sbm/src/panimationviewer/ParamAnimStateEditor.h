@@ -37,6 +37,8 @@ class PanimationWindow;
 class ParameterVisualization;
 class Parameter3DVisualization;
 class ParamAnimEditorWidget;
+class PAParameterEditor;
+class PAAutoFootStepsEditor;
 
 class PAStateEditor : public Fl_Group
 {
@@ -51,10 +53,12 @@ class PAStateEditor : public Fl_Group
 		static void changeStateList(Fl_Widget* widget, void* data);
 		static void addStateTimeMark(Fl_Widget* widget, void* data);
 		static void addFootStepMark(Fl_Widget* widget, void* data);
+		static void undoFootStepMark(Fl_Widget* widget, void* data);
 		static void removeStateTimeMark(Fl_Widget* widget, void* data);
 		static void snapTimeMark(Fl_Widget* widget, void* data);
 		static void snapStartTimeMark(Fl_Widget* widget, void* data);
 		static void snapEndTimeMark(Fl_Widget* widget, void* data);
+		static void snapSliderTimeMark(Fl_Widget* widget, void* data);
 		static void updateStateTimeMark(Fl_Widget* widget, void* data);
 		static void updateMaxTime(Fl_Widget* widget, void* data);
 		static void updateMinTime(Fl_Widget* widget, void* data);
@@ -64,10 +68,15 @@ class PAStateEditor : public Fl_Group
 		static void removeShape(Fl_Widget* widget, void* data);
 		static void selectShape(Fl_Widget* widget, void* data);
 		static void updateParameters(Fl_Widget* widget, void* data);
+		static void editParameterCb(Fl_Widget* widget, void* data);
 		static void scrub(Fl_Widget* widget, void* data);
 		static void playmotion(Fl_Widget* widget, void* data);
 		void updateCorrespondenceMarks(PAState* state);
 		void refresh();
+
+		// helper functions
+		std::vector<std::string> getSelectedMotions();
+		PAState* getCurrentState();
 
 	public:
 		PanimationWindow* paWindow;
@@ -87,20 +96,25 @@ class PAStateEditor : public Fl_Group
 		Fl_Button*		snapMark;
 		Fl_Button*		snapStartMark;
 		Fl_Button*		snapEndMark;
+		Fl_Button*		snapSliderMark;
 		Fl_Button*		updateMark;
 		Fl_Button*		buttonSave;
-		Fl_Button*		autoFootStepMarks;
+		Fl_Button*		buttonAutoFootSetpsEditor;
+		Fl_Button*		buttonUndoAutoFootSteps;
 		Fl_Float_Input*		minTimeInput;
 		Fl_Float_Input*		maxTimeInput;
 		Fl_Float_Input* inputParameterX;
 		Fl_Float_Input* inputParameterY;
 		Fl_Float_Input* inputParameterZ;
+		Fl_Button*		buttonEditParameter;
 		Fl_Value_Slider* sliderScrub;
 		Fl_Button* buttonPlay;
 		Fl_Choice*		choiceAutoParameter;
 		ParamAnimEditorWidget* stateTimeMarkWidget;
 		nle::NonLinearEditorModel* stateEditorNleModel;
 		PAStateCreator* creator;
+		PAParameterEditor* parameterEditor;
+		PAAutoFootStepsEditor* autoFootStepsEditor;
 		std::string lastSelectedMotion;
 
 		Fl_Group*				visualizationGroup;
@@ -110,6 +124,8 @@ class PAStateEditor : public Fl_Group
 
 		int lastNameIndex;
 		bool isPlaying;
+
+		std::vector<std::vector<double>> previousKeys;
 };
 
 #endif

@@ -60,6 +60,7 @@ PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_
 		resetCharacter->callback(reset, this);
 
 		tabGroup = new Fl_Tabs(tabGroupX, tabGroupY, tabGroupW, tabGroupH);
+		tabGroup->callback(changeTabGroup, this);
 		tabGroup->begin();
 			stateEditor = new PAStateEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
 			stateEditor->begin();
@@ -283,8 +284,8 @@ void PanimationWindow::refreshUI(Fl_Widget* widget, void* data)
 	PanimationWindow* window = (PanimationWindow*) data;
 	if (window->tabGroup->value() == window->stateEditor)
 		window->stateEditor->refresh();
-//	if (window->tabGroup->value() == window->scriptEditor)
-//		window->scriptEditor->refresh();
+	if (window->tabGroup->value() == window->runTimeEditor)
+		window->runTimeEditor->initializeRunTimeEditor();
 }
 
 void PanimationWindow::loadCharacters(Fl_Choice* characterList)
@@ -310,6 +311,11 @@ void PanimationWindow::reset(Fl_Widget* widget, void* data)
 	std::stringstream resetPosCommand;
 	resetPosCommand << "set char " << charName << " world_offset x 0 z 0 h 0 p 0 r 0";
 	execCmd(window, resetPosCommand.str());
+}
+
+void PanimationWindow::changeTabGroup(Fl_Widget* widget, void* data)
+{
+	refreshUI(widget, data);
 }
 
 PanimationWindow* PanimationWindow::getPAnimationWindow( Fl_Widget* w )
