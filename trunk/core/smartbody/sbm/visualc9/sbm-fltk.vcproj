@@ -535,6 +535,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\panimationviewer\ParamAnimAutoMarkingEditor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimAutoMarkingEditor.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\panimationviewer\ParamAnimBlock.cpp"
 				>
 			</File>
@@ -548,6 +556,14 @@
 			</File>
 			<File
 				RelativePath="..\src\panimationviewer\ParamAnimEditorWidget.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimParameterEditor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimParameterEditor.h"
 				>
 			</File>
 			<File

@@ -43,15 +43,6 @@ void SBAnimationState::addCorrespondencePoints(const std::vector<std::string>& m
 		return;
 	}	
 	int num = motionNames.size();
-	// first time
-// 	if (keys.size() == 0)
-// 	{
-// 		for (int i = 0; i < num; i++)
-// 		{
-// 			std::vector<double> keyVec;
-// 			keys.push_back(keyVec);
-// 		}
-// 	}
 
 	// find the right place to insert the keys
 	int insertPosition = -1;
@@ -157,26 +148,43 @@ bool SBAnimationState::addSkMotion(const std::string& motion)
 	if (skMotion)
 	{
 		motions.push_back(skMotion);
-
-
-		// add a zero-correspondence point for this new motion
-		int numPoints = 0;
-		if (keys.size() > 0)
-			numPoints  = keys[keys.size() - 1].size();
-		std::vector<double> keyVec;
-		if (numPoints > 0)
+/*		
+		// adding two correspondence points when the first motion got inserted
+		if (motions.size() == 1)
 		{
-			keyVec.resize(numPoints);
-			// uniformly space the correspondence points
-			double time = skMotion->duration();
-			double step = time / double(numPoints);
-			for (int i = 0; i < numPoints; i++)
-			{
-				keyVec[i] = double(i) * step;
-			}
+			std::vector<double> keyVec;
+			keyVec.resize(2);
+			keyVec[0] = 0.0f;
+			keyVec[1] = skMotion->duration();
+			keys.push_back(keyVec);
 		}
-		keys.push_back(keyVec);
-	
+		else
+*/
+		{
+			// add a zero-correspondence point for this new motion
+			int numPoints = 0;
+			if (keys.size() > 0)
+				numPoints  = keys[0].size();
+			std::vector<double> keyVec;
+			if (numPoints > 0)
+			{
+				keyVec.resize(numPoints);
+				double duration = skMotion->duration();
+				if (numPoints >= 2)
+				{
+					keyVec[0] = 0.0f;
+					keyVec[numPoints - 1] = duration;
+				}
+				// uniformly space the correspondence points
+				double step = duration / double(numPoints);
+				for (int i = 1; i < numPoints - 1; i++)
+				{
+					keyVec[i] = double(i) * step;
+				}
+			}
+			keys.push_back(keyVec);
+		}
+
 		getParameters().push_back(SrVec());
 	}
 	else

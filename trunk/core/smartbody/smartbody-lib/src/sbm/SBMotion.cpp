@@ -232,7 +232,7 @@ float SBMotion::getJointSpeed(SBJoint* joint, float startTime, float endTime)
 	int minFrameId = int(startTime / dt);
 	int maxFrameId = int(endTime / dt);
 	float distance = 0;
-	for (int i = minFrameId; i < maxFrameId - 1; i++)
+	for (int i = minFrameId; i < maxFrameId + 1; i++)
 	{
 		apply_frame(i);
 		connected_skeleton()->update_global_matrices();
@@ -274,7 +274,7 @@ float SBMotion::getJointSpeedAxis(SBJoint* joint, const std::string& axis, float
 	int minFrameId = int(startTime / dt);
 	int maxFrameId = int(endTime / dt);
 	float distance = 0;
-	for (int i = minFrameId; i < maxFrameId - 1; i++)
+	for (int i = minFrameId; i < maxFrameId + 1; i++)
 	{
 		apply_frame(i);
 		connected_skeleton()->update_global_matrices();
@@ -305,7 +305,7 @@ float SBMotion::getJointAngularSpeed(SBJoint* joint, float startTime, float endT
 	int minFrameId = int(startTime / dt);
 	int maxFrameId = int(endTime / dt);
 	float diffRotY = 0.0f;
-	for (int i = minFrameId; i < maxFrameId - 1; i++)
+	for (int i = minFrameId; i < maxFrameId + 1; i++)
 	{
 		apply_frame(i);
 		connected_skeleton()->update_global_matrices();
@@ -357,7 +357,7 @@ float SBMotion::getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis
 	int minFrameId = int(startTime / dt);
 	int maxFrameId = int(endTime / dt);
 	float diffRot = 0.0f;
-	for (int i = minFrameId; i < maxFrameId - 1; i++)
+	for (int i = minFrameId; i < maxFrameId + 1; i++)
 	{
 		apply_frame(i);
 		connected_skeleton()->update_global_matrices();
@@ -598,6 +598,12 @@ double SBMotion::getTimeStop()
 double SBMotion::getDuration()
 {
 	return duration();
+}
+
+
+double SBMotion::getFrameRate()
+{
+	return getDuration() / double(getNumFrames() - 1);
 }
 
 void SBMotion::addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly)

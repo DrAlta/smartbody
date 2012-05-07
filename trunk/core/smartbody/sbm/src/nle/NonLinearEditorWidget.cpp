@@ -1178,37 +1178,46 @@ int EditorWidget::handle(int event)
 							(mousey >= minY && mousey <= maxY))
 						{
 							mark->setSelected(!mark->isSelected());
-							if (mark->isSelected() && mark->isInterval())
+							if (mark->isSelected())
 							{
-								// how to manipulate this mark? 
-								// first third = start time
-								// middle third = move entire mark
-								// last third = end time
-								int denom = maxX - minX;
-								if (denom != 0)
+								if  (mark->isInterval())
 								{
-									int numerator = mousex - minX;
-									float d = (float) denom;
-									float n = (float) numerator;
-									float param = n / d;
-									if (param < .33)
+									// how to manipulate this mark? 
+									// first third = start time
+									// middle third = move entire mark
+									// last third = end time
+									int denom = maxX - minX;
+									if (denom != 0)
 									{
-										mark->setSelectedStartTime(true);
-										mark->setSelectedEndTime(false);
-										mark->setSelectedBothTime(false);
+										int numerator = mousex - minX;
+										float d = (float) denom;
+										float n = (float) numerator;
+										float param = n / d;
+										if (param < .33)
+										{
+											mark->setSelectedStartTime(true);
+											mark->setSelectedEndTime(false);
+											mark->setSelectedBothTime(false);
+										}
+										else if (param > .67)
+										{
+											mark->setSelectedStartTime(false);
+											mark->setSelectedEndTime(true);
+											mark->setSelectedBothTime(false);
+										}
+										else
+										{
+											mark->setSelectedStartTime(false);
+											mark->setSelectedEndTime(false);
+											mark->setSelectedBothTime(true);
+										}
 									}
-									else if (param > .67)
-									{
-										mark->setSelectedStartTime(false);
-										mark->setSelectedEndTime(true);
-										mark->setSelectedBothTime(false);
-									}
-									else
-									{
-										mark->setSelectedStartTime(false);
-										mark->setSelectedEndTime(false);
-										mark->setSelectedBothTime(true);
-									}
+								}
+								else
+								{
+									mark->setSelectedStartTime(false);
+									mark->setSelectedEndTime(false);
+									mark->setSelectedBothTime(true);
 								}
 							}
 

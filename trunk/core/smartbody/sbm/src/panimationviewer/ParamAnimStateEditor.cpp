@@ -28,9 +28,11 @@
 #include <sbm/SBMotion.h>
 #include <FL/Fl_File_Chooser.H>
 #include "ParamAnimStateCreatorWidget.h"
+#include "ParamAnimParameterEditor.h"
 #include "ParameterVisualization.h"
 #include "Parameter3DVisualization.h"
 #include "ParamAnimEditorWidget.h"
+#include "ParamAnimAutoMarkingEditor.h"
 
 PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
 {
@@ -87,6 +89,10 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 			inputParameterY->deactivate();
 			inputParameterZ->deactivate();
 
+			buttonEditParameter = new Fl_Button(csx + 300, csy + 150, 60, 20, "Edit");
+			buttonEditParameter->deactivate();
+			buttonEditParameter->callback(editParameterCb, this);
+
 			buttonPlay = new Fl_Button(csx + 380, csy + 150, 30, 20, "@>");
 			buttonPlay->callback(playmotion, this);
 			buttonPlay->deactivate();
@@ -100,29 +106,33 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 		stateSelectionGroup->box(FL_BORDER_BOX);
 
 		int esx = xDis + x;
-		int esy = h / 3  + yDis + y;
+		int esy = h / 3  + y;
 		Fl_Group* buttonGroup = new Fl_Group(esx, esy, w - 2 * xDis, 3 * yDis);
 		buttonGroup->begin();
-			addMark = new Fl_Button(xDis + esx, yDis + esy, 50, 2 * yDis, "+");
+			addMark = new Fl_Button(xDis + esx, esy, 50, 2 * yDis, "+");
 			addMark->callback(addStateTimeMark, this);
-			removeMark = new Fl_Button(xDis + 50 + esx, yDis + esy, 50, 2 * yDis, "-");
+			removeMark = new Fl_Button(xDis + 50 + esx, esy, 50, 2 * yDis, "-");
 			removeMark->callback(removeStateTimeMark, this);
-			snapMark = new Fl_Button(xDis + 100 + esx, yDis + esy, 50, 2 * yDis, "Snap");
+			snapMark = new Fl_Button(xDis + 100 + esx, esy, 100, 2 * yDis, "SnapScrub");
 			snapMark->callback(snapTimeMark, this);
-			snapStartMark = new Fl_Button(xDis + 150 + esx, yDis + esy, 50, 2 * yDis, "@|< Snap");
+			snapSliderMark = new Fl_Button(xDis + 200 + esx, esy, 100, 2 * yDis, "SnapSlider");
+			snapSliderMark->callback(snapSliderTimeMark, this);
+			snapStartMark = new Fl_Button(xDis + 300 + esx, esy, 50, 2 * yDis, "@|< Snap");
 			snapStartMark->callback(snapStartTimeMark, this);
-			snapEndMark = new Fl_Button(xDis + 200 + esx, yDis + esy, 50, 2 * yDis, "Snap @>|");
+			snapEndMark = new Fl_Button(xDis + 350 + esx, esy, 50, 2 * yDis, "Snap @>|");
 			snapEndMark->callback(snapEndTimeMark, this);
-			buttonSave = new Fl_Button(xDis + 300 + esx, yDis + esy, 100, 2 * yDis, "Save");
+			buttonAutoFootSetpsEditor = new Fl_Button(xDis + 500 + esx, esy, 100, 2 * yDis, "Auto Footsteps");
+			buttonAutoFootSetpsEditor->callback(addFootStepMark, this);
+			buttonUndoAutoFootSteps = new Fl_Button(xDis + 600 + esx, esy, 60, 2 * yDis, "Undo");
+			buttonUndoAutoFootSteps->callback(undoFootStepMark, this);
+			buttonUndoAutoFootSteps->deactivate();
+
+			buttonSave = new Fl_Button(xDis + esx, 2 * yDis + esy, 100, 2 * yDis, "Save");
 			buttonSave->callback(save, this);
-			minTimeInput = new Fl_Float_Input(xDis + 580 + esx, yDis + esy, 60, 2 * yDis, "Show Times");
+			minTimeInput = new Fl_Float_Input(xDis + 200 + esx, 2 * yDis + esy, 60, 2 * yDis, "Show Times");
 			minTimeInput->callback(updateMinTime, this);
-			maxTimeInput = new Fl_Float_Input(xDis + 640 + esx, yDis + esy, 60, 2 * yDis, "");
+			maxTimeInput = new Fl_Float_Input(xDis + 260 + esx, 2 * yDis + esy, 60, 2 * yDis, "");
 			maxTimeInput->callback(updateMaxTime, this);
-#ifdef AUTO_FOOTSTEP_MARK
-			autoFootStepMarks = new Fl_Button(15 * xDis + 400+ esx, yDis + esy, 100, 2 * yDis, "Auto Footsteps");
-			autoFootStepMarks->callback(addFootStepMark, this);
-#endif
 		buttonGroup->end();
 
 		editStateTimeMarkGroup = new Fl_Scroll(csx, esy + 3 * yDis + 10, workspaceWidth, workspaceHeight / 3 - 5 * yDis - 10);
@@ -149,6 +159,8 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 	stateTimeMarkWidget->setup();
 
 	creator = NULL;
+	parameterEditor = NULL;
+	autoFootStepsEditor = NULL;
 	lastSelectedMotion = "";
 	triangleVisualization = NULL;
 	tetraVisualization = NULL;
@@ -454,17 +466,40 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 	editor->paWindow->redraw();
 }
 
-void PAStateEditor::addFootStepMark( Fl_Widget* widget, void* data )
+void PAStateEditor::addFootStepMark(Fl_Widget* widget, void* data)
 {
-	LOG("Automatically add foot step marks");
 	PAStateEditor* editor = (PAStateEditor*) data;
+	if (!editor->autoFootStepsEditor)
+	{
+		editor->autoFootStepsEditor = new PAAutoFootStepsEditor(editor, editor->paWindow->x() + 50, editor->paWindow->y() + 50, 500, 500);
+	}
+	editor->autoFootStepsEditor->show();	
+}
 
+
+void PAStateEditor::undoFootStepMark(Fl_Widget* widget, void* data)
+{
+	PAStateEditor* editor = (PAStateEditor*) data;	
+
+	PAState* currentState = editor->getCurrentState();
+
+	currentState->keys.clear();
+	currentState->keys.resize(currentState->getNumMotions());
+	for (int i = 0; i < currentState->getNumMotions(); i++)
+	{
+		currentState->keys[i].resize(editor->previousKeys[i].size());
+		currentState->keys[i] = editor->previousKeys[i];
+	}
+
+	editor->refresh();
+	editor->buttonUndoAutoFootSteps->deactivate();
 }
 
 void PAStateEditor::updateMaxTime(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	editor->stateTimeMarkWidget->setViewableTimeEnd(atof(editor->maxTimeInput->value()));
+	editor->stateTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
 
@@ -472,6 +507,7 @@ void PAStateEditor::updateMinTime(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor* ) data;
 	editor->stateTimeMarkWidget->setViewableTimeStart(atof(editor->minTimeInput->value()));
+	editor->stateTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
 
@@ -717,6 +753,56 @@ void PAStateEditor::snapEndTimeMark(Fl_Widget* widget, void* data)
 	}
 }
 
+void PAStateEditor::snapSliderTimeMark(Fl_Widget* widget, void* data)
+{
+	PAStateEditor* editor = (PAStateEditor*) data;
+
+	std::string stateName = editor->stateList->text();
+
+	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	if (!state)
+		return;
+
+	// which correspondence point has been selected?
+	int keyIndex = -1;
+	CorrespondenceMark* attachedMark = NULL;
+	int motionIndex = -1;
+	for (int t = 0; t < editor->stateEditorNleModel->getNumTracks(); t++)
+	{
+		nle::Track* track = editor->stateEditorNleModel->getTrack(t);
+		for (int b = 0; b < track->getNumBlocks(); b++)
+		{
+			nle::Block* block = track->getBlock(b);
+			for (int m = 0; m < block->getNumMarks(); m++)
+			{
+				nle::Mark* mark = block->getMark(m);
+				if (mark->isSelected())
+				{
+					keyIndex = m;
+					motionIndex = t;
+					break;
+				}
+			}
+		}
+	}
+	if (keyIndex > -1 && keyIndex < state->getNumKeys())
+	{
+		// get the slider time
+		double sliderTime = editor->sliderScrub->value();
+		state->setCorrespondencePoints(motionIndex, keyIndex, sliderTime);
+		editor->updateCorrespondenceMarks(state);
+
+		editor->stateTimeMarkWidget->setup();
+		editor->selectStateAnimations(editor->stateAnimationList, editor);
+		// reselect the equivalent mark
+		editor->stateTimeMarkWidget->getModel()->getTrack(motionIndex)->getBlock(0)->getMark(keyIndex)->setSelected(true);
+
+		editor->sliderScrub->value(sliderTime);
+		editor->scrub(editor->sliderScrub, editor);
+		editor->paWindow->redraw();
+	}
+}
+
 void PAStateEditor::updateCorrespondenceMarks(PAState* state)
 {
 	for (int i = 0; i < stateEditorNleModel->getNumTracks(); i++)
@@ -775,17 +861,36 @@ void PAStateEditor::refresh()
 	loadStates();
 	stateList->value(origStateValue);
 	changeStateList(stateList, this);
+	selectStateAnimations(stateAnimationList, this);
 }
+
+std::vector<std::string> PAStateEditor::getSelectedMotions()
+{
+	std::vector<std::string> selectedMotions;
+
+	for (int i = 0; i < stateAnimationList->size(); i++)
+	{
+		if (stateAnimationList->selected(i+1))
+		{
+			selectedMotions.push_back(stateAnimationList->text(i + 1));
+		}
+	}
+	return selectedMotions;
+}
+
+PAState* PAStateEditor::getCurrentState()
+{
+	std::string stateName = stateList->text();
+	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	return state;
+}
+
 
 void PAStateEditor::save(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 
 	//std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
-
-
-
-
 	const char* stateFileName = fl_file_chooser("State file:", "*.py", NULL);
 	if (!stateFileName)
 		return;
@@ -945,13 +1050,16 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 	PAStateEditor* editor = (PAStateEditor*) data;
 
 	std::vector<std::string> selectedMotions;
-
+	std::vector<bool> boolSelectedMotions;
 	for (int i = 0; i < editor->stateAnimationList->size(); i++)
 	{
 		if (editor->stateAnimationList->selected(i+1))
 		{
+			boolSelectedMotions.push_back(true);
 			selectedMotions.push_back(editor->stateAnimationList->text(i + 1));
 		}
+		else
+			boolSelectedMotions.push_back(false);
 	}
 
 	const char* stateText = editor->stateList->text();
@@ -1091,6 +1199,15 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 		editor->inputParameterZ->deactivate();
 	}
 
+	if (selectedMotions.size() > 0 && !state0D)
+	{
+		editor->buttonEditParameter->activate();
+	}
+	else
+	{
+		editor->buttonEditParameter->deactivate();
+	}
+
 	if ((selectedMotions.size() == 3 && state2D) ||
 		(selectedMotions.size() == 4 && state3D))
 	
@@ -1101,7 +1218,14 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 	{
 		editor->shapeAdd->deactivate();
 	}
-
+	if (editor->triangleVisualization)
+	{
+		editor->triangleVisualization->setSelectedParameters(boolSelectedMotions);
+	}
+	if (editor->tetraVisualization)
+	{
+		editor->tetraVisualization->setSelectedParameters(boolSelectedMotions);
+	}
 }
 
 void PAStateEditor::addShape(Fl_Widget* widget, void* data)
@@ -1210,20 +1334,8 @@ void PAStateEditor::selectShape(Fl_Widget* widget, void* data)
 void PAStateEditor::updateParameters(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
-
-	std::vector<std::string> selectedMotions;
-
-	for (int i = 0; i < editor->stateAnimationList->size(); i++)
-	{
-		if (editor->stateAnimationList->selected(i+1))
-		{
-			selectedMotions.push_back(editor->stateAnimationList->text(i + 1));
-		}
-	}
-
-	const char* stateText = editor->stateList->text();
-	PAState* currentState = NULL;
-	currentState = mcuCBHandle::singleton().lookUpPAState(stateText);
+	std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
+	PAState* currentState = editor->getCurrentState();
 	if (!currentState)
 		return;
 
@@ -1253,19 +1365,20 @@ void PAStateEditor::updateParameters(Fl_Widget* widget, void* data)
 	}
 }
 
+void PAStateEditor::editParameterCb(Fl_Widget* widget, void* data)
+{
+	PAStateEditor* editor = (PAStateEditor*) data;
+	if (!editor->parameterEditor)
+	{
+		editor->parameterEditor = new PAParameterEditor(editor, editor->paWindow->x() + 50, editor->paWindow->y() + 50, 300, 300);
+	}
+	editor->parameterEditor->show();	
+}
+
 void PAStateEditor::scrub(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
-
-	std::vector<std::string> selectedMotions;
-
-	for (int i = 0; i < editor->stateAnimationList->size(); i++)
-	{
-		if (editor->stateAnimationList->selected(i+1))
-		{
-			selectedMotions.push_back(editor->stateAnimationList->text(i + 1));
-		}
-	}
+	std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
 
 	if (selectedMotions.size() == 1)
 	{

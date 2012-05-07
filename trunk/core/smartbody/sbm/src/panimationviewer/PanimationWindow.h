@@ -103,6 +103,7 @@ class PanimationWindow : public Fl_Double_Window, public GenericViewer
 		static void loadTransitions(Fl_Choice* transitionList);
 		static void createNewTransition(Fl_Widget* widget, void* data);
 		static void changeTransitionList(Fl_Widget* widget, void* data);
+		static void changeTabGroup(Fl_Widget* widget, void* data);
 
 	public:
 		std::string lastCommand;

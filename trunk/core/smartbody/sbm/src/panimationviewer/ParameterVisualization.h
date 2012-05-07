@@ -23,6 +23,7 @@ class ParameterVisualization : public Fl_Group
 		void updateStateData(float param1, float param2);
 
 		void setSelectedTriangles(std::vector<bool>& selected);
+		void setSelectedParameters(std::vector<bool>& selected);
 
 	private:
 		void getBound(int ptX, int ptY, int& x, int& y, int& w, int& h);
@@ -44,6 +45,7 @@ class ParameterVisualization : public Fl_Group
 		ParameterGroup* paramGroup;
 		bool interactiveMode;
 		std::vector<bool> selectedTriangles;
+		std::vector<bool> selectedParameters;
 };
 
 #endif
