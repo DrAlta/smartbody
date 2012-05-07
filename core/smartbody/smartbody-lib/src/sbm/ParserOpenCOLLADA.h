@@ -37,10 +37,14 @@ class ParserOpenCOLLADA
 	public:
 		static DOMNode* getNode(std::string nodeName, DOMNode* node);
 		static DOMNode* getNode(std::string nodeName, std::string fileName);
+		static std::string getNodeAttributeString(DOMNode* node, XMLCh* attrName);
+		static int         getNodeAttributeInt(DOMNode* node, XMLCh* attrName);
 		static bool parse(SkSkeleton& skeleton, SkMotion& motion, std::string fileName, float scale, bool doParseSkeleton, bool doParseMotion);
 		static void parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name);
 		static void parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent = NULL);
 		static void parseLibraryAnimations(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
+		static void parseLibraryAnimations2(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
+	
 		static void animationPostProcess(SkSkeleton& skeleton, SkMotion& motion);
 		static void animationPostProcessByChannels(SkSkeleton& skeleton, SkMotion& motion, SkChannelArray& channels);
 		static void parseLibraryGeometries(DOMNode* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::vector<SrModel*>& meshModelVec, float scale);
@@ -51,10 +55,11 @@ class ParserOpenCOLLADA
 
 	private:
 		static int getMotionChannelId(SkChannelArray& channels, std::string sourceName);
+		static int getMotionChannelId(SkChannelArray& channels, std::string& jointName, std::string& targetType);
 		static std::string tokenize(std::string& str,const std::string& delimiters = " ", int mode = 1);
 		static int getRotationOrder(std::vector<std::string> orderVec);
 		static std::string getGeometryType(std::string s);
-		static void setModelVertexSource(std::string& sourceName, std::string& semanticName, SrModel* model, VecListMap& vecMap);
+		static void setModelVertexSource(std::string& sourceName, std::string& semanticName, SrModel* model, VecListMap& vecMap);		
 };
 
 #endif

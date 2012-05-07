@@ -839,10 +839,30 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 			}					
 		}
 	}
-
-
 	return smooth_p;
+}
 
+SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targetSk )
+{	
+	SkSkeleton interSk; interSk.copy(targetSk); // copy for an intermediate skeleton
+	SkSkeleton tempSrcSk; tempSrcSk.copy(sourceSk);
+	SkMotion *retarget_p = new SmartBody::SBMotion();
+	srSynchPoints sp(synch_points);
+	retarget_p->synch_points = sp;
+	retarget_p->init( targetSk->channels() ); // use the target channels instead
+	int num_f = this->frames();
+	this->connect(&tempSrcSk);
+
+	for (int i = 0; i < num_f; i++)
+	{
+		retarget_p->insert_frame(i, this->keytime(i));		
+		this->apply_frame(i); 
+		tempSrcSk.update_global_matrices(); // update global values for the temp source skeleton
+				
+		
+	}
+	this->disconnect();
+	return retarget_p;
 }
 
 SkMotion* SkMotion::buildMirrorMotion(SkSkeleton* skeleton)

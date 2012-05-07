@@ -2232,7 +2232,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 								DOMNamedNodeMap* sourceAttributes = childNodeOfSkin->getAttributes();
 								DOMNodeList* realContentNodeList = childNodeOfSkin->getChildNodes();
 								std::string sourceId;
-								nodeStr(sourceAttributes->getNamedItem(BML::BMLDefs::ATTR_ID)->getNodeValue(), sourceId);
+								nodeStr(sourceAttributes->getNamedItem(BML::BMLDefs::ATTR_ID)->getNodeValue(), sourceId);								
 								boost::algorithm::to_lower(sourceId);
 								bool isBindJointName = (sourceId.find("joints") != std::string::npos);
 								bool isBindWeights = (sourceId.find("weights") != std::string::npos);
@@ -2246,14 +2246,14 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 
 									std::string tokenBlock;
 									nodeStr(realContentNode->getTextContent(), tokenBlock);
+									
 									boost::tokenizer<boost::char_separator<char> > tokens(tokenBlock, sep);
 									int matCounter = 0;
 									float bindPosMat[16];
-									SrMat newMat;
-
+									SrMat newMat;									
 									for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
-										 it != tokens.end();
-										 ++it)
+										it != tokens.end();
+										++it)
 									{
 										//if ( sourceId == bindJointName && realNodeName == "Name_array") // joint name
 										if ( isBindJointName && realNodeName == "Name_array") // joint name
@@ -2270,7 +2270,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 												skinWeight->infJointName.push_back(joint->getName());
 											else
 												skinWeight->infJointName.push_back(jointName);
-											
+
 										}
 										//if ( sourceId == bindWeightName && realNodeName == "float_array") // joint weights
 										if ( isBindWeights && realNodeName == "float_array") // joint weights
@@ -2291,7 +2291,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 												skinWeight->bindPoseMat.push_back(newMat);
 											}
 										}
-									}
+									}																		
 								}								
 							} // end of if (childNameOfSkin == "source")
 							if (childNameOfSkin == "vertex_weights")
