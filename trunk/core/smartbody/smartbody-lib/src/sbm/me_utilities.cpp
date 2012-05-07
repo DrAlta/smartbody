@@ -50,8 +50,8 @@
 #include "ParserOpenCOLLADA.h"
 #include "ParserASFAMC.h"
 #include "ParserFBX.h"
-#include <sbm/SBSkeleton.h>
-#include <sbm/SBMotion.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBMotion.h>
 
 using namespace std;
 using namespace boost::filesystem;

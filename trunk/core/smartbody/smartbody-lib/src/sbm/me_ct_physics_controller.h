@@ -1,7 +1,7 @@
 #ifndef		_ME_CT_PHYSICS_CONTROLLER_H_
 #define _ME_CT_PHYSICS_CONTROLLER_H_
 
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 #include <sbm/sbm_character.hpp>
 #include <map>
 

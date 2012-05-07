@@ -36,8 +36,8 @@
 #include <sk/sk_motion.h>
 #include <sk/sk_posture.h>
 #include <sk/sk_skeleton.h>
-#include <sbm/SBObject.h>
-#include <sbm/SBAttribute.h>
+#include <sb/SBObject.h>
+#include <sb/SBAttribute.h>
 #include <sbm/DefaultAttributeTable.h>
 
 

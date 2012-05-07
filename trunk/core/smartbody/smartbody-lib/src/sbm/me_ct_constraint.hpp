@@ -23,7 +23,7 @@
 #pragma once
 #include <map>
 #include <sk/sk_skeleton.h>
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 #include "me_ct_limb.hpp"
 #include "me_ct_jacobian_IK.hpp"
 #include "gwiz_math.h"

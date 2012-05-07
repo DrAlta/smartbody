@@ -1,7 +1,7 @@
 #ifndef _BMLOBJECT_H
 #define _BMLOBJECT_H
 
-#include "sbm/SBObject.h"
+#include "sb/SBObject.h"
 #include <string>
 
 class BMLObject : public SmartBody::SBObject

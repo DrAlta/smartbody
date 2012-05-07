@@ -24,7 +24,7 @@
 #define ME_CT_EYELID_H
 
 #include <sk/sk_skeleton.h>
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 #include "sr_linear_curve.h"
 
 //////////////////////////////////////////////////////////////////////////////////

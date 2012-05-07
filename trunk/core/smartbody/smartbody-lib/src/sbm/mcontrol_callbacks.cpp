@@ -29,15 +29,15 @@
 
 #include "vhcl.h"
 #include "mcontrol_callbacks.h"
-#include "SBScene.h"
+#include "sb/SBScene.h"
 
 #include <cstdlib>
 #include <iostream>
 #include <string>
 #include <boost/tokenizer.hpp>
-#include <sbm/SBSkeleton.h>
-#include <sbm/SBPhysicsManager.h>
-#include <sbm/SBBoneBusManager.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBPhysicsManager.h>
+#include <sb/SBBoneBusManager.h>
 
 #ifdef WIN32
 #include <direct.h>
@@ -69,13 +69,13 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>
 #include "ParserFBX.h"
-#include "SBCharacter.h"
+#include "sb/SBCharacter.h"
 #include <sbm/BMLDefs.h>
-#include <sbm/SBSteerManager.h>
-#include <sbm/SBJointMapManager.h>
-#include <sbm/SBJointMap.h>
-#include <sbm/SBAnimationState.h>
-#include <sbm/SBMotion.h>
+#include <sb/SBSteerManager.h>
+#include <sb/SBJointMapManager.h>
+#include <sb/SBJointMap.h>
+#include <sb/SBAnimationState.h>
+#include <sb/SBMotion.h>
 #include <math.h>
 
 

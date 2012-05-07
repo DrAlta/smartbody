@@ -25,7 +25,7 @@
 #define ME_CT_EXAMPLES_H
 
 #include <sk/sk_skeleton.h>
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 
 #include "gwiz_math.h"
 

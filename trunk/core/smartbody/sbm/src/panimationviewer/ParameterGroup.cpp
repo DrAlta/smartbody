@@ -2,8 +2,8 @@
 #include <sbm/mcontrol_util.h>
 #include "ParameterVisualization.h"
 #include "Parameter3DVisualization.h"
-#include <sbm/SBScene.h>
-#include <sbm/SBCharacter.h>
+#include <sb/SBScene.h>
+#include <sb/SBCharacter.h>
 
 ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateData* s, PanimationWindow* window, bool ex) : Fl_Group(x, y, w, h, name), stateData(s), paWindow(window), exec(ex)
 {

@@ -15,9 +15,9 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <sbm/nvbg.h>
-#include <sbm/SBServiceManager.h>
-#include <sbm/SBJointMapManager.h>
-#include <sbm/SBJointMap.h>
+#include <sb/SBServiceManager.h>
+#include <sb/SBJointMapManager.h>
+#include <sb/SBJointMap.h>
 
 
 // enum {

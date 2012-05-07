@@ -33,7 +33,7 @@
 # include <sr/sr_sn_shape.h>
 # include <sr/sr_sa_gl_render.h>
 # include <sr/sr_sa_bbox.h>
-#include <sbm/SBObject.h>
+#include <sb/SBObject.h>
 #include <external/glew/glew.h>
 #include <GL/gl.h>
 #include <GL/glu.h>

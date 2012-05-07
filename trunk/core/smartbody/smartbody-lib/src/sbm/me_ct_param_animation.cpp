@@ -22,8 +22,8 @@
 
 #include "me_ct_param_animation.h"
 #include <sbm/mcontrol_util.h>
-#include <sbm/SBAnimationState.h>
-#include <sbm/SBSkeleton.h>
+#include <sb/SBAnimationState.h>
+#include <sb/SBSkeleton.h>
 #include <sr/sr_euler.h>
 
 std::string MeCtParamAnimation::Context::CONTEXT_TYPE = "MeCtParamAnimation::Context";

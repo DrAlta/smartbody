@@ -1,7 +1,7 @@
 #include "SbmPhysicsSimODE.h"
 #include <sbm/mcontrol_util.h>
-#include <sbm/SBScene.h>
-#include <sbm/SBCollisionManager.h>
+#include <sb/SBScene.h>
+#include <sb/SBCollisionManager.h>
 
 /************************************************************************/
 /* Physics Sim ODE                                                      */

@@ -32,7 +32,7 @@
 
 # include <sk/sk_motion.h>
 
-# include <sbm/SBController.h>
+# include <sb/SBController.h>
 #include <queue>
 
 namespace SmartBody {

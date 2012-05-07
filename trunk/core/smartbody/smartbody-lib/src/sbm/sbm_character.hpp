@@ -33,7 +33,7 @@
 #include <set>
 #include <map>
 
-#include <sbm/SBPawn.h>
+#include <sb/SBPawn.h>
 
 #include <sk/sk_motion.h>
 
@@ -52,7 +52,7 @@
 #include <sbm/MeCtReachEngine.h>
 #include <sbm/me_ct_breathing_interface.h>
 #include <sbm/me_ct_breathing.h>
-#include <sbm/SBFaceDefinition.h>
+#include <sb/SBFaceDefinition.h>
 #define MeCtSchedulerClass MeCtScheduler2
 
 #if(1) // Use primary locomotion controller

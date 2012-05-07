@@ -10,7 +10,7 @@
 
 #pragma warning(push)
 #pragma warning(disable:4121)  // needed for boost::python::extract<std::string>() below
-#include "sbm/SBScene.h"
+#include "sb/SBScene.h"
 #include "sbm/xercesc_utils.hpp"
 #include "sbm/mcontrol_util.h"
 #include "sbm/mcontrol_callbacks.h"
@@ -18,9 +18,9 @@
 #include "sbm/sbm_test_cmds.hpp"
 #include "sbm/resource_cmds.h"
 #include "sbm/locomotion_cmds.hpp"
-#include "sbm/SBPython.h"
-#include "sbm/SBCharacter.h"
-#include "sbm/SBSkeleton.h"
+#include "sb/SBPython.h"
+#include "sb/SBCharacter.h"
+#include "sb/SBSkeleton.h"
 #pragma warning(pop)
 
 

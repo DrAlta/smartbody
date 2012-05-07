@@ -1,12 +1,12 @@
 #include "SBCharacter.h"
-#include <sbm/SBSkeleton.h>
+#include <sb/SBSkeleton.h>
 #include <sbm/mcontrol_util.h>
 #include <sbm/mcontrol_callbacks.h>
-#include "sbm/SBController.h"
+#include "sb/SBController.h"
 #include "sbm/me_utilities.hpp"
-#include "sbm/SBBehavior.h"
-#include <sbm/SBSteerAgent.h>
-#include <sbm/SBPhysicsManager.h>
+#include "sb/SBBehavior.h"
+#include <sb/SBSteerAgent.h>
+#include <sb/SBPhysicsManager.h>
 
 namespace SmartBody {
 

@@ -1,6 +1,6 @@
 #include "BMLSpeechObject.h"
 #include <sstream>
-#include <sbm/SBAttribute.h>
+#include <sb/SBAttribute.h>
 
 BMLSpeechObject::BMLSpeechObject() : BMLObject()
 {

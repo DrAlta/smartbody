@@ -16,7 +16,7 @@
 #else verify(expr) expr
 #endif
 
-#include <sbm/SBScene.h>
+#include <sb/SBScene.h>
 #include <sr/sr_camera.h>
 #include <sr/sr_light.h>
 #include <sr/sr_gl.h>

@@ -31,9 +31,9 @@
 #include <sk/sk_motion.h>
 #include <sk/sk_skeleton.h>
 #include <me/me_controller.h>
-#include <sbm/SBFaceDefinition.h>
+#include <sb/SBFaceDefinition.h>
 #include "sr_hash_map.h"
-#include "sbm/SBController.h"
+#include "sb/SBController.h"
 #include <vector>
 
 /*

@@ -29,7 +29,7 @@
 
 # include <sk/sk_skeleton.h>
 # include <sk/sk_posture.h>
-#include <sbm/SBJoint.h>
+#include <sb/SBJoint.h>
 
 //============================ load_skeleton ============================
 

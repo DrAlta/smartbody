@@ -1,7 +1,7 @@
 #include "FLTKListener.h"
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
-#include <sbm/SBPawn.h>
-#include <sbm/SBSkeleton.h>
+#include <sb/SBPawn.h>
+#include <sb/SBSkeleton.h>
 #include <fltk_viewer.h>
 #include <RootWindow.h>
 

@@ -34,8 +34,8 @@
 # include <sk/sk_motion.h>
 # include <me/me_controller.h>
 # include <sbm/me_ct_breathing_interface.h>
-#include <sbm/SBSubject.h>
-#include <sbm/SBController.h>
+#include <sb/SBSubject.h>
+#include <sb/SBController.h>
 #include <list>
 using std::list;
 

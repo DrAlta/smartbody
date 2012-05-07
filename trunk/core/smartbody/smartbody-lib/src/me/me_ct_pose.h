@@ -28,7 +28,7 @@
 
 //=================================== MeCtPose =====================================
 
-# include <sbm/SBController.h>
+# include <sb/SBController.h>
 # include <sk/sk_posture.h>
 # include <sk/sk_motion.h>
 

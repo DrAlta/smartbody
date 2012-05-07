@@ -1,7 +1,7 @@
 #ifndef _ME_CT_DATA_RECEIVER_H_
 #define _ME_CT_DATA_RECEIVER_H_
 
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 #include <sk/sk_skeleton.h>
 #include <map>
 

@@ -44,8 +44,8 @@ that is distributed: */
 
 #include <FL/Fl_Scroll.H>
 #include "vhcl.h"
-#include "sbm/SBObserver.h"
-#include "sbm/SBAttribute.h"
+#include "sb/SBObserver.h"
+#include "sb/SBAttribute.h"
 #include <map>
 
 #include <FL/Fl_Double_Window.H>

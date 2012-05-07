@@ -25,7 +25,7 @@
 #define ME_CT_LILT_TRY_H
 
 #include <sk/sk_skeleton.h>
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 
 #include "gwiz_math.h"
 

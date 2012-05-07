@@ -29,7 +29,7 @@
 #include "bml_animation.hpp"
 #include "mcontrol_util.h"
 #include "bml_xml_consts.hpp"
-#include <sbm/SBSkeleton.h>
+#include <sb/SBSkeleton.h>
 
 using namespace std;
 using namespace BML;

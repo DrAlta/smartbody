@@ -37,16 +37,16 @@
 #include <me/me_ct_time_shift_warp.hpp>
 #include "mcontrol_util.h"
 #include "mcontrol_callbacks.h"
-#include "SBScene.h"
+#include "sb/SBScene.h"
 #include "me_utilities.hpp"
 #include <me/me_spline_1d.hpp>
 #include <me/me_ct_interpolator.h>
 #include "sr_curve_builder.h"
 #include "lin_win.h"
 #include <boost/filesystem/operations.hpp>
-#include <sbm/SBSkeleton.h>
-#include <sbm/SBJoint.h>
-#include <sbm/SBBoneBusManager.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBJoint.h>
+#include <sb/SBBoneBusManager.h>
 
 #define USE_REACH 1
 #define USE_PHYSICS_CHARACTER 1

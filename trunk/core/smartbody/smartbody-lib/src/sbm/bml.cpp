@@ -41,7 +41,7 @@
 #include "me/me_ct_blend.hpp"
 #include "me/me_ct_blend.hpp"
 #include "BMLDefs.h"
-#include <sbm/SBAnimationState.h>
+#include <sb/SBAnimationState.h>
 
 
 using namespace std;

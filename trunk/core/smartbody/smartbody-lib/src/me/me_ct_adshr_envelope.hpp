@@ -23,7 +23,7 @@
 #ifndef ME_CT_ADSHR_ENVELOPE_HPP
 #define ME_CT_ADSHR_ENVELOPE_HPP
 
-#include <sbm/SBController.h>
+#include <sb/SBController.h>
 
 
 /**

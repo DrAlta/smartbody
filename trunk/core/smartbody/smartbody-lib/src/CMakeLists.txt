@@ -211,8 +211,6 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/bml_target.cpp
 	sbm/bml_saccade.cpp
 	sbm/bml_states.cpp
-	sbm/SBJointMap.cpp
-	sbm/SBJointMapManager.cpp
 	sbm/Event.cpp
 	sbm/GenericViewer.cpp
 	sbm/gwiz_cmdl.cpp
@@ -335,48 +333,50 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/GPU/SbmShader.cpp
 	sbm/SteeringAgent.cpp
 	sbm/SteerSuiteEnginerDriver.cpp
+	sbm/sr_path_list.cpp
 
-	sbm/SBAttribute.cpp
-	sbm/SBAttributeManager.cpp
-	sbm/SBObject.cpp
-	sbm/SBObserver.cpp
-	sbm/SBSubject.cpp
+	sb/SBAttribute.cpp
+	sb/SBAttributeManager.cpp
+	sb/SBObject.cpp
+	sb/SBObserver.cpp
+	sb/SBSubject.cpp
 	sbm/DefaultAttributeTable.cpp
 
-	sbm/SBScene.cpp
+	sb/SBScene.cpp
 	sbm/KinectProcessor.cpp
 	sbm/me_ct_data_receiver.cpp
 
-	sbm/SBScript.cpp
-	sbm/SBCharacter.cpp
-	sbm/SBPawn.cpp
-	sbm/SBJoint.cpp
-	sbm/SBSkeleton.cpp
-	sbm/SBController.cpp
-	sbm/SBSimulationManager.cpp
-	sbm/SBBmlProcessor.cpp
-	sbm/SBAnimationState.cpp
-	sbm/SBAnimationTransition.cpp
-	sbm/SBAnimationStateManager.cpp
-	sbm/SBSteerManager.cpp
-	sbm/SBSteerAgent.cpp
-	sbm/SBReachManager.cpp
-	sbm/SBReach.cpp
-	sbm/SBGestureMapManager.cpp
-	sbm/SBGestureMap.cpp
-	sbm/SBServiceManager.cpp
-	sbm/SBService.cpp
-	sbm/SBMotion.cpp
-	sbm/SBFaceDefinition.cpp
-	sbm/SBPhysicsManager.cpp
-	sbm/SBBoneBusManager.cpp
-	sbm/SBCollisionManager.cpp
-	sbm/SBParser.cpp
-	sbm/SBParseNode.cpp
-	sbm/sr_path_list.cpp
+	sb/SBScript.cpp
+	sb/SBCharacter.cpp
+	sb/SBPawn.cpp
+	sb/SBJoint.cpp
+	sb/SBSkeleton.cpp
+	sb/SBController.cpp
+	sb/SBSimulationManager.cpp
+	sb/SBBmlProcessor.cpp
+	sb/SBAnimationState.cpp
+	sb/SBAnimationTransition.cpp
+	sb/SBAnimationStateManager.cpp
+	sb/SBSteerManager.cpp
+	sb/SBSteerAgent.cpp
+	sb/SBReachManager.cpp
+	sb/SBReach.cpp
+	sb/SBGestureMapManager.cpp
+	sb/SBGestureMap.cpp
+	sb/SBServiceManager.cpp
+	sb/SBService.cpp
+	sb/SBMotion.cpp
+	sb/SBFaceDefinition.cpp
+	sb/SBPhysicsManager.cpp
+	sb/SBBoneBusManager.cpp
+	sb/SBCollisionManager.cpp
+	sb/SBParser.cpp
+	sb/SBParseNode.cpp
+	sb/SBJointMap.cpp
+	sb/SBJointMapManager.cpp
 
-	sbm/SBPython.cpp
-	sbm/SBPythonClass.cpp
+	sb/SBPython.cpp
+	sb/SBPythonClass.cpp
 
 	sbm/nvbg.cpp
 	sbm/MiniBrain.cpp

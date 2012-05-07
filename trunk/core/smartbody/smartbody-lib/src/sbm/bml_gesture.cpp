@@ -6,10 +6,10 @@
 
 #include "bml_gesture.hpp"
 #include "mcontrol_util.h"
-#include "SBScene.h"
+#include "sb/SBScene.h"
 #include "bml_xml_consts.hpp"
-#include <sbm/SBGestureMap.h>
-#include <sbm/SBGestureMapManager.h>
+#include <sb/SBGestureMap.h>
+#include <sb/SBGestureMapManager.h>
 
 using namespace std;
 using namespace BML;

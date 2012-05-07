@@ -35,13 +35,13 @@
 #include "bml_event.hpp"
 
 #include "mcontrol_util.h"
-#include "SBScene.h"
+#include "sb/SBScene.h"
 #include "me_ct_locomotion.hpp"
 
 #include "bml_xml_consts.hpp"
 #include "xercesc_utils.hpp"
 #include "BMLDefs.h"
-#include <sbm/SBSteerManager.h>
+#include <sb/SBSteerManager.h>
 
 ////// XML ATTRIBUTES
 

@@ -3,7 +3,7 @@
 
 #include "sbm_deformable_mesh.h"
 #include "mcontrol_util.h"
-#include <sbm/SBSkeleton.h>
+#include <sb/SBSkeleton.h>
 
 typedef std::pair<int,int> IntPair;
 typedef std::pair<int,float> IntFloatPair;
