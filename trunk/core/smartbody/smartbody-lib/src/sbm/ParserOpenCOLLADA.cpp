@@ -452,7 +452,311 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 	}
 }
 
-void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order)
+struct ColladaFloatArray
+{
+	std::vector<float> floatArray;
+	std::string accessorParam;
+	int stride;	 
+};
+
+struct ColladaSampler
+{
+	std::string inputName;
+	std::string outputName;
+};
+
+struct ColladChannel
+{
+	std::string sourceName;
+	std::string targetJointName;
+	std::string targetType;
+};
+
+
+void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order )
+{
+	SkChannelArray& skChannels = skeleton.channels();
+	motion.init(skChannels);
+	SkChannelArray& motionChannels = motion.channels();
+	SkChannelArray channelsForAdjusting;
+
+	std::map<std::string, ColladaFloatArray > floatArrayMap;
+	std::map<std::string, ColladaSampler > samplerMap;
+	std::vector<ColladChannel> channelSamplerNameMap;
+
+	std::map<std::string,std::vector<std::string> > jointRotationOrderMap;
+
+	const DOMNodeList* list = node->getChildNodes();
+	// load all array of floats with corresponding channel names and sample rates
+	for (unsigned int i = 0; i < list->getLength(); i++)
+	{
+		DOMNode* node1 = list->item(i);		
+		std::string node1Name;
+		xml_utils::xml_translate(&node1Name, node1->getNodeName());
+		if (node1Name == "animation")
+		{			
+			std::string idAttr = getNodeAttributeString(node1,BML::BMLDefs::ATTR_ID);
+			const DOMNodeList* list1 = node1->getChildNodes();
+			for (unsigned int j = 0; j < list1->getLength(); j++)
+			{
+				DOMNode* node2 = list1->item(j);
+				std::string node2Name;
+				xml_utils::xml_translate(&node2Name, node2->getNodeName());
+				if (node2Name == "source")
+				{							
+					std::string sourceIdAttr = getNodeAttributeString(node2,BML::BMLDefs::ATTR_ID);
+					const DOMNodeList* list2 = node2->getChildNodes();
+					for (unsigned int k = 0; k < list2->getLength(); k++)
+					{
+						DOMNode* node3 = list2->item(k);
+						std::string node3Name;
+						xml_utils::xml_translate(&node3Name, node3->getNodeName());
+						// parse float array
+						if (node3Name == "float_array")
+						{							
+							int counter = getNodeAttributeInt(node3,BML::BMLDefs::ATTR_COUNT); 
+							std::string nodeID = getNodeAttributeString(node3, BML::BMLDefs::ATTR_ID);
+							std::string arrayString;
+							xml_utils::xml_translate(&arrayString, node3->getTextContent());
+							std::vector<std::string> tokens;
+							vhcl::Tokenize(arrayString, tokens, " \n");		
+							if (floatArrayMap.find(sourceIdAttr) == floatArrayMap.end())
+							{
+								floatArrayMap[sourceIdAttr] = ColladaFloatArray();
+							}
+							ColladaFloatArray& colFloatArray = floatArrayMap[sourceIdAttr];
+							std::vector<float>& floatArray = colFloatArray.floatArray;
+							floatArray.resize(counter);						
+							for (int m=0;m<counter;m++)
+							{
+								float v = (float)atof(tokens[m].c_str());
+								floatArray[m] = v * scale;
+							}												
+							DOMNode* accessorNode = getNode("accessor",node2);
+							if (accessorNode)
+							{
+								colFloatArray.stride = getNodeAttributeInt(accessorNode,BML::BMLDefs::ATTR_STRIDE);
+								DOMNode* paramNode = getNode("param",accessorNode);
+								if (paramNode)
+								{
+									colFloatArray.accessorParam = getNodeAttributeString(paramNode,BML::BMLDefs::ATTR_NAME);
+								}
+							}
+						}								
+					}
+				}
+				else if (node2Name == "sampler")
+				{
+					const DOMNodeList* list2 = node2->getChildNodes();
+					std::string samplerID = getNodeAttributeString(node2,BML::BMLDefs::ATTR_ID);
+					if (samplerMap.find(samplerID) == samplerMap.end())
+					{
+						samplerMap[samplerID] = ColladaSampler();
+					}
+					ColladaSampler& sampler = samplerMap[samplerID];
+					for (unsigned int k = 0; k < list2->getLength(); k++)
+					{
+						DOMNode* node3 = list2->item(k);
+						std::string node3Name;
+						xml_utils::xml_translate(&node3Name, node3->getNodeName());						
+						if (node3Name == "input")
+						{
+							std::string attrSemantic = getNodeAttributeString(node3,BML::BMLDefs::ATTR_SEMANTIC);
+							if (attrSemantic == "INPUT")
+							{
+								sampler.inputName = getNodeAttributeString(node3,BML::BMLDefs::ATTR_SOURCE).substr(1);	
+								//LOG("sampelr input name = %s",sampler.inputName.c_str());
+							}
+							else if (attrSemantic == "OUTPUT")
+							{
+								sampler.outputName = getNodeAttributeString(node3,BML::BMLDefs::ATTR_SOURCE).substr(1);
+								//LOG("sampelr input name = %s",sampler.outputName.c_str());
+							}
+						}
+					}
+				} 
+				else if (node2Name == "channel")
+				{
+					std::string target = getNodeAttributeString(node2,BML::BMLDefs::ATTR_TARGET);
+					std::string source = getNodeAttributeString(node2,BML::BMLDefs::ATTR_SOURCE);
+					channelSamplerNameMap.push_back(ColladChannel());
+					ColladChannel& colChannel = channelSamplerNameMap.back();
+					colChannel.sourceName = source.substr(1);
+					//LOG("colChannel input name = %s",colChannel.sourceName.c_str());
+					std::vector<std::string> tokens;
+					vhcl::Tokenize(target, tokens, "/.");
+					std::string jname = tokens[0];
+					SkJoint* joint = skeleton.search_joint(jname.c_str());
+					if (joint) jname = joint->name();
+					colChannel.targetJointName = jname;
+					colChannel.targetType = tokens[1];					
+				}
+			}
+		}
+	}
+
+	std::vector<ColladChannel>::iterator mi;
+	for ( mi  = channelSamplerNameMap.begin();
+		  mi != channelSamplerNameMap.end();
+		  mi++)
+	{
+		ColladChannel& colChannel = *mi;
+		SkJoint* joint = skeleton.search_joint(colChannel.targetJointName.c_str());
+		if (!joint) continue; // joint does not exist in the skeleton
+		if (samplerMap.find(colChannel.sourceName) == samplerMap.end()) continue; // sampler does not exist
+		ColladaSampler& sampler = samplerMap[colChannel.sourceName];
+		if (floatArrayMap.find(sampler.inputName) == floatArrayMap.end() || floatArrayMap.find(sampler.outputName) == floatArrayMap.end()) 
+			continue; // no float array
+
+		ColladaFloatArray& inFloatArray = floatArrayMap[sampler.inputName];
+		ColladaFloatArray& outFloatArray = floatArrayMap[sampler.outputName];
+
+		// insert frames for the motion
+		if (motion.frames() == 0)
+		{
+			for (unsigned int frameCt = 0; frameCt < inFloatArray.floatArray.size(); frameCt++)
+			{
+				motion.insert_frame(frameCt, inFloatArray.floatArray[frameCt]);
+				for (int postureCt = 0; postureCt < motion.posture_size(); postureCt++)
+					motion.posture(frameCt)[postureCt] = 0.0f;										
+			}								
+		}		
+		if (colChannel.targetType == "matrix")
+		{
+			int stride = 16;
+			SrMat tran;
+			std::string jName = colChannel.targetJointName;			
+			for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
+			{
+				SrMat tran;				
+				for (int m = 0; m < stride; m++)
+				{
+					int idx = frameCt*stride+m;
+					tran[m] = outFloatArray.floatArray[idx];
+				}
+				tran.transpose();				
+				SrVec offset;												
+				offset.x = tran[12];
+				offset.y = tran[13];
+				offset.z = tran[14];
+ 				//if (joint)
+ 				//	offset -= joint->offset();
+				//offset = offset*joint->quat()->prerot();
+				SrQuat quat(tran);	
+				//quat = joint->quat()->prerot().inverse()*quat;
+				int channelId = -1;
+				// put in translation
+				std::string strTranslate = "translate";
+				channelId = getMotionChannelId(motionChannels,jName,strTranslate);
+				if (channelId >= 0)
+				{
+					for (int k=0;k<3;k++)
+						motion.posture(frameCt)[channelId+k] = offset[k];
+				}
+				// put in rotation
+				std::string strRotation = "rotateX";
+				channelId = getMotionChannelId(motionChannels,jName,strRotation);
+				if (channelId >= 0)
+				{
+					for (int k=0;k<4;k++)
+						motion.posture(frameCt)[channelId+k] = quat.getData(k);
+				}										
+			}
+		}
+		else
+		{
+			int channelId = getMotionChannelId(motionChannels, colChannel.targetJointName,colChannel.targetType);									
+			if (channelId >= 0)
+			{
+				int stride = outFloatArray.stride;
+				for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
+				{
+					for (int strideCt = 0; strideCt < stride; strideCt++)
+					{
+						int idx = frameCt*stride + strideCt;
+						if (idx >= (int)outFloatArray.floatArray.size()) continue;
+						motion.posture(frameCt)[channelId + strideCt] = outFloatArray.floatArray[idx];
+					}
+				}
+			}	
+
+			std::string jointName = colChannel.targetJointName;
+			std::string channelType = colChannel.targetType;
+			if (channelType == "rotateX" || channelType == "rotateY" || channelType == "rotateZ")
+			{
+				if (channelsForAdjusting.search(jointName.c_str(), SkChannel::Quat) < 0)
+					channelsForAdjusting.add(jointName.c_str(), SkChannel::Quat);
+				if (jointRotationOrderMap.find(jointName) == jointRotationOrderMap.end())
+				{
+					std::vector<std::string> emptyString;
+					jointRotationOrderMap[jointName] = emptyString;
+				}
+				std::string rotationOrder = channelType.substr(channelType.size()-1,1);
+				jointRotationOrderMap[jointName].push_back(rotationOrder);
+			}
+			if (channelType == "translate")
+			{
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::XPos);
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::YPos);
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::ZPos);
+			}
+			if (channelType == "translateX")
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::XPos);
+			if (channelType == "translateY")
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::YPos);
+			if (channelType == "translateZ")
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::ZPos);
+		}
+
+	}	
+
+	// remap the euler angles to quaternion if necessary
+	std::vector<int> quatIndices;	
+	std::map<std::string,std::vector<std::string> >::iterator vi;
+	for (vi  = jointRotationOrderMap.begin();
+		vi != jointRotationOrderMap.end();
+		vi++)
+	{
+		std::string jointName = (*vi).first;
+		//LOG("joint name = %s",jointName.c_str());
+		int channelID = motionChannels.search(jointName,SkChannel::Quat);
+		if (channelID != -1)
+		{
+			quatIndices.push_back(motionChannels.float_position(channelID));
+		}		
+	}
+
+	for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
+	{
+		for (size_t i = 0; i < quatIndices.size(); i++)
+		{
+			int quatId = quatIndices[i];
+			float rotx = motion.posture(frameCt)[quatId + 0] / scale;
+			float roty = motion.posture(frameCt)[quatId + 1] / scale;
+			float rotz = motion.posture(frameCt)[quatId + 2] / scale;
+			//LOG("rotx = %f, roty = %f, rotz = %f",rotx,roty,rotz);
+			rotx *= float(M_PI) / 180.0f;
+			roty *= float(M_PI) / 180.0f;
+			rotz *= float(M_PI) / 180.0f;
+			SrMat mat;
+			sr_euler_mat(order, mat, rotx, roty, rotz);
+			SrQuat quat = SrQuat(mat);
+			motion.posture(frameCt)[quatId + 0] = quat.w;
+			motion.posture(frameCt)[quatId + 1] = quat.x;
+			motion.posture(frameCt)[quatId + 2] = quat.y;
+			motion.posture(frameCt)[quatId + 3] = quat.z;
+		}
+	}
+
+	double duration = double(motion.duration());
+	motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration / 2.0, duration / 2.0, duration * 2.0/3.0, duration);
+	motion.compress();
+	// now there's adjust for the channels by default
+	//animationPostProcessByChannels(skeleton, motion, channelsForAdjusting);
+	animationPostProcess(skeleton,motion);
+}
+
+void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order)
 {
 	SkChannelArray& skChannels = skeleton.channels();
 	motion.init(skChannels);
@@ -739,7 +1043,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 	motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration / 2.0, duration / 2.0, duration * 2.0/3.0, duration);
 	motion.compress();
 	// now there's adjust for the channels by default
-	animationPostProcessByChannels(skeleton, motion, channelsForAdjusting);
+	//animationPostProcessByChannels(skeleton, motion, channelsForAdjusting);
 }
 
 void ParserOpenCOLLADA::animationPostProcess(SkSkeleton& skeleton, SkMotion& motion)
@@ -795,22 +1099,24 @@ void ParserOpenCOLLADA::animationPostProcessByChannels(SkSkeleton& skeleton, SkM
 			if (!joint || dataId < 0)
 				continue;
 			SkChannel::Type chanType = chan.type;
-
+			SrVec offset = joint->offset();					
 			if (chanType == SkChannel::XPos)
 			{
 				float v = motion.posture(i)[dataId];
-				motion.posture(i)[dataId] = v - joint->offset().x;
+				motion.posture(i)[dataId] = v - offset[0];
 			}
 			if (chanType == SkChannel::YPos)
 			{
 				float v = motion.posture(i)[dataId];
-				motion.posture(i)[dataId] = v - joint->offset().y;
+				motion.posture(i)[dataId] = v - offset[1];
 			}
 			if (chanType == SkChannel::ZPos)
 			{
 				float v = motion.posture(i)[dataId];
-				motion.posture(i)[dataId] = v - joint->offset().z;
+				motion.posture(i)[dataId] = v - offset[2];
 			}
+
+
 			if (chanType == SkChannel::Quat)
 			{
 				SrQuat globalQuat = SrQuat(motion.posture(i)[dataId], motion.posture(i)[dataId + 1], motion.posture(i)[dataId + 2], motion.posture(i)[dataId + 3]);
@@ -825,6 +1131,60 @@ void ParserOpenCOLLADA::animationPostProcessByChannels(SkSkeleton& skeleton, SkM
 
 		}
 	}
+}
+
+int ParserOpenCOLLADA::getMotionChannelId( SkChannelArray& channels, std::string& jointName, std::string& targetType )
+{
+	int id = -1;
+	int dataId = -1;	
+	SkChannel::Type chanType;
+	if (targetType == "translate")
+	{
+		chanType = SkChannel::XPos;
+		id = channels.search(jointName, chanType);
+		dataId = channels.float_position(id);
+	}
+	else if (targetType == "translateX")
+	{
+		chanType = SkChannel::XPos;
+		id = channels.search(jointName, chanType);
+		dataId = channels.float_position(id);
+	}
+	else if (targetType == "translateY")
+	{
+		chanType = SkChannel::YPos;
+		id = channels.search(jointName, chanType);
+		dataId = channels.float_position(id);
+	}
+	else if (targetType == "translateZ")
+	{
+		chanType = SkChannel::ZPos;
+		id = channels.search(jointName, chanType);
+		dataId = channels.float_position(id);
+	}
+	else if (targetType == "rotateX")
+	{
+		chanType = SkChannel::Quat;
+		id = channels.search(jointName, chanType);
+		dataId = channels.float_position(id);
+	}
+	else if (targetType == "rotateY")
+	{
+		chanType = SkChannel::Quat;
+		id = channels.search(jointName, chanType);
+		dataId = channels.float_position(id);
+		if (id >= 0)
+			dataId += 1;
+	}
+	else if (targetType == "rotateZ")
+	{
+		chanType = SkChannel::Quat;
+		id = channels.search(jointName, chanType);
+		dataId = channels.float_position(id);
+		if (id >= 0)
+			dataId += 2;
+	}
+	return dataId;	
 }
 
 int ParserOpenCOLLADA::getMotionChannelId(SkChannelArray& mChannels, std::string sourceName)
@@ -1426,4 +1786,20 @@ void ParserOpenCOLLADA::parseLibraryEffects(DOMNode* node, std::map<std::string,
 			}
 		}
 	}
+}
+
+std::string ParserOpenCOLLADA::getNodeAttributeString( DOMNode* node, XMLCh* attrName )
+{
+	std::string sourceIdAttr = "";
+	DOMNamedNodeMap* sourceAttr = node->getAttributes();
+	DOMNode* sourceIdNode = sourceAttr->getNamedItem(attrName);					
+	if (sourceIdNode)
+		xml_utils::xml_translate(&sourceIdAttr, sourceIdNode->getNodeValue());
+	return sourceIdAttr;
+}
+
+int ParserOpenCOLLADA::getNodeAttributeInt( DOMNode* node, XMLCh* attrName )
+{
+	std::string strAttr = getNodeAttributeString(node,attrName);
+	return atoi(strAttr.c_str());
 }

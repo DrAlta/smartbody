@@ -228,6 +228,9 @@ public :
 	// smooth out the window between [0,timeInterval] and [duration-timeInterval, duration] so the motion will look smooth when cycling
 	SkMotion* buildSmoothMotionCycle(float timeInterval);
 
+	// retarget the motion from source skeleton to target skeleton
+	SkMotion* buildRetargetMotion(SkSkeleton* sourceSk, SkSkeleton* targetSk);
+
 	/*! Change the angle values of all channels in euler angles type by
 	adding +-2PI, in order to have the smallest distance between frames,
 	e.g., to obtain interpolation from 0 to -60, instead of 0 to 300.
