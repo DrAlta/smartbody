@@ -1,8 +1,8 @@
 include_directories( "." )
-include_directories( "/home/shapiro/smartbody/trunk/core/smartbody/sbm-debugger/lib" )
-include_directories( "/home/shapiro/smartbody/trunk/lib/festival/src/include" )
-include_directories( "/home/shapiro/smartbody/trunk/lib/festival/src/modules/VHDuration" )
-include_directories( "/home/shapiro/smartbody/trunk/lib/speech_tools/include" )
+include_directories( "/hocontrollers/shapiro/smartbody/trunk/core/smartbody/sbm-debugger/lib" )
+include_directories( "/hocontrollers/shapiro/smartbody/trunk/lib/festival/src/include" )
+include_directories( "/hocontrollers/shapiro/smartbody/trunk/lib/festival/src/modules/VHDuration" )
+include_directories( "/hocontrollers/shapiro/smartbody/trunk/lib/speech_tools/include" )
 
 
 ####
@@ -78,25 +78,25 @@ set( SMARTBODY_LIB_EXT_SOIL_SRC
 
 set( SMARTBODY_LIB_ME_SRC
 
-	me/me_controller_context.cpp
-	me/me_controller_context_proxy.cpp
-	me/me_controller.cpp
-	me/me_controller_tree_root.cpp
-	me/me_ct_adshr_envelope.cpp
-	me/me_ct_blend.cpp
-	me/me_ct_channel_writer.cpp
-	me/me_ct_container.cpp
-	me/me_ct_curve_writer.cpp
-	me/me_ct_interpolator.cpp
-	me/me_ct_lifecycle_test.cpp
-	me/me_ct_motion.cpp
-	me/me_ct_periodic_replay.cpp
-	me/me_ct_pose.cpp
-	me/me_ct_scheduler2.cpp
-	me/me_ct_time_shift_warp.cpp
-	me/me_ct_unary.cpp
-	me/me_default_prune_policy.cpp
-	me/me_spline_1d.cpp
+	controllers/me_controller_context.cpp
+	controllers/me_controller_context_proxy.cpp
+	controllers/me_controller.cpp
+	controllers/me_controller_tree_root.cpp
+	controllers/me_ct_adshr_envelope.cpp
+	controllers/me_ct_blend.cpp
+	controllers/me_ct_channel_writer.cpp
+	controllers/me_ct_container.cpp
+	controllers/me_ct_curve_writer.cpp
+	controllers/me_ct_interpolator.cpp
+	controllers/me_ct_lifecycle_test.cpp
+	controllers/me_ct_motion.cpp
+	controllers/me_ct_periodic_replay.cpp
+	controllers/me_ct_pose.cpp
+	controllers/me_ct_scheduler2.cpp
+	controllers/me_ct_time_shift_warp.cpp
+	controllers/me_ct_unary.cpp
+	controllers/me_default_prune_policy.cpp
+	controllers/me_spline_1d.cpp
 )
 
 set( SMARTBODY_LIB_SK_SRC
@@ -224,68 +224,68 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/mcontrol_util.cpp
 	sbm/action_unit.cpp
 	
-	sbm/me_ct_basic_locomotion.cpp
-	sbm/me_ct_ccd_IK.cpp
-	sbm/me_ct_constraint.cpp
-	sbm/me_ct_data_driven_reach.cpp
-	sbm/me_ct_data_interpolation.cpp
-	sbm/me_ct_example_body_reach.cpp
-	sbm/me_ct_examples.cpp
-	sbm/me_ct_eyelid.cpp
-	sbm/me_ct_face.cpp
-	sbm/me_ct_gaze_alg.cpp
-	sbm/me_ct_gaze.cpp
-	sbm/me_ct_gaze_joint.cpp
-	sbm/me_ct_gaze_keymap.cpp
-	sbm/me_ct_gaze_target.cpp
-	sbm/me_ct_IK.cpp
-	sbm/me_ct_IK_scenario.cpp
-	sbm/me_ct_jacobian_IK.cpp
-	sbm/me_ct_lilt_try.cpp
-	sbm/me_ct_limb.cpp
-	sbm/me_ct_locomotion_analysis.cpp
-	sbm/me_ct_locomotion_anim_global_info.cpp
-	sbm/me_ct_locomotion_balance.cpp
-	sbm/me_ct_locomotion.cpp
-	sbm/me_ct_locomotion_func.cpp
-	sbm/me_ct_locomotion_height_offset.cpp
-	sbm/me_ct_locomotion_IK.cpp
-	sbm/me_ct_locomotion_joint_info.cpp
-	sbm/me_ct_locomotion_limb_anim.cpp
-	sbm/me_ct_locomotion_limb.cpp
-	sbm/me_ct_locomotion_limb_direction_planner.cpp
-	sbm/me_ct_locomotion_navigator.cpp
-	sbm/me_ct_locomotion_pawn.cpp
-	sbm/me_ct_locomotion_quadratic_synchronizer.cpp
-	sbm/me_ct_locomotion_routine.cpp
-	sbm/me_ct_locomotion_simple.cpp
-	sbm/me_ct_locomotion_speed_accelerator.cpp
-	sbm/me_ct_locomotion_terrain.cpp
-	sbm/me_ct_locomotion_timing_space.cpp
-	sbm/me_ct_motion_example.cpp
-	sbm/me_ct_motion_parameter.cpp
-	sbm/me_ct_motion_player.cpp
-	sbm/me_ct_motion_timewarp.cpp
-	sbm/me_ct_navigation_circle.cpp
-	sbm/me_ct_navigation_waypoint.cpp
-	sbm/me_ct_param_animation.cpp
-	sbm/me_ct_param_animation_data.cpp
-	sbm/me_ct_param_animation_utilities.cpp
-	sbm/me_ct_quick_draw.cpp
-	sbm/me_ct_reach.cpp
-	sbm/me_ct_hand.cpp
-	sbm/me_ct_motion_profile.cpp
-	sbm/me_ct_barycentric_interpolation.cpp
-	sbm/me_ct_inverse_interpolation.cpp
-	sbm/me_ct_reach_IK.cpp
-	sbm/me_ct_simple_gaze.cpp
-	sbm/me_ct_step_turn.cpp
-	sbm/me_ct_tether.cpp
-	sbm/me_ct_ublas.cpp
+	controllers/me_ct_basic_locomotion.cpp
+	controllers/me_ct_ccd_IK.cpp
+	controllers/me_ct_constraint.cpp
+	controllers/me_ct_data_driven_reach.cpp
+	controllers/me_ct_data_interpolation.cpp
+	controllers/me_ct_example_body_reach.cpp
+	controllers/me_ct_examples.cpp
+	controllers/me_ct_eyelid.cpp
+	controllers/me_ct_face.cpp
+	controllers/me_ct_gaze_alg.cpp
+	controllers/me_ct_gaze.cpp
+	controllers/me_ct_gaze_joint.cpp
+	controllers/me_ct_gaze_keymap.cpp
+	controllers/me_ct_gaze_target.cpp
+	controllers/me_ct_IK.cpp
+	controllers/me_ct_IK_scenario.cpp
+	controllers/me_ct_jacobian_IK.cpp
+	controllers/me_ct_lilt_try.cpp
+	controllers/me_ct_limb.cpp
+	controllers/me_ct_locomotion_analysis.cpp
+	controllers/me_ct_locomotion_anim_global_info.cpp
+	controllers/me_ct_locomotion_balance.cpp
+	controllers/me_ct_locomotion.cpp
+	controllers/me_ct_locomotion_func.cpp
+	controllers/me_ct_locomotion_height_offset.cpp
+	controllers/me_ct_locomotion_IK.cpp
+	controllers/me_ct_locomotion_joint_info.cpp
+	controllers/me_ct_locomotion_limb_anim.cpp
+	controllers/me_ct_locomotion_limb.cpp
+	controllers/me_ct_locomotion_limb_direction_planner.cpp
+	controllers/me_ct_locomotion_navigator.cpp
+	controllers/me_ct_locomotion_pawn.cpp
+	controllers/me_ct_locomotion_quadratic_synchronizer.cpp
+	controllers/me_ct_locomotion_routine.cpp
+	controllers/me_ct_locomotion_simple.cpp
+	controllers/me_ct_locomotion_speed_accelerator.cpp
+	controllers/me_ct_locomotion_terrain.cpp
+	controllers/me_ct_locomotion_timing_space.cpp
+	controllers/me_ct_motion_example.cpp
+	controllers/me_ct_motion_parameter.cpp
+	controllers/me_ct_motion_player.cpp
+	controllers/me_ct_motion_timewarp.cpp
+	controllers/me_ct_navigation_circle.cpp
+	controllers/me_ct_navigation_waypoint.cpp
+	controllers/me_ct_param_animation.cpp
+	controllers/me_ct_param_animation_data.cpp
+	controllers/me_ct_param_animation_utilities.cpp
+	controllers/me_ct_quick_draw.cpp
+	controllers/me_ct_reach.cpp
+	controllers/me_ct_hand.cpp
+	controllers/me_ct_motion_profile.cpp
+	controllers/me_ct_barycentric_interpolation.cpp
+	controllers/me_ct_inverse_interpolation.cpp
+	controllers/me_ct_reach_IK.cpp
+	controllers/me_ct_simple_gaze.cpp
+	controllers/me_ct_step_turn.cpp
+	controllers/me_ct_tether.cpp
+	controllers/me_ct_ublas.cpp
 	sbm/me_utilities.cpp
-	sbm/me_ct_breathing.cpp
-	sbm/me_ct_breathing_interface.cpp
-	sbm/me_ct_physics_controller.cpp
+	controllers/me_ct_breathing.cpp
+	controllers/me_ct_breathing_interface.cpp
+	controllers/me_ct_physics_controller.cpp
 	sbm/ParserBVH.cxx
 	sbm/ParserASFAMC.cxx
 	sbm/ParserFBX.cpp
@@ -295,9 +295,9 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/Resource.cpp
 	sbm/ResourceManager.cpp
 	sbm/sbm_audio.cpp
-	sbm/MeCtBodyReachState.cpp
-	sbm/MeCtReachEngine.cpp
-	sbm/me_ct_saccade.cpp
+	controllers/MeCtBodyReachState.cpp
+	controllers/MeCtReachEngine.cpp
+	controllers/me_ct_saccade.cpp
 	sbm/local_speech.cpp
 
 ## UNUSED:
@@ -344,7 +344,7 @@ set( SMARTBODY_LIB_SBM_SRC
 
 	sb/SBScene.cpp
 	sbm/KinectProcessor.cpp
-	sbm/me_ct_data_receiver.cpp
+	controllers/me_ct_data_receiver.cpp
 
 	sb/SBScript.cpp
 	sb/SBCharacter.cpp
