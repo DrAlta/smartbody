@@ -26,7 +26,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "xercesc_utils.hpp"
+#include "sbm/xercesc_utils.hpp"
 
 #include <xercesc/framework/MemBufInputSource.hpp>
 

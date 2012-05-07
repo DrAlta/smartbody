@@ -24,11 +24,11 @@
 #define _PARSER_OPENCOLLADA_H_
 
 #include <fstream>
-#include "xercesc_utils.hpp"
+#include "sbm/xercesc_utils.hpp"
 #include "sk/sk_skeleton.h"
 #include "sk/sk_motion.h"
-#include "mcontrol_util.h"
-#include "gwiz_math.h"
+#include "sbm/mcontrol_util.h"
+#include "sbm/gwiz_math.h"
 
 typedef std::map<std::string, std::vector<SrVec> > VecListMap;
 

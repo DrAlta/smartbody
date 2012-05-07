@@ -27,7 +27,7 @@
 //#include <hash_map>
 #include <map>
 
-#include "sbm_speech.hpp"
+#include "sbm/sbm_speech.hpp"
 
 
 namespace SmartBody

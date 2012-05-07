@@ -7,8 +7,8 @@
 # include "sk_blend_cfg.h"
 # include "sk_pos_cfg.h"
 
-#include <sbm/me_ct_motion_parameter.h>
-#include <sbm/me_ct_motion_example.hpp>
+#include <controllers/me_ct_motion_parameter.h>
+#include <controllers/me_ct_motion_example.hpp>
 
 # include <sr/sr_box.h>
 # include <sk/sk_joint.h>

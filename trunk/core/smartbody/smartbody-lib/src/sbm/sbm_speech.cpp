@@ -22,7 +22,7 @@
 
 #include "vhcl.h"
 
-#include "sbm_speech.hpp"
+#include "sbm/sbm_speech.hpp"
 
 
 using namespace std;

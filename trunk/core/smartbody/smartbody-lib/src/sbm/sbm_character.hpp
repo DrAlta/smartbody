@@ -41,27 +41,27 @@
 #include "sbm_speech.hpp"
 #include <sbm/sr_linear_curve.h>
 
-#include <me/me_ct_scheduler2.h>
-#include <sbm/me_ct_face.h>
-#include <sbm/me_ct_eyelid.h>
-#include <sbm/me_ct_gaze.h>
-#include <sbm/me_ct_reach.hpp>
-#include <sbm/me_ct_constraint.hpp>
-#include <sbm/me_ct_example_body_reach.hpp>
-#include <sbm/me_ct_hand.hpp>
-#include <sbm/MeCtReachEngine.h>
-#include <sbm/me_ct_breathing_interface.h>
-#include <sbm/me_ct_breathing.h>
+#include <controllers/me_ct_scheduler2.h>
+#include <controllers/me_ct_face.h>
+#include <controllers/me_ct_eyelid.h>
+#include <controllers/me_ct_gaze.h>
+#include <controllers/me_ct_reach.hpp>
+#include <controllers/me_ct_constraint.hpp>
+#include <controllers/me_ct_example_body_reach.hpp>
+#include <controllers/me_ct_hand.hpp>
+#include <controllers/MeCtReachEngine.h>
+#include <controllers/me_ct_breathing_interface.h>
+#include <controllers/me_ct_breathing.h>
 #include <sb/SBFaceDefinition.h>
 #define MeCtSchedulerClass MeCtScheduler2
 
 #if(1) // Use primary locomotion controller
-#include "me_ct_navigation_circle.hpp"
-#include "me_ct_locomotion.hpp"
+#include "controllers/me_ct_navigation_circle.hpp"
+#include "controllers/me_ct_locomotion.hpp"
 #define  MeCtLocomotionClass MeCtLocomotion
 #else
 // "Ghost-walking" implementation, useful for test just the navigation code
-#include "me_ct_locomotion_simple.hpp"
+#include "controllers/me_ct_locomotion_simple.hpp"
 #define MeCtLocomotionClass MeCtLocomotionSimple
 #endif
 
@@ -73,17 +73,17 @@
 #include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
 
-#include <sbm/me_ct_param_animation.h>
-#include <sbm/me_ct_saccade.h>
-#include <sbm/me_ct_basic_locomotion.h>
+#include <controllers/me_ct_param_animation.h>
+#include <controllers/me_ct_saccade.h>
+#include <controllers/me_ct_basic_locomotion.h>
 #include "SteeringAgent.h"
 
-#include <sbm/me_ct_data_receiver.h>
-#include <sbm/me_ct_physics_controller.h>
+#include <controllers/me_ct_data_receiver.h>
+#include <controllers/me_ct_physics_controller.h>
 #include <sbm/nvbg.h>
 #include <sbm/MiniBrain.h>
 
-//#include <me/me_spline_1d.hpp>
+//#include <controllers/me_spline_1d.hpp>
 class MeCtMotionPlayer;
 class MeCtPAnimation;
 class MeCtParamAnimation;

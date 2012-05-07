@@ -31,9 +31,9 @@
 #include <sbm/Physics/SbmColObject.h>
 #include <sbm/SteerSuiteEngineDriver.h>
 
-#include <me/me_controller_tree_root.hpp>
-#include <me/me_ct_channel_writer.hpp>
-#include <me/me_ct_curve_writer.hpp>
+#include <controllers/me_controller_tree_root.hpp>
+#include <controllers/me_ct_channel_writer.hpp>
+#include <controllers/me_ct_curve_writer.hpp>
 #include <sb/SBObject.h>
 #include <SteerLib.h>
 

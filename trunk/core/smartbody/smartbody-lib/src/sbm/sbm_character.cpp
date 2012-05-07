@@ -24,7 +24,7 @@
 */
 
 #include "vhcl.h"
-#include "sbm_character.hpp"
+#include "sbm/sbm_character.hpp"
 
 #include <stdio.h>
 
@@ -33,16 +33,16 @@
 #include <cstring>
 
 #include <sk/sk_skeleton.h>
-#include <me/me_ct_blend.hpp>
-#include <me/me_ct_time_shift_warp.hpp>
-#include "mcontrol_util.h"
+#include <controllers/me_ct_blend.hpp>
+#include <controllers/me_ct_time_shift_warp.hpp>
+#include "sbm/mcontrol_util.h"
 #include "mcontrol_callbacks.h"
 #include "sb/SBScene.h"
 #include "me_utilities.hpp"
-#include <me/me_spline_1d.hpp>
-#include <me/me_ct_interpolator.h>
+#include <controllers/me_spline_1d.hpp>
+#include <controllers/me_ct_interpolator.h>
 #include "sr_curve_builder.h"
-#include "lin_win.h"
+#include "sbm/lin_win.h"
 #include <boost/filesystem/operations.hpp>
 #include <sb/SBSkeleton.h>
 #include <sb/SBJoint.h>

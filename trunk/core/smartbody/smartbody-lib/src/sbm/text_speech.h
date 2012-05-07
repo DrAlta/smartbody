@@ -7,10 +7,10 @@ class text_speech;
 
 
 #include <string>
-#include "sbm_speech.hpp"
+#include "sbm/sbm_speech.hpp"
 #include "sr_hash_map.h"
 #include "sr_arg_buff.h"
-#include "sbm_character.hpp"
+#include "sbm/sbm_character.hpp"
 // Predeclare class
 class mcuCBHandle;
 class srCmdSeq;
@@ -46,6 +46,6 @@ class text_speech: public SmartBody::SpeechInterface {
 
 
 // included after class definition b/c dependency
-#include "mcontrol_util.h"
+#include "sbm/mcontrol_util.h"
 
 #endif

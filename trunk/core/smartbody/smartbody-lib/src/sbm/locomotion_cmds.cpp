@@ -24,13 +24,13 @@
 #include <iostream>
 #include <string>
 
-#include "gwiz_math.h"
+#include "sbm/gwiz_math.h"
 #include "locomotion_cmds.hpp"
-#include "me_ct_locomotion.hpp"
+#include "controllers/me_ct_locomotion.hpp"
 
 #include <sk/sk_channel_array.h>
-//#include <me/me_ct_raw_writer.hpp>
-#include <sbm/me_ct_navigation_circle.hpp>
+//#include <controllers/me_ct_raw_writer.hpp>
+#include <controllers/me_ct_navigation_circle.hpp>
 
 using namespace std;
 

@@ -21,7 +21,7 @@
  *      Andrew n marshall, USC
  */
 
-#include "lin_win.h"
+#include "sbm/lin_win.h"
 
 #include "sr_cmd_seq.h"
 #include "sr_arg_buff.h"

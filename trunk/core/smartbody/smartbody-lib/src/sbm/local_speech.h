@@ -28,11 +28,11 @@
 // Predeclare class
 
 #include <string>
-#include "sbm_speech.hpp"
+#include "sbm/sbm_speech.hpp"
 #include "remote_speech.h"
 #include "sr_hash_map.h"
 #include "sr_arg_buff.h"
-#include "sbm_character.hpp"
+#include "sbm/sbm_character.hpp"
 // Predeclare class
 class mcuCBHandle;
 
@@ -96,7 +96,7 @@ class local_speech: public remote_speech {
 
 
 // included after class definition b/c dependency
-//#include "mcontrol_util.h"
+//#include "sbm/mcontrol_util.h"
 
 //int localSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p);
 //int set_char_voice(char* char_name, char* voiceCode, mcuCBHandle* mcu_p);

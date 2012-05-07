@@ -24,7 +24,7 @@
 #define SBM_TEST_CMDS_HPP
 
 #include "sr_arg_buff.h"
-#include "mcontrol_util.h"
+#include "sbm/mcontrol_util.h"
 
 
 

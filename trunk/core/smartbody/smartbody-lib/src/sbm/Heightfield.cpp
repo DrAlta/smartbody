@@ -19,7 +19,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <math.h>
-#include "lin_win.h"
+#include "sbm/lin_win.h"
 
 #define BITMAP_ID 0x4D42
 

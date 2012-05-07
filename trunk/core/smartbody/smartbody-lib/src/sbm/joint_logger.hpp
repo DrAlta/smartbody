@@ -26,13 +26,13 @@
 
 #include <sstream>
 
-#include <me/me_evaluation_logger.hpp>
+#include <controllers/me_evaluation_logger.hpp>
 
 // Predeclare class and namespace because of circular reference:
 namespace joint_logger {
 	class EvaluationLogger;
 }
-#include "mcontrol_util.h"
+#include "sbm/mcontrol_util.h"
 
 
 namespace joint_logger {

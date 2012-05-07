@@ -7,7 +7,7 @@
 # include <sr/sr_vec.h>
 # include <vector>
 #include <sbm/Physics/SbmColObject.h>
-#include <sbm/me_ct_motion_example.hpp>
+#include <controllers/me_ct_motion_example.hpp>
 
 //=================================== SkPosCfg =====================================
 

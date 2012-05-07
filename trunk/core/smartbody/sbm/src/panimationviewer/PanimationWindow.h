@@ -39,8 +39,8 @@
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/fl_ask.H>
 #include <sbm/GenericViewer.h>
-#include <sbm/me_ct_param_animation_utilities.h>
-#include <sbm/me_ct_param_animation_data.h>
+#include <controllers/me_ct_param_animation_utilities.h>
+#include <controllers/me_ct_param_animation_data.h>
 #include <map>
 
 

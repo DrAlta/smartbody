@@ -53,10 +53,10 @@
 #include <float.h>
 #include "time.h"
 
-#include "xercesc_utils.hpp"
+#include "sbm/xercesc_utils.hpp"
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/framework/MemBufFormatTarget.hpp>
-#include "BMLDefs.h"
+#include "sbm/BMLDefs.h"
 
 
 using namespace std;

@@ -10,8 +10,8 @@
 #include "nle/NonLinearEditorWidget.h"
 #include "BehaviorEditorWidget.h"
 #include "BehaviorBlock.h"
-#include <sbm/bml_speech.hpp>
-#include <sbm/bml_event.hpp>
+#include <bml/bml_speech.hpp>
+#include <bml/bml_event.hpp>
 #include <sbm/GenericViewer.h>
 
 class BehaviorWindow : public Fl_Double_Window, public GenericViewer

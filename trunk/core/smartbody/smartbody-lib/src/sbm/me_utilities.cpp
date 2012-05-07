@@ -45,7 +45,7 @@
 #include <sk/sk_posture.h>
 
 #include "sbm_constants.h"
-#include "gwiz_math.h"
+#include "sbm/gwiz_math.h"
 #include "ParserBVH.h"
 #include "ParserOpenCOLLADA.h"
 #include "ParserASFAMC.h"

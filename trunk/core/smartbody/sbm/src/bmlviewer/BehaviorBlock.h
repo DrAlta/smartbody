@@ -1,7 +1,7 @@
 #ifndef _BEHAVIORBLOCK_
 #define _BEHAVIORBLOCK_
 
-#include <sbm/bml.hpp>
+#include <bml/bml.hpp>
 #include "nle/NonLinearEditor.h"
 
 class BehaviorMark : public nle::Mark

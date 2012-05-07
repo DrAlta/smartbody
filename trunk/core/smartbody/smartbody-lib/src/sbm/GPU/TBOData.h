@@ -1,6 +1,6 @@
 #pragma once
 #include "SbmShader.h"
-#include <sbm/me_ct_ublas.hpp>
+#include <controllers/me_ct_ublas.hpp>
 #include "gfx/vec3.h"
 #include "gfx/vec4.h"
 

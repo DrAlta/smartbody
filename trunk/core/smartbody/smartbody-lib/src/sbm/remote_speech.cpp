@@ -36,8 +36,8 @@
 #include <float.h>
 #include "time.h"
 
-#include "xercesc_utils.hpp"
-#include "BMLDefs.h"
+#include "sbm/xercesc_utils.hpp"
+#include "sbm/BMLDefs.h"
 
 
 using namespace std;

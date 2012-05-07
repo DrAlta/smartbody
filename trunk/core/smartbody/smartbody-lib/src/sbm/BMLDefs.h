@@ -1,7 +1,7 @@
 #ifndef _BMLDEFS_H_
 #define _BMLDEFS_H_
 
-#include "bml.hpp"
+#include "bml/bml.hpp"
 
 namespace BML {
 
