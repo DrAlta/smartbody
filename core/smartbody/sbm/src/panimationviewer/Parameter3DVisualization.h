@@ -3,7 +3,7 @@
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Gl_Window.H>
-#include <sbm/me_ct_param_animation_data.h>
+#include <controllers/me_ct_param_animation_data.h>
 #include "ParameterGroup.h"
 #include <sr/sr_camera.h>
 

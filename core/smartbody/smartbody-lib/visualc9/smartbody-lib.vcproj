@@ -864,59 +864,147 @@
 			Name="controllers"
 			>
 			<File
-				RelativePath="..\src\me\me_controller.cpp"
+				RelativePath="..\src\controllers\me_controller.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\me\me_controller.h"
+				RelativePath="..\src\controllers\me_controller.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\me\me_controller_context.cpp"
+				RelativePath="..\src\controllers\me_controller_context.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\me\me_controller_context.hpp"
+				RelativePath="..\src\controllers\me_controller_context.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\me\me_controller_context_proxy.cpp"
+				RelativePath="..\src\controllers\me_controller_context_proxy.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\me\me_controller_context_proxy.hpp"
+				RelativePath="..\src\controllers\me_controller_context_proxy.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\me\me_controller_tree_root.cpp"
+				RelativePath="..\src\controllers\me_controller_tree_root.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\me\me_controller_tree_root.hpp"
+				RelativePath="..\src\controllers\me_controller_tree_root.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\me\me_default_prune_policy.cpp"
+				RelativePath="..\src\controllers\me_ct_adshr_envelope.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\me\me_default_prune_policy.hpp"
+				RelativePath="..\src\controllers\me_ct_adshr_envelope.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\me\me_evaluation_logger.hpp"
+				RelativePath="..\src\controllers\me_ct_curve_writer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\me\me_prune_policy.hpp"
+				RelativePath="..\src\controllers\me_ct_curve_writer.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\me\me_spline_1d.cpp"
+				RelativePath="..\src\controllers\me_ct_data_interpolation.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\me\me_spline_1d.hpp"
+				RelativePath="..\src\controllers\me_ct_data_interpolation.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_jacobian_IK.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_jacobian_IK.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_lifecycle_test.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_lifecycle_test.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_motion.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_motion.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_motion_timewarp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_motion_timewarp.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_navigation_waypoint.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_navigation_waypoint.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_periodic_replay.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_periodic_replay.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_pose.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_pose.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_scheduler2.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_ct_scheduler2.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_default_prune_policy.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_default_prune_policy.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_evaluation_logger.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_prune_policy.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_spline_1d.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\controllers\me_spline_1d.hpp"
 				>
 			</File>
 			<File
@@ -931,187 +1019,187 @@
 				Name="semiprocedurallocomotion"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_IK.cpp"
+					RelativePath="..\src\controllers\me_ct_IK.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_IK.hpp"
+					RelativePath="..\src\controllers\me_ct_IK.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_IK_scenario.cpp"
+					RelativePath="..\src\controllers\me_ct_IK_scenario.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_IK_scenario.hpp"
+					RelativePath="..\src\controllers\me_ct_IK_scenario.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion.cpp"
+					RelativePath="..\src\controllers\me_ct_interpolator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion.hpp"
+					RelativePath="..\src\controllers\me_ct_interpolator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_analysis.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_analysis.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_anim_global_info.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_analysis.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_anim_global_info.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_analysis.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_balance.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_anim_global_info.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_balance.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_anim_global_info.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_func.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_balance.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_func.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_balance.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_height_offset.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_func.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_height_offset.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_func.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_IK.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_height_offset.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_IK.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_height_offset.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_joint_info.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_IK.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_joint_info.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_IK.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_limb.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_joint_info.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_limb.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_joint_info.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_limb_anim.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_limb.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_limb_anim.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_limb.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_limb_direction_planner.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_limb_anim.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_limb_direction_planner.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_limb_anim.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_navigator.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_limb_direction_planner.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_navigator.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_limb_direction_planner.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_pawn.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_navigator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_pawn.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_navigator.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_quadratic_synchronizer.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_pawn.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_quadratic_synchronizer.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_pawn.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_routine.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_quadratic_synchronizer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_routine.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_quadratic_synchronizer.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_simple.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_routine.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_simple.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_routine.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_speed_accelerator.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_simple.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_speed_accelerator.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_simple.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_terrain.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_speed_accelerator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_terrain.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_speed_accelerator.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_timing_space.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_terrain.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_locomotion_timing_space.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_terrain.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_navigation_circle.cpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_timing_space.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_navigation_circle.hpp"
+					RelativePath="..\src\controllers\me_ct_locomotion_timing_space.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_navigation_waypoint.cpp"
+					RelativePath="..\src\controllers\me_ct_navigation_circle.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_navigation_waypoint.hpp"
+					RelativePath="..\src\controllers\me_ct_navigation_circle.hpp"
 					>
 				</File>
 			</Filter>
@@ -1119,43 +1207,43 @@
 				Name="gaze"
 				>
 				<File
-					RelativePath="..\src\sbm\me_blend_cover.h"
+					RelativePath="..\src\controllers\me_blend_cover.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_gaze.cpp"
+					RelativePath="..\src\controllers\me_ct_gaze.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_gaze.h"
+					RelativePath="..\src\controllers\me_ct_gaze.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_gaze_alg.cpp"
+					RelativePath="..\src\controllers\me_ct_gaze_alg.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_gaze_alg.h"
+					RelativePath="..\src\controllers\me_ct_gaze_alg.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_gaze_joint.cpp"
+					RelativePath="..\src\controllers\me_ct_gaze_joint.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_gaze_joint.h"
+					RelativePath="..\src\controllers\me_ct_gaze_joint.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_gaze_keymap.cpp"
+					RelativePath="..\src\controllers\me_ct_gaze_keymap.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_gaze_sensor.h"
+					RelativePath="..\src\controllers\me_ct_gaze_sensor.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_gaze_target.cpp"
+					RelativePath="..\src\controllers\me_ct_gaze_target.cpp"
 					>
 				</File>
 			</Filter>
@@ -1163,11 +1251,11 @@
 				Name="stepturn"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_step_turn.cpp"
+					RelativePath="..\src\controllers\me_ct_step_turn.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_step_turn.h"
+					RelativePath="..\src\controllers\me_ct_step_turn.h"
 					>
 				</File>
 			</Filter>
@@ -1175,11 +1263,11 @@
 				Name="eyelid"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_eyelid.cpp"
+					RelativePath="..\src\controllers\me_ct_eyelid.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_eyelid.h"
+					RelativePath="..\src\controllers\me_ct_eyelid.h"
 					>
 				</File>
 			</Filter>
@@ -1187,11 +1275,11 @@
 				Name="face"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_face.cpp"
+					RelativePath="..\src\controllers\me_ct_face.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_face.h"
+					RelativePath="..\src\controllers\me_ct_face.h"
 					>
 				</File>
 			</Filter>
@@ -1199,11 +1287,11 @@
 				Name="tether"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_tether.cpp"
+					RelativePath="..\src\controllers\me_ct_tether.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_tether.h"
+					RelativePath="..\src\controllers\me_ct_tether.h"
 					>
 				</File>
 			</Filter>
@@ -1211,11 +1299,11 @@
 				Name="lilt"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_lilt_try.cpp"
+					RelativePath="..\src\controllers\me_ct_lilt_try.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_lilt_try.h"
+					RelativePath="..\src\controllers\me_ct_lilt_try.h"
 					>
 				</File>
 			</Filter>
@@ -1223,11 +1311,11 @@
 				Name="quickdraw"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_quick_draw.cpp"
+					RelativePath="..\src\controllers\me_ct_quick_draw.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_quick_draw.h"
+					RelativePath="..\src\controllers\me_ct_quick_draw.h"
 					>
 				</File>
 			</Filter>
@@ -1235,11 +1323,11 @@
 				Name="nodshake"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_examples.cpp"
+					RelativePath="..\src\controllers\me_ct_examples.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_examples.h"
+					RelativePath="..\src\controllers\me_ct_examples.h"
 					>
 				</File>
 			</Filter>
@@ -1247,37 +1335,21 @@
 				Name="simplegaze"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_simple_gaze.cpp"
+					RelativePath="..\src\controllers\me_ct_simple_gaze.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_simple_gaze.h"
+					RelativePath="..\src\controllers\me_ct_simple_gaze.h"
 					>
 				</File>
 			</Filter>
 			<Filter
 				Name="motion"
 				>
-				<File
-					RelativePath="..\src\me\me_ct_motion.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\me\me_ct_motion.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="adshrenvelope"
 				>
-				<File
-					RelativePath="..\src\me\me_ct_adshr_envelope.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\me\me_ct_adshr_envelope.hpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="scheduler"
@@ -1307,35 +1379,27 @@
 				Name="interpolator"
 				>
 				<File
-					RelativePath="..\src\me\me_ct_interpolator.cpp"
+					RelativePath="..\src\controllers\me_ct_inverse_interpolation.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\me\me_ct_interpolator.h"
+					RelativePath="..\src\controllers\me_ct_inverse_interpolation.h"
 					>
 				</File>
 			</Filter>
 			<Filter
 				Name="lifecycle"
 				>
-				<File
-					RelativePath="..\src\me\me_ct_lifecycle_test.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\me\me_ct_lifecycle_test.hpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="timewarp"
 				>
 				<File
-					RelativePath="..\src\me\me_ct_time_shift_warp.cpp"
+					RelativePath="..\src\controllers\me_ct_time_shift_warp.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\me\me_ct_time_shift_warp.hpp"
+					RelativePath="..\src\controllers\me_ct_time_shift_warp.hpp"
 					>
 				</File>
 			</Filter>
@@ -1343,43 +1407,27 @@
 				Name="channelwriter"
 				>
 				<File
-					RelativePath="..\src\me\me_ct_channel_writer.cpp"
+					RelativePath="..\src\controllers\me_ct_channel_writer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\me\me_ct_channel_writer.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\me\me_ct_curve_writer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\me\me_ct_curve_writer.hpp"
+					RelativePath="..\src\controllers\me_ct_channel_writer.hpp"
 					>
 				</File>
 			</Filter>
 			<Filter
 				Name="pose"
 				>
-				<File
-					RelativePath="..\src\me\me_ct_pose.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\me\me_ct_pose.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="container"
 				>
 				<File
-					RelativePath="..\src\me\me_ct_container.cpp"
+					RelativePath="..\src\controllers\me_ct_container.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\me\me_ct_container.hpp"
+					RelativePath="..\src\controllers\me_ct_container.hpp"
 					>
 				</File>
 			</Filter>
@@ -1387,11 +1435,11 @@
 				Name="unary"
 				>
 				<File
-					RelativePath="..\src\me\me_ct_unary.cpp"
+					RelativePath="..\src\controllers\me_ct_unary.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\me\me_ct_unary.hpp"
+					RelativePath="..\src\controllers\me_ct_unary.hpp"
 					>
 				</File>
 			</Filter>
@@ -1399,46 +1447,46 @@
 				Name="reach"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_data_driven_reach.cpp"
+					RelativePath="..\src\controllers\me_ct_data_driven_reach.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_data_driven_reach.hpp"
+					RelativePath="..\src\controllers\me_ct_data_driven_reach.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_limb.cpp"
+					RelativePath="..\src\controllers\me_ct_limb.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_limb.hpp"
+					RelativePath="..\src\controllers\me_ct_limb.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_reach.cpp"
+					RelativePath="..\src\controllers\me_ct_reach.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_reach.hpp"
+					RelativePath="..\src\controllers\me_ct_reach.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_reach_IK.cpp"
+					RelativePath="..\src\controllers\me_ct_reach_IK.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_reach_IK.hpp"
+					RelativePath="..\src\controllers\me_ct_reach_IK.hpp"
 					>
 				</File>
 				<Filter
 					Name="Constraint"
 					>
 					<File
-						RelativePath="..\src\sbm\me_ct_constraint.cpp"
+						RelativePath="..\src\controllers\me_ct_constraint.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\me_ct_constraint.hpp"
+						RelativePath="..\src\controllers\me_ct_constraint.hpp"
 						>
 					</File>
 				</Filter>
@@ -1446,27 +1494,27 @@
 					Name="BodyReach"
 					>
 					<File
-						RelativePath="..\src\sbm\me_ct_example_body_reach.cpp"
+						RelativePath="..\src\controllers\me_ct_example_body_reach.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\me_ct_example_body_reach.hpp"
+						RelativePath="..\src\controllers\me_ct_example_body_reach.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\MeCtBodyReachState.cpp"
+						RelativePath="..\src\controllers\MeCtBodyReachState.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\MeCtBodyReachState.h"
+						RelativePath="..\src\controllers\MeCtBodyReachState.h"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\MeCtReachEngine.cpp"
+						RelativePath="..\src\controllers\MeCtReachEngine.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\MeCtReachEngine.h"
+						RelativePath="..\src\controllers\MeCtReachEngine.h"
 						>
 					</File>
 				</Filter>
@@ -1474,11 +1522,11 @@
 					Name="Hand"
 					>
 					<File
-						RelativePath="..\src\sbm\me_ct_hand.cpp"
+						RelativePath="..\src\controllers\me_ct_hand.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\me_ct_hand.hpp"
+						RelativePath="..\src\controllers\me_ct_hand.hpp"
 						>
 					</File>
 				</Filter>
@@ -1487,11 +1535,11 @@
 				Name="blend"
 				>
 				<File
-					RelativePath="..\src\me\me_ct_blend.cpp"
+					RelativePath="..\src\controllers\me_ct_blend.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\me\me_ct_blend.hpp"
+					RelativePath="..\src\controllers\me_ct_blend.hpp"
 					>
 				</File>
 			</Filter>
@@ -1499,11 +1547,11 @@
 				Name="motionplayer"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_motion_player.cpp"
+					RelativePath="..\src\controllers\me_ct_motion_player.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_motion_player.h"
+					RelativePath="..\src\controllers\me_ct_motion_player.h"
 					>
 				</File>
 			</Filter>
@@ -1514,59 +1562,35 @@
 					Name="MotionInterpolation"
 					>
 					<File
-						RelativePath="..\src\sbm\me_ct_barycentric_interpolation.cpp"
+						RelativePath="..\src\controllers\me_ct_barycentric_interpolation.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\me_ct_barycentric_interpolation.h"
+						RelativePath="..\src\controllers\me_ct_barycentric_interpolation.h"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\me_ct_data_interpolation.cpp"
+						RelativePath="..\src\controllers\me_ct_motion_example.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\me_ct_data_interpolation.h"
+						RelativePath="..\src\controllers\me_ct_motion_example.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\me_ct_inverse_interpolation.cpp"
+						RelativePath="..\src\controllers\me_ct_motion_parameter.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\me_ct_inverse_interpolation.h"
+						RelativePath="..\src\controllers\me_ct_motion_parameter.h"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\me_ct_motion_example.cpp"
+						RelativePath="..\src\controllers\me_ct_motion_profile.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\me_ct_motion_example.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_motion_parameter.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_motion_parameter.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_motion_profile.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_motion_profile.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_motion_timewarp.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_motion_timewarp.hpp"
+						RelativePath="..\src\controllers\me_ct_motion_profile.h"
 						>
 					</File>
 				</Filter>
@@ -1574,19 +1598,7 @@
 					Name="IK"
 					>
 					<File
-						RelativePath="..\src\sbm\me_ct_ccd_IK.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_ccd_IK.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_jacobian_IK.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_jacobian_IK.hpp"
+						RelativePath="..\src\controllers\me_ct_ccd_IK.hpp"
 						>
 					</File>
 				</Filter>
@@ -1594,11 +1606,11 @@
 					Name="ublas"
 					>
 					<File
-						RelativePath="..\src\sbm\me_ct_ublas.cpp"
+						RelativePath="..\src\controllers\me_ct_ublas.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\me_ct_ublas.hpp"
+						RelativePath="..\src\controllers\me_ct_ublas.hpp"
 						>
 					</File>
 				</Filter>
@@ -1607,11 +1619,11 @@
 				Name="saccade"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_saccade.cpp"
+					RelativePath="..\src\controllers\me_ct_saccade.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_saccade.h"
+					RelativePath="..\src\controllers\me_ct_saccade.h"
 					>
 				</File>
 			</Filter>
@@ -1619,11 +1631,11 @@
 				Name="basiclocomotion"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_basic_locomotion.cpp"
+					RelativePath="..\src\controllers\me_ct_basic_locomotion.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_basic_locomotion.h"
+					RelativePath="..\src\controllers\me_ct_basic_locomotion.h"
 					>
 				</File>
 			</Filter>
@@ -1631,11 +1643,15 @@
 				Name="datareceiver"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_data_receiver.cpp"
+					RelativePath="..\src\controllers\me_ct_ccd_IK.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_data_receiver.h"
+					RelativePath="..\src\controllers\me_ct_data_receiver.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\controllers\me_ct_data_receiver.h"
 					>
 				</File>
 			</Filter>
@@ -1643,19 +1659,19 @@
 				Name="breathing"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_breathing.cpp"
+					RelativePath="..\src\controllers\me_ct_breathing.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_breathing.h"
+					RelativePath="..\src\controllers\me_ct_breathing.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_breathing_interface.cpp"
+					RelativePath="..\src\controllers\me_ct_breathing_interface.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_breathing_interface.h"
+					RelativePath="..\src\controllers\me_ct_breathing_interface.h"
 					>
 				</File>
 			</Filter>
@@ -1663,27 +1679,27 @@
 				Name="paramanimation"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_param_animation.cpp"
+					RelativePath="..\src\controllers\me_ct_param_animation.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_param_animation.h"
+					RelativePath="..\src\controllers\me_ct_param_animation.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_param_animation_data.cpp"
+					RelativePath="..\src\controllers\me_ct_param_animation_data.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_param_animation_data.h"
+					RelativePath="..\src\controllers\me_ct_param_animation_data.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_param_animation_utilities.cpp"
+					RelativePath="..\src\controllers\me_ct_param_animation_utilities.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_param_animation_utilities.h"
+					RelativePath="..\src\controllers\me_ct_param_animation_utilities.h"
 					>
 				</File>
 			</Filter>
@@ -1691,11 +1707,11 @@
 				Name="physics"
 				>
 				<File
-					RelativePath="..\src\sbm\me_ct_physics_controller.cpp"
+					RelativePath="..\src\controllers\me_ct_physics_controller.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\me_ct_physics_controller.h"
+					RelativePath="..\src\controllers\me_ct_physics_controller.h"
 					>
 				</File>
 			</Filter>
@@ -1712,19 +1728,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\behavior_scheduler_constant_speed.cpp"
+				RelativePath="..\src\bml\behavior_scheduler_constant_speed.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\behavior_scheduler_constant_speed.hpp"
+				RelativePath="..\src\bml\behavior_scheduler_constant_speed.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\behavior_scheduler_fixed.cpp"
+				RelativePath="..\src\bml\behavior_scheduler_fixed.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\behavior_scheduler_fixed.hpp"
+				RelativePath="..\src\bml\behavior_scheduler_fixed.hpp"
 				>
 			</File>
 			<File
@@ -1736,183 +1752,179 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml.cpp"
+				RelativePath="..\src\bml\bml.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml.hpp"
+				RelativePath="..\src\bml\bml.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_animation.cpp"
+				RelativePath="..\src\bml\bml_animation.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_animation.hpp"
+				RelativePath="..\src\bml\bml_animation.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_bodyreach.cpp"
+				RelativePath="..\src\bml\bml_bodyreach.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_bodyreach.hpp"
+				RelativePath="..\src\bml\bml_bodyreach.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_constraint.cpp"
+				RelativePath="..\src\bml\bml_constraint.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_constraint.hpp"
+				RelativePath="..\src\bml\bml_constraint.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_event.cpp"
+				RelativePath="..\src\bml\bml_event.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_event.hpp"
+				RelativePath="..\src\bml\bml_event.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_exception.hpp"
+				RelativePath="..\src\bml\bml_exception.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_face.cpp"
+				RelativePath="..\src\bml\bml_face.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_face.hpp"
+				RelativePath="..\src\bml\bml_face.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_gaze.cpp"
+				RelativePath="..\src\bml\bml_gaze.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_gaze.hpp"
+				RelativePath="..\src\bml\bml_gaze.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_general_param.cpp"
+				RelativePath="..\src\bml\bml_general_param.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_general_param.hpp"
+				RelativePath="..\src\bml\bml_general_param.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_gesture.cpp"
+				RelativePath="..\src\bml\bml_gesture.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_gesture.hpp"
+				RelativePath="..\src\bml\bml_gesture.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_grab.cpp"
+				RelativePath="..\src\bml\bml_grab.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_grab.hpp"
+				RelativePath="..\src\bml\bml_grab.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_interrupt.cpp"
+				RelativePath="..\src\bml\bml_interrupt.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_interrupt.hpp"
+				RelativePath="..\src\bml\bml_interrupt.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_locomotion.cpp"
+				RelativePath="..\src\bml\bml_locomotion.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_locomotion.hpp"
+				RelativePath="..\src\bml\bml_locomotion.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_processor.cpp"
+				RelativePath="..\src\bml\bml_processor.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_processor.hpp"
+				RelativePath="..\src\bml\bml_processor.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_quickdraw.cpp"
+				RelativePath="..\src\bml\bml_quickdraw.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_quickdraw.hpp"
+				RelativePath="..\src\bml\bml_quickdraw.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_reach.cpp"
+				RelativePath="..\src\bml\bml_reach.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_reach.hpp"
+				RelativePath="..\src\bml\bml_reach.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_saccade.cpp"
+				RelativePath="..\src\bml\bml_saccade.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_saccade.hpp"
+				RelativePath="..\src\bml\bml_saccade.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_schedule.hpp"
+				RelativePath="..\src\bml\bml_schedule.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_scheduler.hpp"
+				RelativePath="..\src\bml\bml_speech.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_speech.cpp"
+				RelativePath="..\src\bml\bml_speech.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_speech.hpp"
+				RelativePath="..\src\bml\bml_states.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_states.cpp"
+				RelativePath="..\src\bml\bml_states.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_states.hpp"
+				RelativePath="..\src\bml\bml_sync_point.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_sync_point.cpp"
+				RelativePath="..\src\bml\bml_sync_point.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_sync_point.hpp"
+				RelativePath="..\src\bml\bml_target.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_target.cpp"
+				RelativePath="..\src\bml\bml_target.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_target.hpp"
+				RelativePath="..\src\bml\bml_types.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\bml_types.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\bml_xml_consts.hpp"
+				RelativePath="..\src\bml\bml_xml_consts.hpp"
 				>
 			</File>
 			<File

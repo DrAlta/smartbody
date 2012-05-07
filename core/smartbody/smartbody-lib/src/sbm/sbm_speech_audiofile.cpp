@@ -23,8 +23,8 @@
 
 #include "vhcl.h"
 #include "sbm_speech_audiofile.hpp"
-#include "BMLDefs.h"
-#include "mcontrol_util.h"
+#include "sbm/BMLDefs.h"
+#include "sbm/mcontrol_util.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 #include <fstream>

@@ -25,7 +25,7 @@
 #include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
 #include <sb/SBPythonClass.h>
-#include <sbm/me_ct_param_animation_data.h>
+#include <controllers/me_ct_param_animation_data.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBSimulationManager.h>

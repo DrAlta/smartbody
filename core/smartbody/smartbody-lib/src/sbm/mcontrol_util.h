@@ -49,33 +49,33 @@ class mcuCBHandle;
 #include <sbm/GenericViewer.h>
 #include <sr/sr_viewer.h>
 #include <sr/sr_camera.h>
-#include <me/me_ct_pose.h>
-#include <me/me_ct_motion.h>
-#include <me/me_ct_lifecycle_test.hpp>
-#include "me_ct_step_turn.h"
-#include "me_ct_quick_draw.h"
-#include "me_ct_gaze.h"
-#include "me_ct_tether.h"
-#include "me_ct_eyelid.h"
-#include "me_ct_data_driven_reach.hpp"
+#include <controllers/me_ct_pose.h>
+#include <controllers/me_ct_motion.h>
+#include <controllers/me_ct_lifecycle_test.hpp>
+#include "controllers/me_ct_step_turn.h"
+#include "controllers/me_ct_quick_draw.h"
+#include "controllers/me_ct_gaze.h"
+#include "controllers/me_ct_tether.h"
+#include "controllers/me_ct_eyelid.h"
+#include "controllers/me_ct_data_driven_reach.hpp"
 
 #include "sbm_constants.h"
 
-#include <me/me_ct_scheduler2.h>
-#include <sbm/me_ct_motion_player.h>
+#include <controllers/me_ct_scheduler2.h>
+#include <controllers/me_ct_motion_player.h>
 
 #include "sr_hash_map.h"
 #include "sr_cmd_map.h"
 #include "sr_cmd_seq.h"
 #include "sr_path_list.h"
 #include "sbm_pawn.hpp"
-#include "sbm_character.hpp"
+#include "sbm/sbm_character.hpp"
 #include "remote_speech.h"
 #include "local_speech.h"
 #include "text_speech.h" // [BMLR]
 #include "sbm_speech_audiofile.hpp"
-#include "me_ct_examples.h"
-#include "me_ct_lilt_try.h"
+#include "controllers/me_ct_examples.h"
+#include "controllers/me_ct_lilt_try.h"
 #include "time_regulator.h"
 #include "time_profiler.h"
 #include "Heightfield.h"
@@ -90,7 +90,7 @@ class mcuCBHandle;
 #include <sb/SBJointMap.h>
 #include <sbm/nvbg.h>
 
-#include <me/me_ct_interpolator.h>
+#include <controllers/me_ct_interpolator.h>
 
 #include <sbm/SteerSuiteEngineDriver.h>
 #include <sbm/Physics/SbmPhysicsSim.h>

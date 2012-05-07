@@ -56,7 +56,7 @@
 #include "wsp.h"
 #endif
 
-#include "mcontrol_util.h"
+#include "sbm/mcontrol_util.h"
 #include "me_utilities.hpp"
 #include "sr/sr_model.h"
 #include "sr/sr_euler.h"

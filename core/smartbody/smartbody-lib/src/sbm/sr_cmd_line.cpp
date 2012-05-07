@@ -12,7 +12,7 @@
 #include <vhcl_log.h>
 
 #include "sr_cmd_line.h"
-#include "mcontrol_util.h"
+#include "sbm/mcontrol_util.h"
 
 #define ENABLE_NEW_PROMPT		1
 

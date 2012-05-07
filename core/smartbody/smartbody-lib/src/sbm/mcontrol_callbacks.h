@@ -28,7 +28,7 @@
 #ifndef MCONTROL_CALLBACKS_H
 #define MCONTROL_CALLBACKS_H
 
-#include "mcontrol_util.h"
+#include "sbm/mcontrol_util.h"
 
 //////////////////////////////////////////////////////////////////
 

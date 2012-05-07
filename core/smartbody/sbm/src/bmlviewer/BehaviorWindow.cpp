@@ -11,13 +11,13 @@
 #include <FL/Fl_Scroll.H>
 
 #include <sbm/mcontrol_util.h>
-#include <me/me_ct_blend.hpp>
-#include <me/me_ct_time_shift_warp.hpp>
+#include <controllers/me_ct_blend.hpp>
+#include <controllers/me_ct_time_shift_warp.hpp>
 #include "BehaviorBlock.h"
-#include <sbm/bml_types.hpp>
+#include <bml/bml_types.hpp>
 #include <sbm/text_speech.h>
 #include <sbm/remote_speech.h>
-#include <sbm/behavior_scheduler_fixed.hpp>
+#include <bml/behavior_scheduler_fixed.hpp>
 #include "sbm/xercesc_utils.hpp"
 
 

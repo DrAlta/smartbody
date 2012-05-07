@@ -11,11 +11,11 @@
 #include <float.h>
 #include "time.h"
 
-#include "xercesc_utils.hpp"
+#include "sbm/xercesc_utils.hpp"
 #include "text_speech.h"
 #include <sb/SBScene.h>
 #include <sb/SBBoneBusManager.h>
-#include "BMLDefs.h"
+#include "sbm/BMLDefs.h"
 
 
 

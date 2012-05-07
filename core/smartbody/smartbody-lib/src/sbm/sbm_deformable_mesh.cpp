@@ -2,7 +2,7 @@
 #include "vhcl.h"
 
 #include "sbm_deformable_mesh.h"
-#include "mcontrol_util.h"
+#include "sbm/mcontrol_util.h"
 #include <sb/SBSkeleton.h>
 
 typedef std::pair<int,int> IntPair;

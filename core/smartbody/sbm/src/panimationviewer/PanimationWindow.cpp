@@ -26,7 +26,7 @@
 #include "ParamAnimBlock.h"
 
 #include <sbm/mcontrol_util.h>
-#include <sbm/bml.hpp>
+#include <bml/bml.hpp>
 
 #include <iostream>
 #include <fstream>

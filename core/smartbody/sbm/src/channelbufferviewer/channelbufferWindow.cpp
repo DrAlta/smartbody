@@ -26,7 +26,7 @@
 #include <vector>
 #include <algorithm>
 
-#include <sbm/bml.hpp>
+#include <bml/bml.hpp>
 #include <sb/SBSkeleton.h>
 
 ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)

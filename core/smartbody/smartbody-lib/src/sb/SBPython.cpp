@@ -1,6 +1,6 @@
 #include "SBPython.h"
 #include "SBPythonClass.h"
-#include "me/me_ct_scheduler2.h"
+#include "controllers/me_ct_scheduler2.h"
 #include "SBFaceDefinition.h"
 #include "sbm/nvbg.h"
 #include "SBBehavior.h"

@@ -36,9 +36,9 @@
 #endif
 #endif
 
-#include "lin_win.h"
+#include "sbm/lin_win.h"
 #include "vhcl.h"
-#include "mcontrol_util.h"
+#include "sbm/mcontrol_util.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -82,8 +82,8 @@
 #include <sb/SBServiceManager.h>
 #include <sb/SBAnimationState.h>
 #include "SbmDebuggerServer.h"
-#include <sbm/me_ct_param_animation_utilities.h>
-#include <sbm/me_ct_param_animation_data.h>
+#include <controllers/me_ct_param_animation_utilities.h>
+#include <controllers/me_ct_param_animation_data.h>
 
 
 using namespace std;
