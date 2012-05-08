@@ -28,6 +28,7 @@
 # include <stdlib.h>
 # include <string.h>
 #include <iostream>
+#include <queue>
 
 # include <sk/sk_motion.h>
 # include <sk/sk_posture.h>
@@ -843,23 +844,234 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 }
 
 SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targetSk )
+{		
+	SkChannelArray& mchan_arr = this->channels();
+	SkSkeleton* interSk = new SkSkeleton(targetSk); // copy for an intermediate skeleton
+	SkSkeleton* tempSrcSk = new SkSkeleton(sourceSk);
+	
+	// update the global matrices
+	tempSrcSk->invalidate_global_matrices();
+	tempSrcSk->update_global_matrices();
+	interSk->invalidate_global_matrices();
+	interSk->update_global_matrices();
+// 	sourceSk->invalidate_global_matrices();
+// 	sourceSk->update_global_matrices();
+// 	for (int i=0;i<sourceSk->joints().size(); i++)
+// 	{
+// 		SkJoint* j1 = tempSrcSk->joints()[i];
+// 		SkJoint* j2 = sourceSk->joints()[i];
+// 
+// 		SrVec j1Pos = j1->gmat().get_translation();
+// 		SrVec j2Pos = j2->gmat().get_translation();
+// 		SrVec j1ZeroPos = j1->gmatZero().get_translation();
+// 		SrVec j2ZeroPos = j2->gmatZero().get_translation();
+// 		SrQuat j1Prerot = j1->quat()->prerot();
+// 		SrQuat j2Prerot = j2->quat()->prerot();
+// 
+// 		SrQuat j1Quat = j1->quat()->value();
+// 		SrQuat j2Quat = j2->quat()->value();
+// 		LOG("j1 = %s, pos = %f %f %f, zeropos = %f %f %f",j1->name().c_str(),j1Pos.x,j1Pos.y,j1Pos.z, j1ZeroPos.x, j1ZeroPos.y, j1ZeroPos.z);
+// 		LOG("j2 = %s, pos = %f %f %f, zeropos = %f %f %f",j2->name().c_str(),j2Pos.x,j2Pos.y,j2Pos.z, j2ZeroPos.x, j2ZeroPos.y, j2ZeroPos.z);
+// 		//sr_out << "j1 prerot = " << j1Prerot << "  , j2 prerot = " << j2Prerot << srnl;
+// 		sr_out << "j1 quat = " << j1Quat << "  , j2 quat = " << j2Quat << srnl;
+// 	}
+
+
+	SkMotion *retarget_p = new SmartBody::SBMotion();
+	srSynchPoints sp(synch_points);
+	retarget_p->synch_points = sp;
+	retarget_p->init( mchan_arr ); // use the target channels instead
+	int num_f = this->frames();
+	//_leftRightRot = SrQuat(lEyeJoint->gmatZero()*rEyeJoint->gmatZero().inverse());
+	std::map<std::string, SrQuat> rotationMap;
+	for (int k=0;k<mchan_arr.size();k++)
+	{
+		SkChannel& chan = mchan_arr[k];
+		const std::string& jointName = mchan_arr.name(k);
+		int index = mchan_arr.float_position(k);
+		if (chan.type == SkChannel::Quat)
+		{
+			// flip rotation for y,z axis			
+			SkJoint* srcJoint = sourceSk->search_joint(jointName.c_str());
+			SkJoint* targetJoint = targetSk->search_joint(jointName.c_str());
+			if (srcJoint && targetJoint)
+			{
+				SrQuat srcToTargetRot = SrQuat(srcJoint->gmatZero()*targetJoint->gmatZero().inverse());
+				rotationMap[jointName] = srcToTargetRot;
+			}
+		}
+	}	
+
+	std::map<std::string, SrQuat> jointRotationMap;
+	std::queue<std::string> jointQueues;
+	jointQueues.push(interSk->root()->name());	
+// 	tempSrcSk->invalidate_global_matrices();
+// 	tempSrcSk->update_global_matrices();
+// 	interSk->invalidate_global_matrices();
+// 	interSk->update_global_matrices();
+	while (!jointQueues.empty())
+	{
+		std::string pjointName = jointQueues.front();
+		jointQueues.pop();		
+		SkJoint* pjoint = interSk->search_joint(pjointName.c_str());
+		SkJoint* srcjoint = tempSrcSk->search_joint(pjointName.c_str());
+		std::vector<SrVec> srcDirList, origSrcDirList;
+		std::vector<SrVec> dstDirList;
+		SrVec pos = pjoint->gmat().get_translation();
+		if (srcjoint)
+		{
+			SrVec srcPos = srcjoint->gmat().get_translation();
+			//LOG("joint = %s, src pos = %f %f %f, dst pos = %f %f %f",pjointName.c_str(),srcPos[0],srcPos[1],srcPos[2],pos[0],pos[1],pos[2]);
+		}
+		for (int i=0; i< pjoint->num_children(); i++)
+		{
+			SkJoint* child = pjoint->child(i);
+			SrVec srcdir = tempSrcSk->boneGlobalDirection(pjoint->name(),child->name());
+			SrVec dstdir = interSk->boneGlobalDirection(pjoint->name(),child->name());
+			SrVec srcDir1 = sourceSk->boneGlobalDirection(pjoint->name(),child->name());
+			jointQueues.push(child->name());
+			srcDirList.push_back(srcdir);
+			origSrcDirList.push_back(srcDir1);
+			dstDirList.push_back(dstdir);
+			//dir += gdir;
+		}
+		SrQuat jointRotation;
+		if (srcDirList.size() == 1)
+		{
+			SrVec srcDir = srcDirList[0];
+			SrVec srcDir1 = origSrcDirList[0];
+			SrVec dstDir = dstDirList[0];
+
+			//LOG("joint = %s, src dir = %f %f %f, orig dir = %f %f %f, dst dir = %f %f %f",pjointName.c_str(), srcDir[0],srcDir[1],srcDir[2], srcDir1[0],srcDir1[1],srcDir1[2], dstDir[0],dstDir[1],dstDir[2]);
+			double dot_v = dot(srcDir, dstDir);
+			if(dot_v >= 0.9999995000000f) 
+			{				
+				dot_v = 1.0f;
+			}
+			else if(dot_v < -1.0f) dot_v = -1.0f;
+			double angle = acos(dot_v);
+			//printf("angle = %f\n",angle);
+			SrVec rotAxis = cross(dstDir, srcDir);
+			rotAxis.normalize();
+			SrVec rotAxisAngle = rotAxis*(float)angle; // global rotation
+			SrQuat alignQuat = SrQuat(rotAxisAngle);
+			SrMat alignMat;
+			SrMat prerotMat;
+			SrMat gmatRot = pjoint->gmat().get_rotation();
+			pjoint->quat()->prerot().get_mat(prerotMat);
+			alignQuat.get_mat(alignMat);
+			//SrMat gmatInv = prerotMat.inverse()*pjoint->parent()->gmat().get_rotation();//pjoint->gmat().get_rotation();//(prerotMat*pjoint->parent()->gmat()).inverse();//pjoint->gmatZero().get_rotation().inverse();//(prerotMat*pjoint->parent()->gmat()).inverse();
+			//rotAxisAngle = rotAxisAngle*gmatInv;
+			SrMat quatMat = prerotMat.inverse()*gmatRot*alignMat*pjoint->parent()->gmat().get_rotation().inverse();
+			//SrQuat quat = SrQuat(rotAxisAngle);
+			SrQuat quat = SrQuat(quatMat);
+			jointRotationMap[pjointName] = quat;
+			pjoint->quat()->value(quat);
+			pjoint->update_gmat();
+			//LOG("skeleton align rotation, joint = %s, rotation = %f %f %f",pjointName.c_str(),rotAxisAngle[0],rotAxisAngle[1],rotAxisAngle[2]);
+		}		
+	}
+
+	for (int i = 0; i < num_f; i++)
+	{
+		retarget_p->insert_frame(i, this->keytime(i));		
+		float *ref_p = this->posture( i );
+		float *new_p = retarget_p->posture( i );
+		//tempSrcSk.update_global_matrices(); // update global values for the temp source skeleton
+		for (int k=0;k<mchan_arr.size();k++)
+		{
+			SkChannel& chan = mchan_arr[k];
+			const std::string& jointName = mchan_arr.name(k);
+			// map pre-rotation
+			SrQuat srcToTargetRot;			
+			if (rotationMap.find(jointName) != rotationMap.end())
+				srcToTargetRot = rotationMap[jointName];
+
+			SrQuat jointRot;
+			if (jointRotationMap.find(jointName) != jointRotationMap.end())
+				jointRot = jointRotationMap[jointName];
+
+			int index = mchan_arr.float_position(k);
+			if (chan.type == SkChannel::Quat)
+			{
+				// flip rotation for y,z axis
+				SrQuat q_orig = SrQuat( ref_p[ index ], ref_p[ index + 1 ], ref_p[ index + 2 ], ref_p[ index + 3 ] );
+				SrVec qa = q_orig.axisAngle();
+				SrVec qa_rot = qa*srcToTargetRot;	
+				SrQuat final_q = jointRot*SrQuat(qa_rot);	
+				new_p[ index + 0 ] = (float)final_q.w;
+				new_p[ index + 1 ] = (float)final_q.x;
+				new_p[ index + 2 ] = (float)final_q.y;
+				new_p[ index + 3 ] = (float)final_q.z;
+			}
+		}		
+	}	
+
+	return retarget_p;
+}
+
+
+SkMotion* SkMotion::buildRetargetMotion2( SkSkeleton* sourceSk, SkSkeleton* targetSk )
 {	
+	SkChannelArray& mchan_arr = this->channels();
 	SkSkeleton interSk; interSk.copy(targetSk); // copy for an intermediate skeleton
 	SkSkeleton tempSrcSk; tempSrcSk.copy(sourceSk);
 	SkMotion *retarget_p = new SmartBody::SBMotion();
 	srSynchPoints sp(synch_points);
 	retarget_p->synch_points = sp;
-	retarget_p->init( targetSk->channels() ); // use the target channels instead
+	retarget_p->init( mchan_arr ); // use the target channels instead
 	int num_f = this->frames();
 	this->connect(&tempSrcSk);
+
+	//_leftRightRot = SrQuat(lEyeJoint->gmatZero()*rEyeJoint->gmatZero().inverse());
+	std::map<std::string, SrQuat> rotationMap;
+	for (int k=0;k<mchan_arr.size();k++)
+	{
+		SkChannel& chan = mchan_arr[k];
+		const std::string& jointName = mchan_arr.name(k);
+		int index = mchan_arr.float_position(k);
+		if (chan.type == SkChannel::Quat)
+		{
+			// flip rotation for y,z axis			
+			SkJoint* srcJoint = sourceSk->search_joint(jointName.c_str());
+			SkJoint* targetJoint = targetSk->search_joint(jointName.c_str());
+			if (srcJoint && targetJoint)
+			{
+				SrQuat srcToTargetRot = SrQuat(srcJoint->gmatZero()*targetJoint->gmatZero().inverse());
+				rotationMap[jointName] = srcToTargetRot;
+			}
+		}
+	}	
 
 	for (int i = 0; i < num_f; i++)
 	{
 		retarget_p->insert_frame(i, this->keytime(i));		
-		this->apply_frame(i); 
-		tempSrcSk.update_global_matrices(); // update global values for the temp source skeleton
-				
-		
+		float *ref_p = this->posture( i );
+		float *new_p = retarget_p->posture( i );
+		//tempSrcSk.update_global_matrices(); // update global values for the temp source skeleton
+		for (int k=0;k<mchan_arr.size();k++)
+		{
+			SkChannel& chan = mchan_arr[k];
+			const std::string& jointName = mchan_arr.name(k);
+			// map pre-rotation
+			SrQuat srcToTargetRot;			
+			if (rotationMap.find(jointName) != rotationMap.end())
+				srcToTargetRot = rotationMap[jointName];
+
+			int index = mchan_arr.float_position(k);
+			if (chan.type == SkChannel::Quat)
+			{
+				// flip rotation for y,z axis
+				SrQuat q_orig = SrQuat( ref_p[ index ], ref_p[ index + 1 ], ref_p[ index + 2 ], ref_p[ index + 3 ] );
+				SrVec qa = q_orig.axisAngle();
+				SrVec qa_rot = qa*srcToTargetRot;	
+				SrQuat final_q = SrQuat(qa_rot);	
+				new_p[ index + 0 ] = (float)final_q.w;
+				new_p[ index + 1 ] = (float)final_q.x;
+				new_p[ index + 2 ] = (float)final_q.y;
+				new_p[ index + 3 ] = (float)final_q.z;
+			}
+		}		
 	}
 	this->disconnect();
 	return retarget_p;

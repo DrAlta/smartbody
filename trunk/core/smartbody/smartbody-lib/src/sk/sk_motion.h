@@ -230,6 +230,7 @@ public :
 
 	// retarget the motion from source skeleton to target skeleton
 	SkMotion* buildRetargetMotion(SkSkeleton* sourceSk, SkSkeleton* targetSk);
+	SkMotion* buildRetargetMotion2(SkSkeleton* sourceSk, SkSkeleton* targetSk);
 
 	/*! Change the angle values of all channels in euler angles type by
 	adding +-2PI, in order to have the smallest distance between frames,

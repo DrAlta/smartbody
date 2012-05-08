@@ -166,6 +166,40 @@ void SBMotion::disconnect()
 	SkMotion::disconnect();
 }
 
+
+SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std::string dstSkeletonName )
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	SBSkeleton* srcSkeleton = mcu._scene->getSkeleton(srcSkeletonName);
+	SBSkeleton* dstSkeleton = mcu._scene->getSkeleton(dstSkeletonName);
+	if (!srcSkeleton || !dstSkeleton)
+	{
+		LOG("Skeleton %s or %s not found. Retargeted motion %s not built.",srcSkeletonName.c_str(),dstSkeletonName.c_str(),name.c_str());
+		return NULL;
+	}
+	
+	SkMotion* motion = buildRetargetMotion(srcSkeleton,dstSkeleton);
+	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
+	if (sbmotion)
+	{
+		std::string motionName = "";
+		if (name == "")
+		{
+			motionName = sbmotion->getName();
+			if (motionName == EMPTY_STRING)
+				motionName = getName() + "_retarget";
+		}
+		else
+			motionName = name;
+		sbmotion->setName(motionName.c_str());
+
+
+		mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, motion));
+	}
+	return sbmotion;
+
+}
+
 SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 

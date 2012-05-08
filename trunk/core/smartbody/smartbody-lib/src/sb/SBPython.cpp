@@ -901,6 +901,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("connect", &SBMotion::connect, "Connect current motion to a skeleton object so the channels inside the motion are mapped to the channels inside skeleton. \n Input: Skeleton Object \n Output: NULL")
 		.def("disconnect", &SBMotion::disconnect, "Disconnect current motion with current skeleton object. ")
 		.def("mirror", &SBMotion::mirror, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Mirrors the motion.")
+		.def("retarget", &SBMotion::retarget, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Retarget the motion to a different skeleton.")
 		.def("smoothCycle", &SBMotion::smoothCycle, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Build the smooth cycle the motion.")
 		.def("getJointSpeed", &SBMotion::getJointSpeed, "Get the accumulative joint speed. \n Input: SBJoint, start time, end time \n Output: joint speed(unit: same with the skeleton)")
 		.def("getJointSpeedAxis", &SBMotion::getJointSpeedAxis, "Get the accumulative joint speed of a given axis: X, Y or Z. \n Input: SBJoint, axis, start time, end time \n Output: joint speed(unit: same with the skeleton)")
