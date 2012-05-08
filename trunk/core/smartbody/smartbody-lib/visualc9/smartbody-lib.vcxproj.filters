@@ -1006,15 +1006,15 @@
     <ClCompile Include="..\src\sbm\xercesc_utils.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sbm\sbm_speech_impl_skeleton.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_blend_cover.h">
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\controllers\me_blend_cover.h">
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\controllers\me_controller.h">
@@ -1257,13 +1257,7 @@
     <ClInclude Include="..\src\controllers\me_default_prune_policy.hpp">
       <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_evaluation_logger.hpp">
-      <Filter>controllers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\controllers\me_evaluation_logger.hpp">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\me\me_prune_policy.hpp">
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\controllers\me_prune_policy.hpp">
@@ -1950,34 +1944,7 @@
     <ClInclude Include="..\src\sbm\ResourceManager.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_audio.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_character.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_constants.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_deformable_mesh.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_pawn.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_speech.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_speech_audiofile.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_test_cmds.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\Physics\SbmColObject.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SbmDebuggerServer.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\GPU\SbmDeformableMeshGPU.h">
@@ -2067,12 +2034,45 @@
     <ClInclude Include="..\src\external\parser\Wrd.h">
       <Filter>sbm</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_test_cmds.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_speech_impl_skeleton.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_speech_audiofile.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_speech.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_pawn.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_deformable_mesh.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_constants.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_character.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_audio.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag">
       <Filter>sbm</Filter>
     </None>
     <None Include="..\src\sbm\GPU\shaderFiles\vs_skin_pos.vert">
+      <Filter>sbm</Filter>
+    </None>
+    <None Include="..\src\sbm\sbm_pawn.cpp.bak">
+      <Filter>sbm</Filter>
+    </None>
+    <None Include="..\src\sbm\sbm_deformable_mesh.cpp.bak">
       <Filter>sbm</Filter>
     </None>
   </ItemGroup>

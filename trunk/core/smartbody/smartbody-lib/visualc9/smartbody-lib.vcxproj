@@ -260,6 +260,7 @@
     <ClCompile Include="..\src\sbm\Resource.cpp" />
     <ClCompile Include="..\src\sbm\resource_cmds.cpp" />
     <ClCompile Include="..\src\sbm\ResourceManager.cpp" />
+    <ClCompile Include="..\src\sbm\sbm_speech_impl_skeleton.cpp" />
     <ClCompile Include="..\src\sb\SBBoneBusManager.cpp" />
     <ClCompile Include="..\src\sb\SBJointMap.cpp" />
     <ClCompile Include="..\src\sb\SBJointMapManager.cpp" />
@@ -681,7 +682,7 @@
     <ClCompile Include="..\src\sb\SBSkeleton.cpp" />
     <ClCompile Include="..\src\sb\SBSteerAgent.cpp" />
     <ClCompile Include="..\src\sb\SBSteerManager.cpp" />
-	<ClCompile Include="..\src\sb\SBCollisionManager.cpp" />
+    <ClCompile Include="..\src\sb\SBCollisionManager.cpp" />
     <ClCompile Include="..\src\sb\SBSubject.cpp" />
     <ClCompile Include="..\src\sbm\nvbg.cpp" />
   </ItemGroup>
@@ -710,18 +711,18 @@
     <ClInclude Include="..\src\sbm\Resource.h" />
     <ClInclude Include="..\src\sbm\resource_cmds.h" />
     <ClInclude Include="..\src\sbm\ResourceManager.h" />
+    <ClInclude Include="..\src\sbm\sbm_audio.h" />
+    <ClInclude Include="..\src\sbm\sbm_character.hpp" />
+    <ClInclude Include="..\src\sbm\sbm_constants.h" />
+    <ClInclude Include="..\src\sbm\sbm_deformable_mesh.h" />
+    <ClInclude Include="..\src\sbm\sbm_pawn.hpp" />
+    <ClInclude Include="..\src\sbm\sbm_speech.hpp" />
+    <ClInclude Include="..\src\sbm\sbm_speech_audiofile.hpp" />
+    <ClInclude Include="..\src\sbm\sbm_speech_impl_skeleton.hpp" />
+    <ClInclude Include="..\src\sbm\sbm_test_cmds.hpp" />
     <ClInclude Include="..\src\sb\SBBoneBusManager.h" />
     <ClInclude Include="..\src\sb\SBJointMap.h" />
     <ClInclude Include="..\src\sb\SBJointMapManager.h" />
-    <ClInclude Include="..\src\sb\SBm_audio.h" />
-    <ClInclude Include="..\src\sb\SBm_character.hpp" />
-    <ClInclude Include="..\src\sb\SBm_constants.h" />
-    <ClInclude Include="..\src\sb\SBm_deformable_mesh.h" />
-    <ClInclude Include="..\src\sb\SBm_pawn.hpp" />
-    <ClInclude Include="..\src\sb\SBm_speech.hpp" />
-    <ClInclude Include="..\src\sb\SBm_speech_audiofile.hpp" />
-    <ClInclude Include="..\src\sb\SBm_test_cmds.hpp" />
-    <ClInclude Include="..\src\sb\SBmDebuggerServer.h" />
     <ClInclude Include="..\src\sbm\sr_arg_buff.h" />
     <ClInclude Include="..\src\sbm\sr_cmd_line.h" />
     <ClInclude Include="..\src\sbm\sr_cmd_map.h" />
@@ -1040,6 +1041,8 @@
   <ItemGroup>
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag" />
     <None Include="..\src\sbm\GPU\shaderFiles\vs_skin_pos.vert" />
+    <None Include="..\src\sbm\sbm_deformable_mesh.cpp.bak" />
+    <None Include="..\src\sbm\sbm_pawn.cpp.bak" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\lib\bonebus\bonebus.vcxproj">
