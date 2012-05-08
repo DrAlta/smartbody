@@ -1,673 +1,437 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="sbm">
-      <UniqueIdentifier>{c99adccd-6f86-402e-8ef4-f7a4420fe2ca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="sbm\GPU">
-      <UniqueIdentifier>{4bb71286-2f31-47bb-a283-4a3693212eb1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="sbm\GPU\gfx">
-      <UniqueIdentifier>{a90743a3-dffa-4a9f-80f5-ddf66ecf040f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="sbm\GPU\shaderFiles">
-      <UniqueIdentifier>{93c8bd2b-5da1-45e8-a7b5-80ba57db0663}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="sbm\Physics">
-      <UniqueIdentifier>{475d74a8-9cbc-47ef-9f0a-92522baf4fae}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="sbm\steering">
-      <UniqueIdentifier>{16d279dc-86c9-4cd5-96de-d12b6bdbdc9c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers">
-      <UniqueIdentifier>{ded75d6a-6e4d-4b1e-8d44-8a105350fc8c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\semiprocedurallocomotion">
-      <UniqueIdentifier>{a3e5f0af-ceb9-4a24-a913-2bbeb3c8987f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\gaze">
-      <UniqueIdentifier>{254ed58d-c203-45fd-99b5-de6a90e03772}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\stepturn">
-      <UniqueIdentifier>{b97f0423-8d97-4cbc-8a3b-496322f012b4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\eyelid">
-      <UniqueIdentifier>{23eadcdc-468c-4f78-b54c-9f9b65afc7d7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\face">
-      <UniqueIdentifier>{a841d8cd-9be8-44cd-bea5-51d13bfc388b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\tether">
-      <UniqueIdentifier>{0fd013cc-21c4-44d7-bf33-5e6f1809f21a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\lilt">
-      <UniqueIdentifier>{47581279-bef1-4eaf-90e8-910909d41ee1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\quickdraw">
-      <UniqueIdentifier>{0b1907a8-ebd5-47f9-8500-1a447b5552ac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\nodshake">
-      <UniqueIdentifier>{c512c08d-05cc-48f5-b4a6-3ecde3bcfd82}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\simplegaze">
-      <UniqueIdentifier>{c623aa25-38f2-4c63-844f-5e7e97611e48}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\motion">
-      <UniqueIdentifier>{dcac7cb4-aca9-437a-bf61-0d3cf6dd3a95}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\adshrenvelope">
-      <UniqueIdentifier>{6cb2b310-78c9-4e3a-82c5-52b2811c1ba0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\scheduler">
-      <UniqueIdentifier>{a245f186-9588-4afb-90da-6f7d06510819}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\replay">
-      <UniqueIdentifier>{3e1cbfc8-2d2f-4565-ace0-dacea4023cbc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\interpolator">
-      <UniqueIdentifier>{16fa2683-31ff-4777-a15d-c6ef219f1f6c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\lifecycle">
-      <UniqueIdentifier>{563350f1-8a91-4d55-bbdb-73b974f8c179}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\timewarp">
-      <UniqueIdentifier>{112bef9b-b27e-4d75-9f38-eb89583d0601}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\channelwriter">
-      <UniqueIdentifier>{b91cbbb5-59b3-4efa-a042-f78641af9ca4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\pose">
-      <UniqueIdentifier>{69d0d740-e9b8-4aed-a2c0-f46657e1210b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\container">
-      <UniqueIdentifier>{174f4a45-5eb5-4b33-b4ae-175a22fe7490}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\unary">
-      <UniqueIdentifier>{b62c05eb-b09e-4f03-abe8-3c536acefc59}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\reach">
-      <UniqueIdentifier>{325a2e9c-135f-4dd3-b8e9-89acb26e481d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\reach\Constraint">
-      <UniqueIdentifier>{b1af4c82-3621-4a1c-a678-3a7b2afc0ba2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\reach\BodyReach">
-      <UniqueIdentifier>{eeb99ff9-a3b6-4ed1-abd2-4744e596c995}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\reach\Hand">
-      <UniqueIdentifier>{36625d1e-c549-420d-929f-846beff6c9f5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\blend">
-      <UniqueIdentifier>{74b6da33-222c-4df0-8335-075e637ccee8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\motionplayer">
-      <UniqueIdentifier>{a7541062-5acf-4fea-9190-b44b6870a6ce}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\general">
-      <UniqueIdentifier>{ef5c5435-3d42-43e3-a745-e2ceadfcf9d2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\general\MotionInterpolation">
-      <UniqueIdentifier>{462eaad0-bfe9-4873-89c6-35888018b37b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\general\IK">
-      <UniqueIdentifier>{4f86ae63-f797-4931-8460-31cdd8af5873}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\general\ublas">
-      <UniqueIdentifier>{fdf4b898-126f-42cc-8969-b97c2bf89d66}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\saccade">
-      <UniqueIdentifier>{613ab21e-95ef-417c-973a-b91f8e2887f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\basiclocomotion">
-      <UniqueIdentifier>{6034accf-940c-4ff6-8c71-d4d0e13ada2b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\datareceiver">
-      <UniqueIdentifier>{f11221fa-d382-4850-abfc-1eef524a40b7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\breathing">
-      <UniqueIdentifier>{fae98a5f-ed48-4458-960b-c1334ed98c54}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\paramanimation">
-      <UniqueIdentifier>{e917095b-fd02-402d-b79a-bc6a79e0cd73}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="controllers\physics">
-      <UniqueIdentifier>{0593e6e8-033e-4aa7-9d54-07dacce87834}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BML">
-      <UniqueIdentifier>{f670ab4e-ce84-4d78-abd1-5cac900bf1bd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="sk">
-      <UniqueIdentifier>{135921b1-ad39-4a94-8e8a-926a97755475}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="sr">
-      <UniqueIdentifier>{c3c3abe6-edbb-4a01-b0db-1df1ddc36fcc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="sr\planner">
-      <UniqueIdentifier>{de9ef0a2-39f9-4da4-b7ad-c9bbf6dcf77d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="sr\planner\PositionPlanner">
-      <UniqueIdentifier>{15a1267e-3fa4-4d43-8144-4741fbd7cc50}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="sr\planner\BlendPlanner">
-      <UniqueIdentifier>{66d4df8d-9723-4322-a430-e5f8c8ea96e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="external">
-      <UniqueIdentifier>{fa583c39-2755-4889-a3a8-5673a44bf455}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="external\ANN">
-      <UniqueIdentifier>{e2bdbc76-e264-4274-a82a-cbe813c251fa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="external\glew">
-      <UniqueIdentifier>{d93227f0-b355-42dc-8d14-8c653646bb0e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="external\SOIL">
-      <UniqueIdentifier>{fab2468d-542c-4318-a82b-1418d5e383ce}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="external\parser">
-      <UniqueIdentifier>{83b23acd-759b-41e6-9cea-7fd47941d94a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="python">
-      <UniqueIdentifier>{08e505b9-20fa-4489-bed0-fbcd959f60a5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SB">
-      <UniqueIdentifier>{88982256-099a-4e62-a3da-8f9d43363b80}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="nvbg">
-      <UniqueIdentifier>{686ab576-5898-4501-8c04-9d812d4c3963}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\sbm\action_unit.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\DefaultAttributeTable.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\Event.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\GenericViewer.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\gwiz_cmdl.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\gwiz_math.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\gwiz_spline.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\Heightfield.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\joint_logger.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\KinectProcessor.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\lin_win.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\local_speech.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\locomotion_cmds.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\mcontrol_callbacks.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\mcontrol_util.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\MiniBrain.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\ParserASFAMC.cxx">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\ParserBVH.cxx">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\ParserFBX.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\ParserOpenCOLLADA.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\remote_speech.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\Resource.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\resource_cmds.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\ResourceManager.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sbm_audio.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sbm_character.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sbm_deformable_mesh.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sbm_pawn.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sbm_speech.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sbm_speech_audiofile.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sbm_test_cmds.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SbmDebuggerServer.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sr_arg_buff.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sr_cmd_line.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sr_cmd_seq.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sr_hash_map.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sr_linear_curve.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sr_path_list.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sr_spline_curve.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sr_synch_points.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\text_speech.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\time_profiler.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\time_regulator.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\xercesc_utils.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\GPU\SbmDeformableMeshGPU.cpp">
-      <Filter>sbm\GPU</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\GPU\SbmShader.cpp">
-      <Filter>sbm\GPU</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\GPU\SbmTexture.cpp">
-      <Filter>sbm\GPU</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\GPU\TBOData.cpp">
-      <Filter>sbm\GPU</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\GPU\VBOData.cpp">
-      <Filter>sbm\GPU</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\Physics\SbmColObject.cpp">
-      <Filter>sbm\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\Physics\SbmPhysicsSim.cpp">
-      <Filter>sbm\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\Physics\SbmPhysicsSimODE.cpp">
-      <Filter>sbm\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SteeringAgent.cpp">
-      <Filter>sbm\steering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SteerSuiteEnginerDriver.cpp">
-      <Filter>sbm\steering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\me\me_controller.cpp">
+    <ClCompile Include="..\src\controllers\me_controller.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_controller_context.cpp">
+    <ClCompile Include="..\src\controllers\me_controller_context.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_controller_context_proxy.cpp">
+    <ClCompile Include="..\src\controllers\me_controller_context_proxy.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_controller_tree_root.cpp">
+    <ClCompile Include="..\src\controllers\me_controller_tree_root.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_default_prune_policy.cpp">
+    <ClCompile Include="..\src\controllers\me_ct_adshr_envelope.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_spline_1d.cpp">
+    <ClCompile Include="..\src\controllers\me_ct_barycentric_interpolation.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_basic_locomotion.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_blend.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_breathing.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_breathing_interface.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_ccd_IK.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_channel_writer.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_constraint.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_container.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_curve_writer.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_data_driven_reach.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_data_interpolation.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_data_receiver.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_example_body_reach.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_examples.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_eyelid.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_face.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_gaze.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_gaze_alg.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_gaze_joint.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_gaze_keymap.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_gaze_target.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_hand.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_IK.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_IK_scenario.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_interpolator.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_inverse_interpolation.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_jacobian_IK.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_lifecycle_test.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_lilt_try.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_limb.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_analysis.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_anim_global_info.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_balance.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_func.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_height_offset.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_IK.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_joint_info.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_limb.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_limb_anim.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_limb_direction_planner.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_navigator.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_pawn.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_quadratic_synchronizer.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_routine.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_simple.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_speed_accelerator.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_terrain.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_timing_space.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_motion.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_motion_example.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_motion_parameter.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_motion_player.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_motion_profile.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_motion_timewarp.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_navigation_circle.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_navigation_waypoint.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_param_animation.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_param_animation_data.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_param_animation_utilities.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_periodic_replay.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_physics_controller.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_pose.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_quick_draw.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_reach.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_reach_IK.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_saccade.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_scheduler2.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_simple_gaze.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_step_turn.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_tether.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_time_shift_warp.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_ublas.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_unary.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_default_prune_policy.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_spline_1d.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\me_utilities.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_IK.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_IK_scenario.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_animation.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_bodyreach.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_analysis.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_constraint.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_anim_global_info.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_event.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_balance.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_face.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_func.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_gaze.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_height_offset.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_general_param.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_IK.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_gesture.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_joint_info.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_grab.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_limb.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_interrupt.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_limb_anim.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_locomotion.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_limb_direction_planner.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_processor.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_navigator.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_quickdraw.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_pawn.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_reach.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_quadratic_synchronizer.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_saccade.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_routine.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_speech.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_simple.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_states.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_speed_accelerator.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_sync_point.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_terrain.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\bml\bml_target.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_locomotion_timing_space.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\sb\SBAnimationState.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_navigation_circle.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\sb\SBAnimationStateManager.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_navigation_waypoint.cpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClCompile Include="..\src\sb\SBAnimationTransition.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_gaze.cpp">
-      <Filter>controllers\gaze</Filter>
+    <ClCompile Include="..\src\sb\SBAttribute.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_gaze_alg.cpp">
-      <Filter>controllers\gaze</Filter>
+    <ClCompile Include="..\src\sb\SBAttributeManager.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_gaze_joint.cpp">
-      <Filter>controllers\gaze</Filter>
+    <ClCompile Include="..\src\sb\SBBehavior.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_gaze_keymap.cpp">
-      <Filter>controllers\gaze</Filter>
+    <ClCompile Include="..\src\sb\SBBmlProcessor.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_gaze_target.cpp">
-      <Filter>controllers\gaze</Filter>
+    <ClCompile Include="..\src\sb\SBBoneBusManager.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_step_turn.cpp">
-      <Filter>controllers\stepturn</Filter>
+    <ClCompile Include="..\src\sb\SBCharacter.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_eyelid.cpp">
-      <Filter>controllers\eyelid</Filter>
+    <ClCompile Include="..\src\sb\SBCollisionManager.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_face.cpp">
-      <Filter>controllers\face</Filter>
+    <ClCompile Include="..\src\sb\SBController.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_tether.cpp">
-      <Filter>controllers\tether</Filter>
+    <ClCompile Include="..\src\sb\SBFaceDefinition.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_lilt_try.cpp">
-      <Filter>controllers\lilt</Filter>
+    <ClCompile Include="..\src\sb\SBGestureMap.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_quick_draw.cpp">
-      <Filter>controllers\quickdraw</Filter>
+    <ClCompile Include="..\src\sb\SBGestureMapManager.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_examples.cpp">
-      <Filter>controllers\nodshake</Filter>
+    <ClCompile Include="..\src\sb\SBJoint.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_simple_gaze.cpp">
-      <Filter>controllers\simplegaze</Filter>
+    <ClCompile Include="..\src\sb\SBJointMap.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_ct_motion.cpp">
-      <Filter>controllers\motion</Filter>
+    <ClCompile Include="..\src\sb\SBJointMapManager.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_ct_adshr_envelope.cpp">
-      <Filter>controllers\adshrenvelope</Filter>
+    <ClCompile Include="..\src\controllers\MeCtBodyReachState.cpp">
+      <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_ct_scheduler2.cpp">
-      <Filter>controllers\scheduler</Filter>
+    <ClCompile Include="..\src\controllers\MeCtReachEngine.cpp">
+      <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_ct_periodic_replay.cpp">
-      <Filter>controllers\replay</Filter>
+    <ClCompile Include="..\src\sb\SBObject.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_ct_interpolator.cpp">
-      <Filter>controllers\interpolator</Filter>
+    <ClCompile Include="..\src\sb\SBObserver.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_ct_lifecycle_test.cpp">
-      <Filter>controllers\lifecycle</Filter>
+    <ClCompile Include="..\src\sb\SBParseNode.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_ct_time_shift_warp.cpp">
-      <Filter>controllers\timewarp</Filter>
+    <ClCompile Include="..\src\sb\SBParser.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_ct_channel_writer.cpp">
-      <Filter>controllers\channelwriter</Filter>
+    <ClCompile Include="..\src\sb\SBPawn.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_ct_curve_writer.cpp">
-      <Filter>controllers\channelwriter</Filter>
+    <ClCompile Include="..\src\sb\SBPhysicsManager.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_ct_pose.cpp">
-      <Filter>controllers\pose</Filter>
+    <ClCompile Include="..\src\sb\SBPython.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_ct_container.cpp">
-      <Filter>controllers\container</Filter>
+    <ClCompile Include="..\src\sb\SBPythonClass.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_ct_unary.cpp">
-      <Filter>controllers\unary</Filter>
+    <ClCompile Include="..\src\sb\SBReach.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_data_driven_reach.cpp">
-      <Filter>controllers\reach</Filter>
+    <ClCompile Include="..\src\sb\SBReachManager.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_limb.cpp">
-      <Filter>controllers\reach</Filter>
+    <ClCompile Include="..\src\sb\SBScene.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_reach.cpp">
-      <Filter>controllers\reach</Filter>
+    <ClCompile Include="..\src\sb\SBScript.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_reach_IK.cpp">
-      <Filter>controllers\reach</Filter>
+    <ClCompile Include="..\src\sb\SBService.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_constraint.cpp">
-      <Filter>controllers\reach\Constraint</Filter>
+    <ClCompile Include="..\src\sb\SBServiceManager.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_example_body_reach.cpp">
-      <Filter>controllers\reach\BodyReach</Filter>
+    <ClCompile Include="..\src\sb\SBSimulationManager.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\MeCtBodyReachState.cpp">
-      <Filter>controllers\reach\BodyReach</Filter>
+    <ClCompile Include="..\src\sb\SBSkeleton.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\MeCtReachEngine.cpp">
-      <Filter>controllers\reach\BodyReach</Filter>
+    <ClCompile Include="..\src\sb\SBSteerAgent.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_hand.cpp">
-      <Filter>controllers\reach\Hand</Filter>
+    <ClCompile Include="..\src\sb\SBSteerManager.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\me\me_ct_blend.cpp">
-      <Filter>controllers\blend</Filter>
+    <ClCompile Include="..\src\sb\SBSubject.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_motion_player.cpp">
-      <Filter>controllers\motionplayer</Filter>
+    <ClCompile Include="..\src\sr\planner\sk_blend_cfg.cpp">
+      <Filter>sk</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_barycentric_interpolation.cpp">
-      <Filter>controllers\general\MotionInterpolation</Filter>
+    <ClCompile Include="..\src\sr\planner\sk_blend_cfg_manager.cpp">
+      <Filter>sk</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_data_interpolation.cpp">
-      <Filter>controllers\general\MotionInterpolation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_inverse_interpolation.cpp">
-      <Filter>controllers\general\MotionInterpolation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_motion_example.cpp">
-      <Filter>controllers\general\MotionInterpolation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_motion_parameter.cpp">
-      <Filter>controllers\general\MotionInterpolation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_motion_profile.cpp">
-      <Filter>controllers\general\MotionInterpolation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_motion_timewarp.cpp">
-      <Filter>controllers\general\MotionInterpolation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_ccd_IK.cpp">
-      <Filter>controllers\general\IK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_jacobian_IK.cpp">
-      <Filter>controllers\general\IK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_ublas.cpp">
-      <Filter>controllers\general\ublas</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_saccade.cpp">
-      <Filter>controllers\saccade</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_basic_locomotion.cpp">
-      <Filter>controllers\basiclocomotion</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_data_receiver.cpp">
-      <Filter>controllers\datareceiver</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_breathing.cpp">
-      <Filter>controllers\breathing</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_breathing_interface.cpp">
-      <Filter>controllers\breathing</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_param_animation.cpp">
-      <Filter>controllers\paramanimation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_param_animation_data.cpp">
-      <Filter>controllers\paramanimation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_param_animation_utilities.cpp">
-      <Filter>controllers\paramanimation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\me_ct_physics_controller.cpp">
-      <Filter>controllers\physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\behavior_scheduler.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\behavior_scheduler_constant_speed.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\behavior_scheduler_fixed.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\behavior_span.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_animation.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_bodyreach.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_constraint.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_event.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_face.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_gaze.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_general_param.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_gesture.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_grab.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_interrupt.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_locomotion.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_processor.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_quickdraw.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_reach.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_saccade.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_speech.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_states.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_sync_point.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\bml_target.cpp">
-      <Filter>BML</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\BMLDefs.cpp">
-      <Filter>BML</Filter>
+    <ClCompile Include="..\src\sr\planner\sk_blend_planner.cpp">
+      <Filter>sk</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sk\sk_channel.cpp">
       <Filter>sk</Filter>
@@ -696,6 +460,15 @@
     <ClCompile Include="..\src\sk\sk_motion_io.cpp">
       <Filter>sk</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sr\planner\sk_pos_cfg.cpp">
+      <Filter>sk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sr\planner\sk_pos_cfg_manager.cpp">
+      <Filter>sk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sr\planner\sk_pos_planner.cpp">
+      <Filter>sk</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\sk\sk_posture.cpp">
       <Filter>sk</Filter>
     </ClCompile>
@@ -717,6 +490,9 @@
     <ClCompile Include="..\src\sr\sr_alg.cpp">
       <Filter>sr</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sbm\sr_arg_buff.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\sr\sr_array.cpp">
       <Filter>sr</Filter>
     </ClCompile>
@@ -727,6 +503,27 @@
       <Filter>sr</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sr\sr_camera.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sr\planner\sr_cfg_manager.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sr\planner\sr_cfg_path.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sr\planner\sr_cfg_planner.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sr\planner\sr_cfg_planner_lazy.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sr\planner\sr_cfg_tree.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\sr_cmd_line.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\sr_cmd_seq.cpp">
       <Filter>sr</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sr\sr_color.cpp">
@@ -750,6 +547,9 @@
     <ClCompile Include="..\src\sr\sr_gl_render_funcs.cpp">
       <Filter>sr</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sbm\sr_hash_map.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\sr\sr_hash_table.cpp">
       <Filter>sr</Filter>
     </ClCompile>
@@ -760,6 +560,9 @@
       <Filter>sr</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sr\sr_line.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\sr_linear_curve.cpp">
       <Filter>sr</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sr\sr_lines.cpp">
@@ -784,6 +587,9 @@
       <Filter>sr</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sr\sr_path_array.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\sr_path_list.cpp">
       <Filter>sr</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sr\sr_plane.cpp">
@@ -840,10 +646,16 @@
     <ClCompile Include="..\src\sr\sr_spline.cpp">
       <Filter>sr</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sbm\sr_spline_curve.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\sr\sr_string.cpp">
       <Filter>sr</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sr\sr_string_array.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\sr_synch_points.cpp">
       <Filter>sr</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sr\sr_timer.cpp">
@@ -867,857 +679,796 @@
     <ClCompile Include="..\src\sr\sr_viewer.cpp">
       <Filter>sr</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sr\planner\sr_cfg_manager.cpp">
-      <Filter>sr\planner</Filter>
+    <ClCompile Include="..\src\sb\SBMotion.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sr\planner\sr_cfg_path.cpp">
-      <Filter>sr\planner</Filter>
+    <ClCompile Include="..\src\bml\behavior_scheduler.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sr\planner\sr_cfg_planner.cpp">
-      <Filter>sr\planner</Filter>
+    <ClCompile Include="..\src\bml\behavior_scheduler_constant_speed.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sr\planner\sr_cfg_planner_lazy.cpp">
-      <Filter>sr\planner</Filter>
+    <ClCompile Include="..\src\bml\behavior_scheduler_fixed.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sr\planner\sr_cfg_tree.cpp">
-      <Filter>sr\planner</Filter>
+    <ClCompile Include="..\src\bml\behavior_span.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sr\planner\sk_pos_cfg.cpp">
-      <Filter>sr\planner\PositionPlanner</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sr\planner\sk_pos_cfg_manager.cpp">
-      <Filter>sr\planner\PositionPlanner</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sr\planner\sk_pos_planner.cpp">
-      <Filter>sr\planner\PositionPlanner</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sr\planner\sk_blend_cfg.cpp">
-      <Filter>sr\planner\BlendPlanner</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sr\planner\sk_blend_cfg_manager.cpp">
-      <Filter>sr\planner\BlendPlanner</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sr\planner\sk_blend_planner.cpp">
-      <Filter>sr\planner\BlendPlanner</Filter>
+    <ClCompile Include="..\src\sbm\action_unit.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\ANN\ANN.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\bd_fix_rad_search.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\bd_pr_search.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\bd_search.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\bd_tree.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\brute.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_dump.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_fix_rad_search.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_pr_search.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_search.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_split.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_tree.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_util.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\perf.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\glew\glew.cpp">
-      <Filter>external\glew</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\SOIL\image_DXT.c">
-      <Filter>external\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\SOIL\image_helper.c">
-      <Filter>external\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\SOIL\SOIL.c">
-      <Filter>external\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\SOIL\stb_image_aug.c">
-      <Filter>external\SOIL</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\Bchart.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\BchartSm.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\bd_fix_rad_search.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\bd_pr_search.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\bd_search.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\bd_tree.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\BMLDefs.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\brute.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\Bst.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\ChartBase.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\ClassRule.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\CntxArray.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\CombineBests.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\DefaultAttributeTable.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\ECArgs.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\Edge.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\EdgeHeap.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\edgeSubFns.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\EgsFromTree.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\Event.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\ewDciTokStrm.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\extraMain.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\FBinaryArray.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\Feat.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\Feature.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\FeatureTree.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\fhSubFns.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\Field.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\FullHist.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\GenericViewer.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\glew\glew.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\GotIter.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\gwiz_cmdl.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\gwiz_math.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\gwiz_spline.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\headFinder.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\headFinderCh.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\Heightfield.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\SOIL\image_DXT.c">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\SOIL\image_helper.c">
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\InputTree.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\Item.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\joint_logger.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_dump.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_fix_rad_search.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_pr_search.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_search.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_split.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_tree.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_util.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\KinectProcessor.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\lin_win.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\Link.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\local_speech.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\locomotion_cmds.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\mcontrol_callbacks.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\mcontrol_util.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\MeChart.cpp">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\external\parser\Params.cpp">
-      <Filter>external\parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\ParseStats.cpp">
-      <Filter>external\parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\SentRep.cpp">
-      <Filter>external\parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\Term.cpp">
-      <Filter>external\parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\TimeIt.cpp">
-      <Filter>external\parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\UnitRules.cpp">
-      <Filter>external\parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\utils.cpp">
-      <Filter>external\parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\ValHeap.cpp">
-      <Filter>external\parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBPython.cpp">
-      <Filter>python</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBPythonClass.cpp">
-      <Filter>python</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBAnimationState.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBAnimationStateManager.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBAnimationTransition.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBAttribute.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBAttributeManager.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBBehavior.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBBmlProcessor.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBCharacter.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBController.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBFaceDefinition.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBGestureMap.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBGestureMapManager.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBJoint.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBMotion.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBObject.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBObserver.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBParseNode.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBParser.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBPawn.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBPhysicsManager.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBReach.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBReachManager.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBScene.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBScript.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBService.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBServiceManager.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBSimulationManager.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBSkeleton.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBSteerAgent.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBSteerManager.cpp">
-      <Filter>SB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\SBSubject.cpp">
-      <Filter>SB</Filter>
+    <ClCompile Include="..\src\sbm\MiniBrain.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\nvbg.cpp">
-      <Filter>nvbg</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\SBBoneBusManager.cpp" />
+    <ClCompile Include="..\src\external\parser\Params.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\ParserASFAMC.cxx">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\ParserBVH.cxx">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\ParserFBX.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\ParserOpenCOLLADA.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\ParseStats.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\perf.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\remote_speech.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\Resource.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\resource_cmds.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\ResourceManager.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\sbm_audio.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\sbm_character.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\sbm_deformable_mesh.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\sbm_pawn.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\sbm_speech.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\sbm_speech_audiofile.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\sbm_test_cmds.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\Physics\SbmColObject.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\SbmDebuggerServer.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\GPU\SbmDeformableMeshGPU.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\Physics\SbmPhysicsSim.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\Physics\SbmPhysicsSimODE.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\GPU\SbmShader.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\GPU\SbmTexture.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\SentRep.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\SOIL\SOIL.c">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\SOIL\stb_image_aug.c">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\SteeringAgent.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\sbm\SteerPath.cpp">
-      <Filter>sbm\steering</Filter>
+      <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\SBJointMap.cpp">
-      <Filter>SB</Filter>
+    <ClCompile Include="..\src\sbm\SteerSuiteEnginerDriver.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\SBJointMapManager.cpp">
-      <Filter>SB</Filter>
+    <ClCompile Include="..\src\sbm\GPU\TBOData.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\Term.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\text_speech.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\time_profiler.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\time_regulator.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\TimeIt.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\UnitRules.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\utils.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\ValHeap.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\GPU\VBOData.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\xercesc_utils.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\sbm\action_unit.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\DefaultAttributeTable.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\Event.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\general_param_setting.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GenericViewer.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\gwiz_cmdl.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\gwiz_math.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\Heightfield.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\joint_logger.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\KinectProcessor.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\lin_win.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\local_speech.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\locomotion_cmds.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\mcontrol_callbacks.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\mcontrol_util.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\MiniBrain.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\ParserASFAMC.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\ParserBVH.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\ParserFBX.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\ParserOpenCOLLADA.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\remote_speech.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\Resource.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\resource_cmds.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\ResourceManager.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_audio.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_character.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_constants.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_deformable_mesh.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_pawn.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_speech.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_speech_audiofile.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_test_cmds.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SbmDebuggerServer.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sr_arg_buff.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sr_cmd_line.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sr_cmd_map.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sr_cmd_seq.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sr_curve_builder.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sr_hash_map.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sr_linear_curve.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sr_path_list.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sr_spline_curve.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sr_synch_points.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\text_speech.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\time_profiler.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\time_regulator.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\viseme_map.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\xercesc_utils.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\SbmDeformableMeshGPU.h">
-      <Filter>sbm\GPU</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\SbmShader.h">
-      <Filter>sbm\GPU</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\SbmTexture.h">
-      <Filter>sbm\GPU</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\TBOData.h">
-      <Filter>sbm\GPU</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\VBOData.h">
-      <Filter>sbm\GPU</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\gfx\mat2.h">
-      <Filter>sbm\GPU\gfx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\gfx\mat3.h">
-      <Filter>sbm\GPU\gfx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\gfx\mat4.h">
-      <Filter>sbm\GPU\gfx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\gfx\vec2.h">
-      <Filter>sbm\GPU\gfx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\gfx\vec3.h">
-      <Filter>sbm\GPU\gfx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\gfx\vec4.h">
-      <Filter>sbm\GPU\gfx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\Physics\SbmColObject.h">
-      <Filter>sbm\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\Physics\SbmPhysicsSim.h">
-      <Filter>sbm\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\Physics\SbmPhysicsSimODE.h">
-      <Filter>sbm\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SteeringAgent.h">
-      <Filter>sbm\steering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SteerSuiteEngineDriver.h">
-      <Filter>sbm\steering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\me\me_controller.h">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\me\me_controller_context.hpp">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\me\me_controller_context_proxy.hpp">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\me\me_controller_tree_root.hpp">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\me\me_default_prune_policy.hpp">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\me\me_evaluation_logger.hpp">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\me\me_prune_policy.hpp">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\me\me_spline_1d.hpp">
+    <ClInclude Include="..\src\sbm\me_blend_cover.h">
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
       <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_IK.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_blend_cover.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_IK_scenario.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_controller.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_controller_context.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_analysis.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_controller_context_proxy.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_anim_global_info.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_controller_tree_root.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_balance.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_adshr_envelope.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_func.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_barycentric_interpolation.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_height_offset.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_basic_locomotion.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_IK.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_blend.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_joint_info.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_breathing.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_limb.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_breathing_interface.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_limb_anim.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_ccd_IK.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_limb_direction_planner.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_channel_writer.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_navigator.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_constraint.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_pawn.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_container.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_quadratic_synchronizer.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_curve_writer.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_routine.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_data_driven_reach.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_simple.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_data_interpolation.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_speed_accelerator.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_data_receiver.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_terrain.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_example_body_reach.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_locomotion_timing_space.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_examples.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_navigation_circle.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_eyelid.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_navigation_waypoint.hpp">
-      <Filter>controllers\semiprocedurallocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_face.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_blend_cover.h">
-      <Filter>controllers\gaze</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_gaze.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_gaze.h">
-      <Filter>controllers\gaze</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_gaze_alg.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_gaze_alg.h">
-      <Filter>controllers\gaze</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_gaze_joint.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_gaze_joint.h">
-      <Filter>controllers\gaze</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_gaze_sensor.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_gaze_sensor.h">
-      <Filter>controllers\gaze</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_hand.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_step_turn.h">
-      <Filter>controllers\stepturn</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_IK.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_eyelid.h">
-      <Filter>controllers\eyelid</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_IK_scenario.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_face.h">
-      <Filter>controllers\face</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_interpolator.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_tether.h">
-      <Filter>controllers\tether</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_inverse_interpolation.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_lilt_try.h">
-      <Filter>controllers\lilt</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_jacobian_IK.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_quick_draw.h">
-      <Filter>controllers\quickdraw</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_lifecycle_test.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_examples.h">
-      <Filter>controllers\nodshake</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_lilt_try.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_simple_gaze.h">
-      <Filter>controllers\simplegaze</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_limb.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_ct_motion.h">
-      <Filter>controllers\motion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_ct_adshr_envelope.hpp">
-      <Filter>controllers\adshrenvelope</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_analysis.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_ct_scheduler2.h">
-      <Filter>controllers\scheduler</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_anim_global_info.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_ct_periodic_replay.hpp">
-      <Filter>controllers\replay</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_balance.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_ct_interpolator.h">
-      <Filter>controllers\interpolator</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_func.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_ct_lifecycle_test.hpp">
-      <Filter>controllers\lifecycle</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_height_offset.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_ct_time_shift_warp.hpp">
-      <Filter>controllers\timewarp</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_IK.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_ct_channel_writer.hpp">
-      <Filter>controllers\channelwriter</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_joint_info.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_ct_curve_writer.hpp">
-      <Filter>controllers\channelwriter</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_limb.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_ct_pose.h">
-      <Filter>controllers\pose</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_limb_anim.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_ct_container.hpp">
-      <Filter>controllers\container</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_limb_direction_planner.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_ct_unary.hpp">
-      <Filter>controllers\unary</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_navigator.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_data_driven_reach.hpp">
-      <Filter>controllers\reach</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_pawn.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_limb.hpp">
-      <Filter>controllers\reach</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_quadratic_synchronizer.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_reach.hpp">
-      <Filter>controllers\reach</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_routine.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_reach_IK.hpp">
-      <Filter>controllers\reach</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_simple.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_constraint.hpp">
-      <Filter>controllers\reach\Constraint</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_speed_accelerator.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_example_body_reach.hpp">
-      <Filter>controllers\reach\BodyReach</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_terrain.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\MeCtBodyReachState.h">
-      <Filter>controllers\reach\BodyReach</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_timing_space.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\MeCtReachEngine.h">
-      <Filter>controllers\reach\BodyReach</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_motion.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_hand.hpp">
-      <Filter>controllers\reach\Hand</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_motion_example.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\me\me_ct_blend.hpp">
-      <Filter>controllers\blend</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_motion_parameter.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_motion_player.h">
-      <Filter>controllers\motionplayer</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_motion_player.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_barycentric_interpolation.h">
-      <Filter>controllers\general\MotionInterpolation</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_motion_profile.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_data_interpolation.h">
-      <Filter>controllers\general\MotionInterpolation</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_motion_timewarp.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_inverse_interpolation.h">
-      <Filter>controllers\general\MotionInterpolation</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_navigation_circle.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_motion_example.hpp">
-      <Filter>controllers\general\MotionInterpolation</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_navigation_waypoint.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_motion_parameter.h">
-      <Filter>controllers\general\MotionInterpolation</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_param_animation.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_motion_profile.h">
-      <Filter>controllers\general\MotionInterpolation</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_param_animation_data.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_motion_timewarp.hpp">
-      <Filter>controllers\general\MotionInterpolation</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_param_animation_utilities.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_ccd_IK.hpp">
-      <Filter>controllers\general\IK</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_periodic_replay.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_jacobian_IK.hpp">
-      <Filter>controllers\general\IK</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_physics_controller.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_ublas.hpp">
-      <Filter>controllers\general\ublas</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_pose.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_saccade.h">
-      <Filter>controllers\saccade</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_quick_draw.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_basic_locomotion.h">
-      <Filter>controllers\basiclocomotion</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_reach.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_data_receiver.h">
-      <Filter>controllers\datareceiver</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_reach_IK.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_breathing.h">
-      <Filter>controllers\breathing</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_saccade.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_breathing_interface.h">
-      <Filter>controllers\breathing</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_scheduler2.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_param_animation.h">
-      <Filter>controllers\paramanimation</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_simple_gaze.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_param_animation_data.h">
-      <Filter>controllers\paramanimation</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_step_turn.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_param_animation_utilities.h">
-      <Filter>controllers\paramanimation</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_tether.h">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\me_ct_physics_controller.h">
-      <Filter>controllers\physics</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_time_shift_warp.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\behavior_scheduler.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_ublas.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\behavior_scheduler_constant_speed.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\controllers\me_ct_unary.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\behavior_scheduler_fixed.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\controllers\me_default_prune_policy.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\behavior_span.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\me\me_evaluation_logger.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\controllers\me_evaluation_logger.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_animation.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\me\me_prune_policy.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_bodyreach.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\controllers\me_prune_policy.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_constraint.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\controllers\me_spline_1d.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_event.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_xml_consts.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_exception.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_face.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_animation.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_gaze.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_bodyreach.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_general_param.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_constraint.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_gesture.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_event.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_grab.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_exception.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_interrupt.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_face.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_locomotion.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_gaze.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_processor.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_general_param.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_quickdraw.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_gesture.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_reach.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_grab.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_saccade.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_interrupt.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_schedule.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_locomotion.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_speech.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_processor.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_states.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_quickdraw.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_sync_point.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_reach.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_target.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_saccade.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_types.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_schedule.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\bml_xml_consts.hpp">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_speech.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\BMLDefs.h">
-      <Filter>BML</Filter>
+    <ClInclude Include="..\src\bml\bml_states.hpp">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bml\bml_sync_point.hpp">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bml\bml_target.hpp">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bml\bml_types.hpp">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBJointMapManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBAnimationState.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBAnimationStateManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBAnimationTransition.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBAttribute.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBAttributeManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBBehavior.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBBmlProcessor.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBBoneBusManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBCharacter.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBCollisionManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBController.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBFaceDefinition.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBGestureMap.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBGestureMapManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBJoint.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBJointMap.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\controllers\MeCtReachEngine.h">
+      <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\controllers\MeCtBodyReachState.h">
+      <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBSubject.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBObject.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBObserver.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBParseNode.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBParser.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBPawn.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBPhysicsManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBPython.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBPythonClass.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBReach.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBReachManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBScene.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBScript.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBService.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBServiceManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBSimulationManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBSkeleton.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBSteerAgent.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBSteerManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sk\sk_vec_limits.h">
+      <Filter>sk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sr\planner\sk_blend_cfg.h">
+      <Filter>sk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sr\planner\sk_blend_cfg_manager.h">
+      <Filter>sk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sr\planner\sk_blend_planner.h">
+      <Filter>sk</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sk\sk_channel.h">
       <Filter>sk</Filter>
@@ -1743,6 +1494,15 @@
     <ClInclude Include="..\src\sk\sk_motion.h">
       <Filter>sk</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\sr\planner\sk_pos_cfg.h">
+      <Filter>sk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sr\planner\sk_pos_cfg_manager.h">
+      <Filter>sk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sr\planner\sk_pos_planner.h">
+      <Filter>sk</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\sk\sk_posture.h">
       <Filter>sk</Filter>
     </ClInclude>
@@ -1752,13 +1512,16 @@
     <ClInclude Include="..\src\sk\sk_skeleton.h">
       <Filter>sk</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sk\sk_vec_limits.h">
-      <Filter>sk</Filter>
+    <ClInclude Include="..\src\sr\sr_viewer.h">
+      <Filter>sr</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sr\sr.h">
       <Filter>sr</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sr\sr_alg.h">
+      <Filter>sr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sr_arg_buff.h">
       <Filter>sr</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sr\sr_array.h">
@@ -1773,10 +1536,34 @@
     <ClInclude Include="..\src\sr\sr_camera.h">
       <Filter>sr</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\sr\planner\sr_cfg_manager.h">
+      <Filter>sr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sr\planner\sr_cfg_path.h">
+      <Filter>sr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sr\planner\sr_cfg_planner.h">
+      <Filter>sr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sr\planner\sr_cfg_tree.h">
+      <Filter>sr</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\sr\sr_class_manager.h">
       <Filter>sr</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\sbm\sr_cmd_line.h">
+      <Filter>sr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sr_cmd_map.h">
+      <Filter>sr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sr_cmd_seq.h">
+      <Filter>sr</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\sr\sr_color.h">
+      <Filter>sr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sr_curve_builder.h">
       <Filter>sr</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sr\sr_cylinder.h">
@@ -1797,6 +1584,9 @@
     <ClInclude Include="..\src\sr\sr_gl_render_funcs.h">
       <Filter>sr</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\sbm\sr_hash_map.h">
+      <Filter>sr</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\sr\sr_hash_table.h">
       <Filter>sr</Filter>
     </ClInclude>
@@ -1810,6 +1600,9 @@
       <Filter>sr</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sr\sr_line.h">
+      <Filter>sr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sr_linear_curve.h">
       <Filter>sr</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sr\sr_lines.h">
@@ -1828,6 +1621,9 @@
       <Filter>sr</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sr\sr_path_array.h">
+      <Filter>sr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sr_path_list.h">
       <Filter>sr</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sr\sr_plane.h">
@@ -1887,10 +1683,16 @@
     <ClInclude Include="..\src\sr\sr_spline.h">
       <Filter>sr</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\sbm\sr_spline_curve.h">
+      <Filter>sr</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\sr\sr_string.h">
       <Filter>sr</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sr\sr_string_array.h">
+      <Filter>sr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sr_synch_points.h">
       <Filter>sr</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sr\sr_timer.h">
@@ -1911,326 +1713,387 @@
     <ClInclude Include="..\src\sr\sr_vec2.h">
       <Filter>sr</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sr\sr_viewer.h">
-      <Filter>sr</Filter>
+    <ClInclude Include="..\src\sb\SBMotion.h">
+      <Filter>sb</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sr\planner\sr_cfg_manager.h">
-      <Filter>sr\planner</Filter>
+    <ClInclude Include="..\src\bml\behavior_span.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sr\planner\sr_cfg_path.h">
-      <Filter>sr\planner</Filter>
+    <ClInclude Include="..\src\bml\behavior_scheduler.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sr\planner\sr_cfg_planner.h">
-      <Filter>sr\planner</Filter>
+    <ClInclude Include="..\src\bml\behavior_scheduler_constant_speed.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sr\planner\sr_cfg_tree.h">
-      <Filter>sr\planner</Filter>
+    <ClInclude Include="..\src\bml\behavior_scheduler_fixed.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sr\planner\sk_pos_cfg.h">
-      <Filter>sr\planner\PositionPlanner</Filter>
+    <ClInclude Include="..\src\sbm\xercesc_utils.hpp">
+      <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sr\planner\sk_pos_cfg_manager.h">
-      <Filter>sr\planner\PositionPlanner</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sr\planner\sk_pos_planner.h">
-      <Filter>sr\planner\PositionPlanner</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sr\planner\sk_blend_cfg.h">
-      <Filter>sr\planner\BlendPlanner</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sr\planner\sk_blend_cfg_manager.h">
-      <Filter>sr\planner\BlendPlanner</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sr\planner\sk_blend_planner.h">
-      <Filter>sr\planner\BlendPlanner</Filter>
+    <ClInclude Include="..\src\sbm\action_unit.hpp">
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\ANN\ANN.h">
-      <Filter>external\ANN</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\ANN\ANNperf.h">
-      <Filter>external\ANN</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\ANN\ANNx.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\bd_tree.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\kd_fix_rad_search.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\kd_pr_search.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\kd_search.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\kd_split.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\kd_tree.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\kd_util.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\pr_queue.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\pr_queue_k.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\glew\glew.h">
-      <Filter>external\glew</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\glew\wglew.h">
-      <Filter>external\glew</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\SOIL\image_DXT.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\SOIL\image_helper.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\SOIL\SOIL.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\SOIL\stb_image_aug.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\SOIL\stbi_DDS_aug.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\SOIL\stbi_DDS_aug_c.h">
-      <Filter>external\SOIL</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\Bchart.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\bd_tree.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\BMLDefs.h">
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\Bst.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\ChartBase.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\ClassRule.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\CntxArray.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\CombineBests.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\DefaultAttributeTable.h">
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\ECArgs.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\ECString.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\Edge.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\EdgeHeap.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\edgeSubFns.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\Event.h">
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\ewDciTokStrm.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\extraMain.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\FBinaryArray.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\Feat.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\Feature.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\FeatureTree.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\fhSubFns.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\Field.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\FullHist.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\general_param_setting.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GenericViewer.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\glew\glew.h">
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\GotIter.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\gwiz_cmdl.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\gwiz_math.h">
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\headFinder.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\headFinderCh.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\Heightfield.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\SOIL\image_DXT.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\SOIL\image_helper.h">
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\InputTree.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\Item.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\joint_logger.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\kd_fix_rad_search.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\kd_pr_search.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\kd_search.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\kd_split.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\kd_tree.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\kd_util.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\KinectProcessor.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\lin_win.h">
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\Link.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\local_speech.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\locomotion_cmds.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\gfx\mat2.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\gfx\mat3.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\gfx\mat4.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\mcontrol_callbacks.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\mcontrol_util.h">
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\MeChart.h">
-      <Filter>external\parser</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\external\parser\Params.h">
-      <Filter>external\parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\ParseStats.h">
-      <Filter>external\parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\SentRep.h">
-      <Filter>external\parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\Term.h">
-      <Filter>external\parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\TimeIt.h">
-      <Filter>external\parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\UnitRules.h">
-      <Filter>external\parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\utils.h">
-      <Filter>external\parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\ValHeap.h">
-      <Filter>external\parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\Wrd.h">
-      <Filter>external\parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBPython.h">
-      <Filter>python</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBPythonClass.h">
-      <Filter>python</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBAnimationState.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBAnimationStateManager.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBAnimationTransition.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBAttribute.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBAttributeManager.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBBehavior.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBBmlProcessor.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBCharacter.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBController.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBFaceDefinition.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBGestureMap.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBGestureMapManager.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBJoint.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBMotion.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBObject.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBObserver.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBParseNode.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBParser.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBPawn.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBPhysicsManager.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBReach.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBReachManager.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBScene.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBScript.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBService.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBServiceManager.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBSimulationManager.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBSkeleton.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBSteerAgent.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBSteerManager.h">
-      <Filter>SB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\SBSubject.h">
-      <Filter>SB</Filter>
+    <ClInclude Include="..\src\sbm\MiniBrain.h">
+      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\nvbg.h">
-      <Filter>nvbg</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\SBBoneBusManager.h" />
+    <ClInclude Include="..\src\external\parser\Params.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\ParserASFAMC.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\ParserBVH.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\ParserFBX.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\ParserOpenCOLLADA.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\ParseStats.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\pr_queue.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\pr_queue_k.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\remote_speech.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\Resource.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\resource_cmds.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\ResourceManager.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_audio.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_character.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_constants.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_deformable_mesh.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_pawn.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_speech.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_speech_audiofile.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sbm_test_cmds.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\Physics\SbmColObject.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\SbmDebuggerServer.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\SbmDeformableMeshGPU.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\Physics\SbmPhysicsSim.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\Physics\SbmPhysicsSimODE.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\SbmShader.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\SbmTexture.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\SentRep.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\SOIL\SOIL.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\SOIL\stb_image_aug.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\SOIL\stbi_DDS_aug.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\SOIL\stbi_DDS_aug_c.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\SteeringAgent.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\sbm\SteerPath.h">
-      <Filter>sbm\steering</Filter>
+      <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\SBJointMap.h">
-      <Filter>SB</Filter>
+    <ClInclude Include="..\src\sbm\SteerSuiteEngineDriver.h">
+      <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\SBJointMapManager.h">
-      <Filter>SB</Filter>
+    <ClInclude Include="..\src\sbm\GPU\TBOData.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\Term.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\text_speech.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\time_profiler.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\time_regulator.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\TimeIt.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\UnitRules.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\utils.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\ValHeap.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\VBOData.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\gfx\vec2.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\gfx\vec3.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\gfx\vec4.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\viseme_map.hpp">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\glew\wglew.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\Wrd.h">
+      <Filter>sbm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag">
-      <Filter>sbm\GPU\shaderFiles</Filter>
+      <Filter>sbm</Filter>
     </None>
     <None Include="..\src\sbm\GPU\shaderFiles\vs_skin_pos.vert">
-      <Filter>sbm\GPU\shaderFiles</Filter>
+      <Filter>sbm</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="bml">
+      <UniqueIdentifier>{c53309e1-fb62-4f25-9476-b80669701bf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="controllers">
+      <UniqueIdentifier>{59ca3e0a-c8e0-4c10-9e25-068f10074238}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sr">
+      <UniqueIdentifier>{1214e16f-d857-4da2-bb36-6f5265aa992c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sk">
+      <UniqueIdentifier>{b67dca66-0c06-449e-8a7e-b61a52914680}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sbm">
+      <UniqueIdentifier>{6b43e5c5-1ac3-4a04-b162-883618581d26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sb">
+      <UniqueIdentifier>{25d7b403-4056-4421-83e7-df3a41e0c16f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
