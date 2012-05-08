@@ -30,11 +30,11 @@
 
 #include <sk/sk_skeleton.h>
 
-#include <me/me_ct_scheduler2.h>
-#include <me/me_ct_blend.hpp>
-#include <me/me_ct_time_shift_warp.hpp>
-#include <me/me_ct_motion.h>
-#include <me/me_ct_interpolator.h>
+#include <controllers/me_ct_scheduler2.h>
+#include <controllers/me_ct_blend.hpp>
+#include <controllers/me_ct_time_shift_warp.hpp>
+#include <controllers/me_ct_motion.h>
+#include <controllers/me_ct_interpolator.h>
 
 #include <sbm/mcontrol_util.h>
 
