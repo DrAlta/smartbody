@@ -37,6 +37,7 @@ class SkJointQuat
  { protected://private :
     SkJoint* _joint; // to notify the joint that the current rotation has changed
     SrQuat _quat;    // the quaternion
+	SrQuat _rawQuat; // the raw quaternion value without applying joint orientation and pre-post rotation
     bool _active;    // to block access to setting new rotations
     bool _jntsync;   // 0 whenever a new quat is set, and only SkJoint will make it 1 (SkJoint is a friend)
     bool _dersync;   // 0 whenever a new quat is set, and only the derived class will make it 1 with ask_new
@@ -70,6 +71,8 @@ class SkJointQuat
     /*! Access the current quaternion. If a new rotation is available
         by derived classes, get_quat will be called. */
     const SrQuat& value ();
+
+	const SrQuat& rawValue();
     
     /*! Freeze rotations, ie, make new calls to value(q) to have no effect */
     void deactivate () { _active=0; }

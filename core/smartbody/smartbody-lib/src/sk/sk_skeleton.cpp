@@ -394,15 +394,15 @@ void SkSkeleton::copy_joint(SkJoint* dest, SkJoint* src)
 		dest->quat()->activate();
 
 	dest->offset(src->offset());
-	dest->updateGmatZero(src->gmatZero());
+	dest->updateGmatZero(src->gmatZero());	
 	SkJointQuat* srcQuat = src->quat();
 	SkJointQuat* destQuat = dest->quat();
-	destQuat->value(srcQuat->value());
+	//destQuat->value(srcQuat->value());
+	destQuat->value(srcQuat->rawValue()); // set the raw value here since value() may contain pre-rotation
 	destQuat->prerot(srcQuat->prerot());
 	destQuat->postrot(srcQuat->postrot());
-	destQuat->orientation(srcQuat->orientation());
-
-	dest->mass(src->mass());
+	destQuat->orientation(srcQuat->orientation());	
+	dest->mass(src->mass());		
 }
 
 void SkSkeleton::create_joints(SkJoint* origParent, SkJoint* parent)
@@ -416,6 +416,19 @@ void SkSkeleton::create_joints(SkJoint* origParent, SkJoint* parent)
 		copy_joint(newJoint, origParent->child(i));
 		create_joints(origParent->child(i), newJoint);
 	}
+}
+
+SrVec SkSkeleton::boneGlobalDirection(const std::string& srcName, const std::string& dstName)
+{
+	SrVec dir = SrVec(0,0,0);
+	SkJoint* srcJoint = search_joint(srcName.c_str());
+	SkJoint* targetJoint = search_joint(dstName.c_str());	
+	if (!srcJoint || !targetJoint) return dir;	
+	srcJoint->update_gmat();
+	targetJoint->update_gmat();
+	dir = targetJoint->gmat().get_translation() - srcJoint->gmat().get_translation();
+	dir.normalize();
+	return dir;
 }
 
 

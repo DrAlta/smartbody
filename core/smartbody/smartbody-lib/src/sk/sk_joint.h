@@ -268,7 +268,7 @@ public:
 
 	void updateGmatZero(const SrMat& gmatZero);
 	const SrMat& gmatZero() { return _gmatZero; }
-	SrVec localGlobalAxis(int i);
+	SrVec localGlobalAxis(int i);	
 };
 
 //==================================== End of File ===========================================

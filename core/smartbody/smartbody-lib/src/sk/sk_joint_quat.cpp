@@ -42,12 +42,19 @@ SkJointQuat::~SkJointQuat()
    delete _prepost; // C++ handles null pointer case
  }
 
+
+const SrQuat& SkJointQuat::rawValue()
+{
+	return _rawQuat;
+}
+
 void SkJointQuat::value ( const SrQuat& q )
  {
    if ( !_active ) return;
    _jntsync = 0;
    _dersync = 0;
    _quat = q;
+   _rawQuat = q;
    _joint->set_lmat_changed(); // let joint and skeleton know there was a change
    ask_new ();
  }
@@ -58,6 +65,7 @@ void SkJointQuat::value ( const float* f )
    _jntsync = 0;
    _dersync = 0;
    _quat.set ( f );
+   _rawQuat = _quat;
    _joint->set_lmat_changed(); // let joint and skeleton know there was a change
    ask_new ();
  }
@@ -146,5 +154,5 @@ const SrQuat& SkJointQuat::orientation()
 {
 	return _jorientation;
 }
- 
+
 //============================ End of File ============================
