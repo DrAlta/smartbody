@@ -187,30 +187,30 @@ set( SMARTBODY_LIB_SR_SRC
 set( SMARTBODY_LIB_SBM_SRC
 
 	sbm/BMLDefs.cpp
-	sbm/behavior_scheduler_constant_speed.cpp
-	sbm/behavior_scheduler.cpp
-	sbm/behavior_scheduler_fixed.cpp
-	sbm/behavior_span.cpp
-	sbm/bml_animation.cpp
-	sbm/bml_gesture.cpp
-	sbm/bml_bodyreach.cpp
-	sbm/bml_constraint.cpp
-	sbm/bml.cpp
-	sbm/bml_event.cpp
-	sbm/bml_face.cpp
-	sbm/bml_gaze.cpp
-	sbm/bml_general_param.cpp
-	sbm/bml_grab.cpp
-	sbm/bml_interrupt.cpp
-	sbm/bml_locomotion.cpp
-	sbm/bml_processor.cpp
-	sbm/bml_quickdraw.cpp
-	sbm/bml_reach.cpp
-	sbm/bml_speech.cpp
-	sbm/bml_sync_point.cpp
-	sbm/bml_target.cpp
-	sbm/bml_saccade.cpp
-	sbm/bml_states.cpp
+	bml/behavior_scheduler_constant_speed.cpp
+	bml/behavior_scheduler.cpp
+	bml/behavior_scheduler_fixed.cpp
+	bml/behavior_span.cpp
+	bml/bml_animation.cpp
+	bml/bml_gesture.cpp
+	bml/bml_bodyreach.cpp
+	bml/bml_constraint.cpp
+	bml/bml.cpp
+	bml/bml_event.cpp
+	bml/bml_face.cpp
+	bml/bml_gaze.cpp
+	bml/bml_general_param.cpp
+	bml/bml_grab.cpp
+	bml/bml_interrupt.cpp
+	bml/bml_locomotion.cpp
+	bml/bml_processor.cpp
+	bml/bml_quickdraw.cpp
+	bml/bml_reach.cpp
+	bml/bml_speech.cpp
+	bml/bml_sync_point.cpp
+	bml/bml_target.cpp
+	bml/bml_saccade.cpp
+	bml/bml_states.cpp
 	sbm/Event.cpp
 	sbm/GenericViewer.cpp
 	sbm/gwiz_cmdl.cpp
@@ -380,7 +380,7 @@ set( SMARTBODY_LIB_SBM_SRC
 
 	sbm/nvbg.cpp
 	sbm/MiniBrain.cpp
-	sbm/SBBehavior.cpp
+	sb/SBBehavior.cpp
 	sbm/SbmDebuggerServer.cpp
 	sbm/SteerPath.cpp
 
