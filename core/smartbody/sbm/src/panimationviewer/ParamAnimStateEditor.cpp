@@ -485,6 +485,10 @@ void PAStateEditor::addFootStepMark(Fl_Widget* widget, void* data)
 	}
 	editor->autoFootStepsEditor->show();	
 	editor->autoFootStepsEditor->refreshSelectedMotions();
+	if (editor->getCurrentState()->getNumMotions() == editor->getSelectedMotions().size())
+		editor->autoFootStepsEditor->inputMaxSteps->activate();
+	else
+		editor->autoFootStepsEditor->inputMaxSteps->deactivate();
 }
 
 
