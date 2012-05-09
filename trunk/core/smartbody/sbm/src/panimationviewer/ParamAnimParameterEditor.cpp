@@ -55,7 +55,7 @@ PAParameterEditor::PAParameterEditor(PAStateEditor* editor, int x, int y, int w,
 	SBCharacter* character = stateEditor->paWindow->getCurrentCharacter();
 	if (character)
 	{
-		std::vector<std::string>& charJNames = character->getSkeleton()->getJointNames();
+		const std::vector<std::string>& charJNames = character->getSkeleton()->getJointNames();
 		for (size_t i = 0; i < charJNames.size(); i++)
 			inputJoint->add(charJNames[i].c_str());
 		inputJoint->value(0);
@@ -118,7 +118,7 @@ void PAParameterEditor::confirmEditting(Fl_Widget* widget, void* data)
 	SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(currentState);
 	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(currentState);
 	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(currentState);
-	std::vector<std::string>& selectedMotions = paramEditor->stateEditor->getSelectedMotions();
+	const std::vector<std::string>& selectedMotions = paramEditor->stateEditor->getSelectedMotions();
 	
 	for (size_t i = 0; i < selectedMotions.size(); i++)
 	{
