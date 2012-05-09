@@ -362,7 +362,7 @@ void SBMotion::alignToSide(int numFrames, int direction)
 }
 
 
-SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std::string dstSkeletonName )
+SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	SBSkeleton* srcSkeleton = mcu._scene->getSkeleton(srcSkeletonName);
@@ -373,7 +373,7 @@ SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std
 		return NULL;
 	}
 	
-	SkMotion* motion = buildRetargetMotion(srcSkeleton,dstSkeleton);
+	SkMotion* motion = buildRetargetMotion(srcSkeleton,dstSkeleton, endJoints);
 	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
 	if (sbmotion)
 	{

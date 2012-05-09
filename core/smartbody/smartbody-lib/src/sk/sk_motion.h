@@ -229,8 +229,9 @@ public :
 	SkMotion* buildSmoothMotionCycle(float timeInterval);
 
 	// retarget the motion from source skeleton to target skeleton
-	SkMotion* buildRetargetMotion(SkSkeleton* sourceSk, SkSkeleton* targetSk);
+	SkMotion* buildRetargetMotion(SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints);
 	SkMotion* buildRetargetMotion2(SkSkeleton* sourceSk, SkSkeleton* targetSk);
+	SkMotion* buildRetargetMotion3( SkSkeleton* sourceSk, SkSkeleton* targetSk );
 
 	/*! Change the angle values of all channels in euler angles type by
 	adding +-2PI, in order to have the smallest distance between frames,
