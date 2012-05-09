@@ -123,9 +123,19 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 			snapEndMark->callback(snapEndTimeMark, this);
 			buttonAutoFootSetpsEditor = new Fl_Button(xDis + 500 + esx, esy, 100, 2 * yDis, "Auto Footsteps");
 			buttonAutoFootSetpsEditor->callback(addFootStepMark, this);
+			buttonAutoFootSetpsEditor->deactivate();
 			buttonUndoAutoFootSteps = new Fl_Button(xDis + 600 + esx, esy, 60, 2 * yDis, "Undo");
 			buttonUndoAutoFootSteps->callback(undoFootStepMark, this);
 			buttonUndoAutoFootSteps->deactivate();
+			buttonAlignLeft = new Fl_Button(xDis + 500 + esx, 2 * yDis + esy, 50, 2 * yDis, "@|< Align");
+			buttonAlignLeft->callback(alignLeft, this);
+			buttonAlignLeft->deactivate();
+			buttonAlignRight = new Fl_Button(xDis + 550 + esx, 2 * yDis + esy, 50, 2 * yDis, "Align @>|");
+			buttonAlignRight->callback(alignRight, this);
+			buttonAlignRight->deactivate();
+			buttonAlignRecover = new Fl_Button(xDis + 600 + esx, 2 * yDis + esy, 60, 2 * yDis, "Recover");
+			buttonAlignRecover->callback(alignRecover, this);
+			buttonAlignRecover->deactivate();
 
 			buttonSave = new Fl_Button(xDis + esx, 2 * yDis + esy, 100, 2 * yDis, "Save");
 			buttonSave->callback(save, this);
@@ -471,9 +481,10 @@ void PAStateEditor::addFootStepMark(Fl_Widget* widget, void* data)
 	PAStateEditor* editor = (PAStateEditor*) data;
 	if (!editor->autoFootStepsEditor)
 	{
-		editor->autoFootStepsEditor = new PAAutoFootStepsEditor(editor, editor->paWindow->x() + 50, editor->paWindow->y() + 50, 500, 500);
+		editor->autoFootStepsEditor = new PAAutoFootStepsEditor(editor, editor->paWindow->x() + 50, editor->paWindow->y() + 50, 500, 600);
 	}
 	editor->autoFootStepsEditor->show();	
+	editor->autoFootStepsEditor->refreshSelectedMotions();
 }
 
 
@@ -803,6 +814,45 @@ void PAStateEditor::snapSliderTimeMark(Fl_Widget* widget, void* data)
 	}
 }
 
+void PAStateEditor::alignLeft(Fl_Widget* widget, void* data)
+{
+	PAStateEditor* editor = (PAStateEditor*) data;
+	
+	std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
+	for (size_t i = 0; i < selectedMotions.size(); i++)
+	{
+		SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
+		if (motion)
+			motion->alignToBegin(1);
+	}
+}
+
+void PAStateEditor::alignRight(Fl_Widget* widget, void* data)
+{
+	PAStateEditor* editor = (PAStateEditor*) data;
+
+	std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
+	for (size_t i = 0; i < selectedMotions.size(); i++)
+	{
+		SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
+		if (motion)
+			motion->alignToEnd(1);
+	}
+}
+
+void PAStateEditor::alignRecover(Fl_Widget* widget, void* data)
+{
+	PAStateEditor* editor = (PAStateEditor*) data;
+
+	std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
+	for (size_t i = 0; i < selectedMotions.size(); i++)
+	{
+		SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
+		if (motion)
+			motion->recoverAlign();
+	}
+}
+
 void PAStateEditor::updateCorrespondenceMarks(PAState* state)
 {
 	for (int i = 0; i < stateEditorNleModel->getNumTracks(); i++)
@@ -862,6 +912,8 @@ void PAStateEditor::refresh()
 	stateList->value(origStateValue);
 	changeStateList(stateList, this);
 	selectStateAnimations(stateAnimationList, this);
+	isPlaying = true;
+	playmotion(this->buttonPlay, this);
 }
 
 std::vector<std::string> PAStateEditor::getSelectedMotions()
@@ -1202,10 +1254,18 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 	if (selectedMotions.size() > 0 && !state0D)
 	{
 		editor->buttonEditParameter->activate();
+		editor->buttonAutoFootSetpsEditor->activate();
+		editor->buttonAlignLeft->activate();
+		editor->buttonAlignRight->activate();
+		editor->buttonAlignRecover->activate();
 	}
 	else
 	{
 		editor->buttonEditParameter->deactivate();
+		editor->buttonAutoFootSetpsEditor->deactivate();
+		editor->buttonAlignLeft->deactivate();
+		editor->buttonAlignRight->deactivate();
+		editor->buttonAlignRecover->deactivate();
 	}
 
 	if ((selectedMotions.size() == 3 && state2D) ||
