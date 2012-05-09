@@ -38,27 +38,24 @@ PAAutoFootStepsEditor::PAAutoFootStepsEditor(PAStateEditor* editor, int x, int y
 			browserJoint->add(charJNames[i].c_str());
 	}
 
-	inputMaxSteps = new Fl_Input(xDis + csx + 100, 36 * yDis, 10 * xDis, 2 * yDis, "MaxSteps");
+	inputStepsPerJoint = new Fl_Input(xDis + csx + 100, 36 * yDis, 10 * xDis, 2 * yDis, "StepsPerJoint");
 	PAState* curState = stateEditor->getCurrentState();
 	std::vector<std::string> selectedMotions = stateEditor->getSelectedMotions();
 	if (selectedMotions.size() == curState->getNumMotions())
-		inputMaxSteps->activate();
+		inputStepsPerJoint->activate();
 	else
-		inputMaxSteps->deactivate();
-	int maxSteps = 4;
-	if (curState)
-		maxSteps = curState->getNumKeys();
+		inputStepsPerJoint->deactivate();
+	int stepsPerJoint = 2;
 	std::stringstream ss;
-	ss << maxSteps;
-	inputMaxSteps->value(ss.str().c_str());
+	ss << stepsPerJoint;
+	inputStepsPerJoint->value(ss.str().c_str());
 
 
 	browserSelectedMotions = new Fl_Browser(xDis + csx + 100, 39 * yDis, 28 * xDis, 10 * yDis, "SelectedMotions");
-	for (size_t i = 0; i < selectedMotions.size(); i++)
-		browserSelectedMotions->add(selectedMotions[i].c_str());
-	checkDebugInfo = new Fl_Check_Button(xDis + csx + 100, 51 * yDis, 10 * xDis, 2 * yDis, "DetailInfo");
-	checkDivideJoint = new Fl_Check_Button(xDis + csx + 220, 51 * yDis, 10 * xDis, 2 * yDis, "DivideJoint");
-	checkDivideJoint->value(1);
+	browserSelectedMotions->deactivate();
+	refreshSelectedMotions();
+
+	checkDebugInfo = new Fl_Check_Button(xDis + csx + 100, 51 * yDis, 10 * xDis, 2 * yDis, "DumpDetailInformation");
 
 	buttonConfirm = new Fl_Button(xDis + csx, 55 * yDis, 10 * xDis, 2 * yDis, "Apply");
 	buttonConfirm->callback(confirmEditting, this);
@@ -97,15 +94,16 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 	float heightThresh = (float)atof(footStepEditor->inputHeightThreshold->value());
 	float speedThresh = (float)atof(footStepEditor->inputSpeedThreshold->value());
 	int speedWindow = atoi(footStepEditor->inputSpeedDetectWindow->value());
-	int maxNumSteps = atoi(footStepEditor->inputMaxSteps->value());
-	if (maxNumSteps < 2)
-		maxNumSteps = 2;
+	int stepsPerJoint = atoi(footStepEditor->inputStepsPerJoint->value());
+	if (stepsPerJoint < 1)
+		stepsPerJoint = 1;
 	int checkDebugInfoVal = footStepEditor->checkDebugInfo->value();
 	if (checkDebugInfoVal == 0)
 		footStepEditor->isPrintDebugInfo = false;
 	if (checkDebugInfoVal == 1)
 		footStepEditor->isPrintDebugInfo = true;
 
+	std::vector<std::string>& selectedMotions = footStepEditor->stateEditor->getSelectedMotions();
 	SBCharacter* curCharacter = footStepEditor->stateEditor->paWindow->getCurrentCharacter();
 	std::vector<std::string> selectedJoints;
 	for (int i = 0; i < footStepEditor->browserJoint->size(); i++)
@@ -121,11 +119,7 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 		return;
 	}
 
-	std::vector<std::string>& selectedMotions = footStepEditor->stateEditor->getSelectedMotions();
-	bool processAll = false;
-	if (selectedMotions.size() == currentState->getNumMotions())
-		processAll = true;
-
+	bool isConvergent = true;
 	for (size_t m = 0; m < selectedMotions.size(); m++)
 	{
 		// shared
@@ -183,45 +177,42 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 		}
 
 		// K means algorithm according to desired number of steps
-		// check if joints are evenly divided or shared
 		std::vector<double> outMeans;	
-		bool isConvergent = true;
-		int jointDividedVal = footStepEditor->checkDivideJoint->value();
-		if (maxNumSteps < (int)selectedJoints.size())
+		if (!footStepEditor->isProcessAll)
 		{
-			LOG("Desired num of foot steps %d cannot be less than number of selected joints %d, using shared data to do kmeans", maxNumSteps, selectedJoints.size());
-			jointDividedVal = 0;
-			footStepEditor->checkDivideJoint->value(0);
+			int maxNumSteps = footStepEditor->stateEditor->getCurrentState()->getNumKeys();
+			stepsPerJoint = maxNumSteps / selectedJoints.size();
 		}
-		if (jointDividedVal == 0)
+
+		/*
+		int numSteps = footStepEditor->stateEditor->getCurrentState()->getNumKeys();
+		isConvergent = footStepEditor->kMeansClustering1D(numSteps, possibleTiming, outMeans);
+		*/
+
+		for (size_t jointId = 0; jointId < selectedJoints.size(); jointId++)
 		{
-			isConvergent = footStepEditor->kMeansClustering1D(maxNumSteps, possibleTiming, outMeans);
+			if (jointId == (selectedJoints.size() - 1) && !footStepEditor->isProcessAll)
+			{
+				int mod = footStepEditor->stateEditor->getCurrentState()->getNumKeys() % selectedJoints.size();
+				stepsPerJoint += mod;
+			}
+
+			bool retBoolean = footStepEditor->kMeansClustering1D(stepsPerJoint, vecTiming[jointId], vecOutMeans[jointId]);
+			if (!retBoolean)
+			{
+				isConvergent = false;
+				break;
+			}
 		}
-		else if (jointDividedVal == 1)
+		if (isConvergent)
 		{
-			for (size_t jointId = 0; jointId < selectedJoints.size(); jointId++)
+			outMeans.clear();
+			for (size_t joinId = 0; joinId < selectedJoints.size(); joinId++)
 			{
-				int step = maxNumSteps / selectedJoints.size();
-				int mod = maxNumSteps % selectedJoints.size();
-				if (jointId == (selectedJoints.size() - 1))
-					step += mod;
-				bool retBoolean = footStepEditor->kMeansClustering1D(step, vecTiming[jointId], vecOutMeans[jointId]);
-				if (!retBoolean)
-				{
-					isConvergent = false;
-					break;
-				}
+				for (size_t meanId = 0; meanId < vecOutMeans[joinId].size(); meanId++)
+					outMeans.push_back(vecOutMeans[joinId][meanId]);
 			}
-			if (isConvergent)
-			{
-				outMeans.clear();
-				for (size_t joinId = 0; joinId < selectedJoints.size(); joinId++)
-				{
-					for (size_t meanId = 0; meanId < vecOutMeans[joinId].size(); meanId++)
-						outMeans.push_back(vecOutMeans[joinId][meanId]);
-				}
-				std::sort(outMeans.begin(), outMeans.end());
-			}
+			std::sort(outMeans.begin(), outMeans.end());
 		}
 
 		// apply it to corresponding points
@@ -235,22 +226,22 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 				ss << outMeans[i] << " ";
 			LOG("%s", ss.str().c_str());
 			currentState->keys[motionIndex].clear();
-			if (processAll)
+			if (footStepEditor->isProcessAll)
 				currentState->keys[motionIndex].push_back(0);
-			for (int i = 0; i < maxNumSteps; i++)
+			for (size_t i = 0; i < outMeans.size(); i++)
 				currentState->keys[motionIndex].push_back(outMeans[i]);
-			if (processAll)
+			if (footStepEditor->isProcessAll)
 				currentState->keys[motionIndex].push_back(motion->getDuration());
 		}
 		else
 		{
 			std::stringstream ss;
 			ss << "State " << currentState->stateName << " motion " << motion->getName() << " auto foot steps not detected(evenly distributed): ";
+			int actualNum = currentState->keys[motionIndex].size();
 			currentState->keys[motionIndex].clear();
 			ss << 0 << " ";
-			int actualNum = maxNumSteps;
-			if (processAll)
-				actualNum = maxNumSteps + 2;
+			if (footStepEditor->isProcessAll)
+				actualNum += 2;
 			for (int i = 0; i < actualNum; i++)
 			{
 				double step = motion->getDuration() / double(actualNum - 1);
@@ -282,7 +273,18 @@ void PAAutoFootStepsEditor::refreshSelectedMotions()
 	browserSelectedMotions->clear();
 	std::vector<std::string>& selectedMotions = stateEditor->getSelectedMotions();
 	for (size_t i = 0; i < selectedMotions.size(); i++)
-		browserSelectedMotions->add(selectedMotions[i].c_str());	
+		browserSelectedMotions->add(selectedMotions[i].c_str());
+
+	if (stateEditor->getCurrentState()->getNumMotions() == stateEditor->getSelectedMotions().size())
+	{
+		inputStepsPerJoint->activate();
+		isProcessAll = true;
+	}
+	else
+	{
+		inputStepsPerJoint->deactivate();
+		isProcessAll = false;
+	}
 }
 
 

@@ -34,6 +34,7 @@ ParamAnimEditorWidget::ParamAnimEditorWidget(Fl_Group* g, int x, int y, int w, i
 	trackSelectionChanged = false;
 	this->lockBlockFunc(true);
 	showScrubLine = false;
+	showAlignLine = true;
 	parentGroup = g;
 
 }
@@ -256,6 +257,21 @@ void ParamAnimEditorWidget::draw()
 			fl_line(xPos, y1, xPos, y1 + h1);	
 		}
 	}
+	if (showAlignLine)
+	{
+		if (alignTimes.size() != model->getNumTracks())
+			return;
+		fl_color(FL_MAGENTA);
+		// draw the align line
+		for (int t = 0; t < model->getNumTracks(); t++)
+		{
+			int xPos = convertTimeToPosition(alignTimes[t]);
+			nle::Track* track = model->getTrack(t);
+			int x1, y1, w1, h1;
+			track->getBounds(x1, y1, w1, h1);
+			fl_line(xPos, y1, xPos, y1 + h1);	
+		}
+	}
 }
 
 void ParamAnimEditorWidget::setLocalTimes(std::vector<double>& t)
@@ -271,6 +287,21 @@ std::vector<double>& ParamAnimEditorWidget::getLocalTimes()
 void ParamAnimEditorWidget::setShowScrubLine(bool val)
 {
 	showScrubLine = val;
+}
+
+void ParamAnimEditorWidget::setAlignTimes(std::vector<double>& t)
+{
+	alignTimes = t;
+}
+
+std::vector<double>& ParamAnimEditorWidget::getAlignTimes()
+{
+	return alignTimes;
+}
+
+void ParamAnimEditorWidget::setShowAlignLine(bool val)
+{
+	showAlignLine = val;
 }
 
 nle::Mark* ParamAnimEditorWidget::getSelectedCorrespondancePointIndex(int& selectedIndex)

@@ -183,6 +183,10 @@ void SBMotion::alignToEnd(int numFrames)
 	alignToSide(numFrames, 0);
 }
 
+int SBMotion::getAlignIndex()
+{
+	return alignIndex;
+}
 
 void SBMotion::recoverAlign()
 {

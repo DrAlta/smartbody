@@ -74,6 +74,8 @@ class PAStateEditor : public Fl_Group
 		static void editParameterCb(Fl_Widget* widget, void* data);
 		static void scrub(Fl_Widget* widget, void* data);
 		static void playmotion(Fl_Widget* widget, void* data);
+		void refreshAlign();
+		void updateMotionPlayer(double t);
 		void updateCorrespondenceMarks(PAState* state);
 		void refresh();
 

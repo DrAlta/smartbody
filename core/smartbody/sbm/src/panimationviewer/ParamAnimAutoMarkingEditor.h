@@ -30,15 +30,15 @@ public:
 	Fl_Input*			inputSpeedDetectWindow;
 	Fl_Multi_Browser*	browserJoint;
 	Fl_Browser*			browserSelectedMotions;
-	Fl_Input*			inputMaxSteps;
+	Fl_Input*			inputStepsPerJoint;
 	Fl_Button*			buttonConfirm;
 	Fl_Button*			buttonCancel;
 	Fl_Check_Button*	checkDebugInfo;
-	Fl_Check_Button*	checkDivideJoint;
 
 	PAStateEditor*		stateEditor;
 	int xDis;
 	int yDis;
 	bool isPrintDebugInfo;
+	bool isProcessAll;
 };
 #endif
