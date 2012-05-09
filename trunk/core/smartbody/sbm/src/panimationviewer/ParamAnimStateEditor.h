@@ -59,6 +59,9 @@ class PAStateEditor : public Fl_Group
 		static void snapStartTimeMark(Fl_Widget* widget, void* data);
 		static void snapEndTimeMark(Fl_Widget* widget, void* data);
 		static void snapSliderTimeMark(Fl_Widget* widget, void* data);
+		static void alignLeft(Fl_Widget* widget, void* data);
+		static void alignRight(Fl_Widget* widget, void* data);
+		static void alignRecover(Fl_Widget* widget, void* data);
 		static void updateStateTimeMark(Fl_Widget* widget, void* data);
 		static void updateMaxTime(Fl_Widget* widget, void* data);
 		static void updateMinTime(Fl_Widget* widget, void* data);
@@ -101,6 +104,9 @@ class PAStateEditor : public Fl_Group
 		Fl_Button*		buttonSave;
 		Fl_Button*		buttonAutoFootSetpsEditor;
 		Fl_Button*		buttonUndoAutoFootSteps;
+		Fl_Button*		buttonAlignLeft;
+		Fl_Button*		buttonAlignRight;
+		Fl_Button*		buttonAlignRecover;
 		Fl_Float_Input*		minTimeInput;
 		Fl_Float_Input*		maxTimeInput;
 		Fl_Float_Input* inputParameterX;
@@ -125,7 +131,7 @@ class PAStateEditor : public Fl_Group
 		int lastNameIndex;
 		bool isPlaying;
 
-		std::vector<std::vector<double>> previousKeys;
+		std::vector<std::vector<double> > previousKeys;
 };
 
 #endif

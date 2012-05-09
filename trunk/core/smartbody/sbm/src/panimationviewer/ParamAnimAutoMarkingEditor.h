@@ -6,7 +6,7 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Check_Button.H>
-#include <FL/Fl_Browser.H>
+#include <FL/Fl_Multi_Browser.H>
 #include <vector>
 
 class PAStateEditor;
@@ -18,6 +18,7 @@ public:
 
 	static void confirmEditting(Fl_Widget* widget, void* data);
 	static void cancelEditting(Fl_Widget* widget, void* data);
+	void refreshSelectedMotions();
 
 	// helper function
 	bool kMeansClustering1D(int num, std::vector<double>& inputPoints, std::vector<double>& outMeans);
@@ -27,13 +28,17 @@ public:
 	Fl_Input*			inputHeightThreshold;
 	Fl_Input*			inputSpeedThreshold;
 	Fl_Input*			inputSpeedDetectWindow;
-	Fl_Browser*			browserJoint;
+	Fl_Multi_Browser*	browserJoint;
+	Fl_Browser*			browserSelectedMotions;
 	Fl_Input*			inputMaxSteps;
 	Fl_Button*			buttonConfirm;
 	Fl_Button*			buttonCancel;
+	Fl_Check_Button*	checkDebugInfo;
+	Fl_Check_Button*	checkDivideJoint;
 
 	PAStateEditor*		stateEditor;
 	int xDis;
 	int yDis;
+	bool isPrintDebugInfo;
 };
 #endif

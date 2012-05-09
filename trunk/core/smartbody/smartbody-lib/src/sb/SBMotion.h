@@ -30,6 +30,10 @@ class SBMotion : public SkMotion
 		virtual void connect(SBSkeleton* skel);
 		virtual void disconnect();
 
+		void alignToBegin(int numFrames);
+		void alignToEnd(int numFrames);
+		void recoverAlign();
+
 		SBMotion* mirror(std::string name, std::string skeletonName);
 		SBMotion* smoothCycle(std::string name, float timeInterval);
 		SBMotion* retarget(std::string name, std::string srcSkeletonName, std::string dstSkeletonName);
@@ -59,8 +63,12 @@ class SBMotion : public SkMotion
 		void addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly);
 
 	protected:
+		void alignToSide(int numFrames, int direction = 0);
+
+	protected:
 		std::string _motionFile;
 		std::string _emptyString;
+		int alignIndex;
 };
 
 };

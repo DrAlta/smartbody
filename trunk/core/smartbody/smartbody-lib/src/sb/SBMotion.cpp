@@ -12,16 +12,22 @@ namespace SmartBody {
 SBMotion::SBMotion() : SkMotion()
 {
 	_motionFile = "";
+
+	alignIndex = 0; 
 }
 
 SBMotion::SBMotion(const SBMotion& motion)
 {
 	//...
+
+	alignIndex = 0;
 }
 
 SBMotion::SBMotion(std::string file) : SkMotion()
 {
 	_motionFile = file;
+
+	alignIndex = 0;
 }
 
 SBMotion::~SBMotion()
@@ -164,6 +170,195 @@ void SBMotion::connect(SBSkeleton* skel)
 void SBMotion::disconnect()
 {
 	SkMotion::disconnect();
+}
+
+
+void SBMotion::alignToBegin(int numFrames)
+{
+	alignToSide(numFrames, 1);
+}
+
+void SBMotion::alignToEnd(int numFrames)
+{
+	alignToSide(numFrames, 0);
+}
+
+
+void SBMotion::recoverAlign()
+{
+	if (alignIndex > 0)
+		alignToEnd(alignIndex);
+	else if (alignIndex < 0)
+		alignToBegin(-alignIndex);
+}
+
+void SBMotion::alignToSide(int numFrames, int direction)
+{
+	if (numFrames >= getNumFrames())
+	{
+		LOG("SBMotion::alignToSide WARNING: number of frames %d exceed the motion cycle.", numFrames);
+		return;
+	}
+
+	if (direction != 0 && direction != 1)
+	{
+		LOG("SBMotion::alignToSide WARNING: direction %d not valid.", direction);
+		return;
+	}
+
+	if (getNumFrames() == 1)
+	{
+		LOG("SBMotion::alignToSide WARNING: motion %s only has one frame, no need to align.", this->getName().c_str());
+		return;
+	}
+
+	// register previous motion
+	registerAnimation();
+	
+	// handle base joint
+	// get adjust matrix
+	SrMat adjustBaseMat;
+	if (isRegistered())
+	{
+		int startFrameId = 0;
+		int endFrameId = getNumFrames() - 1;
+
+		SrMat matStart;
+		_frameOrientation[startFrameId].get_mat(matStart);
+		matStart.setl4(_frameOffset[startFrameId]);
+
+		SrMat matEnd;
+		_frameOrientation[endFrameId].get_mat(matEnd);
+		matEnd.setl4(_frameOffset[endFrameId]);
+
+		if (direction == 0)
+		{
+			SrMat mat0;
+			_frameOrientation[0].get_mat(mat0);
+			mat0.setl4(_frameOffset[0]);
+			SrMat mat1;
+			_frameOrientation[1].get_mat(mat1);
+			mat1.setl4(_frameOffset[1]);
+			SrMat mat01 = mat0.inverse() * mat1;
+
+			adjustBaseMat = mat01 * (matStart.inverse() * matEnd);
+		}
+		else if (direction == 1)
+		{
+			SrMat mat1;
+			_frameOrientation[getNumFrames() - 1].get_mat(mat1);
+			mat1.setl4(_frameOffset[getNumFrames() - 1]);
+			SrMat mat0;
+			_frameOrientation[getNumFrames() - 2].get_mat(mat0);
+			mat0.setl4(_frameOffset[getNumFrames() - 2]);
+			SrMat mat10 = mat1.inverse() * mat0;
+
+			adjustBaseMat = mat10 * (matEnd.inverse() * matStart);
+		}
+	}
+
+	// calculate new matrix vector
+	std::vector<SrMat> copyMatVec;
+	copyMatVec.resize(getNumFrames());
+	for (int i = 0; i < getNumFrames(); i++)
+	{
+		int origMotionId = 0;
+		bool cycle = false;
+		if (direction == 0)
+		{
+			if (i < (getNumFrames() - numFrames))
+				origMotionId = i + numFrames;
+			else
+			{
+				origMotionId = i - (getNumFrames() - numFrames);
+				cycle = true;
+			}
+		}
+		else if (direction == 1)
+		{
+			if (i < numFrames)
+			{
+				origMotionId = i + (getNumFrames() - numFrames);
+				cycle = true;
+			}
+			else
+				origMotionId = i - numFrames;
+		}
+
+		_frameOrientation[origMotionId].get_mat(copyMatVec[i]);
+		copyMatVec[i].setl4(_frameOffset[origMotionId]);
+		if (cycle)
+		{
+			SrMat temp = copyMatVec[i] * adjustBaseMat;
+			copyMatVec[i] = temp;
+		}
+	}
+
+	// copy it back
+	for (int i = 0; i < getNumFrames(); i++)
+	{
+		_frameOrientation[i] = SrQuat(copyMatVec[i]);
+		_frameOffset[i] = copyMatVec[i].get_translation();
+	}
+
+	// create a new motion
+	SkChannelArray& mchan_arr = this->channels();
+	SkMotion* copyMotion = new SmartBody::SBMotion();
+	srSynchPoints sp(synch_points);
+	copyMotion->synch_points = sp;
+	copyMotion->init(mchan_arr);
+
+	// insert frames into new motion
+	for (int i = 0; i < getNumFrames(); i++)
+	{
+		int origMotionId = 0;
+		if (direction == 0)
+		{
+			if (i < (getNumFrames() - numFrames))
+				origMotionId = i + numFrames;
+			else
+				origMotionId = i - (getNumFrames() - numFrames);
+		}
+		else if (direction == 1)
+		{
+			if (i < numFrames)
+				origMotionId = i + (getNumFrames() - numFrames);
+			else
+				origMotionId = i - numFrames;
+		}
+		copyMotion->insert_frame(i, this->keytime(i));
+		float *ref_p = this->posture(origMotionId);
+		float *new_p = copyMotion->posture(i);
+		for (int k = 0; k < mchan_arr.size(); k++)
+		{
+			SkChannel& chan = mchan_arr[k];
+			int index = mchan_arr.float_position(k);			
+			for (int n = 0; n < chan.size(); n++)
+				new_p[index + n] = ref_p[index + n];
+		}
+	}
+
+	// assign back to the old motion
+	for (int i = 0; i < getNumFrames(); i++)
+	{
+		float* orig_p = this->posture(i);
+		float* copy_p = copyMotion->posture(i);
+		for (int k = 0; k < mchan_arr.size(); k++)
+		{
+			SkChannel& chan = mchan_arr[k];
+			int index = mchan_arr.float_position(k);			
+			for (int n = 0; n < chan.size(); n++)
+				orig_p[index + n] = copy_p[index + n];
+		}
+	}
+
+	// unregister animation
+	unregisterAnimation();
+
+	delete copyMotion;
+	copyMotion = NULL;
+
+	alignIndex -= numFrames;	
 }
 
 
