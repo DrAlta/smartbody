@@ -1394,7 +1394,7 @@ void PAStateEditor::selectShape(Fl_Widget* widget, void* data)
 void PAStateEditor::updateParameters(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
-	std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
+	const std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
 	PAState* currentState = editor->getCurrentState();
 	if (!currentState)
 		return;
@@ -1438,7 +1438,7 @@ void PAStateEditor::editParameterCb(Fl_Widget* widget, void* data)
 void PAStateEditor::scrub(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
-	std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
+	const std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
 
 	if (selectedMotions.size() == 1)
 	{

@@ -33,7 +33,7 @@ PAAutoFootStepsEditor::PAAutoFootStepsEditor(PAStateEditor* editor, int x, int y
 	SBCharacter* character = stateEditor->paWindow->getCurrentCharacter();
 	if (character)
 	{
-		std::vector<std::string>& charJNames = character->getSkeleton()->getJointNames();
+		const std::vector<std::string>& charJNames = character->getSkeleton()->getJointNames();
 		for (size_t i = 0; i < charJNames.size(); i++)
 			browserJoint->add(charJNames[i].c_str());
 	}
