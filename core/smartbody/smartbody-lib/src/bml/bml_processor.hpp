@@ -25,7 +25,7 @@
 #ifndef BML_PROCESSOR_HPP
 #define BML_PROCESSOR_HPP
 
-#include "sr_hash_map.h"
+#include "sbm/sr_hash_map.h"
 #include "sbm/xercesc_utils.hpp"
 #include "bml.hpp"
 
