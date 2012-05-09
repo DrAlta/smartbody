@@ -431,5 +431,17 @@ SrVec SkSkeleton::boneGlobalDirection(const std::string& srcName, const std::str
 	return dir;
 }
 
+void SkSkeleton::clearJointValues()
+{
+	for (unsigned int i=0;i<_joints.size();i++)
+	{
+		SkJoint* joint = _joints[i];
+		joint->quat()->value(SrQuat()); // reset rotation
+		for (int k=0;k<3;k++)
+			joint->pos()->value(k,0.f);
+	}
+	invalidate_global_matrices();
+	update_global_matrices();
+}
 
 //============================ End of File ============================

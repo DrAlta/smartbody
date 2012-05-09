@@ -189,6 +189,7 @@ class SkSkeleton : public SrSharedClass
 	
 	void copy_joint(SkJoint* dest, SkJoint* src);
 	void create_joints(SkJoint* origParent, SkJoint* parent);	
+	void clearJointValues(); // reset all joint quat/pos values to zero
 
 	// get the global direction of a bone pair based on the current skeleton configuration
 	SrVec boneGlobalDirection(const std::string& srcJoint, const std::string& dstJoints); 
