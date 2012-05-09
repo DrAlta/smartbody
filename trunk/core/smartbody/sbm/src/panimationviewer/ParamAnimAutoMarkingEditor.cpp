@@ -250,7 +250,7 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 			ss << 0 << " ";
 			int actualNum = maxNumSteps;
 			if (processAll)
-				actualNum = maxNumSteps + 1;
+				actualNum = maxNumSteps + 2;
 			for (int i = 0; i < actualNum; i++)
 			{
 				double step = motion->getDuration() / double(actualNum - 1);
@@ -353,5 +353,8 @@ void PAAutoFootStepsEditor::calculateMeans(std::vector<double>&inputPoints, std:
 	if (diff < convergentValue)
 		return;
 	else
-		calculateMeans(inputPoints, newMeans, convergentValue);
+	{
+		means = newMeans;
+		calculateMeans(inputPoints, means, convergentValue);
+	}
 }
