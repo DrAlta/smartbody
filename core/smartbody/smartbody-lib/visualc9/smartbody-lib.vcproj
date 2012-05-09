@@ -1720,11 +1720,11 @@
 			Name="BML"
 			>
 			<File
-				RelativePath="..\src\sbm\behavior_scheduler.cpp"
+				RelativePath="..\src\bml\behavior_scheduler.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\behavior_scheduler.hpp"
+				RelativePath="..\src\bml\behavior_scheduler.hpp"
 				>
 			</File>
 			<File
@@ -1744,11 +1744,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\behavior_span.cpp"
+				RelativePath="..\src\bml\behavior_span.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\behavior_span.hpp"
+				RelativePath="..\src\bml\behavior_span.hpp"
 				>
 			</File>
 			<File
