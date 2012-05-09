@@ -188,7 +188,7 @@ public :
 	skeleton was connected to the motion with method connect.
 	Only sucessfully matched channels are used. Parameter f can
 	be out of range to specify extreme postures. */
-	void apply_frame ( int f, float* buffer, SrBuffer<int>* map_p, bool isAdditive = false );
+	void apply_frame ( int f, float* buffer, SrBuffer<int>* map_p, bool isAdditive = false );	
 
 	/*! Interpolation type used by apply */
 	enum InterpType { Linear, CubicSpline };

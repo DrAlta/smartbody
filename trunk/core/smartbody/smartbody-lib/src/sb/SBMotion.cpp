@@ -474,6 +474,7 @@ float SBMotion::getJointSpeed(SBJoint* joint, float startTime, float endTime)
 		distance += dist(srcPt, destPt);
 	}
 	float accSpd = distance / (endTime - startTime);
+	connected_skeleton()->clearJointValues(); // reset the joint quat/pos
 	return accSpd;
 }
 
@@ -516,6 +517,7 @@ float SBMotion::getJointSpeedAxis(SBJoint* joint, const std::string& axis, float
 		distance += destPt[axisIndex] - srcPt[axisIndex];
 	}
 	float accSpd = distance / (endTime - startTime);
+	connected_skeleton()->clearJointValues(); // reset the joint quat/pos
 	return accSpd;
 }
 
@@ -556,6 +558,7 @@ float SBMotion::getJointAngularSpeed(SBJoint* joint, float startTime, float endT
 	}
 	float accAngularSpd = diffRotY / (endTime - startTime);
 	accAngularSpd *= (180.0f/ float(M_PI));
+	connected_skeleton()->clearJointValues(); // reset the joint quat/pos
 	return accAngularSpd;
 }
 
@@ -622,6 +625,7 @@ float SBMotion::getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis
 	}
 	float accAngularSpd = diffRot / (endTime - startTime);
 	accAngularSpd *= (180.0f/ float(M_PI));
+	connected_skeleton()->clearJointValues(); // reset the joint quat/pos
 	return accAngularSpd;
 }
 
@@ -663,6 +667,7 @@ std::vector<float> SBMotion::getJointTransition(SBJoint* joint, float startTime,
 	heading = SrVec(sin(ry - ry0), 0, cos(ry - ry0));
 	float z = dot(transitionVec, heading);
 	transitions.push_back(z);
+	connected_skeleton()->clearJointValues(); // reset the joint quat/pos
 	return transitions;
 }
 
