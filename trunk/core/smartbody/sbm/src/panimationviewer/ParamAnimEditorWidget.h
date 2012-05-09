@@ -52,6 +52,10 @@ class ParamAnimEditorWidget : public nle::EditorWidget
 		std::vector<double>& getLocalTimes();
 		void setShowScrubLine(bool val);
 
+		void setAlignTimes(std::vector<double>& t);
+		std::vector<double>& getAlignTimes();
+		void setShowAlignLine(bool val);
+
 		nle::Mark* getSelectedCorrespondancePointIndex(int& index);
 
 protected:
@@ -64,6 +68,8 @@ protected:
 
 		std::vector<double> scrubTimes;
 		bool showScrubLine;
+		std::vector<double> alignTimes;
+		bool showAlignLine;
 		Fl_Group* parentGroup;
 
 };

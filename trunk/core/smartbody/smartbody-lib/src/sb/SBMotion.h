@@ -32,6 +32,7 @@ class SBMotion : public SkMotion
 
 		void alignToBegin(int numFrames);
 		void alignToEnd(int numFrames);
+		int getAlignIndex();
 		void recoverAlign();
 
 		SBMotion* mirror(std::string name, std::string skeletonName);
