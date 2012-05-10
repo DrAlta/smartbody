@@ -1,8 +1,8 @@
 include_directories( "." )
-include_directories( "/hocontrollers/shapiro/smartbody/trunk/core/smartbody/sbm-debugger/lib" )
-include_directories( "/hocontrollers/shapiro/smartbody/trunk/lib/festival/src/include" )
-include_directories( "/hocontrollers/shapiro/smartbody/trunk/lib/festival/src/modules/VHDuration" )
-include_directories( "/hocontrollers/shapiro/smartbody/trunk/lib/speech_tools/include" )
+include_directories( "../../core/smartbody/sbm-debugger/lib" )
+include_directories( "../../lib/festival/src/include" )
+include_directories( "../../lib/festival/src/modules/VHDuration" )
+include_directories( "../../lib/speech_tools/include" )
 
 
 ####
