@@ -679,6 +679,28 @@ void SkMotion::registerAnimation()
 		return _isRegistered;
 	}
 
+	void SkMotion::setFrameOrientation(std::vector<SrQuat>& orientation)
+	{
+		_frameOrientation.resize(orientation.size());
+		_frameOrientation = orientation;
+	}
+	std::vector<SrQuat>& SkMotion::getFrameOrientation()
+	{
+		return _frameOrientation;
+	}
+
+	void SkMotion::setFrameOffset(std::vector<SrVec>& offset)
+	{
+		_frameOffset.resize(offset.size());
+		_frameOffset = offset;
+	}
+
+	std::vector<SrVec>& SkMotion::getFrameOffset()
+	{
+		return _frameOffset;
+	}
+
+
 /*
 // static:
 struct JT { SkJoint* j; char t[7]; float v[7]; };

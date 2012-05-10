@@ -366,6 +366,96 @@ void SBMotion::alignToSide(int numFrames, int direction)
 }
 
 
+SBMotion* SBMotion::duplicateCycle(int num)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	registerAnimation();
+
+	num++;
+
+	// create a new motion
+	SkChannelArray& mchan_arr = this->channels();
+	SBMotion* copyMotion = new SmartBody::SBMotion();
+	std::string copyMotionName = "";
+	std::stringstream ss;
+	ss << this->getName() << "_duplicate" << (num - 1);
+	copyMotionName = ss.str();
+	copyMotion->setName(copyMotionName);
+	mcu.motion_map.insert(std::pair<std::string, SkMotion*>(copyMotionName, copyMotion));
+	srSynchPoints sp(synch_points);
+	copyMotion->synch_points = sp;
+	copyMotion->init(mchan_arr);
+
+	std::vector<SrVec>& frameOffset = getFrameOffset();
+	std::vector<SrQuat>& frameOrientation = getFrameOrientation();
+	SrMat adjustBaseMat;
+	if (isRegistered())
+	{
+		int startFrameId = 0;
+		int endFrameId = getNumFrames() - 1;
+
+		SrMat matStart;
+		frameOrientation[startFrameId].get_mat(matStart);
+		matStart.setl4(frameOffset[startFrameId]);
+
+		SrMat matEnd;
+		frameOrientation[endFrameId].get_mat(matEnd);
+		matEnd.setl4(frameOffset[endFrameId]);
+
+		SrMat mat0;
+		frameOrientation[0].get_mat(mat0);
+		mat0.setl4(frameOffset[0]);
+		SrMat mat1;
+		frameOrientation[1].get_mat(mat1);
+		mat1.setl4(frameOffset[1]);
+		SrMat mat01 = mat0.inverse() * mat1;
+
+		adjustBaseMat = mat01 * (matStart.inverse() * matEnd);
+	}
+
+	std::vector<SrQuat> copyFrameOrientation;
+	std::vector<SrVec> copyFrameOffset;
+	copyFrameOrientation.resize(getNumFrames() * num);
+	copyFrameOffset.resize(getNumFrames() * num);
+	for (int cycleId = 0; cycleId < num; cycleId++)
+	{
+		// handle base joints
+		SrMat adjustMats;
+		SrVec adjustVec;
+		SrQuat adjustQuat;
+		for (int i = 0; i < cycleId; i++)
+		{
+			SrMat temp = adjustMats * adjustBaseMat;
+			adjustMats = temp;
+		}
+		adjustVec = adjustMats.get_translation();
+		adjustQuat = SrQuat(adjustMats);
+
+		for (int i = 0; i < getNumFrames(); i++)
+		{
+			// copy frame data without base joints
+			copyMotion->insert_frame(i + cycleId * getNumFrames(), this->keytime(i) + float(cycleId * getDuration()));
+			float* orig_p = posture(i);
+			float* copy_p = copyMotion->posture(i + cycleId * getNumFrames());
+			for (int k = 0; k < mchan_arr.size(); k++)
+			{
+				SkChannel& chan = mchan_arr[k];
+				int index = mchan_arr.float_position(k);			
+				for (int n = 0; n < chan.size(); n++)
+					copy_p[index + n] = orig_p[index + n];
+			}
+			copyFrameOffset[i + cycleId * getNumFrames()] = frameOffset[i] + adjustVec;
+			copyFrameOrientation[i + cycleId * getNumFrames()] = frameOrientation[i] * adjustQuat;
+		}	
+	}
+	unregisterAnimation();
+	copyMotion->setFrameOffset(copyFrameOffset);
+	copyMotion->setFrameOrientation(copyFrameOrientation);
+	copyMotion->unregisterAnimation();
+
+	return copyMotion;
+}
+
 SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 

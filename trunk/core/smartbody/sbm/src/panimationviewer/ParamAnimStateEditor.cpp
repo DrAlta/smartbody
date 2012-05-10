@@ -872,7 +872,7 @@ void PAStateEditor::refreshAlign()
 			int alignId = motion->getAlignIndex();
 			if (alignId < 0)
 				alignId = motion->getNumFrames() + alignId;
-			double alignTime = alignId * motion->getDuration();
+			double alignTime = alignId * motion->getFrameRate();
 			alignTimes.push_back(alignTime);
 		}
 		else
@@ -881,6 +881,7 @@ void PAStateEditor::refreshAlign()
 		}
 	}
 	stateTimeMarkWidget->setAlignTimes(alignTimes);
+	stateTimeMarkWidget->redraw();
 }
 
 void PAStateEditor::updateCorrespondenceMarks(PAState* state)

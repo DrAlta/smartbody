@@ -297,6 +297,10 @@ public :
 	void registerAnimation();
 	void unregisterAnimation();
 	bool isRegistered();
+	void setFrameOrientation(std::vector<SrQuat>& orientation);
+	std::vector<SrQuat>& getFrameOrientation();
+	void setFrameOffset(std::vector<SrVec>& offset);
+	std::vector<SrVec>& getFrameOffset();
 
 	void addMotionEvent(SmartBody::MotionEvent* motionEvent);
 	std::vector<SmartBody::MotionEvent*>& getMotionEvents();
