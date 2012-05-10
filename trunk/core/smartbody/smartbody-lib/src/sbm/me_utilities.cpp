@@ -189,30 +189,6 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, SBResou
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-
-bool validate_path( path& result, const char* pathname ) {
-	// Validate pathname before creating path to prevent exceptions
-	string path_str( pathname );
-	if( native( path_str ) ) {
-		if( DEBUG_LOAD_PATHS )
-			LOG("DEBUG: validate_path(..): Native path \"%s\".", path_str.c_str());
-		result = path( path_str, native );
-	} else if( no_check( path_str ) ) {
-		if( DEBUG_LOAD_PATHS )
-			LOG("DEBUG: validate_path(..): Valid no_check path  \"%s\".", path_str.c_str());
-		result = path( path_str, no_check );
-	} else {
-		if( DEBUG_LOAD_PATHS )
-			LOG("DEBUG: validate_path(..): Invalid name \"%s\". Tried native and no_check.", path_str.c_str() );
-		return false;
-	}
-
-	// TODO - warn about non portable names?
-
-	return true;
-}
-
 int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, SBResourceManager* manager, double scale, const char* error_prefix ) {
 	if( !exists( pathname ) ) {
 		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
