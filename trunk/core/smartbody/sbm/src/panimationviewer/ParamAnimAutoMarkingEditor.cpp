@@ -177,11 +177,15 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 		}
 
 		// K means algorithm according to desired number of steps
-		std::vector<double> outMeans;	
+		std::vector<double> outMeans;
+		int maxNumSteps = footStepEditor->stateEditor->getCurrentState()->getNumKeys();
 		if (!footStepEditor->isProcessAll)
 		{
-			int maxNumSteps = footStepEditor->stateEditor->getCurrentState()->getNumKeys();
 			stepsPerJoint = maxNumSteps / selectedJoints.size();
+		}
+		else
+		{
+			maxNumSteps = stepsPerJoint * selectedJoints.size();
 		}
 
 		/*
@@ -237,7 +241,7 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 		{
 			std::stringstream ss;
 			ss << "State " << currentState->stateName << " motion " << motion->getName() << " auto foot steps not detected(evenly distributed): ";
-			int actualNum = currentState->keys[motionIndex].size();
+			int actualNum = maxNumSteps;
 			currentState->keys[motionIndex].clear();
 			ss << 0 << " ";
 			if (footStepEditor->isProcessAll)
