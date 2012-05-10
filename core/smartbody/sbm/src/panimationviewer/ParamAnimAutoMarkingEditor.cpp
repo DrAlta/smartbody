@@ -103,7 +103,7 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 	if (checkDebugInfoVal == 1)
 		footStepEditor->isPrintDebugInfo = true;
 
-	std::vector<std::string>& selectedMotions = footStepEditor->stateEditor->getSelectedMotions();
+	const std::vector<std::string>& selectedMotions = footStepEditor->stateEditor->getSelectedMotions();
 	SBCharacter* curCharacter = footStepEditor->stateEditor->paWindow->getCurrentCharacter();
 	std::vector<std::string> selectedJoints;
 	for (int i = 0; i < footStepEditor->browserJoint->size(); i++)
@@ -271,7 +271,7 @@ void PAAutoFootStepsEditor::cancelEditting(Fl_Widget* widget, void* data)
 void PAAutoFootStepsEditor::refreshSelectedMotions()
 {
 	browserSelectedMotions->clear();
-	std::vector<std::string>& selectedMotions = stateEditor->getSelectedMotions();
+	const std::vector<std::string>& selectedMotions = stateEditor->getSelectedMotions();
 	for (size_t i = 0; i < selectedMotions.size(); i++)
 		browserSelectedMotions->add(selectedMotions[i].c_str());
 

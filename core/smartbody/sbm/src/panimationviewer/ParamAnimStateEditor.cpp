@@ -819,7 +819,7 @@ void PAStateEditor::alignLeft(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	
-	std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
+	const std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
 	for (size_t i = 0; i < selectedMotions.size(); i++)
 	{
 		SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
@@ -833,7 +833,7 @@ void PAStateEditor::alignRight(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 
-	std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
+	const std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
 	for (size_t i = 0; i < selectedMotions.size(); i++)
 	{
 		SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
@@ -847,7 +847,7 @@ void PAStateEditor::alignRecover(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 
-	std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
+	const std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
 	for (size_t i = 0; i < selectedMotions.size(); i++)
 	{
 		SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
