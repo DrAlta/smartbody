@@ -165,6 +165,10 @@ std::string SBBmlProcessor::execBML(std::string character, std::string bml)
 	return send_vrX( "vrSpeak", character, "ALL", "", true, true, entireBml.str() );
 }
 
+std::string SBBmlProcessor::execBMLFile(std::string character, std::string filename)
+{
+	return send_vrX( "vrSpeak", character, "ALL", "", true, true, filename );
+}
 
 std::string SBBmlProcessor::execXML(std::string character, std::string xml)
 {

@@ -747,6 +747,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 
 	boost::python::class_<SBBmlProcessor>("BmlProcessor")
 		.def("execBML", &SBBmlProcessor::execBML, boost::python::return_value_policy<boost::python::return_by_value>(), "Execute a generic BML instruction to a given character. Adds the <?xml..> and <act><bml>...</bml></act> elements.")
+		.def("execBMLFile", &SBBmlProcessor::execBMLFile, boost::python::return_value_policy<boost::python::return_by_value>(), "Execute the BML instructions contained in a file for a given character.")
 		.def("execXML", &SBBmlProcessor::execXML, boost::python::return_value_policy<boost::python::return_by_value>(), "Execute a generic XML instruction to a given character. Adds the <?xml..> header.")
 		;
 
