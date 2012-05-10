@@ -483,14 +483,25 @@ void EditorWidget::drawTrack(nle::Track* track, int trackNum)
     }
 
 	// write the track names
-	fl_color(FL_BLACK);
+	if (track->isSelected())
+	{
+		fl_color(FL_YELLOW);
+	}
+	else
+	{
+		fl_color(FL_BLACK);
+	}
 	fl_draw(track->getName().c_str(), left + 15, (bounds[1] + (bounds[1] + bounds[3])) / 2);
 
 	if (track->isSelected())
+	{
 		//fl_color(FL_DARK2);
 		fl_color(FL_YELLOW);
+	}
 	else
+	{
 		fl_color(FL_LIGHT1);
+	}
 	fl_rectf(bounds[0], bounds[1], bounds[2], bounds[3]);
 
 	fl_color(FL_DARK3);

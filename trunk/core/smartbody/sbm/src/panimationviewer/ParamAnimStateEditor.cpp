@@ -1176,6 +1176,29 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(currentState);
 	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(currentState);
 
+	bool needsRedraw = false;
+	int numTracks = editor->stateTimeMarkWidget->getModel()->getNumTracks();
+	for (int t = 0; t < numTracks; t++)
+	{
+		nle::Track* track = editor->stateTimeMarkWidget->getModel()->getTrack(t);
+		if (track->isSelected())
+		{
+			needsRedraw = true;
+			track->setSelected(false);
+		}
+	}
+	for (std::vector<std::string>::iterator iter = selectedMotions.begin();
+		 iter != selectedMotions.end();
+		 iter++)
+	{
+		nle::Track* track = editor->stateTimeMarkWidget->getModel()->getTrack(*iter);
+		if (!track->isSelected())
+		{
+			needsRedraw = true;
+			track->setSelected(true);
+		}		
+	}
+
 	if (selectedMotions.size() == 1)
 	{
 		editor->buttonPlay->activate();
@@ -1336,6 +1359,10 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 	if (editor->tetraVisualization)
 	{
 		editor->tetraVisualization->setSelectedParameters(boolSelectedMotions);
+	}
+	if (needsRedraw)
+	{
+		editor->stateTimeMarkWidget->redraw();
 	}
 }
 
