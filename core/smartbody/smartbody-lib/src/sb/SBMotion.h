@@ -34,6 +34,7 @@ class SBMotion : public SkMotion
 		void alignToEnd(int numFrames);
 		int getAlignIndex();
 		void recoverAlign();
+		SBMotion* duplicateCycle(int num);
 
 		SBMotion* mirror(std::string name, std::string skeletonName);
 		SBMotion* smoothCycle(std::string name, float timeInterval);
