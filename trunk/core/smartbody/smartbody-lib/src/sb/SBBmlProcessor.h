@@ -16,6 +16,7 @@ class SBBmlProcessor
 		void vrAgentBML(std::string op, std::string agent, std::string msgId, std::string msg);
 		
 		std::string execBML(std::string character, std::string bml);
+		std::string execBMLFile(std::string character, std::string filename);
 		std::string execXML(std::string character, std::string xml);
 
 	protected:
