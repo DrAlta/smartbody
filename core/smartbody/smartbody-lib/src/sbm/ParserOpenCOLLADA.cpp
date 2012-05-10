@@ -123,6 +123,7 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 					SrQuat adjust(xaxis, 3.14159f / -2.0f);
 					SrQuat final = adjust * prerot;
 					root->quat()->prerot(final);
+					root->offset(root->offset()*adjust);
 				}
 			}
 		}		
@@ -134,7 +135,7 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 			return true;
 		}
 		if (doParseMotion)
-			parseLibraryAnimations(skmNode, skeleton, motion, scale, order);
+			parseLibraryAnimations(skmNode, skeleton, motion, scale, order, zaxis);
 	//	animationPostProcess(skeleton, motion);
 		
 	}
@@ -473,7 +474,7 @@ struct ColladChannel
 };
 
 
-void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order )
+void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, bool zaxis )
 {
 	SkChannelArray& skChannels = skeleton.channels();
 	motion.init(skChannels);
@@ -625,7 +626,15 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
 		{
 			int stride = 16;
 			SrMat tran;
-			std::string jName = colChannel.targetJointName;			
+			std::string jName = colChannel.targetJointName;	
+// 			SrQuat rotateOffset;
+// 			if (zaxis && jName == skeleton.root()->name())
+// 			{
+// 				// rotate by 90 degree				
+// 				SrVec xaxis(1, 0, 0);
+// 				SrQuat adjust(xaxis, 3.14159f / -2.0f);
+// 				rotateOffset = adjust;	
+// 			}
 			for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
 			{
 				SrMat tran;				
@@ -643,6 +652,8 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
  				//	offset -= joint->offset();
 				//offset = offset*joint->quat()->prerot();
 				SrQuat quat(tran);	
+// 				quat = rotateOffset*quat;
+// 				offset = offset*rotateOffset;
 				//quat = joint->quat()->prerot().inverse()*quat;
 				int channelId = -1;
 				// put in translation
@@ -712,6 +723,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
 
 	// remap the euler angles to quaternion if necessary
 	std::vector<int> quatIndices;	
+	int rootIdx = -1;
 	std::map<std::string,std::vector<std::string> >::iterator vi;
 	for (vi  = jointRotationOrderMap.begin();
 		vi != jointRotationOrderMap.end();
@@ -722,7 +734,10 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
 		int channelID = motionChannels.search(jointName,SkChannel::Quat);
 		if (channelID != -1)
 		{
-			quatIndices.push_back(motionChannels.float_position(channelID));
+			int quatIdx = motionChannels.float_position(channelID);
+			if (zaxis && jointName == skeleton.root()->name())
+				rootIdx = quatIdx;
+			quatIndices.push_back(quatIdx);
 		}		
 	}
 
@@ -739,14 +754,55 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
 			roty *= float(M_PI) / 180.0f;
 			rotz *= float(M_PI) / 180.0f;
 			SrMat mat;
-			sr_euler_mat(order, mat, rotx, roty, rotz);
-			SrQuat quat = SrQuat(mat);
+			sr_euler_mat(order, mat, rotx, roty, rotz);			
+			SrQuat quat = SrQuat(mat);			
 			motion.posture(frameCt)[quatId + 0] = quat.w;
 			motion.posture(frameCt)[quatId + 1] = quat.x;
 			motion.posture(frameCt)[quatId + 2] = quat.y;
 			motion.posture(frameCt)[quatId + 3] = quat.z;
 		}
+
+		if (zaxis) // rotate the root joints depending on up axis
+		{
+			std::string rootName = skeleton.root()->name();
+			SrVec newPos;
+			SrQuat newQuatRot;
+			SrVec xaxis(1, 0, 0);
+			SrQuat adjust(xaxis, 3.14159f / -2.0f);
+			int channelID = motionChannels.search(rootName,SkChannel::Quat);
+			if (channelID != -1)
+			{
+				int quatId = motionChannels.float_position(channelID);
+				newQuatRot.w = motion.posture(frameCt)[quatId + 0];
+				newQuatRot.x = motion.posture(frameCt)[quatId + 1];
+				newQuatRot.y = motion.posture(frameCt)[quatId + 2];
+				newQuatRot.z = motion.posture(frameCt)[quatId + 3];
+				newQuatRot = adjust*newQuatRot;
+				motion.posture(frameCt)[quatId + 0] = newQuatRot.w;
+				motion.posture(frameCt)[quatId + 1] = newQuatRot.x;
+				motion.posture(frameCt)[quatId + 2] = newQuatRot.y;
+				motion.posture(frameCt)[quatId + 3] = newQuatRot.z;
+			}
+
+			for (int k=0;k<3;k++)
+			{
+				int chanType = SkChannel::XPos + k; 				
+				int xID = motionChannels.search(rootName,(SkChannel::Type)chanType);
+				if (xID)
+					newPos[k] = motion.posture(frameCt)[motionChannels.float_position(xID)];
+			}			
+			newPos = newPos*adjust;
+			for (int k=0;k<3;k++)
+			{
+				int chanType = SkChannel::XPos + k; 	
+				int xID = motionChannels.search(rootName,(SkChannel::Type)chanType);
+				if (xID)
+					motion.posture(frameCt)[motionChannels.float_position(xID)] = newPos[k];
+			}
+		}
 	}
+
+	
 
 	double duration = double(motion.duration());
 	motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration / 2.0, duration / 2.0, duration * 2.0/3.0, duration);
