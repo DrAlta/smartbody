@@ -1179,7 +1179,6 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 	if (selectedMotions.size() == 1)
 	{
 		editor->buttonPlay->activate();
-		editor->sliderScrub->deactivate();
 		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[0]);
 		if (motion)
 		{
@@ -1222,7 +1221,7 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 			}
 			else
 			{
-				editor->sliderScrub->activate();
+				editor->sliderScrub->deactivate();
 				editor->buttonPlay->label("@>");
 				editor->stateTimeMarkWidget->setShowScrubLine(false);
 			}
