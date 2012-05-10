@@ -154,6 +154,34 @@ void ParamAnimEditorWidget::changeBlockSelectionEvent(nle::Block* block)
 void ParamAnimEditorWidget::changeTrackSelectionEvent(nle::Track* track)
 {
 	trackSelectionChanged = true;
+	// select the motions associated with this track change
+	bool isTrackSelected = track->isSelected();
+	std::string trackName = track->getName();
+	PAStateEditor* stateEditor = dynamic_cast<PAStateEditor*>(parentGroup);
+	int numItems = stateEditor->stateAnimationList->size();
+	bool changed = false;
+	for (int i = 0; i < numItems; i++)
+	{
+		const char* motionName = stateEditor->stateAnimationList->text(i + 1);
+		if (trackName == motionName)
+		{
+			int isMotionSelected  = stateEditor->stateAnimationList->selected(i + 1);
+			if (isTrackSelected && !isMotionSelected)
+			{
+				stateEditor->stateAnimationList->select(i + 1, 1);
+				changed = true;
+			}
+			else if (!isTrackSelected && isMotionSelected)
+			{
+				stateEditor->stateAnimationList->select(i + 1, 0);
+				changed = true;
+			}
+		}
+	}
+	if (changed)
+	{
+		stateEditor->selectStateAnimations(stateEditor->stateAnimationList, stateEditor);
+	}
 }
 
 void ParamAnimEditorWidget::changeMarkSelectionEvent(nle::Mark* mark)
