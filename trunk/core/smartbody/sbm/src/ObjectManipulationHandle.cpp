@@ -4,6 +4,7 @@
 #include <FL/gl.h>
 #include <GL/glu.h>
 #include <sbm/mcontrol_util.h>
+#include <sb/SBCharacter.h>
 
 ObjectManipulationHandle::ObjectManipulationHandle(void)
 {
@@ -112,11 +113,17 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera& c
 		SrVec pawn_pos = PawnPosControl::get_pawn_pos(pawn);
 		glPushName(0xffffffff);
 		glLoadName(i);
+		SmartBody::SBCharacter* curChar = dynamic_cast<SmartBody::SBCharacter*>(pawn);
 		//PositionControl::drawSphere(pawn_pos, pawnSize);		
 		if (active_control && active_control->get_attach_pawn() == pawn)
 		{			
 			//pawnPosControl.hitOPS(cam);
 			active_control->hitTest(cam);
+		}
+		else if (curChar) // the selected pawn is actually a character
+		{
+			SrBox bbox = curChar->getBoundingBox();
+			PositionControl::drawBox(bbox);						
 		}
 		else if (pawn->getPhysicsObject())
 		{

@@ -4224,6 +4224,9 @@ void FltkViewer::makeGLContext()
 	make_current();
 }
 
+
+
+
 void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 {
 	glEnable(GL_LIGHTING);
