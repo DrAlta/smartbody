@@ -177,6 +177,16 @@ void PositionControl::drawSphere(SrVec& pos, float fRadius, SrVec color)
 	glDisable(GL_LIGHTING);
 }
 
+
+void PositionControl::drawBox( SrBox& box )
+{
+	SrSnBox sbox;					
+	sbox.shape().a = box.a;
+	sbox.shape().b = box.b;	
+	sbox.render_mode(srRenderModeSmooth);
+	SrGlRenderFuncs::render_box(&sbox);
+}
+
 void PositionControl::identify( std::vector<int>& path )
 {
 	opdir=path[1];	
