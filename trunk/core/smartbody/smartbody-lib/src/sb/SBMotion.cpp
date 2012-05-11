@@ -362,7 +362,10 @@ void SBMotion::alignToSide(int numFrames, int direction)
 	delete copyMotion;
 	copyMotion = NULL;
 
-	alignIndex -= numFrames;	
+	if (direction == 0)
+		alignIndex -= numFrames;	
+	else if (direction == 1)
+		alignIndex += numFrames;
 }
 
 

@@ -62,6 +62,10 @@ class EditorWidget : public NonLinearEditorModelListener, public Fl_Widget
 		virtual void changeTrackSelectionEvent(Track* track);
 		virtual void changeMarkSelectionEvent(Mark* mark);
 
+		virtual void releaseBlockEvent(Block* block);
+		virtual void releaseTrackEvent(Track* track);
+		virtual void releaseMarkEvent(Mark* mark);
+
 		virtual void lockBlockFunc(bool val);
 		virtual bool getBlockLockedStatus();
 

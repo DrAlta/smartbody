@@ -37,7 +37,11 @@ class ParamAnimEditorWidget : public nle::EditorWidget
 		virtual void changeBlockSelectionEvent(nle::Block* block);
 		virtual void changeTrackSelectionEvent(nle::Track* track);
 		virtual void changeMarkSelectionEvent(nle::Mark* mark);
+		virtual void releaseBlockEvent(nle::Block* block);
+		virtual void releaseTrackEvent(nle::Track* track);
+		virtual void releaseMarkEvent(nle::Mark* mark);
 		virtual void setup();
+		virtual int handle(int event);
 
 		void setBlockSelectionChanged(bool val);
 		bool getBlockSelectionChanged();
