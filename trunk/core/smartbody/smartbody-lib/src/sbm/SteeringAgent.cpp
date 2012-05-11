@@ -1105,7 +1105,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		float y = dot(agentToTargetVec, heading);
 		SrVec verticalHeading = SrVec(sin(degToRad(yaw - 90)), 0, cos(degToRad(yaw - 90)));
 		float x = dot(agentToTargetVec, verticalHeading);
-		if (character->param_animation_ct->hasPAState(stepStateName.c_str()))
+		if (!character->param_animation_ct->hasPAState(stepStateName.c_str()))
 		{
 			PAState* stepState = scene->getStateManager()->getState(stepStateName);
 			std::vector<double> weights;
