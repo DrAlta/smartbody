@@ -1118,6 +1118,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 				command << weights[i] << " ";
 			scene->command((char*) command.str().c_str());
 		}		
+		sendLocomotionEvent("success");
 		return 0;
 	}
 
