@@ -1117,9 +1117,9 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 			for (int i = 0; i < stepState->getNumMotions(); i++)
 				command << weights[i] << " ";
 			scene->command((char*) command.str().c_str());
+			return 0;
 		}		
-		sendLocomotionEvent("success");
-		return 0;
+		
 	}
 
 	//---start locomotion
