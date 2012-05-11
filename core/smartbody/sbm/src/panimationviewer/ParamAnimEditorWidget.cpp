@@ -187,6 +187,18 @@ void ParamAnimEditorWidget::changeTrackSelectionEvent(nle::Track* track)
 void ParamAnimEditorWidget::changeMarkSelectionEvent(nle::Mark* mark)
 {
 	markSelectionChanged = true;
+}
+
+void ParamAnimEditorWidget::releaseBlockEvent(nle::Block* block)
+{
+}
+
+void ParamAnimEditorWidget::releaseTrackEvent(nle::Track* track)
+{
+}
+
+void ParamAnimEditorWidget::releaseMarkEvent(nle::Mark* mark)
+{
 	// a mark was moved should also result in a moved 
 	// correspandence point associated with that point
 	CorrespondenceMark* cMark = dynamic_cast<CorrespondenceMark*>(mark);
@@ -203,6 +215,7 @@ void ParamAnimEditorWidget::changeMarkSelectionEvent(nle::Mark* mark)
 		if (currentState)
 		{
 			currentState->setCorrespondencePoints(trackIndex, markIndex, cMark->getStartTime());
+			setup();
 		}
 	}
 	else
@@ -243,6 +256,76 @@ void ParamAnimEditorWidget::setup()
 	}
 
 	//	this->setViewableTimeEnd(maxEndTime + 1.0);
+}
+
+int ParamAnimEditorWidget::handle(int event)
+{
+	PAStateEditor* stateEditor = dynamic_cast<PAStateEditor*>(parentGroup);
+	if (stateEditor)
+	{
+		PAState* currentState = stateEditor->getCurrentState();
+		const std::vector<std::string>& selectedMotions = stateEditor->getSelectedMotions();
+		if (selectedMotions.size() == 1)
+		{
+			switch (event)
+			{
+			case FL_DRAG:
+				nle::Mark* selectedMarker = NULL;
+				int selectedMarkerId = -1;
+				for (int t = 0; t < model->getNumTracks(); t++)
+				{
+					nle::Track* track = model->getTrack(t);
+					for (int b = 0; b < track->getNumBlocks(); b++)
+					{
+						nle::Block* block = track->getBlock(b);
+						for (int m = 0; m < block->getNumMarks(); m++)
+						{
+							nle::Mark* mark = block->getMark(m);
+							if (mark->isSelected())
+							{
+								selectedMarker = mark;
+								selectedMarkerId = m;
+								break;
+							}
+						}
+					}
+				}
+
+				if (selectedMarker)
+				{
+					int motionId = currentState->getMotionId(selectedMotions[0]);
+					if (motionId >= 0)
+					{
+						int prevMarker = selectedMarkerId - 1;
+						if (prevMarker >= 0)
+						{
+							double prevMarkerTime = currentState->keys[motionId][prevMarker];
+							if (selectedMarker->getStartTime() < prevMarkerTime)
+							{
+								selectedMarker->setStartTime(prevMarkerTime + 0.01f);
+								selectedMarker->setEndTime(prevMarkerTime + 0.01f);
+								redraw();
+							}
+						}
+						int nextMarker = selectedMarkerId + 1;
+						if (nextMarker <= (currentState->getNumKeys() - 1))
+						{
+							double nextMarkerTime = currentState->keys[motionId][nextMarker];
+							if (selectedMarker->getStartTime() > nextMarkerTime)
+							{
+								selectedMarker->setStartTime(nextMarkerTime - 0.01f);
+								selectedMarker->setEndTime(nextMarkerTime - 0.01f);
+								redraw();
+							}
+						}
+					}
+
+				}
+				break;
+			}
+		}
+	}
+	return nle::EditorWidget::handle(event);
 }
 
 void ParamAnimEditorWidget::setTrackSelectionChanged(bool val)

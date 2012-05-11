@@ -119,6 +119,10 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 		return;
 	}
 
+	std::stringstream finalMessage;
+	std::vector<std::string> motionsNeedManualAdjusting;
+	finalMessage << "Current State: " << currentState->stateName << "\n";
+
 	bool isConvergent = true;
 	for (size_t m = 0; m < selectedMotions.size(); m++)
 	{
@@ -225,10 +229,11 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 		if (isConvergent)
 		{
 			std::stringstream ss;
-			ss << "State " << currentState->stateName << " motion " << motion->getName() << " auto foot steps detected: ";
+			ss << "[" << motion->getName() << "]detected ";
 			for (size_t i = 0; i < outMeans.size(); i++)
 				ss << outMeans[i] << " ";
 			LOG("%s", ss.str().c_str());
+			finalMessage << ss.str() << "\n";
 			currentState->keys[motionIndex].clear();
 			if (footStepEditor->isProcessAll)
 				currentState->keys[motionIndex].push_back(0);
@@ -239,11 +244,11 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 		}
 		else
 		{
+			motionsNeedManualAdjusting.push_back(motion->getName());
 			std::stringstream ss;
-			ss << "State " << currentState->stateName << " motion " << motion->getName() << " auto foot steps not detected(evenly distributed): ";
+			ss << "[" << motion->getName() << "]NOT detected(evenly distrubted): ";
 			int actualNum = maxNumSteps;
 			currentState->keys[motionIndex].clear();
-			ss << 0 << " ";
 			if (footStepEditor->isProcessAll)
 				actualNum += 2;
 			for (int i = 0; i < actualNum; i++)
@@ -252,12 +257,21 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 				currentState->keys[motionIndex].push_back(step * i);
 				ss << step * i << " ";
 			}
-			ss << motion->getDuration() << " ";
 			LOG("%s", ss.str().c_str());
+			finalMessage << ss.str() << "\n";
 		}
-
 		motion->disconnect();
 	}
+
+	// print out final message
+	finalMessage << "\n\n=======Summary=======\n";
+	for (size_t m = 0; m < motionsNeedManualAdjusting.size(); m++)
+	{
+		finalMessage << motionsNeedManualAdjusting[m] << " may need manual adjusting\n";
+	}
+	fl_message("%s", finalMessage.str().c_str());
+
+	// refresh state editor
 	footStepEditor->stateEditor->buttonUndoAutoFootSteps->activate();
 	footStepEditor->stateEditor->refresh();
 	footStepEditor->hide();	

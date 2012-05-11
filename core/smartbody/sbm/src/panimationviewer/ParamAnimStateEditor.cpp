@@ -107,7 +107,7 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 
 		int esx = xDis + x;
 		int esy = h / 3  + y;
-		Fl_Group* buttonGroup = new Fl_Group(esx, esy, w - 2 * xDis, 3 * yDis);
+		Fl_Group* buttonGroup = new Fl_Group(esx, esy, w - 2 * xDis, 4 * yDis);
 		buttonGroup->begin();
 			addMark = new Fl_Button(xDis + esx, esy, 50, 2 * yDis, "+");
 			addMark->callback(addStateTimeMark, this);
@@ -145,7 +145,7 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 			maxTimeInput->callback(updateMaxTime, this);
 		buttonGroup->end();
 
-		editStateTimeMarkGroup = new Fl_Scroll(csx, esy + 3 * yDis + 10, workspaceWidth, workspaceHeight / 3 - 5 * yDis - 10);
+		editStateTimeMarkGroup = new Fl_Scroll(csx, esy + 3 * yDis + 20, workspaceWidth, workspaceHeight / 3 - 5 * yDis - 10);
 		editStateTimeMarkGroup->type(Fl_Scroll::VERTICAL_ALWAYS);
 		editStateTimeMarkGroup->begin();
 			stateTimeMarkWidget = new ParamAnimEditorWidget(this, csx + 10, 5 * yDis + esy, workspaceWidth - 10, workspaceHeight / 3 - 7 * yDis, (char*) "");
@@ -1360,6 +1360,7 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 	{
 		editor->tetraVisualization->setSelectedParameters(boolSelectedMotions);
 	}
+
 	if (needsRedraw)
 	{
 		editor->stateTimeMarkWidget->redraw();

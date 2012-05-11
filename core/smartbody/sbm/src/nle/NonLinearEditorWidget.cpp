@@ -1459,6 +1459,30 @@ int EditorWidget::handle(int event)
 		case FL_RELEASE:
 			selectState = STATE_NORMAL;
 			cameraState = CAMERASTATE_NORMAL;
+			for (int t = 0; t < model->getNumTracks(); t++)
+			{
+				nle::Track* track = model->getTrack(t);
+				if (track->isSelected())
+				{
+					releaseTrackEvent(track);
+				}
+				for (int b = 0; b < track->getNumBlocks(); b++)
+				{
+					nle::Block* block = track->getBlock(b);
+					if (block->isSelected())
+					{
+						releaseBlockEvent(block);
+					}
+					for (int m = 0; m < block->getNumMarks(); m++)
+					{
+						nle::Mark* mark = block->getMark(m);
+						if (mark->isSelected())
+						{
+							releaseMarkEvent(mark);
+						}
+					}
+				}
+			}
 			this->setTimeWindowSelected(false);
 			redraw();
 			break;
@@ -1669,6 +1693,22 @@ void EditorWidget::changeTrackSelectionEvent(Track* track)
 void EditorWidget::changeMarkSelectionEvent(Mark* mark)
 {
 }
+
+void EditorWidget::releaseBlockEvent(Block* block)
+{
+
+}
+
+void EditorWidget::releaseTrackEvent(Track* track)
+{
+
+}
+
+void EditorWidget::releaseMarkEvent(Mark* mark)
+{
+
+}
+
 
 void EditorWidget::notifyModelChanged(NonLinearEditorModel* model)
 {
