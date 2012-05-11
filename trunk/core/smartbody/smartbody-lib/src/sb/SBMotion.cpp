@@ -879,12 +879,40 @@ bool SBMotion::retime(float factor)
 	return true;
 }
 
-/*
+
 bool SBMotion::trim(int numFramesFromFront, int numFramesFromBack)
 {
+	int newFrames = frames() - numFramesFromFront - numFramesFromBack;
+	if (numFramesFromFront < 0 || numFramesFromBack < 0)
+	{
+		LOG("trim frames can not be negative");
+		return false;
+	}
+	if (newFrames < 1)
+	{
+		LOG("Motion %s has only %d frames, can not be trimmed by %d frames at front and %d frames at back",getName().c_str(), frames(), numFramesFromFront, numFramesFromBack);
+		return false;
+	}
+	for (int i=0;i<newFrames;i++)
+	{
+		int idx = i + numFramesFromFront;
+		Frame& srcFrame = _frames[idx];
+		Frame& tgtFrame = _frames[i];
+		// copy over the posture at that frame, but reserved the key time
+		memcpy(tgtFrame.posture,srcFrame.posture,sizeof(float)*posture_size());
+	}
+	// remove all frames from the back
+	for (int i=frames()-1; i>= newFrames; i--)
+	{
+		Frame& delFrame = _frames[i];
+		delete [] delFrame.posture;
+		_frames.pop_back();
+	}
+
 	return true;
 }
 
+/*
 bool SBMotion::move(int startFrame, int endFrame, int position)
 {
 	return true;

@@ -263,7 +263,15 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 		else if (ext == ".dae" || ext == ".DAE" || ext == ".xml" || ext == ".XML")
 		{			
 			SkSkeleton skeleton;
-			parseSuccessful = ParserOpenCOLLADA::parse(skeleton, *motion, pathname.string(), float(scale), true, true);			
+			parseSuccessful = ParserOpenCOLLADA::parse(skeleton, *motion, pathname.string(), float(scale), true, true);		
+			// now there's adjust for the channels by default
+			//animationPostProcessByChannels(skeleton, motion, channelsForAdjusting);
+			SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(motion);
+			int pretrimFrames = SBScene::getScene()->getIntAttribute("colladaTrimFrames");
+			if (pretrimFrames > 0 && sbMotion)
+			{
+				sbMotion->trim(pretrimFrames,0);				
+			}
 		}
 		else if (ext == ".amc" || ext == ".AMC")
 		{

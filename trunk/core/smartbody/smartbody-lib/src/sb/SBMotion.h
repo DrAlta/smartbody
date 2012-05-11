@@ -43,7 +43,7 @@ class SBMotion : public SkMotion
 		bool rotate(float xaxis, float yaxis, float zaxis, const std::string& baseJointName);
 		bool scale(float factor);
 		bool retime(float factor);
-	//	bool trim(int numFramesFromFront, int numFramesFromBack);
+		bool trim(int numFramesFromFront, int numFramesFromBack);
 	//	bool move(int startFrame, int endFrame, int position);
 
 		float getJointSpeed(SBJoint* joint, float startTime, float endTime);

@@ -453,27 +453,6 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 	}
 }
 
-struct ColladaFloatArray
-{
-	std::vector<float> floatArray;
-	std::string accessorParam;
-	int stride;	 
-};
-
-struct ColladaSampler
-{
-	std::string inputName;
-	std::string outputName;
-};
-
-struct ColladChannel
-{
-	std::string sourceName;
-	std::string targetJointName;
-	std::string targetType;
-};
-
-
 void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, bool zaxis )
 {
 	SkChannelArray& skChannels = skeleton.channels();
@@ -496,103 +475,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
 		xml_utils::xml_translate(&node1Name, node1->getNodeName());
 		if (node1Name == "animation")
 		{			
-			std::string idAttr = getNodeAttributeString(node1,BML::BMLDefs::ATTR_ID);
-			const DOMNodeList* list1 = node1->getChildNodes();
-			for (unsigned int j = 0; j < list1->getLength(); j++)
-			{
-				DOMNode* node2 = list1->item(j);
-				std::string node2Name;
-				xml_utils::xml_translate(&node2Name, node2->getNodeName());
-				if (node2Name == "source")
-				{							
-					std::string sourceIdAttr = getNodeAttributeString(node2,BML::BMLDefs::ATTR_ID);
-					const DOMNodeList* list2 = node2->getChildNodes();
-					for (unsigned int k = 0; k < list2->getLength(); k++)
-					{
-						DOMNode* node3 = list2->item(k);
-						std::string node3Name;
-						xml_utils::xml_translate(&node3Name, node3->getNodeName());
-						// parse float array
-						if (node3Name == "float_array")
-						{							
-							int counter = getNodeAttributeInt(node3,BML::BMLDefs::ATTR_COUNT); 
-							std::string nodeID = getNodeAttributeString(node3, BML::BMLDefs::ATTR_ID);
-							std::string arrayString;
-							xml_utils::xml_translate(&arrayString, node3->getTextContent());
-							std::vector<std::string> tokens;
-							vhcl::Tokenize(arrayString, tokens, " \n");		
-							if (floatArrayMap.find(sourceIdAttr) == floatArrayMap.end())
-							{
-								floatArrayMap[sourceIdAttr] = ColladaFloatArray();
-							}
-							ColladaFloatArray& colFloatArray = floatArrayMap[sourceIdAttr];
-							std::vector<float>& floatArray = colFloatArray.floatArray;
-							floatArray.resize(counter);						
-							for (int m=0;m<counter;m++)
-							{
-								float v = (float)atof(tokens[m].c_str());
-								floatArray[m] = v * scale;
-							}												
-							DOMNode* accessorNode = getNode("accessor",node2);
-							if (accessorNode)
-							{
-								colFloatArray.stride = getNodeAttributeInt(accessorNode,BML::BMLDefs::ATTR_STRIDE);
-								DOMNode* paramNode = getNode("param",accessorNode);
-								if (paramNode)
-								{
-									colFloatArray.accessorParam = getNodeAttributeString(paramNode,BML::BMLDefs::ATTR_NAME);
-								}
-							}
-						}								
-					}
-				}
-				else if (node2Name == "sampler")
-				{
-					const DOMNodeList* list2 = node2->getChildNodes();
-					std::string samplerID = getNodeAttributeString(node2,BML::BMLDefs::ATTR_ID);
-					if (samplerMap.find(samplerID) == samplerMap.end())
-					{
-						samplerMap[samplerID] = ColladaSampler();
-					}
-					ColladaSampler& sampler = samplerMap[samplerID];
-					for (unsigned int k = 0; k < list2->getLength(); k++)
-					{
-						DOMNode* node3 = list2->item(k);
-						std::string node3Name;
-						xml_utils::xml_translate(&node3Name, node3->getNodeName());						
-						if (node3Name == "input")
-						{
-							std::string attrSemantic = getNodeAttributeString(node3,BML::BMLDefs::ATTR_SEMANTIC);
-							if (attrSemantic == "INPUT")
-							{
-								sampler.inputName = getNodeAttributeString(node3,BML::BMLDefs::ATTR_SOURCE).substr(1);	
-								//LOG("sampelr input name = %s",sampler.inputName.c_str());
-							}
-							else if (attrSemantic == "OUTPUT")
-							{
-								sampler.outputName = getNodeAttributeString(node3,BML::BMLDefs::ATTR_SOURCE).substr(1);
-								//LOG("sampelr input name = %s",sampler.outputName.c_str());
-							}
-						}
-					}
-				} 
-				else if (node2Name == "channel")
-				{
-					std::string target = getNodeAttributeString(node2,BML::BMLDefs::ATTR_TARGET);
-					std::string source = getNodeAttributeString(node2,BML::BMLDefs::ATTR_SOURCE);
-					channelSamplerNameMap.push_back(ColladChannel());
-					ColladChannel& colChannel = channelSamplerNameMap.back();
-					colChannel.sourceName = source.substr(1);
-					//LOG("colChannel input name = %s",colChannel.sourceName.c_str());
-					std::vector<std::string> tokens;
-					vhcl::Tokenize(target, tokens, "/.");
-					std::string jname = tokens[0];
-					SkJoint* joint = skeleton.search_joint(jname.c_str());
-					if (joint) jname = joint->name();
-					colChannel.targetJointName = jname;
-					colChannel.targetType = tokens[1];					
-				}
-			}
+			parseNodeAnimation(node1, floatArrayMap, scale, samplerMap, channelSamplerNameMap, skeleton);
 		}
 	}
 
@@ -1097,9 +980,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skele
 
 	double duration = double(motion.duration());
 	motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration / 2.0, duration / 2.0, duration * 2.0/3.0, duration);
-	motion.compress();
-	// now there's adjust for the channels by default
-	//animationPostProcessByChannels(skeleton, motion, channelsForAdjusting);
+	motion.compress();	
 }
 
 void ParserOpenCOLLADA::animationPostProcess(SkSkeleton& skeleton, SkMotion& motion)
@@ -1858,4 +1739,110 @@ int ParserOpenCOLLADA::getNodeAttributeInt( DOMNode* node, XMLCh* attrName )
 {
 	std::string strAttr = getNodeAttributeString(node,attrName);
 	return atoi(strAttr.c_str());
+}
+
+void ParserOpenCOLLADA::parseNodeAnimation( DOMNode* node1, std::map<std::string, ColladaFloatArray > &floatArrayMap, float scale, std::map<std::string, ColladaSampler > &samplerMap, std::vector<ColladChannel> &channelSamplerNameMap, SkSkeleton &skeleton )
+{
+	std::string idAttr = getNodeAttributeString(node1,BML::BMLDefs::ATTR_ID);
+	const DOMNodeList* list1 = node1->getChildNodes();			
+	for (unsigned int j = 0; j < list1->getLength(); j++)
+	{
+		DOMNode* node2 = list1->item(j);
+		std::string node2Name;
+		xml_utils::xml_translate(&node2Name, node2->getNodeName());
+		if (node2Name == "source")
+		{							
+			std::string sourceIdAttr = getNodeAttributeString(node2,BML::BMLDefs::ATTR_ID);
+			const DOMNodeList* list2 = node2->getChildNodes();
+			for (unsigned int k = 0; k < list2->getLength(); k++)
+			{
+				DOMNode* node3 = list2->item(k);
+				std::string node3Name;
+				xml_utils::xml_translate(&node3Name, node3->getNodeName());
+				// parse float array
+				if (node3Name == "float_array")
+				{							
+					int counter = getNodeAttributeInt(node3,BML::BMLDefs::ATTR_COUNT); 
+					std::string nodeID = getNodeAttributeString(node3, BML::BMLDefs::ATTR_ID);
+					std::string arrayString;
+					xml_utils::xml_translate(&arrayString, node3->getTextContent());
+					std::vector<std::string> tokens;
+					vhcl::Tokenize(arrayString, tokens, " \n");		
+					if (floatArrayMap.find(sourceIdAttr) == floatArrayMap.end())
+					{
+						floatArrayMap[sourceIdAttr] = ColladaFloatArray();
+					}
+					ColladaFloatArray& colFloatArray = floatArrayMap[sourceIdAttr];
+					std::vector<float>& floatArray = colFloatArray.floatArray;
+					floatArray.resize(counter);						
+					for (int m=0;m<counter;m++)
+					{
+						float v = (float)atof(tokens[m].c_str());
+						floatArray[m] = v * scale;
+					}												
+					DOMNode* accessorNode = getNode("accessor",node2);
+					if (accessorNode)
+					{
+						colFloatArray.stride = getNodeAttributeInt(accessorNode,BML::BMLDefs::ATTR_STRIDE);
+						DOMNode* paramNode = getNode("param",accessorNode);
+						if (paramNode)
+						{
+							colFloatArray.accessorParam = getNodeAttributeString(paramNode,BML::BMLDefs::ATTR_NAME);
+						}
+					}
+				}								
+			}
+		}
+		else if (node2Name == "sampler")
+		{
+			const DOMNodeList* list2 = node2->getChildNodes();
+			std::string samplerID = getNodeAttributeString(node2,BML::BMLDefs::ATTR_ID);
+			if (samplerMap.find(samplerID) == samplerMap.end())
+			{
+				samplerMap[samplerID] = ColladaSampler();
+			}
+			ColladaSampler& sampler = samplerMap[samplerID];
+			for (unsigned int k = 0; k < list2->getLength(); k++)
+			{
+				DOMNode* node3 = list2->item(k);
+				std::string node3Name;
+				xml_utils::xml_translate(&node3Name, node3->getNodeName());						
+				if (node3Name == "input")
+				{
+					std::string attrSemantic = getNodeAttributeString(node3,BML::BMLDefs::ATTR_SEMANTIC);
+					if (attrSemantic == "INPUT")
+					{
+						sampler.inputName = getNodeAttributeString(node3,BML::BMLDefs::ATTR_SOURCE).substr(1);	
+						//LOG("sampelr input name = %s",sampler.inputName.c_str());
+					}
+					else if (attrSemantic == "OUTPUT")
+					{
+						sampler.outputName = getNodeAttributeString(node3,BML::BMLDefs::ATTR_SOURCE).substr(1);
+						//LOG("sampelr input name = %s",sampler.outputName.c_str());
+					}
+				}
+			}
+		} 
+		else if (node2Name == "channel")
+		{
+			std::string target = getNodeAttributeString(node2,BML::BMLDefs::ATTR_TARGET);
+			std::string source = getNodeAttributeString(node2,BML::BMLDefs::ATTR_SOURCE);
+			channelSamplerNameMap.push_back(ColladChannel());
+			ColladChannel& colChannel = channelSamplerNameMap.back();
+			colChannel.sourceName = source.substr(1);
+			//LOG("colChannel input name = %s",colChannel.sourceName.c_str());
+			std::vector<std::string> tokens;
+			vhcl::Tokenize(target, tokens, "/.");
+			//LOG("token1 = %s, token2 = %s",tokens[0].c_str(),tokens[1].c_str());
+			std::string jname = tokens[0];
+			SkJoint* joint = skeleton.search_joint(jname.c_str());
+			if (joint) jname = joint->name();
+			colChannel.targetJointName = jname;
+			colChannel.targetType = tokens[1];					
+		}
+		else if (node2Name == "animation") // for some reasons this kind of recursion does happen in some OpenCollada files
+		{
+			parseNodeAnimation(node2,floatArrayMap,scale,samplerMap,channelSamplerNameMap,skeleton);
+		}
+	}
 }

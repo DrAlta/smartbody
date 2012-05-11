@@ -915,6 +915,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("translate", &SBMotion::translate, "Translates the base joint name by x,y,z values.")		
 		.def("rotate", &SBMotion::rotate, "Rotates the base joint name by x,y,z axis.")			
 		.def("scale", &SBMotion::scale, "Scales all translations in skeleton by scale factor.")		
+		.def("trim", &SBMotion::trim, "Trims the starting and ending frames in the motion.")	
 		.def("getTimeStart", &SBMotion::retime, "Returns the start time of the motion.")
 		.def("getTimeReady", &SBMotion::retime, "Returns the ready time of the motion.")
 		.def("getTimeStrokeStart", &SBMotion::retime, "Returns the stroke start time of the motion.")

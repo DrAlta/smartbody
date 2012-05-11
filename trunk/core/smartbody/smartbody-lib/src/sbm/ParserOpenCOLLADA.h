@@ -32,6 +32,26 @@
 
 typedef std::map<std::string, std::vector<SrVec> > VecListMap;
 
+struct ColladaFloatArray
+{
+	std::vector<float> floatArray;
+	std::string accessorParam;
+	int stride;	 
+};
+
+struct ColladaSampler
+{
+	std::string inputName;
+	std::string outputName;
+};
+
+struct ColladChannel
+{
+	std::string sourceName;
+	std::string targetJointName;
+	std::string targetType;
+};
+
 class ParserOpenCOLLADA
 {
 	public:
@@ -43,6 +63,8 @@ class ParserOpenCOLLADA
 		static void parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name);
 		static void parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent = NULL);
 		static void parseLibraryAnimations(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, bool zaxis = false);
+
+		static void parseNodeAnimation( DOMNode* node1, std::map<std::string, ColladaFloatArray > &floatArrayMap, float scale, std::map<std::string, ColladaSampler > &samplerMap, std::vector<ColladChannel> &channelSamplerNameMap, SkSkeleton &skeleton );
 		static void parseLibraryAnimations2(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
 	
 		static void animationPostProcess(SkSkeleton& skeleton, SkMotion& motion);
