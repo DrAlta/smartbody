@@ -131,7 +131,7 @@ copy /Y ..\..\..\lib\boost\lib\boost_regex-vc100-mt-gd-1_44.dll .\bin
 copy /Y ..\..\..\lib\boost\lib\boost_python-vc100-mt-gd-1_44.dll .\bin
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll  .\bin
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\pprAId.dll  .\bin
-copy /Y ..\..\..\core\smartbody\Python26\python26.dll .\bin
+copy /Y ..\..\..\core\smartbody\Python26\libs\python26.dll .\bin
 copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
 </Command>
     </PostBuildEvent>
@@ -184,7 +184,7 @@ copy /Y ..\..\..\lib\boost\lib\boost_regex-vc100-mt-1_44.dll .\bin
 copy /Y ..\..\..\lib\boost\lib\boost_python-vc100-mt-1_44.dll .\bin
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll  .\bin
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll  .\bin
-copy /Y ..\..\..\core\smartbody\Python26\python26.dll .\bin
+copy /Y ..\..\..\core\smartbody\Python26\libs\python26.dll .\bin
 copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
 </Command>
     </PostBuildEvent>
