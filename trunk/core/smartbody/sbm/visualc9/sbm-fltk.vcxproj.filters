@@ -190,6 +190,8 @@
     <ClCompile Include="..\src\panimationviewer\ParamAnimTransitionCreatorWidget.cpp">
       <Filter>panimationviewer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ParamAnimAutoMarkingEditor.cpp" />
+    <ClCompile Include="..\src\panimationviewer\ParamAnimParameterEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -350,5 +352,7 @@
     <ClInclude Include="..\src\panimationviewer\ParamAnimTransitionCreatorWidget.h">
       <Filter>panimationviewer</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ParamAnimAutoMarkingEditor.h" />
+    <ClInclude Include="..\src\panimationviewer\ParamAnimParameterEditor.h" />
   </ItemGroup>
 </Project>

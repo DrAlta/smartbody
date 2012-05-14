@@ -35,7 +35,7 @@ copy /Y ..\..\..\lib\boost\lib\boost_regex-vc90-mt-1_44.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_python-vc90-mt-1_44.dll %BIN_DIR%
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll %BIN_DIR%
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll %BIN_DIR%
-copy /Y ..\..\..\core\smartbody\python26\python26.dll %BIN_DIR%
+copy /Y ..\..\..\core\smartbody\python26\libs9\python26.dll %BIN_DIR%
 copy /Y ..\..\..\lib\pthreads\lib9\pthreadVSE2.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\apr\apr\lib9\libapr-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll %BIN_DIR%
@@ -89,7 +89,7 @@ copy /Y ..\..\..\lib\boost\lib\boost_regex-vc90-mt-gd-1_44.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_python-vc90-mt-gd-1_44.dll %BIN_DIR%
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll %BIN_DIR%
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\pprAId.dll %BIN_DIR%
-copy /Y ..\..\..\core\smartbody\python26\python26.dll %BIN_DIR%
+copy /Y ..\..\..\core\smartbody\python26\libs9\python26.dll %BIN_DIR%
 copy /Y ..\..\..\lib\pthreads\lib9\pthreadVSE2.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\apr\apr\lib9\libapr-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll %BIN_DIR%
