@@ -427,8 +427,33 @@ struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrappe
 		SmartBody::PythonController::stop();
 	}
 };
-#endif
 
+// wrapper for std::map
+template<class T>
+struct map_item
+{
+	typedef typename T::key_type K;
+	typedef typename T::mapped_type V;
+	static V get(T const& x, K const& i)
+	{
+		V temp;
+		if( x.find(i) != x.end() ) 
+			return x.find(i)->second;
+		PyErr_SetString(PyExc_KeyError, "Key not found");
+		return temp;		
+	}
+	static void set(T & x, K const& i, V const& v)
+	{
+		x[i]=v; // use map autocreation feature
+	}
+	static void del(T & x, K const& i)
+	{
+		if( x.find(i) != x.end() ) x.erase(i);
+		else PyErr_SetString(PyExc_KeyError, "Key not found");
+	}
+};
+
+#endif
 
 
 
@@ -438,7 +463,8 @@ struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrappe
 #include <boost/python/args.hpp>
 #endif
 
-
+typedef std::map<std::string,SrQuat> QuatMap;
+typedef std::map<std::string,SrVec> VecMap;
 
 namespace SmartBody 
 {
@@ -462,6 +488,28 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::class_<std::vector<double> >("DoubleVec")
         .def(boost::python::vector_indexing_suite<std::vector<double> >())
     ;
+
+	boost::python::class_< QuatMap >("QuatMap")
+		.def("__len__", &QuatMap::size)
+		.def("clear", &QuatMap::clear)
+		.def("__getitem__", &map_item<QuatMap>::get,
+		boost::python::return_value_policy<boost::python::return_by_value>())
+		.def("__setitem__", &map_item<QuatMap>::set,
+		boost::python::with_custodian_and_ward<1,2>()) // to let container keep value
+		.def("__delitem__", &map_item<QuatMap>::del)
+		;
+
+	boost::python::class_< VecMap >("VecMap")
+		.def("__len__", &VecMap::size)
+		.def("clear", &VecMap::clear)
+		.def("__getitem__", &map_item<VecMap>::get,
+		boost::python::return_value_policy<boost::python::return_by_value>())
+		.def("__setitem__", &map_item<VecMap>::set,
+		boost::python::with_custodian_and_ward<1,2>()) // to let container keep value
+		.def("__delitem__", &map_item<VecMap>::del)
+		;
+
+	
 
 	//boost::python::numeric::array::set_module_and_type("numpy", "ndarray");
 	
@@ -1205,7 +1253,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def(boost::python::init<float, float, float, float>())
 		.def("getData", &SrQuat::getData, "gets the data in the quaterion at location indicated by the index w,x,y,z")
 		.def("setData", &SrQuat::setData, "sets the data in the quaterion at location indicated by the index w,x,y,z")
-		;
+		;	
 	
 	boost::python::class_<SrBox>("SrBox")
 		.def(boost::python::init<>())

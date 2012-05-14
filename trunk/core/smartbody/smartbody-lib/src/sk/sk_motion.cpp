@@ -865,7 +865,7 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 	return smooth_p;
 }
 
-SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints )
+SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints, std::map<std::string, SrVec>& offsetJoints )
 {
 	SkChannelArray& mchan_arr = this->channels();
 	SkSkeleton* interSk = new SkSkeleton(targetSk); // copy for an intermediate skeleton
@@ -893,8 +893,14 @@ SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targe
 		// clean up intermediate skeleton
 		for (unsigned int j=0;j<interSk->joints().size();j++)
 		{
-			SkJoint* joint = interSk->joints()[j];
-			joint->quat()->value(SrQuat());
+			SkJoint* joint = interSk->joints()[j];			
+			SrQuat offsetQuat;
+			if (offsetJoints.find(joint->name()) != offsetJoints.end())
+			{
+				SrVec offsetRot = offsetJoints[joint->name()];
+				offsetQuat = SrQuat(offsetRot*srDEGRAD);					
+			}
+			joint->quat()->value(offsetQuat);
 		}
 		this->apply_frame(i);		
 
@@ -903,8 +909,10 @@ SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targe
 			std::string pjointName = jointQueues.front();
 			jointQueues.pop();		
 			// do not process if it is the end joints
+			bool addChildren = true;
 			if (std::find(endJoints.begin(),endJoints.end(),pjointName) != endJoints.end())
-				continue;
+				addChildren = false;
+				
 
 			SkJoint* pjoint = interSk->search_joint(pjointName.c_str());
 			SkJoint* srcjoint = tempSrcSk->search_joint(pjointName.c_str());
@@ -922,7 +930,8 @@ SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targe
 				SrVec srcdir = tempSrcSk->boneGlobalDirection(pjoint->name(),child->name());
 				SrVec dstdir = interSk->boneGlobalDirection(pjoint->name(),child->name());
 				SrVec srcDir1 = sourceSk->boneGlobalDirection(pjoint->name(),child->name());
-				jointQueues.push(child->name());
+				if (addChildren)
+					jointQueues.push(child->name());
 				srcDirList.push_back(srcdir);			
 				dstDirList.push_back(dstdir);
 				//dir += gdir;
@@ -955,9 +964,10 @@ SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targe
 				SrVec rotAxisAngle = rotAxis*(float)angle; // global rotation
 				SrQuat alignQuat = SrQuat(rotAxisAngle);
 				SrMat alignMat;
-				SrMat prerotMat;
-				SrMat gmatRot = pjoint->gmat().get_rotation();
+				SrMat prerotMat;				
 				SrMat pmatInv;
+
+				SrMat gmatRot = pjoint->gmat().get_rotation();
 				if (pjoint->parent())
 					pmatInv = pjoint->parent()->gmat().get_rotation().inverse();
 				pjoint->quat()->prerot().get_mat(prerotMat);
@@ -966,15 +976,14 @@ SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targe
 				//rotAxisAngle = rotAxisAngle*gmatInv;
 				SrMat quatMat = prerotMat.inverse()*gmatRot*alignMat*pmatInv;//alignMat*gmatRot.inverse();//prerotMat.inverse()*gmatRot*alignMat*pmat;
 				//SrQuat quat = SrQuat(prerotMat.inverse())*SrQuat(gmatRot)*alignQuat*SrQuat(pmatInv);
-				SrVec alignRotAxisAngle = rotAxisAngle*gmatRot.inverse();
-				//SrQuat quat = SrQuat(quatMat);
-				SrQuat quat = SrQuat(alignRotAxisAngle);
+				SrVec alignRotAxisAngle = rotAxisAngle*gmatRot.inverse();								
+				SrQuat quat = pjoint->quat()->rawValue()*SrQuat(alignRotAxisAngle);//*pjoint->quat()->rawValue();
 				jointRotationMap[pjointName] = quat;
 				pjoint->quat()->value(quat);
 				pjoint->set_lmat_changed();
-				//pjoint->update_gmat();
-				interSk->invalidate_global_matrices();
-				interSk->update_global_matrices();
+				pjoint->update_gmat();
+				//interSk->invalidate_global_matrices();
+				//interSk->update_global_matrices();
 				//LOG("skeleton align rotation, joint = %s, rotation = %f %f %f",pjointName.c_str(),rotAxisAngle[0],rotAxisAngle[1],rotAxisAngle[2]);			
 				SrVec newDstDir = SrVec();
 				for (int k=0;k<pjoint->num_children();k++)

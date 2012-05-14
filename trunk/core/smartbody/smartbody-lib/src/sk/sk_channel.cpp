@@ -308,6 +308,55 @@ int SkChannel::load ( Type type, SrInput& in, float* v, double scale ) // static
     { if ( f )
        { fscanf ( f, "%f", v ); }
       else
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
        { in >> v[0]; }
       v[0] = SR_TORAD(v[0]);
       return 1;

@@ -86,6 +86,14 @@ class SrQuat
     /*! Initializes SrQuat from a rotation matrix */
     SrQuat ( const SrMat& m ) { set(m); }
 
+
+
+
+
+
+
+
+
     ///*! Set a random quaternion, using a uniform distribution method */
     //void random ();
     

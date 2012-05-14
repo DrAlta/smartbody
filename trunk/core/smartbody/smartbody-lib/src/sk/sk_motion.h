@@ -229,7 +229,7 @@ public :
 	SkMotion* buildSmoothMotionCycle(float timeInterval);
 
 	// retarget the motion from source skeleton to target skeleton
-	SkMotion* buildRetargetMotion(SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints);
+	SkMotion* buildRetargetMotion(SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints, std::map<std::string, SrVec>& offsetJoints);
 	SkMotion* buildRetargetMotion2(SkSkeleton* sourceSk, SkSkeleton* targetSk);
 	SkMotion* buildRetargetMotion3( SkSkeleton* sourceSk, SkSkeleton* targetSk );
 

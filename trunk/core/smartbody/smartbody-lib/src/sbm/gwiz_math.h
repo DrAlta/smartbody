@@ -90,6 +90,48 @@ namespace gwiz {
 #ifndef M_PI
 #define M_PI	( gwiz::pi() )
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #ifndef RAD // ( degrees )
 #define RAD 	( gwiz::rad )
 #endif
