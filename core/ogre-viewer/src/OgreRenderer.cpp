@@ -1,3 +1,6 @@
+#include "vhcl.h"
+#include "vhcl_audio.h"
+
 #include "OgreRenderer.h"
 #include "OgreFrameListener.h"
 #include "BoneBusHandler.h"
@@ -22,6 +25,8 @@ bool OgreRenderer::isUseBoneBus()
 
 void OgreRenderer::destroyScene(void)
 {
+	delete m_audio;  m_audio = NULL;
+
 	// Send vrProcEnd message to ActiveMQ
 	vhmsg::ttu_notify2( "vrProcEnd", "renderer" );
 
@@ -211,10 +216,10 @@ void OgreRenderer::createScene()
     vhmsg::ttu_register( "CommAPI" );
     vhmsg::ttu_register( "object-data" );
     vhmsg::ttu_register( "wsp" );
-	
-	
 
-	
+
+    m_audio = new vhcl::Audio();
+    m_audio->Open();
 }
 
 
@@ -253,6 +258,25 @@ void OgreRenderer::tt_client_callback( const char * op, const char * args, void 
 			 ((OgreFrameListener*)app->mFrameListener)->scheduleQuit();
 		 }
 	  }
+   }
+   else if (sOp == "PlaySound")
+   {
+        std::string fileName = splitArgs[0];
+
+        // remove double quotes
+        fileName = fileName.erase(0, 1);
+        fileName = fileName.erase(fileName.length() - 1);
+
+        vhcl::Sound * sound = app->m_audio->FindSound(fileName);
+        if (sound == NULL)
+        {
+            sound = app->m_audio->CreateSound(fileName, fileName);
+        }
+
+        if (sound != NULL)
+        {
+            sound->Play();
+        }
    }
 
    if (!app->isUseBoneBus())

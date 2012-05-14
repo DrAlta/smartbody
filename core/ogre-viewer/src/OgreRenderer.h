@@ -13,6 +13,10 @@
 #include "SBListener.h"
 #include "OgreFrameListener.h"
 
+
+namespace vhcl { class Audio; }
+
+
 class OgreRenderer : public ExampleApplication, public SmartbodyListener
 {
 
@@ -53,6 +57,8 @@ class OgreRenderer : public ExampleApplication, public SmartbodyListener
 		SBListener* m_sbListener;
 		bool m_useBoneBus;
 		std::string mDebugText;
+
+		vhcl::Audio * m_audio;
 	
 	public:
 
