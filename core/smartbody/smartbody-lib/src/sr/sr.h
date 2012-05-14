@@ -125,6 +125,8 @@ const float sr2pi    = 6.28318530f; //!< 2*pi
 const float srsqrt2  = 1.41421356f; //!< sqrt(2) = 1.4142135
 const float srsqrt3  = 1.73205080f; //!< sqrt(3) = 1.7320508
 const float srsqrt6  = 2.44948974f; //!< sqrt(6) = 2.4494897
+const float srDEGRAD = srpi/360.f;
+const float srRADDEG = 360.f/srpi;
 
 const sruint sruintmax = ((sruint)0)-1; //!< the unsigned int maximum value
 

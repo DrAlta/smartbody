@@ -38,7 +38,7 @@ class SBMotion : public SkMotion
 
 		SBMotion* mirror(std::string name, std::string skeletonName);
 		SBMotion* smoothCycle(std::string name, float timeInterval);
-		SBMotion* retarget(std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints);
+		SBMotion* retarget(std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints, std::map<std::string, SrVec>& offsetJointMap);
 		bool translate(float x, float y, float z, const std::string& baseJointName);
 		bool rotate(float xaxis, float yaxis, float zaxis, const std::string& baseJointName);
 		bool scale(float factor);
