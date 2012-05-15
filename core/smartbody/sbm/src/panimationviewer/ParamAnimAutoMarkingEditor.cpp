@@ -22,9 +22,14 @@ PAAutoFootStepsEditor::PAAutoFootStepsEditor(PAStateEditor* editor, int x, int y
 	inputFloorHeight = new Fl_Input(xDis + csx + 100, yDis, 10 * xDis, 2 * yDis, "FloorHeight");
 	inputFloorHeight->value("0");
 	inputHeightThreshold = new Fl_Input(xDis + csx + 100, 4 * yDis, 10 * xDis, 2 * yDis, "HeightThreshold");
-	inputHeightThreshold->value("15");
+	std::stringstream inputHeightSS;
+	inputHeightSS << 0.15f / SmartBody::SBScene::getScene()->getScale();
+	inputHeightThreshold->value(inputHeightSS.str().c_str());
 	inputSpeedThreshold = new Fl_Input(xDis + csx + 100, 7 * yDis, 10 * xDis, 2 * yDis, "SpeedThreshold");
-	inputSpeedThreshold->value("10");
+	std::stringstream inputSpeedSS;
+	inputSpeedSS << 0.4f / SmartBody::SBScene::getScene()->getScale();
+	inputSpeedThreshold->value(inputSpeedSS.str().c_str());
+
 	inputSpeedDetectWindow = new Fl_Input(xDis + csx + 100, 10 * yDis, 10 * xDis, 2 * yDis, "SpeedDetectWindow");
 	inputSpeedDetectWindow->value("3");
 	inputSpeedDetectWindow->deactivate();

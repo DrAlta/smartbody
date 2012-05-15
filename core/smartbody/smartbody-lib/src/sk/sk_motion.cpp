@@ -610,6 +610,8 @@ void SkMotion::registerAnimation()
 		return;
 	}
 
+	_frameOffset.clear();
+	_frameOrientation.clear();
 	for (size_t f = 0; f < _frames.size(); f++)
 	{
 		SkMotion::Frame& frame = _frames[f];
