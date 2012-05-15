@@ -21,8 +21,7 @@ public:
 	void refreshSelectedMotions();
 
 	// helper function
-	bool kMeansClustering1D(int num, std::vector<double>& inputPoints, std::vector<double>& outMeans);
-	void calculateMeans(std::vector<double>&inputPoints, std::vector<double>& means, double convergentValue);
+	
 
 	Fl_Input*			inputFloorHeight;
 	Fl_Input*			inputHeightThreshold;

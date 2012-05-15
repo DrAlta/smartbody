@@ -975,4 +975,206 @@ void SBMotion::addEvent(double time, const std::string& type, const std::string&
 	addMotionEvent(motionEvent);
 }
 
+bool SBMotion::kMeansClustering1D(int num, std::vector<double>& inputPoints, std::vector<double>& outMeans)
+{
+	if ((int)inputPoints.size() < num)
+	{
+		LOG("PAAutoFootStepsEditor::kMeansClustering1D Warning: Input points are less than number of means");
+		return false;
+	}
+
+	// pick initial point
+	int step = inputPoints.size() / num;
+	for (int i = 0; i < num; i++)
+		outMeans.push_back(inputPoints[i * step]);
+
+	double convergence = 0.1;
+	calculateMeans(inputPoints, outMeans, convergence);
+
+	outMeans.resize(num);
+	return true;
+}
+
+
+void SBMotion::calculateMeans(std::vector<double>&inputPoints, std::vector<double>& means, double convergentValue)
+{
+	std::vector<std::vector<double> > partitionBin;
+	partitionBin.resize(means.size());
+
+	// partition
+	for (size_t i = 0; i < inputPoints.size(); i++)
+	{
+		double minDist = 9999;
+		int minDistId = -1;
+		for (size_t j = 0; j < means.size(); j++)
+		{
+			double dist = fabs(inputPoints[i] - means[j]);
+			if (dist < minDist)
+			{
+				minDist = dist;
+				minDistId = j;
+			}
+		}
+		if (minDistId >= 0)
+		{
+			partitionBin[minDistId].push_back(inputPoints[i]);
+		}
+	}
+
+	// get new means
+	std::vector<double> newMeans;
+	for (size_t i = 0; i < means.size(); i++)
+	{
+		double newMean = 0;
+		for (size_t j = 0; j < partitionBin[i].size(); j++)
+			newMean += partitionBin[i][j];
+		newMean /= double(partitionBin[i].size());
+		newMeans.push_back(newMean);
+	}
+
+	double diff = 0.0f;
+	for (size_t i = 0; i < means.size(); i++)
+	{
+		diff = diff + (means[i] - newMeans[i]) * (means[i] - newMeans[i]);
+	}
+	diff = sqrt(diff);
+
+	if (diff < convergentValue)
+		return;
+	else
+	{
+		means = newMeans;
+		calculateMeans(inputPoints, means, convergentValue);
+	}
+}
+
+
+bool SBMotion::autoFootStepDetection( std::vector<double>& outMeans, int numStepsPerJoint, int maxNumSteps, SBSkeleton* skeleton, 
+									  std::vector<std::string>& selectedJoints, float floorHeight, float floorThreshold, 
+									  float speedThreshold, int speedWindow, bool isPrintDebugInfo  )
+{
+	std::vector<double> possibleTiming;
+
+	// divided
+	std::vector<std::vector<double> > vecOutMeans;
+	vecOutMeans.resize(selectedJoints.size());
+	std::vector<std::vector<double> > vecTiming;
+	vecTiming.resize(selectedJoints.size());	
+	this->connect(skeleton);
+	for(int f = 0; f < frames(); f++)
+	{
+		this->apply_frame(f);
+		this->connected_skeleton()->update_global_matrices();
+
+		for (size_t jointId = 0; jointId < selectedJoints.size(); jointId ++)
+		{
+			std::string jointName = selectedJoints[jointId];
+			SBJoint* joint = skeleton->getJointByName(jointName);
+			if (!joint)
+				continue;
+
+			// get height
+			const SrMat& gMat = joint->gmat();
+			SrVec gPos = SrVec(gMat.get(12), gMat.get(13), gMat.get(14));
+
+			// get speed
+			int startFrame = f - speedWindow / 2;
+			int endFrame = f + speedWindow / 2;
+			float startTime = startFrame * (float)getFrameRate();
+			float endTime = endFrame * (float)getFrameRate();
+			float speed = getJointSpeed(joint, startTime, endTime);
+
+			// print info
+			if (isPrintDebugInfo)
+				LOG("motion %s at time %f-> speed is %f, height is %f, joint is %s", getName().c_str(), f * getFrameRate(), speed, gPos.y, jointName.c_str());
+
+			// filter for height
+			if (gPos.y < floorHeight || gPos.y > (floorHeight + floorThreshold))
+				continue;
+
+			// filter speed
+			if (speed <= speedThreshold)
+			{
+				vecTiming[jointId].push_back(f * (float)getFrameRate());
+				possibleTiming.push_back(f * (float)getFrameRate());
+			}
+		}
+	}	
+	/*
+	int numSteps = footStepEditor->stateEditor->getCurrentState()->getNumKeys();
+	isConvergent = footStepEditor->kMeansClustering1D(numSteps, possibleTiming, outMeans);
+	*/
+	int maxSteps = maxNumSteps;
+	int stepsPerJoint = numStepsPerJoint;
+	bool isConvergent = true;
+	for (size_t jointId = 0; jointId < selectedJoints.size(); jointId++)
+	{
+		if (jointId == (selectedJoints.size() - 1) )
+		{
+			int mod = maxSteps % selectedJoints.size();
+			stepsPerJoint += mod;
+		}
+
+		bool retBoolean = kMeansClustering1D(stepsPerJoint, vecTiming[jointId], vecOutMeans[jointId]);
+		if (!retBoolean)
+		{
+			isConvergent = false;
+			break;
+		}
+	}
+	if (isConvergent)
+	{
+		outMeans.clear();
+		for (size_t joinId = 0; joinId < selectedJoints.size(); joinId++)
+		{
+			for (size_t meanId = 0; meanId < vecOutMeans[joinId].size(); meanId++)
+				outMeans.push_back(vecOutMeans[joinId][meanId]);
+		}
+		std::sort(outMeans.begin(), outMeans.end());
+	}
+
+	// apply it to corresponding points
+	// also appending starting and ending corresponding points
+	/*
+	int motionIndex = currentState->getMotionId(selectedMotions[m]);
+	if (isConvergent)
+	{
+		std::stringstream ss;
+		ss << "[" << motion->getName() << "]detected ";
+		for (size_t i = 0; i < outMeans.size(); i++)
+			ss << outMeans[i] << " ";
+		LOG("%s", ss.str().c_str());
+		finalMessage << ss.str() << "\n";
+		currentState->keys[motionIndex].clear();
+		if (footStepEditor->isProcessAll)
+			currentState->keys[motionIndex].push_back(0);
+		for (size_t i = 0; i < outMeans.size(); i++)
+			currentState->keys[motionIndex].push_back(outMeans[i]);
+		if (footStepEditor->isProcessAll)
+			currentState->keys[motionIndex].push_back(motion->getDuration());
+	}
+	else
+	{
+		motionsNeedManualAdjusting.push_back(motion->getName());
+		std::stringstream ss;
+		ss << "[" << motion->getName() << "]NOT detected(evenly distrubted): ";
+		int actualNum = maxNumSteps;
+		currentState->keys[motionIndex].clear();
+		if (footStepEditor->isProcessAll)
+			actualNum += 2;
+		for (int i = 0; i < actualNum; i++)
+		{
+			double step = motion->getDuration() / double(actualNum - 1);
+			currentState->keys[motionIndex].push_back(step * i);
+			ss << step * i << " ";
+		}
+		LOG("%s", ss.str().c_str());
+		finalMessage << ss.str() << "\n";
+	}
+	*/
+	disconnect();
+	return isConvergent;
+
+}
+
 };
