@@ -31,6 +31,7 @@
 # include <sk/sk_channel_array.h>
 # include <sbm/sr_synch_points.h>
 #include <sb/SBObject.h>
+#include <queue>
 
 class SkPosture;
 class SkSkeleton;
@@ -221,7 +222,7 @@ public :
 
 	/*! Move all keytimes so that the first keytime starts at the given time */
 	void move_keytimes ( float startkt );
-
+	
 	// Build and return a mirror motion from the motion. The mirror axis is assumed to be y-z plane with the character center at origin.
 	SkMotion* buildMirrorMotion(SkSkeleton* skeleton);
 
@@ -307,6 +308,8 @@ public :
 
 private : 
 	bool _load_bvh ( SrInput& in );
+protected:
+	void convertBoneOrientation( std::string &pjointName, SkSkeleton* interSk, SkSkeleton* tempSrcSk, std::queue<std::string> &jointQueues, std::map<std::string, SrQuat> &jointRotationMap );
 };
 
 //================================ End of File =================================================

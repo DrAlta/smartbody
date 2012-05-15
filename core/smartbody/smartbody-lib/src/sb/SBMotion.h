@@ -52,6 +52,11 @@ class SBMotion : public SkMotion
 		float getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);
 		std::vector<float> getJointTransition(SBJoint* joint, float startTime, float endTime);
 
+		bool autoFootStepDetection(std::vector<double>& outMeans, int numStepsPerJoint, int maxNumSteps, SBSkeleton* skeleton, 
+								   std::vector<std::string>& selectedJoints, float floorHeight, float floorThreshold, float speedThreshold, 
+								   int speedWindow, bool isPrintDebugInfo = false);
+
+
 		double getFrameRate();
 		double getDuration();
 		double getTimeStart();
@@ -66,6 +71,9 @@ class SBMotion : public SkMotion
 
 	protected:
 		void alignToSide(int numFrames, int direction = 0);
+
+		static bool kMeansClustering1D(int num, std::vector<double>& inputPoints, std::vector<double>& outMeans);
+		static void calculateMeans(std::vector<double>&inputPoints, std::vector<double>& means, double convergentValue);
 
 	protected:
 		std::string _motionFile;

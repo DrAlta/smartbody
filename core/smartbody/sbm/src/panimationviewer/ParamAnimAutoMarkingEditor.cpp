@@ -138,6 +138,25 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 		SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[m]);
 		if (!motion)
 			continue;
+
+#if 1 // feng : I tried to refactor the footstep detection into a API function in SBMotion. 
+	  // Still contains too many parameters to be used as an API. But would clean it up more and see if we can come up with 
+	  // a version that can also detect the number of steps as the input. If this is interfering with the editor, set this back to 0.	  
+		std::vector<double> outMeans;
+		int maxNumSteps = footStepEditor->stateEditor->getCurrentState()->getNumKeys();
+		if (!footStepEditor->isProcessAll)
+		{
+			stepsPerJoint = maxNumSteps / selectedJoints.size();
+		}
+		else
+		{
+			maxNumSteps = stepsPerJoint * selectedJoints.size();
+		}
+
+		isConvergent = motion->autoFootStepDetection(outMeans, stepsPerJoint, maxNumSteps, curCharacter->getSkeleton(), selectedJoints,
+			                          floorHeight, heightThresh, speedThresh, speedWindow, footStepEditor->isPrintDebugInfo);
+
+#else 
 		motion->connect(curCharacter->getSkeleton());
 
 		for(int f = 0; f < motion->getNumFrames(); f++)
@@ -222,6 +241,7 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 			}
 			std::sort(outMeans.begin(), outMeans.end());
 		}
+#endif
 
 		// apply it to corresponding points
 		// also appending starting and ending corresponding points
@@ -306,75 +326,3 @@ void PAAutoFootStepsEditor::refreshSelectedMotions()
 }
 
 
-bool PAAutoFootStepsEditor::kMeansClustering1D(int num, std::vector<double>& inputPoints, std::vector<double>& outMeans)
-{
-	if ((int)inputPoints.size() < num)
-	{
-		LOG("PAAutoFootStepsEditor::kMeansClustering1D Warning: Input points are less than number of means");
-		return false;
-	}
-
-	// pick initial point
-	int step = inputPoints.size() / num;
-	for (int i = 0; i < num; i++)
-		outMeans.push_back(inputPoints[i * step]);
-
-	double convergence = 0.1;
-	calculateMeans(inputPoints, outMeans, convergence);
-
-	outMeans.resize(num);
-	return true;
-}
-
-
-void PAAutoFootStepsEditor::calculateMeans(std::vector<double>&inputPoints, std::vector<double>& means, double convergentValue)
-{
-	std::vector<std::vector<double> > partitionBin;
-	partitionBin.resize(means.size());
-
-	// partition
-	for (size_t i = 0; i < inputPoints.size(); i++)
-	{
-		double minDist = 9999;
-		int minDistId = -1;
-		for (size_t j = 0; j < means.size(); j++)
-		{
-			double dist = fabs(inputPoints[i] - means[j]);
-			if (dist < minDist)
-			{
-				minDist = dist;
-				minDistId = j;
-			}
-		}
-		if (minDistId >= 0)
-		{
-			partitionBin[minDistId].push_back(inputPoints[i]);
-		}
-	}
-
-	// get new means
-	std::vector<double> newMeans;
-	for (size_t i = 0; i < means.size(); i++)
-	{
-		double newMean = 0;
-		for (size_t j = 0; j < partitionBin[i].size(); j++)
-			newMean += partitionBin[i][j];
-		newMean /= double(partitionBin[i].size());
-		newMeans.push_back(newMean);
-	}
-
-	double diff = 0.0f;
-	for (size_t i = 0; i < means.size(); i++)
-	{
-		diff = diff + (means[i] - newMeans[i]) * (means[i] - newMeans[i]);
-	}
-	diff = sqrt(diff);
-	
-	if (diff < convergentValue)
-		return;
-	else
-	{
-		means = newMeans;
-		calculateMeans(inputPoints, means, convergentValue);
-	}
-}
