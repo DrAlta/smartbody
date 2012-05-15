@@ -4,6 +4,8 @@
 #include <sbm/mcontrol_callbacks.h>
 #include "sb/SBController.h"
 #include "sbm/me_utilities.hpp"
+#include "bml/bml_types.hpp"
+#include "bml/bml_speech.hpp"
 #include "sb/SBBehavior.h"
 #include <sb/SBSteerAgent.h>
 #include <sb/SBPhysicsManager.h>
@@ -256,6 +258,27 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 	_curBehaviors.clear();
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	// speech
+	BML::MapOfBmlRequest bmlRequestMap = mcu.bml_processor.getBMLRequestMap();
+	for (BML::MapOfBmlRequest::iterator iter = bmlRequestMap.begin(); 
+		 iter != bmlRequestMap.end();
+		 iter ++
+		)
+	{
+		std::string requestName = iter->first;
+		BML::BmlRequestPtr bmlRequestPtr = iter->second;
+		if (bmlRequestPtr->actor->getName() == this->getName())
+		{
+			if (bmlRequestPtr->speech_request)
+			{
+				SpeechBehavior* speechBehavior = new SpeechBehavior();
+				// what information do we need here?
+
+				_curBehaviors.push_back(speechBehavior);
+			}
+		}
+	}
 
 	// posture
 	if (this->posture_sched_p)

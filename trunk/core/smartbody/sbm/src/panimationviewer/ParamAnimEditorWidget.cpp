@@ -372,15 +372,30 @@ void ParamAnimEditorWidget::draw()
 	{
 		if (alignTimes.size() != model->getNumTracks())
 			return;
-		fl_color(FL_MAGENTA);
-		// draw the align line
+		fl_color(FL_BLACK);
+		int triangleWidth = 1;
+		// draw the align triangles
 		for (int t = 0; t < model->getNumTracks(); t++)
 		{
 			int xPos = convertTimeToPosition(alignTimes[t]);
+			if (alignTimes[t] == 0)
+				continue;
+
 			nle::Track* track = model->getTrack(t);
 			int x1, y1, w1, h1;
 			track->getBounds(x1, y1, w1, h1);
-			fl_line(xPos, y1, xPos, y1 + h1);	
+			/*
+			fl_line(xPos, y1 + h1 / 2, xPos - 1, y1);
+			fl_line(xPos, y1 + h1 / 2, xPos + 1, y1);
+			fl_line(xPos + 1, y1, xPos - 1, y1);
+			fl_line(xPos, y1 + h1 / 2, xPos - 1, y1 + h1);
+			fl_line(xPos, y1 + h1 / 2, xPos + 1, y1 + h1);
+			fl_line(xPos + 1, y1 + h1, xPos - 1, y1 + h1);
+			*/
+
+			fl_polygon(xPos, y1 + h1 / 2, xPos - triangleWidth, y1, xPos + triangleWidth, y1);
+			fl_polygon(xPos, y1 + h1 / 2, xPos - triangleWidth, y1 + h1, xPos + triangleWidth, y1 + h1);
+			//fl_line(xPos, y1, xPos, y1 + h1);	
 		}
 	}
 }

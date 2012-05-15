@@ -369,7 +369,7 @@ void SBMotion::alignToSide(int numFrames, int direction)
 }
 
 
-SBMotion* SBMotion::duplicateCycle(int num)
+SBMotion* SBMotion::duplicateCycle(int num, std::string newName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	registerAnimation();
@@ -379,10 +379,14 @@ SBMotion* SBMotion::duplicateCycle(int num)
 	// create a new motion
 	SkChannelArray& mchan_arr = this->channels();
 	SBMotion* copyMotion = new SmartBody::SBMotion();
-	std::string copyMotionName = "";
-	std::stringstream ss;
-	ss << this->getName() << "_duplicate" << (num - 1);
-	copyMotionName = ss.str();
+	std::string copyMotionName = newName;
+	if (newName == "")
+	{
+		std::stringstream ss;
+		ss << this->getName() << "_duplicate" << (num - 1);
+		copyMotionName = ss.str();
+	}
+
 	copyMotion->setName(copyMotionName);
 	mcu.motion_map.insert(std::pair<std::string, SkMotion*>(copyMotionName, copyMotion));
 	srSynchPoints sp(synch_points);
