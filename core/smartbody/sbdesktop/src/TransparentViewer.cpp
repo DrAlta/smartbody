@@ -128,19 +128,36 @@ LRESULT CALLBACK WindowFunc(HWND hWnd,UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_NCHITTEST:
 			return HTCAPTION;   // allows dragging of the window
 
-        case WM_DESTROY:
-            if(m_hrc)
+		case WM_CLOSE:
+			 if(m_hrc)
             {
                 wglMakeCurrent(NULL, NULL);
                 wglDeleteContext(m_hrc) ;
             }			
             PostQuitMessage(0) ;
+		break;
+
+        case WM_DESTROY:
+            return 0;
         break;
 
 		case WM_KEYDOWN:
 			if (wParam == VK_ESCAPE)
 			{
-				SendMessage(curhWnd, WM_CLOSE, 0, 0);				
+				int msgboxID = MessageBox(
+					NULL,
+					"Are you sure you want to quit?",
+					"Quit SmartBody Desktop",
+					MB_OKCANCEL				);
+
+				switch (msgboxID)
+				{
+				case IDCANCEL:
+					break;
+				case IDOK:
+					SendMessage(curhWnd, WM_CLOSE, 0, 0);	
+					break;
+				}	
 				return 0;
 			}
 			break;
