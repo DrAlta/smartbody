@@ -63,7 +63,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="vhcl_d.lib vhmsg_d.lib bonebus_d.lib smartbody-dll_d.lib OIS_d.lib OgreMain_d.lib pthreadVSE2.lib activemq-cppd.lib ws2_32.lib rpcrt4.lib winmm.lib"
+				AdditionalDependencies="smartbody-dll_d.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib OIS_d.lib OgreMain_d.lib pthreadVSE2.lib activemq-cppd.lib ws2_32.lib rpcrt4.lib winmm.lib"
 				OutputFile="$(OutDir)\OgreViewer_d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib\vhcl\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;&quot;..\..\..\..\core\smartbody\smartbody-dll\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib9\debug;..\..\..\..\lib\pthreads\lib9;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;..\..\..\..\lib\boost\lib"
@@ -147,7 +147,7 @@
 				AdditionalDependencies="vhcl.lib vhmsg.lib bonebus.lib smartbody-dll.lib OIS.lib OgreMain.lib pthreadVSE2.lib activemq-cpp.lib ws2_32.lib rpcrt4.lib winmm.lib"
 				OutputFile="$(OutDir)\OgreViewer.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\lib\vhcl\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;&quot;..\..\..\..\core\smartbody\smartbody-dll\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib9\release;..\..\..\..\lib\pthreads\lib9;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;..\..\..\..\lib\boost\lib"
+				AdditionalLibraryDirectories="..\..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\..\lib\vhcl\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;&quot;..\..\..\..\core\smartbody\smartbody-dll\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib9\release;..\..\..\..\lib\pthreads\lib9;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;..\..\..\..\lib\boost\lib"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
