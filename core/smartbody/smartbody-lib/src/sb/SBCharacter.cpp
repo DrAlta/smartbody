@@ -20,6 +20,17 @@ SBCharacter::SBCharacter() : SbmCharacter()
 SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name.c_str(), type)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	createBoolAttribute("visemecurve", false, true, "Basic", 200, false, false, false, "Use curve-based visemes instead of discrete visemes.");
+	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
+	timeDelayAttr->setMin(0.0);
+	createStringAttribute("deformableMesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
+	createDoubleAttribute("deformableMeshScale", 1, true, "Basic", 230, false, false, false, "Scale factor when loading mesh.");
+	createStringAttribute("receiverName", "kinect1", true, "Basic", 300, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
+	createStringAttribute("voice", "remote", true, "Basic", 400, false, false, false, "How the voice is created - local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
+	createStringAttribute("voiceCode", "voice_kal_diphone", true, "Basic", 400, false, false, false, "For local and remote voices, the name of the voice to be used. For audiofile, the path to the audiofile when combined with the media path.");
+	createStringAttribute("voiceBackup", "audiofile", true, "Basic", 400, false, false, false, "How the voice is created if the primary voice fails. local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
+	createStringAttribute("voiceBackupCode", ".", true, "Basic", 400, false, false, false, "For local and remote voices, the name of the backup voice to be used. For audiofile, the path to the audiofile when combined with the media path.");
 }
 
 int SBCharacter::setup()
@@ -373,6 +384,62 @@ void SBCharacter::notify(SBSubject* subject)
 			SmartBody::SBPhysicsManager* manager = SmartBody::SBScene::getScene()->getPhysicsManager();
 			manager->createPhysicsCharacter(this->getName());
 			return;
+		}
+
+		const std::string& attrName = attribute->getName();
+		if (attrName == "visemecurve")
+		{
+			SmartBody::BoolAttribute* curveAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			set_viseme_curve_mode(curveAttribute->getValue());
+		}
+		else if (attrName == "visemetimedelay")
+		{
+			SmartBody::DoubleAttribute* timeDelayAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			set_viseme_time_delay((float) timeDelayAttribute->getValue());
+		}
+		else if (attrName == "deformableMesh")
+		{
+			SmartBody::StringAttribute* meshAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+			std::stringstream strstr;
+			strstr << "char " << getName() << " mesh " << meshAttribute->getValue();
+			SmartBody::DoubleAttribute* meshScaleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("deformableMeshScale"));
+			if (meshScaleAttribute && meshScaleAttribute->getValue() !=  1.0)
+			{
+				strstr << " -scale " << meshScaleAttribute->getValue();
+			}
+
+			mcuCBHandle& mcu = mcuCBHandle::singleton();
+			int success = mcu.execute((char*) strstr.str().c_str());
+			if (success != CMD_SUCCESS)
+			{
+				LOG("Problem setting attribute 'mesh' on character %s", getName().c_str());
+			}
+		}
+		else if (attrName == "voice")
+		{
+			SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+			this->setVoice(strAttribute->getValue());
+		}
+		else if (attrName == "voiceCode")
+		{
+			SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+			this->setVoiceCode(strAttribute->getValue());
+		}
+		else if (attrName == "voiceBackup")
+		{
+			SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+			this->setVoiceBackup(strAttribute->getValue());
+		}
+		else if (attrName == "voiceBackupCode")
+		{
+			SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+			this->setVoiceBackupCode(strAttribute->getValue());
+		}
+		if (attrName.find("steering.") == 0)
+		{
+			// update the steering params on the next evaluation cycle
+			if (steeringAgent)
+				steeringAgent->setSteerParamsDirty(true);
 		}
 	}
 

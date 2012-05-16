@@ -67,13 +67,13 @@ public:
 
 	SbmTransform& getCombineTransform();
 	virtual SrVec getCenter();	
-	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) = 0; // check if a point is inside the object	
+	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) { return false; } // check if a point is inside the object	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f) { return false; }; // check if a line segment is intersect with the object
 	// estimate the hand position and orientation
-	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist = 0.f) = 0;
-	virtual std::string geomType() = 0;
-	virtual SrVec       getGeomSize() = 0;
-	virtual void	    setGeomSize(SrVec& size) = 0;
+	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist = 0.f) { return false; }
+	virtual std::string geomType() { return ""; }
+	virtual SrVec       getGeomSize() { return SrVec(); }
+	virtual void	    setGeomSize(SrVec& size) { return; }
 
 	static SbmGeomObject* createGeometry(const std::string& type, SrVec extends, SrVec from = SrVec(), SrVec to = SrVec() );
 };
