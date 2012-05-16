@@ -304,6 +304,12 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 				editor->visualizationGroup->remove(editor->triangleVisualization);
 				delete editor->triangleVisualization;
 				editor->triangleVisualization = NULL;
+			}			
+			if (editor->tetraVisualization != NULL)
+			{
+				editor->tetraVisualization->remove(editor->triangleVisualization);
+				delete editor->tetraVisualization;
+				editor->tetraVisualization = NULL;
 			}
 			std::vector<double> weights;
 			editor->stateData = new PAStateData(currentState, weights);
@@ -454,7 +460,15 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 		editor->sliderScrub->deactivate();
 
 		editor->stateAnimationList->clear();
-		editor->buttonPlay->deactivate();
+		editor->shapeList->clear();
+		editor->shapeList->label("");
+		editor->inputParameterX->value("");
+		editor->inputParameterX->deactivate();
+		editor->inputParameterY->value("");
+		editor->inputParameterY->deactivate();
+		editor->inputParameterZ->value("");
+		editor->inputParameterZ->deactivate();
+
 
 		// remove any visualizations
 		if (editor->triangleVisualization != NULL)
