@@ -409,6 +409,8 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
 	vhcl::Log::g_log.AddListener(listener);
 
+	vhcl::Log::FileListener* fileListener = new vhcl::Log::FileListener("smartbody.log");
+	vhcl::Log::g_log.AddListener(fileListener);
 
 	int err;
 	SrString net_host;
@@ -720,7 +722,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 
 	mcu.speech_audiofile_base_path = "../../../../";
 
-	mcu._scene->getDebuggerServer()->SetID("sbm-fltk");
+	mcu._scene->getDebuggerServer()->SetID("sbdesktop");
 
 //	(void)signal( SIGABRT, signal_handler );
 //	(void)signal( SIGFPE, signal_handler );
