@@ -500,12 +500,6 @@ void SbmCharacter::initData()
 	locomotion_type = Basic;
 	statePrefix = "";
 
-	createBoolAttribute("visemecurve", false, true, "Basic", 200, false, false, false, "Use curve-based visemes instead of discrete visemes.");
-	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
-	timeDelayAttr->setMin(0.0);
-	createStringAttribute("deformableMesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
-	createDoubleAttribute("deformableMeshScale", 1, true, "Basic", 230, false, false, false, "Scale factor when loading mesh.");
-	createStringAttribute("receiverName", "kinect1", true, "Basic", 300, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
 }
 
 void SbmCharacter::locomotion_reset()
@@ -3608,48 +3602,7 @@ float SbmCharacter::getMinVisemeTime() const
 void SbmCharacter::notify(SBSubject* subject)
 {
 	SBPawn::notify(subject);
-
-	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
-	if (attribute)
-	{
-		const std::string& attrName = attribute->getName();
-		if (attrName == "visemecurve")
-		{
-			SmartBody::BoolAttribute* curveAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
-			set_viseme_curve_mode(curveAttribute->getValue());
-		}
-		else if (attrName == "visemetimedelay")
-		{
-			SmartBody::DoubleAttribute* timeDelayAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
-			set_viseme_time_delay((float) timeDelayAttribute->getValue());
-		}
-		else if (attrName == "deformableMesh")
-		{
-			SmartBody::StringAttribute* meshAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
-			std::stringstream strstr;
-			strstr << "char " << getName() << " mesh " << meshAttribute->getValue();
-			SmartBody::DoubleAttribute* meshScaleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("deformableMeshScale"));
-			if (meshScaleAttribute && meshScaleAttribute->getValue() !=  1.0)
-			{
-				strstr << " -scale " << meshScaleAttribute->getValue();
-			}
-
-			mcuCBHandle& mcu = mcuCBHandle::singleton();
-			int success = mcu.execute((char*) strstr.str().c_str());
-			if (success != CMD_SUCCESS)
-			{
-				LOG("Problem setting attribute 'mesh' on character %s", getName().c_str());
-			}
-		}
-		if (attrName.find("steering.") == 0)
-		{
-			// update the steering params on the next evaluation cycle
-			if (steeringAgent)
-				steeringAgent->setSteerParamsDirty(true);
-		}
-	}
 }
-
 SrVec SbmCharacter::getFacingDirection()
 {
 	float x,y,z,h,p,r;
