@@ -28,6 +28,7 @@ copy /Y ..\..\..\core\smartbody\smartbody-dll\lib\smartbody-dll.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\alut.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\OpenAL32.dll %BIN_DIR%
+copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\wrap_oal.dll %BIN_DIR%
 copy /Y ..\..\..\lib\xerces-c\bin9\xerces-c_3_1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-1_44.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_system-vc90-mt-1_44.dll %BIN_DIR%
@@ -82,6 +83,7 @@ copy /Y ..\..\..\core\smartbody\smartbody-dll\lib\smartbody-dll_d.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\alut.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\OpenAL32.dll %BIN_DIR%
+copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\wrap_oal.dll %BIN_DIR%
 copy /Y ..\..\..\lib\xerces-c\bin9\xerces-c_3_1D.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-gd-1_44.dll %BIN_DIR%
 copy /Y ..\..\..\lib\boost\lib\boost_system-vc90-mt-gd-1_44.dll %BIN_DIR%
