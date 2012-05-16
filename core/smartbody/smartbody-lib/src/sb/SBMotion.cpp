@@ -435,8 +435,6 @@ SBMotion* SBMotion::duplicateCycle(int num, std::string newName)
 			SrMat temp = adjustMats * adjustBaseMat;
 			adjustMats = temp;
 		}
-		adjustVec = adjustMats.get_translation();
-		adjustQuat = SrQuat(adjustMats);
 
 		for (int i = 0; i < getNumFrames(); i++)
 		{
@@ -451,8 +449,12 @@ SBMotion* SBMotion::duplicateCycle(int num, std::string newName)
 				for (int n = 0; n < chan.size(); n++)
 					copy_p[index + n] = orig_p[index + n];
 			}
-			copyFrameOffset[i + cycleId * getNumFrames()] = frameOffset[i] + adjustVec;
-			copyFrameOrientation[i + cycleId * getNumFrames()] = frameOrientation[i] * adjustQuat;
+			SrMat curMat;
+			frameOrientation[i].get_mat(curMat);
+			curMat.setl4(frameOffset[i]);
+			SrMat newMat = curMat * adjustMats;
+			copyFrameOffset[i + cycleId * getNumFrames()] = newMat.get_translation();
+			copyFrameOrientation[i + cycleId * getNumFrames()] = SrQuat(newMat);
 		}	
 	}
 	unregisterAnimation();
