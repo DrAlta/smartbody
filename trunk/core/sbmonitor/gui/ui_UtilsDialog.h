@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'UtilsDialog.ui'
 **
-** Created: Fri Apr 27 11:08:57 2012
+** Created: Thu May 17 14:30:11 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -60,6 +60,7 @@ public:
     QComboBox *gazeTargetBox;
     QFrame *line_5;
     QLabel *controlLabel;
+    QPushButton *StopGazeButton;
     QFrame *line_6;
     QComboBox *selectedCharacterBox;
     QLabel *selectedCharacterLabel;
@@ -175,7 +176,7 @@ public:
         line_4->setFrameShadow(QFrame::Sunken);
         frame_4 = new QFrame(UtilsDialog);
         frame_4->setObjectName(QString::fromUtf8("frame_4"));
-        frame_4->setGeometry(QRect(20, 310, 141, 111));
+        frame_4->setGeometry(QRect(20, 310, 211, 111));
         frame_4->setFrameShape(QFrame::StyledPanel);
         frame_4->setFrameShadow(QFrame::Raised);
         GazeAtButton = new QPushButton(frame_4);
@@ -186,7 +187,7 @@ public:
         gazeTargetLabel->setGeometry(QRect(0, 30, 61, 16));
         gazeTargetBox = new QComboBox(frame_4);
         gazeTargetBox->setObjectName(QString::fromUtf8("gazeTargetBox"));
-        gazeTargetBox->setGeometry(QRect(0, 50, 121, 22));
+        gazeTargetBox->setGeometry(QRect(0, 50, 131, 22));
         line_5 = new QFrame(frame_4);
         line_5->setObjectName(QString::fromUtf8("line_5"));
         line_5->setGeometry(QRect(0, 20, 118, 3));
@@ -197,6 +198,9 @@ public:
         controlLabel->setObjectName(QString::fromUtf8("controlLabel"));
         controlLabel->setGeometry(QRect(0, 0, 71, 16));
         controlLabel->setFont(font);
+        StopGazeButton = new QPushButton(frame_4);
+        StopGazeButton->setObjectName(QString::fromUtf8("StopGazeButton"));
+        StopGazeButton->setGeometry(QRect(70, 80, 61, 23));
         line_6 = new QFrame(UtilsDialog);
         line_6->setObjectName(QString::fromUtf8("line_6"));
         line_6->setGeometry(QRect(20, 290, 441, 16));
@@ -250,6 +254,7 @@ public:
         GazeAtButton->setText(QApplication::translate("UtilsDialog", "Gaze At", 0, QApplication::UnicodeUTF8));
         gazeTargetLabel->setText(QApplication::translate("UtilsDialog", "Gaze Target", 0, QApplication::UnicodeUTF8));
         controlLabel->setText(QApplication::translate("UtilsDialog", "Control", 0, QApplication::UnicodeUTF8));
+        StopGazeButton->setText(QApplication::translate("UtilsDialog", "Stop Gaze", 0, QApplication::UnicodeUTF8));
         selectedCharacterLabel->setText(QApplication::translate("UtilsDialog", "Selected Character", 0, QApplication::UnicodeUTF8));
         refreshButton->setText(QApplication::translate("UtilsDialog", "Refresh", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
