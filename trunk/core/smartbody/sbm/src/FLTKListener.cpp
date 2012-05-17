@@ -156,9 +156,11 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 	pawn->dMesh_p =  new SbmDeformableMeshGPU();
 	pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
 
+	float sceneScale = 0.01f/SBScene::getScene()->getScale();
+
 	pawn->scene_p = new SkScene();
 	pawn->scene_p->ref();
-	pawn->scene_p->init(pawn->getSkeleton());
+	pawn->scene_p->init(pawn->getSkeleton(), sceneScale);
 	mcu.add_scene(pawn->scene_p);
 }
 

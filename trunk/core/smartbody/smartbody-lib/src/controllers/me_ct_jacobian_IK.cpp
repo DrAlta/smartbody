@@ -484,6 +484,10 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 			else
 				parentMat = s->ikGlobalMat;
 
+			// fix for prerotation
+			SrMat prerot; node->joint->quat()->prerot().get_mat(prerot);
+			parentMat = prerot*parentMat;
+
 			SrVec nodePos = SrVec(nodeMat.get(12),nodeMat.get(13),nodeMat.get(14));
 			SrVec axis[3];
 			for (int k=0;k<3;k++)
@@ -551,6 +555,10 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 				parentMat = node->parent->gmat;
 			else
 				parentMat = s->ikGlobalMat;
+
+			// fix for prerotation
+			SrMat prerot; node->joint->quat()->prerot().get_mat(prerot);
+			parentMat = prerot*parentMat;
 			//parentMat = node->gmat;
 			SrVec axis[3];
 			for (int k=0;k<3;k++)
