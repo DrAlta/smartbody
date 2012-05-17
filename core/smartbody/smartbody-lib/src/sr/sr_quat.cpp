@@ -88,6 +88,7 @@ void SrQuat::set ( const SrVec& axisangle )
 
 void SrQuat::set ( const SrMat& m )
  {
+/*
    # define E(i)   m.get(i)
    # define M(i,j) m.get(i,j)
    # define Q(i)   *((&x)+i)
@@ -119,10 +120,57 @@ void SrQuat::set ( const SrMat& m )
       w    = (M(j,k) - M(k,j)) * s;
       Q(j) = (M(i,j) + M(j,i)) * s;
       Q(k) = (M(i,k) + M(k,i)) * s;
-    }
-   # undef E
-   # undef M
-   # undef Q
+	}
+	  # undef E
+	  # undef M
+	  # undef Q
+	*/
+
+	#define M(i,j) m.get(i,j)
+	register float ww, xx, yy, rcp, qx, qy, qz, qw;
+	ww = 0.25f * (1.0f + M(0,0) + M(1,1)+ M(2,2));
+	if (ww > gwiz::epsilon6()) 
+	{
+		qw = sqrt( ww );
+		rcp = 1.0f / ( 4.0f * qw );
+		qx = (M(1,2) - M(2,1)) * rcp;
+		qy = (M(2,0) - M(0,2)) * rcp;
+		qz = (M(0,1) - M(1,0)) * rcp;
+	}
+	else	
+	{
+		qw = 0.0f;
+		xx = -0.5f * (M(1,1) + M(2,2));
+		if (xx > gwiz::epsilon6())	
+		{
+			qx = sqrt(xx);
+			rcp = 1.0f / (2.0f * qx);
+			qy = M(0,1) * rcp;
+			qz = M(0,2) * rcp;
+		}
+		else
+		{
+			qx = 0.0f;
+			yy = 0.5f * (1 - M(2,2));
+			if (yy > gwiz::epsilon6()) 
+			{
+				qy = sqrt(yy);
+				qz = M(1,2) / (2.0f * qy);
+			}
+			else	
+			{
+				qy = 0.0f;
+				qz = 1.0f;
+			}
+		}
+	}
+
+	float inv_mag = 1.0f / sqrt(qw * qw + qx * qx + qy * qy + qz * qz);
+	w = qw * inv_mag;
+	x = qx * inv_mag;
+	y = qy * inv_mag;
+	z = qz * inv_mag;
+	#undef M
  }
 
 void SrQuat::set( float ex, float ey, float ez )
