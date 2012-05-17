@@ -52,7 +52,7 @@ class SkScene : public SrSnGroup
         set_visibility() can be used to visualize other objects.
         Null can be passed to clear the scene.
         The skeleton ref()/unref() methods are respected. */
-    void init ( SkSkeleton* s );
+    void init ( SkSkeleton* s, float scale = 1.f );
 
     /*! Update the transformations of the scene graph according
         to the joints in the skeleton sent to init(). */

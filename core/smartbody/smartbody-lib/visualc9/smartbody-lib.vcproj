@@ -920,14 +920,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\controllers\me_ct_jacobian_IK.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\controllers\me_ct_jacobian_IK.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\controllers\me_ct_lifecycle_test.cpp"
 				>
 			</File>
@@ -1599,6 +1591,14 @@
 					>
 					<File
 						RelativePath="..\src\controllers\me_ct_ccd_IK.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\controllers\me_ct_jacobian_IK.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\controllers\me_ct_jacobian_IK.hpp"
 						>
 					</File>
 				</Filter>

@@ -82,7 +82,7 @@ static SrSnGroup* make_joint_group ( const SkJoint* j, SkSkeleton* s, SrArray<Sr
 enum GroupPos { AxisPos=0, SpherePos=1, MatrixPos=2, GeoPos=3 };
 enum GeoGroupPos { VisgeoPos=0, ColgeoPos=1, FirstCylPos=2 };
 
-void SkScene::init ( SkSkeleton* s )
+void SkScene::init ( SkSkeleton* s, float scale )
  {
    remove_all();
    _jgroup.size ( 0 );
@@ -118,7 +118,7 @@ void SkScene::init ( SkSkeleton* s )
    float height = s->getCurrentHeight();
    float scaleFactor =  height / 175.0f;
    if (scaleFactor == 0.0f)
-	   scaleFactor = 1.0f;
+	   scaleFactor = scale;
    sphere->shape().radius = scaleFactor * _cradius * _sfactor;
    sphere->visible ( true );
    sphere->ref();
