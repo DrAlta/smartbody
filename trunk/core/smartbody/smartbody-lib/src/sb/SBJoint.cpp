@@ -3,6 +3,7 @@
 #include "SBCharacter.h"
 #include <sk/sk_skeleton.h>
 #include <sbm/mcontrol_util.h>
+#include <queue>
 
 namespace SmartBody {
 
@@ -219,6 +220,26 @@ SrQuat SBJoint::getPostrotation()
 		return jointQuat->postrot();
 	else
 		return SrQuat();
+}
+
+std::vector<SBJoint*> SBJoint::getDescendants()
+{
+	std::vector<SBJoint*> joints;
+	std::queue<SBJoint*> jointQueue;
+	jointQueue.push(this);
+	while (!jointQueue.empty())
+	{
+		SBJoint* firstInQueue = jointQueue.front();
+		jointQueue.pop();
+		if (firstInQueue != this)
+			joints.push_back(firstInQueue);
+		for (int i=0;i<firstInQueue->getNumChildren();i++)
+		{
+			SBJoint* child = firstInQueue->getChild(i);
+			jointQueue.push(child);
+		}
+	}		
+	return joints;
 }
 
 };

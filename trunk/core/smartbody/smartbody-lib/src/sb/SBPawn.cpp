@@ -191,6 +191,7 @@ void SBPawn::notify(SBSubject* subject)
 		{
 			SbmGeomObject* object = getGeomObject();
 			std::string shapeName = getStringAttribute("collisionShape");
+			LOG("collisionShape = %s",shapeName.c_str());
 			if (shapeName != object->geomType())
 			{
 				SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();

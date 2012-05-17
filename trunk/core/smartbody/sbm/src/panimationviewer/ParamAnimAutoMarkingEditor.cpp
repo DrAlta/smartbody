@@ -158,6 +158,16 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 			maxNumSteps = stepsPerJoint * selectedJoints.size();
 		}
 
+// 		std::vector<FootStepRecord> footSteps;
+// 		motion->autoFootPlantDetection(curCharacter->getSkeleton(),selectedJoints,floorHeight, heightThresh,speedThresh,footSteps);
+// 
+// 		for (int i=0;i<footSteps.size();i++)
+// 		{
+// 			FootStepRecord& record = footSteps[i];
+// 			LOG("Footstep joint = %s, start frame = %f, end frame = %f",record.jointName.c_str(), record.startTime, record.endTime);
+// 		}
+
+
 		isConvergent = motion->autoFootStepDetection(outMeans, stepsPerJoint, maxNumSteps, curCharacter->getSkeleton(), selectedJoints,
 			                          floorHeight, heightThresh, speedThresh, speedWindow, footStepEditor->isPrintDebugInfo);
 

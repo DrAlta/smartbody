@@ -16,32 +16,41 @@ void SBListener::OnCharacterCreate( const  std::string & name )
 
 void SBListener::OnCharacterCreate( const  std::string & name, const  std::string & objectClass )
 {	
+	//printf("Character create callback\n");
 	std::string logMsg = "Character " + name + " Created. Type is " + objectClass;
 	LogManager::getSingleton().logMessage(logMsg.c_str());
-	if (objectClass == "pawn")
-		return;
 
-	Entity * ent;
 	if (m_app->getSceneManager()->hasEntity(name))
 		return;
 
-	try
+
+	Entity * ent;
+
+	if (objectClass == "pawn")
 	{
-		//Create character from characterType
-		ent = m_app->getSceneManager()->createEntity(name, name + ".mesh" );
+		ent = m_app->getSceneManager()->createEntity(name, "sphere2.mesh" );		
 	}
-	catch( Ogre::ItemIdentityException& )
+	else
 	{
-		;
-	}
-	catch( Ogre::Exception& e )
-	{
-		if( e.getNumber() == Ogre::Exception::ERR_FILE_NOT_FOUND ) 
+		try
 		{
-			//Default to existing Brad character
-			ent = m_app->getSceneManager()->createEntity(name, "Brad.mesh" );
+			//Create character from characterType
+
+			ent = m_app->getSceneManager()->createEntity(name, name + ".mesh" );						
 		}
-	}
+		catch( Ogre::ItemIdentityException& )
+		{
+			;
+		}
+		catch( Ogre::Exception& e )
+		{
+			if( e.getNumber() == Ogre::Exception::ERR_FILE_NOT_FOUND ) 
+			{
+				//Default to existing Brad character
+				ent = m_app->getSceneManager()->createEntity(name, "Brad.mesh" );
+			}
+		}
+	}	
 
 	if (ent == NULL)
 	{
@@ -52,24 +61,37 @@ void SBListener::OnCharacterCreate( const  std::string & name, const  std::strin
 	SceneNode * mSceneNode = m_app->getSceneManager()->getRootSceneNode()->createChildSceneNode(name);
 	mSceneNode->attachObject(ent);
 	Ogre::Skeleton* skel = ent->getSkeleton();
-
 	OgreFrameListener* frameListener = m_app->getOgreFrameListener();
-	if (frameListener)
+
+	if (objectClass == "pawn")
 	{
+		mSceneNode->scale( .05f, .05f, .05f );
+		if (frameListener)
+		{
+			frameListener->m_pawnList.push_back(name);
+		}
+		return;
+	}
+
+	if (frameListener)
+	{		
 		// insert into character list
 		frameListener->m_characterList.push_back(name);
 		
 		// get intial bone position for every character
 		std::map<std::string, Ogre::Vector3> intialBonePositions;
-
-		for (int i = 0; i < skel->getNumBones(); i++)
+		
+		if (skel)
 		{
-			Bone* bone = skel->getBone(i);
-			intialBonePositions.insert(std::make_pair(bone->getName(), bone->getPosition()));
-			frameListener->m_validJointNames.insert(bone->getName());
+			for (int i = 0; i < skel->getNumBones(); i++)
+			{
+				Bone* bone = skel->getBone(i);
+				intialBonePositions.insert(std::make_pair(bone->getName(), bone->getPosition()));
+				frameListener->m_validJointNames.insert(bone->getName());
 
-		}
-		frameListener->m_initialBonePositions.insert(std::make_pair(name, intialBonePositions));
+			}
+		}		
+		frameListener->m_initialBonePositions.insert(std::make_pair(name, intialBonePositions));		
 	}
 }
 

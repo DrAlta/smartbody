@@ -1,5 +1,6 @@
 #include "OgreFrameListener.h"
 #include "vhmsg-tt.h"
+#include "smartbody-c-dll.h"
 
 OgreFrameListener::OgreFrameListener(RenderWindow * win, Camera * cam, const std::string & debugText, SceneManager * mgr, 
 									 bonebus::BoneBusServer * bonebus, Smartbody_dll* sbmdll, std::vector<std::string>& initialCommands) 
@@ -219,12 +220,36 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 		if (firstTime)
 		{
 			for (size_t i = 0; i < m_initialCommands.size(); i++)
+			{
+				printf("initial command %d : %s\n",i, m_initialCommands[i].c_str());
 				vhmsg::ttu_notify2("sbm", m_initialCommands[i].c_str());
+			}
 		}
 
 		SceneNode* sceneNode = mSceneMgr->getRootSceneNode();
 		if (!sceneNode)
 			return false;
+
+		for ( size_t i = 0; i< m_pawnList.size(); i++ )
+		{
+			std::string& name = m_pawnList[i];
+			
+			std::string command = "ball = scene.getPawn('"+name+"')";
+			m_sbmDLL->PythonCommandVoid(command);
+			m_sbmDLL->PythonCommandVoid("position = ball.getPosition()\norientation = ball.getOrientation()");
+			float x = m_sbmDLL->PythonCommandFloat("ret = position.getData(0)");
+			float y = m_sbmDLL->PythonCommandFloat("ret = position.getData(1)");
+			float z = m_sbmDLL->PythonCommandFloat("ret = position.getData(2)");
+			float qw = m_sbmDLL->PythonCommandFloat("ret = orientation.getData(0)");
+			float qx = m_sbmDLL->PythonCommandFloat("ret = orientation.getData(1)");
+			float qy = m_sbmDLL->PythonCommandFloat("ret = orientation.getData(2)");
+			float qz = m_sbmDLL->PythonCommandFloat("ret = orientation.getData(3)");
+
+			Node* node = sceneNode->getChild(name);
+			if (!node) continue;
+			node->setPosition(x,y,z);
+			node->setOrientation(qw,qx,qy,qz);
+		}
 		
 		// set character position and rotation
 		for ( size_t i = 0; i < m_characterList.size(); i++ )
@@ -249,6 +274,7 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 				continue;
 			std::map<std::string, Ogre::Vector3>& intialBonePositionMap = m_initialBonePositions[name];
 			Ogre::Skeleton* skel = ent->getSkeleton();
+			if (!skel) continue;
 			for (size_t jId = 0; jId < c.m_joints.size(); jId++)
 			{
 				SmartbodyJoint& joint = c.m_joints[jId];

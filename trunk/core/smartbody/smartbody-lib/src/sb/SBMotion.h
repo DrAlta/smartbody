@@ -10,6 +10,16 @@ namespace SmartBody {
 class SBJoint;
 class SBSkeleton;
 
+class FootStepRecord
+{
+public:
+	std::string jointName;
+	float startTime, endTime;
+	FootStepRecord();
+	~FootStepRecord();
+	FootStepRecord& operator= ( const FootStepRecord& rt);
+};
+
 class SBMotion : public SkMotion
 {
 	public:
@@ -55,6 +65,8 @@ class SBMotion : public SkMotion
 		bool autoFootStepDetection(std::vector<double>& outMeans, int numStepsPerJoint, int maxNumSteps, SBSkeleton* skeleton, 
 								   std::vector<std::string>& selectedJoints, float floorHeight, float floorThreshold, float speedThreshold, 
 								   int speedWindow, bool isPrintDebugInfo = false);
+
+		bool autoFootPlantDetection(SBSkeleton* srcSk, std::vector<std::string>& footJoints, float floorHeight, float heightThreshold, float speedThreshold, std::vector<FootStepRecord>& footStepRecords);
 
 
 		double getFrameRate();

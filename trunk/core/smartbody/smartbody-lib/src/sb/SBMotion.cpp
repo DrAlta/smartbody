@@ -8,6 +8,23 @@
 
 namespace SmartBody {
 
+FootStepRecord::FootStepRecord()
+{
+
+}
+
+FootStepRecord::~FootStepRecord()
+{
+
+}
+
+FootStepRecord& FootStepRecord::operator=( const FootStepRecord& rt )
+{
+	jointName = rt.jointName;
+	startTime = rt.startTime;
+	endTime   = rt.endTime;
+	return *this;
+}
 
 SBMotion::SBMotion() : SkMotion()
 {
@@ -1061,6 +1078,112 @@ void SBMotion::calculateMeans(std::vector<double>&inputPoints, std::vector<doubl
 		means = newMeans;
 		calculateMeans(inputPoints, means, convergentValue);
 	}
+}
+
+
+bool SBMotion::autoFootPlantDetection( SBSkeleton* srcSk, std::vector<std::string>& footJoints, float floorHeight, float heightThreshold, float speedThreshold, std::vector<FootStepRecord>& footStepRecords )
+{
+	int speedWindow = 3;
+	footStepRecords.clear();	
+	std::vector<std::vector<float> > vecTiming;
+	vecTiming.resize(footJoints.size());	
+	std::vector<std::vector<SrVec> > vecPos;
+	vecPos.resize(footJoints.size());
+	this->connect(srcSk);
+	for(int f = 0; f < frames(); f++)
+	{
+		this->apply_frame(f);
+		this->connected_skeleton()->update_global_matrices();
+		for (size_t jointId = 0; jointId < footJoints.size(); jointId ++)
+		{
+			std::string jointName = footJoints[jointId];
+			SBJoint* joint = srcSk->getJointByName(jointName);
+			if (!joint)
+				continue;			
+			// get height
+			const SrMat& gMat = joint->gmat();
+			SrVec gPos = SrVec(gMat.get(12), gMat.get(13), gMat.get(14));			
+			// get speed
+			int startFrame = f - speedWindow / 2;
+			int endFrame = f + speedWindow / 2;
+			float startTime = startFrame * (float)getFrameRate();
+			float endTime = endFrame * (float)getFrameRate();
+			float speed = getJointSpeed(joint, startTime, endTime);		
+
+			std::vector<SBJoint*> descendants = joint->getDescendants();
+			for (int k=0;k<descendants.size();k++)
+			{
+				SBJoint* des = descendants[k];
+				gPos += des->gmat().get_translation();
+				speed += getJointSpeed(des, startTime, endTime);
+			}
+			gPos /= (descendants.size()+1);
+			speed /= (descendants.size()+1);
+			// filter for height
+			if (gPos.y < floorHeight || gPos.y > (floorHeight + heightThreshold))
+				continue;
+			// filter speed
+			if (speed <= speedThreshold)
+			{
+				vecTiming[jointId].push_back(f);	
+				vecPos[jointId].push_back(gPos); // also push back the joint's current position
+			}
+		}
+	}	
+
+	// merging the constraints
+	float Fmax = 10.f;
+	float dmax = 0.1f;
+	for (unsigned int i=0;i<footJoints.size();i++)
+	{
+		std::string jointName = footJoints[i];
+		std::vector<float>& plantFrames = vecTiming[i];
+		std::vector<SrVec>& plantPos = vecPos[i];
+		if (plantFrames.size() == 0)
+			continue;
+		std::vector<float> mergeFrames;
+		float curFrame = plantFrames[0];
+		SrVec curPos = plantPos[0];
+		mergeFrames.push_back(curFrame); // init the constraint
+		for (unsigned int k=1;k<plantFrames.size();k++)
+		{
+			float nextFrame = plantFrames[k];
+			SrVec nextPos = plantPos[k];
+			float curDist = (nextPos - curPos).norm();
+			float ftol = Fmax*exp(-curDist*log(Fmax)/dmax);
+			if (ftol > fabs(nextFrame-curFrame)) // merge constraint
+			{
+				mergeFrames.push_back(nextFrame);
+				curFrame = nextFrame;
+				curPos = nextPos;
+			}
+			else // finalize the current constraint
+			{
+				FootStepRecord footPlant;
+				footPlant.jointName = jointName;
+				footPlant.startTime = mergeFrames[0]*(float)getFrameRate();
+				footPlant.endTime   = mergeFrames[mergeFrames.size()-1]*(float)getFrameRate();	
+				footStepRecords.push_back(footPlant);
+
+				curFrame = nextFrame;
+				curPos = nextPos;
+				mergeFrames.clear();
+				mergeFrames.push_back(curFrame);
+			}
+		}
+
+		// push again if there are values in mergeFrames
+		if (mergeFrames.size() > 0)
+		{
+			FootStepRecord footPlant;
+			footPlant.jointName = jointName;
+			footPlant.startTime = mergeFrames[0]*(float)getFrameRate();
+			footPlant.endTime   = mergeFrames[mergeFrames.size()-1]*(float)getFrameRate();	
+
+			footStepRecords.push_back(footPlant);
+		}		
+	}
+	this->disconnect();
 }
 
 
