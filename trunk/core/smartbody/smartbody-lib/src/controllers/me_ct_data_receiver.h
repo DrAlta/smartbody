@@ -30,6 +30,7 @@ class MeCtDataReceiver : public SmartBody::SBController
 
 		void setGlobalPosition(std::string jName, SrVec& pos);
 		void setLocalRotation(std::string jName, SrQuat& q);
+		void removeLocalRotation(std::string jName);
 
 	private:
 		virtual bool controller_evaluate(double t, MeFrameData& frame);
