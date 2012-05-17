@@ -32,6 +32,7 @@ private:
 
 private slots:
    void GazeAtPressed();
+   void StopGazePressed();
    void RunBmlPressed();
    void PlayAnimPressed();
    void SetPosturePressed();

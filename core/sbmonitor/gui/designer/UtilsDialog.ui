@@ -380,7 +380,7 @@
     <rect>
      <x>20</x>
      <y>310</y>
-     <width>141</width>
+     <width>211</width>
      <height>111</height>
     </rect>
    </property>
@@ -421,7 +421,7 @@
      <rect>
       <x>0</x>
       <y>50</y>
-      <width>121</width>
+      <width>131</width>
       <height>22</height>
      </rect>
     </property>
@@ -458,6 +458,19 @@
     </property>
     <property name="text">
      <string>Control</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="StopGazeButton">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>80</y>
+      <width>61</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stop Gaze</string>
     </property>
    </widget>
   </widget>

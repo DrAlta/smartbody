@@ -33,6 +33,7 @@ UtilsDialog::UtilsDialog(SbmDebuggerClient* client, GLWidget* pRenderView, QWidg
    connect(ui.showEyeBeamsBox, SIGNAL(toggled(bool)), pRenderView, SLOT(ToggleShowEyeBeams(bool)));
    connect(ui.allowBoneUpdatesBox, SIGNAL(toggled(bool)), pRenderView, SLOT(ToggleAllowBoneUpdates(bool)));
    connect(ui.GazeAtButton, SIGNAL(pressed()), this, SLOT(GazeAtPressed()));
+   connect(ui.StopGazeButton, SIGNAL(pressed()), this, SLOT(StopGazePressed()));
    connect(ui.runBmlButton, SIGNAL(pressed()), this, SLOT(RunBmlPressed()));
    connect(ui.PlayAnimButton, SIGNAL(pressed()), this, SLOT(PlayAnimPressed()));
    connect(ui.SetPostureButton, SIGNAL(pressed()), this, SLOT(SetPosturePressed()));
@@ -54,6 +55,13 @@ void UtilsDialog::GazeAtPressed()
 {
    //"sbm test bml character {0} gaze target {1}", gazer, gazeTarget
    string message = vhcl::Format("sbm test bml character %s gaze target %s", GetSelectedChar().c_str(),
+      ui.gazeTargetBox->currentText().toStdString().c_str());
+   vhmsg::ttu_notify1(message.c_str());
+}
+
+void UtilsDialog::StopGazePressed()
+{
+   string message = vhcl::Format("sbm char %s gazefade out 1", GetSelectedChar().c_str(),
       ui.gazeTargetBox->currentText().toStdString().c_str());
    vhmsg::ttu_notify1(message.c_str());
 }
