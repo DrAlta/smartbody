@@ -190,7 +190,14 @@ void SBScene::removeCharacter(std::string charName)
 
 		// remove the connected steering object for steering space
 		if (this->getSteerManager())
+		{
 			this->getSteerManager()->removeSteerAgent(charName);
+		}
+
+		if (this->getCollisionManager())
+		{
+			this->getCollisionManager()->removeObjectFromCollisionSpace(character->getGeomObjectName());
+		}
 
 		delete character;
 	}	
@@ -206,6 +213,11 @@ void SBScene::removePawn(std::string pawnName)
 		if (!character)
 		{
 			mcu.unregisterPawn(pawn);
+
+			if (this->getCollisionManager())
+			{
+				this->getCollisionManager()->removeObjectFromCollisionSpace(pawn->getGeomObjectName());
+			}
 			delete pawn;
 		}
 	}	
