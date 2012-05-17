@@ -38,7 +38,7 @@ DeformableMesh::DeformableMesh()
 
 DeformableMesh::~DeformableMesh() 
 {
-	skeleton->unref();
+//	skeleton->unref();
 	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
 		dMeshDynamic_p[i]->unref();
 	dMeshDynamic_p.clear();
