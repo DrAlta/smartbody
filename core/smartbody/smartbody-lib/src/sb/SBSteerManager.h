@@ -24,6 +24,8 @@ class SBSteerManager : public SmartBody::SBService
 		virtual void afterUpdate(double time);
 		virtual void stop();
 
+		virtual void onCharacterDelete(SBCharacter* character);
+
 		SteerSuiteEngineDriver* getEngineDriver();
 
 		SBSteerAgent* createSteerAgent(std::string name);

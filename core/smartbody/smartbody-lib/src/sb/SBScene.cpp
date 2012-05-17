@@ -144,6 +144,16 @@ SBCharacter* SBScene::createCharacter(std::string charName, std::string metaInfo
 		SkJoint* joint = skeleton->add_joint(SkJoint::TypeQuat);
 		joint->setName("world_offset");
 		mcu.registerCharacter(character);
+
+		// notify the services
+		std::map<std::string, SmartBody::SBService*>& services = getServiceManager()->getServices();
+		for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
+			iter != services.end();
+			iter++)
+		{
+			SBService* service = (*iter).second;
+			service->onCharacterCreate(character);
+		}
 		return character;
 	}
 }
@@ -171,6 +181,16 @@ SBPawn* SBScene::createPawn(std::string pawnName)
 		SkJoint* joint = skeleton->add_joint(SkJoint::TypeQuat);
 		joint->setName("world_offset");
 		mcu.registerPawn(pawn);
+
+		// notify the services
+		std::map<std::string, SmartBody::SBService*>& services = getServiceManager()->getServices();
+		for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
+			iter != services.end();
+			iter++)
+		{
+			SBService* service = (*iter).second;
+			service->onPawnCreate(character);
+		}
 		return pawn;
 	}
 }
@@ -178,7 +198,7 @@ SBPawn* SBScene::createPawn(std::string pawnName)
 void SBScene::removeCharacter(std::string charName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmCharacter* character = mcu.getCharacter(charName);
+	SBCharacter* character = this->getCharacter(charName);
 	if (character)
 	{
 		mcu.unregisterCharacter(character);
@@ -187,18 +207,16 @@ void SBScene::removeCharacter(std::string charName)
 		vrProcEnd_msg += getName();
 		mcu.vhmsg_send( vrProcEnd_msg.c_str() );
 
-
-		// remove the connected steering object for steering space
-		if (this->getSteerManager())
+		// notify the services
+		std::map<std::string, SmartBody::SBService*>& services = getServiceManager()->getServices();
+		for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
+			iter != services.end();
+			iter++)
 		{
-			this->getSteerManager()->removeSteerAgent(charName);
+			SBService* service = (*iter).second;
+			service->onCharacterDelete(character);
 		}
-
-		if (this->getCollisionManager())
-		{
-			this->getCollisionManager()->removeObjectFromCollisionSpace(character->getGeomObjectName());
-		}
-
+	
 		delete character;
 	}	
 }
@@ -214,10 +232,16 @@ void SBScene::removePawn(std::string pawnName)
 		{
 			mcu.unregisterPawn(pawn);
 
-			if (this->getCollisionManager())
+			// notify the services
+			std::map<std::string, SmartBody::SBService*>& services = getServiceManager()->getServices();
+			for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
+				iter != services.end();
+				iter++)
 			{
-				this->getCollisionManager()->removeObjectFromCollisionSpace(pawn->getGeomObjectName());
+				SBService* service = (*iter).second;
+				service->onPawnDelete(character);
 			}
+
 			delete pawn;
 		}
 	}	

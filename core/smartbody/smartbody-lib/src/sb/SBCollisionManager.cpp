@@ -332,6 +332,18 @@ bool SBCollisionManager::removeObjectFromCollisionSpace( const std::string& geom
 	}
 	return false;
 }
+
+
+void SBCollisionManager::onCharacterDelete(SBCharacter* character)
+{
+	SBCollisionManager::removeObjectFromCollisionSpace(character->getGeomObjectName());
+}
+
+void SBCollisionManager::onPawnDelete(SBPawn* pawn)
+{
+	SBCollisionManager::removeObjectFromCollisionSpace(pawn->getGeomObjectName());
+}
+
 }
 
 

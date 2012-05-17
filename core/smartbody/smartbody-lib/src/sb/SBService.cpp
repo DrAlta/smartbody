@@ -1,6 +1,8 @@
 #include "SBService.h"
 #include <sb/SBSubject.h>
 #include <sb/SBAttribute.h>
+#include <sb/SBPawn.h>
+#include <sb/SBCharacter.h>
 
 namespace SmartBody {
 
@@ -39,6 +41,22 @@ void SBService::notify(SBSubject* subject)
 			}
 		}
 	}
+}
+
+void SBService::onPawnCreate(SBPawn* pawn)
+{
+}
+
+void SBService::onPawnDelete(SBPawn* pawn)
+{
+}
+
+void SBService::onCharacterCreate(SBCharacter* character)
+{
+}
+
+void SBService::onCharacterDelete(SBCharacter* character)
+{
 }
 
 

@@ -21,6 +21,9 @@ class SBCollisionManager : public SBService
 		virtual void stop();
 		virtual void notify(SBSubject* subject);
 
+		virtual void onCharacterDelete(SBCharacter* character);
+		virtual void onPawnDelete(SBPawn* character);
+
 		SbmGeomObject* createCollisionObject(const std::string& geomName, const std::string& geomType, SrVec size, SrVec from = SrVec(), SrVec to = SrVec());	
 		SbmGeomObject* getCollisionObject(const std::string& geomName);
 		bool           removeCollisionObject(const std::string& geomName);
