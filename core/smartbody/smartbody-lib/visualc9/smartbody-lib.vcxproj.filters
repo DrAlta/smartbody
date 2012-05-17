@@ -1011,9 +1011,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\sbm\me_blend_cover.h">
-      <Filter>controllers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
       <Filter>controllers</Filter>
     </ClInclude>
@@ -2060,6 +2057,9 @@
     </ClInclude>
     <ClInclude Include="..\src\sbm\sbm_audio.h">
       <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\controllers\me_blend_cover.h">
+      <Filter>controllers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
