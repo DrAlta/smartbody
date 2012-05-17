@@ -1050,6 +1050,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 	// WJ added end
 	//---------------------------------------------------------------------------
 
+	bool sentLocomotionEvent = false;
 	bool reachTarget = false;
 	float agentToTargetDist = 0.0f;
 	SrVec agentToTargetVec;
@@ -1066,6 +1067,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		{
 			character->steeringAgent->getAgent()->clearGoals();
 			sendLocomotionEvent("success");
+			sentLocomotionEvent = true;
 		}
 	}
 	int numGoals = goalQueue.size();
@@ -1184,7 +1186,8 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		{
 			std::vector<double> weights;
 			character->param_animation_ct->schedule(NULL, weights);
-			sendLocomotionEvent("success");
+			if (!sentLocomotionEvent)
+				sendLocomotionEvent("success");
 		}
 		else
 		{
