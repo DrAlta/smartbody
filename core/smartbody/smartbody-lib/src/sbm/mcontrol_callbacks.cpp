@@ -6431,6 +6431,17 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			SbmCharacter* character = mcu->getCharacter(skelName);	
 			character->datareceiver_ct->setLocalRotation(jName, quat);
 		}
+		else if (skeletonType == "norotation")
+		{
+			std::string jName;
+			if (emitterName == "kinect")
+				jName = mcu->kinectProcessor->getSBJointName(args.read_int());
+			else
+				jName = args.read_token();
+
+			SbmCharacter* character = mcu->getCharacter(skelName);	
+			character->datareceiver_ct->removeLocalRotation(jName);
+		}
 		if (skeletonType == "rotations")
 		{
 			if (emitterName == "kinect")

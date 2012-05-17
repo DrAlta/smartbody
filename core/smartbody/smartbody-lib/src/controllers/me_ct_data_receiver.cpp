@@ -43,6 +43,13 @@ void MeCtDataReceiver::setLocalRotation(std::string jName, SrQuat& q)
 		iter->second = q;
 }
 
+void MeCtDataReceiver::removeLocalRotation(std::string jName)
+{
+	std::map<std::string, SrQuat>::iterator iter = _quatMap.find(jName);
+	if (iter != _quatMap.end())
+		_quatMap.erase(iter);
+}
+
 bool MeCtDataReceiver::controller_evaluate(double t, MeFrameData& frame)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
