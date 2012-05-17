@@ -368,4 +368,9 @@ std::map<std::string, SBSteerAgent*>& SBSteerManager::getSteerAgents()
 	return _steerAgents;
 }
 
+void SBSteerManager::onCharacterDelete(SBCharacter* character)
+{
+	removeSteerAgent(character->getName());
+}
+
 }
