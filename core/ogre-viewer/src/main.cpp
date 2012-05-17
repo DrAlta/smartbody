@@ -26,6 +26,7 @@
 
 #include "OgreRenderer.h"
 
+//#undef WIN32
 #ifdef WIN32
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 #else
@@ -44,7 +45,7 @@ int main(int argc, char* argv[])
 #else
 	std::stringstream strstr;
 	for (int i = 0; i < argc; i++)
-		strstr << argv[i];
+		strstr << argv[i] << " ";
 #endif
 	std::istream_iterator<std::string> it(strstr);
 	std::istream_iterator<std::string> end;
@@ -54,6 +55,7 @@ int main(int argc, char* argv[])
 	while (tokenCounter < numTokens)
 	{
 		std::string op = tokenzied[tokenCounter];
+		printf("op = %s\n",op.c_str());
 		if (op == "-seqpath" || op == "-scriptpath")
 		{
 			tokenCounter++;
@@ -69,6 +71,7 @@ int main(int argc, char* argv[])
 			if (tokenCounter < numTokens)
 			{
 				std::string command = "seq " + tokenzied[tokenCounter];
+				printf("-------------- command = %s\n",command.c_str());;
 				app.m_initialCommands.push_back(command);
 			}
 		}
@@ -86,7 +89,6 @@ int main(int argc, char* argv[])
 
 	if (app.m_initialCommands.size() > 0)
 		app.setUseBoneBus(false);
-
 	try
 	{
 		app.go();

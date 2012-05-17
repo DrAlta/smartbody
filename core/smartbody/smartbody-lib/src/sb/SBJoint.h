@@ -26,6 +26,7 @@ class SBJoint : public SkJoint
 		int getNumChildren();
 		SBJoint* getChild(int index);
 		void addChild(SBJoint* child);
+		std::vector<SBJoint*> getDescendants();
 
 		void setSkeleton(SBSkeleton* skeleton);
 		SBSkeleton* getSkeleton();

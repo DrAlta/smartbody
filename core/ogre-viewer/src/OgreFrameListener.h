@@ -18,6 +18,7 @@ class OgreFrameListener : public ExampleFrameListener
 		void scheduleQuit(void);
 		void SetOgreMouse( const bool enabled );							  
 		std::vector<std::string>	m_characterList;
+		std::vector<std::string>    m_pawnList;
 		std::map<std::string, std::map<std::string, Ogre::Vector3> > m_initialBonePositions;
 
 		std::set<std::string> m_validJointNames;
