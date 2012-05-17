@@ -22,7 +22,9 @@
 #define VHCL_AUDIO_H
 
 
-#if defined(WIN_BUILD) //|| defined(__ANDROID__)
+////#if defined(WIN_BUILD)
+//#if 1
+#if !defined(__ANDROID__)
 
 // Requires linking with the following libs:
 //   lib\vhcl\openal\libs\Win32\OpenAL32.lib
@@ -121,6 +123,10 @@ class Audio
       // Sound * CloneSound( const std::string & name );
       void DestroySound( const std::string & name );
       Sound * FindSound( const std::string & name );
+      void PauseAllSounds();
+      void UnpauseAllSounds();
+      void StopAllSounds();
+
 
       void Update( const float frameTime );
 
@@ -208,6 +214,9 @@ class Audio
 
       void Update( const float frameTime ) {}
 
+      void PauseAllSounds() {};
+      void UnpauseAllSounds() {};
+      void StopAllSounds() {};
 
       bool AttachSoundToFreeChannel( Sound * sound ) { return true; }
       void ReleaseSoundFromChannel( Sound * sound ) {}

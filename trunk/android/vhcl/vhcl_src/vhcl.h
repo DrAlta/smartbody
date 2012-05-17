@@ -55,6 +55,7 @@
 #include "vhcl_memory.h"
 #include "vhcl_assert.h"
 #include "vhcl_string.h"
+#include "vhcl_math.h"
 #include "vhcl_timer.h"
 #include "vhcl_crash.h"
 #include "vhcl_log.h"

@@ -223,49 +223,48 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sk/sk_skeleton.cpp \
 	$(SBM_MY_DIR)/sk/sk_skeleton_io.cpp \
 	$(SBM_MY_DIR)/sk/sk_vec_limits.cpp \
-	$(SBM_MY_DIR)/me/me_controller_context.cpp \
-	$(SBM_MY_DIR)/me/me_controller_context_proxy.cpp \
-	$(SBM_MY_DIR)/me/me_controller.cpp \
-	$(SBM_MY_DIR)/me/me_controller_tree_root.cpp \
-	$(SBM_MY_DIR)/me/me_ct_adshr_envelope.cpp \
-	$(SBM_MY_DIR)/me/me_ct_blend.cpp \
-	$(SBM_MY_DIR)/me/me_ct_channel_writer.cpp \
-	$(SBM_MY_DIR)/me/me_ct_container.cpp \
-	$(SBM_MY_DIR)/me/me_ct_curve_writer.cpp \
-	$(SBM_MY_DIR)/me/me_ct_interpolator.cpp \
-	$(SBM_MY_DIR)/me/me_ct_lifecycle_test.cpp \
-	$(SBM_MY_DIR)/me/me_ct_motion.cpp \
-	$(SBM_MY_DIR)/me/me_ct_periodic_replay.cpp \
-	$(SBM_MY_DIR)/me/me_ct_pose.cpp \
-	$(SBM_MY_DIR)/me/me_ct_scheduler2.cpp \
-	$(SBM_MY_DIR)/me/me_ct_time_shift_warp.cpp \
-	$(SBM_MY_DIR)/me/me_ct_unary.cpp \
-	$(SBM_MY_DIR)/me/me_default_prune_policy.cpp \
+	$(SBM_MY_DIR)/controllers/me_controller_context.cpp \
+	$(SBM_MY_DIR)/controllers/me_controller_context_proxy.cpp \
+	$(SBM_MY_DIR)/controllers/me_controller.cpp \
+	$(SBM_MY_DIR)/controllers/me_controller_tree_root.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_adshr_envelope.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_blend.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_channel_writer.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_container.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_curve_writer.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_interpolator.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_lifecycle_test.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_motion.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_periodic_replay.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_pose.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_scheduler2.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_time_shift_warp.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_unary.cpp \
+	$(SBM_MY_DIR)/controllers/me_default_prune_policy.cpp \
 	$(SBM_MY_DIR)/sbm/BMLDefs.cpp \
-	$(SBM_MY_DIR)/sbm/behavior_scheduler_constant_speed.cpp \
-	$(SBM_MY_DIR)/sbm/behavior_scheduler.cpp \
-	$(SBM_MY_DIR)/sbm/behavior_scheduler_fixed.cpp \
-	$(SBM_MY_DIR)/sbm/behavior_span.cpp \
-	$(SBM_MY_DIR)/sbm/bml_animation.cpp \
-	$(SBM_MY_DIR)/sbm/bml_bodyreach.cpp \
-	$(SBM_MY_DIR)/sbm/bml_constraint.cpp \
-	$(SBM_MY_DIR)/sbm/bml.cpp \
-	$(SBM_MY_DIR)/sbm/bml_event.cpp \
-	$(SBM_MY_DIR)/sbm/bml_face.cpp \
-	$(SBM_MY_DIR)/sbm/bml_gaze.cpp \
-	$(SBM_MY_DIR)/sbm/bml_general_param.cpp \
-	$(SBM_MY_DIR)/sbm/bml_gesture.cpp \
-	$(SBM_MY_DIR)/sbm/bml_grab.cpp \
-	$(SBM_MY_DIR)/sbm/bml_interrupt.cpp \
-	$(SBM_MY_DIR)/sbm/bml_locomotion.cpp \
-	$(SBM_MY_DIR)/sbm/bml_processor.cpp \
-	$(SBM_MY_DIR)/sbm/bml_quickdraw.cpp \
-	$(SBM_MY_DIR)/sbm/bml_speech.cpp \
-	$(SBM_MY_DIR)/sbm/bml_sync_point.cpp \
-	$(SBM_MY_DIR)/sbm/bml_target.cpp \
-	$(SBM_MY_DIR)/sbm/bml_saccade.cpp \
-	$(SBM_MY_DIR)/sbm/bml_states.cpp \
-	$(SBM_MY_DIR)/sbm/BoneMap.cpp \
+	$(SBM_MY_DIR)/bml/behavior_scheduler_constant_speed.cpp \
+	$(SBM_MY_DIR)/bml/behavior_scheduler.cpp \
+	$(SBM_MY_DIR)/bml/behavior_scheduler_fixed.cpp \
+	$(SBM_MY_DIR)/bml/behavior_span.cpp \
+	$(SBM_MY_DIR)/bml/bml_animation.cpp \
+	$(SBM_MY_DIR)/bml/bml_bodyreach.cpp \
+	$(SBM_MY_DIR)/bml/bml_constraint.cpp \
+	$(SBM_MY_DIR)/bml/bml.cpp \
+	$(SBM_MY_DIR)/bml/bml_event.cpp \
+	$(SBM_MY_DIR)/bml/bml_face.cpp \
+	$(SBM_MY_DIR)/bml/bml_gaze.cpp \
+	$(SBM_MY_DIR)/bml/bml_general_param.cpp \
+	$(SBM_MY_DIR)/bml/bml_gesture.cpp \
+	$(SBM_MY_DIR)/bml/bml_grab.cpp \
+	$(SBM_MY_DIR)/bml/bml_interrupt.cpp \
+	$(SBM_MY_DIR)/bml/bml_locomotion.cpp \
+	$(SBM_MY_DIR)/bml/bml_processor.cpp \
+	$(SBM_MY_DIR)/bml/bml_quickdraw.cpp \
+	$(SBM_MY_DIR)/bml/bml_speech.cpp \
+	$(SBM_MY_DIR)/bml/bml_sync_point.cpp \
+	$(SBM_MY_DIR)/bml/bml_target.cpp \
+	$(SBM_MY_DIR)/bml/bml_saccade.cpp \
+	$(SBM_MY_DIR)/bml/bml_states.cpp \
 	$(SBM_MY_DIR)/sbm/Event.cpp \
 	$(SBM_MY_DIR)/sbm/GenericViewer.cpp \
 	$(SBM_MY_DIR)/sbm/gwiz_cmdl.cpp \
@@ -277,66 +276,66 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/locomotion_cmds.cpp \
 	$(SBM_MY_DIR)/sbm/mcontrol_callbacks.cpp \
 	$(SBM_MY_DIR)/sbm/mcontrol_util.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_basic_locomotion.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_ccd_IK.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_constraint.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_data_driven_reach.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_data_interpolation.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_example_body_reach.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_physics_controller.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_examples.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_eyelid.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_face.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_gaze_alg.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_gaze.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_gaze_joint.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_gaze_keymap.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_gaze_target.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_reach_IK.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_IK.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_IK_scenario.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_jacobian_IK.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_lilt_try.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_limb.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_breathing.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_breathing_interface.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_analysis.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_anim_global_info.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_balance.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_func.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_height_offset.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_IK.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_joint_info.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_limb_anim.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_limb.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_limb_direction_planner.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_navigator.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_pawn.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_quadratic_synchronizer.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_routine.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_simple.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_speed_accelerator.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_terrain.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_locomotion_timing_space.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_motion_example.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_motion_parameter.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_motion_player.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_motion_timewarp.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_navigation_circle.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_navigation_waypoint.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_param_animation.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_param_animation_data.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_param_animation_utilities.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_quick_draw.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_hand.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_motion_profile.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_barycentric_interpolation.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_inverse_interpolation.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_simple_gaze.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_step_turn.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_tether.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_ublas.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_basic_locomotion.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_ccd_IK.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_constraint.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_data_driven_reach.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_data_interpolation.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_example_body_reach.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_physics_controller.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_examples.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_eyelid.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_face.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_gaze_alg.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_gaze.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_gaze_joint.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_gaze_keymap.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_gaze_target.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_reach_IK.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_IK.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_IK_scenario.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_jacobian_IK.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_lilt_try.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_limb.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_breathing.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_breathing_interface.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_analysis.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_anim_global_info.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_balance.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_func.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_height_offset.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_IK.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_joint_info.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_limb_anim.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_limb.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_limb_direction_planner.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_navigator.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_pawn.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_quadratic_synchronizer.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_routine.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_simple.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_speed_accelerator.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_terrain.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_locomotion_timing_space.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_motion_example.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_motion_parameter.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_motion_player.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_motion_timewarp.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_navigation_circle.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_navigation_waypoint.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_param_animation.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_param_animation_data.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_param_animation_utilities.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_quick_draw.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_hand.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_motion_profile.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_barycentric_interpolation.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_inverse_interpolation.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_simple_gaze.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_step_turn.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_tether.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_ublas.cpp \
 	$(SBM_MY_DIR)/sbm/me_utilities.cpp \
 	$(SBM_MY_DIR)/sbm/ParserFBX.cpp \
 	$(SBM_MY_DIR)/sbm/ParserOpenCOLLADA.cpp \
@@ -346,9 +345,9 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/Resource.cpp \
 	$(SBM_MY_DIR)/sbm/ResourceManager.cpp \
 	$(SBM_MY_DIR)/sbm/sbm_audio.cpp \
-	$(SBM_MY_DIR)/sbm/MeCtBodyReachState.cpp \
-	$(SBM_MY_DIR)/sbm/MeCtReachEngine.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_saccade.cpp \
+	$(SBM_MY_DIR)/controllers/MeCtBodyReachState.cpp \
+	$(SBM_MY_DIR)/controllers/MeCtReachEngine.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_saccade.cpp \
 	$(SBM_MY_DIR)/sbm/sbm_character.cpp \
 	$(SBM_MY_DIR)/sbm/sbm_deformable_mesh.cpp \
 	$(SBM_MY_DIR)/sbm/sbm_pawn.cpp \
@@ -372,48 +371,52 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/Physics/SbmPhysicsSimODE.cpp \
 	$(SBM_MY_DIR)/sbm/SteeringAgent.cpp \
 	$(SBM_MY_DIR)/sbm/SteerSuiteEnginerDriver.cpp \
-	$(SBM_MY_DIR)/sbm/SBAttribute.cpp \
-	$(SBM_MY_DIR)/sbm/SBAttributeManager.cpp \
-	$(SBM_MY_DIR)/sbm/SBObject.cpp \
-	$(SBM_MY_DIR)/sbm/SBObserver.cpp \
-	$(SBM_MY_DIR)/sbm/SBSubject.cpp \
+	$(SBM_MY_DIR)/sb/SBAttribute.cpp \
+	$(SBM_MY_DIR)/sb/SBAttributeManager.cpp \
+	$(SBM_MY_DIR)/sb/SBObject.cpp \
+	$(SBM_MY_DIR)/sb/SBObserver.cpp \
+	$(SBM_MY_DIR)/sb/SBSubject.cpp \
 	$(SBM_MY_DIR)/sbm/DefaultAttributeTable.cpp \
-	$(SBM_MY_DIR)/sbm/SBScene.cpp \
+	$(SBM_MY_DIR)/sb/SBScene.cpp \
 	$(SBM_MY_DIR)/sbm/KinectProcessor.cpp \
-	$(SBM_MY_DIR)/sbm/me_ct_data_receiver.cpp \
-	$(SBM_MY_DIR)/sbm/SBCharacter.cpp \
-	$(SBM_MY_DIR)/sbm/SBPawn.cpp \
-	$(SBM_MY_DIR)/sbm/SBJoint.cpp \
-	$(SBM_MY_DIR)/sbm/SBSkeleton.cpp \
-	$(SBM_MY_DIR)/sbm/SBController.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_data_receiver.cpp \
+	$(SBM_MY_DIR)/sb/SBCharacter.cpp \
+	$(SBM_MY_DIR)/sb/SBPawn.cpp \
+	$(SBM_MY_DIR)/sb/SBJoint.cpp \
+	$(SBM_MY_DIR)/sb/SBSkeleton.cpp \
+	$(SBM_MY_DIR)/sb/SBController.cpp \
 	$(SBM_MY_DIR)/sbm/sr_path_list.cpp \
-	$(SBM_MY_DIR)/sbm/SBPython.cpp \
-	$(SBM_MY_DIR)/sbm/SBPythonClass.cpp \
-	$(SBM_MY_DIR)/sbm/SBSimulationManager.cpp \
-	$(SBM_MY_DIR)/sbm/SBBmlProcessor.cpp \
-	$(SBM_MY_DIR)/sbm/SBAnimationState.cpp \
-	$(SBM_MY_DIR)/sbm/SBAnimationTransition.cpp \
-	$(SBM_MY_DIR)/sbm/SBAnimationStateManager.cpp \
-	$(SBM_MY_DIR)/sbm/SBSteerManager.cpp \
-	$(SBM_MY_DIR)/sbm/SBSteerAgent.cpp \
-	$(SBM_MY_DIR)/sbm/SBReachManager.cpp \
-	$(SBM_MY_DIR)/sbm/SBReach.cpp \
-	$(SBM_MY_DIR)/sbm/SBServiceManager.cpp \
-	$(SBM_MY_DIR)/sbm/SBService.cpp \
-	$(SBM_MY_DIR)/sbm/SBMotion.cpp \
-	$(SBM_MY_DIR)/sbm/SBScript.cpp	\
-	$(SBM_MY_DIR)/sbm/SBFaceDefinition.cpp \
-	$(SBM_MY_DIR)/sbm/SBPhysicsManager.cpp \
-	$(SBM_MY_DIR)/sbm/SBParser.cpp \
-	$(SBM_MY_DIR)/sbm/SBParseNode.cpp \
+	$(SBM_MY_DIR)/sb/SBPython.cpp \
+	$(SBM_MY_DIR)/sb/SBPythonClass.cpp \
+	$(SBM_MY_DIR)/sb/SBSimulationManager.cpp \
+	$(SBM_MY_DIR)/sb/SBBmlProcessor.cpp \
+	$(SBM_MY_DIR)/sb/SBAnimationState.cpp \
+	$(SBM_MY_DIR)/sb/SBAnimationTransition.cpp \
+	$(SBM_MY_DIR)/sb/SBAnimationStateManager.cpp \
+	$(SBM_MY_DIR)/sb/SBSteerManager.cpp \
+	$(SBM_MY_DIR)/sb/SBSteerAgent.cpp \
+	$(SBM_MY_DIR)/sb/SBReachManager.cpp \
+	$(SBM_MY_DIR)/sb/SBReach.cpp \
+	$(SBM_MY_DIR)/sb/SBServiceManager.cpp \
+	$(SBM_MY_DIR)/sb/SBService.cpp \
+	$(SBM_MY_DIR)/sb/SBMotion.cpp \
+	$(SBM_MY_DIR)/sb/SBScript.cpp	\
+	$(SBM_MY_DIR)/sb/SBFaceDefinition.cpp \
+	$(SBM_MY_DIR)/sb/SBPhysicsManager.cpp \
+	$(SBM_MY_DIR)/sb/SBCollisionManager.cpp \
+	$(SBM_MY_DIR)/sb/SBJointMapManager.cpp \
+	$(SBM_MY_DIR)/sb/SBJointMap.cpp \
+	$(SBM_MY_DIR)/sbm/SteerPath.cpp \
+	$(SBM_MY_DIR)/sb/SBParser.cpp \
+	$(SBM_MY_DIR)/sb/SBParseNode.cpp \
 	$(SBM_MY_DIR)/sbm/nvbg.cpp \
 	$(SBM_MY_DIR)/sbm/MiniBrain.cpp \
-	$(SBM_MY_DIR)/sbm/SBBehavior.cpp \
+	$(SBM_MY_DIR)/sb/SBBehavior.cpp \
 	$(SBM_MY_DIR)/sbm/ParserBVH.cpp \
 	$(SBM_MY_DIR)/sbm/ParserASFAMC.cpp \
-	$(SBM_MY_DIR)/sbm/SBBoneBusManager.cpp \
-	$(SBM_MY_DIR)/sbm/SBGestureMapManager.cpp \
-	$(SBM_MY_DIR)/sbm/SBGestureMap.cpp \
+	$(SBM_MY_DIR)/sb/SBBoneBusManager.cpp \
+	$(SBM_MY_DIR)/sb/SBGestureMapManager.cpp \
+	$(SBM_MY_DIR)/sb/SBGestureMap.cpp \
 	$(SBM_MY_DIR)/sbm/SbmDebuggerServer.cpp \
 	$(SBM_MY_DIR)/sbm/action_unit.cpp
 	

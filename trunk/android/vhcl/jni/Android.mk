@@ -18,9 +18,11 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(MY_VHCL_DIR)
 LOCAL_SRC_FILES := $(MY_VHCL_DIR)/Pow2Assert.cpp \
 				$(MY_VHCL_DIR)/vhcl_log.cpp \
 				$(MY_VHCL_DIR)/vhcl_string.cpp \
-				   $(MY_VHCL_DIR)/vhcl_timer.cpp \
-				   $(MY_VHCL_DIR)/vhcl_memory.cpp \
-				   $(MY_VHCL_DIR)/vhcl_crash.cpp  \
+				$(MY_VHCL_DIR)/vhcl_timer.cpp \
+				$(MY_VHCL_DIR)/vhcl_memory.cpp \
+				$(MY_VHCL_DIR)/vhcl_socket.cpp \
+				$(MY_VHCL_DIR)/vhcl_crash.cpp  \
+				$(MY_VHCL_DIR)/vhcl_math.cpp  \
 				$(MY_VHCL_DIR)/vhcl_audio.cpp
 LOCAL_LDLIBS    := -llog	
 #LOCAL_STATIC_LIBRARIES := openal sndfile openalut
