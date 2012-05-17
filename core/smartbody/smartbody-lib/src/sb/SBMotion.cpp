@@ -1119,15 +1119,15 @@ bool SBMotion::autoFootPlantDetection( SBSkeleton* srcSk, std::vector<std::strin
 				gPos += des->gmat().get_translation();
 				speed += getJointSpeed(des, startTime, endTime);
 			}
-			gPos /= (descendants.size()+1);
-			speed /= (descendants.size()+1);
+			gPos /= (float)(descendants.size()+1);
+			speed /= (float)(descendants.size()+1);
 			// filter for height
 			if (gPos.y < floorHeight || gPos.y > (floorHeight + heightThreshold))
 				continue;
 			// filter speed
 			if (speed <= speedThreshold)
 			{
-				vecTiming[jointId].push_back(f);	
+				vecTiming[jointId].push_back((float)f);	
 				vecPos[jointId].push_back(gPos); // also push back the joint's current position
 			}
 		}
@@ -1186,6 +1186,7 @@ bool SBMotion::autoFootPlantDetection( SBSkeleton* srcSk, std::vector<std::strin
 		}		
 	}
 	this->disconnect();
+	return true;
 }
 
 
