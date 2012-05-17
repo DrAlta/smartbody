@@ -687,6 +687,7 @@
     <ClCompile Include="..\src\sbm\nvbg.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\controllers\me_blend_cover.h" />
     <ClInclude Include="..\src\sbm\action_unit.hpp" />
     <ClInclude Include="..\src\sbm\DefaultAttributeTable.h" />
     <ClInclude Include="..\src\sbm\Event.h" />
@@ -787,7 +788,6 @@
     <ClInclude Include="..\src\controllers\me_ct_locomotion_timing_space.hpp" />
     <ClInclude Include="..\src\controllers\me_ct_navigation_circle.hpp" />
     <ClInclude Include="..\src\controllers\me_ct_navigation_waypoint.hpp" />
-    <ClInclude Include="..\src\sbm\me_blend_cover.h" />
     <ClInclude Include="..\src\controllers\me_ct_gaze.h" />
     <ClInclude Include="..\src\controllers\me_ct_gaze_alg.h" />
     <ClInclude Include="..\src\controllers\me_ct_gaze_joint.h" />
