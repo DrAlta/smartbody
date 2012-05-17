@@ -483,8 +483,10 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 			delete editor->tetraVisualization;
 			editor->tetraVisualization = NULL;
 		}
-
 	}
+
+	editor->isPlaying = true;
+	editor->playmotion(editor->buttonPlay, editor);
 	editor->refreshAlign();
 	editor->stateTimeMarkWidget->setup();
 	editor->editStateTimeMarkGroup->scroll_to(0, 0);
