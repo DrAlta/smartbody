@@ -14,6 +14,41 @@ void SBListener::OnCharacterCreate( const  std::string & name )
 }
 
 
+void SBListener::OnPawnCreate( const std::string& name )
+{
+	if (m_app->getSceneManager()->hasEntity(name))
+		return;
+
+	Entity * ent = NULL;
+	try
+	{
+		//Create character from characterType
+		ent = m_app->getSceneManager()->createEntity(name, "sphere2.mesh" );						
+	}
+	catch( Ogre::ItemIdentityException& )
+	{
+		;
+	}		
+
+	if (ent == NULL)
+	{
+		return;
+	}
+
+	// Add entity to the scene node
+	SceneNode * mSceneNode = m_app->getSceneManager()->getRootSceneNode()->createChildSceneNode(name);
+	mSceneNode->attachObject(ent);	
+	OgreFrameListener* frameListener = m_app->getOgreFrameListener();
+
+	mSceneNode->scale( .05f, .05f, .05f );
+	if (frameListener)
+	{
+		frameListener->m_pawnList.push_back(name);
+	}
+	return;
+}
+
+
 void SBListener::OnCharacterCreate( const  std::string & name, const  std::string & objectClass )
 {	
 	//printf("Character create callback\n");
@@ -26,31 +61,26 @@ void SBListener::OnCharacterCreate( const  std::string & name, const  std::strin
 
 	Entity * ent;
 
-	if (objectClass == "pawn")
+	
+	try
 	{
-		ent = m_app->getSceneManager()->createEntity(name, "sphere2.mesh" );		
-	}
-	else
-	{
-		try
-		{
-			//Create character from characterType
+		//Create character from characterType
 
-			ent = m_app->getSceneManager()->createEntity(name, name + ".mesh" );						
-		}
-		catch( Ogre::ItemIdentityException& )
+		ent = m_app->getSceneManager()->createEntity(name, name + ".mesh" );						
+	}
+	catch( Ogre::ItemIdentityException& )
+	{
+		;
+	}
+	catch( Ogre::Exception& e )
+	{
+		if( e.getNumber() == Ogre::Exception::ERR_FILE_NOT_FOUND ) 
 		{
-			;
+			//Default to existing Brad character
+			ent = m_app->getSceneManager()->createEntity(name, "Brad.mesh" );
 		}
-		catch( Ogre::Exception& e )
-		{
-			if( e.getNumber() == Ogre::Exception::ERR_FILE_NOT_FOUND ) 
-			{
-				//Default to existing Brad character
-				ent = m_app->getSceneManager()->createEntity(name, "Brad.mesh" );
-			}
-		}
-	}	
+	}
+		
 
 	if (ent == NULL)
 	{
@@ -62,17 +92,6 @@ void SBListener::OnCharacterCreate( const  std::string & name, const  std::strin
 	mSceneNode->attachObject(ent);
 	Ogre::Skeleton* skel = ent->getSkeleton();
 	OgreFrameListener* frameListener = m_app->getOgreFrameListener();
-
-	if (objectClass == "pawn")
-	{
-		mSceneNode->scale( .05f, .05f, .05f );
-		if (frameListener)
-		{
-			frameListener->m_pawnList.push_back(name);
-		}
-		return;
-	}
-
 	if (frameListener)
 	{		
 		// insert into character list

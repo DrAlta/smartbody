@@ -16,6 +16,7 @@ class SBListener : public SmartbodyListener
 		virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
 		virtual void OnCharacterDelete( const std::string & name );
 		virtual void OnCharacterChange( const std::string & name );
+		virtual void OnPawnCreate( const std::string& name );
 
 	protected:
 		OgreRenderer* m_app;

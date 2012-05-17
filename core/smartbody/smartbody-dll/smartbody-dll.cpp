@@ -104,7 +104,7 @@ class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
 	  {
 		  if ( m_dll->m_listener )
 		  {
-			  m_dll->m_listener->OnCharacterCreate( name, "pawn" );
+			  m_dll->m_listener->OnPawnCreate( name );
 		  }
 	  }
 
