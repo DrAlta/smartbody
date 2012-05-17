@@ -463,14 +463,25 @@ bool Smartbody_dll::InitVHMsg()
    return true;
 }
 
+#ifdef __ANDROID__
+#define USE_SBPYTHON 0
+#else
+#define USE_SBPYTHON 1
+#endif
+
 SMARTBODY_DLL_API bool Smartbody_dll::PythonCommandVoid( const std::string & command )
 {
+#if USE_SBPYTHON
    mcuCBHandle & mcu = mcuCBHandle::singleton();
    return mcu.executePython(command.c_str()) == 1 ? true : false;
+#else
+   return false;
+#endif
 }
 
 bool Smartbody_dll::PythonCommandBool( const std::string & command )
 {
+#if USE_SBPYTHON
 	mcuCBHandle & mcu = mcuCBHandle::singleton();
 	try {
 		boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
@@ -480,10 +491,15 @@ bool Smartbody_dll::PythonCommandBool( const std::string & command )
 		PyErr_Print();
 		return false;
 	}
+#else
+	return false;
+#endif
 }
+
 
 int Smartbody_dll::PythonCommandInt( const std::string & command )
 {
+#if USE_SBPYTHON
 	mcuCBHandle & mcu = mcuCBHandle::singleton();
 	try {
 		boost::python::object obj = boost::python::exec(command.c_str(),mcu.mainDict);
@@ -493,10 +509,14 @@ int Smartbody_dll::PythonCommandInt( const std::string & command )
 		PyErr_Print();
 		return 0;
 	}
+#else
+	return 0;
+#endif
 }
 
 float Smartbody_dll::PythonCommandFloat( const std::string & command )
 {
+#if USE_SBPYTHON
 	mcuCBHandle & mcu = mcuCBHandle::singleton();
 	try {
 		boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
@@ -506,10 +526,14 @@ float Smartbody_dll::PythonCommandFloat( const std::string & command )
 		PyErr_Print();
 		return 0.;
 	}
+#else
+	return 0.;
+#endif
 }
 
 std::string Smartbody_dll::PythonCommandString( const std::string & command )
 {
+#if USE_SBPYTHON
 	mcuCBHandle & mcu = mcuCBHandle::singleton();
 	try {
 		boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
@@ -519,6 +543,9 @@ std::string Smartbody_dll::PythonCommandString( const std::string & command )
 		PyErr_Print();
 		return "";
 	}
+#else
+	return "";
+#endif
 }
 
 void Smartbody_dll::RegisterCallbacks()

@@ -41,6 +41,7 @@
 #include "bml_xml_consts.hpp"
 #include "sbm/xercesc_utils.hpp"
 #include "sbm/BMLDefs.h"
+#include <boost/lexical_cast.hpp>
 #include <sb/SBSteerManager.h>
 
 ////// XML ATTRIBUTES
@@ -344,7 +345,10 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			{				
 				float x,y,z,h,p,r;
 				pawn->get_world_offset(x,y,z,h,p,r);
-				command << boost::lexical_cast<std::string>(x) << " 0 " << boost::lexical_cast<std::string>(z) << " ";
+				std::string xstr, zstr;
+				xstr = boost::lexical_cast<std::string>(x);
+				zstr = boost::lexical_cast<std::string>(x);
+				command <<  xstr << " 0 " << zstr << " ";
 				icount += 1;
 			}
 			else if (icount + 1 < tokens.size() ) // or use two coordinates

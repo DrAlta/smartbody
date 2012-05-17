@@ -21,11 +21,12 @@
 #include "vhcl.h"
 
 
-#if defined(WIN_BUILD) // || defined(__ANDROID__)
+//#if defined(WIN_BUILD)
+//#if 1
+#if !defined(__ANDROID__)
 
 
 #include "vhcl_audio.h"
-
 
 #ifdef __ANDROID__
 #include <AL/al.h>
@@ -285,6 +286,46 @@ Sound * Audio::FindSound( const std::string & name )
 
    return NULL;
 }
+
+
+void Audio::PauseAllSounds()
+{
+   for ( size_t i = 0; i < m_sounds.size(); i++ )
+   {
+      if ( m_sounds[ i ]->IsPlaying())
+      {
+         m_sounds[i]->Pause();
+      }
+   }
+}
+
+
+void Audio::UnpauseAllSounds()
+{
+   for ( size_t i = 0; i < m_sounds.size(); i++ )
+   {
+      if ( m_sounds[ i ]->IsPaused())
+      {
+         m_sounds[i]->Play();
+      }
+   }
+}
+
+void Audio::StopAllSounds()
+{
+   for ( size_t i = 0; i < m_sounds.size(); i++ )
+   {
+      if ( m_sounds[ i ]->IsPlaying())
+      {
+         m_sounds[i]->Stop();
+      }
+   }
+}
+
+
+
+
+
 
 
 void Audio::Update( const float frameTime )
