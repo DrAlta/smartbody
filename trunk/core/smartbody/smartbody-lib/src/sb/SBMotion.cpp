@@ -301,7 +301,16 @@ void SBMotion::alignToSide(int numFrames, int direction)
 	// copy it back
 	for (int i = 0; i < getNumFrames(); i++)
 	{
-		_frameOrientation[i] = SrQuat(copyMatVec[i]);
+		gwiz::matrix_t actualMatrix;
+		for (int r = 0; r < 4; r++)
+			for (int c = 0; c < 4; c++)
+			{
+				actualMatrix.set(r, c, copyMatVec[i].get(r, c));
+			}
+		gwiz::quat_t retQuat = actualMatrix.quat();
+
+		_frameOrientation[i] = SrQuat((float)retQuat.w(), (float)retQuat.x(), (float)retQuat.y(), (float)retQuat.z());
+		//_frameOrientation[i] = SrQuat(copyMatVec[i]);
 		_frameOffset[i] = copyMatVec[i].get_translation();
 	}
 
