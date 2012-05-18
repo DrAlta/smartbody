@@ -54,6 +54,7 @@
      <string>File</string>
     </property>
     <addaction name="actionConnect"/>
+    <addaction name="actionConnect_Single"/>
     <addaction name="actionDisconnect"/>
     <addaction name="actionSettings"/>
     <addaction name="actionExit"/>
@@ -366,6 +367,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionConnect_Single">
+   <property name="text">
+    <string>Connect S&amp;ingle</string>
+   </property>
+   <property name="toolTip">
+    <string>Connect to first sbm process found</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
   </action>
  </widget>
