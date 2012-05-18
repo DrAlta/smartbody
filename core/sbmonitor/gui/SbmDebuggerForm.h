@@ -25,6 +25,7 @@ class SbmDebuggerForm : public QMainWindow
 
  private slots:
        void ShowConnectDialog();
+       void ConnectToFirstFoundProcess();
        void ShowSettingsDialog();
        void ShowResourceDialog();
        void ShowCommandDialog();
@@ -66,6 +67,7 @@ class SbmDebuggerForm : public QMainWindow
       Rotation,
     };
 
+    void ConnectToSbmProcess(string processId);
     void InitSignalsSlots();
     void Update();
     void UpdateSceneTree();

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'CommandDialog.ui'
 **
-** Created: Thu May 17 14:30:11 2012
+** Created: Fri May 18 13:45:41 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

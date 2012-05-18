@@ -84,6 +84,7 @@ void SbmDebuggerForm::InitSignalsSlots()
 {
    // File Menu
    connect(ui.actionConnect, SIGNAL(triggered()), this, SLOT(ShowConnectDialog()));
+   connect(ui.actionConnect_Single, SIGNAL(triggered()), this, SLOT(ConnectToFirstFoundProcess()));
    connect(ui.actionDisconnect, SIGNAL(triggered()), this, SLOT(Disconnect()));
    connect(ui.actionSettings, SIGNAL(triggered()), this, SLOT(ShowSettingsDialog()));
    connect(ui.actionExit, SIGNAL(triggered()), MainWindow(), SLOT(close()));
@@ -125,31 +126,52 @@ void SbmDebuggerForm::ShowConnectDialog()
       QListWidget * listWidget = dlg.GetListWidget();
       if (listWidget->currentItem())
       {
-         Disconnect();
-
          string sbmId = listWidget->currentItem()->text().toStdString();
-         c.Connect(sbmId);
-         vhcl::Sleep(2);
-         vhmsg::ttu_poll();
-         if (c.GetConnectResult())
-         {
-             printf("Connect succeeded to id: %s\n", sbmId.c_str());
-         }
-
-         c.Init();
-
-         c.StartUpdates(0.01f);
-
-         // since you're connected, enable the disconnect button
-         ui.actionDisconnect->setEnabled(true);
-
-         c.SendSBMCommand(NetRequest::Get_Scene_Scale, "float", "scene.getScale()", GetSceneScale, this);
+         ConnectToSbmProcess(sbmId);
       }
    }
-   else 
+}
+
+void SbmDebuggerForm::ConnectToFirstFoundProcess()
+{
+   c.QuerySbmProcessIds();
+   vhcl::Sleep(2);
+   vhmsg::ttu_poll();
+   vector<string> ids = c.GetSbmProcessIds();
+
+   if (ids.size() == 0)
    {
-      // TODO: They hit the Esc key, cancel button, or Close button
+      // no sbm processes found
+      QMessageBox box(QMessageBox::Warning, "No Sbm Processes Found", "There aren't any active running Smartbody processes", QMessageBox::NoButton, this);
+      box.exec();
    }
+   else
+   {
+      ConnectToSbmProcess(ids[0]);
+   }
+}
+
+void SbmDebuggerForm::ConnectToSbmProcess(string processId)
+{
+   // disconnect from any previous process
+   Disconnect();
+
+   c.Connect(processId);
+   vhcl::Sleep(2);
+   vhmsg::ttu_poll();
+   if (c.GetConnectResult())
+   {
+      printf("Connect succeeded to id: %s\n", processId.c_str());
+   }
+
+   c.Init();
+
+   c.StartUpdates(0.01f);
+
+   // since you're connected, enable the disconnect button
+   ui.actionDisconnect->setEnabled(true);
+
+   c.SendSBMCommand(NetRequest::Get_Scene_Scale, "float", "scene.getScale()", GetSceneScale, this);
 }
 
 void SbmDebuggerForm::ShowSettingsDialog()
