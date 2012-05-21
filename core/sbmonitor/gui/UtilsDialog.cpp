@@ -16,16 +16,11 @@ using std::string;
 bool GetAnimationNames(void* caller, NetRequest* req);
 
 
-UtilsDialog::UtilsDialog(SbmDebuggerClient* client, GLWidget* pRenderView, QWidget* parent) : QDialog(parent)
+UtilsDialog::UtilsDialog(SbmDebuggerClient* client, GLWidget* pRenderView, Ui::MainWindow& ui) //: QDialog(parent)
 {
-   //QUiLoader loader;
-   //QFile file("designer/UtilsDialog.ui");
-   //file.open(QFile::ReadOnly);
-   //QWidget *formWidget = loader.load(&file, this);
-   //file.close();
-
    m_client = client;
-   ui.setupUi(this);
+   this->ui = ui;
+   //ui.setupUi(this);
    m_pScene = m_client->GetScene();
    m_pRenderView = pRenderView;
 
@@ -156,9 +151,18 @@ bool GetAnimationNames(void* caller, NetRequest* req)
 
    dlg->m_animations = req->Args();
    QStringList names;
+
+   QRect size = dlg->ui.animationNamesBox->geometry();
    for (unsigned int i = 0; i < dlg->m_animations.size(); i++)
    {
       names.append(dlg->m_animations[i].c_str());
+
+      // make sure the box is long enough
+      int width = dlg->ui.animationNamesBox->fontMetrics().width(names[i]);
+      if (width > size.width())
+      {
+         size.setWidth(width);
+      }
    }
 
    switch (req->Rid())
@@ -169,5 +173,8 @@ bool GetAnimationNames(void* caller, NetRequest* req)
       break;
    }
 
+   // resize it
+   dlg->ui.animationNamesBox->setGeometry(size);
+   
    return true;
 }

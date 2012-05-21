@@ -10,6 +10,7 @@
 #include "GLWidget.h"
 #include "ui_SbmDebuggerForm.h"
 #include "ui_ConnectDialog.h"
+#include "UtilsDialog.h"
 
 class SbmDebuggerForm : public QMainWindow
  {
@@ -30,7 +31,6 @@ class SbmDebuggerForm : public QMainWindow
        void ShowResourceDialog();
        void ShowCommandDialog();
        void ShowDataViewerDialog();
-       void ShowUtilDialog();
        void ShowFaceDialog();
        void ShowBmlCreatorDialog();
        void ShowEntityCreatorDialog();
@@ -39,6 +39,7 @@ class SbmDebuggerForm : public QMainWindow
        void SetSelectedSceneTreeItem(const Pawn* selectedObj, const Joint* selectedJoint);
 
  private:
+     UtilsDialog* m_Utils;
      Ui::MainWindow ui;
      QMainWindow* m_pMainWindow;
      GLWidget* m_pGLWidget;

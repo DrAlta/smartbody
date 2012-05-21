@@ -67,12 +67,15 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
   setUpdatesEnabled(true);
 
   m_msSinceLastFrame = m_StopWatch.GetTime();
+
+  m_Utils = new UtilsDialog(&c, m_pGLWidget, ui);
 }
 
 SbmDebuggerForm::~SbmDebuggerForm()
 {
    vhmsg::ttu_close();
    delete m_pGLWidget;
+   delete m_Utils;
 }
 
 QSize SbmDebuggerForm::sizeHint() const
@@ -96,7 +99,6 @@ void SbmDebuggerForm::InitSignalsSlots()
    connect(ui.actionResource_Viewer, SIGNAL(triggered()), this, SLOT(ShowResourceDialog()));
    connect(ui.actionCommand_Window, SIGNAL(triggered()), this, SLOT(ShowCommandDialog()));
    connect(ui.actionData_Viewer, SIGNAL(triggered()), this, SLOT(ShowDataViewerDialog()));
-   connect(ui.actionUtils_Window, SIGNAL(triggered()), this, SLOT(ShowUtilDialog()));
    connect(ui.actionFace_Viewer, SIGNAL(triggered()), this, SLOT(ShowFaceDialog()));
    connect(ui.actionBML_Creator, SIGNAL(triggered()), this, SLOT(ShowBmlCreatorDialog()));
    connect(ui.actionEnity_Creator, SIGNAL(triggered()), this, SLOT(ShowEntityCreatorDialog()));
@@ -178,27 +180,13 @@ void SbmDebuggerForm::ShowSettingsDialog()
 {
    SettingsDialog dlg(this);
    connect(&dlg, SIGNAL(DialogFinished(const SettingsDialog*, int)), m_pGLWidget, SLOT(OnCloseSettingsDialog(const SettingsDialog*, int)));
-   if (dlg.exec() == QDialog::Accepted)
-   {
-
-   }
-   else
-   {
-
-   }
+   dlg.exec();
 }
 
 void SbmDebuggerForm::ShowResourceDialog()
 {
    ResourceDialog dlg(&c, this);
-   if (dlg.exec() == QDialog::Accepted)
-   {
-      
-   }
-   else
-   {
-      
-   }
+   dlg.exec();
 }
 
 void SbmDebuggerForm::ShowCommandDialog()
@@ -210,12 +198,6 @@ void SbmDebuggerForm::ShowCommandDialog()
 void SbmDebuggerForm::ShowDataViewerDialog()
 {
    DataViewerDialog dlg(&c, this);
-   dlg.exec();
-}
-
-void SbmDebuggerForm::ShowUtilDialog()
-{
-   UtilsDialog dlg(&c, m_pGLWidget, this);
    dlg.exec();
 }
 
