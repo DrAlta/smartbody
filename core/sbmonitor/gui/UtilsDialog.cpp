@@ -153,16 +153,22 @@ bool GetAnimationNames(void* caller, NetRequest* req)
    QStringList names;
 
    QRect size = dlg->ui.animationNamesBox->geometry();
+   QRect searchSize = dlg->ui.animFilterBox->geometry();
    for (unsigned int i = 0; i < dlg->m_animations.size(); i++)
    {
-      names.append(dlg->m_animations[i].c_str());
-
       // make sure the box is long enough
-      int width = dlg->ui.animationNamesBox->fontMetrics().width(names[i]);
+      QString name = dlg->m_animations[i].c_str();
+      int width = dlg->ui.animationNamesBox->fontMetrics().boundingRect(name).width();
       if (width > size.width())
       {
+         // resize animation combo box and search filter
          size.setWidth(width);
+         searchSize.setWidth(width);
+         dlg->ui.animationNamesBox->setGeometry(size);
+         dlg->ui.animFilterBox->setGeometry(size);
       }
+
+      names.append(name);
    }
 
    switch (req->Rid())
@@ -173,8 +179,5 @@ bool GetAnimationNames(void* caller, NetRequest* req)
       break;
    }
 
-   // resize it
-   dlg->ui.animationNamesBox->setGeometry(size);
-   
    return true;
 }

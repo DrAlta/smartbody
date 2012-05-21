@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Mon May 21 10:47:05 2012
+** Created: Mon May 21 11:50:35 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -283,14 +283,14 @@ public:
         QueryAnimButton->setGeometry(QRect(10, 180, 75, 23));
         animationNamesBox = new QComboBox(frame_2);
         animationNamesBox->setObjectName(QString::fromUtf8("animationNamesBox"));
-        animationNamesBox->setGeometry(QRect(10, 120, 201, 22));
+        animationNamesBox->setGeometry(QRect(10, 120, 291, 22));
         animationsLabel = new QLabel(frame_2);
         animationsLabel->setObjectName(QString::fromUtf8("animationsLabel"));
         animationsLabel->setGeometry(QRect(10, 10, 81, 16));
         animationsLabel->setFont(font);
         animFilterBox = new QPlainTextEdit(frame_2);
         animFilterBox->setObjectName(QString::fromUtf8("animFilterBox"));
-        animFilterBox->setGeometry(QRect(10, 60, 191, 31));
+        animFilterBox->setGeometry(QRect(10, 60, 291, 31));
         filterLabel = new QLabel(frame_2);
         filterLabel->setObjectName(QString::fromUtf8("filterLabel"));
         filterLabel->setGeometry(QRect(10, 40, 71, 16));
@@ -408,6 +408,7 @@ public:
         menuSbm->addAction(actionData_Viewer);
         menuSbm->addAction(actionResource_Viewer);
         menuSbm->addAction(actionCommand_Window);
+        menuSbm->addAction(actionUtils_Window);
         menuSbm->addAction(actionFace_Viewer);
         menuSbm->addAction(actionBML_Creator);
         menuSbm->addAction(actionEnity_Creator);

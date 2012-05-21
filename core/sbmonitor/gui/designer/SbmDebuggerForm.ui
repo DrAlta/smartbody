@@ -76,6 +76,7 @@
     <addaction name="actionData_Viewer"/>
     <addaction name="actionResource_Viewer"/>
     <addaction name="actionCommand_Window"/>
+    <addaction name="actionUtils_Window"/>
     <addaction name="actionFace_Viewer"/>
     <addaction name="actionBML_Creator"/>
     <addaction name="actionEnity_Creator"/>
@@ -382,7 +383,7 @@
                <rect>
                 <x>10</x>
                 <y>120</y>
-                <width>201</width>
+                <width>291</width>
                 <height>22</height>
                </rect>
               </property>
@@ -410,7 +411,7 @@
                <rect>
                 <x>10</x>
                 <y>60</y>
-                <width>191</width>
+                <width>291</width>
                 <height>31</height>
                </rect>
               </property>
