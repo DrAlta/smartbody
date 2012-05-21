@@ -858,27 +858,6 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getEaseInEnd", &SBAnimationTransition::getEaseInEnd, "")
 		;
 
-	boost::python::class_<SBAnimationBlendManager>("SBAnimationStateManager")
-		.def("createState0D", &SBAnimationBlendManager::createBlend0D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 1D state.")
-		.def("createState1D", &SBAnimationBlendManager::createBlend1D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 1D state.")
-		.def("createState2D", &SBAnimationBlendManager::createBlend2D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 2D state.")
-		.def("createState3D", &SBAnimationBlendManager::createBlend3D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 3D state.")
-		.def("createTransition", &SBAnimationBlendManager::createTransition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a transition.")
-		.def("getState", &SBAnimationBlendManager::getBlend, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a state of a given name.")
-		.def("getBlend", &SBAnimationBlendManager::getBlend, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a state of a given name.")
-		.def("getNumStates", &SBAnimationBlendManager::getNumBlends, "Returns the number of blends.")
-		.def("getStateNames", &SBAnimationBlendManager::getBlendNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the blend names.")
-		.def("getTransition", &SBAnimationBlendManager::getTransition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a transition with a given name.")
-		.def("getNumTransitions", &SBAnimationBlendManager::getNumTransitions, "Returns the state names.")
-		.def("getTransitionNames", &SBAnimationBlendManager::getTransitionNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the state names.")
-		.def("getCurrentState", &SBAnimationBlendManager::getCurrentBlend, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the character's current state name.")
-		.def("getCurrentStateParameters", &SBAnimationBlendManager::getCurrentBlendParameters, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the character's current state name.")
-		.def("getCurrenBlend", &SBAnimationBlendManager::getCurrentBlend, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the character's current state name.")
-		.def("getCurrentBlendParameters", &SBAnimationBlendManager::getCurrentBlendParameters, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the character's current state name.")
-		.def("isStateScheduled", &SBAnimationBlendManager::isBlendScheduled, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns whether the character has the state scheduled. Used to avoid scheduling the same state.")
-		.def("isBlendScheduled", &SBAnimationBlendManager::isBlendScheduled, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns whether the character has the state scheduled. Used to avoid scheduling the same state.")
-		;
-
 	boost::python::class_<SBAnimationBlendManager>("SBAnimationBlendManager")
 		.def("createState0D", &SBAnimationBlendManager::createBlend0D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 1D blend.")
 		.def("createState1D", &SBAnimationBlendManager::createBlend1D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 1D blend.")
