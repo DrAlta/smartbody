@@ -9,11 +9,11 @@
 #include <FL/Fl_Multi_Browser.H>
 #include <vector>
 
-class PAStateEditor;
+class PABlendEditor;
 class PAAutoFootStepsEditor : public Fl_Window
 {
 public:
-	PAAutoFootStepsEditor(PAStateEditor* editor, int x, int y, int w, int h);
+	PAAutoFootStepsEditor(PABlendEditor* editor, int x, int y, int w, int h);
 	~PAAutoFootStepsEditor();
 
 	static void confirmEditting(Fl_Widget* widget, void* data);
@@ -34,7 +34,7 @@ public:
 	Fl_Button*			buttonCancel;
 	Fl_Check_Button*	checkDebugInfo;
 
-	PAStateEditor*		stateEditor;
+	PABlendEditor*		stateEditor;
 	int xDis;
 	int yDis;
 	bool isPrintDebugInfo;

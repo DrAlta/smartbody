@@ -30,7 +30,7 @@ SBScene::SBScene(void)
 	_sim = new SBSimulationManager();
 	_profiler = new SBProfiler();
 	_bml = new SBBmlProcessor();
-	_stateManager = new SBAnimationStateManager();
+	_blendManager = new SBAnimationBlendManager();
 	_reachManager = new SBReachManager();
 	_steerManager = new SBSteerManager();
 	_serviceManager = new SBServiceManager();
@@ -69,7 +69,7 @@ SBScene::~SBScene(void)
 	delete _sim;
 	delete _profiler;
 	delete _bml;
-	delete _stateManager;
+	delete _blendManager;
 	delete _reachManager;
 	delete _steerManager;
 	delete _physicsManager;
@@ -611,9 +611,9 @@ SBBmlProcessor* SBScene::getBmlProcessor()
 	return _bml;
 }
 
-SBAnimationStateManager* SBScene::getStateManager()
+SBAnimationBlendManager* SBScene::getBlendManager()
 {
-	return _stateManager;
+	return _blendManager;
 }
 
 SBReachManager* SBScene::getReachManager()

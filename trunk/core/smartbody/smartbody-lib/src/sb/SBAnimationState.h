@@ -5,12 +5,12 @@
 
 namespace SmartBody {
 
-class SBAnimationState : public PAState
+class SBAnimationBlend : public PABlend
 {
 	public:
-		SBAnimationState();
-		SBAnimationState(const std::string& name);
-		~SBAnimationState();
+		SBAnimationBlend();
+		SBAnimationBlend(const std::string& name);
+		~SBAnimationBlend();
 
 		void addCorrespondencePoints(const std::vector<std::string>& motions, const std::vector<double>& points);
 		void removeCorrespondencePoints(int index);
@@ -46,36 +46,36 @@ class SBAnimationState : public PAState
 };
 
 
-class SBAnimationState0D : public SBAnimationState
+class SBAnimationBlend0D : public SBAnimationBlend
 {
 	public:
-		SBAnimationState0D();
-		SBAnimationState0D(const std::string& name);
-		~SBAnimationState0D();
+		SBAnimationBlend0D();
+		SBAnimationBlend0D(const std::string& name);
+		~SBAnimationBlend0D();
 
 		virtual void addMotion(const std::string& motion);
 		virtual void removeMotion(const std::string& motionName);
 		
 };
 
-class SBAnimationState1D : public SBAnimationState
+class SBAnimationBlend1D : public SBAnimationBlend
 {
 	public:
-		SBAnimationState1D();
-		SBAnimationState1D(const std::string& name);
-		~SBAnimationState1D();
+		SBAnimationBlend1D();
+		SBAnimationBlend1D(const std::string& name);
+		~SBAnimationBlend1D();
 
 		virtual void addMotion(const std::string& motion, float parameter);
 		virtual void removeMotion(const std::string& motionName);
 		void setParameter(const std::string& motion, float parameter);
 };
 
-class SBAnimationState2D : public SBAnimationState
+class SBAnimationBlend2D : public SBAnimationBlend
 {
 	public:
-		SBAnimationState2D();
-		SBAnimationState2D(const std::string& name);
-		~SBAnimationState2D();
+		SBAnimationBlend2D();
+		SBAnimationBlend2D(const std::string& name);
+		~SBAnimationBlend2D();
 
 		virtual void addMotion(const std::string& motion, float parameter1, float paramter2);
 		virtual void removeMotion(const std::string& motionName);
@@ -83,12 +83,12 @@ class SBAnimationState2D : public SBAnimationState
 		void addTriangle(const std::string& motion1, const std::string& motion2, const std::string&motion3);
 };
 
-class SBAnimationState3D : public SBAnimationState
+class SBAnimationBlend3D : public SBAnimationBlend
 {
 	public:
-		SBAnimationState3D();
-		SBAnimationState3D(const std::string& name);
-		~SBAnimationState3D();
+		SBAnimationBlend3D();
+		SBAnimationBlend3D(const std::string& name);
+		~SBAnimationBlend3D();
 
 		virtual void addMotion(const std::string& motion, float parameter1, float paramter2, float paramter3);
 		virtual void removeMotion(const std::string& motionName);

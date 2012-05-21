@@ -27,7 +27,7 @@
 #include <vhcl.h>
 #include "nle/NonLinearEditorWidget.h"
 
-class PAStateEditor;
+class PABlendEditor;
 
 class ParamAnimEditorWidget : public nle::EditorWidget
 {

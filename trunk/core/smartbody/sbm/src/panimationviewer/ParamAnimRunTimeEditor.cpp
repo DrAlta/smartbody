@@ -66,9 +66,9 @@ void PARunTimeEditor::update()
 		return;
 
 	std::string currentState = "";
-	if (character->param_animation_ct->getCurrentPAStateData())
+	if (character->param_animation_ct->getCurrentPABlendData())
 	{
-		currentState = character->param_animation_ct->getCurrentPAStateData()->state->stateName;
+		currentState = character->param_animation_ct->getCurrentPABlendData()->state->stateName;
 	}
 	if (prevCycleState != currentState)
 	{
@@ -80,7 +80,7 @@ void PARunTimeEditor::update()
 
 	if (paramGroup)
 	{
-		PAStateData* curStateData = character->param_animation_ct->getCurrentPAStateData();
+		PABlendData* curStateData = character->param_animation_ct->getCurrentPABlendData();
 		if (!curStateData)
 			return;
 		if (curStateData)
@@ -115,10 +115,10 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 {
 	nextCycleStates->clear();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	PAState* state = mcu.lookUpPAState(currentState);
+	PABlend* state = mcu.lookUpPABlend(currentState);
 
-//	if (stateData)
-//		if (!stateData->cycle)
+//	if (blendData)
+//		if (!blendData->cycle)
 //			return;
 
 	if (currentState == "")
@@ -126,15 +126,15 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 
 	if (currentState == PseudoIdleState)
 	{
-		for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
+		for (size_t i = 0; i < mcu.param_anim_blends.size(); i++)
 		{
-//			if (mcu.param_anim_states[i]->cycle)
-				addItem(nextCycleStates, mcu.param_anim_states[i]->stateName);
+//			if (mcu.param_anim_blends[i]->cycle)
+				addItem(nextCycleStates, mcu.param_anim_blends[i]->stateName);
 		}
 	}
 	else
 	{
-//		if (stateData->toStates.size() == 0)
+//		if (blendData->toStates.size() == 0)
 			addItem(nextCycleStates, PseudoIdleState);
 		std::vector<std::string> nextStates;
 
@@ -155,9 +155,9 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 	if (state)
 	{
 		std::vector<double> weights;
-		PAStateData* stateData = new PAStateData(state, weights);
+		PABlendData* blendData = new PABlendData(state, weights);
 		// memory leak!
-		paramGroup = new ParameterGroup(this->parameterGroup->x(), this->parameterGroup->y(), parameterGroup->w(), parameterGroup->h(), (char*)"", stateData, paWindow);
+		paramGroup = new ParameterGroup(this->parameterGroup->x(), this->parameterGroup->y(), parameterGroup->w(), parameterGroup->h(), (char*)"", blendData, paWindow);
 		parameterGroup->add(paramGroup);
 		paramGroup->show();
 		paramGroup->redraw();
@@ -186,9 +186,9 @@ void PARunTimeEditor::initializeRunTimeEditor()
 	{
 		if (character->param_animation_ct == NULL)
 			return;
-		PAStateData* stateData = character->param_animation_ct->getCurrentPAStateData();
-		if (stateData)
-			currentCycleState->value(stateData->state->stateName.c_str());
+		PABlendData* blendData = character->param_animation_ct->getCurrentPABlendData();
+		if (blendData)
+			currentCycleState->value(blendData->state->stateName.c_str());
 
 		nextCycleStates->clear();
 		availableTransitions->clear();
@@ -207,7 +207,7 @@ void PARunTimeEditor::updateNonCycleState(Fl_Widget* widget, void* data)
 		if (editor->availableTransitions->selected(i+1))
 			nonCycleState = editor->availableTransitions->text(i+1);
 	}
-	PAState* state = mcuCBHandle::singleton().lookUpPAState(nonCycleState);
+	PABlend* state = mcuCBHandle::singleton().lookUpPABlend(nonCycleState);
 	if (state && state->getNumParameters() > 0)
 	{
 		if (editor->paramGroup)
@@ -218,9 +218,9 @@ void PARunTimeEditor::updateNonCycleState(Fl_Widget* widget, void* data)
 		}
 		
 		std::vector<double> weights;
-		PAStateData* stateData = new PAStateData(state, weights);
+		PABlendData* blendData = new PABlendData(state, weights);
 		// memory leak here!
-		editor->paramGroup = new ParameterGroup(editor->parameterGroup->x(), editor->parameterGroup->y(), editor->parameterGroup->w(), editor->parameterGroup->h(), (char*)"", stateData, editor->paWindow);
+		editor->paramGroup = new ParameterGroup(editor->parameterGroup->x(), editor->parameterGroup->y(), editor->parameterGroup->w(), editor->parameterGroup->h(), (char*)"", blendData, editor->paWindow);
 		editor->parameterGroup->add(editor->paramGroup);
 		editor->paramGroup->show();
 		editor->paramGroup->redraw();		
@@ -239,20 +239,20 @@ void PARunTimeEditor::updateTransitionStates(Fl_Widget* widget, void* data)
 		if (editor->nextCycleStates->selected(i+1))
 			nextState = editor->nextCycleStates->text(i+1);
 	}
-	for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
+	for (size_t i = 0; i < mcu.param_anim_blends.size(); i++)
 	{
 		bool fromHit = false;
 		bool toHit = false;
 		if (currentState == PseudoIdleState)
 		{
 			/*
-			if (mcu.param_anim_states[i]->fromStates.size() == 0)
+			if (mcu.param_anim_blends[i]->fromStates.size() == 0)
 			{
-				for (size_t j = 0; j < mcu.param_anim_states[i]->toStates.size(); j++)
+				for (size_t j = 0; j < mcu.param_anim_blends[i]->toStates.size(); j++)
 				{
-					if (mcu.param_anim_states[i]->toStates[j]->stateName == nextState)
+					if (mcu.param_anim_blends[i]->toStates[j]->stateName == nextState)
 					{
-						editor->availableTransitions->add(mcu.param_anim_states[i]->stateName.c_str());	
+						editor->availableTransitions->add(mcu.param_anim_blends[i]->stateName.c_str());	
 						break;
 					}
 				}
@@ -262,13 +262,13 @@ void PARunTimeEditor::updateTransitionStates(Fl_Widget* widget, void* data)
 		else if (nextState == PseudoIdleState)
 		{
 			/*
-			if (mcu.param_anim_states[i]->toStates.size() == 0)
+			if (mcu.param_anim_blends[i]->toStates.size() == 0)
 			{
-				for (size_t j = 0; j < mcu.param_anim_states[i]->fromStates.size(); j++)
+				for (size_t j = 0; j < mcu.param_anim_blends[i]->fromStates.size(); j++)
 				{
-					if (mcu.param_anim_states[i]->fromStates[j]->stateName == currentState)
+					if (mcu.param_anim_blends[i]->fromStates[j]->stateName == currentState)
 					{
-						editor->availableTransitions->add(mcu.param_anim_states[i]->stateName.c_str());	
+						editor->availableTransitions->add(mcu.param_anim_blends[i]->stateName.c_str());	
 						break;
 					}
 				}
@@ -278,14 +278,14 @@ void PARunTimeEditor::updateTransitionStates(Fl_Widget* widget, void* data)
 		else
 		{
 			/*
-			for (size_t j = 0; j < mcu.param_anim_states[i]->fromStates.size(); j++)
-				if (mcu.param_anim_states[i]->fromStates[j]->stateName == currentState)
+			for (size_t j = 0; j < mcu.param_anim_blends[i]->fromStates.size(); j++)
+				if (mcu.param_anim_blends[i]->fromStates[j]->stateName == currentState)
 				{
 					fromHit = true;
 					break;
 				}
-			for (size_t j = 0; j < mcu.param_anim_states[i]->toStates.size(); j++)
-				if (mcu.param_anim_states[i]->toStates[j]->stateName == nextState)
+			for (size_t j = 0; j < mcu.param_anim_blends[i]->toStates.size(); j++)
+				if (mcu.param_anim_blends[i]->toStates[j]->stateName == nextState)
 				{
 					toHit = true;
 					break;
@@ -293,7 +293,7 @@ void PARunTimeEditor::updateTransitionStates(Fl_Widget* widget, void* data)
 				*/
 
 			if (fromHit && toHit)
-				editor->availableTransitions->add(mcu.param_anim_states[i]->stateName.c_str());	
+				editor->availableTransitions->add(mcu.param_anim_blends[i]->stateName.c_str());	
 		}
 	}
 }

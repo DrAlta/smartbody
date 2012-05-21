@@ -153,9 +153,9 @@ void PATransitionEditor2::loadStates()
 	state1List->clear();
 	state1List->add("---");
 	// states may have names that conflict with FLTK's parsing, such as a '@'
-	for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
+	for (size_t i = 0; i < mcu.param_anim_blends.size(); i++)
 	{
-		state1List->add(mcu.param_anim_states[i]->stateName.c_str());
+		state1List->add(mcu.param_anim_blends[i]->stateName.c_str());
 	}
 	
 	state1List->value(0);
@@ -163,9 +163,9 @@ void PATransitionEditor2::loadStates()
 	state2List->clear();
 	state2List->add("---");
 	// states may have names that conflict with FLTK's parsing, such as a '@'
-	for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
+	for (size_t i = 0; i < mcu.param_anim_blends.size(); i++)
 	{
-		state2List->add(mcu.param_anim_states[i]->stateName.c_str());
+		state2List->add(mcu.param_anim_blends[i]->stateName.c_str());
 	}
 	
 	state2List->value(0);
@@ -254,7 +254,7 @@ void PATransitionEditor2::changeState1List(Fl_Widget* widget, void* data)
 	editor->loadStates();	
 	editor->state1List->value(stateValue);
 	editor->state2List->value(stateValueP);
-	PAState* state1 = mcuCBHandle::singleton().lookUpPAState(editor->state1List->text(stateValue));
+	PABlend* state1 = mcuCBHandle::singleton().lookUpPABlend(editor->state1List->text(stateValue));
 	editor->state1AnimationList->clear();
 	if (state1)
 	{
@@ -265,11 +265,11 @@ void PATransitionEditor2::changeState1List(Fl_Widget* widget, void* data)
 		editor->state1AnimationList->select(i, false);
 
 	// get any existing transition for the state list
-	PAState* state2 = mcuCBHandle::singleton().lookUpPAState(editor->state2List->text(stateValueP));
+	PABlend* state2 = mcuCBHandle::singleton().lookUpPABlend(editor->state2List->text(stateValueP));
 	if (state1 && state2)
 	{
 		// find any transition from state1 to state2
-		SmartBody::SBAnimationStateManager* manager = SmartBody::SBScene::getScene()->getStateManager();
+		SmartBody::SBAnimationBlendManager* manager = SmartBody::SBScene::getScene()->getBlendManager();
 		SmartBody::SBAnimationTransition* transition = manager->getTransition(state1->stateName, state2->stateName);
 		if (transition)
 		{
@@ -279,7 +279,7 @@ void PATransitionEditor2::changeState1List(Fl_Widget* widget, void* data)
 			const std::string& destinationMotionName = transition->getDestinationMotionName();
 			if (sourceMotionName != "")
 			{
-				int motionId = transition->getSourceState()->getMotionId(sourceMotionName);
+				int motionId = transition->getSourceBlend()->getMotionId(sourceMotionName);
 				if (motionId != -1)
 				{
 					editor->state1AnimationList->select(motionId + 1);
@@ -287,7 +287,7 @@ void PATransitionEditor2::changeState1List(Fl_Widget* widget, void* data)
 			}
 			if (destinationMotionName != "")
 			{
-				int motionId = transition->getDestinationState()->getMotionId(destinationMotionName);
+				int motionId = transition->getDestinationBlend()->getMotionId(destinationMotionName);
 				if (motionId != -1)
 				{
 					editor->state2AnimationList->select(motionId + 1);
@@ -311,7 +311,7 @@ void PATransitionEditor2::changeState2List(Fl_Widget* widget, void* data)
 	int stateValue = editor->state2List->value();
 	int stateValueP = editor->state1List->value();
 	editor->loadStates();
-	PAState* state2 = mcuCBHandle::singleton().lookUpPAState(editor->state2List->menu()[stateValue].label());
+	PABlend* state2 = mcuCBHandle::singleton().lookUpPABlend(editor->state2List->menu()[stateValue].label());
 	editor->state2List->value(stateValue);
 	editor->state1List->value(stateValueP);
 	editor->state2AnimationList->clear();
@@ -324,11 +324,11 @@ void PATransitionEditor2::changeState2List(Fl_Widget* widget, void* data)
 		editor->state2AnimationList->select(i, false);
 
 	// get any existing transition for the state list
-	PAState* state1 = mcuCBHandle::singleton().lookUpPAState(editor->state1List->text(stateValueP));
+	PABlend* state1 = mcuCBHandle::singleton().lookUpPABlend(editor->state1List->text(stateValueP));
 	if (state1 && state2)
 	{
 		// find any transition from state1 to state2
-		SmartBody::SBAnimationStateManager* manager = SmartBody::SBScene::getScene()->getStateManager();
+		SmartBody::SBAnimationBlendManager* manager = SmartBody::SBScene::getScene()->getBlendManager();
 		SmartBody::SBAnimationTransition* transition = manager->getTransition(state1->stateName, state2->stateName);
 		if (transition)
 		{
@@ -338,7 +338,7 @@ void PATransitionEditor2::changeState2List(Fl_Widget* widget, void* data)
 			const std::string& destinationMotionName = transition->getDestinationMotionName();
 			if (sourceMotionName != "")
 			{
-				int motionId = transition->getSourceState()->getMotionId(sourceMotionName);
+				int motionId = transition->getSourceBlend()->getMotionId(sourceMotionName);
 				if (motionId != -1)
 				{
 					editor->state1AnimationList->select(motionId + 1);
@@ -346,7 +346,7 @@ void PATransitionEditor2::changeState2List(Fl_Widget* widget, void* data)
 			}
 			if (destinationMotionName != "")
 			{
-				int motionId = transition->getDestinationState()->getMotionId(destinationMotionName);
+				int motionId = transition->getDestinationBlend()->getMotionId(destinationMotionName);
 				if (motionId != -1)
 				{
 					editor->state2AnimationList->select(motionId + 1);
@@ -408,7 +408,7 @@ void PATransitionEditor2::removeTransitionTimeMark(Fl_Widget* widget, void* data
 	// determine where to add the time marks
 	std::string stateName = editor->state1List->text();
 
-	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	if (!state)
 		return;
 
@@ -453,7 +453,7 @@ void PATransitionEditor2::snapTimeMark(Fl_Widget* widget, void* data)
 	// determine where to add the time marks
 	std::string stateName = editor->state1List->text();
 
-	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	if (!state)
 		return;
 
@@ -555,7 +555,7 @@ void PATransitionEditor2::snapEndTimeMark(Fl_Widget* widget, void* data)
 
 	std::string stateName = editor->state1List->text();
 
-	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	if (!state)
 		return;
 
@@ -868,7 +868,7 @@ void PATransitionEditor2::scrub(Fl_Widget* widget, void* data)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		std::string currentStateName = editor->state1List->menu()[editor->state1List->value()].label();
-		PAState* currentState = mcu.lookUpPAState(currentStateName);
+		PABlend* currentState = mcu.lookUpPABlend(currentStateName);
 		int lastMotionIndex = currentState->getMotionId(editor->lastSelectedMotion);
 		double curTime = editor->sliderScrub->value();
 		double localTime = currentState->getLocalTime(curTime, lastMotionIndex);
@@ -881,10 +881,10 @@ void PATransitionEditor2::scrub(Fl_Widget* widget, void* data)
 		{
 			weights[lastMotionIndex] = 1.;
 		}
-		PAStateData stateData(currentState, weights);
-		stateData.timeManager->updateWeights();
-		std::vector<double> times(stateData.state->getNumMotions());
-		stateData.timeManager->getParallelTimes(localTime, times);
+		PABlendData blendData(currentState, weights);
+		blendData.timeManager->updateWeights();
+		std::vector<double> times(blendData.state->getNumMotions());
+		blendData.timeManager->getParallelTimes(localTime, times);
 		editor->transitionTimeMarkWidget->setLocalTimes(times);
 
 		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[0]);

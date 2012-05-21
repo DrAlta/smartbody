@@ -16,7 +16,7 @@ class EventManager;
 class SBSimulationManager;
 class SBProfiler;
 class SBBmlProcessor;
-class SBAnimationStateManager;
+class SBAnimationBlendManager;
 class SBReachManager;
 class SBSteerManager;
 class SBServiceManager;
@@ -98,7 +98,7 @@ class SBScene : public SBObject
 		SBSimulationManager* getSimulationManager();
 		SBProfiler* getProfiler();
 		SBBmlProcessor* getBmlProcessor();
-		SBAnimationStateManager* getStateManager();
+		SBAnimationBlendManager* getBlendManager();
 		SBReachManager* getReachManager();
 		SBSteerManager* getSteerManager();
 		SBServiceManager* getServiceManager();
@@ -118,7 +118,7 @@ class SBScene : public SBObject
 		SBSimulationManager* _sim;
 		SBProfiler* _profiler;
 		SBBmlProcessor* _bml;
-		SBAnimationStateManager* _stateManager;
+		SBAnimationBlendManager* _blendManager;
 		SBReachManager* _reachManager;
 		SBSteerManager* _steerManager;
 		SBServiceManager* _serviceManager;

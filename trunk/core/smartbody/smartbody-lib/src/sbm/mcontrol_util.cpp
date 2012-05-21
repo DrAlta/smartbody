@@ -301,8 +301,8 @@ mcuCBHandle::mcuCBHandle()
 	_scene->getDebuggerServer()->Init();
 	_scene->getDebuggerServer()->SetSBScene(_scene);
 
-	SmartBody::SBAnimationState0D* idleState = new SmartBody::SBAnimationState0D(PseudoIdleState);
-	addPAState(idleState);
+	SmartBody::SBAnimationBlend0D* idleState = new SmartBody::SBAnimationBlend0D(PseudoIdleState);
+	addPABlend(idleState);
 
 
 }
@@ -637,13 +637,13 @@ void mcuCBHandle::clear( void )	{
 	}
 
 	// remove the parameterized animation states
-	for (std::vector<PAState*>::iterator iter = param_anim_states.begin();
-	     iter != param_anim_states.end();
+	for (std::vector<PABlend*>::iterator iter = param_anim_blends.begin();
+	     iter != param_anim_blends.end();
 	     iter++)
 	{
 		delete (*iter);
 	}
-	param_anim_states.clear();
+	param_anim_blends.clear();
 
 	// remove the transition maps
 	for (std::vector<PATransition*>::iterator iter = param_anim_transitions.begin();
@@ -1925,20 +1925,20 @@ SkMotion* mcuCBHandle::lookUpMotion( const char* motionName )
 	return anim_p;
 }
 
-PAState* mcuCBHandle::lookUpPAState(std::string stateName)
+PABlend* mcuCBHandle::lookUpPABlend(std::string stateName)
 {
-	for (size_t i = 0; i < param_anim_states.size(); i++)
+	for (size_t i = 0; i < param_anim_blends.size(); i++)
 	{
-		if (param_anim_states[i]->stateName == stateName)
-			return param_anim_states[i];
+		if (param_anim_blends[i]->stateName == stateName)
+			return param_anim_blends[i];
 	}
 	return NULL;
 }
 
-void mcuCBHandle::addPAState(PAState* state)
+void mcuCBHandle::addPABlend(PABlend* state)
 {
-	if (!lookUpPAState(state->stateName))
-		param_anim_states.push_back(state);
+	if (!lookUpPABlend(state->stateName))
+		param_anim_blends.push_back(state);
 }
 
 PATransition* mcuCBHandle::lookUpPATransition(std::string fromStateName, std::string toStateName)

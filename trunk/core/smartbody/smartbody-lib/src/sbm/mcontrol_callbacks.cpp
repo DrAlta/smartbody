@@ -953,8 +953,8 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		if (operation == "state")
 		{
-			std::string stateName = args.read_token();
-			PAState* newState = new PAState(stateName);
+			std::string blendName = args.read_token();
+			PABlend* newState = new PABlend(blendName);
 			std::string nextString = args.read_token();
 			if (nextString == "cycle")
 			{
@@ -997,16 +997,16 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					newState->keys.push_back(keysForOneMotion);
 				}
 
-				mcu_p->addPAState(newState);
+				mcu_p->addPABlend(newState);
 			}
 			else if (nextString == "parameter")
 			{
-				PAState* state = mcu_p->lookUpPAState(stateName);
-				if (!state) return CMD_FAILURE;
+				PABlend* blend = mcu_p->lookUpPABlend(blendName);
+				if (!blend) return CMD_FAILURE;
 				std::string type = args.read_token();
-				if (type == "1D") state->setType(0);
-				else if (type == "2D") state->setType(1);
-				else if (type == "3D") state->setType(2);
+				if (type == "1D") blend->setType(0);
+				else if (type == "2D") blend->setType(1);
+				else if (type == "3D") blend->setType(2);
 				else return CMD_FAILURE;
 				int num = args.read_int();
 				for (int i = 0; i < num; i++)
@@ -1015,21 +1015,21 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					if (type == "1D")
 					{
 						std::string parameter = args.read_token();
-						int motionId = state->getMotionId(m);
+						int motionId = blend->getMotionId(m);
 						if (motionId < 0) return CMD_FAILURE;
-						double param = parseMotionParameters(m, parameter, state->keys[motionId][0], state->keys[motionId][state->getNumKeys() - 1]);
+						double param = parseMotionParameters(m, parameter, blend->keys[motionId][0], blend->keys[motionId][blend->getNumKeys() - 1]);
 						if (param < -9000) param = atof(parameter.c_str());
-						state->setParameter(m, param);
+						blend->setParameter(m, param);
 					}
 					else if (type == "2D")
 					{
 						std::string parameterX = args.read_token();
 						std::string parameterY = args.read_token();
-						double paramX = parseMotionParameters(m, parameterX, state->keys[state->getMotionId(m)][0], state->keys[state->getMotionId(m)][state->getNumKeys() - 1]);
-						double paramY = parseMotionParameters(m, parameterY, state->keys[state->getMotionId(m)][0], state->keys[state->getMotionId(m)][state->getNumKeys() - 1]);
+						double paramX = parseMotionParameters(m, parameterX, blend->keys[blend->getMotionId(m)][0], blend->keys[blend->getMotionId(m)][blend->getNumKeys() - 1]);
+						double paramY = parseMotionParameters(m, parameterY, blend->keys[blend->getMotionId(m)][0], blend->keys[blend->getMotionId(m)][blend->getNumKeys() - 1]);
 						if (paramX < -9000) paramX = atof(parameterX.c_str());
 						if (paramY < -9000) paramY = atof(parameterY.c_str());
-						state->setParameter(m, paramX, paramY);
+						blend->setParameter(m, paramX, paramY);
 					}
 					else if (type == "3D")
 					{
@@ -1037,10 +1037,10 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 						for (int pc = 0; pc < 3; pc++)
 						{
 							std::string para = args.read_token();
-							param[pc] = parseMotionParameters(m, para, state->keys[state->getMotionId(m)][0], state->keys[state->getMotionId(m)][state->getNumKeys() - 1]);
+							param[pc] = parseMotionParameters(m, para, blend->keys[blend->getMotionId(m)][0], blend->keys[blend->getMotionId(m)][blend->getNumKeys() - 1]);
 							if (param[pc] < -9000) param[pc] = atof(para.c_str());
 						}
-						state->setParameter(m, param[0], param[1], param[2]);
+						blend->setParameter(m, param[0], param[1], param[2]);
 					}
 				}
 //				if (type == "3D")
@@ -1048,21 +1048,21 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			}
 			else if (nextString == "triangle")
 			{
-				PAState* state = mcu_p->lookUpPAState(stateName);
-				if (!state) return CMD_FAILURE;
+				PABlend* blend = mcu_p->lookUpPABlend(blendName);
+				if (!blend) return CMD_FAILURE;
 				int numTriangles = args.read_int();
 				for (int i = 0; i < numTriangles; i++)
 				{
 					std::string motion1 = args.read_token();
 					std::string motion2 = args.read_token();
 					std::string motion3 = args.read_token();
-					state->addTriangle(motion1, motion2, motion3);
+					blend->addTriangle(motion1, motion2, motion3);
 				}
 			}
 			else if (nextString == "tetrahedron")
 			{ 
-				PAState* state = mcu_p->lookUpPAState(stateName);
-				if (!state) return CMD_FAILURE;
+				PABlend* blend = mcu_p->lookUpPABlend(blendName);
+				if (!blend) return CMD_FAILURE;
 				int numTetrahedrons = args.read_int();
 				for (int i = 0; i < numTetrahedrons; i++)
 				{
@@ -1070,7 +1070,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					std::string motion2 = args.read_token();
 					std::string motion3 = args.read_token();
 					std::string motion4 = args.read_token();
-					state->addTetrahedron(motion1, motion2, motion3, motion4);
+					blend->addTetrahedron(motion1, motion2, motion3, motion4);
 				}				
 			}
 			else
@@ -1092,36 +1092,36 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 			if (operation == "schedule")
 			{
-				std::string stateString = args.read_token();
-				if (stateString != "state")
+				std::string blendString = args.read_token();
+				if (blendString != "state")
 					return CMD_FAILURE;
-				std::string stateName = args.read_token();
-				PAState* state = mcu_p->lookUpPAState(stateName);
-				if (!state)
-					LOG("State %s not exist, schedule Idle State.", stateName.c_str());
+				std::string blendName = args.read_token();
+				PABlend* blend = mcu_p->lookUpPABlend(blendName);
+				if (!blend)
+					LOG("Blend %s not exist, schedule Idle blend.", blendName.c_str());
 				std::string loopString = args.read_token();
 				if (loopString != "loop")
 					return CMD_FAILURE;
 				std::string loop = args.read_token();
-				PAStateData::WrapMode wrap = PAStateData::Loop;
-				if (loop == "true") wrap = PAStateData::Loop;
-				if (loop == "false") wrap = PAStateData::Once;
+				PABlendData::WrapMode wrap = PABlendData::Loop;
+				if (loop == "true") wrap = PABlendData::Loop;
+				if (loop == "false") wrap = PABlendData::Once;
 				std::string playNowString = args.read_token();
 				if (playNowString != "playnow")
 					return CMD_FAILURE;
-				PAStateData::ScheduleMode schedule = PAStateData::Queued;
+				PABlendData::ScheduleMode schedule = PABlendData::Queued;
 				std::string playNow = args.read_token();
-				if (playNow == "true") schedule = PAStateData::Now;
-				else if (playNow == "false") schedule = PAStateData::Queued;
+				if (playNow == "true") schedule = PABlendData::Now;
+				else if (playNow == "false") schedule = PABlendData::Queued;
 				else 
 					return CMD_FAILURE;
-				PAStateData::BlendMode blend = PAStateData::Overwrite;
+				PABlendData::BlendMode blendMode = PABlendData::Overwrite;
 				std::string additiveString = args.read_token();
 				if (additiveString != "additive")
 					return CMD_FAILURE;
 				std::string addtive = args.read_token();
-				if (addtive == "true") blend = PAStateData::Overwrite;
-				else if (addtive == "false") blend = PAStateData::Additive;
+				if (addtive == "true") blendMode = PABlendData::Overwrite;
+				else if (addtive == "false") blendMode = PABlendData::Additive;
 				else
 					return CMD_FAILURE;
 				std::string jointString = args.read_token();
@@ -1132,19 +1132,19 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				int numWeights = args.calc_num_tokens();
 				if (numWeights > 0)
 				{
-					if (state)
+					if (blend)
 					{
-						for (int i = 0; i < state->getNumMotions(); i++)
+						for (int i = 0; i < blend->getNumMotions(); i++)
 							weights.push_back(args.read_double());
 					}
 				}
-				if (state && numWeights < state->getNumMotions())
+				if (blend && numWeights < blend->getNumMotions())
 				{
-					character->param_animation_ct->schedule(state, 0, 0, 0, wrap, schedule, blend, joint);
+					character->param_animation_ct->schedule(blend, 0, 0, 0, wrap, schedule, blendMode, joint);
 				}
 				else
 				{
-					character->param_animation_ct->schedule(state, weights, wrap, schedule, blend, joint);
+					character->param_animation_ct->schedule(blend, weights, wrap, schedule, blendMode, joint);
 				}
 			}
 
@@ -1163,13 +1163,13 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			}
 			if (operation == "updatestate")
 			{
-				if (!character->param_animation_ct->getCurrentPAStateData())
+				if (!character->param_animation_ct->getCurrentPABlendData())
 				{
 					LOG("No state available for character %s.", character->getName().c_str());
 					return CMD_FAILURE;
 				}
 
-				int type = character->param_animation_ct->getCurrentPAStateData()->state->getType();
+				int type = character->param_animation_ct->getCurrentPABlendData()->state->getType();
 				if (args.calc_num_tokens() != type + 1)
 				{
 					LOG("Cannot update state %s for character %s which has %d parameters, you sent %d.", character->param_animation_ct->getName().c_str(), character->getName().c_str(), (type + 1), args.calc_num_tokens());
@@ -1179,13 +1179,13 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				for (int i = 0; i < (type + 1); i++)
 					p.push_back(args.read_double());
 				std::vector<double> weights;
-				weights.resize(character->param_animation_ct->getCurrentPAStateData()->state->getNumMotions());
+				weights.resize(character->param_animation_ct->getCurrentPABlendData()->state->getNumMotions());
 				if (type == 0)
-					character->param_animation_ct->getCurrentPAStateData()->state->getWeightsFromParameters(p[0], weights);
+					character->param_animation_ct->getCurrentPABlendData()->state->getWeightsFromParameters(p[0], weights);
 				else if (type == 1)
-					character->param_animation_ct->getCurrentPAStateData()->state->getWeightsFromParameters(p[0], p[1], weights);
+					character->param_animation_ct->getCurrentPABlendData()->state->getWeightsFromParameters(p[0], p[1], weights);
 				else if (type == 2)
-					character->param_animation_ct->getCurrentPAStateData()->state->getWeightsFromParameters(p[0], p[1], p[2], weights);
+					character->param_animation_ct->getCurrentPABlendData()->state->getWeightsFromParameters(p[0], p[1], p[2], weights);
 				character->param_animation_ct->updateWeights(weights);
 				return CMD_SUCCESS;
 			}
@@ -1200,14 +1200,14 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			std::string fromStateString = args.read_token();
 			if (fromStateString != "fromstate")
 				return CMD_FAILURE;
-			PAState* fromState = mcu_p->lookUpPAState(args.read_token());
+			PABlend* fromState = mcu_p->lookUpPABlend(args.read_token());
 			if (!fromState)
 				return CMD_FAILURE;
 			newTransition->fromState = fromState;
 			std::string toStateString = args.read_token();
 			if (toStateString != "tostate")
 				return CMD_FAILURE;
-			PAState* toState = mcu_p->lookUpPAState(args.read_token());
+			PABlend* toState = mcu_p->lookUpPABlend(args.read_token());
 			if (!toState)
 				return CMD_FAILURE;
 			newTransition->toState = toState;

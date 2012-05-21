@@ -8,7 +8,7 @@
 class ParameterVisualization : public Fl_Group
 {
 	public:
-		ParameterVisualization(bool isInteractive, int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* window);
+		ParameterVisualization(bool isInteractive, int x, int y, int w, int h, char* name, PABlendData* s, ParameterGroup* window);
 		~ParameterVisualization();
 
 		virtual void draw();
@@ -41,7 +41,7 @@ class ParameterVisualization : public Fl_Group
 		int height;
 		int paramX;
 		int paramY;
-		PAStateData* stateData;
+		PABlendData* blendData;
 		ParameterGroup* paramGroup;
 		bool interactiveMode;
 		std::vector<bool> selectedTriangles;

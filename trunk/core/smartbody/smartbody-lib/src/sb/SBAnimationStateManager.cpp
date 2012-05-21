@@ -6,15 +6,15 @@
 
 namespace SmartBody {
 
-SBAnimationStateManager::SBAnimationStateManager()
+SBAnimationBlendManager::SBAnimationBlendManager()
 {
 }
 
-SBAnimationStateManager::~SBAnimationStateManager()
+SBAnimationBlendManager::~SBAnimationBlendManager()
 {
 }
 
-std::vector<std::string> SBAnimationStateManager::getAutoStateTransitions( const std::string& characterName, const std::string& targetState )
+std::vector<std::string> SBAnimationBlendManager::getAutoBlendTransitions( const std::string& characterName, const std::string& targetBlend )
 {
 	std::vector<std::string> pathVec;
 	
@@ -22,7 +22,7 @@ std::vector<std::string> SBAnimationStateManager::getAutoStateTransitions( const
 	return pathVec;		
 }
 
-bool SBAnimationStateManager::addStateToGraph( const std::string& name )
+bool SBAnimationBlendManager::addBlendToGraph( const std::string& name )
 {
 	BoostGraph::vertex_descriptor v = stateGraph.vertex(name);
 	
@@ -36,7 +36,7 @@ bool SBAnimationStateManager::addStateToGraph( const std::string& name )
 	return true;
 }
 
-bool SBAnimationStateManager::addTransitionEdgeToGraph( const std::string& source, const std::string& dest )
+bool SBAnimationBlendManager::addTransitionEdgeToGraph( const std::string& source, const std::string& dest )
 {
 	BoostGraph::vertex_descriptor vs = stateGraph.vertex(source), vd = stateGraph.vertex(dest);
 	
@@ -49,94 +49,94 @@ bool SBAnimationStateManager::addTransitionEdgeToGraph( const std::string& sourc
 	boost::add_edge_by_label(source,dest,stateGraph); return true;
 }
 
-SBAnimationState0D* SBAnimationStateManager::createState0D(const std::string& name)
+SBAnimationBlend0D* SBAnimationBlendManager::createBlend0D(const std::string& name)
 {
-	SBAnimationState0D* state = new SBAnimationState0D(name);
+	SBAnimationBlend0D* blend = new SBAnimationBlend0D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	addStateToGraph(name);
-	mcu.addPAState(state);
-	return state;
+	addBlendToGraph(name);
+	mcu.addPABlend(blend);
+	return blend;
 }
 
-SBAnimationState1D* SBAnimationStateManager::createState1D(const std::string& name)
+SBAnimationBlend1D* SBAnimationBlendManager::createBlend1D(const std::string& name)
 {
-	SBAnimationState1D* state = new SBAnimationState1D(name);
+	SBAnimationBlend1D* blend = new SBAnimationBlend1D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	addStateToGraph(name);
-	mcu.addPAState(state);
-	return state;
+	addBlendToGraph(name);
+	mcu.addPABlend(blend);
+	return blend;
 }
 
-SBAnimationState2D* SBAnimationStateManager::createState2D(const std::string& name)
+SBAnimationBlend2D* SBAnimationBlendManager::createBlend2D(const std::string& name)
 {
-	SBAnimationState2D* state = new SBAnimationState2D(name);
+	SBAnimationBlend2D* blend = new SBAnimationBlend2D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	addStateToGraph(name);
-	mcu.addPAState(state);
-	return state;
+	addBlendToGraph(name);
+	mcu.addPABlend(blend);
+	return blend;
 }
 
-SBAnimationState3D* SBAnimationStateManager::createState3D(const std::string& name)
+SBAnimationBlend3D* SBAnimationBlendManager::createBlend3D(const std::string& name)
 {
-	SBAnimationState3D* state = new SBAnimationState3D(name);
+	SBAnimationBlend3D* blend = new SBAnimationBlend3D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	addStateToGraph(name);
-	mcu.addPAState(state);
-	return state;
+	addBlendToGraph(name);
+	mcu.addPABlend(blend);
+	return blend;
 }
 
-SBAnimationTransition* SBAnimationStateManager::createTransition(const std::string& source, const std::string& dest)
+SBAnimationTransition* SBAnimationBlendManager::createTransition(const std::string& source, const std::string& dest)
 {	
 	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SBAnimationState* sourceState = getState(source);
-	if (!sourceState)
+	SBAnimationBlend* sourceBlend = getBlend(source);
+	if (!sourceBlend)
 	{
 		LOG("Source state %s does not exist. No transition created.", source.c_str());
 		return NULL;
 	}
-	SBAnimationState* destState = getState(dest);
-	if (!destState)
+	SBAnimationBlend* destBlend = getBlend(dest);
+	if (!destBlend)
 	{
 		LOG("Destination state %s does not exist. No transition created.", dest.c_str());
 		return NULL;
 	}
 	SBAnimationTransition* transition = new SBAnimationTransition(source + "/" + dest);
-	transition->set(sourceState, destState);
+	transition->set(sourceBlend, destBlend);
 
 	mcu.addPATransition(transition);
 	return transition;
 }
 
-SBAnimationState* SBAnimationStateManager::getState(const std::string& name)
+SBAnimationBlend* SBAnimationBlendManager::getBlend(const std::string& name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	PAState* stateData = mcu.lookUpPAState(name);
-	SBAnimationState* state = dynamic_cast<SBAnimationState*>(stateData);
-	return state;
+	PABlend* blendData = mcu.lookUpPABlend(name);
+	SBAnimationBlend* blend = dynamic_cast<SBAnimationBlend*>(blendData);
+	return blend;
 }
 
-int SBAnimationStateManager::getNumStates()
+int SBAnimationBlendManager::getNumBlends()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	return mcu.param_anim_states.size();
+	return mcu.param_anim_blends.size();
 }
 
-std::vector<std::string> SBAnimationStateManager::getStateNames()
+std::vector<std::string> SBAnimationBlendManager::getBlendNames()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	std::vector<std::string> states;
-	for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
+	for (size_t i = 0; i < mcu.param_anim_blends.size(); i++)
 	{
-		states.push_back(mcu.param_anim_states[i]->stateName);
+		states.push_back(mcu.param_anim_blends[i]->stateName);
 	}
 	return states;
 }
 
-SBAnimationTransition* SBAnimationStateManager::getTransition(const std::string& source, const std::string& dest)
+SBAnimationTransition* SBAnimationBlendManager::getTransition(const std::string& source, const std::string& dest)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
@@ -146,14 +146,14 @@ SBAnimationTransition* SBAnimationStateManager::getTransition(const std::string&
 	return animTransition;
 }
 
-int SBAnimationStateManager::getNumTransitions()
+int SBAnimationBlendManager::getNumTransitions()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	return mcu.param_anim_transitions.size();
 }
 
-std::vector<std::string> SBAnimationStateManager::getTransitionNames()
+std::vector<std::string> SBAnimationBlendManager::getTransitionNames()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
@@ -166,7 +166,7 @@ std::vector<std::string> SBAnimationStateManager::getTransitionNames()
 	return transitionNames;
 }
 
-std::string SBAnimationStateManager::getCurrentState(const std::string& characterName)
+std::string SBAnimationBlendManager::getCurrentBlend(const std::string& characterName)
 {
 	SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 	if (!character)
@@ -175,13 +175,13 @@ std::string SBAnimationStateManager::getCurrentState(const std::string& characte
 	if (!character->param_animation_ct)
 		return "";
 
-	PAStateData* stateData = character->param_animation_ct->getCurrentPAStateData();
-	if (!stateData)
+	PABlendData* blendData = character->param_animation_ct->getCurrentPABlendData();
+	if (!blendData)
 		return "";
-	return stateData->state->stateName;
+	return blendData->state->stateName;
 }
 
-SrVec SBAnimationStateManager::getCurrentStateParameters(const std::string& characterName)
+SrVec SBAnimationBlendManager::getCurrentBlendParameters(const std::string& characterName)
 {
 	SrVec params;
 	SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
@@ -192,36 +192,36 @@ SrVec SBAnimationStateManager::getCurrentStateParameters(const std::string& char
 		return params;
 
 	
-	PAStateData* stateData = character->param_animation_ct->getCurrentPAStateData();
-	if (!stateData)
+	PABlendData* blendData = character->param_animation_ct->getCurrentPABlendData();
+	if (!blendData)
 		return params;
 
-	SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(stateData->state);
+	SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SmartBody::SBAnimationBlend0D*>(blendData->state);
 	if (state0D)
 		return params;
 
-	SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(stateData->state);
-	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(stateData->state);
-	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(stateData->state);
+	SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SmartBody::SBAnimationBlend1D*>(blendData->state);
+	SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(blendData->state);
+	SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(blendData->state);
 	if (state1D)
 	{
-		stateData->state->getParametersFromWeights(params[0], stateData->weights);
+		blendData->state->getParametersFromWeights(params[0], blendData->weights);
 		return params;
 	}
 	if (state2D)
 	{
-		stateData->state->getParametersFromWeights(params[0], params[1], stateData->weights);
+		blendData->state->getParametersFromWeights(params[0], params[1], blendData->weights);
 		return params;
 	}
 	if (state3D)
 	{
-		stateData->state->getParametersFromWeights(params[0], params[1], params[2], stateData->weights);
+		blendData->state->getParametersFromWeights(params[0], params[1], params[2], blendData->weights);
 		return params;
 	}
 	return params;
 }
 
-bool SBAnimationStateManager::isStateScheduled(const std::string& characterName, const std::string& stateName)
+bool SBAnimationBlendManager::isBlendScheduled(const std::string& characterName, const std::string& stateName)
 {
 	SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 	if (!character)
@@ -230,7 +230,7 @@ bool SBAnimationStateManager::isStateScheduled(const std::string& characterName,
 	if (!character->param_animation_ct)
 		return false;
 
-	return character->param_animation_ct->hasPAState(stateName);
+	return character->param_animation_ct->hasPABlend(stateName);
 }
 
 }

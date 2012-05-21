@@ -200,10 +200,10 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		{
 			if (c->param_animation_ct)
 			{
-				if (c->param_animation_ct->hasPAState(c->steeringAgent->jumpName))
+				if (c->param_animation_ct->hasPABlend(c->steeringAgent->jumpName))
 					return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
 				std::stringstream command1;
-				if (c->param_animation_ct->getCurrentPAStateData()->state->stateName == c->steeringAgent->locomotionName)
+				if (c->param_animation_ct->getCurrentPABlendData()->state->stateName == c->steeringAgent->locomotionName)
 				{
 					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"" << c->steeringAgent->jumpName << "\" sbm:startnow=\"true\"/>";
 					command1 << "<sbm:states loop=\"true\" name=\"" << c->steeringAgent->locomotionName << "\" sbm:startnow=\"false\"/>";
@@ -220,7 +220,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			return BehaviorRequestPtr();
 
 		// also has to update state weight
-	//	PAState* locoData = mcu->lookUpPAState(c->steeringAgent->locomotionName);
+	//	PABlend* locoData = mcu->lookUpPABlend(c->steeringAgent->locomotionName);
 	//	if (locoData)
 	//		locoData->setWeight(c->steeringAgent->desiredSpeed * 100.0f, 0.0);
 	}
@@ -377,7 +377,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			LOG("Parameterized Animation Engine not setup, cannot use step control.");
 			return BehaviorRequestPtr();
 		}
-		if (c->param_animation_ct->hasPAState(c->steeringAgent->stepStateName) || !c->param_animation_ct->isIdle())
+		if (c->param_animation_ct->hasPABlend(c->steeringAgent->stepStateName) || !c->param_animation_ct->isIdle())
 			return BehaviorRequestPtr();
 		c->steeringAgent->stepAdjust = false;
 		if (stepTargetMode)		// given target

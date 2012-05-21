@@ -26,7 +26,7 @@ double SBAnimationTransition::getEaseInEnd()
 }
 
 
-void SBAnimationTransition::set(SBAnimationState* source, SBAnimationState* dest)
+void SBAnimationTransition::set(SBAnimationBlend* source, SBAnimationBlend* dest)
 {
 	fromState = source;
 	toState = dest;
@@ -67,25 +67,25 @@ void SBAnimationTransition::removeEaseOutInterval(int num)
 {
 }
 
-void SBAnimationTransition::setSourceState(SBAnimationState* source)
+void SBAnimationTransition::setSourceBlend(SBAnimationBlend* source)
 {
 	fromState = source;
 }
 
-void SBAnimationTransition::setDestinationState(SBAnimationState* dest)
+void SBAnimationTransition::setDestinationBlend(SBAnimationBlend* dest)
 {
 	toState = dest;
 }
 
-SBAnimationState* SBAnimationTransition::getSourceState()
+SBAnimationBlend* SBAnimationTransition::getSourceBlend()
 {
-	SBAnimationState* from = dynamic_cast<SBAnimationState*>(fromState);
+	SBAnimationBlend* from = dynamic_cast<SBAnimationBlend*>(fromState);
 	return from;
 }
 
-SBAnimationState* SBAnimationTransition::getDestinationState()
+SBAnimationBlend* SBAnimationTransition::getDestinationBlend()
 {
-	SBAnimationState* to = dynamic_cast<SBAnimationState*>(toState);
+	SBAnimationBlend* to = dynamic_cast<SBAnimationBlend*>(toState);
 	return to;
 }
 

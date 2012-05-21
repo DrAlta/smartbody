@@ -53,13 +53,13 @@ struct TetrahedronInfo
 	std::string motion4;
 };
 
-class PAState
+class PABlend
 {
 	public:
-		PAState();
-		PAState(PAState* data);
-		PAState(const std::string& name);
-		~PAState();
+		PABlend();
+		PABlend(PABlend* data);
+		PABlend(const std::string& name);
+		~PABlend();
 
 		bool getWeightsFromParameters(double x, std::vector<double>& weights);
 		bool getWeightsFromParameters(double x, double y, std::vector<double>& weights);
@@ -147,12 +147,12 @@ class PATransition
 {
 	public:
 		PATransition();
-		PATransition(PATransition* data, PAState* from, PAState* to);
+		PATransition(PATransition* data, PABlend* from, PABlend* to);
 		~PATransition();
 
 	public:
-		PAState* fromState;
-		PAState* toState;
+		PABlend* fromState;
+		PABlend* toState;
 		std::string fromMotionName;
 		std::string toMotionName;
 		std::vector<double> easeOutStart;

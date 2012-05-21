@@ -278,6 +278,7 @@ XMLCh* BMLDefs::ATTR_WAGGLE = NULL;
 XMLCh* BMLDefs::ATTR_PARAMETERIZED = NULL;
 
 XMLCh* BMLDefs::TAG_STATES = NULL;
+XMLCh* BMLDefs::TAG_BLEND = NULL;
 XMLCh* BMLDefs::ATTR_STARTINGNOW = NULL;
 XMLCh* BMLDefs::ATTR_ADDITIVE = NULL;
 XMLCh* BMLDefs::ATTR_PARTIALJOINT = NULL;
@@ -605,6 +606,7 @@ BMLDefs::BMLDefs()
 	ATTR_NODDECAY = XMLString::transcode("sbm:decay");
 
 	TAG_STATES = XMLString::transcode("sbm:states");
+	TAG_BLEND = XMLString::transcode("blend");
 	ATTR_STARTINGNOW = XMLString::transcode("sbm:startnow");
 	ATTR_ADDITIVE = XMLString::transcode("sbm:additive");
 	ATTR_PARTIALJOINT = XMLString::transcode("sbm:partial-joint");

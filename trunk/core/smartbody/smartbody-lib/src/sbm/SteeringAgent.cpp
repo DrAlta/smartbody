@@ -504,7 +504,7 @@ void SteeringAgent::sendLocomotionEvent(const std::string& status)
 
 void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, float yaw)
 {
-	PAStateData* curStateData = character->param_animation_ct->getCurrentPAStateData();
+	PABlendData* curStateData = character->param_animation_ct->getCurrentPABlendData();
 	if (!curStateData)
 		return;
 	const std::string& curStateName = curStateData->state->stateName;
@@ -518,7 +518,7 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 
 	if (character->param_animation_ct->isIdle() && steerPath.pathLength() > 0)    // need to define when you want to start the locomotion
 	{
-		PAState* locoState = mcu.lookUpPAState(locomotionName.c_str());
+		PABlend* locoState = mcu.lookUpPABlend(locomotionName.c_str());
 		SrVec pathDir;
 		float pathDist;
 		SrVec targetPos = steerPath.closestPointOnPath(SrVec(x,0,z),pathDir,pathDist);
@@ -1087,7 +1087,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		targetSpeed = distToTarget / brakingGain;
 
 	if (stepAdjust)
-		if (!character->param_animation_ct->hasPAState(stepStateName.c_str()))
+		if (!character->param_animation_ct->hasPABlend(stepStateName.c_str()))
 		{
 			agentToTargetDist = distToTarget / scene->getScale();
 			agentToTargetVec.x = targetLoc.x - x * scene->getScale();
@@ -1096,7 +1096,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 			agentToTargetVec /= scene->getScale();
 		}
 
-	PAStateData* curStateData =  character->param_animation_ct->getCurrentPAStateData();
+	PABlendData* curStateData =  character->param_animation_ct->getCurrentPABlendData();
 	const std::string& curStateName = character->param_animation_ct->getCurrentStateName();
 	const std::string& nextStateName = character->param_animation_ct->getNextStateName();
 
@@ -1107,9 +1107,9 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		float y = dot(agentToTargetVec, heading);
 		SrVec verticalHeading = SrVec(sin(degToRad(yaw - 90)), 0, cos(degToRad(yaw - 90)));
 		float x = dot(agentToTargetVec, verticalHeading);
-		if (!character->param_animation_ct->hasPAState(stepStateName.c_str()))
+		if (!character->param_animation_ct->hasPABlend(stepStateName.c_str()))
 		{
-			PAState* stepState = scene->getStateManager()->getState(stepStateName);
+			PABlend* stepState = scene->getBlendManager()->getBlend(stepStateName);
 			std::vector<double> weights;
 			weights.resize(stepState->getNumMotions());
 			stepState->getWeightsFromParameters(x, y, weights);
@@ -1222,7 +1222,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 
 
 	//---Need a better way to handle the control between steering and Parameterized Animation Controller
-	if (character->param_animation_ct->hasPAState(jumpName))
+	if (character->param_animation_ct->hasPABlend(jumpName))
 		inControl = false;
 	else
 		inControl = true;
@@ -1402,8 +1402,8 @@ void SteeringAgent::startLocomotion( float angleDiff )
 		desiredSpeed *= 1.0f / SmartBody::SBScene::getScene()->getScale();
 
 		std::vector<double> weights;
-		SmartBody::SBAnimationStateManager* stateManager = SmartBody::SBScene::getScene()->getStateManager();
-		SmartBody::SBAnimationState* state = stateManager->getState(locomotionName);
+		SmartBody::SBAnimationBlendManager* stateManager = SmartBody::SBScene::getScene()->getBlendManager();
+		SmartBody::SBAnimationBlend* state = stateManager->getBlend(locomotionName);
 		if (!state)
 		{
 			LOG("No state named %s found for character %s. Cannot start locomotion.", locomotionName.c_str(), character->getName().c_str());
@@ -1426,9 +1426,9 @@ void SteeringAgent::adjustFacingAngle( float angleDiff )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
 	std::string playNow;
-	if (fabs(angleDiff) > facingAngleThreshold && !character->param_animation_ct->hasPAState(idleTurnName.c_str()))
+	if (fabs(angleDiff) > facingAngleThreshold && !character->param_animation_ct->hasPABlend(idleTurnName.c_str()))
 	{
-		PAState* idleTurnState = mcu.lookUpPAState(idleTurnName.c_str());
+		PABlend* idleTurnState = mcu.lookUpPABlend(idleTurnName.c_str());
 		std::vector<double> weights;
 		weights.resize(idleTurnState->getNumMotions());
 
@@ -1462,9 +1462,9 @@ float SteeringAgent::evaluateSteppingLoco(float dt, float x, float y, float z, f
 		float offsety = dot(agentToTargetVec, heading);
 		SrVec verticalHeading = SrVec(sin(degToRad(yaw - 90)), 0, cos(degToRad(yaw - 90)));
 		float offsetx = dot(agentToTargetVec, verticalHeading);
-		if (!character->param_animation_ct->hasPAState(stepStateName.c_str()))
+		if (!character->param_animation_ct->hasPABlend(stepStateName.c_str()))
 		{
-			PAState* stepState = mcu.lookUpPAState(stepStateName.c_str());
+			PABlend* stepState = mcu.lookUpPABlend(stepStateName.c_str());
 			std::vector<double> weights;
 			weights.resize(stepState->getNumMotions());
 			stepState->getWeightsFromParameters(x, y, weights);

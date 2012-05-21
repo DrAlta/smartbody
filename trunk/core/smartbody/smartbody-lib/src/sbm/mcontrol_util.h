@@ -218,7 +218,7 @@ class mcuCBHandle {
 
 		KinectProcessor*							kinectProcessor;
 
-		std::vector<PAState*>					param_anim_states;
+		std::vector<PABlend*>					param_anim_blends;
 		std::vector<PATransition*>				param_anim_transitions;
 		
 
@@ -510,8 +510,8 @@ public:
 
 		SkMotion* lookUpMotion(const char* motionName);
 
-		PAState* lookUpPAState(std::string stateName);
-		void addPAState(PAState* state);
+		PABlend* lookUpPABlend(std::string stateName);
+		void addPABlend(PABlend* state);
 		PATransition* lookUpPATransition(std::string fromStateName, std::string toStateName);
 		void addPATransition(PATransition* transition);
 

@@ -29,20 +29,20 @@
 #include <controllers/me_ct_param_animation_data.h>
 
 
-class PAState;
+class PABlend;
 class PATransition;
-class PAStateData;
+class PABlendData;
 class PATransitionManager;
 class PAControllerBlending;
 
 struct ScheduleUnit
 {
-	PAState* data;
+	PABlend* data;
 	std::vector<double> weights;
 	double time;
-	PAStateData::WrapMode wrap;
-	PAStateData::ScheduleMode schedule;
-	PAStateData::BlendMode blend;
+	PABlendData::WrapMode wrap;
+	PABlendData::ScheduleMode schedule;
+	PABlendData::BlendMode blend;
 	std::string partialJoint;
 };
 
@@ -84,8 +84,8 @@ class MeCtParamAnimation : public MeCtContainer
 		void setBaseJointName(const std::string& name);
 		const std::string& getBaseJointName();
 		
-		void schedule(PAState* state, double x, double y, double z, PAStateData::WrapMode wrap = PAStateData::Loop, PAStateData::ScheduleMode schedule = PAStateData::Queued, PAStateData::BlendMode blend = PAStateData::Overwrite, std::string jName = "", double timeOffset = 0.0);
-		void schedule(PAState* state, const std::vector<double>& weights, PAStateData::WrapMode wrap = PAStateData::Loop, PAStateData::ScheduleMode schedule = PAStateData::Queued, PAStateData::BlendMode blend = PAStateData::Overwrite, std::string jName = "", double timeOffset = 0.0);
+		void schedule(PABlend* state, double x, double y, double z, PABlendData::WrapMode wrap = PABlendData::Loop, PABlendData::ScheduleMode schedule = PABlendData::Queued, PABlendData::BlendMode blend = PABlendData::Overwrite, std::string jName = "", double timeOffset = 0.0);
+		void schedule(PABlend* state, const std::vector<double>& weights, PABlendData::WrapMode wrap = PABlendData::Loop, PABlendData::ScheduleMode schedule = PABlendData::Queued, PABlendData::BlendMode blend = PABlendData::Overwrite, std::string jName = "", double timeOffset = 0.0);
 		void unschedule();
 		void updateWeights(std::vector<double>& w);
 		void updateWeights();
@@ -94,13 +94,13 @@ class MeCtParamAnimation : public MeCtContainer
 		
 		const std::string& getNextStateName();
 		const std::string& getCurrentStateName();
-		PAStateData* getCurrentPAStateData();
-		bool hasPAState(const std::string& stateName);
+		PABlendData* getCurrentPABlendData();
+		bool hasPABlend(const std::string& stateName);
 		bool isIdle();
 
 	private:
 		void autoScheduling(double time);
-		PAStateData* createStateModule(ScheduleUnit su);
+		PABlendData* createStateModule(ScheduleUnit su);
 		void reset();
 		void updateWo(SrMat& mat, MeCtChannelWriter* wo, SrBuffer<float>& buffer);
 		SrMat combineMat(SrMat& mat1, SrMat& mat2);
@@ -114,8 +114,8 @@ class MeCtParamAnimation : public MeCtContainer
 		PATransitionManager* transitionManager;
 		double			prevGlobalTime;
 
-		PAStateData*	curStateData;
-		PAStateData*	nextStateData;
+		PABlendData*	curStateData;
+		PABlendData*	nextStateData;
 		std::list<ScheduleUnit> waitingList;
 };
 #endif

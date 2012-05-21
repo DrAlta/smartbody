@@ -6,7 +6,7 @@
 
 namespace SmartBody {
 
-class SBAnimationState;
+class SBAnimationBlend;
 
 class SBAnimationTransition : public PATransition
 {
@@ -15,12 +15,12 @@ class SBAnimationTransition : public PATransition
 		SBAnimationTransition(std::string name);
 		~SBAnimationTransition();
 
-		void setSourceState(SBAnimationState* source);
-		void setDestinationState(SBAnimationState* dest);
-		SBAnimationState* getSourceState();
-		SBAnimationState* getDestinationState();
+		void setSourceBlend(SBAnimationBlend* source);
+		void setDestinationBlend(SBAnimationBlend* dest);
+		SBAnimationBlend* getSourceBlend();
+		SBAnimationBlend* getDestinationBlend();
 
-		void set(SBAnimationState* source, SBAnimationState* dest);
+		void set(SBAnimationBlend* source, SBAnimationBlend* dest);
 		double getEaseInStart();
 		double getEaseInEnd();
 		void setEaseInInterval(std::string destMotion, float start, float end);

@@ -275,6 +275,7 @@ class BMLDefs
 		static XMLCh* ATTR_PARAMETERIZED;
 
 		static XMLCh* TAG_STATES;
+		static XMLCh* TAG_BLEND;
 		static XMLCh* ATTR_STARTINGNOW;
 		static XMLCh* ATTR_ADDITIVE;
 		static XMLCh* ATTR_PARTIALJOINT;

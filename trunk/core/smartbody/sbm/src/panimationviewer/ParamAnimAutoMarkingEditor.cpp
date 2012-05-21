@@ -7,7 +7,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
 
-PAAutoFootStepsEditor::PAAutoFootStepsEditor(PAStateEditor* editor, int x, int y, int w, int h) : Fl_Window(x, y, w, h)
+PAAutoFootStepsEditor::PAAutoFootStepsEditor(PABlendEditor* editor, int x, int y, int w, int h) : Fl_Window(x, y, w, h)
 {
 	set_modal();
 	stateEditor = editor;
@@ -44,7 +44,7 @@ PAAutoFootStepsEditor::PAAutoFootStepsEditor(PAStateEditor* editor, int x, int y
 	}
 
 	inputStepsPerJoint = new Fl_Input(xDis + csx + 100, 36 * yDis, 10 * xDis, 2 * yDis, "StepsPerJoint");
-	PAState* curState = stateEditor->getCurrentState();
+	PABlend* curState = stateEditor->getCurrentState();
 	std::vector<std::string> selectedMotions = stateEditor->getSelectedMotions();
 	if (selectedMotions.size() == curState->getNumMotions())
 		inputStepsPerJoint->activate();
@@ -78,7 +78,7 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 {
 	PAAutoFootStepsEditor* footStepEditor = (PAAutoFootStepsEditor*) data;
 	
-	PAState* currentState = footStepEditor->stateEditor->getCurrentState();
+	PABlend* currentState = footStepEditor->stateEditor->getCurrentState();
 	if (!currentState)
 	{	
 		LOG("PAAutoFootStepsEditor::confirmEditting WARNING: please select a state!");

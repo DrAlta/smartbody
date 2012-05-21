@@ -10,7 +10,7 @@
 class Parameter3DVisualization : public Fl_Gl_Window
 {
 	public:
-		Parameter3DVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* window);
+		Parameter3DVisualization(int x, int y, int w, int h, char* name, PABlendData* s, ParameterGroup* window);
 		~Parameter3DVisualization();
 
 		virtual void draw();
@@ -40,7 +40,7 @@ class Parameter3DVisualization : public Fl_Gl_Window
 		int lastMouseY;
 
 	private:
-		PAStateData* stateData;
+		PABlendData* blendData;
 		ParameterGroup* paramGroup;
 		std::vector<SrVec> tet;
 };

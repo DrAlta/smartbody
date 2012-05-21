@@ -37,7 +37,7 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 		LOG("parse_bml_states ERR: expecting a state name.");
 		return BehaviorRequestPtr();
 	}
-	PAState* state = mcu->lookUpPAState(stateName);
+	PABlend* state = mcu->lookUpPABlend(stateName);
 	if (!state)
 	{
 		LOG("parse_bml_states WARNING: Can't find state name %s, will schedule PseudoIdle state under schedule mode", stateName.c_str());
@@ -83,27 +83,27 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	if (wrap == "")
 		wrap = "Loop";
 	boost::algorithm::to_lower(wrap);
-	PAStateData::WrapMode wrapMode = PAStateData::Loop;
+	PABlendData::WrapMode wrapMode = PABlendData::Loop;
 	if (wrap == "once")
-		wrapMode = PAStateData::Once;
+		wrapMode = PABlendData::Once;
 
 	// schedule mode
 	std::string schedule = xml_parse_string(BMLDefs::ATTR_SCHEDULEMODE, elem);
 	if (schedule == "")
 		schedule = "Queued";
 	boost::algorithm::to_lower(schedule);
-	PAStateData::ScheduleMode scheduleMode = PAStateData::Queued;
+	PABlendData::ScheduleMode scheduleMode = PABlendData::Queued;
 	if (schedule == "now")
-		scheduleMode = PAStateData::Now;
+		scheduleMode = PABlendData::Now;
 
 	// blend mode
 	std::string blend = xml_parse_string(BMLDefs::ATTR_BLENDMODE, elem);
 	if (blend == "")
 		blend = "Overwrite";
 	boost::algorithm::to_lower(blend);
-	PAStateData::BlendMode blendMode =PAStateData::Overwrite;
+	PABlendData::BlendMode blendMode =PABlendData::Overwrite;
 	if (blend == "additive")
-		blendMode = PAStateData::Additive;
+		blendMode = PABlendData::Additive;
 
 	// partial joint name
 	std::string joint = xml_parse_string(BMLDefs::ATTR_PARTIALJOINT, elem);

@@ -5,12 +5,12 @@
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 
-ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateData* s, PanimationWindow* window, bool ex) : Fl_Group(x, y, w, h, name), stateData(s), paWindow(window), exec(ex)
+ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PABlendData* s, PanimationWindow* window, bool ex) : Fl_Group(x, y, w, h, name), blendData(s), paWindow(window), exec(ex)
 {
 	//printf("Create parameter group, x = %d, y = %d\n",x,y);
-	this->label(stateData->state->stateName.c_str());
+	this->label(blendData->state->stateName.c_str());
 	this->begin();
-		int type = stateData->state->getType();
+		int type = blendData->state->getType();
 		if (type == 0)
 		{			
 			int paraH =  h - 5 * yDis;
@@ -21,15 +21,15 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			this->resizable(paramVisualization);
 			yAxis = NULL;
 			zAxis = NULL;
-			double min = stateData->state->getVec(stateData->state->getMinVecX()).x;
-			double max = stateData->state->getVec(stateData->state->getMaxVecX()).x;
+			double min = blendData->state->getVec(blendData->state->getMinVecX()).x;
+			double max = blendData->state->getVec(blendData->state->getMaxVecX()).x;
 			xAxis = new Fl_Value_Slider(4 * xDis + x, h - 4 * yDis + y, w - 5 * xDis, 2 * yDis, "X");
 			xAxis->minimum(min);
 			xAxis->maximum(max);			
 			xAxis->type(FL_HORIZONTAL);			
 			xAxis->callback(updateXAxisValue, this);
 			float actualValue;
-			stateData->state->getParametersFromWeights(actualValue, stateData->weights);
+			blendData->state->getParametersFromWeights(actualValue, blendData->weights);
 			int actualX = 0;
 			int actualY = 0;
 			paramVisualization->getActualPixel(actualValue, 0.0f, actualX, actualY);
@@ -41,10 +41,10 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			paramVisualization = new ParameterVisualization(true, 4 * xDis + x, yDis + y, w - 5 * xDis, h - 5 * yDis, (char*)"", s, this);
 			paramVisualization->end();
 			this->resizable(paramVisualization);
-			double minX = stateData->state->getVec(stateData->state->getMinVecX()).x;
-			double maxX = stateData->state->getVec(stateData->state->getMaxVecX()).x;
-			double minY = stateData->state->getVec(stateData->state->getMinVecY()).y;
-			double maxY = stateData->state->getVec(stateData->state->getMaxVecY()).y;
+			double minX = blendData->state->getVec(blendData->state->getMinVecX()).x;
+			double maxX = blendData->state->getVec(blendData->state->getMaxVecX()).x;
+			double minY = blendData->state->getVec(blendData->state->getMinVecY()).y;
+			double maxY = blendData->state->getVec(blendData->state->getMaxVecY()).y;
 			xAxis = new Fl_Value_Slider(4 * xDis + x, h - 4 * yDis + y, w - 5 * xDis, 2 * yDis, "X");
 			xAxis->minimum(minX);
 			xAxis->maximum(maxX);
@@ -56,7 +56,7 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			yAxis->callback(updateXYAxisValue, this);
 			yAxis->type(FL_VERTICAL);
 			float actualValueX, actualValueY;
-			stateData->state->getParametersFromWeights(actualValueX, actualValueY, stateData->weights);
+			blendData->state->getParametersFromWeights(actualValueX, actualValueY, blendData->weights);
 			int actualX = 0;
 			int actualY = 0;
 			paramVisualization->getActualPixel(actualValueX, actualValueY, actualX, actualY);
@@ -68,12 +68,12 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			param3DVisualization->end();
 			this->resizable(param3DVisualization);	
 			paramVisualization = NULL;
-			double minX = stateData->state->getVec(stateData->state->getMinVecX()).x;
-			double maxX = stateData->state->getVec(stateData->state->getMaxVecX()).x;
-			double minY = stateData->state->getVec(stateData->state->getMinVecY()).y;
-			double maxY = stateData->state->getVec(stateData->state->getMaxVecY()).y;
-			double minZ = stateData->state->getVec(stateData->state->getMinVecZ()).z;
-			double maxZ = stateData->state->getVec(stateData->state->getMaxVecZ()).z;
+			double minX = blendData->state->getVec(blendData->state->getMinVecX()).x;
+			double maxX = blendData->state->getVec(blendData->state->getMaxVecX()).x;
+			double minY = blendData->state->getVec(blendData->state->getMinVecY()).y;
+			double maxY = blendData->state->getVec(blendData->state->getMaxVecY()).y;
+			double minZ = blendData->state->getVec(blendData->state->getMinVecZ()).z;
+			double maxZ = blendData->state->getVec(blendData->state->getMaxVecZ()).z;
 			xAxis = new Fl_Value_Slider(4 * xDis + x, h - 4 * yDis + y, w - 5 * xDis, 2 * yDis, "X");
 			xAxis->minimum(minX);
 			xAxis->maximum(maxX);
@@ -113,25 +113,25 @@ ParameterGroup::~ParameterGroup()
 void ParameterGroup::updateXAxisValue(Fl_Widget* widget, void* data)
 {
 	ParameterGroup* group = (ParameterGroup*) data;
-	PAStateData* stateData = group->getCurrentPAStateData();
+	PABlendData* blendData = group->getCurrentPABlendData();
 	double w = group->xAxis->value();
 	bool success = false;
-	success = stateData->state->getWeightsFromParameters(w, stateData->weights);
+	success = blendData->state->getWeightsFromParameters(w, blendData->weights);
 	if (success)
-		group->getCurrentCharacter()->param_animation_ct->updateWeights(stateData->weights);
+		group->getCurrentCharacter()->param_animation_ct->updateWeights(blendData->weights);
 	group->redraw();
 }
 
 void ParameterGroup::updateXYAxisValue(Fl_Widget* widget, void* data)
 {
 	ParameterGroup* group = (ParameterGroup*) data;
-	PAStateData* stateData = group->getCurrentPAStateData();
+	PABlendData* blendData = group->getCurrentPABlendData();
 	double x = group->xAxis->value();
 	double y = group->yAxis->value();
 	bool success = false;
 	std::vector<double> weights;
-	weights.resize(stateData->state->getNumMotions());
-	success = stateData->state->getWeightsFromParameters(x, y, weights);
+	weights.resize(blendData->state->getNumMotions());
+	success = blendData->state->getWeightsFromParameters(x, y, weights);
 	if (success)
 		group->getCurrentCharacter()->param_animation_ct->updateWeights(weights);
 	group->redraw();
@@ -140,14 +140,14 @@ void ParameterGroup::updateXYAxisValue(Fl_Widget* widget, void* data)
 void ParameterGroup::updateXYZAxisValue(Fl_Widget* widget, void* data)
 {		
 	ParameterGroup* group = (ParameterGroup*) data;
-	PAStateData* stateData = group->getCurrentPAStateData();
+	PABlendData* blendData = group->getCurrentPABlendData();
 	double x = group->xAxis->value();
 	double y = group->yAxis->value();
 	double z = group->zAxis->value();
 	bool success = false;
 	std::vector<double> weights;
-	weights.resize(stateData->state->getNumMotions());
-	success = stateData->state->getWeightsFromParameters(x, y, z, weights);
+	weights.resize(blendData->state->getNumMotions());
+	success = blendData->state->getWeightsFromParameters(x, y, z, weights);
 	if (success)
 		group->getCurrentCharacter()->param_animation_ct->updateWeights(weights);
 	group->redraw();	
@@ -160,14 +160,14 @@ void ParameterGroup::updateWeight()
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
 	std::stringstream command;
 	command << "panim update char " << charName;
-	int wNumber = stateData->state->getNumMotions();
+	int wNumber = blendData->state->getNumMotions();
 	for (int j = 0; j < wNumber; j++)
-		command << " " << stateData->weights[j];
+		command << " " << blendData->weights[j];
 	paWindow->execCmd(paWindow, command.str());
 	
 }
 
-PAStateData* ParameterGroup::getCurrentPAStateData()
+PABlendData* ParameterGroup::getCurrentPABlendData()
 {
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
 	SbmCharacter* character = mcuCBHandle::singleton().getCharacter(charName);
@@ -175,7 +175,7 @@ PAStateData* ParameterGroup::getCurrentPAStateData()
 		return NULL;
 	if (!character->param_animation_ct)
 		return NULL;
-	return character->param_animation_ct->getCurrentPAStateData();
+	return character->param_animation_ct->getCurrentPABlendData();
 }
 
 SmartBody::SBCharacter* ParameterGroup::getCurrentCharacter()

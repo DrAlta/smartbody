@@ -8,7 +8,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
 
-PAParameterEditor::PAParameterEditor(PAStateEditor* editor, int x, int y, int w, int h) : Fl_Window(x, y, w, h)
+PAParameterEditor::PAParameterEditor(PABlendEditor* editor, int x, int y, int w, int h) : Fl_Window(x, y, w, h)
 {
 	set_modal();
 	stateEditor = editor;
@@ -24,10 +24,10 @@ PAParameterEditor::PAParameterEditor(PAStateEditor* editor, int x, int y, int w,
 	stateName->deactivate();
 
 	choiceDimension = new Fl_Choice(xDis + csx + 100, 4 * yDis, 10 * xDis, 2 * yDis, "Dimension");
-	PAState* currentState = editor->getCurrentState();
-	SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(currentState);
-	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(currentState);
-	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(currentState);
+	PABlend* currentState = editor->getCurrentState();
+	SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SmartBody::SBAnimationBlend1D*>(currentState);
+	SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(currentState);
+	SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(currentState);
 	if (state1D || state2D || state3D)
 	{
 		choiceDimension->add("X");
@@ -111,13 +111,13 @@ void PAParameterEditor::confirmEditting(Fl_Widget* widget, void* data)
 	std::string dimensionName = paramEditor->choiceDimension->text();
 
 	// update the parameter changes to state
-	PAState* currentState = paramEditor->stateEditor->getCurrentState();
+	PABlend* currentState = paramEditor->stateEditor->getCurrentState();
 	if (!currentState)
 		return;
 
-	SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(currentState);
-	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(currentState);
-	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(currentState);
+	SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SmartBody::SBAnimationBlend1D*>(currentState);
+	SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(currentState);
+	SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(currentState);
 	const std::vector<std::string>& selectedMotions = paramEditor->stateEditor->getSelectedMotions();
 	
 	for (size_t i = 0; i < selectedMotions.size(); i++)

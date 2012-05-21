@@ -107,10 +107,10 @@ void PATransitionEditor::loadStates()
 	stateList2->clear();
 	stateList1->add("---");
 	stateList2->add("---");
-	for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
+	for (size_t i = 0; i < mcu.param_anim_blends.size(); i++)
 	{
-		stateList1->add(mcu.param_anim_states[i]->stateName.c_str());
-		stateList2->add(mcu.param_anim_states[i]->stateName.c_str());
+		stateList1->add(mcu.param_anim_blends[i]->stateName.c_str());
+		stateList2->add(mcu.param_anim_blends[i]->stateName.c_str());
 	}
 	stateList1->value(0);
 	stateList2->value(0);
@@ -152,7 +152,7 @@ void PATransitionEditor::changeStateList1(Fl_Widget* widget, void* data)
 	editor->loadStates();	
 	editor->stateList1->value(stateValue);
 	editor->stateList2->value(stateValueP);
-	PAState* state1 = mcuCBHandle::singleton().lookUpPAState(editor->stateList1->text(stateValue));
+	PABlend* state1 = mcuCBHandle::singleton().lookUpPABlend(editor->stateList1->text(stateValue));
 	editor->animForTransition1->clear();
 	if (state1)
 	{
@@ -169,7 +169,7 @@ void PATransitionEditor::changeStateList2(Fl_Widget* widget, void* data)
 	int stateValue = editor->stateList2->value();
 	int stateValueP = editor->stateList1->value();
 	editor->loadStates();
-	PAState* state2 = mcuCBHandle::singleton().lookUpPAState(editor->stateList2->menu()[stateValue].label());
+	PABlend* state2 = mcuCBHandle::singleton().lookUpPABlend(editor->stateList2->menu()[stateValue].label());
 	editor->stateList2->value(stateValue);
 	editor->stateList1->value(stateValueP);
 	editor->animForTransition2->clear();
@@ -230,8 +230,8 @@ void PATransitionEditor::changeAnimForTransition(Fl_Widget* widget, void* data)
 		nle::Block* block2 = editor->transitionEditorNleModel->getTrack(1)->getBlock(0);
 		std::string stateName1 = editor->stateList1->menu()[editor->stateList1->value()].label();
 		std::string stateName2 = editor->stateList2->menu()[editor->stateList2->value()].label();
-		PAState* fromState = mcu.lookUpPAState(stateName1);
-		PAState* toState = mcu.lookUpPAState(stateName2);
+		PABlend* fromState = mcu.lookUpPABlend(stateName1);
+		PABlend* toState = mcu.lookUpPABlend(stateName2);
 		for (int i = 0; i < fromState->getNumMotions(); i++)
 		{
 			if (motionName1 == fromState->motions[i]->getName())
@@ -301,8 +301,8 @@ void PATransitionEditor::updateTransitionTimeMark(Fl_Widget* widget, void* data)
 	{
 		nle::Block* block1 = editor->transitionEditorNleModel->getTrack(0)->getBlock(0);
 		nle::Block* block2 = editor->transitionEditorNleModel->getTrack(1)->getBlock(0);		
-		PAState* fromState = mcuCBHandle::singleton().lookUpPAState(fromStateName);
-		PAState* toState = mcuCBHandle::singleton().lookUpPAState(toStateName);
+		PABlend* fromState = mcuCBHandle::singleton().lookUpPABlend(fromStateName);
+		PABlend* toState = mcuCBHandle::singleton().lookUpPABlend(toStateName);
 		transition->fromState = fromState;
 		transition->toState = toState;
 		transition->fromMotionName = block1->getName();
@@ -354,8 +354,8 @@ void PATransitionEditor::createNewTransition(Fl_Widget* widget, void* data)
 		LOG("Transition %s to %s already exist.", fromStateName.c_str(), toStateName.c_str());
 		return;
 	}
-	PAState* fromState = mcuCBHandle::singleton().lookUpPAState(fromStateName);
-	PAState* toState = mcuCBHandle::singleton().lookUpPAState(toStateName);
+	PABlend* fromState = mcuCBHandle::singleton().lookUpPABlend(fromStateName);
+	PABlend* toState = mcuCBHandle::singleton().lookUpPABlend(toStateName);
 	if (fromState != NULL && toState != NULL)
 	{
 		transition = new PATransition();
