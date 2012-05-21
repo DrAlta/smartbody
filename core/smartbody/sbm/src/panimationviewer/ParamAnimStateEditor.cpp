@@ -34,7 +34,7 @@
 #include "ParamAnimEditorWidget.h"
 #include "ParamAnimAutoMarkingEditor.h"
 
-PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
+PABlendEditor::PABlendEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
 {
 	lastNameIndex = 0;
 	isPlaying = false;
@@ -174,33 +174,33 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 	lastSelectedMotion = "";
 	triangleVisualization = NULL;
 	tetraVisualization = NULL;
-	stateData = NULL;
+	blendData = NULL;
 
 	loadStates();
 	changeStateList(stateList, this);
 }
 
-PAStateEditor::~PAStateEditor()
+PABlendEditor::~PABlendEditor()
 {
 }
 
-void PAStateEditor::loadStates()
+void PABlendEditor::loadStates()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	stateList->clear();
 	stateList->add("---");
 	// states may have names that conflict with FLTK's parsing, such as a '@'
-	for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
+	for (size_t i = 0; i < mcu.param_anim_blends.size(); i++)
 	{
-		stateList->add(mcu.param_anim_states[i]->stateName.c_str());
+		stateList->add(mcu.param_anim_blends[i]->stateName.c_str());
 	}
 	
 	stateList->value(0);
 }
 
-void PAStateEditor::updateStateTimeMarkEditor(Fl_Widget* widget, void* data, bool toAdd)
+void PABlendEditor::updateStateTimeMarkEditor(Fl_Widget* widget, void* data, bool toAdd)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	if (editor->stateAnimationList->size() == 0)
@@ -253,9 +253,9 @@ void PAStateEditor::updateStateTimeMarkEditor(Fl_Widget* widget, void* data, boo
 	editor->paWindow->redraw();
 }
 
-void PAStateEditor::editStateMotions(Fl_Widget* widget, void* data)
+void PABlendEditor::editStateMotions(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 
 	bool isCreateMode = true;
 	std::string stateName = "";
@@ -266,34 +266,34 @@ void PAStateEditor::editStateMotions(Fl_Widget* widget, void* data)
 	}
 	if (!editor->creator)
 	{
-		editor->creator = new PAStateCreator(editor, editor->paWindow->x() + 50, editor->paWindow->y() + 50, 800, 600);
+		editor->creator = new PABlendCreator(editor, editor->paWindow->x() + 50, editor->paWindow->y() + 50, 800, 600);
 	}
 	editor->creator->setInfo(isCreateMode, stateName);
 	
 	editor->creator->show();
 }
 
-void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
+void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	int curValue = editor->stateList->value();
 	editor->loadStates();
 	editor->stateList->value(curValue);
 	editor->stateEditorNleModel->removeAllTracks();
 	std::string currentStateName = editor->stateList->menu()[editor->stateList->value()].label();
-	PAState* currentState = mcu.lookUpPAState(currentStateName);
+	PABlend* currentState = mcu.lookUpPABlend(currentStateName);
 	if (currentState)
 	{
-		if (editor->stateData)
-			delete editor->stateData;
-		editor->stateData = NULL;
+		if (editor->blendData)
+			delete editor->blendData;
+		editor->blendData = NULL;
 
 		editor->shapeList->clear();
 
 		editor->createStateButton->label("Edit State");
 		// determine the state type
-		SBAnimationState0D* state0d = dynamic_cast<SBAnimationState0D*>(currentState);
+		SBAnimationBlend0D* state0d = dynamic_cast<SBAnimationBlend0D*>(currentState);
 		if (state0d)
 		{
 			editor->choiceStateType->value(1);
@@ -312,13 +312,13 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 				editor->tetraVisualization = NULL;
 			}
 			std::vector<double> weights;
-			editor->stateData = new PAStateData(currentState, weights);
-			editor->triangleVisualization = new ParameterVisualization(false, editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->stateData, NULL);
+			editor->blendData = new PABlendData(currentState, weights);
+			editor->triangleVisualization = new ParameterVisualization(false, editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->blendData, NULL);
 			editor->visualizationGroup->add(editor->triangleVisualization);
 			editor->triangleVisualization->show();
 			editor->triangleVisualization->redraw();
 		}
-		SBAnimationState1D* state1d = dynamic_cast<SBAnimationState1D*>(currentState);
+		SBAnimationBlend1D* state1d = dynamic_cast<SBAnimationBlend1D*>(currentState);
 		if (state1d)
 		{
 			editor->choiceStateType->value(2);
@@ -337,13 +337,13 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 				editor->tetraVisualization = NULL;
 			}
 			std::vector<double> weights;
-			editor->stateData = new PAStateData(currentState, weights);
-			editor->triangleVisualization = new ParameterVisualization(false, editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->stateData, NULL);
+			editor->blendData = new PABlendData(currentState, weights);
+			editor->triangleVisualization = new ParameterVisualization(false, editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->blendData, NULL);
 			editor->visualizationGroup->add(editor->triangleVisualization);
 			editor->triangleVisualization->show();
 			editor->triangleVisualization->redraw();
 		}
-		SBAnimationState2D* state2d = dynamic_cast<SBAnimationState2D*>(currentState);
+		SBAnimationBlend2D* state2d = dynamic_cast<SBAnimationBlend2D*>(currentState);
 		if (state2d)
 		{
 			editor->choiceStateType->value(3);
@@ -362,13 +362,13 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 				editor->tetraVisualization = NULL;
 			}
 			std::vector<double> weights;
-			editor->stateData = new PAStateData(currentState, weights);
-			editor->triangleVisualization = new ParameterVisualization(false, editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->stateData, NULL);
+			editor->blendData = new PABlendData(currentState, weights);
+			editor->triangleVisualization = new ParameterVisualization(false, editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->blendData, NULL);
 			editor->visualizationGroup->add(editor->triangleVisualization);
 			editor->triangleVisualization->show();
 			editor->triangleVisualization->redraw();
 		}
-		SBAnimationState3D* state3d = dynamic_cast<SBAnimationState3D*>(currentState);
+		SBAnimationBlend3D* state3d = dynamic_cast<SBAnimationBlend3D*>(currentState);
 		if (state3d)
 		{
 			editor->choiceStateType->value(4);
@@ -387,8 +387,8 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 				editor->tetraVisualization = NULL;
 			}
 			std::vector<double> weights;
-			editor->stateData = new PAStateData(currentState, weights);
-			editor->tetraVisualization = new Parameter3DVisualization(editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->stateData, NULL);
+			editor->blendData = new PABlendData(currentState, weights);
+			editor->tetraVisualization = new Parameter3DVisualization(editor->visualizationGroup->x(), editor->visualizationGroup->y(), editor->visualizationGroup->w(), editor->visualizationGroup->h(), "triangle", editor->blendData, NULL);
 			editor->visualizationGroup->add(editor->tetraVisualization);
 			editor->tetraVisualization->show();
 			editor->tetraVisualization->redraw();
@@ -493,9 +493,9 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 	editor->paWindow->redraw();
 }
 
-void PAStateEditor::addFootStepMark(Fl_Widget* widget, void* data)
+void PABlendEditor::addFootStepMark(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 	if (!editor->autoFootStepsEditor)
 	{
 		editor->autoFootStepsEditor = new PAAutoFootStepsEditor(editor, editor->paWindow->x() + 50, editor->paWindow->y() + 50, 500, 600);
@@ -505,11 +505,11 @@ void PAStateEditor::addFootStepMark(Fl_Widget* widget, void* data)
 }
 
 
-void PAStateEditor::undoFootStepMark(Fl_Widget* widget, void* data)
+void PABlendEditor::undoFootStepMark(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;	
+	PABlendEditor* editor = (PABlendEditor*) data;	
 
-	PAState* currentState = editor->getCurrentState();
+	PABlend* currentState = editor->getCurrentState();
 
 	currentState->keys.clear();
 	currentState->keys.resize(currentState->getNumMotions());
@@ -523,17 +523,17 @@ void PAStateEditor::undoFootStepMark(Fl_Widget* widget, void* data)
 	editor->buttonUndoAutoFootSteps->deactivate();
 }
 
-void PAStateEditor::updateMaxTime(Fl_Widget* widget, void* data)
+void PABlendEditor::updateMaxTime(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 	editor->stateTimeMarkWidget->setViewableTimeEnd(atof(editor->maxTimeInput->value()));
 	editor->stateTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
 
-void PAStateEditor::updateMinTime(Fl_Widget* widget, void* data)
+void PABlendEditor::updateMinTime(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor* ) data;
+	PABlendEditor* editor = (PABlendEditor* ) data;
 	editor->stateTimeMarkWidget->setViewableTimeStart(atof(editor->minTimeInput->value()));
 	editor->stateTimeMarkWidget->setup();
 	editor->paWindow->redraw();
@@ -541,14 +541,14 @@ void PAStateEditor::updateMinTime(Fl_Widget* widget, void* data)
 
 
 
-void PAStateEditor::addStateTimeMark(Fl_Widget* widget, void* data)
+void PABlendEditor::addStateTimeMark(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 
 	// determine where to add the time marks
 	std::string stateName = editor->stateList->text();
 
-	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	if (!state)
 		return;
 	std::vector<double> localTimes = editor->stateTimeMarkWidget->getLocalTimes();
@@ -561,10 +561,10 @@ void PAStateEditor::addStateTimeMark(Fl_Widget* widget, void* data)
 		}
 	}
 
-	SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(state);
-	SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(state);
-	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(state);
-	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(state);
+	SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SmartBody::SBAnimationBlend0D*>(state);
+	SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SmartBody::SBAnimationBlend1D*>(state);
+	SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(state);
+	SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(state);
 
 	std::vector<std::string> motionNames;
 	for (int x = 0; x < state->getNumMotions(); x++)
@@ -583,14 +583,14 @@ void PAStateEditor::addStateTimeMark(Fl_Widget* widget, void* data)
 	editor->paWindow->redraw();
 }
 
-void PAStateEditor::removeStateTimeMark(Fl_Widget* widget, void* data)
+void PABlendEditor::removeStateTimeMark(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 
 	// determine where to add the time marks
 	std::string stateName = editor->stateList->text();
 
-	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	if (!state)
 		return;
 
@@ -628,14 +628,14 @@ void PAStateEditor::removeStateTimeMark(Fl_Widget* widget, void* data)
 	
 }
 
-void PAStateEditor::snapTimeMark(Fl_Widget* widget, void* data)
+void PABlendEditor::snapTimeMark(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 
 	// determine where to add the time marks
 	std::string stateName = editor->stateList->text();
 
-	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	if (!state)
 		return;
 
@@ -679,13 +679,13 @@ void PAStateEditor::snapTimeMark(Fl_Widget* widget, void* data)
 	}
 }
 
-void PAStateEditor::snapStartTimeMark(Fl_Widget* widget, void* data)
+void PABlendEditor::snapStartTimeMark(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 
 	std::string stateName = editor->stateList->text();
 
-	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	if (!state)
 		return;
 
@@ -729,13 +729,13 @@ void PAStateEditor::snapStartTimeMark(Fl_Widget* widget, void* data)
 	}
 }
 
-void PAStateEditor::snapEndTimeMark(Fl_Widget* widget, void* data)
+void PABlendEditor::snapEndTimeMark(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 
 	std::string stateName = editor->stateList->text();
 
-	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	if (!state)
 		return;
 
@@ -781,13 +781,13 @@ void PAStateEditor::snapEndTimeMark(Fl_Widget* widget, void* data)
 	}
 }
 
-void PAStateEditor::snapSliderTimeMark(Fl_Widget* widget, void* data)
+void PABlendEditor::snapSliderTimeMark(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 
 	std::string stateName = editor->stateList->text();
 
-	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	if (!state)
 		return;
 
@@ -831,9 +831,9 @@ void PAStateEditor::snapSliderTimeMark(Fl_Widget* widget, void* data)
 	}
 }
 
-void PAStateEditor::alignLeft(Fl_Widget* widget, void* data)
+void PABlendEditor::alignLeft(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 	
 	const std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
 	for (size_t i = 0; i < selectedMotions.size(); i++)
@@ -845,9 +845,9 @@ void PAStateEditor::alignLeft(Fl_Widget* widget, void* data)
 	editor->refreshAlign();
 }
 
-void PAStateEditor::alignRight(Fl_Widget* widget, void* data)
+void PABlendEditor::alignRight(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 
 	const std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
 	for (size_t i = 0; i < selectedMotions.size(); i++)
@@ -859,9 +859,9 @@ void PAStateEditor::alignRight(Fl_Widget* widget, void* data)
 	editor->refreshAlign();
 }
 
-void PAStateEditor::alignRecover(Fl_Widget* widget, void* data)
+void PABlendEditor::alignRecover(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 
 	const std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
 	for (size_t i = 0; i < selectedMotions.size(); i++)
@@ -873,9 +873,9 @@ void PAStateEditor::alignRecover(Fl_Widget* widget, void* data)
 	editor->refreshAlign();
 }
 
-void PAStateEditor::refreshAlign()
+void PABlendEditor::refreshAlign()
 {
-	PAState* currentState = getCurrentState();
+	PABlend* currentState = getCurrentState();
 	if (!currentState)
 		return;
 
@@ -900,7 +900,7 @@ void PAStateEditor::refreshAlign()
 	stateTimeMarkWidget->redraw();
 }
 
-void PAStateEditor::updateCorrespondenceMarks(PAState* state)
+void PABlendEditor::updateCorrespondenceMarks(PABlend* state)
 {
 	for (int i = 0; i < stateEditorNleModel->getNumTracks(); i++)
 	{
@@ -948,7 +948,7 @@ void PAStateEditor::updateCorrespondenceMarks(PAState* state)
 	}
 }
 
-void PAStateEditor::refresh()
+void PABlendEditor::refresh()
 {
 	int origStateValue = stateList->value();
 	stateEditorNleModel->removeAllTracks();
@@ -963,7 +963,7 @@ void PAStateEditor::refresh()
 	playmotion(this->buttonPlay, this);
 }
 
-std::vector<std::string> PAStateEditor::getSelectedMotions()
+std::vector<std::string> PABlendEditor::getSelectedMotions()
 {
 	std::vector<std::string> selectedMotions;
 
@@ -977,17 +977,17 @@ std::vector<std::string> PAStateEditor::getSelectedMotions()
 	return selectedMotions;
 }
 
-PAState* PAStateEditor::getCurrentState()
+PABlend* PABlendEditor::getCurrentState()
 {
 	std::string stateName = stateList->text();
-	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
+	SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	return state;
 }
 
 
-void PAStateEditor::save(Fl_Widget* widget, void* data)
+void PABlendEditor::save(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 
 	//std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
 	const char* stateFileName = fl_file_chooser("State file:", "*.py", NULL);
@@ -996,11 +996,11 @@ void PAStateEditor::save(Fl_Widget* widget, void* data)
 
 	std::string stateName = editor->stateList->text();
 
-	SmartBody::SBAnimationState* state = SmartBody::SBScene::getScene()->getStateManager()->getState(stateName);
-	SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(state);
-	SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(state);
-	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(state);
-	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(state);
+	SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
+	SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SmartBody::SBAnimationBlend0D*>(state);
+	SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SmartBody::SBAnimationBlend1D*>(state);
+	SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(state);
+	SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(state);
 
 	std::string stateNameVariable = "state" + stateName;
 	std::stringstream strstr;
@@ -1034,19 +1034,19 @@ void PAStateEditor::save(Fl_Widget* widget, void* data)
 		// add the motions
 		if (state0D)
 		{
-			strstr << stateNameVariable << " = stateManager.createState0D(\"" << stateName << "\")\n";		
+			strstr << stateNameVariable << " = stateManager.createBlend0D(\"" << stateName << "\")\n";		
 		}
 		if (state1D)
 		{
-			strstr << stateNameVariable << " = stateManager.createState1D(\"" << stateName << "\")\n";
+			strstr << stateNameVariable << " = stateManager.createBlend1D(\"" << stateName << "\")\n";
 		}
 		else if (state2D)
 		{
-			strstr << stateNameVariable << " = stateManager.createState2D(\"" << stateName << "\")\n";
+			strstr << stateNameVariable << " = stateManager.createBlend2D(\"" << stateName << "\")\n";
 		}
 		else if (state3D)
 		{
-			strstr << stateNameVariable << " = stateManager.createState3D(\"" << stateName << "\")\n";
+			strstr << stateNameVariable << " = stateManager.createBlend3D(\"" << stateName << "\")\n";
 		}
 
 		strstr << "\n";
@@ -1164,9 +1164,9 @@ void PAStateEditor::save(Fl_Widget* widget, void* data)
 	*/
 }
 
-void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
+void PABlendEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 
 	std::vector<std::string> selectedMotions;
 	std::vector<bool> boolSelectedMotions;
@@ -1182,15 +1182,15 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 	}
 
 	const char* stateText = editor->stateList->text();
-	PAState* currentState = NULL;
-	currentState = mcuCBHandle::singleton().lookUpPAState(stateText);
+	PABlend* currentState = NULL;
+	currentState = mcuCBHandle::singleton().lookUpPABlend(stateText);
 	if (!currentState)
 		return;
 
-	SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(currentState);
-	SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(currentState);
-	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(currentState);
-	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(currentState);
+	SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SmartBody::SBAnimationBlend0D*>(currentState);
+	SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SmartBody::SBAnimationBlend1D*>(currentState);
+	SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(currentState);
+	SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(currentState);
 
 	bool needsRedraw = false;
 	int numTracks = editor->stateTimeMarkWidget->getModel()->getNumTracks();
@@ -1237,10 +1237,10 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 				{
 					weights[lastMotionIndex] = 1.;
 				}
-				PAStateData stateData(currentState, weights);
-				stateData.timeManager->updateWeights();
-				std::vector<double> times(stateData.state->getNumMotions());
-				stateData.timeManager->getParallelTimes(localTime, times);
+				PABlendData blendData(currentState, weights);
+				blendData.timeManager->updateWeights();
+				std::vector<double> times(blendData.state->getNumMotions());
+				blendData.timeManager->getParallelTimes(localTime, times);
 				editor->stateTimeMarkWidget->setLocalTimes(times);
 
 				
@@ -1383,12 +1383,12 @@ void PAStateEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 	}
 }
 
-void PAStateEditor::addShape(Fl_Widget* widget, void* data)
+void PABlendEditor::addShape(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 	const char* stateText = editor->stateList->text();
-	PAState* currentState = NULL;
-	currentState = mcuCBHandle::singleton().lookUpPAState(stateText);
+	PABlend* currentState = NULL;
+	currentState = mcuCBHandle::singleton().lookUpPABlend(stateText);
 	if (!currentState)
 		return;
 
@@ -1401,8 +1401,8 @@ void PAStateEditor::addShape(Fl_Widget* widget, void* data)
 		}
 	}
 
-	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(currentState);
-	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(currentState);
+	SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(currentState);
+	SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(currentState);
 	if (state2D && selectedMotions.size() == 3)
 	{
 		state2D->addTriangle(selectedMotions[0], selectedMotions[1], selectedMotions[2]);
@@ -1414,12 +1414,12 @@ void PAStateEditor::addShape(Fl_Widget* widget, void* data)
 	editor->refresh();
 }
 
-void PAStateEditor::removeShape(Fl_Widget* widget, void* data)
+void PABlendEditor::removeShape(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 	const char* stateText = editor->stateList->text();
-	PAState* currentState = NULL;
-	currentState = mcuCBHandle::singleton().lookUpPAState(stateText);
+	PABlend* currentState = NULL;
+	currentState = mcuCBHandle::singleton().lookUpPABlend(stateText);
 	if (!currentState)
 		return;
 
@@ -1439,8 +1439,8 @@ void PAStateEditor::removeShape(Fl_Widget* widget, void* data)
 		// remove from state
 		std::vector<std::string> motions;
 		vhcl::Tokenize(selectedShapes[i], motions, "|");		
-		SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(currentState);
-		SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(currentState);
+		SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(currentState);
+		SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(currentState);
 		if (state2D && motions.size() == 3)
 		{
 			state2D->removeTriangle(motions[0], motions[1], motions[2]);
@@ -1453,9 +1453,9 @@ void PAStateEditor::removeShape(Fl_Widget* widget, void* data)
 	editor->refresh();
 }
 
-void PAStateEditor::selectShape(Fl_Widget* widget, void* data)
+void PABlendEditor::selectShape(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 	std::vector<std::string> selectedShapes;
 	std::vector<bool> highlightShapes;
 	for (int i = 0; i < editor->shapeList->size(); i++)
@@ -1486,19 +1486,19 @@ void PAStateEditor::selectShape(Fl_Widget* widget, void* data)
 		editor->tetraVisualization->setSelectedTetrahedrons(highlightShapes);
 }
 
-void PAStateEditor::updateParameters(Fl_Widget* widget, void* data)
+void PABlendEditor::updateParameters(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 	const std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
-	PAState* currentState = editor->getCurrentState();
+	PABlend* currentState = editor->getCurrentState();
 	if (!currentState)
 		return;
 
 
-	SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(currentState);
-	SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(currentState);
-	SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(currentState);
-	SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(currentState);
+	SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SmartBody::SBAnimationBlend0D*>(currentState);
+	SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SmartBody::SBAnimationBlend1D*>(currentState);
+	SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(currentState);
+	SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(currentState);
 	
 	if (state0D)
 	{
@@ -1520,9 +1520,9 @@ void PAStateEditor::updateParameters(Fl_Widget* widget, void* data)
 	}
 }
 
-void PAStateEditor::editParameterCb(Fl_Widget* widget, void* data)
+void PABlendEditor::editParameterCb(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 	if (!editor->parameterEditor)
 	{
 		editor->parameterEditor = new PAParameterEditor(editor, editor->paWindow->x() + 50, editor->paWindow->y() + 50, 300, 300);
@@ -1530,16 +1530,16 @@ void PAStateEditor::editParameterCb(Fl_Widget* widget, void* data)
 	editor->parameterEditor->show();	
 }
 
-void PAStateEditor::scrub(Fl_Widget* widget, void* data)
+void PABlendEditor::scrub(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 	const std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
 
 	if (selectedMotions.size() == 1)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		std::string currentStateName = editor->stateList->menu()[editor->stateList->value()].label();
-		PAState* currentState = mcu.lookUpPAState(currentStateName);
+		PABlend* currentState = mcu.lookUpPABlend(currentStateName);
 		int lastMotionIndex = currentState->getMotionId(editor->lastSelectedMotion);
 		double curTime = editor->sliderScrub->value();
 		double localTime = currentState->getLocalTime(curTime, lastMotionIndex);
@@ -1552,10 +1552,10 @@ void PAStateEditor::scrub(Fl_Widget* widget, void* data)
 		{
 			weights[lastMotionIndex] = 1.;
 		}
-		PAStateData stateData(currentState, weights);
-		stateData.timeManager->updateWeights();
-		std::vector<double> times(stateData.state->getNumMotions());
-		stateData.timeManager->getParallelTimes(localTime, times);
+		PABlendData blendData(currentState, weights);
+		blendData.timeManager->updateWeights();
+		std::vector<double> times(blendData.state->getNumMotions());
+		blendData.timeManager->getParallelTimes(localTime, times);
 		editor->stateTimeMarkWidget->setLocalTimes(times);
 
 		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[0]);
@@ -1572,7 +1572,7 @@ void PAStateEditor::scrub(Fl_Widget* widget, void* data)
 }
 
 
-void PAStateEditor::updateMotionPlayer(double t)
+void PABlendEditor::updateMotionPlayer(double t)
 {
 	const std::vector<std::string>& selectedMotions = getSelectedMotions();
 
@@ -1590,11 +1590,11 @@ void PAStateEditor::updateMotionPlayer(double t)
 	}
 }
 
-void PAStateEditor::playmotion(Fl_Widget* widget, void* data)
+void PABlendEditor::playmotion(Fl_Widget* widget, void* data)
 {
-	PAStateEditor* editor = (PAStateEditor*) data;
+	PABlendEditor* editor = (PABlendEditor*) data;
 
-	PAStateEditor::selectStateAnimations(widget, data);
+	PABlendEditor::selectStateAnimations(widget, data);
 
 	std::string charName = editor->paWindow->characterList->menu()[editor->paWindow->characterList->value()].label();
 

@@ -1615,10 +1615,10 @@ void FltkViewer::translate_keyboard_state()
 	}
 
 	//direction control
-	PAStateData* stateData = NULL;
+	PABlendData* blendData = NULL;
 	if (_paLocoData->character && _paLocoData->character->param_animation_ct)
 		if (_paLocoData->character->param_animation_ct)
-			stateData = _paLocoData->character->param_animation_ct->getCurrentPAStateData();
+			blendData = _paLocoData->character->param_animation_ct->getCurrentPABlendData();
 
 #ifdef OLD_LOCOMOTION_CONTROL
 	if(Fl::event_key(FL_Up))
@@ -4525,15 +4525,15 @@ void PALocomotionData::updateKeys(float dt)
 	std::string locoStateName = getLocomotionStateName();
 	if (locoStateName == "")
 		return;
-	PAStateData* stateData = NULL;
+	PABlendData* blendData = NULL;
 	if (character && character->param_animation_ct)
 		if (character->param_animation_ct)
-			stateData = character->param_animation_ct->getCurrentPAStateData();	
+			blendData = character->param_animation_ct->getCurrentPABlendData();	
 
-	if (!stateData) return;
+	if (!blendData) return;
 	float unitScale = 1.f/SmartBody::SBScene::getScene()->getScale();
 	float scale = 0.05f;
-	if (stateData->state->stateName == locoStateName)
+	if (blendData->state->stateName == locoStateName)
 		scale = 1.f;
 	
 	float linearAcc = 1.f*scale*unitScale;
@@ -4654,11 +4654,11 @@ void PALocomotionData::updateKeys(float dt)
 	float speedEps = 0.001f*unitScale;	
 	float angleEps = 0.01f;
 	if ( (fabs(v) > 0 || fabs(w) > 0 || fabs(s)) && 
-		stateData->state->stateName == PseudoIdleState && !starting)
+		blendData->state->stateName == PseudoIdleState && !starting)
 	{
 		std::string locomotionStateName =  getLocomotionStateName();
 		std::stringstream command1;			
-		PAState* locoState = mcu.lookUpPAState(locomotionStateName);
+		PABlend* locoState = mcu.lookUpPABlend(locomotionStateName);
 		if (!locoState)
 			return;
 		std::vector<double> weights;
@@ -4675,14 +4675,14 @@ void PALocomotionData::updateKeys(float dt)
 	else if (fabs(v) < speedEps && 
 		     fabs(w) < angleEps && 
 			 fabs(s) < speedEps && 
-			 stateData->state->stateName == locoStateName && 
+			 blendData->state->stateName == locoStateName && 
 			 !stopping)
 	{	
 		//LOG("stop, v = %f, w = %f, s = %f",v,w,s);
 		v = w = 0;
 		std::vector<double> weights;
-		weights.resize(stateData->state->getNumMotions());
-		bool success = stateData->state->getWeightsFromParameters(0,0,0, weights);
+		weights.resize(blendData->state->getNumMotions());
+		bool success = blendData->state->getWeightsFromParameters(0,0,0, weights);
 		std::stringstream command;
 		command << "panim schedule char " << character->getName() << " state " << "null" << " loop true playnow true additive false joint null ";
 		
@@ -4695,8 +4695,8 @@ void PALocomotionData::updateKeys(float dt)
 	else // update moving parameter
 	{		
 		std::vector<double> weights;
-		weights.resize(stateData->state->getNumMotions());
-		bool success = stateData->state->getWeightsFromParameters(v, w, s, weights);		
+		weights.resize(blendData->state->getNumMotions());
+		bool success = blendData->state->getWeightsFromParameters(v, w, s, weights);		
  		character->param_animation_ct->updateWeights(weights);
 	}	
 		

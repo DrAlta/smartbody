@@ -6,11 +6,11 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Choice.H>
 
-class PAStateEditor;
+class PABlendEditor;
 class PAParameterEditor : public Fl_Window
 {
 public:
-	PAParameterEditor(PAStateEditor* editor, int x, int y, int w, int h);
+	PAParameterEditor(PABlendEditor* editor, int x, int y, int w, int h);
 	~PAParameterEditor();
 
 	static void changeParameter(Fl_Widget* widget, void* data);	
@@ -23,7 +23,7 @@ public:
 	Fl_Choice*		inputJoint;
 	Fl_Choice*		choiceAxis;
 	Fl_Input*		stateName;
-	PAStateEditor*	stateEditor;
+	PABlendEditor*	stateEditor;
 	Fl_Button*		buttonConfirm;
 	Fl_Button*		buttonCancel;
 

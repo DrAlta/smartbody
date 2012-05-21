@@ -157,7 +157,7 @@ void ParamAnimEditorWidget::changeTrackSelectionEvent(nle::Track* track)
 	// select the motions associated with this track change
 	bool isTrackSelected = track->isSelected();
 	std::string trackName = track->getName();
-	PAStateEditor* stateEditor = dynamic_cast<PAStateEditor*>(parentGroup);
+	PABlendEditor* stateEditor = dynamic_cast<PABlendEditor*>(parentGroup);
 	int numItems = stateEditor->stateAnimationList->size();
 	bool changed = false;
 	for (int i = 0; i < numItems; i++)
@@ -207,11 +207,11 @@ void ParamAnimEditorWidget::releaseMarkEvent(nle::Mark* mark)
 	int trackIndex = model->getTrackIndex(track);
 	int markIndex = block->getMarkIndex(cMark);
 	// update that correspondance point on the state
-	PAStateEditor* stateEditor = dynamic_cast<PAStateEditor*>(parentGroup);
+	PABlendEditor* stateEditor = dynamic_cast<PABlendEditor*>(parentGroup);
 	if (stateEditor)
 	{
 		std::string currentStateName = stateEditor->stateList->menu()[stateEditor->stateList->value()].label();
-		SmartBody::SBAnimationState* currentState = SmartBody::SBScene::getScene()->getStateManager()->getState(currentStateName);
+		SmartBody::SBAnimationBlend* currentState = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(currentStateName);
 		if (currentState)
 		{
 			currentState->setCorrespondencePoints(trackIndex, markIndex, cMark->getStartTime());
@@ -260,10 +260,10 @@ void ParamAnimEditorWidget::setup()
 
 int ParamAnimEditorWidget::handle(int event)
 {
-	PAStateEditor* stateEditor = dynamic_cast<PAStateEditor*>(parentGroup);
+	PABlendEditor* stateEditor = dynamic_cast<PABlendEditor*>(parentGroup);
 	if (stateEditor)
 	{
-		PAState* currentState = stateEditor->getCurrentState();
+		PABlend* currentState = stateEditor->getCurrentState();
 		const std::vector<std::string>& selectedMotions = stateEditor->getSelectedMotions();
 		if (selectedMotions.size() == 1)
 		{

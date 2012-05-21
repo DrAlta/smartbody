@@ -33,7 +33,7 @@
 
 const double changeLimit = 20;
 
-PAState::PAState()
+PABlend::PABlend()
 {
 	stateName = "unknown";
 	parameterScale.x = 1.0f;
@@ -41,7 +41,7 @@ PAState::PAState()
 	parameterScale.z = 1.0f;
 }
 
-PAState::PAState(PAState* data)
+PABlend::PABlend(PABlend* data)
 {
 	stateName = data->stateName;
 	for (unsigned int i = 0; i < data->motions.size(); i++)
@@ -76,7 +76,7 @@ PAState::PAState(PAState* data)
 }
 
 
-PAState::PAState(const std::string& name)
+PABlend::PABlend(const std::string& name)
 {
 	stateName = name;
 	cycle = false;
@@ -86,7 +86,7 @@ PAState::PAState(const std::string& name)
 	parameterScale.z = 1.0f;
 }
 
-PAState::~PAState()
+PABlend::~PABlend()
 {
 	for (unsigned int i = 0; i < motions.size(); i++)
 	{
@@ -96,12 +96,12 @@ PAState::~PAState()
 }
 
 
-int PAState::getNumMotions()
+int PABlend::getNumMotions()
 {
 	return motions.size();
 }
 
-int PAState::getNumKeys()
+int PABlend::getNumKeys()
 {
 	if (getNumMotions() > 0)
 		return keys[0].size();
@@ -109,7 +109,7 @@ int PAState::getNumKeys()
 		return 0;
 }
 
-int PAState::getMotionId(const std::string& motion)
+int PABlend::getMotionId(const std::string& motion)
 {
 	for (int i = 0; i < getNumMotions(); i++)
 	{
@@ -117,7 +117,7 @@ int PAState::getMotionId(const std::string& motion)
 		if (motion == mName)
 			return i;
 	}
-	LOG("PAState::getMotionId Warning: cannot get motion with name %s", motion.c_str());
+	LOG("PABlend::getMotionId Warning: cannot get motion with name %s", motion.c_str());
 	return -1;
 }
 
@@ -126,7 +126,7 @@ PATransition::PATransition()
 {
 }
 
-PATransition::PATransition(PATransition* data, PAState* from, PAState* to)
+PATransition::PATransition(PATransition* data, PABlend* from, PABlend* to)
 {
 	this->fromState = from;
 	this->toState = to;
@@ -151,7 +151,7 @@ int PATransition::getNumEaseOut()
 	return easeOutStart.size();
 }
 
-bool PAState::getWeightsFromParameters(double x, std::vector<double>& weights)
+bool PABlend::getWeightsFromParameters(double x, std::vector<double>& weights)
 {
 	if (type != 0)
 		return false;
@@ -231,7 +231,7 @@ bool PAState::getWeightsFromParameters(double x, std::vector<double>& weights)
 	return true;
 }
 
-bool PAState::getWeightsFromParameters(double x, double y, std::vector<double>& weights)
+bool PABlend::getWeightsFromParameters(double x, double y, std::vector<double>& weights)
 {
 	if (type != 1)
 		return false;
@@ -318,7 +318,7 @@ bool PAState::getWeightsFromParameters(double x, double y, std::vector<double>& 
 	return true;
 }
 
-bool PAState::getWeightsFromParameters(double x, double y, double z, std::vector<double>& weights)
+bool PABlend::getWeightsFromParameters(double x, double y, double z, std::vector<double>& weights)
 {
 	if (type != 2)
 		return false;
@@ -466,7 +466,7 @@ bool PAState::getWeightsFromParameters(double x, double y, double z, std::vector
 	return false;
 }
 
-void PAState::getParametersFromWeights(float& x, std::vector<double>& weights)
+void PABlend::getParametersFromWeights(float& x, std::vector<double>& weights)
 {
 	x = 0.0f;
 	for (int i = 0; i < getNumParameters(); i++)
@@ -476,7 +476,7 @@ void PAState::getParametersFromWeights(float& x, std::vector<double>& weights)
 	}
 }
 
-void PAState::getParametersFromWeights(float& x, float& y, std::vector<double>& weights)
+void PABlend::getParametersFromWeights(float& x, float& y, std::vector<double>& weights)
 {
 	std::vector<int> indices;
 	for (int i = 0; i < getNumMotions(); i++)
@@ -516,7 +516,7 @@ void PAState::getParametersFromWeights(float& x, float& y, std::vector<double>& 
 	}
 }
 
-void PAState::getParametersFromWeights(float& x, float& y, float& z, std::vector<double>& weights)
+void PABlend::getParametersFromWeights(float& x, float& y, float& z, std::vector<double>& weights)
 {
 	std::vector<int> indices;
 	for (int i = 0; i < getNumMotions(); i++)
@@ -558,7 +558,7 @@ void PAState::getParametersFromWeights(float& x, float& y, float& z, std::vector
 	}
 }
 
-void PAState::updateParameterScale()
+void PABlend::updateParameterScale()
 {
 	float xMin = 9999.0f;
 	float xMax = -9999.0f;
@@ -608,7 +608,7 @@ void PAState::updateParameterScale()
 		invParameterScale.z = 1.f / parameterScale.z;
 }
 
-void PAState::setParameter(const std::string& motion, double x)
+void PABlend::setParameter(const std::string& motion, double x)
 {
 	type = 0;
 	SrVec vec;
@@ -629,7 +629,7 @@ void PAState::setParameter(const std::string& motion, double x)
 	updateParameterScale();
 }
 
-void PAState::setParameter(const std::string& motion, double x, double y)
+void PABlend::setParameter(const std::string& motion, double x, double y)
 {
 	type = 1;
 	SrVec vec;
@@ -651,7 +651,7 @@ void PAState::setParameter(const std::string& motion, double x, double y)
 	updateParameterScale();
 }
 
-void PAState::setParameter(const std::string& motion, double x, double y, double z)
+void PABlend::setParameter(const std::string& motion, double x, double y, double z)
 {
 	type = 2;
 	SrVec vec;
@@ -675,7 +675,7 @@ void PAState::setParameter(const std::string& motion, double x, double y, double
 	updateParameterScale();
 }
 
-void PAState::getParameter(const std::string& motion, double& x)
+void PABlend::getParameter(const std::string& motion, double& x)
 {
 	type = 0;
 	SrVec vec;
@@ -690,7 +690,7 @@ void PAState::getParameter(const std::string& motion, double& x)
 	}
 }
 
-void PAState::getParameter(const std::string& motion, double& x, double& y)
+void PABlend::getParameter(const std::string& motion, double& x, double& y)
 {
 	type = 1;
 	SrVec vec;
@@ -707,7 +707,7 @@ void PAState::getParameter(const std::string& motion, double& x, double& y)
 	}
 }
 
-void PAState::getParameter(const std::string& motion, double& x, double& y, double& z)
+void PABlend::getParameter(const std::string& motion, double& x, double& y, double& z)
 {
 	type = 2;
 	SrVec vec;
@@ -726,7 +726,7 @@ void PAState::getParameter(const std::string& motion, double& x, double& y, doub
 	}
 }
 
-void PAState::removeParameter(const std::string& motion)
+void PABlend::removeParameter(const std::string& motion)
 {
 	for (size_t i = 0; i < motions.size(); i++)
 	{
@@ -740,11 +740,11 @@ void PAState::removeParameter(const std::string& motion)
 }
 
 
-void PAState::addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
+void PABlend::addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
 {
 	if (getTriangleIndex(motion1, motion2, motion3) >= 0)
 	{
-		LOG("PAState::addTriangle ERR: triangle with motion %s, %s, %s already exist!", motion1.c_str(), motion2.c_str(), motion3.c_str());
+		LOG("PABlend::addTriangle ERR: triangle with motion %s, %s, %s already exist!", motion1.c_str(), motion2.c_str(), motion3.c_str());
 		return;
 	}
 
@@ -760,7 +760,7 @@ void PAState::addTriangle(const std::string& motion1, const std::string& motion2
 	triangles.push_back(tInfo);
 }
 
-int PAState::getTriangleIndex(const std::string& motion1, const std::string& motion2, const std::string& motion3)
+int PABlend::getTriangleIndex(const std::string& motion1, const std::string& motion2, const std::string& motion3)
 {
 	for (size_t i = 0; i < triangles.size(); i++)
 	{
@@ -792,7 +792,7 @@ int PAState::getTriangleIndex(const std::string& motion1, const std::string& mot
 	return -1;
 }
 
-void PAState::removeTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
+void PABlend::removeTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
 {
 	int id = getTriangleIndex(motion1, motion2, motion3);
 	if (id >= 0)
@@ -800,7 +800,7 @@ void PAState::removeTriangle(const std::string& motion1, const std::string& moti
 }
 
 
-void PAState::removeTriangles(const std::string& motion)
+void PABlend::removeTriangles(const std::string& motion)
 {
 	// what is a good way to reconstruct triangles?
 
@@ -817,11 +817,11 @@ void PAState::removeTriangles(const std::string& motion)
 	}
 }
 
-void PAState::addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
+void PABlend::addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
 {
 	if (getTetrahedronIndex(motion1, motion2, motion3, motion4) >= 0)
 	{
-		LOG("PAState::addTetrahedron ERR: triangle with motion %s, %s, %s, %s already exist!", motion1.c_str(), motion2.c_str(), motion3.c_str(), motion4.c_str());
+		LOG("PABlend::addTetrahedron ERR: triangle with motion %s, %s, %s, %s already exist!", motion1.c_str(), motion2.c_str(), motion3.c_str(), motion4.c_str());
 		return;
 	}
 
@@ -838,7 +838,7 @@ void PAState::addTetrahedron(const std::string& motion1, const std::string& moti
 	tetrahedrons.push_back(tetraInfo);
 }
 
-int PAState::getTetrahedronIndex(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
+int PABlend::getTetrahedronIndex(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
 {
 	for (size_t i = 0; i < tetrahedrons.size(); i++)
 	{
@@ -872,14 +872,14 @@ int PAState::getTetrahedronIndex(const std::string& motion1, const std::string& 
 	return -1;
 }
 
-void PAState::removeTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
+void PABlend::removeTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
 {
 	int id = getTetrahedronIndex(motion1, motion2, motion3, motion4);
 	if (id >= 0)
 		tetrahedrons.erase(tetrahedrons.begin() + id);
 }
 
-void PAState::removeTetrahedrons(const std::string& motion)
+void PABlend::removeTetrahedrons(const std::string& motion)
 {
 	// what is a good way to reconstruct tetrahedrons?
 
@@ -897,7 +897,7 @@ void PAState::removeTetrahedrons(const std::string& motion)
 	}	
 }
 
-void PAState::buildTetrahedron()
+void PABlend::buildTetrahedron()
 {
 #if USE_TETGEN
 	tetgenio ptIn, tetOut;
@@ -926,22 +926,22 @@ void PAState::buildTetrahedron()
 #endif
 }
 
-int PAState::getType()
+int PABlend::getType()
 {
 	return type;
 }
 
-void PAState::setType(int typ)
+void PABlend::setType(int typ)
 {
 	type = typ;
 }
 
-int PAState::getNumParameters()
+int PABlend::getNumParameters()
 {
 	return parameters.size();
 }
 
-int PAState::getMinVecX()
+int PABlend::getMinVecX()
 {
 	float min = 9999;
 	int ret = -1;
@@ -956,7 +956,7 @@ int PAState::getMinVecX()
 	return ret;
 }
 
-int PAState::getMinVecY()
+int PABlend::getMinVecY()
 {
 	float min = 9999;
 	int ret = -1;
@@ -971,7 +971,7 @@ int PAState::getMinVecY()
 	return ret;
 }
 
-int PAState::getMinVecZ()
+int PABlend::getMinVecZ()
 {
 	float min = 9999;
 	int ret = -1;
@@ -987,7 +987,7 @@ int PAState::getMinVecZ()
 }
 
 
-int PAState::getMaxVecX()
+int PABlend::getMaxVecX()
 {
 	float max = -9999;
 	int ret = -1;
@@ -1002,7 +1002,7 @@ int PAState::getMaxVecX()
 	return ret;
 }
 
-int PAState::getMaxVecY()
+int PABlend::getMaxVecY()
 {
 	float max = -9999;
 	int ret = -1;
@@ -1017,7 +1017,7 @@ int PAState::getMaxVecY()
 	return ret;
 }
 
-int PAState::getMaxVecZ()
+int PABlend::getMaxVecZ()
 {
 	float max = -9999;
 	int ret = -1;
@@ -1032,7 +1032,7 @@ int PAState::getMaxVecZ()
 	return ret;
 }
 
-SrVec PAState::getVec(const std::string& motion)
+SrVec PABlend::getVec(const std::string& motion)
 {
 	if (motions.size() < (size_t) getNumParameters())
 		return SrVec();
@@ -1044,14 +1044,14 @@ SrVec PAState::getVec(const std::string& motion)
 	return SrVec();
 }
 
-SrVec PAState::getVec(int id)
+SrVec PABlend::getVec(int id)
 {
 	if (id < 0 || id > getNumParameters())
 		return SrVec();
 	return parameters[id];
 }
 
-const std::string& PAState::getMotionName(int id)
+const std::string& PABlend::getMotionName(int id)
 {
 	if (id < 0 || id > getNumParameters())
 		return emptyString;
@@ -1059,17 +1059,17 @@ const std::string& PAState::getMotionName(int id)
 	return motions[id]->getName();	
 }
 
-int PAState::getNumTriangles()
+int PABlend::getNumTriangles()
 {
 	return triangles.size();
 }
 
-SrTriangle& PAState::getTriangle(int id)
+SrTriangle& PABlend::getTriangle(int id)
 {
 	return triangles[id].triangle;
 }
 
-float PAState::getMinimumDist(SrVec& c, SrVec& a, SrVec& b, SrVec& minimumPt)
+float PABlend::getMinimumDist(SrVec& c, SrVec& a, SrVec& b, SrVec& minimumPt)
 {
 	SrVec ab = b - a;
 	SrVec ac = c - a;
@@ -1090,7 +1090,7 @@ float PAState::getMinimumDist(SrVec& c, SrVec& a, SrVec& b, SrVec& minimumPt)
 	return dist(c, minimumPt);
 }
 
-bool PAState::insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3)
+bool PABlend::insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3)
 {
 	SrVec ptToV1 = v1 - pt;
 	SrVec ptToV2 = v2 - pt;
@@ -1107,7 +1107,7 @@ bool PAState::insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3)
 		return false;
 }
 
-void PAState::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, double& w2, double& w3)
+void PABlend::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, double& w2, double& w3)
 {
 	SrVec ptToV1 = v1 - pt;
 	SrVec ptToV2 = v2 - pt;
@@ -1134,7 +1134,7 @@ void PAState::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, 
 	}
 }
 
-void PAState::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrVec& v4, double& w1, double& w2, double& w3, double& w4)
+void PABlend::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrVec& v4, double& w1, double& w2, double& w3, double& w4)
 {
 	dMatrix mat(3, 3);
 	mat(0, 0) = v1.x - v4.x;
@@ -1169,7 +1169,7 @@ void PAState::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrVec& v4, d
 }
 
 
-SrVec PAState::closestPtPointTriangle(SrVec& p, SrVec& a, SrVec& b, SrVec& c)
+SrVec PABlend::closestPtPointTriangle(SrVec& p, SrVec& a, SrVec& b, SrVec& c)
 {
 	SrVec ab = b - a;
 	SrVec ac = c - a;
@@ -1215,12 +1215,12 @@ SrVec PAState::closestPtPointTriangle(SrVec& p, SrVec& a, SrVec& b, SrVec& c)
 	return a + ab * v + ac * w;
 }
 
-int PAState::PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c)
+int PABlend::PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c)
 {
 	return dot(p - a, cross(b - a, c - a)) >= 0.0f;
 }
 
-SrVec PAState::vecMultiply(SrVec& vec1, SrVec& vec2)
+SrVec PABlend::vecMultiply(SrVec& vec1, SrVec& vec2)
 {
 	SrVec retVec;
 	retVec.x = vec1.x * vec2.x;
@@ -1229,7 +1229,7 @@ SrVec PAState::vecMultiply(SrVec& vec1, SrVec& vec2)
 	return retVec;
 }
 
-double PAState::getLocalTime(double motionTime, int motionIndex)
+double PABlend::getLocalTime(double motionTime, int motionIndex)
 {
 	if (keys.size() <= (size_t) motionIndex)
 	{
@@ -1247,7 +1247,7 @@ double PAState::getLocalTime(double motionTime, int motionIndex)
 	return localTime;
 }
 
-double PAState::getMotionTime(double localTime, int motionIndex)
+double PABlend::getMotionTime(double localTime, int motionIndex)
 {
 	if (keys.size() <= (size_t) motionIndex)
 	{
@@ -1274,12 +1274,12 @@ const bool ascendingTime2(std::pair<SmartBody::MotionEvent*, int>* a, std::pair<
 	return (a->first->getTime() < b->first->getTime());
 }
 
-std::vector<std::pair<SmartBody::MotionEvent*, int> >& PAState::getEvents()
+std::vector<std::pair<SmartBody::MotionEvent*, int> >& PABlend::getEvents()
 {
 	return _events;
 }
 
-void PAState::addEventToMotion(const std::string& motion, SmartBody::MotionEvent* motionEvent)
+void PABlend::addEventToMotion(const std::string& motion, SmartBody::MotionEvent* motionEvent)
 {
 	// determine the motion index
 	int index = getMotionId(motion);

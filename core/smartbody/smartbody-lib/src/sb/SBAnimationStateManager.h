@@ -12,11 +12,11 @@
 
 namespace SmartBody {
 
-class SBAnimationState;
-class SBAnimationState0D;
-class SBAnimationState1D;
-class SBAnimationState2D;
-class SBAnimationState3D;
+class SBAnimationBlend;
+class SBAnimationBlend0D;
+class SBAnimationBlend1D;
+class SBAnimationBlend2D;
+class SBAnimationBlend3D;
 
 class SBAnimationTransition;
 
@@ -24,34 +24,34 @@ typedef boost::property<boost::vertex_name_t,std::string> StateVertexProperty;
 typedef boost::labeled_graph<boost::adjacency_list<boost::listS,boost::listS, boost::directedS, StateVertexProperty>,std::string> BoostGraph;
 
 
-class SBAnimationStateManager
+class SBAnimationBlendManager
 {
 	protected:
 		BoostGraph stateGraph;		
 	public:
-		SBAnimationStateManager();
-		~SBAnimationStateManager();
+		SBAnimationBlendManager();
+		~SBAnimationBlendManager();
 
-		SBAnimationState0D* createState0D(const std::string& name);
-		SBAnimationState1D* createState1D(const std::string& name);
-		SBAnimationState2D* createState2D(const std::string& name);
-		SBAnimationState3D* createState3D(const std::string& name);
+		SBAnimationBlend0D* createBlend0D(const std::string& name);
+		SBAnimationBlend1D* createBlend1D(const std::string& name);
+		SBAnimationBlend2D* createBlend2D(const std::string& name);
+		SBAnimationBlend3D* createBlend3D(const std::string& name);
 		SBAnimationTransition* createTransition(const std::string& source, const std::string& dest);
 
-		SBAnimationState* getState(const std::string&name);
-		int getNumStates();
-		std::vector<std::string> getStateNames();
+		SBAnimationBlend* getBlend(const std::string&name);
+		int getNumBlends();
+		std::vector<std::string> getBlendNames();
 
 		SBAnimationTransition* getTransition(const std::string& source, const std::string& dest);
 		int getNumTransitions();
 		std::vector<std::string> getTransitionNames();
 
-		std::string getCurrentState(const std::string& characterName);
-		SrVec getCurrentStateParameters(const std::string& characterName);
-		std::vector<std::string> getAutoStateTransitions(const std::string& characterName, const std::string& targetState);
-		bool isStateScheduled(const std::string& characterName, const std::string& stateName);
+		std::string getCurrentBlend(const std::string& characterName);
+		SrVec getCurrentBlendParameters(const std::string& characterName);
+		std::vector<std::string> getAutoBlendTransitions(const std::string& characterName, const std::string& targetBlend);
+		bool isBlendScheduled(const std::string& characterName, const std::string& blendName);
 protected:
-		bool addStateToGraph(const std::string& name);
+		bool addBlendToGraph(const std::string& name);
 		bool addTransitionEdgeToGraph(const std::string& source, const std::string& dest);
 };
 }

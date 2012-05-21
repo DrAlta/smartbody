@@ -1077,13 +1077,13 @@ void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, mcuCBHa
 
 		// error check: 1 - state name not empty 2 - state does exist 3 - it's a 3D state(x: tilt right y: tilt forward z: duration) 4 - it has 4 corresponding points (start stroke relax end)
 		// TODO: Add more flexibility later
-		PAState* state = mcu->lookUpPAState(stateName);
+		PABlend* state = mcu->lookUpPABlend(stateName);
 		if (!state)
 		{
 			LOG("ParameterizedAnimationRequest::realize_impl ERR: Can't find state name %s", stateName.c_str());
 			return;
 		}
-		SBAnimationState3D* state3D = dynamic_cast<SBAnimationState3D*> (state);
+		SBAnimationBlend3D* state3D = dynamic_cast<SBAnimationBlend3D*> (state);
 		if (!state3D)
 		{
 			LOG("ParameterizedAnimationRequest::realize_impl ERR: state %s is not a 3D state.", stateName.c_str());
@@ -1120,9 +1120,9 @@ void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, mcuCBHa
 				z = 0;
 
 			state3D->getWeightsFromParameters(x, y, z, weights);
-			PAStateData* stateData = new PAStateData(state, weights);
-			stateData->timeManager->updateWeights();
-			std::vector<double> blendedKey = stateData->timeManager->getKey();
+			PABlendData* blendData = new PABlendData(state, weights);
+			blendData->timeManager->updateWeights();
+			std::vector<double> blendedKey = blendData->timeManager->getKey();
 			startTime = relaxTime - (blendedKey[2] - blendedKey[0]);
 			if (startTime < 0)
 			{
@@ -1134,7 +1134,7 @@ void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, mcuCBHa
 		// get partial joint name (mainly skullbase or spine4) Hack for now
 		std::string jointName = "spine4";	
 		// schedule the state
-		paramAnimCt->schedule(state, x, y, z, PAStateData::Once, PAStateData::Now, PAStateData::Additive, jointName, startTime);			
+		paramAnimCt->schedule(state, x, y, z, PABlendData::Once, PABlendData::Now, PABlendData::Additive, jointName, startTime);			
 	}
 }
 

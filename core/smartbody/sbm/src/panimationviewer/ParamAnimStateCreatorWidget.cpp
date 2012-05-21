@@ -3,9 +3,9 @@
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBScene.h>
 
-int PAStateCreator::lastNameIndex = 0;
+int PABlendCreator::lastNameIndex = 0;
 
-PAStateCreator::PAStateCreator(PAStateEditor* editor, int x, int y, int w, int h) : Fl_Window(x, y, w, h)
+PABlendCreator::PABlendCreator(PABlendEditor* editor, int x, int y, int w, int h) : Fl_Window(x, y, w, h)
 {
 	set_modal();
 	isCreateMode = true;
@@ -43,11 +43,11 @@ PAStateCreator::PAStateCreator(PAStateEditor* editor, int x, int y, int w, int h
 	this->end();
 }
 
-PAStateCreator::~PAStateCreator()
+PABlendCreator::~PABlendCreator()
 {
 }
 
-void PAStateCreator::setInfo(bool createModeFlag, const std::string& stateName)
+void PABlendCreator::setInfo(bool createModeFlag, const std::string& stateName)
 {
 	isCreateMode = createModeFlag;
 	if (isCreateMode)
@@ -66,8 +66,8 @@ void PAStateCreator::setInfo(bool createModeFlag, const std::string& stateName)
 	loadMotions();
 	if (!isCreateMode)
 	{
-		SmartBody::SBAnimationStateManager* stateManager = SmartBody::SBScene::getScene()->getStateManager();
-		SmartBody::SBAnimationState* state = stateManager->getState(stateName);
+		SmartBody::SBAnimationBlendManager* stateManager = SmartBody::SBScene::getScene()->getBlendManager();
+		SmartBody::SBAnimationBlend* state = stateManager->getBlend(stateName);
 		if (!state)
 		{
 			fl_alert("State %s does not exist.", stateName.c_str());
@@ -83,16 +83,16 @@ void PAStateCreator::setInfo(bool createModeFlag, const std::string& stateName)
 		}
 
 
-		SBAnimationState0D* state0d = dynamic_cast<SBAnimationState0D*>(state);
+		SBAnimationBlend0D* state0d = dynamic_cast<SBAnimationBlend0D*>(state);
 		if (state0d)
 			choiceStateType->value(0);
-		SBAnimationState1D* state1d = dynamic_cast<SBAnimationState1D*>(state);
+		SBAnimationBlend1D* state1d = dynamic_cast<SBAnimationBlend1D*>(state);
 		if (state1d)
 			choiceStateType->value(1);
-		SBAnimationState2D* state2d = dynamic_cast<SBAnimationState2D*>(state);
+		SBAnimationBlend2D* state2d = dynamic_cast<SBAnimationBlend2D*>(state);
 		if (state2d)
 			choiceStateType->value(2);
-		SBAnimationState3D* state3d = dynamic_cast<SBAnimationState3D*>(state);
+		SBAnimationBlend3D* state3d = dynamic_cast<SBAnimationBlend3D*>(state);
 		if (state3d)
 			choiceStateType->value(3);
 
@@ -100,7 +100,7 @@ void PAStateCreator::setInfo(bool createModeFlag, const std::string& stateName)
 	}
 }
 
-void PAStateCreator::loadMotions()
+void PABlendCreator::loadMotions()
 {
 	animationList->clear();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -112,9 +112,9 @@ void PAStateCreator::loadMotions()
 		animationList->add(iter->c_str());
 }
 
-void PAStateCreator::addMotion(Fl_Widget* widget, void* data)
+void PABlendCreator::addMotion(Fl_Widget* widget, void* data)
 {
-	PAStateCreator* creator = (PAStateCreator*) data;
+	PABlendCreator* creator = (PABlendCreator*) data;
 	for (int i = 0; i < creator->animationList->size(); i++)
 	{
 		if (creator->animationList->selected(i+1))
@@ -134,9 +134,9 @@ void PAStateCreator::addMotion(Fl_Widget* widget, void* data)
 	}
 }
 
-void PAStateCreator::removeMotion(Fl_Widget* widget, void* data)
+void PABlendCreator::removeMotion(Fl_Widget* widget, void* data)
 {
-	PAStateCreator* creator = (PAStateCreator*) data;
+	PABlendCreator* creator = (PABlendCreator*) data;
 
 	std::vector<std::string> selectedMotions;
 	for (int i = 0; i < creator->stateAnimationList->size(); i++)
@@ -150,9 +150,9 @@ void PAStateCreator::removeMotion(Fl_Widget* widget, void* data)
 	}
 }
 
-std::string PAStateCreator::getUniqueStateName(std::string prefix)
+std::string PABlendCreator::getUniqueStateName(std::string prefix)
 {
-	SmartBody::SBAnimationStateManager* stateManager = SmartBody::SBScene::getScene()->getStateManager();
+	SmartBody::SBAnimationBlendManager* stateManager = SmartBody::SBScene::getScene()->getBlendManager();
 	
 	std::stringstream strstr;
 
@@ -165,7 +165,7 @@ std::string PAStateCreator::getUniqueStateName(std::string prefix)
 		strstr << prefix << lastNameIndex;
 		lastNameIndex++;
 
-		SBAnimationState* state = stateManager->getState(strstr.str());
+		SBAnimationBlend* state = stateManager->getBlend(strstr.str());
 		if (state)
 			lastNameIndex++;
 	}
@@ -173,17 +173,17 @@ std::string PAStateCreator::getUniqueStateName(std::string prefix)
 	return strstr.str();
 } 
 
-void PAStateCreator::createState(Fl_Widget* widget, void* data)
+void PABlendCreator::createState(Fl_Widget* widget, void* data)
 {
-	PAStateCreator* creator = (PAStateCreator*) data;
+	PABlendCreator* creator = (PABlendCreator*) data;
 
 	// get the animation type and name
 	std::string type = creator->choiceStateType->menu()[creator->choiceStateType->value()].label();
 	std::string stateName = creator->inputStateName->value();
 
 	// make sure the name is valid
-	SmartBody::SBAnimationStateManager* stateManager = SmartBody::SBScene::getScene()->getStateManager();
-	SmartBody::SBAnimationState* state = stateManager->getState(stateName);
+	SmartBody::SBAnimationBlendManager* stateManager = SmartBody::SBScene::getScene()->getBlendManager();
+	SmartBody::SBAnimationBlend* state = stateManager->getBlend(stateName);
 
 	if (creator->isCreateMode)
 	{
@@ -195,7 +195,7 @@ void PAStateCreator::createState(Fl_Widget* widget, void* data)
 
 		if (type == "0D")
 		{
-			SmartBody::SBAnimationState0D* animState = stateManager->createState0D(stateName);
+			SmartBody::SBAnimationBlend0D* animState = stateManager->createBlend0D(stateName);
 			
 			for (int i = 0; i < creator->stateAnimationList->size(); i++)
 			{
@@ -204,7 +204,7 @@ void PAStateCreator::createState(Fl_Widget* widget, void* data)
 		}
 		else if (type == "1D")
 		{
-			SmartBody::SBAnimationState1D* animState = stateManager->createState1D(stateName);
+			SmartBody::SBAnimationBlend1D* animState = stateManager->createBlend1D(stateName);
 
 			for (int i = 0; i < creator->stateAnimationList->size(); i++)
 			{
@@ -215,7 +215,7 @@ void PAStateCreator::createState(Fl_Widget* widget, void* data)
 		}
 		else if (type == "2D")
 		{
-			SmartBody::SBAnimationState2D* animState = stateManager->createState2D(stateName);
+			SmartBody::SBAnimationBlend2D* animState = stateManager->createBlend2D(stateName);
 
 			for (int i = 0; i < creator->stateAnimationList->size(); i++)
 			{
@@ -224,7 +224,7 @@ void PAStateCreator::createState(Fl_Widget* widget, void* data)
 		}
 		else if (type == "3D")
 		{
-			SmartBody::SBAnimationState3D* animState = stateManager->createState3D(stateName);
+			SmartBody::SBAnimationBlend3D* animState = stateManager->createBlend3D(stateName);
 
 			for (int i = 0; i < creator->stateAnimationList->size(); i++)
 			{
@@ -233,7 +233,7 @@ void PAStateCreator::createState(Fl_Widget* widget, void* data)
 		}
 
 		// Insert 2 corresponding points by default
-		state = stateManager->getState(stateName);
+		state = stateManager->getBlend(stateName);
 		std::vector<std::string> motionNames;
 		std::vector<double> startingPoints;
 		std::vector<double> endingPoints;
@@ -277,10 +277,10 @@ void PAStateCreator::createState(Fl_Widget* widget, void* data)
 			if (foundIter == motionMap.end())
 			{
 				// new motion to be added to the state
-				SmartBody::SBAnimationState0D* state0D = dynamic_cast<SBAnimationState0D*>(state);	
-				SmartBody::SBAnimationState1D* state1D = dynamic_cast<SBAnimationState1D*>(state);
-				SmartBody::SBAnimationState2D* state2D = dynamic_cast<SBAnimationState2D*>(state);
-				SmartBody::SBAnimationState3D* state3D = dynamic_cast<SBAnimationState3D*>(state);
+				SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SBAnimationBlend0D*>(state);	
+				SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SBAnimationBlend1D*>(state);
+				SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SBAnimationBlend2D*>(state);
+				SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SBAnimationBlend3D*>(state);
 				if (state0D)
 				{
 					state0D->addMotion((*newMotionIter));
@@ -308,10 +308,10 @@ void PAStateCreator::createState(Fl_Widget* widget, void* data)
 			if (foundIter == updatedMap.end())
 			{
 				// motion to be removed from the state
-				SmartBody::SBAnimationState0D* state0D = dynamic_cast<SBAnimationState0D*>(state);	
-				SmartBody::SBAnimationState1D* state1D = dynamic_cast<SBAnimationState1D*>(state);
-				SmartBody::SBAnimationState2D* state2D = dynamic_cast<SBAnimationState2D*>(state);
-				SmartBody::SBAnimationState3D* state3D = dynamic_cast<SBAnimationState3D*>(state);
+				SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SBAnimationBlend0D*>(state);	
+				SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SBAnimationBlend1D*>(state);
+				SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SBAnimationBlend2D*>(state);
+				SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SBAnimationBlend3D*>(state);
 				if (state0D)
 				{
 					state0D->removeMotion((*toDeleteIter));
@@ -343,9 +343,9 @@ void PAStateCreator::createState(Fl_Widget* widget, void* data)
 	
 }
 
-void PAStateCreator::cancelState(Fl_Widget* widget, void* data)
+void PABlendCreator::cancelState(Fl_Widget* widget, void* data)
 {
-	PAStateCreator* creator = (PAStateCreator*) data;
+	PABlendCreator* creator = (PABlendCreator*) data;
 	creator->stateEditor->creator = NULL;
 	creator->hide();
 	delete creator;

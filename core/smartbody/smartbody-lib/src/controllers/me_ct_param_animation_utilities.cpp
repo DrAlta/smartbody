@@ -32,36 +32,36 @@ PATimeManager::PATimeManager()
 {
 }
 
-PATimeManager::PATimeManager(PAStateData* data)
+PATimeManager::PATimeManager(PABlendData* data)
 {
-	stateData = data;
+	blendData = data;
 
-	if (stateData->state->keys.size() > 0)
+	if (blendData->state->keys.size() > 0)
 	{
-		if (stateData->state->keys[0].size() > 0)
-			for (size_t i = 0; i < stateData->state->keys.size(); i++)
-				localTimes.push_back(stateData->state->keys[i][0]);
+		if (blendData->state->keys[0].size() > 0)
+			for (size_t i = 0; i < blendData->state->keys.size(); i++)
+				localTimes.push_back(blendData->state->keys[i][0]);
 	}
 	else
 	{
-		SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(stateData->state);
+		SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SmartBody::SBAnimationBlend0D*>(blendData->state);
 		if (state0D)
 		{
 			localTimes.push_back(0);
 		}
 		else
 		{
-			LOG("State %s has no keys, setting all local times to zero.", stateData->state->stateName.c_str());
-			for (int x = 0; x < stateData->state->getNumMotions(); x++)
+			LOG("State %s has no keys, setting all local times to zero.", blendData->state->stateName.c_str());
+			for (int x = 0; x < blendData->state->getNumMotions(); x++)
 			{
 				localTimes.push_back(0);
 			}
 
 		}
 	}
-	if (stateData->weights.size() > localTimes.size())
+	if (blendData->weights.size() > localTimes.size())
 	{
-		LOG("Problem: fewer keys (%d) than weights (%d)", stateData->state->keys.size(), stateData->weights.size());
+		LOG("Problem: fewer keys (%d) than weights (%d)", blendData->state->keys.size(), blendData->weights.size());
 	}
 	setMotionTimes();
 	setKey();
@@ -98,9 +98,9 @@ bool PATimeManager::step(double timeStep)
 	double newLocalTime = localTime + timeStep;
 	int loopcounter = 0;
 	double lastKey = 0;
-	if (stateData->state->keys.size() > 0)
+	if (blendData->state->keys.size() > 0)
 		lastKey = key[key.size() - 1];
-	if (stateData->state->keys.size() > 0 && 
+	if (blendData->state->keys.size() > 0 && 
 		(newLocalTime > lastKey && lastKey >= 0.0))
 	{
 		double d = key[key.size() - 1] - key[0];
@@ -127,7 +127,7 @@ bool PATimeManager::step(double timeStep)
 	if (motionTimes.size() == numMotionTimes)
 	{
 		timeDiffs.clear();
-		for (size_t i = 0; i < stateData->weights.size(); i++)
+		for (size_t i = 0; i < blendData->weights.size(); i++)
 			timeDiffs.push_back(motionTimes[i] - prevMotionTimes[i]);
 	}
 	else
@@ -146,7 +146,7 @@ void PATimeManager::loadEvents()
 		_events.pop();
 
 
-	std::vector<std::pair<SmartBody::MotionEvent*, int> >& events = stateData->state->getEvents();
+	std::vector<std::pair<SmartBody::MotionEvent*, int> >& events = blendData->state->getEvents();
 	for (size_t x = 0; x < events.size(); x++)
 	{
 		_events.push(events[x]);
@@ -195,26 +195,26 @@ void PATimeManager::setKey()
 {
 	key.clear();
 	int numKeys = 0;
-	if (stateData->weights.size() > 0) numKeys = stateData->state->keys[0].size();
+	if (blendData->weights.size() > 0) numKeys = blendData->state->keys[0].size();
 	for (int i = 0; i < numKeys; i++)
 	{
 		double tempK = 0.0;
-		for (size_t j = 0; j < stateData->weights.size(); j++)
-			tempK += stateData->weights[j] * stateData->state->keys[j][i];
+		for (size_t j = 0; j < blendData->weights.size(); j++)
+			tempK += blendData->weights[j] * blendData->state->keys[j][i];
 		key.push_back(tempK);
 	}
 }
 
 void PATimeManager::setLocalTime()
 {
-	if (localTimes.size() < stateData->weights.size())
+	if (localTimes.size() < blendData->weights.size())
 	{
-		LOG("Problem with number of local times (%d) versus number of weights (%d)", localTimes.size(), stateData->weights.size());
+		LOG("Problem with number of local times (%d) versus number of weights (%d)", localTimes.size(), blendData->weights.size());
 		return;
 	}
 	localTime = 0.0;
-	for (size_t i = 0; i < stateData->weights.size(); i++)
-		localTime += stateData->weights[i] * localTimes[i];
+	for (size_t i = 0; i < blendData->weights.size(); i++)
+		localTime += blendData->weights[i] * localTimes[i];
 	prevLocalTime = localTime;
 }
 
@@ -223,10 +223,10 @@ void PATimeManager::setMotionTimes()
 	motionTimes.clear();
 	if (localTimes.size() > 0)
 	{
-		for (size_t i = 0; i < stateData->weights.size(); i++)
+		for (size_t i = 0; i < blendData->weights.size(); i++)
 		{
-			int d = (int) (localTimes[i] / stateData->state->motions[i]->duration());
-			motionTimes.push_back(localTimes[i] - d * stateData->state->motions[i]->duration());
+			int d = (int) (localTimes[i] / blendData->state->motions[i]->duration());
+			motionTimes.push_back(localTimes[i] - d * blendData->state->motions[i]->duration());
 		}
 	}
 	
@@ -248,15 +248,15 @@ void PATimeManager::getParallelTimes(double time, std::vector<double>& times)
 	int section = getSection(time);
 	if (section < 0)
 	{
-		for (size_t i = 0; i < stateData->weights.size(); i++)
+		for (size_t i = 0; i < blendData->weights.size(); i++)
 		{
 			times.push_back(0);
 		}
 		return;
 	}
-	for (size_t i = 0; i < stateData->weights.size(); i++)
+	for (size_t i = 0; i < blendData->weights.size(); i++)
 	{
-		double t = stateData->state->keys[i][section] + (stateData->state->keys[i][section + 1] - stateData->state->keys[i][section]) * (time - key[section]) / (key[section + 1] - key[section]);
+		double t = blendData->state->keys[i][section] + (blendData->state->keys[i][section + 1] - blendData->state->keys[i][section]) * (time - key[section]) / (key[section + 1] - key[section]);
 		times.push_back(t);
 	}
 }
@@ -270,9 +270,9 @@ PAMotions::PAMotions()
 {
 }
 
-PAMotions::PAMotions(PAStateData* data)
+PAMotions::PAMotions(PABlendData* data)
 {
-	stateData = data;
+	blendData = data;
 }
 
 PAMotions::~PAMotions()
@@ -283,9 +283,9 @@ PAMotions::~PAMotions()
 void PAMotions::setMotionContextMaps(MeControllerContext* context)
 {
 	SkChannelArray& cChannels = context->channels();
-	for (size_t mId = 0; mId < stateData->state->motions.size(); mId++)
+	for (size_t mId = 0; mId < blendData->state->motions.size(); mId++)
 	{
-		SkChannelArray& mChannels = stateData->state->motions[mId]->channels();
+		SkChannelArray& mChannels = blendData->state->motions[mId]->channels();
 		const int size = mChannels.size();
 		SrBuffer<int> map;
 		map.size(size);
@@ -301,7 +301,7 @@ void PAMotions::setMotionContextMaps(MeControllerContext* context)
 
 int PAMotions::getNumMotions()
 {
-	return stateData->state->motions.size();
+	return blendData->state->motions.size();
 }
 
 
@@ -487,7 +487,7 @@ PAInterpolator::PAInterpolator()
 {
 }
 
-PAInterpolator::PAInterpolator(PAStateData* data) : PAMotions(data)
+PAInterpolator::PAInterpolator(PABlendData* data) : PAMotions(data)
 {
 }
 
@@ -501,14 +501,14 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 	int numMotions = getNumMotions();
 	for (int i = 0; i < numMotions; i++)
 	{
-		if (stateData->weights[i] != 0.0)
+		if (blendData->weights[i] != 0.0)
 			indices.push_back(i);
 	}
 
 	SrBuffer<float> buffer;
 	buffer.size(buff.size());
 
-	if (indices.size() == 0 && stateData->getStateName() == PseudoIdleState)
+	if (indices.size() == 0 && blendData->getStateName() == PseudoIdleState)
 	{
 		handleBaseMatForBuffer(buff);
 		return;
@@ -518,7 +518,7 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 		buffer = buff;
 		int id = indices[0];
 		double time = times[id];
-		getBuffer(stateData->state->motions[id], time, motionContextMaps[id], buffer);
+		getBuffer(blendData->state->motions[id], time, motionContextMaps[id], buffer);
 		handleBaseMatForBuffer(buffer);
 	}
 	else
@@ -533,29 +533,29 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 			SrBuffer<float>& b = buffers[buffers.size() - 1];
 			b.size(buff.size());
 			b = buff;
-			getBuffer(stateData->state->motions[indices[i]], times[indices[i]], motionContextMaps[indices[i]], b);
+			getBuffer(blendData->state->motions[indices[i]], times[indices[i]], motionContextMaps[indices[i]], b);
 			handleBaseMatForBuffer(b);
 		}
 		buffer = buffers[0];
-		SkChannelArray& motionChan = stateData->state->motions[indices[0]]->channels();
+		SkChannelArray& motionChan = blendData->state->motions[indices[0]]->channels();
 		int chanSize = motionChan.size();
 		for (int i = 0; i < chanSize; i++)
 		{
 			const std::string& chanName = motionChan.name(i);
 			for (int j = 1; j < numMotions; j++)
 			{
-				if (stateData->motionIndex.size() != stateData->state->motions.size())
+				if (blendData->motionIndex.size() != blendData->state->motions.size())
 				{
-					stateData->updateMotionIndices();
+					blendData->updateMotionIndices();
 				}
-				if (stateData->motionIndex.size() == 0)
+				if (blendData->motionIndex.size() == 0)
 					continue;
 
-				if ((int)stateData->motionIndex[indices[j]].size() <= i)
+				if ((int)blendData->motionIndex[indices[j]].size() <= i)
 					continue;
 
-				int id = stateData->motionIndex[indices[j]][i];
-				//int id = stateData->state->motions[indices[j]]->channels().search(chanName, motionChan[i].type);
+				int id = blendData->motionIndex[indices[j]][i];
+				//int id = blendData->state->motions[indices[j]]->channels().search(chanName, motionChan[i].type);
 				if (id < 0)
 					continue;
 				int buffId = motionContextMaps[indices[0]].get(i);
@@ -563,9 +563,9 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 				{
 					double prevWeight = 0.0;
 					for (int k = 0; k < j; k++)
-						prevWeight += stateData->weights[indices[k]];
-					double w = prevWeight / (stateData->weights[indices[j]] + prevWeight);
-					stateData->state->motions[indices[0]]->channels()[i].interp(&buffer[buffId], &buffer[buffId], &buffers[j][buffId], (float)(1 - w));
+						prevWeight += blendData->weights[indices[k]];
+					double w = prevWeight / (blendData->weights[indices[j]] + prevWeight);
+					blendData->state->motions[indices[0]]->channels()[i].interp(&buffer[buffId], &buffer[buffId], &buffers[j][buffId], (float)(1 - w));
 				}
 			}
 		}
@@ -596,7 +596,7 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 			currQ.y = buffer[buffId.q + 2];
 			currQ.z = buffer[buffId.q + 3];
 			SrQuat finalQ;
-			if (stateData->blendMode == PAStateData::Additive)
+			if (blendData->blendMode == PABlendData::Additive)
 				finalQ = origQ * currQ;
 			else
 				finalQ = currQ;
@@ -633,7 +633,7 @@ PAWoManager::PAWoManager()
 {
 }
 
-PAWoManager::PAWoManager(PAStateData* data) : PAMotions(data)
+PAWoManager::PAWoManager(PABlendData* data) : PAMotions(data)
 {
 	firstTime = true;
 	for (int i = 0; i < getNumMotions(); i++)
@@ -656,10 +656,10 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 	{
 		std::vector<int> indices;
 		for (int i = 0; i < getNumMotions(); i++)
-			if (stateData->weights[i] != 0.0)
+			if (blendData->weights[i] != 0.0)
 				indices.push_back(i);
 
-		if (indices.size() == 0 && stateData->state->stateName == PseudoIdleState)
+		if (indices.size() == 0 && blendData->state->stateName == PseudoIdleState)
 		{
 			//baseTransformMat = currentBaseMats[0] * baseMats[0].inverse();
 			currentBaseTransformMat = currentBaseMats[0];
@@ -702,8 +702,8 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 			{
 				double prevWeight = 0.0;
 				for (int j = 0; j < i; j++)
-					prevWeight += stateData->weights[indices[j]];
-				double w = prevWeight / (stateData->weights[indices[i]] + prevWeight);
+					prevWeight += blendData->weights[indices[j]];
+				double w = prevWeight / (blendData->weights[indices[i]] + prevWeight);
 				SrMat mat = tempMat;
 				matInterp(tempMat, mat, mats[i], (float)(w));
 			}
@@ -759,10 +759,10 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 		for (int i = 0; i < getNumMotions(); i++)
 		{	
 			SrMat src;
-			getBuffer(stateData->state->motions[i], 0.0, motionContextMaps[i], buffer);
+			getBuffer(blendData->state->motions[i], 0.0, motionContextMaps[i], buffer);
 			src = getBaseMatFromBuffer(buffer);
 			SrMat dest;
-			getBuffer(stateData->state->motions[i], stateData->state->motions[i]->duration(), motionContextMaps[i], buffer);
+			getBuffer(blendData->state->motions[i], blendData->state->motions[i]->duration(), motionContextMaps[i], buffer);
 			dest = getBaseMatFromBuffer(buffer);
 			SrMat transition = src.inverse() * dest;
 			baseTransitionMats.push_back(SrMat());
@@ -775,7 +775,7 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 	SrBuffer<float> buffer;
 	buffer.size(bufferSize);
 	int numMotions = getNumMotions();
-	if ( getNumMotions() == 0 && stateData->state->stateName == PseudoIdleState)
+	if ( getNumMotions() == 0 && blendData->state->stateName == PseudoIdleState)
 	{
 		SrMat baseMat;			
 		baseMat = getBaseMatFromBuffer(inBuff);
@@ -790,7 +790,7 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 			
 			double time = times[i];
 			SrMat baseMat;
-			getBuffer(stateData->state->motions[i], time, motionContextMaps[i], buffer);
+			getBuffer(blendData->state->motions[i], time, motionContextMaps[i], buffer);
 			baseMat = getBaseMatFromBuffer(buffer);
 			mats.push_back(SrMat());
 			SrMat& updateBaseMat = mats[mats.size() - 1];
@@ -800,10 +800,10 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 	
 }
 
-PAStateData::PAStateData(const std::string& stateName, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule)
+PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	PAState* s = mcu.lookUpPAState(stateName);
+	PABlend* s = mcu.lookUpPABlend(stateName);
 	state = s;
 	if (state)
 	{
@@ -830,7 +830,7 @@ PAStateData::PAStateData(const std::string& stateName, std::vector<double>& w, B
 	active = false;
 }
 
-PAStateData::PAStateData(PAState* s, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule)
+PABlendData::PABlendData(PABlend* s, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule)
 {
 	state = s;
 	weights.resize(s->getNumMotions());
@@ -847,7 +847,7 @@ PAStateData::PAStateData(PAState* s, std::vector<double>& w, BlendMode blend, Wr
 	active = false;
 }
 
-PAStateData::~PAStateData()
+PABlendData::~PABlendData()
 {
 	if (timeManager)
 		delete timeManager;
@@ -860,7 +860,7 @@ PAStateData::~PAStateData()
 	woManager = NULL;
 }
 
-void PAStateData::evaluateTransition( double timeStep, SrBuffer<float>& buffer, bool tranIn )
+void PABlendData::evaluateTransition( double timeStep, SrBuffer<float>& buffer, bool tranIn )
 {
 	if (state && getStateName() == PseudoIdleState) // transition 
 	{
@@ -883,7 +883,7 @@ void PAStateData::evaluateTransition( double timeStep, SrBuffer<float>& buffer, 
 	}
 }
 
-void PAStateData::evaluate(double timeStep, SrBuffer<float>& buffer)
+void PABlendData::evaluate(double timeStep, SrBuffer<float>& buffer)
 {
 	if (state && state->stateName == PseudoIdleState)
 	{
@@ -906,12 +906,12 @@ void PAStateData::evaluate(double timeStep, SrBuffer<float>& buffer)
 		active = false;
 }
 
-std::string PAStateData::getStateName()
+std::string PABlendData::getStateName()
 {
 	return state->stateName;	
 }
 
-bool PAStateData::isPartialBlending()
+bool PABlendData::isPartialBlending()
 {
 	if (interpolator->joints.size() != 0)
 		return true;
@@ -919,7 +919,7 @@ bool PAStateData::isPartialBlending()
 		return false;
 }
 
-void PAStateData::updateMotionIndices()
+void PABlendData::updateMotionIndices()
 {
 	motionIndex.clear();
 
@@ -979,7 +979,7 @@ PATransitionManager::PATransitionManager(double easeOutStart, double dur)
 #endif
 }
 
-PATransitionManager::PATransitionManager(PATransition* trans, PAStateData* f, PAStateData* t)
+PATransitionManager::PATransitionManager(PATransition* trans, PABlendData* f, PABlendData* t)
 {
 	from = f;
 	to = t;
@@ -1004,7 +1004,7 @@ PATransitionManager::~PATransitionManager()
 	This function activate next state module according to current module.
 	PATransitionManager has two mode: align mode and blending mode, it starts with align mode, after aligning, switch to blending mode
 */
-void PATransitionManager::align(PAStateData* current, PAStateData* next)
+void PATransitionManager::align(PABlendData* current, PABlendData* next)
 {
 
 	// possible bug spot, although for now, the result seems better

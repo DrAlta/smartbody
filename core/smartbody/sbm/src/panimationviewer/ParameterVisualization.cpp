@@ -1,7 +1,7 @@
 #include "ParameterVisualization.h"
 #include <sb/SBCharacter.h>
 
-ParameterVisualization::ParameterVisualization(bool isInteractive, int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* group) : Fl_Group(x, y, w, h, name), stateData(s), paramGroup(group)
+ParameterVisualization::ParameterVisualization(bool isInteractive, int x, int y, int w, int h, char* name, PABlendData* s, ParameterGroup* group) : Fl_Group(x, y, w, h, name), blendData(s), paramGroup(group)
 {
 	paramX = -9999;
 	paramY = -9999;
@@ -46,11 +46,11 @@ void ParameterVisualization::draw()
 
 	// draw parameters
 	bool highLight = false;
-	if (selectedParameters.size() == stateData->state->getNumParameters())
+	if (selectedParameters.size() == blendData->state->getNumParameters())
 		highLight = true;
 
 	fl_color(FL_GREEN);
-	for (int i = 0; i < stateData->state->getNumParameters(); i++)
+	for (int i = 0; i < blendData->state->getNumParameters(); i++)
 	{
 		if (highLight && selectedParameters[i])
 			fl_color(FL_RED);
@@ -58,7 +58,7 @@ void ParameterVisualization::draw()
 			fl_color(FL_GREEN);
 
 		int recX, recY, recW, recH;
-		SrVec vec =  stateData->state->getVec(i);
+		SrVec vec =  blendData->state->getVec(i);
 		int x = 0;
 		if (fabs(scaleX) > 0.0001)
 			x = int(vec.x / scaleX);
@@ -71,11 +71,11 @@ void ParameterVisualization::draw()
 
 	// draw lines connecting parameters
 	fl_color(FL_GREEN);
-	for (int i = 0; i <  stateData->state->getNumTriangles(); i++)
+	for (int i = 0; i <  blendData->state->getNumTriangles(); i++)
 	{
-		SrVec vec1 = stateData->state->getTriangle(i).a;
-		SrVec vec2 = stateData->state->getTriangle(i).b;
-		SrVec vec3 = stateData->state->getTriangle(i).c;
+		SrVec vec1 = blendData->state->getTriangle(i).a;
+		SrVec vec2 = blendData->state->getTriangle(i).b;
+		SrVec vec3 = blendData->state->getTriangle(i).c;
 		int x1, y1, x2, y2, x3, y3;
 		getActualPixel(vec1.x, vec1.y, x1, y1);
 		getActualPixel(vec2.x, vec2.y, x2, y2);
@@ -86,14 +86,14 @@ void ParameterVisualization::draw()
 		fl_line(x3, y3, x2, y2);
 	}
 
-	if (selectedTriangles.size() == stateData->state->getNumTriangles())
+	if (selectedTriangles.size() == blendData->state->getNumTriangles())
 	{
 		fl_color(FL_MAGENTA);
-		for (int i = 0; i <  stateData->state->getNumTriangles(); i++)
+		for (int i = 0; i <  blendData->state->getNumTriangles(); i++)
 		{
-			SrVec vec1 = stateData->state->getTriangle(i).a;
-			SrVec vec2 = stateData->state->getTriangle(i).b;
-			SrVec vec3 = stateData->state->getTriangle(i).c;
+			SrVec vec1 = blendData->state->getTriangle(i).a;
+			SrVec vec2 = blendData->state->getTriangle(i).b;
+			SrVec vec3 = blendData->state->getTriangle(i).c;
 			int x1, y1, x2, y2, x3, y3;
 			getActualPixel(vec1.x, vec1.y, x1, y1);
 			getActualPixel(vec2.x, vec2.y, x2, y2);
@@ -110,19 +110,19 @@ void ParameterVisualization::draw()
 
 	// draw parameters info
 	fl_color(FL_BLACK);
-	for (int i = 0; i < stateData->state->getNumParameters(); i++)
+	for (int i = 0; i < blendData->state->getNumParameters(); i++)
 	{
 		if (highLight && selectedParameters[i])
 			fl_color(FL_BLUE);
 		else
 			fl_color(FL_BLACK);
 
-		SrVec vec = stateData->state->getVec(i);
+		SrVec vec = blendData->state->getVec(i);
 		int x = int(vec.x / scaleX);
 		int y = int(vec.y / scaleY);
 		char buff[200];
 //		sprintf(buff, "%s(%d,%d)", state->getMotionName(i).c_str(), x, y);
-		sprintf(buff, "%s", stateData->state->getMotionName(i).c_str());
+		sprintf(buff, "%s", blendData->state->getMotionName(i).c_str());
 		Fl_Font prevFont = fl_font();
 		Fl_Fontsize prevSize = fl_size();
 
@@ -178,14 +178,14 @@ void ParameterVisualization::setup()
 	width = w();
 	height = h();
 
-	SrVec vec = stateData->state->getVec(stateData->state->getMaxVecX());
+	SrVec vec = blendData->state->getVec(blendData->state->getMaxVecX());
 	float maxX = vec.x;
-	vec = stateData->state->getVec(stateData->state->getMinVecX());
+	vec = blendData->state->getVec(blendData->state->getMinVecX());
 	float minX = vec.x;
 	if (fabs(maxX) < fabs(minX)) maxX = minX;
-	vec = stateData->state->getVec(stateData->state->getMaxVecY());
+	vec = blendData->state->getVec(blendData->state->getMaxVecY());
 	float maxY = vec.y;
-	vec = stateData->state->getVec(stateData->state->getMinVecY());
+	vec = blendData->state->getVec(blendData->state->getMinVecY());
 	float minY = vec.y;
 	if (fabs(maxY) < fabs(minY)) maxY = minY;
 	scaleX = fabs(maxX * 3 / (float)width);
@@ -247,12 +247,12 @@ void ParameterVisualization::updateSlider(float param1, float param2)
 
 void ParameterVisualization::updateStateData(float param1, float param2)
 {
-	if (stateData->state->getType() == 0)
-		stateData->state->getWeightsFromParameters(param1, stateData->weights);
-	if (stateData->state->getType() == 1)
-		stateData->state->getWeightsFromParameters(param1, param2, stateData->weights);
+	if (blendData->state->getType() == 0)
+		blendData->state->getWeightsFromParameters(param1, blendData->weights);
+	if (blendData->state->getType() == 1)
+		blendData->state->getWeightsFromParameters(param1, param2, blendData->weights);
 	SmartBody::SBCharacter* character = paramGroup->getCurrentCharacter();
-	character->param_animation_ct->updateWeights(stateData->weights);
+	character->param_animation_ct->updateWeights(blendData->weights);
 }
 
 void ParameterVisualization::setSelectedTriangles(std::vector<bool>& selected)

@@ -62,7 +62,7 @@ PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_
 		tabGroup = new Fl_Tabs(tabGroupX, tabGroupY, tabGroupW, tabGroupH);
 		tabGroup->callback(changeTabGroup, this);
 		tabGroup->begin();
-			stateEditor = new PAStateEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
+			stateEditor = new PABlendEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
 			stateEditor->begin();
 			stateEditor->end();
 //			transitionEditor = new PATransitionEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);

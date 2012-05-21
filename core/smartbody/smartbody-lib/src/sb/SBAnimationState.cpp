@@ -3,21 +3,21 @@
 
 namespace SmartBody {
 
-SBAnimationState::SBAnimationState() : PAState()
+SBAnimationBlend::SBAnimationBlend() : PABlend()
 {
 	_isFinalized = false;
 }
 
-SBAnimationState::SBAnimationState(const std::string& name) : PAState(name)
+SBAnimationBlend::SBAnimationBlend(const std::string& name) : PABlend(name)
 {
 	_isFinalized = false;
 }
 
-SBAnimationState::~SBAnimationState()
+SBAnimationBlend::~SBAnimationBlend()
 {
 }
 
-void SBAnimationState::addCorrespondencePoints(const std::vector<std::string>& motionNames, const std::vector<double>& points)
+void SBAnimationBlend::addCorrespondencePoints(const std::vector<std::string>& motionNames, const std::vector<double>& points)
 {
 	if (motions.size() == 0)
 	{
@@ -70,7 +70,7 @@ void SBAnimationState::addCorrespondencePoints(const std::vector<std::string>& m
 	validateCorrespondencePoints();
 }
 
-void SBAnimationState::setCorrespondencePoints(int motionIndex, int pointIndex, double value)
+void SBAnimationBlend::setCorrespondencePoints(int motionIndex, int pointIndex, double value)
 {
 	if (motionIndex < 0 || pointIndex < 0 || (keys.size() == 0) || (pointIndex >= (int) keys[0].size()))
 		return;
@@ -79,7 +79,7 @@ void SBAnimationState::setCorrespondencePoints(int motionIndex, int pointIndex, 
 	validateCorrespondencePoints();
 }
 
-void SBAnimationState::removeCorrespondencePoints(int index)
+void SBAnimationBlend::removeCorrespondencePoints(int index)
 {
 	if (index < 0 || (keys.size() == 0) || (index >= (int) keys[0].size()))
 		return;
@@ -93,12 +93,12 @@ void SBAnimationState::removeCorrespondencePoints(int index)
 	}	
 }
 
-int SBAnimationState::getNumMotions()
+int SBAnimationBlend::getNumMotions()
 {
 	return motions.size();
 }
 
-std::string SBAnimationState::getMotion(int num)
+std::string SBAnimationBlend::getMotion(int num)
 {
 	if (motions.size() > (size_t) num && num >= 0)
 	{
@@ -110,12 +110,12 @@ std::string SBAnimationState::getMotion(int num)
 	}
 }
 
-int SBAnimationState::getNumCorrespondencePoints()
+int SBAnimationBlend::getNumCorrespondencePoints()
 {
 	return getNumKeys();
 }
 
-std::vector<double> SBAnimationState::getCorrespondencePoints(int num)
+std::vector<double> SBAnimationBlend::getCorrespondencePoints(int num)
 {
 	if (keys.size() > (size_t) num && num >= 0)
 	{
@@ -127,12 +127,12 @@ std::vector<double> SBAnimationState::getCorrespondencePoints(int num)
 	}
 }
 
-std::string SBAnimationState::getDimension()
+std::string SBAnimationBlend::getDimension()
 {
 	return _dimension;
 }
 
-void SBAnimationState::removeMotion(const std::string& motionName)
+void SBAnimationBlend::removeMotion(const std::string& motionName)
 {
 	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(motionName);
 	if (!motion)
@@ -141,7 +141,7 @@ void SBAnimationState::removeMotion(const std::string& motionName)
 	}
 }
 
-bool SBAnimationState::addSkMotion(const std::string& motion)
+bool SBAnimationBlend::addSkMotion(const std::string& motion)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SkMotion* skMotion = mcu.getMotion(motion);
@@ -189,13 +189,13 @@ bool SBAnimationState::addSkMotion(const std::string& motion)
 	}
 	else
 	{
-		LOG("SBAnimationState add sk motion failure, %s doesn't exist", motion.c_str());
+		LOG("SBAnimationBlend add sk motion failure, %s doesn't exist", motion.c_str());
 		return false;
 	}
 	return true;
 }
 
-bool SBAnimationState::removeSkMotion(const std::string& motionName)
+bool SBAnimationBlend::removeSkMotion(const std::string& motionName)
 {
 	// find the index of the motion
 	int index = -1;
@@ -210,7 +210,7 @@ bool SBAnimationState::removeSkMotion(const std::string& motionName)
 	}
 	if (index < 0)
 	{
-		LOG("SBAnimationState delete motion failure, %s doesn't exist", motionName.c_str());
+		LOG("SBAnimationBlend delete motion failure, %s doesn't exist", motionName.c_str());
 		return false;
 	}
 
@@ -226,7 +226,7 @@ bool SBAnimationState::removeSkMotion(const std::string& motionName)
 /*
 	P.S. This is organized way, but is not a efficient way to do it
 */
-void SBAnimationState::validateCorrespondencePoints()
+void SBAnimationBlend::validateCorrespondencePoints()
 {
 	for (int i = 0; i < getNumMotions(); i++)
 	{
@@ -243,7 +243,7 @@ void SBAnimationState::validateCorrespondencePoints()
 	}
 }
 
-bool SBAnimationState::validateState()
+bool SBAnimationBlend::validateState()
 {
 	if (_isFinalized)
 		return true;
@@ -267,7 +267,7 @@ bool SBAnimationState::validateState()
 	return true;
 }
 
-void SBAnimationState::addEvent(const std::string& motion, double time, const std::string& type, const std::string& parameters, bool onceOnly)
+void SBAnimationBlend::addEvent(const std::string& motion, double time, const std::string& type, const std::string& parameters, bool onceOnly)
 {
 	MotionEvent* motionEvent = new MotionEvent();
 	motionEvent->setIsOnceOnly(onceOnly);
@@ -277,13 +277,13 @@ void SBAnimationState::addEvent(const std::string& motion, double time, const st
 	addEventToMotion(motion, motionEvent);
 }
 
-void SBAnimationState::removeEvent(int index)
+void SBAnimationBlend::removeEvent(int index)
 {
 	if (index < 0 || (int) _events.size() > index)
 		return;
 }
 
-MotionEvent* SBAnimationState::getEvent(int index)
+MotionEvent* SBAnimationBlend::getEvent(int index)
 {
 	if (index < 0 || (int) _events.size() > index)
 		return NULL;
@@ -291,7 +291,7 @@ MotionEvent* SBAnimationState::getEvent(int index)
 	return _events[index].first;
 }
 
-void SBAnimationState::removeAllEvents()
+void SBAnimationBlend::removeAllEvents()
 {
 	for (std::vector<std::pair<MotionEvent*, int> >::iterator iter = _events.begin();
 		 iter != _events.end();
@@ -302,52 +302,52 @@ void SBAnimationState::removeAllEvents()
 	_events.clear();
 }
 
-int SBAnimationState::getNumEvents()
+int SBAnimationBlend::getNumEvents()
 {
 	return _events.size();
 }
 
-SBAnimationState0D::SBAnimationState0D() : SBAnimationState("unknown")
+SBAnimationBlend0D::SBAnimationBlend0D() : SBAnimationBlend("unknown")
 {
 }
 
-SBAnimationState0D::SBAnimationState0D(const std::string& name) : SBAnimationState(name)
+SBAnimationBlend0D::SBAnimationBlend0D(const std::string& name) : SBAnimationBlend(name)
 {
 	_dimension = "0D";
 }
 
-SBAnimationState0D::~SBAnimationState0D()
+SBAnimationBlend0D::~SBAnimationBlend0D()
 {
 }
 
-void SBAnimationState0D::addMotion(const std::string& motion)
+void SBAnimationBlend0D::addMotion(const std::string& motion)
 {
 	addSkMotion(motion);	
 }
 
-void SBAnimationState0D::removeMotion(const std::string& motion)
+void SBAnimationBlend0D::removeMotion(const std::string& motion)
 {
-	SBAnimationState::removeMotion(motion);
+	SBAnimationBlend::removeMotion(motion);
 
 	// remove correspondence points
 	removeSkMotion(motion);
 }
 
-SBAnimationState1D::SBAnimationState1D() : SBAnimationState("unknown")
+SBAnimationBlend1D::SBAnimationBlend1D() : SBAnimationBlend("unknown")
 {
 }
 
 
-SBAnimationState1D::SBAnimationState1D(const std::string& name) : SBAnimationState(name)
+SBAnimationBlend1D::SBAnimationBlend1D(const std::string& name) : SBAnimationBlend(name)
 {
 	_dimension = "1D";
 }
 
-SBAnimationState1D::~SBAnimationState1D()
+SBAnimationBlend1D::~SBAnimationBlend1D()
 {
 }
 
-void SBAnimationState1D::addMotion(const std::string& motion, float parameter)
+void SBAnimationBlend1D::addMotion(const std::string& motion, float parameter)
 {
 	addSkMotion(motion);
 
@@ -355,43 +355,43 @@ void SBAnimationState1D::addMotion(const std::string& motion, float parameter)
 	setParameter(motion, parameter);
 }
 
-void SBAnimationState1D::removeMotion(const std::string& motionName)
+void SBAnimationBlend1D::removeMotion(const std::string& motionName)
 {
-	SBAnimationState::removeMotion(motionName);
+	SBAnimationBlend::removeMotion(motionName);
 
 	// remove correspondnce points
 	removeSkMotion(motionName);
 }
 
-void SBAnimationState1D::setParameter(const std::string& motion, float parameter)
+void SBAnimationBlend1D::setParameter(const std::string& motion, float parameter)
 {
-	PAState::setParameter(motion, parameter);
+	PABlend::setParameter(motion, parameter);
 }
 
-SBAnimationState2D::SBAnimationState2D() : SBAnimationState("unknown")
+SBAnimationBlend2D::SBAnimationBlend2D() : SBAnimationBlend("unknown")
 {
 }
 
-SBAnimationState2D::SBAnimationState2D(const std::string& name) : SBAnimationState(name)
+SBAnimationBlend2D::SBAnimationBlend2D(const std::string& name) : SBAnimationBlend(name)
 {
 	_dimension = "2D";
 }
 
-SBAnimationState2D::~SBAnimationState2D()
+SBAnimationBlend2D::~SBAnimationBlend2D()
 {
 }
 
-void SBAnimationState2D::addMotion(const std::string& motion, float parameter1, float parameter2)
+void SBAnimationBlend2D::addMotion(const std::string& motion, float parameter1, float parameter2)
 {
 	addSkMotion(motion);
 	
 	setType(1);
-	PAState::setParameter(motion, parameter1, parameter2);
+	PABlend::setParameter(motion, parameter1, parameter2);
 }
 
-void SBAnimationState2D::removeMotion(const std::string& motionName)
+void SBAnimationBlend2D::removeMotion(const std::string& motionName)
 {
-	SBAnimationState::removeMotion(motionName);
+	SBAnimationBlend::removeMotion(motionName);
 
 	// remove correspondence points
 	removeSkMotion(motionName);
@@ -400,32 +400,32 @@ void SBAnimationState2D::removeMotion(const std::string& motionName)
 	removeTriangles(motionName);
 }
 
-void SBAnimationState2D::setParameter(const std::string& motion, float parameter1, float parameter2)
+void SBAnimationBlend2D::setParameter(const std::string& motion, float parameter1, float parameter2)
 {
-	PAState::setParameter(motion, parameter1, parameter2);
+	PABlend::setParameter(motion, parameter1, parameter2);
 }
 
-void SBAnimationState2D::addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
+void SBAnimationBlend2D::addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
 {
-	PAState::addTriangle(motion1, motion2, motion3);
+	PABlend::addTriangle(motion1, motion2, motion3);
 }
 
-SBAnimationState3D::SBAnimationState3D() : SBAnimationState("unknown")
+SBAnimationBlend3D::SBAnimationBlend3D() : SBAnimationBlend("unknown")
 {
 }
 
 
-SBAnimationState3D::SBAnimationState3D(const std::string& name) : SBAnimationState(name)
+SBAnimationBlend3D::SBAnimationBlend3D(const std::string& name) : SBAnimationBlend(name)
 {
 	_dimension = "3D";
 }
 
-SBAnimationState3D::~SBAnimationState3D()
+SBAnimationBlend3D::~SBAnimationBlend3D()
 {
 }
 
 
-void SBAnimationState3D::addMotion(const std::string& motion, float parameter1, float parameter2, float parameter3)
+void SBAnimationBlend3D::addMotion(const std::string& motion, float parameter1, float parameter2, float parameter3)
 {
 	addSkMotion(motion);
 	
@@ -433,9 +433,9 @@ void SBAnimationState3D::addMotion(const std::string& motion, float parameter1, 
 	setParameter(motion, parameter1, parameter2, parameter3);
 }
 
-void SBAnimationState3D::removeMotion(const std::string& motionName)
+void SBAnimationBlend3D::removeMotion(const std::string& motionName)
 {
-	SBAnimationState::removeMotion(motionName);
+	SBAnimationBlend::removeMotion(motionName);
 
 	// remove correspondence points
 	removeSkMotion(motionName);
@@ -444,14 +444,14 @@ void SBAnimationState3D::removeMotion(const std::string& motionName)
 	removeTetrahedrons(motionName);
 }
 
-void SBAnimationState3D::setParameter(const std::string& motion, float parameter1, float parameter2, float parameter3)
+void SBAnimationBlend3D::setParameter(const std::string& motion, float parameter1, float parameter2, float parameter3)
 {
-	PAState::setParameter(motion, parameter1, parameter2, parameter3);
+	PABlend::setParameter(motion, parameter1, parameter2, parameter3);
 }
 
-void SBAnimationState3D::addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
+void SBAnimationBlend3D::addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
 {
-	PAState::addTetrahedron(motion1, motion2, motion3, motion4);
+	PABlend::addTetrahedron(motion1, motion2, motion3, motion4);
 }
 
 }

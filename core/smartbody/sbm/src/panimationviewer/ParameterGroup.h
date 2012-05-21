@@ -14,7 +14,7 @@ namespace SmartBody {
 class ParameterGroup : public Fl_Group
 {
 	public:
-		ParameterGroup(int x, int y, int w, int h, char* name, PAStateData* s, PanimationWindow* window, bool ex = false);
+		ParameterGroup(int x, int y, int w, int h, char* name, PABlendData* s, PanimationWindow* window, bool ex = false);
 		~ParameterGroup();
 
 		virtual void resize(int x, int y, int w, int h);
@@ -23,12 +23,12 @@ class ParameterGroup : public Fl_Group
 		static void updateXYAxisValue(Fl_Widget* widget, void* data);
 		static void updateXYZAxisValue(Fl_Widget* widget, void* data);
 		void updateWeight();
-		PAStateData* getCurrentPAStateData();
+		PABlendData* getCurrentPABlendData();
 		SmartBody::SBCharacter* getCurrentCharacter();
 
 	public:
 		PanimationWindow* paWindow;
-		PAStateData* stateData;
+		PABlendData* blendData;
 		ParameterVisualization* paramVisualization;
 		Parameter3DVisualization* param3DVisualization;
 		bool exec;

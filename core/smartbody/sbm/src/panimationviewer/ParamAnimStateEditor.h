@@ -32,7 +32,7 @@
 #include <FL/Fl_Check_Button.H>
 #include "PanimationWindow.h"
 
-class PAStateCreator;
+class PABlendCreator;
 class PanimationWindow;
 class ParameterVisualization;
 class Parameter3DVisualization;
@@ -40,11 +40,11 @@ class ParamAnimEditorWidget;
 class PAParameterEditor;
 class PAAutoFootStepsEditor;
 
-class PAStateEditor : public Fl_Group
+class PABlendEditor : public Fl_Group
 {
 	public:
-		PAStateEditor(int x, int y, int w, int h, PanimationWindow* window);
-		~PAStateEditor();
+		PABlendEditor(int x, int y, int w, int h, PanimationWindow* window);
+		~PABlendEditor();
 	
 		void loadStates();
 		static void changeStateEditorMode(Fl_Widget* widget, void* data);
@@ -76,12 +76,12 @@ class PAStateEditor : public Fl_Group
 		static void playmotion(Fl_Widget* widget, void* data);
 		void refreshAlign();
 		void updateMotionPlayer(double t);
-		void updateCorrespondenceMarks(PAState* state);
+		void updateCorrespondenceMarks(PABlend* state);
 		void refresh();
 
 		// helper functions
 		std::vector<std::string> getSelectedMotions();
-		PAState* getCurrentState();
+		PABlend* getCurrentState();
 
 	public:
 		PanimationWindow* paWindow;
@@ -120,7 +120,7 @@ class PAStateEditor : public Fl_Group
 		Fl_Choice*		choiceAutoParameter;
 		ParamAnimEditorWidget* stateTimeMarkWidget;
 		nle::NonLinearEditorModel* stateEditorNleModel;
-		PAStateCreator* creator;
+		PABlendCreator* creator;
 		PAParameterEditor* parameterEditor;
 		PAAutoFootStepsEditor* autoFootStepsEditor;
 		std::string lastSelectedMotion;
@@ -128,7 +128,7 @@ class PAStateEditor : public Fl_Group
 		Fl_Group*				visualizationGroup;
 		ParameterVisualization* triangleVisualization;
 		Parameter3DVisualization* tetraVisualization;
-		PAStateData*	stateData;
+		PABlendData*	blendData;
 
 		int lastNameIndex;
 		bool isPlaying;

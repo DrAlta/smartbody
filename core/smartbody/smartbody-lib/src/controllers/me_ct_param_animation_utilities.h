@@ -39,13 +39,13 @@ struct JointChannelId
 	int x, y, z, q;
 };
 
-class PAStateData;
+class PABlendData;
 
 class PATimeManager
 {
 	public:
 		PATimeManager();
-		PATimeManager(PAStateData* data);
+		PATimeManager(PABlendData* data);
 		~PATimeManager();
 
 		int getNumKeys();
@@ -68,7 +68,7 @@ class PATimeManager
 		double localTime;
 		double prevLocalTime;
 
-		PAStateData* stateData;
+		PABlendData* blendData;
 
 	public:
 	protected:
@@ -93,7 +93,7 @@ class PAMotions
 
 	public:
 		PAMotions();
-		PAMotions(PAStateData* data);
+		PAMotions(PABlendData* data);
 		~PAMotions();
 
 		int getNumMotions();
@@ -107,7 +107,7 @@ class PAMotions
 		void getBuffer(SkMotion* motion, double t, SrBuffer<int>& map, SrBuffer<float>& buff);				
 		void getUpdateMat(SrMat& dest, SrMat& src);
 		void getProcessedMat(SrMat& dest, SrMat& src);
-		PAStateData* stateData;
+		PABlendData* blendData;
 };
 
 class PAWoManager : public PAMotions
@@ -122,7 +122,7 @@ class PAWoManager : public PAMotions
 		SrMat currentBaseTransformMat;
 	public:
 		PAWoManager();
-		PAWoManager(PAStateData* data);
+		PAWoManager(PABlendData* data);
 		~PAWoManager();
 
 		void apply(std::vector<double>& times, std::vector<double>& timeDiffs, SrBuffer<float>& buffer);
@@ -139,7 +139,7 @@ class PAInterpolator : public PAMotions
 {
 	public:
 		PAInterpolator();
-		PAInterpolator(PAStateData* data);
+		PAInterpolator(PABlendData* data);
 		~PAInterpolator();
 
 		std::vector<std::string> joints;	// joints to be blended, if this is defined which means partial, world offset would be ignored
@@ -153,8 +153,8 @@ class PAInterpolator : public PAMotions
 		void handleBaseMatForBuffer(SrBuffer<float>& buff);
 };
 
-class PAState;
-class PAStateData
+class PABlend;
+class PABlendData
 {
 	public:
 		enum WrapMode { Loop, Once };
@@ -162,10 +162,10 @@ class PAStateData
 		enum ScheduleMode { Now, Queued };
 
 	public:
-		PAStateData();
-		PAStateData(const std::string& stateName, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued);
-		PAStateData(PAState* state, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued);
-		~PAStateData();
+		PABlendData();
+		PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued);
+		PABlendData(PABlend* state, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued);
+		~PABlendData();
 		virtual void evaluate(double timeStep, SrBuffer<float>& buffer);
 		virtual void evaluateTransition(double timeStep, SrBuffer<float>& buffer, bool tranIn);
 
@@ -180,7 +180,7 @@ class PAStateData
 		WrapMode wrapMode;
 		BlendMode blendMode;
 		ScheduleMode scheduleMode;
-		PAState* state;
+		PABlend* state;
 
 		bool active;
 		std::vector<std::vector<int> > motionIndex;
@@ -195,10 +195,10 @@ class PATransitionManager
 		
 		PATransitionManager();
 		PATransitionManager(double easeOutStart, double duration);
-		PATransitionManager(PATransition* transition, PAStateData* from, PAStateData* to);
+		PATransitionManager(PATransition* transition, PABlendData* from, PABlendData* to);
 		~PATransitionManager();
 
-		void align(PAStateData* current, PAStateData* next);
+		void align(PABlendData* current, PABlendData* next);
 		void blending(SrBuffer<float>& buffer, SrBuffer<float>&buffer1, SrBuffer<float>&buffer2, SrMat& mat, SrMat& mat1, SrMat& mat2, double timeStep, MeControllerContext* context);
 		void update();
 		double getSlope();
@@ -207,8 +207,8 @@ class PATransitionManager
 		bool active;
 		bool startTransition;
 
-		PAStateData* from;
-		PAStateData* to;
+		PABlendData* from;
+		PABlendData* to;
 		PATransition* transition;
 		srLinearCurve* curve;
 		double duration;

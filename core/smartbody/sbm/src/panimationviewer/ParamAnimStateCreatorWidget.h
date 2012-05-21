@@ -10,11 +10,11 @@
 #include "ParamAnimStateEditor.h"
 
 
-class PAStateCreator : public Fl_Window
+class PABlendCreator : public Fl_Window
 {
 	public:
-		PAStateCreator(PAStateEditor* editor, int x, int y, int w, int h);
-		~PAStateCreator();
+		PABlendCreator(PABlendEditor* editor, int x, int y, int w, int h);
+		~PABlendCreator();
 
 		std::string getUniqueStateName(std::string prefix);
 		void loadMotions();
@@ -32,7 +32,7 @@ class PAStateCreator : public Fl_Window
 		Fl_Button*		animationRemove;
 		Fl_Input*		inputStateName;
 		Fl_Choice*		choiceStateType;
-		PAStateEditor*	stateEditor;
+		PABlendEditor*	stateEditor;
 		Fl_Button*		buttonCreateState;
 		Fl_Button*		buttonCancelState;
 

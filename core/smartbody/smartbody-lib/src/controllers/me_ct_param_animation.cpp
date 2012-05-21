@@ -85,7 +85,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	if ((!curStateData && !nextStateData) ||
 		!curStateData)
 	{
-		if (!hasPAState(PseudoIdleState))
+		if (!hasPABlend(PseudoIdleState))
 		{
 			std::vector<double> weights;
 			schedule(NULL, weights);
@@ -97,9 +97,9 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	{
 		if (curStateData->state &&
 			curStateData->state->stateName != PseudoIdleState && 
-			nextStateData == NULL && (curStateData->wrapMode == PAStateData::Once))
+			nextStateData == NULL && (curStateData->wrapMode == PABlendData::Once))
 		{
-			if (!hasPAState(PseudoIdleState))
+			if (!hasPABlend(PseudoIdleState))
 			{
 				std::vector<double> weights;
 				schedule(NULL, weights);
@@ -256,11 +256,11 @@ const std::string& MeCtParamAnimation::getBaseJointName()
 	return baseJointName;
 }
 
-void MeCtParamAnimation::schedule(PAState* state, double x, double y, double z, PAStateData::WrapMode wrap, PAStateData::ScheduleMode schedule, PAStateData::BlendMode blend, std::string jName, double timeOffset)
+void MeCtParamAnimation::schedule(PABlend* state, double x, double y, double z, PABlendData::WrapMode wrap, PABlendData::ScheduleMode schedule, PABlendData::BlendMode blend, std::string jName, double timeOffset)
 {
 	std::vector<double> weights;
 	weights.resize(state->getNumMotions());
-	SmartBody::SBAnimationState0D* state0D = dynamic_cast<SmartBody::SBAnimationState0D*>(state);
+	SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SmartBody::SBAnimationBlend0D*>(state);
 	if (state0D)
 	{
 		if (state->getNumMotions() > 0)
@@ -268,21 +268,21 @@ void MeCtParamAnimation::schedule(PAState* state, double x, double y, double z, 
 	}
 	else
 	{
-		SmartBody::SBAnimationState1D* state1D = dynamic_cast<SmartBody::SBAnimationState1D*>(state);
+		SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SmartBody::SBAnimationBlend1D*>(state);
 		if (state1D)
 		{
 			state->getWeightsFromParameters(x, weights);
 		}
 		else
 		{
-			SmartBody::SBAnimationState2D* state2D = dynamic_cast<SmartBody::SBAnimationState2D*>(state);
+			SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(state);
 			if (state2D)
 			{
 				state->getWeightsFromParameters(x, y, weights);
 			}
 			else
 			{
-				SmartBody::SBAnimationState3D* state3D = dynamic_cast<SmartBody::SBAnimationState3D*>(state);
+				SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(state);
 				if (state3D)
 				{
 					state->getWeightsFromParameters(x, y, z, weights);
@@ -297,10 +297,10 @@ void MeCtParamAnimation::schedule(PAState* state, double x, double y, double z, 
 	this->schedule(state, weights, wrap, schedule, blend, jName, timeOffset);
 }
 
-void MeCtParamAnimation::schedule(PAState* stateData, const std::vector<double>& weights, PAStateData::WrapMode wrap, PAStateData::ScheduleMode schedule, PAStateData::BlendMode blend, std::string jName, double timeOffset)
+void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>& weights, PABlendData::WrapMode wrap, PABlendData::ScheduleMode schedule, PABlendData::BlendMode blend, std::string jName, double timeOffset)
 {
 	ScheduleUnit unit;
-	SmartBody::SBAnimationState* animState = dynamic_cast<SmartBody::SBAnimationState*>(stateData);
+	SmartBody::SBAnimationBlend* animState = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData);
 	if (animState)
 	{
 		animState->validateState(); // to make sure the animaion state is valid before schedule it
@@ -308,7 +308,7 @@ void MeCtParamAnimation::schedule(PAState* stateData, const std::vector<double>&
 
 	// schedule
 	unit.weights = weights;
-	unit.data = stateData;
+	unit.data = blendData;
 	unit.wrap = wrap;
 	unit.schedule = schedule;
 	unit.blend = blend;
@@ -409,7 +409,7 @@ const std::string& MeCtParamAnimation::getCurrentStateName()
 		return m_emptyString;
 }
 
-PAStateData* MeCtParamAnimation::getCurrentPAStateData()
+PABlendData* MeCtParamAnimation::getCurrentPABlendData()
 {
 	if (curStateData)
 		return curStateData;
@@ -417,7 +417,7 @@ PAStateData* MeCtParamAnimation::getCurrentPAStateData()
 		return NULL;
 }
 
-bool MeCtParamAnimation::hasPAState(const std::string& name)
+bool MeCtParamAnimation::hasPABlend(const std::string& name)
 {
 	if (getCurrentStateName() == name)
 		return true;
@@ -443,9 +443,9 @@ bool MeCtParamAnimation::hasPAState(const std::string& name)
 
 bool MeCtParamAnimation::isIdle()
 {
-	if (getCurrentPAStateData() && 
-		getCurrentPAStateData()->state &&
-		getCurrentPAStateData()->state->stateName != PseudoIdleState)
+	if (getCurrentPABlendData() && 
+		getCurrentPABlendData()->state &&
+		getCurrentPABlendData()->state->stateName != PseudoIdleState)
 		return false;
 	if (getNextStateName() != "")
 		return false;
@@ -513,7 +513,7 @@ void MeCtParamAnimation::autoScheduling(double time)
 				transitionManager = new PATransitionManager();
 			else
 			{
-				if (nextStateData->scheduleMode == PAStateData::Now)
+				if (nextStateData->scheduleMode == PABlendData::Now)
 					transitionManager = new PATransitionManager();
 				else
 				{
@@ -534,12 +534,12 @@ void MeCtParamAnimation::autoScheduling(double time)
 	}
 }
 
-PAStateData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
+PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 {
-	PAStateData* module = NULL;
+	PABlendData* module = NULL;
 	if (su.data)
 	{
-		module = new PAStateData(su.data, su.weights, su.blend, su.wrap, su.schedule);
+		module = new PABlendData(su.data, su.weights, su.blend, su.wrap, su.schedule);
 		std::vector<std::string> joints;
 		SkJoint* j = character->getSkeleton()->search_joint(su.partialJoint.c_str());
 		if (j)
@@ -556,7 +556,7 @@ PAStateData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	}
 	else
 	{
-		module = new PAStateData(PseudoIdleState, su.weights);
+		module = new PABlendData(PseudoIdleState, su.weights);
 	}
 	if (_context)
 	{
