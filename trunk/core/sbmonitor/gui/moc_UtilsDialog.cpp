@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'UtilsDialog.h'
 **
-** Created: Fri May 18 13:45:41 2012
+** Created: Mon May 21 10:47:05 2012
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -78,7 +78,7 @@ const QMetaObjectExtraData UtilsDialog::staticMetaObjectExtraData = {
 };
 
 const QMetaObject UtilsDialog::staticMetaObject = {
-    { &QDialog::staticMetaObject, qt_meta_stringdata_UtilsDialog,
+    { &QObject::staticMetaObject, qt_meta_stringdata_UtilsDialog,
       qt_meta_data_UtilsDialog, &staticMetaObjectExtraData }
 };
 
@@ -96,12 +96,12 @@ void *UtilsDialog::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_UtilsDialog))
         return static_cast<void*>(const_cast< UtilsDialog*>(this));
-    return QDialog::qt_metacast(_clname);
+    return QObject::qt_metacast(_clname);
 }
 
 int UtilsDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QDialog::qt_metacall(_c, _id, _a);
+    _id = QObject::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
