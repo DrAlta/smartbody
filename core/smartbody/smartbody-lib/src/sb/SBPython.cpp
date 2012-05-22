@@ -466,6 +466,7 @@ struct map_item
 typedef std::map<std::string,SrQuat> QuatMap;
 typedef std::map<std::string,SrVec> VecMap;
 
+
 namespace SmartBody 
 {
 #ifdef USE_PYTHON
@@ -488,6 +489,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::class_<std::vector<double> >("DoubleVec")
         .def(boost::python::vector_indexing_suite<std::vector<double> >())
     ;
+
 
 	boost::python::class_< QuatMap >("QuatMap")
 		.def("__len__", &QuatMap::size)
@@ -965,6 +967,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("disconnect", &SBMotion::disconnect, "Disconnect current motion with current skeleton object. ")
 		.def("mirror", &SBMotion::mirror, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Mirrors the motion.")
 		.def("retarget", &SBMotion::retarget, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Retarget the motion to a different skeleton.")
+		.def("footSkateCleanUp", &SBMotion::footSkateCleanUp, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Retarget the motion to a different skeleton.")
 		.def("smoothCycle", &SBMotion::smoothCycle, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Build the smooth cycle the motion.")
 		.def("alignToEnd", &SBMotion::alignToEnd, "Cut the first x number of frames and stitch them to the end. x is the input number")
 		.def("alignToBegin", &SBMotion::alignToBegin, "Cut the last x number of frames and stitch them to the begin. x is the input number")

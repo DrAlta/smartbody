@@ -58,9 +58,7 @@ typedef std::vector<EffectorConstraint*> VecOfConstraintPtr;
 
 class MeCtIKTreeScenario
 {
-
-public:	
-	SkSkeleton*                  ikSkeleton;
+public:		
 	IKTreeNodeList               ikTreeNodes;
 	IKTreeNodeList               ikValidNodes;
 	MeCtIKTreeNode*              ikTreeRoot; // contains the tree structure for IK tree ( which may contain multiple end effectors/IK chains )	
@@ -79,6 +77,7 @@ public:
 	void updateQuat(const dVector& dTheta, bool updateOnlyValidNodes = false);
 	void copyTreeNodeQuat(NodeQuatType typeFrom, NodeQuatType typeTo);
 	void setTreeNodeQuat(const std::vector<SrQuat>& inQuatList,NodeQuatType type);
+	void setTreeNodeQuat(SkSkeleton* skel,NodeQuatType type);
 	void getTreeNodeQuat(std::vector<SrQuat>& inQuatList, NodeQuatType type);
 	void updateJointLimit();	
 	void updateNodeGlobalMat(MeCtIKTreeNode* jointNode, NodeQuatType quatType = QUAT_INIT);	

@@ -330,6 +330,19 @@ void MeCtIKTreeScenario::setTreeNodeQuat( const std::vector<SrQuat>& inQuatList,
 		ikTreeNodes[i]->setQuat(inQuatList[i],type);
 }
 
+void MeCtIKTreeScenario::setTreeNodeQuat( SkSkeleton* skel,NodeQuatType type )
+{
+	for (unsigned int i=0;i<ikTreeNodes.size();i++)
+	{
+		MeCtIKTreeNode* node = ikTreeNodes[i];
+		SkJoint* joint = skel->search_joint(node->nodeName.c_str());
+		if (joint)
+		{
+			node->setQuat(joint->quat()->rawValue(),type);
+		}
+	}
+}
+
 void MeCtIKTreeScenario::getTreeNodeQuat( std::vector<SrQuat>& inQuatList, NodeQuatType type )
 {
 	inQuatList.resize(ikTreeNodes.size());

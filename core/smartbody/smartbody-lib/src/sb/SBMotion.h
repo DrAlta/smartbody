@@ -9,15 +9,19 @@ namespace SmartBody {
 
 class SBJoint;
 class SBSkeleton;
+class SBMotion;
 
 class FootStepRecord
 {
 public:
-	std::string jointName;
-	float startTime, endTime;
+	std::vector<std::string> jointNames; // all joints related to a footstep
+	std::vector<SrVec> posVec; // desired positions for these joints
+	float startTime, endTime;	
 	FootStepRecord();
 	~FootStepRecord();
 	FootStepRecord& operator= ( const FootStepRecord& rt);
+
+	void updateJointAveargePosition( SBSkeleton* skel, SBMotion* motion);
 };
 
 class SBMotion : public SkMotion
@@ -66,8 +70,11 @@ class SBMotion : public SkMotion
 								   std::vector<std::string>& selectedJoints, float floorHeight, float floorThreshold, float speedThreshold, 
 								   int speedWindow, bool isPrintDebugInfo = false);
 
-		bool autoFootPlantDetection(SBSkeleton* srcSk, std::vector<std::string>& footJoints, float floorHeight, float heightThreshold, float speedThreshold, std::vector<FootStepRecord>& footStepRecords);
-
+		bool autoFootPlantDetection(SBSkeleton* srcSk, std::vector<std::string>& footJoints, float floorHeight, float heightThreshold, float speedThreshold, std::vector<FootStepRecord>& footStepRecords);		
+		SBMotion* autoFootSkateCleanUp(std::string name, std::string srcSkeletonName, std::string rootName, std::vector<FootStepRecord>& footStepRecords);
+		// API wrapper
+		SBMotion* footSkateCleanUp(std::string name, std::vector<std::string>& footJoints, std::string srcSkeletonName, std::string srcMotionName, 
+								   std::string tgtSkeletonName, std::string tgtRootName, float floorHeight, float heightThreshold, float speedThreshold);
 
 		double getFrameRate();
 		double getDuration();
@@ -86,6 +93,7 @@ class SBMotion : public SkMotion
 
 		static bool kMeansClustering1D(int num, std::vector<double>& inputPoints, std::vector<double>& outMeans);
 		static void calculateMeans(std::vector<double>&inputPoints, std::vector<double>& means, double convergentValue);
+		
 
 	protected:
 		std::string _motionFile;
