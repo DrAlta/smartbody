@@ -73,7 +73,7 @@
     <Link>
       <AdditionalDependencies>libFestival.lib;libestbase.lib;libestools.lib;libeststring.lib;Ws2_32.lib;winmm.lib;vhcl_d.lib;xerces-c_3D.lib;vhmsg_d.lib;pthreadVSE2.lib;activemq-cppd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)d.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\lib\festival\festival\src\lib;..\..\lib\festival\speech_tools\lib;..\..\lib\vhcl\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\xerces-c\lib;..\..\lib\pthreads\lib9;..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\lib\festival\festival\src\lib;..\..\lib\festival\speech_tools\lib;..\..\lib\vhcl\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\xerces-c\lib;..\..\lib\pthreads\lib;..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -133,7 +133,7 @@ copy /Y ..\..\lib\festival\speech_tools\lib\siod\web.scm ..\..\bin\FestivalRelay
     </ProjectReference>
     <Link>
       <AdditionalDependencies>libFestival.lib;libestbase.lib;libestools.lib;libeststring.lib;Ws2_32.lib;winmm.lib;xerces-c_3.lib;vhcl.lib;vhmsg.lib;pthreadVSE2.lib;activemq-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\lib\festival\festival\src\lib;..\..\lib\festival\speech_tools\lib;..\..\lib\xerces-c\lib9;..\..\lib\vhcl\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL;..\..\lib\pthreads\lib9;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\lib\festival\festival\src\lib;..\..\lib\festival\speech_tools\lib;..\..\lib\xerces-c\lib;..\..\lib\vhcl\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\lib\pthreads\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>
