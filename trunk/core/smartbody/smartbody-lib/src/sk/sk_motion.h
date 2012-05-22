@@ -223,6 +223,7 @@ public :
 	/*! Move all keytimes so that the first keytime starts at the given time */
 	void move_keytimes ( float startkt );
 	
+	SkMotion* copyMotion();
 	// Build and return a mirror motion from the motion. The mirror axis is assumed to be y-z plane with the character center at origin.
 	SkMotion* buildMirrorMotion(SkSkeleton* skeleton);
 

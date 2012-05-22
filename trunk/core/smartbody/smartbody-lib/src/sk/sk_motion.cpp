@@ -878,7 +878,12 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 	{
 		SkJoint* child = pjoint->child(i);
 		SrVec srcdir = tempSrcSk->boneGlobalDirection(pjoint->name(),child->name());
-		SrVec dstdir = interSk->boneGlobalDirection(pjoint->name(),child->name());				
+		SrVec dstdir = interSk->boneGlobalDirection(pjoint->name(),child->name());	
+// 		if (pjointName == "spine5" || pjointName == "spine4")
+// 		{
+// 			LOG("joint name %s, child %d, srcdir = %f %f %f, dstdir = %f %f %f",pjointName.c_str(),i,srcdir[0],srcdir[1],srcdir[2],dstdir[0],dstdir[1],dstdir[2]);
+// 		}
+		
 		jointQueues.push(child->name());
 		srcDirList.push_back(srcdir);			
 		dstDirList.push_back(dstdir);
@@ -889,8 +894,10 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 	{
 
 		SrVec srcDir, dstDir;
+		//for (unsigned int k=0;k<srcDirList.size();k++)
 		for (unsigned int k=0;k<srcDirList.size();k++)
 		{
+			if (k>=1) continue;
 			srcDir += srcDirList[k];
 			dstDir += dstDirList[k];
 		}
@@ -929,7 +936,11 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		pjoint->update_gmat();
 		//interSk->invalidate_global_matrices();
 		//interSk->update_global_matrices();
-		//LOG("skeleton align rotation, joint = %s, rotation = %f %f %f",pjointName.c_str(),rotAxisAngle[0],rotAxisAngle[1],rotAxisAngle[2]);			
+// 		if (pjointName == "spine4" || pjointName == "spine5")
+// 		{
+// 			LOG("skeleton align rotation, joint = %s, rotation = %f %f %f",pjointName.c_str(),rotAxisAngle[0],rotAxisAngle[1],rotAxisAngle[2]);			
+// 			LOG("srcdir = %f %f %f, dstdir = %f %f %f, alignRotAxisAngle = %f %f %f",srcDir[0],srcDir[1],srcDir[2], dstDir[0],dstDir[1],dstDir[2],alignRotAxisAngle[0],alignRotAxisAngle[1],alignRotAxisAngle[2]);
+// 		}
 		SrVec newDstDir = SrVec();
 		for (int k=0;k<pjoint->num_children();k++)
 		{
@@ -1285,6 +1296,24 @@ SkMotion* SkMotion::buildRetargetMotion2( SkSkeleton* sourceSk, SkSkeleton* targ
 	}
 	this->disconnect();
 	return retarget_p;
+}
+
+SkMotion* SkMotion::copyMotion()
+{
+	SkChannelArray& mchan_arr = this->channels();
+	SkMotion* cpMotion = new SmartBody::SBMotion();
+	srSynchPoints sp(synch_points);
+	cpMotion->synch_points = sp;
+	cpMotion->init( mchan_arr );
+	int num_f = this->frames();
+	for (int i = 0; i < num_f; i++)
+	{
+		cpMotion->insert_frame( i, this->keytime( i ) );
+		float *ref_p = this->posture( i );
+		float *new_p = cpMotion->posture( i );
+		memcpy(new_p,ref_p,sizeof(float)*posture_size());
+	}
+	return cpMotion;	
 }
 
 SkMotion* SkMotion::buildMirrorMotion(SkSkeleton* skeleton)
