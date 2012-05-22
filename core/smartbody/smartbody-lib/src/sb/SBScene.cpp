@@ -201,7 +201,6 @@ void SBScene::removeCharacter(std::string charName)
 	SBCharacter* character = this->getCharacter(charName);
 	if (character)
 	{
-		mcu.unregisterCharacter(character);
 
 		string vrProcEnd_msg = "vrProcEnd sbm ";
 		vrProcEnd_msg += getName();
@@ -217,6 +216,8 @@ void SBScene::removeCharacter(std::string charName)
 			service->onCharacterDelete(character);
 		}
 	
+		mcu.unregisterCharacter(character);
+
 		delete character;
 	}	
 }
@@ -230,8 +231,6 @@ void SBScene::removePawn(std::string pawnName)
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
 		if (!character)
 		{
-			mcu.unregisterPawn(pawn);
-
 			// notify the services
 			std::map<std::string, SmartBody::SBService*>& services = getServiceManager()->getServices();
 			for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
@@ -239,8 +238,10 @@ void SBScene::removePawn(std::string pawnName)
 				iter++)
 			{
 				SBService* service = (*iter).second;
-				service->onPawnDelete(character);
+				SBPawn* sbpawn = dynamic_cast<SBPawn*>(pawn);
+				service->onPawnDelete(sbpawn);
 			}
+			mcu.unregisterPawn(pawn);
 
 			delete pawn;
 		}
@@ -255,8 +256,7 @@ int SBScene::getNumCharacters()
 
 int SBScene::getNumPawns() 
 {  
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	LOG("Python calls getNumPawns");
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	return mcu.getNumPawns() - mcu.getNumCharacters(); 
 }
 
