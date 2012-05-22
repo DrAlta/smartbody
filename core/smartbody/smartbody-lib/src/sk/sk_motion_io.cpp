@@ -29,6 +29,7 @@
 # include <sk/sk_motion.h>
 #include <iostream>
 #include <sstream>
+#include <SB/SBMotion.h>
 
 using namespace std;
 
@@ -117,7 +118,7 @@ bool SkMotion::_load_bvh ( SrInput& in ) {
 
 //======================= parse_timing_metadata ========================
 
-bool parse_timing_metadata( SrInput& in, SrString name, float& time ) {
+bool parse_timing_metadata( SrInput& in, SrString name, float& time) {
 	int      line_number = in.curline();  // store in case of error
 
 	SrInput::TokenType token_type = in.get_token();
@@ -144,6 +145,38 @@ bool parse_timing_metadata( SrInput& in, SrString name, float& time ) {
 		return false;
 	}
 	time = token.atof();
+	return true;
+}
+
+bool parseMetaDataFloat( SrInput& in, SrString name, float& time) 
+{
+	int      line_number = in.curline();  // store in case of error	
+	SrInput::TokenType token_type = in.get_token();
+	if( token_type==SrInput::Delimiter ) {
+		// Ignore and get next token
+		token_type = in.get_token();
+	}
+	SrString& token = in.last_token();
+	if( token_type!=SrInput::Real && token_type!=SrInput::Integer ) {
+		std::stringstream strstr;
+		strstr << "ERROR: SkMotion::load(): File \""<<in.filename()<<"\", line "<<line_number<<": Invalid \""<<name<<"\" time value. Expected number, but recieved \"" << token << "\" (token_type "<<token_type<<").";
+		LOG(strstr.str().c_str());
+		return false;
+	}
+	time = token.atof();
+	return true;
+}
+
+bool parseMetaDataString( SrInput& in, SrString name, std::string& strValue) 
+{
+	int      line_number = in.curline();  // store in case of error	
+	SrInput::TokenType token_type = in.get_token();
+	if( token_type==SrInput::Delimiter ) {
+		// Ignore and get next token
+		token_type = in.get_token();
+	}
+	SrString& token = in.last_token();	
+	strValue = token;
 	return true;
 }
 
@@ -227,6 +260,14 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 		move_keytimes ( start_kt );
 	compress();
 
+	enum { READY=1, STROKE_START=2, STROKE_EMPH=4, STROKE_END=8, RELAX=16, ALL=31 };
+	//token == "emphasisTime" || token == "readyTime" || token == "relaxTime" || token == "strokeStartTime" || token == "strokeTime"  || token == "strokeEmphasisTime" || token == "strokeEndTime"
+	std::map<std::string, std::pair<int,float*> > defaultTagMap;
+	defaultTagMap["readyTime"] = std::pair<int,float*>(READY, &_time_ready);
+	defaultTagMap["strokeStartTime"] = std::pair<int,float*>(STROKE_START, &_time_stroke_start);
+	defaultTagMap["emphasisTime"] = std::pair<int,float*>(STROKE_EMPH, &_time_stroke_end);	
+	defaultTagMap["strokeTime"] = std::pair<int,float*>(STROKE_END, &_time_stroke_end);	
+	defaultTagMap["relaxTime"] = std::pair<int,float*>(RELAX, &_time_relax);
 
 	// 7. read timing metadata until end of file
 	SrInput::TokenType token_type = in.get_token();
@@ -235,10 +276,11 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 		cout<<endl<<endl<<"WARNING: ATTEMPT TO LOAD SKM WITHOUT READY,STROKE,RELAX METADATA : "<<_name<<endl; 
 #endif
 	} else {
-		enum { READY=1, STROKE_START=2, STROKE_EMPH=4, STROKE_END=8, RELAX=16, ALL=31 };
+		
 		int metadata_flags = 0;
 		do {
 			SrString& token = in.last_token();
+			std::string strToken = token;
 
 			if( token=="ready" ) {
 				if( parse_timing_metadata( in, token, _time_ready ) )
@@ -309,7 +351,49 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 					metadata_flags |= STROKE_END;
 				else
 					continue;
-			} else {
+			} 
+			// new sync point labels
+			else if (defaultTagMap.find(strToken) != defaultTagMap.end())
+			{
+				int metaFlag = defaultTagMap[strToken].first;
+				float& timeValue = *defaultTagMap[strToken].second;
+				if (parseMetaDataFloat(in, token, timeValue))
+					metadata_flags |= metaFlag;
+				else
+					continue;
+			}			
+			else {
+#if 1
+				SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(this);
+				if (sbMotion)
+				{
+					std::string tag = token;					
+					std::string strValue;
+					parseMetaDataString(in, token, strValue);
+					
+					// remove number post-fix at the tag
+					bool hasNumber =true;
+					int subStrIndex = tag.size();
+					for (int k=tag.size()-1;k>= 0; k--)
+					{
+						if (!isdigit(tag[k]))
+						{
+							hasNumber = false;
+							break;
+						}
+						else
+						{
+							subStrIndex = k;
+						}
+					}
+					tag = tag.substr(0,subStrIndex); 
+					sbMotion->addTagMetaData(tag,strValue);
+				}
+				else
+				{
+					continue;
+				}
+#else
 				std::stringstream strstr;
 				strstr << "ERROR: SkMotion::load(): ";
 				if( in.filename() )
@@ -323,6 +407,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				strstr <<": Expected metadata name, but recieved \"" << token << "\".";
 				LOG(strstr.str().c_str());
 				continue;
+#endif
 			}
 		} while( in.get_token() != SrInput::EndOfFile );
 

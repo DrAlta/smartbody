@@ -990,7 +990,15 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getTimeStop", &SBMotion::retime, "Returns the stop time of the motion.")	
 		.def("getDuration", &SBMotion::getDuration, "Return the duration of the motion")
 		.def("addEvent", &SBMotion::addEvent, "Adds an event associated with this motion that will be triggered at the given time. The last paramter determines if the event will be triggered only once, or every time the motion is looped.")
-
+		.def("addTagMetaData", &SBMotion::addTagMetaData, "Add a tagged metadata as string to the motion.")
+		.def("removeTagMetaData", &SBMotion::removeTagMetaData, "Remove a tagged metadata from the motion.")
+		.def("getTagMetaDataSize", &SBMotion::getTagMetaDataSize, "Get the size of the metadata list based on tag name.")
+		.def("getTagMetaDataString", &SBMotion::getTagMetaDataString, "Get the first metadata based on tag name")
+		.def("getTagMetaDataStringWithIndex", &SBMotion::getTagMetaDataStringWithIndex, "Get the k-th metadata based on tag name.")
+		.def("getTagMetaDataDouble", &SBMotion::getTagMetaDataDouble, "Get the first metadata based on tag name")
+		.def("getTagMetaDataDoubleWithIndex", &SBMotion::getTagMetaDataDoubleWithIndex, "Get the k-th metadata based on tag name.")
+		.def("getTagMetaDataStringList", &SBMotion::getTagMetaDataStringList, "Get the metadata string list based on tag name.")
+		.def("getMetaDataTagList", &SBMotion::getMetaDataTagList, "Get all tag names in the metadata map.")
 		;
 
 
