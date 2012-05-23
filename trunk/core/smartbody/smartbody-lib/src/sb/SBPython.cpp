@@ -465,6 +465,7 @@ struct map_item
 
 typedef std::map<std::string,SrQuat> QuatMap;
 typedef std::map<std::string,SrVec> VecMap;
+typedef std::map<std::string, std::string> StringMap;
 
 
 namespace SmartBody 
@@ -509,6 +510,16 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("__setitem__", &map_item<VecMap>::set,
 		boost::python::with_custodian_and_ward<1,2>()) // to let container keep value
 		.def("__delitem__", &map_item<VecMap>::del)
+		;
+
+	boost::python::class_< StringMap >("StringMap")
+		.def("__len__", &StringMap::size)
+		.def("clear", &StringMap::clear)
+		.def("__getitem__", &map_item<StringMap>::get,
+		boost::python::return_value_policy<boost::python::return_by_value>())
+		.def("__setitem__", &map_item<StringMap>::set,
+		boost::python::with_custodian_and_ward<1,2>()) // to let container keep value
+		.def("__delitem__", &map_item<StringMap>::del)
 		;
 
 	
@@ -968,6 +979,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("mirror", &SBMotion::mirror, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Mirrors the motion.")
 		.def("retarget", &SBMotion::retarget, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Retarget the motion to a different skeleton.")
 		.def("footSkateCleanUp", &SBMotion::footSkateCleanUp, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Retarget the motion to a different skeleton.")
+		.def("constrain", &SBMotion::constrain, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Constrain the retargeted motion to based on the source skeleton and motion.")
 		.def("smoothCycle", &SBMotion::smoothCycle, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Build the smooth cycle the motion.")
 		.def("alignToEnd", &SBMotion::alignToEnd, "Cut the first x number of frames and stitch them to the end. x is the input number")
 		.def("alignToBegin", &SBMotion::alignToBegin, "Cut the last x number of frames and stitch them to the begin. x is the input number")

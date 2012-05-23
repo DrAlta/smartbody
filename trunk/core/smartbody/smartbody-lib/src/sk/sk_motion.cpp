@@ -38,6 +38,7 @@
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 #include <sb/SBMotion.h>
+#include <sb/SBSkeleton.h>
 
 using namespace gwiz;
 
@@ -951,6 +952,8 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 	}
 }
 
+
+
 SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints, std::map<std::string, SrVec>& offsetJoints )
 {
 	SkChannelArray& mchan_arr = this->channels();
@@ -961,7 +964,7 @@ SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targe
 	tempSrcSk->invalidate_global_matrices();
 	tempSrcSk->update_global_matrices();
 	interSk->invalidate_global_matrices();
-	interSk->update_global_matrices();
+	interSk->update_global_matrices();	
 
 	SkMotion *retarget_p = new SmartBody::SBMotion();
 	srSynchPoints sp(synch_points);
@@ -1048,7 +1051,8 @@ SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targe
 			else if (chan.type == SkChannel::XPos || chan.type == SkChannel::YPos || chan.type == SkChannel::ZPos)
 			{
 				// just copy over the translation for now
-				new_p[ index ] = ref_p[ index ];
+				float chanValue = ref_p[ index ];				
+				new_p[ index ] = chanValue;
 			}
 		}	
 	}

@@ -52,7 +52,9 @@ class SBMotion : public SkMotion
 
 		SBMotion* mirror(std::string name, std::string skeletonName);
 		SBMotion* smoothCycle(std::string name, float timeInterval);
-		SBMotion* retarget(std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints, std::map<std::string, SrVec>& offsetJointMap);
+		SBMotion* retarget(std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints, std::map<std::string, SrVec>& offsetJointMap);	
+
+
 		bool translate(float x, float y, float z, const std::string& baseJointName);
 		bool rotate(float xaxis, float yaxis, float zaxis, const std::string& baseJointName);
 		bool scale(float factor);
@@ -72,9 +74,13 @@ class SBMotion : public SkMotion
 
 		bool autoFootPlantDetection(SBSkeleton* srcSk, std::vector<std::string>& footJoints, float floorHeight, float heightThreshold, float speedThreshold, std::vector<FootStepRecord>& footStepRecords);		
 		SBMotion* autoFootSkateCleanUp(std::string name, std::string srcSkeletonName, std::string rootName, std::vector<FootStepRecord>& footStepRecords);
+		SBMotion* buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* targetSk, SBMotion* targetMotion, std::vector<std::string>& endJoints );
+
 		// API wrapper
 		SBMotion* footSkateCleanUp(std::string name, std::vector<std::string>& footJoints, std::string srcSkeletonName, std::string srcMotionName, 
 								   std::string tgtSkeletonName, std::string tgtRootName, float floorHeight, float heightThreshold, float speedThreshold);
+
+		SBMotion* constrain(std::string name, std::string srcSkeletonName, std::string tgtSkeletonName, std::string tgtMotionName, std::vector<std::string>& endJoints);
 
 		double getFrameRate();
 		double getDuration();

@@ -335,6 +335,14 @@ void SkSkeleton::set_geo_local ()
 	update_global_matrices ();
 }
 
+
+float SkSkeleton::getBaseHeight()
+{
+	SrBox boundingBox = getBoundingBox();
+	SrVec basePos = _root->gmat().get_translation();
+	return basePos.y - boundingBox.a.y;
+}
+
 float SkSkeleton::getCurrentHeight()
 {
 	SrBox initialBoundingBox = getBoundingBox();	

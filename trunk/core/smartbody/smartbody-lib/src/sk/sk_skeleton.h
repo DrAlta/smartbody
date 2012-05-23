@@ -182,9 +182,10 @@ class SkSkeleton : public SrSharedClass
 	void compute_com () {}; 
 
 	/*! retrieves the center of mass of the skeleton */
-	SrVec& com () { return _com; };
+	SrVec& com () { return _com; };	
 	
-	float getCurrentHeight();
+	float getBaseHeight();
+	float getCurrentHeight();	
 	SrBox getBoundingBox();
 	
 	void copy_joint(SkJoint* dest, SkJoint* src);
