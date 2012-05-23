@@ -369,25 +369,24 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				{
 					std::string tag = token;					
 					std::string strValue;
-					parseMetaDataString(in, token, strValue);
-					
+					parseMetaDataString(in, token, strValue);					
 					// remove number post-fix at the tag
-					bool hasNumber =true;
-					int subStrIndex = tag.size();
-					for (int k=tag.size()-1;k>= 0; k--)
-					{
-						if (!isdigit(tag[k]))
-						{
-							hasNumber = false;
-							break;
-						}
-						else
-						{
-							subStrIndex = k;
-						}
-					}
-					tag = tag.substr(0,subStrIndex); 
-					sbMotion->addTagMetaData(tag,strValue);
+// 					bool hasNumber =true;
+// 					int subStrIndex = tag.size();
+// 					for (int k=tag.size()-1;k>= 0; k--)
+// 					{
+// 						if (!isdigit(tag[k]))
+// 						{
+// 							hasNumber = false;
+// 							break;
+// 						}
+// 						else
+// 						{
+// 							subStrIndex = k;
+// 						}
+// 					}
+// 					tag = tag.substr(0,subStrIndex); 
+					sbMotion->addMetaData(tag,strValue);
 				}
 				else
 				{

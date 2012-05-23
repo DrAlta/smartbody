@@ -86,15 +86,11 @@ class SBMotion : public SkMotion
 		double getTimeRelax();
 		double getTimeStop();
 
-		bool addTagMetaData(const std::string& tagName, const std::string& strValue);
-		bool removeTagMetaData(const std::string& tagName);
-		int  getTagMetaDataSize(const std::string& tagName);
-		std::string getTagMetaDataString(const std::string& tagName);
-		std::string getTagMetaDataStringWithIndex(const std::string& tagName, int index);
-		double      getTagMetaDataDouble(const std::string& tagName);
-		double      getTagMetaDataDoubleWithIndex(const std::string& tagName, int index);
-		std::vector<std::string> getTagMetaDataStringList(const std::string& tagName);	
-		std::vector<std::string> getMetaDataTagList();
+		bool addMetaData(const std::string& tagName, const std::string& strValue);
+		bool removeMetaData(const std::string& tagName);		
+		std::string getMetaDataString(const std::string& tagName);	
+		double      getMetaDataDouble(const std::string& tagName);				
+		std::vector<std::string> getMetaDataTags();
 		
 
 		void addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly);
@@ -110,7 +106,7 @@ class SBMotion : public SkMotion
 		std::string _motionFile;
 		std::string _emptyString;
 		int alignIndex;
-		std::map<std::string, std::vector<std::string> > tagAttrMap; // store the tagged attributes in a map
+		std::map<std::string, std::string> tagAttrMap; // store the tagged attributes in a map
 };
 
 };
