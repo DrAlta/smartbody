@@ -634,7 +634,7 @@ SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkele
 	{
  		if (frameConstraintMap.find(iframe) == frameConstraintMap.end())
 		{
-			prevConstraint = false;
+			//prevConstraint = false;
  			continue;
 		}
 
@@ -644,7 +644,7 @@ SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkele
 		if (!prevConstraint)
 		{
 			ikScenario.setTreeNodeQuat(skel,QUAT_INIT);
-			prevConstraint = true;
+			//prevConstraint = true;
 		}		
 		ikScenario.copyTreeNodeQuat(QUAT_INIT,QUAT_CUR);
 		ikScenario.setTreeNodeQuat(skel,QUAT_REF);
@@ -667,19 +667,19 @@ SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkele
 // 			ikCCD.update(&ikScenario);
 // 		}
 		
-		ConstraintMap combineCons;
-		for (unsigned int k=0; k<recIdxList.size(); k++)
-		{
-			ConstraintMap& cons = constrainMapList[recIdxList[k]];
-			combineCons.insert(cons.begin(),cons.end());
-		}
-		ikScenario.ikPosEffectors = &combineCons;
-		ikScenario.ikRotEffectors = &noRotConstraint;
-		for (int k=0;k<10;k++)
-		{
-			ikJacobian.update(&ikScenario);
-			ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);	
-		}
+// 		ConstraintMap combineCons;
+// 		for (unsigned int k=0; k<recIdxList.size(); k++)
+// 		{
+// 			ConstraintMap& cons = constrainMapList[recIdxList[k]];
+// 			combineCons.insert(cons.begin(),cons.end());
+// 		}
+// 		ikScenario.ikPosEffectors = &combineCons;
+// 		ikScenario.ikRotEffectors = &noRotConstraint;
+// 		for (int k=0;k<10;k++)
+// 		{
+// 			ikJacobian.update(&ikScenario);
+// 			ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);	
+// 		}
 		
 
 			
@@ -1547,17 +1547,18 @@ bool SBMotion::autoFootStepDetection( std::vector<double>& outMeans, int numStep
 
 }
 
-bool SBMotion::addTagMetaData( const std::string& tagName, const std::string& strValue )
+bool SBMotion::addMetaData( const std::string& tagName, const std::string& strValue )
 {
+	bool newData = false;
 	if (tagAttrMap.find(tagName) == tagAttrMap.end())
-	{
-		tagAttrMap[tagName] = std::vector<std::string>();
+	{		
+		newData = true;		
 	}
-	tagAttrMap[tagName].push_back(strValue);
-	return true;
+	tagAttrMap[tagName] = strValue;	
+	return newData;
 }
 
-bool SBMotion::removeTagMetaData( const std::string& tagName )
+bool SBMotion::removeMetaData( const std::string& tagName )
 {
 	if (tagAttrMap.find(tagName) != tagAttrMap.end())
 	{
@@ -1571,47 +1572,18 @@ bool SBMotion::removeTagMetaData( const std::string& tagName )
 	return false;
 }
 
-int SBMotion::getTagMetaDataSize( const std::string& tagName )
+double SBMotion::getMetaDataDouble( const std::string& tagName )
 {
-	int metaDataSize = -1;
-	if (tagAttrMap.find(tagName) != tagAttrMap.end())
-	{
-		metaDataSize = tagAttrMap[tagName].size();
-	}
-	else
-	{
-		LOG("Tag %s not found !", tagName.c_str());
-	}
-	return metaDataSize;
-}
-
-double SBMotion::getTagMetaDataDouble( const std::string& tagName )
-{
-	std::string strValue = getTagMetaDataString(tagName);
+	std::string strValue = getMetaDataString(tagName);
 	return boost::lexical_cast<double>(strValue);
 }
 
-
-double SBMotion::getTagMetaDataDoubleWithIndex( const std::string& tagName, int index )
-{
-	std::string strValue = getTagMetaDataStringWithIndex(tagName,index);
-	return boost::lexical_cast<double>(strValue);
-}
-
-std::string SBMotion::getTagMetaDataStringWithIndex( const std::string& tagName, int index )
+std::string SBMotion::getMetaDataString( const std::string& tagName )
 {
 	std::string strValue = "";
 	if (tagAttrMap.find(tagName) != tagAttrMap.end())
 	{
-		std::vector<std::string>& strList = tagAttrMap[tagName];
-		if (index >=0 && index < (int)strList.size())
-		{
-			strValue = strList[index];
-		}
-		else
-		{
-			LOG("Index %d out of range, tag %s size = %d",index, tagName.c_str(), strList.size());
-		}
+		strValue = tagAttrMap[tagName];		
 	}
 	else
 	{
@@ -1620,29 +1592,10 @@ std::string SBMotion::getTagMetaDataStringWithIndex( const std::string& tagName,
 	return strValue;
 }
 
-std::string SBMotion::getTagMetaDataString( const std::string& tagName )
-{
-	return getTagMetaDataStringWithIndex(tagName,0);
-}
-
-std::vector<std::string> SBMotion::getTagMetaDataStringList( const std::string& tagName )
-{
-	std::vector<std::string> strValueList;
-	if (tagAttrMap.find(tagName) != tagAttrMap.end())
-	{
-		strValueList = tagAttrMap[tagName];		
-	}
-	else
-	{
-		LOG("Tag %s not found !", tagName.c_str());
-	}
-	return strValueList;
-}
-
-std::vector<std::string> SBMotion::getMetaDataTagList()
+std::vector<std::string> SBMotion::getMetaDataTags()
 {
 	std::vector<std::string> tagList;
-	std::map<std::string, std::vector<std::string> >::iterator mi;
+	std::map<std::string, std::string >::iterator mi;
 	for ( mi  = tagAttrMap.begin();
 		  mi != tagAttrMap.end();
 		  mi++)
