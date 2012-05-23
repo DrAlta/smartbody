@@ -29,7 +29,7 @@
 # include <sk/sk_motion.h>
 #include <iostream>
 #include <sstream>
-#include <SB/SBMotion.h>
+#include <sb/SBMotion.h>
 
 using namespace std;
 
@@ -280,7 +280,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 		int metadata_flags = 0;
 		do {
 			SrString& token = in.last_token();
-			std::string strToken = token;
+			std::string strToken = (const char*) token;
 
 			if( token=="ready" ) {
 				if( parse_timing_metadata( in, token, _time_ready ) )
@@ -367,7 +367,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 				SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(this);
 				if (sbMotion)
 				{
-					std::string tag = token;					
+					std::string tag = (const char*) token;					
 					std::string strValue;
 					parseMetaDataString(in, token, strValue);					
 					// remove number post-fix at the tag
