@@ -555,6 +555,164 @@ SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std
 	return sbmotion;
 }
 
+SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* targetSk, SBMotion* targetMotion, std::vector<std::string>& endJoints )
+{
+	SkChannelArray& mchan_arr = this->channels();
+	SmartBody::SBSkeleton* interSk = new SmartBody::SBSkeleton(dynamic_cast<SBSkeleton*>(targetSk)); // copy for an intermediate skeleton
+	SmartBody::SBSkeleton* tempSrcSk = new SmartBody::SBSkeleton(dynamic_cast<SBSkeleton*>(sourceSk));
+
+	tempSrcSk->invalidate_global_matrices();
+	tempSrcSk->update_global_matrices();
+	interSk->invalidate_global_matrices();
+	interSk->update_global_matrices();	
+
+	SmartBody::SBJoint* rootJoint = dynamic_cast<SBJoint*>(interSk->root());
+	SmartBody::SBMotion* constraintMotion = dynamic_cast<SBMotion*>(targetMotion->copyMotion()); // copy the motion first	
+	MeCtIKTreeScenario ikScenario;
+	ikScenario.buildIKTreeFromJointRoot(rootJoint);	
+	MeCtJacobianIK ikJacobian;
+	float sceneScale = (float)1.f/SBScene::getScene()->getScale();
+	ikJacobian.maxOffset = 0.1f*sceneScale;
+	ikJacobian.dampJ = 1.5f*sceneScale;
+
+	float heightRatio = interSk->getBaseHeight()/tempSrcSk->getBaseHeight();
+
+	ConstraintMap consMap;
+	ConstraintMap noRotConstraint;
+	for (unsigned int i=0;i<endJoints.size();i++)
+	{
+		std::string jname = endJoints[i];
+		SBJoint* srcJoint = tempSrcSk->getJointByName(jname);
+		SBJoint* tgtJoint = interSk->getJointByName(jname);
+		if (srcJoint && tgtJoint) // a valid effector
+		{
+			EffectorConstantConstraint* constraint = new EffectorConstantConstraint();
+			constraint->efffectorName = jname;
+			//SBJoint* pjoint = dynamic_cast<SBJoint*>(tgtJoint->getParent()->getParent()->getParent());
+			SBJoint* pjoint = tgtJoint->getParent();
+			while (pjoint->getParent() != rootJoint)
+				pjoint = pjoint->getParent();
+			constraint->rootName = pjoint->name();				
+			consMap[jname] = constraint;
+		}
+	}
+
+	for (int iframe=0; iframe<frames(); iframe++)
+	{
+		int chanID = mchan_arr.search(rootJoint->name(),SkChannel::Quat);
+		float* cur_p = constraintMotion->posture(iframe);	
+		float* orig_p = this->posture(iframe);
+		int index = mchan_arr.float_position(chanID);
+		for (int k=0;k<3;k++)
+		{
+			cur_p[index+k] = orig_p[index+k]*heightRatio;
+		}
+
+	}
+
+	constraintMotion->connect(interSk);
+	this->connect(tempSrcSk);
+	bool prevConstraint = false;
+
+	constraintMotion->apply_frame(0);
+	this->apply_frame(0);
+	constraintMotion->connected_skeleton()->update_global_matrices();
+	this->connected_skeleton()->update_global_matrices();
+	std::map<std::string, SrVec> prevPosMap;
+	ConstraintMap::iterator mi;
+	for ( mi  = consMap.begin();
+		  mi != consMap.end();
+		  mi++)
+	{
+		EffectorConstantConstraint* con = dynamic_cast<EffectorConstantConstraint*>(mi->second);
+		SBJoint* srcJoint = tempSrcSk->getJointByName(con->efffectorName);
+		SBJoint* tgtJoint = interSk->getJointByName(con->efffectorName);
+		if (tgtJoint)
+		{
+			con->targetPos = tgtJoint->getMatrixGlobal().get_translation(); // initialize the frame 
+		}					
+		if (srcJoint)
+		{
+			prevPosMap[con->efffectorName] = srcJoint->getMatrixGlobal().get_translation();
+		}
+	}
+
+
+
+	for (int iframe=0; iframe<frames(); iframe++)
+	{			
+		constraintMotion->apply_frame(iframe);
+		this->apply_frame(iframe);
+		constraintMotion->connected_skeleton()->update_global_matrices();
+		this->connected_skeleton()->update_global_matrices();
+		float* cur_p = constraintMotion->posture(iframe);		
+		if (!prevConstraint)
+		{
+			ikScenario.setTreeNodeQuat(interSk,QUAT_INIT);
+			prevConstraint = true;
+		}		
+		ikScenario.copyTreeNodeQuat(QUAT_INIT,QUAT_CUR);
+		ikScenario.setTreeNodeQuat(interSk,QUAT_REF);
+		// update root transformation
+		if (rootJoint->pos())
+		{
+			SkJointPos* jpos = rootJoint->pos();
+			ikScenario.ikTreeRootPos = SrVec(jpos->value(0),jpos->value(1),jpos->value(2));
+		}		
+		if (rootJoint->getParent())
+			ikScenario.ikGlobalMat = rootJoint->getParent()->gmat();
+
+		// update joint constraint
+		ConstraintMap::iterator mi;
+		for ( mi  = consMap.begin();
+			  mi != consMap.end();
+			  mi++)
+		{
+			EffectorConstantConstraint* con = dynamic_cast<EffectorConstantConstraint*>(mi->second);
+			SBJoint* srcJoint = tempSrcSk->getJointByName(con->efffectorName);
+			if (srcJoint)
+			{
+				//con->targetPos = srcJoint->getMatrixGlobal().get_translation();
+				SrVec offset = srcJoint->getMatrixGlobal().get_translation() - prevPosMap[con->efffectorName];
+				con->targetPos += offset*heightRatio;
+				prevPosMap[con->efffectorName] = srcJoint->getMatrixGlobal().get_translation();
+			}			
+		}
+
+		// update IK for each constraint at this frame	
+		ikScenario.ikPosEffectors = &consMap;
+		ikScenario.ikRotEffectors = &noRotConstraint;
+		for (int k=0;k<20;k++)
+		{
+			ikJacobian.update(&ikScenario);
+			ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);	
+		}
+		for (unsigned int k=0;k<ikScenario.ikTreeNodes.size();k++)
+		{
+			MeCtIKTreeNode* ikNode = ikScenario.ikTreeNodes[k];
+			SBJoint* ikJoint = interSk->getJointByName(ikNode->nodeName);
+			int chanID = mchan_arr.search(ikNode->nodeName,SkChannel::Quat);
+			SrQuat& nq = ikNode->getQuat(QUAT_CUR);
+			SrQuat kq; 
+			if (ikJoint) kq = ikJoint->quat()->rawValue();			
+			if (chanID != -1)
+			{
+				int floatIdx = mchan_arr.float_position(chanID);
+				//LOG("old quat = %f %f %f %f",cur_p[ floatIdx + 0 ],cur_p[ floatIdx + 1 ],cur_p[ floatIdx + 2 ],cur_p[ floatIdx + 3 ] );
+				//LOG("new quat = %f %f %f %f",nq.w,nq.x,nq.y,nq.z );
+				//LOG("skel quat = %f %f %f %f",kq.w,kq.x,kq.y,kq.z );
+				cur_p[ floatIdx + 0 ] = nq.w;
+				cur_p[ floatIdx + 1 ] = nq.x;
+				cur_p[ floatIdx + 2 ] = nq.y;
+				cur_p[ floatIdx + 3 ] = nq.z;
+			}
+		}				
+	}
+	constraintMotion->disconnect();
+	this->disconnect();
+	return constraintMotion;
+}
+
 
 SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkeletonName, std::string rootName, std::vector<FootStepRecord>& footStepRecords )
 {
@@ -1266,6 +1424,39 @@ void SBMotion::calculateMeans(std::vector<double>&inputPoints, std::vector<doubl
 		calculateMeans(inputPoints, means, convergentValue);
 	}
 }
+
+
+SBMotion* SBMotion::constrain( std::string name, std::string srcSkeletonName, std::string tgtSkeletonName, std::string tgtMotionName, std::vector<std::string>& endJoints )
+{
+	SBSkeleton* origSkel = SBScene::getScene()->getSkeleton(srcSkeletonName);
+	if (!origSkel) return NULL;
+	SBMotion* tgtMotion = SBScene::getScene()->getMotion(tgtMotionName);
+	if (!tgtMotion) return NULL;
+	SBSkeleton* tgtSkel  = SBScene::getScene()->getSkeleton(tgtSkeletonName);
+	if (!tgtSkel) return NULL;
+
+	SBMotion* constraintMotion = buildConstraintMotion(origSkel, tgtSkel, tgtMotion, endJoints);
+
+	if (constraintMotion)
+	{
+		std::string motionName = "";
+		if (name == "")
+		{
+			motionName = constraintMotion->getName();
+			if (motionName == EMPTY_STRING)
+				motionName = getName() + "_cleanup";
+		}
+		else
+			motionName = name;
+		constraintMotion->setName(motionName.c_str());
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		//mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, cleanUpMotion));
+		mcu.motion_map[motionName] = constraintMotion;
+	}
+	return constraintMotion;
+
+}
+
 
 SBMotion* SBMotion::footSkateCleanUp( std::string name, std::vector<std::string>& footJoints, std::string srcSkeletonName, 
 									  std::string srcMotionName, std::string tgtSkeletonName, std::string tgtRootName, 
