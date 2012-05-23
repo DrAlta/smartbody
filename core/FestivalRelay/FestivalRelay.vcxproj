@@ -80,22 +80,22 @@
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(TargetPath)" .
-copy /Y ..\..\lib\pthreads\lib9\pthreadVSE2.dll .
-copy /Y ..\..\lib\activemq\apr\apr\lib9\libapr-1.dll .
-copy /Y ..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll .
-copy /Y ..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll .
-copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll .
-copy /Y ..\..\lib\xerces-c\bin9\xerces-c_3_1D.dll .
+copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .
+copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll .
+copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .
+copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .
+copy /Y ..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll .
+copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_1D.dll .
 
 
 if not exist ..\..\bin\FestivalRelay\bin\Release mkdir ..\..\bin\FestivalRelay\bin\bin
 copy /Y "$(TargetPath)" ..\..\bin\FestivalRelay\bin\bin
-copy /Y ..\..\lib\pthreads\lib9\pthreadVSE2.dll ..\..\bin\FestivalRelay\bin\bin
-copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll ..\..\bin\FestivalRelay\bin\bin
 copy /Y ..\..\lib\xerces-c\bin9\xerces-c_3_1.dll ..\..\bin\FestivalRelay\bin\bin
-copy /Y ..\..\lib\activemq\apr\apr\lib9\libapr-1.dll ..\..\bin\FestivalRelay\bin\bin
-copy /Y ..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll ..\..\bin\FestivalRelay\bin\bin
-copy /Y ..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\bin\FestivalRelay\bin\bin
 
 if not exist ..\..\bin\FestivalRelay\lib\festival\festival\lib mkdir ..\..\bin\FestivalRelay\lib\festival\festival\lib
 xcopy /Y /S ..\..\lib\festival\festival\lib ..\..\bin\FestivalRelay\lib\festival\festival\lib
@@ -144,21 +144,21 @@ copy /Y ..\..\lib\festival\speech_tools\lib\siod\web.scm ..\..\bin\FestivalRelay
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(TargetPath)" .
-copy /Y ..\..\lib\pthreads\lib9\pthreadVSE2.dll .
-copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll .
-copy /Y ..\..\lib\xerces-c\bin9\xerces-c_3_1.dll .
-copy /Y ..\..\lib\activemq\apr\apr\lib9\libapr-1.dll .
-copy /Y ..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll .
-copy /Y ..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll .
+copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .
+copy /Y ..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll .
+copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_1.dll .
+copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll .
+copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .
+copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .
 
 if not exist ..\..\bin\FestivalRelay\bin\Release mkdir ..\..\bin\FestivalRelay\bin\bin
 copy /Y "$(TargetPath)" ..\..\bin\FestivalRelay\bin\bin
-copy /Y ..\..\lib\pthreads\lib9\pthreadVSE2.dll ..\..\bin\FestivalRelay\bin\bin
-copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll ..\..\bin\FestivalRelay\bin\bin
-copy /Y ..\..\lib\xerces-c\bin9\xerces-c_3_1.dll ..\..\bin\FestivalRelay\bin\bin
-copy /Y ..\..\lib\activemq\apr\apr\lib9\libapr-1.dll ..\..\bin\FestivalRelay\bin\bin
-copy /Y ..\..\lib\activemq\apr\apr-iconv\lib9\libapriconv-1.dll ..\..\bin\FestivalRelay\bin\bin
-copy /Y ..\..\lib\activemq\apr\apr-util\lib9\libaprutil-1.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_1.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\bin\FestivalRelay\bin\bin
+copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\bin\FestivalRelay\bin\bin
 
 if not exist ..\..\bin\FestivalRelay\lib\festival\festival\lib mkdir ..\..\bin\FestivalRelay\lib\festival\festival\lib
 xcopy /Y /S ..\..\lib\festival\festival\lib ..\..\bin\FestivalRelay\lib\festival\festival\lib
