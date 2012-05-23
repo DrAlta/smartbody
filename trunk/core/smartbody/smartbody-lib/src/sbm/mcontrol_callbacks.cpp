@@ -5853,7 +5853,7 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		SBMotion* motion = scene->getMotion((*iter));
 		if (!motion)
 		{
-			LOG("Motion not found for name '%s'.", (*iter));
+			LOG("Motion not found for name '%s'.", (*iter).c_str());
 			continue;
 		}
 		const std::string& fileName = motion->getMotionFileName();
