@@ -16,7 +16,13 @@ VisemeCurveEditor::VisemeCurveEditor(int x, int y, int w, int h, char* name) : F
 	_gridSizeX = 5;
 	_gridSizeY = 5;
 }
+void VisemeCurveEditor::selectLine(int viseme){
+	_lineIsSelected = true;
+	_selectedLine = viseme;
 
+	_pointIsSelected = false;
+	_selectedPoint = -1;
+}
 
 VisemeCurveEditor::~VisemeCurveEditor()
 {
@@ -269,11 +275,7 @@ void VisemeCurveEditor::drawGrid()
 void VisemeCurveEditor::setVisibility(int viseme, bool isVisible)
 {
 	_curves[viseme].setVisibilty( isVisible);
-	_lineIsSelected = true;
-	_selectedLine = viseme;
 
-	_pointIsSelected = false;
-	_selectedPoint = -1;
 }
 
 void VisemeCurveEditor::generateCurves(int count)

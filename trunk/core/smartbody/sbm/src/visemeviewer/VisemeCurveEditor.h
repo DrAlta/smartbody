@@ -17,7 +17,7 @@ class VisemeCurveEditor : public Fl_Widget
 		int handle(int event);
 		
 		void setVisibility(int viseme, bool isVisible);
-
+		void selectLine(int viseme);
 		//Temporary
 		void generateCurves(int count);
 
