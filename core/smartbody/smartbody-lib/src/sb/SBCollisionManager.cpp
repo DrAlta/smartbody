@@ -119,7 +119,7 @@ void SBCollisionManager::afterUpdate(double time)
 
 	EventManager* eventManager = EventManager::getEventManager();	
 
-	std::string collisionResMethod = getStringAttribute("collisionResolutionType");	
+	const std::string& collisionResMethod = getStringAttribute("collisionResolutionType");	
 
 	while (needMoreIterations && curIteration < _maxIterations)
 	{

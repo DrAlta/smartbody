@@ -12,6 +12,7 @@ namespace SmartBody {
 
 SBPawn::SBPawn() : SbmPawn()
 {
+	createBoolAttribute("visible", true, true, "Basic", 5, false, false, false, "");
 	_posX = createDoubleAttribute("posX", 0.0, true, "transform", 10, false, false, false, "X position");
 	_posY = createDoubleAttribute("posY", 0.0, true, "transform", 20, false, false, false, "Y position");
 	_posZ = createDoubleAttribute("posZ", 0.0, true, "transform", 30, false, false, false, "Z position");
@@ -35,6 +36,7 @@ SBPawn::SBPawn() : SbmPawn()
 
 SBPawn::SBPawn(const char* name) : SbmPawn(name)
 {
+	createBoolAttribute("visible", true, true, "Basic", 5, false, false, false, "");
 	_posX = createDoubleAttribute("posX", 0.0, true, "transform", 10, false, false, false, "X position");
 	_posY = createDoubleAttribute("posY", 0.0, true, "transform", 20, false, false, false, "Y position");
 	_posZ = createDoubleAttribute("posZ", 0.0, true, "transform", 30, false, false, false, "Z position");
