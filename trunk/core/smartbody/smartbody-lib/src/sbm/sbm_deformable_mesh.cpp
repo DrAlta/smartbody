@@ -272,10 +272,13 @@ bool DeformableMesh::buildVertexBuffer()
 				SrModel& model = dMeshStatic->shape();
 				if (dMeshStatic->shape().F.size() == 0)
 					continue;
-				SrModel::Face& faceIdx = dMeshStatic->shape().F[i];			
-				if (dMeshStatic->shape().Fn.size() == 0)
-					continue;
-				SrModel::Face& nIdx = dMeshStatic->shape().Fn[i];
+				SrModel::Face& faceIdx = dMeshStatic->shape().F[i];	
+				SrModel::Face& nIdx = dMeshStatic->shape().F[i];
+				if (dMeshStatic->shape().Fn.size() != 0)
+				{
+					nIdx = dMeshStatic->shape().Fn[i];			
+				}
+				//SrModel::Face& nIdx = dMeshStatic->shape().Fn[i];
 				SrModel::Face& tIdx = defaultIdx;
 				if (model.Ft.size() > i)
 					tIdx = model.Ft[i];
@@ -438,23 +441,29 @@ bool DeformableMesh::buildVertexBuffer()
 			for (int i=0; i < numTris ; i++)
 			{
 				if (dMeshStatic->shape().F.size() <= i)
-					continue;
-				if (dMeshStatic->shape().Fn.size() <= i)
-					continue;
+					continue;				
 				SrModel::Face& faceIdx = dMeshStatic->shape().F[i];
-				SrModel::Face& normalIdx = dMeshStatic->shape().Fn[i];
+				SrModel::Face& normalIdx = dMeshStatic->shape().F[i];
+
+				if (dMeshStatic->shape().Fn.size() > i)
+					normalIdx = dMeshStatic->shape().Fn[i];							
 				SrModel::Face& texCoordIdx = defaultIdx;
 				if (dMeshStatic->shape().Ft.size() > i)
 					texCoordIdx = dMeshStatic->shape().Ft[i];
 				int fIdx[3] = { faceIdx.a, faceIdx.b, faceIdx.c};
 				int nIdx[3] = { normalIdx.a, normalIdx.b, normalIdx.c};
 				int tIdx[3] = { texCoordIdx.a, texCoordIdx.b, texCoordIdx.c};
-
+				
+				SrVec faceNormal = dMeshStatic->shape().face_normal(i);
 				for (int k=0;k<3;k++)
 				{
 					SrVec nvec;
 					SrPnt2 tvec = SrPnt2(0,0);
-					nvec = dMeshStatic->shape().N[nIdx[k]];
+					int nidx = nIdx[k];
+					if (dMeshStatic->shape().N.size() > nidx)
+						nvec = dMeshStatic->shape().N[nIdx[k]];
+					else
+						nvec = faceNormal;
 					if (dMeshStatic->shape().T.size() > tIdx[k] && dMeshStatic->shape().T.size() > 0 && dMeshStatic->shape().Ft.size() > 0)
 						tvec = dMeshStatic->shape().T[tIdx[k]];
 					int newNIdx = nIdx[k] + iNormalIdxOffset;

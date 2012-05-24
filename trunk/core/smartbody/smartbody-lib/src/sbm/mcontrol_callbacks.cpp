@@ -4461,9 +4461,9 @@ int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 //            if ( _fullpath( full, "..\\..\\..\\..\\..", _MAX_PATH ) != NULL )
             if ( boost::filesystem2::exists( abs_p ) )
             {
-//               soundFile = string( full ) + string( "/" ) + soundFile;
-				p  /= soundFile;
-               soundFile = abs_p.string();
+                //soundFile = string( full ) + string( "/" ) + soundFile;
+			    p  /= soundFile;
+               soundFile = abs_p.string() + string("/") + soundFile;
             }
          }
 

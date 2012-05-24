@@ -226,6 +226,7 @@ void main (void)\n\
 	}\n\
 	const float shadow_ambient = 1.0;\n\
 	gl_FragColor = vec4(color.rgb*shadowWeight*shadow_ambient,color.a);//color*shadow_ambient*shadowWeight;//vec4(color.rgb*shadowWeight,color.a);//color*shadowWeight;\n\
+	//gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n\
 }";
 
 
