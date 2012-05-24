@@ -83,6 +83,7 @@ void MeCtCCDIK::CCDIteration(MeCtIKTreeNode* startNode, EffectorConstraint* con 
 
 	SrMat prerot; startNode->joint->quat()->prerot().get_mat(prerot);
 	matInv = matInv*prerot.inverse();
+	//matInv = prerot.inverse()*matInv;
 
 	lSrc = startNode->gmat.get_translation()*matInv;	
 	lTarget = targetPos*matInv;
