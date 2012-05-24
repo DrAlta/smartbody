@@ -54,7 +54,7 @@
 0 setmap mixamo LeftToeBase l_forefoot
 0 setmap mixamo RightUpLeg r_hip
 0 setmap mixamo RightLeg r_knee
-0 setmap mixamo RightFoot l_ankle
+0 setmap mixamo RightFoot r_ankle
 0 setmap mixamo RightToeBase r_forefoot
 0 setmap mixamo Spine2 spine3
 0 setmap mixamo Spine1 spine2
