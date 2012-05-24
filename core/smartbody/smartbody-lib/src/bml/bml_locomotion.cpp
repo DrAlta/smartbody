@@ -347,7 +347,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 				pawn->get_world_offset(x,y,z,h,p,r);
 				std::string xstr, zstr;
 				xstr = boost::lexical_cast<std::string>(x);
-				zstr = boost::lexical_cast<std::string>(x);
+				zstr = boost::lexical_cast<std::string>(z);
 				command <<  xstr << " 0 " << zstr << " ";
 				icount += 1;
 			}
