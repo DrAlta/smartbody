@@ -3045,6 +3045,7 @@ void FltkViewer::drawPawns()
 	if (_data->pawnmode == ModeNoPawns)
 		return;
 
+
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	// determine the size of the pawns relative to the size of the characters
@@ -3067,6 +3068,10 @@ void FltkViewer::drawPawns()
 			continue;
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
 		if (character)
+			continue;
+
+		const bool isVisible = pawn->getBoolAttribute("visible");
+		if (!isVisible)
 			continue;
 
 		SrMat gmat = pawn->get_world_offset();//pawn->get_world_offset_joint()->gmat();		
