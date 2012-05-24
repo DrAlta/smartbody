@@ -138,7 +138,7 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 		SkJoint* joint = affectedJoints[i];
 		SrQuat jointQuat = SrQuat();
 		if (joint->quat()->active())
-			jointQuat = affectedJoints[i]->quat()->value();	
+			jointQuat = affectedJoints[i]->quat()->rawValue();	
 
 		outMotionFrame.jointQuat[i] = jointQuat;			
 	}
