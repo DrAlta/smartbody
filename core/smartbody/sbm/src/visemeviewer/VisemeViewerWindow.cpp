@@ -169,6 +169,7 @@ void VisemeViewerWindow::OnVisemeSelectCB(Fl_Widget* widget, void* data)
 	viewer->selectPhonemes(viewer->_browserViseme->text(viseme));
 
 	viewer->_curveEditor->setVisibility(viseme - 1, true);
+	viewer->_curveEditor->selectLine(viseme - 1);
 
 	viewer->updateViseme();
 	viewer->draw();
@@ -181,6 +182,8 @@ void VisemeViewerWindow::selectViseme(const char * phoneme1, const char * phonem
 	_browserViseme->select(viseme);
 
 	_curveEditor->setVisibility(viseme - 1, true);
+	_curveEditor->selectLine(viseme - 1);
+
 }
 
 void VisemeViewerWindow::selectPhonemes(const char * viseme)

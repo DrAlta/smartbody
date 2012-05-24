@@ -70,7 +70,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/BML Creator", 0, LaunchBMLCreatorCB, this, NULL);
 	menubar->add("&Window/Face Viewer", 0, LaunchFaceViewerCB, this, NULL);
 	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, NULL);
-	//menubar->add("&Window/Viseme Viewer", 0, LaunchVisemeViewerCB, this, NULL);
+	menubar->add("&Window/Viseme Viewer", 0, LaunchVisemeViewerCB, this, NULL);
 	//menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
 	//menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, FL_MENU_DIVIDER);
 
