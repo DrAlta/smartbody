@@ -28,6 +28,9 @@
     <Filter Include="bmlcreator">
       <UniqueIdentifier>{fbaae2c9-1e25-4b03-b1cf-0b767bb24300}</UniqueIdentifier>
     </Filter>
+    <Filter Include="visemeviewer">
+      <UniqueIdentifier>{ff606155-3868-40d0-b5f4-96697ed8f36f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -192,6 +195,15 @@
     </ClCompile>
     <ClCompile Include="..\src\panimationviewer\ParamAnimAutoMarkingEditor.cpp" />
     <ClCompile Include="..\src\panimationviewer\ParamAnimParameterEditor.cpp" />
+    <ClCompile Include="..\src\visemeviewer\VisemeCurve.cpp">
+      <Filter>visemeviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\visemeviewer\VisemeCurveEditor.cpp">
+      <Filter>visemeviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\visemeviewer\VisemeViewerWindow.cpp">
+      <Filter>visemeviewer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -354,5 +366,14 @@
     </ClInclude>
     <ClInclude Include="..\src\panimationviewer\ParamAnimAutoMarkingEditor.h" />
     <ClInclude Include="..\src\panimationviewer\ParamAnimParameterEditor.h" />
+    <ClInclude Include="..\src\visemeviewer\VisemeCurve.h">
+      <Filter>visemeviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\visemeviewer\VisemeCurveEditor.h">
+      <Filter>visemeviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\visemeviewer\VisemeViewerWindow.h">
+      <Filter>visemeviewer</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

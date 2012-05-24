@@ -530,6 +530,9 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClCompile Include="..\src\pic.cpp" />
     <ClCompile Include="..\src\ppm.cpp" />
     <ClCompile Include="..\src\sbm_main.cpp" />
+    <ClCompile Include="..\src\visemeviewer\VisemeCurve.cpp" />
+    <ClCompile Include="..\src\visemeviewer\VisemeCurveEditor.cpp" />
+    <ClCompile Include="..\src\visemeviewer\VisemeViewerWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h" />
@@ -588,6 +591,9 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClInclude Include="..\src\bmlcreator\BMLStateObject.h" />
     <ClInclude Include="..\src\glfont2.h" />
     <ClInclude Include="..\src\pic.h" />
+    <ClInclude Include="..\src\visemeviewer\VisemeCurve.h" />
+    <ClInclude Include="..\src\visemeviewer\VisemeCurveEditor.h" />
+    <ClInclude Include="..\src\visemeviewer\VisemeViewerWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\lib\bonebus\bonebus.vcxproj">
