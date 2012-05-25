@@ -3844,6 +3844,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sb\SBPhoneme.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBPhoneme.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBPhonemeManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBPhonemeManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sb\SBPhysicsManager.cpp"
 				>
 			</File>

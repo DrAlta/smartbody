@@ -25,6 +25,7 @@ class SBBoneBusManager;
 class SBGestureMapManager;
 class SBJointMapManager;
 class SBCollisionManager;
+class SBDiphoneManager;
 class SBParser;
 class SBScript;
 class SBSubject;
@@ -107,6 +108,7 @@ class SBScene : public SBObject
 		SBGestureMapManager* getGestureMapManager();
 		SBJointMapManager* getJointMapManager();
 		SBCollisionManager* getCollisionManager();
+		SBDiphoneManager* getDiphoneManager();
 
 		SBParser* getParser();
 
@@ -127,6 +129,7 @@ class SBScene : public SBObject
 		SBGestureMapManager* _gestureMapManager;
 		SBJointMapManager* _jointMapManager;
 		SBCollisionManager* _collisionManager;
+		SBDiphoneManager* _diphoneManager;
 		SBParser* _parser;
 
 		std::map<std::string, SBScript*> _scripts;

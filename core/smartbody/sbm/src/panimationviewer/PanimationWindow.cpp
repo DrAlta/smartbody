@@ -282,10 +282,11 @@ std::vector<std::string> PanimationWindow::tokenize(const std::string& str,const
 void PanimationWindow::refreshUI(Fl_Widget* widget, void* data)
 {
 	PanimationWindow* window = (PanimationWindow*) data;
-	if (window->tabGroup->value() == window->stateEditor)
-		window->stateEditor->refresh();
 	if (window->tabGroup->value() == window->runTimeEditor)
 		window->runTimeEditor->initializeRunTimeEditor();
+
+	window->stateEditor->isPlaying = true;
+	window->stateEditor->playmotion(window->stateEditor->buttonPlay, window->stateEditor);
 }
 
 void PanimationWindow::loadCharacters(Fl_Choice* characterList)

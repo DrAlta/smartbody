@@ -133,13 +133,23 @@ namespace SmartBody {
 		/** Get the viseme Mode. */
 		bool isCurveMode() {return _curveMode;}
 
+		/** Set the viseme Mode. */
+		void setCurveMode(bool val) {_curveMode = val; _trapezoidMode = !val; _floatCurveMode = !val;}
+
 		/** Get the viseme Mode. */
 		bool isTrapezoidMode() {return _trapezoidMode;}
+
+		/** Set the viseme Mode. */
+		void setTrapezoidMode(bool val) {_curveMode = !val; _trapezoidMode = val; _floatCurveMode = !val;}
 
 		/** Get the viseme Mode. */
 		bool isFloatCurveMode() {return _floatCurveMode;}
 
+		/** Set the viseme Mode. */
+		void setFloatCurveMode(bool val) {_curveMode = !val; _trapezoidMode = !val; _floatCurveMode = val;}
+
 		void setFloatCurve(std::vector<float>& curve, int numKeys, int floatsPerKey) {
+			_curveData.clear();
 			_numKeys = numKeys;
 			_floatsPerKey = floatsPerKey;
 			for (int x = 0; x < numKeys; x++)

@@ -158,10 +158,15 @@ namespace BML {
 		*/
 		VecOfVisemeData& getVisemes() { return visemes; }
 
+		/**
+		* Process the visemes by diphone
+		*/
+		void processVisemes(std::vector<VisemeData*>* visemes, BmlRequestPtr request);
 
 	protected:
 		void createStandardSyncPoint( const std::wstring& attr, SyncPointPtr& sync );
 
+		std::vector<float> smoothCurve(std::vector<float>& c1, std::vector<float>& c2);
 
 		friend class BML::Processor;  //temporary
 	};

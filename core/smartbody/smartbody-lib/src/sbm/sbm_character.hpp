@@ -388,6 +388,8 @@ public:
 	bool isSoftEyes( void ) const { return _soft_eyes_enabled; }
 	bool isVisemePlateau( void ) const { return _visemePlateau; }
 	void setVisemePlateau( bool val ) { _visemePlateau = val; }
+	bool isDiphone( void ) const { return _diphone; }
+	void setDiphone( bool val ) { _diphone = val; }
 	
 	SrVec getFacingDirection() ;
 
@@ -411,6 +413,7 @@ private:
 	bool	_soft_eyes_enabled;
 	bool	_visemePlateau;	
 	float	_minVisemeTime;
+	bool	_diphone;
 
 protected:
 	/*!

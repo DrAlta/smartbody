@@ -494,6 +494,7 @@ void SbmCharacter::initData()
 	_lastReachStatus = true;
 	_height = 1.0f; 
 	_visemePlateau = true;
+	_diphone = false;
 	_nvbg = NULL;
 	_miniBrain = NULL;
 
@@ -1776,6 +1777,7 @@ void SbmCharacter::schedule_viseme_curve(
 						float w = curve_info[ i * num_key_params + 1 ] * visemeWeight;
 
 						//					if (i == 0) spline.insert(t - .001, w);
+						ct_p->insert_key(t, w);
 						spline.insert( t, w );
 						//					if (i == num_keys - 1) spline.insert(t + .001, w);
 					}
@@ -1783,7 +1785,7 @@ void SbmCharacter::schedule_viseme_curve(
 
 #define LINEAR_SPLINE_SEGS_PER_SEC 30.0
 #if 1
-					ct_p->insert_spline( spline, LINEAR_SPLINE_SEGS_PER_SEC );
+					//ct_p->insert_spline( spline, LINEAR_SPLINE_SEGS_PER_SEC );
 #else
 					double fr, to;
 					spline.query_span( &fr, &to );
@@ -2626,7 +2628,29 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 								}
 								return CMD_SUCCESS;
 							}
-
+							if (_stricmp( viseme, "diphone" ) == 0 )
+							{
+								if (!next)
+								{
+									LOG("Character %s diphone setting is %s", this->getName().c_str(), this->isDiphone()? "on" : "off");
+									return CMD_SUCCESS;
+								}
+								if (_stricmp(next, "on") == 0)
+								{
+									this->setDiphone(true);
+									LOG("Character %s diphone setting is now on.", this->getName().c_str());
+								}
+								else if (_stricmp(next, "off") == 0)
+								{
+									this->setDiphone(false);
+									LOG("Character %s diphone setting is now off.", this->getName().c_str());
+								}
+								else
+								{
+									LOG("use: char %s diphone <on|off>", this->getName().c_str());
+								}
+								return CMD_SUCCESS;
+							}
 							if( strcmp( viseme, "minvisemetime" ) == 0 )
 							{
 								if (!next)
@@ -2666,7 +2690,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 								args.read_float_vect( curveInfo, num_remaining );											
 
 								//			schedule_viseme_blend_curve( viseme, mcu_p->time, 1.0f, curveInfo, numKeys, numKeyParams );
-								schedule_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams, 0.1f, 0.1f );
+								schedule_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams, 0.0f, 0.0f );
 								delete [] curveInfo;
 							}
 							else if( _stricmp( next, "trap" ) == 0 )
