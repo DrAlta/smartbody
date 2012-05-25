@@ -28,6 +28,8 @@
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBCollisionManager.h>
 #include <sb/SBSteerAgent.h>
+#include <sb/SBPhoneme.h>
+#include <sb/SBPhonemeManager.h>
 #include <sr/sr_box.h>
 
 
@@ -937,7 +939,24 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getCurrentSBCharacter", &SBSteerAgent::getCurrentSBCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return SBCharacter that SBSteerAgent is attached to.")		
 		;
 
-	
+
+	boost::python::class_<SBDiphoneManager>("SBDiphoneManager")
+		.def("createDiphone", &SBDiphoneManager::createDiphone, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a diphone.")
+		.def("getDiphones", &SBDiphoneManager::getDiphones, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get diphones given diphone set name.")
+		.def("getDiphone", &SBDiphoneManager::getDiphone, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get diphone given from phoneme, to phoneme and diphone set name.")
+		.def("getNumDiphoneMap", &SBDiphoneManager::getNumDiphoneMap, "Return number of diphone set.")
+		.def("getNumDiphones", &SBDiphoneManager::getNumDiphones, "Return number of diphones given the diphone set name.")
+		;
+
+	boost::python::class_<SBDiphone>("SBDiphone")
+		.def("addKey", &SBDiphone::addKey, "add key to the diphone.")
+		.def("getKeys", &SBDiphone::getKeys, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return the keys given viseme name.")
+		.def("getVisemeNames", &SBDiphone::getVisemeNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the viseme names.")
+		.def("getNumVisemes", &SBDiphone::getNumVisemes, "Return the number of viseme.")
+		.def("getFromPhonemeName", &SBDiphone::getFromPhonemeName, boost::python::return_value_policy<boost::python::return_by_value>(), "Return FROM phoneme name.")
+		.def("getToPhonemeName", &SBDiphone::getToPhonemeName, boost::python::return_value_policy<boost::python::return_by_value>(), "Return TO phoneme name.")		
+		;
+
 
 /*
 	boost::python::class_<Viseme>("Viseme")		
@@ -1402,6 +1421,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getGestureMapManager", &SBScene::getGestureMapManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the gesture map manager object.")
 		.def("getJointMapManager", &SBScene::getJointMapManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the joint mapping manager object.")
 		.def("getCollisionManager", &SBScene::getCollisionManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the collision manager object.")
+		.def("getDiphoneManager", &SBScene::getDiphoneManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the diphone manager object.")
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
 
 	;

@@ -367,7 +367,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 			if( fabs( key_weight ) > 0.01 )	{
 				float adjustedWeight = key_weight;
 			
-//				LOG( "Face: '%s': %f\n", key_pose_p->name(), key_weight );
+				//LOG( "Face: '%s': %f\n", key_pose_p->getName().c_str(), key_weight );
 			
 				float* key_pose_buff_p = key_pose_p->posture( 0 );
 				int numKeyChannels = key_pose_p->channels().size();

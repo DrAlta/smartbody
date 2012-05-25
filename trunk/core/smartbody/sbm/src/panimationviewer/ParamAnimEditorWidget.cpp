@@ -158,29 +158,32 @@ void ParamAnimEditorWidget::changeTrackSelectionEvent(nle::Track* track)
 	bool isTrackSelected = track->isSelected();
 	std::string trackName = track->getName();
 	PABlendEditor* stateEditor = dynamic_cast<PABlendEditor*>(parentGroup);
-	int numItems = stateEditor->stateAnimationList->size();
-	bool changed = false;
-	for (int i = 0; i < numItems; i++)
+	if (stateEditor)
 	{
-		const char* motionName = stateEditor->stateAnimationList->text(i + 1);
-		if (trackName == motionName)
+		int numItems = stateEditor->stateAnimationList->size();
+		bool changed = false;
+		for (int i = 0; i < numItems; i++)
 		{
-			int isMotionSelected  = stateEditor->stateAnimationList->selected(i + 1);
-			if (isTrackSelected && !isMotionSelected)
+			const char* motionName = stateEditor->stateAnimationList->text(i + 1);
+			if (trackName == motionName)
 			{
-				stateEditor->stateAnimationList->select(i + 1, 1);
-				changed = true;
-			}
-			else if (!isTrackSelected && isMotionSelected)
-			{
-				stateEditor->stateAnimationList->select(i + 1, 0);
-				changed = true;
+				int isMotionSelected  = stateEditor->stateAnimationList->selected(i + 1);
+				if (isTrackSelected && !isMotionSelected)
+				{
+					stateEditor->stateAnimationList->select(i + 1, 1);
+					changed = true;
+				}
+				else if (!isTrackSelected && isMotionSelected)
+				{
+					stateEditor->stateAnimationList->select(i + 1, 0);
+					changed = true;
+				}
 			}
 		}
-	}
-	if (changed)
-	{
-		stateEditor->selectStateAnimations(stateEditor->stateAnimationList, stateEditor);
+		if (changed)
+		{
+			stateEditor->selectStateAnimations(stateEditor->stateAnimationList, stateEditor);
+		}
 	}
 }
 

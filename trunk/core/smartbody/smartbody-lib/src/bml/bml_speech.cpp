@@ -32,6 +32,8 @@
 #include "bml_exception.hpp"
 #include "bml_xml_consts.hpp"
 #include "sbm/BMLDefs.h"
+#include <sb/SBPhoneme.h>
+#include <sb/SBPhonemeManager.h>
 
 using namespace std;
 using namespace BML;
@@ -379,6 +381,198 @@ void BML::SpeechRequest::speech_response( srArgBuffer& response_args ) {
 	this->speech_error_msg = error_msg? error_msg : string();
 }
 
+void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes, BmlRequestPtr request)
+{
+	if (result_visemes == NULL)
+		return;
+
+	VisemeData* curViseme = NULL;
+	VisemeData* prevViseme = NULL;
+	std::vector<VisemeData*> visemeRawData;
+	for ( size_t i = 0; i < (*result_visemes).size(); i++ )
+	{
+		if (i > 0)
+			prevViseme = (*result_visemes)[i - 1];
+		curViseme = (*result_visemes)[i];
+		if (prevViseme != NULL)
+		{
+			SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(prevViseme->id(), curViseme->id(), request->actor->getName());
+			float blendIval = curViseme->time() - prevViseme->time();
+
+			//if (blendIval < 0.1f)
+			//	blendIval = 0.1f;
+			//blendIval *= 2;
+			if (diphone)
+			{
+				std::vector<std::string>& visemeNames = diphone->getVisemeNames();
+				for (int v = 0; v < diphone->getNumVisemes(); v++)
+				{
+					std::vector<float> curve = diphone->getKeys(visemeNames[v]);
+					for (size_t k = 0; k < curve.size(); k++)
+					{
+						if ((k % 2) == 0)
+						{
+							curve[k] *= blendIval;
+							curve[k] += prevViseme->time();
+							curve[k] -= (*result_visemes)[0]->time();
+						}
+					}
+					VisemeData* vcopy = new VisemeData( visemeNames[v], 0.0f);
+					vcopy->setFloatCurve(curve, curve.size() / 2, 2);
+					visemeRawData.push_back(vcopy);
+				}
+			}
+		}
+	}
+
+	// get rid of all zero data
+	for (size_t i = 0; i < visemeRawData.size(); i++)
+	{
+		if (visemeRawData[i]->getFloatCurve().size() == 0)
+		{
+			delete visemeRawData[i];
+			visemeRawData[i] = NULL;
+			visemeRawData.erase(visemeRawData.begin() + i);
+			i--;
+		}
+	}
+
+	// process the diphone raw data
+	std::vector<VisemeData*> visemeProcessedData;
+	for (size_t i = 0; i < visemeRawData.size(); i++)
+	{
+		bool firstTime = true;
+		int index = -1;
+		for (size_t j = 0; j < visemeProcessedData.size(); j++)
+		{
+			if (visemeProcessedData[j]->id() == visemeRawData[i]->id())
+			{
+				firstTime = false;
+				index = j;
+				break;
+			}
+		}
+
+		if (firstTime)
+		{
+			VisemeData* newV = new VisemeData(visemeRawData[i]->id(), visemeRawData[i]->time());
+			newV->setFloatCurve(visemeRawData[i]->getFloatCurve(), visemeRawData[i]->getFloatCurve().size() / 2, 2);
+			visemeProcessedData.push_back(newV);
+		}
+		else	// stitch the curves
+		{
+			std::vector<float>& stitchingCurve = visemeRawData[i]->getFloatCurve();
+			std::vector<float>& origCurve = visemeProcessedData[index]->getFloatCurve();
+			std::vector<float> newCurve = smoothCurve(origCurve, stitchingCurve);
+			visemeProcessedData[index]->setFloatCurve(newCurve, newCurve.size() / 2, 2);
+		}
+	}
+
+	// assign back the viseme
+	for ( size_t i = 0; i < (*result_visemes).size(); i++ )
+	{
+		delete (*result_visemes)[i];
+	}
+	(*result_visemes).clear();
+	for (size_t i = 0; i < visemeProcessedData.size(); i++)
+	{
+		VisemeData* newV = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
+		newV->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
+		(*result_visemes).push_back(newV);
+	}
+}
+
+std::vector<float> BML::SpeechRequest::smoothCurve(std::vector<float>& c1, std::vector<float>& c2)
+{
+	int size1 = c1.size();
+	int size2 = c2.size();
+	if (size1 == 0 || size2 == 0)
+	{
+		return std::vector<float>();
+	}
+
+	std::vector<float> x1;
+	std::vector<float> y1;
+	std::vector<float> x2;
+	std::vector<float> y2;
+	for (int i = 0; i < size1; i++)
+	{
+		if ((i % 2) == 0)
+			x1.push_back(c1[i]);
+		else
+			y1.push_back(c1[i]);
+	}
+	for (int i = 0; i < size2; i++)
+	{
+		if ((i % 2) == 0)
+			x2.push_back(c2[i]);
+		else
+			y2.push_back(c2[i]);
+	}
+
+
+	// simple algorithm
+	// do for second curve
+	for (size_t i = 0; i < x1.size() - 1; i++)
+	{
+		for (size_t j = 0; j < x2.size(); j++)
+		{
+			if (x1[i] <= x2[j] && x1[i + 1] >= x2[j])
+			{
+				float f = (x2[j] - x1[i])/ (x1[i + 1] - x1[i]);
+				float curX1 = f * y1[i] + (1.0f - f) * y1[i + 1];
+				float newX2 = (curX1 + y2[j]) * 0.5f;
+				y2[j] = newX2;
+			}
+		}
+	}
+
+	// do for first curve
+	for (size_t i = 0; i < x2.size() - 1; i++)
+	{
+		for (size_t j = 0; j < x1.size(); j++)
+		{
+			if (x2[i] <= x1[j] && x2[i + 1] >= x1[j])
+			{
+				float f = (x1[j] - x2[i])/ (x2[i + 1] - x2[i]);
+				float curX2 = f * y2[i] + (1.0f - f) * y2[i + 1];
+				float newX1 = (curX2 + y1[j]) * 0.5f;
+				y1[j] = newX1;
+			}
+		}
+	}
+
+	std::vector<float> newX;
+	std::vector<float> newY;
+
+	for (size_t i = 0; i < x1.size(); i++)
+	{
+		newX.push_back(x1[i]);
+		newY.push_back(y1[i]);
+	}
+
+	for (size_t i = 0; i < x2.size(); i++)
+	{
+		for (size_t j = 0; j < newX.size(); j++)
+		{
+			if (newX[j] >= x2[i])
+			{
+				newX.insert(newX.begin() + j, x2[i]);
+				newY.insert(newY.begin() + j, y2[i]);
+				break;
+			}
+		}
+	}
+
+	std::vector<float> retFloats;
+	for (size_t i = 0; i < newX.size(); i++)
+	{
+		retFloats.push_back(newX[i]);
+		retFloats.push_back(newY[i]);
+	}
+	return retFloats;
+}
+
 void BML::SpeechRequest::schedule( time_sec now ) {
 	//// TODO: Sync to prior behaviors
 	// behav_syncs.applyParentTimes()
@@ -394,7 +588,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	SyncPointPtr sp_relax( behav_syncs.sync_relax()->sync() );
 	SyncPointPtr sp_end( behav_syncs.sync_end()->sync() );
 
-		string warning_context = string( "Behavior \"" ) + unique_id + "\"";
+	string warning_context = string( "Behavior \"" ) + unique_id + "\"";
 	behav_syncs.applyParentTimes( warning_context );
 
 	
@@ -432,6 +626,10 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		if (speech_impl_backup) // run the backup speech server if available
 			result_visemes = speech_impl->getVisemes( speech_request_id, NULL );
 	}
+
+
+	if (actor && actor->isDiphone()) // if use diphone, reconstruct the curves
+		processVisemes(result_visemes, request);			
 
 	if (result_visemes)
 	{
