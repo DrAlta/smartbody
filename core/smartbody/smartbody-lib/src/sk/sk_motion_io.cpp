@@ -417,10 +417,18 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 			LOG(strstr.str().c_str());
 		}
 
+		float lastKeyTime = -1;
+		if (_frames.size() > 0)
+			lastKeyTime = last_keytime();
+
+		float keyt = -1;
+		if (_frames.size() > 0)
+			keyt = keytime( 0 );
+
 		synch_points.set_time( 
-			keytime( 0 ), _time_ready, 
+			keyt, _time_ready, 
 			_time_stroke_start, _time_stroke_emphasis, _time_stroke_end,
-			_time_relax, last_keytime()
+			_time_relax, lastKeyTime
 		);
 		if( synch_points.get_error() )	{
 			LOG( "SkMotion::load ERR: reading synch points in '%s'", in.filename() );

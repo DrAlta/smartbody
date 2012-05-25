@@ -149,7 +149,7 @@ public :
 	void keytime ( int f, float time ) { if ((int) _frames.size() > f && f >= 0) _frames[f].keytime = time; }
 
 	/*! Returns the keytime of the last frame */
-	float last_keytime () const { return _frames[frames()-1].keytime; }
+	float last_keytime () const { if (_frames.size() == 0) return -1.0f; return _frames[frames()-1].keytime; }
 
 	/*! Returns the final keytime of the motion minus the first one.
 	This method requires the motion to not be empty. */
