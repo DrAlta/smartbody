@@ -150,6 +150,8 @@ copy /Y ..\..\..\lib\qt\bin\QtCore4.dll ..
 copy /Y ..\..\..\lib\qt\bin\QtGui4.dll ..
 copy /Y ..\..\..\lib\qt\bin\QtOpenGL4.dll ..
 copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" ..
+copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcp100.dll" ..
+copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcr100.dll" ..
 
 if not exist ..\images mkdir ..\images
 copy /Y images\*.* ..\images
@@ -167,6 +169,8 @@ copy /Y ..\..\..\lib\qt\bin\QtCore4.dll ..\..\..\bin\sbmonitor
 copy /Y ..\..\..\lib\qt\bin\QtGui4.dll ..\..\..\bin\sbmonitor
 copy /Y ..\..\..\lib\qt\bin\QtOpenGL4.dll ..\..\..\bin\sbmonitor
 copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\bin\sbmonitor
+copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcp100.dll" ..\..\..\bin\sbmonitor
+copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcr100.dll" ..\..\..\bin\sbmonitor
 
 if not exist ..\..\..\bin\sbmonitor\images mkdir ..\..\..\bin\sbmonitor\images
 copy /Y images\*.* ..\..\..\bin\sbmonitor\images
