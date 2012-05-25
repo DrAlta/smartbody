@@ -102,7 +102,7 @@ bool  VisemeViewerWindow::loadData()
 	_browserViseme->add("wide");
 	*/
 
-	std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (size_t i = 0; i < characterNames.size(); i++)
 	{
 		_choiceCharacter->add(characterNames[i].c_str());

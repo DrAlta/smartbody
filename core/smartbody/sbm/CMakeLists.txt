@@ -102,6 +102,10 @@ set( SBM_FLTK_SRC
 	src/resourceViewer/ResourceWindow.cpp
 	src/resourceViewer/TreeInfoObject.cpp
 
+	src/visemeviewer/VisemeCurve.cpp
+	src/visemeviewer/VisemeCurveEditor.cpp
+	src/visemeviewer/VisemeViewerWindow.cpp
+
 	src/faceviewer/FaceViewer.cpp
 	src/FLTKListener.cpp
 
