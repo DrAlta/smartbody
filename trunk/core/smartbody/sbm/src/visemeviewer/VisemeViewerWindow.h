@@ -15,17 +15,25 @@
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Button.H>
 #include "VisemeCurveEditor.h"
+#include <sb/SBCharacter.h>
+#include <sb/SBPhoneme.h>
 
+
+class VisemeCurveEditor;
 class VisemeViewerWindow : public Fl_Double_Window{
 public:
 	VisemeViewerWindow(int x, int y, int w, int h, char* name);
 	~VisemeViewerWindow();
+
+	void refreshData();
+
 	static Fl_Menu_Item menu_[];
 protected:
 
 	Fl_Choice * _choiceCharacter;
 	Fl_Hold_Browser *_browserPhoneme[2];
 	Fl_Multi_Browser *_browserViseme;
+	Fl_Browser *_browserVisemeColor;
 	Fl_Value_Slider *_sliderCurveAnimation;
 	Fl_Button *_buttonPlay;
 	VisemeCurveEditor * _curveEditor;
@@ -36,15 +44,17 @@ protected:
 	void selectViseme(const char * phoneme1, const char * phoneme2);
 	void selectPhonemes(const char * viseme);
 	void updateViseme();
-	
-	//Temporary
-	void generateVisemes();
+	void initializeVisemes();
+
+	SBCharacter* getCurrentCharacter();
+	std::string getCurrentCharacterName();
+	SBDiphone* getCurrentDiphone();
 
 	static void OnCharacterSelectCB(Fl_Widget* widget, void* data);
 	static void OnPhoneme1SelectCB(Fl_Widget* widget, void* data);
 	static void OnPhoneme2SelectCB(Fl_Widget* widget, void* data);
 	static void OnVisemeSelectCB(Fl_Widget* widget, void* data);
 	static void OnSliderSelectCB(Fl_Widget* widget, void* data);
-	static void OnMenuSelectCB(Fl_Widget* widget, void* data);
+	static void OnSaveCB(Fl_Widget* widget, void* data);
 };
 #endif
