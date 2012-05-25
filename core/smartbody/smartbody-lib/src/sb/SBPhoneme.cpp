@@ -18,12 +18,7 @@ SBDiphone::SBDiphone(const std::string& fromPhoneme, const std::string& toPhonem
 
 SBDiphone::~SBDiphone()
 {
-	std::map<std::string, std::vector<float> >::iterator iter = _visemeKeysMap.begin();
-	for (; iter != _visemeKeysMap.end(); iter++)
-	{
-		iter->second.clear();
-	}
-	_visemeKeysMap.clear();
+	clean();
 }
 
 void SBDiphone::addKey(const std::string& viseme, float time, float weight)
@@ -91,6 +86,15 @@ int SBDiphone::getNumVisemes()
 	return _visemeKeysMap.size();
 }
 
+void SBDiphone::clean()
+{
+	std::map<std::string, std::vector<float> >::iterator iter = _visemeKeysMap.begin();
+	for (; iter != _visemeKeysMap.end(); iter++)
+	{
+		iter->second.clear();
+	}
+	_visemeKeysMap.clear();
+}
 
 const std::string& SBDiphone::getFromPhonemeName()
 {

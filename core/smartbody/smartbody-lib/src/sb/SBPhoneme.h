@@ -21,6 +21,7 @@ public:
 	std::vector<float>& getKeys(const std::string& viseme);
 	std::vector<std::string> getVisemeNames();
 	int getNumVisemes();
+	void clean();
 
 private:
 	std::string _fromPhoneme;
