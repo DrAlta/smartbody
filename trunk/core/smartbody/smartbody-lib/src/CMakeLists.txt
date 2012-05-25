@@ -374,6 +374,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBParseNode.cpp
 	sb/SBJointMap.cpp
 	sb/SBJointMapManager.cpp
+	sb/SBPhoneme.cpp
+	sb/SBPhonemeManager.cpp
 
 	sb/SBPython.cpp
 	sb/SBPythonClass.cpp

@@ -404,7 +404,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 			//blendIval *= 2;
 			if (diphone)
 			{
-				std::vector<std::string>& visemeNames = diphone->getVisemeNames();
+				const std::vector<std::string>& visemeNames = diphone->getVisemeNames();
 				for (int v = 0; v < diphone->getNumVisemes(); v++)
 				{
 					std::vector<float> curve = diphone->getKeys(visemeNames[v]);
