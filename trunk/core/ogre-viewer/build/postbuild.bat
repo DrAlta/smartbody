@@ -42,6 +42,8 @@ copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll %BIN_DIR%
+copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcp100.dll" %BIN_DIR%
+copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcr100.dll" %BIN_DIR%
 
 if not exist ..\media\packs   mkdir ..\media\packs
 if not exist ..\media\models  mkdir ..\media\models
