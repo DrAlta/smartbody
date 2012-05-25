@@ -273,10 +273,12 @@ bool DeformableMesh::buildVertexBuffer()
 				if (dMeshStatic->shape().F.size() == 0)
 					continue;
 				SrModel::Face& faceIdx = dMeshStatic->shape().F[i];	
-				SrModel::Face& nIdx = dMeshStatic->shape().F[i];
+				SrModel::Face nIdx;
+				nIdx.set(faceIdx.a,faceIdx.b,faceIdx.c);
 				if (dMeshStatic->shape().Fn.size() != 0)
 				{
-					nIdx = dMeshStatic->shape().Fn[i];			
+					SrModel::Face& fnIdx = dMeshStatic->shape().Fn[i];	
+					nIdx.set(fnIdx.a,fnIdx.b,fnIdx.c);
 				}
 				//SrModel::Face& nIdx = dMeshStatic->shape().Fn[i];
 				SrModel::Face& tIdx = defaultIdx;
@@ -443,10 +445,15 @@ bool DeformableMesh::buildVertexBuffer()
 				if (dMeshStatic->shape().F.size() <= i)
 					continue;				
 				SrModel::Face& faceIdx = dMeshStatic->shape().F[i];
-				SrModel::Face& normalIdx = dMeshStatic->shape().F[i];
+				SrModel::Face normalIdx;// = dMeshStatic->shape().F[i];
+				normalIdx.set(faceIdx.a,faceIdx.b,faceIdx.c);
 
 				if (dMeshStatic->shape().Fn.size() > i)
-					normalIdx = dMeshStatic->shape().Fn[i];							
+				{
+					//normalIdx = dMeshStatic->shape().Fn[i];							
+					SrModel::Face& fnIdx = dMeshStatic->shape().Fn[i];	
+					normalIdx.set(fnIdx.a,fnIdx.b,fnIdx.c);
+				}
 				SrModel::Face& texCoordIdx = defaultIdx;
 				if (dMeshStatic->shape().Ft.size() > i)
 					texCoordIdx = dMeshStatic->shape().Ft[i];
