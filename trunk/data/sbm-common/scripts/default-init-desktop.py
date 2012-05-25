@@ -80,8 +80,8 @@ utah.setStringAttribute("deformableMesh", "utah")
 #scene.setDefaultCharacter("doctor")
 #scene.setDefaultRecipient("elder")
 
-#scene.run("init-param-animation.py")
-#scene.run("init-steer-agents.py")
+scene.run("init-param-animation.py")
+scene.run("init-steer-agents.py")
 
 scene.setBoolAttribute("internalAudio", True)
 
