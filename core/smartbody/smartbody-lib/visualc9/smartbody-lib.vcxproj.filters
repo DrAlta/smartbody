@@ -1009,6 +1009,12 @@
     <ClCompile Include="..\src\sbm\sbm_speech_impl_skeleton.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sb\SBPhoneme.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBPhonemeManager.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -2060,6 +2066,12 @@
     </ClInclude>
     <ClInclude Include="..\src\controllers\me_blend_cover.h">
       <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBPhoneme.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBPhonemeManager.h">
+      <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

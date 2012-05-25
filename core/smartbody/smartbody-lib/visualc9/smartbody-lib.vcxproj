@@ -405,6 +405,8 @@
     <ClCompile Include="..\src\bml\bml_sync_point.cpp" />
     <ClCompile Include="..\src\bml\bml_target.cpp" />
     <ClCompile Include="..\src\sbm\BMLDefs.cpp" />
+    <ClCompile Include="..\src\sb\SBPhoneme.cpp" />
+    <ClCompile Include="..\src\sb\SBPhonemeManager.cpp" />
     <ClCompile Include="..\src\sk\sk_channel.cpp" />
     <ClCompile Include="..\src\sk\sk_channel_array.cpp" />
     <ClCompile Include="..\src\sk\sk_joint.cpp" />
@@ -871,6 +873,8 @@
     <ClInclude Include="..\src\bml\bml_types.hpp" />
     <ClInclude Include="..\src\bml\bml_xml_consts.hpp" />
     <ClInclude Include="..\src\sbm\BMLDefs.h" />
+    <ClInclude Include="..\src\sb\SBPhoneme.h" />
+    <ClInclude Include="..\src\sb\SBPhonemeManager.h" />
     <ClInclude Include="..\src\sk\sk_channel.h" />
     <ClInclude Include="..\src\sk\sk_channel_array.h" />
     <ClInclude Include="..\src\sk\sk_joint.h" />
