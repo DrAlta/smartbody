@@ -80,8 +80,10 @@ void MeCtCCDIK::CCDIteration(MeCtIKTreeNode* startNode, EffectorConstraint* con 
 	SrMat mat, matInv;
 	if(!startNode->parent) matInv = ikScenario->ikGlobalMat.inverse();
 	else matInv = startNode->parent->gmat.inverse();
-
-	SrMat prerot; startNode->joint->quat()->prerot().get_mat(prerot);
+	
+	SkJointQuat* jquat = startNode->joint->quat();
+	SrQuat prequat = jquat->orientation()*jquat->prerot();
+	SrMat prerot; prequat.get_mat(prerot);
 	matInv = matInv*prerot.inverse();
 	//matInv = prerot.inverse()*matInv;
 

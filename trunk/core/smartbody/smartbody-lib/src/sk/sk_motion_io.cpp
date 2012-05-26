@@ -537,6 +537,11 @@ bool SkMotion::save ( SrOutput& out )
        }
       out << srnl;
     }
+   out << "ready time: " << time_ready() << srnl;
+   out << "strokeStart time: " << time_stroke_start() << srnl;
+   out << "emphasis time: " << time_stroke_emphasis() << srnl;
+   out << "stroke time: " << time_stroke_end() << srnl;
+   out << "relax time: " << time_relax() << srnl;
    out << srnl;
 
    return true;
