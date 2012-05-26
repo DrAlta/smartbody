@@ -39,7 +39,7 @@ protected:
 	ReachEngineMap        reachEngineMap;
 	MeCtReachEngine*      currentReachEngine;
 	std::string           characterName;		
-	bool                  footIKFix;
+	bool                  footIKFix;	
 	bool                  useProfileInterpolation;
 	bool                  useRetiming;
 	bool                  isMoving;

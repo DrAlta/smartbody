@@ -350,6 +350,7 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 		ik.update(&ikScenario);		
 		ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);		
 	}
+	//ikCCD.update(&ikScenario);
 
 	
 	if (footIKFix)
@@ -484,7 +485,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 
 	ikMaxOffset = ikDefaultVelocity*3.f*dt;	
 	mcu.mark("Reach",0,"reachIK");
- 	if (1)//(footIKFix)
+ 	if (1)//if (footIKFix)
  	{
  		solveIK(reachData,ikMotionFrame);	
  	}

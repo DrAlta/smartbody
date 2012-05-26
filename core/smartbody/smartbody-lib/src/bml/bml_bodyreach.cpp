@@ -181,7 +181,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	{			
 		bodyReachCt->setFootIK(true);
 	}
-	else if( stringICompare(attrFootIK,"false") )
+	else if (stringICompare(attrFootIK,"false"))
 	{			
 		bodyReachCt->setFootIK(false);
 	}

@@ -364,7 +364,7 @@ SrMat MeCtIKTreeScenario::getLocalMat( const SkJoint* joint, const SrQuat& q, co
 	SrMat lMat;
 	SkJoint* j = const_cast<SkJoint*>(joint);
 	SkJointQuat* qu = j->quat();
-	lMat = (qu->prerot()*q).get_mat(lMat);
+	lMat = (qu->orientation()*qu->prerot()*q).get_mat(lMat);
 	lMat[12] = joint->offset().x + pos.x;
 	lMat[13] = joint->offset().y + pos.y;
 	lMat[14] = joint->offset().z + pos.z;
@@ -498,8 +498,11 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 				parentMat = s->ikGlobalMat;
 
 			// fix for prerotation
-			SrMat prerot; node->joint->quat()->prerot().get_mat(prerot);
+			SkJointQuat* jquat = node->joint->quat();
+			SrQuat prerotQuat = jquat->orientation()*jquat->prerot();
+			SrMat prerot; prerotQuat.get_mat(prerot);
 			parentMat = prerot*parentMat;
+			//parentMat = parentMat*prerot;
 
 			SrVec nodePos = SrVec(nodeMat.get(12),nodeMat.get(13),nodeMat.get(14));
 			SrVec axis[3];
@@ -509,7 +512,7 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 				axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2));//*node->joint->parent()->gmatZero().get_rotation().inverse()*node->joint->gmatZero().get_rotation();								
 				//axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->gmatZero().get_rotation()*node->joint->parent()->gmatZero().get_rotation().inverse();
 				
-				SrVec jVec = cross(axis[k],endPos-nodePos);
+				SrVec jVec = cross(axis[k],(endPos-nodePos));
 				matJ(posCount*3+0,idx*3+k) = jVec[0]*nodeWeight;
 				matJ(posCount*3+1,idx*3+k) = jVec[1]*nodeWeight;	
 				matJ(posCount*3+2,idx*3+k) = jVec[2]*nodeWeight;							
@@ -570,8 +573,11 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 				parentMat = s->ikGlobalMat;
 
 			// fix for prerotation
-			SrMat prerot; node->joint->quat()->prerot().get_mat(prerot);
+			SkJointQuat* jquat = node->joint->quat();
+			SrQuat prerotQuat = jquat->orientation()*jquat->prerot();
+			SrMat prerot; prerotQuat.get_mat(prerot);			
 			parentMat = prerot*parentMat;
+			//parentMat = parentMat*prerot;
 			//parentMat = node->gmat;
 			SrVec axis[3];
 			for (int k=0;k<3;k++)
