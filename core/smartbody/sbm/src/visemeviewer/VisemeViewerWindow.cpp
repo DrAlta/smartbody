@@ -237,7 +237,7 @@ void VisemeViewerWindow::OnVisemeSelectCB(Fl_Widget* widget, void* data)
 	SBDiphone* diphone = viewer->getCurrentDiphone();
 	if (diphone)
 	{
-		std::vector<std::string>& visemeNames = diphone->getVisemeNames();
+		const std::vector<std::string>& visemeNames = diphone->getVisemeNames();
 
 		for (size_t i = 0; i < visemeNames.size(); i++)
 		{
@@ -266,7 +266,7 @@ void VisemeViewerWindow::selectViseme(const char * phoneme1, const char * phonem
 	if (diphone)
 	{
 		_browserViseme->deselect();
-		std::vector<std::string>& visemeNames = diphone->getVisemeNames();
+		const std::vector<std::string>& visemeNames = diphone->getVisemeNames();
 		for (int i = 0; i < _browserViseme->size(); i++)
 		{
 			for (size_t j = 0; j < visemeNames.size(); j++)
@@ -359,7 +359,7 @@ void VisemeViewerWindow::OnSaveCB(Fl_Widget* widget, void* data)
 	for (size_t i = 0; i < diphones.size(); i++)
 	{
 		strstr << "diphone = diphoneManager.createDiphone(\"" << diphones[i]->getFromPhonemeName() << "\", \"" << diphones[i]->getToPhonemeName() << "\", \"" << viewer->getCurrentCharacterName() << "\")" << "\n";
-		std::vector<std::string>& visemeNames = diphones[i]->getVisemeNames();
+		const std::vector<std::string>& visemeNames = diphones[i]->getVisemeNames();
 		for (size_t n = 0; n < visemeNames.size(); n++)
 		{
 			std::vector<float>& key = diphones[i]->getKeys(visemeNames[n]);
