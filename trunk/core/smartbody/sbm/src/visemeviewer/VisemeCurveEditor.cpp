@@ -4,6 +4,7 @@
 #include <FL/fl_device.H>
 #include <FL/fl_draw.H>
 #include <stdlib.h>
+#include <sr/sr_vec.h>
 
 VisemeCurveEditor::VisemeCurveEditor(int x, int y, int w, int h, char* name) : Fl_Widget(x, y, w, h)
 {
@@ -144,7 +145,8 @@ int VisemeCurveEditor::handle(int event)
 					break;
 				else
 				{
-					SrVec newCurvePoint = mapDrawData(SrVec((float)mousex, (float)mousey, 0.0f));
+					SrVec temp((float)mousex, (float)mousey, 0.0f);
+					SrVec newCurvePoint = mapDrawData(temp);
 					point.x = newCurvePoint.x;
 					point.y = newCurvePoint.y;
 					isCurveDirty = true;
@@ -179,8 +181,8 @@ bool VisemeCurveEditor::isPointSelected(int mousex, int mousey)
 
 		for(int j = 0; j < (int)_curves[i].size(); j++)
 		{	
-			SrVec& point = _curves[i][j];
-			SrVec& newPoint = mapCurveData(point);
+			SrVec point = _curves[i][j];
+			SrVec newPoint = mapCurveData(point);
 			float distance = dist(mouseClick, newPoint);
 			
 			if(distance <= _curves[i].getPointRadius())
