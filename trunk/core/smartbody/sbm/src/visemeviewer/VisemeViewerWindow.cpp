@@ -21,7 +21,11 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_sliderCurveAnimation = new Fl_Value_Slider(115, 460, 435, 30);
 	_sliderCurveAnimation->type(5);
 	_sliderCurveAnimation->textsize(14);
+	_sliderCurveAnimation->deactivate();
+	_sliderCurveAnimation->callback(OnSliderSelectCB, this);
 	_buttonPlay = new Fl_Button(40, 455, 65, 40, "@>");
+	_buttonPlay->callback(OnPlayCB, this);
+	_isPlaying = false;
 
 	_choiceCharacter = new Fl_Choice(70, 35, 100, 25, "Character");
 	_choiceCharacter->callback(OnCharacterSelectCB, this);
@@ -46,10 +50,6 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_browserViseme = new Fl_Multi_Browser(575, 80, 70, 350, "Visemes");
 	_browserViseme->align(FL_ALIGN_TOP);
 	_browserViseme->callback(OnVisemeSelectCB, this);
-
-//	_browserVisemeColor = new Fl_Browser(550, 80, 70, 350, "Colors");
-//	_browserVisemeColor->align(FL_ALIGN_TOP);
-
 	this->end();
 	
 	loadData();
@@ -123,6 +123,19 @@ void VisemeViewerWindow::initializeVisemes()
 	_curveEditor->generateCurves(_browserViseme->size());
 }
 
+void VisemeViewerWindow::resetViseme()
+{
+	std::string characterName = getCurrentCharacterName();
+	for (int i = 0; i < _browserViseme->size(); i++)
+	{
+		std::stringstream strstr;
+		strstr << "char " << characterName << " viseme " << _browserViseme->text(i + 1) << " " << 0.0f;
+		SmartBody::SBScene::getScene()->command(strstr.str());		
+	}
+	_isPlaying = true;
+	OnPlayCB(this->_buttonPlay, this);
+}
+
 SBCharacter* VisemeViewerWindow::getCurrentCharacter()
 {
 	const char* characterName = _choiceCharacter->menu()[_choiceCharacter->value()].label();
@@ -138,6 +151,12 @@ std::string VisemeViewerWindow::getCurrentCharacterName()
 
 SBDiphone* VisemeViewerWindow::getCurrentDiphone()
 {
+	if (_browserPhoneme[0]->value() <= 0)
+		return NULL;
+
+	if (_browserPhoneme[1]->value() <= 0)
+		return NULL;
+
 	std::string phoneme1 = _browserPhoneme[0]->text(_browserPhoneme[0]->value());
 	std::string phoneme2 = _browserPhoneme[1]->text(_browserPhoneme[1]->value());
 	SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(phoneme1, phoneme2, getCurrentCharacterName());
@@ -186,6 +205,15 @@ void VisemeViewerWindow::refreshData()
 	}
 }
 
+bool VisemeViewerWindow::isPlayingViseme()
+{
+	return _isPlaying;
+}
+
+float VisemeViewerWindow::getSliderValue()
+{
+	return (float)_sliderCurveAnimation->value();
+}
 
 void VisemeViewerWindow::OnPhoneme1SelectCB(Fl_Widget* widget, void* data)
 {
@@ -203,7 +231,7 @@ void VisemeViewerWindow::OnPhoneme1SelectCB(Fl_Widget* widget, void* data)
 		int lineSelected2 = viewer->_browserPhoneme[1]->value();
 		viewer->selectViseme(viewer->_browserPhoneme[0]->text(lineSelected1), viewer->_browserPhoneme[1]->text(lineSelected2));
 	}
-
+	viewer->resetViseme();
 	viewer->updateViseme();
 	viewer->draw();
 }
@@ -222,7 +250,7 @@ void VisemeViewerWindow::OnPhoneme2SelectCB(Fl_Widget* widget, void* data)
 		int lineSelected2 = viewer->_browserPhoneme[1]->value();
 		viewer->selectViseme(viewer->_browserPhoneme[0]->text(lineSelected1), viewer->_browserPhoneme[1]->text(lineSelected2));
 	}
-
+	viewer->resetViseme();
 	viewer->updateViseme();
 	viewer->draw();
 }
@@ -252,7 +280,8 @@ void VisemeViewerWindow::OnVisemeSelectCB(Fl_Widget* widget, void* data)
 	viewer->_curveEditor->changeCurve(viseme - 1, curveData);
 	viewer->refreshData();
 
-	viewer->_curveEditor->selectLine(viseme - 1);
+	viewer->_curveEditor->selectLine(viseme - 1);	
+	viewer->resetViseme();
 	viewer->updateViseme();
 	viewer->draw();
 }
@@ -303,8 +332,6 @@ void VisemeViewerWindow::selectViseme(const char * phoneme1, const char * phonem
 
 void VisemeViewerWindow::selectPhonemes(const char * viseme)
 {
-	
-
 	/*
 	int phoneme1 = rand() % _browserPhoneme[0]->size() + 1;
 	int phoneme2 = rand() % _browserPhoneme[1]->size() + 1;
@@ -322,6 +349,32 @@ void VisemeViewerWindow::selectPhonemes(const char * viseme)
 void VisemeViewerWindow::OnSliderSelectCB(Fl_Widget* widget, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+	SBDiphone* curDiphone = viewer->getCurrentDiphone();
+	if (!curDiphone)
+		return;
+
+	std::string characterName = viewer->getCurrentCharacterName();
+	std::vector<std::string>& visemeNames = curDiphone->getVisemeNames();
+	float sliderValue = (float)viewer->_sliderCurveAnimation->value();
+	for (size_t i = 0; i < visemeNames.size(); i++)
+	{
+		float curveValue = 0.0f;
+		std::vector<float>& key = curDiphone->getKeys(visemeNames[i]);
+		for (size_t k = 0; k < key.size() / 2 - 1; k++)
+		{
+			if (key[k * 2] <= sliderValue && key[(k + 1) * 2] >= sliderValue)
+			{
+				float f = (sliderValue - key[k * 2]) / (key[(k + 1) * 2] - key[k * 2]);
+				curveValue = f * (key[(k + 1) * 2 + 1] - key[k * 2 + 1]) + key[k * 2 + 1];
+				break;
+			}
+		}
+		std::stringstream strstr;
+		strstr << "char " << characterName << " viseme " << visemeNames[i] << " " << curveValue;
+		LOG("%s", strstr.str().c_str());
+		SmartBody::SBScene::getScene()->command(strstr.str());
+	}
+	viewer->_curveEditor->redraw();
 }
 
 void VisemeViewerWindow::OnCharacterSelectCB(Fl_Widget* widget, void* data)
@@ -338,6 +391,24 @@ void VisemeViewerWindow::OnCharacterSelectCB(Fl_Widget* widget, void* data)
 			viewer->_browserViseme->add(faceDefinition->getVisemeName(i).c_str());
 	}
 	viewer->initializeVisemes();
+}
+
+void VisemeViewerWindow::OnPlayCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+	if (!viewer->_isPlaying)
+	{
+		viewer->_isPlaying = true;
+		viewer->_buttonPlay->label("@square");
+		viewer->_sliderCurveAnimation->activate();
+	}
+	else
+	{
+		viewer->_isPlaying = false;
+		viewer->_buttonPlay->label("@>");
+		viewer->_sliderCurveAnimation->value(0);
+		viewer->_sliderCurveAnimation->deactivate();
+	}
 }
 
 void VisemeViewerWindow::OnSaveCB(Fl_Widget* widget, void* data)

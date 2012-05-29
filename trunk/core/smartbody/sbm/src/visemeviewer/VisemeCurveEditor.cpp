@@ -50,6 +50,14 @@ void VisemeCurveEditor::draw()
 	drawGrid();
 	drawPoints();
 	drawCurve();
+
+	//draw scrub line for slider
+	fl_color(FL_BLACK);
+	if (visemeWindow->isPlayingViseme())
+	{
+		float sliderVal = visemeWindow->getSliderValue();
+		fl_line(x() + int(w() * sliderVal), y(), x() + int(w() * sliderVal), y() + h());
+	}
 }
 
 
