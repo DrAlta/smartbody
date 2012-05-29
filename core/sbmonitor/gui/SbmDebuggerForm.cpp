@@ -34,6 +34,8 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
   MainWindow()->show();
   m_pGLWidget = new GLWidget(c.GetScene(), this);
 
+  ui.actionConnectionStatus->setIcon(QIcon("Images/ConnectionStatus_Disconnected.png"));
+
   // setup renderer size and positioning
   QPoint rendererPosition = ui.RenderView->pos();
   QSize rendererSize = ui.RenderView->size();
@@ -91,6 +93,7 @@ void SbmDebuggerForm::InitSignalsSlots()
    connect(ui.actionDisconnect, SIGNAL(triggered()), this, SLOT(Disconnect()));
    connect(ui.actionSettings, SIGNAL(triggered()), this, SLOT(ShowSettingsDialog()));
    connect(ui.actionExit, SIGNAL(triggered()), MainWindow(), SLOT(close()));
+   connect(ui.actionConnectionStatus, SIGNAL(triggered()), this, SLOT(ConnectionStatusButtonPressed()));
 
    // Tool bar
    connect(ui.actionToggleFreeLookCamera, SIGNAL(triggered()), m_pGLWidget, SLOT(ToggleFreeLook()));
@@ -153,6 +156,19 @@ void SbmDebuggerForm::ConnectToFirstFoundProcess()
    }
 }
 
+void SbmDebuggerForm::ConnectionStatusButtonPressed()
+{
+   if (ui.actionDisconnect->isEnabled())
+   {
+      // you're connected to a process
+      Disconnect();
+   }
+   else
+   {
+      ConnectToFirstFoundProcess();
+   }
+}
+
 void SbmDebuggerForm::ConnectToSbmProcess(string processId)
 {
    // disconnect from any previous process
@@ -172,6 +188,9 @@ void SbmDebuggerForm::ConnectToSbmProcess(string processId)
 
    // since you're connected, enable the disconnect button
    ui.actionDisconnect->setEnabled(true);
+   ui.actionConnectionStatus->setToolTip(vhcl::Format("Connected to %s", processId.c_str()).c_str());
+
+   ui.actionConnectionStatus->setIcon(QIcon("Images/ConnectionStatus_Connected.png"));
 
    c.SendSBMCommand(NetRequest::Get_Scene_Scale, "float", "scene.getScale()", GetSceneScale, this);
 }
@@ -227,6 +246,9 @@ void SbmDebuggerForm::Disconnect()
    ui.sceneTree->insertTopLevelItem(Characters, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Characters"))));
    ui.sceneTree->insertTopLevelItem(Pawns, new QTreeWidgetItem(ui.sceneTree, QStringList(QString("Pawns"))));
    m_pSelectedSceneJointItem = NULL;
+
+   ui.actionConnectionStatus->setIcon(QIcon("Images/ConnectionStatus_Disconnected.png"));
+   ui.actionConnectionStatus->setToolTip("Disconnected");
    c.Disconnect();
 }
 
