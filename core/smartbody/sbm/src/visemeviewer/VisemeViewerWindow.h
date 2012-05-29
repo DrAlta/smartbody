@@ -26,18 +26,19 @@ public:
 	~VisemeViewerWindow();
 
 	void refreshData();
+	bool isPlayingViseme();
+	float getSliderValue();
 
 	static Fl_Menu_Item menu_[];
 protected:
-
 	Fl_Choice * _choiceCharacter;
 	Fl_Hold_Browser *_browserPhoneme[2];
 	Fl_Multi_Browser *_browserViseme;
-	Fl_Browser *_browserVisemeColor;
 	Fl_Value_Slider *_sliderCurveAnimation;
 	Fl_Button *_buttonPlay;
 	VisemeCurveEditor * _curveEditor;
 	bool _phonemesSelected[2];
+	bool _isPlaying;
 
 	void draw();
 	bool loadData();
@@ -45,6 +46,7 @@ protected:
 	void selectPhonemes(const char * viseme);
 	void updateViseme();
 	void initializeVisemes();
+	void resetViseme();
 
 	SBCharacter* getCurrentCharacter();
 	std::string getCurrentCharacterName();
@@ -55,6 +57,7 @@ protected:
 	static void OnPhoneme2SelectCB(Fl_Widget* widget, void* data);
 	static void OnVisemeSelectCB(Fl_Widget* widget, void* data);
 	static void OnSliderSelectCB(Fl_Widget* widget, void* data);
+	static void OnPlayCB(Fl_Widget* widget, void* data);
 	static void OnSaveCB(Fl_Widget* widget, void* data);
 };
 #endif
