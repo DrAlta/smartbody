@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SettingsDialog.ui'
 **
-** Created: Mon May 21 10:47:05 2012
+** Created: Tue May 29 13:17:11 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -20,6 +20,7 @@
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
+#include <QtGui/QSlider>
 #include <QtGui/QTabWidget>
 #include <QtGui/QWidget>
 
@@ -33,6 +34,9 @@ public:
     QWidget *general_tab;
     QComboBox *unitsBox;
     QLabel *label;
+    QSlider *rendererSpeedSlider;
+    QLabel *rendererSpeedLabel;
+    QDoubleSpinBox *rendererSpeedBox;
     QWidget *camera_tab;
     QComboBox *cameraControlBox;
     QLabel *cameraControlLabel;
@@ -62,6 +66,20 @@ public:
         label = new QLabel(general_tab);
         label->setObjectName(QString::fromUtf8("label"));
         label->setGeometry(QRect(10, 10, 61, 16));
+        rendererSpeedSlider = new QSlider(general_tab);
+        rendererSpeedSlider->setObjectName(QString::fromUtf8("rendererSpeedSlider"));
+        rendererSpeedSlider->setGeometry(QRect(10, 90, 121, 19));
+        rendererSpeedSlider->setMaximum(100);
+        rendererSpeedSlider->setValue(100);
+        rendererSpeedSlider->setOrientation(Qt::Horizontal);
+        rendererSpeedLabel = new QLabel(general_tab);
+        rendererSpeedLabel->setObjectName(QString::fromUtf8("rendererSpeedLabel"));
+        rendererSpeedLabel->setGeometry(QRect(10, 70, 81, 16));
+        rendererSpeedBox = new QDoubleSpinBox(general_tab);
+        rendererSpeedBox->setObjectName(QString::fromUtf8("rendererSpeedBox"));
+        rendererSpeedBox->setEnabled(false);
+        rendererSpeedBox->setGeometry(QRect(140, 90, 62, 22));
+        rendererSpeedBox->setValue(1);
         tabWidget->addTab(general_tab, QString());
         camera_tab = new QWidget();
         camera_tab->setObjectName(QString::fromUtf8("camera_tab"));
@@ -102,6 +120,7 @@ public:
     {
         SettingsDialog->setWindowTitle(QApplication::translate("SettingsDialog", "Settings", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("SettingsDialog", "Units", 0, QApplication::UnicodeUTF8));
+        rendererSpeedLabel->setText(QApplication::translate("SettingsDialog", "Renderer Speed", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(general_tab), QApplication::translate("SettingsDialog", "General", 0, QApplication::UnicodeUTF8));
         cameraControlLabel->setText(QApplication::translate("SettingsDialog", "Camera Control", 0, QApplication::UnicodeUTF8));
         cameraMovementSpeedLabel->setText(QApplication::translate("SettingsDialog", "Movement Speed", 0, QApplication::UnicodeUTF8));

@@ -9,6 +9,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent)
    ui.unitsBox->addItem("1");
    ui.unitsBox->addItem("100");
    ui.unitsBox->setCurrentIndex(1);
+   connect(ui.rendererSpeedSlider, SIGNAL(valueChanged (int)), this, SLOT(RendererTimeSetValue(int)));
 }
 
 SettingsDialog::~SettingsDialog()
@@ -28,3 +29,7 @@ void SettingsDialog::reject()
    emit DialogFinished(this, Rejected);
 }
 
+void SettingsDialog::RendererTimeSetValue(int value)
+{
+   ui.rendererSpeedBox->setValue((double)value / 100.0);
+}

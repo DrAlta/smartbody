@@ -23,6 +23,7 @@ class SbmDebuggerForm : public QMainWindow
      static QTreeWidgetItem* FindTreeWidgetItemByName(const QTreeWidgetItem* subTree, const std::string& name);
      static Pawn* FindSbmEntityFromTreeSelection(const QTreeWidgetItem* treeWidget, Scene* pScene);
      GLWidget* GetGLWidget() { return m_pGLWidget; }
+     UtilsDialog* m_Utils;
 
  private slots:
        void ShowConnectDialog();
@@ -39,7 +40,6 @@ class SbmDebuggerForm : public QMainWindow
        void SetSelectedSceneTreeItem(const Pawn* selectedObj, const Joint* selectedJoint);
 
  private:
-     UtilsDialog* m_Utils;
      Ui::MainWindow ui;
      QMainWindow* m_pMainWindow;
      GLWidget* m_pGLWidget;

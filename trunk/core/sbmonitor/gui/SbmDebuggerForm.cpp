@@ -474,5 +474,8 @@ bool GetSceneScale(void* caller, NetRequest* req)
 
    dlg->GetGLWidget()->SetObjectScale(1 / scale);
 
+   // refresh the utils tab with the character info
+   dlg->m_Utils->Refresh();
+
    return true;
 }

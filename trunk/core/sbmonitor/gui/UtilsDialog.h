@@ -40,6 +40,8 @@ private slots:
    void SpeakButtonPressed();
    void QueryAnimsPressed();
    void FilterAnims();
+
+public slots:
    void Refresh();
 };
 

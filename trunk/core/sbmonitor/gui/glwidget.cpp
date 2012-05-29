@@ -80,6 +80,9 @@ void GLWidget::OnCloseSettingsDialog(const SettingsDialog* dlg, int result)
       
       float scale = vhcl::ToDouble(dlg->ui.unitsBox->currentText().toStdString());
       SetObjectScale(scale);
+
+      string message = vhcl::Format("renderer time %.2f", dlg->ui.rendererSpeedBox->value());
+      vhmsg::ttu_notify1(message.c_str());
    }
 }
 
