@@ -6429,7 +6429,8 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			quat.y = args.read_float();
 			quat.z = args.read_float();
 			SbmCharacter* character = mcu->getCharacter(skelName);	
-			character->datareceiver_ct->setLocalRotation(jName, quat);
+			if (character)
+				character->datareceiver_ct->setLocalRotation(jName, quat);
 		}
 		else if (skeletonType == "norotation")
 		{
@@ -6439,8 +6440,9 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			else
 				jName = args.read_token();
 
-			SbmCharacter* character = mcu->getCharacter(skelName);	
-			character->datareceiver_ct->removeLocalRotation(jName);
+			SbmCharacter* character = mcu->getCharacter(skelName);
+			if (character)
+				character->datareceiver_ct->removeLocalRotation(jName);
 		}
 		if (skeletonType == "rotations")
 		{
@@ -6465,10 +6467,13 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 				KinectProcessor::processGlobalRotation(quats);
 	//			mcu->kinectProcessor->filterRotation(quats);
 				SbmCharacter* character = mcu->getCharacter(skelName);	
-				for (int i = 0; i < 20; i++)
+				if (character)
 				{
-					if (quats[i].w != 0)
-						character->datareceiver_ct->setLocalRotation(mcu->kinectProcessor->getSBJointName(i), quats[i]);
+					for (int i = 0; i < 20; i++)
+					{
+						if (quats[i].w != 0)
+							character->datareceiver_ct->setLocalRotation(mcu->kinectProcessor->getSBJointName(i), quats[i]);
+					}
 				}
 			}
 		}
