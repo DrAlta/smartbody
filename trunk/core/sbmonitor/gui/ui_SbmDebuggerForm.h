@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SbmDebuggerForm.ui'
 **
-** Created: Tue May 29 13:17:11 2012
+** Created: Tue May 29 15:16:50 2012
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -52,6 +52,7 @@ public:
     QAction *actionBML_Creator;
     QAction *actionEnity_Creator;
     QAction *actionConnect_Single;
+    QAction *actionConnectionStatus;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout_3;
     QWidget *RenderView;
@@ -118,7 +119,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(1264, 882);
+        MainWindow->resize(1264, 868);
         MainWindow->setBaseSize(QSize(1274, 830));
         actionConnect = new QAction(MainWindow);
         actionConnect->setObjectName(QString::fromUtf8("actionConnect"));
@@ -150,6 +151,11 @@ public:
         actionEnity_Creator->setObjectName(QString::fromUtf8("actionEnity_Creator"));
         actionConnect_Single = new QAction(MainWindow);
         actionConnect_Single->setObjectName(QString::fromUtf8("actionConnect_Single"));
+        actionConnectionStatus = new QAction(MainWindow);
+        actionConnectionStatus->setObjectName(QString::fromUtf8("actionConnectionStatus"));
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8("../../images/ConnectionStatus_Disconnected.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionConnectionStatus->setIcon(icon1);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout_3 = new QHBoxLayout(centralwidget);
@@ -412,11 +418,12 @@ public:
         menuSbm->addAction(actionFace_Viewer);
         menuSbm->addAction(actionBML_Creator);
         menuSbm->addAction(actionEnity_Creator);
+        toolBar->addAction(actionConnectionStatus);
         toolBar->addAction(actionToggleFreeLookCamera);
 
         retranslateUi(MainWindow);
 
-        sceneTab->setCurrentIndex(2);
+        sceneTab->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -459,6 +466,10 @@ public:
         actionConnect_Single->setToolTip(QApplication::translate("MainWindow", "Connect to first sbm process found", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_TOOLTIP
         actionConnect_Single->setShortcut(QApplication::translate("MainWindow", "Ctrl+I", 0, QApplication::UnicodeUTF8));
+        actionConnectionStatus->setText(QApplication::translate("MainWindow", "Connection Status", 0, QApplication::UnicodeUTF8));
+#ifndef QT_NO_TOOLTIP
+        actionConnectionStatus->setToolTip(QApplication::translate("MainWindow", "Disconnected", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_TOOLTIP
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0, QApplication::UnicodeUTF8));
         menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'SbmDebuggerForm.h'
 **
-** Created: Tue May 29 13:17:11 2012
+** Created: Tue May 29 15:01:03 2012
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      12,   14, // methods
+      13,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -34,15 +34,16 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
       17,   16,   16,   16, 0x08,
       37,   16,   16,   16, 0x08,
       66,   16,   16,   16, 0x08,
-      87,   16,   16,   16, 0x08,
-     108,   16,   16,   16, 0x08,
-     128,   16,   16,   16, 0x08,
-     151,   16,   16,   16, 0x08,
-     168,   16,   16,   16, 0x08,
-     191,   16,   16,   16, 0x08,
-     217,   16,   16,   16, 0x08,
-     247,  230,   16,   16, 0x08,
-     329,  303,   16,   16, 0x08,
+      98,   16,   16,   16, 0x08,
+     119,   16,   16,   16, 0x08,
+     140,   16,   16,   16, 0x08,
+     160,   16,   16,   16, 0x08,
+     183,   16,   16,   16, 0x08,
+     200,   16,   16,   16, 0x08,
+     223,   16,   16,   16, 0x08,
+     249,   16,   16,   16, 0x08,
+     279,  262,   16,   16, 0x08,
+     361,  335,   16,   16, 0x08,
 
        0        // eod
 };
@@ -50,6 +51,7 @@ static const uint qt_meta_data_SbmDebuggerForm[] = {
 static const char qt_meta_stringdata_SbmDebuggerForm[] = {
     "SbmDebuggerForm\0\0ShowConnectDialog()\0"
     "ConnectToFirstFoundProcess()\0"
+    "ConnectionStatusButtonPressed()\0"
     "ShowSettingsDialog()\0ShowResourceDialog()\0"
     "ShowCommandDialog()\0ShowDataViewerDialog()\0"
     "ShowFaceDialog()\0ShowBmlCreatorDialog()\0"
@@ -68,16 +70,17 @@ void SbmDebuggerForm::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
         switch (_id) {
         case 0: _t->ShowConnectDialog(); break;
         case 1: _t->ConnectToFirstFoundProcess(); break;
-        case 2: _t->ShowSettingsDialog(); break;
-        case 3: _t->ShowResourceDialog(); break;
-        case 4: _t->ShowCommandDialog(); break;
-        case 5: _t->ShowDataViewerDialog(); break;
-        case 6: _t->ShowFaceDialog(); break;
-        case 7: _t->ShowBmlCreatorDialog(); break;
-        case 8: _t->ShowEntityCreatorDialog(); break;
-        case 9: _t->Disconnect(); break;
-        case 10: _t->sceneTreeItemChanged((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< QTreeWidgetItem*(*)>(_a[2]))); break;
-        case 11: _t->SetSelectedSceneTreeItem((*reinterpret_cast< const Pawn*(*)>(_a[1])),(*reinterpret_cast< const Joint*(*)>(_a[2]))); break;
+        case 2: _t->ConnectionStatusButtonPressed(); break;
+        case 3: _t->ShowSettingsDialog(); break;
+        case 4: _t->ShowResourceDialog(); break;
+        case 5: _t->ShowCommandDialog(); break;
+        case 6: _t->ShowDataViewerDialog(); break;
+        case 7: _t->ShowFaceDialog(); break;
+        case 8: _t->ShowBmlCreatorDialog(); break;
+        case 9: _t->ShowEntityCreatorDialog(); break;
+        case 10: _t->Disconnect(); break;
+        case 11: _t->sceneTreeItemChanged((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< QTreeWidgetItem*(*)>(_a[2]))); break;
+        case 12: _t->SetSelectedSceneTreeItem((*reinterpret_cast< const Pawn*(*)>(_a[1])),(*reinterpret_cast< const Joint*(*)>(_a[2]))); break;
         default: ;
         }
     }
@@ -115,9 +118,9 @@ int SbmDebuggerForm::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 12)
+        if (_id < 13)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 12;
+        _id -= 13;
     }
     return _id;
 }

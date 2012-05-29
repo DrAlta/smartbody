@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1264</width>
-    <height>882</height>
+    <height>868</height>
    </rect>
   </property>
   <property name="baseSize">
@@ -97,6 +97,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionConnectionStatus"/>
    <addaction name="actionToggleFreeLookCamera"/>
   </widget>
   <widget class="QDockWidget" name="sceneDockWidget">
@@ -138,7 +139,7 @@
         <enum>Qt::LeftToRight</enum>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
@@ -894,6 +895,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="actionConnectionStatus">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../images/ConnectionStatus_Disconnected.png</normaloff>../../images/ConnectionStatus_Disconnected.png</iconset>
+   </property>
+   <property name="text">
+    <string>Connection Status</string>
+   </property>
+   <property name="toolTip">
+    <string>Disconnected</string>
    </property>
   </action>
  </widget>

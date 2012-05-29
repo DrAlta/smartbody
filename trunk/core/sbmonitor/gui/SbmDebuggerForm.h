@@ -28,6 +28,7 @@ class SbmDebuggerForm : public QMainWindow
  private slots:
        void ShowConnectDialog();
        void ConnectToFirstFoundProcess();
+       void ConnectionStatusButtonPressed();
        void ShowSettingsDialog();
        void ShowResourceDialog();
        void ShowCommandDialog();
