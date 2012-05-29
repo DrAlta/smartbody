@@ -7,18 +7,20 @@ class SettingsDialog : public QDialog
 {
    Q_OBJECT
 
-   public:
-      SettingsDialog(QWidget* parent = 0);
-      ~SettingsDialog();
+public:
+   SettingsDialog(QWidget* parent = 0);
+   ~SettingsDialog();
 
-      Ui::SettingsDialog ui;
+   Ui::SettingsDialog ui;
 
 signals:
       void DialogFinished(const SettingsDialog* dlg, int result);
 
-   private slots:
-     void accept();
-     void reject();
+private slots:
+   void accept();
+   void reject();
+   void RendererTimeSetValue(int value);
+
 };
 
 #endif

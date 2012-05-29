@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'UtilsDialog.h'
 **
-** Created: Mon May 21 10:47:05 2012
+** Created: Tue May 29 13:17:11 2012
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -39,7 +39,7 @@ static const uint qt_meta_data_UtilsDialog[] = {
      101,   12,   12,   12, 0x08,
      122,   12,   12,   12, 0x08,
      142,   12,   12,   12, 0x08,
-     156,   12,   12,   12, 0x08,
+     156,   12,   12,   12, 0x0a,
 
        0        // eod
 };
