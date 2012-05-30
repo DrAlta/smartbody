@@ -572,10 +572,10 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 	ikScenario.buildIKTreeFromJointRoot(rootJoint);	
 	MeCtJacobianIK ikJacobian;
 	float sceneScale = (float)1.f/SBScene::getScene()->getScale();
-	ikJacobian.maxOffset = 0.1f*sceneScale;
+	ikJacobian.maxOffset = 0.01f*sceneScale;
 	ikJacobian.dampJ = 1.5f*sceneScale;
 
-	float heightRatio = interSk->getBaseHeight()/tempSrcSk->getBaseHeight();
+	float heightRatio = (interSk->getBaseHeight()/tempSrcSk->getBaseHeight());//*0.99f;
 
 	ConstraintMap consMap;
 	ConstraintMap noRotConstraint;
@@ -597,17 +597,31 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 		}
 	}
 
+	SrVec prevPos;
+	SrVec prevOffsetPos;
 	for (int iframe=0; iframe<frames(); iframe++)
 	{
-		int chanID = mchan_arr.search(rootJoint->name(),SkChannel::Quat);
+		int chanID = mchan_arr.search(rootJoint->name(),SkChannel::XPos);
 		float* cur_p = constraintMotion->posture(iframe);	
 		float* orig_p = this->posture(iframe);
 		int index = mchan_arr.float_position(chanID);
+		SrVec curPos;
 		for (int k=0;k<3;k++)
 		{
 			cur_p[index+k] = orig_p[index+k]*heightRatio;
+			curPos[k] = orig_p[index+k];
 		}
-
+		SrVec baseOffset = curPos - prevPos;
+		prevPos = curPos;
+		if (iframe > 0)
+		{
+			curPos = prevOffsetPos + baseOffset*heightRatio;
+			for (int k=0;k<3;k++)
+			{
+				cur_p[index+k] = curPos[k];
+			}
+		}
+		prevOffsetPos = curPos;
 	}
 
 	constraintMotion->connect(interSk);
@@ -620,6 +634,8 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 	this->connected_skeleton()->update_global_matrices();
 	std::map<std::string, SrVec> prevPosMap;
 	ConstraintMap::iterator mi;
+	SBJoint* srcRoot = tempSrcSk->getJointByName(rootJoint->name());
+	SBJoint* tgtRoot = rootJoint;
 	for ( mi  = consMap.begin();
 		  mi != consMap.end();
 		  mi++)
@@ -629,7 +645,8 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 		SBJoint* tgtJoint = interSk->getJointByName(con->efffectorName);
 		if (tgtJoint)
 		{
-			con->targetPos = tgtJoint->getMatrixGlobal().get_translation(); // initialize the frame 
+			SrVec offset = srcJoint->getMatrixGlobal().get_translation() - srcRoot->getMatrixGlobal().get_translation();
+			con->targetPos = tgtRoot->getMatrixGlobal().get_translation() + offset*heightRatio;//tgtJoint->getMatrixGlobal().get_translation(); // initialize the frame 
 		}					
 		if (srcJoint)
 		{

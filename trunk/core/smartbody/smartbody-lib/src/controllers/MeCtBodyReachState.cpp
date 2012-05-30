@@ -565,6 +565,7 @@ void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
 	ReachTarget& rtarget = rd->reachTarget;
 	SRT ts = rtarget.getTargetState();
 	SRT tsBlend = rd->getPoseState(rd->targetRefFrame);
+	SRT tsBlendGlobal;
 
 
 	if (rd->useInterpolation())
@@ -577,7 +578,16 @@ void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
 	}			
 	//LOG("reach target before offset = %f %f %f\n",ts.tran[0],ts.tran[1],ts.tran[2]);
 	tsBlend.tran = ts.tran;
-	SRT offset = rd->curHandAction->getHandTargetStateOffset(rd,tsBlend);
+	tsBlendGlobal = tsBlend;
+	SrQuat newRot = SrQuat(rd->effectorState.gmatZero.inverse()*tsBlendGlobal.gmat());
+	tsBlendGlobal.rot = newRot;
+	SRT offset = rd->curHandAction->getHandTargetStateOffset(rd,tsBlendGlobal);
+	//offset.rot = SrQuat(offset.gmat()*rd->effectorState.gmatZero);
+	//SrVec rotOffset = offset.rot.axisAngle();
+	//rotOffset = rotOffset*rd->effectorState.gmatZero;
+	//offset.rot = SrQuat(rotOffset);
+	//tsBlendGlobal.add(offset);
+	//tsBlendGlobal.rot = SrQuat(tsBlendGlobal.gmat()*rd->effectorState.gmatZero);
 	tsBlend.add(offset);		
 	//LOG("reach target after offset = %f %f %f\n",tsBlend.tran[0],tsBlend.tran[1],tsBlend.tran[2]);
 	estate.ikTargetState = tsBlend;
