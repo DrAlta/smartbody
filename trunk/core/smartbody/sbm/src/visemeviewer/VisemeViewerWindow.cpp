@@ -138,15 +138,27 @@ void VisemeViewerWindow::resetViseme()
 
 SBCharacter* VisemeViewerWindow::getCurrentCharacter()
 {
-	const char* characterName = _choiceCharacter->menu()[_choiceCharacter->value()].label();
-	SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);	
-	return character;
+	int characterIndex = _choiceCharacter->value();
+	if (characterIndex >= 0)
+	{
+		const char* characterName = _choiceCharacter->menu()[_choiceCharacter->value()].label();
+		SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);	
+		return character;
+	}
+	else
+		return NULL;
 }
 
 std::string VisemeViewerWindow::getCurrentCharacterName()
 {
-	const char* characterName = _choiceCharacter->menu()[_choiceCharacter->value()].label();
-	return characterName;
+	int characterIndex = _choiceCharacter->value();
+	if (characterIndex >= 0)
+	{
+		const char* characterName = _choiceCharacter->menu()[_choiceCharacter->value()].label();
+		return characterName;
+	}
+	else
+		return "";
 }
 
 SBDiphone* VisemeViewerWindow::getCurrentDiphone()
@@ -382,6 +394,7 @@ void VisemeViewerWindow::OnCharacterSelectCB(Fl_Widget* widget, void* data)
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
 
 	SmartBody::SBCharacter* character = viewer->getCurrentCharacter();
+
 	SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
 	if (faceDefinition)
 	{
