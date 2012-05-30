@@ -34,6 +34,7 @@ public:
 	SRT curState; 
 	SRT grabStateError;
 	SrVec paraTarget;
+	SrMat gmatZero;
 
 	//SbmPawn* attachedPawn;	
 	std::string attachedPawnName;

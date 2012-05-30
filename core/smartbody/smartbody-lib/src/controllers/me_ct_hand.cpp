@@ -244,9 +244,10 @@ void MeCtHand::getPinchFrame( BodyMotionFrame& pinchFrame, SrVec& wristOffset )
 	SrVec wristPos = ikScenario.ikTreeRoot->gmat.get_translation();
 	SrVec ikTarget = wristPos + wristOffset*ikScenario.ikTreeRoot->gmat.get_rotation();
 	for (int i=0;i<MeCtHand::F_NUM_FINGERS;i++)
-	{
+	{		
 		FingerChain& fig = fingerChains[i];
 		MeCtIKTreeNode* node = fig.fingerTip;
+		if (!node) continue;
 		EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(handPosConstraint[node->nodeName]);
 		cons->targetPos = ikTarget;		
 	}

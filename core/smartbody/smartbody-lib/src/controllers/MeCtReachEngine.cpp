@@ -169,6 +169,7 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 	EffectorState& estate = reachData->effectorState;
 	estate.effectorName = reachEndEffector->name().c_str();
 	estate.curIKTargetState = reachData->getPoseState(idleMotionFrame);
+	estate.gmatZero = copyEffector->gmatZero();
 
 
 	stateTable["Idle"] = new ReachStateIdle();
@@ -343,7 +344,7 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 
 	//sr_out << "target pos = " << estate.curTargetState.tran << " , target rot = " << estate.curTargetState.rot << srnl;
 	ik.maxOffset = ikMaxOffset;
-	ik.dampJ = ikDamp;
+	ik.dampJ = ikDamp*0.1f;
 	ik.refDampRatio = 0.05;
 	for (int i=0;i<10;i++)
 	{
