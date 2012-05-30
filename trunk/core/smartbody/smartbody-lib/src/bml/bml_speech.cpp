@@ -399,9 +399,9 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 			SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(prevViseme->id(), curViseme->id(), request->actor->getName());
 			float blendIval = curViseme->time() - prevViseme->time();
 
-			//if (blendIval < 0.1f)
-			//	blendIval = 0.1f;
-			//blendIval *= 2;
+			if (blendIval < 0.1f)
+				blendIval = 0.1f;
+			blendIval *= 2;
 			if (diphone)
 			{
 				const std::vector<std::string>& visemeNames = diphone->getVisemeNames();
@@ -445,7 +445,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 		int index = -1;
 		for (size_t j = 0; j < visemeProcessedData.size(); j++)
 		{
-			if (visemeProcessedData[j]->id() == visemeRawData[i]->id())
+			if (_stricmp(visemeProcessedData[j]->id(), visemeRawData[i]->id()) == 0)
 			{
 				firstTime = false;
 				index = j;
@@ -463,7 +463,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 		{
 			std::vector<float>& stitchingCurve = visemeRawData[i]->getFloatCurve();
 			std::vector<float>& origCurve = visemeProcessedData[index]->getFloatCurve();
-			std::vector<float> newCurve = smoothCurve(origCurve, stitchingCurve);
+			std::vector<float>& newCurve = smoothCurve(origCurve, stitchingCurve);
 			visemeProcessedData[index]->setFloatCurve(newCurve, newCurve.size() / 2, 2);
 		}
 	}
@@ -510,6 +510,8 @@ std::vector<float> BML::SpeechRequest::smoothCurve(std::vector<float>& c1, std::
 			y2.push_back(c2[i]);
 	}
 
+	std::vector<float> smoothedY1 = y1;
+	std::vector<float> smoothedY2 = y2;
 
 	// simple algorithm
 	// do for second curve
@@ -520,9 +522,9 @@ std::vector<float> BML::SpeechRequest::smoothCurve(std::vector<float>& c1, std::
 			if (x1[i] <= x2[j] && x1[i + 1] >= x2[j])
 			{
 				float f = (x2[j] - x1[i])/ (x1[i + 1] - x1[i]);
-				float curX1 = f * y1[i] + (1.0f - f) * y1[i + 1];
-				float newX2 = (curX1 + y2[j]) * 0.5f;
-				y2[j] = newX2;
+				float curY1 = f * (y1[i + 1] - y1[i]) + y1[i];
+				float newY2 = curY1 > y2[j] ? curY1 : y2[j]; //(curY1 + y2[j]) * 0.5f;
+				smoothedY2[j] = newY2;
 			}
 		}
 	}
@@ -535,9 +537,9 @@ std::vector<float> BML::SpeechRequest::smoothCurve(std::vector<float>& c1, std::
 			if (x2[i] <= x1[j] && x2[i + 1] >= x1[j])
 			{
 				float f = (x1[j] - x2[i])/ (x2[i + 1] - x2[i]);
-				float curX2 = f * y2[i] + (1.0f - f) * y2[i + 1];
-				float newX1 = (curX2 + y1[j]) * 0.5f;
-				y1[j] = newX1;
+				float curY2 = f * (y2[i + 1] - y2[i]) + y2[i];
+				float newY1 = curY2 > y1[j] ? curY2 : y1[j]; //(curY2 + y1[j]) * 0.5f;
+				smoothedY1[j] = newY1;
 			}
 		}
 	}
@@ -548,19 +550,26 @@ std::vector<float> BML::SpeechRequest::smoothCurve(std::vector<float>& c1, std::
 	for (size_t i = 0; i < x1.size(); i++)
 	{
 		newX.push_back(x1[i]);
-		newY.push_back(y1[i]);
+		newY.push_back(smoothedY1[i]);
 	}
 
 	for (size_t i = 0; i < x2.size(); i++)
 	{
+		bool isAppending = true;
 		for (size_t j = 0; j < newX.size(); j++)
 		{
 			if (newX[j] >= x2[i])
 			{
 				newX.insert(newX.begin() + j, x2[i]);
-				newY.insert(newY.begin() + j, y2[i]);
+				newY.insert(newY.begin() + j, smoothedY2[i]);
+				isAppending = false;
 				break;
 			}
+		}
+		if (isAppending)
+		{
+			newX.push_back(x2[i]);
+			newY.push_back(smoothedY2[i]);
 		}
 	}
 

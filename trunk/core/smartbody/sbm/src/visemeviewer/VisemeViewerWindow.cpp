@@ -371,7 +371,7 @@ void VisemeViewerWindow::OnSliderSelectCB(Fl_Widget* widget, void* data)
 		}
 		std::stringstream strstr;
 		strstr << "char " << characterName << " viseme " << visemeNames[i] << " " << curveValue;
-		LOG("%s", strstr.str().c_str());
+		//LOG("%s", strstr.str().c_str());
 		SmartBody::SBScene::getScene()->command(strstr.str());
 	}
 	viewer->_curveEditor->redraw();
