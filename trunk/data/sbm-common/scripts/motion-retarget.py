@@ -2,27 +2,32 @@ print "|-------------------------------------------------|"
 print "|  data/sbm-common/scripts/motion-retarget.py     |"
 print "|-------------------------------------------------|"
 
-def retargetMotion(motionName, srcSkelName, tgtSkelName) :	
+def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :	
 	testMotion = scene.getMotion(motionName);
-	outMotionName = tgtSkelName + motionName	
+	outMotionName = tgtSkelName + motionName		
 	existMotion = scene.getMotion(outMotionName)
 	if existMotion != None : # do nothing if the retargeted motion is already there
 		return	
+		
+	if not os.path.exists(outDir):
+		os.makedirs(outDir)
 		
 	offsetJoints = VecMap();
 	endJoints = StringVec();
 	endJoints.append('l_ankle')
 	endJoints.append('r_ankle')	
 	effectorJoints = StringVec();
-	effectorJoints.append('r_ankle')	
+	#effectorJoints.append('r_ankle')	
 	effectorJoints.append('r_forefoot')
-	effectorJoints.append('l_ankle')
-	effectorJoints.append('l_forefoot')				
+	effectorJoints.append('r_toe')
+	#effectorJoints.append('l_ankle')
+	effectorJoints.append('l_forefoot')	
+	effectorJoints.append('l_toe')		
 	
 	#print 'Retarget motion = ' + motionName;
 	outMotion = testMotion.retarget(outMotionName,srcSkelName,tgtSkelName, endJoints, offsetJoints);	
 	cleanMotion = testMotion.constrain(outMotionName, srcSkelName, tgtSkelName, outMotionName, effectorJoints);
-	saveCommand = 'animation ' + outMotionName + ' save ' + outMotionName + '.skm';
+	saveCommand = 'animation ' + outMotionName + ' save ' + outDir + outMotionName + '.skm';
 	print 'Save command = ' + saveCommand;
 	scene.command(saveCommand)
 
@@ -114,17 +119,20 @@ def retargetSetup(targetSkelName):
 	getStandardGestureMotions(gestureMotions,"")
 	getStandardReachMotions(reachMotions,"")
 	
+	outDir = '../../../../data/sbm-common/common-sk/motion/' + targetSkelName + '/';
+	if not os.path.exists(outDir):
+		os.makedirs(outDir)
 	# retarget reach motions
 	for n in range(0, len(reachMotions)):
-		retargetMotion(reachMotions[n], 'common.sk', targetSkelName);
+		retargetMotion(reachMotions[n], 'common.sk', targetSkelName, outDir+'reachMotion/');
 	
 	# retarget locomotions
 	for n in range(0, len(locoMotions)):
-		retargetMotion(locoMotions[n], 'test_utah.sk', targetSkelName);
+		retargetMotion(locoMotions[n], 'test_utah.sk', targetSkelName, outDir+'locoMotion/');
 		
 	# retarget gesture motions
 	for n in range(0, len(gestureMotions)):
-		retargetMotion(gestureMotions[n], 'common.sk', targetSkelName);
+		retargetMotion(gestureMotions[n], 'common.sk', targetSkelName, outDir);
 	
 
 	
@@ -154,6 +162,13 @@ def retargetCharacter(charName, targetSkelName):
 	# setup reach 
 	scene.run("init-example-reach.py")
 	reachSetup(charName,targetSkelName)
+	
+	# setup steering
+	scene.run("init-steer-agents.py")
+	steerManager = scene.getSteerManager()
+	steerManager.setEnable(False)
+	setupSteerAgent(charName,targetSkelName)	
+	steerManager.setEnable(True)
 		
 	
 
