@@ -49,6 +49,7 @@ class VisemeCurveEditor : public Fl_Widget
 		void drawPoints();
 		void drawCurve();
 		void drawGrid();
+		void drawName();
 };
 
 #endif

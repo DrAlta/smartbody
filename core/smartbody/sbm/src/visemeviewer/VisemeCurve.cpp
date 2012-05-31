@@ -3,7 +3,7 @@
 VisemeCurve::VisemeCurve()
 {
 	_lineColor = FL_BLACK;
-	_pointColor = FL_RED;
+	_pointColor = FL_BLACK;
 	_isVisible = false;
 	_pointRadius = 5;
 }

@@ -28,6 +28,7 @@ public:
 	void refreshData();
 	bool isPlayingViseme();
 	float getSliderValue();
+	void drawNames();
 
 	static Fl_Menu_Item menu_[];
 protected:
