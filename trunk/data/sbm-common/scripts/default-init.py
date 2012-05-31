@@ -69,7 +69,15 @@ scene.setDefaultCharacter("doctor")
 scene.setDefaultRecipient("elder")
 
 scene.run("init-param-animation.py")
+
 scene.run("init-steer-agents.py")
+steerManager = scene.getSteerManager()
+
+numCharacters = scene.getNumCharacters()
+charNames = scene.getCharacterNames()
+for i in range(0, numCharacters):
+	setupSteerAgent(charNames[i],'all')	
+steerManager.setEnable(True)
 
 scene.setBoolAttribute("internalAudio", True)
 
@@ -77,8 +85,8 @@ scene.setBoolAttribute("internalAudio", True)
 scene.run("init-example-reach.py")
 names = scene.getCharacterNames()
 for n in range(0, len(names)):
-	reachSetup(names[n])
-
+	reachSetup(names[n],"")
+	
 # start the simulation
 sim.start()
 
