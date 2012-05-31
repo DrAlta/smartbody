@@ -9,6 +9,8 @@
 #include "sb/SBBehavior.h"
 #include <sb/SBSteerAgent.h>
 #include <sb/SBPhysicsManager.h>
+#include <sb/SBPhoneme.h>
+#include <sb/SBPhonemeManager.h>
 
 namespace SmartBody {
 
@@ -21,7 +23,10 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	createBoolAttribute("visemecurve", false, true, "Basic", 200, false, false, false, "Use curve-based visemes instead of discrete visemes.");
+	createBoolAttribute("visemecurve", false, true, "Basic", 100, false, false, false, "Use curve-based visemes instead of discrete visemes.");
+	createBoolAttribute("useDiphone", false, true, "Basic", 110, false, false, false, "Use diphones.");
+	createBoolAttribute("diphoneSplineCurve", true, true, "Basic", 120, false, false, false, "Use diphones spline/linear curve.");
+	SmartBody::DoubleAttribute* diphoneSmoothWindow = createDoubleAttribute("diphoneSmoothWindow", -1.0, true, "Basic", 130, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
 	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
 	timeDelayAttr->setMin(0.0);
 	createStringAttribute("deformableMesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
@@ -366,7 +371,7 @@ SBFaceDefinition* SBCharacter::getFaceDefinition()
 
 void SBCharacter::setFaceDefinition(SBFaceDefinition* face)
 {
-		SbmCharacter::setFaceDefinition(face);
+	SbmCharacter::setFaceDefinition(face);
 }
 
 void SBCharacter::setSteerAgent(SBSteerAgent* sbAgent)
@@ -396,6 +401,21 @@ void SBCharacter::notify(SBSubject* subject)
 		{
 			SmartBody::DoubleAttribute* timeDelayAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
 			set_viseme_time_delay((float) timeDelayAttribute->getValue());
+		}
+		else if (attrName == "useDiphone")
+		{
+			SmartBody::BoolAttribute* diphoneAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			this->setDiphone(diphoneAttribute->getValue());
+		}
+		else if (attrName == "diphoneSplineCurve")
+		{
+			SmartBody::BoolAttribute* splineCurveAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			this->setDiphoneSplineCurve(splineCurveAttribute->getValue());
+		}
+		else if (attrName == "diphoneSmoothWindow")
+		{
+			SmartBody::DoubleAttribute* smoothWindowAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			setDiphoneSmoothWindow((float)smoothWindowAttribute->getValue());
 		}
 		else if (attrName == "deformableMesh")
 		{
