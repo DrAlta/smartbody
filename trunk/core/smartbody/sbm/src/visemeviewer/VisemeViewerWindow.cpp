@@ -321,6 +321,9 @@ void VisemeViewerWindow::selectViseme(const char * phoneme1, const char * phonem
 {
 	if (_browserViseme->size() == 0)
 		return;
+	
+	if (!phoneme1 || !phoneme2)
+		return;
 
 	SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(phoneme1, phoneme2, getCurrentCharacterName());
 	if (diphone)
@@ -423,6 +426,11 @@ void VisemeViewerWindow::OnCharacterSelectCB(Fl_Widget* widget, void* data)
 			viewer->_browserViseme->add(faceDefinition->getVisemeName(i).c_str());
 	}
 	viewer->initializeVisemes();
+	viewer->_browserPhoneme[0]->deselect();
+	viewer->_browserPhoneme[1]->deselect();
+	viewer->resetViseme();
+	viewer->updateViseme();
+	viewer->_curveEditor->redraw();
 }
 
 void VisemeViewerWindow::OnPlayCB(Fl_Widget* widget, void* data)

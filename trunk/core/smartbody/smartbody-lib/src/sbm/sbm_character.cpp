@@ -468,7 +468,6 @@ void SbmCharacter::initData()
 	eyelid_reg_ct_p = NULL;
 	face_ct = NULL;
 	motionplayer_ct = NULL;
-	use_viseme_curve = false;
 	_soft_eyes_enabled = ENABLE_EYELID_CORRECTIVE_CT;
 	_height = 1.0f;
 	bonebusCharacter = NULL;
@@ -483,6 +482,7 @@ void SbmCharacter::initData()
 	viseme_channel_start_pos = 0;
 	viseme_channel_end_pos = 0;
 	viseme_history_arr = NULL;
+	_diphoneSetName = "";
 	_minVisemeTime = 0.0f;
 	_isControllerPruning = true;
 	_classType = "";
@@ -495,6 +495,8 @@ void SbmCharacter::initData()
 	_height = 1.0f; 
 	_visemePlateau = true;
 	_diphone = false;
+	_diphoneSplineCurve = true;
+	_diphoneSmoothWindow = -1.0f;
 	_nvbg = NULL;
 	_miniBrain = NULL;
 
@@ -1767,7 +1769,7 @@ void SbmCharacter::schedule_viseme_curve(
 				else
 				{
 					srSplineCurve spline( srSplineCurve::INSERT_NODES );
-					//				srSplineCurve spline( srSplineCurve::INSERT_KEYS );
+					//srSplineCurve spline( srSplineCurve::INSERT_KEYS );
 					spline.set_extensions( srSplineCurve::EXTEND_DECEL, srSplineCurve::EXTEND_DECEL );
 					spline.set_algorithm( srSplineCurve::ALG_HALTING );
 
@@ -1775,34 +1777,16 @@ void SbmCharacter::schedule_viseme_curve(
 
 						float t = curve_info[ i * num_key_params + 0 ];
 						float w = curve_info[ i * num_key_params + 1 ] * visemeWeight;
-
-						//					if (i == 0) spline.insert(t - .001, w);
-						ct_p->insert_key(t, w);
+						//if (i == 0) spline.insert(t - .001, w);
+						if (!isDiphoneSplineCurve())
+							ct_p->insert_key(t, w);
 						spline.insert( t, w );
-						//					if (i == num_keys - 1) spline.insert(t + .001, w);
+						//if (i == num_keys - 1) spline.insert(t + .001, w);
 					}
 					spline.apply_extensions();
-
-#define LINEAR_SPLINE_SEGS_PER_SEC 30.0
-#if 1
-					//ct_p->insert_spline( spline, LINEAR_SPLINE_SEGS_PER_SEC );
-#else
-					double fr, to;
-					spline.query_span( &fr, &to );
-					int num_segs = (int)( ( to - fr ) * LINEAR_SPLINE_SEGS_PER_SEC );
-
-					// MeCtCurveWriter: ct_p must handle the build internally...
-					// ct_p->sample_spline( int curve_index, spline, num_segs, true );
-					srCurveBuilder builder;
-					srLinearCurve linear;
-					builder.get_spline_curve( &linear, spline, num_segs, true );
-
-					linear.query_reset();
-					double t, v;
-					while( linear.query_next( &t, &v, true ) )	{
-						ct_p->insert_key( t, v );
-					}
-#endif
+					#define LINEAR_SPLINE_SEGS_PER_SEC 30.0
+					if (isDiphoneSplineCurve())
+						ct_p->insert_spline( spline, LINEAR_SPLINE_SEGS_PER_SEC );
 				}
 				double ct_dur = ct_p->controller_duration();
 				double tin = start_time + timeDelay;

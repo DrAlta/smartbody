@@ -166,7 +166,9 @@ namespace BML {
 	protected:
 		void createStandardSyncPoint( const std::wstring& attr, SyncPointPtr& sync );
 
-		std::vector<float> smoothCurve(std::vector<float>& c1, std::vector<float>& c2);
+		std::vector<float> stitchCurve(std::vector<float>& c1, std::vector<float>& c2);
+
+		void smoothCurve(std::vector<float>& c, float windowSize);
 
 		friend class BML::Processor;  //temporary
 	};

@@ -9,6 +9,7 @@ class SBSkeleton;
 class SBBehavior;
 class SBSteerAgent;
 class SBController;
+class SBDiphone;
 
 class SBCharacter : public SbmCharacter
 {
@@ -61,7 +62,7 @@ class SBCharacter : public SbmCharacter
 		virtual void setFaceDefinition(SBFaceDefinition* face);
 
 		void setSteerAgent(SBSteerAgent* agent);
-	
+
 		void notify(SBSubject* subject);
 
 	protected:

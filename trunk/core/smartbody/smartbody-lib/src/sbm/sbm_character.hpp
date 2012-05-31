@@ -168,6 +168,7 @@ protected:
 	float	viseme_sound_offset;
 	float	viseme_magnitude;
 	int 	viseme_channel_count;
+	std::string _diphoneSetName;
 
 	float	*viseme_history_arr;
 
@@ -390,7 +391,11 @@ public:
 	void setVisemePlateau( bool val ) { _visemePlateau = val; }
 	bool isDiphone( void ) const { return _diphone; }
 	void setDiphone( bool val ) { _diphone = val; }
-	
+	bool isDiphoneSplineCurve( void ) const { return _diphoneSplineCurve; }
+	void setDiphoneSplineCurve( bool val ) { _diphoneSplineCurve = val; }
+	float getDiphoneSmoothWindow( void ) const { return _diphoneSmoothWindow; }
+	void setDiphoneSmoothWindow( float val ) { _diphoneSmoothWindow = val; }
+
 	SrVec getFacingDirection() ;
 
 	void setMinVisemeTime(float minTime);
@@ -414,6 +419,8 @@ private:
 	bool	_visemePlateau;	
 	float	_minVisemeTime;
 	bool	_diphone;
+	bool	_diphoneSplineCurve;
+	float	_diphoneSmoothWindow;
 
 protected:
 	/*!
