@@ -1,14 +1,11 @@
 print "Init Steer Agent"
-
-steerManager = scene.getSteerManager()
-
-numCharacters = scene.getNumCharacters()
-charNames = scene.getCharacterNames()
-for i in range(0, numCharacters):
-	steerAgent = steerManager.createSteerAgent(charNames[i])
-	steerAgent.setSteerStateNamePrefix("all")
+def setupSteerAgent(charName, prefix):
+	steerManager.removeSteerAgent(charName)
+	steerAgent = steerManager.createSteerAgent(charName)
+	steerAgent.setSteerStateNamePrefix(prefix)
 	steerAgent.setSteerType("example")
-	sbCharacter = scene.getCharacter(charNames[i])
+	sbCharacter = scene.getCharacter(charName)
 	sbCharacter.setSteerAgent(steerAgent)
 	
-steerManager.setEnable(True)
+
+
