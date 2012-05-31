@@ -3,8 +3,10 @@ def locomotionSetup(skeletonName, baseJoint, preFix, statePreFix):
 	print "** State: allLocomotion"
 
 	stateManager = scene.getStateManager()
-	state = stateManager.createState3D(statePreFix+"Locomotion")
-
+	stateName = statePreFix+"Locomotion"
+	if (stateManager.getBlend(stateName) != None): # don't create duplicate state
+		return		
+	state = stateManager.createBlend3D(stateName)
 	# add motions
 	motions = StringVec()
 	motions.append(preFix+"ChrUtah_Walk001")

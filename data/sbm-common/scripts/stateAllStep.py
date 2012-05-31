@@ -2,8 +2,10 @@ def stepSetup(skeletonName, baseJoint, preFix, statePreFix):
 	stateManager = scene.getStateManager()
 
 	print "** State: allStep"
-	state = stateManager.createState2D(statePreFix+"Step")
-
+	stateName = statePreFix+"Step"
+	if (stateManager.getBlend(stateName) != None): # don't create duplicate state
+		return				
+	state = stateManager.createState2D(stateName)
 	# add motions
 	motions = StringVec()
 	motions.append(preFix+"ChrUtah_Idle001")

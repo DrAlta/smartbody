@@ -1,7 +1,10 @@
 def idleTurnSetup(skeletonName, baseJoint, preFix, statePreFix):
 	print "** State: allIdleTurn"
-	stateManager = scene.getStateManager()
-	state = stateManager.createState1D(statePreFix+"IdleTurn")
+	stateManager = scene.getStateManager()	
+	stateName = statePreFix+"IdleTurn"
+	if (stateManager.getBlend(stateName) != None): # don't create duplicate state
+		return	
+	state = stateManager.createState1D(stateName)
 	motions = StringVec()
 	motions.append(preFix+"ChrUtah_Idle001")
 	motions.append(preFix+"ChrUtah_Turn90Lf01")
