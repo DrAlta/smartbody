@@ -73,6 +73,8 @@ void VisemeViewerWindow::draw()
 	_curveEditor->redraw();
 
 	Fl_Double_Window::draw();
+
+	drawNames();
 }
 
 bool  VisemeViewerWindow::loadData()
@@ -296,6 +298,23 @@ void VisemeViewerWindow::OnVisemeSelectCB(Fl_Widget* widget, void* data)
 	viewer->resetViseme();
 	viewer->updateViseme();
 	viewer->draw();
+}
+
+void VisemeViewerWindow::drawNames()
+{
+	std::vector<VisemeCurve>& curves = _curveEditor->getCurves();
+
+	for (size_t i = 0; i < curves.size(); i++)
+	{
+		fl_color(FL_BLACK);
+
+		if(!curves[i].isVisible())
+			continue;
+
+		SrVec point1 = _curveEditor->mapCurveData(curves[i][0]);
+
+		fl_draw(_browserViseme->text((int)(i+1)), (int)point1.x, (int)point1.y - 10);
+	}
 }
 
 void VisemeViewerWindow::selectViseme(const char * phoneme1, const char * phoneme2)

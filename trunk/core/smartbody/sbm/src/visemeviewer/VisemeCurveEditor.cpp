@@ -50,6 +50,7 @@ void VisemeCurveEditor::draw()
 	drawGrid();
 	drawPoints();
 	drawCurve();
+	//visemeWindow->drawNames();
 
 	//draw scrub line for slider
 	fl_color(FL_BLACK);
@@ -261,11 +262,11 @@ void VisemeCurveEditor::drawPoints()
 	}
 
 	// draw selected point
-	if(_pointIsSelected)
+	if(_pointIsSelected && _curves[_selectedLine].isVisible())
 	{
 		SrVec& point = _curves[_selectedLine][_selectedPoint];
 		SrVec newPoint = mapCurveData(point);
-		fl_color(_curves[_selectedLine].getPointColor() - 30);
+		fl_color(FL_BLUE);
 		fl_circle(newPoint.x, newPoint.y, _curves[_selectedLine].getPointRadius() + 3);
 	}
 
@@ -292,6 +293,7 @@ void VisemeCurveEditor::drawCurve()
 				newLastPoint = mapCurveData(lastPoint);
 				continue;
 			}
+
 			SrVec& point = _curves[i][j];
 			SrVec newPoint = mapCurveData(point);
 			fl_line((int) newLastPoint.x, (int) newLastPoint.y, (int) newPoint.x, (int) newPoint.y);
@@ -299,6 +301,8 @@ void VisemeCurveEditor::drawCurve()
 		}
 	}
 }
+
+
 void VisemeCurveEditor::drawGrid()
 {
 	int centerX = x() + w() / 2;
@@ -335,8 +339,9 @@ void VisemeCurveEditor::generateCurves(int count)
 			SrVec point( rand() % 25 + (float)(x() + j * 70), (float)( y() + h()/2.0f + rand() % 70), (float)0);
 			curve.push_back(point);
 		}
+
 		curve.SetLineColor( rand() % 256);
-		curve.SetPointColor( rand() % 256);
+		//curve.SetPointColor( rand() % 256);
 
 		_curves.push_back(curve);
 	}
