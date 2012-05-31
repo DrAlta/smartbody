@@ -242,4 +242,15 @@ std::vector<SBJoint*> SBJoint::getDescendants()
 	return joints;
 }
 
+SbmTransform& SBJoint::getGlobalTransform()
+{	
+	globalTransform.gmat(gmat());
+	return globalTransform;
+}
+
+void SBJoint::setGlobalTransform( SbmTransform& newGlobalTransform )
+{
+	// can not set gmat directly
+}
+
 };

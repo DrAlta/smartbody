@@ -518,7 +518,7 @@ bool SkMotion::save ( SrOutput& out )
 
    if ( getName() != "")
     { 
-	  out << "name " << getName().c_str() << srnl<<srnl;
+	  out << "name " << "\"" << getName().c_str() << "\"" << srnl<<srnl;
     }
 
    out << _channels << srnl;

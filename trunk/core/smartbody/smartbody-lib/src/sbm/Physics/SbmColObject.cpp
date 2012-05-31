@@ -590,3 +590,8 @@ void SbmCollisionSpace::removeCollisionObjects( const std::string& objName  )
 		collsionObjMap.erase(objName);					
 	}		
 }
+
+void SbmCollisionSpace::addExcludePair( const std::string& objName1, const std::string& objName2 )
+{
+	
+}

@@ -613,15 +613,16 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 		}
 		SrVec baseOffset = curPos - prevPos;
 		prevPos = curPos;
+		SrVec curScalePos = curPos*heightRatio;
 		if (iframe > 0)
 		{
-			curPos = prevOffsetPos + baseOffset*heightRatio;
+			curScalePos = prevOffsetPos + baseOffset*heightRatio;
 			for (int k=0;k<3;k++)
 			{
-				cur_p[index+k] = curPos[k];
+				cur_p[index+k] = curScalePos[k];
 			}
 		}
-		prevOffsetPos = curPos;
+		prevOffsetPos = curScalePos;
 	}
 
 	constraintMotion->connect(interSk);
