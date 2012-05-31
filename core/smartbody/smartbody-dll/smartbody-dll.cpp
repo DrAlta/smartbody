@@ -364,7 +364,7 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
       float x = pos->value( SkJointPos::X );
       float y = pos->value( SkJointPos::Y );
       float z = pos->value( SkJointPos::Z );
-	  LOG("world_offset = %f %f %f",x,y,z);
+	  //LOG("world_offset = %f %f %f",x,y,z);
 
       SkJoint::RotType rot_type = joint->rot_type();
       if ( rot_type != SkJoint::TypeQuat )
