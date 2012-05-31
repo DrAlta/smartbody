@@ -181,11 +181,13 @@ class SbmCollisionSpace
 protected:
 	//std::list<SbmGeomObject*> collisionObjs;
 	std::map<std::string,SbmGeomObject*> collsionObjMap;
+	std::map<SbmCollisionPair, bool> excludePairMap;
 public:
 	SbmCollisionSpace();
 	~SbmCollisionSpace();
 	virtual void addCollisionObjects(const std::string& objName);
 	virtual void removeCollisionObjects(const std::string& objName);
+	virtual void addExcludePair(const std::string& objName1, const std::string& objName2);
 	virtual void getPotentialCollisionPairs(std::vector<SbmCollisionPair>& collisionPairs) = 0;
 };
 

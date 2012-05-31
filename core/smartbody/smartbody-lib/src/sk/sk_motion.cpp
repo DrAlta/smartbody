@@ -884,7 +884,6 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 // 		{
 // 			LOG("joint name %s, child %d, srcdir = %f %f %f, dstdir = %f %f %f",pjointName.c_str(),i,srcdir[0],srcdir[1],srcdir[2],dstdir[0],dstdir[1],dstdir[2]);
 // 		}
-		
 		jointQueues.push(child->name());
 		srcDirList.push_back(srcdir);			
 		dstDirList.push_back(dstdir);
@@ -1016,9 +1015,9 @@ SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targe
 				SrQuat refQuat = SrQuat(ref_p[index],ref_p[index+1],ref_p[index+2],ref_p[index+3]);
 				SrVec refAA = refQuat.axisAngle()*rotMap;
 				jointRotationMap[pjointName] = SrQuat(refAA);
-				for (int i=0;i<srcJoint->num_children();i++)
+				for (int i=0;i<targetJoint->num_children();i++)
 				{
-					jointQueues.push(srcJoint->child(i)->name());
+					jointQueues.push(targetJoint->child(i)->name());
 				}
 			}
 			else

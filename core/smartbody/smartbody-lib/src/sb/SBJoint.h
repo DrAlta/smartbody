@@ -2,6 +2,7 @@
 #define _SBJOINT_H_
 
 #include <sk/sk_joint.h>
+#include <sbm/Physics/SbmColObject.h>
 #include <string>
 
 
@@ -10,7 +11,7 @@ namespace SmartBody {
 
 class SBSkeleton;
 
-class SBJoint : public SkJoint
+class SBJoint : public SkJoint, public SbmTransformObjInterface
 {
 	public:
 		SBJoint();
@@ -55,11 +56,12 @@ class SBJoint : public SkJoint
 		void setPostrotation(SrQuat& quat);
 		SrQuat getPostrotation();
 
+		virtual SbmTransform& getGlobalTransform();
+		virtual void setGlobalTransform(SbmTransform& newGlobalTransform);
 
 	protected:
 		SrVec _localCenter;
-
-
+		SbmTransform globalTransform;
 };
 
 };
