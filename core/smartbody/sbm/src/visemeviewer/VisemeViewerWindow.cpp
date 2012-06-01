@@ -388,7 +388,7 @@ void VisemeViewerWindow::OnSliderSelectCB(Fl_Widget* widget, void* data)
 		return;
 
 	std::string characterName = viewer->getCurrentCharacterName();
-	std::vector<std::string>& visemeNames = curDiphone->getVisemeNames();
+	const std::vector<std::string>& visemeNames = curDiphone->getVisemeNames();
 	float sliderValue = (float)viewer->_sliderCurveAnimation->value();
 	for (size_t i = 0; i < visemeNames.size(); i++)
 	{
