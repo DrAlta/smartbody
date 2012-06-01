@@ -572,11 +572,12 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 	ikScenario.buildIKTreeFromJointRoot(rootJoint);	
 	MeCtJacobianIK ikJacobian;
 	float sceneScale = (float)1.f/SBScene::getScene()->getScale();
-	ikJacobian.maxOffset = 0.01f*sceneScale;
+	ikJacobian.maxOffset = 0.05f*sceneScale;
 	ikJacobian.dampJ = 1.5f*sceneScale;
 
 	float heightRatio = (interSk->getBaseHeight()/tempSrcSk->getBaseHeight());//*0.99f;
 
+	std::map<std::string, float> jointScaleMap;
 	ConstraintMap consMap;
 	ConstraintMap noRotConstraint;
 	for (unsigned int i=0;i<endJoints.size();i++)
@@ -592,7 +593,7 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 			SBJoint* pjoint = tgtJoint->getParent();
 			while (pjoint->getParent() != rootJoint)
 				pjoint = pjoint->getParent();
-			constraint->rootName = pjoint->name();				
+			constraint->rootName = pjoint->name();
 			consMap[jname] = constraint;
 		}
 	}

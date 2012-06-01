@@ -258,7 +258,13 @@ void SbmCharacter::createStandardControllers()
 	this->head_param_anim_ct->setName(headParamAnimName.c_str());
 	this->head_param_anim_ct->ref();
 
-	SkJoint* effector = this->_skeleton->search_joint("r_index1");
+	SkJoint* effector = this->_skeleton->search_joint("r_middle1");
+	if (!effector) 
+		effector = this->_skeleton->search_joint("r_index1");
+	
+	if (!effector)
+		effector = this->_skeleton->search_joint("r_wrist");
+
 	if (effector)
 	{
 		MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
@@ -270,7 +276,13 @@ void SbmCharacter::createStandardControllers()
 		this->reachEngineMap[MeCtReachEngine::RIGHT_JUMP] = rengineJump;	
 	}	
 
-	SkJoint* leftEffector = this->_skeleton->search_joint("l_index1");
+	SkJoint* leftEffector = this->_skeleton->search_joint("l_middle1");
+
+	if (!leftEffector) 
+		leftEffector = this->_skeleton->search_joint("l_index1");
+
+	if (!leftEffector)
+		leftEffector = this->_skeleton->search_joint("l_wrist");
 	if (leftEffector)
 	{
 		MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);

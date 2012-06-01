@@ -209,6 +209,7 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 	reachFrame = releaseFrame;
 	grabFrame  = releaseFrame;
 	tempFrame    = releaseFrame;
+	inputFrame = releaseFrame;
 	affectedJoints.clear();	
 	for (unsigned int i=0;i<nodeList.size();i++)
 	{
@@ -287,8 +288,9 @@ BodyMotionFrame& MeCtHand::findTargetFrame( GrabState state )
 	}
 	else if (state == GRAB_RETURN)
 	{
-		return releaseFrame;
-	}
+		//return releaseFrame;
+		return inputFrame;
+	}	
 	return reachFrame;
 }
 
@@ -301,6 +303,8 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 		//dt = 0.001f;
 		updateChannelBuffer(frame,currentFrame,true);
 	}
+
+	updateChannelBuffer(frame,inputFrame,true);
 	updateDt((float)t);
 
 	static bool bInit = false;
@@ -310,6 +314,7 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 		ikScenario.setTreeNodeQuat(currentFrame.jointQuat,QUAT_CUR);		
 		bInit = true;
 	}		
+	
 	
 	updateChannelBuffer(frame,tempFrame,true);
 	currentFrame.jointQuat[0] = tempFrame.jointQuat[0];

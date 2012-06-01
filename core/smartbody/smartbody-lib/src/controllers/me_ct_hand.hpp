@@ -43,7 +43,7 @@ protected:
 	SkChannelArray	_channels;	
 	GrabState             currentGrabState;
 	int                   grabType;
-	BodyMotionFrame       releaseFrame, grabFrame, reachFrame, currentFrame, tempFrame;	
+	BodyMotionFrame       releaseFrame, grabFrame, reachFrame, currentFrame, tempFrame, inputFrame;	
 	
 	vector<FingerChain>   fingerChains;
 	vector<SkJoint*>      affectedJoints;
