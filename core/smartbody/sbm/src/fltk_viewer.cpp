@@ -2530,7 +2530,7 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 		}
 		else if ( DOLLYING(e) )
 		{ 
-			float amount = dx;
+			float amount = dx-dy;
 			SrVec cameraPos(_data->camera.eye);
 			SrVec targetPos(_data->camera.center);
 			SrVec diff = targetPos - cameraPos;

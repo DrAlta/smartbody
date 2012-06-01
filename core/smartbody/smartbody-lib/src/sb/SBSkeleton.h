@@ -18,6 +18,7 @@ class SBSkeleton : public SkSkeleton
 		SBSkeleton(SBSkeleton* copySkel);
 
 		virtual bool load(std::string skeletonFile);
+		virtual bool save(std::string skeletonFile);
 
 		const std::string& getName();
 		int getNumJoints();

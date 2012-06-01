@@ -62,6 +62,38 @@ bool SBSkeleton::load(std::string skeletonFile)
 	}
 }
 
+bool SBSkeleton::save(std::string skeletonFile)
+{
+	SkSkeleton* myskel = dynamic_cast<SkSkeleton*>(this);
+	FILE *fp = NULL;
+	fp = fopen(skeletonFile.c_str(), "w");
+	if (fp == NULL )
+	{
+		LOG("Can't create skeleton file %s.", skeletonFile.c_str());
+		return false;
+	}
+	SrOutput output(fp);
+	if (output.valid())
+	{
+		output.filename(skeletonFile.c_str());
+		if (!SkSkeleton::save(output))
+		{
+			LOG("Problem saving skeleton to file %s.", skeletonFile.c_str());
+			return false;
+		} 
+		else
+		{
+			LOG("Skeleton saved to file %s.", skeletonFile.c_str());
+			return true;
+		}
+	}
+	else
+	{
+		LOG("Problem saving skeleton to file %s.", skeletonFile.c_str());
+		return false;
+	}
+}
+
 const std::string& SBSkeleton::getName()
 {
 	return name();
