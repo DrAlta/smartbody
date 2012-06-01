@@ -465,7 +465,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 		{
 			std::vector<float>& stitchingCurve = visemeRawData[i]->getFloatCurve();
 			std::vector<float>& origCurve = visemeProcessedData[index]->getFloatCurve();
-			std::vector<float>& newCurve = stitchCurve(origCurve, stitchingCurve);
+			std::vector<float> newCurve(stitchCurve(origCurve, stitchingCurve));
 			visemeProcessedData[index]->setFloatCurve(newCurve, newCurve.size() / 2, 2);
 		}
 	}
@@ -605,29 +605,53 @@ void BML::SpeechRequest::smoothCurve(std::vector<float>& c, float windowSize)
 			y.push_back(c[i]);
 	}
 	
-	for (size_t i = 0; i < x.size(); i++)
+	if ((x[x.size() - 1] - x[0]) <=  windowSize)
 	{
 		std::vector<int> localMaxId;
-		for (size_t j = i + 1; j < (x.size() - 1); j++)
+		for (size_t j = 1; j < (x.size() - 1); j++)
 		{
 			if ((y[j] - y[j - 1]) > 0 &&
 				(y[j] - y[j + 1]) > 0)
 			{
 				localMaxId.push_back(j);
 			}
-
-			if ((x[j] - x[i]) > windowSize) // within the window, get rid of all the points between local max
+			if (localMaxId.size() >= 2)
 			{
-				if (localMaxId.size() >= 2)
+				for (size_t l = 0; l < (localMaxId.size() - 1); l++)
 				{
-					for (size_t l = 0; l < (localMaxId.size() - 1); l++)
-					{
-						for (int markId = (localMaxId[l] + 1); markId < (localMaxId[l + 1]); markId++)
-							markDelete[markId] = true;
-					}
-	//				i = j;
+					for (int markId = (localMaxId[l] + 1); markId < (localMaxId[l + 1]); markId++)
+						markDelete[markId] = true;
 				}
-				break;
+			}
+		}
+
+	}
+	else
+	{
+		for (size_t i = 0; i < x.size(); i++)
+		{
+			std::vector<int> localMaxId;
+			for (size_t j = i + 1; j < (x.size() - 1); j++)
+			{
+				if ((y[j] - y[j - 1]) > 0 &&
+					(y[j] - y[j + 1]) > 0)
+				{
+					localMaxId.push_back(j);
+				}
+
+				if ((x[j] - x[i]) > windowSize) // within the window, get rid of all the points between local max
+				{
+					if (localMaxId.size() >= 2)
+					{
+						for (size_t l = 0; l < (localMaxId.size() - 1); l++)
+						{
+							for (int markId = (localMaxId[l] + 1); markId < (localMaxId[l + 1]); markId++)
+								markDelete[markId] = true;
+						}
+		//				i = j;
+					}
+					break;
+				}
 			}
 		}
 	}
