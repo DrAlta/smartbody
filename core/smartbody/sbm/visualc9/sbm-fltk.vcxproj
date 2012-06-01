@@ -207,7 +207,6 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>..\src;..\..\smartbody-lib\src;..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk-1.3.0rc6;..\..\..\..\lib\xerces-c\include;..\..\..\..\lib\boost;..\..\sbm-ui\panimationviewer\src;..\..\sbm-ui\bmlviewer\src;..\..\sbm-ui\channelbufferviewer\src;..\..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python26\include;C:\ICT\vh\trunk\core\nvb_generator\charniak-windows\PARSE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
@@ -216,7 +215,6 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
       </PrecompiledHeaderOutputFile>
       <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
