@@ -912,14 +912,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\controllers\me_ct_data_interpolation.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\controllers\me_ct_data_interpolation.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\controllers\me_ct_lifecycle_test.cpp"
 				>
 			</File>
@@ -1370,14 +1362,6 @@
 			<Filter
 				Name="interpolator"
 				>
-				<File
-					RelativePath="..\src\controllers\me_ct_inverse_interpolation.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\controllers\me_ct_inverse_interpolation.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="lifecycle"
@@ -1562,6 +1546,22 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\controllers\me_ct_data_interpolation.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\controllers\me_ct_data_interpolation.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\controllers\me_ct_inverse_interpolation.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\controllers\me_ct_inverse_interpolation.h"
+						>
+					</File>
+					<File
 						RelativePath="..\src\controllers\me_ct_motion_example.cpp"
 						>
 					</File>
@@ -1589,6 +1589,10 @@
 				<Filter
 					Name="IK"
 					>
+					<File
+						RelativePath="..\src\controllers\me_ct_ccd_IK.cpp"
+						>
+					</File>
 					<File
 						RelativePath="..\src\controllers\me_ct_ccd_IK.hpp"
 						>
@@ -1642,10 +1646,6 @@
 			<Filter
 				Name="datareceiver"
 				>
-				<File
-					RelativePath="..\src\controllers\me_ct_ccd_IK.cpp"
-					>
-				</File>
 				<File
 					RelativePath="..\src\controllers\me_ct_data_receiver.cpp"
 					>
