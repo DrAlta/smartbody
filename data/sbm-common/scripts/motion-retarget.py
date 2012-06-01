@@ -67,6 +67,43 @@ def getStandardLocomomtionAnimations(locoMotions, preFix):
 	locoMotions.append(preFix+"ChrUtah_Idle01_StepForwardLf01")
 	locoMotions.append(preFix+"ChrUtah_Idle01_StepSidewaysLf01")	
 	
+def getMarineLocomomtionAnimations(marineLocomotions, preFix):		
+	marineLocomotions.append("ChrMarine@Idle01")
+	marineLocomotions.append("ChrMarine@Jog01")
+	marineLocomotions.append("ChrMarine@Meander01")
+	marineLocomotions.append("ChrMarine@Run01")
+	marineLocomotions.append("ChrMarine@RunCircleLf01_smooth")
+	marineLocomotions.append("ChrMarine@RunCircleRt01_smooth")
+	marineLocomotions.append("ChrMarine@RunTightCircleLf01")
+	marineLocomotions.append("ChrMarine@RunTightCircleRt01")
+	marineLocomotions.append("ChrMarine@StrafeSlowLf01")
+	marineLocomotions.append("ChrMarine@StrafeSlowRt01")
+	marineLocomotions.append("ChrMarine@Walk01")
+	marineLocomotions.append("ChrMarine@WalkCircleLf01_smooth")
+	marineLocomotions.append("ChrMarine@WalkCircleRt01_smooth")
+	marineLocomotions.append("ChrMarine@WalkTightCircleLf01_smooth")
+	marineLocomotions.append("ChrMarine@WalkTightCircleRt01_smooth")
+	marineLocomotions.append("ChrMarine@Turn360Lf01")
+	marineLocomotions.append("ChrMarine@Turn360Rt01")
+	marineLocomotions.append("ChrMarine@StrafeFastLf01_smooth")
+	marineLocomotions.append("ChrMarine@StrafeFastRt01_smooth")
+	marineLocomotions.append("ChrMarine@Idle01_StepBackwardsLf01")
+	marineLocomotions.append("ChrMarine@Idle01_StepBackwardsRt01")
+	marineLocomotions.append("ChrMarine@Idle01_StepForwardLf01")
+	marineLocomotions.append("ChrMarine@Idle01_StepForwardRt01")
+	marineLocomotions.append("ChrMarine@Idle01_StepSidewaysLf01")
+	marineLocomotions.append("ChrMarine@Idle01_StepSidewaysRt01")
+	marineLocomotions.append("ChrMarine@Turn90Lf01")
+	marineLocomotions.append("ChrMarine@Turn180Lf01")
+	marineLocomotions.append("ChrMarine@Turn90Rt01")
+	marineLocomotions.append("ChrMarine@Turn180Rt01")
+	marineLocomotions.append("ChrMarine@Idle01_ToWalkLf01")
+	marineLocomotions.append("ChrMarine@Idle01_ToWalk01_Turn90Lf01")
+	marineLocomotions.append("ChrMarine@Idle01_ToWalk01_Turn180Lf01")
+	marineLocomotions.append("ChrMarine@Idle01_ToWalk01")
+	marineLocomotions.append("ChrMarine@Idle01_ToWalk01_Turn90Rt01")
+	marineLocomotions.append("ChrMarine@Idle01_ToWalk01_Turn180Rt01")
+	
 def getStandardReachMotions(reachMotions, preFix):	
 	reachMotions.append(preFix+"ChrHarmony_Relax001_ArmReachRtHigh")
 	reachMotions.append(preFix+"ChrHarmony_Relax001_ArmReachRtMidHigh")
@@ -115,7 +152,9 @@ def retargetSetup(targetSkelName):
 	gestureMotions = StringVec()
 	reachMotions = StringVec()
 	locoMotions = StringVec()
+	marineLocomotions = StringVec()
 	getStandardLocomomtionAnimations(locoMotions,"")
+	getMarineLocomomtionAnimations(marineLocomotions,"")
 	getStandardGestureMotions(gestureMotions,"")
 	getStandardReachMotions(reachMotions,"")
 	
@@ -129,6 +168,10 @@ def retargetSetup(targetSkelName):
 	# retarget locomotions
 	for n in range(0, len(locoMotions)):
 		retargetMotion(locoMotions[n], 'test_utah.sk', targetSkelName, outDir+'locoMotion/');
+	
+	# marine locomotions
+	#for n in range(0, len(marineLocomotions)):
+	#	retargetMotion(marineLocomotions[n], 'ChrBackovic.sk', targetSkelName, outDir+'marineLocomotion/');
 		
 	# retarget gesture motions
 	for n in range(0, len(gestureMotions)):
@@ -142,6 +185,9 @@ def retargetCharacter(charName, targetSkelName):
 	# setup locomotion
 	scene.run("stateAllLocomotion.py")
 	locomotionSetup(targetSkelName, "base", targetSkelName, targetSkelName)
+	
+	#scene.run("stateMarineLocomotion.py")
+	#marineLocomotionSetup(targetSkelName, "base", targetSkelName, targetSkelName)
 
 	# starting state, starting locomotion with different angle
 	scene.run("stateAllStarting.py")
@@ -156,8 +202,8 @@ def retargetCharacter(charName, targetSkelName):
 	stepSetup(targetSkelName, "base", targetSkelName, targetSkelName)
 
 	# transitions
-	scene.run("transitions.py")
-	transitionSetup(targetSkelName, targetSkelName)
+	#scene.run("transitions.py")
+	#transitionSetup(targetSkelName, targetSkelName)
 	
 	# setup reach 
 	scene.run("init-example-reach.py")
