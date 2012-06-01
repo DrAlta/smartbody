@@ -495,7 +495,7 @@ void SbmCharacter::initData()
 	_height = 1.0f; 
 	_visemePlateau = true;
 	_diphone = false;
-	_diphoneSplineCurve = true;
+	_diphoneSplineCurve = false;
 	_diphoneSmoothWindow = -1.0f;
 	_nvbg = NULL;
 	_miniBrain = NULL;

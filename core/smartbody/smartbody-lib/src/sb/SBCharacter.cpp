@@ -25,7 +25,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 
 	createBoolAttribute("visemecurve", false, true, "Basic", 100, false, false, false, "Use curve-based visemes instead of discrete visemes.");
 	createBoolAttribute("useDiphone", false, true, "Basic", 110, false, false, false, "Use diphones.");
-	createBoolAttribute("diphoneSplineCurve", true, true, "Basic", 120, false, false, false, "Use diphones spline/linear curve.");
+	createBoolAttribute("diphoneSplineCurve", false, true, "Basic", 120, false, false, false, "Use diphones spline/linear curve.");
 	SmartBody::DoubleAttribute* diphoneSmoothWindow = createDoubleAttribute("diphoneSmoothWindow", -1.0, true, "Basic", 130, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
 	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
 	timeDelayAttr->setMin(0.0);
