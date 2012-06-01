@@ -165,11 +165,11 @@ def retargetSetup(targetSkelName):
 	for n in range(0, len(reachMotions)):
 		retargetMotion(reachMotions[n], 'common.sk', targetSkelName, outDir+'reachMotion/');
 	
-	# retarget locomotions
+	# retarget standard locomotions
 	for n in range(0, len(locoMotions)):
 		retargetMotion(locoMotions[n], 'test_utah.sk', targetSkelName, outDir+'locoMotion/');
 	
-	# marine locomotions
+	# retarget marine locomotions
 	#for n in range(0, len(marineLocomotions)):
 	#	retargetMotion(marineLocomotions[n], 'ChrBackovic.sk', targetSkelName, outDir+'marineLocomotion/');
 		
@@ -182,10 +182,11 @@ def retargetSetup(targetSkelName):
 def retargetCharacter(charName, targetSkelName):
 	retargetSetup(targetSkelName) # make sure all retargeted motions are already created
 	
-	# setup locomotion
+	# setup standard locomotion
 	scene.run("stateAllLocomotion.py")
 	locomotionSetup(targetSkelName, "base", targetSkelName, targetSkelName)
 	
+	# setup marine locomotion
 	#scene.run("stateMarineLocomotion.py")
 	#marineLocomotionSetup(targetSkelName, "base", targetSkelName, targetSkelName)
 
@@ -202,8 +203,8 @@ def retargetCharacter(charName, targetSkelName):
 	stepSetup(targetSkelName, "base", targetSkelName, targetSkelName)
 
 	# transitions
-	#scene.run("transitions.py")
-	#transitionSetup(targetSkelName, targetSkelName)
+	scene.run("transitions.py")
+	transitionSetup(targetSkelName, targetSkelName)
 	
 	# setup reach 
 	scene.run("init-example-reach.py")

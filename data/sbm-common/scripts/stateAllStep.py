@@ -51,6 +51,7 @@ def stepSetup(skeletonName, baseJoint, preFix, statePreFix):
 	skeleton = scene.getSkeleton(skeletonName)
 	joint = skeleton.getJointByName(baseJoint)
 	for i in range(0, len(motions)):
+		print 'motion = ' + motions[i]
 		motion = scene.getMotion(motions[i])
 		motion.connect(skeleton)
 		correspondancePoints = state.getCorrespondancePoints(i)
