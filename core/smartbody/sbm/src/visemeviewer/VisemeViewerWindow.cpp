@@ -3,12 +3,14 @@
 #include <sb/SBScene.h>
 #include <sb/SBFaceDefinition.h>
 #include <sb/SBPhonemeManager.h>
-#include "VisemeViewerWindow.h"
-#include <FL/Fl.H>
+#include <sbm/mcontrol_util.h>
+#include <bml/bml_speech.hpp>
+
 #include <FL/fl_device.H>
 #include <FL/fl_draw.H>
-#include <stdlib.h>
 #include <FL/Fl_File_Chooser.H>
+
+#include "VisemeViewerWindow.h"
 
 VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h)
 {
@@ -23,9 +25,17 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_sliderCurveAnimation->textsize(14);
 	_sliderCurveAnimation->deactivate();
 	_sliderCurveAnimation->callback(OnSliderSelectCB, this);
-	_buttonPlay = new Fl_Button(40, 455, 65, 40, "@>");
+	_checkEnableScrub = new Fl_Check_Button(40, 460, 65, 30, "Scrub");
+	_checkEnableScrub->callback(OnEnableScrub, this);
+
+	_buttonPlay = new Fl_Button(560, 460, 65, 30, "@>");
 	_buttonPlay->callback(OnPlayCB, this);
-	_isPlaying = false;
+	_inputPlayTime = new Fl_Input(630, 460, 60, 30, "");
+	_inputPlayTime->value("0");
+
+	_buttonPlayDialog = new Fl_Button(40, 500, 65, 30, "Speak");
+	_buttonPlayDialog->callback(OnPlayDialogCB, this);
+	_inputUtterance = new Fl_Input(115, 500, 435, 30);
 
 	_choiceCharacter = new Fl_Choice(70, 35, 100, 25, "Character");
 	_choiceCharacter->callback(OnCharacterSelectCB, this);
@@ -50,15 +60,34 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_browserViseme = new Fl_Multi_Browser(575, 80, 70, 350, "Visemes");
 	_browserViseme->align(FL_ALIGN_TOP);
 	_browserViseme->callback(OnVisemeSelectCB, this);
+
+	_browserDiphone = new Fl_Browser(650, 80, 70, 350, "Diphones");
+	_browserDiphone->align(FL_ALIGN_TOP);
+
 	this->end();
-	
+
+
 	loadData();
 }
 
 VisemeViewerWindow::~VisemeViewerWindow()
 {
-
 }
+
+void VisemeViewerWindow::show()
+{
+	Fl_Double_Window::show();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.bml_processor.registerRequestCallback(OnBmlRequestCB, this);
+}
+
+void VisemeViewerWindow::hide()
+{
+	Fl_Double_Window::hide();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.bml_processor.registerRequestCallback(NULL, NULL);
+}
+
 
 Fl_Menu_Item VisemeViewerWindow::menu_[] = {
 	{"File", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
@@ -134,8 +163,9 @@ void VisemeViewerWindow::resetViseme()
 		strstr << "char " << characterName << " viseme " << _browserViseme->text(i + 1) << " " << 0.0f;
 		SmartBody::SBScene::getScene()->command(strstr.str());		
 	}
-	_isPlaying = true;
-	OnPlayCB(this->_buttonPlay, this);
+	_checkEnableScrub->value(0);
+	_sliderCurveAnimation->value(0);
+	_sliderCurveAnimation->deactivate();
 }
 
 SBCharacter* VisemeViewerWindow::getCurrentCharacter()
@@ -221,7 +251,11 @@ void VisemeViewerWindow::refreshData()
 
 bool VisemeViewerWindow::isPlayingViseme()
 {
-	return _isPlaying;
+	int val = _checkEnableScrub->value();
+	bool ret = false;
+	if (val == 1)
+		ret = true;
+	return ret;
 }
 
 float VisemeViewerWindow::getSliderValue()
@@ -433,21 +467,50 @@ void VisemeViewerWindow::OnCharacterSelectCB(Fl_Widget* widget, void* data)
 	viewer->_curveEditor->redraw();
 }
 
-void VisemeViewerWindow::OnPlayCB(Fl_Widget* widget, void* data)
+
+void VisemeViewerWindow::OnEnableScrub(Fl_Widget* widget, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
-	if (!viewer->_isPlaying)
+	if (viewer->_checkEnableScrub->value() == 1)
 	{
-		viewer->_isPlaying = true;
-		viewer->_buttonPlay->label("@square");
 		viewer->_sliderCurveAnimation->activate();
 	}
 	else
-	{
-		viewer->_isPlaying = false;
-		viewer->_buttonPlay->label("@>");
+	{	
 		viewer->_sliderCurveAnimation->value(0);
 		viewer->_sliderCurveAnimation->deactivate();
+	}
+}
+
+void VisemeViewerWindow::OnPlayCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	float playTime = (float)atoi(viewer->_inputPlayTime->value());
+	if (playTime > 0)
+	{
+		for (int i = 0; i < viewer->_browserViseme->size(); i++)
+		{
+			std::stringstream strstr;
+			strstr << "char " << viewer->getCurrentCharacterName() << " viseme " << viewer->_browserViseme->text(i + 1) << " curve ";
+			strstr << viewer->_curveEditor->getCurves()[i].size() << " ";
+			for (size_t j = 0; j < viewer->_curveEditor->getCurves()[i].size(); j++)
+				strstr << viewer->_curveEditor->getCurves()[i][j].x * playTime << " " << viewer->_curveEditor->getCurves()[i][j].y << " ";
+			SmartBody::SBScene::getScene()->command(strstr.str());		
+		}
+	}
+}
+
+
+void VisemeViewerWindow::OnPlayDialogCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+	std::string utterance = viewer->_inputUtterance->value(); 	
+	if (utterance != "")
+	{
+		std::stringstream strstr;
+		strstr << "python bml.execBML('" << viewer->getCurrentCharacterName() << "', '<speech type=\"text/plain\">" << viewer->_inputUtterance->value() << "</speech>')";
+		SmartBody::SBScene::getScene()->command(strstr.str());
 	}
 }
 
@@ -491,4 +554,32 @@ void VisemeViewerWindow::OnSaveCB(Fl_Widget* widget, void* data)
 	}
 	file << strstr.str();
 	file.close();	
+}
+
+
+void VisemeViewerWindow::OnBmlRequestCB(BML::BmlRequest* request, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	BML::VecOfBehaviorRequest b = request->behaviors;
+	for (BML::VecOfBehaviorRequest::iterator iter = b.begin();
+		iter != b.end();
+		iter++)
+	{
+		BML::BehaviorRequestPtr requestPtr = (*iter);
+		BML::BehaviorRequest* behavior = requestPtr.get();
+		BML::SpeechRequest* speechRequest = dynamic_cast<BML::SpeechRequest*> (behavior);
+		if (speechRequest)
+		{
+			viewer->_browserDiphone->clear();
+			for ( size_t i = 0; i < (speechRequest->getPhonemes().size() - 1); i++ )
+			{
+				VisemeData* v1 = speechRequest->getPhonemes()[i];
+				VisemeData* v2 = speechRequest->getPhonemes()[i + 1];
+				std::stringstream strstr;
+				strstr << v1->id() << " - " << v2->id();
+				viewer->_browserDiphone->add(strstr.str().c_str());
+			}
+		}
+	}
 }

@@ -65,8 +65,9 @@ namespace BML {
 		std::string			   audioPlay;
 		std::string			   audioStop;
 
-		VecOfVisemeData		   visemes;
-	    VecOfSbmCommand		   sbm_commands;
+		VecOfVisemeData	visemes;
+		VecOfVisemeData	phonemes;	   
+	    VecOfSbmCommand	sbm_commands;
 
 		// Equivalent to BehaviorRequest fields
 		TriggerEventPtr        trigger;
@@ -75,6 +76,7 @@ namespace BML {
 		MapOfSyncPoint         wbToSync;  //  TODO: Replace use of wbToSync with BehaviorRequest::behav_syncs::idToSync
 
 		std::vector<SpeechMark> speechMarks;
+
 	public:
 		///////////////////////////////////////////////////////////////
 		// Methods
@@ -157,6 +159,11 @@ namespace BML {
 		* Returns the visemes and timings
 		*/
 		VecOfVisemeData& getVisemes() { return visemes; }
+
+		/**
+		* Returns the visemes and timings
+		*/
+		VecOfVisemeData& getPhonemes() { return phonemes; }
 
 		/**
 		* Process the visemes by diphone
