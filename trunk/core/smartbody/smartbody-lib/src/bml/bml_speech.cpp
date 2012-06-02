@@ -325,6 +325,11 @@ BML::SpeechRequest::~SpeechRequest() {
 	size_t count = visemes.size();
 	for( size_t i=0; i<count; ++i )
 		delete visemes[i];
+
+	// delete phonemes
+	count = phonemes.size();
+	for( size_t i=0; i<count; ++i )
+		delete phonemes[i];
 }
 
 /*
@@ -717,14 +722,22 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	time_sec last_viseme = TIME_UNSET;  // end of last viseme
 	time_sec longest_viseme = TIME_UNSET;
 
-	// Process Visemes
+	// Extract Visemes
 	vector<VisemeData*>* result_visemes = speech_impl->getVisemes( speech_request_id, actor );
 	if( !result_visemes ) {
 		if (speech_impl_backup) // run the backup speech server if available
 			result_visemes = speech_impl->getVisemes( speech_request_id, NULL );
 	}
 
+	// Save Phonemes
+	for ( size_t i = 0; i < (*result_visemes).size(); i++ )
+	{
+		VisemeData* v = (*result_visemes)[ i ];
+		VisemeData* newV = new VisemeData(v->id(), v->time());
+		phonemes.push_back(newV);
+	}
 
+	// Process Visemes
 	if (actor && actor->isDiphone()) // if use diphone, reconstruct the curves
 		processVisemes(result_visemes, request);			
 

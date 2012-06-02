@@ -12,8 +12,11 @@
 #include <FL/FL_Multi_Browser.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Value_Slider.H>
+#include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Input.H>
+
 #include "VisemeCurveEditor.h"
 #include <sb/SBCharacter.h>
 #include <sb/SBPhoneme.h>
@@ -29,17 +32,24 @@ public:
 	bool isPlayingViseme();
 	float getSliderValue();
 	void drawNames();
+	void show();
+	void hide();
 
 	static Fl_Menu_Item menu_[];
 protected:
 	Fl_Choice * _choiceCharacter;
 	Fl_Hold_Browser *_browserPhoneme[2];
 	Fl_Multi_Browser *_browserViseme;
+	Fl_Browser* _browserDiphone;
 	Fl_Value_Slider *_sliderCurveAnimation;
 	Fl_Button *_buttonPlay;
+	Fl_Check_Button* _checkEnableScrub;
+	
+	Fl_Input* _inputPlayTime;
+	Fl_Button* _buttonPlayDialog;
+	Fl_Input* _inputUtterance;
 	VisemeCurveEditor * _curveEditor;
 	bool _phonemesSelected[2];
-	bool _isPlaying;
 
 	void draw();
 	bool loadData();
@@ -59,6 +69,10 @@ protected:
 	static void OnVisemeSelectCB(Fl_Widget* widget, void* data);
 	static void OnSliderSelectCB(Fl_Widget* widget, void* data);
 	static void OnPlayCB(Fl_Widget* widget, void* data);
+	static void OnEnableScrub(Fl_Widget* widget, void* data);
+	static void OnPlayDialogCB(Fl_Widget* widget, void* data);
 	static void OnSaveCB(Fl_Widget* widget, void* data);
+	static void OnBmlRequestCB(BML::BmlRequest* request, void* data);
+
 };
 #endif
