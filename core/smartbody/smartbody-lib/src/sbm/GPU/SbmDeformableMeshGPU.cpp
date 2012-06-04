@@ -255,7 +255,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glAlphaFunc ( GL_GREATER, 0.3f ) ;
 
-	glEnable(GL_TEXTURE);
+	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_COLOR_MATERIAL);
 	glUseProgram(program);	
 
@@ -414,7 +414,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 	VBOPos->VBO()->UnbindBuffer();
 
 	glUseProgram(0);		
-	glDisable(GL_TEXTURE);
+	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_ALPHA_TEST) ;
 	glDisable(GL_BLEND);
 }

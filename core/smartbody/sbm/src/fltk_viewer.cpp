@@ -3100,7 +3100,7 @@ void FltkViewer::drawPawns()
 			sphere.shape().radius = pawnSize;
 			sphere.render_mode(srRenderModeLines);
 			SrGlRenderFuncs::render_sphere(&sphere);
-			glEnd();
+			//glEnd();
 			glPopMatrix();
 			glPopMatrix();
 			glPopAttrib();

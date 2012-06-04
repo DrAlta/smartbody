@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 	while (tokenCounter < numTokens)
 	{
 		std::string op = tokenzied[tokenCounter];
-		printf("op = %s\n",op.c_str());
+		
 		if (op == "-seqpath" || op == "-scriptpath")
 		{
 			tokenCounter++;
@@ -84,6 +84,7 @@ int main(int argc, char* argv[])
 				app.m_initialCommands.push_back(command);
 			}
 		}
+		printf("op = %s, param = %s\n",op.c_str(), tokenzied[tokenCounter].c_str());
 		tokenCounter++;
 	}
 

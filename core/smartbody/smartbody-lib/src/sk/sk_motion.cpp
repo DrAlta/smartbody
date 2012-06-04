@@ -868,8 +868,11 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 	return smooth_p;
 }
 
-void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* interSk, SkSkeleton* tempSrcSk, std::queue<std::string> &jointQueues, std::map<std::string, SrQuat> &jointRotationMap )
-{
+void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* interSk, SkSkeleton* tempSrcSk, std::queue<std::string> &jointQueues, std::map<std::string, SrQuat> &jointRotationMap, std::vector<std::string>& endJoints )
+{	
+	if (std::find(endJoints.begin(),endJoints.end(),pjointName) != endJoints.end())
+		return;
+
 	SkJoint* pjoint = interSk->search_joint(pjointName.c_str());
 	SkJoint* srcjoint = tempSrcSk->search_joint(pjointName.c_str());
 	std::vector<SrVec> srcDirList, origSrcDirList;
@@ -878,13 +881,15 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 	for (int i=0; i< pjoint->num_children(); i++)
 	{
 		SkJoint* child = pjoint->child(i);
+		if (std::find(endJoints.begin(),endJoints.end(),child->name()) != endJoints.end())
+			continue;
 		SrVec srcdir = tempSrcSk->boneGlobalDirection(pjoint->name(),child->name());
 		SrVec dstdir = interSk->boneGlobalDirection(pjoint->name(),child->name());	
 // 		if (pjointName == "spine5" || pjointName == "spine4")
 // 		{
 // 			LOG("joint name %s, child %d, srcdir = %f %f %f, dstdir = %f %f %f",pjointName.c_str(),i,srcdir[0],srcdir[1],srcdir[2],dstdir[0],dstdir[1],dstdir[2]);
 // 		}
-		jointQueues.push(child->name());
+		//jointQueues.push(child->name());
 		srcDirList.push_back(srcdir);			
 		dstDirList.push_back(dstdir);
 		//dir += gdir;
@@ -1001,8 +1006,8 @@ SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targe
 // 			bool addChildren = true;
 // 			if (std::find(endJoints.begin(),endJoints.end(),pjointName) != endJoints.end())
 // 				addChildren = false;
-			if (std::find(endJoints.begin(),endJoints.end(),pjointName) != endJoints.end())
-				continue;
+			//if (std::find(endJoints.begin(),endJoints.end(),pjointName) != endJoints.end())
+			//	continue;
 			
 			SkJoint* srcJoint = tempSrcSk->search_joint(pjointName.c_str());
 			SkJoint* targetJoint = interSk->search_joint(pjointName.c_str());
@@ -1022,7 +1027,13 @@ SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targe
 			}
 			else
 			{
-				convertBoneOrientation(pjointName, interSk, tempSrcSk, jointQueues, jointRotationMap);
+				convertBoneOrientation(pjointName, interSk, tempSrcSk, jointQueues, jointRotationMap, endJoints);								
+				SkJoint* pjoint = interSk->search_joint(pjointName.c_str());
+				for (int i=0; i< pjoint->num_children(); i++)
+				{
+					SkJoint* child = pjoint->child(i);
+					jointQueues.push(child->name());
+				}
 			}			
 		}
 

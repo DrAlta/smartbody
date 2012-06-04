@@ -9,24 +9,45 @@ def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :
 	if existMotion != None : # do nothing if the retargeted motion is already there
 		return	
 		
-	if not os.path.exists(outDir):
-		os.makedirs(outDir)
+	tgtSkel = scene.getSkeleton(tgtSkelName)
+	if (tgtSkel == None) :
+		return
 		
-	offsetJoints = VecMap();
+	if not os.path.exists(outDir):
+		os.makedirs(outDir)			
+		
+	offsetJoints = VecMap();	
 	endJoints = StringVec();
-	endJoints.append('l_ankle')
-	endJoints.append('r_ankle')	
-	effectorJoints = StringVec();
-	#effectorJoints.append('r_ankle')	
+	#endJoints.append('l_ankle')
+	endJoints.append('l_forefoot')
+	endJoints.append('l_toe')
+	endJoints.append('l_acromioclavicular')
+	#endJoints.append('r_ankle')		
+	endJoints.append('r_forefoot')	
+	endJoints.append('r_toe')
+	endJoints.append('r_acromioclavicular')
+	
+	
+	effectorJoints = StringVec();	
+	if tgtSkel.getJointByName('r_toe') != None:
+		effectorJoints.append('r_toe')
+		effectorJoints.append('l_toe')
+	else:
+		effectorJoints.append('r_ankle')
+		effectorJoints.append('l_ankle')		
+		
 	effectorJoints.append('r_forefoot')
-	effectorJoints.append('r_toe')
-	#effectorJoints.append('l_ankle')
-	effectorJoints.append('l_forefoot')	
-	effectorJoints.append('l_toe')		
+	effectorJoints.append('l_forefoot')		
+	#effectorJoints.append('l_toe')		
+	effectorRoots = StringVec();
+	effectorRoots.append('r_hip')
+	effectorRoots.append('l_hip')
+	effectorRoots.append('r_hip')
+	effectorRoots.append('l_hip')
 	
 	#print 'Retarget motion = ' + motionName;
 	outMotion = testMotion.retarget(outMotionName,srcSkelName,tgtSkelName, endJoints, offsetJoints);	
-	cleanMotion = testMotion.constrain(outMotionName, srcSkelName, tgtSkelName, outMotionName, effectorJoints);
+	cleanMotion = testMotion.constrain(outMotionName, srcSkelName, tgtSkelName, outMotionName, effectorJoints, effectorRoots);
 	saveCommand = 'animation ' + outMotionName + ' save ' + outDir + outMotionName + '.skm';
 	print 'Save command = ' + saveCommand;
 	scene.command(saveCommand)
@@ -207,8 +228,8 @@ def retargetCharacter(charName, targetSkelName):
 	transitionSetup(targetSkelName, targetSkelName)
 	
 	# setup reach 
-	scene.run("init-example-reach.py")
-	reachSetup(charName,targetSkelName)
+	#scene.run("init-example-reach.py")
+	#reachSetup(charName,targetSkelName)
 	
 	# setup steering
 	scene.run("init-steer-agents.py")

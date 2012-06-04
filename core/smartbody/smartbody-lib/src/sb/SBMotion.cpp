@@ -555,7 +555,7 @@ SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std
 	return sbmotion;
 }
 
-SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* targetSk, SBMotion* targetMotion, std::vector<std::string>& endJoints )
+SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* targetSk, SBMotion* targetMotion, std::vector<std::string>& endJoints, std::vector<std::string>& endJointRoots )
 {
 	SkChannelArray& mchan_arr = this->channels();
 	SmartBody::SBSkeleton* interSk = new SmartBody::SBSkeleton(dynamic_cast<SBSkeleton*>(targetSk)); // copy for an intermediate skeleton
@@ -583,17 +583,28 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 	for (unsigned int i=0;i<endJoints.size();i++)
 	{
 		std::string jname = endJoints[i];
+		std::string jrootName = "";
+		if (endJointRoots.size() > i)
+			jrootName = endJointRoots[i];
+
 		SBJoint* srcJoint = tempSrcSk->getJointByName(jname);
 		SBJoint* tgtJoint = interSk->getJointByName(jname);
 		if (srcJoint && tgtJoint) // a valid effector
 		{
 			EffectorConstantConstraint* constraint = new EffectorConstantConstraint();
 			constraint->efffectorName = jname;
-			//SBJoint* pjoint = dynamic_cast<SBJoint*>(tgtJoint->getParent()->getParent()->getParent());
-			SBJoint* pjoint = tgtJoint->getParent();
-			while (pjoint->getParent() != rootJoint)
-				pjoint = pjoint->getParent();
-			constraint->rootName = pjoint->name();
+			//SBJoint* pjoint = dynamic_cast<SBJoint*>(tgtJoint->getParent()->getParent()->getParent());			
+			if (interSk->getJointByName(jrootName))
+			{
+				constraint->rootName = jrootName;
+			}
+			else
+			{
+				SBJoint* pjoint = tgtJoint->getParent();
+				while (pjoint->getParent() != rootJoint)
+					pjoint = pjoint->getParent();
+				constraint->rootName = pjoint->name();
+			}			
 			consMap[jname] = constraint;
 		}
 	}
@@ -1445,7 +1456,7 @@ void SBMotion::calculateMeans(std::vector<double>&inputPoints, std::vector<doubl
 }
 
 
-SBMotion* SBMotion::constrain( std::string name, std::string srcSkeletonName, std::string tgtSkeletonName, std::string tgtMotionName, std::vector<std::string>& endJoints )
+SBMotion* SBMotion::constrain( std::string name, std::string srcSkeletonName, std::string tgtSkeletonName, std::string tgtMotionName, std::vector<std::string>& endJoints, std::vector<std::string>& endJointRoots )
 {
 	SBSkeleton* origSkel = SBScene::getScene()->getSkeleton(srcSkeletonName);
 	if (!origSkel) return NULL;
@@ -1454,7 +1465,7 @@ SBMotion* SBMotion::constrain( std::string name, std::string srcSkeletonName, st
 	SBSkeleton* tgtSkel  = SBScene::getScene()->getSkeleton(tgtSkeletonName);
 	if (!tgtSkel) return NULL;
 
-	SBMotion* constraintMotion = buildConstraintMotion(origSkel, tgtSkel, tgtMotion, endJoints);
+	SBMotion* constraintMotion = buildConstraintMotion(origSkel, tgtSkel, tgtMotion, endJoints, endJointRoots);
 
 	if (constraintMotion)
 	{

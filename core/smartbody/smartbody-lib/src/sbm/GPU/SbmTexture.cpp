@@ -113,7 +113,7 @@ void SbmTexture::buildTexture()
 {	
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:10");	
 	GLuint iType = GL_TEXTURE_2D;
-	glEnable(GL_TEXTURE);
+	glEnable(GL_TEXTURE_2D);
 	glEnable(iType);	
 	glGenTextures(1,&texID);
 	glBindTexture(iType,texID);
