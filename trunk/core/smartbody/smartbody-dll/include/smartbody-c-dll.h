@@ -99,6 +99,31 @@ struct SBM_SmartbodyCharacter
 };
 
 
+// similar to SBM_SmartbodyCharacter but with the joint data in separate arrays to help with marshalling
+struct SBM_SmartbodyCharacter2
+{
+   char * m_name;
+   float x;
+   float y;
+   float z;
+   float rw;
+   float rx;
+   float ry;
+   float rz;
+   size_t m_numJoints;
+
+   //SBM_SmartbodyJoint * m_joints;
+   char ** jname;
+   float * jx;
+   float * jy;
+   float * jz;
+   float * jrw;
+   float * jrx;
+   float * jry;
+   float * jrz;
+};
+
+
 SMARTBODY_C_DLL_API SBMHANDLE SBM_CreateSBM();
 
 SMARTBODY_C_DLL_API bool SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandle, const char * basePath );
@@ -121,6 +146,7 @@ SMARTBODY_C_DLL_API bool SBM_ExecutePython( SBMHANDLE sbmHandle, const char * co
 
 SMARTBODY_C_DLL_API int  SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle );
 SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character );
+SMARTBODY_C_DLL_API bool SBM_GetCharacter2( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter2 * character );
 SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character );
 SMARTBODY_C_DLL_API bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character );
 SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb);
