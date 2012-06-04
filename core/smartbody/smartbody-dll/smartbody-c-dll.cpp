@@ -169,6 +169,7 @@ public:
 
 bool SBM_HandleExists( SBMHANDLE sbmHandle );
 void SBM_CharToCSbmChar( const SmartbodyCharacter * sbmChar, SBM_SmartbodyCharacter * sbmCChar );
+void SBM_CharToCSbmChar2( const SmartbodyCharacter * sbmChar, SBM_SmartbodyCharacter2 * sbmCChar );
 
 
 std::map< int, Smartbody_dll * > g_smartbodyInstances;
@@ -359,6 +360,21 @@ SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * nam
 }
 
 
+SMARTBODY_C_DLL_API bool SBM_GetCharacter2( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter2 * character )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   SmartbodyCharacter& dllChar = g_smartbodyInstances[ sbmHandle ]->GetCharacter( (string)name );
+
+   SBM_CharToCSbmChar2( &dllChar, character );
+
+   return true;
+}
+
+
 SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character )
 {
    if ( !character )
@@ -443,6 +459,74 @@ void SBM_CharToCSbmChar( const::SmartbodyCharacter * sbmChar, SBM_SmartbodyChara
             // only initialize joints if this is the first time
             sbmCChar->m_joints[ i ].m_name = new char[ sbmChar->m_joints[ i ].m_name.length() + 1 ];
             strcpy( sbmCChar->m_joints[ i ].m_name, sbmChar->m_joints[ i ].m_name.c_str() );
+         }
+      }
+   }
+}
+
+
+void SBM_CharToCSbmChar2( const::SmartbodyCharacter * sbmChar, SBM_SmartbodyCharacter2 * sbmCChar )
+{
+   // copy transformation data
+   sbmCChar->x = sbmChar->x;
+   sbmCChar->y = sbmChar->y;
+   sbmCChar->z = sbmChar->z;
+   sbmCChar->rw = sbmChar->rw;
+   sbmCChar->rx = sbmChar->rx;
+   sbmCChar->ry = sbmChar->ry;
+   sbmCChar->rz = sbmChar->rz;
+
+
+   // copy name
+   // NOTE: name should be copied during callback and character creation
+   //sbmCChar->m_name = new char[ sbmChar->m_name.length() + 1 ];
+   //strcpy( sbmCChar->m_name, sbmChar->m_name.c_str() );
+
+   if ( sbmChar->m_joints.size() > 0 )
+   {
+      bool initJoints = false;
+      if (sbmCChar->m_numJoints == 0)
+      {
+         //SBM_LogMessage("CREATING JOINTS!", 2);
+         sbmCChar->m_numJoints = sbmChar->m_joints.size();
+         //sbmCChar->m_joints = new SBM_SmartbodyJoint[ sbmCChar->m_numJoints ];
+         sbmCChar->jname = new char * [ sbmCChar->m_numJoints ];
+         sbmCChar->jx = new float [ sbmCChar->m_numJoints ];
+         sbmCChar->jy = new float [ sbmCChar->m_numJoints ];
+         sbmCChar->jz = new float [ sbmCChar->m_numJoints ];
+         sbmCChar->jrw = new float [ sbmCChar->m_numJoints ];
+         sbmCChar->jrx = new float [ sbmCChar->m_numJoints ];
+         sbmCChar->jry = new float [ sbmCChar->m_numJoints ];
+         sbmCChar->jrz = new float [ sbmCChar->m_numJoints ];
+         initJoints = true;
+      }
+
+      for ( size_t i = 0; i < sbmCChar->m_numJoints; i++ )
+      {
+         // copy transformation data
+         //sbmCChar->m_joints[ i ].x = sbmChar->m_joints[ i ].x;
+         //sbmCChar->m_joints[ i ].y = sbmChar->m_joints[ i ].y;
+         //sbmCChar->m_joints[ i ].z = sbmChar->m_joints[ i ].z;
+         //sbmCChar->m_joints[ i ].rw = sbmChar->m_joints[ i ].rw;
+         //sbmCChar->m_joints[ i ].rx = sbmChar->m_joints[ i ].rx;
+         //sbmCChar->m_joints[ i ].ry = sbmChar->m_joints[ i ].ry;
+         //sbmCChar->m_joints[ i ].rz = sbmChar->m_joints[ i ].rz;
+         sbmCChar->jx[ i ] = sbmChar->m_joints[ i ].x;
+         sbmCChar->jy[ i ] = sbmChar->m_joints[ i ].y;
+         sbmCChar->jz[ i ] = sbmChar->m_joints[ i ].z;
+         sbmCChar->jrw[ i ] = sbmChar->m_joints[ i ].rw;
+         sbmCChar->jrx[ i ] = sbmChar->m_joints[ i ].rx;
+         sbmCChar->jry[ i ] = sbmChar->m_joints[ i ].ry;
+         sbmCChar->jrz[ i ] = sbmChar->m_joints[ i ].rz;
+
+         // copy name
+         if (initJoints)
+         {
+            // only initialize joints if this is the first time
+            //sbmCChar->m_joints[ i ].m_name = new char[ sbmChar->m_joints[ i ].m_name.length() + 1 ];
+            //strcpy( sbmCChar->m_joints[ i ].m_name, sbmChar->m_joints[ i ].m_name.c_str() );
+            sbmCChar->jname[ i ] = new char[ sbmChar->m_joints[ i ].m_name.length() + 1 ];
+            strcpy( sbmCChar->jname[ i ], sbmChar->m_joints[ i ].m_name.c_str() );
          }
       }
    }
