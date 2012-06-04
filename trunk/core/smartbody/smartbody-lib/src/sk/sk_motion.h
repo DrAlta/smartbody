@@ -310,7 +310,7 @@ public :
 private : 
 	bool _load_bvh ( SrInput& in );
 protected:
-	void convertBoneOrientation( std::string &pjointName, SkSkeleton* interSk, SkSkeleton* tempSrcSk, std::queue<std::string> &jointQueues, std::map<std::string, SrQuat> &jointRotationMap );
+	void convertBoneOrientation( std::string &pjointName, SkSkeleton* interSk, SkSkeleton* tempSrcSk, std::queue<std::string> &jointQueues, std::map<std::string, SrQuat> &jointRotationMap, std::vector<std::string>& endJoints );
 };
 
 //================================ End of File =================================================
