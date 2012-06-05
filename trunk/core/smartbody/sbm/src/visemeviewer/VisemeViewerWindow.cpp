@@ -491,12 +491,15 @@ void VisemeViewerWindow::OnPlayCB(Fl_Widget* widget, void* data)
 	{
 		for (int i = 0; i < viewer->_browserViseme->size(); i++)
 		{
-			std::stringstream strstr;
-			strstr << "char " << viewer->getCurrentCharacterName() << " viseme " << viewer->_browserViseme->text(i + 1) << " curve ";
-			strstr << viewer->_curveEditor->getCurves()[i].size() << " ";
-			for (size_t j = 0; j < viewer->_curveEditor->getCurves()[i].size(); j++)
-				strstr << viewer->_curveEditor->getCurves()[i][j].x * playTime << " " << viewer->_curveEditor->getCurves()[i][j].y << " ";
-			SmartBody::SBScene::getScene()->command(strstr.str());		
+			if (viewer->_browserViseme->selected(i + 1))
+			{
+				std::stringstream strstr;
+				strstr << "char " << viewer->getCurrentCharacterName() << " viseme " << viewer->_browserViseme->text(i + 1) << " curve ";
+				strstr << viewer->_curveEditor->getCurves()[i].size() << " ";
+				for (size_t j = 0; j < viewer->_curveEditor->getCurves()[i].size(); j++)
+					strstr << viewer->_curveEditor->getCurves()[i][j].x * playTime << " " << viewer->_curveEditor->getCurves()[i][j].y << " ";
+				SmartBody::SBScene::getScene()->command(strstr.str());		
+			}
 		}
 	}
 }
