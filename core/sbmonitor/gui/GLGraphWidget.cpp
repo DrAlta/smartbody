@@ -16,7 +16,14 @@ GLGraphWidget::GLGraphWidget(const QRect& renderSize, Scene* scene, QWidget* par
 
 GLGraphWidget::~GLGraphWidget()
 {
+   while (m_LineGraphPoints.size() != 0)
+   {
+      LineGraphPoint* pPoint = m_LineGraphPoints.front();
+      m_LineGraphPoints.pop_front();
+      delete pPoint;
+   }
 
+   m_LineGraphPoints.clear();
 }
 
 void GLGraphWidget::initializeGL()
@@ -117,21 +124,21 @@ void GLGraphWidget::Draw()
 	glColor3f(0.1f, 0.1f, 0.1f);	
 	float x;
 	glBegin(GL_LINES);
-		for(int i = y_label_num; i > 0; --i)
-		{
-			glVertex3f(0, i*y_length/y_label_num, -10.0f);
-			glVertex3f(x_length, i*y_length/y_label_num, -10.0f);
-			glVertex3f(0, -i*y_length/y_label_num, -10.0f);
-			glVertex3f(x_length, -i*y_length/y_label_num, -10.0f);
+	   for(int i = y_label_num; i > 0; --i)
+	   {
+		   glVertex3f(0, i*y_length/y_label_num, -10.0f);
+		   glVertex3f(x_length, i*y_length/y_label_num, -10.0f);
+		   glVertex3f(0, -i*y_length/y_label_num, -10.0f);
+		   glVertex3f(x_length, -i*y_length/y_label_num, -10.0f);
 
-		}
-		for(int i = x_label_num; i > 0; --i)
-		{
-			x = i*x_length/x_label_num;
-			x = x*((int)(i*x_size/x_label_num))/(i*x_size/x_label_num);
-			glVertex3f(x, y_length, -10.0f);
-			glVertex3f(x, -y_length, -10.0f);
-		}
+	   }
+	   for(int i = x_label_num; i > 0; --i)
+	   {
+		   x = i*x_length/x_label_num;
+		   x = x*((int)(i*x_size/x_label_num))/(i*x_size/x_label_num);
+		   glVertex3f(x, y_length, -10.0f);
+		   glVertex3f(x, -y_length, -10.0f);
+	   }
 	glEnd();
 
    glColor3f(0.5f, 0.5f, 0.5f);
@@ -142,6 +149,18 @@ void GLGraphWidget::Draw()
 		glVertex3f(0.0f, y_length, -10.0f);
 		glVertex3f(0.0f, -y_length, -10.0f);
 	glEnd();
+
+   // render line graph points
+   glBegin(GL_LINE_STRIP);
+      list<LineGraphPoint*>::iterator it;
+      LineGraphPoint* pPoint = NULL;
+      for (it = m_LineGraphPoints.begin(); it != m_LineGraphPoints.end(); ++it)
+      {
+         pPoint = (*it);
+         glColor3d(pPoint->color.x, pPoint->color.y, pPoint->color.z);
+         glVertex3d(pPoint->position.x, pPoint->position.y, pPoint->position.z);
+      }
+   glEnd();
 }
 
 void GLGraphWidget::timerEvent(QTimerEvent * event)
@@ -153,5 +172,22 @@ void GLGraphWidget::timerEvent(QTimerEvent * event)
    else
    {
       QWidget::timerEvent(event);
+   }
+}
+
+void GLGraphWidget::AddLineGraphPoint(Vector3& position, Vector3& color)
+{
+   m_LineGraphPoints.push_back(new LineGraphPoint(position, color));
+}
+
+void GLGraphWidget::AddLineGraphPoint(Vector3& position, Vector3& color, unsigned int maxSize)
+{
+   AddLineGraphPoint(position, color);
+
+   while (m_LineGraphPoints.size() > maxSize)
+   {
+      LineGraphPoint* pPoint = m_LineGraphPoints.front();
+      m_LineGraphPoints.pop_front();
+      delete pPoint;
    }
 }

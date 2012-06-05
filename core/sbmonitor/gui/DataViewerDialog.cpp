@@ -11,13 +11,15 @@ DataViewerDialog::DataViewerDialog(SbmDebuggerClient* client, QWidget* parent) :
    m_pScene = m_client->GetScene();
    ui.setupUi(this);
    m_pGraphWidget = new GLGraphWidget(ui.renderSize->geometry(), m_pScene, this);
+   //m_pGraphWidget->AddLineGraphPoint(Vector3(0, 0, -10.0f), Vector3(1, 0, 1), ui.numFramesBox->value());
+   timer.start(10, this);
 
    ui.showRotaionAsBox->addItem("Quaternion");
    ui.showRotaionAsBox->addItem("Euler Angle");
-   ui.showRotaionAsBox->addItem("Axis-Angle");
-   ui.showRotaionAsBox->addItem("Quaternion Velocity");
-   ui.showRotaionAsBox->addItem("Euler Velocity");
-   ui.showRotaionAsBox->addItem("Axis-Angle Velocity");
+   //ui.showRotaionAsBox->addItem("Axis-Angle");
+   //ui.showRotaionAsBox->addItem("Quaternion Velocity");
+   //ui.showRotaionAsBox->addItem("Euler Velocity");
+   //ui.showRotaionAsBox->addItem("Axis-Angle Velocity");
 
    connect(ui.addChannelButton, SIGNAL(pressed()), this, SLOT(AddSelectedChannels()));
    connect(ui.removeChannelButton, SIGNAL(pressed()), this, SLOT(RemoveSelectedChannels()));
@@ -27,7 +29,6 @@ DataViewerDialog::DataViewerDialog(SbmDebuggerClient* client, QWidget* parent) :
    connect(ui.characterNameBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(ChangedSelectedCharacter(const QString&)));
 
    Refresh();
-
 }
 
 DataViewerDialog::~DataViewerDialog()
@@ -83,6 +84,67 @@ void DataViewerDialog::ChangedSelectedMotion(const QString& text)
    m_client->SendSBMCommand(NetRequest::Get_Channel_Names, "string-array", command, GetStringList, this);
 }
 
+void DataViewerDialog::Update()
+{
+   if (ui.monitoredListBox->count() == 0 || ui.characterNameBox->count() == 0)
+      return; 
+
+   // find the character that is selected
+   Character* pSelectedCharacter = m_pScene->FindCharacter(ui.characterNameBox->currentText().toStdString());
+   if (!pSelectedCharacter)
+      return;
+   
+   static float somefloat = 0.1f;
+   
+   // go through the monitored joints and update the graph with the new data
+   for (int i = 0; i < ui.monitoredListBox->count(); i++)
+   {
+      QListWidgetItem* item = ui.monitoredListBox->item(i);
+      QString channelName = item->text();
+      QString suffix = "";
+      double value = 0;
+      int suffixIndex = channelName.lastIndexOf("_");
+      
+      if (suffixIndex != -1)
+      {
+         suffix = channelName.right(suffixIndex);
+         channelName = channelName.remove(suffixIndex, channelName.length() - suffixIndex);
+      }
+
+      static float someFloat = 0;
+      
+      Joint* joint = pSelectedCharacter->FindJoint(channelName.toStdString());
+
+      if (joint)
+      {
+         if (suffix.contains("x", Qt::CaseInsensitive))
+            value = joint->pos.x;
+         else if (suffix.contains("y", Qt::CaseInsensitive))
+            value = joint->pos.y;
+         else if (suffix.contains("z", Qt::CaseInsensitive))
+            value = joint->pos.z;
+         //else if (suffix.contains("quat", Qt::CaseInsensitive))
+         //   value = joint->rot;
+
+         m_pGraphWidget->AddLineGraphPoint(Vector3(someFloat, value, -10.0f), Vector3(1, 0, 1), ui.numFramesBox->value());
+         someFloat += 0.01f;
+      }
+   }
+}
+
+void DataViewerDialog::timerEvent(QTimerEvent * event)
+{
+   if (event->timerId() == timer.timerId())
+   {
+      Update();
+   }
+   else
+   {
+      QWidget::timerEvent(event);
+   }
+}
+
+
 bool GetStringList(void* caller, NetRequest* req)
 {
    DataViewerDialog* dlg = req->getCaller<DataViewerDialog*>();
@@ -103,6 +165,17 @@ bool GetStringList(void* caller, NetRequest* req)
 
    case NetRequest::Get_Channel_Names:
       dlg->ui.channelListBox->clear();
+      //for (int i = 0; i < names.length(); i++)
+      //{
+      //   if (names[i].contains("Quat"))
+      //   {
+      //      names[i].append(" (4)");
+      //   }
+      //   else
+      //   {
+      //      names[i].append(" (1)");
+      //   }
+      //}
       dlg->ui.channelListBox->addItems(names);
       break;
 
