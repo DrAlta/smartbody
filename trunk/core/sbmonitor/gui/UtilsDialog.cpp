@@ -38,7 +38,7 @@ UtilsDialog::UtilsDialog(SbmDebuggerClient* client, GLWidget* pRenderView, Ui::M
    connect(ui.animFilterBox, SIGNAL(textChanged()), this, SLOT(FilterAnims()));
 
    Refresh();
-   QueryAnimsPressed();
+   //QueryAnimsPressed();
 }
 
 UtilsDialog::~UtilsDialog()
@@ -164,8 +164,8 @@ bool GetAnimationNames(void* caller, NetRequest* req)
          // resize animation combo box and search filter
          size.setWidth(width);
          searchSize.setWidth(width);
-         dlg->ui.animationNamesBox->setGeometry(size);
-         dlg->ui.animFilterBox->setGeometry(size);
+         //dlg->ui.animationNamesBox->setGeometry(size);
+         //dlg->ui.animFilterBox->setGeometry(size);
       }
 
       names.append(name);

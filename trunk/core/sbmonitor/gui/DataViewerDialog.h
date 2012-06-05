@@ -29,11 +29,15 @@ private slots:
    void Refresh();
 
 private:
-   
    Scene* m_pScene;
    GLGraphWidget* m_pGraphWidget;
    SbmDebuggerClient* m_client;
+   QBasicTimer timer;
    //void AddAllJointsToList(QListWidget* list, std::vector<Joint*>& joints);
+
+protected:
+   virtual void timerEvent(QTimerEvent * event);
+   void Update();
 };
 
 #endif

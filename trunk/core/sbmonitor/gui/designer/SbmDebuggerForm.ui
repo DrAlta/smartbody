@@ -76,7 +76,6 @@
     <addaction name="actionData_Viewer"/>
     <addaction name="actionResource_Viewer"/>
     <addaction name="actionCommand_Window"/>
-    <addaction name="actionUtils_Window"/>
     <addaction name="actionFace_Viewer"/>
     <addaction name="actionBML_Creator"/>
     <addaction name="actionEnity_Creator"/>
