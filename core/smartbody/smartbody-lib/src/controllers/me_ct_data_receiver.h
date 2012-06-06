@@ -20,6 +20,7 @@ class MeCtDataReceiver : public SmartBody::SBController
 		std::map<std::string, SrVec>	_posMap;				// global position
 		std::map<std::string, SrVec>	_startingPos;			// starting position
 		std::map<std::string, SrQuat>	_quatMap;				// local rotation
+		std::map<std::string, SrVec>	_localPosMap;			// local position
 
 	public:
 		MeCtDataReceiver(SkSkeleton* skel);
@@ -28,9 +29,11 @@ class MeCtDataReceiver : public SmartBody::SBController
 		bool getValid()						{return _valid;}
 		void setValid(bool v)				{_valid = v;}
 
+		void setLocalPosition(std::string jName, SrVec& pos);
 		void setGlobalPosition(std::string jName, SrVec& pos);
 		void setLocalRotation(std::string jName, SrQuat& q);
 		void removeLocalRotation(std::string jName);
+		void removeLocalPosition(std::string jName);
 
 	private:
 		virtual bool controller_evaluate(double t, MeFrameData& frame);
