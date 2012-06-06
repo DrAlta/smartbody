@@ -24,7 +24,51 @@
 *      Arno Hartholt, USC
 */
 
+#include "vhcl.h"
 #include "OgreRenderer.h"
+#include <vector>
+#include <string>
+#include "ini.h"
+
+static int inihandler(void* user, const char* section, const char* name,
+                   const char* value)
+{
+	OgreRenderer* renderer = (OgreRenderer*) user;
+
+    #define MATCH(s, n) stricmp(section, s) == 0 && stricmp(name, n) == 0
+    if (MATCH("GENERAL", "UseBoneBus"))
+	{
+		std::string boneBusValue(value);
+		if (boneBusValue == "true" || boneBusValue == "True" || boneBusValue == "TRUE")
+		{
+			renderer->setUseBoneBus(true);
+		}
+		else if (boneBusValue == "false" || boneBusValue == "False" || boneBusValue == "FALSE")
+		{
+			renderer->setUseBoneBus(false);
+		}
+    }
+	else if (MATCH("GENERAL", "DefaultPyFile"))
+	{
+		std::string temp = "pythonscript " + std::string(value);
+		renderer->m_initialCommands.push_back(temp);
+	}
+	else if (MATCH("GENERAL", "ScriptPath"))
+	{
+		std::string temp = "python scene.addAssetPath(\"script\", \"" + std::string(value) + "\")";
+		renderer->m_initialCommands.push_back(temp);
+    }
+	else if (MATCH("GENERAL", "Scene"))
+	{
+		renderer->m_initialMeshName = std::string(value);
+    }
+	else
+	{
+        return 0;  /* unknown section/name, error */
+    }
+    return 1;
+}
+
 
 //#undef WIN32
 #ifdef WIN32
@@ -52,16 +96,39 @@ int main(int argc, char* argv[])
 	std::vector<std::string> tokenzied(it, end);
 	int numTokens = tokenzied.size();
 	int tokenCounter = 0;
+	// if no parameters are given, look for a file named config.ini in the local path
+	bool implicitConfig = false;
+	if (numTokens == 0)
+	{
+		tokenzied.push_back("-config");
+		tokenzied.push_back("config.ini");
+		numTokens = 2;
+		implicitConfig = true;
+	}
 	while (tokenCounter < numTokens)
 	{
 		std::string op = tokenzied[tokenCounter];
+		if (op == "-config")
+		{
+			tokenCounter++;
+			if (tokenCounter < numTokens)
+			{
+				std::vector<std::string> commands;
+				if (ini_parse(tokenzied[tokenCounter].c_str(), inihandler, &app) < 0)
+				{
+					if (!implicitConfig)
+						printf("Can't load configuration file '%s'\n", tokenzied[tokenCounter].c_str());
+					continue;
+				}
+			}
+		}
 		
 		if (op == "-seqpath" || op == "-scriptpath")
 		{
 			tokenCounter++;
 			if (tokenCounter < numTokens)
 			{
-				std::string command = "path seq " + tokenzied[tokenCounter];
+				std::string command = "python scene.addAssetPath(\"script\", \"" + tokenzied[tokenCounter] + "\")";
 				app.m_initialCommands.push_back(command);
 			}
 		}
@@ -84,12 +151,67 @@ int main(int argc, char* argv[])
 				app.m_initialCommands.push_back(command);
 			}
 		}
-		printf("op = %s, param = %s\n",op.c_str(), tokenzied[tokenCounter].c_str());
+		if (op == "-mediapath")
+		{
+			tokenCounter++;
+			if (tokenCounter < numTokens)
+			{
+				std::string command = "python scene.setMediaPath(\"" + tokenzied[tokenCounter] + "\")";
+				app.m_initialCommands.push_back(command);
+			}
+		}
+		if (op == "-scene")
+		{
+			tokenCounter++;
+			if (tokenCounter < numTokens)
+			{
+				app.m_initialMeshName = tokenzied[tokenCounter];
+			}
+		}
+		if (op.size() > 11 && op.substr(0,11)  == "-mediapath=")
+		{
+			tokenCounter++;
+			std::string mediaPath = op.substr(11);
+			if (tokenCounter < numTokens)
+			{
+				std::string command = "python scene.setMediaPath(\"" + mediaPath + "\")";
+				app.m_initialCommands.push_back(command);
+			}
+		}
+		if (op == "-help")
+		{
+			printf("Usage: OgreViewer [-config filename] [-scriptpath scriptpathname] [-script scriptname] [-mediapath mediapathname] [-scene startupmeshname]\n");
+			printf("If the OgreViewer is not passed any parameters, it will look for a configuration file called 'config.ini' in the current direction.\n");
+			printf("If the OgreViewer is not passed any startup scripts or cannot find a config.ini, it will start in BoneBus mode and attempt to connect to SmartBody process.\n");
+			printf("If no SmartBody process is available, the OgreViewer will wait and render SmartBody characters after such a process is started.\n");
+			printf("\n");
+			printf("The following is a sample configuration script:\n");
+			printf("\n");
+			printf("[GENERAL]\n");
+			printf("UseBoneBus=false\n");
+			printf("ScriptPath=../../../../data/sbm-common/scripts\n");
+			printf("[DefaultPyFile=default-init.py\n");
+			printf("[MediaPath=.\n");
+			printf("[Scene=vh_basic_level.mesh\n");
+			
+			return 0;
+		}
 		tokenCounter++;
+	}
+
+
+	if (app.m_initialCommands.size() > 0)
+	{
+		if (app.isUseBoneBus())
+		{
+			printf("OgreViewer is running in BoneBus mode.");
+			app.m_initialCommands.clear();
+		}
 	}
 
 	if (app.m_initialCommands.size() > 0)
 		app.setUseBoneBus(false);
+
 	try
 	{
 		app.go();

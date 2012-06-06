@@ -38,11 +38,12 @@ class OgreRenderer : public ExampleApplication, public SmartbodyListener
 		
 		std::set<std::string> m_validJointNames;
 		std::vector<std::string> m_initialCommands;
+		std::string m_initialMeshName;
 	
 	protected:
 		// ExampleApplication callbacks
 		void destroyScene(void);
-		void createDefaultScene();
+		void createDefaultScene(std::string meshName);
 		void createScene();
 		void createFrameListener();
 

@@ -31,7 +31,7 @@ void OgreRenderer::destroyScene(void)
 	vhmsg::ttu_close();
 }
 
-void OgreRenderer::createDefaultScene()
+void OgreRenderer::createDefaultScene(std::string meshName)
 {
 	mSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_MODULATIVE );
 	mSceneMgr->setShadowTextureSize( 4048 );
@@ -155,18 +155,26 @@ void OgreRenderer::createDefaultScene()
 	sceneNode->attachObject(sceneEntity);
 	sceneNode->setVisible(false);
 
-	// adding generic VH scene 
-	sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("world_scene_vh");
-	sceneEntity = mSceneMgr->createEntity("world_entity_vh","vh_basic_level.mesh");
-	sceneNode->attachObject(sceneEntity);
-	sceneNode->setVisible(true);
+	// adding generic scene if specified
+	if (meshName != "")
+	{
+		sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("world_scene");
+		sceneEntity = mSceneMgr->createEntity("world_entity", meshName);
+		sceneNode->attachObject(sceneEntity);
+		sceneNode->setVisible(true); // if the user specifies a scene to load, make it the default
+	}
+	else
+	{
+		mSceneMgr->getSceneNode("plane_node")->setVisible(true); // if the user doesn't specify a scene to load, make it the default
+	}
+	
 }
 
 // Just override the mandatory create scene method
 void OgreRenderer::createScene()
 {
 
-	createDefaultScene();
+	createDefaultScene(m_initialMeshName);
 
 	if (m_useBoneBus)
 	{
