@@ -123,30 +123,43 @@ bool OgreFrameListener::processUnbufferedKeyInput(const FrameEvent& evt)
 	{
 		mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
 		mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
-		mSceneMgr->getSceneNode("plane_node")->setVisible(false); 
-	    mSceneMgr->getSceneNode("world_scene_vh")->setVisible(true);
+		mSceneMgr->getSceneNode("plane_node")->setVisible(false);
+		if (mSceneMgr->hasSceneNode("world_scene"))
+			mSceneMgr->getSceneNode("world_scene")->setVisible(true);
 	}
 	if(mKeyboard->isKeyDown(OIS::KC_2))
 	{
 		mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
 		mSceneMgr->getSceneNode("world_scene_cm")->setVisible(true);
 		mSceneMgr->getSceneNode("plane_node")->setVisible(false);
-		mSceneMgr->getSceneNode("world_scene_vh")->setVisible(false);
+		if (mSceneMgr->hasSceneNode("world_scene"))
+			mSceneMgr->getSceneNode("world_scene")->setVisible(false);
 	}
 	if(mKeyboard->isKeyDown(OIS::KC_3))
 	{
 		mSceneMgr->getSceneNode("world_scene_ft")->setVisible(true);
 		mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
 		mSceneMgr->getSceneNode("plane_node")->setVisible(false);
-		mSceneMgr->getSceneNode("world_scene_vh")->setVisible(false);
+		if (mSceneMgr->hasSceneNode("world_scene"))
+			mSceneMgr->getSceneNode("world_scene")->setVisible(false);
 	}
 	if(mKeyboard->isKeyDown(OIS::KC_4))
 	{
 		mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
 		mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
 		mSceneMgr->getSceneNode("plane_node")->setVisible(true);
-		mSceneMgr->getSceneNode("world_scene_vh")->setVisible(false);
+		if (mSceneMgr->hasSceneNode("world_scene"))
+			mSceneMgr->getSceneNode("world_scene")->setVisible(false);
 	}
+	if(mKeyboard->isKeyDown(OIS::KC_5))
+	{
+		mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
+		mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
+		mSceneMgr->getSceneNode("plane_node")->setVisible(false);
+		if (mSceneMgr->hasSceneNode("world_scene"))
+			mSceneMgr->getSceneNode("world_scene")->setVisible(true);
+	}
+
 
 
 	if ( mKeyboard->isKeyDown( OIS::KC_J ) )
@@ -230,13 +243,14 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 		if (!sceneNode)
 			return false;
 
+		// gets the position of pawns
 		for ( size_t i = 0; i< m_pawnList.size(); i++ )
 		{
 			std::string& name = m_pawnList[i];
 			
-			std::string command = "ball = scene.getPawn('"+name+"')";
+			std::string command = "tmp = scene.getPawn('"+name+"')";
 			m_sbmDLL->PythonCommandVoid(command);
-			m_sbmDLL->PythonCommandVoid("position = ball.getPosition()\norientation = ball.getOrientation()");
+			m_sbmDLL->PythonCommandVoid("position = tmp.getPosition()\norientation = tmp.getOrientation()");
 			float x = m_sbmDLL->PythonCommandFloat("ret = position.getData(0)");
 			float y = m_sbmDLL->PythonCommandFloat("ret = position.getData(1)");
 			float z = m_sbmDLL->PythonCommandFloat("ret = position.getData(2)");
