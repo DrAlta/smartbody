@@ -244,7 +244,7 @@ SBM_INLINE float MeCtIK::distance_to_plane(SrVec& point, SrVec& plane_normal, Sr
 	return dis;
 }
 
-SBM_INLINE SrVec MeCtIK::cross_point_on_plane(SrVec& point, SrVec& line, SrVec& plane_normal, SrVec& plane_point)
+SrVec MeCtIK::cross_point_on_plane(SrVec& point, SrVec& line, SrVec& plane_normal, SrVec& plane_point)
 {
 	float dis = distance_to_plane(point, plane_normal, plane_point);
 	float cos = dot(line, plane_normal)/plane_normal.len();
@@ -484,7 +484,7 @@ SBM_INLINE void MeCtIK::update_manipulated_joint_pos(int index)
 	scenario->joint_pos_list.set(manipulated_joint_index, scenario->joint_global_mat_list.get(index) * scenario->joint_pos_list.get(manipulated_joint_index));
 }
 
-SBM_INLINE void MeCtIK::get_limb_section_local_pos(int start_index, int end_index)
+void MeCtIK::get_limb_section_local_pos(int start_index, int end_index)
 {
 	SrMat gmat;
 	SrMat pmat;
