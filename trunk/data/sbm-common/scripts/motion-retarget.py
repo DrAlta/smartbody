@@ -27,6 +27,13 @@ def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :
 	endJoints.append('r_toe')
 	endJoints.append('r_acromioclavicular')
 	
+	relativeJoints = StringVec();
+	relativeJoints.append('spine1')
+	relativeJoints.append('spine2')
+	relativeJoints.append('spine3')
+	relativeJoints.append('spine4')
+	relativeJoints.append('spine5')
+	
 	
 	effectorJoints = StringVec();	
 	if tgtSkel.getJointByName('r_toe') != None:
@@ -46,7 +53,7 @@ def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :
 	effectorRoots.append('l_hip')
 	
 	#print 'Retarget motion = ' + motionName;
-	outMotion = testMotion.retarget(outMotionName,srcSkelName,tgtSkelName, endJoints, offsetJoints);	
+	outMotion = testMotion.retarget(outMotionName,srcSkelName,tgtSkelName, endJoints, relativeJoints, offsetJoints);	
 	cleanMotion = testMotion.constrain(outMotionName, srcSkelName, tgtSkelName, outMotionName, effectorJoints, effectorRoots);
 	saveCommand = 'animation ' + outMotionName + ' save ' + outDir + outMotionName + '.skm';
 	print 'Save command = ' + saveCommand;

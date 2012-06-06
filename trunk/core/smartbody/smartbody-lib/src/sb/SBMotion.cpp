@@ -522,7 +522,7 @@ SBMotion* SBMotion::duplicateCycle(int num, std::string newName)
 	return copyMotion;
 }
 
-SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints, std::map<std::string, SrVec>& offsetJointMap)
+SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints, std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJointMap)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	SBSkeleton* srcSkeleton = mcu._scene->getSkeleton(srcSkeletonName);
@@ -533,7 +533,7 @@ SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std
 		return NULL;
 	}
 	
-	SkMotion* motion = buildRetargetMotion(srcSkeleton,dstSkeleton, endJoints, offsetJointMap);
+	SkMotion* motion = buildRetargetMotion(srcSkeleton,dstSkeleton, endJoints, relativeJoints, offsetJointMap);
 	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
 	if (sbmotion)
 	{

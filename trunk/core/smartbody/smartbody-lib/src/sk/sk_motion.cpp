@@ -958,7 +958,8 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 
 
 
-SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints, std::map<std::string, SrVec>& offsetJoints )
+SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints, 
+										 std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJoints )
 {
 	SkChannelArray& mchan_arr = this->channels();
 	SkSkeleton* interSk = new SkSkeleton(targetSk); // copy for an intermediate skeleton
@@ -1011,7 +1012,11 @@ SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targe
 			
 			SkJoint* srcJoint = tempSrcSk->search_joint(pjointName.c_str());
 			SkJoint* targetJoint = interSk->search_joint(pjointName.c_str());
-			if (pjointName == interSk->root()->name() && srcJoint && targetJoint) // directly copy over the root joint rotation
+			bool isRelativeJoint = false;
+			// just copy over joint quat if that is a root or relative joint
+			if (pjointName == interSk->root()->name() || std::find(relativeJoints.begin(),relativeJoints.end(), pjointName) != relativeJoints.end())
+				isRelativeJoint = true;
+			if ( isRelativeJoint && srcJoint && targetJoint) // directly copy over the root joint rotation
 			{
 				int chanID = mchan_arr.search(pjointName, SkChannel::Quat);
 				int index = mchan_arr.float_position(chanID);
@@ -1113,7 +1118,7 @@ SkMotion* SkMotion::buildRetargetMotion3( SkSkeleton* sourceSk, SkSkeleton* targ
 		if (srcjoint)
 		{
 			SrVec srcPos = srcjoint->gmat().get_translation();
-			//LOG("joint = %s, src pos = %f %f %f, dst pos = %f %f %f",pjointName.c_str(),srcPos[0],srcPos[1],srcPos[2],pos[0],pos[1],pos[2]);
+			LOG("joint = %s, src pos = %f %f %f, dst pos = %f %f %f",pjointName.c_str(),srcPos[0],srcPos[1],srcPos[2],pos[0],pos[1],pos[2]);
 		}
 		for (int i=0; i< pjoint->num_children(); i++)
 		{
