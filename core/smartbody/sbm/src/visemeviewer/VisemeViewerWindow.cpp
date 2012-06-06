@@ -486,7 +486,7 @@ void VisemeViewerWindow::OnPlayCB(Fl_Widget* widget, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
 
-	float playTime = (float)atoi(viewer->_inputPlayTime->value());
+	float playTime = (float)atof(viewer->_inputPlayTime->value());
 	if (playTime > 0)
 	{
 		for (int i = 0; i < viewer->_browserViseme->size(); i++)
