@@ -120,6 +120,7 @@
     <ClCompile Include="..\..\src\OgreFrameListener.cpp" />
     <ClCompile Include="..\..\src\OgreRenderer.cpp" />
     <ClCompile Include="..\..\src\SBListener.cpp" />
+	<ClCompile Include="..\..\src\ini.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\BoneBusHandler.h" />
@@ -128,6 +129,7 @@
     <ClInclude Include="..\..\src\OgreFrameListener.h" />
     <ClInclude Include="..\..\src\OgreRenderer.h" />
     <ClInclude Include="..\..\src\SBListener.h" />
+	<ClInclude Include="..\..\src\ini.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\lib\bonebus\bonebus.vcxproj">
