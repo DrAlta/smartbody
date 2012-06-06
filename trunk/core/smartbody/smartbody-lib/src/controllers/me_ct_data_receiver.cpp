@@ -34,6 +34,18 @@ void MeCtDataReceiver::setGlobalPosition(std::string jName, SrVec& pos)
 		iter->second = pos;
 }
 
+
+void MeCtDataReceiver::setLocalPosition(std::string jName, SrVec& pos)
+{
+	std::map<std::string, SrVec>::iterator iter = _localPosMap.find(jName);
+	if (iter == _localPosMap.end())
+	{
+		_localPosMap.insert(std::make_pair(jName, pos));
+	}
+	else
+		iter->second = pos;
+}
+
 void MeCtDataReceiver::setLocalRotation(std::string jName, SrQuat& q)
 {
 	std::map<std::string, SrQuat>::iterator iter = _quatMap.find(jName);
@@ -48,6 +60,13 @@ void MeCtDataReceiver::removeLocalRotation(std::string jName)
 	std::map<std::string, SrQuat>::iterator iter = _quatMap.find(jName);
 	if (iter != _quatMap.end())
 		_quatMap.erase(iter);
+}
+
+void MeCtDataReceiver::removeLocalPosition(std::string jName)
+{
+	std::map<std::string, SrVec>::iterator iter = _localPosMap.find(jName);
+	if (iter != _localPosMap.end())
+		_localPosMap.erase(iter);
 }
 
 bool MeCtDataReceiver::controller_evaluate(double t, MeFrameData& frame)
@@ -78,6 +97,24 @@ bool MeCtDataReceiver::controller_evaluate(double t, MeFrameData& frame)
 			frame.buffer()[bufferId + 1] = quat.x;
 			frame.buffer()[bufferId + 2] = quat.y;
 			frame.buffer()[bufferId + 3] = quat.z;
+		}
+
+		// set local position directly
+		std::map<std::string, SrVec>::iterator iter2;
+		for (iter2 = _localPosMap.begin(); iter2 != _localPosMap.end(); iter2++)
+		{
+			std::string jName = iter2->first;
+			SkJoint* joint = _skeleton->search_joint(jName.c_str());
+			if (!joint)	continue;
+			int channelId = _context->channels().search(jName, SkChannel::XPos);
+			if (channelId < 0)	continue;
+			int bufferId = frame.toBufferIndex(channelId);
+			if (bufferId < 0)	continue;
+			SrVec curr = iter2->second;
+
+			frame.buffer()[bufferId + 0] = curr.x;
+			frame.buffer()[bufferId + 1] = curr.y;
+			frame.buffer()[bufferId + 2] = curr.z;
 		}
 
 		// get difference of global position and add up to frame buffer

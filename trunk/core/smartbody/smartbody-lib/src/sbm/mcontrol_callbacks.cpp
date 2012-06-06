@@ -6409,13 +6409,16 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 				return CMD_SUCCESS;
 			}
 			SrVec vec(x, y, z);
-			character->datareceiver_ct->setGlobalPosition(jName, vec);
+			if (emitterName == "kinect")
+				character->datareceiver_ct->setGlobalPosition(jName, vec);
+			else
+				character->datareceiver_ct->setLocalPosition(jName, vec);
 		}
-		if (skeletonType == "positions")
+		else if (skeletonType == "positions")
 		{
 			;	// TODO: add support to joint global positions
 		}
-		if (skeletonType == "rotation")
+		else if (skeletonType == "rotation")
 		{
 			std::string jName;
 			if (emitterName == "kinect")
@@ -6444,7 +6447,19 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			if (character)
 				character->datareceiver_ct->removeLocalRotation(jName);
 		}
-		if (skeletonType == "rotations")
+		else if (skeletonType == "noposition")
+		{
+			std::string jName;
+			if (emitterName == "kinect")
+				jName = mcu->kinectProcessor->getSBJointName(args.read_int());
+			else
+				jName = args.read_token();
+
+			SbmCharacter* character = mcu->getCharacter(skelName);
+			if (character)
+				character->datareceiver_ct->removeLocalPosition(jName);
+		}
+		else if (skeletonType == "rotations")
 		{
 			if (emitterName == "kinect")
 			{
