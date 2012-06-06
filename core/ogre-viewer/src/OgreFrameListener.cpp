@@ -121,11 +121,13 @@ bool OgreFrameListener::processUnbufferedKeyInput(const FrameEvent& evt)
 	// display appropriate scenes
 	if(mKeyboard->isKeyDown(OIS::KC_1))
 	{
-		mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
-		mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
-		mSceneMgr->getSceneNode("plane_node")->setVisible(false);
 		if (mSceneMgr->hasSceneNode("world_scene"))
+		{
+			mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
+			mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
+			mSceneMgr->getSceneNode("plane_node")->setVisible(false);			
 			mSceneMgr->getSceneNode("world_scene")->setVisible(true);
+		}
 	}
 	if(mKeyboard->isKeyDown(OIS::KC_2))
 	{
@@ -151,16 +153,6 @@ bool OgreFrameListener::processUnbufferedKeyInput(const FrameEvent& evt)
 		if (mSceneMgr->hasSceneNode("world_scene"))
 			mSceneMgr->getSceneNode("world_scene")->setVisible(false);
 	}
-	if(mKeyboard->isKeyDown(OIS::KC_5))
-	{
-		mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
-		mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
-		mSceneMgr->getSceneNode("plane_node")->setVisible(false);
-		if (mSceneMgr->hasSceneNode("world_scene"))
-			mSceneMgr->getSceneNode("world_scene")->setVisible(true);
-	}
-
-
 
 	if ( mKeyboard->isKeyDown( OIS::KC_J ) )
 	{
