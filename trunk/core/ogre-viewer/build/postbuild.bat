@@ -60,6 +60,7 @@ copy /Y %OGRE_HOME%\media\models\cube.mesh    ..\media\models
 copy /Y %OGRE_HOME%\media\models\sphere.mesh  ..\media\models
 
 copy /Y %OGRE_BIN%\resources.cfg  %BIN_DIR%
+copy /Y ..\src\config.ini %BIN_DIR%
 
 xcopy /Y /Q /E /I /D %BIN_DIR% %FINAL_BIN_DIR%
 xcopy /Y /Q /E /I /D ..\media %FINAL_MEDIA_DIR%
@@ -115,6 +116,7 @@ copy /Y %OGRE_HOME%\media\models\cube.mesh    ..\media\models
 copy /Y %OGRE_HOME%\media\models\sphere.mesh  ..\media\models
 
 copy /Y %OGRE_BIN%\resources_d.cfg  %BIN_DIR%\resources.cfg
+copy /Y ..\src\config.ini %BIN_DIR%
 
 xcopy /Y /Q /E /I /D %BIN_DIR% %FINAL_BIN_DIR%
 xcopy /Y /Q /E /I /D ..\media %FINAL_MEDIA_DIR%
