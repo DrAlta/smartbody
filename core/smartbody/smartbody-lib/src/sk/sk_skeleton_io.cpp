@@ -125,7 +125,7 @@ static bool read_channel ( SrInput& in, SkJoint* j )
 	SrString s = in.last_token();
 	in.unget_token();
 	if ( s=="axis" )
-	{ SrQuat q; in>>q; j->quat()->value(q);
+	{ SrQuat q; in>>q; j->quat()->prerot(q);
 	in.get_token();
 	if ( in.last_token()=="frozen" )
 		j->quat()->deactivate();

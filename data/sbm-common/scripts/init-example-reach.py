@@ -1,4 +1,4 @@
-def reachSetup(characterName, preFix):
+def reachSetup(characterName, interpolatorType, preFix):
 	print "Setting up reach database for " + characterName
 	rightHandMotions = StringVec();
 	rightHandMotions.append(preFix+"ChrHarmony_Relax001_ArmReachRtHigh")
@@ -70,6 +70,7 @@ def reachSetup(characterName, preFix):
 	skeleton = character.getSkeleton()
 	reachManager = scene.getReachManager()
 	reach = reachManager.createReach(characterName)	
+	reach.setInterpolatorType(interpolatorType)
 	for i in range(0,len(rightHandMotions)):
 		mirrorMotion1 = scene.getMotion(rightHandMotions[i])
 		mirrorMotion1.mirror(leftHandMotions[i], skeleton.getName())
