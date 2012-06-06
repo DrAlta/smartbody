@@ -7,11 +7,13 @@ namespace SmartBody {
 SBReach::SBReach()
 {
 	_character = NULL;
+	interpolatorType = "KNN";
 }
 
 SBReach::SBReach(SBCharacter* character)
 {
 	_character = character;
+	interpolatorType = "KNN";
 }
 
 SBReach::~SBReach()
@@ -107,7 +109,7 @@ void SBReach::build(SBCharacter* character)
 		MeCtReachEngine* re = mi->second;
 		if (re)
 		{
-			re->updateMotionExamples(_character->getReachMotionDataSet());
+			re->updateMotionExamples(_character->getReachMotionDataSet(), interpolatorType);
 		}
 	}
 }
@@ -193,4 +195,8 @@ SBMotion* SBReach::getReachHandMotion(std::string type)
 	return sbMotion;
 }
 
+void SBReach::setInterpolatorType( std::string type )
+{
+	interpolatorType = type;
+}
 }

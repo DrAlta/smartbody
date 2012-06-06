@@ -8,6 +8,7 @@
 #include "MeCtReachEngine.h"
 #include "sbm/mcontrol_util.h"
 #include "controllers/me_ct_barycentric_interpolation.h"
+#include "controllers/me_ct_inverse_interpolation.h"
 #include "sbm/Event.h"
 #include "MeCtBodyReachState.h"
 
@@ -187,7 +188,7 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 	curReachState = getState("Idle");
 }
 
-void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
+void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet, std::string interpolatorType )
 {
 	if (inMotionSet.size() == 0)
 		return;
@@ -257,7 +258,7 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 	if (dataInterpolator)
 		delete dataInterpolator;
 
-	dataInterpolator = createInterpolator();
+	dataInterpolator = createInterpolator(interpolatorType);
 	dataInterpolator->init(&motionExamples);
 	dataInterpolator->buildInterpolator();		
 
@@ -418,13 +419,23 @@ SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 	return rootJoint;
 }
 
-DataInterpolator* MeCtReachEngine::createInterpolator()
+DataInterpolator* MeCtReachEngine::createInterpolator(std::string interpolatorType)
 {
-	KNNInterpolator* interpolator = new KNNInterpolator(5000,ikReachRegion*1.f);
-	//RBFInterpolator* interpolator = new RBFInterpolator();
-	resampleData = &interpolator->resampleData;		
-	// 	InverseInterpolation* interpolator = new InverseInterpolation();
-	// 	resampleData = NULL;
+	DataInterpolator* interpolator = NULL;
+	
+	if (interpolatorType == "KNN")
+	{
+
+		KNNInterpolator* knnInterpolator = new KNNInterpolator(5000,ikReachRegion*1.f);
+		resampleData = &knnInterpolator->resampleData;	
+		interpolator = knnInterpolator;
+	}
+	else if (interpolatorType == "Inverse")
+	{
+		interpolator = new InverseInterpolation();
+		resampleData = NULL;
+	}
+	//RBFInterpolator* interpolator = new RBFInterpolator();	 	
 	interpExampleData = interpolator->getInterpExamples();
 	return interpolator;
 }
@@ -486,7 +497,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 
 	ikMaxOffset = ikDefaultVelocity*3.f*dt;	
 	mcu.mark("Reach",0,"reachIK");
- 	if (1)//if (footIKFix)
+ 	if (footIKFix)
  	{
  		solveIK(reachData,ikMotionFrame);	
  	}

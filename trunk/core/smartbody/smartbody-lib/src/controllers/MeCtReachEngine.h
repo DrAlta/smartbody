@@ -44,7 +44,7 @@ protected:
 
 	// for motion interpolation
 	MotionParameter*      motionParameter;		
-	DataInterpolator*     dataInterpolator;
+	DataInterpolator*     dataInterpolator;	
 	ResampleMotion*       interpMotion; // pointer to motion interface for generating motion example
 
 	vector<InterpolationExample*>* interpExampleData;
@@ -99,14 +99,14 @@ public:
 	bool addHandConstraint(SkJoint* targetJoint, const char* effectorName);
 	void updateReach(float t, float dt, BodyMotionFrame& inputFrame, float blendWeight);
 	void init(int rtype, SkJoint* effectorJoint);
-	void updateMotionExamples(const MotionDataSet& inMotionSet);
+	void updateMotionExamples(const MotionDataSet& inMotionSet, std::string interpolatorType);
 	void solveIK(ReachStateData* rd, BodyMotionFrame& outFrame );
 	static int getReachType(const std::string& tag);
 protected:
 	void updateSkeletonCopy();
 	ReachStateInterface* getState(const std::string& stateName);
 	SkJoint* findRootJoint(SkSkeleton* sk);
-	DataInterpolator* createInterpolator();
+	DataInterpolator* createInterpolator(std::string interpolatorType);
 	ResampleMotion*   createInterpMotion();	
 	bool hasEffectorRotConstraint(ReachStateData* rd);
 };

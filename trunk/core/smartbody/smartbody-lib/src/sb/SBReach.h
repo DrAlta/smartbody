@@ -19,6 +19,7 @@ class SBReach
 		SBCharacter* getCharacter();
 		SBReach* copy();
 
+		void setInterpolatorType(std::string type);
 		void addMotion(std::string type, SBMotion* motion);
 		void removeMotion(std::string type, SBMotion* motion);
 		int getNumMotions();
@@ -36,6 +37,7 @@ class SBReach
 	protected:
 
 		SBCharacter* _character;
+		std::string interpolatorType;
 };
 
 }
