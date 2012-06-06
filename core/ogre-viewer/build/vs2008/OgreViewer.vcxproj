@@ -55,7 +55,7 @@
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\core\smartbody\smartbody-dll\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\OgreSDK\include\OGRE;..\..\..\..\lib\OgreSDK\include;..\..\..\..\lib\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -87,7 +87,7 @@
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\core\smartbody\smartbody-dll\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\OgreSDK\include\OGRE;..\..\..\..\lib\OgreSDK\include;..\..\..\..\lib\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -120,7 +120,7 @@
     <ClCompile Include="..\..\src\OgreFrameListener.cpp" />
     <ClCompile Include="..\..\src\OgreRenderer.cpp" />
     <ClCompile Include="..\..\src\SBListener.cpp" />
-	<ClCompile Include="..\..\src\ini.c" />
+    <ClCompile Include="..\..\src\ini.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\BoneBusHandler.h" />
@@ -129,7 +129,7 @@
     <ClInclude Include="..\..\src\OgreFrameListener.h" />
     <ClInclude Include="..\..\src\OgreRenderer.h" />
     <ClInclude Include="..\..\src\SBListener.h" />
-	<ClInclude Include="..\..\src\ini.h" />
+    <ClInclude Include="..\..\src\ini.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\lib\bonebus\bonebus.vcxproj">
