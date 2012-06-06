@@ -204,8 +204,8 @@ def retargetCharacter(charName, targetSkelName):
 	retargetSetup(targetSkelName) # make sure all retargeted motions are already created
 	
 	# setup standard locomotion
-	#scene.run("stateAllLocomotion.py")
-	#locomotionSetup(targetSkelName, "base", targetSkelName, targetSkelName)
+	scene.run("stateAllLocomotion.py")
+	locomotionSetup(targetSkelName, "base", targetSkelName, targetSkelName)
 	
 	# setup marine locomotion
 	#scene.run("stateMarineLocomotion.py")
