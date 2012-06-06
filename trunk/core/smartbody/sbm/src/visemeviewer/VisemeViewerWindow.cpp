@@ -53,7 +53,7 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	menuBar->add("&File/Save", 0, OnSaveCB, this, NULL);
 	//menuBar->callback(OnMenuSelectCB, this);
 
-	_curveEditor = new VisemeCurveEditor(165, 85, 390, 350, "Animation Curve");
+	_curveEditor = new VisemeCurveEditor(160, 80, 395, 355, "Animation Curve");
 	_curveEditor->setVisemeWindow(this);
 	_curveEditor->color(FL_GRAY0, FL_GRAY0);
 
@@ -61,8 +61,9 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_browserViseme->align(FL_ALIGN_TOP);
 	_browserViseme->callback(OnVisemeSelectCB, this);
 
-	_browserDiphone = new Fl_Browser(650, 80, 70, 350, "Diphones");
-	_browserDiphone->align(FL_ALIGN_TOP);
+	_browserDiphone = new Fl_Hold_Browser(650, 80, 70, 350, "Diphones");
+	_browserDiphone->align(FL_ALIGN_TOP); 
+	_browserDiphone->callback(OnDiphoneSelectCB, this);
 
 	this->end();
 
@@ -110,40 +111,46 @@ bool  VisemeViewerWindow::loadData()
 {
 	for (int x = 0; x < 2; x++)
 	{
+		_browserPhoneme[x]->add("Aa");   /// Viseme for aa
+		_browserPhoneme[x]->add("Ah");   /// Viseme for aa, ae, ah
 		_browserPhoneme[x]->add("Ao");
+		_browserPhoneme[x]->add("Aw");   /// aw
+		_browserPhoneme[x]->add("Ay");  /// ay
+		_browserPhoneme[x]->add("BMP");
 		_browserPhoneme[x]->add("D");
 		_browserPhoneme[x]->add("EE");
+		_browserPhoneme[x]->add("Eh");   /// ey, eh, uh
 		_browserPhoneme[x]->add("Er");
 		_browserPhoneme[x]->add("f");
+		_browserPhoneme[x]->add("H");  /// h
+		_browserPhoneme[x]->add("Ih");   /// y, iy, ih, ix
 		_browserPhoneme[x]->add("j");
 		_browserPhoneme[x]->add("kg");
 		_browserPhoneme[x]->add("Ih");
+		_browserPhoneme[x]->add("L");   /// l
 		_browserPhoneme[x]->add("ng");
 		_browserPhoneme[x]->add("Oh");
 		_browserPhoneme[x]->add("OO");
+		_browserPhoneme[x]->add("Ow");   /// ow
+		_browserPhoneme[x]->add("Oy");  /// oy
 		_browserPhoneme[x]->add("R");
-		_browserPhoneme[x]->add("th");
+		_browserPhoneme[x]->add("Sh");   /// sh, ch, jh, zh
+		_browserPhoneme[x]->add("Th");
+		_browserPhoneme[x]->add("W");
 		_browserPhoneme[x]->add("Z");
-		_browserPhoneme[x]->add("BMP");
+		_browserPhoneme[x]->add("_");	/// silence
 	}
-
-	/*
-	_browserViseme->add("FV");
-	_browserViseme->add("open");
-	_browserViseme->add("PBM");
-	_browserViseme->add("ShCh");
-	_browserViseme->add("tBack");
-	_browserViseme->add("tRoof");
-	_browserViseme->add("tTeeth");
-	_browserViseme->add("wide");
-	*/
 
 	const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (size_t i = 0; i < characterNames.size(); i++)
 	{
 		_choiceCharacter->add(characterNames[i].c_str());
 	}
-
+	if (characterNames.size() > 0)
+	{
+		_choiceCharacter->value(0);
+		OnCharacterSelectCB(this->_choiceCharacter, this);
+	}
 	initializeVisemes();
 	
 	return true;
@@ -413,7 +420,6 @@ void VisemeViewerWindow::selectPhonemes(const char * viseme)
 	*/
 }
 
-
 void VisemeViewerWindow::OnSliderSelectCB(Fl_Widget* widget, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
@@ -585,4 +591,40 @@ void VisemeViewerWindow::OnBmlRequestCB(BML::BmlRequest* request, void* data)
 			}
 		}
 	}
+}
+
+void VisemeViewerWindow::OnDiphoneSelectCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	std::string str = viewer->_browserDiphone->text(viewer->_browserDiphone->value());
+	std::vector<string> diphones;
+	std::stringstream ss(str);
+
+	string tok;
+
+	while (ss >> tok)
+	{
+		if (tok == "-")
+			continue;
+        
+		diphones.push_back(tok);
+	}
+	
+	viewer->_browserPhoneme[0]->deselect();
+	viewer->_browserPhoneme[1]->deselect();
+
+	for(int i =0; i < 2; i++){
+		for(int j = 1; j <= viewer->_browserPhoneme[0]->size(); j++){
+			std::string diphone = viewer->_browserPhoneme[i]->text(j);
+			
+			if(diphone == diphones[i])
+			{
+				viewer->_browserPhoneme[i]->select(j);
+				break;
+			}
+		}
+	}
+
+	OnPhoneme1SelectCB(widget, data);
 }

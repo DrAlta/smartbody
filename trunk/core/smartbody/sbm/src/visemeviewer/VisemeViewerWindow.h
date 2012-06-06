@@ -23,6 +23,7 @@
 
 
 class VisemeCurveEditor;
+
 class VisemeViewerWindow : public Fl_Double_Window{
 public:
 	VisemeViewerWindow(int x, int y, int w, int h, char* name);
@@ -40,7 +41,7 @@ protected:
 	Fl_Choice * _choiceCharacter;
 	Fl_Hold_Browser *_browserPhoneme[2];
 	Fl_Multi_Browser *_browserViseme;
-	Fl_Browser* _browserDiphone;
+	Fl_Hold_Browser* _browserDiphone;
 	Fl_Value_Slider *_sliderCurveAnimation;
 	Fl_Button *_buttonPlay;
 	Fl_Check_Button* _checkEnableScrub;
@@ -63,6 +64,7 @@ protected:
 	std::string getCurrentCharacterName();
 	SBDiphone* getCurrentDiphone();
 
+	static void OnDiphoneSelectCB(Fl_Widget* widget, void* data);
 	static void OnCharacterSelectCB(Fl_Widget* widget, void* data);
 	static void OnPhoneme1SelectCB(Fl_Widget* widget, void* data);
 	static void OnPhoneme2SelectCB(Fl_Widget* widget, void* data);

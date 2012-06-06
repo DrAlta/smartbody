@@ -29,6 +29,8 @@ class VisemeCurveEditor : public Fl_Widget
 		SrVec mapDrawData(SrVec& origData);
 		std::vector<VisemeCurve>& getCurves();
 
+		float getMinimumDist(SrVec& pt, SrVec& a, SrVec& b, SrVec& minimumPt);
+
 	protected:
 		std::vector<VisemeCurve> _curves;
 		
@@ -39,13 +41,19 @@ class VisemeCurveEditor : public Fl_Widget
 		
 		int _gridSizeX;
 		int _gridSizeY;
+		int _gridPosX;
+		int _gridPosY;
+		int _gridWidth;
+		int _gridHeight;
 
 		bool _pointIsSelected;
 		bool _lineIsSelected;
 
 		bool isPointSelected(int mousex, int mousey);
+		bool isLineSelected(int mousex, int mousey);
 		int getInsertionIndex(int mousex, int mousey);
 
+		void drawAxes();
 		void drawPoints();
 		void drawCurve();
 		void drawGrid();
