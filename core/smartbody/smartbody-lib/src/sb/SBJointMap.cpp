@@ -150,7 +150,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 	base (Hips)
 	- spine1 <- (Spine)
 	-- spine2 <- (Spine1)
-	--- spine3 <- (Spine3, chest equivalent)
+	--- spine3 <- (Spine2, chest equivalent)
 	----- spine4 <- (Neck)
 	------- skullbase <- (Head)
 	- l_acromioclavicular <- (LeftShoulder)
@@ -177,18 +177,18 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 	SkJoint *base = 0;
 	SkJoint *spine1 = 0;
 	SkJoint *spine2 = 0;
-	SkJoint *spine3_chest = 0; // SB: spine3
-	SkJoint *spine4_neck = 0; // SB: spine4
-	SkJoint *skullbase_head = 0;
-	SkJoint *l_AC_shoulder=0,	*r_AC_shoulder=0; // SB: l/r_acromioclavicular
-	SkJoint *l_shoulder_arm=0,	*r_shoulder_arm=0; // SB: l/r_shoulder
-	SkJoint *l_elbow=0,			*r_elbow=0;
-	SkJoint *l_forearm_roll=0,	*r_forearm_roll=0; // SB: l/r_forearm
-	SkJoint *l_wrist=0,			*r_wrist=0;
-	SkJoint *l_hip_upleg=0,		*r_hip_upleg=0; // SB: l/r_hip
-	SkJoint *l_knee=0,			*r_knee=0;
-	SkJoint *l_ankle=0,			*r_ankle=0;
-	SkJoint *l_forefoot_toe=0,	*r_forefoot_toe=0; // SB: l/r_forefoot
+	SkJoint *spine3 = 0; // chest
+	SkJoint *spine4 = 0; // neck
+	SkJoint *skullbase = 0; // head
+	SkJoint *l_acromioclavicular=0,	*r_acromioclavicular=0; // shoulder
+	SkJoint *l_shoulder=0,	*r_shoulder=0; // uparm
+	SkJoint *l_elbow=0,		*r_elbow=0;
+	SkJoint *l_forearm=0,	*r_forearm=0; // forearm twist/roll
+	SkJoint *l_wrist=0,		*r_wrist=0;
+	SkJoint *l_hip=0,		*r_hip=0; // upleg
+	SkJoint *l_knee=0,		*r_knee=0;
+	SkJoint *l_ankle=0,		*r_ankle=0;
+	SkJoint *l_forefoot=0,	*r_forefoot=0; // toe
 
 	SkJoint *l_thumb1=0,*l_thumb2=0, *l_thumb3=0, *l_thumb4=0;
 	SkJoint *l_index1=0, *l_index2=0, *l_index3=0, *l_index4=0;
@@ -250,11 +250,11 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			return false;
 		}
 		// guess left/right upleg from the names
-		guessLeftRightFromJntNames(ja, jb, l_hip_upleg, r_hip_upleg);
+		guessLeftRightFromJntNames(ja, jb, l_hip, r_hip);
 
 		setJointMap("spine1", spine1);
-		setJointMap("l_hip_upleg", l_hip_upleg);
-		setJointMap("r_hip_upleg", r_hip_upleg);
+		setJointMap("l_hip", l_hip);
+		setJointMap("r_hip", r_hip);
 	}
 	else if(base->num_children()==3)
 	{
@@ -293,11 +293,11 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			return false;
 		}
 		// guess left/right upleg from the names
-		guessLeftRightFromJntNames(ja, jb, l_hip_upleg, r_hip_upleg);
+		guessLeftRightFromJntNames(ja, jb, l_hip, r_hip);
 		
 		setJointMap("spine1", spine1);
-		setJointMap("l_hip_upleg", l_hip_upleg);
-		setJointMap("r_hip_upleg", r_hip_upleg);
+		setJointMap("l_hip", l_hip);
+		setJointMap("r_hip", r_hip);
 	}
 	else if(base->num_children() > 3)
 	{
@@ -307,61 +307,61 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 	}
 
 	//-------------------------------------------------------------------------
-	// CONTINUE with spine1, try finding spine3_chest, spine4_neck, l/r_AC_shoulder
+	// CONTINUE with spine1, try finding spine3, spine4, l/r_acromioclavicular
 	for(unsigned int i=getJointIndex(spine1); i<jnts.size(); i++)
 	{
 		SkJoint* j = jnts[i];
 		if(j->num_children()>=2)
 		{
-			spine3_chest = j;
+			spine3 = j;
 			break;
 		}
 	}
-	if(!spine3_chest)
+	if(!spine3)
 	{
-		LOG("guessMap: spine3_chest joint NOT found, aborting...\n");
+		LOG("guessMap: spine3 joint NOT found, aborting...\n");
 		return false;
 	}
-	setJointMap("spine3_chest", spine3_chest);
+	setJointMap("spine3", spine3);
 
-	if(spine3_chest->num_children() == 2)
+	if(spine3->num_children() == 2)
 	{
-		LOG("guessMap: spine3_chest has 2 children, NOT tested.\n");
-		SkJoint* j1 = spine3_chest->child(0);
-		SkJoint* j2 = spine3_chest->child(1);
+		LOG("guessMap: spine3 has 2 children, NOT tested.\n");
+		SkJoint* j1 = spine3->child(0);
+		SkJoint* j2 = spine3->child(1);
 		SkJoint* ja;
 		SkJoint* jb;
 		if(j1->num_children()==2 && j2->num_children()==2)
 		{
-			LOG("guessMap: TODO: spine3_chest has 2 children, each has 2 children of their own.\n");
+			LOG("guessMap: TODO: spine3 has 2 children, each has 2 children of their own.\n");
 			return false;
 		}
 		else if(j1->num_children()==2) // j1 is parent of 2 shoulders
 		{
-			ja = j1->child(0); jb = j1->child(1); spine4_neck = j2;
+			ja = j1->child(0); jb = j1->child(1); spine4 = j2;
 		}
 		else if(j2->num_children()==2) // j2 is parent of 2 shoulders
 		{
-			ja = j2->child(0); jb = j2->child(1); spine4_neck = j1;
+			ja = j2->child(0); jb = j2->child(1); spine4 = j1;
 		}
 		else
 		{
-			LOG("guessMap: TODO: spine3_chest has 2 children.\n");
+			LOG("guessMap: TODO: spine3 has 2 children.\n");
 			return false;
 		}
 		// guess left/right shoulder from the names
-		guessLeftRightFromJntNames(ja, jb, l_AC_shoulder, r_AC_shoulder);
+		guessLeftRightFromJntNames(ja, jb, l_acromioclavicular, r_acromioclavicular);
 
-		setJointMap("spine4_neck", spine4_neck);
-		setJointMap("l_AC_shoulder", l_AC_shoulder);
-		setJointMap("r_AC_shoulder", r_AC_shoulder);
+		setJointMap("spine4", spine4);
+		setJointMap("l_acromioclavicular", l_acromioclavicular);
+		setJointMap("r_acromioclavicular", r_acromioclavicular);
 	}
-	else if(spine3_chest->num_children() == 3)
+	else if(spine3->num_children() == 3)
 	{
-		//mDBGTXT("spine3_chest has 3 children.");
-		SkJoint* j1 = spine3_chest->child(0);
-		SkJoint* j2 = spine3_chest->child(1);
-		SkJoint* j3 = spine3_chest->child(2);
+		//mDBGTXT("spine3 has 3 children.");
+		SkJoint* j1 = spine3->child(0);
+		SkJoint* j2 = spine3->child(1);
+		SkJoint* j3 = spine3->child(2);
 		SkJoint* ja;
 		SkJoint* jb;
 		if(countChildren(j1)==countChildren(j2) && countChildren(j1)==countChildren(j3))
@@ -373,17 +373,17 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		else if(countChildren(j1)==countChildren(j2))
 		{
 			// j1, j2 are upleg joints
-			ja = j1; jb = j2; spine4_neck = j3;
+			ja = j1; jb = j2; spine4 = j3;
 		}
 		else if(countChildren(j1)==countChildren(j3))
 		{
 			// j1, j3 are upleg joints
-			ja = j1; jb = j3; spine4_neck = j2;
+			ja = j1; jb = j3; spine4 = j2;
 		}
 		else if(countChildren(j2)==countChildren(j3))
 		{
 			// j2, j3 are upleg joints
-			ja = j2; jb = j3; spine4_neck = j1;
+			ja = j2; jb = j3; spine4 = j1;
 		}
 		else
 		{
@@ -392,47 +392,47 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			return false;
 		}
 		// guess left/right shoulder from the names
-		guessLeftRightFromJntNames(ja, jb, l_AC_shoulder, r_AC_shoulder);
+		guessLeftRightFromJntNames(ja, jb, l_acromioclavicular, r_acromioclavicular);
 
-		setJointMap("spine4_neck", spine4_neck);
-		setJointMap("l_AC_shoulder", l_AC_shoulder);
-		setJointMap("r_AC_shoulder", r_AC_shoulder);
+		setJointMap("spine4", spine4);
+		setJointMap("l_acromioclavicular", l_acromioclavicular);
+		setJointMap("r_acromioclavicular", r_acromioclavicular);
 	}
-	else if(spine3_chest->num_children() > 3)
+	else if(spine3->num_children() > 3)
 	{
 		// probably not a humanoid, should never happen
-		LOG("guessMap: spine3_chest has 4 or more children, probably not humanoid.\n");
+		LOG("guessMap: spine3 has 4 or more children, probably not humanoid.\n");
 		return false;
 	}
 
 
 	//-------------------------------------------------------------------------
-	// CONTINUE with spine4_neck, try finding skullbase_head
-	if(spine4_neck && spine4_neck->num_children()>0)
+	// CONTINUE with spine4, try finding skullbase
+	if(spine4 && spine4->num_children()>0)
 	{
 		std::vector<SkJoint*> j_list;
-		listChildrenJoints(spine4_neck, j_list);
+		listChildrenJoints(spine4, j_list);
 		for(unsigned int i=0; i<j_list.size(); i++)
 		{
 			SkJoint* j = j_list[i];
 			SrString jname(j->name().c_str());
 			if(jname.search("head")>=0) // FIXME: try search keyword "head"
 			{
-				skullbase_head = j;
+				skullbase = j;
 				break;
 			}
 		}
-		if(skullbase_head==0)
+		if(skullbase==0)
 		{
-			skullbase_head = getDeepestLevelJoint(j_list);
-			if(skullbase_head)
+			skullbase = getDeepestLevelJoint(j_list);
+			if(skullbase)
 			{
 				// try to avoid Head_End
-				if(getJointHierarchyLevel(skullbase_head->parent()) > getJointHierarchyLevel(spine4_neck))
-					skullbase_head = skullbase_head->parent();
+				if(getJointHierarchyLevel(skullbase->parent()) > getJointHierarchyLevel(spine4))
+					skullbase = skullbase->parent();
 			}
 		}
-		setJointMap("skullbase_head", skullbase_head);
+		setJointMap("skullbase", skullbase);
 
 		// TODO: for those with facial bones, maybe check global position ?
 	}
@@ -444,7 +444,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		SkJoint* j2 = 0;
 		SkJoint* ja = 0;
 		SkJoint* jb = 0;
-		for(unsigned int i=getJointIndex(l_AC_shoulder), j=getJointIndex(r_AC_shoulder); i<jnts.size()&&j<jnts.size(); i++,j++)
+		for(unsigned int i=getJointIndex(l_acromioclavicular), j=getJointIndex(r_acromioclavicular); i<jnts.size()&&j<jnts.size(); i++,j++)
 		{
 			j1 = jnts[i];
 			j2 = jnts[j];
@@ -464,7 +464,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		{
 			// try finding the deepest joint as Hand_End
 			std::vector<SkJoint*> j_list1, j_list2;
-			listChildrenJoints(l_AC_shoulder, j_list1); listChildrenJoints(r_AC_shoulder, j_list2);
+			listChildrenJoints(l_acromioclavicular, j_list1); listChildrenJoints(r_acromioclavicular, j_list2);
 			j1 = getDeepestLevelJoint(j_list1); j2 = getDeepestLevelJoint(j_list2);
 			if(j1 && j2)
 			{
@@ -490,69 +490,69 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 	}
 
 	//-------------------------------------------------------------------------
-	// CONTINUE to find l/r_elbow using l/r_AC_shoulder and l/r_wrist
+	// CONTINUE to find l/r_elbow using l/r_acromioclavicular and l/r_wrist
 	{
-		if(!(l_wrist&&l_AC_shoulder))
+		if(!(l_wrist&&l_acromioclavicular))
 		{
-			LOG("guessMap: l_wrist or l_AC_shoulder NOT found, abort finding l_elbow...\n");
+			LOG("guessMap: l_wrist or l_acromioclavicular NOT found, abort finding l_elbow...\n");
 			return false;
 		}
 		if(l_wrist->num_children()==5) // this must be hand joint
 		{
-			if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_AC_shoulder) == 2)
+			if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_acromioclavicular) == 2)
 			{
 				l_elbow = l_wrist->parent();
 				r_elbow = r_wrist->parent();
 				setJointMap("l_elbow", l_elbow);
 				setJointMap("r_elbow", r_elbow);
-				l_shoulder_arm = l_AC_shoulder; // use upperArm to replace AC_shoulder
-				r_shoulder_arm = r_AC_shoulder;
-				LOG("guessMap: Use l/r_shoulder_arm to replace l/r_AC_shoulder.\n");
-				setJointMap("l_shoulder_arm", l_shoulder_arm);
-				setJointMap("r_shoulder_arm", r_shoulder_arm);
+				l_shoulder = l_acromioclavicular; // use upperArm to replace AC_shoulder
+				r_shoulder = r_acromioclavicular;
+				LOG("guessMap: Use l/r_shoulder to replace l/r_acromioclavicular.\n");
+				setJointMap("l_shoulder", l_shoulder);
+				setJointMap("r_shoulder", r_shoulder);
 			}
-			else if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_AC_shoulder) == 3)
+			else if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_acromioclavicular) == 3)
 			{
-				if(l_AC_shoulder->num_children()==1 && (l_AC_shoulder->child(0)->num_children()==1||l_AC_shoulder->child(0)->num_children()==2))
+				if(l_acromioclavicular->num_children()==1 && (l_acromioclavicular->child(0)->num_children()==1||l_acromioclavicular->child(0)->num_children()==2))
 				{
-					l_shoulder_arm = l_AC_shoulder->child(0); // most likely the upperArm joint
-					r_shoulder_arm = r_AC_shoulder->child(0);
-					setJointMap("l_shoulder_arm", l_shoulder_arm);
-					setJointMap("r_shoulder_arm", r_shoulder_arm);
+					l_shoulder = l_acromioclavicular->child(0); // most likely the upperArm joint
+					r_shoulder = r_acromioclavicular->child(0);
+					setJointMap("l_shoulder", l_shoulder);
+					setJointMap("r_shoulder", r_shoulder);
 					l_elbow = l_wrist->parent();
 					r_elbow = r_wrist->parent();
 					setJointMap("l_elbow", l_elbow);
 					setJointMap("r_elbow", r_elbow);
-					if(l_shoulder_arm->num_children()==2)
+					if(l_shoulder->num_children()==2)
 						LOG("guessMap: Might have an upperArm twist/roll joint.\n");
 				}
-				else if(l_AC_shoulder->num_children()==2) // should be upperArm, with elbow and 1 twist children joints
+				else if(l_acromioclavicular->num_children()==2) // should be upperArm, with elbow and 1 twist children joints
 				{
-					l_shoulder_arm = l_AC_shoulder; // should be upperArm joint
-					r_shoulder_arm = r_AC_shoulder;
-					setJointMap("l_shoulder_arm", l_shoulder_arm);
-					setJointMap("r_shoulder_arm", r_shoulder_arm);
-					l_AC_shoulder = 0; r_AC_shoulder = 0; // don't use AC_shoulder anymore
+					l_shoulder = l_acromioclavicular; // should be upperArm joint
+					r_shoulder = r_acromioclavicular;
+					setJointMap("l_shoulder", l_shoulder);
+					setJointMap("r_shoulder", r_shoulder);
+					l_acromioclavicular = 0; r_acromioclavicular = 0; // don't use AC_shoulder anymore
 
 					LOG("guessMap: Might have two arm twist/roll joints.\n");
 				}
 			}
-			else if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_AC_shoulder) == 4)
+			else if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_acromioclavicular) == 4)
 			{ /* Could be shoulder -> uparm -> elbow -> forarmTwist -> wrist
 				 Or       shoulder -> uparm -> uparmTwist -> elbow -> wrist */
-				l_shoulder_arm = l_AC_shoulder->child(0);
-				r_shoulder_arm = r_AC_shoulder->child(0);
-				setJointMap("l_shoulder_arm", l_shoulder_arm);
-				setJointMap("r_shoulder_arm", r_shoulder_arm);
+				l_shoulder = l_acromioclavicular->child(0);
+				r_shoulder = r_acromioclavicular->child(0);
+				setJointMap("l_shoulder", l_shoulder);
+				setJointMap("r_shoulder", r_shoulder);
 				SkJoint* ja = l_wrist->parent();
 				SkJoint* jb = r_wrist->parent();
 				SrString jname(ja->name().c_str());
 				if(jname.search("twist")>=0 || jname.search("roll")>=0)
 				{
-					l_forearm_roll = ja;
-					r_forearm_roll = jb;
-					setJointMap("l_forearm_roll", l_forearm_roll);
-					setJointMap("r_forearm_roll", r_forearm_roll);
+					l_forearm = ja;
+					r_forearm = jb;
+					setJointMap("l_forearm", l_forearm);
+					setJointMap("r_forearm", r_forearm);
 					l_elbow = ja->parent();
 					r_elbow = jb->parent();
 				}
@@ -564,34 +564,34 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 				setJointMap("l_elbow", l_elbow);
 				setJointMap("r_elbow", r_elbow);
 			}
-			else if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_AC_shoulder) == 5)
+			else if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_acromioclavicular) == 5)
 			{ // Might be shoulder -> uparm -> uparmTwist -> elbow -> forearmTwist -> wrist 
-				l_shoulder_arm = l_AC_shoulder->child(0);
-				r_shoulder_arm = r_AC_shoulder->child(0);
-				setJointMap("l_shoulder_arm", l_shoulder_arm);
-				setJointMap("r_shoulder_arm", r_shoulder_arm);
-				l_forearm_roll = l_wrist->parent();
-				r_forearm_roll = r_wrist->parent();
-				setJointMap("l_forearm_roll", l_forearm_roll);
-				setJointMap("r_forearm_roll", r_forearm_roll);
-				l_elbow = l_forearm_roll->parent();
-				r_elbow = r_forearm_roll->parent();
+				l_shoulder = l_acromioclavicular->child(0);
+				r_shoulder = r_acromioclavicular->child(0);
+				setJointMap("l_shoulder", l_shoulder);
+				setJointMap("r_shoulder", r_shoulder);
+				l_forearm = l_wrist->parent();
+				r_forearm = r_wrist->parent();
+				setJointMap("l_forearm", l_forearm);
+				setJointMap("r_forearm", r_forearm);
+				l_elbow = l_forearm->parent();
+				r_elbow = r_forearm->parent();
 				setJointMap("l_elbow", l_elbow);
 				setJointMap("r_elbow", r_elbow);
 			}
 		}
 		else // using guessed hand joint with less than 5 fingers
 		{
-			if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_AC_shoulder) == 2)
+			if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_acromioclavicular) == 2)
 			{
 				l_elbow = l_wrist->parent();
 				r_elbow = r_wrist->parent();
 				setJointMap("l_elbow", l_elbow);
 				setJointMap("r_elbow", r_elbow);
-				l_shoulder_arm = l_AC_shoulder; // make upperArm the same as AC_shoulder
-				r_shoulder_arm = r_AC_shoulder;
-				setJointMap("l_shoulder_arm", l_shoulder_arm);
-				setJointMap("r_shoulder_arm", r_shoulder_arm);
+				l_shoulder = l_acromioclavicular; // make upperArm the same as AC_shoulder
+				r_shoulder = r_acromioclavicular;
+				setJointMap("l_shoulder", l_shoulder);
+				setJointMap("r_shoulder", r_shoulder);
 			}
 			else
 			{
@@ -611,7 +611,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		SkJoint* j2 = 0;
 		SkJoint* ja = 0;
 		SkJoint* jb = 0;
-		for(unsigned int i=getJointIndex(l_hip_upleg), j=getJointIndex(r_hip_upleg); i<jnts.size()&&j<jnts.size(); i++,j++)
+		for(unsigned int i=getJointIndex(l_hip), j=getJointIndex(r_hip); i<jnts.size()&&j<jnts.size(); i++,j++)
 		{
 			j1 = jnts[i];
 			j2 = jnts[j];
@@ -632,7 +632,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		else if(!ja || !jb) // no heel
 		{
 			// first try search "ankle" or "foot"
-			for(unsigned int i=getJointIndex(l_hip_upleg), j=getJointIndex(r_hip_upleg); i<jnts.size()&&j<jnts.size(); i++,j++)
+			for(unsigned int i=getJointIndex(l_hip), j=getJointIndex(r_hip); i<jnts.size()&&j<jnts.size(); i++,j++)
 			{
 				j1 = jnts[i];
 				j2 = jnts[j];
@@ -662,27 +662,27 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			{
 				//gsout << "  Toe_End joints: " << j1->name() <<gspc<< j2->name() << gsnl;
 				if(getJointHierarchyLevel(j1)-getJointHierarchyLevel(l_ankle)>2)
-					guessLeftRightFromJntNames(j1->parent(), j2->parent(), l_forefoot_toe, r_forefoot_toe);
+					guessLeftRightFromJntNames(j1->parent(), j2->parent(), l_forefoot, r_forefoot);
 				else
-					guessLeftRightFromJntNames(j1, j2, l_forefoot_toe, r_forefoot_toe);
-				setJointMap("l_forefoot_toe", l_forefoot_toe);
-				setJointMap("r_forefoot_toe", r_forefoot_toe);
+					guessLeftRightFromJntNames(j1, j2, l_forefoot, r_forefoot);
+				setJointMap("l_forefoot", l_forefoot);
+				setJointMap("r_forefoot", r_forefoot);
 			}
 		}
 		else // l/r_ankle not found, try make deepest joint as toe then make its parent as ankle
 		{	
 			std::vector<SkJoint*> j_list1, j_list2;
-			listChildrenJoints(l_hip_upleg, j_list1); listChildrenJoints(r_hip_upleg, j_list2);
+			listChildrenJoints(l_hip, j_list1); listChildrenJoints(r_hip, j_list2);
 			j1 = getDeepestLevelJoint(j_list1); j2 = getDeepestLevelJoint(j_list2);
 			if(j1 && j2)
 			{
 				//gsout << "  Toe_End joints: " << j1->name() <<gspc<< j2->name() << gsnl;
-				if(getJointHierarchyLevel(j1)-getJointHierarchyLevel(l_hip_upleg)>3)
-					guessLeftRightFromJntNames(j1->parent(), j2->parent(), l_forefoot_toe, r_forefoot_toe);
+				if(getJointHierarchyLevel(j1)-getJointHierarchyLevel(l_hip)>3)
+					guessLeftRightFromJntNames(j1->parent(), j2->parent(), l_forefoot, r_forefoot);
 				else
-					guessLeftRightFromJntNames(j1, j2, l_forefoot_toe, r_forefoot_toe);
-				setJointMap("l_forefoot_toe", l_forefoot_toe);
-				setJointMap("r_forefoot_toe", r_forefoot_toe);
+					guessLeftRightFromJntNames(j1, j2, l_forefoot, r_forefoot);
+				setJointMap("l_forefoot", l_forefoot);
+				setJointMap("r_forefoot", r_forefoot);
 
 				// try finding foot(ankle) joints
 				ja = j1->parent()->parent();
@@ -704,22 +704,22 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 	}
 
 	//-------------------------------------------------------------------------
-	// CONTINUE to find l/r_knee using l/r_hip_upleg and l/r_ankle
+	// CONTINUE to find l/r_knee using l/r_hip and l/r_ankle
 	{
-		if(!(l_ankle&&l_hip_upleg))
+		if(!(l_ankle&&l_hip))
 		{
-			LOG("guessMap: l_ankle or l_hip_upleg NOT found, abort finding l_knee...\n");
+			LOG("guessMap: l_ankle or l_hip NOT found, abort finding l_knee...\n");
 			return false;
 		}
 
-		if(getJointHierarchyLevel(l_ankle) - getJointHierarchyLevel(l_hip_upleg) == 2)
+		if(getJointHierarchyLevel(l_ankle) - getJointHierarchyLevel(l_hip) == 2)
 		{
 			l_knee = l_ankle->parent();
 			r_knee = r_ankle->parent();
 			setJointMap("l_knee", l_knee);
 			setJointMap("r_knee", r_knee);
 		}
-		if(getJointHierarchyLevel(l_ankle) - getJointHierarchyLevel(l_hip_upleg) == 4)
+		if(getJointHierarchyLevel(l_ankle) - getJointHierarchyLevel(l_hip) == 4)
 		{ // leg has two twist joints
 			l_knee = l_ankle->parent()->parent();
 			r_knee = r_ankle->parent()->parent();
