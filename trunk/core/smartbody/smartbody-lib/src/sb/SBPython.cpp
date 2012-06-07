@@ -1245,6 +1245,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getTarget", &SBJointMap::getTarget, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the target joint of the nth mapping.")
 		.def("applyMotion", &SBJointMap::applyMotion, "Applies the current joint mapping to a motion.")
 		.def("applySkeleton", &SBJointMap::applySkeleton, "Applies the current skeleton mapping to a motion.")
+		.def("guessMapping", &SBJointMap::guessMapping, "Automatic joint name matching to standard SmartBody names.")
 		;
 
 	boost::python::class_<SBJointMapManager>("SBJointMapManager")
