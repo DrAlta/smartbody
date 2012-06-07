@@ -10,7 +10,7 @@
 
 InverseInterpolation::InverseInterpolation()
 {
-	numKNN  = 5;
+	numKNN  = 13;
 }
 
 InverseInterpolation::~InverseInterpolation()
@@ -147,7 +147,7 @@ int InverseInterpolation::optimizeBlendWeight( const dVector& para, VecOfInterpW
 				total_iter ++;
 			}
 			else no_hit_counter++;
-			if(no_hit_counter > 5) goto terminate_iter;
+			if(no_hit_counter > 10) goto terminate_iter;
 		}
 		counter++;
 
