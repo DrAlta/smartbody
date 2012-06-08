@@ -34,8 +34,8 @@ SbmDebuggerServer::~SbmDebuggerServer()
 
 static const int NETWORK_PORT_TCP = 15104;
 
-void * m_sockTCP;
-vector< void * > m_sockConnectionsTCP;
+vhcl::socket_t m_sockTCP;
+vector< vhcl::socket_t > m_sockConnectionsTCP;
 
 
 void SbmDebuggerServer::Init()
@@ -200,7 +200,7 @@ void SbmDebuggerServer::Update()
                for ( size_t i = 0; i < m_sockConnectionsTCP.size(); i++ )
                {
                   //static int c = 0;
-                  //printf("TCP Send %d\n", c++);
+                  //LOG("TCP Send %d - %d\n", c++, i);
                   vhcl::SocketSend(m_sockConnectionsTCP[ i ], msg);
                }
             }
@@ -214,7 +214,7 @@ void SbmDebuggerServer::Update()
 
    if (vhcl::SocketIsDataPending(m_sockTCP))
    {
-      void * socket = vhcl::SocketAccept(m_sockTCP);
+      vhcl::socket_t socket = vhcl::SocketAccept(m_sockTCP);
       if (socket)
       {
          vhcl::SocketSetBlocking(socket, false);
@@ -225,7 +225,7 @@ void SbmDebuggerServer::Update()
 
    for ( size_t i = 0; i < m_sockConnectionsTCP.size(); i++ )
    {
-      void * s = m_sockConnectionsTCP[i];
+      vhcl::socket_t s = m_sockConnectionsTCP[i];
 
       bool tcpDataPending;
       tcpDataPending = vhcl::SocketIsDataPending(s);
