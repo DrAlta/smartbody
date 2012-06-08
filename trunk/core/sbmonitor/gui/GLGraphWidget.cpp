@@ -1,3 +1,5 @@
+#include "vhcl.h"
+
 #include "GLGraphwidget.h"
 
 #ifndef GL_MULTISAMPLE
