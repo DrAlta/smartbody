@@ -1,6 +1,8 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+#include "vhcl_public.h"
+
 #include "QtCrtDbgOff.h"
 #include <QGLWidget>
 #include <QtGui>
