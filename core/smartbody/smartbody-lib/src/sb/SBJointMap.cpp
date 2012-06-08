@@ -167,6 +167,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 	--- l_knee <- (LeftLeg)
 	----- l_ankle <- (LeftFoot)
 	------- l_forefoot <- (LeftToeBase)
+	--------- l_toe <- (LeftToeBaseEnd)
 	(... right side joints ...)
 
 	note: SmartBody doesn't have "Heel" and "UpArmTwist/UpArmRoll" joints.	*/
@@ -188,7 +189,8 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 	SkJoint *l_hip=0,		*r_hip=0; // upleg
 	SkJoint *l_knee=0,		*r_knee=0;
 	SkJoint *l_ankle=0,		*r_ankle=0;
-	SkJoint *l_forefoot=0,	*r_forefoot=0; // toe
+	SkJoint *l_forefoot=0,	*r_forefoot=0; // toebase
+	SkJoint *l_toe=0,		*r_toe=0; // toe
 
 	SkJoint *l_thumb1=0,*l_thumb2=0, *l_thumb3=0, *l_thumb4=0;
 	SkJoint *l_index1=0, *l_index2=0, *l_index3=0, *l_index4=0;
@@ -210,53 +212,73 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 	// TODO: check joint names make sure they are unique !
 
 	//-------------------------------------------------------------------------
-	// first find base
-	for(unsigned int i=0; i<jnts.size(); i++)
+	// first find hips
+#define BASE_SEARCHES 10
+	const unsigned int base_searchs = jnts.size()<BASE_SEARCHES ? jnts.size() : BASE_SEARCHES;
+	for(unsigned int i=0; i<base_searchs; i++)
 	{
-		if(jnts[i]->num_children()>=2)
+		if(jnts[i]->num_children()==3)
 		{
 			base = jnts[i];
 			setJointMap("base", base);
 			break;
 		}
 	}
-	if(!base)
+	if(!base) // no joint with 3 children found, try finding one with 2 children...
 	{
-		LOG("guessMap: base joint NOT found, aborting...\n");
-		return false;
-	}
-	if(base->num_children()==2)
-	{
-		SkJoint* j1 = base->child(0);
-		SkJoint* j2 = base->child(1);
-		SkJoint* ja;
-		SkJoint* jb;
-		if(j1->num_children()==2 && j2->num_children()==2)
+		for(unsigned int i=0; i<base_searchs; i++)
 		{
-			LOG("guessMap: TODO: base has 2 children, each has 2 children of their own.\n");
+			if(jnts[i]->num_children()>=2)
+			{
+				base = jnts[i];
+				setJointMap("base", base);
+				break;
+			}
+		}
+		if(!base)
+		{
+			LOG("guessMap: base joint NOT found within first %d joints, aborting...\n", base_searchs);
 			return false;
 		}
-		else if(j1->num_children()==2) // j1 is parent of 2 uplegs
+		if(base->num_children()==2)
 		{
-			ja = j1->child(0); jb = j1->child(1); spine1 = j2;
-		}
-		else if(j2->num_children()==2) // j2 is parent of 2 uplegs
-		{
-			ja = j2->child(0); jb = j2->child(1); spine1 = j1;
-		}
-		else
-		{
-			LOG("guessMap: TODO: base has 2 children.\n");
-			return false;
-		}
-		// guess left/right upleg from the names
-		guessLeftRightFromJntNames(ja, jb, l_hip, r_hip);
+			SkJoint* j1 = base->child(0);
+			SkJoint* j2 = base->child(1);
+			SkJoint* ja;
+			SkJoint* jb;
+			if(j1->num_children()==2 && j2->num_children()==2)
+			{
+				LOG("guessMap: TODO: base has 2 children, each has 2 children of their own.\n");
+				return false;
+			}
+			else if(j1->num_children()==2) // j1 is parent of 2 uplegs
+			{
+				ja = j1->child(0); jb = j1->child(1); spine1 = j2;
+			}
+			else if(j2->num_children()==2) // j2 is parent of 2 uplegs
+			{
+				ja = j2->child(0); jb = j2->child(1); spine1 = j1;
+			}
+			else
+			{
+				LOG("guessMap: TODO: base has 2 children.\n");
+				return false;
+			}
+			// guess left/right upleg from the names
+			guessLeftRightFromJntNames(ja, jb, l_hip, r_hip);
 
-		setJointMap("spine1", spine1);
-		setJointMap("l_hip", l_hip);
-		setJointMap("r_hip", r_hip);
+			setJointMap("spine1", spine1);
+			setJointMap("l_hip", l_hip);
+			setJointMap("r_hip", r_hip);
+		}
+		else // base->num_children() >= 4
+		{
+			// TODO: need to dig further, but should never happen
+			LOG("guessMap: TODO: base has 4 or more children, cased not handled.\n");
+			return false;
+		}
 	}
-	else if(base->num_children()==3)
+	else // base->num_children()==3
 	{
 		//mDBGTXT("base has 3 children.");
 		SkJoint* j1 = base->child(0);
@@ -268,7 +290,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		if(countChildren(j1)==countChildren(j2) && countChildren(j1)==countChildren(j3))
 		{
 			// TODO: need to dig further, but should never happen
-			LOG("guessMap: Can not figure out UpLeg joints, aborting...\n");
+			LOG("guessMap: Can not figure out l/r_hip (UpLeg), aborting...\n");
 			return false;
 		}
 		else if(countChildren(j1)==countChildren(j2))
@@ -289,7 +311,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		else
 		{
 			// error, j1 j2 j3 each has different children joints counts
-			LOG("guessMap: can not figure out UpLeg joint, aborting...\n");
+			LOG("guessMap: can not figure out l/r_hip (UpLeg), aborting...\n");
 			return false;
 		}
 		// guess left/right upleg from the names
@@ -299,12 +321,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		setJointMap("l_hip", l_hip);
 		setJointMap("r_hip", r_hip);
 	}
-	else if(base->num_children() > 3)
-	{
-		// TODO: need to dig further, but should never happen
-		LOG("guessMap: TODO: base has 4 or more children.\n");
-		return false;
-	}
+
 
 	//-------------------------------------------------------------------------
 	// CONTINUE with spine1, try finding spine3, spine4, l/r_acromioclavicular
@@ -333,7 +350,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		SkJoint* jb;
 		if(j1->num_children()==2 && j2->num_children()==2)
 		{
-			LOG("guessMap: TODO: spine3 has 2 children, each has 2 children of their own.\n");
+			LOG("guessMap: TODO: spine3 has 2 children, each has 2 children of their own, aborting...\n");
 			return false;
 		}
 		else if(j1->num_children()==2) // j1 is parent of 2 shoulders
@@ -346,7 +363,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		}
 		else
 		{
-			LOG("guessMap: TODO: spine3 has 2 children.\n");
+			LOG("guessMap: TODO: spine3 has 2 children, aborting...\n");
 			return false;
 		}
 		// guess left/right shoulder from the names
@@ -401,7 +418,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 	else if(spine3->num_children() > 3)
 	{
 		// probably not a humanoid, should never happen
-		LOG("guessMap: spine3 has 4 or more children, probably not humanoid.\n");
+		LOG("guessMap: spine3 has 4 or more children, probably not humanoid, aborting...\n");
 		return false;
 	}
 
@@ -491,12 +508,10 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 
 	//-------------------------------------------------------------------------
 	// CONTINUE to find l/r_elbow using l/r_acromioclavicular and l/r_wrist
+	if(!(l_wrist&&l_acromioclavicular))
+		LOG("guessMap: l_wrist or l_acromioclavicular NOT found, abort finding l/r_elbow...\n");
+	else
 	{
-		if(!(l_wrist&&l_acromioclavicular))
-		{
-			LOG("guessMap: l_wrist or l_acromioclavicular NOT found, abort finding l_elbow...\n");
-			return false;
-		}
 		if(l_wrist->num_children()==5) // this must be hand joint
 		{
 			if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_acromioclavicular) == 2)
@@ -601,7 +616,6 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 				setJointMap("r_elbow", r_elbow);
 			}
 		}
-
 	}
 
 	//-------------------------------------------------------------------------
@@ -653,7 +667,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			}
 		}
 
-		if(l_ankle && r_ankle) // find toe (assuming they exist)
+		if(l_ankle && r_ankle) // find toebase and toe (assuming they exist)
 		{
 			std::vector<SkJoint*> j_list1, j_list2;
 			listChildrenJoints(l_ankle, j_list1); listChildrenJoints(r_ankle, j_list2);
@@ -677,9 +691,14 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			if(j1 && j2)
 			{
 				//gsout << "  Toe_End joints: " << j1->name() <<gspc<< j2->name() << gsnl;
-				if(getJointHierarchyLevel(j1)-getJointHierarchyLevel(l_hip)>3)
+				if(getJointHierarchyLevel(j1)-getJointHierarchyLevel(l_hip)>3) // we have toebase and toe
+				{
+					guessLeftRightFromJntNames(j1, j2, l_toe, r_toe);
+					setJointMap("l_toe", l_toe);
+					setJointMap("r_toe", r_toe);
 					guessLeftRightFromJntNames(j1->parent(), j2->parent(), l_forefoot, r_forefoot);
-				else
+				}
+				else // only toebase, no toe
 					guessLeftRightFromJntNames(j1, j2, l_forefoot, r_forefoot);
 				setJointMap("l_forefoot", l_forefoot);
 				setJointMap("r_forefoot", r_forefoot);
@@ -697,20 +716,15 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		}
 
 		if(!l_ankle || !r_ankle)
-		{
-			LOG("guessMap: ankle/toe_end joints NOT found, aborting...\n");
-			return false;
-		}
+			LOG("guessMap: ankle/toe_end joints NOT found.\n");
 	}
 
 	//-------------------------------------------------------------------------
 	// CONTINUE to find l/r_knee using l/r_hip and l/r_ankle
+	if(!(l_ankle&&l_hip))
+		LOG("guessMap: l_ankle or l_hip NOT found, abort finding l/r_knee...\n");
+	else
 	{
-		if(!(l_ankle&&l_hip))
-		{
-			LOG("guessMap: l_ankle or l_hip NOT found, abort finding l_knee...\n");
-			return false;
-		}
 
 		if(getJointHierarchyLevel(l_ankle) - getJointHierarchyLevel(l_hip) == 2)
 		{
@@ -728,6 +742,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		}
 	}
 
+
 	//-------------------------------------------------------------------------
 	// CONTINUE to guess 5 fingers names (must have all 5 fingers to proceed here!)
 	// l_thumb1~4 (LeftHandThumb1~4)
@@ -735,19 +750,13 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 	// l_middle1~4 (LeftHandMiddle1~4)
 	// l_ring1~4 (LeftHandRing1~4)
 	// l_pinky1~4 (LeftHandPinky1~4)
+
+	if(!l_wrist || !r_wrist)
+		LOG("guessMap: l/r_wrist NOT found, abort finding fingers...\n");
+	else if(l_wrist->num_children()!=5 || r_wrist->num_children()!=5)
+		LOG("guessMap: l/r_wrist must have 5 children joints to proceed, abort finding fingers...\n");
+	else
 	{
-		if(!l_wrist || !r_wrist)
-		{
-			LOG("guessMap: l/r_wrist NOT found, abort finding fingers...\n");
-			return false;
-		}
-		if(l_wrist->num_children()!=5 || r_wrist->num_children()!=5)
-		{
-			LOG("guessMap: l/r_wrist must have 5 children joints to proceed, abort finding fingers...\n");
-			return false;
-		}
-
-
 		for(unsigned int i=0; i<5; i++)
 		{
 			SkJoint* ja = l_wrist->child(i);
@@ -757,37 +766,26 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			// name search, alternative names from wiki
 			if(!l_thumb1 && (janame.search("thumb")>=0||janame.search("pollex")>=0||janame.search("finger0")>=0))
 				l_thumb1 = ja;
-			if(!l_index1 && (janame.search("index")>=0||janame.search("pointer")>=0||janame.search("forefinger")>=0))
+			if(!l_index1 && (janame.search("index")>=0||janame.search("pointer")>=0||janame.search("forefinger")>=0||janame.search("finger1")>=0))
 				l_index1 = ja;
-			if(!l_middle1 && (janame.search("middle")>=0||janame.search("medius")>=0||janame.search("mid")>=0))
+			if(!l_middle1 && (janame.search("middle")>=0||janame.search("medius")>=0||janame.search("mid")>=0||janame.search("finger2")>=0))
 				l_middle1 = ja;
-			if(!l_ring1 && (janame.search("ring")>=0||janame.search("fourth")>=0||janame.search("finger4")>=0))
+			if(!l_ring1 && (janame.search("ring")>=0||janame.search("fourth")>=0||janame.search("finger3")>=0))
 				l_ring1 = ja;
-			if(!l_pinky1 && (janame.search("pinky")>=0||janame.search("little")>=0||janame.search("finger5")>=0))
+			if(!l_pinky1 && (janame.search("pinky")>=0||janame.search("little")>=0||janame.search("finger4")>=0))
 				l_pinky1 = ja;
 
 			if(!r_thumb1 && (jbname.search("thumb")>=0||jbname.search("pollex")>=0||jbname.search("finger0")>=0))
 				r_thumb1 = jb;
-			if(!r_index1 && (jbname.search("index")>=0||jbname.search("pointer")>=0||jbname.search("forefinger")>=0))
+			if(!r_index1 && (jbname.search("index")>=0||jbname.search("pointer")>=0||jbname.search("forefinger")>=0||janame.search("finger1")>=0))
 				r_index1 = jb;
-			if(!r_middle1 && (jbname.search("middle")>=0||jbname.search("medius")>=0||jbname.search("mid")>=0))
+			if(!r_middle1 && (jbname.search("middle")>=0||jbname.search("medius")>=0||jbname.search("mid")>=0||janame.search("finger2")>=0))
 				r_middle1 = jb;
-			if(!r_ring1 && (jbname.search("ring")>=0||jbname.search("fourth")>=0||janame.search("finger4")>=0))
+			if(!r_ring1 && (jbname.search("ring")>=0||jbname.search("fourth")>=0||janame.search("finger3")>=0))
 				r_ring1 = jb;
-			if(!r_pinky1 && (jbname.search("pinky")>=0||jbname.search("little")>=0||janame.search("finger5")>=0))
+			if(!r_pinky1 && (jbname.search("pinky")>=0||jbname.search("little")>=0||janame.search("finger4")>=0))
 				r_pinky1 = jb;
 		}
-		//setJointMap("l_thumb1", l_thumb1);
-		//setJointMap("l_index1", l_index1);
-		//setJointMap("l_middle1", l_middle1);
-		//setJointMap("l_ring1", l_ring1);
-		//setJointMap("l_pinky1", l_pinky1);
-
-		//setJointMap("r_thumb1", r_thumb1);
-		//setJointMap("r_index1", r_index1);
-		//setJointMap("r_middle1", r_middle1);
-		//setJointMap("r_ring1", r_ring1);
-		//setJointMap("r_pinky1", r_pinky1);
 
 		// left hand finger children
 		if(l_thumb1 && l_thumb1->num_children()>0)
@@ -969,7 +967,7 @@ int SBJointMap::getJointHierarchyLevel(SkJoint* j, SkJoint* j_top)
 	return level;
 }
 
-// (recursive) count all num_children() joints below given joint in the hierachy
+// (recursive) count all children joints below given joint in the hierachy
 int SBJointMap::countChildren(SkJoint* j)
 {
 	int count = 0;
@@ -1042,7 +1040,7 @@ void SBJointMap::guessLeftRightFromJntNames(SkJoint* ja, SkJoint* jb,
 	}
 }
 
-// push all num_children() joints into given list, make sure list is empty! (recursive)
+// push all children joints into given list, make sure list is empty! (recursive)
 void SBJointMap::listChildrenJoints(SkJoint* j, std::vector<SkJoint*>& j_list)
 {
 	if(!j) return;
@@ -1080,13 +1078,11 @@ void SBJointMap::setJointMap(const char* SB_jnt, SkJoint* j)
 		LOG("WARNING: joint not found! %s \n", SB_jnt);
 		return;
 	}
-	//printf("%-15s <=> %-20s, %d chd(s), level %d \n",
-	//	SB_jnt, j->name().c_str(),	j->num_children(), getJointHierarchyLevel(j));
 
 	setMapping(j->name().c_str(), SB_jnt); // set the mapping here
 
-	LOG("%-15s <=> %-20s, %d chd(s), level %d \n",
-		SB_jnt, j->name().c_str(),	j->num_children(), getJointHierarchyLevel(j));
+	//LOG("%-15s <=> %-20s, %d chd(s), level %d \n",
+	//	SB_jnt, j->name().c_str(),	j->num_children(), getJointHierarchyLevel(j));
 }
 
 
