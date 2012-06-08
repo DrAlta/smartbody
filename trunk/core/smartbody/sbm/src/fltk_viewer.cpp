@@ -264,9 +264,9 @@ Fl_Menu_Item MenuTable[] =
 
 static void get_pawn_submenus(void* user_data,SrArray<Fl_Menu_Item>& menu_list)
 {
-	SrArray<SbmPawn*> pawn_list;
+	std::vector<SbmPawn*> pawn_list;
 	ObjectManipulationHandle::get_pawn_list(pawn_list);
-	for (int i=0;i<pawn_list.size();i++)
+	for (unsigned int i=0;i<pawn_list.size();i++)
 	{
 		SbmPawn* pawn = pawn_list[i];
 		//printf("pawn name = %s\n",pawn->name);
@@ -710,8 +710,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	{
 		applyToCharacters();						
 	}
-
-   render ();
+	render ();
  }
 
 
@@ -1160,6 +1159,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		SbmPawn* pawn = (*iter).second;
 		if(pawn->dMesh_p && pawn->dMeshInstance_p)
 		{
+			//pawn->dMesh_p->update();
 			pawn->dMeshInstance_p->update();
 		}
 	}
@@ -1201,6 +1201,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		_data->render_action.apply ( _data->root );
 	}	
 	
+#if !USE_OGRE_VIEWER // ogre will draw its own floor
 	static GLfloat mat_emissin[] = { 0.f,  0.f,    0.f,    1.f };
 	static GLfloat mat_ambient[] = { 0.f,  0.f,    0.f,    1.f };
 	static GLfloat mat_diffuse[] = { 0.8f,  0.8f,    0.8f,    1.f };
@@ -1228,6 +1229,8 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	glNormal3f(0,1,0);
 	glVertex3f(-floorSize,planeY,-floorSize);	
 	glEnd();
+#endif
+
 	drawPawns();
 	//glUseProgram(0);	
 	glDisable(GL_LIGHTING);
@@ -1248,11 +1251,17 @@ void FltkViewer::draw()
 	SbmTextureManager& texm = SbmTextureManager::singleton();
 
 	if (!context_valid())
-	{
+	{		
 		bool hasShaderSupport = ssm.initGLExtension();
         if (hasShaderSupport)
 		    initShadowMap();
 	}
+	
+
+	//make_current();
+	//wglMakeCurrent(fl_GetDC(fl_xid(this)),(HGLRC)context());
+	//LOG("viewer GL context = %d, current context = %d",context(), wglGetCurrentContext());
+
 	
    
    bool hasOpenGL        = ssm.initOpenGL();
@@ -1273,10 +1282,7 @@ void FltkViewer::draw()
    {
 		SrVec2 pick_loc = _objManipulator.getPickLoc();
 		_objManipulator.picking(pick_loc.x,pick_loc.y, _data->camera);	   
-   }
-
-   
-
+   }  
 
    mcuCBHandle& mcu = mcuCBHandle::singleton();
    glViewport ( 0, 0, w(), h() );
@@ -1358,13 +1364,10 @@ void FltkViewer::draw()
 		drawCharacterBoundingVolumes();
 
 	drawInteractiveLocomotion();
-
 	//_posControl.Draw();
 	_objManipulator.draw(cam);
 	// feng : debugging draw for reach controller
 	drawReach();
-	
-
 
 	_data->fcounter.stop();
 
@@ -1399,7 +1402,7 @@ static void translate_event ( SrEvent& e, SrEvent::EventType t, int w, int h, Fl
    e.width = w;
    e.height = h;
    e.mouseCoord.x = (float)Fl::event_x();
-   e.mouseCoord.y = (float)Fl::event_y();
+   e.mouseCoord.y = (float)Fl::event_y();  
 
    if ( t==SrEvent::EventPush)
    {
@@ -1410,6 +1413,11 @@ static void translate_event ( SrEvent& e, SrEvent::EventType t, int w, int h, Fl
 	   e.origMouse.x = e.mouseCoord.x;
 	   e.origMouse.y = e.mouseCoord.y;
    }
+//    else if ( t==SrEvent::EventDrag)
+//    {
+// 	   e.origMouse.x = e.mouseCoord.x;
+// 	   e.origMouse.y = e.mouseCoord.y;	   
+//    }
    else if (t==SrEvent::EventRelease )
    {
 	   e.button = Fl::event_button();
@@ -2555,6 +2563,35 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
        }
       else if ( ROTATING(e) )
        { 
+#if 1
+		   float deltaX = -(e.mouseCoord.x - e.origMouse.x) / e.width;
+		   float deltaY = -(e.mouseCoord.y -  e.origMouse.y) / e.height;
+		   SrVec origUp = e.origUp;
+		   SrVec origCenter = e.origCenter;
+		   SrVec origCamera = e.origEye;
+#else
+
+		   float deltaX = -(e.mouse.x - e.lmouse.x) ;
+		   float deltaY = (e.mouse.y -  e.lmouse.y) ;
+		   SrVec origUp = _data->camera.up;
+		   SrVec origCenter = _data->camera.center;
+		   SrVec origCamera = _data->camera.eye;
+#endif
+		   if (deltaX == 0.0 && deltaY == 0.0)
+			   return 1;
+
+		   SrVec forward =origCenter - origCamera; 		   
+		   SrQuat q = SrQuat(origUp, vhcl::DEG_TO_RAD()*deltaX*150.f);			   
+		   forward = forward*q;
+		   _data->camera.center = _data->camera.eye + forward;
+
+		   SrVec cameraRight = cross(forward,origUp);
+		   cameraRight.normalize();		   
+		   q = SrQuat(cameraRight, vhcl::DEG_TO_RAD()*deltaY*150.f);	
+		   _data->camera.up = origUp*q;
+		   forward = forward*q;
+		   _data->camera.center = _data->camera.eye + forward;		  
+		   redraw();
        }
       else if ( ROTATING2(e) )
        { 
@@ -4325,6 +4362,7 @@ void FltkViewer::drawSteeringInfo()
 
 	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
 	glPushMatrix();
+	glDisable(GL_LIGHTING);
 
 	glScalef(1 / scene->getScale(), 1 / scene->getScale(), 1 / scene->getScale());
 

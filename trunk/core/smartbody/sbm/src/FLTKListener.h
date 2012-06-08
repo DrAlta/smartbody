@@ -14,6 +14,7 @@ class FLTKListener : public SBMCharacterListener, public SmartBody::SBObserver
       virtual void OnCharacterDelete( const std::string & name );
 	  virtual void OnCharacterUpdate( const std::string & name, const std::string & objectClass );
 	  virtual void OnCharacterChanged( const std::string& name );
+	  virtual void OnCharacterChangeMesh( const std::string& name );
       virtual void OnPawnCreate( const std::string & name );
       virtual void OnPawnDelete( const std::string & name );
       virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime );
@@ -21,6 +22,10 @@ class FLTKListener : public SBMCharacterListener, public SmartBody::SBObserver
 	  virtual void OnReset();
 
 	  virtual void notify(SmartBody::SBSubject* subject);
+
+	  void setOtherListener(SBMCharacterListener* listener);
+	protected:
+      SBMCharacterListener* otherListener;	
 };
 
 #endif

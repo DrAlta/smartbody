@@ -1,5 +1,6 @@
 #pragma once
 #include "PawnPosControl.h"
+#include <vector>
 
 class ObjectManipulationHandle
 {
@@ -34,7 +35,7 @@ public:
 	void drag(SrCamera& cam,  float fx, float fy, float tx, float ty);
 	void draw(SrCamera& cam);
 
-	static void get_pawn_list(SrArray<SbmPawn*>& pawn_list);
+	static void get_pawn_list(std::vector<SbmPawn*>& pawn_list);
 	PawnControl* getPawnControl(ControlType type);
 protected:	
 	std::vector<int>  process_hit(unsigned int *pickbuffer,int nhits);

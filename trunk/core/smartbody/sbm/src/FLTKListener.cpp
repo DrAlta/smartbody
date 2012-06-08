@@ -7,6 +7,7 @@
 
 FLTKListener::FLTKListener()
 {
+	otherListener = NULL;
 }
 
 FLTKListener::~FLTKListener()
@@ -48,13 +49,17 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 
 	#if defined(__ANDROID__) || defined(SBM_IPHONE)
 		character->dMesh_p = new DeformableMesh();
+		character->dMeshInstance_p =  new DeformableMeshInstance();
 	#else
-		character->dMesh_p =  new SbmDeformableMeshGPU();
-		character->dMeshInstance_p =  new SbmDeformableMeshGPUInstance();
+		character->dMesh_p         =  new SbmDeformableMeshGPU();
+		character->dMeshInstance_p =  new SbmDeformableMeshGPUInstance();		
 	#endif
 	SBSkeleton* sbSkel = character->getSkeleton();
 	character->dMesh_p->setSkeleton(sbSkel);
 	character->dMeshInstance_p->setSkeleton(sbSkel);
+	
+	if (otherListener)
+		otherListener->OnCharacterCreate(name,objectClass);
 }
 
 void FLTKListener::OnCharacterDelete( const std::string & name )
@@ -82,7 +87,7 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 		delete character->dMesh_p;
 		character->dMesh_p = NULL;
 	}
-
+#if 1 //!USE_OGRE_VIEWER
 	// make sure the character isn't associated with the viewer
 	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
 	if (window)
@@ -97,12 +102,22 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 			window->fltkViewer->_objManipulator.removeActiveControl();
 		}
 	}
+#endif
+
+	if (otherListener)
+		otherListener->OnCharacterDelete(name);
 }
 
 void FLTKListener::OnCharacterUpdate( const std::string & name, const std::string & objectClass )
 {
 	OnCharacterDelete(name);
 	OnCharacterCreate(name, objectClass);
+
+	if (otherListener)
+	{
+		otherListener->OnCharacterDelete(name);
+		otherListener->OnCharacterCreate(name, objectClass);
+	}
 }
 
 void FLTKListener::OnCharacterChanged( const std::string& name )
@@ -115,6 +130,27 @@ void FLTKListener::OnCharacterChanged( const std::string& name )
 
 	OnCharacterDelete(name);
 	OnCharacterCreate(name, character->getClassType());
+
+	if (otherListener)
+	{
+		otherListener->OnCharacterDelete(name);
+		otherListener->OnCharacterCreate(name, character->getClassType());
+	}
+}
+
+
+void FLTKListener::OnCharacterChangeMesh( const std::string& name )
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	SbmCharacter* character = mcu.getCharacter(name);
+	if (!character)
+		return;	
+
+	if (otherListener)
+	{
+		otherListener->OnCharacterChangeMesh(name);		
+	}	
 }
 
 void FLTKListener::OnPawnCreate( const std::string & name )
@@ -124,6 +160,7 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 	if (!pawn)
 		return;
 
+#if 1 //!USE_OGRE_VIEWER
 	if (name.find("light") == 0)
 	{
 		pawn->registerObserver(this);
@@ -133,7 +170,7 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 			window->fltkViewer->updateLights();
 		}
 	}
-
+#endif
 	// remove any existing scene
 	if (pawn->scene_p)
 	{
@@ -153,8 +190,8 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 		pawn->dMeshInstance_p = NULL;
 	}
 
-	pawn->dMesh_p =  new SbmDeformableMeshGPU();
-	pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
+	pawn->dMesh_p         =  new SbmDeformableMeshGPU();
+	pawn->dMeshInstance_p =  new SbmDeformableMeshGPUInstance();	
 
 	float sceneScale = 0.01f/SBScene::getScene()->getScale();
 
@@ -162,6 +199,9 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 	pawn->scene_p->ref();
 	pawn->scene_p->init(pawn->getSkeleton(), sceneScale);
 	mcu.add_scene(pawn->scene_p);
+
+	if (otherListener)
+		otherListener->OnPawnCreate(name);
 }
 
 void FLTKListener::OnPawnDelete( const std::string & name )
@@ -171,7 +211,7 @@ void FLTKListener::OnPawnDelete( const std::string & name )
 	if (!pawn)
 		return;
 	pawn->unregisterObserver(this);
-
+#if 1 //!USE_OGRE_VIEWER
 	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
 	if (window)
 	{
@@ -182,13 +222,18 @@ void FLTKListener::OnPawnDelete( const std::string & name )
 			window->fltkViewer->_objManipulator.removeActiveControl();
 		}
 	}
-
+#endif
 	// remove any existing scene
 	if (pawn->scene_p)
 	{
 		mcu.remove_scene(pawn->scene_p);
 		pawn->scene_p->unref();
 		pawn->scene_p = NULL;
+	}
+
+	if (otherListener)
+	{
+		otherListener->OnPawnDelete(name);
 	}
 }
 
@@ -221,7 +266,9 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 			BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
 			if (window)
 			{
+#if 1 //!USE_OGRE_VIEWER
 				window->fltkViewer->updateLights();
+#endif
 			}
 
 
@@ -230,3 +277,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 	}
 }
 
+void FLTKListener::setOtherListener( SBMCharacterListener* listener )
+{
+	otherListener = listener;
+}

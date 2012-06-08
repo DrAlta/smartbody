@@ -152,6 +152,8 @@ void GlChartView::render()
 
 void GlChartView::draw()
 {
+	make_current();
+	//LOG("data viewer GL context = %d",wglGetCurrentContext());
 	glViewport ( 0, 0, w(), h() );
 	SrLight light1;
 	SrLight light2;
