@@ -121,10 +121,10 @@ bool  VisemeViewerWindow::loadData()
 		_browserPhoneme[x]->add("EE");
 		_browserPhoneme[x]->add("Eh");   /// ey, eh, uh
 		_browserPhoneme[x]->add("Er");
-		_browserPhoneme[x]->add("f");
+		_browserPhoneme[x]->add("F");
 		_browserPhoneme[x]->add("H");  /// h
 		_browserPhoneme[x]->add("Ih");   /// y, iy, ih, ix
-		_browserPhoneme[x]->add("j");
+		_browserPhoneme[x]->add("J");
 		_browserPhoneme[x]->add("kg");
 		_browserPhoneme[x]->add("Ih");
 		_browserPhoneme[x]->add("L");   /// l
@@ -139,6 +139,7 @@ bool  VisemeViewerWindow::loadData()
 		_browserPhoneme[x]->add("W");
 		_browserPhoneme[x]->add("Z");
 		_browserPhoneme[x]->add("_");	/// silence
+		_browserPhoneme[x]->deselect();
 	}
 
 	const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
@@ -210,6 +211,7 @@ SBDiphone* VisemeViewerWindow::getCurrentDiphone()
 
 	std::string phoneme1 = _browserPhoneme[0]->text(_browserPhoneme[0]->value());
 	std::string phoneme2 = _browserPhoneme[1]->text(_browserPhoneme[1]->value());
+
 	SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(phoneme1, phoneme2, getCurrentCharacterName());
 	return diphone;
 }
@@ -229,10 +231,14 @@ void VisemeViewerWindow::refreshData()
 {
 	SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
 	SBDiphone* diphone = getCurrentDiphone();
+
 	if (!diphone)
 	{
-		std::string phoneme1 = _browserPhoneme[0]->text(_browserPhoneme[0]->value());
-		std::string phoneme2 = _browserPhoneme[1]->text(_browserPhoneme[1]->value());
+		//std::string phoneme1 = _browserPhoneme[0]->text(_browserPhoneme[0]->value());
+		//std::string phoneme2 = _browserPhoneme[1]->text(_browserPhoneme[1]->value());
+
+		std::string phoneme1 = "";
+		std::string phoneme2 = "";
 		diphone = diphoneManager->createDiphone(phoneme1, phoneme2, getCurrentCharacterName());
 	}
 	else
@@ -627,4 +633,5 @@ void VisemeViewerWindow::OnDiphoneSelectCB(Fl_Widget* widget, void* data)
 	}
 
 	OnPhoneme1SelectCB(widget, data);
+	viewer->refreshData();
 }

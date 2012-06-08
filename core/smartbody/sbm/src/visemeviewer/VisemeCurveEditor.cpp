@@ -255,7 +255,6 @@ bool VisemeCurveEditor::isLineSelected(int mousex, int mousey)
 				_selectedLine = i;
 				break;
 			}
-
 		}
 	}
 
