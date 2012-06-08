@@ -233,7 +233,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, int
 			pluginName.append("_d");
 		}
 		ogreRoot->loadPlugin(pluginName);
-		ogreRoot->loadPlugin(sceneManagerPlugin);
+		//ogreRoot->loadPlugin(sceneManagerPlugin);
 		const Ogre::RenderSystemList& lRenderSystemList = (ogreRoot->getAvailableRenderers());
 		Ogre::RenderSystem *lRenderSystem = lRenderSystemList[0];		
 		ogreRoot->setRenderSystem(lRenderSystem);
@@ -295,7 +295,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, int
 		ogreWnd->setActive(true);
 		// I want to update myself the content of the window, not automatically.
 		ogreWnd->setAutoUpdated(false);		
-		setupResource();
+		//setupResource();
 		createDefaultScene();
 	}
 	catch( Ogre::Exception& e )
@@ -626,8 +626,8 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh
 		pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);	
 		pass->setSceneBlending(SBF_SOURCE_ALPHA,SBF_ONE_MINUS_SOURCE_ALPHA);
 		pass->setShadingMode(SO_PHONG);
-		pass->setVertexProgram("Ogre/HardwareSkinningFourWeightsGLSL");
-		pass->setShadowCasterVertexProgram("Ogre/HardwareSkinningFourWeightsShadowCasterGLSL");
+		//pass->setVertexProgram("Ogre/HardwareSkinningFourWeightsGLSL");
+		//pass->setShadowCasterVertexProgram("Ogre/HardwareSkinningFourWeightsShadowCasterGLSL");
  		ogSubMesh->setMaterialName(materialName);
 		//ogSubMesh->setMaterialName("smartbody");
 	}

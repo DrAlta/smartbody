@@ -35,6 +35,9 @@ D:        Step right
 #ifndef __ExampleFrameListener_H__
 #define __ExampleFrameListener_H__
 
+#ifdef WIN32_LEAN_AND_MEAN
+#undef WIN32_LEAN_AND_MEAN
+#endif
 #include "Ogre.h"
 #include "OgreStringConverter.h"
 #include "OgreException.h"
