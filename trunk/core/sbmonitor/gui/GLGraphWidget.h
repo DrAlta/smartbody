@@ -14,7 +14,12 @@
 #include "vhcl_public.h"
 
 #include <list>
+#include <map>
+#include <string>
+
 using std::list;
+using std::map;
+using std::string;
 using vhcl::Vector3;
 
 class GLGraphWidget : QGLWidget
@@ -23,8 +28,9 @@ public:
    GLGraphWidget(const QRect& renderSize, Scene* scene, QWidget* parent = 0);
    ~GLGraphWidget();
 
-   void AddLineGraphPoint(Vector3& position, Vector3& color);
-   void AddLineGraphPoint(Vector3& position, Vector3& color, unsigned int maxSize);
+   void AddLineGraphPoint(const string& lineName, const Vector3& position, const Vector3& color);
+   void AddLineGraphPoint(const string& lineName, const Vector3& position, const Vector3& color, unsigned int maxSize);
+   void RemoveLineGraph(const string& lineName);
 
 Q_SIGNALS:
 protected:
@@ -37,18 +43,23 @@ private:
    void timerEvent(QTimerEvent * event);
    QColor qtClearColor;
    QBasicTimer timer;
+   Scene* m_pScene;
+   double m_SceneScale;
 
    struct LineGraphPoint
    {
+      //string lineName;
       Vector3 position;
       Vector3 color;
-      LineGraphPoint(Vector3 _position, Vector3 _color)
+      LineGraphPoint(/*const string& _lineName, */Vector3 _position, Vector3 _color)
       {
+         //lineName = _lineName;
          position = _position;
          color = _color;
       }
    };
-   list<LineGraphPoint*> m_LineGraphPoints;
+
+   map<string, list<LineGraphPoint*> > m_DataLines;
 };
 
 #endif

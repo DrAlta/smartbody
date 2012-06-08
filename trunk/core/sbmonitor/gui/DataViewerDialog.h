@@ -33,6 +33,8 @@ private:
    GLGraphWidget* m_pGraphWidget;
    SbmDebuggerClient* m_client;
    QBasicTimer timer;
+   float m_DrawIntervals;
+   float m_AccumTime;
    //void AddAllJointsToList(QListWidget* list, std::vector<Joint*>& joints);
 
 protected:

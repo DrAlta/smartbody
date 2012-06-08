@@ -1,5 +1,6 @@
 #include "vhcl.h"
 
+using vhcl::Vector4;
 #include "DataViewerDialog.h"
 
 //callbacks
@@ -11,11 +12,12 @@ DataViewerDialog::DataViewerDialog(SbmDebuggerClient* client, QWidget* parent) :
    m_pScene = m_client->GetScene();
    ui.setupUi(this);
    m_pGraphWidget = new GLGraphWidget(ui.renderSize->geometry(), m_pScene, this);
-   //m_pGraphWidget->AddLineGraphPoint(Vector3(0, 0, -10.0f), Vector3(1, 0, 1), ui.numFramesBox->value());
-   timer.start(10, this);
 
+   m_AccumTime = 0;
+   m_DrawIntervals = 10;
+   timer.start((int)m_DrawIntervals, this);
    ui.showRotaionAsBox->addItem("Quaternion");
-   ui.showRotaionAsBox->addItem("Euler Angle");
+   //ui.showRotaionAsBox->addItem("Euler Angle");
    //ui.showRotaionAsBox->addItem("Axis-Angle");
    //ui.showRotaionAsBox->addItem("Quaternion Velocity");
    //ui.showRotaionAsBox->addItem("Euler Velocity");
@@ -62,8 +64,26 @@ void DataViewerDialog::RemoveSelectedChannels()
    QList<QListWidgetItem*> selectedItems = ui.monitoredListBox->selectedItems();
    for (int i = 0; i < selectedItems.length(); i++)
    {
+      if (selectedItems[i]->text().contains("quat", Qt::CaseInsensitive))
+      {
+         // get rid of all 4 lines
+         m_pGraphWidget->RemoveLineGraph(selectedItems[i]->text().toStdString() + "x");
+         m_pGraphWidget->RemoveLineGraph(selectedItems[i]->text().toStdString() + "y");
+         m_pGraphWidget->RemoveLineGraph(selectedItems[i]->text().toStdString() + "z");
+         m_pGraphWidget->RemoveLineGraph(selectedItems[i]->text().toStdString() + "w");
+      }
+      else
+      {
+         m_pGraphWidget->RemoveLineGraph(selectedItems[i]->text().toStdString());
+      }
+
       ui.channelListBox->addItem(selectedItems[i]->text());
       delete ui.monitoredListBox->takeItem(ui.monitoredListBox->row(selectedItems[i]));
+   }
+
+   if (ui.monitoredListBox->selectedItems().length() == 0)
+   {
+      m_AccumTime = 0;
    }
 }
 
@@ -94,15 +114,13 @@ void DataViewerDialog::Update()
    if (!pSelectedCharacter)
       return;
    
-   static float somefloat = 0.1f;
-   
    // go through the monitored joints and update the graph with the new data
    for (int i = 0; i < ui.monitoredListBox->count(); i++)
    {
       QListWidgetItem* item = ui.monitoredListBox->item(i);
       QString channelName = item->text();
       QString suffix = "";
-      double value = 0;
+      Vector4 value; // positions use only the x value, rotations use all 4 values
       int suffixIndex = channelName.lastIndexOf("_");
       
       if (suffixIndex != -1)
@@ -110,24 +128,28 @@ void DataViewerDialog::Update()
          suffix = channelName.right(suffixIndex);
          channelName = channelName.remove(suffixIndex, channelName.length() - suffixIndex);
       }
-
-      static float someFloat = 0;
       
       Joint* joint = pSelectedCharacter->FindJoint(channelName.toStdString());
+      const float ZPos = -9.9f;
 
       if (joint)
       {
          if (suffix.contains("x", Qt::CaseInsensitive))
-            value = joint->pos.x;
+            m_pGraphWidget->AddLineGraphPoint(item->text().toStdString(), Vector3(m_AccumTime, joint->pos.x, ZPos), Vector3(1, 0, 1), ui.numFramesBox->value());
          else if (suffix.contains("y", Qt::CaseInsensitive))
-            value = joint->pos.y;
+            m_pGraphWidget->AddLineGraphPoint(item->text().toStdString(), Vector3(m_AccumTime, joint->pos.y, ZPos), Vector3(1, 0, 1), ui.numFramesBox->value());
          else if (suffix.contains("z", Qt::CaseInsensitive))
-            value = joint->pos.z;
-         //else if (suffix.contains("quat", Qt::CaseInsensitive))
-         //   value = joint->rot;
+            m_pGraphWidget->AddLineGraphPoint(item->text().toStdString(), Vector3(m_AccumTime, joint->pos.z, ZPos), Vector3(1, 0, 1), ui.numFramesBox->value());
+         else if (suffix.contains("quat", Qt::CaseInsensitive))
+         {
+            m_pGraphWidget->AddLineGraphPoint(item->text().toStdString() + "x", Vector3(m_AccumTime, joint->rot.x, ZPos), Vector3(1, 0, 0), ui.numFramesBox->value());
+            m_pGraphWidget->AddLineGraphPoint(item->text().toStdString() + "y", Vector3(m_AccumTime, joint->rot.y, ZPos), Vector3(0, 1, 0), ui.numFramesBox->value());
+            m_pGraphWidget->AddLineGraphPoint(item->text().toStdString() + "z", Vector3(m_AccumTime, joint->rot.z, ZPos), Vector3(0, 0, 1), ui.numFramesBox->value());
+            m_pGraphWidget->AddLineGraphPoint(item->text().toStdString() + "w", Vector3(m_AccumTime, joint->rot.w, ZPos), Vector3(1, 0, 1), ui.numFramesBox->value());
+         }
 
-         m_pGraphWidget->AddLineGraphPoint(Vector3(someFloat, value, -10.0f), Vector3(1, 0, 1), ui.numFramesBox->value());
-         someFloat += 0.01f;
+         
+         m_AccumTime += m_DrawIntervals / 1000.0f;
       }
    }
 }

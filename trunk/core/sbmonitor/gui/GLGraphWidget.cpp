@@ -7,23 +7,27 @@
 GLGraphWidget::GLGraphWidget(const QRect& renderSize, Scene* scene, QWidget* parent) : QGLWidget(parent)
 {
    setGeometry(renderSize);
-
+   m_pScene = scene;
    //qtClearColor = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
    qtClearColor.setRgb(0, 0, 0);
-
    timer.start(100, this);
+   m_SceneScale = 1;
 }
 
 GLGraphWidget::~GLGraphWidget()
 {
-   while (m_LineGraphPoints.size() != 0)
+   map<string, list<LineGraphPoint*> >::iterator itMap;
+   for (itMap = m_DataLines.begin(); itMap != m_DataLines.end(); ++itMap)
    {
-      LineGraphPoint* pPoint = m_LineGraphPoints.front();
-      m_LineGraphPoints.pop_front();
-      delete pPoint;
+      while ((*itMap).second.size() != 0)
+      {
+         LineGraphPoint* pPoint = (*itMap).second.front();
+         (*itMap).second.pop_front();
+         delete pPoint;
+      }
    }
-
-   m_LineGraphPoints.clear();
+  
+   m_DataLines.clear();
 }
 
 void GLGraphWidget::initializeGL()
@@ -52,17 +56,6 @@ void GLGraphWidget::initializeGL()
 	//glViewport ( 0, 0, renderSize.width(), renderSize.height() );
    glViewport(geometry().x() - 50, 0, renderSize.width() + 50, renderSize.height());
 
-	/*      glCullFace ( GL_BACK );
-	      glDepthFunc ( GL_LEQUAL );
-	      glFrontFace ( GL_CCW );
-	      glEnable ( GL_POLYGON_SMOOTH );
-	      glEnable ( GL_POINT_SMOOTH );
-	      glPointSize ( 1.0 );
-	      glShadeModel ( GL_SMOOTH );
-         glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
-	      glEnable( GL_COLOR_MATERIAL );
-	      glEnable( GL_NORMALIZE );*/
-
     
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -76,9 +69,9 @@ void GLGraphWidget::initializeGL()
     glLightfv(GL_LIGHT1, GL_POSITION, lightPosition);
     
 
-   glMatrixMode(GL_PROJECTION);
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-0.5, +0.5, -10.5, +10.5, 0.1, 15.0);
+    glOrtho(-0.5 * m_SceneScale, +0.5 * m_SceneScale, -10.5 * m_SceneScale, +10.5 * m_SceneScale, 0.1, 15.0);
     //glOrtho(renderSize.x(), renderSize.x() + renderSize.width(), -20, 20, 0.1f, 1000);
 
     glMatrixMode(GL_MODELVIEW);
@@ -88,6 +81,15 @@ void GLGraphWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
+
+    //glMatrixMode(GL_PROJECTION);
+    //glLoadIdentity();
+    //glOrtho(-0.5 * m_SceneScale, +0.5 * m_SceneScale, -10.5 * m_SceneScale, +10.5 * m_SceneScale, 0.1, 15.0);
+    //glMatrixMode(GL_MODELVIEW);
+
+    if (!m_pScene->m_rendererIsRightHanded)
+       glScaled(-1, 1, 1); 
+    
     glPushMatrix();
       Draw();
     glPopMatrix();
@@ -97,70 +99,73 @@ void GLGraphWidget::resizeGL(int width, int height)
 {
     int side = qMin(width, height);
     QRect renderSize = geometry();
-    //glViewport((width - side) / 2, (height - side) / 2, side, side);
     glViewport(geometry().x() - 50, 0, width + 50, height);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-0.5, +0.5, -10.5, +10.5, 0.1, 15.0);
-    //glOrtho(renderSize.x(), renderSize.x() + renderSize.width(), -20, 20, 0.1, 1000);
+    glOrtho(-0.5 * m_SceneScale, +0.5 * m_SceneScale, -10.5 * m_SceneScale, +10.5 * m_SceneScale, 0.1, 15.0);
 
     glMatrixMode(GL_MODELVIEW);
 }
 
 void GLGraphWidget::Draw()
 {
-   const int y_label_num = 10;
+   const int y_label_num = 25;
    const int x_label_num = 10;
-   const float x_size = 800.0f;
-	const float y_size = 1.0f;
+   const float x_size = 1.0f * m_SceneScale;
+	const float y_size = 1.0f * m_SceneScale;
+   const float ZPos = -10.0f;
 
-   glTranslatef(-5.5f, 0, 0);
+   glTranslatef(-5.5f * m_SceneScale, 0, 0);
 
-   //float y_length = 1.0f;//GetYScale()*y_size;
-	//float x_length = 1.0f;//GetXScale();
-   float y_length = 4;//GetYScale()*y_size;
-	float x_length = 11.65f;//GetXScale();
-	glColor3f(0.1f, 0.1f, 0.1f);	
-	float x;
-	glBegin(GL_LINES);
-	   for(int i = y_label_num; i > 0; --i)
+   float y_length = 8 * m_SceneScale;
+	float x_length = 11.65f * m_SceneScale;
+	glColor3f(0.25f, 0.25f, 0.25f);
+
+   // draw the grid
+	glBegin(GL_LINES); 
+      // vertical lines
+      for (int i = 1; i < y_label_num; i++)
 	   {
-		   glVertex3f(0, i*y_length/y_label_num, -10.0f);
-		   glVertex3f(x_length, i*y_length/y_label_num, -10.0f);
-		   glVertex3f(0, -i*y_length/y_label_num, -10.0f);
-		   glVertex3f(x_length, -i*y_length/y_label_num, -10.0f);
-
+		   glVertex3f(i * x_size, y_length, ZPos);
+		   glVertex3f(i * x_size, -y_length, ZPos);
 	   }
-	   for(int i = x_label_num; i > 0; --i)
+      
+      // horizontal lines
+      for (int i = 1; i < x_label_num; i++)
 	   {
-		   x = i*x_length/x_label_num;
-		   x = x*((int)(i*x_size/x_label_num))/(i*x_size/x_label_num);
-		   glVertex3f(x, y_length, -10.0f);
-		   glVertex3f(x, -y_length, -10.0f);
+		   glVertex3f(0, y_size * i, ZPos);
+		   glVertex3f(x_length, y_size * i, ZPos);
+         glVertex3f(0, -y_size * i, ZPos);
+		   glVertex3f(x_length, -y_size * i, ZPos);
 	   }
 	glEnd();
 
+   // draw the world axis darker
    glColor3f(0.5f, 0.5f, 0.5f);
 	glBegin(GL_LINES);
-		glVertex3f(0.0f, 0.0f, -10.0f);
-		glVertex3f(x_length, 0.0f, -10.0f);
+		glVertex3f(0.0f, 0.0f, ZPos);
+		glVertex3f(x_length, 0.0f, ZPos);
 
-		glVertex3f(0.0f, y_length, -10.0f);
-		glVertex3f(0.0f, -y_length, -10.0f);
+		glVertex3f(0.01f, y_length, ZPos);
+		glVertex3f(0.01f, -y_length, ZPos);
 	glEnd();
 
    // render line graph points
-   glBegin(GL_LINE_STRIP);
-      list<LineGraphPoint*>::iterator it;
-      LineGraphPoint* pPoint = NULL;
-      for (it = m_LineGraphPoints.begin(); it != m_LineGraphPoints.end(); ++it)
+   map<string, list<LineGraphPoint*> >::iterator itMap;
+   list<LineGraphPoint*>::iterator itList;
+   LineGraphPoint* pPoint = NULL;
+   for (itMap = m_DataLines.begin(); itMap != m_DataLines.end(); ++itMap)
+   {
+      glBegin(GL_LINE_STRIP);
+      for (itList = (*itMap).second.begin(); itList != (*itMap).second.end(); ++itList)
       {
-         pPoint = (*it);
+         pPoint = (*itList);
          glColor3d(pPoint->color.x, pPoint->color.y, pPoint->color.z);
          glVertex3d(pPoint->position.x, pPoint->position.y, pPoint->position.z);
       }
-   glEnd();
+      glEnd();
+   }
 }
 
 void GLGraphWidget::timerEvent(QTimerEvent * event)
@@ -175,19 +180,49 @@ void GLGraphWidget::timerEvent(QTimerEvent * event)
    }
 }
 
-void GLGraphWidget::AddLineGraphPoint(Vector3& position, Vector3& color)
+void GLGraphWidget::AddLineGraphPoint(const string& lineName, const Vector3& position, const Vector3& color)
 {
-   m_LineGraphPoints.push_back(new LineGraphPoint(position, color));
+   if (m_DataLines.find(lineName) == m_DataLines.end())
+   {
+      m_DataLines[lineName] = list<LineGraphPoint*>();
+   }
+   else
+   {
+      m_DataLines[lineName].push_back(new LineGraphPoint(position, color));
+   }
 }
 
-void GLGraphWidget::AddLineGraphPoint(Vector3& position, Vector3& color, unsigned int maxSize)
+void GLGraphWidget::AddLineGraphPoint(const string& lineName, const Vector3& position, const Vector3& color, unsigned int maxSize)
 {
-   AddLineGraphPoint(position, color);
+   AddLineGraphPoint(lineName, position, color);
 
-   while (m_LineGraphPoints.size() > maxSize)
+   list<LineGraphPoint*> points = m_DataLines[lineName];
+   while (points.size() > maxSize)
    {
-      LineGraphPoint* pPoint = m_LineGraphPoints.front();
-      m_LineGraphPoints.pop_front();
-      delete pPoint;
+      delete points.front();
+      points.pop_front();
+   }
+
+   //while (points.size() > 10)
+   //{
+   //   list<LineGraphPoint*>::iterator it = points.begin();
+   //   delete *it;
+   //   points.erase(it);
+   //}
+}
+
+void GLGraphWidget::RemoveLineGraph(const string& lineName)
+{
+   map<string, list<LineGraphPoint*> >::iterator itMap = m_DataLines.find(lineName);
+   if (itMap != m_DataLines.end())
+   {
+      while ((*itMap).second.size() != 0)
+      {
+         LineGraphPoint* pPoint = (*itMap).second.front();
+         (*itMap).second.pop_front();
+         delete pPoint;
+      }
+
+      m_DataLines.erase(itMap);
    }
 }
