@@ -181,6 +181,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 	SkJoint *spine3 = 0; // chest
 	SkJoint *spine4 = 0; // neck
 	SkJoint *skullbase = 0; // head
+	SkJoint *eyeball_left=0,		*eyeball_right=0;
 	SkJoint *l_acromioclavicular=0,	*r_acromioclavicular=0; // shoulder
 	SkJoint *l_shoulder=0,	*r_shoulder=0; // uparm
 	SkJoint *l_elbow=0,		*r_elbow=0;
@@ -433,13 +434,27 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		{
 			SkJoint* j = j_list[i];
 			SrString jname(j->name().c_str());
-			if(jname.search("head")>=0) // FIXME: try search keyword "head"
+			if(jname.search("head")>=0||jname.search("skull")>=0)
 			{
 				skullbase = j;
 				break;
 			}
 		}
-		if(skullbase==0)
+		if(skullbase==0 && j_list.size()>2) // for skel w/ many facial bones
+		{ // try parent of the joint with largest offset
+			SkJoint* ja = j_list[1];
+			float offset_len = ja->offset().norm();
+			for(unsigned int i=2; i<j_list.size(); i++)
+			{
+				SkJoint* jb = j_list[i];
+				if(jb->offset().norm() > offset_len)
+				{
+					offset_len = jb->offset().norm();
+					skullbase = jb->parent();
+				}
+			}
+		}
+		else if(skullbase==0) // should never reach here
 		{
 			skullbase = getDeepestLevelJoint(j_list);
 			if(skullbase)
@@ -451,7 +466,33 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		}
 		setJointMap("skullbase", skullbase);
 
-		// TODO: for those with facial bones, maybe check global position ?
+		// try find eye joints.
+		SkJoint* j1 = 0;
+		SkJoint* j2 = 0;
+		for(unsigned int i=0; i<j_list.size(); i++)
+		{
+			SkJoint* j = j_list[i];
+			SrString jname(j->name().c_str());
+			if(!j1 && jname.search("eye")>=0)
+			{
+				if(jname.search("lid")>=0||jname.search("brow")>=0||jname.search("lash")>=0) continue;
+				else
+					j1 = j;
+			}
+			else if(j1 && !j2 && jname.search("eye")>=0 && getJointHierarchyLevel(j)==getJointHierarchyLevel(j1))
+			{
+				if(jname.search("lid")>=0||jname.search("brow")>=0||jname.search("lash")>=0) continue;
+				else
+					j2 = j;
+			}
+			if(j1 && j2) break;
+		}
+		if(j1 && j2)
+		{
+			guessLeftRightFromJntNames(j1, j2, eyeball_left, eyeball_right);
+			setJointMap("eyeball_left", eyeball_left);
+			setJointMap("eyeball_right", eyeball_right);
+		}
 	}
 
 	//-------------------------------------------------------------------------
