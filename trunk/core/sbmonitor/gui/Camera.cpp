@@ -1,6 +1,5 @@
 #include "Camera.h"
 #include <QtOpenGL>
-#include <gl\GLU.h>
 
 QVector3D WorldUp(0, 1, 0);
 
