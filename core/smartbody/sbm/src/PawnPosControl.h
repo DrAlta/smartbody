@@ -1,9 +1,11 @@
 #pragma once
 #include "PositionControl.h"
 #include "RotationControl.h"
-#include <sbm/sbm_pawn.hpp>
 #ifdef WIN32
 #include "glfont2.h"
+#include <sb/SBObserver.h>
+
+class SbmPawn;
 
 using namespace glfont;
 #endif

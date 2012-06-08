@@ -76,6 +76,10 @@
 #include "FLTKListener.h"
 #include "sbm/SbmDebuggerServer.h"
 
+#if USE_OGRE_VIEWER
+#include "FLTKOgreViewer.h"
+#endif
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -261,6 +265,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "dataviewer",	mcu_channelbufferviewer_func);
 	mcu.insert( "resourceviewer",	mcu_resourceViewer_func);	
 	mcu.insert( "faceviewer",	mcu_faceViewer_func);
+	mcu.insert( "ogreviewer", mcu_ogreViewer_func);
 }
 
 void cleanup( void )	{
@@ -466,6 +471,10 @@ int main( int argc, char **argv )	{
 	mcu.register_channelbufferviewer_factory(new ChannelBufferViewerFactory());	
 	mcu.register_ResourceViewer_factory(new ResourceViewerFactory());
 	mcu.register_FaceViewer_factory(new FaceViewerFactory());
+#if USE_OGRE_VIEWER
+	mcu.register_OgreViewer_factory(new OgreViewerFactory());
+#endif
+
 
 	// Build the floor for the viewer
 	//mcu.add_scene( build_checkerboard_floor( 200.0 ) );
@@ -923,8 +932,8 @@ int main( int argc, char **argv )	{
 			 iter++)
 		{
 			SbmPawn* pawn = (*iter).second;
-			if (pawn->scene_p)
-				pawn->scene_p->update();	
+ 			if (pawn->scene_p)
+ 				pawn->scene_p->update();	
 		}
 
 		// update any tracked cameras

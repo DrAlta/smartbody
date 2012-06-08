@@ -17,7 +17,7 @@ ObjectManipulationHandle::~ObjectManipulationHandle(void)
 {
 }
 
-void ObjectManipulationHandle::get_pawn_list(SrArray<SbmPawn*>& pawn_list)
+void ObjectManipulationHandle::get_pawn_list(std::vector<SbmPawn*>& pawn_list)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
@@ -25,7 +25,7 @@ void ObjectManipulationHandle::get_pawn_list(SrArray<SbmPawn*>& pawn_list)
 		iter++)
 	{
 		SbmPawn* pawn = (*iter).second;
-		pawn_list.push(pawn);
+		pawn_list.push_back(pawn);
 	}
 }
 
@@ -92,7 +92,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera& c
 	// draw buffer object for each joints ?	
 	// test for each joints
 	//pawn_control.hitTest();
-	SrArray<SbmPawn*> pawn_list;
+	std::vector<SbmPawn*> pawn_list;
 	this->get_pawn_list(pawn_list);
 
 	// determine the size of the pawns relative to the size of the characters
@@ -107,7 +107,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera& c
 		break;
 	}
 
-	for (int i=0;i<pawn_list.size();i++)
+	for (unsigned int i=0;i<pawn_list.size();i++)
 	{
 		SbmPawn* pawn = pawn_list[i];
 		SrVec pawn_pos = PawnPosControl::get_pawn_pos(pawn);
