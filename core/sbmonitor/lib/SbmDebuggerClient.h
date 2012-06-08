@@ -8,15 +8,19 @@
 
 class SbmDebuggerClient
 {
+public:
+   typedef void (*OnClose)(void* data);
+
 private:
    //vhmsg::Client m_vhmsg;
    std::vector<std::string> m_processIdList;
    std::string m_sbmId;
    bool m_connectResult;
 
-
    Scene m_scene;
    NetRequestManager m_netRequestManager;
+   OnClose m_OnCloseCB;
+   void* m_pCloseCBData;
 
 public:
    SbmDebuggerClient();
@@ -35,6 +39,7 @@ public:
    void Update();
    void StartUpdates(double updateFrequencyS);
    void EndUpdates();
+   void AddOnCloseCallback(OnClose onClose, void* closeData) { m_OnCloseCB = onClose; m_pCloseCBData = closeData; }
 
    void GetResourcePaths();
 

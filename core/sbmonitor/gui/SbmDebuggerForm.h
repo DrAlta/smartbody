@@ -24,6 +24,8 @@ class SbmDebuggerForm : public QMainWindow
      static Pawn* FindSbmEntityFromTreeSelection(const QTreeWidgetItem* treeWidget, Scene* pScene);
      GLWidget* GetGLWidget() { return m_pGLWidget; }
      UtilsDialog* m_Utils;
+     void EmitClose();
+     
 
  private slots:
        void ShowConnectDialog();
@@ -76,6 +78,7 @@ class SbmDebuggerForm : public QMainWindow
     void UpdateLabels();
     void closeEvent(QCloseEvent *event);
     void AddJointToSceneTree(QTreeWidgetItem* parent, const Joint* joint);
+    static void EmitClose(void* form);
 
     virtual void timerEvent(QTimerEvent * event);
 

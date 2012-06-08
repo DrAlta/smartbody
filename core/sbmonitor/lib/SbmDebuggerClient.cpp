@@ -666,14 +666,19 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
       }
       else if (split[0] == "vrKillComponent")
       {
-         if (split.size() > 1 && split[1] == "sbmdebugger")
+         if (split.size() > 1)
          {
-            
+            if (split[1] == "sbmonitor" || split[1] == "all")
+            {
+               if (m_OnCloseCB)
+                  (*m_OnCloseCB)(m_pCloseCBData);
+            }
          }
       }
       else if (split[0] == "vrKillAll")
       {
-         
+         if (m_OnCloseCB)
+            (*m_OnCloseCB)(m_pCloseCBData);
       }
    }
 }

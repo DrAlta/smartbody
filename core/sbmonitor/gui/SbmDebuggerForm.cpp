@@ -34,6 +34,8 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
   MainWindow()->show();
   m_pGLWidget = new GLWidget(c.GetScene(), this);
 
+  c.AddOnCloseCallback(SbmDebuggerForm::EmitClose, this);
+
   ui.actionConnectionStatus->setIcon(QIcon("Images/ConnectionStatus_Disconnected.png"));
 
   // setup renderer size and positioning
@@ -48,6 +50,10 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
   vhmsg::ttu_open();
   vhmsg::ttu_register("sbmdebugger");
   vhmsg::ttu_register("sbmlog");
+  vhmsg::ttu_register("vrAllCall");
+  vhmsg::ttu_register("vrKillComponent");
+  vhmsg::ttu_register("vrKillAll");
+  vhmsg::ttu_notify1("vrComponent sbmonitor");
 
   // setup scene tree
   ui.sceneDockWidget->setBaseSize(220, 767);
@@ -75,9 +81,32 @@ SbmDebuggerForm::SbmDebuggerForm(QWidget *parent)
 
 SbmDebuggerForm::~SbmDebuggerForm()
 {
+   if (m_pGLWidget)
+   {
+      delete m_pGLWidget;
+      m_pGLWidget = NULL;
+   }
+
+   if (m_Utils)
+   {
+      delete m_Utils;
+      m_Utils = NULL;
+   }
+
+   SbmDebuggerForm::EmitClose(this);
+   vhmsg::ttu_notify1("vrProcEnd sbmonitor");
    vhmsg::ttu_close();
-   delete m_pGLWidget;
-   delete m_Utils;
+}
+
+void SbmDebuggerForm::EmitClose(void* form)
+{
+   SbmDebuggerForm* pForm = static_cast<SbmDebuggerForm*>(form);
+   pForm->EmitClose();
+}
+
+void SbmDebuggerForm::EmitClose()
+{
+   emit close();
 }
 
 QSize SbmDebuggerForm::sizeHint() const
