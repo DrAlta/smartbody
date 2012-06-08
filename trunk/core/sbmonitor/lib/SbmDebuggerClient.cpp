@@ -38,7 +38,7 @@ void SbmDebuggerClient::QuerySbmProcessIds()
 
 
 
-void * m_sockTCP = NULL;
+vhcl::socket_t m_sockTCP = NULL;
 
 
 void SbmDebuggerClient::Connect(const string & id)
@@ -119,7 +119,7 @@ int m_tcpDataCount = 0;
 void SbmDebuggerClient::Update()
 {
    {
-      void * s = m_sockTCP;
+      vhcl::socket_t s = m_sockTCP;
 
       int tcpDataPending;
       tcpDataPending = vhcl::SocketIsDataPending(s);
