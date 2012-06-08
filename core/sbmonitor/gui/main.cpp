@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
    vhcl::Log::g_log.AddListener( new vhcl::Log::StdoutListener() );
 
 
+#if WIN32_BUILD
    // Get the exe's path and manually set the working dir.
    // We do this so that the .exe can find the asset path correctly,
    // no matter where the .exe was launched from.
@@ -30,6 +31,7 @@ int main(int argc, char *argv[])
    std::wstring file;
    vhcl::StripPath(std::wstring(lpFilename), path, file);
    SetCurrentDirectory(path.c_str());
+#endif
 
 
    QApplication app(argc, argv);

@@ -7,7 +7,11 @@
 #include <QtOpenGL>
 #include "QtCrtDbgOn.h"
 
-#include <gl\GLU.h>
+#if MAC_BUILD
+#include <OpenGL/glu.h>
+#else
+#include <GL/glu.h>
+#endif
 
 #include "SbmDebuggerCommon.h"
 

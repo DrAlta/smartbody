@@ -198,9 +198,8 @@ void BmlCreatorDialog::SliderMoved(int value)
    if (!sender)
       return;
 
-   char text[8] = {0};
-   _itoa_s(value, text, sizeof(text), 10);
-   AppendBml(sender->accessibleName(), text);
+   string text = vhcl::ToString(value);
+   AppendBml(sender->accessibleName(), text.c_str());
 }
 
 void BmlCreatorDialog::SpinValueChanged(const QString & text)
