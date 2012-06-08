@@ -1,4 +1,7 @@
 #pragma once
+#ifdef WIN32_LEAN_AND_MEAN
+#undef WIN32_LEAN_AND_MEAN
+#endif
 #include <Ogre.h>
 //#include <sbm/SBSkeleton.h>
 //#include <sbm/SBCharacter.h>

@@ -1,8 +1,11 @@
 #include "ExampleFrameListener.h"
 
+#define SHOW_OGRE_DEBUG_OVERLAY 0
+
 using namespace Ogre;
 void ExampleFrameListener::updateStats( void )
 {
+#if SHOW_OGRE_DEBUG_OVERLAY
 	static String currFps = "Current FPS: ";
 	static String avgFps = "Average FPS: ";
 	static String bestFps = "Best FPS: ";
@@ -35,6 +38,7 @@ void ExampleFrameListener::updateStats( void )
 		guiDbg->setCaption(mDebugText);
 	}
 	catch(...) { /* ignore */ }
+#endif
 }
 
 ExampleFrameListener::ExampleFrameListener( RenderWindow* win, Camera* cam, bool bufferedKeys /*= false*/, bool bufferedMouse /*= false*/, bool bufferedJoy /*= false */ ) :
@@ -42,11 +46,7 @@ mCamera(cam), mTranslateVector(Vector3::ZERO), mCurrentSpeed(0), mWindow(win), m
 mMoveScale(0.0f), mRotScale(0.0f), mTimeUntilNextToggle(0), mFiltering(TFO_BILINEAR),
 mAniso(1), mSceneDetailIndex(0), mMoveSpeed(500), mRotateSpeed(36), mDebugOverlay(0),
 mInputManager(0), mMouse(0), mKeyboard(0), mJoy(0)
-{
-	mDebugOverlay = OverlayManager::getSingleton().getByName("Core/DebugOverlay");
-	Ogre::OverlayContainer* logo = mDebugOverlay->getChild("Core/LogoPanel");
-	logo->hide();	
-	mDebugOverlay->hide();
+{	
 	LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
 	OIS::ParamList pl;
 	size_t windowHnd = 0;
@@ -95,7 +95,13 @@ mInputManager(0), mMouse(0), mKeyboard(0), mJoy(0)
 	//LogManager::getSingletonPtr()->logMessage( "*** Initializing OIS step4 ***" );
 	windowResized(mWindow);
 	//LogManager::getSingletonPtr()->logMessage( "*** Initializing OIS step5 ***" );
+#if SHOW_OGRE_DEBUG_OVERLAY
+	mDebugOverlay = OverlayManager::getSingleton().getByName("Core/DebugOverlay");
+	Ogre::OverlayContainer* logo = mDebugOverlay->getChild("Core/LogoPanel");
+	logo->hide();	
+	mDebugOverlay->hide();
 	showDebugOverlay(false);
+#endif
 	//LogManager::getSingletonPtr()->logMessage( "*** Initializing OIS step6 ***" );
 
 	//Register as a Window listener
@@ -259,7 +265,7 @@ void ExampleFrameListener::moveCamera()
 
 void ExampleFrameListener::showDebugOverlay( bool show )
 {
-
+#if SHOW_OGRE_DEBUG_OVERLAY
 	if (mDebugOverlay)
 	{
 		if (show)
@@ -267,6 +273,7 @@ void ExampleFrameListener::showDebugOverlay( bool show )
 		else
 			mDebugOverlay->hide();
 	}
+#endif
 }
 
 bool ExampleFrameListener::frameRenderingQueued( const FrameEvent& evt )
