@@ -1317,6 +1317,7 @@ void mcuCBHandle::update( void )	{
 		_scene->getDebuggerServer()->m_cameraZNear  = viewer_p->get_camera()->znear;
 		_scene->getDebuggerServer()->m_cameraZFar   = viewer_p->get_camera()->zfar;
 	}
+	/*
 	else
 	{
 		SrCamera defaultCam;
@@ -1335,6 +1336,7 @@ void mcuCBHandle::update( void )	{
 		_scene->getDebuggerServer()->m_cameraZNear  = defaultCam.znear;
 		_scene->getDebuggerServer()->m_cameraZFar   = defaultCam.zfar;
 	}
+	*/
 
 	_scene->getDebuggerServer()->Update();
 
