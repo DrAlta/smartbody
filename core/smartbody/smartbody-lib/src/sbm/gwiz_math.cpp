@@ -21,7 +21,7 @@
  */
 
 #include "sbm/gwiz_math.h"
-#include "sbm/lin_win.h"
+//#include "sbm/lin_win.h"
 
 //int gwiz::temp_read2( void ) { return( temp_test ); }
 

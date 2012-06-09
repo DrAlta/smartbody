@@ -347,7 +347,7 @@ PanimationViewerFactory::PanimationViewerFactory()
 
 GenericViewer* PanimationViewerFactory::create(int x, int y, int w, int h)
 {
-	PanimationWindow* panimationWindow = new PanimationWindow(x, y, w, h, (char*)"Parameterized Animation");
+	PanimationWindow* panimationWindow = new PanimationWindow(x, y, w, h, (char*)"Blends");
 	return panimationWindow;
 }
 

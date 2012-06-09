@@ -921,7 +921,7 @@ int mcuCBHandle::open_panimation_viewer( int width, int height, int px, int py )
 {
 	if( panimationviewer_p == NULL )	{
 		panimationviewer_p = panimationviewer_factory->create( px, py, width, height );
-		panimationviewer_p->label_viewer( "Parameterized Animation Viewer" );
+		panimationviewer_p->label_viewer( "Blend Viewer" );
 		panimationviewer_p->show_viewer();
 		
 		return( CMD_SUCCESS );
