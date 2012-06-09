@@ -25,11 +25,11 @@ BMLHeadObject::BMLHeadObject() : BMLObject()
 	createDoubleAttribute("sbm:pitch", 0, true, "Basic", 120, false, false, false, "pitch parameter for wiggle and waggle");
 	createDoubleAttribute("sbm:decay", 0, true, "Basic", 130, false, false, false, "decay parameter for wiggle and waggle");
 
-	createStringAttribute("sbm:state-name", "", true, "Basic", 140, false, false, false, "parameterized animation state name used for head movement");
-	createStringAttribute("x", "", true, "Basic", 150, false, false, false, "parameterized animation state parameter x");
-	createStringAttribute("y", "", true, "Basic", 160, false, false, false, "parameterized animation state parameter y");
-	createStringAttribute("sbm:duration", "", true, "Basic", 170, false, false, false, "parameterized animation state parameter z");
-	//createStringAttribute("sbm:partial-joint", "", true, "Basic", 180, false, false, false, "parameterized animation state parameter z");
+	createStringAttribute("sbm:state-name", "", true, "Basic", 140, false, false, false, "blend name used for head movement");
+	createStringAttribute("x", "", true, "Basic", 150, false, false, false, "blend parameter x");
+	createStringAttribute("y", "", true, "Basic", 160, false, false, false, "blend parameter y");
+	createStringAttribute("sbm:duration", "", true, "Basic", 170, false, false, false, "blend parameter z");
+	//createStringAttribute("sbm:partial-joint", "", true, "Basic", 180, false, false, false, "blend parameter z");
 
 	createStringAttribute("start", "", true, "Basic", 250, false, false, false, "when the head movements starts");
 	createStringAttribute("ready", "", true, "Basic", 260, false, false, false, "preparation phase of head movement"); 
