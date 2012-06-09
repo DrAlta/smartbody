@@ -141,7 +141,7 @@ std::string SBJointMap::getSource(int num)
 
 // Automatic joint name matching to standard SmartBody names
 // Based mainly on skeleton hierarchy/symmetry but also used a few hardcoded keywords
-bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
+bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 {
 	/* this function tries to search the following joints for SmartBody
 	// added by David Huang 2012-06
@@ -221,7 +221,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		if(jnts[i]->num_children()==3)
 		{
 			base = jnts[i];
-			setJointMap("base", base);
+			setJointMap("base", base, prtMap);
 			break;
 		}
 	}
@@ -232,7 +232,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			if(jnts[i]->num_children()>=2)
 			{
 				base = jnts[i];
-				setJointMap("base", base);
+				setJointMap("base", base, prtMap);
 				break;
 			}
 		}
@@ -268,9 +268,9 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			// guess left/right upleg from the names
 			guessLeftRightFromJntNames(ja, jb, l_hip, r_hip);
 
-			setJointMap("spine1", spine1);
-			setJointMap("l_hip", l_hip);
-			setJointMap("r_hip", r_hip);
+			setJointMap("spine1", spine1, prtMap);
+			setJointMap("l_hip", l_hip, prtMap);
+			setJointMap("r_hip", r_hip, prtMap);
 		}
 		else // base->num_children() >= 4
 		{
@@ -318,9 +318,9 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		// guess left/right upleg from the names
 		guessLeftRightFromJntNames(ja, jb, l_hip, r_hip);
 		
-		setJointMap("spine1", spine1);
-		setJointMap("l_hip", l_hip);
-		setJointMap("r_hip", r_hip);
+		setJointMap("spine1", spine1, prtMap);
+		setJointMap("l_hip", l_hip, prtMap);
+		setJointMap("r_hip", r_hip, prtMap);
 	}
 
 
@@ -340,7 +340,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		LOG("guessMap: spine3 joint NOT found, aborting...\n");
 		return false;
 	}
-	setJointMap("spine3", spine3);
+	setJointMap("spine3", spine3, prtMap);
 
 	if(spine3->num_children() == 2)
 	{
@@ -370,9 +370,9 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		// guess left/right shoulder from the names
 		guessLeftRightFromJntNames(ja, jb, l_acromioclavicular, r_acromioclavicular);
 
-		setJointMap("spine4", spine4);
-		setJointMap("l_acromioclavicular", l_acromioclavicular);
-		setJointMap("r_acromioclavicular", r_acromioclavicular);
+		setJointMap("spine4", spine4, prtMap);
+		setJointMap("l_acromioclavicular", l_acromioclavicular, prtMap);
+		setJointMap("r_acromioclavicular", r_acromioclavicular, prtMap);
 	}
 	else if(spine3->num_children() == 3)
 	{
@@ -412,9 +412,9 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		// guess left/right shoulder from the names
 		guessLeftRightFromJntNames(ja, jb, l_acromioclavicular, r_acromioclavicular);
 
-		setJointMap("spine4", spine4);
-		setJointMap("l_acromioclavicular", l_acromioclavicular);
-		setJointMap("r_acromioclavicular", r_acromioclavicular);
+		setJointMap("spine4", spine4, prtMap);
+		setJointMap("l_acromioclavicular", l_acromioclavicular, prtMap);
+		setJointMap("r_acromioclavicular", r_acromioclavicular, prtMap);
 	}
 	else if(spine3->num_children() > 3)
 	{
@@ -464,7 +464,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 					skullbase = skullbase->parent();
 			}
 		}
-		setJointMap("skullbase", skullbase);
+		setJointMap("skullbase", skullbase, prtMap);
 
 		// try find eye joints.
 		SkJoint* j1 = 0;
@@ -490,8 +490,8 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		if(j1 && j2)
 		{
 			guessLeftRightFromJntNames(j1, j2, eyeball_left, eyeball_right);
-			setJointMap("eyeball_left", eyeball_left);
-			setJointMap("eyeball_right", eyeball_right);
+			setJointMap("eyeball_left", eyeball_left, prtMap);
+			setJointMap("eyeball_right", eyeball_right, prtMap);
 		}
 	}
 
@@ -537,8 +537,8 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			// guess left/right hand from the names
 			guessLeftRightFromJntNames(ja, jb, l_wrist, r_wrist);
 
-			setJointMap("l_wrist", l_wrist);
-			setJointMap("r_wrist", r_wrist);
+			setJointMap("l_wrist", l_wrist, prtMap);
+			setJointMap("r_wrist", r_wrist, prtMap);
 		}
 		else
 		{
@@ -559,13 +559,13 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			{
 				l_elbow = l_wrist->parent();
 				r_elbow = r_wrist->parent();
-				setJointMap("l_elbow", l_elbow);
-				setJointMap("r_elbow", r_elbow);
+				setJointMap("l_elbow", l_elbow, prtMap);
+				setJointMap("r_elbow", r_elbow, prtMap);
 				l_shoulder = l_acromioclavicular; // use upperArm to replace AC_shoulder
 				r_shoulder = r_acromioclavicular;
 				LOG("guessMap: Use l/r_shoulder to replace l/r_acromioclavicular.\n");
-				setJointMap("l_shoulder", l_shoulder);
-				setJointMap("r_shoulder", r_shoulder);
+				setJointMap("l_shoulder", l_shoulder, prtMap);
+				setJointMap("r_shoulder", r_shoulder, prtMap);
 			}
 			else if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_acromioclavicular) == 3)
 			{
@@ -573,12 +573,12 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 				{
 					l_shoulder = l_acromioclavicular->child(0); // most likely the upperArm joint
 					r_shoulder = r_acromioclavicular->child(0);
-					setJointMap("l_shoulder", l_shoulder);
-					setJointMap("r_shoulder", r_shoulder);
+					setJointMap("l_shoulder", l_shoulder, prtMap);
+					setJointMap("r_shoulder", r_shoulder, prtMap);
 					l_elbow = l_wrist->parent();
 					r_elbow = r_wrist->parent();
-					setJointMap("l_elbow", l_elbow);
-					setJointMap("r_elbow", r_elbow);
+					setJointMap("l_elbow", l_elbow, prtMap);
+					setJointMap("r_elbow", r_elbow, prtMap);
 					if(l_shoulder->num_children()==2)
 						LOG("guessMap: Might have an upperArm twist/roll joint.\n");
 				}
@@ -586,8 +586,8 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 				{
 					l_shoulder = l_acromioclavicular; // should be upperArm joint
 					r_shoulder = r_acromioclavicular;
-					setJointMap("l_shoulder", l_shoulder);
-					setJointMap("r_shoulder", r_shoulder);
+					setJointMap("l_shoulder", l_shoulder, prtMap);
+					setJointMap("r_shoulder", r_shoulder, prtMap);
 					l_acromioclavicular = 0; r_acromioclavicular = 0; // don't use AC_shoulder anymore
 
 					LOG("guessMap: Might have two arm twist/roll joints.\n");
@@ -598,8 +598,8 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 				 Or       shoulder -> uparm -> uparmTwist -> elbow -> wrist */
 				l_shoulder = l_acromioclavicular->child(0);
 				r_shoulder = r_acromioclavicular->child(0);
-				setJointMap("l_shoulder", l_shoulder);
-				setJointMap("r_shoulder", r_shoulder);
+				setJointMap("l_shoulder", l_shoulder, prtMap);
+				setJointMap("r_shoulder", r_shoulder, prtMap);
 				SkJoint* ja = l_wrist->parent();
 				SkJoint* jb = r_wrist->parent();
 				SrString jname(ja->name().c_str());
@@ -607,8 +607,8 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 				{
 					l_forearm = ja;
 					r_forearm = jb;
-					setJointMap("l_forearm", l_forearm);
-					setJointMap("r_forearm", r_forearm);
+					setJointMap("l_forearm", l_forearm, prtMap);
+					setJointMap("r_forearm", r_forearm, prtMap);
 					l_elbow = ja->parent();
 					r_elbow = jb->parent();
 				}
@@ -617,23 +617,23 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 					l_elbow = ja;
 					r_elbow = jb;
 				}
-				setJointMap("l_elbow", l_elbow);
-				setJointMap("r_elbow", r_elbow);
+				setJointMap("l_elbow", l_elbow, prtMap);
+				setJointMap("r_elbow", r_elbow, prtMap);
 			}
 			else if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_acromioclavicular) == 5)
 			{ // Might be shoulder -> uparm -> uparmTwist -> elbow -> forearmTwist -> wrist 
 				l_shoulder = l_acromioclavicular->child(0);
 				r_shoulder = r_acromioclavicular->child(0);
-				setJointMap("l_shoulder", l_shoulder);
-				setJointMap("r_shoulder", r_shoulder);
+				setJointMap("l_shoulder", l_shoulder, prtMap);
+				setJointMap("r_shoulder", r_shoulder, prtMap);
 				l_forearm = l_wrist->parent();
 				r_forearm = r_wrist->parent();
-				setJointMap("l_forearm", l_forearm);
-				setJointMap("r_forearm", r_forearm);
+				setJointMap("l_forearm", l_forearm, prtMap);
+				setJointMap("r_forearm", r_forearm, prtMap);
 				l_elbow = l_forearm->parent();
 				r_elbow = r_forearm->parent();
-				setJointMap("l_elbow", l_elbow);
-				setJointMap("r_elbow", r_elbow);
+				setJointMap("l_elbow", l_elbow, prtMap);
+				setJointMap("r_elbow", r_elbow, prtMap);
 			}
 		}
 		else // using guessed hand joint with less than 5 fingers
@@ -642,19 +642,19 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			{
 				l_elbow = l_wrist->parent();
 				r_elbow = r_wrist->parent();
-				setJointMap("l_elbow", l_elbow);
-				setJointMap("r_elbow", r_elbow);
+				setJointMap("l_elbow", l_elbow, prtMap);
+				setJointMap("r_elbow", r_elbow, prtMap);
 				l_shoulder = l_acromioclavicular; // make upperArm the same as AC_shoulder
 				r_shoulder = r_acromioclavicular;
-				setJointMap("l_shoulder", l_shoulder);
-				setJointMap("r_shoulder", r_shoulder);
+				setJointMap("l_shoulder", l_shoulder, prtMap);
+				setJointMap("r_shoulder", r_shoulder, prtMap);
 			}
 			else
 			{
 				l_elbow = l_wrist->parent();
 				r_elbow = r_wrist->parent();
-				setJointMap("l_elbow", l_elbow);
-				setJointMap("r_elbow", r_elbow);
+				setJointMap("l_elbow", l_elbow, prtMap);
+				setJointMap("r_elbow", r_elbow, prtMap);
 			}
 		}
 	}
@@ -681,8 +681,8 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			// guess left/right ankle from the names
 			guessLeftRightFromJntNames(ja, jb, l_ankle, r_ankle);
 
-			setJointMap("l_ankle", l_ankle);
-			setJointMap("r_ankle", r_ankle);
+			setJointMap("l_ankle", l_ankle, prtMap);
+			setJointMap("r_ankle", r_ankle, prtMap);
 		}
 		else if(!ja || !jb) // no heel
 		{
@@ -703,8 +703,8 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 				// guess left/right ankle from the names
 				guessLeftRightFromJntNames(ja, jb, l_ankle, r_ankle);
 
-				setJointMap("l_ankle", l_ankle);
-				setJointMap("r_ankle", r_ankle);
+				setJointMap("l_ankle", l_ankle, prtMap);
+				setJointMap("r_ankle", r_ankle, prtMap);
 			}
 		}
 
@@ -720,8 +720,8 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 					guessLeftRightFromJntNames(j1->parent(), j2->parent(), l_forefoot, r_forefoot);
 				else
 					guessLeftRightFromJntNames(j1, j2, l_forefoot, r_forefoot);
-				setJointMap("l_forefoot", l_forefoot);
-				setJointMap("r_forefoot", r_forefoot);
+				setJointMap("l_forefoot", l_forefoot, prtMap);
+				setJointMap("r_forefoot", r_forefoot, prtMap);
 			}
 		}
 		else // l/r_ankle not found, try make deepest joint as toe then make its parent as ankle
@@ -735,14 +735,14 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 				if(getJointHierarchyLevel(j1)-getJointHierarchyLevel(l_hip)>3) // we have toebase and toe
 				{
 					guessLeftRightFromJntNames(j1, j2, l_toe, r_toe);
-					setJointMap("l_toe", l_toe);
-					setJointMap("r_toe", r_toe);
+					setJointMap("l_toe", l_toe, prtMap);
+					setJointMap("r_toe", r_toe, prtMap);
 					guessLeftRightFromJntNames(j1->parent(), j2->parent(), l_forefoot, r_forefoot);
 				}
 				else // only toebase, no toe
 					guessLeftRightFromJntNames(j1, j2, l_forefoot, r_forefoot);
-				setJointMap("l_forefoot", l_forefoot);
-				setJointMap("r_forefoot", r_forefoot);
+				setJointMap("l_forefoot", l_forefoot, prtMap);
+				setJointMap("r_forefoot", r_forefoot, prtMap);
 
 				// try finding foot(ankle) joints
 				ja = j1->parent()->parent();
@@ -751,8 +751,8 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 				// guess left/right ankle from the names
 				guessLeftRightFromJntNames(ja, jb, l_ankle, r_ankle);
 
-				setJointMap("l_ankle", l_ankle);
-				setJointMap("r_ankle", r_ankle);
+				setJointMap("l_ankle", l_ankle, prtMap);
+				setJointMap("r_ankle", r_ankle, prtMap);
 			}
 		}
 
@@ -771,15 +771,15 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 		{
 			l_knee = l_ankle->parent();
 			r_knee = r_ankle->parent();
-			setJointMap("l_knee", l_knee);
-			setJointMap("r_knee", r_knee);
+			setJointMap("l_knee", l_knee, prtMap);
+			setJointMap("r_knee", r_knee, prtMap);
 		}
 		if(getJointHierarchyLevel(l_ankle) - getJointHierarchyLevel(l_hip) == 4)
 		{ // leg has two twist joints
 			l_knee = l_ankle->parent()->parent();
 			r_knee = r_ankle->parent()->parent();
-			setJointMap("l_knee", l_knee);
-			setJointMap("r_knee", r_knee);
+			setJointMap("l_knee", l_knee, prtMap);
+			setJointMap("r_knee", r_knee, prtMap);
 		}
 	}
 
@@ -952,17 +952,17 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton)
 			}
 		}
 
-		setJointMap("l_thumb1", l_thumb1);	setJointMap("l_thumb2", l_thumb2);	setJointMap("l_thumb3", l_thumb3);	if(l_thumb4) setJointMap("l_thumb4", l_thumb4);
-		setJointMap("l_index1", l_index1);	setJointMap("l_index2", l_index2);	setJointMap("l_index3", l_index3);	if(l_index4) setJointMap("l_index4", l_index4);
-		setJointMap("l_middle1", l_middle1);setJointMap("l_middle2", l_middle2);setJointMap("l_middle3", l_middle3);if(l_middle4) setJointMap("l_middle4", l_middle4);
-		setJointMap("l_ring1", l_ring1);	setJointMap("l_ring2", l_ring2);	setJointMap("l_ring3", l_ring3);	if(l_ring4) setJointMap("l_ring4", l_ring4);
-		setJointMap("l_pinky1", l_pinky1);	setJointMap("l_pinky2", l_pinky2);	setJointMap("l_pinky3", l_pinky3);	if(l_pinky4) setJointMap("l_pinky4", l_pinky4);
+		setJointMap("l_thumb1", l_thumb1, prtMap);	setJointMap("l_thumb2", l_thumb2, prtMap);	setJointMap("l_thumb3", l_thumb3, prtMap);	if(l_thumb4) setJointMap("l_thumb4", l_thumb4, prtMap);
+		setJointMap("l_index1", l_index1, prtMap);	setJointMap("l_index2", l_index2, prtMap);	setJointMap("l_index3", l_index3, prtMap);	if(l_index4) setJointMap("l_index4", l_index4, prtMap);
+		setJointMap("l_middle1", l_middle1, prtMap);setJointMap("l_middle2", l_middle2, prtMap);setJointMap("l_middle3", l_middle3, prtMap);if(l_middle4) setJointMap("l_middle4", l_middle4, prtMap);
+		setJointMap("l_ring1", l_ring1, prtMap);	setJointMap("l_ring2", l_ring2, prtMap);	setJointMap("l_ring3", l_ring3, prtMap);	if(l_ring4) setJointMap("l_ring4", l_ring4, prtMap);
+		setJointMap("l_pinky1", l_pinky1, prtMap);	setJointMap("l_pinky2", l_pinky2, prtMap);	setJointMap("l_pinky3", l_pinky3, prtMap);	if(l_pinky4) setJointMap("l_pinky4", l_pinky4, prtMap);
 
-		setJointMap("r_thumb1", r_thumb1);	setJointMap("r_thumb2", r_thumb2);	setJointMap("r_thumb3", r_thumb3);	if(r_thumb4) setJointMap("r_thumb4", r_thumb4);
-		setJointMap("r_index1", r_index1);	setJointMap("r_index2", r_index2);	setJointMap("r_index3", r_index3);	if(r_index4) setJointMap("r_index4", r_index4);
-		setJointMap("r_middle1", r_middle1);setJointMap("r_middle2", r_middle2);setJointMap("r_middle3", r_middle3);if(r_middle4) setJointMap("r_middle4", r_middle4);
-		setJointMap("r_ring1", r_ring1);	setJointMap("r_ring2", r_ring2);	setJointMap("r_ring3", r_ring3);	if(r_ring4) setJointMap("r_ring4", r_ring4);
-		setJointMap("r_pinky1", r_pinky1);	setJointMap("r_pinky2", r_pinky2);	setJointMap("r_pinky3", r_pinky3);	if(r_pinky4) setJointMap("r_pinky4", r_pinky4);
+		setJointMap("r_thumb1", r_thumb1, prtMap);	setJointMap("r_thumb2", r_thumb2, prtMap);	setJointMap("r_thumb3", r_thumb3, prtMap);	if(r_thumb4) setJointMap("r_thumb4", r_thumb4, prtMap);
+		setJointMap("r_index1", r_index1, prtMap);	setJointMap("r_index2", r_index2, prtMap);	setJointMap("r_index3", r_index3, prtMap);	if(r_index4) setJointMap("r_index4", r_index4, prtMap);
+		setJointMap("r_middle1", r_middle1, prtMap);setJointMap("r_middle2", r_middle2, prtMap);setJointMap("r_middle3", r_middle3, prtMap);if(r_middle4) setJointMap("r_middle4", r_middle4, prtMap);
+		setJointMap("r_ring1", r_ring1, prtMap);	setJointMap("r_ring2", r_ring2, prtMap);	setJointMap("r_ring3", r_ring3, prtMap);	if(r_ring4) setJointMap("r_ring4", r_ring4, prtMap);
+		setJointMap("r_pinky1", r_pinky1, prtMap);	setJointMap("r_pinky2", r_pinky2, prtMap);	setJointMap("r_pinky3", r_pinky3, prtMap);	if(r_pinky4) setJointMap("r_pinky4", r_pinky4, prtMap);
 
 	}	
 	
@@ -1112,18 +1112,21 @@ SkJoint* SBJointMap::getDeepestLevelJoint(const std::vector<SkJoint*>& j_list)
 	return return_j;
 }
 
-void SBJointMap::setJointMap(const char* SB_jnt, SkJoint* j)
+void SBJointMap::setJointMap(const char* SB_jnt, SkJoint* j, bool prtMap)
 {
 	if(j==0)
 	{
-		LOG("WARNING: joint not found! %s \n", SB_jnt);
+		LOG("WARNING! guessMap::setJointMap() joint not found! %s \n", SB_jnt);
 		return;
 	}
 
 	setMapping(j->name().c_str(), SB_jnt); // set the mapping here
 
-	//LOG("%-15s <=> %-20s, %d chd(s), level %d \n",
-	//	SB_jnt, j->name().c_str(),	j->num_children(), getJointHierarchyLevel(j));
+	if(prtMap)
+	{
+		LOG("%-15s <=> %-20s, %d chd(s), level %d \n",
+			SB_jnt, j->name().c_str(),	j->num_children(), getJointHierarchyLevel(j));
+	}
 }
 
 
