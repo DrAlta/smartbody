@@ -1,15 +1,15 @@
 #pragma once
 #include "PositionControl.h"
 #include "RotationControl.h"
+#include <sb/SBObserver.h>
 #ifdef WIN32
 #include "glfont2.h"
-#include <sb/SBObserver.h>
 
-class SbmPawn;
 
 using namespace glfont;
 #endif
 
+class SbmPawn;
 class PawnControl : public SmartBody::SBObserver
 {
 protected:
