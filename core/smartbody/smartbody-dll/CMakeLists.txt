@@ -64,7 +64,6 @@ target_link_libraries( smartbody-dll
 	lapack
 	${OPENGL_LIBRARIES}
 	GLEW
-	log4cxx
 	activemq-cpp
 	steerlib
 	pprAI

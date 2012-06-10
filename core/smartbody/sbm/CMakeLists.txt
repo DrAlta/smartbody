@@ -139,7 +139,6 @@ target_link_libraries( sbm-fltk
 	blas
 	lapack
 	GLEW
-	log4cxx
 	${XFT}
 	fltk_images 
 	fltk 
