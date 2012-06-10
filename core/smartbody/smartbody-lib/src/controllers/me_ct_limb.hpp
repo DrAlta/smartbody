@@ -25,7 +25,7 @@ public:
 	bool hasJoint(SkJoint* joint);
 	void init(SkSkeleton* skel);
 	// To-Do : build a tree traversal to find directed path between root node and effector node
-	bool buildJointChain(const char* root_name, const char* effector_name) {}
+	bool buildJointChain(const char* root_name, const char* effector_name) { return true; }
 
 	// User provide the joint list and all joint limits. Joint[0] = root, Joint[Size-1] = end effector.
 	bool buildJointChain(SrArray<const char*>& joint_names, SrArray<MeCtIKJointLimit>& joint_limit);
