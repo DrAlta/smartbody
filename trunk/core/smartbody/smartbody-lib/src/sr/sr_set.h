@@ -118,7 +118,7 @@ class SrSet : public SrSetBase
     const X* const_get ( int i ) const { return (const X*)SrSetBase::const_get(i); }
     X* operator[] ( int i ) const { return (X*)SrSetBase::get(i); }
     void operator = ( const SrSet& s )
-     { SrArrayBase::copy ( s ); }
+     { SrSetBase::copy ( s ); }
  };
 
 /*! Base class for iterating over sets. */
