@@ -85,7 +85,7 @@ void BodyMotion::updateRootOffset(SkSkeleton* skel, SkJoint* rootJoint)
 {
 	motion->connect(skel);		
 	motion->apply(0.001f);
-	SrQuat tempQ = rootJoint->quat()->value();
+	SrQuat tempQ = rootJoint->quat()->rawValue();
 	SrMat src, mat;
 	src = tempQ.get_mat(src);
 	float rx, ry, rz;
@@ -144,9 +144,9 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 	}
 
 	// root orientation
-	outMotionFrame.jointQuat[0] = quatP.inverse()*outMotionFrame.jointQuat[0];	
+	outMotionFrame.jointQuat[0] = quatP.inverse()*outMotionFrame.jointQuat[0];	//outMotionFrame.jointQuat[0];//
 	outMotionFrame.rootPos.set(rootJoint->pos()->value());
-	outMotionFrame.rootPos = (outMotionFrame.rootPos - rootOffset)*quatP.inverse();
+	outMotionFrame.rootPos = (outMotionFrame.rootPos - rootOffset)*quatP.inverse(); // outMotionFrame.rootPos;//
 	return timeWarp->invTimeWarp(rt);
 }
 
