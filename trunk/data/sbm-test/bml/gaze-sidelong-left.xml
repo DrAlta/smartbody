@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<act>
-	<bml>
-		<gaze target="camera">
-			<sbm:chest /><!-- zero bias -->
-			<sbm:head  heading="20" pitch="10"/><!-- left, down -->
-		</gaze>
-	</bml>
-</act>

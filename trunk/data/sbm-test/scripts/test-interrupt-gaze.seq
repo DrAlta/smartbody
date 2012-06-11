@@ -1,3 +1,0 @@
-0	send vrSpeak doctor elder test-interrupt-gaze <?xml version="1.0" encoding="UTF-8"?><act><bml><gaze target="LEFT"/></bml></act>
-
-0.8	test bml <sbm:interrupt act="test-interrupt-gaze" />

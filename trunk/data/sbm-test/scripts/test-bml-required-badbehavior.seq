@@ -1,4 +1,0 @@
-0	=== echo Starting test-bml-required-badbehavior.seq
-0	echo Expected to fail with a "vrAgentBML .. end ERROR .." and "vrSpeakFailed .."
-
-0	test bml <required><fake id="fake"/></required>

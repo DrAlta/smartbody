@@ -1,4 +1,0 @@
-0	send vrSpeak doctor elder test-interrupt-posture <?xml version="1.0" encoding="UTF-8"?><act><bml><body posture="LHandOnHip_RArm_GestureOffer"/></bml></act>
-
-##	Doesn't work because the gaze act is unregistered upon vrAgentBML end
-0.8	test bml <sbm:interrupt act="test-interrupt-posture" />

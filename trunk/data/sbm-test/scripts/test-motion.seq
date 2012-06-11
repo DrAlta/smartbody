@@ -1,6 +1,0 @@
-## test quickdraw controller functions:
-0 echo EXEC: data/sbm-test/scripts/test-motion.seq
-
-0 char doctor ctrl M begin
-
-#5 char doctor ctrl M2 begin

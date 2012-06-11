@@ -1,3 +1,0 @@
-0	send vrSpeak doctor elder test-interrupt-anim <?xml version="1.0" encoding="UTF-8"?><act><bml><sbm:animation name="HandsAtSide_RArm_GestureYou"/></bml></act>
-
-1	test bml <sbm:interrupt act="test-interrupt-anim" />
