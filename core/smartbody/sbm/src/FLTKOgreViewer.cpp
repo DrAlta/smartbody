@@ -11,8 +11,8 @@
 #include "EmbeddedOgre.h"
 #include "FLTKOgreViewer.h"
 #include "SBOgreListener.h"
-#include <sbm/gpu/SbmDeformableMeshGPU.h>
-#include <Fl/x.H>
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
+#include <FL/x.H>
 #include <sr/sr_gl.h>
 
 
@@ -45,10 +45,10 @@ void FLTKOgreWindow::initOgreWindow()
 	//fl_open_display();
 	//GLChoiceType* glChoice = GLChoiceType::find( CAP_DEPTH_BUFFER | CAP_DOUBLE_BUFFER, NULL );
 	//Fl_X::make_xid( this, glChoice->vis, glChoice->colormap );	
-	void* flHwnd = fl_xid(this); // get hwnd	
+	void* flHwnd = (void*)fl_xid(this); // get hwnd	
 	void* flParentHwnd = NULL;
 	if (parent())
-		flParentHwnd = fl_xid(dynamic_cast<Fl_Window*>(parent()));
+		flParentHwnd = (void*)fl_xid(dynamic_cast<Fl_Window*>(parent()));
 	make_current();
 	//printf("ogreWindow, GLContext = %d\n",context());
 	ogreInterface = new EmbeddedOgre();

@@ -340,11 +340,12 @@ void OgreFrameListener::SetOgreMouse( const bool enabled )
 
 	mWindow->getCustomAttribute( "WINDOW", &windowHnd );
 
-	while (GetParent((HWND)windowHnd)) // loop until we get top level window
+/*
+	while (getParentWindowHandle(windowHnd)) // loop until we get top level window
 	{
-		windowHnd = (size_t)GetParent((HWND)windowHnd);
+		windowHnd = getParentWindowHandle(windowHnd);
 	}
-
+*/
 	windowHndStr << windowHnd;
 	pl.insert( std::make_pair( std::string( "WINDOW" ), windowHndStr.str() ) );
 

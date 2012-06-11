@@ -2,7 +2,7 @@ cmake_minimum_required( VERSION 2.8 )
 project( SmartBody )
 
 set( CMAKE_INSTALL_PREFIX "../" )
-
+set( BUILD_OGRE FALSE)
 #add_definitions(	-D__linux__	-fPIC -m32 -Ignore -fpermissive -g3 )
 #add_definitions(	-g3 -fPIC )
 add_definitions(	-fPIC )

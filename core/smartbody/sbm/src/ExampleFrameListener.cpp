@@ -1,5 +1,7 @@
 #include "ExampleFrameListener.h"
 
+#include <X11/Xlib.h>
+
 #define SHOW_OGRE_DEBUG_OVERLAY 0
 
 using namespace Ogre;
@@ -49,14 +51,19 @@ mInputManager(0), mMouse(0), mKeyboard(0), mJoy(0)
 {	
 	LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
 	OIS::ParamList pl;
-	size_t windowHnd = 0;
+	unsigned int windowAttr = 15;
+	size_t windowHnd = 10;
 	std::ostringstream windowHndStr;	
-	win->getCustomAttribute("WINDOW", &windowHnd);
+	win->getCustomAttribute("WINDOW", &windowAttr);
+	
+	windowHnd = windowAttr;
+	printf("custom attribute = %u, windowHnd = %u\n",windowAttr,windowHnd);
 
-	while (GetParent((HWND)windowHnd)) // loop until we get top level window
+	/*while (getParentWindowHandle(windowHnd)) // loop until we get top level window
 	{
-		windowHnd = (size_t)GetParent((HWND)windowHnd);
+		windowHnd = getParentWindowHandle(windowHnd);
 	}
+	*/
 	windowHndStr << windowHnd;
 	pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
 	pl.insert(std::make_pair(std::string("w32_keyboard"),std::string("DISCL_NONEXCLUSIVE")));
@@ -107,6 +114,21 @@ mInputManager(0), mMouse(0), mKeyboard(0), mJoy(0)
 	//Register as a Window listener
 	WindowEventUtilities::addWindowEventListener(mWindow, this);
 	LogManager::getSingletonPtr()->logMessage( "*** Finish Initialize OIS ***" );
+}
+
+size_t ExampleFrameListener::getParentWindowHandle(size_t winHandle)
+{
+#if defined(WIN32)
+	return (size_t)GetParent((HWND)winHandle);
+#else
+	Window rootReturn;
+        Window parentReturn;
+        Window *childrenReturn;
+	unsigned int nchildrenReturn;	
+	XQueryTree(XOpenDisplay(NULL),winHandle,&rootReturn,&parentReturn,&childrenReturn,&nchildrenReturn);
+	printf("window handle  =%d, parent handle = %d\n",winHandle,parentReturn);
+  	return parentReturn;
+#endif
 }
 
 void ExampleFrameListener::windowClosed( RenderWindow* rw )

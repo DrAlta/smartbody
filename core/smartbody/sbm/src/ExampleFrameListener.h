@@ -92,6 +92,9 @@ public:
 		updateStats();
 		return true;
 	}
+protected:
+	size_t getParentWindowHandle(size_t winHandle);
+
 
 protected:
 	Ogre::Camera* mCamera;
