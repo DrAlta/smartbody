@@ -45,12 +45,10 @@ void FLTKOgreWindow::initOgreWindow()
 	//fl_open_display();
 	//GLChoiceType* glChoice = GLChoiceType::find( CAP_DEPTH_BUFFER | CAP_DOUBLE_BUFFER, NULL );
 	//Fl_X::make_xid( this, glChoice->vis, glChoice->colormap );	
-	HWND flHwnd = fl_xid(this); // get hwnd	
-	HDC flContext = fl_GetDC(flHwnd);
-	HWND flParentHwnd = NULL;
+	void* flHwnd = fl_xid(this); // get hwnd	
+	void* flParentHwnd = NULL;
 	if (parent())
 		flParentHwnd = fl_xid(dynamic_cast<Fl_Window*>(parent()));
-
 	make_current();
 	//printf("ogreWindow, GLContext = %d\n",context());
 	ogreInterface = new EmbeddedOgre();

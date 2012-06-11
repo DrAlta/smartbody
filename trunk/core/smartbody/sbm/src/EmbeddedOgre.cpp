@@ -15,7 +15,9 @@
 #include <sb/SBCharacter.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sbm/gpu/SbmTexture.h>
-
+#if !defined(WIN32)
+#include <GL/glx.h>
+#endif
 
 using namespace Ogre;
 
@@ -215,11 +217,20 @@ void EmbeddedOgre::createDefaultScene()
 }
 
 
+unsigned long EmbeddedOgre::getCurrentGLContext()
+{
+#ifdef WIN32
+	return (unsigned long)wglGetCurrentContext();
+#else
+	return (unsigned long)glxGetCurrentContext();
+#endif
+}
+
 void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, int width, int height, std::string windowName )
 {
 	// initialize Ogre3D
-	HWND winHandle = (HWND)windowHandle;
-	unsigned long oldGLContext = (unsigned long)wglGetCurrentContext();
+	size_t winHandle = (size_t)windowHandle;
+	unsigned long oldGLContext = getCurrentGLContext();
 	//LOG("embeddedOgre, current GL context = %d",oldGLContext);
 	try 
 	{		
@@ -242,12 +253,12 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, int
 		Ogre::NameValuePairList params;
 		//if (parentHandle)
 		//	params["parentWindowHandle"] = Ogre::StringConverter::toString((size_t)parentHandle);	
-		params["externalWindowHandle"] = Ogre::StringConverter::toString((size_t)winHandle);		
+		params["externalWindowHandle"] = Ogre::StringConverter::toString(winHandle);		
 		params["externalGLControl"] = Ogre::StringConverter::toString( true );
-		params["externalGLContext"] = Ogre::StringConverter::toString( (unsigned long)wglGetCurrentContext() );
+		params["externalGLContext"] = Ogre::StringConverter::toString( (unsigned long)getCurrentGLContext() );
 		ogreWnd = ogreRoot->createRenderWindow( windowName, width, height, false, &params );
 
-		ogreGLContext = (unsigned long)wglGetCurrentContext();
+		ogreGLContext = (unsigned long)getCurrentGLContext();
 		
 
 		// setup scene manager
@@ -658,7 +669,7 @@ void EmbeddedOgre::addTexture( std::string texName )
 		pixelFormat,     // pixel format
 		TU_STATIC );  	
 	HardwarePixelBufferSharedPtr pixelBuffer = ogreTex->getBuffer();
-	LOG("texture format = %d, buffer format = %d",ogreTex->getFormat(), pixelBuffer->getFormat());
+	//LOG("texture format = %d, buffer format = %d",ogreTex->getFormat(), pixelBuffer->getFormat());
 	pixelBuffer->lock(HardwareBuffer::HBL_NORMAL);
 	const PixelBox& pixelBox = pixelBuffer->getCurrentLock();
 	uint8* pDest = static_cast<uint8*>(pixelBox.data);
