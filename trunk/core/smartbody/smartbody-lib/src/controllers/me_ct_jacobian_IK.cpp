@@ -239,7 +239,7 @@ int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode,
 		if (prevNode)
 			prevNode->brother = childNode;
 
-		if ( strcmp(child->name().c_str(),"spine5")==0)// || 
+		if ( strcmp(child->name().c_str(),"skullbase")==0)// || 
 // 			strcmp(child->name().get_string(),"l_wrist")==0 ||
 // 			strcmp(child->name().get_string(),"r_wrist")==0 )
 		{
