@@ -29,7 +29,7 @@
 #include <sr/sr_shared_ptr.hpp>
 
 
-#if !defined(BOOST_NO_MEMBER_TEMPLATES) || defined(BOOST_MSVC6_MEMBER_TEMPLATES)
+#if 0
 #define FUNC_NAMESPACE boost::
 #else
 #define FUNC_NAMESPACE

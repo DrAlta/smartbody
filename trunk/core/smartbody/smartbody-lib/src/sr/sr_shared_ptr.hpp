@@ -32,14 +32,14 @@
 
 // class specific addref/release implementation
 // the two function overloads must be in the boost namespace on most compilers:
-#if !defined(BOOST_NO_MEMBER_TEMPLATES) || defined(BOOST_MSVC6_MEMBER_TEMPLATES)
+#if 0
 namespace boost {
 #endif
 
 	void intrusive_ptr_add_ref( SrSharedClass* p );
 	void intrusive_ptr_release( SrSharedClass* p );
 
-#if !defined(BOOST_NO_MEMBER_TEMPLATES) || defined(BOOST_MSVC6_MEMBER_TEMPLATES)
+#if 0
 } // namespace boost
 #endif
 
