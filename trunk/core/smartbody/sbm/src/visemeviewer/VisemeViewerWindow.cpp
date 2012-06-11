@@ -125,10 +125,10 @@ bool  VisemeViewerWindow::loadData()
 		_browserPhoneme[x]->add("H");  /// h
 		_browserPhoneme[x]->add("Ih");   /// y, iy, ih, ix
 		_browserPhoneme[x]->add("J");
-		_browserPhoneme[x]->add("kg");
+		_browserPhoneme[x]->add("Kg");
 		_browserPhoneme[x]->add("Ih");
 		_browserPhoneme[x]->add("L");   /// l
-		_browserPhoneme[x]->add("ng");
+		_browserPhoneme[x]->add("Ng");
 		_browserPhoneme[x]->add("Oh");
 		_browserPhoneme[x]->add("OO");
 		_browserPhoneme[x]->add("Ow");   /// ow
@@ -287,6 +287,8 @@ void VisemeViewerWindow::OnPhoneme1SelectCB(Fl_Widget* widget, void* data)
 		viewer->_phonemesSelected[0] = false;
 	}
 
+	viewer->_browserDiphone->deselect();
+
 	if(viewer->_phonemesSelected[0] && viewer->_phonemesSelected[1]){
 		int lineSelected1 = viewer->_browserPhoneme[0]->value();
 		int lineSelected2 = viewer->_browserPhoneme[1]->value();
@@ -294,7 +296,7 @@ void VisemeViewerWindow::OnPhoneme1SelectCB(Fl_Widget* widget, void* data)
 	}
 	viewer->resetViseme();
 	viewer->updateViseme();
-	viewer->draw();
+	viewer->redraw();
 }
 
 void VisemeViewerWindow::OnPhoneme2SelectCB(Fl_Widget* widget, void* data)
@@ -306,6 +308,8 @@ void VisemeViewerWindow::OnPhoneme2SelectCB(Fl_Widget* widget, void* data)
 	else 
 		viewer->_phonemesSelected[1] = false;
 
+	viewer->_browserDiphone->deselect();
+
 	if(viewer->_phonemesSelected[0] && viewer->_phonemesSelected[1]){
 		int lineSelected1 = viewer->_browserPhoneme[0]->value();
 		int lineSelected2 = viewer->_browserPhoneme[1]->value();
@@ -313,7 +317,7 @@ void VisemeViewerWindow::OnPhoneme2SelectCB(Fl_Widget* widget, void* data)
 	}
 	viewer->resetViseme();
 	viewer->updateViseme();
-	viewer->draw();
+	viewer->redraw();
 }
 
 
@@ -344,7 +348,7 @@ void VisemeViewerWindow::OnVisemeSelectCB(Fl_Widget* widget, void* data)
 	viewer->_curveEditor->selectLine(viseme - 1);	
 	viewer->resetViseme();
 	viewer->updateViseme();
-	viewer->draw();
+	viewer->redraw();
 }
 
 void VisemeViewerWindow::drawNames()
@@ -603,6 +607,9 @@ void VisemeViewerWindow::OnDiphoneSelectCB(Fl_Widget* widget, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
 
+	if(viewer->_browserDiphone->size() == 0)
+		return;
+
 	std::string str = viewer->_browserDiphone->text(viewer->_browserDiphone->value());
 	std::vector<string> diphones;
 	std::stringstream ss(str);
@@ -632,6 +639,15 @@ void VisemeViewerWindow::OnDiphoneSelectCB(Fl_Widget* widget, void* data)
 		}
 	}
 
-	OnPhoneme1SelectCB(widget, data);
-	viewer->refreshData();
+	viewer->_phonemesSelected[0] = true;
+	viewer->_phonemesSelected[1] = true;
+
+	if(viewer->_phonemesSelected[0] && viewer->_phonemesSelected[1]){
+		int lineSelected1 = viewer->_browserPhoneme[0]->value();
+		int lineSelected2 = viewer->_browserPhoneme[1]->value();
+		viewer->selectViseme(viewer->_browserPhoneme[0]->text(lineSelected1), viewer->_browserPhoneme[1]->text(lineSelected2));
+	}
+	viewer->resetViseme();
+	viewer->updateViseme();
+	viewer->redraw();
 }
