@@ -1,3 +1,4 @@
+#include "vhcl.h"
 #include "OgreFrameListener.h"
 #include "EmbeddedOgre.h"
 #include <boost/lexical_cast.hpp>

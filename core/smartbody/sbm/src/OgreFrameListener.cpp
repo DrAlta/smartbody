@@ -1,3 +1,4 @@
+#include "vhcl.h"
 #include "vhmsg-tt.h"
 #include "OgreFrameListener.h"
 #include <sb/SBScene.h>
