@@ -239,29 +239,29 @@ namespace BML {
 	protected:
 		BehaviorSyncPoints::iterator parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id );
 	};
+
+
+	//  ostream Output Operators
+	template < typename charT, typename traits >
+	inline
+	std::basic_ostream<charT,traits>& 
+	operator << ( std::basic_ostream<charT,traits>& out, const BML::SyncPointPtr& sync ) {
+		out << *(sync.get());
+		return out;
+	}
+
+	template < typename charT, typename traits >
+	inline
+	std::basic_ostream<charT,traits>& 
+	operator << ( std::basic_ostream<charT,traits>& out, const BML::SyncPoint& sync ) {
+		if( sync.parent ) {
+			out << "time=" << sync.time << "; parent="<< sync.parent.get() << "; offset="<<sync.offset;
+		} else {
+			out << "time="<<sync.time;
+		}
+		return out;
+	}
 } // end namespace BML
 
-
-
-//  ostream Output Operators
-template < typename charT, typename traits >
-inline
-std::basic_ostream<charT,traits>& 
-operator << ( std::basic_ostream<charT,traits>& out, const BML::SyncPointPtr& sync ) {
-	out << *(sync.get());
-	return out;
-}
-
-template < typename charT, typename traits >
-inline
-std::basic_ostream<charT,traits>& 
-operator << ( std::basic_ostream<charT,traits>& out, const BML::SyncPoint& sync ) {
-	if( sync.parent ) {
-		out << "time=" << sync.time << "; parent="<< sync.parent.get() << "; offset="<<sync.offset;
-	} else {
-		out << "time="<<sync.time;
-	}
-	return out;
-}
 
 #endif  // BML_SYNC_POINT_HPP
