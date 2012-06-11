@@ -474,50 +474,6 @@
 				RelativePath="..\src\RotationControl.h"
 				>
 			</File>
-			<Filter
-				Name="Ogre"
-				>
-				<File
-					RelativePath="..\src\EmbeddedOgre.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\EmbeddedOgre.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\ExampleFrameListener.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\ExampleFrameListener.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\FLTKOgreViewer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\FLTKOgreViewer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\OgreFrameListener.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\OgreFrameListener.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\SBOgreListener.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\SBOgreListener.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="bmlviewer"
