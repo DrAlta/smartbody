@@ -1,7 +1,7 @@
 #include "VisemeCurveEditor.h"
 
 #include <FL/Fl.H>
-#include <FL/fl_device.H>
+#include <FL/Fl_Device.H>
 #include <FL/fl_draw.H>
 #include <stdlib.h>
 #include <sr/sr_vec.h>

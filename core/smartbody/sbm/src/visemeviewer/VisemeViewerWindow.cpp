@@ -6,7 +6,7 @@
 #include <sbm/mcontrol_util.h>
 #include <bml/bml_speech.hpp>
 
-#include <FL/fl_device.H>
+#include <FL/Fl_Device.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_File_Chooser.H>
 
