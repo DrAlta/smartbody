@@ -92,22 +92,21 @@ namespace BML {
 		void parse_gaze_key_element( DOMElement* elem, Gaze::KeyData* key_data );
 
 		bool parse_children( DOMElement* elem, Gaze::KeyData* key_data[] );
+
+		ostream& operator<<( ostream& os, const Gaze::KeyData key_data ) {
+			os <<"KeyData: heading="<<key_data.bias_heading
+					<<", pitch="<<key_data.bias_pitch
+					<<", roll="<<key_data.bias_roll
+					<<", interpolate-bias="<<(key_data.interpolate_bias?"true":"false")
+					<<", blend="<<key_data.blend_weight;
+			return os;
+		};
 	};
 };
 
 using namespace std;
 using namespace BML;
 using namespace xml_utils;
-
-
-ostream& operator<<( ostream& os, const Gaze::KeyData key_data ) {
-	os <<"KeyData: heading="<<key_data.bias_heading
-		      <<", pitch="<<key_data.bias_pitch
-			  <<", roll="<<key_data.bias_roll
-			  <<", interpolate-bias="<<(key_data.interpolate_bias?"true":"false")
-			  <<", blend="<<key_data.blend_weight;
-	return os;
-}
 
 int check_gaze_speed( float head, float eyeball ) {
 	if( head <= 0 || eyeball <= 0 ) {
