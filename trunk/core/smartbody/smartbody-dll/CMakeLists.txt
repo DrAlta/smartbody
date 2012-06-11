@@ -12,6 +12,10 @@ find_library (FESTIVAL Festival ../../../lib/festival/festival/src/lib)
 find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
 find_library (ESTSTRING eststring ../../..//lib/festival/speech_tools/lib)
 find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
+else()
+find_library (LIBSNDFILE sndfile )
+find_library (ALUT alut )
+find_library (OPENAL openal)
 endif()
 
 

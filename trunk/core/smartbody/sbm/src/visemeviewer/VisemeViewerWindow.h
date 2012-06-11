@@ -9,7 +9,7 @@
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Browser.H>
-#include <FL/FL_Multi_Browser.H>
+#include <FL/Fl_Multi_Browser.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Value_Slider.H>
 #include <FL/Fl_Check_Button.H>

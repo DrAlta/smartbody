@@ -122,6 +122,10 @@ extern SpeechRequestData xmlMetaData;
 extern std::map<string,string> phonemeToViseme;
 extern std::string mapping;
 
+SpeechRequestData xmlMetaData;
+std::map<string,string> phonemeToViseme;
+std::string mapping;
+
 std::string festivalLibDir = "";
 
 #ifdef WIN32
