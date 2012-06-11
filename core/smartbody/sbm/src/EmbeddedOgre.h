@@ -38,8 +38,10 @@ public:
 	Ogre::Entity* createOgreCharacter(SmartBody::SBCharacter* sbChar); // create a ogre character from a smartbody character
 	void addSBSkeleton(SmartBody::SBSkeleton* skel); // convert a SB skeleton to ogre
 	void addDeformableMesh(std::string meshName, DeformableMesh* mesh);
-	void addTexture(std::string texName);
-	
+	void addTexture(std::string texName);	
+
+protected:
+	static unsigned long getCurrentGLContext();	
 protected:
 	Ogre::Root*           ogreRoot;
 	Ogre::RenderWindow*   ogreWnd;
