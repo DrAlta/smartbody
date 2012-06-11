@@ -1,9 +1,0 @@
-0   echo === Starting: data/sbm-test/scripts/init-test-assets.seq
-
-0	echo >>> Loading data/sbm-test assets...
-0	load motions ../../../../data/sbm-test/common-sk/motion
-0	load motions ../../../../data/sbm-test/common-sk/step
-0	load motions ../../../../data/sbm-test/common-sk/qdraw
-#0	load motions ../../../../data/sbm-test/common-sk/face
-
-0   echo === Complete: data/sbm-test/scripts/init-test-assets.seq

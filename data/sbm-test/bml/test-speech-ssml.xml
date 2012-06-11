@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<act>
-  <bml>
-    <speech id="speech" type="application/ssml+xml">
-	  This is a test of <mark name="mark"/>SSML speech behaviors.
-    </speech>
-  </bml>
-</act>

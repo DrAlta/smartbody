@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<act>
-  <bml>
-    <speech id="speech" type="text/plain">
-	  This is a test of <tm id="mark"/>plain text speech behaviors.
-    </speech>
-  </bml>
-</act>

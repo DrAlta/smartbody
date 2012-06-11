@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<act>
-	<bml>
-		<speech id="sp1" ref="" type="application/ssml+xml">
-			<mark name="T0"/>hello<mark name="T1"/>
-		</speech>
-		<head amount="0.10" priority="5" ready="sp1:T0" relax="sp1:T1" repeats="0.5" type="NOD"/>
-	</bml>
-</act>

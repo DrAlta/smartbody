@@ -1,2 +1,0 @@
-The assets in this directory require the common skeleton:
-  data\sbm-common\common-sk\common.sk

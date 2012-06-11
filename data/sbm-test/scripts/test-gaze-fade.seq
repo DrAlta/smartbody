@@ -1,7 +1,0 @@
-
-0 gaze G1 target point -1000 180 0
-
-0 char doctor ctrl G1 begin
-
-4 gaze G1 fadeout 0.5
-6 gaze G1 fadein 0.5
