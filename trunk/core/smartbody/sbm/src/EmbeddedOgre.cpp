@@ -15,7 +15,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBCharacter.h>
 #include <sbm/sbm_deformable_mesh.h>
-#include <sbm/gpu/SbmTexture.h>
+#include <sbm/GPU/SbmTexture.h>
 #if !defined(WIN32)
 #include <GL/glx.h>
 #endif
@@ -223,7 +223,7 @@ unsigned long EmbeddedOgre::getCurrentGLContext()
 #ifdef WIN32
 	return (unsigned long)wglGetCurrentContext();
 #else
-	return (unsigned long)glxGetCurrentContext();
+	return (unsigned long)glXGetCurrentContext();
 #endif
 }
 
@@ -246,7 +246,11 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, int
 		}
 		ogreRoot->loadPlugin(pluginName);
 		//ogreRoot->loadPlugin(sceneManagerPlugin);
+#ifdef WIN32
 		const Ogre::RenderSystemList& lRenderSystemList = (ogreRoot->getAvailableRenderers());
+#else // in Linux, we use Ogre 1.6.5, which has a slightly different API calls
+		const Ogre::RenderSystemList& lRenderSystemList = (*ogreRoot->getAvailableRenderers());
+#endif
 		Ogre::RenderSystem *lRenderSystem = lRenderSystemList[0];		
 		ogreRoot->setRenderSystem(lRenderSystem);
 				
@@ -254,6 +258,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, int
 		Ogre::NameValuePairList params;
 		//if (parentHandle)
 		//	params["parentWindowHandle"] = Ogre::StringConverter::toString((size_t)parentHandle);	
+		printf("window handle = %d\n",winHandle);
 		params["externalWindowHandle"] = Ogre::StringConverter::toString(winHandle);		
 		params["externalGLControl"] = Ogre::StringConverter::toString( true );
 		params["externalGLContext"] = Ogre::StringConverter::toString( (unsigned long)getCurrentGLContext() );

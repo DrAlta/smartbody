@@ -1,5 +1,6 @@
 include_directories( ./src )
 include_directories( ../smartbody-lib/src )
+include_directories( /usr/local/include/OGRE )
 
 find_package(OpenGL REQUIRED)
 
@@ -11,6 +12,25 @@ find_library (FESTIVAL Festival ../../../lib/festival/festival/src/lib)
 find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
 find_library (ESTSTRING eststring ../../../lib/festival/speech_tools/lib)
 find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
+endif()
+
+if (${BUILD_OGRE})
+set (OGRE_LIBS
+	OgreMain
+	OIS	
+)
+set (OGRE_SRCS
+	src/EmbeddedOgre.cpp
+	src/ExampleFrameListener.cpp	
+	src/FLTKOgreViewer.cpp	
+	src/OgreFrameListener.cpp
+	src/SBOgreListener.cpp	
+)
+else()
+set (OGRE_LIBS
+)
+set (OGRE_SRCS
+)
 endif()
 
 find_library (LIBSNDFILE sndfile )
@@ -53,6 +73,7 @@ set( SBM_FLTK_SRC
 	src/RotationControl.cpp
 	src/RootWindow.cxx
 	src/fltk_viewer.cpp
+	${OGRE_SRCS}
 	src/pic.cpp
 	src/ppm.cpp
 	src/bmlviewer/BehaviorBlock.cpp
@@ -149,9 +170,9 @@ target_link_libraries( sbm-fltk
 	pprAI
 	ode
 	python2.6
-    ncurses
-
+    	ncurses	
 	${MORE_LIBS}
+	${OGRE_LIBS}
 )
 
 set( EXEC_LIST
