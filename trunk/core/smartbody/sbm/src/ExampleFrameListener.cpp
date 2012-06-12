@@ -1,7 +1,7 @@
 #include "ExampleFrameListener.h"
-
+#if !defined(WIN32)
 #include <X11/Xlib.h>
-
+#endif
 #define SHOW_OGRE_DEBUG_OVERLAY 0
 
 using namespace Ogre;
