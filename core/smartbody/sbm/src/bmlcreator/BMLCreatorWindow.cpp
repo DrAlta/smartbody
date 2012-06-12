@@ -48,7 +48,7 @@ BMLCreatorWindow::BMLCreatorWindow(int x,int y,int w,int h, const char* s) : Fl_
 	BMLObject* event = new BMLEventObject();
 	event->setName("event");
 	BMLObject* state = new BMLStateObject();
-	state->setName("sbm:states");
+	state->setName("blend");
 
 	_bmlObjects.push_back(body);
 	_bmlObjects.push_back(locomotion);

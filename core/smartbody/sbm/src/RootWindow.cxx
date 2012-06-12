@@ -118,7 +118,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 
 	curY += 30;
 	*/
-#if !USE_OGRE_VIEWER
+#if USE_OGRE_VIEWER < 1
 	fltkViewer = new FltkViewer(10, curY, w - 20, h - (curY + 10), NULL);
 #else
 	fltkViewer = new FLTKOgreWindow(10, curY, w - 20, h - (curY + 10), NULL);	

@@ -23,7 +23,7 @@ class SbmCharacter;
 #endif
 #define NO_OGRE_VIEWER_CMD 0
 
-#if USE_OGRE_VIEWER
+#if USE_OGRE_VIEWER > 0
 #include "FLTKOgreViewer.h"
 #endif
 
@@ -47,7 +47,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		void reloadScriptsByDir(std::string scriptsDir, std::string parentStr);
 		SbmCharacter* getSelectedCharacter();
 
-#if USE_OGRE_VIEWER
+#if USE_OGRE_VIEWER > 0
 		FLTKOgreWindow* fltkViewer;
 #else
 		FltkViewer* fltkViewer;
