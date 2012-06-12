@@ -76,7 +76,7 @@
 #include "FLTKListener.h"
 #include "sbm/SbmDebuggerServer.h"
 
-#if USE_OGRE_VIEWER
+#if USE_OGRE_VIEWER > 0
 #include "FLTKOgreViewer.h"
 #endif
 
@@ -471,7 +471,7 @@ int main( int argc, char **argv )	{
 	mcu.register_channelbufferviewer_factory(new ChannelBufferViewerFactory());	
 	mcu.register_ResourceViewer_factory(new ResourceViewerFactory());
 	mcu.register_FaceViewer_factory(new FaceViewerFactory());
-#if USE_OGRE_VIEWER
+#if USE_OGRE_VIEWER > 0
 	mcu.register_OgreViewer_factory(new OgreViewerFactory());
 #endif
 

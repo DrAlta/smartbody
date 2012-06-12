@@ -1201,7 +1201,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		_data->render_action.apply ( _data->root );
 	}	
 	
-#if !USE_OGRE_VIEWER // ogre will draw its own floor
+#if USE_OGRE_VIEWER  < 1 // ogre will draw its own floor
 	static GLfloat mat_emissin[] = { 0.f,  0.f,    0.f,    1.f };
 	static GLfloat mat_ambient[] = { 0.f,  0.f,    0.f,    1.f };
 	static GLfloat mat_diffuse[] = { 0.8f,  0.8f,    0.8f,    1.f };
