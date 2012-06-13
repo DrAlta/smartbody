@@ -200,29 +200,27 @@ bool VisemeCurveEditor::isPointSelected(int mousex, int mousey)
 {
 	SrVec mouseClick((float) mousex, (float) mousey, 0.f);
 	bool pointIsSelected = false;
-	for (int i = 0; i < (int)_curves.size(); i++)
-	{
-		if(!_curves[i].isVisible())
-			continue;
 
-		for(int j = 0; j < (int)_curves[i].size(); j++)
-		{	
-			SrVec point = _curves[i][j];
-			SrVec newPoint = mapCurveData(point);
-			float distance = dist(mouseClick, newPoint);
-		
-			if(distance <= _curves[i].getPointRadius())
-			{
-				pointIsSelected = true;
-				_pointIsSelected = true;
-				_lineIsSelected = true;
-				_selectedPoint = j;
-				_selectedLine = i;
-				break;
-			}
+	if(!_curves[_selectedLine].isVisible())
+		return false;
+
+	for(int j = 0; j < (int)_curves[_selectedLine].size(); j++)
+	{	
+		SrVec point = _curves[_selectedLine][j];
+		SrVec newPoint = mapCurveData(point);
+		float distance = dist(mouseClick, newPoint);
+	
+		if(distance <= _curves[_selectedLine].getPointRadius())
+		{
+			pointIsSelected = true;
+			_pointIsSelected = true;
+			_lineIsSelected = true;
+			_selectedPoint = j;
+			//_selectedLine = i;
+			break;
 		}
 	}
-
+	
 	return pointIsSelected;
 }
 
@@ -440,6 +438,7 @@ SrVec VisemeCurveEditor::mapDrawData(SrVec& origData)
 	newData.x = (origData.x - _gridPosX) / _gridWidth;
 	newData.y = 1.0f - ((origData.y - _gridPosY) / _gridHeight);
 	newData.z = origData.z;
+
 	return newData;
 }
 

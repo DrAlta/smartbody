@@ -51,6 +51,7 @@ protected:
 	Fl_Input* _inputUtterance;
 	VisemeCurveEditor * _curveEditor;
 	bool _phonemesSelected[2];
+	std::string _lastUtterance;
 
 	void draw();
 	bool loadData();

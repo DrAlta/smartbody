@@ -16,6 +16,7 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 {
 	_phonemesSelected[0] = false;
 	_phonemesSelected[1] = false;
+	_lastUtterance = "";
 	
 	this->label("Diphone Viewer");
 	this->begin();
@@ -66,7 +67,6 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_browserDiphone->callback(OnDiphoneSelectCB, this);
 
 	this->end();
-
 
 	loadData();
 }
@@ -234,11 +234,9 @@ void VisemeViewerWindow::refreshData()
 
 	if (!diphone)
 	{
-		//std::string phoneme1 = _browserPhoneme[0]->text(_browserPhoneme[0]->value());
-		//std::string phoneme2 = _browserPhoneme[1]->text(_browserPhoneme[1]->value());
+		std::string phoneme1 = _browserPhoneme[0]->text(_browserPhoneme[0]->value());
+		std::string phoneme2 = _browserPhoneme[1]->text(_browserPhoneme[1]->value());
 
-		std::string phoneme1 = "";
-		std::string phoneme2 = "";
 		diphone = diphoneManager->createDiphone(phoneme1, phoneme2, getCurrentCharacterName());
 	}
 	else
@@ -296,6 +294,7 @@ void VisemeViewerWindow::OnPhoneme1SelectCB(Fl_Widget* widget, void* data)
 	}
 	viewer->resetViseme();
 	viewer->updateViseme();
+//	viewer->_curveEditor->redraw();
 	viewer->redraw();
 }
 
@@ -317,6 +316,7 @@ void VisemeViewerWindow::OnPhoneme2SelectCB(Fl_Widget* widget, void* data)
 	}
 	viewer->resetViseme();
 	viewer->updateViseme();
+//	viewer->_curveEditor->redraw();
 	viewer->redraw();
 }
 
@@ -324,6 +324,15 @@ void VisemeViewerWindow::OnPhoneme2SelectCB(Fl_Widget* widget, void* data)
 void VisemeViewerWindow::OnVisemeSelectCB(Fl_Widget* widget, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+	
+	if(viewer->_browserPhoneme[0]->value() < 1 &&
+		viewer->_browserPhoneme[1]->value() < 1)
+	{
+		viewer->_browserViseme->deselect();
+		return;
+	}
+
+
 	int viseme = viewer->_browserViseme->value();
 	std::vector<float> curveData;
 
@@ -531,6 +540,8 @@ void VisemeViewerWindow::OnPlayDialogCB(Fl_Widget* widget, void* data)
 		strstr << "python bml.execBML('" << viewer->getCurrentCharacterName() << "', '<speech type=\"text/plain\">" << viewer->_inputUtterance->value() << "</speech>')";
 		SmartBody::SBScene::getScene()->command(strstr.str());
 	}
+
+	
 }
 
 void VisemeViewerWindow::OnSaveCB(Fl_Widget* widget, void* data)
@@ -580,6 +591,11 @@ void VisemeViewerWindow::OnBmlRequestCB(BML::BmlRequest* request, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
 
+	std::string utterance = viewer->_inputUtterance->value(); 	
+
+	if(utterance == viewer->_lastUtterance)
+		return;
+
 	BML::VecOfBehaviorRequest b = request->behaviors;
 	for (BML::VecOfBehaviorRequest::iterator iter = b.begin();
 		iter != b.end();
@@ -601,6 +617,7 @@ void VisemeViewerWindow::OnBmlRequestCB(BML::BmlRequest* request, void* data)
 			}
 		}
 	}
+	viewer->_lastUtterance = utterance;
 }
 
 void VisemeViewerWindow::OnDiphoneSelectCB(Fl_Widget* widget, void* data)
