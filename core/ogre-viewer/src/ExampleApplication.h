@@ -31,7 +31,8 @@ Description: Base class for all the OGRE examples
 // This function will locate the path to our application on OS X,
 // unlike windows you can not rely on the curent working directory
 // for locating your configuration files and resources.
-std::string macBundlePath()
+std::string macBundlePath();
+/*
 {
     char path[1024];
     CFBundleRef mainBundle = CFBundleGetMainBundle();
@@ -50,6 +51,7 @@ std::string macBundlePath()
 
     return std::string(path);
 }
+ */
 #endif
 
 using namespace Ogre;

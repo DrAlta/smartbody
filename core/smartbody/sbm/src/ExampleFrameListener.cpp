@@ -72,7 +72,7 @@ mInputManager(0), mMouse(0), mKeyboard(0), mJoy(0)
 	pl.insert(std::make_pair(std::string("w32_mouse"),std::string("DISCL_BACKGROUND")));
 
 	//LogManager::getSingletonPtr()->logMessage( "*** Initializing OIS step1 ***" );
-
+#if 0
 	//LogManager::getSingletonPtr()->logMessage( "*** Initializing OIS step2 ***" );
 	mInputManager = OIS::InputManager::createInputSystem( windowHnd );
 	//LogManager::getSingletonPtr()->logMessage( "*** Initializing OIS step3 ***" );
@@ -88,7 +88,7 @@ mInputManager(0), mMouse(0), mKeyboard(0), mJoy(0)
 		//LogManager::getSingletonPtr()->logMessage("Exception when createInputObject, description = " + e);	 
 		printf("exception = %s\n", e.eText);
 	}
-	
+#endif	
 #if 0
 	try {
 		mJoy = static_cast<OIS::JoyStick*>(mInputManager->createInputObject( OIS::OISJoyStick, bufferedJoy ));
@@ -157,6 +157,7 @@ ExampleFrameListener::~ExampleFrameListener()
 
 bool ExampleFrameListener::processUnbufferedKeyInput( const FrameEvent& evt )
 {
+    return false;
 	if(mKeyboard->isKeyDown(OIS::KC_A))
 		mTranslateVector.x = -mMoveScale;	// Move camera left
 
@@ -256,6 +257,7 @@ bool ExampleFrameListener::processUnbufferedKeyInput( const FrameEvent& evt )
 
 bool ExampleFrameListener::processUnbufferedMouseInput( const FrameEvent& evt )
 {
+    return false;
 	// Rotation factors, may not be used if the second mouse button is pressed
 	// 2nd mouse button - slide, otherwise rotate
 	const OIS::MouseState &ms = mMouse->getMouseState();
@@ -300,6 +302,7 @@ void ExampleFrameListener::showDebugOverlay( bool show )
 
 bool ExampleFrameListener::frameRenderingQueued( const FrameEvent& evt )
 {
+    return false;
 	if(mWindow->isClosed())	return false;
 
 	mSpeedLimit = mMoveScale * evt.timeSinceLastFrame;
