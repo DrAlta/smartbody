@@ -45,14 +45,17 @@ void FLTKOgreWindow::initOgreWindow()
 	//fl_open_display();
 	//GLChoiceType* glChoice = GLChoiceType::find( CAP_DEPTH_BUFFER | CAP_DOUBLE_BUFFER, NULL );
 	//Fl_X::make_xid( this, glChoice->vis, glChoice->colormap );	
+    
 	void* flHwnd = (void*)fl_xid(this); // get hwnd	
 	void* flParentHwnd = NULL;
 	if (parent())
 		flParentHwnd = (void*)fl_xid(dynamic_cast<Fl_Window*>(parent()));
 	make_current();
-	//printf("ogreWindow, GLContext = %d\n",context());
+    unsigned long fltkGLContext = (unsigned long)this->context();
+	printf("ogreWindow, GLContext = %d\n",fltkGLContext);
+    
 	ogreInterface = new EmbeddedOgre();
-	ogreInterface->createOgreWindow(flHwnd, flParentHwnd, w(), h(), "OgreWindow");	
+	ogreInterface->createOgreWindow(flHwnd, flParentHwnd, fltkGLContext, w(), h(), "OgreWindow");	
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	FLTKListener* fltkListener = dynamic_cast<FLTKListener*>(mcu.sbm_character_listener);
@@ -70,7 +73,10 @@ void FLTKOgreWindow::initOgreWindow()
 		{
 			ogreListener->OnCharacterChangeMesh(charNames[i]);
 		}
-	}	
+	}
+     
+     
+    
 	//fl_set_gl_context(this,ogreInterface->getGLContext());	
 }
 
@@ -79,8 +85,11 @@ void FLTKOgreWindow::draw()
 	//fl_set_gl_context(this,ogreInterface->getGLContext());
 	make_current();
 	if (ogreInterface)
+    //if (1)
 	{
+        
  		//glPushAttrib( GL_ALL_ATTRIB_BITS );
+        
  		glPushClientAttrib( GL_CLIENT_ALL_ATTRIB_BITS );
  		glMatrixMode( GL_COLOR );
 		glPushMatrix();
@@ -102,9 +111,10 @@ void FLTKOgreWindow::draw()
 		glMatrixMode( GL_MODELVIEW );
 		glPopMatrix();
  		glPopClientAttrib();
+        
  		//glPopAttrib();
  		
- 		fltkRender(); // let old fltk viewer render rest of stuffs
+ 		//fltkRender(); // let old fltk viewer render rest of stuffs
  		ogreInterface->finishRender();
 	}
 	Ogre::WindowEventUtilities::messagePump();
@@ -133,7 +143,8 @@ void FLTKOgreWindow::updateOgreCamera()
 
 void FLTKOgreWindow::fltkRender()
 {
-	//FltkViewer::draw();
+	FltkViewer::draw();
+    return;
 	glEnable(GL_DEPTH_TEST);
 	if (_objManipulator.hasPicking())
 	{
@@ -146,6 +157,11 @@ void FLTKOgreWindow::fltkRender()
 	SrLight &light = _data->light;
 	SrCamera &cam  = _data->camera;
 	SrMat mat ( SrMat::NotInitialized );
+    
+    
+    //glClearColor ( _data->bcolor );
+    //glClearColor(1.f,0.f,0.f,1.f);
+    //glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 	//----- Set Projection ----------------------------------------------
 	cam.aspect = (float)w()/(float)h();

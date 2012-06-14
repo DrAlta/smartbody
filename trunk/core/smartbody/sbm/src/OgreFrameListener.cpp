@@ -1,9 +1,9 @@
 #include "vhcl.h"
 #include "vhmsg-tt.h"
-#include "OgreFrameListener.h"
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
+#include "OgreFrameListener.h"
 #include "EmbeddedOgre.h"
 
 
@@ -18,7 +18,7 @@ OgreFrameListener::OgreFrameListener(RenderWindow * win, Camera * cam, const std
 	mQuit = false;
 	m_ogreMouseEnabled = true;
 	// turn off mouse look by default
-	SetOgreMouse( true );
+	//SetOgreMouse( true );
 }
 
 
@@ -29,6 +29,7 @@ void OgreFrameListener::windowFocusChange( RenderWindow * rw )
 
 bool OgreFrameListener::processUnbufferedKeyInput(const FrameEvent& evt)
 {
+    return false;
 #if 0
 	if(mKeyboard->isKeyDown(OIS::KC_A))
 		mTranslateVector.x = -mMoveScale;	// Move camera left

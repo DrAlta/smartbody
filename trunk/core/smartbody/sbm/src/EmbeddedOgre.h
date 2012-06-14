@@ -22,7 +22,7 @@ class EmbeddedOgre
 public:
 	EmbeddedOgre(void);
 	~EmbeddedOgre(void);
-	void createOgreWindow(void* windowHandle, void* parentHandle, int width, int height, std::string windowName);
+	void createOgreWindow(void* windowHandle, void* parentHandle, unsigned long glContext, int width, int height, std::string windowName);
 	void setupResource();
 	void createDefaultScene();	
 	void update();

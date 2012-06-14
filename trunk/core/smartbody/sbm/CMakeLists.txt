@@ -1,6 +1,13 @@
 include_directories( ./src )
 include_directories( ../smartbody-lib/src )
-include_directories( /usr/local/include/OGRE )
+
+# never build ogre if in osx
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set (BUILD_OGRE FALSE)
+	#include_directories( /Users/feng/SmartBodyDev/OgreSDK_1.7/include/ )
+	#include_directories( /Users/feng/SmartBodyDev/OgreSDK_1.7/include/Ogre/ )
+endif()
+
 
 find_package(OpenGL REQUIRED)
 
@@ -12,12 +19,25 @@ find_library (FESTIVAL Festival ../../../lib/festival/festival/src/lib)
 find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
 find_library (ESTSTRING eststring ../../../lib/festival/speech_tools/lib)
 find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
+# these are the libraries necessary for osx, but disable it for now
+#find_library (IOKIT_LIBRARY IOKit)
+#find_library (FOUNDATION_LIBRARY Foundation)
+#find_library (COCOA_LIBRARY Cocoa)
+#find_library (X11_LIBRARY X11)
+#find_library (OGREMAIN Ogre /Users/feng/SmartBodyDev/ogre_src_v1-8-0/build/lib/relwithdebinfo/) 
+#find_library (OGREMAIN Ogre /Users/feng/SmartBodyDev/OgreSDK/lib/release/) 
+#find_library (OGREMAIN_17 Ogre /Users/feng/SmartBodyDev/OgreSDK_1.7/lib/release/) 
+#find_library (OGREMAIN_17_r Ogre /Users/feng/SmartBodyDev/ogre_src_v1-7-4/build/lib/RelWithDebInfo/)
+#find_library (OISLIB OIS /Users/feng/SmartBodyDev/ogre_src_v1-8-0/build/lib/relwithdebinfo/)
 endif()
 
 if (${BUILD_OGRE})
+include_directories( /usr/local/include/OGRE )
+set (OGREMAINLIB OgreMain)
+set (OISLIB OIS)
 set (OGRE_LIBS
-	OgreMain
-	OIS	
+	${OGREMAINLIB}	
+	${OISLIB}		
 )
 set (OGRE_SRCS
 	src/EmbeddedOgre.cpp
@@ -38,10 +58,15 @@ find_library (ALUT alut )
 find_library (OPENAL openal)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+link_directories(/usr/X11R6/lib)
 set( MORE_LIBS
         ${COREAUDIO_LIBRARY}
         ${AUDIOUNIT_LIBRARY}
         ${CORESERVICES_LIBRARY}
+	${IOKIT_LIBRARY}
+	${FOUNDATION_LIBRARY}
+	${COCOA_LIBRARY}
+	${X11_LIBRARY}	
         ${LIBSNDFILE}
         ${ALUT}
         ${OPENAL}

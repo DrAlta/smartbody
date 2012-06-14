@@ -1,4 +1,13 @@
 #include "vhcl.h"
+#include <sb/SBScene.h>
+#include <sb/SBJoint.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBCharacter.h>
+#include <sbm/sbm_deformable_mesh.h>
+#include <sbm/GPU/SbmTexture.h>
+#if !defined(WIN32)
+#include <GL/glx.h>
+#endif
 #include "OgreFrameListener.h"
 #include "EmbeddedOgre.h"
 #include <boost/lexical_cast.hpp>
@@ -10,15 +19,7 @@
 #undef UINTMAX_C
 #endif
 
-#include <sb/SBScene.h>
-#include <sb/SBJoint.h>
-#include <sb/SBSkeleton.h>
-#include <sb/SBCharacter.h>
-#include <sbm/sbm_deformable_mesh.h>
-#include <sbm/GPU/SbmTexture.h>
-#if !defined(WIN32)
-#include <GL/glx.h>
-#endif
+
 
 using namespace Ogre;
 
@@ -55,16 +56,9 @@ void EmbeddedOgre::setupResource()
 		{
 			typeName = i->first;
 			archName = i->second;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-			// OS X does not set the working directory relative to the app,
-			// In order to make things portable on OS X we need to provide
-			// the loading with it's own bundle path location
-			ResourceGroupManager::getSingleton().addResourceLocation(
-				String(macBundlePath() + "/" + archName), typeName, secName);
-#else
+
 			ResourceGroupManager::getSingleton().addResourceLocation(
 				archName, typeName, secName);
-#endif
 		}
 	}
 
@@ -97,7 +91,7 @@ void EmbeddedOgre::createDefaultScene()
 	ogreSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_MODULATIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_ADDITIVE );
 	ogreSceneMgr->setShadowTextureSize( 2048 );
-	//ogreSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );
+	ogreSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );
 
 	// Setup animation default
 	Animation::setDefaultInterpolationMode( Animation::IM_LINEAR );
@@ -174,18 +168,20 @@ void EmbeddedOgre::createDefaultScene()
 	Plane plane;
 	plane.normal = Vector3::UNIT_Y;
 	plane.d = 0;
+    
 	Ogre::MeshPtr planeMesh = MeshManager::getSingleton().createPlane( "Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 3500, 3500, 100, 100, true, 1, 60, 60, Vector3::UNIT_Z );
 	std::string materialName = "MyplaneMat";
+    
 	Ogre::MaterialPtr ogreMat = Ogre::MaterialManager::getSingleton().create(materialName, "General");
 	Ogre::Pass* pass = ogreMat->getTechnique(0)->getPass(0);			
-	pass->setDiffuse(0.3f,0.3f,0.3f,1.f);	
+	pass->setDiffuse(1.0f,0.3f,0.3f,1.f);	
 	pass->setShadingMode(SO_PHONG);
 	for (int i=0;i<planeMesh->getNumSubMeshes();i++)
 	{
 		SubMesh* subMesh = planeMesh->getSubMesh(i);
 		subMesh->setMaterialName(materialName);
 	}
-
+    
 	Entity * pPlaneEnt = ogreSceneMgr->createEntity( "plane", "Myplane" );	
 	//pPlaneEnt->setMaterialName( "Ogre/DepthShadowmap/Receiver/RockWall" );
 	//pPlaneEnt->setMaterialName( "Ogre/Compositor/HDR/GaussianBloom" );
@@ -227,12 +223,12 @@ unsigned long EmbeddedOgre::getCurrentGLContext()
 #endif
 }
 
-void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, int width, int height, std::string windowName )
+void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, unsigned long glContext, int width, int height, std::string windowName )
 {
 	// initialize Ogre3D
 	size_t winHandle = (size_t)windowHandle;
-	unsigned long oldGLContext = getCurrentGLContext();
-	//LOG("embeddedOgre, current GL context = %d",oldGLContext);
+	unsigned long oldGLContext = glContext;//getCurrentGLContext();//glContext;
+	//LOG("embeddedOgre, current GL context = %lu, input GL context = %lu, winHandle = %lu",oldGLContext, glContext, winHandle);
 	try 
 	{		
 		ogreRoot = new Ogre::Root();
@@ -246,11 +242,9 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, int
 		}
 		ogreRoot->loadPlugin(pluginName);
 		//ogreRoot->loadPlugin(sceneManagerPlugin);
-#ifdef WIN32
+
 		const Ogre::RenderSystemList& lRenderSystemList = (ogreRoot->getAvailableRenderers());
-#else // in Linux, we use Ogre 1.6.5, which has a slightly different API calls
-		const Ogre::RenderSystemList& lRenderSystemList = (*ogreRoot->getAvailableRenderers());
-#endif
+
 		Ogre::RenderSystem *lRenderSystem = lRenderSystemList[0];		
 		ogreRoot->setRenderSystem(lRenderSystem);
 				
@@ -258,13 +252,25 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, int
 		Ogre::NameValuePairList params;
 		//if (parentHandle)
 		//	params["parentWindowHandle"] = Ogre::StringConverter::toString((size_t)parentHandle);	
-		printf("window handle = %d\n",winHandle);
-		params["externalWindowHandle"] = Ogre::StringConverter::toString(winHandle);		
-		params["externalGLControl"] = Ogre::StringConverter::toString( true );
-		params["externalGLContext"] = Ogre::StringConverter::toString( (unsigned long)getCurrentGLContext() );
+        
+        char charHandle[256];
+        sprintf(charHandle,"%ld",winHandle);
+        Ogre::String strHandle = Ogre::StringConverter::toString((size_t)winHandle);
+        
+		//printf("window handle = %lu, strHandle = %s, charHandle = %s\n",winHandle, strHandle.c_str(), charHandle);
+#if defined(__APPLE__)        
+        params["macAPI"] = "cocoa";	
+        params["macAPICocoaUseNSView"] = "true";	
+#elif defined(linux)
+        params["currentGLContext"] = String("true");
+#else
+        params["externalGLControl"] = Ogre::StringConverter::toString( true );
+		params["externalGLContext"] = Ogre::StringConverter::toString( (unsigned long)glContext );
+        
+#endif
+		params["externalWindowHandle"] = strHandle;				                
 		ogreWnd = ogreRoot->createRenderWindow( windowName, width, height, false, &params );
-
-		ogreGLContext = (unsigned long)getCurrentGLContext();
+		ogreGLContext = (unsigned long)glContext;
 		
 
 		// setup scene manager
