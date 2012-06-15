@@ -175,7 +175,7 @@ namespace BML {
 
 		std::vector<float> stitchCurve(std::vector<float>& c1, std::vector<float>& c2);
 
-		void smoothCurve(std::vector<float>& c, float windowSize);
+		void smoothCurve(std::vector<float>& c, std::vector<float>& timeMarkers, float windowSize);
 
 		friend class BML::Processor;  //temporary
 	};

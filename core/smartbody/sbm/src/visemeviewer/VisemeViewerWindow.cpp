@@ -485,7 +485,7 @@ void VisemeViewerWindow::OnCharacterSelectCB(Fl_Widget* widget, void* data)
 		viewer->_browserViseme->clear();
 		for (int i = 0; i < numViseme; i++){
 			char* c_str = (char*)faceDefinition->getVisemeName(i).c_str();
-			viewer->enforceNamingConvention(c_str);
+//			viewer->enforceNamingConvention(c_str);
 			viewer->_browserViseme->add(c_str);
 		}
 	}
@@ -686,7 +686,7 @@ void VisemeViewerWindow::enforceNamingConvention(char * c_str)
 	if(islower(c_str[0]))
 		c_str[0] = toupper(c_str[0]);
 
-	for(int k = 1; k < strlen(c_str); k++)
+	for(size_t k = 1; k < strlen(c_str); k++)
 	{
 		if(isupper(c_str[k]))
 			c_str[k] = tolower(c_str[k]);

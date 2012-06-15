@@ -395,20 +395,30 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 	SBCharacter* character = dynamic_cast<SBCharacter*>(request->actor);
 	VisemeData* curViseme = NULL;
 	VisemeData* prevViseme = NULL;
+	VisemeData* nextViseme = NULL;
+	std::vector<float> visemeTimeMarkers;
 	std::vector<VisemeData*> visemeRawData;
 	for ( size_t i = 0; i < (*result_visemes).size(); i++ )
 	{
 		if (i > 0)
 			prevViseme = (*result_visemes)[i - 1];
+		if (i < ((*result_visemes).size() - 1))
+			nextViseme = (*result_visemes)[i + 1];
 		curViseme = (*result_visemes)[i];
+		visemeTimeMarkers.push_back(curViseme->time());
 		if (prevViseme != NULL)
 		{
 			SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(prevViseme->id(), curViseme->id(), request->actor->getName());
-			float blendIval = curViseme->time() - prevViseme->time();
+			float blendIval = 0.0f;
+			if (nextViseme != NULL)
+				blendIval = nextViseme->time() - prevViseme->time();
+			else
+				blendIval = 2.0f * (curViseme->time() - prevViseme->time());
 
-			if (blendIval < 0.1f)
-				blendIval = 0.1f;
-			blendIval *= 2;
+			// ad-hoc, blend interval should not be less than 0.1f
+//			if (blendIval < 0.2f)
+//				blendIval = 0.2f;
+
 			if (diphone)
 			{
 				const std::vector<std::string>& visemeNames = diphone->getVisemeNames();
@@ -484,7 +494,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 	for (size_t i = 0; i < visemeProcessedData.size(); i++)
 	{
 		VisemeData* newV = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
-		smoothCurve(visemeProcessedData[i]->getFloatCurve(), character->getDiphoneSmoothWindow());
+		smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, character->getDiphoneSmoothWindow());
 		newV->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
 		(*result_visemes).push_back(newV);
 	}
@@ -591,7 +601,7 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 }
 
 
-void BML::SpeechRequest::smoothCurve(std::vector<float>& c, float windowSize)
+void BML::SpeechRequest::smoothCurve(std::vector<float>& c, std::vector<float>& timeMarkers, float windowSize)
 {
 	if (windowSize <= 0)
 		return;
@@ -609,7 +619,56 @@ void BML::SpeechRequest::smoothCurve(std::vector<float>& c, float windowSize)
 		else
 			y.push_back(c[i]);
 	}
-	
+
+	// local smoothing, by window size or phoneme intervals
+	for (size_t i = 1; i < timeMarkers.size() - 1; i++)
+	{
+		// left&right time and window size
+		//float leftTime = timeMarkers[i - 1];
+		//float rightTime = timeMarkers[i + 1];
+		float leftTime = timeMarkers[i] - windowSize / 2;
+		float rightTime = timeMarkers[i] + windowSize / 2;
+
+		int leftId = 0;
+		int rightId = 0;
+		for (size_t j = 0; j < x.size(); j++)
+		{
+			if (x[j] >= leftTime)
+			{
+				leftId = j;
+				break;
+			}
+		}
+		for (size_t j = 0; j < x.size(); j++)
+		{
+			if (x[j] >= rightTime)
+			{
+				rightId = j;
+				break;
+			}
+		}
+
+		std::vector<int> localMaxId;
+		for (int j = (leftId + 1); j <= (rightId - 1); j++)
+		{
+			if ((y[j] - y[j - 1]) > 0 &&
+				(y[j] - y[j + 1]) > 0)
+			{
+				localMaxId.push_back(j);
+			}
+		}
+		if (localMaxId.size() >= 2)
+		{
+			for (size_t l = 0; l < (localMaxId.size() - 1); l++)
+			{
+				for (int markId = (localMaxId[l] + 1); markId < (localMaxId[l + 1]); markId++)
+					markDelete[markId] = true;
+			}
+		}
+	}
+
+	// global smoothing(by windowsize or phoneme intervals
+	/*
 	if ((x[x.size() - 1] - x[0]) <=  windowSize)
 	{
 		std::vector<int> localMaxId;
@@ -629,12 +688,20 @@ void BML::SpeechRequest::smoothCurve(std::vector<float>& c, float windowSize)
 				}
 			}
 		}
-
 	}
 	else
 	{
 		for (size_t i = 0; i < x.size(); i++)
 		{
+			for (size_t t = 0; t < timeMarkers.size(); t++)
+			{
+				if (x[i] >= timeMarkers[t] && t < (timeMarkers.size() - 3))
+				{
+					windowSize = (timeMarkers[t + 3] - timeMarkers[t]);
+					break;
+				}
+			}
+
 			std::vector<int> localMaxId;
 			for (size_t j = i + 1; j < (x.size() - 1); j++)
 			{
@@ -660,6 +727,7 @@ void BML::SpeechRequest::smoothCurve(std::vector<float>& c, float windowSize)
 			}
 		}
 	}
+	*/
 
 	std::vector<float> newCurve;
 	for (size_t i = 0; i < markDelete.size(); i++)
