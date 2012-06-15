@@ -145,6 +145,7 @@ SBCharacter* SBScene::createCharacter(std::string charName, std::string metaInfo
 		character->setSkeleton(skeleton);
 		SkJoint* joint = skeleton->add_joint(SkJoint::TypeQuat);
 		joint->setName("world_offset");
+		joint->update_gmat();
 		mcu.registerCharacter(character);
 
 		// notify the services
@@ -578,6 +579,13 @@ void SBScene::commandAt(float seconds, const std::string& command)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	mcu.execute_later((char*) command.c_str(), seconds);
+}
+
+void SBScene::removePendingCommands()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	mcu.activeSequences.clear();
+	mcu.pendingSequences.clear();
 }
 
 void SBScene::sendVHMsg(std::string message)

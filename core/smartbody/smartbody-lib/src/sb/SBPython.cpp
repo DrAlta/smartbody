@@ -1403,6 +1403,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getScript", &SBScene::getScript, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a script.")
 		.def("getScale", &SBScene::getScale, "Returns the scene scale in meters (default is centimeters .01)")
 		.def("setScale", &SBScene::setScale, "Sets the scene scale in meters.")
+		.def("removePendingCommands", &SBScene::removePendingCommands, "Removes any commands stored in SmartBody awaiting execution.")
 
 		// command processing
 		.def("command", &SBScene::command, "Runs an old-Style SmartBody command.")
