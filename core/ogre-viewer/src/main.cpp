@@ -29,7 +29,9 @@
 #include <vector>
 #include <string>
 #include "ini.h"
+#include "bonebus.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 std::string macBundlePath()
 {
     char path[1024];
@@ -49,6 +51,7 @@ std::string macBundlePath()
     
     return std::string(path);
 }
+#endif
 
 static int inihandler(void* user, const char* section, const char* name,
                    const char* value)
@@ -168,7 +171,7 @@ int main(int argc, char* argv[])
 			if (tokenCounter < numTokens)
 			{
 				std::string command = "pythonscript " + tokenzied[tokenCounter];
-				app.m_initialCommands.push_back(command);
+				app.m_initialCommands.push_back(command);				
 			}
 		}
 		if (op == "-mediapath")
