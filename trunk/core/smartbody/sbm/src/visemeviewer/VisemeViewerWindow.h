@@ -60,6 +60,7 @@ protected:
 	void updateViseme();
 	void initializeVisemes();
 	void resetViseme();
+	void enforceNamingConvention(char * c_str);
 
 	SBCharacter* getCurrentCharacter();
 	std::string getCurrentCharacterName();
