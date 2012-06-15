@@ -114,7 +114,7 @@ void FLTKOgreWindow::draw()
         
  		//glPopAttrib();
  		
- 		//fltkRender(); // let old fltk viewer render rest of stuffs
+ 		fltkRender(); // let old fltk viewer render rest of stuffs
  		ogreInterface->finishRender();
 	}
 	Ogre::WindowEventUtilities::messagePump();
@@ -143,8 +143,8 @@ void FLTKOgreWindow::updateOgreCamera()
 
 void FLTKOgreWindow::fltkRender()
 {
-	FltkViewer::draw();
-    return;
+	//FltkViewer::draw();
+    //return;
 	glEnable(GL_DEPTH_TEST);
 	if (_objManipulator.hasPicking())
 	{

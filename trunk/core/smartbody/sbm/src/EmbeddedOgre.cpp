@@ -174,7 +174,7 @@ void EmbeddedOgre::createDefaultScene()
     
 	Ogre::MaterialPtr ogreMat = Ogre::MaterialManager::getSingleton().create(materialName, "General");
 	Ogre::Pass* pass = ogreMat->getTechnique(0)->getPass(0);			
-	pass->setDiffuse(1.0f,0.3f,0.3f,1.f);	
+	pass->setDiffuse(0.3f,0.3f,0.3f,1.f);	
 	pass->setShadingMode(SO_PHONG);
 	for (int i=0;i<planeMesh->getNumSubMeshes();i++)
 	{
@@ -227,7 +227,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 {
 	// initialize Ogre3D
 	size_t winHandle = (size_t)windowHandle;
-	unsigned long oldGLContext = glContext;//getCurrentGLContext();//glContext;
+	unsigned long oldGLContext = getCurrentGLContext();//glContext;
 	//LOG("embeddedOgre, current GL context = %lu, input GL context = %lu, winHandle = %lu",oldGLContext, glContext, winHandle);
 	try 
 	{		
@@ -265,12 +265,12 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
         params["currentGLContext"] = String("true");
 #else
         params["externalGLControl"] = Ogre::StringConverter::toString( true );
-		params["externalGLContext"] = Ogre::StringConverter::toString( (unsigned long)glContext );
+		params["externalGLContext"] = Ogre::StringConverter::toString( (unsigned long)getCurrentGLContext() );
         
 #endif
-		params["externalWindowHandle"] = strHandle;				                
+		params["externalWindowHandle"] = Ogre::StringConverter::toString((size_t)winHandle);				                
 		ogreWnd = ogreRoot->createRenderWindow( windowName, width, height, false, &params );
-		ogreGLContext = (unsigned long)glContext;
+		ogreGLContext = (unsigned long)getCurrentGLContext();
 		
 
 		// setup scene manager
