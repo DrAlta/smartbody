@@ -64,8 +64,9 @@ class SBScene : public SBObject
 
 		std::vector<std::string> getPawnNames();
 		std::vector<std::string> getCharacterNames();
-		
 
+		void removePendingCommands();
+		
 		SBSkeleton* createSkeleton(std::string char_name);
 
 		SBMotion* getMotion(std::string name);

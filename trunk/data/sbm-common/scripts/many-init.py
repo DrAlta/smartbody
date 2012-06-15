@@ -14,7 +14,7 @@ scene.run("init-common-assets.py")
 #0	seq init-general-parameters
 scene.run("init-common-face.py")
 
-numCharacters = 20
+numCharacters = 50
 for i in range(0, numCharacters):
 
 	brad = scene.createCharacter("brad" + str(i), "brad")
@@ -39,6 +39,13 @@ scene.setDefaultRecipient("brad1")
 scene.run("init-param-animation.py")
 
 scene.run("init-steer-agents.py")
+steerManager = scene.getSteerManager()
+
+numCharacters = scene.getNumCharacters()
+charNames = scene.getCharacterNames()
+for i in range(0, numCharacters):
+	setupSteerAgent(charNames[i],'all')	
+steerManager.setEnable(True)
 
 #scene.run("init-example-reach.py")
 #names = scene.getCharacterNames()
