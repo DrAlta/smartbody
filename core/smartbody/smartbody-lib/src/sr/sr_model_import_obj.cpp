@@ -300,7 +300,7 @@ bool SrModel::import_obj ( const char* file )
 //   remove_redundant_normals ();
    compress ();
 
-   // after remove all redundant materials, load the corresponding textures
+   // after remove all redundant materials, load the corresponding textures   
 #if !defined (__ANDROID__) && !defined(SBM_IPHONE)
    for (int i=0;i<M.size();i++)
    {

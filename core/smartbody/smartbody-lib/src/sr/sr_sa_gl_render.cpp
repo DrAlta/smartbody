@@ -159,19 +159,30 @@ bool SrSaGlRender::shape_apply ( SrSnShapeBase* s )
    // 2. Render only if needed
    if ( !s->visible() ) return true;
 
+  
+   bool isSrModel = sr_compare(s->inst_class_name(),"model") == 0;
    // 3. Check if lists are up to date
-   if ( !s->haschanged() )
-    { //SR_TRACE2 ( "Calling list..." );
+   if ( !s->haschanged() && !isSrModel)
+   { //SR_TRACE2 ( "Calling list..." );
       glCallList ( ogl->list ); 
       return true;
-    }
+   }
 
    // 4. If the list is not up to date, regenerate it calling the render function
    //SR_TRACE2 ( "Creating and executing list of SrSn"<<s->inst_class_name()<<"..." );
-   glNewList ( ogl->list, GL_COMPILE_AND_EXECUTE );
-   ogl->rfunc ( s );
-   glEndList ();
-   s->changed(false);
+  
+   if (!isSrModel)
+   {
+	   glNewList ( ogl->list, GL_COMPILE_AND_EXECUTE );
+	   ogl->rfunc ( s );
+	   glEndList ();
+	   s->changed(false);
+   }
+   else
+   {
+	   ogl->rfunc(s);
+   }   
+
    return true;
  }
 
