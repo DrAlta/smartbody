@@ -81,6 +81,7 @@ class SrModel : public SrSharedClass
 
 	std::map<std::string,std::string> mtlTextureNameMap; // map from material name to texture name
 	std::map<std::string,std::string> mtlNormalTexNameMap;
+	std::map<std::string,std::vector<int>> mtlFaceIndices;
 
     /*! Will be set to true (the default) if back face culling
         should be applied, and false othrwise */

@@ -285,7 +285,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 	{
 		GLuint my_sampler_uniform_location = glGetUniformLocation(program,"Transform");	
 		tranTBO->UpdateTBOData((float*)getPtr(tranBuffer));
-		glActiveTexture(GL_TEXTURE0_ARB);
+		glActiveTexture(GL_TEXTURE0_ARB);		
 		tranTBO->BindBufferToTexture();
 		glUniform1i(my_sampler_uniform_location, iActiveTex);
 	}

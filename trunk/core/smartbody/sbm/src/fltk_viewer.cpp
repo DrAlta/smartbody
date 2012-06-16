@@ -100,10 +100,12 @@ void main()\n\
 	gl_Position = ftransform();\n\
 	normal = normalize(gl_NormalMatrix * gl_Normal);\n\
 	gl_FrontColor = gl_FrontMaterial.diffuse*gl_LightSource[0].diffuse *vec4(max(dot(normal, normalize(gl_LightSource[0].position.xyz)), 0.0));\n\
+	//gl_FrontColor = color;\n\
 	gl_TexCoord[0] = gl_MultiTexCoord0;\n\
 }";
 std::string Std_FS = 
 "uniform sampler2D tex;\n\
+uniform sampler2D diffuseTex;\n\
 uniform int useShadowMap;\n\
 varying vec4 vPos;\n\
 float shadowCoef()\n\
@@ -124,7 +126,11 @@ void main()\n\
 	float shadow_coef = 1.0;\n\
 	if (useShadowMap == 1) \n\
 		shadow_coef = shadowCoef();\n\
-	gl_FragColor = gl_Color*shadow_ambient * shadow_coef;\n\
+	vec4 texColor = texture2D(diffuseTex,gl_TexCoord[0].st);\n\
+	if (length(texColor) == 0) texColor = 1.0; \n\
+	//vec4 color = vec4(0,0,0,0);\n\
+	vec4 color = vec4(gl_Color.rgb*texColor.rgb, texColor.a);\n\
+	gl_FragColor = vec4(color.rgb*shadow_coef*shadow_ambient,color.a);//color.a);//gl_Color*shadow_ambient * shadow_coef;\n\
 }";
 
 
@@ -1169,13 +1175,14 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	if ( _data->displayaxis ) _data->render_action.apply ( _data->sceneaxis );
 	if ( _data->boundingbox ) _data->render_action.apply ( _data->scenebox );
 
-    if (hasGPUSupport)
+	
+    if (hasGPUSupport)// && _data->shadowmode == ModeShadows)
     {
         std::string shaderName = _data->shadowmode == ModeShadows && !shadowPass ? "Basic" : "BasicShadow";
 	    SbmShaderProgram* basicShader = SbmShaderManager::singleton().getShader(shaderName);
 	    GLuint program = basicShader->getShaderProgram();
-	    if (!shadowPass)
-		    glUseProgram(program);		
+	    if (_data->shadowmode == ModeShadows && !shadowPass)
+			glUseProgram(program);		
 	    GLuint useShadowMapLoc = glGetUniformLocation(program,"useShadowMap");
 	    if (_data->shadowmode == ModeShadows && !shadowPass) // attach the texture
 	    {		
@@ -1186,16 +1193,17 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		    //glLoadMatrixf(shadowTexMatrix.pt(0));
 		    glCullFace(GL_BACK);
 		    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-		    glUniform1i(glGetUniformLocation(program, "tex"), 7); 		
+		    glUniform1i(glGetUniformLocation(program, "tex"), 7); 	
+			glUniform1i(glGetUniformLocation(program, "diffuseTex"), 0); 
 		    glMatrixMode(GL_MODELVIEW);			
 		    glUniform1i(useShadowMapLoc,1);		
 	    }
 	    else
 	    {
+			glUniform1i(glGetUniformLocation(program, "diffuseTex"), 0); 
 		    glUniform1i(useShadowMapLoc,0);		
 	    }
     }
-	
 
 	if( _data->root )	{		
 		_data->render_action.apply ( _data->root );
@@ -1232,9 +1240,12 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 #endif
 
 	drawPawns();
-	//glUseProgram(0);	
+	
 	glDisable(GL_LIGHTING);
+	
+	glUseProgram(0);	
 }
+
 
    
 void FltkViewer::draw() 
@@ -1338,6 +1349,9 @@ void FltkViewer::draw()
 
 	glDisable( GL_COLOR_MATERIAL );
 
+
+	
+
    //----- Render user scene -------------------------------------------
 
 	//glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
@@ -1347,11 +1361,9 @@ void FltkViewer::draw()
 	drawAllGeometries();		
    // draw the grid
 	//   if (gridList == -1)
-	//	   initGridList();
+	//	   initGridList();	
 	drawGrid();
-
 	drawSteeringInfo();
-
 	drawEyeBeams();
 	drawEyeLids();
 	drawDynamics();
@@ -2093,7 +2105,7 @@ int FltkViewer::handle ( int event )
 	   case FL_PASTE:              // handle actual drop (paste) operation		   
 		   label(Fl::event_text());
 		   //fprintf(stderr, "PASTE: %s\n", Fl::event_text());
-		   //LOG("PASTE: %s\n", Fl::event_text());
+		   LOG("PASTE: %s\n", Fl::event_text());
 		   dndText = Fl::event_text();
 		   processDragAndDrop(dndText,dndX,dndY);
 		   ret = 1;

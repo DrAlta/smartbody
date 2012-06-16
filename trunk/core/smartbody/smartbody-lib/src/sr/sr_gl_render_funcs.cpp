@@ -29,6 +29,8 @@
 # include <sr/sr_sphere.h>
 # include <sr/sr_cylinder.h>
 # include <sr/sr_polygons.h>
+#include <sbm/gpu/SbmTexture.h>
+#include <sbm/gpu/SbmShader.h>
 
 # include <sr/sr_sn.h>
 # include <sr/sr_sn_shape.h>
@@ -36,8 +38,6 @@
 
 # include <sr/sr_gl.h>
 
-//# define SR_USE_TRACE1 // render
-//# include <sr/sr_trace.h>
 
 //=============================== render_model ====================================
 
@@ -46,12 +46,15 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    SrModel& model = ((SrSnModel*)shape)->shape();
 
    //SR_TRACE1 ( "Render Model faces="<<model.F.size() );
+   //initTex();
 
    SrArray<SrModel::Face>& F = model.F;
    SrArray<SrModel::Face>& Fn = model.Fn;
+   SrArray<SrModel::Face>& Ft = model.Ft;
    SrArray<int>&           Fm = model.Fm;
    SrArray<SrVec>&         V = model.V;
    SrArray<SrVec>&         N = model.N;
+   SrArray<SrPnt2>&        T = model.T;
    SrArray<SrMaterial>&    M = model.M;
 
    int fsize = F.size();
@@ -68,13 +71,10 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    else
     glDisable ( GL_CULL_FACE );
 
-   bool flat = true;
-
-   int f;
+   bool flat = true;   
    SrVec fn(SrVec::i);
    int fmIndex = Fm.size() > 0? Fm[0] : -1;
    SrMaterial curmtl = fmsize>0 && fmIndex >= 0? M[Fm[0]]:shape->material();
-
    switch ( shape->render_mode() )
     { case srRenderModeDefault :
       case srRenderModeSmooth :
@@ -91,39 +91,108 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
            glPolygonMode ( GL_FRONT_AND_BACK, GL_POINT );
            break;
     }
+   
+   glMaterial ( curmtl );    
+   for (int i=0;i<model.mtlnames.size();i++)
+   {
+	   std::string mtlName = model.mtlnames[i];
+	   if (model.mtlFaceIndices.find(mtlName) == model.mtlFaceIndices.end())
+		   continue;
+	   std::vector<int>& mtlFaces = model.mtlFaceIndices[mtlName];	   
+	   std::string texName = "none";
+	   if (model.mtlTextureNameMap.find(mtlName) != model.mtlTextureNameMap.end())
+		   texName = model.mtlTextureNameMap[mtlName];
 
-   glMaterial ( curmtl );
+	   SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,texName.c_str());
+	   if ( fsize > Fn.size() || flat ) // no normal
+	   {
+		   glBegin ( GL_TRIANGLES ); // some cards do require begin/end for each triangle!
+		   for (unsigned int k=0; k<mtlFaces.size(); k++ )
+		   {  
+			   int f = mtlFaces[k];			   
+			   fn = model.face_normal(f);
+			   glNormal ( fn );		   
+			   glVertex ( V[F[f].a] );
+			   glVertex ( V[F[f].b] );
+			   glVertex ( V[F[f].c] );		   
+		   }
+		   glEnd ();
+	   }
+	   else if ( fsize > Ft.size() || !tex ) // no texture
+	   {
+		   glBegin ( GL_TRIANGLES );
+		   for (unsigned int k=0; k<mtlFaces.size(); k++ )
+		   {	
+			   int f = mtlFaces[k];
+			   glNormal ( N[Fn[f].a] ); glVertex ( V[F[f].a] );
+			   glNormal ( N[Fn[f].b] ); glVertex ( V[F[f].b] );
+			   glNormal ( N[Fn[f].c] ); glVertex ( V[F[f].c] );		   
+		   }
+		   glEnd (); 
+	   }
+	   else // has normal and texture
+	   {   // to-do : figure out why texture does not work in the fixed-pipeline ?	  
+		   //glDisable(GL_LIGHTING);	
+		   glEnable ( GL_ALPHA_TEST );
+		   glEnable (GL_BLEND);
+		   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		   glAlphaFunc ( GL_GREATER, 0.3f ) ;
+		   glDisable(GL_COLOR_MATERIAL);	   
+		   glActiveTexture(GL_TEXTURE0);
+		   glEnable(GL_TEXTURE_2D);	 	
+		   glBindTexture(GL_TEXTURE_2D,tex->getID());	   	   
+		   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP);
+		   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP);
+		   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);//_MIPMAP_LINEAR);
+		   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+		   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	  
+		   glBegin ( GL_TRIANGLES );
+		   //glColor3f(1.f,0.f,1.f);
+		   for (unsigned int k=0; k<mtlFaces.size(); k++ )
+		   {	
+			   int f = mtlFaces[k];
+			   //printf("texture coord = %f %f\n",T[Ft[f].a].x, T[Ft[f].a].y);
+			   glNormal ( N[Fn[f].a] ); 
+			   //glColor3f(T[Ft[f].a].x, T[Ft[f].a].y, 0.f);
+			   glTexCoord2f(T[Ft[f].a].x, T[Ft[f].a].y); glVertex ( V[F[f].a] ); 
+			   glNormal ( N[Fn[f].b] ); 
+			   //glColor3f(T[Ft[f].b].x, T[Ft[f].b].y, 0.f);
+			   glTexCoord2f(T[Ft[f].b].x, T[Ft[f].b].y); glVertex ( V[F[f].b] ); 
+			   glNormal ( N[Fn[f].c] ); 
+			   //glColor3f(T[Ft[f].b].x, T[Ft[f].b].y, 0.f);
+			   glTexCoord2f(T[Ft[f].c].x, T[Ft[f].c].y); glVertex ( V[F[f].c] ); 		   
+		   }
+		   glEnd (); 	   
+		   glBindTexture(GL_TEXTURE_2D, 0);	   
+		   glDisable(GL_BLEND);
+	   }
+	   
+   }
+   //if (tex)
+	//	printf("texture name = %s, tex id = %d\n",textureName.c_str(), tex->getID());
+   
 
-   for ( f=0; f<fsize; f++ )
-    {
-      
-//       if ( f<fmsize )
-//        { 
-// 		 int fmIndex = Fm.size() > 0? Fm[0] : -1;
-// 		 SrMaterial& mtl = M[Fm[f]];
-//          if (mtl!=curmtl) { curmtl=mtl; glMaterial(mtl); }
+//    for ( f=0; f<fsize; f++ )
+//    {    
+//       if ( flat || f>=Fn.size() )
+//        {
+//          fn = model.face_normal(f);
+//          glNormal ( fn );
+//          glBegin ( GL_TRIANGLES ); // some cards do require begin/end for each triangle!
+//          glVertex ( V[F[f].a] );
+//          glVertex ( V[F[f].b] );
+//          glVertex ( V[F[f].c] );
+//          glEnd ();
 //        }
-      
-    
-      if ( flat || f>=Fn.size() )
-       {
-         fn = model.face_normal(f);
-         glNormal ( fn );
-         glBegin ( GL_TRIANGLES ); // some cards do require begin/end for each triangle!
-         glVertex ( V[F[f].a] );
-         glVertex ( V[F[f].b] );
-         glVertex ( V[F[f].c] );
-         glEnd ();
-       }
-      else
-       {
-         glBegin ( GL_TRIANGLES );
-         glNormal ( N[Fn[f].a] ); glVertex ( V[F[f].a] );
-         glNormal ( N[Fn[f].b] ); glVertex ( V[F[f].b] );
-         glNormal ( N[Fn[f].c] ); glVertex ( V[F[f].c] );
-         glEnd (); 
-       }
-    }
+//       else
+//        {
+//          glBegin ( GL_TRIANGLES );
+//          glNormal ( N[Fn[f].a] ); glVertex ( V[F[f].a] );
+//          glNormal ( N[Fn[f].b] ); glVertex ( V[F[f].b] );
+//          glNormal ( N[Fn[f].c] ); glVertex ( V[F[f].c] );
+//          glEnd (); 
+//        }
+//     }
 
    //SR_TRACE1 ( "End Render Model." );
  }

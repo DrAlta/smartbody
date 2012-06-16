@@ -110,6 +110,18 @@ void SrModel::validate ()
       Fm.size ( fsize );
       for ( i=j; i<fsize; i++ ) Fm[i]=0;
     }
+   for (int i=0;i<Fm.size();i++)
+   {
+	   int matIdx = Fm[i];
+	   std::string matName = "none";	   
+	   if (matIdx < mtlnames.size() && matIdx >= 0)
+	   {
+		   matName = mtlnames[matIdx];
+	   }
+	   if (mtlFaceIndices.find(matName) == mtlFaceIndices.end())
+		   mtlFaceIndices[matName] = std::vector<int>();
+	   mtlFaceIndices[matName].push_back(i);
+   }
  }
 
 void SrModel::remove_redundant_materials ()
@@ -965,6 +977,7 @@ void SrModel::operator = ( const SrModel& m )
 
    mtlTextureNameMap = m.mtlTextureNameMap;
    mtlNormalTexNameMap = m.mtlNormalTexNameMap;
+   mtlFaceIndices = m.mtlFaceIndices;
     
    name = m.name;
  }
