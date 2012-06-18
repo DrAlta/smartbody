@@ -111,14 +111,12 @@ varying vec4 vPos;\n\
 float shadowCoef()\n\
 {\n\
 	int index = 0;\n\
-	vec4 shadow_coord = vPos/vPos.w;//gl_TextureMatrix[1]*vPos;\n\
+	vec4 shadow_coord = vPos/vPos.w;\n\
 	shadow_coord.z += 0.000005;\n\
-	//shadow_coord.w = shadow_coord.z;\n\
-	//shadow_coord.z = float(index);\n\
 	float shadow_d = texture2D(tex, shadow_coord.st).x;\n\
 	float diff = 1.0;\n\
 	diff = shadow_d - shadow_coord.z;\n\
-	return clamp( diff*850.0 + 1.0, 0.0, 1.0);//(shadow_d-0.9)*10;//clamp( diff*250.0 + 1.0, 0.0, 1.0);\n\
+	return clamp( diff*850.0 + 1.0, 0.0, 1.0);\n\
 }\n\
 void main()\n\
 {\n\
@@ -127,10 +125,9 @@ void main()\n\
 	if (useShadowMap == 1) \n\
 		shadow_coef = shadowCoef();\n\
 	vec4 texColor = texture2D(diffuseTex,gl_TexCoord[0].st);\n\
-	if (length(texColor) == 0) texColor = 1.0; \n\
-	//vec4 color = vec4(0,0,0,0);\n\
+	if (length(texColor.rgb) < 0.01) texColor = vec4(1.0,1.0,1.0,1.0); \n\
 	vec4 color = vec4(gl_Color.rgb*texColor.rgb, texColor.a);\n\
-	gl_FragColor = vec4(color.rgb*shadow_coef*shadow_ambient,color.a);//color.a);//gl_Color*shadow_ambient * shadow_coef;\n\
+        gl_FragColor = vec4(color.rgb*shadow_coef*shadow_ambient,color.a);//color.a);//gl_Color*shadow_ambient * shadow_coef;\n\
 }";
 
 

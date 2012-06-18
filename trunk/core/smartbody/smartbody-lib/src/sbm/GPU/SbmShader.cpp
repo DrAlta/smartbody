@@ -83,6 +83,8 @@ void SbmShaderProgram::buildShader()
 	}
 
 	printShaderInfoLog(vsID);
+    printShaderInfoLog(fsID);
+    
 	programID = glCreateProgram();
 	if (vsID != -1)
 		glAttachShader(programID,vsID);
