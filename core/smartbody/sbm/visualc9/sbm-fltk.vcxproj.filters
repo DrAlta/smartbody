@@ -31,6 +31,9 @@
     <Filter Include="visemeviewer">
       <UniqueIdentifier>{ff606155-3868-40d0-b5f4-96697ed8f36f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="monitorViewer">
+      <UniqueIdentifier>{8c9ae46e-7260-4f60-bb2f-cd1a15721a70}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -204,6 +207,9 @@
     <ClCompile Include="..\src\visemeviewer\VisemeViewerWindow.cpp">
       <Filter>visemeviewer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\monitorviewer\MonitorConnectWindow.cpp">
+      <Filter>monitorViewer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -374,6 +380,9 @@
     </ClInclude>
     <ClInclude Include="..\src\visemeviewer\VisemeViewerWindow.h">
       <Filter>visemeviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\monitorviewer\MonitorConnectWindow.h">
+      <Filter>monitorViewer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

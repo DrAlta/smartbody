@@ -1015,6 +1015,12 @@
     <ClCompile Include="..\src\sb\SBPhonemeManager.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sbm\SbmDebuggerClient.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\SbmDebuggerUtility.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -2072,6 +2078,15 @@
     </ClInclude>
     <ClInclude Include="..\src\sb\SBPhonemeManager.h">
       <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\NetRequest.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\SbmDebuggerClient.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\SbmDebuggerUtility.h">
+      <Filter>sbm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

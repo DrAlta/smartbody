@@ -258,6 +258,8 @@
     <ClCompile Include="..\src\sbm\Resource.cpp" />
     <ClCompile Include="..\src\sbm\resource_cmds.cpp" />
     <ClCompile Include="..\src\sbm\ResourceManager.cpp" />
+    <ClCompile Include="..\src\sbm\SbmDebuggerClient.cpp" />
+    <ClCompile Include="..\src\sbm\SbmDebuggerUtility.cpp" />
     <ClCompile Include="..\src\sbm\sbm_speech_impl_skeleton.cpp" />
     <ClCompile Include="..\src\sb\SBBoneBusManager.cpp" />
     <ClCompile Include="..\src\sb\SBJointMap.cpp" />
@@ -704,6 +706,7 @@
     <ClInclude Include="..\src\sbm\mcontrol_callbacks.h" />
     <ClInclude Include="..\src\sbm\mcontrol_util.h" />
     <ClInclude Include="..\src\sbm\MiniBrain.h" />
+    <ClInclude Include="..\src\sbm\NetRequest.h" />
     <ClInclude Include="..\src\sbm\ParserASFAMC.h" />
     <ClInclude Include="..\src\sbm\ParserBVH.h" />
     <ClInclude Include="..\src\sbm\ParserFBX.h" />
@@ -712,6 +715,8 @@
     <ClInclude Include="..\src\sbm\Resource.h" />
     <ClInclude Include="..\src\sbm\resource_cmds.h" />
     <ClInclude Include="..\src\sbm\ResourceManager.h" />
+    <ClInclude Include="..\src\sbm\SbmDebuggerClient.h" />
+    <ClInclude Include="..\src\sbm\SbmDebuggerUtility.h" />
     <ClInclude Include="..\src\sbm\sbm_audio.h" />
     <ClInclude Include="..\src\sbm\sbm_character.hpp" />
     <ClInclude Include="..\src\sbm\sbm_constants.h" />
