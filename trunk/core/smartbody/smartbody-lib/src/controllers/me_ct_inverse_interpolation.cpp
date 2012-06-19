@@ -320,7 +320,6 @@ CALC_GRAD_VEC:
 		bool minima_reached = false;
 		for(int i=1; !minima_reached && !out_bound; i++)
 		{
-			total_iter++;
 			tempWeight = blendWeight;
 			for(unsigned int j=0; j<size; j++)
 			{
@@ -347,6 +346,8 @@ CALC_GRAD_VEC:
 				else // patl_dev_qty==1
 					goto TERMINATE_OPTMGD;
 			}
+			
+			total_iter++;
 
 			normalizeBlendWeight(tempWeight);
 			fmin_gd = evaluateErrorFunction(para,tempWeight);

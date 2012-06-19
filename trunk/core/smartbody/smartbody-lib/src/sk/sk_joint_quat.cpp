@@ -143,7 +143,9 @@ void SkJointQuat::get_quat ( SrQuat& q ) const
  {
  }
 
-
+/* it appears that no function uses this, but was added before so that it stores any pre rotation 
+// skel might have, in this way PrePost(pre, post) can be used purely to re-orient joint local axes.
+// (this comment was added by David Huang Jun 2012)  */
 void SkJointQuat::orientation(const SrQuat& q)
 {
 	_jorientation = q;

@@ -1075,7 +1075,9 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getJoint", &SBSkeleton::getJoint, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the joint with a given index.")
 		.def("getNumChannels", &SBSkeleton::getNumChannels, "Returns the number of the channels inside the skeleton.")
 		.def("getChannelType", &SBSkeleton::getChannelType, "Returns the type of the channel of a given index.")
-		.def("getChannelSize", &SBSkeleton::getChannelSize, "Returns the size of the channel given index.")	
+		.def("getChannelSize", &SBSkeleton::getChannelSize, "Returns the size of the channel given index.")
+		.def("createSkelWithoutPreRot", &SBSkeleton::createSkelWithoutPreRot, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a new standard T-pose skel from source but without pre-rotations")	
+		.def("orientJointsLocalAxesToWorld", &SBSkeleton::orientJointsLocalAxesToWorld, "Orient skeleton joints local axes to match world coordinate axes (Y-up Z-front)")	
 		;
 
 	boost::python::class_<SBJoint, boost::python::bases<SBObject> >("SBJoint")
