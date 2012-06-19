@@ -250,9 +250,9 @@ void SBSkeleton::orientJointsLocalAxesToWorld(void)
 // put source skel(TposeSk) into T-pose before running this!   */
 void SBSkeleton::_createSkelWithoutPreRot(SBSkeleton* TposeSk, SBSkeleton* newSk, const char* new_name)
 {
+	TposeSk->invalidate_global_matrices();
 	TposeSk->update_global_matrices();
 	newSk->copy(TposeSk); // first copy
-
 	if(new_name || strlen(new_name)<1)
 	{
 		newSk->name(string(new_name));
@@ -262,6 +262,7 @@ void SBSkeleton::_createSkelWithoutPreRot(SBSkeleton* TposeSk, SBSkeleton* newSk
 		//fname.append(".sk");
 		newSk->skfilename(fname);
 	}
+	
 	const std::vector<SkJoint*>& new_jnts = newSk->joints();
 	for(size_t i=1; i<new_jnts.size(); i++)
 	{
@@ -271,9 +272,10 @@ void SBSkeleton::_createSkelWithoutPreRot(SBSkeleton* TposeSk, SBSkeleton* newSk
 		if(!src_j) continue;
 		if(!src_j->parent()) continue;
 		SrVec new_offset = src_j->gmat().get_translation() -
-			src_j->parent()->gmat().get_translation();
+			src_j->parent()->gmat().get_translation();		
 		new_j->offset(new_offset);
 	}
+	
 	for(size_t i=1; i<new_jnts.size(); i++)
 	{
 		SkJoint* new_j = new_jnts[i];
