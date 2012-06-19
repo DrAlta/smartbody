@@ -8,6 +8,7 @@ scene.run("default-viewer.py")
 scene.addAssetPath("seq", "../../../../data/sbm-common/scripts")
 scene.addAssetPath("seq", "../../../../data/sbm-test/scripts")
 scene.addAssetPath("mesh", "../../../../data/mesh")
+scene.addAssetPath("mesh", "../../../../data/retarget/mesh")
 
 scene.run("init-common-assets.py")
 scene.run("init-common-face.py")

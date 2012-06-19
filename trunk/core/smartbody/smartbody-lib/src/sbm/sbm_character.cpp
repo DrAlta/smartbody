@@ -47,6 +47,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBJoint.h>
 #include <sb/SBBoneBusManager.h>
+#include <sbm/gpu/SbmDeformableMeshGPU.h>
 
 #define USE_REACH 1
 #define USE_PHYSICS_CHARACTER 1
@@ -2221,6 +2222,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		while ((path = mcu_p->mesh_paths.next_path()) != "")
 		{
 			boost::filesystem2::path curpath( path );
+			LOG("curpath = %s",curpath.directory_string().c_str());
 			if (!boost::filesystem2::is_directory(curpath))
 				continue;
 			curpath /= std::string(meshdir);			
@@ -2228,7 +2230,8 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			if (!isDir)
 			{
 				LOG("%s is not a directory.", curpath.directory_string().c_str());
-				return CMD_FAILURE;
+				//return CMD_FAILURE;
+				continue;
 			}
 			else
 			{
@@ -2240,7 +2243,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			std::vector<std::string> xmlFileList;
 			std::vector<std::string> objFileList;
 			boost::filesystem2::directory_iterator end;
-			for (boost::filesystem2::directory_iterator iter(curpath); iter != end; iter++)
+			for (boost::filesystem2::directory_iterator iter(curpath); iter != end ; iter++)
 			{
 				if (boost::filesystem2::is_regular(*iter))
 				{
@@ -2810,6 +2813,17 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 								if (scene_p)
 									scene_p->set_visibility(0,0,0,0);
 								dMesh_p->set_visibility(1);
+								if (dMeshInstance_p)
+									dMeshInstance_p->setVisibility(1);
+							}
+							else if (viewType == "5" || viewType == "deformableGPU")
+							{
+								if (scene_p)
+									scene_p->set_visibility(0,0,0,0);
+								dMesh_p->set_visibility(1);
+								SbmDeformableMeshGPU::useGPUDeformableMesh = true;
+								if (dMeshInstance_p)
+									dMeshInstance_p->setVisibility(1);
 							}
 							else
 							{

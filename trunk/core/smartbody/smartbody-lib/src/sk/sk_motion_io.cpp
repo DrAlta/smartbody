@@ -199,7 +199,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 	in.get_token();
 	if ( in.last_token()=="HIERARCHY" ) { // bvh format
 		return _load_bvh ( in );
-	} else if ( in.last_token()!="SkMotion" && in.last_token()!="HoMotion" ) {
+	} else if ( in.last_token()!="SkMotion" && in.last_token()!="HoMotion" && in.last_token()!="KnMotion" ) {
 		return false;
 	}
 

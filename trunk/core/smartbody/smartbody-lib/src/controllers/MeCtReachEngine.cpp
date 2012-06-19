@@ -389,7 +389,13 @@ ReachStateInterface* MeCtReachEngine::getState( const std::string& stateName )
 
 SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 {
+
 	SkJoint* rootJoint = sk->root()->child(0); // skip world offset
+	if (sk->search_joint("base"))
+	{
+		rootJoint = sk->search_joint("base");
+		return rootJoint;
+	}
 	//LOG("ReachEngine Root Name = %s\n",rootJoint->name().get_string());
 	bool bStop = false;
 	while (!bStop)

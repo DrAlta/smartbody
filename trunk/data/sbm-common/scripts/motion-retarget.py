@@ -43,8 +43,9 @@ def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :
 		effectorJoints.append('r_ankle')
 		effectorJoints.append('l_ankle')		
 		
-	effectorJoints.append('r_forefoot')
-	effectorJoints.append('l_forefoot')		
+	if tgtSkel.getJointByName('r_forefoot') != None:
+		effectorJoints.append('r_forefoot')
+		effectorJoints.append('l_forefoot')		
 	#effectorJoints.append('l_toe')		
 	effectorRoots = StringVec();
 	effectorRoots.append('r_hip')
@@ -52,7 +53,7 @@ def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :
 	effectorRoots.append('r_hip')
 	effectorRoots.append('l_hip')
 	
-	#print 'Retarget motion = ' + motionName;
+	print 'Retarget motion = ' + motionName;
 	outMotion = testMotion.retarget(outMotionName,srcSkelName,tgtSkelName, endJoints, relativeJoints, offsetJoints);	
 	cleanMotion = testMotion.constrain(outMotionName, srcSkelName, tgtSkelName, outMotionName, effectorJoints, effectorRoots);
 	saveCommand = 'animation ' + outMotionName + ' save ' + outDir + outMotionName + '.skm';
@@ -186,7 +187,9 @@ def retargetSetup(targetSkelName):
 	getStandardGestureMotions(gestureMotions,"")
 	getStandardReachMotions(reachMotions,"")
 	
-	outDir = '../../../../data/sbm-common/common-sk/motion/' + targetSkelName + '/';
+	#outDir = '../../../../data/sbm-common/common-sk/motion/' + targetSkelName + '/';
+	outDir = '../../../../data/retarget/motion/' + targetSkelName + '/';
+	print 'outDir = ' + outDir ;
 	if not os.path.exists(outDir):
 		os.makedirs(outDir)
 	# retarget reach motions

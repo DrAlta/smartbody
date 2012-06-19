@@ -71,6 +71,10 @@
 # include <sb/SBSteerAgent.h>
 # include <sb/SBAnimationStateManager.h>
 
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
+#include <boost/algorithm/string.hpp>
+
 #if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support
 #include "sbm/GPU/SbmShader.h"
 #include "sbm/GPU/SbmTexture.h"
@@ -2019,8 +2023,8 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 	//LOG("dndMsg = %s",dndMsg.c_str());
 	std::vector<std::string> toks;
 	vhcl::Tokenize(dndMsg,toks,":");
-	if (toks.size() != 2)
-		return;
+	//if (toks.size() != 2)
+	//	return;
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SBScene* scene = mcu._scene;
@@ -2060,6 +2064,81 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		sprintf(cmdStr,"set pawn defaultPawn%d world_offset x %f y %f z %f",pawnCount,dest.x,dest.y,dest.z);
 		mcu.execute(cmdStr);
 		pawnCount++;
+	}
+	else // drag a file from explorer
+	{	
+		boost::filesystem::path dndPath(dndMsg);
+		std::string fullPathName = dndMsg;
+		std::string filebasename = boost::filesystem::basename(dndMsg);
+		std::string fileextension = boost::filesystem::extension(dndMsg);	
+		
+		std::string skelName = filebasename+fileextension;
+		std::string meshName = filebasename;
+		std::string fullPath = dndPath.parent_path().string();
+
+		LOG("path name = %s, base name = %s, extension = %s",fullPath.c_str(), filebasename.c_str(), fileextension.c_str());
+		bool hasMesh = false;
+		bool hasSkeleton = false;
+		// copy the file over
+		std::string meshDir = "../../../../data/retarget/mesh/";
+		std::string retargetDir = "../../../../data/retarget/";
+
+		// create the folder if they do not exist
+		if (!boost::filesystem::exists(retargetDir))
+			boost::filesystem::create_directory(retargetDir);
+		if (!boost::filesystem::exists(meshDir))
+			boost::filesystem::create_directory(meshDir);		
+		boost::filesystem::create_directory(meshDir+meshName);
+
+		std::string targetMeshFile = meshDir+meshName+"/"+filebasename+fileextension;
+		std::string targetSkelFile = retargetDir+"/"+filebasename+fileextension;
+		
+		
+		if (!boost::filesystem::exists(targetMeshFile))
+			boost::filesystem::copy_file(fullPathName,targetMeshFile);
+		if (!boost::filesystem::exists(targetSkelFile))
+			boost::filesystem::copy_file(fullPathName,targetSkelFile);
+
+		boost::filesystem::directory_iterator dirIter(dndPath.parent_path());
+		boost::filesystem::directory_iterator endIter;
+		cout << " dirIter initial : " << dirIter->path().string() << "\n";
+		for ( ;
+			  dirIter != endIter;
+			  ++dirIter )
+		{
+			cout << " dirIter : " << dirIter->path().string() << "\n";
+			if ( boost::filesystem::is_regular_file( *dirIter ) )
+			{
+				std::string filename = dirIter->path().string();
+				cout << filename << " : " << boost::filesystem::file_size( dirIter->path() ) << "\n";
+				std::string basename = boost::filesystem::basename(filename);
+				std::string extname = boost::filesystem::extension(filename);
+				if ( boost::iequals(extname,".jpg") || boost::iequals(extname,".bmp") || boost::iequals(extname,".png") 
+					|| boost::iequals(extname,".dds") || boost::iequals(extname,".tga"))
+				{
+					// copy over the file if it is an image file
+					std::string targetImgFile = meshDir+meshName+"/"+basename+extname;
+					if (!boost::filesystem::exists(targetImgFile))
+						boost::filesystem::copy_file(filename,targetImgFile);
+				}
+			}
+		}
+		
+
+		
+		// load the new skeleton
+ 		mcu.load_skeletons(retargetDir.c_str(), false);
+ 		//boost::filesystem::copy_file()
+ 		SBSkeleton* skel = mcu._scene->getSkeleton(skelName);
+ 		float yOffset = -skel->getBoundingBox().a.y;
+ 		dest.y = yOffset;		
+		sprintf(cmdStr,"createDragAndDropCharacter('defaultChar%d','%s','%s',SrVec(%f,%f,%f))",characterCount,skelName.c_str(),meshName.c_str(),
+			    dest.x,dest.y,dest.z);	
+		LOG("pythonCmd = %s",cmdStr);
+		mcu.executePythonFile("drag-and-drop.py");
+		characterCount++;		
+		mcu.executePython(cmdStr);
+		
 	}
 }
 
