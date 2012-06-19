@@ -890,6 +890,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getStateNames", &SBAnimationBlendManager::getBlendNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the blend names.")
 		.def("getBlendNames", &SBAnimationBlendManager::getBlendNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the blend names.")
 		.def("getTransition", &SBAnimationBlendManager::getTransition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a transition with a given name.")
+		.def("getTransitionByIndex", &SBAnimationBlendManager::getTransitionByIndex, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a transition with a given name.")
 		.def("getNumTransitions", &SBAnimationBlendManager::getNumTransitions, "Returns the state names.")
 		.def("getTransitionNames", &SBAnimationBlendManager::getTransitionNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the blend names.")
 		.def("getCurrentState", &SBAnimationBlendManager::getCurrentBlend, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the character's current blend name.")
@@ -968,6 +969,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 */
 
 	boost::python::class_<SBFaceDefinition>("SBFaceDefinition")
+		.def("getName", &SBFaceDefinition::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns name of the face definition.")
 		.def("getNumVisemes", &SBFaceDefinition::getNumVisemes, "Returns the number of visemes.")
 		.def("getVisemeNames", &SBFaceDefinition::getVisemeNames, "Returns the names of the visemes.")
 		.def("setViseme", &SBFaceDefinition::setViseme, "Sets a viseme to a particular motion name.")
@@ -978,6 +980,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getAUMotion", &SBFaceDefinition::getAUMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the motion associated with a given Action Unit side: LEFT, RIGHT, or BOTH.")
 		.def("setAU", &SBFaceDefinition::setAU, "Sets an Action Unit of a given number to a side and a motion.")
 		.def("setFaceNeutral", &SBFaceDefinition::setFaceNeutral, "Sets the neutral face to a particular motion name.")
+		.def("save", &SBFaceDefinition::save, "Save face definition to a file.")
 		;
 
 
@@ -1374,6 +1377,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("createFaceDefinition", &SBScene::createFaceDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new face definition with a given name.")
 		.def("getFaceDefinition", &SBScene::getFaceDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a face definition with a given name.")
 		.def("getNumFaceDefinitions", &SBScene::getNumFaceDefinitions, "Returns the number of face definitions.")
+		.def("getFaceDefinitionNames", &SBScene::getFaceDefinitionNames, "Return a list of all face definition names. \n Input: NULL \nOutput: list of face definition names.")
 		.def("removeCharacter", &SBScene::removeCharacter, "Remove the character given its name. \n Input: character name \n Output: NULL")
 		.def("removePawn", &SBScene::removePawn, "Remove the pawn given its name. \n Input: pawn name \n Output: NULL")
 		.def("getNumPawns", &SBScene::getNumPawns, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.")
@@ -1405,6 +1409,8 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getScript", &SBScene::getScript, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a script.")
 		.def("getScale", &SBScene::getScale, "Returns the scene scale in meters (default is centimeters .01)")
 		.def("setScale", &SBScene::setScale, "Sets the scene scale in meters.")
+		.def("isRemoteMode", &SBScene::isRemoteMode, "Returns the boolean indicating whether scene is in remote mode.")
+		.def("setRemoteMode", &SBScene::setRemoteMode, "Sets the scene remote mode.")
 		.def("removePendingCommands", &SBScene::removePendingCommands, "Removes any commands stored in SmartBody awaiting execution.")
 
 		// command processing

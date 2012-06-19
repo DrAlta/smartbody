@@ -294,6 +294,7 @@ int SbmPawn::setup() {
 	world_offset_pos->limits( SkVecLimits::Z, false );
 	world_offset_joint->quat()->activate();
 	_skeleton->compress();
+	_skeleton->make_active_channels();
 
 	if( WORLD_OFFSET_CHANNELS_P.size()==0 ) {
 		std::string world_offset_joint_name( WORLD_OFFSET_JOINT_NAME );

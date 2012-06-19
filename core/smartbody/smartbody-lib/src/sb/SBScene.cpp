@@ -21,7 +21,9 @@
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBParser.h>
-#include "sbm/SbmDebuggerServer.h"
+#include <sbm/SbmDebuggerServer.h>
+#include <sbm/SbmDebuggerClient.h>
+#include <sbm/SbmDebuggerUtility.h>
 #include <sbm/sbm_audio.h>
 
 namespace SmartBody {
@@ -52,6 +54,9 @@ SBScene::SBScene(void)
 	_parser = new SBParser();
 
 	_debuggerServer = new SbmDebuggerServer();
+	_debuggerClient = new SbmDebuggerClient();
+	_debuggerUtility = new SbmDebuggerUtility();
+	_isRemoteMode = false;
 
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 	createStringAttribute("speechRelaySoundCacheDir","../../../..",true,"",10,false,false,false,"Directory where sound files from speech relays will be placed. ");
@@ -81,6 +86,8 @@ SBScene::~SBScene(void)
 	delete _parser;
 
 	delete _debuggerServer;  // TODO: should delete these in reverse order?
+	delete _debuggerClient;
+	delete _debuggerUtility;
 }
 
 SBScene* SBScene::getScene()
@@ -692,6 +699,23 @@ SmartBody::SBFaceDefinition* SBScene::createFaceDefinition(const std::string& na
 	mcu.face_map.insert(std::pair<std::string, SBFaceDefinition*>(name, face));
 
 	return face;
+}
+
+void SBScene::removeFaceDefinition(const std::string& name)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	// make sure the name doesn't already exist
+	std::map<std::string, SBFaceDefinition*>::iterator iter = mcu.face_map.find(name);
+	if (iter == mcu.face_map.end())
+	{
+		LOG("Face definition named '%s' does not exist.", name.c_str());
+		return;
+	}
+
+	delete iter->second;
+	iter->second = NULL;
+	mcu.face_map.erase(iter);
 }
 
 SmartBody::SBFaceDefinition* SBScene::getFaceDefinition(const std::string& name)

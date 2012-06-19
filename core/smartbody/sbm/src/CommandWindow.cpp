@@ -185,6 +185,7 @@ CommandWindow* CommandWindow::getCommandWindow(Fl_Widget* w)
 
 void CommandWindow::entercb(int key, Fl_Text_Editor* editor) 
 {
+	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
 	CommandWindow* commandWindow =  CommandWindow::getCommandWindow(editor);
 
 	Fl_Text_Buffer* tempBuffer = editor->buffer();
@@ -203,11 +204,25 @@ void CommandWindow::entercb(int key, Fl_Text_Editor* editor)
 
 	if (editor == commandWindow->textEditor[1])
 	{
-		mcuCBHandle::singleton().executePython(c);
+		if (!sbScene->isRemoteMode())
+			mcuCBHandle::singleton().executePython(c);
+		else
+		{
+			string sendStr = "send sbm python ";
+			sendStr.append(c);
+			mcuCBHandle::singleton().execute((char*)sendStr.c_str());
+		}
 	}
 	else
 	{
-		mcuCBHandle::singleton().execute(c);
+		if (!sbScene->isRemoteMode())
+			mcuCBHandle::singleton().execute(c);
+		else
+		{
+			string sendStr = "send sbm ";
+			sendStr.append(c);
+			mcuCBHandle::singleton().execute((char*)sendStr.c_str());
+		}
 	}
 
 	int index = (editor == commandWindow->textEditor[0]? 0 : 1);

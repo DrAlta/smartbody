@@ -62,6 +62,7 @@ void PARunTimeEditor::update()
 	SbmCharacter* character = mcuCBHandle::singleton().getCharacter(charName);
 	if (!character)
 		return;
+
 	if (!character->param_animation_ct)
 		return;
 

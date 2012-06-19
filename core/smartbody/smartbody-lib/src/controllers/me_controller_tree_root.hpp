@@ -151,6 +151,8 @@ public:
 
 	virtual void applyBufferToAllSkeletons() = 0;
 
+	virtual void applySkeletonToBuffer() = 0;
+
 	///**
 	// *  Returns a map of channel index to the index of 
 	// *  the channel's first float in the buffer.

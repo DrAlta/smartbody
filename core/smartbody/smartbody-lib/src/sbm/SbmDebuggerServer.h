@@ -22,7 +22,8 @@ private:
    SmartBody::SBScene * m_scene;
 
 public:
-   vhcl::Vector3 m_cameraPos;
+	vhcl::Vector3 m_cameraPos;
+	vhcl::Vector3 m_cameraLookAt;
    vhcl::Vector4 m_cameraRot;
    double m_cameraFovY;
    double m_cameraAspect;
@@ -40,6 +41,7 @@ public:
 
    void SetSBScene(SmartBody::SBScene * scene) { m_scene = scene; }
    void SetID(const std::string & id);
+   const std::string& GetID();
 
    void Update();
 

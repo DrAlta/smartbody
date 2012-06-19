@@ -31,6 +31,8 @@ class SBAnimationBlend : public PABlend
 		virtual std::string getDimension();
 		bool validateState();
 
+		std::string saveToString();
+
 	protected:
 		bool addSkMotion(const std::string& motionName);
 		bool removeSkMotion(const std::string& motionName);

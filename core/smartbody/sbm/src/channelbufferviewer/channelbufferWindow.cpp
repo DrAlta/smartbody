@@ -478,7 +478,7 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 	SbmCharacter* actor = mcu.getCharacter(character->mvalue()->label());
 	SkSkeleton* skeleton = actor->getSkeleton();
 
-	SkChannelArray& channels = skeleton->channels();
+	SkChannelArray& channels = actor->ct_tree_p->channels(); //skeleton->channels();
 	int numChannels = channels.size();
 
 	clearChannelItem(window);

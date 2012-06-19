@@ -43,6 +43,7 @@ class SBAnimationBlendManager
 		std::vector<std::string> getBlendNames();
 
 		SBAnimationTransition* getTransition(const std::string& source, const std::string& dest);
+		SBAnimationTransition* getTransitionByIndex(int id);
 		int getNumTransitions();
 		std::vector<std::string> getTransitionNames();
 

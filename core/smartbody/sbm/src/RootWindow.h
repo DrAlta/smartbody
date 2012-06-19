@@ -12,6 +12,7 @@
 #include "CommandWindow.h"
 #include "bmlcreator/BMLCreatorWindow.h"
 #include "visemeviewer/VisemeViewerWindow.h"
+#include "monitorviewer/MonitorConnectWindow.h"
 #include "CharacterCreatorWindow.h"
 
 class SbmCharacter;
@@ -56,6 +57,8 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		CommandWindow* commandWindow;
 		BMLCreatorWindow* bmlCreatorWindow;
 		VisemeViewerWindow* visemeViewerWindow;
+		MonitorConnectWindow* monitorConnectWindow;
+
 		Fl_Menu_Bar* menubar;
 		Fl_Button* buttonPlay;
 		Fl_Button* buttonStop;
@@ -78,6 +81,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void LaunchResourceViewerCB(Fl_Widget* widget, void* data);		
 		static void LaunchFaceViewerCB(Fl_Widget* widget, void* data);
 		static void LaunchSpeechRelayCB(Fl_Widget* widget, void* data);
+		static void LaunchConnectCB(Fl_Widget* widget, void* data);
 		static void StartCB(Fl_Widget* widget, void* data);
 		static void StopCB(Fl_Widget* widget, void* data);
 		static void StepCB(Fl_Widget* widget, void* data);

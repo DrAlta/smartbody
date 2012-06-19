@@ -903,6 +903,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="monitorViewer"
+			>
+			<File
+				RelativePath="..\src\monitorviewer\MonitorConnectWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\monitorviewer\MonitorConnectWindow.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\src\glfont2.cpp"
 			>

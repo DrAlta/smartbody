@@ -11,6 +11,9 @@
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBAnimationStateManager.h>
+#include <sb/SBAnimationState.h>
+#include <sb/SBAnimationTransition.h>
 
 using std::string;
 using std::vector;
@@ -117,6 +120,11 @@ void SbmDebuggerServer::SetID(const std::string & id)
    m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
 }
 
+const std::string& SbmDebuggerServer::GetID()
+{
+	return m_fullId;
+}
+
 void SbmDebuggerServer::Update()
 {
    if (m_updateFrequencyS > 0)
@@ -165,9 +173,10 @@ void SbmDebuggerServer::Update()
                   // camera update
                   msg += vhcl::Format("sbmdebugger %s update camera\n", m_fullId.c_str());
 
-                  msg += vhcl::Format("pos %.3f %.3f %.3f\n", m_cameraPos.x, m_cameraPos.y, m_cameraPos.z);
+				  msg += vhcl::Format("pos %.3f %.3f %.3f\n", m_cameraPos.x, m_cameraPos.y, m_cameraPos.z);
                   msg += vhcl::Format("rot %.3f %.3f %.3f %.3f\n", m_cameraRot.x, m_cameraRot.y, m_cameraRot.z, m_cameraRot.w);
-                  msg += vhcl::Format("persp %.3f %.3f %.3f %.3f\n", m_cameraFovY, m_cameraAspect, m_cameraZNear, m_cameraZFar);
+				  msg += vhcl::Format("persp %.3f %.3f %.3f %.3f\n", m_cameraFovY, m_cameraAspect, m_cameraZNear, m_cameraZFar);
+				  msg += vhcl::Format("lookat %.3f %.3f %.3f\n", m_cameraLookAt.x, m_cameraLookAt.y, m_cameraLookAt.z);
                   msg += ";";
                   sentCamUpdate = true;
                }
@@ -331,6 +340,16 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
                   {
                      if (m_scene != NULL)
                      {
+						std::vector<string> skeletonNames = m_scene->getSkeletonNames();
+						for (size_t i = 0; i < skeletonNames.size(); ++i)
+						{
+							SBSkeleton* skeleton = m_scene->getSkeleton(skeletonNames[i]);
+							std::string msg = vhcl::Format("sbmdebugger %s init skeleton %s ", m_fullId.c_str(), skeleton->skfilename().c_str());
+							msg += skeleton->saveToString();
+
+							vhmsg::ttu_notify1(msg.c_str());	
+						}						
+
                         vector<string> charNames = m_scene->getCharacterNames();
                         for (size_t i = 0; i < charNames.size(); i++)
                         {
@@ -338,18 +357,21 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 
                            size_t numBones = c->getSkeleton()->getNumJoints();
 
+						   // SbmMonitor character format
                            string msg = vhcl::Format("sbmdebugger %s init", m_fullId.c_str());
                            msg += vhcl::Format(" character %s bones %d\n", c->getName().c_str(), numBones);
-
-                           SBJoint * root = c->getSkeleton()->getJoint(0);
-
+						   SBJoint * root = c->getSkeleton()->getJoint(0);
                            GenerateInitHierarchyMsg(root, msg, 4);
+						   vhmsg::ttu_notify1(msg.c_str());
 
-                           vhmsg::ttu_notify1(msg.c_str());
+						  // this is used for smartbody-monitor (use character-skeleton to not conflict with sbm-monitor)
+						   msg = vhcl::Format("sbmdebugger %s init", m_fullId.c_str());
+						   msg += vhcl::Format(" character-skeleton %s %s\n", c->getName().c_str(), c->getSkeleton()->getName().c_str());
+						   vhmsg::ttu_notify1(msg.c_str());
 
-
+						   // render direction information
                            msg = vhcl::Format("sbmdebugger %s init", m_fullId.c_str());
-                           msg += vhcl::Format(" renderer right_handed %d\n", m_rendererIsRightHanded ? 1 : 0);
+						   msg += vhcl::Format(" renderer right_handed %d\n", m_rendererIsRightHanded ? 1 : 0);
                            vhmsg::ttu_notify1(msg.c_str());
                         }
 
@@ -365,6 +387,44 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 
                            vhmsg::ttu_notify1(msg.c_str());
                         }
+
+						std::vector<std::string>& faceDefNames = m_scene->getFaceDefinitionNames();
+						for (size_t i = 0; i < faceDefNames.size(); i++)
+						{
+							SBFaceDefinition* faceDefinition = m_scene->getFaceDefinition(faceDefNames[i]);
+							std::string msg = vhcl::Format("sbmdebugger %s init face_definition %s", m_fullId.c_str(), faceDefNames[i].c_str());
+							msg += faceDefinition->saveToString();
+
+							vhmsg::ttu_notify1(msg.c_str());
+						}
+
+						for (size_t i = 0; i < charNames.size(); i++)
+						{
+							SBCharacter * c = m_scene->getCharacter(charNames[i]);
+							string msg = vhcl::Format("sbmdebugger %s init", m_fullId.c_str());
+							msg += vhcl::Format(" character-face_definition %s %s\n", c->getName().c_str(), c->getFaceDefinition()->getName().c_str());
+							vhmsg::ttu_notify1(msg.c_str());
+						}
+						
+						SBAnimationBlendManager* blendManager = m_scene->getBlendManager();
+						std::vector<std::string>& blendNames = blendManager->getBlendNames();
+						for (size_t i = 0; i < blendNames.size(); i++)
+						{
+							SBAnimationBlend* blend = blendManager->getBlend(blendNames[i]);
+							std::string msg = vhcl::Format("sbmdebugger %s init blend %s", m_fullId.c_str(), blendNames[i].c_str());
+							msg += blend->saveToString();
+
+							vhmsg::ttu_notify1(msg.c_str());
+						}
+
+						for (int i = 0; i < blendManager->getNumTransitions(); ++i)
+						{
+							SBAnimationTransition* transition = blendManager->getTransitionByIndex(i);
+							std::string msg = vhcl::Format("sbmdebugger %s init transition ", m_fullId.c_str());
+							msg += transition->saveToString();
+
+							vhmsg::ttu_notify1(msg.c_str());
+						}
                      }
                   }
                   else if (split[2] == "start_update")

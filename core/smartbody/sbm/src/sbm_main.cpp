@@ -74,7 +74,8 @@
 #include <sb/SBPython.h>
 #include <sb/SBSteerManager.h>
 #include "FLTKListener.h"
-#include "sbm/SbmDebuggerServer.h"
+#include <sbm/SbmDebuggerServer.h>
+#include <sbm/SbmDebuggerClient.h>
 
 #if USE_OGRE_VIEWER > 0
 #include "FLTKOgreViewer.h"
@@ -126,8 +127,17 @@ using std::string;
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
+void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) 
+{
 	// Replace singleton with a user_data pointer
+	if (mcuCBHandle::singleton()._scene->isRemoteMode())
+	{
+		mcuCBHandle::singleton()._scene->getDebuggerClient()->ProcessVHMsgs(op, args);
+		return;
+	}
+	else
+		mcuCBHandle::singleton()._scene->getDebuggerServer()->ProcessVHMsgs(op, args);
+
 	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
             LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
@@ -136,8 +146,6 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
             LOG("SBM ERR: command FAILED: '%s' + '%s'", op, args );
             break;
     }
-
-	mcuCBHandle::singleton()._scene->getDebuggerServer()->ProcessVHMsgs(op, args);
 }
 
 int sbm_vhmsg_register_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
