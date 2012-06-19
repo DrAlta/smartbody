@@ -60,6 +60,8 @@ AudioFileSpeech::~AudioFileSpeech()
 
 RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const std::string voiceCode, const DOMNode * node, const char * callbackCmd )
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	//mcu.mark("requestSpeechAudio", 0, "begin");
 	string encoding = "";
 	xml_utils::xml_translate( &encoding, node->getOwnerDocument()->getXmlEncoding() );
 	string version = "";
@@ -72,23 +74,30 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const std
    xmlConverted += "encoding=\"" + encoding.substr( 0, 7 ) + "\"?>";
 
    xml_utils::xmlToString( node, xmlConverted ); //Xml to string recursively searches DOM tree and returns a string of the xml document
-
-   return requestSpeechAudio( agentName, voiceCode, xmlConverted, callbackCmd );
+   if (!SmartBody::SBScene::getScene()->getBoolAttribute("useFastXMLParsing"))
+   {
+	  // mcu.mark("requestSpeechAudio");
+	   return requestSpeechAudio( agentName, voiceCode, xmlConverted, callbackCmd );
+   }
+   else
+   {
+	   //mcu.mark("requestSpeechAudio");
+	   return requestSpeechAudioFast( agentName, voiceCode, xmlConverted, callbackCmd );
+   }
 }
 
-/*
-RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::string voiceCode, std::string text, const char * callbackCmd )
+
+RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::string voiceCode, std::string text, const char * callbackCmd )
 {
 	
     mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.mark("requestSpeechAudio", 0, "begin");
+	mcu.mark("requestSpeechAudioFast", 0, "begin");
 	rapidxml::xml_document<> doc;
-	std::vector<char> xml(text.begin(), text.end());
-    xml.push_back('\0');
-
+	//std::vector<char> xml(text.begin(), text.end());
+    //xml.push_back('\0');
 	std::string ref = "";
 	try {
-		doc.parse<0>(&xml[0]);
+		doc.parse<0>(const_cast<char *>(text.c_str()));
 
 		std::string name = doc.name();
 		rapidxml::xml_node<>* node = doc.first_node(); 
@@ -106,7 +115,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 		m_speechRequestInfo[ m_requestIdCounter ].id = speechId;
 	} catch (...) {
 		LOG("Problem parsing XML speech request.");
-		mcu.mark("requestSpeechAudio");
+		mcu.mark("requestSpeechAudioFast");
 		return 0;
 	}
 
@@ -114,17 +123,20 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    if ( agent == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
-	  mcu.mark("requestSpeechAudio");
+	  mcu.mark("requestSpeechAudioFast");
       return 0;
    }
 
 
    char fullAudioPath[ _MAX_PATH ];
-   string relativeAudioPath = mcu.speech_audiofile_base_path + voiceCode;
+   //string relativeAudioPath = mcu.speech_audiofile_base_path + voiceCode;
+   bool useAudioPaths = true;
+   mcu.audio_paths.reset();
+	string relativeAudioPath = mcu.audio_paths.next_path();
    if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
-	  mcu.mark("requestSpeechAudio");
+	  mcu.mark("requestSpeechAudiofast");
       return 0;
    }
 
@@ -133,19 +145,20 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
    // TODO: Should we fail if the .bml file isn't present?
 
-   string bmlFilename = mcu.speech_audiofile_base_path + voiceCode + "/" + ref + ".bml";
+   //string bmlFilename = mcu.speech_audiofile_base_path + voiceCode + "/" + ref + ".bml";
+   string bmlFilename = relativeAudioPath + "/" + ref + ".bml";
 //////////////////////////////////
    //ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
    m_speechRequestInfo[ m_requestIdCounter ].visemeData.clear();
 
-   mcu.mark("requestSpeechAudio", 0, "lips");
+   mcu.mark("requestSpeechAudioFast", 0, "lips");
    rapidxml::file<char> bmlFile(bmlFilename.c_str());
-   mcu.mark("requestSpeechAudio", 0, "fileconstruction");
+   mcu.mark("requestSpeechAudioFast", 0, "fileconstruction");
    rapidxml::xml_document<> bmldoc;
-   mcu.mark("requestSpeechAudio", 0, "parse");
+   mcu.mark("requestSpeechAudioFast", 0, "parse");
    bmldoc.parse< rapidxml::parse_declaration_node>(bmlFile.data());
 
-   mcu.mark("requestSpeechAudio", 0, "traverse");
+   mcu.mark("requestSpeechAudioFast", 0, "traverse");
 
    bool useCurveMode = visemeCurveMode;
    if (useCurveMode)
@@ -261,7 +274,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
     m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.clear();
 
 
-	mcu.mark("requestSpeechAudio", 0, "sync");
+	mcu.mark("requestSpeechAudioFast", 0, "sync");
 	rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
 	rapidxml::xml_node<>* speechnode = bmlnode->first_node("speech");
 	if (speechnode)
@@ -306,11 +319,11 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    mcu.execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
 
 
-    mcu.mark("requestSpeechAudio");
+    mcu.mark("requestSpeechAudioFast");
    return m_requestIdCounter++;
 
 }
-*/
+
 
 RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::string voiceCode, std::string text, const char * callbackCmd )
 {

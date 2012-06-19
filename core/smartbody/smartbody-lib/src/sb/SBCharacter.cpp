@@ -32,10 +32,23 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createStringAttribute("deformableMesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
 	createDoubleAttribute("deformableMeshScale", 1, true, "Basic", 230, false, false, false, "Scale factor when loading mesh.");
 	createStringAttribute("receiverName", "kinect1", true, "Basic", 300, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
-	createStringAttribute("voice", "remote", true, "Basic", 400, false, false, false, "How the voice is created - local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
+
+	std::vector<std::string> voiceTypes;
+	voiceTypes.push_back("");
+	voiceTypes.push_back("remote");
+	voiceTypes.push_back("audiofile");	
+	voiceTypes.push_back("local");	
+	voiceTypes.push_back("text");
+
+	StringAttribute* voiceAttribute = createStringAttribute("voice", "remote", true, "Basic", 400, false, false, false, "How the voice is created - local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
+	voiceAttribute->setValidValues(voiceTypes);
+
 	createStringAttribute("voiceCode", "voice_kal_diphone", true, "Basic", 400, false, false, false, "For local and remote voices, the name of the voice to be used. For audiofile, the path to the audiofile when combined with the media path.");
-	createStringAttribute("voiceBackup", "audiofile", true, "Basic", 400, false, false, false, "How the voice is created if the primary voice fails. local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
+	StringAttribute* voiceBackupAttribute = createStringAttribute("voiceBackup", "audiofile", true, "Basic", 400, false, false, false, "How the voice is created if the primary voice fails. local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
+	voiceBackupAttribute->setValidValues(voiceTypes);
 	createStringAttribute("voiceBackupCode", ".", true, "Basic", 400, false, false, false, "For local and remote voices, the name of the backup voice to be used. For audiofile, the path to the audiofile when combined with the media path.");
+
+
 }
 
 int SBCharacter::setup()
@@ -188,6 +201,11 @@ void SBCharacter::setVoice(std::string type)
 	{
 		LOG("Unknown voice setting '%s'.", type.c_str());
 	}
+
+	StringAttribute* attr = dynamic_cast<StringAttribute*>(getAttribute("voice"));
+	if (attr)
+		attr->setValueFast(type);
+
 }
 
 const std::string& SBCharacter::getVoice()
@@ -198,6 +216,9 @@ const std::string& SBCharacter::getVoice()
 void SBCharacter::setVoiceCode(std::string param)
 {
 	set_voice_code(param);
+	StringAttribute* attr = dynamic_cast<StringAttribute*>(getAttribute("voiceCode"));
+	if (attr)
+		attr->setValueFast(param);
 }
 
 const std::string& SBCharacter::getVoiceCode()
@@ -234,6 +255,9 @@ void SBCharacter::setVoiceBackup(std::string type)
 		LOG("Unknown voice backup setting '%s'.", type.c_str());
 	}
 
+	StringAttribute* attr = dynamic_cast<StringAttribute*>(getAttribute("voiceBackup"));
+	if (attr)
+		attr->setValueFast(type);
 }
 
 const std::string& SBCharacter::getVoiceBackup()
@@ -244,6 +268,9 @@ const std::string& SBCharacter::getVoiceBackup()
 void SBCharacter::setVoiceBackupCode(std::string param)
 {
 	set_voice_code_backup(param);
+	StringAttribute* attr = dynamic_cast<StringAttribute*>(getAttribute("voiceCodeBackup"));
+	if (attr)
+		attr->setValueFast(param);
 }
 
 const std::string& SBCharacter::getVoiceBackupCode()
