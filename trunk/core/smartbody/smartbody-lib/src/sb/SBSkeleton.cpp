@@ -96,6 +96,19 @@ bool SBSkeleton::save(std::string skeletonFile)
 	}
 }
 
+std::string SBSkeleton::saveToString()
+{
+	std::string retString = "";
+	SkSkeleton* myskel = dynamic_cast<SkSkeleton*>(this);
+	SrString outputString;
+	SrOutput output(outputString);
+	if (myskel->save(output))
+	{
+		retString = (const char*)outputString;
+	}
+	return retString;
+}
+
 const std::string& SBSkeleton::getName()
 {
 	return name();

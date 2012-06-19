@@ -73,6 +73,9 @@ class SBFaceDefinition
 		SBMotion* getAUMotion(int num, std::string side);
 		ActionUnit* getAU(int index);
 		std::string getAUSide(int num);
+
+		std::string saveToString();
+		void save(const std::string& fileName);
 		
 	protected:
 		void addAU(int auNum, ActionUnit* au);

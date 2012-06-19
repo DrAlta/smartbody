@@ -82,6 +82,7 @@
 #include <sb/SBServiceManager.h>
 #include <sb/SBAnimationState.h>
 #include "SbmDebuggerServer.h"
+#include "SbmDebuggerClient.h"
 #include <controllers/me_ct_param_animation_utilities.h>
 #include <controllers/me_ct_param_animation_data.h>
 
@@ -339,8 +340,12 @@ void mcuCBHandle::reset( void )	{
 	// processes will be identified differently
 	theWSP->init( "SMARTBODY" );
 #endif
+	
+	_scene = new SmartBody::SBScene();
+	_scene->getDebuggerServer()->Init();
+	_scene->getDebuggerServer()->SetSBScene(_scene);
 
-	if ( _scene->getBoneBusManager()->getHost() != "" )
+	if (_scene->getBoneBusManager()->getHost() != "" )
 		_scene->getBoneBusManager()->setEnable(true);
 }
 
@@ -747,6 +752,7 @@ void mcuCBHandle::clear( void )	{
 	kinectProcessor = NULL;
 
 	delete _scene;
+	_scene = NULL;
 }
 
 /////////////////////////////////////////////////////////////
@@ -1070,7 +1076,24 @@ int mcuCBHandle::remove_scene( SrSnGroup *scene_p )	{
 	return( CMD_FAILURE );
 }
 
-void mcuCBHandle::update( void )	{
+void mcuCBHandle::update( void )	
+{
+	// remote mode
+	if (_scene->isRemoteMode())
+	{
+		_scene->getDebuggerClient()->Update();
+		std::map<std::string, SbmPawn*>::iterator iter;
+		for (iter = getPawnMap().begin();
+			iter != getPawnMap().end();
+			iter++)
+		{
+			SbmPawn* pawn = (*iter).second;
+			pawn->ct_tree_p->evaluate(time);
+			pawn->ct_tree_p->applySkeletonToBuffer();
+		}
+
+		return;
+	}
 
 	// scripts
 	std::map<std::string, SmartBody::SBScript*>& scripts = _scene->getScripts();
@@ -1153,8 +1176,6 @@ void mcuCBHandle::update( void )	{
 	{
 		activeSequences.removeSequence(sequencesToDelete[d], true);
 	}
-
-
 
 	bool isClosingBoneBus = false;
     std::map<std::string, SbmPawn*>::iterator iter;
@@ -1308,6 +1329,9 @@ void mcuCBHandle::update( void )	{
 		_scene->getDebuggerServer()->m_cameraPos.x = viewer_p->get_camera()->eye.x;
 		_scene->getDebuggerServer()->m_cameraPos.y = viewer_p->get_camera()->eye.y;
 		_scene->getDebuggerServer()->m_cameraPos.z = viewer_p->get_camera()->eye.z;
+		_scene->getDebuggerServer()->m_cameraLookAt.x = viewer_p->get_camera()->center.x;
+		_scene->getDebuggerServer()->m_cameraLookAt.y = viewer_p->get_camera()->center.y;
+		_scene->getDebuggerServer()->m_cameraLookAt.z = viewer_p->get_camera()->center.z;
 		_scene->getDebuggerServer()->m_cameraRot.x = quat.x;
 		_scene->getDebuggerServer()->m_cameraRot.y = quat.y;
 		_scene->getDebuggerServer()->m_cameraRot.z = quat.z;
@@ -1338,7 +1362,8 @@ void mcuCBHandle::update( void )	{
 	}
 	*/
 
-	_scene->getDebuggerServer()->Update();
+	if (!_scene->isRemoteMode())
+		_scene->getDebuggerServer()->Update();
 
 
 	if (panimationviewer_p)

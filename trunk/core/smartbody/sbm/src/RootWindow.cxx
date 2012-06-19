@@ -72,6 +72,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Face Viewer", 0, LaunchFaceViewerCB, this, NULL);
 	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, NULL);
 	menubar->add("&Window/Viseme Viewer", 0, LaunchVisemeViewerCB, this, NULL);
+	menubar->add("&Monitor/Connect", 0, LaunchConnectCB, this, NULL);
 	//menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
 	//menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, FL_MENU_DIVIDER);
 
@@ -139,6 +140,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 
 	visemeViewerWindow = NULL;
 
+	monitorConnectWindow = NULL;
 }
 
 BaseWindow::~BaseWindow() {
@@ -270,6 +272,17 @@ void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )
 #else
 	system("../../../../core/FestivalRelay/speechrelay.sh&");
 #endif
+}
+
+void BaseWindow::LaunchConnectCB(Fl_Widget* widget, void* data)
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->monitorConnectWindow)
+	{
+		rootWindow->monitorConnectWindow = new MonitorConnectWindow(150, 150, 400, 300, "Monitor Connect");
+	}
+
+	rootWindow->monitorConnectWindow->show();	
 }
 
 void BaseWindow::LaunchConsoleCB(Fl_Widget* widget, void* data)

@@ -145,7 +145,14 @@ void BMLCreatorWindow::RunBMLCB(Fl_Widget* w, void *data)
 	BMLCreatorWindow* window = (BMLCreatorWindow*) data;
 	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.executePython(window->_editor->buffer()->text());
+	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
+	if (!sbScene->isRemoteMode())
+		mcu.executePython(window->_editor->buffer()->text());
+	else
+	{
+		std::string sendStr = "send sbm python " + std::string(window->_editor->buffer()->text());
+		mcu.execute((char*)sendStr.c_str());
+	}
 }
 
 void BMLCreatorWindow::RefreshCharactersCB(Fl_Widget* w, void *data)

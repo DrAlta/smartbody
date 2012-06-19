@@ -146,6 +146,20 @@ SBAnimationTransition* SBAnimationBlendManager::getTransition(const std::string&
 	return animTransition;
 }
 
+SBAnimationTransition* SBAnimationBlendManager::getTransitionByIndex(int id)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if (id >= 0 && id < (int)mcu.param_anim_transitions.size())
+	{
+		PATransition* transition = mcu.param_anim_transitions[id];
+		SBAnimationTransition* animTransition = dynamic_cast<SBAnimationTransition*>(transition);
+		return animTransition;
+	}
+	
+	return NULL;
+}
+
+
 int SBAnimationBlendManager::getNumTransitions()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();

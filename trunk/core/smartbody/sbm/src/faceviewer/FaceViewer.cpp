@@ -142,7 +142,13 @@ void FaceViewer::ResetCB(Fl_Widget* widget, void* data)
 				std::stringstream strstr;
 				std::string name = slider->label();
 				strstr << "char " << faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label() << " viseme " << name << " " << slider->value();
-				mcu.execute((char*) strstr.str().c_str());
+				if (!mcu._scene->isRemoteMode())
+					mcu.execute((char*) strstr.str().c_str());
+				else
+				{
+					std::string sendStr = "send sbm " + strstr.str();
+					mcu.execute((char*) sendStr.c_str());
+				}
 			}
 
 		}
@@ -191,8 +197,13 @@ void FaceViewer::FaceCB(Fl_Widget* widget, void* data)
 	std::stringstream strstr;
 	std::string name = slider->label();
 	strstr << "char " << faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label() << " viseme " << name << " " << slider->value();
-	mcu.execute((char*) strstr.str().c_str());
-	
+	if (!mcu._scene->isRemoteMode())
+		mcu.execute((char*) strstr.str().c_str());
+	else
+	{
+		std::string sendStr = "send sbm " + strstr.str();
+		mcu.execute((char*) sendStr.c_str());
+	}
 }
 
 void FaceViewer::FaceWeightCB(Fl_Widget* widget, void* data)
@@ -215,7 +226,13 @@ void FaceViewer::FaceWeightCB(Fl_Widget* widget, void* data)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::stringstream strstr;
 	strstr << "char " << faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label()  << " " << " visemeweight " << visemeName  << " " << weightSlider->value();
-	mcu.execute((char*) strstr.str().c_str());
+	if (!mcu._scene->isRemoteMode())
+		mcu.execute((char*) strstr.str().c_str());
+	else
+	{
+		std::string sendStr = "send sbm " + strstr.str();
+		mcu.execute((char*) sendStr.c_str());
+	}
 }
 
 

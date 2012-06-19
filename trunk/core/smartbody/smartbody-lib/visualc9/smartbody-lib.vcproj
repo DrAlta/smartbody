@@ -476,6 +476,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\NetRequest.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\ParserASFAMC.cxx"
 				>
 			</File>
@@ -604,11 +608,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\SbmDebuggerClient.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SbmDebuggerClient.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\SbmDebuggerServer.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\src\sbm\SbmDebuggerServer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SbmDebuggerUtility.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SbmDebuggerUtility.h"
 				>
 			</File>
 			<File

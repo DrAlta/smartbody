@@ -31,7 +31,7 @@ class SBAnimationTransition : public PATransition
 		int getNumEaseOutIntervals();
 		std::vector<double> getEaseOutInterval(int num);
 		
-		
+		std::string saveToString();
 
 	protected:
 

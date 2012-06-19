@@ -4,6 +4,8 @@
 #include <sb/SBObject.h>
 
 class SbmDebuggerServer;
+class SbmDebuggerClient;
+class SbmDebuggerUtility;
 
 namespace SmartBody {
 
@@ -58,6 +60,7 @@ class SBScene : public SBObject
 		SBPawn* getPawn(std::string name);
 
 		SBFaceDefinition* createFaceDefinition(const std::string& name);
+		void removeFaceDefinition(const std::string& name);
 		SBFaceDefinition* getFaceDefinition(const std::string& name);
 		int getNumFaceDefinitions();
 		std::vector<std::string> getFaceDefinitionNames();
@@ -114,6 +117,10 @@ class SBScene : public SBObject
 		SBParser* getParser();
 
 		SbmDebuggerServer * getDebuggerServer() { return _debuggerServer; }
+		SbmDebuggerClient * getDebuggerClient() { return _debuggerClient; }
+		SbmDebuggerUtility* getDebuggerUtility() { return _debuggerUtility; }
+		bool isRemoteMode()	{ return _isRemoteMode; }
+		void setRemoteMode(bool val)	{ _isRemoteMode = val; }
 
 		void notify(SBSubject* subject);
 
@@ -135,8 +142,11 @@ class SBScene : public SBObject
 
 		std::map<std::string, SBScript*> _scripts;
 		float _scale;
+		bool _isRemoteMode;
 
-		SbmDebuggerServer* _debuggerServer;
+		SbmDebuggerServer*	_debuggerServer;
+		SbmDebuggerClient*	_debuggerClient;
+		SbmDebuggerUtility*	_debuggerUtility;
 };
 
 SBScene* getScene();

@@ -77,6 +77,8 @@
 #include <sb/SBAnimationState.h>
 #include <sb/SBMotion.h>
 #include <math.h>
+#include <sbm/SbmDebuggerServer.h>
+#include <sbm/SbmDebuggerClient.h>
 
 
 #ifdef USE_GOOGLE_PROFILER
@@ -1252,6 +1254,9 @@ int mcu_motion_player_func(srArgBuffer& args, mcuCBHandle *mcu_p )
 		SbmCharacter* character = mcu_p->getCharacter(charName);
 		if (character)
 		{
+			if (!character->motionplayer_ct)
+				return CMD_FAILURE;
+
 			std::string next = args.read_token();
 			if (next == "on")
 				character->motionplayer_ct->setActive(true);
@@ -6820,9 +6825,15 @@ int mcu_vhmsg_disconnect_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 void mcu_vhmsg_callback( const char *op, const char *args, void * user_data )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	switch( mcu.execute( op, (char*) args ) )
+	if (mcuCBHandle::singleton()._scene->isRemoteMode())
 	{
+		mcuCBHandle::singleton()._scene->getDebuggerClient()->ProcessVHMsgs(op, args);
+		return;
+	}
+	else
+		mcuCBHandle::singleton()._scene->getDebuggerServer()->ProcessVHMsgs(op, args);
+
+	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
             LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
             break;

@@ -1892,7 +1892,8 @@ void SbmCharacter::schedule_viseme_blend_curve(
 				value[ 0 ] = weight * visemeWeight;
 				ct_p->set_data(value);
 
-				head_sched_p->schedule( ct_p, start_time + timeDelay, curve_info, num_keys, num_key_params );
+				if (head_sched_p)
+					head_sched_p->schedule( ct_p, start_time + timeDelay, curve_info, num_keys, num_key_params );
 			}
 		}
 }
@@ -3735,7 +3736,10 @@ void SbmCharacter::setFaceDefinition(SmartBody::SBFaceDefinition* faceDefinition
 		this->removeAllFaceChannels();
 	}
 	_faceDefinition = new SmartBody::SBFaceDefinition(faceDefinition);
-	_faceDefinition->setName(faceDefinition->getName() + "_copy");
+//	_faceDefinition->setName(faceDefinition->getName() + "_copy");
+	
+	// why add _copy suffix? 
+	_faceDefinition->setName(faceDefinition->getName());
 
 	SkSkeleton* skeleton = getSkeleton();
 	if (!skeleton)

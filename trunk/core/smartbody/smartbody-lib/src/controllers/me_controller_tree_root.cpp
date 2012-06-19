@@ -491,6 +491,44 @@ public:
 		}
 	}
 
+	/*
+	Applys the skeleton data to the frame buffer
+	*/
+	void applySkeletonToBuffer()
+	{
+		SR_ASSERT( _state!=REMAPPING );
+		if( _skeleton ) {
+			if( _state==INVALID )
+				remapFrameData();
+
+			SkChannelArray& channels = _channels[_channels_cur];
+			SrBuffer<float>& buffer = _frame_data.buffer();
+			int size = channels.size();
+			const int BEGIN =0;
+			const int END = size;
+
+			//// Debug pointer range
+			//float* fp_min = &( buffer.get( _frame_data.toBufferIndex( 0 ) ) );
+			//float* fp_max = fp_min;
+			for( int i=BEGIN; i<END; ++i ) {
+				SkChannel& channel = channels[i];
+				if( channel.joint ) {
+					if( channel.joint->skeleton() == _skeleton ) {
+						// Line by line temp variables for the debugger
+						int buffer_index = _frame_data.toBufferIndex( i );
+						float* fp = &( buffer.get( buffer_index ) );  // pointer hack copied from Marcelo's SkChannelArray::set_values
+						//fp_min = std::min( fp_min, fp );
+						//fp_max = std::max( fp_max, fp );
+						channel.get( fp );
+					} else {
+						LOG("ERROR: applySkeletonToBuffer(): channels[%d].joint.skeleton() != _skeleton", i);
+					}
+				} else {
+					LOG("ERROR: applySkeletonToBuffer(): channels[%d].joint == NULL", i);
+				}
+			}
+		}
+	}
 	void set_evaluation_logger( MeEvaluationLogger* logger ) {
 		if( _logger ) {
 			_logger->unref();
