@@ -213,8 +213,6 @@ void BMLCreatorWindow::ResetBMLCB(Fl_Widget* w, void *data)
 			{
 				stringAttr->setValue(stringAttr->getDefaultValue());
 			}
-			
-			
 		}
 	}
 
