@@ -143,8 +143,8 @@ void SkJointQuat::get_quat ( SrQuat& q ) const
  {
  }
 
-/* it appears that no function uses this, but was added before so that it stores any pre rotation 
-// skel might have, in this way PrePost(pre, post) can be used purely to re-orient joint local axes.
+/* it appears that no function uses this before but was added so that it stores any pre-rotation 
+// skel might have, in this way prerot/postrot can be used purely to re-orient joint local axes.
 // (this comment was added by David Huang Jun 2012)  */
 void SkJointQuat::orientation(const SrQuat& q)
 {
@@ -155,6 +155,19 @@ void SkJointQuat::orientation(const SrQuat& q)
 const SrQuat& SkJointQuat::orientation()
 {
 	return _jorientation;
+}
+
+SrQuat SkJointQuat::getWorldAlignedLocalRot()
+{
+	SrQuat q;
+	if(_prepost)
+	{
+		q = _prepost->pre.inverse() * _jorientation.inverse() * _rawQuat * _prepost->post.inverse();
+		q.normalize();
+	}
+	else
+		q = _rawQuat;
+	return q;
 }
 
 //============================ End of File ============================
