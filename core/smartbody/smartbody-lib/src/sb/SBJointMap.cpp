@@ -639,21 +639,85 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		}
 		else // using guessed hand joint with less than 5 fingers
 		{
+			LOG("guessMap: No hand joint w/ 5 fingers found, result might be wrong...\n");
 			if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_acromioclavicular) == 2)
 			{
 				l_elbow = l_wrist->parent();
 				r_elbow = r_wrist->parent();
 				setJointMap("l_elbow", l_elbow, prtMap);
 				setJointMap("r_elbow", r_elbow, prtMap);
-				l_shoulder = l_acromioclavicular; // make upperArm the same as AC_shoulder
+				l_shoulder = l_acromioclavicular; // use upperArm to replace AC_shoulder
 				r_shoulder = r_acromioclavicular;
+				LOG("guessMap: Use l/r_shoulder to replace l/r_acromioclavicular.\n");
 				setJointMap("l_shoulder", l_shoulder, prtMap);
 				setJointMap("r_shoulder", r_shoulder, prtMap);
+
 			}
-			else
+			else if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_acromioclavicular) == 3)
 			{
-				l_elbow = l_wrist->parent();
-				r_elbow = r_wrist->parent();
+				if(l_acromioclavicular->num_children()==1 && (l_acromioclavicular->child(0)->num_children()==1||l_acromioclavicular->child(0)->num_children()==2))
+				{
+					l_shoulder = l_acromioclavicular->child(0); // most likely the upperArm joint
+					r_shoulder = r_acromioclavicular->child(0);
+					setJointMap("l_shoulder", l_shoulder, prtMap);
+					setJointMap("r_shoulder", r_shoulder, prtMap);
+					l_elbow = l_wrist->parent();
+					r_elbow = r_wrist->parent();
+					setJointMap("l_elbow", l_elbow, prtMap);
+					setJointMap("r_elbow", r_elbow, prtMap);
+					if(l_shoulder->num_children()==2)
+						LOG("guessMap: Might have an upperArm twist/roll joint.\n");
+				}
+				else if(l_acromioclavicular->num_children()==2) // should be upperArm, with elbow and 1 twist children joints
+				{
+					l_shoulder = l_acromioclavicular; // should be upperArm joint
+					r_shoulder = r_acromioclavicular;
+					setJointMap("l_shoulder", l_shoulder, prtMap);
+					setJointMap("r_shoulder", r_shoulder, prtMap);
+					l_acromioclavicular = 0; r_acromioclavicular = 0; // don't use AC_shoulder anymore
+
+					LOG("guessMap: Might have two arm twist/roll joints.\n");
+				}
+			}
+			else if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_acromioclavicular) == 4)
+			{ /* Could be shoulder -> uparm -> elbow -> forarmTwist -> wrist
+				 Or       shoulder -> uparm -> uparmTwist -> elbow -> wrist */
+				l_shoulder = l_acromioclavicular->child(0);
+				r_shoulder = r_acromioclavicular->child(0);
+				setJointMap("l_shoulder", l_shoulder, prtMap);
+				setJointMap("r_shoulder", r_shoulder, prtMap);
+				SkJoint* ja = l_wrist->parent();
+				SkJoint* jb = r_wrist->parent();
+				SrString jname(ja->name().c_str());
+				if(jname.search("twist")>=0 || jname.search("roll")>=0)
+				{
+					l_forearm = ja;
+					r_forearm = jb;
+					setJointMap("l_forearm", l_forearm, prtMap);
+					setJointMap("r_forearm", r_forearm, prtMap);
+					l_elbow = ja->parent();
+					r_elbow = jb->parent();
+				}
+				else
+				{
+					l_elbow = ja;
+					r_elbow = jb;
+				}
+				setJointMap("l_elbow", l_elbow, prtMap);
+				setJointMap("r_elbow", r_elbow, prtMap);
+			}
+			else if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_acromioclavicular) == 5)
+			{ // Might be shoulder -> uparm -> uparmTwist -> elbow -> forearmTwist -> wrist 
+				l_shoulder = l_acromioclavicular->child(0);
+				r_shoulder = r_acromioclavicular->child(0);
+				setJointMap("l_shoulder", l_shoulder, prtMap);
+				setJointMap("r_shoulder", r_shoulder, prtMap);
+				l_forearm = l_wrist->parent();
+				r_forearm = r_wrist->parent();
+				setJointMap("l_forearm", l_forearm, prtMap);
+				setJointMap("r_forearm", r_forearm, prtMap);
+				l_elbow = l_forearm->parent();
+				r_elbow = r_forearm->parent();
 				setJointMap("l_elbow", l_elbow, prtMap);
 				setJointMap("r_elbow", r_elbow, prtMap);
 			}
