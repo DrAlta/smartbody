@@ -116,6 +116,11 @@ class SkJointQuat
 
 	const SrQuat& orientation();
 
+	/*! convert local rot into world aligned rot (added by David Huang 2012-06)
+	// for applying directly on world-aligned (MotionBuilder standard) T-pose skel
+	// use after doing SBSkeleton::orientJointsLocalAxesToWorld() */
+	SrQuat getWorldAlignedLocalRot();
+
    protected :
 
     /*! This method is to be called by derived classes whenever a new rotation
