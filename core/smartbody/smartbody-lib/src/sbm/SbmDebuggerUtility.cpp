@@ -10,8 +10,7 @@
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sbm/mcontrol_util.h>
-#include <sbm/mcontrol_util.h>
-
+#include <sb/SBPythonClass.h>
 
 bool QueryResourcesCB(void* caller, NetRequest* req);
 
@@ -26,21 +25,21 @@ SbmDebuggerUtility::~SbmDebuggerUtility()
 
 void SbmDebuggerUtility::initScene()
 {
-	//mcuCBHandle::singleton().reset();
-
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	// remove face definitions, characters, pawns, scripts.. etc.
+	// clear out the default face definitions
+	for (std::map<std::string, SmartBody::SBFaceDefinition*>::iterator iter = mcu.face_map.begin();
+		iter != mcu.face_map.end();
+		iter++)
+	{
+		SmartBody::SBFaceDefinition* face = (*iter).second;
+		delete face;
+	}
 	mcu.face_map.clear();
-	mcu.getCharacterMap().clear();
-	mcu.getPawnMap().clear();
-	mcu.pose_map.clear();
-	mcu.motion_map.clear();
-	mcu.skeleton_map.clear();
+
+	// clear out the default states
 	mcu.param_anim_blends.clear();
 	mcu.param_anim_transitions.clear();
-	mcu._scene->clearAttributes();
-	SmartBody::SBScene::getScene()->setRemoteMode(true);
 }
 
 void SbmDebuggerUtility::queryResources()

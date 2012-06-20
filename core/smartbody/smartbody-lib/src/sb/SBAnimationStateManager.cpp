@@ -25,7 +25,6 @@ std::vector<std::string> SBAnimationBlendManager::getAutoBlendTransitions( const
 bool SBAnimationBlendManager::addBlendToGraph( const std::string& name )
 {
 	BoostGraph::vertex_descriptor v = stateGraph.vertex(name);
-	
 	if (v == BoostGraph::null_vertex()) // the state does not exist in the graph
 	{		
 		stateGraph.add_vertex(name);	
@@ -53,7 +52,7 @@ SBAnimationBlend0D* SBAnimationBlendManager::createBlend0D(const std::string& na
 {
 	SBAnimationBlend0D* blend = new SBAnimationBlend0D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	addBlendToGraph(name);
+//	addBlendToGraph(name);
 	mcu.addPABlend(blend);
 	return blend;
 }
@@ -62,7 +61,7 @@ SBAnimationBlend1D* SBAnimationBlendManager::createBlend1D(const std::string& na
 {
 	SBAnimationBlend1D* blend = new SBAnimationBlend1D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	addBlendToGraph(name);
+//	addBlendToGraph(name);
 	mcu.addPABlend(blend);
 	return blend;
 }
@@ -71,7 +70,7 @@ SBAnimationBlend2D* SBAnimationBlendManager::createBlend2D(const std::string& na
 {
 	SBAnimationBlend2D* blend = new SBAnimationBlend2D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	addBlendToGraph(name);
+//	addBlendToGraph(name);
 	mcu.addPABlend(blend);
 	return blend;
 }
@@ -80,7 +79,7 @@ SBAnimationBlend3D* SBAnimationBlendManager::createBlend3D(const std::string& na
 {
 	SBAnimationBlend3D* blend = new SBAnimationBlend3D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	addBlendToGraph(name);
+//	addBlendToGraph(name);
 	mcu.addPABlend(blend);
 	return blend;
 }

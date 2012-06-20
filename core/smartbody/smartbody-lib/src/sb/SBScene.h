@@ -119,8 +119,8 @@ class SBScene : public SBObject
 		SbmDebuggerServer * getDebuggerServer() { return _debuggerServer; }
 		SbmDebuggerClient * getDebuggerClient() { return _debuggerClient; }
 		SbmDebuggerUtility* getDebuggerUtility() { return _debuggerUtility; }
-		bool isRemoteMode()	{ return _isRemoteMode; }
-		void setRemoteMode(bool val)	{ _isRemoteMode = val; }
+		bool isRemoteMode();
+		void setRemoteMode(bool val);
 
 		void notify(SBSubject* subject);
 

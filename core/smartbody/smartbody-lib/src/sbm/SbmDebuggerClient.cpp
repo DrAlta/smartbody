@@ -328,7 +328,7 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
                {
                   if (split[2] == "connect_success")
                   {
-                     m_connectResult = true;					 
+                     m_connectResult = true;					
 					 SmartBody::SBScene::getScene()->getDebuggerUtility()->initScene();
 					 SmartBody::SBScene::getScene()->getDebuggerUtility()->queryResources();
                   }
