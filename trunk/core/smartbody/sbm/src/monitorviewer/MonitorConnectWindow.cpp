@@ -6,6 +6,8 @@
 #include <sb/SBSimulationManager.h>
 #include <sbm/SbmDebuggerClient.h>
 #include <sbm/SbmDebuggerServer.h>
+#include <sbm/mcontrol_util.h>
+#include <sb/SBPythonClass.h>
 
 MonitorConnectWindow::MonitorConnectWindow(int x, int y, int w, int h, char* label) : Fl_Double_Window(x, y, w, h, label)
 {
@@ -17,12 +19,9 @@ MonitorConnectWindow::MonitorConnectWindow(int x, int y, int w, int h, char* lab
 	_buttonOk->callback(OnConfirmCB, this);
 	_buttonCancel = new Fl_Button(120, 250, 100, 20, "Cancel");
 	_buttonCancel->callback(OnCancelCB, this);
-	_buttonRefresh = new Fl_Button(230, 250, 100, 20, "Refresh");
-	_buttonRefresh->callback(OnFefreshCB, this);
+//	_buttonRefresh = new Fl_Button(230, 250, 100, 20, "Refresh");
+//	_buttonRefresh->callback(OnFefreshCB, this);
 	this->end();
-
-
-	loadProcesses();
 }
 
 MonitorConnectWindow::~MonitorConnectWindow()
@@ -31,6 +30,8 @@ MonitorConnectWindow::~MonitorConnectWindow()
 
 void MonitorConnectWindow::show()
 {
+	loadProcesses();
+
 	Fl_Double_Window::show();
 }
 
@@ -42,7 +43,6 @@ void MonitorConnectWindow::hide()
 void MonitorConnectWindow::loadProcesses()
 {
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
-
 	SmartBody::SBScene::getScene()->setRemoteMode(true);
 
 	SbmDebuggerClient* c = sbScene->getDebuggerClient();

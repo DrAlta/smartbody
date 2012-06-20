@@ -81,6 +81,7 @@
 #include <sb/SBScript.h>
 #include <sb/SBServiceManager.h>
 #include <sb/SBAnimationState.h>
+#include <sb/SBSimulationManager.h>
 #include "SbmDebuggerServer.h"
 #include "SbmDebuggerClient.h"
 #include <controllers/me_ct_param_animation_utilities.h>
@@ -240,6 +241,7 @@ mcuCBHandle::mcuCBHandle()
 	sbm_character_listener( NULL ),
 	play_internal_audio( false ),
 	resourceDataChanged( false ),
+	perceptionData( new PerceptionData() ),
 	skScale( 1.0 ),
 	skmScale( 1.0 ),
 	viewer_p( NULL ),
@@ -313,9 +315,82 @@ mcuCBHandle::mcuCBHandle()
 mcuCBHandle::~mcuCBHandle() {
 	clear();
 
-	for (size_t x = 0; x < _defaultControllers.size(); x++)
-		_defaultControllers[x]->unref();
-	_defaultControllers.clear();
+	// clean up factories and time profiler which are set externally
+	if (internal_profiler_p)
+	{
+		delete internal_profiler_p;
+		internal_profiler_p = NULL;
+	}
+	if (external_profiler_p)
+	{
+		delete external_profiler_p;
+		external_profiler_p = NULL;
+	}
+	if (profiler_p)
+	{
+		delete profiler_p;
+		profiler_p = NULL;
+	}
+	if (internal_timer_p)
+	{
+		delete internal_timer_p;
+		internal_timer_p = NULL;
+	}
+	if (external_timer_p)
+	{
+		delete external_timer_p;
+		external_timer_p = NULL;
+	}
+	if (timer_p)
+	{
+		delete timer_p;
+		timer_p = NULL;
+	}
+	if (viewer_factory)
+	{
+		delete viewer_factory;
+		viewer_factory = NULL;
+	}
+	if (ogreViewerFactory)
+	{
+		delete ogreViewerFactory;
+		ogreViewerFactory = NULL;
+	}
+	if (bmlviewer_factory)
+	{
+		delete bmlviewer_factory;
+		bmlviewer_factory = NULL;
+	}
+	if (panimationviewer_factory)
+	{
+		delete panimationviewer_factory;
+		panimationviewer_factory = NULL;
+	}
+	if (channelbufferviewer_factory)
+	{
+		delete channelbufferviewer_factory;
+		channelbufferviewer_factory = NULL;
+	}
+	if (commandviewer_factory)
+	{
+		delete commandviewer_factory;
+		commandviewer_factory = NULL;
+	}
+	if (resourceViewerFactory)
+	{
+		delete resourceViewerFactory;
+		resourceViewerFactory = NULL;
+	}
+	if (velocityViewerFactory)
+	{
+		delete velocityViewerFactory;
+		velocityViewerFactory = NULL;
+	}
+	if (faceViewerFactory)
+	{
+		delete faceViewerFactory;
+		faceViewerFactory = NULL;
+	}
 
 	// clean up python
 #ifdef USE_PYTHON
@@ -323,30 +398,65 @@ mcuCBHandle::~mcuCBHandle() {
 #endif
 }
 
-void mcuCBHandle::reset( void )	{
+void mcuCBHandle::reset( void )	
+{
+	// clear everything
 	clear();
 
-	// reset initial variables to match the constructor.
+	// initialize everything
 	loop = true;
-	time = 0.0;
+	vhmsg_enabled = false;
 	net_bone_updates = false;
+	net_world_offset_updates = true;
+	play_internal_audio = false;
+	resourceDataChanged = false;
+	perceptionData = new PerceptionData();
+	skmScale = 1.0;
+	skScale = 1.0;
 	root_group_p = new SrSnGroup();
-	root_group_p->ref();
 	logger_p = new joint_logger::EvaluationLogger();
+	test_character_default = "";
+	test_recipient_default = "ALL";
+	queued_cmds = 0;
+	updatePhysics = false;
+	resource_manager = SBResourceManager::getResourceManager();
+	snapshot_counter = 1;
+	use_python = true;
+	delay_behaviors = true;
+	media_path = ".";
+	_interactive = true;
+	sendPawnUpdates = false;
+	logListener = NULL;
+	useXmlCache = false;
+	useXmlCacheAuto = false;
+	testBMLId = 0;
+	registerCallbacks();
+	root_group_p->ref();
 	logger_p->ref();
-
+	kinectProcessor = new KinectProcessor();
 #if USE_WSP
-	// TODO: this needs to have a unique name so that multiple sbm
-	// processes will be identified differently
+	theWSP = WSP::create_manager();
 	theWSP->init( "SMARTBODY" );
 #endif
-	
+
+	// Create default settings
+	createDefaultControllers();
+	SmartBody::SBFaceDefinition* faceDefinition = new SmartBody::SBFaceDefinition();
+	faceDefinition->setName("_default_");
+	face_map["_default_"] = faceDefinition;
 	_scene = new SmartBody::SBScene();
 	_scene->getDebuggerServer()->Init();
 	_scene->getDebuggerServer()->SetSBScene(_scene);
+	SmartBody::SBAnimationBlend0D* idleState = new SmartBody::SBAnimationBlend0D(PseudoIdleState);
+	addPABlend(idleState);
 
-	if (_scene->getBoneBusManager()->getHost() != "" )
-		_scene->getBoneBusManager()->setEnable(true);
+	// reset timer & viewer window
+	_scene->getSimulationManager()->reset();
+	_scene->getSimulationManager()->start();
+	getViewer()->show_viewer();
+
+
+	_scene->command("vhmsgconnect");
 }
 
  void mcuCBHandle::createDefaultControllers()
@@ -588,32 +698,123 @@ void mcuCBHandle::registerCallbacks()
  *  Clears the contents of the mcuCBHandle.
  *  Used by reset and destructor.
  */
-void mcuCBHandle::clear( void )	{
+void mcuCBHandle::clear( void )	
+{
+	if (logListener)
+	{
+		vhcl::Log::g_log.RemoveListener(logListener);
+		delete logListener;
+		logListener = NULL;
+	}
+	
+	if (perceptionData)
+	{
+		delete perceptionData;
+		perceptionData = NULL;
+	}
 
-	for (std::map<std::string, SmartBody::SBFaceDefinition*>::iterator iter = this->face_map.begin();
+	if (kinectProcessor)
+	{
+		delete kinectProcessor;
+		kinectProcessor = NULL;
+	}
+
+	param_anim_blends.clear();
+	param_anim_transitions.clear();
+
+	close_viewer();
+	if (viewer_p)
+	{
+		delete viewer_p;
+		viewer_p = NULL;
+	}
+
+	if (ogreViewer_p)
+	{
+		delete ogreViewer_p;
+		ogreViewer_p = NULL;
+	}
+
+	if (bmlviewer_p)
+	{
+		delete bmlviewer_p;
+		bmlviewer_p = NULL;
+	}
+
+	if (channelbufferviewer_p)
+	{
+		delete channelbufferviewer_p;
+		channelbufferviewer_p = NULL;
+	}
+
+	if (resourceViewer_p)
+	{
+		delete resourceViewer_p;
+		resourceViewer_p = NULL;
+	}
+
+	if (velocityViewer_p)
+	{
+		delete velocityViewer_p;
+		velocityViewer_p = NULL;
+	}
+
+	if (faceViewer_p)
+	{
+		delete faceViewer_p;
+		faceViewer_p = NULL;
+	}
+
+	if (camera_p)
+	{
+		delete camera_p;
+		camera_p = NULL;
+	}
+
+	if( root_group_p )	
+	{
+		root_group_p->unref();
+		root_group_p = NULL;
+	}
+
+	if( height_field_p )	
+	{
+		delete height_field_p;
+		height_field_p = NULL;
+	}
+
+	// srPathList? srCmdMap? Ignore clear for now
+
+/*
+	cmd_map.reset();
+	while (cmd_map.getHashMap().pull() != NULL)
+	{
+	}
+	set_cmd_map.reset();
+	while (set_cmd_map.getHashMap().pull() != NULL)
+	{
+	}
+	print_cmd_map.reset();
+	while (print_cmd_map.getHashMap().pull() != NULL)
+	{
+	}
+	test_cmd_map.reset();
+	while (test_cmd_map.getHashMap().pull() != NULL)
+	{
+	}
+*/
+
+	pendingSequences.clear();
+	activeSequences.clear();
+
+	for (std::map<std::string, SmartBody::SBFaceDefinition*>::iterator iter = face_map.begin();
 		iter != face_map.end();
 		iter++)
 	{
 		SmartBody::SBFaceDefinition* face = (*iter).second;
 		delete face;
 	}
-
-	for (size_t x = 0; x < this->cameraTracking.size(); x++)
-	{
-		delete this->cameraTracking[x];
-	}
-
-	if( height_field_p )	{
-		delete height_field_p;
-		height_field_p = NULL;
-	}
-
-	pendingSequences.clear();
-	activeSequences.clear();
-
-	getCharacterMap().clear();
-	getPawnMap().clear();
-
+	face_map.clear();
 
 	for (std::map<std::string, SkPosture*>::iterator postureIter = pose_map.begin();
 		postureIter != pose_map.end();
@@ -622,134 +823,87 @@ void mcuCBHandle::clear( void )	{
 		SkPosture* posture = (*postureIter).second;
 		delete posture;
 	}
-	
+	pose_map.clear();
+
 	for (std::map<std::string, SkMotion*>::iterator motionIter = motion_map.begin();
-		 motionIter != motion_map.end();
-		 motionIter++)
+		motionIter != motion_map.end();
+		motionIter++)
 	{
 
 		SkMotion* motion = (*motionIter).second;
 		delete motion;
-
 	}
+	motion_map.clear();
 
 	for (std::map<std::string, SkSkeleton*>::iterator skelIter = skeleton_map.begin();
-		 skelIter != skeleton_map.end();
-		 skelIter++)
+		skelIter != skeleton_map.end();
+		skelIter++)
 	{
 		SkSkeleton* skeleton = (*skelIter).second;
 		delete skeleton;
 	}
+	skeleton_map.clear();
 
-	// remove the parameterized animation states
-	for (std::vector<PABlend*>::iterator iter = param_anim_blends.begin();
-	     iter != param_anim_blends.end();
-	     iter++)
+	for (std::map<std::string, DeformableMesh*>::iterator deformableIter = deformableMeshMap.begin();
+		deformableIter != deformableMeshMap.end();
+		deformableIter++)
 	{
-		delete (*iter);
+		DeformableMesh* deformableMesh = (*deformableIter).second;
+		delete deformableMesh;
 	}
-	param_anim_blends.clear();
+	deformableMeshMap.clear();
 
-	// remove the transition maps
-	for (std::vector<PATransition*>::iterator iter = param_anim_transitions.begin();
-	     iter != param_anim_transitions.end();
-	     iter++)
-	{
-		delete (*iter);
-	}
-	param_anim_transitions.clear();
+	// srHashMap? Ignore for now
 
 	// remove the XML cache
-	for (std::map<std::string, DOMDocument*>::iterator iter = xmlCache.begin();
-		 iter != xmlCache.end();
-		 iter++)
+	for (std::map<std::string, DOMDocument*>::iterator xmlIter = xmlCache.begin();
+		xmlIter != xmlCache.end();
+		xmlIter++)
 	{
-		(*iter).second->release();
+		(*xmlIter).second->release();
 	}
-	
-	/*
-	MeCtPose* pose_ctrl_p;
-	pose_ctrl_map.reset();
-	while( pose_ctrl_p = pose_ctrl_map.pull() )	{
-		pose_ctrl_p->unref();
-	}
-	
-	MeCtMotion* mot_ctrl_p;
-	motion_ctrl_map.reset();
-	while( mot_ctrl_p = motion_ctrl_map.pull() )	{
-		mot_ctrl_p->unref();
-	}
-	
-	MeCtStepTurn* stepturn_ctrl_p;
-	stepturn_ctrl_map.reset();
-	while( stepturn_ctrl_p = stepturn_ctrl_map.pull() )	{
-		stepturn_ctrl_p->unref();
-	}
+	xmlCache.clear();
 
-	MeCtQuickDraw* qdraw_ctrl_p;
-	quickdraw_ctrl_map.reset();
-	while( qdraw_ctrl_p = quickdraw_ctrl_map.pull() )	{
-		qdraw_ctrl_p->unref();
-	}
-		
-	MeCtGaze* gaze_ctrl_p;
-	gaze_ctrl_map.reset();
-	while( gaze_ctrl_p = gaze_ctrl_map.pull() )	{
-		gaze_ctrl_p->unref();
-	}
-	
-	MeCtSimpleNod* snod_ctrl_p;
-	snod_ctrl_map.reset();
-	while( snod_ctrl_p = snod_ctrl_map.pull() )	{
-		snod_ctrl_p->unref();
-	}
-	
-	MeCtAnkleLilt* lilt_ctrl_p;
-	lilt_ctrl_map.reset();
-	while( lilt_ctrl_p = lilt_ctrl_map.pull() ){
-		lilt_ctrl_p->unref();
-	}
-	
-	MeCtEyeLid* eyelid_ctrl_p;
-	eyelid_ctrl_map.reset();
-	while( eyelid_ctrl_p = eyelid_ctrl_map.pull() ){
-		eyelid_ctrl_p->unref();
-	}
-	
-	MeCtScheduler2* sched_ctrl_p;
-	sched_ctrl_map.reset();
-	while( sched_ctrl_p = sched_ctrl_map.pull() )	{
-		sched_ctrl_p->unref();
-	}
-	
-	MeController* ctrl_p;
-	controller_map.reset();
-	while( ctrl_p = controller_map.pull() )	{
-		ctrl_p->unref();
-	}
-	*/
-	
-	if( root_group_p )	{
-		root_group_p->unref();
-		root_group_p = NULL;
-	}
+	// remove pawns (cannot direct destruct, smart pointer)
+	getCharacterMap().clear();
+	getPawnMap().clear();
 
-	if( logger_p ) {
-		logger_p->unref();
-		logger_p = NULL;
+	// remove NVBG
+	for (std::map<std::string, Nvbg*>::iterator nvbgIter = nvbgMap.begin();
+		nvbgIter != nvbgMap.end();
+		nvbgIter++)
+	{
+		Nvbg* nvbg = (*nvbgIter).second;
+		delete nvbg;
 	}
-
-	close_viewer();
-
-	if (_scene->getBoneBusManager()->getBoneBus().IsOpen())
-		_scene->getBoneBusManager()->getBoneBus().CloseConnection();
+	nvbgMap.clear();
 
 #if USE_WSP
 	theWSP->shutdown();
 #endif
-	if (kinectProcessor)
-		delete kinectProcessor;
-	kinectProcessor = NULL;
+	if (theWSP)
+	{
+		delete theWSP;
+		theWSP = NULL;
+	}
+
+	if( logger_p ) 
+	{
+		logger_p->unref();
+		logger_p = NULL;
+	}
+	
+	resource_manager->cleanup();
+	resource_manager = NULL;
+	cameraTracking.clear();
+
+	for (size_t x = 0; x < _defaultControllers.size(); x++)
+		_defaultControllers[x]->unref();
+	_defaultControllers.clear();
+
+
+	if (_scene->getBoneBusManager()->getBoneBus().IsOpen())
+		_scene->getBoneBusManager()->getBoneBus().CloseConnection();
 
 	delete _scene;
 	_scene = NULL;
@@ -872,7 +1026,7 @@ int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{
 		if (!viewer_factory)
 			return CMD_FAILURE;
 		viewer_p = viewer_factory->create( px, py, width, height );
-		viewer_p->label_viewer( "SBM Viewer" );
+		viewer_p->label_viewer( "SBM Viewer - Local Mode" );
 		camera_p = new SrCamera;
 		viewer_p->set_camera( *camera_p );
 		//((FltkViewer*)viewer_p)->set_mcu(this);

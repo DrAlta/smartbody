@@ -77,7 +77,9 @@ SBScene::~SBScene(void)
 	delete _sim;
 	delete _profiler;
 	delete _bml;
+	_bml = NULL;
 	delete _blendManager;
+	_blendManager = NULL;
 	delete _reachManager;
 	delete _steerManager;
 	delete _physicsManager;
@@ -86,6 +88,8 @@ SBScene::~SBScene(void)
 
 	delete _parser;
 
+	_debuggerClient->Disconnect();
+	_debuggerServer->Close();
 	delete _debuggerServer;  // TODO: should delete these in reverse order?
 	delete _debuggerClient;
 	delete _debuggerUtility;
@@ -683,6 +687,16 @@ SBJointMapManager* SBScene::getJointMapManager()
 SBParser* SBScene::getParser()
 {
 	return _parser;
+}
+
+bool SBScene::isRemoteMode()	
+{ 
+	return _isRemoteMode; 
+}
+
+void SBScene::setRemoteMode(bool val)	
+{ 
+	_isRemoteMode = val; 
 }
 
 SmartBody::SBFaceDefinition* SBScene::createFaceDefinition(const std::string& name)

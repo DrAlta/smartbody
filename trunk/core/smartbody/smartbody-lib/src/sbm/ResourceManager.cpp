@@ -43,6 +43,8 @@ SBResourceManager::~SBResourceManager()
 		delete r;
 		cur_cmd_parent.pop();
 	}
+
+	last_resource = NULL;
 }
 
 void SBResourceManager::addResource(Resource* r)

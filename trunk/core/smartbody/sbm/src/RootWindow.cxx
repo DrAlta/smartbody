@@ -13,6 +13,7 @@
 #include <fstream>
 #include "CommandWindow.h"
 #include <sb/SBSkeleton.h>
+#include <sbm/SbmDebuggerClient.h>
 
 BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
 {
@@ -22,10 +23,13 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 
 	menubar = new Fl_Menu_Bar(0, 0, w, 30); 
 	menubar->labelsize(10);
-/*	menubar->add("&File/Load...", 0, BaseWindow::LoadCB, 0, NULL);
-	menubar->add("&File/Save Configuration...", 0, NULL, 0, NULL);
-	menubar->add("&File/Run Script...", 0, NULL, 0, NULL);
-*/	menubar->add("&View/Character/Bones", 0, ModeBonesCB, this, NULL);
+	menubar->add("&File/New", 0, NewCB, this, NULL);	
+	menubar->add("&File/Load...", 0, LoadCB, this, NULL);
+	menubar->add("&File/Connect...", 0, LaunchConnectCB, this, NULL);
+	menubar->add("&File/Disconnect", 0, DisconnectRemoteCB, this, NULL);
+//	menubar->add("&File/Save Configuration...", 0, NULL, 0, NULL);
+//	menubar->add("&File/Run Script...", 0, NULL, 0, NULL);
+	menubar->add("&View/Character/Bones", 0, ModeBonesCB, this, NULL);
 	menubar->add("&View/Character/Geometry", 0, ModeGeometryCB, this, NULL);
 	menubar->add("&View/Character/Collision Geometry", 0, ModeCollisionGeometryCB, this, NULL);
 	menubar->add("&View/Character/Deformable Geometry", 0, ModeDeformableGeometryCB, this, NULL);
@@ -72,7 +76,6 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Face Viewer", 0, LaunchFaceViewerCB, this, NULL);
 	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, NULL);
 	menubar->add("&Window/Viseme Viewer", 0, LaunchVisemeViewerCB, this, NULL);
-	menubar->add("&Monitor/Connect", 0, LaunchConnectCB, this, NULL);
 	//menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
 	//menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, FL_MENU_DIVIDER);
 
@@ -218,7 +221,7 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 		return;
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute((char*)"reset");
+	mcu.execute((char*)"seq ");
 }
 
 void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
@@ -274,6 +277,16 @@ void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )
 #endif
 }
 
+void BaseWindow::NewCB(Fl_Widget* widget, void* data)
+{
+	int confirm = fl_choice("This will reset the current session.\nContinue?", "yes", "no", NULL);
+	if (confirm == 0)
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		mcu.reset();
+	}
+}
+
 void BaseWindow::LaunchConnectCB(Fl_Widget* widget, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
@@ -283,6 +296,13 @@ void BaseWindow::LaunchConnectCB(Fl_Widget* widget, void* data)
 	}
 
 	rootWindow->monitorConnectWindow->show();	
+}
+
+void BaseWindow::DisconnectRemoteCB(Fl_Widget* widget, void* data)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu._scene->getDebuggerClient()->Disconnect();
+	mcu.reset();
 }
 
 void BaseWindow::LaunchConsoleCB(Fl_Widget* widget, void* data)
