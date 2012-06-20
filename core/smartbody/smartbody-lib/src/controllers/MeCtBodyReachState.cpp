@@ -373,6 +373,12 @@ std::string ReachHandAction::generateAttachCmd( const std::string& charName, con
 	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:source-joint=\"" + wristName + "\" sbm:grab-type=\"" + reachType + "\"" + targetStr + "/>";
 	return cmd;
 }
+
+int ReachHandAction::getType()
+{
+	return MeCtReachEngine::TOUCH_OBJECT;
+}
+
 /************************************************************************/
 /* Reach Hand Pick-Up Action                                            */
 /************************************************************************/
@@ -400,6 +406,11 @@ void ReachHandPickUpAction::reachReturnAction( ReachStateData* rd )
 	std::string charName = rd->charName;	
 	cmd = "char " + charName + " gazefade out 0.5";
 	//sendReachEvent(cmd);
+}
+
+int ReachHandPickUpAction::getType()
+{
+	return MeCtReachEngine::PICK_UP_OBJECT;
 }
 /************************************************************************/
 /* Reach Hand Put-Down Action                                           */
@@ -430,6 +441,41 @@ void ReachHandPutDownAction::reachReturnAction( ReachStateData* rd )
 SRT ReachHandPutDownAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalState )
 {
 	return rd->effectorState.grabStateError;
+}
+
+int ReachHandPutDownAction::getType()
+{
+	return MeCtReachEngine::PUT_DOWN_OBJECT;
+}
+
+
+SRT ReachHandPointAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalState )
+{
+	return SRT();	
+}
+
+bool ReachHandPointAction::isPickingUpNewPawn( ReachStateData* rd )
+{
+	return false;	
+}
+
+int ReachHandPointAction::getType()
+{
+	return MeCtReachEngine::POINT_AT_OBJECT;
+}
+
+void ReachHandPointAction::reachPreCompleteAction( ReachStateData* rd )
+{
+	std::string cmd;
+	std::string charName = rd->charName;
+
+	EffectorState& estate = rd->effectorState;	
+	if (estate.getAttachedPawn())
+		return; // don't do any hand animation if there is a pawn attached
+	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"return\"/>";
+
+	cmd = generateGrabCmd(charName,"","point",rd->reachType);
+	sendReachEvent("reach",cmd);	
 }
 /************************************************************************/
 /* Reach State Data                                                     */
@@ -541,6 +587,8 @@ float ReachStateData::XZDistanceToTarget(SrVec& pos)
 	float dist = (targetXZ - curXZ).norm();
 	return dist;
 }
+
+
 /************************************************************************/
 /* Reach State Interface                                                */
 /************************************************************************/
@@ -564,9 +612,21 @@ void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
 	EffectorState& estate = rd->effectorState;
 	ReachTarget& rtarget = rd->reachTarget;
 	SRT ts = rtarget.getTargetState();
+	
+	if (rd->curHandAction->getType() == MeCtReachEngine::POINT_AT_OBJECT)
+	{
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		SmartBody::SBCharacter* sbChar = scene->getCharacter(rd->charName);
+		
+		SrVec sbCenter = rd->shoulderPosition;//(rd->gmat.get_translation()+rd->centerOffset);
+		SrVec newTargetDir = ts.tran - sbCenter;
+		newTargetDir.normalize(); 
+		SrVec newTargetPos = sbCenter + newTargetDir*rd->characterHeight*0.4f;
+		ts.tran = newTargetPos;
+	}	
+
 	SRT tsBlend = rd->getPoseState(rd->targetRefFrame);
 	SRT tsBlendGlobal;
-
 
 	if (rd->useInterpolation())
 	{
@@ -581,13 +641,7 @@ void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
 	tsBlendGlobal = tsBlend;
 	SrQuat newRot = SrQuat(rd->effectorState.gmatZero.inverse()*tsBlendGlobal.gmat());
 	tsBlendGlobal.rot = newRot;
-	SRT offset = rd->curHandAction->getHandTargetStateOffset(rd,tsBlendGlobal);
-	//offset.rot = SrQuat(offset.gmat()*rd->effectorState.gmatZero);
-	//SrVec rotOffset = offset.rot.axisAngle();
-	//rotOffset = rotOffset*rd->effectorState.gmatZero;
-	//offset.rot = SrQuat(rotOffset);
-	//tsBlendGlobal.add(offset);
-	//tsBlendGlobal.rot = SrQuat(tsBlendGlobal.gmat()*rd->effectorState.gmatZero);
+	SRT offset = rd->curHandAction->getHandTargetStateOffset(rd,tsBlendGlobal);	
 	tsBlend.add(offset);		
 	//LOG("reach target after offset = %f %f %f\n",tsBlend.tran[0],tsBlend.tran[1],tsBlend.tran[2]);
 	estate.ikTargetState = tsBlend;

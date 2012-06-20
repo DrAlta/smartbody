@@ -177,7 +177,7 @@ void MeCtHand::setGrabTargetObject( SbmPawn* targetObj )
 
 
 
-void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const MotionDataSet& grabPose, const MotionDataSet& releasePose)
+void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const MotionDataSet& grabPose, const MotionDataSet& releasePose, const MotionDataSet& pointPose)
 {
 	int type = MeCtReachEngine::getReachType(grabType);
 	if (type == -1)
@@ -210,6 +210,7 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 	grabFrame  = releaseFrame;
 	tempFrame    = releaseFrame;
 	inputFrame = releaseFrame;
+	pointFrame = releaseFrame;
 	affectedJoints.clear();	
 	for (unsigned int i=0;i<nodeList.size();i++)
 	{
@@ -219,23 +220,30 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 		affectedJoints.push_back(joint);	
 		_channels.add(joint->name(), SkChannel::Quat);		
 	}	
-	SkMotion *releaseHand, *grabHand, *reachHand;
+	SkMotion *releaseHand, *grabHand, *reachHand, *pointHand;
 	releaseHand = SbmCharacter::findTagSkMotion(type,releasePose);
 	grabHand = SbmCharacter::findTagSkMotion(type,grabPose);
 	reachHand = SbmCharacter::findTagSkMotion(type,reachPose);
+	pointHand = SbmCharacter::findTagSkMotion(type, pointPose);	
 
 	if (releaseHand && grabHand && reachHand)
 	{
-		//printf("set example hand pose\n");
-		releaseFrame.setMotionPose(0.f,skeletonCopy,affectedJoints,releaseHand);
-		grabFrame.setMotionPose(0.f,skeletonCopy,affectedJoints,grabHand);
-		reachFrame.setMotionPose(0.f,skeletonCopy,affectedJoints,reachHand);
+		//printf("set example hand pose\n");		
+		//releaseFrame.setMotionPose((float)releaseHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,releaseHand);
+		//grabFrame.setMotionPose((float)grabHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,grabHand);
+		//reachFrame.setMotionPose((float)reachHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,reachHand);
+		//pointFrame.setMotionPose((float)pointHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,pointHand);
+
+		releaseFrame.setMotionPose((float)pointHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,releaseHand);
+		grabFrame.setMotionPose((float)pointHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,grabHand);
+		reachFrame.setMotionPose((float)pointHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,reachHand);
+		pointFrame.setMotionPose((float)pointHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,pointHand);
 	}
-	else
-	{
-		SrVec vec(-8,-6,0);
-		getPinchFrame(grabFrame,vec);
-	}
+// 	else
+// 	{
+// 		SrVec vec(-8,-6,0);
+// 		getPinchFrame(grabFrame,vec);
+// 	}
 	grabTargetName = "";//NULL;//new ColSphere(); // hard coded to sphere for now		
 }
 
@@ -290,7 +298,11 @@ BodyMotionFrame& MeCtHand::findTargetFrame( GrabState state )
 	{
 		//return releaseFrame;
 		return inputFrame;
-	}	
+	}
+	else if (state == GRAB_POINT)
+	{
+		return pointFrame;
+	}
 	return reachFrame;
 }
 

@@ -62,6 +62,7 @@ public:
 public:
 	void pickUpAttachedPawn(ReachStateData* rd);
 	void putDownAttachedPawn(ReachStateData* rd);
+	virtual int getType();
 protected:
 	std::string generateGrabCmd(const std::string& charName, const std::string& targetName, const std::string& grabState, int type);
 	std::string generateAttachCmd(const std::string& charName, const std::string& targetName, int type);
@@ -73,7 +74,8 @@ public:
 	virtual void reachCompleteAction(ReachStateData* rd);		
 	virtual void reachNewTargetAction(ReachStateData* rd);
 	virtual void reachPreReturnAction(ReachStateData* rd) {} ;
-	virtual void reachReturnAction(ReachStateData* rd); // do nothing when return	
+	virtual void reachReturnAction(ReachStateData* rd); // do nothing when return
+	virtual int getType();
 };
 
 class ReachHandPutDownAction : public ReachHandAction
@@ -83,6 +85,19 @@ public:
 	virtual void reachCompleteAction(ReachStateData* rd);	
 	virtual void reachReturnAction(ReachStateData* rd);	
 	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
+	virtual int getType();
+};
+
+class ReachHandPointAction : public ReachHandAction // dafault hand behavior for "Touch"
+{
+public:	
+	virtual void reachPreCompleteAction(ReachStateData* rd);
+	virtual void reachCompleteAction(ReachStateData* rd) {};	
+	virtual void reachPreReturnAction(ReachStateData* rd) {};
+	virtual void reachNewTargetAction(ReachStateData* rd) {};	
+	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
+	virtual bool isPickingUpNewPawn(ReachStateData* rd);
+	virtual int getType();
 };
 
 class ReachStateData
@@ -96,6 +111,8 @@ public:
 	float           blendWeight;
 	float           retimingFactor;
 	SrMat           gmat;
+	SrVec           centerOffset;
+	SrVec           shoulderPosition;
 	// reference motion frames ( as motion interpolation output, or IK reference pose )
 	BodyMotionFrame idleRefFrame, startRefFrame, targetRefFrame, currentRefFrame;		
 	BodyMotionFrame curMotionFrame; 

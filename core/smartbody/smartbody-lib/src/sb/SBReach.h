@@ -27,6 +27,8 @@ class SBReach
 		std::vector<std::string> getMotionNames(std::string type);
 		void build(SBCharacter* character);
 		
+		void setPointHandMotion(std::string type, SBMotion* pointMotion);
+		SBMotion* getPointHandMotion(std::string type);
 		void setGrabHandMotion(std::string type, SBMotion* grabMotion);
 		SBMotion* getGrabHandMotion(std::string type);
 		void setReleaseHandMotion(std::string type,SBMotion* releasebMotion);

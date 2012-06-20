@@ -1211,6 +1211,8 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getReleaseHandMotion", &SBReach::getReleaseHandMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the hand pose to be used when releasing an object.")
 		.def("setReachHandMotion", &SBReach::setReachHandMotion, "Sets the hand pose to be used when reaching for an object.")
 		.def("getReachHandMotion", &SBReach::getReachHandMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the hand pose to be used when reaching for an object.")
+		.def("setPointHandMotion", &SBReach::setPointHandMotion, "Sets the hand pose to be used when reaching for an object.")
+		.def("getPointHandMotion", &SBReach::getPointHandMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the hand pose to be used when reaching for an object.")
 		.def("setInterpolatorType", &SBReach::setInterpolatorType, "Set the interpolation type when building the reach engine")
 
 		;

@@ -93,6 +93,11 @@ def reachSetup(characterName, interpolatorType, preFix):
 	reach.setReleaseHandMotion("right",scene.getMotion(preFix+"ChrHarmony_Relax001_HandGraspSmSphere_Release"));
 	reach.setReleaseHandMotion("left",scene.getMotion(preFix+"ChrHarmony_Relax001_LHandGraspSmSphere_Release"));
 	
+	pointMirrorMotion = scene.getMotion(preFix+"HandsAtSide_RArm_GestureYou")
+	pointMirrorMotion.mirror(preFix+"HandsAtSide_LArm_GestureYou", skeleton.getName())
+	reach.setPointHandMotion("right",scene.getMotion(preFix+"HandsAtSide_RArm_GestureYou"));
+	reach.setPointHandMotion("left",scene.getMotion(preFix+"HandsAtSide_LArm_GestureYou"));
+	
 	reach.build(scene.getCharacter(characterName))		
 
 # handle grasp event

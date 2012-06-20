@@ -29,7 +29,7 @@ public:
 class MeCtReachEngine
 {
 public:
-	enum HandActionState { PICK_UP_OBJECT = 0, TOUCH_OBJECT, PUT_DOWN_OBJECT };
+	enum HandActionState { PICK_UP_OBJECT = 0, TOUCH_OBJECT, PUT_DOWN_OBJECT, POINT_AT_OBJECT };
 	enum { RIGHT_ARM = 0, LEFT_ARM, RIGHT_JUMP, LEFT_JUMP, REACH_TYPE_SIZE };
 	static std::string ReachTypeTag[REACH_TYPE_SIZE];
 protected:
