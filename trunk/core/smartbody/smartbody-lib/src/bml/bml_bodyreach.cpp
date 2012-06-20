@@ -165,6 +165,10 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	{			
 		bodyReachCt->setHandActionState(MeCtReachEngine::PUT_DOWN_OBJECT);
 	}
+	else if( stringICompare(attrReachAction,"point-at") )
+	{			
+		bodyReachCt->setHandActionState(MeCtReachEngine::POINT_AT_OBJECT);
+	}
 
 	std::string attrReachFinish = xml_parse_string( BMLDefs::ATTR_REACH_FINISH, elem, "", REQUIRED_ATTR );	
 	if( stringICompare(attrReachFinish,"true") ) 

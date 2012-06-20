@@ -181,8 +181,9 @@ void MeCtExampleBodyReach::setReachTargetPos( SrVec& targetPos )
 
 bool MeCtExampleBodyReach::updateLocomotion()
 {	
-	// we only move the character when it is idle
-	if (currentReachEngine->getCurrentState()->curStateName() != "Idle")
+	// we only move the character when it is idle, and no need to move if we are just point at the object
+	if (currentReachEngine->getCurrentState()->curStateName() != "Idle" 
+		|| currentReachEngine->curHandActionState == MeCtReachEngine::POINT_AT_OBJECT)
 		return true;
 
 	float x,y,z,h,p,r;

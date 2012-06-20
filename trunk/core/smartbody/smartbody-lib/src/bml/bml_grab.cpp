@@ -130,7 +130,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 		handCt->handle(handle);
 		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
 		
-		handCt->init(grabType,chr->getReachHandData(),chr->getGrabHandData(),chr->getReleaseHandData());		
+		handCt->init(grabType,chr->getReachHandData(),chr->getGrabHandData(),chr->getReleaseHandData(), chr->getPointHandData());		
 		if (grabVelocity > 0)
 			handCt->grabVelocity = grabVelocity;		
 		bCreateNewController = true;
@@ -152,6 +152,10 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	else if( stringICompare(attrGrabState,"return") )
 	{			
 		handCt->setGrabState(MeCtHand::GRAB_RETURN);
+	}
+	else if( stringICompare(attrGrabState,"point") )
+	{			
+		handCt->setGrabState(MeCtHand::GRAB_POINT);
 	}
 		
 

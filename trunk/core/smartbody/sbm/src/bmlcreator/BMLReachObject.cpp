@@ -13,6 +13,7 @@ BMLReachObject::BMLReachObject() : BMLObject()
 	reachActions.push_back("pick-up");
 	reachActions.push_back("put-down");
 	reachActions.push_back("touch");
+	reachActions.push_back("point-at");
 	reachActionAttr->setValidValues(reachActions);
 
 	createStringAttribute("sbm:handle", "", true, "Basic", 30, false, false, false, "Handle of this reach instance, can be reused during later reach commands.");

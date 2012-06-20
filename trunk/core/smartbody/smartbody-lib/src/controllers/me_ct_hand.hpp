@@ -34,7 +34,7 @@ private:
 	static std::string CONTROLLER_TYPE;
 public:
 	enum FingerID { F_THUMB = 0, F_INDEX, F_MIDDLE, F_RING, F_PINKY, F_NUM_FINGERS };
-	enum GrabState { GRAB_START, GRAB_REACH, GRAB_FINISH, GRAB_RETURN };
+	enum GrabState { GRAB_START, GRAB_REACH, GRAB_FINISH, GRAB_RETURN, GRAB_POINT };
 protected:
 	SkSkeleton*     skeletonRef;
 	SkSkeleton*     skeletonCopy;
@@ -43,7 +43,7 @@ protected:
 	SkChannelArray	_channels;	
 	GrabState             currentGrabState;
 	int                   grabType;
-	BodyMotionFrame       releaseFrame, grabFrame, reachFrame, currentFrame, tempFrame, inputFrame;	
+	BodyMotionFrame       releaseFrame, grabFrame, reachFrame, currentFrame, pointFrame, tempFrame, inputFrame;	
 	
 	vector<FingerChain>   fingerChains;
 	vector<SkJoint*>      affectedJoints;
@@ -68,7 +68,7 @@ public:
 	MeCtHand(SkSkeleton* sk, SkJoint* wrist);
 	~MeCtHand(void);	
 
-	void init(std::string grabType, const MotionDataSet& reachPose, const MotionDataSet& grabPose, const MotionDataSet& releasePose);
+	void init(std::string grabType, const MotionDataSet& reachPose, const MotionDataSet& grabPose, const MotionDataSet& releasePose, const MotionDataSet& pointPose);
 
 public:
 	virtual void controller_map_updated();

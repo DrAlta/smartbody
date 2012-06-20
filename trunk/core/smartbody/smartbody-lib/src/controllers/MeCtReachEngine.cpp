@@ -157,15 +157,20 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 
 	SbmCharacter* curCharacter = character;
 
+	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->name();
+	SrVec initRootPosition = skeletonRef->search_joint(rootName.c_str())->gmat().get_translation();
+
 	reachData = new ReachStateData();
 	reachData->characterHeight = characterHeight;		
 	reachData->charName = character->getName();
+	reachData->centerOffset = (curCharacter->getBoundingBox().getMaximum()*0.7f+curCharacter->getBoundingBox().getMinimum()*0.3f) - initRootPosition;
 	reachData->reachRegion = ikReachRegion;	
 	reachData->linearVel = ikDefaultVelocity;
 	reachData->curRefTime = 0.f;
 	reachData->motionParameter = motionParameter;
 	reachData->idleRefFrame = reachData->currentRefFrame = reachData->targetRefFrame = idleMotionFrame;	
 	reachData->reachType = reachType;
+	
 
 	EffectorState& estate = reachData->effectorState;
 	estate.effectorName = reachEndEffector->name().c_str();
@@ -184,6 +189,7 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 	handActionTable[PICK_UP_OBJECT] = new ReachHandPickUpAction();
 	handActionTable[TOUCH_OBJECT] = new ReachHandAction(); // default hand action
 	handActionTable[PUT_DOWN_OBJECT] = new ReachHandPutDownAction();
+	handActionTable[POINT_AT_OBJECT] = new ReachHandPointAction();
 
 	curReachState = getState("Idle");
 }
@@ -344,13 +350,21 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 	}
 
 	//sr_out << "target pos = " << estate.curTargetState.tran << " , target rot = " << estate.curTargetState.rot << srnl;
-	ik.maxOffset = ikMaxOffset;
-	ik.dampJ = ikDamp*0.1f;
-	ik.refDampRatio = 0.05;
-	for (int i=0;i<10;i++)
+	if (curHandActionState != POINT_AT_OBJECT)
 	{
-		ik.update(&ikScenario);		
-		ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);		
+		ik.maxOffset = ikMaxOffset;
+		ik.dampJ = ikDamp*0.1f;
+		ik.refDampRatio = 0.05;
+		for (int i=0;i<10;i++)
+		{
+			ik.update(&ikScenario);		
+			ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);		
+		}
+	}	
+	else
+	{
+		ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_INIT);
+		ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_CUR);
 	}
 	//ikCCD.update(&ikScenario);
 
@@ -480,6 +494,12 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	reachData->stateTime += dt;
 	reachData->curHandAction = handActionTable[curHandActionState];	
 	reachData->updateReachState(skeletonRef->search_joint(rootName.c_str())->gmat(),ikMotionFrame);
+	//reachData->shoulderPosition;
+	std::string shoulderJoint = (reachType == LEFT_ARM) ? "l_sternoclavicular" : "r_sternoclavicular";
+	reachData->shoulderPosition = reachData->gmat.get_translation()+reachData->centerOffset;
+	if (skeletonRef->search_joint(shoulderJoint.c_str()))
+		reachData->shoulderPosition = skeletonRef->search_joint(shoulderJoint.c_str())->gmat().get_translation();
+	
 	if (curCharacter)
 	{		
 		reachData->locomotionComplete = (curCharacter->_reachTarget && !curCharacter->_lastReachStatus);		

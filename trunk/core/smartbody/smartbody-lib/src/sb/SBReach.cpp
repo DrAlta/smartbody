@@ -114,6 +114,34 @@ void SBReach::build(SBCharacter* character)
 	}
 }
 
+void SBReach::setPointHandMotion( std::string type, SBMotion* pointMotion )
+{
+	if (!_character)
+		return;
+	MotionDataSet& pointMotionSet = const_cast<MotionDataSet&>(_character->getPointHandData());
+	int reachType = MeCtReachEngine::getReachType(type);
+	if (reachType != -1)
+	{
+		TagMotion motion = TagMotion(reachType,pointMotion);
+		pointMotionSet.insert(motion);
+	}
+	else
+	{
+		LOG("Please use 'LEFT' or 'RIGHT'");
+		return;
+	}	
+
+}
+
+SBMotion* SBReach::getPointHandMotion( std::string type )
+{
+	MotionDataSet& pointMotionSet = const_cast<MotionDataSet&>(_character->getPointHandData());
+	int reachType = MeCtReachEngine::getReachType(type);
+	SkMotion* skMotion = SbmCharacter::findTagSkMotion(reachType,pointMotionSet);
+	SBMotion* sbMotion = dynamic_cast<SBMotion*>(skMotion);
+	return sbMotion;
+}
+
 void SBReach::setGrabHandMotion(std::string type, SBMotion* grabMotion)
 {
 	if (!_character)
@@ -199,4 +227,6 @@ void SBReach::setInterpolatorType( std::string type )
 {
 	interpolatorType = type;
 }
+
+
 }

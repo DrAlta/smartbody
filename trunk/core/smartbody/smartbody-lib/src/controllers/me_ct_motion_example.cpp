@@ -41,7 +41,7 @@ void BodyMotionFrame::setMotionPose( float time, SkSkeleton* skel, const vector<
 		SkJoint* joint = affectedJoints[i];
 		SrQuat jq = SrQuat();
 		if (joint->quat()->active())
-			jq = affectedJoints[i]->quat()->value();	
+			jq = affectedJoints[i]->quat()->rawValue();	
 
 		jointQuat[i] = jq;			
 	}	
