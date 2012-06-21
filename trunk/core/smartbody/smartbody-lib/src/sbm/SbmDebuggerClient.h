@@ -1,5 +1,7 @@
 #ifndef SBM_DEBUGGER_CLIENT_H_
 #define SBM_DEBUGGER_CLIENT_H_
+
+#include <vhcl_socket.h>
 #include <string>
 #include <vector>
 
@@ -12,6 +14,7 @@ private:
    std::vector<std::string> m_processIdList;
    std::string m_sbmId;
    bool m_connectResult;
+   vhcl::socket_t m_sockTCP_client;
 
    NetRequestManager m_netRequestManager;
 

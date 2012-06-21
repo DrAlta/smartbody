@@ -20,6 +20,7 @@ using std::vector;
 
 SbmDebuggerClient::SbmDebuggerClient()
 {
+	m_sockTCP_client = NULL;
 }
 
 SbmDebuggerClient::~SbmDebuggerClient()
@@ -33,7 +34,7 @@ void SbmDebuggerClient::QuerySbmProcessIds()
 }
 
 
-void * m_sockTCP_client = NULL;
+
 
 
 void SbmDebuggerClient::Connect(const string & id)
@@ -57,7 +58,11 @@ void SbmDebuggerClient::Connect(const string & id)
 
 
    m_sockTCP_client = vhcl::SocketOpenTcp();
+#ifdef WIN32
    if (m_sockTCP_client == NULL)
+#else
+   if (m_sockTCP_client == -1)
+#endif
    {
       printf( "SocketOpenTcp() failed\n" );
       vhcl::SocketShutdown();
@@ -107,7 +112,7 @@ int m_tcpDataCount = 0;
 void SbmDebuggerClient::Update()
 {
    {
-      void * s = m_sockTCP_client;
+      vhcl::socket_t s = m_sockTCP_client;
 
       int tcpDataPending;
       tcpDataPending = vhcl::SocketIsDataPending(s);
