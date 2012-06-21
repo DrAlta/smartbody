@@ -29,8 +29,8 @@
 # include <sr/sr_sphere.h>
 # include <sr/sr_cylinder.h>
 # include <sr/sr_polygons.h>
-#include <sbm/gpu/SbmTexture.h>
-#include <sbm/gpu/SbmShader.h>
+#include <sbm/GPU/SbmTexture.h>
+#include <sbm/GPU/SbmShader.h>
 
 # include <sr/sr_sn.h>
 # include <sr/sr_sn_shape.h>

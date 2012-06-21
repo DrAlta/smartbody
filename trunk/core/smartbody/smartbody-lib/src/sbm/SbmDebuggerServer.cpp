@@ -54,7 +54,11 @@ void SbmDebuggerServer::Init()
 
 
    m_sockTCP = vhcl::SocketOpenTcp();
+#ifdef WIN32
    if (m_sockTCP == NULL)
+#else   
+   if (m_sockTCP == -1)
+#endif
    {
       printf( "SocketOpenTcp() failed\n" );
       vhcl::SocketShutdown();
@@ -388,7 +392,7 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
                            vhmsg::ttu_notify1(msg.c_str());
                         }
 
-						std::vector<std::string>& faceDefNames = m_scene->getFaceDefinitionNames();
+						const std::vector<std::string>& faceDefNames = m_scene->getFaceDefinitionNames();
 						for (size_t i = 0; i < faceDefNames.size(); i++)
 						{
 							SBFaceDefinition* faceDefinition = m_scene->getFaceDefinition(faceDefNames[i]);
@@ -407,7 +411,7 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 						}
 						
 						SBAnimationBlendManager* blendManager = m_scene->getBlendManager();
-						std::vector<std::string>& blendNames = blendManager->getBlendNames();
+						const std::vector<std::string>& blendNames = blendManager->getBlendNames();
 						for (size_t i = 0; i < blendNames.size(); i++)
 						{
 							SBAnimationBlend* blend = blendManager->getBlend(blendNames[i]);

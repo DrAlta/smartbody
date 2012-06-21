@@ -3,6 +3,7 @@
 #include "sr/sr_string.h"
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
+#include <cstring>
 
 namespace SmartBody {
 
