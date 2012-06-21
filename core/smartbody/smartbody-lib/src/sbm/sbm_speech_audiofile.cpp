@@ -133,12 +133,14 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
    bool useAudioPaths = true;
    mcu.audio_paths.reset();
 	string relativeAudioPath = mcu.audio_paths.next_path();
+#ifdef WIN32
    if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
 	  mcu.mark("requestSpeechAudiofast");
       return 0;
    }
+#endif
 
    m_speechRequestInfo[ m_requestIdCounter ].audioFilename = (string)fullAudioPath + "\\" + ref + ".wav";
 

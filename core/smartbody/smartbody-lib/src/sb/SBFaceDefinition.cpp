@@ -540,7 +540,7 @@ std::string SBFaceDefinition::saveToString()
 			strstr << faceName << ".setAU(" << index << ", \"both\", \"" << this->getAUMotion(index, "both")->getName() << "\")\n";
 	}
 
-	std::vector<std::string>& visemeNames = this->getVisemeNames();
+	const std::vector<std::string>& visemeNames = this->getVisemeNames();
 	for (int i = 0; i < this->getNumVisemes(); i++)
 	{
 		strstr << faceName << ".setViseme(\"" << visemeNames[i] << "\", \"" << this->getVisemeMotion(visemeNames[i])->getName() << "\")\n";
@@ -557,7 +557,7 @@ void SBFaceDefinition::save(const std::string& fileName)
 		LOG("Problem writing to file %s, face definition was not saved.", fileName.c_str());
 		return;
 	}
-	std::string& fileContent = saveToString();
+	const std::string& fileContent = saveToString();
 	file << fileContent;
 	file.close();		
 }

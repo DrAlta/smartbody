@@ -152,6 +152,8 @@ set( SBM_FLTK_SRC
 	src/visemeviewer/VisemeCurveEditor.cpp
 	src/visemeviewer/VisemeViewerWindow.cpp
 
+	src/monitorviewer/MonitorConnectWindow.cpp 
+
 	src/faceviewer/FaceViewer.cpp
 	src/FLTKListener.cpp
 
