@@ -845,6 +845,9 @@ void ChannelBufferWindow::update()
 {
 	if(!is_freezed)
 	{
+		if (character->size() == 0)
+			return;
+
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		SbmPawn* pawn_p = NULL;
 		SbmCharacter* actor = mcu.getCharacter(character->mvalue()->label());

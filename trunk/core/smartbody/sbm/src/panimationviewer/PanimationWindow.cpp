@@ -121,6 +121,9 @@ void PanimationWindow::hide_viewer()
 
 void PanimationWindow::update_viewer()
 {
+	if (characterList->size() == 0)
+		return;
+
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::string charName = characterList->menu()[characterList->value()].label();
 	SbmCharacter* character = mcu.getCharacter(charName);

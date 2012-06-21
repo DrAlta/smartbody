@@ -8,6 +8,7 @@ class GenericViewer
 	public:
 		GenericViewer();
 		GenericViewer(int x, int y, int w, int h);
+		virtual ~GenericViewer();
 
 		virtual void label_viewer(std::string name);
 		virtual void show_viewer();

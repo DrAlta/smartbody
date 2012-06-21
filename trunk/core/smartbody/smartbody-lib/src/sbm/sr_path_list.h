@@ -44,7 +44,7 @@ class srPathList
 		void reset();
 		std::string next_path(bool addPrefix = true);
 		std::string next_filename(char *buffer, const char *name);
-
+		std::vector<std::string>& getPaths()	{ return _paths; }
 	private:
 		std::string _prefix;
 		std::vector<std::string> _paths;

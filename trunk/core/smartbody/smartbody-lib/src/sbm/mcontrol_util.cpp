@@ -723,47 +723,27 @@ void mcuCBHandle::clear( void )
 	param_anim_transitions.clear();
 
 	close_viewer();
-	if (viewer_p)
-	{
-		delete viewer_p;
-		viewer_p = NULL;
-	}
 
+	ogreViewerFactory->remove(ogreViewer_p);
 	if (ogreViewer_p)
 	{
 		delete ogreViewer_p;
 		ogreViewer_p = NULL;
 	}
 
-	if (bmlviewer_p)
-	{
-		delete bmlviewer_p;
-		bmlviewer_p = NULL;
-	}
+	bmlviewer_factory->destroy(bmlviewer_p);
+	bmlviewer_p = NULL;
+	panimationviewer_factory->destroy(panimationviewer_p);
+	panimationviewer_p = NULL;
+	channelbufferviewer_factory->destroy(channelbufferviewer_p);
+	channelbufferviewer_p = NULL;
+	resourceViewerFactory->destroy(resourceViewer_p);
+	resourceViewer_p = NULL;
+	velocityViewerFactory->destroy(velocityViewer_p);
+	velocityViewer_p = NULL;
+	faceViewerFactory->destroy(faceViewer_p);
+	faceViewer_p = NULL;
 
-	if (channelbufferviewer_p)
-	{
-		delete channelbufferviewer_p;
-		channelbufferviewer_p = NULL;
-	}
-
-	if (resourceViewer_p)
-	{
-		delete resourceViewer_p;
-		resourceViewer_p = NULL;
-	}
-
-	if (velocityViewer_p)
-	{
-		delete velocityViewer_p;
-		velocityViewer_p = NULL;
-	}
-
-	if (faceViewer_p)
-	{
-		delete faceViewer_p;
-		faceViewer_p = NULL;
-	}
 
 	if (camera_p)
 	{
@@ -784,7 +764,10 @@ void mcuCBHandle::clear( void )
 	}
 
 	// srPathList? srCmdMap? Ignore clear for now
-
+	seq_paths.getPaths().clear();
+	me_paths.getPaths().clear();
+	audio_paths.getPaths().clear();
+	mesh_paths.getPaths().clear();
 /*
 	cmd_map.reset();
 	while (cmd_map.getHashMap().pull() != NULL)
