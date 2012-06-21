@@ -181,6 +181,9 @@ void PARunTimeEditor::addItem(Fl_Browser* browser, std::string item)
 
 void PARunTimeEditor::initializeRunTimeEditor()
 {
+	if (paWindow->characterList->size() == 0)
+		return;
+
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
 	SbmCharacter* character = mcuCBHandle::singleton().getCharacter(charName);
 	if (character)

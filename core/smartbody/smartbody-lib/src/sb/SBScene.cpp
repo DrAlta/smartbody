@@ -77,9 +77,7 @@ SBScene::~SBScene(void)
 	delete _sim;
 	delete _profiler;
 	delete _bml;
-	_bml = NULL;
 	delete _blendManager;
-	_blendManager = NULL;
 	delete _reachManager;
 	delete _steerManager;
 	delete _physicsManager;
@@ -635,6 +633,12 @@ SBBmlProcessor* SBScene::getBmlProcessor()
 
 SBAnimationBlendManager* SBScene::getBlendManager()
 {
+	if (_blendManager == NULL)
+	{
+		LOG("Blend Manager is NULL, re-initialize.");
+		_blendManager = new SBAnimationBlendManager();
+	}
+
 	return _blendManager;
 }
 

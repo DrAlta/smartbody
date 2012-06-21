@@ -210,18 +210,51 @@ SrSn* BaseWindow::root()
 	return fltkViewer->root();
 }
 
+
+void BaseWindow::resetWindow()
+{
+	if (commandWindow)
+	{
+		delete commandWindow;
+		commandWindow = NULL;
+	}
+	if (bmlCreatorWindow)
+	{
+		delete bmlCreatorWindow;
+		bmlCreatorWindow = NULL;
+	}
+	if (visemeViewerWindow)
+	{
+		delete visemeViewerWindow;
+		visemeViewerWindow = NULL;
+	}
+	if (monitorConnectWindow)
+	{
+		delete monitorConnectWindow;
+		monitorConnectWindow = NULL;
+	}
+}
+
 void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 {
 	int confirm = fl_choice("This will reset the current session.\nContinue?", "yes", "no", NULL);
-	if (!confirm)
+	if (confirm == 1)
 		return;
 
-	const char* seqFile = fl_file_chooser("Load file:", "*.seq", NULL);
+	const char* seqFile = fl_file_chooser("Load file:", "*.py", NULL);
 	if (!seqFile)
 		return;
-
+/*
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute((char*)"seq ");
+	mcu.reset();
+	std::string filebasename = boost::filesystem::basename(seqFile);
+	std::string fileextension = boost::filesystem::extension(seqFile);
+	std::string fullfilename = std::string(seqFile);
+	size_t pos = fullfilename.find(filebasename);
+	std::string path = fullfilename.substr(0, pos - 1);
+	mcu._scene->addAssetPath("script", path);
+	mcu._scene->runScript(filebasename);
+*/
 }
 
 void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
@@ -1043,6 +1076,9 @@ void FltkViewerFactory::remove(SrViewer* viewer)
 	if (viewer && (viewer == s_viewer))
 	{
 		viewer->hide_viewer();
+		BaseWindow* baseWindow = dynamic_cast<BaseWindow*> (s_viewer);
+		if (baseWindow)
+			baseWindow->resetWindow();
 	}
 }
 

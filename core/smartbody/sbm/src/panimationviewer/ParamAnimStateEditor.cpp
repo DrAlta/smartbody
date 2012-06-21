@@ -1596,6 +1596,9 @@ void PABlendEditor::playmotion(Fl_Widget* widget, void* data)
 
 	PABlendEditor::selectStateAnimations(widget, data);
 
+	if (editor->paWindow->characterList->size() == 0)
+		return;
+
 	std::string charName = editor->paWindow->characterList->menu()[editor->paWindow->characterList->value()].label();
 
 	std::stringstream command;

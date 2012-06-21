@@ -8,6 +8,10 @@ GenericViewer::GenericViewer(int x, int y, int w, int h)
 {
 }
 
+GenericViewer::~GenericViewer()
+{
+}
+
 void GenericViewer::label_viewer(std::string name)
 {
 }
@@ -37,5 +41,6 @@ GenericViewer* GenericViewerFactory::create(int x, int y, int w, int h)
 void GenericViewerFactory::destroy(GenericViewer* viewer)
 {
 	delete viewer;
+	viewer = NULL;
 }
 

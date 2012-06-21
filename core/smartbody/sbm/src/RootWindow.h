@@ -43,6 +43,8 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		void root(SrSn* r);
 		SrSn* root();
 
+		void resetWindow();
+
 		void runScript(std::string filename);
 		void reloadScripts(std::string scriptsDir);
 		void reloadScriptsByDir(std::string scriptsDir, std::string parentStr);

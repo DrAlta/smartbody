@@ -1666,6 +1666,7 @@ GenericViewer* BehaviorViewerFactory::create(int x, int y, int w, int h)
 void BehaviorViewerFactory::destroy(GenericViewer* viewer)
 {
 	delete viewer;
+	viewer = NULL;
 }
 
 

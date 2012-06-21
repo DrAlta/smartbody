@@ -62,7 +62,6 @@ void MonitorConnectWindow::loadProcesses()
 void MonitorConnectWindow::OnConfirmCB(Fl_Widget* widget, void* data)
 {
 	MonitorConnectWindow* monitorConnectWindow = (MonitorConnectWindow*) data;
-
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
 	SbmDebuggerClient* c = sbScene->getDebuggerClient();
 	SbmDebuggerServer* s = sbScene->getDebuggerServer();
