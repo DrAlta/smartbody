@@ -47,7 +47,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBJoint.h>
 #include <sb/SBBoneBusManager.h>
-#include <sbm/gpu/SbmDeformableMeshGPU.h>
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
 
 #define USE_REACH 1
 #define USE_PHYSICS_CHARACTER 1
