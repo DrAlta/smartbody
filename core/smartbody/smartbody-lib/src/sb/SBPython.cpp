@@ -1449,6 +1449,8 @@ boost::python::class_<SBReach>("SBReach")
 
 void initPython(std::string pythonLibPath)
 {	
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.initPythonLibPath = pythonLibPath;
 #ifdef USE_PYTHON
 #ifdef __ANDROID__
 	Py_SetProgramName("/sdcard/sbmmedia/python/");
@@ -1456,8 +1458,7 @@ void initPython(std::string pythonLibPath)
 	Py_SetProgramName("../../../../core/smartbody/Python26/");
 #endif	
 	Py_Initialize();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
+	
 	try {
 		mcu.mainModule = boost::python::import("__main__");
 		mcu.mainDict = mcu.mainModule.attr("__dict__");

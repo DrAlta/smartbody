@@ -269,6 +269,7 @@ class mcuCBHandle {
 		srPathList	mesh_paths;
 
 		std::string media_path;
+		std::string initPythonLibPath;
 
 		/** Character id for test commands to use when required but not specified. */
 		std::string test_character_default;
@@ -476,8 +477,12 @@ public:
 		}
 		
 		void update( void );
-		int insert( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp, char* description = NULL )	{
-			return( cmd_map.insert( key, fp ) );
+		int insert( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp, char* description = NULL )
+		{
+			//if (cmd_map.is_command(key))
+				return( cmd_map.insert( key, fp ) );
+			//else
+			//	return CMD_SUCCESS;
 		}
 
 		int insert_set_cmd( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
