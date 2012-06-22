@@ -14,13 +14,22 @@ MonitorConnectWindow::MonitorConnectWindow(int x, int y, int w, int h, char* lab
 	set_modal();
 	this->label("Monitor Connect");
 	this->begin();
-	_browserSBProcesses = new Fl_Hold_Browser(10, 10, 300, 200, "Process");
-	_buttonOk = new Fl_Button(10, 250, 100, 20, "OK");
+
+	_inputServerName = new Fl_Input(40, 10, 200, 20, "Server");
+	_inputServerName->value("localhost");
+//	_inputPort = new Fl_Input(40, 40, 200, 20, "Port");
+//	_inputPort->value("61616");
+//	_inputScope = new Fl_Input(40, 70, 200, 20, "Scope");
+//	_inputScope->value("DEFAULT_SCOPE");
+
+	_buttonLoad = new Fl_Button(40, 40, 100, 20, "Load");
+	_buttonLoad->callback(OnFefreshCB, this);
+
+	_browserSBProcesses = new Fl_Hold_Browser(10, 70, 300, 200, "Process");
+	_buttonOk = new Fl_Button(10, 300, 100, 20, "OK");
 	_buttonOk->callback(OnConfirmCB, this);
-	_buttonCancel = new Fl_Button(120, 250, 100, 20, "Cancel");
+	_buttonCancel = new Fl_Button(120, 300, 100, 20, "Cancel");
 	_buttonCancel->callback(OnCancelCB, this);
-//	_buttonRefresh = new Fl_Button(230, 250, 100, 20, "Refresh");
-//	_buttonRefresh->callback(OnFefreshCB, this);
 	this->end();
 }
 
@@ -30,8 +39,6 @@ MonitorConnectWindow::~MonitorConnectWindow()
 
 void MonitorConnectWindow::show()
 {
-	loadProcesses();
-
 	Fl_Double_Window::show();
 }
 
@@ -99,5 +106,10 @@ void MonitorConnectWindow::OnCancelCB(Fl_Widget* widget, void* data)
 void MonitorConnectWindow::OnFefreshCB(Fl_Widget* widget, void* data)
 {
 	MonitorConnectWindow* monitorConnectWindow = (MonitorConnectWindow*) data;
+	
+	std::string command = "vhmsgconnect " + std::string(monitorConnectWindow->_inputServerName->value());
+	//command = " " + std::string(monitorConnectWindow->_inputPort->value());
+	//command = " " + std::string(monitorConnectWindow->_inputPort->value());
+	SmartBody::SBScene::getScene()->command(command);
 	monitorConnectWindow->loadProcesses();	
 }

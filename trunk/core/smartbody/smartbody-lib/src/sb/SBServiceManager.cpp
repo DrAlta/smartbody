@@ -9,6 +9,7 @@ SBServiceManager::SBServiceManager() : SBObject()
 
 SBServiceManager::~SBServiceManager()
 {
+	_services.clear();
 }
 
 int SBServiceManager::getNumServices()

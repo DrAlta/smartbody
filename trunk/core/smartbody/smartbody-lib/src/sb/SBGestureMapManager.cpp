@@ -16,6 +16,7 @@ SBGestureMapManager::~SBGestureMapManager()
 	{
 		delete iter->second;
 	}
+	_gestureMaps.clear();
 }
 
 SBGestureMap* SBGestureMapManager::createGestureMap(std::string characterName)

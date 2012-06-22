@@ -81,8 +81,12 @@ SBScene::~SBScene(void)
 	delete _reachManager;
 	delete _steerManager;
 	delete _physicsManager;
+	delete _boneBusManager;
+	delete _collisionManager;
 	delete _gestureMapManager;
 	delete _jointMapManager;
+	delete _diphoneManager;
+	delete _serviceManager;
 
 	delete _parser;
 
@@ -633,12 +637,6 @@ SBBmlProcessor* SBScene::getBmlProcessor()
 
 SBAnimationBlendManager* SBScene::getBlendManager()
 {
-	if (_blendManager == NULL)
-	{
-		LOG("Blend Manager is NULL, re-initialize.");
-		_blendManager = new SBAnimationBlendManager();
-	}
-
 	return _blendManager;
 }
 
