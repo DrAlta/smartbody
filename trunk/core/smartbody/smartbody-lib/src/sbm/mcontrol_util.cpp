@@ -278,7 +278,8 @@ mcuCBHandle::mcuCBHandle()
 	sendPawnUpdates(false),
 	logListener(NULL),
 	useXmlCache(false),
-	useXmlCacheAuto(false)
+	useXmlCacheAuto(false),
+	initPythonLibPath("")
 {	
 	testBMLId = 0;
 	registerCallbacks();
@@ -457,6 +458,7 @@ void mcuCBHandle::reset( void )
 
 
 	_scene->command("vhmsgconnect");
+
 }
 
  void mcuCBHandle::createDefaultControllers()
@@ -472,6 +474,7 @@ void mcuCBHandle::reset( void )
 	 for (size_t x = 0; x < _defaultControllers.size(); x++)
 		 _defaultControllers[x]->ref();
  }
+
 
 void mcuCBHandle::registerCallbacks()
 {
@@ -768,8 +771,10 @@ void mcuCBHandle::clear( void )
 	me_paths.getPaths().clear();
 	audio_paths.getPaths().clear();
 	mesh_paths.getPaths().clear();
-/*
-	cmd_map.reset();
+
+/*	cmd_map.reset();
+
+
 	while (cmd_map.getHashMap().pull() != NULL)
 	{
 	}

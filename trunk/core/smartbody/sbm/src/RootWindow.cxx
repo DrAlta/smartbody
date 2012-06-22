@@ -312,11 +312,12 @@ void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )
 
 void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 {
-	int confirm = fl_choice("This will reset the current session.\nContinue?", "yes", "no", NULL);
-	if (confirm == 0)
+	int confirm = fl_choice("This will reset the current session.\nContinue?", "No", "Yes", NULL);
+	if (confirm == 1)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		mcu.reset();
+		CameraResetCB(widget, data);
 	}
 }
 

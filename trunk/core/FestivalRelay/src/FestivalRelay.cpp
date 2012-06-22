@@ -555,6 +555,7 @@ void process_message( const char * message )
 	//Only send out a reply when result is not empty, ignore otherwise as a nother voice relay might pick up the request
 	if ( replyXML.compare("") != 0 )
 	{
+      printf("%s", remoteSpeechReply.c_str());
 	  vhmsg::ttu_notify2( "RemoteSpeechReply", remoteSpeechReply.c_str() );
 	}
 }
@@ -598,6 +599,52 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
 
     if(mapping == "sbm")
     {
+		phonemeToViseme[ "pau" ] = "_";  // SIL
+phonemeToViseme[ "aa" ]  = "Aa"; // AA
+phonemeToViseme[ "ae" ]  = "Ah"; // AE
+phonemeToViseme[ "ah" ]  = "Ah"; // AH
+phonemeToViseme[ "ao" ]  = "Ao"; // AO
+phonemeToViseme[ "ax" ]  = "Ah"; // AX
+phonemeToViseme[ "@" ]   = "Ih"; // ??
+phonemeToViseme[ "aw" ]  = "Ah"; // AW
+phonemeToViseme[ "ay" ]  = "Ay"; // AY
+phonemeToViseme[ "b" ]   = "BMP";//  B
+phonemeToViseme[ "ch" ]  = "J";  // CH
+phonemeToViseme[ "d" ]   = "D";  //  D
+phonemeToViseme[ "dh" ]  = "Th"; // DH
+phonemeToViseme[ "dx" ]  = "D";  // ??
+phonemeToViseme[ "eh" ]  = "Eh"; // EH
+phonemeToViseme[ "er" ]  = "Er"; // ER
+phonemeToViseme[ "ey" ]  = "Eh"; // 
+phonemeToViseme[ "f" ]   = "F";  //  F
+phonemeToViseme[ "g" ]   = "Kg"; //  G
+phonemeToViseme[ "hh" ]  = "Ih"; // HH
+phonemeToViseme[ "ih" ]  = "Ih"; // IH
+phonemeToViseme[ "iy" ]  = "Ih"; // IY
+phonemeToViseme[ "jh" ]  = "j";  // JH
+phonemeToViseme[ "k" ]   = "Kg"; //  K
+phonemeToViseme[ "l" ]   = "D";  //  L
+phonemeToViseme[ "m" ]   = "BMP";//  M
+phonemeToViseme[ "n" ]   = "Kg"; //  N
+phonemeToViseme[ "ng" ]  = "Kg"; // NG
+phonemeToViseme[ "ow" ]  = "Ow"; // OW
+phonemeToViseme[ "oy" ]  = "Oy"; // OY
+phonemeToViseme[ "p" ]   = "BMP";//  P
+phonemeToViseme[ "r" ]   = "R";  //  R
+phonemeToViseme[ "s" ]   = "Z";  //  S
+phonemeToViseme[ "sh" ]  = "J";  // SH
+phonemeToViseme[ "T" ]   = "D";  // T?
+phonemeToViseme[ "t" ]   = "D";  // T?
+phonemeToViseme[ "th" ]  = "Th"; // TH
+phonemeToViseme[ "uh" ]  = "Eh"; // UH
+phonemeToViseme[ "uw" ]  = "Oh"; // UW
+phonemeToViseme[ "v" ]   = "F";  //  V
+phonemeToViseme[ "w" ]   = "W"; //  W
+phonemeToViseme[ "y" ]   = "Ih"; //  Y
+phonemeToViseme[ "z" ]   = "Z";  //  Z
+phonemeToViseme[ "zh" ]  = "J";  // ZH
+
+		/*
         phonemeToViseme[ "pau" ] = "_";  // SIL
         phonemeToViseme[ "aa" ]  = "Ao"; // AA
         phonemeToViseme[ "ae" ]  = "Ih"; // AE
@@ -642,6 +689,7 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
         phonemeToViseme[ "y" ]   = "OO"; //  Y
         phonemeToViseme[ "z" ]   = "Z";  //  Z
         phonemeToViseme[ "zh" ]  = "J";  // ZH
+		*/
     }
    
 }
@@ -838,7 +886,7 @@ int main(int argc, char **argv)
 		// this command hooks our virtual human method such that every time an utterance is synthesized, our method is called on it
 		// in order to generate the virtual human message (RemoteSpeechReply)
 		festivalCommands.push_back("(set! after_synth_hooks (list Duration_VirtualHuman))");					
-		
+		 
 	}
 
 	printf("\n");
