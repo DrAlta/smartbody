@@ -237,14 +237,14 @@ void BaseWindow::resetWindow()
 
 void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 {
-	int confirm = fl_choice("This will reset the current session.\nContinue?", "yes", "no", NULL);
-	if (confirm == 1)
+	int confirm = fl_choice("This will reset the current session.\nContinue?", "No", "Yes", NULL);
+	if (confirm == 0)
 		return;
 
 	const char* seqFile = fl_file_chooser("Load file:", "*.py", NULL);
 	if (!seqFile)
 		return;
-/*
+
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.reset();
 	std::string filebasename = boost::filesystem::basename(seqFile);
@@ -254,7 +254,6 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	std::string path = fullfilename.substr(0, pos - 1);
 	mcu._scene->addAssetPath("script", path);
 	mcu._scene->runScript(filebasename);
-*/
 }
 
 void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
@@ -326,7 +325,7 @@ void BaseWindow::LaunchConnectCB(Fl_Widget* widget, void* data)
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (!rootWindow->monitorConnectWindow)
 	{
-		rootWindow->monitorConnectWindow = new MonitorConnectWindow(150, 150, 400, 300, "Monitor Connect");
+		rootWindow->monitorConnectWindow = new MonitorConnectWindow(150, 150, 320, 400, "Monitor Connect");
 	}
 
 	rootWindow->monitorConnectWindow->show();	

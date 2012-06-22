@@ -293,7 +293,10 @@ mcuCBHandle::mcuCBHandle()
 	// processes will be identified differently
 	theWSP->init( "SMARTBODY" );
 #endif
-	createDefaultControllers();
+
+	// do we need default controllers?
+	//createDefaultControllers();
+
 	// initialize the default face motion mappings
 	SmartBody::SBFaceDefinition* faceDefinition = new SmartBody::SBFaceDefinition();
 	faceDefinition->setName("_default_");
@@ -459,6 +462,9 @@ void mcuCBHandle::reset( void )
 
 	_scene->command("vhmsgconnect");
 
+	PyRun_SimpleString("scene = getScene()");
+	PyRun_SimpleString("bml = scene.getBmlProcessor()");
+	PyRun_SimpleString("sim = scene.getSimulationManager()");
 }
 
  void mcuCBHandle::createDefaultControllers()

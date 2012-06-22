@@ -52,8 +52,7 @@ SBAnimationBlend0D* SBAnimationBlendManager::createBlend0D(const std::string& na
 {
 	SBAnimationBlend0D* blend = new SBAnimationBlend0D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu._scene->isRemoteMode())
-		addBlendToGraph(name);
+	addBlendToGraph(name);
 	mcu.addPABlend(blend);
 	return blend;
 }
@@ -62,8 +61,7 @@ SBAnimationBlend1D* SBAnimationBlendManager::createBlend1D(const std::string& na
 {
 	SBAnimationBlend1D* blend = new SBAnimationBlend1D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu._scene->isRemoteMode())
-		addBlendToGraph(name);
+	addBlendToGraph(name);
 	mcu.addPABlend(blend);
 	return blend;
 }
@@ -72,8 +70,7 @@ SBAnimationBlend2D* SBAnimationBlendManager::createBlend2D(const std::string& na
 {
 	SBAnimationBlend2D* blend = new SBAnimationBlend2D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu._scene->isRemoteMode())
-		addBlendToGraph(name);
+	addBlendToGraph(name);
 	mcu.addPABlend(blend);
 	return blend;
 }
@@ -82,8 +79,7 @@ SBAnimationBlend3D* SBAnimationBlendManager::createBlend3D(const std::string& na
 {
 	SBAnimationBlend3D* blend = new SBAnimationBlend3D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu._scene->isRemoteMode())
-		addBlendToGraph(name);
+	addBlendToGraph(name);
 	mcu.addPABlend(blend);
 	return blend;
 }
