@@ -423,7 +423,7 @@ def fullBuild(svnPassword, buildSuffix):
         emailSubjectPrefix = "[SB-MAC]"
 
     f = open(finalMailFile,"w")
-    f.write("build: Automatically tagging r{0} as Build #{1}\n".format(buildSvnRevision, buildNumber))
+    f.write("build: r{0} as Build #{1}\n".format(buildSvnRevision, buildNumber))
     f.write("\n")
     f.write("Build Summary:\n")
     if buildSuccess:
@@ -469,7 +469,7 @@ def fullBuild(svnPassword, buildSuffix):
         fp.close()
 
         emailTo = "nospam@ict.usc.edu"
-        msg["Subject"] = "{0} Build Results #{1}".format(emailSubjectPrefix, buildNumber)
+        msg["Subject"] = "{0} Build Results #{1} - r{2}".format(emailSubjectPrefix, buildNumber, buildSvnRevision)
         msg["From"] = "svn@ict.usc.edu"
         msg["To"] = emailTo
 
