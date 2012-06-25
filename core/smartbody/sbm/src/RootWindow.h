@@ -84,6 +84,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void LaunchFaceViewerCB(Fl_Widget* widget, void* data);
 		static void LaunchSpeechRelayCB(Fl_Widget* widget, void* data);
 		static void NewCB(Fl_Widget* widget, void* data);
+		static void QuitCB(Fl_Widget* widget, void* data);
 		static void LaunchConnectCB(Fl_Widget* widget, void* data);
 		static void DisconnectRemoteCB(Fl_Widget* widget, void* data);
 		static void StartCB(Fl_Widget* widget, void* data);
