@@ -320,81 +320,21 @@ mcuCBHandle::~mcuCBHandle() {
 	clear();
 
 	// clean up factories and time profiler which are set externally
-	if (internal_profiler_p)
-	{
-		delete internal_profiler_p;
-		internal_profiler_p = NULL;
-	}
-	if (external_profiler_p)
-	{
-		delete external_profiler_p;
-		external_profiler_p = NULL;
-	}
-	if (profiler_p)
-	{
-		delete profiler_p;
-		profiler_p = NULL;
-	}
-	if (internal_timer_p)
-	{
-		delete internal_timer_p;
-		internal_timer_p = NULL;
-	}
-	if (external_timer_p)
-	{
-		delete external_timer_p;
-		external_timer_p = NULL;
-	}
-	if (timer_p)
-	{
-		delete timer_p;
-		timer_p = NULL;
-	}
-	if (viewer_factory)
-	{
-		delete viewer_factory;
-		viewer_factory = NULL;
-	}
-	if (ogreViewerFactory)
-	{
-		delete ogreViewerFactory;
-		ogreViewerFactory = NULL;
-	}
-	if (bmlviewer_factory)
-	{
-		delete bmlviewer_factory;
-		bmlviewer_factory = NULL;
-	}
-	if (panimationviewer_factory)
-	{
-		delete panimationviewer_factory;
-		panimationviewer_factory = NULL;
-	}
-	if (channelbufferviewer_factory)
-	{
-		delete channelbufferviewer_factory;
-		channelbufferviewer_factory = NULL;
-	}
-	if (commandviewer_factory)
-	{
-		delete commandviewer_factory;
-		commandviewer_factory = NULL;
-	}
-	if (resourceViewerFactory)
-	{
-		delete resourceViewerFactory;
-		resourceViewerFactory = NULL;
-	}
-	if (velocityViewerFactory)
-	{
-		delete velocityViewerFactory;
-		velocityViewerFactory = NULL;
-	}
-	if (faceViewerFactory)
-	{
-		delete faceViewerFactory;
-		faceViewerFactory = NULL;
-	}
+	internal_profiler_p = NULL;
+	external_profiler_p = NULL;
+	profiler_p = NULL;
+	internal_timer_p = NULL;
+	external_timer_p = NULL;
+	timer_p = NULL;
+	viewer_factory = NULL;
+	ogreViewerFactory = NULL;
+	bmlviewer_factory = NULL;
+	panimationviewer_factory = NULL;
+	channelbufferviewer_factory = NULL;
+	commandviewer_factory = NULL;
+	resourceViewerFactory = NULL;
+	velocityViewerFactory = NULL;
+	faceViewerFactory = NULL;
 
 	// clean up python
 #ifdef USE_PYTHON
@@ -462,9 +402,9 @@ void mcuCBHandle::reset( void )
 
 	_scene->command("vhmsgconnect");
 
-	PyRun_SimpleString("scene = getScene()");
-	PyRun_SimpleString("bml = scene.getBmlProcessor()");
-	PyRun_SimpleString("sim = scene.getSimulationManager()");
+
+	Py_Finalize();
+	initPython(initPythonLibPath);
 }
 
  void mcuCBHandle::createDefaultControllers()
@@ -728,7 +668,16 @@ void mcuCBHandle::clear( void )
 		kinectProcessor = NULL;
 	}
 
+	for (size_t i = 0; i < param_anim_blends.size(); i++)
+	{
+		delete param_anim_blends[i];
+	}
 	param_anim_blends.clear();
+
+	for (size_t i = 0; i < param_anim_transitions.size(); i++)
+	{
+		delete param_anim_transitions[i];
+	}
 	param_anim_transitions.clear();
 
 	close_viewer();

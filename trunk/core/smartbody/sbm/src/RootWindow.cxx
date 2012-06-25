@@ -27,6 +27,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&File/Load...", 0, LoadCB, this, NULL);
 	menubar->add("&File/Connect...", 0, LaunchConnectCB, this, NULL);
 	menubar->add("&File/Disconnect", 0, DisconnectRemoteCB, this, NULL);
+	menubar->add("&File/Quit", 0, QuitCB, this, NULL);
 //	menubar->add("&File/Save Configuration...", 0, NULL, 0, NULL);
 //	menubar->add("&File/Run Script...", 0, NULL, 0, NULL);
 	menubar->add("&View/Character/Bones", 0, ModeBonesCB, this, NULL);
@@ -317,6 +318,16 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		mcu.reset();
 		CameraResetCB(widget, data);
+	}
+}
+
+void BaseWindow::QuitCB(Fl_Widget* widget, void* data)
+{
+	int confirm = fl_choice("This will quit SmartBody.\nContinue?", "No", "Yes", NULL);
+	if (confirm == 1)
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		mcu.executePython("quit()");
 	}
 }
 
