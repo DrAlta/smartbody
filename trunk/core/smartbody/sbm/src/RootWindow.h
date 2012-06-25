@@ -144,6 +144,7 @@ class FltkViewerFactory : public SrViewerFactory
 
 		virtual SrViewer* create(int x, int y, int w, int h);
 		virtual void remove(SrViewer* viewer);
+		virtual void reset(SrViewer* viewer);
 
 	private:
 		static SrViewer* s_viewer;

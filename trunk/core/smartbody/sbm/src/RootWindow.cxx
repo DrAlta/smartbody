@@ -1089,8 +1089,22 @@ void FltkViewerFactory::remove(SrViewer* viewer)
 		viewer->hide_viewer();
 		BaseWindow* baseWindow = dynamic_cast<BaseWindow*> (s_viewer);
 		if (baseWindow)
+		{
 			baseWindow->resetWindow();
+			baseWindow->render();
+		}
 	}
 }
 
-
+void FltkViewerFactory::reset(SrViewer* viewer)
+{
+	if (viewer && (viewer == s_viewer))
+	{
+		BaseWindow* baseWindow = dynamic_cast<BaseWindow*> (s_viewer);
+		if (baseWindow)
+		{
+			baseWindow->resetWindow();
+			baseWindow->render();
+		}
+	}
+}

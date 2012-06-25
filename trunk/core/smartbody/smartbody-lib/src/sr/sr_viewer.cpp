@@ -87,4 +87,9 @@ void SrViewerFactory::remove(SrViewer* viewer)
 {
 }
 
+void SrViewerFactory::reset(SrViewer* viewer)
+{
+}
+
+
 //================================ End of File =================================================
