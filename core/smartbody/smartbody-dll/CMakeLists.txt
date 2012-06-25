@@ -20,6 +20,11 @@ endif()
 
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-value")
+endif()
+
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 set( MORE_LIBS
 	${COREAUDIO_LIBRARY}
 	${AUDIOUNIT_LIBRARY}
