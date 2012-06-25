@@ -680,7 +680,16 @@ void mcuCBHandle::clear( void )
 	}
 	param_anim_transitions.clear();
 
-	close_viewer();
+	//close_viewer();
+	if (viewer_p)	
+	{
+		viewer_factory->reset(viewer_p);
+		viewer_p = NULL;
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+		SbmShaderManager::singleton().setViewer(NULL);
+#endif
+	}
+
 
 	ogreViewerFactory->remove(ogreViewer_p);
 	if (ogreViewer_p)
