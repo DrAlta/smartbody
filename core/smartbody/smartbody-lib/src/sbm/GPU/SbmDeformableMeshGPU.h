@@ -13,6 +13,8 @@ public:
 	VBOVec3i* VBOTri;
 	int       numTri;
 public:	
+	MeshSubset() {}
+	~MeshSubset();
 };
 
 class SbmDeformableMeshGPUInstance;
