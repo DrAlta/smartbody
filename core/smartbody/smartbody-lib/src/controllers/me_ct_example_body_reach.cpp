@@ -92,7 +92,7 @@ MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
 void MeCtExampleBodyReach::setDefaultReachType( const std::string& reachTypeName )
 {
 	defaultReachType = MeCtReachEngine::getReachType(reachTypeName);	
-	LOG("default reach type name = %s, id =  %d",reachTypeName.c_str(), defaultReachType);
+//	LOG("default reach type name = %s, id =  %d",reachTypeName.c_str(), defaultReachType);
 }
 
 void MeCtExampleBodyReach::setHandActionState( MeCtReachEngine::HandActionState newState )
