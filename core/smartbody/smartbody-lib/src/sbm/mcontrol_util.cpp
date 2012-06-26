@@ -403,9 +403,11 @@ void mcuCBHandle::reset( void )
 
 	_scene->command("vhmsgconnect");
 
-
-	Py_Finalize();
-	initPython(initPythonLibPath);
+	//Py_Finalize();
+	//initPython(initPythonLibPath);
+	PyRun_SimpleString("scene = getScene()");
+	PyRun_SimpleString("bml = scene.getBmlProcessor()");
+	PyRun_SimpleString("sim = scene.getSimulationManager()");
 }
 
  void mcuCBHandle::createDefaultControllers()
