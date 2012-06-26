@@ -239,7 +239,21 @@ SbmDeformableMeshGPU::SbmDeformableMeshGPU(void)
 
 SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
 {
+	initShader = false;
+	if (VBOPos) delete VBOPos;
+	if (VBOTangent) delete VBOTangent;
+	if (VBOBiNormal) delete VBOBiNormal;
+	if (VBOTexCoord) delete VBOTexCoord;
+	if (VBOTri) delete VBOTri;
+	if (VBOBoneID1) delete VBOBoneID1;
+	if (VBOBoneID2) delete VBOBoneID2;
+	if (VBOWeight1) delete VBOWeight1;
+	if (VBOWeight2) delete VBOWeight2;
+	if (TBOTran) delete TBOTran;
 
+	for (unsigned int i=0;i<meshSubset.size();i++)
+		delete meshSubset[i];
+	meshSubset.clear();
 }
 
 void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOData* tranTBO)
@@ -1051,4 +1065,11 @@ void SbmDeformableMeshGPUInstance::setDeformableMesh( DeformableMesh* mesh )
 {
 	DeformableMeshInstance::setDeformableMesh(mesh);
 	bufferReady = false;
+}
+
+MeshSubset::~MeshSubset()
+{
+	if (VBOTri)
+		delete VBOTri;
+
 }

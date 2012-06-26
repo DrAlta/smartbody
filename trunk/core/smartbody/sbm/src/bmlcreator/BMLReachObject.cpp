@@ -16,6 +16,13 @@ BMLReachObject::BMLReachObject() : BMLObject()
 	reachActions.push_back("point-at");
 	reachActionAttr->setValidValues(reachActions);
 
+	SmartBody::StringAttribute* reachTypeAttr = createStringAttribute("sbm:reach-type","",true,"Basic", 20, false, false, false,"use left hand or right hand.");
+	std::vector<std::string> reachTypess;
+	reachTypess.push_back("left");
+	reachTypess.push_back("right");
+	reachTypess.push_back("none");	
+	reachTypeAttr->setValidValues(reachTypess);
+
 	createStringAttribute("sbm:handle", "", true, "Basic", 30, false, false, false, "Handle of this reach instance, can be reused during later reach commands.");
 	createBoolAttribute("sbm:foot-ik",true,true,"Basic", 40, false, false, false,"whether to apply ik and fixed the foot sliding.");
 	createBoolAttribute("sbm:reach-finish",false,true,"Basic", 50, false, false, false,"whether to finish the reaching action and return to the rest pose.");

@@ -471,6 +471,10 @@ SbmPawn::~SbmPawn()	{
 	{
 		delete dMesh_p;
 	}
+	if (dMeshInstance_p)
+	{
+		delete dMeshInstance_p;
+	}
 
 	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
 	colManager->removeCollisionObject(collisionObjName);

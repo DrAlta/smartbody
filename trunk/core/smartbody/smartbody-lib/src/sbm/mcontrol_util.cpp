@@ -71,6 +71,7 @@
 #if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support
 #include "sbm/GPU/SbmShader.h"
 #include "sbm/GPU/SbmTexture.h"
+#include "sbm/GPU/SbmDeformableMeshGPU.h"
 #endif
 
 #include "sbm_deformable_mesh.h"
@@ -804,6 +805,9 @@ void mcuCBHandle::clear( void )
 		delete deformableMesh;
 	}
 	deformableMeshMap.clear();
+	//SbmDeformableMeshGPU::initShader = false;
+	//SbmShaderManager::destroy_singleton();
+
 
 	// srHashMap? Ignore for now
 

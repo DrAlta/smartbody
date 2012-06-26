@@ -92,6 +92,7 @@ MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
 void MeCtExampleBodyReach::setDefaultReachType( const std::string& reachTypeName )
 {
 	defaultReachType = MeCtReachEngine::getReachType(reachTypeName);	
+	LOG("default reach type name = %s, id =  %d",reachTypeName.c_str(), defaultReachType);
 }
 
 void MeCtExampleBodyReach::setHandActionState( MeCtReachEngine::HandActionState newState )
@@ -182,10 +183,6 @@ void MeCtExampleBodyReach::setReachTargetPos( SrVec& targetPos )
 bool MeCtExampleBodyReach::updateLocomotion()
 {	
 	// we only move the character when it is idle, and no need to move if we are just point at the object
-	if (currentReachEngine->getCurrentState()->curStateName() != "Idle" 
-		|| currentReachEngine->curHandActionState == MeCtReachEngine::POINT_AT_OBJECT)
-		return true;
-
 	float x,y,z,h,p,r;
 	SbmCharacter* character = currentReachEngine->getCharacter();
 	character->get_world_offset(x,y,z,h,p,r);	
@@ -195,8 +192,15 @@ bool MeCtExampleBodyReach::updateLocomotion()
 	SrVec targetPos = currentReachData->reachTarget.getTargetState().tran;
 	SrVec distanceVec(x, y, z);
 	float dist = currentReachData->XZDistanceToTarget(distanceVec);	
+
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (dist > character->getHeight()*0.35f && !isMoving && startReach && mcu._scene->getSteerManager()->getEngineDriver()->isInitialized() )//currentReachData->startReach) 
+	if (currentReachEngine->getCurrentState()->curStateName() != "Idle" 
+		|| currentReachEngine->curHandActionState == MeCtReachEngine::POINT_AT_OBJECT)
+	{
+		updateReachType(targetPos);
+		return true;
+	}
+	else if (dist > character->getHeight()*0.35f && !isMoving && startReach && mcu._scene->getSteerManager()->getEngineDriver()->isInitialized() )//currentReachData->startReach) 
 	{	
 		// if the target is far away, move the character first
 		//printf("idle to walk\n");
