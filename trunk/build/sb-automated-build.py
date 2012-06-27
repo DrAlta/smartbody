@@ -432,10 +432,14 @@ def fullBuild(svnPassword, buildSuffix):
         f.write("   Build FAILED!!\n")
     f.write("\n")
     f.write("Broken projects:\n")
+    if len(buildCompileErrors) > 0:
+        f.write("   {0} error(s)\n".format(len(buildCompileErrors)))
     for line in buildCompileErrors:
         f.write(line + "\n")
     f.write("\n")
     f.write("Dirty projects:\n")
+    if len(buildCompileWarnings) > 0:
+        f.write("   {0} warning(s)\n".format(len(buildCompileWarnings)))
     for line in buildCompileWarnings:
         f.write(line + "\n")
     f.write("\n")
