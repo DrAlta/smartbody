@@ -373,8 +373,15 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		guessLeftRightFromJntNames(ja, jb, l_acromioclavicular, r_acromioclavicular);
 
 		setJointMap("spine4", spine4, prtMap);
-		setJointMap("l_acromioclavicular", l_acromioclavicular, prtMap);
-		setJointMap("r_acromioclavicular", r_acromioclavicular, prtMap);
+		if (l_acromioclavicular->getName() == "l_sternoclavicular")
+			setJointMap("l_sternoclavicular", r_acromioclavicular, prtMap);
+		else
+			setJointMap("l_acromioclavicular", l_acromioclavicular, prtMap);
+
+		if (r_acromioclavicular->getName() == "r_sternoclavicular")
+			setJointMap("r_sternoclavicular", r_acromioclavicular, prtMap);
+		else
+			setJointMap("r_acromioclavicular", r_acromioclavicular, prtMap);
 	}
 	else if(spine3->num_children() == 3)
 	{
@@ -415,8 +422,15 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		guessLeftRightFromJntNames(ja, jb, l_acromioclavicular, r_acromioclavicular);
 
 		setJointMap("spine4", spine4, prtMap);
-		setJointMap("l_acromioclavicular", l_acromioclavicular, prtMap);
-		setJointMap("r_acromioclavicular", r_acromioclavicular, prtMap);
+		if (l_acromioclavicular->name() == "l_sternoclavicular")
+			setJointMap("l_sternoclavicular", l_acromioclavicular, prtMap);
+		else
+			setJointMap("l_acromioclavicular", l_acromioclavicular, prtMap);
+
+		if (r_acromioclavicular->name() == "r_sternoclavicular")
+			setJointMap("r_sternoclavicular", r_acromioclavicular, prtMap);
+		else
+			setJointMap("r_acromioclavicular", r_acromioclavicular, prtMap);
 	}
 	else if(spine3->num_children() > 3)
 	{
@@ -624,10 +638,25 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 			}
 			else if(getJointHierarchyLevel(l_wrist) - getJointHierarchyLevel(l_acromioclavicular) == 5)
 			{ // Might be shoulder -> uparm -> uparmTwist -> elbow -> forearmTwist -> wrist 
+
 				l_shoulder = l_acromioclavicular->child(0);
 				r_shoulder = r_acromioclavicular->child(0);
-				setJointMap("l_shoulder", l_shoulder, prtMap);
-				setJointMap("r_shoulder", r_shoulder, prtMap);
+				if (l_shoulder->name() == "l_acromioclavicular" && r_shoulder->name() == "r_acromioclavicular")
+				// added by feng : special case for common.sk to account for both "sternoclavicular" and "acromioclavicular"
+				{
+					setJointMap("l_acromioclavicular", l_shoulder, prtMap);
+					setJointMap("r_acromioclavicular", r_shoulder, prtMap);
+					l_shoulder = l_shoulder->child(0);
+					r_shoulder = r_shoulder->child(0);
+					setJointMap("l_shoulder", l_shoulder, prtMap);
+					setJointMap("r_shoulder", r_shoulder, prtMap);
+				}
+				else
+				{
+					setJointMap("l_shoulder", l_shoulder, prtMap);
+					setJointMap("r_shoulder", r_shoulder, prtMap);
+				}
+				
 				l_forearm = l_wrist->parent();
 				r_forearm = r_wrist->parent();
 				setJointMap("l_forearm", l_forearm, prtMap);
@@ -782,10 +811,16 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 			if(j1 && j2)
 			{
 				//gsout << "  Toe_End joints: " << j1->name() <<gspc<< j2->name() << gsnl;
-				if(getJointHierarchyLevel(j1)-getJointHierarchyLevel(l_ankle)>2)
+				if(getJointHierarchyLevel(j1)-getJointHierarchyLevel(l_ankle)>=2)
+				{
 					guessLeftRightFromJntNames(j1->parent(), j2->parent(), l_forefoot, r_forefoot);
+					guessLeftRightFromJntNames(j1, j2, l_toe, r_toe);
+					setJointMap("l_toe", l_toe, prtMap);
+					setJointMap("r_toe", r_toe, prtMap);
+				}
 				else
-					guessLeftRightFromJntNames(j1, j2, l_forefoot, r_forefoot);
+					guessLeftRightFromJntNames(j1, j2, l_forefoot, r_forefoot);	
+
 				setJointMap("l_forefoot", l_forefoot, prtMap);
 				setJointMap("r_forefoot", r_forefoot, prtMap);
 			}
