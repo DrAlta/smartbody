@@ -81,6 +81,11 @@ static int inihandler(void* user, const char* section, const char* name,
 		std::string temp = "python scene.addAssetPath(\"script\", \"" + std::string(value) + "\")";
 		renderer->m_initialCommands.push_back(temp);
     }
+	else if (MATCH("GENERAL", "MediaPath"))
+	{
+		std::string temp = "python scene.setMediaPath(\"" + std::string(value) + "\")";
+		renderer->m_initialCommands.push_back(temp);
+    }
 	else if (MATCH("GENERAL", "Scene"))
 	{
 		renderer->m_initialMeshName = std::string(value);
