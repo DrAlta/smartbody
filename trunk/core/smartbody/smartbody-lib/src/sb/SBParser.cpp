@@ -252,5 +252,10 @@ void SBParser::cleanUp(SmartBody::SBParseNode* node)
 		delete node;
 }
 
+bool SBParser::isInitialized()
+{
+	return _initialized;
+}
+
 }
 

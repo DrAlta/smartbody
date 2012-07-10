@@ -1,5 +1,4 @@
-import sys
-import os
+import NewNVBG
 from NewNVBG.NVBG import *
 from xml.etree import ElementTree as ET
 
@@ -25,13 +24,7 @@ class SmartBodyNVBG(Nvbg):
                 nvbgCharName = ""
                 if hasattr(self, 'nvbg') is False:
                         return
-                if (self.nvbg is not None):
-                        nvbgCharName = self.nvbg.characterName
-                        del self.nvbg
-
                 scene.run("resetNVBG.py")
-                self.nvbg = NVBG(nvbgCharName)
-
         
         def notifyAction(self, name):
                 """

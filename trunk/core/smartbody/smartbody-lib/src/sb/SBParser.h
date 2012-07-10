@@ -19,6 +19,7 @@ class SBParser
 		void initialize(const std::string& arg1, const std::string& arg2);
 		SmartBody::SBParseNode* parse(const std::string& input);
 		void cleanUp(SmartBody::SBParseNode* node);
+		bool isInitialized();
 
 	protected:
 		void createParseTree(InputTree* inputTree, SBParseNode* node);
