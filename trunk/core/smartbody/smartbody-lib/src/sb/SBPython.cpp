@@ -1290,6 +1290,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("parse", &SBParser::parse, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Parses an utterance using the Charniak parser.")
 		.def("initialize", &SBParser::initialize, "Initializes the Charniak parser with parameters.")
 		.def("cleanUp", &SBParser::cleanUp, "Deletes parse tree.")
+		.def("isInitialized", &SBParser::isInitialized, "Return boolean telling if Charniak parser is initialized.")
 		;
 
 #ifndef __ANDROID__
@@ -1476,6 +1477,14 @@ void initPython(std::string pythonLibPath)
 		strstr.clear();
 		strstr << "sys.path.append(\"";
 		strstr << pythonSitePackagePath;
+		strstr << "\");";
+		PyRun_SimpleString(strstr.str().c_str());
+
+		// add path to DLLs
+		std::string pythonDLLPath = pythonLibPath + "/../DLLs";
+		strstr.clear();
+		strstr << "sys.path.append(\"";
+		strstr << pythonDLLPath;
 		strstr << "\");";
 		PyRun_SimpleString(strstr.str().c_str());
 
