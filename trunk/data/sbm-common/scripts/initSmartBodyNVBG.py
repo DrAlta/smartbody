@@ -16,16 +16,6 @@ class SmartBodyNVBG(Nvbg):
                 """
                 self.nvbg = n
 
-        def reset(self):
-                """
-                Optional
-                Reset NVBG and Pyke
-                """
-                nvbgCharName = ""
-                if hasattr(self, 'nvbg') is False:
-                        return
-                scene.run("resetNVBG.py")
-        
         def notifyAction(self, name):
                 """
                 Optional
@@ -183,9 +173,6 @@ class SmartBodyNVBG(Nvbg):
                 """
                 if hasattr(self, 'nvbg') is False:
                         return
-
-                ''' reset '''                
-                self.createActionAttribute("reset", True, "nvbgs", 20, False, False, False, "Reload pyke")
 
                 ''' dialogs '''
                 dialog = self.createStringAttribute("dialog", "", True, "nvbgs", 50, False, False, False, "Dialog")
