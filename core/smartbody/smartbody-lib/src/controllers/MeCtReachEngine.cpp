@@ -100,9 +100,26 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 
 	EffectorConstantConstraint* cons = new EffectorConstantConstraint();
 	cons->efffectorName = reachEndEffector->name().c_str();
-	std::string consRootName = "r_sternoclavicular";
+
+	std::vector<std::string> consJointList;
+	consJointList.push_back("sternoclavicular");
+	consJointList.push_back("acromioclavicular");
+	consJointList.push_back("shoulder");
+	std::string preFix = "r_";	
 	if (reachType == LEFT_ARM || reachType == LEFT_JUMP)
-		consRootName = "l_sternoclavicular";
+		preFix = "l_";	
+	std::string consRootName = preFix + consJointList[0];	
+		
+	
+ 	for (unsigned int i=0;i<consJointList.size();i++)
+ 	{		
+		consRootName = preFix + consJointList[i];
+		if (skeletonCopy->search_joint(consRootName.c_str()) != NULL)
+			break;
+ 	}
+	//if (!skeletonCopy->search_joint(consRootName.c_str()))
+// 	if (reachType == LEFT_ARM || reachType == LEFT_JUMP)
+// 		consRootName = "l_shoulder";
 	cons->rootName = consRootName;
 	reachPosConstraint[cons->efffectorName] = cons;
 	// if there is a child	

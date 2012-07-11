@@ -22,7 +22,7 @@ def testRetargetCharacter(charName, skelName):
 	sbChar = scene.getCharacter(charName)	 
 	position = sbChar.getPosition()
 	print 'sbChar.getPosition=' + str(position.getData(0)) + ' ,' + str(position.getData(1)) + ', ' + str(position.getData(2))
-	gazePos = SrVec(position.getData(0), sbChar.getHeight()*1.8 ,position.getData(2)+100);
+	gazePos = SrVec(position.getData(0), sbChar.getHeight()*1.8 ,position.getData(2)+sbChar.getHeight()*0.6);
 	print 'sbChar.getPosition=' + str(gazePos.getData(0)) + ' ,' + str(gazePos.getData(1)) + ', ' + str(gazePos.getData(2))
 	testPawn.setPosition(gazePos)
 	bml.execBML(charName, '<gaze target="'+ pawnTargetName+ '" sbm:joint-speed="5200" start="8"/>')
@@ -33,13 +33,13 @@ def testRetargetCharacter(charName, skelName):
 	#bml.execBML(charName, '<gaze target="'+ gazeTargetName+ '"/>')
 	scene.commandAt(12.0, 'char ' + charName + ' gazefade out 1.5')
 	# test reach
-	reachPos = SrVec(position.getData(0)-30, sbChar.getHeight()*0.8 ,position.getData(2)+40);
+	reachPos = SrVec(position.getData(0)-sbChar.getHeight()*0.2, sbChar.getHeight()*0.8 ,position.getData(2)+sbChar.getHeight()*0.2);
 	print 'sbChar.getPosition=' + str(reachPos.getData(0)) + ' ,' + str(reachPos.getData(1)) + ', ' + str(reachPos.getData(2))
 	scene.commandAt(14.0, 'set pawn '+pawnTargetName+' world_offset x ' + str(reachPos.getData(0)) +' y ' + str(reachPos.getData(1)) + ' z ' + str(reachPos.getData(2)))
 	scene.commandAt(14.1, 'bml char '+ charName+ ' <sbm:reach sbm:action="touch" sbm:reach-duration="0.5" target="'+pawnTargetName+'"/>')
 	#bml.execBML(charName, '<sbm:reach sbm:action="touch" sbm:reach-duration="0.5" target="'+pawnTargetName+'" start="14"/>')
 	
-	reachPos = SrVec(position.getData(0)-30, sbChar.getHeight()*0.1 ,position.getData(2)+40);
+	reachPos = SrVec(position.getData(0)-sbChar.getHeight()*0.2, sbChar.getHeight()*0.1 ,position.getData(2)+sbChar.getHeight()*0.2);
 	scene.commandAt(18.0, 'set pawn '+pawnTargetName+' world_offset x ' + str(reachPos.getData(0)) +' y ' + str(reachPos.getData(1)) + ' z ' + str(reachPos.getData(2)))	
 	scene.commandAt(18.1, 'bml char '+ charName+ ' <sbm:reach sbm:action="touch" sbm:reach-duration="0.5" target="'+pawnTargetName+'"/>')	
 	#/bml.execBML(charName, '<sbm:reach sbm:action="touch" sbm:reach-duration="0.5" target="'+pawnTargetName+'" start="18"/>')
