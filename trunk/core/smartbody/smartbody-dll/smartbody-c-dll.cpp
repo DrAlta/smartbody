@@ -91,7 +91,7 @@ public:
 
    virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass )
    {
-#ifdef WIN32
+#if !defined(IPHONE_BUILD)
          m_createCharacterCallback( m_sbmHandle, name.c_str(), objectClass.c_str() );
 #else
           SBM_CallbackInfo* info = new SBM_CallbackInfo();
@@ -106,7 +106,7 @@ public:
 
    virtual void OnCharacterDelete( const std::string & name )
    {
-#ifdef WIN32
+#if !defined(IPHONE_BUILD)
       m_deleteCharacterCallback( m_sbmHandle, name.c_str() );
 #else
       SBM_CallbackInfo* info = new SBM_CallbackInfo();
@@ -118,7 +118,7 @@ public:
 
    virtual void OnCharacterChange( const std::string & name )
    {
-#ifdef WIN32      
+#if !defined(IPHONE_BUILD)
       m_changeCharacterCallback( m_sbmHandle, name.c_str() );
 #else
       SBM_CallbackInfo* info = new SBM_CallbackInfo();
@@ -130,7 +130,7 @@ public:
 
    virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
    {
-#ifdef WIN32 
+#if !defined(IPHONE_BUILD)
       m_viseme( m_sbmHandle, name.c_str(), visemeName.c_str(), weight, blendTime );
 #else
       SBM_CallbackInfo* info = new SBM_CallbackInfo();
@@ -149,7 +149,7 @@ public:
 
    virtual void OnChannel( const std::string & name, const std::string & channelName, const float value )
    {
-#ifdef WIN32 
+#if !defined(IPHONE_BUILD)
       m_channel( m_sbmHandle, name.c_str(), channelName.c_str(), value );
 #else
       SBM_CallbackInfo* info = new SBM_CallbackInfo();
