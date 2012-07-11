@@ -73,7 +73,7 @@ set( SMARTBODY_LIB_EXT_SOIL_SRC
 	external/SOIL/image_helper.c
 	external/SOIL/SOIL.c
 	external/SOIL/stb_image_aug.c
-	external/SOIL/stbi_DDS_aug_c.h
+#	external/SOIL/stbi_DDS_aug_c.h
 )
 
 set( SMARTBODY_LIB_ME_SRC
@@ -393,6 +393,7 @@ set( SMARTBODY_LIB_SBM_SRC
 ####
 
 #set( CMAKE_MODULE_LINKER_FLAGS -m32 )
+set_source_files_properties( ${SMARTBODY_LIB_EXT_SOIL_SRC} PROPERTIES LANGUAGE CXX )
 
 add_library(
 	smartbody-lib
