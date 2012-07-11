@@ -43,9 +43,10 @@ def createDragAndDropCharacter(charName, skelName, meshName, position):
 	# start the simulation
 	sim.start()
 	bml.execBML(charName, '<body posture="'+ skelName +'HandsAtSide_Motex"/>')
-	scene.command('char ' +charName + ' viewer deformable');
+	scene.command('char ' +charName + ' viewer deformable');	
 	scene.run("characterTest.py")
-	testRetargetCharacter(charName, skelName)
+	testRetargetCharacter(charName)
+	
 
 
 	
