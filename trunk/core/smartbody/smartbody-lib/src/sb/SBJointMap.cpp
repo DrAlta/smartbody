@@ -325,7 +325,19 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		setJointMap("r_hip", r_hip, prtMap);
 	}
 
-
+	SkJoint* newBase = base;
+	
+	while (newBase->parent())
+	{
+		newBase = newBase->parent();		
+	}
+	
+	if (newBase && newBase != base)
+	{
+		setJointMap("base",newBase, prtMap);
+		setJointMap("base1",base, prtMap);
+	}
+	
 	//-------------------------------------------------------------------------
 	// CONTINUE with spine1, try finding spine3, spine4, l/r_acromioclavicular
 	for(unsigned int i=getJointIndex(spine1); i<jnts.size(); i++)

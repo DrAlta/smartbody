@@ -26,7 +26,7 @@ doctor.setVoice("remote")
 doctor.setVoiceCode("Festival_voice_rab_diphone")
 doctor.createStandardControllers()
 doctor.setStringAttribute("deformableMesh", "doctor")
-
+'''
 elder = scene.createCharacter("elder", "SasoBase.Mayor")
 elderSkeleton = scene.createSkeleton("common.sk")
 elder.setSkeleton(elderSkeleton)
@@ -65,7 +65,7 @@ utah.setVoice("remote")
 utah.setVoiceCode("Festival_voice_rab_diphone")
 utah.createStandardControllers()
 utah.setStringAttribute("deformableMesh", "utah")
-
+'''
 scene.setDefaultCharacter("doctor")
 scene.setDefaultRecipient("elder")
 

@@ -29,6 +29,7 @@ def createDragAndDropCharacter(charName, skelName, meshName, position):
 	
 	dndSkel = scene.getSkeleton(skelName)
 	jointMap.applySkeleton(dndSkel)
+
 	createStandardCharacter(charName, skelName, meshName, position)
 	
 	print 'drag and drop position =' + str(position.getData(0)) + ' ,' + str(position.getData(1)) + ', ' + str(position.getData(2))
@@ -42,9 +43,10 @@ def createDragAndDropCharacter(charName, skelName, meshName, position):
 	# start the simulation
 	sim.start()
 	bml.execBML(charName, '<body posture="'+ skelName +'HandsAtSide_Motex"/>')
-	scene.command('char ' +charName + ' viewer deformableGPU');
+	scene.command('char ' +charName + ' viewer deformable');
 	scene.run("characterTest.py")
 	testRetargetCharacter(charName, skelName)
+
 
 	
 
