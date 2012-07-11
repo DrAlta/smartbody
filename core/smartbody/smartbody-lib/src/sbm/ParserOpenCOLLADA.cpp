@@ -387,6 +387,21 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 							if (orderVec.size() != 3)
 								orderVec.push_back(sidAttr.substr(6, 1));
 						}
+						if (sidAttr.substr(0, 8) == "rotation")
+						{
+							std::string rotationString;
+							xml_utils::xml_translate(&rotationString, infoNode->getTextContent());
+							std::vector<std::string> tokens;
+							vhcl::Tokenize(rotationString, tokens, " \n");
+							float finalValue;
+							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
+								finalValue = (float)atof(tokens[tokenizeC].c_str());
+							if (sidAttr == "rotationX") rotx = finalValue;
+							if (sidAttr == "rotationY") roty = finalValue;
+							if (sidAttr == "rotationZ") rotz = finalValue;
+							if (orderVec.size() != 3)
+								orderVec.push_back(sidAttr.substr(8, 1));
+						}
 					}
 				}
 				order = getRotationOrder(orderVec);

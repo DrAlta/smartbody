@@ -14,6 +14,7 @@ scene.run("init-common-assets.py")
 scene.run("init-common-face.py")
 scene.run("init-utah-face.py")
 
+'''
 doctor = scene.createCharacter("doctor", "SasoBase.SasoDoctorPerez")
 doctorSkeleton = scene.createSkeleton("common.sk")
 doctor.setSkeleton(doctorSkeleton)
@@ -26,7 +27,7 @@ doctor.setVoice("remote")
 doctor.setVoiceCode("Festival_voice_rab_diphone")
 doctor.createStandardControllers()
 doctor.setStringAttribute("deformableMesh", "doctor")
-'''
+
 elder = scene.createCharacter("elder", "SasoBase.Mayor")
 elderSkeleton = scene.createSkeleton("common.sk")
 elder.setSkeleton(elderSkeleton)
@@ -91,15 +92,15 @@ for n in range(0, len(names)):
 # start the simulation
 sim.start()
 
-bml.execBML('doctor', '<body posture="LHandOnHip_Motex"/>')
-bml.execBML('elder', '<body posture="LHandOnHip_Motex"/>')
-bml.execBML('brad', '<body posture="HandsAtSide_Motex"/>')
-bml.execBML('utah', '<body posture="ChrUtah_Idle003"/>')
+#bml.execBML('doctor', '<body posture="LHandOnHip_Motex"/>')
+#bml.execBML('elder', '<body posture="LHandOnHip_Motex"/>')
+#bml.execBML('brad', '<body posture="HandsAtSide_Motex"/>')
+#bml.execBML('utah', '<body posture="ChrUtah_Idle003"/>')
 
-bml.execBML('doctor', '<saccade mode="listen"/>')
-bml.execBML('elder', '<saccade mode="listen"/>')
-bml.execBML('brad', '<saccade mode="listen"/>')
-bml.execBML('utah', '<saccade mode="listen"/>')
+#bml.execBML('doctor', '<saccade mode="listen"/>')
+#bml.execBML('elder', '<saccade mode="listen"/>')
+#bml.execBML('brad', '<saccade mode="listen"/>')
+#bml.execBML('utah', '<saccade mode="listen"/>')
 
 sim.resume()
 

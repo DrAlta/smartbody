@@ -96,7 +96,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    if (model.mtlnames.size() == 0)
    {
 	   glBegin ( GL_TRIANGLES ); // some cards do require begin/end for each triangle!
-	   for (unsigned int k=0; k<F.size(); k++ )
+	   for (int k=0; k<F.size(); k++ )
 	   {	
 		   int f = k;
 		   glNormal ( N[Fn[f].a] ); glVertex ( V[F[f].a] );
