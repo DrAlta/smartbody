@@ -474,6 +474,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\bmlcreator\TextEditor.cpp" />
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp" />
     <ClCompile Include="..\src\fltk_viewer.cpp" />
     <ClCompile Include="..\src\FLTKListener.cpp" />
@@ -538,6 +539,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClCompile Include="..\src\visemeviewer\VisemeViewerWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\bmlcreator\TextEditor.h" />
     <ClInclude Include="..\src\CharacterCreatorWindow.h" />
     <ClInclude Include="..\src\fltk_viewer.h" />
     <ClInclude Include="..\src\FLTKListener.h" />

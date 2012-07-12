@@ -210,6 +210,9 @@
     <ClCompile Include="..\src\monitorviewer\MonitorConnectWindow.cpp">
       <Filter>monitorViewer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\TextEditor.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -383,6 +386,9 @@
     </ClInclude>
     <ClInclude Include="..\src\monitorviewer\MonitorConnectWindow.h">
       <Filter>monitorViewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\TextEditor.h">
+      <Filter>bmlcreator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
