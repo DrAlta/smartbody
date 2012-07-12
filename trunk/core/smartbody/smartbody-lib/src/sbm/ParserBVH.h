@@ -58,7 +58,7 @@ class ParserBVH
 {
 	public:
 		static bool parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, std::ifstream &file, float scale, int N1 = -1, int N2 = 2000000);
-		static void convertBVHtoSmartBody(SkMotion& motion, ChannelInfo* channelInfo, double data[6], float* posture, double frameTime, float scale);
+		static void convertBVHtoSmartBody(SkJoint* joint, SkMotion& motion, ChannelInfo* channelInfo, double data[6], float* posture, double frameTime, float scale);
 		static int determineRotationOrder(int bvhChannels[6], int numBVHChannels);
 
 };
