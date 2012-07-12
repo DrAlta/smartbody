@@ -824,12 +824,13 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getCorrespondancePoints", &SBAnimationBlend::getCorrespondencePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the correspondence points in one motion given the index. \n Input: index of motion \n Output: correspondence points vector of this motion")
 		.def("getNumCorrespondencePoints", &SBAnimationBlend::getNumCorrespondencePoints, "Number of correspondence points for the motions in the blend")
 		.def("getCorrespondencePoints", &SBAnimationBlend::getCorrespondencePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the correspondence points in one motion given the index. \n Input: index of motion \n Output: correspondence points vector of this motion")
+		.def("setCorrespondencePoints", &SBAnimationBlend::setCorrespondencePoints, "Sets the correspondence points given a motion index, a parameter index and a value.")
 		.def("getDimension", &SBAnimationBlend::getDimension, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the dimension of the state. Dimension represents the number of parameter for each motion. 0D means no parameter, 1D means one parameter for each motion etc.")
 		.def("addEvent", &SBAnimationBlend::addEvent, "Adds an event to the blend at a specific local time for the given motion.")
 		.def("removeAllEvents", &SBAnimationBlend::removeAllEvents, "Removes all events from the blend at a specific local time for the given motion.")
 		.def("getNumEvents", &SBAnimationBlend::getNumEvents, "Returns the number of events associated with this blend.")
 		.def("getEvent", &SBAnimationBlend::getEvent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event of a given index.")
-		.def("removeEvent", &SBAnimationBlend::removeEvent, "Removes the event of a given index.")
+		.def("removeEvent", &SBAnimationBlend::removeEvent, "Removes the event of a given index.") 
 		;
 
 	boost::python::class_<SBAnimationBlend0D, boost::python::bases<SBAnimationBlend> >("SBAnimationBlend0D")
@@ -1012,6 +1013,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getJointAngularSpeed", &SBMotion::getJointAngularSpeed, "Get the joint accumulative angular speed. \n Input: SBJoint, start time, end time \n Output: joint angular speed(unit: degree/sec)")		
 		.def("getJointAngularSpeedAxis", &SBMotion::getJointAngularSpeedAxis, "Get the joint accumulative angular speed of a given axis: X, Y or Z. \n Input: SBJoint, axis, start time, end time \n Output: joint angular speed(unit: degree/sec)")		
 		.def("getJointTransition", &SBMotion::getJointTransition, "Get the joint transition vector. \n Input: SBJoint, start time, end time \n Output: joint transition vector containing x, y, z value (unit: same with the skeleton)")		
+		.def("getJointPosition", &SBMotion::getJointPosition, "Get the joint position. \n Input: SBJoint, time \n Output: joint position containing x, y, z value (unit: same with the skeleton)")		
 		.def("translate", &SBMotion::translate, "Translates the base joint name by x,y,z values.")		
 		.def("rotate", &SBMotion::rotate, "Rotates the base joint name by x,y,z axis.")			
 		.def("scale", &SBMotion::scale, "Scales all translations in skeleton by scale factor.")		

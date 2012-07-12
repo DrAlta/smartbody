@@ -67,6 +67,7 @@ class SBMotion : public SkMotion
 		float getJointAngularSpeed(SBJoint* joint, float startTime, float endTime);
 		float getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);
 		std::vector<float> getJointTransition(SBJoint* joint, float startTime, float endTime);
+		SrVec getJointPosition(SBJoint* joint, float time);
 
 		bool autoFootStepDetection(std::vector<double>& outMeans, int numStepsPerJoint, int maxNumSteps, SBSkeleton* skeleton, 
 								   std::vector<std::string>& selectedJoints, float floorHeight, float floorThreshold, float speedThreshold, 

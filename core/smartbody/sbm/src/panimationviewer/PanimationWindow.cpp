@@ -339,6 +339,9 @@ PanimationWindow* PanimationWindow::getPAnimationWindow( Fl_Widget* w )
 
 SBCharacter* PanimationWindow::getCurrentCharacter()
 {
+	if (!characterList->menu())
+		return NULL;
+
 	std::string charName = characterList->menu()[characterList->value()].label();
 	SBScene* _scene = SmartBody::SBScene::getScene();
 	return _scene->getCharacter(charName);
