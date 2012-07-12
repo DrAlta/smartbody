@@ -148,7 +148,11 @@ void reset()
 
 void printLog(const std::string& message)
 {
-	LOG(message.c_str());
+	string s = message;
+	if (vhcl::EndsWith(s, "\n"))
+		s.erase(s.length() - 1);
+	if (s.length() > 0)
+		LOG(message.c_str());
 }
 
 
