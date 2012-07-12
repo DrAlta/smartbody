@@ -539,6 +539,8 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
 				for (int m = 0; m < stride; m++)
 				{
 					int idx = frameCt*stride+m;
+					if (idx >= (int) outFloatArray.floatArray.size())
+						break;
 					tran[m] = outFloatArray.floatArray[idx];
 				}
 				tran.transpose();				

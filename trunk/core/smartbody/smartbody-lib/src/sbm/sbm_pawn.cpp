@@ -154,7 +154,7 @@ dMesh_p( NULL) ,
 #else
 dMesh_p( NULL ),
 dMeshInstance_p(NULL),
-#endif,
+#endif
 ct_tree_p( MeControllerTreeRoot::create() ),
 world_offset_writer_p( NULL ),
 wo_cache_timestamp( -std::numeric_limits<float>::max() )

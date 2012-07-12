@@ -1583,6 +1583,9 @@ void PABlendEditor::updateMotionPlayer(double t)
 			return;
 
 		int frameIndex = int(t * motion->getFrameRate());
+		if (!paWindow->characterList->menu())
+			return;
+
 		std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
 		std::stringstream command;
 		command << "motionplayer " << charName << " " << selectedMotions[0] << " " << frameIndex;

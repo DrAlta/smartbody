@@ -1137,9 +1137,16 @@ float SBMotion::getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis
 
 std::vector<float> SBMotion::getJointTransition(SBJoint* joint, float startTime, float endTime)
 {
-	if (!joint)
-		return std::vector<float>();
 	std::vector<float> transitions;
+	if (!joint)
+	{
+		LOG("No joint found when determining joint transitions.");
+		transitions.push_back(0);
+		transitions.push_back(0);
+		transitions.push_back(0);
+		return transitions;
+	}
+
 	if (connected_skeleton() == NULL)
 	{
 		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
@@ -1175,6 +1182,29 @@ std::vector<float> SBMotion::getJointTransition(SBJoint* joint, float startTime,
 	transitions.push_back(z);
 	connected_skeleton()->clearJointValues(); // reset the joint quat/pos
 	return transitions;
+}
+
+SrVec SBMotion::getJointPosition(SBJoint* joint, float time)
+{
+	if (!joint)
+		return SrVec();
+	if (connected_skeleton() == NULL)
+	{
+		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
+		return SrVec();
+	}
+
+	float dt = duration() / float(frames() - 1);
+	int frameId = int(time / dt);
+	float distance = 0;
+	
+	apply_frame(frameId);
+	connected_skeleton()->update_global_matrices();
+	const SrMat& srcMat = joint->gmat();
+	SrVec point = SrVec(srcMat.get(12), srcMat.get(13), srcMat.get(14));
+	connected_skeleton()->clearJointValues(); // reset the joint quat/pos
+	
+	return point;
 }
 
 
@@ -1798,7 +1828,11 @@ bool SBMotion::removeMetaData( const std::string& tagName )
 double SBMotion::getMetaDataDouble( const std::string& tagName )
 {
 	std::string strValue = getMetaDataString(tagName);
+#ifdef __ANDROID__
+	return atof(strValue.c_str());
+#else
 	return boost::lexical_cast<double>(strValue);
+#endif
 }
 
 std::string SBMotion::getMetaDataString( const std::string& tagName )
