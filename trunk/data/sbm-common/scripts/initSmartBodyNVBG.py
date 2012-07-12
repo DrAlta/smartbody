@@ -16,6 +16,16 @@ class SmartBodyNVBG(Nvbg):
                 """
                 self.nvbg = n
 
+        def reset(self):
+                """
+                Optional
+                Reset NVBG and Pyke
+                """
+                nvbgCharName = ""
+                if hasattr(self, 'nvbg') is False:
+                        return
+                scene.run("resetNVBG.py")
+
         def notifyAction(self, name):
                 """
                 Optional
@@ -173,6 +183,9 @@ class SmartBodyNVBG(Nvbg):
                 """
                 if hasattr(self, 'nvbg') is False:
                         return
+                
+                ''' reset '''                
+                self.createActionAttribute("reset", True, "nvbgs", 20, False, False, False, "Reload pyke")
 
                 ''' dialogs '''
                 dialog = self.createStringAttribute("dialog", "", True, "nvbgs", 50, False, False, False, "Dialog")
@@ -206,3 +219,24 @@ class SmartBodyNVBG(Nvbg):
                 bmlHidden.setValidValues(bmlHiddenVec)
                 self.createStringAttribute("bml", "", True, "nvbgs", 120, False, False, False, "BML corresponding to the behavior")
                 self.createActionAttribute("play behavior", True, "nvbgs", 130, False, False, False, "Play the chosen behavior")
+
+        def resetTool(self):
+                ''' reload kfb rules '''                
+                behavior = self.getAttribute("behavior")
+                bmlHidden = self.getAttribute("bml hidden")
+                factList = nvbg_engine.get_kb('nvbg').entity_lists['dict']
+                universalFact = factList.universal_facts[0]
+                numBehaviors = len(universalFact[1])    #universalFact[0] is bmlPatterns
+                behaviorVec = StringVec()
+                bmlHiddenVec = StringVec()
+                for i in range(0, numBehaviors):
+                        behaviorUnit = universalFact[1][i]
+                        behaviorVec.append(behaviorUnit[0])
+                        bmlTuple = behaviorUnit[1]
+                        bmlStr = ""
+                        for j in range(0, len(bmlTuple)):
+                                bmlStr = bmlStr + bmlTuple[j]
+                        bmlHiddenVec.append(bmlStr)
+                behavior.setValidValues(behaviorVec)
+                bmlHidden.setValidValues(bmlHiddenVec)                
+                

@@ -127,6 +127,7 @@ set( SBM_FLTK_SRC
 	src/panimationviewer/ParamAnimParameterEditor.cpp
 	src/CharacterCreatorWindow.cpp
 	src/bmlcreator/AttributeWindow.cpp
+	src/bmlcreator/TextEditor.cpp
 	src/bmlcreator/BMLAnimationObject.cpp
 	src/bmlcreator/BMLBodyObject.cpp
 	src/bmlcreator/BMLConstraintObject.cpp
