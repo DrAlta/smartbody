@@ -56,6 +56,7 @@ that is distributed: */
 #include <cstring>
 #include <sb/SBAttribute.h>
 #include <sb/SBAttributeManager.h>
+#include "TextEditor.h"
 
 #ifndef WIN32
 #define _strdup strdup
@@ -473,12 +474,16 @@ void AttributeWindow::draw()
 					if (stringAttr->getValidValues().size() == 0)
 					{
 						Fl_Input* input = new Fl_Input(mainGroup->x() + _offset, mainGroup->y() + startY, 150, 20, _strdup(name.c_str()));
+						Fl_Button* edit = new Fl_Button(mainGroup->x() + _offset + 160, mainGroup->y() + startY, 20, 20, ".");
+						edit->tooltip(stringAttr->getName().c_str());
+						edit->callback(EditStringCB, stringAttr);
 						if (attrInfo->getDescription() != "")
 							input->tooltip(_strdup(attrInfo->getDescription().c_str()));
 						input->value(stringAttr->getValue().c_str());
 						startY += widgetHeight; // make sure the next widget starts lower
 						input->callback(StringCB, this);
 						mainGroup->add(input);
+						mainGroup->add(edit);
 						widgetMap[name] = input;
 						reverseWidgetMap[input] = name;
 					}
@@ -609,6 +614,13 @@ void AttributeWindow::draw()
 	Fl_Group::draw();
 }
 
+void AttributeWindow::EditStringCB(Fl_Widget* w, void *data)
+{
+	SmartBody::StringAttribute* sa = (SmartBody::StringAttribute*) data;
+	TextEditorWindow* textEditor = new TextEditorWindow(w->window()->x() + 10, w->window()->y() + 10, 400, 360, "Edit Text");
+	textEditor->setSBStringAttribute(sa);
+	textEditor->show();
+}
 
 SmartBody::SBObject* AttributeWindow::getObject()
 {

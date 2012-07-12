@@ -874,6 +874,14 @@
 				RelativePath="..\src\bmlcreator\BMLStateObject.h"
 				>
 			</File>
+			<File
+				RelativePath="..\src\bmlcreator\TextEditor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\TextEditor.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="visemeviewer"

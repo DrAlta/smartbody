@@ -21,5 +21,4 @@ for i in range(0, numCharacters):
     n = NVBG(characterNames[i], getScene())
     n.setParser(parser)
     scene.getCharacter(characterNames[i]).getNvbg().nvbg = n
-    scene.getCharacter(characterNames[i]).getNvbg().clearAttributes()
-    scene.getCharacter(characterNames[i]).getNvbg().setupTool()
+    scene.getCharacter(characterNames[i]).getNvbg().resetTool()

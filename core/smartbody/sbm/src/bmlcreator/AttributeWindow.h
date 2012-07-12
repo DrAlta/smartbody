@@ -86,6 +86,8 @@ public:
 	static void Vec3CB(Fl_Widget* w, void *data);
 	static void ActionCB(Fl_Widget* w, void *data);
 
+	static void EditStringCB(Fl_Widget* w, void *data);
+
 	static const uchar ATTRIBUTEWINDOWTYPE = (uchar)240;
 
 	SmartBody::SBObject* object;
