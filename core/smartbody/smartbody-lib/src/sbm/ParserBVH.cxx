@@ -511,7 +511,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 									}
 									// TODO: Add data to SkMotion
 									ChannelInfo* channelInfo = channelInfoMap[oldJoint->index()];
-									ParserBVH::convertBVHtoSmartBody(motion, channelInfo, frames, posture, curFrame * frameTime, scale);
+									ParserBVH::convertBVHtoSmartBody(oldJoint, motion, channelInfo, frames, posture, curFrame * frameTime, scale);
 								}
 
 								for (int x = 0; x < 6; x++)
@@ -539,7 +539,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						{
 							// convert the BVH frame into the appropriate SmartBody frame
 							ChannelInfo* channelInfo = channelInfoMap[oldJoint->index()];
-							ParserBVH::convertBVHtoSmartBody(motion, channelInfo, frames, posture, curFrame * frameTime, scale);
+							ParserBVH::convertBVHtoSmartBody(oldJoint, motion, channelInfo, frames, posture, curFrame * frameTime, scale);
 						}
 						state = 11;
 					}
@@ -580,7 +580,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 	return true;
 }
 
-void ParserBVH::convertBVHtoSmartBody(SkMotion& motion, ChannelInfo* channelInfo, double data[6], float* posture, double frameTime, float scale)
+void ParserBVH::convertBVHtoSmartBody(SkJoint* joint, SkMotion& motion, ChannelInfo* channelInfo, double data[6], float* posture, double frameTime, float scale)
 {
 	SrVec rot(0.0f, 0.0f, 0.0f);
 
@@ -595,7 +595,21 @@ void ParserBVH::convertBVHtoSmartBody(SkMotion& motion, ChannelInfo* channelInfo
 		{
 			if (motion.posture_size() <= channelInfo->startingChannelIndex + skChannelOffset)
 				std::cout << "WARNING!" << std::endl;
-			posture[channelInfo->startingChannelIndex + skChannelOffset] = float(data[c]) * scale;
+			if (!joint->parent())
+			{ 
+				float finalValue = float(data[c]) * scale;
+				if (channelInfo->channels[c] == BVHXPOSITION)
+					finalValue -= joint->offset().x;
+				else if (channelInfo->channels[c] == BVHYPOSITION)
+					finalValue -= joint->offset().y;
+				else if (channelInfo->channels[c] == BVHZPOSITION)
+					finalValue -= joint->offset().z;
+				posture[channelInfo->startingChannelIndex + skChannelOffset] = finalValue * scale;
+			}
+			else
+			{
+				posture[channelInfo->startingChannelIndex + skChannelOffset] = 0.0;
+			}
 			skChannelOffset++;
 		}
 		else if (channelInfo->channels[c] == BVHXROTATION)
