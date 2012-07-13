@@ -1455,11 +1455,13 @@ void initPython(std::string pythonLibPath)
 {	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.initPythonLibPath = pythonLibPath;
+	std::string pythonHome = pythonLibPath + "/..";
 #ifdef USE_PYTHON
 #ifdef __ANDROID__
 	Py_SetProgramName("/sdcard/sbmmedia/python/");
 #else
 	Py_SetProgramName("../../../../core/smartbody/Python26/");
+	Py_SetPythonHome((char*)pythonHome.c_str());
 #endif	
 	Py_Initialize();
 	
@@ -1468,6 +1470,8 @@ void initPython(std::string pythonLibPath)
 		mcu.mainDict = mcu.mainModule.attr("__dict__");
 	
 		PyRun_SimpleString("import sys");
+
+		/*
 		// set the proper python path
 		std::stringstream strstr;
 		strstr << "sys.path.append(\"";
@@ -1477,6 +1481,7 @@ void initPython(std::string pythonLibPath)
 
 		// add path to site-packages
 		std::string pythonSitePackagePath = pythonLibPath + "/site-packages";
+		strstr.str(std::string());
 		strstr.clear();
 		strstr << "sys.path.append(\"";
 		strstr << pythonSitePackagePath;
@@ -1485,11 +1490,13 @@ void initPython(std::string pythonLibPath)
 
 		// add path to DLLs
 		std::string pythonDLLPath = pythonLibPath + "/../DLLs";
+		strstr.str(std::string());
 		strstr.clear();
 		strstr << "sys.path.append(\"";
 		strstr << pythonDLLPath;
 		strstr << "\");";
 		PyRun_SimpleString(strstr.str().c_str());
+		*/
 
 		SmartBody::initSmartBody();
 
