@@ -162,161 +162,42 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 
    mcu.mark("requestSpeechAudioFast", 0, "traverse");
 
-   bool useCurveMode = visemeCurveMode;
-   if (useCurveMode)
-   {
-	   rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
-	   if (!bmlnode)
-	   {
-		   LOG( "Could not find <bml> tag in %s.", bmlFilename.c_str());
-	   }
-	   else
-	   {
-		   rapidxml::xml_node<>* curvesnode = bmlnode->first_node("curves");
-		   if (!curvesnode)
-		   {
-			   LOG( "Could not find <curves> tag in %s.", bmlFilename.c_str());
-			   // revert to normal viseme mode if no curves are found
-			   useCurveMode = false;
-		   }
-		   else
-		   {
-			   rapidxml::xml_node<>* node = curvesnode->first_node("curve");
-			   while (node)
-			   {
-				  rapidxml::xml_attribute<>* nameAttr = node->first_attribute("name");
-				  string name = "";
-				  if (nameAttr)
-					  name = nameAttr->value();
+	boost::filesystem::path p( relativeAudioPath );
+	p /= voiceCode;
+	boost::filesystem::path abs_p = boost::filesystem::complete( p );	
 
-				  rapidxml::xml_attribute<>* numKeysAttr = node->first_attribute("num_keys");
-				  string numKeys = "";
-				  if (numKeysAttr)
-					  numKeys = numKeysAttr->value();
+	if( !boost::filesystem2::exists( abs_p ))
+	{
+	  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
+	  mcu.mark("requestSpeechAudio");
+      return 0;
+	}
 
-				  rapidxml::xml_node<>* keyData = node->first_node();
-				  if (keyData)
-				  {
-					  std::string curveInfo = keyData->value();
-					  m_speechRequestInfo[ m_requestIdCounter ].visemeData.push_back(VisemeData(name.c_str(), atoi(numKeys.c_str()), curveInfo.c_str()));
+	boost::filesystem::path wavPath = abs_p;
+	wavPath /= std::string(ref + ".wav");
+	boost::filesystem::path bmlPath = abs_p;
+	bmlPath /= std::string(ref + ".bml");
+	std::string basePath = abs_p.native_directory_string().c_str();
 
-				  }
+	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.native_directory_string().c_str();
 
-				   node = node->next_sibling();
-			   }
-			   // revert to normal viseme mode if no curves are found
-			   if (!node)
-				useCurveMode = false;
-		   }
-	   }
-   }
-
-   if (!useCurveMode)
-   {	      
-	   rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
-	   if (!bmlnode)
-	   {
-		   LOG( "Could not find <bml> tag in %s.", bmlFilename.c_str());
-	   }
-
-	   rapidxml::xml_node<>* node = bmlnode->first_node("lips");
-	   while (node)
-	   {
-		  rapidxml::xml_attribute<>* visemeAttr = node->first_attribute("viseme");
-		  string viseme = "";
-		  if (visemeAttr)
-			  viseme = visemeAttr->value();
-
-		  rapidxml::xml_attribute<>* artiulationAttr = node->first_attribute("articulation");
-		  string articulation = "";
-		  if (artiulationAttr)
-			  articulation = artiulationAttr->value();
-
-		  rapidxml::xml_attribute<>* startAttr = node->first_attribute("start");
-		  string start = "";
-		  if (startAttr)
-			  start = startAttr->value();
-
-
-		  rapidxml::xml_attribute<>* readyAttr = node->first_attribute("start");
-		  string ready = "";
-		  if (readyAttr)
-			  ready = readyAttr->value();
-
-
-		  rapidxml::xml_attribute<>* relaxAttr = node->first_attribute("relax");
-		  string relax = "";
-		  if (relaxAttr)
-			  relax = relaxAttr->value();
-
-		  rapidxml::xml_attribute<>* endAttr = node->first_attribute("end");
-		  string end = "";
-		  if (endAttr)
-			  end = endAttr->value();
-
-		  m_speechRequestInfo[ m_requestIdCounter ].visemeData.push_back( VisemeData( viseme.c_str(), (float)atof( articulation.c_str() ), (float)atof( start.c_str() ) ) );
-		  m_speechRequestInfo[ m_requestIdCounter ].visemeData.push_back( VisemeData( viseme.c_str(), 0.0f,                                (float)atof( end.c_str() ) ) );
-
-		  node = node->next_sibling("lips");
-	   }
-   }
-   else
-   {
-   }
-//////////////////////////////////
-
+   mcu.mark("requestSpeechAudio", 0, "lips");
+   ReadVisemeDataBMLFast( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlFilename.c_str() );
-      //return 0;
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
+	  mcu.mark("requestSpeechAudio");
+      return 0;
    }
 
-   //ReadSpeechTiming( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
-//////////////////////////
-    m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.clear();
-
-
-	mcu.mark("requestSpeechAudioFast", 0, "sync");
-	rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
-	rapidxml::xml_node<>* speechnode = bmlnode->first_node("speech");
-	if (speechnode)
-	{
-		rapidxml::xml_node<>* textNode = speechnode->first_node("text");
-		if (textNode)
-		{
-			rapidxml::xml_node<>* syncNode = textNode->first_node("sync");
-			while (syncNode)
-			{
-				rapidxml::xml_attribute<>* idAttr = syncNode->first_attribute("id");
-				string id = "";
-				if (idAttr)
-					id = idAttr->value();
-
-				rapidxml::xml_attribute<>* timeAttr = syncNode->first_attribute("time");
-				string time = "";
-				if (timeAttr)
-					time = timeAttr->value();
-
-				 m_speechRequestInfo[ m_requestIdCounter ].timeMarkers[ id ] = (float)atof( time.c_str() );
-				 syncNode = syncNode->next_sibling("sync");
-
-			}
-		}
-	}
-	
-	
- 
-   /////////////////////////
-
-
-
-
+   mcu.mark("requestSpeechAudio", 0, "sync");
+   ReadSpeechTiming( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
    if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
    {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlFilename.c_str() );
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.native_directory_string().c_str() );
+	  //mcu.mark("requestSpeechAudio");
       //return 0;
    }
-
 
    mcu.execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
 
@@ -870,4 +751,247 @@ void AudioFileSpeech::ReadSpeechTiming( const char * filename, std::map< std::st
 std::map< RequestId, AudioFileSpeech::SpeechRequestInfo >& AudioFileSpeech::getSpeechRequestInfo()
 {
 	return m_speechRequestInfo;
+}
+
+
+void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector< VisemeData > & visemeData, const SbmCharacter* character )
+{
+	//////////////////////////////////
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	//ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
+	m_speechRequestInfo[ m_requestIdCounter ].visemeData.clear();
+
+	mcu.mark("requestSpeechAudioFast", 0, "lips");
+	rapidxml::file<char> bmlFile(filename);
+	mcu.mark("requestSpeechAudioFast", 0, "fileconstruction");
+	rapidxml::xml_document<> bmldoc;
+	mcu.mark("requestSpeechAudioFast", 0, "parse");
+	bmldoc.parse< rapidxml::parse_declaration_node>(bmlFile.data());
+
+	mcu.mark("requestSpeechAudioFast", 0, "traverse");
+
+	bool useCurveMode = visemeCurveMode;
+	if (useCurveMode)
+	{
+		rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
+		if (!bmlnode)
+		{
+			LOG( "Could not find <bml> tag in %s.", filename);
+		}
+		else
+		{
+			rapidxml::xml_node<>* curvesnode = bmlnode->first_node("curves");
+			if (!curvesnode)
+			{
+				LOG( "Could not find <curves> tag in %s.", filename);
+				// revert to normal viseme mode if no curves are found
+				useCurveMode = false;
+			}
+			else
+			{
+				rapidxml::xml_node<>* node = curvesnode->first_node("curve");
+				while (node)
+				{
+					rapidxml::xml_attribute<>* nameAttr = node->first_attribute("name");
+					string name = "";
+					if (nameAttr)
+						name = nameAttr->value();
+
+					rapidxml::xml_attribute<>* numKeysAttr = node->first_attribute("num_keys");
+					string numKeys = "";
+					if (numKeysAttr)
+						numKeys = numKeysAttr->value();
+
+					rapidxml::xml_node<>* keyData = node->first_node();
+					if (keyData)
+					{
+						std::string curveInfo = keyData->value();
+						m_speechRequestInfo[ m_requestIdCounter ].visemeData.push_back(VisemeData(name.c_str(), atoi(numKeys.c_str()), curveInfo.c_str()));
+
+					}
+
+					node = node->next_sibling();
+				}
+				// revert to normal viseme mode if no curves are found
+				if (!node)
+					useCurveMode = false;
+			}
+		}
+	}
+
+	if (!useCurveMode)
+	{	      
+		rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
+		if (!bmlnode)
+		{
+			LOG( "Could not find <bml> tag in %s.", filename);
+		}
+
+		rapidxml::xml_node<>* node = bmlnode->first_node("lips");
+		while (node)
+		{
+			rapidxml::xml_attribute<>* visemeAttr = node->first_attribute("viseme");
+			string viseme = "";
+			if (visemeAttr)
+				viseme = visemeAttr->value();
+
+			rapidxml::xml_attribute<>* artiulationAttr = node->first_attribute("articulation");
+			string articulation = "";
+			if (artiulationAttr)
+				articulation = artiulationAttr->value();
+
+			rapidxml::xml_attribute<>* startAttr = node->first_attribute("start");
+			string start = "";
+			if (startAttr)
+				start = startAttr->value();
+
+
+			rapidxml::xml_attribute<>* readyAttr = node->first_attribute("start");
+			string ready = "";
+			if (readyAttr)
+				ready = readyAttr->value();
+
+
+			rapidxml::xml_attribute<>* relaxAttr = node->first_attribute("relax");
+			string relax = "";
+			if (relaxAttr)
+				relax = relaxAttr->value();
+
+			rapidxml::xml_attribute<>* endAttr = node->first_attribute("end");
+			string end = "";
+			if (endAttr)
+				end = endAttr->value();
+
+			//		  m_speechRequestInfo[ m_requestIdCounter ].visemeData.push_back( VisemeData( viseme.c_str(), (float)atof( articulation.c_str() ), (float)atof( start.c_str() ) ) );
+			//		  m_speechRequestInfo[ m_requestIdCounter ].visemeData.push_back( VisemeData( viseme.c_str(), 0.0f,                                (float)atof( end.c_str() ) ) );
+
+			float startTime = (float)atof( start.c_str() );
+			float endTime = (float)atof( end.c_str() );
+			float readyTime = (float)atof( ready.c_str() );
+			float relaxTime = (float)atof( relax.c_str() );		  
+			float rampIn = readyTime - startTime;
+			if (rampIn <= 0.0f)
+				rampIn = 0.1f;
+			float rampOut = endTime - relaxTime;
+			if (rampOut <= 0.0f)
+				rampOut = 0.1f;
+
+			float weight = (float) atof( articulation.c_str());
+			weight *= character->get_viseme_magnitude();
+			VisemeData* curViseme = new VisemeData(viseme, weight, startTime,  endTime - startTime, rampIn, rampOut);
+
+			if (visemeData.size() > 0)
+			{
+				//VisemeData& prevViseme = visemeData.back();
+				VisemeData& prevViseme = visemeData.back();
+				//float blendTime = startTime - prevViseme.time();
+				//if (blendTime <= 0.1f)
+				//  blendTime = .1f;
+				//prevViseme.setRampout(blendTime);
+				//prevViseme.setDuration(prevViseme.rampin() + prevViseme.rampout());
+				//rampIn = blendTime;
+				if (character && !character->isVisemePlateau())
+				{
+					VisemeData& prevViseme = visemeData.back();
+					float blendTime = (startTime - prevViseme.time());
+					if (blendTime <= .1f)
+						blendTime = .1f;
+					curViseme->rampin(blendTime);
+					prevViseme.rampout(blendTime);
+					prevViseme.setDuration(prevViseme.rampin() + prevViseme.rampout());
+				} 
+				else  
+				{
+					float blendIval = (startTime - prevViseme.time());
+					if (blendIval <= .1f)
+						blendIval = .1f;
+					curViseme->rampin( blendIval * 0.5f );
+					prevViseme.rampout( blendIval * 0.5f );
+					if (visemeData.size() > 1)
+					{
+						VisemeData& prevPrevViseme = visemeData[visemeData.size() - 2];
+					}
+					prevViseme.setDuration( 1.5f * ( prevViseme.rampin() + prevViseme.rampout() ) );
+				}
+			}
+
+			visemeData.push_back((*curViseme));
+
+			node = node->next_sibling("lips");
+		}
+
+		if (visemeData.size() > 0)
+		{
+			if (visemeData.size() > 1)
+			{
+				// set the blend in duration for the first viseme
+				VisemeData& firstViseme = visemeData[0];
+				// set the blend out duration for the last viseme
+				VisemeData& lastViseme = visemeData[visemeData.size() - 1];
+				if (character && !character->isVisemePlateau())
+				{
+					firstViseme.rampin(firstViseme.rampout());
+					firstViseme.setDuration(firstViseme.rampin() + firstViseme.rampout());
+
+					lastViseme.rampout(lastViseme.rampin());
+					lastViseme.setDuration(lastViseme.rampin() + lastViseme.rampout());
+				} 
+				else 
+				{
+					firstViseme.rampin(firstViseme.rampout());
+					firstViseme.setDuration(1.5f * (firstViseme.rampin() + firstViseme.rampout()));
+
+					lastViseme.rampout(lastViseme.rampin());
+					lastViseme.setDuration( 1.5f * ( lastViseme.rampin() + lastViseme.rampout()));
+				}
+			}
+			else
+			{
+				visemeData[0].setRampin(.1f);
+				visemeData[0].setRampout(.1f);
+				visemeData[0].setDuration(visemeData[0].rampin() + visemeData[0].rampout());
+			}
+		}
+	}
+
+   if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
+   {
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", filename );
+      //return 0;
+   }
+
+}
+	
+void AudioFileSpeech::ReadSpeechTimingFast( const char * filename, std::map< std::string, float > & timeMarkers ){
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.mark("requestSpeechAudioFast", 0, "sync");
+	m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.clear();
+
+	rapidxml::xml_document<> bmldoc;
+	rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
+	rapidxml::xml_node<>* speechnode = bmlnode->first_node("speech");
+	if (speechnode)
+	{
+		rapidxml::xml_node<>* textNode = speechnode->first_node("text");
+		if (textNode)
+		{
+			rapidxml::xml_node<>* syncNode = textNode->first_node("sync");
+			while (syncNode)
+			{
+				rapidxml::xml_attribute<>* idAttr = syncNode->first_attribute("id");
+				string id = "";
+				if (idAttr)
+					id = idAttr->value();
+
+				rapidxml::xml_attribute<>* timeAttr = syncNode->first_attribute("time");
+				string time = "";
+				if (timeAttr)
+					time = timeAttr->value();
+
+				 m_speechRequestInfo[ m_requestIdCounter ].timeMarkers[ id ] = (float)atof( time.c_str() );
+				 syncNode = syncNode->next_sibling("sync");
+
+			}
+		}
+	}
 }
