@@ -1461,7 +1461,9 @@ void initPython(std::string pythonLibPath)
 	Py_SetProgramName("/sdcard/sbmmedia/python/");
 #else
 	Py_SetProgramName("../../../../core/smartbody/Python26/");
+#ifdef WIN32
 	Py_SetPythonHome((char*)pythonHome.c_str());
+#endif
 #endif	
 	Py_Initialize();
 	
@@ -1471,7 +1473,7 @@ void initPython(std::string pythonLibPath)
 	
 		PyRun_SimpleString("import sys");
 
-		/*
+#ifndef WIN32
 		// set the proper python path
 		std::stringstream strstr;
 		strstr << "sys.path.append(\"";
@@ -1496,7 +1498,7 @@ void initPython(std::string pythonLibPath)
 		strstr << pythonDLLPath;
 		strstr << "\");";
 		PyRun_SimpleString(strstr.str().c_str());
-		*/
+#endif
 
 		SmartBody::initSmartBody();
 
