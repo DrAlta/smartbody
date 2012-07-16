@@ -31,3 +31,42 @@ public:
 	virtual void getMotionParameter(BodyMotionInterface* motion, dVector& outPara);
 	virtual void getMotionFrameParameter(BodyMotionInterface* motion, float refTime, dVector& outPara);	
 };
+
+class LocomotionParameter : public MotionParameter
+{
+protected:
+	std::string baseJointName;	
+public:
+	LocomotionParameter(SkSkeleton* skel, std::vector<SkJoint*>& joints, const std::string& baseName);
+	~LocomotionParameter();
+
+	virtual void getPoseParameter(const BodyMotionFrame& frame, dVector& outPara);
+	virtual void getMotionFrameParameter(BodyMotionInterface* motion, float refTime, dVector& outPara);
+	virtual void getMotionParameter(BodyMotionInterface* motion, dVector& outPara);	
+
+protected:
+	float getMotionSpeed( BodyMotionInterface* motion, const std::string& jointName);
+	float getMotionAngularSpeed( BodyMotionInterface* motion, const std::string& jointName);
+	float getMotionSpeedAxis( BodyMotionInterface* motion, const std::string& axis, const std::string& jointName);
+
+};
+
+class JumpParameter : public MotionParameter
+{
+protected:
+	std::string baseJointName;	
+public:
+	JumpParameter(SkSkeleton* skel, std::vector<SkJoint*>& joints, const std::string& baseName);
+	~JumpParameter();
+
+	virtual void getPoseParameter(const BodyMotionFrame& frame, dVector& outPara);
+	virtual void getMotionFrameParameter(BodyMotionInterface* motion, float refTime, dVector& outPara);
+	virtual void getMotionParameter(BodyMotionInterface* motion, dVector& outPara);	
+
+protected:
+	float getMotionHeight( BodyMotionInterface* motion, const std::string& jointName);
+	float getMotionDirection( BodyMotionInterface* motion, const std::string& jointName);
+	float getMotionXZDistance( BodyMotionInterface* motion, const std::string& jointName);
+
+};
+

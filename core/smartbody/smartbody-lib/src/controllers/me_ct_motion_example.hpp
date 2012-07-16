@@ -43,6 +43,8 @@ public:
 public:	
 	virtual void getMotionParameter(dVector& outPara);	
 	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame) = 0;
+	virtual SrVec getMotionBaseTranslation(float time, const std::string& baseName) { return SrVec(); }
+	virtual SrQuat getMotionBaseRotation(float time, const std::string& baseName) { return SrQuat(); }
 	
 	virtual double strokeEmphasisTime() = 0;
 	virtual double motionDuration(DurationType durType) = 0;
@@ -62,6 +64,8 @@ public:
 	virtual ~BodyMotion();
 	virtual double strokeEmphasisTime();
 	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame);
+	virtual SrVec getMotionBaseTranslation(float time, const std::string& baseName);
+	virtual SrQuat getMotionBaseRotation(float time, const std::string& baseName);
 	virtual double motionDuration(DurationType durType);	
 	virtual double motionPercent(float time);
 	virtual double getRefDeltaTime(float u, float dt);	
@@ -115,6 +119,8 @@ public:
 
 	virtual double strokeEmphasisTime();
 	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame);
+	virtual SrVec getMotionBaseTranslation(float time, const std::string& baseName);
+	virtual SrQuat getMotionBaseRotation(float time, const std::string& baseName);
 	virtual double motionDuration(DurationType durType);	
 	virtual void getExampleParameter(dVector& outPara);
 	virtual double motionPercent(float time);
@@ -171,6 +177,7 @@ public:
 	// blend multiple motion examples according to the blending weights. A set of joint quats ( based on affected joints ) are returned at the given ref time 
 	double blendMotion(float time, const VecOfInterpWeight& blendWeight, BodyMotionFrame& outMotionFrame);
 	virtual InterpolationExample* createPseudoExample();
+	MotionExample* getMotionExample(const std::string& motionName);
 	
 public:
 	static double blendMotionFunc(float time, SkSkeleton* skel, const vector<SkJoint*>& joints, const VecOfBodyMotionPtr& motions, 

@@ -17,6 +17,7 @@ class SBAnimationBlend : public PABlend
 
 		virtual int getNumMotions();
 		virtual std::string getMotion(int num);
+		SkMotion* getSkMotion(const std::string& motionName);
 		virtual int getNumCorrespondencePoints();
 		virtual std::vector<double> getCorrespondencePoints(int num);
 		virtual void setCorrespondencePoints(int motionIndex, int pointIndex, double value);

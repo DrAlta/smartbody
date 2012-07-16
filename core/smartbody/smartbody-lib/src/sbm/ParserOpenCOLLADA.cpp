@@ -278,7 +278,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 			DOMNode* tempMaterialNode = ParserOpenCOLLADA::getNode("bind_material", childNode);
 			if (typeNode)
 				xml_utils::xml_translate(&typeAttr, typeNode->getNodeValue());
-			if (typeAttr == "JOINT" || (nameAttr.find("Bip") != std::string::npos && skeleton.root() == NULL) )
+			if (typeAttr == "JOINT" || (nameAttr.find("Bip")!= std::string::npos && skeleton.root() == NULL) )
 			{
 				int index = -1;
 				if (parent != NULL)	

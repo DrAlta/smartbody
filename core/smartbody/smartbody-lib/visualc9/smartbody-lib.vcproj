@@ -1735,6 +1735,26 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="motionblend"
+				>
+				<File
+					RelativePath="..\src\controllers\me_ct_motion_blend.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\controllers\me_ct_motion_blend.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\controllers\MeCtBlendEngine.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\controllers\MeCtBlendEngine.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="BML"
@@ -2373,6 +2393,14 @@
 			</File>
 			<File
 				RelativePath="..\src\sr\sr_sn.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sr\sr_sn_colorsurf.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sr\sr_sn_colorsurf.h"
 				>
 			</File>
 			<File
@@ -3821,6 +3849,14 @@
 			</File>
 			<File
 				RelativePath="..\src\sb\SBMotion.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBMotionBlendBase.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBMotionBlendBase.h"
 				>
 			</File>
 			<File

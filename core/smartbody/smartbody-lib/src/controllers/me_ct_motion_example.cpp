@@ -98,6 +98,47 @@ void BodyMotion::updateRootOffset(SkSkeleton* skel, SkJoint* rootJoint)
 	rootOffset.set(rootJoint->pos()->value());	
 }
 
+SrVec BodyMotion::getMotionBaseTranslation( float time, const std::string& baseName )
+{
+	double rt = timeWarp->timeWarp(time);
+	int idxFrame = (int)(rt/motion->duration()*motion->frames());
+	if (idxFrame >= motion->frames()) idxFrame = motion->frames()-1;
+	float *fp = motion->posture(idxFrame);
+	SkChannelArray& chans = motion->channels();
+	SrVec pos;
+	for (int i=0;i<3;i++)
+	{
+		int chanIdx = chans.search(baseName, SkChannel::Type(SkChannel::XPos + i));
+		int floatIdx = chans.float_position(chanIdx);
+		if (floatIdx >= 0)
+		{
+			pos[i] = fp[floatIdx];
+		}
+	}		
+	return pos;	
+}
+
+SrQuat BodyMotion::getMotionBaseRotation( float time, const std::string& baseName )
+{
+	double rt = timeWarp->timeWarp(time);
+	int idxFrame = (int)(rt/motion->duration()*motion->frames());
+	if (idxFrame >= motion->frames()) idxFrame = motion->frames()-1;
+	float *fp = motion->posture(idxFrame);
+	SkChannelArray& chans = motion->channels();
+	SrQuat rot;
+	int chanIdx = chans.search(baseName, SkChannel::Quat);
+	int floatIdx = chans.float_position(chanIdx);
+	if (floatIdx >= 0)
+	{
+		rot.w = fp[floatIdx+0];
+		rot.x = fp[floatIdx+1];
+		rot.y = fp[floatIdx+2];
+		rot.z = fp[floatIdx+3];
+	}			
+	return rot;	
+}
+
+
 double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame )
 {
 	// Because the SkMotion stored its joint quats in an indirect way, it is not straightforward to grab corresponding quats we need.
@@ -196,6 +237,58 @@ double ResampleMotion::getMotionFrame( float time, SkSkeleton* skel, const vecto
 {
 	// use blended weights to get the motion frame
 	return MotionExampleSet::blendMotionFunc(time,skel,affectedJoints,*motionDataRef,weight,outMotionFrame);	
+}
+
+SrVec ResampleMotion::getMotionBaseTranslation( float time, const std::string& baseName )
+{
+	SrVec basePos = SrVec(0.f,0.f,0.f);
+	VecOfBodyMotionPtr& motions = *motionDataRef;
+	for (unsigned int i=0;i<weight.size();i++)
+	{
+		int idx = weight[i].first;
+		float w = weight[i].second;
+		BodyMotionInterface* motion = motions[idx];
+		basePos += motion->getMotionBaseTranslation(time, baseName)*w;
+	}
+	return basePos;		
+}
+
+SrQuat ResampleMotion::getMotionBaseRotation( float time, const std::string& baseName )
+{
+	// 	SrQuat baseRot = SrQuat(0.f,0.f,0.f,0.f);
+	// 	VecOfBodyMotionPtr& motions = *motionDataRef;
+	// 	for (unsigned int i=0;i<weight.size();i++)
+	// 	{
+	// 		int idx = weight[i].first;
+	// 		float w = weight[i].second;
+	// 		BodyMotionInterface* motion = motions[idx];
+	// 		//baseRot = baseRot + motion->getMotionBaseRotation(time, baseName)*w;
+	// 	}
+	// 	baseRot.normalize();
+
+	VecOfBodyMotionPtr& motions = *motionDataRef;
+	int idx = weight[0].first;
+	double newTime = 0.0;
+	float weightSum = weight[0].second;
+	BodyMotionInterface* ex = motions[idx];
+	float w1,w2;	
+	SrQuat outQuat = ex->getMotionBaseRotation(time,baseName);
+	for (unsigned int i=1;i<weight.size();i++)
+	{
+		w1 = weightSum;
+		w2 = weight[i].second;
+		weightSum += w2;
+		idx = weight[i].first;
+		if (weightSum == 0.f)
+			continue;
+
+		float weight = w2/weightSum;
+		float oneMinusWeight = 1.f - weight;
+		BodyMotionInterface* motion = motions[idx];
+		outQuat = slerp(outQuat,motion->getMotionBaseRotation(time, baseName), weight);
+		outQuat.normalize();
+	}	
+	return outQuat;	
 }
 
 double ResampleMotion::motionDuration(DurationType durType)
@@ -426,6 +519,18 @@ MotionExampleSet::~MotionExampleSet()
 	}
 	motionExamples.clear();
 }
+
+MotionExample* MotionExampleSet::getMotionExample( const std::string& motionName )
+{
+	for (unsigned int i=0;i<motionExamples.size();i++)
+	{
+		MotionExample* ex = motionExamples[i];
+		if (ex->motion->getName() == motionName)
+			return ex;
+	}
+	return NULL;
+}
+
 
 
 InterpolationExample* MotionExampleSet::createPseudoExample()

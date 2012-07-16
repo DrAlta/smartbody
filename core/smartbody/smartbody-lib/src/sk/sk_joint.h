@@ -245,6 +245,10 @@ public:
 	the transformation from the root to the children of this joint */
 	const SrMat& gmat () const { return _gmat; }
 
+	/*! Returns the translation encoded in the current global matrix.
+	Be sure that the global matrix is up to date */
+	SrVec gcenter () const { return _gmat.get_translation(); }
+
 	/*! Get a single visualization model for this node and all the
 	children (update_gmat) is called */
 	void unite_visgeo ( SrModel& m );

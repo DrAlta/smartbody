@@ -131,6 +131,7 @@ class PABlend
 
 		int type;
 		//std::vector<std::string> motionNames;
+		std::vector<SrVec> pseudoParameters;
 		std::vector<SrVec> parameters;
 		SrVec parameterScale;
 		SrVec invParameterScale;

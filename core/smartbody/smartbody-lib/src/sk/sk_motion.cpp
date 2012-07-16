@@ -957,6 +957,137 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 }
 
 
+SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints, std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJoints )
+{
+	SkChannelArray& mchan_arr = this->channels();
+	SkSkeleton* interSk = new SkSkeleton(targetSk); // copy for an intermediate skeleton
+	SkSkeleton* tempSrcSk = new SkSkeleton(sourceSk);
+
+	// update the global matrices
+	tempSrcSk->invalidate_global_matrices();
+	tempSrcSk->update_global_matrices();
+	interSk->invalidate_global_matrices();
+	interSk->update_global_matrices();	
+
+	SkMotion *retarget_p = new SmartBody::SBMotion();
+	srSynchPoints sp(synch_points);
+	retarget_p->synch_points = sp;
+	retarget_p->init( mchan_arr ); // use the target channels instead
+	int num_f = this->frames();
+
+	this->connect(tempSrcSk);
+	for (int i = 0; i < num_f; i++)
+	{
+		std::map<std::string, SrQuat> jointRotationMap;
+		std::map<std::string, SrMat> jointPreRot;
+		std::map<std::string, SrVec> jointPosMap;
+		std::queue<std::string> jointQueues;
+		std::string rootName = "base";
+		jointQueues.push(rootName);	
+
+		float *ref_p = this->posture( i );
+		// clean up intermediate skeleton
+		for (unsigned int j=0;j<interSk->joints().size();j++)
+		{
+			SkJoint* joint = interSk->joints()[j];			
+			SrQuat offsetQuat;
+			if (offsetJoints.find(joint->name()) != offsetJoints.end())
+			{
+				SrVec offsetRot = offsetJoints[joint->name()];
+				offsetQuat = SrQuat(offsetRot*srDEGRAD);					
+			}
+			joint->quat()->value(offsetQuat);
+		}
+		this->apply_frame(i);		
+
+		while (!jointQueues.empty())
+		{
+			std::string pjointName = jointQueues.front();
+			jointQueues.pop();		
+			SkJoint* srcJoint = tempSrcSk->search_joint(pjointName.c_str());
+			SkJoint* targetJoint = interSk->search_joint(pjointName.c_str());
+			bool isRelativeJoint = false;
+			if (pjointName == rootName || std::find(relativeJoints.begin(),relativeJoints.end(), pjointName) != relativeJoints.end())
+				isRelativeJoint = true;
+			if ( isRelativeJoint && srcJoint && targetJoint) // directly copy over the root joint rotation
+			{
+				int chanID = mchan_arr.search(pjointName, SkChannel::Quat);
+				int index = mchan_arr.float_position(chanID);
+				SrMat rotMap = srcJoint->gmatZero()*targetJoint->gmatZero().inverse();
+				rotMap = rotMap.get_rotation();
+				SrQuat refQuat = SrQuat(ref_p[index],ref_p[index+1],ref_p[index+2],ref_p[index+3]);
+				SrVec refAA = refQuat.axisAngle()*rotMap;
+				jointRotationMap[pjointName] = SrQuat(refAA);
+				jointPreRot[pjointName] = rotMap;
+				for (int i=0;i<targetJoint->num_children();i++)
+				{
+					jointQueues.push(targetJoint->child(i)->name());
+				}
+
+				int posChanID = mchan_arr.search(pjointName, SkChannel::XPos);
+				if (posChanID != -1)
+				{
+					int posIndex = mchan_arr.float_position(posChanID);
+					SrVec pos;
+					for (int k=0;k<3;k++)
+					{
+						pos[k] = ref_p[posIndex+k];
+					}
+					pos = pos*rotMap;					
+					jointPosMap[pjointName] = pos;
+				}
+			}
+			else
+			{
+				convertBoneOrientation(pjointName, interSk, tempSrcSk, jointQueues, jointRotationMap, endJoints);								
+				SkJoint* pjoint = interSk->search_joint(pjointName.c_str());
+				for (int i=0; i< pjoint->num_children(); i++)
+				{
+					SkJoint* child = pjoint->child(i);
+					jointQueues.push(child->name());
+				}
+			}			
+		}
+
+
+		retarget_p->insert_frame(i, this->keytime(i));				
+		float *new_p = retarget_p->posture( i );		
+		//tempSrcSk.update_global_matrices(); // update global values for the temp source skeleton
+		for (int k=0;k<mchan_arr.size();k++)
+		{
+			SkChannel& chan = mchan_arr[k];
+			const std::string& jointName = mchan_arr.name(k);
+			SrQuat jointRot;	
+			SrMat prerot;
+			if (jointRotationMap.find(jointName) != jointRotationMap.end())
+				jointRot = jointRotationMap[jointName];
+
+			int index = mchan_arr.float_position(k);
+			if (chan.type == SkChannel::Quat)
+			{				
+				SrQuat final_q = jointRot;
+				new_p[ index + 0 ] = (float)final_q.w;
+				new_p[ index + 1 ] = (float)final_q.x;
+				new_p[ index + 2 ] = (float)final_q.y;
+				new_p[ index + 3 ] = (float)final_q.z;
+			}	
+			else if (chan.type == SkChannel::XPos || chan.type == SkChannel::YPos || chan.type == SkChannel::ZPos)
+			{
+				// just copy over the translation for now
+				float chanValue = ref_p[ index ];				
+				new_p[ index ] = chanValue;
+				// 				if (jointPosMap.find(jointName) != jointPosMap.end())
+				// 				{
+				// 					SrVec pos = jointPosMap[jointName];
+				// 					new_p[index] = pos[chan.type - SkChannel::XPos];
+				// 				}
+			}
+		}	
+	}
+	this->disconnect();
+	return retarget_p;
+}
+
 
 SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints, 
 										 std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJoints )
@@ -1097,7 +1228,6 @@ SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targe
 	}
 	this->disconnect();
 	return retarget_p;
-
 }
 
 
