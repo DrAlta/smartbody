@@ -21,6 +21,10 @@ std::map< int, std::vector<SBM_CallbackInfo*> > g_ChannelCallbackInfo;
 
 LogMessageCallback LogMessageFunc = NULL;
 
+
+void DeleteCallbacks(SBMHANDLE sbmHandle, std::map< int, std::vector<SBM_CallbackInfo*> >& callbackData);
+
+
 class LogMessageListener : public vhcl::Log::Listener
 {
 public:
