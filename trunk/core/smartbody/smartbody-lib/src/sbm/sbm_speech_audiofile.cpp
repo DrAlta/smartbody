@@ -753,7 +753,7 @@ std::map< RequestId, AudioFileSpeech::SpeechRequestInfo >& AudioFileSpeech::getS
 }
 
 
-void AudioFileSpeech::ReadVisemeDataBMLFast(std::vector< VisemeData > & visemeData, const SbmCharacter* character, rapidxml::xml_document<>& bmldoc)
+void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector< VisemeData > & visemeData, const SbmCharacter* character, rapidxml::xml_document<>& bmldoc)
 {
 	//////////////////////////////////
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -955,7 +955,8 @@ void AudioFileSpeech::ReadVisemeDataBMLFast(std::vector< VisemeData > & visemeDa
 
 }
 	
-void AudioFileSpeech::ReadSpeechTimingFast(std::map< std::string, float > & timeMarkers, rapidxml::xml_document<>& bmldoc ){
+void AudioFileSpeech::ReadSpeechTimingFast( const char * filename, std::map< std::string, float > & timeMarkers, rapidxml::xml_document<>& bmldoc)
+{
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.mark("requestSpeechAudioFast", 0, "sync");
 	m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.clear();
