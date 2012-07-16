@@ -28,7 +28,7 @@
 #include <map>
 
 #include "sbm/sbm_speech.hpp"
-
+#include "rapidxml.hpp"
 
 namespace SmartBody
 {
@@ -79,8 +79,8 @@ class AudioFileSpeech : public SpeechInterface
       virtual void ReadVisemeDataBML( const char * filename, std::vector< VisemeData > & visemeData, const SbmCharacter* character );
 //      virtual void ReadSpeechTiming( const char * filename, stdext::hash_map< std::string, float > & timeMarkers );
       virtual void ReadSpeechTiming( const char * filename, std::map< std::string, float > & timeMarkers );
-	  virtual void ReadSpeechTimingFast( const char * filename, std::map< std::string, float > & timeMarkers );
-	  virtual void ReadVisemeDataBMLFast( const char * filename, std::vector< VisemeData > & visemeData, const SbmCharacter* character );
+	  virtual void ReadSpeechTimingFast(std::map< std::string, float > & timeMarkers, rapidxml::xml_document<>& bmlDoc);
+	  virtual void ReadVisemeDataBMLFast(std::vector< VisemeData > & visemeData, const SbmCharacter* character, rapidxml::xml_document<>& bmldoc);
 };
 
 };
