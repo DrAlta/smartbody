@@ -168,8 +168,6 @@ SMARTBODY_C_DLL_API int SBM_PythonCommandInt( SBMHANDLE sbmHandle,  const char *
 SMARTBODY_C_DLL_API float SBM_PythonCommandFloat( SBMHANDLE sbmHandle,  const char * command );
 SMARTBODY_C_DLL_API char* SBM_PythonCommandString( SBMHANDLE sbmHandle, const char * command, char* output, int maxLen);
 
-// helper functions
-void DeleteCallbacks(SBMHANDLE sbmHandle, std::map< int, std::vector<SBM_CallbackInfo*> >& callbackData);
 
 #ifdef __cplusplus
 }
