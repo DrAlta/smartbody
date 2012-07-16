@@ -454,8 +454,11 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 								std::string targetName = "";
 								if (targetNameString.length() > 0)
 									targetName = targetNameString.substr(1);
-								if (materialId2Name.find(targetName) == materialId2Name.end() && targetName != "")
-									materialId2Name.insert(std::make_pair(targetName, materialName));
+// 								if (materialId2Name.find(targetName) == materialId2Name.end() && targetName != "")
+// 									materialId2Name.insert(std::make_pair(targetName, materialName));
+								if (materialId2Name.find(materialName) == materialId2Name.end() && materialName != "")
+									materialId2Name.insert(std::make_pair(materialName, targetName));
+
 							}
 						}
 					}
@@ -1266,7 +1269,7 @@ std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 	return "";
 }
 
-void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::vector<SrModel*>& meshModelVec, float scale)
+void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames,std::map<std::string, std::string>& materialId2Name,  std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::vector<SrModel*>& meshModelVec, float scale)
 {
 	const DOMNodeList* list = node->getChildNodes();
 
@@ -1407,7 +1410,11 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 					DOMNode* materialNode = nodeAttr1->getNamedItem(BML::BMLDefs::ATTR_MATERIAL);
 					std::string materialName;
 					xml_utils::xml_translate(&materialName, materialNode->getNodeValue());
-					curmtl = mnames.lsearch(materialName.c_str());
+					std::string materialID = materialName;
+					if (materialId2Name.find(materialName) != materialId2Name.end())
+						materialID = materialId2Name[materialName];
+					curmtl = mnames.lsearch(materialID.c_str());
+					//curmtl = mnames.lsearch(materialName.c_str());
 					std::map<int, std::string> inputMap;
 					int pStride = 0;
 					std::vector<int> vcountList;
@@ -1690,11 +1697,11 @@ void ParserOpenCOLLADA::parseLibraryEffects(DOMNode* node, std::map<std::string,
 			std::string effectId;
 			xml_utils::xml_translate(&effectId, idNode->getNodeValue());
 			std::string materialId = effectId2MaterialId[effectId];
-			std::string materialName = materialId2Name[materialId];
+			//std::string materialName = materialId2Name[materialId];
 			SrMaterial material;
 			material.init();
 			M.push(material);
-			SrString matName(materialName.c_str());
+			SrString matName(materialId.c_str());
 			mnames.push(matName);
 
 			DOMNode* initFromNode = ParserOpenCOLLADA::getNode("init_from", node);

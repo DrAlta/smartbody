@@ -23,6 +23,7 @@
 #include "controllers/me_ct_param_animation.h"
 #include <sbm/mcontrol_util.h>
 #include <sb/SBAnimationState.h>
+#include <sb/SBMotionBlendBase.h>
 #include <sb/SBSkeleton.h>
 #include <sr/sr_euler.h>
 
@@ -289,7 +290,15 @@ void MeCtParamAnimation::schedule(PABlend* state, double x, double y, double z, 
 				}
 				else
 				{
-					LOG("Unknown state type. What is this?");
+					SmartBody::SBMotionBlendBase* blendBase = dynamic_cast<SmartBody::SBMotionBlendBase*>(state);					
+					if (blendBase)
+					{
+						state->getWeightsFromParameters(x, y, z, weights);
+					}
+					else
+					{
+						LOG("Unknown state type. What is this?");
+					}
 				}
 			}
 		}
