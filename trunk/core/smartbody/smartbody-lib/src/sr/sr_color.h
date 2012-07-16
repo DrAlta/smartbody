@@ -47,7 +47,9 @@ class SrColor
                          magenta, //!< magenta color (255,0,255)
                          cyan,    //!< cyan color (0,255,255)
                          white,   //!< white color (255,255,255)
-                         gray;    //!< gray color (127,127,127)
+                         gray,    //!< gray color (127,127,127)
+						 darkgray, //!< gray color (64,64,64)
+						 lightgray;//!< gray color (225,225,225)
  
     srbyte r; //!< r component, in {0,...,255}, default is 127
     srbyte g; //!< g component, in {0,...,255}, default is 127
@@ -97,6 +99,9 @@ class SrColor
 
     /*! Put the four components in b[], each component varying from 0 to 255. */
     void get ( srbyte b[4] ) const;
+
+	/*! Returns a color across the hue space from given parameter in [0,1] */
+	static SrColor interphue(float hue);
 
     /*! Comparison equal operator. */
     friend bool operator == ( const SrColor &c1, const SrColor &c2 );

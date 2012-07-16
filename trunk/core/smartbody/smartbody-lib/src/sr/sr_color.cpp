@@ -33,6 +33,8 @@ const SrColor SrColor::magenta(255,0,255);
 const SrColor SrColor::cyan   (0,255,255);
 const SrColor SrColor::white  (255,255,255);
 const SrColor SrColor::gray   (127,127,127);
+const SrColor SrColor::darkgray  (64,64,64);
+const SrColor SrColor::lightgray (225,225,225);
 
 //========================================= SrColor =======================================
 
@@ -125,5 +127,56 @@ SrInput& operator>> ( SrInput& in, SrColor& c )
  {
    return in >> c.r >> c.g >> c.b >> c.a;
  }
+
+SrColor SrColor::interphue(float hue) // static method
+{
+	// usisng ease-in/ease-out to generate a more linear distributed hue (optional)
+	hue = -(2.0f*(hue*hue*hue)) + (3.0f*(hue*hue));
+
+	// Calculate RGB from HSV (Hue color space). added by David Huang
+	float h = 1.0f - hue;
+	if(h > 1.0f) h = 1.0f; // input Hue is bounded between 0 and 1
+	if (h<0.0f) h=0.0f;
+	//if(h < -gstiny) return GsColor::black; // this may generate interesting result
+
+	float hsv_h, hsv_s, hsv_v, sat_r, sat_g, sat_b;
+
+	//hsv_h = h*360.0f*0.65f - 6.0f; // re-mapping hue space
+	hsv_h = h * 240.0f; // re-mapping hue space
+	hsv_s = 1.0f; hsv_v = 1.0f;
+
+	if(hsv_h < 0.0f)
+		hsv_h += 360.0f;
+	if(hsv_h > 360.0f)
+		hsv_h -= 360.0f;
+
+	if(hsv_h < 120.0f)
+	{
+		sat_r = (120.0f - hsv_h) / 60.0f;
+		sat_g = hsv_h / 60.0f;
+		sat_b = 0.0f;
+	}
+	else if(hsv_h < 240.0f)
+	{
+		sat_r = 0.0f;
+		sat_g = (240.0f - hsv_h) / 60.0f;
+		sat_b = (hsv_h - 120.0f) / 60.0f;
+	}
+	else
+	{
+		sat_r = (hsv_h - 240.0f) / 60.0f;
+		sat_g = 0.0f;
+		sat_b = (360.0f - hsv_h) / 60.0f;
+	}
+	if(sat_r > 1) sat_r = 1;
+	if(sat_g > 1) sat_g = 1;
+	if(sat_b > 1) sat_b = 1;
+
+	SrColor color;
+	color.r = (srbyte)((1.0f - hsv_s + hsv_s * sat_r) * hsv_v * 255.0f);
+	color.g = (srbyte)((1.0f - hsv_s + hsv_s * sat_g) * hsv_v * 255.0f);
+	color.b = (srbyte)((1.0f - hsv_s + hsv_s * sat_b) * hsv_v * 255.0f);
+	return color;
+} 
 
 //=================================== End of File ==========================================

@@ -183,6 +183,9 @@ const sruint sruintmax = ((sruint)0)-1; //!< the unsigned int maximum value
 /*! Macro that returns x clipped by the interval [i,s]. */
 # define SR_BOUND(x,i,s) (x)<(i)? (i): (x)>(s)? (s): (x)
 
+/*! Macro that clips x to be inside the interval [i,s]. */
+# define SR_CLIP(x,i,s) if(x<i)x=i; else if(x>s)x=s
+
 /*! Macro that forces a to be positive by negating it if it is negative. */
 # define SR_POS(a) if((a)<0) a=-(a)
 

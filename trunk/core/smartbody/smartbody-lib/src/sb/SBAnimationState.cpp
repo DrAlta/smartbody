@@ -460,6 +460,19 @@ std::string SBAnimationBlend::saveToString()
 	return strstr.str();
 }
 
+SkMotion* SBAnimationBlend::getSkMotion( const std::string& motionName )
+{
+	for(int i=0; i<getNumMotions(); i++)
+	{
+		SkMotion* m = motions[i];
+		if (m->getName() == motionName)
+			return m;
+	}
+	// not found!
+	LOG("Error: SBAnimationBlend::getSkMotion(): %s doesn't exist", motionName.c_str());
+	return 0;
+}
+
 SBAnimationBlend0D::SBAnimationBlend0D() : SBAnimationBlend("unknown")
 {
 }
