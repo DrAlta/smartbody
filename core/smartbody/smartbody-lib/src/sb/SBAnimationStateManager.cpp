@@ -1,6 +1,7 @@
 #include "SBAnimationStateManager.h"
 #include <sbm/mcontrol_util.h>
 #include <sb/SBAnimationState.h>
+#include <sb/SBMotionBlendBase.h>
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBCharacter.h>
 
@@ -80,6 +81,15 @@ SBAnimationBlend3D* SBAnimationBlendManager::createBlend3D(const std::string& na
 	SBAnimationBlend3D* blend = new SBAnimationBlend3D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	addBlendToGraph(name);
+	mcu.addPABlend(blend);
+	return blend;
+}
+
+SBMotionBlendBase* SBAnimationBlendManager::createMotionBlendBase( const std::string& name, const std::string& skelName, int dimension )
+{
+	SBMotionBlendBase* blend = new SBMotionBlendBase(name,skelName, dimension);
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	//	addBlendToGraph(name);
 	mcu.addPABlend(blend);
 	return blend;
 }

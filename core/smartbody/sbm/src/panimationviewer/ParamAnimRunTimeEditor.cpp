@@ -102,9 +102,9 @@ void PARunTimeEditor::update()
 				{
 					float x = 0.0f, y = 0.0f, z = 0.0f;
 					curStateData->state->getParametersFromWeights(x, y, z, curStateData->weights);
-					paramGroup->xAxis->value(x);
-					paramGroup->yAxis->value(y);
-					paramGroup->zAxis->value(z);
+// 					paramGroup->xAxis->value(x);
+// 					paramGroup->yAxis->value(y);
+// 					paramGroup->zAxis->value(z);
 					paramGroup->param3DVisualization->redraw();
 				}
 			}

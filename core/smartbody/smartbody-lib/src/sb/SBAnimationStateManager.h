@@ -17,6 +17,7 @@ class SBAnimationBlend0D;
 class SBAnimationBlend1D;
 class SBAnimationBlend2D;
 class SBAnimationBlend3D;
+class SBMotionBlendBase;
 
 class SBAnimationTransition;
 
@@ -36,6 +37,7 @@ class SBAnimationBlendManager
 		SBAnimationBlend1D* createBlend1D(const std::string& name);
 		SBAnimationBlend2D* createBlend2D(const std::string& name);
 		SBAnimationBlend3D* createBlend3D(const std::string& name);
+		SBMotionBlendBase*  createMotionBlendBase(const std::string& name, const std::string& skelName, int dimension);
 		SBAnimationTransition* createTransition(const std::string& source, const std::string& dest);
 
 		SBAnimationBlend* getBlend(const std::string&name);

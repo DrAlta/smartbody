@@ -1955,7 +1955,7 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p
 			}
 
 			// parsing geometry
-			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f);
+			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f);
 
 			float factor = 1.0f;
 			for (unsigned int i = 0; i < meshModelVec.size(); i++)
@@ -2083,7 +2083,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 			}
 
 			// parsing geometry
-			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f); 
+			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames,  materialId2Name, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f); 
 		}
 		else
 		{

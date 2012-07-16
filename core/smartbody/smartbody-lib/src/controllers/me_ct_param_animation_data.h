@@ -61,12 +61,12 @@ class PABlend
 		PABlend(const std::string& name);
 		~PABlend();
 
-		bool getWeightsFromParameters(double x, std::vector<double>& weights);
-		bool getWeightsFromParameters(double x, double y, std::vector<double>& weights);
-		bool getWeightsFromParameters(double x, double y, double z, std::vector<double>& weights);
-		void getParametersFromWeights(float& x, std::vector<double>& weights);
-		void getParametersFromWeights(float& x, float& y, std::vector<double>& weights);
-		void getParametersFromWeights(float& x, float& y, float& z, std::vector<double>& weights);
+		virtual bool getWeightsFromParameters(double x, std::vector<double>& weights);
+		virtual bool getWeightsFromParameters(double x, double y, std::vector<double>& weights);
+		virtual bool getWeightsFromParameters(double x, double y, double z, std::vector<double>& weights);
+		virtual void getParametersFromWeights(float& x, std::vector<double>& weights);
+		virtual void getParametersFromWeights(float& x, float& y, std::vector<double>& weights);
+		virtual void getParametersFromWeights(float& x, float& y, float& z, std::vector<double>& weights);
 		void setParameter(const std::string& motion, double x);
 		void setParameter(const std::string& motion, double x, double y);
 		void setParameter(const std::string& motion, double x, double y, double z);

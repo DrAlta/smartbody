@@ -14,6 +14,7 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBBmlProcessor.h>
 #include <sb/SBAnimationState.h>
+#include <sb/SBMotionBlendBase.h>
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBSteerManager.h>
@@ -854,6 +855,22 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("addTetrahedron", &SBAnimationBlend3D::addTetrahedron, "Add tetrahedrons to the state. By changing the point inside tetrahedron, you can get different blending weights and different results")
 	;
 
+	boost::python::class_<SBMotionBlendBase, boost::python::bases<SBAnimationBlend> >("SBMotionBlendBase")
+		.def("addMotion", &SBMotionBlendBase::addMotion, "Add motion and its parameters to animation state. \n Input: motion name, vector of parameters. \n Output: NULL")
+		.def("setParameter", &SBMotionBlendBase::setMotionParameter, "Set/Change the parameter for given motion. \n Input: motion name, vector of parameters. \n Output: NULL")
+		.def("getParameter", &SBMotionBlendBase::getMotionParameter, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the parameter of a given motion")
+		.def("buildBlendBase", &SBMotionBlendBase::buildBlendBase, "Initialize BlendBase. \n Input : Motion Parameter Name, Interpolator Type \n Output: NULL")
+		.def("buildVisSurfaces", &SBMotionBlendBase::buildVisSurfaces, "Build a visualization surface. \n Input : Error Type, Surface Type, Num of Segements, Grid Resolutions \n Output: NULL")
+		.def("addTetrahedron", &SBMotionBlendBase::addTetrahedron, "Add tetrahedrons to the state. By changing the point inside tetrahedron, you can get different blending weights and different results")
+		.def("createMotionVectorFlow", &SBMotionBlendBase::createMotionVectorFlow, "create Vector Flow visualization. \n Input: motion name. \n Output: NULL")
+		.def("clearMotionVectorFlow", &SBMotionBlendBase::clearMotionVectorFlow, "clear Vector Flow visualization. \n Input: NULL. \n Output: NULL")
+		.def("plotMotion", &SBMotionBlendBase::plotMotion, "Plot motion frames with stick skeleton. \n Input: motion name, intervals, ifClearAll \n Output: NULL")
+		.def("plotMotionFrameTime", &SBMotionBlendBase::plotMotionFrameTime, "Plot one single motion frame (at given time) with stick skeleton. \n Input: motion name, time, ifClearAll \n Output: NULL")
+		.def("plotMotionJointTrajectory", &SBMotionBlendBase::plotMotionJointTrajectory, "Plot joint trajectory over entire motion (at given time). \n Input: motion name, jointName, ifClearAll \n Output: NULL")
+		.def("clearPlotMotion", &SBMotionBlendBase::clearPlotMotion, "clear Plotted motions. \n Input: NULL. \n Output: NULL")
+		;
+
+
 	boost::python::class_<SBAnimationTransition>("SBAnimationTransition")
 		.def("set", &SBAnimationTransition::set, "")
 		.def("setSourceState", &SBAnimationTransition::setSourceBlend, "")
@@ -884,6 +901,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("createBlend1D", &SBAnimationBlendManager::createBlend1D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 1D blend.")
 		.def("createBlend2D", &SBAnimationBlendManager::createBlend2D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 2D blend.")
 		.def("createBlend3D", &SBAnimationBlendManager::createBlend3D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 3D blend.")
+		.def("createMotionBlendBase", &SBAnimationBlendManager::createMotionBlendBase, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a motion blend base.")
 		.def("createTransition", &SBAnimationBlendManager::createTransition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a transition.")
 		.def("getState", &SBAnimationBlendManager::getBlend, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a blend of a given name.")
 		.def("getBlend", &SBAnimationBlendManager::getBlend, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a blend of a given name.")
