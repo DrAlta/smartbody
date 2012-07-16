@@ -25,7 +25,6 @@
 #include "sbm_speech_audiofile.hpp"
 #include "sbm/BMLDefs.h"
 #include "sbm/mcontrol_util.h"
-#include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 #include <fstream>
 
@@ -181,17 +180,17 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 
 	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.native_directory_string().c_str();
 
-   mcu.mark("requestSpeechAudio", 0, "lips");
-   ReadVisemeDataBMLFast( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
+   mcu.mark("requestSpeechAudioFast", 0, "lips");
+   ReadVisemeDataBMLFast( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent, bmldoc );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
-	  mcu.mark("requestSpeechAudio");
+	  mcu.mark("requestSpeechAudioFast");
       return 0;
    }
 
-   mcu.mark("requestSpeechAudio", 0, "sync");
-   ReadSpeechTiming( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
+   mcu.mark("requestSpeechAudioFast", 0, "sync");
+   ReadSpeechTimingFast( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers, bmldoc );
    if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.native_directory_string().c_str() );
@@ -754,19 +753,13 @@ std::map< RequestId, AudioFileSpeech::SpeechRequestInfo >& AudioFileSpeech::getS
 }
 
 
-void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector< VisemeData > & visemeData, const SbmCharacter* character )
+void AudioFileSpeech::ReadVisemeDataBMLFast(std::vector< VisemeData > & visemeData, const SbmCharacter* character, rapidxml::xml_document<>& bmldoc)
 {
 	//////////////////////////////////
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	//ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
 	m_speechRequestInfo[ m_requestIdCounter ].visemeData.clear();
 
-	mcu.mark("requestSpeechAudioFast", 0, "lips");
-	rapidxml::file<char> bmlFile(filename);
-	mcu.mark("requestSpeechAudioFast", 0, "fileconstruction");
-	rapidxml::xml_document<> bmldoc;
-	mcu.mark("requestSpeechAudioFast", 0, "parse");
-	bmldoc.parse< rapidxml::parse_declaration_node>(bmlFile.data());
 
 	mcu.mark("requestSpeechAudioFast", 0, "traverse");
 
@@ -962,12 +955,12 @@ void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector<
 
 }
 	
-void AudioFileSpeech::ReadSpeechTimingFast( const char * filename, std::map< std::string, float > & timeMarkers ){
+void AudioFileSpeech::ReadSpeechTimingFast(std::map< std::string, float > & timeMarkers, rapidxml::xml_document<>& bmldoc ){
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.mark("requestSpeechAudioFast", 0, "sync");
 	m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.clear();
 
-	rapidxml::xml_document<> bmldoc;
+	//rapidxml::xml_document<> bmldoc;
 	rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
 	rapidxml::xml_node<>* speechnode = bmlnode->first_node("speech");
 	if (speechnode)
@@ -994,4 +987,5 @@ void AudioFileSpeech::ReadSpeechTimingFast( const char * filename, std::map< std
 			}
 		}
 	}
+	mcu.mark("requestSpeechAudioFast");
 }
