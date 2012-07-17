@@ -7,8 +7,8 @@
 
 
 namespace SmartBody {
-class SBMotionBlendBase : public SBAnimationBlend
-{
+	class SBMotionBlendBase : public SBAnimationBlend
+	{
 	protected:
 		MeCtBlendEngine* blendEngine;			
 		int parameterDim;
@@ -16,7 +16,7 @@ class SBMotionBlendBase : public SBAnimationBlend
 		std::vector<SrSnColorSurf*> errorSurfaces;
 		std::vector<SrSnColorSurf*> smoothSurfaces;		
 		std::string skeletonName;
-		
+
 		std::vector<SrSnLines*> vecflowLinesArray;
 		// put a list of joint global positions into array
 		void getJointsGPosFromSkel(SkSkeleton* sk, SrArray<SrVec>& pnts_array, const std::vector<SkJoint*>& jnt_list);
@@ -47,7 +47,7 @@ class SBMotionBlendBase : public SBAnimationBlend
 		virtual void getParametersFromWeights(float& x, float& y, std::vector<double>& weights);
 		virtual void getParametersFromWeights(float& x, float& y, float& z, std::vector<double>& weights);
 		void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
-		
+
 		SrSnColorSurf* createCurveSurface(float radius, unsigned int dimension, SrVec center, SrVec2 phi, SrVec2 theta);		
 		SrSnColorSurf* createFlatSurface(float depth, unsigned int dimension, SrVec2 topLeft, SrVec2 lowerRight);
 		void createErrorSurfaces(const std::string& type, SrVec center, int segments, int dimensions, std::vector<SrSnColorSurf*>& surfList);
@@ -67,12 +67,12 @@ class SBMotionBlendBase : public SBAnimationBlend
 
 		/* plot motion frames. added by David Huang, June 2012 */
 		void plotMotion(const std::string& motionName, unsigned int interval,
-						bool clearAll, bool useRandomColor);
+			bool clearAll, bool useRandomColor);
 		void plotMotionFrameTime(const std::string& motionName, float time, bool useRandomColor);
 		void plotMotionJointTrajectory(const std::string& motionName, const std::string& jointName,
-										float start_t, float end_t, bool useRandomColor);
+			float start_t, float end_t, bool useRandomColor);
 		std::vector<SrSnLines*>& getPlotMotionSrSnLines() { return plotMotionLinesArray; }
 		void clearPlotMotion(void);
-};
+	};
 }
 #endif

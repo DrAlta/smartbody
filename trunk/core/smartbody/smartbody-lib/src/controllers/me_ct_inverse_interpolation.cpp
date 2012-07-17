@@ -10,7 +10,7 @@
 
 InverseInterpolation::InverseInterpolation()
 {
-	numKNN  = 13;
+	numKNN  = 8;
 }
 
 InverseInterpolation::~InverseInterpolation()
@@ -49,50 +49,57 @@ void InverseInterpolation::predictInterpWeights( const dVector& para, VecOfInter
 	vector<float> KNNDists, KNNWeights;
 	VecOfInterpWeight tempWeight;
 
+	//LOG("numKNN = %d",numKNN);
 	// calculate the initial weights
 	kdTreeKNN(kdTree,para,numKNN,tempWeight);
 	pairToVec(tempWeight,KNNIdx,KNNDists);
 	generateDistWeights(KNNDists,KNNWeights);
+	//generateRandomWeight(numKNN, KNNWeights);
 	vecToPair(KNNIdx,KNNWeights,tempWeight);	
 	mapDistWeightToBlendWeight(exampleSet->getExamples(),tempWeight,blendWeights);	
 
-	//printf("rough blend weight : ");
-// 	for (unsigned int i=0;i<blendWeights.size();i++)
-// 	{
-// 		printf("%d : %.4f ", blendWeights[i].first, blendWeights[i].second);
-// 	}
-	//printf("\n");
-	float prevError = evaluateErrorFunction(para,prevWeight);
-	float initError = evaluateErrorFunction(para,blendWeights);
-	//printf("prev error = %f, init error = %f\n",prevError,initError);
-	if (prevError < initError)
-		blendWeights = prevWeight;
+
+	//	//printf("rough blend weight : %d\n",blendWeights.size());
+	//// 	for (unsigned int i=0;i<blendWeights.size();i++)
+	//// 	{
+	//// 		//printf("%d : %.4f ", blendWeights[i].first, blendWeights[i].second);
+	//// 		blendWeights[i].second = 1.f/blendWeights.size();	
+	//// 	}
+	//	//printf("\n");
+	//	float prevError = evaluateErrorFunction(para,prevWeight);
+	//	float initError = evaluateErrorFunction(para,blendWeights);
+	//	//printf("prev error = %f, init error = %f\n",prevError,initError);
+	//	if (prevError < initError)
+	//		blendWeights = prevWeight;
 
 	// Inverse Blending Optimization procedure
-	//int nIteration = optimizeBlendWeight(para,blendWeights); // steepest descent
-	int nIteration = optimizeBlendWeightGradDes(para,blendWeights); // gradient descent
+	int nIteration = optimizeBlendWeight(para,blendWeights); // steepest descent
+	//int nIteration = optimizeBlendWeightGradDes(para,blendWeights); // gradient descent
 
 	float finalError = evaluateErrorFunction(para,blendWeights);
-	//printf("final blend weight : ");
-// 	for (unsigned int i=0;i<blendWeights.size();i++)
-// 	{
-// 		printf("%d : %.2f ", blendWeights[i].first, blendWeights[i].second);
-// 	}
-// 	printf("\n");
- 	printf("init error = %f, final error = %f, num iterations = %d\n",initError, finalError,nIteration);
+	// 	printf("final blend weight : ");
+	// 	for (unsigned int i=0;i<blendWeights.size();i++)
+	// 	{
+	// 		printf("%d : %.2f ", blendWeights[i].first, blendWeights[i].second);
+	// 	}
+	// 	printf("\n");
+
+
+	// printf("init error = %f, final error = %f, num iterations = %d\n",initError, finalError,nIteration);
+
 	prevWeight = blendWeights;
 
 }
 
 
 /* Inverse Blending steepest descent optimization method
-   see header file for definition of the following param:
-	OPTM_MAX_ITER (300)			max iteration
-	OPTM_ADDL_ITER (50)			additional iteration on steepest direction
-	OPTM_ITER_STEP (0.005f)		step to increase/decrease weight
-	OPTM_WT_UPBOUND (1.0f)		upper-bound for weight
-	OPTM_WT_LOBOUND (0.0f)		lower-bound for weight
-	OPTM_NO_HIT_TERM_TH (15)	terminate if no further desent occurs after # iterations
+see header file for definition of the following param:
+OPTM_MAX_ITER (300)			max iteration
+OPTM_ADDL_ITER (50)			additional iteration on steepest direction
+OPTM_ITER_STEP (0.005f)		step to increase/decrease weight
+OPTM_WT_UPBOUND (1.0f)		upper-bound for weight
+OPTM_WT_LOBOUND (0.0f)		lower-bound for weight
+OPTM_NO_HIT_TERM_TH (15)	terminate if no further desent occurs after # iterations
 */
 int InverseInterpolation::optimizeBlendWeight( const dVector& para, VecOfInterpWeight& blendWeight )
 {
@@ -196,23 +203,23 @@ int InverseInterpolation::optimizeBlendWeight( const dVector& para, VecOfInterpW
 		}
 	}
 
-// terminate_iter:
+	// terminate_iter:
 	return total_iter;
 }
 
 
 /* Inverse Blending gradient descent optimization method, will run Optimize() in the end.
-   see header file for definition of the following param:
-	OPTMGD_MAX_ITER 100
-	OPTMGD_ADDL_ITER 50
-	OPTMGD_NO_HIT_TERM_TH 15
-	OPTMGD_ITER_STEP 0.005f
-	OPTMGD_WT_UPBOUND 1.0f
-	OPTMGD_WT_LOBOUND 0.0f
-	OPTMGD_MAGNI_TH 0.70f // ignore small partial derivatives ( < 0.7x of largest desc)
-	OPTMGD_PATL_DEV_QTY 4 // max qty of partial derivatives
+see header file for definition of the following param:
+OPTMGD_MAX_ITER 100
+OPTMGD_ADDL_ITER 50
+OPTMGD_NO_HIT_TERM_TH 15
+OPTMGD_ITER_STEP 0.005f
+OPTMGD_WT_UPBOUND 1.0f
+OPTMGD_WT_LOBOUND 0.0f
+OPTMGD_MAGNI_TH 0.70f // ignore small partial derivatives ( < 0.7x of largest desc)
+OPTMGD_PATL_DEV_QTY 4 // max qty of partial derivatives
 
-	note: testings show gradient descent reduces optimization iterations roughly by half
+note: testings show gradient descent reduces optimization iterations roughly by half
 */
 int InverseInterpolation::optimizeBlendWeightGradDes( const dVector& para, VecOfInterpWeight& blendWeight )
 {
@@ -346,7 +353,7 @@ CALC_GRAD_VEC:
 				else // patl_dev_qty==1
 					goto TERMINATE_OPTMGD;
 			}
-			
+
 			total_iter++;
 
 			normalizeBlendWeight(tempWeight);
@@ -415,7 +422,7 @@ void InverseInterpolation::sortIndexDesc(const float* val, int* idx_array, unsig
 
 	float f_tmp;
 	int i_tmp;
-    for(unsigned int i=0; i<size-1 ;i++)
+	for(unsigned int i=0; i<size-1 ;i++)
 	{
 		for(unsigned int j = i+1 ; j<size ;j++)
 		{

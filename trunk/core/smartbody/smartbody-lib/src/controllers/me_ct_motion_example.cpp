@@ -597,6 +597,59 @@ void MotionExampleSet::blendMotionFrame( BodyMotionFrame& startFrame, BodyMotion
 	outFrame = tempFrame;	
 }
 
+// faster version, not using slerp for Quat but just do weighted sum then normalize
+double MotionExampleSet::blendMotionFuncFast( float time, SkSkeleton* skel, const vector<SkJoint*>& joints, const VecOfBodyMotionPtr& motions, 
+											 const VecOfInterpWeight& blendWeight, BodyMotionFrame& outMotionFrame )
+{
+	// assuming the weight array has been normalized !!!
+	int idx;
+	float weight;
+	double newTime = 0.0;
+	BodyMotionFrame tempFrame;
+
+	// first init outMotionFrame
+	idx = blendWeight[0].first;
+	weight = blendWeight[0].second;
+	BodyMotionInterface* ex = motions[idx];
+	newTime = ex->getMotionFrame(time,skel,joints,outMotionFrame);
+	unsigned int jntQuatSize = outMotionFrame.jointQuat.size();
+	for(unsigned int k=0; k<jntQuatSize; k++)
+	{
+		outMotionFrame.jointQuat[k].w = outMotionFrame.jointQuat[k].w * weight;
+		outMotionFrame.jointQuat[k].x = outMotionFrame.jointQuat[k].x * weight;
+		outMotionFrame.jointQuat[k].y = outMotionFrame.jointQuat[k].y * weight;
+		outMotionFrame.jointQuat[k].z = outMotionFrame.jointQuat[k].z * weight;
+	}
+	outMotionFrame.rootPos = outMotionFrame.rootPos * weight;
+	newTime = newTime * weight;
+
+	for(unsigned int i=1;i<blendWeight.size();i++)
+	{
+		idx = blendWeight[i].first;
+		weight = blendWeight[i].second;
+
+		// avg frame time
+		newTime += motions[idx]->getMotionFrame(time,skel,joints,tempFrame) * weight;
+
+		// avg Quat
+		for (unsigned int k=0;k<jntQuatSize;k++)
+		{
+			outMotionFrame.jointQuat[k].w += tempFrame.jointQuat[k].w * weight;
+			outMotionFrame.jointQuat[k].x += tempFrame.jointQuat[k].x * weight;
+			outMotionFrame.jointQuat[k].y += tempFrame.jointQuat[k].y * weight;
+			outMotionFrame.jointQuat[k].z += tempFrame.jointQuat[k].z * weight;
+		}
+		// avg root pos
+		outMotionFrame.rootPos += tempFrame.rootPos * weight;
+	}	
+
+	// Quat (from  weighted sum) must be normalized !!!
+	for (unsigned int k=0;k<jntQuatSize;k++)
+		outMotionFrame.jointQuat[k].normalize();
+
+	return newTime;
+}
+
 void MotionExampleSet::blendMotionFrameProfile( ResampleMotion* motion, BodyMotionFrame& startFrame, BodyMotionFrame& endFrame, float weight, BodyMotionFrame& outFrame )
 {
 	std::vector<SkJoint*>& affectedJoints = motion->motionParameterFunc->affectedJoints;

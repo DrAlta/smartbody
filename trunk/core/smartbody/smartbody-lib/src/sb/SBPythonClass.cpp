@@ -128,6 +128,43 @@ void Camera::removeTrack()
 	}
 }
 
+void Camera::loadCamera(std::string camFileName)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	FILE * pFile;
+	SrString f(camFileName.c_str());
+	pFile = fopen (f,"r");
+	if (pFile!=0)
+	{
+		SrInput file_in (pFile);
+		file_in >> *(mcu.camera_p);
+		fclose (pFile);
+		mcu.viewer_p->set_camera(*mcu.camera_p);
+	}
+	else
+		LOG("WARNING: can not load cam file!");
+}
+
+void Camera::saveCamera(std::string camFileName)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SrCamera* cam = mcu.viewer_p->get_camera();
+
+	FILE * pFile = 0;
+	SrString f(camFileName.c_str());
+	pFile = fopen (f,"w");
+	if (pFile!=0)
+	{
+		SrOutput file_out (pFile);
+		file_out << *(cam);
+		fclose (pFile);
+	}
+	else
+		LOG("WARNING: can not save cam file");
+}
+
+
 void pythonExit()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 

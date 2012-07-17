@@ -182,6 +182,8 @@ public:
 public:
 	static double blendMotionFunc(float time, SkSkeleton* skel, const vector<SkJoint*>& joints, const VecOfBodyMotionPtr& motions, 
 		                        const VecOfInterpWeight& blendWeight, BodyMotionFrame& outMotionFrame);
+	static double blendMotionFuncFast(float time, SkSkeleton* skel, const vector<SkJoint*>& joints, const VecOfBodyMotionPtr& motions, 
+		const VecOfInterpWeight& blendWeight, BodyMotionFrame& outMotionFrame);
 	// blend start frame to end frame based on blend weight
 	static void   blendMotionFrame( BodyMotionFrame& startFrame,  BodyMotionFrame& endFrame, float weight, BodyMotionFrame& outFrame);	
 	static void   blendMotionFrameProfile( ResampleMotion* motion, BodyMotionFrame& startFrame,  BodyMotionFrame& endFrame, float weight, BodyMotionFrame& outFrame);
