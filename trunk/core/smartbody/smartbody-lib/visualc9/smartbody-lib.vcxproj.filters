@@ -1030,6 +1030,9 @@
     <ClCompile Include="..\src\controllers\MeCtBlendEngine.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sr\sr_sn_colorsurf.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -2105,6 +2108,9 @@
     </ClInclude>
     <ClInclude Include="..\src\controllers\MeCtBlendEngine.h">
       <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sr\sr_sn_colorsurf.h">
+      <Filter>sr</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
