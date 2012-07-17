@@ -2,6 +2,7 @@
 
 
 cd build/lib/festival/speech_tools
+sed -i '' -e 's/-Wall/-Wall -arch i386/g' config/compilers/gcc_defaults.mak
 chmod 700 configure
 ./configure
 make clean
@@ -20,6 +21,6 @@ cd ../../../..
 
 mkdir build/bin
 cd build/bin
-cmake ..
+cmake -DCMAKE_OSX_ARCHITECTURES="i386" ..
 make
 make install
