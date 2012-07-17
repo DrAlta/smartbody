@@ -286,6 +286,10 @@ set( SMARTBODY_LIB_SBM_SRC
 	controllers/me_ct_breathing.cpp
 	controllers/me_ct_breathing_interface.cpp
 	controllers/me_ct_physics_controller.cpp
+	
+	controllers/MeCtBlendEngine.cpp
+	controllers/me_ct_motion_blend.cpp
+
 	sbm/ParserBVH.cxx
 	sbm/ParserASFAMC.cxx
 	sbm/ParserFBX.cpp
@@ -376,6 +380,9 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBJointMapManager.cpp
 	sb/SBPhoneme.cpp
 	sb/SBPhonemeManager.cpp
+	sb/SBBehaviorSet.cpp
+	sb/SBBehaviorSetManager.cpp
+	sb/SBMotionBlendBase.cpp
 
 	sb/SBPython.cpp
 	sb/SBPythonClass.cpp

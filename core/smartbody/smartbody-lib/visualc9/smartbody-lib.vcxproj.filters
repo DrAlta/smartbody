@@ -1021,6 +1021,15 @@
     <ClCompile Include="..\src\sbm\SbmDebuggerUtility.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sb\SBMotionBlendBase.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_motion_blend.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\MeCtBlendEngine.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -2087,6 +2096,15 @@
     </ClInclude>
     <ClInclude Include="..\src\sbm\SbmDebuggerUtility.h">
       <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBMotionBlendBase.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\controllers\me_ct_motion_blend.hpp">
+      <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\controllers\MeCtBlendEngine.h">
+      <Filter>controllers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
