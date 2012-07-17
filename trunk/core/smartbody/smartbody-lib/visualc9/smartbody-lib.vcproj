@@ -3756,6 +3756,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sb\SBBehaviorSet.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBBehaviorSet.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBBehaviorSetManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBBehaviorSetManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sb\SBBmlProcessor.cpp"
 				>
 			</File>
