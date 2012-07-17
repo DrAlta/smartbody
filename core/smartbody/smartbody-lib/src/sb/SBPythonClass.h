@@ -121,6 +121,8 @@ class Camera
 
 		void setTrack(std::string cName, std::string jName);
 		void removeTrack();
+		void loadCamera(std::string camFileName);
+		void saveCamera(std::string camFileName);
 };
 
 void pythonExit();

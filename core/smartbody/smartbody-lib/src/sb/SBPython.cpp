@@ -798,6 +798,8 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("setScale", &Camera::setScale, "Set camera scale. \n camera scale: NULL \n Output: NULL")
 		.def("setTrack", &Camera::setTrack, "Set camera track. \n Input: character name, joint name \n Output: NULL")
 		.def("removeTrack", &Camera::removeTrack, "Remove camera track. ")
+		.def("loadCamera", &Camera::loadCamera, "load Camera from file \n Input: camera file (*.cam) \n Output: NULL ")
+		.def("saveCamera", &Camera::saveCamera, "save Camera to file \n Input: camera file (*.cam) \n Output: NULL ")
 		;
 
 	boost::python::class_<SrViewer>("Viewer")
