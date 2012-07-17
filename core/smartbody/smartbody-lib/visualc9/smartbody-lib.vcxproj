@@ -462,6 +462,7 @@
     <ClCompile Include="..\src\sr\sr_sa_render_mode.cpp" />
     <ClCompile Include="..\src\sr\sr_shared_ptr.cpp" />
     <ClCompile Include="..\src\sr\sr_sn.cpp" />
+    <ClCompile Include="..\src\sr\sr_sn_colorsurf.cpp" />
     <ClCompile Include="..\src\sr\sr_sn_group.cpp" />
     <ClCompile Include="..\src\sr\sr_sn_matrix.cpp" />
     <ClCompile Include="..\src\sr\sr_sn_shape.cpp" />
@@ -935,6 +936,7 @@
     <ClInclude Include="..\src\sr\sr_shared_class.h" />
     <ClInclude Include="..\src\sr\sr_shared_ptr.hpp" />
     <ClInclude Include="..\src\sr\sr_sn.h" />
+    <ClInclude Include="..\src\sr\sr_sn_colorsurf.h" />
     <ClInclude Include="..\src\sr\sr_sn_group.h" />
     <ClInclude Include="..\src\sr\sr_sn_matrix.h" />
     <ClInclude Include="..\src\sr\sr_sn_shape.h" />
