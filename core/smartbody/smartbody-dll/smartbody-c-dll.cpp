@@ -762,3 +762,56 @@ SMARTBODY_C_DLL_API char* SBM_PythonCommandString( SBMHANDLE sbmHandle,  const c
    return output;
 }
 
+
+
+
+
+
+#if 0
+// stubs used for testing dll usage on other platforms
+int unused = 0;
+SMARTBODY_C_DLL_API SBMHANDLE SBM_CreateSBM() { unused++; return unused; }
+
+SMARTBODY_C_DLL_API bool SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandle, const char * basePath ) { return true; }
+SMARTBODY_C_DLL_API bool SBM_SetProcessId( SBMHANDLE sbmHandle, const char * processId ) { return true; }
+SMARTBODY_C_DLL_API bool SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * path ) { return true; }
+
+SMARTBODY_C_DLL_API bool SBM_Init( SBMHANDLE sbmHandle, const char* pythonLibPath, bool logToFile ) { return true; }
+SMARTBODY_C_DLL_API bool SBM_Shutdown( SBMHANDLE sbmHandle ) { return true; }
+
+SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changedCB, SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB ) { return true; }
+
+SMARTBODY_C_DLL_API bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds ) { return true; }
+
+SMARTBODY_C_DLL_API void SBM_SetDebuggerId( SBMHANDLE sbmHandle, const char * id ) { return; }
+SMARTBODY_C_DLL_API void SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar ) { return; }
+SMARTBODY_C_DLL_API void SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmHandle, bool enabled ) { return; }
+
+SMARTBODY_C_DLL_API bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args ) { return true; }
+SMARTBODY_C_DLL_API bool SBM_ExecutePython( SBMHANDLE sbmHandle, const char * command ) { return true; }
+
+SMARTBODY_C_DLL_API int  SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle ) { return 42; }
+SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character ) { return true; }
+SMARTBODY_C_DLL_API bool SBM_GetCharacter2( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter2 * character ) { return true; }
+SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character ) { return true; }
+SMARTBODY_C_DLL_API bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character ) { return true; }
+SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb) { return true; }
+SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType) { return; }
+
+
+// used for polling on iOS since callbacks aren't allowed
+SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** objectClass ) { return true; }
+SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, int * numCharacters, char *** name ) { return true; }
+SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, int * numCharacters, char *** name ) { return true; }
+SMARTBODY_C_DLL_API bool SBM_IsVisemeSet( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** visemeName, float** weight, float** blendTime ) { return true; }
+SMARTBODY_C_DLL_API bool SBM_IsChannelSet( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** channelName, float ** value ) { return true; }
+
+// python usage functions
+// functions can't be distinguished by return type alone so they are named differently
+SMARTBODY_C_DLL_API bool SBM_PythonCommandVoid( SBMHANDLE sbmHandle,  const char * command ) { return true; }
+SMARTBODY_C_DLL_API bool SBM_PythonCommandBool( SBMHANDLE sbmHandle,  const char * command ) { return true; }
+SMARTBODY_C_DLL_API int SBM_PythonCommandInt( SBMHANDLE sbmHandle,  const char * command ) { return 42; }
+SMARTBODY_C_DLL_API float SBM_PythonCommandFloat( SBMHANDLE sbmHandle,  const char * command )  { return 42; }
+SMARTBODY_C_DLL_API char* SBM_PythonCommandString( SBMHANDLE sbmHandle, const char * command, char* output, int maxLen) { return "test"; }
+
+#endif
