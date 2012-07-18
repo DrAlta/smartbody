@@ -157,7 +157,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp $PROJECT_DIR/build/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
+			shellScript = "cp $BUILD_DIR/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -213,6 +213,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
+					/usr/include/python2.6,
 					"../python/Python-2.6.5",
 					"../python/Python-2.6.5/_install/include/python2.6",
 					../boost/boost_1_44_0,
