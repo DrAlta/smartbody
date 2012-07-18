@@ -531,7 +531,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp $PROJECT_DIR/build/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
+			shellScript = "cp $BUILD_DIR/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
 		};
 		AA17914D14216D3F00DCA9FE /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -544,7 +544,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp $PROJECT_DIR/build/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
+			shellScript = "cp $BUILD_DIR/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
 		};
 		AA17914E14216D4400DCA9FE /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -557,7 +557,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp $PROJECT_DIR/build/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
+			shellScript = "cp $BUILD_DIR/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
 		};
 		AA563C4614D39CC000D4A91D /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -570,7 +570,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp $PROJECT_DIR/build/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
+			shellScript = "cp $BUILD_DIR/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -674,6 +674,7 @@
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = (
+					/usr/include/python2.6,
 					"$PROJECT_DIR/../python/Python-2.6.5/_install/include/python2.6",
 					$PROJECT_DIR/boost_1_44_0,
 					"$PROJECT_DIR/../python/Python-2.6.5",
@@ -697,6 +698,7 @@
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = (
+					/usr/include/python2.6,
 					"$PROJECT_DIR/../python/Python-2.6.5/_install/include/python2.6",
 					$PROJECT_DIR/boost_1_44_0,
 					"$PROJECT_DIR/../python/Python-2.6.5",

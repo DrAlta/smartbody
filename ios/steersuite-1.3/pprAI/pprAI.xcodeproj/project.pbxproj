@@ -149,7 +149,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp $PROJECT_DIR/../build/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../../libs/$PLATFORM_NAME";
+			shellScript = "cp $BUILD_DIR/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../../libs/$PLATFORM_NAME";
 		};
 /* End PBXShellScriptBuildPhase section */
 
