@@ -317,13 +317,15 @@ def fullBuild(svnPassword, buildSuffix):
     #  ": fatal error "
     #  ": warning: "   # gcc
     #  ": error: "     # gcc
+    #  "CMake Error "  # cmake
 
     buildCompileErrors = []
     buildCompileWarnings = []
     for line in buildCompileOutput:
         if ": error " in line or \
            ": fatal error " in line or \
-           ": error: " in line:
+           ": error: " in line or \
+           "CMake Error " in line:
            buildCompileErrors.append("   " + line)
 
         if ": warning " in line or \
