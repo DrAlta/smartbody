@@ -272,8 +272,8 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 	// 7. read timing metadata until end of file
 	SrInput::TokenType token_type = in.get_token();
 	if( token_type==SrInput::EndOfFile ) {
-#ifdef DEBUG
-		cout<<endl<<endl<<"WARNING: ATTEMPT TO LOAD SKM WITHOUT READY,STROKE,RELAX METADATA : "<<_name<<endl; 
+#ifdef DEBUG_BUILD
+		cout<<endl<<endl<<"WARNING: ATTEMPT TO LOAD SKM WITHOUT READY,STROKE,RELAX METADATA : "<<_filename<<endl; 
 #endif
 	} else {
 		
