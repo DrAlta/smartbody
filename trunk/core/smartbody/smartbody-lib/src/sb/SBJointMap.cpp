@@ -582,6 +582,19 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 			j1 = jnts[i];
 			j2 = jnts[j];
 			SrString jname(j1->name().c_str());
+
+			if (j1->num_children() == 5)
+			{
+				ja = j1;
+			}			
+			if (j2->num_children() == 5)
+			{
+				jb = j2;
+			}
+			
+			if (ja && jb)
+				break;
+
 			if(j1->num_children()==5 && j2->num_children()==5) // this must be hand joint
 			{
 				ja = j1; jb = j2;

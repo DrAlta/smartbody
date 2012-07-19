@@ -875,20 +875,21 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 
 	SkJoint* pjoint = interSk->search_joint(pjointName.c_str());
 	SkJoint* srcjoint = tempSrcSk->search_joint(pjointName.c_str());
+	if (!srcjoint || !pjoint) return;
+
 	std::vector<SrVec> srcDirList, origSrcDirList;
 	std::vector<SrVec> dstDirList;
 	SrVec pos = pjoint->gmat().get_translation();					
-	for (int i=0; i< pjoint->num_children(); i++)
+	for (int i=0; i< srcjoint->num_children(); i++)
 	{
-		SkJoint* child = pjoint->child(i);
+		SkJoint* child = srcjoint->child(i);
 		if (std::find(endJoints.begin(),endJoints.end(),child->name()) != endJoints.end())
 			continue;
+		if (!interSk->search_joint(child->name().c_str()))
+			continue;
+
 		SrVec srcdir = tempSrcSk->boneGlobalDirection(pjoint->name(),child->name());
 		SrVec dstdir = interSk->boneGlobalDirection(pjoint->name(),child->name());	
-// 		if (pjointName == "spine5" || pjointName == "spine4")
-// 		{
-// 			LOG("joint name %s, child %d, srcdir = %f %f %f, dstdir = %f %f %f",pjointName.c_str(),i,srcdir[0],srcdir[1],srcdir[2],dstdir[0],dstdir[1],dstdir[2]);
-// 		}
 		//jointQueues.push(child->name());
 		srcDirList.push_back(srcdir);			
 		dstDirList.push_back(dstdir);
@@ -938,21 +939,7 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		jointRotationMap[pjointName] = quat;
 		pjoint->quat()->value(quat);
 		pjoint->set_lmat_changed();
-		pjoint->update_gmat();
-		//interSk->invalidate_global_matrices();
-		//interSk->update_global_matrices();
-// 		if (pjointName == "spine4" || pjointName == "spine5")
-// 		{
-// 			LOG("skeleton align rotation, joint = %s, rotation = %f %f %f",pjointName.c_str(),rotAxisAngle[0],rotAxisAngle[1],rotAxisAngle[2]);			
-// 			LOG("srcdir = %f %f %f, dstdir = %f %f %f, alignRotAxisAngle = %f %f %f",srcDir[0],srcDir[1],srcDir[2], dstDir[0],dstDir[1],dstDir[2],alignRotAxisAngle[0],alignRotAxisAngle[1],alignRotAxisAngle[2]);
-// 		}
-		SrVec newDstDir = SrVec();
-		for (int k=0;k<pjoint->num_children();k++)
-		{
-			SkJoint* child = pjoint->child(k);
-			newDstDir += interSk->boneGlobalDirection(pjoint->name(),child->name());				
-		}
-		newDstDir.normalize();
+		pjoint->update_gmat();	
 	}
 }
 
@@ -1012,9 +999,9 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 		{
 			convertBoneOrientation(pjointName, interSk, tempSrcSk, jointQueues, jointRotationMap, endJoints);								
 			SkJoint* pjoint = interSk->search_joint(pjointName.c_str());			
-			SrQuat newPreRot = pjoint->quat()->prerot()*pjoint->quat()->rawValue();
-			pjoint->quat()->prerot(newPreRot); // reset pre-rotation to
-			pjoint->quat()->value(SrQuat()); // cleanup quat value
+			//SrQuat newPreRot = pjoint->quat()->prerot()*pjoint->quat()->rawValue();
+			//pjoint->quat()->prerot(newPreRot); // reset pre-rotation to
+			//pjoint->quat()->value(SrQuat()); // cleanup quat value
 			for (int i=0; i< pjoint->num_children(); i++)
 			{
 				SkJoint* child = pjoint->child(i);
@@ -1050,9 +1037,11 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 					SrQuat gsrc = SrQuat(srcJoint->gmat());
 					SrQuat gdst = SrQuat(targetJoint->gmat());
 					SrQuat protSrc = srcJoint->quat()->prerot();
-					SrQuat protDst = targetJoint->quat()->prerot();//targetJoint->quat()->rawValue();//targetJoint->quat()->prerot();
+					SrQuat protDst = targetJoint->quat()->rawValue();//targetJoint->quat()->prerot();//targetJoint->quat()->rawValue();//targetJoint->quat()->prerot();
 					//sr_out << "gsrc = " << gsrc << " gdst = " << gdst << srnl;
 					final_q = protDst*gdst.inverse()*gsrc*protSrc.inverse()*q_orig*gsrc.inverse()*gdst;
+					//final_q = protDst;//gdst.inverse()*gsrc*protSrc.inverse()*q_orig*gsrc.inverse()*gdst*protDst;
+					final_q.normalize();
 				}
 
 				new_p[ index + 0 ] = (float)final_q.w;
