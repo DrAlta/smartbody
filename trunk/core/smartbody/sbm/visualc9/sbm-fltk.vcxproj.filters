@@ -34,6 +34,9 @@
     <Filter Include="monitorViewer">
       <UniqueIdentifier>{8c9ae46e-7260-4f60-bb2f-cd1a15721a70}</UniqueIdentifier>
     </Filter>
+    <Filter Include="retargetcreator">
+      <UniqueIdentifier>{9e176b9c-43b9-4770-a4ea-e32e0d2e4455}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -213,6 +216,9 @@
     <ClCompile Include="..\src\bmlcreator\TextEditor.cpp">
       <Filter>bmlcreator</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\retargetcreator\RetargetCreatorWindow.cpp">
+      <Filter>retargetcreator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -389,6 +395,9 @@
     </ClInclude>
     <ClInclude Include="..\src\bmlcreator\TextEditor.h">
       <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\retargetcreator\RetargetCreatorWindow.h">
+      <Filter>retargetcreator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

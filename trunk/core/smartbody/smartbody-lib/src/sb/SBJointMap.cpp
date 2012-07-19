@@ -29,7 +29,54 @@ void SBJointMap::applyMotion(SmartBody::SBMotion* motion)
 		std::string to = (*iter).second;
 		channels.changeChannelName(from, to);
 	}
+}
 
+void SBJointMap::applyMotionInverse( SmartBody::SBMotion* motion )
+{
+	if (!motion)
+		return;
+
+	SkChannelArray& channels = motion->channels();
+	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
+		iter != _map.end();
+		iter++)
+	{
+		std::string from = (*iter).second;
+		std::string to = (*iter).first;		
+		channels.changeChannelName(from, to);
+	}
+}
+
+
+void SBJointMap::applySkeletonInverse( SmartBody::SBSkeleton* skeleton )
+{
+	if (!skeleton)
+		return;
+
+	std::vector<SkJoint*> joints = skeleton->joints();
+	for (size_t j = 0; j < joints.size(); j++)
+	{
+		for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
+			iter != _map.end();
+			iter++)
+		{
+			std::string to = (*iter).first;
+			std::string from = (*iter).second;
+			if (joints[j]->name() == from.c_str())
+			{
+				joints[j]->name(to);
+			}
+		}
+	}
+	SkChannelArray& channels = skeleton->channels();
+	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
+		iter != _map.end();
+		iter++)
+	{
+		std::string to = (*iter).first;
+		std::string from = (*iter).second;
+		channels.changeChannelName(from, to);
+	}
 }
 
 void SBJointMap::applySkeleton(SmartBody::SBSkeleton* skeleton)

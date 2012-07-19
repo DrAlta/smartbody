@@ -19,7 +19,9 @@ class SBJointMap
 		~SBJointMap();
 
 		void applyMotion(SmartBody::SBMotion* motion);
+		void applyMotionInverse(SmartBody::SBMotion* motion); // apply the inverse mapping 
 		void applySkeleton(SmartBody::SBSkeleton* skeleton);
+		void applySkeletonInverse(SmartBody::SBSkeleton* skeleton);
 
 		void setMapping(const std::string& from, const std::string& to);
 		void removeMapping(const std::string& from);
