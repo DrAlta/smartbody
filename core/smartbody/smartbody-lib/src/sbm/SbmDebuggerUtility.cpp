@@ -25,7 +25,26 @@ SbmDebuggerUtility::~SbmDebuggerUtility()
 
 void SbmDebuggerUtility::initScene()
 {
+	// better to reset() this, but until the viewer problems are fixed, 
+	// remove objects individually
+
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string>& characters = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characters.begin();
+		 iter != characters.end();
+		 iter++)
+	{
+		scene->removeCharacter((*iter));
+	}
+	std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::iterator iter = pawns.begin();
+		 iter != pawns.end();
+		 iter++)
+	{
+		scene->removePawn((*iter));
+	}
 
 	// clear out the default face definitions
 	for (std::map<std::string, SmartBody::SBFaceDefinition*>::iterator iter = mcu.face_map.begin();
@@ -40,6 +59,7 @@ void SbmDebuggerUtility::initScene()
 	// clear out the default states
 	mcu.param_anim_blends.clear();
 	mcu.param_anim_transitions.clear();
+
 }
 
 void SbmDebuggerUtility::queryResources()
@@ -73,9 +93,29 @@ void SbmDebuggerUtility::queryResources()
 */
 void SbmDebuggerUtility::initCharacter(const std::string& name, const std::string& skelName)
 {
+	if (name == "")
+	{
+		LOG("Character has no name - will not be created.");
+		return;
+	}
 	SBCharacter* sbCharacter = SmartBody::SBScene::getScene()->createCharacter(name, "");
+	if (!sbCharacter)
+	{
+		LOG("Problem creating character %s, will not be created in remote session...", name.c_str());
+		return;
+	}
 	SBSkeleton* sbSkeleton = SmartBody::SBScene::getScene()->getSkeleton(skelName);
+	if (!sbSkeleton)
+	{
+		LOG("Problem creating skeleton %s, character %s will not be created in remote session...", name.c_str(), skelName.c_str());
+		return;
+	}
 	SBSkeleton* copySbSkeleton = new SBSkeleton(sbSkeleton);
+	if (!copySbSkeleton)
+	{
+		LOG("Problem creating copy of skeleton %s, character %s will not be created in remote session...", name.c_str(), skelName.c_str());
+		return;
+	}
 	sbCharacter->setSkeleton(copySbSkeleton);	
 }
 
