@@ -112,16 +112,32 @@ next(Edge*& edge)
 NeedmeIter::
 NeedmeIter(Item* itm)
 {
+	stackIncreaseSize = 256;
+	stack = new EdgePtr[stackIncreaseSize];
+	curStackSize = stackIncreaseSize;
   stackptr = -1;
   //cerr << "nmi for " << *itm << endl;
   list<Edge*>::iterator eiter = itm->needme().begin();
   for( ; eiter != itm->needme().end() ; eiter++)
     {
       stackptr++;
-      assert(stackptr < 64000); //was 32;
+	  if (stackptr >= curStackSize)
+		  resizeStack();
+//      assert(stackptr < 64000); //was 32;
       stack[stackptr] = *eiter;
     }
 }
+
+void 
+NeedmeIter::resizeStack()
+{
+	EdgePtr* newStack = new EdgePtr[curStackSize + stackIncreaseSize];
+	memcpy(newStack, stack, curStackSize * sizeof(EdgePtr));
+	curStackSize += stackIncreaseSize;
+	delete [] stack;
+	stack = newStack;	
+}
+
 
 bool
 NeedmeIter::
@@ -136,7 +152,9 @@ next(Edge*& e)
   while(si.next(suc))
     {
       stackptr++;
-      assert(stackptr < 64000); //was 32.
+	  if (stackptr >= curStackSize)
+		  resizeStack();
+      //assert(stackptr < 64000); //was 32.
       //cerr << "nmisuc " << *suc << endl;
       stack[stackptr] = suc;
     }

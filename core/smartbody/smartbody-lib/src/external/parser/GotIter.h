@@ -82,9 +82,15 @@ class          NeedmeIter
  public:
   NeedmeIter(Item* itm);
   bool    next(Edge*& e);
+  void resizeStack();
+
  private:
-  int          stackptr;
-  Edge*        stack[64000]; //??? was 32;
+	int curStackSize;	
+	int stackIncreaseSize;
+	int stackptr;
+	typedef	Edge* EdgePtr;
+	EdgePtr*	stack;
+  //Edge*        stack[64000]; //??? was 32;
 };
   
 #endif	/* ! GOTITER_H */
