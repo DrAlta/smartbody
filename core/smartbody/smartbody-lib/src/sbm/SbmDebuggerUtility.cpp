@@ -31,14 +31,14 @@ void SbmDebuggerUtility::initScene()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string>& characters = SmartBody::SBScene::getScene()->getCharacterNames();
+	std::vector<std::string> characters = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (std::vector<std::string>::iterator iter = characters.begin();
 		 iter != characters.end();
 		 iter++)
 	{
 		scene->removeCharacter((*iter));
 	}
-	std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::iterator iter = pawns.begin();
 		 iter != pawns.end();
 		 iter++)

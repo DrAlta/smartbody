@@ -160,6 +160,7 @@ set( SMARTBODY_LIB_SR_SRC
 	sr/sr_sn_group.cpp
 	sr/sr_sn_matrix.cpp
 	sr/sr_sn_shape.cpp
+	sr/sr_sn_colorsurf.cpp
 	sr/sr_sphere.cpp
 	sr/sr_spline.cpp
 	sr/sr_string_array.cpp
