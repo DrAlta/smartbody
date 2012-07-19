@@ -935,6 +935,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="retargetviewer"
+			>
+			<File
+				RelativePath="..\src\retargetviewer\RetargetViewer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\retargetviewer\RetargetViewer.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\src\glfont2.cpp"
 			>
