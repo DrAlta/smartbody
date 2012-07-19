@@ -24,7 +24,7 @@ RetargetCreatorWindow::RetargetCreatorWindow(int x, int y, int w, int h, char* n
 	_buttonDirChoose = new Fl_Button(350, 80, 90, 25, "Output Dir");
 	_buttonDirChoose->callback(OnDirChooseCB, this);
 	_curOutputDir    = new Fl_Input(450, 80, 250, 25);
-	_curOutputDir->value("../../../../data/");
+	_curOutputDir->value("../../../../data/sbm-common/common-sk/retargetMotion/");
 	//_curOutputDir->deactivate();
 
 	_buttonAssetDirChoose = new Fl_Button(350, 120, 90, 25, "Asset Dir");
@@ -105,7 +105,9 @@ void RetargetCreatorWindow::OnAssetDirChooseCB( Fl_Widget* widget, void* data )
 void RetargetCreatorWindow::OnReloadAssetCB( Fl_Widget* widget, void* data )
 {
 	RetargetCreatorWindow* win = (RetargetCreatorWindow*) data;
-	win->retargetSelectedMotion();			
+	win->reloadAssets();
+	win->loadMotions();
+	win->loadSkeletons();
 }
 
 void RetargetCreatorWindow::OnMotionSelectCB( Fl_Widget* widget, void* data )
