@@ -2,20 +2,15 @@ print "|-------------------------------------------------|"
 print "|  data/sbm-common/scripts/motion-retarget.py     |"
 print "|-------------------------------------------------|"
 
-def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :	
+def retargetMotionFunc(motionName, srcSkelName, tgtSkelName):
 	testMotion = scene.getMotion(motionName);
 	outMotionName = tgtSkelName + motionName		
 	existMotion = scene.getMotion(outMotionName)
 	if existMotion != None : # do nothing if the retargeted motion is already there
-		return	
-		
+		return "None"		
 	tgtSkel = scene.getSkeleton(tgtSkelName)
 	if (tgtSkel == None) :
-		return
-		
-	if not os.path.exists(outDir):
-		os.makedirs(outDir)			
-		
+		return "None"			
 	offsetJoints = VecMap();	
 	endJoints = StringVec();
 	#endJoints.append('l_ankle')
@@ -55,7 +50,34 @@ def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :
 	
 	print 'Retarget motion = ' + motionName;
 	outMotion = testMotion.retarget(outMotionName,srcSkelName,tgtSkelName, endJoints, relativeJoints, offsetJoints);	
-	cleanMotion = testMotion.constrain(outMotionName, srcSkelName, tgtSkelName, outMotionName, effectorJoints, effectorRoots);
+	return outMotionName
+
+def remapAndSaveMotion(outMotionName, jointMapName, outDir):
+	jointMapManager = scene.getJointMapManager()
+	jointMap = jointMapManager.getJointMap(jointMapName)
+	if (jointMap == None): 
+		print 'jointMap = ' + jointMapName + ' not found!'
+		return	
+	outMotion = scene.getMotion(outMotionName)
+	if (outMotion == None):
+		print 'jointMap = ' + outMotionName + ' not found!'
+		return
+
+	jointMap.applyMotionInverse(outMotion)
+	if not os.path.exists(outDir):
+		os.makedirs(outDir)					
+	saveCommand = 'animation ' + outMotionName + ' save ' + outDir + outMotionName + '.skm';
+	print 'Save command = ' + saveCommand;
+	scene.command(saveCommand)
+	
+
+def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :	
+	outMotionName = retargetMotionFunc(motionName, srcSkelName, tgtSkelName)
+	if outMotionName == "None":
+		return
+	#cleanMotion = testMotion.constrain(outMotionName, srcSkelName, tgtSkelName, outMotionName, effectorJoints, effectorRoots);
+	if not os.path.exists(outDir):
+		os.makedirs(outDir)					
 	saveCommand = 'animation ' + outMotionName + ' save ' + outDir + outMotionName + '.skm';
 	print 'Save command = ' + saveCommand;
 	scene.command(saveCommand)

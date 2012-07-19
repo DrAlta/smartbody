@@ -18,17 +18,38 @@ def createStandardCharacter(charName, skelName, meshName, position):
 	scene.run("motion-retarget.py")
 	print 'retarget character : ' + charName + '  , skelName : ' + skelName;
 	retargetCharacter(charName,skelName)
-
-def createDragAndDropCharacter(charName, skelName, meshName, position):
-	dndSkel = scene.getSkeleton(skelName)
+	
+def remapSkeleton(skelName):
+	remapSkel = scene.getSkeleton(skelName)
 	jointMapManager = scene.getJointMapManager()
 	jointMap = jointMapManager.getJointMap(skelName)
 	if (jointMap == None):
 		jointMap = jointMapManager.createJointMap(skelName)
-		jointMap.guessMapping(dndSkel, False)
+		jointMap.guessMapping(remapSkel, False)
+	jointMap.applySkeleton(remapSkel)
+
+def remapSkeletonInverse(skelName, jointMapName):
+	remapSkel = scene.getSkeleton(skelName)
+	jointMapManager = scene.getJointMapManager()
+	jointMap = jointMapManager.getJointMap(jointMapName)
+	if (jointMap == None):
+		return
+	jointMap.applySkeletonInverse(remapSkel)
 	
+
+def createDragAndDropCharacter(charName, skelName, meshName, position):
 	dndSkel = scene.getSkeleton(skelName)
-	jointMap.applySkeleton(dndSkel)
+	if (dndSkel == None):
+		return
+	# jointMapManager = scene.getJointMapManager()
+	# jointMap = jointMapManager.getJointMap(skelName)
+	# if (jointMap == None):
+		# jointMap = jointMapManager.createJointMap(skelName)
+		# jointMap.guessMapping(dndSkel, False)
+	
+	# dndSkel = scene.getSkeleton(skelName)
+	# jointMap.applySkeleton(dndSkel)
+	remapSkeleton(skelName)
 
 	createStandardCharacter(charName, skelName, meshName, position)
 	
@@ -43,9 +64,8 @@ def createDragAndDropCharacter(charName, skelName, meshName, position):
 	# start the simulation
 	sim.start()
 	bml.execBML(charName, '<body posture="'+ skelName +'HandsAtSide_Motex"/>')
-	scene.command('char ' +charName + ' viewer deformable');	
-	scene.run("characterTest.py")
-	testRetargetCharacter(charName)
+	scene.command('char ' +charName + ' viewer deformableGPU');	
+	
 	
 
 

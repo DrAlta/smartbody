@@ -77,6 +77,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Face Viewer", 0, LaunchFaceViewerCB, this, NULL);
 	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, NULL);
 	menubar->add("&Window/Viseme Viewer", 0, LaunchVisemeViewerCB, this, NULL);
+	menubar->add("&Window/Retarget Creator", 0, LaunchRetargetCreatorCB, this, NULL);
 	//menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
 	//menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, FL_MENU_DIVIDER);
 
@@ -145,6 +146,8 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	visemeViewerWindow = NULL;
 
 	monitorConnectWindow = NULL;
+
+	retargetCreatorWindow = NULL;
 }
 
 BaseWindow::~BaseWindow() {
@@ -223,6 +226,11 @@ void BaseWindow::resetWindow()
 	{
 		delete bmlCreatorWindow;
 		bmlCreatorWindow = NULL;
+	}
+	if (retargetCreatorWindow)
+	{
+		delete retargetCreatorWindow;
+		retargetCreatorWindow = NULL;
 	}
 	if (visemeViewerWindow)
 	{
@@ -371,6 +379,17 @@ void BaseWindow::LaunchBMLCreatorCB(Fl_Widget* widget, void* data)
 	}
 
 	rootWindow->bmlCreatorWindow->show();
+}
+
+void BaseWindow::LaunchRetargetCreatorCB(Fl_Widget* widget, void* data)
+{
+	// console doesn't receive commands - why?
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->retargetCreatorWindow)
+	{
+		rootWindow->retargetCreatorWindow = new RetargetCreatorWindow(150, 150, 800, 600, "Retarget Creator");
+	}
+	rootWindow->retargetCreatorWindow->show();
 }
 
 void BaseWindow::LaunchVisemeViewerCB(Fl_Widget* widget, void* data)

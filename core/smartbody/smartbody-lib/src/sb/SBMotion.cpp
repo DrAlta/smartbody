@@ -533,7 +533,8 @@ SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std
 		return NULL;
 	}
 	
-	SkMotion* motion = buildRetargetMotion(srcSkeleton,dstSkeleton, endJoints, relativeJoints, offsetJointMap);
+	//SkMotion* motion = buildRetargetMotion(srcSkeleton,dstSkeleton, endJoints, relativeJoints, offsetJointMap);
+	SkMotion* motion = buildRetargetMotionV2(srcSkeleton,dstSkeleton, endJoints, relativeJoints, offsetJointMap);
 	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
 	if (sbmotion)
 	{

@@ -923,6 +923,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="retargetcreator"
+			>
+			<File
+				RelativePath="..\src\retargetcreator\RetargetCreatorWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\retargetcreator\RetargetCreatorWindow.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\src\glfont2.cpp"
 			>
