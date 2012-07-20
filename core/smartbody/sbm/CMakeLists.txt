@@ -153,6 +153,9 @@ set( SBM_FLTK_SRC
 	src/visemeviewer/VisemeCurveEditor.cpp
 	src/visemeviewer/VisemeViewerWindow.cpp
 
+	src/retargetviewer/RetargetViewer.cpp
+	src/retargetcreator/RetargetCreatorWindow.cpp
+
 	src/monitorviewer/MonitorConnectWindow.cpp 
 
 	src/faceviewer/FaceViewer.cpp
