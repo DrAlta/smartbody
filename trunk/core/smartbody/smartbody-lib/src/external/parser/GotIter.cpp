@@ -22,6 +22,7 @@
  */
 
 #include "GotIter.h"
+#include <string.h>
 
 GotIter::
 GotIter(Edge* edge) : whereIam( edge )
