@@ -3257,6 +3257,7 @@
 					"../boost/boost-numeric-bindings",
 					"../xerces-c/iphoneos/include",
 					../ode/iphoneos/include,
+					/usr/include/python2.6,
 					"../python/Python-2.6.5/_install/include/python2.6",
 					"../python/Python-2.6.5",
 					"../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0",
