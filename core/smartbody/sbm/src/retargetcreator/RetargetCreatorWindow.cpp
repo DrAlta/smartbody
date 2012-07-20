@@ -79,15 +79,16 @@ void RetargetCreatorWindow::reloadAssets()
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::string assetDir = _curAssetDir->value();
-	std::string sceneCmd = "scene.setAssetPath('"+assetDir+"')";
+	//std::string sceneCmd = "scene.setAssetPath('"+assetDir+"')";
+	std::string sceneCmd ="scene.loadAssetsFromPath('"+assetDir+"')";
 	mcu.executePython(sceneCmd.c_str());	
-	mcu.executePython("scene.loadAssets()");
+	//mcu.executePython("scene.loadAssets()");
 }
 
 void RetargetCreatorWindow::OnDirChooseCB( Fl_Widget* widget, void* data )
 {
 	RetargetCreatorWindow* viewer = (RetargetCreatorWindow*) data;
-	const char* fileDir = fl_dir_chooser("Output Dir", viewer->_curOutputDir->value(), NULL);
+	const char* fileDir = fl_dir_chooser("Output Dir", viewer->_curOutputDir->value(), 1);
 	if (!fileDir)
 		return;
 	viewer->_curOutputDir->value(fileDir);
@@ -96,7 +97,7 @@ void RetargetCreatorWindow::OnDirChooseCB( Fl_Widget* widget, void* data )
 void RetargetCreatorWindow::OnAssetDirChooseCB( Fl_Widget* widget, void* data )
 {
 	RetargetCreatorWindow* viewer = (RetargetCreatorWindow*) data;
-	const char* assetDir = fl_dir_chooser("Asset Dir", viewer->_curAssetDir->value(), NULL);
+	const char* assetDir = fl_dir_chooser("Asset Dir", viewer->_curAssetDir->value(), 1);
 	if (!assetDir)
 		return;
 	viewer->_curAssetDir->value(assetDir);
