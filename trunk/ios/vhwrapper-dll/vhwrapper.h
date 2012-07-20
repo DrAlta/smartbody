@@ -133,34 +133,26 @@ void WRAPPER_tt_client_callback(const char * op, const char * args, void * user_
 #endif
 //////////////////////////////////////////////////////////////
 
+#ifdef __cplusplus
+}
+#endif
 
 
 
 // stubs for testing library loading on different platforms
 #if 0
 
-#ifdef __cplusplus
-}
-#endif
-
-
-
-#if 0
 #include <stdint.h>
-
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
-    
+#endif
 
 typedef intptr_t SBMHANDLE;
 SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode);
 
-
 #ifdef __cplusplus
 }
-#endif
 #endif
 
 #endif
