@@ -1352,6 +1352,19 @@ bool SBMotion::trim(int numFramesFromFront, int numFramesFromBack)
 	return true;
 }
 
+void SBMotion::saveToSkm(const std::string& fileName)
+{
+	SrOutput* out = new SrOutput(fileName.c_str(), "w");
+	if (!out->valid())
+	{
+		LOG("Cannot write to file %s", fileName.c_str());
+		delete out;
+		return;
+	}
+
+	this->save(*out);
+}
+
 /*
 bool SBMotion::move(int startFrame, int endFrame, int position)
 {

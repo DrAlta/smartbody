@@ -334,15 +334,17 @@ class mcuCBHandle {
 		int getNumCharacters();
 
 		SkMotion* getMotion(const std::string& motionName);
+
+		std::map<std::string, Nvbg*> nvbgMap;
+		std::map<std::string, SbmPawn*>	pawn_map;
+		std::map<std::string, SbmCharacter*> character_map;
+
+
 #ifndef __ANDROID__
 		boost::python::object mainModule;
 		boost::python::object mainDict;
 #endif
-
-protected:
-		std::map<std::string, SbmPawn*>	pawn_map;
-		std::map<std::string, SbmCharacter*> character_map;
-		std::map<std::string, Nvbg*> nvbgMap;
+		
 public:
 
 		BML_PROCESSOR				bml_processor;
@@ -446,8 +448,6 @@ public:
 		void close_channelbuffer_viewer( void );
 		int openResourceViewer( int width, int height, int px, int py );
 		void closeResourceViewer( void );
-		int openVelocityViewer( int width, int height, int px, int py );
-		void closeVelocityViewer( void );
 		int openFaceViewer( int width, int height, int px, int py );
 		void closeFaceViewer( void );
 

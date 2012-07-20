@@ -16,6 +16,7 @@ BMLHeadObject::BMLHeadObject() : BMLObject()
 	typeAttr->setValidValues(headTypes);
 
 	createDoubleAttribute("repeats", 1, true, "Basic", 30, false, false, false, "number of times a NOD or SHAKE repeats");
+	createDoubleAttribute("velocity", 1, true, "Basic", 40, false, false, false, "speed of head movement");
 
 	createDoubleAttribute("amount", 0, true, "Basic", 70, false, false, false, "magnitude of head movement, from 0 to 1");
 	createDoubleAttribute("sbm:smooth", 0, true, "Basic", 80, false, false, false, "smoothing parameter when starting and finishing head movements");

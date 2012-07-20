@@ -18,17 +18,13 @@ class SBAnimationBlend1D;
 class SBAnimationBlend2D;
 class SBAnimationBlend3D;
 class SBMotionBlendBase;
-
 class SBAnimationTransition;
 
 typedef boost::property<boost::vertex_name_t,std::string> StateVertexProperty;
 typedef boost::labeled_graph<boost::adjacency_list<boost::listS,boost::listS, boost::directedS, StateVertexProperty>,std::string> BoostGraph;
 
-
 class SBAnimationBlendManager
 {
-	protected:
-		BoostGraph stateGraph;		
 	public:
 		SBAnimationBlendManager();
 		~SBAnimationBlendManager();
@@ -53,9 +49,17 @@ class SBAnimationBlendManager
 		SrVec getCurrentBlendParameters(const std::string& characterName);
 		std::vector<std::string> getAutoBlendTransitions(const std::string& characterName, const std::string& targetBlend);
 		bool isBlendScheduled(const std::string& characterName, const std::string& blendName);
+
+		void removeAllBlends();
+		void removeAllTransitions();
+
 protected:
 		bool addBlendToGraph(const std::string& name);
 		bool addTransitionEdgeToGraph(const std::string& source, const std::string& dest);
+
+		BoostGraph stateGraph;		
 };
+
 }
+
 #endif

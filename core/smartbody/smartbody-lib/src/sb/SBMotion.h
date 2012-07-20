@@ -61,6 +61,7 @@ class SBMotion : public SkMotion
 		bool retime(float factor);
 		bool trim(int numFramesFromFront, int numFramesFromBack);
 	//	bool move(int startFrame, int endFrame, int position);
+		void saveToSkm(const std::string& fileName);
 
 		float getJointSpeed(SBJoint* joint, float startTime, float endTime);
 		float getJointSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);

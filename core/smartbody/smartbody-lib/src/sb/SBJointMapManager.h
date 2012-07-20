@@ -18,6 +18,8 @@ class SBJointMapManager
 		SmartBody::SBJointMap* createJointMap(const std::string& name);
 		SmartBody::SBJointMap* getJointMap(const std::string& name);
 		std::vector<std::string> getJointMapNames();
+		void removeJointMap(const std::string& name);
+		void removeAllJointMaps();
 
 	private:
 		std::map<std::string, SmartBody::SBJointMap*> _jointMaps;

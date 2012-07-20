@@ -416,7 +416,8 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 	XMLCh tempStr[100];
     XMLString::transcode("LS", tempStr, 99);
     DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(tempStr);
-    DOMLSSerializer* theSerializer = ((DOMImplementationLS*)impl)->createLSSerializer();
+//    DOMLSSerializer* theSerializer = ((DOMImplementationLS*)impl)->createLSSerializer();
+    DOMLSSerializer* theSerializer = impl->createLSSerializer();
 	XMLCh* xmlOutput = theSerializer->writeToString(request->doc);
 	theSerializer->release();
 	std::string xmlStr = xml_utils::xml_translate_string(xmlOutput);

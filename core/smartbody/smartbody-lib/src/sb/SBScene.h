@@ -28,6 +28,7 @@ class SBGestureMapManager;
 class SBJointMapManager;
 class SBCollisionManager;
 class SBDiphoneManager;
+class SBBehaviorSetManager;
 class SBParser;
 class SBScript;
 class SBSubject;
@@ -51,8 +52,10 @@ class SBScene : public SBObject
 
 		SBCharacter* createCharacter(std::string charName, std::string metaInfo);
 		SBPawn* createPawn(std::string);
+		void removeAllCharacters();
 		void removeCharacter(std::string charName);
 		void removePawn(std::string pawnName);
+		void removeAllPawns();
 		int getNumCharacters();
 		int getNumPawns();
 		SBCharacter* getCharacter(std::string name);
@@ -79,18 +82,23 @@ class SBScene : public SBObject
 		std::vector<std::string> getEventHandlerNames();
 
 		void setMediaPath(std::string path);
+		const std::string& getMediaPath();
 		void addAssetPath(std::string type, std::string path);
 		std::vector<std::string> getAssetPaths(std::string type);
 		void removeAssetPath(std::string type, std::string path);
 		void loadAssets();
+		void loadAssetsFromPath(std::string assetPath);
 		void loadMotions();
 		void addPose(std::string path, bool recursive);
 		void addMotion(std::string path, bool recursive);
 		
+		void run(std::string command);
 		void runScript(std::string script);
 
 		void setDefaultCharacter(const std::string& character);
 		void setDefaultRecipient(const std::string& recipient);
+
+		void reset();
 
 		void addScript(std::string name, SBScript* script);
 		void removeScript(std::string name);
@@ -113,6 +121,7 @@ class SBScene : public SBObject
 		SBJointMapManager* getJointMapManager();
 		SBCollisionManager* getCollisionManager();
 		SBDiphoneManager* getDiphoneManager();
+		SBBehaviorSetManager* getBehaviorSetManager();
 
 		SBParser* getParser();
 
@@ -139,6 +148,8 @@ class SBScene : public SBObject
 		SBCollisionManager* _collisionManager;
 		SBDiphoneManager* _diphoneManager;
 		SBParser* _parser;
+
+		SBBehaviorSetManager* _behaviorSetManager;
 
 		std::map<std::string, SBScript*> _scripts;
 		float _scale;

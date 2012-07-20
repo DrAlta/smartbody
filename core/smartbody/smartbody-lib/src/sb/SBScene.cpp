@@ -19,12 +19,16 @@
 #include <sb/SBJointMapManager.h>
 #include <sb/SBCollisionManager.h>
 #include <sb/SBPhonemeManager.h>
+#include <sb/SBBehaviorSetManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBParser.h>
 #include <sbm/SbmDebuggerServer.h>
 #include <sbm/SbmDebuggerClient.h>
 #include <sbm/SbmDebuggerUtility.h>
 #include <sbm/sbm_audio.h>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
+#include <sbm/nvbg.h>
 
 namespace SmartBody {
 
@@ -43,6 +47,7 @@ SBScene::SBScene(void)
 	_boneBusManager = new SBBoneBusManager();
 	_collisionManager = new SBCollisionManager();
 	_diphoneManager = new SBDiphoneManager();
+	_behaviorSetManager = new SBBehaviorSetManager();
 	_scale = .01f; // default scale is centimeters
 
 	// add the services
@@ -86,6 +91,7 @@ SBScene::~SBScene(void)
 	delete _gestureMapManager;
 	delete _jointMapManager;
 	delete _diphoneManager;
+	delete _behaviorSetManager;
 	delete _serviceManager;
 
 	delete _parser;
@@ -114,6 +120,99 @@ float SBScene::getScale()
 	return _scale;
 }
 
+void SBScene::reset()
+{
+	// stop the simulation
+	getSimulationManager()->stop();
+
+	// remove the characters
+	removeAllCharacters();
+	
+	// remove the pawns
+	removeAllPawns();
+
+	// clear the joint maps
+	getJointMapManager()->removeAllJointMaps();
+
+	// remove all blends and transitions
+	getBlendManager()->removeAllBlends();
+	getBlendManager()->removeAllTransitions();
+
+	// clear out the default face definitions
+	std::vector<std::string> faceDefinitions = getFaceDefinitionNames();
+
+	for (std::vector<std::string>::iterator iter = faceDefinitions.begin();
+		 iter != faceDefinitions.end();
+		 iter++)
+	{
+		std::string faceName = (*iter);
+		removeFaceDefinition(faceName);
+	}
+
+	// stop the services
+	SBServiceManager* serviceManager = getServiceManager();
+	std::vector<std::string> serviceNames =  serviceManager->getServiceNames();
+	for (std::vector<std::string>::iterator iter = serviceNames.begin();
+		 iter != serviceNames.end();
+		 iter++)
+	{
+		SBService* service = serviceManager->getService(*iter);
+		service->stop();
+	}
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	// remove the motions and skeleton
+	for (std::map<std::string, SkMotion*>::iterator motionIter = mcu.motion_map.begin();
+		motionIter !=  mcu.motion_map.end();
+		motionIter++)
+	{
+
+		SkMotion* motion = (*motionIter).second;
+		delete motion;
+	}
+	mcu.motion_map.clear();
+
+	for (std::map<std::string, SkSkeleton*>::iterator skelIter =  mcu.skeleton_map.begin();
+		skelIter !=  mcu.skeleton_map.end();
+		skelIter++)
+	{
+		SkSkeleton* skeleton = (*skelIter).second;
+		delete skeleton;
+	}
+	mcu.skeleton_map.clear();
+
+	// remove the deformable meshes
+/*	for (std::map<std::string, DeformableMesh*>::iterator deformableIter =  mcu.deformableMeshMap.begin();
+		deformableIter !=  mcu.deformableMeshMap.end();
+		deformableIter++)
+	{
+		DeformableMesh* deformableMesh = (*deformableIter).second;
+		delete deformableMesh;
+	}
+	mcu.deformableMeshMap.clear();
+*/
+	// remove the XML cache
+	for (std::map<std::string, DOMDocument*>::iterator xmlIter = mcu.xmlCache.begin();
+		xmlIter != mcu.xmlCache.end();
+		xmlIter++)
+	{
+		(*xmlIter).second->release();
+	}
+	mcu.xmlCache.clear();
+
+	// remove NVBG
+	for (std::map<std::string, Nvbg*>::iterator nvbgIter = mcu.nvbgMap.begin();
+		nvbgIter != mcu.nvbgMap.end();
+		nvbgIter++)
+	{
+		Nvbg* nvbg = (*nvbgIter).second;
+		delete nvbg;
+	}
+	mcu.nvbgMap.clear();
+
+
+}
 
 void SBScene::notify( SBSubject* subject )
 {
@@ -239,6 +338,17 @@ void SBScene::removeCharacter(std::string charName)
 	}	
 }
 
+void SBScene::removeAllCharacters()
+{
+	std::vector<std::string>& characters = getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characters.begin();
+		 iter != characters.end();
+		 iter++)
+	{
+		removeCharacter((*iter));
+	}
+}
+
 void SBScene::removePawn(std::string pawnName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -263,6 +373,17 @@ void SBScene::removePawn(std::string pawnName)
 			delete pawn;
 		}
 	}	
+}
+
+void SBScene::removeAllPawns()
+{
+	std::vector<std::string>& pawns = getPawnNames();
+	for (std::vector<std::string>::iterator iter = pawns.begin();
+		 iter != pawns.end();
+		 iter++)
+	{
+		removePawn((*iter));
+	}
 }
 
 int SBScene::getNumCharacters() 
@@ -537,6 +658,19 @@ void SBScene::loadAssets()
 	}
 }
 
+void SBScene::loadAssetsFromPath(std::string assetPath)
+{
+	const std::string& mediaPath = this->getMediaPath();
+	boost::filesystem::path p( mediaPath );
+	p /= assetPath;
+	boost::filesystem::path abs_p = boost::filesystem::complete( p );
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	std::string finalPath = abs_p.string();
+	mcu.load_motions(finalPath.c_str(), true);
+	mcu.load_skeletons(finalPath.c_str(), true);
+}
+
 void SBScene::addPose(std::string path, bool recursive)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
@@ -553,6 +687,12 @@ void SBScene::setMediaPath(std::string path)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.setMediaPath(path);
+}
+
+const std::string& SBScene::getMediaPath()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	return mcu.getMediaPath();
 }
 
 void SBScene::setDefaultCharacter(const std::string& character)
@@ -614,6 +754,12 @@ void SBScene::sendVHMsg2(std::string message, std::string message2)
 	mcu.vhmsg_send(message.c_str(), message2.c_str());
 }
 
+void SBScene::run(std::string command)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	mcu.executePython(command.c_str());
+}
+
 void SBScene::runScript(std::string script)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
@@ -664,6 +810,11 @@ SBCollisionManager* SBScene::getCollisionManager()
 SBDiphoneManager* SBScene::getDiphoneManager()
 {
 	return _diphoneManager;
+}
+
+SBBehaviorSetManager* SBScene::getBehaviorSetManager()
+{
+	return _behaviorSetManager;
 }
 
 SBPhysicsManager* SBScene::getPhysicsManager()

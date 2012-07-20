@@ -198,7 +198,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 	if( is_directory( pathname ) ) {
 		// ignore any '.' diretories
 		std::string filebase = pathname.leaf();
-		if (filebase.find(".") == 0)
+		if (filebase.find(".") == 0 && filebase.size() > 1)
 		{
 			// ignore hidden directories
 			return CMD_SUCCESS;
