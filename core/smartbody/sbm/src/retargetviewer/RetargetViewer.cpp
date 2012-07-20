@@ -5,6 +5,7 @@
 #include <sb/SBScene.h>
 #include <FL/Fl_Check_Button.H>
 #include <sstream>
+#include <cstring>
 
 RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h, name)
 {
@@ -18,7 +19,7 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 
 	_choiceCharacters = new Fl_Choice(110, curY, 150, 20, "Character");
 	//choiceCharacters->callback(CharacterCB, this);
-	std::vector<std::string>& characters = scene->getCharacterNames();
+	std::vector<std::string> characters = scene->getCharacterNames();
 	for (size_t c = 0; c < characters.size(); c++)
 	{
 		_choiceCharacters->add(characters[c].c_str());
@@ -27,7 +28,7 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 
 	_choiceSkeletons = new Fl_Choice(110, curY, 150, 20, "Skeleton");
 	//choiceSkeleton->callback(SkeletonCB, this);
-	std::vector<std::string>& skeletons = scene->getSkeletonNames();
+	std::vector<std::string> skeletons = scene->getSkeletonNames();
 	for (size_t c = 0; c < skeletons.size(); c++)
 	{
 		_choiceSkeletons->add(skeletons[c].c_str());
@@ -47,7 +48,7 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 		 iter++)
 	{
 		std::string name = (*iter).first;
-		Fl_Check_Button* check = new Fl_Check_Button(20, curY, 100, 20, _strdup(name.c_str()));
+		Fl_Check_Button* check = new Fl_Check_Button(20, curY, 100, 20, strdup(name.c_str()));
 		curY += 25;
 	}
 	_scrollGroup->end();

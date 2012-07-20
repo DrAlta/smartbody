@@ -340,7 +340,7 @@ void SBScene::removeCharacter(std::string charName)
 
 void SBScene::removeAllCharacters()
 {
-	std::vector<std::string>& characters = getCharacterNames();
+	std::vector<std::string> characters = getCharacterNames();
 	for (std::vector<std::string>::iterator iter = characters.begin();
 		 iter != characters.end();
 		 iter++)
@@ -377,7 +377,7 @@ void SBScene::removePawn(std::string pawnName)
 
 void SBScene::removeAllPawns()
 {
-	std::vector<std::string>& pawns = getPawnNames();
+	std::vector<std::string> pawns = getPawnNames();
 	for (std::vector<std::string>::iterator iter = pawns.begin();
 		 iter != pawns.end();
 		 iter++)
