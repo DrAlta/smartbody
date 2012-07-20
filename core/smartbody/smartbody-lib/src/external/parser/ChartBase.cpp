@@ -111,7 +111,7 @@ ChartBase(SentRep & sentence)
   popedEdgeCount_(0),
   sentence_( sentence )
 {
-#ifdef DEBUG
+#if 0
     extern int	rulei_high_water;
     rulei_high_water = 0;
 #endif /* DEBUG */
