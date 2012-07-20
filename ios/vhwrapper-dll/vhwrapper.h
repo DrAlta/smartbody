@@ -6,6 +6,8 @@
 
 //#define ENABLE_SBM
 
+#include "vhcl_public.h"
+
 #include "smartbody-c-dll.h"
 
 #ifdef ENABLE_VHMSG_WRAPPER
@@ -13,7 +15,7 @@
 #endif
 
 
-#if WIN32
+#if defined(WIN_BUILD)
 #ifdef VHWRAPPERDLL_EXPORTS
 #define VHWRAPPERDLL_API __declspec(dllexport)
 #else
@@ -41,7 +43,7 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_SetMediaPath( SBMHANDLE sbmHandle, const char 
 VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle, const char * pythonPath, bool logToFile );
 VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle );
 
-#ifdef WIN32
+#if !defined(IPHONE_BUILD)
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB,
                                               SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changeCB,
                                               SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB );
@@ -55,6 +57,7 @@ VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmH
 VHWRAPPERDLL_API bool WRAPPER_SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args );
 VHWRAPPERDLL_API int  WRAPPER_SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle );
 VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character );
+VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter2( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter2 * character );
 VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character );
 VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character );
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetLogMessageCallback( LogMessageCallback cb );
@@ -130,6 +133,34 @@ void WRAPPER_tt_client_callback(const char * op, const char * args, void * user_
 #endif
 //////////////////////////////////////////////////////////////
 
+
+
+
+// stubs for testing library loading on different platforms
+#if 0
+
 #ifdef __cplusplus
 }
+#endif
+
+
+
+#if 0
+#include <stdint.h>
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif 
+    
+
+typedef intptr_t SBMHANDLE;
+SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode);
+
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+
 #endif

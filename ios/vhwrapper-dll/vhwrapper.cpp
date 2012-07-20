@@ -47,6 +47,7 @@ typedef bool (*SBM_SetDebuggerRendererRightHanded_DEF)(SBMHANDLE, bool );
 typedef bool (*SBM_ProcessVHMsgs_DEF)(SBMHANDLE, const char*, const char*);
 typedef int  (*SBM_GetNumberOfCharacters_DEF)(SBMHANDLE sbmHandle);
 typedef bool (*SBM_GetCharacter_DEF)( SBMHANDLE sbmHandle, const char*, SBM_SmartbodyCharacter* );
+typedef bool (*SBM_GetCharacter2_DEF)( SBMHANDLE sbmHandle, const char*, SBM_SmartbodyCharacter2* );
 typedef bool (*SBM_ReleaseCharacter_DEF)(SBM_SmartbodyCharacter *);
 typedef bool (*SBM_ReleaseCharacterJoints_DEF)(SBM_SmartbodyCharacter *);
 typedef bool (*SBM_SetLogMessageCallback_DEF)(LogMessageCallback);
@@ -77,6 +78,7 @@ SBM_SetDebuggerRendererRightHanded_DEF  g_SBM_SetDebuggerRendererRightHanded_DEF
 SBM_ProcessVHMsgs_DEF              g_SBM_ProcessVHMsgs_DEF = NULL;
 SBM_GetNumberOfCharacters_DEF      g_SBM_GetNumberOfCharacters_DEF = NULL;
 SBM_GetCharacter_DEF               g_SBM_GetCharacter_DEF = NULL;
+SBM_GetCharacter2_DEF              g_SBM_GetCharacter2_DEF = NULL;
 SBM_ReleaseCharacter_DEF           g_SBM_ReleaseCharacter_DEF = NULL;
 SBM_ReleaseCharacterJoints_DEF     g_SBM_ReleaseCharacterJoints_DEF = NULL;
 SBM_SetLogMessageCallback_DEF      g_SBM_SetLogMessageCallback_DEF = NULL;
@@ -124,6 +126,7 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
    g_SBM_ProcessVHMsgs_DEF              = (SBM_ProcessVHMsgs_DEF)GetProcAddress(g_SBM_HINST, "SBM_ProcessVHMsgs");
    g_SBM_GetNumberOfCharacters_DEF      = (SBM_GetNumberOfCharacters_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetNumberOfCharacters");
    g_SBM_GetCharacter_DEF               = (SBM_GetCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetCharacter");
+   g_SBM_GetCharacter2_DEF              = (SBM_GetCharacter2_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetCharacter2");
    g_SBM_ReleaseCharacter_DEF           = (SBM_ReleaseCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_ReleaseCharacter");
    g_SBM_ReleaseCharacterJoints_DEF     = (SBM_ReleaseCharacterJoints_DEF)GetProcAddress(g_SBM_HINST, "SBM_ReleaseCharacterJoints");
    g_SBM_SetLogMessageCallback_DEF      = (SBM_SetLogMessageCallback_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetLogMessageCallback");
@@ -229,16 +232,20 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle )
 #endif
 }
 
-#ifdef WIN32
+#if !defined(IPHONE_BUILD)
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB,
                                               SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changeCB,
                                               SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB  )
 {
+#ifdef WIN32
    if (g_SBM_SetListener_DEF)
    {
       return g_SBM_SetListener_DEF(sbmHandle, createCB, deleteCB, changeCB, visemeCB, channelCB);
    }
    return false;
+#else
+    return SBM_SetListener(sbmHandle, createCB, deleteCB, changeCB, visemeCB, channelCB);
+#endif
 }
 #else
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetListener( SBMHANDLE sbmHandle)
@@ -329,6 +336,19 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter( SBMHANDLE sbmHandle, const char 
    return false;
 #else
    return SBM_GetCharacter(sbmHandle, name, character);
+#endif
+}
+
+VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter2( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter2 * character )
+{
+#ifdef WIN32
+   if (g_SBM_GetCharacter2_DEF)
+   {
+      return g_SBM_GetCharacter2_DEF(sbmHandle, name, character);
+   }
+   return false;
+#else
+   return SBM_GetCharacter2(sbmHandle, name, character);
 #endif
 }
 
@@ -476,6 +496,7 @@ VHWRAPPERDLL_API char* WRAPPER_SBM_PythonCommandString(SBMHANDLE sbmHandle, cons
 ////////////////////////////////////////////////////////////////////////////
 
 
+#if !defined(MAC_BUILD) && !defined(IPHONE_BUILD)
 
 VHWRAPPERDLL_API AUDIOHANDLE WRAPPER_VHCL_AUDIO_CreateAudio()
 {
@@ -748,6 +769,9 @@ bool VHCL_AUDIO_HandleExists( const AUDIOHANDLE handle )
    return g_audioInstances.find( handle ) != g_audioInstances.end();
 }
 
+#endif  // !defined(MAC_BUILD)
+
+
 #ifdef ENABLE_VHMSG_WRAPPER
 ///VHMSG c++ WRAPPER FUNCTIONS////////////////////////////////
 VHWRAPPERDLL_API VHMSGHANDLE WRAPPER_VHMSG_CreateVHMsg()
@@ -969,3 +993,18 @@ void WRAPPER_tt_client_callback(const char * op, const char * args, void * user_
 #endif
 
 //////////////////////////////////////////////////////////////
+
+
+
+// stubs for testing library loading on different platforms
+#if 0
+#include "vhwrapper.h"
+
+
+SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
+{
+   return 42;
+   //return SBM_CreateSBM();
+}
+
+#endif
