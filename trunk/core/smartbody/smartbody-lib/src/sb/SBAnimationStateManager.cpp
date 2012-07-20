@@ -5,6 +5,7 @@
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBCharacter.h>
 
+
 namespace SmartBody {
 
 SBAnimationBlendManager::SBAnimationBlendManager()
@@ -254,6 +255,33 @@ bool SBAnimationBlendManager::isBlendScheduled(const std::string& characterName,
 		return false;
 
 	return character->param_animation_ct->hasPABlend(stateName);
+}
+
+void SBAnimationBlendManager::removeAllBlends()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	// remove the transitions, too
+	removeAllTransitions();
+
+	for (size_t i = 0; i < mcu.param_anim_blends.size(); i++)
+	{
+		delete mcu.param_anim_blends[i];
+	}
+
+	stateGraph = BoostGraph();
+
+}
+
+void SBAnimationBlendManager::removeAllTransitions()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	for (size_t i = 0; i < mcu.param_anim_transitions.size(); i++)
+	{
+		delete mcu.param_anim_transitions[i];
+	}
+	mcu.param_anim_transitions.clear();
 }
 
 }

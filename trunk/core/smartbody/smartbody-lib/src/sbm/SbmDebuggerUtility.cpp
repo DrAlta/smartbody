@@ -25,41 +25,7 @@ SbmDebuggerUtility::~SbmDebuggerUtility()
 
 void SbmDebuggerUtility::initScene()
 {
-	// better to reset() this, but until the viewer problems are fixed, 
-	// remove objects individually
-
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> characters = SmartBody::SBScene::getScene()->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characters.begin();
-		 iter != characters.end();
-		 iter++)
-	{
-		scene->removeCharacter((*iter));
-	}
-	std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
-	for (std::vector<std::string>::iterator iter = pawns.begin();
-		 iter != pawns.end();
-		 iter++)
-	{
-		scene->removePawn((*iter));
-	}
-
-	// clear out the default face definitions
-	for (std::map<std::string, SmartBody::SBFaceDefinition*>::iterator iter = mcu.face_map.begin();
-		iter != mcu.face_map.end();
-		iter++)
-	{
-		SmartBody::SBFaceDefinition* face = (*iter).second;
-		delete face;
-	}
-	mcu.face_map.clear();
-
-	// clear out the default states
-	mcu.param_anim_blends.clear();
-	mcu.param_anim_transitions.clear();
-
+	
 }
 
 void SbmDebuggerUtility::queryResources()

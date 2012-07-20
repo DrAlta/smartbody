@@ -398,7 +398,9 @@ void mcuCBHandle::reset( void )
 	// reset timer & viewer window
 	_scene->getSimulationManager()->reset();
 	_scene->getSimulationManager()->start();
-	getViewer()->show_viewer();
+	SrViewer* viewer = getViewer();
+	if (viewer)
+		viewer->show_viewer();
 
 
 	_scene->command("vhmsgconnect");
@@ -1094,26 +1096,6 @@ void mcuCBHandle::closeResourceViewer( void )
 	if( resourceViewer_p )	{
 		resourceViewerFactory->destroy(resourceViewer_p);
 		resourceViewer_p = NULL;
-	}
-}
-
-int mcuCBHandle::openVelocityViewer( int width, int height, int px, int py )
-{
-	if( velocityViewer_p == NULL )	{
-		velocityViewer_p = velocityViewerFactory->create( px, py, width, height );
-		velocityViewer_p->label_viewer( "Velocity Viewer" );
-		velocityViewer_p->show_viewer();
-
-		return( CMD_SUCCESS );
-	}
-	return( CMD_FAILURE );
-}
-
-void mcuCBHandle::closeVelocityViewer( void )
-{
-	if( velocityViewer_p )	{
-		velocityViewerFactory->destroy(velocityViewer_p);
-		velocityViewer_p = NULL;
 	}
 }
 

@@ -42,7 +42,7 @@
 # include <sr/sr_sa_gl_render.h>
 # include <sr/sr_sa_bbox.h>
 # include <FL/Fl_Menu.H>
-
+#include "retargetviewer/RetargetViewer.h"
 
 #include "ObjectManipulationHandle.h"
 
@@ -371,6 +371,9 @@ protected:
 	MeCtConstraint*    getCurrentCharacterConstraintController();
 	SbmCharacter*        getCurrentCharacter();
 	std::vector<SrLight> _lights;
+
+	
+	RetargetViewer* _retargetViewer;
  };
 
 

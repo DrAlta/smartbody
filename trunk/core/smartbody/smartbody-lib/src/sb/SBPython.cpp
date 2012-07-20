@@ -31,6 +31,8 @@
 #include <sb/SBSteerAgent.h>
 #include <sb/SBPhoneme.h>
 #include <sb/SBPhonemeManager.h>
+#include <sb/SBBehaviorSet.h>
+#include <sb/SBBehaviorSetManager.h>
 #include <sr/sr_box.h>
 
 
@@ -980,6 +982,22 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getToPhonemeName", &SBDiphone::getToPhonemeName, boost::python::return_value_policy<boost::python::return_by_value>(), "Return TO phoneme name.")		
 		;
 
+		boost::python::class_<SBBehaviorSetManager>("SBBehaviorSetManager")
+		.def("createBehaviorSet", &SBBehaviorSetManager::createBehaviorSet, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a behavior set.")
+		.def("getBehaviorSets", &SBBehaviorSetManager::getBehaviorSets, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets all the behavior sets.")
+		.def("getBehaviorSet", &SBBehaviorSetManager::getBehaviorSet, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets a behavior set with a given name.")
+		.def("getNumBehaviorSets", &SBBehaviorSetManager::getNumBehaviorSets, "Returns the number of behavior sets.")
+		.def("removeBehaviorSet", &SBBehaviorSetManager::removeBehaviorSet, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Removes a behavior set with a given name.")
+		.def("removeAllBehaviorSets", &SBBehaviorSetManager::removeAllBehaviorSets, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Removes all the behavior sets.")
+		;
+
+	boost::python::class_<SBBehaviorSet>("SBBehaviorSet")
+		.def("setName", &SBBehaviorSet::setName, "Sets the name of the behavior set.")
+		.def("getName", &SBBehaviorSet::getName, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the name of the behavior set.")
+		.def("setScript", &SBBehaviorSet::setScript, "Sets the name of the script to be run for this behavior set.")
+		.def("getScript", &SBBehaviorSet::getScript, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the name of the script to be run for this behavior set.")
+		;
+
 
 /*
 	boost::python::class_<Viseme>("Viseme")		
@@ -1038,6 +1056,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("rotate", &SBMotion::rotate, "Rotates the base joint name by x,y,z axis.")			
 		.def("scale", &SBMotion::scale, "Scales all translations in skeleton by scale factor.")		
 		.def("trim", &SBMotion::trim, "Trims the starting and ending frames in the motion.")	
+		.def("saveToSkm", &SBMotion::saveToSkm, "Saves the file in .skm format to a given file name.")	
 		.def("getTimeStart", &SBMotion::retime, "Returns the start time of the motion.")
 		.def("getTimeReady", &SBMotion::retime, "Returns the ready time of the motion.")
 		.def("getTimeStrokeStart", &SBMotion::retime, "Returns the stroke start time of the motion.")
@@ -1284,6 +1303,8 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getJointMap", &SBJointMapManager::getJointMap, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the joint map associated with a given name.")
 		.def("createJointMap", &SBJointMapManager::createJointMap, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a joint map with a given name. Returns null is the map already exists.")
 		.def("getJointMapNames", &SBJointMapManager::getJointMapNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the names of all joint maps.")
+		.def("removeJointMap", &SBJointMapManager::removeJointMap, "Removes a joint map of a given name.")
+		.def("removeAllJointMaps", &SBJointMapManager::removeAllJointMaps, "Removes all the joint maps.")
 		;
 
 	boost::python::class_<Event>("Event")
@@ -1407,7 +1428,9 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getNumFaceDefinitions", &SBScene::getNumFaceDefinitions, "Returns the number of face definitions.")
 		.def("getFaceDefinitionNames", &SBScene::getFaceDefinitionNames, "Return a list of all face definition names. \n Input: NULL \nOutput: list of face definition names.")
 		.def("removeCharacter", &SBScene::removeCharacter, "Remove the character given its name. \n Input: character name \n Output: NULL")
+		.def("removeAllCharacters", &SBScene::removeAllCharacters, "Removes all the characters.")
 		.def("removePawn", &SBScene::removePawn, "Remove the pawn given its name. \n Input: pawn name \n Output: NULL")
+		.def("removeAllPawns", &SBScene::removeAllPawns, "Removes all the pawns.")
 		.def("getNumPawns", &SBScene::getNumPawns, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.")
 		.def("getNumCharacters", &SBScene::getNumCharacters, "Returns the number of characters.\n Input: NULL \nOutput: number of characters.")
 		.def("getPawn", &SBScene::getPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the pawn object given its name. \n Input: pawn name \nOutput: pawn object")
@@ -1425,8 +1448,10 @@ boost::python::class_<SBReach>("SBReach")
 		.def("addAssetPath", &SBScene::addAssetPath, "Add path resource given path type and actual path string. \n Input: type(can be seq|me|ME), path \n Output: NULL")
 		.def("removeAssetPath", &SBScene::removeAssetPath, "Removes a  path resource given path type and actual path string. \n Input: type(can be seq|me|ME), path \n Output: NULL")
 		.def("getAssetPaths", &SBScene::getAssetPaths, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all path names for a given type: seq, me, audio, mesh.")
-		.def("loadAssets", &SBScene::loadAssets, "Loads the skeletons and motions from the motion paths.")
+		.def("loadAssets", &SBScene::loadAssets, "Loads the skeletons and motions from the asset paths.")
+		.def("loadAssetsFromPath", &SBScene::loadAssetsFromPath, "Loads the skeletons and motions from a given path. The path will not be stored for later use.")
 		.def("setMediaPath",&SBScene::setMediaPath, "Sets the media path.")
+		.def("getMediaPath",&SBScene::getMediaPath, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the media path.")
 		.def("setDefaultCharacter", &SBScene::setDefaultCharacter, "Sets the default character.")
 		.def("setDefaultRecipient", &SBScene::setDefaultRecipient, "Sets the default recipient.")
 		.def("createSkeleton", &SBScene::createSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a skeleton definition.")
@@ -1463,6 +1488,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getJointMapManager", &SBScene::getJointMapManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the joint mapping manager object.")
 		.def("getCollisionManager", &SBScene::getCollisionManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the collision manager object.")
 		.def("getDiphoneManager", &SBScene::getDiphoneManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the diphone manager object.")
+		.def("getBehaviorSetManager", &SBScene::getBehaviorSetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the behavior set manager.")
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
 
 	;

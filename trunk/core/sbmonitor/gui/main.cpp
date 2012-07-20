@@ -35,6 +35,8 @@ int main(int argc, char *argv[])
 
 
    QApplication app(argc, argv);
+   QFont font;
+   printf("%s", font.rawName().toStdString().c_str());
    SbmDebuggerForm sbmDebugger;
 
    return app.exec();

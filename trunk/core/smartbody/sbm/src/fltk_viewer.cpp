@@ -420,6 +420,8 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    init_foot_print();
    _lastSelectedCharacter = "";
 
+   _retargetViewer = NULL;
+
    // init timer update for keyboard
    Fl::add_timeout(0.01,timerUpdate,_paLocoData);
 }
@@ -2150,13 +2152,28 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
  		SBSkeleton* skel = mcu._scene->getSkeleton(skelName);
  		float yOffset = -skel->getBoundingBox().a.y;
  		dest.y = yOffset;		
-		sprintf(cmdStr,"createDragAndDropCharacter('defaultChar%d','%s','%s',SrVec(%f,%f,%f))",characterCount,skelName.c_str(),meshName.c_str(),
-			    dest.x,dest.y,dest.z);	
+		std::stringstream strstr;
+		strstr << "defaultChar";
+		strstr << characterCount;
+		characterCount++;
+		std::string charName = strstr.str();
+		sprintf(cmdStr,"createDragAndDropCharacter('%s','%s','%s',SrVec(%f,%f,%f))",charName.c_str(),skelName.c_str(),meshName.c_str(),
+			    dest.x,dest.y,dest.z);
+		
 		LOG("pythonCmd = %s",cmdStr);
 		mcu.executePythonFile("drag-and-drop.py");
-		characterCount++;		
 		mcu.executePython(cmdStr);
 		
+		// launch the retargetting window 
+		if (_retargetViewer)
+		{
+			delete _retargetViewer;
+		}
+		_retargetViewer = new RetargetViewer(this->x() + 50, this->y() + 50, 320, 320, "Behavior Sets");
+		_retargetViewer->setCharacterName(charName);
+		_retargetViewer->setSkeletonName(skelName);
+
+		_retargetViewer->show();
 	}
 }
 
