@@ -263,6 +263,8 @@
     <ClCompile Include="..\src\sbm\SbmDebuggerClient.cpp" />
     <ClCompile Include="..\src\sbm\SbmDebuggerUtility.cpp" />
     <ClCompile Include="..\src\sbm\sbm_speech_impl_skeleton.cpp" />
+    <ClCompile Include="..\src\sb\SBBehaviorSet.cpp" />
+    <ClCompile Include="..\src\sb\SBBehaviorSetManager.cpp" />
     <ClCompile Include="..\src\sb\SBBoneBusManager.cpp" />
     <ClCompile Include="..\src\sb\SBJointMap.cpp" />
     <ClCompile Include="..\src\sb\SBJointMapManager.cpp" />

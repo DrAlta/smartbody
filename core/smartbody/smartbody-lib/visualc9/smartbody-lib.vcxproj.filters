@@ -1033,6 +1033,12 @@
     <ClCompile Include="..\src\sr\sr_sn_colorsurf.cpp">
       <Filter>sr</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sb\SBBehaviorSet.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBBehaviorSetManager.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
