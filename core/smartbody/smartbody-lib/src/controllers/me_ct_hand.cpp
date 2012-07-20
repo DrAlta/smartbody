@@ -226,19 +226,24 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 	reachHand = SbmCharacter::findTagSkMotion(type,reachPose);
 	pointHand = SbmCharacter::findTagSkMotion(type, pointPose);	
 
-	if (releaseHand && grabHand && reachHand)
-	{
+	if (releaseHand)
+		releaseFrame.setMotionPose((float)releaseHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,releaseHand);
+	if (grabHand)
+		grabFrame.setMotionPose((float)grabHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,grabHand);
+	if (reachHand)
+		reachFrame.setMotionPose((float)reachHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,reachHand);
+	if (pointHand)
+		pointFrame.setMotionPose((float)pointHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,pointHand);
+//	if (releaseHand && grabHand && reachHand)
+//	{
 		//printf("set example hand pose\n");		
 		//releaseFrame.setMotionPose((float)releaseHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,releaseHand);
 		//grabFrame.setMotionPose((float)grabHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,grabHand);
 		//reachFrame.setMotionPose((float)reachHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,reachHand);
 		//pointFrame.setMotionPose((float)pointHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,pointHand);
 
-		releaseFrame.setMotionPose((float)pointHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,releaseHand);
-		grabFrame.setMotionPose((float)pointHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,grabHand);
-		reachFrame.setMotionPose((float)pointHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,reachHand);
-		pointFrame.setMotionPose((float)pointHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,pointHand);
-	}
+		
+//	}
 // 	else
 // 	{
 // 		SrVec vec(-8,-6,0);
