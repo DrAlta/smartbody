@@ -37,6 +37,9 @@
     <Filter Include="retargetcreator">
       <UniqueIdentifier>{9e176b9c-43b9-4770-a4ea-e32e0d2e4455}</UniqueIdentifier>
     </Filter>
+    <Filter Include="retargetviewer">
+      <UniqueIdentifier>{a9d611ef-7e60-4b03-b21f-ffb6881cdd53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -218,6 +221,12 @@
     </ClCompile>
     <ClCompile Include="..\src\retargetcreator\RetargetCreatorWindow.cpp">
       <Filter>retargetcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\retargetviewer\RetargetViewer.cpp">
+      <Filter>retargetviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\retargetviewer\RetargetViewer.h">
+      <Filter>retargetviewer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
