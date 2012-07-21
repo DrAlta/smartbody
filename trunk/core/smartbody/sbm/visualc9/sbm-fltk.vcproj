@@ -646,6 +646,26 @@
 				RelativePath="..\src\panimationviewer\ParameterVisualization.h"
 				>
 			</File>
+			<Filter
+				Name="Visualization"
+				>
+				<File
+					RelativePath="..\src\panimationviewer\ErrorVisualization.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\panimationviewer\ErrorVisualization.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\panimationviewer\VisualizationView.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\panimationviewer\VisualizationView.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="channelbufferviewer"

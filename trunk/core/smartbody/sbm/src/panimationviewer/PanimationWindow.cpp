@@ -38,6 +38,7 @@
 #include "ParamAnimTransitionEditor2.h"
 #include "ParamAnimRunTimeEditor.h"
 #include "ParamAnimScriptEditor.h"
+#include "VisualizationView.h"
 
 PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
 {
@@ -77,6 +78,9 @@ PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_
 			runTimeEditor = new PARunTimeEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
 			runTimeEditor->begin();
 			runTimeEditor->end();
+			visView = new VisualizationView(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
+			visView->begin();
+			visView->end();
 		tabGroup->end();
 	this->end();
 	this->resizable(tabGroup);
@@ -132,8 +136,10 @@ void PanimationWindow::update_viewer()
 
 //	if (tabGroup->value() == scriptEditor)
 //		scriptEditor->update();
-	if (tabGroup->value() ==runTimeEditor)
+	if (tabGroup->value() == runTimeEditor)
 		runTimeEditor->update();
+	if (tabGroup->value() == visView)
+		visView->update();
 		
 }
 

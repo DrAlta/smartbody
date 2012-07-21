@@ -1,6 +1,6 @@
 #ifndef _SBSTATE_H
 #define _SBSTATE_H
-
+#include <sr/sr_sn_colorsurf.h>
 #include <controllers/me_ct_param_animation_data.h>
 
 namespace SmartBody {
@@ -34,6 +34,15 @@ class SBAnimationBlend : public PABlend
 
 		std::string saveToString();
 
+		void buildVisSurfaces(const std::string& errorType, const std::string& surfaceType, int segments, int dimensions);
+		SrSnColorSurf* createCurveSurface(float radius, unsigned int dimension, SrVec center, SrVec2 phi, SrVec2 theta);		
+		SrSnColorSurf* createFlatSurface(float depth, unsigned int dimension, SrVec2 topLeft, SrVec2 lowerRight);
+		void createErrorSurfaces(const std::string& type, SrVec center, int segments, int dimensions, std::vector<SrSnColorSurf*>& surfList);
+		void updateErrorSurace(SrSnColorSurf* surf, SrVec center);
+		void updateSmoothSurface(SrSnColorSurf* surf);
+		std::vector<SrSnColorSurf*>& getErrorSurfaces() { return errorSurfaces; }
+		std::vector<SrSnColorSurf*>& getSmoothSurfaces() { return smoothSurfaces; }
+
 	protected:
 		bool addSkMotion(const std::string& motionName);
 		bool removeSkMotion(const std::string& motionName);
@@ -46,6 +55,8 @@ class SBAnimationBlend : public PABlend
 		std::string _dimension;
 		bool _isFinalized;
 
+		std::vector<SrSnColorSurf*> errorSurfaces;
+		std::vector<SrSnColorSurf*> smoothSurfaces;		
 };
 
 

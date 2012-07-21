@@ -836,6 +836,8 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getNumEvents", &SBAnimationBlend::getNumEvents, "Returns the number of events associated with this blend.")
 		.def("getEvent", &SBAnimationBlend::getEvent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event of a given index.")
 		.def("removeEvent", &SBAnimationBlend::removeEvent, "Removes the event of a given index.") 
+		.def("buildVisSurfaces", &SBAnimationBlend::buildVisSurfaces, "Build a visualization surface. \n Input : Error Type, Surface Type, Num of Segements, Grid Resolutions \n Output: NULL")
+
 		;
 
 	boost::python::class_<SBAnimationBlend0D, boost::python::bases<SBAnimationBlend> >("SBAnimationBlend0D")
@@ -864,7 +866,6 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("setParameter", &SBMotionBlendBase::setMotionParameter, "Set/Change the parameter for given motion. \n Input: motion name, vector of parameters. \n Output: NULL")
 		.def("getParameter", &SBMotionBlendBase::getMotionParameter, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the parameter of a given motion")
 		.def("buildBlendBase", &SBMotionBlendBase::buildBlendBase, "Initialize BlendBase. \n Input : Motion Parameter Name, Interpolator Type \n Output: NULL")
-		.def("buildVisSurfaces", &SBMotionBlendBase::buildVisSurfaces, "Build a visualization surface. \n Input : Error Type, Surface Type, Num of Segements, Grid Resolutions \n Output: NULL")
 		.def("addTetrahedron", &SBMotionBlendBase::addTetrahedron, "Add tetrahedrons to the state. By changing the point inside tetrahedron, you can get different blending weights and different results")
 		.def("createMotionVectorFlow", &SBMotionBlendBase::createMotionVectorFlow, "create Vector Flow visualization. \n Input: motion name. \n Output: NULL")
 		.def("clearMotionVectorFlow", &SBMotionBlendBase::clearMotionVectorFlow, "clear Vector Flow visualization. \n Input: NULL. \n Output: NULL")
