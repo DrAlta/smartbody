@@ -323,6 +323,7 @@ bool PABlend::getWeightsFromParameters(double x, double y, double z, std::vector
 	if (type != 2)
 		return false;
 
+	if (weights.size() != getNumMotions()) weights.resize(getNumMotions());
 	SrVec point = SrVec((float)x, (float)y, (float)z);
 	for (unsigned int i = 0; i < tetrahedrons.size(); i++)
 	{

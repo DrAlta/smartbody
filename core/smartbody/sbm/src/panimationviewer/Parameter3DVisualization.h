@@ -7,37 +7,53 @@
 #include "ParameterGroup.h"
 #include <sr/sr_camera.h>
 
-class Parameter3DVisualization : public Fl_Gl_Window
+class VisualizationBase : public Fl_Gl_Window
+{
+public:
+	VisualizationBase(int x, int y, int w, int h, char* name);
+	~VisualizationBase();
+
+	virtual void draw();
+	virtual int handle(int event);
+	virtual void resize(int x, int y, int w, int h);
+	void init_opengl();
+	void translate_event(SrEvent& e, SrEvent::EventType t, int w, int h, VisualizationBase* viewer);
+	void mouse_event(SrEvent& e);
+
+	// user data		
+	void drawGrid();		
+
+public:
+	SrCamera cam;
+	SrEvent e;
+	float gridSize;
+	float gridStep;
+	float floorHeight;
+	int lastMouseX;
+	int lastMouseY;
+private:
+	PABlendData* blendData;		
+};
+
+
+class Parameter3DVisualization : public VisualizationBase
 {
 	public:
 		Parameter3DVisualization(int x, int y, int w, int h, char* name, PABlendData* s, ParameterGroup* window);
 		~Parameter3DVisualization();
 
-		virtual void draw();
-		virtual int handle(int event);
-		virtual void resize(int x, int y, int w, int h);
-		void init_opengl();
-		void translate_event(SrEvent& e, SrEvent::EventType t, int w, int h, Parameter3DVisualization* viewer);
-		void mouse_event(SrEvent& e);
+		virtual void draw();			
 
 		// user data
 		void setSelectedTetrahedrons(std::vector<bool>& selected);
 		void setSelectedParameters(std::vector<bool>& selected);
-		void drawTetrahedrons();
-		void drawGrid();
+		void drawTetrahedrons();		
 		void drawParameter();
 		SrVec determineScale();
 
-	public:
-		SrCamera cam;
-		SrEvent e;
-		float gridSize;
-		float gridStep;
-		float floorHeight;
+	public:		
 		std::vector<bool> selectedTetrahedrons;
-		std::vector<bool> selectedParameters;
-		int lastMouseX;
-		int lastMouseY;
+		std::vector<bool> selectedParameters;		
 
 	private:
 		PABlendData* blendData;

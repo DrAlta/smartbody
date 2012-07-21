@@ -34,7 +34,7 @@ PARunTimeEditor::PARunTimeEditor(int x, int y, int w, int h, PanimationWindow* w
 {
 	this->label("Run Time Editor");
 	this->begin();
-		currentCycleState = new Fl_Output(2 * xDis + 100 + x, yDis + y, 100, 2 * yDis, "Current State");
+		currentCycleState = new Fl_Output(2 * xDis + 100 + x, yDis + y, 200, 2 * yDis, "Current State");
 		nextCycleStates = new Fl_Hold_Browser(2 * xDis + x, 5 * yDis + y, w / 2 - 4 * xDis, h / 4, "Next State");
 		nextCycleStates->callback(updateTransitionStates, this);
 		

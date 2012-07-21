@@ -480,10 +480,12 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClCompile Include="..\src\FLTKListener.cpp" />
     <ClCompile Include="..\src\monitorviewer\MonitorConnectWindow.cpp" />
     <ClCompile Include="..\src\ObjectManipulationHandle.cpp" />
+    <ClCompile Include="..\src\panimationviewer\ErrorVisualization.cpp" />
     <ClCompile Include="..\src\panimationviewer\ParamAnimAutoMarkingEditor.cpp" />
     <ClCompile Include="..\src\panimationviewer\ParamAnimParameterEditor.cpp" />
     <ClCompile Include="..\src\panimationviewer\ParamAnimTransitionCreatorWidget.cpp" />
     <ClCompile Include="..\src\panimationviewer\ParamAnimTransitionEditor2.cpp" />
+    <ClCompile Include="..\src\panimationviewer\VisualizationView.cpp" />
     <ClCompile Include="..\src\PawnPosControl.cpp" />
     <ClCompile Include="..\src\PositionControl.cpp" />
     <ClCompile Include="..\src\retargetcreator\RetargetCreatorWindow.cpp" />
@@ -538,7 +540,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClCompile Include="..\src\visemeviewer\VisemeCurve.cpp" />
     <ClCompile Include="..\src\visemeviewer\VisemeCurveEditor.cpp" />
     <ClCompile Include="..\src\visemeviewer\VisemeViewerWindow.cpp" />
-	<ClCompile Include="..\src\retargetviewer\RetargetViewer.cpp" />
+    <ClCompile Include="..\src\retargetviewer\RetargetViewer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\bmlcreator\TextEditor.h" />
@@ -547,10 +549,12 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClInclude Include="..\src\FLTKListener.h" />
     <ClInclude Include="..\src\monitorviewer\MonitorConnectWindow.h" />
     <ClInclude Include="..\src\ObjectManipulationHandle.h" />
+    <ClInclude Include="..\src\panimationviewer\ErrorVisualization.h" />
     <ClInclude Include="..\src\panimationviewer\ParamAnimAutoMarkingEditor.h" />
     <ClInclude Include="..\src\panimationviewer\ParamAnimParameterEditor.h" />
     <ClInclude Include="..\src\panimationviewer\ParamAnimTransitionCreatorWidget.h" />
     <ClInclude Include="..\src\panimationviewer\ParamAnimTransitionEditor2.h" />
+    <ClInclude Include="..\src\panimationviewer\VisualizationView.h" />
     <ClInclude Include="..\src\PawnPosControl.h" />
     <ClInclude Include="..\src\PositionControl.h" />
     <ClInclude Include="..\src\retargetcreator\RetargetCreatorWindow.h" />
@@ -603,7 +607,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClInclude Include="..\src\visemeviewer\VisemeCurve.h" />
     <ClInclude Include="..\src\visemeviewer\VisemeCurveEditor.h" />
     <ClInclude Include="..\src\visemeviewer\VisemeViewerWindow.h" />
-	<ClCompile Include="..\src\retargetviewer\RetargetViewer.h" />
+    <ClCompile Include="..\src\retargetviewer\RetargetViewer.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\lib\bonebus\bonebus.vcxproj">

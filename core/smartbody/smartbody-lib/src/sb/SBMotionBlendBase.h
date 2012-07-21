@@ -1,6 +1,5 @@
 #ifndef _SBMOTIONBLENDBASE_H
 #define _SBMOTIONBLENDBASE_H
-#include <sr/sr_sn_colorsurf.h>
 #include <sb/SBAnimationState.h>
 #include <controllers/me_ct_param_animation_data.h>
 #include <controllers/MeCtBlendEngine.h>
@@ -12,9 +11,7 @@ namespace SmartBody {
 	protected:
 		MeCtBlendEngine* blendEngine;			
 		int parameterDim;
-		std::string interpType;
-		std::vector<SrSnColorSurf*> errorSurfaces;
-		std::vector<SrSnColorSurf*> smoothSurfaces;		
+		std::string interpType;		
 		std::string skeletonName;
 
 		std::vector<SrSnLines*> vecflowLinesArray;
@@ -38,7 +35,7 @@ namespace SmartBody {
 
 		virtual void removeMotion(const std::string& motionName);
 		void buildBlendBase(const std::string& motionParameter, const std::string& interpolatorType, bool copySimplex);
-		void buildVisSurfaces(const std::string& errorType, const std::string& surfaceType, int segments, int dimensions);
+		
 
 		virtual bool getWeightsFromParameters(double x, std::vector<double>& weights);
 		virtual bool getWeightsFromParameters(double x, double y, std::vector<double>& weights);
@@ -48,13 +45,7 @@ namespace SmartBody {
 		virtual void getParametersFromWeights(float& x, float& y, float& z, std::vector<double>& weights);
 		void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
 
-		SrSnColorSurf* createCurveSurface(float radius, unsigned int dimension, SrVec center, SrVec2 phi, SrVec2 theta);		
-		SrSnColorSurf* createFlatSurface(float depth, unsigned int dimension, SrVec2 topLeft, SrVec2 lowerRight);
-		void createErrorSurfaces(const std::string& type, SrVec center, int segments, int dimensions, std::vector<SrSnColorSurf*>& surfList);
-		void updateErrorSurace(SrSnColorSurf* surf, SrVec center);
-		void updateSmoothSurface(SrSnColorSurf* surf);
-		std::vector<SrSnColorSurf*>& getErrorSurfaces() { return errorSurfaces; }
-		std::vector<SrSnColorSurf*>& getSmoothSurfaces() { return smoothSurfaces; }
+		
 
 		/* draw vector flow in-between consecutive frame pairs, to visualize smoothness of motion
 		// if maxError=0, it'll be set as max vec norm among all frame pairs;

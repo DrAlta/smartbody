@@ -40,6 +40,9 @@
     <Filter Include="retargetviewer">
       <UniqueIdentifier>{a9d611ef-7e60-4b03-b21f-ffb6881cdd53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="panimationviewer\visualization">
+      <UniqueIdentifier>{1180fb1f-9e22-4e8b-8474-7dcfbf71c750}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -228,6 +231,14 @@
     <ClCompile Include="..\src\retargetviewer\RetargetViewer.h">
       <Filter>retargetviewer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\retargetviewer\RetargetViewer.cpp" />
+    <ClCompile Include="..\src\retargetviewer\RetargetViewer.h" />
+    <ClCompile Include="..\src\panimationviewer\ErrorVisualization.cpp">
+      <Filter>panimationviewer\visualization</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\VisualizationView.cpp">
+      <Filter>panimationviewer\visualization</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -407,6 +418,12 @@
     </ClInclude>
     <ClInclude Include="..\src\retargetcreator\RetargetCreatorWindow.h">
       <Filter>retargetcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ErrorVisualization.h">
+      <Filter>panimationviewer\visualization</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\VisualizationView.h">
+      <Filter>panimationviewer\visualization</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
