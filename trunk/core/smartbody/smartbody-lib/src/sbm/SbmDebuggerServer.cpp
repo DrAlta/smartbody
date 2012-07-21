@@ -348,10 +348,17 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 						for (size_t i = 0; i < skeletonNames.size(); ++i)
 						{
 							SBSkeleton* skeleton = m_scene->getSkeleton(skeletonNames[i]);
-							std::string msg = vhcl::Format("sbmdebugger %s init skeleton %s ", m_fullId.c_str(), skeleton->skfilename().c_str());
-							msg += skeleton->saveToString();
+							if (!skeleton)
+							{
+								LOG("Cannot find skeleton %s.", skeletonNames[i].c_str());
+							}
+							else
+							{
+								std::string msg = vhcl::Format("sbmdebugger %s init skeleton %s ", m_fullId.c_str(), skeleton->skfilename().c_str());
+								msg += skeleton->saveToString();
 
-							vhmsg::ttu_notify1(msg.c_str());	
+								vhmsg::ttu_notify1(msg.c_str());	
+							}
 						}						
 
                         vector<string> charNames = m_scene->getCharacterNames();
