@@ -28,27 +28,18 @@
     <Filter Include="bmlcreator">
       <UniqueIdentifier>{fbaae2c9-1e25-4b03-b1cf-0b767bb24300}</UniqueIdentifier>
     </Filter>
-    <Filter Include="visemeviewer">
-      <UniqueIdentifier>{ff606155-3868-40d0-b5f4-96697ed8f36f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="monitorViewer">
-      <UniqueIdentifier>{8c9ae46e-7260-4f60-bb2f-cd1a15721a70}</UniqueIdentifier>
+    <Filter Include="retargetviewer">
+      <UniqueIdentifier>{7f983ecd-5e90-4253-bde5-ff7f00300634}</UniqueIdentifier>
     </Filter>
     <Filter Include="retargetcreator">
-      <UniqueIdentifier>{9e176b9c-43b9-4770-a4ea-e32e0d2e4455}</UniqueIdentifier>
+      <UniqueIdentifier>{56361f18-4f18-4cc4-b99b-6afd39fa8ac8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="retargetviewer">
-      <UniqueIdentifier>{a9d611ef-7e60-4b03-b21f-ffb6881cdd53}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="panimationviewer\visualization">
-      <UniqueIdentifier>{1180fb1f-9e22-4e8b-8474-7dcfbf71c750}</UniqueIdentifier>
+    <Filter Include="diphoneviewer">
+      <UniqueIdentifier>{2b51ee1f-542b-4db5-8b62-afe631bec4b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
-      <Filter>viewer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\fltk_viewer.cpp">
       <Filter>viewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FLTKListener.cpp">
@@ -205,46 +196,43 @@
     <ClCompile Include="..\src\panimationviewer\ParamAnimTransitionCreatorWidget.cpp">
       <Filter>panimationviewer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\panimationviewer\ParamAnimAutoMarkingEditor.cpp" />
-    <ClCompile Include="..\src\panimationviewer\ParamAnimParameterEditor.cpp" />
-    <ClCompile Include="..\src\visemeviewer\VisemeCurve.cpp">
-      <Filter>visemeviewer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\visemeviewer\VisemeCurveEditor.cpp">
-      <Filter>visemeviewer</Filter>
+    <ClCompile Include="..\src\monitorviewer\MonitorConnectWindow.cpp" />
+    <ClCompile Include="..\src\retargetcreator\RetargetCreatorWindow.cpp">
+      <Filter>retargetcreator</Filter>
     </ClCompile>
     <ClCompile Include="..\src\visemeviewer\VisemeViewerWindow.cpp">
-      <Filter>visemeviewer</Filter>
+      <Filter>diphoneviewer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\monitorviewer\MonitorConnectWindow.cpp">
-      <Filter>monitorViewer</Filter>
+    <ClCompile Include="..\src\visemeviewer\VisemeCurveEditor.cpp">
+      <Filter>diphoneviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\visemeviewer\VisemeCurve.cpp">
+      <Filter>diphoneviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\VisualizationView.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ParamAnimParameterEditor.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ParamAnimAutoMarkingEditor.cpp">
+      <Filter>panimationviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\panimationviewer\ErrorVisualization.cpp">
+      <Filter>panimationviewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\bmlcreator\TextEditor.cpp">
       <Filter>bmlcreator</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\retargetcreator\RetargetCreatorWindow.cpp">
-      <Filter>retargetcreator</Filter>
+    <ClCompile Include="..\src\fltk_viewer.cpp">
+      <Filter>viewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\retargetviewer\RetargetViewer.cpp">
       <Filter>retargetviewer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\retargetviewer\RetargetViewer.h">
-      <Filter>retargetviewer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\retargetviewer\RetargetViewer.cpp" />
-    <ClCompile Include="..\src\retargetviewer\RetargetViewer.h" />
-    <ClCompile Include="..\src\panimationviewer\ErrorVisualization.cpp">
-      <Filter>panimationviewer\visualization</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\panimationviewer\VisualizationView.cpp">
-      <Filter>panimationviewer\visualization</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
-      <Filter>viewer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\fltk_viewer.h">
       <Filter>viewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\FLTKListener.h">
@@ -399,31 +387,39 @@
     <ClInclude Include="..\src\panimationviewer\ParamAnimTransitionCreatorWidget.h">
       <Filter>panimationviewer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\panimationviewer\ParamAnimAutoMarkingEditor.h" />
-    <ClInclude Include="..\src\panimationviewer\ParamAnimParameterEditor.h" />
-    <ClInclude Include="..\src\visemeviewer\VisemeCurve.h">
-      <Filter>visemeviewer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\visemeviewer\VisemeCurveEditor.h">
-      <Filter>visemeviewer</Filter>
+    <ClInclude Include="..\src\monitorviewer\MonitorConnectWindow.h" />
+    <ClInclude Include="..\src\retargetcreator\RetargetCreatorWindow.h">
+      <Filter>retargetcreator</Filter>
     </ClInclude>
     <ClInclude Include="..\src\visemeviewer\VisemeViewerWindow.h">
-      <Filter>visemeviewer</Filter>
+      <Filter>diphoneviewer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\monitorviewer\MonitorConnectWindow.h">
-      <Filter>monitorViewer</Filter>
+    <ClInclude Include="..\src\visemeviewer\VisemeCurveEditor.h">
+      <Filter>diphoneviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\visemeviewer\VisemeCurve.h">
+      <Filter>diphoneviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\VisualizationView.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ParamAnimParameterEditor.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ParamAnimAutoMarkingEditor.h">
+      <Filter>panimationviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\panimationviewer\ErrorVisualization.h">
+      <Filter>panimationviewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\bmlcreator\TextEditor.h">
       <Filter>bmlcreator</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\retargetcreator\RetargetCreatorWindow.h">
-      <Filter>retargetcreator</Filter>
+    <ClInclude Include="..\src\fltk_viewer.h">
+      <Filter>viewer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\panimationviewer\ErrorVisualization.h">
-      <Filter>panimationviewer\visualization</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\panimationviewer\VisualizationView.h">
-      <Filter>panimationviewer\visualization</Filter>
+    <ClInclude Include="..\src\retargetviewer\RetargetViewer.h">
+      <Filter>retargetviewer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
