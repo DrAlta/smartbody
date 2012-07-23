@@ -48,7 +48,7 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 		 iter++)
 	{
 		std::string name = (*iter).first;
-		Fl_Check_Button* check = new Fl_Check_Button(20, curY, 100, 20, strdup(name.c_str()));
+		Fl_Check_Button* check = new Fl_Check_Button(20, curY, 100, 20, _strdup(name.c_str()));
 		curY += 25;
 	}
 	_scrollGroup->end();
