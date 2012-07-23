@@ -208,6 +208,10 @@ MeCtGaze::MeCtGaze( void )	: SmartBody::SBController() {
 	fading_complete = false;
 	fading_mode = FADING_MODE_OFF;
 	
+	scheduled_time = 0.0f;
+	scheduled_fade_mode = FADING_MODE_OFF;
+	scheduled_fade_interval = 0.0f;
+
 	joint_key_count = 0;
 	joint_key_map = NULL;
 	joint_key_top_map = NULL;
@@ -1139,10 +1143,38 @@ void MeCtGaze::set_fade_out( float interval )	{
 	}
 }
 
+
+void MeCtGaze::set_fade_in_scheduled(float interval, double time)
+{
+	scheduled_time = mcuCBHandle::singleton().time + time;
+	scheduled_fade_mode = FADING_MODE_IN;
+	scheduled_fade_interval = interval;
+}
+
+void MeCtGaze::set_fade_out_scheduled(float interval, double time)
+{
+	scheduled_time = mcuCBHandle::singleton().time + time;
+	scheduled_fade_mode = FADING_MODE_OUT;
+	scheduled_fade_interval = interval;
+}
+
 #define SMOOTH_RATE_REF (30.0f)
 #define FADE_EPSILON	(0.001f)
 
 bool MeCtGaze::update_fading( float dt )	{
+
+	if (scheduled_time > 0.0f && mcuCBHandle::singleton().time > scheduled_time)
+	{
+		if (scheduled_fade_mode == FADING_MODE_IN)
+			if (!isFadingIn())
+				set_fade_in(scheduled_fade_interval);
+		if (scheduled_fade_mode == FADING_MODE_OUT)
+			if (!isFadingOut())
+				set_fade_out(scheduled_fade_interval);
+		
+		scheduled_time = 0.0f;
+		return false;
+	}
 
 	// returns true if fully faded.
 	

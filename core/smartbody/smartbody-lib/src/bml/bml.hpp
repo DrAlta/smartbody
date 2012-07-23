@@ -345,6 +345,7 @@ namespace BML {
 			           const BehaviorSyncPoints& behav_syncs );
 	};
 
+
 	class ParameterizedAnimationRequest : public BehaviorRequest 
 	{
 	public:
@@ -412,6 +413,17 @@ namespace BML {
 			            const BehaviorSyncPoints& behav_syncs );
 
 		virtual BehaviorSpan getBehaviorSpan();
+	};
+
+	class GazeRequest : public MeControllerRequest {
+	private:
+		float gazeFadeInterval;
+		int gazeFadeMode;
+
+	public:
+		GazeRequest(   float interval, int mode, const std::string& unique_id, const std::string& localId, MeController* gaze, MeCtSchedulerClass* schedule_ct,
+			           const BehaviorSyncPoints& behav_syncs );
+		virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
 	};
 
 	class SequenceRequest : public BehaviorRequest {

@@ -576,13 +576,32 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 
 	float gaze_fade_out_ival = xml_utils::xml_parse_float( BMLDefs::ATTR_FADE_OUT, elem, BML::Gaze::fade_out_ival );
 	float gaze_fade_in_ival = xml_utils::xml_parse_float( BMLDefs::ATTR_FADE_IN, elem, BML::Gaze::fade_in_ival );
-
+	float gaze_fade_ival = 0.0f;
+	int gaze_fade_mode = 0;
+	if (gaze_fade_out_ival > 0 && gaze_fade_in_ival > 0)
+		LOG( "WARNING: fade in and out cannot be both valid" );
+	else
+	{
+		if (gaze_fade_out_ival > 0)
+		{
+			gaze_fade_ival = gaze_fade_out_ival;
+			gaze_fade_mode = 0;
+		}
+		if (gaze_fade_in_ival > 0)
+		{
+			gaze_fade_ival = gaze_fade_in_ival;
+			gaze_fade_mode = 1;
+		}
+	}
+/*
 	if( gaze_fade_out_ival >= 0.0f )	{
 		// assuming we are freeing this little angel...
 		// gaze_ct->recurrent = false...
 		if (gaze_ct)
 		{
-			if (!gaze_ct->isFadingOut())
+			if (fadeStart > 0.0f)
+				gaze_ct->set_fade_out_scheduled(gaze_fade_out_ival, fadeStart);
+			else if (!gaze_ct->isFadingOut())
 				gaze_ct->set_fade_out( gaze_fade_out_ival );
 			else	// silence ignore if it's already fading out now
 				return BehaviorRequestPtr( new EventRequest(unique_id, "", "", behav_syncs, ""));
@@ -594,13 +613,15 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		// gaze_ct->recurrent = false...
 		if (gaze_ct)
 		{
-			if (!gaze_ct->isFadingIn())
+			if (fadeStart > 0.0f)
+				gaze_ct->set_fade_in_scheduled(gaze_fade_out_ival, fadeStart);
+			else if (!gaze_ct->isFadingIn())
 				gaze_ct->set_fade_in( gaze_fade_in_ival );
 			else	// silence ignore if it's already fading in now
 				return BehaviorRequestPtr( new EventRequest(unique_id, "", "", behav_syncs, ""));
 		}
 	}
-
+*/
 	if( LOG_GAZE_PARAMS ) {
 		cout << "DEBUG: Gaze parameters:" << endl
 				<< "\tgaze_speed_head = " << gaze_speed_head << endl
@@ -762,7 +783,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	std::string localId;
 	xml_utils::xml_parse_string(&localId, BMLDefs::ATTR_ID, elem );
 
-	boost::shared_ptr<MeControllerRequest> ct_request( new MeControllerRequest( unique_id, localId, gaze_ct, request->actor->gaze_sched_p, behav_syncs ) );
+	boost::shared_ptr<GazeRequest> ct_request( new GazeRequest(gaze_fade_ival, gaze_fade_mode, unique_id, localId, gaze_ct, request->actor->gaze_sched_p, behav_syncs ) );
 	ct_request->set_persistent( true );
 	return ct_request;
 }
