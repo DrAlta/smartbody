@@ -61,7 +61,7 @@ void BMLObject::constructBML()
 		{
 			if (vecAttribute->getValue() != vecAttribute->getDefaultValue())
 			{
-				strstr << " " << doubleAttribute->getName() << "=\"" << vecAttribute->getValue()[0] << " " << vecAttribute->getValue()[1] << " " << vecAttribute->getValue()[1] << "\"";
+				strstr << " " << vecAttribute->getName() << "=\"" << vecAttribute->getValue()[0] << " " << vecAttribute->getValue()[1] << " " << vecAttribute->getValue()[2] << "\"";
 				numUsedElements++;
 			}
 		}

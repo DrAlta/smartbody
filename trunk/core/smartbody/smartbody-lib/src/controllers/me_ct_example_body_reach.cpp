@@ -31,6 +31,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 	_duration = -1.f;	
 	footIKFix = true;
 	useProfileInterpolation = false;
+	useLocomotion = false;
 	useRetiming = false;
 	isMoving = false;
 	startReach = false;
@@ -125,6 +126,11 @@ void MeCtExampleBodyReach::setFootIK( bool useIK )
 	footIKFix = useIK;
 }
 
+void MeCtExampleBodyReach::setUseLocomotion( bool useLoco )
+{
+	useLocomotion = useLoco;
+}
+
 void MeCtExampleBodyReach::setLinearVelocity( float vel )
 {
 	currentReachData->linearVel = vel;
@@ -195,7 +201,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (currentReachEngine->getCurrentState()->curStateName() != "Idle" 
-		|| currentReachEngine->curHandActionState == MeCtReachEngine::POINT_AT_OBJECT)
+		|| currentReachEngine->curHandActionState == MeCtReachEngine::POINT_AT_OBJECT || !useLocomotion)
 	{
 		updateReachType(targetPos);
 		return true;

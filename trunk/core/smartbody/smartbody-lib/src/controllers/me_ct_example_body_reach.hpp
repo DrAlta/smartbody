@@ -40,6 +40,7 @@ protected:
 	MeCtReachEngine*      currentReachEngine;
 	std::string           characterName;		
 	bool                  footIKFix;	
+	bool                  useLocomotion;
 	bool                  useProfileInterpolation;
 	bool                  useRetiming;
 	bool                  isMoving;
@@ -80,6 +81,7 @@ public:
 	void setReachTargetPos(SrVec& targetPos);
 	void setFinishReaching(bool isFinish);
 	void setFootIK(bool useIK);
+	void setUseLocomotion(bool useLoco);
 	void setDefaultReachType(const std::string& reachTypeName);
 	void init(SbmPawn* pawn);	
 	void notify(SBSubject* subject);

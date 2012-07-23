@@ -6,7 +6,7 @@ BMLReachObject::BMLReachObject() : BMLObject()
 	setName("reach");
 
 	createStringAttribute("target", "", true, "Basic", 10, false, false, false, "reach target");
-	//createVec3Attribute("sbm:target-pos", 0,0,0, true, "Basic", 10, false, false, false, "reach target");
+	createVec3Attribute("sbm:target-pos", 0,0,0, true, "Basic", 10, false, false, false, "reach target position");
 	
 	SmartBody::StringAttribute* reachActionAttr = createStringAttribute("sbm:action","",true,"Basic", 20, false, false, false,"the action to be executed when reaching.");
 	std::vector<std::string> reachActions;
@@ -25,6 +25,8 @@ BMLReachObject::BMLReachObject() : BMLObject()
 
 	createStringAttribute("sbm:handle", "", true, "Basic", 30, false, false, false, "Handle of this reach instance, can be reused during later reach commands.");
 	createBoolAttribute("sbm:foot-ik",true,true,"Basic", 40, false, false, false,"whether to apply ik and fixed the foot sliding.");
+	createBoolAttribute("sbm:use-locomotion",false,true,"Basic", 40, false, false, false,"whether to use locomotion for target far away.");
+
 	createBoolAttribute("sbm:reach-finish",false,true,"Basic", 50, false, false, false,"whether to finish the reaching action and return to the rest pose.");
 
 	createDoubleAttribute("sbm:reach-velocity",60.0,true,"Basic", 60, false, false, false,"the end effector movement velocity when interpolating two poses.");
