@@ -13,16 +13,41 @@
 
 using std::string;
 
-std::map< int, std::vector<SBM_CallbackInfo*> > g_CreateCallbackInfo;
-std::map< int, std::vector<SBM_CallbackInfo*> > g_DeleteCallbackInfo;
-std::map< int, std::vector<SBM_CallbackInfo*> > g_ChangeCallbackInfo;
-std::map< int, std::vector<SBM_CallbackInfo*> > g_VisemeCallbackInfo;
-std::map< int, std::vector<SBM_CallbackInfo*> > g_ChannelCallbackInfo;
 
-LogMessageCallback LogMessageFunc = NULL;
+struct SBM_CallbackInfo
+{
+    char * name;
+    char * objectClass;
+    char * visemeName;
+    float weight;
+    float blendTime;
 
+   SBM_CallbackInfo()
+   {
+      name = NULL;
+      objectClass = NULL;
+      visemeName = NULL;
+   }
 
-void DeleteCallbacks(SBMHANDLE sbmHandle, std::map< int, std::vector<SBM_CallbackInfo*> >& callbackData);
+   ~SBM_CallbackInfo()
+   {
+      if (name)
+      {
+         delete name;
+         name = NULL;
+      }
+      if (objectClass)
+      {
+         delete objectClass;
+         objectClass = NULL;
+      }
+      if (visemeName)
+      {
+         delete visemeName;
+         visemeName = NULL;
+      }
+   }
+};
 
 
 class LogMessageListener : public vhcl::Log::Listener
@@ -48,9 +73,21 @@ public:
 LogMessageListener* g_pLogMessageListener = NULL;
 
 
+std::map< int, std::vector<SBM_CallbackInfo*> > g_CreateCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo*> > g_DeleteCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo*> > g_ChangeCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo*> > g_VisemeCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo*> > g_ChannelCallbackInfo;
+
+LogMessageCallback g_LogMessageFunc = NULL;
+
+
+void DeleteCallbacks(SBMHANDLE sbmHandle, std::map< int, std::vector<SBM_CallbackInfo*> >& callbackData);
+
+
 SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb)
 {
-   LogMessageFunc = cb;
+   g_LogMessageFunc = cb;
 
    if (g_pLogMessageListener == NULL)
    {
@@ -66,9 +103,9 @@ SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb)
 SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType)
 {
    // 0 = normal, 1 = error, 2 = warning
-   if (LogMessageFunc)
+   if (g_LogMessageFunc)
    {
-      LogMessageFunc(message, messageType);
+      g_LogMessageFunc(message, messageType);
    }
 }
 
@@ -96,15 +133,15 @@ public:
    virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass )
    {
 #if !defined(IPHONE_BUILD)
-         m_createCharacterCallback( m_sbmHandle, name.c_str(), objectClass.c_str() );
+      m_createCharacterCallback( m_sbmHandle, name.c_str(), objectClass.c_str() );
 #else
-          SBM_CallbackInfo* info = new SBM_CallbackInfo();
-          info->name = new char[name.length() + 1];
-          strcpy(info->name, name.c_str());
-          
-          info->objectClass = new char[objectClass.length() + 1];
-          strcpy(info->objectClass, objectClass.c_str());
-          g_CreateCallbackInfo[m_sbmHandle].push_back(info);
+      SBM_CallbackInfo* info = new SBM_CallbackInfo();
+      info->name = new char[name.length() + 1];
+      strcpy(info->name, name.c_str());
+
+      info->objectClass = new char[objectClass.length() + 1];
+      strcpy(info->objectClass, objectClass.c_str());
+      g_CreateCallbackInfo[m_sbmHandle].push_back(info);
 #endif
    }
 

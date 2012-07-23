@@ -2,7 +2,7 @@
 #ifndef SMARTBODY_C_DLL_H
 #define SMARTBODY_C_DLL_H
 
-#if WIN32
+#ifdef WIN32
 #ifdef SMARTBODY_C_DLL_EXPORTS
 #define SMARTBODY_C_DLL_API __declspec(dllexport)
 #else
@@ -15,12 +15,11 @@
 
 
 #include "vhcl_public.h"
-#include <map>
+
 
 typedef intptr_t SBMHANDLE;
 
-typedef void (__stdcall *LogMessageCallback)(const char* message, int messageType); //0 = normal, 1 = error, 2 = warning
-
+typedef void (__stdcall *LogMessageCallback)(const char* message, int messageType);  // 0 = normal, 1 = error, 2 = warning
 
 // Listener callbacks to get Smartbody related notifications
 typedef int (__stdcall *SBM_OnCreateCharacterCallback)( SBMHANDLE sbmHandle, const char * name, const char * objectClass );
@@ -29,40 +28,6 @@ typedef int (__stdcall *SBM_OnCharacterChangeCallback)( SBMHANDLE sbmHandle, con
 typedef int (__stdcall *SBM_OnVisemeCallback)( SBMHANDLE sbmHandle, const char * name, const char * visemeName, float weight, float blendTime );
 typedef int (__stdcall *SBM_OnChannelCallback)( SBMHANDLE sbmHandle, const char * name, const char * channelName, float value );
 
-struct SBM_CallbackInfo
-{
-    char * name;
-    char * objectClass;
-    char * visemeName;
-    float weight;
-    float blendTime;
-
-   SBM_CallbackInfo()
-   {
-      name = NULL;
-      objectClass = NULL;
-      visemeName = NULL;
-   }
-
-   ~SBM_CallbackInfo()
-   {
-      if (name)
-      {
-         delete name;
-         name = NULL;
-      }
-      if (objectClass)
-      {
-         delete objectClass;
-         objectClass = NULL;
-      }
-      if (visemeName)
-      {
-         delete visemeName;
-         visemeName = NULL;
-      }
-   }
-};
 
 #ifdef __cplusplus
 extern "C" {
