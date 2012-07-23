@@ -148,12 +148,41 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	monitorConnectWindow = NULL;
 
 	retargetCreatorWindow = NULL;
+
+	faceViewerWindow = NULL;
+	bmlViewerWindow = NULL;
+	dataViewerWindow = NULL;
+	resourceWindow = NULL;
+	panimationWindow = NULL;
+
 }
 
 BaseWindow::~BaseWindow() {
+
 	delete fltkViewer;
 	if (commandWindow)
 		delete commandWindow;
+	if (characterCreator)
+		delete characterCreator;
+	if (visemeViewerWindow)
+		delete visemeViewerWindow;
+	if (monitorConnectWindow)
+		delete monitorConnectWindow;
+	if (retargetCreatorWindow)
+		delete retargetCreatorWindow;
+	if (faceViewerWindow)
+		delete faceViewerWindow;
+	if (bmlViewerWindow)
+		delete bmlViewerWindow;
+	if (bmlCreatorWindow)
+		delete bmlCreatorWindow;
+	if (dataViewerWindow)
+		delete dataViewerWindow;
+	if (resourceWindow)
+		delete resourceWindow;
+	if (panimationWindow)
+		delete panimationWindow;
+
 }
 
 
@@ -242,14 +271,54 @@ void BaseWindow::resetWindow()
 		delete monitorConnectWindow;
 		monitorConnectWindow = NULL;
 	}
+
+	if (characterCreator)
+	{
+		delete characterCreator;
+		characterCreator = NULL;
+	}
+	if (visemeViewerWindow)
+	{
+		delete visemeViewerWindow;
+		visemeViewerWindow = NULL;
+	}
+
+	if (monitorConnectWindow)
+	{
+		delete monitorConnectWindow;
+		monitorConnectWindow = NULL;
+	}
+
+	if (faceViewerWindow)
+	{
+		delete faceViewerWindow;
+		faceViewerWindow = NULL;
+	}
+	if (bmlViewerWindow)
+	{
+		delete bmlViewerWindow;
+		bmlViewerWindow = NULL;
+	}
+	if (dataViewerWindow)
+	{
+		delete dataViewerWindow;
+		dataViewerWindow = NULL;
+	}
+	if (resourceWindow)
+	{
+		delete resourceWindow;
+		resourceWindow = NULL;
+	}
+	if (panimationWindow)
+	{
+		delete panimationWindow;
+		panimationWindow = NULL;
+	}
+
 }
 
 void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 {
-	int confirm = fl_choice("This will reset the current session.\nContinue?", "No", "Yes", NULL);
-	if (confirm == 0)
-		return;
-
 	const char* seqFile = fl_file_chooser("Load file:", "*.py", NULL);
 	if (!seqFile)
 		return;
@@ -275,37 +344,52 @@ void BaseWindow::RunCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::LaunchBMLViewerCB(Fl_Widget* widget, void* data)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute((char*)"bmlviewer open");
-	mcu.execute((char*)"bmlviewer show");
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->bmlViewerWindow)
+	{
+		rootWindow->bmlViewerWindow = new BehaviorWindow(rootWindow->x() + 50, rootWindow->y() + 50, 800, 600, "BML Viewer");
+	}
+	rootWindow->bmlViewerWindow->show();
 }
 
 void BaseWindow::LaunchParamAnimViewerCB(Fl_Widget* widget, void* data)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute((char*)"panimviewer open");
-	mcu.execute((char*)"panimviewer show");	
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->panimationWindow)
+	{
+		rootWindow->panimationWindow = new PanimationWindow(rootWindow->x() + 50, rootWindow->y() + 50, 800, 600, "Blend Viewer");
+	}
+	rootWindow->panimationWindow->show();
 }
 
 void BaseWindow::LaunchDataViewerCB(Fl_Widget* widget, void* data)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute((char*)"cbufviewer open");
-	mcu.execute((char*)"cbufviewer show");
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->dataViewerWindow)
+	{
+		rootWindow->dataViewerWindow = new ChannelBufferWindow(rootWindow->x() + 50, rootWindow->y() + 50, 800, 600, "Blend Viewer");
+	}
+	rootWindow->dataViewerWindow->show();
 }
 
 void BaseWindow::LaunchResourceViewerCB( Fl_Widget* widget, void* data )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute((char*)"resourceviewer open");
-	mcu.execute((char*)"resourceviewer show");	
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->resourceWindow)
+	{
+		rootWindow->resourceWindow = new ResourceWindow(rootWindow->x() + 50, rootWindow->y() + 50, 800, 600, "Resource Viewer");
+	}
+	rootWindow->resourceWindow->show();
 }
 
 void BaseWindow::LaunchFaceViewerCB( Fl_Widget* widget, void* data )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute((char*)"faceviewer open");
-	mcu.execute((char*)"faceviewer show");	
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->faceViewerWindow)
+	{
+		rootWindow->faceViewerWindow = new FaceViewer(rootWindow->x() + 50, rootWindow->y() + 50, 800, 600, "Face Viewer");
+	}
+	rootWindow->faceViewerWindow->show();
 }
 
 void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )

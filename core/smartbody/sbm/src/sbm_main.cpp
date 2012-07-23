@@ -108,11 +108,6 @@
 //#include <FL/Fl_glut.h>
 #include "sr/sr_model.h"
 
-#define ENABLE_DEFAULT_BOOTSTRAP	(1) 
-//#define DEFAULT_SEQUENCE_FILE		("ELITE-all.seq")
-#define DEFAULT_SEQUENCE_FILE		("default.seq")
-#define DEFAULT_PY_FILE				("default.py")
-
 ///////////////////////////////////////////////////////////////////////////////////
 
 #ifdef WIN32_LEAN_AND_MEAN
@@ -140,10 +135,10 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data )
 
 	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
-            LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
+            LOG("SmartBody Error: command NOT FOUND: '%s' + '%s'", op, args );
             break;
         case CMD_FAILURE:
-            LOG("SBM ERR: command FAILED: '%s' + '%s'", op, args );
+            LOG("SmartBody Error: command FAILED: '%s' + '%s'", op, args );
             break;
     }
 }
@@ -232,32 +227,6 @@ int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-SrSnGroup *build_checkerboard_floor( float width )	{
-
-	SrSnGroup *floor_group_p = new SrSnGroup;
-	SrSnBox* floor_bg_p = new SrSnBox;
-	SrSnBox* tile_1_p = new SrSnBox;
-	SrSnBox* tile_2_p = new SrSnBox;
-	
-	float half = width * 0.5f;
-	floor_bg_p->color( SrColor( 220, 220, 220 ) );
-	floor_bg_p->shape().a.set( -half, -1.0f, -half );
-	floor_bg_p->shape().b.set(  half, -0.1f, half );
-	
-	tile_1_p->color( SrColor( 100, 100, 100 ) );
-	tile_1_p->shape().a.set( -half, -0.5f, -half );
-	tile_1_p->shape().b.set(  0.0, 0.0, 0.0 );
-	
-	tile_2_p->color( SrColor( 100, 100, 100 ) );
-	tile_2_p->shape().a.set(  0.0, -0.5f, 0.0 );
-	tile_2_p->shape().b.set(  half, 0.0, half );
-	
-	floor_group_p->add( floor_bg_p );
-	floor_group_p->add( tile_1_p );
-	floor_group_p->add( tile_2_p );
-	return( floor_group_p );
-}
-
 void mcu_register_callbacks( void ) {
 	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -267,20 +236,13 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "quit",			mcu_quit_func );
 	mcu.insert( "snapshot",		mcu_snapshot_func );
 	mcu.insert( "viewer",		mcu_viewer_func );
-	mcu.insert( "bmlviewer",    mcu_bmlviewer_func);
-	mcu.insert( "panimviewer",  mcu_panimationviewer_func);
-	mcu.insert( "cbufviewer",	mcu_channelbufferviewer_func); // deprecated
-	mcu.insert( "dataviewer",	mcu_channelbufferviewer_func);
-	mcu.insert( "resourceviewer",	mcu_resourceViewer_func);	
-	mcu.insert( "faceviewer",	mcu_faceViewer_func);
-	mcu.insert( "ogreviewer", mcu_ogreViewer_func);
 }
 
 void cleanup( void )	{
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		if( mcu.loop )	{
-			LOG( "SBM NOTE: unexpected exit " );
+			LOG( "SmartBody NOTE: unexpected exit " );
 			mcu.loop = false;
 		}
 
@@ -474,18 +436,9 @@ int main( int argc, char **argv )	{
 	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
 	//viewerFactory->setFltkViewer(viewer);
 	mcu.register_viewer_factory(viewerFactory);
-	mcu.register_bmlviewer_factory(new BehaviorViewerFactory());
-	mcu.register_panimationviewer_factory(new PanimationViewerFactory());
-	mcu.register_channelbufferviewer_factory(new ChannelBufferViewerFactory());	
-	mcu.register_ResourceViewer_factory(new ResourceViewerFactory());
-	mcu.register_FaceViewer_factory(new FaceViewerFactory());
 #if USE_OGRE_VIEWER > 0
 	mcu.register_OgreViewer_factory(new OgreViewerFactory());
 #endif
-
-
-	// Build the floor for the viewer
-	//mcu.add_scene( build_checkerboard_floor( 200.0 ) );
 	
 	mcu_register_callbacks();
 
@@ -505,7 +458,7 @@ int main( int argc, char **argv )	{
 	SrString	s;
 	for (	i=1; i<argc; i++ )
 	{
-		LOG( "SBM ARG[%d]: '%s'", i, argv[i] );
+		LOG( "SmartBody ARG[%d]: '%s'", i, argv[i] );
 		s = argv[i];
 
 		if( s == "-pythonpath" )  // argument -pythonpath
@@ -697,15 +650,15 @@ int main( int argc, char **argv )	{
 		mcu.vhmsg_enabled = true;
 	} else {
 		if( vhmsg_disabled ) {
-			LOG( "SBM: VHMSG_SERVER='%s': Messaging disabled.\n", vhmsg_server?"NULL":vhmsg_server );
+			LOG( "SmartBody: VHMSG_SERVER='%s': Messaging disabled.\n", vhmsg_server?"NULL":vhmsg_server );
 		} else {
 #if 0 // disable server name query until vhmsg is fixed
 			const char* vhmsg_server_actual = vhmsg::ttu_get_server();
-			LOG( "SBM ERR: ttu_open VHMSG_SERVER='%s' FAILED\n", vhmsg_server_actual?"NULL":vhmsg_server_actual );
+			LOG( "SmartBody Error: ttu_open VHMSG_SERVER='%s' FAILED\n", vhmsg_server_actual?"NULL":vhmsg_server_actual );
 #else
 			std::string vhserver = (vhmsg_server? vhmsg_server : "localhost");
 			std::string vhport = (vhmsg_port ? vhmsg_port : "61616");
-			LOG( "SBM ERR: ttu_open FAILED\n" );
+			LOG( "SmartBody Error: ttu_open FAILED\n" );
 			LOG("Could not connect to %s:%s", vhserver.c_str(), vhport.c_str());
 #endif
 		}
@@ -750,7 +703,6 @@ int main( int argc, char **argv )	{
 	gwiz::cmdl commandline;
 	commandline.set_callback( mcuCBHandle::cmdl_tab_callback );
 
-#if ENABLE_DEFAULT_BOOTSTRAP
 	vector<string>::iterator it;
 
 	if( seq_paths.empty() && py_paths.empty() ) {
@@ -801,14 +753,13 @@ int main( int argc, char **argv )	{
 	{
 		if (!mcu.use_python)
 		{
-			LOG( "No sequences specified. Loading sequence '%s'\n", DEFAULT_SEQUENCE_FILE );
-			init_seqs.push_back( DEFAULT_SEQUENCE_FILE );
+			LOG( "No sequences specified.  Loading default configuration.'\n" );
 		}
 		else
 		{
-			LOG( "No Python scripts specified. Loading script '%s'\n", DEFAULT_PY_FILE );
-			init_pys.push_back( DEFAULT_PY_FILE );
+			LOG( "No Python scripts specified. Loading default configuration.'\n" );
 		}
+		mcu.executePython("getViewer().show()\ngetCamera().reset()");
 	}
 
 	for( it = init_seqs.begin();
@@ -833,7 +784,6 @@ int main( int argc, char **argv )	{
 	me_paths.clear();
 	seq_paths.clear();
 	init_seqs.clear();
-#endif
 
 	// Notify world SBM is ready to receive messages
 	srArgBuffer argBuff("");
@@ -901,17 +851,17 @@ int main( int argc, char **argv )	{
 
 					switch( result ) {
 						case CMD_NOT_FOUND:
-							printf("SBM ERR: command NOT FOUND: '%s'\n", cmd );
+							printf("SmartBody Error: command NOT FOUND: '%s'\n", cmd );
 							fprintf( stdout, "> " ); fflush( stdout );
 							break;
 						case CMD_FAILURE:
-							printf("SBM ERR: command FAILED: '%s'\n", cmd );
+							printf("SmartBody Error: command FAILED: '%s'\n", cmd );
 							fprintf( stdout, "> " ); fflush( stdout );
 							break;
 						case CMD_SUCCESS:						
 							break;
 						default:
-							printf("SBM ERR: return value %d ERROR: '%s'\n", result, cmd );
+							printf("SmartBody Error: return value %d ERROR: '%s'\n", result, cmd );
 							fprintf( stdout, "> " ); fflush( stdout );
 							break;
 					}
@@ -963,14 +913,21 @@ int main( int argc, char **argv )	{
 			mcu.viewer_p->set_camera(*( mcu.camera_p ));
 		}	
 
-		if((ChannelBufferWindow*)mcu.channelbufferviewer_p != NULL)
+		BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+
+		if(rootWindow && rootWindow->dataViewerWindow && rootWindow->dataViewerWindow->shown())
 		{
-			((ChannelBufferWindow*)mcu.channelbufferviewer_p)->update();
+			rootWindow->dataViewerWindow->update();
 		}
 
-		if((ResourceWindow*)mcu.resourceViewer_p != NULL)
+		if(rootWindow && rootWindow->resourceWindow && rootWindow->resourceWindow->shown())
 		{
-			((ResourceWindow*)mcu.resourceViewer_p)->update();
+			rootWindow->resourceWindow->update();
+		}
+
+		if (rootWindow && rootWindow->panimationWindow && rootWindow->panimationWindow->shown())
+		{
+			 rootWindow->panimationWindow->update_viewer();
 		}
 
 		mcu.render();

@@ -621,8 +621,6 @@ BOOST_PYTHON_MODULE(SmartBody)
 	// viewers
 	boost::python::def("getCamera", getCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the camera object for the viewer. \n Input: NULL \n Output: camera object");
 	boost::python::def("getViewer", getViewer, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the visual debugger. \n Input: NULL \n Output: visual debugger");
-	boost::python::def("getBmlViewer", getBmlViewer, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the bml viewer object. \n Input: NULL \n Output: bml viewer object");
-	boost::python::def("getDataViewer", getDataViewer, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the channel viewer object. \n Input: NULL \n Output: channel viewer object");
 	
 
 	// assets

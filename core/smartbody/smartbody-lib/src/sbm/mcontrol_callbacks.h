@@ -48,12 +48,6 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_sequence_chain_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_bmlviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_panimationviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_channelbufferviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_resourceViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_faceViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_ogreViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_terrain_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p );
@@ -92,15 +86,6 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string
 int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string name  );
 
 int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_sched_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_motion_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_snod_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_lilt_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_load_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_net_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_net_reset( srArgBuffer& args, mcuCBHandle *mcu_p );
@@ -128,7 +113,6 @@ int mcu_vrSpeech_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
-int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 

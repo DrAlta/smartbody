@@ -246,12 +246,6 @@ mcuCBHandle::mcuCBHandle()
 	skScale( 1.0 ),
 	skmScale( 1.0 ),
 	viewer_p( NULL ),
-	bmlviewer_p( NULL ),
-	panimationviewer_p( NULL ),
-	channelbufferviewer_p( NULL ),
-	resourceViewer_p( NULL ),
-	velocityViewer_p( NULL ),
-	faceViewer_p( NULL ),
 	ogreViewer_p( NULL ),
 	camera_p( NULL ),
 	root_group_p( new SrSnGroup() ),
@@ -263,13 +257,6 @@ mcuCBHandle::mcuCBHandle()
 	updatePhysics( false ),
 	viewer_factory ( new SrViewerFactory() ),
 	ogreViewerFactory ( new SrViewerFactory() ),
-	bmlviewer_factory ( new GenericViewerFactory() ),
-	panimationviewer_factory ( new GenericViewerFactory() ),
-	channelbufferviewer_factory ( new GenericViewerFactory() ),
-	commandviewer_factory ( new GenericViewerFactory() ),
-	resourceViewerFactory ( new GenericViewerFactory() ),
-	velocityViewerFactory ( new GenericViewerFactory() ),
-	faceViewerFactory ( new GenericViewerFactory() ),	
 	resource_manager(SBResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
 	use_python( true ),
@@ -329,13 +316,6 @@ mcuCBHandle::~mcuCBHandle() {
 	timer_p = NULL;
 	viewer_factory = NULL;
 	ogreViewerFactory = NULL;
-	bmlviewer_factory = NULL;
-	panimationviewer_factory = NULL;
-	channelbufferviewer_factory = NULL;
-	commandviewer_factory = NULL;
-	resourceViewerFactory = NULL;
-	velocityViewerFactory = NULL;
-	faceViewerFactory = NULL;
 
 	// clean up python
 #ifdef USE_PYTHON
@@ -456,20 +436,10 @@ void mcuCBHandle::registerCallbacks()
 	insert( "mirror",       mcu_motion_mirror_cmd_func);
 	insert( "motionplayer", mcu_motion_player_func);
 
-	insert( "load",			mcu_load_func );
 	insert( "pawn",			SbmPawn::pawn_cmd_func );
 	insert( "char",			SbmCharacter::character_cmd_func );
 
 	insert( "ctrl",			mcu_controller_func );
-	insert( "sched",		mcu_sched_controller_func );
-	insert( "motion",		mcu_motion_controller_func );
-	insert( "stepturn",		mcu_stepturn_controller_func );
-	insert( "quickdraw",	mcu_quickdraw_controller_func );
-	insert( "gaze",			mcu_gaze_controller_func );	
-	insert( "gazelimit",	mcu_gaze_limit_func );
-	insert( "snod",			mcu_snod_controller_func );
-	insert( "lilt",			mcu_lilt_controller_func );
-	insert( "divulge",		mcu_divulge_content_func );
 	insert( "wsp",			mcu_wsp_cmd_func );
 	insert( "create_remote_pawn", SbmPawn::create_remote_pawn_func );
 
@@ -551,7 +521,6 @@ void mcuCBHandle::registerCallbacks()
 	insert_print_cmd( "face",         mcu_print_face_func );
 	insert_print_cmd( "joint_logger", joint_logger::print_func );
 	insert_print_cmd( "J_L",          joint_logger::print_func );  // shorthand
-	insert_print_cmd( "mcu",          mcu_divulge_content_func );
 	insert_print_cmd( "test",         sbm_print_test_func );
 
 	insert_test_cmd( "args", test_args_func );
@@ -702,20 +671,6 @@ void mcuCBHandle::clear( void )
 		delete ogreViewer_p;
 		ogreViewer_p = NULL;
 	}
-
-	bmlviewer_factory->destroy(bmlviewer_p);
-	bmlviewer_p = NULL;
-	panimationviewer_factory->destroy(panimationviewer_p);
-	panimationviewer_p = NULL;
-	channelbufferviewer_factory->destroy(channelbufferviewer_p);
-	channelbufferviewer_p = NULL;
-	resourceViewerFactory->destroy(resourceViewer_p);
-	resourceViewer_p = NULL;
-	velocityViewerFactory->destroy(velocityViewer_p);
-	velocityViewer_p = NULL;
-	faceViewerFactory->destroy(faceViewer_p);
-	faceViewer_p = NULL;
-
 
 	if (camera_p)
 	{
@@ -1014,109 +969,6 @@ void mcuCBHandle::close_viewer( void )	{
 	if( camera_p )	{
 		delete camera_p;
 		camera_p = NULL;
-	}
-}
-
-int mcuCBHandle::open_bml_viewer( int width, int height, int px, int py )	{
-	
-	if( bmlviewer_p == NULL )	{
-		bmlviewer_p = bmlviewer_factory->create( px, py, width, height );
-		bmlviewer_p->label_viewer( "SBM BML Viewer" );
-		bmlviewer_p->show_viewer();
-		
-		return( CMD_SUCCESS );
-	}
-	return( CMD_FAILURE );
-}
-
-void mcuCBHandle::close_bml_viewer( void )	{
-
-	if( bmlviewer_p )	{
-		bmlviewer_factory->destroy(bmlviewer_p);
-		bmlviewer_p = NULL;
-	}
-}
-
-int mcuCBHandle::open_panimation_viewer( int width, int height, int px, int py )
-{
-	if( panimationviewer_p == NULL )	{
-		panimationviewer_p = panimationviewer_factory->create( px, py, width, height );
-		panimationviewer_p->label_viewer( "Blend Viewer" );
-		panimationviewer_p->show_viewer();
-		
-		return( CMD_SUCCESS );
-	}
-	return( CMD_FAILURE );
-}
-
-void mcuCBHandle::close_panimation_viewer( void )
-{
-	if( panimationviewer_p )	{
-		panimationviewer_factory->destroy(panimationviewer_p);
-		panimationviewer_p = NULL;
-	}
-}
-
-int mcuCBHandle::open_channelbuffer_viewer( int width, int height, int px, int py )
-{
-	if( channelbufferviewer_p == NULL )	{
-		channelbufferviewer_p = channelbufferviewer_factory->create( px, py, width, height );
-		channelbufferviewer_p->label_viewer( "Channel Buffer Viewer" );
-		channelbufferviewer_p->show_viewer();
-		
-		return( CMD_SUCCESS );
-	}
-	return( CMD_FAILURE );
-}
-
-void mcuCBHandle::close_channelbuffer_viewer( void )
-{
-	if( channelbufferviewer_p )	{
-		channelbufferviewer_factory->destroy(channelbufferviewer_p);
-		channelbufferviewer_p = NULL;
-	}
-}
-
-
-int mcuCBHandle::openResourceViewer( int width, int height, int px, int py )
-{
-	if( resourceViewer_p == NULL )	{
-		resourceViewer_p = resourceViewerFactory->create( px, py, width, height );
-		resourceViewer_p->label_viewer( "Resource Viewer" );
-		resourceViewer_p->show_viewer();
-
-		return( CMD_SUCCESS );
-	}
-	return( CMD_FAILURE );
-}
-
-
-void mcuCBHandle::closeResourceViewer( void )
-{
-	if( resourceViewer_p )	{
-		resourceViewerFactory->destroy(resourceViewer_p);
-		resourceViewer_p = NULL;
-	}
-}
-
-int mcuCBHandle::openFaceViewer( int width, int height, int px, int py )
-{
-	if( faceViewer_p == NULL )	{
-		faceViewer_p = faceViewerFactory->create( px, py, width, height );
-		faceViewer_p->label_viewer( "Face Viewer" );
-		faceViewer_p->show_viewer();
-
-		return( CMD_SUCCESS );
-	}
-	return( CMD_FAILURE );
-}
-
-
-void mcuCBHandle::closeFaceViewer( void )
-{
-	if( resourceViewer_p )	{
-		faceViewerFactory->destroy(faceViewer_p);
-		faceViewer_p = NULL;
 	}
 }
 
@@ -1458,11 +1310,6 @@ void mcuCBHandle::update( void )
 
 	if (!_scene->isRemoteMode())
 		_scene->getDebuggerServer()->Update();
-
-
-	if (panimationviewer_p)
-		panimationviewer_p->update_viewer();
-
 
 	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();

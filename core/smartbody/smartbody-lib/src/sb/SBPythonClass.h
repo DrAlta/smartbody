@@ -134,8 +134,6 @@ SBController* createController(std::string controllerType, std::string controlle
 
 Camera* getCamera();
 SrViewer* getViewer();
-GenericViewer* getBmlViewer();
-GenericViewer* getDataViewer();
 
 //Script* getScript(std::string fileName);
 void showCommandResources();
