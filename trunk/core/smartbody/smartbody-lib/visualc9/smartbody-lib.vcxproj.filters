@@ -697,103 +697,19 @@
     <ClCompile Include="..\src\sbm\action_unit.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\external\ANN\ANN.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\Bchart.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\BchartSm.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\bd_fix_rad_search.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\bd_pr_search.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\bd_search.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\bd_tree.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\BMLDefs.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\brute.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\Bst.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\ChartBase.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\ClassRule.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\CntxArray.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\CombineBests.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\DefaultAttributeTable.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\external\parser\ECArgs.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\Edge.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\EdgeHeap.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\edgeSubFns.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\EgsFromTree.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\Event.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\ewDciTokStrm.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\extraMain.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\FBinaryArray.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\Feat.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\Feature.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\FeatureTree.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\fhSubFns.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\Field.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\external\parser\FullHist.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\GenericViewer.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\glew\glew.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\GotIter.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\gwiz_cmdl.cpp">
@@ -805,58 +721,16 @@
     <ClCompile Include="..\src\sbm\gwiz_spline.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\external\parser\headFinder.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\headFinderCh.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\Heightfield.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\external\SOIL\image_DXT.c">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\SOIL\image_helper.c">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\InputTree.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\Item.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\joint_logger.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_dump.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_fix_rad_search.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_pr_search.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_search.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_split.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_tree.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\kd_util.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\KinectProcessor.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\lin_win.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\Link.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\local_speech.cpp">
@@ -869,9 +743,6 @@
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\mcontrol_util.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\MeChart.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\MiniBrain.cpp">
@@ -893,12 +764,6 @@
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\ParserOpenCOLLADA.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\ParseStats.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\ANN\perf.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\remote_speech.cpp">
@@ -955,15 +820,6 @@
     <ClCompile Include="..\src\sbm\GPU\SbmTexture.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\external\parser\SentRep.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\SOIL\SOIL.c">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\SOIL\stb_image_aug.c">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\SteeringAgent.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
@@ -971,12 +827,6 @@
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\SteerSuiteEnginerDriver.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\GPU\TBOData.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\Term.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\text_speech.cpp">
@@ -988,19 +838,7 @@
     <ClCompile Include="..\src\sbm\time_regulator.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\external\parser\TimeIt.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\UnitRules.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\external\parser\utils.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\ValHeap.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\GPU\VBOData.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\xercesc_utils.cpp">
@@ -1038,6 +876,168 @@
     </ClCompile>
     <ClCompile Include="..\src\sb\SBBehaviorSetManager.cpp">
       <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\Bchart.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\BchartSm.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\ChartBase.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\ClassRule.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\ECArgs.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\Edge.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\EdgeHeap.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\edgeSubFns.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\EgsFromTree.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\ewDciTokStrm.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\Bst.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\CntxArray.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\ANN.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\bd_fix_rad_search.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\bd_pr_search.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\bd_search.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\bd_tree.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\brute.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\CombineBests.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\extraMain.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\FBinaryArray.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\Feat.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\Feature.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\fhSubFns.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\FeatureTree.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\FullHist.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\glew\glew.cpp">
+      <Filter>external\glew</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\GotIter.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\headFinder.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\headFinderCh.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\SOIL\image_DXT.c">
+      <Filter>external\SOIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\SOIL\image_helper.c">
+      <Filter>external\SOIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\InputTree.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\Item.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_dump.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_fix_rad_search.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_pr_search.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_search.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_split.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_tree.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\kd_util.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\Link.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\MeChart.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\ParseStats.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\ANN\perf.cpp">
+      <Filter>external\ANN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\SOIL\SOIL.c">
+      <Filter>external\SOIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\SOIL\stb_image_aug.c">
+      <Filter>external\SOIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\Term.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\SentRep.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\TimeIt.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\GPU\TBOData.cpp">
+      <Filter>GPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\GPU\VBOData.cpp">
+      <Filter>GPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\ValHeap.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\UnitRules.cpp">
+      <Filter>external\parser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1755,85 +1755,16 @@
     <ClInclude Include="..\src\sbm\action_unit.hpp">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\external\ANN\ANN.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\ANNperf.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\ANNx.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\Bchart.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\bd_tree.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\BMLDefs.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\Bst.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\ChartBase.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\ClassRule.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\CntxArray.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\CombineBests.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\DefaultAttributeTable.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\external\parser\ECArgs.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\ECString.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\Edge.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\EdgeHeap.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\edgeSubFns.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\Event.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\external\parser\ewDciTokStrm.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\extraMain.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\FBinaryArray.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\Feat.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\Feature.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\FeatureTree.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\fhSubFns.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\external\parser\Field.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\FullHist.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\general_param_setting.h">
@@ -1842,58 +1773,16 @@
     <ClInclude Include="..\src\sbm\GenericViewer.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\external\glew\glew.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\GotIter.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\gwiz_cmdl.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\gwiz_math.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\external\parser\headFinder.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\headFinderCh.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\Heightfield.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\external\SOIL\image_DXT.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\SOIL\image_helper.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\InputTree.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\Item.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\joint_logger.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\kd_fix_rad_search.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\kd_pr_search.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\kd_search.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\kd_split.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\kd_tree.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\kd_util.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\KinectProcessor.h">
@@ -1902,31 +1791,16 @@
     <ClInclude Include="..\src\sbm\lin_win.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\external\parser\Link.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\local_speech.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\locomotion_cmds.hpp">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\gfx\mat2.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\gfx\mat3.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\gfx\mat4.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\mcontrol_callbacks.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\mcontrol_util.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\MeChart.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\MiniBrain.h">
@@ -1948,15 +1822,6 @@
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\ParserOpenCOLLADA.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\ParseStats.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\pr_queue.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\ANN\pr_queue_k.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\remote_speech.h">
@@ -1989,21 +1854,6 @@
     <ClInclude Include="..\src\sbm\GPU\SbmTexture.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\external\parser\SentRep.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\SOIL\SOIL.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\SOIL\stb_image_aug.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\SOIL\stbi_DDS_aug.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\SOIL\stbi_DDS_aug_c.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\SteeringAgent.h">
       <Filter>sbm</Filter>
     </ClInclude>
@@ -2011,12 +1861,6 @@
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\SteerSuiteEngineDriver.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\TBOData.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\Term.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\text_speech.h">
@@ -2028,37 +1872,10 @@
     <ClInclude Include="..\src\sbm\time_regulator.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\external\parser\TimeIt.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\UnitRules.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\external\parser\utils.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\external\parser\ValHeap.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\VBOData.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\gfx\vec2.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\gfx\vec3.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\GPU\gfx\vec4.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\viseme_map.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\glew\wglew.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\Wrd.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\sbm_test_cmds.hpp">
@@ -2118,6 +1935,189 @@
     <ClInclude Include="..\src\sr\sr_sn_colorsurf.h">
       <Filter>sr</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\external\parser\Bchart.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\ChartBase.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\ClassRule.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\ECArgs.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\ECString.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\Edge.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\EdgeHeap.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\edgeSubFns.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\ewDciTokStrm.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\Bst.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\CntxArray.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\ANN.h">
+      <Filter>external\ANN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\ANNperf.h">
+      <Filter>external\ANN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\ANNx.h">
+      <Filter>external\ANN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\bd_tree.h">
+      <Filter>external\ANN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\CombineBests.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\extraMain.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\FBinaryArray.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\Feat.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\Feature.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\fhSubFns.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\FeatureTree.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\FullHist.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\glew\glew.h">
+      <Filter>external\glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\GotIter.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\headFinder.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\headFinderCh.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\SOIL\image_DXT.h">
+      <Filter>external\SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\SOIL\image_helper.h">
+      <Filter>external\SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\InputTree.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\Item.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\Wrd.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\kd_fix_rad_search.h">
+      <Filter>external\ANN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\kd_pr_search.h">
+      <Filter>external\ANN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\kd_search.h">
+      <Filter>external\ANN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\kd_split.h">
+      <Filter>external\ANN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\kd_tree.h">
+      <Filter>external\ANN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\kd_util.h">
+      <Filter>external\ANN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\Link.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\MeChart.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\gfx\mat2.h">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\gfx\mat4.h">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\gfx\mat3.h">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\ParseStats.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\pr_queue.h">
+      <Filter>external\ANN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\ANN\pr_queue_k.h">
+      <Filter>external\ANN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\SOIL\SOIL.h">
+      <Filter>external\SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\SOIL\stb_image_aug.h">
+      <Filter>external\SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\SOIL\stbi_DDS_aug.h">
+      <Filter>external\SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\SOIL\stbi_DDS_aug_c.h">
+      <Filter>external\SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\Term.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\SentRep.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\TimeIt.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\TBOData.h">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\VBOData.h">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\gfx\vec2.h">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\gfx\vec3.h">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\GPU\gfx\vec4.h">
+      <Filter>GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\ValHeap.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\glew\wglew.h">
+      <Filter>external\glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\UnitRules.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag">
@@ -2151,6 +2151,24 @@
     </Filter>
     <Filter Include="sb">
       <UniqueIdentifier>{25d7b403-4056-4421-83e7-df3a41e0c16f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external">
+      <UniqueIdentifier>{9427dafc-d6ca-444e-8032-2f38bb7541bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\parser">
+      <UniqueIdentifier>{31890d7d-b417-435b-a706-a182828538ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\ANN">
+      <UniqueIdentifier>{10b2e66e-7af2-449e-960c-d17673d6290f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\glew">
+      <UniqueIdentifier>{42d95ee1-297c-4238-9426-c5e03669f891}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\SOIL">
+      <UniqueIdentifier>{5e0ecb52-a963-4f41-92b8-907bae648845}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GPU">
+      <UniqueIdentifier>{3b133278-3c1b-4375-93aa-b0103170e643}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

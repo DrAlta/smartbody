@@ -1,4 +1,3 @@
-//----------------------------------------------------------------------
 // File:			brute.cpp
 // Programmer:		Sunil Arya and David Mount
 // Description:		Brute-force nearest neighbors

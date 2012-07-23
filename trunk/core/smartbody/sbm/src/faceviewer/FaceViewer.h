@@ -8,7 +8,7 @@
 #include <FL/Fl_Scroll.H>
 #include <sbm/GenericViewer.h>
 
-class FaceViewer : public GenericViewer, Fl_Double_Window
+class FaceViewer : public GenericViewer, public Fl_Double_Window
 {
 	public:
 		FaceViewer(int x, int y, int w, int h, char* name);

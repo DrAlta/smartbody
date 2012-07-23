@@ -286,6 +286,8 @@ bool MeCtLocomotion::is_motions_loaded()
 
 bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) 
 {
+	return false;
+
 	navigation_circle.controller_evaluate(time, frame);
 
 	if(!valid) return false;

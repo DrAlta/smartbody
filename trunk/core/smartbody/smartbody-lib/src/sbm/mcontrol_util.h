@@ -240,23 +240,6 @@ class mcuCBHandle {
 		SrViewerFactory *ogreViewerFactory;
 		SrViewer	*viewer_p;
 		SrViewer    *ogreViewer_p;
-
-		GenericViewer	*bmlviewer_p;
-		GenericViewer	*panimationviewer_p;
-		GenericViewer	*channelbufferviewer_p;
-		GenericViewer   *resourceViewer_p;
-		GenericViewer   *velocityViewer_p;
-		GenericViewer   *faceViewer_p;
-		
-
-		GenericViewerFactory *bmlviewer_factory;
-		GenericViewerFactory *panimationviewer_factory;
-		GenericViewerFactory *channelbufferviewer_factory;
-		GenericViewerFactory *commandviewer_factory;
-		GenericViewerFactory *resourceViewerFactory;
-		GenericViewerFactory *velocityViewerFactory;
-		GenericViewerFactory *faceViewerFactory;
-		
 		
 		SrCamera	*camera_p;
 		SrSnGroup	*root_group_p;
@@ -292,16 +275,6 @@ class mcuCBHandle {
 
 		GeneralParamMap				param_map;			// map that contains the information of shader parameters
 
-		srHashMap <MeCtPose>		pose_ctrl_map;
-		srHashMap <MeCtMotion>		motion_ctrl_map;
-		srHashMap <MeCtStepTurn>	stepturn_ctrl_map;
-		srHashMap <MeCtQuickDraw>	quickdraw_ctrl_map;
-		srHashMap <MeCtGaze>		gaze_ctrl_map;
-		srHashMap <MeCtSimpleNod>	snod_ctrl_map;
-		srHashMap <MeCtAnkleLilt>	lilt_ctrl_map;
-		srHashMap <MeCtEyeLid>		eyelid_ctrl_map;
-		srHashMap <MeCtScheduler2>	sched_ctrl_map;
-		
 		srHashMap <MeController>	controller_map;
 
 		std::map<std::string, DOMDocument*> xmlCache;
@@ -440,16 +413,6 @@ public:
 
 		int open_viewer( int width, int height, int px, int py );
 		void close_viewer( void );
-		int open_bml_viewer( int width, int height, int px, int py );
-		void close_bml_viewer( void );
-		int open_panimation_viewer( int width, int height, int px, int py );
-		void close_panimation_viewer( void );
-		int open_channelbuffer_viewer( int width, int height, int px, int py );
-		void close_channelbuffer_viewer( void );
-		int openResourceViewer( int width, int height, int px, int py );
-		void closeResourceViewer( void );
-		int openFaceViewer( int width, int height, int px, int py );
-		void closeFaceViewer( void );
 
 		int openOgreViewer( int width, int height, int px, int py );
 		void closeOgreViewer( void );
@@ -628,42 +591,7 @@ public:
 		void register_OgreViewer_factory(SrViewerFactory* factory) { 
 			if (ogreViewerFactory != NULL) delete ogreViewerFactory;
 			ogreViewerFactory = factory;
-		}
-
-		void register_bmlviewer_factory(GenericViewerFactory* factory) { 
-				if (bmlviewer_factory != NULL) delete bmlviewer_factory;
-				bmlviewer_factory = factory;
-		}
-		void register_panimationviewer_factory(GenericViewerFactory* factory) { 
-				if (panimationviewer_factory != NULL) delete panimationviewer_factory;
-				panimationviewer_factory = factory;
-		}
-		void register_channelbufferviewer_factory(GenericViewerFactory* factory) { 
-				if (channelbufferviewer_factory != NULL) delete channelbufferviewer_factory;
-				channelbufferviewer_factory = factory;
-		}
-
-		void register_commandviewer_factory(GenericViewerFactory* factory) { 
-				if (commandviewer_factory != NULL) delete commandviewer_factory;
-				commandviewer_factory = factory;
-		}
-
-		void register_ResourceViewer_factory(GenericViewerFactory* factory) { 
-			if (resourceViewerFactory != NULL) delete resourceViewerFactory;
-			resourceViewerFactory = factory;
-		}
-
-		void register_VelocityViewer_factory(GenericViewerFactory* factory) { 
-			if (velocityViewerFactory != NULL) delete velocityViewerFactory;
-			velocityViewerFactory = factory;
-		}
-
-		void register_FaceViewer_factory(GenericViewerFactory* factory) { 
-			if (faceViewerFactory != NULL) delete faceViewerFactory;
-			faceViewerFactory = factory;
 		}	
-
-		
 
 		void registerCallbacks();
 

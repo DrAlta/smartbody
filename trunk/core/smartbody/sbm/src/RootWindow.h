@@ -10,10 +10,15 @@
 #include "fltk_viewer.h"
 #include <sr/sr_viewer.h>
 #include "CommandWindow.h"
+#include "bmlviewer/BehaviorWindow.h"
 #include "bmlcreator/BMLCreatorWindow.h"
+#include "resourceViewer/ResourceWindow.h"
 #include "visemeviewer/VisemeViewerWindow.h"
 #include "retargetcreator/RetargetCreatorWindow.h"
 #include "monitorviewer/MonitorConnectWindow.h"
+#include "panimationviewer/PanimationWindow.h"
+#include "faceviewer/FaceViewer.h"
+#include "channelbufferviewer/channelbufferWindow.hpp"
 #include "CharacterCreatorWindow.h"
 
 class SbmCharacter;
@@ -57,11 +62,17 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		FltkViewer* fltkViewer;
 #endif
 		
+		
 		CommandWindow* commandWindow;
 		BMLCreatorWindow* bmlCreatorWindow;
 		VisemeViewerWindow* visemeViewerWindow;
 		MonitorConnectWindow* monitorConnectWindow;
 		RetargetCreatorWindow* retargetCreatorWindow;
+		FaceViewer* faceViewerWindow;
+		BehaviorWindow* bmlViewerWindow;
+		ChannelBufferWindow* dataViewerWindow;
+		ResourceWindow* resourceWindow;
+		PanimationWindow* panimationWindow;
 
 		Fl_Menu_Bar* menubar;
 		Fl_Button* buttonPlay;

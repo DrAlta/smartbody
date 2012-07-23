@@ -1399,6 +1399,7 @@ void FltkViewer::draw()
       _data->message.set ( "" ); // will not deallocate the string but set len==0
     }
 
+
    //----- Fltk will then flush and swap buffers -----------------------------
  }
 

@@ -263,42 +263,6 @@ SrViewer* getViewer()
 	return mcu.viewer_p;
 }
 
-GenericViewer* getBmlViewer()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	if (!mcu.bmlviewer_p)
-	{
-		mcu.bmlviewer_p = mcu.bmlviewer_factory->create(100, 100, 640, 480);
-		mcu.bmlviewer_p->label_viewer( "BML Viewer");	
-	}
-	return mcu.bmlviewer_p;
-}
-
-GenericViewer* getDataViewer()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	if (!mcu.channelbufferviewer_p)
-	{
-		mcu.channelbufferviewer_p = mcu.channelbufferviewer_factory->create(100, 100, 640, 480);
-		mcu.channelbufferviewer_p->label_viewer( "Data Viewer");	
-	}
-
-	return mcu.channelbufferviewer_p;
-}
-
-GenericViewer* getPanimationViewer()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	if (!mcu.panimationviewer_p)
-	{
-		mcu.panimationviewer_p = mcu.panimationviewer_factory->create(100, 100, 640, 480);
-		mcu.panimationviewer_p->label_viewer( "Parameterized Animation Viewer");	
-	}
-
-	return mcu.panimationviewer_p;
-}
-
-
 void showCommandResources()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
