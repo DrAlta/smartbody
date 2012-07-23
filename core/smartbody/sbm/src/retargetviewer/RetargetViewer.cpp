@@ -7,6 +7,10 @@
 #include <sstream>
 #include <cstring>
 
+#ifndef WIN32
+#define _strdup strdup
+#endif
+
 RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h, name)
 {
 
