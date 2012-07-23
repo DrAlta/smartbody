@@ -90,7 +90,7 @@ public:
       m_deleteCharacterCallback = deleteCharCallback;
       m_changeCharacterCallback = changeCharCallback;
       m_viseme = visemeCallback;
-	  m_channel = channelCallback;
+      m_channel = channelCallback;
    }
 
    virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass )
@@ -553,14 +553,14 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, int * numC
 #ifdef _WIN32
          strcpy_s((*name)[i], length, g_CreateCallbackInfo[sbmHandle][i]->name);
 #else
-		 strncpy((*name)[i], g_CreateCallbackInfo[sbmHandle][i]->name, length);
+         strncpy((*name)[i], g_CreateCallbackInfo[sbmHandle][i]->name, length);
 #endif
          length = strlen(g_CreateCallbackInfo[sbmHandle][i]->objectClass) + 1;
          (*objectClass)[i] = new char[length];
 #ifdef _WIN32
          strcpy_s((*objectClass)[i], length, g_CreateCallbackInfo[sbmHandle][i]->objectClass);  
 #else
-		 strncpy((*objectClass)[i], g_CreateCallbackInfo[sbmHandle][i]->objectClass, length);
+         strncpy((*objectClass)[i], g_CreateCallbackInfo[sbmHandle][i]->objectClass, length);
 #endif
     }
 
@@ -584,7 +584,7 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, int * numC
 #ifdef _WIN32
          strcpy_s((*name)[i], length, g_DeleteCallbackInfo[sbmHandle][i]->name); 
 #else
-		 strncpy((*name)[i], g_DeleteCallbackInfo[sbmHandle][i]->name, length);
+         strncpy((*name)[i], g_DeleteCallbackInfo[sbmHandle][i]->name, length);
 #endif
     }
     
@@ -608,7 +608,7 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, int * numC
 #ifdef _WIN32
          strcpy_s((*name)[i], length, g_ChangeCallbackInfo[sbmHandle][i]->name);
 #else
-		 strncpy((*name)[i], g_ChangeCallbackInfo[sbmHandle][i]->name, length);
+         strncpy((*name)[i], g_ChangeCallbackInfo[sbmHandle][i]->name, length);
 #endif
     }
 
@@ -636,14 +636,14 @@ SMARTBODY_C_DLL_API bool SBM_IsVisemeSet( SBMHANDLE sbmHandle, int * numCharacte
 #ifdef _WIN32
          strcpy_s((*name)[i], length, g_VisemeCallbackInfo[sbmHandle][i]->name); 
 #else
-		 strncpy((*name)[i], g_VisemeCallbackInfo[sbmHandle][i]->name, length); 
+         strncpy((*name)[i], g_VisemeCallbackInfo[sbmHandle][i]->name, length); 
 #endif
          length = strlen(g_VisemeCallbackInfo[sbmHandle][i]->visemeName) + 1;
          (*visemeName)[i] = new char[length];
 #ifdef _WIN32
          strcpy_s((*visemeName)[i], length, g_VisemeCallbackInfo[sbmHandle][i]->visemeName);  
 #else
-		 strncpy((*visemeName)[i], g_VisemeCallbackInfo[sbmHandle][i]->visemeName, length);  
+         strncpy((*visemeName)[i], g_VisemeCallbackInfo[sbmHandle][i]->visemeName, length);  
 #endif
          (*weight)[i] = g_VisemeCallbackInfo[sbmHandle][i]->weight;
          (*blendTime)[i] = g_VisemeCallbackInfo[sbmHandle][i]->blendTime;
@@ -672,7 +672,7 @@ SMARTBODY_C_DLL_API bool SBM_IsChannelSet( SBMHANDLE sbmHandle, int * numCharact
 #ifdef _WIN32
          strcpy_s((*name)[i], length, g_ChannelCallbackInfo[sbmHandle][i]->name); 
 #else
-		 strncpy((*name)[i], g_ChannelCallbackInfo[sbmHandle][i]->name, length); 
+         strncpy((*name)[i], g_ChannelCallbackInfo[sbmHandle][i]->name, length); 
 #endif
          // channel name is stored in visemeName
          length = strlen(g_ChannelCallbackInfo[sbmHandle][i]->visemeName) + 1;
@@ -680,7 +680,7 @@ SMARTBODY_C_DLL_API bool SBM_IsChannelSet( SBMHANDLE sbmHandle, int * numCharact
 #ifdef _WIN32
          strcpy_s((*channelName)[i], length, g_ChannelCallbackInfo[sbmHandle][i]->visemeName);  
 #else
-		 strncpy((*channelName)[i], g_ChannelCallbackInfo[sbmHandle][i]->visemeName, length); 
+         strncpy((*channelName)[i], g_ChannelCallbackInfo[sbmHandle][i]->visemeName, length); 
 #endif
          (*value)[i] = g_ChannelCallbackInfo[sbmHandle][i]->weight;
     }
