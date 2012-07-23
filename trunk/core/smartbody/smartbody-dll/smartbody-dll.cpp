@@ -30,14 +30,10 @@
 using std::string;
 
 
-// TODO: this stuff should go in vhcl_platform.h
-#ifdef __APPLE__
-#include "TargetConditionals.h"
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#ifndef SBM_IPHONE
-#define SBM_IPHONE
-#endif
-#endif
+#if defined(ANDROID_BUILD)
+#define USE_SBPYTHON  0
+#else
+#define USE_SBPYTHON  1
 #endif
 
 
@@ -455,7 +451,7 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
 
 bool Smartbody_dll::InitVHMsg()
 {
-#if !defined(__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined(ANDROID_BUILD) && !defined(IPHONE_BUILD)
 
    mcuCBHandle & mcu = mcuCBHandle::singleton();
    SBScene * scene = mcu._scene;
@@ -472,11 +468,6 @@ bool Smartbody_dll::InitVHMsg()
    return true;
 }
 
-#ifdef __ANDROID__
-#define USE_SBPYTHON 0
-#else
-#define USE_SBPYTHON 1
-#endif
 
 SMARTBODY_DLL_API bool Smartbody_dll::PythonCommandVoid( const std::string & command )
 {
