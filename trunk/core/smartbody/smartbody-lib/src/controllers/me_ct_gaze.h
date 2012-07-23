@@ -270,7 +270,9 @@ class MeCtGaze : public SmartBody::SBController	{
 		// FADE: automatic fading of controller
 		void set_fade_in( float interval );
 		void set_fade_out( float interval );
-		
+		void set_fade_in_scheduled(float interval, double time);
+		void set_fade_out_scheduled(float interval, double time);
+
 		// LIMIT: key-group rotation limit
 		void set_limit( int key, float p, float h, float r );
 		void set_limit( int key, float p_up, float p_dn, float h, float r );
@@ -353,6 +355,10 @@ class MeCtGaze : public SmartBody::SBController	{
 		float			fading_normal;
 		bool			fading_complete;
 		int 			fading_mode;
+		
+		double			scheduled_time;
+		int				scheduled_fade_mode;
+		float			scheduled_fade_interval;
 
 		int 			joint_key_count;
 		int*			joint_key_map;

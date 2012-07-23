@@ -1411,6 +1411,42 @@ BehaviorSpan PostureRequest::getBehaviorSpan()
 	return span;
 }
 
+
+GazeRequest::GazeRequest(   float interval, int mode, const std::string& unique_id, const std::string& localId, MeController* gaze, MeCtSchedulerClass* schedule_ct,
+							const BehaviorSyncPoints& behav_syncs )
+:	MeControllerRequest( unique_id, localId, gaze, schedule_ct, behav_syncs ),
+    gazeFadeInterval(interval),
+	gazeFadeMode(mode)
+{
+}
+
+void GazeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
+{
+	double startAt  = (double)behav_syncs.sync_start()->time();
+	double readyAt  = (double)behav_syncs.sync_ready()->time();
+	double strokeAt = (double)behav_syncs.sync_stroke()->time();
+	double relaxAt  = (double)behav_syncs.sync_relax()->time();
+	double endAt    = (double)behav_syncs.sync_end()->time();
+
+	double curTime = mcu->time;
+	double timeOffset = startAt - curTime;
+
+	if (gazeFadeInterval > 0.0f)
+	{
+		MeCtGaze* gazeCt = dynamic_cast<MeCtGaze*> (anim_ct);
+		if (gazeCt)
+		{
+			if (gazeFadeMode == 0)
+				gazeCt->set_fade_out_scheduled(gazeFadeInterval, timeOffset);
+			if (gazeFadeMode == 1)
+				gazeCt->set_fade_in_scheduled(gazeFadeInterval, timeOffset);
+		}
+	}
+	else
+		MeControllerRequest::realize_impl(request, mcu);
+}
+
+
 // SequenceRequest
 SequenceRequest::SequenceRequest( const std::string& unique_id, const std::string& local, const BehaviorSyncPoints& syncs_in,
                                   time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime )
