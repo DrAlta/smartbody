@@ -100,13 +100,13 @@ class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
          }
       }
 
-	  virtual void OnPawnCreate( const std::string & name )
-	  {
-		  if ( m_dll->m_listener )
-		  {
-			  m_dll->m_listener->OnPawnCreate( name );
-		  }
-	  }
+      virtual void OnPawnCreate( const std::string & name )
+      {
+         if ( m_dll->m_listener )
+         {
+            m_dll->m_listener->OnPawnCreate( name );
+         }
+      }
 
       virtual void OnViseme( const string & name, const string & visemeName, const float weight, const float blendTime )
       {
@@ -116,7 +116,7 @@ class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
          }
       }
 
-	  virtual void OnChannel( const string & name, const string & channelName, const float value )
+      virtual void OnChannel( const string & name, const string & channelName, const float value )
       {
          if ( m_dll->m_listener )
          {
@@ -134,7 +134,7 @@ class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
             {
                pc = mi->second;
                delete pc;
-               m_dll->m_characters.erase(mi);				  
+               m_dll->m_characters.erase(mi);
             }
             m_dll->m_listener->OnCharacterChanged(name);
          }
@@ -318,9 +318,9 @@ SMARTBODY_DLL_API bool Smartbody_dll::ExecutePython( const char * command )
    mcuCBHandle & mcu = mcuCBHandle::singleton();
    int ret = mcu.executePython(command);
    if (ret == CMD_SUCCESS)
-	   return true;
+      return true;
    else
-	   return false;
+      return false;
 }
 
 
@@ -364,7 +364,7 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
       float x = pos->value( SkJointPos::X );
       float y = pos->value( SkJointPos::Y );
       float z = pos->value( SkJointPos::Z );
-	  //LOG("world_offset = %f %f %f",x,y,z);
+      //LOG("world_offset = %f %f %f",x,y,z);
 
       SkJoint::RotType rot_type = joint->rot_type();
       if ( rot_type != SkJoint::TypeQuat )
@@ -491,17 +491,20 @@ SMARTBODY_DLL_API bool Smartbody_dll::PythonCommandVoid( const std::string & com
 bool Smartbody_dll::PythonCommandBool( const std::string & command )
 {
 #if USE_SBPYTHON
-	mcuCBHandle & mcu = mcuCBHandle::singleton();
-	try {
-		boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
-		bool result = boost::python::extract<bool>(mcu.mainDict["ret"]);
-		return result;
-	} catch (...) {
-		PyErr_Print();
-		return false;
-	}
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   try
+   {
+      boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
+      bool result = boost::python::extract<bool>(mcu.mainDict["ret"]);
+      return result;
+   }
+   catch (...)
+   {
+      PyErr_Print();
+      return false;
+   }
 #else
-	return false;
+   return false;
 #endif
 }
 
@@ -509,51 +512,60 @@ bool Smartbody_dll::PythonCommandBool( const std::string & command )
 int Smartbody_dll::PythonCommandInt( const std::string & command )
 {
 #if USE_SBPYTHON
-	mcuCBHandle & mcu = mcuCBHandle::singleton();
-	try {
-		boost::python::object obj = boost::python::exec(command.c_str(),mcu.mainDict);
-		int result = boost::python::extract<int>(mcu.mainDict["ret"]);
-		return result;
-	} catch (...) {
-		PyErr_Print();
-		return 0;
-	}
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   try
+   {
+      boost::python::object obj = boost::python::exec(command.c_str(),mcu.mainDict);
+      int result = boost::python::extract<int>(mcu.mainDict["ret"]);
+      return result;
+   }
+   catch (...)
+   {
+      PyErr_Print();
+      return 0;
+   }
 #else
-	return 0;
+   return 0;
 #endif
 }
 
 float Smartbody_dll::PythonCommandFloat( const std::string & command )
 {
 #if USE_SBPYTHON
-	mcuCBHandle & mcu = mcuCBHandle::singleton();
-	try {
-		boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
-		float result = boost::python::extract<float>(mcu.mainDict["ret"]);
-		return result;
-	} catch (...) {
-		PyErr_Print();
-		return 0.;
-	}
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   try
+   {
+      boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
+      float result = boost::python::extract<float>(mcu.mainDict["ret"]);
+      return result;
+   }
+   catch (...)
+   {
+      PyErr_Print();
+      return 0;
+   }
 #else
-	return 0.;
+   return 0;
 #endif
 }
 
 std::string Smartbody_dll::PythonCommandString( const std::string & command )
 {
 #if USE_SBPYTHON
-	mcuCBHandle & mcu = mcuCBHandle::singleton();
-	try {
-		boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
-		std::string result = boost::python::extract<std::string>(mcu.mainDict["ret"]);
-		return result;
-	} catch (...) {
-		PyErr_Print();
-		return "";
-	}
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   try
+   {
+      boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
+      std::string result = boost::python::extract<std::string>(mcu.mainDict["ret"]);
+      return result;
+   }
+   catch (...)
+   {
+      PyErr_Print();
+      return "";
+   }
 #else
-	return "";
+   return "";
 #endif
 }
 

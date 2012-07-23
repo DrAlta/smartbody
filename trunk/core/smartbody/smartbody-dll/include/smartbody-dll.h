@@ -25,9 +25,9 @@ class SmartbodyListener
       virtual void OnCharacterCreate( const std::string& name, const std::string& objectClass ) {}
       virtual void OnCharacterDelete( const std::string& name ) {}
       virtual void OnCharacterChanged( const std::string& name ) {}
-	  virtual void OnPawnCreate( const std::string& name ) {}
+      virtual void OnPawnCreate( const std::string& name ) {}
       virtual void OnViseme( const std::string& name, const std::string& visemeName, const float weight, const float blendTime ) {}
-	  virtual void OnChannel( const std::string& name, const std::string& channelName, const float value ) {}
+      virtual void OnChannel( const std::string& name, const std::string& channelName, const float value ) {}
 };
 
 
@@ -94,8 +94,8 @@ class Smartbody_dll
       SMARTBODY_DLL_API void SetDebuggerRendererRightHanded( bool enabled );
 
       SMARTBODY_DLL_API bool ProcessVHMsgs( const char * op, const char * args );
-	  SMARTBODY_DLL_API bool ExecutePython( const char * command);
-	 
+      SMARTBODY_DLL_API bool ExecutePython( const char * command);
+
       SMARTBODY_DLL_API int GetNumberOfCharacters();
 
       SMARTBODY_DLL_API SmartbodyCharacter& GetCharacter( const std::string & name );
