@@ -256,6 +256,7 @@ class BMLDefs
 		static XMLCh* ATTR_ATTACH_PAWN;
 		static XMLCh* ATTR_RELEASE_PAWN;
 		static XMLCh* ATTR_FOOT_IK;
+		static XMLCh* ATTR_USE_LOCOMOTION;
 		static XMLCh* ATTR_MAGNITUDE;
 		static XMLCh* ATTR_MODE;
 		static XMLCh* ATTR_ANGLELIMIT;

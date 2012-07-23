@@ -35,6 +35,7 @@
 
 #include "sbm/mcontrol_util.h"
 #include "controllers/me_ct_example_body_reach.hpp"
+#include <sb/SBCharacter.h>
 
 #include "bml_target.hpp"
 #include "bml_xml_consts.hpp"
@@ -74,6 +75,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 	MeCtExampleBodyReach* bodyReachCt = NULL; 
 	SbmCharacter* curCharacter = const_cast<SbmCharacter*>(request->actor);
+	SmartBody::SBCharacter* curSBChar = dynamic_cast<SmartBody::SBCharacter*>(curCharacter);
 	std::map<int,MeCtReachEngine*>& reMap = curCharacter->getReachEngineMap();
 	if (reMap.size() == 0)
 	{
@@ -189,6 +191,15 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	{			
 		bodyReachCt->setFootIK(true);
 	}
+
+	std::string attrUseLocomotion = xml_parse_string( BMLDefs::ATTR_USE_LOCOMOTION, elem, "", REQUIRED_ATTR );	
+	bool useLocomotion = false;
+	if (curSBChar) useLocomotion = curSBChar->getBoolAttribute("reach.useLocomotion");
+	if (stringICompare(attrUseLocomotion,"true"))
+		useLocomotion = true;
+	else if (stringICompare(attrUseLocomotion,"false"))
+		useLocomotion = false;
+	bodyReachCt->setUseLocomotion(useLocomotion);
 
 	if (reachVelocity > 0)
 	{

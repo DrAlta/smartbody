@@ -259,6 +259,7 @@ XMLCh* BMLDefs::ATTR_SOURCE_JOINT = NULL;
 XMLCh* BMLDefs::ATTR_ATTACH_PAWN = NULL;
 XMLCh* BMLDefs::ATTR_RELEASE_PAWN = NULL;
 XMLCh* BMLDefs::ATTR_FOOT_IK = NULL;
+XMLCh* BMLDefs::ATTR_USE_LOCOMOTION = NULL;
 XMLCh* BMLDefs::TAG_SACCADE = NULL;
 XMLCh* BMLDefs::ATTR_MAGNITUDE = NULL;
 XMLCh* BMLDefs::ATTR_MODE = NULL;
@@ -588,6 +589,7 @@ BMLDefs::BMLDefs()
 	ATTR_ATTACH_PAWN = XMLString::transcode("sbm:attach-pawn");
 	ATTR_RELEASE_PAWN = XMLString::transcode("sbm:release-pawn");
 	ATTR_FOOT_IK = XMLString::transcode("sbm:foot-ik");
+	ATTR_USE_LOCOMOTION = XMLString::transcode("sbm:use-locomotion");
 
 	ATTR_MAGNITUDE = XMLString::transcode("magnitude");
 	ATTR_MODE = XMLString::transcode("mode");
