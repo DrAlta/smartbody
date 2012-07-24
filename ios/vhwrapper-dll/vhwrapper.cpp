@@ -8,15 +8,27 @@
 
 #include <stdio.h>
 
-#ifdef WIN32
+#ifdef WIN_BUILD
 #include <windows.h>
-HINSTANCE g_SBM_HINST;
 #endif
 
 #ifdef ENABLE_VHMSG_WRAPPER
 #include "vhmsg-tt.h"
 #endif
 
+#include "vhcl_audio.h"
+
+
+using vhcl::Audio;
+using vhcl::Sound;
+
+
+bool VHCL_AUDIO_HandleExists( const AUDIOHANDLE handle );
+
+
+#ifdef WIN_BUILD
+HINSTANCE g_SBM_HINST = NULL;
+#endif
 
 #ifdef ENABLE_VHMSG_WRAPPER
 std::map<VHMSGHANDLE, vhmsg::Client*> g_vhmsgInstances;
@@ -24,11 +36,6 @@ std::vector<wchar_t*> g_vhmsgQueuedMessages;
 int g_vhmsgHandleId = 0;
 #endif
 
-#include "vhcl_audio.h"
-
-using vhcl::Audio;
-using vhcl::Sound;
-bool VHCL_AUDIO_HandleExists( const AUDIOHANDLE handle );
 std::map<AUDIOHANDLE, Audio*> g_audioInstances;
 int g_audioHandleId = 0;
 
@@ -52,51 +59,51 @@ typedef bool (*SBM_ReleaseCharacter_DEF)(SBM_SmartbodyCharacter *);
 typedef bool (*SBM_ReleaseCharacterJoints_DEF)(SBM_SmartbodyCharacter *);
 typedef bool (*SBM_SetLogMessageCallback_DEF)(LogMessageCallback);
 typedef void (*SBM_LogMessage_DEF)(const char*, int);
-typedef bool (*SBM_IsCharacterCreated_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** objectClass );
-typedef bool (*SBM_IsCharacterDeleted_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name );
-typedef bool (*SBM_IsCharacterChanged_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name );
-typedef bool (*SBM_IsVisemeSet_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** visemeName, float** weight, float** blendTime );
-typedef bool (*SBM_IsChannelSet_DEF)( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** channelName, float ** value );
-
+typedef bool (*SBM_IsCharacterCreated_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * objectClass, int maxObjectClassLen );
+typedef bool (*SBM_IsCharacterDeleted_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen );
+typedef bool (*SBM_IsCharacterChanged_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen );
+typedef bool (*SBM_IsVisemeSet_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * visemeName, int maxVisemeNameLen, float * weight, float * blendTime );
+typedef bool (*SBM_IsChannelSet_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * channelName, int maxChannelNameLen, float * value );
 typedef bool (*SBM_PythonCommandVoid_DEF)(SBMHANDLE sbmHandle, const char * command);
 typedef bool (*SBM_PythonCommandBool_DEF)(SBMHANDLE sbmHandle, const char * command);
-typedef int (*SBM_PythonCommandInt_DEF)(SBMHANDLE sbmHandle, const char *command);
+typedef int  (*SBM_PythonCommandInt_DEF)(SBMHANDLE sbmHandle, const char *command);
 typedef float (*SBM_PythonCommandFloat_DEF)(SBMHANDLE sbmHandle, const char * command);
-typedef char* (*SBM_PythonCommandString_DEF)(SBMHANDLE sbmHandle, const char * command, char* output, int maxLen);
+typedef char * (*SBM_PythonCommandString_DEF)(SBMHANDLE sbmHandle, const char * command, char * output, int maxLen);
 
-SBM_CreateSBM_DEF                  g_SBM_CreateSBM_DEF = NULL;
-SBM_SetSpeechAudiofileBasePath_DEF g_SBM_SetSpeechAudiofileBasePath_DEF = NULL;
-SBM_SetProcessId_DEF               g_SBM_SetProcessId_DEF = NULL;
-SBM_SetMediaPath_DEF               g_SBM_SetMediaPath_DEF = NULL;
-SBM_Init_DEF                       g_SBM_Init_DEF = NULL;
-SBM_Shutdown_DEF                   g_SBM_Shutdown_DEF = NULL;
-SBM_SetListener_DEF                g_SBM_SetListener_DEF = NULL;
-SBM_Update_DEF                     g_SBM_Update_DEF = NULL;
-SBM_SetDebuggerId_DEF              g_SBM_SetDebuggerId_DEF = NULL;
-SBM_SetDebuggerCameraValues_DEF    g_SBM_SetDebuggerCameraValues_DEF = NULL;
-SBM_SetDebuggerRendererRightHanded_DEF  g_SBM_SetDebuggerRendererRightHanded_DEF = NULL;
-SBM_ProcessVHMsgs_DEF              g_SBM_ProcessVHMsgs_DEF = NULL;
-SBM_GetNumberOfCharacters_DEF      g_SBM_GetNumberOfCharacters_DEF = NULL;
-SBM_GetCharacter_DEF               g_SBM_GetCharacter_DEF = NULL;
-SBM_GetCharacter2_DEF              g_SBM_GetCharacter2_DEF = NULL;
-SBM_ReleaseCharacter_DEF           g_SBM_ReleaseCharacter_DEF = NULL;
-SBM_ReleaseCharacterJoints_DEF     g_SBM_ReleaseCharacterJoints_DEF = NULL;
-SBM_SetLogMessageCallback_DEF      g_SBM_SetLogMessageCallback_DEF = NULL;
-SBM_LogMessage_DEF                 g_SBM_LogMessage_DEF = NULL;
-SBM_IsCharacterCreated_DEF         g_SBM_IsCharacterCreated_DEF = NULL;
-SBM_IsCharacterDeleted_DEF           g_SBM_IsCharacterDeleted_DEF = NULL;
-SBM_IsCharacterChanged_DEF         g_SBM_IsCharacterChanged_DEF = NULL;
-SBM_IsVisemeSet_DEF                g_SBM_IsVisemeSet_DEF = NULL;
-SBM_IsChannelSet_DEF               g_SBM_IsChannelSet_DEF = NULL;
+SBM_CreateSBM_DEF                  g_SBM_CreateSBM = NULL;
+SBM_SetSpeechAudiofileBasePath_DEF g_SBM_SetSpeechAudiofileBasePath = NULL;
+SBM_SetProcessId_DEF               g_SBM_SetProcessId = NULL;
+SBM_SetMediaPath_DEF               g_SBM_SetMediaPath = NULL;
+SBM_Init_DEF                       g_SBM_Init = NULL;
+SBM_Shutdown_DEF                   g_SBM_Shutdown = NULL;
+SBM_SetListener_DEF                g_SBM_SetListener = NULL;
+SBM_Update_DEF                     g_SBM_Update = NULL;
+SBM_SetDebuggerId_DEF              g_SBM_SetDebuggerId = NULL;
+SBM_SetDebuggerCameraValues_DEF    g_SBM_SetDebuggerCameraValues = NULL;
+SBM_SetDebuggerRendererRightHanded_DEF  g_SBM_SetDebuggerRendererRightHanded = NULL;
+SBM_ProcessVHMsgs_DEF              g_SBM_ProcessVHMsgs = NULL;
+SBM_GetNumberOfCharacters_DEF      g_SBM_GetNumberOfCharacters = NULL;
+SBM_GetCharacter_DEF               g_SBM_GetCharacter = NULL;
+SBM_GetCharacter2_DEF              g_SBM_GetCharacter2 = NULL;
+SBM_ReleaseCharacter_DEF           g_SBM_ReleaseCharacter = NULL;
+SBM_ReleaseCharacterJoints_DEF     g_SBM_ReleaseCharacterJoints = NULL;
+SBM_SetLogMessageCallback_DEF      g_SBM_SetLogMessageCallback = NULL;
+SBM_LogMessage_DEF                 g_SBM_LogMessage = NULL;
+SBM_IsCharacterCreated_DEF         g_SBM_IsCharacterCreated = NULL;
+SBM_IsCharacterDeleted_DEF         g_SBM_IsCharacterDeleted = NULL;
+SBM_IsCharacterChanged_DEF         g_SBM_IsCharacterChanged = NULL;
+SBM_IsVisemeSet_DEF                g_SBM_IsVisemeSet = NULL;
+SBM_IsChannelSet_DEF               g_SBM_IsChannelSet = NULL;
 SBM_PythonCommandVoid_DEF          g_SBM_PythonCommandVoid = NULL;
 SBM_PythonCommandBool_DEF          g_SBM_PythonCommandBool = NULL;
 SBM_PythonCommandInt_DEF           g_SBM_PythonCommandInt = NULL;
 SBM_PythonCommandFloat_DEF         g_SBM_PythonCommandFloat = NULL;
 SBM_PythonCommandString_DEF        g_SBM_PythonCommandString = NULL;
 
+
 VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
 {
-#ifdef WIN32
+#ifdef WIN_BUILD
    if (releaseMode)
    {
       g_SBM_HINST = LoadLibrary(TEXT("smartbody-dll.dll")); 
@@ -112,39 +119,39 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
       return -1;
    }
 
-   g_SBM_CreateSBM_DEF                  = (SBM_CreateSBM_DEF)GetProcAddress(g_SBM_HINST, "SBM_CreateSBM");
-   g_SBM_SetSpeechAudiofileBasePath_DEF = (SBM_SetSpeechAudiofileBasePath_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetSpeechAudiofileBasePath");
-   g_SBM_SetProcessId_DEF               = (SBM_SetProcessId_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetProcessId");
-   g_SBM_SetMediaPath_DEF               = (SBM_SetMediaPath_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetMediaPath");
-   g_SBM_Init_DEF                       = (SBM_Init_DEF)GetProcAddress(g_SBM_HINST, "SBM_Init");
-   g_SBM_Shutdown_DEF                   = (SBM_Shutdown_DEF)GetProcAddress(g_SBM_HINST, "SBM_Shutdown");
-   g_SBM_SetListener_DEF                = (SBM_SetListener_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetListener");
-   g_SBM_Update_DEF                     = (SBM_Update_DEF)GetProcAddress(g_SBM_HINST, "SBM_Update");
-   g_SBM_SetDebuggerId_DEF              = (SBM_SetDebuggerId_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerId");
-   g_SBM_SetDebuggerCameraValues_DEF    = (SBM_SetDebuggerCameraValues_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerCameraValues");
-   g_SBM_SetDebuggerRendererRightHanded_DEF  = (SBM_SetDebuggerRendererRightHanded_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerRendererRightHanded");
-   g_SBM_ProcessVHMsgs_DEF              = (SBM_ProcessVHMsgs_DEF)GetProcAddress(g_SBM_HINST, "SBM_ProcessVHMsgs");
-   g_SBM_GetNumberOfCharacters_DEF      = (SBM_GetNumberOfCharacters_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetNumberOfCharacters");
-   g_SBM_GetCharacter_DEF               = (SBM_GetCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetCharacter");
-   g_SBM_GetCharacter2_DEF              = (SBM_GetCharacter2_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetCharacter2");
-   g_SBM_ReleaseCharacter_DEF           = (SBM_ReleaseCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_ReleaseCharacter");
-   g_SBM_ReleaseCharacterJoints_DEF     = (SBM_ReleaseCharacterJoints_DEF)GetProcAddress(g_SBM_HINST, "SBM_ReleaseCharacterJoints");
-   g_SBM_SetLogMessageCallback_DEF      = (SBM_SetLogMessageCallback_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetLogMessageCallback");
-   g_SBM_LogMessage_DEF                 = (SBM_LogMessage_DEF)GetProcAddress(g_SBM_HINST, "SBM_LogMessage");
-   g_SBM_IsCharacterCreated_DEF         = (SBM_IsCharacterCreated_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsCharacterCreated");
-   g_SBM_IsCharacterDeleted_DEF         = (SBM_IsCharacterDeleted_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsCharacterDeleted");
-   g_SBM_IsCharacterChanged_DEF         = (SBM_IsCharacterChanged_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsCharacterChanged");
-   g_SBM_IsVisemeSet_DEF                = (SBM_IsVisemeSet_DEF )GetProcAddress(g_SBM_HINST, "SBM_IsVisemeSet");
-   g_SBM_IsChannelSet_DEF               = (SBM_IsChannelSet_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsChannelSet");
-   g_SBM_PythonCommandVoid              = (SBM_PythonCommandVoid_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandVoid");
-   g_SBM_PythonCommandBool              = (SBM_PythonCommandBool_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandBool");
-   g_SBM_PythonCommandInt               = (SBM_PythonCommandInt_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandInt");
-   g_SBM_PythonCommandFloat             = (SBM_PythonCommandFloat_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandFloat");
-   g_SBM_PythonCommandString            = (SBM_PythonCommandString_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandString");
+   g_SBM_CreateSBM                  = (SBM_CreateSBM_DEF)GetProcAddress(g_SBM_HINST, "SBM_CreateSBM");
+   g_SBM_SetSpeechAudiofileBasePath = (SBM_SetSpeechAudiofileBasePath_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetSpeechAudiofileBasePath");
+   g_SBM_SetProcessId               = (SBM_SetProcessId_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetProcessId");
+   g_SBM_SetMediaPath               = (SBM_SetMediaPath_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetMediaPath");
+   g_SBM_Init                       = (SBM_Init_DEF)GetProcAddress(g_SBM_HINST, "SBM_Init");
+   g_SBM_Shutdown                   = (SBM_Shutdown_DEF)GetProcAddress(g_SBM_HINST, "SBM_Shutdown");
+   g_SBM_SetListener                = (SBM_SetListener_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetListener");
+   g_SBM_Update                     = (SBM_Update_DEF)GetProcAddress(g_SBM_HINST, "SBM_Update");
+   g_SBM_SetDebuggerId              = (SBM_SetDebuggerId_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerId");
+   g_SBM_SetDebuggerCameraValues    = (SBM_SetDebuggerCameraValues_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerCameraValues");
+   g_SBM_SetDebuggerRendererRightHanded  = (SBM_SetDebuggerRendererRightHanded_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerRendererRightHanded");
+   g_SBM_ProcessVHMsgs              = (SBM_ProcessVHMsgs_DEF)GetProcAddress(g_SBM_HINST, "SBM_ProcessVHMsgs");
+   g_SBM_GetNumberOfCharacters      = (SBM_GetNumberOfCharacters_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetNumberOfCharacters");
+   g_SBM_GetCharacter               = (SBM_GetCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetCharacter");
+   g_SBM_GetCharacter2              = (SBM_GetCharacter2_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetCharacter2");
+   g_SBM_ReleaseCharacter           = (SBM_ReleaseCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_ReleaseCharacter");
+   g_SBM_ReleaseCharacterJoints     = (SBM_ReleaseCharacterJoints_DEF)GetProcAddress(g_SBM_HINST, "SBM_ReleaseCharacterJoints");
+   g_SBM_SetLogMessageCallback      = (SBM_SetLogMessageCallback_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetLogMessageCallback");
+   g_SBM_LogMessage                 = (SBM_LogMessage_DEF)GetProcAddress(g_SBM_HINST, "SBM_LogMessage");
+   g_SBM_IsCharacterCreated         = (SBM_IsCharacterCreated_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsCharacterCreated");
+   g_SBM_IsCharacterDeleted         = (SBM_IsCharacterDeleted_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsCharacterDeleted");
+   g_SBM_IsCharacterChanged         = (SBM_IsCharacterChanged_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsCharacterChanged");
+   g_SBM_IsVisemeSet                = (SBM_IsVisemeSet_DEF )GetProcAddress(g_SBM_HINST, "SBM_IsVisemeSet");
+   g_SBM_IsChannelSet               = (SBM_IsChannelSet_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsChannelSet");
+   g_SBM_PythonCommandVoid          = (SBM_PythonCommandVoid_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandVoid");
+   g_SBM_PythonCommandBool          = (SBM_PythonCommandBool_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandBool");
+   g_SBM_PythonCommandInt           = (SBM_PythonCommandInt_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandInt");
+   g_SBM_PythonCommandFloat         = (SBM_PythonCommandFloat_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandFloat");
+   g_SBM_PythonCommandString        = (SBM_PythonCommandString_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandString");
 
-   if (g_SBM_CreateSBM_DEF)
+   if (g_SBM_CreateSBM)
    {
-      return g_SBM_CreateSBM_DEF();
+      return g_SBM_CreateSBM();
    }
 
    return -1;
@@ -155,10 +162,10 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandle, const char * basePath )
 {
-#ifdef WIN32
-   if (g_SBM_SetSpeechAudiofileBasePath_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_SetSpeechAudiofileBasePath)
    {
-      return g_SBM_SetSpeechAudiofileBasePath_DEF(sbmHandle, basePath);
+      return g_SBM_SetSpeechAudiofileBasePath(sbmHandle, basePath);
    }
    return false;
 #else
@@ -168,10 +175,10 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandl
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetProcessId( SBMHANDLE sbmHandle, const char * processId )
 {
-#ifdef WIN32
-   if (g_SBM_SetProcessId_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_SetProcessId)
    {
-      return g_SBM_SetProcessId_DEF(sbmHandle, processId);
+      return g_SBM_SetProcessId(sbmHandle, processId);
    }
    return false;
 #else
@@ -181,10 +188,10 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_SetProcessId( SBMHANDLE sbmHandle, const char 
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * path )
 {
-#ifdef WIN32
-   if (g_SBM_SetMediaPath_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_SetMediaPath)
    {
-      return g_SBM_SetMediaPath_DEF(sbmHandle, path);
+      return g_SBM_SetMediaPath(sbmHandle, path);
    }
    return false;
 #else
@@ -194,10 +201,10 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_SetMediaPath( SBMHANDLE sbmHandle, const char 
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle, const char * pythonPath, bool logToFile )
 {
-#ifdef WIN32
-   if (g_SBM_Init_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_Init)
    {
-      return g_SBM_Init_DEF(sbmHandle, pythonPath, logToFile);
+      return g_SBM_Init(sbmHandle, pythonPath, logToFile);
    }
    return false;
 #else
@@ -207,11 +214,11 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle, const char * python
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle )
 {
-#ifdef WIN32
+#ifdef WIN_BUILD
    bool retVal = false;
-   if (g_SBM_Shutdown_DEF)
+   if (g_SBM_Shutdown)
    {
-      retVal = g_SBM_Shutdown_DEF(sbmHandle);
+      retVal = g_SBM_Shutdown(sbmHandle);
    }
 
    BOOL freeSuccessful = FreeLibrary(g_SBM_HINST);
@@ -232,34 +239,29 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle )
 #endif
 }
 
-#if !defined(IPHONE_BUILD)
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB,
-                                              SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changeCB,
-                                              SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB  )
+                                               SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changeCB,
+                                               SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB )
 {
-#ifdef WIN32
-   if (g_SBM_SetListener_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_SetListener)
    {
-      return g_SBM_SetListener_DEF(sbmHandle, createCB, deleteCB, changeCB, visemeCB, channelCB);
+      return g_SBM_SetListener(sbmHandle, createCB, deleteCB, changeCB, visemeCB, channelCB);
    }
    return false;
+#elif defined(IPHONE_BUILD)
+   return SBM_SetListener(sbmHandle, NULL, NULL, NULL, NULL, NULL);
 #else
-    return SBM_SetListener(sbmHandle, createCB, deleteCB, changeCB, visemeCB, channelCB);
+   return SBM_SetListener(sbmHandle, createCB, deleteCB, changeCB, visemeCB, channelCB);
 #endif
 }
-#else
-VHWRAPPERDLL_API bool WRAPPER_SBM_SetListener( SBMHANDLE sbmHandle)
-{
-    return SBM_SetListener(sbmHandle, NULL, NULL, NULL, NULL, NULL);
-}
-#endif
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
 {
-#ifdef WIN32
-   if (g_SBM_Update_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_Update)
    {
-      return g_SBM_Update_DEF(sbmHandle, timeInSeconds);
+      return g_SBM_Update(sbmHandle, timeInSeconds);
    }
    return false;
 #else
@@ -269,43 +271,46 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_Update( SBMHANDLE sbmHandle, double timeInSeco
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerId( SBMHANDLE sbmHandle, const char * id )
 {
-#ifdef WIN32
-   if (g_SBM_SetDebuggerId_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_SetDebuggerId)
    {
-      g_SBM_SetDebuggerId_DEF(sbmHandle, id );
+      g_SBM_SetDebuggerId(sbmHandle, id );
    }
 #else
+   SBM_SetDebuggerId(sbmHandle, id);
 #endif
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
 {
-#ifdef WIN32
-   if (g_SBM_SetDebuggerCameraValues_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_SetDebuggerCameraValues)
    {
-      g_SBM_SetDebuggerCameraValues_DEF(sbmHandle, x, y, z, rx, ry, rz, rw, fov, aspect, zNear, zFar );
+      g_SBM_SetDebuggerCameraValues(sbmHandle, x, y, z, rx, ry, rz, rw, fov, aspect, zNear, zFar );
    }
 #else
+   SBM_SetDebuggerCameraValues(sbmHandle, x, y, z, rx, ry, rz, rw, fov, aspect, zNear, zFar );
 #endif
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmHandle, bool enabled )
 {
-#ifdef WIN32
-   if (g_SBM_SetDebuggerRendererRightHanded_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_SetDebuggerRendererRightHanded)
    {
-      g_SBM_SetDebuggerRendererRightHanded_DEF(sbmHandle, enabled );
+      g_SBM_SetDebuggerRendererRightHanded(sbmHandle, enabled );
    }
 #else
+   SBM_SetDebuggerRendererRightHanded(sbmHandle, enabled );
 #endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args )
 {
-#ifdef WIN32
-   if (g_SBM_ProcessVHMsgs_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_ProcessVHMsgs)
    {
-      return g_SBM_ProcessVHMsgs_DEF(sbmHandle, op, args);
+      return g_SBM_ProcessVHMsgs(sbmHandle, op, args);
    }
    return false;
 #else
@@ -315,10 +320,10 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char
 
 VHWRAPPERDLL_API int WRAPPER_SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle )
 {
-#ifdef WIN32
-   if (g_SBM_GetNumberOfCharacters_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_GetNumberOfCharacters)
    {
-      return g_SBM_GetNumberOfCharacters_DEF(sbmHandle);
+      return g_SBM_GetNumberOfCharacters(sbmHandle);
    }
    return -1;
 #else
@@ -328,10 +333,10 @@ VHWRAPPERDLL_API int WRAPPER_SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle )
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character )
 {
-#ifdef WIN32
-   if (g_SBM_GetCharacter_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_GetCharacter)
    {
-      return g_SBM_GetCharacter_DEF(sbmHandle, name, character);
+      return g_SBM_GetCharacter(sbmHandle, name, character);
    }
    return false;
 #else
@@ -341,10 +346,10 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter( SBMHANDLE sbmHandle, const char 
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter2( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter2 * character )
 {
-#ifdef WIN32
-   if (g_SBM_GetCharacter2_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_GetCharacter2)
    {
-      return g_SBM_GetCharacter2_DEF(sbmHandle, name, character);
+      return g_SBM_GetCharacter2(sbmHandle, name, character);
    }
    return false;
 #else
@@ -354,10 +359,10 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter2( SBMHANDLE sbmHandle, const char
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character )
 {
-#ifdef WIN32
-   if (g_SBM_ReleaseCharacter_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_ReleaseCharacter)
    {
-      return g_SBM_ReleaseCharacter_DEF(character);
+      return g_SBM_ReleaseCharacter(character);
    }
    return false;
 #else
@@ -367,10 +372,10 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacter( SBM_SmartbodyCharacter * cha
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character )
 {
-#ifdef WIN32
-   if (g_SBM_ReleaseCharacter_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_ReleaseCharacter)
    {
-      return g_SBM_ReleaseCharacter_DEF(character);
+      return g_SBM_ReleaseCharacter(character);
    }
    return false;
 #else
@@ -380,10 +385,10 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetLogMessageCallback( LogMessageCallback cb )
 {
-#ifdef WIN32
-   if (g_SBM_SetLogMessageCallback_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_SetLogMessageCallback)
    {
-      return g_SBM_SetLogMessageCallback_DEF(cb);
+      return g_SBM_SetLogMessageCallback(cb);
    }
    return false;
 #else
@@ -393,101 +398,141 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_SetLogMessageCallback( LogMessageCallback cb )
 
 VHWRAPPERDLL_API void WRAPPER_SBM_LogMessage(const char* message, int messageType)
 {
-#ifdef WIN32
-   if (g_SBM_LogMessage_DEF)
+#ifdef WIN_BUILD
+   if (g_SBM_LogMessage)
    {
-      g_SBM_LogMessage_DEF(message, messageType);
+      g_SBM_LogMessage(message, messageType);
    }
 #else
    SBM_LogMessage(message, messageType);
 #endif
 }
 
-VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterCreated( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** objectClass )
+VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * objectClass, int maxObjectClassLen )
 {
-#ifdef WIN32
-   return g_SBM_IsCharacterCreated_DEF(sbmHandle, numCharacters, name, objectClass);
+#ifdef WIN_BUILD
+   if (g_SBM_IsCharacterCreated)
+   {
+      return g_SBM_IsCharacterCreated(sbmHandle, name, maxNameLen, objectClass, maxObjectClassLen);
+   }
+   return false;
 #else
-    return SBM_IsCharacterCreated(sbmHandle, numCharacters, name, objectClass);
+   return SBM_IsCharacterCreated(sbmHandle, name, maxNameLen, objectClass, maxObjectClassLen);
 #endif
 }
 
-VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, int * numCharacters, char *** name)
+VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, char * name, int maxNameLen )
 {
-#ifdef WIN32
-   return g_SBM_IsCharacterDeleted_DEF(sbmHandle, numCharacters, name);
+#ifdef WIN_BUILD
+   if (g_SBM_IsCharacterDeleted)
+   {
+      return g_SBM_IsCharacterDeleted(sbmHandle, name, maxNameLen);
+   }
+   return false;
 #else
-    return SBM_IsCharacterDeleted(sbmHandle, numCharacters, name);
+   return SBM_IsCharacterDeleted(sbmHandle, name, maxNameLen);
 #endif
 }
 
-VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterChanged( SBMHANDLE sbmHandle, int * numCharacters, char *** name)
+VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterChanged( SBMHANDLE sbmHandle, char * name, int maxNameLen )
 {
-#ifdef WIN32
-   return g_SBM_IsCharacterChanged_DEF(sbmHandle, numCharacters, name);
+#ifdef WIN_BUILD
+   if (g_SBM_IsCharacterChanged)
+   {
+      return g_SBM_IsCharacterChanged(sbmHandle, name, maxNameLen);
+   }
+   return false;
 #else
-    return SBM_IsCharacterChanged(sbmHandle, numCharacters, name);
+   return SBM_IsCharacterChanged(sbmHandle, name, maxNameLen);
 #endif
 }
 
-VHWRAPPERDLL_API bool WRAPPER_SBM_IsVisemeSet( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** visemeName, float** weight, float** blendTime)
+VHWRAPPERDLL_API bool WRAPPER_SBM_IsVisemeSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * visemeName, int maxVisemeNameLen, float * weight, float * blendTime )
 {
-#ifdef WIN32
-   return g_SBM_IsVisemeSet_DEF(sbmHandle, numCharacters, name, visemeName, weight, blendTime);
+#ifdef WIN_BUILD
+   if (g_SBM_IsVisemeSet)
+   {
+      return g_SBM_IsVisemeSet(sbmHandle, name, maxNameLen, visemeName, maxVisemeNameLen, weight, blendTime);
+   }
+   return false;
 #else
-    return SBM_IsVisemeSet(sbmHandle, numCharacters, name, visemeName, weight, blendTime);
+   return SBM_IsVisemeSet(sbmHandle, name, maxNameLen, visemeName, maxVisemeNameLen, weight, blendTime);
 #endif
 }
 
-VHWRAPPERDLL_API bool WRAPPER_SBM_IsChannelSet( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** channelName, float ** value)
+VHWRAPPERDLL_API bool WRAPPER_SBM_IsChannelSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * channelName, int maxChannelNameLen, float * value )
 {
-#ifdef WIN32
-   return g_SBM_IsChannelSet_DEF(sbmHandle, numCharacters, name, channelName, value);
+#ifdef WIN_BUILD
+   if (g_SBM_IsChannelSet)
+   {
+      return g_SBM_IsChannelSet(sbmHandle, name, maxNameLen, channelName, maxChannelNameLen, value);
+   }
+   return false;
 #else
-   return SBM_IsChannelSet(sbmHandle, numCharacters, name, channelName, value);
+   return SBM_IsChannelSet(sbmHandle, name, maxNameLen, channelName, maxChannelNameLen, value);
 #endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_PythonCommandVoid(SBMHANDLE sbmHandle, const char * command)
 {
-#ifdef WIN32
-   return g_SBM_PythonCommandVoid(sbmHandle, command);
+#ifdef WIN_BUILD
+   if (g_SBM_PythonCommandVoid)
+   {
+      return g_SBM_PythonCommandVoid(sbmHandle, command);
+   }
+   return false;
 #else
-    return SBM_PythonCommandVoid(sbmHandle, command);
+   return SBM_PythonCommandVoid(sbmHandle, command);
 #endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_PythonCommandBool(SBMHANDLE sbmHandle, const char * command)
 {
-#ifdef WIN32
-   return g_SBM_PythonCommandBool(sbmHandle, command);
+#ifdef WIN_BUILD
+   if (g_SBM_PythonCommandBool)
+   {
+      return g_SBM_PythonCommandBool(sbmHandle, command);
+   }
+   return false;
 #else
-    return SBM_PythonCommandBool(sbmHandle, command);
+   return SBM_PythonCommandBool(sbmHandle, command);
 #endif
 }
 
 VHWRAPPERDLL_API int WRAPPER_SBM_PythonCommandInt(SBMHANDLE sbmHandle, const char * command)
 {
-#ifdef WIN32
-   return g_SBM_PythonCommandInt(sbmHandle, command);
+#ifdef WIN_BUILD
+   if (g_SBM_PythonCommandInt)
+   {
+      return g_SBM_PythonCommandInt(sbmHandle, command);
+   }
+   return 0;
 #else
-    return SBM_PythonCommandInt(sbmHandle, command);
+   return SBM_PythonCommandInt(sbmHandle, command);
 #endif
 }
 
 VHWRAPPERDLL_API float WRAPPER_SBM_PythonCommandFloat(SBMHANDLE sbmHandle, const char *command)
 {
-#ifdef WIN32
-   return g_SBM_PythonCommandFloat(sbmHandle, command);
+#ifdef WIN_BUILD
+   if (g_SBM_PythonCommandFloat)
+   {
+      return g_SBM_PythonCommandFloat(sbmHandle, command);
+   }
+   return 0;
 #else
     return SBM_PythonCommandFloat(sbmHandle, command);
 #endif
 }
 
-VHWRAPPERDLL_API char* WRAPPER_SBM_PythonCommandString(SBMHANDLE sbmHandle, const char * command, char* output, int maxLen)
+VHWRAPPERDLL_API char * WRAPPER_SBM_PythonCommandString(SBMHANDLE sbmHandle, const char * command, char * output, int maxLen)
 {
-#ifdef WIN32
-   return g_SBM_PythonCommandString(sbmHandle, command, output, maxLen);
+#ifdef WIN_BUILD
+   if (g_SBM_PythonCommandString)
+   {
+      return g_SBM_PythonCommandString(sbmHandle, command, output, maxLen);
+   }
+   return NULL;
 #else
     return SBM_PythonCommandString(sbmHandle, command, output, maxLen);
 #endif
