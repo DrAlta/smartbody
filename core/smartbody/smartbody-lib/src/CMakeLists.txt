@@ -400,8 +400,14 @@ set( SMARTBODY_LIB_SBM_SRC
 
 ####
 
+
 #set( CMAKE_MODULE_LINKER_FLAGS -m32 )
 set_source_files_properties( ${SMARTBODY_LIB_EXT_SOIL_SRC} PROPERTIES LANGUAGE CXX )
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-writable-strings")
+endif()
+
 
 add_library(
 	smartbody-lib
