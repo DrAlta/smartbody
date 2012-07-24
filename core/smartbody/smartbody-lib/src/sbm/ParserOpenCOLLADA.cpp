@@ -162,7 +162,7 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 	return true;
 }
 
-DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, DOMNode* node)
+DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, DOMNode* node)
 {
 	int type = node->getNodeType();
 	std::string name;
@@ -183,7 +183,7 @@ DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, DOMNode* node)
 	return child;
 }
 
-DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, std::string fileName)
+DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, std::string fileName)
 {
 	try 
 	{
@@ -1144,7 +1144,7 @@ int ParserOpenCOLLADA::getMotionChannelId( SkChannelArray& channels, std::string
 	return dataId;	
 }
 
-int ParserOpenCOLLADA::getMotionChannelId(SkChannelArray& mChannels, std::string sourceName)
+int ParserOpenCOLLADA::getMotionChannelId(SkChannelArray& mChannels, std::string& sourceName)
 {
 	int id = -1;
 	int dataId = -1;

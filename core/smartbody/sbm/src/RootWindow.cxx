@@ -357,7 +357,7 @@ void BaseWindow::LaunchParamAnimViewerCB(Fl_Widget* widget, void* data)
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (!rootWindow->panimationWindow)
 	{
-		rootWindow->panimationWindow = new PanimationWindow(rootWindow->x() + 50, rootWindow->y() + 50, 800, 600, "Blend Viewer");
+		rootWindow->panimationWindow = new PanimationWindow(rootWindow->x() + 50, rootWindow->y() + 50, 800, 800, "Blend Viewer");
 	}
 	rootWindow->panimationWindow->show();
 }
