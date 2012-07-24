@@ -413,8 +413,12 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 						{
 							SBCharacter * c = m_scene->getCharacter(charNames[i]);
 							string msg = vhcl::Format("sbmdebugger %s init", m_fullId.c_str());
-							msg += vhcl::Format(" character-face_definition %s %s\n", c->getName().c_str(), c->getFaceDefinition()->getName().c_str());
-							vhmsg::ttu_notify1(msg.c_str());
+							SBFaceDefinition* faceDef = c->getFaceDefinition();
+							if (faceDef)
+							{
+								msg += vhcl::Format(" character-face_definition %s %s\n", c->getName().c_str(), faceDef->getName().c_str());
+								vhmsg::ttu_notify1(msg.c_str());
+							}
 						}
 						
 						SBAnimationBlendManager* blendManager = m_scene->getBlendManager();
