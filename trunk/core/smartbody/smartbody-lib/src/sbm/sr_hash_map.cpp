@@ -79,11 +79,11 @@ srHashMapBase::sr_map_entry_t *srHashMapBase::new_table_entry( const char *key, 
 void *srHashMapBase::find_table_data( sr_map_entry_t *bucket_p, const char *key )	{
 		
 		if( !bucket_p ) { 
-			fprintf( stderr, "srHashMapBase::find_table_data ERR: bucket_p is NULL \n" ); 
+			LOG( "srHashMapBase::find_table_data ERR: bucket_p is NULL \n" ); 
 			return( NULL ); 
 		}
 		if( !key ) { 
-			fprintf( stderr, "srHashMapBase::find_table_data ERR: key is NULL \n" ); 
+			LOG( "srHashMapBase::find_table_data ERR: key is NULL \n" ); 
 			return( NULL ); 
 		}
 		if( strcmp( bucket_p->key, key ) == 0 )	{
@@ -173,11 +173,11 @@ void srHashMapBase::print( int reverse )	{
 int srHashMapBase::insert( const char *key, void *data, int claim )	{
 		
 		if( bucket_pp == NULL ) {
-			fprintf( stderr, "srHashMapBase::insert ERR: bucket_pp is NULL \n" ); 
+			LOG( "srHashMapBase::insert ERR: bucket_pp is NULL \n" ); 
 			return( CMD_FAILURE );
 		}
 		if( key == NULL ) { 
-			fprintf( stderr, "srHashMapBase::insert ERR: NULL key \n" ); 
+			LOG( "srHashMapBase::insert ERR: NULL key \n" ); 
 			return( CMD_FAILURE );
 		}
 		
@@ -185,7 +185,8 @@ int srHashMapBase::insert( const char *key, void *data, int claim )	{
 		sr_map_entry_t *head_entry_p = bucket_pp[ i ];
 		if( head_entry_p )	{
 			if( find_table_data( head_entry_p, key ) )	{
-				fprintf( stderr, "srHashMapBase::insert ERR: duplicate key '%s'\n", key ); 
+				// commented out for now - causing noisy log messages - AS 7/24/12
+				//LOG( "srHashMapBase::insert ERR: duplicate key '%s'\n", key ); 
 				return( CMD_FAILURE );
 			}
 		}
@@ -197,11 +198,11 @@ int srHashMapBase::insert( const char *key, void *data, int claim )	{
 void *srHashMapBase::lookup( const char *key )	{
 	
 		if( bucket_pp == NULL ) {
-			fprintf( stderr, "srHashMapBase::lookup ERR: bucket_pp is NULL \n" ); 
+			LOG("srHashMapBase::lookup ERR: bucket_pp is NULL \n" ); 
 			return( NULL );
 		}
 		if( key == NULL ) {
-			fprintf( stderr, "srHashMapBase::lookup ERR: key is NULL \n" ); 
+			LOG("srHashMapBase::lookup ERR: key is NULL \n" ); 
 			return( NULL );
 		}
 
@@ -217,11 +218,11 @@ void *srHashMapBase::remove( const char *key, int *claimed_p )	{
 	void *data;
 	
 		if( bucket_pp == NULL ) {
-			fprintf( stderr, "srHashMapBase::remove ERR: bucket_pp is NULL \n" ); 
+			LOG( "srHashMapBase::remove ERR: bucket_pp is NULL \n" ); 
 			return( NULL );
 		}
 		if( key == NULL ) {
-			fprintf( stderr, "srHashMapBase::remove ERR: key is NULL \n" ); 
+			LOG( "srHashMapBase::remove ERR: key is NULL \n" ); 
 			return(NULL);
 		}
 
@@ -284,7 +285,7 @@ void srHashMapBase::reset(void)	{
 void *srHashMapBase::next( char** key_ref_p )	{
 
 		if( bucket_pp == NULL ) {
-			fprintf( stderr, "srHashMapBase::next ERR: bucket_pp is NULL \n" ); 
+			LOG( "srHashMapBase::next ERR: bucket_pp is NULL \n" ); 
 			return( NULL );
 		}
 		increment_iterator();
@@ -300,7 +301,7 @@ void *srHashMapBase::next( char** key_ref_p )	{
 void *srHashMapBase::pull( int *claimed_p )	{
 
 		if( bucket_pp == NULL ) {
-			fprintf( stderr, "srHashMapBase::pull ERR: bucket_pp is NULL \n" ); 
+			LOG( "srHashMapBase::pull ERR: bucket_pp is NULL \n" ); 
 			return( NULL );
 		}
 		increment_iterator();
@@ -315,7 +316,7 @@ void *srHashMapBase::pull( int *claimed_p )	{
 void srHashMapBase::increment_iterator(void)	{
 
 		if( bucket_pp == NULL ) {
-			fprintf( stderr, "srHashMapBase::increment_iterator ERR: bucket_pp is NULL \n" ); 
+			LOG( "srHashMapBase::increment_iterator ERR: bucket_pp is NULL \n" ); 
 			return;
 		}
 		if( iterator_p )	{
@@ -329,7 +330,7 @@ void srHashMapBase::increment_iterator(void)	{
 void srHashMapBase::decrement_iterator(void)	{
 
 		if( bucket_pp == NULL ) {
-			fprintf( stderr, "srHashMapBase::decrement_iterator ERR: bucket_pp is NULL \n" ); 
+			LOG( "srHashMapBase::decrement_iterator ERR: bucket_pp is NULL \n" ); 
 			return;
 		}
 		if( iterator_p )	{

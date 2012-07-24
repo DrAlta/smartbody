@@ -5,6 +5,7 @@
 #include <sbm/mcontrol_util.h>
 
 #include <sr/sr.h>
+#include <sr/sr_lines.h>
 
 namespace SmartBody {
 

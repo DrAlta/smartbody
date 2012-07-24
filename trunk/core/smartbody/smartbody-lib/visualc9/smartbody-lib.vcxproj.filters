@@ -751,9 +751,6 @@
     <ClCompile Include="..\src\sbm\nvbg.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\external\parser\Params.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\ParserASFAMC.cxx">
       <Filter>sbm</Filter>
     </ClCompile>
@@ -836,9 +833,6 @@
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\time_regulator.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\external\parser\utils.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\xercesc_utils.cpp">
@@ -1037,6 +1031,12 @@
       <Filter>external\parser</Filter>
     </ClCompile>
     <ClCompile Include="..\src\external\parser\UnitRules.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\Params.cpp">
+      <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\parser\utils.cpp">
       <Filter>external\parser</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1809,9 +1809,6 @@
     <ClInclude Include="..\src\sbm\nvbg.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\external\parser\Params.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\ParserASFAMC.h">
       <Filter>sbm</Filter>
     </ClInclude>
@@ -1870,9 +1867,6 @@
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\time_regulator.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\parser\utils.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\viseme_map.hpp">
@@ -2116,6 +2110,12 @@
       <Filter>external\glew</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\UnitRules.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\Params.h">
+      <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\parser\utils.h">
       <Filter>external\parser</Filter>
     </ClInclude>
   </ItemGroup>
