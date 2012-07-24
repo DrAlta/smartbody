@@ -403,13 +403,13 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
    create_popup_menus();   
 
-   gridColor[0] = 0.5;
-   gridColor[1] = 0.5;
-   gridColor[2] = 0.5;
-   gridColor[3] = 0.5;
-   gridHighlightColor[0] = .0;
-   gridHighlightColor[1] = .0;
-   gridHighlightColor[2] = .0;
+   gridColor[0] = 0.7f;
+   gridColor[1] = 0.7f;
+   gridColor[2] = 0.7f;
+   gridColor[3] = .5f;
+   gridHighlightColor[0] = .6f;
+   gridHighlightColor[1] = .6f;
+   gridHighlightColor[2] = .6f;
    gridSize = 200.0;
    gridStep = 20.0;
 //   gridSize = 400.0;
@@ -2817,7 +2817,7 @@ void FltkViewer::drawGrid()
 	float adjustedGridStep = gridStep;
 	if (sceneScale > 0.f)
 	{
-		adjustedGridStep *= adjustedGridStep / .01f;
+		adjustedGridStep *= sceneScale / .01f;
 	}
 
 	for (float x = -gridSize; x <= gridSize; x += adjustedGridStep)
