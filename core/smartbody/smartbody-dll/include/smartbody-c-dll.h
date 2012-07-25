@@ -34,21 +34,7 @@ extern "C" {
 #endif 
 
 
-// helper class for receiving individual joint data
-struct SBM_SmartbodyJoint
-{
-   char * m_name;
-   float x;
-   float y;
-   float z;
-   float rw;
-   float rx;
-   float ry;
-   float rz;
-};
-
-
-// helper class for receiving character data including all the joints
+// keeping the joint data in separate arrays to help with marshalling
 struct SBM_SmartbodyCharacter
 {
    char * m_name;
@@ -60,24 +46,7 @@ struct SBM_SmartbodyCharacter
    float ry;
    float rz;
    size_t m_numJoints;
-   SBM_SmartbodyJoint * m_joints;
-};
 
-
-// similar to SBM_SmartbodyCharacter but with the joint data in separate arrays to help with marshalling
-struct SBM_SmartbodyCharacter2
-{
-   char * m_name;
-   float x;
-   float y;
-   float z;
-   float rw;
-   float rx;
-   float ry;
-   float rz;
-   size_t m_numJoints;
-
-   //SBM_SmartbodyJoint * m_joints;
    char ** jname;
    float * jx;
    float * jy;
@@ -110,12 +79,11 @@ SMARTBODY_C_DLL_API bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op
 SMARTBODY_C_DLL_API bool SBM_ExecutePython( SBMHANDLE sbmHandle, const char * command );
 
 SMARTBODY_C_DLL_API int  SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle );
+SMARTBODY_C_DLL_API bool SBM_InitCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character );
 SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character );
-SMARTBODY_C_DLL_API bool SBM_GetCharacter2( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter2 * character );
 SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character );
-SMARTBODY_C_DLL_API bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character );
 SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb);
-SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType);
+SMARTBODY_C_DLL_API void SBM_LogMessage(const char * message, int messageType);
 
 // used for polling on iOS since callbacks aren't allowed
 SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * objectClass, int maxObjectClassLen );

@@ -166,14 +166,13 @@ public:
 };
 
 
+bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character );
 bool SBM_HandleExists( SBMHANDLE sbmHandle );
 void SBM_CharToCSbmChar( const SmartbodyCharacter * sbmChar, SBM_SmartbodyCharacter * sbmCChar );
-void SBM_CharToCSbmChar2( const SmartbodyCharacter * sbmChar, SBM_SmartbodyCharacter2 * sbmCChar );
 
 
 std::map< int, Smartbody_dll * > g_smartbodyInstances;
 int g_handleId_DLL = 0;
-std::map< int, SBM_SmartbodyCharacter * > g_characters;
 
 
 SMARTBODY_C_DLL_API SBMHANDLE SBM_CreateSBM()
@@ -344,6 +343,38 @@ SMARTBODY_C_DLL_API int SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle )
 }
 
 
+SMARTBODY_C_DLL_API bool SBM_InitCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   character->m_name = new char[ strlen(name) + 1 ];
+   strcpy( character->m_name, name );
+
+   character->x  = 0;
+   character->y  = 0;
+   character->z  = 0;
+   character->rw = 0;
+   character->rx = 0;
+   character->ry = 0;
+   character->rz = 0;
+   character->m_numJoints = 0;
+
+   character->jname = NULL;
+   character->jx  = NULL;
+   character->jy  = NULL;
+   character->jz  = NULL;
+   character->jrw = NULL;
+   character->jrx = NULL;
+   character->jry = NULL;
+   character->jrz = NULL;
+
+   return true;
+}
+
+
 SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
@@ -359,21 +390,6 @@ SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * nam
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_GetCharacter2( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter2 * character )
-{
-   if ( !SBM_HandleExists( sbmHandle ) )
-   {
-      return false;
-   }
-
-   SmartbodyCharacter& dllChar = g_smartbodyInstances[ sbmHandle ]->GetCharacter( (string)name );
-
-   SBM_CharToCSbmChar2( &dllChar, character );
-
-   return true;
-}
-
-
 SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character )
 {
    if ( !character )
@@ -382,14 +398,15 @@ SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * characte
    }
 
    SBM_ReleaseCharacterJoints(character);
-   
+
    delete [] character->m_name;
+   character->m_name = NULL;
 
    return true;
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character )
+bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character )
 {
    if ( !character )
    {
@@ -398,10 +415,36 @@ SMARTBODY_C_DLL_API bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * ch
 
    for ( size_t i = 0; i < character->m_numJoints; i++ )
    {
-      delete [] character->m_joints[ i ].m_name;
+      delete [] character->jname[ i ];
    }
 
-   delete [] character->m_joints;
+   character->x  = 0;
+   character->y  = 0;
+   character->z  = 0;
+   character->rw = 0;
+   character->rx = 0;
+   character->ry = 0;
+   character->rz = 0;
+   character->m_numJoints = 0;
+
+   delete [] character->jname;
+   delete [] character->jx;
+   delete [] character->jy;
+   delete [] character->jz;
+   delete [] character->jrw;
+   delete [] character->jrx;
+   delete [] character->jry;
+   delete [] character->jrz;
+
+   character->jname = NULL;
+   character->jx  = NULL;
+   character->jy  = NULL;
+   character->jz  = NULL;
+   character->jrw = NULL;
+   character->jrx = NULL;
+   character->jry = NULL;
+   character->jrz = NULL;
+
    return true;
 }
 
@@ -412,7 +455,7 @@ bool SBM_HandleExists( SBMHANDLE sbmHandle )
 }
 
 
-void SBM_CharToCSbmChar( const::SmartbodyCharacter * sbmChar, SBM_SmartbodyCharacter * sbmCChar )
+void SBM_CharToCSbmChar( const SmartbodyCharacter * sbmChar, SBM_SmartbodyCharacter * sbmCChar )
 {
    // copy transformation data
    sbmCChar->x = sbmChar->x;
@@ -424,12 +467,6 @@ void SBM_CharToCSbmChar( const::SmartbodyCharacter * sbmChar, SBM_SmartbodyChara
    sbmCChar->rz = sbmChar->rz;
 
 
-   // copy name
-   // NOTE: name should be copied during callback and character creation
-   //sbmCChar->m_name = new char[ sbmChar->m_name.length() + 1 ];
-   //strcpy( sbmCChar->m_name, sbmChar->m_name.c_str() );
-
-
    if ( sbmChar->m_joints.size() > 0 )
    {
       bool initJoints = false;
@@ -437,58 +474,6 @@ void SBM_CharToCSbmChar( const::SmartbodyCharacter * sbmChar, SBM_SmartbodyChara
       {
          //SBM_LogMessage("CREATING JOINTS!", 2);
          sbmCChar->m_numJoints = sbmChar->m_joints.size();
-         sbmCChar->m_joints = new SBM_SmartbodyJoint[ sbmCChar->m_numJoints ];
-         initJoints = true;
-      }
-
-      for ( size_t i = 0; i < sbmCChar->m_numJoints; i++ )
-      {
-         // copy transformation data
-         sbmCChar->m_joints[ i ].x = sbmChar->m_joints[ i ].x;
-         sbmCChar->m_joints[ i ].y = sbmChar->m_joints[ i ].y;
-         sbmCChar->m_joints[ i ].z = sbmChar->m_joints[ i ].z;
-         sbmCChar->m_joints[ i ].rw = sbmChar->m_joints[ i ].rw;
-         sbmCChar->m_joints[ i ].rx = sbmChar->m_joints[ i ].rx;
-         sbmCChar->m_joints[ i ].ry = sbmChar->m_joints[ i ].ry;
-         sbmCChar->m_joints[ i ].rz = sbmChar->m_joints[ i ].rz;
-
-         // copy name
-         if (initJoints)
-         {
-            // only initialize joints if this is the first time
-            sbmCChar->m_joints[ i ].m_name = new char[ sbmChar->m_joints[ i ].m_name.length() + 1 ];
-            strcpy( sbmCChar->m_joints[ i ].m_name, sbmChar->m_joints[ i ].m_name.c_str() );
-         }
-      }
-   }
-}
-
-
-void SBM_CharToCSbmChar2( const::SmartbodyCharacter * sbmChar, SBM_SmartbodyCharacter2 * sbmCChar )
-{
-   // copy transformation data
-   sbmCChar->x = sbmChar->x;
-   sbmCChar->y = sbmChar->y;
-   sbmCChar->z = sbmChar->z;
-   sbmCChar->rw = sbmChar->rw;
-   sbmCChar->rx = sbmChar->rx;
-   sbmCChar->ry = sbmChar->ry;
-   sbmCChar->rz = sbmChar->rz;
-
-
-   // copy name
-   // NOTE: name should be copied during callback and character creation
-   //sbmCChar->m_name = new char[ sbmChar->m_name.length() + 1 ];
-   //strcpy( sbmCChar->m_name, sbmChar->m_name.c_str() );
-
-   if ( sbmChar->m_joints.size() > 0 )
-   {
-      bool initJoints = false;
-      if (sbmCChar->m_numJoints == 0)
-      {
-         //SBM_LogMessage("CREATING JOINTS!", 2);
-         sbmCChar->m_numJoints = sbmChar->m_joints.size();
-         //sbmCChar->m_joints = new SBM_SmartbodyJoint[ sbmCChar->m_numJoints ];
          sbmCChar->jname = new char * [ sbmCChar->m_numJoints ];
          sbmCChar->jx = new float [ sbmCChar->m_numJoints ];
          sbmCChar->jy = new float [ sbmCChar->m_numJoints ];
@@ -503,13 +488,6 @@ void SBM_CharToCSbmChar2( const::SmartbodyCharacter * sbmChar, SBM_SmartbodyChar
       for ( size_t i = 0; i < sbmCChar->m_numJoints; i++ )
       {
          // copy transformation data
-         //sbmCChar->m_joints[ i ].x = sbmChar->m_joints[ i ].x;
-         //sbmCChar->m_joints[ i ].y = sbmChar->m_joints[ i ].y;
-         //sbmCChar->m_joints[ i ].z = sbmChar->m_joints[ i ].z;
-         //sbmCChar->m_joints[ i ].rw = sbmChar->m_joints[ i ].rw;
-         //sbmCChar->m_joints[ i ].rx = sbmChar->m_joints[ i ].rx;
-         //sbmCChar->m_joints[ i ].ry = sbmChar->m_joints[ i ].ry;
-         //sbmCChar->m_joints[ i ].rz = sbmChar->m_joints[ i ].rz;
          sbmCChar->jx[ i ] = sbmChar->m_joints[ i ].x;
          sbmCChar->jy[ i ] = sbmChar->m_joints[ i ].y;
          sbmCChar->jz[ i ] = sbmChar->m_joints[ i ].z;
@@ -522,8 +500,6 @@ void SBM_CharToCSbmChar2( const::SmartbodyCharacter * sbmChar, SBM_SmartbodyChar
          if (initJoints)
          {
             // only initialize joints if this is the first time
-            //sbmCChar->m_joints[ i ].m_name = new char[ sbmChar->m_joints[ i ].m_name.length() + 1 ];
-            //strcpy( sbmCChar->m_joints[ i ].m_name, sbmChar->m_joints[ i ].m_name.c_str() );
             sbmCChar->jname[ i ] = new char[ sbmChar->m_joints[ i ].m_name.length() + 1 ];
             strcpy( sbmCChar->jname[ i ], sbmChar->m_joints[ i ].m_name.c_str() );
          }
@@ -689,13 +665,11 @@ SMARTBODY_C_DLL_API bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op
 SMARTBODY_C_DLL_API bool SBM_ExecutePython( SBMHANDLE sbmHandle, const char * command ) { return true; }
 
 SMARTBODY_C_DLL_API int  SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle ) { return 42; }
+SMARTBODY_C_DLL_API bool SBM_InitCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character ) { return true; }
 SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character ) { return true; }
-SMARTBODY_C_DLL_API bool SBM_GetCharacter2( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter2 * character ) { return true; }
 SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character ) { return true; }
-SMARTBODY_C_DLL_API bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character ) { return true; }
 SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb) { return true; }
-SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType) { return; }
-
+SMARTBODY_C_DLL_API void SBM_LogMessage(const char * message, int messageType) { return; }
 
 // used for polling on iOS since callbacks aren't allowed
 SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * objectClass, int maxObjectClassLen ) { return false; }

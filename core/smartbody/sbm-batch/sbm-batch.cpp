@@ -103,9 +103,7 @@ class SBMListener : public SmartbodyListener
 {
 	 characters.push_back( name );
 	 SBM_SmartbodyCharacter* character = new SBM_SmartbodyCharacter();
-	  // copy name
-	   character->m_name = new char[ strlen(name) + 1 ];
-	   strcpy( character->m_name, name  );
+	 SBM_InitCharacter(sbmHandle, name, character);
 	 instances.push_back(character);
 	 return 0;
 }
@@ -120,6 +118,7 @@ class SBMListener : public SmartbodyListener
         {
            characters.erase( characters.begin() + i );
 		   SBM_SmartbodyCharacter* c = instances[i];
+		   SBM_ReleaseCharacter(c);
 		   delete c;
 		   instances.erase(instances.begin() + i);
            break;
@@ -137,8 +136,7 @@ class SBMListener : public SmartbodyListener
         if ( characters[ i ].compare( name ) == 0 )
         {
 			SBM_SmartbodyCharacter* c = instances[i];
-			c->m_numJoints = 0;
-			delete [] c->m_joints;
+			SBM_ReleaseCharacter(c);
            break;
         }
      }
