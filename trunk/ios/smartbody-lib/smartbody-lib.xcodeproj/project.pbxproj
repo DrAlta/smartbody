@@ -416,9 +416,7 @@
 		AA9CD989141FF8D10064C27A /* MeCtReachEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD740141FF8D10064C27A /* MeCtReachEngine.h */; };
 		AA9CD98A141FF8D10064C27A /* nvbg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD741141FF8D10064C27A /* nvbg.cpp */; };
 		AA9CD98B141FF8D10064C27A /* nvbg.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD742141FF8D10064C27A /* nvbg.h */; };
-		AA9CD98C141FF8D10064C27A /* ParserASFAMC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD743141FF8D10064C27A /* ParserASFAMC.cpp */; };
 		AA9CD98E141FF8D10064C27A /* ParserASFAMC.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD745141FF8D10064C27A /* ParserASFAMC.h */; };
-		AA9CD98F141FF8D10064C27A /* ParserBVH.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD746141FF8D10064C27A /* ParserBVH.cpp */; };
 		AA9CD991141FF8D10064C27A /* ParserBVH.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD748141FF8D10064C27A /* ParserBVH.h */; };
 		AA9CD992141FF8D10064C27A /* ParserFBX.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD749141FF8D10064C27A /* ParserFBX.cpp */; };
 		AA9CD993141FF8D10064C27A /* ParserFBX.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD74A141FF8D10064C27A /* ParserFBX.h */; };
@@ -657,6 +655,18 @@
 		C4126A2615B6552200D530A3 /* SBPhonemeManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C4126A2215B6552200D530A3 /* SBPhonemeManager.h */; };
 		C4126A2915B6567F00D530A3 /* SbmDeformableMeshGPU.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4126A2715B6567F00D530A3 /* SbmDeformableMeshGPU.cpp */; };
 		C4126A2A15B6567F00D530A3 /* SbmDeformableMeshGPU.h in Headers */ = {isa = PBXBuildFile; fileRef = C4126A2815B6567F00D530A3 /* SbmDeformableMeshGPU.h */; };
+		C423E7B915BF5E2600D22BBB /* SBMotionBlendBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C423E7B715BF5E2600D22BBB /* SBMotionBlendBase.cpp */; };
+		C423E7BA15BF5E2600D22BBB /* SBMotionBlendBase.h in Headers */ = {isa = PBXBuildFile; fileRef = C423E7B815BF5E2600D22BBB /* SBMotionBlendBase.h */; };
+		C423E7BE15BF5E3B00D22BBB /* SBBehaviorSetManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C423E7BC15BF5E3B00D22BBB /* SBBehaviorSetManager.cpp */; };
+		C423E7BF15BF5E3B00D22BBB /* SBBehaviorSetManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C423E7BD15BF5E3B00D22BBB /* SBBehaviorSetManager.h */; };
+		C423E7C215BF5E5300D22BBB /* SBBehaviorSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C423E7C015BF5E5300D22BBB /* SBBehaviorSet.cpp */; };
+		C423E7C315BF5E5300D22BBB /* SBBehaviorSet.h in Headers */ = {isa = PBXBuildFile; fileRef = C423E7C115BF5E5300D22BBB /* SBBehaviorSet.h */; };
+		C423E7E915BF633800D22BBB /* MeCtBlendEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C423E7E715BF633800D22BBB /* MeCtBlendEngine.cpp */; };
+		C423E7EA15BF633800D22BBB /* MeCtBlendEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = C423E7E815BF633800D22BBB /* MeCtBlendEngine.h */; };
+		C423E80F15BF654F00D22BBB /* sr_sn_colorsurf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C423E80D15BF654F00D22BBB /* sr_sn_colorsurf.cpp */; };
+		C423E81015BF654F00D22BBB /* sr_sn_colorsurf.h in Headers */ = {isa = PBXBuildFile; fileRef = C423E80E15BF654F00D22BBB /* sr_sn_colorsurf.h */; };
+		C4D195C515BF3E9900EDEE47 /* ParserASFAMC.cxx in Sources */ = {isa = PBXBuildFile; fileRef = C4D195C315BF3E9900EDEE47 /* ParserASFAMC.cxx */; };
+		C4D195C615BF3E9900EDEE47 /* ParserBVH.cxx in Sources */ = {isa = PBXBuildFile; fileRef = C4D195C415BF3E9900EDEE47 /* ParserBVH.cxx */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1067,9 +1077,7 @@
 		AA9CD740141FF8D10064C27A /* MeCtReachEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeCtReachEngine.h; sourceTree = "<group>"; };
 		AA9CD741141FF8D10064C27A /* nvbg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nvbg.cpp; path = sbm/nvbg.cpp; sourceTree = "<group>"; };
 		AA9CD742141FF8D10064C27A /* nvbg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nvbg.h; path = sbm/nvbg.h; sourceTree = "<group>"; };
-		AA9CD743141FF8D10064C27A /* ParserASFAMC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserASFAMC.cpp; sourceTree = "<group>"; };
 		AA9CD745141FF8D10064C27A /* ParserASFAMC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserASFAMC.h; sourceTree = "<group>"; };
-		AA9CD746141FF8D10064C27A /* ParserBVH.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserBVH.cpp; sourceTree = "<group>"; };
 		AA9CD748141FF8D10064C27A /* ParserBVH.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserBVH.h; sourceTree = "<group>"; };
 		AA9CD749141FF8D10064C27A /* ParserFBX.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserFBX.cpp; sourceTree = "<group>"; };
 		AA9CD74A141FF8D10064C27A /* ParserFBX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserFBX.h; sourceTree = "<group>"; };
@@ -1312,6 +1320,18 @@
 		C4126A2215B6552200D530A3 /* SBPhonemeManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBPhonemeManager.h; path = sb/SBPhonemeManager.h; sourceTree = "<group>"; };
 		C4126A2715B6567F00D530A3 /* SbmDeformableMeshGPU.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SbmDeformableMeshGPU.cpp; path = GPU/SbmDeformableMeshGPU.cpp; sourceTree = "<group>"; };
 		C4126A2815B6567F00D530A3 /* SbmDeformableMeshGPU.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SbmDeformableMeshGPU.h; path = GPU/SbmDeformableMeshGPU.h; sourceTree = "<group>"; };
+		C423E7B715BF5E2600D22BBB /* SBMotionBlendBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBMotionBlendBase.cpp; path = sb/SBMotionBlendBase.cpp; sourceTree = "<group>"; };
+		C423E7B815BF5E2600D22BBB /* SBMotionBlendBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBMotionBlendBase.h; path = sb/SBMotionBlendBase.h; sourceTree = "<group>"; };
+		C423E7BC15BF5E3B00D22BBB /* SBBehaviorSetManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBBehaviorSetManager.cpp; path = sb/SBBehaviorSetManager.cpp; sourceTree = "<group>"; };
+		C423E7BD15BF5E3B00D22BBB /* SBBehaviorSetManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBBehaviorSetManager.h; path = sb/SBBehaviorSetManager.h; sourceTree = "<group>"; };
+		C423E7C015BF5E5300D22BBB /* SBBehaviorSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBBehaviorSet.cpp; path = sb/SBBehaviorSet.cpp; sourceTree = "<group>"; };
+		C423E7C115BF5E5300D22BBB /* SBBehaviorSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBBehaviorSet.h; path = sb/SBBehaviorSet.h; sourceTree = "<group>"; };
+		C423E7E715BF633800D22BBB /* MeCtBlendEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MeCtBlendEngine.cpp; sourceTree = "<group>"; };
+		C423E7E815BF633800D22BBB /* MeCtBlendEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeCtBlendEngine.h; sourceTree = "<group>"; };
+		C423E80D15BF654F00D22BBB /* sr_sn_colorsurf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_sn_colorsurf.cpp; sourceTree = "<group>"; };
+		C423E80E15BF654F00D22BBB /* sr_sn_colorsurf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_sn_colorsurf.h; sourceTree = "<group>"; };
+		C4D195C315BF3E9900EDEE47 /* ParserASFAMC.cxx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserASFAMC.cxx; sourceTree = "<group>"; };
+		C4D195C415BF3E9900EDEE47 /* ParserBVH.cxx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserBVH.cxx; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1482,6 +1502,8 @@
 		AA73BC88146C634000B199A1 /* controllers */ = {
 			isa = PBXGroup;
 			children = (
+				C423E7E715BF633800D22BBB /* MeCtBlendEngine.cpp */,
+				C423E7E815BF633800D22BBB /* MeCtBlendEngine.h */,
 				AA73BC8D146C655F00B199A1 /* adshrenvelope */,
 				AA73BC8E146C658A00B199A1 /* basiclocomotion */,
 				AA73BC8F146C65BB00B199A1 /* blend */,
@@ -1556,6 +1578,12 @@
 		AA73BC8B146C637E00B199A1 /* SB */ = {
 			isa = PBXGroup;
 			children = (
+				C423E7C015BF5E5300D22BBB /* SBBehaviorSet.cpp */,
+				C423E7C115BF5E5300D22BBB /* SBBehaviorSet.h */,
+				C423E7BC15BF5E3B00D22BBB /* SBBehaviorSetManager.cpp */,
+				C423E7BD15BF5E3B00D22BBB /* SBBehaviorSetManager.h */,
+				C423E7B715BF5E2600D22BBB /* SBMotionBlendBase.cpp */,
+				C423E7B815BF5E2600D22BBB /* SBMotionBlendBase.h */,
 				C4126A1F15B6552200D530A3 /* SBPhoneme.cpp */,
 				C4126A2015B6552200D530A3 /* SBPhoneme.h */,
 				C4126A2115B6552200D530A3 /* SBPhonemeManager.cpp */,
@@ -2163,6 +2191,8 @@
 		AA9CD64E141FF8D00064C27A /* sbm */ = {
 			isa = PBXGroup;
 			children = (
+				C4D195C315BF3E9900EDEE47 /* ParserASFAMC.cxx */,
+				C4D195C415BF3E9900EDEE47 /* ParserBVH.cxx */,
 				C4126A2715B6567F00D530A3 /* SbmDeformableMeshGPU.cpp */,
 				C4126A2815B6567F00D530A3 /* SbmDeformableMeshGPU.h */,
 				C4126A1715B653FF00D530A3 /* SbmDebuggerClient.cpp */,
@@ -2203,9 +2233,7 @@
 				AA9CD6BE141FF8D00064C27A /* mcontrol_util.h */,
 				AAB20E75145393C9001542D3 /* MiniBrain.cpp */,
 				AAB20E76145393C9001542D3 /* MiniBrain.h */,
-				AA9CD743141FF8D10064C27A /* ParserASFAMC.cpp */,
 				AA9CD745141FF8D10064C27A /* ParserASFAMC.h */,
-				AA9CD746141FF8D10064C27A /* ParserBVH.cpp */,
 				AA9CD748141FF8D10064C27A /* ParserBVH.h */,
 				AA9CD749141FF8D10064C27A /* ParserFBX.cpp */,
 				AA9CD74A141FF8D10064C27A /* ParserFBX.h */,
@@ -2319,6 +2347,8 @@
 		AA9CD7C3141FF8D10064C27A /* sr */ = {
 			isa = PBXGroup;
 			children = (
+				C423E80D15BF654F00D22BBB /* sr_sn_colorsurf.cpp */,
+				C423E80E15BF654F00D22BBB /* sr_sn_colorsurf.h */,
 				AA9CD7DD141FF8D10064C27A /* sr.cpp */,
 				AA9CD7DE141FF8D10064C27A /* sr.h */,
 				AA9CD7DF141FF8D10064C27A /* sr_alg.cpp */,
@@ -2761,6 +2791,11 @@
 				C4126A2415B6552200D530A3 /* SBPhoneme.h in Headers */,
 				C4126A2615B6552200D530A3 /* SBPhonemeManager.h in Headers */,
 				C4126A2A15B6567F00D530A3 /* SbmDeformableMeshGPU.h in Headers */,
+				C423E7BA15BF5E2600D22BBB /* SBMotionBlendBase.h in Headers */,
+				C423E7BF15BF5E3B00D22BBB /* SBBehaviorSetManager.h in Headers */,
+				C423E7C315BF5E5300D22BBB /* SBBehaviorSet.h in Headers */,
+				C423E7EA15BF633800D22BBB /* MeCtBlendEngine.h in Headers */,
+				C423E81015BF654F00D22BBB /* sr_sn_colorsurf.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2966,8 +3001,6 @@
 				AA9CD986141FF8D10064C27A /* MeCtBodyReachState.cpp in Sources */,
 				AA9CD988141FF8D10064C27A /* MeCtReachEngine.cpp in Sources */,
 				AA9CD98A141FF8D10064C27A /* nvbg.cpp in Sources */,
-				AA9CD98C141FF8D10064C27A /* ParserASFAMC.cpp in Sources */,
-				AA9CD98F141FF8D10064C27A /* ParserBVH.cpp in Sources */,
 				AA9CD992141FF8D10064C27A /* ParserFBX.cpp in Sources */,
 				AA9CD994141FF8D10064C27A /* ParserOpenCOLLADA.cpp in Sources */,
 				AA9CD996141FF8D10064C27A /* SbmColObject.cpp in Sources */,
@@ -3148,6 +3181,13 @@
 				C4126A2315B6552200D530A3 /* SBPhoneme.cpp in Sources */,
 				C4126A2515B6552200D530A3 /* SBPhonemeManager.cpp in Sources */,
 				C4126A2915B6567F00D530A3 /* SbmDeformableMeshGPU.cpp in Sources */,
+				C4D195C515BF3E9900EDEE47 /* ParserASFAMC.cxx in Sources */,
+				C4D195C615BF3E9900EDEE47 /* ParserBVH.cxx in Sources */,
+				C423E7B915BF5E2600D22BBB /* SBMotionBlendBase.cpp in Sources */,
+				C423E7BE15BF5E3B00D22BBB /* SBBehaviorSetManager.cpp in Sources */,
+				C423E7C215BF5E5300D22BBB /* SBBehaviorSet.cpp in Sources */,
+				C423E7E915BF633800D22BBB /* MeCtBlendEngine.cpp in Sources */,
+				C423E80F15BF654F00D22BBB /* sr_sn_colorsurf.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
