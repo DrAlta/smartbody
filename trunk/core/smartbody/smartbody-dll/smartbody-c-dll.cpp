@@ -158,7 +158,7 @@ public:
 #else
       SBM_CallbackInfo info;
       info.name = name;
-      info.visemeName = visemeName;
+      info.visemeName = channelName;
       info.weight = value;
       g_ChannelCallbackInfo[m_sbmHandle].push_back(info);
 #endif
@@ -553,8 +553,8 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, char * nam
         return false;
     }
 
-    SBM_CallbackInfo info = g_CreateCallbackInfo[sbmHandle].back();
-    g_CreateCallbackInfo[sbmHandle].pop_back();
+    SBM_CallbackInfo info = g_DeleteCallbackInfo[sbmHandle].back();
+    g_DeleteCallbackInfo[sbmHandle].pop_back();
 
     strncpy(name, info.name.c_str(), maxNameLen);
     return true;
@@ -567,8 +567,8 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, char * nam
         return false;
     }
 
-    SBM_CallbackInfo info = g_CreateCallbackInfo[sbmHandle].back();
-    g_CreateCallbackInfo[sbmHandle].pop_back();
+    SBM_CallbackInfo info = g_ChangeCallbackInfo[sbmHandle].back();
+    g_ChangeCallbackInfo[sbmHandle].pop_back();
 
     strncpy(name, info.name.c_str(), maxNameLen);
     return true;
@@ -581,8 +581,8 @@ SMARTBODY_C_DLL_API bool SBM_IsVisemeSet( SBMHANDLE sbmHandle, char * name, int 
         return false;
     }
 
-    SBM_CallbackInfo info = g_CreateCallbackInfo[sbmHandle].back();
-    g_CreateCallbackInfo[sbmHandle].pop_back();
+    SBM_CallbackInfo info = g_VisemeCallbackInfo[sbmHandle].back();
+    g_VisemeCallbackInfo[sbmHandle].pop_back();
 
     strncpy(name, info.name.c_str(), maxNameLen);
     strncpy(visemeName, info.visemeName.c_str(), maxNameLen);
@@ -598,8 +598,8 @@ SMARTBODY_C_DLL_API bool SBM_IsChannelSet( SBMHANDLE sbmHandle, char * name, int
         return false;
     }
 
-    SBM_CallbackInfo info = g_CreateCallbackInfo[sbmHandle].back();
-    g_CreateCallbackInfo[sbmHandle].pop_back();
+    SBM_CallbackInfo info = g_ChannelCallbackInfo[sbmHandle].back();
+    g_ChannelCallbackInfo[sbmHandle].pop_back();
 
     strncpy(name, info.name.c_str(), maxNameLen);
     strncpy(channelName, info.visemeName.c_str(), maxNameLen);
