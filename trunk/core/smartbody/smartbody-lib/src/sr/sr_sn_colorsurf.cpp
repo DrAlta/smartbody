@@ -89,6 +89,7 @@ void SrSnColorSurf::gl_render_node(bool alphaBlend) const
 	if ( vsize!=msize )
 	{ printf("Materials size != vertices size in SrSnColorSurf !"); return; }
 
+#ifndef __APPLE__
 	if ( nsize<vsize ) glDisable ( GL_LIGHTING ); else glEnable ( GL_LIGHTING );
 
 	if(alphaBlend)
@@ -149,7 +150,7 @@ void SrSnColorSurf::gl_render_node(bool alphaBlend) const
    if(alphaBlend) glDisable(GL_BLEND);
    glEnable ( GL_LIGHTING );
    //SR_TRACE2 ( "End Render "<<instance_name() );
-
+#endif
  }
 
 //================================ EOF =================================================
