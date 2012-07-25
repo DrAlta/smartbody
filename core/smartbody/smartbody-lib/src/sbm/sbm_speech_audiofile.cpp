@@ -783,6 +783,7 @@ void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector<
 			else
 			{
 				rapidxml::xml_node<>* node = curvesnode->first_node("curve");
+				int numNodes = 0;
 				while (node)
 				{
 					rapidxml::xml_attribute<>* nameAttr = node->first_attribute("name");
@@ -804,9 +805,10 @@ void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector<
 					}
 
 					node = node->next_sibling();
+					numNodes++;
 				}
 				// revert to normal viseme mode if no curves are found
-				if (!node)
+				if (numNodes == 0)
 					useCurveMode = false;
 			}
 		}
