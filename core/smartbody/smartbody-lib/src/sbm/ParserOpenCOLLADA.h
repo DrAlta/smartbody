@@ -76,7 +76,7 @@ class ParserOpenCOLLADA
 		static void parseLibraryEffects(DOMNode* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap);
 
 	private:
-		static int getMotionChannelId(SkChannelArray& channels, std::string&  sourceName);
+		static int getMotionChannelId(SkChannelArray& channels, const std::string&  sourceName);
 		static int getMotionChannelId(SkChannelArray& channels, std::string& jointName, std::string& targetType);
 		static std::string tokenize(std::string& str,const std::string& delimiters = " ", int mode = 1);
 		static int getRotationOrder(std::vector<std::string> orderVec);

@@ -1144,11 +1144,12 @@ int ParserOpenCOLLADA::getMotionChannelId( SkChannelArray& channels, std::string
 	return dataId;	
 }
 
-int ParserOpenCOLLADA::getMotionChannelId(SkChannelArray& mChannels, std::string& sourceName)
+int ParserOpenCOLLADA::getMotionChannelId(SkChannelArray& mChannels, const std::string& sourceName)
 {
 	int id = -1;
 	int dataId = -1;
-	std::string jName = tokenize(sourceName, ".-");
+	std::string sourceNameCopy = sourceName;
+	std::string jName = tokenize(sourceNameCopy, ".-");
 	SkChannel::Type chanType;
 	
 	if (sourceName.find("translate") != std::string::npos)
