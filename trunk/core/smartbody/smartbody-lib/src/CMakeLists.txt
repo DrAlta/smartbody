@@ -291,8 +291,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	controllers/MeCtBlendEngine.cpp
 	controllers/me_ct_motion_blend.cpp
 
-	sbm/ParserBVH.cxx
-	sbm/ParserASFAMC.cxx
+	sbm/ParserBVH.cpp
+	sbm/ParserASFAMC.cpp
 	sbm/ParserFBX.cpp
 	sbm/ParserOpenCOLLADA.cpp
 	sbm/remote_speech.cpp
