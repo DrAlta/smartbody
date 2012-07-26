@@ -69,7 +69,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 		if( echo ) {
 			msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false );
 			// don't log a vrX message
-			//LOG("%s %s", cmd, msg.str().c_str());
+			LOG("%s %s", cmd, msg.str().c_str());
 		}
 
 		if( send ) {
@@ -85,6 +85,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 				}
 			} else {
 				msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false );
+				LOG("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
 				mcu.vhmsg_send( cmd, msg.str().c_str() );
 			}
 		}

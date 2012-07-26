@@ -4,7 +4,6 @@
 
 
 #include "vhcl.h"
-#include <sbm/mcontrol_util.h>
 #include <sbm/resource_cmds.h>
 #include <sbm/sbm_character.hpp>
 #include <sbm/me_utilities.hpp>
@@ -26,19 +25,22 @@
 #endif
 #endif
 
-#if !defined (__ANDROID__)
+//#if !defined (__ANDROID__)
 #ifndef USE_PYTHON
 #define USE_PYTHON
 #endif
-#endif
+//#endif
 
 #ifdef USE_PYTHON
 #include <boost/python.hpp>
-
+#endif
 namespace SmartBody 
 {
 
+SrViewer* getViewer();
 
+
+#ifdef USE_PYTHON
 class PyLogger
 {
 protected:
@@ -133,7 +135,6 @@ void printLog(const std::string& message);
 SBController* createController(std::string controllerType, std::string controllerName);
 
 Camera* getCamera();
-SrViewer* getViewer();
 
 //Script* getScript(std::string fileName);
 void showCommandResources();
@@ -178,9 +179,9 @@ public:
 protected:
 	SkChannelArray channels;
 };
-
+#endif
 
 }
-#endif
+
 
 #endif

@@ -139,20 +139,20 @@ include $(SBM_LOCAL_PATH)/../../wsp/jni/Android.mk
 include $(SBM_LOCAL_PATH)/../../bonebus/jni/Android.mk
 include $(SBM_LOCAL_PATH)/../../steersuite-1.3/jni/Android.mk
 
-
+SB_LIB_PATH := ../../../lib
 LOCAL_PATH := $(SBM_LOCAL_PATH)
 include $(CLEAR_VARS)
 LOCAL_MODULE := sbm
-LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti
+LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti 
 LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
+					$(SBM_LOCAL_PATH)/../../pythonLib/include/python2.6 \
 					$(SBM_LOCAL_PATH)/../../boost \
-					$(SBM_LOCAL_PATH)/../../../lib/boost \
+					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/boost \
 					$(SBM_LOCAL_PATH)/../../include \
-					$(SBM_LOCAL_PATH)/../../python_lib/include/python2.6 \
-					$(SBM_LOCAL_PATH)/../../vhcl/vhcl_src \
-					$(SBM_LOCAL_PATH)/../../../lib/bonebus/include \
-					$(SBM_LOCAL_PATH)/../../vhmsg/vhmsg_src \
-					$(SBM_LOCAL_PATH)/../../../lib/wsp/wsp/include \
+					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/vhcl/include \
+					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/bonebus/include \
+					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/vhmsg/vhmsg-c/include \
+					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/wsp/wsp/include \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/external/ \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/external/parser/ \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/steerlib/include \
@@ -183,6 +183,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sr/sr_output.cpp \
 	$(SBM_MY_DIR)/sr/sr_path_array.cpp \
 	$(SBM_MY_DIR)/sr/sr_plane.cpp \
+	$(SBM_MY_DIR)/sr/sr_sn_colorsurf.cpp \
 	$(SBM_MY_DIR)/sr/sr_points.cpp \
 	$(SBM_MY_DIR)/sr/sr_polygon.cpp \
 	$(SBM_MY_DIR)/sr/sr_polygons.cpp \
@@ -336,6 +337,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_step_turn.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_tether.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_ublas.cpp \
+	$(SBM_MY_DIR)/controllers/MeCtBlendEngine.cpp \
 	$(SBM_MY_DIR)/sbm/me_utilities.cpp \
 	$(SBM_MY_DIR)/sbm/ParserFBX.cpp \
 	$(SBM_MY_DIR)/sbm/ParserOpenCOLLADA.cpp \
@@ -391,6 +393,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBSimulationManager.cpp \
 	$(SBM_MY_DIR)/sb/SBBmlProcessor.cpp \
 	$(SBM_MY_DIR)/sb/SBAnimationState.cpp \
+	$(SBM_MY_DIR)/sb/SBMotionBlendBase.cpp \
 	$(SBM_MY_DIR)/sb/SBAnimationTransition.cpp \
 	$(SBM_MY_DIR)/sb/SBAnimationStateManager.cpp \
 	$(SBM_MY_DIR)/sb/SBSteerManager.cpp \
@@ -418,14 +421,20 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBGestureMapManager.cpp \
 	$(SBM_MY_DIR)/sb/SBGestureMap.cpp \
 	$(SBM_MY_DIR)/sbm/SbmDebuggerServer.cpp \
+	$(SBM_MY_DIR)/sbm/SbmDebuggerClient.cpp \
+	$(SBM_MY_DIR)/sbm/SbmDebuggerUtility.cpp \
+	$(SBM_MY_DIR)/sb/SBPhonemeManager.cpp \
+	$(SBM_MY_DIR)/sb/SBPhoneme.cpp \
+	$(SBM_MY_DIR)/sb/SBBehaviorSet.cpp \
+	$(SBM_MY_DIR)/sb/SBBehaviorSetManager.cpp \
 	$(SBM_MY_DIR)/sbm/action_unit.cpp
 	
 	
 
 LOCAL_LDLIBS    := -llog 	  
-LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
-#LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
-#LOCAL_SHARED_LIBRARIES := python-prebuilt 
+#LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
+LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
+LOCAL_SHARED_LIBRARIES := python-prebuilt 
 include $(BUILD_STATIC_LIBRARY)
 #include $(BUILD_SHARED_LIBRARY)
 

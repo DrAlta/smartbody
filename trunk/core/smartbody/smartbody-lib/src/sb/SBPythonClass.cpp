@@ -4,6 +4,20 @@
 namespace SmartBody 
 {
 
+SrViewer* getViewer()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	if (!mcu.viewer_p)
+	{
+		mcu.viewer_p = mcu.viewer_factory->create(100, 100, 640, 480);
+		mcu.viewer_p->label_viewer("Visual Debugger");
+		mcu.camera_p = new SrCamera();
+		mcu.viewer_p->set_camera(*mcu.camera_p);
+		mcu.viewer_p->root(mcu.root_group_p);
+	}
+	return mcu.viewer_p;
+}
+
 #ifdef USE_PYTHON
 
 
@@ -247,20 +261,6 @@ Camera* getCamera()
 		LOG("Camera not exists, returning NULL instead.");
 		return NULL;
 	}
-}
-
-SrViewer* getViewer()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	if (!mcu.viewer_p)
-	{
-		mcu.viewer_p = mcu.viewer_factory->create(100, 100, 640, 480);
-		mcu.viewer_p->label_viewer("Visual Debugger");
-		mcu.camera_p = new SrCamera();
-		mcu.viewer_p->set_camera(*mcu.camera_p);
-		mcu.viewer_p->root(mcu.root_group_p);
-	}
-	return mcu.viewer_p;
 }
 
 void showCommandResources()

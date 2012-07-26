@@ -22,7 +22,9 @@
 */
 
 # include <sr/sr_sn_colorsurf.h>
+#if !defined(__ANDROID__)
 # include <sr/sr_gl.h>
+#endif
 
 //======================================= SrSnColorSurf ====================================
 
@@ -89,7 +91,7 @@ void SrSnColorSurf::gl_render_node(bool alphaBlend) const
 	if ( vsize!=msize )
 	{ printf("Materials size != vertices size in SrSnColorSurf !"); return; }
 
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__ANDROID__)
 	if ( nsize<vsize ) glDisable ( GL_LIGHTING ); else glEnable ( GL_LIGHTING );
 
 	if(alphaBlend)

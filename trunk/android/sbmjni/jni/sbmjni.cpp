@@ -16,7 +16,8 @@
 
 // OpenGL ES 2.0 code
 
-#include "vhcl_log.h"
+#include <vhcl_log.h>
+#include <vhcl_string.h>
 #include <vhmsg-tt.h>
 #include <sbm/mcontrol_util.h>
 #include <sbm/mcontrol_callbacks.h>
@@ -24,8 +25,9 @@
 #include <boost/filesystem/operations.hpp>
 #include <sr/sr_camera.h>
 
+#define ANDROID_PYTHON
 #ifdef ANDROID_PYTHON
-#include <sbm/SbmPython.h>
+#include <sb/SBPython.h>
 #endif
 
 #include <jni.h>
@@ -66,7 +68,7 @@ static void checkGlError(const char* op) {
 
 void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 	// Replace singleton with a user_data pointer
-	//if (!mcuInit) return;
+	if (!mcuInit) return;
 	//LOG("VHMSG Callback : op = %s ,args = %s\n",op,args);
 	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
 		case CMD_NOT_FOUND:
@@ -181,6 +183,7 @@ void initConnection()
 	if( openConnection == vhmsg::TTU_SUCCESS )
 	{
 		vhmsg::ttu_set_client_callback( sbm_vhmsg_callback );
+		err = vhmsg::ttu_register( "sb" );
 		err = vhmsg::ttu_register( "sbm" );
 		err = vhmsg::ttu_register( "vrAgentBML" );
 		err = vhmsg::ttu_register( "vrExpress" );
@@ -230,7 +233,7 @@ void renderFrame() {
 	SrCamera& cam = engine.camera;
 
 	// Just fill the screen with a color.
-	glClearColor(0.03f,0.03f,0.03f,1);
+	glClearColor(1.03f,0.03f,0.03f,1);
 	//glClearColor(((float)engine->state.x)/engine->width, engine->state.angle,
 	//        ((float)engine->state.y)/engine->height, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -290,8 +293,11 @@ void initPython()
 void initSmartBody()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute("path seq /sdcard/sbmjniData/");
-	mcu.execute("seq default.seq");		
+	mcu.executePython("scene.addAssetPath('seq', '/sdcard/sbmjniData/')");
+	mcu.executePythonFile("default.py");
+//	mcu.execute("path seq /sdcard/sbmjniData/");
+//	mcu.execute("seq default.seq");	
+//	mcu.executePython("print 'aaa'");	
 	TimeRegulator& timer = engine.timer;
 	timer.reset();
 	timer.start();	
@@ -331,7 +337,7 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_step(JNIEnv * env, jobj
 	if( update_sim ) {
 		mcu.update();
 	}
-    renderFrame();
+    	renderFrame();
 }
 
 JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executeSbm(JNIEnv * env, jobject obj, jstring sbmCmd)
@@ -352,6 +358,7 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executePython(JNIEnv * 
 	if (!mcuInit) return;
 	const char* pyCmdStrConst = (env)->GetStringUTFChars( pythonCmd , NULL ) ;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	//LOG("python cmd = %s",pyCmdStrConst);
 	char* pyCmdStr = const_cast<char*>(pyCmdStrConst);
 	mcu.executePython(pyCmdStr);
 #else // if there is no python, then run the sbm command. 

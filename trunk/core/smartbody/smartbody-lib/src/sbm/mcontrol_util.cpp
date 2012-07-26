@@ -387,9 +387,11 @@ void mcuCBHandle::reset( void )
 
 	//Py_Finalize();
 	//initPython(initPythonLibPath);
+#ifdef USE_PYTHON
 	PyRun_SimpleString("scene = getScene()");
 	PyRun_SimpleString("bml = scene.getBmlProcessor()");
 	PyRun_SimpleString("sim = scene.getSimulationManager()");
+#endif
 }
 
  void mcuCBHandle::createDefaultControllers()
@@ -1533,6 +1535,7 @@ void mcuCBHandle::set_process_id( const char * process_id )
 int mcuCBHandle::vhmsg_send( const char *op, const char* message ) {
 #if LINK_VHMSG_CLIENT
 	//std::cout<<"Sending :" << cmdName << ' ' << cmdArgs <<std::endl;
+	LOG("vhmsg_send, op = %s, message = %s",op,message);
 
 	if( vhmsg_enabled ) {
 		int err = vhmsg::ttu_notify2( op, message );
@@ -1571,6 +1574,7 @@ int mcuCBHandle::vhmsg_send( const char* message ) {
 	//std::cout<<"Sending :" << cmdName << ' ' << cmdArgs <<std::endl;
 
 	if( vhmsg_enabled ) {
+
 		int err = vhmsg::ttu_notify1( message );
 		if( err != vhmsg::TTU_SUCCESS )	{
 			std::stringstream strstr;
@@ -1857,8 +1861,10 @@ int mcuCBHandle::executePython(const char* command)
 		resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number
 		resource->setCommand(command);
 		resource_manager->addResource(resource);
+		//LOG("executePython = %s",command);
 
-		PyRun_SimpleString(command);
+		int result = PyRun_SimpleString(command);
+		//LOG("cmd result = %d",result);
 
 		return CMD_SUCCESS;
 	} catch (...) {

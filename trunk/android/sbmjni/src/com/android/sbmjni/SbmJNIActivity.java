@@ -117,7 +117,8 @@ public class SbmJNIActivity extends Activity {
         	}
         	else
         	*/
-        	SbmJNILib.executeSbm(sbmCmd); 
+        	//SbmJNILib.executeSbm(sbmCmd); 
+        	SbmJNILib.executePython(sbmCmd);  
         	sbmTextEdit.getText().clear();
         }
     };

@@ -40,7 +40,6 @@
 
 #ifdef USE_PYTHON
 
-#ifndef __ANDROID__ 
 struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 {
 	virtual void objectEvent(std::string character, std::string name, bool isAnimate, SrVec position, SrVec velocity, SrVec relativePosition, SrVec relativeVelocity)
@@ -329,9 +328,7 @@ struct SBScriptWrap :  SBScript, boost::python::wrapper<SBScript>
 	}
 };
 
-#endif
 
-#if !defined (__ANDROID__)
 struct EventHandlerWrap :  EventHandler, boost::python::wrapper<EventHandler>
 {
 	virtual void executeAction(Event* event)
@@ -353,7 +350,6 @@ struct EventHandlerWrap :  EventHandler, boost::python::wrapper<EventHandler>
 		EventHandler::executeAction(event);
 	}
 };
-#endif
 
 
 struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrapper<SmartBody::PythonController>
@@ -480,6 +476,8 @@ namespace SmartBody
 #ifdef USE_PYTHON
 BOOST_PYTHON_MODULE(SmartBody)
 {
+	boost::python::def("printlog", printLog, "Write to the log. \n Input: message string \n Output: NULL");
+#if 1
 	boost::python::docstring_options local_docstring_options(true, true, false);
 
     boost::python::class_<std::vector<std::string> >("StringVec")
@@ -548,7 +546,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 	//#endif
 
-#ifdef __ANDROID__
+#if 0
 	boost::python::def("pa", &PyLogger::pa, "Prints an a");
 	boost::python::def("pb", &PyLogger::pb, "Prints an b");
 	boost::python::def("pc", &PyLogger::pc, "Prints an c");
@@ -617,8 +615,6 @@ BOOST_PYTHON_MODULE(SmartBody)
 	// etc. 
 	// 
 
-#ifndef __ANDROID__
-
 
 	// viewers
 	boost::python::def("getCamera", getCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the camera object for the viewer. \n Input: NULL \n Output: camera object");
@@ -644,8 +640,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 	// system
 	boost::python::def("pythonexit", pythonExit, "Exits the Python interpreter. ");
 	boost::python::def("reset", reset, "Reset SBM. ");
-	boost::python::def("quit", quitSbm, "Quit SBM. ");
-	boost::python::def("printlog", printLog, "Write to the log. \n Input: message string \n Output: NULL");
+	boost::python::def("quit", quitSbm, "Quit SBM. ");	
 	boost::python::def("getScene", SBScene::getScene, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the SmartBody scene object.");
 
 
@@ -1230,14 +1225,12 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getNumBehaviors", &SBCharacter::getNumBehaviors, "Returns the number of behaviors of the character.")
 		.def("getBehavior", &SBCharacter::getBehavior, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the ith behavior of the character.")
 		.def("setSteerAgent", &SBCharacter::setSteerAgent, "Set the steer agent of the character")
-#endif
 		//.def("getFaceDefinition", &SBCharacter::getFaceDefinition, "Gets face definition (visemes, action units) for a character.")
 #ifndef __ANDROID__
 		.def("setNvbg", &SBCharacter::setNvbg, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Sets the NVBG handler for this character.")
 		.def("getNvbg", &SBCharacter::getNvbg, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the NVBG handler for this character.")
 		.def("setMiniBrain", &SBCharacter::setMiniBrain, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Sets the mini brain handler for this character.")
 		.def("getMiniBrain", &SBCharacter::getMiniBrain, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the mini brain handler for this character.")
-
 #endif
 		;
 
@@ -1341,7 +1334,6 @@ boost::python::class_<SBReach>("SBReach")
 		.def("isInitialized", &SBParser::isInitialized, "Return boolean telling if Charniak parser is initialized.")
 		;
 
-#ifndef __ANDROID__
 	boost::python::class_<SrVec>("SrVec")
 		.def(boost::python::init<>())
 		.def(boost::python::init<float, float, float>())
@@ -1384,7 +1376,6 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getVolume", &SrBox::volume, "returns the volume of the box")
 		.def("isEmpty", &SrBox::empty, "returns true if the box is empty")
 		;
-#endif
 
 #ifndef __ANDROID__
 	boost::python::class_<NvbgWrap, boost::python::bases<SBObject>, boost::noncopyable>("Nvbg")
@@ -1492,8 +1483,8 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getDiphoneManager", &SBScene::getDiphoneManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the diphone manager object.")
 		.def("getBehaviorSetManager", &SBScene::getBehaviorSetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the behavior set manager.")
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
-
 	;
+#endif
 	}
 #endif
 
@@ -1518,11 +1509,12 @@ void initPython(std::string pythonLibPath)
 	Py_Initialize();
 	
 	try {
+#ifdef USE_PYTHON
 		mcu.mainModule = boost::python::import("__main__");
 		mcu.mainDict = mcu.mainModule.attr("__dict__");
 	
 		PyRun_SimpleString("import sys");
-
+#endif
 #ifndef WIN32
 		// set the proper python path
 		std::stringstream strstr;
@@ -1594,7 +1586,7 @@ void initPython(std::string pythonLibPath)
 		PyRun_SimpleString("from SmartBody import *");
 		//LOG("before import pydoc");
 		PyRun_SimpleString("from pydoc import *");
-#ifndef __ANDROID__
+#if 1
 		PyRun_SimpleString("scene = getScene()");
 		PyRun_SimpleString("bml = scene.getBmlProcessor()");
 		PyRun_SimpleString("sim = scene.getSimulationManager()");

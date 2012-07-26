@@ -622,6 +622,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 #define DFL_NOD_REPS		1.0f
 
 #define DFL_NOD_AMOUNT		0.5f
+
 #define DFL_NOD_VELOCITY	1.0f
 #define DFL_NOD_SMOOTH		0.5f
 
@@ -1267,6 +1268,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	const char *message_id   = args.read_token();
 	char       *xml          = args.read_remainder_raw();
 	//cout << "DEBUG: vrSpeak " << agentId << " " << recipientId << " " << messageId << endl;
+	LOG("agent_id = %s, recipient_id = %s, message id = %s, xml = %s",agent_id,recipient_id, message_id, xml);
 
 	try {
 		if( xml[0]=='\0' ) {
