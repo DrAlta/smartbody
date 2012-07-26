@@ -170,6 +170,12 @@ void SteeringAgent::addSteeringAttributes()
 	if (!character->hasAttribute("steering.pedMaxTurningRateMultiplier"))
 		character->createDoubleAttribute("steering.pedMaxTurningRateMultiplier", 20.f, true, "steering", 430, false, false, false, ""); 
 
+	if (!character->hasAttribute("steering.tiltGain"))
+		character->createDoubleAttribute("steering.tiltGain", 2.f, true, "steering", 440, false, false, false, ""); 
+
+	if (!character->hasAttribute("steering.terrainMode"))
+		character->createBoolAttribute("steering.terrainMode", false, true, "steering", 450, false, false, false, ""); 
+
 	setSteerParamsDirty(false);
 }
 
@@ -300,6 +306,15 @@ void SteeringAgent::initSteerParams()
 	else
 		pedMaxTurningRateMultiplier = 20.f;
 
+	if (character && character->hasAttribute("steering.tiltGain"))
+		tiltGain = (float) character->getDoubleAttribute("steering.tiltGain");
+	else
+		tiltGain = 2.0f;
+
+	if (character && character->hasAttribute("steering.terrainMode"))
+		terrainMode = character->getBoolAttribute("steering.terrainMode");
+	else
+		terrainMode = false;
 
 	setSteerParamsDirty(false);
 
@@ -434,7 +449,7 @@ void SteeringAgent::evaluate(double dtime)
 		float x1, y1, z1;
 		float yaw1, pitch1, roll1;
 		target->get_world_offset(x1, y1, z1, yaw1, pitch1, roll1);
-		float dist = sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1) + (z - z1) * (z - z1));
+		float dist = sqrt((x - x1) * (x - x1) + (z - z1) * (z - z1));
 		if (dist > distThreshold)
 		{
 			agent->clearGoals();
@@ -624,9 +639,18 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 		counter++;
 #endif
 		// update locomotion state
+		float tnormal[3];
+		float terrainHeight = mcuCBHandle::singleton().query_terrain(x, z, tnormal);
+		float difference = y - terrainHeight;
+		float ang = - difference * tiltGain;
+		//LOG("current y %f, terrain height %f, character height %f, difference %f, angle %f", y, terrainHeight, character->getHeight(), difference, ang);
+
 		std::vector<double> weights;
 		weights.resize(curStateData->state->getNumMotions());
-		curStateData->state->getWeightsFromParameters(newSpeed, nextTurningAngle, newScoot, weights);
+		if (terrainMode)
+			curStateData->state->getWeightsFromParameters(newSpeed, nextTurningAngle, ang, weights);
+		else
+			curStateData->state->getWeightsFromParameters(newSpeed, nextTurningAngle, newScoot, weights);
 		character->param_animation_ct->updateWeights(weights);	
 		
 	}
@@ -1233,6 +1257,10 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 	float curScoot = 0.0f;
 	if (curStateName == locomotionName && numGoals != 0)
 	{
+		float tnormal[3];
+		mcuCBHandle::singleton().query_terrain(x, z, tnormal);
+		LOG("current normal %f %f %f", tnormal[0], tnormal[1], tnormal[2]);
+
 		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);
 		if (smoothing)
 		{

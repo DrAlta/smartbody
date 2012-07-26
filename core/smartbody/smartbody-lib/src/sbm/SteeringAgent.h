@@ -76,6 +76,11 @@ class SteeringAgent
 		SbmCharacter* target;
 
 	public:
+		enum SteeringParamType
+		{
+			ForwardSpeed, TurningSpeed, TravelDirection, TerrainAngle
+		};
+
 		// basic param
 		float basicLocoAngleGain;
 		float basicLocoScootGain;
@@ -101,7 +106,8 @@ class SteeringAgent
 		SrVec targetLoc;
 		bool stepAdjust;
 		float pedMaxTurningRateMultiplier;
-
+		float tiltGain;
+		bool terrainMode;
 
 		SrVec curSteerPos, curSteerDir, nextSteerDir, nextSteerPos, nextPtOnPath;
 

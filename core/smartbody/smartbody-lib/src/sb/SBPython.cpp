@@ -35,6 +35,8 @@
 #include <sb/SBBehaviorSetManager.h>
 #include <sr/sr_box.h>
 
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 #ifdef USE_PYTHON
 
@@ -821,11 +823,12 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 	boost::python::class_<SBAnimationBlend>("SBAnimationBlend")
 		.def("addCorrespondencePoints", &SBAnimationBlend::addCorrespondencePoints, "Correspondence points for motions inside the blend.")
 		.def("addCorrespondancePoints", &SBAnimationBlend::addCorrespondencePoints, "Correspondence points for motions inside the blend.")
+		.def("setIncrementWorldOffsetY", &SBAnimationBlend::setIncrementWorldOffsetY, "Boolean flag that increment world offset y-axis value according to the base joint value.")
 		.def("getNumMotions", &SBAnimationBlend::getNumMotions, "Number of motions inside the blend.")
 		.def("getMotion", &SBAnimationBlend::getMotion, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the motion name given index. \n Input: index of motion \n Output: motion name")
 		.def("getNumCorrespondancePoints", &SBAnimationBlend::getNumCorrespondencePoints, "Number of correspondence points for the motions in the blend")
-		.def("getCorrespondancePoints", &SBAnimationBlend::getCorrespondencePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the correspondence points in one motion given the index. \n Input: index of motion \n Output: correspondence points vector of this motion")
 		.def("getNumCorrespondencePoints", &SBAnimationBlend::getNumCorrespondencePoints, "Number of correspondence points for the motions in the blend")
+		.def("getCorrespondancePoints", &SBAnimationBlend::getCorrespondencePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the correspondence points in one motion given the index. \n Input: index of motion \n Output: correspondence points vector of this motion")
 		.def("getCorrespondencePoints", &SBAnimationBlend::getCorrespondencePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the correspondence points in one motion given the index. \n Input: index of motion \n Output: correspondence points vector of this motion")
 		.def("setCorrespondencePoints", &SBAnimationBlend::setCorrespondencePoints, "Sets the correspondence points given a motion index, a parameter index and a value.")
 		.def("getDimension", &SBAnimationBlend::getDimension, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the dimension of the state. Dimension represents the number of parameter for each motion. 0D means no parameter, 1D means one parameter for each motion etc.")
