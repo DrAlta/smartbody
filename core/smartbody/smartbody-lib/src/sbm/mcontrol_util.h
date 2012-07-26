@@ -88,6 +88,7 @@ class mcuCBHandle;
 #include <sbm/general_param_setting.h>
 
 #include <sb/SBJointMap.h>
+#include <sb/SBPythonClass.h>
 #include <sbm/nvbg.h>
 
 #include <controllers/me_ct_interpolator.h>
@@ -98,7 +99,12 @@ class mcuCBHandle;
 #include <sb/SBScene.h>
 #include <sbm/SbmCharacterListener.h>
 
-#ifndef __ANDROID__
+
+#ifndef USE_PYTHON
+#define USE_PYTHON
+#endif
+
+#ifdef USE_PYTHON
 #include <boost/python.hpp>
 #endif
 
@@ -313,11 +319,11 @@ class mcuCBHandle {
 		std::map<std::string, SbmCharacter*> character_map;
 
 
-#ifndef __ANDROID__
+#ifdef USE_PYTHON
 		boost::python::object mainModule;
 		boost::python::object mainDict;
 #endif
-		
+	
 public:
 
 		BML_PROCESSOR				bml_processor;

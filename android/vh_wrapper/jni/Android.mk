@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 SBM_ANDROID_LOCAL_PATH := $(call my-dir)
+IOS_PATH := ../../../ios/vhwrapper-dll/
 SBM_PATH := ../../../core/smartbody/smartbody-lib/
 
 include $(SBM_ANDROID_LOCAL_PATH)/../../smartbody-lib/jni/Android.mk
@@ -21,6 +22,7 @@ LOCAL_PATH = $(SBM_ANDROID_LOCAL_PATH)
 include $(CLEAR_VARS)
 LOCAL_MODULE    := libvhwrapper
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
+					$(LOCAL_PATH)/../../pythonLib/include/python2.6 \
 					$(LOCAL_PATH)/../../boost \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/boost \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/bonebus/include \
@@ -33,11 +35,13 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../smartbody-dll/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../android/include \
 					$(LOCAL_PATH)/../../../core/smartbody/sbm-debugger/lib \
-					$(LOCAL_PATH)/$(SBM_PATH)/src
+					$(LOCAL_PATH)/$(SBM_PATH)/src \
+					$(LOCAL_PATH)/$(IOS_PATH)/
 LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti
 LOCAL_SRC_FILES := $(SBM_PATH)/../smartbody-dll/smartbody-dll.cpp \
-       	     $(SBM_PATH)/../smartbody-dll/smartbody-c-dll.cpp \
-                   vhwrapper.cpp
+       	           $(SBM_PATH)/../smartbody-dll/smartbody-c-dll.cpp \
+		   $(IOS_PATH)/vhwrapper.cpp
+                   
 			
 LOCAL_LDLIBS    := -llog -lOpenSLES
 LOCAL_STATIC_LIBRARIES := sbm xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile openalut

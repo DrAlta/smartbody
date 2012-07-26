@@ -47,11 +47,15 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBJoint.h>
 #include <sb/SBBoneBusManager.h>
+// android does not use GPU shader for now
+#if !defined(__ANDROID__)
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
+#endif
 
 #define USE_REACH 1
 #define USE_PHYSICS_CHARACTER 1
 //#define USE_REACH_TEST 0
+
 const bool LOG_PRUNE_CMD_TIME							= false;
 const bool LOG_CONTROLLER_TREE_PRUNING					= false;
 const bool LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS	= false;
@@ -2821,7 +2825,9 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 								if (scene_p)
 									scene_p->set_visibility(0,0,0,0);
 								dMesh_p->set_visibility(1);
+							#if !defined(__ANDROID__)
 								SbmDeformableMeshGPU::useGPUDeformableMesh = true;
+							#endif
 								if (dMeshInstance_p)
 									dMeshInstance_p->setVisibility(1);
 							}
