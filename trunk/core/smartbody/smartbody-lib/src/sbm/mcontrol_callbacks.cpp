@@ -1174,7 +1174,7 @@ int mcu_terrain_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			int n = args.calc_num_tokens();
 			if( n == 0 )	{
 				mcu_p->height_field_p->load( (char*)"../../../../data/terrain/range1.e.ppm" );
-				mcu_p->height_field_p->set_scale( 5000.0f, 300.0f, 5000.0f );
+				mcu_p->height_field_p->set_scale( 5000.0f * mcu_p->_scene->getScale() / 100.0f, 300.0f * mcu_p->_scene->getScale() / 100.0f, 5000.0f  * mcu_p->_scene->getScale() / 100.0f);
 				mcu_p->height_field_p->set_auto_origin();
 			}
 			else	{

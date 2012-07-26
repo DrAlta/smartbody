@@ -39,6 +39,7 @@ PABlend::PABlend()
 	parameterScale.x = 1.0f;
 	parameterScale.y = 1.0f;
 	parameterScale.z = 1.0f;
+	incrementWorldOffsetY = false;
 }
 
 PABlend::PABlend(PABlend* data)
@@ -60,6 +61,8 @@ PABlend::PABlend(PABlend* data)
 	cycle = data->cycle;
 
 	type = data->getType();
+
+	incrementWorldOffsetY = data->incrementWorldOffsetY;
 	
 	for (unsigned int i = 0; i < data->getParameters().size(); i++)
 		parameters.push_back(data->getParameters()[i]);
@@ -80,6 +83,7 @@ PABlend::PABlend(const std::string& name)
 {
 	stateName = name;
 	cycle = false;
+	incrementWorldOffsetY = false;
 
 	parameterScale.x = 1.0f;
 	parameterScale.y = 1.0f;

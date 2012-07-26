@@ -18,6 +18,11 @@ SBAnimationBlend::~SBAnimationBlend()
 {
 }
 
+void SBAnimationBlend::setIncrementWorldOffsetY(bool flag)
+{
+	incrementWorldOffsetY = flag;
+}
+
 SrSnColorSurf* SBAnimationBlend::createFlatSurface( float depth, unsigned int dimension, SrVec2 topLeft, SrVec2 lowerRight )
 {
 	SrSnColorSurf* surf = new SrSnColorSurf(); surf->ref();	
@@ -415,7 +420,6 @@ void SBAnimationBlend::buildVisSurfaces( const std::string& errorType, const std
 			updateSmoothSurface(surf);
 	}	
 }
-
 
 void SBAnimationBlend::addCorrespondencePoints(const std::vector<std::string>& motionNames, const std::vector<double>& points)
 {

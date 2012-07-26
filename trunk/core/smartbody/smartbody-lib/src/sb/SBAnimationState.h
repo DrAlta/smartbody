@@ -12,6 +12,7 @@ class SBAnimationBlend : public PABlend
 		SBAnimationBlend(const std::string& name);
 		~SBAnimationBlend();
 
+		void setIncrementWorldOffsetY(bool flag);
 		void addCorrespondencePoints(const std::vector<std::string>& motions, const std::vector<double>& points);
 		void removeCorrespondencePoints(int index);
 

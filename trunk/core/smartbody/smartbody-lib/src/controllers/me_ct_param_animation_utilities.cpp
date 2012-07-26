@@ -428,6 +428,8 @@ void PAMotions::getUpdateMat(SrMat& dest, SrMat& src)
 
 	quatP.get_mat(dest);
 	dest.set(12, src.get(12));
+	if (blendData->state->incrementWorldOffsetY)
+		dest.set(13, src.get(13));
 	dest.set(14, src.get(14));
 }
 
@@ -480,7 +482,9 @@ void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 	SrQuat quatP = SrQuat((float)q.w(), (float)q.x(), (float)q.y(), (float)q.z());
 */
 	quatP.get_mat(dest);
-	dest.set(13, src.get(13));
+
+	if (!blendData->state->incrementWorldOffsetY)
+		dest.set(13, src.get(13));
 }
 
 PAInterpolator::PAInterpolator()

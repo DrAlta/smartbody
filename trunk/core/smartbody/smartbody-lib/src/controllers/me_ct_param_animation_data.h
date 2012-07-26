@@ -116,6 +116,7 @@ class PABlend
 		std::vector<std::vector<double> > keys;
 
 		bool cycle;
+		bool incrementWorldOffsetY;
 
 		virtual int getNumMotions();
 		virtual int getNumKeys();
