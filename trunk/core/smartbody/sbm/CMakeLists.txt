@@ -88,6 +88,7 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	if (${CMAKE_C_COMPILER_VERSION} VERSION_GREATER 4.2.0)
 		add_definitions(-Wno-deprecated-writable-strings)
+		add_definitions(-Wno-unused-value)
 	endif()
 endif()
 
