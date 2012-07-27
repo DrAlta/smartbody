@@ -86,7 +86,9 @@ endif()
 
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-writable-strings")
+	if (${CMAKE_C_COMPILER_VERSION} VERSION_GREATER 4.2.0)
+		add_definitions(-Wno-deprecated-writable-strings)
+	endif()
 endif()
 
 
