@@ -1259,7 +1259,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 	{
 		float tnormal[3];
 		mcuCBHandle::singleton().query_terrain(x, z, tnormal);
-		LOG("current normal %f %f %f", tnormal[0], tnormal[1], tnormal[2]);
+		//LOG("current normal %f %f %f", tnormal[0], tnormal[1], tnormal[2]);
 
 		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);
 		if (smoothing)
