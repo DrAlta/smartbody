@@ -833,7 +833,12 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getEvent", &SBAnimationBlend::getEvent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event of a given index.")
 		.def("removeEvent", &SBAnimationBlend::removeEvent, "Removes the event of a given index.") 
 		.def("buildVisSurfaces", &SBAnimationBlend::buildVisSurfaces, "Build a visualization surface. \n Input : Error Type, Surface Type, Num of Segements, Grid Resolutions \n Output: NULL")
-
+		.def("createMotionVectorFlow", &SBAnimationBlend::createMotionVectorFlow, "create Vector Flow visualization. \n Input: motion name. \n Output: NULL")
+		.def("clearMotionVectorFlow", &SBAnimationBlend::clearMotionVectorFlow, "clear Vector Flow visualization. \n Input: NULL. \n Output: NULL")
+		.def("plotMotion", &SBAnimationBlend::plotMotion, "Plot motion frames with stick skeleton. \n Input: motion name, intervals, ifClearAll \n Output: NULL")
+		.def("plotMotionFrameTime", &SBAnimationBlend::plotMotionFrameTime, "Plot one single motion frame (at given time) with stick skeleton. \n Input: motion name, time, ifClearAll \n Output: NULL")
+		.def("plotMotionJointTrajectory", &SBAnimationBlend::plotMotionJointTrajectory, "Plot joint trajectory over entire motion (at given time). \n Input: motion name, jointName, ifClearAll \n Output: NULL")
+		.def("clearPlotMotion", &SBAnimationBlend::clearPlotMotion, "clear Plotted motions. \n Input: NULL. \n Output: NULL")
 		;
 
 	boost::python::class_<SBAnimationBlend0D, boost::python::bases<SBAnimationBlend> >("SBAnimationBlend0D")
@@ -863,12 +868,6 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getParameter", &SBMotionBlendBase::getMotionParameter, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the parameter of a given motion")
 		.def("buildBlendBase", &SBMotionBlendBase::buildBlendBase, "Initialize BlendBase. \n Input : Motion Parameter Name, Interpolator Type \n Output: NULL")
 		.def("addTetrahedron", &SBMotionBlendBase::addTetrahedron, "Add tetrahedrons to the state. By changing the point inside tetrahedron, you can get different blending weights and different results")
-		.def("createMotionVectorFlow", &SBMotionBlendBase::createMotionVectorFlow, "create Vector Flow visualization. \n Input: motion name. \n Output: NULL")
-		.def("clearMotionVectorFlow", &SBMotionBlendBase::clearMotionVectorFlow, "clear Vector Flow visualization. \n Input: NULL. \n Output: NULL")
-		.def("plotMotion", &SBMotionBlendBase::plotMotion, "Plot motion frames with stick skeleton. \n Input: motion name, intervals, ifClearAll \n Output: NULL")
-		.def("plotMotionFrameTime", &SBMotionBlendBase::plotMotionFrameTime, "Plot one single motion frame (at given time) with stick skeleton. \n Input: motion name, time, ifClearAll \n Output: NULL")
-		.def("plotMotionJointTrajectory", &SBMotionBlendBase::plotMotionJointTrajectory, "Plot joint trajectory over entire motion (at given time). \n Input: motion name, jointName, ifClearAll \n Output: NULL")
-		.def("clearPlotMotion", &SBMotionBlendBase::clearPlotMotion, "clear Plotted motions. \n Input: NULL. \n Output: NULL")
 		;
 
 
@@ -1054,13 +1053,13 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("scale", &SBMotion::scale, "Scales all translations in skeleton by scale factor.")		
 		.def("trim", &SBMotion::trim, "Trims the starting and ending frames in the motion.")	
 		.def("saveToSkm", &SBMotion::saveToSkm, "Saves the file in .skm format to a given file name.")	
-		.def("getTimeStart", &SBMotion::retime, "Returns the start time of the motion.")
-		.def("getTimeReady", &SBMotion::retime, "Returns the ready time of the motion.")
-		.def("getTimeStrokeStart", &SBMotion::retime, "Returns the stroke start time of the motion.")
-		.def("getTimeStroke", &SBMotion::retime, "Returns the stroke time of the motion.")
-		.def("getTimeStrokeEnd", &SBMotion::retime, "Returns the stroke end time of the motion.")
-		.def("getTimeRelax", &SBMotion::retime, "Returns the relax time of the motion.")
-		.def("getTimeStop", &SBMotion::retime, "Returns the stop time of the motion.")	
+		.def("getTimeStart", &SBMotion::getTimeStart, "Returns the start time of the motion.")
+		.def("getTimeReady", &SBMotion::getTimeReady, "Returns the ready time of the motion.")
+		.def("getTimeStrokeStart", &SBMotion::getTimeStrokeStart, "Returns the stroke start time of the motion.")
+		.def("getTimeStroke", &SBMotion::getTimeStroke, "Returns the stroke time of the motion.")
+		.def("getTimeStrokeEnd", &SBMotion::getTimeStrokeEnd, "Returns the stroke end time of the motion.")
+		.def("getTimeRelax", &SBMotion::getTimeRelax, "Returns the relax time of the motion.")
+		.def("getTimeStop", &SBMotion::getTimeStop, "Returns the stop time of the motion.")	
 		.def("getDuration", &SBMotion::getDuration, "Return the duration of the motion")
 		.def("addEvent", &SBMotion::addEvent, "Adds an event associated with this motion that will be triggered at the given time. The last paramter determines if the event will be triggered only once, or every time the motion is looped.")
 		.def("addMetaData", &SBMotion::addMetaData, "Add a tagged metadata as string to the motion.")

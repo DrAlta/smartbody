@@ -511,6 +511,13 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
     { 
       case CmdViewAll : view_all (); break;
 
+	  case CmdBackground:
+		  {
+			  SrColor c = background(); 
+			  fl_color_chooser("Set background color:", c.r, c.g, c.b);
+			  background(c);
+		  } break;
+
       case CmdAsIs   : _data->rendermode = ModeAsIs;
                        _data->render_action.restore_render_mode ( _data->root );
                        break;
@@ -1371,6 +1378,9 @@ void FltkViewer::draw()
 	drawEyeLids();
 	drawDynamics();
 	drawLocomotion();
+
+	drawMotionVectorFlow();
+	drawPlotMotion();
 	
 
 	if (_data->showcollisiongeometry)
@@ -4176,6 +4186,23 @@ SbmCharacter* FltkViewer::getCurrentCharacter()
 	 return character;
 }
 
+SmartBody::SBAnimationBlend* FltkViewer::getCurrentCharacterAnimationBlend()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmCharacter* character = getCurrentCharacter();
+	if (!character) return 0;
+
+	SmartBody::SBAnimationBlend* animBlend = NULL;
+
+	MeCtParamAnimation* panimCt = character->param_animation_ct;
+	if (panimCt)
+	{
+		PABlendData* pblendData = panimCt->getCurrentPABlendData();
+		if (pblendData)
+			animBlend = dynamic_cast<SBAnimationBlend*>(pblendData->state);
+	}	
+	return animBlend;
+}
 
 MeCtExampleBodyReach* FltkViewer::getCurrentCharacterBodyReachController()
 {
@@ -4202,8 +4229,6 @@ MeCtExampleBodyReach* FltkViewer::getCurrentCharacterBodyReachController()
 	}
 	return reachCt;
 }
-
-
 
 MeCtConstraint* FltkViewer::getCurrentCharacterConstraintController()
 {
@@ -4515,6 +4540,37 @@ void FltkViewer::drawSteeringInfo()
 	glPopAttrib();
 
 }
+
+
+// draw motion vector flow
+void FltkViewer::drawMotionVectorFlow()
+{
+	SmartBody::SBAnimationBlend* animBlend = getCurrentCharacterAnimationBlend();
+	if (!animBlend)
+		return;
+
+	std::vector<SrSnLines*>& vecflow_lines = animBlend->getVectorFlowSrSnLines();
+	for(unsigned int i=0; i<vecflow_lines.size(); i++)
+	{
+		SrSnShapeBase* sp = dynamic_cast<SrSnShapeBase*>(vecflow_lines[i]);
+		SrGlRenderFuncs::render_lines(sp);
+	}
+}
+// plot motion frames
+void FltkViewer::drawPlotMotion()
+{
+	SmartBody::SBAnimationBlend* animBlend = getCurrentCharacterAnimationBlend();
+	if (!animBlend)
+		return;
+
+	std::vector<SrSnLines*>& plotmotion_lines = animBlend->getPlotMotionSrSnLines();
+	for(unsigned int i=0; i<plotmotion_lines.size(); i++)
+	{
+		SrSnShapeBase* sp = dynamic_cast<SrSnShapeBase*>(plotmotion_lines[i]);
+		SrGlRenderFuncs::render_lines(sp);
+	}
+}
+
 
 void FltkViewer::notify(SmartBody::SBSubject* subject)
 {

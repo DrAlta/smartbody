@@ -2,6 +2,9 @@
 #include <sb/SBMotion.h>
 #include <sbm/mcontrol_util.h>
 
+#include <sr/sr.h>
+#include <sr/sr_lines.h>
+
 namespace SmartBody {
 
 SBAnimationBlend::SBAnimationBlend() : PABlend()
@@ -420,6 +423,469 @@ void SBAnimationBlend::buildVisSurfaces( const std::string& errorType, const std
 			updateSmoothSurface(surf);
 	}	
 }
+
+// Motion Vector Flow visualization, added by David Huang  June 2012
+void SBAnimationBlend::createMotionVectorFlow(const std::string& motionName, const std::string& chrName,
+											   float plotThreshold, unsigned int slidWinHalfSize)
+{
+	SkMotion* mo = SBAnimationBlend::getSkMotion(motionName);
+	if(mo==0) return;
+	if(mo->frames()<3)
+	{
+		LOG("createMotionVectorFlow(): motion does not have enough frames, aborting...");
+		return;
+	}
+	SkSkeleton* sk = mo->connected_skeleton();
+	if(sk==0)
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
+		std::map<std::string, SbmCharacter*>& characterMap = mcu.getCharacterMap();
+
+		SbmCharacter* sbsk = NULL;
+		if(characterMap.find(chrName) != characterMap.end())
+		{
+			sbsk = characterMap[chrName];
+			std::string sbname = sbsk->statePrefix; // get skelelton name. FIXME: better way ???
+			
+			if(skeletonMap.find(sbname) != skeletonMap.end())
+				sk = skeletonMap[sbname];
+		}
+		if(sk)
+		{
+			LOG("%s connected to %s for plotting.", motionName.c_str(), chrName.c_str());
+			mo->connect(sk);
+		}
+		else
+		{
+			LOG("createMotionVectorFlow(): motion not connected to any skeleton, aborting...");
+			return;
+		}
+	}
+
+	SR_CLIP(plotThreshold, 0.0f, 1.0f);
+
+	clearMotionVectorFlow(); // clear vector flow SrSnLines
+
+	const std::vector<SkJoint*>& jnts = sk->joints();
+	createJointExclusionArray(jnts); // making a list of excluded joints
+	const int jsize = jnts.size();
+	const int frames = mo->frames();
+	const float dur = mo->duration();
+	const float intv = dur / (frames-1);
+	SrArray<SrArray<SrVec>*> pnts_arr; // jsize X frames
+	for(int i=0; i<frames; i++)
+	{
+		pnts_arr.push(new SrArray<SrVec>);
+		// mo->apply_frame(i); // use original frames
+		mo->apply(intv * i); // resample motion time uniformly
+		sk->invalidate_global_matrices();
+		sk->update_global_matrices();
+		getJointsGPosFromSkel(sk, *pnts_arr.top(), jnts);
+	}
+
+	// LOG("createMotionVectorFlow(): max vector norm = %f \n", getVectorMaxNorm(pnts_arr));
+
+	// compute all vector norms
+	SrArray<SrArray<float>*> norm_arr; // jsize X (frames-1)
+	for(int i=0; i<frames-1; i++)
+	{
+		SrArray<float>* n_arr = new SrArray<float>;
+		norm_arr.push(n_arr);
+		n_arr->capacity(jsize);
+		n_arr->size(jsize);
+		for(int k=0; k<jsize; k++)
+		{
+			SkJoint* j = jnts[k]; if(isExcluded(j)) continue;
+			SrVec curr_p = pnts_arr[i]->get(k);
+			SrVec next_p = pnts_arr[i+1]->get(k);
+			n_arr->set(k, dist(curr_p, next_p));
+		}
+	}
+
+	// compute norm threshold with sliding window
+	SrArray<SrArray<float>*> norm_th_arr; // jsize X (frames-1)
+	for(int i=0; i<frames; i++)
+	{
+		SrArray<float>* n_arr = new SrArray<float>;
+		norm_th_arr.push(n_arr);
+		n_arr->capacity(jsize);
+		n_arr->size(jsize);
+		float th;
+		for(int k=0; k<jsize; k++)
+		{
+			SkJoint* j = jnts[k]; if(isExcluded(j)) continue;
+			th = 0.0f;
+			for(unsigned int j=i-slidWinHalfSize; j<=i+slidWinHalfSize; j++)
+			{
+				int m = j;
+				SR_CLIP(m, 0, frames-2);
+				th = th + norm_arr[m]->get(k);
+			}
+			th = th / (2*slidWinHalfSize+1);
+			n_arr->set(k, th);
+		}
+	}
+
+	// plot vector flow
+	for(int i=1; i<mo->frames()-1; i++)
+	{
+		SrSnLines* l = new SrSnLines; l->ref();
+		l->resolution(VFLOW_LINE_WIDTH); // change vector flow lines thickness
+		vecflowLinesArray.push_back(l);
+		SrLines& line = l->shape();
+		line.init();
+		for(int k=0; k<jsize; k++)
+		{
+			SkJoint* j = jnts[k]; if(isExcluded(j)) continue;
+			const SrVec& curr_p = pnts_arr[i]->get(k);
+			const SrVec& next_p = pnts_arr[i+1]->get(k);
+			const float& norm = norm_arr[i]->get(k);
+			const float& th = norm_th_arr[i]->get(k);
+			float c = norm / th;
+			if(c > 1.0f+plotThreshold)
+			{
+				c = c - (1.0f+plotThreshold);
+				c = c + 0.5f; // use 0.5~1 hue space
+				SR_CLIP(c, 0.0f, 1.0f);
+				line.push_color(SrColor::interphue(c));
+				line.push_line(curr_p, next_p);
+			}
+			else if(c < 1.0f-plotThreshold)
+			{
+				c = c - (1.0f-plotThreshold);
+				c = c - 0.5f; // use 0~0.5 hue space
+				SR_CLIP(c, 0.0f, 1.0f);
+				line.push_color(SrColor::interphue(c));
+				line.push_line(curr_p, next_p);
+			}
+			else
+			{
+				line.push_color(SrColor::lightgray);
+				line.push_line(curr_p, next_p);
+			}
+		}
+	}
+}
+
+void SBAnimationBlend::clearMotionVectorFlow(void)
+{
+	// clear vector flow lines
+	for(unsigned int i=0; i<vecflowLinesArray.size(); i++)
+		vecflowLinesArray[i]->unref();
+	vecflowLinesArray.resize(0);
+}
+
+void SBAnimationBlend::plotMotion(const std::string& motionName, const std::string& chrName, unsigned int interval,
+								   bool clearAll, bool useRandomColor)
+{
+	SkMotion* mo = SBAnimationBlend::getSkMotion(motionName);
+	if(mo==0) return;
+	if(mo->frames()<3)
+	{
+		LOG("plotMotion(): motion does not have enough frames, aborting...");
+		return;
+	}
+	SkSkeleton* sk = mo->connected_skeleton();
+	if(sk==0)
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
+		std::map<std::string, SbmCharacter*>& characterMap = mcu.getCharacterMap();
+
+		SbmCharacter* sbsk = NULL;
+		if(characterMap.find(chrName) != characterMap.end())
+		{
+			sbsk = characterMap[chrName];
+			std::string sbname = sbsk->statePrefix; // get skelelton name. FIXME: better way ???
+			
+			if(skeletonMap.find(sbname) != skeletonMap.end())
+				sk = skeletonMap[sbname];
+		}
+		if(sk)
+		{
+			LOG("%s connected to %s for plotting.", motionName.c_str(), chrName.c_str());
+			mo->connect(sk);
+		}
+		else
+		{
+			LOG("plotMotion(): motion not connected to any skeleton, aborting...");
+			return;
+		}
+	}
+
+	if(interval < 2) interval = 2;
+
+	// clear plot motion SrSnLines
+	if(clearAll)
+		clearPlotMotion();
+
+
+	const SrColor color_begin = SrColor::blue;
+	const SrColor color_end = SrColor::red;
+	SrColor color_random;
+	if(useRandomColor)
+	{
+		static float hue = 0.0f;
+		color_random = SrColor::interphue(hue);
+		hue += 0.1f;
+		if(hue>1.0f) hue = 0.0f;
+	}
+	const std::vector<SkJoint*>& jnts = sk->joints();
+	createJointExclusionArray(jnts); // making a list of excluded joints
+	float mo_dur = mo->duration();
+	for(unsigned int i=0; i<=interval; i++)
+	{
+		mo->apply(mo_dur/interval * i);
+		sk->invalidate_global_matrices();
+		sk->update_global_matrices();
+
+		SrSnLines* l = new SrSnLines; l->ref();
+		plotMotionLinesArray.push_back(l);
+		SrLines& line = l->shape();
+
+		line.init();
+		if(useRandomColor) line.push_color(color_random);
+		else line.push_color(lerp(color_begin, color_end, (float)i/interval));
+		for(unsigned int k=0; k<jnts.size(); k++) // set k=1 to skip ref root
+		{
+			SkJoint* j = jnts[k];
+			if(isExcluded(j)) continue;
+			for(int m=0; m<j->num_children();m++)
+			{
+				if(isExcluded(j->child(m))) continue;
+				line.push_line(j->gcenter(), j->child(m)->gcenter());
+			}
+		}
+	}
+}
+
+void SBAnimationBlend::plotMotionFrameTime(const std::string& motionName, const std::string& chrName,
+										   float time, bool useRandomColor)
+{
+	SkMotion* mo = SBAnimationBlend::getSkMotion(motionName);
+	if(mo==0) return;
+	if(mo->frames()<3)
+	{
+		LOG("plotMotionFrame(): motion does not have enough frames, aborting...");
+		return;
+	}
+	SkSkeleton* sk = mo->connected_skeleton();
+	if(sk==0)
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
+		std::map<std::string, SbmCharacter*>& characterMap = mcu.getCharacterMap();
+
+		SbmCharacter* sbsk = NULL;
+		if(characterMap.find(chrName) != characterMap.end())
+		{
+			sbsk = characterMap[chrName];
+			std::string sbname = sbsk->statePrefix; // get skelelton name. FIXME: better way ???
+			
+			if(skeletonMap.find(sbname) != skeletonMap.end())
+				sk = skeletonMap[sbname];
+		}
+		if(sk)
+		{
+			LOG("%s connected to %s for plotting.", motionName.c_str(), chrName.c_str());
+			mo->connect(sk);
+		}
+		else
+		{
+			LOG("plotMotionFrame(): motion not connected to any skeleton, aborting...");
+			return;
+		}
+	}
+
+	const std::vector<SkJoint*>& jnts = sk->joints();
+	createJointExclusionArray(jnts); // making a list of excluded joints
+
+	mo->apply(time);
+	//sk->invalidate_global_matrices();
+	sk->update_global_matrices();
+
+	SrSnLines* l = new SrSnLines; l->ref();
+	plotMotionLinesArray.push_back(l);
+	SrLines& line = l->shape();
+	line.init();
+	if(useRandomColor)
+	{
+		static float hue = 0.0f;
+		line.push_color(SrColor::interphue(hue));
+		hue += 0.1f;
+		if(hue>1.0f) hue = 0.0f;
+	}
+	else
+		line.push_color(SrColor::lightgray);
+	for(unsigned int k=0; k<jnts.size(); k++) // set k=1 to skip ref root
+	{
+		SkJoint* j = jnts[k];
+		if(isExcluded(j)) continue;
+		for(int m=0; m<j->num_children();m++)
+		{
+			if(isExcluded(j->child(m))) continue;
+			line.push_line(j->gcenter(), j->child(m)->gcenter());
+		}
+	}
+}
+
+void SBAnimationBlend::plotMotionJointTrajectory(const std::string& motionName, const std::string& chrName,
+												 const std::string& jointName, float start_t, float end_t, bool useRandomColor)
+{
+
+	SkMotion* mo = SBAnimationBlend::getSkMotion(motionName);
+	if(mo==0) return;
+	if(mo->frames()<3)
+	{
+		LOG("plotMotionJointTrajectory(): motion does not have enough frames, aborting...");
+		return;
+	}
+	SkSkeleton* sk = mo->connected_skeleton();
+	if(sk==0)
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
+		std::map<std::string, SbmCharacter*>& characterMap = mcu.getCharacterMap();
+
+		SbmCharacter* sbsk = NULL;
+		if(characterMap.find(chrName) != characterMap.end())
+		{
+			sbsk = characterMap[chrName];
+			std::string sbname = sbsk->statePrefix; // get skelelton name. FIXME: better way ???
+			
+			if(skeletonMap.find(sbname) != skeletonMap.end())
+				sk = skeletonMap[sbname];
+		}
+		if(sk)
+		{
+			LOG("%s connected to %s for plotting.", motionName.c_str(), chrName.c_str());
+			mo->connect(sk);
+		}
+		else
+		{
+			LOG("plotMotionJointTrajectory(): motion not connected to any skeleton, aborting...");
+			return;
+		}
+	}
+	SkJoint* jnt = sk->search_joint(jointName.c_str());
+	if(!jnt)
+	{
+		LOG("plotMotionJointTrajectory(): specified joint is not found in skeleton, aborting...");
+		return;
+	}
+	
+	unsigned int frames = mo->frames();
+	const float mo_dur = mo->duration();
+	SR_CLIP(start_t, 0.0f, mo_dur);
+	SR_CLIP(end_t, 0.0f, mo_dur);
+	const SrColor color_begin = SrColor::blue;
+	const SrColor color_end = SrColor::red;
+	SrColor color_random;
+	if(useRandomColor)
+	{
+		static float hue = 0.0f;
+		color_random = SrColor::interphue(hue);
+		hue += 0.1f;
+		if(hue>1.0f) hue = 0.0f;
+	}
+	SrSnLines* l = new SrSnLines; l->ref();
+	plotMotionLinesArray.push_back(l);
+	SrLines& line = l->shape();
+	line.init();
+	mo->apply(start_t);
+	sk->update_global_matrices();
+	SrVec last_jnt_pos = jnt->gcenter(); // first frame
+	for(float t=start_t; t<end_t; t+=0.016667f)
+	{
+		if(useRandomColor) line.push_color(color_random);
+		else line.push_color(lerp(color_begin, color_end, (t-start_t)/(end_t-start_t))); // begin~end: blue~red
+		mo->apply(t);
+		sk->update_global_matrices();
+		SrVec cur_jnt_pos = jnt->gcenter();
+		line.push_line(last_jnt_pos, cur_jnt_pos);
+		last_jnt_pos = cur_jnt_pos;
+	}
+}
+
+
+void SBAnimationBlend::clearPlotMotion(void)
+{
+	for(unsigned int i=0; i<plotMotionLinesArray.size(); i++)
+		plotMotionLinesArray[i]->unref();
+	plotMotionLinesArray.resize(0);
+}
+
+void SBAnimationBlend::getJointsGPosFromSkel(SkSkeleton* sk, SrArray<SrVec>& pnts_array,
+											  const std::vector<SkJoint*>& jnt_list)
+{
+	const unsigned int size = jnt_list.size();
+	pnts_array.capacity(size);
+	pnts_array.size(size);
+
+	for(unsigned int k=0; k<size; k++) // set k=1 to skip ref root
+	{
+		SkJoint* j = jnt_list[k];
+		pnts_array[k] = j->gcenter();
+	}
+}
+
+float SBAnimationBlend::getVectorMaxNorm(SrArray<SrArray<SrVec>*>& pnts_arr)
+{
+	const int frames = pnts_arr.size();
+	const int size = pnts_arr[0]->size();
+	float max_err = 0.0f;
+	for(int i=1; i<frames; i++)
+	{
+		for(int k=0; k<size; k++)
+		{
+			float norm = dist(pnts_arr[i]->get(k), pnts_arr[i-1]->get(k));
+			if(norm > max_err)
+				max_err = norm;
+		}
+	}
+	return max_err;
+}
+
+
+void SBAnimationBlend::createJointExclusionArray(const std::vector<SkJoint*>& orig_list)
+{
+	plot_excld_list.resize(0);
+	for(unsigned int i=0; i<orig_list.size(); i++)
+	{
+		SkJoint* j = orig_list[i];
+		SrString jname(j->name().c_str());
+		if(jname.search("face")>=0) { plot_excld_list.push_back(j); continue; }
+		if(jname.search("brow")>=0) { plot_excld_list.push_back(j); continue; }
+		if(jname.search("eye")>=0)  { plot_excld_list.push_back(j); continue; }
+		if(jname.search("nose")>=0) { plot_excld_list.push_back(j); continue; }
+		if(jname.search("lid")>=0)  { plot_excld_list.push_back(j); continue; }
+		if(jname.search("jaw")>=0)  { plot_excld_list.push_back(j); continue; }
+		if(jname.search("tongue")>=0) { plot_excld_list.push_back(j); continue; }
+		if(jname.search("lip")>=0)    { plot_excld_list.push_back(j); continue; }
+		if(jname.search("cheek")>=0)  { plot_excld_list.push_back(j); continue; }
+
+		if(jname.search("finger")>=0) { plot_excld_list.push_back(j); continue; }
+		if(jname.search("thumb")>=0)  { plot_excld_list.push_back(j); continue; }
+		if(jname.search("index")>=0)  { plot_excld_list.push_back(j); continue; }
+		if(jname.search("middle")>=0) { plot_excld_list.push_back(j); continue; }
+		if(jname.search("pinky")>=0)  { plot_excld_list.push_back(j); continue; }
+		if(jname.search("ring")>=0)   { plot_excld_list.push_back(j); continue; }
+	}
+}
+
+bool SBAnimationBlend::isExcluded(SkJoint* j)
+{
+	for(unsigned int i=0; i<plot_excld_list.size(); i++)
+		if(plot_excld_list[i] == j)
+			return true;
+	return false;
+}
+
 
 void SBAnimationBlend::addCorrespondencePoints(const std::vector<std::string>& motionNames, const std::vector<double>& points)
 {

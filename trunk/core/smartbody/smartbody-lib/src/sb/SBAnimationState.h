@@ -3,6 +3,8 @@
 #include <sr/sr_sn_colorsurf.h>
 #include <controllers/me_ct_param_animation_data.h>
 
+# define VFLOW_LINE_WIDTH 2.0f
+
 namespace SmartBody {
 
 class SBAnimationBlend : public PABlend
@@ -44,6 +46,28 @@ class SBAnimationBlend : public PABlend
 		std::vector<SrSnColorSurf*>& getErrorSurfaces() { return errorSurfaces; }
 		std::vector<SrSnColorSurf*>& getSmoothSurfaces() { return smoothSurfaces; }
 
+
+		/* motion vector flow for motion smoothness visualize: each vector is the abs. movement of a particular joint
+		// as it traverse 3d space between two consecutive motion frames. Colors are assigned to the vectors representing
+		// sudden change in vector length compared against local average of the length computed with a sliding window,
+		// highlighting the abnormal speed-ups (warm color) and slowdowns (cool color) caused by jitters and such.
+		// vecs within [1-plotTh, 1+plotTh] of local avg are plotted in light gray.
+		// sliding window size = slidWinHalfSize x 2 + 1.
+		// added by David Huang, June 2012 */
+		void createMotionVectorFlow(const std::string& motionName, const std::string& chrName, float plotThreshold=0.45f, unsigned int slidWinHalfSize=7);
+		std::vector<SrSnLines*>& getVectorFlowSrSnLines() { return vecflowLinesArray; }
+		void clearMotionVectorFlow(void);
+
+		/* plot motion frames (stick figures) and joint trajectory
+		// added by David Huang, June 2012 */
+		void plotMotion(const std::string& motionName, const std::string& chrName, unsigned int interval,
+						bool clearAll, bool useRandomColor);
+		void plotMotionFrameTime(const std::string& motionName, const std::string& chrName, float time, bool useRandomColor);
+		void plotMotionJointTrajectory(const std::string& motionName, const std::string& chrName, const std::string& jointName,
+										float start_t, float end_t, bool useRandomColor);
+		std::vector<SrSnLines*>& getPlotMotionSrSnLines() { return plotMotionLinesArray; }
+		void clearPlotMotion(void);
+
 	protected:
 		bool addSkMotion(const std::string& motionName);
 		bool removeSkMotion(const std::string& motionName);
@@ -57,7 +81,19 @@ class SBAnimationBlend : public PABlend
 		bool _isFinalized;
 
 		std::vector<SrSnColorSurf*> errorSurfaces;
-		std::vector<SrSnColorSurf*> smoothSurfaces;		
+		std::vector<SrSnColorSurf*> smoothSurfaces;
+
+		std::vector<SrSnLines*> vecflowLinesArray;
+		// put a list of joint global positions into array
+		void getJointsGPosFromSkel(SkSkeleton* sk, SrArray<SrVec>& pnts_array, const std::vector<SkJoint*>& jnt_list);
+		// find maximum vector norm (vector are connected between jnt global positions in consecutive frame pairs)
+		float getVectorMaxNorm(SrArray<SrArray<SrVec>*>& pnts_arr);
+		std::vector<SrSnLines*> plotMotionLinesArray; // plotMotion()
+		std::vector<SkJoint*> plot_excld_list;
+		// create a list for joint exclusion when plotting motion and vector flow (hard coded to exclude fingers, eye, etc)
+		void createJointExclusionArray(const std::vector<SkJoint*>& orig_list);
+		bool isExcluded(SkJoint* j); // return true if joint is excluded
+
 };
 
 
