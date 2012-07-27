@@ -104,7 +104,9 @@ bool srSynchPoints::set_time( int tag, double t )	{
 	else	{
 		return( false );
 	}
-
+	return false;
+// feng : If there are errors in the input sync points, the order adjustment usually makes it worse instead of fix it. So disable for now.
+/*
 // check and bump back order of preceding:
 	int tmp_tag = tag;
 	double tmp_time = get_prev( & tmp_tag );
@@ -125,6 +127,7 @@ bool srSynchPoints::set_time( int tag, double t )	{
 		}
 	}
 	return( true );
+	*/
 #else
 	if( valid_tag( tag ) )	{
 
@@ -155,7 +158,7 @@ bool srSynchPoints::set_time( int tag, double t )	{
 		return( true );
 	}
 	return( false );
-#endif
+#endif	
 }
 
 bool srSynchPoints::set_interval( int tag, double t )	{

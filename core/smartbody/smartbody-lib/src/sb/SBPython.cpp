@@ -1542,6 +1542,8 @@ void initPython(std::string pythonLibPath)
 #endif
 
 		SmartBody::initSmartBody();
+		
+		
 
 		if (PyErr_Occurred())
 			PyErr_Print();

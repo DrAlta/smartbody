@@ -14,30 +14,14 @@ def createStandardCharacter(charName, skelName, meshName, position):
 	sbChar.setVoice("remote")
 	sbChar.setVoiceCode("Festival_voice_rab_diphone")
 	sbChar.createStandardControllers()
-	sbChar.setStringAttribute("deformableMesh", meshName)	
-	scene.run("motion-retarget.py")
+	sbChar.setStringAttribute("deformableMesh", meshName)		
 	print 'retarget character : ' + charName + '  , skelName : ' + skelName;
 	retargetCharacter(charName,skelName)
 	
-def remapSkeleton(skelName):
-	remapSkel = scene.getSkeleton(skelName)
-	jointMapManager = scene.getJointMapManager()
-	jointMap = jointMapManager.getJointMap(skelName)
-	if (jointMap == None):
-		jointMap = jointMapManager.createJointMap(skelName)
-		jointMap.guessMapping(remapSkel, False)
-	jointMap.applySkeleton(remapSkel)
 
-def remapSkeletonInverse(skelName, jointMapName):
-	remapSkel = scene.getSkeleton(skelName)
-	jointMapManager = scene.getJointMapManager()
-	jointMap = jointMapManager.getJointMap(jointMapName)
-	if (jointMap == None):
-		return
-	jointMap.applySkeletonInverse(remapSkel)
-	
 
 def createDragAndDropCharacter(charName, skelName, meshName, position):
+	scene.run("motion-retarget.py")
 	dndSkel = scene.getSkeleton(skelName)
 	if (dndSkel == None):
 		return
