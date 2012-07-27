@@ -2,8 +2,52 @@ print "|-------------------------------------------------|"
 print "|  data/sbm-common/scripts/motion-retarget.py     |"
 print "|-------------------------------------------------|"
 
+def remapSkeleton(skelName):
+	remapSkel = scene.getSkeleton(skelName)
+	jointMapManager = scene.getJointMapManager()
+	jointMap = jointMapManager.getJointMap(skelName)
+	if (jointMap == None):
+		jointMap = jointMapManager.createJointMap(skelName)
+		jointMap.guessMapping(remapSkel, False)
+	jointMap.applySkeleton(remapSkel)
+
+def remapSkeletonInverse(skelName, jointMapName):
+	remapSkel = scene.getSkeleton(skelName)
+	jointMapManager = scene.getJointMapManager()
+	jointMap = jointMapManager.getJointMap(jointMapName)
+	if (jointMap == None):
+		return
+	jointMap.applySkeletonInverse(remapSkel)
+	
+def remapMotion(skelName, motionName):
+	remapSkel = scene.getSkeleton(skelName)
+	jointMapManager = scene.getJointMapManager()
+	jointMap = jointMapManager.getJointMap(skelName)
+	if (jointMap == None):
+		jointMap = jointMapManager.createJointMap(skelName)
+		jointMap.guessMapping(remapSkel, False)
+	remapMotion = scene.getMotion(motionName)
+	if (remapMotion == None):
+		return
+	jointMap.applyMotion(remapMotion)
+	
+def remapMotionInverse(skelName, motionName):
+	remapSkel = scene.getSkeleton(skelName)
+	jointMapManager = scene.getJointMapManager()
+	jointMap = jointMapManager.getJointMap(skelName)
+	if (jointMap == None):
+		jointMap = jointMapManager.createJointMap(skelName)
+		jointMap.guessMapping(remapSkel, False)
+	remapMotion = scene.getMotion(motionName)
+	if (remapMotion == None):
+		return
+	jointMap.applyMotionInverse(remapMotion)
+	
+	
 def retargetMotionFunc(motionName, srcSkelName, tgtSkelName):
-	testMotion = scene.getMotion(motionName);
+	#remapSkeleton(srcSkelName)
+	#remapMotion(srcSkelName, motionName)	
+	testMotion = scene.getMotion(motionName);	
 	outMotionName = tgtSkelName + motionName		
 	existMotion = scene.getMotion(outMotionName)
 	if existMotion != None : # do nothing if the retargeted motion is already there
@@ -49,7 +93,8 @@ def retargetMotionFunc(motionName, srcSkelName, tgtSkelName):
 	effectorRoots.append('l_hip')
 	
 	print 'Retarget motion = ' + motionName;
-	outMotion = testMotion.retarget(outMotionName,srcSkelName,tgtSkelName, endJoints, relativeJoints, offsetJoints);	
+	outMotion = testMotion.retarget(outMotionName,srcSkelName,tgtSkelName, endJoints, relativeJoints, offsetJoints);
+	#cleanMotion = testMotion.constrain(outMotionName, srcSkelName, tgtSkelName, outMotionName, effectorJoints, effectorRoots);
 	return outMotionName
 
 def remapAndSaveMotion(outMotionName, jointMapName, outDir):
@@ -60,7 +105,7 @@ def remapAndSaveMotion(outMotionName, jointMapName, outDir):
 		return	
 	outMotion = scene.getMotion(outMotionName)
 	if (outMotion == None):
-		print 'jointMap = ' + outMotionName + ' not found!'
+		print 'outMotion = ' + outMotionName + ' not found!'
 		return
 
 	jointMap.applyMotionInverse(outMotion)
@@ -71,7 +116,10 @@ def remapAndSaveMotion(outMotionName, jointMapName, outDir):
 	scene.command(saveCommand)
 	
 
-def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :	
+def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :
+	# map source skeleton and motion channels to standard names
+	remapSkeleton(srcSkelName)
+	remapMotion(srcSkelName, motionName)
 	outMotionName = retargetMotionFunc(motionName, srcSkelName, tgtSkelName)
 	if outMotionName == "None":
 		return
@@ -81,6 +129,9 @@ def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :
 	saveCommand = 'animation ' + outMotionName + ' save ' + outDir + outMotionName + '.skm';
 	print 'Save command = ' + saveCommand;
 	scene.command(saveCommand)
+	# restore channel names original skeleton and motion 
+	remapSkeletonInverse(srcSkelName, srcSkelName)
+	remapMotionInverse(srcSkelName, motionName)
 
 def getStandardLocomomtionAnimations(locoMotions, preFix):
 	locoMotions.append(preFix+"ChrUtah_Walk001")
@@ -185,6 +236,46 @@ def getStandardReachMotions(reachMotions, preFix):
 	reachMotions.append(preFix+"ChrHarmony_Relax001_HandGraspSmSphere_Grasp")
 	reachMotions.append(preFix+"ChrHarmony_Relax001_HandGraspSmSphere_Reach")
 	reachMotions.append(preFix+"ChrHarmony_Relax001_HandGraspSmSphere_Release")
+	
+def getMocapReachMotions(reachMotions, preFix):	
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachBackFloor01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachBackHigh01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachBackLow01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachBackMediumFar01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachBackMediumMid01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachBackMediumNear01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachForwardFloor01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachForwardHigh01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachForwardLow01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachForwardMediumFar01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachForwardMediumMid01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachLeft30Floor01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachLeft30High01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachLeft30Low01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachLeft30MediumFar01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachLeft30MediumMid01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachLeft30MediumNear01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachLeft60Floor01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachLeft60High01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachLeft60Low01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachLeft60MediumFar01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachLeft60MediumMid01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachLeft60MediumNear01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachRight120Floor01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachRight120High01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachRight120Low01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachRight120MediumFar01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachRight120MediumMid01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachRight120MediumNear01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachRight30Floor01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachRight30High01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachRight30Low01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachRight30MediumFar01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachRight30MediumMid01")
+	reachMotions.append(preFix+"ChrGarza@IdleStand01_ReachRight30MediumNear01")	
+	reachMotions.append(preFix+"ChrHarmony_Relax001_HandGraspSmSphere_Grasp")
+	reachMotions.append(preFix+"ChrHarmony_Relax001_HandGraspSmSphere_Reach")
+	reachMotions.append(preFix+"ChrHarmony_Relax001_HandGraspSmSphere_Release")
 
 def getStandardGestureMotions(gestureMotions, preFix):
 	gestureMotions.append(preFix+"HandsAtSide_Motex")
@@ -204,10 +295,13 @@ def retargetSetup(targetSkelName):
 	reachMotions = StringVec()
 	locoMotions = StringVec()
 	marineLocomotions = StringVec()
+	mocapReachMotions = StringVec()
 	getStandardLocomomtionAnimations(locoMotions,"")
 	getMarineLocomomtionAnimations(marineLocomotions,"")
 	getStandardGestureMotions(gestureMotions,"")
 	getStandardReachMotions(reachMotions,"")
+	getMocapReachMotions(mocapReachMotions,"")
+	
 	
 	#outDir = '../../../../data/sbm-common/common-sk/motion/' + targetSkelName + '/';
 	outDir = '../../../../data/retarget/motion/' + targetSkelName + '/';
@@ -217,6 +311,8 @@ def retargetSetup(targetSkelName):
 	# retarget reach motions
 	for n in range(0, len(reachMotions)):
 		retargetMotion(reachMotions[n], 'common.sk', targetSkelName, outDir+'reachMotion/');
+	#for n in range(0, len(mocapReachMotions)):
+	#	retargetMotion(mocapReachMotions[n], 'ChrGarza.sk', targetSkelName, outDir+'reachMotion/');
 	
 	# retarget standard locomotions
 	for n in range(0, len(locoMotions)):
@@ -262,6 +358,9 @@ def retargetCharacter(charName, targetSkelName):
 	# setup reach 
 	scene.run("init-example-reach.py")
 	reachSetup(charName,"KNN",targetSkelName)
+	
+	#scene.run("init-example-reach-mocap.py")
+	#reachMocapSetup(charName,"KNN",targetSkelName)
 	
 	# setup steering
 	scene.run("init-steer-agents.py")

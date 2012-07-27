@@ -961,8 +961,8 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 	interSk->update_global_matrices();
 
 	SkMotion *retarget_p = new SmartBody::SBMotion();
-	srSynchPoints sp(synch_points);
-	retarget_p->synch_points = sp;
+	//srSynchPoints sp(synch_points);
+	retarget_p->synch_points.copy_points(synch_points);// = sp;
 	retarget_p->init( mchan_arr ); // use the target channels instead
 	int num_f = this->frames();
 
@@ -1009,7 +1009,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 			}
 		}				
 	}
-
+	float heightRatio = (interSk->getBaseHeight()/tempSrcSk->getBaseHeight());//*0.99f;
 	for (int i = 0; i < num_f; i++)
 	{
 		retarget_p->insert_frame(i, this->keytime(i));		
@@ -1036,7 +1036,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 				{					
 					SrQuat gsrc = SrQuat(srcJoint->gmat());
 					SrQuat gdst = SrQuat(targetJoint->gmat());
-					SrQuat protSrc = srcJoint->quat()->prerot();
+					SrQuat protSrc = srcJoint->quat()->rawValue();
 					SrQuat protDst = targetJoint->quat()->rawValue();//targetJoint->quat()->prerot();//targetJoint->quat()->rawValue();//targetJoint->quat()->prerot();
 					//sr_out << "gsrc = " << gsrc << " gdst = " << gdst << srnl;
 					final_q = protDst*gdst.inverse()*gsrc*protSrc.inverse()*q_orig*gsrc.inverse()*gdst;
@@ -1053,7 +1053,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 			{
 				// just copy over the translation for now
 				float chanValue = ref_p[ index ];				
-				new_p[ index ] = chanValue;
+				new_p[ index ] = chanValue*heightRatio;
 				// 				if (jointPosMap.find(jointName) != jointPosMap.end())
 				// 				{
 				// 					SrVec pos = jointPosMap[jointName];

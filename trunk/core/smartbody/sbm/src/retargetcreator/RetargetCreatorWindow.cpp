@@ -59,6 +59,8 @@ void RetargetCreatorWindow::retargetSelectedMotion()
 	for (unsigned int i=0; i < inputMotionList.size(); i++)
 	{
 		std::string moName = inputMotionList[i];
+		std::string mapCmd = "remapMotion('" + srcSkelName +"','" + moName + "')";
+		mcu.executePython(mapCmd.c_str());
 		retargetCmd = "tempMotionName = retargetMotionFunc('" + moName + "','" + srcSkelName + "','" + tgtSkelName + "')";
 		LOG("retarget Cmd = %s", retargetCmd.c_str());
 		//scene->command(retargetCmd);
@@ -66,12 +68,14 @@ void RetargetCreatorWindow::retargetSelectedMotion()
 		std::string saveCmd = "remapAndSaveMotion(tempMotionName,'"+tgtSkelName+"','"+outDir+"')";
 		LOG("save Cmd = %s", saveCmd.c_str());
 		mcu.executePython(saveCmd.c_str());
+		mapCmd = "remapMotionInverse('" + srcSkelName +"','" + moName + "')";
+		mcu.executePython(mapCmd.c_str());
 	}
 	// revert the skeleton name
 	std::string invmapCmd = "remapSkeletonInverse('"+tgtSkelName+"','"+tgtSkelName+"')";
 	mcu.executePython(invmapCmd.c_str());
 	invmapCmd = "remapSkeletonInverse('"+srcSkelName+"','"+srcSkelName+"')";
-	mcu.executePython(remapCmd.c_str());
+	mcu.executePython(invmapCmd.c_str());
 }
 
 void RetargetCreatorWindow::reloadAssets()
