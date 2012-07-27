@@ -720,6 +720,8 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 			  }
 		  }
 		  break;
+	  default:
+		  break;
 	}
 	
 	if (applyToCharacter)

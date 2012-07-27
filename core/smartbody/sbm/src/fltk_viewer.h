@@ -457,8 +457,8 @@ class LocomotionData
 			spd;
 			x_spd = 7;
 			z_spd = 70;
-			t_direction[200];
-			character[100];
+			t_direction[0];
+			character[0];
 			char_index = 0;
 			kmode = 0;
 			height_disp = 0.0f;
