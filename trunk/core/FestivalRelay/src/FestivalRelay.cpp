@@ -877,7 +877,7 @@ int main(int argc, char **argv)
 
 	if (!scriptFileRead)
 	{
-		printf("Running default Festival commands\n\n", voice.c_str());
+		printf("Running default Festival commands - %s\n\n", voice.c_str());
 		// setting voice to be used
 		std::string voice_command = "(" + voice + ")";
 		festivalCommands.push_back(voice_command.c_str());
