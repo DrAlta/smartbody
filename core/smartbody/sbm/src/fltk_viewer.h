@@ -43,6 +43,7 @@
 # include <sr/sr_sa_bbox.h>
 # include <FL/Fl_Menu.H>
 #include "retargetviewer/RetargetViewer.h"
+#include <sb/SBMotionBlendBase.h>
 
 #include "ObjectManipulationHandle.h"
 
@@ -316,6 +317,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	void drawEyeLids();
 	void drawDynamics();
 	void drawLocomotion();
+
 	void drawReach();
 	void drawInteractiveLocomotion();
 	void drawPawns();
@@ -323,6 +325,8 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	void drawCharacterBoundingVolumes();
 	void drawSteeringInfo();
 	void drawColObject(SbmGeomObject* colObj, SrMat& gmat);		
+	void drawMotionVectorFlow();
+	void drawPlotMotion();
 
 	void drawTetra(SrVec vtxPos[4], SrVec& color);
 	void drawArrow(SrVec& from, SrVec& to, float width, SrVec& color);
@@ -372,6 +376,7 @@ protected:
 	SbmCharacter*        getCurrentCharacter();
 	std::vector<SrLight> _lights;
 
+	SmartBody::SBAnimationBlend* getCurrentCharacterAnimationBlend(); // for visualization plots
 	
 	RetargetViewer* _retargetViewer;
  };

@@ -43,8 +43,15 @@ class VisualizationView : public Fl_Group
 	public:
 		Fl_Output*				currentCycleState;
 		Fl_Choice*              visShapeChoice;
-		Fl_Button*              buildVizButton;
 		Fl_Choice*              currentViz;
+		Fl_Button*              buildVizButton;
+
+		Fl_Button*              plotMotionButton;
+		Fl_Button*              plotJointTrajButton;
+		Fl_Button*              clearMotionButton;
+		Fl_Button*              plotVectorFlowButton;
+		Fl_Button*              clearVectorFlowButton;
+
 		std::string				prevCycleState;
 		PanimationWindow*		paWindow;
 		Fl_Group*				parameterGroup;		
@@ -54,6 +61,18 @@ class VisualizationView : public Fl_Group
 		void buildVisualization();
 		static void buildViz(Fl_Widget* widget, void* data);
 		static void updateVizType(Fl_Widget* widget, void* data);
+
+		void plotMotion();
+		static void plotMotion(Fl_Widget* widget, void* data);
+		void plotJointTraj();
+		static void plotJointTraj(Fl_Widget* widget, void* data);
+		void clearMotion();
+		static void clearMotion(Fl_Widget* widget, void* data);
+		
+		void plotVectorFlow();
+		static void plotVectorFlow(Fl_Widget* widget, void* data);
+		void clearVectorFlow();
+		static void clearVectorFlow(Fl_Widget* widget, void* data);
 
 };
 #endif

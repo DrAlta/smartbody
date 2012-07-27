@@ -28,6 +28,7 @@
 #include <FL/fl_draw.H>
 #include <sbm/mcontrol_util.h>
 #include "ErrorVisualization.h"
+#include <sb/SBMotionBlendBase.h>
 
 VisualizationView::VisualizationView(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h)
 {
@@ -35,20 +36,38 @@ VisualizationView::VisualizationView(int x, int y, int w, int h, PanimationWindo
 	this->label("Visualization");
 	this->begin();
 	currentCycleState = new Fl_Output(2 * xDis + 100 + x, yDis + y, 200, 2 * yDis, "Current State");
-	visShapeChoice = new Fl_Choice(2 * xDis + 100 + x, yDis*5 + y, 200, 2 * yDis, "Surface Type");
+
+	visShapeChoice = new Fl_Choice(2 * xDis + 100 + x, yDis*4 + y, 200, 2 * yDis, "Surface Type");
 	visShapeChoice->add("curve");
 	visShapeChoice->add("flat");
-	visShapeChoice->value(1);
+	visShapeChoice->value(0);
 
-	buildVizButton = new Fl_Button(2 * xDis + 350 + x, yDis*10 + y , 200, 2 * yDis, "Build Viz");
-	buildVizButton->callback(buildViz,this);
-
-	currentViz = new Fl_Choice(2 * xDis + 100 + x, yDis*10 + y, 200, 2 * yDis, "Viz Type");
+	currentViz = new Fl_Choice(2 * xDis + 100 + x, yDis*7 + y, 200, 2 * yDis, "Viz Type");
 	currentViz->add("error");
 	currentViz->add("smooth");
 	currentViz->value(0);
 	currentViz->callback(updateVizType,this);
-	
+
+	buildVizButton = new Fl_Button(2 * xDis + 350 + x, yDis*7 + y , 200, 2 * yDis, "Build Viz");
+	buildVizButton->callback(buildViz,this);
+
+
+	plotMotionButton = new Fl_Button(2 * xDis + 50 + x, yDis*9 + y , 100, 2 * yDis, "Plot Motion");
+	plotMotionButton->callback(plotMotion,this);
+
+	plotJointTrajButton = new Fl_Button(2 * xDis + 150 + x, yDis*9 + y , 100, 2 * yDis, "Plot Joint Traj");
+	plotJointTrajButton->callback(plotJointTraj,this);
+
+	clearMotionButton = new Fl_Button(2 * xDis + 250 + x, yDis*9 + y , 100, 2 * yDis, "Clear Motion");
+	clearMotionButton->callback(clearMotion,this);
+
+	plotVectorFlowButton = new Fl_Button(2 * xDis + 350 + x, yDis*9 + y , 100, 2 * yDis, "Plot VectorFlow");
+	plotVectorFlowButton->callback(plotVectorFlow,this);
+
+	clearVectorFlowButton = new Fl_Button(2 * xDis + 450 + x, yDis*9 + y , 100, 2 * yDis, "Clear VectorFlow");
+	clearVectorFlowButton->callback(clearVectorFlow,this);
+
+
 	parameterGroup = new Fl_Group(2 * xDis + x , h / 10 + 9 * yDis + y, w - 2 * xDis, 9 * h / 10 - 10 * yDis);
 	parameterGroup->box(FL_UP_BOX);
 	this->end();
@@ -121,4 +140,89 @@ void VisualizationView::updateVizType( Fl_Widget* widget, void* data )
 	VisualizationView* vizView = (VisualizationView*)(data);
 	std::string drawType = vizView->currentViz->text(vizView->currentViz->value());
 	vizView->errorViz->setDrawType(drawType);
+}
+
+void VisualizationView::plotMotion()
+{
+	SmartBody::SBCharacter* sbChar = paWindow->getCurrentCharacter();
+	if (!sbChar) return;
+	if (!sbChar->param_animation_ct) return;
+	PABlendData* blendData = sbChar->param_animation_ct->getCurrentPABlendData();
+	if (!blendData) return;
+	SmartBody::SBAnimationBlend* curBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData->state);
+	if (!curBlend) return;
+
+	for(int i=0; i<curBlend->getNumMotions(); i++)
+	{
+		std::string moName = curBlend->getMotion(i);
+		//SkMotion* mo = getSkMotion(moName);
+		curBlend->plotMotion(moName, sbChar->getName(), 20, true, false);
+	}
+}
+void VisualizationView::plotMotion(Fl_Widget* widget, void* data)
+{
+	VisualizationView* vizView = (VisualizationView*)(data);
+	vizView->plotMotion();
+}
+
+void VisualizationView::plotJointTraj(Fl_Widget* widget, void* data)
+{
+}
+
+void VisualizationView::clearMotion()
+{
+	SmartBody::SBCharacter* sbChar = paWindow->getCurrentCharacter();
+	if (!sbChar) return;
+	if (!sbChar->param_animation_ct) return;
+	PABlendData* blendData = sbChar->param_animation_ct->getCurrentPABlendData();
+	if (!blendData) return;
+	SmartBody::SBAnimationBlend* curBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData->state);
+	if (!curBlend) return;
+
+	curBlend->clearPlotMotion();
+}
+void VisualizationView::clearMotion(Fl_Widget* widget, void* data)
+{
+	VisualizationView* vizView = (VisualizationView*)(data);
+	vizView->clearMotion();
+}
+
+void VisualizationView::plotVectorFlow()
+{
+	SmartBody::SBCharacter* sbChar = paWindow->getCurrentCharacter();
+	if (!sbChar) return;
+	if (!sbChar->param_animation_ct) return;
+	PABlendData* blendData = sbChar->param_animation_ct->getCurrentPABlendData();
+	if (!blendData) return;
+	SmartBody::SBAnimationBlend* curBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData->state);
+	if (!curBlend) return;
+
+	for(int i=0; i<curBlend->getNumMotions(); i++)
+	{
+		std::string moName = curBlend->getMotion(i);
+		curBlend->createMotionVectorFlow(moName, sbChar->getName(), 0.45f, 7);
+	}
+}
+void VisualizationView::plotVectorFlow(Fl_Widget* widget, void* data)
+{
+	VisualizationView* vizView = (VisualizationView*)(data);
+	vizView->plotVectorFlow();
+}
+
+void VisualizationView::clearVectorFlow()
+{
+	SmartBody::SBCharacter* sbChar = paWindow->getCurrentCharacter();
+	if (!sbChar) return;
+	if (!sbChar->param_animation_ct) return;
+	PABlendData* blendData = sbChar->param_animation_ct->getCurrentPABlendData();
+	if (!blendData) return;
+	SmartBody::SBAnimationBlend* curBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData->state);
+	if (!curBlend) return;
+
+	curBlend->clearMotionVectorFlow();
+}
+void VisualizationView::clearVectorFlow(Fl_Widget* widget, void* data)
+{
+	VisualizationView* vizView = (VisualizationView*)(data);
+	vizView->clearVectorFlow();
 }

@@ -84,7 +84,7 @@ double RBFInterpolator::RBFValue(const dVector& p1,const dVector& p2 )
 	//Plus(p1,p2,diff,-1.0);
 	diff = p1 - p2;
 	double r = sqrt(norm_2(diff));
-	//return exp(-(r*r)*0.0005);
+	return exp(-(r*r)*0.0005);
 	if (r==0.0)
 		return r;
 	else
@@ -113,7 +113,7 @@ void RBFInterpolator::predictInterpWeights( const dVector& para, VecOfInterpWeig
 	MeCtUBLAS::matrixVecMult(rbfMatrix,rbfIn,rbfWeight);
 	blendWeights.resize(nK);	
 
-	float weightSum = 0.0;
+	double weightSum = 0.0;
 	for (int i=0;i<nK;i++)
 	{
 		InterpWeight w;		
@@ -127,7 +127,7 @@ void RBFInterpolator::predictInterpWeights( const dVector& para, VecOfInterpWeig
 	}
 
 	for (int i=0;i<nK;i++)
-		blendWeights[i].second /= weightSum;
+		blendWeights[i].second = (float)((double)blendWeights[i].second / weightSum);
 }
 
 /************************************************************************/
@@ -153,7 +153,7 @@ void KNNBaseInterpolator::generateDistWeights( vector<float>& dists, vector<floa
 	int nK = dists.size();
 	outWeights.resize(nK);
 
-	float weightSum = 0.f;
+	double weightSum = 0.f;
 	for (int i=0;i<nK;i++)
 	{
 		float weight = 1.0f/dists[i] - 1.0f/dists[nK-1];
@@ -165,7 +165,7 @@ void KNNBaseInterpolator::generateDistWeights( vector<float>& dists, vector<floa
 	strstr << "weights = ";		
 	for (int i=0;i<nK;i++)
 	{
-		outWeights[i] /= weightSum;
+		outWeights[i] = (float)((double)outWeights[i] / weightSum);
 		strstr << outWeights[i] << " ,";				
 	}
 	strstr << std::endl;
@@ -186,7 +186,7 @@ int KNNBaseInterpolator::kdTreeKNN( ANNkd_tree* kdTree, const dVector& inPara, i
 	const double* paraData = (const double*)(&inPara[0]);
 	kdTree->annkSearch((double*)paraData,nKNN,nnIdx,nnDists);
 
-	float weightSum = 0.f;
+	double weightSum = 0.f;
 	for (int i=0;i<nKNN;i++)
 	{
 		int index = nnIdx[i];				
@@ -202,7 +202,7 @@ int KNNBaseInterpolator::kdTreeKNN( ANNkd_tree* kdTree, const dVector& inPara, i
 
 void KNNBaseInterpolator::normalizeBlendWeight( VecOfInterpWeight& weight )
 {
-	float weightSum = 0.f;
+	double weightSum = 0.f;
 	for (unsigned int i=0;i<weight.size();i++)
 	{
 		InterpWeight& w = weight[i];
@@ -212,7 +212,7 @@ void KNNBaseInterpolator::normalizeBlendWeight( VecOfInterpWeight& weight )
 	for (unsigned int i=0;i<weight.size();i++)
 	{
 		InterpWeight& w = weight[i];
-		w.second = w.second/weightSum;
+		w.second = (float)((double)w.second/weightSum);
 	}
 }
 
@@ -220,7 +220,7 @@ void KNNBaseInterpolator::mapDistWeightToBlendWeight( VecOfInterpExample& exampl
 {
 	std::map<int,float> finalWeight;
 
-	float weightSum = 0.f;
+	double weightSum = 0.f;
 	for (unsigned int i=0;i<inDistWeight.size();i++)
 	{
 		InterpWeight& tempW = inDistWeight[i];
@@ -293,7 +293,7 @@ void KNNInterpolator::predictInterpWeights( const dVector& para, VecOfInterpWeig
 	// map pseudo examples to final weight	
 // 	std::map<int,float> finalWeight;
 // 
-// 	float weightSum = 0.f;
+// 	double weightSum = 0.f;
 // 	for (unsigned int i=0;i<tempWeight.size();i++)
 // 	{
 // 		InterpWeight& tempW = tempWeight[i];

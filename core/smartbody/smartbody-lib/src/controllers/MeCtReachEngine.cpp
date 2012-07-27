@@ -469,10 +469,16 @@ DataInterpolator* MeCtReachEngine::createInterpolator(std::string interpolatorTy
 	}
 	else if (interpolatorType == "Inverse")
 	{
-		interpolator = new InverseInterpolation();
+		InverseInterpolation* ibinterpolator = new InverseInterpolation(); // Inverse Blending
+		interpolator = ibinterpolator;
 		resampleData = NULL;
 	}
-	//RBFInterpolator* interpolator = new RBFInterpolator();	 	
+	else if (interpolatorType == "RBF")
+	{
+		RBFInterpolator* rbfinterpolator = new RBFInterpolator();
+		interpolator = rbfinterpolator;
+		resampleData = NULL;
+	}
 	interpExampleData = interpolator->getInterpExamples();
 	return interpolator;
 }
