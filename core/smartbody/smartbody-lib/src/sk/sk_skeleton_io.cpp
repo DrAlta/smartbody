@@ -125,7 +125,7 @@ static bool read_channel ( SrInput& in, SkJoint* j )
 	SrString s = in.last_token();
 	in.unget_token();
 	if ( s=="axis" )
-	{ SrQuat q; in>>q; j->quat()->prerot(q);
+	{ SrQuat q; in>>q; //j->quat()->prerot(q);
 	in.get_token();
 	if ( in.last_token()=="frozen" )
 		j->quat()->deactivate();
@@ -714,11 +714,11 @@ static void outvlim ( SrOutput& out, const char* ctype, SkVecLimits* vl, int d )
 // syntax: channel Quat [axis <x> <y> <z> ang <degrees>] [frozen]
 static void outquat ( SrOutput& out, SkJointQuat* q )
 {
-	float w = q->value().w;
+	float w = q->rawValue().w;
 	if ( !q->active() && w==1.0f ) return;
 	out.outm ();
 	out << "channel Quat";
-	if ( w!=1.0 ) out << srspc << q->value();
+	if ( w!=1.0 ) out << srspc << q->rawValue();
 	if ( !q->active() ) out << " frozen";
 	out<<srnl;
 }
