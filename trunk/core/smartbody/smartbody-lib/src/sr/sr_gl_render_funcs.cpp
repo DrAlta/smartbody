@@ -244,78 +244,82 @@ void SrGlRenderFuncs::render_lines ( SrSnShapeBase* shape )
    if ( I.size()>1 ) { i=0; i1=I[i]; i2=I[i+1]; }
 
    while ( v<V.size() )
-    {
-      if ( v==i1 )
-       { if ( i2<0 ) // new color
-          { /*if ( 0 )//shape->render_mode()==srRenderModeSmooth )
-             { SrMaterial mtl = shape->material();
-               mtl.diffuse = C[-i2-1];
-               glMaterial ( mtl );
-             }
-            else*/
-             { glColor ( C[-i2-1] );
-             }
-          }
-         else // new polyline
-          { glBegin ( GL_LINE_STRIP );
-            while ( v<V.size() && v<=i2 ) glVertex(V[v++]);
-            glEnd ();
-          }
-         i+=2; // update next I information
-         if ( i<imax ) { i1=I[i]; i2=I[i+1]; } else i1=-1;
-       }
-      else
-       { glBegin ( GL_LINES );
-         while ( v<V.size() && v!=i1 ) glVertex(V[v++]); 
-         glEnd ();
-       }
-    }
- }
+   {
+	   if ( v==i1 )
+	   {if ( i2<0 ) // new color
+	   { /*if ( 0 )//shape->render_mode()==srRenderModeSmooth )
+		 { SrMaterial mtl = shape->material();
+		 mtl.diffuse = C[-i2-1];
+		 glMaterial ( mtl );
+		 }
+		 else*/
+		   { glColor ( C[-i2-1] );
+		   }
+	   }
+	   else // new polyline
+	   { glBegin ( GL_LINE_STRIP );
+	   while ( v<V.size() && v<=i2 ) glVertex(V[v++]);
+	   glEnd ();
+	   }
+	   i+=2; // update next I information
+	   if ( i<imax ) { i1=I[i]; i2=I[i+1]; } else i1=-1;
+	   }
+	   else
+	   { glBegin ( GL_LINES );
+	   while ( v<V.size() && v!=i1 ) glVertex(V[v++]); 
+	   glEnd ();
+	   }
+   }
+
+   glLineWidth(1.0f);
+}
 
 //============================= render_points ====================================
 
 void SrGlRenderFuncs::render_points ( SrSnShapeBase* shape )
- {
-   //SR_TRACE1 ( "Render points" );
+{
+	//SR_TRACE1 ( "Render points" );
 
-   SrPoints& p = ((SrSnPoints*)shape)->shape();
+	SrPoints& p = ((SrSnPoints*)shape)->shape();
 
-   SrArray<SrPoints::Atrib>* A = p.A;
-   SrArray<SrPnt>& P = p.P;
+	SrArray<SrPoints::Atrib>* A = p.A;
+	SrArray<SrPnt>& P = p.P;
 
-   if ( P.size()==0 ) return;
+	if ( P.size()==0 ) return;
 
-   glDisable ( GL_LIGHTING );
-   glColor ( shape->material().diffuse );
+	glDisable ( GL_LIGHTING );
+	glColor ( shape->material().diffuse );
 
-   if ( shape->render_mode()==srRenderModeSmooth )
-    { // render shperes, with resolution as radius?
-    }
+	if ( shape->render_mode()==srRenderModeSmooth )
+	{ // render shperes, with resolution as radius?
+	}
 
-   glPointSize ( shape->resolution() ); // default is 1.0
+	glPointSize ( shape->resolution() ); // default is 1.0
 
-   int i;
+	int i;
 
-   if ( A )
-    {
-      for ( i=0; i<P.size(); i++ )
-       { if ( i<A->size() )
-          { glPointSize ( A->get(i).s );
-            glColor ( A->get(i).c );
-          }
-       
-         glBegin ( GL_POINTS );
-         glVertex ( P[i] );
-         glEnd ();
-       }
-    }
-   else
-    {
-      glBegin ( GL_POINTS );
-      for ( i=0; i<P.size(); i++ ) glVertex ( P[i] );
-      glEnd ();
-    }
- }
+	if ( A )
+	{
+		for ( i=0; i<P.size(); i++ )
+		{ if ( i<A->size() )
+		{ glPointSize ( A->get(i).s );
+		glColor ( A->get(i).c );
+		}
+
+		glBegin ( GL_POINTS );
+		glVertex ( P[i] );
+		glEnd ();
+		}
+	}
+	else
+	{
+		glBegin ( GL_POINTS );
+		for ( i=0; i<P.size(); i++ ) glVertex ( P[i] );
+		glEnd ();
+	}
+
+	glPointSize(1.0f);
+}
 
 //=============================== render_box ====================================
 

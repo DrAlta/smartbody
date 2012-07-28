@@ -54,7 +54,8 @@ class SBAnimationBlend : public PABlend
 		// vecs within [1-plotTh, 1+plotTh] of local avg are plotted in light gray.
 		// sliding window size = slidWinHalfSize x 2 + 1.
 		// added by David Huang, June 2012 */
-		void createMotionVectorFlow(const std::string& motionName, const std::string& chrName, float plotThreshold=0.45f, unsigned int slidWinHalfSize=7);
+		void createMotionVectorFlow(const std::string& motionName, const std::string& chrName, float plotThreshold=0.45f,
+									unsigned int slidWinHalfSize=7, bool clearAll=false);
 		std::vector<SrSnLines*>& getVectorFlowSrSnLines() { return vecflowLinesArray; }
 		void clearMotionVectorFlow(void);
 
@@ -64,7 +65,7 @@ class SBAnimationBlend : public PABlend
 						bool clearAll, bool useRandomColor);
 		void plotMotionFrameTime(const std::string& motionName, const std::string& chrName, float time, bool useRandomColor);
 		void plotMotionJointTrajectory(const std::string& motionName, const std::string& chrName, const std::string& jointName,
-										float start_t, float end_t, bool useRandomColor);
+										float start_t=0.0f, float end_t=0.0f, bool useRandomColor=false);
 		std::vector<SrSnLines*>& getPlotMotionSrSnLines() { return plotMotionLinesArray; }
 		void clearPlotMotion(void);
 
