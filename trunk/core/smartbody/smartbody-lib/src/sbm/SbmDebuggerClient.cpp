@@ -250,7 +250,7 @@ void SbmDebuggerClient::Update()
 					 float centerX = vhcl::ToFloat(split[i + 15]);
 					 float centerY = vhcl::ToFloat(split[i + 16]);
 					 float centerZ = vhcl::ToFloat(split[i + 17]);
-					 SmartBody::SBScene::getScene()->getDebuggerUtility()->updateCamera(posX, posY, posZ, centerX, centerY, centerZ, fovY, aspect, zNear, zFar);
+					 //SmartBody::SBScene::getScene()->getDebuggerUtility()->updateCamera(posX, posY, posZ, centerX, centerY, centerZ, fovY, aspect, zNear, zFar);
                   }
                }
 

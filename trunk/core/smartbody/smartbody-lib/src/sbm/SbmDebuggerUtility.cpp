@@ -140,7 +140,9 @@ void SbmDebuggerUtility::updateCharacter(const std::string& cName, const std::st
 		sbJoint->pos()->value(0, (float)posX);
 		sbJoint->pos()->value(1, (float)posY);
 		sbJoint->pos()->value(2, (float)posZ);
-		sbJoint->quat()->value(SrQuat((float)rotW, (float)rotX, (float)rotY, (float)rotZ));
+		SrQuat q = SrQuat((float)rotW, (float)rotX, (float)rotY, (float)rotZ);
+		SrQuat newq = sbJoint->getPrerotation().inverse()*q;
+		sbJoint->quat()->value(newq);
 	}
 }
 

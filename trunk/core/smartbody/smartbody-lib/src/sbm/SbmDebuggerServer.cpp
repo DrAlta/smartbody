@@ -165,7 +165,7 @@ void SbmDebuggerServer::Update()
                   float rotx = joint->getQuaternion().x;
                   float roty = joint->getQuaternion().y;
                   float rotz = joint->getQuaternion().z;
-                  float rotw = joint->getQuaternion().w;
+                  float rotw = joint->getQuaternion().w;				  
 
                   msg += vhcl::Format("  %s pos %.3f %.3f %.3f rot %.3f %.3f %.3f %.3f\n", joint->getName().c_str(), posx, posy, posz, rotx, roty, rotz, rotw);
                }
@@ -295,7 +295,7 @@ void SbmDebuggerServer::GenerateInitHierarchyMsg(SBJoint * root, string & msg, i
    float posx = root->offset().x;
    float posy = root->offset().y;
    float posz = root->offset().z;
-   const SrQuat & q = root->quat()->prerot();
+   const SrQuat & q = root->quat()->prerot();   
 
    msg += string().assign(tab, ' ');
    msg += vhcl::Format("{ %s pos %f %f %f prerot %f %f %f %f\n", name.c_str(), posx, posy, posz, q.x, q.y, q.z, q.w);
