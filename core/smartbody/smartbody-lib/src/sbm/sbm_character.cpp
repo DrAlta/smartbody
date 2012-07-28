@@ -3252,7 +3252,8 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 												MeCtReachEngine* re = mi->second;
 												if (re)
 												{
-													re->updateMotionExamples(getReachMotionDataSet(),"KNN");
+													//re->updateMotionExamples(getReachMotionDataSet(),"KNN");
+													re->updateMotionExamples(getReachMotionDataSet(),"Inverse");
 												}
 											}
 											return (CMD_SUCCESS);

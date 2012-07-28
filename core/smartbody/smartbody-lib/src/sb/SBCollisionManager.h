@@ -4,6 +4,7 @@
 #include <sb/SBService.h>
 #include <sb/SBSubject.h>
 #include <sbm/Physics/SbmColObject.h>
+#include <sk/sk_joint.h>
 
 namespace SmartBody {
 
@@ -15,6 +16,7 @@ class SBCollisionManager : public SBService
 
 		virtual void setEnable(bool enable);
 		virtual void start();
+		virtual bool getJointCollisionMode() { return _singleChrCapsuleMode; }
 		virtual void beforeUpdate(double time);
 		virtual void update(double time);
 		virtual void afterUpdate(double time);
@@ -29,13 +31,18 @@ class SBCollisionManager : public SBService
 		bool           removeCollisionObject(const std::string& geomName);
 		bool           addObjectToCollisionSpace(const std::string& geomName);
 		bool           removeObjectFromCollisionSpace(const std::string& geomName);
+
 	protected:
 		SbmCollisionSpace* collisionSpace;
 		float _characterRadius;
 		int _maxIterations;
 		std::map<std::string, SrVec> _velocities;
 		std::map<std::string, SrVec> _positions;
-		std::map<std::string, SbmGeomObject*> geomObjectMap;		
+		std::map<std::string, SbmGeomObject*> geomObjectMap;
+
+		bool _singleChrCapsuleMode;
+		float _jointBVLenRadRatio;
+		bool isJointExcluded(SkJoint* j, const std::vector<SkJoint*>& jnt_excld_list);
 };
 
 

@@ -70,6 +70,7 @@
 # include <sb/SBSteerManager.h>
 # include <sb/SBSteerAgent.h>
 # include <sb/SBAnimationStateManager.h>
+# include <sb/SBCollisionManager.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -3090,16 +3091,50 @@ void FltkViewer::drawEyeLids()
 
 void FltkViewer::drawCharacterBoundingVolumes()
 {
+	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
+	if(!colManager->isEnable())
+		return;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	bool singleChrCapsuleMode = colManager->getJointCollisionMode();
+
 	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
 		iter != mcu.getCharacterMap().end();
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		if (character && character->getGeomObject())
+		if(singleChrCapsuleMode)
 		{
-			SrMat gmat = character->getGeomObject()->getGlobalTransform().gmat();
-			this->drawColObject(character->getGeomObject(), gmat);
+			if (character && character->getGeomObject())
+			{
+				SrMat gmat = character->getGeomObject()->getGlobalTransform().gmat();
+				this->drawColObject(character->getGeomObject(), gmat);
+			}
+		}
+		else
+		{
+			if(character)
+			{
+				SkSkeleton* sk = character->getSkeleton();
+				const std::vector<SkJoint*>& origJnts = sk->joints();
+				sk->update_global_matrices();
+				for(unsigned int i=1; i<origJnts.size(); i++) // skip world_offset
+				{
+					SkJoint* j = origJnts[i];
+					for(int k=0; k<j->num_children(); k++)
+					{
+						SkJoint* j_ch = j->child(k);
+						const SrVec& offset = j_ch->offset();
+						float offset_len = offset.norm();
+						if(offset_len < 5.0f) continue;
+						std::string colObjName = character->getGeomObjectName() + ":" + j->name();
+						if(k>0) colObjName = colObjName + ":" + boost::lexical_cast<std::string>(k);
+						SbmGeomObject* geomObj = colManager->getCollisionObject(colObjName);
+						if(!geomObj) continue;
+						const SrMat& gmat = j->gmat();
+						this->drawColObject(geomObj, (SrMat&)gmat);
+					}
+				}
+			}
 		}
 	}
 }
