@@ -1,5 +1,7 @@
 #include "SBAnimationState.h"
 #include <sb/SBMotion.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBSkeleton.h>
 #include <sbm/mcontrol_util.h>
 
 #include <sr/sr.h>
@@ -426,7 +428,7 @@ void SBAnimationBlend::buildVisSurfaces( const std::string& errorType, const std
 
 // Motion Vector Flow visualization, added by David Huang  June 2012
 void SBAnimationBlend::createMotionVectorFlow(const std::string& motionName, const std::string& chrName,
-											   float plotThreshold, unsigned int slidWinHalfSize)
+											   float plotThreshold, unsigned int slidWinHalfSize, bool clearAll)
 {
 	SkMotion* mo = SBAnimationBlend::getSkMotion(motionName);
 	if(mo==0) return;
@@ -439,18 +441,14 @@ void SBAnimationBlend::createMotionVectorFlow(const std::string& motionName, con
 	if(sk==0)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
-		std::map<std::string, SbmCharacter*>& characterMap = mcu.getCharacterMap();
-
-		SbmCharacter* sbsk = NULL;
-		if(characterMap.find(chrName) != characterMap.end())
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		SBCharacter* sbSk = scene->getCharacter(chrName);
+		if(sbSk)
 		{
-			sbsk = characterMap[chrName];
-			std::string sbname = sbsk->statePrefix; // get skelelton name. FIXME: better way ???
-			
-			if(skeletonMap.find(sbname) != skeletonMap.end())
-				sk = skeletonMap[sbname];
+			std::string sbName = sbSk->getSkeleton()->getName();
+			if(skeletonMap.find(sbName) != skeletonMap.end())
+				sk = skeletonMap[sbName];
 		}
 		if(sk)
 		{
@@ -466,7 +464,8 @@ void SBAnimationBlend::createMotionVectorFlow(const std::string& motionName, con
 
 	SR_CLIP(plotThreshold, 0.0f, 1.0f);
 
-	clearMotionVectorFlow(); // clear vector flow SrSnLines
+	if(clearAll)
+		clearMotionVectorFlow(); // clear vector flow SrSnLines
 
 	const std::vector<SkJoint*>& jnts = sk->joints();
 	createJointExclusionArray(jnts); // making a list of excluded joints
@@ -591,18 +590,14 @@ void SBAnimationBlend::plotMotion(const std::string& motionName, const std::stri
 	if(sk==0)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
-		std::map<std::string, SbmCharacter*>& characterMap = mcu.getCharacterMap();
-
-		SbmCharacter* sbsk = NULL;
-		if(characterMap.find(chrName) != characterMap.end())
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		SBCharacter* sbSk = scene->getCharacter(chrName);
+		if(sbSk)
 		{
-			sbsk = characterMap[chrName];
-			std::string sbname = sbsk->statePrefix; // get skelelton name. FIXME: better way ???
-			
-			if(skeletonMap.find(sbname) != skeletonMap.end())
-				sk = skeletonMap[sbname];
+			std::string sbName = sbSk->getSkeleton()->getName();
+			if(skeletonMap.find(sbName) != skeletonMap.end())
+				sk = skeletonMap[sbName];
 		}
 		if(sk)
 		{
@@ -676,18 +671,14 @@ void SBAnimationBlend::plotMotionFrameTime(const std::string& motionName, const 
 	if(sk==0)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
-		std::map<std::string, SbmCharacter*>& characterMap = mcu.getCharacterMap();
-
-		SbmCharacter* sbsk = NULL;
-		if(characterMap.find(chrName) != characterMap.end())
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		SBCharacter* sbSk = scene->getCharacter(chrName);
+		if(sbSk)
 		{
-			sbsk = characterMap[chrName];
-			std::string sbname = sbsk->statePrefix; // get skelelton name. FIXME: better way ???
-			
-			if(skeletonMap.find(sbname) != skeletonMap.end())
-				sk = skeletonMap[sbname];
+			std::string sbName = sbSk->getSkeleton()->getName();
+			if(skeletonMap.find(sbName) != skeletonMap.end())
+				sk = skeletonMap[sbName];
 		}
 		if(sk)
 		{
@@ -748,18 +739,14 @@ void SBAnimationBlend::plotMotionJointTrajectory(const std::string& motionName, 
 	if(sk==0)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
-		std::map<std::string, SbmCharacter*>& characterMap = mcu.getCharacterMap();
-
-		SbmCharacter* sbsk = NULL;
-		if(characterMap.find(chrName) != characterMap.end())
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		SBCharacter* sbSk = scene->getCharacter(chrName);
+		if(sbSk)
 		{
-			sbsk = characterMap[chrName];
-			std::string sbname = sbsk->statePrefix; // get skelelton name. FIXME: better way ???
-			
-			if(skeletonMap.find(sbname) != skeletonMap.end())
-				sk = skeletonMap[sbname];
+			std::string sbName = sbSk->getSkeleton()->getName();
+			if(skeletonMap.find(sbName) != skeletonMap.end())
+				sk = skeletonMap[sbName];
 		}
 		if(sk)
 		{
@@ -781,6 +768,7 @@ void SBAnimationBlend::plotMotionJointTrajectory(const std::string& motionName, 
 	
 	unsigned int frames = mo->frames();
 	const float mo_dur = mo->duration();
+	if(end_t <= 0.0f) end_t = mo_dur;
 	SR_CLIP(start_t, 0.0f, mo_dur);
 	SR_CLIP(end_t, 0.0f, mo_dur);
 	const SrColor color_begin = SrColor::blue;

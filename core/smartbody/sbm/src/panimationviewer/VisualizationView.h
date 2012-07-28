@@ -33,46 +33,52 @@
 #include <sr/sr_camera.h>
 #include <sr/sr_event.h>
 #include "PanimationWindow.h"
+#include <sb/SBAnimationState.h>
 
 class ErrorVisualization;
 class VisualizationView : public Fl_Group
 {
-	public:
-		VisualizationView(int x, int y, int w, int h, PanimationWindow* window);
-		~VisualizationView();
-	public:
-		Fl_Output*				currentCycleState;
-		Fl_Choice*              visShapeChoice;
-		Fl_Choice*              currentViz;
-		Fl_Button*              buildVizButton;
+public:
+	VisualizationView(int x, int y, int w, int h, PanimationWindow* window);
+	~VisualizationView();
+public:
+	Fl_Output*				currentCycleState;
+	Fl_Choice*              visShapeChoice;
+	Fl_Choice*              currentViz;
+	Fl_Button*              buildVizButton;
 
-		Fl_Button*              plotMotionButton;
-		Fl_Button*              plotJointTrajButton;
-		Fl_Button*              clearMotionButton;
-		Fl_Button*              plotVectorFlowButton;
-		Fl_Button*              clearVectorFlowButton;
+	Fl_Button*              plotMotionButton;
+	Fl_Input*				plotJointTrajInput;
+	Fl_Button*              plotJointTrajButton;
+	Fl_Check_Button*		plotRandomColorCheckbox;
+	Fl_Button*              clearMotionButton;
+	Fl_Button*              plotVectorFlowButton;
+	Fl_Button*              clearVectorFlowButton;
 
-		std::string				prevCycleState;
-		PanimationWindow*		paWindow;
-		Fl_Group*				parameterGroup;		
-		ErrorVisualization*     errorViz;
-	public:		
-		void update();		
-		void buildVisualization();
-		static void buildViz(Fl_Widget* widget, void* data);
-		static void updateVizType(Fl_Widget* widget, void* data);
+	std::string				prevCycleState;
+	PanimationWindow*		paWindow;
+	Fl_Group*				parameterGroup;		
+	ErrorVisualization*     errorViz;
 
-		void plotMotion();
-		static void plotMotion(Fl_Widget* widget, void* data);
-		void plotJointTraj();
-		static void plotJointTraj(Fl_Widget* widget, void* data);
-		void clearMotion();
-		static void clearMotion(Fl_Widget* widget, void* data);
-		
-		void plotVectorFlow();
-		static void plotVectorFlow(Fl_Widget* widget, void* data);
-		void clearVectorFlow();
-		static void clearVectorFlow(Fl_Widget* widget, void* data);
+public:
+	SmartBody::SBAnimationBlend* getCurrentBlend(void);
+
+	void update();		
+	void buildVisualization();
+	static void buildViz(Fl_Widget* widget, void* data);
+	static void updateVizType(Fl_Widget* widget, void* data);
+
+	void plotMotion(bool randomColor);
+	static void plotMotion(Fl_Widget* widget, void* data);
+	void plotJointTraj(const std::string& jntName, bool randomColor);
+	static void plotJointTraj(Fl_Widget* widget, void* data);
+	void clearMotion();
+	static void clearMotion(Fl_Widget* widget, void* data);
+
+	void plotVectorFlow();
+	static void plotVectorFlow(Fl_Widget* widget, void* data);
+	void clearVectorFlow();
+	static void clearVectorFlow(Fl_Widget* widget, void* data);
 
 };
 #endif

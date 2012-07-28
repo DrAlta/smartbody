@@ -22,13 +22,15 @@
 
 #include "VisualizationView.h"
 #include <sb/SBCharacter.h>
-#include <sb/SBAnimationState.h>
+
 #include <FL/gl.h>
 #include <GL/glu.h>
 #include <FL/fl_draw.H>
 #include <sbm/mcontrol_util.h>
 #include "ErrorVisualization.h"
-#include <sb/SBMotionBlendBase.h>
+
+#include <FL/Fl_Input.H>
+
 
 VisualizationView::VisualizationView(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h)
 {
@@ -52,19 +54,24 @@ VisualizationView::VisualizationView(int x, int y, int w, int h, PanimationWindo
 	buildVizButton->callback(buildViz,this);
 
 
-	plotMotionButton = new Fl_Button(2 * xDis + 50 + x, yDis*9 + y , 100, 2 * yDis, "Plot Motion");
+	plotMotionButton = new Fl_Button(2 * xDis + 50 + x, yDis*10 + y , 100, 2 * yDis, "Plot Motion");
 	plotMotionButton->callback(plotMotion,this);
 
-	plotJointTrajButton = new Fl_Button(2 * xDis + 150 + x, yDis*9 + y , 100, 2 * yDis, "Plot Joint Traj");
+	plotJointTrajButton = new Fl_Button(2 * xDis + 150 + x, yDis*10 + y , 100, 2 * yDis, "Plot Joint Traj");
 	plotJointTrajButton->callback(plotJointTraj,this);
+	plotJointTrajInput = new Fl_Input(2 * xDis + 150 + x, yDis*12 + y , 100, 2 * yDis, "Plot Joint Name:");
+	plotJointTrajInput->value("base");
+	plotRandomColorCheckbox = new Fl_Check_Button(2 * xDis + 250 + x, yDis*12 + y , 100, 2 * yDis, "use random color");
+	plotRandomColorCheckbox->value(true);
 
-	clearMotionButton = new Fl_Button(2 * xDis + 250 + x, yDis*9 + y , 100, 2 * yDis, "Clear Motion");
+	clearMotionButton = new Fl_Button(2 * xDis + 250 + x, yDis*10 + y , 100, 2 * yDis, "Clear Motion");
 	clearMotionButton->callback(clearMotion,this);
 
-	plotVectorFlowButton = new Fl_Button(2 * xDis + 350 + x, yDis*9 + y , 100, 2 * yDis, "Plot VectorFlow");
+
+	plotVectorFlowButton = new Fl_Button(2 * xDis + 350 + x, yDis*10 + y , 100, 2 * yDis, "Plot VectorFlow");
 	plotVectorFlowButton->callback(plotVectorFlow,this);
 
-	clearVectorFlowButton = new Fl_Button(2 * xDis + 450 + x, yDis*9 + y , 100, 2 * yDis, "Clear VectorFlow");
+	clearVectorFlowButton = new Fl_Button(2 * xDis + 450 + x, yDis*10 + y , 100, 2 * yDis, "Clear VectorFlow");
 	clearVectorFlowButton->callback(clearVectorFlow,this);
 
 
@@ -142,7 +149,7 @@ void VisualizationView::updateVizType( Fl_Widget* widget, void* data )
 	vizView->errorViz->setDrawType(drawType);
 }
 
-void VisualizationView::plotMotion()
+void VisualizationView::plotMotion(bool randomColor)
 {
 	SmartBody::SBCharacter* sbChar = paWindow->getCurrentCharacter();
 	if (!sbChar) return;
@@ -156,27 +163,54 @@ void VisualizationView::plotMotion()
 	{
 		std::string moName = curBlend->getMotion(i);
 		//SkMotion* mo = getSkMotion(moName);
-		curBlend->plotMotion(moName, sbChar->getName(), 20, true, false);
+		bool randomColor = plotRandomColorCheckbox->value();
+		curBlend->plotMotion(moName, sbChar->getName(), 10, false, randomColor);
 	}
 }
 void VisualizationView::plotMotion(Fl_Widget* widget, void* data)
 {
 	VisualizationView* vizView = (VisualizationView*)(data);
-	vizView->plotMotion();
+	bool randomColor = vizView->plotRandomColorCheckbox->value();
+	vizView->plotMotion(randomColor);
 }
 
+void VisualizationView::plotJointTraj(const std::string& jntName, bool randomColor)
+{
+	SmartBody::SBCharacter* sbChar = paWindow->getCurrentCharacter();
+	if (!sbChar) return;
+	SmartBody::SBAnimationBlend* curBlend = getCurrentBlend();
+	if (!curBlend) return;
+
+	for(int i=0; i<curBlend->getNumMotions(); i++)
+	{
+		std::string moName = curBlend->getMotion(i);
+		curBlend->plotMotionJointTrajectory(moName, sbChar->getName(), jntName, 0.0f, 0.0f, randomColor);
+	}
+}
 void VisualizationView::plotJointTraj(Fl_Widget* widget, void* data)
 {
+	VisualizationView* vizView = (VisualizationView*)(data);
+	const std::string jntName(vizView->plotJointTrajInput->value());
+	bool randomColor = vizView->plotRandomColorCheckbox->value();
+	vizView->plotJointTraj(jntName, randomColor);
+}
+
+SmartBody::SBAnimationBlend* VisualizationView::getCurrentBlend(void)
+{
+	SmartBody::SBCharacter* sbChar = paWindow->getCurrentCharacter();
+	if (!sbChar) return 0;
+	if (!sbChar->param_animation_ct) return 0;
+	PABlendData* blendData = sbChar->param_animation_ct->getCurrentPABlendData();
+	if (!blendData) return 0;
+	SmartBody::SBAnimationBlend* curBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData->state);
+	return curBlend;
 }
 
 void VisualizationView::clearMotion()
 {
 	SmartBody::SBCharacter* sbChar = paWindow->getCurrentCharacter();
 	if (!sbChar) return;
-	if (!sbChar->param_animation_ct) return;
-	PABlendData* blendData = sbChar->param_animation_ct->getCurrentPABlendData();
-	if (!blendData) return;
-	SmartBody::SBAnimationBlend* curBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData->state);
+	SmartBody::SBAnimationBlend* curBlend = getCurrentBlend();
 	if (!curBlend) return;
 
 	curBlend->clearPlotMotion();
@@ -191,16 +225,13 @@ void VisualizationView::plotVectorFlow()
 {
 	SmartBody::SBCharacter* sbChar = paWindow->getCurrentCharacter();
 	if (!sbChar) return;
-	if (!sbChar->param_animation_ct) return;
-	PABlendData* blendData = sbChar->param_animation_ct->getCurrentPABlendData();
-	if (!blendData) return;
-	SmartBody::SBAnimationBlend* curBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData->state);
+	SmartBody::SBAnimationBlend* curBlend = getCurrentBlend();
 	if (!curBlend) return;
 
 	for(int i=0; i<curBlend->getNumMotions(); i++)
 	{
 		std::string moName = curBlend->getMotion(i);
-		curBlend->createMotionVectorFlow(moName, sbChar->getName(), 0.45f, 7);
+		curBlend->createMotionVectorFlow(moName, sbChar->getName());
 	}
 }
 void VisualizationView::plotVectorFlow(Fl_Widget* widget, void* data)
@@ -213,10 +244,7 @@ void VisualizationView::clearVectorFlow()
 {
 	SmartBody::SBCharacter* sbChar = paWindow->getCurrentCharacter();
 	if (!sbChar) return;
-	if (!sbChar->param_animation_ct) return;
-	PABlendData* blendData = sbChar->param_animation_ct->getCurrentPABlendData();
-	if (!blendData) return;
-	SmartBody::SBAnimationBlend* curBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData->state);
+	SmartBody::SBAnimationBlend* curBlend = getCurrentBlend();
 	if (!curBlend) return;
 
 	curBlend->clearMotionVectorFlow();
