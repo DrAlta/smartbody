@@ -29,7 +29,6 @@
 #include <sbm/mcontrol_util.h>
 #include "ErrorVisualization.h"
 
-#include <FL/Fl_Input.H>
 
 
 VisualizationView::VisualizationView(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h)
@@ -57,11 +56,14 @@ VisualizationView::VisualizationView(int x, int y, int w, int h, PanimationWindo
 	plotMotionButton = new Fl_Button(2 * xDis + 50 + x, yDis*10 + y , 100, 2 * yDis, "Plot Motion");
 	plotMotionButton->callback(plotMotion,this);
 
+
 	plotJointTrajButton = new Fl_Button(2 * xDis + 150 + x, yDis*10 + y , 100, 2 * yDis, "Plot Joint Traj");
 	plotJointTrajButton->callback(plotJointTraj,this);
-	plotJointTrajInput = new Fl_Input(2 * xDis + 150 + x, yDis*12 + y , 100, 2 * yDis, "Plot Joint Name:");
-	plotJointTrajInput->value("base");
-	plotRandomColorCheckbox = new Fl_Check_Button(2 * xDis + 250 + x, yDis*12 + y , 100, 2 * yDis, "use random color");
+	plotJointChoice = new Fl_Choice(2 * xDis + 150 + x, yDis*12 + y , 100, 2 * yDis, "select joint:");
+	plotJointButton = new Fl_Button(2 * xDis + 250 + x, yDis*12 + y , 100, 2 * yDis, "refresh list");
+	plotJointButton->callback(refreshJointList, this);
+
+	plotRandomColorCheckbox = new Fl_Check_Button(2 * xDis + 350 + x, yDis*12 + y , 100, 2 * yDis, "use random color");
 	plotRandomColorCheckbox->value(true);
 
 	clearMotionButton = new Fl_Button(2 * xDis + 250 + x, yDis*10 + y , 100, 2 * yDis, "Clear Motion");
@@ -159,6 +161,8 @@ void VisualizationView::plotMotion(bool randomColor)
 	SmartBody::SBAnimationBlend* curBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData->state);
 	if (!curBlend) return;
 
+	curBlend->setChrPlotTransform(sbChar->getName());
+
 	for(int i=0; i<curBlend->getNumMotions(); i++)
 	{
 		std::string moName = curBlend->getMotion(i);
@@ -181,6 +185,8 @@ void VisualizationView::plotJointTraj(const std::string& jntName, bool randomCol
 	SmartBody::SBAnimationBlend* curBlend = getCurrentBlend();
 	if (!curBlend) return;
 
+	curBlend->setChrPlotTransform(sbChar->getName());
+
 	for(int i=0; i<curBlend->getNumMotions(); i++)
 	{
 		std::string moName = curBlend->getMotion(i);
@@ -190,9 +196,27 @@ void VisualizationView::plotJointTraj(const std::string& jntName, bool randomCol
 void VisualizationView::plotJointTraj(Fl_Widget* widget, void* data)
 {
 	VisualizationView* vizView = (VisualizationView*)(data);
-	const std::string jntName(vizView->plotJointTrajInput->value());
+	std::string jntName = vizView->plotJointChoice->text(vizView->plotJointChoice->value());
 	bool randomColor = vizView->plotRandomColorCheckbox->value();
 	vizView->plotJointTraj(jntName, randomColor);
+}
+
+void VisualizationView::refreshJointList()
+{
+	plotJointChoice->clear();
+
+	SmartBody::SBCharacter* sbChar = paWindow->getCurrentCharacter();
+	if (!sbChar) return;
+	SkSkeleton* sk = sbChar->getSkeleton();
+	if (!sk) return;
+	const std::vector<SkJoint*>& jnts = sk->joints();
+	for(int i=0; i<jnts.size(); i++)
+		plotJointChoice->add(jnts[i]->name().c_str());
+}
+void VisualizationView::refreshJointList(Fl_Widget* widget, void* data)
+{
+	VisualizationView* vizView = (VisualizationView*)(data);
+	vizView->refreshJointList();
 }
 
 SmartBody::SBAnimationBlend* VisualizationView::getCurrentBlend(void)
@@ -214,6 +238,7 @@ void VisualizationView::clearMotion()
 	if (!curBlend) return;
 
 	curBlend->clearPlotMotion();
+	curBlend->clearPlotTransform();
 }
 void VisualizationView::clearMotion(Fl_Widget* widget, void* data)
 {
@@ -227,6 +252,8 @@ void VisualizationView::plotVectorFlow()
 	if (!sbChar) return;
 	SmartBody::SBAnimationBlend* curBlend = getCurrentBlend();
 	if (!curBlend) return;
+
+	curBlend->setChrPlotTransform(sbChar->getName());
 
 	for(int i=0; i<curBlend->getNumMotions(); i++)
 	{
@@ -248,6 +275,7 @@ void VisualizationView::clearVectorFlow()
 	if (!curBlend) return;
 
 	curBlend->clearMotionVectorFlow();
+	curBlend->clearPlotTransform();
 }
 void VisualizationView::clearVectorFlow(Fl_Widget* widget, void* data)
 {

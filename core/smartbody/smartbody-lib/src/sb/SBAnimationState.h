@@ -61,13 +61,18 @@ class SBAnimationBlend : public PABlend
 
 		/* plot motion frames (stick figures) and joint trajectory
 		// added by David Huang, June 2012 */
-		void plotMotion(const std::string& motionName, const std::string& chrName, unsigned int interval,
-						bool clearAll, bool useRandomColor);
+		void plotMotion(const std::string& motionName, const std::string& chrName, unsigned int interval=10,
+						bool clearAll=false, bool useRandomColor=true);
 		void plotMotionFrameTime(const std::string& motionName, const std::string& chrName, float time, bool useRandomColor);
 		void plotMotionJointTrajectory(const std::string& motionName, const std::string& chrName, const std::string& jointName,
 										float start_t=0.0f, float end_t=0.0f, bool useRandomColor=false);
 		std::vector<SrSnLines*>& getPlotMotionSrSnLines() { return plotMotionLinesArray; }
 		void clearPlotMotion(void);
+
+		void setChrPlotTransform(const std::string& chrName);
+		void setPlotTransform(SrVec offset=SrVec::null, float yRot=0.0f);
+		const SrMat& getPlotTransform() { return plotTransform; }
+		void clearPlotTransform() { plotTransform.identity(); }
 
 	protected:
 		bool addSkMotion(const std::string& motionName);
@@ -86,6 +91,7 @@ class SBAnimationBlend : public PABlend
 		std::vector<SrSnColorSurf*> errorSurfaces;
 		std::vector<SrSnColorSurf*> smoothSurfaces;
 
+		SrMat plotTransform;
 		std::vector<SrSnLines*> vecflowLinesArray;
 		// put a list of joint global positions into array
 		void getJointsGPosFromSkel(SkSkeleton* sk, SrArray<SrVec>& pnts_array, const std::vector<SkJoint*>& jnt_list);
