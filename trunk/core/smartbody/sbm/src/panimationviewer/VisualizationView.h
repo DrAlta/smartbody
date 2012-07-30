@@ -48,7 +48,8 @@ public:
 	Fl_Button*              buildVizButton;
 
 	Fl_Button*              plotMotionButton;
-	Fl_Input*				plotJointTrajInput;
+	Fl_Choice*				plotJointChoice; // joint list
+	Fl_Button*				plotJointButton; // refresh button
 	Fl_Button*              plotJointTrajButton;
 	Fl_Check_Button*		plotRandomColorCheckbox;
 	Fl_Button*              clearMotionButton;
@@ -72,6 +73,8 @@ public:
 	static void plotMotion(Fl_Widget* widget, void* data);
 	void plotJointTraj(const std::string& jntName, bool randomColor);
 	static void plotJointTraj(Fl_Widget* widget, void* data);
+	void refreshJointList();
+	static void refreshJointList(Fl_Widget* widget, void* data);
 	void clearMotion();
 	static void clearMotion(Fl_Widget* widget, void* data);
 

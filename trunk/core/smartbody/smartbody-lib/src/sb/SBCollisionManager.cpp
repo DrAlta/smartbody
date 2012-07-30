@@ -126,6 +126,7 @@ void SBCollisionManager::start()
 					if(jname.search("ring")>=0)   { jnt_excld_list.push_back(j); continue; }
 				}
 				std::string chrName = character->getGeomObjectName();
+				float chrHeight = character->getHeight();
 				for(unsigned int i=0; i<origJnts.size(); i++)
 				{
 					SkJoint* j = origJnts[i];
@@ -138,7 +139,7 @@ void SBCollisionManager::start()
 						const SrVec& offset = j_ch->offset();
 						float offset_len = offset.norm();
 						float radius = offset_len / jointBVLenRadRatio;
-						if(offset_len < 5.0f) continue;
+						if(offset_len < 0.03*chrHeight) continue; // skip short bones
 						std::string colObjName = chrName + ":" + j->name();
 						if(k>0) colObjName = colObjName + ":" + boost::lexical_cast<std::string>(k);
 						SbmGeomObject* obj = createCollisionObject(colObjName,"capsule",SrVec(0, radius, 0),SrVec::null,offset);

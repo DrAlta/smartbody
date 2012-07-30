@@ -3115,6 +3115,7 @@ void FltkViewer::drawCharacterBoundingVolumes()
 			if(character)
 			{
 				SkSkeleton* sk = character->getSkeleton();
+				float chrHeight = character->getHeight();
 				const std::vector<SkJoint*>& origJnts = sk->joints();
 				sk->update_global_matrices();
 				for(unsigned int i=1; i<origJnts.size(); i++) // skip world_offset
@@ -3125,7 +3126,7 @@ void FltkViewer::drawCharacterBoundingVolumes()
 						SkJoint* j_ch = j->child(k);
 						const SrVec& offset = j_ch->offset();
 						float offset_len = offset.norm();
-						if(offset_len < 5.0f) continue;
+						if(offset_len < 0.03*chrHeight) continue; // skip short bones
 						std::string colObjName = character->getGeomObjectName() + ":" + j->name();
 						if(k>0) colObjName = colObjName + ":" + boost::lexical_cast<std::string>(k);
 						SbmGeomObject* geomObj = colManager->getCollisionObject(colObjName);
@@ -4582,9 +4583,14 @@ void FltkViewer::drawSteeringInfo()
 // draw motion vector flow
 void FltkViewer::drawMotionVectorFlow()
 {
+
 	SmartBody::SBAnimationBlend* animBlend = getCurrentCharacterAnimationBlend();
 	if (!animBlend)
 		return;
+
+	glPushMatrix();
+	SrMat mat = animBlend->getPlotTransform();
+	glMultMatrixf((const float*) mat);
 
 	std::vector<SrSnLines*>& vecflow_lines = animBlend->getVectorFlowSrSnLines();
 	for(unsigned int i=0; i<vecflow_lines.size(); i++)
@@ -4592,7 +4598,9 @@ void FltkViewer::drawMotionVectorFlow()
 		SrSnShapeBase* sp = dynamic_cast<SrSnShapeBase*>(vecflow_lines[i]);
 		SrGlRenderFuncs::render_lines(sp);
 	}
+	glPopMatrix();
 }
+
 // plot motion frames
 void FltkViewer::drawPlotMotion()
 {
@@ -4600,12 +4608,17 @@ void FltkViewer::drawPlotMotion()
 	if (!animBlend)
 		return;
 
+	glPushMatrix();
+	SrMat mat = animBlend->getPlotTransform();
+	glMultMatrixf((const float*) mat);
+
 	std::vector<SrSnLines*>& plotmotion_lines = animBlend->getPlotMotionSrSnLines();
 	for(unsigned int i=0; i<plotmotion_lines.size(); i++)
 	{
 		SrSnShapeBase* sp = dynamic_cast<SrSnShapeBase*>(plotmotion_lines[i]);
 		SrGlRenderFuncs::render_lines(sp);
 	}
+	glPopMatrix();
 }
 
 

@@ -808,6 +808,27 @@ void SBAnimationBlend::clearPlotMotion(void)
 	plotMotionLinesArray.resize(0);
 }
 
+void SBAnimationBlend::setChrPlotTransform(const std::string& chrName)
+{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		SBCharacter* sbSk = scene->getCharacter(chrName);
+		if(sbSk)
+		{
+			SrVec hpr = sbSk->getHPR();
+			setPlotTransform(sbSk->getPosition(), SR_TORAD(hpr.x));
+		}
+}
+
+void SBAnimationBlend::setPlotTransform(SrVec offset, float yRot)
+{
+	SrQuat q(SrVec::j, yRot);
+	q.get_mat(plotTransform);
+	plotTransform.setl4(offset);
+}
+
+
 void SBAnimationBlend::getJointsGPosFromSkel(SkSkeleton* sk, SrArray<SrVec>& pnts_array,
 											  const std::vector<SkJoint*>& jnt_list)
 {
