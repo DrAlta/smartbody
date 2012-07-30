@@ -200,10 +200,10 @@ bool MeCtExampleBodyReach::updateLocomotion()
 	float dist = currentReachData->XZDistanceToTarget(distanceVec);	
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (currentReachEngine->getCurrentState()->curStateName() != "Idle" 
-		|| currentReachEngine->curHandActionState == MeCtReachEngine::POINT_AT_OBJECT || !useLocomotion)
+	if (currentReachEngine->curHandActionState == MeCtReachEngine::POINT_AT_OBJECT || !useLocomotion)
 	{
-		updateReachType(targetPos);
+		if (currentReachEngine->getCurrentState()->curStateName() == "Idle" && startReach)
+			updateReachType(targetPos);
 		return true;
 	}
 	else if (dist > character->getHeight()*0.35f && !isMoving && startReach && mcu._scene->getSteerManager()->getEngineDriver()->isInitialized() )//currentReachData->startReach) 
