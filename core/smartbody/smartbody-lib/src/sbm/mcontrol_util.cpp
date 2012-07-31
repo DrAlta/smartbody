@@ -1535,7 +1535,7 @@ void mcuCBHandle::set_process_id( const char * process_id )
 int mcuCBHandle::vhmsg_send( const char *op, const char* message ) {
 #if LINK_VHMSG_CLIENT
 	//std::cout<<"Sending :" << cmdName << ' ' << cmdArgs <<std::endl;
-	LOG("vhmsg_send, op = %s, message = %s",op,message);
+	//LOG("vhmsg_send, op = %s, message = %s",op,message);
 
 	if( vhmsg_enabled ) {
 		int err = vhmsg::ttu_notify2( op, message );

@@ -519,17 +519,17 @@ void SteeringAgent::sendLocomotionEvent(const std::string& status)
 
 void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, float yaw)
 {
-	PABlendData* curStateData = character->param_animation_ct->getCurrentPABlendData();
-	if (!curStateData)
-		return;
-	const std::string& curStateName = curStateData->state->stateName;
+	PABlendData* curStateData = character->param_animation_ct->getCurrentPABlendData();	
+	std::string curStateName = "";
+	if (curStateData)
+		curStateName = curStateData->state->stateName;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
 	
 	bool locomotionEnd = false;
 	static int counter = 0;		
 	
-	if (steerPath.pathLength() == 0) // do nothing if there is no steer path
-		return; 
+	//if (steerPath.pathLength() == 0) // do nothing if there is no steer path
+	//	return; 
 
 	if (character->param_animation_ct->isIdle() && steerPath.pathLength() > 0)    // need to define when you want to start the locomotion
 	{
@@ -563,7 +563,7 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 		counter = 0;	
 	}
 
-	if (curStateName == locomotionName)
+	if (curStateName == locomotionName && steerPath.pathLength() != 0)
 	{
 		//locomotionEnd = true;
 		float curSpeed;
@@ -609,7 +609,10 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 		float distThreshold = 0.05f*sceneScale;
 		float speedThreshold = 0.05f*sceneScale;
 		if (distToTarget < distThreshold && newSpeed < speedThreshold)
+		{
 			locomotionEnd = true;
+			
+		}
 
 		float newTurningAngle = radToDeg(asin(cross(curSteerDir,ptDir).y));
 		normalizeAngle(newTurningAngle);
@@ -658,24 +661,21 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 	{
 		std::vector<double> weights;
 		character->param_animation_ct->schedule(NULL, weights);
-
-		// adjust facing angle 
-		if (fabs(facingAngle) <= 180)
-		{
-			float diff = facingAngle - yaw;
-			normalizeAngle(diff);
-			adjustFacingAngle(diff);
-		}
-
 		sendLocomotionEvent("success");
-
-		
-		//LOG("path following end");
-
 		character->trajectoryGoalList.clear();
 		agent->clearGoals();
 		goalList.clear();
-		steerPath.clearPath();		
+		steerPath.clearPath();			
+		//character->param_animation_ct->schedule(NULL, weights);		
+		//LOG("path following end");			
+	}
+	// adjust facing angle 			
+	if (fabs(facingAngle) <= 180 && character->param_animation_ct->isIdle())
+	{		
+		float diff = facingAngle - yaw;
+		//LOG("Idle state, facing angle = %f, diff = %f", facingAngle, diff);
+		normalizeAngle(diff);
+		adjustFacingAngle(diff);			
 	}
 }
 
@@ -1388,6 +1388,8 @@ void SteeringAgent::startLocomotion( float angleDiff )
 		std::stringstream command;
 		double w;
 		float maxRotAngle = 180;
+		
+		
 		if (angleDiff > 0)
 		{
 			if (angleDiff > 90)
@@ -1405,8 +1407,8 @@ void SteeringAgent::startLocomotion( float angleDiff )
 				command << " state " << startingLName << " loop false playnow false additive false joint null " << 1 - w << " " << w << " " << " 0 ";
 				mcu.execute((char*) command.str().c_str());
 			}
-		}
-		else
+		}		
+		else		
 		{
 			if (angleDiff < -90)
 			{
@@ -1424,6 +1426,7 @@ void SteeringAgent::startLocomotion( float angleDiff )
 				mcu.execute((char*) command.str().c_str());
 			}				
 		}
+		
 		PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
 		const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
 		float desiredSpeed = steeringCommand.targetSpeed;
@@ -1468,10 +1471,12 @@ void SteeringAgent::adjustFacingAngle( float angleDiff )
 			command << weights[i] << " ";
 		mcu.execute((char*) command.str().c_str());
 	}
+	/*
 	else
 	{
 		facingAngle = -200;
 	}
+	*/
 }
 
 float SteeringAgent::evaluateSteppingLoco(float dt, float x, float y, float z, float yaw)
