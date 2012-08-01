@@ -3974,11 +3974,11 @@ int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          string command = args.read_token();
 		 if (command == "delay")
 		 {
-			 mcu_p->delay_behaviors = true;
+			 SmartBody::SBScene::getScene()->setBoolAttribute("delaySpeechIfNeeded", true);
 		 }
 		 else if (command == "nodelay")
 		 {
-			 mcu_p->delay_behaviors = false;
+			SmartBody::SBScene::getScene()->setBoolAttribute("delaySpeechIfNeeded", false);
 		 }
 		 else
 		 {
@@ -3990,7 +3990,7 @@ int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p )
       }
 	  else
 	  {
-		  if (mcu_p->delay_behaviors)
+		  if (SmartBody::SBScene::getScene()->getBoolAttribute("delaySpeechIfNeeded"))
 		  {
 			 LOG("Behavior policy is 'delay'. Behaviors will be offset to a future time to make sure that all behaviors are executed in full.");
 		  }

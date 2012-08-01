@@ -238,7 +238,6 @@ class mcuCBHandle {
 		TimeIntervalProfiler	*external_profiler_p;
 		TimeIntervalProfiler	*profiler_p;
 
-		bool		delay_behaviors;
 		int			snapshot_counter;
 		bool		use_python;
 

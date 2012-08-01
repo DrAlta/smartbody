@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0"  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="viewer">
       <UniqueIdentifier>{1bd7e2de-8fb3-42cb-8fc5-7f04e3167f3a}</UniqueIdentifier>
@@ -36,6 +36,9 @@
     </Filter>
     <Filter Include="diphoneviewer">
       <UniqueIdentifier>{2b51ee1f-542b-4db5-8b62-afe631bec4b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="monitorviewer">
+      <UniqueIdentifier>{6f962f55-7281-489e-ad9b-4c381c001a85}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -196,7 +199,6 @@
     <ClCompile Include="..\src\panimationviewer\ParamAnimTransitionCreatorWidget.cpp">
       <Filter>panimationviewer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\monitorviewer\MonitorConnectWindow.cpp" />
     <ClCompile Include="..\src\retargetcreator\RetargetCreatorWindow.cpp">
       <Filter>retargetcreator</Filter>
     </ClCompile>
@@ -229,6 +231,9 @@
     </ClCompile>
     <ClCompile Include="..\src\retargetviewer\RetargetViewer.cpp">
       <Filter>retargetviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\monitorviewer\MonitorConnectWindow.cpp">
+      <Filter>monitorviewer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -387,7 +392,6 @@
     <ClInclude Include="..\src\panimationviewer\ParamAnimTransitionCreatorWidget.h">
       <Filter>panimationviewer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\monitorviewer\MonitorConnectWindow.h" />
     <ClInclude Include="..\src\retargetcreator\RetargetCreatorWindow.h">
       <Filter>retargetcreator</Filter>
     </ClInclude>
@@ -420,6 +424,9 @@
     </ClInclude>
     <ClInclude Include="..\src\retargetviewer\RetargetViewer.h">
       <Filter>retargetviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\monitorviewer\MonitorConnectWindow.h">
+      <Filter>monitorviewer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
