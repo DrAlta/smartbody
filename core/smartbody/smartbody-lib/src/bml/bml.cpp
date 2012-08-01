@@ -367,7 +367,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		// ...and offset everything to be positive (assumes times are only relative to each other, not wall time, etc.)
 		// ignore differences less than TIME_DELTA
 
-		if (mcu->delay_behaviors) // shift the behaviors if this option is sset
+		if (SmartBody::SBScene::getScene()->getBoolAttribute("delaySpeechIfNeeded")) // shift the behaviors if this option is set
 		{
 			if( min_time < now - TIME_DELTA ) {
 				time_sec offset = now - min_time;

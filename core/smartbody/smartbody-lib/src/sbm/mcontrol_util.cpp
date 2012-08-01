@@ -260,7 +260,6 @@ mcuCBHandle::mcuCBHandle()
 	resource_manager(SBResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
 	use_python( true ),
-	delay_behaviors(true),
 	media_path("."),
 	_interactive(true),
 	sendPawnUpdates(false),
@@ -347,7 +346,6 @@ void mcuCBHandle::reset( void )
 	resource_manager = SBResourceManager::getResourceManager();
 	snapshot_counter = 1;
 	use_python = true;
-	delay_behaviors = true;
 	media_path = ".";
 	_interactive = true;
 	sendPawnUpdates = false;
@@ -1268,7 +1266,7 @@ void mcuCBHandle::update( void )
 		pawn->afterUpdate(time);
 	}
 
-
+	
 	if (viewer_p && viewer_p->get_camera())
 	{
 		SrMat m;
@@ -1289,6 +1287,7 @@ void mcuCBHandle::update( void )
 		_scene->getDebuggerServer()->m_cameraZNear  = viewer_p->get_camera()->znear;
 		_scene->getDebuggerServer()->m_cameraZFar   = viewer_p->get_camera()->zfar;
 	}
+	
 	/*
 	else
 	{
