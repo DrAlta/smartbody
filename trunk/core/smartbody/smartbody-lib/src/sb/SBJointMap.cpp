@@ -379,7 +379,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		newBase = newBase->parent();		
 	}
 	
-	if (newBase && newBase != base)
+	if (newBase && newBase != base && base->name() != "base")
 	{
 		setJointMap("base",newBase, prtMap);
 		setJointMap("base1",base, prtMap);
@@ -1292,6 +1292,17 @@ void SBJointMap::setJointMap(const char* SB_jnt, SkJoint* j, bool prtMap)
 		LOG("WARNING! guessMap::setJointMap() joint not found! %s \n", SB_jnt);
 		return;
 	}
+	// do some safe check if this mapping is just making things worse :p
+	SkSkeleton* sk = j->skeleton();
+	if (sk && sk->search_joint(SB_jnt)) // the target name is already in the skeleton
+	{
+		if (j->name() != SB_jnt)
+		{
+			// why would you want to mangle the joint names if the target name already exists ?
+			return;
+		}
+	}
+
 
 	setMapping(j->name().c_str(), SB_jnt); // set the mapping here
 
