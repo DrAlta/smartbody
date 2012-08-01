@@ -210,7 +210,7 @@ void VisualizationView::refreshJointList()
 	SkSkeleton* sk = sbChar->getSkeleton();
 	if (!sk) return;
 	const std::vector<SkJoint*>& jnts = sk->joints();
-	for(int i=0; i<jnts.size(); i++)
+	for(size_t i=0; i<jnts.size(); i++)
 		plotJointChoice->add(jnts[i]->name().c_str());
 }
 void VisualizationView::refreshJointList(Fl_Widget* widget, void* data)
