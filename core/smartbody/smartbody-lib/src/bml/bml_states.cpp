@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <boost/algorithm/string.hpp> 
+#include <SB/SBAnimationState.h>
 
 #include "bml_states.hpp"
 #include "sbm/mcontrol_util.h"
@@ -112,12 +113,17 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 
 	// take time offset
 	double timeOffset = xml_parse_double(BMLDefs::ATTR_START, elem);
+	double stateStartOffset = xml_parse_double(BMLDefs::ATTR_OFFSET, elem);
+
+	SmartBody::SBAnimationBlend0D* ZeroDState = dynamic_cast<SmartBody::SBAnimationBlend0D*>(state);
+	if (!ZeroDState) // don't use state offset unless it is a 0-D state
+		stateStartOffset = 0.0;
 
 	// schedule a state
 	if (mode == "schedule")
 	{
 		if (state)
-			character->param_animation_ct->schedule(state, x, y, z, wrapMode, scheduleMode, blendMode, joint, timeOffset);
+			character->param_animation_ct->schedule(state, x, y, z, wrapMode, scheduleMode, blendMode, joint, timeOffset, stateStartOffset);
 		else
 			character->param_animation_ct->schedule(state, weights);
 	}

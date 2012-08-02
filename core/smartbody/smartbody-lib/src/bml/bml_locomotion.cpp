@@ -167,7 +167,12 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	if (speed > 0.0f)
 	{
 		c->steeringAgent->desiredSpeed = speed;
-		c->setDoubleAttribute("steering.pathMaxSpeed",(double)speed);
+		//c->setDoubleAttribute("steering.pathMaxSpeed",(double)speed);
+		c->steeringAgent->currentTargetSpeed = speed;
+	}
+	else
+	{
+		c->steeringAgent->currentTargetSpeed = (float)c->getDoubleAttribute("steering.pathMaxSpeed");
 	}
 
 	if (manner != "")
@@ -182,17 +187,20 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		if (manner == "walk" && speed <= 0.0f)
 		{
 			c->steeringAgent->desiredSpeed = 1.2f;			
-			c->setDoubleAttribute("steering.pathMaxSpeed",1.2);
+			//c->setDoubleAttribute("steering.pathMaxSpeed",1.2);
+			c->steeringAgent->currentTargetSpeed = 1.2f;
 		}
 		else if (manner == "jog" && speed <= 0.0f)
 		{
 			c->steeringAgent->desiredSpeed = 2.5f;
-			c->setDoubleAttribute("steering.pathMaxSpeed",2.5);
+			//c->setDoubleAttribute("steering.pathMaxSpeed",2.5);
+			c->steeringAgent->currentTargetSpeed = 2.5f;
 		}
 		else if (manner == "run" && speed <= 0.0f)
 		{
 			c->steeringAgent->desiredSpeed = 3.5f;
-			c->setDoubleAttribute("steering.pathMaxSpeed",3.5);
+			//c->setDoubleAttribute("steering.pathMaxSpeed",3.5);
+			c->steeringAgent->currentTargetSpeed = 3.5f;
 		}
 		else if (manner == "sbm:step")
 			stepMode = true;

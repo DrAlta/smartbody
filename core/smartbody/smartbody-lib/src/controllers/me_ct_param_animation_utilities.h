@@ -52,8 +52,9 @@ class PATimeManager
 		void updateLocalTimes(double time);
 		bool step(double timeStep);
 		void updateWeights();
-		double getDuration();
-		double getLocalTime(double motionTime, int motionIndex);
+		double getDuration();		
+		double getNormalizeLocalTime();
+		double getPrevNormalizeLocalTime();
 		void getParallelTimes(double time, std::vector<double>& times);
 		std::vector<double>& getKey();
 
@@ -65,6 +66,7 @@ class PATimeManager
 		std::vector<double> motionTimes;		//actual motion times get from localTimes
 		std::vector<double> timeDiffs;			//time steps from last evaluation to this evaluation, get from motionTimes
 		std::vector<double> key;				//key get from keys and current weights
+	protected:
 		double localTime;
 		double prevLocalTime;
 
@@ -76,6 +78,7 @@ class PATimeManager
 		void setLocalTime();
 		void setMotionTimes();
 		int getSection(double time);
+		
 
 		std::queue<std::pair<SmartBody::MotionEvent*, int> > _events;
 };
@@ -163,13 +166,17 @@ class PABlendData
 
 	public:
 		PABlendData();
-		PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued);
-		PABlendData(PABlend* state, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued);
+		PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0);
+		PABlendData(PABlend* state, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0);
 		~PABlendData();
 		virtual void evaluate(double timeStep, SrBuffer<float>& buffer);
 		virtual void evaluateTransition(double timeStep, SrBuffer<float>& buffer, bool tranIn);
 
-		std::string getStateName();
+		std::string getStateName();		
+		
+		float getStateKeyTime(int motionIdx, int sectionIdx);
+		float getStateMotionDuration(int motionIdx);
+
 		bool isPartialBlending();
 		std::vector<double> weights;
 
@@ -181,6 +188,7 @@ class PABlendData
 		BlendMode blendMode;
 		ScheduleMode scheduleMode;
 		PABlend* state;
+		float blendStartOffset;
 
 		bool active;
 		std::vector<std::vector<int> > motionIndex;
