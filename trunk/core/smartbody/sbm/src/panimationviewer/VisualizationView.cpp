@@ -210,8 +210,26 @@ void VisualizationView::refreshJointList()
 	SkSkeleton* sk = sbChar->getSkeleton();
 	if (!sk) return;
 	const std::vector<SkJoint*>& jnts = sk->joints();
-	for(size_t i=0; i<jnts.size(); i++)
+	for(unsigned int i=0; i<jnts.size(); i++)
+	{
+		SrString jname(jnts[i]->name().c_str());
+		if(jname.search("face")>=0) continue;
+		if(jname.search("brow")>=0) continue;
+		if(jname.search("eye")>=0)  continue;
+		if(jname.search("nose")>=0) continue;
+		if(jname.search("lid")>=0)  continue;
+		if(jname.search("jaw")>=0)  continue;
+		if(jname.search("tongue")>=0) continue;
+		if(jname.search("lip")>=0)    continue;
+		if(jname.search("cheek")>=0)  continue;
+		if(jname.search("finger")>=0) continue;
+		if(jname.search("thumb")>=0)  continue;
+		if(jname.search("index")>=0)  continue;
+		if(jname.search("middle")>=0) continue;
+		if(jname.search("pinky")>=0)  continue;
+		if(jname.search("ring")>=0)   continue;
 		plotJointChoice->add(jnts[i]->name().c_str());
+	}
 }
 void VisualizationView::refreshJointList(Fl_Widget* widget, void* data)
 {
