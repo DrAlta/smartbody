@@ -257,7 +257,7 @@ const std::string& MeCtParamAnimation::getBaseJointName()
 	return baseJointName;
 }
 
-void MeCtParamAnimation::schedule(PABlend* state, double x, double y, double z, PABlendData::WrapMode wrap, PABlendData::ScheduleMode schedule, PABlendData::BlendMode blend, std::string jName, double timeOffset)
+void MeCtParamAnimation::schedule(PABlend* state, double x, double y, double z, PABlendData::WrapMode wrap, PABlendData::ScheduleMode schedule, PABlendData::BlendMode blend, std::string jName, double timeOffset, double stateTimeOffset )
 {
 	std::vector<double> weights;
 	weights.resize(state->getNumMotions());
@@ -303,10 +303,10 @@ void MeCtParamAnimation::schedule(PABlend* state, double x, double y, double z, 
 			}
 		}
 	}
-	this->schedule(state, weights, wrap, schedule, blend, jName, timeOffset);
+	this->schedule(state, weights, wrap, schedule, blend, jName, timeOffset, stateTimeOffset);
 }
 
-void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>& weights, PABlendData::WrapMode wrap, PABlendData::ScheduleMode schedule, PABlendData::BlendMode blend, std::string jName, double timeOffset)
+void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>& weights, PABlendData::WrapMode wrap, PABlendData::ScheduleMode schedule, PABlendData::BlendMode blend, std::string jName, double timeOffset, double stateTimeOffset)
 {
 	ScheduleUnit unit;
 	SmartBody::SBAnimationBlend* animState = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData);
@@ -323,6 +323,7 @@ void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>&
 	unit.blend = blend;
 	unit.partialJoint = jName;
 	unit.time = mcuCBHandle::singleton().time + timeOffset;
+	unit.stateTimeOffset = (float)stateTimeOffset;
 
 	// make sure the weights are valid for non-pseudoidle state
 	if (unit.weights.size() == 0 && unit.data != NULL)
@@ -528,15 +529,15 @@ void MeCtParamAnimation::autoScheduling(double time)
 				{
 					// check to see if the current local time cannot afford the defaultTransition time
 					double actualTransitionTime = defaultTransition;
-					if (curStateData->timeManager->localTime >= (curStateData->timeManager->getDuration() - defaultTransition))
-						actualTransitionTime = curStateData->timeManager->getDuration() - curStateData->timeManager->localTime;
+					if (curStateData->timeManager->getNormalizeLocalTime() >= (curStateData->timeManager->getDuration() - defaultTransition))
+						actualTransitionTime = curStateData->timeManager->getDuration() - curStateData->timeManager->getNormalizeLocalTime();
 					transitionManager = new PATransitionManager(curStateData->timeManager->getDuration() - actualTransitionTime, actualTransitionTime);	
 				}
 			}
 		}
 		else
 		{
-			transitionManager = new PATransitionManager(data, curStateData, nextStateData);
+			transitionManager = new PATransitionManager(data, curStateData, nextStateData);			
 			nextStateData->timeManager->updateLocalTimes(transitionManager->s2);
 		}
 		waitingList.pop_front();
@@ -548,7 +549,8 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	PABlendData* module = NULL;
 	if (su.data)
 	{
-		module = new PABlendData(su.data, su.weights, su.blend, su.wrap, su.schedule);
+		module = new PABlendData(su.data, su.weights, su.blend, su.wrap, su.schedule, su.stateTimeOffset);
+		module->blendStartOffset = su.stateTimeOffset;
 		std::vector<std::string> joints;
 		SkJoint* j = character->getSkeleton()->search_joint(su.partialJoint.c_str());
 		if (j)

@@ -539,7 +539,7 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 		SrVec targetPos = steerPath.closestPointOnPath(SrVec(x,0,z),pathDir,pathDist);
 		float distOnPath = steerPath.pathDistance(targetPos);
 		float sceneScale = 1.f/SmartBody::SBScene::getScene()->getScale();
-		float maxSpeed = (float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
+		float maxSpeed = this->currentTargetSpeed*sceneScale;//(float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
 		nextPtOnPath = steerPath.pathPoint(distOnPath+maxSpeed);		
 		float targetAngle = radToDeg(atan2(nextPtOnPath.x - x, nextPtOnPath.z - z));
 		normalizeAngle(targetAngle);
@@ -587,7 +587,7 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 		SrVec ptDir = nextPtOnPath - curSteerPos; ptDir.normalize();
 		
 		float sceneScale = 1.f/SmartBody::SBScene::getScene()->getScale();
-		float maxSpeed = (float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
+		float maxSpeed = this->currentTargetSpeed*sceneScale;//(float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
 		float minSpeed = (float)character->getDoubleAttribute("steering.pathMinSpeed")*sceneScale;
 		float angAcc = (float)character->getDoubleAttribute("steering.pathAngleAcc");
 		float detectSeg = maxSpeed*1.5f;

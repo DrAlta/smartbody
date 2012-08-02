@@ -40,14 +40,16 @@ PATimeManager::PATimeManager(PABlendData* data)
 	{
 		if (blendData->state->keys[0].size() > 0)
 			for (size_t i = 0; i < blendData->state->keys.size(); i++)
-				localTimes.push_back(blendData->state->keys[i][0]);
+				//localTimes.push_back(blendData->state->keys[i][0]);
+				localTimes.push_back(blendData->getStateKeyTime(i,0));
 	}
 	else
 	{
 		SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SmartBody::SBAnimationBlend0D*>(blendData->state);
 		if (state0D)
 		{
-			localTimes.push_back(0);
+			//LOG("state 0D, use blend offset");
+			localTimes.push_back(blendData->blendStartOffset);
 		}
 		else
 		{
@@ -98,21 +100,32 @@ bool PATimeManager::step(double timeStep)
 	double newLocalTime = localTime + timeStep;
 	int loopcounter = 0;
 	double lastKey = 0;
+	//double keyDuration = 0.0;
 	if (blendData->state->keys.size() > 0)
-		lastKey = key[key.size() - 1];
-	if (blendData->state->keys.size() > 0 && 
-		(newLocalTime > lastKey && lastKey >= 0.0))
 	{
+		lastKey = key[key.size() - 1];
+		//keyDuration = key[key.size()-1] - key[0];
+	}
+	
+	if (blendData->state->keys.size() > 0 && 
+	//	(newLocalTime > keyDuration && keyDuration >= 0.0))	
+		(newLocalTime > lastKey && lastKey >= 0.0))	
+	{		
 		double d = key[key.size() - 1] - key[0];
-		int times = (int) (newLocalTime / d);
+		
+		// consider the case when key[0] > 0
+		double offsetLocalTime = newLocalTime - key[0];
+		int times = (int) (offsetLocalTime / d);
 		if (times > 0)
 		{
-			newLocalTime = newLocalTime - float(times) * d;
+			offsetLocalTime = offsetLocalTime - float(times) * d;
 			loadEvents();
 		}
+		newLocalTime = offsetLocalTime + key[0];
 		notReachDuration = false;
 	}
 
+	
 	localTime = newLocalTime;
 	getParallelTimes(localTime, localTimes);
 	if (localTimes.size() == 0)
@@ -134,6 +147,7 @@ bool PATimeManager::step(double timeStep)
 	{
 		LOG("Motion times do not match! Please check!");
 	}
+	//LOG("newLocal time = %f, lastKey = %f, notReachDuration = %d",newLocalTime, lastKey,notReachDuration);
 
 	return notReachDuration;
 }
@@ -191,6 +205,16 @@ double PATimeManager::getDuration()
 	return (key[getNumKeys() - 1] - key[0]);
 }
 
+double PATimeManager::getNormalizeLocalTime()
+{
+	return localTime - key[0];
+}
+
+double PATimeManager::getPrevNormalizeLocalTime()
+{
+	return prevLocalTime - key[0];
+}
+
 void PATimeManager::setKey()
 {
 	key.clear();
@@ -200,7 +224,7 @@ void PATimeManager::setKey()
 	{
 		double tempK = 0.0;
 		for (size_t j = 0; j < blendData->weights.size(); j++)
-			tempK += blendData->weights[j] * blendData->state->keys[j][i];
+			tempK += blendData->weights[j] * blendData->getStateKeyTime(j,i);//blendData->state->keys[j][i];
 		key.push_back(tempK);
 	}
 }
@@ -225,8 +249,11 @@ void PATimeManager::setMotionTimes()
 	{
 		for (size_t i = 0; i < blendData->weights.size(); i++)
 		{
-			int d = (int) (localTimes[i] / blendData->state->motions[i]->duration());
-			motionTimes.push_back(localTimes[i] - d * blendData->state->motions[i]->duration());
+			//int d = (int) (localTimes[i] / blendData->state->motions[i]->duration());
+			//motionTimes.push_back(localTimes[i] - d * blendData->state->motions[i]->duration());			
+			//int d = (int) (localTimes[i] / blendData->getStateMotionDuration(i));
+			//motionTimes.push_back(localTimes[i] - d * blendData->getStateMotionDuration(i));
+			motionTimes.push_back(localTimes[i]);
 		}
 	}
 	
@@ -242,10 +269,14 @@ int PATimeManager::getSection(double time)
 	return -1;
 }
 
+
+
 void PATimeManager::getParallelTimes(double time, std::vector<double>& times)
 {
 	times.clear();
-	int section = getSection(time);
+	double offsetTime = time;// + blendData->blendStartOffset;
+	int section = getSection(offsetTime);
+	//LOG("localtime = %f, section = %d",offsetTime,section);
 	if (section < 0)
 	{
 		for (size_t i = 0; i < blendData->weights.size(); i++)
@@ -254,9 +285,10 @@ void PATimeManager::getParallelTimes(double time, std::vector<double>& times)
 		}
 		return;
 	}
+	
 	for (size_t i = 0; i < blendData->weights.size(); i++)
 	{
-		double t = blendData->state->keys[i][section] + (blendData->state->keys[i][section + 1] - blendData->state->keys[i][section]) * (time - key[section]) / (key[section + 1] - key[section]);
+		double t = blendData->getStateKeyTime(i,section) + (blendData->getStateKeyTime(i,section+1) - blendData->getStateKeyTime(i,section)) * (offsetTime - key[section]) / (key[section + 1] - key[section]);
 		times.push_back(t);
 	}
 }
@@ -804,9 +836,10 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 	
 }
 
-PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule)
+PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule, double blendOffset)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	blendStartOffset = (float)blendOffset;
 	PABlend* s = mcu.lookUpPABlend(stateName);
 	state = s;
 	if (state)
@@ -830,12 +863,12 @@ PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, B
 	blendMode = blend;
 	wrapMode = wrap;
 	scheduleMode = schedule;
-
 	active = false;
 }
 
-PABlendData::PABlendData(PABlend* s, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule)
+PABlendData::PABlendData(PABlend* s, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule, double blendOffset)
 {
+	blendStartOffset = (float)blendOffset;
 	state = s;
 	weights.resize(s->getNumMotions());
 	for (size_t x = 0; x < w.size(); x++)
@@ -847,6 +880,7 @@ PABlendData::PABlendData(PABlend* s, std::vector<double>& w, BlendMode blend, Wr
 	blendMode = blend;
 	wrapMode = wrap;
 	scheduleMode = schedule;
+	
 
 	active = false;
 }
@@ -914,6 +948,19 @@ std::string PABlendData::getStateName()
 {
 	return state->stateName;	
 }
+
+float PABlendData::getStateKeyTime( int motionIdx, int sectionIdx )
+{
+	float stateKeyTime = (float)state->keys[motionIdx][sectionIdx];	
+	if (sectionIdx == 0) stateKeyTime += blendStartOffset;
+	return stateKeyTime;
+}
+
+float PABlendData::getStateMotionDuration( int motionIdx )
+{
+	return (getStateKeyTime(motionIdx,state->getNumKeys()-1) - getStateKeyTime(motionIdx, 0));
+}
+
 
 bool PABlendData::isPartialBlending()
 {
@@ -1038,7 +1085,7 @@ void PATransitionManager::align(PABlendData* current, PABlendData* next)
 	int numEaseOut = getNumEaseOut();
 	for (int i = 0; i < numEaseOut; i++)
 	{
-		if (current->timeManager->prevLocalTime <= easeOutStarts[i] && current->timeManager->localTime >= easeOutStarts[i]) 
+		if (current->timeManager->getPrevNormalizeLocalTime() <= easeOutStarts[i] && current->timeManager->getNormalizeLocalTime() >= easeOutStarts[i]) 
 		{
 			s1 = easeOutStarts[i];
 			e1 = easeOutEnds[i];
@@ -1046,12 +1093,12 @@ void PATransitionManager::align(PABlendData* current, PABlendData* next)
 		}
 	}
 
-	if (current->timeManager->prevLocalTime <= s1 && current->timeManager->localTime >= s1)
+	if (current->timeManager->getPrevNormalizeLocalTime() <= s1 && current->timeManager->getNormalizeLocalTime() >= s1)
 	{
 		next->active = true;
 		blendingMode = true;
 		// Important: adjust for the duration (is this enough?)
-		duration += (current->timeManager->prevLocalTime - current->timeManager->localTime);
+		duration += (current->timeManager->getPrevNormalizeLocalTime() - current->timeManager->getNormalizeLocalTime());
 		curve->insert(0.0, 1.0);
 		curve->insert(duration, 0.0);
 	}
