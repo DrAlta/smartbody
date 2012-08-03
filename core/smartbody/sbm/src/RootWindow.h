@@ -143,6 +143,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void LocomotionFootstepsCB(Fl_Widget* w, void* data);
 		static void VelocityCB(Fl_Widget* w, void* data);
 		static void TrajectoryCB(Fl_Widget* w, void* data);
+		static void GestureCB(Fl_Widget* w, void* data);
 		static void SteeringCharactersCB(Fl_Widget* w, void* data);
 		static void SteeringAllCB(Fl_Widget* w, void* data);
 		static void SteeringNoneCB(Fl_Widget* w, void* data);	

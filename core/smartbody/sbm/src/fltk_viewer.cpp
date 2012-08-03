@@ -356,6 +356,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    resizable(this);
 
    _data = new FltkViewerData();
+   _gestureData = new GestureData();
    _locoData = new LocomotionData();
    _paLocoData = new PALocomotionData();
 
@@ -392,6 +393,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->showkinematicfootprints = false;
    _data->interactiveLocomotion = false;
    _data->showtrajectory = false;
+   _data->showgesture = false;
 
    _data->light.init();
 
@@ -425,6 +427,12 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
    // init timer update for keyboard
    Fl::add_timeout(0.01,timerUpdate,_paLocoData);
+
+   // register gesture event handler
+	GestureVisualizationHandler* gv = new GestureVisualizationHandler();
+	gv->setGestureData(_gestureData);
+	EventManager* manager = EventManager::getEventManager();
+	manager->addEventHandler("bmlstatus", gv);
 }
 
 void FltkViewer::create_popup_menus()
@@ -610,6 +618,15 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	  case CmdShowTrajectory : _data->showtrajectory = !_data->showtrajectory;
 						if (!_data->showtrajectory) _data->showtrajectory = false;
 					   break;
+	  case CmdShowGesture : _data->showgesture = !_data->showgesture;
+						if (!_data->showgesture) 
+						{
+							_gestureData->reset();
+							_gestureData->toggleFeedback(false);
+						}
+						else
+							_gestureData->toggleFeedback(true);
+					   break;
 	  case CmdInteractiveLocomotion  : _data->interactiveLocomotion = !_data->interactiveLocomotion;
                        break;
       case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
@@ -764,6 +781,7 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
 	  case CmdShowSelection : return _data->showselection? true:false;
 	  case CmdShowKinematicFootprints : return _data->showkinematicfootprints? true:false;
 	  case CmdShowTrajectory : return _data->showtrajectory ? true:false;
+	  case CmdShowGesture : return _data->showgesture ? true:false;
 	  case CmdShowLocomotionFootprints : return _data->showlocofootprints? true:false;
       case CmdAxis        : return _data->displayaxis? true:false;
       case CmdBoundingBox : return _data->boundingbox? true:false;
@@ -1381,6 +1399,7 @@ void FltkViewer::draw()
 	drawEyeLids();
 	drawDynamics();
 	drawLocomotion();
+	drawGestures();
 
 	drawMotionVectorFlow();
 	drawPlotMotion();
@@ -3834,6 +3853,96 @@ void FltkViewer::drawArrow(SrVec& from, SrVec& to, float width, SrVec& color)
 	glDisable(GL_BLEND); 
 }
 
+void FltkViewer::drawGestures()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if (_gestureData->currentCharacter == "")
+		return;
+	SBCharacter* character = mcu._scene->getCharacter(_gestureData->currentCharacter);
+	if (!character)
+		return;
+
+	if (!_data->showgesture)
+		return;
+	
+	if (_gestureData->gestureSections.size() < 2)
+		return;
+
+	glDisable(GL_LIGHTING);
+
+	std::string wristLfName = "l_wrist";
+	std::string wristRtName = "r_wrist";
+	SBJoint* wristLfJoint = character->getSkeleton()->getJointByName(wristLfName);
+	SBJoint* wristRtJoint = character->getSkeleton()->getJointByName(wristRtName);
+	if (!wristLfJoint || !wristRtJoint)
+		return;
+
+	character->getSkeleton()->update_global_matrices();
+	SrMat wristLfGMat = wristLfJoint->gmat();
+	SrVec wristLfVec = SrVec(wristLfGMat.get(12), wristLfGMat.get(13), wristLfGMat.get(14));
+	SrMat wristRtGMat = wristRtJoint->gmat();
+	SrVec wristRtVec = SrVec(wristRtGMat.get(12), wristRtGMat.get(13), wristRtGMat.get(14));
+
+	if (!_gestureData->pause)
+	{
+		std::list<SrVec>& leftWriteData = _gestureData->gestureSections[_gestureData->gestureSections.size() - 2].data;
+		if ((int)leftWriteData.size() >= _gestureData->displayMaximum)
+			leftWriteData.pop_front();
+		leftWriteData.push_back(wristLfVec);
+		
+		std::list<SrVec>& rightWriteData = _gestureData->gestureSections[_gestureData->gestureSections.size() - 1].data;
+		if ((int)rightWriteData.size() >= _gestureData->displayMaximum)
+			rightWriteData.pop_front();
+		rightWriteData.push_back(wristRtVec);
+	}
+
+	glBegin(GL_LINES);
+	for (size_t gsId = 0; gsId < _gestureData->gestureSections.size(); ++gsId)
+	{
+		SrVec& sectionColor = _gestureData->gestureSections[gsId].color;
+		glColor3f(sectionColor.x, sectionColor.y, sectionColor.z);
+		std::list<SrVec>::iterator iter = _gestureData->gestureSections[gsId].data.begin();
+		for (; iter != _gestureData->gestureSections[gsId].data.end(); iter++)
+		{
+			std::list<SrVec>::iterator iter1 = iter;
+			iter1++;
+			if (iter1 != _gestureData->gestureSections[gsId].data.end())
+			{
+				glVertex3f(iter->x, iter->y, iter->z);
+				glVertex3f(iter1->x, iter1->y, iter1->z);
+			}
+		}
+	}
+	glEnd();
+
+	if (_gestureData->currentStatus != GestureData::OTHER)
+	{
+		GestureData::SyncPointData left;
+		left.side = 0;
+		left.type = _gestureData->currentStatus;
+		left.location = wristLfVec;
+		left.color = _gestureData->getSyncPointColor(_gestureData->currentStatus);
+		_gestureData->syncPoints.push_back(left);
+		GestureData::SyncPointData right;
+		right.side = 1;
+		right.type = _gestureData->currentStatus;
+		right.location = wristRtVec;
+		right.color = _gestureData->getSyncPointColor(_gestureData->currentStatus);
+		_gestureData->syncPoints.push_back(right);
+		_gestureData->currentStatus = GestureData::OTHER;
+	}
+
+	for (size_t i = 0; i < _gestureData->syncPoints.size(); ++i)
+	{
+		GestureData::SyncPointData data = _gestureData->syncPoints[i];
+		drawPoint(data.location.x, data.location.y, data.location.z, 20.0f, data.color);
+	}
+
+	glEnable(GL_LIGHTING);
+
+}
+
+
 static int pre_dominant = 0;
 void FltkViewer::drawLocomotion()
 {
@@ -4724,6 +4833,135 @@ void FltkViewer::timerUpdate( void* data )
 	PALocomotionData* paLocoData = (PALocomotionData*)data;	
 	paLocoData->updateKeys(0.01f);
 	Fl::repeat_timeout(0.01,timerUpdate,paLocoData);	
+}
+
+
+GestureVisualizationHandler::GestureVisualizationHandler()
+{
+	_gestureData = NULL;
+}
+
+GestureVisualizationHandler::~GestureVisualizationHandler()
+{
+	_gestureData = NULL;
+}
+
+void GestureVisualizationHandler::setGestureData(GestureData* data)
+{
+	_gestureData = data;
+}
+
+void GestureVisualizationHandler::executeAction(Event* event)
+{
+	if (!_gestureData)
+		return;
+
+	std::vector<std::string> parameters;
+	std::string param = event->getParameters();
+	vhcl::Tokenize(param, parameters);
+	if (parameters[0] == "syncpointprogress")
+	{	
+		_gestureData->currentCharacter = parameters[1];
+
+		if (parameters[3] == "start")
+		{
+			GestureData::GestureSection newSectionL;
+			newSectionL.side = 0;
+			newSectionL.color = _gestureData->getColor();
+			_gestureData->gestureSections.push_back(newSectionL);
+			GestureData::GestureSection newSectionR;
+			newSectionR.side = 0;
+			newSectionR.color = _gestureData->getColor();
+			_gestureData->gestureSections.push_back(newSectionR);
+
+			_gestureData->currentStatus = GestureData::START;
+
+		}
+		if (parameters[3] == "end")
+		{
+			_gestureData->currentStatus = GestureData::END;
+		}
+		if (parameters[3] == "stroke_start")
+			_gestureData->currentStatus = GestureData::STROKE_START;
+		if (parameters[3] == "stroke")
+			_gestureData->currentStatus = GestureData::STROKE;
+		if (parameters[3] == "stroke_end")
+			_gestureData->currentStatus = GestureData::STROKE_END;
+		if (parameters[3] == "ready")
+			_gestureData->currentStatus = GestureData::READY;
+		if (parameters[3] == "relax")
+			_gestureData->currentStatus = GestureData::RELAX;
+	}
+	if (parameters[0] == "blockstart")
+	{
+		_gestureData->pause = false;
+		_gestureData->reset();
+	}
+	if (parameters[0] == "blockend")
+	{
+		_gestureData->pause = true;
+	}
+}
+
+GestureData::GestureData() 
+{ 
+	currentStatus = OTHER; 
+	currentCharacter = ""; 
+
+	// note: the number below representing the color is for approximate, not accurate
+	colorTables.push_back(SrVec(0.8f, 0.5f, 0.8f));			// violet
+	colorTables.push_back(SrVec(0.7f, 0.7f, 0.7f));			// silver
+	colorTables.push_back(SrVec(1.0f, 0.8f, 0.0f));			// gold
+	colorTables.push_back(SrVec(0.5f, 0.5f, 0.5f));			// gray
+	colorTables.push_back(SrVec(1.0f, 0.7f, 0.75f));		// pink
+	colorTables.push_back(SrVec(1.0f, 0.0f, 1.0f));			// fuscia
+	colorTables.push_back(SrVec(0.0f, 1.0f, 1.0f));			// aqua
+	colorTables.push_back(SrVec(0.95f, 0.85f, 0.6f));		// khaki
+
+	syncPointColorMap.insert(std::make_pair(GestureData::START, SrVec(0.0f, 0.0f, 1.0f)));				// blue
+	syncPointColorMap.insert(std::make_pair(GestureData::READY, SrVec(0.0f, 0.0f, 0.0f)));				// black
+	syncPointColorMap.insert(std::make_pair(GestureData::STROKE, SrVec(1.0f, 0.0f, 0.0f)));				// red
+	syncPointColorMap.insert(std::make_pair(GestureData::STROKE_START, SrVec(0.0f, 0.5f, 0.0f)));		// green
+	syncPointColorMap.insert(std::make_pair(GestureData::STROKE_END, SrVec(0.5f, 0.0f, 0.5f)));			// purple
+	syncPointColorMap.insert(std::make_pair(GestureData::RELAX, SrVec(1.0f, 1.0f, 0.0f)));				// yellow
+	syncPointColorMap.insert(std::make_pair(GestureData::END, SrVec(1.0f, 0.75, 0.0f)));				// orange
+
+	colorIndex = 0;
+	pause = false;
+	displayMaximum = 5000;
+}
+
+SrVec& GestureData::getColor()
+{
+	SrVec& color = colorTables[colorIndex];
+	colorIndex++;
+	if (colorIndex >= (int)colorTables.size())
+		colorIndex = 0;
+	return color;
+}
+
+SrVec& GestureData::getSyncPointColor(Status type)
+{
+	return syncPointColorMap[type];
+}
+
+void GestureData::toggleFeedback(bool val)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.bml_processor.set_bml_feedback(val);
+}
+
+void GestureData::reset()
+{
+
+	currentCharacter = "";
+	for (size_t i = 0; i < gestureSections.size(); i++)
+	{
+		gestureSections[i].data.clear();
+	}
+
+	gestureSections.clear();
+	syncPoints.clear();
 }
 
 PALocomotionData::PALocomotionData()
