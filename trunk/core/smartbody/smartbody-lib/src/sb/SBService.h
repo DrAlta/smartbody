@@ -2,12 +2,17 @@
 #define _SBSERVICE_H_
 
 #include <sb/SBObject.h>
-
+#ifdef __native_client__
+#include <sb/SBCharacter.h>
+#endif
 namespace SmartBody {
 
 class SBSubject;
 class SBPawn;
+
+#ifndef __native_client__
 class SBCharacter;
+#endif
 
 class SBService : public SBObject
 {

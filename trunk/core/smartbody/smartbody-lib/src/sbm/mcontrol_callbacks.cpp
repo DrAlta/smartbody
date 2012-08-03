@@ -28,6 +28,11 @@
  */
 
 #include "vhcl.h"
+#ifdef __native_client__
+#include "vhmsg.h"
+#include "vhmsg-tt.h"
+#endif
+
 #include "mcontrol_callbacks.h"
 #include "sb/SBScene.h"
 
@@ -2136,7 +2141,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 int mcu_character_load_skinweights( const char* char_name, const char* skin_file, mcuCBHandle* mcu_p, float scaleFactor, const char* prefix )
 {
 
-#if defined(__ANDROID__) || defined(SBM_IPHONE)
+#if defined(__ANDROID__) || defined(SBM_IPHONE) || defined(__native_client__)
 	return ( CMD_SUCCESS );	
 #endif
 
@@ -3784,6 +3789,7 @@ int mcu_vrSpeech_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 #ifndef __ANDROID__
+#ifndef __native_client__
 	std::string instanceId = args.read_token();
 	// make sure this instance id matches
 	// ...
@@ -3946,6 +3952,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
 	return CMD_FAILURE;
 #endif	
+#endif
 	return CMD_SUCCESS;
 
 }

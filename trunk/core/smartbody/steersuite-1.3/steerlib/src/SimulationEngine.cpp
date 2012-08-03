@@ -679,6 +679,10 @@ SteerLib::ModuleMetaInformation * SimulationEngine::_loadModule(const std::strin
 		std::string extension = ".dylib";
 #endif
 
+#ifdef __native_client__
+		std::string extension = ".so";
+#endif
+
 #ifdef _DEBUG
 		std::string moduleFileName = searchPath + moduleName + "d" + extension;
 #else

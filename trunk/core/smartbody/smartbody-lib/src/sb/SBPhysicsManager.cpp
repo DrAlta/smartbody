@@ -1,10 +1,14 @@
 #include "SBPhysicsManager.h"
+#ifndef __native_client__
 #include <sb/SBPythonClass.h>
+#endif
 #include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
 #include <sbm/Physics/SbmPhysicsSimODE.h>
 
 #ifdef __ANDROID__
+#define USE_PHYSICS_CHARACTER 0
+#elif __native_client__
 #define USE_PHYSICS_CHARACTER 0
 #else
 #define USE_PHYSICS_CHARACTER 1	

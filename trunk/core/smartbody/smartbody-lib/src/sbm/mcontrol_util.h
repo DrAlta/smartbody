@@ -36,6 +36,8 @@ class mcuCBHandle;
 #ifdef __ANDROID__
 #define LINK_VHMSG_CLIENT		(1)
 #define USE_WSP 1
+#elif defined(__native_client__)
+#define USE_WSP 0
 #else
 #define LINK_VHMSG_CLIENT		(1)
 #define USE_WSP 1
@@ -105,7 +107,9 @@ class mcuCBHandle;
 #endif
 
 #ifdef USE_PYTHON
+#ifndef __native_client__
 #include <boost/python.hpp>
+#endif
 #endif
 
 #include BML_PROCESSOR_INCLUDE
@@ -319,8 +323,10 @@ class mcuCBHandle {
 
 
 #ifdef USE_PYTHON
+#ifndef __native_client__
 		boost::python::object mainModule;
 		boost::python::object mainDict;
+#endif		
 #endif
 	
 public:

@@ -5,11 +5,15 @@
 #include <sbm/Physics/SbmColObject.h>
 #include <string>
 
-
+#ifdef __native_client__
+#include <sb/SBSkeleton.h>
+#endif
 
 namespace SmartBody {
 
+#ifndef __native_client__
 class SBSkeleton;
+#endif
 
 class SBJoint : public SkJoint, public SbmTransformObjInterface
 {
