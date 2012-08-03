@@ -47,7 +47,9 @@
 #endif
 
 #ifndef BUILD_IPHONE
+#ifndef __native_client__
 #include "glfw/include/GL/glfw.h"
+#endif
 #endif
 
 using namespace SteerLib;
@@ -196,7 +198,8 @@ SimulationOptions::SimulationOptions()
 	// overridden if they are specified in the config file.
 	//
 
-#ifndef BUILD_IPHONE    
+#ifndef BUILD_IPHONE
+#ifndef __native_client__    
 	// keyboard config
 	keyboardBindings.quit = DEFAULT_KEY_QUIT;
 	keyboardBindings.printCameraInfo = DEFAULT_KEY_PRINT_CAMERA_INFO;
@@ -218,7 +221,7 @@ SimulationOptions::SimulationOptions()
 	mouseBindings.rotateCamera = DEFAULT_MOUSE_BUTTON_TO_ROTATE_CAMERA;
 	mouseBindings.zoomCamera = DEFAULT_MOUSE_BUTTON_TO_ZOOM_CAMERA;
 #endif
-    
+#endif    
 	// global options
 	globalOptions.engineDriver = DEFAULT_ENGINE_DRIVER;
 	globalOptions.coutRedirectionFilename = DEFAULT_COUT_REDIRECTION_FILENAME;

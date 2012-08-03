@@ -1,5 +1,9 @@
 #pragma once
+#ifndef __native_client__
 #include "external/glew/glew.h"
+#else
+#include <GLES2/gl2.h>
+#endif
 #include <map>
 #include <string>
 

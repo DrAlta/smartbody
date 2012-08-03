@@ -1,6 +1,10 @@
 
 #include "vhcl.h"
 
+#if __native_client__
+#include "vhmsg-tt.h"
+#endif
+
 #include "smartbody-dll.h"
 
 #ifdef WIN_BUILD
@@ -30,7 +34,7 @@
 using std::string;
 
 
-#if defined(ANDROID_BUILD)
+#if defined(ANDROID_BUILD) || (NACL_BUILD) 
 #define USE_SBPYTHON  0
 #else
 #define USE_SBPYTHON  1

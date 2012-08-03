@@ -24,7 +24,11 @@
 #include "SteeringAgent.h"
 #include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
+
+#ifndef __native_client__
 #include <sb/SBPythonClass.h>
+#endif
+
 #include <controllers/me_ct_param_animation_data.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBAnimationStateManager.h>

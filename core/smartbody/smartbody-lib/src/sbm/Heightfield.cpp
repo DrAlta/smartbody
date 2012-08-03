@@ -10,7 +10,8 @@
 #endif
 
 //#include <windows.h> // standard Windows app include
-#if defined (__ANDROID__) || defined (SBM_IPHONE)
+#if defined (__ANDROID__) || defined (SBM_IPHONE) || defined(__native_client__)
+#include <GLES2/gl2.h>
 #else
 #include <GL/gl.h> // standard OpenGL include
 #include <GL/glu.h> // OpenGL utilties
@@ -137,7 +138,7 @@ void Heightfield::paste_img( void )	{
 #endif
 
 void Heightfield::render( int renderMode )	{
-#if defined (__ANDROID__) || defined (SBM_IPHONE)
+#if defined (__ANDROID__) || defined (SBM_IPHONE) || defined(__native_client__)
 #else
 	if( vertex_arr && color_arr )	{
 

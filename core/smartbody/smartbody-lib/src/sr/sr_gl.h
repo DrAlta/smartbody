@@ -38,6 +38,8 @@
 
 # ifdef __APPLE__
 # include <OpenGL/gl.h>
+#elif __native_client__
+#include <GLES2/gl2.h>
 # else
 # include <GL/gl.h>
 # endif

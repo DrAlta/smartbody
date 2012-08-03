@@ -61,18 +61,37 @@
 #if USE_WSP
 #include "wsp.h"
 #endif
+
+#ifndef __native_client__
+
 #include <sb/SBPythonClass.h>
 #include <sb/SBPython.h>
+
 #ifdef USE_PYTHON
 #include <boost/python.hpp> // boost python support
 #endif
+
+#else
+#ifdef USE_PYTHON
+#undef USE_PYTHON
+#endif 
+#endif
+
 #include "sr/sr_model.h"
 
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE)  && !defined(__native_client__)// disable shader support
+#ifndef __native_client__
 #include "sbm/GPU/SbmShader.h"
 #include "sbm/GPU/SbmTexture.h"
 #include "sbm/GPU/SbmDeformableMeshGPU.h"
 #endif
+#endif
+
+#if __native_client__
+#include "sbm_test_cmds.hpp"
+#include "resource_cmds.h"
+#endif
+
 
 #include "sbm_deformable_mesh.h"
 #include "sbm/Physics/SbmPhysicsSimODE.h"
@@ -376,19 +395,22 @@ void mcuCBHandle::reset( void )
 	// reset timer & viewer window
 	_scene->getSimulationManager()->reset();
 	_scene->getSimulationManager()->start();
+
+#ifndef __native_client__
 	SrViewer* viewer = getViewer();
 	if (viewer)
 		viewer->show_viewer();
-
+#endif
 
 	_scene->command("vhmsgconnect");
-
+#ifndef __native_client__
 	//Py_Finalize();
 	//initPython(initPythonLibPath);
 #ifdef USE_PYTHON
 	PyRun_SimpleString("scene = getScene()");
 	PyRun_SimpleString("bml = scene.getBmlProcessor()");
 	PyRun_SimpleString("sim = scene.getSimulationManager()");
+#endif
 #endif
 }
 
@@ -659,7 +681,7 @@ void mcuCBHandle::clear( void )
 	{
 		viewer_factory->reset(viewer_p);
 		viewer_p = NULL;
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE) && !defined(__native_client__)
 		SbmShaderManager::singleton().setViewer(NULL);
 #endif
 	}
@@ -795,13 +817,13 @@ void mcuCBHandle::clear( void )
 
 #if USE_WSP
 	theWSP->shutdown();
-#endif
+
 	if (theWSP)
 	{
 		delete theWSP;
 		theWSP = NULL;
 	}
-
+#endif
 	if( logger_p ) 
 	{
 		logger_p->unref();
@@ -949,7 +971,7 @@ int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{
 		if( root_group_p )	{
 			viewer_p->root( root_group_p );
 		}
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE) && !defined(__native_client__)
 		SbmShaderManager::singleton().setViewer(viewer_p);
 #endif
 		return( CMD_SUCCESS );
@@ -962,7 +984,7 @@ void mcuCBHandle::close_viewer( void )	{
 	if( viewer_p )	{
 		viewer_factory->remove(viewer_p);
 		viewer_p = NULL;
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE) && !defined(__native_client__)
 		SbmShaderManager::singleton().setViewer(NULL);
 #endif
 	}
@@ -1203,7 +1225,7 @@ void mcuCBHandle::update( void )
 			
 
 			if ( _scene->getBoneBusManager()->isEnable() && char_p->getSkeleton() && char_p->bonebusCharacter ) {
-				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->getSkeleton(), &param_map );
+				NetworkSendSkeleton( char_p->bonebusCharacter, (SkSkeleton *)(char_p->getSkeleton()), &param_map );
 
 				if ( net_world_offset_updates ) {
 

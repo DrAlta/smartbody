@@ -25,7 +25,11 @@
 #include "vhcl.h"
 #include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
+
+#ifndef __native_client__
 #include <sb/SBPythonClass.h>
+#endif
+
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBPhysicsManager.h>
@@ -41,7 +45,7 @@
 #endif
 #endif
 
-#if defined(__ANDROID__) || defined(SBM_IPHONE)
+#if defined(__ANDROID__) || defined(SBM_IPHONE) || defined(__native_client__)
 #include <sbm/sbm_deformable_mesh.h>
 #else
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
@@ -50,10 +54,14 @@
 #include <string.h>
 #include <iostream>
 
+#ifndef __native_client__
+
 // added by AShapiro 6/30/11 - not sure why the USE_WSP variable this is not being picked up in mcontrol_util.h
 #define USE_WSP 1
 #if USE_WSP
 #include "wsp.h"
+#endif
+
 #endif
 
 #include "sbm/mcontrol_util.h"

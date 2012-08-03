@@ -1,5 +1,10 @@
 #pragma once
+
+#if __native_client__
+#include<GLES2/gl2.h>
+#else
 #include "external/glew/glew.h"
+#endif
 #include <sr/sr_viewer.h>
 #include <vector>
 #include <string>

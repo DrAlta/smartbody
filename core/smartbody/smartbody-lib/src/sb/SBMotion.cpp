@@ -1844,6 +1844,8 @@ double SBMotion::getMetaDataDouble( const std::string& tagName )
 	std::string strValue = getMetaDataString(tagName);
 #ifdef __ANDROID__
 	return atof(strValue.c_str());
+#elif __native_client__
+	return atof(strValue.c_str());
 #else
 	return boost::lexical_cast<double>(strValue);
 #endif

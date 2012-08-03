@@ -111,6 +111,7 @@ void SbmTexture::loadImage( const char* fileName )
 
 void SbmTexture::buildTexture()
 {	
+#ifndef __native_client__
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:10");	
 	GLuint iType = GL_TEXTURE_2D;
 	glEnable(GL_TEXTURE_2D);
@@ -125,8 +126,12 @@ void SbmTexture::buildTexture()
 	}
 
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:50");	
+
 	glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_CLAMP);
+
 	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);//_MIPMAP_LINEAR);
 	glTexParameteri(iType, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -154,5 +159,6 @@ void SbmTexture::buildTexture()
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:300");
 	//printf("Texture name = %s, texture ID = %d\n",textureName.c_str(),texID);	
 	//imdebug("rgb w=%d h=%d %p", width, height, buffer);
+#endif
 }
 

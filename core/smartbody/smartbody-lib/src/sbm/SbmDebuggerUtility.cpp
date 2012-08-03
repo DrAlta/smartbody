@@ -10,7 +10,10 @@
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sbm/mcontrol_util.h>
+
+#ifndef __native_client__
 #include <sb/SBPythonClass.h>
+#endif
 
 bool QueryResourcesCB(void* caller, NetRequest* req);
 
