@@ -95,6 +95,11 @@ VisualizationView::~VisualizationView()
 void VisualizationView::update()
 {
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
+
+	// pass current selected char to mcu for visualization plots
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	mcu.setPAWinSelChrName(charName);
+
 	SbmCharacter* character = mcuCBHandle::singleton().getCharacter(charName);
 	if (!character)
 		return;
@@ -161,7 +166,7 @@ void VisualizationView::plotMotion(bool randomColor)
 	SmartBody::SBAnimationBlend* curBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData->state);
 	if (!curBlend) return;
 
-	curBlend->setChrPlotTransform(sbChar->getName());
+	curBlend->setChrPlotMotionTransform(sbChar->getName());
 
 	for(int i=0; i<curBlend->getNumMotions(); i++)
 	{
@@ -185,7 +190,7 @@ void VisualizationView::plotJointTraj(const std::string& jntName, bool randomCol
 	SmartBody::SBAnimationBlend* curBlend = getCurrentBlend();
 	if (!curBlend) return;
 
-	curBlend->setChrPlotTransform(sbChar->getName());
+	curBlend->setChrPlotMotionTransform(sbChar->getName());
 
 	for(int i=0; i<curBlend->getNumMotions(); i++)
 	{
@@ -196,9 +201,17 @@ void VisualizationView::plotJointTraj(const std::string& jntName, bool randomCol
 void VisualizationView::plotJointTraj(Fl_Widget* widget, void* data)
 {
 	VisualizationView* vizView = (VisualizationView*)(data);
-	std::string jntName = vizView->plotJointChoice->text(vizView->plotJointChoice->value());
-	bool randomColor = vizView->plotRandomColorCheckbox->value();
-	vizView->plotJointTraj(jntName, randomColor);
+	int sel = vizView->plotJointChoice->value();
+	if(sel >=0 && sel < vizView->plotJointChoice->size())
+	{
+		std::string jntName = vizView->plotJointChoice->text(sel);
+		bool randomColor = vizView->plotRandomColorCheckbox->value();
+		vizView->plotJointTraj(jntName, randomColor);
+	}
+	else
+	{
+		LOG("No joint is selected for trajectory plot! Refresh joint list and select.");
+	}
 }
 
 void VisualizationView::refreshJointList()
@@ -256,7 +269,7 @@ void VisualizationView::clearMotion()
 	if (!curBlend) return;
 
 	curBlend->clearPlotMotion();
-	curBlend->clearPlotTransform();
+	curBlend->clearPlotMotionTransform();
 }
 void VisualizationView::clearMotion(Fl_Widget* widget, void* data)
 {
@@ -271,7 +284,7 @@ void VisualizationView::plotVectorFlow()
 	SmartBody::SBAnimationBlend* curBlend = getCurrentBlend();
 	if (!curBlend) return;
 
-	curBlend->setChrPlotTransform(sbChar->getName());
+	curBlend->setChrPlotVectorFlowTransform(sbChar->getName());
 
 	for(int i=0; i<curBlend->getNumMotions(); i++)
 	{
@@ -293,7 +306,7 @@ void VisualizationView::clearVectorFlow()
 	if (!curBlend) return;
 
 	curBlend->clearMotionVectorFlow();
-	curBlend->clearPlotTransform();
+	curBlend->clearPlotVectorFlowTransform();
 }
 void VisualizationView::clearVectorFlow(Fl_Widget* widget, void* data)
 {

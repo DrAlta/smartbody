@@ -4336,7 +4336,10 @@ SbmCharacter* FltkViewer::getCurrentCharacter()
 SmartBody::SBAnimationBlend* FltkViewer::getCurrentCharacterAnimationBlend()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmCharacter* character = getCurrentCharacter();
+	SBScene* scene = SmartBody::SBScene::getScene();
+	const std::string& chrname = mcu.getPAWinSelChrName();
+	if(chrname.length() == 0) return 0;
+	SBCharacter* character = scene->getCharacter(chrname);
 	if (!character) return 0;
 
 	SmartBody::SBAnimationBlend* animBlend = NULL;
@@ -4698,7 +4701,7 @@ void FltkViewer::drawMotionVectorFlow()
 		return;
 
 	glPushMatrix();
-	SrMat mat = animBlend->getPlotTransform();
+	SrMat mat = animBlend->getPlotVectorFlowTransform();
 	glMultMatrixf((const float*) mat);
 
 	std::vector<SrSnLines*>& vecflow_lines = animBlend->getVectorFlowSrSnLines();
@@ -4718,7 +4721,7 @@ void FltkViewer::drawPlotMotion()
 		return;
 
 	glPushMatrix();
-	SrMat mat = animBlend->getPlotTransform();
+	SrMat mat = animBlend->getPlotMotionTransform();
 	glMultMatrixf((const float*) mat);
 
 	std::vector<SrSnLines*>& plotmotion_lines = animBlend->getPlotMotionSrSnLines();

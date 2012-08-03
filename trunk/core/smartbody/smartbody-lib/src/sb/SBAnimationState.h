@@ -69,10 +69,14 @@ class SBAnimationBlend : public PABlend
 		std::vector<SrSnLines*>& getPlotMotionSrSnLines() { return plotMotionLinesArray; }
 		void clearPlotMotion(void);
 
-		void setChrPlotTransform(const std::string& chrName);
-		void setPlotTransform(SrVec offset=SrVec::null, float yRot=0.0f);
-		const SrMat& getPlotTransform() { return plotTransform; }
-		void clearPlotTransform() { plotTransform.identity(); }
+		void setChrPlotMotionTransform(const std::string& chrName);
+		void setPlotMotionTransform(SrVec offset=SrVec::null, float yRot=0.0f);
+		const SrMat& getPlotMotionTransform() { return plotMotionTransform; }
+		void clearPlotMotionTransform() { plotMotionTransform.identity(); }
+		void setChrPlotVectorFlowTransform(const std::string& chrName);
+		void setPlotVectorFlowTransform(SrVec offset=SrVec::null, float yRot=0.0f);
+		const SrMat& getPlotVectorFlowTransform() { return plotVectorFlowTransform; }
+		void clearPlotVectorFlowTransform() { plotVectorFlowTransform.identity(); }
 
 	protected:
 		bool addSkMotion(const std::string& motionName);
@@ -91,7 +95,8 @@ class SBAnimationBlend : public PABlend
 		std::vector<SrSnColorSurf*> errorSurfaces;
 		std::vector<SrSnColorSurf*> smoothSurfaces;
 
-		SrMat plotTransform;
+		SrMat plotMotionTransform;
+		SrMat plotVectorFlowTransform;
 		std::vector<SrSnLines*> vecflowLinesArray;
 		// put a list of joint global positions into array
 		void getJointsGPosFromSkel(SkSkeleton* sk, SrArray<SrVec>& pnts_array, const std::vector<SkJoint*>& jnt_list);
