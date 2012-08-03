@@ -110,18 +110,21 @@ bool PATimeManager::step(double timeStep)
 	if (blendData->state->keys.size() > 0 && 
 	//	(newLocalTime > keyDuration && keyDuration >= 0.0))	
 		(newLocalTime > lastKey && lastKey >= 0.0))	
-	{		
-		double d = key[key.size() - 1] - key[0];
-		
-		// consider the case when key[0] > 0
-		double offsetLocalTime = newLocalTime - key[0];
-		int times = (int) (offsetLocalTime / d);
-		if (times > 0)
+	{	
+		// loop back 
+		if (blendData->wrapMode == PABlendData::Loop)
 		{
-			offsetLocalTime = offsetLocalTime - float(times) * d;
-			loadEvents();
-		}
-		newLocalTime = offsetLocalTime + key[0];
+			double d = key[key.size() - 1] - key[0];		
+			// consider the case when key[0] > 0
+			double offsetLocalTime = newLocalTime - key[0];
+			int times = (int) (offsetLocalTime / d);
+			if (times > 0)
+			{
+				offsetLocalTime = offsetLocalTime - float(times) * d;
+				loadEvents();
+			}
+			newLocalTime = offsetLocalTime + key[0];
+		}		
 		notReachDuration = false;
 	}
 
@@ -248,12 +251,13 @@ void PATimeManager::setMotionTimes()
 	if (localTimes.size() > 0)
 	{
 		for (size_t i = 0; i < blendData->weights.size(); i++)
-		{
-			//int d = (int) (localTimes[i] / blendData->state->motions[i]->duration());
-			//motionTimes.push_back(localTimes[i] - d * blendData->state->motions[i]->duration());			
+		{	
+			// this is just to substract any key times that are larger than motion duration, not to deal with the looping. 
+			int d = (int) (localTimes[i] / blendData->state->motions[i]->duration());
+			motionTimes.push_back(localTimes[i] - d * blendData->state->motions[i]->duration());			
 			//int d = (int) (localTimes[i] / blendData->getStateMotionDuration(i));
 			//motionTimes.push_back(localTimes[i] - d * blendData->getStateMotionDuration(i));
-			motionTimes.push_back(localTimes[i]);
+			//motionTimes.push_back(localTimes[i]);
 		}
 	}
 	
@@ -266,6 +270,8 @@ int PATimeManager::getSection(double time)
 		if (key[i] <= time && key[i + 1] > time)
 			return i;
 	}
+	if (time > key[getNumKeys()-1])
+		return getNumKeys();
 	return -1;
 }
 
@@ -282,6 +288,14 @@ void PATimeManager::getParallelTimes(double time, std::vector<double>& times)
 		for (size_t i = 0; i < blendData->weights.size(); i++)
 		{
 			times.push_back(0);
+		}
+		return;
+	}
+	else if (section >= getNumKeys())
+	{
+		for (size_t i = 0; i < blendData->weights.size(); i++)
+		{
+			times.push_back(blendData->getStateKeyTime(i,getNumKeys()-1));
 		}
 		return;
 	}
@@ -396,6 +410,11 @@ void PAMotions::setBufferByBaseMat(SrMat& mat, SrBuffer<float>& buffer)
 	buffer[baseBuffId.q + 3] = quat.z;	
 }
 
+void PAMotions::processMat( SrMat& src, SrMat& yMat, SrMat xzMat )
+{
+
+}
+
 
 void PAMotions::getUpdateMat(SrMat& dest, SrMat& src)
 {
@@ -437,11 +456,13 @@ void PAMotions::getUpdateMat(SrMat& dest, SrMat& src)
 	SrMat mat;
 	quat.get_mat(mat);
 	float rx, ry, rz;
-	sr_euler_angles(rotType, mat, rx, ry, rz);
+	sr_euler_angles(rotType, mat, rx, ry, rz);	
 	rx = 0.0;
 	rz = 0.0;
 	sr_euler_mat(rotType, mat, rx, ry, rz);
-	SrQuat quatP = SrQuat(mat);
+	//SrQuat quatP = SrQuat(mat);
+	//LOG("ry = %f, quat = %f %f %f %f",SR_TODEG(ry), quatP.w, quatP.x, quatP.y, quatP.z);
+	
 
 //	SrVec vec = quat.axis() * quat.angle();
 //	SrVec vec1 = vec * prerotMat.inverse();
@@ -458,7 +479,8 @@ void PAMotions::getUpdateMat(SrMat& dest, SrMat& src)
 	SrQuat quatP = SrQuat((float)q.w(), (float)q.x(), (float)q.y(), (float)q.z());
 */
 
-	quatP.get_mat(dest);
+	//quatP.get_mat(dest);
+	dest = mat;
 	dest.set(12, src.get(12));
 	if (blendData->state->incrementWorldOffsetY)
 		dest.set(13, src.get(13));
@@ -684,10 +706,16 @@ PAWoManager::~PAWoManager()
 {
 }
 
-void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDiffs, SrBuffer<float>& buffer)
+void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDiffs, SrBuffer<float>& buffer, bool directOverride)
 {
 	std::vector<SrMat> currentBaseMats;
 	getBaseMats(currentBaseMats, times, timeDiffs, buffer.size(), buffer);
+	if (directOverride)
+	{
+		baseTransformMat = currentBaseMats[0];		
+		return;
+	}
+
 	if (!firstTime)
 	{
 		std::vector<int> indices;
@@ -704,7 +732,8 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 		{
 			int id = indices[0];
 			if (timeDiffs[id] > 0)
-				baseTransformMat = currentBaseMats[id] * baseMats[id].inverse();
+				//baseTransformMat = currentBaseMats[id] * baseMats[id].inverse();
+				baseTransformMat = currentBaseMats[id] * baseMats[id].rigidInverse();
 	#if LoopHandle
 			else
 			{
@@ -840,6 +869,7 @@ PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, B
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	blendStartOffset = (float)blendOffset;
+	directPlay = true;
 	PABlend* s = mcu.lookUpPABlend(stateName);
 	state = s;
 	if (state)
@@ -869,6 +899,7 @@ PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, B
 PABlendData::PABlendData(PABlend* s, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule, double blendOffset)
 {
 	blendStartOffset = (float)blendOffset;
+	directPlay = true;
 	state = s;
 	weights.resize(s->getNumMotions());
 	for (size_t x = 0; x < w.size(); x++)
@@ -933,15 +964,35 @@ void PABlendData::evaluate(double timeStep, SrBuffer<float>& buffer)
 	bool notReachCycle = true;
 	notReachCycle = timeManager->step(timeStep);
 	SrBuffer<float> buffCopy = buffer;
-	if (wrapMode == Loop || ((wrapMode != Loop) && notReachCycle))
-	{
-		interpolator->blending(timeManager->motionTimes, buffer);
-		woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffCopy);
+	bool isZeroD = isZeroDState();
+	bool OnceAndReachCycle = (wrapMode != Loop && !notReachCycle);
+// 	if (isZeroD && directPlay && wrapMode != Loop)
+// 	{
+// 		if (OnceAndReachCycle)
+// 		{
+// 			interpolator->blending(timeManager->motionTimes, buffer);
+// 			LOG("motion time = %f",timeManager->motionTimes[0]);
+// 			woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffCopy, true);
+// 			active = false;
+// 		}
+// 		else
+// 		{
+// 			active = true;
+// 		}
+// 	}
+// 	else
+	{		
+		if (wrapMode == Loop || ((wrapMode != Loop) && notReachCycle))
+		{
+			//LOG("motion time = %f",timeManager->motionTimes[0]);
+			interpolator->blending(timeManager->motionTimes, buffer);
+			woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffCopy);
 
-		active = true;
-	}
-	else
-		active = false;
+			active = true;
+		}
+		else
+			active = false;	
+	}	
 }
 
 std::string PABlendData::getStateName()
@@ -991,7 +1042,13 @@ void PABlendData::updateMotionIndices()
 	}
 }
 
-PATransitionManager::PATransitionManager()
+bool PABlendData::isZeroDState()
+{
+	SmartBody::SBAnimationBlend0D* zeroBlend = dynamic_cast<SmartBody::SBAnimationBlend0D*>(state);
+	return (zeroBlend != NULL);
+}
+
+PATransitionManager::PATransitionManager(float transitionLen)
 {
 	from = NULL;
 	to = NULL;
@@ -1001,13 +1058,16 @@ PATransitionManager::PATransitionManager()
 	transition = NULL;
 	curve = new srLinearCurve();
 	curve->insert(0.0, 1.0);
-	curve->insert(defaultTransition, 0.0);
-	duration = defaultTransition;
+	float tranLen = transitionLen;
+#if 1
+	curve->insert(tranLen, 0.0);
+	duration = tranLen;
 	localTime = 0.0;
 	s1 = 0.0;
-	e1 += defaultTransition;
+	e1 = tranLen;
 	s2 = 0.0;
-	e2 += defaultTransition;
+	e2 = tranLen;	
+#endif
 }
 
 PATransitionManager::PATransitionManager(double easeOutStart, double dur)
@@ -1080,25 +1140,24 @@ void PATransitionManager::align(PABlendData* current, PABlendData* next)
 		LOG("State %s being scheduled.[ACTIVE]", next->data->stateName.c_str());
 #endif
 	}
-#else
-
+#else	
 	int numEaseOut = getNumEaseOut();
 	for (int i = 0; i < numEaseOut; i++)
 	{
 		if (current->timeManager->getPrevNormalizeLocalTime() <= easeOutStarts[i] && current->timeManager->getNormalizeLocalTime() >= easeOutStarts[i]) 
 		{
 			s1 = easeOutStarts[i];
-			e1 = easeOutEnds[i];
+			e1 = easeOutEnds[i];			
 			break;
 		}
 	}
-
-	if (current->timeManager->getPrevNormalizeLocalTime() <= s1 && current->timeManager->getNormalizeLocalTime() >= s1)
+	//if (current->timeManager->getPrevNormalizeLocalTime() <= s1 && current->timeManager->getNormalizeLocalTime() >= s1)
+	if (current->timeManager->getNormalizeLocalTime() >= s1)
 	{
 		next->active = true;
 		blendingMode = true;
 		// Important: adjust for the duration (is this enough?)
-		duration += (current->timeManager->getPrevNormalizeLocalTime() - current->timeManager->getNormalizeLocalTime());
+		duration += (current->timeManager->getPrevNormalizeLocalTime() - current->timeManager->getNormalizeLocalTime());				
 		curve->insert(0.0, 1.0);
 		curve->insert(duration, 0.0);
 	}
@@ -1109,11 +1168,7 @@ void PATransitionManager::blending(SrBuffer<float>& buffer, SrBuffer<float>&buff
 {
 	double w = curve->evaluate(localTime);
 	bufferBlending(buffer, buffer1, buffer2, w, _context);
-	PAWoManager::matInterp(mat, mat1, mat2, (float)w);
-
-	localTime += timeStep;
-	if (localTime > duration) 
-		active = false;
+	PAWoManager::matInterp(mat, mat1, mat2, (float)w);		
 }
 
 void PATransitionManager::update()
@@ -1248,4 +1303,11 @@ double PATransitionManager::getTime(double time, const std::vector<double>& key,
 		ret += t * w[i];
 	}
 	return ret;
+}
+
+void PATransitionManager::step( double timeStep )
+{
+	localTime += timeStep;
+	if (localTime > duration) 
+		active = false;
 }

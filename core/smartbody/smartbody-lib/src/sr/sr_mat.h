@@ -263,6 +263,8 @@ class SrMat
         but with more numerical errors. The result is a new matrix returned by value. */
     SrMat inverse () const;
 
+	SrMat rigidInverse() const;
+
     /*! Makes SrMat to be its inverse, calling the inverse() method. */
     void invert () { *this=inverse(); }
 

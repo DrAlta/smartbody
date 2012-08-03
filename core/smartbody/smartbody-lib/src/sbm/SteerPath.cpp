@@ -2,9 +2,11 @@
 #include <sr/sr_line.h>
 #include <float.h>
 #include <math.h>
+#include <vhcl.h>
 
 SteerPath::SteerPath(void)
 {
+	currentGoal = 1;
 }
 
 SteerPath::~SteerPath(void)
@@ -23,6 +25,7 @@ void SteerPath::initPath( std::vector<SrPnt>& pts, float radius )
 		lineDir.normalize();
 		pathSegDir.push_back(lineDir);
 	}
+	currentGoal = 1;
 }
 
 void SteerPath::clearPath()
@@ -31,6 +34,61 @@ void SteerPath::clearPath()
 	pathSegLength.clear();
 	pathSegDir.clear();
 	pathRadius = 0.f;
+	currentGoal = 1;
+}
+
+bool SteerPath::atLastGoal()
+{
+	return (currentGoal >= pathPts.size()-1);
+}
+
+void SteerPath::advanceToNextGoal( float length )
+{
+	unsigned int iPath = currentGoal;
+	if (iPath > pathPts.size()-1)
+	{
+		iPath = pathPts.size()-1;
+	}	
+	float pathTotalLength = 0.f;
+	for (unsigned int i=0;i<iPath;i++)
+	{
+		pathTotalLength += pathSegLength[i];
+	}
+	if (pathTotalLength < length)
+	{
+		currentGoal++;
+		//LOG("next goal = %d",currentGoal);
+	}
+	
+}
+
+SrVec SteerPath::closestPointOnNextGoal( const SrVec& pt, SrVec& tangent, float& dist )
+{
+	SrVec closePt;	
+	unsigned int iPath = currentGoal;
+	if (iPath > pathPts.size()-1)
+	{
+		iPath = pathPts.size()-1;
+	}	
+
+	SrLine line(pathPts[iPath-1],pathPts[iPath]);
+	float k;
+	SrVec linePt = line.closestpt(pt,&k);
+	float lineDist = (linePt - pt).len();	
+	closePt = linePt;
+	tangent = pathSegDir[iPath-1];	
+	return closePt;
+}
+
+
+SrVec SteerPath::pathGoalPoint()
+{
+	unsigned int iPath = currentGoal;
+	if (iPath > pathPts.size()-1)
+	{
+		iPath = pathPts.size()-1;
+	}	
+	return pathPts[iPath];	
 }
 
 SrVec SteerPath::closestPointOnPath( const SrVec& pt, SrVec& tangent, float& dist )
@@ -121,6 +179,7 @@ float SteerPath::pathDistance( const SrVec& pt )
 	}
 	return outDist;
 }
+
 
 float SteerPath::pathLength()
 {

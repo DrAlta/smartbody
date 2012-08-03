@@ -110,6 +110,7 @@ class PAMotions
 		void getBuffer(SkMotion* motion, double t, SrBuffer<int>& map, SrBuffer<float>& buff);				
 		void getUpdateMat(SrMat& dest, SrMat& src);
 		void getProcessedMat(SrMat& dest, SrMat& src);
+		void processMat(SrMat& src, SrMat& yMat, SrMat xzMat);
 		PABlendData* blendData;
 };
 
@@ -128,7 +129,7 @@ class PAWoManager : public PAMotions
 		PAWoManager(PABlendData* data);
 		~PAWoManager();
 
-		void apply(std::vector<double>& times, std::vector<double>& timeDiffs, SrBuffer<float>& buffer);
+		void apply(std::vector<double>& times, std::vector<double>& timeDiffs, SrBuffer<float>& buffer, bool directOverride = false);
 		SrMat& getBaseTransformMat();
 		SrMat& getFirstBaseTransformMat();
 		SrMat& getCurrentBaseTransformMat();
@@ -178,6 +179,7 @@ class PABlendData
 		float getStateMotionDuration(int motionIdx);
 
 		bool isPartialBlending();
+		bool isZeroDState();
 		std::vector<double> weights;
 
 		PATimeManager* timeManager;
@@ -189,8 +191,9 @@ class PABlendData
 		ScheduleMode scheduleMode;
 		PABlend* state;
 		float blendStartOffset;
-
-		bool active;
+		float transitionLength;
+		bool active;	
+		bool directPlay;
 		std::vector<std::vector<int> > motionIndex;
 		void updateMotionIndices();
 };
@@ -201,13 +204,15 @@ class PATransitionManager
 {
 	public:
 		
-		PATransitionManager();
+		PATransitionManager(float transitionLen);
 		PATransitionManager(double easeOutStart, double duration);
 		PATransitionManager(PATransition* transition, PABlendData* from, PABlendData* to);
 		~PATransitionManager();
 
 		void align(PABlendData* current, PABlendData* next);
 		void blending(SrBuffer<float>& buffer, SrBuffer<float>&buffer1, SrBuffer<float>&buffer2, SrMat& mat, SrMat& mat1, SrMat& mat2, double timeStep, MeControllerContext* context);
+
+		void step( double timeStep );
 		void update();
 		double getSlope();
 		int getNumEaseOut();

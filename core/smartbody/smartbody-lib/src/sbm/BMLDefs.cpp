@@ -208,6 +208,7 @@ XMLCh* BMLDefs::ATTR_LOOP = NULL;
 XMLCh* BMLDefs::ATTR_WRAPMODE = NULL;
 XMLCh* BMLDefs::ATTR_SCHEDULEMODE = NULL;
 XMLCh* BMLDefs::ATTR_BLENDMODE = NULL;
+XMLCh* BMLDefs::ATTR_TRANSITION_LENGTH = NULL;
 
 ////// XML ATTRIBUTES
 XMLCh* BMLDefs::ATTR_VALUE = NULL;
@@ -538,6 +539,7 @@ BMLDefs::BMLDefs()
 	ATTR_WRAPMODE = XMLString::transcode("sbm:wrap-mode");
 	ATTR_BLENDMODE = XMLString::transcode("sbm:blend-mode");
 	ATTR_SCHEDULEMODE = XMLString::transcode("sbm:schedule-mode");
+	ATTR_TRANSITION_LENGTH = XMLString::transcode("sbm:transition-length");
 
 	////// XML ATTRIBUTES
 	ATTR_VALUE   = XMLString::transcode("value");

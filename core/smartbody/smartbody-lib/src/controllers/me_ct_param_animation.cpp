@@ -32,6 +32,18 @@ std::string MeCtParamAnimation::CONTROLLER_TYPE = "MeCtParamAnimation";
 
 #define debug 0
 
+ScheduleType::ScheduleType()
+{
+	wrap = PABlendData::Loop;
+	schedule = PABlendData::Queued;
+	blend = PABlendData::Overwrite;
+	jName = "";
+	timeOffset = 0.0;
+	stateTimeOffset = 0.0;
+	transitionLen = -1.0;
+}
+
+
 void MeCtParamAnimation::Context::child_channels_updated( MeController* child )
 {
 }
@@ -103,7 +115,9 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 			if (!hasPABlend(PseudoIdleState))
 			{
 				std::vector<double> weights;
-				schedule(NULL, weights);
+				ScheduleType scType;
+				scType.transitionLen = curStateData->transitionLength;
+				schedule(NULL, weights, scType);
 			}
 		}
 			
@@ -111,6 +125,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	//------
 
 	// dealing with transition
+	
 	if (transitionManager)
 	{
 		if (curStateData == NULL || nextStateData == NULL)
@@ -165,7 +180,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 				SrMat curBaseMat;
 				SrMat nextBaseMat;
 
-				bool pseudoTransition = (curStateData->getStateName() == PseudoIdleState || nextStateData->getStateName() == PseudoIdleState);								
+				bool pseudoTransition = (curStateData->getStateName() == PseudoIdleState || nextStateData->getStateName() == PseudoIdleState);				
 				if (pseudoTransition && (!curStateData->isPartialBlending() && !nextStateData->isPartialBlending())) // first time && not partial blending case
 				{
 					bool transitionIn = (curStateData->getStateName() == PseudoIdleState);
@@ -196,21 +211,23 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 						}
 						else
 						{							
-							curBaseMat = nextStateData->woManager->getCurrentBaseTransformMat().inverse();//SrMat();//nbMat.inverse();							
+							curBaseMat = curBaseMat*nextStateData->woManager->getCurrentBaseTransformMat().inverse();//SrMat();//nbMat.inverse();							
 							pos = curBaseMat.get_translation();
 							SrVec origPos = nextStateData->woManager->getCurrentBaseTransformMat().get_translation();
 						}
 						transitionManager->startTransition = true;
 					}					
 				}
-				else // proceed as usual
+				else // proceed as usual						
 				{
 					curStateData->evaluate(timeStep * transitionManager->getSlope(), buffer1);
 					nextStateData->evaluate(timeStep, buffer2);
 					curBaseMat = curStateData->woManager->getBaseTransformMat();
 					nextBaseMat = nextStateData->woManager->getBaseTransformMat();
 				}			
+
 				transitionManager->blending(frame.buffer(), buffer1, buffer2, transformMat, curBaseMat, nextBaseMat, timeStep, _context);
+				transitionManager->step(timeStep);
 				if (!curStateData->isPartialBlending() && !nextStateData->isPartialBlending())
 					updateWo(transformMat, woWriter, frame.buffer());
 				mcu.mark("locomotion");
@@ -226,6 +243,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 			}			
 		}
 	} 
+	
 
 	// if there's only one state, update current state
 	if (curStateData && curStateData->state->stateName != PseudoIdleState)
@@ -257,7 +275,7 @@ const std::string& MeCtParamAnimation::getBaseJointName()
 	return baseJointName;
 }
 
-void MeCtParamAnimation::schedule(PABlend* state, double x, double y, double z, PABlendData::WrapMode wrap, PABlendData::ScheduleMode schedule, PABlendData::BlendMode blend, std::string jName, double timeOffset, double stateTimeOffset )
+void MeCtParamAnimation::schedule(PABlend* state, double x, double y, double z, PABlendData::WrapMode wrap, PABlendData::ScheduleMode schedule, PABlendData::BlendMode blend, std::string jName, double timeOffset, double stateTimeOffset, double transitionLen )
 {
 	std::vector<double> weights;
 	weights.resize(state->getNumMotions());
@@ -303,10 +321,15 @@ void MeCtParamAnimation::schedule(PABlend* state, double x, double y, double z, 
 			}
 		}
 	}
-	this->schedule(state, weights, wrap, schedule, blend, jName, timeOffset, stateTimeOffset);
+	this->schedule(state, weights, wrap, schedule, blend, jName, timeOffset, stateTimeOffset, transitionLen);
 }
 
-void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>& weights, PABlendData::WrapMode wrap, PABlendData::ScheduleMode schedule, PABlendData::BlendMode blend, std::string jName, double timeOffset, double stateTimeOffset)
+void MeCtParamAnimation::schedule( PABlend* state, const std::vector<double>& weights, const ScheduleType& scType )
+{
+	schedule(state,weights,scType.wrap,scType.schedule,scType.blend,scType.jName, scType.timeOffset,scType.stateTimeOffset, scType.transitionLen);
+}
+
+void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>& weights, PABlendData::WrapMode wrap, PABlendData::ScheduleMode schedule, PABlendData::BlendMode blend, std::string jName, double timeOffset, double stateTimeOffset, double transitionLen)
 {
 	ScheduleUnit unit;
 	SmartBody::SBAnimationBlend* animState = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData);
@@ -324,6 +347,23 @@ void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>&
 	unit.partialJoint = jName;
 	unit.time = mcuCBHandle::singleton().time + timeOffset;
 	unit.stateTimeOffset = (float)stateTimeOffset;
+	
+	float unitTransitionLen = (float)defaultTransition; // set this to initial default	
+	// override if the default attribute exists
+	if (character->hasAttribute("defaultTransition") && character->getDoubleAttribute("defaultTransition") >= 0)
+	{
+		unitTransitionLen = (float)character->getDoubleAttribute("defaultTransition");
+	}
+	// override if specified in the blend scheduling
+	if (transitionLen >= 0)
+	{
+		unitTransitionLen = (float)transitionLen;
+	}
+	unit.transitionLength = unitTransitionLen;
+	
+	
+	
+	
 
 	// make sure the weights are valid for non-pseudoidle state
 	if (unit.weights.size() == 0 && unit.data != NULL)
@@ -520,18 +560,21 @@ void MeCtParamAnimation::autoScheduling(double time)
 		if (!data)
 		{
 			if (curStateData->state->stateName == PseudoIdleState)
-				transitionManager = new PATransitionManager();
+				transitionManager = new PATransitionManager(nextStateData->transitionLength);
 			else
 			{
+				double transitionLen = nextStateData->transitionLength;				
 				if (nextStateData->scheduleMode == PABlendData::Now)
-					transitionManager = new PATransitionManager();
+					transitionManager = new PATransitionManager(transitionLen);
 				else
 				{
 					// check to see if the current local time cannot afford the defaultTransition time
-					double actualTransitionTime = defaultTransition;
-					if (curStateData->timeManager->getNormalizeLocalTime() >= (curStateData->timeManager->getDuration() - defaultTransition))
+					
+					double actualTransitionTime = transitionLen;
+					if (curStateData->timeManager->getNormalizeLocalTime() >= (curStateData->timeManager->getDuration() - transitionLen))
 						actualTransitionTime = curStateData->timeManager->getDuration() - curStateData->timeManager->getNormalizeLocalTime();
 					transitionManager = new PATransitionManager(curStateData->timeManager->getDuration() - actualTransitionTime, actualTransitionTime);	
+					//transitionManager = new PATransitionManager(curStateData->timeManager->getDuration(), 0.0);
 				}
 			}
 		}
@@ -551,6 +594,7 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	{
 		module = new PABlendData(su.data, su.weights, su.blend, su.wrap, su.schedule, su.stateTimeOffset);
 		module->blendStartOffset = su.stateTimeOffset;
+		module->transitionLength = su.transitionLength;
 		std::vector<std::string> joints;
 		SkJoint* j = character->getSkeleton()->search_joint(su.partialJoint.c_str());
 		if (j)
@@ -568,6 +612,7 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	else
 	{
 		module = new PABlendData(PseudoIdleState, su.weights);
+		module->transitionLength = su.transitionLength;
 	}
 	if (_context)
 	{

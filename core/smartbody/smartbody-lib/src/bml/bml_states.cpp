@@ -114,6 +114,7 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	// take time offset
 	double timeOffset = xml_parse_double(BMLDefs::ATTR_START, elem);
 	double stateStartOffset = xml_parse_double(BMLDefs::ATTR_OFFSET, elem);
+	double transitionLen = xml_parse_double(BMLDefs::ATTR_TRANSITION_LENGTH, elem, -1.0);
 
 	SmartBody::SBAnimationBlend0D* ZeroDState = dynamic_cast<SmartBody::SBAnimationBlend0D*>(state);
 	if (!ZeroDState) // don't use state offset unless it is a 0-D state
@@ -123,7 +124,7 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	if (mode == "schedule")
 	{
 		if (state)
-			character->param_animation_ct->schedule(state, x, y, z, wrapMode, scheduleMode, blendMode, joint, timeOffset, stateStartOffset);
+			character->param_animation_ct->schedule(state, x, y, z, wrapMode, scheduleMode, blendMode, joint, timeOffset, stateStartOffset, transitionLen);
 		else
 			character->param_animation_ct->schedule(state, weights);
 	}
