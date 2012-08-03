@@ -44,6 +44,7 @@
 # include <FL/Fl_Menu.H>
 #include "retargetviewer/RetargetViewer.h"
 #include <sb/SBMotionBlendBase.h>
+#include <sbm/Event.h>
 
 #include "ObjectManipulationHandle.h"
 
@@ -55,6 +56,7 @@ class SrCamera;
 class SrSn;
 class SrViewer;
 class SrLight;
+class GestureData;
 class FltkViewerData;
 class LocomotionData;
 class PALocomotionData;
@@ -190,7 +192,8 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 				   CmdShowKinematicFootprints,
 				   CmdShowLocomotionFootprints,
 				   CmdInteractiveLocomotion,
-				   CmdShowTrajectory,				  
+				   CmdShowTrajectory,
+				   CmdShowGesture,
 				   CmdReachShowExamples,
 				   CmdReachNoExamples,
 				   CmdConstraintToggleIK,
@@ -317,6 +320,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	void drawEyeLids();
 	void drawDynamics();
 	void drawLocomotion();
+	void drawGestures();
 
 	void drawReach();
 	void drawInteractiveLocomotion();
@@ -360,6 +364,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 
     FltkViewerData* _data;
 	LocomotionData* _locoData;
+	GestureData* _gestureData;
 	float _arrowTime;
 	PALocomotionData* _paLocoData;
 	ObjectManipulationHandle _objManipulator; // a hack for testing. 
@@ -421,6 +426,7 @@ protected:
    bool showlocofootprints;
    bool showkinematicfootprints;
    bool showtrajectory;
+   bool showgesture;
    bool interactiveLocomotion;
 
    SrString message;   // user msg to display in the window
@@ -497,6 +503,63 @@ class LocomotionData
 		bool a_key;
 		bool d_key;
 		float off_height_comp;
+};
+
+class GestureVisualizationHandler : public EventHandler
+{
+	public:
+		GestureVisualizationHandler();
+		~GestureVisualizationHandler();
+		void setGestureData(GestureData* data);
+
+		virtual void executeAction(Event* event);
+
+	private:
+		GestureData* _gestureData;
+};
+
+class GestureData
+{
+public:
+	enum Status { START, READY, STROKE, STROKE_START, STROKE_END, RELAX, END, OTHER };
+
+public:
+	GestureData();
+	~GestureData() {}
+
+	SrVec& getColor();
+	SrVec& getSyncPointColor(Status type);
+
+	void reset();
+	void toggleFeedback(bool val);
+	struct SyncPointData
+	{
+		int side;
+		Status type;
+		SrVec location;
+		SrVec color;
+		int bmlId;
+	};
+	struct GestureSection
+	{
+		int side;
+		int length;
+		SrVec color;
+		std::list<SrVec> data;
+	};
+
+	int displayMaximum;
+	bool pause;
+
+	int colorIndex;
+	std::vector<SrVec> colorTables;
+	std::map<Status, SrVec> syncPointColorMap;
+
+	std::vector<SyncPointData> syncPoints;
+	std::vector<GestureSection> gestureSections;
+
+	Status currentStatus;
+	std::string currentCharacter;
 };
 
 class PALocomotionData

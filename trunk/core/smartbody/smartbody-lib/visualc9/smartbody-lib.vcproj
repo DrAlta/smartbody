@@ -940,14 +940,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\controllers\me_ct_motion.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\controllers\me_ct_motion.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\controllers\me_ct_motion_timewarp.cpp"
 				>
 			</File>
@@ -977,14 +969,6 @@
 			</File>
 			<File
 				RelativePath="..\src\controllers\me_ct_pose.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\controllers\me_ct_scheduler2.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\controllers\me_ct_scheduler2.h"
 				>
 			</File>
 			<File
@@ -1350,6 +1334,14 @@
 			<Filter
 				Name="motion"
 				>
+				<File
+					RelativePath="..\src\controllers\me_ct_motion.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\controllers\me_ct_motion.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="adshrenvelope"
@@ -1359,11 +1351,11 @@
 				Name="scheduler"
 				>
 				<File
-					RelativePath="..\src\me\me_ct_scheduler2.cpp"
+					RelativePath="..\src\controllers\me_ct_scheduler2.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\me\me_ct_scheduler2.h"
+					RelativePath="..\src\controllers\me_ct_scheduler2.h"
 					>
 				</File>
 			</Filter>

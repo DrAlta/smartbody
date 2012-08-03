@@ -48,6 +48,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 //	menubar->add("&View/Character/Locomotion/Velocity", 0, VelocityCB, this, NULL);
 //	menubar->add("&View/Character/Locomotion/Trajectory", 0, TrajectoryCB, this, NULL);
 	menubar->add("&View/Character/Show Trajectory", 0, TrajectoryCB, this, NULL);
+	menubar->add("&View/Character/Show Gesture", 0, GestureCB, this, NULL);
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
 	menubar->add("&View/Shadows", 0, ShadowsCB, this, NULL);
 	menubar->add("&View/Grid", 0, GridCB, this, NULL);
@@ -1106,6 +1107,14 @@ void BaseWindow::TrajectoryCB(Fl_Widget* w, void* data)
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowTrajectory, NULL);	
+#endif
+}
+
+void BaseWindow::GestureCB(Fl_Widget* w, void* data)
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowGesture, NULL);	
 #endif
 }
 
