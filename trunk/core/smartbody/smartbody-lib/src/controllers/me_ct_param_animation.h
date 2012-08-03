@@ -35,12 +35,27 @@ class PABlendData;
 class PATransitionManager;
 class PAControllerBlending;
 
+struct ScheduleType
+{
+	PABlendData::WrapMode wrap;
+	PABlendData::ScheduleMode schedule;
+	PABlendData::BlendMode blend; 
+	std::string jName;
+	double timeOffset;
+	double stateTimeOffset;
+	double transitionLen;
+	
+	ScheduleType();
+
+};
+
 struct ScheduleUnit
 {
 	PABlend* data;
 	std::vector<double> weights;
 	double time;
 	float stateTimeOffset;
+	float transitionLength;
 	PABlendData::WrapMode wrap;
 	PABlendData::ScheduleMode schedule;
 	PABlendData::BlendMode blend;
@@ -85,8 +100,9 @@ class MeCtParamAnimation : public MeCtContainer
 		void setBaseJointName(const std::string& name);
 		const std::string& getBaseJointName();
 		
-		void schedule(PABlend* state, double x, double y, double z, PABlendData::WrapMode wrap = PABlendData::Loop, PABlendData::ScheduleMode schedule = PABlendData::Queued, PABlendData::BlendMode blend = PABlendData::Overwrite, std::string jName = "", double timeOffset = 0.0, double stateTimeOffset = 0.0);
-		void schedule(PABlend* state, const std::vector<double>& weights, PABlendData::WrapMode wrap = PABlendData::Loop, PABlendData::ScheduleMode schedule = PABlendData::Queued, PABlendData::BlendMode blend = PABlendData::Overwrite, std::string jName = "", double timeOffset = 0.0, double stateTimeOffset = 0.0);
+		void schedule(PABlend* state, double x, double y, double z, PABlendData::WrapMode wrap = PABlendData::Loop, PABlendData::ScheduleMode schedule = PABlendData::Queued, PABlendData::BlendMode blend = PABlendData::Overwrite, std::string jName = "", double timeOffset = 0.0, double stateTimeOffset = 0.0, double transitionLen = -1.0);
+		void schedule(PABlend* state, const std::vector<double>& weights, PABlendData::WrapMode wrap = PABlendData::Loop, PABlendData::ScheduleMode schedule = PABlendData::Queued, PABlendData::BlendMode blend = PABlendData::Overwrite, std::string jName = "", double timeOffset = 0.0, double stateTimeOffset = 0.0, double transitionLen = -1.0);
+		void schedule(PABlend* state, const std::vector<double>& weights, const ScheduleType& scType);
 		void unschedule();
 		void updateWeights(std::vector<double>& w);
 		void updateWeights();

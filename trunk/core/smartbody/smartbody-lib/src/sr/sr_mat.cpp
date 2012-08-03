@@ -364,6 +364,16 @@ SrMat SrMat::inverse () const
    return inv; 
  }
 
+SrMat SrMat::rigidInverse() const
+{	
+	SrVec tran = get_translation();
+	SrMat rotMat = get_rotation();
+	rotMat.transpose3x3();
+	tran = tran*rotMat;
+	rotMat.set_translation(-tran);
+	return rotMat;
+}
+
 float SrMat::det () const
  {
    float m12 = E21*E32 - E22*E31;

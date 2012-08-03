@@ -531,16 +531,22 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 	
 	bool locomotionEnd = false;
 	static int counter = 0;		
-	
+	float sceneScale = 1.f/SmartBody::SBScene::getScene()->getScale();	
+	float distThreshold = 0.05f*sceneScale;
+	float speedThreshold = 0.05f*sceneScale;	
 	//if (steerPath.pathLength() == 0) // do nothing if there is no steer path
 	//	return; 
-
 	if (character->param_animation_ct->isIdle() && steerPath.pathLength() > 0)    // need to define when you want to start the locomotion
 	{
 		PABlend* locoState = mcu.lookUpPABlend(locomotionName.c_str());
 		SrVec pathDir;
-		float pathDist;
-		SrVec targetPos = steerPath.closestPointOnPath(SrVec(x,0,z),pathDir,pathDist);
+		float pathDist;		
+		curSteerPos = SrVec(x,0,z);
+		//float distToTarget = (curSteerPos - steerPath.pathPoint(steerPath.pathLength()-0.01f)).len();
+		float distToTarget = (curSteerPos - steerPath.pathGoalPoint()).len();
+		float distToPathEnd = (curSteerPos - steerPath.pathPoint(steerPath.pathLength()-0.01f)).len();
+		SrVec targetPos = steerPath.closestPointOnNextGoal(SrVec(x,0,z),pathDir,pathDist);
+		//SrVec targetPos = steerPath.closestPointOnPath(SrVec(x,0,z),pathDir,pathDist);
 		float distOnPath = steerPath.pathDistance(targetPos);
 		float sceneScale = 1.f/SmartBody::SBScene::getScene()->getScale();
 		float maxSpeed = this->currentTargetSpeed*sceneScale;//(float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
@@ -552,18 +558,29 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 		normalizeAngle(diff);
 		
 		// using the transition motion with different direction
-		if (character->getBoolAttribute("steering.pathStartStep"))
-		//if (0)
+		if (distToTarget > distThreshold*3.f || distToPathEnd > distThreshold*3.f)
 		{
-			startLocomotion(diff);
+			if (character->getBoolAttribute("steering.pathStartStep"))// && distToTarget > distThreshold*10.f)
+				//if (0)
+			{
+				startLocomotion(diff);
+			}
+			else
+			{
+				std::stringstream command;
+				command << "panim schedule char " << character->getName();
+				command << " state " << locomotionName << " loop true playnow true";
+				mcu.execute((char*) command.str().c_str());  
+			}	
 		}
 		else
 		{
-			std::stringstream command;
-			command << "panim schedule char " << character->getName();
-			command << " state " << locomotionName << " loop true playnow true";
-			mcu.execute((char*) command.str().c_str());  
-		}		
+			// end locomotion directly
+			character->trajectoryGoalList.clear();
+			agent->clearGoals();
+			goalList.clear();
+			steerPath.clearPath();					
+		}
 		counter = 0;	
 	}
 
@@ -585,12 +602,14 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 		//SrVec nextPos = curPos + (curDir+nextDir)*0.5f*curSpeed*dt;
 		SrVec pathDir;
 		float pathDist;
-		nextPtOnPath = steerPath.closestPointOnPath(nextSteerPos,pathDir,pathDist);
+		//nextPtOnPath = steerPath.closestPointOnPath(nextSteerPos,pathDir,pathDist);		
+		nextPtOnPath = steerPath.closestPointOnNextGoal(nextSteerPos, pathDir, pathDist);
 		float distOnPath = steerPath.pathDistance(nextPtOnPath);
 		nextPtOnPath = steerPath.pathPoint(distOnPath+curSpeed);
 		SrVec ptDir = nextPtOnPath - curSteerPos; ptDir.normalize();
+		steerPath.advanceToNextGoal(distOnPath+curSpeed);
 		
-		float sceneScale = 1.f/SmartBody::SBScene::getScene()->getScale();
+		
 		float maxSpeed = this->currentTargetSpeed*sceneScale;//(float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
 		float minSpeed = (float)character->getDoubleAttribute("steering.pathMinSpeed")*sceneScale;
 		float angAcc = (float)character->getDoubleAttribute("steering.pathAngleAcc");
@@ -607,15 +626,13 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
  		float newSpeed = curSpeed + acc*dt; 
 
 		float distToTarget = (curSteerPos - steerPath.pathPoint(steerPath.pathLength()-0.01f)).len();		
-		if (distToTarget < curSpeed * brakingGain ) // if close to target, slow down directly
+		if (distToTarget < curSpeed * brakingGain && steerPath.atLastGoal()) // if close to target, slow down directly
 			newSpeed = distToTarget / brakingGain;
 		
-		float distThreshold = 0.05f*sceneScale;
-		float speedThreshold = 0.05f*sceneScale;
-		if (distToTarget < distThreshold && newSpeed < speedThreshold)
+		
+		if (distToTarget < distThreshold && newSpeed < speedThreshold &&  steerPath.atLastGoal())
 		{
-			locomotionEnd = true;
-			
+			locomotionEnd = true;			
 		}
 
 		float newTurningAngle = radToDeg(asin(cross(curSteerDir,ptDir).y));
