@@ -808,7 +808,7 @@ void SBAnimationBlend::clearPlotMotion(void)
 	plotMotionLinesArray.resize(0);
 }
 
-void SBAnimationBlend::setChrPlotTransform(const std::string& chrName)
+void SBAnimationBlend::setChrPlotMotionTransform(const std::string& chrName)
 {
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
@@ -817,15 +817,36 @@ void SBAnimationBlend::setChrPlotTransform(const std::string& chrName)
 		if(sbSk)
 		{
 			SrVec hpr = sbSk->getHPR();
-			setPlotTransform(sbSk->getPosition(), SR_TORAD(hpr.x));
+			setPlotMotionTransform(sbSk->getPosition(), SR_TORAD(hpr.x));
 		}
 }
 
-void SBAnimationBlend::setPlotTransform(SrVec offset, float yRot)
+void SBAnimationBlend::setPlotMotionTransform(SrVec offset, float yRot)
 {
 	SrQuat q(SrVec::j, yRot);
-	q.get_mat(plotTransform);
-	plotTransform.setl4(offset);
+	q.get_mat(plotMotionTransform);
+	plotMotionTransform.setl4(offset);
+}
+
+
+void SBAnimationBlend::setChrPlotVectorFlowTransform(const std::string& chrName)
+{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		SBCharacter* sbSk = scene->getCharacter(chrName);
+		if(sbSk)
+		{
+			SrVec hpr = sbSk->getHPR();
+			setPlotVectorFlowTransform(sbSk->getPosition(), SR_TORAD(hpr.x));
+		}
+}
+
+void SBAnimationBlend::setPlotVectorFlowTransform(SrVec offset, float yRot)
+{
+	SrQuat q(SrVec::j, yRot);
+	q.get_mat(plotVectorFlowTransform);
+	plotVectorFlowTransform.setl4(offset);
 }
 
 

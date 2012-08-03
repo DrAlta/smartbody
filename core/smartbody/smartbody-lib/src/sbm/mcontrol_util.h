@@ -487,6 +487,10 @@ public:
 		void addPABlend(PABlend* state);
 		PATransition* lookUpPATransition(std::string fromStateName, std::string toStateName);
 		void addPATransition(PATransition* transition);
+		
+		std::string PAWinSelChrName;
+		void setPAWinSelChrName(const std::string& name) { PAWinSelChrName.assign(name); }
+		const std::string& getPAWinSelChrName() { return PAWinSelChrName; }
 
 		SkMotion* addMirrorMotion(SkMotion* motion);
 // 		void setPhysicsEngine(bool start);
