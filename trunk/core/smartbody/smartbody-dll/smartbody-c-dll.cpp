@@ -126,7 +126,7 @@ public:
 #endif
    }
 
-   virtual void OnCharacterChange( const std::string & name )
+   virtual void OnCharacterChanged( const std::string & name )
    {
 #if !defined(IPHONE_BUILD)
       m_changeCharacterCallback( m_sbmHandle, name.c_str() );
