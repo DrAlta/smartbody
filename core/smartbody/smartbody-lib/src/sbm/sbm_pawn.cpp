@@ -202,6 +202,13 @@ void SbmPawn::initData()
 	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();	
 	SbmGeomObject* geomObj = colManager->createCollisionObject(collisionObjName,"null",SrVec());
 	geomObj->attachToObj(this);
+
+	wo_cache.x = 0;
+	wo_cache.y = 0;
+	wo_cache.z = 0;
+	wo_cache.h = 0;
+	wo_cache.p = 0;
+	wo_cache.r = 0;
 }
 
 SkSkeleton* SbmPawn::getSkeleton() const
