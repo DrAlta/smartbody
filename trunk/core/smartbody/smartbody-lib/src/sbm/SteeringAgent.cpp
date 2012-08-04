@@ -1410,7 +1410,7 @@ void SteeringAgent::startLocomotion( float angleDiff )
 		double w;
 		float maxRotAngle = 180;
 		
-		
+		//LOG("angleDiff = %f",angleDiff);
 		if (angleDiff > 0)
 		{
 			if (angleDiff > 90)
@@ -1419,7 +1419,7 @@ void SteeringAgent::startLocomotion( float angleDiff )
 				w = (angleDiff - 90) / (maxRotAngle-90);				
 				command << "panim schedule char " << character->getName();			
 				command << " state " << startingLName << " loop false playnow false additive false joint null " << " 0 " << 1 - w << " " << w;
-				mcu.execute((char*) command.str().c_str());
+				mcu.execute((char*) command.str().c_str());				
 			}
 			else
 			{
@@ -1443,10 +1443,11 @@ void SteeringAgent::startLocomotion( float angleDiff )
 			{
 				w = -angleDiff / 90;					
 				command << "panim schedule char " << character->getName();
-				command << " state " << startingRName << " loop false playnow true additive false joint null " << 1 - w << " " << w << " 0 ";
+				command << " state " << startingRName << " loop false playnow false additive false joint null " << 1 - w << " " << w << " 0 ";
 				mcu.execute((char*) command.str().c_str());
 			}				
 		}
+		//LOG("start turn command = %s",command.str().c_str());
 		
 		PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
 		const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();

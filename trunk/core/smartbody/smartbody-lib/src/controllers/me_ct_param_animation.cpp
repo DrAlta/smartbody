@@ -565,21 +565,27 @@ void MeCtParamAnimation::autoScheduling(double time)
 			{
 				double transitionLen = nextStateData->transitionLength;				
 				if (nextStateData->scheduleMode == PABlendData::Now)
-					transitionManager = new PATransitionManager(transitionLen);
+				{
+					transitionManager = new PATransitionManager((float)transitionLen);
+					//LOG("schedule mode = now");
+				}
 				else
 				{
-					// check to see if the current local time cannot afford the defaultTransition time
-					
+					// check to see if the current local time cannot afford the defaultTransition time					
 					double actualTransitionTime = transitionLen;
 					if (curStateData->timeManager->getNormalizeLocalTime() >= (curStateData->timeManager->getDuration() - transitionLen))
 						actualTransitionTime = curStateData->timeManager->getDuration() - curStateData->timeManager->getNormalizeLocalTime();
-					transitionManager = new PATransitionManager(curStateData->timeManager->getDuration() - actualTransitionTime, actualTransitionTime);	
+					double easeOutStart = curStateData->timeManager->getDuration() - actualTransitionTime;
+					double easeOutDur = actualTransitionTime;
+					//LOG("easeOutStart = %f, duration = %f",easeOutStart, easeOutDur);
+					transitionManager = new PATransitionManager(easeOutStart, easeOutDur);	
 					//transitionManager = new PATransitionManager(curStateData->timeManager->getDuration(), 0.0);
 				}
 			}
 		}
 		else
 		{
+			//LOG("state transition from = %s, to = %s, easeOut = %f, easeIn = %f",curStateData->getStateName().c_str(), nextStateData->getStateName().c_str(),data->easeOutStart[0], data->easeInStart);
 			transitionManager = new PATransitionManager(data, curStateData, nextStateData);			
 			nextStateData->timeManager->updateLocalTimes(transitionManager->s2);
 		}

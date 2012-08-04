@@ -1151,12 +1151,13 @@ void PATransitionManager::align(PABlendData* current, PABlendData* next)
 			break;
 		}
 	}
-	//if (current->timeManager->getPrevNormalizeLocalTime() <= s1 && current->timeManager->getNormalizeLocalTime() >= s1)
-	if (current->timeManager->getNormalizeLocalTime() >= s1)
+	if (current->timeManager->getPrevNormalizeLocalTime() <= s1 && current->timeManager->getNormalizeLocalTime() >= s1)
+	//if (current->timeManager->getNormalizeLocalTime() >= s1)
 	{
 		next->active = true;
 		blendingMode = true;
 		// Important: adjust for the duration (is this enough?)
+		//LOG("start transition, s1 = %f, local time = %f",s1,current->timeManager->getNormalizeLocalTime());
 		duration += (current->timeManager->getPrevNormalizeLocalTime() - current->timeManager->getNormalizeLocalTime());				
 		curve->insert(0.0, 1.0);
 		curve->insert(duration, 0.0);
