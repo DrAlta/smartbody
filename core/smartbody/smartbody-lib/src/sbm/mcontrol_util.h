@@ -90,7 +90,11 @@ class mcuCBHandle;
 #include <sbm/general_param_setting.h>
 
 #include <sb/SBJointMap.h>
+
+#ifndef __native_client__
 #include <sb/SBPythonClass.h>
+#endif
+
 #include <sbm/nvbg.h>
 
 #include <controllers/me_ct_interpolator.h>
