@@ -16,14 +16,6 @@
  *  License along with SBM.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
  *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently at UC Merced)
- *      Marcus Thiebaux, USC
- *      Andrew n marshall, USC
- *      Ed Fast, USC
- *      Ashok Basawapatna, USC (no longer)
- *      Eric Forbell, USC
- *      Thomas Amundsen, USC
  */
 
 #define ENABLE_CMDL_TEST		0
@@ -240,8 +232,9 @@ void cleanup( void )	{
 			vhmsg::ttu_close();
 		}
 #endif
+		mcu.camera_p = NULL;
 	}
-
+	
 	mcuCBHandle::destroy_singleton();
 	
 	XMLPlatformUtils::Terminate();
@@ -658,6 +651,8 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	// initialize python
 	initPython(python_lib_path);
 	mcu.festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
+
+
 
 #if LINK_VHMSG_CLIENT
 	char * vhmsg_server = getenv( "VHMSG_SERVER" );
