@@ -74,8 +74,8 @@ gl_FragColor = gl_Color;\n\
 const int SHADOW_MAP_RES = 2048;
 
 
-const TCHAR szAppName[]=_T("TransparentGL");
-const TCHAR wcWndName[]=_T("WS_EX_LAYERED OpenGL");
+const TCHAR szAppName[]=_T("SmartBody Desktop");
+const TCHAR wcWndName[]=_T("SmartBody Desktop");
 
 HDC hDC = 0;            
 HGLRC m_hrc = 0;        
