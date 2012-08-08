@@ -951,8 +951,8 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 	SkSkeleton* tempSrcSk = new SkSkeleton(sourceSk);
 
 	std::vector<std::string> stopJoints;
-	stopJoints.push_back("l_wrist");
-	stopJoints.push_back("r_wrist");
+	//stopJoints.push_back("l_wrist");
+	//stopJoints.push_back("r_wrist");
 
 	// update the global matrices
 	tempSrcSk->invalidate_global_matrices();
@@ -975,7 +975,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 	while (!jointQueues.empty())
 	{
 		std::string pjointName = jointQueues.front();		
-		jointQueues.pop();		
+		jointQueues.pop();				
 		if (std::find(stopJoints.begin(),stopJoints.end(),pjointName) != stopJoints.end())
 			continue;
 
@@ -991,12 +991,13 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 		{
 			// don't change the t-pose for these joints
 			for (int i=0;i<targetJoint->num_children();i++)
-			{
+			{					
 				jointQueues.push(targetJoint->child(i)->name());
 			}
 		}
 		else
 		{
+			//LOG("pjoint name = %s",pjointName.c_str());
 			convertBoneOrientation(pjointName, interSk, tempSrcSk, jointQueues, jointRotationMap, endJoints);								
 			SkJoint* pjoint = interSk->search_joint(pjointName.c_str());			
 			//SrQuat newPreRot = pjoint->quat()->prerot()*pjoint->quat()->rawValue();
@@ -1004,6 +1005,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 			//pjoint->quat()->value(SrQuat()); // cleanup quat value
 			for (int i=0; i< pjoint->num_children(); i++)
 			{
+				//LOG("target joint = %s, child = %s",pjoint->name().c_str(), pjoint->child(i)->name().c_str());
 				SkJoint* child = pjoint->child(i);
 				jointQueues.push(child->name());
 			}

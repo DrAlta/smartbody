@@ -331,6 +331,13 @@ void MeCtGaze::init( SbmPawn* pawn, int key_fr, int key_to )	{
 	if( key_fr > key_to )	{
 		int tmp = key_fr; key_fr = key_to; key_to = tmp;
 	}
+	if (key_to == GAZE_KEY_EYES)
+	{
+		// no eye ball joints, select neck instead
+		if (!pawn->get_joint(joint_label(GAZE_JOINT_EYE_R)) && !pawn->get_joint(joint_label(GAZE_JOINT_EYE_L)))
+			key_to = GAZE_KEY_HEAD;
+	}
+
 	key_min = key_fr;
 	key_max = key_to;
 
@@ -871,6 +878,12 @@ printf( "s1: %f\n", joint_arr[ GAZE_JOINT_SPINE1 ].local_pos.y() );
 			0.5, joint_arr[ GAZE_JOINT_EYE_R ].world_zero_pos 
 		) +
 		vector_t( 0.0, 0.0, interocular.length()); // NOTE: PRESUMES 5CM SCALE...
+
+	if (!joint_arr[GAZE_JOINT_EYE_L].active && !joint_arr[GAZE_JOINT_EYE_R].active) // no eye joints
+	{
+		double forwardLen = skeleton_ref_p->getCurrentHeight()*0.02;
+		world_mid_eye_pos = joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos + vector_t(0.0,forwardLen*2.0, forwardLen);
+	}
 
 	//printf( "eyes:\n" );
 	//world_mid_eye_pos.print();
