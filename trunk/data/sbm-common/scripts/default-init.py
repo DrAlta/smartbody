@@ -91,15 +91,15 @@ for n in range(0, len(names)):
 # start the simulation
 sim.start()
 
-#bml.execBML('doctor', '<body posture="LHandOnHip_Motex"/>')
-#bml.execBML('elder', '<body posture="LHandOnHip_Motex"/>')
-#bml.execBML('brad', '<body posture="HandsAtSide_Motex"/>')
-#bml.execBML('utah', '<body posture="ChrUtah_Idle003"/>')
+bml.execBML('doctor', '<body posture="LHandOnHip_Motex"/>')
+bml.execBML('elder', '<body posture="LHandOnHip_Motex"/>')
+bml.execBML('brad', '<body posture="HandsAtSide_Motex"/>')
+bml.execBML('utah', '<body posture="ChrUtah_Idle003"/>')
 
-#bml.execBML('doctor', '<saccade mode="listen"/>')
-#bml.execBML('elder', '<saccade mode="listen"/>')
-#bml.execBML('brad', '<saccade mode="listen"/>')
-#bml.execBML('utah', '<saccade mode="listen"/>')
+bml.execBML('doctor', '<saccade mode="listen"/>')
+bml.execBML('elder', '<saccade mode="listen"/>')
+bml.execBML('brad', '<saccade mode="listen"/>')
+bml.execBML('utah', '<saccade mode="listen"/>')
 
 sim.resume()
 
