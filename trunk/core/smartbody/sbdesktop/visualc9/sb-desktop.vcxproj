@@ -156,7 +156,7 @@ copy /Y ..\..\..\..\core\smartbody\python26\libs\python26.dll  ..\bin
 copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" ..\bin
 copy /Y default.py ..\bin
 
-if not exist ..\..\..\..\bin\smartbody\sbm\bin mkdir ..\..\..\..\bin\smartbody\sbdesktop\bin
+if not exist ..\..\..\..\bin\smartbody\sbdesktop\bin mkdir ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy "$(TargetPath)" ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
