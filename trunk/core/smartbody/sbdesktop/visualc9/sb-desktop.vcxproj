@@ -271,7 +271,7 @@ copy /Y ..\..\..\..\core\smartbody\python26\libs\python26.dll ..\..\..\..\bin\sm
 copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcp100.dll" ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcr100.dll" ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y default.py ..\..\..\..\bin\smartbody\sbdesktop\bin
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
