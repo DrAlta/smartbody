@@ -14,7 +14,6 @@ scene.run("init-common-assets.py")
 scene.run("init-common-face.py")
 scene.run("init-utah-face.py")
 
-'''
 doctor = scene.createCharacter("doctor", "SasoBase.SasoDoctorPerez")
 doctorSkeleton = scene.createSkeleton("common.sk")
 doctor.setSkeleton(doctorSkeleton)
@@ -66,7 +65,7 @@ utah.setVoice("remote")
 utah.setVoiceCode("Festival_voice_rab_diphone")
 utah.createStandardControllers()
 utah.setStringAttribute("deformableMesh", "utah")
-'''
+
 scene.setDefaultCharacter("doctor")
 scene.setDefaultRecipient("elder")
 
