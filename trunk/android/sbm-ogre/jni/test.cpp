@@ -21,6 +21,12 @@
 #include <sbm/locomotion_cmds.hpp>
 #include <sr/sr_camera.h>
 
+
+#define ANDROID_PYTHON
+#ifdef ANDROID_PYTHON
+#include <sb/SBPython.h>
+#endif
+
 //XERCES_CPP_NAMESPACE_USE
 
 /*
@@ -249,6 +255,15 @@ void initConnection(const char* serverName, const char* portName)
 
 }
 
+void initSBMPython()
+{
+#ifdef ANDROID_PYTHON
+	std::string python_lib_path = "/sdcard/sbmmedia/python";
+	//LOGI("Before init Python");
+	initPython(python_lib_path);
+#endif
+}
+
 
 void MCUInitialize()
 {
@@ -261,13 +276,22 @@ void MCUInitialize()
     const char* port = "61616";
     LOG("Before Init Connection");
     initConnection(serverName,port);
-    SBMExecuteCmd("time resume");
+    initSBMPython();
+    //SBMExecuteCmd("time resume");
 }
         
 void SBMInitialize(const char* mediaPath)
 {
-	SBMExecuteCmd("path seq /sdcard/SbmOgre/");
-	SBMExecuteCmd("seq initOgre.seq");
+    LOG("before add asset path");
+    mcuCBHandle& mcu = mcuCBHandle::singleton();
+    mcu.executePython("scene.addAssetPath('seq', '/sdcard/SbmOgre/')");
+    LOG("before execute python file");
+    mcu.executePythonFile("initOgre.py");
+    LOG("after execute python file");
+
+
+	//SBMExecuteCmd("path seq /sdcard/SbmOgre/");
+	//SBMExecuteCmd("seq initOgre.seq");
 	/*
     SBMExecuteCmd("char brad init common.sk"); 
     SBMExecuteCmd("set character brad world_offset x -35 y 102 h -17");
@@ -297,7 +321,7 @@ void SBMExecuteCmd(const char* command)
 {
     //if (!mcuInit) return;
     mcuCBHandle& mcu = mcuCBHandle::singleton();
-    mcu.execute((char*) command);
+    mcu.executePython((char*) command);
 }
 
 
