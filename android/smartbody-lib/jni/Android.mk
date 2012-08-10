@@ -143,6 +143,7 @@ SB_LIB_PATH := ../../../lib
 LOCAL_PATH := $(SBM_LOCAL_PATH)
 include $(CLEAR_VARS)
 LOCAL_MODULE := sbm
+#LOCAL_CFLAGS    :=  -gstabs -g -DBUILD_ANDROID -frtti 
 LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti 
 LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/../../pythonLib/include/python2.6 \
@@ -430,8 +431,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/action_unit.cpp
 	
 	
-
-LOCAL_LDLIBS    := -llog 	  
+LOCAL_LDLIBS    := -llog 
+#LOCAL_LDLIBS    := -llog -gstabs	  
 #LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
 LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
 LOCAL_SHARED_LIBRARIES := python-prebuilt 

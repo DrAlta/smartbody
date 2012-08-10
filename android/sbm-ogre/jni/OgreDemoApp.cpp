@@ -232,12 +232,14 @@ void DemoApp::setupDemoScene()
     mcuCBHandle& mcu = mcuCBHandle::singleton();
     mcu.sbm_character_listener = m_sbListener;
      
+/*
     std::string command = "load skeletons -R \"" + OgreFramework::getSingletonPtr()->m_ResourcePath + "/sbm/\"";
     OgreFramework::getSingletonPtr()->m_pLog->logMessage(command.c_str());
     SBMExecuteCmd(command.c_str());
     std::string command1 = "load motions -R \"" + OgreFramework::getSingletonPtr()->m_ResourcePath + "/sbm/\"";
     OgreFramework::getSingletonPtr()->m_pLog->logMessage(command1.c_str());
     SBMExecuteCmd(command1.c_str());    
+*/
     SBMInitialize("");  
 
 /*    

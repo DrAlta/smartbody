@@ -4,7 +4,7 @@
 #include <sstream>
 #include <string>
 #include <boost/algorithm/string.hpp> 
-#include <SB/SBAnimationState.h>
+#include <sb/SBAnimationState.h>
 
 #include "bml_states.hpp"
 #include "sbm/mcontrol_util.h"

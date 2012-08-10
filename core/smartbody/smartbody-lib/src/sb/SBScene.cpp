@@ -244,7 +244,7 @@ void SBScene::notify( SBSubject* subject )
 }
 
 SBCharacter* SBScene::createCharacter(std::string charName, std::string metaInfo)
-{
+{	
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	SbmCharacter* character = mcu.getCharacter(charName);
 	if (character)
@@ -256,13 +256,14 @@ SBCharacter* SBScene::createCharacter(std::string charName, std::string metaInfo
 	{
 		SBCharacter* character = new SBCharacter(charName, metaInfo);
 		SBSkeleton* skeleton = new SBSkeleton();
+		//LOG("before character->setSkeleton");
 		character->setSkeleton(skeleton);
 		SkJoint* joint = skeleton->add_joint(SkJoint::TypeQuat);
 		joint->setName("world_offset");
-		joint->update_gmat();
+		joint->update_gmat();		
 		mcu.registerCharacter(character);
 
-		// notify the services
+		// notify the services		
 		std::map<std::string, SmartBody::SBService*>& services = getServiceManager()->getServices();
 		for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
 			iter != services.end();
@@ -270,7 +271,7 @@ SBCharacter* SBScene::createCharacter(std::string charName, std::string metaInfo
 		{
 			SBService* service = (*iter).second;
 			service->onCharacterCreate(character);
-		}
+		}		
 		return character;
 	}
 }
