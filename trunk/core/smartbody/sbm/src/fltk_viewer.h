@@ -528,14 +528,14 @@ public:
 	~GestureData() {}
 
 	SrVec& getColor();
-	SrVec& getSyncPointColor(GestureData::Status type);
+	SrVec& getSyncPointColor(int type);
 
 	void reset();
 	void toggleFeedback(bool val);
 	struct SyncPointData
 	{
 		int side;
-		Status type;
+		int type;
 		SrVec location;
 		SrVec color;
 		int bmlId;
@@ -553,12 +553,12 @@ public:
 
 	int colorIndex;
 	std::vector<SrVec> colorTables;
-	std::map<Status, SrVec> syncPointColorMap;
+	std::map<int, SrVec> syncPointColorMap;
 
 	std::vector<SyncPointData> syncPoints;
 	std::vector<GestureSection> gestureSections;
 
-	Status currentStatus;
+	int currentStatus;
 	std::string currentCharacter;
 };
 
