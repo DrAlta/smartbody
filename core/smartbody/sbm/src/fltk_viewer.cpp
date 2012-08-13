@@ -4943,7 +4943,7 @@ SrVec& GestureData::getColor()
 	return color;
 }
 
-SrVec& GestureData::getSyncPointColor(Status type)
+SrVec& GestureData::getSyncPointColor(GestureData::Status type)
 {
 	return syncPointColorMap[type];
 }

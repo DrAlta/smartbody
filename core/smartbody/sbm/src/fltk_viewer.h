@@ -528,7 +528,7 @@ public:
 	~GestureData() {}
 
 	SrVec& getColor();
-	SrVec& getSyncPointColor(Status type);
+	SrVec& getSyncPointColor(GestureData::Status type);
 
 	void reset();
 	void toggleFeedback(bool val);
