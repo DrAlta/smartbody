@@ -1341,6 +1341,8 @@ boost::python::class_<SBReach>("SBReach")
 		.def("len", &SrVec::norm, "gets the length of the vector")
 		.def("normalize", &SrVec::normalize, "normalizes the vector")
 		.def("isZero", &SrVec::iszero, "returns True if the vector is zero")
+		.def("rotY", &SrVec::rotY, "rotate vector around Y axis (radian)")
+		.def("vecAngle", &SrVec::vecAngle, "Returns the angle between v1 and v2 (radian)")
 		;
 
 	boost::python::class_<SrMat>("SrMat")
