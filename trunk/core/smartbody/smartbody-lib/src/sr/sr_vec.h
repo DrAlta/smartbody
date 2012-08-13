@@ -119,6 +119,7 @@ class SrVec
     /*! Same as the other roty() method, but with one parameter
        angle in radians. */
     void roty ( float radians );
+	void rotY ( float radians ) { roty(radians); } // for python interface
 
     /*! Same as the other rotz() method, but with one parameter
        angle in radians. */
@@ -240,6 +241,7 @@ class SrVec
     /*! Returns the angle between v1 and v2, that is inside the interval [0,pi],
         using acosf. The returned angle is in radians. */
     friend float angle ( const SrVec& v1, const SrVec& v2 ); 
+	float vecAngle(const SrVec& v1, const SrVec& v2);
 
     /*! Returns the angle between v1 and v2, but considering that
         v1 and v2 are already normalized, ie, computes acosf(dot(v1,v2)). */

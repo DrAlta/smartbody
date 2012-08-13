@@ -35,6 +35,7 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBAnimationState.h>
 
+#include "sbm/Event.h"
 
 #define DebugInfo 0
 #define FastStart 1
@@ -1492,6 +1493,16 @@ void SteeringAgent::adjustFacingAngle( float angleDiff )
 		for (int i = 0; i < idleTurnState->getNumMotions(); i++)
 			command << weights[i] << " ";
 		mcu.execute((char*) command.str().c_str());
+	}
+	else
+	{
+		MotionEvent facingEvent;
+		facingEvent.setType("adjustFacing");
+		std::string cmd = "bml chr " + character->getName() + " success";
+		//cmd = cmd + " facing: " + boost::lexical_cast<std::string>(facing)
+		facingEvent.setParameters(cmd);
+		EventManager* manager = EventManager::getEventManager();		
+		manager->handleEvent(&facingEvent, 0.0f);
 	}
 	/*
 	else

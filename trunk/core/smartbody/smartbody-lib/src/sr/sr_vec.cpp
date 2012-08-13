@@ -159,6 +159,11 @@ float angle ( const SrVec& v1, const SrVec& v2 )
    return acosf ( dot(v1,v2)/(v1.norm()*v2.norm()) );
  }
 
+float SrVec::vecAngle(const SrVec& v1, const SrVec& v2)
+{
+	return acosf( dot(v1,v2)/(v1.norm()*v2.norm()) );
+}
+
 float angle_fornormvecs ( const SrVec& v1, const SrVec& v2 )
  {
    return acosf ( dot(v1,v2) );
