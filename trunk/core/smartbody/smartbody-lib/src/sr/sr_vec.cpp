@@ -183,6 +183,13 @@ void SrVec::cross ( const SrVec& v1, const SrVec& v2 )
    z = v1.x*v2.y - v1.y*v2.x;
  }
 
+float SrVec::vecYaw(const SrVec& v)
+{
+	if (v.x == 0.0f && v.z == 0.0f)
+		return 0.0f;
+    return (float) -(atan2(v.z, v.x) - SR_PIDIV2);
+}
+
 float dot ( const SrVec& v1, const SrVec& v2 )
  {
    return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z;
