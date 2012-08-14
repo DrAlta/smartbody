@@ -50,12 +50,9 @@ VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, 
 VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmHandle, bool enabled );
 VHWRAPPERDLL_API bool WRAPPER_SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args );
 VHWRAPPERDLL_API int  WRAPPER_SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle );
+VHWRAPPERDLL_API bool WRAPPER_SBM_InitCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character );
 VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character );
-#ifndef __ANDROID__
-VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter2( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter2 * character );
-#endif
 VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character );
-VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character );
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetLogMessageCallback( LogMessageCallback cb );
 VHWRAPPERDLL_API void WRAPPER_SBM_LogMessage( const char * message, int messageType );
 

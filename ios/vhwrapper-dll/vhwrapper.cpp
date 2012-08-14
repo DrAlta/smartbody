@@ -53,12 +53,9 @@ typedef bool (*SBM_SetDebuggerCameraValues_DEF)(SBMHANDLE, double, double, doubl
 typedef bool (*SBM_SetDebuggerRendererRightHanded_DEF)(SBMHANDLE, bool );
 typedef bool (*SBM_ProcessVHMsgs_DEF)(SBMHANDLE, const char*, const char*);
 typedef int  (*SBM_GetNumberOfCharacters_DEF)(SBMHANDLE sbmHandle);
+typedef bool (*SBM_InitCharacter_DEF)( SBMHANDLE sbmHandle, const char*, SBM_SmartbodyCharacter* );
 typedef bool (*SBM_GetCharacter_DEF)( SBMHANDLE sbmHandle, const char*, SBM_SmartbodyCharacter* );
-#ifndef __ANDROID__
-typedef bool (*SBM_GetCharacter2_DEF)( SBMHANDLE sbmHandle, const char*, SBM_SmartbodyCharacter2* );
-#endif
 typedef bool (*SBM_ReleaseCharacter_DEF)(SBM_SmartbodyCharacter *);
-typedef bool (*SBM_ReleaseCharacterJoints_DEF)(SBM_SmartbodyCharacter *);
 typedef bool (*SBM_SetLogMessageCallback_DEF)(LogMessageCallback);
 typedef void (*SBM_LogMessage_DEF)(const char*, int);
 typedef bool (*SBM_IsCharacterCreated_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * objectClass, int maxObjectClassLen );
@@ -85,12 +82,9 @@ SBM_SetDebuggerCameraValues_DEF    g_SBM_SetDebuggerCameraValues = NULL;
 SBM_SetDebuggerRendererRightHanded_DEF  g_SBM_SetDebuggerRendererRightHanded = NULL;
 SBM_ProcessVHMsgs_DEF              g_SBM_ProcessVHMsgs = NULL;
 SBM_GetNumberOfCharacters_DEF      g_SBM_GetNumberOfCharacters = NULL;
+SBM_InitCharacter_DEF              g_SBM_InitCharacter = NULL;
 SBM_GetCharacter_DEF               g_SBM_GetCharacter = NULL;
-#ifndef __ANDROID__
-SBM_GetCharacter2_DEF              g_SBM_GetCharacter2 = NULL;
-#endif
 SBM_ReleaseCharacter_DEF           g_SBM_ReleaseCharacter = NULL;
-SBM_ReleaseCharacterJoints_DEF     g_SBM_ReleaseCharacterJoints = NULL;
 SBM_SetLogMessageCallback_DEF      g_SBM_SetLogMessageCallback = NULL;
 SBM_LogMessage_DEF                 g_SBM_LogMessage = NULL;
 SBM_IsCharacterCreated_DEF         g_SBM_IsCharacterCreated = NULL;
@@ -136,12 +130,9 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
    g_SBM_SetDebuggerRendererRightHanded  = (SBM_SetDebuggerRendererRightHanded_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerRendererRightHanded");
    g_SBM_ProcessVHMsgs              = (SBM_ProcessVHMsgs_DEF)GetProcAddress(g_SBM_HINST, "SBM_ProcessVHMsgs");
    g_SBM_GetNumberOfCharacters      = (SBM_GetNumberOfCharacters_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetNumberOfCharacters");
+   g_SBM_InitCharacter              = (SBM_InitCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_InitCharacter");
    g_SBM_GetCharacter               = (SBM_GetCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetCharacter");
-#ifndef __ANDROID__
-   g_SBM_GetCharacter2              = (SBM_GetCharacter2_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetCharacter2");
-#endif
    g_SBM_ReleaseCharacter           = (SBM_ReleaseCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_ReleaseCharacter");
-   g_SBM_ReleaseCharacterJoints     = (SBM_ReleaseCharacterJoints_DEF)GetProcAddress(g_SBM_HINST, "SBM_ReleaseCharacterJoints");
    g_SBM_SetLogMessageCallback      = (SBM_SetLogMessageCallback_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetLogMessageCallback");
    g_SBM_LogMessage                 = (SBM_LogMessage_DEF)GetProcAddress(g_SBM_HINST, "SBM_LogMessage");
    g_SBM_IsCharacterCreated         = (SBM_IsCharacterCreated_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsCharacterCreated");
@@ -337,6 +328,19 @@ VHWRAPPERDLL_API int WRAPPER_SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle )
 #endif
 }
 
+VHWRAPPERDLL_API bool WRAPPER_SBM_InitCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_InitCharacter)
+   {
+      return g_SBM_InitCharacter(sbmHandle, name, character);
+   }
+   return false;
+#else
+   return SBM_InitCharacter(sbmHandle, name, character);
+#endif
+}
+
 VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character )
 {
 #ifdef WIN_BUILD
@@ -349,20 +353,6 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter( SBMHANDLE sbmHandle, const char 
    return SBM_GetCharacter(sbmHandle, name, character);
 #endif
 }
-#ifndef __ANDROID__
-VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter2( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter2 * character )
-{
-#ifdef WIN_BUILD
-   if (g_SBM_GetCharacter2)
-   {
-      return g_SBM_GetCharacter2(sbmHandle, name, character);
-   }
-   return false;
-#else
-   return SBM_GetCharacter2(sbmHandle, name, character);
-#endif
-}
-#endif
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character )
 {
@@ -376,20 +366,6 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacter( SBM_SmartbodyCharacter * cha
    return SBM_ReleaseCharacter(character);
 #endif
 }
-#ifndef __ANDROID__
-VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character )
-{
-#ifdef WIN_BUILD
-   if (g_SBM_ReleaseCharacter)
-   {
-      return g_SBM_ReleaseCharacter(character);
-   }
-   return false;
-#else
-   return SBM_ReleaseCharacterJoints(character);
-#endif
-}
-#endif
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetLogMessageCallback( LogMessageCallback cb )
 {
