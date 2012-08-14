@@ -1343,6 +1343,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("isZero", &SrVec::iszero, "returns True if the vector is zero")
 		.def("rotY", &SrVec::rotY, "rotate vector around Y axis (radian)")
 		.def("vecAngle", &SrVec::vecAngle, "Returns the angle between v1 and v2 (radian)")
+		.def("vecYaw", &SrVec::vecYaw, "Returns Yaw angle on X-Z plane of given vec (radian)")
 		;
 
 	boost::python::class_<SrMat>("SrMat")

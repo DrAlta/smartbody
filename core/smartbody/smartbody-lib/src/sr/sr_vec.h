@@ -285,6 +285,9 @@ class SrVec
 	/*! Returns the value specified by the index */
     float getData ( int index ) { return (*this)[index];}
 
+	/*! Returns the Yaw angle value of given vector on X-Z plane, in radian, not normalized. - David Huang */
+	float vecYaw(const SrVec& v);
+
  };
 
  SrVec rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle);
