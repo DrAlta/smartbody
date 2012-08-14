@@ -4,6 +4,7 @@
 #define VisemeViewerWindow_h
 
 #include <vector>
+#include <map>
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Bar.H>
@@ -48,10 +49,15 @@ protected:
 	
 	Fl_Input* _inputPlayTime;
 	Fl_Button* _buttonPlayDialog;
+	Fl_Button* _buttonReset;
+	Fl_Button* _buttonShowStats;
 	Fl_Input* _inputUtterance;
+	Fl_Check_Button* _checkStats;
 	VisemeCurveEditor * _curveEditor;
 	bool _phonemesSelected[2];
 	std::string _lastUtterance;
+	bool _gatherStats;
+	std::map<std::string, int> _diphoneStats;
 
 	void draw();
 	bool loadData();
@@ -77,6 +83,9 @@ protected:
 	static void OnPlayDialogCB(Fl_Widget* widget, void* data);
 	static void OnSaveCB(Fl_Widget* widget, void* data);
 	static void OnBmlRequestCB(BML::BmlRequest* request, void* data);
+	static void OnShowStatsCB(Fl_Widget* widget, void* data);
+	static void OnStatsResetCB(Fl_Widget* widget, void* data);
+	static void OnGatherStatsCB(Fl_Widget* widget, void* data);
 
 };
 #endif

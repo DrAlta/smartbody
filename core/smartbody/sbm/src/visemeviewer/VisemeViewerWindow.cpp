@@ -43,6 +43,15 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_choiceCharacter = new Fl_Choice(70, 35, 100, 25, "Character");
 	_choiceCharacter->callback(OnCharacterSelectCB, this);
 
+	_checkStats = new Fl_Check_Button(250, 35, 100, 25, "Gather Stats");
+	_checkStats->callback(OnGatherStatsCB, this);
+
+	_buttonReset = new Fl_Button(400, 35, 100, 25, "Reset Stats");
+	_buttonReset->callback(OnStatsResetCB, this);
+
+	_buttonShowStats = new Fl_Button(500, 35, 100, 25, "Save Stats");
+	_buttonShowStats->callback(OnShowStatsCB, this);
+
 	_browserPhoneme[0] = new Fl_Hold_Browser(10, 80, 70, 350, "Phoneme 1");
 	_browserPhoneme[0]->align(FL_ALIGN_TOP);
 	_browserPhoneme[0]->callback(OnPhoneme1SelectCB, this);
@@ -69,6 +78,8 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_browserDiphone->callback(OnDiphoneSelectCB, this);
 
 	this->end();
+
+	_gatherStats = false;
 
 	loadData();
 }
@@ -626,6 +637,23 @@ void VisemeViewerWindow::OnBmlRequestCB(BML::BmlRequest* request, void* data)
 
 				strstr << v[0] << " - " << v[1];
 				viewer->_browserDiphone->add(strstr.str().c_str());
+
+				if (viewer->_gatherStats)
+				{
+					std::map<std::string, int>::iterator iter = viewer->_diphoneStats.find(strstr.str());
+					if (iter == viewer->_diphoneStats.end())
+					{
+						std::pair<std::string, int> entry;
+						entry.first = strstr.str();
+						entry.second = 1;
+						viewer->_diphoneStats.insert(entry);
+					}
+					else
+					{
+						int& count = (*iter).second;
+						count++;
+					}
+				}
 			}
 		}
 	}
@@ -692,3 +720,89 @@ void VisemeViewerWindow::enforceNamingConvention(char * c_str)
 			c_str[k] = tolower(c_str[k]);
 	}
 }
+
+typedef std::pair<std::string, int> data_a;     
+std::map<std::string, int>::iterator a_it;  
+
+template<class T>    
+struct less_second : std::binary_function<T,T,bool>    
+{    
+    inline bool operator()( const T& lhs, const T& rhs )    
+    {    
+        return lhs.second < rhs.second;    
+    }    
+};
+
+std::vector<data_a> sort_by_weight(std::map<std::string, int>& map)    
+{        
+    std::vector< data_a > vec(map.begin(), map.end());           
+    std::sort(vec.begin(), vec.end(), less_second<data_a>());       
+    return vec;    
+} 
+
+
+void VisemeViewerWindow::OnShowStatsCB(Fl_Widget* widget, void* data)
+{
+	const char* filename = fl_file_chooser("Save diphone stats to:", "*.txt", NULL);
+	if (!filename)
+		return;
+
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	// sort the map
+	std::vector<data_a> sortedDiphones = sort_by_weight(viewer->_diphoneStats);
+
+	// determine the total instance count
+	int instanceCount = 0;
+	for (std::vector<data_a>::iterator iter = sortedDiphones.begin();
+		 iter != sortedDiphones.end();
+		 iter++)
+	{
+		instanceCount +=  (*iter).second; 
+	}
+
+	if (instanceCount == 0)
+	{
+		fl_alert("No diphone instances found. No file written.");
+		return;
+	}
+
+	float instanceCountF = (float) instanceCount;
+		
+	std::stringstream strstr;
+	for (std::vector<data_a>::iterator iter = sortedDiphones.begin();
+		 iter != sortedDiphones.end();
+		 iter++)
+	{
+		float percentage = float((*iter).second) / instanceCountF;
+		strstr << (*iter).first << " " << (*iter).second << " " << percentage << "\n"; 
+	}
+
+
+	std::ofstream file(filename);
+	if (file.is_open() != true)
+	{
+		fl_alert("Problem writing to file %s, diphone stats were not saved.", filename);
+		return;
+	}
+	file << strstr.str();
+	file.close();	
+
+	
+
+}
+
+void VisemeViewerWindow::OnStatsResetCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+	viewer->_diphoneStats.clear();
+}
+
+void VisemeViewerWindow::OnGatherStatsCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	Fl_Check_Button* check = dynamic_cast<Fl_Check_Button*>(widget);
+	viewer->_gatherStats = check->value();
+}
+
