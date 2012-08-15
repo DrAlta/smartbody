@@ -246,7 +246,7 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreate
       return g_SBM_SetListener(sbmHandle, createCB, deleteCB, changeCB, visemeCB, channelCB);
    }
    return false;
-#elif defined(IPHONE_BUILD)
+#elif defined(IPHONE_BUILD) || defined(ANDROID_BUILD)
    return SBM_SetListener(sbmHandle, NULL, NULL, NULL, NULL, NULL);
 #else
    return SBM_SetListener(sbmHandle, createCB, deleteCB, changeCB, visemeCB, channelCB);
@@ -525,7 +525,7 @@ VHWRAPPERDLL_API char * WRAPPER_SBM_PythonCommandString(SBMHANDLE sbmHandle, con
 ////////////////////////////////////////////////////////////////////////////
 
 
-#if !defined(MAC_BUILD) && !defined(IPHONE_BUILD)
+#if !defined(MAC_BUILD) && !defined(IPHONE_BUILD) && !defined(ANDROID_BUILD)
 
 VHWRAPPERDLL_API AUDIOHANDLE WRAPPER_VHCL_AUDIO_CreateAudio()
 {

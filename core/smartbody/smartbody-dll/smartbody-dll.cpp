@@ -125,7 +125,7 @@ class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
       }
 
       virtual void OnCharacterChanged( const std::string& name ) 
-      {
+      {	 
          if ( m_dll->m_listener )
          {
             std::map<std::string,SmartbodyCharacter*>::iterator mi = m_dll->m_characters.find(name);

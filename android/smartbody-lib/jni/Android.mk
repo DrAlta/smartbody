@@ -63,15 +63,20 @@ LOCAL_MODULE := iconv-prebuilt
 LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libiconv.a
 include $(PREBUILT_STATIC_LIBRARY)
 
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := python-prebuilt
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.6.so
+#include $(PREBUILT_SHARED_LIBRARY)
+
 include $(CLEAR_VARS)
 LOCAL_MODULE := python-prebuilt
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.6.so
-include $(PREBUILT_SHARED_LIBRARY)
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.6.a
+include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := boost-python-prebuilt
 LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_python.a
-LOCAL_SHARED_LIBRARIES := python-prebuilt	
+LOCAL_STATIC_LIBRARIES := python-prebuilt	
 include $(PREBUILT_STATIC_LIBRARY)
 
 
@@ -434,8 +439,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 LOCAL_LDLIBS    := -llog 
 #LOCAL_LDLIBS    := -llog -gstabs	  
 #LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
-LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
-LOCAL_SHARED_LIBRARIES := python-prebuilt 
+LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt python-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode  
+#LOCAL_SHARED_LIBRARIES := python-prebuilt 
 include $(BUILD_STATIC_LIBRARY)
 #include $(BUILD_SHARED_LIBRARY)
 

@@ -105,7 +105,7 @@ public:
 
    virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass )
    {
-#if !defined(IPHONE_BUILD)
+#if !defined(IPHONE_BUILD) && !defined(ANDROID_BUILD)
       m_createCharacterCallback( m_sbmHandle, name.c_str(), objectClass.c_str() );
 #else
       SBM_CallbackInfo info;
@@ -117,7 +117,7 @@ public:
 
    virtual void OnCharacterDelete( const std::string & name )
    {
-#if !defined(IPHONE_BUILD)
+#if !defined(IPHONE_BUILD) && !defined(ANDROID_BUILD)
       m_deleteCharacterCallback( m_sbmHandle, name.c_str() );
 #else
       SBM_CallbackInfo info;
@@ -128,7 +128,7 @@ public:
 
    virtual void OnCharacterChanged( const std::string & name )
    {
-#if !defined(IPHONE_BUILD)
+#if !defined(IPHONE_BUILD) && !defined(ANDROID_BUILD)
       m_changeCharacterCallback( m_sbmHandle, name.c_str() );
 #else
       SBM_CallbackInfo info;
@@ -139,7 +139,7 @@ public:
 
    virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
    {
-#if !defined(IPHONE_BUILD)
+#if !defined(IPHONE_BUILD) && !defined(ANDROID_BUILD)
       m_viseme( m_sbmHandle, name.c_str(), visemeName.c_str(), weight, blendTime );
 #else
       SBM_CallbackInfo info;
@@ -153,7 +153,7 @@ public:
 
    virtual void OnChannel( const std::string & name, const std::string & channelName, const float value )
    {
-#if !defined(IPHONE_BUILD)
+#if !defined(IPHONE_BUILD) && !defined(ANDROID_BUILD)
       m_channel( m_sbmHandle, name.c_str(), channelName.c_str(), value );
 #else
       SBM_CallbackInfo info;
@@ -516,9 +516,8 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char * nam
 
     SBM_CallbackInfo info = g_CreateCallbackInfo[sbmHandle].back();
     g_CreateCallbackInfo[sbmHandle].pop_back();
-
     strncpy(name, info.name.c_str(), maxNameLen);
-    strncpy(objectClass, info.objectClass.c_str(), maxObjectClassLen);
+    strncpy(objectClass, info.objectClass.c_str(), maxObjectClassLen);    
     return true;
 }
 
@@ -544,9 +543,9 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, char * nam
     }
 
     SBM_CallbackInfo info = g_ChangeCallbackInfo[sbmHandle].back();
-    g_ChangeCallbackInfo[sbmHandle].pop_back();
-
-    strncpy(name, info.name.c_str(), maxNameLen);
+    g_ChangeCallbackInfo[sbmHandle].pop_back();    
+    strncpy(name, info.name.c_str(), maxNameLen);   
+ 
     return true;
 }
 
@@ -559,9 +558,10 @@ SMARTBODY_C_DLL_API bool SBM_IsVisemeSet( SBMHANDLE sbmHandle, char * name, int 
 
     SBM_CallbackInfo info = g_VisemeCallbackInfo[sbmHandle].back();
     g_VisemeCallbackInfo[sbmHandle].pop_back();
-
+   
     strncpy(name, info.name.c_str(), maxNameLen);
     strncpy(visemeName, info.visemeName.c_str(), maxNameLen);
+    
     *weight = info.weight;
     *blendTime = info.blendTime;
     return true;
@@ -579,6 +579,7 @@ SMARTBODY_C_DLL_API bool SBM_IsChannelSet( SBMHANDLE sbmHandle, char * name, int
 
     strncpy(name, info.name.c_str(), maxNameLen);
     strncpy(channelName, info.visemeName.c_str(), maxNameLen);
+    
     *value = info.weight;
     return true;
 }

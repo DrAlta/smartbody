@@ -21,7 +21,7 @@ package com.android.sbmjni;
 public class SbmJNILib {
 
      static {
-    	 System.loadLibrary("python2.6");
+    	 //System.loadLibrary("python2.6");
     	 //System.loadLibrary("sbm");
          System.loadLibrary("sbmjni");
      }

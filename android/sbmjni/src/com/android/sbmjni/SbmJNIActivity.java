@@ -40,6 +40,16 @@ public class SbmJNIActivity extends Activity {
     }
 
     @Override protected void onResume() {
+    	/*
+    	try {
+    		Thread.sleep(1000*15);
+    		
+    	}
+    	catch (Exception e)
+    	{
+    	
+    	}
+    	*/
         super.onResume();
         SbmJNILib.executeSbm("time resume"); 
         //mView.onResume();

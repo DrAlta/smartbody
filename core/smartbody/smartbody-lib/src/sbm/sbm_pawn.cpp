@@ -235,26 +235,25 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 
 	if (_skeleton)
-	{
+	{		
 		ct_tree_p->remove_skeleton( _skeleton->name() );
 		_skeleton->unref();
 	}
 	_skeleton = sk;
-	_skeleton->ref();
-	ct_tree_p->add_skeleton( _skeleton->name(), _skeleton );
-
+	_skeleton->ref();	
+	ct_tree_p->add_skeleton( _skeleton->name(), _skeleton );	
 	if ( mcuCBHandle::singleton().sbm_character_listener )
-	{
+	{		
 		mcuCBHandle::singleton().sbm_character_listener->OnCharacterChanged( getName() );
 	}
 	//scene_p->init(_skeleton);
 	//int err = mcu.add_scene(scene_p);	
 	if (dMesh_p)
-		dMesh_p->skeleton = _skeleton;
+		dMesh_p->skeleton = _skeleton;	
 	if (dMeshInstance_p)
 		dMeshInstance_p->setSkeleton(_skeleton);
-
-	float height = _skeleton->getCurrentHeight();
+		
+	float height = _skeleton->getCurrentHeight();	
 	setHeight(height);
 	_skeleton->ref();
 }
