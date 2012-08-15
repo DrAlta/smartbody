@@ -108,10 +108,11 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	}	
 	if (curStateData)
 	{
-		if (curStateData->state &&
-			curStateData->state->stateName != PseudoIdleState && 
-			nextStateData == NULL && (curStateData->wrapMode == PABlendData::Once))
-		{
+		if (curStateData->state && // the state exist
+			curStateData->state->stateName != PseudoIdleState &&  // not a idle state
+			nextStateData == NULL && (curStateData->wrapMode == PABlendData::Once) && // only played once
+			curStateData->timeManager->getNormalizeLocalTime() >= (curStateData->timeManager->getDuration() - curStateData->transitionLength)) // about to finish
+		{			
 			if (!hasPABlend(PseudoIdleState))
 			{
 				std::vector<double> weights;
@@ -507,13 +508,14 @@ bool MeCtParamAnimation::isIdle()
 void MeCtParamAnimation::autoScheduling(double time)
 {
 	if (waitingList.size() == 0)
-		return;
-
-	if (transitionManager)
-		return;
+		return;	
 
 	ScheduleUnit nextUnit = waitingList.front();
+
 	if (time < nextUnit.time)
+		return;
+	
+	if (transitionManager)
 		return;
 
 	// if current state is pseudo idle & next state is also pseudo idle, ignore

@@ -1,4 +1,4 @@
-12/1/11
+08/13/2012
 
 Instructions to build a SmartBody application for Android
 ---------------------------------------------------------
@@ -27,27 +27,29 @@ Note that there are three different examples of Android applications using Smart
 (3A) sbmjni :
 
 sbmjni is a hello world project for SmartBody. It has very basic rendering and minimal functionality, but it helps demonstarte the SmartBody port on android. 
-i)   Go to (SmartBodyDir)/android/sbm-jni/
-ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading).
-iii) Use Eclipse to open the project (SmartBodyDir)/android/sbm/. 
-iv)  Select Project->Build Project. Connect the device and then run the program as "Android Application".
+a) Go to (SmartBodyDir)/android/sbm-jni/
+b) ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading).
+c) copy the directory (SmartBodyDir)/android/sbm-jni/sbmjniData and its files to sdcard directory of your android device. ( Usually under /sdcard/ )
+d) Use Eclipse to open the project (SmartBodyDir)/android/sbm/. 
+e) Select Project->Build Project. Connect the device and then run the program as "Android Application".
 
 (3B) sbm-ogre :
 
 sbm-ogre combines SmartBody and ogre for high quality rendering. Currently, it is very slow when rendering in deformable model mode.
-i)   Go to (SmartBodyDir)/android/sbm-ogre/
-ii)  ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading).
-iii) Use Eclipse to open the project (SmartBodyDir)/android/sbm-ogre/. 
-iv)  Select Project->Build Project. ThConnect the device and then run the program as "Android Application".
+a) Go to (SmartBodyDir)/android/sbm-ogre/
+b) ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading).
+c) copy the directory (SmartBodyDir)/android/sbm-ogre/SbmOgre and its files to sdcard directory of your android device. ( Usually under /sdcard/ )
+d) Use Eclipse to open the project (SmartBodyDir)/android/sbm-ogre/. 
+e) Select Project->Build Project. ThConnect the device and then run the program as "Android Application".
 
 (3C) vh-wrapper
 
 vh-wrapper is a SmartBody interface to Unity3D. Note that SmartBody connects to Unity via Unity's native code plugin interface, which presently requires a Unity Pro license. In addition, the Unity project needs to be compiled for Android, so a Unity Android license is needed as well.
 
-i)   Go to SmartBody/android/vh_wrapper/
-ii)  ndk-build
-iii) rename libvhwrapper.so to libvhwrapper-dll.so ( for some reason, Android does not accept a build target name with "-" )
-iv)  copy libvhwrapper-dll.so to the plug-in directory of Unity project. Build the Unity project for android.
+a) Go to SmartBody/android/vh_wrapper/
+b) ndk-build
+c) rename libvhwrapper.so to libvhwrapper-dll.so ( for some reason, Android does not accept a build target name with "-" )
+d) copy libvhwrapper-dll.so to the plug-in directory of Unity project. Build the Unity project for android.
 
 
 **** If you are targeting other hardware achitecture ( x86, etc ) or you prefer to rebuild all libraries from their sources:
