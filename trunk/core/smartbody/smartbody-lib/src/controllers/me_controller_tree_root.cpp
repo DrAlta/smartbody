@@ -274,7 +274,7 @@ public:
      *  Sets channel set to skeletons joints.
      *  Currently only supports one entity/skeleton.
      */
-	void add_skeleton( const std::string& entityName, SkSkeleton* skeleton ) {
+	void add_skeleton( const std::string& entityName, SkSkeleton* skeleton ) {		
 		SR_ASSERT( _state!=REMAPPING );  // simple lock
 
 		if( skeleton==NULL ) {
@@ -284,10 +284,9 @@ public:
 		if( _skeleton!=NULL && _skeleton!=skeleton ) {
 			LOG("MeEvaluationContextSimple::addSkeleton(..): Unimplemented: Multiple Skeletons.");
 			return;
-		}
-
-		_skeletonName = entityName;
-		_skeleton = skeleton;
+		}		
+		_skeletonName = entityName;		
+		_skeleton = skeleton;		
 		_skeleton->ref();
 
 		_state = INVALID;

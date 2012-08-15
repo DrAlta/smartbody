@@ -1379,7 +1379,6 @@ boost::python::class_<SBReach>("SBReach")
 		.def("isEmpty", &SrBox::empty, "returns true if the box is empty")
 		;
 
-#ifndef __ANDROID__
 	boost::python::class_<NvbgWrap, boost::python::bases<SBObject>, boost::noncopyable>("Nvbg")
 		.def("objectEvent", &Nvbg::objectEvent, &NvbgWrap::default_objectEvent, "An event indicating that an object of interest is present.")
 		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the xml vrX message.")
@@ -1405,7 +1404,6 @@ boost::python::class_<SBReach>("SBReach")
 	boost::python::class_<EventHandlerWrap, boost::noncopyable>("EventHandler")
 		.def("executeAction", &EventHandler::executeAction, &EventHandlerWrap::default_executeAction, "Execute the event handler.")
 		;
-#endif
 
 	boost::python::class_<PythonControllerWrap, boost::python::bases<SBController>, boost::noncopyable> ("PythonController")
 		.def("start", &PythonController::start, &PythonControllerWrap::default_start, "start.")

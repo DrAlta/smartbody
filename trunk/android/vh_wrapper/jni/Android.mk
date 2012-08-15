@@ -27,7 +27,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/boost \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/bonebus/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/vhcl/include \
-					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/vhmsg/include \
+					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/vhmsg/vhmsg-c/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/wsp/wsp/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../steersuite-1.3/external/ \
 					$(LOCAL_PATH)/$(SBM_PATH)/../steersuite-1.3/steerlib/include \
@@ -37,6 +37,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					$(LOCAL_PATH)/../../../core/smartbody/sbm-debugger/lib \
 					$(LOCAL_PATH)/$(SBM_PATH)/src \
 					$(LOCAL_PATH)/$(IOS_PATH)/
+#LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti
 LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti
 LOCAL_SRC_FILES := $(SBM_PATH)/../smartbody-dll/smartbody-dll.cpp \
        	           $(SBM_PATH)/../smartbody-dll/smartbody-c-dll.cpp \
@@ -44,6 +45,6 @@ LOCAL_SRC_FILES := $(SBM_PATH)/../smartbody-dll/smartbody-dll.cpp \
                    
 			
 LOCAL_LDLIBS    := -llog -lOpenSLES
-LOCAL_SHARED_LIBRARIES := python-prebuilt 
-LOCAL_STATIC_LIBRARIES := sbm xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile openalut
+#LOCAL_SHARED_LIBRARIES := python-prebuilt 
+LOCAL_STATIC_LIBRARIES := sbm xerces-prebuilt python-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile openalut
 include $(BUILD_SHARED_LIBRARY) 

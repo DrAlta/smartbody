@@ -86,6 +86,6 @@ LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti
 LOCAL_SRC_FILES := Main.cpp AndroidLogListener.cpp OgreDemoApp.cpp OgreFramework.cpp test.cpp SBListener.cpp
 LOCAL_LDLIBS    := -llog -lEGL -lGLESv2
 #LOCAL_LDLIBS    := -llog -lEGL -lGLESv2 -gstabs
-LOCAL_SHARED_LIBRARIES := python-prebuilt 
-LOCAL_STATIC_LIBRARIES := libogre rs_gles2 librts libois libfreeimage libfreetype libzzip sbm xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt
+#LOCAL_SHARED_LIBRARIES := python-prebuilt 
+LOCAL_STATIC_LIBRARIES := libogre rs_gles2 librts libois libfreeimage libfreetype libzzip sbm xerces-prebuilt python-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt
 include $(BUILD_SHARED_LIBRARY) 

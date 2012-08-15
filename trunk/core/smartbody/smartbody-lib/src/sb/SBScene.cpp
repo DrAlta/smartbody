@@ -255,12 +255,11 @@ SBCharacter* SBScene::createCharacter(std::string charName, std::string metaInfo
 	else
 	{
 		SBCharacter* character = new SBCharacter(charName, metaInfo);
-		SBSkeleton* skeleton = new SBSkeleton();
-		//LOG("before character->setSkeleton");
-		character->setSkeleton(skeleton);
+		SBSkeleton* skeleton = new SBSkeleton();		
+		character->setSkeleton(skeleton);		
 		SkJoint* joint = skeleton->add_joint(SkJoint::TypeQuat);
-		joint->setName("world_offset");
-		joint->update_gmat();		
+		joint->setName("world_offset");		
+		joint->update_gmat();			
 		mcu.registerCharacter(character);
 
 		// notify the services		
