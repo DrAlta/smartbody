@@ -385,12 +385,6 @@
     <ClCompile Include="..\src\sb\SBPhysicsManager.cpp">
       <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sb\SBPython.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sb\SBPythonClass.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sb\SBReach.cpp">
       <Filter>sb</Filter>
     </ClCompile>
@@ -1039,6 +1033,27 @@
     <ClCompile Include="..\src\external\parser\utils.cpp">
       <Filter>external\parser</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sb\SBPythonClass.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBPython.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBPython1.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBPython2.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBPython3.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBPython4.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBPythonFromEd.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -1441,12 +1456,6 @@
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sb\SBPhysicsManager.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sb\SBPython.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sb\SBPythonClass.h">
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sb\SBReach.h">
@@ -2118,6 +2127,18 @@
     <ClInclude Include="..\src\external\parser\utils.h">
       <Filter>external\parser</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\sb\SBPythonClass.h">
+      <Filter>python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBPython.h">
+      <Filter>python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBTypes.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBPythonInternal.h">
+      <Filter>python</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag">
@@ -2169,6 +2190,9 @@
     </Filter>
     <Filter Include="GPU">
       <UniqueIdentifier>{3b133278-3c1b-4375-93aa-b0103170e643}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="python">
+      <UniqueIdentifier>{3d4ce46a-b597-4aba-8b2b-bd42c8d1d853}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

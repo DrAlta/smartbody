@@ -551,10 +551,11 @@ void VisemeViewerWindow::OnPlayDialogCB(Fl_Widget* widget, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
 	std::string utterance = viewer->_inputUtterance->value(); 	
+	std::string utteranceClean = vhcl::Replace(utterance, "'", "\\'");
 	if (utterance != "")
 	{
 		std::stringstream strstr;
-		strstr << "python bml.execBML('" << viewer->getCurrentCharacterName() << "', '<speech type=\"text/plain\">" << viewer->_inputUtterance->value() << "</speech>')";
+		strstr << "python bml.execBML('" << viewer->getCurrentCharacterName() << "', '<speech type=\"text/plain\">" << utteranceClean << "</speech>')";
 		SmartBody::SBScene::getScene()->command(strstr.str());
 	}
 
