@@ -395,6 +395,10 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBController.cpp \
 	$(SBM_MY_DIR)/sbm/sr_path_list.cpp \
 	$(SBM_MY_DIR)/sb/SBPython.cpp \
+	$(SBM_MY_DIR)/sb/SBPython1.cpp \
+	$(SBM_MY_DIR)/sb/SBPython2.cpp \
+	$(SBM_MY_DIR)/sb/SBPython3.cpp \
+	$(SBM_MY_DIR)/sb/SBPython4.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonClass.cpp \
 	$(SBM_MY_DIR)/sb/SBSimulationManager.cpp \
 	$(SBM_MY_DIR)/sb/SBBmlProcessor.cpp \
