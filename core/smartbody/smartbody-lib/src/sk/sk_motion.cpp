@@ -879,7 +879,9 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 
 	std::vector<SrVec> srcDirList, origSrcDirList;
 	std::vector<SrVec> dstDirList;
-	SrVec pos = pjoint->gmat().get_translation();					
+	SrVec pos = pjoint->gmat().get_translation();	
+
+#if 0
 	for (int i=0; i< srcjoint->num_children(); i++)
 	{
 		SkJoint* child = srcjoint->child(i);
@@ -895,6 +897,33 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		dstDirList.push_back(dstdir);
 		//dir += gdir;
 	}
+#else
+	std::queue<std::string> childJointNameQueue;
+	for (int i=0; i< srcjoint->num_children(); i++)
+		childJointNameQueue.push(srcjoint->child(i)->name());
+	while (!childJointNameQueue.empty())
+	{
+		std::string childName = childJointNameQueue.front(); childJointNameQueue.pop();
+		SkJoint* child = tempSrcSk->search_joint(childName.c_str());
+		if (std::find(endJoints.begin(),endJoints.end(),childName) != endJoints.end())
+			continue;
+		SkJoint* interSkChild = interSk->search_joint(childName.c_str());
+		if (interSkChild)
+		{
+			SrVec srcdir = tempSrcSk->boneGlobalDirection(pjoint->name(),childName);
+			SrVec dstdir = interSk->boneGlobalDirection(pjoint->name(),childName);	
+			//jointQueues.push(child->name());
+			srcDirList.push_back(srcdir);			
+			dstDirList.push_back(dstdir);			
+			break;
+		}
+		for (int k=0;k<child->num_children();k++)
+		{
+			childJointNameQueue.push(child->child(k)->name());
+		}
+	}
+#endif	
+
 	SrQuat jointRotation;
 	//if (srcDirList.size() == 1 || srcDirList.size() == 2)
 	{
