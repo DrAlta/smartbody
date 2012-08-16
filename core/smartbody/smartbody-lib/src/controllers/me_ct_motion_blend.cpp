@@ -15,6 +15,7 @@
 
 using namespace boost;
 
+std::string MeCtMotionBlend::CONTROLLER_TYPE = "Blend";
 
 /************************************************************************/
 /* Motion Blending Controller                                           */
