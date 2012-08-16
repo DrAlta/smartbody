@@ -35,6 +35,8 @@ SBReach* SBReachManager::createReach(std::string characterName)
 	}
 
 	SBReach* reach = new SBReach(character);
+	//_reaches.insert(pair<std::string, SBReach*>(characterName, reach));
+	_reaches[characterName] = reach;
 	return reach;
 }
 
