@@ -23,6 +23,7 @@ class SBReach
 		void addMotion(std::string type, SBMotion* motion);
 		void removeMotion(std::string type, SBMotion* motion);
 		int getNumMotions();
+		bool isPawnAttached(std::string pawnName);
 
 		std::vector<std::string> getMotionNames(std::string type);
 		void build(SBCharacter* character);
