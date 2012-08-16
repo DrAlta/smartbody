@@ -966,21 +966,6 @@ void PABlendData::evaluate(double timeStep, SrBuffer<float>& buffer)
 	SrBuffer<float> buffCopy = buffer;
 	bool isZeroD = isZeroDState();
 	bool OnceAndReachCycle = (wrapMode != Loop && !notReachCycle);
-// 	if (isZeroD && directPlay && wrapMode != Loop)
-// 	{
-// 		if (OnceAndReachCycle)
-// 		{
-// 			interpolator->blending(timeManager->motionTimes, buffer);
-// 			LOG("motion time = %f",timeManager->motionTimes[0]);
-// 			woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffCopy, true);
-// 			active = false;
-// 		}
-// 		else
-// 		{
-// 			active = true;
-// 		}
-// 	}
-// 	else
 	{		
 		if (wrapMode == Loop || ((wrapMode != Loop) && notReachCycle))
 		{
