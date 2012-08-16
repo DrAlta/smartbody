@@ -412,10 +412,6 @@
     <ClCompile Include="..\src\sb\SBMotionBlendBase.cpp" />
     <ClCompile Include="..\src\sb\SBPhoneme.cpp" />
     <ClCompile Include="..\src\sb\SBPhonemeManager.cpp" />
-    <ClCompile Include="..\src\sb\SBPython1.cpp" />
-    <ClCompile Include="..\src\sb\SBPython2.cpp" />
-    <ClCompile Include="..\src\sb\SBPython3.cpp" />
-    <ClCompile Include="..\src\sb\SBPython4.cpp" />
     <ClCompile Include="..\src\sk\sk_channel.cpp" />
     <ClCompile Include="..\src\sk\sk_channel_array.cpp" />
     <ClCompile Include="..\src\sk\sk_joint.cpp" />
@@ -891,7 +887,6 @@
     <ClInclude Include="..\src\sb\SBMotionBlendBase.h" />
     <ClInclude Include="..\src\sb\SBPhoneme.h" />
     <ClInclude Include="..\src\sb\SBPhonemeManager.h" />
-    <ClInclude Include="..\src\sb\SBPythonInternal.h" />
     <ClInclude Include="..\src\sb\SBTypes.h" />
     <ClInclude Include="..\src\sk\sk_channel.h" />
     <ClInclude Include="..\src\sk\sk_channel_array.h" />

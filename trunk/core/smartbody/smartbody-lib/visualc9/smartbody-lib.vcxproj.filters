@@ -1039,18 +1039,6 @@
     <ClCompile Include="..\src\sb\SBPython.cpp">
       <Filter>python</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sb\SBPython1.cpp">
-      <Filter>python</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sb\SBPython2.cpp">
-      <Filter>python</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sb\SBPython3.cpp">
-      <Filter>python</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sb\SBPython4.cpp">
-      <Filter>python</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -2132,9 +2120,6 @@
     </ClInclude>
     <ClInclude Include="..\src\sb\SBTypes.h">
       <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sb\SBPythonInternal.h">
-      <Filter>python</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

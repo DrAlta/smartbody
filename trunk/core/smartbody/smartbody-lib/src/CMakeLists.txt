@@ -386,10 +386,6 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBMotionBlendBase.cpp
 
 	sb/SBPython.cpp
-	sb/SBPython1.cpp
-	sb/SBPython2.cpp
-	sb/SBPython3.cpp
-	sb/SBPython4.cpp
 	sb/SBPythonClass.cpp
 
 	sbm/nvbg.cpp
