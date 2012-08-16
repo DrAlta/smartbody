@@ -3688,11 +3688,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sb\SBPython1.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBPython2.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBPython3.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBPython4.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sb\SBPythonClass.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\src\sb\SBPythonClass.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBPythonInternal.h"
 				>
 			</File>
 		</Filter>
