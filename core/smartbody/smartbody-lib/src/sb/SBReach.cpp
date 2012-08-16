@@ -1,6 +1,7 @@
 #include "SBReach.h"
 #include <sb/SBCharacter.h>
 #include <sb/SBMotion.h>
+#include <controllers/MeCtBodyReachState.h>
 
 namespace SmartBody {
 
@@ -112,6 +113,28 @@ void SBReach::build(SBCharacter* character)
 			re->updateMotionExamples(_character->getReachMotionDataSet(), interpolatorType);
 		}
 	}
+}
+
+
+bool SBReach::isPawnAttached( std::string pawnName )
+{	
+	if (!_character)
+		return false;
+
+	for (ReachEngineMap::iterator mi = _character->getReachEngineMap().begin();
+		mi != _character->getReachEngineMap().end();
+		mi++)
+	{
+		MeCtReachEngine* re = mi->second;
+		if (re)
+		{
+			if (re->getReachData()->effectorState.attachedPawnName == pawnName)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void SBReach::setPointHandMotion( std::string type, SBMotion* pointMotion )
