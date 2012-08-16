@@ -416,7 +416,6 @@
     <ClCompile Include="..\src\sb\SBPython2.cpp" />
     <ClCompile Include="..\src\sb\SBPython3.cpp" />
     <ClCompile Include="..\src\sb\SBPython4.cpp" />
-    <ClCompile Include="..\src\sb\SBPythonFromEd.cpp" />
     <ClCompile Include="..\src\sk\sk_channel.cpp" />
     <ClCompile Include="..\src\sk\sk_channel_array.cpp" />
     <ClCompile Include="..\src\sk\sk_joint.cpp" />

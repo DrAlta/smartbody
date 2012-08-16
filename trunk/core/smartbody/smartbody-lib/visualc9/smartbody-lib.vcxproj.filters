@@ -1051,9 +1051,6 @@
     <ClCompile Include="..\src\sb\SBPython4.cpp">
       <Filter>python</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sb\SBPythonFromEd.cpp">
-      <Filter>python</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
