@@ -49,6 +49,7 @@ class SteeringAgent
 		void initSteerParams();
 		void addSteeringAttributes();
 		void sendLocomotionEvent(const std::string& status);
+		void locomotionHalt();
 
 	private:
 		void normalizeAngle(float& angle);

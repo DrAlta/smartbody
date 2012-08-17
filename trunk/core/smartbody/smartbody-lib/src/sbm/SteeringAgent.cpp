@@ -681,13 +681,8 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 	}
 	if (locomotionEnd)      // need to define when you want to end the locomotion
 	{
-		std::vector<double> weights;
-		character->param_animation_ct->schedule(NULL, weights);
-		sendLocomotionEvent("success");
-		character->trajectoryGoalList.clear();
-		agent->clearGoals();
-		goalList.clear();
-		steerPath.clearPath();			
+		locomotionHalt();
+
 		//character->param_animation_ct->schedule(NULL, weights);		
 		//LOG("path following end");			
 	}
@@ -1617,4 +1612,17 @@ void SteeringAgent::setSteerParamsDirty(bool val)
 bool SteeringAgent::isSteerParamsDirty()
 {
 	return _dirty;
+}
+
+void SteeringAgent::locomotionHalt()
+{
+	std::vector<double> weights;
+	ScheduleType sc;
+	sc.schedule = PABlendData::Now;
+	character->param_animation_ct->schedule(NULL, weights,sc);
+	sendLocomotionEvent("success");
+	character->trajectoryGoalList.clear();
+	agent->clearGoals();
+	goalList.clear();
+	steerPath.clearPath();
 }
