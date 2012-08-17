@@ -6,24 +6,33 @@ print "|--------------------------------------------|"
 # =====================================	
 # FOLLOW THESE STEPS TO USE THIS SCRIPT
 '''
-scene.run("hotpotato.py")
+# 1. load the script
+scene.run("hot-potato.py")
 
+# 2. set up names for agents and object
 giver = 'doctor'
 taker = 'brad'
 obj = 'box'
 
-# then make sure object is somewhere can be picked up
+# 3. make sure object is somewhere can be picked up
 dummyPos = offerHandPos(giver, taker)
 dummy.setPosition(dummyPos)
 target = scene.getPawn(obj)
 target.setPosition(dummyPos)
 
+# 4. this triggers the object passing, from giver to taker
+# giver will pickup object if not already attached in hand
+# taker will walk towards giver when giver "offers" the obj
+# make sure object can be grabbed by giver (e.g. not in someone's hand)
 giverHandToTaker(giver, taker, obj)
-# or specify giver, taker, obj with the following:
-giverHandToTaker('elder', 'utah', 'box')
-giverHandToTaker('brad', 'doctor', 'box')
+# or simply
+t()
 
-# then release the object:
+# swap the giver and taker, and run it again:
+swap()
+t()
+
+# taker release the object:
 reset()
 # or simply
 r()
@@ -33,13 +42,17 @@ masterReset()
 # or simply
 mr()
 
+# you can also directly specify giver, taker, obj as follows:
+#giverHandToTaker('elder', 'utah', 'box')
+#giverHandToTaker('brad', 'doctor', 'box')
+
 # optional: enable pathFollowingMode
 giverChr = scene.getCharacter(giver)
 giverChr.setBoolAttribute("steering.pathFollowingMode", True)
 takerChr = scene.getCharacter(taker)
 takerChr.setBoolAttribute("steering.pathFollowingMode", True)
-
 '''
+
 # =====================================	
 # for state machine
 IDLE = 0

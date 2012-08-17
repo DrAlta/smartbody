@@ -119,7 +119,11 @@ PASSING = 1
 LOCOMOTION = 2
 
 # for set up character array
-totalChr = 10
+totalChr = 30
+maxItemsPerGridCell = 7
+if (totalChr > maxItemsPerGridCell):
+	steerManager = scene.getSteerManager()
+	steerManager.setIntAttribute("gridDatabaseOptions.maxItemsPerGridCell", totalChr)
 chrCircleRadiusHeightRatio = 0.467
 
 
