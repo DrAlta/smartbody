@@ -1055,11 +1055,12 @@ std::string ReachStateReturn::nextState( ReachStateData* rd )
 		rd->blendWeight = 0.f;
 		rd->curHandAction->sendReachEvent("reachstate","return");
 
+		std::string _state = "bml char " + charName + " reach-stateCurrent: " + nextStateName;
+		
 		nextStateName = "Idle";
 
 		std::string charName = rd->charName;
-		std::string _state = "bml char " + charName + " reach-stateCurrent: " + nextStateName;
-		_state = _state + " reach-stateNEW: " + nextStateName;
+		_state = _state + " reach-stateNew: " + nextStateName;
 		EffectorState& estate = rd->effectorState;	
 		if(estate.getAttachedPawn())
 			_state = _state + " pawn-attached: " + estate.attachedPawnName;
