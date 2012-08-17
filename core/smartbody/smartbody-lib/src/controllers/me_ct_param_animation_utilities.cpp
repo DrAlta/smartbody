@@ -179,6 +179,7 @@ void PATimeManager::checkEvents()
 	while (!_events.empty())
 	{
 		std::pair<SmartBody::MotionEvent*, int>& event = _events.front();
+		motionIndex = event.second;
 		// localTime is the parameterized time, determine the local time of the event
 		if (event.first->isEnabled() && localTimes[motionIndex] >= event.first->getTime())
 		{

@@ -99,20 +99,6 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		} 
 	}
 
-	// Enable/disable locomotion controller
-	attrEnable = elem->getAttribute( BMLDefs::ATTR_ENABLE );
-	if( attrEnable && *attrEnable != 0 ) 
-	{
-		if( XMLString::compareIString( attrEnable, BMLDefs::ATTR_TRUE )==0 ) 
-		{
-			ct_locomotion->set_enabled(true);
-		}
-		else if( XMLString::compareIString( attrEnable, BMLDefs::ATTR_FALSE )==0 )
-		{
-			ct_locomotion->set_enabled(false);
-		}
-	}
-
 	int id = xml_parse_int( BMLDefs::ATTR_ID, elem, -1 );
 
 	child = getFirstChildElement( elem );
@@ -139,6 +125,22 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		LOG("Steering Agent not attached. Check initialization");
 		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));	
 	}
+
+	// Enable/disable locomotion controller
+	attrEnable = elem->getAttribute( BMLDefs::ATTR_ENABLE );
+	if( attrEnable && *attrEnable != 0 ) 
+	{
+		if( XMLString::compareIString( attrEnable, BMLDefs::ATTR_TRUE )==0 ) 
+		{
+			ct_locomotion->set_enabled(true);
+		}
+		else if( XMLString::compareIString( attrEnable, BMLDefs::ATTR_FALSE )==0 )
+		{
+			ct_locomotion->set_enabled(false);
+			c->steeringAgent->locomotionHalt();
+		}
+	}
+
 	c->steeringAgent->steppingMode = false;
 	bool stepMode = false;
 	bool stepTargetMode = false;
