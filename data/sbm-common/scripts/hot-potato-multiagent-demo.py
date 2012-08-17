@@ -106,10 +106,10 @@ def setFacing(chrName, heading):
 
 
 offerHandPosHeightRatio	= 0.75
-offerHandBodyDistHeightRatio = 0.40
+offerHandBodyDistHeightRatio = 0.4
 offerHandIsLeft = True
 takerHandIsLeft = True
-takerGiverDistHeightRatio = 0.58
+takerGiverDistHeightRatio = 0.3
 # field of view of human eye is 95 degrees away from nose
 facingThreshold = 95
 
@@ -424,8 +424,11 @@ def takerPickup():
 	giverChr = scene.getCharacter(giver)
 	giverPos = getPos2D(giver)
 	takerPos = getPos2D(taker)
+	target = scene.getPawn(obj)
+	tgtPos = target.getPosition()
+	tgtPos.setData(1, 0)	
 	chrHeight = giverChr.getHeight()
-	walkThreshold = chrHeight * (takerGiverDistHeightRatio + 0.1)
+	walkThreshold = chrHeight * (takerGiverDistHeightRatio + -0.15)
 	takerFacingCurrent = getFacing(taker)
 	vecGiverToTaker = vecSub(giverPos, takerPos)
 	giverDirectionToTaker = toDegree(vec2Yaw(vecGiverToTaker))
@@ -433,7 +436,6 @@ def takerPickup():
 	#mDBGINFO( 'giverDirectionToTaker: ' + str(giverDirectionToTaker) + ' , takerHeading: ' + str(takerFacingCurrent) )
 	giverHPR = giverChr.getHPR()
 	giverHeading = giverHPR.getData(0)	
-	#takerHeading = normalizeAngleDeg(giverHeading + 180)
 	offset2D = SrVec(0, 0, chrHeight * takerGiverDistHeightRatio)
 
 	x = toDegree(vec2Yaw(vecSub(takerPos, giverPos)))
@@ -443,7 +445,7 @@ def takerPickup():
 	takerHeading = normalizeAngleDeg(offerHandDir + 180)
 	
 	offset2D.rotY(toRadian(offerHandDir))
-	locomGoalPos = vecPlus(giverPos, offset2D)
+	locomGoalPos = vecPlus(tgtPos, offset2D)
 	chrDist = vecDist(locomGoalPos, takerPos)
 	#mDBGINFO( 'chr dist: ' + str(chrDist) + ' ,  facing dist: ' + str(facingDist) )
 	if chrDist > walkThreshold or facingDist > facingThreshold:
@@ -538,6 +540,9 @@ bml.execBML(chrName, '<saccade mode="listen"/>')
 sceneSetup()
 
 tenChrSetup()
+
+# this starts the chain reaction of "hot potato"
+#t()
 
 sim.resume()
 
