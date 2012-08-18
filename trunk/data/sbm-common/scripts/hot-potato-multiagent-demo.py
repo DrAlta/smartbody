@@ -329,7 +329,7 @@ class ReachingHandler(EventHandler):
 				#3 taker pick-up obj
 				takerPickup()
 
-		elif "reach-stateNEW: Idle" in params:
+		elif "reach-stateNew: Idle" in params:
 			mDBGINFO( '[REACHED RETURNED] ' + params )
 			keywd = "bml char " + giver
 			if keywd in params:
