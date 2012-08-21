@@ -84,11 +84,11 @@ double RBFInterpolator::RBFValue(const dVector& p1,const dVector& p2 )
 	//Plus(p1,p2,diff,-1.0);
 	diff = p1 - p2;
 	double r = sqrt(norm_2(diff));
-	return exp(-(r*r)*0.0005);
-	if (r==0.0)
-		return r;
-	else
-		return r*r*log(r);
+	return exp(-(r*r)*0.00000005);
+// 	if (r==0.0)
+// 		return r;
+// 	else
+// 		return r*r*log(r);
 }
 
 void RBFInterpolator::predictInterpWeights( const dVector& para, VecOfInterpWeight& blendWeights )

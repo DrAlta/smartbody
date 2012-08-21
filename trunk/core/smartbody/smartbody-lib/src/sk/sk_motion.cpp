@@ -979,10 +979,10 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 	SkSkeleton* interSk = new SkSkeleton(targetSk); // copy for an intermediate skeleton
 	SkSkeleton* tempSrcSk = new SkSkeleton(sourceSk);
 
-	std::vector<std::string> stopJoints;
+	std::vector<std::string> stopJoints;	
+	stopJoints.push_back("skullbase");
 	//stopJoints.push_back("l_wrist");
 	//stopJoints.push_back("r_wrist");
-
 	// update the global matrices
 	tempSrcSk->invalidate_global_matrices();
 	tempSrcSk->update_global_matrices();
@@ -1050,7 +1050,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 		for (int k=0;k<mchan_arr.size();k++)
 		{
 			SkChannel& chan = mchan_arr[k];			
-			const std::string& jointName = mchan_arr.name(k);
+			const std::string& jointName = mchan_arr.name(k);				
 			// map pre-rotation
 			int index = mchan_arr.float_position(k);
 			if (chan.type == SkChannel::Quat)
@@ -1062,7 +1062,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 				//SrVec qa_rot = qa*srcToTargetRot;	
 				//SrQuat final_q = jointRot;//*SrQuat(qa_rot);	
 				SkJoint* srcJoint = tempSrcSk->search_joint(jointName.c_str());
-				SkJoint* targetJoint = interSk->search_joint(jointName.c_str());
+				SkJoint* targetJoint = interSk->search_joint(jointName.c_str());			
 				if (srcJoint && targetJoint)
 				{					
 					SrQuat gsrc = SrQuat(srcJoint->gmat());

@@ -272,21 +272,21 @@ void MeCtBlendEngine::getBlendParameterFromWeights( dVector& outPara, std::vecto
 	}
 	interpMotion->weight = weight;
 	// a quick and dirty way to combine the parameters, but are they the right way ?
-// 	VecOfBodyMotionPtr& motions = *interpMotion->motionDataRef;
-// 	for (unsigned int i=0;i<weight.size();i++)
-// 	{
-// 		int index = weight[i].first;
-// 		float w = weight[i].second;
-// 		InterpolationExample* ex = (*interpExampleData)[index];
-// 		dVector tempPara;		
-// 		if (i == 0)
-// 		{			
-// 			outPara = ex->parameter*w;
-// 		}
-// 		else
-// 		{
-// 			outPara = outPara + ex->parameter*w;
-// 		}
-// 	}
-	motionParameter->getMotionParameter(interpMotion, outPara);
+	VecOfBodyMotionPtr& motions = *interpMotion->motionDataRef;
+	for (unsigned int i=0;i<weight.size();i++)
+	{
+		int index = weight[i].first;
+		float w = weight[i].second;
+		InterpolationExample* ex = (*interpExampleData)[index];
+		dVector tempPara;		
+		if (i == 0)
+		{			
+			outPara = ex->parameter*w;
+		}
+		else
+		{
+			outPara = outPara + ex->parameter*w;
+		}
+	}
+	//motionParameter->getMotionParameter(interpMotion, outPara);
 }

@@ -358,6 +358,9 @@ void SteeringAgent::evaluate(double dtime)
 	float x, y, z;
 	float yaw, pitch, roll;
 	character->get_world_offset(x, y, z, yaw, pitch, roll);
+	curSteerDir = SrVec(sin(degToRad(yaw)), 0, cos(degToRad(yaw)));
+	curSteerPos = SrVec(x,y,z);
+	nextSteerPos = curSteerPos;
 
 	//LOG("Character world offset : x = %f, y = %f, z = %f",x,y,z);
 
@@ -1085,6 +1088,9 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 	//
 	newForward = normalize(newForward);
 	forward = newForward;
+	nextSteerDir = SrVec(newForward.x,newForward.y,newForward.z);
+	
+
 	rightSide = rightSideInXZPlane(newForward);
 
 	pprAgent->updateDesiredForward(forward);
@@ -1123,7 +1129,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		stepAdjust = false;
 
 	// slow down mechanism when close to the target
-	float targetSpeed = steeringCommand.targetSpeed;
+	float targetSpeed = steeringCommand.targetSpeed;	
 	if (distToTarget < targetSpeed * brakingGain && goalList.size() == 0)
 		targetSpeed = distToTarget / brakingGain;
 
@@ -1272,13 +1278,14 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 	float curSpeed = 0.0f;
 	float curTurningAngle = 0.0f;
 	float curScoot = 0.0f;
+	float targetAngleDiff = 0.f;
 	if (curStateName == locomotionName && numGoals != 0)
 	{
 		float tnormal[3];
 		mcuCBHandle::singleton().query_terrain(x, z, tnormal);
 		//LOG("current normal %f %f %f", tnormal[0], tnormal[1], tnormal[2]);
 
-		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);
+		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);		
 		if (smoothing)
 		{
 			float addOnScoot = steeringCommand.scoot * paLocoScootGain;
@@ -1342,7 +1349,8 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 			normalizeAngle(yaw);
 			float angleDiff = angleGlobal - yaw;
 			normalizeAngle(angleDiff);
-
+			
+			targetAngleDiff = angleDiff;
 			float addOnTurning = angleDiff * paLocoAngleGain;
 			if (fabs(curTurningAngle - addOnTurning) > angleSpeedThreshold)
 			{
@@ -1372,9 +1380,8 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 			normalizeAngle(angleDiff);
 
 			curSpeed = targetSpeed / scene->getScale();
-			curTurningAngle = angleDiff * paLocoAngleGain;
-			curScoot = steeringCommand.scoot * paLocoScootGain;
-			
+			curTurningAngle = angleDiff * paLocoAngleGain ;
+			curScoot = steeringCommand.scoot * paLocoScootGain;			
 			newSpeed = targetSpeed;
 		}
 
@@ -1382,6 +1389,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		{
 			std::vector<double> weights;
 			weights.resize(curStateData->state->getNumMotions());
+			//LOG("target Speed = %f, curSpeed = %f, angleDiff = %f, curTurningAngle = %f, curScoot = %f",targetSpeed, curSpeed, targetAngleDiff, curTurningAngle, curScoot);
 			curStateData->state->getWeightsFromParameters(curSpeed, curTurningAngle, curScoot, weights);
 			character->param_animation_ct->updateWeights(weights);
 		}

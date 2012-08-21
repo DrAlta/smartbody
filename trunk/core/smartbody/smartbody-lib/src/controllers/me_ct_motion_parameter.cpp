@@ -236,7 +236,7 @@ float LocomotionParameter::getMotionAngularSpeed( BodyMotionInterface* motion, c
 #endif	
 
 	float speed = rotYDiff/(float)motion->motionDuration(BodyMotionInterface::DURATION_ACTUAL);
-	//speed *= (180.0f/ float(M_PI));
+	speed *= (180.0f/ float(M_PI));
 	return speed;
 }
 
