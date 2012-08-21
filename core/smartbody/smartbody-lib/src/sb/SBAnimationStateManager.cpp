@@ -227,6 +227,7 @@ SrVec SBAnimationBlendManager::getCurrentBlendParameters(const std::string& char
 	SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SmartBody::SBAnimationBlend1D*>(blendData->state);
 	SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(blendData->state);
 	SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(blendData->state);
+	SmartBody::SBMotionBlendBase* blendBase = dynamic_cast<SmartBody::SBMotionBlendBase*>(blendData->state);
 	if (state1D)
 	{
 		blendData->state->getParametersFromWeights(params[0], blendData->weights);
@@ -237,7 +238,7 @@ SrVec SBAnimationBlendManager::getCurrentBlendParameters(const std::string& char
 		blendData->state->getParametersFromWeights(params[0], params[1], blendData->weights);
 		return params;
 	}
-	if (state3D)
+	if (state3D || blendBase)
 	{
 		blendData->state->getParametersFromWeights(params[0], params[1], params[2], blendData->weights);
 		return params;
