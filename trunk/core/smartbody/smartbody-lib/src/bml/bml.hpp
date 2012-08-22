@@ -65,9 +65,10 @@ namespace std
 	typedef basic_istringstream<wchar_t, char_traits<wchar_t>,
 		allocator<wchar_t> > wistringstream;
 }
-extern wostream &wcout;
-extern wostream &wcerr;
+//extern std::wostream &std::wcout;
+//extern std::wostream &std::wcerr;
 #endif
+
 
 namespace BML {
 	//  Helper Function

@@ -59,8 +59,8 @@ const bool LOG_CONTROLLER_SCHEDULE			= false;
 const bool LOG_REQUEST_REALIZE_TIME_SPAN	= false;
 
 #ifdef __ANDROID__ // android does not support wstring by default. Thus we need to explicitly define these template class.
-wostream &wcout;
-wostream &wcerr;
+//std::wostream &std::wcout;
+//std::wostream &std::wcerr;
 #endif
 
 
@@ -700,8 +700,10 @@ bool BmlRequest::registerBehavior( const std::wstring& id, BehaviorRequestPtr be
 
 	if( LOG_BEHAVIOR_SYNCHPOINTS ) {
 		cout << "DEBUG: BmlRequest::registerBehavior(): BehaviorSyncPoints for " << behavior->unique_id << flush;
+#ifndef __ANDROID__
 		if( id.size()>0 )
 			wcout << " \"" << id << "\"" << flush;
+#endif
 		cout << ":" << endl << "\t" << flush;
 
 		behavior->behav_syncs.printSyncIds();

@@ -82,7 +82,7 @@ include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := ann
-LOCAL_CFLAGS    := -DBUILD_ANDROID
+LOCAL_CFLAGS    := -DBUILD_ANDROID -frtti -fexceptions 
 LOCAL_SRC_FILES := $(SBM_MY_DIR)/external/ANN/ANN.cpp \
 	$(SBM_MY_DIR)/external/ANN/bd_fix_rad_search.cpp \
 	$(SBM_MY_DIR)/external/ANN/bd_pr_search.cpp \
@@ -149,7 +149,7 @@ LOCAL_PATH := $(SBM_LOCAL_PATH)
 include $(CLEAR_VARS)
 LOCAL_MODULE := sbm
 #LOCAL_CFLAGS    :=  -gstabs -g -DBUILD_ANDROID -frtti 
-LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti 
+LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions 
 LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/../../pythonLib/include/python2.6 \
 					$(SBM_LOCAL_PATH)/../../boost \

@@ -5,7 +5,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := steerlib
-LOCAL_CFLAGS    := -DBUILD_ANDROID
+LOCAL_CFLAGS    := -DBUILD_ANDROID -frtti -fexceptions 
 MY_DIR := ../../../../core/smartbody/steersuite-1.3/steerlib
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(MY_DIR)/include \
 		    $(LOCAL_PATH)/$(MY_DIR)/../external \
