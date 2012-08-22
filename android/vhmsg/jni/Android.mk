@@ -32,7 +32,7 @@ LOCAL_MODULE := vhmsg
 TARGET_PLATFORM := android-9
 #MY_VHMSG_DIR := ../vhmsg_src/
 MY_VHMSG_DIR := ../../../lib/vhmsg/vhmsg-c/
-LOCAL_CFLAGS    := -DBUILD_ANDROID 
+LOCAL_CFLAGS    := -DBUILD_ANDROID -frtti -fexceptions 
 LOCAL_C_INCLUDES := $(VHMSG_LOCAL_PATH)/$(MY_VHMSG_DIR)/include $(VHMSG_LOCAL_PATH)/$(MY_VHMSG_DIR)/../../vhcl/include \
 					$(VHMSG_LOCAL_PATH)/../../include/activemq-cpp/include
 LOCAL_SRC_FILES := $(MY_VHMSG_DIR)/src/HttpUtility.cpp \

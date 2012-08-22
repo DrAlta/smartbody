@@ -489,25 +489,26 @@ void BehaviorSyncPoints::applyParentTimes( std::string& warning_context ) {
 }
 
 void BehaviorSyncPoints::printSyncIds() {
+#ifndef __ANDROID__
 	wostringstream buffer;
 	if( !named_syncs.empty() ) {
 		iterator it = named_syncs.begin();
 		iterator end = named_syncs.end();
-
 		// First SyncPoint
 		buffer << it->name();
-
 		// Remaining
 		for( ++it; it!=end; ++it ) {
 			buffer << ", " << it->name();
 		}
 	}
+
 	wcout << buffer.str() << endl;
+#endif
 }
 
 void BehaviorSyncPoints::printSyncTimes() {
+#ifndef __ANDROID__
 	wostringstream buffer; // buffer output for single write
-
 	if( !named_syncs.empty() ) {
 		iterator it = named_syncs.begin();
 		iterator end = named_syncs.end();
@@ -517,8 +518,8 @@ void BehaviorSyncPoints::printSyncTimes() {
 			wcout << "\t" << it->name() << ": " << it->sync() << endl;
 		}
 	}
-
 	wcout << buffer.str();
+#endif
 }
 
 const std::map<std::wstring, std::wstring>& BehaviorSyncPoints::getBehaviorToSyncNames() const
