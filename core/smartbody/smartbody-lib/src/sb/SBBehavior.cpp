@@ -15,6 +15,16 @@ const std::string& SBBehavior::getType()
 	return _type;
 }
 
+const std::string& SBBehavior::getId()
+{
+	return _id;
+}
+
+void SBBehavior::setId(const std::string& id)
+{
+	_id = id;
+}
+
 SpeechBehavior::SpeechBehavior()
 {
 	_type = "speech";

@@ -58,6 +58,9 @@ class SBCharacter : public SbmCharacter
 		SBBehavior* getBehavior(int num);
 		std::vector<SBBehavior*>& getBehaviors();
 
+		double getLastScheduledSpeechBehavior();
+		std::string hasSpeechBehavior();
+
 		virtual SBFaceDefinition* getFaceDefinition();
 		virtual void setFaceDefinition(SBFaceDefinition* face);
 

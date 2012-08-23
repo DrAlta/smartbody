@@ -27,6 +27,7 @@
 
 bool AUDIO_Init();
 void AUDIO_Play( const char * audio_file );
+void AUDIO_Stop( const char * audio_file );
 void AUDIO_Close();
 
 
