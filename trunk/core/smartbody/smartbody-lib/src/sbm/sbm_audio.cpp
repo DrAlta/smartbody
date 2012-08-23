@@ -51,6 +51,12 @@ void AUDIO_Play( const char * audio_file )
    }
 }
 
+void AUDIO_Stop( const char * audio_file )
+{
+   if (g_audio)
+	   g_audio->DestroySound(audio_file);
+}
+
 
 void AUDIO_Close()
 {

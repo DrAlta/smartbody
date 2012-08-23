@@ -469,9 +469,16 @@ char* remote_speech::getSpeechStopCommand( RequestId requestId, SbmCharacter* ch
 
 	// Get bonebus character id for spatialization
 	string characterName;
-	if ( character && character->bonebusCharacter )
+	if ( character )
 	{
-		characterName = character->bonebusCharacter->m_name;
+		if (character->bonebusCharacter )
+		{
+			characterName = character->bonebusCharacter->m_name;
+		}
+		else
+		{
+			characterName = character->getName();
+		}
 	}
 
 	string cmd = vhcl::Format( "send StopSound \"%s\" %s", soundFile.c_str(), characterName.c_str() );

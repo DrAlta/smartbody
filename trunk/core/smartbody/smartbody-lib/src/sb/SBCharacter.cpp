@@ -44,11 +44,18 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	StringAttribute* voiceAttribute = createStringAttribute("voice", "remote", true, "Basic", 400, false, false, false, "How the voice is created - local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
 	voiceAttribute->setValidValues(voiceTypes);
 
-	createStringAttribute("voiceCode", "voice_kal_diphone", true, "Basic", 400, false, false, false, "For local and remote voices, the name of the voice to be used. For audiofile, the path to the audiofile when combined with the media path.");
-	StringAttribute* voiceBackupAttribute = createStringAttribute("voiceBackup", "audiofile", true, "Basic", 400, false, false, false, "How the voice is created if the primary voice fails. local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
+	createStringAttribute("voiceCode", "voice_kal_diphone", true, "Basic", 410, false, false, false, "For local and remote voices, the name of the voice to be used. For audiofile, the path to the audiofile when combined with the media path.");
+	StringAttribute* voiceBackupAttribute = createStringAttribute("voiceBackup", "audiofile", true, "Basic", 420, false, false, false, "How the voice is created if the primary voice fails. local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
 	voiceBackupAttribute->setValidValues(voiceTypes);
-	createStringAttribute("voiceBackupCode", ".", true, "Basic", 400, false, false, false, "For local and remote voices, the name of the backup voice to be used. For audiofile, the path to the audiofile when combined with the media path.");
-
+	createStringAttribute("voiceBackupCode", ".", true, "Basic", 430, false, false, false, "For local and remote voices, the name of the backup voice to be used. For audiofile, the path to the audiofile when combined with the media path.");
+	
+	std::vector<std::string> utterancePolicyTypes;
+	utterancePolicyTypes.push_back("none");
+	utterancePolicyTypes.push_back("ignore");
+	utterancePolicyTypes.push_back("queue");
+	utterancePolicyTypes.push_back("interrupt");	
+	StringAttribute* utterancePolicyAttribute = createStringAttribute("utterancePolicy", "none", true, "Basic", 500, false, false, false, "How utterances are handled when the character is already performing an utterance. Valid values are: ignore (ignores the new utterance and any associated behaviors), queue (plays the new utterance and associated behavior when the old utterance has finished), interrupt (stops the existing utterance and associated behaviors and plays the new one)");
+	utterancePolicyAttribute->setValidValues(utterancePolicyTypes);
 
 }
 
@@ -293,6 +300,57 @@ SBBehavior* SBCharacter::getBehavior(int num)
 		return NULL;
 }
 
+double SBCharacter::getLastScheduledSpeechBehavior()
+{
+	double lastTime =-1.0;
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	BML::MapOfBmlRequest bmlRequestMap = mcu.bml_processor.getBMLRequestMap();
+	for (BML::MapOfBmlRequest::iterator iter = bmlRequestMap.begin(); 
+		 iter != bmlRequestMap.end();
+		 iter ++
+		)
+	{
+		std::string requestName = iter->first;
+		BML::BmlRequestPtr bmlRequestPtr = iter->second;
+		if (bmlRequestPtr->actor->getName() == this->getName())
+		{
+			if (bmlRequestPtr->speech_request)
+			{
+				if (lastTime < bmlRequestPtr->speech_request.get()->behav_syncs.sync_end()->time())
+					lastTime = bmlRequestPtr->speech_request.get()->behav_syncs.sync_end()->time();
+
+			}
+		}
+	}
+	return lastTime;
+}
+
+std::string SBCharacter::hasSpeechBehavior()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	BML::MapOfBmlRequest bmlRequestMap = mcu.bml_processor.getBMLRequestMap();
+	for (BML::MapOfBmlRequest::iterator iter = bmlRequestMap.begin(); 
+		 iter != bmlRequestMap.end();
+		 iter ++
+		)
+	{
+		std::string requestName = iter->first;
+		BML::BmlRequestPtr bmlRequestPtr = iter->second;
+		if (bmlRequestPtr->actor->getName() == this->getName())
+		{
+			if (bmlRequestPtr->speech_request)
+			{
+				return (*bmlRequestPtr).msgId;
+			}
+		}
+	}
+
+	return "";
+}
+
 std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 {
 	for (size_t b = 0; b < _curBehaviors.size(); b++)
@@ -318,6 +376,7 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 			{
 				SpeechBehavior* speechBehavior = new SpeechBehavior();
 				// what information do we need here?
+				speechBehavior->setId((*bmlRequestPtr).msgId);
 
 				_curBehaviors.push_back(speechBehavior);
 			}

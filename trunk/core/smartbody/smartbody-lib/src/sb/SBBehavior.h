@@ -13,9 +13,12 @@ class SBBehavior
 		~SBBehavior();
 
 		virtual const std::string& getType();
+		virtual const std::string& getId();
+		virtual void setId(const std::string& id);
 
 	protected:
 		std::string _type;
+		std::string _id;
 
 };
 

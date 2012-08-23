@@ -3339,7 +3339,7 @@ int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
          if ( mcu_p->play_internal_audio )
          {
-            AUDIO_Play( soundFile.c_str() );
+            AUDIO_Play( soundFile.c_str() );			
          }
          else
          {
@@ -3434,8 +3434,14 @@ int mcu_stop_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
             }
          }
 #endif
-
-         mcu_p->_scene->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() );
+		 if ( mcu_p->play_internal_audio )
+         {
+			AUDIO_Stop(soundFile.c_str());
+		 }
+		 else
+		 {
+	         mcu_p->_scene->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() );
+		 }
 
          return CMD_SUCCESS;
       }
