@@ -393,55 +393,66 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		SBCharacter* character = mcu->_scene->getCharacter(actorId);
 		if (character)
 		{
-			const std::string& utterancePolicy = character->getStringAttribute("utterancePolicy");
-			if (utterancePolicy != "none")
+		
+			for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i )
 			{
-				for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i )
+				BehaviorRequestPtr behavior = *i;
+				BML::SpeechRequest* speechRequest = dynamic_cast<BML::SpeechRequest*>(&(*behavior));
+				if (speechRequest)
 				{
-					BehaviorRequestPtr behavior = *i;
-					if (dynamic_cast<BML::SpeechRequest*>(&(*behavior)))
+					std::string utterancePolicy = "";
+					if (speechRequest->policy != "")
 					{
-						// a speech behavior exists in this block, 
-						// determine if an existing utterance behavior is already running
-						std::string speechMsdId = character->hasSpeechBehavior();
-						if (speechMsdId == this->msgId)
-								continue;					
-			
-						// character currently has a speech behavior
-						if (utterancePolicy == "ignore")
-						{ 
-							// ignore the current behavior
-								ostringstream oss;
-								oss << "BML block will not be executed since character " << actorId << " is already performing an utterance and the 'utterancePolicy' is set to 'ignore', msgId=\"" << msgId << "\""; 
-								throw RealizingException( oss.str().c_str() );
-						}
-
-						else if (utterancePolicy == "queue")
-						{
-							// queue the behaviors such that they coincide with the end of the current utterance
-							double lastTime = character->getLastScheduledSpeechBehavior();
-							time_sec offset = lastTime - now ;
-							for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i )
-							{
-								BehaviorRequestPtr behavior = *i;
-					
-								BehaviorSyncPoints::iterator syncs_end = behavior->behav_syncs.end();
-								for( BehaviorSyncPoints::iterator j = behavior->behav_syncs.begin(); j != syncs_end; ++j )
-								{
-									j->sync()->time += offset;
-								}
-							}
-							break;
-						}
-						else if (utterancePolicy == "interrupt")
-						{
-							// interrupt the current utterance and associated behaviors and
-							// schedule the current behavior set instead
-							bp->interrupt(character, speechMsdId, 0.0, mcu);
-							break;
-						}
-										
+						utterancePolicy = speechRequest->policy;
 					}
+					else
+					{
+						utterancePolicy = character->getStringAttribute("utterancePolicy");
+					}
+						
+					if (utterancePolicy == "none")
+						continue;
+
+					// a speech behavior exists in this block, 
+					// determine if an existing utterance behavior is already running
+					std::string speechMsdId = character->hasSpeechBehavior();
+					if (speechMsdId == this->msgId)
+							continue;					
+			
+					// character currently has a speech behavior
+					if (utterancePolicy == "ignore")
+					{ 
+						// ignore the current behavior
+							ostringstream oss;
+							oss << "BML block will not be executed since character " << actorId << " is already performing an utterance and the 'utterancePolicy' is set to 'ignore', msgId=\"" << msgId << "\""; 
+							throw RealizingException( oss.str().c_str() );
+					}
+
+					else if (utterancePolicy == "queue")
+					{
+						// queue the behaviors such that they coincide with the end of the current utterance
+						double lastTime = character->getLastScheduledSpeechBehavior();
+						time_sec offset = lastTime - now ;
+						for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i )
+						{
+							BehaviorRequestPtr behavior = *i;
+					
+							BehaviorSyncPoints::iterator syncs_end = behavior->behav_syncs.end();
+							for( BehaviorSyncPoints::iterator j = behavior->behav_syncs.begin(); j != syncs_end; ++j )
+							{
+								j->sync()->time += offset;
+							}
+						}
+						break;
+					}
+					else if (utterancePolicy == "interrupt")
+					{
+						// interrupt the current utterance and associated behaviors and
+						// schedule the current behavior set instead
+						bp->interrupt(character, speechMsdId, 0.0, mcu);
+						break;
+					}
+										
 				}
 			}
 		}

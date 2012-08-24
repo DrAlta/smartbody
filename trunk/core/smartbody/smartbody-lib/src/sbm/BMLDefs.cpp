@@ -309,12 +309,17 @@ XMLCh* BMLDefs::ATTR_OFFSET = NULL;
 XMLCh* BMLDefs::ATTR_SYMBOL = NULL;
 XMLCh* BMLDefs::ATTR_MATERIAL = NULL;
 
+
+
 // locomotion
 XMLCh* BMLDefs::ATTR_BRAKING = NULL;
 
 XMLCh* BMLDefs::ATTR_STYLE = NULL;
 
 XMLCh* BMLDefs::ATTR_STATENAME = NULL;
+
+XMLCh* BMLDefs::ATTR_POLICY = NULL;
+
 
 BMLDefs::BMLDefs()
 {
@@ -645,6 +650,8 @@ BMLDefs::BMLDefs()
 	ATTR_STYLE = XMLString::transcode("sbm:style");
 
 	ATTR_STATENAME = XMLString::transcode("sbm:state-name");
+
+	ATTR_POLICY = XMLString::transcode("policy");
 }
 
 }

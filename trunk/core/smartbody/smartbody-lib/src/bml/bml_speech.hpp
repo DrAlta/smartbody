@@ -64,6 +64,7 @@ namespace BML {
 
 		std::string			   audioPlay;
 		std::string			   audioStop;
+		
 
 		VecOfVisemeData	visemes;
 		VecOfVisemeData	phonemes;	   
@@ -87,6 +88,7 @@ namespace BML {
 			SmartBody::SpeechInterface* speech_impl,
 			SmartBody::SpeechInterface* speech_impl_backup,
 			SmartBody::RequestId speech_request_id,
+			const std::string& policyOverride,
 			const std::vector<SpeechMark>& marks,
 			BmlRequestPtr request
 		);
@@ -169,6 +171,8 @@ namespace BML {
 		* Process the visemes by diphone
 		*/
 		void processVisemes(std::vector<VisemeData*>* visemes, BmlRequestPtr request);
+
+		string	policy;
 
 	protected:
 		void createStandardSyncPoint( const std::wstring& attr, SyncPointPtr& sync );

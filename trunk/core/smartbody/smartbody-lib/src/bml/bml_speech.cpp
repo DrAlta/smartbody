@@ -83,6 +83,11 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 
 	request->localId = localId;
 
+	// get the utterance policy: ignore, queue or interrupt
+	const XMLCh* policy = xml->getAttribute(BMLDefs::ATTR_POLICY);
+	std::string policyStr;
+	xml_utils::xml_translate(&policyStr, policy);
+	
 	vector<SpeechMark> marks;  // Ordered list of named bookmarks
 
 	// Parse <speech> for sync points
@@ -283,7 +288,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	}
 	*/
 	
-	SpeechRequestPtr speechResult( new SpeechRequest( unique_id, localId, behav_syncs, cur_speech_impl, cur_speech_impl_backup, speech_request_id, marks, request ) );
+	SpeechRequestPtr speechResult( new SpeechRequest( unique_id, localId, behav_syncs, cur_speech_impl, cur_speech_impl_backup, speech_request_id, policyStr, marks, request ) );
 	return speechResult;
 
 }
@@ -297,6 +302,7 @@ BML::SpeechRequest::SpeechRequest(
 	SpeechInterface* speech_impl,
 	SpeechInterface* speech_impl_backup,
 	RequestId speech_request_id,
+	const std::string& policyOverride,
 	const vector<SpeechMark>& marks,
 	BmlRequestPtr request
 )
@@ -304,7 +310,8 @@ BML::SpeechRequest::SpeechRequest(
 	speech_impl( speech_impl ),
 	speech_impl_backup( speech_impl_backup ),
 	speech_request_id( speech_request_id ),
-	trigger( behav_syncs.sync_start()->sync()->trigger.lock() )
+	trigger( behav_syncs.sync_start()->sync()->trigger.lock() ),
+	policy(policyOverride)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	// Add SyncPoints for SpeechMarks
