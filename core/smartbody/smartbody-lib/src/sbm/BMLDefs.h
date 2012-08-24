@@ -312,6 +312,8 @@ class BMLDefs
 		static XMLCh* ATTR_STYLE;
 
 		static XMLCh* ATTR_STATENAME;
+
+		static XMLCh* ATTR_POLICY;
 };
 
 

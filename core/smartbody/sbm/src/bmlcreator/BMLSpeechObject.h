@@ -17,5 +17,6 @@ class BMLSpeechObject : public BMLObject
 		SmartBody::StringAttribute* typeAttr;
 		SmartBody::StringAttribute* refAttr;
 		SmartBody::StringAttribute* contentAttr;
+		SmartBody::StringAttribute* policyAttr;
 };
 #endif
