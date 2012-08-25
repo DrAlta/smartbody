@@ -39,6 +39,7 @@
 #include <boost/algorithm/string.hpp>
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
+#include <external/perlin/perlin.h>
 
 using namespace gwiz;
 
@@ -1499,6 +1500,321 @@ SkMotion* SkMotion::copyMotion()
 	}
 	return cpMotion;	
 }
+
+
+/*
+	This function can be made generic later on
+*/
+SkMotion* SkMotion::buildPrestrokeHoldMotion(float holdTime, SkMotion* idleMotion)
+{
+	int numHoldFrames = int(holdTime * this->frames() / this->duration());
+	int strokeStartFrameId = int(synch_points.get_time(srSynchPoints::STROKE_START) * this->frames() / this->duration());
+
+	SkChannelArray& mchan_arr = this->channels();
+	SkMotion* newMotion = new SmartBody::SBMotion();
+	newMotion->synch_points.set_time(	synch_points.get_time(srSynchPoints::START),
+										synch_points.get_time(srSynchPoints::READY),
+										synch_points.get_time(srSynchPoints::STROKE_START) + holdTime,
+										synch_points.get_time(srSynchPoints::STROKE) + holdTime,
+										synch_points.get_time(srSynchPoints::STROKE_STOP) + holdTime,
+										synch_points.get_time(srSynchPoints::RELAX) + holdTime,
+										synch_points.get_time(srSynchPoints::STOP) + holdTime
+										);
+
+	newMotion->init( mchan_arr );
+	int num_f = this->frames();
+	for (int i = 0; i < (num_f + numHoldFrames); ++i)
+	{
+		newMotion->insert_frame(i, float(i) * this->duration() / float(this->frames()));
+
+		int refPosId = i;
+		if (i >= strokeStartFrameId && i <= (strokeStartFrameId + numHoldFrames))
+			refPosId = strokeStartFrameId;
+		else if (i < strokeStartFrameId)
+			refPosId = i;
+		else
+			refPosId = i - numHoldFrames;
+		float *ref_p = this->posture(refPosId);
+		float *new_p = newMotion->posture(i);
+		memcpy(new_p,ref_p,sizeof(float)*posture_size());
+	}
+	return newMotion;	
+}
+
+/*
+	This function can be made generic later on
+*/
+SkMotion* SkMotion::buildPoststrokeHoldMotion(float holdTime, std::vector<std::string>& joints, float scale, float freq, SkMotion* idleMotion)
+{
+	bool insertIdleMotion = (idleMotion != NULL) ? true : false;
+
+	int numHoldFrames = int(holdTime * this->frames() / this->duration());
+	int strokeEndFrameId = int(synch_points.get_time(srSynchPoints::STROKE_STOP) * this->frames() / this->duration());
+
+	SkChannelArray& mchan_arr = this->channels();
+	SkMotion* newMotion = new SmartBody::SBMotion();
+	newMotion->synch_points.set_time(	synch_points.get_time(srSynchPoints::START),
+										synch_points.get_time(srSynchPoints::READY),
+										synch_points.get_time(srSynchPoints::STROKE_START),
+										synch_points.get_time(srSynchPoints::STROKE),
+										synch_points.get_time(srSynchPoints::STROKE_STOP) + holdTime,
+										synch_points.get_time(srSynchPoints::RELAX) + holdTime,
+										synch_points.get_time(srSynchPoints::STOP) + holdTime
+										);
+
+	newMotion->init( mchan_arr );
+	int num_f = this->frames();
+	for (int i = 0; i < (num_f + numHoldFrames); ++i)
+	{
+		newMotion->insert_frame(i, float(i) * this->duration() / float(this->frames() - 1));
+
+		int refPosId = i;
+		bool inHoldingPeriod = false;
+		if (i >= strokeEndFrameId && i <= (strokeEndFrameId + numHoldFrames))
+		{
+			if (insertIdleMotion)	// insert idle motion frames
+			{
+				int numIdleFrames = idleMotion->frames();
+				refPosId = (i - strokeEndFrameId) % numIdleFrames;
+			}
+			else
+				refPosId = strokeEndFrameId;
+			inHoldingPeriod = true;
+		}
+		else if (i < strokeEndFrameId)
+			refPosId = i;
+		else
+			refPosId = i - numHoldFrames;
+
+		float* ref_p;
+		if (inHoldingPeriod && insertIdleMotion)
+			ref_p = idleMotion->posture(refPosId);
+		else
+			ref_p = this->posture(refPosId);
+
+		float* new_p = newMotion->posture(i);
+		memcpy(new_p,ref_p,sizeof(float)*posture_size());
+	}
+	std::vector<int> toSmoothIds;
+	int wide = 5;
+	for (int i = strokeEndFrameId - wide; i <= strokeEndFrameId + wide; i++)
+		toSmoothIds.push_back(i);
+
+
+	// handle the base joints
+	if (strokeEndFrameId == 0)
+	{
+		LOG("SkMotion::buildPoststrokeHoldMotion ERR: please check if the stroke end time is set correctly!");
+		return newMotion;
+	}
+
+	if (insertIdleMotion)
+	{
+		float *ref_p = newMotion->posture(strokeEndFrameId - 1);
+		for (int i = strokeEndFrameId; i <= strokeEndFrameId + numHoldFrames; ++i)
+		{
+			for (int k=0;k<mchan_arr.size();k++)
+			{
+				SkChannel& chan = mchan_arr[k];
+				const std::string& jointName = mchan_arr.name(k);
+				int index = mchan_arr.float_position(k);
+				bool isPos = chan.type == SkChannel::XPos; 
+				if (jointName == "base" && isPos)
+				{
+					newMotion->posture(i)[index] = ref_p[index];
+					newMotion->posture(i)[index + 1] = ref_p[index + 1];
+					newMotion->posture(i)[index + 2] = ref_p[index + 2];
+					break;
+				}
+			}
+		}
+		newMotion->smoothAtFrame(strokeEndFrameId, 1, 5);
+		newMotion->smoothAtFrame(strokeEndFrameId + numHoldFrames, 1, 5);
+	}
+	else if (joints.size() > 0)	// joint specified, add perlin noise
+	{
+		newMotion->addPerlinNoise(joints, strokeEndFrameId, strokeEndFrameId + numHoldFrames, scale, freq);
+	}
+
+	
+	return newMotion;
+}
+
+
+/*
+	- smooth section [frameId - interval, frameId + interval]
+	- while smoothing each frame, use the mask
+	- mask looks like	[0.25, 0.5, 0.25]				maskType = 0 (linear), maskSize = 3
+						[0.11, 0.22, 0.33, 0.22, 0.11]	maskType = 0 (linear), maskSize = 5
+						etc.
+*/
+void SkMotion::smoothAtFrame(int frameId, int interval, int maskSize, int maskType)
+{
+	if (maskSize == 0 || (maskSize % 2) == 0)
+	{
+		LOG("SkMotion::smoothAtFrame Warning: mask size has to be odd number.");
+		return;
+	}
+
+	std::vector<int> frameIds;
+	for (int i = frameId - interval; i <= frameId + interval; ++i)
+		frameIds.push_back(i);
+
+	std::vector<float> mask;
+	mask.resize(maskSize);
+	if (maskType == 0)	// linear
+	{
+		int halfSize = maskSize / 2;
+		for (int i = 0; i < halfSize; ++i)
+		{
+			float v = float(i + 1) / float(halfSize * halfSize + halfSize * 2 + 1);
+			mask[i] = v;
+			mask[maskSize - i - 1] = v;
+		}
+		mask[halfSize] = 1.0f / float(halfSize + 1);
+	}
+	smoothByMask(frameIds, mask);
+}
+
+void SkMotion::addPerlinNoise(std::vector<std::string>& affectedJoints, int startFrame, int endFrame, float amp, float freq)
+{
+	if (startFrame == -1)	startFrame = 0;
+	if (endFrame == -1)	endFrame = this->frames() - 1;
+
+	SkChannelArray& mchan_arr = this->channels();
+	
+	int interval = endFrame - startFrame + 1;
+	Perlin perlinNoise;
+	if (freq < 0)
+		freq = 1.0f / float(interval);
+
+	std::vector<std::vector<float> > vecRandomN;
+	vecRandomN.resize(affectedJoints.size() * 3);
+	// generate random number
+	for (size_t j = 0; j < affectedJoints.size(); ++j)
+		for (int d = 0; d < 3; ++d)
+		{
+			std::vector<float> randomN;
+			randomN.resize(interval);
+			perlinNoise.init();
+			for (int f = startFrame; f <= endFrame; ++f)
+			{
+				float x = (f - startFrame) * freq;
+				float v = perlinNoise.noise1(x);
+				randomN[f - startFrame] = v * amp;
+			}
+			vecRandomN[j * 3 + d] = randomN;
+		}
+
+	for (int i = startFrame; i <= endFrame; ++i)	
+	{
+		// set to motion
+		float* ref_p = this->posture(i);
+		for (size_t j = 0; j < affectedJoints.size(); ++j)
+		{
+			int chanId = mchan_arr.linear_search(affectedJoints[j], SkChannel::Quat);
+			if (chanId < 0)
+				continue;
+			int index = mchan_arr.float_position(chanId);
+			ref_p[index + 1] += vecRandomN[j * 3 + 0][i - startFrame];
+			ref_p[index + 2] += vecRandomN[j * 3 + 1][i - startFrame];
+			ref_p[index + 3] += vecRandomN[j * 3 + 2][i - startFrame];
+		}
+	}
+}
+
+
+void SkMotion::smoothByMask(std::vector<int>& frameIds, std::vector<float>& mask)
+{
+	if (mask.size() == 0 || (mask.size() % 2) == 0)
+	{
+		LOG("SkMotion::smoothByMask Warning: mask size has to be odd number or non-zero.");
+		return;
+	}
+
+	int halfWide = mask.size() / 2;
+
+	std::vector<float*> newFrameData;
+	for (size_t i = 0; i < frameIds.size(); ++i)
+	{
+		float* new_p = (float*)malloc(sizeof(float)*posture_size());
+		memset(new_p, 0, posture_size());
+		newFrameData.push_back(new_p);
+	}
+	
+	SkChannelArray& mchan_arr = this->channels();
+
+	// smooth the frameIds
+	for (size_t i = 0; i < frameIds.size(); ++i)
+	{
+		int frameId = frameIds[i];
+		float *new_p = newFrameData[i];
+
+		for (int j = frameId - halfWide; j <= frameId + halfWide; ++j)
+		{
+			float w = mask[j - frameId + halfWide];
+			// not sure this part should be clamp or loop, put it into clamp right now
+			if (j < 0) 
+				j = 0;					// clamp
+				//j += this->frames();	// loop
+			if (j >= this->frames()) 
+				j = this->frames() - 1;	// clamp
+				//j -= this->frames();	// loop
+			
+			float* ref_p = this->posture(j);
+			for (int k=0;k<mchan_arr.size();k++)
+			{
+				SkChannel& chan = mchan_arr[k];
+				const std::string& jointName = mchan_arr.name(k);
+				bool isPos = chan.type <= SkChannel::ZPos; 
+				bool isBase = jointName == "base";
+				int index = mchan_arr.float_position(k);		
+				if (chan.type == SkChannel::Quat) // not sure if this is the best way of doing this
+				{
+					SrQuat curQ = SrQuat( new_p[ index ], new_p[ index + 1 ], new_p[ index + 2 ], new_p[ index + 3 ] );
+					if (curQ.w == 0 && curQ.x == 0 && curQ.y == 0 && curQ.z == 0)
+						curQ.w = 1.0f;
+					SrQuat refQ = SrQuat( ref_p[ index ], ref_p[ index + 1 ], ref_p[ index + 2 ], ref_p[ index + 3 ] );
+					SrQuat unitQ;
+					SrQuat finalQ = slerp(unitQ, refQ, w) * curQ;
+					if (isBase)
+					{
+						new_p[ index + 0 ] = (float)refQ.w;
+						new_p[ index + 1 ] = (float)refQ.x;
+						new_p[ index + 2 ] = (float)refQ.y;
+						new_p[ index + 3 ] = (float)refQ.z;
+					}
+					else
+					{
+						new_p[ index + 0 ] = (float)finalQ.w;
+						new_p[ index + 1 ] = (float)finalQ.x;
+						new_p[ index + 2 ] = (float)finalQ.y;
+						new_p[ index + 3 ] = (float)finalQ.z;
+					}
+				}
+				else
+				{
+					for (int c = 0; c < chan.size(); c++)
+					{
+						if (isBase)
+							new_p[index+c] = ref_p[index + c];
+						else
+							new_p[index+c] += w * ref_p[index + c];
+					}	
+				}
+			}
+		}
+	}
+
+	for (size_t i = 0; i < frameIds.size(); ++i)
+		memcpy(this->posture(frameIds[i]), newFrameData[i], posture_size());
+
+	// clear memory
+	for (size_t i = 0; i < newFrameData.size(); ++i)
+		delete [] newFrameData[i];
+	newFrameData.clear();
+}
+
 
 SkMotion* SkMotion::buildMirrorMotion(SkSkeleton* skeleton)
 {	

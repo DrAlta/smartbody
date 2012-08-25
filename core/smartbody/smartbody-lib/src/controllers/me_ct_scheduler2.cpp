@@ -550,22 +550,66 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 		} else {
 			double time_scale = 1.0 / motionController->twarp();
 			double time_offset = motionController->offset();
-			time_warp.insert( startAt,	0.0 );
+			// following piece of code detects if we need to truncate the motion
+			double counter = 0;
+			double marker = startAt;
+			if (fabs(startAt - readyAt) < gwiz::epsilon4())
+			{
+				counter++;
+				marker = strokeStartAt;
+			}
+			if (fabs(startAt - strokeStartAt) < gwiz::epsilon4())
+			{
+				counter++;
+				marker = strokeAt;
+			}
+			if (fabs(startAt - strokeAt) < gwiz::epsilon4())
+			{
+				counter++;
+				marker = strokeEndAt;
+			}
+			if (fabs(startAt - strokeEndAt) < gwiz::epsilon4())
+			{
+				counter++;
+				marker = relaxAt;
+			}
+			if (fabs(startAt - relaxAt) < gwiz::epsilon4())
+			{
+				counter++;
+				marker = endAt;
+			}
+			if (fabs(startAt - endAt) < gwiz::epsilon4())
+			{
+				counter++;
+				marker = endAt;
+			}
 
-			//time_warp.insert( readyAt,			motionController->time_ready() );
-			//time_warp.insert( strokeStartAt,	motionController->time_stroke_start() );
- 			//time_warp.insert( strokeAt,			motionController->time_stroke_emphasis() );
-			//time_warp.insert( strokeEndAt,		motionController->time_stroke_end() );
-			//time_warp.insert( relaxAt,			motionController->time_relax() );
-			//time_warp.insert( endAt,	ct_dur );
-
-			time_warp.insert( readyAt,			skMotion->time_ready() );
-			time_warp.insert( strokeStartAt,	skMotion->time_stroke_start() );
- 			time_warp.insert( strokeAt,			skMotion->time_stroke_emphasis() );
-			time_warp.insert( strokeEndAt,		skMotion->time_stroke_end() );
-			time_warp.insert( relaxAt,			skMotion->time_relax() );
-
-			time_warp.insert( endAt,	skMotion->time_stop() );
+			if (counter > 0)
+			{
+				blend_curve.clear();
+				blend_curve.insert(startAt, 0.0f);
+				blend_curve.insert(marker, 1.0f);
+				blend_curve.insert(relaxAt, 1.0f);
+				blend_curve.insert(endAt, 0.0f);
+				time_warp.insert(startAt, skMotion->duration() - (endAt - startAt));
+				time_warp.insert(endAt, skMotion->duration());
+			}
+			else
+			{
+				time_warp.insert( startAt,			skMotion->time_start() );
+				//time_warp.insert( readyAt,			motionController->time_ready() );
+				//time_warp.insert( strokeStartAt,	motionController->time_stroke_start() );
+ 				//time_warp.insert( strokeAt,			motionController->time_stroke_emphasis() );
+				//time_warp.insert( strokeEndAt,		motionController->time_stroke_end() );
+				//time_warp.insert( relaxAt,			motionController->time_relax() );
+				//time_warp.insert( endAt,	ct_dur );
+				time_warp.insert( readyAt,			skMotion->time_ready() );
+				time_warp.insert( strokeStartAt,	skMotion->time_stroke_start() );
+ 				time_warp.insert( strokeAt,			skMotion->time_stroke_emphasis() );
+				time_warp.insert( strokeEndAt,		skMotion->time_stroke_end() );
+				time_warp.insert( relaxAt,			skMotion->time_relax() );
+				time_warp.insert( endAt,			skMotion->duration());
+			}
 		}
 	}
 	else

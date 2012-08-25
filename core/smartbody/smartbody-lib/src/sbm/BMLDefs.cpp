@@ -19,6 +19,13 @@ XMLCh* BMLDefs::ATTR_STROKE_END = NULL;
 XMLCh* BMLDefs::ATTR_RELAX = NULL;
 XMLCh* BMLDefs::ATTR_END = NULL;
 
+XMLCh* BMLDefs::ATTR_PRESTROKE_HOLD = NULL;
+XMLCh* BMLDefs::ATTR_POSTSTROKE_HOLD = NULL;
+XMLCh* BMLDefs::ATTR_PRESTROKE_HOLD_IDLEMOTION = NULL;
+XMLCh* BMLDefs::ATTR_POSTSTROKE_HOLD_IDLEMOTION = NULL;
+XMLCh* BMLDefs::ATTR_SCALE = NULL;
+XMLCh* BMLDefs::ATTR_FREQUENCY = NULL;
+
 XMLCh* BMLDefs::TM_START = NULL;
 XMLCh* BMLDefs::TM_READY = NULL;
 XMLCh* BMLDefs::TM_STROKE_START = NULL;
@@ -337,6 +344,13 @@ BMLDefs::BMLDefs()
 	ATTR_STROKE_END = XMLString::transcode("stroke_end");
 	ATTR_RELAX = XMLString::transcode("relax");
 	ATTR_END = XMLString::transcode("end");
+
+	ATTR_PRESTROKE_HOLD =  XMLString::transcode("prestroke_hold");
+	ATTR_PRESTROKE_HOLD_IDLEMOTION = XMLString::transcode("prestroke_hold_idlemotion");
+	ATTR_POSTSTROKE_HOLD =  XMLString::transcode("poststroke_hold");
+	ATTR_POSTSTROKE_HOLD_IDLEMOTION = XMLString::transcode("poststroke_hold_idlemotion");
+	ATTR_SCALE = XMLString::transcode("sbm:scale");
+	ATTR_FREQUENCY = XMLString::transcode("sbm:frequency");
 
 	TM_START = XMLString::transcode("start");
 	TM_READY = XMLString::transcode("ready");

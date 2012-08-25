@@ -3643,6 +3643,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="perlin"
+				>
+				<File
+					RelativePath="..\src\external\perlin\perlin.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\perlin\perlin.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="python"

@@ -163,6 +163,11 @@ void MeCtMotion::twarp ( float tw ) {
 		emphasist ( -1.0f ); // set -1 again to ensure that all <0 values are -1
 }
 
+double MeCtMotion::phase_duration ()
+{ 
+	return synch_points.get_duration(); 
+}
+
 void MeCtMotion::output ( SrOutput& out )
  {
    MeController::output ( out );
@@ -289,6 +294,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 			}
 		}
 	} else {
+		//LOG("MeCtMotion::controller_evaluate %s time %f, duration %f", this->getName().c_str(), t, dur);
 		continuing = t < dur;
 	}
 

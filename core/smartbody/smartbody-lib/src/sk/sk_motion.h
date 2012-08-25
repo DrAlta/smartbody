@@ -30,8 +30,8 @@
 # include <sr/sr_shared_class.h>
 # include <sk/sk_channel_array.h>
 # include <sbm/sr_synch_points.h>
-#include <sb/SBObject.h>
-#include <queue>
+# include <sb/SBObject.h>
+# include <queue>
 
 class SkPosture;
 class SkSkeleton;
@@ -224,6 +224,15 @@ public :
 	void move_keytimes ( float startkt );
 	
 	SkMotion* copyMotion();
+
+	SkMotion* buildPrestrokeHoldMotion(float holdTime, SkMotion* idleMotion = NULL);
+	SkMotion* buildPoststrokeHoldMotion(float holdTime, std::vector<std::string>& joints, float scale = 1.0f, float freq = -1.0f, SkMotion* idleMotion = NULL);
+	
+	void smoothAtFrame(int frameId, int interval, int maskSize = 3, int maskType = 0);
+	void smoothByMask(std::vector<int>& frameIds, std::vector<float>& mask);
+	void addPerlinNoise(std::vector<std::string>& affectedJoints, int startFrame = -1, int endFrame = -1, float amp = 1.0f, float freq = -1.0f);
+	
+
 	// Build and return a mirror motion from the motion. The mirror axis is assumed to be y-z plane with the character center at origin.
 	SkMotion* buildMirrorMotion(SkSkeleton* skeleton);
 
