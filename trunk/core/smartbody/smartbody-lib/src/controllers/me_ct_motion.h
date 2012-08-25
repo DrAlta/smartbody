@@ -128,7 +128,7 @@ class MeCtMotion : public SmartBody::SBController
     /*! Returns the duration of the warped motion, which corresponds to the phase in
         a loop controller with undetermined duration */
 //    double phase_duration () { return _duration; }
-    double phase_duration () { return synch_points.get_duration(); }
+    double phase_duration ();
 
     /*! Output data */
     void output ( SrOutput& out );

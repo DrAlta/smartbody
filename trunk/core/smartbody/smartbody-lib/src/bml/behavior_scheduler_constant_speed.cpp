@@ -272,7 +272,12 @@ void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& behav_syncs, 
 		if (intervalScale.size() < 6)
 		{
 			for (int x = intervalScale.size() - 1; x < 6; x++)
-				intervalScale.push_back(lastScale);
+			{	
+				if (lastScale == 0.0f)
+					intervalScale.push_back(1.0f);
+				else
+					intervalScale.push_back(lastScale);
+			}
 		}
 		// at this point, intervalScale[] should contain the scaling for those particular intervals
 		// now determine the proper execution times based on the interval scaling
