@@ -236,6 +236,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\controllers\MeCtBlendEngine.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_motion_blend.cpp" />
+    <ClCompile Include="..\src\external\perlin\perlin.cpp" />
     <ClCompile Include="..\src\sbm\action_unit.cpp" />
     <ClCompile Include="..\src\sbm\DefaultAttributeTable.cpp" />
     <ClCompile Include="..\src\sbm\Event.cpp" />
@@ -698,6 +699,7 @@
     <ClInclude Include="..\src\controllers\MeCtBlendEngine.h" />
     <ClInclude Include="..\src\controllers\me_blend_cover.h" />
     <ClInclude Include="..\src\controllers\me_ct_motion_blend.hpp" />
+    <ClInclude Include="..\src\external\perlin\perlin.h" />
     <ClInclude Include="..\src\sbm\action_unit.hpp" />
     <ClInclude Include="..\src\sbm\DefaultAttributeTable.h" />
     <ClInclude Include="..\src\sbm\Event.h" />
