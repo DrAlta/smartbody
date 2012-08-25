@@ -1039,6 +1039,9 @@
     <ClCompile Include="..\src\sbm\BMLDefs.cpp">
       <Filter>bml</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\external\perlin\perlin.cpp">
+      <Filter>external\perlin</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -2121,6 +2124,9 @@
     <ClInclude Include="..\src\sbm\BMLDefs.h">
       <Filter>bml</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\external\perlin\perlin.h">
+      <Filter>external\perlin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag">
@@ -2175,6 +2181,9 @@
     </Filter>
     <Filter Include="python">
       <UniqueIdentifier>{3d4ce46a-b597-4aba-8b2b-bd42c8d1d853}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\perlin">
+      <UniqueIdentifier>{369d463a-1bdf-4121-bbd8-bc7504bf7f8e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
