@@ -75,7 +75,10 @@ set( SMARTBODY_LIB_EXT_SOIL_SRC
 	external/SOIL/stb_image_aug.c
 #	external/SOIL/stbi_DDS_aug_c.h
 )
-
+set( SMARTBODY_LIB_EXT_PERLIN_SRC
+	
+	external/perlin/perlin.cpp
+)
 set( SMARTBODY_LIB_ME_SRC
 
 	controllers/me_controller_context.cpp
@@ -420,6 +423,8 @@ add_library(
 	${SMARTBODY_LIB_EXT_SOIL_SRC}
 	
 	${SMARTBODY_LIB_EXT_PARSER_SRC}
+
+	${SMARTBODY_LIB_EXT_PERLIN_SRC}
 	
  	${SMARTBODY_LIB_ME_SRC}
 	
