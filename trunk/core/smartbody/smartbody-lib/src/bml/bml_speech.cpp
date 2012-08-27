@@ -410,6 +410,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 		return;
 
 	SBCharacter* character = dynamic_cast<SBCharacter*>(request->actor);
+	const std::string& diphoneMap = character->getStringAttribute("diphoneSetName");
 	VisemeData* curViseme = NULL;
 	VisemeData* prevViseme = NULL;
 	VisemeData* nextViseme = NULL;
@@ -425,7 +426,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 		visemeTimeMarkers.push_back(curViseme->time());
 		if (prevViseme != NULL)
 		{
-			SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(prevViseme->id(), curViseme->id(), request->actor->getName());
+			SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(prevViseme->id(), curViseme->id(), diphoneMap);
 			float blendIval = 0.0f;
 			if (nextViseme != NULL)
 				blendIval = nextViseme->time() - prevViseme->time();

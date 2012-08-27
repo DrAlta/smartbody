@@ -51,7 +51,10 @@ protected:
 	Fl_Button* _buttonPlayDialog;
 	Fl_Button* _buttonReset;
 	Fl_Button* _buttonShowStats;
+	Fl_Button* _buttonRefreshCharacter;
+	Fl_Button* _buttonDump;
 	Fl_Input* _inputUtterance;
+
 	Fl_Check_Button* _checkStats;
 	VisemeCurveEditor * _curveEditor;
 	bool _phonemesSelected[2];
@@ -86,6 +89,8 @@ protected:
 	static void OnShowStatsCB(Fl_Widget* widget, void* data);
 	static void OnStatsResetCB(Fl_Widget* widget, void* data);
 	static void OnGatherStatsCB(Fl_Widget* widget, void* data);
+	static void OnCharacterRefreshCB(Fl_Widget* widget, void* data);
+	static void OnDumpCB(Fl_Widget* widget, void* data);
 
 };
 #endif
