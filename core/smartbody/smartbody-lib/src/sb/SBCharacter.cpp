@@ -24,10 +24,12 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	createBoolAttribute("visemecurve", false, true, "Basic", 100, false, false, false, "Use curve-based visemes instead of discrete visemes.");
-	createBoolAttribute("useDiphone", false, true, "Basic", 110, false, false, false, "Use diphones.");
 	createBoolAttribute("reach.useLocomotion", false, true, "Basic", 110, false, false, false, "Whether to use locomotion for reach by default.");
-	createBoolAttribute("diphoneSplineCurve", false, true, "Basic", 120, false, false, false, "Use diphones spline/linear curve.");
-	SmartBody::DoubleAttribute* diphoneSmoothWindow = createDoubleAttribute("diphoneSmoothWindow", -1.0, true, "Basic", 130, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
+	createBoolAttribute("useDiphone", false, true, "Basic", 150, false, false, false, "Use diphones.");
+	createStringAttribute("diphoneSetName", "", true, "Basic", 160, false, false, false, "Name of the diphone set to be used when using diphone-based lip-syncing.");
+	createBoolAttribute("diphoneSplineCurve", false, true, "Basic", 170, false, false, false, "Use diphones spline/linear curve.");
+	SmartBody::DoubleAttribute* diphoneSmoothWindow = createDoubleAttribute("diphoneSmoothWindow", -1.0, true, "Basic", 180, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
+
 	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
 	timeDelayAttr->setMin(0.0);
 	createStringAttribute("deformableMesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
@@ -56,6 +58,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	utterancePolicyTypes.push_back("interrupt");	
 	StringAttribute* utterancePolicyAttribute = createStringAttribute("utterancePolicy", "none", true, "Basic", 500, false, false, false, "How utterances are handled when the character is already performing an utterance. Valid values are: ignore (ignores the new utterance and any associated behaviors), queue (plays the new utterance and associated behavior when the old utterance has finished), interrupt (stops the existing utterance and associated behaviors and plays the new one)");
 	utterancePolicyAttribute->setValidValues(utterancePolicyTypes);
+
 
 }
 

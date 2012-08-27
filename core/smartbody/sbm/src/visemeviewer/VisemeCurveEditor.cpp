@@ -201,6 +201,9 @@ bool VisemeCurveEditor::isPointSelected(int mousex, int mousey)
 	SrVec mouseClick((float) mousex, (float) mousey, 0.f);
 	bool pointIsSelected = false;
 
+	if (_selectedLine < int(0) || _selectedLine >= int(_curves.size()))
+		return false;
+
 	if(!_curves[_selectedLine].isVisible())
 		return false;
 

@@ -14,6 +14,8 @@ class SBDiphoneManager
 public:
 	SBDiphoneManager();
 	~SBDiphoneManager();
+
+	std::vector<std::string> getCommonPhonemes();
 	
 	SBDiphone* createDiphone(const std::string& fromPhoneme, const std::string& toPhoneme, const std::string& name);
 	std::vector<SBDiphone*>& getDiphones(const std::string& name);
