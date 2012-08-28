@@ -166,7 +166,10 @@ void SBMotionBlendBase::buildBlendBase( const std::string& motionParameter, cons
 	SBSkeleton* sbSkel = SBScene::getScene()->getSkeleton(skeletonName);
 	SrVec center = SrVec(0,0,0);
 	if (sbSkel)
-		center = sbSkel->getJointByName("base")->gmat().get_translation();
+	{
+		SBJoint* baseJoint =  sbSkel->getJointByName("base");
+		if (baseJoint)
+			center = baseJoint->gmat().get_translation();
 
 	//// 	createErrorSurfaces("curve", center, 0, 50, errorSurfaces);
 	//// 	createErrorSurfaces("curve", center, 0, 80, smoothSurfaces);
@@ -180,6 +183,7 @@ void SBMotionBlendBase::buildBlendBase( const std::string& motionParameter, cons
 	//// 		SrSnColorSurf* surf = smoothSurfaces[i];
 	//// 		updateSmoothSurface(surf);
 	//// 	}
+	}
 
 	pseudoParameters = blendEngine->resamplePts;
 }

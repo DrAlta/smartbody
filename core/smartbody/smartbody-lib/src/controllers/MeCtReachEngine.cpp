@@ -123,7 +123,7 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 	cons->rootName = consRootName;
 	reachPosConstraint[cons->efffectorName] = cons;
 	// if there is a child	
-	if (reachEndEffector->child(0))
+	if (reachEndEffector->num_children() > 0 && reachEndEffector->child(0))
 	{
 		EffectorConstantConstraint* rotCons = new EffectorConstantConstraint();				
 		rotCons->efffectorName = reachEndEffector->name().c_str();
@@ -355,6 +355,8 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 	
 	{
 		EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachRotConstraint[reachEndEffector->name().c_str()]);		
+		if (!cons)
+			return;
 		cons->targetRot = estate.curIKTargetState.rot;//ikRotTrajectory;//ikRotTarget;//motionParameter->getMotionFrameJoint(interpMotionFrame,reachEndEffector->name().get_string())->gmat();//ikRotTarget;	
 		cons->constraintWeight = 0.f;//1.f - rd->blendWeight;
 

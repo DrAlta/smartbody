@@ -22,6 +22,7 @@
 *      Marcus Thiebaux, USC
 */
 
+#include <vhcl.h>
 # include <sr/sr_model.h>
 
 # include <sk/sk_skeleton.h>
@@ -92,8 +93,15 @@ SkSkeleton::~SkSkeleton ()
 
 void SkSkeleton::copy(SkSkeleton* origSkel)
 {
+	if (!origSkel->root())
+	{
+		LOG("Original skeleton has no root joint, cannot be copied.");
+		return;
+	}
 	_name = origSkel->name();
 	_skfilename = origSkel->skfilename();
+
+
 	//	_root = new SkJoint(this, 0, origSkel->root()->rot_type(), origSkel->root()->index());
 	_root = new SmartBody::SBJoint(this, 0, origSkel->root()->rot_type(), origSkel->root()->index());
 	copy_joint(_root, origSkel->root());
