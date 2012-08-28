@@ -106,7 +106,8 @@ void MeCtBlendEngine::updateMotionExamples( const std::vector<SkMotion*>& inMoti
 	for (int i=0;i<3;i++)
 	{
 		skeletonCopy->root()->pos()->value(i,0.f);
-		root->pos()->value(i,0.f);
+		if (root)
+			root->pos()->value(i,0.f);
 	}	
 
 	SkJoint* rootJoint = affectedJoints[0];
