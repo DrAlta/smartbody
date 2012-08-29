@@ -128,36 +128,15 @@ void VisemeViewerWindow::draw()
 
 bool  VisemeViewerWindow::loadData()
 {
+	SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
+	std::vector<std::string> commonPhonemes = diphoneManager->getCommonPhonemes();
+
 	for (int x = 0; x < 2; x++)
 	{
-		_browserPhoneme[x]->add("Aa");   /// Viseme for aa
-		_browserPhoneme[x]->add("Ah");   /// Viseme for aa, ae, ah
-		_browserPhoneme[x]->add("Ao");
-		_browserPhoneme[x]->add("Aw");   /// aw
-		_browserPhoneme[x]->add("Ay");  /// ay
-		_browserPhoneme[x]->add("Bmp");
-		_browserPhoneme[x]->add("D");
-		_browserPhoneme[x]->add("Ee");
-		_browserPhoneme[x]->add("Eh");   /// ey, eh, uh
-		_browserPhoneme[x]->add("Er");
-		_browserPhoneme[x]->add("F");
-		_browserPhoneme[x]->add("H");  /// h
-		_browserPhoneme[x]->add("Ih");   /// y, iy, ih, ix
-		_browserPhoneme[x]->add("J");
-		_browserPhoneme[x]->add("Kg");
-		_browserPhoneme[x]->add("Ih");
-		_browserPhoneme[x]->add("L");   /// l
-		_browserPhoneme[x]->add("Ng");
-		_browserPhoneme[x]->add("Oh");
-		_browserPhoneme[x]->add("Oo");
-		_browserPhoneme[x]->add("Ow");   /// ow
-		_browserPhoneme[x]->add("Oy");  /// oy
-		_browserPhoneme[x]->add("R");
-		_browserPhoneme[x]->add("Sh");   /// sh, ch, jh, zh
-		_browserPhoneme[x]->add("Th");
-		_browserPhoneme[x]->add("W");
-		_browserPhoneme[x]->add("Z");
-		_browserPhoneme[x]->add("_");	/// silence
+		for (size_t p = 0; p < commonPhonemes.size(); p++)
+		{
+			_browserPhoneme[x]->add(commonPhonemes[p].c_str());
+		}		
 		_browserPhoneme[x]->deselect();
 	}
 
@@ -863,14 +842,20 @@ void VisemeViewerWindow::OnDumpCB(Fl_Widget* widget, void* data)
 	SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
 
 	std::vector<std::string> commonPhonemes = diphoneManager->getCommonPhonemes();
-	std::set<std::string> diphoneSet;
-	for (size_t i = 0; i < commonPhonemes.size() - 1; i++)
+	for (size_t i = 0; i < commonPhonemes.size(); i++)
 	{
-		for (size_t j = 1; j < commonPhonemes.size(); j++)
+		std::transform(commonPhonemes[i].begin(), commonPhonemes[i].end(), commonPhonemes[i].begin(), tolower); 
+	}
+
+	std::set<std::string> diphoneSet;
+	for (size_t i = 0; i < commonPhonemes.size(); i++)
+	{
+		for (size_t j = 0; j < commonPhonemes.size(); j++)
 		{
 			std::string str = commonPhonemes[i];
 			str.append(" - ");
 			str.append(commonPhonemes[j]);
+			diphoneSet.insert(str);
 		}
 	}
 
@@ -894,20 +879,18 @@ void VisemeViewerWindow::OnDumpCB(Fl_Widget* widget, void* data)
 	}
 	file << "# The following diphones are missing from diphone set '" << curDiphoneSet << "'\n";
 
-	for (size_t c = 0; c < diphones.size(); c++)
+	for (size_t i = 0; i < commonPhonemes.size(); i++)
 	{
-			const std::string& from = diphones[c]->getFromPhonemeName();
-			const std::string& to = diphones[c]->getToPhonemeName();
-			std::string str = from;
-			str.append(" - ");
-			str.append(to);
-
-			std::set<std::string>::iterator iter = diphoneSet.find(str);
-			if (iter == diphoneSet.end())
-			{
-				file << str << "\n";
-			}
+		for (size_t j = 0; j < commonPhonemes.size(); j++)
+		{
+			 SBDiphone* diphone = diphoneManager->getDiphone(commonPhonemes[i], commonPhonemes[j], curDiphoneSet);
+			 if (!diphone)
+			 {
+				 file <<  commonPhonemes[i] << " - " <<  commonPhonemes[j] << "\n";
+			 }
+		}	
 	}
+
 	file.close();	
 }
 
