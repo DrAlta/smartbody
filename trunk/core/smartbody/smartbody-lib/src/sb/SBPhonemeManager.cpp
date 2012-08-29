@@ -13,34 +13,28 @@ std::vector<std::string> SBDiphoneManager::getCommonPhonemes()
 {
 	std::vector<std::string> commonPhonemes;
 
-	commonPhonemes.push_back("Aa");   /// Viseme for aa
+	commonPhonemes.push_back("_");    /// silence
 	commonPhonemes.push_back("Ah");   /// Viseme for aa, ae, ah
-	commonPhonemes.push_back("Ao");
-	commonPhonemes.push_back("Aw");   /// aw
-	commonPhonemes.push_back("Ay");  /// ay
-	commonPhonemes.push_back("Bmp");
-	commonPhonemes.push_back("D");
-	commonPhonemes.push_back("Ee");
+	commonPhonemes.push_back("Aa");   /// Viseme for aa
+	commonPhonemes.push_back("Ao");   /// ao
 	commonPhonemes.push_back("Eh");   /// ey, eh, uh
-	commonPhonemes.push_back("Er");
-	commonPhonemes.push_back("F");
-	commonPhonemes.push_back("H");  /// h
+	commonPhonemes.push_back("Er");   /// er
 	commonPhonemes.push_back("Ih");   /// y, iy, ih, ix
-	commonPhonemes.push_back("J");
-	commonPhonemes.push_back("Kg");
-	commonPhonemes.push_back("Ih");
-	commonPhonemes.push_back("L");   /// l
-	commonPhonemes.push_back("Ng");
-	commonPhonemes.push_back("Oh");
-	commonPhonemes.push_back("Oo");
+	commonPhonemes.push_back("W");   /// w, uw
 	commonPhonemes.push_back("Ow");   /// ow
+	commonPhonemes.push_back("Aw");   /// aw
 	commonPhonemes.push_back("Oy");  /// oy
-	commonPhonemes.push_back("R");
+	commonPhonemes.push_back("Ay");  /// ay
+	commonPhonemes.push_back("H");  /// h
+	commonPhonemes.push_back("R");   /// r
+	commonPhonemes.push_back("L");   /// l
+	commonPhonemes.push_back("Z");   /// s, z
 	commonPhonemes.push_back("Sh");   /// sh, ch, jh, zh
-	commonPhonemes.push_back("Th");
-	commonPhonemes.push_back("W");
-	commonPhonemes.push_back("Z");
-	commonPhonemes.push_back("_");	/// silence
+	commonPhonemes.push_back("Th");  /// th, dh
+	commonPhonemes.push_back("F");   /// f, v
+	commonPhonemes.push_back("D");   /// d, t, n   - also try NG: 2 to 1 against
+	commonPhonemes.push_back("KG");  /// k, g, ,ng   - also try NG: 2 to 1 against
+	commonPhonemes.push_back("BMP"); /// p, b, m
 
 	return commonPhonemes;
 }
