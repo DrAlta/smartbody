@@ -19,16 +19,19 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 {
 	const XMLCh* animName = elem->getAttribute( BMLDefs::ATTR_NAME );
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
-	const XMLCh* typeAttr = elem->getAttribute(BMLDefs::ATTR_LEXEME);
+	const XMLCh* lexemeAttr = elem->getAttribute(BMLDefs::ATTR_LEXEME);
+	const XMLCh* typeAttr = elem->getAttribute(BMLDefs::ATTR_TYPE);
 	const XMLCh* modeAttr = elem->getAttribute(BMLDefs::ATTR_MODE);
 	const XMLCh* styleAttr = elem->getAttribute(BMLDefs::ATTR_STYLE);
 	std::string animationName;
 	std::string localId;
+	std::string lexeme;
 	std::string type;
 	std::string mode;
 	std::string style;
 	xml_utils::xml_translate(&localId, id);
 	xml_utils::xml_translate(&animationName, animName);
+	xml_utils::xml_translate(&lexeme, lexemeAttr);
 	xml_utils::xml_translate(&type, typeAttr);
 	xml_utils::xml_translate(&mode, modeAttr);
 	xml_utils::xml_translate(&style, styleAttr);
@@ -57,8 +60,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 				}
 			}
 		}
-
-		animationName = gestureMap->getGestureByInfo(type, posture, mode, style);
+		animationName = gestureMap->getGestureByInfo(lexeme, type, mode, style, posture);
 	}
 
 	if (animationName == "")
@@ -83,8 +85,28 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		ostringstream name;
 		name << unique_id << ' ' << motion->getName();
 		motionCt->setName(name.str().c_str());  // TODO: include BML act and behavior ids
-		motionCt->init(const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0);
+		// Handle stroke hold
+		SkMotion* mForCt = motion;
+		float prestrokehold = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_PRESTROKE_HOLD, elem, -1.0);
+		std::string prestrokehold_idlemotion = xml_utils::xml_parse_string(BMLDefs::ATTR_PRESTROKE_HOLD_IDLEMOTION, elem);
+		SkMotion* preIdleMotion = (SkMotion*)mcu->_scene->getMotion(prestrokehold_idlemotion);
+		if (prestrokehold > 0)
+			mForCt = motion->buildPrestrokeHoldMotion(prestrokehold, preIdleMotion);
+		float poststrokehold = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_POSTSTROKE_HOLD, elem, -1.0);
+		std::string poststrokehold_idlemotion = xml_utils::xml_parse_string(BMLDefs::ATTR_POSTSTROKE_HOLD_IDLEMOTION, elem);
+		SkMotion* postIdleMotion = (SkMotion*)mcu->_scene->getMotion(poststrokehold_idlemotion);
+		if (poststrokehold > 0)
+		{
+			std::string joints = xml_utils::xml_parse_string(BMLDefs::ATTR_JOINT_RANGE, elem);
+			std::vector<std::string> jointVec;
+			vhcl::Tokenize(joints, jointVec);
+			float scale = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_SCALE, elem, 1.0);
+			float freq = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_FREQUENCY, elem, -1.0);
 
+			mForCt = mForCt->buildPoststrokeHoldMotion(poststrokehold, jointVec, scale, freq, postIdleMotion);
+		}
+		//motionCt->init(const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0);
+		motionCt->init( const_cast<SbmCharacter*>(request->actor), mForCt, 0.0, 1.0);
 		BehaviorRequestPtr behavPtr(new MotionRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs ) );
 		return behavPtr; 
 	} 

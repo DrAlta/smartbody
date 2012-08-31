@@ -16,11 +16,7 @@ SBGestureMap::SBGestureMap(SBCharacter* character)
 
 SBGestureMap::~SBGestureMap()
 {
-	std::map<std::string, SBGestureInfo*>::iterator iter = _gestureMap.begin();
-	for (; iter != _gestureMap.end(); iter++)
-	{
-		delete iter->second;
-	}
+	_gestureMap.clear();
 }
 
 SBCharacter* SBGestureMap::getCharacter()
@@ -34,27 +30,33 @@ SBGestureMap* SBGestureMap::copy()
 	return NULL;
 }
 
-void SBGestureMap::addGestureMapping(const std::string& name, const std::string& type, const std::string& posture, const std::string& hand, const std::string& style)
+void SBGestureMap::addGestureMapping(const std::string& name, const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture)
 {
-	SBGestureInfo* gestureInfo = new SBGestureInfo(type, posture, hand, style);
-	std::map<std::string, SBGestureInfo*>::iterator iter = _gestureMap.find(name);
+	GestureInfo gInfo;
+	gInfo._lexeme = lexeme;
+	gInfo._type = type;
+	gInfo._hand = hand;
+	gInfo._style = style;
+	gInfo._posture = posture;
+
+	std::map<std::string, GestureInfo>::iterator iter = _gestureMap.find(name);
 	if (iter != _gestureMap.end())
 	{
-		delete iter->second;
 		_gestureMap.erase(iter);
 	}
-	_gestureMap.insert(std::make_pair(name, gestureInfo));
+	_gestureMap.insert(std::make_pair(name, gInfo));
 }
 
-std::string SBGestureMap::getGestureByInfo(const std::string& type, const std::string& posture, const std::string& hand, const std::string& style)
+std::string SBGestureMap::getGestureByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture)
 {
-	std::map<std::string, SBGestureInfo*>::iterator iter = _gestureMap.begin();
+	std::map<std::string, GestureInfo>::iterator iter = _gestureMap.begin();
 	for (; iter != _gestureMap.end(); iter++)
 	{
-		if (iter->second->getType() == type &&
-			iter->second->getPosture() == posture &&
-			iter->second->getHand() == hand &&
-			iter->second->getStyle() == style)
+		if (iter->second._lexeme == lexeme &&
+			iter->second._type == type &&
+			iter->second._hand == hand &&
+			iter->second._style == style &&
+			iter->second._posture == posture)
 		{
 			return iter->first;
 		}
@@ -65,109 +67,20 @@ std::string SBGestureMap::getGestureByInfo(const std::string& type, const std::s
 
 std::string SBGestureMap::getGestureByIndex(int i)
 {
-	std::map<std::string, SBGestureInfo*>::iterator iter = _gestureMap.begin();
-	int index = 0;
-	for (; iter != _gestureMap.end(); iter++)
+	if (i < 0 || i >= int(_gestureMap.size()))
 	{
-		if (index == i)
-			return iter->first;
-		index++;
+		LOG("Index %d out of range of gesture map.", i);
+		return "";
 	}
-	LOG("Index out of range of gesture map.");
-	return "";
 
+	std::map<std::string, GestureInfo>::iterator iter = _gestureMap.begin();
+	std::advance(iter, i);
+	return iter->first;
 }
 
 int SBGestureMap::getNumMappings()
 {
 	return _gestureMap.size();
-}
-
-std::string SBGestureMap::getGestureType(const std::string& name)
-{
-	std::map<std::string, SBGestureInfo*>::iterator iter = _gestureMap.find(name);
-	if (iter != _gestureMap.end())
-		return iter->second->getType();
-	LOG("Gesture %s doesn't exist", name.c_str());
-	return "";
-}
-
-std::string SBGestureMap::getGesturePosture(const std::string& name)
-{
-	std::map<std::string, SBGestureInfo*>::iterator iter = _gestureMap.find(name);
-	if (iter != _gestureMap.end())
-		return iter->second->getPosture();
-	LOG("Gesture %s doesn't exist", name.c_str());
-	return "";
-}
-
-std::string SBGestureMap::getGestureHand(const std::string& name)
-{
-	std::map<std::string, SBGestureInfo*>::iterator iter = _gestureMap.find(name);
-	if (iter != _gestureMap.end())
-		return iter->second->getHand();
-	LOG("Gesture %s doesn't exist", name.c_str());
-	return "";
-}
-
-std::string SBGestureMap::getGestureStyle(const std::string& name)
-{
-	std::map<std::string, SBGestureInfo*>::iterator iter = _gestureMap.find(name);
-	if (iter != _gestureMap.end())
-		return iter->second->getStyle();
-	LOG("Gesture %s doesn't exist", name.c_str());
-	return "";
-}
-
-SBGestureInfo::SBGestureInfo(const std::string& type, const std::string& posture, const std::string& hand, const std::string& style)
-{
-	_type = type;
-	_posture = posture;
-	_hand = hand;
-	_style = style;
-}
-
-SBGestureInfo::~SBGestureInfo()
-{
-}
-
-void SBGestureInfo::setType(const std::string& type)
-{
-	_type = type;
-}
-
-const std::string& SBGestureInfo::getType()
-{
-	return _type;
-}
-
-void SBGestureInfo::setPosture(const std::string& posture)
-{
-	_posture = posture;
-}
-
-const std::string& SBGestureInfo::getPosture()
-{
-	return _posture;
-}
-
-void SBGestureInfo::setHand(const std::string& hand)
-{
-	_hand = hand;
-}
-
-const std::string& SBGestureInfo::getHand()
-{
-	return _hand;
-}
-
-void SBGestureInfo::setStyle(const std::string& style)
-{
-	_style = style;
-}
-const std::string& SBGestureInfo::getStyle()
-{
-	return _style;
 }
 
 }
