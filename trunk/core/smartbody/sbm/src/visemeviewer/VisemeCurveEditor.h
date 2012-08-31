@@ -7,7 +7,6 @@
 #include "VisemeCurve.h"
 #include "VisemeViewerWindow.h"
 
-
 class VisemeViewerWindow;
 class VisemeCurveEditor : public Fl_Widget
 {
@@ -58,6 +57,8 @@ class VisemeCurveEditor : public Fl_Widget
 		void drawCurve();
 		void drawGrid();
 		void drawName();
+
+		std::vector<Fl_Color> _colors;
 };
 
 #endif

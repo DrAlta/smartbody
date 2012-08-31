@@ -22,6 +22,13 @@ VisemeCurveEditor::VisemeCurveEditor(int x, int y, int w, int h, char* name) : F
 	_gridHeight = h - 12;
 
 	visemeWindow = NULL;
+
+	_colors.push_back(FL_BLACK);
+	_colors.push_back(FL_RED);
+	_colors.push_back(FL_GREEN);
+	_colors.push_back(FL_BLUE);
+	_colors.push_back(FL_DARK_RED);
+	_colors.push_back(FL_MAGENTA);
 }
 
 void VisemeCurveEditor::setVisemeWindow(VisemeViewerWindow* w)
@@ -397,7 +404,10 @@ void VisemeCurveEditor::generateCurves(int count)
 			SrVec point( rand() % 25 + (float)(x() + j * 70), (float)( y() + h()/2.0f + rand() % 70), (float)0);
 			curve.push_back(point);
 		}
-		curve.SetLineColor( rand() % 256);
+		if (i < (int) _colors.size())
+			curve.SetLineColor(_colors[i]);
+		else
+			curve.SetLineColor( rand() % 256);
 		//curve.SetPointColor( rand() % 256);
 
 		_curves.push_back(curve);
