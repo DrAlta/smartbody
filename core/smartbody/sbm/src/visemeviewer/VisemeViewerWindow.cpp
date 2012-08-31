@@ -697,7 +697,17 @@ void VisemeViewerWindow::OnDiphoneSelectCB(Fl_Widget* widget, void* data)
         
 		diphones.push_back(tok);
 	}
-	
+
+	if (diphones.size() != 2)
+	{
+		LOG("Could not parse two phonemes from '%s'", str.c_str()); 
+			return;
+	}
+
+	// convert the chosen diphones to lower case
+	std::transform(diphones[0].begin(), diphones[0].end(), diphones[0].begin(), ::tolower);
+	std::transform(diphones[1].begin(), diphones[1].end(), diphones[1].begin(), ::tolower);
+
 	viewer->_browserPhoneme[0]->deselect();
 	viewer->_browserPhoneme[1]->deselect();
 
