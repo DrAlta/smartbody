@@ -136,7 +136,9 @@ bool  VisemeViewerWindow::loadData()
 	{
 		for (size_t p = 0; p < commonPhonemes.size(); p++)
 		{
-			_browserPhoneme[x]->add(commonPhonemes[p].c_str());
+			std::string lowerCasePhoneme = commonPhonemes[p];
+			std::transform(lowerCasePhoneme.begin(), lowerCasePhoneme.end(), lowerCasePhoneme.begin(), ::tolower);
+			_browserPhoneme[x]->add(lowerCasePhoneme.c_str());
 		}		
 		_browserPhoneme[x]->deselect();
 	}
@@ -401,9 +403,15 @@ void VisemeViewerWindow::selectViseme(const char * phoneme1, const char * phonem
 	if (!phoneme1 || !phoneme2)
 		return;
 
+	std::string p1 = phoneme1;
+	std::string p2 = phoneme2;
+
+	std::transform(p1.begin(), p1.end(), p1.begin(), ::tolower);
+	std::transform(p2.begin(), p2.end(), p2.begin(), ::tolower);
+
 	const std::string& diphoneMap = SmartBody::SBScene::getScene()->getCharacter(getCurrentCharacterName())->getStringAttribute("diphoneSetName");
 
-	SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(phoneme1, phoneme2, diphoneMap);
+	SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(p1, p2, diphoneMap);
 	if (diphone)
 	{
 		_browserViseme->deselect();
