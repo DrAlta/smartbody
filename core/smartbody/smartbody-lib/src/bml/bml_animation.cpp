@@ -75,30 +75,7 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 			ostringstream name;
 			name << unique_id << ' ' << motion->getName();
 			motionCt->setName( name.str().c_str() );  // TODO: include BML act and behavior ids
-			//motionCt->init( const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0 / twarp );
-
-			///////// Handle stroke hold
-			SkMotion* mForCt = motion;
-			float prestrokehold = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_PRESTROKE_HOLD, elem, -1.0);
-			std::string prestrokehold_idlemotion = xml_utils::xml_parse_string(BMLDefs::ATTR_PRESTROKE_HOLD_IDLEMOTION, elem);
-			SkMotion* preIdleMotion = (SkMotion*)mcu->_scene->getMotion(prestrokehold_idlemotion);
-			if (prestrokehold > 0)
-				mForCt = motion->buildPrestrokeHoldMotion(prestrokehold, preIdleMotion);
-			float poststrokehold = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_POSTSTROKE_HOLD, elem, -1.0);
-			std::string poststrokehold_idlemotion = xml_utils::xml_parse_string(BMLDefs::ATTR_POSTSTROKE_HOLD_IDLEMOTION, elem);
-			SkMotion* postIdleMotion = (SkMotion*)mcu->_scene->getMotion(poststrokehold_idlemotion);
-			if (poststrokehold > 0)
-			{
-				std::string joints = xml_utils::xml_parse_string(BMLDefs::ATTR_JOINT_RANGE, elem);
-				std::vector<std::string> jointVec;
-				vhcl::Tokenize(joints, jointVec);
-				float scale = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_SCALE, elem, 1.0);
-				float freq = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_FREQUENCY, elem, -1.0);
-
-				mForCt = mForCt->buildPoststrokeHoldMotion(poststrokehold, jointVec, scale, freq, postIdleMotion);
-			}
-
-			motionCt->init( const_cast<SbmCharacter*>(request->actor), mForCt, 0.0, 1.0 / twarp );
+			motionCt->init( const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0 / twarp );
 			BehaviorRequestPtr behavPtr(new MotionRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs ) );
 			return behavPtr; 
 		} else {
