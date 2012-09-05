@@ -207,7 +207,8 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	}
 
 	bool hasTarget = false;
-	if( targetPawn )	{		
+	if( targetPawn && targetPawn != bodyReachCt->getAttachedPawn())	{	// don't use the attached pawn as target
+		
 		bodyReachCt->setReachTargetPawn(const_cast<SbmPawn*>(targetPawn));		
 		hasTarget = true;
 	}

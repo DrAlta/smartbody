@@ -76,6 +76,7 @@ public:
 	void setLinearVelocity(float vel);
 	void setReachCompleteDuration(float duration);	
 	bool addHandConstraint(SkJoint* targetJoint, const char* effectorName);
+	SbmPawn* getAttachedPawn();
 	void setReachTargetPawn(SbmPawn* targetPawn);
 	void setReachTargetJoint(SkJoint* targetJoint);
 	void setReachTargetPos(SrVec& targetPos);
