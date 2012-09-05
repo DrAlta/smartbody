@@ -419,19 +419,19 @@ void ReachHandPickUpAction::reachCompleteAction( ReachStateData* rd )
 		ReachHandAction::reachPreReturnAction(rd);
 		return;
 	}
-	ReachHandAction::reachCompleteAction(rd);	
-	pickUpAttachedPawn(rd);
+	ReachHandAction::reachCompleteAction(rd);		
 }
 
 void ReachHandPickUpAction::reachNewTargetAction( ReachStateData* rd )
 {	
-	putDownAttachedPawn(rd);
+	//putDownAttachedPawn(rd);
 	//rd->effectorState.removeAttachedPawn(rd);
 	ReachHandAction::reachNewTargetAction(rd);
 }
 
 void ReachHandPickUpAction::reachReturnAction( ReachStateData* rd )
 {
+	pickUpAttachedPawn(rd);
 	std::string cmd;
 	std::string charName = rd->charName;	
 	cmd = "char " + charName + " gazefade out 0.5";

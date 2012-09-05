@@ -141,6 +141,14 @@ bool MeCtExampleBodyReach::addHandConstraint( SkJoint* targetJoint, const char* 
 	return currentReachEngine->addHandConstraint(targetJoint,effectorName);
 }
 
+SbmPawn* MeCtExampleBodyReach::getAttachedPawn()
+{
+	if (currentReachData->hasAttachedPawn())
+		return currentReachData->effectorState.getAttachedPawn();
+	else
+		return NULL;
+}
+
 void MeCtExampleBodyReach::setReachTargetPawn( SbmPawn* targetPawn )
 {
 	//reachTargetPawn = targetPawn;	
