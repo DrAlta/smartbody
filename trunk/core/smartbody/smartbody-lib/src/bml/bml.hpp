@@ -346,6 +346,13 @@ namespace BML {
 			           const BehaviorSyncPoints& behav_syncs );
 	};
 
+	class GestureRequest : public MeControllerRequest {
+	public:
+		GestureRequest( const std::string& unique_id, const std::string& localId, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
+						const BehaviorSyncPoints& behav_syncs );
+
+		virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
+	};
 
 	class ParameterizedAnimationRequest : public BehaviorRequest 
 	{

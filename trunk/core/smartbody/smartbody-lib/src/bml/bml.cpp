@@ -1131,6 +1131,34 @@ void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu 
 	// TODO: set sync point times
 }
 
+void GestureRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
+{
+	// takes in stroke and stroke_end
+	double startAt		= (double)behav_syncs.sync_start()->time();
+	double readyAt		= (double)behav_syncs.sync_ready()->time();
+	double strokeStartAt= (double)behav_syncs.sync_stroke_start()->time();
+	double strokeAt		= (double)behav_syncs.sync_stroke()->time();
+	double strokeEndAt	= (double)behav_syncs.sync_stroke_end()->time();
+	double relaxAt		= (double)behav_syncs.sync_relax()->time();
+	double endAt		= (double)behav_syncs.sync_end()->time();
+
+
+	MeCtMotion* motion_ct = dynamic_cast<MeCtMotion*> (anim_ct);
+	SkMotion* motion = motion_ct->motion();
+	double motionStroke = motion->time_stroke_end();
+	double motionStrokeEnd = motion->time_stroke_emphasis();
+	
+	double holdTime = (strokeEndAt - strokeAt) - (motionStrokeEnd - motionStroke);
+	if (holdTime > 0)
+	{		
+		SkMotion* holdM = motion->buildPoststrokeHoldMotion((float)holdTime, std::vector<std::string>());
+		motion_ct->init(const_cast<SbmCharacter*>(request->actor), holdM, 0.0, 1.0);
+		BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController(motion_ct);
+		set_scheduler(scheduler);
+	}
+	MeControllerRequest::realize_impl(request, mcu);
+}
+
 void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 {
 	double startAt  = (double)behav_syncs.sync_start()->time();
@@ -1288,6 +1316,19 @@ MotionRequest::MotionRequest( const std::string& unique_id, const std::string& l
 						 schedule_ct,
 						 syncs_in )
 {}
+
+GestureRequest::GestureRequest( const std::string& unique_id, const std::string& local, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
+								const BehaviorSyncPoints& syncs_in )
+:	MeControllerRequest( unique_id,
+						 local,
+                         motion_ct,
+						 schedule_ct,
+						 syncs_in )
+{
+	BehaviorSchedulerConstantSpeed* sched = dynamic_cast<BehaviorSchedulerConstantSpeed*> (scheduler.get());
+	if (sched)
+		sched->constant = false;
+}
 
 // Parameterized Animation Request
 ParameterizedAnimationRequest::ParameterizedAnimationRequest( MeCtParamAnimation* param_anim_ct, const std::string& sName, double paramX, double paramY, double paramZ, BML::ParamAnimBehaviorType type,
@@ -1508,7 +1549,16 @@ void GazeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 
 	if (gazeFadeInterval > 0.0f)
 	{
-		MeCtGaze* gazeCt = dynamic_cast<MeCtGaze*> (anim_ct);
+		// what's difference between anim_ct and gazeCt queried from controller tree?? 
+		// apparently anim_ct doesn't work
+		// need to figure out why. -Yuyu 09/04/2012
+		MeCtGaze* gazeCt = NULL;
+		const SbmCharacter* character = request->actor;
+		if (character)	{
+			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
+			MeController* controller = controllerTree->findControllerByHandle(anim_ct->handle());
+			gazeCt = dynamic_cast<MeCtGaze*>( controller );
+		}
 		if (gazeCt)
 		{
 			if (gazeFadeMode == 0)

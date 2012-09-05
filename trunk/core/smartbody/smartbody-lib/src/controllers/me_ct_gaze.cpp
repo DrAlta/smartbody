@@ -1159,16 +1159,22 @@ void MeCtGaze::set_fade_out( float interval )	{
 
 void MeCtGaze::set_fade_in_scheduled(float interval, double time)
 {
-	scheduled_time = mcuCBHandle::singleton().time + time;
-	scheduled_fade_mode = FADING_MODE_IN;
-	scheduled_fade_interval = interval;
+	FadingInfo info;
+	info.fadingMode = FADING_MODE_IN;
+	info.fadingInterval = interval;
+	double fadingScheduleTime = mcuCBHandle::singleton().time + time;
+	fadingSchedules.insert(std::make_pair((float)fadingScheduleTime, info));
+	//LOG("set_fade_in_scheduled(%s): Current time %f, scheduled fading time is at %f.", this->_handle.c_str(), mcuCBHandle::singleton().time, fadingScheduleTime);
 }
 
 void MeCtGaze::set_fade_out_scheduled(float interval, double time)
 {
-	scheduled_time = mcuCBHandle::singleton().time + time;
-	scheduled_fade_mode = FADING_MODE_OUT;
-	scheduled_fade_interval = interval;
+	FadingInfo info;
+	info.fadingMode = FADING_MODE_OUT;
+	info.fadingInterval = interval;
+	double fadingScheduleTime = mcuCBHandle::singleton().time + time;
+	fadingSchedules.insert(std::make_pair((float)fadingScheduleTime, info));
+	//LOG("set_fade_out_scheduled(%s): Current time %f, scheduled fading time is at %f.", this->_handle.c_str(), mcuCBHandle::singleton().time, fadingScheduleTime);
 }
 
 #define SMOOTH_RATE_REF (30.0f)
@@ -1176,17 +1182,27 @@ void MeCtGaze::set_fade_out_scheduled(float interval, double time)
 
 bool MeCtGaze::update_fading( float dt )	{
 
-	if (scheduled_time > 0.0f && mcuCBHandle::singleton().time > scheduled_time)
+	std::map<double, FadingInfo>::iterator iter = fadingSchedules.begin();
+	for (; iter != fadingSchedules.end(); ++iter)
 	{
-		if (scheduled_fade_mode == FADING_MODE_IN)
-			if (!isFadingIn())
-				set_fade_in(scheduled_fade_interval);
-		if (scheduled_fade_mode == FADING_MODE_OUT)
-			if (!isFadingOut())
-				set_fade_out(scheduled_fade_interval);
-		
-		scheduled_time = 0.0f;
-		return false;
+		if (mcuCBHandle::singleton().time >= iter->first)
+		{
+			//LOG("update_fading(%s): Current time %f, scheduled fading time is at %f.", this->_handle.c_str(), mcuCBHandle::singleton().time, scheduled_time);	
+			if (iter->second.fadingMode == FADING_MODE_IN)
+				if (!isFadingIn())
+				{
+					//LOG("fade in!");
+					set_fade_in(iter->second.fadingInterval);
+				}
+			if (iter->second.fadingMode == FADING_MODE_OUT)
+				if (!isFadingOut())
+				{
+					//LOG("fade out!");
+					set_fade_out(iter->second.fadingInterval);				
+				}
+			fadingSchedules.erase(iter);
+			return false;
+		}
 	}
 
 	// returns true if fully faded.

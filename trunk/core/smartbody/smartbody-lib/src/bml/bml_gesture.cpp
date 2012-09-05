@@ -107,7 +107,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		}
 		//motionCt->init(const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0);
 		motionCt->init( const_cast<SbmCharacter*>(request->actor), mForCt, 0.0, 1.0);
-		BehaviorRequestPtr behavPtr(new MotionRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs ) );
+		BehaviorRequestPtr behavPtr(new GestureRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs ) );
 		return behavPtr; 
 	} 
 	else 

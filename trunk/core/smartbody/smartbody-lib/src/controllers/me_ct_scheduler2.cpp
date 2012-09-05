@@ -553,45 +553,54 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 			// following piece of code detects if we need to truncate the motion
 			double counter = 0;
 			double marker = startAt;
+			double cut = 0;
+			bool span = true;
 			if (fabs(startAt - readyAt) < gwiz::epsilon4())
 			{
 				counter++;
 				marker = strokeStartAt;
+				cut = skMotion->time_ready() - skMotion->time_start();
 			}
 			if (fabs(startAt - strokeStartAt) < gwiz::epsilon4())
 			{
 				counter++;
 				marker = strokeAt;
+				cut = skMotion->time_stroke_start() - skMotion->time_start();
 			}
 			if (fabs(startAt - strokeAt) < gwiz::epsilon4())
 			{
 				counter++;
 				marker = strokeEndAt;
+				cut = skMotion->time_stroke_emphasis() - skMotion->time_start();
 			}
 			if (fabs(startAt - strokeEndAt) < gwiz::epsilon4())
 			{
 				counter++;
 				marker = relaxAt;
+				cut = skMotion->time_stroke_end() - skMotion->time_start();
 			}
 			if (fabs(startAt - relaxAt) < gwiz::epsilon4())
 			{
 				counter++;
 				marker = endAt;
+				cut = skMotion->time_relax() - skMotion->time_start();
 			}
 			if (fabs(startAt - endAt) < gwiz::epsilon4())
 			{
 				counter++;
 				marker = endAt;
+				cut = skMotion->duration() - skMotion->time_start();
 			}
 
 			if (counter > 0)
 			{
+				// how do we handle this transition ? 
 				blend_curve.clear();
 				blend_curve.insert(startAt, 0.0f);
 				blend_curve.insert(marker, 1.0f);
 				blend_curve.insert(relaxAt, 1.0f);
 				blend_curve.insert(endAt, 0.0f);
-				time_warp.insert(startAt, skMotion->duration() - (endAt - startAt));
+				time_warp.insert(startAt, cut);
 				time_warp.insert(endAt, skMotion->duration());
 			}
 			else
