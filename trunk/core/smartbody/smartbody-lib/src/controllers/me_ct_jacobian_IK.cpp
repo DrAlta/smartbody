@@ -485,7 +485,7 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 
 			assert(idx != -1);
 			float nodeWeight = 1.f;		
-			if (node->nodeName == "r_shoulder" || node->nodeName == "r_forearm" || node->nodeName == "l_forearm" || node->nodeName == "r_shoulder") 
+			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm" || node->nodeName == "l_forearm" || node->nodeName == "l_acromioclavicular") 
 				nodeWeight = 0.f;
 			if (!node->active)
 				nodeWeight = 0.f;
@@ -560,7 +560,7 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 			int idx = node->validNodeIdx;
 			assert(idx != -1);
 			float nodeWeight = 1.f;
-			if (node->nodeName == "r_shoulder" || node->nodeName == "r_forearm" ||  node->nodeName == "l_forearm" || node->nodeName == "r_shoulder") 
+			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm" ||  node->nodeName == "l_forearm" || node->nodeName == "l_acromioclavicular") 
 				nodeWeight = 0.f;
 			if (!node->active)
 				nodeWeight = 0.f;

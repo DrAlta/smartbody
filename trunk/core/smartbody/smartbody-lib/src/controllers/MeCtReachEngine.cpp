@@ -105,6 +105,7 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 	consJointList.push_back("sternoclavicular");
 	consJointList.push_back("acromioclavicular");
 	consJointList.push_back("shoulder");
+
 	std::string preFix = "r_";	
 	if (reachType == LEFT_ARM || reachType == LEFT_JUMP)
 		preFix = "l_";	
@@ -424,12 +425,12 @@ SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 {
 
 	SkJoint* rootJoint = sk->root()->child(0); // skip world offset
-	if (sk->search_joint("base"))
-	{
-		rootJoint = sk->search_joint("base");
-		return rootJoint;
-	}
-	//LOG("ReachEngine Root Name = %s\n",rootJoint->name().get_string());
+// 	if (sk->search_joint("base"))
+// 	{
+// 		rootJoint = sk->search_joint("base");
+// 		return rootJoint;
+// 	}
+	
 	bool bStop = false;
 	while (!bStop)
 	{
@@ -455,6 +456,7 @@ SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 			bStop = true;
 		}
 	}
+	LOG("ReachEngine Root Name = %s\n",rootJoint->name().c_str());
 	return rootJoint;
 }
 
