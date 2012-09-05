@@ -1150,8 +1150,10 @@ void GestureRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	
 	double holdTime = (strokeEndAt - strokeAt) - (motionStrokeEnd - motionStroke);
 	if (holdTime > 0)
-	{		
-		SkMotion* holdM = motion->buildPoststrokeHoldMotion((float)holdTime, std::vector<std::string>());
+	{	
+		std::vector<std::string> jointVec;
+		vhcl::Tokenize(joints, jointVec);
+		SkMotion* holdM = motion->buildPoststrokeHoldMotion((float)holdTime, jointVec, scale, freq, NULL);
 		motion_ct->init(const_cast<SbmCharacter*>(request->actor), holdM, 0.0, 1.0);
 		BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController(motion_ct);
 		set_scheduler(scheduler);
@@ -1318,7 +1320,7 @@ MotionRequest::MotionRequest( const std::string& unique_id, const std::string& l
 {}
 
 GestureRequest::GestureRequest( const std::string& unique_id, const std::string& local, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
-								const BehaviorSyncPoints& syncs_in )
+								const BehaviorSyncPoints& syncs_in, const std::string& js, float s, float f)
 :	MeControllerRequest( unique_id,
 						 local,
                          motion_ct,
@@ -1328,6 +1330,10 @@ GestureRequest::GestureRequest( const std::string& unique_id, const std::string&
 	BehaviorSchedulerConstantSpeed* sched = dynamic_cast<BehaviorSchedulerConstantSpeed*> (scheduler.get());
 	if (sched)
 		sched->constant = false;
+
+	joints = js;
+	scale = s;
+	freq = f;
 }
 
 // Parameterized Animation Request

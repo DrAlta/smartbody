@@ -15,6 +15,12 @@ using namespace std;
 using namespace BML;
 using namespace xml_utils;
 
+/*	Usage of bml gestures
+ *	- if stroke and stroke_end is defined, poststroke_hold time would be calculated automatically even if there's poststroke_hold given by user
+ *	- you can specify idle animation used for gesture holding period
+ *	- you can specify joints, scale, frequency for perlin noise added to gesture holding period. premise is no idle animation is specified.
+ */
+
 BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) 
 {
 	const XMLCh* animName = elem->getAttribute( BMLDefs::ATTR_NAME );
@@ -95,19 +101,21 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		float poststrokehold = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_POSTSTROKE_HOLD, elem, -1.0);
 		std::string poststrokehold_idlemotion = xml_utils::xml_parse_string(BMLDefs::ATTR_POSTSTROKE_HOLD_IDLEMOTION, elem);
 		SkMotion* postIdleMotion = (SkMotion*)mcu->_scene->getMotion(poststrokehold_idlemotion);
-		if (poststrokehold > 0)
+		
+		std::string joints = xml_utils::xml_parse_string(BMLDefs::ATTR_JOINT_RANGE, elem);
+		float scale = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_SCALE, elem, 0.02f);
+		float freq = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_FREQUENCY, elem, 0.03f);
+		std::string strokeString = xml_utils::xml_parse_string(BMLDefs::ATTR_STROKE, elem);
+		std::string strokeEndString = xml_utils::xml_parse_string(BMLDefs::ATTR_STROKE_END, elem);
+		if (poststrokehold > 0 && strokeString == "" && strokeEndString == "")
 		{
-			std::string joints = xml_utils::xml_parse_string(BMLDefs::ATTR_JOINT_RANGE, elem);
 			std::vector<std::string> jointVec;
 			vhcl::Tokenize(joints, jointVec);
-			float scale = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_SCALE, elem, 1.0);
-			float freq = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_FREQUENCY, elem, -1.0);
-
 			mForCt = mForCt->buildPoststrokeHoldMotion(poststrokehold, jointVec, scale, freq, postIdleMotion);
 		}
 		//motionCt->init(const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0);
 		motionCt->init( const_cast<SbmCharacter*>(request->actor), mForCt, 0.0, 1.0);
-		BehaviorRequestPtr behavPtr(new GestureRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs ) );
+		BehaviorRequestPtr behavPtr(new GestureRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs, joints, scale, freq) );
 		return behavPtr; 
 	} 
 	else 
