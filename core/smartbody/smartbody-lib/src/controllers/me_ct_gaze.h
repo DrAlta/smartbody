@@ -320,6 +320,12 @@ class MeCtGaze : public SmartBody::SBController	{
 		bool calc_real_angle_to_target( float& deg );
 		
 	private:
+		struct FadingInfo
+		{
+			int fadingMode;
+			float fadingInterval;
+		};
+
 		double	prev_time;
 		int 	foostart;	// to initialize prev_time, dt
 		int 	started;
@@ -359,6 +365,7 @@ class MeCtGaze : public SmartBody::SBController	{
 		double			scheduled_time;
 		int				scheduled_fade_mode;
 		float			scheduled_fade_interval;
+		std::map<double, FadingInfo> fadingSchedules;
 
 		int 			joint_key_count;
 		int*			joint_key_map;

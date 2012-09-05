@@ -58,7 +58,9 @@ BehaviorSchedulerConstantSpeed::BehaviorSchedulerConstantSpeed(
     relaxTime( relaxTime ),
 	endTime( endTime ),
 	speed( speed )
-{}
+{	
+	constant = true;	
+}
 
 
 
@@ -262,8 +264,19 @@ void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& behav_syncs, 
 			if ((rawTimes[end] - rawTimes[start]) != 0)
 				scale = (syncTimes[end] - syncTimes[start]) / (rawTimes[end] - rawTimes[start]);
 
-			for (int x = lastScaleIndex; x < end; x++)
+			if (constant)
 			{
+				for (int x = lastScaleIndex; x < end; x++)
+				{
+					intervalScale.push_back(scale);
+				}
+			}
+			else
+			{
+				for (int x = lastScaleIndex; x < end - 1; x++)
+				{
+					intervalScale.push_back(1.0f);
+				}
 				intervalScale.push_back(scale);
 			}
 			lastScaleIndex = end;
@@ -273,7 +286,7 @@ void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& behav_syncs, 
 		{
 			for (int x = intervalScale.size() - 1; x < 6; x++)
 			{	
-				if (lastScale == 0.0f)
+				if (!constant)
 					intervalScale.push_back(1.0f);
 				else
 					intervalScale.push_back(lastScale);

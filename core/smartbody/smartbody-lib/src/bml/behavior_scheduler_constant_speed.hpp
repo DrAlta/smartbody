@@ -35,7 +35,9 @@
 namespace BML {
 	/**
 	 *  Schedules a behavior with a linearly adjustable duration.
-	 *  That is, the proportions between sync points will always remain constant.
+	 *  The proportions between sync points will always remain constant by default.
+	 *	By toggle boolean variable 'constant', you can choose to break the proportions. 
+	 *	(This feature is added to make the behavior sync points manipulation easier).
 	 *  Often used by controller-based behaviors.
 	 */
 	class BehaviorSchedulerConstantSpeed : public BehaviorScheduler {
@@ -49,7 +51,9 @@ namespace BML {
 		    time_sec relaxTime;
 			time_sec endTime;
 
-	        time_sec speed;  
+	        time_sec speed; 
+			
+			bool constant;
 
 		public:
 	        // preferred "local times" of sync points
