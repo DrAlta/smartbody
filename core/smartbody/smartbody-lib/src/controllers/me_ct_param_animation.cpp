@@ -353,7 +353,7 @@ void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>&
 	unit.time = mcuCBHandle::singleton().time + timeOffset;
 	unit.stateTimeOffset = (float)stateTimeOffset;
 
-	LOG("unit schedule mode = %d",unit.schedule);
+	//LOG("unit schedule mode = %d",unit.schedule);
 	
 	float unitTransitionLen = (float)defaultTransition; // set this to initial default	
 	// override if the default attribute exists
