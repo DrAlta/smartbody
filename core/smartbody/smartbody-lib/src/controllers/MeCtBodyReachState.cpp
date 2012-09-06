@@ -298,10 +298,15 @@ bool ReachHandAction::isPickingUpNewPawn( ReachStateData* rd )
 {
 	ReachTarget& rtarget = rd->reachTarget;
 	EffectorState& estate = rd->effectorState;
-	if (rd->startReach && rtarget.targetIsPawn())
+	if (rd->startReach && rtarget.targetIsPawn()) // a new target pawn
 	{
 		return (estate.getAttachedPawn() != rtarget.getTargetPawn());
 	}
+	else if (rd->startReach && !rtarget.targetIsPawn() && !rtarget.targetIsJoint()) // a new target position
+	{
+		return (estate.getAttachedPawn() != NULL);
+	}
+
 	return false;
 }
 
@@ -327,7 +332,8 @@ void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 	rd->curHandAction->sendReachEvent("reachNotifier",cmd);
 	
 	cmd = "pawn " + targetName + " physics off";
-	rd->curHandAction->sendReachEvent("reach",cmd);
+	rd->curHandAction->sendReachEvent("reach",cmd);	
+	rd->reachTarget.setTargetState(rd->effectorState.curIKTargetState);
 }
 
 void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
@@ -419,7 +425,8 @@ void ReachHandPickUpAction::reachCompleteAction( ReachStateData* rd )
 		ReachHandAction::reachPreReturnAction(rd);
 		return;
 	}
-	ReachHandAction::reachCompleteAction(rd);		
+	ReachHandAction::reachCompleteAction(rd);	
+	pickUpAttachedPawn(rd);
 }
 
 void ReachHandPickUpAction::reachNewTargetAction( ReachStateData* rd )
@@ -431,7 +438,7 @@ void ReachHandPickUpAction::reachNewTargetAction( ReachStateData* rd )
 
 void ReachHandPickUpAction::reachReturnAction( ReachStateData* rd )
 {
-	pickUpAttachedPawn(rd);
+	
 	std::string cmd;
 	std::string charName = rd->charName;	
 	cmd = "char " + charName + " gazefade out 0.5";
@@ -929,15 +936,7 @@ std::string ReachStateComplete::nextState( ReachStateData* rd )
 	if (rd->endReach)
 		toNextState = true;
 
-	if (toNextState)
-	{
-		//rd->curHandAction->reachNewTargetAction(rd);
-		rd->curHandAction->reachPreReturnAction(rd);
-		rd->endReach = false;		
-		//completeTime = 0.f; // reset complete time
-		nextStateName = "PreReturn";
-	}
-	else if (rd->curHandAction->isPickingUpNewPawn(rd))
+	if (rd->curHandAction->isPickingUpNewPawn(rd))
 	{
 		rd->curHandAction->reachNewTargetAction(rd);
 		rd->newTarget = true;	
@@ -945,6 +944,14 @@ std::string ReachStateComplete::nextState( ReachStateData* rd )
 		//completeTime = 0.f;		
 		nextStateName = "PreReturn";//"NewTarget";
 	}
+	else if (toNextState)
+	{
+		//rd->curHandAction->reachNewTargetAction(rd);
+		rd->curHandAction->reachPreReturnAction(rd);
+		rd->endReach = false;		
+		//completeTime = 0.f; // reset complete time
+		nextStateName = "PreReturn";
+	}	
 	return nextStateName;
 }
 /************************************************************************/
@@ -973,11 +980,11 @@ std::string ReachStateNewTarget::nextState( ReachStateData* rd )
 		rd->curHandAction->sendReachEvent("reachstate","newtarget");
 		nextStateName = "Complete";
 	}
-	else if (rd->endReach)
-	{
-		rd->startReach = false;
-		nextStateName = "PreReturn";
-	}
+// 	else if (rd->endReach)
+// 	{
+// 		rd->startReach = false;
+// 		nextStateName = "PreReturn";
+// 	}
 	return nextStateName;
 }
 
