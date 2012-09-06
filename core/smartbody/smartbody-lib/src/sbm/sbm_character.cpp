@@ -1787,7 +1787,8 @@ void SbmCharacter::schedule_viseme_curve(
 				{
 					srSplineCurve spline( srSplineCurve::INSERT_NODES );
 					//srSplineCurve spline( srSplineCurve::INSERT_KEYS );
-					spline.set_extensions( srSplineCurve::EXTEND_DECEL, srSplineCurve::EXTEND_DECEL );
+					//spline.set_extensions( srSplineCurve::EXTEND_DECEL, srSplineCurve::EXTEND_DECEL );
+					spline.set_extensions( srSplineCurve::EXTEND_NONE, srSplineCurve::EXTEND_NONE );
 					spline.set_algorithm( srSplineCurve::ALG_HALTING );
 
 					for (int i = 0; i < num_keys; i++)	{
