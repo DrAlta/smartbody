@@ -68,6 +68,7 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 
 	fastInitial = false;
 	smoothing = false;
+	facingAdjust = false;
 
 	lastMessage = "";
 	numMessageRepeats = 0;
@@ -685,12 +686,12 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 	if (locomotionEnd)      // need to define when you want to end the locomotion
 	{
 		locomotionHalt();
-
+		facingAdjust = true;		
 		//character->param_animation_ct->schedule(NULL, weights);		
 		//LOG("path following end");			
 	}
 	// adjust facing angle 			
-	if (fabs(facingAngle) <= 180 && character->param_animation_ct->isIdle())
+	if (fabs(facingAngle) <= 180 && character->param_animation_ct->isIdle() && facingAdjust )
 	{		
 		float diff = facingAngle - yaw;
 		//LOG("Idle state, facing angle = %f, diff = %f", facingAngle, diff);
@@ -1506,6 +1507,7 @@ void SteeringAgent::adjustFacingAngle( float angleDiff )
 		facingEvent.setParameters(cmd);
 		EventManager* manager = EventManager::getEventManager();		
 		manager->handleEvent(&facingEvent, 0.0f);
+		facingAdjust = false; // stop facing adjustment
 	}
 	/*
 	else
