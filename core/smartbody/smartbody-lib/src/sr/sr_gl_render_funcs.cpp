@@ -147,10 +147,12 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 		   else // has normal and texture
 		   {   // to-do : figure out why texture does not work in the fixed-pipeline ?	  
 			   //glDisable(GL_LIGHTING);	
+			   
 			   glEnable ( GL_ALPHA_TEST );
 			   glEnable (GL_BLEND);
 			   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			   glAlphaFunc ( GL_GREATER, 0.3f ) ;
+			   //glAlphaFunc ( GL_GREATER, 0.3f ) ;
+			   
 			   glDisable(GL_COLOR_MATERIAL);	   
 			   glActiveTexture(GL_TEXTURE0);
 			   glEnable(GL_TEXTURE_2D);	 	
