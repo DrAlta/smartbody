@@ -165,6 +165,7 @@ class SteeringAgent
 		bool fastInitial;	// whether to use the transition animation
 		bool smoothing;
 		bool pathFollowing;
+		bool facingAdjust;
 
 		protected:
 		std::string lastMessage;
