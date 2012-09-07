@@ -22,6 +22,8 @@ SBCharacter::SBCharacter() : SbmCharacter()
 SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name.c_str(), type)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
+	createBoolAttribute("bmlRequest.autoGestureTransition", false, true, "Basic", 90, false, false, false, "Whether smartbody should figure out the transition between gestures' stroke automatically."); 
 
 	createBoolAttribute("visemecurve", false, true, "Basic", 100, false, false, false, "Use curve-based visemes instead of discrete visemes.");
 	createBoolAttribute("reach.useLocomotion", false, true, "Basic", 110, false, false, false, "Whether to use locomotion for reach by default.");

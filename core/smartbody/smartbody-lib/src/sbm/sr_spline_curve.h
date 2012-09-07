@@ -151,6 +151,11 @@ class srSplineCurve {
 		void set_auto_extend( bool set = true ) {
 			auto_extensions = set;
 		}
+		void set_insertion_mode(int mode)
+		{
+			insert_mode = mode;
+		}
+
 		void set_algorithm( int alg )	{ 
 			algorithm = alg;
 		}
