@@ -238,7 +238,7 @@ bool DeformableMesh::buildVertexBuffer()
 	{
 		SkinWeight* skinWeight = skinWeights[skinCounter];		
 		int pos;
-		int globalCounter = 0;
+		int globalCounter = 0;		
 		pos = this->getMesh(skinWeight->sourceMesh);
 		if (pos != -1)
 		{
@@ -263,7 +263,8 @@ bool DeformableMesh::buildVertexBuffer()
 				{
 					boneJointIdxMap[jointName] = nTotalBones++;		
 					boneJointList.push_back(curJoint);
-					bindPoseMatList.push_back(skinWeight->bindShapeMat*skinWeight->bindPoseMat[k]);
+					//bindPoseMatList.push_back(skinWeight->bindShapeMat*skinWeight->bindPoseMat[k]);
+					bindPoseMatList.push_back(skinWeight->bindPoseMat[k]);
 				}
 			}
 			int numTris = dMeshStatic->shape().F.size();
@@ -368,11 +369,12 @@ bool DeformableMesh::buildVertexBuffer()
 					continue;
 				int numOfInfJoints = skinWeight->numInfJoints[i];				
 				SrVec& lv = dMeshStatic->shape().V[i];					
-				posBuf[iVtx] = lv;  
+				posBuf[iVtx] = lv*skinWeight->bindShapeMat;  
 				SrVec& lt =	dMeshStatic->shape().Tangent[i];		
 				SrVec  lb = dMeshStatic->shape().BiNormal[i];
-				tangentBuf[iVtx] = lt;
-				binormalBuf[iVtx] = lb;
+				tangentBuf[iVtx] = lt*skinWeight->bindShapeMat;
+				binormalBuf[iVtx] = lb*skinWeight->bindShapeMat;
+				
 				//normalBuffer(iVtx) = Vec3f(ln[0],ln[1],ln[2]);
 				for (int k=0;k<2;k++)
 				{

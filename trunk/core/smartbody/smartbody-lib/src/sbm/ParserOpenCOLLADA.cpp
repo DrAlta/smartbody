@@ -1746,6 +1746,34 @@ void ParserOpenCOLLADA::parseLibraryEffects(DOMNode* node, std::map<std::string,
 					w = (float)atof(tokens[3].c_str());
 				M.top().ambient = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
 			}
+			DOMNode* transparentNode = ParserOpenCOLLADA::getNode("transparent", node);
+			if (transparentNode)
+			{
+				DOMNamedNodeMap* transparentNodeAttr = transparentNode->getAttributes();
+				DOMNode* opaqueNode = transparentNodeAttr->getNamedItem(BML::BMLDefs::ATTR_OPAQUE);			
+				std::string opaqueMode;
+				xml_utils::xml_translate(&opaqueMode, opaqueNode->getTextContent());
+				float alpha = 1.f;				
+				if (opaqueMode == "RGB_ZERO")
+				{
+					DOMNode* colorNode = ParserOpenCOLLADA::getNode("color", transparentNode);				
+					std::string color;
+					xml_utils::xml_translate(&color, colorNode->getTextContent());
+					std::vector<std::string> tokens;
+					vhcl::Tokenize(color, tokens, " \n");
+					SrVec colorVec;
+					if (tokens.size() >= 3)
+					{
+						for (int i=0;i<3;i++)
+						{
+							colorVec[i] = (float)atof(tokens[i].c_str());
+						}
+					}
+					alpha = 1.f - colorVec.norm();										
+				}
+				//float alpha = float(1.0 - xml_utils::xml_translate_float(colorNode->getTextContent()));				
+				M.top().diffuse.a = (srbyte) ( alpha*255.0f );
+			}
 		}
 	}
 }

@@ -175,8 +175,8 @@ uniform int  useShadowMap;\n\
 varying vec3 normal,lightDir[2],halfVector[2];\n\
 varying vec3 tv,bv;\n\
 varying vec4 vPos;\n\
-uniform vec3 diffuseMaterial;\n\
-uniform vec3 specularMaterial;\n\
+uniform vec4 diffuseMaterial;\n\
+uniform vec4 specularMaterial;\n\
 uniform float  shineness;\n\
 //uniform vec3 specularColors;\n\
 varying float dist[2];\n\
@@ -203,8 +203,8 @@ void main (void)\n\
 	vec3 normalColor = normalize(texture2D(normalTexture,gl_TexCoord[0].st).xyz* 2.0 - 1.0);\n\
 	vec3 normalMapN = normalize(newtv*normalColor.x+newbv*normalColor.y+newn*normalColor.z); \n\
 	if (useTexture == 0) \n\
-		texColor = vec4(diffuseMaterial,1.0);//vec4(matColor,1.0);\n\
-	color.a = texColor.a;\n\
+		texColor = diffuseMaterial;//vec4(matColor,1.0);\n\
+	color.a = texColor.a*diffuseMaterial.a;\n\
 	n = normalize(normal);\n\
 	if (useNormalMap == 1)\n\
 		n = normalMapN;\n\
@@ -221,7 +221,7 @@ void main (void)\n\
 			color += vec4(texColor.xyz*NdotL,0)*att;\n\
 			halfV = normalize(halfVector[i]);\n\
 			NdotHV = max(dot(n,halfV),0.0);\n\
-			color += vec4(specularMaterial*pow(NdotHV, shineness+1.0),0)*att;\n\
+			color += vec4(specularMaterial.rgb*pow(NdotHV, shineness+1.0),0)*att;\n\
 		}   \n\
 	}\n\
 	const float shadow_ambient = 1.0;\n\
@@ -358,9 +358,9 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 		SbmSubMesh* mesh = subMeshList[i];
 		float color[4];
 		mesh->material.diffuse.get(color);		
-		glUniform3f(diffuseLoc,color[0],color[1],color[2]);
+		glUniform4f(diffuseLoc,color[0],color[1],color[2],color[3]);
 		mesh->material.specular.get(color);		
-		glUniform3f(specularLoc,color[0],color[1],color[2]);	
+		glUniform4f(specularLoc,color[0],color[1],color[2],color[3]);	
 		//printf("shineness = %d\n",mesh->material.shininess);
 		glUniform1f(shinenessLoc,mesh->material.shininess);
 		//LOG("mat color = %f %f %f\n",color[0],color[1],color[2]);
