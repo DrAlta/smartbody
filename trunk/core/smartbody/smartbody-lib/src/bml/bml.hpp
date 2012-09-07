@@ -149,6 +149,9 @@ namespace BML {
 
 		void cleanup( Processor* bp, mcuCBHandle* mcu );
 
+		// this function handles all the special process in between behaviors' schedule and realize
+		void specialHandle();
+
 	public:
 		virtual ~BmlRequest();
 

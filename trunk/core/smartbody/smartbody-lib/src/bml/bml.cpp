@@ -43,6 +43,7 @@
 #include "sbm/BMLDefs.h"
 #include <sb/SBAnimationState.h>
 #include <sb/SBBehavior.h>
+#include <sb/SBMotion.h>
 
 
 using namespace std;
@@ -177,7 +178,8 @@ BmlRequest::BmlRequest( SbmCharacter* actor, const string & actorId, const strin
 	requestId( requestId ),
 	msgId( msgId ),
 	doc (xmlDoc)
-{}
+{
+}
 
 void BmlRequest::init( BmlRequestPtr self ) {
 	// TODO: Assert self.get() == this
@@ -321,6 +323,66 @@ BehaviorSpan BmlRequest::getBehaviorSpan() {
 
 	return span;
 }
+
+
+void BmlRequest::specialHandle()
+{
+	// handle gesture transition
+	if (actor->getBoolAttribute("bmlRequest.autoGestureTransition"))
+	{
+		GestureRequest* prevGesture = NULL;
+		for (VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behaviors.end(); ++i) 
+		{
+			BehaviorRequest* behavior = (*i).get();
+			GestureRequest* gesture = dynamic_cast<GestureRequest*> (behavior);
+			if (gesture)
+			{
+				if (prevGesture != NULL)
+				{
+					// handle transitions
+					double prevGestureEndAt = (double)prevGesture->behav_syncs.sync_end()->time();
+					double currGestureStartAt = (double)gesture->behav_syncs.sync_start()->time();
+					if (prevGestureEndAt > currGestureStartAt)
+					{
+						double prevGestureStrokeAt = (double)prevGesture->behav_syncs.sync_stroke()->time();
+						double prevGestureStrokeEndAt = (double)prevGesture->behav_syncs.sync_stroke()->time();
+						double currGestureStrokeAt = (double)gesture->behav_syncs.sync_stroke()->time();
+						double currGestureStrokeStartAt = (double)gesture->behav_syncs.sync_stroke()->time();
+						if (currGestureStrokeAt > prevGestureStrokeAt)
+						{
+							// extend or shrink previous gesture stroke end to current gesture stroke start
+							// notice here might need to guarantee the gap between currGestureStroke and prevGestureStroke to be bigger than some threshold
+
+							if (currGestureStrokeStartAt > prevGestureStrokeAt)
+							{
+								// prevGestureStrokeEndAt<-currGestureStrokeStartAt
+								prevGesture->behav_syncs.sync_stroke_end()->set_time(currGestureStrokeStartAt);
+								//LOG("BmlRequest::specialHandle: Previous gesture %s's stroke end time %f is extended to current gesture %s's stroke start time %f.", prevGesture->unique_id.c_str(), prevGestureStrokeEndAt, gesture->unique_id.c_str(), currGestureStrokeStartAt);
+							}
+							else
+							{
+								// currGestureStrokeStartAt<-prevGestureStrokeAt
+								gesture->behav_syncs.sync_stroke_start()->set_time(prevGestureStrokeAt);
+								//LOG("BmlRequest::specialHandle: Current gesture %s's stroke start time %f is changed to previous gesture %s's stroke time %f.", gesture->unique_id.c_str(), currGestureStrokeStartAt, prevGesture->unique_id.c_str(), prevGestureStrokeAt);
+							}
+							// cut off currGesture
+							currGestureStrokeStartAt = (double)gesture->behav_syncs.sync_stroke_start()->time();
+							gesture->behav_syncs.sync_start()->set_time(currGestureStrokeStartAt);
+							gesture->behav_syncs.sync_ready()->set_time(currGestureStrokeStartAt);							
+						}
+						else
+						{
+							// should not happen ideally, nvbg should mark the gesture in order
+							LOG("BmlRequest::specialHandle Warning: Current gesture %s's stroke time %f is smaller than previous gesture %s's stroke time %f. Should not happen!", gesture->unique_id.c_str(), currGestureStrokeAt, prevGesture->unique_id.c_str(), prevGestureStrokeAt);
+						}
+					}
+				}
+				prevGesture = gesture;
+			}
+		}
+	}
+}
+
 
 void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	// Self reference to pass on...
@@ -525,6 +587,8 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 
 		
 	}
+
+	specialHandle();
 
 	// Realize behaviors
 #if USE_CUSTOM_PRUNE_POLICY
@@ -936,8 +1000,6 @@ SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 	return sync;  // May be NULL
 }
 
-
-
 SbmCommand::SbmCommand( std::string & command, time_sec time )
 :	command( command ),
 	time( time )
@@ -1145,6 +1207,7 @@ void GestureRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 
 	MeCtMotion* motion_ct = dynamic_cast<MeCtMotion*> (anim_ct);
 	SkMotion* motion = motion_ct->motion();
+	SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
 	double motionStroke = motion->time_stroke_end();
 	double motionStrokeEnd = motion->time_stroke_emphasis();
 	
@@ -1152,6 +1215,15 @@ void GestureRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	if (holdTime > 0)
 	{	
 		std::vector<std::string> jointVec;
+		if (sbMotion)
+		{
+			if (sbMotion->hasMetaData("noise_joints"))
+				joints = sbMotion->getMetaDataString("noise_joints");
+			if (sbMotion->hasMetaData("noise_scale"))
+				scale = (float)atof(sbMotion->getMetaDataString("noise_scale").c_str());
+			if (sbMotion->hasMetaData("noise_frequency"))
+				freq = (float)atof(sbMotion->getMetaDataString("noise_frequency").c_str());
+		}
 		vhcl::Tokenize(joints, jointVec);
 		SkMotion* holdM = motion->buildPoststrokeHoldMotion((float)holdTime, jointVec, scale, freq, NULL);
 		motion_ct->init(const_cast<SbmCharacter*>(request->actor), holdM, 0.0, 1.0);

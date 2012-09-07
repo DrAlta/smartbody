@@ -114,6 +114,11 @@ namespace BML {
 		time_sec time() const
 		{	return _sync->time; }
 
+		// Adding this function to enable updating sync points explicitly. Need this for gesture transition. (Yuyu, 09/06/2012)
+		// Might find a better way to do this later
+		void set_time(double t)
+		{ _sync->time = t; }
+
 	protected:
 		friend class BML::BehaviorSyncPoints;
 		void set_sync( SyncPointPtr new_sync ) { _sync = new_sync; }

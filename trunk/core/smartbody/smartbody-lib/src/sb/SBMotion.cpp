@@ -1825,6 +1825,13 @@ bool SBMotion::addMetaData( const std::string& tagName, const std::string& strVa
 	return newData;
 }
 
+bool SBMotion::hasMetaData(const std::string& tagName)
+{
+	if (tagAttrMap.find(tagName) == tagAttrMap.end())
+		return false;
+	return true;
+}
+
 bool SBMotion::removeMetaData( const std::string& tagName )
 {
 	if (tagAttrMap.find(tagName) != tagAttrMap.end())

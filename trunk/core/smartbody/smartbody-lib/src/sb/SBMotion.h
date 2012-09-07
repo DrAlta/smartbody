@@ -96,9 +96,10 @@ class SBMotion : public SkMotion
 		double getTimeStop();
 
 		bool addMetaData(const std::string& tagName, const std::string& strValue);
+		bool hasMetaData(const std::string& tagName);
 		bool removeMetaData(const std::string& tagName);		
-		std::string getMetaDataString(const std::string& tagName);	
-		double      getMetaDataDouble(const std::string& tagName);				
+		std::string getMetaDataString(const std::string& tagName);
+		double      getMetaDataDouble(const std::string& tagName);
 		std::vector<std::string> getMetaDataTags();
 		
 		

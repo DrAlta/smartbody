@@ -594,12 +594,21 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 
 			if (counter > 0)
 			{
-				// how do we handle this transition ? 
 				blend_curve.clear();
 				blend_curve.insert(startAt, 0.0f);
+				// build a better blending curve
+				int numSeg = 30;
+				for (int s = 1; s < numSeg; ++s)
+				{
+					double x = (marker - startAt) * double(s) / double(numSeg);
+					double y = sin(M_PI * 0.5f * x / (marker - startAt));
+					blend_curve.insert(x + startAt, y);
+				}
 				blend_curve.insert(marker, 1.0f);
+
 				blend_curve.insert(relaxAt, 1.0f);
 				blend_curve.insert(endAt, 0.0f);
+
 				time_warp.insert(startAt, cut);
 				time_warp.insert(endAt, skMotion->duration());
 			}
