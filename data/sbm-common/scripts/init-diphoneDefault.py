@@ -2084,8 +2084,6 @@ diphone.addKey("wide", 0.412533, 0.157434)
 diphone.addKey("wide", 0.652741, 0.446064)
 diphone.addKey("wide", 1.00261, 0.0058309)
 
-
-
 diphone = diphoneManager.createDiphone("f", "ay", "rachel")
 diphone.addKey("FV", 0, 0)
 diphone.addKey("FV", 0.180157, 0.895044)
@@ -2120,11 +2118,10 @@ diphone.addKey("wide", 0.0287206, 0)
 diphone.addKey("wide", 0.284595, 0.521866)
 diphone.addKey("wide", 0.691906, 0)
 
-
 diphone = diphoneManager.createDiphone("l", "f", "rachel")
 diphone.addKey("FV", 0.289817, 0.00874636)
 diphone.addKey("FV", 0.590078, 0.889213)
-diphon.addKey("FV", 0.736292, 0.769679)
+diphone.addKey("FV", 0.736292, 0.769679)
 diphone.addKey("FV", 0.997389, 0)
 
 diphone.addKey("open", 0, 0)
