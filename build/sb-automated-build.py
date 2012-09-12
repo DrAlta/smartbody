@@ -330,7 +330,8 @@ def fullBuild(svnPassword, buildSuffix):
 
         if ": warning " in line or \
            ": warning: " in line:
-           buildCompileWarnings.append("   " + line)
+           if ": (not reported) : warning:" not in line:
+              buildCompileWarnings.append("   " + line)
 
 
 
@@ -344,40 +345,34 @@ def fullBuild(svnPassword, buildSuffix):
         print "Build Failed."
 
 
-    # Get time of last build
-
-    if os.path.exists("BUILD_NUMBER"):
-        f = open("BUILD_NUMBER","r")
-        buildNumber = int(f.read())
-        f.close()
-    else:
-        buildNumber = 0
-
-    buildNumber += 1
-
-    f = open("BUILD_NUMBER","w")
-    f.write(str(buildNumber))
-    f.close()
-
-    print "build: {0}".format(buildNumber)
-
-
     buildDate = time.strftime("%m-%d-%Y")
 
     print "date: {0}".format(buildDate)
 
 
-    if buildSuccess:
-        buildFolderName = "Build{0}-{1}{2}".format(buildNumber, buildDate, buildSuffix)
-    else:
-        buildFolderName = "Build{0}-{1}{2}-failed".format(buildNumber, buildDate, buildSuffix)
-
-    print "buildFolderName: {0}".format(buildFolderName)
-
-
+    buildNumber = buildSvnRevision
+    buildFolderName = "Build{0}-{1}{2}{3}".format(buildNumber, buildDate, buildSuffix, "" if buildSuccess else "-failed")
     buildFolder = os.path.join(destinationFolder, buildFolderName)
 
+    # check for duplicate destination folder since we're using revision number as build number
+    while os.path.exists(buildFolder):
+        c = str(buildNumber)[-1:]
+        if c.isalpha():
+            buildNumber = str(buildNumber[:-1]) + chr(ord(c) + 1)
+        else:
+            buildNumber = str(buildNumber) + "a"
+
+        buildFolderName = "Build{0}-{1}{2}{3}".format(buildNumber, buildDate, buildSuffix, "" if buildSuccess else "-failed")
+        buildFolder = os.path.join(destinationFolder, buildFolderName)
+
+    print "build: {0}".format(buildNumber)
+    print "buildFolderName: {0}".format(buildFolderName)
     print "buildFolder: {0}".format(buildFolder)
+
+
+    # prune out files that aren't needed
+    distLocation = "build"
+    makeDist(distLocation)
 
 
     # move build to its destination folder
@@ -425,7 +420,7 @@ def fullBuild(svnPassword, buildSuffix):
         emailSubjectPrefix = "[SB-MAC]"
 
     f = open(finalMailFile,"w")
-    f.write("build: r{0} as Build #{1}\n".format(buildSvnRevision, buildNumber))
+    f.write("Build #{0}\n".format(buildNumber))
     f.write("\n")
     f.write("Build Summary:\n")
     if buildSuccess:
@@ -475,8 +470,8 @@ def fullBuild(svnPassword, buildSuffix):
         fp.close()
 
         emailTo = "nospam@ict.usc.edu"
-        msg["Subject"] = "{0} Build Results #{1} - r{2}".format(emailSubjectPrefix, buildNumber, buildSvnRevision)
-        msg["From"] = "svn@ict.usc.edu"
+        msg["Subject"] = "{0} Build Results #{1}".format(emailSubjectPrefix, buildNumber)
+        msg["From"] = "svn@svn.ict.usc.edu"
         msg["To"] = emailTo
 
         s = smtplib.SMTP("smtp.ict.usc.edu")
@@ -516,10 +511,6 @@ def fullBuild(svnPassword, buildSuffix):
         os.remove("BUILD_RUNNING")
 
 
-    distLocation = buildFolder
-
-
-    makeDist(distLocation)
 
 
 def checkIfTimeForBuild(svnURL, svnUser, svnPassword, minFreeSpaceRequiredForBuildGig, buildDrive, buildOutputFolder, buildSuffix):
