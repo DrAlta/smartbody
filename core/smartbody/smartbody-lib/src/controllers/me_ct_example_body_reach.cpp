@@ -39,6 +39,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 	autoReturnDuration = -1.f;
 	defaultReachType = reachType;
 	reachVelocityScale = 1.f; 
+	desireLinearVel = -1.f;
 	addDefaultAttributeFloat("reach.autoReturnDuration",-1.f,&autoReturnDuration);
 	addDefaultAttributeFloat("reach.velocityScale",1.f,&reachVelocityScale);
 	addDefaultAttributeBool("reach.footIK",true,&footIKFix);
@@ -133,7 +134,8 @@ void MeCtExampleBodyReach::setUseLocomotion( bool useLoco )
 
 void MeCtExampleBodyReach::setLinearVelocity( float vel )
 {
-	currentReachData->linearVel = vel;
+	//currentReachData->linearVel = vel;
+	desireLinearVel = vel;
 }
 
 bool MeCtExampleBodyReach::addHandConstraint( SkJoint* targetJoint, const char* effectorName )
@@ -386,8 +388,12 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	currentReachData->autoReturnTime = autoReturnDuration;	
 	currentReachData->useProfileInterpolation = useProfileInterpolation;
 	currentReachData->useRetiming = useRetiming;
-	currentReachData->linearVel = currentReachEngine->ikDefaultVelocity*reachVelocityScale;
+	if (desireLinearVel > 0)
+		currentReachData->linearVel = desireLinearVel;
+	else
+		currentReachData->linearVel = currentReachEngine->ikDefaultVelocity*reachVelocityScale;
 	currentReachEngine->footIKFix    = footIKFix;
+	//LOG("curReachData linearVel = %f",currentReachData->linearVel);
 	//if (canReach)
 	if (startReach)
 	{

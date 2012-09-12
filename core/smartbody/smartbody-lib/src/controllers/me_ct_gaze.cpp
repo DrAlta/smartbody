@@ -879,7 +879,7 @@ printf( "s1: %f\n", joint_arr[ GAZE_JOINT_SPINE1 ].local_pos.y() );
 		) +
 		vector_t( 0.0, 0.0, interocular.length()); // NOTE: PRESUMES 5CM SCALE...
 
-	if (!joint_arr[GAZE_JOINT_EYE_L].active && !joint_arr[GAZE_JOINT_EYE_R].active) // no eye joints
+	if (!joint_arr[GAZE_JOINT_EYE_L].active && !joint_arr[GAZE_JOINT_EYE_R].active && skeleton_ref_p) // no eye joints
 	{
 		double forwardLen = skeleton_ref_p->getCurrentHeight()*0.02;
 		world_mid_eye_pos = joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos + vector_t(0.0,forwardLen*2.0, forwardLen);
