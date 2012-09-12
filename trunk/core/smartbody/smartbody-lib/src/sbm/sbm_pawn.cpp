@@ -168,7 +168,7 @@ ct_tree_p( MeControllerTreeRoot::create() ),
 world_offset_writer_p( NULL ),
 wo_cache_timestamp( -std::numeric_limits<float>::max() )
 {
-	setName( name );
+	SmartBody::SBObject::setName( name );
 	//_skeleton->ref();
 	ct_tree_p->ref();
 	ct_tree_p->setPawn(this);

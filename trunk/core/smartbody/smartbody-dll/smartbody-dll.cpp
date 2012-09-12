@@ -34,7 +34,7 @@
 using std::string;
 
 
-#if defined(ANDROID_BUILD) || (NACL_BUILD) 
+#if (NACL_BUILD) 
 #define USE_SBPYTHON  0
 #else
 #define USE_SBPYTHON  1
