@@ -25,6 +25,9 @@ using namespace gwiz;
 
 #include "controllers/me_ct_eyelid.h"
 #include <sbm/sbm_pawn.hpp>
+#include <sb/SBCharacter.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBJoint.h>
 #include <vhcl_log.h>
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -260,7 +263,25 @@ void MeCtEyeLidRegulator::init(SbmPawn* pawn,  bool tracking_pitch)	{
 	}
 
 	MeController::init(pawn);
-	
+
+
+	SBCharacter* c = dynamic_cast<SBCharacter*> (pawn);
+	if (c)
+	{
+		SBSkeleton* skel = c->getSkeleton();
+		if (skel)
+		{
+			SBJoint* lEyeJoint = skel->getJointByName("eyeball_left");
+			SBJoint* rEyeJoint = skel->getJointByName("eyeball_right");
+			if (lEyeJoint && rEyeJoint)
+			{
+				_leftPreRot = lEyeJoint->quat()->prerot();
+				_rightPreRot = rEyeJoint->quat()->prerot();
+			}
+		}
+	}
+
+
 	float upperMin = (float) pawn->getDoubleAttribute("eyelid.rangeUpperMin");
 	float upperMax = (float) pawn->getDoubleAttribute("eyelid.rangeUpperMax");
 	set_upper_range( upperMin, upperMax );
@@ -400,24 +421,28 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 		euler_t L_eye_e;
 		if (buff_idx >= 0)
 		{
-			L_eye_e = quat_t(
+			quat_t L_eye_q = quat_t(
 									fbuffer[ buff_idx ],
 									fbuffer[ buff_idx + 1 ],
 									fbuffer[ buff_idx + 2 ],
 									fbuffer[ buff_idx + 3 ]
 			);
+			quat_t L_prerot = quat_t(_leftPreRot.w, _leftPreRot.x, _leftPreRot.y, _leftPreRot.z);
+			L_eye_e = L_prerot * L_eye_q;
 		}
 
 		buff_idx = _context->toBufferIndex( R_eye_quat_idx );
 		euler_t R_eye_e;
 		if (buff_idx >= 0)
 		{
-			R_eye_e = quat_t(
+			quat_t R_eye_q = quat_t(
 									fbuffer[ buff_idx ],
 									fbuffer[ buff_idx + 1 ],
 									fbuffer[ buff_idx + 2 ],
 									fbuffer[ buff_idx + 3 ]
 			);
+			quat_t R_prerot = quat_t(_rightPreRot.w, _rightPreRot.x, _rightPreRot.y, _rightPreRot.z);
+			R_eye_e =  R_prerot * R_eye_q;
 		}
 
 		UL_set.set_pitch( (float)( L_eye_e.p() ) );
