@@ -197,7 +197,9 @@ class MeCtEyeLidRegulator : public SmartBody::SBController	{
 		LidSet	LL_set;
 		LidSet	UR_set;
 		LidSet	LR_set;
-		
+		SrQuat          _leftPreRot;	// left eye ball pre-rot
+		SrQuat          _rightPreRot;	// right eye ball pre-rot
+
 		srLinearCurve	curve;
 		
 		bool	pitch_tracking;
