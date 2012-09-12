@@ -22,7 +22,7 @@ struct SBM_CallbackInfo
     float weight;
     float blendTime;
 
-    SBM_CallbackInfo() : weight(0), blendTime(0) {}
+    SBM_CallbackInfo() : weight(0), blendTime(0) {}	
 };
 
 

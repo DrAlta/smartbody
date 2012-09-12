@@ -1029,7 +1029,9 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 		{
 			//LOG("pjoint name = %s",pjointName.c_str());
 			convertBoneOrientation(pjointName, interSk, tempSrcSk, jointQueues, jointRotationMap, endJoints);								
-			SkJoint* pjoint = interSk->search_joint(pjointName.c_str());			
+			SkJoint* pjoint = interSk->search_joint(pjointName.c_str());	
+			if (!pjoint)
+				continue;
 			//SrQuat newPreRot = pjoint->quat()->prerot()*pjoint->quat()->rawValue();
 			//pjoint->quat()->prerot(newPreRot); // reset pre-rotation to
 			//pjoint->quat()->value(SrQuat()); // cleanup quat value
