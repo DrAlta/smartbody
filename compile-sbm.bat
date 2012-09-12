@@ -1,11 +1,25 @@
 
 setlocal
 
+
+@rem Windows VS2010 build
+
 call "%VS100COMNTOOLS%\..\..\VC\vcvarsall.bat" x86
 @rem vcvarsall turns echo off and doesn't turn it back on, shame on them
 @echo on
 
 devenv vs2010.sln /build Debug
 devenv vs2010.sln /build Release
+
+
+@rem Android build
+
+set NDK_EXE="c:\android-ndk-r8b\ndk-build.cmd"
+if defined ANDROID_NDK set NDK_EXE="%ANDROID_NDK%\ndk-build.cmd"
+
+pushd android\vh_wrapper\jni
+%NDK_EXE% -j 8
+popd
+
 
 endlocal
