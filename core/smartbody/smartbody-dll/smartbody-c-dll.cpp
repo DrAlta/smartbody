@@ -23,6 +23,13 @@ struct SBM_CallbackInfo
     float blendTime;
 
     SBM_CallbackInfo() : weight(0), blendTime(0) {}	
+    void operator = ( const SBM_CallbackInfo &l )
+    { name = l.name;
+      objectClass = l.objectClass;
+      visemeName = l.visemeName;
+      weight = l.weight;
+      blendTime = l.blendTime;
+    }
 };
 
 
@@ -112,6 +119,7 @@ public:
       info.name = name;
       info.objectClass = objectClass;
       g_CreateCallbackInfo[m_sbmHandle].push_back(info);
+      //LOG("smartbody-c-dll : OnCharacterCreate, name = %s, objectClass = %s, number of callback info = %d",name.c_str(), objectClass.c_str(), g_CreateCallbackInfo[m_sbmHandle].size());
 #endif
    }
 
@@ -379,12 +387,14 @@ SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * nam
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
+      LOG("SBM_GetCharcter : Handle %d does not exist", sbmHandle);
       return false;
    }
 
    SmartbodyCharacter& dllChar = g_smartbodyInstances[ sbmHandle ]->GetCharacter( (string)name );
 
    SBM_CharToCSbmChar( &dllChar, character );
+   //LOG("dll char pos = %f %f %f, unity character pos = %f %f %f",dllChar.x, dllChar.y, dllChar.z , character->x, character->y, character->z);
 
    return true;
 }
@@ -516,6 +526,7 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char * nam
 
     SBM_CallbackInfo info = g_CreateCallbackInfo[sbmHandle].back();
     g_CreateCallbackInfo[sbmHandle].pop_back();
+    //LOG("SBM_IsCharacterCreated, info.name = %s, info.objectClass = %s",info.name.c_str(), info.objectClass.c_str());
     strncpy(name, info.name.c_str(), maxNameLen);
     strncpy(objectClass, info.objectClass.c_str(), maxObjectClassLen);    
     return true;

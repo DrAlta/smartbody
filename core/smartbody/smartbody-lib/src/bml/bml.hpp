@@ -55,6 +55,7 @@ const bool LOG_AUDIO		= false;
 #define ENABLE_DIRECT_VISEME_SCHEDULE	0
 
 #ifdef __ANDROID__ // android does not support wstring by default. Thus we need to explicitly define these template class.
+/*
 namespace std
 {
 	typedef basic_stringstream<wchar_t, char_traits<wchar_t>,
@@ -64,7 +65,7 @@ namespace std
 	typedef basic_ostream<wchar_t, char_traits<wchar_t> > wostream;
 	typedef basic_istringstream<wchar_t, char_traits<wchar_t>,
 		allocator<wchar_t> > wistringstream;
-}
+}*/
 //extern std::wostream &std::wcout;
 //extern std::wostream &std::wcerr;
 #endif
