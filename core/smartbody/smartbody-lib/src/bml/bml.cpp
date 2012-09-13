@@ -1208,8 +1208,8 @@ void GestureRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	MeCtMotion* motion_ct = dynamic_cast<MeCtMotion*> (anim_ct);
 	SkMotion* motion = motion_ct->motion();
 	SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
-	double motionStroke = motion->time_stroke_end();
-	double motionStrokeEnd = motion->time_stroke_emphasis();
+	double motionStroke = motion->time_stroke_emphasis();
+	double motionStrokeEnd = motion->time_stroke_end();
 	
 	double holdTime = (strokeEndAt - strokeAt) - (motionStrokeEnd - motionStroke);
 	if (holdTime > 0)
