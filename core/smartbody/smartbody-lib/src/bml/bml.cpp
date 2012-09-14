@@ -345,9 +345,9 @@ void BmlRequest::specialHandle()
 					if (prevGestureEndAt > currGestureStartAt)
 					{
 						double prevGestureStrokeAt = (double)prevGesture->behav_syncs.sync_stroke()->time();
-						double prevGestureStrokeEndAt = (double)prevGesture->behav_syncs.sync_stroke()->time();
+						double prevGestureStrokeEndAt = (double)prevGesture->behav_syncs.sync_stroke_end()->time();
 						double currGestureStrokeAt = (double)gesture->behav_syncs.sync_stroke()->time();
-						double currGestureStrokeStartAt = (double)gesture->behav_syncs.sync_stroke()->time();
+						double currGestureStrokeStartAt = (double)gesture->behav_syncs.sync_stroke_start()->time();
 						if (currGestureStrokeAt > prevGestureStrokeAt)
 						{
 							// extend or shrink previous gesture stroke end to current gesture stroke start
@@ -356,7 +356,10 @@ void BmlRequest::specialHandle()
 							if (currGestureStrokeStartAt > prevGestureStrokeAt)
 							{
 								// prevGestureStrokeEndAt<-currGestureStrokeStartAt
+								double prevGestureOffset = currGestureStrokeStartAt - prevGestureStrokeEndAt;
 								prevGesture->behav_syncs.sync_stroke_end()->set_time(currGestureStrokeStartAt);
+								prevGesture->behav_syncs.sync_relax()->set_time(prevGesture->behav_syncs.sync_relax()->time() + prevGestureOffset);
+								prevGesture->behav_syncs.sync_end()->set_time(prevGesture->behav_syncs.sync_end()->time() + prevGestureOffset);
 								//LOG("BmlRequest::specialHandle: Previous gesture %s's stroke end time %f is extended to current gesture %s's stroke start time %f.", prevGesture->unique_id.c_str(), prevGestureStrokeEndAt, gesture->unique_id.c_str(), currGestureStrokeStartAt);
 							}
 							else
