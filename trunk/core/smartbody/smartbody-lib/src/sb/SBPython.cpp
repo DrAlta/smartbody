@@ -1109,6 +1109,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def(boost::python::init<std::string>())
 		.def("load", &SBSkeleton::load, "Loads the skeleton definition from the given skeleton name.")
 		.def("save", &SBSkeleton::save, "Saves the skeleton definition with the given skeleton name.")
+		.def("rescale", &SBSkeleton::rescale, "Adjust the skeleton size to scale ratio")
 		.def("getName", &SBSkeleton::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the skeleton.")
 		.def("getNumJoints", &SBSkeleton::getNumJoints, "Returns the number of joints for this skeleton.")
 		.def("getJointNames", &SBSkeleton::getJointNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the joint names for this skeleton.")
@@ -1118,7 +1119,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getChannelType", &SBSkeleton::getChannelType, "Returns the type of the channel of a given index.")
 		.def("getChannelSize", &SBSkeleton::getChannelSize, "Returns the size of the channel given index.")
 		.def("createSkelWithoutPreRot", &SBSkeleton::createSkelWithoutPreRot, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a new standard T-pose skel from source but without pre-rotations")	
-		.def("orientJointsLocalAxesToWorld", &SBSkeleton::orientJointsLocalAxesToWorld, "Orient skeleton joints local axes to match world coordinate axes (Y-up Z-front)")	
+		.def("orientJointsLocalAxesToWorld", &SBSkeleton::orientJointsLocalAxesToWorld, "Orient skeleton joints local axes to match world coordinate axes (Y-up Z-front)")			
 		;
 
 	boost::python::class_<SBJoint, boost::python::bases<SBObject> >("SBJoint")

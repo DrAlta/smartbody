@@ -33,6 +33,7 @@ public:
 
 	SBCharacter* getCharacter();
 
+	void rescale(float scaleRatio);
 	void update();
 
 	/* the following are designed to re-orient joints local axes. added by David Huang Jun 2012 */

@@ -292,5 +292,14 @@ SBSkeleton* SBSkeleton::createSkelWithoutPreRot(const char* new_name)
 	return newSk;
 }
 
+void SBSkeleton::rescale( float scaleRatio )
+{
+	for (unsigned int i=0;i<joints().size();i++)
+	{
+		SBJoint* joint = dynamic_cast<SBJoint*>(joints()[i]);
+		if (joint)
+			joint->setOffset(joint->getOffset()*(float)scaleRatio);
+	}
+}
 
 }; //namespace
