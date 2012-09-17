@@ -53,7 +53,7 @@
 #define HAVE_ATANH 1
 
 /* Define if GCC supports __attribute__((format(PyArg_ParseTuple, 2, 3))) */
-#define HAVE_ATTRIBUTE_FORMAT_PARSETUPLE 1
+//#define HAVE_ATTRIBUTE_FORMAT_PARSETUPLE 1
 
 /* Define to 1 if you have the `bind_textdomain_codeset' function. */
 /* #undef HAVE_BIND_TEXTDOMAIN_CODESET */
