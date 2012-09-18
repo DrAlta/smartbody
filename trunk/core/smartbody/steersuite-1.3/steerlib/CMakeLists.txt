@@ -51,7 +51,9 @@ add_library(
 target_link_libraries( steerlib
 	
 	${OPENGL_LIBRARIES}
+	dl
 )
+
 
 install(
 

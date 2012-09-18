@@ -60,6 +60,7 @@ target_link_libraries( sbm-batch
 #	profiler
 #	${CMAKE_REQUIRED_LIBRARIES} 
 	ncurses
+	pthread
 	${MORE_LIBS}
 )
 

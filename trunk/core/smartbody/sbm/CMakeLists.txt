@@ -212,6 +212,8 @@ target_link_libraries( sbm-fltk
 	ode
 	python2.6
     	ncurses	
+	pthread
+	rt
 	${MORE_LIBS}
 	${OGRE_LIBS}
 )
