@@ -317,6 +317,7 @@ def fullBuild(svnPassword, buildSuffix):
     #  ": fatal error "
     #  ": warning: "   # gcc
     #  ": error: "     # gcc
+    #  "make: *** " ... "Error "  # gcc
     #  "CMake Error "  # cmake
 
     buildCompileErrors = []
@@ -325,6 +326,7 @@ def fullBuild(svnPassword, buildSuffix):
         if ": error " in line or \
            ": fatal error " in line or \
            ": error: " in line or \
+           (line.startswith("make: *** ") and "Error " in line) or \
            "CMake Error " in line:
            buildCompileErrors.append("   " + line)
 
@@ -370,14 +372,23 @@ def fullBuild(svnPassword, buildSuffix):
     print "buildFolder: {0}".format(buildFolder)
 
 
+    makeDistTime = time.clock()
+
     # prune out files that aren't needed
     distLocation = "build"
     makeDist(distLocation)
 
+    makeDistTime = time.clock() - makeDistTime
+
+
+    moveTime = time.clock()
 
     # move build to its destination folder
+    print "--- Moving build to folder: {0}".format(buildFolder)
     os.makedirs(buildFolder)
     shutil.move("build", os.path.join(buildFolder, "smartbody"))
+
+    moveTime = time.clock() - moveTime
 
 
     print "--- Starting directory statistics..."
@@ -405,6 +416,8 @@ def fullBuild(svnPassword, buildSuffix):
     buildSvnTime_t     = time.gmtime(buildSvnTime)
     buildExportTime_t  = time.gmtime(buildExportTime)
     buildCompileTime_t = time.gmtime(buildCompileTime)
+    makeDistTime_t     = time.gmtime(makeDistTime)
+    moveTime_t         = time.gmtime(moveTime)
 
 
     # generate output to be used in email report
@@ -445,6 +458,8 @@ def fullBuild(svnPassword, buildSuffix):
     f.write("   buildSvnTime {0}\n".format(time.strftime("%X", buildSvnTime_t)))
     f.write("   buildExportTime {0}\n".format(time.strftime("%X", buildExportTime_t)))
     f.write("   buildCompileTime {0}\n".format(time.strftime("%X", buildCompileTime_t)))
+    f.write("   makeDistTime {0}\n".format(time.strftime("%X", makeDistTime_t)))
+    f.write("   moveTime {0}\n".format(time.strftime("%X", moveTime_t)))
     f.write("\n")
     f.write("Build size: {0} ({1} files, {2} dirs)\n".format(intWithCommas(dirSizeTotal), intWithCommas(numFilesTotal), intWithCommas(numDirsTotal)))
     f.write("\n")
