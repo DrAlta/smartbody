@@ -2,10 +2,10 @@ print "|-------------------------------------------------|"
 print "|  data/sbm-common/scripts/motion-retarget.py     |"
 print "|-------------------------------------------------|"
 
-def remapSkeleton(skelName):
+def remapSkeleton(skelName, jointMapName):
 	remapSkel = scene.getSkeleton(skelName)
 	jointMapManager = scene.getJointMapManager()
-	jointMap = jointMapManager.getJointMap(skelName)
+	jointMap = jointMapManager.getJointMap(jointMapName)
 	if (jointMap == None):
 		jointMap = jointMapManager.createJointMap(skelName)
 		jointMap.guessMapping(remapSkel, False)
@@ -19,10 +19,10 @@ def remapSkeletonInverse(skelName, jointMapName):
 		return
 	jointMap.applySkeletonInverse(remapSkel)
 	
-def remapMotion(skelName, motionName):
+def remapMotion(skelName, motionName, jointMapName):
 	remapSkel = scene.getSkeleton(skelName)
 	jointMapManager = scene.getJointMapManager()
-	jointMap = jointMapManager.getJointMap(skelName)
+	jointMap = jointMapManager.getJointMap(jointMapName)
 	if (jointMap == None):
 		jointMap = jointMapManager.createJointMap(skelName)
 		jointMap.guessMapping(remapSkel, False)
@@ -31,10 +31,10 @@ def remapMotion(skelName, motionName):
 		return
 	jointMap.applyMotion(remapMotion)
 	
-def remapMotionInverse(skelName, motionName):
+def remapMotionInverse(skelName, motionName, jointMapName):
 	remapSkel = scene.getSkeleton(skelName)
 	jointMapManager = scene.getJointMapManager()
-	jointMap = jointMapManager.getJointMap(skelName)
+	jointMap = jointMapManager.getJointMap(jointMapName)
 	if (jointMap == None):
 		jointMap = jointMapManager.createJointMap(skelName)
 		jointMap.guessMapping(remapSkel, False)
@@ -116,12 +116,39 @@ def remapAndSaveMotion(outMotionName, jointMapName, outDir):
 	saveCommand = 'animation ' + outMotionName + ' save ' + outDir + outMotionName + '.skm';
 	print 'Save command = ' + saveCommand;
 	scene.command(saveCommand)
+
+def retargetMotionWithGuessMap(motionName, srcSkelName, tgtSkelName, outDir):
+	remapSkeleton(srcSkelName, srcSkelName)
+	remapSkeleton(tgtSkelName, tgtSkelName)
+	remapMotion(srcSkelName,motionName, srcSkelName)
+	tempMotionName = retargetMotionFunc(motionName, srcSkelName, tgtSkelName)
+	remapAndSaveMotion(tempMotionName, tgtSkelName, outDir)
+	remapMotionInverse(srcSkelName, motionName, srcSkelName)
+	remapSkeletonInverse(tgtSkelName, tgtSkelName)
+	remapSkeletonInverse(srcSkelName, srcSkelName)
 	
+def retargetMotionWithMap(motionName, srcSkelName, tgtSkelName, outDir, srcMapName, tgtMapName):
+	jointMapManager = scene.getJointMapManager()
+	srcMap = jointMapManager.getJointMap(srcMapName)
+	tgtMap = jointMapManager.getJointMap(tgtMapName)
+	# joint map can not be found
+	if srcMap == None or tgtMap == None: 
+		print 'source joint map ' + srcMapName + ' ,or target joint map ' + tgtMapName + 'can not be found !'
+		return
+	remapSkeleton(srcSkelName, srcMapName)
+	remapSkeleton(tgtSkelName, tgtMapName)
+	remapMotion(srcSkelName,motionName, srcMapName)
+	tempMotionName = retargetMotionFunc(motionName, srcSkelName, tgtSkelName)
+	remapAndSaveMotion(tempMotionName, tgtMapName, outDir)
+	remapMotionInverse(srcSkelName, motionName, srcMapName)
+	remapSkeletonInverse(tgtSkelName, tgtMapName)
+	remapSkeletonInverse(srcSkelName, srcMapName)		
+		
 
 def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :
 	# map source skeleton and motion channels to standard names
-	remapSkeleton(srcSkelName)
-	remapMotion(srcSkelName, motionName)
+	remapSkeleton(srcSkelName, srcSkelName)
+	remapMotion(srcSkelName, motionName, srcSkelName)
 	outMotionName = retargetMotionFunc(motionName, srcSkelName, tgtSkelName)
 	if outMotionName == "None":
 		return
@@ -133,8 +160,8 @@ def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :
 	scene.command(saveCommand)
 	# restore channel names original skeleton and motion 
 	remapSkeletonInverse(srcSkelName, srcSkelName)
-	remapMotionInverse(srcSkelName, motionName)
-
+	remapMotionInverse(srcSkelName, motionName, srcSkelName)
+	
 def getStandardLocomomtionAnimations(locoMotions, preFix):
 	locoMotions.append(preFix+"ChrUtah_Walk001")
 	locoMotions.append(preFix+"ChrUtah_Idle001")
