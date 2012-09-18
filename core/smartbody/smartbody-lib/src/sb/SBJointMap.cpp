@@ -21,6 +21,7 @@ void SBJointMap::applyMotion(SmartBody::SBMotion* motion)
 		return;
 	
 	SkChannelArray& channels = motion->channels();
+	channels.startChannelNameChange();
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
 		iter != _map.end();
 		iter++)
@@ -37,6 +38,7 @@ void SBJointMap::applyMotionInverse( SmartBody::SBMotion* motion )
 		return;
 
 	SkChannelArray& channels = motion->channels();
+	channels.startChannelNameChange();
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
 		iter != _map.end();
 		iter++)
@@ -54,6 +56,8 @@ void SBJointMap::applySkeletonInverse( SmartBody::SBSkeleton* skeleton )
 		return;
 
 	std::vector<SkJoint*> joints = skeleton->joints();
+	std::vector<bool> jointUpdateTable;
+	jointUpdateTable.resize(joints.size(),false);	
 	for (size_t j = 0; j < joints.size(); j++)
 	{
 		for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
@@ -62,13 +66,15 @@ void SBJointMap::applySkeletonInverse( SmartBody::SBSkeleton* skeleton )
 		{
 			std::string to = (*iter).first;
 			std::string from = (*iter).second;
-			if (joints[j]->name() == from.c_str())
+			if (joints[j]->name() == from.c_str() && !jointUpdateTable[j])
 			{
 				joints[j]->name(to);
+				jointUpdateTable[j] = true;
 			}
 		}
 	}
 	SkChannelArray& channels = skeleton->channels();
+	channels.startChannelNameChange();
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
 		iter != _map.end();
 		iter++)
@@ -85,6 +91,8 @@ void SBJointMap::applySkeleton(SmartBody::SBSkeleton* skeleton)
 		return;
 	
 	std::vector<SkJoint*> joints = skeleton->joints();
+	std::vector<bool> jointUpdateTable;
+	jointUpdateTable.resize(joints.size(),false);	
 	for (size_t j = 0; j < joints.size(); j++)
 	{
 		for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
@@ -93,13 +101,15 @@ void SBJointMap::applySkeleton(SmartBody::SBSkeleton* skeleton)
 		{
 			std::string from = (*iter).first;
 			std::string to = (*iter).second;
-			if (joints[j]->name() == from.c_str())
+			if (joints[j]->name() == from.c_str() && !jointUpdateTable[j])
 			{
 				joints[j]->name(to);
+				jointUpdateTable[j] = true;
 			}
 		}
 	}
 	SkChannelArray& channels = skeleton->channels();
+	channels.startChannelNameChange();
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
 		iter != _map.end();
 		iter++)
@@ -886,15 +896,19 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 				if(getJointHierarchyLevel(j1)-getJointHierarchyLevel(l_ankle)>=2)
 				{
 					guessLeftRightFromJntNames(j1->parent(), j2->parent(), l_forefoot, r_forefoot);
-					guessLeftRightFromJntNames(j1, j2, l_toe, r_toe);
-					setJointMap("l_toe", l_toe, prtMap);
-					setJointMap("r_toe", r_toe, prtMap);
+					guessLeftRightFromJntNames(j1, j2, l_toe, r_toe);					
 				}
 				else
 					guessLeftRightFromJntNames(j1, j2, l_forefoot, r_forefoot);	
 
 				setJointMap("l_forefoot", l_forefoot, prtMap);
 				setJointMap("r_forefoot", r_forefoot, prtMap);
+
+				if (l_toe && r_toe)
+				{
+					setJointMap("l_toe", l_toe, prtMap);
+					setJointMap("r_toe", r_toe, prtMap);
+				}				
 			}
 		}
 		else // l/r_ankle not found, try make deepest joint as toe then make its parent as ankle
@@ -1294,7 +1308,7 @@ void SBJointMap::setJointMap(const char* SB_jnt, SkJoint* j, bool prtMap)
 	}
 	// do some safe check if this mapping is just making things worse :p
 	SkSkeleton* sk = j->skeleton();
-	if (sk && sk->search_joint(SB_jnt)) // the target name is already in the skeleton
+	if (sk && sk->search_joint(SB_jnt) && j->num_children() > 0) // the target name is already in the skeleton
 	{
 		if (j->name() != SB_jnt)
 		{
