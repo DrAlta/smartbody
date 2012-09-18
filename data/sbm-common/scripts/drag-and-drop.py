@@ -33,7 +33,7 @@ def createDragAndDropCharacter(charName, skelName, meshName, position):
 	
 	# dndSkel = scene.getSkeleton(skelName)
 	# jointMap.applySkeleton(dndSkel)
-	remapSkeleton(skelName)
+	remapSkeleton(skelName, skelName)
 	createStandardCharacter(charName, skelName, meshName, position)
 	
 	print 'drag and drop position =' + str(position.getData(0)) + ' ,' + str(position.getData(1)) + ', ' + str(position.getData(2))
