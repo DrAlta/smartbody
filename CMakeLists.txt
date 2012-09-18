@@ -24,6 +24,10 @@ include_directories(
 
 )
 
+LINK_DIRECTORIES(
+	/usr/local/lib
+)
+
 add_subdirectory( lib )
 add_subdirectory( core )
 
