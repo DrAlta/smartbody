@@ -545,11 +545,12 @@ void SkChannelArray::changeChannelName(std::string oldName, std::string newName)
 {
 	bool channelFound = false;
 	for (size_t c = 0; c < _channelList.size(); c++)
-	{
-		if (oldName == _channelList[c].name)
+	{		
+		if (oldName == _channelList[c].name && !_channelUpdateTable[c])
 		{
 			_channelList[c].name = newName;
 			channelFound = true;
+			_channelUpdateTable[c] = true;
 		}
 	}
 
@@ -563,6 +564,12 @@ void SkChannelArray::changeChannelName(std::string oldName, std::string newName)
 	_dirty = true;
 }
 
+void SkChannelArray::startChannelNameChange()
+{
+	_channelUpdateTable.resize(_channelList.size());
+	for (unsigned int c=0;c< _channelList.size(); c++)
+		_channelUpdateTable[c] = false;
+}
 
 //============================ End of File ============================
 

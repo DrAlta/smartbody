@@ -76,7 +76,8 @@ private :
 	bool _dirty;
 
 	std::map<std::string, std::map<SkChannel::Type, int> > _channelMap;
-	std::vector<Channel> _channelList;
+	std::vector<Channel> _channelList;	
+	std::vector<bool>    _channelUpdateTable;
 
 public :
 	//////////////////////////////////////////////////////////////////////////
@@ -111,6 +112,7 @@ public :
 	void add ( SkChannel ch ) { _add(ch.joint, "",ch.type,false); }
 
 	void changeChannelName(std::string oldName, std::string newName);
+	void startChannelNameChange(); // reset bool table
 
 	/*! Inserts a channel in the array at given position. The joint is
 		set as null and can be 'connected' later */

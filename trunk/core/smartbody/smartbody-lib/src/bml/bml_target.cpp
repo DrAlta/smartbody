@@ -129,7 +129,11 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 
 			// Look up the joint
 			const SkJoint* joint = target->get_joint( bone_id.c_str() );
-			if( joint == NULL ) {
+			if( joint == NULL ) {				
+				if (mcu->getCharacter( object_id )) // target is a character but does not have eye joint
+				{
+					return target->get_world_offset_joint();
+				}
 				strstr << "WARNING: BML::parse_target(): Gaze: Target \""<<object_id<<"\" does not have joint \""<<bone_id<<"\". Behavior ignored.";
 				LOG(strstr.str().c_str());
 				return NULL;
