@@ -52,14 +52,14 @@ void RetargetCreatorWindow::retargetSelectedMotion()
 	tgtSkelName = _choiceTgtSkeleton->text(_choiceTgtSkeleton->value());
 	outDir = _curOutputDir->value();
 	// apply the skeleton name mapping so both src and tgt skeleton are in the same internal joint names
-	std::string remapCmd = "remapSkeleton('"+tgtSkelName+"')";
+	std::string remapCmd = "remapSkeleton('"+tgtSkelName+"','" + tgtSkelName + "')";
 	mcu.executePython(remapCmd.c_str());
-	remapCmd = "remapSkeleton('"+srcSkelName+"')";
+	remapCmd = "remapSkeleton('"+srcSkelName+"','" + srcSkelName + "')";
 	mcu.executePython(remapCmd.c_str());
 	for (unsigned int i=0; i < inputMotionList.size(); i++)
 	{
 		std::string moName = inputMotionList[i];
-		std::string mapCmd = "remapMotion('" + srcSkelName +"','" + moName + "')";
+		std::string mapCmd = "remapMotion('" + srcSkelName +"','" + moName + "','" + srcSkelName + "')";
 		mcu.executePython(mapCmd.c_str());
 		retargetCmd = "tempMotionName = retargetMotionFunc('" + moName + "','" + srcSkelName + "','" + tgtSkelName + "')";
 		LOG("retarget Cmd = %s", retargetCmd.c_str());
@@ -68,7 +68,7 @@ void RetargetCreatorWindow::retargetSelectedMotion()
 		std::string saveCmd = "remapAndSaveMotion(tempMotionName,'"+tgtSkelName+"','"+outDir+"')";
 		LOG("save Cmd = %s", saveCmd.c_str());
 		mcu.executePython(saveCmd.c_str());
-		mapCmd = "remapMotionInverse('" + srcSkelName +"','" + moName + "')";
+		mapCmd = "remapMotionInverse('" + srcSkelName +"','" + moName + "','" + srcSkelName + "')";
 		mcu.executePython(mapCmd.c_str());
 	}
 	// revert the skeleton name
