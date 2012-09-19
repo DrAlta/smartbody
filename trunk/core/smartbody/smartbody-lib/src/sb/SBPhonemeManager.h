@@ -20,6 +20,7 @@ public:
 	SBDiphone* createDiphone(const std::string& fromPhoneme, const std::string& toPhoneme, const std::string& name);
 	std::vector<SBDiphone*>& getDiphones(const std::string& name);
 	SBDiphone* getDiphone(const std::string& fromPhoneme, const std::string& toPhoneme, const std::string& name);
+	std::vector<std::string> getDiphoneMapNames();
 	int getNumDiphoneMap();
 	int getNumDiphones(const std::string& name);
 

@@ -967,6 +967,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getDiphone", &SBDiphoneManager::getDiphone, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get diphone given from phoneme, to phoneme and diphone set name.")
 		.def("getNumDiphoneMap", &SBDiphoneManager::getNumDiphoneMap, "Return number of diphone set.")
 		.def("getNumDiphones", &SBDiphoneManager::getNumDiphones, "Return number of diphones given the diphone set name.")
+		.def("getDiphoneMapNames", &SBDiphoneManager::getDiphoneMapNames, "Returns the names of all the diphone sets.")
 		;
 
 	boost::python::class_<SBDiphone>("SBDiphone")
@@ -1455,6 +1456,8 @@ boost::python::class_<SBReach>("SBReach")
 		.def("isRemoteMode", &SBScene::isRemoteMode, "Returns the boolean indicating whether scene is in remote mode.")
 		.def("setRemoteMode", &SBScene::setRemoteMode, "Sets the scene remote mode.")
 		.def("removePendingCommands", &SBScene::removePendingCommands, "Removes any commands stored in SmartBody awaiting execution.")
+		.def("save", &SBScene::save, "Saves the SmartBody configuration. Returns a string containing Python commands representing the configuration.")
+		.def("exportScene", &SBScene::exportScene, "Saves the entire SmartBody configuration, including assets, into a given file location.")
 
 		// command processing
 		.def("command", &SBScene::command, "Runs an old-Style SmartBody command.")

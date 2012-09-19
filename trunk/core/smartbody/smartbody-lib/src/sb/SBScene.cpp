@@ -7,8 +7,11 @@
 #include <sb/SBMotion.h>
 #include <sb/SBScript.h>
 #include <sbm/Event.h>
+#include <sb/SBPhoneme.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBBmlProcessor.h>
+#include <sb/SBAnimationState.h>
+#include <sb/SBAnimationTransition.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBReachManager.h>
 #include <sb/SBSteerManager.h>
@@ -981,6 +984,238 @@ SBScript* SBScene::getScript(std::string name)
 std::map<std::string, SBScript*>& SBScene::getScripts()
 {
 	return _scripts;
+}
+
+std::string SBScene::save()
+{
+	std::stringstream strstr;
+	
+	// mediapath
+	std::string mediaPath = getMediaPath();
+	strstr << "scene.setMediaPath(\"" << mediaPath << ")\n";
+
+	// asset paths
+	std::vector<std::string>::iterator iter;
+	std::vector<std::string> motionPaths = getAssetPaths("motion");
+	for (iter = motionPaths.begin(); iter != motionPaths.end(); iter++)
+	{
+		const std::string& path = (*iter);
+		strstr << "scene.addAssetPath(\"motion\", " << path << ")\n";
+	}
+	
+	std::vector<std::string> scriptPaths = getAssetPaths("script");
+	for (iter = motionPaths.begin(); iter != motionPaths.end(); iter++)
+	{
+		const std::string& path = (*iter);
+		strstr << "scene.addAssetPath(\"script\", " << path << ")\n";
+	}
+
+	std::vector<std::string> audioPaths = getAssetPaths("audio");
+	for (iter = motionPaths.begin(); iter != motionPaths.end(); iter++)
+	{
+		const std::string& path = (*iter);
+		strstr << "scene.addAssetPath(\"audio\", " << path << ")\n";
+	}
+
+	std::vector<std::string> meshPaths = getAssetPaths("mesh");
+	for (iter = motionPaths.begin(); iter != motionPaths.end(); iter++)
+	{
+		const std::string& path = (*iter);
+		strstr << "scene.addAssetPath(\"mesh\", " << path << ")\n";
+	}
+
+	// face definitions
+	std::vector<std::string> faceDefinitions = getFaceDefinitionNames();
+	for (iter = faceDefinitions.begin(); iter != faceDefinitions.end(); iter++)
+	{
+		const std::string& faceDefName = (*iter);
+		SmartBody::SBFaceDefinition* faceDef = getFaceDefinition(faceDefName);
+
+		std::string faceDefinitionName = "face";
+		faceDefinitionName.append(faceDef->getName());
+
+		strstr << faceDefinitionName << " = SBFaceDefinition()\n";
+
+		SkMotion* neutral = faceDef->getFaceNeutral();
+		if (neutral)
+		{
+			strstr << faceDefinitionName << ".setFaceNeutral(\"" << neutral->getName() << "\")\n";
+		}
+
+		std::vector<std::string> visemeNames = faceDef->getVisemeNames();
+		for (std::vector<std::string>::iterator faceIter = faceDefinitions.begin(); 
+			 faceIter != faceDefinitions.end(); 
+			 faceIter++)
+		{
+			const std::string& viseme = (*faceIter);
+			strstr << faceDefinitionName << ".setViseme(\"" << viseme << ", ";
+			SkMotion* visemeMotion = faceDef->getVisemeMotion(viseme);
+			if (visemeMotion)
+			{
+				strstr << "\"" + visemeMotion->getName() + "\")\n";
+			}
+			else
+			{
+				strstr << "\"\")\n";
+			}
+		}	
+
+		std::vector<int> auNum = faceDef->getAUNumbers();
+		for (std::vector<int>::iterator auIter = auNum.begin(); 
+			 auIter != auNum.end(); 
+			 auIter++)
+		{
+			int num = (*auIter);
+			ActionUnit* au = faceDef->getAU((*auIter));
+			strstr << faceDefinitionName << ".setAU(" << num << ", ";
+			SkMotion* motion = NULL;
+			if (au->is_bilateral())
+			{
+				strstr << "\"both\", \"";
+				motion = au->left;
+			}
+			else
+			{
+				
+				if (au->is_left())
+				{
+					strstr << "\"left\", \"";
+					motion = au->left;
+				}
+				else
+				{
+					strstr << "\"right\", \"";
+					motion = au->right;
+				}
+			}
+			if (motion)
+			{
+				strstr << motion->getName(); 
+			}
+			strstr << "\")\n";
+
+		}
+	}
+
+
+	// joint maps
+	SBJointMapManager* jointMapManager = getJointMapManager();
+	std::vector<std::string> jointMapNames = jointMapManager->getJointMapNames();
+	for (iter = jointMapNames.begin(); iter != jointMapNames.end(); iter++)
+	{
+		const std::string& jointMapName = (*iter);
+		SBJointMap* jointMap = jointMapManager->getJointMap(jointMapName);
+
+		strstr << "jointMap" << jointMapName << " = scene.getJointMapManager().createJointMapSBJointMap(\"" << jointMapName << "\")\n";
+
+		int numMappings = jointMap->getNumMappings();
+		for (int m = 0; m < numMappings; m++)
+		{
+			std::string target = jointMap->getTarget(m);
+			std::string source = jointMap->getSource(m);
+			strstr << jointMapName << ".setMapping(\"" << source << "\", \"" << target << "\")\n";
+		}
+	}
+
+	// diphones
+	SBDiphoneManager* diphoneManager = getDiphoneManager();
+	std::vector<std::string> diphoneMapNames = diphoneManager->getDiphoneMapNames();
+	strstr << "diphoneMapManager = scene.getDiphoneManager()\n";
+	for (iter = diphoneMapNames.begin(); iter != diphoneMapNames.end(); iter++)
+	{
+		const std::string& diphoneMapName = (*iter);
+		std::vector<SBDiphone*>& diphones = diphoneManager->getDiphones(diphoneMapName);
+		for (std::vector<SBDiphone*>::iterator diphoneIter = diphones.begin();
+			 diphoneIter != diphones.end();
+			 diphoneIter++)
+		{
+			SBDiphone* diphone = (*diphoneIter);
+			const std::string& fromPhoneme = diphone->getFromPhonemeName();
+			const std::string& toPhoneme = diphone->getToPhonemeName();
+			strstr << "diphone = diphoneMapManager.createDiphone(\"" << fromPhoneme << "\", \"" << toPhoneme << "\", \"" << diphoneMapName << "\")\n";
+			int numVisemes = diphone->getNumVisemes();
+			std::vector<std::string> visemes = diphone->getVisemeNames();
+			for (std::vector<std::string>::iterator visemeIter = visemes.begin();
+				 visemeIter != visemes.end();
+				 visemeIter++)
+			{
+				std::vector<float>& keys = diphone->getKeys((*iter));
+				for (size_t x = 0; x < keys.size(); x++)
+				{
+					if (x + 1 < keys.size())
+					{
+						strstr << "diphone.addKey(\"" << (*iter) << "\", " << keys[x] << ", " << keys[x + 1] << ")\n";
+					}
+					x++;
+				}
+				strstr << "\n";
+			}
+		}
+	}
+		
+	// reach
+
+	// blends & transitions
+	SBAnimationBlendManager* blendManager = getBlendManager();
+	int numBlends = blendManager->getNumBlends();
+	std::vector<std::string> blends = blendManager->getBlendNames();
+	for (std::vector<std::string>::iterator blendIter = blends.begin();
+		 blendIter != blends.end();
+		 blendIter++)
+	{
+		SBAnimationBlend* blend = blendManager->getBlend((*blendIter));
+		std::string blendString = blend->saveToString();
+		strstr << blendString;
+		strstr << "\n";
+	}
+
+	int numTransitions = blendManager->getNumTransitions();
+	std::vector<std::string> transitions = blendManager->getBlendNames();
+	for (int t = 0; t < numTransitions; t++)
+	{
+		SBAnimationTransition* transition = blendManager->getTransitionByIndex(t);
+		std::string transitionString = transition->saveToString();
+		strstr << transitionString;
+		strstr << "\n";
+	}
+
+	// pawns
+	std::vector<std::string> pawns = getPawnNames();
+	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+		 pawnIter != pawns.end();
+		 pawnIter++)
+	{
+		SBPawn* pawn = getPawn((*pawnIter));
+		strstr << "pawn = scene.createPawn(\"" << pawn->getName() << "\")\n";
+		SrVec position = pawn->getPosition();
+		strstr << "pawn.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
+		// attributes
+		// ...
+	}
+
+	// characters
+	std::vector<std::string> characters = getCharacterNames();
+	for (std::vector<std::string>::iterator characterIter = characters.begin();
+		 characterIter != characters.end();
+		 characterIter++)
+	{
+		SBCharacter* character = getCharacter((*characterIter));
+		strstr << "character = scene.createCharacter(\"" << character->getName() << "\", \"" << character->getType() << "\"))\n";
+		SrVec position = character->getPosition();
+		strstr << "character.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << ")\n";
+		// controllers
+		strstr << "character.createStandardControllers()\n";
+		// attributes
+		// ...
+	}
+
+	return strstr.str();
+
+
+}
+
+void SBScene::exportScene(const std::string& filename)
+{
 }
 
 
