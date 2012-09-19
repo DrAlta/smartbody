@@ -19,7 +19,7 @@ if defined ANDROID_NDK set NDK_EXE="%ANDROID_NDK%\ndk-build.cmd"
 
 pushd android\vh_wrapper\jni
 
-%NDK_EXE% -j 8
+call %NDK_EXE% -j 8
 
 @rem ndk-build turns echo off and doesn't turn it back on, shame on them
 @echo on
