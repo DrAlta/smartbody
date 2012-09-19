@@ -2,15 +2,11 @@
 #define SBSCENE_H
 
 #include <sb/SBObject.h>
-#include <sb/SBTypes.h>
 #include <sb/SBScript.h>
 
 class SbmDebuggerServer;
 class SbmDebuggerClient;
 class SbmDebuggerUtility;
-
-//SMARTBODYDLLLIB_TEMPLATE template class SMARTBODYDLLLIB_API std::vector<std::string>;
-//SMARTBODYDLLLIB_TEMPLATE template class SMARTBODYDLLLIB_API std::map<std::string, SmartBody::SBScript*>;
 
 namespace SmartBody {
 
