@@ -393,6 +393,8 @@ public:
 	void setVisemePlateau( bool val ) { _visemePlateau = val; }
 	bool isDiphone( void ) const { return _diphone; }
 	void setDiphone( bool val ) { _diphone = val; }
+	float getDiphoneScale( void ) const { return _diphoneScale; }
+	void setDiphoneScale( float val ) { _diphoneScale = val; }
 	bool isDiphoneSplineCurve( void ) const { return _diphoneSplineCurve; }
 	void setDiphoneSplineCurve( bool val ) { _diphoneSplineCurve = val; }
 	float getDiphoneSmoothWindow( void ) const { return _diphoneSmoothWindow; }
@@ -421,6 +423,7 @@ private:
 	bool	_visemePlateau;	
 	float	_minVisemeTime;
 	bool	_diphone;
+	float	_diphoneScale;
 	bool	_diphoneSplineCurve;
 	float	_diphoneSmoothWindow;
 

@@ -922,7 +922,7 @@ int main( int argc, char **argv )	{
 
 		if(rootWindow && rootWindow->resourceWindow && rootWindow->resourceWindow->shown())
 		{
-			rootWindow->resourceWindow->update();
+			//rootWindow->resourceWindow->update();
 		}
 
 		if (rootWindow && rootWindow->panimationWindow && rootWindow->panimationWindow->shown())
