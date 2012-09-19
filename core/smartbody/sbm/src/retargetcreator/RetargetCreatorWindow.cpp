@@ -9,6 +9,7 @@
 #include <FL/Fl_File_Chooser.H>
 #include "RetargetCreatorWindow.h"
 
+const std::string defaultAssetDir = "../../../../data/";
 
 RetargetCreatorWindow::RetargetCreatorWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h)
 {		
@@ -21,19 +22,23 @@ RetargetCreatorWindow::RetargetCreatorWindow(int x, int y, int w, int h, char* n
 	_browserMotion->align(FL_ALIGN_TOP);
 	_browserMotion->when(FL_WHEN_CHANGED);
 	_browserMotion->callback(OnMotionSelectCB, this);	
-	_buttonDirChoose = new Fl_Button(350, 80, 90, 25, "Output Dir");
+	_buttonDirChoose = new Fl_Button(350, 80, 120, 25, "Output Dir");
 	_buttonDirChoose->callback(OnDirChooseCB, this);
-	_curOutputDir    = new Fl_Input(450, 80, 250, 25);
+	_curOutputDir    = new Fl_Input(480, 80, 250, 25);
 	_curOutputDir->value("../../../../data/sbm-common/common-sk/retargetMotion/");
 	//_curOutputDir->deactivate();
 
-	_buttonAssetDirChoose = new Fl_Button(350, 120, 90, 25, "Asset Dir");
+	_buttonAssetDirChoose = new Fl_Button(350, 120, 120, 25, "Add Asset Dir");
 	_buttonAssetDirChoose->callback(OnAssetDirChooseCB, this);
-	_curAssetDir    = new Fl_Input(450, 120, 250, 25);
-	_curAssetDir->value("../../../../data/");
-	_buttonRetarget  = new Fl_Button(350, 180, 100, 25, "Retarget");
+
+	_buttonAssetDirChoose = new Fl_Button(350, 150, 120, 25, "Remove Asset Dir");
+	_buttonAssetDirChoose->callback(OnAssetDirRemoveCB, this);
+	//_curAssetDir    = new Fl_Input(450, 120, 250, 25);
+	//_curAssetDir->value("../../../../data/");
+	_assetDirList = new Fl_Multi_Browser(480, 120, 250, 100, "Motion Asset Dirs");
+	_buttonRetarget  = new Fl_Button(350, 280, 100, 25, "Retarget");
 	_buttonRetarget->callback(OnRetargetCB, this);
-	_buttonReloadAsset = new Fl_Button(460, 180, 100, 25, "Reload Assets");
+	_buttonReloadAsset = new Fl_Button(460, 280, 100, 25, "Reload Assets");
 	_buttonReloadAsset->callback(OnReloadAssetCB, this);
 	this->end();	
 	loadSkeletons();
@@ -82,10 +87,14 @@ void RetargetCreatorWindow::reloadAssets()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::string assetDir = _curAssetDir->value();
-	//std::string sceneCmd = "scene.setAssetPath('"+assetDir+"')";
-	std::string sceneCmd ="scene.loadAssetsFromPath('"+assetDir+"')";
-	mcu.executePython(sceneCmd.c_str());	
+	//std::string assetDir = _curAssetDir->value();
+	for (int i=0; i < _assetDirList->size(); i++)
+	{
+		std::string assetDir = _assetDirList->text(i+1);
+		std::string sceneCmd ="scene.loadAssetsFromPath('"+assetDir+"')";
+		mcu.executePython(sceneCmd.c_str());	
+	}
+	//std::string sceneCmd = "scene.setAssetPath('"+assetDir+"')";	
 	//mcu.executePython("scene.loadAssets()");
 }
 
@@ -101,10 +110,11 @@ void RetargetCreatorWindow::OnDirChooseCB( Fl_Widget* widget, void* data )
 void RetargetCreatorWindow::OnAssetDirChooseCB( Fl_Widget* widget, void* data )
 {
 	RetargetCreatorWindow* viewer = (RetargetCreatorWindow*) data;
-	const char* assetDir = fl_dir_chooser("Asset Dir", viewer->_curAssetDir->value(), 1);
+	const char* assetDir = fl_dir_chooser("Add Asset Dir", defaultAssetDir.c_str(), 1);
 	if (!assetDir)
 		return;
-	viewer->_curAssetDir->value(assetDir);
+	//viewer->_curAssetDir->value(assetDir);
+	viewer->_assetDirList->add(assetDir);
 }
 
 void RetargetCreatorWindow::OnReloadAssetCB( Fl_Widget* widget, void* data )
@@ -133,6 +143,23 @@ void RetargetCreatorWindow::OnMotionSelectCB( Fl_Widget* widget, void* data )
 			boolSelectedMotions.push_back(false);
 	}
 	win->inputMotionList = selectedMotions;
+}
+
+
+
+void RetargetCreatorWindow::OnAssetDirRemoveCB( Fl_Widget* widget, void* data )
+{
+	RetargetCreatorWindow* win = (RetargetCreatorWindow*) data;
+
+	std::vector<std::string> selectedDirs;	
+	Fl_Multi_Browser* browserDir = win->_assetDirList;
+	for (int i=browserDir->size()-1; i >= 0; i--)
+	{
+		if (browserDir->selected(i+1))
+		{
+			browserDir->remove(i+1);						
+		}
+	}	
 }
 
 

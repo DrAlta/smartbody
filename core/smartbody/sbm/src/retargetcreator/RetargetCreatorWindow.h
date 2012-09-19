@@ -32,7 +32,9 @@ public:
 	Fl_Choice * _choiceTgtSkeleton;
 	
 	Fl_Multi_Browser *_browserMotion;	
+	Fl_Multi_Browser *_assetDirList;
 	Fl_Button *_buttonDirChoose;	
+	Fl_Button *_buttonDirRemove;
 	Fl_Button *_buttonRetarget;
 	Fl_Input *_curOutputDir;
 
@@ -47,6 +49,7 @@ public:
 	void reloadAssets();
 	static void OnDirChooseCB(Fl_Widget* widget, void* data);
 	static void OnAssetDirChooseCB(Fl_Widget* widget, void* data);
+	static void OnAssetDirRemoveCB(Fl_Widget* widget, void* data);
 	static void OnRetargetCB(Fl_Widget* widget, void* data);
 	static void OnReloadAssetCB(Fl_Widget* widget, void* data);
 	static void OnMotionSelectCB(Fl_Widget* widget, void* data);
