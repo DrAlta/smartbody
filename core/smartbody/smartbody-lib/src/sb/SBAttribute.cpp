@@ -297,16 +297,16 @@ const bool& BoolAttribute::getDefaultValue()
 std::string BoolAttribute::write()
 {
 	std::stringstream strstr;
-	strstr << "\"set\", \"bool\", \"";
+	strstr << "setBoolAttribute(\"";
 	strstr << getName();
 	strstr << "\", ";
 	if (getValue() == true)
 	{
-		strstr << "\"true\"";
+		strstr << "True";
 	}
 	else
 	{
-		strstr << "\"false\"";
+		strstr << "False)";
 	}
 	return strstr.str();
 }
@@ -404,10 +404,10 @@ const int& IntAttribute::getDefaultValue()
 std::string IntAttribute::write()
 {
 	std::stringstream strstr;
-	strstr << "\"set\", \"int\", \"";
+	strstr << "setIntAttribute(\"";
 	strstr << getName();
 	strstr << "\", ";
-	strstr << getValue();
+	strstr << getValue() << ")";
 
 	return strstr.str();
 }
@@ -509,10 +509,10 @@ void DoubleAttribute::setMax(double val)
 std::string DoubleAttribute::write()
 {
 	std::stringstream strstr;
-	strstr << "\"set\", \"double\", \"";
+	strstr << "setDoubleAttribute(\"";
 	strstr << getName();
 	strstr << "\", ";
-	strstr << getValue();
+	strstr << getValue() << ")";
 
 	return strstr.str();
 }
@@ -576,7 +576,7 @@ const std::string& StringAttribute::getDefaultValue()
 std::string StringAttribute::write()
 {
 	std::stringstream strstr;
-	strstr << "\"set\", \"string\", \"";
+	strstr << "setStringAttribute(\"";
 	strstr << getName();
 	strstr << "\", \"";
 	// need to escape any backslashes
@@ -590,7 +590,7 @@ std::string StringAttribute::write()
 	}
 
 	strstr << valStr.str();
-	strstr << "\"";
+	strstr << "\")";
 
 	return strstr.str();
 }
@@ -666,14 +666,15 @@ const SrVec& Vec3Attribute::getDefaultValue()
 std::string Vec3Attribute::write()
 {
 	std::stringstream strstr;
-	strstr << "\"set\", \"vec3\", \"";
+	strstr << "setVec3Attribute(\"";
 	strstr << getName();
-	strstr << "\", ";
+	strstr << "\", SrVec(";
 	strstr << m_value[0];
 	strstr << ", ";
 	strstr << m_value[1];
 	strstr << ", ";
 	strstr << m_value[2];
+	strstr << "))";
 
 	return strstr.str();
 }
@@ -739,8 +740,8 @@ std::string MatrixAttribute::write()
 {
 	
 	std::stringstream strstr;
-	strstr << "\"set\", \"matrix\", \"";
-	strstr << getName() << "\"";
+	strstr << "setMatrixAttribute(\"";
+	strstr << getName() << "\", SrMat(";
 	for (int r = 0; r < 4; r++)
 	{
 		for (int c = 0; c < 4; c++)
@@ -749,6 +750,7 @@ std::string MatrixAttribute::write()
 			strstr << m_value.get(r, c);
 		}
 	}
+	strstr << "))";
 
 	return strstr.str();
 }

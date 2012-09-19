@@ -112,4 +112,18 @@ int SBDiphoneManager::getNumDiphones(const std::string& name)
 	return diphones.size();
 }
 
+std::vector<std::string> SBDiphoneManager::getDiphoneMapNames()
+{
+	std::vector<std::string> diphoneMaps;
+	for (std::map<std::string, std::vector<SBDiphone*> >::iterator iter = _diphoneMap.begin();
+		 iter != _diphoneMap.end();
+		 iter++)
+	{
+		diphoneMaps.push_back((*iter).first);
+	}
+
+	return diphoneMaps;
+
+}
+
 }

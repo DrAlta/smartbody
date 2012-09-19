@@ -21,7 +21,7 @@ class SBCharacter : public SbmCharacter
 		void setName(std::string& name);
 
 		void setType(const std::string& type);
-		const std::string& getType();
+		std::string getType();
 		
 		virtual int setup();
 

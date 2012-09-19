@@ -84,6 +84,16 @@ void SBCharacter::setName(std::string& name)
 	mcu.registerCharacter(this);
 }
 
+void SBCharacter::setType(const std::string& type)
+{
+	setClassType(type);
+}
+
+std::string SBCharacter::getType()
+{
+	return getClassType();
+}
+
 void SBCharacter::setMeshMap(std::string filename)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
