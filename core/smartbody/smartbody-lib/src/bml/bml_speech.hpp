@@ -170,7 +170,7 @@ namespace BML {
 		/**
 		* Process the visemes by diphone
 		*/
-		void processVisemes(std::vector<VisemeData*>* visemes, BmlRequestPtr request);
+		void processVisemes(std::vector<VisemeData*>* visemes, BmlRequestPtr request, float scale = 1.0f);
 
 		string	policy;
 

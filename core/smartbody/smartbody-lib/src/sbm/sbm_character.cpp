@@ -512,6 +512,7 @@ void SbmCharacter::initData()
 	_height = 1.0f; 
 	_visemePlateau = true;
 	_diphone = false;
+	_diphoneScale = 1.0f;
 	_diphoneSplineCurve = false;
 	_diphoneSmoothWindow = -1.0f;
 	_nvbg = NULL;

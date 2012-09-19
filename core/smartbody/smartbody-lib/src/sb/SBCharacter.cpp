@@ -28,6 +28,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createBoolAttribute("visemecurve", false, true, "Basic", 100, false, false, false, "Use curve-based visemes instead of discrete visemes.");
 	createBoolAttribute("reach.useLocomotion", false, true, "Basic", 110, false, false, false, "Whether to use locomotion for reach by default.");
 	createBoolAttribute("useDiphone", false, true, "Basic", 150, false, false, false, "Use diphones.");
+	createDoubleAttribute("diphoneScale", 1, true, "Basic", 155, false, false, false, "Scale factor for diphone curves.");
 	createStringAttribute("diphoneSetName", "", true, "Basic", 160, false, false, false, "Name of the diphone set to be used when using diphone-based lip-syncing.");
 	createBoolAttribute("diphoneSplineCurve", false, true, "Basic", 170, false, false, false, "Use diphones spline/linear curve.");
 	SmartBody::DoubleAttribute* diphoneSmoothWindow = createDoubleAttribute("diphoneSmoothWindow", -1.0, true, "Basic", 180, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
@@ -511,6 +512,11 @@ void SBCharacter::notify(SBSubject* subject)
 		{
 			SmartBody::BoolAttribute* diphoneAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
 			this->setDiphone(diphoneAttribute->getValue());
+		}
+		else if (attrName == "diphoneScale")
+		{
+			SmartBody::DoubleAttribute* diphoneScaleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			this->setDiphoneScale((float)diphoneScaleAttribute->getValue());
 		}
 		else if (attrName == "diphoneSplineCurve")
 		{

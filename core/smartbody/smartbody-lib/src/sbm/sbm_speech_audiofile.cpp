@@ -126,40 +126,10 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
       return 0;
    }
 
-
-   char fullAudioPath[ _MAX_PATH ];
-   //string relativeAudioPath = mcu.speech_audiofile_base_path + voiceCode;
+   // if an audio path is present, use it
    bool useAudioPaths = true;
    mcu.audio_paths.reset();
-	string relativeAudioPath = mcu.audio_paths.next_path();
-#ifdef WIN32
-   if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
-   {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
-	  mcu.mark("requestSpeechAudiofast");
-      return 0;
-   }
-#endif
-
-   m_speechRequestInfo[ m_requestIdCounter ].audioFilename = (string)fullAudioPath + "\\" + ref + ".wav";
-
-
-   // TODO: Should we fail if the .bml file isn't present?
-
-   //string bmlFilename = mcu.speech_audiofile_base_path + voiceCode + "/" + ref + ".bml";
-   string bmlFilename = relativeAudioPath + "/" + ref + ".bml";
-//////////////////////////////////
-   //ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
-   m_speechRequestInfo[ m_requestIdCounter ].visemeData.clear();
-
-   mcu.mark("requestSpeechAudioFast", 0, "lips");
-   rapidxml::file<char> bmlFile(bmlFilename.c_str());
-   mcu.mark("requestSpeechAudioFast", 0, "fileconstruction");
-   rapidxml::xml_document<> bmldoc;
-   mcu.mark("requestSpeechAudioFast", 0, "parse");
-   bmldoc.parse< rapidxml::parse_declaration_node>(bmlFile.data());
-
-   mcu.mark("requestSpeechAudioFast", 0, "traverse");
+   std::string relativeAudioPath = mcu.audio_paths.next_path();
 
 	boost::filesystem::path p( relativeAudioPath );
 	p /= voiceCode;
@@ -180,30 +150,38 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 
 	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.native_directory_string().c_str();
 
-   mcu.mark("requestSpeechAudioFast", 0, "lips");
-   ReadVisemeDataBMLFast( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent, bmldoc );
-   if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
-   {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
+	string bmlFilename = bmlPath.native_directory_string().c_str();
+
+	mcu.mark("requestSpeechAudioFast", 0, "lips");
+	rapidxml::file<char> bmlFile(bmlFilename.c_str());
+	mcu.mark("requestSpeechAudioFast", 0, "fileconstruction");
+	rapidxml::xml_document<> bmldoc;
+	mcu.mark("requestSpeechAudioFast", 0, "parse");
+	bmldoc.parse< rapidxml::parse_declaration_node>(bmlFile.data());
+
+	mcu.mark("requestSpeechAudioFast", 0, "traverse");
+
+	m_speechRequestInfo[ m_requestIdCounter ].visemeData.clear();
+	ReadVisemeDataBMLFast( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent, bmldoc );
+	if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
+	{
+	  LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
 	  mcu.mark("requestSpeechAudioFast");
-      return 0;
-   }
+	  return 0;
+	}
 
-   mcu.mark("requestSpeechAudioFast", 0, "sync");
-   ReadSpeechTimingFast( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers, bmldoc );
-   if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
-   {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.native_directory_string().c_str() );
-	  //mcu.mark("requestSpeechAudio");
-      //return 0;
-   }
+	mcu.mark("requestSpeechAudioFast", 0, "sync");
+	ReadSpeechTimingFast( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers, bmldoc );
+	if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
+	{
+		LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.native_directory_string().c_str() );
+		//mcu.mark("requestSpeechAudio");
+		//return 0;
+	}
 
-   mcu.execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
-
-
-    mcu.mark("requestSpeechAudioFast");
-   return m_requestIdCounter++;
-
+	mcu.execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
+	mcu.mark("requestSpeechAudioFast");
+	return m_requestIdCounter++;
 }
 
 
