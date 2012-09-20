@@ -642,10 +642,11 @@ void VisemeViewerWindow::OnBmlRequestCB(BML::BmlRequest* request, void* data)
 		{
 			viewer->_browserDiphone->clear();
 			char* v[2];
-			for ( size_t i = 0; i < (speechRequest->getPhonemes().size() - 1); i++ )
+			std::vector<SmartBody::VisemeData*>& phonemes = speechRequest->getPhonemes();
+			for ( size_t i = 0; (i + 1) < phonemes.size(); i++ )
 			{
-				v[0] = (char*)speechRequest->getPhonemes()[i]->id();
-				v[1] = (char*)speechRequest->getPhonemes()[i + 1]->id();
+				v[0] = (char*)phonemes[i]->id();
+				v[1] = (char*)phonemes[i + 1]->id();
 				
 				for(int j = 0; j < 2; j++)
 					viewer->enforceNamingConvention(v[j]);
