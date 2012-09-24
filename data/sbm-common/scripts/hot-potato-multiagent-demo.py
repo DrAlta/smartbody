@@ -542,7 +542,7 @@ sceneSetup()
 tenChrSetup()
 
 # this starts the chain reaction of "hot potato"
-#t()
+t()
 
 sim.resume()
 
