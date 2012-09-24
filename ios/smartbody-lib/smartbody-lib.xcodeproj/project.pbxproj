@@ -665,6 +665,8 @@
 		C423E7EA15BF633800D22BBB /* MeCtBlendEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = C423E7E815BF633800D22BBB /* MeCtBlendEngine.h */; };
 		C423E80F15BF654F00D22BBB /* sr_sn_colorsurf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C423E80D15BF654F00D22BBB /* sr_sn_colorsurf.cpp */; };
 		C423E81015BF654F00D22BBB /* sr_sn_colorsurf.h in Headers */ = {isa = PBXBuildFile; fileRef = C423E80E15BF654F00D22BBB /* sr_sn_colorsurf.h */; };
+		C42C3DA5160D394F00A7D1D4 /* perlin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C42C3DA3160D394F00A7D1D4 /* perlin.cpp */; };
+		C42C3DA6160D394F00A7D1D4 /* perlin.h in Headers */ = {isa = PBXBuildFile; fileRef = C42C3DA4160D394F00A7D1D4 /* perlin.h */; };
 		C4D195C515BF3E9900EDEE47 /* ParserASFAMC.cxx in Sources */ = {isa = PBXBuildFile; fileRef = C4D195C315BF3E9900EDEE47 /* ParserASFAMC.cxx */; };
 		C4D195C615BF3E9900EDEE47 /* ParserBVH.cxx in Sources */ = {isa = PBXBuildFile; fileRef = C4D195C415BF3E9900EDEE47 /* ParserBVH.cxx */; };
 /* End PBXBuildFile section */
@@ -1330,6 +1332,8 @@
 		C423E7E815BF633800D22BBB /* MeCtBlendEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeCtBlendEngine.h; sourceTree = "<group>"; };
 		C423E80D15BF654F00D22BBB /* sr_sn_colorsurf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_sn_colorsurf.cpp; sourceTree = "<group>"; };
 		C423E80E15BF654F00D22BBB /* sr_sn_colorsurf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_sn_colorsurf.h; sourceTree = "<group>"; };
+		C42C3DA3160D394F00A7D1D4 /* perlin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = perlin.cpp; path = perlin/perlin.cpp; sourceTree = "<group>"; };
+		C42C3DA4160D394F00A7D1D4 /* perlin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = perlin.h; path = perlin/perlin.h; sourceTree = "<group>"; };
 		C4D195C315BF3E9900EDEE47 /* ParserASFAMC.cxx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserASFAMC.cxx; sourceTree = "<group>"; };
 		C4D195C415BF3E9900EDEE47 /* ParserBVH.cxx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserBVH.cxx; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -2149,6 +2153,8 @@
 		AA9CD5F9141FF8D00064C27A /* external */ = {
 			isa = PBXGroup;
 			children = (
+				C42C3DA3160D394F00A7D1D4 /* perlin.cpp */,
+				C42C3DA4160D394F00A7D1D4 /* perlin.h */,
 				AA9CD5FA141FF8D00064C27A /* ANN */,
 				AA563F1114D3AE0700D4A91D /* parser */,
 			);
@@ -2796,6 +2802,7 @@
 				C423E7C315BF5E5300D22BBB /* SBBehaviorSet.h in Headers */,
 				C423E7EA15BF633800D22BBB /* MeCtBlendEngine.h in Headers */,
 				C423E81015BF654F00D22BBB /* sr_sn_colorsurf.h in Headers */,
+				C42C3DA6160D394F00A7D1D4 /* perlin.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3188,6 +3195,7 @@
 				C423E7C215BF5E5300D22BBB /* SBBehaviorSet.cpp in Sources */,
 				C423E7E915BF633800D22BBB /* MeCtBlendEngine.cpp in Sources */,
 				C423E80F15BF654F00D22BBB /* sr_sn_colorsurf.cpp in Sources */,
+				C42C3DA5160D394F00A7D1D4 /* perlin.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
