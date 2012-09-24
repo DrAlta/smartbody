@@ -194,6 +194,7 @@ class SkSkeleton : public SrSharedClass
 
 	// get the global direction of a bone pair based on the current skeleton configuration
 	SrVec boneGlobalDirection(const std::string& srcJoint, const std::string& dstJoints); 
+	SrVec getFacingDirection();
 
    private :
     int _loadjdata ( SrInput& in, SkJoint* j, SrStringArray& paths );

@@ -990,6 +990,16 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 	interSk->invalidate_global_matrices();
 	interSk->update_global_matrices();
 
+#if 0 // don't apply root pre-rotation ( still experimental )
+	SrVec srcFaceDir = tempSrcSk->getFacingDirection();
+	SrVec tgtFaceDir = interSk->getFacingDirection();
+	SrQuat offsetRot = SrQuat(srcFaceDir,tgtFaceDir);
+	sr_out << "srcFaceDir = " << srcFaceDir;
+	sr_out << "tgtFaceDir = " << tgtFaceDir;
+	sr_out << "offset rot = " << offsetRot << srnl;
+	tempSrcSk->root()->quat()->prerot(offsetRot);
+#endif
+	
 	SkMotion *retarget_p = new SmartBody::SBMotion();
 	//srSynchPoints sp(synch_points);
 	retarget_p->synch_points.copy_points(synch_points);// = sp;
