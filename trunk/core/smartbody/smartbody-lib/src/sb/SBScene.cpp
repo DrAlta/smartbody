@@ -524,7 +524,7 @@ std::vector<std::string> SBScene::getSkeletonNames()
 		iter++)
 	{
 		SkSkeleton* skeleton = (*iter).second;
-		ret.push_back(std::string(skeleton->name()));
+		ret.push_back(std::string(iter->first));
 	}
 
 	return ret;	

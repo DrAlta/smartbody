@@ -460,4 +460,33 @@ void SkSkeleton::clearJointValues()
 	update_global_matrices();
 }
 
+SrVec SkSkeleton::getFacingDirection()
+{
+	SrVec defaultDir = SrVec(0,0,1);
+	invalidate_global_matrices();
+	update_global_matrices();
+	
+	SkJoint *base, *l_hip, *r_hip;
+	base = search_joint("base");
+	l_hip = search_joint("l_hip");
+	r_hip = search_joint("r_hip");
+	
+	if (!base || !l_hip || !r_hip)
+		return defaultDir;
+
+	SrVec lhipPos,rhipPos, basePos;
+	lhipPos = l_hip->gmatZero().get_translation();
+	rhipPos = r_hip->gmatZero().get_translation();
+	basePos = base->gmatZero().get_translation();
+
+	defaultDir = cross(rhipPos-basePos,lhipPos-basePos);
+	sr_out << "l_hip = " << lhipPos << srnl;
+	sr_out << "r_hip = " << rhipPos << srnl;
+	sr_out << "base = " << basePos << srnl;
+	sr_out << "defaultDir = " << defaultDir << srnl;
+	defaultDir.y = 0.0;
+	defaultDir.normalize();
+	return defaultDir;
+}
+
 //============================ End of File ============================

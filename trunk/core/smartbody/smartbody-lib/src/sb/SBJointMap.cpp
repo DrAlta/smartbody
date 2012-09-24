@@ -445,12 +445,12 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		if (l_acromioclavicular->getName() == "l_sternoclavicular")
 			setJointMap("l_sternoclavicular", r_acromioclavicular, prtMap);
 		else
-			setJointMap("l_acromioclavicular", l_acromioclavicular, prtMap);
+			setJointMap("l_sternoclavicular", l_acromioclavicular, prtMap);
 
 		if (r_acromioclavicular->getName() == "r_sternoclavicular")
 			setJointMap("r_sternoclavicular", r_acromioclavicular, prtMap);
 		else
-			setJointMap("r_acromioclavicular", r_acromioclavicular, prtMap);
+			setJointMap("r_sternoclavicular", r_acromioclavicular, prtMap);
 	}
 	else if(spine3->num_children() == 3)
 	{
@@ -494,12 +494,12 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		if (l_acromioclavicular->name() == "l_sternoclavicular")
 			setJointMap("l_sternoclavicular", l_acromioclavicular, prtMap);
 		else
-			setJointMap("l_acromioclavicular", l_acromioclavicular, prtMap);
+			setJointMap("l_sternoclavicular", l_acromioclavicular, prtMap);
 
 		if (r_acromioclavicular->name() == "r_sternoclavicular")
 			setJointMap("r_sternoclavicular", r_acromioclavicular, prtMap);
 		else
-			setJointMap("r_acromioclavicular", r_acromioclavicular, prtMap);
+			setJointMap("r_sternoclavicular", r_acromioclavicular, prtMap);
 	}
 	else if(spine3->num_children() > 3)
 	{
@@ -587,10 +587,14 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		SkJoint* j2 = 0;
 		SkJoint* ja = 0;
 		SkJoint* jb = 0;
-		for(unsigned int i=getJointIndex(l_acromioclavicular), j=getJointIndex(r_acromioclavicular); i<jnts.size()&&j<jnts.size(); i++,j++)
+
+		std::vector<SkJoint*> j_listL, j_listR;
+		listChildrenJoints(l_acromioclavicular, j_listL); listChildrenJoints(r_acromioclavicular, j_listR);
+		//for(unsigned int i=getJointIndex(l_acromioclavicular), j=getJointIndex(r_acromioclavicular); i<jnts.size()&&j<jnts.size(); i++,j++)
+		for (unsigned int i=0, j=0; i<j_listL.size()&&j<j_listR.size(); i++,j++)
 		{
-			j1 = jnts[i];
-			j2 = jnts[j];
+			j1 = j_listL[i];
+			j2 = j_listR[j];
 			SrString jname(j1->name().c_str());
 
 			if (j1->num_children() == 5)
@@ -843,10 +847,13 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		SkJoint* j2 = 0;
 		SkJoint* ja = 0;
 		SkJoint* jb = 0;
-		for(unsigned int i=getJointIndex(l_hip), j=getJointIndex(r_hip); i<jnts.size()&&j<jnts.size(); i++,j++)
+		std::vector<SkJoint*> j_listL, j_listR;
+		listChildrenJoints(l_hip, j_listL); listChildrenJoints(r_hip, j_listR);
+		//for(unsigned int i=getJointIndex(l_hip), j=getJointIndex(r_hip); i<jnts.size()&&j<jnts.size(); i++,j++)
+		for(unsigned int i=0, j=0; i<j_listL.size()&&j<j_listR.size(); i++,j++)
 		{
-			j1 = jnts[i];
-			j2 = jnts[j];
+			j1 = j_listL[i];
+			j2 = j_listR[j];
 			if(j1->num_children()==2 && j2->num_children()==2) // ankle with foot and heel children joints
 			{
 				ja = j1; jb = j2;
@@ -864,10 +871,11 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		else if(!ja || !jb) // no heel
 		{
 			// first try search "ankle" or "foot"
-			for(unsigned int i=getJointIndex(l_hip), j=getJointIndex(r_hip); i<jnts.size()&&j<jnts.size(); i++,j++)
+			//for(unsigned int i=getJointIndex(l_hip), j=getJointIndex(r_hip); i<jnts.size()&&j<jnts.size(); i++,j++)
+			for(unsigned int i=0, j=0; i<j_listL.size()&&j<j_listR.size(); i++,j++)
 			{
-				j1 = jnts[i];
-				j2 = jnts[j];
+				j1 = j_listL[i];
+				j2 = j_listR[j];
 				SrString jname(j1->name().c_str());
 				if(jname.search("ankle")>=0 || jname.search("foot")>=0) // try search keyword "ankle" FIXME
 				{
@@ -1150,9 +1158,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		setJointMap("r_middle1", r_middle1, prtMap);setJointMap("r_middle2", r_middle2, prtMap);setJointMap("r_middle3", r_middle3, prtMap);if(r_middle4) setJointMap("r_middle4", r_middle4, prtMap);
 		setJointMap("r_ring1", r_ring1, prtMap);	setJointMap("r_ring2", r_ring2, prtMap);	setJointMap("r_ring3", r_ring3, prtMap);	if(r_ring4) setJointMap("r_ring4", r_ring4, prtMap);
 		setJointMap("r_pinky1", r_pinky1, prtMap);	setJointMap("r_pinky2", r_pinky2, prtMap);	setJointMap("r_pinky3", r_pinky3, prtMap);	if(r_pinky4) setJointMap("r_pinky4", r_pinky4, prtMap);
-
-	}	
-	
+	}		
 	return true;
 }
 
@@ -1264,7 +1270,7 @@ void SBJointMap::guessLeftRightFromJntNames(SkJoint* ja, SkJoint* jb,
 	else // can NOT figure out which is left/right from name (letter counting)
 	{
 		l_j = ja; r_j = jb; // 50% chance wrong
-		LOG("guessMap: 50% chance wrong: %s <=> %s \n", ja->name().c_str(), jb->name().c_str());
+		LOG("guessMap: 50 percent chance wrong: %s <=> %s \n", ja->name().c_str(), jb->name().c_str());
 	}
 }
 
