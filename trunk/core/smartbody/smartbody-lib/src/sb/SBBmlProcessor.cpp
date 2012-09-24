@@ -69,7 +69,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 		if( echo ) {
 			msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false );
 			// don't log a vrX message
-			LOG("%s %s", cmd, msg.str().c_str());
+			////LOG("%s %s", cmd, msg.str().c_str());
 		}
 
 		if( send ) {
@@ -85,7 +85,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 				}
 			} else {
 				msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false );
-				LOG("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
+				///////LOG("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
 				mcu.vhmsg_send( cmd, msg.str().c_str() );
 			}
 		}
@@ -100,13 +100,13 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
 				std::stringstream strstr;
 				strstr << "WARNING: send_vrX(..): Failed to insert echo header command for character \"" << char_id << "\".";
-				LOG(strstr.str().c_str());
+				////LOG(strstr.str().c_str());
 			}
 			msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false );
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
 				std::stringstream strstr;
 				strstr << "WARNING: send_vrX(..): Failed to insert echoed command for character \"" << char_id << "\".";
-				LOG(strstr.str().c_str());
+				////LOG(strstr.str().c_str());
 			}
 		}
 		if( all_characters ) {
@@ -119,7 +119,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 				if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
 					std::stringstream strstr;
 					strstr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\".";
-					LOG(strstr.str().c_str());
+					////LOG(strstr.str().c_str());
 				}
 			}
 		} else {
@@ -127,7 +127,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
 				std::stringstream strstr;
 				strstr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\".";
-				LOG(strstr.str().c_str());
+				////LOG(strstr.str().c_str());
 			}
 		}
 
@@ -137,7 +137,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 			{
 				std::stringstream strstr;
 				strstr << "ERROR: send_vrX(..): Failed to insert seq into active sequences.";
-				LOG(strstr.str().c_str());
+				////LOG(strstr.str().c_str());
 				return msgId;
 			}
 		} else {
@@ -146,7 +146,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 			{
 				std::stringstream strstr;
 				strstr << "ERROR: send_vrX(..): Failed to insert seq into pending sequences.";
-				LOG(strstr.str().c_str());
+				////LOG(strstr.str().c_str());
 				return msgId;
 			}
 		}
@@ -163,12 +163,14 @@ std::string SBBmlProcessor::execBML(std::string character, std::string bml)
 				<< "\t\t" << bml
 				<< "\t</bml>\n"
 				<< "</act>";	
-	return send_vrX( "vrSpeak", character, "ALL", "", true, true, entireBml.str() );
+	//return send_vrX( "vrSpeak", character, "ALL", "", true, true, entireBml.str() );
+	return send_vrX( "vrSpeak", character, "ALL", "", false, true, entireBml.str() );
 }
 
 std::string SBBmlProcessor::execBMLFile(std::string character, std::string filename)
 {
-	return send_vrX( "vrSpeak", character, "ALL", "", true, true, filename );
+	//return send_vrX( "vrSpeak", character, "ALL", "", true, true, filename );
+	return send_vrX( "vrSpeak", character, "ALL", "", false, true, filename );
 }
 
 std::string SBBmlProcessor::execXML(std::string character, std::string xml)
@@ -176,8 +178,9 @@ std::string SBBmlProcessor::execXML(std::string character, std::string xml)
 	std::ostringstream entireXML;
 	entireXML	<< "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 				<< xml;
-	return send_vrX( "vrSpeak", character, "ALL", "", true, true, entireXML.str() );
+	//return send_vrX( "vrSpeak", character, "ALL", "", true, true, entireXML.str() );
+	return send_vrX( "vrSpeak", character, "ALL", "", false, true, entireXML.str() );
 }
 
-}
+} // namespace
 

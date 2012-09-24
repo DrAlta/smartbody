@@ -110,7 +110,7 @@ namespace BML {
 		if( error_msg==NULL || error_msg[0]=='\0' )
 			error_msg = "INVALID_ERROR_MESSAGE";
 
-		LOG("WARNING: bml_error(..): %s (agent \"%s\", message id \"%s\")", error_msg, agent_id, message_id);
+		////LOG("WARNING: bml_error(..): %s (agent \"%s\", message id \"%s\")", error_msg, agent_id, message_id);
 
 		// Old vrSpeakFailed form (sans recipient)
 		ostringstream buff;
@@ -1268,7 +1268,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	const char *message_id   = args.read_token();
 	char       *xml          = args.read_remainder_raw();
 	//cout << "DEBUG: vrSpeak " << agentId << " " << recipientId << " " << messageId << endl;
-	LOG("agent_id = %s, recipient_id = %s, message id = %s, xml = %s",agent_id,recipient_id, message_id, xml);
+	//////LOG("agent_id = %s, recipient_id = %s, message id = %s, xml = %s",agent_id,recipient_id, message_id, xml);
 
 	try {
 		if( xml[0]=='\0' ) {

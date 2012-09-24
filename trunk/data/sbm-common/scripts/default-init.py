@@ -52,7 +52,7 @@ brad.setVoice("remote")
 brad.setVoiceCode("Festival_voice_rab_diphone")
 brad.createStandardControllers()
 brad.setStringAttribute("deformableMesh", "brad")
-
+'''
 utah = scene.createCharacter("utah", "")
 utahSkeleton = scene.createSkeleton("test_utah.sk")
 utah.setSkeleton(utahSkeleton)

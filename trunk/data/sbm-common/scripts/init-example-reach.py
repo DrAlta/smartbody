@@ -70,6 +70,7 @@ def reachSetup(characterName, interpolatorType, preFix):
 	skeleton = character.getSkeleton()
 	reachManager = scene.getReachManager()
 	reach = reachManager.createReach(characterName)	
+	print 'setting up reach for ' + characterName + ' , numReach()=' + str(reachManager.getNumReaches())
 	reach.setInterpolatorType(interpolatorType)
 	for i in range(0,len(rightHandMotions)):
 		mirrorMotion1 = scene.getMotion(rightHandMotions[i])
