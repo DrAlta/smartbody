@@ -484,7 +484,8 @@ std::string generateReply(const char * utterance,const char * soundFileName)
 		printf("Problem creating sound file from speech '%s'", spoken_text.c_str());
 	}
     //wave.save(soundFileName,"riff");
-    int saveResult = wave.save(soundFileName,"wav");
+    //int saveResult = wave.save(soundFileName,"wav");
+	int saveResult = wave.save(soundFileName,"aiff");
     if (saveResult == FALSE)
     {
     	printf("Problem writing sound to file '%s'", soundFileName);
@@ -597,55 +598,9 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
  void set_phonemes_to_visemes()
 {
 
-    if(mapping == "sbm")
+     if(mapping == "sbmold")
     {
 		phonemeToViseme[ "pau" ] = "_";  // SIL
-phonemeToViseme[ "aa" ]  = "Aa"; // AA
-phonemeToViseme[ "ae" ]  = "Ah"; // AE
-phonemeToViseme[ "ah" ]  = "Ah"; // AH
-phonemeToViseme[ "ao" ]  = "Ao"; // AO
-phonemeToViseme[ "ax" ]  = "Ah"; // AX
-phonemeToViseme[ "@" ]   = "Ih"; // ??
-phonemeToViseme[ "aw" ]  = "Ah"; // AW
-phonemeToViseme[ "ay" ]  = "Ay"; // AY
-phonemeToViseme[ "b" ]   = "BMP";//  B
-phonemeToViseme[ "ch" ]  = "J";  // CH
-phonemeToViseme[ "d" ]   = "D";  //  D
-phonemeToViseme[ "dh" ]  = "Th"; // DH
-phonemeToViseme[ "dx" ]  = "D";  // ??
-phonemeToViseme[ "eh" ]  = "Eh"; // EH
-phonemeToViseme[ "er" ]  = "Er"; // ER
-phonemeToViseme[ "ey" ]  = "Eh"; // 
-phonemeToViseme[ "f" ]   = "F";  //  F
-phonemeToViseme[ "g" ]   = "Kg"; //  G
-phonemeToViseme[ "hh" ]  = "Ih"; // HH
-phonemeToViseme[ "ih" ]  = "Ih"; // IH
-phonemeToViseme[ "iy" ]  = "Ih"; // IY
-phonemeToViseme[ "jh" ]  = "j";  // JH
-phonemeToViseme[ "k" ]   = "Kg"; //  K
-phonemeToViseme[ "l" ]   = "D";  //  L
-phonemeToViseme[ "m" ]   = "BMP";//  M
-phonemeToViseme[ "n" ]   = "Kg"; //  N
-phonemeToViseme[ "ng" ]  = "Kg"; // NG
-phonemeToViseme[ "ow" ]  = "Ow"; // OW
-phonemeToViseme[ "oy" ]  = "Oy"; // OY
-phonemeToViseme[ "p" ]   = "BMP";//  P
-phonemeToViseme[ "r" ]   = "R";  //  R
-phonemeToViseme[ "s" ]   = "Z";  //  S
-phonemeToViseme[ "sh" ]  = "J";  // SH
-phonemeToViseme[ "T" ]   = "D";  // T?
-phonemeToViseme[ "t" ]   = "D";  // T?
-phonemeToViseme[ "th" ]  = "Th"; // TH
-phonemeToViseme[ "uh" ]  = "Eh"; // UH
-phonemeToViseme[ "uw" ]  = "Oh"; // UW
-phonemeToViseme[ "v" ]   = "F";  //  V
-phonemeToViseme[ "w" ]   = "W"; //  W
-phonemeToViseme[ "y" ]   = "Ih"; //  Y
-phonemeToViseme[ "z" ]   = "Z";  //  Z
-phonemeToViseme[ "zh" ]  = "J";  // ZH
-
-		/*
-        phonemeToViseme[ "pau" ] = "_";  // SIL
         phonemeToViseme[ "aa" ]  = "Ao"; // AA
         phonemeToViseme[ "ae" ]  = "Ih"; // AE
         phonemeToViseme[ "ah" ]  = "Ih"; // AH
@@ -689,8 +644,54 @@ phonemeToViseme[ "zh" ]  = "J";  // ZH
         phonemeToViseme[ "y" ]   = "OO"; //  Y
         phonemeToViseme[ "z" ]   = "Z";  //  Z
         phonemeToViseme[ "zh" ]  = "J";  // ZH
-		*/
     }
+	else if (mapping == "sbm")
+	{
+		phonemeToViseme[ "pau" ] = "_";  // SIL
+		phonemeToViseme[ "aa" ]  = "Aa"; // AA
+		phonemeToViseme[ "ae" ]  = "Ah"; // AE
+		phonemeToViseme[ "ah" ]  = "Ah"; // AH
+		phonemeToViseme[ "ao" ]  = "Ao"; // AO
+		phonemeToViseme[ "ax" ]  = "Ah"; // AX
+		phonemeToViseme[ "@" ]   = "Ih"; // ??
+		phonemeToViseme[ "aw" ]  = "Ah"; // AW
+		phonemeToViseme[ "ay" ]  = "Ay"; // AY
+		phonemeToViseme[ "b" ]   = "BMP";//  B
+		phonemeToViseme[ "ch" ]  = "Sh";  // CH
+		phonemeToViseme[ "d" ]   = "D";  //  D
+		phonemeToViseme[ "dh" ]  = "Th"; // DH
+		phonemeToViseme[ "dx" ]  = "D";  // ??
+		phonemeToViseme[ "eh" ]  = "Eh"; // EH
+		phonemeToViseme[ "er" ]  = "Er"; // ER
+		phonemeToViseme[ "ey" ]  = "Eh"; // 
+		phonemeToViseme[ "f" ]   = "F";  //  F
+		phonemeToViseme[ "g" ]   = "Kg"; //  G
+		phonemeToViseme[ "hh" ]  = "Ih"; // HH
+		phonemeToViseme[ "ih" ]  = "Ih"; // IH
+		phonemeToViseme[ "iy" ]  = "Ih"; // IY
+		phonemeToViseme[ "jh" ]  = "Sh";  // JH
+		phonemeToViseme[ "k" ]   = "Kg"; //  K
+		phonemeToViseme[ "l" ]   = "L";  //  L
+		phonemeToViseme[ "m" ]   = "BMP";//  M
+		phonemeToViseme[ "n" ]   = "Kg"; //  N
+		phonemeToViseme[ "ng" ]  = "Kg"; // NG
+		phonemeToViseme[ "ow" ]  = "Ow"; // OW
+		phonemeToViseme[ "oy" ]  = "Oy"; // OY
+		phonemeToViseme[ "p" ]   = "BMP";//  P
+		phonemeToViseme[ "r" ]   = "R";  //  R
+		phonemeToViseme[ "s" ]   = "Z";  //  S
+		phonemeToViseme[ "sh" ]  = "Sh";  // SH
+		phonemeToViseme[ "T" ]   = "D";  // T?
+		phonemeToViseme[ "t" ]   = "D";  // T?
+		phonemeToViseme[ "th" ]  = "Th"; // TH
+		phonemeToViseme[ "uh" ]  = "Eh"; // UH
+		phonemeToViseme[ "uw" ]  = "Oh"; // UW
+		phonemeToViseme[ "v" ]   = "F";  //  V
+		phonemeToViseme[ "w" ]   = "W"; //  W
+		phonemeToViseme[ "y" ]   = "Ih"; //  Y
+		phonemeToViseme[ "z" ]   = "Z";  //  Z
+		phonemeToViseme[ "zh" ]  = "Sh";  // ZH
+	}
    
 }
 
