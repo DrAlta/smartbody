@@ -1139,7 +1139,7 @@ std::string SBScene::save()
 				 visemeIter != visemes.end();
 				 visemeIter++)
 			{
-				std::vector<float>& keys = diphone->getKeys((*iter));
+				std::vector<float>& keys = diphone->getKeys((*visemeIter));
 				for (size_t x = 0; x < keys.size(); x++)
 				{
 					if (x + 1 < keys.size())
