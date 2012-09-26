@@ -113,6 +113,13 @@ SBScene* SBScene::getScene()
 	return mcu._scene;
 }
 
+void SBScene::update()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.update();
+}
+
+
 
 void SBScene::setScale(float val)
 {
