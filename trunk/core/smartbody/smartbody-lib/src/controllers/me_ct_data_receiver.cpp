@@ -93,10 +93,16 @@ bool MeCtDataReceiver::controller_evaluate(double t, MeFrameData& frame)
 			int bufferId = frame.toBufferIndex(channelId);
 			if (bufferId < 0)	continue;
 			SrQuat quat = iter->second;
-			frame.buffer()[bufferId + 0] = quat.w;
-			frame.buffer()[bufferId + 1] = quat.x;
-			frame.buffer()[bufferId + 2] = quat.y;
-			frame.buffer()[bufferId + 3] = quat.z;
+			//SrQuat quat_p = joint->quat()->prerot().inverse() * (quat * joint->gmatZero().inverse());
+			//SrQuat quat_p = (quat * joint->gmatZero().inverse()) * joint->quat()->prerot().inverse();
+
+			SrQuat quat_p =  joint->gmatZero().inverse() * quat * joint->gmatZero();
+			//SrQuat quat_p = quat * joint->quat()->prerot().inverse();
+			//SrQuat quat_p = quat;
+			frame.buffer()[bufferId + 0] = quat_p.w;
+			frame.buffer()[bufferId + 1] = quat_p.x;
+			frame.buffer()[bufferId + 2] = quat_p.y;
+			frame.buffer()[bufferId + 3] = quat_p.z;
 		}
 
 		// set local position directly
