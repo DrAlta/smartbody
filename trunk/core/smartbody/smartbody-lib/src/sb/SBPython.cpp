@@ -1105,7 +1105,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 	boost::python::class_<MeCtCurveWriter, boost::python::bases<SBController> > ("CurveWriterController")
 		;
 
-	boost::python::class_<SBSkeleton>("SBSkeleton")
+	boost::python::class_<SBSkeleton, boost::python::bases<SBObject> >("SBSkeleton")
 	//	.def(boost::python::init<>())
 		.def(boost::python::init<std::string>())
 		.def("load", &SBSkeleton::load, "Loads the skeleton definition from the given skeleton name.")

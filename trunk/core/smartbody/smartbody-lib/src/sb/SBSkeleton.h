@@ -7,6 +7,7 @@
 
 namespace SmartBody {
 
+class SBSubject;
 class SBJoint;
 class SBCharacter;
 
@@ -36,6 +37,8 @@ public:
 	void rescale(float scaleRatio);
 	void update();
 
+	void notify(SBSubject* subject);
+
 	/* the following are designed to re-orient joints local axes. added by David Huang Jun 2012 */
 	// Orient skeleton joints local axes to match world coordinate axes (Y-up Z-front)
 	void orientJointsLocalAxesToWorld(void);
@@ -44,6 +47,10 @@ public:
 	void _createSkelWithoutPreRot(SBSkeleton* TposeSk, SBSkeleton* newSk, const char* new_name=0);
 	// same as above but for Python interface
 	SBSkeleton* createSkelWithoutPreRot(const char* new_name);
+
+	protected:
+		SrQuat _origRootPrerot;
+		bool _origRootChanged;
 };
 
 

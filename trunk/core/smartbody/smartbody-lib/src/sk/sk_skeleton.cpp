@@ -32,7 +32,7 @@
 
 //============================ SkSkeleton ============================
 
-SkSkeleton::SkSkeleton ()
+SkSkeleton::SkSkeleton () : SmartBody::SBObject()
 {
 	_name = "noname";
 	_root = 0;
@@ -43,7 +43,7 @@ SkSkeleton::SkSkeleton ()
 	_com.set(0, 0, 0);
 }
 
-SkSkeleton::SkSkeleton (SkSkeleton* origSkel)
+SkSkeleton::SkSkeleton (SkSkeleton* origSkel)  : SmartBody::SBObject()
 {
 	_name = origSkel->name();
 	_skfilename = origSkel->skfilename();
