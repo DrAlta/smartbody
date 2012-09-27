@@ -32,6 +32,7 @@
 # include <sk/sk_joint.h>
 # include <sk/sk_channel_array.h>
 # include <sk/sk_posture.h>
+#include <sb/SBObject.h>
 
 class SrStringArray;
 class SrVarTable;
@@ -40,7 +41,7 @@ class SkColdet;
 //================================ SkSkeleton =================================================
 
 /*! A Skeleton defined as a hierarchy of joints */
-class SkSkeleton : public SrSharedClass
+class SkSkeleton : public SmartBody::SBObject, public SrSharedClass
  { private :
     // basic data:
 	std::string _name;

@@ -1,6 +1,7 @@
 #include "SBSkeleton.h"
 #include "SBJoint.h"
 #include "SBCharacter.h"
+#include "SBAttribute.h"
 #include <sbm/mcontrol_util.h>
 
 #include <sr/sr_string.h>
@@ -9,10 +10,14 @@ namespace SmartBody {
 
 SBSkeleton::SBSkeleton() : SkSkeleton()
 {
+	_origRootChanged = false;
+	createVec3Attribute("orientation", 0, 0, 0, true, "Basic", 100, false, false, false, "Change in orientation from initial loading of skeleton. Parameters are rotation in degrees of the X, then Y, then Z axes.");
 }
 
 SBSkeleton::SBSkeleton(std::string skelFile) : SkSkeleton()
 {
+	_origRootChanged = false;
+	createVec3Attribute("orientation", 0, 0, 0, true, "Basic", 100, false, false, false, "Change in orientation from initial loading of skeleton. Parameters are rotation in degrees of the X, then Y, then Z axes.");
 	load(skelFile);
 }
 
@@ -300,6 +305,58 @@ void SBSkeleton::rescale( float scaleRatio )
 		if (joint)
 			joint->setOffset(joint->getOffset()*(float)scaleRatio);
 	}
+}
+
+void SBSkeleton::notify(SBSubject* subject)
+{
+	SBObject::notify(subject);
+
+	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
+	if (attribute)
+	{
+		if (attribute->getName() == "orientation")
+		{
+			Vec3Attribute* orientationAttr = dynamic_cast<Vec3Attribute*>(attribute);
+			// get the root node
+			SkJoint* root = this->root();
+			if (root)
+			{
+				if (root->quat())
+				{
+					SrQuat prerot = root->quat()->prerot();
+					if (_origRootChanged)	
+						prerot = _origRootPrerot;
+					_origRootChanged = true;
+					_origRootPrerot = prerot;
+					SrQuat adjustX;
+					SrQuat adjustY;
+					SrQuat adjustZ;
+
+					if (orientationAttr->getValue().x != 0)
+					{
+						SrVec xaxis(1, 0, 0);
+						adjustX.set(xaxis, orientationAttr->getValue().x * 3.14159f / 180.0f);
+					}
+					if (orientationAttr->getValue().y != 0)
+					{
+						SrVec yaxis(0, 1, 0);
+						adjustY.set(yaxis, orientationAttr->getValue().y * 3.14159f / 180.0f);
+					}
+					if (orientationAttr->getValue().z != 0)
+					{	
+						SrVec zaxis(0, 0, 1);
+						adjustZ.set(zaxis, orientationAttr->getValue().z * 3.14159f / 180.0f);
+					}
+					
+					SrQuat finalAdjust = adjustX * adjustY * adjustZ;
+					SrQuat final = finalAdjust * prerot;
+					root->quat()->prerot(final);
+					root->offset(root->offset() * finalAdjust);
+				}
+			}
+		}
+	}
+
 }
 
 }; //namespace
