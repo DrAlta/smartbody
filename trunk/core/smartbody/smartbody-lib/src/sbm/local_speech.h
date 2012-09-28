@@ -55,6 +55,7 @@ protected:
 	void removeTabsFromString(string &spoken_text);
 	std::string storeXMLMetaData( const std::string & txt);
 	void cleanString(std::string &message);
+	void set_phonemes_to_visemes();
 };
 
 

@@ -594,7 +594,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 		// TODO: Log / print error
 		return( CMD_FAILURE );  // known character but unknown message id
 	}
-	//LOG("character = %s, status = %s, result = %s",character->getName().c_str(),status,result);
+	LOG("Handle remote speech character = %s, status = %s, result = %s",character->getName().c_str(),status,result);
 	try{
 		if( strcmp( status, "OK:" )==0 ) {
 			XercesDOMParser *Prser;  
