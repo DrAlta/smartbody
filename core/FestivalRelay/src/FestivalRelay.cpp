@@ -530,7 +530,7 @@ void process_message( const char * message )
 
 	//Generate the audio
 	string replyXML = generateReply(utterance.c_str(),festival_file_name.c_str());
-
+	printf("\nafter reply, replyXML = %s\n",replyXML.c_str());
 	string remoteSpeechReply = agent_name+" "+message_id+" OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?><speak><soundFile name=\"";
 
 #ifdef WIN32

@@ -38,7 +38,7 @@
 #define makeDirectory(pathname) mkdir(pathname,0777)
 #endif
 
-#if 0
+#if 1
 #include <festival.h>
 #include <VHDuration.h>
 #endif
@@ -107,6 +107,8 @@ class XStr
 XERCES_CPP_NAMESPACE_USE
 #if 0
 extern SpeechRequestData xmlMetaData;
+extern std::map<string,string> phonemeToViseme;
+extern std::string mapping;
 
 FestivalSpeechRelayLocal::FestivalSpeechRelayLocal()
 {
@@ -476,11 +478,11 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	file_name = file_name.substr( pos2, pos - pos2 ) + ".wav";
 	std::string festival_file_name = cacheDirectory + file_name;
 	//Generate the audio
-	//LOG("before reply");
+	LOG("before reply");
 	string replyXML = generateReply(utterance.c_str(),festival_file_name.c_str());
-	//LOG("after reply, replyXML = %s",replyXML.c_str());
+	LOG("after reply, replyXML = %s",replyXML.c_str());
 	string remoteSpeechReply = agent_name+" "+message_id+" OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?><speak><soundFile name=\"";
-	//LOG("remoteSpeechReply = %s",remoteSpeechReply.c_str());
+	LOG("remoteSpeechReply = %s",remoteSpeechReply.c_str());
 
 	char full[ _MAX_PATH ];
 	if ( getFullPath( full, const_cast<char*>(festival_file_name.c_str())) == NULL )
@@ -495,8 +497,8 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 
 	remoteSpeechReply += soundPathName+"\"/>";
 	remoteSpeechReply += replyXML + "</speak>";
-	//LOG("replyXML = %s\n",replyXML.c_str());
-	//LOG("Sound path name = %s\n",soundPathName.c_str());
+	LOG("replyXML = %s\n",replyXML.c_str());
+	LOG("Sound path name = %s\n",soundPathName.c_str());
 
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -504,7 +506,7 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	string replyCmd = "RemoteSpeechReply ";
 	replyCmd = replyCmd + remoteSpeechReply; //cmdConst;
 	//mcu.execute_later("RemoteSpeechReply", cmdConst ); //sends the remote speech command using singleton* MCU_p	
-	//LOG("replyCmd = %s",replyCmd.c_str());
+	LOG("replyCmd = %s",replyCmd.c_str());
 	mcu.execute_later(replyCmd.c_str());
 }
 
@@ -526,10 +528,113 @@ void FestivalSpeechRelayLocal::setVoice(std::string voice)
 	festival_eval_command("(Parameter.set 'Duration_Stretch 0.8)");
 }
 
+void FestivalSpeechRelayLocal::set_phonemes_to_visemes()
+{
+
+	if(mapping == "sbmold")
+	{
+		phonemeToViseme[ "pau" ] = "_";  // SIL
+		phonemeToViseme[ "aa" ]  = "Ao"; // AA
+		phonemeToViseme[ "ae" ]  = "Ih"; // AE
+		phonemeToViseme[ "ah" ]  = "Ih"; // AH
+		phonemeToViseme[ "ao" ]  = "Ao"; // AO
+		phonemeToViseme[ "ax" ]  = "Ih"; // AX
+		phonemeToViseme[ "@" ]   = "Ih"; // 
+		phonemeToViseme[ "aw" ]  = "Ih"; // AW
+		phonemeToViseme[ "ay" ]  = "Ih"; // AY
+		phonemeToViseme[ "b" ]   = "BMP";//  B
+		phonemeToViseme[ "ch" ]  = "j";  // CH
+		phonemeToViseme[ "d" ]   = "D";  //  D
+		phonemeToViseme[ "dh" ]  = "Th"; // DH
+		phonemeToViseme[ "dx" ]  = "D";  // ??
+		phonemeToViseme[ "eh" ]  = "Ih"; // EH
+		phonemeToViseme[ "er" ]  = "Er"; // ER
+		phonemeToViseme[ "ey" ]  = "Ih"; // 
+		phonemeToViseme[ "f" ]   = "F";  //  F
+		phonemeToViseme[ "g" ]   = "KG"; //  G
+		phonemeToViseme[ "hh" ]  = "Ih"; // HH
+		phonemeToViseme[ "ih" ]  = "Ih"; // IH
+		phonemeToViseme[ "iy" ]  = "EE"; // IY
+		phonemeToViseme[ "jh" ]  = "j";  // JH
+		phonemeToViseme[ "k" ]   = "KG"; //  K
+		phonemeToViseme[ "l" ]   = "D";  //  L
+		phonemeToViseme[ "m" ]   = "BMP";//  M
+		phonemeToViseme[ "n" ]   = "NG"; //  N
+		phonemeToViseme[ "ng" ]  = "NG"; // NG
+		phonemeToViseme[ "ow" ]  = "Oh"; // OW
+		phonemeToViseme[ "oy" ]  = "Oh"; // OY
+		phonemeToViseme[ "p" ]   = "BMP";//  P
+		phonemeToViseme[ "r" ]   = "R";  //  R
+		phonemeToViseme[ "s" ]   = "Z";  //  S
+		phonemeToViseme[ "sh" ]  = "j";  // SH
+		phonemeToViseme[ "T" ]   = "D";  // T?
+		phonemeToViseme[ "t" ]   = "D";  // T?
+		phonemeToViseme[ "th" ]  = "Th"; // TH
+		phonemeToViseme[ "uh" ]  = "Oh"; // UH
+		phonemeToViseme[ "uw" ]  = "Oh"; // UW
+		phonemeToViseme[ "v" ]   = "F";  //  V
+		phonemeToViseme[ "w" ]   = "OO"; //  W
+		phonemeToViseme[ "y" ]   = "OO"; //  Y
+		phonemeToViseme[ "z" ]   = "Z";  //  Z
+		phonemeToViseme[ "zh" ]  = "J";  // ZH
+	}
+	else if (mapping == "sbm")
+	{
+		phonemeToViseme[ "pau" ] = "_";  // SIL
+		phonemeToViseme[ "aa" ]  = "Aa"; // AA
+		phonemeToViseme[ "ae" ]  = "Ah"; // AE
+		phonemeToViseme[ "ah" ]  = "Ah"; // AH
+		phonemeToViseme[ "ao" ]  = "Ao"; // AO
+		phonemeToViseme[ "ax" ]  = "Ah"; // AX
+		phonemeToViseme[ "@" ]   = "Ih"; // ??
+		phonemeToViseme[ "aw" ]  = "Ah"; // AW
+		phonemeToViseme[ "ay" ]  = "Ay"; // AY
+		phonemeToViseme[ "b" ]   = "BMP";//  B
+		phonemeToViseme[ "ch" ]  = "Sh";  // CH
+		phonemeToViseme[ "d" ]   = "D";  //  D
+		phonemeToViseme[ "dh" ]  = "Th"; // DH
+		phonemeToViseme[ "dx" ]  = "D";  // ??
+		phonemeToViseme[ "eh" ]  = "Eh"; // EH
+		phonemeToViseme[ "er" ]  = "Er"; // ER
+		phonemeToViseme[ "ey" ]  = "Eh"; // 
+		phonemeToViseme[ "f" ]   = "F";  //  F
+		phonemeToViseme[ "g" ]   = "Kg"; //  G
+		phonemeToViseme[ "hh" ]  = "Ih"; // HH
+		phonemeToViseme[ "ih" ]  = "Ih"; // IH
+		phonemeToViseme[ "iy" ]  = "Ih"; // IY
+		phonemeToViseme[ "jh" ]  = "Sh";  // JH
+		phonemeToViseme[ "k" ]   = "Kg"; //  K
+		phonemeToViseme[ "l" ]   = "L";  //  L
+		phonemeToViseme[ "m" ]   = "BMP";//  M
+		phonemeToViseme[ "n" ]   = "Kg"; //  N
+		phonemeToViseme[ "ng" ]  = "Kg"; // NG
+		phonemeToViseme[ "ow" ]  = "Ow"; // OW
+		phonemeToViseme[ "oy" ]  = "Oy"; // OY
+		phonemeToViseme[ "p" ]   = "BMP";//  P
+		phonemeToViseme[ "r" ]   = "R";  //  R
+		phonemeToViseme[ "s" ]   = "Z";  //  S
+		phonemeToViseme[ "sh" ]  = "Sh";  // SH
+		phonemeToViseme[ "T" ]   = "D";  // T?
+		phonemeToViseme[ "t" ]   = "D";  // T?
+		phonemeToViseme[ "th" ]  = "Th"; // TH
+		phonemeToViseme[ "uh" ]  = "Eh"; // UH
+		phonemeToViseme[ "uw" ]  = "Oh"; // UW
+		phonemeToViseme[ "v" ]   = "F";  //  V
+		phonemeToViseme[ "w" ]   = "W"; //  W
+		phonemeToViseme[ "y" ]   = "Ih"; //  Y
+		phonemeToViseme[ "z" ]   = "Z";  //  Z
+		phonemeToViseme[ "zh" ]  = "Sh";  // ZH
+	}
+
+}
+
 void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string cacheDir)
 {
 	
         //freopen ("/sdcard/sbm/festivalLog.txt","w",stderr);
+
+	mapping = "sbm";
+	set_phonemes_to_visemes();
 
 	std::string scriptFile = "";
 	std::string voice = "voice_kal_diphone";
@@ -554,7 +659,6 @@ void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string 
 	LOG("Festival lib directory (use -festivalLibDir): %s\n", festivalLibDir.c_str());
 	LOG("Cache directory (use -festivalLibDir)       : %s\n", cache_directory.c_str());
 	LOG("Voice (use -voice)                          : %s\n", voice.c_str());
-	
 
 	//if (!scriptFileRead)
 	{
