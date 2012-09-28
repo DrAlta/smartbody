@@ -10,7 +10,8 @@
 #endif
 
 //#include <windows.h> // standard Windows app include
-#if defined (__ANDROID__) || defined (SBM_IPHONE) || defined(__native_client__)
+#if defined (SBM_IPHONE)
+#elif defined (__ANDROID__) || defined(__native_client__)
 #include <GLES2/gl2.h>
 #else
 #include <GL/gl.h> // standard OpenGL include
