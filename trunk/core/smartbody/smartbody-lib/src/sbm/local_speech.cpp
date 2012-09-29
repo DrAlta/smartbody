@@ -38,7 +38,7 @@
 #define makeDirectory(pathname) mkdir(pathname,0777)
 #endif
 
-#if 1
+#if 0
 #include <festival.h>
 #include <VHDuration.h>
 #endif
