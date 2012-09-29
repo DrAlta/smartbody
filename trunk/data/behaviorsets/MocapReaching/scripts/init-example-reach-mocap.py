@@ -83,33 +83,20 @@ def reachSetup(characterName, interpolatorType, preFix):
 	reach = reachManager.createReach(characterName)	
 	reach.setInterpolatorType(interpolatorType)
 	for i in range(0,len(rightHandMotions)):
-		mirrorMotion1 = scene.getMotion(rightHandMotions[i])
-		mirrorMotion2 = scene.getMotion(leftHandMotions[i])
-		if mirrorMotion1 is not None:
-			mirrorMotion1.mirror(leftHandMotions[i], skeleton.getName())
-			reach.addMotion("right",scene.getMotion(rightHandMotions[i]))
-			reach.addMotion("left",scene.getMotion(leftHandMotions[i]))
-		else:
-			print "Motion " + rightHandMotions[i] + " is not present, will not be added to the reach motion"
+		right = scene.getMotion(rightHandMotions[i])
+		left = scene.getMotion(leftHandMotions[i])
+		reach.addMotion("right",scene.getMotion(rightHandMotions[i]))
+		reach.addMotion("left",scene.getMotion(leftHandMotions[i]))
 		
-	
-	grabMirrorMotion = scene.getMotion(preFix+"ChrHarmony_Relax001_HandGraspSmSphere_Grasp")
-	grabMirrorMotion.mirror(preFix+"ChrHarmony_Relax001_LHandGraspSmSphere_Grasp", skeleton.getName())
 	reach.setGrabHandMotion("right",scene.getMotion(preFix+"ChrHarmony_Relax001_HandGraspSmSphere_Grasp"));
 	reach.setGrabHandMotion("left",scene.getMotion(preFix+"ChrHarmony_Relax001_LHandGraspSmSphere_Grasp"));
 	
-	reachMirrorMotion = scene.getMotion(preFix+"ChrHarmony_Relax001_HandGraspSmSphere_Reach")
-	reachMirrorMotion.mirror(preFix+"ChrHarmony_Relax001_LHandGraspSmSphere_Reach", skeleton.getName())
 	reach.setReachHandMotion("right",scene.getMotion(preFix+"ChrHarmony_Relax001_HandGraspSmSphere_Reach"));
 	reach.setReachHandMotion("left",scene.getMotion(preFix+"ChrHarmony_Relax001_LHandGraspSmSphere_Reach"));
 	
-	releaseMirrorMotion = scene.getMotion(preFix+"ChrHarmony_Relax001_HandGraspSmSphere_Release")
-	releaseMirrorMotion.mirror(preFix+"ChrHarmony_Relax001_LHandGraspSmSphere_Release", skeleton.getName())
 	reach.setReleaseHandMotion("right",scene.getMotion(preFix+"ChrHarmony_Relax001_HandGraspSmSphere_Release"));
 	reach.setReleaseHandMotion("left",scene.getMotion(preFix+"ChrHarmony_Relax001_LHandGraspSmSphere_Release"));
 	
-	pointMirrorMotion = scene.getMotion(preFix+"HandsAtSide_RArm_GestureYou")
-	pointMirrorMotion.mirror(preFix+"HandsAtSide_LArm_GestureYou", skeleton.getName())
 	reach.setPointHandMotion("right",scene.getMotion(preFix+"HandsAtSide_RArm_GestureYou"));
 	reach.setPointHandMotion("left",scene.getMotion(preFix+"HandsAtSide_LArm_GestureYou"));
 	
