@@ -225,6 +225,14 @@ SkJoint* SkSkeleton::linear_search_joint ( const char* n ) const
 	return 0;
 }
 
+void SkSkeleton::resetSearchJoint()
+{
+	_jointMap.clear();
+	_extJointMap.clear();
+	_extIDJointMap.clear();
+	_extSIDJointMap.clear();
+}
+
 SkJoint* SkSkeleton::search_joint ( const char* n )
 {
 	if (_jointMap.size() == 0 &&
@@ -488,5 +496,6 @@ SrVec SkSkeleton::getFacingDirection()
 	defaultDir.normalize();
 	return defaultDir;
 }
+
 
 //============================ End of File ============================
