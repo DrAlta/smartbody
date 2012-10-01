@@ -83,6 +83,7 @@ void SBJointMap::applySkeletonInverse( SmartBody::SBSkeleton* skeleton )
 		std::string from = (*iter).second;
 		channels.changeChannelName(from, to);
 	}
+	skeleton->resetSearchJoint();
 }
 
 void SBJointMap::applySkeleton(SmartBody::SBSkeleton* skeleton)
@@ -118,6 +119,7 @@ void SBJointMap::applySkeleton(SmartBody::SBSkeleton* skeleton)
 		std::string to = (*iter).second;
 		channels.changeChannelName(from, to);
 	}
+	skeleton->resetSearchJoint();
 }
 
 void SBJointMap::setMapping(const std::string& from, const std::string& to)
