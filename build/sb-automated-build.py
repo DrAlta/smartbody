@@ -147,8 +147,42 @@ def cleanBuild():
        print "Build is already running.  Exiting...\n";
        sys.exit()
 
+    # remove the exported build folder on fresh builds
     if os.path.exists("build"):
+        print "--- Removing 'build' folder"
         shutil.rmtree("build", onerror=handleRemoveReadonly)
+
+    # revert modified files, delete unversioned and ignored files when doing incremental builds
+    if os.path.exists("build.sandbox"):
+        print "--- Cleaning build.sandbox folder"
+        if os.name == "nt":
+            p = subprocess.Popen("tortoiseproc /path:build.sandbox /command:cleanup /noui /noprogressui /nodlg /revert /delunversioned /delignored /externals".split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            cleanSandboxOutput = []
+            for line in p.stdout:
+                cleanSandboxOutput.append(line.strip())
+            p.wait()
+        else:
+            # remove unversioned/ignored files
+            # search for the ?, trim the beginning of the line, then call rm on the file/folder
+            p = subprocess.Popen("svn status --no-ignore build.sandbox | grep '^\?' | sed 's/^\?       //'  | xargs -Ixx rm -rf xx", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            cleanSandboxOutput = []
+            for line in p.stdout:
+                cleanSandboxOutput.append(line.strip())
+            p.wait()
+
+            # revert everything in sandbox, doesn't do externals, see http://subversion.tigris.org/issues/show_bug.cgi?id=3824 for future fix
+            p = subprocess.Popen("svn revert -R build.sandbox", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in p.stdout:
+                cleanSandboxOutput.append(line.strip())
+            p.wait()
+
+            # revert everything in externals
+            # search for: Performing status on external item at '...'
+            # trim the beginning up to the first quote, trim the end quote, then call svn revert on the folder
+            p = subprocess.Popen("for i in $(svn status build.sandbox | grep ^Perf | cut -c40-); do echo $i | sed '$s/.$//' | xargs -Ixx svn revert -R xx ; done", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in p.stdout:
+                cleanSandboxOutput.append(line.strip())
+            p.wait()
 
 
 def cleanSandbox():
@@ -171,7 +205,7 @@ def makeDist(distLocation):
     print "Removing source and extra data from: {0}".format(distLocation)
 
 
-def fullBuild(svnPassword, buildSuffix):
+def fullBuild(svnPassword, buildSuffix, doFreshBuild):
 
     """
     This script performs the following tasks:
@@ -200,10 +234,14 @@ def fullBuild(svnPassword, buildSuffix):
     emailReport = True
 
 
+    totalBuildTime = time.time()
+
+
+    cleanTime = time.time()
+
     cleanBuild()
 
-
-    totalBuildTime = time.clock()
+    cleanTime = time.time() - cleanTime
 
 
     # Check to see if a build is already running
@@ -218,11 +256,15 @@ def fullBuild(svnPassword, buildSuffix):
     f.write(time.strftime("%Y-%m-%d %H:%M:%S"))
     f.close()
 
+    if doFreshBuild:
+        f = open("BUILD_FRESH", "w")
+        f.write(time.strftime("%Y-%m-%d %H:%M:%S"))
+        f.close()
 
     # checkout/update build from svn into sandbox
     print "--- Starting build.svn.checkout..."
 
-    buildSvnTime = time.clock()
+    buildSvnTime = time.time()
 
     buildSvnCleanCheckout = False
 
@@ -241,43 +283,52 @@ def fullBuild(svnPassword, buildSuffix):
 
         buildSvnCleanCheckout = True
 
-    buildSvnTime = time.clock() - buildSvnTime
+    buildSvnTime = time.time() - buildSvnTime
 
 
 
-    print "--- Starting build.svn..."
+    print "--- Starting build.export..."
 
-    buildExportTime = time.clock()
+    buildExportTime = time.time()
 
-    p = subprocess.Popen("svn export --non-interactive --username {0} --password {1} build.sandbox build".format(svnUsername, svnPassword).split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    buildSvnExportOutput = []
-    for line in p.stdout:
-        buildSvnExportOutput.append(line.strip())
-    p.wait()
+    if doFreshBuild:
+        p = subprocess.Popen("svn export --non-interactive --username {0} --password {1} build.sandbox build".format(svnUsername, svnPassword).split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        buildSvnExportOutput = []
+        for line in p.stdout:
+            buildSvnExportOutput.append(line.strip())
+        p.wait()
+    else:
+        buildSvnExportOutput = []
 
-    buildExportTime = time.clock() - buildExportTime
+    buildExportTime = time.time() - buildExportTime
 
 
 
     print "--- Starting build.compile..."
 
-    buildCompileTime = time.clock()
+    buildCompileTime = time.time()
 
     currentWorkingDir = os.getcwd()
+
+    if doFreshBuild:
+        buildDir = "build"
+    else:
+        buildDir = "build.sandbox"
+
     p = None
     if os.name == "nt":
-        os.chdir("build")
+        os.chdir(buildDir)
         p = subprocess.Popen("compile-sbm.bat", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     else:
-        p = subprocess.Popen("./sb-compile.sh", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        os.chdir(buildDir)
+        p = subprocess.Popen("./build/sb-compile.sh", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     buildCompileOutput = []
     for line in p.stdout:
         buildCompileOutput.append(line.strip())
     p.wait()
-    if os.name == "nt":
-        os.chdir(currentWorkingDir)
+    os.chdir(currentWorkingDir)
 
-    buildCompileTime = time.clock() - buildCompileTime
+    buildCompileTime = time.time() - buildCompileTime
 
 
 
@@ -317,8 +368,11 @@ def fullBuild(svnPassword, buildSuffix):
     #  ": fatal error "
     #  ": warning: "   # gcc
     #  ": error: "     # gcc
+    #  ": fatal error: "  # gcc
+    #  "make[X]: *** " ... "Error "  # gcc
     #  "make: *** " ... "Error "  # gcc
     #  "CMake Error "  # cmake
+    #  "(beginning of line) "error: " or "warning: "  # xcode
 
     buildCompileErrors = []
     buildCompileWarnings = []
@@ -326,12 +380,16 @@ def fullBuild(svnPassword, buildSuffix):
         if ": error " in line or \
            ": fatal error " in line or \
            ": error: " in line or \
+           ": fatal error: " in line or \
+           (line.startswith("make[") and "Error " in line) or \
            (line.startswith("make: *** ") and "Error " in line) or \
-           "CMake Error " in line:
+           "CMake Error " in line or \
+           line.startswith("error: "):
            buildCompileErrors.append("   " + line)
 
         if ": warning " in line or \
-           ": warning: " in line:
+           ": warning: " in line or \
+           line.startswith("warning: "):
            if ": (not reported) : warning:" not in line:
               buildCompileWarnings.append("   " + line)
 
@@ -353,7 +411,7 @@ def fullBuild(svnPassword, buildSuffix):
 
 
     buildNumber = buildSvnRevision
-    buildFolderName = "Build{0}-{1}{2}{3}".format(buildNumber, buildDate, buildSuffix, "" if buildSuccess else "-failed")
+    buildFolderName = "Build{0}-{1}{2}{3}{4}".format(buildNumber, buildDate, "" if doFreshBuild else "-inc", buildSuffix, "" if buildSuccess else "-failed")
     buildFolder = os.path.join(destinationFolder, buildFolderName)
 
     # check for duplicate destination folder since we're using revision number as build number
@@ -364,7 +422,7 @@ def fullBuild(svnPassword, buildSuffix):
         else:
             buildNumber = str(buildNumber) + "a"
 
-        buildFolderName = "Build{0}-{1}{2}{3}".format(buildNumber, buildDate, buildSuffix, "" if buildSuccess else "-failed")
+        buildFolderName = "Build{0}-{1}{2}{3}{4}".format(buildNumber, buildDate, "" if doFreshBuild else "-inc", buildSuffix, "" if buildSuccess else "-failed")
         buildFolder = os.path.join(destinationFolder, buildFolderName)
 
     print "build: {0}".format(buildNumber)
@@ -372,23 +430,25 @@ def fullBuild(svnPassword, buildSuffix):
     print "buildFolder: {0}".format(buildFolder)
 
 
-    makeDistTime = time.clock()
+    makeDistTime = time.time()
 
     # prune out files that aren't needed
-    distLocation = "build"
-    makeDist(distLocation)
+    if doFreshBuild:
+        distLocation = "build"
+        makeDist(distLocation)
 
-    makeDistTime = time.clock() - makeDistTime
+    makeDistTime = time.time() - makeDistTime
 
 
-    moveTime = time.clock()
+    moveTime = time.time()
 
     # move build to its destination folder
-    print "--- Moving build to folder: {0}".format(buildFolder)
     os.makedirs(buildFolder)
-    shutil.move("build", os.path.join(buildFolder, "smartbody"))
+    if doFreshBuild:
+        print "--- Moving build to folder: {0}".format(buildFolder)
+        shutil.move("build", os.path.join(buildFolder, "vhtoolkit"))
 
-    moveTime = time.clock() - moveTime
+    moveTime = time.time() - moveTime
 
 
     print "--- Starting directory statistics..."
@@ -409,10 +469,11 @@ def fullBuild(svnPassword, buildSuffix):
     print "dirs:  {0}".format(numDirsTotal)
 
 
-    totalBuildTime = time.clock() - totalBuildTime
+    totalBuildTime = time.time() - totalBuildTime
 
 
     totalBuildTime_t   = time.gmtime(totalBuildTime)
+    cleanTime_t        = time.gmtime(cleanTime)
     buildSvnTime_t     = time.gmtime(buildSvnTime)
     buildExportTime_t  = time.gmtime(buildExportTime)
     buildCompileTime_t = time.gmtime(buildCompileTime)
@@ -433,7 +494,7 @@ def fullBuild(svnPassword, buildSuffix):
         emailSubjectPrefix = "[SB-MAC]"
 
     f = open(finalMailFile,"w")
-    f.write("Build #{0}\n".format(buildNumber))
+    f.write("Build #{0} - {1}\n".format(buildNumber, "Fresh Build" if doFreshBuild else "Incremental Build"))
     f.write("\n")
     f.write("Build Summary:\n")
     if buildSuccess:
@@ -455,6 +516,7 @@ def fullBuild(svnPassword, buildSuffix):
     f.write("\n")
     f.write("\n")
     f.write("Build {0} took {1}\n".format(buildNumber, time.strftime("%X", totalBuildTime_t)))
+    f.write("   cleanTime {0}\n".format(time.strftime("%X", cleanTime_t)))
     f.write("   buildSvnTime {0}\n".format(time.strftime("%X", buildSvnTime_t)))
     f.write("   buildExportTime {0}\n".format(time.strftime("%X", buildExportTime_t)))
     f.write("   buildCompileTime {0}\n".format(time.strftime("%X", buildCompileTime_t)))
@@ -528,10 +590,10 @@ def fullBuild(svnPassword, buildSuffix):
 
 
 
-def checkIfTimeForBuild(svnURL, svnUser, svnPassword, minFreeSpaceRequiredForBuildGig, buildDrive, buildOutputFolder, buildSuffix):
+def checkIfTimeForBuild(svnURL, svnUser, svnPassword, minFreeSpaceRequiredForBuildGig, buildDrive, buildOutputFolder, buildSuffix, hoursBetweenFreshBuild):
 
     """
-    This script:
+    This function:
 
     - checks to see if BUILD_RUNNING file exists, exits if so
     - gets the date/time of the last build from BUILD_TIME file
@@ -556,24 +618,39 @@ def checkIfTimeForBuild(svnURL, svnUser, svnPassword, minFreeSpaceRequiredForBui
     else:
         lastBuildDate = "1980-01-01 00:00:01"
 
+    if os.path.exists("BUILD_FRESH"):
+        f = open("BUILD_FRESH","r")
+        lastFreshBuildDate = f.read()
+        f.close()
+    else:
+        lastFreshBuildDate = "1980-01-01 00:00:01"
+
 
     # Get time of last revision from the repository
     lastChangedDate = findSVNInfo( svnURL, svnUser, svnPassword, "Last Changed Date: " )[0:19]
 
     lastBuildDate_t = time.strptime(lastBuildDate, "%Y-%m-%d %H:%M:%S")
+    lastFreshBuildDate_t = time.strptime(lastFreshBuildDate, "%Y-%m-%d %H:%M:%S")
     lastChangedDate_t = time.strptime(lastChangedDate, "%Y-%m-%d %H:%M:%S")
 
 
-    print "Last Build Date:   {0}".format(time.strftime("%c", lastBuildDate_t))
-    print "Last Changed Date: {0}".format(time.strftime("%c", lastChangedDate_t))
-    print "Current Time:      {0}".format(time.strftime("%c", time.localtime()))
+    print "Last Build Date:       {0}".format(time.strftime("%c", lastBuildDate_t))
+    print "Last Fresh Build Date: {0}".format(time.strftime("%c", lastFreshBuildDate_t))
+    print "Last Changed Date:     {0}".format(time.strftime("%c", lastChangedDate_t))
+    print "Current Time:          {0}".format(time.strftime("%c", time.localtime()))
 
 
     # figure out if it's time to run a build
+
+    # if recent commit happened, skip build
+    # if commit is newer than last build, run build
+    # if last fresh build happened longer than wait time, run build and run fresh build
+
     timeToWaitSinceLastCommit    = 5 * 60   # in minutes * 60
     timeSinceLastBuild           = 10       # in seconds
 
     doBuild = False
+    doFreshBuild = False
 
     if time.mktime(time.localtime()) - time.mktime(lastChangedDate_t) < timeToWaitSinceLastCommit:
         print "Too soon since last commit"
@@ -581,44 +658,59 @@ def checkIfTimeForBuild(svnURL, svnUser, svnPassword, minFreeSpaceRequiredForBui
         if time.mktime(lastChangedDate_t) - time.mktime(lastBuildDate_t) > timeSinceLastBuild:
             doBuild = True
         else:
-            print "Too soon since last build"
+            print "Not running Incremental build because there isn't a newer commit"
+
+
+    hoursBetweenFreshBuildSecs = hoursBetweenFreshBuild * 60 * 60;
+
+    if time.mktime(lastChangedDate_t) - time.mktime(lastFreshBuildDate_t) > timeSinceLastBuild:
+        if time.mktime(time.localtime()) - time.mktime(lastFreshBuildDate_t) > hoursBetweenFreshBuildSecs:
+            doBuild = True
+            doFreshBuild = True
+        else:
+            print "Not running Fresh build because not enough time since last Fresh build"
+    else:
+        print "Not running Fresh build because there isn't a newer commit"
 
 
     if not doBuild:
         sys.exit()
 
 
-
-    print "Time to run a new build"
-
-
-    # see how much disk space is left
-    # find all dirs that end with -ci
-    # find lowest build num
-    # delete build
-    # loop until enough space is left
-
-    if os.name == "nt":
-        minFreeSpaceRequiredForBuild = minFreeSpaceRequiredForBuildGig * 1000 * 1000 * 1000;  # ~gigs
-
-        while getFreeSpace(buildDrive) < minFreeSpaceRequiredForBuild:
-            lowestBuildDir = getLowestBuildDir(buildOutputFolder, "ci")
-
-            if lowestBuildDir == "":
-                 print "No CI build dirs found.  Can't delete enough hard disk space.\n"
-                 sys.exit()
-
-            lowestBuildFullPath = os.path.join(buildOutputFolder, lowestBuildDir)
-
-            print "Removing folder {0} to free up disk space".format(lowestBuildFullPath)
-            shutil.rmtree(lowestBuildFullPath, onerror=handleRemoveReadonly)
+    if doFreshBuild:
+        print "Time to run a new Fresh build"
+    else:
+        print "Time to run a new Incremental build"
 
 
-    print "Disk has enough space for build\n";
+    if doFreshBuild:
+        # see how much disk space is left
+        # find all dirs that end with -ci
+        # find lowest build num
+        # delete build
+        # loop until enough space is left
+
+        if os.name == "nt":
+            minFreeSpaceRequiredForBuild = minFreeSpaceRequiredForBuildGig * 1000 * 1000 * 1000;  # ~gigs
+
+            while getFreeSpace(buildDrive) < minFreeSpaceRequiredForBuild:
+                lowestBuildDir = getLowestBuildDir(buildOutputFolder, "ci")
+
+                if lowestBuildDir == "":
+                     print "No CI build dirs found.  Can't delete enough hard disk space.\n"
+                     sys.exit()
+
+                lowestBuildFullPath = os.path.join(buildOutputFolder, lowestBuildDir)
+
+                print "Removing folder {0} to free up disk space".format(lowestBuildFullPath)
+                shutil.rmtree(lowestBuildFullPath, onerror=handleRemoveReadonly)
+
+
+        print "Disk has enough space for build"
 
 
     # start the build
-    fullBuild(svnPassword, buildSuffix)
+    fullBuild(svnPassword, buildSuffix, doFreshBuild)
 
 
 def printUsage():
@@ -654,7 +746,7 @@ else:
         if len(sys.argv) > 3:
             buildSuffix = sys.argv[3]
 
-        fullBuild(svnPassword, buildSuffix)
+        fullBuild(svnPassword, buildSuffix, True)
 
     elif sys.argv[1] == "cleansandbox":
         cleanSandbox()
@@ -666,6 +758,7 @@ else:
         buildDrive = sys.argv[6]
         buildOutputFolder = sys.argv[7]
         buildSuffix = sys.argv[8]
-        checkIfTimeForBuild(svnURL, svnUser, svnPassword, minFreeSpaceRequiredForBuildGig, buildDrive, buildOutputFolder, buildSuffix)
+        hoursBetweenFreshBuild = int(sys.argv[9])
+        checkIfTimeForBuild(svnURL, svnUser, svnPassword, minFreeSpaceRequiredForBuildGig, buildDrive, buildOutputFolder, buildSuffix, hoursBetweenFreshBuild)
     else:
         printUsage()
