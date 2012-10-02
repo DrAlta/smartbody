@@ -17,3 +17,9 @@ behav.setScript("BehaviorSetGestures.py")
 
 behav = behaviorSetManager.createBehaviorSet("Jumping")
 behav.setScript("BehaviorSetJumping.py")
+
+behav = behaviorSetManager.createBehaviorSet("Kicking")
+behav.setScript("BehaviorSetKicking.py")
+
+behav = behaviorSetManager.createBehaviorSet("Punching")
+behav.setScript("BehaviorSetPunching.py")
