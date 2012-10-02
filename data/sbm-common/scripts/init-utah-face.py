@@ -40,4 +40,14 @@ utahFace.setViseme("Z", "utah_z")
 utahFace.setViseme("BMP", "utah_bmp")
 utahFace.setViseme("blink", "utah_045_blink")
 
+utahFace.setViseme("FV", "utah_f")
+utahFace.setViseme("open", "utah_kg")
+utahFace.setViseme("PBM", "utah_bmp")
+utahFace.setViseme("ShCh", "utah_er")
+utahFace.setViseme("W", "utah_oo")
+utahFace.setViseme("Wide", "utah_ee")
+#utahFace.setViseme("tBack", "")
+#utahFace.setViseme("tRoof", "")
+#utahFace.setViseme("tTeeth", "")
+
 
