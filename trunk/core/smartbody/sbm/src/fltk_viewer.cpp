@@ -1113,8 +1113,7 @@ void FltkViewer::updateLights()
 	
 	if (_lights.size() == 0)
 	{
-		SrLight light;
-		light.directional = false;
+		SrLight light;		
 		light.directional = true;
 		light.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
 		light.position = SrVec( 100.0, 250.0, 400.0 );
@@ -1123,9 +1122,9 @@ void FltkViewer::updateLights()
 		_lights.push_back(light);
 
 		SrLight light2 = light;
-		light2.directional = false;
-		light2.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
-		light2.position = SrVec( 100.0, 500.0, -200.0 );
+		light2.directional = true;
+		light2.diffuse = SrColor( 0.8f, 0.8f, 0.8f );
+		light2.position = SrVec( 100.0, 500.0, -1000.0 );
 	//	light2.constant_attenuation = 1.0f;
 	//	light2.linear_attenuation = 2.0f;
 		_lights.push_back(light2);
@@ -1243,7 +1242,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 #if USE_OGRE_VIEWER  < 1 // ogre will draw its own floor
 	static GLfloat mat_emissin[] = { 0.f,  0.f,    0.f,    1.f };
 	static GLfloat mat_ambient[] = { 0.f,  0.f,    0.f,    1.f };
-	static GLfloat mat_diffuse[] = { 0.8f,  0.8f,    0.8f,    1.f };
+	static GLfloat mat_diffuse[] = { 0.5f,  0.5f,    0.5f,    1.f };
 	static GLfloat mat_speclar[] = { 0.f,  0.f,    0.f,    1.f }; 
 	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin );
 	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient );

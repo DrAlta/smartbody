@@ -249,9 +249,9 @@ bool SbmShaderManager::initGLExtension()
 // 		return true;
 // 	}
 //     else 
-	if (glewIsSupported("GL_VERSION_2_0") )
+	if (glewIsSupported("GL_VERSION_2_0") || glewIsSupported("GL_VERSION_3_0"))
 	{
-		LOG("Ready for OpenGL 2.0, but not for OpenGL 3.0.\n");
+		LOG("Ready for OpenGL 2.0.\n");
 		shaderInit = true; 
 		shaderSupport = SUPPORT_OPENGL_2_0;
 		return true;
