@@ -81,6 +81,7 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	setSteerParamsDirty(true);
 	initSteerParams();
 	_curFrame = 0;
+	currentTargetSpeed = 1.5f;
 }
 
 SteeringAgent::~SteeringAgent()
@@ -554,10 +555,13 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 		//SrVec targetPos = steerPath.closestPointOnPath(SrVec(x,0,z),pathDir,pathDist);
 		float distOnPath = steerPath.pathDistance(targetPos);
 		float sceneScale = 1.f/SmartBody::SBScene::getScene()->getScale();
+		//LOG("pathfollowing:targetSpeed = %f",this->currentTargetSpeed);
 		float maxSpeed = this->currentTargetSpeed*sceneScale;//(float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
 		nextPtOnPath = steerPath.pathPoint(distOnPath+maxSpeed);		
 		float targetAngle = radToDeg(atan2(nextPtOnPath.x - x, nextPtOnPath.z - z));
 		normalizeAngle(targetAngle);
+		//LOG("nextPtOnPath = %f %f, curePt = %f %f",nextPtOnPath.x,nextPtOnPath.z, x,z);
+		//LOG("path following:normalize target angle = %f",targetAngle);
 		normalizeAngle(yaw);
 		float diff = targetAngle - yaw;
 		normalizeAngle(diff);
@@ -1178,6 +1182,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		// check to see if there's anything obstacles around it
 		float targetAngle = radToDeg(atan2(pprAgent->getStartTargetPosition().x - x * scene->getScale(), pprAgent->getStartTargetPosition().z - z * scene->getScale()));
 		normalizeAngle(targetAngle);
+		LOG("steering:normalize target angle = %f",targetAngle);
 		normalizeAngle(yaw);
 		float diff = targetAngle - yaw;
 		normalizeAngle(diff);
