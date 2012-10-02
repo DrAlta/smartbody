@@ -1102,10 +1102,103 @@ void FltkViewer::updateLights()
 		{
 			SmartBody::SBPawn* sbpawn = dynamic_cast<SmartBody::SBPawn*>(pawn);
 			SrLight light;
-			light.directional = true;
-			light.diffuse = SrColor( 1.0f, 0.95f, 0.8f );
 			light.position = sbpawn->getPosition();
-			light.constant_attenuation = 1.0f;
+			SmartBody::BoolAttribute* directionalAttr = dynamic_cast<BoolAttribute*>(sbpawn->getAttribute("lightIsDirectional"));
+			if (directionalAttr)
+			{
+				light.directional = directionalAttr->getValue();
+			}
+			else
+			{
+				light.directional = true;
+			}
+			
+			SmartBody::Vec3Attribute* diffuseColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightDiffuseColor"));
+			if (diffuseColorAttr)
+			{
+				const SrVec& color = diffuseColorAttr->getValue();
+				light.diffuse = SrColor( color.x, color.y, color.z );
+			}
+			else
+			{
+				light.diffuse = SrColor( 1.0f, 0.95f, 0.8f );
+			}
+			SmartBody::Vec3Attribute* ambientColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightAmbientColor"));
+			if (ambientColorAttr)
+			{
+				const SrVec& color = ambientColorAttr->getValue();
+				light.ambient = SrColor( color.x, color.y, color.z );
+			}
+			else
+			{
+				light.diffuse = SrColor( 0.0f, 0.0f, 0.0f );
+			}
+			SmartBody::Vec3Attribute* specularColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightSpecularColor"));
+			if (specularColorAttr)
+			{
+				const SrVec& color = specularColorAttr->getValue();
+				light.specular = SrColor( color.x, color.y, color.z );
+			}
+			else
+			{
+				light.specular = SrColor( 0.0f, 0.0f, 0.0f );
+			}
+			SmartBody::DoubleAttribute* spotExponentAttr = dynamic_cast<SmartBody::DoubleAttribute*>(sbpawn->getAttribute("lightSpotExponent"));
+			if (spotExponentAttr)
+			{
+				light.spot_exponent = (float) spotExponentAttr->getValue();
+			}
+			else
+			{
+				light.spot_exponent = 0.0f;
+			}
+			SmartBody::Vec3Attribute* spotDirectionAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightSpotDirection"));
+			if (spotDirectionAttr)
+			{
+				const SrVec& direction = spotDirectionAttr->getValue();
+				light.spot_direction = direction;
+			}
+			else
+			{
+				light.spot_direction = SrVec( 0.0f, 0.0f, -1.0f );
+			}
+			SmartBody::DoubleAttribute* spotCutOffAttr = dynamic_cast<SmartBody::DoubleAttribute*>(sbpawn->getAttribute("lightSpotCutoff"));
+			if (spotExponentAttr)
+			{
+				light.spot_cutoff = (float) spotCutOffAttr->getValue();
+			}
+			else
+			{
+				light.spot_cutoff = 180.0f;
+			}
+			SmartBody::DoubleAttribute* constantAttentuationAttr = dynamic_cast<SmartBody::DoubleAttribute*>(sbpawn->getAttribute("lightConstantAttenuation"));
+			if (constantAttentuationAttr)
+			{
+				light.constant_attenuation = (float) constantAttentuationAttr->getValue();
+			}
+			else
+			{
+				light.constant_attenuation = 1.0f;
+			}
+			SmartBody::DoubleAttribute* linearAttentuationAttr = dynamic_cast<SmartBody::DoubleAttribute*>(sbpawn->getAttribute("lightLinearAttenuation"));
+			if (linearAttentuationAttr)
+			{
+				light.linear_attenuation = (float) linearAttentuationAttr->getValue();
+			}
+			else
+			{
+				light.linear_attenuation = 0.0f;
+			}
+			SmartBody::DoubleAttribute* quadraticAttentuationAttr = dynamic_cast<SmartBody::DoubleAttribute*>(sbpawn->getAttribute("lightQuadraticAttenuation"));
+			if (quadraticAttentuationAttr)
+			{
+				light.quadratic_attenuation = (float) quadraticAttentuationAttr->getValue();
+			}
+			else
+			{
+				light.quadratic_attenuation = 0.0f;
+			}
+			
 			_lights.push_back(light);
 		}
 	}

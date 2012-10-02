@@ -196,6 +196,8 @@ void SkScene::update ( int j )
    if ( !_skeleton ) return;
    SkJoint* joint = _skeleton->joints()[j];
    joint->update_lmat();
+   if (_jgroup.size() <= j) 
+	   return; // workaround for size mismatch between _jgroup and joints() size
    SrSnMatrix* mat =  ((SrSnMatrix*)_jgroup[j]->get(MatrixPos));
    if (mat)  mat->set ( joint->lmat() );
  }
