@@ -446,7 +446,7 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
     os.makedirs(buildFolder)
     if doFreshBuild:
         print "--- Moving build to folder: {0}".format(buildFolder)
-        shutil.move("build", os.path.join(buildFolder, "vhtoolkit"))
+        shutil.move("build", os.path.join(buildFolder, "smartbody"))
 
     moveTime = time.time() - moveTime
 
