@@ -331,12 +331,6 @@ void MeCtGaze::init( SbmPawn* pawn, int key_fr, int key_to )	{
 	if( key_fr > key_to )	{
 		int tmp = key_fr; key_fr = key_to; key_to = tmp;
 	}
-	if (key_to == GAZE_KEY_EYES)
-	{
-		// no eye ball joints, select neck instead
-		if (!pawn->get_joint(joint_label(GAZE_JOINT_EYE_R)) && !pawn->get_joint(joint_label(GAZE_JOINT_EYE_L)))
-			key_to = GAZE_KEY_HEAD;
-	}
 
 	key_min = key_fr;
 	key_max = key_to;
@@ -344,6 +338,14 @@ void MeCtGaze::init( SbmPawn* pawn, int key_fr, int key_to )	{
 	// Activate joints based on key range
 	int joint_fr = joint_key_map[ key_fr ];
 	int joint_to = joint_key_map[ key_to ];
+
+	if (key_to == GAZE_KEY_EYES)
+	{
+		// no eye ball joints, select neck instead
+		if (!pawn->get_joint(joint_label(GAZE_JOINT_EYE_R)) && !pawn->get_joint(joint_label(GAZE_JOINT_EYE_L)))
+			joint_to = GAZE_JOINT_SKULL;
+	}
+
 	for( i = joint_fr; i <= joint_to; i++ )	{
 		joint_arr[ i ].active = 1;
 	}
@@ -403,15 +405,15 @@ void MeCtGaze::init( SbmPawn* pawn, int key_fr, int key_to )	{
 	if (pawn->getAttribute("gaze.limitPitchUpChest") != NULL)
 		limitPitchUp = (float) pawn->getDoubleAttribute("gaze.limitPitchUpChest");
 	else
-		limitPitchUp = DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_BACK];
+		limitPitchUp = DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_CHEST];
 	if (pawn->getAttribute("gaze.limitPitchDownChest") != NULL)
 		limitPitchDown = (float) pawn->getDoubleAttribute("gaze.limitPitchDownChest");
 	else
-		limitPitchDown = DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_BACK];
+		limitPitchDown = DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_CHEST];
 	if (pawn->getAttribute("gaze.limitHeadingChest") != NULL)
 		limitHeading = (float) pawn->getDoubleAttribute("gaze.limitHeadingChest");
 	else
-		limitHeading = DEFAULT_LIMIT_HEADING[GAZE_KEY_BACK];
+		limitHeading = DEFAULT_LIMIT_HEADING[GAZE_KEY_CHEST];
 	if (pawn->getAttribute("gaze.limitRollChest") != NULL)
 		limitRoll = (float) pawn->getDoubleAttribute("gaze.limitRollChest");
 	else
@@ -427,15 +429,15 @@ void MeCtGaze::init( SbmPawn* pawn, int key_fr, int key_to )	{
 	if (pawn->getAttribute("gaze.limitPitchUpNeck") != NULL)
 		limitPitchUp = (float) pawn->getDoubleAttribute("gaze.limitPitchUpNeck");
 	else
-		limitPitchUp = DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_BACK];
+		limitPitchUp = DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_NECK];
 	if (pawn->getAttribute("gaze.limitPitchDownNeck") != NULL)
 		limitPitchDown = (float) pawn->getDoubleAttribute("gaze.limitPitchDownNeck");
 	else
-		limitPitchDown = DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_BACK];
+		limitPitchDown = DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_NECK];
 	if (pawn->getAttribute("gaze.limitHeadingNeck") != NULL)
 		limitHeading = (float) pawn->getDoubleAttribute("gaze.limitHeadingNeck");
 	else
-		limitHeading = DEFAULT_LIMIT_HEADING[GAZE_KEY_BACK];
+		limitHeading = DEFAULT_LIMIT_HEADING[GAZE_KEY_NECK];
 	if (pawn->getAttribute("gaze.limitRollNeck") != NULL)
 		limitRoll = (float) pawn->getDoubleAttribute("gaze.limitRollNeck");
 	else
@@ -458,19 +460,19 @@ void MeCtGaze::init( SbmPawn* pawn, int key_fr, int key_to )	{
 	if (pawn->getAttribute("gaze.limitPitchUpEyes") != NULL)
 		limitPitchUp = (float) pawn->getDoubleAttribute("gaze.limitPitchUpEyes");
 	else
-		limitPitchUp = DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_BACK];
+		limitPitchUp = DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_EYES];
 	if (pawn->getAttribute("gaze.limitPitchDownEyes") != NULL)
 		limitPitchDown = (float) pawn->getDoubleAttribute("gaze.limitPitchDownEyes");
 	else
-		limitPitchDown = DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_BACK];
+		limitPitchDown = DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_EYES];
 	if (pawn->getAttribute("gaze.limitHeadingEyes") != NULL)
 		limitHeading = (float) pawn->getDoubleAttribute("gaze.limitHeadingEyes");
 	else
-		limitHeading = DEFAULT_LIMIT_HEADING[GAZE_KEY_BACK];
+		limitHeading = DEFAULT_LIMIT_HEADING[GAZE_KEY_EYES];
 	if (pawn->getAttribute("gaze.limitRollEyes") != NULL)
 		limitRoll = (float) pawn->getDoubleAttribute("gaze.limitRollEyes");
 	else
-		limitRoll = DEFAULT_LIMIT_ROLL[GAZE_KEY_NECK];
+		limitRoll = DEFAULT_LIMIT_ROLL[GAZE_KEY_EYES];
 
 	set_limit( GAZE_KEY_EYES,   limitPitchUp,
 								limitPitchDown,
@@ -878,12 +880,20 @@ printf( "s1: %f\n", joint_arr[ GAZE_JOINT_SPINE1 ].local_pos.y() );
 			0.5, joint_arr[ GAZE_JOINT_EYE_R ].world_zero_pos 
 		) +
 		vector_t( 0.0, 0.0, interocular.length()); // NOTE: PRESUMES 5CM SCALE...
+	
+	//LOG("before ,  interocular length = %f, skull pos = %f %f %f, mideye pos = %f %f %f", interocular.length(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.x(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.y(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.z(), world_mid_eye_pos.x(), world_mid_eye_pos.y(), world_mid_eye_pos.z() );
+
 
 	if (!joint_arr[GAZE_JOINT_EYE_L].active && !joint_arr[GAZE_JOINT_EYE_R].active && skeleton_ref_p) // no eye joints
 	{		
-		double forwardLen = skeleton_ref_p->getCurrentHeight()*0.08;		
-		world_mid_eye_pos = joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos + vector_t(0.0,forwardLen*2.0, forwardLen);
+		double forwardLen = skeleton_ref_p->getCurrentHeight()*0.03;		
+		world_mid_eye_pos = joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos + vector_t(0.0,forwardLen*2.0, forwardLen*3.0);
+		//LOG("has skeleton ref, forward len = %f, skull pos = %f %f %f, mideye pos = %f %f %f",forwardLen, joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.x(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.y(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.z(), world_mid_eye_pos.x(), world_mid_eye_pos.y(), world_mid_eye_pos.z() );
 	}	
+	else
+	{
+		//LOG("no skeleton ref");
+	}
 
 	//printf( "eyes:\n" );
 	//world_mid_eye_pos.print();
