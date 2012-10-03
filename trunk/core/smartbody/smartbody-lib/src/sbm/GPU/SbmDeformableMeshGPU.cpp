@@ -153,7 +153,7 @@ lightDir[1] = normalize(( vec4(posDir,0.0)).xyz);\n\
 halfVector[1] = normalize((vec4(gl_LightSource[1].halfVector.xyz,0.0)).xyz);\n\
 int colorIdx = int(gl_Vertex.w); \n\
 gl_TexCoord[0] = gl_MultiTexCoord0;\n\
-normal = normalize(gl_NormalMatrix * skin[1].xyz);\n\
+normal = normalize(gl_NormalMatrix * gl_Normal);\n\
 tv     = normalize(gl_NormalMatrix * tangent.xyz);\n\
 bv     = normalize(gl_NormalMatrix * binormal.xyz);\n\
 }\n";
