@@ -9,7 +9,7 @@ namespace SmartBody {
 
 class SBSubject;
 class SBJoint;
-class SBCharacter;
+class SBPawn;
 
 class SBSkeleton : public SkSkeleton
 {
@@ -32,7 +32,7 @@ public:
 	std::string getChannelType(int index);
 	int getChannelSize(int index);
 
-	SBCharacter* getCharacter();
+	SBPawn* getPawn();
 
 	void rescale(float scaleRatio);
 	void update();

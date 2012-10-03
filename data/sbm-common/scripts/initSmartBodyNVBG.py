@@ -162,7 +162,7 @@ class SmartBodyNVBG(Nvbg):
                                                 self.nvbg.set_feedback_msgId(character, msgId)
                 return True
 
-	def objectEvent(self, character, name, isAnimate, position, velocity, relativePosition, relativeVelocity):
+	def objectEvent(self, character, name, isAnimate, cP, cV, position, velocity, relativePosition, relativeVelocity):
                 """
                 Necessary
                 Override the C++ objectEvent function
@@ -171,7 +171,7 @@ class SmartBodyNVBG(Nvbg):
                 if hasattr(self, 'nvbg') is False:
                         return
                 
-		bmlstr = self.nvbg.process_events(character, name, isAnimate, position, velocity, relativePosition, relativeVelocity)
+		bmlstr = self.nvbg.process_events(character, name, isAnimate, cP, cV, position, velocity, relativePosition, relativeVelocity)
 		if (len(bmlstr) != 0):
 			bml.execXML(character, str(bmlstr))
                 return

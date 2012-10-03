@@ -42,21 +42,21 @@
 
 struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 {
-	virtual void objectEvent(std::string character, std::string name, bool isAnimate, SrVec position, SrVec velocity, SrVec relativePosition, SrVec relativeVelocity)
+	virtual void objectEvent(std::string character, std::string name, bool isAnimate, SrVec charPosition, SrVec charVelocity, SrVec objPosition, SrVec objVelocity, SrVec relativePosition, SrVec relativeVelocity)
 	{
 		if (boost::python::override o = this->get_override("objectEvent"))
 		{
 			try {
-				o(character, name, isAnimate, position, velocity, relativePosition, relativeVelocity);
+				o(character, name, isAnimate, charPosition, charVelocity, objPosition, objVelocity, relativePosition, relativeVelocity);
 			} catch (...) {
 				PyErr_Print();
 			}
 		}
 	}
 
-	void default_objectEvent(std::string character, std::string name, bool isAnimate, SrVec position, SrVec velocity, SrVec relativePosition, SrVec relativeVelocity)
+	void default_objectEvent(std::string character, std::string name, bool isAnimate, SrVec charPosition, SrVec charVelocity, SrVec objPosition, SrVec objVelocity, SrVec relativePosition, SrVec relativeVelocity)
 	{
-		return Nvbg::objectEvent(character, name, isAnimate, position, velocity, relativePosition, relativeVelocity);
+		return Nvbg::objectEvent(character, name, isAnimate, charPosition, charVelocity, objPosition, objVelocity, relativePosition, relativeVelocity);
 	}
 
 	virtual bool execute(std::string character, std::string to, std::string messageId, std::string xml)
@@ -792,10 +792,13 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("printInfo", &Camera::printInfo, "Prints all the camera statistics. ")
 		.def("reset", &Camera::reset, "Reset camera with camera eye (0 166 185), camera center (0 92 0). ")
 		.def("setEye", &Camera::setEye, "Set camera eye position. \n Input: camera eye position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
+		.def("getEye", &Camera::getEye, "Get camera eye position.")
 		.def("setCenter", &Camera::setCenter, "Set camera center. \n Input: camera center position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
+		.def("getCenter", &Camera::getCenter, "Get camera center.")
 		.def("setScale", &Camera::setScale, "Set camera scale. \n camera scale: NULL \n Output: NULL")
+		.def("getScale", &Camera::getScale, "Get camera scale.")
 		.def("setTrack", &Camera::setTrack, "Set camera track. \n Input: character name, joint name \n Output: NULL")
-		.def("removeTrack", &Camera::removeTrack, "Remove camera track. ")
+		.def("removeTrack", &Camera::removeTrack, "Remove camera track.")
 		.def("loadCamera", &Camera::loadCamera, "load Camera from file \n Input: camera file (*.cam) \n Output: NULL ")
 		.def("saveCamera", &Camera::saveCamera, "save Camera to file \n Input: camera file (*.cam) \n Output: NULL ")
 		;

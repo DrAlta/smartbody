@@ -5,16 +5,24 @@
 
 MiniBrain::MiniBrain()
 {
+	_cacheLimit = 5;
 }
 
 MiniBrain::~MiniBrain()
 {
 }
 
+
+int minibrainCounter = 0;
+
 void MiniBrain::update(SbmCharacter* character, double time, double dt)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
+	if (minibrainCounter < 300)
+	{
+		minibrainCounter ++;
+		return;
+	}
 	SrVec myVelocity;
 	SrVec myPosition;
 	float mySpeed = 0.0f;
@@ -61,7 +69,19 @@ void MiniBrain::update(SbmCharacter* character, double time, double dt)
 			}
 			
 			data.velocity = (curPosition - data.position) / (float) dt;
-			data.position = curPosition;
+			if ((int)data.cachePositions.size() > _cacheLimit)
+				data.cachePositions.pop_front();
+			data.cachePositions.push_back(curPosition);
+			SrVec temp;
+			for (	std::list<SrVec>::iterator iter = data.cachePositions.begin();
+					iter != data.cachePositions.end();
+					iter++)
+			{
+				temp += (*iter);
+			}
+			data.position = temp / float(data.cachePositions.size());
+
+			//data.position = curPosition;
 			if (curCharacter && curCharacter == character)
 			{
 				myVelocity = data.velocity;
@@ -90,6 +110,9 @@ void MiniBrain::update(SbmCharacter* character, double time, double dt)
 			}
 			data.velocity = SrVec();
 			data.position = curPosition;
+			if ((int)data.cachePositions.size() > _cacheLimit)
+				data.cachePositions.pop_front();
+			data.cachePositions.push_back(curPosition);
 			data.startGazeTime = -1;
 			_data.insert(std::pair<std::string, ObjectData>(pawn->getName(), data));
 		}
@@ -135,7 +158,7 @@ void MiniBrain::update(SbmCharacter* character, double time, double dt)
 		{
 			const std::string& pawnName = (*piter).first;
 			ObjectData& data = (*piter).second;
-			nvbg->objectEvent(character->getName(), pawnName, data.isAnimate, data.position, data.velocity, data.relativePosition, data.relativeVelocity);
+			nvbg->objectEvent(character->getName(), pawnName, data.isAnimate, myPosition, myVelocity, data.position, data.velocity, data.relativePosition, data.relativeVelocity);
 		}
 	}
 	else // simple functionality - look at things that move quickly

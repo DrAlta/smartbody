@@ -1643,9 +1643,19 @@ void GazeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		if (gazeCt)
 		{
 			if (gazeFadeMode == 0)
-				gazeCt->set_fade_out_scheduled(gazeFadeInterval, timeOffset);
+			{
+				if (fabs(timeOffset) > gwiz::epsilon10())
+					gazeCt->set_fade_out_scheduled(gazeFadeInterval, timeOffset);
+				else if (!gazeCt->isFadingOut())
+					gazeCt->set_fade_out(gazeFadeInterval);
+			}
 			if (gazeFadeMode == 1)
-				gazeCt->set_fade_in_scheduled(gazeFadeInterval, timeOffset);
+			{
+				if (fabs(timeOffset) > gwiz::epsilon10())
+					gazeCt->set_fade_in_scheduled(gazeFadeInterval, timeOffset);
+				else if (!gazeCt->isFadingIn())
+					gazeCt->set_fade_in(gazeFadeInterval);
+			}
 		}
 	}
 	else

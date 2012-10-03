@@ -55,6 +55,16 @@ void Camera::setEye(float x, float y, float z)
 	mcu.viewer_p->set_camera(*mcu.camera_p);
 }
 
+SrVec Camera::getEye()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SrVec ret;
+	ret.x = mcu.viewer_p->get_camera()->eye.x;
+	ret.y = mcu.viewer_p->get_camera()->eye.y;
+	ret.z = mcu.viewer_p->get_camera()->eye.z;
+	return ret;
+}
+
 void Camera::setCenter(float x, float y, float z)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -64,11 +74,27 @@ void Camera::setCenter(float x, float y, float z)
 	mcu.viewer_p->set_camera(*mcu.camera_p);
 }
 
+SrVec Camera::getCenter()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SrVec ret;
+	ret.x = mcu.viewer_p->get_camera()->center.x;
+	ret.y = mcu.viewer_p->get_camera()->center.y;
+	ret.z = mcu.viewer_p->get_camera()->center.z;
+	return ret;
+}
+
 void Camera::setScale(float s)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.camera_p->scale = s;
 	mcu.viewer_p->set_camera(*mcu.camera_p);
+}
+
+float Camera::getScale()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	return mcu.viewer_p->get_camera()->scale;
 }
 
 void Camera::reset()
