@@ -1,6 +1,6 @@
 #include "SBSkeleton.h"
 #include "SBJoint.h"
-#include "SBCharacter.h"
+#include "SBPawn.h"
 #include "SBAttribute.h"
 #include <sbm/mcontrol_util.h>
 
@@ -194,20 +194,19 @@ int SBSkeleton::getChannelSize(int index)
 
 }
 
-SBCharacter* SBSkeleton::getCharacter()
+SBPawn* SBSkeleton::getPawn()
 {
 	// determine which character uses this skeleton
 	// NOTE: there should be back pointer between the skeleton and the pawn/character
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		 iter != mcu.getCharacterMap().end();
+	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+		 iter != mcu.getPawnMap().end();
 		 iter++)
 	{
-		SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>((*iter).second);
-		if (character->getSkeleton() == this)
-			return character;
-	
+			SBPawn* pawn = dynamic_cast<SBPawn*>((*iter).second);
+			if (pawn->getSkeleton() == this)
+				return pawn;
 	}
 
 	return NULL;
@@ -218,7 +217,8 @@ void SBSkeleton::update()
 	refresh_joints();
 	make_active_channels();
 		
-	SBCharacter* character = getCharacter();
+	SBPawn* pawn = getPawn();
+	SBCharacter* character = dynamic_cast<SBCharacter*>(pawn);
 	if (character)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();

@@ -441,26 +441,18 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 				if (joint)
 				{
 					SkSkeleton* skeleton = joint->skeleton();
-					// who's skeleton is this? Very inefficient!
-					std::map<std::string, SbmPawn*>& pawns = mcu.getPawnMap();
-					for (std::map<std::string, SbmPawn*>::iterator iter = pawns.begin();
-						iter != pawns.end();
-						iter++)
-					{
-						SbmPawn* pawn = (*iter).second;
-						if (pawn->getSkeleton() == skeleton)
-						{
-							GazeBehavior* gazeBehavior = new GazeBehavior();
-							gazeBehavior->setGazeTarget(pawn->getName());
-							gazeBehavior->setFadingIn(gazeCt->isFadingIn());
-							gazeBehavior->setFadingOut(gazeCt->isFadingOut());
-							gazeBehavior->setFadedOut(gazeCt->isFadedOut());
-							gazeBehavior->setHandle(gazeCt->handle());
+					SBSkeleton* sbSkel = dynamic_cast<SBSkeleton*> (skeleton);
+					SBPawn* sbPawn = sbSkel->getPawn();
+					
+					GazeBehavior* gazeBehavior = new GazeBehavior();
+					gazeBehavior->setGazeTarget(sbPawn->getName());
+					gazeBehavior->setFadingIn(gazeCt->isFadingIn());
+					gazeBehavior->setFadingOut(gazeCt->isFadingOut());
+					gazeBehavior->setFadedOut(gazeCt->isFadedOut());
+					gazeBehavior->setHandle(gazeCt->handle());
 
-							_curBehaviors.push_back(gazeBehavior);
-							break;
-						}
-					}
+					_curBehaviors.push_back(gazeBehavior);
+					break;
 				}
 			}
 		}

@@ -10,7 +10,7 @@ Nvbg::~Nvbg()
 {
 }
 
-void Nvbg::objectEvent(std::string character, std::string name, bool isAnimate, SrVec position, SrVec velocity, SrVec relativePosition, SrVec relativeVelocity)
+void Nvbg::objectEvent(std::string character, std::string name, bool isAnimate, SrVec charPosition, SrVec charVelocity, SrVec objPosition, SrVec objVelocity, SrVec relativePosition, SrVec relativeVelocity)
 {
 	LOG("Object event for %s from %s", character.c_str(), name.c_str());
 }

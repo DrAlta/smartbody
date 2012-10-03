@@ -118,8 +118,11 @@ class Camera
 		void setDefault(int preset = 1);
 
 		void setEye(float x = 0.0, float y = 0.0, float z = 0.0);
+		SrVec getEye();
 		void setCenter(float x = 0.0, float y = 0.0, float z = 0.0);
+		SrVec getCenter();
 		void setScale(float s = 1.0);
+		float getScale();
 
 		void setTrack(std::string cName, std::string jName);
 		void removeTrack();

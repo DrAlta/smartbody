@@ -1279,6 +1279,7 @@ bool MeCtGaze::update_fading( float dt )	{
 					}
 					fading_normal = 0.0f;
 					fading_complete = true;
+					fading_mode = FADING_MODE_OFF;
 //					LOG( "MeCtGaze::update_fading ZERO WEIGHT" );
 				}
 			}
