@@ -38,9 +38,13 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_inputPlayTime = new Fl_Input(630, 460, 60, 30, "");
 	_inputPlayTime->value("0");
 
-	_buttonPlayDialog = new Fl_Button(40, 500, 65, 30, "Speak");
+	_buttonPlayDialog = new Fl_Button(40, 500, 70, 30, "Speak");
 	_buttonPlayDialog->callback(OnPlayDialogCB, this);
 	_inputUtterance = new Fl_Input(115, 500, 435, 30);
+
+	_buttonPlayAudioFile = new Fl_Button(40, 535, 70, 30, "Play Audio");
+	_buttonPlayAudioFile->callback(OnPlayAudioFileCB, this);
+	_inputAudioFile = new Fl_Input(115, 535, 435, 30);
 
 	_choiceCharacter = new Fl_Choice(70, 35, 100, 25, "Character");
 	_choiceCharacter->callback(OnCharacterSelectCB, this);
@@ -87,7 +91,13 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 
 	this->end();
 
+	_inputAudioFile->deactivate();
+	_buttonPlayAudioFile->deactivate();
+	_inputUtterance->deactivate();
+	_buttonPlayDialog->deactivate();
+
 	_gatherStats = false;
+	_useRemote = true;
 
 	loadData();
 }
@@ -108,6 +118,28 @@ void VisemeViewerWindow::hide()
 	Fl_Double_Window::hide();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.bml_processor.registerRequestCallback(NULL, NULL);
+}
+
+void VisemeViewerWindow::update()
+{
+	const std::string& charName = this->getCurrentCharacterName();
+	if (charName == "")
+		return;
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SBCharacter* character = mcu._scene->getCharacter(charName);
+	if (!character)
+		return;
+
+	const std::string& voice = character->getVoice();
+	if (voice == "audiofile" && _useRemote)
+	{
+		setUseRemote(false);
+	}
+	if (voice == "remote" && !_useRemote)
+	{
+		setUseRemote(true);
+	}
 }
 
 
@@ -503,6 +535,9 @@ void VisemeViewerWindow::OnCharacterSelectCB(Fl_Widget* widget, void* data)
 
 	SmartBody::SBCharacter* character = viewer->getCurrentCharacter();
 
+	if (!character)
+		return;
+
 	SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
 	if (faceDefinition)
 	{
@@ -572,8 +607,18 @@ void VisemeViewerWindow::OnPlayDialogCB(Fl_Widget* widget, void* data)
 		strstr << "python bml.execBML('" << viewer->getCurrentCharacterName() << "', '<speech type=\"text/plain\">" << utteranceClean << "</speech>')";
 		SmartBody::SBScene::getScene()->command(strstr.str());
 	}
+}
 
-	
+void VisemeViewerWindow::OnPlayAudioFileCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+	std::string fileName = viewer->_inputAudioFile->value();
+	if (fileName != "")
+	{
+		std::stringstream strstr;
+		strstr << "python bml.execBML('" << viewer->getCurrentCharacterName() << "', '<speech type=\"text/plain\" ref=\"" << fileName << "\">" << "</speech>')";
+		SmartBody::SBScene::getScene()->command(strstr.str());
+	}
 }
 
 void VisemeViewerWindow::OnSaveCB(Fl_Widget* widget, void* data)
@@ -627,7 +672,7 @@ void VisemeViewerWindow::OnBmlRequestCB(BML::BmlRequest* request, void* data)
 
 	std::string utterance = viewer->_inputUtterance->value(); 	
 
-	if(utterance == viewer->_lastUtterance)
+	if(utterance == viewer->_lastUtterance && viewer->_useRemote)
 		return;
 
 	BML::VecOfBehaviorRequest b = request->behaviors;
@@ -751,6 +796,30 @@ void VisemeViewerWindow::enforceNamingConvention(char * c_str)
 		if(isupper(c_str[k]))
 			c_str[k] = ::tolower(c_str[k]);
 	}
+}
+
+void VisemeViewerWindow::setUseRemote(bool val)
+{
+	_useRemote = val;
+	if (_useRemote)
+	{
+		_inputAudioFile->deactivate();
+		_inputUtterance->activate();
+		_buttonPlayAudioFile->deactivate();
+		_buttonPlayDialog->activate();
+	}
+	else
+	{
+		_inputAudioFile->activate();
+		_inputUtterance->deactivate();
+		_buttonPlayAudioFile->activate();
+		_buttonPlayDialog->deactivate();
+	}
+}
+
+bool VisemeViewerWindow::getUseRemote()
+{
+	return _useRemote;
 }
 
 typedef std::pair<std::string, int> data_a;     
