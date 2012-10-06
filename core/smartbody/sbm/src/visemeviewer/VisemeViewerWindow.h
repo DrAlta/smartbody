@@ -36,6 +36,7 @@ public:
 	void drawNames();
 	void show();
 	void hide();
+	void update();
 
 	static Fl_Menu_Item menu_[];
 protected:
@@ -49,11 +50,13 @@ protected:
 	
 	Fl_Input* _inputPlayTime;
 	Fl_Button* _buttonPlayDialog;
+	Fl_Button* _buttonPlayAudioFile;
 	Fl_Button* _buttonReset;
 	Fl_Button* _buttonShowStats;
 	Fl_Button* _buttonRefreshCharacter;
 	Fl_Button* _buttonDump;
 	Fl_Input* _inputUtterance;
+	Fl_Input* _inputAudioFile;
 
 	Fl_Check_Button* _checkStats;
 	VisemeCurveEditor * _curveEditor;
@@ -61,6 +64,7 @@ protected:
 	std::string _lastUtterance;
 	bool _gatherStats;
 	std::map<std::string, int> _diphoneStats;
+	bool _useRemote;
 
 	void draw();
 	bool loadData();
@@ -70,6 +74,9 @@ protected:
 	void initializeVisemes();
 	void resetViseme();
 	void enforceNamingConvention(char * c_str);
+	void setUseRemote(bool val);
+	bool getUseRemote();
+	
 
 	SBCharacter* getCurrentCharacter();
 	std::string getCurrentCharacterName();
@@ -84,6 +91,7 @@ protected:
 	static void OnPlayCB(Fl_Widget* widget, void* data);
 	static void OnEnableScrub(Fl_Widget* widget, void* data);
 	static void OnPlayDialogCB(Fl_Widget* widget, void* data);
+	static void OnPlayAudioFileCB(Fl_Widget* widget, void* data);
 	static void OnSaveCB(Fl_Widget* widget, void* data);
 	static void OnBmlRequestCB(BML::BmlRequest* request, void* data);
 	static void OnShowStatsCB(Fl_Widget* widget, void* data);

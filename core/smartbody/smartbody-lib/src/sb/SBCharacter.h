@@ -42,7 +42,7 @@ class SBCharacter : public SbmCharacter
 
 		void setVoice(std::string type);
 		void setVoiceCode(std::string param);
-		const std::string& getVoice();
+		const std::string getVoice();
 		const std::string& getVoiceCode();
 
 		void setVoiceBackup(std::string type);

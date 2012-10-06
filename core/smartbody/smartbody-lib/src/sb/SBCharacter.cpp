@@ -232,9 +232,26 @@ void SBCharacter::setVoice(std::string type)
 
 }
 
-const std::string& SBCharacter::getVoice()
+const std::string SBCharacter::getVoice()
 {
-	return get_voice_code();
+	/*
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::string type = "";
+	if (mcu.speech_rvoice())
+		type = "remote";
+	if (mcu.speech_audiofile())
+		type = "audiofile";
+	if (mcu.speech_text())
+		type = "text";
+	if (mcu.speech_localvoice())
+		type = "local";
+	*/
+	// through attribute system...
+	std::string type = "";
+	StringAttribute* attr = dynamic_cast<StringAttribute*>(getAttribute("voice"));
+	if (attr)
+		type = attr->getValue();
+	return type;
 }
 
 void SBCharacter::setVoiceCode(std::string param)

@@ -929,6 +929,10 @@ int main( int argc, char **argv )	{
 		{
 			 rootWindow->panimationWindow->update_viewer();
 		}
+		if (rootWindow && rootWindow->visemeViewerWindow && rootWindow->visemeViewerWindow->shown())
+		{
+			rootWindow->visemeViewerWindow->update();
+		}
 
 		mcu.render();
 	
