@@ -1256,7 +1256,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	if( !audioPlay.empty() ) {
 		if( LOG_AUDIO || LOG_BML_VISEMES )
 			cout << "DEBUG: BodyPlannerImpl::realizeRequest(..): scheduling request->audioPlay: " << audioPlay << endl;
-		// schedule for later
+		// schedule for later		
 		sbm_commands.push_back( new SbmCommand( audioPlay, startAt + request->actor->get_viseme_sound_delay() ) );
 		//if( seq->insert( (float)(audioOffset<0? 0: audioOffset), audioPlay.c_str() ) != CMD_SUCCESS ) {
 		//	LOG( "ERROR: BodyPlannerImpl::realizeRequest: insert audio trigger into seq FAILED, msgId=%s\n", bpMsg.msgId ); 

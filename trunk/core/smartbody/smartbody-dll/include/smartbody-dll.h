@@ -108,6 +108,7 @@ class Smartbody_dll
 
    protected:
       bool InitVHMsg();
+      void InitLocalSpeechRelay();
       void RegisterCallbacks();
 
       friend class Smartbody_dll_SBMCharacterListener_Internal;

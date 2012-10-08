@@ -684,6 +684,8 @@ void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string 
 	}
 	LOG("\n");	
 	
+
+
 	printf( "Checking for Cache Directory\n");
 	// check to see if cache directory exists and if not create it
 	if( !(checkPermission( cache_directory.c_str(), 0 ) == 0 ) )
@@ -721,7 +723,7 @@ std::string FestivalSpeechRelayLocal::generateReply(const char * utterance,const
    std::string actualText;
    return actualText;	
 }
-std::string FestivalSpeechRelayLocal::TransformTextWithTimes(std::string txt)
+std::string FestivalSpeechRelayLocal::TransformTextWithTimes(std::string dtxt)
 {
    std::string actualText;
    return actualText;
