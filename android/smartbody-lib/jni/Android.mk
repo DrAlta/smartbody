@@ -15,6 +15,12 @@
 #   $(SBM_MY_DIR)/sbm/me_ct_reach.cpp \
 #   $(SBM_MY_DIR)/sbm/bml_reach.cpp \
 #   $(SBM_MY_DIR)/sbm/VisemeMap.cpp \
+# $(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/festival/speech_tools/include/ \
+# $(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/festival/festival/src/include \
+# $(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/festival/festival/src/modules/VHDuration \
+# $(SBM_LOCAL_PATH)/../../include/speech_tools/include \
+# $(SBM_LOCAL_PATH)/../../include/festival/include \
+# $(SBM_LOCAL_PATH)/../../include/festival/include/VHDuration \
 
 
 SBM_LOCAL_PATH := $(call my-dir)
@@ -79,6 +85,46 @@ LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_python.a
 LOCAL_STATIC_LIBRARIES := python-prebuilt	
 include $(PREBUILT_STATIC_LIBRARY)
 
+include $(CLEAR_VARS)
+LOCAL_MODULE := estbase-prebuilt
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libestbase.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := estools-prebuilt
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libestools.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := eststring-prebuilt
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libeststring.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := festival-prebuilt
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libFestival.a
+LOCAL_STATIC_LIBRARIES := estbase-prebuilt estools-prebuilt eststring-prebuilt
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := openal
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libopenal.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := alut
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libopenalut.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := tremolo
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libtremolo.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := sndfile
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libsndfile.a
+include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := ann
@@ -156,6 +202,9 @@ LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/../../boost \
 					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/boost \
 					$(SBM_LOCAL_PATH)/../../include \
+					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/festival/speech_tools/include \
+					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/festival/festival/src/include \
+					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/festival/festival/src/modules/VHDuration \
 					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/vhcl/include \
 					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/bonebus/include \
 					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/vhmsg/vhmsg-c/include \
@@ -440,7 +489,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 LOCAL_LDLIBS    := -llog 
 #LOCAL_LDLIBS    := -llog -gstabs	  
 #LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
-LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt python-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode  
+LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt python-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
 include $(BUILD_STATIC_LIBRARY)
 #include $(BUILD_SHARED_LIBRARY)

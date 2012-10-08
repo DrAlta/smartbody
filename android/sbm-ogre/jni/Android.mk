@@ -82,7 +82,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					$(LOCAL_PATH)/$(OGRE_DIR)/RenderSystems/GLES2/include \
 					$(LOCAL_PATH)/$(OGRE_DIR)/Dependencies/OIS/include
 #LOCAL_CFLAGS    := -gstabs -g -DBUILD_ANDROID -frtti
-LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti
+LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions
 LOCAL_SRC_FILES := Main.cpp AndroidLogListener.cpp OgreDemoApp.cpp OgreFramework.cpp test.cpp SBListener.cpp
 LOCAL_LDLIBS    := -llog -lEGL -lGLESv2
 #LOCAL_LDLIBS    := -llog -lEGL -lGLESv2 -gstabs

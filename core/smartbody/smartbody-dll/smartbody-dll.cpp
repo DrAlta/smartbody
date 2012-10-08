@@ -22,6 +22,7 @@
 #include "sbm/sbm_test_cmds.hpp"
 #include "sbm/resource_cmds.h"
 #include "sbm/locomotion_cmds.hpp"
+#include "sbm/sbm_audio.h"
 #include "sb/SBPython.h"
 #include "sb/SBCharacter.h"
 #include "sb/SBSkeleton.h"
@@ -204,6 +205,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath, boo
    initPython(pythonLibPath);
 
    InitVHMsg();
+   InitLocalSpeechRelay();
    RegisterCallbacks();
 
    srArgBuffer arg_buf( "" );
@@ -218,6 +220,17 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath, boo
    return true;
 }
 
+void Smartbody_dll::InitLocalSpeechRelay()
+{
+#if defined(__ANDROID__)
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   mcu.play_internal_audio = true;
+   AUDIO_Init();
+   std::string festivalLibDir = "/sdcard/SBUnity/festival/lib/";
+   std::string festivalCacheDir = "/sdcard/SBUnity/festival/cache/";
+   mcu.festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
+#endif
+}
 
 SMARTBODY_DLL_API bool Smartbody_dll::Shutdown()
 {

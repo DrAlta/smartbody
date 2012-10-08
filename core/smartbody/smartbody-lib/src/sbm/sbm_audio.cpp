@@ -47,6 +47,7 @@ void AUDIO_Play( const char * audio_file )
    vhcl::Sound * sound = g_audio->CreateSoundLibSndFile( audio_file, audio_file );
    if ( sound )
    {
+      LOG("has sound, sound = %d",sound);
       sound->Play();
    }
 }

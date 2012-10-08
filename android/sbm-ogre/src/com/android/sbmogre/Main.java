@@ -230,7 +230,7 @@ public class Main
 	
 	static
 	{	
-		System.loadLibrary("python2.6");
+		//System.loadLibrary("python2.6");
 		System.loadLibrary("sbmogre");
 	}
 }
