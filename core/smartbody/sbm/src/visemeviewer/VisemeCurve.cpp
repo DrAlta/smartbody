@@ -12,6 +12,17 @@ VisemeCurve::~VisemeCurve()
 {
 }
 
+void VisemeCurve::copy(VisemeCurve& v)
+{
+	_lineColor = v._lineColor;
+	_pointColor = v._pointColor;
+	_isVisible = v._isVisible;
+	_pointRadius = v._pointRadius;
+
+	for (size_t i = 0; i < v.size(); i++)
+		this->push_back(v[i]);
+}
+
 bool VisemeCurve::isVisible()
 {
 	return _isVisible;

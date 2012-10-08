@@ -11,6 +11,8 @@ public:
 	VisemeCurve();
 	~VisemeCurve();
 
+	void copy(VisemeCurve& v);
+
 	bool isVisible();
 	void setVisibilty(bool isVisible);
 
@@ -24,7 +26,6 @@ public:
 	void setPointRadius(int size);
 
 protected:
-
 	bool _isVisible;
 	Fl_Color _lineColor;
 	Fl_Color _pointColor;

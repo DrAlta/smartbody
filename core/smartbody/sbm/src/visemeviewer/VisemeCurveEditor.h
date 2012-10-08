@@ -17,6 +17,7 @@ class VisemeCurveEditor : public Fl_Widget
 		void draw();
 		void clear();
 		int handle(int event);
+		void refresh();
 		
 		void setVisemeWindow(VisemeViewerWindow* w);
 		void setVisibility(int viseme, bool isVisible);
@@ -32,11 +33,13 @@ class VisemeCurveEditor : public Fl_Widget
 
 	protected:
 		std::vector<VisemeCurve> _curves;
-		
+		std::map<int, VisemeCurve> _copiedCurveMap;
+
 		VisemeViewerWindow* visemeWindow;
 
 		int _selectedPoint;
 		int _selectedLine;
+		std::vector<int> _selectedLines;
 		
 		int _gridSizeX;
 		int _gridSizeY;
