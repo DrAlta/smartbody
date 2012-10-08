@@ -143,6 +143,11 @@ void VisemeViewerWindow::update()
 }
 
 
+void VisemeViewerWindow::selectViseme(int id)
+{
+	_browserViseme->select(id);
+}
+
 Fl_Menu_Item VisemeViewerWindow::menu_[] = {
 	{"File", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
 	{"Save", 0,  0, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
@@ -273,12 +278,12 @@ void VisemeViewerWindow::refreshData()
 		int value1 = _browserPhoneme[0]->value();
 		int value2 = _browserPhoneme[1]->value();
 
-		if (value1 < 0 || value1 >= _browserPhoneme[0]->size())
+		if (value1 <= 0 || value1 > _browserPhoneme[0]->size())
 		{
 			LOG("First phoneme is out of range, cannot create diphone.");
 			return;
 		}
-		if (value2 < 0 || value2 >= _browserPhoneme[1]->size())
+		if (value2 <= 0 || value2 > _browserPhoneme[1]->size())
 		{
 			LOG("Second phoneme is out of range, cannot create diphone.");
 			return;
@@ -404,6 +409,7 @@ void VisemeViewerWindow::OnVisemeSelectCB(Fl_Widget* widget, void* data)
 
 	viewer->_curveEditor->changeCurve(viseme - 1, curveData);
 	viewer->refreshData();
+	viewer->_curveEditor->refresh();
 
 	viewer->_curveEditor->selectLine(viseme - 1);	
 	viewer->resetViseme();
@@ -593,12 +599,14 @@ void VisemeViewerWindow::OnPlayCB(Fl_Widget* widget, void* data)
 			}
 		}
 	}
+	//viewer->OnCharacterRefreshCB(widget, data);
 }
 
 
 void VisemeViewerWindow::OnPlayDialogCB(Fl_Widget* widget, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+	
 	std::string utterance = viewer->_inputUtterance->value(); 	
 	std::string utteranceClean = vhcl::Replace(utterance, "'", "\\'");
 	if (utterance != "")
@@ -619,6 +627,7 @@ void VisemeViewerWindow::OnPlayAudioFileCB(Fl_Widget* widget, void* data)
 		strstr << "python bml.execBML('" << viewer->getCurrentCharacterName() << "', '<speech type=\"text/plain\" ref=\"" << fileName << "\">" << "</speech>')";
 		SmartBody::SBScene::getScene()->command(strstr.str());
 	}
+	//viewer->OnCharacterRefreshCB(widget, data);
 }
 
 void VisemeViewerWindow::OnSaveCB(Fl_Widget* widget, void* data)
@@ -638,7 +647,10 @@ void VisemeViewerWindow::OnSaveCB(Fl_Widget* widget, void* data)
 	strstr << "diphoneManager = scene.getDiphoneManager()\n";
 	strstr << "\n";
 
-	std::vector<SBDiphone*>& diphones = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphones(viewer->getCurrentCharacterName());
+	std::string diphoneSetName = viewer->getCurrentCharacter()->getStringAttribute("diphoneSetName");
+	if (diphoneSetName == "")
+		diphoneSetName = viewer->getCurrentCharacterName();
+	std::vector<SBDiphone*>& diphones = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphones(diphoneSetName);
 	for (size_t i = 0; i < diphones.size(); i++)
 	{
 		strstr << "diphone = diphoneManager.createDiphone(\"" << diphones[i]->getFromPhonemeName() << "\", \"" << diphones[i]->getToPhonemeName() << "\", \"" << diphoneMap << "\")" << "\n";

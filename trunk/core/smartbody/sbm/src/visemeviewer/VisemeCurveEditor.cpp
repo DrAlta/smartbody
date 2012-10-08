@@ -54,6 +54,16 @@ void VisemeCurveEditor::clear()
 	fl_rectf(x(), y(), w(), h());
 }
 
+void VisemeCurveEditor::refresh()
+{
+	_selectedLines.clear();
+	_selectedLine = -1;
+	_selectedPoint = -1;
+	_pointIsSelected = false;
+	_lineIsSelected = false;
+	redraw();
+}
+
 void VisemeCurveEditor::draw()
 {
 	clear();
@@ -78,22 +88,81 @@ int VisemeCurveEditor::handle(int event)
 {
 	int mousex = Fl::event_x();
 	int mousey = Fl::event_y();
-
-
 	bool isCurveDirty = false;
+
+	// copy&paste selected lines
+	int isCtrlPressed = Fl::event_state(FL_CTRL);
+	int isKeyCPressed = Fl::get_key('c');
+	int isKeyVPressed = Fl::get_key('v');
+	if (isCtrlPressed && isKeyCPressed)
+	{
+		for (int i = 0; i < (int)_selectedLines.size(); ++i)
+		{
+			VisemeCurve copiedCurve;
+			copiedCurve.copy(_curves[_selectedLines[i]]);
+			_copiedCurveMap.insert(std::make_pair(_selectedLines[i], copiedCurve));
+		}
+	}
+	if (isCtrlPressed && isKeyVPressed)
+	{
+		for (	std::map<int, VisemeCurve>::iterator iter = _copiedCurveMap.begin();
+			iter != _copiedCurveMap.end();
+			iter++
+			)
+		{
+			_curves[iter->first] = (iter->second);
+			visemeWindow->selectViseme(iter->first + 1);
+		}
+		isCurveDirty = true;
+		_copiedCurveMap.clear();
+		redraw();
+	}
 
 	switch (event)
 	{
 		case FL_PUSH:
 		{
 			int isButton1Pressed = Fl::event_state(FL_BUTTON1);
+			int isButtonMidPressed = Fl::event_state(FL_BUTTON2);
 			int isButton2Pressed = Fl::event_state(FL_BUTTON3);
-			int isCtrlPressed = Fl::event_state(FL_CTRL);
+			int isShiftPressed = Fl::event_state(FL_SHIFT);
 
-			if (isButton1Pressed )
-			{			
-				if (!isCtrlPressed)
+			// middle mouse clear out
+			if (isButtonMidPressed)
+			{
+				_selectedLine = -1;
+				_selectedPoint = -1;
+				_selectedLines.clear();
+				_pointIsSelected = false;
+				_lineIsSelected = false;
+				redraw();
+			}
+			
+			// select line, multi-select lines, add points
+			if (isButton1Pressed)
+			{	
+				if (isCtrlPressed)
 				{
+					_selectedLines.clear();
+					if (isLineSelected(mousex, mousey))
+					{
+						redraw();
+					}
+				}
+				else if (isShiftPressed)
+				{
+					if (_lineIsSelected)
+						_selectedLines.push_back(_selectedLine);
+
+					if (isLineSelected(mousex, mousey))
+					{
+						_selectedLines.push_back(_selectedLine);
+						redraw();
+					}
+				}
+				else
+				{
+					_selectedLines.clear();
 					bool pointIsSelected = isPointSelected(mousex, mousey);
 
 					if(pointIsSelected)
@@ -115,13 +184,6 @@ int VisemeCurveEditor::handle(int event)
 							// draw a point in that location
 							redraw();
 						}
-					}
-				}
-				else
-				{
-					if (isLineSelected(mousex, mousey))
-					{
-						redraw();
 					}
 				}
 			}
@@ -344,6 +406,24 @@ void VisemeCurveEditor::drawCurve()
 		if(!_curves[i].isVisible())
 			continue;
 
+		if(i == _selectedLine)
+			fl_line_style(0, 3, 0);
+		else
+		{
+			bool hasHighlights = false;
+			for (int j = 0; j < (int)_selectedLines.size(); ++j)
+			{
+				if (_selectedLines[j] == i)
+				{
+					fl_line_style(0, 3, 0);
+					hasHighlights = true;
+					break;
+				}
+			}
+			if (!hasHighlights)
+				fl_line_style(0, 0, 0);
+		}
+
 		for(int j = 0; j < (int)_curves[i].size(); j++)
 		{
 
@@ -356,11 +436,6 @@ void VisemeCurveEditor::drawCurve()
 
 			SrVec& point = _curves[i][j];
 			SrVec newPoint = mapCurveData(point);
-
-			if(i == _selectedLine)
-				fl_line_style(0, 3, 0);
-			else
-				fl_line_style(0,0,0);
 
 			fl_line((int) newLastPoint.x, (int) newLastPoint.y, (int) newPoint.x, (int) newPoint.y);
 			newLastPoint = newPoint;

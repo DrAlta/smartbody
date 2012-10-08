@@ -37,6 +37,7 @@ public:
 	void show();
 	void hide();
 	void update();
+	void selectViseme(int id);
 
 	static Fl_Menu_Item menu_[];
 protected:
