@@ -451,6 +451,8 @@ int main( int argc, char **argv )	{
 	std::string python_lib_path = "../../../../core/smartbody/Python26/Lib";
 	std::string festivalLibDir = "../../../../lib/festival/festival/lib/";
 	std::string festivalCacheDir = "../../../../data/cache/festival/";
+
+	std::string cereprocLibDir = "../../../../lib/cerevoice/voices/";	
 	// EDF - taken from tre_main.cpp, a fancier command line parser can be put here if desired.
 	//	check	command line parameters:
 	bool lock_dt_mode = false;
@@ -618,6 +620,7 @@ int main( int argc, char **argv )	{
 	// initialize python
 	initPython(python_lib_path);
 	mcu.festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
+	mcu.cereprocRelay()->initSpeechRelay(cereprocLibDir,festivalCacheDir);
 
 #if LINK_VHMSG_CLIENT
 	char * vhmsg_server = getenv( "VHMSG_SERVER" );

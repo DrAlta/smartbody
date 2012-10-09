@@ -24,6 +24,9 @@
 
 #include "vhcl.h"
 
+#define USE_FESTIVAL_RELAY 0
+#define USE_CEREPROC_RELAY 0
+
 #include "local_speech.h"
 #ifdef WIN32
 #include <direct.h>
@@ -38,10 +41,16 @@
 #define makeDirectory(pathname) mkdir(pathname,0777)
 #endif
 
-#if 0
+#if USE_FESTIVAL_RELAY
 #include <festival.h>
 #include <VHDuration.h>
 #endif
+
+#if USE_CEREPROC_RELAY
+#include "cerevoice_eng.h"
+#include "cerevoice_eng_int.h"
+#endif
+
 
 #include <stdlib.h>
 #include <iostream>
@@ -101,60 +110,318 @@ class XStr
 };
 
 
-
-
 #define X( str ) XStr( str ).unicodeForm()
 XERCES_CPP_NAMESPACE_USE
-#if 0
-extern SpeechRequestData xmlMetaData;
-extern std::map<string,string> phonemeToViseme;
-extern std::string mapping;
 
-FestivalSpeechRelayLocal::FestivalSpeechRelayLocal()
+#if !USE_FESTIVAL_RELAY
+struct SpeechRequestMessageData {
+	/// List of timing tags, and the corresponding words in the XML message
+	/// eg. T0, T1, ... and hello, captain respectively
+	/// words don't have any specific usage yet, but may have in the future, if tags are trimmed from their current protocol of 2 per word
+	std::vector<std::string> tags, words;
+	/// Speech ID (usually sp1)
+	std::string speechIdentifier;
+};
+#endif
+
+/// Cleans up spurious whitespaces in string, and removes weird \n's
+void SpeechRelayLocal::cleanString(std::string &message)
 {
-	
-}
-
-FestivalSpeechRelayLocal::~FestivalSpeechRelayLocal()
-{
-}
-
-std::string FestivalSpeechRelayLocal::generateReply(const char * utterance,const char * soundFileName)
-{
-	EST_Wave wave;
-
-	string spoken_text = storeXMLMetaData( utterance );
-	//LOG("after store XMLMetaData");
-	//printf("done first time\n");
-	if (!spoken_text.compare("") && spoken_text != "")
+	/// Remove newlines and carriage-returns
+	message.erase( std::remove(message.begin(), message.end(), '\r'), message.end() );
+	message.erase( std::remove(message.begin(), message.end(), '\n'), message.end() );
+	/// If it's a space string, we want to leave the last whitespace
+	while ( message.find_last_of(" ") == message.length() - 1  && message.length() > 1)
 	{
-		puts(spoken_text.append("\n").c_str());
+		fprintf(stderr,"Debug: Reducing length by 1 to remove whitespace at end\n");
+		message.resize( message.length() - 1 );
 	}
 
-	//LOG("after spoken text compare");
-	if (xmlMetaData.tags.size() <= 0)
+	unsigned int pos;
+	while ( (pos = message.find("  ")) != std::string::npos )
 	{
-		spoken_text = TransformTextWithTimes(utterance);
-		//LOG("done transforming\n");
-		if (!spoken_text.compare("") && spoken_text != "")
+		fprintf(stderr,"Debug: replacing 2 whitespaces at %d(%s) with 1 whitespace\n",pos, message.substr(pos,2).c_str());
+		message.replace( pos, 2, " " );
+	}
+
+	while ( message.find_first_of(" ") == 0 )
+	{
+		//quick fix but there seems to be some problem with fprintf
+		//fprintf(stderr,"Debug: Cleaning initial whitespace %s\n",message[0]);
+		message = message.substr(1);
+	}
+}
+
+std::string SpeechRelayLocal::removeXMLTagsAndNewLines( const std::string & txt , SpeechRequestMessageData & xmlMetaData)
+{
+//#define _PARSER_DEBUG_MESSAGES_ON
+   std::stringstream txtstream;
+
+   /// Put in some defaults, and do basic cleanup just to be safe
+   xmlMetaData.speechIdentifier = "sp1";
+   xmlMetaData.tags.clear();
+   xmlMetaData.words.clear();
+   /// Start an XML parser to parse the message we have received
+
+   XMLPlatformUtils::Initialize();
+   XercesDOMParser *parser = new XercesDOMParser();
+
+   std::string truncatedTxt = txt.substr(txt.find_first_of(">")+1);
+   
+
+   //******************************************************************************************
+// Code to properly format the message with indentation as otherwise Xerces throws a tantrum
+
+   char * transferTxt = new char[truncatedTxt.length() * 2];
+
+   unsigned int position = truncatedTxt.find("><");
+   unsigned int i = 0;
+   unsigned int j = 0;
+   while(position != std::string::npos)
+   {
+	   transferTxt[i] = truncatedTxt[j];
+	   ++i;
+	   ++j;
+	   if( j == position)
+	   {
+		   transferTxt[i] = '>'; ++i;
+		   transferTxt[i] = '\n'; ++i;
+		   transferTxt[i] = '<'; ++i;
+
+		   position = truncatedTxt.find("><",position+1);
+
+		   j= j+2;
+	   }	   
+   }
+
+   while(j < truncatedTxt.length())
+   {
+	   transferTxt[i] = truncatedTxt[j];
+	   ++j; 
+	   ++i;
+   }
+
+   transferTxt[i] = '\0';
+
+   //******************************************************************************************
+
+
+   char * message = transferTxt;
+
+   LOG("removeXMLTag, message = %s",message);
+
+
+   std::string actualText = "";
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+   fprintf(stderr, "Debug: Parsing message \"%s\"\n",message);
+#endif
+   /// Set up a parser for XML message in memory - code sourced from unknown online reference for Xerces XML library
+   MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
+   parser->parse(memIS);
+   DOMDocument *doc = parser->getDocument();
+   if ( doc )
+   {
+	   DOMElement *root = doc->getDocumentElement();
+
+	   if ( root ) 
+	   {
+		   /// Get all nodes which have the "mark" tag, from these we can extract the timing tags, and speech text
+		   DOMNodeList *messageList = root->getElementsByTagName(XMLString::transcode("speech"));
+		   if ( messageList && messageList->getLength() > 0)
+		   {
+			   DOMElement *speechElement = dynamic_cast<DOMElement*>(messageList->item(0));
+			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
+			   xmlMetaData.speechIdentifier = std::string(speechID);
+			   //actualText = "<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + XMLString::transcode(speechElement->getAttribute(X("type"))) + "\">";
+			   XMLString::release(&speechID);
+		   }
+		   else if ( !strcmp( XMLString::transcode( root->getNodeName() ), "speech") ) {
+			   /// Else, the message might contain only the speech tag, in which case the above code will fail, so we need a fallback
+			   DOMElement *speechElement = root;
+			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
+			   xmlMetaData.speechIdentifier = std::string(speechID);
+			   //actualText = "<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + XMLString::transcode(speechElement->getAttribute(X("type"))) + "\">";
+			   XMLString::release(&speechID);
+		   }
+		   else
+		   {
+			   /// Oops, for some reason all of the above didn't work, default to the default speech id
+			   fprintf(stderr, "Warning: Could not find speech tag in message, creating message beginning by default\n");
+			   //actualText = truncatedTxt.substr(0, truncatedTxt.find_first_of(">") + 1);
+		   }
+		   messageList = root->getElementsByTagName( X("mark"));
+
+		   /// Store all the book marks in the input message, so that they can be retrieved later
+		   if ( messageList ) 
+		   {
+			   XMLSize_t nLetters = messageList->getLength();
+
+			   for ( XMLSize_t i = 0; i < nLetters; i++ )
+			   {
+				   DOMNode* node = messageList->item(i);
+				   /// We only want to parse XML elements
+				   if (node->getNodeType() && node->getNodeType() == DOMNode::ELEMENT_NODE)
+				   {
+					   DOMElement *element = dynamic_cast<DOMElement*>( node );
+					   XMLCh *mark = (XMLCh*)element->getAttribute(XMLString::transcode("name"));
+					   XMLCh *speech = NULL;
+					   DOMNode *speechNode = element->getFirstChild();
+					   if ( speechNode == NULL ) 
+					   {
+						   speechNode = element->getNextSibling();
+					   }
+					   if ( speechNode->getNodeType() == DOMNode::TEXT_NODE )
+					   {
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+						   fprintf(stderr, "Voila! found the text\n");
+#endif
+						   speech = (XMLCh*)speechNode->getNodeValue();
+					   }
+					   /// Get the timing tag as a string
+					   char * t1, *t2;
+					   std::string markString(t1 = XMLString::transcode(mark));
+					   std::string speechString(t2 = (speech)?XMLString::transcode(speech): " ");
+					   XMLString::release(&t1);
+                       if(speech)
+					    XMLString::release(&t2);
+					   /// This code is still not watertight with regards to memory, needs some knowledge of Xerces memory management
+					   //if ( mark ) XMLString::release(&mark);
+					   //if ( speech ) XMLString::release(&speech);
+					   if( markString == "" || speechString == "" )
+					   {
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+						   fprintf(stderr, "The mark or speech strings are null, mark: 0x%x, speech: 0x%x \n", markString, speechString);
+#endif
+						   /// Null strings tend to cause problems with later code sections
+						   if ( speechString == "" ) speechString = " ";
+					   }
+					   else
+					   {
+						   std::string temporaryText = speechString;
+						   cleanString(temporaryText);
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+						   //fprintf(stderr, "Got timing tag: \"%s\" and text: \"%s\"\n", markString.c_str(), temporaryText.c_str());
+#endif
+						   /// Words can be used to match up which tags we need to see
+							/// Push tag and word into xmlMetaData
+							xmlMetaData.tags.push_back(markString);
+							xmlMetaData.words.push_back(temporaryText);
+
+							actualText += temporaryText;
+					   }
+					   /// As said before, needs proper memory management for Xerces
+					  // if(mark)
+							//XMLString::release(&mark);
+					  // if(speech)
+					  // {
+							//XMLString::release(&speech);
+							//XMLString::release(&speechString);
+					   //}
+					   //if ( markString )
+						  // XMLString::release(&markString);
+					   //if ( !_stricmp(" ", speechString) )
+						  // delete speechString;
+					   //else XMLString::release(&speechString);
+					  // if(speechString)
+							//XMLString::release(&markString);
+				   }
+			   }
+		   }
+		   else 
+		   {
+			   fprintf(stderr, "Error: Got no nodes with specified tag.\n");
+		   }
+
+	   }
+	   else
+	   {
+		   fprintf(stderr, "Error: Could not extract root element from XML DOM document\n");
+	   }
+   }
+   else
+   {
+	   fprintf(stderr, "Error: XML DOM document is null!\n");
+   }
+   doc->release();
+
+   //actualText += "</speech>\n";
+   if ( actualText != "" ) {
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+#undef _PARSER_DEBUG_MESSAGES_ON
+	   fprintf(stderr,"Got text: \"%s\"\n",actualText.c_str());
+#endif
+	   return actualText;
+   }
+   else {
+	   fprintf(stderr, "Error: Unable to instantiate DOM Xml parser, reverting to previous text-only parser\n");
+
+	   /// Old non-XML parser based cleanup code, will not store any tags etc. Intended as a fallback in case something goes wrong with the parser above, which should not happen
+	   //for the entire input string
+	   for ( unsigned int i = 0; i < txt.length(); i++ )
+	   {
+		  //if the character is an opening bracket
+		  if ( txt.at( i ) == '<' )
+		  {
+			 //loop until hitting the ending bracket
+			 //so that this text is not input into
+			 //the stringstream
+			 while ( i < txt.length() && txt.at( i ) != '>' )
+			 {
+				i++;
+			 }
+
+			 //to skip over the ending bracket
+			 i++;
+		  }
+
+		  //add the character to the stringstream
+		  if ( i < txt.length() && txt.at( i ) != '\n' )
+			 txtstream << txt.at( i );
+	   }
+
+	   txtstream << "\n";
+   }
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+#undef _PARSER_DEBUG_MESSAGES_ON
+#endif
+   fprintf(stderr,"Got text: \"%s\"\n",txtstream.str().c_str());
+   return txtstream.str() + "</speech>";
+}
+
+std::string SpeechRelayLocal::CreateMarkTimeStamps(std::string text)
+{
+	std::string tempText = text;
+	std::string markUp = "";
+	int i = 0;
+	while (tempText!= "")
+	{
+		std::string temp = tempText;
+		temp = temp.substr(0, tempText.find_first_of(" "));
+
+		char number[256];
+		sprintf(number, "%d", i);
+		markUp = markUp.append("<mark name=\"T");
+		markUp = markUp.append(number);
+		markUp = markUp.append("\" />");
+		markUp = markUp.append(temp + "\n\n");
+		sprintf(number, "%d", ++i);
+		markUp = markUp.append("<mark name=\"T");
+		markUp = markUp.append(number);
+		markUp = markUp.append("\" />\n\n");
+		++i;
+		if (tempText.size() > temp.size())
 		{
-			puts(spoken_text.append("\n").c_str());
+			tempText = tempText.substr(temp.size() + 1);
 		}
-		spoken_text = storeXMLMetaData(spoken_text);
-		//LOG("done second time\n");
+		else
+		{
+			tempText = "";
+		}
 	}
-	//LOG("before remove tab");
-	removeTabsFromString(spoken_text);
-
-	//LOG( "generateReply() - \nbefore: '%s'\nafter: '%s'\n'%s'\n", utterance, spoken_text.c_str(), soundFileName );
-
-	//festival_say_text(spoken_text.c_str());
-	festival_text_to_wave(spoken_text.c_str(),wave);
-    wave.save(soundFileName,"riff");
-
-	return xmlMetaData.replyString;
+	return markUp;
 }
-std::string FestivalSpeechRelayLocal::TransformTextWithTimes(std::string txt)
+
+std::string SpeechRelayLocal::TransformTextWithTimes(std::string txt)
 {
 	//std::string text_string = "";
 
@@ -216,38 +483,518 @@ std::string FestivalSpeechRelayLocal::TransformTextWithTimes(std::string txt)
    return actualText;
 }
 
-std::string FestivalSpeechRelayLocal::CreateMarkTimeStamps(std::string text)
-{
-	std::string tempText = text;
-	std::string markUp = "";
-	int i = 0;
-	while (tempText!= "")
-	{
-		std::string temp = tempText;
-		temp = temp.substr(0, tempText.find_first_of(" "));
+#if USE_CEREPROC_RELAY
 
-		char number[256];
-		sprintf(number, "%d", i);
-		markUp = markUp.append("<mark name=\"T");
-		markUp = markUp.append(number);
-		markUp = markUp.append("\" />");
-		markUp = markUp.append(temp + "\n\n");
-		sprintf(number, "%d", ++i);
-		markUp = markUp.append("<mark name=\"T");
-		markUp = markUp.append(number);
-		markUp = markUp.append("\" />\n\n");
-		++i;
-		if (tempText.size() > temp.size())
-		{
-			tempText = tempText.substr(temp.size() + 1);
-		}
-		else
-		{
-			tempText = "";
-		}
-	}
-	return markUp;
+CereprocSpeechRelayLocal::CereprocSpeechRelayLocal()
+{
+
 }
+
+CereprocSpeechRelayLocal::~CereprocSpeechRelayLocal()
+{
+
+}
+
+void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string cacheDir )
+{
+	std::string voiceName = "cerevoice_star_3.0.0_22k.voice";
+	std::string licenseName = "star2.lic";
+	std::string fullVoiceName = libPath + voiceName;
+	std::string fullLicenseName = libPath + licenseName;
+	voiceEngine = CPRCEN_engine_load(fullLicenseName.c_str(), fullVoiceName.c_str());
+	if (!voiceEngine)
+	{
+		LOG("fail to initialize Cerevoice engine");
+	}
+	cacheDirectory = cacheDir;
+	set_phonemes_to_visemes();
+}
+
+
+std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const char * cereproc_file_name, std::string voice_id )
+{
+	std::string reply = "";
+	CPRCEN_channel_handle chan = CPRCEN_engine_open_default_channel(voiceEngine); /* Create channel */
+	char* fileName = const_cast<char*>(cereproc_file_name);
+	CPRCEN_engine_channel_to_file(voiceEngine, chan, fileName, CPRCEN_RIFF); /* File output on channel */
+	// 	/* Speak with streaming input */
+	CPRC_abuf* abuf = CPRCEN_engine_channel_speak(voiceEngine, chan, text, strlen(text),1);
+
+	SpeechRequestMessageData xmlMetaData;
+	// Feed in input text, further data is to come
+	//Added by Apar Suri
+	//Replacing . and , with "" so because there seems to be a bug in CPRCPMOD_spurt_synth while synthesizing multiple spurts
+	//Apparently a time of 0.0 and 0.1 seems to be added just after the , or .
+	std::string text_string = removeXMLTagsAndNewLines( text, xmlMetaData);
+
+	if (xmlMetaData.tags.size() <= 0 )
+	{
+		//text_string = text;
+		text_string =  TransformTextWithTimes(text);
+		text_string = removeXMLTagsAndNewLines(text_string, xmlMetaData);
+	}
+
+
+	 int errorCode = 0;
+
+
+      DOMImplementation * impl =  DOMImplementationRegistry::getDOMImplementation( X( "Core" ) );
+
+      if ( impl != NULL )
+      {
+         try
+         {
+            //XMLCh * end = XMLString::transcode( "end" );
+            //XMLCh * start = XMLString::transcode( "start" );
+            XMLCh * name = XMLString::transcode( "name" );
+            XMLCh * time = XMLString::transcode( "time" );
+           // XMLCh * id = XMLString::transcode( "id" );
+            XMLCh * file_path = XMLString::transcode( cereproc_file_name );
+
+            DOMDocument* doc = impl->createDocument(
+               0,                    // root element namespace URI.
+               X( "speak" ),         // root element name
+               0 );                  // document type object (DTD).
+
+            DOMElement * rootElem = doc->getDocumentElement();
+
+            DOMElement * soundFileElement = doc->createElement( X( "soundFile" ) );
+            soundFileElement->setAttribute( name, file_path );
+            rootElem->appendChild( soundFileElement );
+
+            DOMElement * wordElement = doc->createElement( X( "word" ) );
+
+            int num_words = 0;
+
+            for ( int i = 0; i < abuf->trans_sz; i++ )
+            {
+               if ( abuf->trans[ i ].type == CPRC_ABUF_TRANS_PHONE )
+               {
+                 std::map<std::string, std::string>::iterator iter = phonemeToViseme.find( abuf->trans[ i ].name );
+
+                 //check added to avoid crashing on entries which are not defined
+                 if ( iter != phonemeToViseme.end() )
+                 {
+
+                    XMLCh * start = XMLString::transcode( "start" );
+                    XMLCh * end = XMLString::transcode( "end" );
+                    XMLCh * type = XMLString::transcode( "type" );
+                    XMLCh * phone_type = XMLString::transcode( iter->second.c_str() );
+
+                    std::string end_f = vhcl::Format( "%0.6f", abuf->trans[i].end );
+                    XMLCh * end_time = XMLString::transcode( end_f.c_str() );
+
+                    std::string start_f = vhcl::Format( "%0.6f", abuf->trans[i].start );
+                    XMLCh * start_time = XMLString::transcode( start_f.c_str() );
+
+                    DOMElement * visemeElement = doc->createElement( X( "viseme" ) );
+                    visemeElement->setAttribute( start, start_time );
+                    visemeElement->setAttribute( type, phone_type );
+
+                    if ( strcmp( abuf->trans[ i ].name, "sil" ) == 0 )
+                    {
+                      rootElem->appendChild( visemeElement );
+                    }
+                    else
+                    {
+                      wordElement->appendChild( visemeElement );
+                    }
+
+                    if ( i < ( abuf->trans_sz - 1 ) )
+                    {
+                        if ( ( abuf->trans[ i + 1 ].type == CPRC_ABUF_TRANS_WORD ) || ( abuf->trans[ i + 1 ].type == CPRC_ABUF_TRANS_MARK ) //) {
+                           || ( strcmp( abuf->trans[ i + 1 ].name, "sil" ) == 0 ) )
+                        {
+                           wordElement->setAttribute( end, end_time );
+
+                           if ( wordElement->hasChildNodes() )
+                              rootElem->appendChild( wordElement );
+   
+                           wordElement = doc->createElement( X( "word" ) );
+
+                           std::string word_start_f = vhcl::Format( "%0.6f", abuf->trans[ i + 1 ].start );
+                           XMLCh * word_start_time = XMLString::transcode( word_start_f.c_str() );
+                           wordElement->setAttribute( start, word_start_time );
+
+                           // Add marker information back
+                           // Should come from initial XML message, 
+                           // but for now is constructed following the known NVBG protocol (markers around words)
+						   // HACK AVOIDED: Fixed to use XML metadata as extracted during parse
+                           std::ostringstream ostr;
+						   //changed by Apar Suri so that it does not coincide with the outer loop i
+                           int double_words = num_words * 2;
+                           ostr << double_words;
+						   std::string s = xmlMetaData.speechIdentifier + ":";
+                           //std::string s = "sp1:T" + ostr.str();
+						   //fprintf(stderr, "%d/%d ",num_words * 2, xmlMetaData.tags.size()-1);
+						   //std::string s = xmlMetaData.speechIdentifier + ":" + xmlMetaData.tags[num_words * 2];
+						   if ( num_words * 2 < (int)xmlMetaData.tags.size() ) {
+							   /// If we have an existing tag for this number, use it
+							   s += xmlMetaData.tags[num_words * 2];
+						   }
+						   else {
+							   /// Extract alphabetical part of the tags, in the hope that we're following a coherent naming pattern, and only numbers are changed
+							   std::string last_tag = xmlMetaData.tags[xmlMetaData.tags.size() - 1];
+							   int j;
+							   for ( j = 0; j < (int)last_tag.size(); j++ ) {
+								   if ( !isalpha(last_tag[j]) ) {
+									   break;
+								   }
+							   }
+							   s += last_tag.substr(0, j) + ostr.str();
+							   fprintf(stderr,"Warning: Reference to unspecified tag, constructing one on-the-fly to be: %s\n", s.c_str());
+						   }
+
+                           DOMElement * markElement = doc->createElement( X( "mark" ) );
+                           XMLCh * mark_name = XMLString::transcode( s.c_str() );
+                           markElement->setAttribute( name, mark_name ) ;
+                           markElement->setAttribute( time, word_start_time );
+                           rootElem->appendChild( markElement );
+
+                           std::ostringstream ostr2;
+                           double_words = num_words * 2 + 1;
+                           ostr2 << double_words;
+						   s = xmlMetaData.speechIdentifier + ":";
+                           //s = "sp1:T" + ostr2.str();
+						   //fprintf(stderr, "%d/%d ",num_words * 2+1, xmlMetaData.tags.size()-1);
+						   //s = xmlMetaData.speechIdentifier + ":" + xmlMetaData.tags[num_words * 2 + 1];
+
+						   /// Modifications to use XML tags saved at previous step - use stored tags, or generate new ones if unseen tag referenced (reason for unseen tags being referenced is still not known)
+						   if ( num_words * 2 + 1 < (int)xmlMetaData.tags.size() ) {
+							   /// If we have an existing tag for this number, use it
+							   s += xmlMetaData.tags[num_words * 2 + 1];
+						   }
+						   else {
+							   /// Extract alphabetical part of the tags, in the hope that we're following a coherent naming pattern, and only numbers are changed
+							   std::string last_tag = xmlMetaData.tags[xmlMetaData.tags.size() - 1];
+							   int j;
+							   for ( j = 0; j < (int)last_tag.size(); j++ ) {
+								   if ( !isalpha(last_tag[j]) ) {
+									   break;
+								   }
+							   }
+							   s += last_tag.substr(0, j) + ostr2.str();
+							   fprintf(stderr,"Warning: Reference to unspecified tag, constructing one on-the-fly to be: %s\n", s.c_str());
+						   }
+                           DOMElement * markElement2 = doc->createElement( X( "mark" ) );
+                           XMLCh * mark_name2 = XMLString::transcode( s.c_str() );
+                           markElement2->setAttribute( name, mark_name2 ) ;
+                           markElement2->setAttribute( time, end_time );
+                           rootElem->appendChild( markElement2 );
+
+                           //float word_start = abuf->trans[ i + 1 ].start;
+                           num_words++;
+                       }
+                    }
+                 }
+                 else
+                 {
+                   printf( "COULDN'T FIND MATCH FOR: %s\n", abuf->trans[ i ].name );
+                 }
+               }
+               /*else if  ( abuf->trans[ i ].type == CPRC_ABUF_TRANS_MARK )
+               {
+                    DOMElement * markElement = doc->createElement( X( "mark" ) );
+                    XMLCh * mark_name = XMLString::transcode( abuf->trans[ i ].name );
+                    markElement->setAttribute( name, mark_name ) ;
+
+                    std::string word_start_f = vhcl::Format( "%0.6f", abuf->trans[ i ].start );
+                    XMLCh * word_start_time = XMLString::transcode( word_start_f.c_str() );
+                    markElement->setAttribute( time, word_start_time );
+
+                    rootElem->appendChild( markElement );
+               }*/
+            }
+
+            DOMLSSerializer* theSerializer = DOMImplementation::getImplementation()->createLSSerializer();
+            XMLCh * xml_result = theSerializer->writeToString( rootElem );
+            reply = XMLString::transcode( xml_result );
+            theSerializer->release();
+         }
+//          catch ( const OutOfMemoryException & )
+//          {
+//             XERCES_STD_QUALIFIER cerr << "OutOfMemoryException" << XERCES_STD_QUALIFIER endl;
+//             errorCode = 5; 
+//          }
+         catch ( const DOMException & e )
+         {
+            XERCES_STD_QUALIFIER cerr << "DOMException code is:  " << e.code << XERCES_STD_QUALIFIER endl;
+            errorCode = 2;
+         }
+         catch ( const XMLException & toCatch )
+         {
+            printf( "XMLException occurred: %s", toCatch.getCode() );
+            errorCode = 4;
+         }
+         catch (...)
+         {
+            XERCES_STD_QUALIFIER cerr << "An error occurred creating the document" << XERCES_STD_QUALIFIER endl;
+            errorCode = 3;
+         }
+      }
+
+
+	
+
+	CPRCEN_engine_channel_close(voiceEngine,chan);
+	return reply;
+}
+
+void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
+{
+// 	CPRCEN_channel_handle chan = CPRCEN_engine_open_default_channel(voiceEngine); /* Create channel */
+// 	CPRCEN_engine_channel_to_file(voiceEngine, chan, "out.wav", CPRCEN_RIFF); /* File output on channel */
+// 	/* Speak with streaming input */
+// 	CPRCEN_engine_channel_speak(voiceEngine, chan, txt1, strlen(txt1), 0);
+
+	std::string message_c = message;
+
+   // parse the string
+   std::vector< std::string > tokens;
+   const std::string delimiters = " ";
+   vhcl::Tokenize( message_c, tokens, delimiters );
+
+   /// Get non-XML components of the message
+   std::string command = tokens.at( 0 );
+
+   std::string agent_name = tokens.at( 1 );
+   std::string message_id = tokens.at( 2 );
+   std::string voice_id = tokens.at( 3 );
+   std::string file_name = tokens.at( 4 );
+   size_t prefix_length = message_c.find( file_name, 0 ) + file_name.length() + 1;
+   std::string utterance = message_c.substr( prefix_length );  // strip off the prefix, only using the xml
+
+   // remove anything after </speech> tag
+   size_t postfix_pos = utterance.rfind( "</speech>" );
+   if ( postfix_pos != std::string::npos )
+      utterance = utterance.substr( 0, postfix_pos + 9 );
+
+   // parse out just the sound file name and give it a .wav file type
+   int pos = file_name.find( ".aiff" );
+   int pos2 = file_name.find( "utt" );
+
+   // obtaining the directory path where the output sound file is to be written
+
+   char directory[_MAX_PATH];
+		
+   strcpy(directory,((std::string)file_name.substr(0, pos2)).c_str());
+   tempDir = directory;
+   // converting the directory path to an absolute path
+   char full[ _MAX_PATH ];
+   if ( _fullpath( full, tempDir.c_str(), _MAX_PATH ) == NULL )
+   {
+		printf("/nError converting path sent from SBM to absolute path/n");
+   }
+	
+   char absolute_directory[_MAX_PATH];
+   strcpy(absolute_directory,full); 
+   fullAudioDir = absolute_directory;
+
+   file_name = file_name.substr( pos2, pos - pos2 ) + ".wav";
+
+   // Make sure the audio temp directory exists and create if not
+   // CPRC_riff_save will not create the directory if non-existent
+   if( !(_access( fullAudioDir.c_str(), 0 ) == 0 ) )
+   {
+      std::string temp = "";
+      std::vector< std::string > tokens;
+      const std::string delimiters = "\\/";
+     
+      vhcl::Tokenize( fullAudioDir, tokens, delimiters );
+      
+      printf( "Warning, audio cache directory, %s, does not exist. Creating directory...\n", fullAudioDir.c_str() );
+      for (unsigned int i = 0; i < tokens.size(); i++)
+      {
+         temp += tokens.at( i ) + "\\";
+         _mkdir( temp.c_str() );
+      }
+
+      // Check if directory has been created. Should be done more elegantly, including sending message or timing out.
+      if( !(_access( fullAudioDir.c_str(), 0 ) == 0 ) )
+      {
+         printf( "ERROR: audio cache directory, %s, could not be created. This will likely lead to errors down the line.\\n", fullAudioDir.c_str() );
+      }
+   }
+
+   // Create file name relative to cerevoice relay
+   /**
+    * Clarification: 
+	*			cereproc_file_name refers to the path that cereproc needs to write to, relative to the path from where this program is running
+	*			player_file_name refers to the path that Unreal or some other renderer will play the file from, i.e. relative to the path where it is running
+	*/
+   std::string cereproc_file_name = fullAudioDir + file_name;
+
+   /// Generate the audio
+   std::string xml = textToSpeech(utterance.c_str(), cereproc_file_name.c_str(), voice_id);
+   // Only send out a reply when result is not empty, ignore otherwise as a nother voice relay might pick up the request
+   LOG("Cerevoice reply Cmd = %s",xml.c_str());
+   if ( xml.compare("") != 0 )
+   {
+      std::string reply = agent_name;
+      reply += " ";
+      reply += message_id;
+      reply += " OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+      reply += xml;
+   
+      printf( "REPLY: %s\n", reply.c_str() );
+
+#ifdef _DUMP_COMM_TO_DISK
+	  fprintf(_outfile, "%d: %s\n\n",_dumpCounter - 1,reply.c_str());
+	  std::string dumpXMLstring = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + xml;
+	  fprintf(_outXML, "%d: %s\n\n", _dumpCounter - 1, dumpXMLstring.c_str() );
+#endif
+	  mcuCBHandle& mcu = mcuCBHandle::singleton();
+	  string replyCmd = "RemoteSpeechReply ";
+	  replyCmd = replyCmd + reply; //cmdConst;
+	  mcu.execute_later(replyCmd.c_str());
+      //vhmsg::ttu_notify2( "RemoteSpeechReply", reply.c_str() );
+   }
+}
+
+void CereprocSpeechRelayLocal::setVoice( std::string voice )
+{
+
+}
+
+void CereprocSpeechRelayLocal::set_phonemes_to_visemes()
+{
+	phonemeToViseme[ "sil" ] = "_";  // SIL
+	phonemeToViseme[ "aa" ]  = "Aa"; // AA
+	phonemeToViseme[ "ae" ]  = "Ah"; // AE
+	phonemeToViseme[ "ah" ]  = "Ah"; // AH
+	phonemeToViseme[ "ao" ]  = "Ao"; // AO
+	phonemeToViseme[ "ax" ]  = "Ah"; // AX
+	phonemeToViseme[ "@" ]  = "Ih"; // Shouldn't happen!
+	phonemeToViseme[ "aw" ]  = "Ah"; // AW
+	phonemeToViseme[ "ay" ]  = "Ay"; // AY
+	phonemeToViseme[ "b" ]   = "BMP";//  B
+	phonemeToViseme[ "ch" ]  = "Sh";  // CH
+	phonemeToViseme[ "d" ]   = "D";  //  D
+	phonemeToViseme[ "dh" ]  = "Th"; // DH
+	phonemeToViseme[ "dx" ]  = "D";  // ??
+	phonemeToViseme[ "eh" ]  = "Eh"; // EH
+	phonemeToViseme[ "er" ]  = "Er"; // ER
+	phonemeToViseme[ "ey" ]  = "Eh"; // ?? probably EY
+	phonemeToViseme[ "f" ]   = "F";  //  F
+	phonemeToViseme[ "g" ]   = "Kg"; //  G
+	phonemeToViseme[ "hh" ]  = "Ih"; // HH
+	phonemeToViseme[ "ih" ]  = "Ih"; // IH
+	phonemeToViseme[ "iy" ]  = "Ih"; // IY
+	phonemeToViseme[ "jh" ]  = "Sh";  // JH
+	phonemeToViseme[ "k" ]   = "Kg"; //  K
+	phonemeToViseme[ "l" ]   = "L";  //  L
+	phonemeToViseme[ "m" ]   = "BMP";//  M
+	phonemeToViseme[ "n" ]   = "Kg"; //  N
+	phonemeToViseme[ "ng" ]  = "Kg"; // NG
+	phonemeToViseme[ "ow" ]  = "Ow"; // OW
+	phonemeToViseme[ "oy" ]  = "Oy"; // OY
+	phonemeToViseme[ "p" ]   = "BMP";//  P
+	phonemeToViseme[ "r" ]   = "R";  //  R
+	phonemeToViseme[ "s" ]   = "Z";  //  S
+	phonemeToViseme[ "sh" ]  = "Sh";  // SH
+	phonemeToViseme[ "T" ]   = "D";  //  T ?
+	phonemeToViseme[ "t" ]   = "D";  //  T ?
+	phonemeToViseme[ "th" ]  = "Th"; // TH
+	phonemeToViseme[ "uh" ]  = "Eh"; // UH
+	phonemeToViseme[ "uw" ]  = "Oh"; // UW
+	phonemeToViseme[ "v" ]   = "F";  //  V
+	phonemeToViseme[ "w" ]   = "W"; //  W
+	phonemeToViseme[ "y" ]   = "Ih"; //  Y
+	phonemeToViseme[ "z" ]   = "Z";  //  Z
+	phonemeToViseme[ "zh" ]  = "Sh";  // ZH
+
+	
+}
+#else
+CereprocSpeechRelayLocal::CereprocSpeechRelayLocal()
+{
+
+}
+
+CereprocSpeechRelayLocal::~CereprocSpeechRelayLocal()
+{
+
+}
+void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string cacheDirectory )
+{
+
+}
+
+void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
+{
+
+}
+
+std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const char * cereproc_file_name, std::string voice_id )
+{
+	std::string reply = "";
+
+	return reply;
+}
+
+void CereprocSpeechRelayLocal::set_phonemes_to_visemes()
+{
+
+}
+
+void CereprocSpeechRelayLocal::setVoice( std::string voice )
+{
+
+}
+#endif
+
+#if USE_FESTIVAL_RELAY
+extern SpeechRequestData xmlMetaData;
+extern std::map<string,string> phonemeToViseme;
+extern std::string mapping;
+
+FestivalSpeechRelayLocal::FestivalSpeechRelayLocal()
+{
+	
+}
+
+FestivalSpeechRelayLocal::~FestivalSpeechRelayLocal()
+{
+}
+
+std::string FestivalSpeechRelayLocal::generateReply(const char * utterance,const char * soundFileName)
+{
+	EST_Wave wave;
+
+	//string spoken_text = storeXMLMetaData( utterance );
+	string spoken_text = removeXMLTagsAndNewLines( utterance ,xmlMetaData);
+	//LOG("after store XMLMetaData");
+	//printf("done first time\n");
+	if (!spoken_text.compare("") && spoken_text != "")
+	{
+		puts(spoken_text.append("\n").c_str());
+	}
+	
+	LOG("after spoken text compare, spoken_text = %s",spoken_text.c_str());
+	if (xmlMetaData.tags.size() <= 0)
+	{
+		spoken_text = TransformTextWithTimes(utterance);
+		LOG("done transforming, spoken_text = %s\n",spoken_text.c_str());
+		if (!spoken_text.compare("") && spoken_text != "")
+		{
+			puts(spoken_text.append("\n").c_str());
+		}
+		spoken_text = removeXMLTagsAndNewLines(spoken_text, xmlMetaData);
+		//spoken_text = storeXMLMetaData( spoken_text );
+		LOG("done second time, spoken_text = %s\n", spoken_text.c_str());
+	}
+	//LOG("before remove tab");
+	removeTabsFromString(spoken_text);
+
+	//LOG( "generateReply() - \nbefore: '%s'\nafter: '%s'\n'%s'\n", utterance, spoken_text.c_str(), soundFileName );
+
+	//festival_say_text(spoken_text.c_str());
+	festival_text_to_wave(spoken_text.c_str(),wave);
+    wave.save(soundFileName,"riff");
+
+	return xmlMetaData.replyString;
+}
+
 void FestivalSpeechRelayLocal::removeTabsFromString(string &spoken_text)
 {
 	std::string::size_type pos = 0;
@@ -279,7 +1026,7 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
    char * message = (char*)truncatedTxt.c_str();
 
    std::string actualText = "";
-
+   //LOG("message = %s",message);
    /// Set up a parser for XML message in memory - code sourced from unknown online reference for Xerces XML library
    //xercesc_3_0::MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
    MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
@@ -287,10 +1034,12 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
    DOMDocument *doc = parser->getDocument();
    if ( doc )
    {
+	   //LOG("has doc");
 	   DOMElement *root = doc->getDocumentElement();
 
 	   if ( root ) 
 	   {
+		   //LOG("has root");
 		   /// Get all nodes which have the "mark" tag, from these we can extract the timing tags, and speech text
 		   DOMNodeList *messageList = root->getElementsByTagName(XMLString::transcode("speech"));
 		   if ( messageList && messageList->getLength() > 0)
@@ -313,12 +1062,12 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
 			   fprintf(stderr, "Warning: Could not find speech tag in message, creating message beginning by default\n");
 		   }
 		   messageList = root->getElementsByTagName( X("mark"));
-
+		   //LOG("check messageList = %d",messageList);
 		   /// Store all the book marks in the input message, so that they can be retrieved later
 		   if ( messageList ) 
 		   {
 			   XMLSize_t nLetters = messageList->getLength();
-
+			   //LOG("has messageList, length = %d",nLetters);
 			   for ( XMLSize_t i = 0; i < nLetters; i++ )
 			   {
 				   DOMNode* node = messageList->item(i);
@@ -386,13 +1135,17 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
 					   else
 					   {
 						   std::string temporaryText = speechString;
+						   //LOG("tempText = %s",temporaryText.c_str());
 						   cleanString(temporaryText);
+						   //LOG("tempText after clean = %s",temporaryText.c_str());
 						   /// Words can be used to match up which tags we need to see
 							/// Push tag and word into xmlMetaData
 							xmlMetaData.tags.push_back(markString);
 							xmlMetaData.words.push_back(temporaryText);
 							actualText += temporaryText;
+							//LOG("actual text before clean = %s",actualText.c_str());
 							cleanString(actualText);
+							//LOG("actual text after clean = %s",actualText.c_str());
 					   }
 				   }
 			   }
@@ -420,31 +1173,6 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
 	   //fprintf(stderr, "Error: Unable to instantiate DOM Xml parser, exiting \n");
 	   return "";
    }
-}
-void FestivalSpeechRelayLocal::cleanString(std::string &message)
-{
-	/// Remove newlines and carriage-returns
-	message.erase( std::remove(message.begin(), message.end(), '\r'), message.end() );
-	message.erase( std::remove(message.begin(), message.end(), '\n'), message.end() );
-	/// If it's a space string, we want to leave the last whitespace
-	while ( message.find_last_of(" ") == message.length() - 1  && message.length() > 1)
-	{
-		//fprintf(stderr,"Debug: Reducing length by 1 to remove whitespace at end\n");
-		message.resize( message.length() - 1 );
-	}
-
-	unsigned int pos;
-	while ( (pos = message.find("  ",message.size())) != std::string::npos && pos < message.size())
-	{
-		//fprintf(stderr,"Debug: replacing 2 whitespaces at %d(%s) with 1 whitespace\n",pos, message.substr(pos,2).c_str());
-		message.replace( pos, 2, " " );
-	}
-
-	while (( message.find_first_of(" ") == 0 ) && (message.length() > 1))
-	{		
-		//fprintf(stderr,"Debug: Cleaning initial whitespace %s\n",message[0]);
-		message = message.substr(1);
-	}
 }
 
 void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
@@ -510,11 +1238,11 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	mcu.execute_later(replyCmd.c_str());
 }
 
-void FestivalSpeechRelayLocal::evalFestivalCommand( const char * cmd )
-{
-	int ret = festival_eval_command(cmd);
-	LOG("%s : ret = %d\n", cmd,ret);	
-}
+// void FestivalSpeechRelayLocal::evalFestivalCommand( const char * cmd )
+// {
+// 	int ret = festival_eval_command(cmd);
+// 	LOG("%s : ret = %d\n", cmd,ret);	
+// }
 
 void FestivalSpeechRelayLocal::setVoice(std::string voice)
 {
@@ -723,17 +1451,7 @@ std::string FestivalSpeechRelayLocal::generateReply(const char * utterance,const
    std::string actualText;
    return actualText;	
 }
-std::string FestivalSpeechRelayLocal::TransformTextWithTimes(std::string dtxt)
-{
-   std::string actualText;
-   return actualText;
-}
 
-std::string FestivalSpeechRelayLocal::CreateMarkTimeStamps(std::string text)
-{
-   std::string actualText;
-   return actualText;
-}
 void FestivalSpeechRelayLocal::removeTabsFromString(string &spoken_text)
 {
 	
@@ -742,14 +1460,6 @@ std::string FestivalSpeechRelayLocal::storeXMLMetaData( const std::string & txt)
 {
 	std::string actualText;
     return actualText;	
-}
-void FestivalSpeechRelayLocal::cleanString(std::string &message)
-{
-	
-}
-
-void FestivalSpeechRelayLocal::evalFestivalCommand( const char * cmd )
-{
 }
 
 void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )

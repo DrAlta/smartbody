@@ -35,26 +35,61 @@
 #include "sbm/sbm_character.hpp"
 // Predeclare class
 class mcuCBHandle;
+struct SpeechRequestMessageData;
 
-class FestivalSpeechRelayLocal
+class SpeechRelayLocal
 {
 protected:
 	std::string cacheDirectory;
-	std::string festivalLibDirectory;
+public:
+	virtual void initSpeechRelay(std::string libPath, std::string cacheDirectory) = 0;
+	virtual void processSpeechMessage(const char* message) = 0;
+	virtual void setVoice(std::string voice) = 0;
+protected:
+	std::string TransformTextWithTimes(std::string txt);	
+	std::string CreateMarkTimeStamps(std::string text);
+	std::string removeXMLTagsAndNewLines( const std::string & txt , SpeechRequestMessageData & xmlMetaData);
+	void cleanString(std::string &message);
+};
+
+class FestivalSpeechRelayLocal : public SpeechRelayLocal
+{
+protected:	
+	std::string festivalLibDirectory;	
 public:
 	FestivalSpeechRelayLocal();
 	~FestivalSpeechRelayLocal();
-	void initSpeechRelay(std::string libPath, std::string cacheDirectory);
-	void processSpeechMessage( const char * message );
-       void evalFestivalCommand( const char * cmd );
-	void setVoice(std::string voice);
+	virtual void initSpeechRelay(std::string libPath, std::string cacheDirectory);
+	virtual void processSpeechMessage( const char * message );
+	virtual void setVoice(std::string voice);
+    //void evalFestivalCommand( const char * cmd );	
 protected:
-	std::string generateReply(const char * utterance,const char * soundFileName);
-	std::string TransformTextWithTimes(std::string txt);
-	std::string CreateMarkTimeStamps(std::string text);
+	std::string generateReply(const char * utterance,const char * soundFileName);	
 	void removeTabsFromString(string &spoken_text);
 	std::string storeXMLMetaData( const std::string & txt);
-	void cleanString(std::string &message);
+	//void cleanString(std::string &message);
+	void set_phonemes_to_visemes();
+};
+
+
+struct CPRCEN_engine;
+
+class CereprocSpeechRelayLocal : public SpeechRelayLocal
+{
+protected:
+	std::string licenseLoc;
+	std::string tempDir;
+	std::string fullAudioDir;
+	CPRCEN_engine* voiceEngine;
+	std::map<string,string> phonemeToViseme;
+public:
+	CereprocSpeechRelayLocal();
+	~CereprocSpeechRelayLocal();
+	virtual void initSpeechRelay(std::string libPath, std::string cacheDirectory);
+	virtual void processSpeechMessage( const char * message );
+	virtual void setVoice(std::string voice);	
+protected:
+	std::string textToSpeech(const char * text, const char * cereproc_file_name, std::string voice_id);
 	void set_phonemes_to_visemes();
 };
 

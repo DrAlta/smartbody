@@ -203,6 +203,7 @@ class mcuCBHandle {
 		SmartBody::AudioFileSpeech	_speech_audiofile;
 		text_speech					_speech_text; // [BMLR]
 		FestivalSpeechRelayLocal    _festivalRelayLocal; 
+		CereprocSpeechRelayLocal    _cereprocRelayLocal;
 		unsigned int				queued_cmds;
 
 	public:
@@ -595,6 +596,7 @@ public:
 
 
 		FestivalSpeechRelayLocal* festivalRelay() { return &_festivalRelayLocal; }
+		CereprocSpeechRelayLocal* cereprocRelay() { return &_cereprocRelayLocal; }
 		remote_speech* speech_rvoice() { return &_speech_rvoice; }
 		local_speech* speech_localvoice() { return &_speech_localvoice; }
 		SmartBody::AudioFileSpeech* speech_audiofile() { return &_speech_audiofile; }
