@@ -104,10 +104,13 @@ def setupBehaviorSet():
 		zebra2Map.applyMotion(scene.getMotion(mocapRReachMotions[i]))
 		mirrorMotion1 = scene.getMotion(mocapRReachMotions[i])
 		mirrorMotion1.mirror(mocapLReachMotions[i], "ChrGarza.sk")	
+		
+	zebra2Map.applyMotion(scene.getMotion("ChrGarza@IdleStand01"))
 
 
 def retargetBehaviorSet(charName, skelName):
 	mocapReachMotions = StringVec();
+	mocapReachMotions.append("ChrGarza@IdleStand01")
 	mocapReachMotions.append("ChrGarza@IdleStand01_ReachBackFloor01")
 	mocapReachMotions.append("ChrGarza@IdleStand01_ReachBackHigh01")
 	mocapReachMotions.append("ChrGarza@IdleStand01_ReachBackLow01")

@@ -24,6 +24,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar = new Fl_Menu_Bar(0, 0, w, 30); 
 	menubar->labelsize(10);
 	menubar->add("&File/New", 0, NewCB, this, NULL);	
+	menubar->add("&File/Save", 0, SaveCB, this, NULL);	
 	menubar->add("&File/Load...", 0, LoadCB, this, NULL);
 	menubar->add("&File/Connect...", 0, LaunchConnectCB, this, NULL);
 	menubar->add("&File/Disconnect", 0, DisconnectRemoteCB, this, NULL);
@@ -79,6 +80,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, NULL);
 	menubar->add("&Window/Viseme Viewer", 0, LaunchVisemeViewerCB, this, NULL);
 	menubar->add("&Window/Retarget Creator", 0, LaunchRetargetCreatorCB, this, NULL);
+	menubar->add("&Help/Create Python API", 0, CreatePythonAPICB, this, NULL);
 	//menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
 	//menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, FL_MENU_DIVIDER);
 
@@ -337,6 +339,29 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
 {
+	const char* saveFile = fl_file_chooser("Save file:", "*.py", NULL);
+	if (!saveFile)
+		return;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SmartBody::SBScene* scene = mcu._scene;
+	std::string fileString = scene->save();
+
+	std::ofstream file(saveFile);
+	if (!file.good())
+	{
+		std::string message = "Cannot save to file '";
+		message.append(saveFile);
+		message.append("'");
+		fl_alert(message.c_str());
+		file.close();
+	}
+	file << fileString;
+	file.close();
+	
+	std::string scenePrompt = "Scene saved to file '";
+	scenePrompt.append(saveFile);
+	scenePrompt.append("'");
+	fl_message(scenePrompt.c_str());
 }
 
 void BaseWindow::RunCB(Fl_Widget* widget, void* data)
@@ -1179,6 +1204,29 @@ void BaseWindow::ShowPoseExamples( Fl_Widget* w, void* data )
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdReachNoExamples, NULL);
 #endif
 }
+
+void BaseWindow::CreatePythonAPICB(Fl_Widget* widget, void* data)
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+
+	const char* docFile = fl_file_chooser("Save documentation to:", "*.html", NULL);
+	if (!docFile)
+		return;
+
+	std::stringstream strstr;
+	strstr << "from pydoc import *\n";
+	strstr << "d = HTMLDoc()\n";
+	strstr << "content = d.docmodule(sys.modules[\"SmartBody\"])\n";
+	strstr << "import io\n";
+	strstr << "f = io.open('./smartbody.html', 'w')\n";
+	strstr << "f.write(unicode(content))\n";
+	strstr << "f.close()\n";
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->run(strstr.str());
+}
+
+
 //== Viewer Factory ========================================================
 SrViewer* FltkViewerFactory::s_viewer = NULL;
 
@@ -1220,3 +1268,5 @@ void FltkViewerFactory::reset(SrViewer* viewer)
 		}
 	}
 }
+
+
