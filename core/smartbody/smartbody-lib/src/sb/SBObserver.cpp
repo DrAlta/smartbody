@@ -48,4 +48,9 @@ void SBObserver::notify(SBSubject* subject)
 {
 }
 
+bool SBObserver::hasDependency(SBSubject* subject)
+{
+	return (_subjects.find(subject) != _subjects.end());
+}
+
 };

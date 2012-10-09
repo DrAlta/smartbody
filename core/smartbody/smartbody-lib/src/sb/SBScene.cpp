@@ -997,9 +997,10 @@ std::string SBScene::save()
 {
 	std::stringstream strstr;
 	
+	strstr << "# -------------------- media and asset paths\n";
 	// mediapath
 	std::string mediaPath = getMediaPath();
-	strstr << "scene.setMediaPath(\"" << mediaPath << ")\n";
+	strstr << "scene.setMediaPath(\"" << mediaPath << "\")\n";
 
 	// asset paths
 	std::vector<std::string>::iterator iter;
@@ -1031,6 +1032,7 @@ std::string SBScene::save()
 		strstr << "scene.addAssetPath(\"mesh\", " << path << ")\n";
 	}
 
+	strstr << "# -------------------- face definitions\n";
 	// face definitions
 	std::vector<std::string> faceDefinitions = getFaceDefinitionNames();
 	for (iter = faceDefinitions.begin(); iter != faceDefinitions.end(); iter++)
@@ -1055,7 +1057,7 @@ std::string SBScene::save()
 			 faceIter++)
 		{
 			const std::string& viseme = (*faceIter);
-			strstr << faceDefinitionName << ".setViseme(\"" << viseme << ", ";
+			strstr << faceDefinitionName << ".setViseme(\"" << viseme << "\", ";
 			SkMotion* visemeMotion = faceDef->getVisemeMotion(viseme);
 			if (visemeMotion)
 			{
@@ -1104,6 +1106,7 @@ std::string SBScene::save()
 		}
 	}
 
+	strstr << "# -------------------- joint maps\n";
 
 	// joint maps
 	SBJointMapManager* jointMapManager = getJointMapManager();
@@ -1123,6 +1126,8 @@ std::string SBScene::save()
 			strstr << jointMapName << ".setMapping(\"" << source << "\", \"" << target << "\")\n";
 		}
 	}
+
+	strstr << "# -------------------- lip syncing\n";
 
 	// diphones
 	SBDiphoneManager* diphoneManager = getDiphoneManager();
@@ -1160,8 +1165,11 @@ std::string SBScene::save()
 		}
 	}
 		
+	strstr << "# -------------------- reaching\n";
 	// reach
 
+
+	strstr << "# -------------------- blends and transitions\n";
 	// blends & transitions
 	SBAnimationBlendManager* blendManager = getBlendManager();
 	int numBlends = blendManager->getNumBlends();
@@ -1186,6 +1194,7 @@ std::string SBScene::save()
 		strstr << "\n";
 	}
 
+	strstr << "# -------------------- pawns and characters\n";
 	// pawns
 	std::vector<std::string> pawns = getPawnNames();
 	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
@@ -1197,7 +1206,15 @@ std::string SBScene::save()
 		SrVec position = pawn->getPosition();
 		strstr << "pawn.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
 		// attributes
-		// ...
+		std::vector<std::string> attributeNames = pawn->getAttributeNames();
+		for (std::vector<std::string>::iterator iter = attributeNames.begin();
+			 iter != attributeNames.end();
+			 iter++)
+		{
+			SmartBody::SBAttribute* attr = pawn->getAttribute((*iter));
+			std::string attrWrite = attr->write();
+			strstr << attrWrite;
+		}
 	}
 
 	// characters
@@ -1213,7 +1230,15 @@ std::string SBScene::save()
 		// controllers
 		strstr << "character.createStandardControllers()\n";
 		// attributes
-		// ...
+		std::vector<std::string> attributeNames = character->getAttributeNames();
+		for (std::vector<std::string>::iterator iter = attributeNames.begin();
+			 iter != attributeNames.end();
+			 iter++)
+		{
+			SmartBody::SBAttribute* attr = character->getAttribute((*iter));
+			std::string attrWrite = attr->write();
+			strstr << attrWrite;
+		}
 	}
 
 	return strstr.str();

@@ -296,18 +296,32 @@ const bool& BoolAttribute::getDefaultValue()
 
 std::string BoolAttribute::write()
 {
+	SBAttributeInfo* info = this->getAttributeInfo();
 	std::stringstream strstr;
-	strstr << "setBoolAttribute(\"";
-	strstr << getName();
-	strstr << "\", ";
-	if (getValue() == true)
+	strstr << "attr = obj.createBoolAttribute(\"" << getName() << "\"";
+	getValue() ? strstr << ", True" :  strstr << ", False";
+	SBObject* object = this->getObject();
+	if (object->hasDependency(this))
 	{
-		strstr << "True";
+		strstr << ", True";
 	}
 	else
 	{
-		strstr << "False)";
+		strstr << ", False";
 	}
+	SBAttributeGroup* group = info->getGroup();
+	strstr << ", " << group->getName();
+	strstr << ", " << info->getPriority();
+	info->getReadOnly() ? strstr << ", True" : strstr << ", False";
+	info->getLocked() ? strstr << ", True" : strstr << ", False";
+	info->getHidden() ? strstr << ", True" : strstr << ", False";
+	strstr << ")\n";
+
+	bool val = getDefaultValue();
+	strstr << "attr.setDefaultValue(\"";
+	val? strstr << "True\")\n" : strstr << "False\")\n"; 
+	strstr << "attr.setDescription(\"" << info->getDescription() << "\")\n";
+
 	return strstr.str();
 }
 
@@ -403,11 +417,30 @@ const int& IntAttribute::getDefaultValue()
 
 std::string IntAttribute::write()
 {
+	SBAttributeInfo* info = this->getAttributeInfo();
 	std::stringstream strstr;
-	strstr << "setIntAttribute(\"";
-	strstr << getName();
-	strstr << "\", ";
-	strstr << getValue() << ")";
+	strstr << "attr = obj.createIntAttribute(\"" << getName() << "\", ";
+	strstr << getValue();
+	SBObject* object = this->getObject();
+	if (object->hasDependency(this))
+	{
+		strstr << ", True";
+	}
+	else
+	{
+		strstr << ", False";
+	}
+	SBAttributeGroup* group = info->getGroup();
+	strstr << ", " << group->getName();
+	strstr << ", " << info->getPriority();
+	info->getReadOnly() ? strstr << ", True" : strstr << ", False";
+	info->getLocked() ? strstr << ", True" : strstr << ", False";
+	info->getHidden() ? strstr << ", True" : strstr << ", False";
+	strstr << ")\n";
+
+	int val = getDefaultValue();
+	strstr << "attr.setDefaultValue(\"" << val << "\")\n";
+	strstr << "attr.setDescription(\"" << info->getDescription() << "\")\n";
 
 	return strstr.str();
 }
@@ -508,12 +541,30 @@ void DoubleAttribute::setMax(double val)
 
 std::string DoubleAttribute::write()
 {
+	SBAttributeInfo* info = this->getAttributeInfo();
 	std::stringstream strstr;
-	strstr << "setDoubleAttribute(\"";
-	strstr << getName();
-	strstr << "\", ";
-	strstr << getValue() << ")";
+	strstr << "attr = obj.createDoubleAttribute(\"" << getName() << "\", ";
+	strstr << getValue();
+	SBObject* object = this->getObject();
+	if (object->hasDependency(this))
+	{
+		strstr << ", True";
+	}
+	else
+	{
+		strstr << ", False";
+	}
+	SBAttributeGroup* group = info->getGroup();
+	strstr << ", " << group->getName();
+	strstr << ", " << info->getPriority();
+	info->getReadOnly() ? strstr << ", True" : strstr << ", False";
+	info->getLocked() ? strstr << ", True" : strstr << ", False";
+	info->getHidden() ? strstr << ", True" : strstr << ", False";
+	strstr << ")\n";
 
+	double val = getDefaultValue();
+	strstr << "attr.setDefaultValue(\"" << val << "\")\n";
+	strstr << "attr.setDescription(\"" << info->getDescription() << "\")\n";
 	return strstr.str();
 }
 
@@ -575,23 +626,39 @@ const std::string& StringAttribute::getDefaultValue()
 
 std::string StringAttribute::write()
 {
+	SBAttributeInfo* info = this->getAttributeInfo();
 	std::stringstream strstr;
-	strstr << "setStringAttribute(\"";
-	strstr << getName();
-	strstr << "\", \"";
-	// need to escape any backslashes
-	std::stringstream valStr;
-	for (size_t i = 0; i < m_value.length(); i++)
+	strstr << "attr = obj.createStringAttribute(\"" << getName() << "\", ";
+	strstr << getValue();
+	SBObject* object = this->getObject();
+	if (object->hasDependency(this))
 	{
-		if (m_value[i] == '\\')
-			valStr << "\\\\";
-		else
-			valStr << m_value[i];
+		strstr << ", True";
 	}
+	else
+	{
+		strstr << ", False";
+	}
+	SBAttributeGroup* group = info->getGroup();
+	strstr << ", " << group->getName();
+	strstr << ", " << info->getPriority();
+	info->getReadOnly() ? strstr << ", True" : strstr << ", False";
+	info->getLocked() ? strstr << ", True" : strstr << ", False";
+	info->getHidden() ? strstr << ", True" : strstr << ", False";
+	strstr << ")\n";
 
-	strstr << valStr.str();
-	strstr << "\")";
-
+	std::string val = getDefaultValue();
+	strstr << "attr.setDefaultValue(\"" << val << "\")\n";
+	strstr << "validValues = SrVec()\n";
+	const std::vector<std::string>& values = getValidValues();
+	for (std::vector<std::string>::const_iterator iter = values.begin();
+		 iter != values.end();
+		 iter++)
+	{
+		strstr << "validValues.append(\"" << (*iter) << "\")\n";
+	}
+	strstr << "attr.setValidValues(validValues)\n";
+	strstr << "attr.setDescription(\"" << info->getDescription() << "\")\n";
 	return strstr.str();
 }
 
@@ -665,16 +732,35 @@ const SrVec& Vec3Attribute::getDefaultValue()
 
 std::string Vec3Attribute::write()
 {
+	SBAttributeInfo* info = this->getAttributeInfo();
 	std::stringstream strstr;
-	strstr << "setVec3Attribute(\"";
-	strstr << getName();
-	strstr << "\", SrVec(";
-	strstr << m_value[0];
-	strstr << ", ";
-	strstr << m_value[1];
-	strstr << ", ";
-	strstr << m_value[2];
-	strstr << "))";
+	strstr << "attr = obj.createVec3Attribute(\"" << getName() << "\", ";
+	const SrVec& vec = getValue();
+	strstr << " " << vec.x << ", " << vec.y << ", " << vec.z;
+	SBObject* object = this->getObject();
+	if (object->hasDependency(this))
+	{
+		strstr << ", True";
+	}
+	else
+	{
+		strstr << ", False";
+	}
+	SBAttributeGroup* group = info->getGroup();
+	strstr << ", " << group->getName();
+	strstr << ", " << info->getPriority();
+	info->getReadOnly() ? strstr << ", True" : strstr << ", False";
+	info->getLocked() ? strstr << ", True" : strstr << ", False";
+	info->getHidden() ? strstr << ", True" : strstr << ", False";
+	strstr << ")\n";
+
+	const SrVec& val = getDefaultValue();
+	strstr << "vec = SrVec()\n";
+	strstr << "vec.setData(0, " << val.x << ")\n";
+	strstr << "vec.setData(1, " << val.x << ")\n";
+	strstr << "vec.setData(2, " << val.x << ")\n";
+	strstr << "attr.setDefaultValue(vec)\n";
+	strstr << "attr.setDescription(\"" << info->getDescription() << "\")\n";
 
 	return strstr.str();
 }
@@ -738,19 +824,40 @@ const SrMat& MatrixAttribute::getDefaultValue()
 
 std::string MatrixAttribute::write()
 {
-	
+	SBAttributeInfo* info = this->getAttributeInfo();
 	std::stringstream strstr;
-	strstr << "setMatrixAttribute(\"";
-	strstr << getName() << "\", SrMat(";
+	strstr << "attr = obj.createMatrixAttribute(\"" << getName() << "\", ";
+	const SrMat& mat = getValue();
+	strstr << "mat = SrMat()\n";
 	for (int r = 0; r < 4; r++)
-	{
 		for (int c = 0; c < 4; c++)
-		{
-			strstr << ", ";
-			strstr << m_value.get(r, c);
-		}
+			strstr << "mat.setData(" << mat.getData(r, c) << ")\n";
+	strstr << "attr.setValue(mat)\n";
+
+	SBObject* object = this->getObject();
+	if (object->hasDependency(this))
+	{
+		strstr << ", True";
 	}
-	strstr << "))";
+	else
+	{
+		strstr << ", False";
+	}
+	SBAttributeGroup* group = info->getGroup();
+	strstr << ", " << group->getName();
+	strstr << ", " << info->getPriority();
+	info->getReadOnly() ? strstr << ", True" : strstr << ", False";
+	info->getLocked() ? strstr << ", True" : strstr << ", False";
+	info->getHidden() ? strstr << ", True" : strstr << ", False";
+	strstr << ")\n";
+
+	const SrMat& defMat = getDefaultValue();
+	strstr << "defMat = SrMat()\n";
+	for (int r = 0; r < 4; r++)
+		for (int c = 0; c < 4; c++)
+			strstr << "defMat.setData(" << defMat.getData(r, c) << ")\n";
+	strstr << "attr.setDefaultValue(defMat)\n";
+	strstr << "attr.setDescription(\"" << info->getDescription() << "\")\n";
 
 	return strstr.str();
 }
@@ -788,8 +895,28 @@ void ActionAttribute::setValue()
 
 std::string ActionAttribute::write()
 {
-	// TODO:
-	return "";
+	SBAttributeInfo* info = this->getAttributeInfo();
+	std::stringstream strstr;
+	strstr << "attr = obj.createActionAttribute(\"" << getName() << "\", ";
+	SBObject* object = this->getObject();
+	if (object->hasDependency(this))
+	{
+		strstr << " True";
+	}
+	else
+	{
+		strstr << " False";
+	}
+	SBAttributeGroup* group = info->getGroup();
+	strstr << ", " << group->getName();
+	strstr << ", " << info->getPriority();
+	info->getReadOnly() ? strstr << ", True" : strstr << ", False";
+	info->getLocked() ? strstr << ", True" : strstr << ", False";
+	info->getHidden() ? strstr << ", True" : strstr << ", False";
+	strstr << ")\n";
+
+	strstr << "attr.setDescription(\"" << info->getDescription() << "\")\n";
+	return strstr.str();
 }
 
 void ActionAttribute::read()

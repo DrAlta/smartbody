@@ -663,6 +663,7 @@ boost::python::class_<SBSubject>("SBSubject")
 boost::python::class_<SBObserver>("SBObserver")
 		.def("addDependency", &SBObserver::addDependency,"Adds a dependency on a subject.")
 		.def("removeDependency", &SBObserver::removeDependency,"Removes a dependency on a subject.")
+		.def("hasDependency", &SBObserver::hasDependency, "Returns True if there is a dependency on the given subject.")
 		.def("notify", &SBObserver::notify, "Notifies the observer of the subject.")
 		;
 
@@ -689,12 +690,16 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 	boost::python::class_<BoolAttribute, boost::python::bases<SBAttribute> >("BoolAttribute")
 		.def("getValue", &BoolAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the bool attribute.")
 		.def("setValue", &BoolAttribute::setValue, "Sets the value of the boolean attribute.")
+		.def("getDefaultValue", &BoolAttribute::getDefaultValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the default value of the bool attribute.")
+		.def("setDefaultValue", &BoolAttribute::setDefaultValue, "Sets the default value of the boolean attribute.")
 		.def("setValueFast", &BoolAttribute::setValueFast, "Sets the value of the boolean attribute without notifying observers.")
 	;
 
 	boost::python::class_<StringAttribute, boost::python::bases<SBAttribute> >("StringAttribute")
 		.def("getValue", &StringAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the string attribute.")
 		.def("setValue", &StringAttribute::setValue, "Sets the value of the string attribute.")
+		.def("getDefaultValue", &StringAttribute::getDefaultValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the default value of the string attribute.")
+		.def("setDefaultValue", &StringAttribute::setDefaultValue, "Sets the default value of the string attribute.")
 		.def("setValueFast", &StringAttribute::setValueFast, "Sets the value of the string attribute without notifying observers.")
 		.def("setValidValues", &StringAttribute::setValidValues, "Sets the valid values of the string attribute.")
 		.def("getValidValues", &StringAttribute::getValidValues, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the valid values of the string attribute.")
@@ -703,6 +708,8 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 	boost::python::class_<IntAttribute, boost::python::bases<SBAttribute> >("IntAttribute")
 		.def("getValue", &IntAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the int attribute.")
 		.def("setValue", &IntAttribute::setValue, "Sets the value of the integer attribute.")
+		.def("getDefaultValue", &IntAttribute::getDefaultValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the default value of the string attribute.")
+		.def("setDefaultValue", &IntAttribute::setDefaultValue, "Sets the default value of the string attribute.")
 		.def("setValueFast", &IntAttribute::setValueFast, "Sets the value of the integer attribute without notifying observers.")
 	;
 

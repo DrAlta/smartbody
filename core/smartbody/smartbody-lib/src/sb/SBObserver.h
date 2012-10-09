@@ -15,6 +15,7 @@ class SBObserver
 
 		virtual void addDependency(SBSubject* subject);
 		virtual void removeDependency(SBSubject* subject);
+		bool hasDependency(SBSubject* subject);
 
 		virtual void notify(SBSubject* subject);
 
