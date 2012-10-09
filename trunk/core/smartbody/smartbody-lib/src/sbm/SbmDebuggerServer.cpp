@@ -145,13 +145,14 @@ void SbmDebuggerServer::Update()
          if (m_scene)
          {
             vector<string> charNames = m_scene->getCharacterNames();
+			string msg = "";
             for (size_t i = 0; i < charNames.size(); i++)
             {
 				SmartBody::SBCharacter * c = m_scene->getCharacter(charNames[i]);
 
                size_t numBones = c->getSkeleton()->getNumJoints();
 
-               string msg = vhcl::Format("sbmdebugger %s update", m_fullId.c_str());
+               msg += vhcl::Format("sbmdebugger %s update", m_fullId.c_str());
                msg += vhcl::Format(" character %s bones %d\n", c->getName().c_str(), numBones);
 
                for (int j = 0; j < c->getSkeleton()->getNumJoints(); j++)
@@ -171,6 +172,7 @@ void SbmDebuggerServer::Update()
                }
 
                msg += ";";
+			}
 
                if (!sentCamUpdate)
                {
@@ -216,7 +218,7 @@ void SbmDebuggerServer::Update()
                   //LOG("TCP Send %d - %d\n", c++, i);
                   vhcl::SocketSend(m_sockConnectionsTCP[ i ], msg);
                }
-            }
+            //}
          }
       }
    }
