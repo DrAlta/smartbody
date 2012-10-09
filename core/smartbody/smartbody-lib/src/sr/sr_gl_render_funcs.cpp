@@ -387,6 +387,7 @@ void SrGlRenderFuncs::render_box ( SrSnShapeBase* shape )
 
 void SrGlRenderFuncs::render_sphere ( SrSnShapeBase* shape )
  {
+   //return;
    //SR_TRACE1 ( "Render sphere" );
 
    SrSphere& sphere = ((SrSnSphere*)shape)->shape();
@@ -534,6 +535,7 @@ void SrGlRenderFuncs::render_sphere ( SrSnShapeBase* shape )
 void SrGlRenderFuncs::render_cylinder ( SrSnShapeBase* shape )
  {
    //SR_TRACE1 ( "Render cylinder" );
+   //return;
 
    SrCylinder& cyl = ((SrSnCylinder*)shape)->shape();
 
