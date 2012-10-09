@@ -4,6 +4,7 @@
 
 #include "SbmDebuggerClient.h"
 #include "SbmDebuggerUtility.h"
+#include <sb/SBSimulationManager.h>
 
 #include <string>
 #include <vector>
@@ -128,18 +129,18 @@ void SbmDebuggerClient::Update()
          if ( bytesReceived > 0 )
          {
             m_tcpData.append(str);
-            m_tcpDataCount += m_tcpData.length();
-
-            //printf("TCP %d\n", m_tcpDataCount);
+            m_tcpDataCount += m_tcpData.length();           
 
             tcpDataPending = vhcl::SocketIsDataPending(s);
+
+			//LOG("TCP Data Count %d, tcpDataPending = %d\n", m_tcpDataCount, tcpDataPending);
          }
 
          // sanity check for spamming too much data
          if (m_tcpData.length() > 500000)
          {
-            //static int i = 0;
-            //printf("TCP Overflow %d - %d\n", i++);
+            static int i = 0;
+            LOG("TCP Overflow %d, length = %d\n", i++,m_tcpData.length());
             tcpDataPending = 0;
          }
       }
@@ -197,7 +198,13 @@ void SbmDebuggerClient::Update()
                           {
                              int numBones = vhcl::ToInt(split[6]);
                           }
-
+// 						  if (split[4] == "ChrBackovicPrefab")						  
+// 						  {							  
+// 							  static double prevTime = 0.0;
+// 							  float dt = SmartBody::SBScene::getScene()->getSimulationManager()->getTime() - prevTime;
+// 							  LOG("Update ChrBackovic, time = %f, num bones = %d", dt,split.size() - 7);
+// 							  prevTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
+// 						  }
                           for (size_t i = 7; i < split.size(); i++)
                           {
                              string name = split[i];
