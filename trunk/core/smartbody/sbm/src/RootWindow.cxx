@@ -219,12 +219,10 @@ void BaseWindow::hide_viewer()
 		this->hide();
 }
 
-void BaseWindow::set_camera ( const SrCamera &cam )
+void BaseWindow::set_camera ( const SrCamera* cam )
 {
    fltkViewer->set_camera(cam);
-
 }
-
 
 SrCamera* BaseWindow::get_camera()
 {

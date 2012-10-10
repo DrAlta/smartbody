@@ -16,7 +16,7 @@ SBJoint::SBJoint( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i ) : SkJo
 {
 }
 
-void SBJoint::setName(std::string& str)
+void SBJoint::setName(const std::string& str)
 {
 	name(str);
 }

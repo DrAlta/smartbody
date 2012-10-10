@@ -1027,7 +1027,7 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				float y = args.read_float();
 				float z = args.read_float();
 				mcu_p->camera_p->eye.set( x, y, z );
-				mcu_p->viewer_p->set_camera( *( mcu_p->camera_p ) );
+				mcu_p->viewer_p->set_camera( mcu_p->camera_p );
 			}
 			else
 			if( strcmp( cam_cmd, "center" ) == 0 )	{
@@ -1035,12 +1035,12 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				float y = args.read_float();
 				float z = args.read_float();
 				mcu_p->camera_p->center.set( x, y, z );
-				mcu_p->viewer_p->set_camera( *( mcu_p->camera_p ) );
+				mcu_p->viewer_p->set_camera( mcu_p->camera_p );
 			}
 			else
 			if( strcmp( cam_cmd, "scale" ) == 0 )	{
 				mcu_p->camera_p->scale = args.read_float();
-				mcu_p->viewer_p->set_camera( *( mcu_p->camera_p ) );
+				mcu_p->viewer_p->set_camera( mcu_p->camera_p );
 			}
 			else
 			if( strcmp( cam_cmd, "track" ) == 0 )	{

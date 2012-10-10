@@ -913,7 +913,7 @@ int main( int argc, char **argv )	{
 			mcu.camera_p->eye.set(cameraLoc.x, cameraLoc.y, cameraLoc.z);
 			SrVec targetLoc = cameraLoc - mcu.cameraTracking[x]->targetToCamera;
 			mcu.camera_p->center.set( targetLoc.x, targetLoc.y, targetLoc.z);
-			mcu.viewer_p->set_camera(*( mcu.camera_p ));
+			mcu.viewer_p->set_camera(mcu.camera_p);
 		}	
 
 		BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(mcu.viewer_p);

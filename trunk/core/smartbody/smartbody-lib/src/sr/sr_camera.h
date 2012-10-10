@@ -56,11 +56,34 @@ class SrCamera
     SrCamera ();
 
     /*! Copy constructor. */
-    SrCamera ( const SrCamera &c );
+    SrCamera ( const SrCamera* c );
 
     /*! Initialize the camera with the main parameters eye, center and up. */
     SrCamera ( const SrPnt& e, const SrPnt& c, const SrVec& u );
 
+	void setScale(float scale);
+	float getScale();
+	void setEye(float x, float y, float z);
+	SrVec getEye();
+	void setCenter(float x, float y, float z);
+	SrVec getCenter();
+	void setUpVector(SrVec up);
+	SrVec getUpVector();
+	void setFov(float fov);
+	float getFov();
+	void setNearPlane(float n);
+	float getNearPlane();
+	void setFarPlane(float f);
+	float getFarPlane();
+	void setAspectRatio(float aspect);
+	float getAspectRatio();
+
+	void setTrack(const std::string& characterName, const std::string& jointName);
+	void removeTrack();
+
+	void print();
+	void reset();
+	
     /*! Set the parameters to their default values, which are :
         eye=(0,0,2), center=(0,0,0), up=(0,1,0), fovy=60, znear=0.1, zfar=1000, aspect=1. */
     void init ();

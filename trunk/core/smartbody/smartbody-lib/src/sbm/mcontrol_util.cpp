@@ -965,7 +965,7 @@ int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{
 		viewer_p = viewer_factory->create( px, py, width, height );
 		viewer_p->label_viewer( "SBM Viewer - Local Mode" );
 		camera_p = new SrCamera;
-		viewer_p->set_camera( *camera_p );
+		viewer_p->set_camera( camera_p );
 		//((FltkViewer*)viewer_p)->set_mcu(this);
 		viewer_p->show_viewer();
 		if( root_group_p )	{
@@ -1000,9 +1000,9 @@ int mcuCBHandle::openOgreViewer( int width, int height, int px, int py )	{
 		if (!ogreViewerFactory)
 			return CMD_FAILURE;
 		ogreViewer_p = ogreViewerFactory->create( px, py, width, height );
-		ogreViewer_p->label_viewer( "SBM Ogre Viewer" );
+		ogreViewer_p->label_viewer( "SB Ogre Viewer" );
 		camera_p = new SrCamera;
-		ogreViewer_p->set_camera( *camera_p );		
+		ogreViewer_p->set_camera( camera_p );		
 		ogreViewer_p->show_viewer();
 		if( root_group_p )	{
 			ogreViewer_p->root( root_group_p );

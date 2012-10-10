@@ -62,7 +62,7 @@ void ObjectManipulationHandle::set_selected_pawn( SbmPawn* pawn )
 	}
 }
 
-SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera& cam, std::vector<int>& hitNames)
+SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* cam, std::vector<int>& hitNames)
 {
 	GLint viewport[4];
 	const int BUFSIZE = 512;
@@ -86,7 +86,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera& c
 	//printf("cursorX = %d, cursorY = %d\n",cursorX,cursorY);
 	gluPickMatrix(cursorX,cursorY,5,5,viewport);
 	ratio = (viewport[2]+0.0f) / viewport[3];	
-	glMultMatrixf ( (const float*)cam.get_perspective_mat(mat) );	
+	glMultMatrixf ( (const float*)cam->get_perspective_mat(mat) );	
 	glMatrixMode(GL_MODELVIEW);
 
 	// draw buffer object for each joints ?	
@@ -118,7 +118,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera& c
 		if (active_control && active_control->get_attach_pawn() == pawn)
 		{			
 			//pawnPosControl.hitOPS(cam);
-			active_control->hitTest(cam);
+			active_control->hitTest(*cam);
 		}
 		else if (curChar) // the selected pawn is actually a character
 		{
@@ -154,7 +154,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera& c
 	return selectPawn;
 }
 
-void ObjectManipulationHandle::picking(float x,float y,SrCamera& cam)
+void ObjectManipulationHandle::picking(float x,float y,SrCamera* cam)
 {
 	// start picking
 	/*
