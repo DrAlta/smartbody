@@ -62,6 +62,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Steer/No Steering", 0, SteeringNoneCB, this, NULL);	
 	menubar->add("&Create/Character...", 0, CreateCharacterCB, this, NULL);
 	menubar->add("&Create/Pawn...", 0, CreatePawnCB, this, NULL);
+	menubar->add("&Create/Light...", 0, CreateLightCB, this, NULL);
 	menubar->add("&Create/Terrain...", 0, CreateTerrainCB, this, NULL);
 	menubar->add("&Camera/Reset", 0, CameraResetCB, this, NULL);
 	menubar->add("&Camera/Frame All", 0, CameraFrameCB, this, NULL);
@@ -1067,6 +1068,44 @@ void BaseWindow::CreatePawnCB(Fl_Widget* w, void* data)
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->create_pawn();
+#endif
+}
+
+void BaseWindow::CreateLightCB(Fl_Widget* w, void* data)
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	int highestLightNum = 0;
+	std::vector<std::string> pawnNames = scene->getPawnNames();
+	for (std::vector<std::string>::iterator iter =  pawnNames.begin();
+		 iter != pawnNames.end();
+		 iter++)
+	{
+		std::string& pawnName = (*iter);
+		if (pawnName.find("light") == 0)
+		{
+			std::string lightNumStr = pawnName.substr(5, pawnName.size());
+			int lightNum = atoi(lightNumStr.c_str());
+			if (lightNum >= highestLightNum)
+				highestLightNum = lightNum + 1;
+		}
+
+	}
+	std::stringstream strstr;
+	strstr << "light = scene.createPawn(\"light" << highestLightNum << "\")\n";
+	strstr << "light.createBoolAttribute(\"lightIsDirectional\", True, True, \"LightParameters\", 200, False, False, False, \"Is the light directional?\")\n";
+	strstr << "light.createVec3Attribute(\"lightDiffuseColor\", 1, .95, .8, True, \"LightParameters\", 210, False, False, False, \" Diffuse light color\")\n";
+	strstr << "light.createVec3Attribute(\"lightAmbientColor\", 0, 0, 0, True, \"LightParameters\", 220, False, False, False, \" Ambient light color\")\n";
+	strstr << "light.createVec3Attribute(\"lightSpecularColor\", 0, 0, 0, True, \"LightParameters\", 230, False, False, False, \"Specular light color\")\n";
+	strstr << "light.createDoubleAttribute(\"lightSpotExponent\", 0, True, \"LightParameters\", 240, False, False, False, \" Spotlight exponent.\")\n";
+	strstr << "light.createVec3Attribute(\"lightSpotDirection\", 0, 0, -1, True, \"LightParameters\", 250, False, False, False, \"Spotlight direction\")\n";
+	strstr << "light.createDoubleAttribute(\"lightSpotCutoff\", 180, True, \"LightParameters\", 260, False, False, False, \"Spotlight cutoff angle\")\n";
+	strstr << "light.createDoubleAttribute(\"lightConstantAttenuation\", 1, True, \"LightParameters\", 270, False, False, False, \"Constant attenuation\")\n";
+	strstr << "light.createDoubleAttribute(\"lightLinearAttenuation\", 1, True, \"LightParameters\", 280, False, False, False, \" Linear attenuation.\")\n";
+	strstr << "light.createDoubleAttribute(\"lightQuadraticAttenuation\", 0, True, \"LightParameters\", 290, False, False, False, \"Quadratic attenuation\")\n";
+	scene->run(strstr.str());
 #endif
 }
 

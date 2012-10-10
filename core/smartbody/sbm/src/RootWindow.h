@@ -138,6 +138,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void AudioCB(Fl_Widget* w, void* data);
 		static void CreateCharacterCB(Fl_Widget* w, void* data);
 		static void CreatePawnCB(Fl_Widget* w, void* data);
+		static void CreateLightCB(Fl_Widget* w, void* data);
 		static void CreateTerrainCB(Fl_Widget* w, void* data);
 		static void KinematicFootstepsCB(Fl_Widget* w, void* data);
 		static void LocomotionFootstepsCB(Fl_Widget* w, void* data);
