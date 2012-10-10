@@ -30,8 +30,8 @@ public:
 	SbmPawn* get_selected_pawn();
 	void set_selected_pawn(SbmPawn* pawn);
 
-	SbmPawn* getPickingPawn(float x, float y, SrCamera& cam, std::vector<int>& hitNames);
-	void picking(float x,float y,SrCamera& cam);
+	SbmPawn* getPickingPawn(float x, float y, SrCamera* cam, std::vector<int>& hitNames);
+	void picking(float x,float y,SrCamera* cam);
 	void drag(SrCamera& cam,  float fx, float fy, float tx, float ty);
 	void draw(SrCamera& cam);
 

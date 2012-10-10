@@ -433,6 +433,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 	gv->setGestureData(_gestureData);
 	EventManager* manager = EventManager::getEventManager();
 	manager->addEventHandler("bmlstatus", gv);
+
 }
 
 void FltkViewer::create_popup_menus()
@@ -817,9 +818,9 @@ void FltkViewer::update_axis ()
 
 void FltkViewer::view_all ()
  {
-   _data->camera.center = SrVec::null;
-   _data->camera.up = SrVec::j;
-   _data->camera.eye.set ( 0, 0, 1.0f );
+   _data->camera->center = SrVec::null;
+   _data->camera->up = SrVec::j;
+   _data->camera->eye.set ( 0, 0, 1.0f );
 
    if ( _data->root )
     { update_bbox ();
@@ -834,7 +835,7 @@ void FltkViewer::view_all ()
       float s = box.max_size();
       // _data->light.constant_attenuation = s;
       //_data->camera.view_all ( box, SR_TORAD(60) );
-      _data->camera.scale = 1.0f / s;
+      _data->camera->scale = 1.0f / s;
       //_data->camera.center = box.center();
       //_data->camera.eye = _data->camera.center;
       //_data->camera.eye.z = s.z;
@@ -875,12 +876,12 @@ void FltkViewer::background ( SrColor c )
 
 SrCamera* FltkViewer::get_camera()
 {
-	return &_data->camera;
+	return _data->camera;
 }
 
-void FltkViewer::set_camera ( const SrCamera &cam )
+void FltkViewer::set_camera ( const SrCamera* cam )
  {
-   _data->camera = cam;
+   _data->camera = const_cast<SrCamera*>(cam);
 
  //  if ( _data->viewmode==ModeExaminer )
 //    { _data->trackball.init();
@@ -1000,13 +1001,13 @@ void FltkViewer::init_opengl ( int w, int h )
 
    glShadeModel ( GL_SMOOTH );
 
-   SrCamera& cam = _data->camera;
+   SrCamera* cam = _data->camera;
    //cam.zfar = 1000000;
    float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
    
    // camera near = 0.1 m, camera far plane is 100 m
-   cam.znear = 0.1f*scale;
-   cam.zfar  = 100.f*scale;
+   cam->znear = 0.1f*scale;
+   cam->zfar  = 100.f*scale;
 
 
    // init shader
@@ -1260,7 +1261,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 			0.5f, 0.5f, 0.5f, 1.0f	};		
 		//glGetFloatv(GL_MODELVIEW_MATRIX, cam_modelview);
 		SrMat viewMat;
-		viewMat = _data->camera.get_view_mat(viewMat);
+		viewMat = _data->camera->get_view_mat(viewMat);
 		cameraInverse(cam_inverse_modelview, viewMat.pt(0));		
 		// since gluLookAt gives us an orthogonal matrix, we speed up the inverse computation
 		//cameraInverse(cam_inverse_modelview, cam_modelview);		
@@ -1421,7 +1422,7 @@ void FltkViewer::draw()
    mcuCBHandle& mcu = mcuCBHandle::singleton();
    glViewport ( 0, 0, w(), h() );
    SrLight &light = _data->light;
-   SrCamera &cam  = _data->camera;
+   SrCamera* cam  = _data->camera;
    SrMat mat ( SrMat::NotInitialized );
 
 
@@ -1430,16 +1431,16 @@ void FltkViewer::draw()
    glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
    //----- Set Projection ----------------------------------------------
-   cam.aspect = (float)w()/(float)h();
+   cam->aspect = (float)w()/(float)h();
 
    glMatrixMode ( GL_PROJECTION );
-   glLoadMatrix ( cam.get_perspective_mat(mat) );
+   glLoadMatrix ( cam->get_perspective_mat(mat) );
 
    //----- Set Visualisation -------------------------------------------
    glMatrixMode ( GL_MODELVIEW );
-   glLoadMatrix ( cam.get_view_mat(mat) );
+   glLoadMatrix ( cam->get_view_mat(mat) );
 
-   glScalef ( cam.scale, cam.scale, cam.scale );
+   glScalef ( cam->scale, cam->scale, cam->scale );
 
     updateLights();
 	glEnable ( GL_LIGHTING );
@@ -1504,7 +1505,7 @@ void FltkViewer::draw()
 
 	drawInteractiveLocomotion();
 	//_posControl.Draw();
-	_objManipulator.draw(cam);
+	_objManipulator.draw(*cam);
 	// feng : debugging draw for reach controller
 	drawReach();
 
@@ -1547,9 +1548,9 @@ static void translate_event ( SrEvent& e, SrEvent::EventType t, int w, int h, Fl
    if ( t==SrEvent::EventPush)
    {
 	   e.button = Fl::event_button();
-	   e.origUp = viewer->getData()->camera.up;
-	   e.origEye = viewer->getData()->camera.eye;
-	   e.origCenter = viewer->getData()->camera.center;
+	   e.origUp = viewer->getData()->camera->up;
+	   e.origEye = viewer->getData()->camera->eye;
+	   e.origCenter = viewer->getData()->camera->center;
 	   e.origMouse.x = e.mouseCoord.x;
 	   e.origMouse.y = e.mouseCoord.y;
    }
@@ -2158,7 +2159,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 	char cmdStr[256];
 	SrVec p1;
 	SrVec p2;
-	_data->camera.get_ray(x,y, p1, p2);
+	_data->camera->get_ray(x,y, p1, p2);
 	SrPlane ground(SrVec(0,0,0), SrVec(0, 1, 0));
 	SrVec dest = ground.intersect(p1, p2);
 	//dest.y = _paLocoData->character->getHeight() / 100.0f;			
@@ -2214,7 +2215,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 				SrInput file_in (pFile);
 				file_in >> *(mcu.camera_p);
 				fclose (pFile);
-				mcu.viewer_p->set_camera(*mcu.camera_p);
+				mcu.viewer_p->set_camera(mcu.camera_p);
 			}
 			else
 				LOG("WARNING: can not load cam file!");
@@ -2426,7 +2427,7 @@ int FltkViewer::handle ( int event )
 					_paLocoData->character->steeringAgent->setTargetAgent(NULL);
 					SrVec p1;
 					SrVec p2;
-					_data->camera.get_ray(e.mouse.x, e.mouse.y, p1, p2);
+					_data->camera->get_ray(e.mouse.x, e.mouse.y, p1, p2);
 					SrPlane ground(SrVec(0,0,0), SrVec(0, 1, 0));
 					SrVec dest = ground.intersect(p1, p2);
 					dest.y = _paLocoData->character->getHeight() / 100.0f;
@@ -2533,9 +2534,9 @@ int FltkViewer::handle ( int event )
    if ( e.type == SrEvent::EventNone ) return 0; // not an interesting event
 
    if ( event==FL_PUSH || event==FL_DRAG )
-    { SrPlane plane ( _data->camera.center, SrVec::k );
-      _data->camera.get_ray ( e.mouse.x, e.mouse.y, e.ray.p1, e.ray.p2 );
-      _data->camera.get_ray ( e.lmouse.x, e.lmouse.y, e.lray.p1, e.lray.p2 );
+    { SrPlane plane ( _data->camera->center, SrVec::k );
+      _data->camera->get_ray ( e.mouse.x, e.mouse.y, e.ray.p1, e.ray.p2 );
+      _data->camera->get_ray ( e.lmouse.x, e.lmouse.y, e.lray.p1, e.lray.p2 );
       e.mousep = plane.intersect ( e.ray.p1, e.ray.p2 );
       e.lmousep = plane.intersect ( e.lray.p1, e.lray.p2 );
 	  if ( event==FL_PUSH  ) // update picking precision
@@ -2549,8 +2550,8 @@ int FltkViewer::handle ( int event )
          b.y  = b.y*2.0f / float(h()) - 1.0f; b.y *= -1.0f;
          //sr_out << "a,b: " << a << srspc << b <<srnl;
          SrLine aray, bray;
-         _data->camera.get_ray ( a.x, a.y, aray.p1, aray.p2 );
-         _data->camera.get_ray ( b.x, b.y, bray.p1, bray.p2 );
+         _data->camera->get_ray ( a.x, a.y, aray.p1, aray.p2 );
+         _data->camera->get_ray ( b.x, b.y, bray.p1, bray.p2 );
          SrPnt pa = plane.intersect ( aray.p1, aray.p2 );
          SrPnt pb = plane.intersect ( bray.p1, bray.p2 );
          //sr_out << "pa,pb: " << pa << srspc << pb <<srnl;
@@ -2652,7 +2653,7 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 	{
 		if (e.button1)// && _posControl.dragging)
 		{			
-			_objManipulator.drag(_data->camera,e.lmouse.x,e.lmouse.y,e.mouse.x,e.mouse.y);			
+			_objManipulator.drag(*_data->camera,e.lmouse.x,e.lmouse.y,e.mouse.x,e.mouse.y);			
 		}
 	}
 	else if (e.type==SrEvent::EventRelease)
@@ -2775,20 +2776,20 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
  {
    if ( e.type==SrEvent::EventDrag )
     { 
-      float dx = e.mousedx() * _data->camera.aspect;
-      float dy = e.mousedy() / _data->camera.aspect;
+      float dx = e.mousedx() * _data->camera->aspect;
+      float dy = e.mousedy() / _data->camera->aspect;
 
 		if ( ZOOMING(e) )
 		{
-			_data->camera.fovy += (dx+dy);//40.0f;
-			_data->camera.fovy = SR_BOUND ( _data->camera.fovy, 0.001f, srpi );
+			_data->camera->fovy += (dx+dy);//40.0f;
+			_data->camera->fovy = SR_BOUND ( _data->camera->fovy, 0.001f, srpi );
 			redraw();
 		}
 		else if ( DOLLYING(e) )
 		{ 
 			float amount = dx-dy;
-			SrVec cameraPos(_data->camera.eye);
-			SrVec targetPos(_data->camera.center);
+			SrVec cameraPos(_data->camera->eye);
+			SrVec targetPos(_data->camera->center);
 			SrVec diff = targetPos - cameraPos;
 			float distance = diff.len();
 			diff.normalize();
@@ -2799,14 +2800,14 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 			SrVec diffVector = diff;
 			SrVec adjustment = diffVector * distance * amount;
 			cameraPos += adjustment;
-			SrVec oldEyePos = _data->camera.eye;
-			_data->camera.eye = cameraPos;
-			SrVec cameraDiff = _data->camera.eye - oldEyePos;
-			_data->camera.center += cameraDiff;
+			SrVec oldEyePos = _data->camera->eye;
+			_data->camera->eye = cameraPos;
+			SrVec cameraDiff = _data->camera->eye - oldEyePos;
+			_data->camera->center += cameraDiff;
 			redraw();
 		}
       else if ( TRANSLATING(e) )
-       { _data->camera.apply_translation_from_mouse_motion ( e.lmouse.x, e.lmouse.y, e.mouse.x, e.mouse.y );
+       { _data->camera->apply_translation_from_mouse_motion ( e.lmouse.x, e.lmouse.y, e.mouse.x, e.mouse.y );
 		redraw();
        }
       else if ( ROTATING(e) )
@@ -2831,14 +2832,14 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 		   SrVec forward =origCenter - origCamera; 		   
 		   SrQuat q = SrQuat(origUp, vhcl::DEG_TO_RAD()*deltaX*150.f);			   
 		   forward = forward*q;
-		   _data->camera.center = _data->camera.eye + forward;
+		   _data->camera->center = _data->camera->eye + forward;
 
 		   SrVec cameraRight = cross(forward,origUp);
 		   cameraRight.normalize();		   
 		   q = SrQuat(cameraRight, vhcl::DEG_TO_RAD()*deltaY*150.f);	
-		   _data->camera.up = origUp*q;
+		   _data->camera->up = origUp*q;
 		   forward = forward*q;
-		   _data->camera.center = _data->camera.eye + forward;		  
+		   _data->camera->center = _data->camera->eye + forward;		  
 		   redraw();
        }
       else if ( ROTATING2(e) )
@@ -2860,7 +2861,7 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 		SrVec camera = rotatePoint(origCamera, origCenter, dirX, -deltaX * float(M_PI));
 		camera = rotatePoint(camera, origCenter, dirY, deltaY * float(M_PI));
 
-		_data->camera.eye = camera;
+		_data->camera->eye = camera;
 		redraw();
 	  }
     }

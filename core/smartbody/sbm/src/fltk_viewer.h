@@ -265,7 +265,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
     void background ( SrColor c );
 
     SrCamera* get_camera();
-    void set_camera (const SrCamera &cam);
+    void set_camera (const SrCamera* cam);
 
 	FltkViewerData* getData() { return _data; };
 	LocomotionData* getLocomotionData() { return _locoData; };
@@ -436,7 +436,7 @@ protected:
    SrEvent    event;      // The translated event from fltk to sr format
    SrColor    bcolor;     // Background color currently used
    SrBox      bbox;       // Bounding box of the root, calculated with viewall
-   SrCamera   camera;     // The current camera parameters
+   SrCamera*  camera;     // The current camera parameters
 
    SrSnLines* scenebox;  // contains the bounding box to display, and use in view_all
    SrSnLines* sceneaxis; // the current axis being displayed

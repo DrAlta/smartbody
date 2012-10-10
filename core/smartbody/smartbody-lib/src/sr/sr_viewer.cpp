@@ -61,7 +61,7 @@ SrCamera* SrViewer::get_camera()
 	return NULL;
 }
 
-void SrViewer::set_camera ( const SrCamera &cam )
+void SrViewer::set_camera ( const SrCamera* cam )
 {
 }
 

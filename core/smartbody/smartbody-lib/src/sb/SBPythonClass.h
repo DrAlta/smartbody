@@ -137,7 +137,7 @@ void printLog(const std::string& message);
 
 SBController* createController(std::string controllerType, std::string controllerName);
 
-Camera* getCamera();
+SrCamera* getCamera();
 
 //Script* getScript(std::string fileName);
 void showCommandResources();

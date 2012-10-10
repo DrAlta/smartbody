@@ -20,10 +20,13 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
  
+#include <vhcl.h>
 # include <math.h>
 # include <sr/sr_box.h>
 # include <sr/sr_plane.h>
 # include <sr/sr_camera.h>
+#include <sstream>
+#include <sbm/mcontrol_util.h>
 
 //# define SR_USE_TRACE1  // ray
 //# include <sr/sr_trace.h>
@@ -35,14 +38,14 @@ SrCamera::SrCamera ()
    init ();
  }
 
-SrCamera::SrCamera ( const SrCamera &c )
-         :eye(c.eye), center(c.center), up(c.up)
+SrCamera::SrCamera ( const SrCamera* c )
+         :eye(c->eye), center(c->center), up(c->up)
  {
-   fovy  = c.fovy;
-   znear = c.znear;
-   zfar  = c.zfar;
-   aspect = c.aspect;
-   scale = c.scale;
+   fovy  = c->fovy;
+   znear = c->znear;
+   zfar  = c->zfar;
+   aspect = c->aspect;
+   scale = c->scale;
  }
 
 SrCamera::SrCamera ( const SrPnt& e, const SrPnt& c, const SrVec& u )
@@ -53,6 +56,147 @@ SrCamera::SrCamera ( const SrPnt& e, const SrPnt& c, const SrVec& u )
    zfar  = 10000.0f; 
    aspect = 1.0f;
  }
+
+
+void SrCamera::setScale(float s)
+{
+	scale = s;
+}
+
+float SrCamera::getScale()
+{
+	return scale;
+}
+
+void SrCamera::setEye(float x, float y, float z)
+{
+	eye.x = x;
+	eye.y = y;
+	eye.z = z;
+}
+
+SrVec SrCamera::getEye()
+{
+	return eye;
+}
+
+void SrCamera::setCenter(float x, float y, float z)
+{
+	center.x = x;
+	center.y = y;
+	center.z = z;
+}
+
+SrVec SrCamera::getCenter()
+{
+	return center;
+}
+
+void SrCamera::setUpVector(SrVec u)
+{
+	up = u;
+}
+
+SrVec SrCamera::getUpVector()
+{
+	return up;
+}
+
+void SrCamera::setFov(float fov)
+{
+	fovy = fov;
+}
+
+float SrCamera::getFov()
+{
+	return fovy;
+}
+
+void SrCamera::setNearPlane(float n)
+{
+	znear = n;
+}
+
+float SrCamera::getNearPlane()
+{
+	return znear;
+}
+
+void SrCamera::setFarPlane(float f)
+{
+	zfar = f;
+}
+
+float SrCamera::getFarPlane()
+{
+	return zfar;
+}
+
+void SrCamera::setAspectRatio(float a)
+{
+	aspect = a;
+}
+
+float SrCamera::getAspectRatio()
+{
+	return aspect;
+}
+
+void SrCamera::setTrack(const std::string& characterName, const std::string& jointName)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmPawn* pawn = mcu.getPawn(characterName);
+	if (!pawn)
+	{
+		LOG("Object %s was not found, cannot track.", characterName.c_str());
+		return;
+	}
+	if (jointName == "")
+	{
+		LOG("Need to specify a joint to track.");
+		return;
+	}
+
+	SkSkeleton* skeleton = NULL;
+	skeleton = pawn->getSkeleton();
+
+	SkJoint* joint = pawn->getSkeleton()->search_joint(jointName.c_str());
+	if (!joint)
+	{
+		LOG("Could not find joint %s on object %s.", jointName.c_str(), characterName.c_str());
+		return;
+	}
+
+	joint->skeleton()->update_global_matrices();
+	joint->update_gmat();
+	const SrMat& jointMat = joint->gmat();
+	SrVec jointPos(jointMat[12], jointMat[13], jointMat[14]);
+	CameraTrack* cameraTrack = new CameraTrack();
+	cameraTrack->joint = joint;
+	cameraTrack->jointToCamera = mcu.camera_p->eye - jointPos;
+	LOG("Vector from joint to target is %f %f %f", cameraTrack->jointToCamera.x, cameraTrack->jointToCamera.y, cameraTrack->jointToCamera.z);
+	cameraTrack->targetToCamera = mcu.camera_p->eye - mcu.camera_p->center;
+	LOG("Vector from target to eye is %f %f %f", cameraTrack->targetToCamera.x, cameraTrack->targetToCamera.y, cameraTrack->targetToCamera.z);				
+	mcu.cameraTracking.push_back(cameraTrack);
+	LOG("Object %s will now be tracked at joint %s.", characterName.c_str(), jointName.c_str());
+}
+
+void SrCamera::removeTrack()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if (mcu.cameraTracking.size() > 0)
+	{
+		for (std::vector<CameraTrack*>::iterator iter = mcu.cameraTracking.begin();
+			 iter != mcu.cameraTracking.end();
+			 iter++)
+		{
+			CameraTrack* cameraTrack = (*iter);
+			delete cameraTrack;
+		}
+		mcu.cameraTracking.clear();
+		LOG("Removing current tracked object.");
+	}
+}
 
 void SrCamera::init () 
  { 
@@ -220,5 +364,27 @@ SrInput& operator>> ( SrInput& inp, SrCamera& c )
     }
    return inp;
  }
+
+void SrCamera::print()
+{
+	std::stringstream strstr;
+	strstr << "   Camera Info " << std::endl;
+	strstr << "-> eye position:	" << "(" << eye.x << ", " << eye.y << ", " << eye.z << ")" << std::endl;
+	strstr << "-> center position:	" << "(" << center.x << ", " << center.y << ", " << center.z << ")" << std::endl;
+	strstr << "-> up vector:		" << "(" << up.x << ", " << up.y << ", " << up.z << ")" << std::endl;
+	strstr << "-> fovy:		" << fovy << std::endl;
+	strstr << "-> near plane:		" << znear << std::endl;
+	strstr << "-> far plane:		" << zfar << std::endl;
+	strstr << "-> aspect:		" << aspect << std::endl;
+	strstr << "-> scale:		" << scale << std::endl;
+	LOG(strstr.str().c_str());
+}
+
+void SrCamera::reset()
+{
+	init();
+	setEye(0, 166, 185);
+	setCenter(0, 92, 0);
+}
 
 //================================ End of File =========================================

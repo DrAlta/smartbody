@@ -12,7 +12,7 @@ SrViewer* getViewer()
 		mcu.viewer_p = mcu.viewer_factory->create(100, 100, 800, 800);
 		mcu.viewer_p->label_viewer("Visual Debugger");
 		mcu.camera_p = new SrCamera();
-		mcu.viewer_p->set_camera(*mcu.camera_p);
+		mcu.viewer_p->set_camera(mcu.camera_p);
 		mcu.viewer_p->root(mcu.root_group_p);
 	}
 	return mcu.viewer_p;
@@ -22,188 +22,6 @@ SrViewer* getViewer()
 
 
 std::string PyLogger::strBuffer = "";
-
-Camera::Camera()
-{
-}
-
-Camera::~Camera()
-{
-}
-
-void Camera::printInfo()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::cout << "   Camera Info " << std::endl;
-	std::cout << "-> eye position:	" << "(" << mcu.camera_p->eye.x << ", " << mcu.camera_p->eye.y << ", " << mcu.camera_p->eye.z << ")" << std::endl;
-	std::cout << "-> center position:	" << "(" << mcu.camera_p->center.x << ", " << mcu.camera_p->center.y << ", " << mcu.camera_p->center.z << ")" << std::endl;
-	std::cout << "-> up vector:		" << "(" << mcu.camera_p->up.x << ", " << mcu.camera_p->up.y << ", " << mcu.camera_p->up.z << ")" << std::endl;
-	std::cout << "-> fovy:		" << mcu.camera_p->fovy << std::endl;
-	std::cout << "-> near plane:		" << mcu.camera_p->znear << std::endl;
-	std::cout << "-> far plane:		" << mcu.camera_p->zfar << std::endl;
-	std::cout << "-> aspect:		" << mcu.camera_p->aspect << std::endl;
-	std::cout << "-> scale:		" << mcu.camera_p->scale << std::endl;
-}
-
-
-void Camera::setEye(float x, float y, float z)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.camera_p->eye.x = x;
-	mcu.camera_p->eye.y = y;
-	mcu.camera_p->eye.z = z;
-	mcu.viewer_p->set_camera(*mcu.camera_p);
-}
-
-SrVec Camera::getEye()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SrVec ret;
-	ret.x = mcu.viewer_p->get_camera()->eye.x;
-	ret.y = mcu.viewer_p->get_camera()->eye.y;
-	ret.z = mcu.viewer_p->get_camera()->eye.z;
-	return ret;
-}
-
-void Camera::setCenter(float x, float y, float z)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.camera_p->center.x = x;
-	mcu.camera_p->center.y = y;
-	mcu.camera_p->center.z = z;
-	mcu.viewer_p->set_camera(*mcu.camera_p);
-}
-
-SrVec Camera::getCenter()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SrVec ret;
-	ret.x = mcu.viewer_p->get_camera()->center.x;
-	ret.y = mcu.viewer_p->get_camera()->center.y;
-	ret.z = mcu.viewer_p->get_camera()->center.z;
-	return ret;
-}
-
-void Camera::setScale(float s)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.camera_p->scale = s;
-	mcu.viewer_p->set_camera(*mcu.camera_p);
-}
-
-float Camera::getScale()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	return mcu.viewer_p->get_camera()->scale;
-}
-
-void Camera::reset()
-{
-	setEye(0, 166, 185);
-	setCenter(0, 92, 0);
-}
-
-void Camera::setDefault(int preset)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (preset == 1)
-		mcu.viewer_p->view_all();
-	else
-		LOG("defaultCamera func option not valid.");
-}
-
-void Camera::setTrack(std::string cName, std::string jName)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = mcu.getPawn(cName);
-	if (!pawn)
-	{
-		LOG("Object %s was not found, cannot track.", cName.c_str());
-		return;
-	}
-	if (jName == "")
-	{
-		LOG("Need to specify a joint to track.");
-		return;
-	}
-
-	SkSkeleton* skeleton = NULL;
-	skeleton = pawn->getSkeleton();
-
-	SkJoint* joint = pawn->getSkeleton()->search_joint(jName.c_str());
-	if (!joint)
-	{
-		LOG("Could not find joint %s on object %s.", jName.c_str(), cName.c_str());
-		return;
-	}
-
-	joint->skeleton()->update_global_matrices();
-	joint->update_gmat();
-	const SrMat& jointMat = joint->gmat();
-	SrVec jointPos(jointMat[12], jointMat[13], jointMat[14]);
-	CameraTrack* cameraTrack = new CameraTrack();
-	cameraTrack->joint = joint;
-	cameraTrack->jointToCamera = mcu.camera_p->eye - jointPos;
-	LOG("Vector from joint to target is %f %f %f", cameraTrack->jointToCamera.x, cameraTrack->jointToCamera.y, cameraTrack->jointToCamera.z);
-	cameraTrack->targetToCamera = mcu.camera_p->eye - mcu.camera_p->center;
-	LOG("Vector from target to eye is %f %f %f", cameraTrack->targetToCamera.x, cameraTrack->targetToCamera.y, cameraTrack->targetToCamera.z);				
-	mcu.cameraTracking.push_back(cameraTrack);
-	LOG("Object %s will now be tracked at joint %s.", cName.c_str(), jName.c_str());
-}
-
-void Camera::removeTrack()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.cameraTracking.size() > 0)
-	{
-		for (std::vector<CameraTrack*>::iterator iter = mcu.cameraTracking.begin();
-			 iter != mcu.cameraTracking.end();
-			 iter++)
-		{
-			CameraTrack* cameraTrack = (*iter);
-			delete cameraTrack;
-		}
-		mcu.cameraTracking.clear();
-		LOG("Removing current tracked object.");
-	}
-}
-
-void Camera::loadCamera(std::string camFileName)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	FILE * pFile;
-	SrString f(camFileName.c_str());
-	pFile = fopen (f,"r");
-	if (pFile!=0)
-	{
-		SrInput file_in (pFile);
-		file_in >> *(mcu.camera_p);
-		fclose (pFile);
-		mcu.viewer_p->set_camera(*mcu.camera_p);
-	}
-	else
-		LOG("WARNING: can not load cam file!");
-}
-
-void Camera::saveCamera(std::string camFileName)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SrCamera* cam = mcu.viewer_p->get_camera();
-
-	FILE * pFile = 0;
-	SrString f(camFileName.c_str());
-	pFile = fopen (f,"w");
-	if (pFile!=0)
-	{
-		SrOutput file_out (pFile);
-		file_out << *(cam);
-		fclose (pFile);
-	}
-	else
-		LOG("WARNING: can not save cam file");
-}
-
 
 void pythonExit()
 {
@@ -274,17 +92,16 @@ SBController* createController(std::string controllerType, std::string controlle
 	return controller;
 }
 
-Camera* getCamera()
+SrCamera* getCamera()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	if (mcu.camera_p)
 	{
-		Camera* camera = new Camera();
-		return camera;
+		return mcu.camera_p;
 	}
 	else
 	{
-		LOG("Camera not exists, returning NULL instead.");
+		LOG("Camera does not exist.");
 		return NULL;
 	}
 }

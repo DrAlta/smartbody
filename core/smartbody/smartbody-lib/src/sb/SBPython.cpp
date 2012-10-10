@@ -34,6 +34,7 @@
 #include <sb/SBBehaviorSet.h>
 #include <sb/SBBehaviorSetManager.h>
 #include <sr/sr_box.h>
+#include <sr/sr_camera.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -716,18 +717,24 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 	boost::python::class_<DoubleAttribute, boost::python::bases<SBAttribute> >("DoubleAttribute")
 		.def("getValue", &DoubleAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the double attribute.")
 		.def("setValue", &DoubleAttribute::setValue, "Sets the value of the double attribute.")
+		.def("getDefaultValue", &DoubleAttribute::getDefaultValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the default value of the double attribute.")
+		.def("setDefaultValue", &DoubleAttribute::setDefaultValue, "Sets the default value of the double attribute.")
 		.def("setValueFast", &DoubleAttribute::setValueFast, "Sets the value of the double attribute without notifying observers.")
 	;
 
 	boost::python::class_<Vec3Attribute, boost::python::bases<SBAttribute> >("Vec3Attribute")
 		.def("getValue", &Vec3Attribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the vec3 attribute.")
 		.def("setValue", &Vec3Attribute::setValue, "Sets the value of the vec3 attribute.")
+		.def("getDefaultValue", &Vec3Attribute::getDefaultValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the default value of the vec3 attribute.")
+		.def("setDefaultValue", &Vec3Attribute::setDefaultValue, "Sets the default value of the vec3 attribute.")
 		.def("setValueFast", &Vec3Attribute::setValueFast, "Sets the value of the vec3 attribute without notifying observers.")
 	;
 
 	boost::python::class_<MatrixAttribute, boost::python::bases<SBAttribute> >("MatrixAttribute")
 		.def("getValue", &MatrixAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the matrix attribute.")
 		.def("setValue", &MatrixAttribute::setValue, "Sets the value of the matrix attribute.")
+		.def("getDefaultValue", &MatrixAttribute::getDefaultValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the default value of the matrix attribute.")
+		.def("setDefaultValue", &MatrixAttribute::setDefaultValue, "Sets the default value of the matrix attribute.")
 		.def("setValueFast", &MatrixAttribute::setValueFast, "Sets the value of the matrix attribute.")
 	;
 
@@ -795,20 +802,29 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("printStats", &SBProfiler::printStats, "Print time profiler statistics. ")
 		;
 
-	boost::python::class_<Camera>("Camera")
-		.def("printInfo", &Camera::printInfo, "Prints all the camera statistics. ")
-		.def("reset", &Camera::reset, "Reset camera with camera eye (0 166 185), camera center (0 92 0). ")
-		.def("setEye", &Camera::setEye, "Set camera eye position. \n Input: camera eye position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
-		.def("getEye", &Camera::getEye, "Get camera eye position.")
-		.def("setCenter", &Camera::setCenter, "Set camera center. \n Input: camera center position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
-		.def("getCenter", &Camera::getCenter, "Get camera center.")
-		.def("setScale", &Camera::setScale, "Set camera scale. \n camera scale: NULL \n Output: NULL")
-		.def("getScale", &Camera::getScale, "Get camera scale.")
-		.def("setTrack", &Camera::setTrack, "Set camera track. \n Input: character name, joint name \n Output: NULL")
-		.def("removeTrack", &Camera::removeTrack, "Remove camera track.")
-		.def("loadCamera", &Camera::loadCamera, "load Camera from file \n Input: camera file (*.cam) \n Output: NULL ")
-		.def("saveCamera", &Camera::saveCamera, "save Camera to file \n Input: camera file (*.cam) \n Output: NULL ")
+	boost::python::class_<SrCamera>("Camera")
+		.def("print", &SrCamera::print, "Shows all the camera statistics. ")
+		.def("reset", &SrCamera::reset, "Reset camera with camera eye (0 166 185), camera center (0 92 0). ")
+		.def("setEye", &SrCamera::setEye, "Set camera eye position. \n Input: camera eye position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
+		.def("getEye", &SrCamera::getEye, "Get camera eye position.")
+		.def("setCenter", &SrCamera::setCenter, "Set camera center. \n Input: camera center position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
+		.def("getCenter", &SrCamera::getCenter, "Get camera center.")
+		.def("setScale", &SrCamera::setScale, "Set camera scale. \n camera scale: NULL \n Output: NULL")
+		.def("getScale", &SrCamera::getScale, "Get camera scale.")
+		.def("setTrack", &SrCamera::setTrack, "Set camera track. \n Input: character name, joint name \n Output: NULL")
+		.def("removeTrack", &SrCamera::removeTrack, "Remove camera track.")
+		.def("setUpVector", &SrCamera::setUpVector, "Set camera up vector.")
+		.def("getUpVector", &SrCamera::getUpVector, "Returns the camera up vector.")
+		.def("setFov", &SrCamera::setFov, "Set's the camera's field of view.")
+		.def("getFov", &SrCamera::getFov, "Get's the camera's field of view.")
+		.def("setNearPlane", &SrCamera::setNearPlane, "Set's the camera's near plane.")
+		.def("getNearPlane", &SrCamera::getNearPlane, "Get's the camera's near plane.")
+		.def("setFarPlane", &SrCamera::setFarPlane, "Set's the camera's far plane.")
+		.def("getFarPlane", &SrCamera::getFarPlane, "Get's the camera's far plane.")
+		.def("setAspectRatio", &SrCamera::setAspectRatio, "Set's the camera's aspect ratio.")
+		.def("getAspectRatio", &SrCamera::getAspectRatio, "Get's the camera's aspect ratio.")
 		;
+
 
 	boost::python::class_<SrViewer>("Viewer")
 		.def("show", &SrViewer::show_viewer, "Shows the viewer.")

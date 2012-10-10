@@ -43,7 +43,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 
 		virtual void show_viewer();
 		virtual void hide_viewer();	
-		virtual void set_camera(const SrCamera &cam);
+		virtual void set_camera(const SrCamera* cam);
 		virtual SrCamera* get_camera();
 		void render();
 		void root(SrSn* r);
