@@ -138,8 +138,9 @@ void SpeechRelayLocal::cleanString(std::string &message)
 	}
 
 	unsigned int pos;
-	while ( (pos = message.find("  ")) != std::string::npos )
+	while ( message.find("  ") != std::string::npos )
 	{
+		pos = message.find(" ");
 		fprintf(stderr,"Debug: replacing 2 whitespaces at %d(%s) with 1 whitespace\n",pos, message.substr(pos,2).c_str());
 		message.replace( pos, 2, " " );
 	}
@@ -174,7 +175,7 @@ std::string SpeechRelayLocal::removeXMLTagsAndNewLines( const std::string & txt 
 
    char * transferTxt = new char[truncatedTxt.length() * 2];
 
-   unsigned int position = truncatedTxt.find("><");
+   size_t position = truncatedTxt.find("><");
    unsigned int i = 0;
    unsigned int j = 0;
    while(position != std::string::npos)
@@ -474,7 +475,7 @@ std::string SpeechRelayLocal::TransformTextWithTimes(std::string txt)
 				   speechID = "sp1";
 			   }*/
 			   //hard coding sp1
-			   speechID = "sp1";
+			   speechID = (char*) "sp1";
 			   //XMLString::transcode(speechElement->getAttribute(X("type"))) 
 			   actualText = actualText.append("<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + "application/ssml+xml" + "\">\n\n");
 			   actualText = actualText.append(textContent);
