@@ -25,7 +25,7 @@
 #include "vhcl.h"
 
 #define USE_FESTIVAL_RELAY 0
-#define USE_CEREPROC_RELAY 0
+#define USE_CEREPROC_RELAY 1
 
 #include "local_speech.h"
 #ifdef WIN32
@@ -280,10 +280,13 @@ std::string SpeechRelayLocal::removeXMLTagsAndNewLines( const std::string & txt 
 					   /// Get the timing tag as a string
 					   char * t1, *t2;
 					   std::string markString(t1 = XMLString::transcode(mark));
-					   std::string speechString(t2 = (speech)?XMLString::transcode(speech): " ");
+					   std::string speechString = (speech)?XMLString::transcode(speech): " ";
 					   XMLString::release(&t1);
-                       if(speech)
-					    XMLString::release(&t2);
+		                           if(speech)
+					   {
+					     t2 = XMLString::transcode(speech);
+			     		     XMLString::release(&t2);
+				           }
 					   /// This code is still not watertight with regards to memory, needs some knowledge of Xerces memory management
 					   //if ( mark ) XMLString::release(&mark);
 					   //if ( speech ) XMLString::release(&speech);
@@ -780,6 +783,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
    strcpy(directory,((std::string)file_name.substr(0, pos2)).c_str());
    tempDir = directory;
    // converting the directory path to an absolute path
+   /*
    char full[ _MAX_PATH ];
    if ( _fullpath( full, tempDir.c_str(), _MAX_PATH ) == NULL )
    {
@@ -815,6 +819,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
          printf( "ERROR: audio cache directory, %s, could not be created. This will likely lead to errors down the line.\\n", fullAudioDir.c_str() );
       }
    }
+   */
 
    // Create file name relative to cerevoice relay
    /**
@@ -822,7 +827,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
 	*			cereproc_file_name refers to the path that cereproc needs to write to, relative to the path from where this program is running
 	*			player_file_name refers to the path that Unreal or some other renderer will play the file from, i.e. relative to the path where it is running
 	*/
-   std::string cereproc_file_name = fullAudioDir + file_name;
+   std::string cereproc_file_name = cacheDirectory + file_name;
 
    /// Generate the audio
    std::string xml = textToSpeech(utterance.c_str(), cereproc_file_name.c_str(), voice_id);
