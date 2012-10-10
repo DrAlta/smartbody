@@ -1132,7 +1132,7 @@ void FltkViewer::updateLights()
 			}
 			else
 			{
-				light.diffuse = SrColor( 0.0f, 0.0f, 0.0f );
+				light.ambient = SrColor( 0.0f, 0.0f, 0.0f );
 			}
 			SmartBody::Vec3Attribute* specularColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightSpecularColor"));
 			if (specularColorAttr)
