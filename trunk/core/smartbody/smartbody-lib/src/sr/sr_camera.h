@@ -29,6 +29,7 @@
 
 # include <sr/sr_vec.h>
 # include <sr/sr_quat.h>
+#include <string>
 
 class SrMat;
 class SrBox;
