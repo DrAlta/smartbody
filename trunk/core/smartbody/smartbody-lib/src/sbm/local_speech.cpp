@@ -25,7 +25,7 @@
 #include "vhcl.h"
 
 #define USE_FESTIVAL_RELAY 0
-#define USE_CEREPROC_RELAY 1
+#define USE_CEREPROC_RELAY 0
 
 #include "local_speech.h"
 #ifdef WIN32
