@@ -300,8 +300,7 @@ mcuCBHandle::mcuCBHandle()
 	theWSP->init( "SMARTBODY" );
 #endif
 
-	// do we need default controllers?
-	//createDefaultControllers();
+	createDefaultControllers();
 
 	// initialize the default face motion mappings
 	SmartBody::SBFaceDefinition* faceDefinition = new SmartBody::SBFaceDefinition();
@@ -316,6 +315,8 @@ mcuCBHandle::mcuCBHandle()
 
 	SmartBody::SBAnimationBlend0D* idleState = new SmartBody::SBAnimationBlend0D(PseudoIdleState);
 	addPABlend(idleState);
+
+	
 
 
 }

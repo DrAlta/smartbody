@@ -25,6 +25,11 @@ SBSkeleton::SBSkeleton(SBSkeleton* copySkel) : SkSkeleton(copySkel)
 {
 }
 
+const std::string& SBSkeleton::getFileName()
+{
+	return skfilename();
+}
+
 bool SBSkeleton::load(std::string skeletonFile)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();

@@ -23,6 +23,7 @@ public:
 		std::string saveToString();
 
 	const std::string& getName();
+	const std::string& getFileName();
 	int getNumJoints();
 	SBJoint* getJoint(int index);		
 	SBJoint* getJointByName(const std::string& jointName);

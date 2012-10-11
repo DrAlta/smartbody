@@ -165,7 +165,10 @@ void SbmPhysicsSim::updateAllPhysicsJoints()
 SbmPhysicsSim* SbmPhysicsSim::getPhysicsEngine()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	return mcu._scene->getPhysicsManager()->getPhysicsEngine();
+	if ( mcu._scene)
+		return mcu._scene->getPhysicsManager()->getPhysicsEngine();
+	else
+		return NULL;
 }
 
 /************************************************************************/

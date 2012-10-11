@@ -125,7 +125,7 @@ void SbmDebuggerUtility::initSkeleton(const std::string& skFileName, const std::
 	SkSkeleton* skSkel = sbSkel;
 	skSkel->load(input);
 	skSkel->skfilename(skFileName.c_str());
-	mcuCBHandle::singleton().skeleton_map.insert(std::pair<std::string, SkSkeleton*>(sbSkel->name(), skSkel));
+	mcuCBHandle::singleton().skeleton_map.insert(std::pair<std::string, SkSkeleton*>(sbSkel->getName(), skSkel));
 }
 
 
