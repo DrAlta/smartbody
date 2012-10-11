@@ -154,7 +154,9 @@ bool SrSaGlRender::shape_apply ( SrSnShapeBase* s )
  {
    // 1. Ensures that render data is initialized
    SrOGLData* ogl = (SrOGLData*) s->get_renderlib_data();
-   if ( !ogl ) ogl = new SrOGLData ( s );
+   if ( !ogl ) {	   
+	   ogl = new SrOGLData ( s );
+   }
    
    // 2. Render only if needed
    if ( !s->visible() ) return true;
@@ -163,7 +165,7 @@ bool SrSaGlRender::shape_apply ( SrSnShapeBase* s )
    bool isSrModel = sr_compare(s->inst_class_name(),"model") == 0;
    // 3. Check if lists are up to date
    if ( !s->haschanged() && !isSrModel)
-   { //SR_TRACE2 ( "Calling list..." );
+   { //SR_TRACE2 ( "Calling list..." );	  
       glCallList ( ogl->list ); 
       return true;
    }
