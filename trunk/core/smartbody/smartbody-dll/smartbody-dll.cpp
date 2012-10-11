@@ -222,13 +222,19 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath, boo
 
 void Smartbody_dll::InitLocalSpeechRelay()
 {
-#if defined(__ANDROID__)
+#if 1 //defined(__ANDROID__)
    mcuCBHandle & mcu = mcuCBHandle::singleton();
-   mcu.play_internal_audio = true;
-   AUDIO_Init();
+   //mcu.play_internal_audio = true;
+   //AUDIO_Init();
+#if defined(__ANDROID__)
    std::string festivalLibDir = "/sdcard/SBUnity/festival/lib/";
    std::string festivalCacheDir = "/sdcard/SBUnity/festival/cache/";
    std::string cereprocLibDir = "/sdcard/SBUnity/cerevoice/voices/";	
+#else
+	std::string festivalLibDir = "./Assets/SBUnity/festival/lib/";
+	std::string festivalCacheDir = "./Assets/SBUnity/festival/cache/";
+	std::string cereprocLibDir = "./Assets/SBUnity/cerevoice/voices/";	
+#endif
    mcu.festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
    mcu.cereprocRelay()->initSpeechRelay(cereprocLibDir,festivalCacheDir);
 #endif

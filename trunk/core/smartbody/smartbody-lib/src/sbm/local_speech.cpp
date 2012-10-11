@@ -209,7 +209,7 @@ std::string SpeechRelayLocal::removeXMLTagsAndNewLines( const std::string & txt 
 
    char * message = transferTxt;
 
-   LOG("removeXMLTag, message = %s",message);
+   //LOG("removeXMLTag, message = %s",message);
 
 
    std::string actualText = "";
@@ -283,11 +283,11 @@ std::string SpeechRelayLocal::removeXMLTagsAndNewLines( const std::string & txt 
 					   std::string markString(t1 = XMLString::transcode(mark));
 					   std::string speechString = (speech)?XMLString::transcode(speech): " ";
 					   XMLString::release(&t1);
-		                           if(speech)
+                       if(speech)
 					   {
-					     t2 = XMLString::transcode(speech);
-			     		     XMLString::release(&t2);
-				           }
+                         t2 = XMLString::transcode(speech);
+					     XMLString::release(&t2);
+					   }
 					   /// This code is still not watertight with regards to memory, needs some knowledge of Xerces memory management
 					   //if ( mark ) XMLString::release(&mark);
 					   //if ( speech ) XMLString::release(&speech);
@@ -500,12 +500,20 @@ CereprocSpeechRelayLocal::~CereprocSpeechRelayLocal()
 }
 
 void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string cacheDir )
-{
-	std::string voiceName = "cerevoice_star_3.0.0_22k.voice";
-	std::string licenseName = "star2.lic";
-	std::string fullVoiceName = libPath + voiceName;
-	std::string fullLicenseName = libPath + licenseName;
-	voiceEngine = CPRCEN_engine_load(fullLicenseName.c_str(), fullVoiceName.c_str());
+{	
+	std::string voiceNames[] = {"cerevoice_star_3.0.0_22k.voice", "cerevoice_heather_3.0.7_22k.voice", "cerevoice_katherine_3.0.8_22k.voice" };
+	std::string licenseNames[] = {"star2.lic", "heather.lic", "katherine2.lic" };	
+	voiceEngine = CPRCEN_engine_new();
+	for (int i=0;i<3;i++)	
+	{
+		std::string fullVoiceName = libPath + voiceNames[i];
+		std::string fullLicenseName = libPath + licenseNames[i];
+		int success = CPRCEN_engine_load_voice(voiceEngine, fullLicenseName.c_str(), NULL, fullVoiceName.c_str(),CPRC_VOICE_LOAD_EMB_AUDIO);
+		if (!success)
+			LOG("Cerevoice Local Relay : load voice %s fail.",voiceNames[i].c_str());
+	}
+	
+
 	if (!voiceEngine)
 	{
 		LOG("fail to initialize Cerevoice engine");
@@ -518,11 +526,13 @@ void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string
 std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const char * cereproc_file_name, std::string voice_id )
 {
 	std::string reply = "";
-	CPRCEN_channel_handle chan = CPRCEN_engine_open_default_channel(voiceEngine); /* Create channel */
+	//CPRCEN_channel_handle chan = CPRCEN_engine_open_default_channel(voiceEngine); /* Create channel */
+	CPRCEN_channel_handle chan = CPRCEN_engine_open_channel(voiceEngine, "", "", voice_id.c_str(), "");
 	char* fileName = const_cast<char*>(cereproc_file_name);
 	CPRCEN_engine_channel_to_file(voiceEngine, chan, fileName, CPRCEN_RIFF); /* File output on channel */
 	// 	/* Speak with streaming input */
 	CPRC_abuf* abuf = CPRCEN_engine_channel_speak(voiceEngine, chan, text, strlen(text),1);
+	//LOG("text to speech, voice_id = %s",voice_id.c_str());
 
 	SpeechRequestMessageData xmlMetaData;
 	// Feed in input text, further data is to come
@@ -784,7 +794,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
    strcpy(directory,((std::string)file_name.substr(0, pos2)).c_str());
    tempDir = directory;
    // converting the directory path to an absolute path
-   /*
+   
    char full[ _MAX_PATH ];
    if ( _fullpath( full, tempDir.c_str(), _MAX_PATH ) == NULL )
    {
@@ -820,7 +830,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
          printf( "ERROR: audio cache directory, %s, could not be created. This will likely lead to errors down the line.\\n", fullAudioDir.c_str() );
       }
    }
-   */
+   
 
    // Create file name relative to cerevoice relay
    /**
@@ -828,12 +838,17 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
 	*			cereproc_file_name refers to the path that cereproc needs to write to, relative to the path from where this program is running
 	*			player_file_name refers to the path that Unreal or some other renderer will play the file from, i.e. relative to the path where it is running
 	*/
-   std::string cereproc_file_name = cacheDirectory + file_name;
+
+#if defined(__ANDROID__)
+   string cereproc_file_name = cacheDirectory + file_name;
+#else
+   string cereproc_file_name = fullAudioDir + file_name;
+#endif 
 
    /// Generate the audio
    std::string xml = textToSpeech(utterance.c_str(), cereproc_file_name.c_str(), voice_id);
    // Only send out a reply when result is not empty, ignore otherwise as a nother voice relay might pick up the request
-   LOG("Cerevoice reply Cmd = %s",xml.c_str());
+   //LOG("Cerevoice reply Cmd = %s",xml.c_str());
    if ( xml.compare("") != 0 )
    {
       std::string reply = agent_name;
@@ -842,7 +857,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
       reply += " OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?>";
       reply += xml;
    
-      printf( "REPLY: %s\n", reply.c_str() );
+      //printf( "REPLY: %s\n", reply.c_str() );
 
 #ifdef _DUMP_COMM_TO_DISK
 	  fprintf(_outfile, "%d: %s\n\n",_dumpCounter - 1,reply.c_str());
@@ -871,7 +886,7 @@ void CereprocSpeechRelayLocal::set_phonemes_to_visemes()
 	phonemeToViseme[ "ao" ]  = "Ao"; // AO
 	phonemeToViseme[ "ax" ]  = "Ah"; // AX
 	phonemeToViseme[ "@" ]  = "Ih"; // Shouldn't happen!
-	phonemeToViseme[ "aw" ]  = "Ah"; // AW
+	phonemeToViseme[ "aw" ]  = "Aw"; // AW
 	phonemeToViseme[ "ay" ]  = "Ay"; // AY
 	phonemeToViseme[ "b" ]   = "BMP";//  B
 	phonemeToViseme[ "ch" ]  = "Sh";  // CH
@@ -883,15 +898,15 @@ void CereprocSpeechRelayLocal::set_phonemes_to_visemes()
 	phonemeToViseme[ "ey" ]  = "Eh"; // ?? probably EY
 	phonemeToViseme[ "f" ]   = "F";  //  F
 	phonemeToViseme[ "g" ]   = "Kg"; //  G
-	phonemeToViseme[ "hh" ]  = "Ih"; // HH
+	phonemeToViseme[ "hh" ]  = "H"; // HH
 	phonemeToViseme[ "ih" ]  = "Ih"; // IH
 	phonemeToViseme[ "iy" ]  = "Ih"; // IY
 	phonemeToViseme[ "jh" ]  = "Sh";  // JH
-	phonemeToViseme[ "k" ]   = "Kg"; //  K
+	phonemeToViseme[ "k" ]   = "Kg"; //  K	
 	phonemeToViseme[ "l" ]   = "L";  //  L
 	phonemeToViseme[ "m" ]   = "BMP";//  M
-	phonemeToViseme[ "n" ]   = "Kg"; //  N
-	phonemeToViseme[ "ng" ]  = "Kg"; // NG
+	phonemeToViseme[ "n" ]   = "D"; //  N
+	phonemeToViseme[ "ng" ]  = "D"; // NG
 	phonemeToViseme[ "ow" ]  = "Ow"; // OW
 	phonemeToViseme[ "oy" ]  = "Oy"; // OY
 	phonemeToViseme[ "p" ]   = "BMP";//  P
@@ -901,15 +916,13 @@ void CereprocSpeechRelayLocal::set_phonemes_to_visemes()
 	phonemeToViseme[ "T" ]   = "D";  //  T ?
 	phonemeToViseme[ "t" ]   = "D";  //  T ?
 	phonemeToViseme[ "th" ]  = "Th"; // TH
-	phonemeToViseme[ "uh" ]  = "Eh"; // UH
-	phonemeToViseme[ "uw" ]  = "Oh"; // UW
+	phonemeToViseme[ "uh" ]  = "W"; // UH
+	phonemeToViseme[ "uw" ]  = "W"; // UW
 	phonemeToViseme[ "v" ]   = "F";  //  V
 	phonemeToViseme[ "w" ]   = "W"; //  W
-	phonemeToViseme[ "y" ]   = "Ih"; //  Y
+	phonemeToViseme[ "y" ]   = "Sh"; //  Y
 	phonemeToViseme[ "z" ]   = "Z";  //  Z
-	phonemeToViseme[ "zh" ]  = "Sh";  // ZH
-
-	
+	phonemeToViseme[ "zh" ]  = "Sh";  // ZH	
 }
 #else
 CereprocSpeechRelayLocal::CereprocSpeechRelayLocal()
@@ -1212,11 +1225,11 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	file_name = file_name.substr( pos2, pos - pos2 ) + ".wav";
 	std::string festival_file_name = cacheDirectory + file_name;
 	//Generate the audio
-	LOG("before reply");
+	//LOG("before reply");
 	string replyXML = generateReply(utterance.c_str(),festival_file_name.c_str());
-	LOG("after reply, replyXML = %s",replyXML.c_str());
+	//LOG("after reply, replyXML = %s",replyXML.c_str());
 	string remoteSpeechReply = agent_name+" "+message_id+" OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?><speak><soundFile name=\"";
-	LOG("remoteSpeechReply = %s",remoteSpeechReply.c_str());
+	//LOG("remoteSpeechReply = %s",remoteSpeechReply.c_str());
 
 	char full[ _MAX_PATH ];
 	if ( getFullPath( full, const_cast<char*>(festival_file_name.c_str())) == NULL )
@@ -1226,13 +1239,13 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 #if defined(__ANDROID__)
 	string soundPathName = cacheDirectory + file_name;
 #else
-       string soundPathName = full;
+    string soundPathName = full;
 #endif
 
 	remoteSpeechReply += soundPathName+"\"/>";
 	remoteSpeechReply += replyXML + "</speak>";
-	LOG("replyXML = %s\n",replyXML.c_str());
-	LOG("Sound path name = %s\n",soundPathName.c_str());
+	//LOG("replyXML = %s\n",replyXML.c_str());
+	//LOG("Sound path name = %s\n",soundPathName.c_str());
 
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -1240,7 +1253,7 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	string replyCmd = "RemoteSpeechReply ";
 	replyCmd = replyCmd + remoteSpeechReply; //cmdConst;
 	//mcu.execute_later("RemoteSpeechReply", cmdConst ); //sends the remote speech command using singleton* MCU_p	
-	LOG("replyCmd = %s",replyCmd.c_str());
+	//LOG("replyCmd = %s",replyCmd.c_str());
 	mcu.execute_later(replyCmd.c_str());
 }
 
@@ -1255,7 +1268,7 @@ void FestivalSpeechRelayLocal::setVoice(std::string voice)
 	std::stringstream strstr;
 	strstr << "(voice_" << voice << ")";
 	int ret = festival_eval_command(strstr.str().c_str());
-	LOG("Voice = %s : ret = %d\n", voice.c_str(),ret);	
+	//LOG("Voice = %s : ret = %d\n", voice.c_str(),ret);	
 
 	festival_eval_command("(Parameter.set `Duration_Method Duration_Default)");		
 	festival_eval_command("(set! after_synth_hooks (list Duration_VirtualHuman))");	
@@ -1359,7 +1372,6 @@ void FestivalSpeechRelayLocal::set_phonemes_to_visemes()
 		phonemeToViseme[ "z" ]   = "Z";  //  Z
 		phonemeToViseme[ "zh" ]  = "Sh";  // ZH
 	}
-
 }
 
 void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string cacheDir)

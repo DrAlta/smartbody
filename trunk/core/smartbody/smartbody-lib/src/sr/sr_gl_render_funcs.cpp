@@ -420,7 +420,7 @@ void SrGlRenderFuncs::render_sphere ( SrSnShapeBase* shape )
    float botWidth, topWidth, yTop, yBot, tmp;
    SrVec vec;
 
-   tmp = shape->resolution()*5.0f;
+   tmp = shape->resolution()*2.0f;
    int depth = SR_ROUND(tmp);
    if ( depth<1 ) depth=1;
    SrArray<SrPnt> array(0,depth*2);
@@ -563,8 +563,9 @@ void SrGlRenderFuncs::render_cylinder ( SrSnShapeBase* shape )
            break;
     }
 
-   int nfaces = int(shape->resolution()*10.0f);
-   if ( nfaces<3 ) nfaces = 3;
+   //int nfaces = int(shape->resolution()*10.0f);
+   //if ( nfaces<3 ) nfaces = 3;
+   int nfaces = 3;
    
    float dang = sr2pi/float(nfaces);
    SrVec va = cyl.b-cyl.a; 

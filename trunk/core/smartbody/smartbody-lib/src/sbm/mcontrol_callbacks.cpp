@@ -4914,6 +4914,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				if (character->locomotion_type != character->Procedural)
 				{
 					character->steeringAgent->desiredSpeed = (float)args.read_double();
+					//character->steeringAgent->currentTargetSpeed = character->steeringAgent->desiredSpeed;
 					return CMD_SUCCESS;
 				}
 			}		
@@ -5211,10 +5212,12 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 				return CMD_SUCCESS;
 			}
 			SrVec vec(x, y, z);
+#if 0
 			if (emitterName == "kinect")
 				character->datareceiver_ct->setGlobalPosition(jName, vec);
 			else
 				character->datareceiver_ct->setLocalPosition(jName, vec);
+#endif
 		}
 		else if (skeletonType == "positions")
 		{
@@ -5233,9 +5236,11 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			quat.x = args.read_float();
 			quat.y = args.read_float();
 			quat.z = args.read_float();
+#if 0
 			SbmCharacter* character = mcu->getCharacter(skelName);	
 			if (character)
 				character->datareceiver_ct->setLocalRotation(jName, quat);
+#endif
 		}
 		else if (skeletonType == "norotation")
 		{
@@ -5272,7 +5277,8 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 					return CMD_FAILURE;
 				}
 				std::vector<SrQuat> quats;
-				for (int i = 0; i < 20; i++)
+				int nJoints = 12;
+				for (int i = 0; i < nJoints; i++)
 				{
 					SrQuat quat;
 					quat.w = args.read_float();
@@ -5286,7 +5292,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 				SbmCharacter* character = mcu->getCharacter(skelName);	
 				if (character)
 				{
-					for (int i = 0; i < 20; i++)
+					for (int i = 0; i < nJoints; i++)
 					{
 						if (quats[i].w != 0)
 							character->datareceiver_ct->setLocalRotation(mcu->kinectProcessor->getSBJointName(i), quats[i]);
@@ -5642,7 +5648,8 @@ void mcu_vhmsg_callback( const char *op, const char *args, void * user_data )
 
 int mcuFestivalRemoteSpeechCmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 {
-	FestivalSpeechRelayLocal* speechRelay = mcu_p->festivalRelay();
+	SpeechRelayLocal* speechRelay = mcu_p->cereprocRelay();//mcu_p->festivalRelay();
+	//SpeechRelayLocal* speechRelay = mcu_p->festivalRelay();
 	const char* message = args.read_remainder_raw();
 	speechRelay->processSpeechMessage(message);
 	//processSpeechMessage(
