@@ -65,8 +65,8 @@ float MeCtGaze::DEFAULT_LIMIT_ROLL[]       = { 10.0,     5.0,    20.0,     15.0,
 //     Speed     (head, eyes, default eyes arg): 360, 10000, 10000
 //     Smoothing (back, neck, eyes): 0.8, 0.8, 0.1
 
-const float MeCtGaze::DEFAULT_SPEED_HEAD         = 1000.0f;
-const float MeCtGaze::DEFAULT_SPEED_EYES         = 1000.0f;
+const float MeCtGaze::DEFAULT_SPEED_HEAD         = 5000.0f;
+const float MeCtGaze::DEFAULT_SPEED_EYES         = 5000.0f;
 
 const float MeCtGaze::DEFAULT_SMOOTHING_LUMBAR   = 0.6f;
 const float MeCtGaze::DEFAULT_SMOOTHING_CERVICAL = 0.5f;
@@ -226,8 +226,8 @@ MeCtGaze::MeCtGaze( void )	: SmartBody::SBController() {
 	joint_arr = NULL;
 
 	// gaze settings
-	addDefaultAttributeDouble("gaze.speedEyes", 1000);
-	addDefaultAttributeDouble("gaze.speedNeck", 1000);
+	addDefaultAttributeDouble("gaze.speedEyes", 5000);
+	addDefaultAttributeDouble("gaze.speedNeck", 5000);
 	addDefaultAttributeDouble("gaze.limitPitchUpEyes", -35.0);
 	addDefaultAttributeDouble("gaze.limitPitchDownEyes", 35.0);
 	addDefaultAttributeDouble("gaze.limitHeadingEyes", 40.0);

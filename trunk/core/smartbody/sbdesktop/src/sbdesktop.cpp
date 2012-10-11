@@ -963,7 +963,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 			mcu.camera_p->eye.set(cameraLoc.x, cameraLoc.y, cameraLoc.z);
 			SrVec targetLoc = cameraLoc - mcu.cameraTracking[x]->targetToCamera;
 			mcu.camera_p->center.set( targetLoc.x, targetLoc.y, targetLoc.z);
-			mcu.viewer_p->set_camera(*( mcu.camera_p ));
+			mcu.viewer_p->set_camera( mcu.camera_p );
 		}	
 
 //		if((ChannelBufferWindow*)mcu.channelbufferviewer_p != NULL)

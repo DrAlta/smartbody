@@ -30,6 +30,8 @@ void SBJointMap::applyMotion(SmartBody::SBMotion* motion)
 		std::string to = (*iter).second;
 		channels.changeChannelName(from, to);
 	}
+
+	_mappedMotions.push_back(motion->getName());
 }
 
 void SBJointMap::applyMotionInverse( SmartBody::SBMotion* motion )
@@ -46,6 +48,17 @@ void SBJointMap::applyMotionInverse( SmartBody::SBMotion* motion )
 		std::string from = (*iter).second;
 		std::string to = (*iter).first;		
 		channels.changeChannelName(from, to);
+	}
+
+	for (std::vector<std::string>::iterator iter = _mappedMotions.begin();
+		 iter != _mappedMotions.end();
+		 iter++)
+	{
+		if ((*iter) == motion->getName())
+		{
+			_mappedMotions.erase(iter);
+			break;
+		}
 	}
 }
 
@@ -84,6 +97,18 @@ void SBJointMap::applySkeletonInverse( SmartBody::SBSkeleton* skeleton )
 		channels.changeChannelName(from, to);
 	}
 	skeleton->resetSearchJoint();
+
+	for (std::vector<std::string>::iterator iter = _mappedSkeletons.begin();
+		 iter != _mappedSkeletons.end();
+		 iter++)
+	{
+		if ((*iter) == skeleton->getName())
+		{
+			_mappedSkeletons.erase(iter);
+			break;
+		}
+	}
+
 }
 
 void SBJointMap::applySkeleton(SmartBody::SBSkeleton* skeleton)
@@ -120,6 +145,18 @@ void SBJointMap::applySkeleton(SmartBody::SBSkeleton* skeleton)
 		channels.changeChannelName(from, to);
 	}
 	skeleton->resetSearchJoint();
+
+	_mappedSkeletons.push_back(skeleton->getName());
+}
+
+std::vector<std::string>&  SBJointMap::getMappedMotions()
+{
+	return _mappedMotions;
+}
+
+std::vector<std::string>& SBJointMap::getMappedSkeletons()
+{
+	return _mappedSkeletons;
 }
 
 void SBJointMap::setMapping(const std::string& from, const std::string& to)

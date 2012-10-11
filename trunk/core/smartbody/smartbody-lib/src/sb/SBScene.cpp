@@ -1032,26 +1032,28 @@ std::string SBScene::save()
 	}
 	
 	std::vector<std::string> scriptPaths = getAssetPaths("script");
-	for (iter = motionPaths.begin(); iter != motionPaths.end(); iter++)
+	for (iter = scriptPaths.begin(); iter != scriptPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"script\", \"" << path << "\")\n";
 	}
 
 	std::vector<std::string> audioPaths = getAssetPaths("audio");
-	for (iter = motionPaths.begin(); iter != motionPaths.end(); iter++)
+	for (iter = audioPaths.begin(); iter != audioPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"audio\", \"" << path << "\")\n";
 	}
 
 	std::vector<std::string> meshPaths = getAssetPaths("mesh");
-	for (iter = motionPaths.begin(); iter != motionPaths.end(); iter++)
+	for (iter = meshPaths.begin(); iter != meshPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"mesh\", \"" << path << "\")\n";
 	}
-
+	strstr << "# -------------------- load assets\n";
+	strstr << "scene.loadAssets()\n";
+	
 	strstr << "# -------------------- face definitions\n";
 	// face definitions
 	std::vector<std::string> faceDefinitions = getFaceDefinitionNames();
@@ -1147,6 +1149,31 @@ std::string SBScene::save()
 		}
 	}
 
+	strstr << "# -------------------- applying joint maps\n";
+	for (iter = jointMapNames.begin(); iter != jointMapNames.end(); iter++)
+	{
+		const std::string& jointMapName = (*iter);
+		SBJointMap* jointMap = jointMapManager->getJointMap(jointMapName);
+
+		strstr << "jointMap = scene.getJointMapManager().getJointMap(\"" << jointMapName << "\")\n";
+
+		std::vector<std::string>& mappedMotions = jointMap->getMappedMotions();
+		for (std::vector<std::string>::iterator iter = mappedMotions.begin();
+			 iter != mappedMotions.end();
+			 iter++)
+		{
+			strstr << "jointMap.applyMotion(scene.getMotion(\"" << (*iter) << "\")\n";
+		}
+
+		std::vector<std::string>& mappedSkeletons = jointMap->getMappedSkeletons();
+		for (std::vector<std::string>::iterator iter = mappedSkeletons.begin();
+			 iter != mappedSkeletons.end();
+			 iter++)
+		{
+			strstr << "jointMap.applySkeleton(scene.getSkeleton(\"" << (*iter) << "\")\n";
+		}
+	}
+	
 	strstr << "# -------------------- lip syncing\n";
 
 	// diphones
