@@ -20,9 +20,9 @@ public:
 
 	virtual bool load(std::string skeletonFile);
 	virtual bool save(std::string skeletonFile);
-		std::string saveToString();
+	std::string saveToString();
 
-	const std::string& getName();
+	void setFileName(const std::string& fname);
 	const std::string& getFileName();
 	int getNumJoints();
 	SBJoint* getJoint(int index);		

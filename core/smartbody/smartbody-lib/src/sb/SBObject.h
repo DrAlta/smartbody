@@ -32,8 +32,8 @@ class SBObject : public SBObserver, public SBSubject
 		virtual void afterUpdate(double time);
 		virtual void stop();
 
-		void setName(const std::string& name);
-		const std::string& getName();
+		virtual void setName(const std::string& name);
+		virtual const std::string& getName();
 		bool hasAttribute(const std::string& attrName);
 		SBAttribute* getAttribute(const std::string& attrName);
 		std::map<std::string, SBAttribute*>& getAttributeList();

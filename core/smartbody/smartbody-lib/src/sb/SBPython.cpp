@@ -1139,6 +1139,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("save", &SBSkeleton::save, "Saves the skeleton definition with the given skeleton name.")
 		.def("rescale", &SBSkeleton::rescale, "Adjust the skeleton size to scale ratio")
 		.def("getName", &SBSkeleton::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the skeleton.")
+		.def("getFileName", &SBSkeleton::getFileName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the original filename where the skeleton was loaded from.")
 		.def("getNumJoints", &SBSkeleton::getNumJoints, "Returns the number of joints for this skeleton.")
 		.def("getJointNames", &SBSkeleton::getJointNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the joint names for this skeleton.")
 		.def("getJointByName", &SBSkeleton::getJointByName, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the joint of a given name.")
@@ -1317,6 +1318,8 @@ boost::python::class_<SBReach>("SBReach")
 		.def("applyMotionInverse", &SBJointMap::applyMotionInverse, "Applies the inverse joint mapping to a motion.")
 		.def("applySkeletonInverse", &SBJointMap::applySkeletonInverse, "Applies the inverse skeleton mapping to a motion.")
 		.def("guessMapping", &SBJointMap::guessMapping, "Automatic joint name matching to standard SmartBody names.")
+		.def("getMappedMotions", &SBJointMap::getMappedMotions, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of the motions that have been mapped by this joint map.")
+		.def("getMappedSkeletons", &SBJointMap::getMappedSkeletons, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of the skeletons that have been mapped by this joint map.")
 		;
 
 	boost::python::class_<SBJointMapManager>("SBJointMapManager")

@@ -100,8 +100,8 @@ void SkSkeleton::copy(SkSkeleton* origSkel)
 	}
 	_name = origSkel->name();
 	_skfilename = origSkel->skfilename();
-
-
+	setName(origSkel->getName());
+	
 	//	_root = new SkJoint(this, 0, origSkel->root()->rot_type(), origSkel->root()->index());
 	_root = new SmartBody::SBJoint(this, 0, origSkel->root()->rot_type(), origSkel->root()->index());
 	copy_joint(_root, origSkel->root());
