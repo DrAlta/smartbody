@@ -241,14 +241,16 @@ bool SbmShaderManager::initGLExtension()
 	//viewer->makeGLContext();
 	glewInit();
 	
-//     if (glewIsSupported("GL_VERSION_3_0"))
-// 	{
-//         LOG("Ready for OpenGL 3.0\n");
-// 		shaderInit = true;
-// 		shaderSupport = SUPPORT_OPENGL_3_0;
-// 		return true;
-// 	}
-//     else 
+#if !defined(MAC_BUILD)	
+    if (glewIsSupported("GL_VERSION_3_0"))
+	{
+        LOG("Ready for OpenGL 3.0\n");
+		shaderInit = true;
+		shaderSupport = SUPPORT_OPENGL_3_0;
+		return true;
+	}
+    else 
+#endif
 	if (glewIsSupported("GL_VERSION_2_0") || glewIsSupported("GL_VERSION_3_0"))
 	{
 		LOG("Ready for OpenGL 2.0.\n");

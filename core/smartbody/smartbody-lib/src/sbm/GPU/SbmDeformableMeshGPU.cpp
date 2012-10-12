@@ -3,6 +3,7 @@
 #include <string>
 #include <set>
 #include <algorithm>
+#include <vhcl.h>
 
 typedef std::pair<int,float> IntFloatPair;
 
@@ -144,6 +145,7 @@ vec3 pos = vec3(gl_Vertex.xyz);\n \
 mat4 skin = TransformPos(pos,gl_Normal,tangent,binormal,BoneID1,BoneWeight1) + TransformPos(pos,gl_Normal,tangent,binormal,BoneID2,BoneWeight2);\n\
 vPos = gl_TextureMatrix[7]* gl_ModelViewMatrix * vec4(skin[0].xyz,1.0);\n\
 gl_Position = gl_ModelViewProjectionMatrix*vec4(skin[0].xyz,1.0);\n\
+//gl_Position = gl_ModelViewProjectionMatrix*vec4(pos.xyz,1.0);\n\
 lightDir[0] = normalize((vec4(gl_LightSource[0].position.xyz,0.0)).xyz);\n\
 halfVector[0] = normalize((vec4(gl_LightSource[0].halfVector.xyz,0.0)).xyz);\n\
 dist[0] = 0.0;\n\
@@ -889,7 +891,8 @@ void SbmDeformableMeshGPU::updateTransformBuffer()
 		SkJoint* joint = boneJointList[i];		
 		if (!joint)
 			continue;
-		transformBuffer[i] = bindPoseMatList[i]*joint->gmat();		
+		transformBuffer[i] = bindPoseMatList[i]*joint->gmat();	
+		SrQuat q = SrQuat(transformBuffer[i]);		
 	}
 }
 
@@ -985,7 +988,7 @@ void SbmDeformableMeshGPUInstance::updateTransformBuffer()
 	if (transformBuffer.size() != _mesh->boneJointIdxMap.size())
 		transformBuffer.resize(_mesh->boneJointIdxMap.size());
 	std::map<std::string,int>& boneIdxMap = _mesh->boneJointIdxMap;
-	std::map<std::string,int>::iterator mi;
+	std::map<std::string,int>::iterator mi;	
 	for ( mi  = boneIdxMap.begin();
 		  mi != boneIdxMap.end();
 		  mi++)	
@@ -994,7 +997,10 @@ void SbmDeformableMeshGPUInstance::updateTransformBuffer()
 		SkJoint* joint = _skeleton->search_joint(mi->first.c_str());//boneJointList[i];		
 		if (!joint)
 			continue;
-		transformBuffer[idx] = _mesh->bindPoseMatList[idx]*joint->gmat();		
+		transformBuffer[idx] = _mesh->bindPoseMatList[idx]*joint->gmat();	
+		SrQuat q = SrQuat(transformBuffer[idx]);
+		//LOG("transform buffer %d , quat = %f %f %f %f",idx,q.w,q.x,q.y,q.z);
+		//sr_out << " transform buffer = " << transformBuffer[idx];
 	}
 }
 

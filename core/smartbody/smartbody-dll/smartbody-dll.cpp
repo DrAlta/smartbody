@@ -231,9 +231,9 @@ void Smartbody_dll::InitLocalSpeechRelay()
    std::string festivalCacheDir = "/sdcard/SBUnity/festival/cache/";
    std::string cereprocLibDir = "/sdcard/SBUnity/cerevoice/voices/";	
 #else
-	std::string festivalLibDir = "./Assets/SBUnity/festival/lib/";
-	std::string festivalCacheDir = "./Assets/SBUnity/festival/cache/";
-	std::string cereprocLibDir = "./Assets/SBUnity/cerevoice/voices/";	
+	std::string festivalLibDir = "./SBUnity/festival/lib/";
+	std::string festivalCacheDir = "./SBUnity/festival/cache/";
+	std::string cereprocLibDir = "./SBUnity/cerevoice/voices/";	
 #endif
    mcu.festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
    mcu.cereprocRelay()->initSpeechRelay(cereprocLibDir,festivalCacheDir);
