@@ -423,8 +423,10 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 				else
 				{
 					std::string fullName = filebase + ext;
-					skeleton->name(fullName.c_str());
-					map.insert(std::pair<std::string, SkSkeleton*>(filebase + ext, skeleton));
+					skeleton->setName(fullName);
+					SmartBody::SBSkeleton* sbskel = dynamic_cast<SmartBody::SBSkeleton*>(skeleton);
+					sbskel->setFileName(pathname.string());
+					map.insert(std::pair<std::string, SkSkeleton*>(fullName, skeleton));
 				}
 			}
 		}

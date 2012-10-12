@@ -25,6 +25,11 @@ SBSkeleton::SBSkeleton(SBSkeleton* copySkel) : SkSkeleton(copySkel)
 {
 }
 
+void SBSkeleton::setFileName(const std::string& fname)
+{
+	skfilename(fname.c_str());
+}
+
 const std::string& SBSkeleton::getFileName()
 {
 	return skfilename();
@@ -117,11 +122,6 @@ std::string SBSkeleton::saveToString()
 		retString = (const char*)outputString;
 	}
 	return retString;
-}
-
-const std::string& SBSkeleton::getName()
-{
-	return name();
 }
 
 int SBSkeleton::getNumJoints()
