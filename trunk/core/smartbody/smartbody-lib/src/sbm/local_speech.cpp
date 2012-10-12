@@ -511,6 +511,9 @@ void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string
 		int success = CPRCEN_engine_load_voice(voiceEngine, fullLicenseName.c_str(), NULL, fullVoiceName.c_str(),CPRC_VOICE_LOAD_EMB_AUDIO);
 		if (!success)
 			LOG("Cerevoice Local Relay : load voice %s fail.",voiceNames[i].c_str());
+		else
+			LOG("Cerevoice Local Relay : load voice %s success.",voiceNames[i].c_str());
+
 	}
 	
 
@@ -518,6 +521,8 @@ void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string
 	{
 		LOG("fail to initialize Cerevoice engine");
 	}
+	else
+		LOG("Success to initialize Cerevoice engine");
 	cacheDirectory = cacheDir;
 	set_phonemes_to_visemes();
 }
@@ -857,7 +862,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
       reply += " OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?>";
       reply += xml;
    
-      //printf( "REPLY: %s\n", reply.c_str() );
+      //LOG( "REPLY: %s\n", reply.c_str() );
 
 #ifdef _DUMP_COMM_TO_DISK
 	  fprintf(_outfile, "%d: %s\n\n",_dumpCounter - 1,reply.c_str());

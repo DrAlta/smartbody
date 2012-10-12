@@ -5642,7 +5642,8 @@ void mcu_vhmsg_callback( const char *op, const char *args, void * user_data )
 
 int mcuFestivalRemoteSpeechCmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 {
-	FestivalSpeechRelayLocal* speechRelay = mcu_p->festivalRelay();
+	//FestivalSpeechRelayLocal* speechRelay = mcu_p->festivalRelay();
+	SpeechRelayLocal* speechRelay = mcu_p->cereprocRelay();
 	const char* message = args.read_remainder_raw();
 	speechRelay->processSpeechMessage(message);
 	//processSpeechMessage(

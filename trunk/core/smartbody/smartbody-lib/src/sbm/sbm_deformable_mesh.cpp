@@ -390,8 +390,8 @@ bool DeformableMesh::buildVertexBuffer()
 					const std::string& curJointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];					
 					float jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
 					int    jointIndex  = boneJointIdxMap[curJointName];
-					// 					if (numOfInfJoints > 8)
-					// 						printf("w = %d : %f\n",jointIndex,jointWeight);
+// 					 					if (numOfInfJoints > 8)
+// 					 						printf("w = %d : %f\n",jointIndex,jointWeight);
 					weightList.push_back(IntFloatPair(jointIndex,jointWeight));							
 					globalCounter ++;									
 				}
@@ -419,6 +419,8 @@ bool DeformableMesh::buildVertexBuffer()
 				{
 					boneWeightBuf[0][iVtx][j] /= weightSum;
 					boneWeightBuf[1][iVtx][j] /= weightSum;
+					//LOG("weight 0 - %d = %f",j,boneWeightBuf[0][iVtx][j]);
+					//LOG("weight 1 - %d = %f",j,boneWeightBuf[1][iVtx][j]);
 				}	
 
 				if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
