@@ -674,11 +674,22 @@ void SBScene::loadAssetsFromPath(std::string assetPath)
 {
 	const std::string& mediaPath = this->getMediaPath();
 	boost::filesystem::path p( mediaPath );
-	p /= assetPath;
-	boost::filesystem::path abs_p = boost::filesystem::complete( p );
+	boost::filesystem::path assetP( assetPath );
+
+	boost::filesystem::path abs_p = boost::filesystem::complete( assetP );	
+
+	if( boost::filesystem2::exists( abs_p ))
+	{
+		p = assetP;
+	}
+	else
+	{
+		p /= assetP;
+	}
+	boost::filesystem::path final = boost::filesystem::complete( p );	
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	std::string finalPath = abs_p.string();
+	std::string finalPath = p.string();
 	mcu.load_motions(finalPath.c_str(), true);
 	mcu.load_skeletons(finalPath.c_str(), true);
 }
