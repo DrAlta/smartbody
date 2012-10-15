@@ -150,6 +150,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void SteeringNoneCB(Fl_Widget* w, void* data);	
 		static void GridCB(Fl_Widget* w, void* data);	
 		static void CreatePythonAPICB(Fl_Widget* widget, void* data);
+		static void DocumentationCB(Fl_Widget* widget, void* data);
 
 };
 

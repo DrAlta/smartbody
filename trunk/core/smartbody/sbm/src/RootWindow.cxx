@@ -81,6 +81,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, NULL);
 	menubar->add("&Window/Viseme Viewer", 0, LaunchVisemeViewerCB, this, NULL);
 	menubar->add("&Window/Retarget Creator", 0, LaunchRetargetCreatorCB, this, NULL);
+	menubar->add("&Help/Documentation", 0, DocumentationCB, this, NULL);
 	menubar->add("&Help/Create Python API", 0, CreatePythonAPICB, this, NULL);
 	//menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
 	//menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, FL_MENU_DIVIDER);
@@ -1258,6 +1259,19 @@ void BaseWindow::CreatePythonAPICB(Fl_Widget* widget, void* data)
 	strstr << "f = io.open('./smartbody.html', 'w')\n";
 	strstr << "f.write(unicode(content))\n";
 	strstr << "f.close()\n";
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->run(strstr.str());
+}
+
+void BaseWindow::DocumentationCB(Fl_Widget* widget, void* data)
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+
+	std::stringstream strstr;
+	strstr << "import webbrowser\n";
+	strstr << "url = \"http://smartbody.ict.usc.edu/documentation\"\n";
+	strstr << "webbrowser.open(url)\n";
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->run(strstr.str());
