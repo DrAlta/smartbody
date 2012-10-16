@@ -1256,7 +1256,7 @@ void BaseWindow::CreatePythonAPICB(Fl_Widget* widget, void* data)
 	strstr << "d = HTMLDoc()\n";
 	strstr << "content = d.docmodule(sys.modules[\"SmartBody\"])\n";
 	strstr << "import io\n";
-	strstr << "f = io.open('./smartbody.html', 'w')\n";
+	strstr << "f = io.open('" << docFile << "', 'w')\n";
 	strstr << "f.write(unicode(content))\n";
 	strstr << "f.close()\n";
 

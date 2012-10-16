@@ -20,6 +20,7 @@ class SBReach
 		SBReach* copy();
 
 		void setInterpolatorType(std::string type);
+		std::string& getInterpolatorType();
 		void addMotion(std::string type, SBMotion* motion);
 		void removeMotion(std::string type, SBMotion* motion);
 		int getNumMotions();
