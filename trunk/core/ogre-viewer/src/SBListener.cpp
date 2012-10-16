@@ -66,7 +66,7 @@ void SBListener::OnCharacterCreate( const  std::string & name, const  std::strin
 	{
 		//Create character from characterType
 
-		ent = m_app->getSceneManager()->createEntity(name, name + ".mesh" );						
+		ent = m_app->getSceneManager()->createEntity(name, objectClass + ".mesh" );						
 	}
 	catch( Ogre::ItemIdentityException& )
 	{
