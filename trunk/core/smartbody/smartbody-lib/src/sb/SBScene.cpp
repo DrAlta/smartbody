@@ -1329,15 +1329,15 @@ std::string SBScene::save()
 			std::string interpType = reach->getInterpolatorType();
 			strstr << "reach.setInterpolatorType(\"" << interpType << "\")\n";
 			// motions
-			std::vector<std::string>& leftMotionNames = reach->getMotionNames("left");
-			for (std::vector<std::string>::iterator iter = leftMotionNames.begin();
+			const std::vector<std::string>& leftMotionNames = reach->getMotionNames("left");
+			for (std::vector<std::string>::const_iterator iter = leftMotionNames.begin();
 				 iter != leftMotionNames.end();
 				 iter++)
 			{
 				strstr << "reach.addMotion(\"left\", scene.getMotion(\"" << (*iter) << "\"))\n";
 			}
-			std::vector<std::string>& rightMotionNames = reach->getMotionNames("right");
-			for (std::vector<std::string>::iterator iter = rightMotionNames.begin();
+			const std::vector<std::string>& rightMotionNames = reach->getMotionNames("right");
+			for (std::vector<std::string>::const_iterator iter = rightMotionNames.begin();
 				 iter != rightMotionNames.end();
 				 iter++)
 			{
