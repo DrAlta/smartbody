@@ -13,7 +13,9 @@
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBAnimationStateManager.h>
+#include <sb/SBReach.h>
 #include <sb/SBReachManager.h>
+#include <sb/SBSteerAgent.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBServiceManager.h>
 #include <sb/SBService.h>
@@ -1223,10 +1225,6 @@ std::string SBScene::save()
 		}
 	}
 		
-	strstr << "# -------------------- reaching\n";
-	// reach
-
-
 	strstr << "# -------------------- blends and transitions\n";
 	// blends & transitions
 	SBAnimationBlendManager* blendManager = getBlendManager();
@@ -1274,6 +1272,7 @@ std::string SBScene::save()
 		 pawnIter++)
 	{
 		SBPawn* pawn = getPawn((*pawnIter));
+		strstr << "\n# ---- pawn: " << pawn->getName() << "\n";
 		strstr << "obj = scene.createPawn(\"" << pawn->getName() << "\")\n";
 		SrVec position = pawn->getPosition();
 		strstr << "obj.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
@@ -1296,11 +1295,16 @@ std::string SBScene::save()
 		 characterIter++)
 	{
 		SBCharacter* character = getCharacter((*characterIter));
+		strstr << "\n# ---- character: " << character->getName() << "\n";
 		strstr << "obj = scene.createCharacter(\"" << character->getName() << "\", \"" << character->getType() << "\")\n";
 		strstr << "skeleton = scene.createSkeleton(\"" << character->getSkeleton()->getName() << "\")\n";
 		strstr << "obj.setSkeleton(skeleton)\n";
 		SrVec position = character->getPosition();
 		strstr << "obj.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
+		// face definition
+		SBFaceDefinition* faceDef = character->getFaceDefinition();
+		strstr << "obj.setFaceDefinition(scene.getFaceDefinition(\"" << faceDef->getName() << "\"))\n";
+
 		// controllers
 		strstr << "obj.createStandardControllers()\n";
 		// attributes
@@ -1313,8 +1317,107 @@ std::string SBScene::save()
 			std::string attrWrite = attr->write();
 			strstr << attrWrite;
 		}
+
+		// reach
+		strstr << "# -------------------- reaching for character " << character->getName() << "\n";
+		// reach
+		SBReachManager* reachManager = this->getReachManager();
+		SBReach* reach = reachManager->getReach(character->getName());
+		if (reach)
+		{
+			strstr << "reach = scene.getReachManager().createReach(\"" << character->getName() << "\")\n";
+			std::string interpType = reach->getInterpolatorType();
+			strstr << "reach.setInterpolatorType(\"" << interpType << "\")\n";
+			// motions
+			std::vector<std::string>& leftMotionNames = reach->getMotionNames("left");
+			for (std::vector<std::string>::iterator iter = leftMotionNames.begin();
+				 iter != leftMotionNames.end();
+				 iter++)
+			{
+				strstr << "reach.addMotion(\"left\", scene.getMotion(\"" << (*iter) << "\"))\n";
+			}
+			std::vector<std::string>& rightMotionNames = reach->getMotionNames("right");
+			for (std::vector<std::string>::iterator iter = rightMotionNames.begin();
+				 iter != rightMotionNames.end();
+				 iter++)
+			{
+				strstr << "reach.addMotion(\"right\", scene.getMotion(\"" << (*iter) << "\"))\n";
+			}
+			// point hand
+			SBMotion* m = NULL;
+			m = reach->getPointHandMotion("left");
+			if (m)
+			{
+				strstr << "reach.setPointHandMotion(\"left\", scene.getMotion(\"" << m->getName() << "\"))\n";
+			}
+			m = reach->getPointHandMotion("right");
+			if (m)
+			{
+				strstr << "reach.setPointHandMotion(\"right\", scene.getMotion(\"" << m->getName() << "\"))\n";
+			}
+			// grab hand
+			m = reach->getGrabHandMotion("left");
+			if (m)
+			{
+				strstr << "reach.setGrabHandMotion(\"left\", scene.getMotion(\"" << m->getName() << "\"))\n";
+			}
+			m = reach->getGrabHandMotion("right");
+			if (m)
+			{
+				strstr << "reach.setGrabHandMotion(\"right\", scene.getMotion(\"" << m->getName() << "\"))\n";
+			}
+			// release hand
+			m = reach->getReleaseHandMotion("left");
+			if (m)
+			{
+				strstr << "reach.setReleaseHandMotion(\"left\", scene.getMotion(\"" << m->getName() << "\"))\n";
+			}
+			m = reach->getReleaseHandMotion("right");
+			if (m)
+			{
+				strstr << "reach.setReleaseHandMotion(\"right\", scene.getMotion(\"" << m->getName() << "\"))\n";
+			}
+			// reach hand
+			m = reach->getReachHandMotion("left");
+			if (m)
+			{
+				strstr << "reach.setReachHandMotion(\"left\", scene.getMotion(\"" << m->getName() << "\"))\n";
+			}
+			m = reach->getReachHandMotion("right");
+			if (m)
+			{
+				strstr << "reach.setReachHandMotion(\"right\", scene.getMotion(\"" << m->getName() << "\"))\n";
+			}
+			strstr << "reach.build(scene.getCharacter(\"" << character->getName() << "\"))\n";
+		}
+		else
+		{
+			strstr << "# -- no reach\n";
+		}
+
+		// steering
+		strstr << "# --- steering for character " << character->getName() << "\n";
+		SBSteerManager* steerManager = this->getSteerManager();
+		SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+		if (steerAgent)
+		{
+			strstr << "steeragent = scene.getSteerManager().createSteerAgent(\"" << character->getName() << "\")\n";
+			strstr << "steeragent.setSteerStateNamePrefix(\"" << steerAgent->getSteerStateNamePrefix() << "\")\n";
+			strstr << "steeragent.setSteerType(\"" << steerAgent->getSteerType() << "\")\n";
+			strstr << "obj.setSteerAgent(steeragent)\n";
+		}
+		else
+		{
+			strstr << "# --- no steering for character " << character->getName() << "\n";
+		}
 	}
 
+	// enable steering
+	if (this->getSteerManager()->getSteerAgents().size() > 0)
+	{
+		strstr << "scene.getServiceManager().getService(\"steering\").setBoolAttribute(\"enable\", True)\n";
+	}
+	
 	// services
 	SmartBody::SBServiceManager* serviceManager = this->getServiceManager();
 	std::vector<std::string> serviceNames = serviceManager->getServiceNames();

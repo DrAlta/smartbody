@@ -251,5 +251,10 @@ void SBReach::setInterpolatorType( std::string type )
 	interpolatorType = type;
 }
 
+std::string& SBReach::getInterpolatorType()
+{
+	return interpolatorType;
+}
+
 
 }
