@@ -593,9 +593,14 @@ diphone.addKey("ShCh", -0.00522193, 0)
 diphone.addKey("ShCh", 0.224543, 0.262391)
 diphone.addKey("ShCh", 0.655352, 0)
 
+diphone.addKey("W", 0.389034, 0)
+diphone.addKey("W", 0.744125, 0.381924)
+diphone.addKey("W", 1, 0)
+
 diphone.addKey("open", -0.00261097, 0.00291545)
 diphone.addKey("open", 0.279373, 0.122449)
-diphone.addKey("open", 0.814621, 0)
+diphone.addKey("open", 0.660574, 0.641399)
+diphone.addKey("open", 0.994778, 0)
 
 diphone.addKey("tRoof", 0.00522193, 0)
 diphone.addKey("tRoof", 0.261097, 0.463557)
@@ -6128,6 +6133,20 @@ diphone.addKey("PBM", 0, 0.00291545)
 diphone.addKey("PBM", 0.27154, 0.638484)
 diphone.addKey("PBM", 0.72846, 0)
 
+diphone.addKey("open", 0.295039, 0)
+diphone.addKey("open", 0.603133, 0.303207)
+diphone.addKey("open", 0.785901, 0.300292)
+diphone.addKey("open", 1, 0.00291545)
+
+diphone.addKey("tBack", 0.342037, 0)
+diphone.addKey("tBack", 0.694517, 0.495627)
+diphone.addKey("tBack", 0.994778, 0.0058309)
+
+diphone.addKey("wide", 0.1, 0)
+diphone.addKey("wide", 0.613577, 0.172012)
+diphone.addKey("wide", 0.793734, 0.166181)
+diphone.addKey("wide", 0.997389, 0.00874636)
+
 diphone = diphoneManager.createDiphone("er", "d", "default")
 diphone.addKey("ShCh", 0.245431, 0)
 diphone.addKey("ShCh", 0.579634, 0.274052)
@@ -6151,9 +6170,23 @@ diphone.addKey("ShCh", 0.245431, 0)
 diphone.addKey("ShCh", 0.579634, 0.274052)
 diphone.addKey("ShCh", 1, 0.00291545)
 
+diphone.addKey("open", 0.0078329, 0)
+diphone.addKey("open", 0.214099, 0.294461)
+diphone.addKey("open", 0.305483, 0.297376)
+diphone.addKey("open", 0.686684, -0.00291545)
+
+diphone.addKey("tBack", 0.0104439, 0)
+diphone.addKey("tBack", 0.234987, 0.451895)
+diphone.addKey("tBack", 0.689295, 0)
+
 diphone.addKey("tRoof", 0.248042, -0.00291545)
 diphone.addKey("tRoof", 0.644909, 0.431487)
 diphone.addKey("tRoof", 1.00261, -0.00291545)
+
+diphone.addKey("wide", 0.0078329, 0)
+diphone.addKey("wide", 0.211488, 0.139942)
+diphone.addKey("wide", 0.32376, 0.142857)
+diphone.addKey("wide", 0.673629, -0.00291545)
 
 diphone = diphoneManager.createDiphone("er", "f", "default")
 diphone.addKey("FV", 0.305483, 0)
@@ -6193,6 +6226,20 @@ diphone.addKey("FV", 0.305483, 0)
 diphone.addKey("FV", 0.697128, 0.653061)
 diphone.addKey("FV", 0.992167, 0.00291545)
 
+diphone.addKey("open", 0.0078329, 0)
+diphone.addKey("open", 0.214099, 0.294461)
+diphone.addKey("open", 0.305483, 0.297376)
+diphone.addKey("open", 0.686684, -0.00291545)
+
+diphone.addKey("tBack", 0.0104439, 0)
+diphone.addKey("tBack", 0.234987, 0.451895)
+diphone.addKey("tBack", 0.689295, 0)
+
+diphone.addKey("wide", 0.0078329, 0)
+diphone.addKey("wide", 0.211488, 0.139942)
+diphone.addKey("wide", 0.32376, 0.142857)
+diphone.addKey("wide", 0.673629, -0.00291545)
+
 diphone = diphoneManager.createDiphone("er", "bmp", "default")
 diphone.addKey("PBM", 0.318538, 0.0058309)
 diphone.addKey("PBM", 0.644909, 0.626822)
@@ -6212,6 +6259,20 @@ diphone.addKey("PBM", 0.318538, 0.0058309)
 diphone.addKey("PBM", 0.644909, 0.626822)
 diphone.addKey("PBM", 1, 0)
 
+diphone.addKey("open", 0.0078329, 0)
+diphone.addKey("open", 0.214099, 0.294461)
+diphone.addKey("open", 0.305483, 0.297376)
+diphone.addKey("open", 0.686684, -0.00291545)
+
+diphone.addKey("tBack", 0.0104439, 0)
+diphone.addKey("tBack", 0.234987, 0.451895)
+diphone.addKey("tBack", 0.689295, 0)
+
+diphone.addKey("wide", 0.0078329, 0)
+diphone.addKey("wide", 0.211488, 0.139942)
+diphone.addKey("wide", 0.32376, 0.142857)
+diphone.addKey("wide", 0.673629, -0.00291545)
+
 diphone = diphoneManager.createDiphone("sh", "bmp", "default")
 diphone.addKey("PBM", 0.318538, 0.0058309)
 diphone.addKey("PBM", 0.762402, 0.469388)
@@ -6226,10 +6287,31 @@ diphone.addKey("ShCh", -0.00261097, -0.00291545)
 diphone.addKey("ShCh", 0.245431, 0.638484)
 diphone.addKey("ShCh", 0.736292, 0.00291545)
 
+diphone.addKey("W", 0.313316, 0)
+diphone.addKey("W", 0.710183, 0.367347)
+diphone.addKey("W", 0.986945, 0)
+
+diphone.addKey("open", 0.253264, 0)
+diphone.addKey("open", 0.629243, 0.618076)
+diphone.addKey("open", 0.992167, 0)
+
 diphone = diphoneManager.createDiphone("sh", "h", "default")
 diphone.addKey("ShCh", -0.00261097, -0.00291545)
 diphone.addKey("ShCh", 0.245431, 0.638484)
 diphone.addKey("ShCh", 0.736292, 0.00291545)
+
+diphone.addKey("open", 0.295039, 0)
+diphone.addKey("open", 0.642298, 0.323615)
+diphone.addKey("open", 1, 0.00291545)
+
+diphone.addKey("tBack", 0.342037, 0)
+diphone.addKey("tBack", 0.694517, 0.495627)
+diphone.addKey("tBack", 0.994778, 0.0058309)
+
+diphone.addKey("wide", 0.1, 0)
+diphone.addKey("wide", 0.613577, 0.172012)
+diphone.addKey("wide", 0.793734, 0.166181)
+diphone.addKey("wide", 0.997389, 0.00874636)
 
 diphone = diphoneManager.createDiphone("sh", "sh", "default")
 diphone.addKey("ShCh", -0.00261097, -0.00291545)
@@ -6275,6 +6357,20 @@ diphone = diphoneManager.createDiphone("h", "sh", "default")
 diphone.addKey("ShCh", 0.263708, 0)
 diphone.addKey("ShCh", 0.665796, 0.635568)
 diphone.addKey("ShCh", 0.997389, -0.00874636)
+
+diphone.addKey("open", 0.0078329, 0)
+diphone.addKey("open", 0.214099, 0.294461)
+diphone.addKey("open", 0.305483, 0.297376)
+diphone.addKey("open", 0.686684, -0.00291545)
+
+diphone.addKey("tBack", 0.0104439, 0)
+diphone.addKey("tBack", 0.234987, 0.451895)
+diphone.addKey("tBack", 0.689295, 0)
+
+diphone.addKey("wide", 0.0078329, 0)
+diphone.addKey("wide", 0.211488, 0.139942)
+diphone.addKey("wide", 0.32376, 0.142857)
+diphone.addKey("wide", 0.673629, -0.00291545)
 
 diphone = diphoneManager.createDiphone("er", "kg", "default")
 diphone.addKey("W", -0.00522193, 0.0058309)
@@ -6761,4 +6857,108 @@ diphone.addKey("wide", 0.26893, 0.122449)
 diphone.addKey("wide", 0.490862, 0.157434)
 diphone.addKey("wide", 0.738903, 0.116618)
 diphone.addKey("wide", 0.984334, 0)
+
+diphone = diphoneManager.createDiphone("h", "l", "default")
+diphone.addKey("open", 0.0078329, 0)
+diphone.addKey("open", 0.198433, 0.268222)
+diphone.addKey("open", 0.671018, 0.212828)
+diphone.addKey("open", 0.992167, 0)
+
+diphone.addKey("tBack", 0.0104439, 0)
+diphone.addKey("tBack", 0.234987, 0.451895)
+diphone.addKey("tBack", 0.689295, 0)
+
+diphone.addKey("tRoof", 0.360313, 0)
+diphone.addKey("tRoof", 0.56658, 0.676385)
+diphone.addKey("tRoof", 0.81201, 0)
+
+diphone.addKey("wide", 0.0078329, 0)
+diphone.addKey("wide", 0.211488, 0.139942)
+diphone.addKey("wide", 0.32376, 0.142857)
+diphone.addKey("wide", 0.673629, -0.00291545)
+
+diphone = diphoneManager.createDiphone("h", "z", "default")
+diphone.addKey("ShCh", 0.305483, 0)
+diphone.addKey("ShCh", 0.563969, 0.472303)
+diphone.addKey("ShCh", 1, 0.00291545)
+
+diphone.addKey("open", 0.0078329, 0)
+diphone.addKey("open", 0.248042, 0.291545)
+diphone.addKey("open", 0.582245, 0.110787)
+diphone.addKey("open", 1, 0)
+
+diphone.addKey("tBack", 0.0104439, 0)
+diphone.addKey("tBack", 0.234987, 0.451895)
+diphone.addKey("tBack", 0.689295, 0)
+
+diphone.addKey("wide", 0.0078329, 0)
+diphone.addKey("wide", 0.571802, 0.282799)
+diphone.addKey("wide", 1, 0)
+
+diphone = diphoneManager.createDiphone("h", "th", "default")
+diphone.addKey("open", 0.0078329, 0)
+diphone.addKey("open", 0.214099, 0.294461)
+diphone.addKey("open", 0.869452, 0.131195)
+diphone.addKey("open", 0.997389, 0.00291545)
+
+diphone.addKey("tBack", 0.0104439, 0)
+diphone.addKey("tBack", 0.234987, 0.451895)
+diphone.addKey("tBack", 0.689295, 0)
+
+diphone.addKey("tTeeth", 0.51436, -0.00291545)
+diphone.addKey("tTeeth", 0.710183, 0.405248)
+diphone.addKey("tTeeth", 0.926893, 0)
+
+diphone.addKey("wide", 0.0078329, 0)
+diphone.addKey("wide", 0.211488, 0.139942)
+diphone.addKey("wide", 0.32376, 0.142857)
+diphone.addKey("wide", 0.673629, -0.00291545)
+
+diphone = diphoneManager.createDiphone("th", "h", "default")
+diphone.addKey("open", 0.00522193, 0)
+diphone.addKey("open", 0.154047, 0.279883)
+diphone.addKey("open", 0.610966, 0.28863)
+diphone.addKey("open", 1, 0.00291545)
+
+diphone.addKey("tBack", 0.483029, 0.0058309)
+diphone.addKey("tBack", 0.707572, 0.48105)
+diphone.addKey("tBack", 0.994778, 0.0058309)
+
+diphone.addKey("tTeeth", 0.0678851, 0)
+diphone.addKey("tTeeth", 0.219321, 0.408163)
+diphone.addKey("tTeeth", 0.412533, 0)
+
+diphone.addKey("wide", 0.1, 0)
+diphone.addKey("wide", 0.613577, 0.172012)
+diphone.addKey("wide", 0.793734, 0.166181)
+diphone.addKey("wide", 0.997389, 0.00874636)
+
+diphone = diphoneManager.createDiphone("ay", "er", "default")
+diphone.addKey("W", 0.237598, 0)
+diphone.addKey("W", 0.707572, 0.446064)
+diphone.addKey("W", 0.992167, 0.00291545)
+
+diphone.addKey("open", -0.00522193, 0)
+diphone.addKey("open", 0.263708, 0.77551)
+diphone.addKey("open", 0.671018, 0.16035)
+diphone.addKey("open", 0.759791, 0.16035)
+diphone.addKey("open", 0.986945, 0)
+
+diphone.addKey("wide", 0.177546, 0)
+diphone.addKey("wide", 0.45953, 0.539359)
+diphone.addKey("wide", 0.81201, -0.00291545)
+
+diphone = diphoneManager.createDiphone("ay", "ao", "default")
+diphone.addKey("W", 0.389034, 0)
+diphone.addKey("W", 0.744125, 0.381924)
+diphone.addKey("W", 1, 0)
+
+diphone.addKey("open", -0.00522193, 0)
+diphone.addKey("open", 0.263708, 0.77551)
+diphone.addKey("open", 0.655352, 0.612245)
+diphone.addKey("open", 1, 0)
+
+diphone.addKey("wide", 0.177546, 0)
+diphone.addKey("wide", 0.45953, 0.539359)
+diphone.addKey("wide", 0.81201, -0.00291545)
 
