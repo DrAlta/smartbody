@@ -1025,6 +1025,19 @@ void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requ
 	}   // else ignore... not a part of this BodyPlanner or expired
 }
 
+void BML::Processor::interrupt( SbmCharacter* actor, time_sec duration, mcuCBHandle* mcu )
+{
+	for (std::map<std::string, BmlRequestPtr>::iterator iter = bml_requests.begin();
+		 iter != bml_requests.end();
+		 iter++)
+	{
+		BmlRequestPtr request = iter->second;
+		if (request->actor == actor)
+		{
+			interrupt(actor, iter->first, duration, mcu);
+		}
+	}
+}
 
 // Interrupt BML Performance (usually via message from InterruptBehavior)
 int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performance_id, time_sec duration, mcuCBHandle* mcu ) {

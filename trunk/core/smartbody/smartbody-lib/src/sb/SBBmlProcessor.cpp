@@ -182,5 +182,34 @@ std::string SBBmlProcessor::execXML(std::string character, std::string xml)
 	return send_vrX( "vrSpeak", character, "ALL", "", false, true, entireXML.str() );
 }
 
+void SBBmlProcessor::interruptCharacter(const std::string& character, double seconds)
+{
+	SBCharacter* sbCharacter = SBScene::getScene()->getCharacter(character);
+	if (!sbCharacter)
+	{
+		LOG("No character named '%s' found. Interrupt not done.", character.c_str());
+		return;
+	}
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.bml_processor.interrupt(sbCharacter, seconds, &mcu);
+	
+}
+
+void SBBmlProcessor::interruptBML(const std::string& character, const std::string& id, double seconds)
+{
+	SBCharacter* sbCharacter = SBScene::getScene()->getCharacter(character);
+	if (!sbCharacter)
+	{
+		LOG("No character named '%s' found. Interrupt not done.", character.c_str());
+		return;
+	}
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.bml_processor.interrupt(sbCharacter, id, seconds, &mcu);
+}
+
+
+
 } // namespace
 

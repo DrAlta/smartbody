@@ -19,6 +19,9 @@ class SBBmlProcessor
 		std::string execBMLFile(std::string character, std::string filename);
 		std::string execXML(std::string character, std::string xml);
 
+		void interruptCharacter(const std::string& character, double seconds);
+		void interruptBML(const std::string& character, const std::string& id, double seconds);
+
 	protected:
 		std::string build_vrX(std::ostringstream& buffer, const std::string& cmd, const std::string& char_id, const std::string& recip_id, const std::string& content, bool for_seq );
 		std::string send_vrX( const char* cmd, const std::string& char_id, const std::string& recip_id,
