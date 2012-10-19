@@ -169,6 +169,8 @@ namespace BML {
 		 */
 		int interrupt( SbmCharacter* actor, const std::string& performance_id, time_sec duration, mcuCBHandle* mcu );
 
+		void interrupt( SbmCharacter* actor, time_sec duration, mcuCBHandle* mcu );
+
 		/**
 		 *  Handles "vrAgentBML .. end .." messages
 		 */
