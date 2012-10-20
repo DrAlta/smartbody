@@ -290,6 +290,8 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				joint->extID(idAttr);
 				joint->extSID(sidAttr);
 
+				bool hasTranslate = false;
+
 				skeleton.channels().add(joint->name(), SkChannel::XPos);
 				skeleton.channels().add(joint->name(), SkChannel::YPos);
 				skeleton.channels().add(joint->name(), SkChannel::ZPos);
@@ -314,6 +316,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				const DOMNodeList* infoList = childNode->getChildNodes();
 				for (unsigned int j = 0; j < infoList->getLength(); j++)
 				{
+					
 					DOMNode* infoNode = infoList->item(j);
 					std::string infoNodeName;
 					xml_utils::xml_translate(&infoNodeName, infoNode->getNodeName());
@@ -341,13 +344,19 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 					}
 					if (infoNodeName == "translate")
 					{
-						std::string offsetString;
-						xml_utils::xml_translate(&offsetString, infoNode->getTextContent());
-						std::vector<std::string> tokens;
-						vhcl::Tokenize(offsetString, tokens, " \n");
-						offset.x = (float)atof(tokens[0].c_str()) * scale;
-						offset.y = (float)atof(tokens[1].c_str()) * scale;
-						offset.z = (float)atof(tokens[2].c_str()) * scale;
+						if (!hasTranslate) // need to distinguish between "origin" and "translate" nodes. For now, assume that the first one is the only valid one 
+						{
+							std::string offsetString;
+							xml_utils::xml_translate(&offsetString, infoNode->getTextContent());
+							std::vector<std::string> tokens;
+							vhcl::Tokenize(offsetString, tokens, " \n");
+							offset.x = (float)atof(tokens[0].c_str()) * scale;
+							offset.y = (float)atof(tokens[1].c_str()) * scale;
+							offset.z = (float)atof(tokens[2].c_str()) * scale;
+							hasTranslate = true;
+						}
+
+						
 					}
 					if (infoNodeName == "rotate")
 					{
@@ -1761,18 +1770,22 @@ void ParserOpenCOLLADA::parseLibraryEffects(DOMNode* node, std::map<std::string,
 					{
 						DOMNode* colorNode = ParserOpenCOLLADA::getNode("color", transparentNode);				
 						std::string color;
-						xml_utils::xml_translate(&color, colorNode->getTextContent());
-						std::vector<std::string> tokens;
-						vhcl::Tokenize(color, tokens, " \n");
-						SrVec colorVec;
-						if (tokens.size() >= 3)
+						if (colorNode)
 						{
-							for (int i=0;i<3;i++)
+							xml_utils::xml_translate(&color, colorNode->getTextContent());
+							std::vector<std::string> tokens;
+							vhcl::Tokenize(color, tokens, " \n");
+							SrVec colorVec;
+							if (tokens.size() >= 3)
 							{
-								colorVec[i] = (float)atof(tokens[i].c_str());
+								for (int i=0;i<3;i++)
+								{
+									colorVec[i] = (float)atof(tokens[i].c_str());
+								}
 							}
+							alpha = 1.f - colorVec.norm();		
 						}
-						alpha = 1.f - colorVec.norm();										
+														
 					}
 				}
 				//float alpha = float(1.0 - xml_utils::xml_translate_float(colorNode->getTextContent()));				
