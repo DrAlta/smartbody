@@ -415,7 +415,16 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				}
 				order = getRotationOrder(orderVec);
 				if (order == -1)
-					LOG("ParserOpenCOLLADA::parseJoints ERR: rotation info not correct in the file");
+				{
+					if (orderVec.size() == 0)
+					{
+						order = 321;
+					}
+					else
+					{
+						LOG("COLLADA Parser: skeleton joint has invalid rotations.");
+					}
+				}
 
 				SrMat rotMat;
 				rotx *= float(M_PI) / 180.0f;
@@ -1248,6 +1257,30 @@ int ParserOpenCOLLADA::getRotationOrder(std::vector<std::string> orderVec)
 			return 213;
 		if (orderVec[0] == "Z" && orderVec[1] == "Y" && orderVec[2] == "X")
 			return 123;
+	}
+	else if (orderVec.size() == 2)
+	{
+		if (orderVec[0] == "X" && orderVec[1] == "Y")
+			return 321;
+		if (orderVec[0] == "X" && orderVec[1] == "Z")
+			return 231;
+		if (orderVec[0] == "Y" && orderVec[1] == "X")
+			return 312;
+		if (orderVec[0] == "Y" && orderVec[1] == "Z")
+			return 132;
+		if (orderVec[0] == "Z" && orderVec[1] == "X")
+			return 213;
+		if (orderVec[0] == "Z" && orderVec[1] == "Y")
+			return 123;
+	}
+	else if (orderVec.size() == 1)
+	{
+		if (orderVec[0] == "X")
+			return 321;
+		if (orderVec[0] == "Y")
+			return 312;
+		if (orderVec[0] == "Z")
+			return 213;
 	}
 	return -1;
 }
