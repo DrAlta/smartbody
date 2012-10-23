@@ -1550,7 +1550,8 @@ void initPython(std::string pythonLibPath)
 	
 		PyRun_SimpleString("import sys");
 #endif
-#ifndef WIN32
+//#ifndef WIN32
+#if 1
 		// set the proper python path
 		std::stringstream strstr;
 		strstr << "sys.path.append(\"";

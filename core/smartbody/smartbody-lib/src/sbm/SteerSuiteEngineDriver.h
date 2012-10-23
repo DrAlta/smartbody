@@ -27,6 +27,7 @@ public:
 	double getStartTime();
 	void setLastUpdateTime(double time);
 	double getLastUpdateTime();
+	float collisionPenetration( SrVec pos, float radius, SteerLib::AgentInterface* agent );	
 
 	/// @name The EngineControllerInterface
 	/// @brief The CommandLineEngineDriver does not support any of the engine controls.
@@ -60,5 +61,6 @@ protected:
 
 
 };
+
 
 #endif

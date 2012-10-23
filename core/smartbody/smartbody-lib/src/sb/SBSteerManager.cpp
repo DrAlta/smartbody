@@ -225,8 +225,8 @@ void SBSteerManager::start()
 			initialConditions.radius = (float) initialRadius;
 		initialConditions.speed = 0.0f;
 		initialConditions.goals.clear();
-		initialConditions.name = character->getName();
-		SteerLib::AgentInterface* agent = mcu._scene->getSteerManager()->getEngineDriver()->_engine->createAgent( initialConditions, pprAIModule );
+		initialConditions.name = character->getName();		
+		SteerLib::AgentInterface* agent = mcu._scene->getSteerManager()->getEngineDriver()->_engine->createAgent( initialConditions, pprAIModule );					
 		character->steeringAgent->setAgent(agent);
 		agent->reset(initialConditions, dynamic_cast<SteerLib::EngineInterface*>(pprAIModule));
 		LOG("Setting up steering agent for character %s", character->getName().c_str());

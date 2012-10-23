@@ -4037,6 +4037,7 @@ void SbmCharacter::addActionUnitChannel(int auNum, ActionUnit* au)
 
 void SbmCharacter::setNvbg(Nvbg* nvbg)
 {
+	LOG("set character %s NVBG",getName().c_str());
 	_nvbg = nvbg;
 }
 
