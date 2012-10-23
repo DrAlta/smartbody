@@ -152,6 +152,7 @@ dMeshInstance_p(NULL)
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	std::string validName = mcu.getValidName("object");
 	setName(validName);	
+	SbmPawn::initData();
 }
 
 // Constructor
@@ -1447,15 +1448,17 @@ void SbmPawn::initSteeringSpaceObject()
 	float zmin = (z - steeringSpaceObjSize.z) / steerScale;
 	float zmax = (z + steeringSpaceObjSize.z) / steerScale;
 
+	//LOG("steeringSpaceObjSize = %f %f %f, scale = %f", steeringSpaceObjSize.x, steeringSpaceObjSize.y, steeringSpaceObjSize.z, steerScale);
+
 	if (steeringSpaceObj_p)
 	{
 		const Util::AxisAlignedBox& box = steeringSpaceObj_p->getBounds();
-		if (fabs(box.xmax - xmax) < .0001 ||
-			fabs(box.xmin - xmin) < .0001 ||
-			fabs(box.ymax - ymax) < .0001 ||
-			fabs(box.ymin - ymin) < .0001 ||
-			fabs(box.zmax - zmax) < .0001 ||
-			fabs(box.zmin - zmin) < .0001)
+		if (fabs(box.xmax - xmax) > .0001 ||
+			fabs(box.xmin - xmin) > .0001 ||
+			fabs(box.ymax - ymax) > .0001 ||
+			fabs(box.ymin - ymin) > .0001 ||
+			fabs(box.zmax - zmax) > .0001 ||
+			fabs(box.zmin - zmin) > .0001)
 		{
 			mcu._scene->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
 			Util::AxisAlignedBox& mutableBox = const_cast<Util::AxisAlignedBox&>(box);

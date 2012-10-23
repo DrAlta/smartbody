@@ -63,6 +63,7 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	prevX = 0.0f;
 	prevZ = 0.0f;
 	prevYaw = 0.0f;
+	collisionTime = 0.f;
 
 	inControl = true;
 
@@ -343,6 +344,39 @@ void SteeringAgent::updateSteerStateName()
 	jumpName = prefix + "Jump";
 }
 
+
+
+SrVec SteeringAgent::getCollisionFreeGoal( SrVec targetPos, SrVec curPos )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBSteerManager* manager = scene->getSteerManager();
+	SrVec scaleCurPos = curPos;
+	SrVec scaleTarget = targetPos;	
+	SrVec newGoal = scaleTarget;
+	scaleCurPos.y = 0.f;
+	scaleTarget.y = 0.f;
+	
+	SteerSuiteEngineDriver* driver = manager->getEngineDriver();	
+	float penetrationDeth = driver->collisionPenetration(newGoal, agent->radius(), agent);
+	float dist = (scaleTarget-scaleCurPos).len();
+	SrVec dir = (scaleCurPos-scaleTarget);
+	dir.normalize();
+	// not move at all if the agent is close to target and there are obstacles on the way.
+	if (penetrationDeth > 0.f && dist <= agent->radius()) 
+		return scaleCurPos;
+
+	// if there are obstacles in target position, setting the new target closer to agent and test again
+	while (penetrationDeth > 0.f && dist > agent->radius())
+	{
+		float offset = min(penetrationDeth+0.2f,agent->radius());
+		newGoal = newGoal + dir*offset;
+		penetrationDeth = driver->collisionPenetration(newGoal, agent->radius(), agent);
+		dist -= offset;
+	}
+
+	return newGoal;
+}
+
 void SteeringAgent::evaluate(double dtime)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -404,11 +438,16 @@ void SteeringAgent::evaluate(double dtime)
 		float goalz = goalList.front();
 		goalList.pop_front();
 		agent->clearGoals();
-		SteerLib::AgentGoalInfo goal;
+		SrVec newGoal = getCollisionFreeGoal(SrVec(goalx,goaly,goalz)*scene->getScale(),curSteerPos*scene->getScale());		
+
+		//LOG("original goal = %f %f %f, new goal = %f %f %f",goalx,goaly,goalz, newGoal.x*100.f, newGoal.y*100.f, newGoal.z*100.f);
+		SteerLib::AgentGoalInfo goal;		
 		goal.desiredSpeed = desiredSpeed;
 		goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
 		goal.targetIsRandom = false;
-		goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
+		//goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
+		// compute a collision free goal toward the target
+		goal.targetLocation = Util::Point(newGoal.x , 0.0f, newGoal.z);
 		// make sure that the desired goal is within the bounds of the steering grid
 		if (manager->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(goal.targetLocation.x, goal.targetLocation.z) == -1)
 		{
@@ -1042,6 +1081,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
 	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
 	const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
+	
 
 	//*** IMPORTANT: use the example-based animation to update the steering agent
 	forward = pprAgent->forward();
@@ -1112,8 +1152,36 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		targetLoc.x = goalQueue.front().targetLocation.x;
 		targetLoc.y = goalQueue.front().targetLocation.y;
 		targetLoc.z = goalQueue.front().targetLocation.z;
+
 		distToTarget = sqrt((x * scene->getScale() - targetLoc.x) * (x * scene->getScale() - targetLoc.x) + 
 							(z * scene->getScale() - targetLoc.z) * (z * scene->getScale() - targetLoc.z));
+
+		if (distToTarget < agent->radius()*10.f)
+		{
+			SmartBody::SBSteerManager* manager = scene->getSteerManager();
+			SteerSuiteEngineDriver* driver = manager->getEngineDriver();	
+			float penetration = driver->collisionPenetration(targetLoc,agent->radius(),agent);		
+			if (penetration > 0) 
+				collisionTime += dt;
+			else
+				collisionTime = 0;
+
+			if (penetration > 0.f && collisionTime > 1.f) // if the current target become blocked
+			{
+				SrVec newTarget = getCollisionFreeGoal(targetLoc, curSteerPos*scene->getScale());
+				agent->clearGoals();
+				SteerLib::AgentGoalInfo goal;
+				goal.desiredSpeed = desiredSpeed;
+				goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
+				goal.targetIsRandom = false;
+				//goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
+				goal.targetLocation = Util::Point(newTarget.x, 0.0f, newTarget.z);
+				//LOG("agent %s, newTarget = %f %f %f",character->getName().c_str(),newTarget.x, newTarget.y,newTarget.z);
+				agent->addGoal(goal);
+				collisionTime = 0;
+			}		
+		}
+		
 
 		if (distToTarget < distDownThreshold)
 		{
@@ -1182,7 +1250,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		// check to see if there's anything obstacles around it
 		float targetAngle = radToDeg(atan2(pprAgent->getStartTargetPosition().x - x * scene->getScale(), pprAgent->getStartTargetPosition().z - z * scene->getScale()));
 		normalizeAngle(targetAngle);
-		LOG("steering:normalize target angle = %f",targetAngle);
+		//LOG("steering:normalize target angle = %f",targetAngle);
 		normalizeAngle(yaw);
 		float diff = targetAngle - yaw;
 		normalizeAngle(diff);
@@ -1251,11 +1319,15 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 			float goalz = goalList.front();
 			goalList.pop_front();
 			agent->clearGoals();
+
+			SrVec newGoal = getCollisionFreeGoal(SrVec(goalx,goaly,goalz)*scene->getScale(),curSteerPos*scene->getScale());		
+			//LOG("evaluateExampleLoco : original goal = %f %f %f, new goal = %f %f %f",goalx,goaly,goalz, newGoal.x*100.f, newGoal.y*100.f, newGoal.z*100.f);
 			SteerLib::AgentGoalInfo goal;
 			goal.desiredSpeed = desiredSpeed;
 			goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
 			goal.targetIsRandom = false;
-			goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
+			//goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
+			goal.targetLocation = Util::Point(newGoal.x, 0.0f, newGoal.z);
 			agent->addGoal(goal);
 		}
 		

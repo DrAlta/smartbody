@@ -70,6 +70,7 @@ class SteeringAgent
 		float getFilteredParameter(std::list<float>& sampleData);
 		void startLocomotion(float angleDiff);
 		void adjustFacingAngle(float angleDiff);
+		SrVec getCollisionFreeGoal(SrVec target, SrVec curPos);
 
 	private:
 		SteerLib::AgentInterface* agent;
@@ -110,6 +111,7 @@ class SteeringAgent
 		float pedMaxTurningRateMultiplier;
 		float tiltGain;
 		bool terrainMode;
+		float collisionTime;
 
 		SrVec curSteerPos, curSteerDir, nextSteerDir, nextSteerPos, nextPtOnPath;
 

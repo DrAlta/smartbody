@@ -159,3 +159,28 @@ void SteerSuiteEngineDriver::unloadSimulation()
 	std::cout << "Simulation unloaded.\n";
 }
 
+float SteerSuiteEngineDriver::collisionPenetration( SrVec pos, float radius, SteerLib::AgentInterface* agent )
+{
+	std::set<SpatialDatabaseItemPtr> neighborList;
+	std::set<SpatialDatabaseItemPtr>::iterator neighbor;
+	// exclude the current agent
+	_engine->getSpatialDatabase()->getItemsInRange(neighborList, pos.x-radius,pos.x+radius,pos.z-radius,pos.z+radius, agent);
+	Util::Point steerPt = Util::Point(pos.x , 0.0f, pos.z);
+	float maxPenetration = 0.f;
+	for (neighbor = neighborList.begin(); neighbor != neighborList.end(); ++neighbor) {
+
+		// this way, collisionKey will be unique across all objects in the spatial database.
+		//unsigned int collisionKey = reinterpret_cast<unsigned int>((*neighbor));
+		SpatialDatabaseItemPtr item = (*neighbor);
+		intptr_t collisionKey = reinterpret_cast<intptr_t>(item);
+		float penetration = 0.0f;
+		penetration = (*neighbor)->computePenetration(steerPt, radius);
+		if (penetration > maxPenetration)
+		{
+			maxPenetration = penetration;						
+		}
+	}
+	return maxPenetration;
+}
+
+
