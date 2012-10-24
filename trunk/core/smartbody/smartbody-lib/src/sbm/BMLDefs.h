@@ -221,6 +221,7 @@ class BMLDefs
 		static XMLCh* ATTR_BLENDMODE;
 		static XMLCh* ATTR_SCHEDULEMODE;
 		static XMLCh* ATTR_TRANSITION_LENGTH;
+		static XMLCh* ATTR_DIRECTPLAY;
 
 		static XMLCh* ATTR_VALUE;
 
@@ -309,6 +310,7 @@ class BMLDefs
 		static XMLCh* ATTR_SOURCE;
 		static XMLCh* ATTR_URL;
 		static XMLCh* ATTR_OFFSET;
+		static XMLCh* ATTR_TRIM;
 		static XMLCh* ATTR_SYMBOL;
 		static XMLCh* ATTR_MATERIAL;
 		static XMLCh* ATTR_OPAQUE;

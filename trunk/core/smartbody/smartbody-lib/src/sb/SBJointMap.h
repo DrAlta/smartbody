@@ -66,7 +66,7 @@ class SBJointMap
 		// get joint with deepest hierachy level from list (first one found if multiple)
 		SkJoint* getDeepestLevelJoint(const std::vector<SkJoint*>& j_list);
 
-		void setJointMap(const char* SB_jnt, SkJoint* j, bool prtMap);
+		void setJointMap(const std::string& SB_jnt, SkJoint* j, bool prtMap);
 };
 
 }

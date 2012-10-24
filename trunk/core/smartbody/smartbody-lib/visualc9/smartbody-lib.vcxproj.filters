@@ -1042,6 +1042,9 @@
     <ClCompile Include="..\src\external\perlin\perlin.cpp">
       <Filter>external\perlin</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\controllers\MotionAnalysis.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -2126,6 +2129,9 @@
     </ClInclude>
     <ClInclude Include="..\src\external\perlin\perlin.h">
       <Filter>external\perlin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\controllers\MotionAnalysis.h">
+      <Filter>controllers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

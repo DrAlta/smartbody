@@ -167,8 +167,8 @@ class PABlendData
 
 	public:
 		PABlendData();
-		PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0);
-		PABlendData(PABlend* state, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0);
+		PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0, double blendTrim = 0.0, bool dplay = false);
+		PABlendData(PABlend* state, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0, double blendTrim = 0.0, bool dplay = false);
 		~PABlendData();
 		virtual void evaluate(double timeStep, SrBuffer<float>& buffer);
 		virtual void evaluateTransition(double timeStep, SrBuffer<float>& buffer, bool tranIn);
@@ -190,7 +190,7 @@ class PABlendData
 		BlendMode blendMode;
 		ScheduleMode scheduleMode;
 		PABlend* state;
-		float blendStartOffset;
+		float blendStartOffset, blendEndTrim;
 		float transitionLength;
 		bool active;	
 		bool directPlay;
@@ -210,7 +210,7 @@ class PATransitionManager
 		~PATransitionManager();
 
 		void align(PABlendData* current, PABlendData* next);
-		void blending(SrBuffer<float>& buffer, SrBuffer<float>&buffer1, SrBuffer<float>&buffer2, SrMat& mat, SrMat& mat1, SrMat& mat2, double timeStep, MeControllerContext* context);
+		void blending(SrBuffer<float>& buffer, SrBuffer<float>&buffer1, SrBuffer<float>&buffer2, SrMat& mat, SrMat& mat1, SrMat& mat2, double timeStep, MeControllerContext* context, bool directCombine = false);
 
 		void step( double timeStep );
 		void update();

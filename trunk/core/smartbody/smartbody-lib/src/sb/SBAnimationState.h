@@ -2,8 +2,11 @@
 #define _SBSTATE_H
 #include <sr/sr_sn_colorsurf.h>
 #include <controllers/me_ct_param_animation_data.h>
-
 # define VFLOW_LINE_WIDTH 2.0f
+
+typedef std::map<std::string, std::vector<double>> KeyTag;
+typedef std::map<int,KeyTag> KeyTagMap;
+class MotionAnalysis;
 
 namespace SmartBody {
 
@@ -15,8 +18,12 @@ class SBAnimationBlend : public PABlend
 		~SBAnimationBlend();
 
 		void setIncrementWorldOffsetY(bool flag);
-		void addCorrespondencePoints(const std::vector<std::string>& motions, const std::vector<double>& points);
+		void addCorrespondencePoints(const std::vector<std::string>& motions, const std::vector<double>& points);			
 		void removeCorrespondencePoints(int index);
+		void addKeyTagValue(const std::string& motionName, int iType, const std::string& tagName, double value);	
+		KeyTagMap* getKeyTagMap(const std::string& motionName);
+		void buildMotionAnalysis(const std::string& skeletonName, const std::string& baseName);
+		MotionAnalysis* getMotionAnalysis();
 
 		virtual int getNumMotions();
 		virtual std::string getMotion(int num);
@@ -37,6 +44,7 @@ class SBAnimationBlend : public PABlend
 
 		std::string saveToString();
 
+		// Functions to build visualization surface
 		void buildVisSurfaces(const std::string& errorType, const std::string& surfaceType, int segments, int dimensions);
 		SrSnColorSurf* createCurveSurface(float radius, unsigned int dimension, SrVec center, SrVec2 phi, SrVec2 theta);		
 		SrSnColorSurf* createFlatSurface(float depth, unsigned int dimension, SrVec2 topLeft, SrVec2 lowerRight);
@@ -84,9 +92,10 @@ class SBAnimationBlend : public PABlend
 		/*
 			This function make sure that all the correspondence points are in ascendant order
 		*/
-		void validateCorrespondencePoints();
+		void validateCorrespondencePoints();		
 
 	protected:
+		MotionAnalysis* motionAnalysis;
 		std::string _dimension;
 		bool _isFinalized;
 
@@ -94,6 +103,7 @@ class SBAnimationBlend : public PABlend
 
 		std::vector<SrSnColorSurf*> errorSurfaces;
 		std::vector<SrSnColorSurf*> smoothSurfaces;
+		std::vector<KeyTagMap> keyTagList;
 
 		SrMat plotMotionTransform;
 		SrMat plotVectorFlowTransform;

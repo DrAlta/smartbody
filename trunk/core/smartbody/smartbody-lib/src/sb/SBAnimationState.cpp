@@ -1,4 +1,5 @@
 #include "SBAnimationState.h"
+#include <controllers/MotionAnalysis.h>
 #include <sb/SBMotion.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
@@ -12,11 +13,13 @@ namespace SmartBody {
 SBAnimationBlend::SBAnimationBlend() : PABlend()
 {
 	_isFinalized = false;
+	motionAnalysis = NULL;
 }
 
 SBAnimationBlend::SBAnimationBlend(const std::string& name) : PABlend(name)
 {
 	_isFinalized = false;
+	motionAnalysis = NULL;
 }
 
 SBAnimationBlend::~SBAnimationBlend()
@@ -1083,6 +1086,7 @@ bool SBAnimationBlend::addSkMotion(const std::string& motion)
 				}
 			}
 			keys.push_back(keyVec);
+			keyTagList.push_back(KeyTagMap());
 		}
 
 		getParameters().push_back(SrVec());
@@ -1370,6 +1374,43 @@ SkMotion* SBAnimationBlend::getSkMotion( const std::string& motionName )
 	// not found!
 	LOG("Error: SBAnimationBlend::getSkMotion(): %s doesn't exist", motionName.c_str());
 	return 0;
+}
+
+void SBAnimationBlend::addKeyTagValue( const std::string& motionName, int iType, const std::string& tagName, double value )
+{
+	int motionIdx = getMotionId(motionName);
+	if (motionIdx < 0 || motionIdx >= (int)keyTagList.size()) return;
+	KeyTagMap& tagMap = keyTagList[motionIdx];
+	
+	if (tagMap.find(iType) == tagMap.end())
+	{
+		tagMap[iType] = KeyTag();		
+	}
+	KeyTag& tags = tagMap[iType];
+	if (tags.find(tagName) == tags.end())		
+		tags[tagName] = std::vector<double>();		
+	tags[tagName].push_back(value);	
+}
+
+KeyTagMap* SBAnimationBlend::getKeyTagMap( const std::string& motionName )
+{
+	int motionIdx = getMotionId(motionName);
+	if (motionIdx < 0 || motionIdx >= (int)keyTagList.size()) return NULL;
+	return &keyTagList[motionIdx];
+}
+
+MotionAnalysis* SBAnimationBlend::getMotionAnalysis()
+{
+	return motionAnalysis;
+}
+
+void SBAnimationBlend::buildMotionAnalysis( const std::string& skeletonName, const std::string& baseName )
+{
+	if (motionAnalysis)
+		delete motionAnalysis;	
+
+	motionAnalysis = new MotionAnalysis();
+	motionAnalysis->init(skeletonName,baseName, this);	
 }
 
 SBAnimationBlend0D::SBAnimationBlend0D() : SBAnimationBlend("unknown")

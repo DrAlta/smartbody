@@ -13,19 +13,6 @@ class ReachStateData;
 class ReachStateInterface;
 class ReachHandAction;
 
-class EffectorConstantConstraint : public EffectorConstraint
-{
-public:		
-	SrQuat          targetRot;
-	SrVec           targetPos;	
-public:
-	EffectorConstantConstraint() {}
-	~EffectorConstantConstraint() {}
-	EffectorConstantConstraint& operator=(const EffectorConstantConstraint& rhs);
-	virtual SrVec getPosConstraint() { return targetPos; }
-	virtual SrQuat getRotConstraint()  { return targetRot; }
-};
-
 class MeCtReachEngine
 {
 public:

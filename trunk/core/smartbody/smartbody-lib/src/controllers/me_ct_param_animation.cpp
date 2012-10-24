@@ -26,6 +26,7 @@
 #include <sb/SBMotionBlendBase.h>
 #include <sb/SBSkeleton.h>
 #include <sr/sr_euler.h>
+#include "controllers/MotionAnalysis.h"
 
 std::string MeCtParamAnimation::Context::CONTEXT_TYPE = "MeCtParamAnimation::Context";
 std::string MeCtParamAnimation::CONTROLLER_TYPE = "MeCtParamAnimation";
@@ -40,7 +41,9 @@ ScheduleType::ScheduleType()
 	jName = "";
 	timeOffset = 0.0;
 	stateTimeOffset = 0.0;
+	stateTimeTrim = 0.0;
 	transitionLen = -1.0;
+	directPlay = false;
 }
 
 
@@ -184,9 +187,9 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 
 				SrMat curBaseMat;
 				SrMat nextBaseMat;
-
+				bool directPlay = (curStateData->directPlay || nextStateData->directPlay);
 				bool pseudoTransition = (curStateData->getStateName() == PseudoIdleState || nextStateData->getStateName() == PseudoIdleState);				
-				if (pseudoTransition && (!curStateData->isPartialBlending() && !nextStateData->isPartialBlending())) // first time && not partial blending case
+				if (pseudoTransition && !directPlay && (!curStateData->isPartialBlending() && !nextStateData->isPartialBlending())) // first time && not partial blending case
 				{
 					bool transitionIn = (curStateData->getStateName() == PseudoIdleState);
 					curStateData->evaluateTransition(timeStep * transitionManager->getSlope(), buffer1, transitionIn);
@@ -230,8 +233,21 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 					curBaseMat = curStateData->woManager->getBaseTransformMat();
 					nextBaseMat = nextStateData->woManager->getBaseTransformMat();
 				}			
-
-				transitionManager->blending(frame.buffer(), buffer1, buffer2, transformMat, curBaseMat, nextBaseMat, timeStep, _context);
+				
+				if (directPlay)
+				{
+					// clean up base mat if cur or next state is pseudo idle state
+					if (curStateData->getStateName() == PseudoIdleState)
+					{
+						curBaseMat = SrMat::id;												
+					}
+					else if (nextStateData->getStateName() == PseudoIdleState)
+					{
+						nextBaseMat = SrMat::id;							
+					}
+				}
+			
+				transitionManager->blending(frame.buffer(), buffer1, buffer2, transformMat, curBaseMat, nextBaseMat, timeStep, _context, directPlay);
 				transitionManager->step(timeStep);
 				if (!curStateData->isPartialBlending() && !nextStateData->isPartialBlending())
 					updateWo(transformMat, woWriter, frame.buffer());
@@ -254,10 +270,11 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	if (curStateData && curStateData->state->stateName != PseudoIdleState)
 	{
 		if (curStateData->active)
-		{
-			curStateData->evaluate(timeStep, frame.buffer());
+		{			
+			curStateData->evaluate(timeStep, frame.buffer());	
 			if (!curStateData->isPartialBlending())
 				updateWo(curStateData->woManager->getBaseTransformMat(), woWriter, frame.buffer());
+			//updateIK(curStateData, curStateData->woManager->getBaseTransformMat(), frame.buffer());
 			return true;
 		}
 		else
@@ -280,7 +297,7 @@ const std::string& MeCtParamAnimation::getBaseJointName()
 	return baseJointName;
 }
 
-void MeCtParamAnimation::schedule(PABlend* state, double x, double y, double z, PABlendData::WrapMode wrap, PABlendData::ScheduleMode schedule, PABlendData::BlendMode blend, std::string jName, double timeOffset, double stateTimeOffset, double transitionLen )
+void MeCtParamAnimation::schedule(PABlend* state, double x, double y, double z, PABlendData::WrapMode wrap, PABlendData::ScheduleMode schedule, PABlendData::BlendMode blend, std::string jName, double timeOffset, double stateTimeOffset, double stateTimeTrim, double transitionLen, bool directPlay )
 {
 	std::vector<double> weights;
 	weights.resize(state->getNumMotions());
@@ -326,15 +343,15 @@ void MeCtParamAnimation::schedule(PABlend* state, double x, double y, double z, 
 			}
 		}
 	}
-	this->schedule(state, weights, wrap, schedule, blend, jName, timeOffset, stateTimeOffset, transitionLen);
+	this->schedule(state, weights, wrap, schedule, blend, jName, timeOffset, stateTimeOffset, stateTimeTrim, transitionLen, directPlay);
 }
 
 void MeCtParamAnimation::schedule( PABlend* state, const std::vector<double>& weights, const ScheduleType& scType )
 {
-	schedule(state,weights,scType.wrap,scType.schedule,scType.blend,scType.jName, scType.timeOffset,scType.stateTimeOffset, scType.transitionLen);
+	schedule(state,weights,scType.wrap,scType.schedule,scType.blend,scType.jName, scType.timeOffset,scType.stateTimeOffset, scType.stateTimeTrim, scType.transitionLen, scType.directPlay);
 }
 
-void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>& weights, PABlendData::WrapMode wrap, PABlendData::ScheduleMode scheduleMode, PABlendData::BlendMode blend, std::string jName, double timeOffset, double stateTimeOffset, double transitionLen)
+void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>& weights, PABlendData::WrapMode wrap, PABlendData::ScheduleMode scheduleMode, PABlendData::BlendMode blend, std::string jName, double timeOffset, double stateTimeOffset, double stateTimeTrim, double transitionLen, bool directPlay)
 {
 	ScheduleUnit unit;
 	SmartBody::SBAnimationBlend* animState = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData);
@@ -352,6 +369,8 @@ void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>&
 	unit.partialJoint = jName;
 	unit.time = mcuCBHandle::singleton().time + timeOffset;
 	unit.stateTimeOffset = (float)stateTimeOffset;
+	unit.stateTimeTrim = (float)stateTimeTrim;
+	unit.directPlay = directPlay;
 
 	//LOG("unit schedule mode = %d",unit.schedule);
 	
@@ -585,7 +604,7 @@ void MeCtParamAnimation::autoScheduling(double time)
 					double easeOutStart = curStateData->timeManager->getDuration() - actualTransitionTime;
 					double easeOutDur = actualTransitionTime;
 					//LOG("easeOutStart = %f, duration = %f",easeOutStart, easeOutDur);
-					transitionManager = new PATransitionManager(easeOutStart, easeOutDur);	
+					transitionManager = new PATransitionManager(easeOutStart, easeOutDur);					
 					//transitionManager = new PATransitionManager(curStateData->timeManager->getDuration(), 0.0);
 				}
 			}
@@ -605,8 +624,9 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	PABlendData* module = NULL;
 	if (su.data)
 	{
-		module = new PABlendData(su.data, su.weights, su.blend, su.wrap, su.schedule, su.stateTimeOffset);
+		module = new PABlendData(su.data, su.weights, su.blend, su.wrap, su.schedule, su.stateTimeOffset, su.stateTimeTrim, su.directPlay);
 		module->blendStartOffset = su.stateTimeOffset;
+		module->blendEndTrim = su.stateTimeTrim;
 		module->transitionLength = su.transitionLength;
 		std::vector<std::string> joints;
 		SkJoint* j = character->getSkeleton()->search_joint(su.partialJoint.c_str());
@@ -624,7 +644,7 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	}
 	else
 	{
-		module = new PABlendData(PseudoIdleState, su.weights, su.blend, su.wrap, su.schedule, su.stateTimeOffset);
+		module = new PABlendData(PseudoIdleState, su.weights, su.blend, su.wrap, su.schedule, su.stateTimeOffset, su.stateTimeTrim, su.directPlay);
 		module->transitionLength = su.transitionLength;
 	}
 	if (_context)
@@ -726,6 +746,76 @@ void MeCtParamAnimation::updateWo(SrMat& mat, MeCtChannelWriter* woWriter, SrBuf
 	buffer[baseBuffId.z] = bufferTran[2];	
 	for (int k = 0; k < 4; k++)
 		buffer[baseBuffId.q + k] = quat.getData(k);
+}
+
+void MeCtParamAnimation::updateIK( PABlendData* curBlendData, SrMat& woMat, SrBuffer<float>& buff )
+{
+	SBAnimationBlend* blend = dynamic_cast<SBAnimationBlend*>(curBlendData->state);
+	if (!blend) return;
+	MotionAnalysis* moAnalysis = blend->getMotionAnalysis();
+	if (!moAnalysis) return;
+
+	updateMotionFrame(inputFrame, moAnalysis->getIKTreeScenario(), buff, true); // read data from frame
+	moAnalysis->applyIKFix(curBlendData->weights, curBlendData->timeManager, woMat, inputFrame, outputFrame);
+
+	updateMotionFrame(outputFrame, moAnalysis->getIKTreeScenario(), buff, false);
+}
+
+void MeCtParamAnimation::updateMotionFrame( BodyMotionFrame& motionFrame, MeCtIKTreeScenario& ikScenario, SrBuffer<float>& buff, bool readData /*= true*/ )
+{
+	IKTreeNodeList& nodeList = ikScenario.ikTreeNodes;
+	if (motionFrame.jointQuat.size() != nodeList.size())
+		motionFrame.jointQuat.resize(nodeList.size());
+
+	MeCtIKTreeNode* rootNode = ikScenario.ikTreeRoot;
+	if (rootNode)
+	{
+		int chanId[3];
+		int buffId[3];
+		chanId[0] = _context->channels().search(rootNode->nodeName.c_str(), SkChannel::XPos);
+		chanId[1] = _context->channels().search(rootNode->nodeName.c_str(), SkChannel::YPos);
+		chanId[2] = _context->channels().search(rootNode->nodeName.c_str(), SkChannel::ZPos);
+		for (int k=0;k<3;k++)
+		{
+			if (chanId[k] < 0)
+				continue;
+			buffId[k] = _context->toBufferIndex(chanId[k]);
+			if (buffId[k] < 0)
+				continue;
+			if (readData)
+				motionFrame.rootPos[k] = buff[buffId[k]];
+			else
+				buff[buffId[k]] = motionFrame.rootPos[k];
+		}		
+	}
+
+	for (unsigned int i=0;i<nodeList.size();i++)
+	{
+		MeCtIKTreeNode* node = nodeList[i];
+		JointChannelId chanId;
+		JointChannelId buffId;
+		chanId.q = _context->channels().search(node->nodeName.c_str(), SkChannel::Quat);
+		if (chanId.q < 0)
+			continue;
+		buffId.q = _context->toBufferIndex(chanId.q);
+		if (buffId.q < 0)
+			continue;
+		SrQuat& origQ = motionFrame.jointQuat[i];
+		if (readData)
+		{
+			origQ.w = buff[buffId.q + 0];
+			origQ.x = buff[buffId.q + 1];
+			origQ.y = buff[buffId.q + 2];
+			origQ.z = buff[buffId.q + 3];
+		}
+		else
+		{
+			buff[buffId.q + 0] = origQ.w ;
+			buff[buffId.q + 1] = origQ.x;
+			buff[buffId.q + 2] = origQ.y;
+			buff[buffId.q + 3] = origQ.z;
+		}
+	}	
 }
 
 

@@ -13,14 +13,6 @@
 #include "MeCtBodyReachState.h"
 
 
-EffectorConstantConstraint& EffectorConstantConstraint::operator=( const EffectorConstantConstraint& rhs )
-{
-	efffectorName = rhs.efffectorName;
-	rootName    = rhs.rootName;	
-	targetPos = rhs.targetPos;//SrQuat(SrVec(0,1,0),M_PI);
-	targetRot = rhs.targetRot;
-	return *this;
-}
 
 /************************************************************************/
 /* Reach Engine                                                         */

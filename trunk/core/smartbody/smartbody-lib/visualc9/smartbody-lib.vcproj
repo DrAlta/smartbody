@@ -1714,6 +1714,18 @@
 					RelativePath="..\src\controllers\me_ct_param_animation_utilities.h"
 					>
 				</File>
+				<Filter
+					Name="LocomotionPostProcessing"
+					>
+					<File
+						RelativePath="..\src\controllers\MotionAnalysis.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\controllers\MotionAnalysis.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="physics"

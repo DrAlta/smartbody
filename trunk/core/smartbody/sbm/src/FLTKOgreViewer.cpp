@@ -124,7 +124,7 @@ void FLTKOgreWindow::draw()
 void FLTKOgreWindow::updateOgreCamera()
 {
 	Ogre::Camera* ogreCam = ogreInterface->getCamera();
-	SrCamera& cam = FltkViewer::_data->camera;
+	SrCamera& cam = *FltkViewer::_data->camera;
 	// override the ogre camera with fltk camera
 	SrMat viewMat;
 	cam.get_view_mat(viewMat);	
@@ -155,7 +155,7 @@ void FLTKOgreWindow::fltkRender()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	glViewport ( 0, 0, w(), h() );
 	SrLight &light = _data->light;
-	SrCamera &cam  = _data->camera;
+	SrCamera &cam  = *_data->camera;
 	SrMat mat ( SrMat::NotInitialized );
     
     

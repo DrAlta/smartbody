@@ -527,6 +527,8 @@ SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	SBSkeleton* srcSkeleton = mcu._scene->getSkeleton(srcSkeletonName);
 	SBSkeleton* dstSkeleton = mcu._scene->getSkeleton(dstSkeletonName);
+	srcSkeleton->clearJointValues();
+	dstSkeleton->clearJointValues();
 	if (!srcSkeleton || !dstSkeleton)
 	{
 		LOG("Skeleton %s or %s not found. Retargeted motion %s not built.",srcSkeletonName.c_str(),dstSkeletonName.c_str(),name.c_str());
@@ -574,11 +576,11 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 	MeCtIKTreeScenario ikScenario;
 	ikScenario.buildIKTreeFromJointRoot(rootJoint);	
 	MeCtJacobianIK ikJacobian;
-	float sceneScale = (float)1.f/SBScene::getScene()->getScale();
+	float sceneScale = (float)1.f/SBScene::getScene()->getScale();	
+	float heightRatio = (interSk->getBaseHeight("base")/tempSrcSk->getBaseHeight("base"));//*0.99f;
+
 	ikJacobian.maxOffset = 0.05f*sceneScale;
 	ikJacobian.dampJ = 1.5f*sceneScale;
-
-	float heightRatio = (interSk->getBaseHeight()/tempSrcSk->getBaseHeight());//*0.99f;
 
 	std::map<std::string, float> jointScaleMap;
 	ConstraintMap consMap;

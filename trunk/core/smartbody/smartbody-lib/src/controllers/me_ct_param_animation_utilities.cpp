@@ -49,7 +49,7 @@ PATimeManager::PATimeManager(PABlendData* data)
 		if (state0D)
 		{
 			//LOG("state 0D, use blend offset");
-			localTimes.push_back(blendData->blendStartOffset);
+			localTimes.push_back(blendData->blendStartOffset);			
 		}
 		else
 		{
@@ -866,11 +866,12 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 	
 }
 
-PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule, double blendOffset)
+PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule, double blendOffset, double blendTrim, bool dplay)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	blendStartOffset = (float)blendOffset;
-	directPlay = true;
+	blendEndTrim = (float)blendEndTrim;
+	directPlay = dplay;
 	PABlend* s = mcu.lookUpPABlend(stateName);
 	state = s;
 	if (state)
@@ -897,10 +898,11 @@ PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, B
 	active = false;
 }
 
-PABlendData::PABlendData(PABlend* s, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule, double blendOffset)
+PABlendData::PABlendData(PABlend* s, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule, double blendOffset, double blendTrim, bool dplay)
 {
 	blendStartOffset = (float)blendOffset;
-	directPlay = true;
+	blendEndTrim = (float)blendTrim;
+	directPlay = dplay;
 	state = s;
 	weights.resize(s->getNumMotions());
 	for (size_t x = 0; x < w.size(); x++)
@@ -970,10 +972,10 @@ void PABlendData::evaluate(double timeStep, SrBuffer<float>& buffer)
 	{		
 		if (wrapMode == Loop || ((wrapMode != Loop) && notReachCycle))
 		{
-			//LOG("motion time = %f",timeManager->motionTimes[0]);
+			//LOG("motion time = %f",timeManager->motionTimes[0]);			
 			interpolator->blending(timeManager->motionTimes, buffer);
 			woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffCopy);
-
+			
 			active = true;
 		}
 		else
@@ -990,6 +992,8 @@ float PABlendData::getStateKeyTime( int motionIdx, int sectionIdx )
 {
 	float stateKeyTime = (float)state->keys[motionIdx][sectionIdx];	
 	if (sectionIdx == 0) stateKeyTime += blendStartOffset;
+	if (sectionIdx == state->getNumKeys()-1) stateKeyTime -= blendEndTrim;
+	
 	return stateKeyTime;
 }
 
@@ -1151,11 +1155,15 @@ void PATransitionManager::align(PABlendData* current, PABlendData* next)
 #endif
 }
 
-void PATransitionManager::blending(SrBuffer<float>& buffer, SrBuffer<float>&buffer1, SrBuffer<float>&buffer2, SrMat& mat, SrMat& mat1, SrMat& mat2, double timeStep, MeControllerContext* _context)
+void PATransitionManager::blending( SrBuffer<float>& buffer, SrBuffer<float>&buffer1, SrBuffer<float>&buffer2, SrMat& mat, SrMat& mat1, SrMat& mat2, double timeStep, MeControllerContext* context, bool directCombine)
 {
 	double w = curve->evaluate(localTime);
-	bufferBlending(buffer, buffer1, buffer2, w, _context);
-	PAWoManager::matInterp(mat, mat1, mat2, (float)w);		
+	bufferBlending(buffer, buffer1, buffer2, w, context);
+	if (directCombine)
+		//PAWoManager::matInterp(mat, mat1, mat2, (float)woBlendWeight);	
+		mat = mat1*mat2;
+	else
+		PAWoManager::matInterp(mat, mat1, mat2, (float)w);		
 }
 
 void PATransitionManager::update()

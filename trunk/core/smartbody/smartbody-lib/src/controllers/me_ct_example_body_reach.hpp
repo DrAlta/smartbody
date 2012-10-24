@@ -47,7 +47,7 @@ protected:
 	bool                  startReach;
 	bool                  endReach;
 	float                 autoReturnDuration;
-	float                 reachVelocityScale;
+	float                 reachVelocityScale;	
 	float                 desireLinearVel;
 	vector<SkJoint*>      affectedJoints;		
 	BodyMotionFrame       inputMotionFrame;		

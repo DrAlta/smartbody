@@ -14,6 +14,17 @@ const MeCtIKJointLimit limb_joint_limit[] = {
 using namespace gwiz;
 using namespace MeCtUBLAS;
 
+
+EffectorConstantConstraint& EffectorConstantConstraint::operator=( const EffectorConstantConstraint& rhs )
+{
+	efffectorName = rhs.efffectorName;
+	rootName    = rhs.rootName;	
+	targetPos = rhs.targetPos;//SrQuat(SrVec(0,1,0),M_PI);
+	targetRot = rhs.targetRot;
+	return *this;
+}
+
+
 MeCtIKTreeNode::MeCtIKTreeNode()
 {
 	joint = NULL;
@@ -202,7 +213,7 @@ void MeCtIKTreeScenario::updateJointLimit()
 	}		
 }
 
-void MeCtIKTreeScenario::buildIKTreeFromJointRoot( SkJoint* root )
+void MeCtIKTreeScenario::buildIKTreeFromJointRoot( SkJoint* root, std::vector<std::string>& stopJoints )
 {
 	clearNodes(); // clear all existing nodes
 
@@ -212,14 +223,14 @@ void MeCtIKTreeScenario::buildIKTreeFromJointRoot( SkJoint* root )
 	ikTreeRoot->nodeLevel = 0;
 	ikTreeRoot->nodeName = root->name();
 	ikTreeNodes.push_back(ikTreeRoot);
-	traverseJoint(root,ikTreeRoot,ikTreeNodes);
+	traverseJoint(root,ikTreeRoot,ikTreeNodes, stopJoints);
 	
 // 	ikQuatList.resize(ikTreeNodes.size());
 // 	ikInitQuatList.resize(ikTreeNodes.size());
 // 	ikRefQuatList.resize(ikTreeNodes.size());
 }
 
-int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode, std::vector<MeCtIKTreeNode*>& nodeList )
+int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode, std::vector<MeCtIKTreeNode*>& nodeList, std::vector<std::string>& stopJoints )
 {
 	int nNodes = 1;
 	MeCtIKTreeNode* prevNode = NULL;
@@ -245,9 +256,13 @@ int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode,
 		{
 			nNodes += 1; // don't traverse their children
 		}
+		else if (std::find(stopJoints.begin(),stopJoints.end(), child->name()) != stopJoints.end()) // stop joints
+		{
+			nNodes += 1;
+		}
 		else
 		{
-			nNodes += traverseJoint(child,childNode,nodeList);
+			nNodes += traverseJoint(child,childNode,nodeList, stopJoints);
 		}
 		prevNode = childNode;
 	}

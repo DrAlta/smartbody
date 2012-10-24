@@ -238,11 +238,8 @@ SkJoint* SkSkeleton::search_joint ( const char* n )
 	if (_jointMap.size() == 0 &&
 		_joints.size() > 0)
 	{
-		int jointSize = _joints.size();
-		for (int i = 0; i < jointSize; i++)
-		{
-			_jointMap.insert(std::pair<std::string, SkJoint*>(_joints[i]->name(), _joints[i]));
-		}
+		updateJointMap();
+
 	}
 
 	if (_extJointMap.size() == 0 &&
@@ -352,10 +349,12 @@ void SkSkeleton::set_geo_local ()
 }
 
 
-float SkSkeleton::getBaseHeight()
+float SkSkeleton::getBaseHeight( const std::string& baseName )
 {
 	SrBox boundingBox = getBoundingBox();
-	SrVec basePos = _root->gmat().get_translation();
+	SkJoint* baseJoint = search_joint(baseName.c_str());
+	if (!baseJoint) return 0.f;
+	SrVec basePos = baseJoint->gmat().get_translation();
 	return basePos.y - boundingBox.a.y;
 }
 
@@ -468,6 +467,15 @@ void SkSkeleton::clearJointValues()
 	update_global_matrices();
 }
 
+void SkSkeleton::updateJointMap()
+{
+	_jointMap.clear();
+	int jointSize = _joints.size();
+	for (int i = 0; i < jointSize; i++)
+	{
+		_jointMap.insert(std::pair<std::string, SkJoint*>(_joints[i]->name(), _joints[i]));
+	}
+}
 SrVec SkSkeleton::getFacingDirection()
 {
 	SrVec defaultDir = SrVec(0,0,1);

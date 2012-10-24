@@ -53,6 +53,19 @@ public:
 	virtual SrQuat getRotConstraint() = 0;
 };
 
+class EffectorConstantConstraint : public EffectorConstraint
+{
+public:		
+	SrQuat          targetRot;
+	SrVec           targetPos;	
+public:
+	EffectorConstantConstraint() {}
+	~EffectorConstantConstraint() {}
+	EffectorConstantConstraint& operator=(const EffectorConstantConstraint& rhs);
+	virtual SrVec getPosConstraint() { return targetPos; }
+	virtual SrQuat getRotConstraint()  { return targetRot; }
+};
+
 typedef std::map<std::string,EffectorConstraint*> ConstraintMap;
 typedef std::vector<EffectorConstraint*> VecOfConstraintPtr;
 
@@ -72,7 +85,7 @@ public:
 	MeCtIKTreeScenario();
 	~MeCtIKTreeScenario();
 public:	
-	void buildIKTreeFromJointRoot(SkJoint* root);		
+	void buildIKTreeFromJointRoot(SkJoint* root, std::vector<std::string>& stopJoints = std::vector<std::string>());		
 	void updateValidNodes();
 	void updateQuat(const dVector& dTheta, bool updateOnlyValidNodes = false);
 	void copyTreeNodeQuat(NodeQuatType typeFrom, NodeQuatType typeTo);
@@ -85,7 +98,7 @@ public:
 	static int findIKTreeNodeInList(const char* jointName, IKTreeNodeList& nodeList);	
 protected:
 	void clearNodes();
-	int traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode, std::vector<MeCtIKTreeNode*>& nodeList);		
+	int traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode, std::vector<MeCtIKTreeNode*>& nodeList, std::vector<std::string>& stopJoints);		
 	// return axis-angle rotation offset to move joint rotation back.
 	static bool checkJointLimit(const SrQuat& q, const MeCtIKJointLimit& limit, const SrQuat& qInit, SrVec& jointOffset); 
 	SrMat getLocalMat(const SkJoint* joint, const SrQuat& q, const SrVec& pos);

@@ -1344,7 +1344,7 @@ SkJoint* SBJointMap::getDeepestLevelJoint(const std::vector<SkJoint*>& j_list)
 	return return_j;
 }
 
-void SBJointMap::setJointMap(const char* SB_jnt, SkJoint* j, bool prtMap)
+void SBJointMap::setJointMap(const std::string& SB_jnt, SkJoint* j, bool prtMap)
 {
 	if(j==0)
 	{
@@ -1353,7 +1353,7 @@ void SBJointMap::setJointMap(const char* SB_jnt, SkJoint* j, bool prtMap)
 	}
 	// do some safe check if this mapping is just making things worse :p
 	SkSkeleton* sk = j->skeleton();
-	if (sk && sk->search_joint(SB_jnt) && j->num_children() > 0) // the target name is already in the skeleton
+	if (sk && sk->search_joint(SB_jnt.c_str()) && j->num_children() > 0) // the target name is already in the skeleton
 	{
 		if (j->name() != SB_jnt)
 		{

@@ -939,7 +939,6 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		}
 		srcDir.normalize(); dstDir.normalize();
 
-		//LOG("joint = %s, src dir = %f %f %f, dst dir = %f %f %f",pjointName.c_str(), srcDir[0],srcDir[1],srcDir[2], dstDir[0],dstDir[1],dstDir[2]);
 		double dot_v = dot(srcDir, dstDir);
 		if(dot_v >= 0.9999995000000f) 
 		{				
@@ -947,6 +946,7 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		}
 		else if(dot_v < -1.0f) dot_v = -1.0f;
 		double angle = acos(dot_v);			
+		
 		SrVec rotAxis = cross(dstDir, srcDir);
 		rotAxis.normalize();
 		SrVec rotAxisAngle = rotAxis*(float)angle; // global rotation
@@ -954,6 +954,9 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		SrMat alignMat;
 		SrMat prerotMat;				
 		SrMat pmatInv;
+
+		LOG("joint = %s, src dir = %f %f %f, dst dir = %f %f %f, rot axist = %f %f %f, angle = %f",pjointName.c_str(), srcDir[0],srcDir[1],srcDir[2], dstDir[0],dstDir[1],dstDir[2], rotAxis[0], rotAxis[1], rotAxis[2], sr_todeg(angle));
+
 
 		SrMat gmatRot = pjoint->gmat().get_rotation();
 		if (pjoint->parent())
@@ -964,7 +967,8 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		//rotAxisAngle = rotAxisAngle*gmatInv;
 		SrMat quatMat = prerotMat.inverse()*gmatRot*alignMat*pmatInv;//alignMat*gmatRot.inverse();//prerotMat.inverse()*gmatRot*alignMat*pmat;
 		//SrQuat quat = SrQuat(prerotMat.inverse())*SrQuat(gmatRot)*alignQuat*SrQuat(pmatInv);
-		SrVec alignRotAxisAngle = rotAxisAngle*gmatRot.inverse();								
+		//SrVec alignRotAxisAngle = rotAxisAngle*gmatRot.inverse();								
+		SrVec alignRotAxisAngle = rotAxisAngle*pmatInv;		
 		SrQuat quat = pjoint->quat()->rawValue()*SrQuat(alignRotAxisAngle);//*pjoint->quat()->rawValue();
 		jointRotationMap[pjointName] = quat;
 		pjoint->quat()->value(quat);
@@ -985,6 +989,8 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 	//stopJoints.push_back("l_wrist");
 	//stopJoints.push_back("r_wrist");
 	// update the global matrices
+	tempSrcSk->clearJointValues();
+	interSk->clearJointValues();
 	tempSrcSk->invalidate_global_matrices();
 	tempSrcSk->update_global_matrices();
 	interSk->invalidate_global_matrices();
@@ -1038,7 +1044,8 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 		else
 		{
 			//LOG("pjoint name = %s",pjointName.c_str());
-			convertBoneOrientation(pjointName, interSk, tempSrcSk, jointQueues, jointRotationMap, endJoints);								
+			convertBoneOrientation(pjointName, interSk, tempSrcSk, jointQueues, jointRotationMap, endJoints);
+			interSk->update_global_matrices();
 			SkJoint* pjoint = interSk->search_joint(pjointName.c_str());	
 			if (!pjoint)
 				continue;
@@ -1053,7 +1060,8 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 			}
 		}				
 	}
-	float heightRatio = (interSk->getBaseHeight()/tempSrcSk->getBaseHeight());//*0.99f;
+	float heightRatio = (interSk->getBaseHeight("base")/tempSrcSk->getBaseHeight("base"));//*0.99f;
+	LOG("height ratio = %f", heightRatio);
 	for (int i = 0; i < num_f; i++)
 	{
 		retarget_p->insert_frame(i, this->keytime(i));		
@@ -1098,6 +1106,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 				// just copy over the translation for now
 				float chanValue = ref_p[ index ];				
 				new_p[ index ] = chanValue*heightRatio;
+				//LOG("jointName = %s, new_p = %f",jointName.c_str(), new_p[index]);
 				// 				if (jointPosMap.find(jointName) != jointPosMap.end())
 				// 				{
 				// 					SrVec pos = jointPosMap[jointName];
