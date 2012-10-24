@@ -4,7 +4,7 @@
 #include <controllers/me_ct_param_animation_data.h>
 # define VFLOW_LINE_WIDTH 2.0f
 
-typedef std::map<std::string, std::vector<double>> KeyTag;
+typedef std::map<std::string, std::vector<double> > KeyTag;
 typedef std::map<int,KeyTag> KeyTagMap;
 class MotionAnalysis;
 
