@@ -199,7 +199,8 @@ void MeCtConstraint::init(SbmPawn* pawn, const char* rootJointName)
 	if (!rootJoint)
 		rootJoint = _skeleton->root()->child(0); // use base joint by default
 
-	ik_scenario.buildIKTreeFromJointRoot(rootJoint);
+	std::vector<std::string> stopJoints;
+	ik_scenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);
 	ik_scenario.ikPosEffectors = &posConstraint;
 	ik_scenario.ikRotEffectors = &rotConstraint;
 

@@ -574,7 +574,8 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 		rootJoint = interSk->getJointByName("base");
 	SmartBody::SBMotion* constraintMotion = dynamic_cast<SBMotion*>(targetMotion->copyMotion()); // copy the motion first	
 	MeCtIKTreeScenario ikScenario;
-	ikScenario.buildIKTreeFromJointRoot(rootJoint);	
+	std::vector<std::string> stopJoints;
+	ikScenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);	
 	MeCtJacobianIK ikJacobian;
 	float sceneScale = (float)1.f/SBScene::getScene()->getScale();	
 	float heightRatio = (interSk->getBaseHeight("base")/tempSrcSk->getBaseHeight("base"));//*0.99f;
@@ -760,7 +761,8 @@ SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkele
 
 	SBMotion* cleanMotion = dynamic_cast<SBMotion*>(this->copyMotion()); // copy the motion first	
 	MeCtIKTreeScenario ikScenario;
-	ikScenario.buildIKTreeFromJointRoot(rootJoint);
+	std::vector<std::string> stopJoints;
+	ikScenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);
 	MeCtCCDIK ikCCD;
 	MeCtJacobianIK ikJacobian;
 	float sceneScale = (float)1.f/SBScene::getScene()->getScale();

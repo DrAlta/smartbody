@@ -36,7 +36,8 @@ MeCtBlendEngine::MeCtBlendEngine(SkSkeleton* sk, std::string rootName)
 void MeCtBlendEngine::init(const std::string& paramFuncType)
 {
 	SkJoint* rootJoint = skeletonCopy->search_joint(rootJointName.c_str());		
-	ikScenario.buildIKTreeFromJointRoot(rootJoint);
+	std::vector<std::string> stopJoints;
+	ikScenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);
 	affectedJoints.clear();	
 	const IKTreeNodeList& nodeList = ikScenario.ikTreeNodes;
 	idleMotionFrame.jointQuat.resize(nodeList.size());

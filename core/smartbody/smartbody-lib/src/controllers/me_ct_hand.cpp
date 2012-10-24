@@ -184,7 +184,8 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 		type = MeCtReachEngine::RIGHT_ARM;
 
 	grabType = type;
-	ikScenario.buildIKTreeFromJointRoot(wristJoint);
+	std::vector<std::string> stopJoints;
+	ikScenario.buildIKTreeFromJointRoot(wristJoint,stopJoints);
 	fingerChains.resize(MeCtHand::F_NUM_FINGERS);
 	for (unsigned int i=0;i<ikScenario.ikTreeNodes.size();i++)
 	{
