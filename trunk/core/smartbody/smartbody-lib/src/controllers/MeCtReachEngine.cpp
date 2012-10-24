@@ -87,8 +87,9 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 	reachType = rtype;
 	reachEndEffector = effectorJoint;
 	SkJoint* rootJoint = findRootJoint(skeletonCopy);//findRootJoint(skeletonRef);//skeletonRef->root()->child(0);//skeletonCopy->root()->child(0);//skeletonRef->root()->child(0);	
-	ikScenario.buildIKTreeFromJointRoot(rootJoint);
-	ikCCDScenario.buildIKTreeFromJointRoot(rootJoint);	
+	std::vector<std::string> stopJoints;
+	ikScenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);
+	ikCCDScenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);	
 
 	EffectorConstantConstraint* cons = new EffectorConstantConstraint();
 	cons->efffectorName = reachEndEffector->name().c_str();

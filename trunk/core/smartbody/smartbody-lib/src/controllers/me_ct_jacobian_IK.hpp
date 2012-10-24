@@ -85,7 +85,7 @@ public:
 	MeCtIKTreeScenario();
 	~MeCtIKTreeScenario();
 public:	
-	void buildIKTreeFromJointRoot(SkJoint* root, std::vector<std::string>& stopJoints = std::vector<std::string>());		
+	void buildIKTreeFromJointRoot(SkJoint* root, std::vector<std::string>& stopJoints);		
 	void updateValidNodes();
 	void updateQuat(const dVector& dTheta, bool updateOnlyValidNodes = false);
 	void copyTreeNodeQuat(NodeQuatType typeFrom, NodeQuatType typeTo);
