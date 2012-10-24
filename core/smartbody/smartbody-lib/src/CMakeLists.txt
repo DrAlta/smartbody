@@ -293,6 +293,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	
 	controllers/MeCtBlendEngine.cpp
 	controllers/me_ct_motion_blend.cpp
+	controllers/MotionAnalysis.cpp
 
 	sbm/ParserBVH.cpp
 	sbm/ParserASFAMC.cpp
