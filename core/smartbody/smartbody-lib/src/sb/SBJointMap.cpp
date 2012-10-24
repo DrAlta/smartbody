@@ -1348,7 +1348,7 @@ void SBJointMap::setJointMap(const std::string& SB_jnt, SkJoint* j, bool prtMap)
 {
 	if(j==0)
 	{
-		LOG("WARNING! guessMap::setJointMap() joint not found! %s \n", SB_jnt);
+		LOG("WARNING! guessMap::setJointMap() joint not found! %s \n", SB_jnt.c_str());
 		return;
 	}
 	// do some safe check if this mapping is just making things worse :p
@@ -1368,7 +1368,7 @@ void SBJointMap::setJointMap(const std::string& SB_jnt, SkJoint* j, bool prtMap)
 	if(prtMap)
 	{
 		LOG("%-15s <=> %-20s, %d chd(s), level %d \n",
-			SB_jnt, j->name().c_str(),	j->num_children(), getJointHierarchyLevel(j));
+			SB_jnt.c_str(), j->name().c_str(),	j->num_children(), getJointHierarchyLevel(j));
 	}
 }
 
