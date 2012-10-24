@@ -394,6 +394,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_tether.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_ublas.cpp \
 	$(SBM_MY_DIR)/controllers/MeCtBlendEngine.cpp \
+	$(SBM_MY_DIR)/controllers/MotionAnalysis.cpp \
 	$(SBM_MY_DIR)/sbm/me_utilities.cpp \
 	$(SBM_MY_DIR)/sbm/ParserFBX.cpp \
 	$(SBM_MY_DIR)/sbm/ParserOpenCOLLADA.cpp \
