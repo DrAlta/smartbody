@@ -1,6 +1,7 @@
 #include "BMLSpeechObject.h"
 #include <sstream>
 #include <sb/SBAttribute.h>
+#include <vhcl.h>
 
 BMLSpeechObject::BMLSpeechObject() : BMLObject()
 {
@@ -49,7 +50,9 @@ std::string BMLSpeechObject::getBML()
 	strstr << ">";
 	if (contentAttr->getValue() != "")
 	{
-		strstr << contentAttr->getValue();
+		std::string content = contentAttr->getValue();
+		std::string content2 = vhcl::Replace(content, "'", "\\'");
+		strstr << content2;
 	}
 	strstr << "</" << getName() << ">";
 
