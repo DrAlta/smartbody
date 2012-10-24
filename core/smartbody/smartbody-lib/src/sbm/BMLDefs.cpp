@@ -216,6 +216,7 @@ XMLCh* BMLDefs::ATTR_WRAPMODE = NULL;
 XMLCh* BMLDefs::ATTR_SCHEDULEMODE = NULL;
 XMLCh* BMLDefs::ATTR_BLENDMODE = NULL;
 XMLCh* BMLDefs::ATTR_TRANSITION_LENGTH = NULL;
+XMLCh* BMLDefs::ATTR_DIRECTPLAY = NULL;
 
 ////// XML ATTRIBUTES
 XMLCh* BMLDefs::ATTR_VALUE = NULL;
@@ -313,6 +314,7 @@ XMLCh* BMLDefs::ATTR_VCOUNT = NULL;
 XMLCh* BMLDefs::ATTR_SOURCE = NULL;
 XMLCh* BMLDefs::ATTR_URL = NULL;
 XMLCh* BMLDefs::ATTR_OFFSET = NULL;
+XMLCh* BMLDefs::ATTR_TRIM = NULL;
 XMLCh* BMLDefs::ATTR_SYMBOL = NULL;
 XMLCh* BMLDefs::ATTR_MATERIAL = NULL;
 XMLCh* BMLDefs::ATTR_OPAQUE = NULL;
@@ -560,6 +562,7 @@ BMLDefs::BMLDefs()
 	ATTR_BLENDMODE = XMLString::transcode("sbm:blend-mode");
 	ATTR_SCHEDULEMODE = XMLString::transcode("sbm:schedule-mode");
 	ATTR_TRANSITION_LENGTH = XMLString::transcode("sbm:transition-length");
+	ATTR_DIRECTPLAY = XMLString::transcode("sbm:direct-play");
 
 	////// XML ATTRIBUTES
 	ATTR_VALUE   = XMLString::transcode("value");
@@ -656,6 +659,7 @@ BMLDefs::BMLDefs()
 	ATTR_SOURCE = XMLString::transcode("source");
 	ATTR_URL = XMLString::transcode("url");
 	ATTR_OFFSET = XMLString::transcode("offset");
+	ATTR_TRIM = XMLString::transcode("trim");
 	ATTR_SYMBOL = XMLString::transcode("symbol");
 	ATTR_MATERIAL = XMLString::transcode("material");
 	ATTR_OPAQUE = XMLString::transcode("opaque");

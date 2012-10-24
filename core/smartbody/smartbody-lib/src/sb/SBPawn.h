@@ -22,8 +22,10 @@ class SBPawn : public SbmPawn
 		SrVec getPosition();
 		SrQuat getOrientation();
 		void setPosition(SrVec pos);
+		void setPositionSmooth(SrVec pos, float smoothTime);
 		void setOrientation(SrQuat quat);
 		void setHPR(SrVec hpr);
+		void setHPRSmooth(SrVec hpr, float smoothTime);
 		SrVec getHPR();
 
 		virtual void afterUpdate(double time);
@@ -36,6 +38,11 @@ class SBPawn : public SbmPawn
 		SmartBody::DoubleAttribute* _rotX;
 		SmartBody::DoubleAttribute* _rotY;
 		SmartBody::DoubleAttribute* _rotZ;
+		SrVec initialHPR, initialPos;
+		SrVec targetHPR, targetPos;
+		float hprStartTime, posStartTime;
+		float hprEndTime, posEndTime;		
+		bool  smoothTargetHPR, smoothTargetPos;
 };
 
 };

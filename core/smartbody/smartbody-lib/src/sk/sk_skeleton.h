@@ -135,6 +135,7 @@ class SkSkeleton : public SmartBody::SBObject, public SrSharedClass
         If the hash table is not up to date, it is automatically re-created. */
     SkJoint* search_joint ( const char* n );
 
+	void updateJointMap();
     /*! Returns the joint with name n performing a linear search.
         0 is returned in case the joint is not found.
         This method should be used if the joint list is being constructed,
@@ -185,13 +186,14 @@ class SkSkeleton : public SmartBody::SBObject, public SrSharedClass
 	/*! retrieves the center of mass of the skeleton */
 	SrVec& com () { return _com; };	
 	
-	float getBaseHeight();
+	float getBaseHeight(const std::string& baseName);
 	float getCurrentHeight();	
 	SrBox getBoundingBox();
 	
 	void copy_joint(SkJoint* dest, SkJoint* src);
 	void create_joints(SkJoint* origParent, SkJoint* parent);	
 	void clearJointValues(); // reset all joint quat/pos values to zero
+
 
 	// get the global direction of a bone pair based on the current skeleton configuration
 	SrVec boneGlobalDirection(const std::string& srcJoint, const std::string& dstJoints); 

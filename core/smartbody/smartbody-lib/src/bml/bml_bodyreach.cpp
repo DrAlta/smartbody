@@ -201,7 +201,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		useLocomotion = false;
 	bodyReachCt->setUseLocomotion(useLocomotion);
 
-	if (reachVelocity > 0)
+	//if (reachVelocity > 0)
 	{
 		bodyReachCt->setLinearVelocity(reachVelocity);		
 	}

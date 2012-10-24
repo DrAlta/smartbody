@@ -706,7 +706,7 @@ void ReachStateInterface::updateMotionPoseInterpolation( ReachStateData* rd )
 	float scaleFactor = (reachDistance)*3.f/rd->characterHeight;
 	float timeScale = (rd->useRetiming && rd->useProfileInterpolation) ? (scaleFactor*(1.f - rd->retimingFactor) + rd->retimingFactor) : 1.f;//(pow(scaleFactor,rd->retimingFactor)) : 1.f;	
 	float reachStep = rd->linearVel*rd->dt*timeScale;
-	SRT diff = SRT::diff(estate.curBlendState,estate.ikTargetState);	
+	SRT diff = SRT::diff(estate.curBlendState,estate.ikTargetState);		
 	float difflenght = diff.tran.norm();
 	SrVec stepVec = diff.tran;		
 	if (stepVec.norm() > reachStep)
@@ -756,7 +756,7 @@ void ReachStateInterface::updateMotionIK( ReachStateData* rd )
 {
 	EffectorState& estate = rd->effectorState;
 	float reachStep = rd->linearVel*rd->dt;
-
+    //LOG("liner vel = %f, reachStep = %f",rd->linearVel, reachStep);	
 	SRT diff = SRT::diff(estate.curIKTargetState,estate.ikTargetState);
 	SrVec offset = diff.tran;
 

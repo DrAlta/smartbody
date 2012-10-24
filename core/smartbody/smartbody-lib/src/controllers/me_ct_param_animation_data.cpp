@@ -1298,6 +1298,11 @@ void PABlend::addEventToMotion(const std::string& motion, SmartBody::MotionEvent
 //	std::sort(_events.begin(), _events.end(), ascendingTime2);
 }
 
+double PABlend::getMotionKey( const std::string& motionName, int iKey )
+{
+	int index = getMotionId(motionName);
+	return keys[index][iKey];
+}
 
 
 MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)

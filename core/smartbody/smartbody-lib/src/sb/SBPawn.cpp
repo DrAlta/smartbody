@@ -32,6 +32,12 @@ SBPawn::SBPawn() : SbmPawn()
 	shapeAttr->setValidValues(shapes);
 	SrVec defaultScale(1.0f, 1.0f, 1.0f);
 	createVec3Attribute("collisionShapeScale", defaultScale[0], defaultScale[1], defaultScale[2], true, "Physics", 360, false, false, false, "Scaling of physics-based shape.");
+	smoothTargetHPR = false;
+	smoothTargetPos = false;
+	posStartTime = 0.f;
+	posEndTime = 0.f;
+	hprStartTime = 0.f;
+	hprEndTime = 0.f;	
 }
 
 SBPawn::SBPawn(const char* name) : SbmPawn(name)
@@ -56,6 +62,12 @@ SBPawn::SBPawn(const char* name) : SbmPawn(name)
 	shapeAttr->setValidValues(shapes);
 	SrVec defaultScale(1.0f, 1.0f, 1.0f);
 	createVec3Attribute("collisionShapeScale", defaultScale[0], defaultScale[1], defaultScale[2], true, "Physics", 360, false, false, false, "Scaling of physics-based shape.");
+	smoothTargetHPR = false;
+	smoothTargetPos = false;
+	posStartTime = 0.f;
+	posEndTime = 0.f;
+	hprStartTime = 0.f;
+	hprEndTime = 0.f;
 }
 
 SBPawn::~SBPawn()
@@ -145,9 +157,59 @@ SrVec SBPawn::getHPR()
 	return hpr;
 }
 
-void SBPawn::afterUpdate(double time)
+void SBPawn::setPositionSmooth( SrVec pos, float smoothTime )
 {
-	float x, y, z, h, p, r;
+	initialPos = getPosition(); // start position
+	targetPos  = pos;
+	posStartTime = (float)mcuCBHandle::singleton().time;
+	posEndTime = posStartTime + smoothTime;
+	smoothTargetPos = true;
+}
+
+void SBPawn::setHPRSmooth( SrVec hpr, float smoothTime )
+{
+	initialHPR = getHPR(); // start position
+	targetHPR  = hpr;
+	hprStartTime = (float)mcuCBHandle::singleton().time;
+	hprEndTime = hprStartTime + smoothTime;
+	smoothTargetHPR = true;
+}
+
+void SBPawn::afterUpdate(double time)
+{	
+	float x, y, z, h, p, r;	
+	if (smoothTargetPos)
+	{
+		if (time >= posStartTime && time <= posEndTime && posStartTime != posEndTime)
+		{
+			float weight = (float)(time-posStartTime)/(float)(posEndTime - posStartTime);
+			SrVec newPos = initialPos*(1.f-weight) + targetPos*(weight);
+			setPosition(newPos);
+		}
+		else
+		{
+			smoothTargetPos = false;
+		}
+	}
+
+	if (smoothTargetHPR)
+	{
+		if (time >= hprStartTime && time <= hprEndTime && hprStartTime != hprEndTime)
+		{
+			float weight = (float)(time-hprStartTime)/(float)(hprEndTime - hprStartTime);
+			gwiz::quat_t q1 = gwiz::euler_t(initialHPR.y, initialHPR.x, initialHPR.z);
+			gwiz::quat_t q2 = gwiz::euler_t(targetHPR.y, targetHPR.x, targetHPR.z);
+			gwiz::quat_t qNew; qNew = qNew.lerp(weight,q1,q2);			
+			//SrVec newHPR = initialHPR*(1.f-weight) + targetHPR*(weight);
+			gwiz::euler_t euler = gwiz::euler_t(gwiz::quat_t(qNew.w(), qNew.x(), qNew.y(), qNew.z()));
+			SrVec newHPR = SrVec(float(euler.h()), float(euler.p()), float(euler.r()));
+			setHPR(newHPR);
+		}
+		else
+		{
+			smoothTargetHPR = false;
+		}
+	}
 	get_world_offset(x, y, z, h, p, r);
 	_posX->setValueFast(x);
 	_posY->setValueFast(y);

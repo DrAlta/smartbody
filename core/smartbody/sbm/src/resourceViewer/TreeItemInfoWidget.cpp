@@ -250,8 +250,12 @@ void MotionItemInfoWidget::updateChannelAttributes()
 	if (chan.type == SkChannel::Quat)
 	{
 		SrQuat quat = SrQuat(&buffer[floatIdx]);
-		SrVec euler = GlChartViewSeries::GetEulerFromQuaternion(quat);
+		
+		//SrVec euler = GlChartViewSeries::GetEulerFromQuaternion(quat);
+		//gwiz::euler_t(p,h,r);	
+		gwiz::euler_t eu = gwiz::euler_t(gwiz::quat_t(quat.w, quat.x,quat.y,quat.z));
 		std::string attrName = (chanName+"."+"euler");
+		SrVec euler = SrVec((float)eu.p(),(float)eu.h(),(float)eu.r());
 		for (int k=0;k<3;k++)
 		{			
 			SmartBody::DoubleAttribute* attr = channelInfoObject->createDoubleAttribute((attrName+tag[k+1]).c_str(),euler[k],true,"Basic",20+k,true,false,false,"?");

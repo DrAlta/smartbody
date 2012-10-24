@@ -29,7 +29,7 @@ BMLReachObject::BMLReachObject() : BMLObject()
 
 	createBoolAttribute("sbm:reach-finish",false,true,"Basic", 50, false, false, false,"whether to finish the reaching action and return to the rest pose.");
 
-	createDoubleAttribute("sbm:reach-velocity",60.0,true,"Basic", 60, false, false, false,"the end effector movement velocity when interpolating two poses.");
+	createDoubleAttribute("sbm:reach-velocity",-1.0,true,"Basic", 60, false, false, false,"the end effector movement velocity when interpolating two poses.");
 	createDoubleAttribute("sbm:reach-duration",-1.0,true,"Basic", 70, false, false, false,"the duration for hand to hold still on the target before automatically return to the rest pose.If it is '-1.0', then the duration is infinite");
 
 

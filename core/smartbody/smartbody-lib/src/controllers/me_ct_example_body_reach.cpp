@@ -487,7 +487,7 @@ void MeCtExampleBodyReach::updateChannelBuffer( MeFrameData& frame, BodyMotionFr
 	for (unsigned int i=0;i<motionFrame.jointQuat.size();i++)
 	{
 		SrQuat& quat = motionFrame.jointQuat[i];		
-		int index = frame.toBufferIndex(_toContextCh[count++]);	
+		int index = frame.toBufferIndex(_toContextCh[count++]);		
 		//printf("buffer index = %d\n",index);		
 		if (index == -1)
 		{

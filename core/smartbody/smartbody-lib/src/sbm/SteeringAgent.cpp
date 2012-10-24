@@ -464,8 +464,14 @@ void SteeringAgent::evaluate(double dtime)
 	// Update Steering Engine (position, orientation, scalar speed)
 	Util::Point newPosition(x * scene->getScale(), 0.0f, z * scene->getScale());
 	Util::Vector newOrientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
+	static float accumTime = 0.f;
 	try {
-		pprAgent->updateAgentState(newPosition, newOrientation, newSpeed);
+		//if (accumTime > 0.1f)
+		{
+			pprAgent->updateAgentState(newPosition, newOrientation, newSpeed);
+			//accumTime -= 0.1f;
+		}		
+		//accumTime += dt;
 		pprAgent->updateAI((float)mcu.time, dt, _curFrame++);
 	} catch (Util::GenericException& ge) {
 		std::string message = ge.what();
@@ -577,8 +583,12 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 	bool locomotionEnd = false;
 	static int counter = 0;		
 	float sceneScale = 1.f/SmartBody::SBScene::getScene()->getScale();	
-	float distThreshold = 0.05f*sceneScale;
-	float speedThreshold = 0.05f*sceneScale;	
+	//float distThreshold = 0.05f*sceneScale;
+	//float speedThreshold = 0.05f*sceneScale;	
+	float pathDistThreshold = distThreshold*sceneScale;
+	float pathSpeedThreshold = speedThreshold*sceneScale;	
+	float smallDistThreshold = 0.05f*sceneScale;
+
 	//if (steerPath.pathLength() == 0) // do nothing if there is no steer path
 	//	return; 
 	if (character->param_animation_ct->isIdle() && steerPath.pathLength() > 0)    // need to define when you want to start the locomotion
@@ -606,7 +616,7 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 		normalizeAngle(diff);
 		
 		// using the transition motion with different direction
-		if (distToTarget > distThreshold*3.f || distToPathEnd > distThreshold*3.f)
+		if (distToTarget > smallDistThreshold*3.f || distToPathEnd > smallDistThreshold*3.f)
 		{
 			if (character->getBoolAttribute("steering.pathStartStep"))// && distToTarget > distThreshold*10.f)
 				//if (0)
@@ -678,7 +688,7 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 			newSpeed = distToTarget / brakingGain;
 		
 		
-		if (distToTarget < distThreshold && newSpeed < speedThreshold &&  steerPath.atLastGoal())
+		if (distToTarget < pathDistThreshold && newSpeed < pathSpeedThreshold &&  steerPath.atLastGoal())
 		{
 			locomotionEnd = true;			
 		}

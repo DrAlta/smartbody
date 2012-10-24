@@ -87,6 +87,7 @@ class PABlend
 		void setType(int typ);
 		double getLocalTime(double motionTime, int motionIndex);
 		double getMotionTime(double localTime, int motionIndex);
+		double getMotionKey(const std::string& motionName, int iKey);
 
 		int getNumParameters();
 		int getMinVecX();

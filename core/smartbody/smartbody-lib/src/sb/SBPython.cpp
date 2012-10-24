@@ -869,6 +869,9 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("plotMotionFrameTime", &SBAnimationBlend::plotMotionFrameTime, "Plot one single motion frame (at given time) with stick skeleton. \n Input: motion name, time, ifClearAll \n Output: NULL")
 		.def("plotMotionJointTrajectory", &SBAnimationBlend::plotMotionJointTrajectory, "Plot joint trajectory over entire motion (at given time). \n Input: motion name, jointName, ifClearAll \n Output: NULL")
 		.def("clearPlotMotion", &SBAnimationBlend::clearPlotMotion, "clear Plotted motions. \n Input: NULL. \n Output: NULL")
+		.def("addKeyTagValue", &SBAnimationBlend::addKeyTagValue, "add the key time tag for motion analysis. \n Input : motion name, tag type, tag name, value. \n Output : NULL")
+		.def("buildMotionAnalysis", &SBAnimationBlend::buildMotionAnalysis, "build the motion analysis structure \n Input : NULL. \n Output : NULL")
+
 		;
 
 	boost::python::class_<SBAnimationBlend0D, boost::python::bases<SBAnimationBlend> >("SBAnimationBlend0D")
@@ -1220,9 +1223,11 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getPosition", &SBPawn::getPosition, "Returns the current position of the character's world offset.")
 		.def("getOrientation", &SBPawn::getOrientation, "Returns the current orientation of the character's world offset.")
 		.def("setPosition", &SBPawn::setPosition, "Sets the current position of the character's world offset.")
+		.def("setPositionSmooth", &SBPawn::setPositionSmooth, "Sets the current position of the character's world offset. The character will be translated smoothly overtime to avoid popping.")
 		.def("setOrientation", &SBPawn::setOrientation, "Set the current orientation of the character's world offset.")
 		.def("setHPR", &SBPawn::setHPR, "Sets the heading, pitch and roll of the character's world offset.")
 		.def("getHPR", &SBPawn::getHPR, "Gets the heading, pitch and roll of the character's world offset.")
+		.def("setHPRSmooth", &SBPawn::setHPRSmooth, "Sets the heading, pitch and roll of the character's world offset. The character will be rotated smoothly overtime to avoid popping.")
 	;
 
 	boost::python::class_<SBCharacter, boost::python::bases<SBPawn, SBObject> >("SBCharacter")
