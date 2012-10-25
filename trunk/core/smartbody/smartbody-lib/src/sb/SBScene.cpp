@@ -139,6 +139,9 @@ void SBScene::reset()
 	// stop the simulation
 	getSimulationManager()->stop();
 
+	// reset the simulation parameters
+	getSimulationManager()->setSimFps(0);
+
 	// remove the characters
 	removeAllCharacters();
 	
