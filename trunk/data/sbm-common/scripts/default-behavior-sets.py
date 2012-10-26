@@ -23,3 +23,6 @@ behav.setScript("BehaviorSetKicking.py")
 
 behav = behaviorSetManager.createBehaviorSet("Punching")
 behav.setScript("BehaviorSetPunching.py")
+
+behav = behaviorSetManager.createBehaviorSet("FemaleGestures")
+behav.setScript("BehaviorSetFemaleGestures.py")
