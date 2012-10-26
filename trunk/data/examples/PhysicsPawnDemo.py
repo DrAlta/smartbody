@@ -76,7 +76,7 @@ size = 150
 def randomizePos():
 	for pawn in pawnList:
 		x = random.uniform(-size, size) + 1
-		y = random.uniform(50, size*3) + 1
+		y = random.uniform(50, size * 3) + 1
 		z = random.uniform(-size, size) + 1
 		h = random.uniform(-180, 180) + 1
 		p = random.uniform(-180, 180) + 1

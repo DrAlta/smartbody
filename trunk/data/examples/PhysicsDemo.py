@@ -38,9 +38,9 @@ setPos('elder', SrVec(-75, 102, 0))
 addCharacter('doctor', 'doctor', True)
 setPos('doctor', SrVec(75, 102, 0))
 setFacing('doctor', 90)
-addCharacter('utah', 'brad', True)
-setPos('utah', SrVec(135, 102, 0))
-setFacing('utah', -90)
+addCharacter('brad2', 'brad', True)
+setPos('brad2', SrVec(135, 102, 0))
+setFacing('brad2', -90)
 
 addPawn('constraint1', 'sphere')
 scene.getPawn('constraint1').setPosition(SrVec(-150, 240, 20))
@@ -48,24 +48,16 @@ scene.getPawn('constraint1').setPosition(SrVec(-150, 240, 20))
 # Add pawns in scene
 addPawn('phy1', 'sphere')
 scene.getPawn('phy1').setPosition(SrVec(-75, 150, 20))
-addPawn('phy2', 'box')
-scene.getPawn('phy2').setPosition(SrVec(0, 200, 50))
-addPawn('phy3', 'sphere')
-scene.getPawn('phy3').setPosition(SrVec(135, 200, 50))
-'''
-addPawn('phy4', 'box', SrVec(40, 20, 20))
-scene.getPawn('phy4').setPosition(SrVec(135, 100, 50))
-scene.getPawn('phy4').setHPR(SrVec(0, 0, 35))
-'''
+
 # Targets
 addPawn('target1', 'sphere', SrVec(0, 0, 0))
 addPawn('target2', 'sphere', SrVec(0, 0, 0))
 addPawn('target3', 'sphere', SrVec(0, 0, 0))
 addPawn('target4', 'sphere', SrVec(0, 0, 0))
-scene.getPawn('target1').setPosition(SrVec(75, 150, 10))
-scene.getPawn('target2').setPosition(SrVec(75, 150, -10))
-scene.getPawn('target3').setPosition(SrVec(135, 150, 10))
-scene.getPawn('target4').setPosition(SrVec(135, 150, -10))
+setPawnPos('target1', SrVec(75, 150, 10))
+setPawnPos('target2', SrVec(75, 150, -10))
+setPawnPos('target3', SrVec(135, 150, 10))
+setPawnPos('target4', SrVec(135, 150, -10))
 
 # Add Gaze script
 scene.run('Gaze.py')
@@ -83,22 +75,20 @@ constrainChr('doctor', 'r_wrist')
 constrainChr('doctor', 'l_wrist')
 constrainChr('doctor', 'r_ankle')
 constrainChr('doctor', 'l_ankle')
-# Utah physics and constraints
-setupCharacterPhysics('utah')
-constrainChr('utah', 'spine1')
-constrainChr('utah', 'r_wrist')
-constrainChr('utah', 'l_wrist')
-constrainChr('utah', 'r_ankle')
-constrainChr('utah', 'l_ankle')
-
+# brad2 physics and constraints
+setupCharacterPhysics('brad2')
+constrainChr('brad2', 'spine1')
+constrainChr('brad2', 'r_wrist')
+constrainChr('brad2', 'l_wrist')
+constrainChr('brad2', 'r_ankle')
+constrainChr('brad2', 'l_ankle')
+# Elder physics and contraints
 setupCharacterPhysics('elder')
 constrainChr('elder', 'spine1')
 constrainChr('elder', 'l_ankle')
 constrainChr('elder', 'r_ankle')
 
 setupPawnPhysics('phy1')
-setupPawnPhysics('phy2')
-setupPawnPhysics('phy3')
 
 bradX = -150
 bradCur = -1
@@ -122,8 +112,7 @@ class PhysicsDemo(SBScript):
 		if diff >= delay:
 			diff = 0
 			canTime = True
-		
-		# If time up, do actions
+		# Trigger once
 		if canTime and not started:
 			started = True
 			togglePhysics('brad')
@@ -131,53 +120,48 @@ class PhysicsDemo(SBScript):
 			togglePhysics('elder')
 			togglePawnPhysics('phy1')
 			togglePawnPhysics('phy1')
-			scene.getPawn('phy1').setPosition(SrVec(-75, 150, 20))
-			togglePawnPhysics('phy2')
-			scene.getPawn('phy2').setPosition(SrVec(0, 200, 50))
-			togglePawnPhysics('phy3')
-			scene.getPawn('phy3').setPosition(SrVec(135, 200, 50))
+			setPawnPos('phy1', SrVec(-75, 150, 20))
 			# Do gaze for elder
 			gaze('elder', 'phy1')
 			bml.execBML('brad', '<body posture="Walk"/>')
-			
+		# If time's up, do action
 		if canTime:
 			bml.execBML('brad', '<head repeats="5" velocity="0.75" type="SHAKE"/>')
 			boxingLogic()
 			
 		# Elder
-		scene.getPawn('phy1').setPosition(SrVec(curX, 150, curZ))
+		setPawnPos('phy1', SrVec(curX, 150, curZ))
 		curX = curX + speed * amountX
 		curZ = curZ + speed * amountZ
 		if curX < -90: amountX = 1
 		if curX > -60: amountX = -1
 		if curZ < 9: amountZ = 1
 		if curZ > 20: amountZ = -1
-	
 		# Brad
-		scene.getPawn('constraint1').setPosition(SrVec(bradX, 240, 20))
+		setPawnPos('constraint1', SrVec(bradX, 240, 20))
 		bradX = bradX + speed * bradCur
 		if bradX < -170: bradCur = 1
 		if bradX > -130: bradCur = -1
 		
-currentTurn = 'utah'		
+currentTurn = 'brad2'		
 def boxingLogic():
 	global currentTurn
-	if currentTurn == 'utah':
-		togglePhysics('utah', 'off')
+	if currentTurn == 'brad2':
+		togglePhysics('brad2', 'off')
 		togglePhysics('doctor', 'on')
 		randNum = random.randrange(0, 2)
 		randDodge = random.randrange(0, 3)
 		if randNum == 0:
-			bml.execBML('utah', '<sbm:reach sbm:action="touch" sbm:reach-finish="true" sbm:reach-type="left" target="target1"/>')
+			bml.execBML('brad2', '<sbm:reach sbm:action="touch" sbm:reach-finish="true" sbm:reach-type="left" target="target1"/>')
 		elif randNum == 1:
-			bml.execBML('utah', '<sbm:reach sbm:action="touch" sbm:reach-finish="true" sbm:reach-type="right" target="target2"/>')
+			bml.execBML('brad2', '<sbm:reach sbm:action="touch" sbm:reach-finish="true" sbm:reach-type="right" target="target2"/>')
 		if randDodge == 2:
 			togglePhysics('doctor', 'off')
 			bml.execBML('doctor', '<animation name="ChrUtah_Relax001_CrouchProtectHead_right"/>')
 		currentTurn = 'doctor'
 	elif currentTurn == 'doctor':
 		togglePhysics('doctor', 'off')
-		togglePhysics('utah', 'on')
+		togglePhysics('brad2', 'on')
 		randNum = random.randrange(0, 2)
 		randDodge = random.randrange(0, 3)
 		if randNum == 0:
@@ -185,14 +169,9 @@ def boxingLogic():
 		elif randNum == 1:
 			bml.execBML('doctor', '<sbm:reach sbm:action="touch" sbm:reach-finish="true" sbm:reach-type="left" target="target4"/>')
 		if randDodge == 2:
-			togglePhysics('utah', 'off')
-			bml.execBML('utah', '<animation name="ChrUtah_Relax001_CrouchProtectHead_right"/>')
-		currentTurn = 'utah'
-		
-# Target list, auto left right
-# Try rube goldberg
-# Character list
-# Enemy list
+			togglePhysics('brad2', 'off')
+			bml.execBML('brad2', '<animation name="ChrUtah_Relax001_CrouchProtectHead_right"/>')
+		currentTurn = 'brad2'
 			
 # Run the update script
 scene.removeScript('physicsdemo')

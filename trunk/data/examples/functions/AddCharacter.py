@@ -188,6 +188,9 @@ def addPawn(name, collisionShape, size=SrVec(10, 10, 10)):
 def setPos(name, target):
 	scene.getCharacter(name).setPosition(target)
 	
+def setPawnPos(name, target):
+	scene.getPawn(name).setPosition(target)
+	
 def setFacing(name, amount):
 	scene.getCharacter(name).setHPR(SrVec(amount, 0, 0))
 	

@@ -39,10 +39,14 @@ setPos('brad', SrVec(50, 102, 0))
 scene.run('Retargetting.py')
 '''Find solution to get retargetted animation name'''
 
+output = ''
+if output == '':
+	autoRetarget('LHandOnHip_Arms_GestureWhy', 'common.sk', 'test_utah.sk', '../../../../data/sbm-common/common-sk/retargetMotion/')
+	output = getOutput()
+	
 last = 0
 canTime = True
 delay = 5
-output = ''
 class Retargetting(SBScript):
 	def update(self, time):
 		global canTime, last, output
@@ -50,6 +54,11 @@ class Retargetting(SBScript):
 			last = time
 			canTime = False
 		diff = time - last
+		if diff >= delay:
+			canTime = True
+			diff = 0
+		if canTime:
+			bml.execBML('brad', '<animation name="LHandOnHip_Arms_GestureWhy"/>')
 		'''
 		#print diff
 		if 5 < diff < 5.1:

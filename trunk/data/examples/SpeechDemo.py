@@ -16,8 +16,8 @@ scene.addAssetPath('audio', '../../../../data/Resources/audio')
 # Runs the default viewer for camera
 scene.run('default-viewer.py')
 camera = getCamera()
-camera.setEye(4, 155.79, 86.42)
-camera.setCenter(4, 155.79, 40.63)
+camera.setEye(1, 144.70, 147.41)
+camera.setCenter(1, 137.54, 102.19)
 camera.setUpVector(SrVec(0, 1, 0))
 camera.setScale(1)
 camera.setFov(1.0472)
@@ -37,6 +37,7 @@ scene.run('Speech.py')
 # Add Facial Movements script
 scene.run('FacialMovements.py')
 
+# Add Gestures script
 scene.run('Gestures.py')
 initGestureMap()
 
@@ -54,7 +55,6 @@ class SpeechDemo(SBScript):
 		if diff >= delay:
 			diff = 0
 			canTime = True
-		
 		# If time's up, do action
 		if canTime:
 			speakRandomSentence()
@@ -64,17 +64,45 @@ scene.removeScript('speechdemo')
 speechdemo = SpeechDemo()
 scene.addScript('speechdemo', speechdemo)
 	
+# Keywords may overlap
 sentenceList = []
-sentenceList.append('I am very very angry at you right now')
+sentenceList.append('You have made me very angry')
 sentenceList.append('I am so happy that I am not a real boy')
-sentenceList.append('I am so sad and you should feel bad')
+sentenceList.append('Why must you hurt my feelings when I am sad')
 sentenceList.append('How can you say that about my weight?')
+sentenceList.append('Free kittens are on the left side of the road')
+sentenceList.append('Sweet death is on the right side of the road')
+lastSentence = ''
 def speakRandomSentence():
+	global lastSentence
 	randomSentence = choice(sentenceList)
-	if 'angry' in randomSentence: angry('utah', 5)
-	if 'happy' in randomSentence: happy('utah', 5)
-	if 'sad' in randomSentence:	sad('utah', 5)
-	if 'weight' in randomSentence: shock('utah', 5)
+	for i in range(5):
+		if randomSentence == lastSentence:
+			randomSentence = choice(sentenceList)
+		else:
+			break
+	# Duration of facial movement
+	duration = 5
+	if 'angry' in randomSentence: 
+		angry('utah', duration)
+		playGesture('utah', 'SWEEP', 'RIGHT_HAND')
+	if 'happy' in randomSentence: 
+		happy('utah', duration)
+		playGesture('utah', 'OFFER', 'RIGHT_HAND')
+	if 'sad' in randomSentence:	
+		sad('utah', duration)
+		playGesture('utah', 'YOU', 'RIGHT_HAND')
+	if 'weight' in randomSentence: 
+		shock('utah', duration)
+		playGesture('utah', 'WHY', 'BOTH_HANDS')
+	if 'left' in randomSentence:
+		happy('utah', duration)
+		playGesture('utah', 'LEFT', 'LEFT_HAND')
+	if 'right' in randomSentence:
+		sad('utah', duration)
+		playGesture('utah', 'RIGHT', 'RIGHT_HAND')
+	
+	lastSentence = randomSentence
 	speak('utah', randomSentence)
 	
 	
