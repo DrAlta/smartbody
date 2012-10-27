@@ -22,6 +22,7 @@ class SBGestureMap
 		std::string getGestureByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture);
 		std::string getGestureByIndex(int i);
 		int getNumMappings();
+		void validate();
 
 	public:
 		struct GestureInfo

@@ -1305,6 +1305,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getGestureByInfo", &SBGestureMap::getGestureByInfo, "Return a gesture given the type and hand of the gesture. Input: type, hand, style. Output: corresponding gesture name")
 		.def("getGestureByIndex", &SBGestureMap::getGestureByIndex, "Return a gesture given the index inside the map.")
 		.def("getNumMappings", &SBGestureMap::getNumMappings, "Return a number of entries inside the map.")
+		.def("validate", &SBGestureMap::validate, "Gives feedback about gestures in the gesture map; reports missing idle poses or motions.")
 		;
 
 	boost::python::class_<SBGestureMapManager>("SBGestureMapManager")

@@ -1,6 +1,8 @@
 #include "SBGestureMap.h"
 #include <sbm/mcontrol_util.h>
 #include <sb/SBCharacter.h>
+#include <sb/SBScene.h>
+#include <sb/SBMotion.h>
 
 namespace SmartBody {
 
@@ -82,5 +84,28 @@ int SBGestureMap::getNumMappings()
 {
 	return _gestureMap.size();
 }
+
+void SBGestureMap::validate()
+{
+	SBScene* scene = SBScene::getScene();
+	std::map<std::string, GestureInfo>::iterator iter = _gestureMap.begin();
+	for (; iter != _gestureMap.end(); iter++)
+	{
+		LOG("Gesture: motion='%s' idle='%s' lexeme='%s', type='%s', hand='%s', style='%s'", 
+			 iter->first.c_str(), iter->second._posture.c_str(), iter->second._lexeme.c_str(), iter->second._type.c_str(), iter->second._hand.c_str(), iter->second._style.c_str());
+		SBMotion* animation = scene->getMotion(iter->first);
+		if (!animation)
+		{
+			LOG("WARNING: Animation '%s' is not loaded.", iter->first.c_str());
+		}
+		SBMotion* idle = scene->getMotion(iter->second._posture);
+		if (!idle)
+		{
+			LOG("WARNING: Idle '%s' is not loaded.", iter->second._posture.c_str());
+		}
+	}
+
+}
+
 
 }

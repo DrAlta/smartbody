@@ -955,7 +955,7 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		SrMat prerotMat;				
 		SrMat pmatInv;
 
-		LOG("joint = %s, src dir = %f %f %f, dst dir = %f %f %f, rot axist = %f %f %f, angle = %f",pjointName.c_str(), srcDir[0],srcDir[1],srcDir[2], dstDir[0],dstDir[1],dstDir[2], rotAxis[0], rotAxis[1], rotAxis[2], sr_todeg(angle));
+		//LOG("joint = %s, src dir = %f %f %f, dst dir = %f %f %f, rot axist = %f %f %f, angle = %f",pjointName.c_str(), srcDir[0],srcDir[1],srcDir[2], dstDir[0],dstDir[1],dstDir[2], rotAxis[0], rotAxis[1], rotAxis[2], sr_todeg(angle));
 
 
 		SrMat gmatRot = pjoint->gmat().get_rotation();
@@ -1061,7 +1061,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 		}				
 	}
 	float heightRatio = (interSk->getBaseHeight("base")/tempSrcSk->getBaseHeight("base"));//*0.99f;
-	LOG("height ratio = %f", heightRatio);
+	//LOG("height ratio = %f", heightRatio);
 	for (int i = 0; i < num_f; i++)
 	{
 		retarget_p->insert_frame(i, this->keytime(i));		
