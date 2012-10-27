@@ -49,7 +49,6 @@ namespace BML {
 	const float CONTROLLER_SPEED_MIN_DEFAULT = 0.25;
 	const float CONTROLLER_SPEED_MAX_DEFAULT = 4;
 
-	static int idCounter;
 	class Processor {
 	private:
 
@@ -102,6 +101,8 @@ namespace BML {
 
 		float ct_speed_min;
 		float ct_speed_max;
+
+		int idCounter;
 
 	public:
 		//////////////////////////////////////////////////////////////////////////

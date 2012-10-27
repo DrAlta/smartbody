@@ -526,7 +526,17 @@ SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	SBSkeleton* srcSkeleton = mcu._scene->getSkeleton(srcSkeletonName);
+	if (!srcSkeleton)
+	{
+		LOG("No retarget source skeleton named %s found.", srcSkeletonName.c_str());
+		return NULL;
+	}
 	SBSkeleton* dstSkeleton = mcu._scene->getSkeleton(dstSkeletonName);
+	if (!dstSkeleton)
+	{
+		LOG("No retarget destination skeleton named %s found.", dstSkeletonName.c_str());
+		return NULL;
+	}
 	srcSkeleton->clearJointValues();
 	dstSkeleton->clearJointValues();
 	if (!srcSkeleton || !dstSkeleton)

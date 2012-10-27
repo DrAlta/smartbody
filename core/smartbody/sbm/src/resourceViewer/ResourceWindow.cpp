@@ -18,7 +18,8 @@
 #include <sb/SBServiceManager.h>
 #include <sb/SBJointMapManager.h>
 #include <sb/SBJointMap.h>
-
+#include <sb/SBGestureMap.h>
+#include <sb/SBGestureMapManager.h>
 
 // enum {
 // 	ITEM_PHYSICS = 0,
@@ -70,6 +71,7 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Doub
 
 	treeItemList[ITEM_SKELETON] = resourceTree->add("Skeletons");
 	treeItemList[ITEM_JOINT_MAP] = resourceTree->add("Character Maps");
+	treeItemList[ITEM_DIPHONES] = resourceTree->add("Diphones");
 	treeItemList[ITEM_MOTION] =  resourceTree->add("Motions");	
 
 	treeItemList[ITEM_FACE_DEFINITION] = resourceTree->add("Face Definitions");
@@ -576,6 +578,7 @@ void ResourceWindow::updatePhysicsCharacter( Fl_Tree_Item* tree, SbmPhysicsChara
 
 void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* character )
 {
+	SBCharacter* sbcharacter = dynamic_cast<SBCharacter*>(character);
 	Fl_Tree_Item* item = resourceTree->add(tree,character->getName().c_str());
 	item->user_data((void*)ITEM_CHARACTER);
 	resourceTree->sortorder(FL_TREE_SORT_NONE);	
@@ -594,6 +597,28 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* characte
 			ctrlItem->user_data((void*)ITEM_CONTROLLER);
 		}
 	}
+	/*
+	// add gesture map
+	Fl_Tree_Item* gestureFolder = resourceTree->add(item,"gestures");	
+	gestureFolder->user_data((void*)-1);
+	gestureFolder->close();
+	// add individual gesture mappings
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
+	SBGestureMap* gestureMap = scene->getGestureMapManager()->getGestureMap(sbcharacter->getName());
+	if (gestureMap)
+	{
+		std::string lexeme;
+		std::string type;
+		std::string hand;
+		std::string style;
+		std::string posture;
+
+		gestureMap->getGestureByInfo(lexeme, type, hand, style, posture);
+		Fl_Tree_Item* gestureItem = resourceTree->add(gestureFolder, lexeme.c_str());
+		gestureItem->user_data((void*)ITEM_GESTUREMAP);
+	}
+	*/
 
 	// add NVBG
 	Nvbg* nvbg = character->getNvbg();
@@ -682,7 +707,7 @@ void ResourceWindow::clearInfoWidget()
 TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* treeItem, int itemType )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SmartBody::SBScene* scene = mcu._scene;	
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	TreeItemInfoWidget* widget = NULL;
 	if (itemType == ITEM_SKELETON)
 	{
@@ -790,6 +815,11 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 			widget = new AttributeItemWidget(ctrl,x,y,w,h,name,treeItem,itemType,this);
 		else
 			widget = new TreeItemInfoWidget(x,y,w,h,name,treeItem,itemType);
+	}
+	else if (itemType == ITEM_GESTUREMAP)
+	{
+		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->parent()->parent()->label()); // a controller's parent is its character name
+		widget = new TreeItemInfoWidget(x,y,w,h,name,treeItem,itemType);
 	}
 	else if (itemType == ITEM_NVBG)
 	{
