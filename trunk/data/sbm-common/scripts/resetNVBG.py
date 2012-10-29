@@ -4,15 +4,21 @@ Reset NVBG, This script is used for debugging
 
 print 'Resetting NVBG...'
 
-''' Reset NVBG.py '''
-reload(NewNVBG.NVBG)
-from NewNVBG.NVBG import *  
+''' Reset NVBG.py & PyKE'''
+reload(Cerebella.NVBG)
+from Cerebella.NVBG import *
+from Cerebella import UniversalFactUtil
 
-''' Reset Pyke '''
-reload(NewNVBG.nvbg)
-reload(NewNVBG.brainstem)
-nvbg_engine = knowledge_engine.engine(NewNVBG.nvbg)
-brainstem_engine = knowledge_engine.engine(NewNVBG.brainstem)
+"""
+reload(Cerebella.nvbg)
+reload(Cerebella.brainstem)
+nvbg_engine = knowledge_engine.engine(Cerebella.nvbg)
+brainstem_engine = knowledge_engine.engine(Cerebella.brainstem)
+"""
+scene.run("InitSemantics.py")
+scene.run("InitNVBGGlobalSetting.py")
+scene.run("InitDefaultBehaviorBMLMapping.py")
+scene.run("InitBrainStemGlobalSetting.py")
 
 characterNames = scene.getCharacterNames()
 numCharacters = len(characterNames)
