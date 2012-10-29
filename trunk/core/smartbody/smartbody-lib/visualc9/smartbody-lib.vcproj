@@ -1084,18 +1084,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="stepturn"
-				>
-				<File
-					RelativePath="..\src\controllers\me_ct_step_turn.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\controllers\me_ct_step_turn.h"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="eyelid"
 				>
 				<File
@@ -1128,18 +1116,6 @@
 				</File>
 				<File
 					RelativePath="..\src\controllers\me_ct_tether.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="lilt"
-				>
-				<File
-					RelativePath="..\src\controllers\me_ct_lilt_try.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\controllers\me_ct_lilt_try.h"
 					>
 				</File>
 			</Filter>
@@ -1221,10 +1197,6 @@
 			</Filter>
 			<Filter
 				Name="interpolator"
-				>
-			</Filter>
-			<Filter
-				Name="lifecycle"
 				>
 			</Filter>
 			<Filter
