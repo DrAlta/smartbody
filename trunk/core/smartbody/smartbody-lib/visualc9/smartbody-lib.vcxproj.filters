@@ -97,12 +97,6 @@
     <ClCompile Include="..\src\controllers\me_ct_jacobian_IK.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\controllers\me_ct_lifecycle_test.cpp">
-      <Filter>controllers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\controllers\me_ct_lilt_try.cpp">
-      <Filter>controllers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\controllers\me_ct_limb.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
@@ -158,9 +152,6 @@
       <Filter>controllers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\controllers\me_ct_simple_gaze.cpp">
-      <Filter>controllers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\controllers\me_ct_step_turn.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\controllers\me_ct_tether.cpp">
@@ -979,6 +970,7 @@
     <ClCompile Include="..\src\controllers\me_ct_locomotion_func.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\controllers\MotionAnalysis.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -1077,12 +1069,6 @@
     <ClInclude Include="..\src\controllers\me_ct_jacobian_IK.hpp">
       <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\controllers\me_ct_lifecycle_test.hpp">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\controllers\me_ct_lilt_try.h">
-      <Filter>controllers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\controllers\me_ct_limb.hpp">
       <Filter>controllers</Filter>
     </ClInclude>
@@ -1138,9 +1124,6 @@
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\controllers\me_ct_simple_gaze.h">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\controllers\me_ct_step_turn.h">
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\controllers\me_ct_tether.h">
@@ -2001,6 +1984,7 @@
     <ClInclude Include="..\src\controllers\me_ct_locomotion_func.hpp">
       <Filter>controllers</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\controllers\MotionAnalysis.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag">

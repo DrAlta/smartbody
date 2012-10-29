@@ -245,7 +245,6 @@ set( SMARTBODY_LIB_SBM_SRC
 	controllers/me_ct_IK.cpp
 	controllers/me_ct_IK_scenario.cpp
 	controllers/me_ct_jacobian_IK.cpp
-	controllers/me_ct_lilt_try.cpp
 	controllers/me_ct_limb.cpp
 	controllers/me_ct_locomotion_func.cpp
 	controllers/me_ct_motion_example.cpp
@@ -263,7 +262,6 @@ set( SMARTBODY_LIB_SBM_SRC
 	controllers/me_ct_inverse_interpolation.cpp
 	controllers/me_ct_reach_IK.cpp
 	controllers/me_ct_simple_gaze.cpp
-	controllers/me_ct_step_turn.cpp
 	controllers/me_ct_tether.cpp
 	controllers/me_ct_ublas.cpp
 	sbm/me_utilities.cpp
