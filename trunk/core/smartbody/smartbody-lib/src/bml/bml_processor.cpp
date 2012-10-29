@@ -63,6 +63,7 @@
 
 #include "controllers/me_ct_examples.h"
 #include "controllers/me_ct_gaze.h"
+#include "controllers/me_ct_pose.h"
 #include "sbm/BMLDefs.h"
 
 #include <boost/filesystem/operations.hpp>

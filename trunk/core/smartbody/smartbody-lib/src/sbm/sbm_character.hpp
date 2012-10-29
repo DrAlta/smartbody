@@ -83,6 +83,7 @@ class MeCtBasicLocomotion;
 class MeCtDataReceiver;
 class SbmPhysicsCharacter;
 class MeCtPhysicsController;
+class MeCtMotionPlayer;
 
 class SbmCharacter : public SmartBody::SBPawn	{
 

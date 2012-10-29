@@ -51,20 +51,7 @@ class mcuCBHandle;
 #include <sbm/GenericViewer.h>
 #include <sr/sr_viewer.h>
 #include <sr/sr_camera.h>
-#include <controllers/me_ct_pose.h>
-#include <controllers/me_ct_motion.h>
-#include <controllers/me_ct_lifecycle_test.hpp>
-#include "controllers/me_ct_step_turn.h"
-#include "controllers/me_ct_quick_draw.h"
-#include "controllers/me_ct_gaze.h"
-#include "controllers/me_ct_tether.h"
-#include "controllers/me_ct_eyelid.h"
-#include "controllers/me_ct_data_driven_reach.hpp"
-
 #include "sbm_constants.h"
-
-#include <controllers/me_ct_scheduler2.h>
-#include <controllers/me_ct_motion_player.h>
 
 #include "sr_hash_map.h"
 #include "sr_cmd_map.h"
@@ -76,8 +63,6 @@ class mcuCBHandle;
 #include "local_speech.h"
 #include "text_speech.h" // [BMLR]
 #include "sbm_speech_audiofile.hpp"
-#include "controllers/me_ct_examples.h"
-#include "controllers/me_ct_lilt_try.h"
 #include "time_regulator.h"
 #include "time_profiler.h"
 #include "Heightfield.h"
@@ -97,10 +82,6 @@ class mcuCBHandle;
 
 #include <sbm/nvbg.h>
 
-#include <controllers/me_ct_interpolator.h>
-
-#include <sbm/SteerSuiteEngineDriver.h>
-#include <sbm/Physics/SbmPhysicsSim.h>
 #include <sbm/KinectProcessor.h>
 #include <sb/SBScene.h>
 #include <sbm/SbmCharacterListener.h>
@@ -315,8 +296,6 @@ class mcuCBHandle {
 		std::map<std::string, SbmCharacter*>& getCharacterMap();
 		std::map<std::string, SkSkeleton*>& getSkeletonMap();
 
-		bool addCharacter(SbmCharacter* character);
-		void removeCharacter(const std::string& name);
 		SbmCharacter* getCharacter(const std::string& name);
 		int getNumCharacters();
 
@@ -382,6 +361,9 @@ public:
 
 		void reset();
 
+		// ----------------------------------------------
+		// time and performance management
+		// ----------------------------------------------
 		void register_profiler( TimeIntervalProfiler& time_prof )	{
 			external_profiler_p = &( time_prof );
 			profiler_p = external_profiler_p;
@@ -424,20 +406,25 @@ public:
 			time_dt = time - prev;
 			return( true );
 		}
+		// ----------------------------------------------
+		// END time and performance management
+		// ----------------------------------------------
 
 		static std::string cmdl_tab_callback( std::string str );
 
-		int open_viewer( int width, int height, int px, int py );
-		void close_viewer( void );
-
-		int openOgreViewer( int width, int height, int px, int py );
-		void closeOgreViewer( void );
-
-
+		// ----------------------------------------------
+		// scene management
+		// ----------------------------------------------
 		int add_scene( SrSnGroup *scene_p );
 		int remove_scene( SrSnGroup *scene_p );
 		void render();
+		// ----------------------------------------------
+		// END scene management
+		// ----------------------------------------------
 		
+		// ----------------------------------------------
+		// terrain management
+		// ----------------------------------------------
 		void render_terrain( int renderMode ) {
 			if( height_field_p )	{
 				height_field_p->render(renderMode);
@@ -454,28 +441,16 @@ public:
 			}
 			return( 0.0 );
 		}
+		// ----------------------------------------------
+		// END terrain management
+		// ----------------------------------------------
 		
 		void update( void );
-		int insert( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp, char* description = NULL )
-		{
-			//if (cmd_map.is_command(key))
-				return( cmd_map.insert( key, fp ) );
-			//else
-			//	return CMD_SUCCESS;
-		}
 
-		int insert_set_cmd( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
-			return( set_cmd_map.insert( key, fp ) );
-		}
 
-		int insert_print_cmd( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
-			return( print_cmd_map.insert( key, fp ) );
-		}
-
-		int insert_test_cmd( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
-			return( test_cmd_map.insert( key, fp ) );
-		}
-
+		// ----------------------------------------------
+		// vhmsg and network management
+		// ----------------------------------------------
 		void set_net_host( const char * net_host );
 		void set_process_id( const char * process_id );
 
@@ -483,9 +458,20 @@ public:
 
 		int vhmsg_send( const char* message );
 
+		void NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map );
+		// ----------------------------------------------
+		// END vhmsg and network management
+		// ----------------------------------------------
+
+		// ----------------------------------------------
+		// asset management
+		// ----------------------------------------------
 		int load_motions( const char* pathname, bool recursive );
 		int load_skeletons( const char* pathname, bool recursive );
 		int load_poses( const char* pathname, bool recursive );
+		// ----------------------------------------------
+		// END asset management
+		// ----------------------------------------------
 
 
 		MeController* lookup_ctrl( const std::string& ctrl_name, const char* print_error_prefix=NULL );
@@ -494,20 +480,26 @@ public:
 
 		SkMotion* lookUpMotion(const char* motionName);
 
+		// ----------------------------------------------
+		// blends and transitions
+		// ----------------------------------------------
+
 		PABlend* lookUpPABlend(std::string stateName);
 		void addPABlend(PABlend* state);
 		PATransition* lookUpPATransition(std::string fromStateName, std::string toStateName);
 		void addPATransition(PATransition* transition);
+		// ----------------------------------------------
+		// END blends and transitions
+		// ----------------------------------------------
 		
 		std::string PAWinSelChrName;
 		void setPAWinSelChrName(const std::string& name) { PAWinSelChrName.assign(name); }
 		const std::string& getPAWinSelChrName() { return PAWinSelChrName; }
 
-		SkMotion* addMirrorMotion(SkMotion* motion);
-// 		void setPhysicsEngine(bool start);
-// 		SbmPhysicsSim* getPhysicsEngine() { return physicsEngine; }
 
-
+		// ----------------------------------------------
+		// command management
+		// ----------------------------------------------
 		int execute( const char *key, srArgBuffer& args ) { 
 			std::stringstream strstr;
 			strstr << key << " " << args.peek_string();
@@ -594,7 +586,13 @@ public:
 		int abortSequence( const char* command );
 		int deleteSequence( const char* command );
 
+		// ----------------------------------------------
+		// END command management
+		// ----------------------------------------------
 
+		// ----------------------------------------------
+		// speech relay management
+		// ----------------------------------------------
 		FestivalSpeechRelayLocal* festivalRelay() { return &_festivalRelayLocal; }
 		CereprocSpeechRelayLocal* cereprocRelay() { return &_cereprocRelayLocal; }
 		remote_speech* speech_rvoice() { return &_speech_rvoice; }
@@ -602,7 +600,22 @@ public:
 		SmartBody::AudioFileSpeech* speech_audiofile() { return &_speech_audiofile; }
 		text_speech* speech_text() { return &_speech_text; } // [BMLR]
 
-		void NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map );
+		// ----------------------------------------------
+		// END speech relay management
+		// ----------------------------------------------
+
+		
+		// ----------------------------------------------
+		// viewer management
+		// ----------------------------------------------
+
+		
+		int open_viewer( int width, int height, int px, int py );
+		void close_viewer( void );
+
+		int openOgreViewer( int width, int height, int px, int py );
+		void closeOgreViewer( void );
+
 
 		void register_viewer_factory(SrViewerFactory* factory) { 
 				if (viewer_factory != NULL) delete viewer_factory;
@@ -613,22 +626,47 @@ public:
 			if (ogreViewerFactory != NULL) delete ogreViewerFactory;
 			ogreViewerFactory = factory;
 		}	
+		// ----------------------------------------------
+		// END viewer management
+		// ----------------------------------------------
+
+
+		// ----------------------------------------------
+		// command setup management
+		// ----------------------------------------------
+		int insert_set_cmd( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
+			return( set_cmd_map.insert( key, fp ) );
+		}
+
+		int insert_print_cmd( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
+			return( print_cmd_map.insert( key, fp ) );
+		}
+
+		int insert_test_cmd( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
+			return( test_cmd_map.insert( key, fp ) );
+		}
+		int insert( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp, char* description = NULL )
+		{
+			//if (cmd_map.is_command(key))
+				return( cmd_map.insert( key, fp ) );
+			//else
+			//	return CMD_SUCCESS;
+		}
 
 		void registerCallbacks();
+		// ----------------------------------------------
+		// END command setup management
+		// ----------------------------------------------
 
 		void setMediaPath(std::string path);
 		const std::string& getMediaPath();
 
-                void setInteractive(bool val);
-                bool getInteractive();
+        void setInteractive(bool val);
+        bool getInteractive();
 
 
 		void createDefaultControllers();
 		std::vector<MeController*>& getDefaultControllers();
-
-		void addNvbg(std::string id, Nvbg* nvbg);
-		void removeNvbg(std::string id);
-		Nvbg* getNvbg(std::string id);
 
 	public:
 		FILE* open_sequence_file( const char *seq_name, std::string& fullPath );

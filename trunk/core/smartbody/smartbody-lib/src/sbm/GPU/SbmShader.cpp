@@ -240,7 +240,7 @@ bool SbmShaderManager::initGLExtension()
 
 	//viewer->makeGLContext();
 	glewInit();
-	
+/*
 #if !defined(MAC_BUILD)	
     if (glewIsSupported("GL_VERSION_3_0"))
 	{
@@ -251,6 +251,7 @@ bool SbmShaderManager::initGLExtension()
 	}
     else 
 #endif
+	*/
 	if (glewIsSupported("GL_VERSION_2_0") || glewIsSupported("GL_VERSION_3_0"))
 	{
 		LOG("Ready for OpenGL 2.0.\n");

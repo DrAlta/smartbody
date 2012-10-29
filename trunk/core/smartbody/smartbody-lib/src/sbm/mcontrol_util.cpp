@@ -2042,29 +2042,6 @@ std::map<std::string, DeformableMesh*>& mcuCBHandle::getDeformableMeshMap()
 	return deformableMeshMap;
 }
 
-bool mcuCBHandle::addCharacter(SbmCharacter* character)
-{
-	SbmCharacter* c = getCharacter(character->getName());
-	if (!c)
-	{
-		character_map[character->getName()] = character;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-void mcuCBHandle::removeCharacter(const std::string& name)
-{
-	std::map<std::string, SbmCharacter*>::iterator iter = character_map.find(name);
-	if (iter != character_map.end())
-	{
-		character_map.erase(iter);
-	}
-}
-
 SbmCharacter* mcuCBHandle::getCharacter(const std::string& name)
 {
 	std::map<std::string, SbmCharacter*>::iterator iter = character_map.find(name);
@@ -2199,37 +2176,6 @@ int mcuCBHandle::unregisterCharacter(SbmCharacter* character)
 	return 1;
 }
 
-void mcuCBHandle::addNvbg(std::string id, Nvbg* nvbg)
-{
-	std::map<std::string, Nvbg*>::iterator iter = nvbgMap.find(id);
-	if (iter != nvbgMap.end())
-	{
-		removeNvbg(id);
-	}
-	nvbgMap[id] = nvbg;
-}
-
-void mcuCBHandle::removeNvbg(std::string id)
-{
-	std::map<std::string, Nvbg*>::iterator iter = nvbgMap.find(id);
-	if (iter != nvbgMap.end())
-	{
-		delete (*iter).second;
-	}
-}
-
-Nvbg* mcuCBHandle::getNvbg(std::string id)
-{
-	std::map<std::string, Nvbg*>::iterator iter = nvbgMap.find(id);
-	if (iter != nvbgMap.end())
-	{
-		return (*iter).second;
-	}
-	else
-	{
-		return NULL;
-	}
-}
 
 void mcuCBHandle::render()
 {
