@@ -356,31 +356,11 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_limb.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_breathing.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_breathing_interface.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_analysis.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_anim_global_info.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_balance.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_locomotion_func.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_height_offset.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_IK.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_joint_info.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_limb_anim.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_limb.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_limb_direction_planner.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_navigator.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_pawn.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_quadratic_synchronizer.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_routine.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_simple.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_speed_accelerator.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_terrain.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_locomotion_timing_space.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_example.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_parameter.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_player.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_timewarp.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_navigation_circle.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_navigation_waypoint.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_param_animation.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_param_animation_data.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_param_animation_utilities.cpp \

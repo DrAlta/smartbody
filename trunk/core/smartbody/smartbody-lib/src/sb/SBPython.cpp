@@ -1127,9 +1127,6 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 	boost::python::class_<MeCtEyeLid, boost::python::bases<SBController> > ("EyelidController")
 		;
 
-	boost::python::class_<MeCtLocomotion, boost::python::bases<SBController> > ("LocomotionController")
-		;
-
 	boost::python::class_<MeCtGaze, boost::python::bases<SBController> > ("GazeController")
 		;
 

@@ -549,8 +549,6 @@ void mcuCBHandle::registerCallbacks()
 	insert_test_cmd( "args", test_args_func );
 	insert_test_cmd( "bml",  test_bml_func );
 	insert_test_cmd( "fml",  test_fml_func );
-	insert_test_cmd( "locomotion", test_locomotion_cmd_func );
-	insert_test_cmd( "loco",       test_locomotion_cmd_func );  // shorthand
 	insert_test_cmd( "rhet", remote_speech_test);
 	insert_test_cmd( "bone_pos", test_bone_pos_func );
 	

@@ -120,7 +120,6 @@ posture_sched_p( CreateSchedulerCt( character_name, "posture" ) ),
 motion_sched_p( CreateSchedulerCt( character_name, "motion" ) ),
 breathing_p( ),
 gaze_sched_p( CreateSchedulerCt( character_name, "gaze" ) ),
-locomotion_ct( NULL ),
 eyelid_reg_ct_p( NULL ),
 #ifdef USE_REACH
 constraint_sched_p( CreateSchedulerCt( character_name, "constraint" ) ),
@@ -188,8 +187,6 @@ SbmCharacter::~SbmCharacter( void )	{
 	eyelid_ct->unref();
 	*/
 
-	if (locomotion_ct)
-		locomotion_ct->unref();
 	if (param_animation_ct)
 		param_animation_ct->unref();
 	if (head_param_anim_ct)
@@ -238,13 +235,14 @@ void SbmCharacter::createStandardControllers()
 	motion_sched_p = CreateSchedulerCt( getName().c_str(), "motion" );
 
 	// procedural locomotion
-	this->locomotion_ct =  new MeCtLocomotionClass();
+	// removed 10/27/12 AS
+	/*this->locomotion_ct =  new MeCtLocomotionClass();
 	std::string locomotionname = getName() + "_locomotionController";
 	this->locomotion_ct->setName( locomotionname.c_str() );
 	locomotion_ct->get_navigator()->setWordOffsetController(world_offset_writer_p);
 	locomotion_ct->init_skeleton(this->getSkeleton(), this->getSkeleton());
 	locomotion_ct->ref();
-
+	*/
 	// example-based locomotion
 	this->param_animation_ct = new MeCtParamAnimation(this, world_offset_writer_p);
 	std::string paramAnimationName = getName() + "_paramAnimationController";
@@ -388,7 +386,7 @@ void SbmCharacter::createStandardControllers()
 	posture_sched_p->init(this);
 	motion_sched_p->init(this);
 	param_sched_p->init(this);
-	locomotion_ct->init(this);
+	//locomotion_ct->init(this);
 	breathing_p->init(this);
 	gaze_sched_p->init(this);
 
@@ -401,7 +399,7 @@ void SbmCharacter::createStandardControllers()
 
 	ct_tree_p->add_controller( posture_sched_p );
 	ct_tree_p->add_controller( motion_sched_p );
-	ct_tree_p->add_controller( locomotion_ct );
+	//ct_tree_p->add_controller( locomotion_ct );
 	ct_tree_p->add_controller( param_animation_ct );
 	ct_tree_p->add_controller( basic_locomotion_ct );
 
@@ -453,8 +451,8 @@ void SbmCharacter::createStandardControllers()
 					//attributeCopy->registerObserver(head_param_anim_ct);
 					//attributeCopy->registerObserver(param_animation_ct);
 				}
-				else if (dynamic_cast<MeCtLocomotion*>(controller))
-					attributeCopy->registerObserver(locomotion_ct);
+				//else if (dynamic_cast<MeCtLocomotion*>(controller))
+					//attributeCopy->registerObserver(locomotion_ct);
 				else if (dynamic_cast<MeCtBasicLocomotion*>(controller))
 					attributeCopy->registerObserver(basic_locomotion_ct);
 				else if (dynamic_cast<MeCtBreathing*>(controller))
@@ -481,7 +479,6 @@ void SbmCharacter::initData()
 
 	speech_impl = NULL;
 	speech_impl_backup = NULL;
-	locomotion_ct = NULL;
 	eyelid_reg_ct_p = NULL;
 	face_ct = NULL;
 	motionplayer_ct = NULL;
@@ -523,142 +520,8 @@ void SbmCharacter::initData()
 
 }
 
-void SbmCharacter::locomotion_reset()
-{
-	locomotion_ct->reset = true;
-}
 
-void SbmCharacter::locomotion_set_turning_speed(float radians)
-{
-	//locomotion_ct->set_turning_speed(radians);
-	for(int i = 0; i < locomotion_ct->limb_list.size(); ++i)
-	{
-		locomotion_ct->limb_list.get(i)->direction_planner.set_turning_speed(radians);
-	}
-}
 
-MeCtLocomotionClass* SbmCharacter::get_locomotion_ct()
-{
-	return this->locomotion_ct;
-}
-
-void SbmCharacter::locomotion_ik_enable(bool enable)
-{
-	locomotion_ct->ik_enabled = enable;
-}
-
-bool SbmCharacter::is_locomotion_controller_initialized()
-{
-	if(locomotion_ct == NULL) return false;
-	return locomotion_ct->is_initialized();
-}
-
-bool SbmCharacter::is_locomotion_controller_enabled()
-{
-	if(locomotion_ct == NULL) return false;
-	return locomotion_ct->is_enabled();
-}
-
-void SbmCharacter::locomotion_set_turning_mode(int mode)
-{
-	for(int i = 0; i < locomotion_ct->limb_list.size(); ++i)
-	{
-		locomotion_ct->limb_list.get(i)->direction_planner.set_turning_mode(mode);
-	}
-}
-
-// void SbmCharacter::updateJointPhyObjs(bool phySim)
-// {
-// 	
-// }
-
-// void SbmCharacter::setJointPhyCollision( bool useCollision )
-// {	
-// 	if (!phyChar) return;
-// 	const std::vector<SkJoint*>& joints = _skeleton->joints();	
-// 	std::map<std::string,SbmJointObj*> jointPhyObjMap = phyChar->getJointObjMap();
-// 	for (size_t i=0;i<joints.size();i++)
-// 	{
-// 		SkJoint* curJoint = joints[i];
-// 		std::string jointName = curJoint->name();
-// 		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
-// 		{
-// 			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
-// 			phyObj->enableCollisionSim(useCollision);
-// 		}
-// 	}	
-// }
-// 
-// void SbmCharacter::buildJointPhyObjs()
-// {
-// 	const std::vector<SkJoint*>& joints = _skeleton->joints();
-// 	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
-// 	if (!phySim)
-// 		return;
-// 	//printf("init physics obj\n");	
-// 	phyChar = new SbmPhysicsCharacter();
-// 	std::queue<SkJoint*> tempJointList;
-// 	std::vector<std::string> jointNameList;
-// 	std::set<std::string> excludeNameList; 
-// 	excludeNameList.insert("r_wrist");
-// 	excludeNameList.insert("l_wrist");
-// 	excludeNameList.insert("spine5");
-// 	excludeNameList.insert("l_forefoot");
-// 	excludeNameList.insert("r_forefoot");
-// 
-// 	excludeNameList.insert("l_ankle");
-// 	excludeNameList.insert("r_ankle");
-// 
-// 	//excludeNameList.insert("r_sternoclavicular");
-// 	//excludeNameList.insert("l_sternoclavicular");
-// 	//excludeNameList.insert("r_shoulder");
-// 	//excludeNameList.insert("l_shoulder");
-// 	//excludeNameList.insert("r_acromioclavicular");
-// 	//excludeNameList.insert("l_acromioclavicular");
-// 
-// 	//excludeNameList.insert("l_hip");
-// 	//excludeNameList.insert("r_hip");	
-// 	//excludeNameList.insert("spine3");
-// 	//excludeNameList.insert("r_elbow");
-// 	//excludeNameList.insert("l_elbow");
-// 	SkJoint* rootJoint = _skeleton->root();
-// 	//jointNameList.push_back(rootJoint->name());
-// 	tempJointList.push(rootJoint->child(0));
-// 	//tempJointList.push(_skeleton->search_joint("spine2"));
-// 
-// 	
-// 	while (!tempJointList.empty())
-// 	{
-// 		SkJoint* joint = tempJointList.front(); tempJointList.pop();
-// 		std::string jName = joint->name();
-// 		if (joint->num_children() == 0) // don't process leaves
-// 			continue;
-// 		jointNameList.push_back(jName);
-// 		if (excludeNameList.find(jName) != excludeNameList.end())
-// 			continue;
-// 		for (int i=0;i<joint->num_children();i++)
-// 		{
-// 			SkJoint* cj = joint->child(i);	
-// 			if (std::find(joints.begin(),joints.end(),cj) != joints.end())
-// 				tempJointList.push(cj);
-// 		}
-// 	}
-// 		
-// 	/*
-// 	for (size_t i=0;i<joints.size();i++)
-// 	{
-// 		SkJoint* curJoint = joints[i];
-// 		std::string jointName = curJoint->name();
-// 		jointNameList.push_back(jointName);				
-// 	}*/
-// 	
-// 
-// 	std::string charName = getName();
-// 	phyChar->initPhysicsCharacter(charName,jointNameList,true);
-// #if USE_PHYSICS_CHARACTER
-// 	phySim->addPhysicsCharacter(phyChar);
-// #endif
-// }
 /*
 void SbmCharacter::setJointCollider( std::string jointName, float len, float radius )
 {
@@ -1020,8 +883,6 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 					//attributeCopy->registerObserver(param_animation_ct);
 					//attributeCopy->registerObserver(head_param_anim_ct);
 				}
-				else if (dynamic_cast<MeCtLocomotion*>(controller))
-					attributeCopy->registerObserver(locomotion_ct);
 				else if (dynamic_cast<MeCtBasicLocomotion*>(controller))
 					attributeCopy->registerObserver(basic_locomotion_ct);
 				else if (dynamic_cast<MeCtBreathing*>(controller))
@@ -1067,50 +928,6 @@ int SbmCharacter::init_skeleton() {
 		return CMD_FAILURE;
 	}
 	const int wo_index = wo_joint_p->index();  // World offest joint index
-
-	// Add channels for locomotion control...
-	{
-		const float max_speed = 1000000.0f;   // TODO: set max speed value to some reasonable value for the current scale
-
-		// 3D vector for current speed and trajectory of the body
-		SkJoint* loc_vector_joint_p = _skeleton->add_joint( SkJoint::TypeEuler, wo_index );
-		loc_vector_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_VELOCITY );
-		// Activate positional channels
-		loc_vector_joint_p->pos()->limits( 0, -max_speed, max_speed );
-		loc_vector_joint_p->pos()->limits( 1, -max_speed, max_speed );
-		loc_vector_joint_p->pos()->limits( 2, -max_speed, max_speed );
-
-		//delete after test
-		//SkJoint* velocity_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
-		//velocity_joint_p->name( SkJointName( LOCOMOTION_ROTATION ) );
-		//velocity_joint_p->pos()->limits( 1, false ); // Unlimit YPos
-		//velocity_joint_p->euler()->activate();
-
-		// 3D position for angular velocity
-		SkJoint* g_angular_velocity_joint_p = _skeleton->add_joint( SkJoint::TypeEuler, wo_index );
-		SkJoint* l_angular_velocity_joint_p = _skeleton->add_joint( SkJoint::TypeEuler, wo_index );
-		SkJoint* l_angular_angle_joint_p = _skeleton->add_joint( SkJoint::TypeEuler, wo_index );
-		SkJoint* time_joint_p = _skeleton->add_joint( SkJoint::TypeEuler, wo_index );
-		SkJoint* id_joint_p = _skeleton->add_joint( SkJoint::TypeEuler, wo_index );
-		g_angular_velocity_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_GLOBAL_ROTATION  );
-		l_angular_velocity_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION  );
-		l_angular_angle_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION_ANGLE  );
-		time_joint_p->name(  MeCtLocomotionPawn::LOCOMOTION_TIME  );
-		id_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_ID  );
-
-		// Activate positional channels, unlimited
-		g_angular_velocity_joint_p->pos()->limits( 1, false ); // Unlimit YPos
-		l_angular_velocity_joint_p->pos()->limits( 1, false ); // Unlimit YPos
-		l_angular_angle_joint_p->pos()->limits( 1, false ); // Unlimit YPos
-		time_joint_p->pos()->limits( 1, false ); // Unlimit XPos
-		id_joint_p->pos()->limits( 1, false ); // Unlimit YPos
-
-		g_angular_velocity_joint_p->euler()->activate();
-		l_angular_velocity_joint_p->euler()->activate();
-		l_angular_angle_joint_p->euler()->activate();
-		time_joint_p->euler()->activate();
-		id_joint_p->euler()->activate();
-	}
 
 	// Adding general parameter channels using a format of <char_name>_1_1, <char_name>_2_1, <char_name>_2_2, <char_name>_2_3...(for joint name)
 	int Index = 0;
@@ -1568,9 +1385,6 @@ void prune_schedule( SbmCharacter*   actor,
 												}
 #endif
 											} 
-											else if(anim_ct_type == MeCtNavigationCircle::TYPE)
-											{
-											}
 											else if(anim_ct_type == MeCtInterpolator::CONTROLLER_TYPE)
 											{
 											}

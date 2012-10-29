@@ -528,15 +528,6 @@ void SteeringAgent::evaluate(double dtime)
 			return;
 		newSpeed = evaluateBasicLoco(dt, x, y, z, yaw);
 	}
-	// Procedural Locomotion Evaluation
-	if (character->locomotion_type == character->Procedural)
-	{
-		if (!character->locomotion_ct)
-			return;
-		if (!character->locomotion_ct->is_enabled())
-			return;
-		evaluateProceduralLoco(dt, x, y, z, yaw);
-	}
 
 	// Example-Based Locomotion Evaluation
 	if (character->locomotion_type == character->Example)
@@ -989,96 +980,6 @@ float SteeringAgent::evaluateBasicLoco(float dt, float x, float y, float z, floa
 }
 
 
-/*
-	Notes:
-	- The proximity is decided by Steering Suite
-	- bml "manner" tag is not supported
-*/
-float SteeringAgent::evaluateProceduralLoco(float dt, float x, float y, float z, float yaw)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
-	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
-	const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
-
-	float angleGlobal = radToDeg(atan2(steeringCommand.targetDirection.x, steeringCommand.targetDirection.z));
-	normalizeAngle(angleGlobal);
-	normalizeAngle(yaw);
-	float angleDiff = angleGlobal - yaw;
-	normalizeAngle(angleDiff);
-
-	float speed = steeringCommand.targetSpeed * locoSpdGain;
-	int numGoals = goalQueue.size();
-	if (numGoals == 0)
-	{				
-		std::stringstream strstr;
-		strstr << "test loco char ";
-		strstr << character->getName();
-		strstr << " stop";
-		mcu.execute((char*)strstr.str().c_str());
-		MeCtLocomotionNavigator* nav = character->locomotion_ct->get_navigator();
-		if (fabs(facingAngle) <= 180)
-		{
-			float diff = facingAngle - yaw;
-			normalizeAngle(diff);
-			if (fabs(diff) > facingAngleThreshold)
-			{
-				float turn = 1.0f;
-				if (diff > 0)
-					turn *= -1.0f;
-				std::stringstream strstr;
-				strstr << "test loco char ";
-				strstr << character->getName();
-				strstr << " leftward spd 0.0 rps " << turn;
-				mcu.execute((char*)strstr.str().c_str());	
-			}
-			else if (nav->limb_blending_factor < 0.1)
-				character->_reachTarget = true;
-		}
-		else if (nav->limb_blending_factor < 0.1)
-			character->_reachTarget = true;
-	}
-	else
-	{
-		if (fabs(steeringCommand.scoot) > scootThreshold)
-		{
-			float turn = -2.0f;
-			if (steeringCommand.scoot > 0)
-				turn *= -1.0f;
-			std::stringstream strstr;
-			strstr << "test loco char ";
-			strstr << character->getName();
-			strstr << " forward spd 0.0 rps " << turn;
-			mcu.execute((char*)strstr.str().c_str());			
-		}
-		else
-		{
-			if (steeringCommand.aimForTargetDirection)
-			{
-				float spd = 1.0f;
-				std::stringstream strstr;
-				strstr << "test loco char ";
-				strstr << character->getName();
-				strstr << " forward spd " << speed << " rps ";
-				if (angleDiff < 0)
-				 strstr << spd << " ";
-				else
-				 strstr << -spd << " ";
-				strstr << "angle " << degToRad(angleDiff);
-				mcu.execute((char*)strstr.str().c_str());
-			}
-			else
-			{
-				std::stringstream strstr;
-				strstr << "test loco char ";
-				strstr << character->getName();
-				strstr << " forward spd " << speed;
-				mcu.execute((char*)strstr.str().c_str());
-			}
-		}
-	}
-	return desiredSpeed;
-}
 
 /*
 	Notes:

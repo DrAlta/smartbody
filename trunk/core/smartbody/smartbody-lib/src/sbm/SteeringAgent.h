@@ -59,7 +59,6 @@ class SteeringAgent
 		inline float radToDeg(float v)	{return (v * 180.0f / float(M_PI));}
 
 		float evaluateBasicLoco(float dt, float x, float y, float z, float yaw);
-		float evaluateProceduralLoco(float dt, float x, float y, float z, float yaw);
 		float evaluateExampleLoco(float dt, float x, float y, float z, float yaw);
 
 		float evaluateSteppingLoco(float dt, float x, float y, float z, float yaw);

@@ -247,31 +247,11 @@ set( SMARTBODY_LIB_SBM_SRC
 	controllers/me_ct_jacobian_IK.cpp
 	controllers/me_ct_lilt_try.cpp
 	controllers/me_ct_limb.cpp
-	controllers/me_ct_locomotion_analysis.cpp
-	controllers/me_ct_locomotion_anim_global_info.cpp
-	controllers/me_ct_locomotion_balance.cpp
-	controllers/me_ct_locomotion.cpp
 	controllers/me_ct_locomotion_func.cpp
-	controllers/me_ct_locomotion_height_offset.cpp
-	controllers/me_ct_locomotion_IK.cpp
-	controllers/me_ct_locomotion_joint_info.cpp
-	controllers/me_ct_locomotion_limb_anim.cpp
-	controllers/me_ct_locomotion_limb.cpp
-	controllers/me_ct_locomotion_limb_direction_planner.cpp
-	controllers/me_ct_locomotion_navigator.cpp
-	controllers/me_ct_locomotion_pawn.cpp
-	controllers/me_ct_locomotion_quadratic_synchronizer.cpp
-	controllers/me_ct_locomotion_routine.cpp
-	controllers/me_ct_locomotion_simple.cpp
-	controllers/me_ct_locomotion_speed_accelerator.cpp
-	controllers/me_ct_locomotion_terrain.cpp
-	controllers/me_ct_locomotion_timing_space.cpp
 	controllers/me_ct_motion_example.cpp
 	controllers/me_ct_motion_parameter.cpp
 	controllers/me_ct_motion_player.cpp
 	controllers/me_ct_motion_timewarp.cpp
-	controllers/me_ct_navigation_circle.cpp
-	controllers/me_ct_navigation_waypoint.cpp
 	controllers/me_ct_param_animation.cpp
 	controllers/me_ct_param_animation_data.cpp
 	controllers/me_ct_param_animation_utilities.cpp

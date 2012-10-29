@@ -27,7 +27,6 @@
 #include <string>
 
 #include <xercesc/util/XMLStringTokenizer.hpp>
-#include <controllers/me_ct_navigation_circle.hpp>
 #include <controllers/me_ct_channel_writer.hpp>
 #include <controllers/me_ct_param_animation.h>
 
@@ -36,7 +35,6 @@
 
 #include "sbm/mcontrol_util.h"
 #include "sb/SBScene.h"
-#include "controllers/me_ct_locomotion.hpp"
 
 #include "bml_xml_consts.hpp"
 #include "sbm/xercesc_utils.hpp"
@@ -60,8 +58,6 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	const char * ascii_enable = NULL;
 	string enable;
 	int type = BML_LOCOMOTION_TARGET_TYPE_UNKNOWN;
-
-	MeCtLocomotion* ct_locomotion = request->actor->locomotion_ct;
 
 	// Viseme transition hack until timing can support multiple sync points
 
@@ -132,11 +128,10 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	{
 		if( XMLString::compareIString( attrEnable, BMLDefs::ATTR_TRUE )==0 ) 
 		{
-			ct_locomotion->set_enabled(true);
+			
 		}
 		else if( XMLString::compareIString( attrEnable, BMLDefs::ATTR_FALSE )==0 )
 		{
-			ct_locomotion->set_enabled(false);
 			c->steeringAgent->locomotionHalt();
 		}
 	}
@@ -421,19 +416,11 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int type, int id)
 {
-	MeCtNavigationCircle* nav_circle = new MeCtNavigationCircle();
-	nav_circle->ref();
-	nav_circle->set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1);
-	request->actor->posture_sched_p->create_track( NULL, NULL, nav_circle);
-	nav_circle->unref();
-
 	float speed = 0.0f;
 	float g_angular_speed = 0.0f;
 	float l_angular_speed = 0.0f;
 	float pos[3];
 	memset(pos, 0, sizeof(float)*3);
-
-	MeCtLocomotion* ct_locomotion = request->actor->locomotion_ct;
 
 	const XMLCh* tag = NULL;
 	DOMElement* child = elem;
@@ -453,12 +440,6 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 			pos[ 1 ] = xml_parse_float( BMLDefs::ATTR_Y, child );
 			pos[ 2 ] = xml_parse_float( BMLDefs::ATTR_Z, child );
 			speed = xml_parse_float( BMLDefs::ATTR_SPEED, child );
-
-			ct_locomotion->get_navigator()->clear_destination_list();
-			SrVec dest(pos[0], pos[1], pos[2]);
-			ct_locomotion->get_navigator()->add_destination(&dest);
-			ct_locomotion->get_navigator()->has_destination = true;
-			ct_locomotion->get_navigator()->add_speed(speed);
 		}
 		else if(XMLString::compareIString( tag, BMLDefs::ATTR_DIRECTION) == 0)
 		{
@@ -479,7 +460,6 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 			pos[0] = dir.x;
 			pos[1] = dir.y;
 			pos[2] = dir.z;
-			ct_locomotion->get_navigator()->has_destination = false;
 		}
 		else if(XMLString::compareIString( tag, BMLDefs::ATTR_VELOCITY) == 0)
 		{
@@ -520,7 +500,5 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 
 		child = getNextElement( child );
 	}
-
-	nav_circle->set( pos[0], pos[1], pos[2], g_angular_speed, l_angular_speed, 0, id, 0, 0, 0, -1 );
 }
 
