@@ -315,11 +315,9 @@
     <ClCompile Include="..\src\controllers\me_ct_gaze_joint.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_gaze_keymap.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_gaze_target.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_step_turn.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_eyelid.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_face.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_tether.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_lilt_try.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_quick_draw.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_examples.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_simple_gaze.cpp" />
@@ -328,7 +326,6 @@
     <ClCompile Include="..\src\controllers\me_ct_scheduler2.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_periodic_replay.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_interpolator.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_lifecycle_test.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_time_shift_warp.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_channel_writer.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_curve_writer.cpp" />
@@ -767,11 +764,9 @@
     <ClInclude Include="..\src\controllers\me_ct_gaze_alg.h" />
     <ClInclude Include="..\src\controllers\me_ct_gaze_joint.h" />
     <ClInclude Include="..\src\controllers\me_ct_gaze_sensor.h" />
-    <ClInclude Include="..\src\controllers\me_ct_step_turn.h" />
     <ClInclude Include="..\src\controllers\me_ct_eyelid.h" />
     <ClInclude Include="..\src\controllers\me_ct_face.h" />
     <ClInclude Include="..\src\controllers\me_ct_tether.h" />
-    <ClInclude Include="..\src\controllers\me_ct_lilt_try.h" />
     <ClInclude Include="..\src\controllers\me_ct_quick_draw.h" />
     <ClInclude Include="..\src\controllers\me_ct_examples.h" />
     <ClInclude Include="..\src\controllers\me_ct_simple_gaze.h" />
@@ -780,7 +775,6 @@
     <ClInclude Include="..\src\controllers\me_ct_scheduler2.h" />
     <ClInclude Include="..\src\controllers\me_ct_periodic_replay.hpp" />
     <ClInclude Include="..\src\controllers\me_ct_interpolator.h" />
-    <ClInclude Include="..\src\controllers\me_ct_lifecycle_test.hpp" />
     <ClInclude Include="..\src\controllers\me_ct_time_shift_warp.hpp" />
     <ClInclude Include="..\src\controllers\me_ct_channel_writer.hpp" />
     <ClInclude Include="..\src\controllers\me_ct_curve_writer.hpp" />
