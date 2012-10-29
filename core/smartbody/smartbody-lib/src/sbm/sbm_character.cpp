@@ -47,6 +47,9 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBJoint.h>
 #include <sb/SBBoneBusManager.h>
+#include <controllers/me_ct_motion_player.h>
+#include <controllers/me_ct_pose.h>
+#include <controllers/me_ct_quick_draw.h>
 // android does not use GPU shader for now
 #if !defined(__ANDROID__)
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
