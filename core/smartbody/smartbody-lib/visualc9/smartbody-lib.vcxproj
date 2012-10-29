@@ -235,6 +235,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\controllers\MeCtBlendEngine.cpp" />
+    <ClCompile Include="..\src\controllers\me_ct_IK.cpp" />
+    <ClCompile Include="..\src\controllers\me_ct_locomotion_func.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_motion_blend.cpp" />
     <ClCompile Include="..\src\controllers\MotionAnalysis.cpp" />
     <ClCompile Include="..\src\external\perlin\perlin.cpp" />
@@ -250,7 +252,6 @@
     <ClCompile Include="..\src\sbm\KinectProcessor.cpp" />
     <ClCompile Include="..\src\sbm\lin_win.cpp" />
     <ClCompile Include="..\src\sbm\local_speech.cpp" />
-    <ClCompile Include="..\src\sbm\locomotion_cmds.cpp" />
     <ClCompile Include="..\src\sbm\mcontrol_callbacks.cpp" />
     <ClCompile Include="..\src\sbm\mcontrol_util.cpp" />
     <ClCompile Include="..\src\sbm\MiniBrain.cpp" />
@@ -308,29 +309,7 @@
     <ClCompile Include="..\src\controllers\me_default_prune_policy.cpp" />
     <ClCompile Include="..\src\controllers\me_spline_1d.cpp" />
     <ClCompile Include="..\src\sbm\me_utilities.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_IK.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_IK_scenario.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_analysis.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_anim_global_info.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_balance.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_func.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_height_offset.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_IK.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_joint_info.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_limb.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_limb_anim.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_limb_direction_planner.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_navigator.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_pawn.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_quadratic_synchronizer.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_routine.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_simple.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_speed_accelerator.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_terrain.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_locomotion_timing_space.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_navigation_circle.cpp" />
-    <ClCompile Include="..\src\controllers\me_ct_navigation_waypoint.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_gaze.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_gaze_alg.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_gaze_joint.cpp" />
@@ -699,6 +678,8 @@
   <ItemGroup>
     <ClInclude Include="..\src\controllers\MeCtBlendEngine.h" />
     <ClInclude Include="..\src\controllers\me_blend_cover.h" />
+    <ClInclude Include="..\src\controllers\me_ct_IK.hpp" />
+    <ClInclude Include="..\src\controllers\me_ct_locomotion_func.hpp" />
     <ClInclude Include="..\src\controllers\me_ct_motion_blend.hpp" />
     <ClInclude Include="..\src\controllers\MotionAnalysis.h" />
     <ClInclude Include="..\src\external\perlin\perlin.h" />
@@ -714,7 +695,6 @@
     <ClInclude Include="..\src\sbm\KinectProcessor.h" />
     <ClInclude Include="..\src\sbm\lin_win.h" />
     <ClInclude Include="..\src\sbm\local_speech.h" />
-    <ClInclude Include="..\src\sbm\locomotion_cmds.hpp" />
     <ClInclude Include="..\src\sbm\mcontrol_callbacks.h" />
     <ClInclude Include="..\src\sbm\mcontrol_util.h" />
     <ClInclude Include="..\src\sbm\MiniBrain.h" />
@@ -782,29 +762,7 @@
     <ClInclude Include="..\src\controllers\me_prune_policy.hpp" />
     <ClInclude Include="..\src\controllers\me_spline_1d.hpp" />
     <ClInclude Include="..\src\sbm\me_utilities.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_IK.hpp" />
     <ClInclude Include="..\src\controllers\me_ct_IK_scenario.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_analysis.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_anim_global_info.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_balance.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_func.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_height_offset.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_IK.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_joint_info.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_limb.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_limb_anim.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_limb_direction_planner.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_navigator.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_pawn.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_quadratic_synchronizer.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_routine.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_simple.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_speed_accelerator.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_terrain.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_locomotion_timing_space.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_navigation_circle.hpp" />
-    <ClInclude Include="..\src\controllers\me_ct_navigation_waypoint.hpp" />
     <ClInclude Include="..\src\controllers\me_ct_gaze.h" />
     <ClInclude Include="..\src\controllers\me_ct_gaze_alg.h" />
     <ClInclude Include="..\src\controllers\me_ct_gaze_joint.h" />

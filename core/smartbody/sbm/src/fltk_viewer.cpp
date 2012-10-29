@@ -1630,8 +1630,6 @@ void FltkViewer::translate_keyboard_state()
 	{
 		_locoData->height_disp += _locoData->height_disp_delta;
 		//if(height_disp > 0.0f) height_disp = 0.0f;
-		if (character->get_locomotion_ct())
-			character->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
 	}
 
 // 	if (Fl::event_key('c'))
@@ -1648,8 +1646,6 @@ void FltkViewer::translate_keyboard_state()
 	{
 		_locoData->height_disp -= _locoData->height_disp_delta;
 		//if(height_disp < -50.0f) height_disp = -50.0f;
-		if (character && character->get_locomotion_ct())
-			character->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
 	}
 	if(Fl::event_key('k'))
 	{
@@ -1746,20 +1742,11 @@ void FltkViewer::translate_keyboard_state()
 
 	if(Fl::event_key('l'))
 	{
-		if(character->get_locomotion_ct()->is_freezed())
-			strcat(cmd, "unfreeze");
-		else strcat(cmd, "freeze");
-		mcu.execute(cmd);
 		return;
 	}
 
 	if(Fl::event_key('p'))
 	{
-		if(character->get_locomotion_ct()->is_freezed())
-		{
-			strcat(cmd, "nextframe");
-			mcu.execute(cmd);
-		}
 		return;
 	}
 
@@ -4054,17 +4041,7 @@ void FltkViewer::drawLocomotion()
 		SrVec arrow_end;
 		if(_data->showvelocity)
 		{
-			if(character->get_locomotion_ct()->get_limb_list()->size() > character->get_locomotion_ct()->get_dominant_limb_index())
-			{
-				SrVec velocity = character->get_locomotion_ct()->get_navigator()->get_global_velocity();
-				velocity.normalize();
-				velocity *= character->get_locomotion_ct()->get_current_speed()/2.0f;
-				float default_speed = character->get_locomotion_ct()->get_limb_list()->get(character->get_locomotion_ct()->get_dominant_limb_index())->blended_anim.global_info->speed/2.0f;
-				arrow_end = arrow_start + velocity;
-				SrVec color(0.1f, 0.3f, 1.0f);
-				drawArrow(arrow_start, arrow_end, 15, color);
-				drawCircle(arrow_start.x, arrow_start.y, arrow_start.z, default_speed, 72, color);
-			}
+			
 		}
 		if(_data->showselection)
 		{
@@ -4077,84 +4054,17 @@ void FltkViewer::drawLocomotion()
 				arrow_end = arrow_start;
 				arrow_end.y += height - base_height;
 				arrow_start.y += height - base_height + 30.0f * character->getHeight() / 200.0f;
-				if(character->get_locomotion_ct()->is_enabled())
-				{
-					if(character->get_locomotion_ct()->get_limb_list()->get(0)->walking_list.size() < 2)
-					{
-						color.set(1.0f, 1.0f, 0.0f);
-					}
-					else color.set(0.0f, 1.0f, 0.2f);
-				}
-				else color.set(1.0f, 0.0f, 0.0f);
+				color.set(1.0f, 0.0f, 0.0f);
 				drawActiveArrow(arrow_start, arrow_end, 3, 10.0f, color, false);
 			}
 		}
 		if(_data->showkinematicfootprints)
 		{
-			//int cur_dominant = character->get_locomotion_ct()->get_dominant_limb_index();
-			//if(i == char_index && character->get_locomotion_ct()->limb_list.size()>cur_dominant)
-			if(counter == _locoData->char_index)
-			{
-				//if(cur_dominant != pre_dominant && character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time >= 0.0f
-				//	&& character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time < 1.0f)
-				for(int k = 0; k < character->get_locomotion_ct()->limb_list.size();++k)
-				{
-					SrMat mat;
-					mat.rot(SrVec(0,1,0), character->get_locomotion_ct()->limb_list.get(k)->curr_rotation+character->get_locomotion_ct()->get_navigator()->get_orientation_angle());
-					SrVec orientation = SrVec(0,0,1)*mat;
-					SrVec normal;
-					bool newprint = true;
-					float off_height = 0.0f;
-					int j = 0;
-					//printf("\n");
-					for(int j = 0; j < 3; ++j)
-					{
-						off_height = character->get_locomotion_ct()->limb_list.get(k)->get_off_ground_height(j+2);
-						if(character->get_locomotion_ct()->limb_list.get(0)->walking_list.size() < 2) off_height -= _locoData->off_height_comp;
-						//printf("%f ", off_height);
-						if(off_height > 0.0f) continue;
-						SrVec pos = character->get_locomotion_ct()->get_supporting_joint_pos(j, k, &orientation, &normal);
-						pos.y += 0.1f;
-						SrVec color(.2f, (float) k, (float) 1-k);
-						newPrints(newprint, j, pos, orientation, normal, color, k, 0);
-						newprint = false;
-					}
-					//pre_dominant = k;
-				}
-				drawKinematicFootprints(0);
-			}
+			
 		}
 		if(_data->showlocofootprints)
 		{
-			int cur_dominant = character->get_locomotion_ct()->get_dominant_limb_index();
-			if (counter == _locoData->char_index && character->get_locomotion_ct()->limb_list.size()>cur_dominant)
-			{
-				if(cur_dominant != pre_dominant && character->get_locomotion_ct()->limb_list.get(cur_dominant)->get_space_time() >= 0.0f
-					&& character->get_locomotion_ct()->limb_list.get(cur_dominant)->get_space_time() < 1.0f)
-				{
-					SrMat mat;
-					mat.rot(SrVec(0,1,0), character->get_locomotion_ct()->limb_list.get(cur_dominant)->curr_rotation+character->get_locomotion_ct()->get_navigator()->get_orientation_angle());
-					SrVec orientation = SrVec(0,0,1)*mat;
-					SrVec normal;
-					bool newprint = true;
-					//float off_height = 0.0f;
-					//int j = 0;
-					//printf("\n");
-					for(int j = 0; j < 3; ++j)
-					{
-						//off_height = character->get_locomotion_ct()->limb_list.get(cur_dominant)->get_off_ground_height(j+2);
-						//printf("%f ", off_height);
-						//if(off_height > 0.0f) continue;
-						SrVec pos = character->get_locomotion_ct()->get_supporting_joint_pos(j, cur_dominant, &orientation, &normal);
-						pos.y += 0.1f;
-						SrVec color(0.0f, (float) cur_dominant*0.3f, (float)(1-cur_dominant)*0.3f);
-						newPrints(newprint, j, pos, orientation, normal, color,  cur_dominant, 1);
-						newprint = false;
-					}
-					pre_dominant = cur_dominant;
-				}
-				drawKinematicFootprints(1);
-			}
+		
 		}
 		if (_data->showtrajectory)
 		{

@@ -73,10 +73,6 @@ SBController* createController(std::string controllerType, std::string controlle
 	{
 		controller = new MeCtFace();
 	}
-	else if (controllerType == "locomotion")
-	{
-		controller = new MeCtLocomotion();
-	}
 	else if (controllerType == "paramanimation")
 	{
 		controller = new MeCtParamAnimation();

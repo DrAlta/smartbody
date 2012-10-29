@@ -24,7 +24,6 @@
 #define BML_LOCOMOTION_HPP
 
 #include "bml.hpp"
-#include "controllers/me_ct_navigation_circle.hpp"
 
 #define BML_LOCOMOTION_TARGET_TYPE_UNKNOWN -1
 #define BML_LOCOMOTION_TARGET_TYPE_TARGET 0 

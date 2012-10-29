@@ -1,4 +1,4 @@
-
+#include <vhcl.h>
 #include "RootWindow.h"
 
 #include <FL/Fl_Pack.H>
@@ -422,7 +422,7 @@ void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )
 {
 	// run the speech relay launcher script
 #ifdef WIN32
-	system("start ..\\..\\..\\..\\core\\TtsRelay\\bin\\x86\\Release\\TtsRelayGui.exe");
+	system("start ..\\..\\..\\..\\bin\\TtsRelay\\bin\\x86\\Release\\TtsRelayGui.exe");
 #else
 	system("../../../../core/FestivalRelay/speechrelay.sh&");
 #endif

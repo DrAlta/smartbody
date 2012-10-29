@@ -132,11 +132,11 @@ void VisemeViewerWindow::update()
 		return;
 
 	const std::string& voice = character->getVoice();
-	if (voice == "audiofile" && _useRemote)
+	if (voice == "audiofile")
 	{
 		setUseRemote(false);
 	}
-	if (voice == "remote" && !_useRemote)
+	if (voice == "remote")
 	{
 		setUseRemote(true);
 	}

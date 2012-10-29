@@ -1631,6 +1631,7 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p
 		LOG("No pawn named '%s' found, mesh from '%s' not loaded.", pawnName, obj_file);
 		return CMD_FAILURE;
 	}
+
 	// Here, detect which type of file it is
 	std::string ext = boost::filesystem2::extension(obj_file);
 	std::string file = boost::filesystem::basename(obj_file);	
@@ -2280,8 +2281,6 @@ int mcu_character_init(
 
 	err = char_p->init( skeleton_p, faceDefinition, &mcu_p->param_map, className );
 	if( err == CMD_SUCCESS ) {
-
-		char_p->locomotion_ct->init_skeleton(skeleton_p, skeleton_p);
 
 		char_p->ct_tree_p->set_evaluation_logger( mcu_p->logger_p );
 	}

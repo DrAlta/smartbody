@@ -55,16 +55,6 @@
 #include <sb/SBFaceDefinition.h>
 #define MeCtSchedulerClass MeCtScheduler2
 
-#if(1) // Use primary locomotion controller
-#include "controllers/me_ct_navigation_circle.hpp"
-#include "controllers/me_ct_locomotion.hpp"
-#define  MeCtLocomotionClass MeCtLocomotion
-#else
-// "Ghost-walking" implementation, useful for test just the navigation code
-#include "controllers/me_ct_locomotion_simple.hpp"
-#define MeCtLocomotionClass MeCtLocomotionSimple
-#endif
-
 #include "sr_path_list.h"
 
 #include "sbm_pawn.hpp"
@@ -116,7 +106,6 @@ public:
 
 public:
 	// Static Constants
-	MeCtLocomotionClass* locomotion_ct;
 	GeneralParamMap*   param_map;
 
 protected:
@@ -339,15 +328,6 @@ public:
 	 *  Handles commands beginning with "print character <character id> ...".
 	 */
 	static int print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-
-	//temp command process.............................
-	bool is_locomotion_controller_initialized();
-	bool is_locomotion_controller_enabled();
-	void locomotion_reset();
-	void locomotion_set_turning_speed(float radians);
-	void locomotion_set_turning_mode(int mode);
-	void locomotion_ik_enable(bool enable);
-	MeCtLocomotionClass* get_locomotion_ct();
 
 public:
 	static SkMotion* findTagSkMotion(int tag, const MotionDataSet& motionSet);

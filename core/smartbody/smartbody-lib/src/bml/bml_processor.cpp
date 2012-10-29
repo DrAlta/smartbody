@@ -384,7 +384,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 						string speechKey = buildSpeechKey( request->actor, speech_request->speech_request_id );
 						bool insert_success = speeches.insert( make_pair( speechKey, speech_request ) ).second;  // store for later reply
 						if( !insert_success ) {
-							LOG("ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speehces already contains an entry for speechKey \"%s\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur. Let Andrew know immeidately.)", speechKey.c_str());
+							LOG("ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speeches already contains an entry for speechKey \"%s\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur..)", speechKey.c_str());
 							// TODO: Send vrSpeakFailed
 						}
 
