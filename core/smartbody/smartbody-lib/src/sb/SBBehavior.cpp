@@ -108,6 +108,7 @@ const std::string& GazeBehavior::getHandle()
 LocomotionBehavior::LocomotionBehavior()
 {
 	_type = "locomotion";
+	_reachTarget = false;
 }
 
 LocomotionBehavior::~LocomotionBehavior()
@@ -122,6 +123,16 @@ void LocomotionBehavior::setLocomotionTarget(const SrVec& target)
 const SrVec& LocomotionBehavior::getLocomotionTarget()
 {
 	return _target;
+}
+
+void LocomotionBehavior::setReachTarget(bool v)
+{
+	_reachTarget = v;
+}
+
+bool LocomotionBehavior::getReachTarget()
+{
+	return _reachTarget;
 }
 
 PostureBehavior::PostureBehavior()

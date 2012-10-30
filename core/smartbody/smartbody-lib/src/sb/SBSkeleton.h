@@ -28,6 +28,7 @@ public:
 	SBJoint* getJoint(int index);		
 	SBJoint* getJointByName(const std::string& jointName);
 	std::vector<std::string> getJointNames();
+	std::vector<std::string> getUpperBodyJointNames();
 
 	int getNumChannels();
 	std::string getChannelType(int index);

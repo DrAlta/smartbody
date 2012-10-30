@@ -440,7 +440,9 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 		Util::Point goalTarget = goal.targetLocation;
 		LocomotionBehavior* locoBehavior = new LocomotionBehavior();
 		SrVec target(goalTarget.x, 0.f, goalTarget.z);
+		bool reachTarget = _reachTarget && !_lastReachStatus;
 		locoBehavior->setLocomotionTarget(target);
+		locoBehavior->setReachTarget(reachTarget);
 		_curBehaviors.push_back(locoBehavior);
 	}
 

@@ -72,10 +72,12 @@ class LocomotionBehavior : public SBBehavior
 
 		virtual void setLocomotionTarget(const SrVec& target);
 		virtual const SrVec& getLocomotionTarget();
+		void setReachTarget(bool v);
+		bool getReachTarget();
 
 	protected:
 		SrVec _target;
-
+		bool _reachTarget;
 
 };
 

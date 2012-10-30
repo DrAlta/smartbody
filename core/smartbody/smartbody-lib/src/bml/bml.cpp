@@ -1229,7 +1229,25 @@ void GestureRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		}
 		vhcl::Tokenize(joints, jointVec);
 		SkMotion* holdM = motion->buildPoststrokeHoldMotion((float)holdTime, jointVec, scale, freq, NULL);
-		motion_ct->init(const_cast<SbmCharacter*>(request->actor), holdM, 0.0, 1.0);
+		SBCharacter* sbCharacter = dynamic_cast<SBCharacter*>(request->actor);
+		bool isInLocomotion = false;
+		if (sbCharacter->steeringAgent)
+		{
+			for (size_t i = 0; i < request->behaviors.size(); ++i)
+			{
+				if ((request->behaviors)[i]->local_id == "locomotion")
+				{
+					isInLocomotion = true;
+					break;
+				}
+			}
+			if (sbCharacter->steeringAgent->isInLocomotion())
+				isInLocomotion = true;
+		}
+		if (isInLocomotion)
+			motion_ct->init( const_cast<SbmCharacter*>(request->actor), holdM, sbCharacter->getSkeleton()->getUpperBodyJointNames());
+		else
+			motion_ct->init(const_cast<SbmCharacter*>(request->actor), holdM, 0.0, 1.0);
 		BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController(motion_ct);
 		set_scheduler(scheduler);
 	}

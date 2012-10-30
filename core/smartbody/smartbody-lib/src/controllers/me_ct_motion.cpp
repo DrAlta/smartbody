@@ -92,6 +92,12 @@ void MeCtMotion::init (SbmPawn* pawn, SkMotion* m_p ) {
 	init(pawn, m_p, 0.0, 1.0 );
 }
 
+void MeCtMotion::init(SbmPawn* pawn, SkMotion* m_p, std::vector<std::string>& joints)
+{
+	_joints = joints;
+	init(pawn, m_p, 0.0, 1.0);
+}
+
 #if 0
 void MeCtMotion::init ( MeCtMotion* other ) {
 	clone_parameters( other );
@@ -245,12 +251,10 @@ bool MeCtMotion::input ( SrInput& inp, const SrHashTable<SkMotion*>& motions ) {
 }
 
 //----- virtuals -----
-
 void MeCtMotion::controller_map_updated() {
 	// Map motion channel index to context float buffer index
 	SkChannelArray& mChannels = _motion->channels();
-	const int size = mChannels.size();
-
+	int size = mChannels.size();
 	_mChan_to_buff.size( size );
 
 	if( _context ) {
@@ -263,14 +267,37 @@ void MeCtMotion::controller_map_updated() {
 		int world_offset_ch_q = cChannels.search( SkJointName("world_offset"), SkChannel::Quat );
 //		LOG( "world_offset_ch_x: %d\n", world_offset_ch_x );
 #endif
-
-		for( int i=0; i<size; ++i ) {
-			int chanIndex = cChannels.search( mChannels.name(i), mChannels.type(i) );
-			_mChan_to_buff[ i ] = _context->toBufferIndex( chanIndex );
+		if (_joints.empty())
+		{
+			for( int i=0; i<size; ++i ) 
+			{
+				int chanIndex = cChannels.search( mChannels.name(i), mChannels.type(i) );
+				_mChan_to_buff[ i ] = _context->toBufferIndex( chanIndex );
+			}
 		}
+		else
+		{
+			for (size_t i = 0; i < _joints.size(); ++i)
+			{
+				int motionChannelId = mChannels.search(_joints[i], SkChannel::Quat);
+				if (motionChannelId >= 0)
+				{
+					int chanIndex = cChannels.search(mChannels.name(motionChannelId), mChannels.type(motionChannelId));
+					if (chanIndex >= 0)
+						_mChan_to_buff[motionChannelId] = _context->toBufferIndex(chanIndex);
+				}
+			}
+		}
+
 	} else {
 		_mChan_to_buff.setall( -1 );
 	}
+}
+
+
+void MeCtMotion::controller_start ()
+{
+
 }
 
 bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
