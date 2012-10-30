@@ -970,7 +970,9 @@
     <ClCompile Include="..\src\controllers\me_ct_locomotion_func.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\controllers\MotionAnalysis.cpp" />
+    <ClCompile Include="..\src\controllers\MotionAnalysis.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -1984,7 +1986,9 @@
     <ClInclude Include="..\src\controllers\me_ct_locomotion_func.hpp">
       <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\controllers\MotionAnalysis.h" />
+    <ClInclude Include="..\src\controllers\MotionAnalysis.h">
+      <Filter>controllers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag">

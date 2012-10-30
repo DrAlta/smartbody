@@ -19,40 +19,33 @@ SBGestureMapManager::~SBGestureMapManager()
 	_gestureMaps.clear();
 }
 
-SBGestureMap* SBGestureMapManager::createGestureMap(std::string characterName)
+SBGestureMap* SBGestureMapManager::createGestureMap(std::string gestureName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SBScene* scene = mcu._scene;
-	// get the character
-	SBCharacter* character = scene->getCharacter(characterName);
-	if (!character)
-	{
-		LOG("Character named %s does not exist.", characterName.c_str());
-		return NULL;
-	}
 
-	std::map<std::string, SBGestureMap*>::iterator iter = _gestureMaps.find(characterName);
+	std::map<std::string, SBGestureMap*>::iterator iter = _gestureMaps.find(gestureName);
 	if (iter != _gestureMaps.end())
 	{
 		delete iter->second;
 		_gestureMaps.erase(iter);
 	}
 	
-	SBGestureMap* map = new SBGestureMap(character);
-	_gestureMaps.insert(std::make_pair(characterName, map));
+	SBGestureMap* map = new SBGestureMap(gestureName);
+	_gestureMaps.insert(std::make_pair(gestureName, map));
 	return map;
 }
 
-void SBGestureMapManager::removeGestureMap(std::string characterName)
+void SBGestureMapManager::removeGestureMap(std::string gestureName)
 {
-	std::map<std::string, SBGestureMap*>::iterator iter = _gestureMaps.find(characterName);
+	std::map<std::string, SBGestureMap*>::iterator iter = _gestureMaps.find(gestureName);
 	if (iter != _gestureMaps.end())
 	{
 		delete iter->second;
 		_gestureMaps.erase(iter);
 	}
 	else
-		LOG("Character %s doesn't has gesture map!", characterName.c_str());
+		LOG("Gesture map %s doesn't exist!", gestureName.c_str());
 }
 
 int SBGestureMapManager::getNumGestureMaps()
@@ -60,9 +53,24 @@ int SBGestureMapManager::getNumGestureMaps()
 	return _gestureMaps.size();
 }
 
-SBGestureMap* SBGestureMapManager::getGestureMap(std::string characterName)
+std::vector<std::string>& SBGestureMapManager::getGestureMapNames()
 {
-	std::map<std::string, SBGestureMap*>::iterator iter = _gestureMaps.find(characterName);
+	std::vector<std::string> gestureMapNames;
+	for (std::map<std::string, SBGestureMap*>::iterator iter = _gestureMaps.begin();
+		 iter != _gestureMaps.end();
+		 iter++)
+	{
+		gestureMapNames.push_back((*iter).first);
+	}
+
+	return gestureMapNames;
+}
+
+
+
+SBGestureMap* SBGestureMapManager::getGestureMap(std::string gestureName)
+{
+	std::map<std::string, SBGestureMap*>::iterator iter = _gestureMaps.find(gestureName);
 	if (iter != _gestureMaps.end())
 	{
 		return (*iter).second;

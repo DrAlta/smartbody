@@ -3,6 +3,8 @@
 
 #include <string>
 #include <map>
+#include <vector>
+
 namespace SmartBody {
 
 class SBGestureMap;
@@ -13,10 +15,11 @@ class SBGestureMapManager
 		SBGestureMapManager();
 		~SBGestureMapManager();
 
-		SBGestureMap* createGestureMap(std::string characterName);
-		void removeGestureMap(std::string characterName);
+		SBGestureMap* createGestureMap(std::string gestureName);
+		void removeGestureMap(std::string gestureName);
 		int getNumGestureMaps();
-		SBGestureMap* getGestureMap(std::string characterName);
+		std::vector<std::string>& getGestureMapNames();
+		SBGestureMap* getGestureMap(std::string gestureName);
 
 	protected:
 		std::map<std::string, SBGestureMap*> _gestureMaps;
