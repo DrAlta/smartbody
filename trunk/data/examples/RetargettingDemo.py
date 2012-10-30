@@ -18,12 +18,6 @@ scene.run('default-viewer.py')
 camera = getCamera()
 camera.setEye(0, 188.56, 241.41)
 camera.setCenter(0, 114.56, 56.41)
-camera.setUpVector(SrVec(0, 1, 0))
-camera.setScale(1)
-camera.setFov(1.0472)
-camera.setFarPlane(10000)
-camera.setNearPlane(1)
-camera.setAspectRatio(1.02632)
 
 # Add Character script
 scene.run('AddCharacter.py')
@@ -34,6 +28,9 @@ setPos('utah', SrVec(-50, 0, 0))
 # .dae
 addCharacter('brad', 'brad')
 setPos('brad', SrVec(50, 102, 0))
+
+# Set camera position
+setPawnPos('camera', SrVec(0, -50, 0))
 
 # Add Retargetting script
 scene.run('Retargetting.py')
@@ -47,7 +44,7 @@ if output == '':
 last = 0
 canTime = True
 delay = 5
-class Retargetting(SBScript):
+class RetargettingDemo(SBScript):
 	def update(self, time):
 		global canTime, last, output
 		if canTime:
@@ -74,6 +71,6 @@ class Retargetting(SBScript):
 			diff = 0
 			#setPos('brad', SrVec(50, -102, 0))
 		'''
-scene.removeScript('retargetting')
-retargetting = Retargetting()
-scene.addScript('retargetting', retargetting)
+scene.removeScript('retargettingdemo')
+retargettingdemo = RetargettingDemo()
+scene.addScript('retargettingdemo', retargettingdemo)

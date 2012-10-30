@@ -14,10 +14,10 @@ def setupPawnPhysics(chr):
 def setupCharacterPhysics(chr):
 	''' Name of character to set up physics for '''
 	# Retrieve physics manager and create physics character
-	phyManager.createPhysicsCharacter(chr)		
+	phyManager.createPhysicsCharacter(chr)
 	
 	jointName = 'base'
-	# Get corresponding body link 
+	# Get corresponding body link
 	phyBodyLink = phyManager.getJointObj(chr, jointName)
 	# Sets collision geometry
 	phyBodyLink.setStringAttribute('geomType', 'capsule')

@@ -1,5 +1,4 @@
 import random
-
 print "|--------------------------------------------|"
 print "|        Starting Physics Pawn Demo          |"
 print "|--------------------------------------------|"
@@ -19,17 +18,11 @@ scene.run('default-viewer.py')
 camera = getCamera()
 camera.setEye(0, 409.62, 733.74)
 camera.setCenter(0, 335.62, 548.74)
-camera.setUpVector(SrVec(0, 1, 0))
-camera.setScale(1)
-camera.setFov(1.0472)
-camera.setFarPlane(10000)
-camera.setNearPlane(1)
-camera.setAspectRatio(1.02632)
-
-#scene.getSimulationManager().setSimFps(60)
 
 # Add Character script
 scene.run('AddCharacter.py')
+
+# Set up pawns in scene
 numPawns = 50
 for i in range(numPawns):
 	baseName = 'phy%s' % i
@@ -37,10 +30,14 @@ for i in range(numPawns):
 	size = random.randrange(5, 30)
 	addPawn(baseName, random.choice(shapeList), SrVec(size, size, size))
 
+# Append all pawn to list
 pawnList = []
 for name in scene.getPawnNames():
 	if 'phy' in name:
 		pawnList.append(scene.getPawn(name))
+		
+# Set camera position
+setPawnPos('camera', SrVec(0, -50, 0))
 
 # Add Physics script
 scene.run('Physics.py')
@@ -63,16 +60,14 @@ class PhysicsPawnDemo(SBScript):
 		if diff >= delay:
 			diff = 0
 			canTime = True
-		if canTime and not started:
-			#for pawn in pawnList:
-				#togglePawnPhysics(pawn.getName())
-			started = True
+		# When time's up, do action
 		if canTime:
 			for pawn in pawnList:
 				togglePawnPhysics(pawn.getName())
 			randomizePos()
 
 size = 150
+# Randomize position and rotation
 def randomizePos():
 	for pawn in pawnList:
 		x = random.uniform(-size, size) + 1
