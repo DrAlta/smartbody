@@ -1,4 +1,3 @@
-import time
 print "|--------------------------------------------|"
 print "|         Starting Locomotion Demo           |"
 print "|--------------------------------------------|"
@@ -16,68 +15,110 @@ scene.addAssetPath('audio', '../../../../data/Resources/audio')
 # Runs the default viewer for camera
 scene.run('default-viewer.py')
 camera = getCamera()
-camera.setEye(0, 1315.49, 1673.26)
-camera.setCenter(0, 1189.21, 1519.14)
-camera.setUpVector(SrVec(0, 1, 0))
-camera.setScale(1)
-camera.setFov(1.0472)
-camera.setFarPlane(10000)
-camera.setNearPlane(1)
-camera.setAspectRatio(1.02632)
+camera.setEye(0, 1747.61, 2099.39)
+camera.setCenter(0, 1621.33, 1945.27)
 
 # Add Character script
 scene.run('AddCharacter.py')
 # Add characters in scene
-addCharacter('brad', 'brad')
-setPos('brad', SrVec(-35, 102, 0))
-addCharacter('elder', 'elder')
-setPos('elder', SrVec(-135, 102, 0))
+addMultipleCharacters('utah', 'utah', 8)
+addMultipleCharacters('doctor', 'doctor', 8)
+addMultipleCharacters('elder', 'elder', 8)
+addMultipleCharacters('brad', 'brad', 8)
 
-# Add pawns
-addPawn('pawn0', 'sphere')
-scene.getPawn('pawn0').setPosition(SrVec(800, 10, 800))
-addPawn('pawn1', 'box')
-scene.getPawn('pawn1').setPosition(SrVec(-800, 10, -800))
+# Add pawns in scene
+addPawn('pawn0', 'sphere', SrVec(1, 1, 1))
+addPawn('pawn1', 'box', SrVec(1, 1, 1))
+setPawnPos('pawn0', SrVec(-1000, 0, -1000))
+setPawnPos('pawn1', SrVec(-200, 0, 1000))
+# Pawns work in x, y, z, Locomotion works in x, y
+
+# Set camera position
+setPawnPos('camera', SrVec(0, -50, 0))
+
+# Set up list of Utahs and Doctors
+utahList = []
+doctorList = []
+elderList = []
+bradList = []
+for name in scene.getCharacterNames():
+	if 'utah' in name:
+		utahList.append(scene.getCharacter(name))
+	if 'doctor' in name:
+		doctorList.append(scene.getCharacter(name))
+	if 'elder' in name:
+		elderList.append(scene.getCharacter(name))
+	if 'brad' in name:
+		bradList.append(scene.getCharacter(name))
 
 # Add Locomotion script
 scene.run('Locomotion.py')
 
 # Whether character has reached its target
+utahReached = True
+doctorReached = True
 bradReached = True
-elderReached = True
+elderReached  = True
 
-# Point A and B and current waypoint for elder
-elderWaypoints = [SrVec(-500, -500, 0), SrVec(-500, 500, 0)]
-cur = 0
+# Paths for characters
+utahPath = [SrVec(-1000, 1000, 0), SrVec(-200, -1000, 0), scene.getPawn('pawn1'), scene.getPawn('pawn0')]
+doctorPath = [SrVec(1000, 1000, 0), SrVec(200, -1000, 0), SrVec(200, 1000, 0), SrVec(1000, -1000, 0)]
+bradPath = list(utahPath)
+bradPath.reverse()
+elderPath = list(doctorPath)
+elderPath.reverse()
+doctorCur = elderCur = 0
+pathAmt = len(doctorPath)
 
-# Mixed vector list for pathfinding function
-vecList = [scene.getPawn('pawn1'), SrVec(-500, 0, 0), scene.getPawn('pawn0'), SrVec(1000, -500, 0), SrVec(-700, -700, 0), SrVec(0, 500, 0)]
-
-class Locomotion(SBScript):
+class LocomotionDemo(SBScript):
 	def update(self, time):
-		global bradReached, elderReached, cur
+		global utahReached, doctorReached, bradReached, elderReached, doctorCur, elderCur
+		# Once utah completes path, do again
+		if utahReached:
+			for utah in utahList:
+				followPath(utah.getName(), utahPath)
+			utahReached = False
+		# Once doctor reaches 1 waypoint, move to next
+		if doctorReached:
+			for doctor in doctorList:
+				move(doctor.getName(), doctorPath[doctorCur])
+			doctorCur = doctorCur + 1
+			# If reaches max path, reset
+			if doctorCur >= pathAmt:
+				doctorCur = 0
+			doctorReached = False
+		# Once brad completes path, do again
 		if bradReached:
-			followPath('brad', vecList)
+			for brad in bradList:
+				followPath(brad.getName(), bradPath)
 			bradReached = False
+		# Once elder reaches 1 waypoint, move to next
 		if elderReached:
-			move('elder', elderWaypoints[cur])
-			if cur == 0: cur = 1
-			elif cur == 1: cur = 0
+			for elder in elderList:
+				move(elder.getName(), elderPath[elderCur])
+			elderCur = elderCur + 1
+			if elderCur >= pathAmt:
+				elderCur = 0
 			elderReached = False
 			
 # Run the update script
-scene.removeScript('locomotion')
-locomotion = Locomotion()
-scene.addScript('locomotion', locomotion)
+scene.removeScript('locomotiondemo')
+locomotiondemo = LocomotionDemo()
+scene.addScript('locomotiondemo', locomotiondemo)
 
+# Locomotion handler to check if characters have arrived
 class LocomotionHandler(EventHandler):
 	def executeAction(self, ev):
-		global bradReached, elderReached
+		global utahReached, doctorReached, bradReached, elderReached
 		params = ev.getParameters()
 		if 'success' in params:
-			if 'brad' in params:
+			if 'utah0' in params:
+				utahReached = True
+			if 'doctor0' in params:
+				doctorReached = True
+			if 'brad0' in params:
 				bradReached = True
-			if 'elder' in params:
+			if 'elder0' in params:
 				elderReached = True
 
 locomotionHdl = LocomotionHandler()

@@ -27,7 +27,7 @@ def followPath(chrName, waypoints, manner='run'):
 			targets = targets + x + ' ' + y + ' '
 		if type(waypoint) is SBCharacter or type(waypoint) is SBPawn:
 			targets = targets + waypoint.getName() + ' '
-	print targets
+	#print targets
 	bml.execBML(chrName, '<locomotion manner="' + manner + '" target="' + targets + '"/>')
 
 def printVector(vec, text=''):

@@ -1,5 +1,4 @@
 import random
-
 print "|--------------------------------------------|"
 print "|          Starting Physics Demo             |"
 print "|--------------------------------------------|"
@@ -19,13 +18,8 @@ scene.run('default-viewer.py')
 camera = getCamera()
 camera.setEye(-9, 255, 417)
 camera.setCenter(-9, 182, 232)
-camera.setUpVector(SrVec(0, 1, 0))
-camera.setScale(1)
-camera.setFov(1.0472)
-camera.setFarPlane(10000)
-camera.setNearPlane(1)
-camera.setAspectRatio(1.02632)
 
+# Set simulation fps
 scene.getSimulationManager().setSimFps(60)
 
 # Add Character script
@@ -42,10 +36,9 @@ addCharacter('brad2', 'brad', True)
 setPos('brad2', SrVec(135, 102, 0))
 setFacing('brad2', -90)
 
-addPawn('constraint1', 'sphere')
-scene.getPawn('constraint1').setPosition(SrVec(-150, 240, 20))
-
 # Add pawns in scene
+addPawn('constraint1', 'sphere', SrVec(1, 1, 1))
+scene.getPawn('constraint1').setPosition(SrVec(-150, 240, 20))
 addPawn('phy1', 'sphere')
 scene.getPawn('phy1').setPosition(SrVec(-75, 150, 20))
 
@@ -58,6 +51,9 @@ setPawnPos('target1', SrVec(75, 150, 10))
 setPawnPos('target2', SrVec(75, 150, -10))
 setPawnPos('target3', SrVec(135, 150, 10))
 setPawnPos('target4', SrVec(135, 150, -10))
+
+# Set camera position
+setPawnPos('camera', SrVec(0, -50, 0))
 
 # Add Gaze script
 scene.run('Gaze.py')
@@ -75,7 +71,7 @@ constrainChr('doctor', 'r_wrist')
 constrainChr('doctor', 'l_wrist')
 constrainChr('doctor', 'r_ankle')
 constrainChr('doctor', 'l_ankle')
-# brad2 physics and constraints
+# Brad2 physics and constraints
 setupCharacterPhysics('brad2')
 constrainChr('brad2', 'spine1')
 constrainChr('brad2', 'r_wrist')
@@ -85,17 +81,18 @@ constrainChr('brad2', 'l_ankle')
 # Elder physics and contraints
 setupCharacterPhysics('elder')
 constrainChr('elder', 'spine1')
+constrainChr('elder', 'l_wrist')
+constrainChr('elder', 'r_wrist')
 constrainChr('elder', 'l_ankle')
 constrainChr('elder', 'r_ankle')
-
+# Setup pawn physics
 setupPawnPhysics('phy1')
 
 bradX = -150
 bradCur = -1
 curZ = 20
 curX = -75
-amountZ = -1
-amountX = -1
+amountZ = amountX = -1
 speed = 0.2
 last = 0
 canTime = True
@@ -122,14 +119,12 @@ class PhysicsDemo(SBScript):
 			togglePawnPhysics('phy1')
 			setPawnPos('phy1', SrVec(-75, 150, 20))
 			# Do gaze for elder
-			gaze('elder', 'phy1')
 			bml.execBML('brad', '<body posture="Walk"/>')
 		# If time's up, do action
 		if canTime:
 			bml.execBML('brad', '<head repeats="5" velocity="0.75" type="SHAKE"/>')
 			boxingLogic()
-			
-		# Elder
+		# Elder pawn
 		setPawnPos('phy1', SrVec(curX, 150, curZ))
 		curX = curX + speed * amountX
 		curZ = curZ + speed * amountZ
@@ -137,15 +132,17 @@ class PhysicsDemo(SBScript):
 		if curX > -60: amountX = -1
 		if curZ < 9: amountZ = 1
 		if curZ > 20: amountZ = -1
-		# Brad
+		# Brad pawn
 		setPawnPos('constraint1', SrVec(bradX, 240, 20))
 		bradX = bradX + speed * bradCur
 		if bradX < -170: bradCur = 1
 		if bradX > -130: bradCur = -1
-		
+	
+# Current turn
 currentTurn = 'brad2'		
 def boxingLogic():
 	global currentTurn
+	# Brad's turn, toggle physics and play reach
 	if currentTurn == 'brad2':
 		togglePhysics('brad2', 'off')
 		togglePhysics('doctor', 'on')
@@ -159,6 +156,7 @@ def boxingLogic():
 			togglePhysics('doctor', 'off')
 			bml.execBML('doctor', '<animation name="ChrUtah_Relax001_CrouchProtectHead_right"/>')
 		currentTurn = 'doctor'
+	# Doctor's turn, toggle physics and play reach
 	elif currentTurn == 'doctor':
 		togglePhysics('doctor', 'off')
 		togglePhysics('brad2', 'on')
@@ -172,6 +170,33 @@ def boxingLogic():
 			togglePhysics('brad2', 'off')
 			bml.execBML('brad2', '<animation name="ChrUtah_Relax001_CrouchProtectHead_right"/>')
 		currentTurn = 'brad2'
+		
+class CollisionHandler(EventHandler):
+	def executeAction(self, ev):
+		params = ev.getParameters()
+		list = params.split()
+		# Elder collision
+		if list[1] == 'elder':
+			if list[2] == 'phy1':
+				#print '%s collided with %s' % (list[1], list[2])
+				gaze('elder', 'phy1', 300)
+				stopGaze('elder', 2, 300)
+		# Doctor doesn't get collision events for some reason
+		if list[1] == 'brad2':
+			# Brad hits doctor
+			if 'wrist' in list[2] and currentTurn == 'doctor':
+				target = list[3] + ' ' + list[4] + ' ' + list[5]
+				gaze('doctor', target, 400)
+				stopGaze('doctor', 1.5, 300)
+			# Doctor hits brad
+			elif '_' in list[2] and currentTurn == 'brad2':
+				target = list[3] + ' ' + list[4] + ' ' + list[5]
+				gaze('brad2', target, 400)
+				stopGaze('brad2', 1.5, 300)
+				
+collisionHdl = CollisionHandler()
+evtMgr = scene.getEventManager()
+evtMgr.addEventHandler('collision', collisionHdl)
 			
 # Run the update script
 scene.removeScript('physicsdemo')

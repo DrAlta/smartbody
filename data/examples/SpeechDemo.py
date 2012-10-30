@@ -18,18 +18,15 @@ scene.run('default-viewer.py')
 camera = getCamera()
 camera.setEye(1, 144.70, 147.41)
 camera.setCenter(1, 137.54, 102.19)
-camera.setUpVector(SrVec(0, 1, 0))
-camera.setScale(1)
-camera.setFov(1.0472)
-camera.setFarPlane(10000)
-camera.setNearPlane(1)
-camera.setAspectRatio(1.02632)
 
 # Add Character script
 scene.run('AddCharacter.py')
 # Add characters in scene
 addCharacter('utah', 'utah')
 setPos('utah', SrVec(0, 0, 0))
+
+# Set camera position
+setPawnPos('camera', SrVec(0, -50, 0))
 
 # Add Speech script 
 scene.run('Speech.py')
@@ -40,6 +37,10 @@ scene.run('FacialMovements.py')
 # Add Gestures script
 scene.run('Gestures.py')
 initGestureMap()
+
+# Add Saccade script
+scene.run('Saccade.py')
+playSaccade('utah', 'talk')
 
 # Update to repeat reaches
 last = 0
@@ -73,6 +74,7 @@ sentenceList.append('How can you say that about my weight?')
 sentenceList.append('Free kittens are on the left side of the road')
 sentenceList.append('Sweet death is on the right side of the road')
 lastSentence = ''
+
 def speakRandomSentence():
 	global lastSentence
 	randomSentence = choice(sentenceList)
