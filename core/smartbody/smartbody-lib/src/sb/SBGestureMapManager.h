@@ -18,7 +18,7 @@ class SBGestureMapManager
 		SBGestureMap* createGestureMap(std::string gestureName);
 		void removeGestureMap(std::string gestureName);
 		int getNumGestureMaps();
-		std::vector<std::string>& getGestureMapNames();
+		std::vector<std::string> getGestureMapNames();
 		SBGestureMap* getGestureMap(std::string gestureName);
 
 	protected:

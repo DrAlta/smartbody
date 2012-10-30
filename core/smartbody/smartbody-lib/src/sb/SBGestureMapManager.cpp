@@ -53,7 +53,7 @@ int SBGestureMapManager::getNumGestureMaps()
 	return _gestureMaps.size();
 }
 
-std::vector<std::string>& SBGestureMapManager::getGestureMapNames()
+std::vector<std::string> SBGestureMapManager::getGestureMapNames()
 {
 	std::vector<std::string> gestureMapNames;
 	for (std::map<std::string, SBGestureMap*>::iterator iter = _gestureMaps.begin();
