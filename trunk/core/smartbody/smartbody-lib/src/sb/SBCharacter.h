@@ -57,7 +57,7 @@ class SBCharacter : public SbmCharacter
 		int getNumBehaviors();
 		SBBehavior* getBehavior(int num);
 		std::vector<SBBehavior*>& getBehaviors();
-
+		
 		double getLastScheduledSpeechBehavior();
 		std::string hasSpeechBehavior();
 

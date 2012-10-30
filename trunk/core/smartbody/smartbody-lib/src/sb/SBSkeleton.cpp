@@ -154,6 +154,22 @@ std::vector<std::string> SBSkeleton::getJointNames()
 	return jointNames;
 }
 
+std::vector<std::string> SBSkeleton::getUpperBodyJointNames()
+{
+	std::vector<std::string> jointNames;
+	SkJoint* spine1 = search_joint("spine1");
+	if (!spine1)
+	{
+		LOG("SBSkeleton::getUpperBodyJointNames WARNING: cannot find spine1");
+		return std::vector<std::string>();
+	}
+	std::vector<SkJoint*> alljoints;
+	SkJoint::recursive_children(alljoints, spine1);
+	for (size_t i = 0; i < alljoints.size(); ++i)
+		jointNames.push_back(alljoints[i]->name());
+
+	return jointNames;
+}
 
 SBJoint* SBSkeleton::getJoint(int index)
 {

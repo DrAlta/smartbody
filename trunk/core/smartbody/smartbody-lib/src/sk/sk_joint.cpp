@@ -308,7 +308,6 @@ void SkJoint::recursive_children(std::vector<SkJoint*>& joints, SkJoint* root)
 	joints.push_back(root);
 	for (int i = 0; i < root->num_children(); i++)
 	{
-		joints.push_back(root->child(i));
 		SkJoint::recursive_children(joints, root->child(i));
 	}
 }

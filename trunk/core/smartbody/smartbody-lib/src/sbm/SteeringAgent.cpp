@@ -1624,3 +1624,17 @@ void SteeringAgent::locomotionHalt()
 	goalList.clear();
 	steerPath.clearPath();
 }
+
+bool SteeringAgent::isInLocomotion()
+{
+	if (!character->param_animation_ct)
+		return false;
+	if (character->param_animation_ct->isIdle())
+		return false;
+	return true;
+}
+
+bool SteeringAgent::isHittingOnTarget()
+{
+	return (character->_reachTarget && !character->_lastReachStatus);
+}

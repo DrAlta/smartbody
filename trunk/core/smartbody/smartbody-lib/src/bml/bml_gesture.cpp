@@ -10,6 +10,7 @@
 #include "bml_xml_consts.hpp"
 #include <sb/SBGestureMap.h>
 #include <sb/SBGestureMapManager.h>
+#include <sb/SBBehavior.h>
 
 using namespace std;
 using namespace BML;
@@ -114,7 +115,25 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 			mForCt = mForCt->buildPoststrokeHoldMotion(poststrokehold, jointVec, scale, freq, postIdleMotion);
 		}
 		//motionCt->init(const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0);
-		motionCt->init( const_cast<SbmCharacter*>(request->actor), mForCt, 0.0, 1.0);
+		SBCharacter* sbCharacter = dynamic_cast<SBCharacter*>(request->actor);
+		bool isInLocomotion = false;
+		if (sbCharacter->steeringAgent)
+		{
+			for (size_t i = 0; i < request->behaviors.size(); ++i)
+			{
+				if ((request->behaviors)[i]->local_id == "locomotion")
+				{
+					isInLocomotion = true;
+					break;
+				}
+			}
+			if (sbCharacter->steeringAgent->isInLocomotion())
+				isInLocomotion = true;
+		}
+		if (isInLocomotion)
+			motionCt->init( const_cast<SbmCharacter*>(request->actor), mForCt, sbCharacter->getSkeleton()->getUpperBodyJointNames());
+		else
+			motionCt->init( const_cast<SbmCharacter*>(request->actor), mForCt, 0.0, 1.0);
 		BehaviorRequestPtr behavPtr(new GestureRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs, joints, scale, freq) );
 		return behavPtr; 
 	} 

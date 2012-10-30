@@ -58,6 +58,7 @@ class MeCtMotion : public SmartBody::SBController
     int                  _last_apply_frame; // to optimize shared motion evaluation
 	SrBuffer<int>        _mChan_to_buff; // motion's channels to context's buffer index
 	std::queue<SmartBody::MotionEvent*> _events;
+	std::vector<std::string>	_joints;	// Joints that motion data would be applied to. Empty means applying all.
 	int					 _lastCycle;
 
    public :
@@ -78,6 +79,7 @@ class MeCtMotion : public SmartBody::SBController
         MeController::init() is automatically called. */
     void init (SbmPawn* pawn, SkMotion* m_p );
     void init (SbmPawn* pawn, SkMotion* m_p, double time_offset, double time_scale );
+	void init (SbmPawn* pawn, SkMotion* m_p, std::vector<std::string>& joints);
 
 	/*! Initialize a controller by cloning another */
 //	void init ( MeCtMotion* other );
@@ -149,6 +151,7 @@ class MeCtMotion : public SmartBody::SBController
 
 	// callbacks for the base class
 	virtual void controller_map_updated();
+	virtual void controller_start ();
 	virtual bool controller_evaluate ( double t, MeFrameData& frame );
     virtual SkChannelArray& controller_channels ();
     virtual const std::string& controller_type () const;

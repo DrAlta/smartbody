@@ -51,6 +51,9 @@ class SteeringAgent
 		void sendLocomotionEvent(const std::string& status);
 		void locomotionHalt();
 
+		bool isInLocomotion();		// include starting moving and ending
+		bool isHittingOnTarget();	// is sending out reaching target signal (one time)
+
 	private:
 		void normalizeAngle(float& angle);
 		inline float cmToM(float v)		{return (v / 100.0f);}

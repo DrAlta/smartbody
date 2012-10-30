@@ -401,10 +401,10 @@ void SbmCharacter::createStandardControllers()
 	face_ct->init( getFaceDefinition() );
 
 	ct_tree_p->add_controller( posture_sched_p );
-	ct_tree_p->add_controller( motion_sched_p );
 	//ct_tree_p->add_controller( locomotion_ct );
 	ct_tree_p->add_controller( param_animation_ct );
 	ct_tree_p->add_controller( basic_locomotion_ct );
+	ct_tree_p->add_controller( motion_sched_p );
 
 	ct_tree_p->add_controller( reach_sched_p );	
 	ct_tree_p->add_controller( grab_sched_p );

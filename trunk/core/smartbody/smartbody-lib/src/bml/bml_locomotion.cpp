@@ -101,8 +101,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 //	Locomotion::parse_routine(child, request, type, id);
 	//-------------starting  from here, it's BML Spec 1.0
-	std::string localId;
-	xml_utils::xml_translate(&localId, attrID);
+	std::string localId = "locomotion";
 
 	if (!mcu->_scene->getSteerManager()->getEngineDriver()->isInitialized())
 	{
