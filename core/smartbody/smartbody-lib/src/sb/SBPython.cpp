@@ -1297,10 +1297,15 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getReach", &SBReachManager::getReach, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a reach engine for a given character.")
 		;
 
+
+
+	boost::python::class_<SBGestureMap::GestureInfo >("GestureInfo")
+    ;
+
 	boost::python::class_<SBGestureMap>("SBGestureMap")
 		.def("addGestureMapping", &SBGestureMap::addGestureMapping, "Add a gesture mapping. Input: name of the animation/state, type, posture, hand. Output: null")
 		.def("getGestureByInfo", &SBGestureMap::getGestureByInfo, "Return a gesture given the type and hand of the gesture. Input: type, hand, style. Output: corresponding gesture name")
-		.def("getGestureByIndex", &SBGestureMap::getGestureByIndex, "Return a gesture given the index inside the map.")
+		.def("getGestureByIndex", &SBGestureMap::getGestureByIndex, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a gesture given the index inside the map.")
 		.def("getNumMappings", &SBGestureMap::getNumMappings, "Return a number of entries inside the map.")
 		.def("validate", &SBGestureMap::validate, "Gives feedback about gestures in the gesture map; reports missing idle poses or motions.")
 		;

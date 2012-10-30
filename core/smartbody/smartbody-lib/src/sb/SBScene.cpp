@@ -21,6 +21,7 @@
 #include <sb/SBService.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBBoneBusManager.h>
+#include <sb/SBGestureMap.h>
 #include <sb/SBGestureMapManager.h>
 #include <sb/SBJointMapManager.h>
 #include <sb/SBCollisionManager.h>
@@ -1252,6 +1253,25 @@ std::string SBScene::save()
 		strstr << transitionString;
 		strstr << "\n";
 	}
+
+	strstr << "# -------------------- gesture maps\n";
+	std::vector<std::string>& gestureMapNames = this->getGestureMapManager()->getGestureMapNames();
+	for (std::vector<std::string>::iterator iter = gestureMapNames.begin();
+		 iter != gestureMapNames.end();
+		 iter++)
+	{
+		SBGestureMap* gestureMap = this->getGestureMapManager()->getGestureMap(*iter);
+		strstr << "gestureMap = scene.getGestureMapManager().createGestureMap(\"" << (*iter) << "\")\n";
+		int numMappings = gestureMap->getNumMappings();
+		for (int m = 0; m < numMappings; m++)
+		{
+			SBGestureMap::GestureInfo& info = gestureMap->getGestureByIndex(m);
+			strstr << "gestureMap.addGestureMapping(\"" << info._animation << "\", \"" << info._lexeme << "\", \"" << info._type << "\", \"" 
+				                                        << info._hand << "\", \"" << info._style << "\", \"" << info._posture << "\")\n";
+
+		}
+	}
+
 
 	strstr << "# -------------------- scene\n";
 	strstr << "obj = scene\n";
