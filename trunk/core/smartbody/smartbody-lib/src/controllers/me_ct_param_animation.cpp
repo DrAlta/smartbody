@@ -44,6 +44,7 @@ ScheduleType::ScheduleType()
 	stateTimeTrim = 0.0;
 	transitionLen = -1.0;
 	directPlay = false;
+	playSpeed = 1.0;
 }
 
 
@@ -187,6 +188,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 
 				SrMat curBaseMat;
 				SrMat nextBaseMat;
+				double playSpeed = max(curStateData->playSpeed, nextStateData->playSpeed);
 				bool directPlay = (curStateData->directPlay || nextStateData->directPlay);
 				bool pseudoTransition = (curStateData->getStateName() == PseudoIdleState || nextStateData->getStateName() == PseudoIdleState);				
 				if (pseudoTransition && !directPlay && (!curStateData->isPartialBlending() && !nextStateData->isPartialBlending())) // first time && not partial blending case
@@ -248,7 +250,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 				}
 			
 				transitionManager->blending(frame.buffer(), buffer1, buffer2, transformMat, curBaseMat, nextBaseMat, timeStep, _context, directPlay);
-				transitionManager->step(timeStep);
+				transitionManager->step(timeStep*playSpeed);
 				if (!curStateData->isPartialBlending() && !nextStateData->isPartialBlending())
 					updateWo(transformMat, woWriter, frame.buffer());
 				mcu.mark("locomotion");
@@ -348,11 +350,97 @@ void MeCtParamAnimation::schedule(PABlend* state, double x, double y, double z, 
 
 void MeCtParamAnimation::schedule( PABlend* state, const std::vector<double>& weights, const ScheduleType& scType )
 {
-	schedule(state,weights,scType.wrap,scType.schedule,scType.blend,scType.jName, scType.timeOffset,scType.stateTimeOffset, scType.stateTimeTrim, scType.transitionLen, scType.directPlay);
+	//schedule(state,weights,scType.wrap,scType.schedule,scType.blend,scType.jName, scType.timeOffset,scType.stateTimeOffset, scType.stateTimeTrim, scType.transitionLen, scType.directPlay);
+	PABlendData::WrapMode wrap = scType.wrap;
+	PABlendData::ScheduleMode scheduleMode = scType.schedule;
+	PABlendData::BlendMode blend = scType.blend;
+	std::string jName = scType.jName;
+	double timeOffset = scType.timeOffset;
+	double stateTimeOffset = scType.stateTimeOffset;
+	double stateTimeTrim = scType.stateTimeTrim;
+	double transitionLen = scType.transitionLen;
+	double playSpeed = scType.playSpeed;
+	bool directPlay = scType.directPlay;
+
+	ScheduleUnit unit;
+	SmartBody::SBAnimationBlend* animState = dynamic_cast<SmartBody::SBAnimationBlend*>(state);
+	if (animState)
+	{
+		animState->validateState(); // to make sure the animaion state is valid before schedule it
+	}
+
+	// schedule
+	unit.weights = weights;
+	unit.data = state;
+	unit.wrap = wrap;
+	unit.schedule = scheduleMode;
+	unit.blend = blend;
+	unit.partialJoint = jName;
+	unit.time = mcuCBHandle::singleton().time + timeOffset;
+	unit.stateTimeOffset = (float)stateTimeOffset;
+	unit.stateTimeTrim = (float)stateTimeTrim;
+	unit.directPlay = directPlay;
+	unit.playSpeed = (float)playSpeed;
+
+	//LOG("unit schedule mode = %d",unit.schedule);
+
+	float unitTransitionLen = (float)defaultTransition; // set this to initial default	
+	// override if the default attribute exists
+	if (character->hasAttribute("defaultTransition") && character->getDoubleAttribute("defaultTransition") >= 0)
+	{
+		unitTransitionLen = (float)character->getDoubleAttribute("defaultTransition");
+	}
+	// override if specified in the blend scheduling
+	if (transitionLen >= 0)
+	{
+		unitTransitionLen = (float)transitionLen;
+	}
+	unit.transitionLength = unitTransitionLen;
+	// make sure the weights are valid for non-pseudoidle state
+	if (unit.weights.size() == 0 && unit.data != NULL)
+	{
+		if (unit.data->stateName != PseudoIdleState)
+		{
+			LOG("MeCtParamAnimation::schedule Warning: state %s has no weights assigned.", unit.data->stateName.c_str());
+			unit.weights.resize(unit.data->getNumMotions());
+			for (int i = 0; i < unit.data->getNumMotions(); i++)
+			{
+				if (i == 0)
+					unit.weights[i] = 1.0;
+				else
+					unit.weights[i] = 0.0;
+			}
+		}
+	}
+	// make sure there's motion for non-pseudoidle state
+	if (unit.data != NULL)
+	{
+		if (unit.data->stateName != PseudoIdleState && unit.data->getNumMotions() == 0)
+		{
+			LOG("MeCtParamAnimation::schedule ERR: state %s has no motions attached.", unit.data->stateName.c_str());
+			return;
+		}
+	}
+	waitingList.push_back(unit);
 }
 
 void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>& weights, PABlendData::WrapMode wrap, PABlendData::ScheduleMode scheduleMode, PABlendData::BlendMode blend, std::string jName, double timeOffset, double stateTimeOffset, double stateTimeTrim, double transitionLen, bool directPlay)
 {
+	// Feng : rewrite this part to use the object scType so we don't need to indefinitely change this schedule function everytime we add another paramter
+	ScheduleType scType;
+	scType.wrap = wrap;
+	scType.schedule = scheduleMode;
+	scType.blend = blend;
+	scType.jName = jName;
+	scType.timeOffset = timeOffset;
+	scType.stateTimeOffset = stateTimeOffset;
+	scType.stateTimeTrim = stateTimeTrim;
+	scType.transitionLen = transitionLen;
+	scType.directPlay = directPlay;
+
+	schedule(blendData,weights,scType);
+
+#if 0
 	ScheduleUnit unit;
 	SmartBody::SBAnimationBlend* animState = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData);
 	if (animState)
@@ -419,6 +507,7 @@ void MeCtParamAnimation::schedule(PABlend* blendData, const std::vector<double>&
 	}
 
 	waitingList.push_back(unit);
+#endif
 }
 
 void MeCtParamAnimation::unschedule()
@@ -628,6 +717,7 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 		module->blendStartOffset = su.stateTimeOffset;
 		module->blendEndTrim = su.stateTimeTrim;
 		module->transitionLength = su.transitionLength;
+		module->playSpeed = su.playSpeed;
 		std::vector<std::string> joints;
 		SkJoint* j = character->getSkeleton()->search_joint(su.partialJoint.c_str());
 		if (j)

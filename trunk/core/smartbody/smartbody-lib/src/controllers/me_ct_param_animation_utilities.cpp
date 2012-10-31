@@ -872,6 +872,7 @@ PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, B
 	blendStartOffset = (float)blendOffset;
 	blendEndTrim = (float)blendEndTrim;
 	directPlay = dplay;
+	playSpeed = 1.f;
 	PABlend* s = mcu.lookUpPABlend(stateName);
 	state = s;
 	if (state)
@@ -903,6 +904,7 @@ PABlendData::PABlendData(PABlend* s, std::vector<double>& w, BlendMode blend, Wr
 	blendStartOffset = (float)blendOffset;
 	blendEndTrim = (float)blendTrim;
 	directPlay = dplay;
+	playSpeed = 1.f;
 	state = s;
 	weights.resize(s->getNumMotions());
 	for (size_t x = 0; x < w.size(); x++)
@@ -965,7 +967,7 @@ void PABlendData::evaluate(double timeStep, SrBuffer<float>& buffer)
 	}
 
 	bool notReachCycle = true;
-	notReachCycle = timeManager->step(timeStep);
+	notReachCycle = timeManager->step(timeStep*playSpeed);
 	SrBuffer<float> buffCopy = buffer;
 	bool isZeroD = isZeroDState();
 	bool OnceAndReachCycle = (wrapMode != Loop && !notReachCycle);
