@@ -444,14 +444,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\locomotion_cmds.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\locomotion_cmds.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\mcontrol_callbacks.cpp"
 				>
 			</File>
@@ -945,14 +937,6 @@
 			</File>
 			<File
 				RelativePath="..\src\controllers\me_ct_motion_timewarp.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\controllers\me_ct_navigation_waypoint.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\controllers\me_ct_navigation_waypoint.hpp"
 				>
 			</File>
 			<File
