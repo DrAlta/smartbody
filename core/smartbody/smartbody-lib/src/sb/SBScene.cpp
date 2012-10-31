@@ -1255,8 +1255,8 @@ std::string SBScene::save()
 	}
 
 	strstr << "# -------------------- gesture maps\n";
-	std::vector<std::string>& gestureMapNames = this->getGestureMapManager()->getGestureMapNames();
-	for (std::vector<std::string>::iterator iter = gestureMapNames.begin();
+	const std::vector<std::string>& gestureMapNames = this->getGestureMapManager()->getGestureMapNames();
+	for (std::vector<std::string>::const_iterator iter = gestureMapNames.begin();
 		 iter != gestureMapNames.end();
 		 iter++)
 	{
