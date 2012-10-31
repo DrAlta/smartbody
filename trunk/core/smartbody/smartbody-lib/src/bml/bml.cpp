@@ -1245,9 +1245,14 @@ void GestureRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 				isInLocomotion = true;
 		}
 		if (isInLocomotion)
-			motion_ct->init( const_cast<SbmCharacter*>(request->actor), holdM, sbCharacter->getSkeleton()->getUpperBodyJointNames());
+		{
+			std::vector<std::string> jointNames = sbCharacter->getSkeleton()->getUpperBodyJointNames();
+			motion_ct->init( const_cast<SbmCharacter*>(request->actor), holdM, jointNames);
+		}
 		else
+		{
 			motion_ct->init(const_cast<SbmCharacter*>(request->actor), holdM, 0.0, 1.0);
+		}
 		BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController(motion_ct);
 		set_scheduler(scheduler);
 	}
