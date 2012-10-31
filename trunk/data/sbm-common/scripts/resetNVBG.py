@@ -18,6 +18,7 @@ brainstem_engine = knowledge_engine.engine(Cerebella.brainstem)
 scene.run("InitSemantics.py")
 scene.run("InitNVBGGlobalSetting.py")
 scene.run("InitDefaultBehaviorBMLMapping.py")
+scene.run("InitCharacterBehaviorBMLMapping.py")
 scene.run("InitBrainStemGlobalSetting.py")
 
 characterNames = scene.getCharacterNames()
