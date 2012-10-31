@@ -138,9 +138,14 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 				isInLocomotion = true;
 		}
 		if (isInLocomotion)
-			motionCt->init( const_cast<SbmCharacter*>(request->actor), mForCt, sbCharacter->getSkeleton()->getUpperBodyJointNames());
+		{
+			std::vector<std::string> jointNames = sbCharacter->getSkeleton()->getUpperBodyJointNames();
+			motionCt->init( const_cast<SbmCharacter*>(request->actor), mForCt, jointNames);
+		}
 		else
+		{
 			motionCt->init( const_cast<SbmCharacter*>(request->actor), mForCt, 0.0, 1.0);
+		}
 		BehaviorRequestPtr behavPtr(new GestureRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs, joints, scale, freq) );
 		return behavPtr; 
 	} 
