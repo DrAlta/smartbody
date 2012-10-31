@@ -68,7 +68,7 @@ class PATimeManager
 		std::vector<double> key;				//key get from keys and current weights
 	protected:
 		double localTime;
-		double prevLocalTime;
+		double prevLocalTime;		
 
 		PABlendData* blendData;
 
@@ -192,6 +192,7 @@ class PABlendData
 		PABlend* state;
 		float blendStartOffset, blendEndTrim;
 		float transitionLength;
+		float playSpeed;
 		bool active;	
 		bool directPlay;
 		std::vector<std::vector<int> > motionIndex;

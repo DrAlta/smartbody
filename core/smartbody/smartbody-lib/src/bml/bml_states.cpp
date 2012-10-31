@@ -80,59 +80,62 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	}
 
 	// wrap mode
+	ScheduleType scType;
 	std::string wrap = xml_parse_string(BMLDefs::ATTR_WRAPMODE, elem);
 	if (wrap == "")
 		wrap = "Loop";
 	boost::algorithm::to_lower(wrap);
-	PABlendData::WrapMode wrapMode = PABlendData::Loop;
+	scType.wrap = PABlendData::Loop;
 	if (wrap == "once")
-		wrapMode = PABlendData::Once;
+		scType.wrap = PABlendData::Once;
 
 	// schedule mode
 	std::string schedule = xml_parse_string(BMLDefs::ATTR_SCHEDULEMODE, elem);
 	if (schedule == "")
 		schedule = "Queued";
 	boost::algorithm::to_lower(schedule);
-	PABlendData::ScheduleMode scheduleMode = PABlendData::Queued;
+	scType.schedule = PABlendData::Queued;
 	if (schedule == "now")
-		scheduleMode = PABlendData::Now;
+		scType.schedule = PABlendData::Now;
 
 	// blend mode
 	std::string blend = xml_parse_string(BMLDefs::ATTR_BLENDMODE, elem);
 	if (blend == "")
 		blend = "Overwrite";
 	boost::algorithm::to_lower(blend);
-	PABlendData::BlendMode blendMode =PABlendData::Overwrite;
+	scType.blend =PABlendData::Overwrite;
 	if (blend == "additive")
-		blendMode = PABlendData::Additive;
+		scType.blend = PABlendData::Additive;
 
 	// partial joint name
 	std::string joint = xml_parse_string(BMLDefs::ATTR_PARTIALJOINT, elem);
 	if (joint == "")
 		joint = "null";
 
-	// take time offset
-	double timeOffset = xml_parse_double(BMLDefs::ATTR_START, elem);
-	double stateStartOffset = xml_parse_double(BMLDefs::ATTR_OFFSET, elem, 0.0);
-	double stateEndTrim = xml_parse_double(BMLDefs::ATTR_TRIM, elem, 0.0);
-	double transitionLen = xml_parse_double(BMLDefs::ATTR_TRANSITION_LENGTH, elem, -1.0);
+	// take time offset0
+	scType.jName = joint;
+	scType.timeOffset = xml_parse_double(BMLDefs::ATTR_START, elem);
+	scType.stateTimeOffset = xml_parse_double(BMLDefs::ATTR_OFFSET, elem, 0.0);
+	scType.stateTimeTrim = xml_parse_double(BMLDefs::ATTR_TRIM, elem, 0.0);
+	scType.transitionLen = xml_parse_double(BMLDefs::ATTR_TRANSITION_LENGTH, elem, -1.0);
+	scType.playSpeed = xml_parse_double(BMLDefs::ATTR_SPEED, elem, 1.0);
 	std::string directPlayStr = xml_parse_string(BMLDefs::ATTR_DIRECTPLAY, elem, "false");
-	bool directPlay = false;
+	scType.directPlay = false;
 	if (directPlayStr == "true")
-		directPlay = true;
+		scType.directPlay = true;
 
 	SmartBody::SBAnimationBlend0D* ZeroDState = dynamic_cast<SmartBody::SBAnimationBlend0D*>(state);
 	if (!ZeroDState) // don't use state offset unless it is a 0-D state
 	{
-		stateStartOffset = 0.0;
-		stateEndTrim = 0.0;
+		scType.stateTimeOffset = 0.0;
+		scType.stateTimeTrim = 0.0;
 	}
-
 	// schedule a state
 	if (mode == "schedule")
 	{
 		if (state)
-			character->param_animation_ct->schedule(state, x, y, z, wrapMode, scheduleMode, blendMode, joint, timeOffset, stateStartOffset, stateEndTrim, transitionLen, directPlay);
+			//character->param_animation_ct->schedule(state, x, y, z, wrapMode, scheduleMode, blendMode, joint, timeOffset, stateStartOffset, stateEndTrim, transitionLen, directPlay);
+			character->param_animation_ct->schedule(state, weights, scType);
 		else
 			character->param_animation_ct->schedule(state, weights);
 	}
