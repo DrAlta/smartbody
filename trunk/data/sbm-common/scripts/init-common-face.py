@@ -43,4 +43,16 @@ defaultFace.setViseme("Z", "viseme_z")
 defaultFace.setViseme("BMP", "viseme_bmp")
 defaultFace.setViseme("blink", "fac_45_blink")
 
+# mapping for new lip sync
+defaultFace.setViseme("FV", "viseme_f")
+defaultFace.setViseme("open", "viseme_kg")
+defaultFace.setViseme("PBM", "viseme_bmp")
+defaultFace.setViseme("ShCh", "viseme_er")
+defaultFace.setViseme("W", "viseme_oo")
+defaultFace.setViseme("Wide", "viseme_ee")
+#defaultFace.setViseme("tBack", "")
+#defaultFace.setViseme("tRoof", "")
+#defaultFace.setViseme("tTeeth", "")
+
+
 print "Complete: data/sbm-common/scripts/common-init-face.py"
