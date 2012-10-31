@@ -19,6 +19,7 @@ def initGestureMap():
 		gMap.addGestureMapping('ChrUtah_IndicateThereLeft001', 'LEFT', '', 'LEFT_HAND', '', posture)
 		gMap.addGestureMapping('ChrUtah_IndicateThereRight001', 'RIGHT', '', 'RIGHT_HAND', '', posture)
 		gMap.addGestureMapping('LHandOnHip_RArm_SweepRight', 'SWEEPRIGHT', '', 'RIGHT_HAND', '', posture)
+		scene.getCharacter(name).setStringAttribute("gestureMap", name)
 
 def playGesture(chrName, gestureName, hand, start=0, ready=0, stroke=0, stroke_end=0):
 	''' Chararacter name to play gesture, lexeme of gesture, hand to use, start point, ready point, stroke, stroke end

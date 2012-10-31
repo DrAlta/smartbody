@@ -19,6 +19,7 @@ class SBJointMap
 		~SBJointMap();
 
 		void applyMotion(SmartBody::SBMotion* motion);
+		void applyMotionRecurse(const std::string& directory);
 		void applyMotionInverse(SmartBody::SBMotion* motion); // apply the inverse mapping 
 		void applySkeleton(SmartBody::SBSkeleton* skeleton);
 		void applySkeletonInverse(SmartBody::SBSkeleton* skeleton);
