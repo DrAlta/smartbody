@@ -31,8 +31,8 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createBoolAttribute("useDiphone", false, true, "Basic", 150, false, false, false, "Use diphones.");
 	createDoubleAttribute("diphoneScale", 1, true, "Basic", 155, false, false, false, "Scale factor for diphone curves.");
 	createStringAttribute("diphoneSetName", "", true, "Basic", 160, false, false, false, "Name of the diphone set to be used when using diphone-based lip-syncing.");
-	createBoolAttribute("diphoneSplineCurve", false, true, "Basic", 170, false, false, false, "Use diphones spline/linear curve.");
-	SmartBody::DoubleAttribute* diphoneSmoothWindow = createDoubleAttribute("diphoneSmoothWindow", -1.0, true, "Basic", 180, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
+	createBoolAttribute("diphoneSplineCurve", true, true, "Basic", 170, false, false, false, "Use diphones spline/linear curve.");
+	SmartBody::DoubleAttribute* diphoneSmoothWindow = createDoubleAttribute("diphoneSmoothWindow", .2, true, "Basic", 180, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
 
 	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
 	timeDelayAttr->setMin(0.0);
