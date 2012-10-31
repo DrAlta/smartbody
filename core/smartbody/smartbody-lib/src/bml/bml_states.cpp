@@ -119,6 +119,7 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	scType.stateTimeTrim = xml_parse_double(BMLDefs::ATTR_TRIM, elem, 0.0);
 	scType.transitionLen = xml_parse_double(BMLDefs::ATTR_TRANSITION_LENGTH, elem, -1.0);
 	scType.playSpeed = xml_parse_double(BMLDefs::ATTR_SPEED, elem, 1.0);
+	scType.duration = xml_parse_double(BMLDefs::ATTR_DURATION, elem, -1.0);
 	std::string directPlayStr = xml_parse_string(BMLDefs::ATTR_DIRECTPLAY, elem, "false");
 	scType.directPlay = false;
 	if (directPlayStr == "true")

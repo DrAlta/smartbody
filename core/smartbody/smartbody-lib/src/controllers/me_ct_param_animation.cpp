@@ -45,6 +45,7 @@ ScheduleType::ScheduleType()
 	transitionLen = -1.0;
 	directPlay = false;
 	playSpeed = 1.0;
+	duration = -1.0;
 }
 
 
@@ -361,6 +362,9 @@ void MeCtParamAnimation::schedule( PABlend* state, const std::vector<double>& we
 	double transitionLen = scType.transitionLen;
 	double playSpeed = scType.playSpeed;
 	bool directPlay = scType.directPlay;
+	double desireDuration = scType.duration;
+
+	
 
 	ScheduleUnit unit;
 	SmartBody::SBAnimationBlend* animState = dynamic_cast<SmartBody::SBAnimationBlend*>(state);
@@ -368,6 +372,8 @@ void MeCtParamAnimation::schedule( PABlend* state, const std::vector<double>& we
 	{
 		animState->validateState(); // to make sure the animaion state is valid before schedule it
 	}
+
+	
 
 	// schedule
 	unit.weights = weights;
@@ -381,6 +387,7 @@ void MeCtParamAnimation::schedule( PABlend* state, const std::vector<double>& we
 	unit.stateTimeTrim = (float)stateTimeTrim;
 	unit.directPlay = directPlay;
 	unit.playSpeed = (float)playSpeed;
+	unit.duration = (float)desireDuration;
 
 	//LOG("unit schedule mode = %d",unit.schedule);
 
@@ -713,11 +720,15 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	PABlendData* module = NULL;
 	if (su.data)
 	{
-		module = new PABlendData(su.data, su.weights, su.blend, su.wrap, su.schedule, su.stateTimeOffset, su.stateTimeTrim, su.directPlay);
+		module = new PABlendData(su.data, su.weights, su.blend, su.wrap, su.schedule, su.stateTimeOffset, su.stateTimeTrim, su.directPlay);		
 		module->blendStartOffset = su.stateTimeOffset;
 		module->blendEndTrim = su.stateTimeTrim;
 		module->transitionLength = su.transitionLength;
 		module->playSpeed = su.playSpeed;
+		if (su.duration > 0.f) // the user set a state duration, adjut playSpeed
+		{
+			module->playSpeed = module->timeManager->getDuration()/su.duration;
+		}
 		std::vector<std::string> joints;
 		SkJoint* j = character->getSkeleton()->search_joint(su.partialJoint.c_str());
 		if (j)

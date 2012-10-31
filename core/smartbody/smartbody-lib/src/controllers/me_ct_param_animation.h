@@ -44,6 +44,7 @@ struct ScheduleType
 	double timeOffset;
 	double stateTimeOffset, stateTimeTrim;
 	double transitionLen;
+	double duration;
 	double playSpeed;
 	bool   directPlay;
 	
@@ -59,6 +60,7 @@ struct ScheduleUnit
 	float stateTimeOffset, stateTimeTrim;
 	float transitionLength;
 	float playSpeed;
+	float duration;
 	bool  directPlay;
 	PABlendData::WrapMode wrap;
 	PABlendData::ScheduleMode schedule;
