@@ -50,14 +50,6 @@ class SmartBodyNVBG(Nvbg):
                 
                 if (name == "reset"):
                        self.reset()
-
-                if (name == "add dialog"):
-                        dialogStr = self.getAttribute("more dialog").getValue()
-                        if (dialogStr == ""):
-                                return
-                        dialogVec = self.getAttribute("dialog").getValidValues()
-                        dialogVec.append(dialogStr)
-                        self.getAttribute("dialog").setValidValues(dialogVec)
 		return
 
 	def notifyBool(self, name, val):
@@ -83,8 +75,8 @@ class SmartBodyNVBG(Nvbg):
                 if hasattr(self, 'nvbg') is False:
                         return
                 
-                if (name == "behavior"):
-                        behVec = self.getAttribute("behavior").getValidValues()
+                if (name == "default behavior"):
+                        behVec = self.getAttribute("default behavior").getValidValues()
                         bmlVec = self.getAttribute("bml hidden").getValidValues()
                         for i in range(0, len(behVec)):
                                 if (behVec[i] == val):
@@ -190,22 +182,14 @@ class SmartBodyNVBG(Nvbg):
 
                 ''' dialogs '''
                 dialog = self.createStringAttribute("dialog", "", True, "nvbgs", 50, False, False, False, "Dialog")
-                dialogVec = StringVec()
-                dialogVec.append("yes")
-                dialogVec.append("yes this is a good idea")
-                dialogVec.append("no i do not like it")
-                dialogVec.append("this is a big one but i prefer a small one")
-                dialog.setValidValues(dialogVec)
                 self.createActionAttribute("play dialog", True, "nvbgs", 60, False, False, False, "Play the chosen dialog")
-                self.createStringAttribute("more dialog", "", True, "nvbgs", 70, False, False, False, "Addtional line that is added")
-                self.createActionAttribute("add dialog", True, "nvbgs", 80, False, False, False, "Add more dialog to the list")
 
                 ''' nvbg behaviors '''
-                behavior = self.createStringAttribute("behavior", "", True, "nvbgs", 100, False, False, False, "Universal behaviors availabe")
+                behavior = self.createStringAttribute("default behavior", "", True, "nvbgs", 100, False, False, False, "Universal behaviors availabe")
                 bmlHidden = self.createStringAttribute("bml hidden", "", True, "nvbgs", 110, False, False, True, "Hidden bml drop list")
                 factList = nvbg_engine.get_kb('nvbg').entity_lists['dict']
                 universalFact = factList.universal_facts[0]
-                numBehaviors = len(universalFact[1])    #universalFact[0] is bmlPatterns
+                numBehaviors = len(universalFact[1])
                 behaviorVec = StringVec()
                 bmlHiddenVec = StringVec()
                 for i in range(0, numBehaviors):
@@ -219,15 +203,15 @@ class SmartBodyNVBG(Nvbg):
                 behavior.setValidValues(behaviorVec)
                 bmlHidden.setValidValues(bmlHiddenVec)
                 self.createStringAttribute("bml", "", True, "nvbgs", 120, False, False, False, "BML corresponding to the behavior")
-                self.createActionAttribute("play behavior", True, "nvbgs", 130, False, False, False, "Play the chosen behavior")
+                self.createActionAttribute("play behavior", True, "nvbgs", 130, False, False, False, "Play the chosen behavior")                
 
         def resetTool(self):
                 ''' reload kfb rules '''                
-                behavior = self.getAttribute("behavior")
+                behavior = self.getAttribute("default behavior")
                 bmlHidden = self.getAttribute("bml hidden")
                 factList = nvbg_engine.get_kb('nvbg').entity_lists['dict']
                 universalFact = factList.universal_facts[0]
-                numBehaviors = len(universalFact[1])    #universalFact[0] is bmlPatterns
+                numBehaviors = len(universalFact[1])
                 behaviorVec = StringVec()
                 bmlHiddenVec = StringVec()
                 for i in range(0, numBehaviors):
