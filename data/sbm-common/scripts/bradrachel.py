@@ -13,6 +13,17 @@ scene.setBoolAttribute("internalAudio", True)
 
 scene.run("default-viewer.py")
 
+camera = getCamera()
+camera.setEye(-0.349958, 2.63862, 2.30012)
+camera.setCenter(0.0118491, 2.17959, 0.395263)
+camera.setUpVector(SrVec(0, 1, 0))
+camera.setScale(1)
+camera.setFov(1.0472)
+camera.setFarPlane(100)
+camera.setNearPlane(0.1)
+camera.setAspectRatio(0.966897)
+
+
 # map to the SmartBody standard
 scene.run("zebra2-map.py")
 zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
@@ -133,6 +144,10 @@ rachel.setVoice("remote")
 rachel.setVoiceCode("MicrosoftAnna")
 
 # Brad's gestures
+# mirror right->left
+bradGestureMirrors = StringVec()
+#bradGestureMirrors.append(
+
 # todo
 
 # Rachel's gestures
