@@ -28,6 +28,7 @@
 
 #include "sr_hash_map.h"
 #include "sr_arg_buff.h"
+#include <string.h>
 
 //////////////////////////////////////////////////////////////////
 
@@ -51,7 +52,7 @@ template <class X> class srCmdMap	{
 		
 		int execute( const char *key, srArgBuffer& argb, X *x_p = NULL )	{
 			if( key )	{
-				size_t keySize = strlen( key );
+				int keySize = strlen( key );
 				if( keySize > 0 )	{
 //					sr_cmd_callback_fp fp = static_cast<sr_cmd_callback_fp>( cmdToCallback.lookup( key ) );
 					sr_cmd_callback_fp fp = (sr_cmd_callback_fp)( cmdToCallback.lookup( key ) );
