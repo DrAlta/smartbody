@@ -3,7 +3,10 @@
 #include "sr/sr_string.h"
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBScene.h>
 #include <cstring>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
 
 namespace SmartBody {
 
@@ -33,6 +36,74 @@ void SBJointMap::applyMotion(SmartBody::SBMotion* motion)
 
 	_mappedMotions.push_back(motion->getName());
 }
+
+void SBJointMap::applyMotionRecurse(const std::string& directory)
+{
+	SBScene* scene = SmartBody::SBScene::getScene();
+
+	std::string mediaPath = scene->getMediaPath();
+
+	boost::filesystem::path path(directory);
+	
+	boost::filesystem::path finalPath;
+	// include the media path in the pathname if applicable
+	std::string rootDir = path.root_directory();
+	if (rootDir.size() == 0)
+	{	
+		finalPath = operator/(mediaPath, path);
+	}
+	else
+	{
+		finalPath = path;
+	}
+
+    if (!boost::filesystem::is_directory(finalPath))
+	{
+		LOG("Path %s is not a directory, so motion mapping will not occur.", finalPath.string().c_str());
+		return;
+	}
+
+	std::vector<std::string> motionNames = scene->getMotionNames();
+	for (std::vector<std::string>::iterator iter = motionNames.begin();
+		 iter != motionNames.end();
+		 iter++)
+	{
+		SBMotion* motion = scene->getMotion((*iter));
+		if (!motion)
+		{
+			LOG("Motion not found for name '%s'.", (*iter).c_str());
+			continue;
+		}
+		const std::string& fileName = motion->getMotionFileName();
+		boost::filesystem::path motionPath(fileName);
+		std::string motionRootDir = motionPath.root_directory();
+		boost::filesystem::path finalMotionPath;
+//		if (motionRootDir.size() == 0)
+//		{
+//			finalMotionPath = operator/(mediaPath, motionPath);
+//		}
+//		else
+//		{
+			finalMotionPath = motionPath;
+//		}
+		boost::filesystem::path currentPath = finalMotionPath;
+		while (currentPath.has_parent_path())
+		{
+			boost::filesystem::path parentPath = currentPath.parent_path();
+			if (boost::filesystem2::equivalent(parentPath, finalPath))
+			{
+				applyMotion(motion);
+				break;
+			}
+			else
+			{
+				currentPath = currentPath.parent_path();
+			}
+		}
+
+	}
+}
+
 
 void SBJointMap::applyMotionInverse( SmartBody::SBMotion* motion )
 {
