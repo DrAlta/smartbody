@@ -182,6 +182,33 @@ std::string SBBmlProcessor::execXML(std::string character, std::string xml)
 	return send_vrX( "vrSpeak", character, "ALL", "", false, true, entireXML.str() );
 }
 
+void SBBmlProcessor::execBMLAt(double time, std::string character, std::string bml)
+{
+	SBScene* scene = SBScene::getScene();
+
+	std::stringstream strstr;
+	strstr << "bml char " << character << " " << bml;
+	scene->commandAt((float) time, strstr.str());
+}
+
+void SBBmlProcessor::execBMLFileAt(double time, std::string character, std::string filename)
+{
+	SBScene* scene = SBScene::getScene();
+
+	std::stringstream strstr;
+	strstr << "bml char " << character << " file " << filename;
+	scene->commandAt((float) time, strstr.str());
+}
+
+void SBBmlProcessor::execXMLAt(double time, std::string character, std::string xml)
+{
+	SBScene* scene = SBScene::getScene();
+
+	std::stringstream strstr;
+	strstr << "bml char " << character << " " << xml;
+	scene->commandAt((float) time, strstr.str());
+}
+
 void SBBmlProcessor::interruptCharacter(const std::string& character, double seconds)
 {
 	SBCharacter* sbCharacter = SBScene::getScene()->getCharacter(character);
@@ -208,6 +235,8 @@ void SBBmlProcessor::interruptBML(const std::string& character, const std::strin
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.bml_processor.interrupt(sbCharacter, id, seconds, &mcu);
 }
+
+
 
 
 

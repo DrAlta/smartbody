@@ -18,6 +18,9 @@ class SBBmlProcessor
 		std::string execBML(std::string character, std::string bml);
 		std::string execBMLFile(std::string character, std::string filename);
 		std::string execXML(std::string character, std::string xml);
+		void execBMLAt(double time, std::string character, std::string bml);
+		void execBMLFileAt(double time, std::string character, std::string filename);
+		void execXMLAt(double time, std::string character, std::string xml);
 
 		void interruptCharacter(const std::string& character, double seconds);
 		void interruptBML(const std::string& character, const std::string& id, double seconds);
