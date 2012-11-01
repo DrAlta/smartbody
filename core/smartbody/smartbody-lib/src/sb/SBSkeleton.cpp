@@ -10,12 +10,14 @@ namespace SmartBody {
 
 SBSkeleton::SBSkeleton() : SkSkeleton()
 {
+	_scale = 1.0f;
 	_origRootChanged = false;
 	createVec3Attribute("orientation", 0, 0, 0, true, "Basic", 100, false, false, false, "Change in orientation from initial loading of skeleton. Parameters are rotation in degrees of the X, then Y, then Z axes.");
 }
 
 SBSkeleton::SBSkeleton(std::string skelFile) : SkSkeleton()
 {
+	_scale = 1.0f;
 	_origRootChanged = false;
 	createVec3Attribute("orientation", 0, 0, 0, true, "Basic", 100, false, false, false, "Change in orientation from initial loading of skeleton. Parameters are rotation in degrees of the X, then Y, then Z axes.");
 	load(skelFile);
@@ -324,8 +326,14 @@ void SBSkeleton::rescale( float scaleRatio )
 	{
 		SBJoint* joint = dynamic_cast<SBJoint*>(joints()[i]);
 		if (joint)
-			joint->setOffset(joint->getOffset()*(float)scaleRatio);
+			joint->setOffset(joint->getOffset()*(float)scaleRatio / _scale);
 	}
+	_scale = scaleRatio;
+}
+
+float SBSkeleton::getScale()
+{
+	return _scale;
 }
 
 void SBSkeleton::notify(SBSubject* subject)

@@ -37,6 +37,7 @@ public:
 	SBPawn* getPawn();
 
 	void rescale(float scaleRatio);
+	float getScale();
 	void update();
 
 	void notify(SBSubject* subject);
@@ -53,6 +54,7 @@ public:
 	protected:
 		SrQuat _origRootPrerot;
 		bool _origRootChanged;
+		float _scale;
 };
 
 
