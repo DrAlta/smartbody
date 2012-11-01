@@ -83,6 +83,7 @@ class MeCtBasicLocomotion;
 class MeCtDataReceiver;
 class SbmPhysicsCharacter;
 class MeCtPhysicsController;
+class MeCtNoiseController;
 class MeCtMotionPlayer;
 
 class SbmCharacter : public SmartBody::SBPawn	{
@@ -254,6 +255,7 @@ public:
 	
 	MeCtMotionPlayer*	motionplayer_ct;
 	MeCtSaccade*		saccade_ct;
+	MeCtNoiseController* noise_ct;
 	//MeCtReachEngine*	reachEngine[2];	
 	MeCtBreathing*			breathing_p;
 	MeCtBasicLocomotion*	basic_locomotion_ct;

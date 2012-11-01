@@ -64,6 +64,7 @@ class BMLDefs
 
 		static XMLCh* TAG_SACCADE;
 		static XMLCh* TAG_REACH;
+		static XMLCh* TAG_NOISE;
 		static XMLCh* TAG_BODYREACH;
 		static XMLCh* TAG_CONSTRAINT;
 

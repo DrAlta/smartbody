@@ -50,6 +50,7 @@
 #include <controllers/me_ct_motion_player.h>
 #include <controllers/me_ct_pose.h>
 #include <controllers/me_ct_quick_draw.h>
+#include <controllers/me_ct_noise_controller.h>
 // android does not use GPU shader for now
 #if !defined(__ANDROID__)
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
@@ -379,6 +380,10 @@ void SbmCharacter::createStandardControllers()
 	std::string physicsCtName = getName() + "_physicsController";
 	this->physics_ct->setName(physicsCtName.c_str());
 
+	this->noise_ct = new MeCtNoiseController(this);
+	std::string noiseCtName = getName() + "_noiseController";
+	this->noise_ct->setName(noiseCtName.c_str());
+
 	posture_sched_p->ref();
 	motion_sched_p->ref();
 	gaze_sched_p->ref();
@@ -420,6 +425,7 @@ void SbmCharacter::createStandardControllers()
 #if USE_PHYSICS_CHARACTER
 	ct_tree_p->add_controller( physics_ct );
 #endif
+	ct_tree_p->add_controller( noise_ct );
 	ct_tree_p->add_controller( motionplayer_ct );
 	ct_tree_p->add_controller( datareceiver_ct );
 
