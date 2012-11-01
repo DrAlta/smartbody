@@ -1,10 +1,4 @@
 scene.run("initSmartBodyNVBG.py")
-'''initialize data'''
-scene.run("InitSemantics.py")
-scene.run("InitNVBGGlobalSetting.py")
-scene.run("InitDefaultBehaviorBMLMapping.py")
-scene.run("InitCharacterBehaviorBMLMapping.py")
-scene.run("InitBrainStemGlobalSetting.py")
 
 ''' Create NVBG, SmartBodyNVBG, Set SmartbodyNVBG '''
 characterNames = scene.getCharacterNames()

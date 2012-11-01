@@ -1,7 +1,5 @@
 import Cerebella
 from Cerebella.NVBG import *
-from Cerebella import UniversalFactUtil
-from xml.etree import ElementTree as ET
 
 """
 This class define the NVBG python class that override smartbody c++ one
