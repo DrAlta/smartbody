@@ -214,6 +214,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	bml/bml_sync_point.cpp
 	bml/bml_target.cpp
 	bml/bml_saccade.cpp
+	bml/bml_noise.cpp
 	bml/bml_states.cpp
 	sbm/Event.cpp
 	sbm/GenericViewer.cpp
@@ -267,6 +268,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	controllers/me_ct_breathing.cpp
 	controllers/me_ct_breathing_interface.cpp
 	controllers/me_ct_physics_controller.cpp
+	controllers/me_ct_noise_controller.cpp
 	
 	controllers/MeCtBlendEngine.cpp
 	controllers/me_ct_motion_blend.cpp

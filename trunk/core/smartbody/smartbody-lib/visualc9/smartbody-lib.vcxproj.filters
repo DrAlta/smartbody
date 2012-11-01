@@ -973,6 +973,12 @@
     <ClCompile Include="..\src\controllers\MotionAnalysis.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\bml\bml_noise.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\controllers\me_ct_noise_controller.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -1987,6 +1993,12 @@
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\controllers\MotionAnalysis.h">
+      <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bml\bml_noise.hpp">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\controllers\me_ct_noise_controller.h">
       <Filter>controllers</Filter>
     </ClInclude>
   </ItemGroup>

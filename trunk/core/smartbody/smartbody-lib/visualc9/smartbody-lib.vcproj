@@ -1563,6 +1563,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="noise"
+				>
+				<File
+					RelativePath="..\src\controllers\me_ct_noise_controller.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\controllers\me_ct_noise_controller.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="BML"
@@ -1697,6 +1709,14 @@
 			</File>
 			<File
 				RelativePath="..\src\bml\bml_locomotion.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bml\bml_noise.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bml\bml_noise.hpp"
 				>
 			</File>
 			<File

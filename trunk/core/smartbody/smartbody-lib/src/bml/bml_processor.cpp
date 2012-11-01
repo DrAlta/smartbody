@@ -60,6 +60,7 @@
 #include "bml_quickdraw.hpp"
 #include "bml_general_param.hpp"
 #include "bml_states.hpp"
+#include "bml_noise.hpp"
 
 #include "controllers/me_ct_examples.h"
 #include "controllers/me_ct_gaze.h"
@@ -420,7 +421,9 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				behavior = /*BML::*/parse_bml_gaze( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_SACCADE )==0 ) {
 				behavior = /*BML::*/parse_bml_saccade( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, BMLDefs::TAG_CONSTRAINT )==0 ) {
+			}  else if( XMLString::compareString( tag, BMLDefs::TAG_NOISE )==0 ) {
+				behavior = /*BML::*/parse_bml_noise( child, unique_id, behav_syncs, required, request, mcu );
+			}else if( XMLString::compareString( tag, BMLDefs::TAG_CONSTRAINT )==0 ) {
 				behavior = /*BML::*/parse_bml_constraint( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_BODYREACH )==0 ) {
 				behavior = /*BML::*/parse_bml_bodyreach( child, unique_id, behav_syncs, required, request, mcu );

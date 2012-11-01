@@ -141,7 +141,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>..\src;..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\..\..\lib\xerces-c\include;..\..\..\..\lib\festival\speech_tools\include;..\..\..\..\lib\festival\festival\src\modules\VHDuration;..\..\..\..\lib\festival\festival\src\include;..\..\..\..\lib\boost;..\..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python26\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\..\..\lib\xerces-c\include;..\..\..\..\lib\festival\speech_tools\include;..\..\..\..\lib\festival\festival\src\modules\VHDuration;..\..\..\..\lib\festival\festival\src\include;..\..\..\..\lib\cerevoice\cerevoice_eng\include;..\..\..\..\lib\boost;..\..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python26\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SYSTEM_IS_WIN32;dNODEBUG;dDOUBLE;WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -234,10 +234,12 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\bml\bml_noise.cpp" />
     <ClCompile Include="..\src\controllers\MeCtBlendEngine.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_IK.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_locomotion_func.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_motion_blend.cpp" />
+    <ClCompile Include="..\src\controllers\me_ct_noise_controller.cpp" />
     <ClCompile Include="..\src\controllers\MotionAnalysis.cpp" />
     <ClCompile Include="..\src\external\perlin\perlin.cpp" />
     <ClCompile Include="..\src\sbm\action_unit.cpp" />
@@ -673,11 +675,13 @@
     <ClCompile Include="..\src\sbm\nvbg.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\bml\bml_noise.hpp" />
     <ClInclude Include="..\src\controllers\MeCtBlendEngine.h" />
     <ClInclude Include="..\src\controllers\me_blend_cover.h" />
     <ClInclude Include="..\src\controllers\me_ct_IK.hpp" />
     <ClInclude Include="..\src\controllers\me_ct_locomotion_func.hpp" />
     <ClInclude Include="..\src\controllers\me_ct_motion_blend.hpp" />
+    <ClInclude Include="..\src\controllers\me_ct_noise_controller.h" />
     <ClInclude Include="..\src\controllers\MotionAnalysis.h" />
     <ClInclude Include="..\src\external\perlin\perlin.h" />
     <ClInclude Include="..\src\sbm\action_unit.hpp" />

@@ -65,6 +65,7 @@ XMLCh* BMLDefs::TAG_LOCOTMOTION = NULL;
 
 XMLCh* BMLDefs::TAG_QUICKDRAW = NULL;
 XMLCh* BMLDefs::TAG_REACH = NULL;
+XMLCh* BMLDefs::TAG_NOISE = NULL;
 
 XMLCh* BMLDefs::TAG_SPEECH = NULL;
 XMLCh* BMLDefs::TAG_SBM_SPEECH = NULL;
@@ -396,6 +397,7 @@ BMLDefs::BMLDefs()
 
 	TAG_SACCADE				= XMLString::transcode("saccade");
 	TAG_REACH				= XMLString::transcode("sbm:reach");
+	TAG_NOISE    			= XMLString::transcode("sbm:noise");
 
 	TAG_SPEECH				= XMLString::transcode("speech");     // Original tag, here for backward compatibility
 	TAG_SBM_SPEECH			= XMLString::transcode("sbm:speech");
