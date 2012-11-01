@@ -598,6 +598,40 @@ std::vector<std::string> SBScene::getAssetPaths(std::string type)
 	return list;
 }
 
+std::vector<std::string> SBScene::getLocalAssetPaths(std::string type)
+{
+
+	std::string mediaPath = getMediaPath();
+	boost::filesystem::path mpath(mediaPath);
+	std::string completeMediaPath =  boost::filesystem::complete(mpath).string();
+	size_t mediaPathLength = completeMediaPath.size();
+
+	std::vector<std::string> paths = getAssetPaths(type);
+
+	std::vector<std::string> localPaths;
+
+	// remove the media path
+	for (std::vector<std::string>::iterator iter = paths.begin();
+		 iter != paths.end();
+		 iter++)
+	{
+		boost::filesystem::path path((*iter));
+		std::string completePath = boost::filesystem::complete( path ).string();
+		size_t loc = completePath.find(completeMediaPath);
+		if (loc == 0)
+		{
+			localPaths.push_back(completePath.substr(mediaPathLength + 1));
+		}
+		else
+		{
+			localPaths.push_back((*iter));
+		}
+	}
+
+	return localPaths;
+
+}
+
 
 void SBScene::addAssetPath(std::string type, std::string path)
 {
@@ -1041,28 +1075,28 @@ std::string SBScene::save()
 
 	// asset paths
 	std::vector<std::string>::iterator iter;
-	std::vector<std::string> motionPaths = getAssetPaths("motion");
+	std::vector<std::string> motionPaths = getLocalAssetPaths("motion");
 	for (iter = motionPaths.begin(); iter != motionPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"motion\", \"" << path << "\")\n";
 	}
 	
-	std::vector<std::string> scriptPaths = getAssetPaths("script");
+	std::vector<std::string> scriptPaths = getLocalAssetPaths("script");
 	for (iter = scriptPaths.begin(); iter != scriptPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"script\", \"" << path << "\")\n";
 	}
 
-	std::vector<std::string> audioPaths = getAssetPaths("audio");
+	std::vector<std::string> audioPaths = getLocalAssetPaths("audio");
 	for (iter = audioPaths.begin(); iter != audioPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"audio\", \"" << path << "\")\n";
 	}
 
-	std::vector<std::string> meshPaths = getAssetPaths("mesh");
+	std::vector<std::string> meshPaths = getLocalAssetPaths("mesh");
 	for (iter = meshPaths.begin(); iter != meshPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
@@ -1070,6 +1104,36 @@ std::string SBScene::save()
 	}
 	strstr << "# -------------------- load assets\n";
 	strstr << "scene.loadAssets()\n";
+
+	// scale any skeletons
+	std::vector<std::string> skeletonNames = this->getSkeletonNames();
+	for (std::vector<std::string>::iterator iter = skeletonNames.begin();
+		 iter != skeletonNames.end();
+		 iter++)
+	{
+		SBSkeleton* skeleton = this->getSkeleton((*iter));
+		if (skeleton->getScale() != 1.0f)
+		{
+			strstr << "skeleton = scene.getSkeleton(\"" << (*iter) << "\")\n";
+			strstr << "skeleton.rescale(" << skeleton->getScale() << ")\n";
+		}
+	}
+
+	
+	// motion transformations
+	std::vector<std::string> motionNames = this->getMotionNames();
+	for (std::vector<std::string>::iterator iter = motionNames.begin();
+		 iter != motionNames.end();
+		 iter++)
+	{
+		SBMotion* motion = this->getMotion((*iter));
+		if (false)
+		{
+			strstr << "motion = scene.getMotion(\"" << (*iter) << "\")\n";
+			// ...
+		}
+	}
+	
 	
 	strstr << "# -------------------- face definitions\n";
 	// face definitions
@@ -1179,7 +1243,7 @@ std::string SBScene::save()
 			 iter != mappedMotions.end();
 			 iter++)
 		{
-			strstr << "jointMap.applyMotion(scene.getMotion(\"" << (*iter) << "\")\n";
+			strstr << "jointMap.applyMotion(scene.getMotion(\"" << (*iter) << "\"))\n";
 		}
 
 		std::vector<std::string>& mappedSkeletons = jointMap->getMappedSkeletons();
@@ -1187,7 +1251,7 @@ std::string SBScene::save()
 			 iter != mappedSkeletons.end();
 			 iter++)
 		{
-			strstr << "jointMap.applySkeleton(scene.getSkeleton(\"" << (*iter) << "\")\n";
+			strstr << "jointMap.applySkeleton(scene.getSkeleton(\"" << (*iter) << "\"))\n";
 		}
 	}
 	
