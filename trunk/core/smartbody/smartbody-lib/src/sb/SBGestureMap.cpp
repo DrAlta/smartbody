@@ -42,6 +42,7 @@ SBGestureMap* SBGestureMap::copy()
 void SBGestureMap::addGestureMapping(const std::string& name, const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture)
 {
 	GestureInfo gInfo;
+	gInfo._animation = name;
 	gInfo._lexeme = lexeme;
 	gInfo._type = type;
 	gInfo._hand = hand;
