@@ -80,6 +80,7 @@ target_link_libraries( smartbody-dll
 	ode
 	python2.6
 	ncurses
+	rt
 	${MORE_LIBS}
 )
 
