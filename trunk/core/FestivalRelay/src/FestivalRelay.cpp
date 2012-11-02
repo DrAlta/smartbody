@@ -122,7 +122,7 @@ extern SpeechRequestData xmlMetaData;
 extern std::map<string,string> phonemeToViseme;
 extern std::string mapping;
 
-#if 0
+#ifndef WIN32
 SpeechRequestData xmlMetaData;
 std::map<string,string> phonemeToViseme;
 std::string mapping;
@@ -754,7 +754,10 @@ BOOL WINAPI ConsoleHandler(DWORD CEvent)
 int main(int argc, char **argv)
 {
 	std::string scriptFile = "";
-	std::string voice = "voice_rab_diphone";
+	std::string voice = "voice_kal_diphone";
+
+	mapping = "sbm";
+
 #ifdef WIN32
 	std::string festivalLibDir = "..\\..\\lib\\festival\\festival\\lib";
 #else
@@ -820,6 +823,18 @@ int main(int argc, char **argv)
 				printf("Use: -cacheDir <dir>");
 			}
 		}
+		else if (!strcmp(argv[i], "-mapping"))
+		{
+			if (argc > i + 1)
+			{
+				mapping = argv[i + 1];
+				i++;
+			}
+			else
+			{
+				printf("Use: -mapping <sbm | sbmold | facefx>");
+			}
+		}
 	}
 
 	festival_libdir = festivalLibDir.c_str();
@@ -829,7 +844,7 @@ int main(int argc, char **argv)
     festival_initialize(load_init_files,heap_size);
 
 
-    mapping = "sbm";
+
     set_phonemes_to_visemes();
 
 

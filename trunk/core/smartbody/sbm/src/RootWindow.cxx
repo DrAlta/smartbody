@@ -595,8 +595,8 @@ void BaseWindow::FaceCameraCB(Fl_Widget* widget, void* data)
 
 	SkSkeleton* skeleton = character->getSkeleton();
 	float height = skeleton->getCurrentHeight();
-	SkJoint* joint = skeleton->linear_search_joint("skullbase");
-	SkJoint* joint2 = skeleton->linear_search_joint("face_top_parent");
+	SkJoint* joint = skeleton->linear_search_joint("eyeball_left");
+	SkJoint* joint2 = skeleton->linear_search_joint("eyeball_right");
 	SkJoint* baseJoint = skeleton->linear_search_joint("base");
 
 	skeleton->update_global_matrices();
