@@ -93,7 +93,7 @@ void MeCtNoiseController::setJointNoise( std::vector<std::string>& jointNames, f
 
 float MeCtNoiseController::getNormalizeTime( float t, float offset )
 {
-	int nT = t/perlinDuration;
+	int nT = int(t/perlinDuration);
 	float normalizeTime = (t - perlinDuration*nT)/perlinDuration;
 	return normalizeTime;
 }
@@ -117,7 +117,7 @@ bool MeCtNoiseController::controller_evaluate(double t, MeFrameData& frame)
 		SrVec normalizeTime;
 		for (int k=0;k<3;k++)
 		{			
-			normalizeTime[k] = getNormalizeTime(t, perlinDuration*0.3f*k);
+			normalizeTime[k] = getNormalizeTime((float)t, perlinDuration*0.3f*k);
 		}
 		
 		std::map<std::string, Perlin>::iterator mi;
