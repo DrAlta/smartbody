@@ -1,3 +1,6 @@
+import random
+
+
 print "|--------------------------------------------|"
 print "|           Starting Crowd Demo              |"
 print "|--------------------------------------------|"
@@ -49,7 +52,7 @@ class CrowdDemo(SBScript):
 		# Once utah completes path, do again
 		if utahReached:
 			for utah in utahList:
-				move(utah.getName(), utahPath[utahCur])
+				move(utah.getName(), utahPath[utahCur], random.uniform(1.2, 5))
 			utahCur = utahCur + 1
 			# If reaches max path, reset
 			if utahCur >= pathAmt:

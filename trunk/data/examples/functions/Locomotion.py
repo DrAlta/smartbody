@@ -1,13 +1,13 @@
-def move(chrName, target, manner='run'):
+def move(chrName, target, speed):
 	''' Character name(string), target(Character/Pawn name or SrVec), Manner of movement
 		Available manners: walk, run, jog, sbm:step, sbm:jump '''
 	# Set pathfinding mode off
 	scene.getCharacter(chrName).setBoolAttribute('steering.pathFollowingMode', False)
 	# If target is character or pawn
 	if target in scene.getCharacterNames() or target in scene.getPawnNames():
-		bml.execBML(chrName, '<locomotion manner="' + manner + '" target="' + target + '"/>')
+		bml.execBML(chrName, '<locomotion speed="' + str(speed) + '" target="' + target + '"/>')
 	if type(target) is SrVec:
-		bml.execBML(chrName, '<locomotion manner="' + manner + '" target="' + vec2str(target) + '"/>')
+		bml.execBML(chrName, '<locomotion speed="' + str(speed) + '" target="' + vec2str(target) + '"/>')
 		
 # Sample lists
 #vecList = [SrVec(-500, 0, 0), SrVec(1000, -500, 0), SrVec(-700, -700, 0), SrVec(0, 500, 0)]

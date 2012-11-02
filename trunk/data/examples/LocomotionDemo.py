@@ -81,7 +81,7 @@ class LocomotionDemo(SBScript):
 		# Once doctor reaches 1 waypoint, move to next
 		if doctorReached:
 			for doctor in doctorList:
-				move(doctor.getName(), doctorPath[doctorCur])
+				move(doctor.getName(), doctorPath[doctorCur], 1.5)
 			doctorCur = doctorCur + 1
 			# If reaches max path, reset
 			if doctorCur >= pathAmt:
@@ -95,7 +95,7 @@ class LocomotionDemo(SBScript):
 		# Once elder reaches 1 waypoint, move to next
 		if elderReached:
 			for elder in elderList:
-				move(elder.getName(), elderPath[elderCur])
+				move(elder.getName(), elderPath[elderCur], 2)
 			elderCur = elderCur + 1
 			if elderCur >= pathAmt:
 				elderCur = 0

@@ -70,10 +70,10 @@ class BlendDemo(SBScript):
 			bml.execBML('utah', '<blend name="3DBlend" x=".5" y=".35" z=".7"/>')
 			played = True
 		# Maintain position and facing direction
-		setPos('brad', SrVec(-55, 102, 0))
-		setPos('utah', SrVec(155, 0, 0))
-		setPos('elder', SrVec(-155, 102, 0))
-		setPos('doctor', SrVec(55, 102, 0))
+#		setPos('brad', SrVec(-55, 102, 0))
+		#setPos('utah', SrVec(155, 0, 0))
+		#setPos('elder', SrVec(-155, 102, 0))
+		#setPos('doctor', SrVec(55, 102, 0))
 		#setFacing('brad', 0)
 		#setFacing('utah', 0)
 		#setFacing('elder', 0)
