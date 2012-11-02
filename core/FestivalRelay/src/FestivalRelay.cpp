@@ -122,7 +122,7 @@ extern SpeechRequestData xmlMetaData;
 extern std::map<string,string> phonemeToViseme;
 extern std::string mapping;
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__APPLE__)
 SpeechRequestData xmlMetaData;
 std::map<string,string> phonemeToViseme;
 std::string mapping;
