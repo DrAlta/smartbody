@@ -21,6 +21,7 @@ public:
 	virtual bool load(std::string skeletonFile);
 	virtual bool save(std::string skeletonFile);
 	std::string saveToString();
+	void loadFromString(const std::string& info);
 
 	void setFileName(const std::string& fname);
 	const std::string& getFileName();

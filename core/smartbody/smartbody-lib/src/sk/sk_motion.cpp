@@ -1837,7 +1837,18 @@ void SkMotion::smoothByMask(std::vector<int>& frameIds, std::vector<float>& mask
 }
 
 
-SkMotion* SkMotion::buildMirrorMotion(SkSkeleton* skeleton)
+SkMotion* SkMotion::buildMirrorMotion( SkSkeleton* skeleton )
+{
+	std::map<std::string,bool> jointNameMap;
+	for (unsigned int i=0; i<skeleton->joints().size();i++)
+	{
+		SkJoint* joint = skeleton->joints()[i];
+		jointNameMap[joint->name()] = true;
+	}
+	return buildMirrorMotionJoints(skeleton,jointNameMap);
+}
+
+SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map<std::string,bool>& jointNameMap)
 {	
 	SkChannelArray& mchan_arr = this->channels();
 	SkMotion *mirror_p = new SmartBody::SBMotion();
@@ -1855,10 +1866,18 @@ SkMotion* SkMotion::buildMirrorMotion(SkSkeleton* skeleton)
 		{
 			SkChannel& chan = mchan_arr[k];
 			const std::string& jointName = mchan_arr.name(k);
+			bool mirrorJoint = true;
+			// not used joints
+			if (jointNameMap.find(jointName) == jointNameMap.end())
+				mirrorJoint = false;
+
 			int index = mchan_arr.float_position(k);
 			if (chan.type == SkChannel::XPos)
 			{
-				new_p[index] = -ref_p[index]; // flip x-translation
+				if (mirrorJoint)
+					new_p[index] = -ref_p[index]; // flip x-translation
+				else
+					new_p[index] = ref_p[index];
 			}
 			else if (chan.type == SkChannel::Quat)
 			{
@@ -1875,27 +1894,31 @@ SkMotion* SkMotion::buildMirrorMotion(SkSkeleton* skeleton)
 				}
 				else
 				{
-					SrQuat q_zero = SrQuat(joint->gmatZero());
-					SrQuat q_lzero = SrQuat(joint->gmatZero());
-					// map left to right joint
-					if (boost::algorithm::starts_with(jointName,"l_") || boost::algorithm::starts_with(jointName,"r_"))
+					SrQuat final_q = q_orig;	
+					if (mirrorJoint)
 					{
-						std::string jointNameComp = jointName;
-						jointNameComp[0] = (jointNameComp[0]=='r') ? 'l' : 'r';  // get the mirror joint name	
-						SkJoint* jointComp = skeleton->search_joint(jointNameComp.c_str());
-						if (jointComp)
-							q_lzero = SrQuat(jointComp->gmatZero());
+						SrQuat q_zero = SrQuat(joint->gmatZero());
+						SrQuat q_lzero = SrQuat(joint->gmatZero());
+						// map left to right joint
+						if (boost::algorithm::starts_with(jointName,"l_") || boost::algorithm::starts_with(jointName,"r_"))
+						{
+							std::string jointNameComp = jointName;
+							jointNameComp[0] = (jointNameComp[0]=='r') ? 'l' : 'r';  // get the mirror joint name	
+							SkJoint* jointComp = skeleton->search_joint(jointNameComp.c_str());
+							if (jointComp)
+								q_lzero = SrQuat(jointComp->gmatZero());
 
-					}
+						}
 
-					SrVec qa_rot = qa*q_zero;					
-					SrQuat qa_temp = SrQuat(qa_rot);
-					euler_t ref_e = euler_t(quat_t(qa_temp.w,qa_temp.x,qa_temp.y,qa_temp.z));														
-					quat_t new_q = euler_t( ref_e.x(), -ref_e.y(), -ref_e.z() );
-					vector3_t new_qv = new_q.axisangle();
-					//SrVec new_qa = SrVec(qa_rot.x,-qa_rot.y,-qa_rot.z)*q_lzero.inverse();//SrVec((float)new_qv.x(),(float)new_qv.y(),(float)new_qv.z())*q_zero.inverse();
-					SrVec new_qa = SrVec((float)new_qv.x(),(float)new_qv.y(),(float)new_qv.z())*q_lzero.inverse();				
-					SrQuat final_q = SrQuat(new_qa);										
+						SrVec qa_rot = qa*q_zero;					
+						SrQuat qa_temp = SrQuat(qa_rot);
+						euler_t ref_e = euler_t(quat_t(qa_temp.w,qa_temp.x,qa_temp.y,qa_temp.z));														
+						quat_t new_q = euler_t( ref_e.x(), -ref_e.y(), -ref_e.z() );
+						vector3_t new_qv = new_q.axisangle();
+						//SrVec new_qa = SrVec(qa_rot.x,-qa_rot.y,-qa_rot.z)*q_lzero.inverse();//SrVec((float)new_qv.x(),(float)new_qv.y(),(float)new_qv.z())*q_zero.inverse();
+						SrVec new_qa = SrVec((float)new_qv.x(),(float)new_qv.y(),(float)new_qv.z())*q_lzero.inverse();				
+						final_q = SrQuat(new_qa);	
+					}																
 					
 #if 0 // print debug info 
 					if (joint->name() == "r_shoulder" || joint->name() == "l_shoulder")
@@ -1927,7 +1950,9 @@ SkMotion* SkMotion::buildMirrorMotion(SkSkeleton* skeleton)
 		for (int k=0;k<mchan_arr.size();k++)
 		{
 			SkChannel& chan = mchan_arr[k];
-			const std::string& jointName = mchan_arr.name(k);
+			const std::string& jointName = mchan_arr.name(k);			
+			if (jointNameMap.find(jointName) == jointNameMap.end()) // skip joint value swapping
+				continue;
 			int index = mchan_arr.float_position(k);
 			if (boost::algorithm::starts_with(jointName,"l_"))
 			{

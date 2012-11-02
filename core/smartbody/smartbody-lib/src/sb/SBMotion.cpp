@@ -946,6 +946,45 @@ SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 	return sbmotion;
 }
 
+
+SBMotion* SBMotion::mirrorChildren( std::string name, std::string skeletonName, std::string parentJointName )
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	SBSkeleton* skeleton = mcu._scene->getSkeleton(skeletonName);
+	if (!skeleton)
+	{
+		LOG("Skeleton %s not found. Mirror motion %s not built.",skeletonName.c_str(),name.c_str());
+		return NULL;
+	}
+	std::map<std::string,bool> jointNameMap;
+	SBJoint* pjoint = skeleton->getJointByName(parentJointName);
+	std::vector<SBJoint*> childJoints = pjoint->getDescendants();
+	for (unsigned int i=0;i<childJoints.size();i++)
+	{
+		jointNameMap[childJoints[i]->name()] = true;
+	}
+	
+	SkMotion* motion = buildMirrorMotionJoints(skeleton,jointNameMap);
+	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
+	if (sbmotion)
+	{
+		std::string motionName = "";
+		if (name == "")
+		{
+			motionName = sbmotion->getName();
+			if (motionName == EMPTY_STRING)
+				motionName = getName() + "_mirror";
+		}
+		else
+			motionName = name;
+		sbmotion->setName(motionName.c_str());
+
+
+		mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, motion));
+	}
+	return sbmotion;
+}
+
 SBMotion* SBMotion::smoothCycle( std::string name, float timeInterval )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 	
@@ -1427,6 +1466,13 @@ double SBMotion::getDuration()
 }
 
 
+bool SBMotion::setSyncPoint( const std::string& syncTag, double time )
+{
+	int tagIndex = synch_points.tag_index(syncTag.c_str());
+	return synch_points.set_time(tagIndex, time);
+}
+
+
 double SBMotion::getFrameRate()
 {
 	return getDuration() / double(getNumFrames() - 1);
@@ -1898,4 +1944,5 @@ std::vector<std::string> SBMotion::getMetaDataTags()
 	}
 	return tagList;
 }
+
 };

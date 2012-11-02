@@ -104,8 +104,7 @@ class srSynchPoints	{
 	// internal maintenance:
 
 		void init( void );
-		bool valid_tag( int tag );
-		bool set_time( int tag, double t );
+		bool valid_tag( int tag );		
 		bool set_interval( int tag, double t );
 
 	public:
@@ -167,6 +166,7 @@ class srSynchPoints	{
 		void set_stop( double at_time );
 
 	// queries:
+		bool set_time( int tag, double t );
 		double get_time( int tag, bool global = false );
 		double get_interval( int fr_tag, int to_tag );
 		double get_interval_to( int to_tag );

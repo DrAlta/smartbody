@@ -14,6 +14,7 @@ private:
    std::vector<std::string> m_processIdList;
    std::string m_sbmId;
    bool m_connectResult;
+   bool m_initFinish;
    vhcl::socket_t m_sockTCP_client;
 
    NetRequestManager m_netRequestManager;

@@ -22,6 +22,7 @@ using std::vector;
 SbmDebuggerClient::SbmDebuggerClient()
 {
 	m_sockTCP_client = NULL;
+	m_initFinish = false;
 }
 
 SbmDebuggerClient::~SbmDebuggerClient()
@@ -111,7 +112,8 @@ string m_tcpData;
 int m_tcpDataCount = 0;
 
 void SbmDebuggerClient::Update()
-{
+{	
+   //return;
    {
       vhcl::socket_t s = m_sockTCP_client;
 
@@ -179,7 +181,7 @@ void SbmDebuggerClient::Update()
                   }
                }
             }
-            else if (split[2] == "update")
+            else if (split[2] == "update" && m_initFinish)
             {
                // handle updates
                if (split.size() > 3)
@@ -303,10 +305,19 @@ void SbmDebuggerClient::SendSBMCommand(int requestId, const std::string & return
 
 void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
 {
-   string message = string(op) + " " + string(args);
+   string message = string(op) + " " + string(args);    
    vector<string> split;
-   vhcl::Tokenize(message, split, " \t\n");
-
+   // get first line of the string
+   size_t nl = message.find_first_of('\n');//std::find( message.begin(), message.end(), '\n' ) ;
+   std::string line1 = message;
+   std::string rest = "";
+   if (nl != std::string::npos)
+   {
+	   line1 = message.substr(0, nl );
+	   rest = message.substr(nl);
+   }  
+   vhcl::Tokenize(line1, split, " \t\n");
+   //vhcl::Tokenize(message, lines, "\n"); // separate lines
    if (split.size() > 0)
    {
       if (split[0] == "sbmdebugger")
@@ -341,11 +352,29 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
                   if (split[2] == "connect_success")
                   {
                      m_connectResult = true;					
+					 m_initFinish = false;
 					 SmartBody::SBScene::getScene()->getDebuggerUtility()->initScene();
-					 SmartBody::SBScene::getScene()->getDebuggerUtility()->queryResources();
+					 SmartBody::SBScene::getScene()->getDebuggerUtility()->queryResources();					 
                   }
                   else if (split[2] == "init")
                   {
+					  if (split.size() > 3)
+					  {
+						  if (split[3] == "scene")
+						  {
+							  //initialize the rest of scene
+							  //LOG("test = %s",rest.c_str());
+							  LOG("rest string size = %d",rest.size());
+							  FILE* fp = fopen("e:/scene.py","wt");
+							  fprintf(fp,"%s",rest.c_str());
+							  fclose(fp);
+
+							  SmartBody::SBScene::getScene()->run(rest);
+							  m_initFinish = true;
+							  //SmartBody::SBScene::getScene()->runScript("e:/scene.py");
+						  }
+					  }
+#if 0
                      if (split.size() > 3)
                      {
                         if (split[3] == "character-skeleton")
@@ -387,8 +416,7 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
 							SmartBody::SBScene::getScene()->getDebuggerUtility()->runPythonCommand(command);						
 						}
                      }
-
-
+#endif
                      //printf("Init Received\n");
                      //printf(message.c_str());
                      //printf("\n");
