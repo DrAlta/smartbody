@@ -727,7 +727,7 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 		module->playSpeed = su.playSpeed;
 		if (su.duration > 0.f) // the user set a state duration, adjut playSpeed
 		{
-			module->playSpeed = module->timeManager->getDuration()/su.duration;
+			module->playSpeed = float(module->timeManager->getDuration()/su.duration);
 		}
 		std::vector<std::string> joints;
 		SkJoint* j = character->getSkeleton()->search_joint(su.partialJoint.c_str());
