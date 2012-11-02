@@ -69,12 +69,14 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 				}
 			}
 		}
-		animationName = gestureMap->getGestureByInfo(lexeme, type, mode, style, posture);
+		animationName = gestureMap->getGestureByInfo(lexeme, type, mode, style, posture, request->actor->getStringAttribute("gesturePolicy"));
 		if (animationName == "")
 		{
 			LOG("Could not find animation for: %s %s %s %s %s", lexeme.c_str(), type.c_str(), mode.c_str(), style.c_str(), posture.c_str());
 			return BehaviorRequestPtr();
 		}
+		else
+			LOG("bml_gesture gesture retrieval: %s", animationName.c_str());
 	}
 
 	if (animationName == "")
