@@ -1132,8 +1132,8 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
 				SrVec camEye = SrVec(0,1.66f,1.85f)*scale;
 				SrVec camCenter = SrVec(0,0.92f,0)*scale;	
-				float znear = 0.01*scale;
-				float zfar = 100.0*scale;
+				float znear = 0.01f*scale;
+				float zfar = 100.0f*scale;
 				char camCommand[256];
 				sprintf(camCommand,"camera eye %f %f %f",camEye[0],camEye[1],camEye[2]);				
 				mcu_p->execute((char*)camCommand);
@@ -1156,8 +1156,8 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				}
 				camera->view_all(sceneBox, camera->fovy);	
 				float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
-				float znear = 0.01*scale;
-				float zfar = 100.0*scale;
+				float znear = 0.01f*scale;
+				float zfar = 100.0f*scale;
 				camera->setNearPlane(znear);
 				camera->setFarPlane(zfar);
 			}
