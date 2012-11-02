@@ -1,7 +1,6 @@
 print "|--------------------------------------------|"
 print "|        Starting Retargetting Demo          |"
 print "|--------------------------------------------|"
-'''FEET SLIDING STUFF'''
 
 # Add asset paths
 scene.addAssetPath("script","../../../../data/examples")

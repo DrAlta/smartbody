@@ -4,9 +4,9 @@ print "|        Starting Physics Pawn Demo          |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath("script","../../../../data/examples")
-scene.addAssetPath("script","../../../../data/examples/functions")
-scene.addAssetPath("script","../../../../data/sbm-common/scripts")
+scene.addAssetPath("script", "../../../../data/examples")
+scene.addAssetPath("script", "../../../../data/examples/functions")
+scene.addAssetPath("script", "../../../../data/sbm-common/scripts")
 scene.addAssetPath('seq', '../../../../data/sbm-common/scripts')
 scene.addAssetPath('seq', '../../../../data/sbm-test/scripts')
 scene.addAssetPath('mesh', '../../../../data/mesh')
@@ -45,14 +45,19 @@ scene.run('Physics.py')
 # Setup pawn physics
 for pawn in pawnList:
 	setupPawnPhysics(pawn.getName())
+	# Random mass
+	mass = random.randrange(1, 11)
+	phyManager.getPhysicsPawn(pawn.getName()).setDoubleAttribute('mass', mass)
 
+# print phyManager.getPhysicsPawn(pawn.getName()).getAttribute('refLinearVelocity').getValue().getData(0)
+# phyManager.getPhysicsPawn(pawn.getName()).setVec3Attribute('refLinearVelocity', 10, 0, 0)
+	
 last = 0
 canTime = True
-delay = 3
-started = False
+delay = 5
 class PhysicsPawnDemo(SBScript):
 	def update(self, time):
-		global canTime, last, started
+		global canTime, last
 		if canTime:
 			last = time
 			canTime = False

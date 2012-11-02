@@ -11,6 +11,10 @@ def initGestureMap():
 			posture = 'HandsAtSide_Motex'
 		if 'elder' in name or 'doctor' in name:
 			posture = 'LHandOnHip_Motex'
+		if 'ChrBrad' in name:
+			posture = 'ChrBrad@Idle01'
+		if 'ChrRachel' in name:
+			posture = 'ChrRachel_ChrBrad@Idle01'
 		# Add gesture mapping
 		gMap.addGestureMapping('HandsAtSide_RArm_GestureYou', 'YOU', '', 'RIGHT_HAND', '', posture)
 		gMap.addGestureMapping('HandsAtSide_Arms_Sweep', 'SWEEP', '', 'BOTH_HANDS', '', posture)
