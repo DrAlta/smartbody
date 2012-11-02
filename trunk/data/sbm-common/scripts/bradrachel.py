@@ -2,7 +2,7 @@ print "|--------------------------------------------|"
 print "|  data/sbm-common/scripts/bradrachel.py  |"
 print "|--------------------------------------------|"
 
-scene.setMediaPath("../../../../data/")
+scene.setMediaPath("../../../../data")
 ### Load data/sbm-common assets
 scene.addAssetPath("script", "sbm-common/scripts")
 scene.addAssetPath("mesh", "mesh")
@@ -14,8 +14,8 @@ scene.setBoolAttribute("internalAudio", True)
 scene.run("default-viewer.py")
 
 camera = getCamera()
-camera.setEye(-0.349958, 2.63862, 2.30012)
-camera.setCenter(0.0118491, 2.17959, 0.395263)
+camera.setEye(-0.35, 1.63, 2.3)
+camera.setCenter(0.012, 1.18, 0.40)
 camera.setUpVector(SrVec(0, 1, 0))
 camera.setScale(1)
 camera.setFov(1.0472)
@@ -75,7 +75,7 @@ brad = scene.createCharacter("ChrBrad", "")
 bradSkeleton = scene.createSkeleton("ChrBrad.sk")
 brad.setSkeleton(bradSkeleton)
 brad.setFaceDefinition(bradFace)
-bradPos = SrVec(.35, 1.02, 0)
+bradPos = SrVec(.35, 0, 0)
 brad.setPosition(bradPos)
 bradHPR = SrVec(-17, 0, 0)
 brad.setHPR(bradHPR)
@@ -87,7 +87,7 @@ brad.setStringAttribute("deformableMesh", "ChrBrad")
 brad.setStringAttribute("diphoneSetName", "default")
 brad.setBoolAttribute("useDiphone", True)
 brad.setVoice("remote")
-brad.setVoiceCode("Festival_voice_rab_diphone")
+brad.setVoiceCode("Festival_voice_kal_diphone")
 
 ############################# Rachel
 rachelSkeleton = scene.getSkeleton("ChrRachel.sk")
@@ -129,7 +129,7 @@ rachel = scene.createCharacter("ChrRachel", "")
 rachelSkeleton = scene.createSkeleton("ChrRachel.sk")
 rachel.setSkeleton(rachelSkeleton)
 rachel.setFaceDefinition(rachelFace)
-rachelPos = SrVec(-.35, 1.02, 0)
+rachelPos = SrVec(-.35, 0, 0)
 rachel.setPosition(rachelPos)
 rachelHPR = SrVec(17, 0, 0)
 rachel.setHPR(rachelHPR)
@@ -144,14 +144,90 @@ rachel.setVoice("remote")
 rachel.setVoiceCode("MicrosoftAnna")
 
 # Brad's gestures
-# mirror right->left
+# mirror left->right
 bradGestureMirrors = StringVec()
-#bradGestureMirrors.append(
+bradGestureMirrors.append("ChrBrad@Idle01_BeatHighLf01")
+bradGestureMirrors.append("ChrBrad@Idle01_BeatMidLf01")
+bradGestureMirrors.append("ChrBrad@Idle01_ChopLf01")
+bradGestureMirrors.append("ChrBrad@Idle01_ExampleLf01")
+bradGestureMirrors.append("ChrBrad@Idle01_HoweverLf01")
+bradGestureMirrors.append("ChrBrad@Idle01_MeLf01")
+bradGestureMirrors.append("ChrBrad@Idle01_OfferLf01")
+bradGestureMirrors.append("ChrBrad@Idle01_PointLf01")
+bradGestureMirrors.append("ChrBrad@Idle01_SafeLf01")
+bradGestureMirrors.append("ChrBrad@Idle01_ScratchHeadLf01")
+bradGestureMirrors.append("ChrBrad@Idle01_ScratchTempleLf01")
+bradGestureMirrors.append("ChrBrad@Idle01_YouLf01")
 
-# todo
+for i in range(0, len(bradGestureMirrors)):
+	motion = scene.getMotion(bradGestureMirrors[i])
+	mirrorMotion = motion.mirror(bradGestureMirrors[i] + "Rt", "ChrBrad.sk")
+
+bradGestureMap = scene.getGestureMapManager().createGestureMap("bradgestures")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_BeatHighLf01", "BEAT", "HIGH", "LEFT_HAND", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_BeatMidLf01", "BEAT", "MID", "LEFT_HAND", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_BeatLowLf01", "BEAT", "LOW", "LEFT_HAND", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_BeatHighLf01Rt", "BEAT", "HIGH", "RIGHT_HAND", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_BeatMidLf01Rt", "BEAT", "MID", "RIGHT_HAND", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_BeatLowLf01Rt", "BEAT", "LOW", "RIGHT_HAND", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_BeatHighBt01", "BEAT", "HIGH", "BOTH_HANDS", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_BeatMidBt01", "BEAT", "MID", "BOTH_HANDS", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_BeatLowBt01", "BEAT", "LOW", "BOTH_HANDS", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_ChopLf01", "CHOP", "", "LEFT_HAND", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_ChopLf01Rt", "CHOP", "", "RIGHT_HAND", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_ChopBt01", "CHOP", "", "BOTH_HANDS", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_ChopLf01", "CHOP", "", "LEFT_HAND", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_PointLf01", "POINT", "", "LEFT_HAND", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_PointLf01Rt", "POINT", "", "RIGHT_HAND", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_OfferLf01", "OFFER", "", "LEFT_HAND", "", "ChrBrad@Idle01")
+bradGestureMap.addGestureMapping("ChrBrad@Idle01_OfferRt01", "OFFER", "", "RIGHT_HAND", "", "ChrBrad@Idle01")
+
+brad.setStringAttribute("gestureMap", "bradgestures")
 
 # Rachel's gestures
-# todo
+# mirror left->right
+rachelGestureMirrors = StringVec()
+rachelGestureMirrors.append("ChrRachel_ChrBrad@Idle01_BeatHighLf01")
+rachelGestureMirrors.append("ChrRachel_ChrBrad@Idle01_BeatMidLf01")
+rachelGestureMirrors.append("ChrRachel_ChrBrad@Idle01_ChopLf01")
+rachelGestureMirrors.append("ChrRachel_ChrBrad@Idle01_ExampleLf01")
+rachelGestureMirrors.append("ChrRachel_ChrBrad@Idle01_HoweverLf01")
+rachelGestureMirrors.append("ChrRachel_ChrBrad@Idle01_MeLf01")
+rachelGestureMirrors.append("ChrRachel_ChrBrad@Idle01_OfferLf01")
+rachelGestureMirrors.append("ChrRachel_ChrBrad@Idle01_PointLf01")
+rachelGestureMirrors.append("ChrRachel_ChrBrad@Idle01_SafeLf01")
+rachelGestureMirrors.append("ChrRachel_ChrBrad@Idle01_ScratchHeadLf01")
+rachelGestureMirrors.append("ChrRachel_ChrBrad@Idle01_ScratchTempleLf01")
+rachelGestureMirrors.append("ChrRachel_ChrBrad@Idle01_YouLf01")
+
+for i in range(0, len(bradGestureMirrors)):
+	motion = scene.getMotion(bradGestureMirrors[i])
+	mirrorMotion = motion.mirror(bradGestureMirrors[i] + "Rt", "ChrBrad.sk")
+
+rachelGestureMap = scene.getGestureMapManager().createGestureMap("rachelgestures")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_BeatHighLf01", "BEAT", "HIGH", "LEFT_HAND", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_BeatMidLf01", "BEAT", "MID", "LEFT_HAND", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_BeatLowLf01", "BEAT", "LOW", "LEFT_HAND", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_BeatHighLf01Rt", "BEAT", "HIGH", "RIGHT_HAND", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_BeatMidLf01Rt", "BEAT", "MID", "RIGHT_HAND", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_BeatLowLf01Rt", "BEAT", "LOW", "RIGHT_HAND", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_BeatHighBt01", "BEAT", "HIGH", "BOTH_HANDS", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_BeatMidBt01", "BEAT", "MID", "BOTH_HANDS", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_BeatLowBt01", "BEAT", "LOW", "BOTH_HANDS", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_ChopLf01", "CHOP", "", "LEFT_HAND", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_ChopLf01Rt", "CHOP", "", "RIGHT_HAND", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_ChopBt01", "CHOP", "", "BOTH_HANDS", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_ChopLf01", "CHOP", "", "LEFT_HAND", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_PointLf01", "POINT", "", "LEFT_HAND", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_PointLf01Rt", "POINT", "", "RIGHT_HAND", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_OfferLf01", "OFFER", "", "LEFT_HAND", "", "ChrRachel_ChrBrad@Idle01")
+rachelGestureMap.addGestureMapping("ChrRachel_ChrBrad@Idle01_OfferRt01", "OFFER", "", "RIGHT_HAND", "", "ChrRachel_ChrBrad@Idle01")
+
+rachel.setStringAttribute("gestureMap", "rachelgestures")
+
+
+# reaching/grasping/touching
+
 
 scene.setDefaultCharacter("ChrBrad")
 scene.setDefaultRecipient("ChrRachel")
