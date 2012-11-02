@@ -1,15 +1,19 @@
 physicsOn = True
 phyManager = scene.getPhysicsManager()
-scene.getPhysicsManager().getPhysicsEngine().setBoolAttribute('enable', physicsOn)
+phyManager.getPhysicsEngine().setBoolAttribute('enable', physicsOn)
 
 def printJointNames(chr):
 	jointList = scene.getCharacter(chr).getSkeleton().getJointNames()	
 	for joint in jointList:
 		print joint
 	
-def setupPawnPhysics(chr):
+def setupPawnPhysics(pawn):
 	''' Name of pawn to set up physics for '''
-	scene.getPawn(chr).getAttribute('createPhysics').setValue()
+	#scene.getPawn(pawn).getAttribute('createPhysics').setValue()
+	pawnName = pawn
+	geomType = scene.getPawn(pawn).getAttribute('collisionShape').getValue()
+	geomSize = scene.getPawn(pawn).getAttribute('collisionShapeScale').getValue()
+	phyManager.createPhysicsPawn(pawnName, geomType, geomSize)
 	
 def setupCharacterPhysics(chr):
 	''' Name of character to set up physics for '''
@@ -74,7 +78,13 @@ def togglePhysics(chr, power=''):
 		phyManager.getPhysicsCharacter(chr).setBoolAttribute('enable', False)
 		phyManager.getPhysicsCharacter(chr).setBoolAttribute('usePD', False)
 	
-def togglePawnPhysics(chr):
-	isOn = scene.getPawn(chr).getAttribute('enablePhysics').getValue()
-	scene.getPawn(chr).setBoolAttribute('enablePhysics', not isOn)
+def togglePawnPhysics(chr, power=''):
+	if power == '':
+		isOn = scene.getPawn(chr).getAttribute('enablePhysics').getValue()
+		scene.getPawn(chr).setBoolAttribute('enablePhysics', not isOn)
+	elif power == 'on':
+		scene.getPawn(chr).setBoolAttribute('enablePhysics', True)
+	elif power == 'off':
+		scene.getPawn(chr).setBoolAttribute('enablePhysics', False)
+	
 	

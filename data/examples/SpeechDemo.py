@@ -87,7 +87,7 @@ def speakRandomSentence():
 	duration = 5
 	if 'angry' in randomSentence: 
 		angry('utah', duration)
-		playGesture('utah', 'SWEEP', 'RIGHT_HAND')
+		playGesture('utah', 'SWEEPRIGHT', 'RIGHT_HAND')
 	if 'happy' in randomSentence: 
 		happy('utah', duration)
 		playGesture('utah', 'OFFER', 'RIGHT_HAND')
