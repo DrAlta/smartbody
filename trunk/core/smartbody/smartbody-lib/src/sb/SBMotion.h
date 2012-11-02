@@ -30,8 +30,7 @@ class SBMotion : public SkMotion
 		SBMotion();
 		SBMotion(const SBMotion& motion);
 		SBMotion(std::string motionFile);
-		~SBMotion();
-
+		~SBMotion();		
 		const std::string& getMotionFileName();
 		int getNumFrames();
 		std::vector<float> getFrameData(int i);
@@ -51,6 +50,7 @@ class SBMotion : public SkMotion
 		SBMotion* duplicateCycle(int num, std::string name);
 
 		SBMotion* mirror(std::string name, std::string skeletonName);
+		SBMotion* mirrorChildren(std::string name, std::string skeletonName, std::string parentJointName);
 		SBMotion* smoothCycle(std::string name, float timeInterval);
 		SBMotion* retarget(std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints, std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJointMap);	
 
@@ -94,6 +94,8 @@ class SBMotion : public SkMotion
 		double getTimeStrokeEnd();
 		double getTimeRelax();
 		double getTimeStop();
+
+		bool setSyncPoint(const std::string& syncTag, double time);		
 
 		bool addMetaData(const std::string& tagName, const std::string& strValue);
 		bool hasMetaData(const std::string& tagName);

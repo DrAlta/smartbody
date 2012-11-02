@@ -40,7 +40,7 @@ class SBScene : public SBObject
 		~SBScene(void);
 
 		void update();
-		std::string save();
+		std::string save(bool remoteSetup = false);
 		void exportScene(const std::string& filename);
 		static SBScene* getScene();
 
@@ -50,7 +50,7 @@ class SBScene : public SBObject
 		void command(const std::string& command);
 		void commandAt(float seconds, const std::string& command);
 		void sendVHMsg(std::string message);
-		void sendVHMsg2(std::string messageType, std::string encodedMessage);
+		void sendVHMsg2(std::string messageType, std::string encodedMessage);		
 
 		SBCharacter* createCharacter(std::string charName, std::string metaInfo);
 		SBPawn* createPawn(std::string);
@@ -94,6 +94,8 @@ class SBScene : public SBObject
 		void loadMotions();
 		void addPose(std::string path, bool recursive);
 		void addMotion(std::string path, bool recursive);
+		SBSkeleton* addSkeletonDefinition(std::string skelName);
+		SBMotion* addMotionDefinition(std::string motionName, double duration);
 		
 		void run(std::string command);
 		void runScript(std::string script);

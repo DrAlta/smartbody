@@ -126,6 +126,13 @@ std::string SBSkeleton::saveToString()
 	return retString;
 }
 
+void SBSkeleton::loadFromString(const std::string& info )
+{
+	LOG("loadFromString = %s",info.c_str());
+	SrInput input(info.c_str());	
+	SkSkeleton::load(input);
+}
+
 int SBSkeleton::getNumJoints()
 {
 	return joints().size();

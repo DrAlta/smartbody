@@ -35,6 +35,8 @@
 #include <sbm/sbm_audio.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/foreach.hpp>
 #include <sbm/nvbg.h>
 
 namespace SmartBody {
@@ -462,9 +464,8 @@ SBSkeleton* SBScene::getSkeleton(std::string name)
 SBMotion* SBScene::getMotion(std::string name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	SkMotion* motion = mcu.getMotion(name);
-	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
+	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);	
 	return sbmotion;
 }
 
@@ -632,7 +633,6 @@ std::vector<std::string> SBScene::getLocalAssetPaths(std::string type)
 
 }
 
-
 void SBScene::addAssetPath(std::string type, std::string path)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
@@ -732,6 +732,27 @@ void SBScene::loadAssetsFromPath(std::string assetPath)
 	std::string finalPath = p.string();
 	mcu.load_motions(finalPath.c_str(), true);
 	mcu.load_skeletons(finalPath.c_str(), true);
+}
+
+SBSkeleton* SBScene::addSkeletonDefinition( std::string skelName )
+{
+	SBSkeleton* sbSkel = new SBSkeleton();
+	SkSkeleton* skSkel = sbSkel;	
+	sbSkel->setName(skelName);
+	skSkel->skfilename(skelName.c_str());
+	mcuCBHandle::singleton().skeleton_map.insert(std::pair<std::string, SkSkeleton*>(sbSkel->getName(), skSkel));
+	return sbSkel;
+}
+
+SBMotion* SBScene::addMotionDefinition( std::string motionName, double duration )
+{
+	SBMotion* sbMotion = new SBMotion();
+	sbMotion->insert_frame(0,0.f);
+	sbMotion->insert_frame(1,(float)duration);
+	sbMotion->setName(motionName);	
+	//mcuCBHandle::singleton().motion_map.insert(std::pair<std::string, SkMotion*>(motionName, sbMotion));
+	mcuCBHandle::singleton().motion_map[motionName] = sbMotion;
+	return sbMotion;
 }
 
 void SBScene::addPose(std::string path, bool recursive)
@@ -1045,7 +1066,7 @@ std::map<std::string, SBScript*>& SBScene::getScripts()
 	return _scripts;
 }
 
-std::string SBScene::save()
+std::string SBScene::save(bool remoteSetup)
 {
 	std::stringstream strstr;
 
@@ -1067,6 +1088,7 @@ std::string SBScene::save()
 		strstr << "camera.setAspectRatio(" << mcu.camera_p->getAspectRatio() << ")\n";
 	}
 	
+	strstr << "scene.setScale(" << getScale() << ")\n";
 	strstr << "# -------------------- media and asset paths\n";
 
 	// mediapath
@@ -1075,78 +1097,103 @@ std::string SBScene::save()
 
 	// asset paths
 	std::vector<std::string>::iterator iter;
-	std::vector<std::string> motionPaths = getLocalAssetPaths("motion");
+	std::vector<std::string> motionPaths = getAssetPaths("motion");
 	for (iter = motionPaths.begin(); iter != motionPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"motion\", \"" << path << "\")\n";
 	}
 	
-	std::vector<std::string> scriptPaths = getLocalAssetPaths("script");
+	std::vector<std::string> scriptPaths = getAssetPaths("script");
 	for (iter = scriptPaths.begin(); iter != scriptPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"script\", \"" << path << "\")\n";
 	}
 
-	std::vector<std::string> audioPaths = getLocalAssetPaths("audio");
+	std::vector<std::string> audioPaths = getAssetPaths("audio");
 	for (iter = audioPaths.begin(); iter != audioPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"audio\", \"" << path << "\")\n";
 	}
 
-	std::vector<std::string> meshPaths = getLocalAssetPaths("mesh");
+	std::vector<std::string> meshPaths = getAssetPaths("mesh");
 	for (iter = meshPaths.begin(); iter != meshPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"mesh\", \"" << path << "\")\n";
 	}
-	strstr << "# -------------------- load assets\n";
-	strstr << "scene.loadAssets()\n";
-
-	// scale any skeletons
-	std::vector<std::string> skeletonNames = this->getSkeletonNames();
-	for (std::vector<std::string>::iterator iter = skeletonNames.begin();
-		 iter != skeletonNames.end();
-		 iter++)
+	if (remoteSetup) // to-do : different treatment when saving setup script for remote connection
 	{
-		SBSkeleton* skeleton = this->getSkeleton((*iter));
-		if (skeleton->getScale() != 1.0f)
+		// need to go through all skeleton, and explicitly create those skeletons from script
+		std::vector<std::string> skeletonNames = getSkeletonNames();
+		std::vector<std::string> charNames = getCharacterNames();
+		std::map<std::string, std::string> charSkelMap;
+		for (unsigned int i=0;i<charNames.size(); i++)
 		{
-			strstr << "skeleton = scene.getSkeleton(\"" << (*iter) << "\")\n";
-			strstr << "skeleton.rescale(" << skeleton->getScale() << ")\n";
+			std::string charName = charNames[i];
+			SBCharacter* sbChar = getCharacter(charName);
+			if (!sbChar)
+				continue;
+			std::string skelName = sbChar->getSkeleton()->getName();
+			SBSkeleton* skel = getSkeleton(skelName);
+			if (skel && charSkelMap.find(skelName) == charSkelMap.end())
+			{
+				std::string skelStr = skel->saveToString();
+				strstr << "tempSkel = scene.addSkeletonDefinition(\"" << skelName << "\")\n";	
+				std::string skelSaveStr = skel->saveToString();
+				//skelSaveStr.replace('\n',)
+				boost::replace_all(skelSaveStr,"\n","\\n");
+				boost::replace_all(skelSaveStr,"\"","");
+				strstr << "tempSkel.loadFromString(\"" << skelSaveStr << "\")\n";
+				charSkelMap[skelName] = charName;
+			}
+		}
+
+		std::vector<std::string> motionNames = getMotionNames();
+		for (unsigned int i=0;i<motionNames.size();i++)
+		{
+			std::string moName = motionNames[i];
+			SBMotion* motion = getMotion(moName);
+			if (motion)
+			{
+				// add motion definition
+				strstr << "tempMotion = scene.addMotionDefinition(\"" << moName << "\"," << motion->getDuration() << ")\n";	
+				// add sync points
+				strstr << "tempMotion.setSyncPoint(\"start\"," << motion->getTimeStart() <<")\n";
+				strstr << "tempMotion.setSyncPoint(\"ready\"," << motion->getTimeReady() <<")\n";
+				strstr << "tempMotion.setSyncPoint(\"stroke_start\"," << motion->getTimeStrokeStart() <<")\n";
+				strstr << "tempMotion.setSyncPoint(\"stroke\"," << motion->getTimeStroke() <<")\n";
+				strstr << "tempMotion.setSyncPoint(\"stroke_stop\"," << motion->getTimeStrokeEnd() <<")\n";
+				strstr << "tempMotion.setSyncPoint(\"relax\"," << motion->getTimeRelax() <<")\n";
+				strstr << "tempMotion.setSyncPoint(\"stop\"," << motion->getTimeStop() <<")\n";				
+				// add meta data tag
+				BOOST_FOREACH(const std::string& tagName, motion->getMetaDataTags())
+				{
+					strstr << "tempMotion.addMetaData(\"" << tagName << "\",\"" << motion->getMetaDataString(tagName) << "\")\n";
+				}
+			}
 		}
 	}
-
-	
-	// motion transformations
-	std::vector<std::string> motionNames = this->getMotionNames();
-	for (std::vector<std::string>::iterator iter = motionNames.begin();
-		 iter != motionNames.end();
-		 iter++)
+	else
 	{
-		SBMotion* motion = this->getMotion((*iter));
-		if (false)
-		{
-			strstr << "motion = scene.getMotion(\"" << (*iter) << "\")\n";
-			// ...
-		}
-	}
-	
+		strstr << "# -------------------- load assets\n";
+		strstr << "scene.loadAssets()\n";
+	}	
 	
 	strstr << "# -------------------- face definitions\n";
 	// face definitions
 	std::vector<std::string> faceDefinitions = getFaceDefinitionNames();
 	for (iter = faceDefinitions.begin(); iter != faceDefinitions.end(); iter++)
 	{
-		const std::string& faceDefName = (*iter);
+		const std::string& faceDefName = (*iter);		
 		SmartBody::SBFaceDefinition* faceDef = getFaceDefinition(faceDefName);
-
 		std::string faceDefinitionName = "face";
 		faceDefinitionName.append(faceDef->getName());
-
-		strstr << faceDefinitionName << " = SBFaceDefinition()\n";
+		strstr << faceDefinitionName << " = scene.getFaceDefinition(\"" << faceDefName << "\")\n";
+		strstr << "if " << faceDefinitionName << " == None:\n";
+		strstr << "\t" << faceDefinitionName << " = scene.createFaceDefinition(\""<< faceDefName << "\")\n";
 
 		SkMotion* neutral = faceDef->getFaceNeutral();
 		if (neutral)
@@ -1155,8 +1202,8 @@ std::string SBScene::save()
 		}
 
 		std::vector<std::string> visemeNames = faceDef->getVisemeNames();
-		for (std::vector<std::string>::iterator faceIter = faceDefinitions.begin(); 
-			 faceIter != faceDefinitions.end(); 
+		for (std::vector<std::string>::iterator faceIter = visemeNames.begin(); 
+			 faceIter != visemeNames.end(); 
 			 faceIter++)
 		{
 			const std::string& viseme = (*faceIter);

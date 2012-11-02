@@ -346,7 +346,15 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
                   {
                      if (m_scene != NULL)
                      {
-						std::vector<string> skeletonNames = m_scene->getSkeletonNames();
+						 std::string message = vhcl::Format("sbmdebugger %s init scene\n", m_fullId.c_str());			
+						 std::string initScript = m_scene->save(true); // save for remote connection	 
+						 //LOG("initScript = %s",initScript.c_str());
+						 message += initScript;
+						 //LOG("initScript size = %d",initScript.size());
+						 vhmsg::ttu_notify1(message.c_str());
+
+#if 0
+						 std::vector<string> skeletonNames = m_scene->getSkeletonNames();
 						for (size_t i = 0; i < skeletonNames.size(); ++i)
 						{
 							SBSkeleton* skeleton = m_scene->getSkeleton(skeletonNames[i]);
@@ -442,6 +450,7 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 
 							vhmsg::ttu_notify1(msg.c_str());
 						}
+#endif
                      }
                   }
                   else if (split[2] == "start_update")
