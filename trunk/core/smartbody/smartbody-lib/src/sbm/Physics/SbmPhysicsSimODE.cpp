@@ -127,7 +127,7 @@ void SbmPhysicsSimODE::updateSimulationInternal( float timeStep )
 		{
 			const SrVec& extF = obj->getExternalForce();
 			const SrVec& extT = obj->getExternalTorque();
-			if (extF.y > 1e-5)
+			if (extF.norm() > 1e-5)
 				dBodyAddForce(odeObj->bodyID,extF.x,extF.y,extF.z);
 			dBodyAddTorque(odeObj->bodyID,extT.x,extT.y,extT.z);
 		}

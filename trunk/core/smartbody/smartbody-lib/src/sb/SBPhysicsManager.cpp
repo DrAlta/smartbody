@@ -152,6 +152,25 @@ SmartBody::SBObject* SBPhysicsManager::getJointObj( std::string charName, std::s
 	return jointObj;	
 }
 
+void SBPhysicsManager::applyForceToPawn( std::string pawnName, SrVec force )
+{
+	SbmPhysicsObj* phyObj = getPhysicsEngine()->getPhysicsPawn(pawnName);
+	if (phyObj)
+	{
+		LOG("Find phyobj, name = %s", pawnName.c_str());
+		phyObj->setExternalForce(force);
+	}
+}
+
+void SBPhysicsManager::applyForceToCharacter( std::string charName, std::string jointName, SrVec force  )
+{
+	SbmPhysicsObj* phyObj = dynamic_cast<SbmPhysicsObj*>(getJointObj(charName, jointName));
+	if (phyObj)
+	{
+		phyObj->setExternalForce(force);
+	}
+}
+
 SmartBody::SBObject* SBPhysicsManager::getPhysicsPawn( std::string pawnName )
 {
 	return getPhysicsEngine()->getPhysicsPawn(pawnName);

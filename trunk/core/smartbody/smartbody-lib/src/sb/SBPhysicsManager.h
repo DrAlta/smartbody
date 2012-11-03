@@ -23,7 +23,7 @@ class SBPhysicsManager : public SBService
 		virtual void stop();
 
 		SbmPhysicsSim* getPhysicsEngine();
-
+				
 		SmartBody::SBObject* createPhysicsCharacter(std::string charName);
 		SmartBody::SBObject* createPhysicsPawn(std::string pawnName, std::string geomType, SrVec geomSize);
 
@@ -32,6 +32,10 @@ class SBPhysicsManager : public SBService
 		SmartBody::SBObject* getPhysicsJoint(std::string charName, std::string jointName);
 		SmartBody::SBObject* getJointObj(std::string charName, std::string jointName);
 		SmartBody::SBObject* getPhysicsPawn(std::string pawnName);
+
+		void applyForceToPawn(std::string pawnName, SrVec force);
+		void applyForceToCharacter(std::string charName, std::string jointName, SrVec force);
+
 
 	protected:
 		SbmPhysicsSimODE* _ode;
