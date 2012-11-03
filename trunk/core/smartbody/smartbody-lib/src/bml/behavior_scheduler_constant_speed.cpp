@@ -252,7 +252,7 @@ void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& behav_syncs, 
 		// now determine the scaling within those intervals
 		int lastScaleIndex = 0;
 		double lastScale = 1.0;
-		std::vector<double> intervalScale; // intervalScale[0] = ready - start, intervalScale1 = strokeStart - ready, etc.
+		std::vector<double> intervalScale; // intervalScale[0] = ready - start, intervalScale[1] = strokeStart - ready, intervalScale[2] = stroke - strokeStart, intervalScale[3] = strokeEnd - stroke, intervalScale[4] = relax - strokeEnd, intervalScale[5] = end - relax.
 		for (std::vector<std::pair<int, int> >::iterator iter = intervals.begin();
 			iter != intervals.end();
 			iter++)
