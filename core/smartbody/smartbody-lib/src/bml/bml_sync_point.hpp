@@ -119,6 +119,12 @@ namespace BML {
 		void set_time(double t)
 		{ _sync->time = t; }
 
+		float offset() const
+		{ return _sync->offset; }
+
+		void set_offset(float t)
+		{ _sync->offset = t; }
+
 	protected:
 		friend class BML::BehaviorSyncPoints;
 		void set_sync( SyncPointPtr new_sync ) { _sync = new_sync; }

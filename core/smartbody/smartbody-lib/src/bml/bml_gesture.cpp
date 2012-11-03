@@ -97,6 +97,17 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		SkMotion* motion = (*motionIter).second;
 		MeCtMotion* motionCt = new MeCtMotion();
 
+		// validate gesture timing input
+		float motionStrokeToEnd = float(motion->synch_points.get_time(srSynchPoints::STROKE_STOP) - motion->synch_points.get_time(srSynchPoints::STROKE));
+		float inputStrokeToEnd = behav_syncs.sync_stroke_end()->offset() - behav_syncs.sync_stroke()->offset();
+		if (inputStrokeToEnd < motionStrokeToEnd)
+		{
+			float gap = motionStrokeToEnd - inputStrokeToEnd;
+			behav_syncs.sync_stroke_end()->set_offset(behav_syncs.sync_stroke_end()->offset() + gap);
+			behav_syncs.sync_relax()->set_offset(behav_syncs.sync_relax()->offset() + gap);
+			behav_syncs.sync_end()->set_offset(behav_syncs.sync_end()->offset() + gap);
+		}
+
 		// Name controller with behavior unique_id
 		ostringstream name;
 		name << unique_id << ' ' << motion->getName();
@@ -148,6 +159,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		{
 			motionCt->init( const_cast<SbmCharacter*>(request->actor), mForCt, 0.0, 1.0);
 		}
+
 		BehaviorRequestPtr behavPtr(new GestureRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs, joints, scale, freq) );
 		return behavPtr; 
 	} 

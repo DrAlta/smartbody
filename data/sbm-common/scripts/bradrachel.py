@@ -214,7 +214,7 @@ brad.setVoice("remote")
 brad.setVoiceCode("Festival_voice_kal_diphone")
 # gesture map setup
 brad.setStringAttribute("gestureMap", "ChrBrad")
-
+brad.setBoolAttribute("bmlRequest.autoGestureTransition", True)
 ############################# Rachel
 rachelSkeleton = scene.getSkeleton("ChrRachel.sk")
 zebra2Map.applySkeleton(rachelSkeleton)
@@ -270,6 +270,8 @@ rachel.setVoice("remote")
 rachel.setVoiceCode("MicrosoftAnna")
 # gesture map setup
 rachel.setStringAttribute("gestureMap", "ChrRachel")
+rachel.setBoolAttribute("bmlRequest.autoGestureTransition", True)
+
 
 scene.setDefaultCharacter("ChrBrad")
 scene.setDefaultRecipient("ChrRachel")
