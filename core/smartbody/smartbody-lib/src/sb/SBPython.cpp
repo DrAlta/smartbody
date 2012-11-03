@@ -981,6 +981,8 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getPhysicsJoint", &SBPhysicsManager::getPhysicsJoint, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a physics-based joint")  
 		.def("getJointObj", &SBPhysicsManager::getJointObj, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a physics-based body link") 
 		.def("getPhysicsPawn", &SBPhysicsManager::getPhysicsPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a rigid body pawn")
+		.def("applyForceToPawn", &SBPhysicsManager::applyForceToPawn, "Apply force to a physics pawn")
+		.def("applyForceToCharacter", &SBPhysicsManager::applyForceToCharacter, "Apply force to a joint of the physics character")
 		.def("start", &SBPhysicsManager::start, "Start the physics simulation.(not implemented yet)") 
 		.def("stop", &SBPhysicsManager::stop, "Stop the physics simulation.(not implemented yet)")		
 		;
