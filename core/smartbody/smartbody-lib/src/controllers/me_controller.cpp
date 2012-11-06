@@ -34,6 +34,8 @@
 #include <vhcl_log.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <sbm/sbm_pawn.hpp>
+#include <sb/SBMotion.h>
+#include <sb/SBScene.h>
 
 #include "sbm/lin_win.h"
 using namespace std;
@@ -74,8 +76,10 @@ MeController::MeController ()
 	_record_mode = RECORD_NULL;
 	_record_max_frames = 0;
 	_record_frame_count = 0;
+	_record_full_prefix = "";
 	_buffer_changes_toggle = false;
 	_buffer_changes_toggle_reset = true;
+	_record_duration = 0.0;
 
 	SBObject::createBoolAttribute("enable", true, true, "Basic", 220, false, false, false, "whether to evaluate this controller");
 	SBObject::createStringAttribute("handle", "", true, "Basic", 220, false, false, false, "handle for this controller");
@@ -330,9 +334,10 @@ void MeController::evaluate ( double time, MeFrameData& frame ) {
 
 	if (this->is_record_buffer_changes())
 		this->cal_buffer_changes( frame );
-
+#if 0 // disable recording in base controller. Should go through MtCtMotionRecorder interface
 	if( _record_mode ) 
 		cont_record( time, frame );
+#endif
 
 	if( logger )
 		logger->controller_post_evaluate( time, *_context, *this, frame );
@@ -543,20 +548,27 @@ void MeController::record_clear()	{
 
 void MeController::record_write( const char *full_prefix ) {
 	
-	_record_full_prefix = std::string(full_prefix);
-	string filename;
+	_record_full_prefix = std::string(full_prefix);	
 	ostringstream record_id_oss;
-
 	_invocation_count++;
 	if( getName() != "" )	{
 		setName( "noname" );
 	}
 	record_id_oss << _instance_id << "." << _invocation_count << "_R";
-	string recordname = string( controller_type() ) + "_" + getName() + "_" + record_id_oss.str();
-	
+	string recordname = string( controller_type() ) + "_" + getName() + "_" + record_id_oss.str();	
+	saveMotionRecord(recordname);
+	_record_full_prefix = "";
+}
+
+void MeController::saveMotionRecord( const std::string &recordname )
+{
+	std::string filename;
+	SrOutput* fileOutput = NULL;
+	SrString stringOutput;
 	if( _record_mode == RECORD_BVH_MOTION )	{
 		filename = _record_full_prefix + recordname + ".bvh";
-		_record_output = new SrOutput( filename.c_str(), "w" );
+		fileOutput = new SrOutput( filename.c_str(), "w" );
+		_record_output = new SrOutput(stringOutput);
 
 		SkSkeleton* skeleton_p = NULL;
 		if( _context->channels().size() > 0 )	{
@@ -566,7 +578,7 @@ void MeController::record_write( const char *full_prefix ) {
 			LOG("MeController::record_write NOTICE: SkSkeleton not available");
 			_record_mode = RECORD_NULL;
 		}
-		
+
 		*_record_output << "HIERARCHY\n";
 		print_bvh_hierarchy( skeleton_p->root(), 0 );
 		*_record_output << "MOTION\n";
@@ -574,43 +586,71 @@ void MeController::record_write( const char *full_prefix ) {
 			<< (const char *)"Frames: " 
 			<< (int)_frames->size() 
 			<< srnl;	
-			
+
 		*_record_output << "Frame Time: " << _record_dt << srnl;	
-//		load_bvh_joint_hmap();
+		//		load_bvh_joint_hmap();
 		LOG("MeController::write_record BVH: %s", filename.c_str() );
 	}
-	else
-	if( _record_mode == RECORD_MOTION )	{
-		filename = _record_full_prefix + recordname + ".skm";
-		_record_output = new SrOutput( filename.c_str(), "w" );
+	else if( _record_mode == RECORD_MOTION )	{
+			filename = _record_full_prefix + recordname + ".skm";
+			fileOutput = new SrOutput( filename.c_str(), "w" );		
+			_record_output = new SrOutput(stringOutput);
 
-		*_record_output << "# SKM Motion Definition - M. Kallmann 2004\n";
-		*_record_output << "# Maya exporter v0.6\n";
-		*_record_output << "# Recorded output from MeController\n\n";
-		*_record_output << "SkMotion\n\n";
-		*_record_output << "name \"" << recordname.c_str() << "\"\n\n";
+			*_record_output << "# SKM Motion Definition - M. Kallmann 2004\n";
+			*_record_output << "# Maya exporter v0.6\n";
+			*_record_output << "# Recorded output from MeController\n\n";
+			*_record_output << "SkMotion\n\n";
+			*_record_output << "name \"" << recordname.c_str() << "\"\n\n";
 
-		SkChannelArray& channels = controller_channels();
-		*_record_output << channels << srnl;
-		*_record_output << "frames " << (int)_frames->size() << srnl;	
+			SkChannelArray& channels = controller_channels();
+			*_record_output << channels << srnl;
+			*_record_output << "frames " << (int)_frames->size() << srnl;	
 
-		LOG("MeController::write_record SKM: %s", filename.c_str() );
+			LOG("MeController::write_record SKM: %s", filename.c_str() );
 	}
-	else	{
+	else	
+	{
 		LOG("MeController::init_record NOTICE: POSE not implemented");
-		_record_mode = RECORD_NULL;
-		_frames->clear();
-		//filename = _record_full_prefix + recordname + ".skp";
+			_record_mode = RECORD_NULL;
+			_frames->clear();
+			//filename = _record_full_prefix + recordname + ".skp";
 	}
+
 	std::list<FRAME>::iterator iter = _frames->begin();
 	std::list<FRAME>::iterator end  = _frames->end();
+	LOG("Output Motion, num frames = %d",_frames->size());
+	int frameCount = 0;
 	for(;iter!=end; iter++)
+	{
 		*_record_output<<(*iter).c_str()<<srnl;
-	record_clear();
-	if( _record_output )	{
-		delete _record_output;
-		_record_output = NULL;
+		//LOG("finish writing frame %d",frameCount++);
 	}
+	if (_record_mode == RECORD_MOTION) // write out time sync point to avoid erroneous results
+	{
+		*_record_output << "ready time: " << _record_duration*0.01 << srnl;
+		*_record_output << "strokeStart time: " << _record_duration*0.02 << srnl;
+		*_record_output << "emphasis time: " << _record_duration*0.5 << srnl;
+		*_record_output << "stroke time: " << _record_duration*0.99 << srnl;
+		*_record_output << "relax time: " << _record_duration*1.0 << srnl;	
+	}
+	
+	// load the motion
+	SrInput recordInput = SrInput((const char*)(stringOutput));
+	SmartBody::SBMotion* sbMotion = SmartBody::SBScene::getScene()->addMotionDefinition(recordname,-1.0);
+	sbMotion->setName(recordname);
+	sbMotion->load(recordInput);
+	sbMotion->filename(filename.c_str());
+		
+	// save motion to file as well
+	*fileOutput << stringOutput;
+	fileOutput->close();
+
+	record_clear();
+	if( fileOutput )	{
+		delete fileOutput;
+		fileOutput = NULL;
+	}
+	
 }
 
 void MeController::cont_record( double time, MeFrameData& frame )	{
@@ -632,7 +672,7 @@ void MeController::cont_record( double time, MeFrameData& frame )	{
 		frame_data.clear();
 		// NOTE: depth only used to hack STUPID-POLYTRANS ROOT bug
 		print_bvh_motion( skeleton_p->root(), 0, frame_data );		
-		if((_record_frame_count>=_record_max_frames)&&(_record_max_frames!=0))
+		if((_record_frame_count>=_record_max_frames)&&(_record_max_frames>0))
 			_frames->pop_front();
 		_frames->push_back(frame_data);
 	}
@@ -669,10 +709,11 @@ void MeController::cont_record( double time, MeFrameData& frame )	{
 			}
 		}
 		frame_data += frame_data_os.str();
-		if((_record_frame_count>=_record_max_frames)&&(_record_max_frames!=0))
+		if((_record_frame_count>=_record_max_frames)&&(_record_max_frames>0))
 			_frames->pop_front();
 		_frames->push_back(frame_data);
 	}
+	_record_duration = time;
 	_record_frame_count++;
 }
 
@@ -858,5 +899,6 @@ void MeController::notify(SmartBody::SBSubject* subject)
 	}
 
 }
+
 
 //============================ End of File ============================

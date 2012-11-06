@@ -29,8 +29,6 @@ class MeCtNoiseController : public SmartBody::SBController
 		void setValid(bool v)				{_valid = v;}	
 		void setJointNoise(std::vector<std::string>& jointNames, float scale, float frequency);
 	protected:
-		void getJointChannelValues(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat, SrVec& outPos);
-		void setJointChannelQuat(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat);
 		float getNormalizeTime(float t, float offset);
 	private:
 		virtual bool controller_evaluate(double t, MeFrameData& frame);

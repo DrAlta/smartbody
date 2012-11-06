@@ -449,7 +449,7 @@ SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 			bStop = true;
 		}
 	}
-	LOG("ReachEngine Root Name = %s\n",rootJoint->name().c_str());
+	//LOG("ReachEngine Root Name = %s\n",rootJoint->name().c_str());
 	return rootJoint;
 }
 

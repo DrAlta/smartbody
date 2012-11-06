@@ -51,6 +51,7 @@
 #include <controllers/me_ct_pose.h>
 #include <controllers/me_ct_quick_draw.h>
 #include <controllers/me_ct_noise_controller.h>
+#include <controllers/me_ct_motion_recorder.h>
 // android does not use GPU shader for now
 #if !defined(__ANDROID__)
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
@@ -139,6 +140,8 @@ head_param_anim_ct( NULL ),
 face_ct( NULL ),
 eyelid_ct( new MeCtEyeLid() ),
 motionplayer_ct( NULL ),	
+noise_ct(NULL),
+record_ct(NULL),
 face_neutral( NULL ),
 _soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 {
@@ -384,6 +387,17 @@ void SbmCharacter::createStandardControllers()
 	std::string noiseCtName = getName() + "_noiseController";
 	this->noise_ct->setName(noiseCtName.c_str());
 
+	SmartBody::SBCharacter* sbChar = dynamic_cast<SmartBody::SBCharacter*>(this);
+	if (!sbChar)
+	{
+		LOG("Error! SbChar = NULL");
+	}
+	this->record_ct = new MeCtMotionRecorder(sbChar);
+	std::string recordCtName = getName() + "_recorderController";
+	this->record_ct->setName(recordCtName.c_str());
+
+	
+
 	posture_sched_p->ref();
 	motion_sched_p->ref();
 	gaze_sched_p->ref();
@@ -428,6 +442,7 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( noise_ct );
 	ct_tree_p->add_controller( motionplayer_ct );
 	ct_tree_p->add_controller( datareceiver_ct );
+	ct_tree_p->add_controller( record_ct );
 
 	// get the default attributes from the default controllers
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -485,6 +500,8 @@ void SbmCharacter::initData()
 	param_animation_ct = NULL;
 	head_param_anim_ct = NULL;
 	saccade_ct = NULL;	
+	noise_ct = NULL;
+	record_ct = NULL;
 
 	speech_impl = NULL;
 	speech_impl_backup = NULL;

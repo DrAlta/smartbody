@@ -11,6 +11,7 @@
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBPhoneme.h>
 #include <sb/SBPhonemeManager.h>
+#include <controllers/me_ct_motion_recorder.h>
 
 namespace SmartBody {
 
@@ -68,7 +69,23 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	utterancePolicyTypes.push_back("interrupt");	
 	StringAttribute* utterancePolicyAttribute = createStringAttribute("utterancePolicy", "none", true, "Basic", 500, false, false, false, "How utterances are handled when the character is already performing an utterance. Valid values are: ignore (ignores the new utterance and any associated behaviors), queue (plays the new utterance and associated behavior when the old utterance has finished), interrupt (stops the existing utterance and associated behaviors and plays the new one)");
 	utterancePolicyAttribute->setValidValues(utterancePolicyTypes);
+}
 
+
+void SBCharacter::startMotionRecord( double frameRate )
+{
+	if (record_ct)
+	{
+		record_ct->startRecording(frameRate);
+	}
+}
+
+void SBCharacter::stopMotionRecord( const std::string& motionName )
+{
+	if (record_ct)
+	{
+		record_ct->stopRecording(motionName);
+	}
 
 }
 
@@ -595,4 +612,5 @@ void SBCharacter::notify(SBSubject* subject)
 	SbmCharacter::notify(subject);
 	SBPawn::notify(subject);
 }
+
 };

@@ -747,8 +747,11 @@ SBSkeleton* SBScene::addSkeletonDefinition( std::string skelName )
 SBMotion* SBScene::addMotionDefinition( std::string motionName, double duration )
 {
 	SBMotion* sbMotion = new SBMotion();
-	sbMotion->insert_frame(0,0.f);
-	sbMotion->insert_frame(1,(float)duration);
+	if (duration > 0)
+	{
+		sbMotion->insert_frame(0,0.f);
+		sbMotion->insert_frame(1,(float)duration);
+	}	
 	sbMotion->setName(motionName);	
 	//mcuCBHandle::singleton().motion_map.insert(std::pair<std::string, SkMotion*>(motionName, sbMotion));
 	mcuCBHandle::singleton().motion_map[motionName] = sbMotion;

@@ -53,6 +53,8 @@ class SBCharacter : public SbmCharacter
 		SBController* getControllerByIndex(int i);
 		SBController* getControllerByName(std::string name);
 		std::vector<std::string> getControllerNames();
+		void startMotionRecord(double frameRate);
+		void stopMotionRecord(const std::string& motionName);
 
 		int getNumBehaviors();
 		SBBehavior* getBehavior(int num);

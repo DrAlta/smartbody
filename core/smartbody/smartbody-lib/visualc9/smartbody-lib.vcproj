@@ -1575,6 +1575,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="motionrecorder"
+				>
+				<File
+					RelativePath="..\src\controllers\me_ct_motion_recorder.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\controllers\me_ct_motion_recorder.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="BML"

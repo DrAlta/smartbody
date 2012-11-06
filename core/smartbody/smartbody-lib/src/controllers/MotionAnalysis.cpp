@@ -313,20 +313,20 @@ void MotionAnalysis::applyIKFix( std::vector<double>& weights, PATimeManager* ti
 		{
 			legState.curSupportPos[m] = legState.curSupportPos[m]*gmatBase; // transform to global space	
 		}
-		if (legState.stanceSupportPos.size() != legState.curSupportPos.size()) // if stance pos is not initialized yet
-			legState.stanceSupportPos = legState.curSupportPos;
-		int phase = 3;		
-		LocomotionLegCycle* legCycle = dominantAnalyzer->getLegCycle(k,(float)dominantMotime);
-		transitionWeight = legCycle->getTransitionWeight((float)dominantMotime,phase);
-		if (phase == 0)
-		{
-			legState.stanceSupportPos = legState.curSupportPos;
-		}
-		// blend in/out of stance leg position
-		for (unsigned int m=0;m<legState.curSupportPos.size();m++)
-		{
-			legState.curSupportPos[m] = legState.curSupportPos[m]*transitionWeight + legState.stanceSupportPos[m]*(1.f-transitionWeight); 
-		}
+// 		if (legState.stanceSupportPos.size() != legState.curSupportPos.size()) // if stance pos is not initialized yet
+// 			legState.stanceSupportPos = legState.curSupportPos;
+// 		int phase = 3;		
+// 		LocomotionLegCycle* legCycle = dominantAnalyzer->getLegCycle(k,(float)dominantMotime);
+// 		transitionWeight = legCycle->getTransitionWeight((float)dominantMotime,phase);
+// 		if (phase == 0)
+// 		{
+// 			legState.stanceSupportPos = legState.curSupportPos;
+// 		}
+// 		// blend in/out of stance leg position
+// 		for (unsigned int m=0;m<legState.curSupportPos.size();m++)
+// 		{
+// 			legState.curSupportPos[m] = legState.curSupportPos[m]*transitionWeight + legState.stanceSupportPos[m]*(1.f-transitionWeight); 
+// 		}
 	}
 	
 	// set ik constraint
