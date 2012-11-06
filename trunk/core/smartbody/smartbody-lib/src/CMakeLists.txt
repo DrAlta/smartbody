@@ -269,6 +269,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	controllers/me_ct_breathing_interface.cpp
 	controllers/me_ct_physics_controller.cpp
 	controllers/me_ct_noise_controller.cpp
+	controllers/me_ct_motion_recorder.cpp
 	
 	controllers/MeCtBlendEngine.cpp
 	controllers/me_ct_motion_blend.cpp

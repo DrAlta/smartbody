@@ -103,9 +103,6 @@ class SBMotion : public SkMotion
 		std::string getMetaDataString(const std::string& tagName);
 		double      getMetaDataDouble(const std::string& tagName);
 		std::vector<std::string> getMetaDataTags();
-		
-		
-
 		void addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly);
 
 	protected:

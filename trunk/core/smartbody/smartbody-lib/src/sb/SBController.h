@@ -36,6 +36,10 @@ class SBController : public MeController
 
 		void setTiming(float indt, float outdt, float empht);
 
+		void getJointChannelValues(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat, SrVec& outPos);
+		void setJointChannelQuat(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat);
+		void setJointChannelPos(const std::string& jointName, MeFrameData& frame, SrVec& outPos);
+
 		virtual bool controller_evaluate ( double t, MeFrameData& frame ) { return true;}
 		virtual double controller_duration () { return 0.0; }
 		virtual SkChannelArray& controller_channels () { return channelArray; }
@@ -44,8 +48,6 @@ class SBController : public MeController
 	private:
 		SkChannelArray channelArray;
 		std::string controllerType;
-
-
 };
 
 }

@@ -95,8 +95,8 @@ class SBScene : public SBObject
 		void addPose(std::string path, bool recursive);
 		void addMotion(std::string path, bool recursive);
 		SBSkeleton* addSkeletonDefinition(std::string skelName);
-		SBMotion* addMotionDefinition(std::string motionName, double duration);
-		
+		SBMotion* addMotionDefinition(std::string motionName, double duration);			
+				
 		void run(std::string command);
 		void runScript(std::string script);
 

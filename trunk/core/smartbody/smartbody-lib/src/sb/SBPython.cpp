@@ -1242,6 +1242,8 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("isAutomaticPruning", &SBCharacter::isAutomaticPruning, "Returns true if the character's cotnroller are automatically pruned.")
 		.def("setAutomaticPruning", &SBCharacter::setAutomaticPruning, "Toggles the automatic pruning mechanism on or off.")
 		.def("pruneControllers", &SBCharacter::pruneControllers, "Prunes the controller tree.")
+		.def("startMotionRecord", &SBCharacter::startMotionRecord, "Start recording the output motion of this character.")
+		.def("stopMotionRecord", &SBCharacter::stopMotionRecord, "Stop the recording and output the motion to a .skm file.")
 		.def("setSoftEyes", &SBCharacter::setSoftEyes, "Sets the soft eyes feature.")
 		.def("isSoftEyes", &SBCharacter::isSoftEyes, "Returns the value of the soft eyes feature.")
 		.def("setUseVisemeCurves", &SBCharacter::setUseVisemeCurves, "Use curves when interpreting visemes.")

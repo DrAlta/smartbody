@@ -120,6 +120,7 @@ protected :
 	int			_record_frame_count;
 	SrOutput	*_record_output; // for recording poses and motions of immediate local results
 	double		_record_dt;
+	double      _record_duration;
 	typedef std::string FRAME;
 	std::list<FRAME>	*_frames;	// buffer to store the frame data
 	int			_record_max_frames; // maximum capacity of the buffer
@@ -282,6 +283,8 @@ public :
 	void record_motion( int max_num_of_frames );			//record start SKM
 	void record_bvh( int max_num_of_frames, double dt );	//record start BVH
 	void record_write( const char *full_prefix );			//write the buffer to files
+
+	void saveMotionRecord( const std::string &recordname );
 	void record_clear(void);								//clear the buffer
 	void record_stop(void);									//stop the recording
 

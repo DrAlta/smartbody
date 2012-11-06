@@ -23,52 +23,6 @@ MeCtNoiseController::~MeCtNoiseController()
 	
 }
 
-void MeCtNoiseController::setJointChannelQuat( const std::string& jointName, MeFrameData& frame, SrQuat& inQuat )
-{
-	bool hasRotation = true;
-	int channelId = _context->channels().search(jointName, SkChannel::Quat);
-	if (channelId < 0)	hasRotation = false;
-	int bufferId = frame.toBufferIndex(channelId);
-	if (bufferId < 0)	hasRotation = false;	
-	
-	if (hasRotation)
-	{
-		frame.buffer()[bufferId + 0] = inQuat.w;
-		frame.buffer()[bufferId + 1] = inQuat.x;;
-		frame.buffer()[bufferId + 2] = inQuat.y;;
-		frame.buffer()[bufferId + 3] = inQuat.z;;
-	}
-}
-
-void MeCtNoiseController::getJointChannelValues( const std::string& jointName, MeFrameData& frame, SrQuat& outQuat, SrVec& outPos )
-{
-	bool hasRotation = true;
-	int channelId = _context->channels().search(jointName, SkChannel::Quat);
-	if (channelId < 0)	hasRotation = false;
-	int bufferId = frame.toBufferIndex(channelId);
-	if (bufferId < 0)	hasRotation = false;	
-
-	bool hasTranslation = true;
-	int positionChannelID = _context->channels().search(jointName, SkChannel::XPos);
-	if (positionChannelID < 0) hasTranslation = false;
-	int posBufferID = frame.toBufferIndex(positionChannelID);
-	if (posBufferID < 0) hasTranslation = false;		
-	// input reference pose
-	if (hasRotation)
-	{
-		outQuat.w = frame.buffer()[bufferId + 0];
-		outQuat.x = frame.buffer()[bufferId + 1];
-		outQuat.y = frame.buffer()[bufferId + 2];
-		outQuat.z = frame.buffer()[bufferId + 3];
-	}
-	if (hasTranslation)
-	{
-		outPos.x = frame.buffer()[posBufferID + 0];
-		outPos.y = frame.buffer()[posBufferID + 1];
-		outPos.z = frame.buffer()[posBufferID + 2];				
-	}
-}
-
 void MeCtNoiseController::setJointNoise( std::vector<std::string>& jointNames, float scale, float frequency )
 {
 	perlinMap.clear();
