@@ -43,6 +43,7 @@ set( MORE_LIBS
 	${LIBSNDFILE}
 	${ALUT}
 	${OPENAL}
+	rt
 )       
 endif()
 
@@ -80,7 +81,6 @@ target_link_libraries( smartbody-dll
 	ode
 	python2.6
 	ncurses
-	rt
 	${MORE_LIBS}
 )
 

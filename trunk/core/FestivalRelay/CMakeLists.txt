@@ -2,6 +2,11 @@ include_directories( ../../lib/festival/festival/src/include )
 include_directories( ../../lib/festival/festival/src/modules/VHDuration)
 include_directories( ../../lib/festival/speech_tools/include )
 
+find_library (COREAUDIO_LIBRARY CoreAudio)
+find_library (AUDIOUNIT_LIBRARY AudioUnit)
+find_library (CORESERVICES_LIBRARY CoreServices)
+find_library (LIBSNDFILE sndfile )
+
 find_library(FESTIVALLIB Festival ../../lib/festival/festival/src/lib )
 find_library(ESTTOOLS estools ../../lib/festival/speech_tools/lib )
 find_library(ESTSTRING eststring ../../lib/festival/speech_tools/lib )
@@ -21,6 +26,7 @@ set( MORE_LIBS
 )
 else()
 set( MORE_LIBS
+	rt
 )
 endif()
 
@@ -31,6 +37,10 @@ add_executable( festivalrelay
 
 target_link_libraries( festivalrelay
 
+	${CORESERVICES_LIBRARY}
+        ${COREAUDIO_LIBRARY}
+        ${AUDIOUNIT_LIBRARY}
+        ${LIBSNDFILE}
 	${FESTIVALLIB}
 	${ESTTOOLS}
 	${ESTSTRING}
@@ -40,7 +50,6 @@ target_link_libraries( festivalrelay
 	vhmsg	
 	activemq-cpp
 	ncurses
-	rt
 	${MORE_LIBS}
 )
 
