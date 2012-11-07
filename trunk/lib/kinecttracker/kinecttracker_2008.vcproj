@@ -21,7 +21,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="./Bin/$(ConfigurationName)"
+			OutputDirectory="../Bin/$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;&quot;D:\Program Files (x86)\OpenNI\Include&quot;;&quot;D:\Program Files (x86)\OpenNI\Include\Win32&quot;;..\vhcl\include;&quot;..\vhmsg\vhmsg-c\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Program Files (x86)\OpenNI\Include&quot;;./include;./;..\vhcl\include;&quot;..\vhmsg\vhmsg-c\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -58,17 +58,17 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories=".\include"
+				AdditionalIncludeDirectories="&quot;C:\Program Files (x86)\OpenNI\Include&quot;;.\include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="OpenNI.lib glut32.lib vhcl_d.lib vhmsg_d.lib activemq-cppd.lib pthreadVSE2.lib"
+				AdditionalDependencies="openNI.lib glut32.lib vhcl_d.lib vhmsg_d.lib activemq-cppd.lib pthreadVSE2.lib"
 				OutputFile="./bin/$(ProjectName)d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="./libs;..\vhcl\lib;&quot;..\vhmsg\vhmsg-c\lib&quot;;&quot;..\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;..\pthreads\lib;&quot;D:\Program Files (x86)\OpenNI\Lib&quot;"
+				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\OpenNI\Lib&quot;;./Lib;./libs;..\vhcl\lib;&quot;..\vhmsg\vhmsg-c\lib&quot;;&quot;..\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;..\pthreads\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="1"
@@ -94,7 +94,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y &quot;C:\Program Files (x86)\OpenNI\Bin\OpenNI.dll&quot;  bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll  bin&#x0D;&#x0A;copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll bin&#x0D;&#x0A;"
+				CommandLine="copy /Y pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y activemq-cppd.dll bin&#x0D;&#x0A;copy /Y libapr-1.dll bin&#x0D;&#x0A;copy /Y libapriconv-1.dll bin&#x0D;&#x0A;copy /Y libaprutil-1.dll bin&#x0D;&#x0A;copy /Y glut32.dll bin&#x0D;&#x0A;xcopy /D /S /I /Y .\Data bin\Data&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -202,7 +202,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;&quot;D:\Program Files (x86)\OpenNI\Include&quot;;&quot;D:\Program Files (x86)\OpenNI\Include\Win32&quot;;..\vhcl\include;&quot;..\vhmsg\vhmsg-c\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Program Files (x86)\OpenNI\Include&quot;;./include;./;..\vhcl\include;&quot;..\vhmsg\vhmsg-c\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -215,17 +215,17 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories=".\include"
+				AdditionalIncludeDirectories="&quot;C:\Program Files (x86)\OpenNI\Include&quot;;.\include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="openNI.lib  glut32.lib vhcl.lib vhmsg.lib activemq-cpp.lib pthreadVSE2.lib"
+				AdditionalDependencies="openNI.lib glut32.lib vhcl.lib vhmsg.lib activemq-cpp.lib pthreadVSE2.lib"
 				OutputFile="./bin/$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="./libs;..\vhcl\lib;&quot;..\vhmsg\vhmsg-c\lib&quot;;&quot;..\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;..\pthreads\lib;&quot;D:\Program Files (x86)\OpenNI\Lib&quot;"
+				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\OpenNI\Lib&quot;;./libs;..\vhcl\lib;&quot;..\vhmsg\vhmsg-c\lib&quot;;&quot;..\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;..\pthreads\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="1"
@@ -253,7 +253,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y &quot;C:\Program Files (x86)\OpenNI\Bin\OpenNI.dll&quot;  bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll  bin&#x0D;&#x0A;copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll bin&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll bin&#x0D;&#x0A;"
+				CommandLine="copy /Y ..\..\bin\smartbody\sbm\bin\pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\activemq-cpp.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\libapr-1.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\libapriconv-1.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\libaprutil-1.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\glut32.dll bin&#x0D;&#x0A;xcopy /D /S /I /Y .\Data bin\Data&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -284,7 +284,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="./Include; ./../vhmsg/vhmsg-c/include; . ;./../vhcl/include"
+				AdditionalIncludeDirectories="../../Include;../../Samples/NiUserTracker"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -356,6 +356,22 @@
 			</File>
 			<File
 				RelativePath=".\src\SceneDrawer.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Res"
+			>
+			<File
+				RelativePath=".\Res\mainicon.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\Res\OpenNI.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\Res\Resource-OpenNI.h"
 				>
 			</File>
 		</Filter>
