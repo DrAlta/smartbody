@@ -1,3 +1,4 @@
+import random
 print "|--------------------------------------------|"
 print "|         Starting Locomotion Demo           |"
 print "|--------------------------------------------|"
@@ -15,16 +16,16 @@ scene.addAssetPath('audio', '../../../../data/Resources/audio')
 # Runs the default viewer for camera
 scene.run('default-viewer.py')
 camera = getCamera()
-camera.setEye(0, 1747.61, 2099.39)
-camera.setCenter(0, 1621.33, 1945.27)
+camera.setEye(0, 1549, 2447)
+camera.setCenter(0, 1437, 2282)
 
 # Add Character script
 scene.run('AddCharacter.py')
 # Add characters in scene
-addMultipleCharacters('utah', 'utah', 8)
-addMultipleCharacters('doctor', 'doctor', 8)
-addMultipleCharacters('elder', 'elder', 8)
-addMultipleCharacters('brad', 'brad', 8)
+addMultipleCharacters('utah', 'utah', 8, False, -1000, 1000)
+addMultipleCharacters('doctor', 'doctor', 8, False, 1000, 1000)
+addMultipleCharacters('elder', 'elder', 8, False, 1000, -1000)
+addMultipleCharacters('brad', 'brad', 8, False, -1000, -1000)
 
 # Add pawns in scene
 addPawn('pawn0', 'sphere', SrVec(1, 1, 1))
@@ -70,6 +71,12 @@ elderPath.reverse()
 doctorCur = elderCur = 0
 pathAmt = len(doctorPath)
 
+# Enable collision
+collisionManager = getScene().getCollisionManager()
+collisionManager.setStringAttribute('collisionResolutionType', 'default')
+#collisionManager.setBoolAttribute('singleChrCapsuleMode', True)
+collisionManager.setEnable(True)
+
 class LocomotionDemo(SBScript):
 	def update(self, time):
 		global utahReached, doctorReached, bradReached, elderReached, doctorCur, elderCur
@@ -81,7 +88,7 @@ class LocomotionDemo(SBScript):
 		# Once doctor reaches 1 waypoint, move to next
 		if doctorReached:
 			for doctor in doctorList:
-				move(doctor.getName(), doctorPath[doctorCur], 1.5)
+				move(doctor.getName(), doctorPath[doctorCur], random.uniform(1, 5))
 			doctorCur = doctorCur + 1
 			# If reaches max path, reset
 			if doctorCur >= pathAmt:
@@ -95,7 +102,7 @@ class LocomotionDemo(SBScript):
 		# Once elder reaches 1 waypoint, move to next
 		if elderReached:
 			for elder in elderList:
-				move(elder.getName(), elderPath[elderCur], 2)
+				move(elder.getName(), elderPath[elderCur], random.uniform(1, 5))
 			elderCur = elderCur + 1
 			if elderCur >= pathAmt:
 				elderCur = 0

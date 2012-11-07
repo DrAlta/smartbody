@@ -1,3 +1,4 @@
+# Physics manager
 physicsOn = True
 phyManager = scene.getPhysicsManager()
 phyManager.getPhysicsEngine().setBoolAttribute('enable', physicsOn)
@@ -67,6 +68,7 @@ def constrainChr(chr, joint, object=''):
 	bodyLink.setStringAttribute('constraintTarget', object)
 	
 def togglePhysics(chr, power=''):
+	''' Name of character, Whether to turn on or off (on/off) '''
 	if power == '':
 		isOn = phyManager.getPhysicsCharacter(chr).getAttribute('enable').getValue()
 		phyManager.getPhysicsCharacter(chr).setBoolAttribute('enable', not isOn)
@@ -79,6 +81,7 @@ def togglePhysics(chr, power=''):
 		phyManager.getPhysicsCharacter(chr).setBoolAttribute('usePD', False)
 	
 def togglePawnPhysics(chr, power=''):
+	''' Name of character, Whether to turn on or off (on/off) '''
 	if power == '':
 		isOn = scene.getPawn(chr).getAttribute('enablePhysics').getValue()
 		scene.getPawn(chr).setBoolAttribute('enablePhysics', not isOn)
