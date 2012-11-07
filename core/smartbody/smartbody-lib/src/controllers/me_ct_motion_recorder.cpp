@@ -181,9 +181,11 @@ bool MeCtMotionRecorder::controller_evaluate(double t, MeFrameData& frame)
 		if (rootJoint) // set the frame buffer value from current global mat
 		{		
 			SrMat lMat = rootJoint->gmat()*rootJoint->gmatZero().inverse();
-			SrVec pos = lMat.get_translation();			
-			setJointChannelQuat(rootJointName,frame,SrQuat(lMat));
-			setJointChannelPos(rootJointName,frame,lMat.get_translation());
+			SrVec pos = lMat.get_translation();		
+			SrQuat temp(lMat);
+			setJointChannelQuat(rootJointName,frame,temp);
+			SrVec trans = lMat.get_translation();
+			setJointChannelPos(rootJointName,frame,trans);
 		}
 		// record the current joint values into motion buffer
 		
