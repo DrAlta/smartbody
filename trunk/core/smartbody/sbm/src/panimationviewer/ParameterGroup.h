@@ -22,7 +22,7 @@ class ParameterGroup : public Fl_Group
 		static void updateXAxisValue(Fl_Widget* widget, void* data);
 		static void updateXYAxisValue(Fl_Widget* widget, void* data);
 		static void updateXYZAxisValue(Fl_Widget* widget, void* data);
-		void updateWeight();
+		void updateWeight(std::vector<double>& weights);
 		PABlendData* getCurrentPABlendData();
 		SmartBody::SBCharacter* getCurrentCharacter();
 

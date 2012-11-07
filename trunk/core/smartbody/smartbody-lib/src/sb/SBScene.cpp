@@ -1334,7 +1334,7 @@ std::string SBScene::save(bool remoteSetup)
 				{
 					if (x + 1 < keys.size())
 					{
-						strstr << "diphone.addKey(\"" << (*iter) << "\", " << keys[x] << ", " << keys[x + 1] << ")\n";
+						strstr << "diphone.addKey(\"" << (*visemeIter) << "\", " << keys[x] << ", " << keys[x + 1] << ")\n";
 					}
 					x++;
 				}

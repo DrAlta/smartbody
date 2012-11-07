@@ -207,7 +207,10 @@ void VisemeViewerWindow::resetViseme()
 	for (int i = 0; i < _browserViseme->size(); i++)
 	{
 		std::stringstream strstr;
-		strstr << "char " << characterName << " viseme " << _browserViseme->text(i + 1) << " " << 0.0f;
+		if (SmartBody::SBScene::getScene()->isRemoteMode())
+			strstr << "send sbm ";
+		strstr << "char " << characterName << " viseme " << _browserViseme->text(i + 1) << " " << 0.0f;		
+		
 		SmartBody::SBScene::getScene()->command(strstr.str());		
 	}
 	_checkEnableScrub->value(0);
@@ -528,6 +531,8 @@ void VisemeViewerWindow::OnSliderSelectCB(Fl_Widget* widget, void* data)
 			}
 		}
 		std::stringstream strstr;
+		if (SmartBody::SBScene::getScene()->isRemoteMode())
+			strstr << "send sbm ";
 		strstr << "char " << characterName << " viseme " << visemeNames[i] << " " << curveValue;
 		//LOG("%s", strstr.str().c_str());
 		SmartBody::SBScene::getScene()->command(strstr.str());
@@ -591,6 +596,8 @@ void VisemeViewerWindow::OnPlayCB(Fl_Widget* widget, void* data)
 			if (viewer->_browserViseme->selected(i + 1))
 			{
 				std::stringstream strstr;
+				if (SmartBody::SBScene::getScene()->isRemoteMode())
+					strstr << "send sbm ";
 				strstr << "char " << viewer->getCurrentCharacterName() << " viseme " << viewer->_browserViseme->text(i + 1) << " curve ";
 				strstr << viewer->_curveEditor->getCurves()[i].size() << " ";
 				for (size_t j = 0; j < viewer->_curveEditor->getCurves()[i].size(); j++)
@@ -612,6 +619,8 @@ void VisemeViewerWindow::OnPlayDialogCB(Fl_Widget* widget, void* data)
 	if (utterance != "")
 	{
 		std::stringstream strstr;
+		if (SmartBody::SBScene::getScene()->isRemoteMode())
+			strstr << "send sbm ";
 		strstr << "python bml.execBML('" << viewer->getCurrentCharacterName() << "', '<speech type=\"text/plain\">" << utteranceClean << "</speech>')";
 		SmartBody::SBScene::getScene()->command(strstr.str());
 	}
@@ -624,6 +633,8 @@ void VisemeViewerWindow::OnPlayAudioFileCB(Fl_Widget* widget, void* data)
 	if (fileName != "")
 	{
 		std::stringstream strstr;
+		if (SmartBody::SBScene::getScene()->isRemoteMode())
+			strstr << "send sbm ";
 		strstr << "python bml.execBML('" << viewer->getCurrentCharacterName() << "', '<speech type=\"text/plain\" ref=\"" << fileName << "\">" << "</speech>')";
 		SmartBody::SBScene::getScene()->command(strstr.str());
 	}

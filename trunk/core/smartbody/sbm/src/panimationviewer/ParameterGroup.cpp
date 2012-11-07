@@ -118,11 +118,11 @@ void ParameterGroup::updateXAxisValue(Fl_Widget* widget, void* data)
 	bool success = false;
 	success = blendData->state->getWeightsFromParameters(w, blendData->weights);
 	if (success)
-	{
-		group->updateWeight();		
+	{		
+		group->updateWeight(blendData->weights);		
 	}
-	//if (success)
-	//	group->getCurrentCharacter()->param_animation_ct->updateWeights(blendData->weights);
+// 	if (success)
+// 		group->getCurrentCharacter()->param_animation_ct->updateWeights(blendData->weights);
 	group->redraw();
 }
 
@@ -138,7 +138,8 @@ void ParameterGroup::updateXYAxisValue(Fl_Widget* widget, void* data)
 	success = blendData->state->getWeightsFromParameters(x, y, weights);
 	if (success)
 	{
-		group->updateWeight();		
+		blendData->weights = weights;
+		group->updateWeight(weights);		
 	}
 	//if (success)
 	//	group->getCurrentCharacter()->param_animation_ct->updateWeights(weights);
@@ -158,14 +159,15 @@ void ParameterGroup::updateXYZAxisValue(Fl_Widget* widget, void* data)
 	success = blendData->state->getWeightsFromParameters(x, y, z, weights);
 	if (success)
 	{
-		group->updateWeight();		
+		blendData->weights = weights;
+		group->updateWeight(weights);		
 	}
 	//if (success)
 	//	group->getCurrentCharacter()->param_animation_ct->updateWeights(weights);
 	group->redraw();	
 }
 
-void ParameterGroup::updateWeight()
+void ParameterGroup::updateWeight(std::vector<double>& weights)
 {
 //	if (!state->cycle)
 //		return;
@@ -173,8 +175,9 @@ void ParameterGroup::updateWeight()
 	std::stringstream command;
 	command << "panim update char " << charName;
 	int wNumber = blendData->state->getNumMotions();
-	for (int j = 0; j < wNumber; j++)
-		command << " " << blendData->weights[j];
+	for (unsigned int j = 0; j < weights.size(); j++)
+		command << " " << weights[j];
+	//LOG("pgroup, weight size = %d",weights.size());
 	paWindow->execCmd(paWindow, command.str());
 	
 }
