@@ -1440,7 +1440,8 @@ std::string SBScene::save(bool remoteSetup)
 		strstr << "obj.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
 		// face definition
 		SBFaceDefinition* faceDef = character->getFaceDefinition();
-		strstr << "obj.setFaceDefinition(scene.getFaceDefinition(\"" << faceDef->getName() << "\"))\n";
+		if (faceDef)
+			strstr << "obj.setFaceDefinition(scene.getFaceDefinition(\"" << faceDef->getName() << "\"))\n";
 
 		// controllers
 		strstr << "obj.createStandardControllers()\n";

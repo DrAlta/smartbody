@@ -118,7 +118,11 @@ void ParameterGroup::updateXAxisValue(Fl_Widget* widget, void* data)
 	bool success = false;
 	success = blendData->state->getWeightsFromParameters(w, blendData->weights);
 	if (success)
-		group->getCurrentCharacter()->param_animation_ct->updateWeights(blendData->weights);
+	{
+		group->updateWeight();		
+	}
+	//if (success)
+	//	group->getCurrentCharacter()->param_animation_ct->updateWeights(blendData->weights);
 	group->redraw();
 }
 
@@ -133,7 +137,11 @@ void ParameterGroup::updateXYAxisValue(Fl_Widget* widget, void* data)
 	weights.resize(blendData->state->getNumMotions());
 	success = blendData->state->getWeightsFromParameters(x, y, weights);
 	if (success)
-		group->getCurrentCharacter()->param_animation_ct->updateWeights(weights);
+	{
+		group->updateWeight();		
+	}
+	//if (success)
+	//	group->getCurrentCharacter()->param_animation_ct->updateWeights(weights);
 	group->redraw();
 }
 
@@ -149,7 +157,11 @@ void ParameterGroup::updateXYZAxisValue(Fl_Widget* widget, void* data)
 	weights.resize(blendData->state->getNumMotions());
 	success = blendData->state->getWeightsFromParameters(x, y, z, weights);
 	if (success)
-		group->getCurrentCharacter()->param_animation_ct->updateWeights(weights);
+	{
+		group->updateWeight();		
+	}
+	//if (success)
+	//	group->getCurrentCharacter()->param_animation_ct->updateWeights(weights);
 	group->redraw();	
 }
 

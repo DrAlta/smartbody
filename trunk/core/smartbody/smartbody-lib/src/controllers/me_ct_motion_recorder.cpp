@@ -50,6 +50,7 @@ void MeCtMotionRecorder::init(SbmPawn* pawn)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SBSkeleton* skel = scene->getSkeleton(pawn->getSkeleton()->getName());	
+	if (!skel) return;
 	SkJoint* rootJoint = findRootJoint(skel);	
 	rootJointName = rootJoint->name();	
 	for (int i=0;i<skel->getNumJoints();i++)
@@ -152,7 +153,7 @@ double MeCtMotionRecorder::controller_duration()
 
 bool MeCtMotionRecorder::controller_evaluate(double t, MeFrameData& frame)
 {	
-	if (!recordStart) // do nothing if not recording
+	if (!recordStart || !character->getSkeleton()) // do nothing if not recording
 		return true;	
 	bool recordFrame = false;
 	if (prevTime < 0.0)
