@@ -199,8 +199,19 @@ void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double
 	}
 	if( success )
 	{
-		if( mcu.execute_seq(seq) != CMD_SUCCESS ) 
-			LOG("ERROR: PanimationWindow::generateBML: Failed to execute sequence.");
+		if (!mcu._scene->isRemoteMode())
+		{
+			if( mcu.execute_seq(seq) != CMD_SUCCESS ) 
+				LOG("ERROR: PanimationWindow::generateBML: Failed to execute sequence.");			
+		}
+		else
+		{
+			//if( mcu.execute_seq(seq) != CMD_SUCCESS ) 
+			//	LOG("ERROR: PanimationWindow::generateBML: Failed to execute sequence.");				
+			mcu.execute((char*)cmd.c_str());
+			std::string sendStr = "send sbm " + cmd;
+			mcu.execute((char*) sendStr.c_str());
+		}		
 	}
 }
 
