@@ -347,14 +347,14 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
                      if (m_scene != NULL)
                      {
 						 std::string message = vhcl::Format("sbmdebugger %s init scene\n", m_fullId.c_str());	
-						 LOG("before scene save");
+						 //LOG("before scene save");
 						 std::string initScript = m_scene->save(true); // save for remote connection	 
-						 LOG("initScript = %s",initScript.c_str());
+						 //LOG("initScript = %s",initScript.c_str());
 						 message += initScript;
 						 //LOG("initScript size = %d",initScript.size());
-						 FILE* fp = fopen("e:/sceneServer.py","wt");
-						 fprintf(fp,"%s",initScript.c_str());
-						 fclose(fp);
+						 //FILE* fp = fopen("e:/sceneServer.py","wt");
+						 //fprintf(fp,"%s",initScript.c_str());
+						 //fclose(fp);
 						 vhmsg::ttu_notify1(message.c_str());
 
 #if 0

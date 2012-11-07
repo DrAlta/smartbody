@@ -364,10 +364,10 @@ void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
 						  {
 							  //initialize the rest of scene
 							  //LOG("test = %s",rest.c_str());
-							  LOG("rest string size = %d",rest.size());
-							  FILE* fp = fopen("e:/scene.py","wt");
-							  fprintf(fp,"%s",rest.c_str());
-							  fclose(fp);
+// 							  LOG("rest string size = %d",rest.size());
+// 							  FILE* fp = fopen("e:/scene.py","wt");
+// 							  fprintf(fp,"%s",rest.c_str());
+// 							  fclose(fp);
 
 							  SmartBody::SBScene::getScene()->run(rest);
 							  m_initFinish = true;

@@ -892,6 +892,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				{
 					for (int i = 0; i < character->param_animation_ct->getNumWeights(); i++)
 						w.push_back(args.read_double());
+					//LOG("weight size = %d",w.size());
 					character->param_animation_ct->updateWeights(w);
 				}
 			}
