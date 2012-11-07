@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./include;./;..\vhcl\include;&quot;..\vhmsg\vhmsg-c\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Program Files (x86)\OpenNI\Include&quot;;./include;./;..\vhcl\include;&quot;..\vhmsg\vhmsg-c\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -58,7 +58,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories=".\include"
+				AdditionalIncludeDirectories="&quot;C:\Program Files (x86)\OpenNI\Include&quot;;.\include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -68,7 +68,7 @@
 				AdditionalDependencies="openNI.lib glut32.lib vhcl_d.lib vhmsg_d.lib activemq-cppd.lib pthreadVSE2.lib"
 				OutputFile="./bin/$(ProjectName)d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="./Lib;./libs;..\vhcl\lib;&quot;..\vhmsg\vhmsg-c\lib&quot;;&quot;..\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;..\pthreads\lib"
+				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\OpenNI\Lib&quot;;./Lib;./libs;..\vhcl\lib;&quot;..\vhmsg\vhmsg-c\lib&quot;;&quot;..\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;..\pthreads\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="1"
@@ -94,7 +94,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y activemq-cppd.dll bin&#x0D;&#x0A;copy /Y libapr-1.dll bin&#x0D;&#x0A;copy /Y libapriconv-1.dll bin&#x0D;&#x0A;copy /Y libaprutil-1.dll bin&#x0D;&#x0A;copy /Y glut32.dll bin&#x0D;&#x0A;"
+				CommandLine="copy /Y pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y activemq-cppd.dll bin&#x0D;&#x0A;copy /Y libapr-1.dll bin&#x0D;&#x0A;copy /Y libapriconv-1.dll bin&#x0D;&#x0A;copy /Y libaprutil-1.dll bin&#x0D;&#x0A;copy /Y glut32.dll bin&#x0D;&#x0A;xcopy /D /S /I /Y .\Data bin\Data&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -202,7 +202,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="./include;./;..\vhcl\include;&quot;..\vhmsg\vhmsg-c\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Program Files (x86)\OpenNI\Include&quot;;./include;./;..\vhcl\include;&quot;..\vhmsg\vhmsg-c\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -215,7 +215,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories=".\include"
+				AdditionalIncludeDirectories="&quot;C:\Program Files (x86)\OpenNI\Include&quot;;.\include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -225,7 +225,7 @@
 				AdditionalDependencies="openNI.lib glut32.lib vhcl.lib vhmsg.lib activemq-cpp.lib pthreadVSE2.lib"
 				OutputFile="./bin/$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="./libs;..\vhcl\lib;&quot;..\vhmsg\vhmsg-c\lib&quot;;&quot;..\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;..\pthreads\lib"
+				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\OpenNI\Lib&quot;;./libs;..\vhcl\lib;&quot;..\vhmsg\vhmsg-c\lib&quot;;&quot;..\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;..\pthreads\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="1"
@@ -253,7 +253,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y activemq-cpp.dll bin&#x0D;&#x0A;copy /Y libapr-1.dll bin&#x0D;&#x0A;copy /Y libapriconv-1.dll bin&#x0D;&#x0A;copy /Y libaprutil-1.dll bin&#x0D;&#x0A;copy /Y glut32.dll bin&#x0D;&#x0A;"
+				CommandLine="copy /Y ..\..\bin\smartbody\sbm\bin\pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\activemq-cpp.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\libapr-1.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\libapriconv-1.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\libaprutil-1.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\glut32.dll bin&#x0D;&#x0A;xcopy /D /S /I /Y .\Data bin\Data&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
