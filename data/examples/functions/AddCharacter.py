@@ -61,8 +61,8 @@ def addCharacter(charName, model, reach=False):
 	bml.execBML(charName, '<saccade mode="listen"/>')
 	sim.resume()
 	
-def addMultipleCharacters(charName, model, amount, reach=False):
-	''' Character name(string), Model name(string), Amount to spawn, Enable reaching '''
+def addMultipleCharacters(charName, model, amount, reach=False, offsetX=0, offsetZ=0):
+	''' Character name(string), Model name(string), Amount to spawn, Enable reaching, Offset X, Offset Z '''
 	index = 0; row = 0; column = 0; count = 0
 	for i in range(amount):
 		name = charName + str(index)
@@ -80,10 +80,10 @@ def addMultipleCharacters(charName, model, amount, reach=False):
 		if 'utah' in model:
 			# Utah uses a different skeleton and has a different origin
 			skeleton = scene.createSkeleton('test_utah.sk')
-			char.setPosition(SrVec(posX, 0, posZ))
+			char.setPosition(SrVec(posX + offsetX, 0, posZ + offsetZ))
 		else:
 			skeleton = scene.createSkeleton('common.sk')
-			char.setPosition(SrVec(posX, 102, posZ))
+			char.setPosition(SrVec(posX + offsetX, 102, posZ + offsetZ))
 		char.setSkeleton(skeleton)
 		# Set up facing direction
 		char.setHPR(SrVec(0, 0, 0))

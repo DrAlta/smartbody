@@ -14,7 +14,6 @@ def create1DBlend(blendID, motionList):
 	
 	m1 = scene.getMotion(motion1)
 	m2 = scene.getMotion(motion2)
-	
 	blend1 = blendManager.createBlend1D(blendID)
 	blend1.addMotion(motion1, 0)
 	blend1.addMotion(motion2, 1)

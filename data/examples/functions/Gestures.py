@@ -1,4 +1,5 @@
 def initGestureMap():
+	''' Call this to initialize gesture map for characters '''
 	gMapManager = getScene().getGestureMapManager()
 	for name in scene.getCharacterNames():
 		gMap = gMapManager.createGestureMap(name)

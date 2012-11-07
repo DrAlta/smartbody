@@ -5,6 +5,7 @@ def gaze(chrName, target, speed=1000):
 	#Else is vector position
 	else:
 		bml.execBML(chrName, '<gaze sbm:joint-range="EYES NECK" sbm:joint-speed="' + str(speed) + '" sbm:target-pos="' + target + '"/>')
+		# Error, asking for target 
 		#bml.execBML(chrName, '<gaze sbm:joint-range="EYES NECK" sbm:joint-speed="' + str(speed) + '" sbm:target-pos="' + target + '" target="' + chrName + '"/>')
 	
 def stopGaze(chrName, start, speed=1000):

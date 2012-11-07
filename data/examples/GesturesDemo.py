@@ -37,8 +37,8 @@ setPawnPos('camera', SrVec(0, -50, 0))
 scene.run('Gestures.py')
 initGestureMap()
 
-scene.getCharacter('brad').setBoolAttribute('bmlRequest.autoGestureTransition', True)
-scene.getCharacter('utah').setBoolAttribute('bmlRequest.autoGestureTransition', True)
+#scene.getCharacter('brad').setBoolAttribute('bmlRequest.autoGestureTransition', True)
+#scene.getCharacter('utah').setBoolAttribute('bmlRequest.autoGestureTransition', True)
 
 last = 0
 canTime = True
@@ -47,6 +47,9 @@ class GesturesDemo(SBScript):
 	def update(self, time):
 		global canTime, last
 		diff = time - last
+		if canTime:
+			last = time
+			canTime = False
 		if diff >= delay:
 			diff = 0
 			canTime = True
@@ -72,9 +75,6 @@ class GesturesDemo(SBScript):
 			playGesture('utah', 'RIGHT', 'RIGHT_HAND', stroke=3, stroke_end=4.5)
 			playGesture('utah', 'LEFT', 'LEFT_HAND', stroke=5.5, stroke_end=6.5)
 			playGesture('utah', 'WHY', 'BOTH_HANDS', stroke=7.5, stroke_end=8.5)
-			# Set time
-			last = time
-			canTime = False
 			
 # Run the update script
 scene.removeScript('gesturesdemo')

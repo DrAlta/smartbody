@@ -53,6 +53,25 @@ class FacialMovementDemo(SBScript):
 		if canTime:
 			randomizeFace()
 		
+# List of expressions, and last expression
+expressionList = ['sad', 'happy', 'angry', 'shock', 'fear', 'disgust', 'sleepy']
+lastExpression = ''
+# List of expressions, choice list, get and call function		
+def randomizeFace():
+	global lastExpression
+	expression = random.choice(expressionList)
+	if expression == lastExpression:
+		expression = random.choice(expressionList)
+	if expression == 'sad': sad('utah')
+	if expression == 'happy': happy('utah')
+	if expression == 'angry': angry('utah')
+	if expression == 'shock': shock('utah')
+	if expression == 'fear': fear('utah')
+	if expression == 'disgust': disgust('utah')
+	if expression == 'sleepy': sleepy('utah')
+	lastExpression = expression
+'''
+# Make a set list of facial expressions, happy, sad, etc, and randomize between them
 AUDict = {'1_left':0, '1_right':0, '2_left':0, '2_right':0, '4_left':0, '4_right':0, 
 		  '5':0, '6':0 , '7':0, '9':0, '10':0, '12':0, '15':0, '20':0,
 		  '23':0, '25':0, '26':0, '27':0, '38':0, '39':0, '45_left':0, '45_right':0}
@@ -73,7 +92,7 @@ def randomizeFace():
 def printDict():
 	for key,value in AUDict.items():
 		print 'Key: %s Value: %s' % (key, value)
-		
+'''	
 # Run the update script
 scene.removeScript('facialmovementdemo')
 facialmovementdemo = FacialMovementDemo()

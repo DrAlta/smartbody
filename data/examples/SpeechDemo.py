@@ -83,25 +83,23 @@ def speakRandomSentence():
 			randomSentence = choice(sentenceList)
 		else:
 			break
-	# Duration of facial movement
-	duration = 5
 	if 'angry' in randomSentence: 
-		angry('utah', duration)
+		angry('utah')
 		playGesture('utah', 'SWEEPRIGHT', 'RIGHT_HAND')
 	if 'happy' in randomSentence: 
-		happy('utah', duration)
+		happy('utah')
 		playGesture('utah', 'OFFER', 'RIGHT_HAND')
 	if 'sad' in randomSentence:	
-		sad('utah', duration)
+		sad('utah')
 		playGesture('utah', 'YOU', 'RIGHT_HAND')
 	if 'weight' in randomSentence: 
-		shock('utah', duration)
+		shock('utah')
 		playGesture('utah', 'WHY', 'BOTH_HANDS')
 	if 'left' in randomSentence:
-		happy('utah', duration)
+		happy('utah')
 		playGesture('utah', 'LEFT', 'LEFT_HAND')
 	if 'right' in randomSentence:
-		sad('utah', duration)
+		sad('utah')
 		playGesture('utah', 'RIGHT', 'RIGHT_HAND')
 	
 	lastSentence = randomSentence
