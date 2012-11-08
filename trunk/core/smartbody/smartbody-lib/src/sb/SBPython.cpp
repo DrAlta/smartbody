@@ -35,6 +35,7 @@
 #include <sb/SBBehaviorSetManager.h>
 #include <sr/sr_box.h>
 #include <sr/sr_camera.h>
+#include <stdlib.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -1271,12 +1272,10 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getBehavior", &SBCharacter::getBehavior, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the ith behavior of the character.")
 		.def("setSteerAgent", &SBCharacter::setSteerAgent, "Set the steer agent of the character")
 		//.def("getFaceDefinition", &SBCharacter::getFaceDefinition, "Gets face definition (visemes, action units) for a character.")
-#ifndef __ANDROID__
 		.def("setNvbg", &SBCharacter::setNvbg, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Sets the NVBG handler for this character.")
 		.def("getNvbg", &SBCharacter::getNvbg, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the NVBG handler for this character.")
 		.def("setMiniBrain", &SBCharacter::setMiniBrain, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Sets the mini brain handler for this character.")
 		.def("getMiniBrain", &SBCharacter::getMiniBrain, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the mini brain handler for this character.")
-#endif
 		;
 
 boost::python::class_<SBReach>("SBReach")
@@ -1548,21 +1547,151 @@ boost::python::class_<SBReach>("SBReach")
 
 }
 
+#ifdef __ANDROID__
+extern "C" {
+	extern void initpyexpat(void);
+	extern void init_functools(void);
+	extern void inititertools(void);
+	extern void initcStringIO(void);
+	extern void initcPickle(void);
+	extern void initcmath(void);
+	extern void initmath(void);
+	extern void inittime(void);
+	extern void initdatetime(void);
+	extern void init_collections(void);
+	extern void initoperator(void);
+	extern void init_md5(void);
+	extern void init_sha(void);
+	extern void init_sha256(void);
+	extern void init_sha512(void);
+	extern void initselect(void);
+	extern void initfcntl(void);
+        extern void init_struct(void);
+	extern void init_ctypes_test(void);
+	extern void init_weakref(void);
+	extern void initarray(void);
+	extern void initstrop(void);
+	extern void initfuture_builtins(void);
+	extern void init_random(void);
+	extern void init_bisect(void);
+	extern void init_heapq(void);
+	extern void init_fileio(void);
+	extern void init_bytesio(void);
+	extern void init_functools(void);
+	extern void init_json(void);
+	extern void init_testcapi(void);
+	extern void init_hotshot(void);
+	extern void init_lsprof(void);
+	extern void initunicodedata(void);
+	extern void init_locale(void);
+	extern void initparser(void);
+	extern void initmmap(void);
+	extern void initsyslog(void);
+	extern void initaudioop(void);
+	extern void initimageop(void);
+	extern void init_csv(void);
+	extern void inittermios(void);
+	extern void initresource(void);
+	extern void initbinascii(void);
+	extern void init_multibytecodec(void);
+	extern void init_codecs_kr(void);
+	extern void init_codecs_jp(void);
+	extern void init_codecs_cn(void);
+	extern void init_codecs_tw(void);
+	extern void init_codecs_hk(void);
+	extern void init_codecs_iso2022(void);
+	extern void init_multiprocessing(void);
+	extern void init_elementtree(void);
+	extern void init_ctypes(void);
+	extern void init_hashlib(void);
+}
+#endif
+
+void appendPythonModule(char* moduleName, void (*initfunc)(void))
+{
+	int result = PyImport_AppendInittab(moduleName, initfunc);
+	LOG("initialize module %s, result = %d",moduleName, result);
+}
+
 
 void initPython(std::string pythonLibPath)
 {	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.initPythonLibPath = pythonLibPath;
 	std::string pythonHome = pythonLibPath + "/..";
+#ifdef __ANDROID__
+	std::string libPath = getenv("LD_LIBRARY_PATH");
+	LOG("LD_LIBRARY_PATH  = %s", libPath.c_str());	
+#endif
+
 #ifdef USE_PYTHON
 #ifdef __ANDROID__
-	Py_SetProgramName("/sdcard/sbmmedia/python/");
+	Py_SetProgramName((char*)pythonHome.c_str());
+        Py_SetPythonHome((char*)pythonHome.c_str());
 #else
 	Py_SetProgramName("../../../../core/smartbody/Python26/");
 #ifdef WIN32
 	Py_SetPythonHome((char*)pythonHome.c_str());
 #endif
 #endif	
+#ifdef __ANDROID__
+	appendPythonModule("pyexpat", initpyexpat);
+	appendPythonModule("_functools", init_functools);
+	appendPythonModule("itertools", inititertools);
+	appendPythonModule("cStringIO", initcStringIO);
+	appendPythonModule("cPickle", initcPickle);
+	appendPythonModule("cmath", initcmath);
+	appendPythonModule("math", initmath);
+	appendPythonModule("time", inittime);
+	appendPythonModule("datetime", initdatetime);
+	appendPythonModule("_collections", init_collections);
+	appendPythonModule("operator", initoperator);
+	appendPythonModule("_md5", init_md5);
+	appendPythonModule("_sha", init_sha);
+	appendPythonModule("_sha", init_sha);
+	appendPythonModule("_sha256", init_sha256);
+	appendPythonModule("_sha512", init_sha512);
+	appendPythonModule("select", initselect);
+	appendPythonModule("fcntl", initfcntl);
+	appendPythonModule("_struct", init_struct);
+	appendPythonModule("_ctypes_test", init_ctypes_test);
+	appendPythonModule("_weakref", init_weakref);
+	appendPythonModule("array", initarray);
+	appendPythonModule("strop", initstrop);
+	appendPythonModule("future_builtins", initfuture_builtins);
+	appendPythonModule("_random", init_random);
+	appendPythonModule("_bisect", init_bisect);
+	appendPythonModule("_heapq", init_heapq);
+	appendPythonModule("_fileio", init_fileio);
+	appendPythonModule("_functools", init_functools);
+	appendPythonModule("_json", init_json);
+
+	appendPythonModule("_testcapi", init_testcapi);
+	appendPythonModule("_hotshot", init_hotshot);
+	appendPythonModule("_lsprof", init_lsprof);
+	appendPythonModule("_locale", init_locale);
+	appendPythonModule("_csv", init_csv);
+	appendPythonModule("unicodedata", initunicodedata);
+	appendPythonModule("parser", initparser);
+	appendPythonModule("mmap", initmmap);
+	appendPythonModule("syslog", initsyslog);
+	appendPythonModule("audioop", initaudioop);
+	appendPythonModule("imageop", initimageop);
+	appendPythonModule("termios", inittermios);
+	appendPythonModule("resource", initresource);
+	appendPythonModule("binascii", initbinascii);	
+	appendPythonModule("_multibytecodec", init_multibytecodec);	
+	appendPythonModule("_codecs_kr", init_codecs_kr);
+	appendPythonModule("_codecs_jp", init_codecs_jp);
+	appendPythonModule("_codecs_cn", init_codecs_cn);
+	appendPythonModule("_codecs_tw", init_codecs_tw);
+	appendPythonModule("_codecs_hk", init_codecs_hk);
+	appendPythonModule("_codecs_iso2022", init_codecs_iso2022);
+	appendPythonModule("_multiprocessing", init_multiprocessing);
+	appendPythonModule("_elementtree", init_elementtree);
+	appendPythonModule("_ctypes", init_ctypes);
+	//appendPythonModule("_hashlib", init_hashlib);
+#endif
 	Py_Initialize();
 	
 	try {
@@ -1572,7 +1701,7 @@ void initPython(std::string pythonLibPath)
 	
 		PyRun_SimpleString("import sys");
 #endif
-//#ifndef WIN32
+
 #if 1
 		// set the proper python path
 		std::stringstream strstr;

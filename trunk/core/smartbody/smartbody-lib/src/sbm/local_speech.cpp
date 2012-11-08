@@ -790,65 +790,10 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
 
    // parse out just the sound file name and give it a .wav file type
    int pos = file_name.find( ".aiff" );
-   int pos2 = file_name.find( "utt" );
-
-   // obtaining the directory path where the output sound file is to be written
-
-   char directory[_MAX_PATH];
-		
-   strcpy(directory,((std::string)file_name.substr(0, pos2)).c_str());
-   tempDir = directory;
-   // converting the directory path to an absolute path
-   
-   char full[ _MAX_PATH ];
-   if ( _fullpath( full, tempDir.c_str(), _MAX_PATH ) == NULL )
-   {
-		printf("/nError converting path sent from SBM to absolute path/n");
-   }
-	
-   char absolute_directory[_MAX_PATH];
-   strcpy(absolute_directory,full); 
-   fullAudioDir = absolute_directory;
-
+   int pos2 = file_name.find( "utt" );   
    file_name = file_name.substr( pos2, pos - pos2 ) + ".wav";
 
-   // Make sure the audio temp directory exists and create if not
-   // CPRC_riff_save will not create the directory if non-existent
-   if( !(_access( fullAudioDir.c_str(), 0 ) == 0 ) )
-   {
-      std::string temp = "";
-      std::vector< std::string > tokens;
-      const std::string delimiters = "\\/";
-     
-      vhcl::Tokenize( fullAudioDir, tokens, delimiters );
-      
-      printf( "Warning, audio cache directory, %s, does not exist. Creating directory...\n", fullAudioDir.c_str() );
-      for (unsigned int i = 0; i < tokens.size(); i++)
-      {
-         temp += tokens.at( i ) + "\\";
-         _mkdir( temp.c_str() );
-      }
-
-      // Check if directory has been created. Should be done more elegantly, including sending message or timing out.
-      if( !(_access( fullAudioDir.c_str(), 0 ) == 0 ) )
-      {
-         printf( "ERROR: audio cache directory, %s, could not be created. This will likely lead to errors down the line.\\n", fullAudioDir.c_str() );
-      }
-   }
-   
-
-   // Create file name relative to cerevoice relay
-   /**
-    * Clarification: 
-	*			cereproc_file_name refers to the path that cereproc needs to write to, relative to the path from where this program is running
-	*			player_file_name refers to the path that Unreal or some other renderer will play the file from, i.e. relative to the path where it is running
-	*/
-
-#if defined(__ANDROID__)
    string cereproc_file_name = cacheDirectory + file_name;
-#else
-   string cereproc_file_name = fullAudioDir + file_name;
-#endif 
 
    /// Generate the audio
    std::string xml = textToSpeech(utterance.c_str(), cereproc_file_name.c_str(), voice_id);

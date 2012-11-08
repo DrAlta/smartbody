@@ -1709,6 +1709,7 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p
 					meshModelVec[i]->V[j] *= factor;
 				}
 
+
 				SrSnModel* srSnModelStatic = new SrSnModel();
 				srSnModelStatic->shape(*meshModelVec[i]);
 				srSnModelStatic->shape().name = meshModelVec[i]->name;
