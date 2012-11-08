@@ -27,7 +27,28 @@ SBM_LOCAL_PATH := $(call my-dir)
 LOCAL_PATH := $(SBM_LOCAL_PATH)
 SBM_MY_DIR := ../../../core/smartbody/smartbody-lib/src
 ANDROID_LIB_DIR := ../../lib
+CEREVOICE_LIB_DIR := ../../cerevoice/libs
 LIB_DIR := ../../../lib
+
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := cerevoice-eng
+#LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libcerevoice_eng.a
+#include $(PREBUILT_STATIC_LIBRARY)
+
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := cerevoice-pmod
+#LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libcerevoice_pmod.a
+#include $(PREBUILT_STATIC_LIBRARY)
+
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := cerevoice
+#LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libcerevoice.a
+#include $(PREBUILT_STATIC_LIBRARY)
+
+#include $(CLEAR_VARS)
+#LOCAL_MODULE := cerehts
+#LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libcerehts.a
+#include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := xerces-prebuilt
@@ -196,6 +217,7 @@ LOCAL_PATH := $(SBM_LOCAL_PATH)
 include $(CLEAR_VARS)
 LOCAL_MODULE := sbm
 #LOCAL_CFLAGS    :=  -gstabs -g -DBUILD_ANDROID -frtti 
+#$(SBM_LOCAL_PATH)/../../cerevoice/cerevoice_eng/include \
 LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions 
 LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/../../pythonLib/include/python2.6 \
@@ -322,6 +344,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/bml/bml_target.cpp \
 	$(SBM_MY_DIR)/bml/bml_saccade.cpp \
 	$(SBM_MY_DIR)/bml/bml_states.cpp \
+	$(SBM_MY_DIR)/bml/bml_noise.cpp \
 	$(SBM_MY_DIR)/sbm/Event.cpp \
 	$(SBM_MY_DIR)/sbm/GenericViewer.cpp \
 	$(SBM_MY_DIR)/sbm/gwiz_cmdl.cpp \
@@ -372,6 +395,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_step_turn.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_tether.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_ublas.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_noise_controller.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_motion_recorder.cpp \
 	$(SBM_MY_DIR)/controllers/MeCtBlendEngine.cpp \
 	$(SBM_MY_DIR)/controllers/MotionAnalysis.cpp \
 	$(SBM_MY_DIR)/sbm/me_utilities.cpp \
@@ -468,8 +493,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	
 LOCAL_LDLIBS    := -llog 
 #LOCAL_LDLIBS    := -llog -gstabs	  
-#LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
-LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt python-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile
+LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile python-prebuilt 
+#LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile cerevoice-eng cerevoice-pmod cerehts cerevoice python-prebuilt 
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
 include $(BUILD_STATIC_LIBRARY)
 #include $(BUILD_SHARED_LIBRARY)
