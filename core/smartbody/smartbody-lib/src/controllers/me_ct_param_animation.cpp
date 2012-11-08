@@ -292,9 +292,9 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 				SmartBody::SBAnimationTransitionRule* rule = transition->getTransitionRule();
 				if (rule)
 				{
-					SBCharacter* character = dynamic_cast<SBCharacter*>(character);
-					SBAnimationBlend* sbblend = dynamic_cast<SBAnimationBlend*>(blend);
-					bool ret = rule->check(character, sbblend);
+					SmartBody::SBCharacter* sbchar = dynamic_cast<SmartBody::SBCharacter*>(character);
+					SmartBody::SBAnimationBlend* sbblend = dynamic_cast<SmartBody::SBAnimationBlend*>(blend);
+					bool ret = rule->check(sbchar, sbblend);
 					if (ret)
 					{
 						schedule(transition->getDestinationBlend(), 0, 0, 0);
