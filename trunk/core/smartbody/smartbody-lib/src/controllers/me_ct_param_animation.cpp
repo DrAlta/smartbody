@@ -23,6 +23,9 @@
 #include "controllers/me_ct_param_animation.h"
 #include <sbm/mcontrol_util.h>
 #include <sb/SBAnimationState.h>
+#include <sb/SBAnimationStateManager.h>
+#include <sb/SBAnimationTransition.h>
+#include <sb/SBAnimationTransitionRule.h>
 #include <sb/SBMotionBlendBase.h>
 #include <sb/SBSkeleton.h>
 #include <sr/sr_euler.h>
@@ -272,6 +275,37 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	// if there's only one state, update current state
 	if (curStateData && curStateData->state->stateName != PseudoIdleState)
 	{
+		///////////////////////////////////////////////////////////////////////
+		// check automatic transitions
+		SmartBody::SBScene* scene = SBScene::getScene();
+		SmartBody::SBAnimationBlendManager* blendManager = scene->getBlendManager();
+		PABlend* blend = curStateData->state;
+		SmartBody::SBAnimationBlend* sbstate = dynamic_cast<SmartBody::SBAnimationBlend*>(blend);
+		std::vector<std::string> blends = blendManager->getTransitionBlends(blend->stateName);
+		for (std::vector<std::string>::iterator iter = blends.begin();
+			 iter != blends.end();
+			 iter++)
+		{
+			SmartBody::SBAnimationTransition* transition = blendManager->getTransition(blend->stateName, (*iter));
+			if (transition)
+			{
+				SmartBody::SBAnimationTransitionRule* rule = transition->getTransitionRule();
+				if (rule)
+				{
+					SBCharacter* character = dynamic_cast<SBCharacter*>(character);
+					SBAnimationBlend* sbblend = dynamic_cast<SBAnimationBlend*>(blend);
+					bool ret = rule->check(character, sbblend);
+					if (ret)
+					{
+						schedule(transition->getDestinationBlend(), 0, 0, 0);
+					}
+				}
+
+			}
+		}
+		///////////////////////////////////////////////////////////////////////
+
+		
 		if (curStateData->active)
 		{			
 			curStateData->evaluate(timeStep, frame.buffer());	

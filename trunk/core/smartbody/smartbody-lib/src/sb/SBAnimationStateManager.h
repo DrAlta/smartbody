@@ -44,6 +44,7 @@ class SBAnimationBlendManager
 		SBAnimationTransition* getTransitionByIndex(int id);
 		int getNumTransitions();
 		std::vector<std::string> getTransitionNames();
+		std::vector<std::string> getTransitionBlends(const std::string& source);
 
 		std::string getCurrentBlend(const std::string& characterName);
 		SrVec getCurrentBlendParameters(const std::string& characterName);

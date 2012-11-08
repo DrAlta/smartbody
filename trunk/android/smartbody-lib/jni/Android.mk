@@ -456,6 +456,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBAnimationState.cpp \
 	$(SBM_MY_DIR)/sb/SBMotionBlendBase.cpp \
 	$(SBM_MY_DIR)/sb/SBAnimationTransition.cpp \
+	$(SBM_MY_DIR)/sb/SBAnimationTransitionRule.cpp \
 	$(SBM_MY_DIR)/sb/SBAnimationStateManager.cpp \
 	$(SBM_MY_DIR)/sb/SBSteerManager.cpp \
 	$(SBM_MY_DIR)/sb/SBSteerAgent.cpp \

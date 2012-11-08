@@ -5,6 +5,7 @@ namespace SmartBody {
 
 SBAnimationTransition::SBAnimationTransition() : PATransition()
 {
+	_rule = NULL;
 }
 
 SBAnimationTransition::SBAnimationTransition(std::string name) : PATransition()
@@ -97,6 +98,16 @@ const std::string& SBAnimationTransition::getSourceMotionName()
 const std::string& SBAnimationTransition::getDestinationMotionName()
 {
 	return toMotionName;
+}
+
+SBAnimationTransitionRule* SBAnimationTransition::getTransitionRule()
+{
+	return _rule;
+}
+
+void SBAnimationTransition::setTransitionRule(SBAnimationTransitionRule* rule)
+{
+	_rule = rule;
 }
 
 std::string SBAnimationTransition::saveToString()
