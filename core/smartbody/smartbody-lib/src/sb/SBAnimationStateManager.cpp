@@ -146,6 +146,20 @@ std::vector<std::string> SBAnimationBlendManager::getBlendNames()
 	return states;
 }
 
+std::vector<std::string> SBAnimationBlendManager::getTransitionBlends(const std::string& source)
+{
+	std::vector<std::string> blends;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	for (size_t i = 0; i < mcu.param_anim_transitions.size(); i++)
+	{
+		if (mcu.param_anim_transitions[i]->fromState->stateName == source)
+			blends.push_back(mcu.param_anim_transitions[i]->toState->stateName);
+	}
+
+	return blends;
+}
+
 SBAnimationTransition* SBAnimationBlendManager::getTransition(const std::string& source, const std::string& dest)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();

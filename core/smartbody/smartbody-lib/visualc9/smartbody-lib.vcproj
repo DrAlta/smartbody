@@ -3580,6 +3580,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sb\SBAnimationTransitionRule.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBAnimationTransitionRule.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sb\SBAnimationTransition.h"
 				>
 			</File>

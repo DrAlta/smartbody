@@ -7,6 +7,7 @@
 namespace SmartBody {
 
 class SBAnimationBlend;
+class SBAnimationTransitionRule;
 
 class SBAnimationTransition : public PATransition
 {
@@ -30,10 +31,13 @@ class SBAnimationTransition : public PATransition
 		void removeEaseOutInterval(int num);
 		int getNumEaseOutIntervals();
 		std::vector<double> getEaseOutInterval(int num);
+		SBAnimationTransitionRule* getTransitionRule();
+		void setTransitionRule(SBAnimationTransitionRule* rule);
 		
 		std::string saveToString();
 
 	protected:
+		SBAnimationTransitionRule* _rule;
 
 };
 

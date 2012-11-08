@@ -16,6 +16,7 @@
 #include <sb/SBAnimationState.h>
 #include <sb/SBMotionBlendBase.h>
 #include <sb/SBAnimationTransition.h>
+#include <sb/SBAnimationTransitionRule.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBPhysicsManager.h>
@@ -433,6 +434,28 @@ struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrappe
 	}
 };
 
+struct TransitionRuleWrap : SmartBody::SBAnimationTransitionRule, boost::python::wrapper<SmartBody::SBAnimationTransitionRule>
+{
+	virtual bool check(SmartBody::SBCharacter* character, SmartBody::SBAnimationBlend* blend)
+	{
+		if (boost::python::override o = this->get_override("check"))
+		{
+			try {
+				return o(character, blend);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		return SBAnimationTransitionRule::check(character, blend);
+	}
+
+	bool default_check(SmartBody::SBCharacter* character, SmartBody::SBAnimationBlend* blend)
+	{
+		return SBAnimationTransitionRule::check(character, blend);
+	}
+};
+
 // wrapper for std::map
 template<class T>
 struct map_item
@@ -759,6 +782,13 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("setVec3Attribute", &SBObject::setVec3Attribute, "Sets a vector attribute of a given name to the given value.")
 		.def("setMatrixAttribute", &SBObject::setMatrixAttribute, "Sets a matrix attribute of a given name to the given value.")
 		.def("setActionAttribute", &SBObject::setActionAttribute, "Sets a action attribute of a given name.")
+		.def("setBool", &SBObject::setBoolAttribute, "Sets a boolean attribute of a given name to the given value.")
+		.def("setInt", &SBObject::setIntAttribute, "Sets an integer attribute of a given name to the given value.")
+		.def("setDouble", &SBObject::setDoubleAttribute, "Sets a floating point attribute of a given name to the given value.")
+		.def("setString", &SBObject::setStringAttribute, "Sets a string attribute of a given name to the given value.")
+		.def("setVec3", &SBObject::setVec3Attribute, "Sets a vector attribute of a given name to the given value.")
+		.def("setMatrix", &SBObject::setMatrixAttribute, "Sets a matrix attribute of a given name to the given value.")
+		.def("setAction", &SBObject::setActionAttribute, "Sets a action attribute of a given name.")
 		;
 
 
@@ -907,7 +937,6 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("addTetrahedron", &SBMotionBlendBase::addTetrahedron, "Add tetrahedrons to the state. By changing the point inside tetrahedron, you can get different blending weights and different results")
 		;
 
-
 	boost::python::class_<SBAnimationTransition>("SBAnimationTransition")
 		.def("set", &SBAnimationTransition::set, "")
 		.def("setSourceState", &SBAnimationTransition::setSourceBlend, "")
@@ -927,6 +956,8 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getDestinationMotionName", &SBAnimationTransition::getDestinationMotionName, boost::python::return_value_policy<boost::python::return_by_value>(), "")
 		.def("getEaseInStart", &SBAnimationTransition::getEaseInStart, "")
 		.def("getEaseInEnd", &SBAnimationTransition::getEaseInEnd, "")
+		.def("getTransitionRule", &SBAnimationTransition::getTransitionRule, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the rule associated with this transition.")
+		.def("setTransitionRule", &SBAnimationTransition::setTransitionRule, "Sets the rule associated with this transition.")
 		;
 
 	boost::python::class_<SBAnimationBlendManager>("SBAnimationBlendManager")
@@ -1461,6 +1492,10 @@ boost::python::class_<SBReach>("SBReach")
 		.def("stop", &PythonController::stop, &PythonControllerWrap::default_stop, "stop.")
 		.def("init", &PythonController::init, &PythonControllerWrap::default_init, "init.")
 		.def("evaluate", &PythonController::evaluate, &PythonControllerWrap::default_evaluate, "evaluate.")
+		;
+
+	boost::python::class_<TransitionRuleWrap, boost::noncopyable>("TransitionRule")
+		.def("check", &SBAnimationTransitionRule::check, &TransitionRuleWrap::default_check, "Determines if the transition rule should be triggered.")
 		;
 
 

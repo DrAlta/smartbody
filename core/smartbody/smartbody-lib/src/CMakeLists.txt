@@ -345,6 +345,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBBmlProcessor.cpp
 	sb/SBAnimationState.cpp
 	sb/SBAnimationTransition.cpp
+	sb/SBAnimationTransitionRule.cpp
 	sb/SBAnimationStateManager.cpp
 	sb/SBSteerManager.cpp
 	sb/SBSteerAgent.cpp
