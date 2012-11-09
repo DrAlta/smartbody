@@ -106,7 +106,7 @@ copy /Y ..\..\bin\smartbody\sbm\bin\libapr-1.dll bin\Debug
 copy /Y ..\..\bin\smartbody\sbm\bin\libapriconv-1.dll bin\Debug
 copy /Y ..\..\bin\smartbody\sbm\bin\libaprutil-1.dll bin\Debug
 copy /Y bin\glut32.dll bin\Debug
-xcopy /D /S /I /Y .\Data bin\Data
+xcopy /D /S /I /Y .\Data bin\Debug\Data
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -173,7 +173,7 @@ copy /Y ..\..\bin\smartbody\sbm\bin\libapr-1.dll bin\Release
 copy /Y ..\..\bin\smartbody\sbm\bin\libapriconv-1.dll bin\Release
 copy /Y ..\..\bin\smartbody\sbm\bin\libaprutil-1.dll bin\Release
 copy /Y bin\glut32.dll bin\Release
-xcopy /D /S /I /Y .\Data bin\Data
+xcopy /D /S /I /Y .\Data bin\Release\Data
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
