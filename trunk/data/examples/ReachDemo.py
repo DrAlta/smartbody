@@ -50,6 +50,10 @@ setPawnPos('doctorPawn', SrVec(-85, 200, 100))
 # Set camera position
 setPawnPos('camera', SrVec(0, 50, 0))
 
+# Turn on GPU deformable geomtery for all
+for name in scene.getCharacterNames():
+	scene.command("char %s viewer deformableGPU" % name)
+
 # Add Physics script
 scene.run('Reach.py')
 scene.run('Gaze.py')

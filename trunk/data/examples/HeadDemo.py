@@ -13,9 +13,26 @@ scene.addAssetPath('mesh', '../../../../data/mesh')
 scene.addAssetPath('mesh', '../../../../data/retarget/mesh')
 scene.addAssetPath('audio', '../../../../data/Resources/audio')
 
-scene.run('bradrachel.py')
-camera.setEye(0.33, 1.64, 0.39)
-camera.setCenter(0.44, 1.57, -0.02)
+# Add Character script
+scene.run('AddCharacter.py')
+
+# Set scene parameters to fit new Brad
+scene.setScale(1.0)
+scene.run("default-viewer.py")
+camera = getCamera()
+camera.setEye(0.0013, 1.66, 0.3756)
+camera.setCenter(0.1031, 1.58, -0.0099)
+camera.setUpVector(SrVec(0, 1, 0))
+camera.setScale(1)
+camera.setFov(1.0472)
+camera.setFarPlane(100)
+camera.setNearPlane(0.1)
+camera.setAspectRatio(0.966897)
+
+addNewBrad('ChrBrad')
+scene.getCharacter('ChrBrad').setHPR(SrVec(-17, 0, 0))
+
+scene.command("char ChrBrad viewer deformableGPU")
 
 last = 0
 canTime = True

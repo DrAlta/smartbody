@@ -37,6 +37,10 @@ setPawnPos('pawn1', SrVec(-200, 0, 1000))
 # Set camera position
 setPawnPos('camera', SrVec(0, -50, 0))
 
+# Turn on GPU deformable geometry for all
+for name in scene.getCharacterNames():
+	scene.command("char %s viewer deformableGPU" % name)
+
 # Set up list of Utahs and Doctors
 utahList = []
 doctorList = []

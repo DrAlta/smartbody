@@ -28,6 +28,9 @@ setPos('utah', SrVec(0, 0, 0))
 # Set camera position
 setPawnPos('camera', SrVec(0, -50, 0))
 
+# Turn GPU deformable geometry on
+scene.command("char utah viewer deformableGPU")
+
 # Add Speech script 
 scene.run('Speech.py')
 
