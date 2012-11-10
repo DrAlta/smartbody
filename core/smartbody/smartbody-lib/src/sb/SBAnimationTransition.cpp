@@ -10,10 +10,12 @@ SBAnimationTransition::SBAnimationTransition() : PATransition()
 
 SBAnimationTransition::SBAnimationTransition(std::string name) : PATransition()
 {
+	_rule = NULL;
 }
 
 SBAnimationTransition::~SBAnimationTransition()
 {
+	
 }
 
 double SBAnimationTransition::getEaseInStart()
