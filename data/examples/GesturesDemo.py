@@ -33,6 +33,10 @@ setPos('utah2', SrVec(60, 0, 0))
 # Set camera position
 setPawnPos('camera', SrVec(0, -50, 0))
 
+# Turn on GPU deformable geometry for all
+for name in scene.getCharacterNames():
+	scene.command("char %s viewer deformableGPU" % name)
+
 # Add Blend script
 scene.run('Gestures.py')
 initGestureMap()
@@ -56,20 +60,20 @@ class GesturesDemo(SBScript):
 		# When time's up, do action
 		if canTime:
 			# Brad2
-			playGesture('brad2', 'SWEEP', 'BOTH_HANDS', 0, 1)
-			playGesture('brad2', 'OFFER', 'RIGHT_HAND', 1.5, 2.5)
-			playGesture('brad2', 'YOU', 'RIGHT_HAND', 3, 4)
-			playGesture('brad2', 'SWEEPRIGHT', 'RIGHT_HAND', 4.5, 5)
+			playGesture('brad2', 'SWEEP', 'BOTH_HANDS', start=0, ready=1)
+			playGesture('brad2', 'OFFER', 'RIGHT_HAND', start=1.5, ready=2.5)
+			playGesture('brad2', 'YOU', 'RIGHT_HAND', start=3, ready=4)
+			playGesture('brad2', 'SWEEPRIGHT', 'RIGHT_HAND', start=4.5, ready=5)
 			# Brad
 			playGesture('brad', 'SWEEP', 'BOTH_HANDS', stroke=0, stroke_end=2.5)
 			playGesture('brad', 'OFFER', 'RIGHT_HAND', stroke=3, stroke_end=4)
 			playGesture('brad', 'YOU', 'RIGHT_HAND', stroke=5, stroke_end=6)
 			playGesture('brad', 'SWEEPRIGHT', 'RIGHT_HAND', stroke=7, stroke_end=8)
 			# Utah2
-			playGesture('utah2', 'YOU', 'RIGHT_HAND', 0, 1)
-			playGesture('utah2', 'RIGHT', 'RIGHT_HAND', 1.5, 2.5)
-			playGesture('utah2', 'LEFT', 'LEFT_HAND', 3, 4)
-			playGesture('utah2', 'WHY', 'BOTH_HANDS', 4.5, 5.5)
+			playGesture('utah2', 'YOU', 'RIGHT_HAND', start=0, ready=1)
+			playGesture('utah2', 'RIGHT', 'RIGHT_HAND', start=1.5, ready=2.5)
+			playGesture('utah2', 'LEFT', 'LEFT_HAND', start=3, ready=4)
+			playGesture('utah2', 'WHY', 'BOTH_HANDS', start=4.5, ready=5.5)
 			# Utah
 			playGesture('utah', 'YOU', 'RIGHT_HAND', stroke=0, stroke_end=2.5)
 			playGesture('utah', 'RIGHT', 'RIGHT_HAND', stroke=3, stroke_end=4.5)

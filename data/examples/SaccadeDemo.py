@@ -30,6 +30,10 @@ setPos('elder', SrVec(-70, 102, 0))
 # Set camera position
 setPawnPos('camera', SrVec(0, -50, 0))
 
+# Turn on GPU deformable geometry for all
+for name in scene.getCharacterNames():
+	scene.command("char %s viewer deformableGPU" % name)
+
 # Add Facial Movements script
 scene.run('Saccade.py')
 

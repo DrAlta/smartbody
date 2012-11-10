@@ -21,15 +21,21 @@ camera.setCenter(0, 114.56, 56.41)
 # Add Character script
 scene.run('AddCharacter.py')
 # Add characters in scene
-addCharacter('utah', 'utah')
-setPos('utah', SrVec(-50, 0, 0))
+addCharacter('brad1', 'brad')
+setPos('brad1', SrVec(-50, 102, 0))
 
 # .dae
-addCharacter('brad', 'brad')
-setPos('brad', SrVec(50, 102, 0))
+addCharacter('brad2', 'brad')
+setPos('brad2', SrVec(50, 102, 0))
+
+addNewBrad('ChrBrad')
 
 # Set camera position
 setPawnPos('camera', SrVec(0, -50, 0))
+
+# Turn on GPU deformable geometry
+scene.command("char brad1 viewer deformableGPU")
+scene.command("char brad2 viewer deformableGPU")
 
 # Add Retargetting script
 scene.run('Retargetting.py')
@@ -37,39 +43,26 @@ scene.run('Retargetting.py')
 
 output = ''
 if output == '':
-	autoRetarget('LHandOnHip_Arms_GestureWhy', 'common.sk', 'test_utah.sk', '../../../../data/sbm-common/common-sk/retargetMotion/')
-	output = getOutput()
+	autoRetarget('ChrBrad@Guitar01', 'ChrBrad.sk', 'common.sk', '../../../../data/sbm-common/common-sk/retargetMotion/')
+	output = 'common.skChrBrad@Guitar01'
 	
 last = 0
 canTime = True
-delay = 5
+delay = 10
 class RetargettingDemo(SBScript):
 	def update(self, time):
 		global canTime, last, output
-		if canTime:
-			last = time
-			canTime = False
 		diff = time - last
 		if diff >= delay:
 			canTime = True
 			diff = 0
 		if canTime:
-			bml.execBML('brad', '<animation name="LHandOnHip_Arms_GestureWhy"/>')
-		'''
-		#print diff
-		if 5 < diff < 5.1:
-			bml.execBML('brad','<animation name="LHandOnHip_Arms_GestureWhy"/>')
-		if 10 < diff < 10.1: 
-			if output == '':
-				autoRetarget('LHandOnHip_Arms_GestureWhy', 'test_utah.sk', 'common.sk', '../../../../data/sbm-common/common-sk/retargetMotion/')
-				output = getOutput()
-		if 12 < diff < 12.1:
-			bml.execBML('utah','<animation name="' + output + '"/>')
-		if diff > 15:
-			canTime = True
-			diff = 0
-			#setPos('brad', SrVec(50, -102, 0))
-		'''
+			last = time
+			canTime = False
+			# Play non retargetted and retargetted
+			bml.execBML('brad1', '<animation name="ChrBrad@Guitar01"/>')
+			bml.execBML('brad2', '<animation name="common.skChrBrad@Guitar01"/>')
+			
 scene.removeScript('retargettingdemo')
 retargettingdemo = RetargettingDemo()
 scene.addScript('retargettingdemo', retargettingdemo)

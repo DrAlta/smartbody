@@ -1,5 +1,5 @@
 # Run retarget script for the functions
-scene.run('motion-retarget2.py')
+scene.run('motion-retarget.py')
 
 '''
 motionName = 'ChrUtah_Relax001_CrouchProtectHead_center'
@@ -13,8 +13,8 @@ outputName = 'None'
 
 def autoRetarget(motionName, srcSkelName, tgtSkelName, outDir):
 	retargetMotionWithGuessMap(motionName, srcSkelName, tgtSkelName, outDir)
-	global outputName
-	outputName = getOutputName()
+	#global outputName
+	#outputName = getOutputName()
 	
 def getOutput():
 	return outputName

@@ -28,6 +28,9 @@ setPos('utah', SrVec(0, 0, 0))
 # Set camera position
 setPawnPos('camera', SrVec(0, -50, 0))
 
+# Turn on GPU deformable geometry
+scene.command("char utah viewer deformableGPU")
+
 # Add Facial Movements script
 scene.run('FacialMovements.py')
 

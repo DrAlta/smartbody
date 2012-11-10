@@ -1,6 +1,4 @@
 import random
-
-
 print "|--------------------------------------------|"
 print "|           Starting Crowd Demo              |"
 print "|--------------------------------------------|"
@@ -28,6 +26,10 @@ addMultipleCharacters('utah', 'utah', 40)
 
 # Set camera position
 setPawnPos('camera', SrVec(0, -50, 0))
+
+# Turn on GPU deformable geometry for all
+for name in scene.getCharacterNames():
+	scene.command("char %s viewer deformableGPU" % name)
 
 # Set up list of Utahs and Doctors
 utahList = []

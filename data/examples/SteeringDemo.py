@@ -28,6 +28,10 @@ addMultipleCharacters('brad', 'brad', 15, False, -900, -900)
 # Set camera position
 setPawnPos('camera', SrVec(0, -50, 0))
 
+# Turn on GPU deformable geometry for all
+for name in scene.getCharacterNames():
+	scene.command("char %s viewer deformableGPU" % name)
+
 # Set up list of Utahs and Doctors
 utahList = []
 bradList = []

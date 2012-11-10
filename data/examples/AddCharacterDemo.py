@@ -31,6 +31,10 @@ setPos('brad', SrVec(-75, 102, 250))
 # Multiple
 addMultipleCharacters('elder', 'elder', 25)
 
+# Turn on GPU deformable geometry for all
+for name in scene.getCharacterNames():
+	scene.command("char %s viewer deformableGPU" % name)
+
 # Set camera position
 setPawnPos('camera', SrVec(0, -50, 0))
 	

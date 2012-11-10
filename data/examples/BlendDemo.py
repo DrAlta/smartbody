@@ -33,6 +33,10 @@ setPos('doctor', SrVec(55, 102, 0))
 # Set camera position
 setPawnPos('camera', SrVec(0, -50, 0))
 
+# Turn on GPU deformable geometry for all
+for name in scene.getCharacterNames():
+	scene.command("char %s viewer deformableGPU" % name)
+
 # Add Blend script
 scene.run('Blend.py')
 

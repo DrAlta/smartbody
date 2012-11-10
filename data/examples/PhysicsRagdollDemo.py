@@ -68,6 +68,10 @@ setPawnPos('wall4', SrVec(-200, 0, 0))
 # Set camera position
 setPawnPos('camera', SrVec(0, -50, 0))
 
+# Turn on GPU deformable geometry for all
+for name in scene.getCharacterNames():
+	scene.command("char %s viewer deformableGPU" % name)
+
 # Add Gaze script
 scene.run('Gaze.py')
 
