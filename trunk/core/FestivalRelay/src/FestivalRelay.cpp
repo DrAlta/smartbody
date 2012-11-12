@@ -674,7 +674,7 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
         phonemeToViseme.insert(make_pair("k",  make_pair("Kg", 1.0))); //  K
         phonemeToViseme.insert(make_pair("l",  make_pair("L", 1.0)));  //  L
         phonemeToViseme.insert(make_pair("m",  make_pair("BMP", 1.0)));//  M
-        phonemeToViseme.insert(make_pair("n",  make_pair("Kg", 1.0))); //  N
+        phonemeToViseme.insert(make_pair("n",  make_pair("D", 1.0))); //  N
         phonemeToViseme.insert(make_pair("ng", make_pair("Kg", 1.0))); // NG
         phonemeToViseme.insert(make_pair("ow", make_pair("Ow", 1.0))); // OW
         phonemeToViseme.insert(make_pair("oy", make_pair("Oy", 1.0))); // OY
@@ -686,7 +686,7 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
         phonemeToViseme.insert(make_pair("t",  make_pair("D", 1.0)));  // T?
         phonemeToViseme.insert(make_pair("th", make_pair("Th", 1.0))); // TH
         phonemeToViseme.insert(make_pair("uh", make_pair("Eh", 1.0))); // UH
-        phonemeToViseme.insert(make_pair("uw", make_pair("Oh", 1.0))); // UW
+        phonemeToViseme.insert(make_pair("uw", make_pair("W", 1.0))); // UW
         phonemeToViseme.insert(make_pair("v",  make_pair("F", 1.0)));  //  V
         phonemeToViseme.insert(make_pair("w",  make_pair("W", 1.0))); //  W
         phonemeToViseme.insert(make_pair("y",  make_pair("Ih", 1.0))); //  Y
