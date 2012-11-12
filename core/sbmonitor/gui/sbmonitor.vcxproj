@@ -54,7 +54,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\lib;designer;src;..;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\qt\include\QtGui;..\..\..\lib\qt\include\QtOpenGL;..\..\..\lib\qt\include;..\..\..\lib\qt\include\QtUiTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\lib;designer;src;..;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\qt\qt\include\QtGui;..\..\..\lib\qt\qt\include\QtOpenGL;..\..\..\lib\qt\qt\include;..\..\..\lib\qt\qt\include\QtUiTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -68,7 +68,7 @@
     </ProjectReference>
     <Link>
       <AdditionalDependencies>sbmonitorlib.lib;vhcl_d.lib;vhmsg_d.lib;QtCored4.lib;QtGuid4.lib;qtmaind.lib;QtOpenGLd4.lib;pthreadVSE2.lib;activemq-cppd.lib;opengl32.lib;glu32.lib;ws2_32.lib;dbghelp.lib;winmm.lib;rpcrt4.lib;QtUiToolsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\lib\Debug;..\..\..\lib\vhcl\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\qt\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\lib\Debug;..\..\..\lib\vhcl\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\qt\qt\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -81,9 +81,9 @@ copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..
 copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..
 copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll ..
-copy /Y ..\..\..\lib\qt\bin\QtCored4.dll ..
-copy /Y ..\..\..\lib\qt\bin\QtGuid4.dll ..
-copy /Y ..\..\..\lib\qt\bin\QtOpenGLd4.dll ..
+copy /Y ..\..\..\lib\qt\qt\bin\QtCored4.dll ..
+copy /Y ..\..\..\lib\qt\qt\bin\QtGuid4.dll ..
+copy /Y ..\..\..\lib\qt\qt\bin\QtOpenGLd4.dll ..
 if exist ..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\msvcr90d.dll copy /Y ..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.* ..
 copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" ..
 
@@ -99,9 +99,9 @@ copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\..\bin\sbmonitor
 copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\..\bin\sbmonitor
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\..\bin\sbmonitor
 copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll ..\..\..\bin\sbmonitor
-copy /Y ..\..\..\lib\qt\bin\QtCored4.dll ..\..\..\bin\sbmonitor
-copy /Y ..\..\..\lib\qt\bin\QtGuid4.dll ..\..\..\bin\sbmonitor
-copy /Y ..\..\..\lib\qt\bin\QtOpenGLd4.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\qt\qt\bin\QtCored4.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\qt\qt\bin\QtGuid4.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\qt\qt\bin\QtOpenGLd4.dll ..\..\..\bin\sbmonitor
 if exist ..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\msvcr90d.dll copy /Y ..\..\..\lib\msvc\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.* ..\..\..\bin\sbmonitor
 copy /Y "$(VS90COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\bin\sbmonitor
 
@@ -117,7 +117,7 @@ copy /Y images\*.* ..\..\..\bin\sbmonitor\images
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>..\lib;designer;src;..;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\qt\include\QtGui;..\..\..\lib\qt\include\QtOpenGL;..\..\..\lib\qt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\lib;designer;src;..;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\qt\qt\include\QtGui;..\..\..\lib\qt\qt\include\QtOpenGL;..\..\..\lib\qt\qt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -130,7 +130,7 @@ copy /Y images\*.* ..\..\..\bin\sbmonitor\images
     </ProjectReference>
     <Link>
       <AdditionalDependencies>sbmonitorlib.lib;vhcl.lib;vhmsg.lib;QtCore4.lib;QtGui4.lib;qtmain.lib;QtOpenGL4.lib;pthreadVSE2.lib;activemq-cpp.lib;opengl32.lib;glu32.lib;ws2_32.lib;dbghelp.lib;winmm.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\lib\Release;..\..\..\lib\vhcl\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\qt\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\lib\Release;..\..\..\lib\vhcl\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\qt\qt\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -145,9 +145,9 @@ copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..
 copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..
 copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll ..
-copy /Y ..\..\..\lib\qt\bin\QtCore4.dll ..
-copy /Y ..\..\..\lib\qt\bin\QtGui4.dll ..
-copy /Y ..\..\..\lib\qt\bin\QtOpenGL4.dll ..
+copy /Y ..\..\..\lib\qt\qt\bin\QtCore4.dll ..
+copy /Y ..\..\..\lib\qt\qt\bin\QtGui4.dll ..
+copy /Y ..\..\..\lib\qt\qt\bin\QtOpenGL4.dll ..
 copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" ..
 copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcp100.dll" ..
 copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcr100.dll" ..
@@ -164,9 +164,9 @@ copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\..\bin\sbmonitor
 copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\..\bin\sbmonitor
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\..\bin\sbmonitor
 copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll ..\..\..\bin\sbmonitor
-copy /Y ..\..\..\lib\qt\bin\QtCore4.dll ..\..\..\bin\sbmonitor
-copy /Y ..\..\..\lib\qt\bin\QtGui4.dll ..\..\..\bin\sbmonitor
-copy /Y ..\..\..\lib\qt\bin\QtOpenGL4.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\qt\qt\bin\QtCore4.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\qt\qt\bin\QtGui4.dll ..\..\..\bin\sbmonitor
+copy /Y ..\..\..\lib\qt\qt\bin\QtOpenGL4.dll ..\..\..\bin\sbmonitor
 copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\bin\sbmonitor
 copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcp100.dll" ..\..\..\bin\sbmonitor
 copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcr100.dll" ..\..\..\bin\sbmonitor
