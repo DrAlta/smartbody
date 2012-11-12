@@ -119,8 +119,9 @@ class XStr
 bool isDone = false;
 
 extern SpeechRequestData xmlMetaData;
-extern std::map<string,string> phonemeToViseme;
-extern std::string mapping;
+extern std::multimap<std::string, std::pair<string, double> > phonemeToViseme;
+
+std::string mapping;
 
 #if !defined(WIN32) && !defined(__APPLE__)
 SpeechRequestData xmlMetaData;
@@ -600,97 +601,97 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
 
      if(mapping == "sbmold")
     {
-		phonemeToViseme[ "pau" ] = "_";  // SIL
-        phonemeToViseme[ "aa" ]  = "Ao"; // AA
-        phonemeToViseme[ "ae" ]  = "Ih"; // AE
-        phonemeToViseme[ "ah" ]  = "Ih"; // AH
-        phonemeToViseme[ "ao" ]  = "Ao"; // AO
-        phonemeToViseme[ "ax" ]  = "Ih"; // AX
-        phonemeToViseme[ "@" ]   = "Ih"; // 
-        phonemeToViseme[ "aw" ]  = "Ih"; // AW
-        phonemeToViseme[ "ay" ]  = "Ih"; // AY
-        phonemeToViseme[ "b" ]   = "BMP";//  B
-        phonemeToViseme[ "ch" ]  = "j";  // CH
-        phonemeToViseme[ "d" ]   = "D";  //  D
-        phonemeToViseme[ "dh" ]  = "Th"; // DH
-        phonemeToViseme[ "dx" ]  = "D";  // ??
-        phonemeToViseme[ "eh" ]  = "Ih"; // EH
-        phonemeToViseme[ "er" ]  = "Er"; // ER
-        phonemeToViseme[ "ey" ]  = "Ih"; // 
-        phonemeToViseme[ "f" ]   = "F";  //  F
-        phonemeToViseme[ "g" ]   = "KG"; //  G
-        phonemeToViseme[ "hh" ]  = "Ih"; // HH
-        phonemeToViseme[ "ih" ]  = "Ih"; // IH
-        phonemeToViseme[ "iy" ]  = "EE"; // IY
-        phonemeToViseme[ "jh" ]  = "j";  // JH
-        phonemeToViseme[ "k" ]   = "KG"; //  K
-        phonemeToViseme[ "l" ]   = "D";  //  L
-        phonemeToViseme[ "m" ]   = "BMP";//  M
-        phonemeToViseme[ "n" ]   = "NG"; //  N
-        phonemeToViseme[ "ng" ]  = "NG"; // NG
-        phonemeToViseme[ "ow" ]  = "Oh"; // OW
-        phonemeToViseme[ "oy" ]  = "Oh"; // OY
-        phonemeToViseme[ "p" ]   = "BMP";//  P
-        phonemeToViseme[ "r" ]   = "R";  //  R
-        phonemeToViseme[ "s" ]   = "Z";  //  S
-        phonemeToViseme[ "sh" ]  = "j";  // SH
-        phonemeToViseme[ "T" ]   = "D";  // T?
-        phonemeToViseme[ "t" ]   = "D";  // T?
-        phonemeToViseme[ "th" ]  = "Th"; // TH
-        phonemeToViseme[ "uh" ]  = "Oh"; // UH
-        phonemeToViseme[ "uw" ]  = "Oh"; // UW
-        phonemeToViseme[ "v" ]   = "F";  //  V
-        phonemeToViseme[ "w" ]   = "OO"; //  W
-        phonemeToViseme[ "y" ]   = "OO"; //  Y
-        phonemeToViseme[ "z" ]   = "Z";  //  Z
-        phonemeToViseme[ "zh" ]  = "J";  // ZH
+        phonemeToViseme.insert(make_pair("pau", make_pair("_", 1.0)));  // SIL
+        phonemeToViseme.insert(make_pair("aa", make_pair("Ao", 1.0))); // AA
+        phonemeToViseme.insert(make_pair("ae", make_pair("Ih", 1.0))); // AE
+        phonemeToViseme.insert(make_pair("ah", make_pair("Ih", 1.0))); // AH
+        phonemeToViseme.insert(make_pair("ao", make_pair("Ao", 1.0))); // AO
+        phonemeToViseme.insert(make_pair("ax", make_pair("Ih", 1.0))); // AX
+        phonemeToViseme.insert(make_pair("@",  make_pair("Ih", 1.0))); //
+        phonemeToViseme.insert(make_pair("aw", make_pair("Ih", 1.0))); // AW
+        phonemeToViseme.insert(make_pair("ay", make_pair("Ih", 1.0))); // AY
+        phonemeToViseme.insert(make_pair("b",  make_pair("BMP", 1.0)));//  B
+        phonemeToViseme.insert(make_pair("ch", make_pair("j", 1.0)));  // CH
+        phonemeToViseme.insert(make_pair("d",  make_pair("D", 1.0)));  //  D
+        phonemeToViseme.insert(make_pair("dh", make_pair("Th", 1.0))); // DH
+        phonemeToViseme.insert(make_pair("dx", make_pair("D", 1.0)));  // ??
+        phonemeToViseme.insert(make_pair("eh", make_pair("Ih", 1.0))); // EH
+        phonemeToViseme.insert(make_pair("er", make_pair("Er", 1.0))); // ER
+        phonemeToViseme.insert(make_pair("ey", make_pair("Ih", 1.0))); //
+        phonemeToViseme.insert(make_pair("f",  make_pair("F", 1.0)));  //  F
+        phonemeToViseme.insert(make_pair("g",  make_pair("KG", 1.0))); //  G
+        phonemeToViseme.insert(make_pair("hh", make_pair("Ih", 1.0))); // HH
+        phonemeToViseme.insert(make_pair("ih", make_pair("Ih", 1.0))); // IH
+        phonemeToViseme.insert(make_pair("iy", make_pair("EE", 1.0))); // IY
+        phonemeToViseme.insert(make_pair("jh", make_pair("j", 1.0)));  // JH
+        phonemeToViseme.insert(make_pair("k",  make_pair("KG", 1.0))); //  K
+        phonemeToViseme.insert(make_pair("l",  make_pair("D", 1.0)));  //  L
+        phonemeToViseme.insert(make_pair("m",  make_pair("BMP", 1.0)));//  M
+        phonemeToViseme.insert(make_pair("n",  make_pair("NG", 1.0))); //  N
+        phonemeToViseme.insert(make_pair("ng", make_pair("NG", 1.0))); // NG
+        phonemeToViseme.insert(make_pair("ow", make_pair("Oh", 1.0))); // OW
+        phonemeToViseme.insert(make_pair("oy", make_pair("Oh", 1.0))); // OY
+        phonemeToViseme.insert(make_pair("p",  make_pair("BMP", 1.0)));//  P
+        phonemeToViseme.insert(make_pair("r",  make_pair("R", 1.0)));  //  R
+        phonemeToViseme.insert(make_pair("s",  make_pair("Z", 1.0)));  //  S
+        phonemeToViseme.insert(make_pair("sh", make_pair("j", 1.0)));  // SH
+        phonemeToViseme.insert(make_pair("T",  make_pair("D", 1.0)));  // T?
+        phonemeToViseme.insert(make_pair("t",  make_pair("D", 1.0)));  // T?
+        phonemeToViseme.insert(make_pair("th", make_pair("Th", 1.0))); // TH
+        phonemeToViseme.insert(make_pair("uh", make_pair("Oh", 1.0))); // UH
+        phonemeToViseme.insert(make_pair("uw", make_pair("Oh", 1.0))); // UW
+        phonemeToViseme.insert(make_pair("v",  make_pair("F", 1.0)));  //  V
+        phonemeToViseme.insert(make_pair("w",  make_pair("OO", 1.0))); //  W
+        phonemeToViseme.insert(make_pair("y",  make_pair("OO", 1.0))); //  Y
+        phonemeToViseme.insert(make_pair("z",  make_pair("Z", 1.0)));  //  Z
+        phonemeToViseme.insert(make_pair("zh", make_pair("J", 1.0)));  // ZH
     }
 	else if (mapping == "sbm")
 	{
-		phonemeToViseme[ "pau" ] = "_";  // SIL
-		phonemeToViseme[ "aa" ]  = "Aa"; // AA
-		phonemeToViseme[ "ae" ]  = "Ah"; // AE
-		phonemeToViseme[ "ah" ]  = "Ah"; // AH
-		phonemeToViseme[ "ao" ]  = "Ao"; // AO
-		phonemeToViseme[ "ax" ]  = "Ah"; // AX
-		phonemeToViseme[ "@" ]   = "Ih"; // ??
-		phonemeToViseme[ "aw" ]  = "Ah"; // AW
-		phonemeToViseme[ "ay" ]  = "Ay"; // AY
-		phonemeToViseme[ "b" ]   = "BMP";//  B
-		phonemeToViseme[ "ch" ]  = "Sh";  // CH
-		phonemeToViseme[ "d" ]   = "D";  //  D
-		phonemeToViseme[ "dh" ]  = "Th"; // DH
-		phonemeToViseme[ "dx" ]  = "D";  // ??
-		phonemeToViseme[ "eh" ]  = "Eh"; // EH
-		phonemeToViseme[ "er" ]  = "Er"; // ER
-		phonemeToViseme[ "ey" ]  = "Eh"; // 
-		phonemeToViseme[ "f" ]   = "F";  //  F
-		phonemeToViseme[ "g" ]   = "Kg"; //  G
-		phonemeToViseme[ "hh" ]  = "Ih"; // HH
-		phonemeToViseme[ "ih" ]  = "Ih"; // IH
-		phonemeToViseme[ "iy" ]  = "Ih"; // IY
-		phonemeToViseme[ "jh" ]  = "Sh";  // JH
-		phonemeToViseme[ "k" ]   = "Kg"; //  K
-		phonemeToViseme[ "l" ]   = "L";  //  L
-		phonemeToViseme[ "m" ]   = "BMP";//  M
-		phonemeToViseme[ "n" ]   = "Kg"; //  N
-		phonemeToViseme[ "ng" ]  = "Kg"; // NG
-		phonemeToViseme[ "ow" ]  = "Ow"; // OW
-		phonemeToViseme[ "oy" ]  = "Oy"; // OY
-		phonemeToViseme[ "p" ]   = "BMP";//  P
-		phonemeToViseme[ "r" ]   = "R";  //  R
-		phonemeToViseme[ "s" ]   = "Z";  //  S
-		phonemeToViseme[ "sh" ]  = "Sh";  // SH
-		phonemeToViseme[ "T" ]   = "D";  // T?
-		phonemeToViseme[ "t" ]   = "D";  // T?
-		phonemeToViseme[ "th" ]  = "Th"; // TH
-		phonemeToViseme[ "uh" ]  = "Eh"; // UH
-		phonemeToViseme[ "uw" ]  = "Oh"; // UW
-		phonemeToViseme[ "v" ]   = "F";  //  V
-		phonemeToViseme[ "w" ]   = "W"; //  W
-		phonemeToViseme[ "y" ]   = "Ih"; //  Y
-		phonemeToViseme[ "z" ]   = "Z";  //  Z
-		phonemeToViseme[ "zh" ]  = "Sh";  // ZH
+        phonemeToViseme.insert(make_pair("pau", make_pair("_", 1.0)));  // SIL
+        phonemeToViseme.insert(make_pair("aa", make_pair("Aa", 1.0))); // AA
+        phonemeToViseme.insert(make_pair("ae", make_pair("Ah", 1.0))); // AE
+        phonemeToViseme.insert(make_pair("ah", make_pair("Ah", 1.0))); // AH
+        phonemeToViseme.insert(make_pair("ao", make_pair("Ao", 1.0))); // AO
+        phonemeToViseme.insert(make_pair("ax", make_pair("Ah", 1.0))); // AX
+        phonemeToViseme.insert(make_pair("@",  make_pair("Ih", 1.0))); // ??
+        phonemeToViseme.insert(make_pair("aw", make_pair("Ah", 1.0))); // AW
+        phonemeToViseme.insert(make_pair("ay", make_pair("Ay", 1.0))); // AY
+        phonemeToViseme.insert(make_pair("b",  make_pair("BMP", 1.0)));//  B
+        phonemeToViseme.insert(make_pair("ch", make_pair("Sh", 1.0)));  // CH
+        phonemeToViseme.insert(make_pair("d",  make_pair("D", 1.0)));  //  D
+        phonemeToViseme.insert(make_pair("dh", make_pair("Th", 1.0))); // DH
+        phonemeToViseme.insert(make_pair("dx", make_pair("D", 1.0)));  // ??
+        phonemeToViseme.insert(make_pair("eh", make_pair("Eh", 1.0))); // EH
+        phonemeToViseme.insert(make_pair("er", make_pair("Er", 1.0))); // ER
+        phonemeToViseme.insert(make_pair("ey", make_pair("Eh", 1.0))); //
+        phonemeToViseme.insert(make_pair("f",  make_pair("F", 1.0)));  //  F
+        phonemeToViseme.insert(make_pair("g",  make_pair("Kg", 1.0))); //  G
+        phonemeToViseme.insert(make_pair("hh", make_pair("Ih", 1.0))); // HH
+        phonemeToViseme.insert(make_pair("ih", make_pair("Ih", 1.0))); // IH
+        phonemeToViseme.insert(make_pair("iy", make_pair("Ih", 1.0))); // IY
+        phonemeToViseme.insert(make_pair("jh", make_pair("Sh", 1.0)));  // JH
+        phonemeToViseme.insert(make_pair("k",  make_pair("Kg", 1.0))); //  K
+        phonemeToViseme.insert(make_pair("l",  make_pair("L", 1.0)));  //  L
+        phonemeToViseme.insert(make_pair("m",  make_pair("BMP", 1.0)));//  M
+        phonemeToViseme.insert(make_pair("n",  make_pair("Kg", 1.0))); //  N
+        phonemeToViseme.insert(make_pair("ng", make_pair("Kg", 1.0))); // NG
+        phonemeToViseme.insert(make_pair("ow", make_pair("Ow", 1.0))); // OW
+        phonemeToViseme.insert(make_pair("oy", make_pair("Oy", 1.0))); // OY
+        phonemeToViseme.insert(make_pair("p",  make_pair("BMP", 1.0)));//  P
+        phonemeToViseme.insert(make_pair("r",  make_pair("R", 1.0)));  //  R
+        phonemeToViseme.insert(make_pair("s",  make_pair("Z", 1.0)));  //  S
+        phonemeToViseme.insert(make_pair("sh", make_pair("Sh", 1.0)));  // SH
+        phonemeToViseme.insert(make_pair("T",  make_pair("D", 1.0)));  // T?
+        phonemeToViseme.insert(make_pair("t",  make_pair("D", 1.0)));  // T?
+        phonemeToViseme.insert(make_pair("th", make_pair("Th", 1.0))); // TH
+        phonemeToViseme.insert(make_pair("uh", make_pair("Eh", 1.0))); // UH
+        phonemeToViseme.insert(make_pair("uw", make_pair("Oh", 1.0))); // UW
+        phonemeToViseme.insert(make_pair("v",  make_pair("F", 1.0)));  //  V
+        phonemeToViseme.insert(make_pair("w",  make_pair("W", 1.0))); //  W
+        phonemeToViseme.insert(make_pair("y",  make_pair("Ih", 1.0))); //  Y
+        phonemeToViseme.insert(make_pair("z",  make_pair("Z", 1.0)));  //  Z
+        phonemeToViseme.insert(make_pair("zh", make_pair("Sh", 1.0)));  // ZH
 	}
    
 }
