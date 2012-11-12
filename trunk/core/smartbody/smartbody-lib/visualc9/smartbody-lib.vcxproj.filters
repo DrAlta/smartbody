@@ -982,6 +982,7 @@
     <ClCompile Include="..\src\controllers\me_ct_motion_recorder.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sb\SBAnimationTransitionRule.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -1980,9 +1981,6 @@
     <ClInclude Include="..\src\sb\SBPython.h">
       <Filter>python</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sb\SBTypes.h">
-      <Filter>sb</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\BMLDefs.h">
       <Filter>bml</Filter>
     </ClInclude>
@@ -2007,6 +2005,7 @@
     <ClInclude Include="..\src\controllers\me_ct_motion_recorder.h">
       <Filter>controllers</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\sb\SBAnimationTransitionRule.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag">

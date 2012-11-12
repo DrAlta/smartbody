@@ -851,7 +851,6 @@
     <ClInclude Include="..\src\sb\SBMotionBlendBase.h" />
     <ClInclude Include="..\src\sb\SBPhoneme.h" />
     <ClInclude Include="..\src\sb\SBPhonemeManager.h" />
-    <ClInclude Include="..\src\sb\SBTypes.h" />
     <ClInclude Include="..\src\sk\sk_channel.h" />
     <ClInclude Include="..\src\sk\sk_channel_array.h" />
     <ClInclude Include="..\src\sk\sk_joint.h" />
