@@ -132,8 +132,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sbdesktop", "core\smartbody
 		{662CF3EB-B816-4727-9D1D-4071C25A3312} = {662CF3EB-B816-4727-9D1D-4071C25A3312}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SmartBody", "core\smartbody\smartbody-lib\visualc9\smartbody.vcproj", "{D41370B8-B1B9-430E-8813-C296D7935F2B}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kinecttracker", "lib\kinecttracker\kinecttracker_2008.vcproj", "{D199709A-523E-4A12-B928-8DF65487980F}"
 EndProject
 Global

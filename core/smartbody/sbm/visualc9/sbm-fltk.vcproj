@@ -1011,6 +1011,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="motioneditor"
+			>
+			<File
+				RelativePath="..\src\motioneditor\MotionEditorWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\motioneditor\MotionEditorWindow.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\src\glfont2.cpp"
 			>
