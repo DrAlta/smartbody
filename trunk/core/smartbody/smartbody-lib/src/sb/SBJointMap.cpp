@@ -230,6 +230,26 @@ std::vector<std::string>& SBJointMap::getMappedSkeletons()
 	return _mappedSkeletons;
 }
 
+bool SBJointMap::isAppliedToMotion(const std::string& name)
+{
+	for (size_t i = 0; i < _mappedMotions.size(); ++i)
+	{
+		if (_mappedMotions[i] == name)
+			return true;
+	}
+	return false;
+}
+
+bool SBJointMap::isAppliedToSkeleton(const std::string& name)
+{
+	for (size_t i = 0; i < _mappedSkeletons.size(); ++i)
+	{
+		if (_mappedSkeletons[i] == name)
+			return true;
+	}
+	return false;
+}
+
 void SBJointMap::setMapping(const std::string& from, const std::string& to)
 {
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();

@@ -81,6 +81,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, NULL);
 	menubar->add("&Window/Viseme Viewer", 0, LaunchVisemeViewerCB, this, NULL);
 	menubar->add("&Window/Retarget Creator", 0, LaunchRetargetCreatorCB, this, NULL);
+	menubar->add("&Window/Motion Editor", 0, LaunchMotionEditorCB, this, NULL);
 	menubar->add("&Help/Documentation", 0, DocumentationCB, this, NULL);
 	menubar->add("&Help/Create Python API", 0, CreatePythonAPICB, this, NULL);
 	//menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
@@ -152,6 +153,8 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 
 	monitorConnectWindow = NULL;
 
+	motionEditorWindow = NULL;
+
 	retargetCreatorWindow = NULL;
 
 	faceViewerWindow = NULL;
@@ -173,6 +176,8 @@ BaseWindow::~BaseWindow() {
 		delete visemeViewerWindow;
 	if (monitorConnectWindow)
 		delete monitorConnectWindow;
+	if (motionEditorWindow)
+		delete motionEditorWindow;
 	if (retargetCreatorWindow)
 		delete retargetCreatorWindow;
 	if (faceViewerWindow)
@@ -274,6 +279,11 @@ void BaseWindow::resetWindow()
 		delete monitorConnectWindow;
 		monitorConnectWindow = NULL;
 	}
+	if (motionEditorWindow)
+	{
+		delete motionEditorWindow;
+		motionEditorWindow = NULL;
+	}
 
 	if (characterCreator)
 	{
@@ -290,6 +300,11 @@ void BaseWindow::resetWindow()
 	{
 		delete monitorConnectWindow;
 		monitorConnectWindow = NULL;
+	}
+	if (motionEditorWindow)
+	{
+		delete motionEditorWindow;
+		motionEditorWindow = NULL;
 	}
 
 	if (faceViewerWindow)
@@ -502,12 +517,23 @@ void BaseWindow::LaunchRetargetCreatorCB(Fl_Widget* widget, void* data)
 	rootWindow->retargetCreatorWindow->show();
 }
 
+void BaseWindow::LaunchMotionEditorCB(Fl_Widget* widget, void* data)
+{
+	// console doesn't receive commands - why?
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->motionEditorWindow)
+	{
+		rootWindow->motionEditorWindow = new MotionEditorWindow(150, 150, 450, 700, "Motion Editor");
+	}
+	rootWindow->motionEditorWindow->show();
+}
+
 void BaseWindow::LaunchVisemeViewerCB(Fl_Widget* widget, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (!rootWindow->visemeViewerWindow)
 	{
-		rootWindow->visemeViewerWindow = new VisemeViewerWindow(150, 150, 800, 600, "Viseme Configuration");
+		rootWindow->visemeViewerWindow = new VisemeViewerWindow(150, 150, 600, 800, "Viseme Configuration");
 	}
 
 	rootWindow->visemeViewerWindow->show();

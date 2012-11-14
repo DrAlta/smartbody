@@ -40,6 +40,9 @@
     <Filter Include="monitorviewer">
       <UniqueIdentifier>{6f962f55-7281-489e-ad9b-4c381c001a85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="motioneditor">
+      <UniqueIdentifier>{42bd09ff-f612-4031-bf07-476a23845bec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -235,6 +238,9 @@
     <ClCompile Include="..\src\monitorviewer\MonitorConnectWindow.cpp">
       <Filter>monitorviewer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\motioneditor\MotionEditorWindow.cpp">
+      <Filter>motioneditor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -427,6 +433,9 @@
     </ClInclude>
     <ClInclude Include="..\src\monitorviewer\MonitorConnectWindow.h">
       <Filter>monitorviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\motioneditor\MotionEditorWindow.h">
+      <Filter>motioneditor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

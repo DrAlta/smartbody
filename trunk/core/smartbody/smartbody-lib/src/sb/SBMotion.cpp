@@ -5,6 +5,8 @@
 #include <sr/sr_euler.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBJoint.h>
+#include <sb/SBJointMap.h>
+#include <sb/SBJointMapManager.h>
 
 namespace SmartBody {
 
@@ -1261,6 +1263,18 @@ SrVec SBMotion::getJointPosition(SBJoint* joint, float time)
 	return point;
 }
 
+SBJointMap* SBMotion::getJointMap()
+{
+	SBJointMapManager* jointMapManager = SBScene::getScene()->getJointMapManager();
+	std::vector<std::string>& jointMapNames = jointMapManager->getJointMapNames();
+	for (size_t i = 0; i < jointMapNames.size(); ++i)
+	{
+		SBJointMap* jointMap = jointMapManager->getJointMap(jointMapNames[i]);
+		if (jointMap->isAppliedToMotion(this->getName()))
+			return jointMap;
+	}
+	return NULL;
+}
 
 bool SBMotion::translate(float x, float y, float z, const std::string& baseJointName)
 {
@@ -1416,6 +1430,7 @@ void SBMotion::saveToSkm(const std::string& fileName)
 	}
 
 	this->save(*out);
+	delete out;
 }
 
 /*
@@ -1472,6 +1487,54 @@ bool SBMotion::setSyncPoint( const std::string& syncTag, double time )
 	return synch_points.set_time(tagIndex, time);
 }
 
+void SBMotion::validateSyncPoint(const std::string& syncTag)
+{
+	if (syncTag == "start")
+	{
+		if (getTimeStart() > getTimeReady())
+			setSyncPoint(syncTag, getTimeReady());
+	}
+	if (syncTag == "ready")
+	{
+		if (getTimeReady() < getTimeStart())
+			setSyncPoint(syncTag, getTimeStart());
+		if (getTimeReady() > getTimeStrokeStart())
+			setSyncPoint(syncTag, getTimeStrokeStart());
+	}
+	if (syncTag == "stroke_start")
+	{
+		if (getTimeStrokeStart() < getTimeReady())
+			setSyncPoint(syncTag, getTimeReady());
+		if (getTimeStrokeStart() > getTimeStroke())
+			setSyncPoint(syncTag, getTimeStroke());
+	}
+	if (syncTag == "stroke")
+	{
+		if (getTimeStroke() < getTimeStrokeStart())
+			setSyncPoint(syncTag, getTimeStrokeStart());
+		if (getTimeStroke() > getTimeStrokeEnd())
+			setSyncPoint(syncTag, getTimeStrokeEnd());
+	}
+	if (syncTag == "stroke_stop")
+	{
+		if (getTimeStrokeEnd() < getTimeStroke())
+			setSyncPoint(syncTag, getTimeStroke());
+		if (getTimeStrokeEnd() > getTimeRelax())
+			setSyncPoint(syncTag, getTimeRelax());
+	}
+	if (syncTag == "relax")
+	{
+		if (getTimeRelax() < getTimeStrokeEnd())
+			setSyncPoint(syncTag, getTimeStrokeEnd());
+		if (getTimeRelax() > getTimeStop())
+			setSyncPoint(syncTag, getTimeStop());
+	}
+	if (syncTag == "stop")
+	{
+		if (getTimeStop() < getTimeRelax())
+			setSyncPoint(syncTag, getTimeRelax());
+	}
+}
 
 double SBMotion::getFrameRate()
 {

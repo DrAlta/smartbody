@@ -30,6 +30,7 @@
 #include <iostream>
 #include <sstream>
 #include <sb/SBMotion.h>
+#include <Sb/SBJointMap.h>
 
 using namespace std;
 
@@ -514,37 +515,69 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 
 bool SkMotion::save ( SrOutput& out )
  {
-   out << "SkMotion\n\n";
+	SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(this);
 
-   if ( getName() != "")
-    { 
-	  out << "name " << "\"" << getName().c_str() << "\"" << srnl<<srnl;
-    }
+	// names
+	out << "SkMotion\n\n";
+	if ( getName() != "")
+	{ 
+		out << "name " << "\"" << getName().c_str() << "\"" << srnl<<srnl;
+	}
 
-   out << _channels << srnl;
+	// channels
+	//writing out channel directly won't consider the joint mapping issue
+	//out << _channels << srnl;
+	SmartBody::SBJointMap* jointMap = NULL;
+	if (sbMotion)
+		jointMap = sbMotion->getJointMap();
 
-   out << "frames " << (int) _frames.size() << srnl;
+	out << "channels " << _channels.size() << srnl;
+	for (int i = 0; i < _channels.size(); ++i)
+	{ 
+		const std::string& chanName = _channels.name(i);
+	   
+		if (jointMap)
+		{
+			std::string source = jointMap->getMapSource(chanName);
+			if (source == "")
+				out << chanName.c_str();
+			else
+				out << source.c_str();
+		}
+		else
+			out << chanName.c_str();
+		out << srspc << _channels.const_get(i).type_name() << srnl;
+	}
 
-   float *pt;
-   int chsize = _channels.size();
-   
-   for (size_t i=0; i<_frames.size(); i++ )
-    { out << "kt " << _frames[i].keytime << " fr ";
-      pt = _frames[i].posture;
-      for (int j=0; j<chsize; j++ )
-       { pt += _channels[j].save ( out, pt );
-         if ( j+1<chsize ) out<<srspc;
-       }
-      out << srnl;
-    }
-   out << "ready time: " << time_ready() << srnl;
-   out << "strokeStart time: " << time_stroke_start() << srnl;
-   out << "emphasis time: " << time_stroke_emphasis() << srnl;
-   out << "stroke time: " << time_stroke_end() << srnl;
-   out << "relax time: " << time_relax() << srnl;
-   out << srnl;
+	// frames
+	out << "frames " << (int) _frames.size() << srnl;
+	float *pt;
+	int chsize = _channels.size();
+	for (size_t i=0; i<_frames.size(); i++ )
+	{ out << "kt " << _frames[i].keytime << " fr ";
+		pt = _frames[i].posture;
+		for (int j=0; j<chsize; j++ )
+		{ pt += _channels[j].save ( out, pt );
+			if ( j+1<chsize ) out<<srspc;
+		}
+		out << srnl;
+	}
 
-   return true;
+	// meta data
+	out << "ready time: " << time_ready() << srnl;
+	out << "strokeStart time: " << time_stroke_start() << srnl;
+	out << "emphasis time: " << time_stroke_emphasis() << srnl;
+	out << "stroke time: " << time_stroke_end() << srnl;
+	out << "relax time: " << time_relax() << srnl;
+	out << srnl;
+	if (sbMotion)
+	{
+		for (size_t i = 0; i < sbMotion->getMetaDataTags().size(); i++)
+		{
+			out << sbMotion->getMetaDataTags()[i].c_str() << ": \"" << sbMotion->getMetaDataString(sbMotion->getMetaDataTags()[i]).c_str() << "\"" << srnl;
+		}
+	}
+	return true;
  }
 
 //============================ End of File ===========================
