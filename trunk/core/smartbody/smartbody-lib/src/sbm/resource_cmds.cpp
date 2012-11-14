@@ -5,7 +5,7 @@
 #include <string>
 #include <boost/regex.hpp>
 #include "resource_cmds.h"
-
+#include <sbm/mcontrol_util.h>
 
 int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 {

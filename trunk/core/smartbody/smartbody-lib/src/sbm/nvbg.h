@@ -1,7 +1,6 @@
 #ifndef _NVBG_H
 #define _NVBG_H
 
-#include "vhcl.h"
 #include <sb/SBObject.h>
 #include <string>
 
