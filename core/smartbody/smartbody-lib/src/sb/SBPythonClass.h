@@ -3,7 +3,6 @@
 
 
 
-#include "vhcl.h"
 #include <sbm/resource_cmds.h>
 #include <sbm/sbm_character.hpp>
 #include <sbm/me_utilities.hpp>

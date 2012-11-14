@@ -1,6 +1,4 @@
 
-#include "vhcl.h"
-
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
@@ -16,7 +14,6 @@
 #include <sb/SBScene.h>
 #include <sb/SBBoneBusManager.h>
 #include "sbm/BMLDefs.h"
-
 
 
 using namespace std;

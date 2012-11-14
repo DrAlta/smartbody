@@ -24,7 +24,6 @@
 
 #ifndef SBM_PAWN_HPP
 #define SBM_PAWN_HPP
-#include "vhcl.h"
 
 #include <sk/sk_scene.h>
 #include <sk/sk_skeleton.h>

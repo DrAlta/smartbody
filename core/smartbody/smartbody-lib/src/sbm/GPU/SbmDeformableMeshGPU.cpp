@@ -1,9 +1,9 @@
+#include "vhcl.h"
 #include "SbmDeformableMeshGPU.h"
 #include "SbmTexture.h"
 #include <string>
 #include <set>
 #include <algorithm>
-#include <vhcl.h>
 
 typedef std::pair<int,float> IntFloatPair;
 

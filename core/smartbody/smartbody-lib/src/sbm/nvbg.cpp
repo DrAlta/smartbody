@@ -1,4 +1,5 @@
 #include "nvbg.h"
+#include "vhcl.h"
 #include <sb/SBAttribute.h>
 
 Nvbg::Nvbg()
