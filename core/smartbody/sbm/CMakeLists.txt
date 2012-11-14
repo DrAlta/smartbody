@@ -168,6 +168,7 @@ set( SBM_FLTK_SRC
 	src/retargetcreator/RetargetCreatorWindow.cpp
 
 	src/monitorviewer/MonitorConnectWindow.cpp 
+	src/motioneditor/MotionEditorWindow.cpp
 
 	src/faceviewer/FaceViewer.cpp
 	src/FLTKListener.cpp
