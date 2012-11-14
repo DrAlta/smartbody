@@ -117,7 +117,7 @@ void MotionEditorWindow::hide()
 
 void MotionEditorWindow::loadCharacters()
 {
-	std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	const std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (size_t i = 0; i < charNames.size(); ++i)
 	{
 		_choiceCharacaterList->add(charNames[i].c_str());
@@ -133,7 +133,7 @@ SmartBody::SBCharacter* MotionEditorWindow::getCurrentCharacter()
 
 void MotionEditorWindow::loadMotions()
 {
-	std::vector<std::string>& motionNames = SmartBody::SBScene::getScene()->getMotionNames();
+	const std::vector<std::string>& motionNames = SmartBody::SBScene::getScene()->getMotionNames();
 	for (size_t i = 0; i < motionNames.size(); ++i)
 	{
 		_browserMotionList->add(motionNames[i].c_str());
@@ -197,7 +197,7 @@ void MotionEditorWindow::OnButtonPlayMotion(Fl_Widget* widget, void* data)
 	SmartBody::SBMotion* curMotion = editor->getCurrentMotion();
 	if (!curMotion)	
 	{
-		std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+		const std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
 		std::stringstream ss;
 		for (size_t i = 0; i < charNames.size(); ++i)
 		{
@@ -396,10 +396,10 @@ void MotionEditorWindow::updateMetaDataUI()
 	_browserMetaNames->deselect();
 	_browserMetaValues->clear();
 	_browserMetaValues->deselect();
-	std::vector<std::string>& metaDataTags = curMotion->getMetaDataTags();
+	const std::vector<std::string>& metaDataTags = curMotion->getMetaDataTags();
 	for (size_t i = 0; i < metaDataTags.size(); ++i)
 	{
-		std::string& metaDataString = curMotion->getMetaDataString(metaDataTags[i]);
+		const std::string& metaDataString = curMotion->getMetaDataString(metaDataTags[i]);
 		_browserMetaNames->add(metaDataTags[i].c_str());
 		_browserMetaValues->add(metaDataString.c_str());
 	}
