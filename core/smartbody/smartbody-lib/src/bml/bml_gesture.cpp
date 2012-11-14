@@ -44,7 +44,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 	xml_utils::xml_translate(&style, styleAttr);
 
 	SBCharacter* character = dynamic_cast<SBCharacter*>(request->actor);
-	std::string gestureMapName = character->getStringAttribute("gestureMap");
+	const std::string& gestureMapName = character->getStringAttribute("gestureMap");
 	if (animationName == "")	// If you have assigned the animation name, do not look for the map
 	{
 		SmartBody::SBGestureMap* gestureMap = mcu->_scene->getGestureMapManager()->getGestureMap(gestureMapName);

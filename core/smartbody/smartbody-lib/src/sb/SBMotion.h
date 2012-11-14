@@ -10,6 +10,8 @@ namespace SmartBody {
 class SBJoint;
 class SBSkeleton;
 class SBMotion;
+class SBJointMap;
+class SBJointMapManager;
 
 class FootStepRecord
 {
@@ -71,6 +73,8 @@ class SBMotion : public SkMotion
 		std::vector<float> getJointTransition(SBJoint* joint, float startTime, float endTime);
 		SrVec getJointPosition(SBJoint* joint, float time);
 
+		SBJointMap* getJointMap();
+
 		bool autoFootStepDetection(std::vector<double>& outMeans, int numStepsPerJoint, int maxNumSteps, SBSkeleton* skeleton, 
 								   std::vector<std::string>& selectedJoints, float floorHeight, float floorThreshold, float speedThreshold, 
 								   int speedWindow, bool isPrintDebugInfo = false);
@@ -95,7 +99,8 @@ class SBMotion : public SkMotion
 		double getTimeRelax();
 		double getTimeStop();
 
-		bool setSyncPoint(const std::string& syncTag, double time);		
+		bool setSyncPoint(const std::string& syncTag, double time);	
+		void validateSyncPoint(const std::string& syncTag);
 
 		bool addMetaData(const std::string& tagName, const std::string& strValue);
 		bool hasMetaData(const std::string& tagName);

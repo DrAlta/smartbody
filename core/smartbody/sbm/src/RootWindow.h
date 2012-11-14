@@ -16,6 +16,7 @@
 #include "visemeviewer/VisemeViewerWindow.h"
 #include "retargetcreator/RetargetCreatorWindow.h"
 #include "monitorviewer/MonitorConnectWindow.h"
+#include "motioneditor/MotionEditorWindow.h"
 #include "panimationviewer/PanimationWindow.h"
 #include "faceviewer/FaceViewer.h"
 #include "channelbufferviewer/channelbufferWindow.hpp"
@@ -67,6 +68,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		BMLCreatorWindow* bmlCreatorWindow;
 		VisemeViewerWindow* visemeViewerWindow;
 		MonitorConnectWindow* monitorConnectWindow;
+		MotionEditorWindow* motionEditorWindow;
 		RetargetCreatorWindow* retargetCreatorWindow;
 		FaceViewer* faceViewerWindow;
 		BehaviorWindow* bmlViewerWindow;
@@ -94,6 +96,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void LaunchConsoleCB(Fl_Widget* widget, void* data);
 		static void LaunchBMLCreatorCB(Fl_Widget* widget, void* data);
 		static void LaunchRetargetCreatorCB(Fl_Widget* widget, void* data);
+		static void LaunchMotionEditorCB(Fl_Widget* widget, void* data);
 		static void LaunchResourceViewerCB(Fl_Widget* widget, void* data);		
 		static void LaunchFaceViewerCB(Fl_Widget* widget, void* data);
 		static void LaunchSpeechRelayCB(Fl_Widget* widget, void* data);
