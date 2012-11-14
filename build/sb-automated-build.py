@@ -199,6 +199,27 @@ def cleanSandbox():
         shutil.rmtree("build.sandbox", onerror=handleRemoveReadonly)
 
 
+def getBuildFolderName(buildNumber, buildDate, doFreshBuild, buildSuffix, buildSuccess, destinationFolder):
+
+    # ex. Build42-04-12-2010-ci-failed
+
+    buildFolderName = "Build{0}-{1}".format(buildNumber, buildDate)
+    if not doFreshBuild:
+        buildFolderName = buildFolderName + "-inc"
+
+    buildFolderName = buildFolderName + buildSuffix
+
+    if not buildSuccess:
+        buildFolderName = buildFolderName + "-failed"
+
+    if doFreshBuild:
+        buildFolder = os.path.join(destinationFolder, buildFolderName)
+    else:
+        buildFolder = os.path.join(destinationFolder, os.path.join("incremental", buildFolderName))
+
+    return buildFolderName, buildFolder
+
+
 def makeDist(distLocation):
     # This builds a distribution, not in the traditional sense, but rather takes a build and removes unneeded files to produce a 'clean' build.
 
@@ -411,8 +432,8 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
 
 
     buildNumber = buildSvnRevision
-    buildFolderName = "Build{0}-{1}{2}{3}{4}".format(buildNumber, buildDate, "" if doFreshBuild else "-inc", buildSuffix, "" if buildSuccess else "-failed")
-    buildFolder = os.path.join(destinationFolder, buildFolderName)
+
+    buildFolderName, buildFolder = getBuildFolderName(buildNumber, buildDate, doFreshBuild, buildSuffix, buildSuccess, destinationFolder)
 
     # check for duplicate destination folder since we're using revision number as build number
     while os.path.exists(buildFolder):
@@ -422,8 +443,8 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
         else:
             buildNumber = str(buildNumber) + "a"
 
-        buildFolderName = "Build{0}-{1}{2}{3}{4}".format(buildNumber, buildDate, "" if doFreshBuild else "-inc", buildSuffix, "" if buildSuccess else "-failed")
-        buildFolder = os.path.join(destinationFolder, buildFolderName)
+        buildFolderName, buildFolder = getBuildFolderName(buildNumber, buildDate, doFreshBuild, buildSuffix, buildSuccess, destinationFolder)
+
 
     print "build: {0}".format(buildNumber)
     print "buildFolderName: {0}".format(buildFolderName)
