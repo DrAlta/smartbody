@@ -1266,7 +1266,7 @@ SrVec SBMotion::getJointPosition(SBJoint* joint, float time)
 SBJointMap* SBMotion::getJointMap()
 {
 	SBJointMapManager* jointMapManager = SBScene::getScene()->getJointMapManager();
-	std::vector<std::string>& jointMapNames = jointMapManager->getJointMapNames();
+	const std::vector<std::string>& jointMapNames = jointMapManager->getJointMapNames();
 	for (size_t i = 0; i < jointMapNames.size(); ++i)
 	{
 		SBJointMap* jointMap = jointMapManager->getJointMap(jointMapNames[i]);
