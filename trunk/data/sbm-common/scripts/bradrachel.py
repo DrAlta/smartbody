@@ -2,6 +2,7 @@ print "|--------------------------------------------|"
 print "|  data/sbm-common/scripts/bradrachel.py  |"
 print "|--------------------------------------------|"
 
+scene.run("motion-retarget.py")
 scene.setMediaPath("../../../../data")
 ### Load data/sbm-common assets
 scene.addAssetPath("script", "sbm-common/scripts")
@@ -34,10 +35,15 @@ zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
 
 scene.addAssetPath("motion", "ChrRachel")
 scene.addAssetPath("motion", "ChrBrad")
+scene.addAssetPath("motion", "retarget\motion")
+scene.addAssetPath("motion", "sbm-common/common-sk")
 scene.loadAssets()
 
 # established lip syncing data set
 scene.run("init-diphoneDefault.py")
+
+# param animation setup
+scene.run("init-param-animation.py")
 
 # established gesture data set
 
@@ -219,6 +225,9 @@ brad.setVoiceCode("Festival_voice_kal_diphone")
 # gesture map setup
 brad.setStringAttribute("gestureMap", "ChrBrad")
 brad.setBoolAttribute("bmlRequest.autoGestureTransition", True)
+# retarget
+retargetCharacter("ChrBrad", "ChrBrad.sk")
+
 ############################# Rachel
 rachelSkeleton = scene.getSkeleton("ChrRachel.sk")
 zebra2Map.applySkeleton(rachelSkeleton)
@@ -275,10 +284,20 @@ rachel.setVoiceCode("MicrosoftAnna")
 # gesture map setup
 rachel.setStringAttribute("gestureMap", "ChrRachel")
 rachel.setBoolAttribute("bmlRequest.autoGestureTransition", True)
-
+# retarget
+retargetCharacter("ChrRachel", "ChrRachel.sk")
 
 scene.setDefaultCharacter("ChrBrad")
 scene.setDefaultRecipient("ChrRachel")
+
+# steering
+scene.run("init-steer-agents.py")
+setupSteerAgent("ChrRachel", "ChrRachel.sk")
+setupSteerAgent("ChrBrad", "ChrBrad.sk")
+steerManager = scene.getSteerManager()
+steerManager.setEnable(False)
+brad.setBoolAttribute("steering.pathFollowingMode", True)
+rachel.setBoolAttribute("steering.pathFollowingMode", True)
 
 # start the simulation
 sim.start()
@@ -293,6 +312,8 @@ bml.execBML('ChrBrad', '<gaze sbm:handle="brad" target="camera"/>')
 bml.execBML('ChrRachel', '<gaze sbm:handle="rachel" target="camera"/>')
 
 sim.resume()
+
+steerManager.setEnable(True)
 
 
 
