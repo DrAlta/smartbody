@@ -339,7 +339,54 @@ mcuCBHandle::~mcuCBHandle() {
 	// clean up python
 #ifdef USE_PYTHON
 	Py_Finalize();
-#endif
+
+#if defined(WIN_BUILD)
+	{
+		// According to the python docs, .pyd files are not unloaded during Py_Finalize().
+		// This causes issues when trying to re-load the smartbody dll over and over.
+		// So, we force unload these .pyd files.  This list is all the standard .pyd files included in the Python26 DLLs folder.
+		// For reference:  http://docs.python.org/2/c-api/init.html  "Dynamically loaded extension modules loaded by Python are not unloaded"
+
+		// initPythonLibPath - eg:  "../../../../core/smartbody/Python26/Lib"
+
+		HMODULE hmodule;
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/bz2.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/pyexpat.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/select.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/unicodedata.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/winsound.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_bsddb.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ctypes.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ctypes_test.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_elementtree.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_hashlib.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_msi.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_multiprocessing.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_socket.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_sqlite3.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ssl.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_testcapi.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_tkinter.pyd", initPythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+	}
+#endif  // WIN_BUILD
+#endif  // USE_PYTHON
 }
 
 void mcuCBHandle::reset( void )	
