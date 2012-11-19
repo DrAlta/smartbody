@@ -1169,7 +1169,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 					command << data[x * floatsPerKey] << " " << data[x * floatsPerKey + 1] << " "; 
 				}
 				string cmd_str = command.str();
-				SbmCommand *cmd = new SbmCommand( cmd_str, mcu->time );
+				SbmCommand *cmd = new SbmCommand( cmd_str, time );
 				sbm_commands.push_back( cmd );
 			}
 			else if (!v->isCurveMode())
