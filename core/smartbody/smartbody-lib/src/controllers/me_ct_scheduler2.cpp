@@ -550,66 +550,49 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 		} else {
 			double time_scale = 1.0 / motionController->twarp();
 			double time_offset = motionController->offset();
-			// following piece of code detects if we need to truncate the motion
-			double counter = 0;
+			// following piece of code detects if we need to truncate the motion 
+			// note: you can only cut till stroke for now
+			int counter = 0;
 			double marker = startAt;
 			double cut = 0;
-			bool span = true;
 			if (fabs(startAt - readyAt) < gwiz::epsilon4())
 			{
 				counter++;
 				marker = strokeStartAt;
-				cut = skMotion->time_ready() - skMotion->time_start();
+				cut = skMotion->time_ready();// - skMotion->time_start();
 			}
 			if (fabs(startAt - strokeStartAt) < gwiz::epsilon4())
 			{
 				counter++;
 				marker = strokeAt;
-				cut = skMotion->time_stroke_start() - skMotion->time_start();
+				cut = skMotion->time_stroke_start();// - skMotion->time_start();
 			}
 			if (fabs(startAt - strokeAt) < gwiz::epsilon4())
 			{
 				counter++;
 				marker = strokeEndAt;
-				cut = skMotion->time_stroke_emphasis() - skMotion->time_start();
+				cut = skMotion->time_stroke_emphasis();// - skMotion->time_start();
 			}
-			if (fabs(startAt - strokeEndAt) < gwiz::epsilon4())
-			{
-				counter++;
-				marker = relaxAt;
-				cut = skMotion->time_stroke_end() - skMotion->time_start();
-			}
-			if (fabs(startAt - relaxAt) < gwiz::epsilon4())
-			{
-				counter++;
-				marker = endAt;
-				cut = skMotion->time_relax() - skMotion->time_start();
-			}
-			if (fabs(startAt - endAt) < gwiz::epsilon4())
-			{
-				counter++;
-				marker = endAt;
-				cut = skMotion->duration() - skMotion->time_start();
-			}
-
-			if (counter > 0)
+			if (counter > 0 && counter <= 3)
 			{
 				blend_curve.clear();
 				blend_curve.insert(startAt, 0.0f);
-				// build a better blending curve
-				int numSeg = 30;
-				for (int s = 1; s < numSeg; ++s)
-				{
-					double x = (marker - startAt) * double(s) / double(numSeg);
-					double y = sin(M_PI * 0.5f * x / (marker - startAt));
-					blend_curve.insert(x + startAt, y);
-				}
 				blend_curve.insert(marker, 1.0f);
-
 				blend_curve.insert(relaxAt, 1.0f);
 				blend_curve.insert(endAt, 0.0f);
 
+
 				time_warp.insert(startAt, cut);
+				if (counter <= 1)
+				{
+					time_warp.insert( strokeStartAt,	skMotion->time_stroke_start() );
+				}
+				if (counter <= 2)
+				{
+					time_warp.insert( strokeAt,			skMotion->time_stroke_emphasis() );		
+				}
+				time_warp.insert( strokeEndAt,		skMotion->time_stroke_end() );
+				time_warp.insert( relaxAt,			skMotion->time_relax() );
 				time_warp.insert(endAt, skMotion->duration());
 			}
 			else

@@ -982,7 +982,9 @@
     <ClCompile Include="..\src\controllers\me_ct_motion_recorder.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sb\SBAnimationTransitionRule.cpp" />
+    <ClCompile Include="..\src\sb\SBAnimationTransitionRule.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -2005,7 +2007,9 @@
     <ClInclude Include="..\src\controllers\me_ct_motion_recorder.h">
       <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sb\SBAnimationTransitionRule.h" />
+    <ClInclude Include="..\src\sb\SBAnimationTransitionRule.h">
+      <Filter>sb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag">

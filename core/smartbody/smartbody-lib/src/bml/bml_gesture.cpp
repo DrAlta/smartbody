@@ -97,13 +97,12 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		SkMotion* motion = (*motionIter).second;
 		MeCtMotion* motionCt = new MeCtMotion();
 
-		// validate gesture timing input
-		float motionStrokeToEnd = float(motion->synch_points.get_time(srSynchPoints::STROKE_STOP) - motion->synch_points.get_time(srSynchPoints::STROKE));
-		float inputStrokeToEnd = behav_syncs.sync_stroke_end()->offset() - behav_syncs.sync_stroke()->offset();
-		if (inputStrokeToEnd < motionStrokeToEnd)
+		// validate gesture timing input (stroke && relax)
+		float motionStrokeToRelax = float(motion->synch_points.get_time(srSynchPoints::RELAX) - motion->synch_points.get_time(srSynchPoints::STROKE));
+		float inputStrokeToRelax = behav_syncs.sync_relax()->offset() - behav_syncs.sync_stroke()->offset();
+		if (inputStrokeToRelax < motionStrokeToRelax)
 		{
-			float gap = motionStrokeToEnd - inputStrokeToEnd;
-			behav_syncs.sync_stroke_end()->set_offset(behav_syncs.sync_stroke_end()->offset() + gap);
+			float gap = motionStrokeToRelax - inputStrokeToRelax;
 			behav_syncs.sync_relax()->set_offset(behav_syncs.sync_relax()->offset() + gap);
 			behav_syncs.sync_end()->set_offset(behav_syncs.sync_end()->offset() + gap);
 		}
@@ -128,7 +127,8 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		float freq = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_FREQUENCY, elem, 0.03f);
 		std::string strokeString = xml_utils::xml_parse_string(BMLDefs::ATTR_STROKE, elem);
 		std::string strokeEndString = xml_utils::xml_parse_string(BMLDefs::ATTR_STROKE_END, elem);
-		if (poststrokehold > 0 && strokeString == "" && strokeEndString == "")
+		std::string relaxString = xml_utils::xml_parse_string(BMLDefs::ATTR_RELAX, elem);
+		if (poststrokehold > 0 && relaxString == "" && strokeEndString == "")
 		{
 			std::vector<std::string> jointVec;
 			vhcl::Tokenize(joints, jointVec);
