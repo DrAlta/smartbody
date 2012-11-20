@@ -99,8 +99,6 @@ class SBAnimationBlend : public PABlend
 		std::string _dimension;
 		bool _isFinalized;
 
-		bool incrementWorldOffsetY;
-
 		std::vector<SrSnColorSurf*> errorSurfaces;
 		std::vector<SrSnColorSurf*> smoothSurfaces;
 		std::vector<KeyTagMap> keyTagList;
