@@ -1578,7 +1578,7 @@ SkMotion* SkMotion::buildPoststrokeHoldMotion(float holdTime, std::vector<std::s
 										synch_points.get_time(srSynchPoints::READY),
 										synch_points.get_time(srSynchPoints::STROKE_START),
 										synch_points.get_time(srSynchPoints::STROKE),
-										synch_points.get_time(srSynchPoints::STROKE_STOP) + holdTime,
+										synch_points.get_time(srSynchPoints::STROKE_STOP),
 										synch_points.get_time(srSynchPoints::RELAX) + holdTime,
 										synch_points.get_time(srSynchPoints::STOP) + holdTime
 										);

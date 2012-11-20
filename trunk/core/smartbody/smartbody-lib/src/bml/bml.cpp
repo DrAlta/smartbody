@@ -346,6 +346,7 @@ void BmlRequest::specialHandle()
 					{
 						double prevGestureStrokeAt = (double)prevGesture->behav_syncs.sync_stroke()->time();
 						double prevGestureStrokeEndAt = (double)prevGesture->behav_syncs.sync_stroke_end()->time();
+						double prevGestureRelaxAt = (double)prevGesture->behav_syncs.sync_relax()->time();
 						double currGestureStrokeAt = (double)gesture->behav_syncs.sync_stroke()->time();
 						double currGestureStrokeStartAt = (double)gesture->behav_syncs.sync_stroke_start()->time();
 						if (currGestureStrokeAt > prevGestureStrokeAt)
@@ -355,10 +356,9 @@ void BmlRequest::specialHandle()
 
 							if (currGestureStrokeStartAt > prevGestureStrokeAt)
 							{
-								// prevGestureStrokeEndAt<-currGestureStrokeStartAt
-								double prevGestureOffset = currGestureStrokeStartAt - prevGestureStrokeEndAt;
-								prevGesture->behav_syncs.sync_stroke_end()->set_time(currGestureStrokeStartAt);
-								prevGesture->behav_syncs.sync_relax()->set_time(prevGesture->behav_syncs.sync_relax()->time() + prevGestureOffset);
+								// prevGestureRelaxAt<-currGestureStrokeStartAt
+								double prevGestureOffset = currGestureStrokeStartAt - prevGestureRelaxAt;
+								prevGesture->behav_syncs.sync_relax()->set_time(currGestureStrokeStartAt);
 								prevGesture->behav_syncs.sync_end()->set_time(prevGesture->behav_syncs.sync_end()->time() + prevGestureOffset);
 								//LOG("BmlRequest::specialHandle: Previous gesture %s's stroke end time %f is extended to current gesture %s's stroke start time %f.", prevGesture->unique_id.c_str(), prevGestureStrokeEndAt, gesture->unique_id.c_str(), currGestureStrokeStartAt);
 							}
@@ -1213,8 +1213,9 @@ void GestureRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
 	double motionStroke = motion->time_stroke_emphasis();
 	double motionStrokeEnd = motion->time_stroke_end();
+	double motionRelax = motion->time_relax();
 	
-	double holdTime = (strokeEndAt - strokeAt) - (motionStrokeEnd - motionStroke);
+	double holdTime = (relaxAt - strokeEndAt) - (motionRelax - motionStrokeEnd);
 	if (holdTime > 0)
 	{	
 		std::vector<std::string> jointVec;

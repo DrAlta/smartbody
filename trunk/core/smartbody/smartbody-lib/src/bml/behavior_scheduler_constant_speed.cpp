@@ -263,6 +263,10 @@ void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& behav_syncs, 
 			double scale = 1.0;
 			if ((rawTimes[end] - rawTimes[start]) != 0)
 				scale = (syncTimes[end] - syncTimes[start]) / (rawTimes[end] - rawTimes[start]);
+			else
+			{
+				if (!constant) scale = 0.0f;
+			}
 
 			if (constant)
 			{
