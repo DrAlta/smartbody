@@ -793,6 +793,7 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 	}
 
 	// Do the sbm viseme name patch here
+	/*
 	std::vector<std::string> au_1_patch;
 	au_1_patch.push_back("au_1_left");
 	au_1_patch.push_back("au_1_right");
@@ -809,6 +810,7 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 	viseme_name_patch.insert(make_pair("au_2", au_2_patch));
 	viseme_name_patch.insert(make_pair("au_4", au_4_patch));
 	viseme_name_patch.insert(make_pair("au_45", au_45_patch));
+	*/
 
 	// Do the bone bus viseme name patch here
 	// hard coded, can be removed if these are added to bone bus and rendering side
@@ -1590,6 +1592,33 @@ void SbmCharacter::schedule_viseme_curve(
 			visemeNames.push_back(viseme);
 
 		SmartBody::SBFaceDefinition* faceDefinition = getFaceDefinition();
+		// patch for AU (both)
+		if (strlen(viseme) >= 4)
+		{
+			int auNum = -1;
+			std::vector<std::string> tokens;
+			vhcl::Tokenize(viseme, tokens, "_");
+			if (tokens.size() >= 2)
+			{
+				if (tokens[0] == "au")
+					auNum = atoi(tokens[1].c_str());
+			}
+			if (auNum > 0 && tokens.size() == 2)
+			{
+				ActionUnit* au = faceDefinition->getAU(auNum);
+				if (au)
+				{
+					if (au->is_left() && au->is_right())
+					{
+						visemeNames.clear();
+						std::string leftName = std::string(viseme) + "_left";
+						std::string rightName = std::string(viseme) + "_right";
+						visemeNames.push_back(leftName);
+						visemeNames.push_back(rightName);
+					}
+				}
+			}
+		}
 
 		for( size_t nCount = 0; nCount < visemeNames.size(); nCount++ )
 		{
@@ -1711,6 +1740,34 @@ void SbmCharacter::schedule_viseme_blend_curve(
 
 		SmartBody::SBFaceDefinition* faceDefinition = getFaceDefinition();
 		float visemeWeight = 1.0f;
+
+		// patch for AU (both)
+		if (strlen(viseme) >= 4)
+		{
+			int auNum = -1;
+			std::vector<std::string> tokens;
+			vhcl::Tokenize(viseme, tokens, "_");
+			if (tokens.size() >= 2)
+			{
+				if (tokens[0] == "au")
+					auNum = atoi(tokens[1].c_str());
+			}
+			if (auNum > 0 && tokens.size() == 2)
+			{
+				ActionUnit* au = faceDefinition->getAU(auNum);
+				if (au)
+				{
+					if (au->is_left() && au->is_right())
+					{
+						visemeNames.clear();
+						std::string leftName = std::string(viseme) + "_left";
+						std::string rightName = std::string(viseme) + "_right";
+						visemeNames.push_back(leftName);
+						visemeNames.push_back(rightName);
+					}
+				}
+			}
+		}
 
 		for( size_t nCount = 0; nCount < visemeNames.size(); nCount++ )
 		{
