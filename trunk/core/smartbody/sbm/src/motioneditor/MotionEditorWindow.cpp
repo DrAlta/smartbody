@@ -1,5 +1,5 @@
 #include "MotionEditorWindow.h"
-#include "SB/SBScene.h"
+#include "sb/SBScene.h"
 #include <FL/Fl_File_Chooser.H>
 
 MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) : Fl_Double_Window(x, y, w, h, label)
