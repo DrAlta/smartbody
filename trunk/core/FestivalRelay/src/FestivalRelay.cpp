@@ -118,15 +118,17 @@ class XStr
 
 bool isDone = false;
 
-extern SpeechRequestData xmlMetaData;
-extern std::multimap<std::string, std::pair<string, double> > phonemeToViseme;
 
-std::string mapping;
 
 #if !defined(WIN32) && !defined(__APPLE__)
 SpeechRequestData xmlMetaData;
-std::map<string,string> phonemeToViseme;
+std::map<std::string, std::pair<std::string, double> > phonemeToViseme;
 std::string mapping;
+#else
+std::string mapping;
+extern SpeechRequestData xmlMetaData;
+extern std::multimap<std::string, std::pair<string, double> > phonemeToViseme;
+
 #endif
 std::string festivalLibDir = "";
 
@@ -601,7 +603,8 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
 
      if(mapping == "sbmold")
     {
-        phonemeToViseme.insert(make_pair("pau", make_pair("_", 1.0)));  // SIL
+	
+        phonemeToViseme.insert(std::make_pair("pau", std::make_pair("_", 1.0)));  // SIL
         phonemeToViseme.insert(make_pair("aa", make_pair("Ao", 1.0))); // AA
         phonemeToViseme.insert(make_pair("ae", make_pair("Ih", 1.0))); // AE
         phonemeToViseme.insert(make_pair("ah", make_pair("Ih", 1.0))); // AH
