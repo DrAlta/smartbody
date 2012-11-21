@@ -30,7 +30,7 @@
 #include <iostream>
 #include <sstream>
 #include <sb/SBMotion.h>
-#include <Sb/SBJointMap.h>
+#include <sb/SBJointMap.h>
 
 using namespace std;
 

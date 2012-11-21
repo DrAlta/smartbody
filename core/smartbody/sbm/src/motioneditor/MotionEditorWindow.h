@@ -9,8 +9,8 @@
 #include <FL/Fl_Multi_Browser.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Input.H>
-#include <SB/SBCharacter.h>
-#include <SB/SBMotion.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBMotion.h>
 
 namespace SmartBody
 {
