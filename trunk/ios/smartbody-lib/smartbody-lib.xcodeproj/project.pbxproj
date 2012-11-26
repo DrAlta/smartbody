@@ -360,8 +360,6 @@
 		AA9CD955141FF8D10064C27A /* me_ct_locomotion_quadratic_synchronizer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD70C141FF8D10064C27A /* me_ct_locomotion_quadratic_synchronizer.hpp */; };
 		AA9CD956141FF8D10064C27A /* me_ct_locomotion_routine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD70D141FF8D10064C27A /* me_ct_locomotion_routine.cpp */; };
 		AA9CD957141FF8D10064C27A /* me_ct_locomotion_routine.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD70E141FF8D10064C27A /* me_ct_locomotion_routine.hpp */; };
-		AA9CD958141FF8D10064C27A /* me_ct_locomotion_simple.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD70F141FF8D10064C27A /* me_ct_locomotion_simple.cpp */; };
-		AA9CD959141FF8D10064C27A /* me_ct_locomotion_simple.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD710141FF8D10064C27A /* me_ct_locomotion_simple.hpp */; };
 		AA9CD95A141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD711141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.cpp */; };
 		AA9CD95B141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD712141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.hpp */; };
 		AA9CD95C141FF8D10064C27A /* me_ct_locomotion_terrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD713141FF8D10064C27A /* me_ct_locomotion_terrain.cpp */; };
@@ -1019,8 +1017,6 @@
 		AA9CD70C141FF8D10064C27A /* me_ct_locomotion_quadratic_synchronizer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_locomotion_quadratic_synchronizer.hpp; sourceTree = "<group>"; };
 		AA9CD70D141FF8D10064C27A /* me_ct_locomotion_routine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_locomotion_routine.cpp; sourceTree = "<group>"; };
 		AA9CD70E141FF8D10064C27A /* me_ct_locomotion_routine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_locomotion_routine.hpp; sourceTree = "<group>"; };
-		AA9CD70F141FF8D10064C27A /* me_ct_locomotion_simple.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_locomotion_simple.cpp; sourceTree = "<group>"; };
-		AA9CD710141FF8D10064C27A /* me_ct_locomotion_simple.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_locomotion_simple.hpp; sourceTree = "<group>"; };
 		AA9CD711141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_locomotion_speed_accelerator.cpp; sourceTree = "<group>"; };
 		AA9CD712141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_locomotion_speed_accelerator.hpp; sourceTree = "<group>"; };
 		AA9CD713141FF8D10064C27A /* me_ct_locomotion_terrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_locomotion_terrain.cpp; sourceTree = "<group>"; };
@@ -1759,8 +1755,6 @@
 				AA9CD70C141FF8D10064C27A /* me_ct_locomotion_quadratic_synchronizer.hpp */,
 				AA9CD70D141FF8D10064C27A /* me_ct_locomotion_routine.cpp */,
 				AA9CD70E141FF8D10064C27A /* me_ct_locomotion_routine.hpp */,
-				AA9CD70F141FF8D10064C27A /* me_ct_locomotion_simple.cpp */,
-				AA9CD710141FF8D10064C27A /* me_ct_locomotion_simple.hpp */,
 				AA9CD711141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.cpp */,
 				AA9CD712141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.hpp */,
 				AA9CD713141FF8D10064C27A /* me_ct_locomotion_terrain.cpp */,
@@ -2571,7 +2565,6 @@
 				AA9CD953141FF8D10064C27A /* me_ct_locomotion_pawn.hpp in Headers */,
 				AA9CD955141FF8D10064C27A /* me_ct_locomotion_quadratic_synchronizer.hpp in Headers */,
 				AA9CD957141FF8D10064C27A /* me_ct_locomotion_routine.hpp in Headers */,
-				AA9CD959141FF8D10064C27A /* me_ct_locomotion_simple.hpp in Headers */,
 				AA9CD95B141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.hpp in Headers */,
 				AA9CD95D141FF8D10064C27A /* me_ct_locomotion_terrain.hpp in Headers */,
 				AA9CD95F141FF8D10064C27A /* me_ct_locomotion_timing_space.hpp in Headers */,
@@ -2966,7 +2959,6 @@
 				AA9CD952141FF8D10064C27A /* me_ct_locomotion_pawn.cpp in Sources */,
 				AA9CD954141FF8D10064C27A /* me_ct_locomotion_quadratic_synchronizer.cpp in Sources */,
 				AA9CD956141FF8D10064C27A /* me_ct_locomotion_routine.cpp in Sources */,
-				AA9CD958141FF8D10064C27A /* me_ct_locomotion_simple.cpp in Sources */,
 				AA9CD95A141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.cpp in Sources */,
 				AA9CD95C141FF8D10064C27A /* me_ct_locomotion_terrain.cpp in Sources */,
 				AA9CD95E141FF8D10064C27A /* me_ct_locomotion_timing_space.cpp in Sources */,
