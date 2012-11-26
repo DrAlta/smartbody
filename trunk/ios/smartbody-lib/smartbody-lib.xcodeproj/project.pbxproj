@@ -364,8 +364,6 @@
 		AA9CD95B141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD712141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.hpp */; };
 		AA9CD95C141FF8D10064C27A /* me_ct_locomotion_terrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD713141FF8D10064C27A /* me_ct_locomotion_terrain.cpp */; };
 		AA9CD95D141FF8D10064C27A /* me_ct_locomotion_terrain.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD714141FF8D10064C27A /* me_ct_locomotion_terrain.hpp */; };
-		AA9CD95E141FF8D10064C27A /* me_ct_locomotion_timing_space.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD715141FF8D10064C27A /* me_ct_locomotion_timing_space.cpp */; };
-		AA9CD95F141FF8D10064C27A /* me_ct_locomotion_timing_space.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD716141FF8D10064C27A /* me_ct_locomotion_timing_space.hpp */; };
 		AA9CD960141FF8D10064C27A /* me_ct_motion_example.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD717141FF8D10064C27A /* me_ct_motion_example.cpp */; };
 		AA9CD961141FF8D10064C27A /* me_ct_motion_example.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD718141FF8D10064C27A /* me_ct_motion_example.hpp */; };
 		AA9CD962141FF8D10064C27A /* me_ct_motion_parameter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD719141FF8D10064C27A /* me_ct_motion_parameter.cpp */; };
@@ -376,10 +374,6 @@
 		AA9CD967141FF8D10064C27A /* me_ct_motion_profile.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD71E141FF8D10064C27A /* me_ct_motion_profile.h */; };
 		AA9CD968141FF8D10064C27A /* me_ct_motion_timewarp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD71F141FF8D10064C27A /* me_ct_motion_timewarp.cpp */; };
 		AA9CD969141FF8D10064C27A /* me_ct_motion_timewarp.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD720141FF8D10064C27A /* me_ct_motion_timewarp.hpp */; };
-		AA9CD96A141FF8D10064C27A /* me_ct_navigation_circle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD721141FF8D10064C27A /* me_ct_navigation_circle.cpp */; };
-		AA9CD96B141FF8D10064C27A /* me_ct_navigation_circle.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD722141FF8D10064C27A /* me_ct_navigation_circle.hpp */; };
-		AA9CD96C141FF8D10064C27A /* me_ct_navigation_waypoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD723141FF8D10064C27A /* me_ct_navigation_waypoint.cpp */; };
-		AA9CD96D141FF8D10064C27A /* me_ct_navigation_waypoint.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD724141FF8D10064C27A /* me_ct_navigation_waypoint.hpp */; };
 		AA9CD96E141FF8D10064C27A /* me_ct_param_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD725141FF8D10064C27A /* me_ct_param_animation.cpp */; };
 		AA9CD96F141FF8D10064C27A /* me_ct_param_animation.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD726141FF8D10064C27A /* me_ct_param_animation.h */; };
 		AA9CD970141FF8D10064C27A /* me_ct_param_animation_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD727141FF8D10064C27A /* me_ct_param_animation_data.cpp */; };
@@ -1021,8 +1015,6 @@
 		AA9CD712141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_locomotion_speed_accelerator.hpp; sourceTree = "<group>"; };
 		AA9CD713141FF8D10064C27A /* me_ct_locomotion_terrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_locomotion_terrain.cpp; sourceTree = "<group>"; };
 		AA9CD714141FF8D10064C27A /* me_ct_locomotion_terrain.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_locomotion_terrain.hpp; sourceTree = "<group>"; };
-		AA9CD715141FF8D10064C27A /* me_ct_locomotion_timing_space.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_locomotion_timing_space.cpp; sourceTree = "<group>"; };
-		AA9CD716141FF8D10064C27A /* me_ct_locomotion_timing_space.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_locomotion_timing_space.hpp; sourceTree = "<group>"; };
 		AA9CD717141FF8D10064C27A /* me_ct_motion_example.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_motion_example.cpp; sourceTree = "<group>"; };
 		AA9CD718141FF8D10064C27A /* me_ct_motion_example.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_motion_example.hpp; sourceTree = "<group>"; };
 		AA9CD719141FF8D10064C27A /* me_ct_motion_parameter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_motion_parameter.cpp; sourceTree = "<group>"; };
@@ -1033,10 +1025,6 @@
 		AA9CD71E141FF8D10064C27A /* me_ct_motion_profile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = me_ct_motion_profile.h; sourceTree = "<group>"; };
 		AA9CD71F141FF8D10064C27A /* me_ct_motion_timewarp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_motion_timewarp.cpp; sourceTree = "<group>"; };
 		AA9CD720141FF8D10064C27A /* me_ct_motion_timewarp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_motion_timewarp.hpp; sourceTree = "<group>"; };
-		AA9CD721141FF8D10064C27A /* me_ct_navigation_circle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_navigation_circle.cpp; sourceTree = "<group>"; };
-		AA9CD722141FF8D10064C27A /* me_ct_navigation_circle.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_navigation_circle.hpp; sourceTree = "<group>"; };
-		AA9CD723141FF8D10064C27A /* me_ct_navigation_waypoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_navigation_waypoint.cpp; sourceTree = "<group>"; };
-		AA9CD724141FF8D10064C27A /* me_ct_navigation_waypoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_navigation_waypoint.hpp; sourceTree = "<group>"; };
 		AA9CD725141FF8D10064C27A /* me_ct_param_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_param_animation.cpp; sourceTree = "<group>"; };
 		AA9CD726141FF8D10064C27A /* me_ct_param_animation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = me_ct_param_animation.h; sourceTree = "<group>"; };
 		AA9CD727141FF8D10064C27A /* me_ct_param_animation_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_param_animation_data.cpp; sourceTree = "<group>"; };
@@ -1723,10 +1711,6 @@
 				AA9CD6E6141FF8D10064C27A /* me_ct_IK.hpp */,
 				AA9CD6E7141FF8D10064C27A /* me_ct_IK_scenario.cpp */,
 				AA9CD6E8141FF8D10064C27A /* me_ct_IK_scenario.hpp */,
-				AA9CD721141FF8D10064C27A /* me_ct_navigation_circle.cpp */,
-				AA9CD722141FF8D10064C27A /* me_ct_navigation_circle.hpp */,
-				AA9CD723141FF8D10064C27A /* me_ct_navigation_waypoint.cpp */,
-				AA9CD724141FF8D10064C27A /* me_ct_navigation_waypoint.hpp */,
 				AA9CD6F1141FF8D10064C27A /* me_ct_locomotion.cpp */,
 				AA9CD6F2141FF8D10064C27A /* me_ct_locomotion.hpp */,
 				AA9CD6F3141FF8D10064C27A /* me_ct_locomotion_analysis.cpp */,
@@ -1759,8 +1743,6 @@
 				AA9CD712141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.hpp */,
 				AA9CD713141FF8D10064C27A /* me_ct_locomotion_terrain.cpp */,
 				AA9CD714141FF8D10064C27A /* me_ct_locomotion_terrain.hpp */,
-				AA9CD715141FF8D10064C27A /* me_ct_locomotion_timing_space.cpp */,
-				AA9CD716141FF8D10064C27A /* me_ct_locomotion_timing_space.hpp */,
 			);
 			name = semiprocedurallocomotion;
 			sourceTree = "<group>";
@@ -2567,14 +2549,11 @@
 				AA9CD957141FF8D10064C27A /* me_ct_locomotion_routine.hpp in Headers */,
 				AA9CD95B141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.hpp in Headers */,
 				AA9CD95D141FF8D10064C27A /* me_ct_locomotion_terrain.hpp in Headers */,
-				AA9CD95F141FF8D10064C27A /* me_ct_locomotion_timing_space.hpp in Headers */,
 				AA9CD961141FF8D10064C27A /* me_ct_motion_example.hpp in Headers */,
 				AA9CD963141FF8D10064C27A /* me_ct_motion_parameter.h in Headers */,
 				AA9CD965141FF8D10064C27A /* me_ct_motion_player.h in Headers */,
 				AA9CD967141FF8D10064C27A /* me_ct_motion_profile.h in Headers */,
 				AA9CD969141FF8D10064C27A /* me_ct_motion_timewarp.hpp in Headers */,
-				AA9CD96B141FF8D10064C27A /* me_ct_navigation_circle.hpp in Headers */,
-				AA9CD96D141FF8D10064C27A /* me_ct_navigation_waypoint.hpp in Headers */,
 				AA9CD96F141FF8D10064C27A /* me_ct_param_animation.h in Headers */,
 				AA9CD971141FF8D10064C27A /* me_ct_param_animation_data.h in Headers */,
 				AA9CD973141FF8D10064C27A /* me_ct_param_animation_utilities.h in Headers */,
@@ -2961,14 +2940,11 @@
 				AA9CD956141FF8D10064C27A /* me_ct_locomotion_routine.cpp in Sources */,
 				AA9CD95A141FF8D10064C27A /* me_ct_locomotion_speed_accelerator.cpp in Sources */,
 				AA9CD95C141FF8D10064C27A /* me_ct_locomotion_terrain.cpp in Sources */,
-				AA9CD95E141FF8D10064C27A /* me_ct_locomotion_timing_space.cpp in Sources */,
 				AA9CD960141FF8D10064C27A /* me_ct_motion_example.cpp in Sources */,
 				AA9CD962141FF8D10064C27A /* me_ct_motion_parameter.cpp in Sources */,
 				AA9CD964141FF8D10064C27A /* me_ct_motion_player.cpp in Sources */,
 				AA9CD966141FF8D10064C27A /* me_ct_motion_profile.cpp in Sources */,
 				AA9CD968141FF8D10064C27A /* me_ct_motion_timewarp.cpp in Sources */,
-				AA9CD96A141FF8D10064C27A /* me_ct_navigation_circle.cpp in Sources */,
-				AA9CD96C141FF8D10064C27A /* me_ct_navigation_waypoint.cpp in Sources */,
 				AA9CD96E141FF8D10064C27A /* me_ct_param_animation.cpp in Sources */,
 				AA9CD970141FF8D10064C27A /* me_ct_param_animation_data.cpp in Sources */,
 				AA9CD972141FF8D10064C27A /* me_ct_param_animation_utilities.cpp in Sources */,
