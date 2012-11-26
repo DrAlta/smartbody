@@ -278,8 +278,6 @@
 		AA9CD8FF141FF8D10064C27A /* KinectProcessor.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD6B6141FF8D00064C27A /* KinectProcessor.h */; };
 		AA9CD900141FF8D10064C27A /* lin_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD6B7141FF8D00064C27A /* lin_win.cpp */; };
 		AA9CD901141FF8D10064C27A /* lin_win.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD6B8141FF8D00064C27A /* lin_win.h */; };
-		AA9CD902141FF8D10064C27A /* locomotion_cmds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD6B9141FF8D00064C27A /* locomotion_cmds.cpp */; };
-		AA9CD903141FF8D10064C27A /* locomotion_cmds.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD6BA141FF8D00064C27A /* locomotion_cmds.hpp */; };
 		AA9CD904141FF8D10064C27A /* mcontrol_callbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD6BB141FF8D00064C27A /* mcontrol_callbacks.cpp */; };
 		AA9CD905141FF8D10064C27A /* mcontrol_callbacks.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD6BC141FF8D00064C27A /* mcontrol_callbacks.h */; };
 		AA9CD906141FF8D10064C27A /* mcontrol_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD6BD141FF8D00064C27A /* mcontrol_util.cpp */; };
@@ -941,8 +939,6 @@
 		AA9CD6B6141FF8D00064C27A /* KinectProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectProcessor.h; sourceTree = "<group>"; };
 		AA9CD6B7141FF8D00064C27A /* lin_win.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lin_win.cpp; sourceTree = "<group>"; };
 		AA9CD6B8141FF8D00064C27A /* lin_win.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lin_win.h; sourceTree = "<group>"; };
-		AA9CD6B9141FF8D00064C27A /* locomotion_cmds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = locomotion_cmds.cpp; sourceTree = "<group>"; };
-		AA9CD6BA141FF8D00064C27A /* locomotion_cmds.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = locomotion_cmds.hpp; sourceTree = "<group>"; };
 		AA9CD6BB141FF8D00064C27A /* mcontrol_callbacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mcontrol_callbacks.cpp; sourceTree = "<group>"; };
 		AA9CD6BC141FF8D00064C27A /* mcontrol_callbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mcontrol_callbacks.h; sourceTree = "<group>"; };
 		AA9CD6BD141FF8D00064C27A /* mcontrol_util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mcontrol_util.cpp; sourceTree = "<group>"; };
@@ -2231,8 +2227,6 @@
 				AA9CD6B8141FF8D00064C27A /* lin_win.h */,
 				AAC99D11143AA3270098208A /* local_speech.cpp */,
 				AAC99D12143AA3270098208A /* local_speech.h */,
-				AA9CD6B9141FF8D00064C27A /* locomotion_cmds.cpp */,
-				AA9CD6BA141FF8D00064C27A /* locomotion_cmds.hpp */,
 				AA9CD6BB141FF8D00064C27A /* mcontrol_callbacks.cpp */,
 				AA9CD6BC141FF8D00064C27A /* mcontrol_callbacks.h */,
 				AA9CD6BD141FF8D00064C27A /* mcontrol_util.cpp */,
@@ -2542,7 +2536,6 @@
 				AA9CD8FD141FF8D10064C27A /* joint_logger.hpp in Headers */,
 				AA9CD8FF141FF8D10064C27A /* KinectProcessor.h in Headers */,
 				AA9CD901141FF8D10064C27A /* lin_win.h in Headers */,
-				AA9CD903141FF8D10064C27A /* locomotion_cmds.hpp in Headers */,
 				AA9CD905141FF8D10064C27A /* mcontrol_callbacks.h in Headers */,
 				AA9CD907141FF8D10064C27A /* mcontrol_util.h in Headers */,
 				AA9CD908141FF8D10064C27A /* me_blend_cover.h in Headers */,
@@ -2939,7 +2932,6 @@
 				AA9CD8FC141FF8D10064C27A /* joint_logger.cpp in Sources */,
 				AA9CD8FE141FF8D10064C27A /* KinectProcessor.cpp in Sources */,
 				AA9CD900141FF8D10064C27A /* lin_win.cpp in Sources */,
-				AA9CD902141FF8D10064C27A /* locomotion_cmds.cpp in Sources */,
 				AA9CD904141FF8D10064C27A /* mcontrol_callbacks.cpp in Sources */,
 				AA9CD906141FF8D10064C27A /* mcontrol_util.cpp in Sources */,
 				AA9CD909141FF8D10064C27A /* me_ct_barycentric_interpolation.cpp in Sources */,
