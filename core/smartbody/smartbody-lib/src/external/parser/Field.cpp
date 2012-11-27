@@ -40,11 +40,11 @@ in( int integer ) const
     {
 	if( integer < 0 )
 	    error( "Field given integer < 0" );
-	return mask_[ integer ] != NULL;
+	return mask_[ integer ] != 0;
     }
     else
     {
 	int	index = integer % fragmentation_;
-	return mask_[ index ] != NULL;
+	return mask_[ index ] != 0;
     }
 }
