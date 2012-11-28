@@ -643,6 +643,14 @@
 		C4126A2615B6552200D530A3 /* SBPhonemeManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C4126A2215B6552200D530A3 /* SBPhonemeManager.h */; };
 		C4126A2915B6567F00D530A3 /* SbmDeformableMeshGPU.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4126A2715B6567F00D530A3 /* SbmDeformableMeshGPU.cpp */; };
 		C4126A2A15B6567F00D530A3 /* SbmDeformableMeshGPU.h in Headers */ = {isa = PBXBuildFile; fileRef = C4126A2815B6567F00D530A3 /* SbmDeformableMeshGPU.h */; };
+		C41FE65E1665C74200265409 /* me_ct_motion_recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C41FE65C1665C74200265409 /* me_ct_motion_recorder.cpp */; };
+		C41FE65F1665C74200265409 /* me_ct_motion_recorder.h in Headers */ = {isa = PBXBuildFile; fileRef = C41FE65D1665C74200265409 /* me_ct_motion_recorder.h */; };
+		C41FE6631665C89C00265409 /* MotionAnalysis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C41FE6611665C89C00265409 /* MotionAnalysis.cpp */; };
+		C41FE6641665C89C00265409 /* MotionAnalysis.h in Headers */ = {isa = PBXBuildFile; fileRef = C41FE6621665C89C00265409 /* MotionAnalysis.h */; };
+		C41FE6671666931100265409 /* me_ct_noise_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C41FE6651666931100265409 /* me_ct_noise_controller.cpp */; };
+		C41FE6681666931100265409 /* me_ct_noise_controller.h in Headers */ = {isa = PBXBuildFile; fileRef = C41FE6661666931100265409 /* me_ct_noise_controller.h */; };
+		C41FE66B1666937800265409 /* SBAnimationTransitionRule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C41FE6691666937800265409 /* SBAnimationTransitionRule.cpp */; };
+		C41FE66C1666937800265409 /* SBAnimationTransitionRule.h in Headers */ = {isa = PBXBuildFile; fileRef = C41FE66A1666937800265409 /* SBAnimationTransitionRule.h */; };
 		C423E7B915BF5E2600D22BBB /* SBMotionBlendBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C423E7B715BF5E2600D22BBB /* SBMotionBlendBase.cpp */; };
 		C423E7BA15BF5E2600D22BBB /* SBMotionBlendBase.h in Headers */ = {isa = PBXBuildFile; fileRef = C423E7B815BF5E2600D22BBB /* SBMotionBlendBase.h */; };
 		C423E7BE15BF5E3B00D22BBB /* SBBehaviorSetManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C423E7BC15BF5E3B00D22BBB /* SBBehaviorSetManager.cpp */; };
@@ -1298,6 +1306,14 @@
 		C4126A2215B6552200D530A3 /* SBPhonemeManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBPhonemeManager.h; path = sb/SBPhonemeManager.h; sourceTree = "<group>"; };
 		C4126A2715B6567F00D530A3 /* SbmDeformableMeshGPU.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SbmDeformableMeshGPU.cpp; path = GPU/SbmDeformableMeshGPU.cpp; sourceTree = "<group>"; };
 		C4126A2815B6567F00D530A3 /* SbmDeformableMeshGPU.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SbmDeformableMeshGPU.h; path = GPU/SbmDeformableMeshGPU.h; sourceTree = "<group>"; };
+		C41FE65C1665C74200265409 /* me_ct_motion_recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_motion_recorder.cpp; sourceTree = "<group>"; };
+		C41FE65D1665C74200265409 /* me_ct_motion_recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = me_ct_motion_recorder.h; sourceTree = "<group>"; };
+		C41FE6611665C89C00265409 /* MotionAnalysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MotionAnalysis.cpp; sourceTree = "<group>"; };
+		C41FE6621665C89C00265409 /* MotionAnalysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MotionAnalysis.h; sourceTree = "<group>"; };
+		C41FE6651666931100265409 /* me_ct_noise_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_noise_controller.cpp; sourceTree = "<group>"; };
+		C41FE6661666931100265409 /* me_ct_noise_controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = me_ct_noise_controller.h; sourceTree = "<group>"; };
+		C41FE6691666937800265409 /* SBAnimationTransitionRule.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBAnimationTransitionRule.cpp; path = sb/SBAnimationTransitionRule.cpp; sourceTree = "<group>"; };
+		C41FE66A1666937800265409 /* SBAnimationTransitionRule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBAnimationTransitionRule.h; path = sb/SBAnimationTransitionRule.h; sourceTree = "<group>"; };
 		C423E7B715BF5E2600D22BBB /* SBMotionBlendBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBMotionBlendBase.cpp; path = sb/SBMotionBlendBase.cpp; sourceTree = "<group>"; };
 		C423E7B815BF5E2600D22BBB /* SBMotionBlendBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBMotionBlendBase.h; path = sb/SBMotionBlendBase.h; sourceTree = "<group>"; };
 		C423E7BC15BF5E3B00D22BBB /* SBBehaviorSetManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBBehaviorSetManager.cpp; path = sb/SBBehaviorSetManager.cpp; sourceTree = "<group>"; };
@@ -1482,6 +1498,12 @@
 		AA73BC88146C634000B199A1 /* controllers */ = {
 			isa = PBXGroup;
 			children = (
+				C41FE6651666931100265409 /* me_ct_noise_controller.cpp */,
+				C41FE6661666931100265409 /* me_ct_noise_controller.h */,
+				C41FE6611665C89C00265409 /* MotionAnalysis.cpp */,
+				C41FE6621665C89C00265409 /* MotionAnalysis.h */,
+				C41FE65C1665C74200265409 /* me_ct_motion_recorder.cpp */,
+				C41FE65D1665C74200265409 /* me_ct_motion_recorder.h */,
 				C423E7E715BF633800D22BBB /* MeCtBlendEngine.cpp */,
 				C423E7E815BF633800D22BBB /* MeCtBlendEngine.h */,
 				AA73BC8D146C655F00B199A1 /* adshrenvelope */,
@@ -1558,6 +1580,8 @@
 		AA73BC8B146C637E00B199A1 /* SB */ = {
 			isa = PBXGroup;
 			children = (
+				C41FE6691666937800265409 /* SBAnimationTransitionRule.cpp */,
+				C41FE66A1666937800265409 /* SBAnimationTransitionRule.h */,
 				C423E7C015BF5E5300D22BBB /* SBBehaviorSet.cpp */,
 				C423E7C115BF5E5300D22BBB /* SBBehaviorSet.h */,
 				C423E7BC15BF5E3B00D22BBB /* SBBehaviorSetManager.cpp */,
@@ -2761,6 +2785,10 @@
 				C423E7EA15BF633800D22BBB /* MeCtBlendEngine.h in Headers */,
 				C423E81015BF654F00D22BBB /* sr_sn_colorsurf.h in Headers */,
 				C42C3DA6160D394F00A7D1D4 /* perlin.h in Headers */,
+				C41FE65F1665C74200265409 /* me_ct_motion_recorder.h in Headers */,
+				C41FE6641665C89C00265409 /* MotionAnalysis.h in Headers */,
+				C41FE6681666931100265409 /* me_ct_noise_controller.h in Headers */,
+				C41FE66C1666937800265409 /* SBAnimationTransitionRule.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3148,6 +3176,10 @@
 				C423E7E915BF633800D22BBB /* MeCtBlendEngine.cpp in Sources */,
 				C423E80F15BF654F00D22BBB /* sr_sn_colorsurf.cpp in Sources */,
 				C42C3DA5160D394F00A7D1D4 /* perlin.cpp in Sources */,
+				C41FE65E1665C74200265409 /* me_ct_motion_recorder.cpp in Sources */,
+				C41FE6631665C89C00265409 /* MotionAnalysis.cpp in Sources */,
+				C41FE6671666931100265409 /* me_ct_noise_controller.cpp in Sources */,
+				C41FE66B1666937800265409 /* SBAnimationTransitionRule.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
