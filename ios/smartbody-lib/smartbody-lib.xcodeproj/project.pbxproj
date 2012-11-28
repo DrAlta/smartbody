@@ -651,6 +651,8 @@
 		C41FE6681666931100265409 /* me_ct_noise_controller.h in Headers */ = {isa = PBXBuildFile; fileRef = C41FE6661666931100265409 /* me_ct_noise_controller.h */; };
 		C41FE66B1666937800265409 /* SBAnimationTransitionRule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C41FE6691666937800265409 /* SBAnimationTransitionRule.cpp */; };
 		C41FE66C1666937800265409 /* SBAnimationTransitionRule.h in Headers */ = {isa = PBXBuildFile; fileRef = C41FE66A1666937800265409 /* SBAnimationTransitionRule.h */; };
+		C41FE66F1666B81100265409 /* bml_noise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C41FE66D1666B81100265409 /* bml_noise.cpp */; };
+		C41FE6701666B81100265409 /* bml_noise.hpp in Headers */ = {isa = PBXBuildFile; fileRef = C41FE66E1666B81100265409 /* bml_noise.hpp */; };
 		C423E7B915BF5E2600D22BBB /* SBMotionBlendBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C423E7B715BF5E2600D22BBB /* SBMotionBlendBase.cpp */; };
 		C423E7BA15BF5E2600D22BBB /* SBMotionBlendBase.h in Headers */ = {isa = PBXBuildFile; fileRef = C423E7B815BF5E2600D22BBB /* SBMotionBlendBase.h */; };
 		C423E7BE15BF5E3B00D22BBB /* SBBehaviorSetManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C423E7BC15BF5E3B00D22BBB /* SBBehaviorSetManager.cpp */; };
@@ -1314,6 +1316,8 @@
 		C41FE6661666931100265409 /* me_ct_noise_controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = me_ct_noise_controller.h; sourceTree = "<group>"; };
 		C41FE6691666937800265409 /* SBAnimationTransitionRule.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBAnimationTransitionRule.cpp; path = sb/SBAnimationTransitionRule.cpp; sourceTree = "<group>"; };
 		C41FE66A1666937800265409 /* SBAnimationTransitionRule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBAnimationTransitionRule.h; path = sb/SBAnimationTransitionRule.h; sourceTree = "<group>"; };
+		C41FE66D1666B81100265409 /* bml_noise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bml_noise.cpp; path = bml/bml_noise.cpp; sourceTree = "<group>"; };
+		C41FE66E1666B81100265409 /* bml_noise.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bml_noise.hpp; path = bml/bml_noise.hpp; sourceTree = "<group>"; };
 		C423E7B715BF5E2600D22BBB /* SBMotionBlendBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBMotionBlendBase.cpp; path = sb/SBMotionBlendBase.cpp; sourceTree = "<group>"; };
 		C423E7B815BF5E2600D22BBB /* SBMotionBlendBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBMotionBlendBase.h; path = sb/SBMotionBlendBase.h; sourceTree = "<group>"; };
 		C423E7BC15BF5E3B00D22BBB /* SBBehaviorSetManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBBehaviorSetManager.cpp; path = sb/SBBehaviorSetManager.cpp; sourceTree = "<group>"; };
@@ -1437,6 +1441,8 @@
 		AA73BC87146C633A00B199A1 /* BML */ = {
 			isa = PBXGroup;
 			children = (
+				C41FE66D1666B81100265409 /* bml_noise.cpp */,
+				C41FE66E1666B81100265409 /* bml_noise.hpp */,
 				C4126A1015B60B7600D530A3 /* bml_gesture.hpp */,
 				AAF8C71714DA2DA20075F2C2 /* bml_gesture.cpp */,
 				AA9CD650141FF8D00064C27A /* behavior_scheduler.cpp */,
@@ -2789,6 +2795,7 @@
 				C41FE6641665C89C00265409 /* MotionAnalysis.h in Headers */,
 				C41FE6681666931100265409 /* me_ct_noise_controller.h in Headers */,
 				C41FE66C1666937800265409 /* SBAnimationTransitionRule.h in Headers */,
+				C41FE6701666B81100265409 /* bml_noise.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3180,6 +3187,7 @@
 				C41FE6631665C89C00265409 /* MotionAnalysis.cpp in Sources */,
 				C41FE6671666931100265409 /* me_ct_noise_controller.cpp in Sources */,
 				C41FE66B1666937800265409 /* SBAnimationTransitionRule.cpp in Sources */,
+				C41FE66F1666B81100265409 /* bml_noise.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
