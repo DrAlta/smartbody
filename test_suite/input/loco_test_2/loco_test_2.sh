@@ -1,14 +1,13 @@
 #!/bin/sh
-SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/loco_test_2 -seq loco_test_2.seq -facebone"
+#SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/loco_test_2 -seq loco_test_2.seq -facebone"
+SBMINPUT="-noninteractive -scriptpath ../../../../test_suite/input/loco_test_2 -script loco_test_2.py"
 OPTION_1=IMG
 THRESHOLD_1=500
 OPTION_2=IMG
 THRESHOLD_2=500
 OPTION_3=IMG
 THRESHOLD_3=500
-OPTION_4=IMG
-THRESHOLD_4=500
-NUMOFCOMP=4
+NUMOFCOMP=3
 
 SBMBIN=$1
 INPUTDIR=$2

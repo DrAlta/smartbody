@@ -1,5 +1,6 @@
 #!/bin/bash
-SBMINPUT="-seqpath ../../../../test_suite/input/test-face-au -seq test-face-au.seq -facebone"
+#SBMINPUT="-seqpath ../../../../test_suite/input/test-face-au -seq test-face-au.seq -facebone"
+SBMINPUT="-scriptpath ../../../../test_suite/input/test-face-au -script test-face-au.py"
 OPTION_1=IMG
 THRESHOLD_1=500
 OPTION_2=IMG
@@ -42,17 +43,7 @@ OPTION_20=IMG
 THRESHOLD_20=500
 OPTION_21=IMG
 THRESHOLD_21=500
-OPTION_22=IMG
-THRESHOLD_22=500
-OPTION_23=IMG
-THRESHOLD_23=500
-OPTION_24=IMG
-THRESHOLD_24=500
-OPTION_25=IMG
-THRESHOLD_25=500
-OPTION_26=IMG
-THRESHOLD_26=500
-NUMOFCOMP=26
+NUMOFCOMP=21
 
 SBMBIN=$1
 INPUTDIR=$2

@@ -1,5 +1,6 @@
 #!/bin/sh
-SBMINPUT="-seqpath ../../../../test_suite/input/test-reach-noexample -seq test-reach-noexample.seq -facebone"
+#SBMINPUT="-seqpath ../../../../test_suite/input/test-reach-noexample -seq test-reach-noexample.seq -facebone"
+SBMINPUT="-scriptpath ../../../../test_suite/input/test-reach-noexample -script test-reach-noexample.py"
 OPTION_1=IMG
 THRESHOLD_1=500
 OPTION_2=IMG

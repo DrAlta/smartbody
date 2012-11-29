@@ -3,49 +3,64 @@ print "|           Starting Blend Demo              |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath("script","../../../../data/examples")
-scene.addAssetPath("script","../../../../data/examples/functions")
-scene.addAssetPath("script","../../../../data/sbm-common/scripts")
-scene.addAssetPath('seq', '../../../../data/sbm-common/scripts')
-scene.addAssetPath('seq', '../../../../data/sbm-test/scripts')
-scene.addAssetPath('mesh', '../../../../data/mesh')
-scene.addAssetPath('mesh', '../../../../data/retarget/mesh')
-scene.addAssetPath('audio', '../../../../data/Resources/audio')
+scene.setMediaPath('../../../../data')
+scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('mesh', 'mesh')
+scene.addAssetPath('mesh', 'retarget/mesh')
+scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.loadAssets()
 
-# Runs the default viewer for camera
+# Set scene parameters and camera
+print 'Configuring scene parameters and camera'
+scene.setBoolAttribute('internalAudio', True)
 scene.run('default-viewer.py')
 camera = getCamera()
-camera.setEye(0, 233.87, 354.69)
-camera.setCenter(0, 159.87, 169.69)
+camera.setEye(-100, 318, 542)
+camera.setCenter(-100, 244, 357)
 
-# Add Character script
-scene.run('AddCharacter.py')
-# Add characters in scene
-addCharacter('brad', 'brad')
-setPos('brad', SrVec(-55, 102, 0))
-addCharacter('utah', 'utah')
-setPos('utah', SrVec(145, 0, 0))
-addCharacter('elder', 'elder')
-setPos('elder', SrVec(-145, 102, 0))
-addCharacter('doctor', 'doctor')
-setPos('doctor', SrVec(55, 102, 0))
-
-# Set camera position
-setPawnPos('camera', SrVec(0, -50, 0))
+# Setting up characters
+print 'Setting up characters'
+# chr0D
+chr0D = scene.createCharacter('chr0D', '')
+chr0DSkeleton = scene.createSkeleton('common.sk')
+chr0D.setSkeleton(chr0DSkeleton)
+chr0D.setPosition(SrVec(-145, 102, 0))
+chr0D.createStandardControllers()
+chr0D.setStringAttribute('deformableMesh', 'brad')
+bml.execBML('chr0D', '<body posture="HandsAtSide_Motex"/>')
+# chr1D
+chr1D = scene.createCharacter('chr1D', '')
+chr1DSkeleton = scene.createSkeleton('common.sk')
+chr1D.setSkeleton(chr1DSkeleton)
+chr1D.setPosition(SrVec(-55, 102, 0))
+chr1D.createStandardControllers()
+chr1D.setStringAttribute('deformableMesh', 'elder')
+bml.execBML('chr1D', '<body posture="LHandOnHip_Motex"/>')
+# chr2D
+chr2D = scene.createCharacter('chr2D', '')
+chr2DSkeleton = scene.createSkeleton('common.sk')
+chr2D.setSkeleton(chr2DSkeleton)
+chr2D.setPosition(SrVec(55, 102, 0))
+chr2D.createStandardControllers()
+chr2D.setStringAttribute('deformableMesh', 'doctor')
+bml.execBML('chr2D', '<body posture="LHandOnHip_Motex"/>')
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
 	scene.command("char %s viewer deformableGPU" % name)
 
-# Add Blend script
-scene.run('Blend.py')
+# Set up blends
+blendManager = scene.getBlendManager()
 
+# 0D Blend
+print 'Setting up 0D blend'
 blend0D = blendManager.createBlend0D('blend0D')
 motions = StringVec()
 motions.append('ChrUtah_WalkInCircleRight001')
 blend0D.addMotion(motions[0])
 
 # 1D Blend
+print 'Setting up 1D blend'
 blend1D = blendManager.createBlend1D('blend1D')
 motions = StringVec()
 motions.append('ChrUtah_Idle001')
@@ -86,6 +101,7 @@ points2.append(2.46667) # ChrUtah_Turn180Rt01 2
 blend1D.addCorrespondencePoints(motions, points2)
 
 # 2D Blend
+print 'Setting up 2D blend'
 blend2D = blendManager.createBlend2D("blend2D")
 
 motions = StringVec()
@@ -149,24 +165,51 @@ blend2D.addTriangle("ChrUtah_Idle001", "ChrUtah_Idle01_StepForwardLf01", "ChrUta
 blend2D.addTriangle("ChrUtah_Idle001", "ChrUtah_Idle01_StepBackwardRt01", "ChrUtah_Idle01_StepSidewaysRt01")
 blend2D.addTriangle("ChrUtah_Idle001", "ChrUtah_Idle01_StepForwardRt01", "ChrUtah_Idle01_StepSidewaysRt01")
 
+''' MISSING 3D BLEND '''
+bml.execBML('chr0D', '<blend name="blend0D"/>')
+
 last = 0
 canTime = True
 delay = 5
-played = False
+
+last1D = 0
+delay1D = 1
+
+blend1DX = -180
+amount = 10
+blend2DX = 28.88
+blend2DY = 47.81
 class BlendDemo(SBScript):
 	def update(self, time):
-		global canTime, last, played
-		if canTime:
-			last = time
-			canTime = False
+		global canTime, last, blend1DX, blend2DX, blend2DY, amount, last1D
+		# Update every few seconds
+		diff1D = time - last1D
+		if diff1D > delay1D:
+			# 1D Blend
+			bml.execBML('chr1D', '<blend name="blend1D" x="' + str(blend1DX) + '"/>')
+			# Slowly increment and decrement
+			blend1DX = blend1DX + amount
+			if blend1DX <= -180: 
+				amount = amount * -1
+			elif blend1DX >= 180:
+				amount = amount * -1
+			last1D = time
+		
 		diff = time - last
 		# Start blend after delay
-		if diff > delay and not played:
-			bml.execBML('elder', '<blend name="blend0D"/>')
-			bml.execBML('brad', '<blend name="blend1D" x="-90"/>')
-			bml.execBML('doctor', '<blend name="blend2D" x="9.16" y="7.21"/>')
-			#bml.execBML('utah', '<blend name="blend3D" x=".5" y=".35" z=".7"/>')
-			played = True
+		if diff > delay:
+			# 2D Blend
+			bml.execBML('chr2D', '<blend name="blend2D" x="' + str(blend2DX) + '" y="' + str(blend2DY) + '"/>')
+			# Alternate between 2D blend
+			if blend2DY == 47.81:
+				blend2DX = -31.74
+				blend2DY = -39.20
+			elif blend2DY == -39.20: 
+				blend2DX = 28.88
+				blend2DY = 47.81
+				#28.88 -31.74
+			# Reset timer
+			last = time
 		
 # Run the update script
 scene.removeScript('blenddemo')

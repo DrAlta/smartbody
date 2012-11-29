@@ -1,5 +1,6 @@
 #!/bin/sh
-SBMINPUT="-seqpath ../../../../test_suite/input/test-reach-footik -seq test-reach-footik.seq -facebone"
+#SBMINPUT="-seqpath ../../../../test_suite/input/test-reach-footik -seq test-reach-footik.seq -facebone"
+SBMINPUT="-scriptpath ../../../../test_suite/input/test-reach-footik -script test-reach-footik.py"
 OPTION_1=IMG
 THRESHOLD_1=500
 OPTION_2=IMG

@@ -1,5 +1,6 @@
 #!/bin/bash
-SBMINPUT="-seqpath ../../../../test_suite/input/test-reach-physics -seq test-reach-physics.seq -facebone"
+#SBMINPUT="-seqpath ../../../../test_suite/input/test-reach-physics -seq test-reach-physics.seq -facebone"
+SBMINPUT="-scriptpath ../../../../test_suite/input/test-reach-physics -script test-reach-physics.py"
 OPTION_1=IMG
 THRESHOLD_1=500
 OPTION_2=IMG

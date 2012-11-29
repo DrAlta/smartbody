@@ -1,5 +1,6 @@
 #!/bin/sh
-SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/gaze_test1 -seq gaze_test1.seq"
+#SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/gaze_test1 -seq gaze_test1.seq"
+SBMINPUT="-noninteractive -scriptpath ../../../../test_suite/input/gaze_test1 -script gaze_test1.py"
 OPTION_1=IMG
 THRESHOLD_1=500
 OPTION_2=IMG
