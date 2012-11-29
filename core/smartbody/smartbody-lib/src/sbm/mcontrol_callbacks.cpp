@@ -1788,7 +1788,10 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 		}
 		meshModelVec.push_back(objModel);
 	}
-	if (ext == ".dae" || ext == ".DAE" || ext == ".xml" || ext == ".XML")
+//	else if (ext == ".xml" || ext == ".XML")
+	//{
+	//}
+	else if (ext == ".dae" || ext == ".DAE" || ext == ".xml" || ext == ".XML")
 	{
 		DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file);
 		if (geometryNode)
