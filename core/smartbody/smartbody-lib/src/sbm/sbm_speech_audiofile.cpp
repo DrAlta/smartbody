@@ -221,19 +221,26 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
    // if an audio path is present, use it
    bool useAudioPaths = true;
-   mcu.audio_paths.reset();
-   std::string relativeAudioPath = mcu.audio_paths.next_path();
 
-	boost::filesystem::path p( relativeAudioPath );
-	p /= voiceCode;
-	boost::filesystem::path abs_p = boost::filesystem::complete( p );	
+   // if the voice code is an absolute path, use it and ignore the media path and audio path
+   boost::filesystem::path abs_p( voiceCode );
+   boost::filesystem::path voicecodeabs_p = boost::filesystem::complete( abs_p );	
+   if( !boost::filesystem2::exists( voicecodeabs_p ))
+   {
+	    mcu.audio_paths.reset();
+	    std::string relativeAudioPath = mcu.audio_paths.next_path();
 
-	if( !boost::filesystem2::exists( abs_p ))
-	{
-	  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
-	  mcu.mark("requestSpeechAudio");
-      return 0;
-	}
+		boost::filesystem::path p( relativeAudioPath );
+		p /= voiceCode;
+		abs_p = boost::filesystem::complete( p );	
+
+		if( !boost::filesystem2::exists( abs_p ))
+		{
+		  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
+		  mcu.mark("requestSpeechAudio");
+		  return 0;
+		}
+   }
 
 	boost::filesystem::path wavPath = abs_p;
 	wavPath /= std::string(ref + ".wav");
