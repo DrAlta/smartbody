@@ -48,6 +48,7 @@
 #include "sbm/gwiz_math.h"
 #include "ParserBVH.h"
 #include "ParserOpenCOLLADA.h"
+#include "ParserOgre.h"
 #include "ParserASFAMC.h"
 #include "ParserFBX.h"
 #include <sb/SBSkeleton.h>
@@ -140,6 +141,17 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, SBResou
 		skeleton_p->skfilename(filename.c_str());
 		skeleton_p->name(skel_file);
 	}
+	else if (filename.find(".skeleton.xml") == (filename.size() - 13) || 
+			 filename.find(".SKELETON.XML") == (filename.size() - 13))
+	{
+		fclose(fp);
+		SkMotion motion;
+		std::vector<SkMotion*> motions;
+		motions.push_back(&motion);
+		ParserOgre::parse(*skeleton_p, motions, filename, float(scale), true, false);
+		skeleton_p->skfilename(filename.c_str());
+		skeleton_p->name(skel_file);
+	}
 #if ENABLE_FBX_PARSER
 	else if (filename.find(".fbx") == (filename.size() - 4) || 
 			 filename.find(".FBX") == (filename.size() - 4))
@@ -220,11 +232,13 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
 					_stricmp( ext.c_str(), ".dae" ) == 0 ||
 					_stricmp( ext.c_str(), ".amc" ) == 0 ||
+					_stricmp( ext.c_str(), ".xml" ) == 0 ||
 					_stricmp( ext.c_str(), ".fbx" ) == 0)
 #else
 				if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || 
 					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
 					_stricmp( ext.c_str(), ".dae" ) == 0 ||
+					_stricmp( ext.c_str(), ".xml" ) == 0 ||
 					_stricmp( ext.c_str(), ".amc" ) == 0)
 #endif
 				{
@@ -237,6 +251,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 		}
 	} else {
 
+		std::vector<SkMotion*> motions;
 		std::string ext = extension( pathname );
 		SkMotion* motion = new SmartBody::SBMotion();
 		bool parseSuccessful = false;
@@ -250,7 +265,8 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			fullin.filename( pathname.string().c_str() ); // copy filename for error message
 			
 			parseSuccessful = motion->load( fullin, scale );
-
+			if (parseSuccessful)
+				motions.push_back(motion);
 		}
 		else if (ext == ".bvh" || ext == ".BVH")
 		{
@@ -258,9 +274,10 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			
 			SkSkeleton skeleton;
 			parseSuccessful = ParserBVH::parse(skeleton, *motion, pathname.string(), filestream, float(scale));
-
+			if (parseSuccessful)
+				motions.push_back(motion);
 		}
-		else if (ext == ".dae" || ext == ".DAE" || ext == ".xml" || ext == ".XML")
+		else if (ext == ".dae" || ext == ".DAE")
 		{			
 			SkSkeleton skeleton;
 			parseSuccessful = ParserOpenCOLLADA::parse(skeleton, *motion, pathname.string(), float(scale), true, true);		
@@ -272,6 +289,14 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			{
 				sbMotion->trim(pretrimFrames,0);				
 			}
+			if (parseSuccessful)
+				motions.push_back(motion);
+
+		}
+		else if (ext == ".xml" || ext == ".XML")
+		{			
+			SkSkeleton skeleton;
+			parseSuccessful = ParserOgre::parse(skeleton, motions, pathname.string(), float(scale), true, true);			
 		}
 		else if (ext == ".amc" || ext == ".AMC")
 		{
@@ -300,6 +325,8 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			SkSkeleton skeleton;
 			parseSuccessful = ParserASFAMC::parse(skeleton, *motion, metafilestream, filestream, float(scale));
 			motion->setName(filebase.c_str());
+			if (parseSuccessful)
+				motions.push_back(motion);
 		}
 #if ENABLE_FBX_PARSER
 		else if (ext == ".fbx" || ext == ".FBX")
@@ -307,6 +334,8 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			SkSkeleton skeleton;
 			LOG("FBX motion parse: %s", pathname.string().c_str());
 			parseSuccessful = ParserFBX::parse(skeleton, *motion, pathname.string(), float(scale));	
+			if (parseSuccessful)
+				motions.push_back(motion);
 		}
 #endif
 		if (parseSuccessful)
@@ -314,32 +343,38 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			// register the motion
 			//motion->registerAnimation();
 
-			char CurrentPath[_MAX_PATH];
-			_getcwd(CurrentPath, _MAX_PATH);
-			std::string filename;
-			MotionResource * motionRes = new MotionResource();
-			motionRes->setType("skm");
-			filename = pathname.filename().c_str();
+			for (std::vector<SkMotion*>::iterator iter = motions.begin();
+				 iter != motions.end();
+				 iter++)
+			{
+				SkMotion* motion = (*iter);
+				char CurrentPath[_MAX_PATH];
+				_getcwd(CurrentPath, _MAX_PATH);
+				std::string filename;
+				MotionResource * motionRes = new MotionResource();
+				motionRes->setType("skm");
+				filename = pathname.filename().c_str();
 			
-			//filename = mcn_return_full_filename_func( CurrentPath, finalPath.string().c_str() );
-			motionRes->setMotionFile( pathname.string() );
-			manager->addResource(motionRes);
+				//filename = mcn_return_full_filename_func( CurrentPath, finalPath.string().c_str() );
+				motionRes->setMotionFile( pathname.string() );
+				manager->addResource(motionRes);
 
-			string filebase = basename( pathname );
-			const char* name = motion->getName().c_str();
-			if( name && _stricmp( filebase.c_str(), name ) ) {
-				LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.native_file_string().c_str(), filebase.c_str());
-				motion->setName( filebase.c_str() );
-			}
-			motion->filename( pathname.native_file_string().c_str() );
+				string filebase = basename( pathname );
+				const char* name = motion->getName().c_str();
+				if( name && _stricmp( filebase.c_str(), name ) ) {
+					LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.native_file_string().c_str(), filebase.c_str());
+					//motion->setName( filebase.c_str() );
+				}
+				motion->filename( pathname.native_file_string().c_str() );
 
-			std::map<std::string, SkMotion*>::iterator motionIter = map.find(filebase);
-			if (motionIter != map.end()) {
-				LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
-				delete motion;
-				return CMD_FAILURE;
+				std::map<std::string, SkMotion*>::iterator motionIter = map.find(filebase);
+				if (motionIter != map.end()) {
+					LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					delete motion;
+					return CMD_FAILURE;
+				}
+				map.insert(std::pair<std::string, SkMotion*>(motion->getName(), motion));
 			}
-			map.insert(std::pair<std::string, SkMotion*>(filebase, motion));
 			
 		} else {
 			// SkMotion::load() already prints an error...
@@ -379,6 +414,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 					_stricmp( ext.c_str(), ".asf" ) == 0 ||
 					_stricmp( ext.c_str(), ".ASF" ) == 0 ||
 					_stricmp( ext.c_str(), ".fbx" ) == 0 ||
+					_stricmp( ext.c_str(), ".xml" ) == 0 ||
 					_stricmp( ext.c_str(), ".FBX" ) == 0)
 #else
 				if( _stricmp( ext.c_str(), ".sk" ) == 0 ||
@@ -387,7 +423,8 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 					_stricmp( ext.c_str(), ".dae" ) == 0 ||
 					_stricmp( ext.c_str(), ".DAE" ) == 0 ||
 					_stricmp( ext.c_str(), ".asf" ) == 0 ||
-					_stricmp( ext.c_str(), ".ASF" ) == 0)
+					_stricmp( ext.c_str(), ".ASF" ) == 0 ||
+					_stricmp( ext.c_str(), ".xml" ) == 0)
 #endif
 				{
 					load_me_skeletons_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
@@ -485,6 +522,29 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 			skeleton->name(filebase.c_str());
 			SkMotion motion;
 			bool ok = ParserOpenCOLLADA::parse(*skeleton, motion, pathname.string(), float(scale), true, false);
+			if (ok)
+			{
+				std::map<std::string, SkSkeleton*>::iterator motionIter = map.find(filebase);
+				if (motionIter != map.end()) {
+					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					delete skeleton;
+					return CMD_FAILURE;
+				}
+				map.insert(std::pair<std::string, SkSkeleton*>(filebase + ext, skeleton));
+			}
+			else
+			{
+				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+				return CMD_FAILURE;
+			}
+		}
+		else if (ext == ".xml" || ext == ".XML")
+		{			
+			skeleton =  new SmartBody::SBSkeleton();
+			skeleton->skfilename(filebase.c_str());
+			skeleton->name(filebase.c_str());
+			std::vector<SkMotion*> motions;
+			bool ok = ParserOgre::parse(*skeleton, motions, pathname.string(), float(scale), true, false);
 			if (ok)
 			{
 				std::map<std::string, SkSkeleton*>::iterator motionIter = map.find(filebase);

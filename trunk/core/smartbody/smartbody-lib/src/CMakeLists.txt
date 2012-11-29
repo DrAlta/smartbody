@@ -278,6 +278,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/ParserBVH.cpp
 	sbm/ParserASFAMC.cpp
 	sbm/ParserFBX.cpp
+	sbm/ParserOgre.cpp
 	sbm/ParserOpenCOLLADA.cpp
 	sbm/remote_speech.cpp
 	sbm/resource_cmds.cpp

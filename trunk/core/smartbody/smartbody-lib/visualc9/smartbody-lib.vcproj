@@ -496,6 +496,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\ParserOgre.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\ParserOgre.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\ParserOpenCOLLADA.cpp"
 				>
 			</File>
@@ -3580,15 +3588,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sb\SBAnimationTransition.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sb\SBAnimationTransitionRule.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\src\sb\SBAnimationTransitionRule.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sb\SBAnimationTransition.h"
 				>
 			</File>
 			<File

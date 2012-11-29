@@ -261,6 +261,7 @@
     <ClCompile Include="..\src\sbm\ParserASFAMC.cxx" />
     <ClCompile Include="..\src\sbm\ParserBVH.cxx" />
     <ClCompile Include="..\src\sbm\ParserFBX.cpp" />
+    <ClCompile Include="..\src\sbm\ParserOgre.cpp" />
     <ClCompile Include="..\src\sbm\ParserOpenCOLLADA.cpp" />
     <ClCompile Include="..\src\sbm\remote_speech.cpp" />
     <ClCompile Include="..\src\sbm\Resource.cpp" />
@@ -706,6 +707,7 @@
     <ClInclude Include="..\src\sbm\ParserASFAMC.h" />
     <ClInclude Include="..\src\sbm\ParserBVH.h" />
     <ClInclude Include="..\src\sbm\ParserFBX.h" />
+    <ClInclude Include="..\src\sbm\ParserOgre.h" />
     <ClInclude Include="..\src\sbm\ParserOpenCOLLADA.h" />
     <ClInclude Include="..\src\sbm\remote_speech.h" />
     <ClInclude Include="..\src\sbm\Resource.h" />
