@@ -1,5 +1,6 @@
 #!/bin/sh
-SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/viseme_basic_test -seq viseme_basic_test.seq -facebone"
+#SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/viseme_basic_test -seq viseme_basic_test.seq -facebone"
+SBMINPUT="-noninteractive -scriptpath ../../../../test_suite/input/viseme_basic_test -script viseme_basic_test.py"
 OPTION_1=IMG
 THRESHOLD_1=500
 OPTION_2=IMG
@@ -18,17 +19,7 @@ OPTION_8=IMG
 THRESHOLD_8=500
 OPTION_9=IMG
 THRESHOLD_9=500
-OPTION_10=IMG
-THRESHOLD_10=500
-OPTION_11=IMG
-THRESHOLD_11=500
-OPTION_12=IMG
-THRESHOLD_12=500
-OPTION_13=IMG
-THRESHOLD_13=500
-OPTION_14=IMG
-THRESHOLD_14=500
-NUMOFCOMP=14
+NUMOFCOMP=9
 
 SBMBIN=$1
 INPUTDIR=$2

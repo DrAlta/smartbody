@@ -357,7 +357,7 @@ def retargetSetup(targetSkelName):
 	
 
 	
-def retargetCharacter(charName, targetSkelName):
+def retargetCharacter(charName, targetSkelName, reach=True):
 	retargetSetup(targetSkelName) # make sure all retargeted motions are already created
 	
 	# setup standard locomotion
@@ -385,8 +385,9 @@ def retargetCharacter(charName, targetSkelName):
 	transitionSetup(targetSkelName, targetSkelName)
 	
 	# setup reach 
-	scene.run("init-example-reach.py")
-	reachSetup(charName,"KNN",targetSkelName)
+	if reach:
+		scene.run("init-example-reach.py")
+		reachSetup(charName,"KNN",targetSkelName)
 	
 	#scene.run("init-example-reach-mocap.py")
 	#reachMocapSetup(charName,"KNN",targetSkelName)

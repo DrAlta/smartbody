@@ -4,24 +4,22 @@ print "|            Starting Head Demo              |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath("script","../../../../data/examples")
-scene.addAssetPath("script","../../../../data/examples/functions")
-scene.addAssetPath("script","../../../../data/sbm-common/scripts")
-scene.addAssetPath('seq', '../../../../data/sbm-common/scripts')
-scene.addAssetPath('seq', '../../../../data/sbm-test/scripts')
-scene.addAssetPath('mesh', '../../../../data/mesh')
-scene.addAssetPath('mesh', '../../../../data/retarget/mesh')
-scene.addAssetPath('audio', '../../../../data/Resources/audio')
+scene.setMediaPath('../../../../data')
+scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('mesh', 'mesh')
+scene.addAssetPath('mesh', 'retarget/mesh')
+scene.addAssetPath('motion', 'ChrBrad')
+scene.addAssetPath('motion', 'retarget\motion')
+scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.loadAssets()
 
-# Add Character script
-scene.run('AddCharacter.py')
-
-# Set scene parameters to fit new Brad
+# Set scene parameters and camera
+print 'Configuring scene parameters and camera'
 scene.setScale(1.0)
 scene.run("default-viewer.py")
 camera = getCamera()
-camera.setEye(0.0013, 1.66, 0.3756)
-camera.setCenter(0.1031, 1.58, -0.0099)
+camera.setEye(0.0, 1.65, 0.38)
+camera.setCenter(0.0, 1.59, -0.02)
 camera.setUpVector(SrVec(0, 1, 0))
 camera.setScale(1)
 camera.setFov(1.0472)
@@ -29,9 +27,25 @@ camera.setFarPlane(100)
 camera.setNearPlane(0.1)
 camera.setAspectRatio(0.966897)
 
-addNewBrad('ChrBrad')
-scene.getCharacter('ChrBrad').setHPR(SrVec(-17, 0, 0))
+# Setting up joint map for Brad
+print 'Setting up joint map and configuring Brad\'s skeleton'
+scene.run('zebra2-map.py')
+zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
+bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+zebra2Map.applySkeleton(bradSkeleton)
+zebra2Map.applyMotionRecurse('ChrBrad')
 
+# Setting up Brad
+print 'Setting up Brad'
+brad = scene.createCharacter('ChrBrad', '')
+bradSkeleton = scene.createSkeleton('ChrBrad.sk')
+brad.setSkeleton(bradSkeleton)
+brad.createStandardControllers()
+# Deformable mesh
+brad.setDoubleAttribute('deformableMeshScale', .01)
+brad.setStringAttribute('deformableMesh', 'ChrBrad')
+
+# Turn on GPU deformable Geometry
 scene.command("char ChrBrad viewer deformableGPU")
 
 last = 0
@@ -48,16 +62,25 @@ class HeadDemo(SBScript):
 		if canTime:
 			last = time
 			canTime = False
-			randomHead()
+			nextHead()
 
 headList = ['NOD', 'SHAKE', 'TOSS', 'WIGGLE', 'WAGGLE']
-def randomHead():
-	headChoice = random.choice(headList)
-	print headChoice
+curHead = 0
+headAmt = len(headList)
+def nextHead():
+	global curHead
+	headChoice = headList[curHead]
+	print 'Playing %s' % headChoice
+	# Random repeats, velocity and amount
 	repeats = random.uniform(0.1, 2)
 	velocity = random.uniform(0.1, 1)
 	amount = random.uniform(0.1, 1)
+	# Perform BML command
 	bml.execBML('*', '<head type="' + headChoice + '" amount="' + str(amount) + '" repeats="' + str(repeats) + '" velocity="' + str(velocity) + '"/>')
+	# Increment index, reset when hit max
+	curHead = curHead + 1
+	if curHead >= headAmt:
+		curHead = 0
 			
 # Run the update script
 scene.removeScript('headdemo')

@@ -8,6 +8,6 @@ export INPUTDIR=$BASEDIR/input
 if [ $os = "Linux" ]; then
 export SBMEXE=sbm-fltk
 else
-export SBMEXE=sbm-fltkd.exe
-#export SBMEXE=sbm-fltk.exe
+#export SBMEXE=sbm-fltkd.exe
+export SBMEXE=sbm-fltk.exe
 fi

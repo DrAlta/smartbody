@@ -1,5 +1,6 @@
 #!/bin/bash
-SBMINPUT="-seqpath ../../../../test_suite/input/test-gesture -seq test-gesture.seq -facebone"
+#SBMINPUT="-seqpath ../../../../test_suite/input/test-gesture -seq test-gesture.seq -facebone"
+SBMINPUT="-scriptpath ../../../../test_suite/input/test-gesture -script test-gesture.py"
 OPTION_1=IMG
 THRESHOLD_1=500
 OPTION_2=IMG

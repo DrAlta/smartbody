@@ -3,73 +3,106 @@ print "|          Starting Constraint Demo          |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath("script","../../../../data/examples")
-scene.addAssetPath("script","../../../../data/examples/functions")
-scene.addAssetPath("script","../../../../data/sbm-common/scripts")
-scene.addAssetPath('seq', '../../../../data/sbm-common/scripts')
-scene.addAssetPath('seq', '../../../../data/sbm-test/scripts')
-scene.addAssetPath('mesh', '../../../../data/mesh')
-scene.addAssetPath('mesh', '../../../../data/retarget/mesh')
-scene.addAssetPath('audio', '../../../../data/Resources/audio')
+scene.setMediaPath('../../../../data')
+scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('mesh', 'mesh')
+scene.addAssetPath('mesh', 'retarget/mesh')
+scene.addAssetPath('motion', 'ChrBrad')
+scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.loadAssets()
 
 # Runs the default viewer for camera
 scene.run('default-viewer.py')
 camera = getCamera()
-camera.setEye(0, 345.99, 502.63)
-camera.setCenter(0, 246.80, 329.83)
+camera.setEye(10, 250, 328.23)
+camera.setCenter(10, 150, 155.43)
 
-# Add Character script
-scene.run('AddCharacter.py')
-# Add characters in scene
-addCharacter('utah0', 'utah', False)
-setPos('utah0', SrVec(55, 0, 0))
-addCharacter('utah1', 'utah', False)
-setPos('utah1', SrVec(145, 0, 0))
-# Characters that need reach 
-addCharacter('utah2', 'utah', True)
-setPos('utah2', SrVec(-145, 0, 0))
-addCharacter('utah3', 'utah', True)
-setPos('utah3', SrVec(-55, 0, 0))
+# Run motion retarget
+scene.run('motion-retarget.py')
+# Set up animation
+scene.run('init-param-animation.py')
 
-# Add pawns in scene
-addPawn('bradPawn', 'sphere', SrVec(0, 0, 0))
-setPawnPos('bradPawn', SrVec(101.28, 111.45, 17.64))
-addPawn('utahPawn', 'sphere', SrVec(0, 0, 0))
-setPawnPos('utahPawn', SrVec(176.66, 107.13, 36.86))
-addPawn('gazePawn1', 'sphere')
-setPawnPos('gazePawn1', SrVec(-200, 175, 150))
-addPawn('touchPawn1', 'sphere', SrVec(5, 5, 5))
-setPawnPos('touchPawn1', SrVec(-178, 155, 43))
-addPawn('touchPawn2', 'sphere', SrVec(5, 5, 5))
-setPawnPos('touchPawn2', SrVec(-88, 155, 43))
+# Set joint map for Brad
+print 'Setting up joint map for Brad'
+scene.run('zebra2-map.py')
+zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
+bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+zebra2Map.applySkeleton(bradSkeleton)
+zebra2Map.applyMotionRecurse('ChrBrad')
 
+# Set proper motion scale
+print 'Scaling motion to fit rescaled skeleton'
+scene.getMotion('ChrBrad@Idle01').scale(100)
+
+print 'Adding characters into scene'
+# Set up multiple Brads
+posX = -145;
+for i in range(4):
+	baseName = 'ChrBrad%s' % i
+	brad = scene.createCharacter(baseName, '')
+	bradSkeleton = scene.createSkeleton('ChrBrad.sk')
+	bradSkeleton.rescale(100)
+	brad.setSkeleton(bradSkeleton)
+	# Set position
+	bradPos = SrVec(posX + (i * 100), 0, 0)
+	brad.setPosition(bradPos)
+	# Set up standard controllers
+	brad.createStandardControllers()
+	# Set deformable mesh
+	brad.setDoubleAttribute('deformableMeshScale', 1)
+	brad.setStringAttribute('deformableMesh', 'ChrBrad')
+	# Play idle animation
+	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
+	# Retarget character
+	retargetCharacter(baseName, 'ChrBrad.sk')
+	
 # Set camera position
-setPawnPos('camera', SrVec(0, 50, 0))
+scene.getPawn('camera').setPosition(SrVec(0, -50, 0))
 
 # Turn on GPU deformable geometry for all
+print 'Turning on GPU deformable geometry for all'
 for name in scene.getCharacterNames():
 	scene.command("char %s viewer deformableGPU" % name)
 
-# Add reach and gaze script
-scene.run('Reach.py')
-scene.run('Gaze.py')
+# Set up multiple pawns
+print 'Adding pawns into scene'
+for i in range(5):
+	baseName = 'pawn%s' % i
+	pawn = scene.createPawn(baseName)
+	pawn.setStringAttribute('collisionShape', 'sphere')
+	collisionShapeScale = SrVec(5, 5, 5)
+	pawn.getAttribute('collisionShapeScale').setValue(collisionShapeScale)
 
-# Get utah2 and utah3 to touch the pawns
-touch('utah2', 'touchPawn1', False, False)
-touch('utah3', 'touchPawn2', False, False)
+# Set pawn position and collision scale
+print 'Set pawn position'
+scene.getPawn('pawn0').setPosition(SrVec(130, 100, 15))
+scene.getPawn('pawn0').getAttribute('collisionShapeScale').setValue(SrVec(0, 0, 0))
+scene.getPawn('pawn1').setPosition(SrVec(190, 100, 15))
+scene.getPawn('pawn1').getAttribute('collisionShapeScale').setValue(SrVec(0, 0, 0))
+scene.getPawn('pawn2').setPosition(SrVec(-100, 175, 150))
+scene.getPawn('pawn3').setPosition(SrVec(-110, 155, 43))
+scene.getPawn('pawn4').setPosition(SrVec(-10, 155, 43))
 
-# Constraint joints at target locations
-bml.execBMLAt(2, 'utah2', '<sbm:constraint effector="r_wrist" sbm:effector-root="r_sternoclavicular" sbm:handle="cutah2" target="touchPawn1" sbm:fade-in="0.5"/>')
-bml.execBMLAt(2, 'utah1', '<sbm:constraint effector="l_wrist" sbm:effector-root="l_sternoclavicular" sbm:handle="cutah" target="utahPawn" sbm:fade-in="0.5"/>')
-bml.execBMLAt(2, 'utah1', '<sbm:constraint effector="r_wrist" sbm:effector-root="r_sternoclavicular" sbm:handle="cutah" target="bradPawn" sbm:fade-in="0.5"/>')
+# 2 on the left touch pawns
+print 'ChrBrad0 and ChrBrad1 touching pawns'
+bml.execBMLAt(1, 'ChrBrad0', '<sbm:reach sbm:action="touch" target="pawn3"/>')
+bml.execBMLAt(1, 'ChrBrad1', '<sbm:reach sbm:action="touch" target="pawn4"/>')
+# Set constraint for ChrBrad0
+bml.execBMLAt(2, 'ChrBrad0', '<sbm:constraint effector="l_wrist" sbm:effector-root="l_sternoclavicular" sbm:handle="cbrad0" target="pawn3" sbm:fade-in="0.5"/>')
 
-# Make all character gaze at pawn
-bml.execBMLAt(5, '*', '<gaze target="gazePawn1"/>')
+# 2 on the right use constraint
+print 'ChrBrad3 using contraints'
+bml.execBMLAt(2, 'ChrBrad3', '<sbm:constraint effector="r_wrist" sbm:effector-root="r_sternoclavicular" sbm:handle="cbrad3" target="pawn0" sbm:fade-in="0.5"/>')
+bml.execBMLAt(2, 'ChrBrad3', '<sbm:constraint effector="l_wrist" sbm:effector-root="l_sternoclavicular" sbm:handle="cbrad3" target="pawn1" sbm:fade-in="0.5"/>')
 
-# Variables to move pawn
+# Make all characters gaze at pawn2
+bml.execBMLAt(20, '*', '<gaze target="pawn2"/>')
+
+# Move pawn around
 gazeX = -200
 dir = 1
 speed = 0.2
+pawn2 = scene.getPawn('pawn2')
 
 class ConstraintDemo(SBScript):
 	def update(self, time):
@@ -80,7 +113,8 @@ class ConstraintDemo(SBScript):
 		elif gazeX < -200:
 			dir = 1
 		gazeX = gazeX + speed * dir
-		setPawnPos('gazePawn1', SrVec(gazeX, 175, 150))
+		# Set pawn position
+		pawn2.setPosition(SrVec(gazeX, 175, 150))
 		
 # Run the update script
 scene.removeScript('constraintdemo')

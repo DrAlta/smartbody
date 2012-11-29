@@ -3,42 +3,66 @@ print "|        Starting Speech/Face Demo           |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath("script","../../../../data/examples")
-scene.addAssetPath("script","../../../../data/examples/functions")
-scene.addAssetPath('seq', '../../../../data/sbm-common/scripts')
-scene.addAssetPath('seq', '../../../../data/sbm-test/scripts')
-scene.addAssetPath('mesh', '../../../../data/mesh')
-scene.addAssetPath('mesh', '../../../../data/retarget/mesh')
-scene.addAssetPath('audio', '../../../../data/Resources/audio')
+scene.setMediaPath('../../../../data')
+scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('mesh', 'mesh')
+scene.addAssetPath('motion', 'ChrBrad')
+scene.loadAssets()
 
-# Runs the default viewer for camera
+# Set scene parameters and camera
+print 'Configuring scene parameters and camera'
+scene.setScale(1.0)
+scene.setBoolAttribute('internalAudio', True)
 scene.run('default-viewer.py')
 camera = getCamera()
-camera.setEye(0, 152.13, 164.30)
-camera.setCenter(0, 141.25, 118.67)
+camera.setEye(0.08, 1.55, 1.29)
+camera.setCenter(0.08, 1.44, 0.83)
+camera.setUpVector(SrVec(0, 1, 0))
+camera.setScale(1)
+camera.setFov(1.0472)
+camera.setFarPlane(100)
+camera.setNearPlane(0.1)
+camera.setAspectRatio(0.966897)
+scene.getPawn('camera').setPosition(SrVec(0, -5, 0))
 
-# Add Character script
-scene.run('AddCharacter.py')
-# Add characters in scene
-addCharacter('utah', 'utah')
-setPos('utah', SrVec(0, 0, 0))
-addCharacter('brad', 'brad')
-setPos('brad', SrVec(70, 102, 0))
-addCharacter('elder', 'elder')
-setPos('elder', SrVec(-70, 102, 0))
+# Set joint map for Brad
+print 'Setting up joint map for Brad'
+scene.run('zebra2-map.py')
+zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
+bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+zebra2Map.applySkeleton(bradSkeleton)
+zebra2Map.applyMotionRecurse('ChrBrad')
 
-# Set camera position
-setPawnPos('camera', SrVec(0, -50, 0))
+# Set up 3 Brads
+print 'Adding characters into scene'
+posX = -55.0
+for i in range(3):
+	baseName = 'ChrBrad%s' % i
+	brad = scene.createCharacter(baseName, '')
+	bradSkeleton = scene.createSkeleton('ChrBrad.sk')
+	brad.setSkeleton(bradSkeleton)
+	# Set position
+	bradPos = SrVec((posX + (i * 55))/100, 0, 0)
+	brad.setPosition(bradPos)
+	# Set up standard controllers
+	brad.createStandardControllers()
+	# Set deformable mesh
+	brad.setDoubleAttribute('deformableMeshScale', .01)
+	brad.setStringAttribute('deformableMesh', 'ChrBrad')
+	# Play idle animation
+	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
+	
+# Set proper facing angle
+scene.getCharacter('ChrBrad0').setHPR(SrVec(25, 0, 0))
+scene.getCharacter('ChrBrad2').setHPR(SrVec(-25, 0, 0))
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
 	scene.command("char %s viewer deformableGPU" % name)
 
-# Add Facial Movements script
-scene.run('Saccade.py')
-
-# Add Saccade script
-scene.run('Saccade.py')
-playSaccade('utah', 'talk')
-playSaccade('elder', 'listen')
-playSaccade('brad', 'think')
+# Talk
+bml.execBML('ChrBrad0', '<saccade mode="talk"/>')
+# Listen
+bml.execBML('ChrBrad1', '<saccade mode="listen"/>')
+# Think
+bml.execBML('ChrBrad2', '<saccade mode="think"/>')

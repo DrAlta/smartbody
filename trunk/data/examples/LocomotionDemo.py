@@ -1,137 +1,137 @@
+import math
 import random
 print "|--------------------------------------------|"
 print "|         Starting Locomotion Demo           |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath("script","../../../../data/examples")
-scene.addAssetPath("script","../../../../data/examples/functions")
-scene.addAssetPath("script","../../../../data/sbm-common/scripts")
-scene.addAssetPath('seq', '../../../../data/sbm-common/scripts')
-scene.addAssetPath('seq', '../../../../data/sbm-test/scripts')
-scene.addAssetPath('mesh', '../../../../data/mesh')
-scene.addAssetPath('mesh', '../../../../data/retarget/mesh')
-scene.addAssetPath('audio', '../../../../data/Resources/audio')
+scene.setMediaPath('../../../../data')
+scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('mesh', 'mesh')
+scene.addAssetPath('mesh', 'retarget/mesh')
+scene.addAssetPath('motion', 'ChrBrad')
+scene.addAssetPath('motion', 'retarget\motion')
+scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.loadAssets()
 
-# Runs the default viewer for camera
+# Set scene parameters and camera
+print 'Configuring scene parameters and camera'
+scene.setScale(1.0)
+scene.setBoolAttribute('internalAudio', True)
 scene.run('default-viewer.py')
 camera = getCamera()
-camera.setEye(0, 1549, 2447)
-camera.setCenter(0, 1437, 2282)
+camera.setEye(0, 19, 25)
+camera.setCenter(0, 18, 24)
+camera.setUpVector(SrVec(0, 1, 0))
+camera.setScale(1)
+camera.setFov(1.0472)
+camera.setFarPlane(100)
+camera.setNearPlane(0.1)
+camera.setAspectRatio(0.966897)
+scene.getPawn('camera').setPosition(SrVec(0, -5, 0))
 
-# Add Character script
-scene.run('AddCharacter.py')
-# Add characters in scene
-addMultipleCharacters('utah', 'utah', 8, False, -1000, 1000)
-addMultipleCharacters('doctor', 'doctor', 8, False, 1000, 1000)
-addMultipleCharacters('elder', 'elder', 8, False, 1000, -1000)
-addMultipleCharacters('brad', 'brad', 8, False, -1000, -1000)
+# Set joint map for Brad
+print 'Setting up joint map for Brad'
+scene.run('zebra2-map.py')
+zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
+bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+zebra2Map.applySkeleton(bradSkeleton)
+zebra2Map.applyMotionRecurse('ChrBrad')
 
-# Add pawns in scene
-addPawn('pawn0', 'sphere', SrVec(1, 1, 1))
-addPawn('pawn1', 'box', SrVec(1, 1, 1))
-setPawnPos('pawn0', SrVec(-1000, 0, -1000))
-setPawnPos('pawn1', SrVec(-200, 0, 1000))
-# Pawns work in x, y, z, Locomotion works in x, y
+# Retarget setup
+scene.run('motion-retarget.py')
+# Animation setup
+scene.run('init-param-animation.py')
+steerManager = scene.getSteerManager()
 
-# Set camera position
-setPawnPos('camera', SrVec(0, -50, 0))
+# Setting up Brads
+print 'Setting up Brads'
+amount = 20
+row = 0; column = 0;
+offsetX = 0; offsetZ = 0;
+for i in range(amount):
+	baseName = 'ChrBrad%s' % i
+	brad = scene.createCharacter(baseName, '')
+	bradSkeleton = scene.createSkeleton('ChrBrad.sk')
+	brad.setSkeleton(bradSkeleton)
+	# Set position logic
+	posX = (-100 * (5/2)) + 100 * column
+	posZ = ((-100 / math.sqrt(amount)) * (amount/2)) + 100 * row
+	column = column + 1
+	if column >= 5:
+		column = 0
+		row = row + 1
+	bradPos = SrVec((posX + offsetX)/100, 0, (posZ + offsetZ)/100)
+	brad.setPosition(bradPos)
+	# Set up standard controllers
+	brad.createStandardControllers()
+	# Set deformable mesh
+	brad.setDoubleAttribute('deformableMeshScale', .01)
+	brad.setStringAttribute('deformableMesh', 'ChrBrad')
+	# Retarget character
+	retargetCharacter(baseName, 'ChrBrad.sk', False)
+	# Set up steering
+	setupSteerAgent(baseName, 'ChrBrad.sk')
+	steerManager.setEnable(False)
+	brad.setBoolAttribute('steering.pathFollowingMode', False)
+	steerManager.setEnable(True)
+	# Play default animation
+	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
-
-# Set up list of Utahs and Doctors
-utahList = []
-doctorList = []
-elderList = []
-bradList = []
+	scene.command('char %s viewer deformableGPU' % name)
+	
+steeringGroup = []
+pathfindingGroup = []
+# Assign groups
+print 'Assigning Brads in groups'
 for name in scene.getCharacterNames():
-	if 'utah' in name:
-		utahList.append(scene.getCharacter(name))
-	if 'doctor' in name:
-		doctorList.append(scene.getCharacter(name))
-	if 'elder' in name:
-		elderList.append(scene.getCharacter(name))
-	if 'brad' in name:
-		bradList.append(scene.getCharacter(name))
+	if 'ChrBrad' in name:
+		if len(steeringGroup) < amount/2:
+			steeringGroup.append(scene.getCharacter(name))
+		else:
+			# Set pathfinding on
+			scene.getCharacter(name).setBoolAttribute('steering.pathFollowingMode', True)
+			pathfindingGroup.append(scene.getCharacter(name))
 
-# Add Locomotion script
-scene.run('Locomotion.py')
+# Adding pawns to scene
+print 'Adding pawns to scene'
+target0 = scene.createPawn('target0')
+target0.setPosition(SrVec(-10, 0, -10))
+target1 = scene.createPawn('target1')
+target1.setPosition(SrVec(-4, 0, 10))
+			
+group1Reached = True
+group2Reached = True
 
-# Whether character has reached its target
-utahReached = True
-doctorReached = True
-bradReached = True
-elderReached  = True
-
-# Paths for characters
-utahPath = [SrVec(-1000, 1000, 0), SrVec(-200, -1000, 0), scene.getPawn('pawn1'), scene.getPawn('pawn0')]
-doctorPath = [SrVec(1000, 1000, 0), SrVec(200, -1000, 0), SrVec(200, 1000, 0), SrVec(1000, -1000, 0)]
-bradPath = list(utahPath)
-bradPath.reverse()
-elderPath = list(doctorPath)
-elderPath.reverse()
-doctorCur = elderCur = 0
-pathAmt = len(doctorPath)
-
-# Enable collision
-collisionManager = getScene().getCollisionManager()
-collisionManager.setStringAttribute('collisionResolutionType', 'default')
-#collisionManager.setBoolAttribute('singleChrCapsuleMode', True)
-collisionManager.setEnable(True)
-
+# Update to repeat paths
+last = 0
+canTime = True
+delay = 30
 class LocomotionDemo(SBScript):
 	def update(self, time):
-		global utahReached, doctorReached, bradReached, elderReached, doctorCur, elderCur
-		# Once utah completes path, do again
-		if utahReached:
-			for utah in utahList:
-				followPath(utah.getName(), utahPath)
-			utahReached = False
-		# Once doctor reaches 1 waypoint, move to next
-		if doctorReached:
-			for doctor in doctorList:
-				move(doctor.getName(), doctorPath[doctorCur], random.uniform(1, 5))
-			doctorCur = doctorCur + 1
-			# If reaches max path, reset
-			if doctorCur >= pathAmt:
-				doctorCur = 0
-			doctorReached = False
-		# Once brad completes path, do again
-		if bradReached:
-			for brad in bradList:
-				followPath(brad.getName(), bradPath)
-			bradReached = False
-		# Once elder reaches 1 waypoint, move to next
-		if elderReached:
-			for elder in elderList:
-				move(elder.getName(), elderPath[elderCur], random.uniform(1, 5))
-			elderCur = elderCur + 1
-			if elderCur >= pathAmt:
-				elderCur = 0
-			elderReached = False
+		global group1Reached, group2Reached, canTime, last
+		if canTime:
+			last = time
+			canTime = False
+			group1Reached = group2Reached = True
+		diff = time - last
+		if diff >= delay:
+			diff = 0
+			canTime = True
+		# Once group 1 completes path, do again
+		if group1Reached:
+			for brad in steeringGroup:
+				bml.execBML(brad.getName(), '<locomotion manner="run" target="-10 10 -4 -10 target1 target0"/>')
+			group1Reached = False
+		# Once group 2 completes path, do again
+		if group2Reached:
+			for brad in pathfindingGroup:
+				bml.execBML(brad.getName(), '<locomotion manner="run" target="10 10 4 -10 4 10 10 -10"/>')
+			group2Reached = False
 			
 # Run the update script
 scene.removeScript('locomotiondemo')
 locomotiondemo = LocomotionDemo()
 scene.addScript('locomotiondemo', locomotiondemo)
-
-# Locomotion handler to check if characters have arrived
-class LocomotionHandler(EventHandler):
-	def executeAction(self, ev):
-		global utahReached, doctorReached, bradReached, elderReached
-		params = ev.getParameters()
-		if 'success' in params:
-			if 'utah0' in params:
-				utahReached = True
-			if 'doctor0' in params:
-				doctorReached = True
-			if 'brad0' in params:
-				bradReached = True
-			if 'elder0' in params:
-				elderReached = True
-
-locomotionHdl = LocomotionHandler()
-evtMgr = scene.getEventManager()
-evtMgr.addEventHandler('locomotion', locomotionHdl)

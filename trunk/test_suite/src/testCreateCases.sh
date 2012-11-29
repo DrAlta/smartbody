@@ -12,7 +12,7 @@ do
 	  if [ -e "$2" ]; then
 	    echo "*  $2 found!"
 	    caseName=`basename $2`
-	    folderName=`basename $2 .seq`
+	    folderName=`basename $2 .py`
 	    if [ $folderName = $caseName ]; then
 	      echo "*  Suffix not correct, skip"
 	      shift
@@ -47,12 +47,12 @@ do
       continue
     fi
     cd $folderName
-    caseName="${folderName}.seq"
+    caseName="${folderName}.py"
     cp $caseName $SBMBIN
   fi
   
   cd $SBMBIN
-  ./$SBMEXE -noninteractive -seq $caseName -facebone
+  ./$SBMEXE -noninteractive -script $caseName
 	
 	imgNum=0  
   for image in *.ppm
@@ -71,7 +71,7 @@ do
     touch $scriptName
     echo "#!/bin/sh" >> $scriptName
     winInputDir=`cygpath -m $INPUTDIR`
-    echo "SBMINPUT=\"-seqpath ../../../../test_suite/input/$folderName -seq $folderName.seq -facebone\"" >> $scriptName  
+    echo "SBMINPUT=\"-scriptpath ../../../../test_suite/input/$folderName -script $folderName.py\"" >> $scriptName  
     imgCounter=0
     while [ $imgCounter -lt $imgNum ]; do
       (( imgCounter ++ ))

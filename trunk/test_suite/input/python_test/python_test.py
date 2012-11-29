@@ -1,20 +1,30 @@
-scene.addAssetPath("seq", "../../../../data/sbm-common/scripts")
+scene.setScale(1.0)
+scene.setMediaPath('../../../../data')
+scene.addAssetPath('script','sbm-common/scripts')
+scene.addAssetPath('mesh', 'mesh')
+
+scene.run('zebra2-map.py')
+zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
+
+scene.addAssetPath('motion', 'ChrBrad')
 scene.loadAssets()
 
-character = scene.createCharacter("character1", "test")
-skeleton = scene.createSkeleton("common.sk")
-character.setSkeleton(skeleton)
+bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+zebra2Map.applySkeleton(bradSkeleton)
+zebra2Map.applyMotionRecurse('ChrBrad')
 
-numCharacters = scene.getNumCharacters()
-if (numCharacters != 1):
-	print "getNumCharacters() failed..."
+brad = scene.createCharacter('ChrBrad', 'ChrBrad')
+bradSkeleton = scene.createSkeleton('ChrBrad.sk')
+brad.setSkeleton(bradSkeleton)
+brad.createStandardControllers()
+brad.setDoubleAttribute('deformableMeshScale', .01)
+brad.setStringAttribute('deformableMesh', 'ChrBrad')
 
+if scene.getNumCharacters() != 1:
+	print 'getNumCharacters() failed...'
 
-pawn = scene.createPawn("pawn1")
-numPawns = scene.getNumPawns()
-if (numPawns != 1):
-	print "numPawns() failed..."
-
-quit()
-
-
+pawn = scene.createPawn('pawn1')
+if scene.getNumPawns() != 1:
+	print 'getNumPawns() failed...'
+	
+scene.commandAt(5, 'quit')

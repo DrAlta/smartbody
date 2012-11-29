@@ -4,65 +4,128 @@ print "|          Starting Steering Demo            |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath("script","../../../../data/examples")
-scene.addAssetPath("script","../../../../data/examples/functions")
-scene.addAssetPath("script","../../../../data/sbm-common/scripts")
-scene.addAssetPath('seq', '../../../../data/sbm-common/scripts')
-scene.addAssetPath('seq', '../../../../data/sbm-test/scripts')
-scene.addAssetPath('mesh', '../../../../data/mesh')
-scene.addAssetPath('mesh', '../../../../data/retarget/mesh')
-scene.addAssetPath('audio', '../../../../data/Resources/audio')
+scene.setMediaPath('../../../../data')
+scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('mesh', 'mesh')
+scene.addAssetPath('mesh', 'retarget/mesh')
+scene.addAssetPath('motion', 'ChrBrad')
+scene.addAssetPath('motion', 'ChrRachel')
+scene.addAssetPath('motion', 'retarget\motion')
+scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.loadAssets()
 
-# Runs the default viewer for camera
+# Set scene parameters and camera
+print 'Configuring scene parameters and camera'
+scene.setScale(1.0)
+scene.setBoolAttribute('internalAudio', True)
 scene.run('default-viewer.py')
 camera = getCamera()
-camera.setEye(0, 1549, 2447)
-camera.setCenter(0, 1437, 2282)
+camera.setEye(0, 15.49, 24.47)
+camera.setCenter(0, 14.37, 22.82)
+camera.setUpVector(SrVec(0, 1, 0))
+camera.setScale(1)
+camera.setFov(1.0472)
+camera.setFarPlane(100)
+camera.setNearPlane(0.1)
+camera.setAspectRatio(0.966897)
+scene.getPawn('camera').setPosition(SrVec(0, -5, 0))
 
-# Add Character script
-scene.run('AddCharacter.py')
-# Add characters in scene
-addMultipleCharacters('utah', 'utah', 15, False, 900, 900)
-addMultipleCharacters('brad', 'brad', 15, False, -900, -900)
+# Set joint map for Brad and Rachel
+print 'Setting up joint map for Brad and Rachel'
+scene.run('zebra2-map.py')
+zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
+bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+zebra2Map.applySkeleton(bradSkeleton)
+zebra2Map.applyMotionRecurse('ChrBrad')
+rachelSkeleton = scene.getSkeleton('ChrRachel.sk')
+zebra2Map.applySkeleton(rachelSkeleton)
+zebra2Map.applyMotionRecurse('ChrRachel')
 
-# Set camera position
-setPawnPos('camera', SrVec(0, -50, 0))
+# Retarget setup
+scene.run('motion-retarget.py')
+# Animation setup
+scene.run('init-param-animation.py')
+# Steering manager
+steerManager = scene.getSteerManager()
+
+# Setting up group of Brads
+print 'Setting up Brads'
+bradList = []
+bradPosX = -500.0
+for i in range(15):
+	baseName = 'ChrBrad%s' % i
+	brad = scene.createCharacter(baseName, '')
+	bradSkeleton = scene.createSkeleton('ChrBrad.sk')
+	brad.setSkeleton(bradSkeleton)
+	# Set position
+	bradPos = SrVec((bradPosX + (i * 50.0))/100, 0, -1)
+	brad.setPosition(bradPos)
+	# Set up standard controllers
+	brad.createStandardControllers()
+	# Set collision shape scale
+	brad.getAttribute('collisionShapeScale').setValue(SrVec(.01, .01, .01))
+	# Set defomable mesh
+	brad.setDoubleAttribute('deformableMeshScale', .01)
+	brad.setStringAttribute('deformableMesh', 'ChrBrad')
+	# Play idle animation
+	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
+	# Retarget character
+	retargetCharacter(baseName, 'ChrBrad.sk', False)
+	# Add current Brad into list
+	bradList.append(brad)
+	
+# Setting up group of Rachels
+print 'Setting up Rachels'
+rachelList = []
+rachelPosX = -500.0
+for i in range(15):
+	baseName = 'ChrRachel%s' % i
+	rachel = scene.createCharacter(baseName, '')
+	rachelSkeleton = scene.createSkeleton('ChrRachel.sk')
+	rachel.setSkeleton(rachelSkeleton)
+	# Set position
+	rachelPos = SrVec((rachelPosX + (i * 50.0))/100, 0, 1)
+	rachel.setPosition(rachelPos)
+	# Set up standard controllers
+	rachel.createStandardControllers()
+	# Set collision shape scale
+	rachel.getAttribute('collisionShapeScale').setValue(SrVec(.01, .01, .01))
+	# Set deformable mesh
+	rachel.setDoubleAttribute('deformableMeshScale', .01)
+	rachel.setStringAttribute('deformableMesh', 'ChrRachel')
+	# Play idle animation
+	bml.execBML(baseName, '<body posture="ChrRachel_ChrBrad@Idle01"/>')
+	# Retarget character
+	retargetCharacter(baseName, 'ChrRachel.sk', False)
+	# Add Rachel into list
+	rachelList.append(rachel)
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
 	scene.command("char %s viewer deformableGPU" % name)
 
-# Set up list of Utahs and Doctors
-utahList = []
-bradList = []
-for name in scene.getCharacterNames():
-	if 'utah' in name:
-		utahList.append(scene.getCharacter(name))
-	if 'brad' in name:
-		bradList.append(scene.getCharacter(name))
+# Paths for Brad and Rachel
+print 'Setting up paths for Brad and Rachel'
+bradPath = [SrVec(-9, -9, 0), SrVec(9, 9, 0)]
+rachelPath = [SrVec(9, 9, 0), SrVec(-9, -9, 0)]
+pathAmt = len(bradPath)
 
-# Add Locomotion script
-scene.run('Locomotion.py')
-
-# Paths for characters
-utahPath = [SrVec(-900, -900, 0), SrVec(900, 900, 0)]
-bradPath = [SrVec(900, 900, 0), SrVec(-900, -900, 0)]
-pathAmt = len(utahPath)
-
+'''
 # Enable collision
 collisionManager = getScene().getCollisionManager()
 collisionManager.setBoolAttribute('singleChrCapsuleMode', True)
 collisionManager.setStringAttribute('collisionResolutionType', 'default')
 collisionManager.setEnable(True)
+'''
 
 bradCur = 0
-utahCur = 0
+rachelCur = 0
 canTime = True
 last = 0
 delay = 20
 class LocomotionDemo(SBScript):
 	def update(self, time):
-		global bradCur, utahCur, canTime, last
+		global bradCur, rachelCur, canTime, last
 		diff = time - last
 		if diff >= delay:
 			diff = 0
@@ -71,16 +134,16 @@ class LocomotionDemo(SBScript):
 		if canTime:
 			last = time
 			canTime = False
-			# Move all utah
-			for utah in utahList:
-				move(utah.getName(), utahPath[utahCur], random.uniform(1, 5))
-			utahCur = utahCur + 1
-			# If reaches max path, reset
-			if utahCur >= pathAmt:
-				utahCur = 0
+			# Move all Rachel
+			for rachel in rachelList:
+				bml.execBML(rachel.getName(), '<locomotion target="' + vec2str(rachelPath[rachelCur]) + '" type="basic" speed="' + str(random.uniform(1, 5)) + '"/>')
+			rachelCur = rachelCur + 1
+			# If raches max path, reset
+			if rachelCur >= pathAmt:
+				rachelCur = 0
 			# Move all brad 
 			for brad in bradList:
-				move(brad.getName(), bradPath[bradCur], random.uniform(1, 5))
+				bml.execBML(brad.getName(), '<locomotion target="' + vec2str(bradPath[bradCur]) + '" type="basic" speed="' + str(random.uniform(1, 5)) + '"/>')
 			bradCur = bradCur + 1
 			# If reaches max path, reset
 			if bradCur >= pathAmt:
@@ -90,3 +153,13 @@ class LocomotionDemo(SBScript):
 scene.removeScript('locomotiondemo')
 locomotiondemo = LocomotionDemo()
 scene.addScript('locomotiondemo', locomotiondemo)
+
+def vec2str(vec):
+	''' Converts SrVec to string '''
+	x = vec.getData(0)
+	y = vec.getData(1)
+	z = vec.getData(2)
+	if -0.0001 < x < 0.0001: x = 0
+	if -0.0001 < y < 0.0001: y = 0
+	if -0.0001 < z < 0.0001: z = 0
+	return "" + str(x) + " " + str(y) + " " + str(z) + ""

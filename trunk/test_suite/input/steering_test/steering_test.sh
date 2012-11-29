@@ -1,5 +1,6 @@
 #!binsh
-SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/steering_test -seq steering_test.seq"
+#SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/steering_test -seq steering_test.seq"
+SBMINPUT="-noninteractive -scriptpath ../../../../test_suite/input/steering_test -script steering_test.py"
 OPTION_1=IMG
 THRESHOLD_1=500
 OPTION_2=IMG

@@ -1,5 +1,6 @@
 #!/bin/bash
-SBMINPUT="-seqpath ../../../../test_suite/input/test-event -seq test-event.seq -facebone"
+#SBMINPUT="-seqpath ../../../../test_suite/input/test-event -seq test-event.seq -facebone"
+SBMINPUT="-scriptpath ../../../../test_suite/input/test-event -script test-event.py"
 OPTION_1=IMG
 THRESHOLD_1=500
 OPTION_2=IMG

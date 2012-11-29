@@ -1,5 +1,6 @@
 #!/bin/sh
-SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/loco_test_1 -seq loco_test_1.seq -facebone"
+#SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/loco_test_1 -seq loco_test_1.seq -facebone"
+SBMINPUT="-noninteractive -scriptpath ../../../../test_suite/input/loco_test_1 -script loco_test_1.py"
 OPTION_1=IMG
 THRESHOLD_1=500
 OPTION_2=IMG

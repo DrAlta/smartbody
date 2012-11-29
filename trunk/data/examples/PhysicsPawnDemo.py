@@ -4,31 +4,29 @@ print "|        Starting Physics Pawn Demo          |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath("script", "../../../../data/examples")
-scene.addAssetPath("script", "../../../../data/examples/functions")
-scene.addAssetPath("script", "../../../../data/sbm-common/scripts")
-scene.addAssetPath('seq', '../../../../data/sbm-common/scripts')
-scene.addAssetPath('seq', '../../../../data/sbm-test/scripts')
-scene.addAssetPath('mesh', '../../../../data/mesh')
-scene.addAssetPath('mesh', '../../../../data/retarget/mesh')
-scene.addAssetPath('audio', '../../../../data/Resources/audio')
+scene.setMediaPath('../../../../data')
+scene.addAssetPath('script', 'sbm-common/scripts')
+scene.loadAssets()
 
-# Runs the default viewer for camera
+# Set scene parameters and camera
+print 'Configuring scene parameters and camera'
+scene.setBoolAttribute('internalAudio', True)
 scene.run('default-viewer.py')
 camera = getCamera()
 camera.setEye(0, 409.62, 733.74)
 camera.setCenter(0, 335.62, 548.74)
-
-# Add Character script
-scene.run('AddCharacter.py')
+scene.getPawn('camera').setPosition(SrVec(0, -20, 0))
 
 # Set up pawns in scene
+print 'Adding pawns to scene'
 numPawns = 50
 for i in range(numPawns):
 	baseName = 'phy%s' % i
 	shapeList = ['sphere', 'box', 'capsule']
 	size = random.randrange(5, 30)
-	addPawn(baseName, random.choice(shapeList), SrVec(size, size, size))
+	pawn = scene.createPawn(baseName)
+	pawn.setStringAttribute('collisionShape', random.choice(shapeList))
+	pawn.getAttribute('collisionShapeScale').setValue(SrVec(15, 15, 15))
 
 # Append all pawn to list
 pawnList = []
@@ -36,28 +34,23 @@ for name in scene.getPawnNames():
 	if 'phy' in name:
 		pawnList.append(scene.getPawn(name))
 		
-# Set camera position
-setPawnPos('camera', SrVec(0, -50, 0))
-
-# Add Physics script
-scene.run('Physics.py')
-
 # Setup pawn physics
+print 'Setting up pawn physics'
+phyManager = scene.getPhysicsManager()
+phyManager.getPhysicsEngine().setBoolAttribute('enable', True)
 for pawn in pawnList:
-	setupPawnPhysics(pawn.getName())
+	pawn.getAttribute('createPhysics').setValue()
 	# Random mass
 	mass = random.randrange(1, 11)
 	phyManager.getPhysicsPawn(pawn.getName()).setDoubleAttribute('mass', mass)
 
-# print phyManager.getPhysicsPawn(pawn.getName()).getAttribute('refLinearVelocity').getValue().getData(0)
-# phyManager.getPhysicsPawn(pawn.getName()).setVec3Attribute('refLinearVelocity', 10, 0, 0)
-	
 last = 0
 canTime = True
 delay = 5
+physicsOn = True
 class PhysicsPawnDemo(SBScript):
 	def update(self, time):
-		global canTime, last
+		global canTime, last, physicsOn
 		if canTime:
 			last = time
 			canTime = False
@@ -68,7 +61,8 @@ class PhysicsPawnDemo(SBScript):
 		# When time's up, do action
 		if canTime:
 			for pawn in pawnList:
-				togglePawnPhysics(pawn.getName())
+				pawn.setBoolAttribute('enablePhysics', physicsOn)
+			physicsOn = not physicsOn
 			randomizePos()
 
 size = 150

@@ -3,48 +3,58 @@ print "|        Starting Retargetting Demo          |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath("script","../../../../data/examples")
-scene.addAssetPath("script","../../../../data/examples/functions")
-scene.addAssetPath("script","../../../../data/sbm-common/scripts")
-scene.addAssetPath('seq', '../../../../data/sbm-common/scripts')
-scene.addAssetPath('seq', '../../../../data/sbm-test/scripts')
-scene.addAssetPath('mesh', '../../../../data/mesh')
-scene.addAssetPath('mesh', '../../../../data/retarget/mesh')
-scene.addAssetPath('audio', '../../../../data/Resources/audio')
+scene.setMediaPath('../../../../data')
+scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('mesh', 'mesh')
+scene.addAssetPath('mesh', 'retarget/mesh')
+scene.addAssetPath('motion', 'ChrBrad')
+scene.addAssetPath('motion', 'retarget\motion')
+scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.loadAssets()
 
 # Runs the default viewer for camera
 scene.run('default-viewer.py')
 camera = getCamera()
 camera.setEye(0, 188.56, 241.41)
 camera.setCenter(0, 114.56, 56.41)
+scene.getPawn('camera').setPosition(SrVec(0, -5, 0))
 
 # Add Character script
-scene.run('AddCharacter.py')
-# Add characters in scene
-addCharacter('brad1', 'brad')
-setPos('brad1', SrVec(-50, 102, 0))
+target = scene.createCharacter('target', '')
+targetSkeleton = scene.createSkeleton('common.sk')
+target.setSkeleton(targetSkeleton)
+targetPos = SrVec(-50, 102, 0)
+target.setPosition(targetPos)
+target.createStandardControllers()
+target.setDoubleAttribute('deformableMeshScale', 1)
+target.setStringAttribute('deformableMesh', 'brad')
+bml.execBML('target', '<body posture="HandsAtSide_Motex"/>')
 
-# .dae
-addCharacter('brad2', 'brad')
-setPos('brad2', SrVec(50, 102, 0))
-
-addNewBrad('ChrBrad')
-
-# Set camera position
-setPawnPos('camera', SrVec(0, -50, 0))
+source = scene.createCharacter('source', '')
+sourceSkeleton = scene.createSkeleton('ChrBrad.sk')
+sourceSkeleton.rescale(100)
+source.setSkeleton(sourceSkeleton)
+sourcePos = SrVec(50, 0, 0)
+source.setPosition(sourcePos)
+source.createStandardControllers()
+# Deformable mesh
+source.setDoubleAttribute('deformableMeshScale', 1)
+source.setStringAttribute('deformableMesh', 'ChrBrad')
+bml.execBML('source', '<body posture="ChrBrad@Idle01"/>')
 
 # Turn on GPU deformable geometry
-scene.command("char brad1 viewer deformableGPU")
-scene.command("char brad2 viewer deformableGPU")
+scene.command("char target viewer deformableGPU")
+scene.command("char source viewer deformableGPU")
 
-# Add Retargetting script
-scene.run('Retargetting.py')
-'''Find solution to get retargetted animation name'''
+# Run motion retarget script
+scene.run('motion-retarget.py')
 
-output = ''
-if output == '':
-	autoRetarget('ChrBrad@Guitar01', 'ChrBrad.sk', 'common.sk', '../../../../data/sbm-common/common-sk/retargetMotion/')
-	output = 'common.skChrBrad@Guitar01'
+# Retarget motion
+print 'About to run retargetting'
+motion = scene.getMotion('ChrBrad@Guitar01')
+motion.scale(100)
+retargetMotionWithGuessMap('ChrBrad@Guitar01', 'ChrBrad.sk', 'common.sk', '../../../../data/sbm-common/common-sk/retargetMotion/')
+output = 'common.skChrBrad@Guitar01'
 	
 last = 0
 canTime = True
@@ -59,9 +69,9 @@ class RetargettingDemo(SBScript):
 		if canTime:
 			last = time
 			canTime = False
-			# Play non retargetted and retargetted
-			bml.execBML('brad1', '<animation name="ChrBrad@Guitar01"/>')
-			bml.execBML('brad2', '<animation name="common.skChrBrad@Guitar01"/>')
+			# Play non retargetted and retargetted add delay
+			bml.execBML('target', '<animation name="common.skChrBrad@Guitar01"/>')
+			bml.execBML('source', '<animation name="ChrBrad@Guitar01"/>')
 			
 scene.removeScript('retargettingdemo')
 retargettingdemo = RetargettingDemo()
