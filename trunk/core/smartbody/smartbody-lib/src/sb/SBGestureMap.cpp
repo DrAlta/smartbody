@@ -59,6 +59,11 @@ void SBGestureMap::addGestureMapping(const std::string& name, const std::string&
 	gInfo._posture = posture;
 
 	_gestureMaps.push_back(gInfo);
+
+	SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(name);
+	if (!motion)
+		return;
+	motion->setMotionType(SBMotion::Gesture);
 }
 
 bool SBGestureMap::gestureInfoCompare(	const std::string& glexeme, const std::string& gtype, const std::string& ghand, const std::string& gstyle, const std::string& gposture,
@@ -78,12 +83,8 @@ bool SBGestureMap::gestureInfoCompare(	const std::string& glexeme, const std::st
 	return true;
 }
 
-/* 
- *	policy can be "random" | "first"
- *  user can only input type and get the result
- *	posture always has to match
- */
-std::string SBGestureMap::getGestureByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture, const std::string& policy)
+
+std::vector<std::string> SBGestureMap::getGestureListByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture)
 {
 	std::vector<std::string> compTypes;
 	if (lexeme != "")
@@ -116,7 +117,18 @@ std::string SBGestureMap::getGestureByInfo(const std::string& lexeme, const std:
 		if (hasMatching)
 			retAnimations.push_back(iter->_animation);
 	}
-	
+
+	return retAnimations;
+}
+
+/* 
+ *	policy can be "random" | "first"
+ *  user can only input type and get the result
+ *	posture always has to match
+ */
+std::string SBGestureMap::getGestureByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture, const std::string& policy)
+{
+	std::vector<std::string>& retAnimations = getGestureListByInfo(lexeme, type, hand, style, posture);
 	if (retAnimations.size() == 0)
 	{
 		LOG("Gesture %s cannot find gesture with type %s, posture %s, hand %s.", getName().c_str(), type.c_str(), posture.c_str(), hand.c_str());

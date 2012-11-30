@@ -29,10 +29,16 @@ public:
 class SBMotion : public SkMotion
 {
 	public:
+		enum MotionType
+		{
+			Unknown, Posture, Gesture, Locomotion, Reach
+		};
+
 		SBMotion();
 		SBMotion(const SBMotion& motion);
 		SBMotion(std::string motionFile);
-		~SBMotion();		
+		~SBMotion();
+		void setMotionType(MotionType type);
 		const std::string& getMotionFileName();
 		int getNumFrames();
 		std::vector<float> getFrameData(int i);
@@ -122,6 +128,7 @@ class SBMotion : public SkMotion
 		std::string _emptyString;
 		int alignIndex;
 		std::map<std::string, std::string> tagAttrMap; // store the tagged attributes in a map
+		MotionType _motionType;
 };
 
 };

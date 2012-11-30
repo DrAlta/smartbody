@@ -30,6 +30,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 	const XMLCh* typeAttr = elem->getAttribute(BMLDefs::ATTR_TYPE);
 	const XMLCh* modeAttr = elem->getAttribute(BMLDefs::ATTR_MODE);
 	const XMLCh* styleAttr = elem->getAttribute(BMLDefs::ATTR_STYLE);
+	const XMLCh* priorityAttr = elem->getAttribute(BMLDefs::ATTR_PRIORITY_JOINT);
 	std::string animationName;
 	std::string localId;
 	std::string lexeme;
@@ -45,6 +46,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 
 	SBCharacter* character = dynamic_cast<SBCharacter*>(request->actor);
 	const std::string& gestureMapName = character->getStringAttribute("gestureMap");
+	std::vector<std::string> animationList;
 	if (animationName == "")	// If you have assigned the animation name, do not look for the map
 	{
 		SmartBody::SBGestureMap* gestureMap = mcu->_scene->getGestureMapManager()->getGestureMap(gestureMapName);
@@ -65,11 +67,11 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 				if (motionCt)
 				{
 					posture = motionCt->motion()->getName();
-					break;
 				}
 			}
 		}
 		animationName = gestureMap->getGestureByInfo(lexeme, type, mode, style, posture, request->actor->getStringAttribute("gesturePolicy"));
+		animationList = gestureMap->getGestureListByInfo(lexeme, type, mode, style, posture);
 		if (animationName == "")
 		{
 			LOG("Could not find animation for: %s %s %s %s %s", lexeme.c_str(), type.c_str(), mode.c_str(), style.c_str(), posture.c_str());
@@ -160,7 +162,8 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 			motionCt->init( const_cast<SbmCharacter*>(request->actor), mForCt, 0.0, 1.0);
 		}
 
-		BehaviorRequestPtr behavPtr(new GestureRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs, joints, scale, freq) );
+		int priority = xml_utils::xml_parse_int(BMLDefs::ATTR_PRIORITY, elem, 0);
+		BehaviorRequestPtr behavPtr(new GestureRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs, animationList, joints, scale, freq, priority) );
 		return behavPtr; 
 	} 
 	else 

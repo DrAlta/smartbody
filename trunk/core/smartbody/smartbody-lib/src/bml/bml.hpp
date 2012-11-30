@@ -151,7 +151,7 @@ namespace BML {
 		void cleanup( Processor* bp, mcuCBHandle* mcu );
 
 		// this function handles all the special process in between behaviors' schedule and realize
-		void specialHandle();
+		void gestureRequestProcess();
 
 	public:
 		virtual ~BmlRequest();
@@ -353,9 +353,14 @@ namespace BML {
 	class GestureRequest : public MeControllerRequest {
 	public:
 		GestureRequest( const std::string& unique_id, const std::string& localId, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
-			const BehaviorSyncPoints& behav_syncs, const std::string& js = "", float s = 0.03f, float freq = 0.02f);
+			const BehaviorSyncPoints& behav_syncs, std::vector<std::string>& gl, const std::string& js = "", float s = 0.03f, float freq = 0.02f, int priority = 0);
 
 		virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
+
+	public:
+		bool filtered;
+		int priority;
+		std::vector<std::string> gestureList;
 
 	private:
 		std::string joints;
