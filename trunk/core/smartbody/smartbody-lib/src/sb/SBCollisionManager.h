@@ -1,6 +1,7 @@
 #ifndef _SBCOLLISIONMANAGER_H_
 #define _SBCOLLISIONMANAGER_H_
 
+#include <sb/SBTypes.h>
 #include <sb/SBService.h>
 #include <sb/SBSubject.h>
 #include <sbm/Physics/SbmColObject.h>
@@ -11,26 +12,26 @@ namespace SmartBody {
 class SBCollisionManager : public SBService
 {
 	public:
-		SBCollisionManager();
-		~SBCollisionManager();
+		SBAPI SBCollisionManager();
+		SBAPI ~SBCollisionManager();
 
-		virtual void setEnable(bool enable);
-		virtual void start();
-		virtual bool getJointCollisionMode() { return _singleChrCapsuleMode; }
-		virtual void beforeUpdate(double time);
-		virtual void update(double time);
-		virtual void afterUpdate(double time);
-		virtual void stop();
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual void setEnable(bool enable);
+		SBAPI virtual void start();
+		SBAPI virtual bool getJointCollisionMode() { return _singleChrCapsuleMode; }
+		SBAPI virtual void beforeUpdate(double time);
+		SBAPI virtual void update(double time);
+		SBAPI virtual void afterUpdate(double time);
+		SBAPI virtual void stop();
+		SBAPI virtual void notify(SBSubject* subject);
 
-		virtual void onCharacterDelete(SBCharacter* character);
-		virtual void onPawnDelete(SBPawn* character);
+		SBAPI virtual void onCharacterDelete(SBCharacter* character);
+		SBAPI virtual void onPawnDelete(SBPawn* character);
 
-		SbmGeomObject* createCollisionObject(const std::string& geomName, const std::string& geomType, SrVec size, SrVec from = SrVec(), SrVec to = SrVec());	
-		SbmGeomObject* getCollisionObject(const std::string& geomName);
-		bool           removeCollisionObject(const std::string& geomName);
-		bool           addObjectToCollisionSpace(const std::string& geomName);
-		bool           removeObjectFromCollisionSpace(const std::string& geomName);
+		SBAPI SbmGeomObject* createCollisionObject(const std::string& geomName, const std::string& geomType, SrVec size, SrVec from = SrVec(), SrVec to = SrVec());	
+		SBAPI SbmGeomObject* getCollisionObject(const std::string& geomName);
+		SBAPI bool           removeCollisionObject(const std::string& geomName);
+		SBAPI bool           addObjectToCollisionSpace(const std::string& geomName);
+		SBAPI bool           removeObjectFromCollisionSpace(const std::string& geomName);
 
 	protected:
 		SbmCollisionSpace* collisionSpace;

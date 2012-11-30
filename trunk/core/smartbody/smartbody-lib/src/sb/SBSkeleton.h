@@ -1,6 +1,7 @@
 #ifndef _SBSKELETON_H_
 #define _SBSKELETON_H_
 
+#include <sb/SBTypes.h>
 #include <sk/sk_skeleton.h>
 #include <string>
 
@@ -14,43 +15,43 @@ class SBPawn;
 class SBSkeleton : public SkSkeleton
 {
 public:
-	SBSkeleton();
-	SBSkeleton(std::string skelFile);
-	SBSkeleton(SBSkeleton* copySkel);
+	SBAPI SBSkeleton();
+	SBAPI SBSkeleton(std::string skelFile);
+	SBAPI SBSkeleton(SBSkeleton* copySkel);
 
-	virtual bool load(std::string skeletonFile);
-	virtual bool save(std::string skeletonFile);
-	std::string saveToString();
-	void loadFromString(const std::string& info);
+	SBAPI virtual bool load(std::string skeletonFile);
+	SBAPI virtual bool save(std::string skeletonFile);
+	SBAPI std::string saveToString();
+	SBAPI void loadFromString(const std::string& info);
 
-	void setFileName(const std::string& fname);
-	const std::string& getFileName();
-	int getNumJoints();
-	SBJoint* getJoint(int index);		
-	SBJoint* getJointByName(const std::string& jointName);
-	std::vector<std::string> getJointNames();
-	std::vector<std::string> getUpperBodyJointNames();
+	SBAPI void setFileName(const std::string& fname);
+	SBAPI const std::string& getFileName();
+	SBAPI int getNumJoints();
+	SBAPI SBJoint* getJoint(int index);		
+	SBAPI SBJoint* getJointByName(const std::string& jointName);
+	SBAPI std::vector<std::string> getJointNames();
+	SBAPI std::vector<std::string> getUpperBodyJointNames();
 
-	int getNumChannels();
-	std::string getChannelType(int index);
-	int getChannelSize(int index);
+	SBAPI int getNumChannels();
+	SBAPI std::string getChannelType(int index);
+	SBAPI int getChannelSize(int index);
 
-	SBPawn* getPawn();
+	SBAPI SBPawn* getPawn();
 
-	void rescale(float scaleRatio);
-	float getScale();
-	void update();
+	SBAPI void rescale(float scaleRatio);
+	SBAPI float getScale();
+	SBAPI void update();
 
-	void notify(SBSubject* subject);
+	SBAPI void notify(SBSubject* subject);
 
 	/* the following are designed to re-orient joints local axes. added by David Huang Jun 2012 */
 	// Orient skeleton joints local axes to match world coordinate axes (Y-up Z-front)
-	void orientJointsLocalAxesToWorld(void);
+	SBAPI void orientJointsLocalAxesToWorld(void);
 	/* Create a new standard T-pose skel from source (TposeSk) with no pre-rotations
 	// put TposeSk (source skel) into T-pose before running this! */
-	void _createSkelWithoutPreRot(SBSkeleton* TposeSk, SBSkeleton* newSk, const char* new_name=0);
+	SBAPI void _createSkelWithoutPreRot(SBSkeleton* TposeSk, SBSkeleton* newSk, const char* new_name=0);
 	// same as above but for Python interface
-	SBSkeleton* createSkelWithoutPreRot(const char* new_name);
+	SBAPI SBSkeleton* createSkelWithoutPreRot(const char* new_name);
 
 	protected:
 		SrQuat _origRootPrerot;

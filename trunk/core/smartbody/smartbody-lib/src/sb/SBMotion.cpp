@@ -29,7 +29,7 @@ FootStepRecord& FootStepRecord::operator=( const FootStepRecord& rt )
 	return *this;
 }
 
-void FootStepRecord::updateJointAveargePosition( SBSkeleton* skel, SBMotion* motion )
+void FootStepRecord::updateJointAveragePosition( SBSkeleton* skel, SBMotion* motion )
 {
 	int steps = 0;
 	posVec.resize(jointNames.size());
@@ -817,7 +817,7 @@ SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkele
 	for (unsigned int i=0;i<footStepRecords.size();i++)
 	{
 		FootStepRecord& rec = footStepRecords[i];
-		rec.updateJointAveargePosition(skel, this);
+		rec.updateJointAveragePosition(skel, this);
 		ConstraintMap& cons = constrainMapList[i];		
 		// setup constraint
 		for (unsigned int k=0;k<rec.jointNames.size();k++)

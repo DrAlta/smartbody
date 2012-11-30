@@ -1,6 +1,7 @@
 #ifndef _SBATTRIBUTE_H
 #define _SBATTRIBUTE_H
 
+#include <sb/SBTypes.h>
 #include <sb/SBSubject.h>
 #include <string>
 #include <vector>
@@ -16,19 +17,19 @@ class SBAttributeInfo;
 class SBAttribute : public SBSubject
 {
 	public:
-		SBAttribute(const std::string& name);	
-		SBAttribute();
-		virtual ~SBAttribute();
-		void setName(const std::string& name);
-		const std::string& getName();
-		virtual std::string write();
-		virtual void read();
-		SBAttributeInfo* getAttributeInfo();
+		SBAPI SBAttribute(const std::string& name);	
+		SBAPI SBAttribute();
+		SBAPI virtual ~SBAttribute();
+		SBAPI void setName(const std::string& name);
+		SBAPI const std::string& getName();
+		SBAPI virtual std::string write();
+		SBAPI virtual void read();
+		SBAPI SBAttributeInfo* getAttributeInfo();
 
-		void setObject(SBObject* object);
-		SBObject* getObject();
+		SBAPI void setObject(SBObject* object);
+		SBAPI SBObject* getObject();
 
-		virtual SBAttribute* copy();
+		SBAPI virtual SBAttribute* copy();
 
 
 	protected:
@@ -40,12 +41,12 @@ class SBAttribute : public SBSubject
 class SBAttributeGroup 
 {
 	public:
-		SBAttributeGroup(const std::string& name);
-		~SBAttributeGroup();
+		SBAPI SBAttributeGroup(const std::string& name);
+		SBAPI ~SBAttributeGroup();
 
-		const std::string& getName();
-		void setPriority(int val);
-		int getPriority();
+		SBAPI const std::string& getName();
+		SBAPI void setPriority(int val);
+		SBAPI int getPriority();
 
 	protected:
 		std::string m_name;
@@ -56,28 +57,28 @@ class SBAttributeGroup
 class SBAttributeInfo
 {
 	public:
-		SBAttributeInfo();
-		~SBAttributeInfo();
+		SBAPI SBAttributeInfo();
+		SBAPI ~SBAttributeInfo();
 
-		void setPriority(int val);
-		int getPriority();
+		SBAPI void setPriority(int val);
+		SBAPI int getPriority();
 
-		void setReadOnly(bool val);
-		bool getReadOnly();
-		void setLocked(bool val);
-		bool getLocked();
-		void setHidden(bool val);
-		bool getHidden();
-		void setGroup(SBAttributeGroup* group);
-		SBAttributeGroup* getGroup();
-		void setGroup(const std::string& groupName);
-		void setDescription(const std::string& description);
-		std::string getDescription();
+		SBAPI void setReadOnly(bool val);
+		SBAPI bool getReadOnly();
+		SBAPI void setLocked(bool val);
+		SBAPI bool getLocked();
+		SBAPI void setHidden(bool val);
+		SBAPI bool getHidden();
+		SBAPI void setGroup(SBAttributeGroup* group);
+		SBAPI SBAttributeGroup* getGroup();
+		SBAPI void setGroup(const std::string& groupName);
+		SBAPI void setDescription(const std::string& description);
+		SBAPI std::string getDescription();
 
-		std::string write();
+		SBAPI std::string write();
 
-		void setAttribute(SBAttribute* attr);
-		SBAttribute* getAttribute();
+		SBAPI void setAttribute(SBAttribute* attr);
+		SBAPI SBAttribute* getAttribute();
 
 	protected:
 		bool m_readOnly;
@@ -92,19 +93,19 @@ class SBAttributeInfo
 class BoolAttribute : public SBAttribute
 {
 	public:
-		BoolAttribute();
-		BoolAttribute(const std::string& name, bool val = true);
-		~BoolAttribute();
+		SBAPI BoolAttribute();
+		SBAPI BoolAttribute(const std::string& name, bool val = true);
+		SBAPI ~BoolAttribute();
 
-		const bool& getValue();
-		void setValue(const bool& val);
-		void setDefaultValue(const bool& defaultVal);
-		const bool& getDefaultValue();
-		void setValueFast(const bool& val);
+		SBAPI const bool& getValue();
+		SBAPI void setValue(const bool& val);
+		SBAPI void setDefaultValue(const bool& defaultVal);
+		SBAPI const bool& getDefaultValue();
+		SBAPI void setValueFast(const bool& val);
 
-		virtual std::string write();
-		virtual void read();
-		virtual SBAttribute* copy();
+		SBAPI virtual std::string write();
+		SBAPI virtual void read();
+		SBAPI virtual SBAttribute* copy();
 
 	private:
 		bool m_value;
@@ -114,23 +115,23 @@ class BoolAttribute : public SBAttribute
 class IntAttribute : public SBAttribute
 {
 	public:
-		IntAttribute();
-		IntAttribute(const std::string& name, int val = 0, int minn = -std::numeric_limits<int>::max(), int maxx = std::numeric_limits<int>::max());
-		~IntAttribute();
+		SBAPI IntAttribute();
+		SBAPI IntAttribute(const std::string& name, int val = 0, int minn = -std::numeric_limits<int>::max(), int maxx = std::numeric_limits<int>::max());
+		SBAPI ~IntAttribute();
 
-		const int& getValue();
-		void setValue(const int& val);
-		void setDefaultValue(const int& defaultVal);
-		const int& getDefaultValue();
-		void setValueFast(const int& val);
-		int getMin();
-		int getMax();
-		void setMin(int val);
-		void setMax(int val);
+		SBAPI const int& getValue();
+		SBAPI void setValue(const int& val);
+		SBAPI void setDefaultValue(const int& defaultVal);
+		SBAPI const int& getDefaultValue();
+		SBAPI void setValueFast(const int& val);
+		SBAPI int getMin();
+		SBAPI int getMax();
+		SBAPI void setMin(int val);
+		SBAPI void setMax(int val);
 		
-		virtual std::string write();
-		virtual void read();
-		virtual SBAttribute* copy();
+		SBAPI virtual std::string write();
+		SBAPI virtual void read();
+		SBAPI virtual SBAttribute* copy();
 
 	private:
 		int m_value;
@@ -142,23 +143,23 @@ class IntAttribute : public SBAttribute
 class DoubleAttribute : public SBAttribute
 {
 	public:
-		DoubleAttribute();
-		DoubleAttribute(const std::string& name, double val = 0, double min = -std::numeric_limits<double>::max(), double max = std::numeric_limits<double>::max());
-		~DoubleAttribute();
+		SBAPI DoubleAttribute();
+		SBAPI DoubleAttribute(const std::string& name, double val = 0, double min = -std::numeric_limits<double>::max(), double max = std::numeric_limits<double>::max());
+		SBAPI ~DoubleAttribute();
 
-		const double& getValue();
-		void setValue(const double& val);
-		void setDefaultValue(const double& defaultVal);
-		const double& getDefaultValue();
-		void setValueFast(const double& val);
-		double getMin();
-		double getMax();
-		void setMin(double val);
-		void setMax(double val);
+		SBAPI const double& getValue();
+		SBAPI void setValue(const double& val);
+		SBAPI void setDefaultValue(const double& defaultVal);
+		SBAPI const double& getDefaultValue();
+		SBAPI void setValueFast(const double& val);
+		SBAPI double getMin();
+		SBAPI double getMax();
+		SBAPI void setMin(double val);
+		SBAPI void setMax(double val);
 
-		virtual std::string write();
-		virtual void read();
-		virtual SBAttribute* copy();
+		SBAPI virtual std::string write();
+		SBAPI virtual void read();
+		SBAPI virtual SBAttribute* copy();
 
 	private:
 		double m_value;
@@ -170,21 +171,21 @@ class DoubleAttribute : public SBAttribute
 class StringAttribute : public SBAttribute
 {
 	public:
-		StringAttribute();
-		StringAttribute(const std::string& name, std::string value = "");
-		~StringAttribute();
+		SBAPI StringAttribute();
+		SBAPI StringAttribute(const std::string& name, std::string value = "");
+		SBAPI ~StringAttribute();
 
-		const std::string& getValue();
-		void setValue(const std::string& val);
-		void setDefaultValue(const std::string& defaultVal);
-		const std::string& getDefaultValue();
-		void setValidValues(const std::vector<std::string>& values);
-		const std::vector<std::string>& getValidValues();
-		void setValueFast(const std::string& val);
+		SBAPI const std::string& getValue();
+		SBAPI void setValue(const std::string& val);
+		SBAPI void setDefaultValue(const std::string& defaultVal);
+		SBAPI const std::string& getDefaultValue();
+		SBAPI void setValidValues(const std::vector<std::string>& values);
+		SBAPI const std::vector<std::string>& getValidValues();
+		SBAPI void setValueFast(const std::string& val);
 
-		virtual std::string write();
-		virtual void read();
-		virtual SBAttribute* copy();
+		SBAPI virtual std::string write();
+		SBAPI virtual void read();
+		SBAPI virtual SBAttribute* copy();
 
 	private:
 		std::string m_value;
@@ -195,19 +196,19 @@ class StringAttribute : public SBAttribute
 class Vec3Attribute : public SBAttribute
 {
 	public:
-		Vec3Attribute();
-		Vec3Attribute(const std::string& name);
-		~Vec3Attribute();
+		SBAPI Vec3Attribute();
+		SBAPI Vec3Attribute(const std::string& name);
+		SBAPI ~Vec3Attribute();
 
-		const SrVec& getValue();
-		void setValue(const SrVec& val);
-		void setDefaultValue(const SrVec& defaultVal);
-		const SrVec& getDefaultValue();
-		void setValueFast(const SrVec& val);
+		SBAPI const SrVec& getValue();
+		SBAPI void setValue(const SrVec& val);
+		SBAPI void setDefaultValue(const SrVec& defaultVal);
+		SBAPI const SrVec& getDefaultValue();
+		SBAPI void setValueFast(const SrVec& val);
 
-		virtual std::string write();
-		virtual void read();
-		virtual SBAttribute* copy();
+		SBAPI virtual std::string write();
+		SBAPI virtual void read();
+		SBAPI virtual SBAttribute* copy();
 
 	private:
 		SrVec m_value;
@@ -217,19 +218,19 @@ class Vec3Attribute : public SBAttribute
 class MatrixAttribute : public SBAttribute
 {
 	public:
-		MatrixAttribute();
-		MatrixAttribute(const std::string& name);
-		~MatrixAttribute();
+		SBAPI MatrixAttribute();
+		SBAPI MatrixAttribute(const std::string& name);
+		SBAPI ~MatrixAttribute();
 
-		const SrMat& getValue();
-		void setValue(const SrMat& matrix);
-		void setDefaultValue(const SrMat& matrix);
-		const SrMat& getDefaultValue();
-		void setValueFast(const SrMat& val);
+		SBAPI const SrMat& getValue();
+		SBAPI void setValue(const SrMat& matrix);
+		SBAPI void setDefaultValue(const SrMat& matrix);
+		SBAPI const SrMat& getDefaultValue();
+		SBAPI void setValueFast(const SrMat& val);
 
-		virtual std::string write();
-		virtual void read();
-		virtual SBAttribute* copy();
+		SBAPI virtual std::string write();
+		SBAPI virtual void read();
+		SBAPI virtual SBAttribute* copy();
 
 	private:
 		SrMat m_value;
@@ -239,15 +240,15 @@ class MatrixAttribute : public SBAttribute
 class ActionAttribute : public SBAttribute
 {
 	public:
-		ActionAttribute();
-		ActionAttribute(const std::string& name);
-		~ActionAttribute();
+		SBAPI ActionAttribute();
+		SBAPI ActionAttribute(const std::string& name);
+		SBAPI ~ActionAttribute();
 
-		void setValue();
+		SBAPI void setValue();
 
-		virtual std::string write();
-		virtual void read();
-		virtual SBAttribute* copy();		
+		SBAPI virtual std::string write();
+		SBAPI virtual void read();
+		SBAPI virtual SBAttribute* copy();		
 };
 
 };

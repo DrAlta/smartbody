@@ -1,6 +1,7 @@
 #ifndef _SBPARSER_H_
 #define _SBPARSER_H_
 
+#include <sb/SBTypes.h>
 #include <vhcl.h>
 #include <external/parser/Params.h>
 
@@ -13,13 +14,13 @@ class SBParseNode;
 class SBParser
 {
 	public:
-		SBParser();
-		~SBParser();
+		SBAPI SBParser();
+		SBAPI ~SBParser();
 
-		void initialize(const std::string& arg1, const std::string& arg2);
-		SmartBody::SBParseNode* parse(const std::string& input);
-		void cleanUp(SmartBody::SBParseNode* node);
-		bool isInitialized();
+		SBAPI void initialize(const std::string& arg1, const std::string& arg2);
+		SBAPI SmartBody::SBParseNode* parse(const std::string& input);
+		SBAPI void cleanUp(SmartBody::SBParseNode* node);
+		SBAPI bool isInitialized();
 
 	protected:
 		void createParseTree(InputTree* inputTree, SBParseNode* node);

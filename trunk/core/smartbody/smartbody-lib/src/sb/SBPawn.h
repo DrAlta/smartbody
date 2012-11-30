@@ -1,6 +1,7 @@
 #ifndef _SBPAWN_H_
 #define _SBPAWN_H_
 
+#include <sb/SBTypes.h>
 #include <sbm/sbm_pawn.hpp>
 
 namespace SmartBody {
@@ -10,26 +11,26 @@ class SBSkeleton;
 class SBPawn : public SbmPawn
 {
 	public:
-		SBPawn();
-		SBPawn( const char* name );
-		~SBPawn();
+		SBAPI SBPawn();
+		SBAPI SBPawn( const char* name );
+		SBAPI ~SBPawn();
 
-		virtual void addMesh(std::string mesh);
+		SBAPI virtual void addMesh(std::string mesh);
 		
-		virtual SBSkeleton* getSkeleton();
-		virtual void setSkeleton(SBSkeleton* skel);
+		SBAPI virtual SBSkeleton* getSkeleton();
+		SBAPI virtual void setSkeleton(SBSkeleton* skel);
 
-		SrVec getPosition();
-		SrQuat getOrientation();
-		void setPosition(SrVec pos);
-		void setPositionSmooth(SrVec pos, float smoothTime);
-		void setOrientation(SrQuat quat);
-		void setHPR(SrVec hpr);
-		void setHPRSmooth(SrVec hpr, float smoothTime);
-		SrVec getHPR();
+		SBAPI SrVec getPosition();
+		SBAPI SrQuat getOrientation();
+		SBAPI void setPosition(SrVec pos);
+		SBAPI void setPositionSmooth(SrVec pos, float smoothTime);
+		SBAPI void setOrientation(SrQuat quat);
+		SBAPI void setHPR(SrVec hpr);
+		SBAPI void setHPRSmooth(SrVec hpr, float smoothTime);
+		SBAPI SrVec getHPR();
 
-		virtual void afterUpdate(double time);
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual void afterUpdate(double time);
+		SBAPI virtual void notify(SBSubject* subject);
 
 	private:
 		SmartBody::DoubleAttribute* _posX;

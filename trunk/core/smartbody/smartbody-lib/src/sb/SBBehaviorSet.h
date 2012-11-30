@@ -1,6 +1,7 @@
 #ifndef _SBBEHAVIORSET_
 #define _SBBEHAVIORSET_
 
+#include <sb/SBTypes.h>
 #include <string>
 
 namespace SmartBody {
@@ -8,13 +9,13 @@ namespace SmartBody {
 class SBBehaviorSet
 {
 	public:
-		SBBehaviorSet();
-		~SBBehaviorSet();
+		SBAPI SBBehaviorSet();
+		SBAPI ~SBBehaviorSet();
 
-		void setName(const std::string& name);
-		const std::string& getName();
-		void setScript(const std::string& name);
-		const std::string& getScript();
+		SBAPI void setName(const std::string& name);
+		SBAPI const std::string& getName();
+		SBAPI void setScript(const std::string& name);
+		SBAPI const std::string& getScript();
 	
 	protected:
 		std::string _name;

@@ -1,6 +1,7 @@
 #ifndef _SBSTATEMANAGER_H
 #define _SBSTATEMANAGER_H
 
+#include <sb/SBTypes.h>
 #include <string>
 #include <vector>
 #include <sr/sr_vec.h>
@@ -26,33 +27,33 @@ typedef boost::labeled_graph<boost::adjacency_list<boost::listS,boost::listS, bo
 class SBAnimationBlendManager
 {
 	public:
-		SBAnimationBlendManager();
-		~SBAnimationBlendManager();
+		SBAPI SBAnimationBlendManager();
+		SBAPI ~SBAnimationBlendManager();
 
-		SBAnimationBlend0D* createBlend0D(const std::string& name);
-		SBAnimationBlend1D* createBlend1D(const std::string& name);
-		SBAnimationBlend2D* createBlend2D(const std::string& name);
-		SBAnimationBlend3D* createBlend3D(const std::string& name);
-		SBMotionBlendBase*  createMotionBlendBase(const std::string& name, const std::string& skelName, int dimension);
-		SBAnimationTransition* createTransition(const std::string& source, const std::string& dest);
+		SBAPI SBAnimationBlend0D* createBlend0D(const std::string& name);
+		SBAPI SBAnimationBlend1D* createBlend1D(const std::string& name);
+		SBAPI SBAnimationBlend2D* createBlend2D(const std::string& name);
+		SBAPI SBAnimationBlend3D* createBlend3D(const std::string& name);
+		SBAPI SBMotionBlendBase*  createMotionBlendBase(const std::string& name, const std::string& skelName, int dimension);
+		SBAPI SBAnimationTransition* createTransition(const std::string& source, const std::string& dest);
 
-		SBAnimationBlend* getBlend(const std::string&name);
-		int getNumBlends();
-		std::vector<std::string> getBlendNames();
+		SBAPI SBAnimationBlend* getBlend(const std::string&name);
+		SBAPI int getNumBlends();
+		SBAPI std::vector<std::string> getBlendNames();
 
-		SBAnimationTransition* getTransition(const std::string& source, const std::string& dest);
-		SBAnimationTransition* getTransitionByIndex(int id);
-		int getNumTransitions();
-		std::vector<std::string> getTransitionNames();
-		std::vector<std::string> getTransitionBlends(const std::string& source);
+		SBAPI SBAnimationTransition* getTransition(const std::string& source, const std::string& dest);
+		SBAPI SBAnimationTransition* getTransitionByIndex(int id);
+		SBAPI int getNumTransitions();
+		SBAPI std::vector<std::string> getTransitionNames();
+		SBAPI std::vector<std::string> getTransitionBlends(const std::string& source);
 
-		std::string getCurrentBlend(const std::string& characterName);
-		SrVec getCurrentBlendParameters(const std::string& characterName);
-		std::vector<std::string> getAutoBlendTransitions(const std::string& characterName, const std::string& targetBlend);
-		bool isBlendScheduled(const std::string& characterName, const std::string& blendName);
+		SBAPI std::string getCurrentBlend(const std::string& characterName);
+		SBAPI SrVec getCurrentBlendParameters(const std::string& characterName);
+		SBAPI std::vector<std::string> getAutoBlendTransitions(const std::string& characterName, const std::string& targetBlend);
+		SBAPI bool isBlendScheduled(const std::string& characterName, const std::string& blendName);
 
-		void removeAllBlends();
-		void removeAllTransitions();
+		SBAPI void removeAllBlends();
+		SBAPI void removeAllTransitions();
 
 protected:
 		bool addBlendToGraph(const std::string& name);

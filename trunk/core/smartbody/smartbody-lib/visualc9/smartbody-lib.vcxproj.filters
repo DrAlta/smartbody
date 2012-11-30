@@ -979,11 +979,17 @@
     <ClCompile Include="..\src\controllers\me_ct_noise_controller.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sb\SBAnimationTransitionRule.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\controllers\me_ct_motion_recorder.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sb\SBAnimationTransitionRule.cpp">
-      <Filter>sb</Filter>
+    <ClCompile Include="..\src\sbm\ParserOgre.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\MiscCommands.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2004,10 +2010,19 @@
     <ClInclude Include="..\src\controllers\me_ct_noise_controller.h">
       <Filter>controllers</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\sb\SBAnimationTransitionRule.h">
+      <Filter>sb</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\controllers\me_ct_motion_recorder.h">
       <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sb\SBAnimationTransitionRule.h">
+    <ClInclude Include="..\src\sbm\ParserOgre.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\MiscCommands.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBTypes.h">
       <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>

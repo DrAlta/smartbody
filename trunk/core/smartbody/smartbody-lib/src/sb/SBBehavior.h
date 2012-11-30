@@ -1,6 +1,7 @@
 #ifndef _SBBEHAVIOR_H_
 #define _SBBEHAVIOR_H_
 
+#include <sb/SBTypes.h>
 #include <string>
 #include <sr/sr_vec.h>
 
@@ -9,12 +10,12 @@ namespace SmartBody {
 class SBBehavior
 {
 	public:
-		SBBehavior();
-		~SBBehavior();
+		SBAPI SBBehavior();
+		SBAPI ~SBBehavior();
 
-		virtual const std::string& getType();
-		virtual const std::string& getId();
-		virtual void setId(const std::string& id);
+		SBAPI virtual const std::string& getType();
+		SBAPI virtual const std::string& getId();
+		SBAPI virtual void setId(const std::string& id);
 
 	protected:
 		std::string _type;
@@ -26,11 +27,11 @@ class SBBehavior
 class SpeechBehavior : public SBBehavior
 {
 	public:
-		SpeechBehavior();
-		~SpeechBehavior();
+		SBAPI SpeechBehavior();
+		SBAPI ~SpeechBehavior();
 
-		virtual void setUtterance(const std::string& utterance);
-		virtual const std::string& getUtterance();
+		SBAPI virtual void setUtterance(const std::string& utterance);
+		SBAPI virtual const std::string& getUtterance();
 
 	protected:
 		std::string _utterance;
@@ -41,19 +42,19 @@ class SpeechBehavior : public SBBehavior
 class GazeBehavior : public SBBehavior
 {
 	public:
-		GazeBehavior();
-		~GazeBehavior();
+		SBAPI GazeBehavior();
+		SBAPI ~GazeBehavior();
 
-		virtual void setGazeTarget(const std::string& target);
-		virtual const std::string& getGazeTarget();
-		void setFadingIn(bool val);
-		void setFadingOut(bool val);
-		void setFadedOut(bool val);
-		bool isFadingIn();
-		bool isFadingOut();
-		bool isFadedOut();
-		void setHandle(const std::string& handle);
-		const std::string& getHandle();
+		SBAPI virtual void setGazeTarget(const std::string& target);
+		SBAPI virtual const std::string& getGazeTarget();
+		SBAPI void setFadingIn(bool val);
+		SBAPI void setFadingOut(bool val);
+		SBAPI void setFadedOut(bool val);
+		SBAPI bool isFadingIn();
+		SBAPI bool isFadingOut();
+		SBAPI bool isFadedOut();
+		SBAPI void setHandle(const std::string& handle);
+		SBAPI const std::string& getHandle();
 
 	protected:
 		std::string _target;
@@ -67,13 +68,13 @@ class GazeBehavior : public SBBehavior
 class LocomotionBehavior : public SBBehavior
 {
 	public:
-		LocomotionBehavior();
-		~LocomotionBehavior();
+		SBAPI LocomotionBehavior();
+		SBAPI ~LocomotionBehavior();
 
-		virtual void setLocomotionTarget(const SrVec& target);
-		virtual const SrVec& getLocomotionTarget();
-		void setReachTarget(bool v);
-		bool getReachTarget();
+		SBAPI virtual void setLocomotionTarget(const SrVec& target);
+		SBAPI virtual const SrVec& getLocomotionTarget();
+		SBAPI void setReachTarget(bool v);
+		SBAPI bool getReachTarget();
 
 	protected:
 		SrVec _target;
@@ -84,11 +85,11 @@ class LocomotionBehavior : public SBBehavior
 class PostureBehavior : public SBBehavior
 {
 	public:
-		PostureBehavior();
-		~PostureBehavior();
+		SBAPI PostureBehavior();
+		SBAPI ~PostureBehavior();
 
-		virtual void setPosture(const std::string& posture);
-		virtual const std::string& getPosture();
+		SBAPI virtual void setPosture(const std::string& posture);
+		SBAPI virtual const std::string& getPosture();
 	
 	protected:
 		std::string _posture;

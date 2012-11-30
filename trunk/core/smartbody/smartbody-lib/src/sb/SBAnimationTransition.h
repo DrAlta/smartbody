@@ -1,6 +1,7 @@
 #ifndef _SBTRANSITION_H_
 #define _SBTRANSITION_H_
 
+#include <sb/SBTypes.h>
 #include <vector>
 #include <controllers/me_ct_param_animation_data.h>
 
@@ -12,29 +13,29 @@ class SBAnimationTransitionRule;
 class SBAnimationTransition : public PATransition
 {
 	public:
-		SBAnimationTransition();
-		SBAnimationTransition(std::string name);
-		~SBAnimationTransition();
+		SBAPI SBAnimationTransition();
+		SBAPI SBAnimationTransition(std::string name);
+		SBAPI ~SBAnimationTransition();
 
-		void setSourceBlend(SBAnimationBlend* source);
-		void setDestinationBlend(SBAnimationBlend* dest);
-		SBAnimationBlend* getSourceBlend();
-		SBAnimationBlend* getDestinationBlend();
+		SBAPI void setSourceBlend(SBAnimationBlend* source);
+		SBAPI void setDestinationBlend(SBAnimationBlend* dest);
+		SBAPI SBAnimationBlend* getSourceBlend();
+		SBAPI SBAnimationBlend* getDestinationBlend();
 
-		void set(SBAnimationBlend* source, SBAnimationBlend* dest);
-		double getEaseInStart();
-		double getEaseInEnd();
-		void setEaseInInterval(std::string destMotion, float start, float end);
-		void addEaseOutInterval(std::string sourceMotion, float start, float end);
-		const std::string& getSourceMotionName();
-		const std::string& getDestinationMotionName();
-		void removeEaseOutInterval(int num);
-		int getNumEaseOutIntervals();
-		std::vector<double> getEaseOutInterval(int num);
-		SBAnimationTransitionRule* getTransitionRule();
-		void setTransitionRule(SBAnimationTransitionRule* rule);
+		SBAPI void set(SBAnimationBlend* source, SBAnimationBlend* dest);
+		SBAPI double getEaseInStart();
+		SBAPI double getEaseInEnd();
+		SBAPI void setEaseInInterval(std::string destMotion, float start, float end);
+		SBAPI void addEaseOutInterval(std::string sourceMotion, float start, float end);
+		SBAPI const std::string& getSourceMotionName();
+		SBAPI const std::string& getDestinationMotionName();
+		SBAPI void removeEaseOutInterval(int num);
+		SBAPI int getNumEaseOutIntervals();
+		SBAPI std::vector<double> getEaseOutInterval(int num);
+		SBAPI SBAnimationTransitionRule* getTransitionRule();
+		SBAPI void setTransitionRule(SBAnimationTransitionRule* rule);
 		
-		std::string saveToString();
+		SBAPI std::string saveToString();
 
 	protected:
 		SBAnimationTransitionRule* _rule;

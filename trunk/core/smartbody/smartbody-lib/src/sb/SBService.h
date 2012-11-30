@@ -1,6 +1,7 @@
 #ifndef _SBSERVICE_H_
 #define _SBSERVICE_H_
 
+#include <sb/SBTypes.h>
 #include <sb/SBObject.h>
 #ifdef __native_client__
 #include <sb/SBCharacter.h>
@@ -17,18 +18,18 @@ class SBCharacter;
 class SBService : public SBObject
 {
 	public:
-		SBService();
-		~SBService();
+		SBAPI SBService();
+		SBAPI ~SBService();
 
-		virtual void setEnable(bool val);
-		virtual bool isEnable();
+		SBAPI virtual void setEnable(bool val);
+		SBAPI virtual bool isEnable();
 
-		virtual void onPawnCreate(SBPawn* pawn);
-		virtual void onPawnDelete(SBPawn* pawn);
-		virtual void onCharacterCreate(SBCharacter* character);
-		virtual void onCharacterDelete(SBCharacter* character);
+		SBAPI virtual void onPawnCreate(SBPawn* pawn);
+		SBAPI virtual void onPawnDelete(SBPawn* pawn);
+		SBAPI virtual void onCharacterCreate(SBCharacter* character);
+		SBAPI virtual void onCharacterDelete(SBCharacter* character);
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual void notify(SBSubject* subject);
 
 	protected:
 		bool _enabled;

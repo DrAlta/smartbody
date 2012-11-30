@@ -1,6 +1,7 @@
 #ifndef _SBCONTROLLER_
 #define _SBCONTROLLER_
 
+#include <sb/SBTypes.h>
 #include "controllers/me_controller.h"
 
 namespace SmartBody {
@@ -8,42 +9,42 @@ namespace SmartBody {
 class SBController : public MeController
 {
 	public:
-		SBController();
-		SBController(const SBController& controller);
-		~SBController();
+		SBAPI SBController();
+		SBAPI SBController(const SBController& controller);
+		SBAPI ~SBController();
 
-		const std::string& getType();
+		SBAPI const std::string& getType();
 
-		SBController* getParent();			// how to get parent?
-		SBController* getChild(int index);
-		int getNumChildren();
-		void addChannel(std::string jointName, std::string channelName);
+		SBAPI SBController* getParent();			// how to get parent?
+		SBAPI SBController* getChild(int index);
+		SBAPI int getNumChildren();
+		SBAPI void addChannel(std::string jointName, std::string channelName);
 
-		const std::string& getCharacterName();
+		SBAPI const std::string& getCharacterName();
 
-		void setIgnore(bool val);
-		bool isIgnore();
-		void setDebug(bool val);
-		bool isDebug();
+		SBAPI void setIgnore(bool val);
+		SBAPI bool isIgnore();
+		SBAPI void setDebug(bool val);
+		SBAPI bool isDebug();
 
-		void printInfo();
-		void startRecordSkm(int maxFrame);
-		void startRecordBvh(int maxFrame);
-		void writeRecord(std::string prefix);
-		void stopRecord();
-		void clearRecord();
-		double getDuration();
+		SBAPI void printInfo();
+		SBAPI void startRecordSkm(int maxFrame);
+		SBAPI void startRecordBvh(int maxFrame);
+		SBAPI void writeRecord(std::string prefix);
+		SBAPI void stopRecord();
+		SBAPI void clearRecord();
+		SBAPI double getDuration();
 
-		void setTiming(float indt, float outdt, float empht);
+		SBAPI void setTiming(float indt, float outdt, float empht);
 
-		void getJointChannelValues(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat, SrVec& outPos);
-		void setJointChannelQuat(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat);
-		void setJointChannelPos(const std::string& jointName, MeFrameData& frame, SrVec& outPos);
+		SBAPI void getJointChannelValues(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat, SrVec& outPos);
+		SBAPI void setJointChannelQuat(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat);
+		SBAPI void setJointChannelPos(const std::string& jointName, MeFrameData& frame, SrVec& outPos);
 
-		virtual bool controller_evaluate ( double t, MeFrameData& frame ) { return true;}
-		virtual double controller_duration () { return 0.0; }
-		virtual SkChannelArray& controller_channels () { return channelArray; }
-		virtual const std::string& controller_type () const { return controllerType; }
+		SBAPI virtual bool controller_evaluate ( double t, MeFrameData& frame ) { return true;}
+		SBAPI virtual double controller_duration () { return 0.0; }
+		SBAPI virtual SkChannelArray& controller_channels () { return channelArray; }
+		SBAPI virtual const std::string& controller_type () const { return controllerType; }
 
 	private:
 		SkChannelArray channelArray;

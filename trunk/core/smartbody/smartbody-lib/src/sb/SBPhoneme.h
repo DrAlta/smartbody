@@ -1,6 +1,7 @@
 #ifndef _SBPHONEME_H_
 #define _SBPHONEME_H_
 
+#include <sb/SBTypes.h>
 #include <vector>
 #include <string>
 #include <map>
@@ -10,18 +11,18 @@ namespace SmartBody {
 class SBDiphone
 {
 public:
-	SBDiphone();
-	SBDiphone(const std::string& fromPhoneme, const std::string& toPhoneme);
-	~SBDiphone();
+	SBAPI SBDiphone();
+	SBAPI SBDiphone(const std::string& fromPhoneme, const std::string& toPhoneme);
+	SBAPI ~SBDiphone();
 
-	const std::string& getFromPhonemeName();
-	const std::string& getToPhonemeName();
+	SBAPI const std::string& getFromPhonemeName();
+	SBAPI const std::string& getToPhonemeName();
 
-	void addKey(const std::string& viseme, float time, float weight);
-	std::vector<float>& getKeys(const std::string& viseme);
-	std::vector<std::string> getVisemeNames();
-	int getNumVisemes();
-	void clean();
+	SBAPI void addKey(const std::string& viseme, float time, float weight);
+	SBAPI std::vector<float>& getKeys(const std::string& viseme);
+	SBAPI std::vector<std::string> getVisemeNames();
+	SBAPI int getNumVisemes();
+	SBAPI void clean();
 
 private:
 	std::string _fromPhoneme;

@@ -188,7 +188,7 @@ public:
 	virtual void createStandardControllers();
 
 	//* Overrides SbmPawn::prune_controller_tree()
-	virtual int prune_controller_tree( mcuCBHandle *mcu_p );
+	virtual int prune_controller_tree();
 
 
 	/**
@@ -298,41 +298,18 @@ public:
 	void inspect_skeleton_local_transform( SkJoint* joint_p, int depth = 0 );
 	void inspect_skeleton_world_transform( SkJoint* joint_p, int depth = 0 );
 
-	int reholster_quickdraw( mcuCBHandle *mcu_p );  // HACK to initiate reholster on all QuickDraw controllers
-
 	int print_controller_schedules();
 
 	/** Returns true if face controller is active on this character. */
 	bool is_face_controller_enabled();
 
-	//////////////////////////////////////////
-	// Static command handlers
 
-	/**
-	 *  Handles commands beginning with "char ..." or "character ...".
-	 *
-	 *  char <> init <skel-file>
-	 *  char <> ctrl <> begin [<ease-in> [<ease-out>]]
-	 *  char <> viseme <viseme_name> <weight>
-	 *  char <> bone <bone_name> <w> <x> <y> <z>
-	 *  char <> remove
-	 */
-	static int character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-	int parse_character_command( std::string cmd, srArgBuffer& args, mcuCBHandle *mcu_p, bool all_characters );
+	static int character_cmd_func( srArgBuffer& args );
+	int parse_character_command( std::string cmd, srArgBuffer& args, bool all_characters );
 
-	static int character_init_cmd( srArgBuffer& args, mcuCBHandle *mcu_p );
+	static int character_init_cmd( srArgBuffer& args);
 
-	static int character_ctrl_cmd( srArgBuffer& args, mcuCBHandle *mcu_p );
-
-	/**
-	 *  Handles commands beginning with "set character <character id> ...".
-	 */
-	static int set_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-
-	/**
-	 *  Handles commands beginning with "print character <character id> ...".
-	 */
-	static int print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+	static int character_ctrl_cmd( srArgBuffer& args);
 
 public:
 	static SkMotion* findTagSkMotion(int tag, const MotionDataSet& motionSet);

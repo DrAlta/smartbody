@@ -1,6 +1,7 @@
 #ifndef DATTRIBUTEMANAGER_H
 #define DATTRIBUTEMANAGER_H
 
+#include <sb/SBTypes.h>
 #include "SBSubject.h"
 #include <map>
 #include <vector>
@@ -14,18 +15,18 @@ class SBAttributeGroup;
 class SBAttributeManager : public SBSubject
 {
 	public:
-		SBAttributeManager();
-		~SBAttributeManager();
+		SBAPI SBAttributeManager();
+		SBAPI ~SBAttributeManager();
 
-		void addGroup(const std::string& name);
-		SBAttributeGroup* getGroup(const std::string& name, bool createIfNotFound = false);
-		std::map<std::string, SBAttributeGroup*>& getGroups();
-		std::vector<SBAttributeGroup*>& getAttributeGroups();
+		SBAPI void addGroup(const std::string& name);
+		SBAPI SBAttributeGroup* getGroup(const std::string& name, bool createIfNotFound = false);
+		SBAPI std::map<std::string, SBAttributeGroup*>& getGroups();
+		SBAPI std::vector<SBAttributeGroup*>& getAttributeGroups();
 
-		void notifyCreateAttribute(SBAttribute* attr);
-		void notifyRemoveAttribute(SBAttribute* attr);
-		void notifyPrioritizeAttribute(SBAttribute* attr);
-		void notifyHideAttribute(SBAttribute* attr);
+		SBAPI void notifyCreateAttribute(SBAttribute* attr);
+		SBAPI void notifyRemoveAttribute(SBAttribute* attr);
+		SBAPI void notifyPrioritizeAttribute(SBAttribute* attr);
+		SBAPI void notifyHideAttribute(SBAttribute* attr);
 
 	protected:
 		void resortGroups();

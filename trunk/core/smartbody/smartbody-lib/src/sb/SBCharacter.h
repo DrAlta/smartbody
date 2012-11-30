@@ -1,6 +1,7 @@
 #ifndef _SBCHARACTER_H_
 #define _SBCHARACTER_H_
 
+#include <sb/SBTypes.h>
 #include <sbm/sbm_character.hpp>
 
 namespace SmartBody {
@@ -14,61 +15,61 @@ class SBDiphone;
 class SBCharacter : public SbmCharacter
 {
 	public:
-		SBCharacter();
-		SBCharacter(std::string name, std::string type = "");
+		SBAPI SBCharacter();
+		SBAPI SBCharacter(std::string name, std::string type = "");
 
-		const std::string& getName();
-		void setName(std::string& name);
+		SBAPI const std::string& getName();
+		SBAPI void setName(std::string& name);
 
-		void setType(const std::string& type);
-		std::string getType();
+		SBAPI void setType(const std::string& type);
+		SBAPI std::string getType();
 		
-		virtual int setup();
+		SBAPI virtual int setup();
 
-		void setMeshMap(std::string filename);
-		void addMesh(std::string mesh);
+		SBAPI void setMeshMap(std::string filename);
+		SBAPI void addMesh(std::string mesh);
 
-		int getNumControllers();
+		SBAPI int getNumControllers();
 
-		void setAutomaticPruning(bool val);
-		bool isAutomaticPruning();
-		void pruneControllers();
+		SBAPI void setAutomaticPruning(bool val);
+		SBAPI bool isAutomaticPruning();
+		SBAPI void pruneControllers();
 
-		void setUseVisemeCurves(bool val);
-		bool isUseVisemeCurves();
+		SBAPI void setUseVisemeCurves(bool val);
+		SBAPI bool isUseVisemeCurves();
 
-		float getVisemeTimeOffset();
-		void setVisemeTimeOffset(float val);
+		SBAPI float getVisemeTimeOffset();
+		SBAPI void setVisemeTimeOffset(float val);
 
-		void setVoice(std::string type);
-		void setVoiceCode(std::string param);
-		const std::string getVoice();
-		const std::string& getVoiceCode();
+		SBAPI void setVoice(std::string type);
+		SBAPI void setVoiceCode(std::string param);
+		SBAPI const std::string getVoice();
+		SBAPI const std::string& getVoiceCode();
 
-		void setVoiceBackup(std::string type);
-		void setVoiceBackupCode(std::string param);
-		const std::string& getVoiceBackup();
-		const std::string& getVoiceBackupCode();
+		SBAPI void setVoiceBackup(std::string type);
+		SBAPI void setVoiceBackupCode(std::string param);
+		SBAPI const std::string& getVoiceBackup();
+		SBAPI const std::string& getVoiceBackupCode();
 
-		SBController* getControllerByIndex(int i);
-		SBController* getControllerByName(std::string name);
-		std::vector<std::string> getControllerNames();
-		void startMotionRecord(double frameRate);
-		void stopMotionRecord(const std::string& motionName);
+		SBAPI SBController* getControllerByIndex(int i);
+		SBAPI SBController* getControllerByName(std::string name);
+		SBAPI std::vector<std::string> getControllerNames();
+		SBAPI void startMotionRecord(double frameRate);
+		SBAPI void stopMotionRecord(const std::string& motionName);
 
-		int getNumBehaviors();
-		SBBehavior* getBehavior(int num);
-		std::vector<SBBehavior*>& getBehaviors();
+		SBAPI int getNumBehaviors();
+		SBAPI SBBehavior* getBehavior(int num);
+		SBAPI std::vector<SBBehavior*>& getBehaviors();
 		
-		double getLastScheduledSpeechBehavior();
-		std::string hasSpeechBehavior();
+		SBAPI double getLastScheduledSpeechBehavior();
+		SBAPI std::string hasSpeechBehavior();
 
-		virtual SBFaceDefinition* getFaceDefinition();
-		virtual void setFaceDefinition(SBFaceDefinition* face);
+		SBAPI virtual SBFaceDefinition* getFaceDefinition();
+		SBAPI virtual void setFaceDefinition(SBFaceDefinition* face);
 
-		void setSteerAgent(SBSteerAgent* agent);
+		SBAPI void setSteerAgent(SBSteerAgent* agent);
 
-		void notify(SBSubject* subject);
+		SBAPI void notify(SBSubject* subject);
 
 	protected:
 		std::vector<SBBehavior*> _curBehaviors;

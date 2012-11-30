@@ -1,6 +1,7 @@
 #ifndef _SBPARSETREE_H_
 #define _SBPARSETREE_H_
 
+#include <sb/SBTypes.h>
 #include <string>
 #include <vector>
 
@@ -9,20 +10,20 @@ namespace SmartBody {
 class SBParseNode
 {
 	public:
-		SBParseNode();
-		SBParseNode(const std::string& word, const std::string& term);
-		~SBParseNode();
+		SBAPI SBParseNode();
+		SBAPI SBParseNode(const std::string& word, const std::string& term);
+		SBAPI ~SBParseNode();
 
-		bool isTerminal();
-		void setWord(const std::string& word);
-		void setTerm(const std::string& term);
+		SBAPI bool isTerminal();
+		SBAPI void setWord(const std::string& word);
+		SBAPI void setTerm(const std::string& term);
 
-		const std::string& getWord();
-		const std::string& getTerm();
+		SBAPI const std::string& getWord();
+		SBAPI const std::string& getTerm();
 
-		void addChild(SBParseNode* node);
-		int getNumChildren();
-		SBParseNode* getChild(int num);
+		SBAPI void addChild(SBParseNode* node);
+		SBAPI int getNumChildren();
+		SBAPI SBParseNode* getChild(int num);
 
 	protected:
 		std::string _word;
