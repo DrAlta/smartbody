@@ -128,7 +128,7 @@ std::vector<std::string> SBGestureMap::getGestureListByInfo(const std::string& l
  */
 std::string SBGestureMap::getGestureByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture, const std::string& policy)
 {
-	std::vector<std::string>& retAnimations = getGestureListByInfo(lexeme, type, hand, style, posture);
+	const std::vector<std::string>& retAnimations = getGestureListByInfo(lexeme, type, hand, style, posture);
 	if (retAnimations.size() == 0)
 	{
 		LOG("Gesture %s cannot find gesture with type %s, posture %s, hand %s.", getName().c_str(), type.c_str(), posture.c_str(), hand.c_str());
