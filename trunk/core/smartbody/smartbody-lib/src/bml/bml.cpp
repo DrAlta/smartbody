@@ -54,8 +54,8 @@ using namespace xml_utils;
 
 const bool USE_CUSTOM_PRUNE_POLICY          = false; // Future feature
 
-const bool LOG_BEHAVIOR_SYNCHPOINTS         = false;
-const bool LOG_BML_BEHAVIOR_SCHEDULE        = false;
+const bool LOG_BEHAVIOR_SYNCHPOINTS         = true;
+const bool LOG_BML_BEHAVIOR_SCHEDULE        = true;
 const bool LOG_METHODS						= false;
 const bool LOG_CONTROLLER_SCHEDULE			= false;
 const bool LOG_REQUEST_REALIZE_TIME_SPAN	= false;
@@ -406,9 +406,14 @@ void BmlRequest::gestureRequestProcess()
 			float rWristTransitionDistance = -1;
 			float currLWristSpeed = -1;
 			float currRWristSpeed = -1;
-			for (size_t l = 0; l < gestures[i]->gestureList.size(); ++l)
+			std::vector<std::string> currGestureList = gestures[i]->gestureList;
+			if (currGestureList.size() == 0)
 			{
-				SBMotion *motionInList = SmartBody::SBScene::getScene()->getMotion(gestures[i]->gestureList[l]);
+				currGestureList.push_back(sbMotion->getName());
+			}
+			for (size_t l = 0; l < currGestureList.size(); ++l)
+			{
+				SBMotion *motionInList = SmartBody::SBScene::getScene()->getMotion(currGestureList[l]);
 				if (!motionInList)
 					continue;
 				motionInList->connect(actor->getSkeleton());
@@ -441,15 +446,16 @@ void BmlRequest::gestureRequestProcess()
 				fabs(minSpeedDiffR) < actor->getDoubleAttribute("bmlRequest.gestureSpeedThreshold"))
 			{
 				shouldFilter = false;
-				if (actor->getBoolAttribute("bmlRequest.gestureLog"))
-				{
-					LOG("gestureRequestProcess: transition from %s to %s", gestures[j]->anim_ct->getName().c_str(), gestures[i]->anim_ct->getName().c_str());
-					LOG("minSpeedDiffL: %f, minSpeedDiffR: %f", minSpeedDiffL, minSpeedDiffR);
-				}
 			}
 			else
 			{
 				shouldFilter = true;
+				logIndex = 0;
+			}
+			if (actor->getBoolAttribute("bmlRequest.gestureLog"))
+			{
+				LOG("gestureRequestProcess: transition from %s to %s", gestures[j]->anim_ct->getName().c_str(), gestures[i]->anim_ct->getName().c_str());
+				LOG("minSpeedDiffL: %f, minSpeedDiffR: %f", minSpeedDiffL, minSpeedDiffR);
 			}
 
 			if (!shouldFilter)

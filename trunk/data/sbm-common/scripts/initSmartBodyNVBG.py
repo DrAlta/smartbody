@@ -45,7 +45,16 @@ class SmartBodyNVBG(Nvbg):
                                         self.nvbg.speak(dialogStr)
                                 else:
                                         self.nvbg.speak(dialogStr, audioStr) 
-
+                if (name == "save"):
+                        dialogStr = self.getAttribute("dialog").getValue()
+                        audioStr = self.getAttribute("audio").getValue()
+                        if (dialogStr == ""):
+                                return
+                        else:
+                                if (audioStr == ""):
+                                        self.nvbg.speakToFile(dialogStr)
+                                else:
+                                        self.nvbg.speakToFile(dialogStr, audioStr) 
                 if (name == "play behavior"):
                         selectedBml = self.getAttribute("bml").getValue()
                         bml.execBML(self.nvbg.characterName, selectedBml)
@@ -186,6 +195,7 @@ class SmartBodyNVBG(Nvbg):
                 dialog = self.createStringAttribute("dialog", "", True, "nvbgs", 50, False, False, False, "Dialog")
                 audio = self.createStringAttribute("audio", "", True, "nvbgs", 55, False, False, False, "Dialog")
                 self.createActionAttribute("play dialog", True, "nvbgs", 60, False, False, False, "Play the chosen dialog")
+                self.createActionAttribute("save", True, "nvbgs", 70, False, False, False, "Save the behavior to autoXML.xml")
 
                 ''' nvbg behaviors '''
                 behavior = self.createStringAttribute("default behavior", "", True, "nvbgs", 100, False, False, False, "Universal behaviors availabe")
