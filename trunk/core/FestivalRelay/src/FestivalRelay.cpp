@@ -125,7 +125,7 @@ SpeechRequestData xmlMetaData;
 std::map<std::string, std::pair<std::string, double> > phonemeToViseme;
 std::string mapping;
 #else
-std::string mapping;
+extern std::string mapping;
 extern SpeechRequestData xmlMetaData;
 extern std::multimap<std::string, std::pair<string, double> > phonemeToViseme;
 
