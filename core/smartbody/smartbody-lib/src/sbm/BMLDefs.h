@@ -325,6 +325,27 @@ class BMLDefs
 		static XMLCh* ATTR_STATENAME;
 
 		static XMLCh* ATTR_POLICY;
+
+
+		static XMLCh* OGRE_BONE;
+		static XMLCh* OGRE_PARENT;
+		static XMLCh* OGRE_ID;
+		static XMLCh* OGRE_NAME;
+		static XMLCh* OGRE_LENGTH;
+		static XMLCh* OGRE_X;
+		static XMLCh* OGRE_Y;
+		static XMLCh* OGRE_Z;
+		static XMLCh* OGRE_ANGLE;
+		static XMLCh* OGRE_AXIS;
+		static XMLCh* OGRE_ANIMATION;
+		static XMLCh* OGRE_TRACKS;
+		static XMLCh* OGRE_TRACK;
+		static XMLCh* OGRE_KEYFRAMES;
+		static XMLCh* OGRE_KEYFRAME;
+		static XMLCh* OGRE_TRANSLATE;
+		static XMLCh* OGRE_ROTATE;
+		static XMLCh* OGRE_TIME;
+
 };
 
 
