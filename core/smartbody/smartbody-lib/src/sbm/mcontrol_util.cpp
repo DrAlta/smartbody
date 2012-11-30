@@ -106,6 +106,7 @@
 #include "SbmDebuggerClient.h"
 #include <controllers/me_ct_param_animation_utilities.h>
 #include <controllers/me_ct_param_animation_data.h>
+#include <sbm/MiscCommands.h>
 
 
 using namespace std;
@@ -506,12 +507,12 @@ void mcuCBHandle::registerCallbacks()
 	insert( "mirror",       mcu_motion_mirror_cmd_func);
 	insert( "motionplayer", mcu_motion_player_func);
 
-	insert( "pawn",			SbmPawn::pawn_cmd_func );
-	insert( "char",			SbmCharacter::character_cmd_func );
+	insert( "pawn",			pawn_cmd_func );
+	insert( "char",			character_cmd_func );
 
 	insert( "ctrl",			mcu_controller_func );
 	insert( "wsp",			mcu_wsp_cmd_func );
-	insert( "create_remote_pawn", SbmPawn::create_remote_pawn_func );
+	insert( "create_remote_pawn", create_remote_pawn_func );
 
 	insert( "vrAgentBML",   BML_PROCESSOR::vrAgentBML_cmd_func );
 	insert( "bp",		    BML_PROCESSOR::bp_cmd_func );
@@ -576,18 +577,18 @@ void mcuCBHandle::registerCallbacks()
 	insert( "stopheapprofile",			   stopheapprofile_func );
 #endif
 	insert_set_cmd( "bp",             BML_PROCESSOR::set_func );
-	insert_set_cmd( "pawn",           SbmPawn::set_cmd_func );
-	insert_set_cmd( "character",      SbmCharacter::set_cmd_func );
-	insert_set_cmd( "char",           SbmCharacter::set_cmd_func );
+	insert_set_cmd( "pawn",           pawn_set_cmd_funcx );
+	insert_set_cmd( "character",      character_set_cmd_func );
+	insert_set_cmd( "char",           character_set_cmd_func );
 	insert_set_cmd( "face",           mcu_set_face_func );
 	insert_set_cmd( "joint_logger",   joint_logger::set_func );
 	insert_set_cmd( "J_L",            joint_logger::set_func );  // shorthand
 	insert_set_cmd( "test",           sbm_set_test_func );
 
 	insert_print_cmd( "bp",           BML_PROCESSOR::print_func );
-	insert_print_cmd( "pawn",         SbmPawn::print_cmd_func );
-	insert_print_cmd( "character",    SbmCharacter::print_cmd_func );
-	insert_print_cmd( "char",         SbmCharacter::print_cmd_func );
+	insert_print_cmd( "pawn",         pawn_print_cmd_funcx);
+	insert_print_cmd( "character",    character_print_cmd_func );
+	insert_print_cmd( "char",         character_print_cmd_func );
 	insert_print_cmd( "face",         mcu_print_face_func );
 	insert_print_cmd( "joint_logger", joint_logger::print_func );
 	insert_print_cmd( "J_L",          joint_logger::print_func );  // shorthand

@@ -2,6 +2,7 @@
 #define DSUBJECT_H
 
 #include <set>
+#include <sb/SBTypes.h>
 
 namespace SmartBody {
 
@@ -10,12 +11,12 @@ class SBObserver;
 class SBSubject
 {
 	public:
-		SBSubject();
-		~SBSubject();
+		SBAPI SBSubject();
+		SBAPI ~SBSubject();
 
-		virtual void registerObserver(SBObserver* observer);
-		virtual void unregisterObserver(SBObserver* observer);
-		virtual void notifyObservers();
+		SBAPI virtual void registerObserver(SBObserver* observer);
+		SBAPI virtual void unregisterObserver(SBObserver* observer);
+		SBAPI virtual void notifyObservers();
 
 	protected:
 		std::set<SBObserver*> m_observers;

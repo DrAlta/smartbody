@@ -23,6 +23,7 @@
 #ifndef _SBFACEDEFINITION_H_
 #define _SBFACEDEFINITION_H_
 
+#include <sb/SBTypes.h>
 #include <map>
 #include <vector>
 #include <string>
@@ -42,40 +43,40 @@ class SBMotion;
 class SBFaceDefinition
 {
 	public:
-		SBFaceDefinition();
-		SBFaceDefinition(const std::string& name);
-		SBFaceDefinition(SBFaceDefinition* source);
+		SBAPI SBFaceDefinition();
+		SBAPI SBFaceDefinition(const std::string& name);
+		SBAPI SBFaceDefinition(SBFaceDefinition* source);
 
-		~SBFaceDefinition();
+		SBAPI ~SBFaceDefinition();
 
-		const std::string& getName();
-		void setName(const std::string& name);
+		SBAPI const std::string& getName();
+		SBAPI void setName(const std::string& name);
 
-		void setFaceNeutral(const std::string& motionName);
-		SkMotion* getFaceNeutral();
+		SBAPI void setFaceNeutral(const std::string& motionName);
+		SBAPI SkMotion* getFaceNeutral();
 
-		bool hasViseme(const std::string& visemeName);
-		void setViseme(const std::string& visemeName, const std::string& motionName);
-		void setVisemeWeight(const std::string& visemeName, float weight);
-		int getNumVisemes();
-		std::vector<std::string> getVisemeNames();
-		const std::string& getVisemeName(int index);
-		SkMotion* getVisemeMotion(const std::string& viseme);
-		float getVisemeWeight(const std::string& viseme);
+		SBAPI bool hasViseme(const std::string& visemeName);
+		SBAPI void setViseme(const std::string& visemeName, const std::string& motionName);
+		SBAPI void setVisemeWeight(const std::string& visemeName, float weight);
+		SBAPI int getNumVisemes();
+		SBAPI std::vector<std::string> getVisemeNames();
+		SBAPI const std::string& getVisemeName(int index);
+		SBAPI SkMotion* getVisemeMotion(const std::string& viseme);
+		SBAPI float getVisemeWeight(const std::string& viseme);
 
 
-		bool hasAU(int auNum);
-		void setAU(int auNum, const std::string& side, const std::string& motion);
-		int getNumAUs();
-		int getNumAUChannels();
-		int getAUNum(int index);
-		std::vector<int> getAUNumbers();
-		SBMotion* getAUMotion(int num, std::string side);
-		ActionUnit* getAU(int index);
-		std::string getAUSide(int num);
+		SBAPI bool hasAU(int auNum);
+		SBAPI void setAU(int auNum, const std::string& side, const std::string& motion);
+		SBAPI int getNumAUs();
+		SBAPI int getNumAUChannels();
+		SBAPI int getAUNum(int index);
+		SBAPI std::vector<int> getAUNumbers();
+		SBAPI SBMotion* getAUMotion(int num, std::string side);
+		SBAPI ActionUnit* getAU(int index);
+		SBAPI std::string getAUSide(int num);
 
-		std::string saveToString();
-		void save(const std::string& fileName);
+		SBAPI std::string saveToString();
+		SBAPI void save(const std::string& fileName);
 		
 	protected:
 		void addAU(int auNum, ActionUnit* au);

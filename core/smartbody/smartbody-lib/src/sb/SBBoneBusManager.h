@@ -1,6 +1,7 @@
 #ifndef _SBBONEBUSMANAGER_
 #define _SBBONEBUSMANAGER_
 
+#include <sb/SBTypes.h>
 #include <sb/SBService.h>
 #include "bonebus.h"
 
@@ -9,22 +10,22 @@ namespace SmartBody {
 class SBBoneBusManager : public SmartBody::SBService
 {
 	public:
-		SBBoneBusManager();
-		~SBBoneBusManager();
+		SBAPI SBBoneBusManager();
+		SBAPI ~SBBoneBusManager();
 
-		virtual void setEnable(bool val);
-		void setHost(const std::string& host);
-		const std::string& getHost();
+		SBAPI virtual void setEnable(bool val);
+		SBAPI void setHost(const std::string& host);
+		SBAPI const std::string& getHost();
 
-		virtual void start();
-		virtual void beforeUpdate(double time);
-		virtual void update(double time);
-		virtual void afterUpdate(double time);
-		virtual void stop();
+		SBAPI virtual void start();
+		SBAPI virtual void beforeUpdate(double time);
+		SBAPI virtual void update(double time);
+		SBAPI virtual void afterUpdate(double time);
+		SBAPI virtual void stop();
 
-		bonebus::BoneBusClient& getBoneBus();
+		SBAPI bonebus::BoneBusClient& getBoneBus();
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual void notify(SBSubject* subject);
 
 	private:
 		bonebus::BoneBusClient _boneBus;

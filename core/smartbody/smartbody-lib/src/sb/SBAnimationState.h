@@ -1,5 +1,7 @@
 #ifndef _SBSTATE_H
 #define _SBSTATE_H
+
+#include <sb/SBTypes.h>
 #include <sr/sr_sn_colorsurf.h>
 #include <controllers/me_ct_param_animation_data.h>
 # define VFLOW_LINE_WIDTH 2.0f
@@ -13,46 +15,46 @@ namespace SmartBody {
 class SBAnimationBlend : public PABlend
 {
 	public:
-		SBAnimationBlend();
-		SBAnimationBlend(const std::string& name);
-		~SBAnimationBlend();
+		SBAPI SBAnimationBlend();
+		SBAPI SBAnimationBlend(const std::string& name);
+		SBAPI ~SBAnimationBlend();
 
-		void setIncrementWorldOffsetY(bool flag);
-		void addCorrespondencePoints(const std::vector<std::string>& motions, const std::vector<double>& points);			
-		void removeCorrespondencePoints(int index);
-		void addKeyTagValue(const std::string& motionName, int iType, const std::string& tagName, double value);	
-		KeyTagMap* getKeyTagMap(const std::string& motionName);
-		void buildMotionAnalysis(const std::string& skeletonName, const std::string& baseName);
-		MotionAnalysis* getMotionAnalysis();
+		SBAPI void setIncrementWorldOffsetY(bool flag);
+		SBAPI void addCorrespondencePoints(const std::vector<std::string>& motions, const std::vector<double>& points);			
+		SBAPI void removeCorrespondencePoints(int index);
+		SBAPI void addKeyTagValue(const std::string& motionName, int iType, const std::string& tagName, double value);	
+		SBAPI KeyTagMap* getKeyTagMap(const std::string& motionName);
+		SBAPI void buildMotionAnalysis(const std::string& skeletonName, const std::string& baseName);
+		SBAPI MotionAnalysis* getMotionAnalysis();
 
-		virtual int getNumMotions();
-		virtual std::string getMotion(int num);
-		SkMotion* getSkMotion(const std::string& motionName);
-		virtual int getNumCorrespondencePoints();
-		virtual std::vector<double> getCorrespondencePoints(int num);
-		virtual void setCorrespondencePoints(int motionIndex, int pointIndex, double value);
+		SBAPI virtual int getNumMotions();
+		SBAPI virtual std::string getMotion(int num);
+		SBAPI SkMotion* getSkMotion(const std::string& motionName);
+		SBAPI virtual int getNumCorrespondencePoints();
+		SBAPI virtual std::vector<double> getCorrespondencePoints(int num);
+		SBAPI virtual void setCorrespondencePoints(int motionIndex, int pointIndex, double value);
 
-		virtual void removeMotion(const std::string& motionName);
-		virtual void addEvent(const std::string& motion, double time, const std::string& type, const std::string& parameters, bool onceOnly);
-		virtual void removeEvent(int index);
-		virtual MotionEvent* getEvent(int index);
-		virtual void removeAllEvents();
-		virtual int getNumEvents();
+		SBAPI virtual void removeMotion(const std::string& motionName);
+		SBAPI virtual void addEvent(const std::string& motion, double time, const std::string& type, const std::string& parameters, bool onceOnly);
+		SBAPI virtual void removeEvent(int index);
+		SBAPI virtual MotionEvent* getEvent(int index);
+		SBAPI virtual void removeAllEvents();
+		SBAPI virtual int getNumEvents();
 
-		virtual std::string getDimension();
-		bool validateState();
+		SBAPI virtual std::string getDimension();
+		SBAPI bool validateState();
 
-		std::string saveToString();
+		SBAPI std::string saveToString();
 
 		// Functions to build visualization surface
-		void buildVisSurfaces(const std::string& errorType, const std::string& surfaceType, int segments, int dimensions);
-		SrSnColorSurf* createCurveSurface(float radius, unsigned int dimension, SrVec center, SrVec2 phi, SrVec2 theta);		
-		SrSnColorSurf* createFlatSurface(float depth, unsigned int dimension, SrVec2 topLeft, SrVec2 lowerRight);
-		void createErrorSurfaces(const std::string& type, SrVec center, int segments, int dimensions, std::vector<SrSnColorSurf*>& surfList);
-		void updateErrorSurace(SrSnColorSurf* surf, SrVec center);
-		void updateSmoothSurface(SrSnColorSurf* surf);
-		std::vector<SrSnColorSurf*>& getErrorSurfaces() { return errorSurfaces; }
-		std::vector<SrSnColorSurf*>& getSmoothSurfaces() { return smoothSurfaces; }
+		SBAPI void buildVisSurfaces(const std::string& errorType, const std::string& surfaceType, int segments, int dimensions);
+		SBAPI SrSnColorSurf* createCurveSurface(float radius, unsigned int dimension, SrVec center, SrVec2 phi, SrVec2 theta);		
+		SBAPI SrSnColorSurf* createFlatSurface(float depth, unsigned int dimension, SrVec2 topLeft, SrVec2 lowerRight);
+		SBAPI void createErrorSurfaces(const std::string& type, SrVec center, int segments, int dimensions, std::vector<SrSnColorSurf*>& surfList);
+		SBAPI void updateErrorSurace(SrSnColorSurf* surf, SrVec center);
+		SBAPI void updateSmoothSurface(SrSnColorSurf* surf);
+		SBAPI std::vector<SrSnColorSurf*>& getErrorSurfaces() { return errorSurfaces; }
+		SBAPI std::vector<SrSnColorSurf*>& getSmoothSurfaces() { return smoothSurfaces; }
 
 
 		/* motion vector flow for motion smoothness visualize: each vector is the abs. movement of a particular joint
@@ -62,29 +64,29 @@ class SBAnimationBlend : public PABlend
 		// vecs within [1-plotTh, 1+plotTh] of local avg are plotted in light gray.
 		// sliding window size = slidWinHalfSize x 2 + 1.
 		// added by David Huang, June 2012 */
-		void createMotionVectorFlow(const std::string& motionName, const std::string& chrName, float plotThreshold=0.45f,
+		SBAPI void createMotionVectorFlow(const std::string& motionName, const std::string& chrName, float plotThreshold=0.45f,
 									unsigned int slidWinHalfSize=7, bool clearAll=false);
-		std::vector<SrSnLines*>& getVectorFlowSrSnLines() { return vecflowLinesArray; }
-		void clearMotionVectorFlow(void);
+		SBAPI std::vector<SrSnLines*>& getVectorFlowSrSnLines() { return vecflowLinesArray; }
+		SBAPI void clearMotionVectorFlow(void);
 
 		/* plot motion frames (stick figures) and joint trajectory
 		// added by David Huang, June 2012 */
-		void plotMotion(const std::string& motionName, const std::string& chrName, unsigned int interval=10,
+		SBAPI void plotMotion(const std::string& motionName, const std::string& chrName, unsigned int interval=10,
 						bool clearAll=false, bool useRandomColor=true);
-		void plotMotionFrameTime(const std::string& motionName, const std::string& chrName, float time, bool useRandomColor);
-		void plotMotionJointTrajectory(const std::string& motionName, const std::string& chrName, const std::string& jointName,
+		SBAPI void plotMotionFrameTime(const std::string& motionName, const std::string& chrName, float time, bool useRandomColor);
+		SBAPI void plotMotionJointTrajectory(const std::string& motionName, const std::string& chrName, const std::string& jointName,
 										float start_t=0.0f, float end_t=0.0f, bool useRandomColor=false);
-		std::vector<SrSnLines*>& getPlotMotionSrSnLines() { return plotMotionLinesArray; }
-		void clearPlotMotion(void);
+		SBAPI std::vector<SrSnLines*>& getPlotMotionSrSnLines() { return plotMotionLinesArray; }
+		SBAPI void clearPlotMotion(void);
 
-		void setChrPlotMotionTransform(const std::string& chrName);
-		void setPlotMotionTransform(SrVec offset=SrVec::null, float yRot=0.0f);
-		const SrMat& getPlotMotionTransform() { return plotMotionTransform; }
-		void clearPlotMotionTransform() { plotMotionTransform.identity(); }
-		void setChrPlotVectorFlowTransform(const std::string& chrName);
-		void setPlotVectorFlowTransform(SrVec offset=SrVec::null, float yRot=0.0f);
-		const SrMat& getPlotVectorFlowTransform() { return plotVectorFlowTransform; }
-		void clearPlotVectorFlowTransform() { plotVectorFlowTransform.identity(); }
+		SBAPI void setChrPlotMotionTransform(const std::string& chrName);
+		SBAPI void setPlotMotionTransform(SrVec offset=SrVec::null, float yRot=0.0f);
+		SBAPI const SrMat& getPlotMotionTransform() { return plotMotionTransform; }
+		SBAPI void clearPlotMotionTransform() { plotMotionTransform.identity(); }
+		SBAPI void setChrPlotVectorFlowTransform(const std::string& chrName);
+		SBAPI void setPlotVectorFlowTransform(SrVec offset=SrVec::null, float yRot=0.0f);
+		SBAPI const SrMat& getPlotVectorFlowTransform() { return plotVectorFlowTransform; }
+		SBAPI void clearPlotVectorFlowTransform() { plotVectorFlowTransform.identity(); }
 
 	protected:
 		bool addSkMotion(const std::string& motionName);
@@ -122,51 +124,51 @@ class SBAnimationBlend : public PABlend
 class SBAnimationBlend0D : public SBAnimationBlend
 {
 	public:
-		SBAnimationBlend0D();
-		SBAnimationBlend0D(const std::string& name);
-		~SBAnimationBlend0D();
+		SBAPI SBAnimationBlend0D();
+		SBAPI SBAnimationBlend0D(const std::string& name);
+		SBAPI ~SBAnimationBlend0D();
 
-		virtual void addMotion(const std::string& motion);
-		virtual void removeMotion(const std::string& motionName);
+		SBAPI virtual void addMotion(const std::string& motion);
+		SBAPI virtual void removeMotion(const std::string& motionName);
 		
 };
 
 class SBAnimationBlend1D : public SBAnimationBlend
 {
 	public:
-		SBAnimationBlend1D();
-		SBAnimationBlend1D(const std::string& name);
-		~SBAnimationBlend1D();
+		SBAPI SBAnimationBlend1D();
+		SBAPI SBAnimationBlend1D(const std::string& name);
+		SBAPI ~SBAnimationBlend1D();
 
-		virtual void addMotion(const std::string& motion, float parameter);
-		virtual void removeMotion(const std::string& motionName);
-		void setParameter(const std::string& motion, float parameter);
+		SBAPI virtual void addMotion(const std::string& motion, float parameter);
+		SBAPI virtual void removeMotion(const std::string& motionName);
+		SBAPI void setParameter(const std::string& motion, float parameter);
 };
 
 class SBAnimationBlend2D : public SBAnimationBlend
 {
 	public:
-		SBAnimationBlend2D();
-		SBAnimationBlend2D(const std::string& name);
-		~SBAnimationBlend2D();
+		SBAPI SBAnimationBlend2D();
+		SBAPI SBAnimationBlend2D(const std::string& name);
+		SBAPI ~SBAnimationBlend2D();
 
-		virtual void addMotion(const std::string& motion, float parameter1, float paramter2);
-		virtual void removeMotion(const std::string& motionName);
-		void setParameter(const std::string& motion, float parameter1, float parameter2);
-		void addTriangle(const std::string& motion1, const std::string& motion2, const std::string&motion3);
+		SBAPI virtual void addMotion(const std::string& motion, float parameter1, float paramter2);
+		SBAPI virtual void removeMotion(const std::string& motionName);
+		SBAPI void setParameter(const std::string& motion, float parameter1, float parameter2);
+		SBAPI void addTriangle(const std::string& motion1, const std::string& motion2, const std::string&motion3);
 };
 
 class SBAnimationBlend3D : public SBAnimationBlend
 {
 	public:
-		SBAnimationBlend3D();
-		SBAnimationBlend3D(const std::string& name);
-		~SBAnimationBlend3D();
+		SBAPI SBAnimationBlend3D();
+		SBAPI SBAnimationBlend3D(const std::string& name);
+		SBAPI ~SBAnimationBlend3D();
 
-		virtual void addMotion(const std::string& motion, float parameter1, float paramter2, float paramter3);
-		virtual void removeMotion(const std::string& motionName);
-		void setParameter(const std::string& motion, float parameter1, float parameter2, float parameter3);
-		void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
+		SBAPI virtual void addMotion(const std::string& motion, float parameter1, float paramter2, float paramter3);
+		SBAPI virtual void removeMotion(const std::string& motionName);
+		SBAPI void setParameter(const std::string& motion, float parameter1, float parameter2, float parameter3);
+		SBAPI void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
 
 };
 }

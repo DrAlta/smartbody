@@ -68,9 +68,6 @@ const bool ENABLE_EYELID_CORRECTIVE_CT					= false;
 
 using namespace std;
 
-// Predeclare private functions defined below
-static int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle *mcu_p );
-static int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle *mcu_p );
 
 #if 0
 static inline bool parse_float_or_error( float& var, const char* str, const string& var_name );
@@ -1473,7 +1470,9 @@ void prune_schedule( SbmCharacter*   actor,
 *  of other types of controllers. Fails to recognize partial
 *  body motions and partial spine gazes.
 */
-int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
+int SbmCharacter::prune_controller_tree( )
+{
+	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
 
 	double time = mcu_p->time;  // current time
 
@@ -1982,87 +1981,11 @@ bool SbmCharacter::is_face_controller_enabled() {
 	return (face_ct!=NULL && face_ct->context()!=NULL);
 }
 
-// HACK to initiate reholster on all QuickDraw controllers
-int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
-	const double now = mcu_p->time;
-
-	double max_blend_dur = -1;
-
-	// Local convience typedefs
-	typedef MeCtScheduler2::TrackPtr   TrackPtr;
-	typedef MeCtScheduler2::VecOfTrack VecOfTrack;
-
-	VecOfTrack tracks = motion_sched_p->tracks();
-
-	VecOfTrack::iterator it = tracks.begin();
-	VecOfTrack::iterator end = tracks.end();
-
-	bool found_quickdraw = false;
-
-	while( it != end ) {
-		TrackPtr track = (*it);
-
-		MeController* anim_ct = track->animation_ct();
-		if( anim_ct ) {
-			string anim_ct_type( anim_ct->controller_type() );
-			if( anim_ct_type==MeCtQuickDraw::type_name ) {
-				found_quickdraw = true;
-
-				MeCtQuickDraw* qdraw_ct = (MeCtQuickDraw*)anim_ct;
-
-				// Initiate reholster
-				qdraw_ct->set_reholster();
-
-				// Attempt to schedule blend out
-				MeCtUnary* blending_ct = track->blending_ct();
-				if(    blending_ct
-					&& blending_ct->controller_type() == MeCtBlend::CONTROLLER_TYPE)
-				{
-					// TODO: account for time scaling of motion_duration
-					double blend_out_start = now + qdraw_ct->get_holster_duration();
-					float  blend_out_dur   = qdraw_ct->outdt();
-					double blend_out_end   = blend_out_start + blend_out_dur;
-					//					float  blend_spline_tanget = -1/blend_out_dur;
-
-					MeCtBlend* blend_ct = (MeCtBlend*)blending_ct;
-					srLinearCurve& blend_curve = blend_ct->get_curve();
-					blend_curve.clear_after( blend_out_start );
-					blend_curve.insert( blend_out_start, 1.0 );
-					blend_curve.insert( blend_out_end, 0.0 );
-
-					if( blend_out_dur > max_blend_dur )
-						max_blend_dur = blend_out_end;
-				}
-			}
-		}
-
-		++it;
-	}
-
-	if( !found_quickdraw ) {
-		std::stringstream strstr;
-		strstr << "WARNING: Character \""<<getName()<<"\" reholster(): No quickdraw controller found.";
-		LOG(strstr.str().c_str());
-	}
-
-	////  Won't compile, and I'm tired:
-	////  Error	1	error C2296: '<<' : illegal, left operand has type 'std::ostringstream (__cdecl *)(void)'
-	//	if( max_blend_dur >= 0 ) {
-	//		// schedule prune
-	//		max_blend_dur += 1;  // small buffer period
-	//
-	//		ostringstream out();
-	//		out << "char " << name << " prune";
-	//		mcu_p->execute_later( out.str().c_str(), max_blend_dur );
-	//	}
-
-	return CMD_SUCCESS;
-}
-
-
 ///////////////////////////////////////////////////////////////////////////
 
-int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, mcuCBHandle *mcu_p, bool all_characters ) {
+int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, bool all_characters )
+{
+	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
 
 	if (cmd == "mesh")
 	{
@@ -2441,7 +2364,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 								return CMD_SUCCESS;
 							}
 							else if( cmd == "prune" ) {
-						return( prune_controller_tree( mcu_p ) );
+						return( prune_controller_tree( ) );
 					}
 					else if( cmd == "viseme" )
 					{ 
@@ -2800,10 +2723,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 							return CMD_SUCCESS;
 				} 	
 				else 
-					if( cmd == "reholster" ) {
-						return( reholster_quickdraw( mcu_p ) );
-					}
-					else
+
 						if( cmd == "blink" )
 						{
 							if( eyelid_reg_ct_p )	{
@@ -3174,322 +3094,9 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 									}
 									return( CMD_NOT_FOUND );
 }
-int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
-	string char_name = args.read_token();
-	if( char_name.length()==0 ) {
-		LOG( "HELP: char <> <command>" );
-		LOG( "  param" );
-		LOG( "  init" );
-		LOG( "  smoothbindmesh" );
-		LOG( "  smoothbindweight" );
-		LOG( "  mesh");
-		LOG( "  ctrl" );
-		LOG( "  inspect" );
-		LOG( "  channels" );
-		LOG( "  controllers" );
-		LOG( "  prune" );
-		LOG( "  viseme curveon|curveoff" );
-		LOG( "  viseme timedelay <timedelay>" );
-		LOG( "  viseme magnitude <amount>" );
-		LOG( "  viseme <viseme name> <weight> <ramp in>" );
-		LOG( "  viseme <viseme name> trap <weight> <dur> [<ramp-in> [<ramp-out>]]" );
-		LOG( "  viseme <viseme name> curve <number of keys> <curve information>" );
-		LOG( "  viseme curve" );
-		LOG( "  viseme plateau on|off" );
-		LOG( "  clampvisemes on|off" );
-		LOG( "  minvisemetime <amount>" );
-		LOG( "  bone" );
-		LOG( "  bonep" );
-		LOG( "  remove" );
-		LOG( "  viewer" );
-		LOG( "  gazefade in|out [<interval>]" );
-		LOG( "  gazefade print" );
-		LOG( "  reholster" );
-		LOG( "  blink" );
-		LOG( "  eyelid pitch <enable>" );
-		LOG( "  eyelid range <min-angle> <max-angle> [<lower-min> <lower-max>]" );
-		LOG( "  eyelid close <closed-angle>" );
-		LOG( "  eyelid tight <upper-norm> [<lower-norm>]" );
-		LOG( "  softeyes" );
-		LOG( "  sk <file> <scale>");
-		LOG( "  minibrain <on|off>");
-		return( CMD_SUCCESS );
-	}
 
-	string char_cmd = args.read_token();
-	if( char_cmd.length()==0 ) {
-		LOG( "SbmCharacter::character_cmd_func: ERR: Expected character command." );
-		return CMD_FAILURE;
-	}
 
-	bool all_characters = false;
-	SbmCharacter* character = NULL;
-	if( char_name == "*" ) {
-
-		all_characters = true;
-		std::vector<std::string> characters;
-		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
-			iter != mcu_p->getCharacterMap().end();
-			iter++)
-		{
-			characters.push_back((*iter).second->getName());
-		}
-
-		for (std::vector<std::string>::iterator citer = characters.begin();
-			citer != characters.end();
-			citer++)
-		{
-			srArgBuffer copy_args( args.peek_string() );
-			character = mcu_p->getCharacter( *citer );
-			int err = character->parse_character_command( char_cmd, copy_args, mcu_p, true );
-			if( err != CMD_SUCCESS )
-				return( err );
-		}
-		return( CMD_SUCCESS );
-	} 
-
-	character = mcu_p->getCharacter( char_name );
-	if( character ) {
-
-		int err = character->parse_character_command( char_cmd, args, mcu_p, false );
-		if( err != CMD_NOT_FOUND )	{
-			return( err );
-		}
-	}
-
-	// Commands for uninitialized characters:
-	if( char_cmd == "init" ) {
-
-		char* skel_file = args.read_token();
-		char* type = args.read_token();
-		return(	
-			mcu_character_init( char_name.c_str(), skel_file, type, mcu_p )
-			);
-	} 
-	else
-		if( char_cmd == "param" ) {
-
-			char* param_name = args.read_token();
-			GeneralParam * new_param = new GeneralParam;
-			new_param->size = args.read_int();
-
-			if( new_param->size == 0 )
-			{
-				LOG("SbmCharacter::parse_character_command: param_registeration ERR: parameter size not defined!\n");
-				delete new_param;
-				return( CMD_FAILURE );
-			}
-			for(int i = 0 ; i < (int)new_param->char_names.size(); i++)
-			{
-				if(char_name == new_param->char_names[i])
-				{
-					LOG("SbmCharacter::parse_character_command: param_registeration ERR: parameter redefinition!\n");
-					delete new_param;
-					return( CMD_FAILURE );	
-				}
-			}
-			new_param->char_names.push_back( char_name );
-			GeneralParamMap::iterator it; 
-			if( (it = mcu_p->param_map.find(param_name)) != mcu_p->param_map.end())
-			{
-				it->second->char_names.push_back( char_name );
-				delete new_param;
-			}
-			else
-			{
-				mcu_p->param_map.insert(make_pair(string(param_name),new_param));
-			}
-			return( CMD_SUCCESS );
-		}
-
-		LOG( "SbmCharacter::character_cmd_func ERR: char '%s' or cmd '%s' NOT FOUND", char_name.c_str(), char_cmd.c_str() );
-		return( CMD_FAILURE );
-}
-
-int SbmCharacter::set_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
-	string character_id = args.read_token();
-	if( character_id.length()==0 ) {
-		LOG("ERROR: SbmCharacter::set_cmd_func(..): Missing character id.");
-		return CMD_FAILURE;
-	}
-
-	SbmCharacter* character = mcu_p->getCharacter( character_id );
-	if( character==NULL ) {
-		LOG("ERROR: SbmCharacter::set_cmd_func(..): Unknown character \"%s\" to set.", character_id.c_str());
-		return CMD_FAILURE;
-	}
-
-	string attribute = args.read_token();
-	if( attribute.length()==0 ) {
-		LOG("ERROR: SbmCharacter::set_cmd_func(..): Missing attribute to set.");
-		return CMD_FAILURE;
-	}
-
-	//  voice_code and voice-code are backward compatible patches
-	if( attribute=="voice" || attribute=="voice_code" || attribute=="voice-code" ) {
-		return set_voice_cmd_func( character, args, mcu_p );
-	} else if( attribute == "voicebackup") {
-		return set_voicebackup_cmd_func( character, args, mcu_p );
-	} else {
-		return SbmPawn::set_attribute( character, attribute, args, mcu_p );
-	}
-}
-
-int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle *mcu_p ) {
-	//  Command: set character voice <speech_impl> <character id> voice <implementation-id> <voice code>
-	//  Where <implementation-id> is "remote" or "audiofile"
-	//  Sets character's voice code
-	const char* impl_id = args.read_token();
-
-	if( strlen( impl_id )==0 ) {
-		character->set_speech_impl( NULL );
-		string s( "" );
-		character->set_voice_code( s );
-
-		// Give feedback if unsetting
-		LOG("Unset %s's voice.", character->getName().c_str());
-	} else if( _stricmp( impl_id, "remote" )==0 ) {
-		const char* voice_id = args.read_token();
-		if( strlen( voice_id )==0 ) {
-			LOG("ERROR: Expected remote voice id.");
-			return CMD_FAILURE;
-		}
-		character->set_speech_impl( mcu_p->speech_rvoice() );
-		string s( voice_id );
-		character->set_voice_code( s );
-	} else if( _stricmp( impl_id, "local" )==0 ) {
-		const char* voice_id = args.read_token();
-		if( strlen( voice_id )==0 ) {
-			LOG("ERROR: Expected local voice id.");
-			return CMD_FAILURE;
-		}
-		LOG("set local voice");
-		character->set_speech_impl( mcu_p->speech_localvoice() );
-		FestivalSpeechRelayLocal* relay = mcu_p->festivalRelay();
-		relay->setVoice(voice_id);
-		string s( voice_id );
-		character->set_voice_code( s );
-	} else if( _stricmp( impl_id, "audiofile" )==0 ) {
-		const char* voice_path = args.read_token();
-		if( strlen( voice_path )==0 ) {
-			LOG("ERROR: Expected audiofile voice path.");
-			return CMD_FAILURE;
-		}
-		character->set_speech_impl( mcu_p->speech_audiofile() );
-		string voice_path_str= "";
-		voice_path_str+=voice_path;
-		character->set_voice_code( voice_path_str );
-	} else if( _stricmp( impl_id, "text" )==0 ) {
-		const char* voice_path = args.read_token();
-		if( strlen( voice_path )==0 ) {
-			LOG("ERROR: Expected id.");
-			return CMD_FAILURE;
-		}
-		character->set_speech_impl( mcu_p->speech_text() );
-		string voice_path_str= "";
-		voice_path_str+=voice_path;
-		character->set_voice_code( voice_path_str );
-	} else {
-		LOG("ERROR: Unknown speech implementation \"%s\".", impl_id);
-		return CMD_FAILURE;
-	}
-	return CMD_SUCCESS;
-}
-
-int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle *mcu_p ) {
-	//  Command: set character voice <speech_impl> <character id> voice <implementation-id> <voice code>
-	//  Where <implementation-id> is "remote" or "audiofile"
-	//  Sets character's voice code
-	const char* impl_id = args.read_token();
-
-	if( strlen( impl_id )==0 ) {
-		character->set_speech_impl_backup( NULL );
-		string s("");
-		character->set_voice_code_backup( s );
-
-		// Give feedback if unsetting
-		LOG("Unset %s's voice.", character->getName().c_str());
-	} else if( _stricmp( impl_id, "remote" )==0 ) {
-		const char* voice_id = args.read_token();
-		if( strlen( voice_id )==0 ) {
-			LOG("ERROR: Expected remote voice id.");
-			return CMD_FAILURE;
-		}
-		character->set_speech_impl_backup( mcu_p->speech_rvoice() );
-		string s( voice_id );
-		character->set_voice_code_backup( s );
-	} else if( _stricmp( impl_id, "local" )==0 ) {
-		const char* voice_id = args.read_token();
-		if( strlen( voice_id )==0 ) {
-			LOG("ERROR: Expected local voice id.");
-			return CMD_FAILURE;
-		}
-		LOG("set local voice");
-		character->set_speech_impl_backup( mcu_p->speech_localvoice() );
-		FestivalSpeechRelayLocal* relay = mcu_p->festivalRelay();
-		relay->setVoice(voice_id);
-		string s( voice_id );
-		character->set_voice_code_backup( s );
-	} else if( _stricmp( impl_id, "audiofile" )==0 ) {
-		const char* voice_path = args.read_token();
-		if( strlen( voice_path )==0 ) {
-			LOG("ERROR: Expected audiofile voice path.");
-			return CMD_FAILURE;
-		}
-		character->set_speech_impl_backup( mcu_p->speech_audiofile() );
-		string voice_path_str= "";
-		voice_path_str+=voice_path;
-		character->set_voice_code_backup( voice_path_str );
-	} else if( _stricmp( impl_id, "text" )==0 ) {
-		const char* voice_path = args.read_token();
-		if( strlen( voice_path )==0 ) {
-			LOG("ERROR: Expected id.");
-			return CMD_FAILURE;
-		}
-		character->set_speech_impl_backup( mcu_p->speech_text() );
-		string voice_path_str= "";
-		voice_path_str+=voice_path;
-		character->set_voice_code_backup( voice_path_str );
-	} else {
-		LOG("ERROR: Unknown speech implementation \"%s\".", impl_id);
-		return CMD_FAILURE;
-	}
-	return CMD_SUCCESS;
-}
-
-int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
-	string character_id = args.read_token();
-	if( character_id.length()==0 ) {
-		LOG("ERROR: SbmCharacter::print_cmd_func(..): Missing character id.");
-		return CMD_FAILURE;
-	}
-
-	SbmCharacter* character = mcu_p->getCharacter( character_id );
-	if( character==NULL ) {
-		LOG("ERROR: SbmCharacter::print_cmd_func(..): Unknown character \"%s\".", character_id.c_str());
-		return CMD_FAILURE;
-	}
-
-	string attribute = args.read_token();
-	if( attribute.length()==0 ) {
-		LOG("ERROR: SbmCharacter::print_cmd_func(..): Missing attribute to print.");
-		return CMD_FAILURE;
-	}
-
-	if( attribute=="voice" || attribute=="voice_code" || attribute=="voice-code" ) {
-		//  Command: print character <character id> voice_code
-		//  Print out the character's voice_id
-		std::stringstream strstr;
-		strstr << "character " << character_id << "'s voice_code: " << character->get_voice_code();
-		LOG(strstr.str().c_str());
-		return CMD_SUCCESS;
-	} else if( attribute=="schedule" ) {
-		return character->print_controller_schedules();
-	} else {
-		return SbmPawn::print_attribute( character, attribute, args, mcu_p );
-	}
-}
 
 
 bool SbmCharacter::removeReachMotion( int tag, SkMotion* motion )

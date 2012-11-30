@@ -1,6 +1,8 @@
 #ifndef SBANIMATIONTRANSITIONRULE_H
 #define SBANIMATIONTRANSITIONRULE_H
 
+#include <sb/SBTypes.h>
+
 namespace SmartBody {
 
 class SBCharacter;
@@ -9,10 +11,10 @@ class SBAnimationBlend;
 class SBAnimationTransitionRule
 {
 	public:
-		SBAnimationTransitionRule();
-		~SBAnimationTransitionRule();
+		SBAPI SBAnimationTransitionRule();
+		SBAPI ~SBAnimationTransitionRule();
 
-		virtual bool check(SBCharacter* character, SBAnimationBlend* blend);
+		SBAPI virtual bool check(SBCharacter* character, SBAnimationBlend* blend);
 
 };
 

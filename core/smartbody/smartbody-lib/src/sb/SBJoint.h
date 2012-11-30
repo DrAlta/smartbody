@@ -1,6 +1,7 @@
 #ifndef _SBJOINT_H_
 #define _SBJOINT_H_
 
+#include <sb/SBTypes.h>
 #include <sk/sk_joint.h>
 #include <sbm/Physics/SbmColObject.h>
 #include <string>
@@ -18,50 +19,50 @@ class SBSkeleton;
 class SBJoint : public SkJoint, public SbmTransformObjInterface
 {
 	public:
-		SBJoint();
-		SBJoint( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i );
+		SBAPI SBJoint();
+		SBAPI SBJoint( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i );
 
-		void setName(const std::string& name);
-		const std::string& getName();
+		SBAPI void setName(const std::string& name);
+		SBAPI const std::string& getName();
 
-		int getIndex();
+		SBAPI int getIndex();
 		
-		void setParent(SBJoint* parent);
-		SBJoint* getParent();
-		int getNumChildren();
-		SBJoint* getChild(int index);
-		void addChild(SBJoint* child);
-		std::vector<SBJoint*> getDescendants();
+		SBAPI void setParent(SBJoint* parent);
+		SBAPI SBJoint* getParent();
+		SBAPI int getNumChildren();
+		SBAPI SBJoint* getChild(int index);
+		SBAPI void addChild(SBJoint* child);
+		SBAPI std::vector<SBJoint*> getDescendants();
 
-		void setSkeleton(SBSkeleton* skeleton);
-		SBSkeleton* getSkeleton();
+		SBAPI void setSkeleton(SBSkeleton* skeleton);
+		SBAPI SBSkeleton* getSkeleton();
 
-		SrVec getOffset();
-		void setOffset(SrVec vec);
+		SBAPI SrVec getOffset();
+		SBAPI void setOffset(SrVec vec);
 
-		SrVec getPosition();
-		SrQuat getQuaternion();
-		SrMat getMatrixGlobal();
-		SrMat getMatrixLocal();
+		SBAPI SrVec getPosition();
+		SBAPI SrQuat getQuaternion();
+		SBAPI SrMat getMatrixGlobal();
+		SBAPI SrMat getMatrixLocal();
 
-		void setUseRotation(bool val);
-		bool isUseRotation();
-		void setUsePosition(int index, bool val);
-		bool isUsePosition(int index);
+		SBAPI void setUseRotation(bool val);
+		SBAPI bool isUseRotation();
+		SBAPI void setUsePosition(int index, bool val);
+		SBAPI bool isUsePosition(int index);
 
-		void calculateLocalCenter();
-		const SrVec& getLocalCenter();
+		SBAPI void calculateLocalCenter();
+		SBAPI const SrVec& getLocalCenter();
 
-		void setMass(float mass);
-		float getMass();
+		SBAPI void setMass(float mass);
+		SBAPI float getMass();
 
-		void setPrerotation(SrQuat& quat);
-		SrQuat getPrerotation();
-		void setPostrotation(SrQuat& quat);
-		SrQuat getPostrotation();
+		SBAPI void setPrerotation(SrQuat& quat);
+		SBAPI SrQuat getPrerotation();
+		SBAPI void setPostrotation(SrQuat& quat);
+		SBAPI SrQuat getPostrotation();
 
-		virtual SbmTransform& getGlobalTransform();
-		virtual void setGlobalTransform(SbmTransform& newGlobalTransform);
+		SBAPI virtual SbmTransform& getGlobalTransform();
+		SBAPI virtual void setGlobalTransform(SbmTransform& newGlobalTransform);
 
 	protected:
 		SrVec _localCenter;

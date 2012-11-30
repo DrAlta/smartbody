@@ -1,6 +1,7 @@
 #ifndef _SBREACHMANAGER_H_
 #define _SBREACHMANAGER_H_
 
+#include <sb/SBTypes.h>
 #include <string>
 #include <map>
 
@@ -11,13 +12,13 @@ class SBReach;
 class SBReachManager
 {
 	public:
-		SBReachManager();
-		~SBReachManager();
+		SBAPI SBReachManager();
+		SBAPI ~SBReachManager();
 
-		SBReach* createReach(std::string characterName);
-		void removeReach(SBReach* reach);
-		int getNumReaches();
-		SBReach* getReach(std::string characterName);
+		SBAPI SBReach* createReach(std::string characterName);
+		SBAPI void removeReach(SBReach* reach);
+		SBAPI int getNumReaches();
+		SBAPI SBReach* getReach(std::string characterName);
 
 	protected:
 		std::map<std::string, SBReach*> _reaches;

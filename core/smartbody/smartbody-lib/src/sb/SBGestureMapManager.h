@@ -1,6 +1,7 @@
 #ifndef _SBGESTUREMAPMANAGER_H_
 #define _SBGESTUREMAPMANAGER_H_
 
+#include <sb/SBTypes.h>
 #include <string>
 #include <map>
 #include <vector>
@@ -12,14 +13,14 @@ class SBGestureMap;
 class SBGestureMapManager
 {
 	public:
-		SBGestureMapManager();
-		~SBGestureMapManager();
+		SBAPI SBGestureMapManager();
+		SBAPI ~SBGestureMapManager();
 
-		SBGestureMap* createGestureMap(std::string gestureName);
-		void removeGestureMap(std::string gestureName);
-		int getNumGestureMaps();
-		std::vector<std::string> getGestureMapNames();
-		SBGestureMap* getGestureMap(std::string gestureName);
+		SBAPI SBGestureMap* createGestureMap(std::string gestureName);
+		SBAPI void removeGestureMap(std::string gestureName);
+		SBAPI int getNumGestureMaps();
+		SBAPI std::vector<std::string> getGestureMapNames();
+		SBAPI SBGestureMap* getGestureMap(std::string gestureName);
 
 	protected:
 		std::map<std::string, SBGestureMap*> _gestureMaps;

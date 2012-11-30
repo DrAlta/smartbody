@@ -1,6 +1,7 @@
 #ifndef _SBSERVICEMANAGER_H_
 #define _SBSERVICEMANAGER_H_
 
+#include <sb/SBTypes.h>
 #include <vhcl.h>
 #include <sb/SBObject.h>
 #include <string>
@@ -13,17 +14,17 @@ class SBService;
 class SBServiceManager : public SBObject
 {
 	public:
-		SBServiceManager();
-		~SBServiceManager();
+		SBAPI SBServiceManager();
+		SBAPI ~SBServiceManager();
 
-		int getNumServices();
-		std::vector<std::string> getServiceNames();
+		SBAPI int getNumServices();
+		SBAPI std::vector<std::string> getServiceNames();
 
-		SBService* getService(const std::string& name);
-		void addService(SBService* service);
-		void removeService(const std::string& name);
+		SBAPI SBService* getService(const std::string& name);
+		SBAPI void addService(SBService* service);
+		SBAPI void removeService(const std::string& name);
 
-		std::map<std::string, SBService*>& getServices();
+		SBAPI std::map<std::string, SBService*>& getServices();
 		
 	protected:
 		std::map<std::string, SBService*> _services;

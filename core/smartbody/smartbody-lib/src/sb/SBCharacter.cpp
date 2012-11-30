@@ -157,8 +157,7 @@ bool SBCharacter::isAutomaticPruning()
 
 void SBCharacter::pruneControllers()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	prune_controller_tree( &mcu );
+	prune_controller_tree();
 }
 
 void SBCharacter::setUseVisemeCurves(bool val)

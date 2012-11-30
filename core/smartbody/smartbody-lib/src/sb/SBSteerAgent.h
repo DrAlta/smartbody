@@ -1,6 +1,7 @@
 #ifndef _STEERAGENT_H_
 #define _STEERAGENT_H_
 
+#include <sb/SBTypes.h>
 #include <sbm/SteeringAgent.h>
 
 class SteeringAgent;
@@ -12,17 +13,17 @@ class SBCharacter;
 class SBSteerAgent : public SteeringAgent
 {
 	public:
-		SBSteerAgent();
-		SBSteerAgent(SBCharacter* sbCharacter);
-		~SBSteerAgent();
+		SBAPI SBSteerAgent();
+		SBAPI SBSteerAgent(SBCharacter* sbCharacter);
+		SBAPI ~SBSteerAgent();
 
-		void setSteerStateNamePrefix(std::string prefix);
-		const std::string& getSteerStateNamePrefix();
-		void setSteerType(std::string type);
-		const std::string& getSteerType();
+		SBAPI void setSteerStateNamePrefix(std::string prefix);
+		SBAPI const std::string& getSteerStateNamePrefix();
+		SBAPI void setSteerType(std::string type);
+		SBAPI const std::string& getSteerType();
 
-		void setCurrentSBCharacter(SBCharacter* sbCharacter);
-		SBCharacter* getCurrentSBCharacter();
+		SBAPI void setCurrentSBCharacter(SBCharacter* sbCharacter);
+		SBAPI SBCharacter* getCurrentSBCharacter();
 
 	private:
 		std::string _steerType;

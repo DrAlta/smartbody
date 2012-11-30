@@ -1,6 +1,7 @@
 #ifndef _SBJOINTMAP_H_
 #define _SBJOINTMAP_H_
 
+#include <sb/SBTypes.h>
 #include <map>
 #include <vector>
 #include <string>
@@ -15,31 +16,31 @@ class SKJoint;
 class SBJointMap
 {
 	public:
-		SBJointMap();
-		~SBJointMap();
+		SBAPI SBJointMap();
+		SBAPI ~SBJointMap();
 
-		void applyMotion(SmartBody::SBMotion* motion);
-		void applyMotionRecurse(const std::string& directory);
-		void applyMotionInverse(SmartBody::SBMotion* motion); // apply the inverse mapping 
-		void applySkeleton(SmartBody::SBSkeleton* skeleton);
-		void applySkeletonInverse(SmartBody::SBSkeleton* skeleton);
-		std::vector<std::string>& getMappedMotions();
-		std::vector<std::string>& getMappedSkeletons();
-		bool isAppliedToMotion(const std::string& name);
-		bool isAppliedToSkeleton(const std::string& name);
+		SBAPI void applyMotion(SmartBody::SBMotion* motion);
+		SBAPI void applyMotionRecurse(const std::string& directory);
+		SBAPI void applyMotionInverse(SmartBody::SBMotion* motion); // apply the inverse mapping 
+		SBAPI void applySkeleton(SmartBody::SBSkeleton* skeleton);
+		SBAPI void applySkeletonInverse(SmartBody::SBSkeleton* skeleton);
+		SBAPI std::vector<std::string>& getMappedMotions();
+		SBAPI std::vector<std::string>& getMappedSkeletons();
+		SBAPI bool isAppliedToMotion(const std::string& name);
+		SBAPI bool isAppliedToSkeleton(const std::string& name);
 
-		void setMapping(const std::string& from, const std::string& to);
-		void removeMapping(const std::string& from);
+		SBAPI void setMapping(const std::string& from, const std::string& to);
+		SBAPI void removeMapping(const std::string& from);
 
-		std::string getMapTarget(const std::string& to);
-		std::string getMapSource(const std::string& from);
+		SBAPI std::string getMapTarget(const std::string& to);
+		SBAPI std::string getMapSource(const std::string& from);
 
-		int getNumMappings();
-		std::string getTarget(int num);
-		std::string getSource(int num);
+		SBAPI int getNumMappings();
+		SBAPI std::string getTarget(int num);
+		SBAPI std::string getSource(int num);
 
 		// Automatic joint name matching to standard SmartBody names
-		bool guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap=false);
+		SBAPI bool guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap=false);
 
 
 	private:

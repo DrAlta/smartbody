@@ -1,6 +1,7 @@
 #ifndef _SBREACH_H_
 #define _SBREACH_H_
 
+#include <sb/SBTypes.h>
 #include <string>
 #include <vector>
 
@@ -12,31 +13,31 @@ class SBMotion;
 class SBReach
 {
 	public:
-		SBReach();
-		SBReach(SBCharacter* character);
-		~SBReach();
+		SBAPI SBReach();
+		SBAPI SBReach(SBCharacter* character);
+		SBAPI ~SBReach();
 
-		SBCharacter* getCharacter();
-		SBReach* copy();
+		SBAPI SBCharacter* getCharacter();
+		SBAPI SBReach* copy();
 
-		void setInterpolatorType(std::string type);
-		std::string& getInterpolatorType();
-		void addMotion(std::string type, SBMotion* motion);
-		void removeMotion(std::string type, SBMotion* motion);
-		int getNumMotions();
-		bool isPawnAttached(std::string pawnName);
+		SBAPI void setInterpolatorType(std::string type);
+		SBAPI std::string& getInterpolatorType();
+		SBAPI void addMotion(std::string type, SBMotion* motion);
+		SBAPI void removeMotion(std::string type, SBMotion* motion);
+		SBAPI int getNumMotions();
+		SBAPI bool isPawnAttached(std::string pawnName);
 
-		std::vector<std::string> getMotionNames(std::string type);
-		void build(SBCharacter* character);
+		SBAPI std::vector<std::string> getMotionNames(std::string type);
+		SBAPI void build(SBCharacter* character);
 		
-		void setPointHandMotion(std::string type, SBMotion* pointMotion);
-		SBMotion* getPointHandMotion(std::string type);
-		void setGrabHandMotion(std::string type, SBMotion* grabMotion);
-		SBMotion* getGrabHandMotion(std::string type);
-		void setReleaseHandMotion(std::string type,SBMotion* releasebMotion);
-		SBMotion* getReleaseHandMotion(std::string type);
-		void setReachHandMotion(std::string type,SBMotion* reachMotion);
-		SBMotion* getReachHandMotion(std::string type);
+		SBAPI void setPointHandMotion(std::string type, SBMotion* pointMotion);
+		SBAPI SBMotion* getPointHandMotion(std::string type);
+		SBAPI void setGrabHandMotion(std::string type, SBMotion* grabMotion);
+		SBAPI SBMotion* getGrabHandMotion(std::string type);
+		SBAPI void setReleaseHandMotion(std::string type,SBMotion* releasebMotion);
+		SBAPI SBMotion* getReleaseHandMotion(std::string type);
+		SBAPI void setReachHandMotion(std::string type,SBMotion* reachMotion);
+		SBAPI SBMotion* getReachHandMotion(std::string type);
 
 	protected:
 

@@ -1,6 +1,7 @@
 #ifndef _SBOBJECT_H_
 #define _SBOBJECT_H_
 
+#include <sb/SBTypes.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -23,61 +24,61 @@ class SBAttributeManager;
 class SBObject : public SBObserver, public SBSubject
 {
 	public:
-		SBObject();
-		~SBObject();
+		SBAPI SBObject();
+		SBAPI ~SBObject();
 
-		virtual void start();
-		virtual void beforeUpdate(double time);
-		virtual void update(double time);
-		virtual void afterUpdate(double time);
-		virtual void stop();
+		SBAPI virtual void start();
+		SBAPI virtual void beforeUpdate(double time);
+		SBAPI virtual void update(double time);
+		SBAPI virtual void afterUpdate(double time);
+		SBAPI virtual void stop();
 
-		virtual void setName(const std::string& name);
-		virtual const std::string& getName();
-		bool hasAttribute(const std::string& attrName);
-		SBAttribute* getAttribute(const std::string& attrName);
-		std::map<std::string, SBAttribute*>& getAttributeList();
-		SBAttributeManager* getAttributeManager();
-		void addAttribute(SBAttribute* attr);
-		void addAttribute(SBAttribute* attr, const std::string& groupName);
-		bool removeAttribute(const std::string& name);
-		void clearAttributes();
-		int getNumAttributes();
+		SBAPI virtual void setName(const std::string& name);
+		SBAPI virtual const std::string& getName();
+		SBAPI bool hasAttribute(const std::string& attrName);
+		SBAPI SBAttribute* getAttribute(const std::string& attrName);
+		SBAPI std::map<std::string, SBAttribute*>& getAttributeList();
+		SBAPI SBAttributeManager* getAttributeManager();
+		SBAPI void addAttribute(SBAttribute* attr);
+		SBAPI void addAttribute(SBAttribute* attr, const std::string& groupName);
+		SBAPI bool removeAttribute(const std::string& name);
+		SBAPI void clearAttributes();
+		SBAPI int getNumAttributes();
 
-		std::vector<std::string> getAttributeNames();
+		SBAPI std::vector<std::string> getAttributeNames();
 
-		BoolAttribute* createBoolAttribute(const std::string& name, bool value, bool notifySelf, const std::string& groupName, int priority, 
+		SBAPI BoolAttribute* createBoolAttribute(const std::string& name, bool value, bool notifySelf, const std::string& groupName, int priority, 
 													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
-		IntAttribute* createIntAttribute(const std::string& name, int value, bool notifySelf, const std::string& groupName, int priority, 
+		SBAPI IntAttribute* createIntAttribute(const std::string& name, int value, bool notifySelf, const std::string& groupName, int priority, 
 													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
-		DoubleAttribute* createDoubleAttribute(const std::string& name, double value, bool notifySelf, const std::string& groupName, int priority, 
+		SBAPI DoubleAttribute* createDoubleAttribute(const std::string& name, double value, bool notifySelf, const std::string& groupName, int priority, 
 													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
-		Vec3Attribute* createVec3Attribute(const std::string& name, float val1, float val2, float val3, bool notifySelf, const std::string& groupName, int priority, 
-													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
-
-		StringAttribute* createStringAttribute(const std::string& name, const std::string& value, bool notifySelf, const std::string& groupName, int priority, 
-													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
-		MatrixAttribute* createMatrixAttribute(const std::string& name, SrMat& value, bool notifySelf, const std::string& groupName, int priority, 
-													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
-		ActionAttribute* createActionAttribute(const std::string& name, bool notifySelf, const std::string& groupName, int priority, 
+		SBAPI Vec3Attribute* createVec3Attribute(const std::string& name, float val1, float val2, float val3, bool notifySelf, const std::string& groupName, int priority, 
 													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
 
-		void setBoolAttribute(const std::string& name, bool value);
-		void setIntAttribute(const std::string& name, int value);
-		void setDoubleAttribute(const std::string& name, double value);
-		void setVec3Attribute(const std::string& name, float val1, float val2, float val3);
-		void setStringAttribute(const std::string& name, std::string value);
-		void setMatrixAttribute(const std::string& name, SrMat& value);
-		void setActionAttribute(const std::string& name);
+		SBAPI StringAttribute* createStringAttribute(const std::string& name, const std::string& value, bool notifySelf, const std::string& groupName, int priority, 
+													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
+		SBAPI MatrixAttribute* createMatrixAttribute(const std::string& name, SrMat& value, bool notifySelf, const std::string& groupName, int priority, 
+													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
+		SBAPI ActionAttribute* createActionAttribute(const std::string& name, bool notifySelf, const std::string& groupName, int priority, 
+													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
 
-		const bool& getBoolAttribute(const std::string& name) ;
-		const int&  getIntAttribute(const std::string& name) ;
-		const double& getDoubleAttribute(const std::string& name) ;
-		const SrVec& getVec3Attribute(const std::string& name) ;
-		const std::string& getStringAttribute(const std::string& name) ;
-		const SrMat& getMatrixAttribute(const std::string& name) ;
+		SBAPI void setBoolAttribute(const std::string& name, bool value);
+		SBAPI void setIntAttribute(const std::string& name, int value);
+		SBAPI void setDoubleAttribute(const std::string& name, double value);
+		SBAPI void setVec3Attribute(const std::string& name, float val1, float val2, float val3);
+		SBAPI void setStringAttribute(const std::string& name, std::string value);
+		SBAPI void setMatrixAttribute(const std::string& name, SrMat& value);
+		SBAPI void setActionAttribute(const std::string& name);
 
-		virtual void notify(SBSubject* subject);
+		SBAPI const bool& getBoolAttribute(const std::string& name) ;
+		SBAPI const int&  getIntAttribute(const std::string& name) ;
+		SBAPI const double& getDoubleAttribute(const std::string& name) ;
+		SBAPI const SrVec& getVec3Attribute(const std::string& name) ;
+		SBAPI const std::string& getStringAttribute(const std::string& name) ;
+		SBAPI const SrMat& getMatrixAttribute(const std::string& name) ;
+
+		SBAPI virtual void notify(SBSubject* subject);
 
 
 	protected:

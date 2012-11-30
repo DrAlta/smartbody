@@ -50,6 +50,12 @@ bool srPathList::remove(std::string path)
 	return false;	
 }
 		
+void srPathList::removeAll()
+{
+	_paths.clear();
+}
+	
+
 void srPathList::reset()
 {	
 	_curIndex = 0;

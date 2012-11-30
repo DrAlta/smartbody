@@ -1,6 +1,7 @@
 #ifndef _SBMOTION_H
 #define _SBMOTION_H
 
+#include <sb/SBTypes.h>
 #include <vector>
 #include <string>
 #include <sk/sk_motion.h>
@@ -15,15 +16,18 @@ class SBJointMapManager;
 
 class FootStepRecord
 {
-public:
-	std::vector<std::string> jointNames; // all joints related to a footstep
-	std::vector<SrVec> posVec; // desired positions for these joints
-	float startTime, endTime;	
-	FootStepRecord();
-	~FootStepRecord();
-	FootStepRecord& operator= ( const FootStepRecord& rt);
+	public:
+		SBAPI FootStepRecord();
+		SBAPI ~FootStepRecord();
 
-	void updateJointAveargePosition( SBSkeleton* skel, SBMotion* motion);
+		SBAPI FootStepRecord& operator= ( const FootStepRecord& rt);
+		SBAPI void updateJointAveragePosition( SBSkeleton* skel, SBMotion* motion);
+
+		std::vector<std::string> jointNames; // all joints related to a footstep
+		std::vector<SrVec> posVec; // desired positions for these joints
+		float startTime;
+		float endTime;	
+
 };
 
 class SBMotion : public SkMotion
@@ -33,97 +37,95 @@ class SBMotion : public SkMotion
 		{
 			Unknown, Posture, Gesture, Locomotion, Reach
 		};
-
-		SBMotion();
-		SBMotion(const SBMotion& motion);
-		SBMotion(std::string motionFile);
-		~SBMotion();
+		SBAPI SBMotion();
+		SBAPI SBMotion(const SBMotion& motion);
+		SBAPI SBMotion(std::string motionFile);
+		SBAPI ~SBMotion();		
+		SBAPI const std::string& getMotionFileName();
+		SBAPI int getNumFrames();
+		SBAPI std::vector<float> getFrameData(int i);
+		SBAPI int getFrameSize();
 		void setMotionType(MotionType type);
-		const std::string& getMotionFileName();
-		int getNumFrames();
-		std::vector<float> getFrameData(int i);
-		int getFrameSize();
 
-		int getNumChannels();
-		std::vector<std::string> getChannels();
-		void checkSkeleton(std::string skel);
+
+		SBAPI int getNumChannels();
+		SBAPI std::vector<std::string> getChannels();
+		SBAPI void checkSkeleton(std::string skel);
 		
-		virtual void connect(SBSkeleton* skel);
-		virtual void disconnect();
+		SBAPI virtual void connect(SBSkeleton* skel);
+		SBAPI virtual void disconnect();
 
-		void alignToBegin(int numFrames);
-		void alignToEnd(int numFrames);
-		int getAlignIndex();
-		void recoverAlign();
-		SBMotion* duplicateCycle(int num, std::string name);
+		SBAPI void alignToBegin(int numFrames);
+		SBAPI void alignToEnd(int numFrames);
+		SBAPI int getAlignIndex();
+		SBAPI void recoverAlign();
+		SBAPI SBMotion* duplicateCycle(int num, std::string name);
 
-		SBMotion* mirror(std::string name, std::string skeletonName);
-		SBMotion* mirrorChildren(std::string name, std::string skeletonName, std::string parentJointName);
-		SBMotion* smoothCycle(std::string name, float timeInterval);
-		SBMotion* retarget(std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints, std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJointMap);	
+		SBAPI SBMotion* mirror(std::string name, std::string skeletonName);
+		SBAPI SBMotion* mirrorChildren(std::string name, std::string skeletonName, std::string parentJointName);
+		SBAPI SBMotion* smoothCycle(std::string name, float timeInterval);
+		SBAPI SBMotion* retarget(std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints, std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJointMap);	
 
 
-		bool translate(float x, float y, float z, const std::string& baseJointName);
-		bool rotate(float xaxis, float yaxis, float zaxis, const std::string& baseJointName);
-		bool scale(float factor);
-		bool retime(float factor);
-		bool trim(int numFramesFromFront, int numFramesFromBack);
+		SBAPI bool translate(float x, float y, float z, const std::string& baseJointName);
+		SBAPI bool rotate(float xaxis, float yaxis, float zaxis, const std::string& baseJointName);
+		SBAPI bool scale(float factor);
+		SBAPI bool retime(float factor);
+		SBAPI bool trim(int numFramesFromFront, int numFramesFromBack);
 	//	bool move(int startFrame, int endFrame, int position);
-		void saveToSkm(const std::string& fileName);
+		SBAPI void saveToSkm(const std::string& fileName);
 
-		float getJointSpeed(SBJoint* joint, float startTime, float endTime);
-		float getJointSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);
-		float getJointAngularSpeed(SBJoint* joint, float startTime, float endTime);
-		float getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);
+		SBAPI float getJointSpeed(SBJoint* joint, float startTime, float endTime);
+		SBAPI float getJointSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);
+		SBAPI float getJointAngularSpeed(SBJoint* joint, float startTime, float endTime);
+		SBAPI float getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);
 		
-		std::vector<float> getJointTransition(SBJoint* joint, float startTime, float endTime);
-		SrVec getJointPosition(SBJoint* joint, float time);
+		SBAPI std::vector<float> getJointTransition(SBJoint* joint, float startTime, float endTime);
+		SBAPI SrVec getJointPosition(SBJoint* joint, float time);
 
-		SBJointMap* getJointMap();
+		SBAPI SBJointMap* getJointMap();
 
-		bool autoFootStepDetection(std::vector<double>& outMeans, int numStepsPerJoint, int maxNumSteps, SBSkeleton* skeleton, 
+		SBAPI bool autoFootStepDetection(std::vector<double>& outMeans, int numStepsPerJoint, int maxNumSteps, SBSkeleton* skeleton, 
 								   std::vector<std::string>& selectedJoints, float floorHeight, float floorThreshold, float speedThreshold, 
 								   int speedWindow, bool isPrintDebugInfo = false);
 
-		bool autoFootPlantDetection(SBSkeleton* srcSk, std::vector<std::string>& footJoints, float floorHeight, float heightThreshold, float speedThreshold, std::vector<FootStepRecord>& footStepRecords);		
-		SBMotion* autoFootSkateCleanUp(std::string name, std::string srcSkeletonName, std::string rootName, std::vector<FootStepRecord>& footStepRecords);
-		SBMotion* buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* targetSk, SBMotion* targetMotion, std::vector<std::string>& endJoints, std::vector<std::string>& endJointRoots );
+		SBAPI bool autoFootPlantDetection(SBSkeleton* srcSk, std::vector<std::string>& footJoints, float floorHeight, float heightThreshold, float speedThreshold, std::vector<FootStepRecord>& footStepRecords);		
+		SBAPI SBMotion* autoFootSkateCleanUp(std::string name, std::string srcSkeletonName, std::string rootName, std::vector<FootStepRecord>& footStepRecords);
+		SBAPI SBMotion* buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* targetSk, SBMotion* targetMotion, std::vector<std::string>& endJoints, std::vector<std::string>& endJointRoots );
 
 		// API wrapper
-		SBMotion* footSkateCleanUp(std::string name, std::vector<std::string>& footJoints, std::string srcSkeletonName, std::string srcMotionName, 
+		SBAPI SBMotion* footSkateCleanUp(std::string name, std::vector<std::string>& footJoints, std::string srcSkeletonName, std::string srcMotionName, 
 								   std::string tgtSkeletonName, std::string tgtRootName, float floorHeight, float heightThreshold, float speedThreshold);
 
-		SBMotion* constrain(std::string name, std::string srcSkeletonName, std::string tgtSkeletonName, std::string tgtMotionName, std::vector<std::string>& endJoints, std::vector<std::string>& endJointRoots);
+		SBAPI SBMotion* constrain(std::string name, std::string srcSkeletonName, std::string tgtSkeletonName, std::string tgtMotionName, std::vector<std::string>& endJoints, std::vector<std::string>& endJointRoots);
 
-		double getFrameRate();
-		double getDuration();
-		double getTimeStart();
-		double getTimeReady();
-		double getTimeStrokeStart();
-		double getTimeStroke();
-		double getTimeStrokeEnd();
-		double getTimeRelax();
-		double getTimeStop();
+		SBAPI double getFrameRate();
+		SBAPI double getDuration();
+		SBAPI double getTimeStart();
+		SBAPI double getTimeReady();
+		SBAPI double getTimeStrokeStart();
+		SBAPI double getTimeStroke();
+		SBAPI double getTimeStrokeEnd();
+		SBAPI double getTimeRelax();
+		SBAPI double getTimeStop();
 
-		bool setSyncPoint(const std::string& syncTag, double time);	
-		void validateSyncPoint(const std::string& syncTag);
+		SBAPI bool setSyncPoint(const std::string& syncTag, double time);	
+		SBAPI void validateSyncPoint(const std::string& syncTag);
 
-		bool addMetaData(const std::string& tagName, const std::string& strValue);
-		bool hasMetaData(const std::string& tagName);
-		bool removeMetaData(const std::string& tagName);		
-		std::string getMetaDataString(const std::string& tagName);
-		double      getMetaDataDouble(const std::string& tagName);
-		std::vector<std::string> getMetaDataTags();
-		void addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly);
+		SBAPI bool addMetaData(const std::string& tagName, const std::string& strValue);
+		SBAPI bool hasMetaData(const std::string& tagName);
+		SBAPI bool removeMetaData(const std::string& tagName);		
+		SBAPI std::string getMetaDataString(const std::string& tagName);
+		SBAPI double      getMetaDataDouble(const std::string& tagName);
+		SBAPI std::vector<std::string> getMetaDataTags();
+		SBAPI void addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly);
 
 	protected:
 		void alignToSide(int numFrames, int direction = 0);
 
 		static bool kMeansClustering1D(int num, std::vector<double>& inputPoints, std::vector<double>& outMeans);
 		static void calculateMeans(std::vector<double>&inputPoints, std::vector<double>& means, double convergentValue);
-		
 
-	protected:
 		std::string _motionFile;
 		std::string _emptyString;
 		int alignIndex;

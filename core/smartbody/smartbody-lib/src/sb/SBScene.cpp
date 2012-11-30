@@ -696,6 +696,35 @@ void SBScene::removeAssetPath(std::string type, std::string path)
 	}
 }
 
+void SBScene::removeAllAssetPaths(std::string type)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+
+	bool ret = false;
+	if (type == "seq" || type == "script")
+	{
+		 mcu.seq_paths.removeAll();
+	}
+	else if (type == "me" || type == "ME" || type == "motion")
+	{
+		mcu.me_paths.removeAll();
+	}
+	else if (type == "audio")
+	{
+		mcu.audio_paths.removeAll();
+	}
+	else
+	{
+		LOG("Input type %s not recognized!", type.c_str());
+		return;
+	}
+
+	if (ret)
+	{
+		// remove the resource from the resource manager
+	}
+}
+
 void SBScene::loadAssets()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 

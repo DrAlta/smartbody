@@ -48,7 +48,6 @@
 #include "sbm_deformable_mesh.h"
 #include "sbm/Physics/SbmPhysicsSim.h"
 // Declare classes used (avoid circular references)
-class mcuCBHandle;
 class srArgBuffer;
 
 
@@ -187,59 +186,29 @@ protected:
 	 */
 	virtual int setup();
 
-	void wo_cache_update();
-
 	void initData();
 
-	int parse_pawn_command( std::string cmd, srArgBuffer& args, mcuCBHandle *mcu_p);
-
+	
 
 
 public:
-	// static command functions
-
-
-	/**
-	 *  Creates a pawn that can be updated through the WSP library
-	 */
-	static int create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-
 	/**
 	 *  Removes a remote pawn that was being manipulated by the WSP library
 	 */
-	static int remove_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+	static int remove_remote_pawn_func( srArgBuffer& args);
 
-	/**
-	 *  Handles commands beginning with "pawn ...".
-	 */
-	static int pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
-	/**
-	 *  Handles commands beginning with "set pawn <pawn id> ...".
-	 */
-	static int set_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-
-	/**
-	 *  Sets the given attribute of the pawn..
-	 */
-	static int set_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args, mcuCBHandle *mcu_p );
 
 	/**
 	 *  Handles commands beginning with "set pawn <pawn id> world_offset ...".
 	 */
 	static int set_world_offset_cmd( SbmPawn* pawn, srArgBuffer& args );
 
-	/**
-	 *  Handles commands beginning with "print pawn <pawn id> ...".
-	 */
-	static int print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-
-	/**
-	 *  Prints the given attribute of the pawn.
-	 */
-	static int print_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args, mcuCBHandle *mcu_p );
 
 	MeCtChannelWriter* get_world_offset_writer_p()	{return world_offset_writer_p;}
+
+	void wo_cache_update();
+	int parse_pawn_command( std::string cmd, srArgBuffer& args);
 
 	/**
 	 *  WSP access functions.
@@ -250,6 +219,9 @@ public:
 	static WSP::WSP_ERROR wsp_position_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
 	static WSP::WSP_ERROR wsp_rotation_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
 #endif
+
+
+
 };
 
 #endif // SBM_PAWN_HPP

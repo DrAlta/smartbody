@@ -1,6 +1,7 @@
 #ifndef _STEERMANAGER_H_
 #define _STEERMANAGER_H_
 
+#include <sb/SBTypes.h>
 #include <vhcl.h>
 #include <SteerLib.h>
 
@@ -14,26 +15,26 @@ class SBSteerAgent;
 class SBSteerManager : public SmartBody::SBService
 {
 	public:
-		SBSteerManager();
-		~SBSteerManager();
+		SBAPI SBSteerManager();
+		SBAPI ~SBSteerManager();
 		
-		virtual void setEnable(bool enable);
-		virtual void start();
-		virtual void beforeUpdate(double time);
-		virtual void update(double time);
-		virtual void afterUpdate(double time);
-		virtual void stop();
+		SBAPI virtual void setEnable(bool enable);
+		SBAPI virtual void start();
+		SBAPI virtual void beforeUpdate(double time);
+		SBAPI virtual void update(double time);
+		SBAPI virtual void afterUpdate(double time);
+		SBAPI virtual void stop();
 
-		virtual void onCharacterDelete(SBCharacter* character);
+		SBAPI virtual void onCharacterDelete(SBCharacter* character);
 
-		SteerSuiteEngineDriver* getEngineDriver();
+		SBAPI SteerSuiteEngineDriver* getEngineDriver();
 
-		SBSteerAgent* createSteerAgent(std::string name);
-		void removeSteerAgent(std::string name);
-		int getNumSteerAgents();
-		SBSteerAgent* getSteerAgent(std::string name);
-		std::vector<std::string> getSteerAgentNames();
-		std::map<std::string, SBSteerAgent*>& getSteerAgents();
+		SBAPI SBSteerAgent* createSteerAgent(std::string name);
+		SBAPI void removeSteerAgent(std::string name);
+		SBAPI int getNumSteerAgents();
+		SBAPI SBSteerAgent* getSteerAgent(std::string name);
+		SBAPI std::vector<std::string> getSteerAgentNames();
+		SBAPI std::map<std::string, SBSteerAgent*>& getSteerAgents();
 
 	protected:
 		std::map<std::string, SBSteerAgent*> _steerAgents;

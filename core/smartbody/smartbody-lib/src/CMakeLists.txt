@@ -381,6 +381,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SbmDebuggerClient.cpp
 	sbm/SbmDebuggerUtility.cpp
 	sbm/SteerPath.cpp
+	sbm/MiscCommands.cpp
 
 )
 

@@ -1,6 +1,7 @@
 #ifndef _SBGESTUREMAP_H_
 #define _SBGESTUREMAP_H_
 
+#include <sb/SBTypes.h>
 #include <string>
 #include <vector>
 #include <sb/SBObject.h>
@@ -10,7 +11,7 @@ namespace SmartBody {
 class SBGestureMap : public SBObject 
 {
 	public:
-		struct GestureInfo
+		SBAPI struct GestureInfo
 		{
 			std::string _animation;
 			std::string _lexeme;
@@ -21,18 +22,18 @@ class SBGestureMap : public SBObject
 		};
 
 	public:
-		SBGestureMap();
-		SBGestureMap(const std::string& name);
-		~SBGestureMap();
+		SBAPI SBGestureMap();
+		SBAPI SBGestureMap(const std::string& name);
+		SBAPI ~SBGestureMap();
 
-		SBGestureMap* copy();
+		SBAPI SBGestureMap* copy();
 
-		void addGestureMapping(const std::string& name, const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture);
-		std::string getGestureByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture, const std::string& policy);
-		std::vector<std::string> getGestureListByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture);
-		GestureInfo& getGestureByIndex(int i);
-		int getNumMappings();
-		void validate();
+		SBAPI void addGestureMapping(const std::string& name, const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture);
+		SBAPI std::string getGestureByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture, const std::string& policy);
+		SBAPI std::vector<std::string> getGestureListByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture);
+		SBAPI GestureInfo& getGestureByIndex(int i);
+		SBAPI int getNumMappings();
+		SBAPI void validate();
 
 	private:
 		bool gestureInfoCompare(const std::string& glexeme, const std::string& gtype, const std::string& ghand, const std::string& gstyle, const std::string& gposture,
