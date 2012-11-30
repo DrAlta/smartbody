@@ -370,7 +370,6 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBBehaviorSet.cpp
 	sb/SBBehaviorSetManager.cpp
 	sb/SBMotionBlendBase.cpp
-	sb/SBTypes.cpp
 
 	sb/SBPython.cpp
 	sb/SBPythonClass.cpp
