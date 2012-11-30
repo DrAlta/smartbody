@@ -327,4 +327,6 @@ emphasis time: 1.67
 stroke time: 1.73
 relax time: 1.87
 
+noise_frequency: "0.015"
 noise_joints: "spine1 spine4"
+noise_scale: "0.05"

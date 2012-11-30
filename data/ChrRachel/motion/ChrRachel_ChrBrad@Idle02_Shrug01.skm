@@ -1,6 +1,6 @@
 SkMotion
 
-name "ChrRachel_ChrBrad@Idle01_Shrug01"
+name "ChrRachel_ChrBrad@Idle02_Shrug01"
 
 channels 201
 JtRoot XPos
@@ -287,4 +287,6 @@ emphasis time: 1.5
 stroke time: 1.53
 relax time: 1.63
 
+noise_frequency: "0.015"
 noise_joints: "spine1 spine4"
+noise_scale: "0.05"

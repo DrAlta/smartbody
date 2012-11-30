@@ -62,6 +62,8 @@ SBMotion::SBMotion() : SkMotion()
 	_motionFile = "";
 
 	alignIndex = 0; 
+
+	_motionType = Unknown;
 }
 
 SBMotion::SBMotion(const SBMotion& motion)
@@ -69,6 +71,8 @@ SBMotion::SBMotion(const SBMotion& motion)
 	//...
 
 	alignIndex = 0;
+
+	_motionType = Unknown;
 }
 
 SBMotion::SBMotion(std::string file) : SkMotion()
@@ -76,11 +80,18 @@ SBMotion::SBMotion(std::string file) : SkMotion()
 	_motionFile = file;
 
 	alignIndex = 0;
+
+	_motionType = Unknown;
 }
 
 SBMotion::~SBMotion()
 {
 	_motionFile = "";
+}
+
+void SBMotion::setMotionType(MotionType type)
+{
+	_motionType = type;
 }
 
 const std::string& SBMotion::getMotionFileName()

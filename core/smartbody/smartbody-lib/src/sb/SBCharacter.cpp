@@ -24,7 +24,10 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	
-	createBoolAttribute("bmlRequest.autoGestureTransition", false, true, "Basic", 90, false, false, false, "Whether smartbody should figure out the transition between gestures' stroke automatically."); 
+	createBoolAttribute("bmlRequest.autoGestureTransition", false, true, "Basic", 90, false, false, false, "Whether smartbody should filter gestures behaviors according to priority."); 
+	createDoubleAttribute("bmlRequest.gestureSpeedThreshold", 1.5, true, "Basic", 95, false, false, false, "The speed threshold used to determine whether it's suitable to transition from one gesture to another"); 
+	createDoubleAttribute("bmlRequest.gestureWristActiveThreshold", 0.3, true, "Basic", 96, false, false, false, "The speed threshold used to determine if this hand moving."); 
+	createBoolAttribute("bmlRequest.gestureLog", false, true, "Basic", 95, false, false, false, "Toggle for logging the gesture request process."); 
 	createStringAttribute("gestureMap", "", true, "Basic", 50, false, false, false, "Name of the gesture map to use.");
 
 	std::vector<std::string> gesturePolicyVec;

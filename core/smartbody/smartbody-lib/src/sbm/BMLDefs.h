@@ -34,6 +34,7 @@ class BMLDefs
 		static XMLCh* ATTR_POSTSTROKE_HOLD_IDLEMOTION;
 		static XMLCh* ATTR_SCALE;
 		static XMLCh* ATTR_FREQUENCY;
+		static XMLCh* ATTR_PRIORITY;
 
 		static XMLCh* TM_START;
 		static XMLCh* TM_READY;

@@ -29,6 +29,7 @@ class SBGestureMap : public SBObject
 
 		void addGestureMapping(const std::string& name, const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture);
 		std::string getGestureByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture, const std::string& policy);
+		std::vector<std::string> getGestureListByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture);
 		GestureInfo& getGestureByIndex(int i);
 		int getNumMappings();
 		void validate();

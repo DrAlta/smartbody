@@ -36,11 +36,15 @@ class SmartBodyNVBG(Nvbg):
                 #print "In notifyAction, attribute is " + name
                 if (name == "play dialog"):
                         dialogStr = self.getAttribute("dialog").getValue()
+                        audioStr = self.getAttribute("audio").getValue()
                         if (dialogStr == ""):
                                 #print "dialog not selected, play default one"
                                 self.nvbg.speak()
                         else:
-                                self.nvbg.speak(dialogStr, self.nvbg.characterName)
+                                if (audioStr == ""):
+                                        self.nvbg.speak(dialogStr)
+                                else:
+                                        self.nvbg.speak(dialogStr, audioStr) 
 
                 if (name == "play behavior"):
                         selectedBml = self.getAttribute("bml").getValue()
@@ -180,6 +184,7 @@ class SmartBodyNVBG(Nvbg):
 
                 ''' dialogs '''
                 dialog = self.createStringAttribute("dialog", "", True, "nvbgs", 50, False, False, False, "Dialog")
+                audio = self.createStringAttribute("audio", "", True, "nvbgs", 55, False, False, False, "Dialog")
                 self.createActionAttribute("play dialog", True, "nvbgs", 60, False, False, False, "Play the chosen dialog")
 
                 ''' nvbg behaviors '''

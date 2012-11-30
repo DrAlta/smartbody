@@ -7,6 +7,7 @@ scene.setMediaPath("../../../../data")
 ### Load data/sbm-common assets
 scene.addAssetPath("script", "sbm-common/scripts")
 scene.addAssetPath("mesh", "mesh")
+scene.addAssetPath("audio", ".")
 
 scene.setScale(1.0)
 scene.setBoolAttribute("internalAudio", True)
@@ -56,6 +57,7 @@ gMap.addGestureMapping("ChrBrad@Idle03_YouLf01", "DEICTIC", "YOU", "LEFT_HAND", 
 gMap.addGestureMapping("ChrBrad@Idle01_MeLf01", "DEICTIC", "ME", "LEFT_HAND", "", "ChrBrad@Idle01")
 gMap.addGestureMapping("ChrBrad@Idle02_MeRt01", "DEICTIC", "ME", "RIGHT_HAND", "", "ChrBrad@Idle02")
 gMap.addGestureMapping("ChrBrad@Idle03_MeLf01", "DEICTIC", "ME", "LEFT_HAND", "", "ChrBrad@Idle03")
+gMap.addGestureMapping("ChrBrad@Idle03_Me", "DEICTIC", "ME", "BOTH_HANDS", "", "ChrBrad@Idle03")
 gMap.addGestureMapping("ChrBrad@Idle01_IndicateLeftLf01", "DEICTIC", "LEFT", "LEFT_HAND", "", "ChrBrad@Idle01")
 gMap.addGestureMapping("ChrBrad@Idle01_IndicateLeftBt01", "DEICTIC", "LEFT", "BOTH_HANDS", "", "ChrBrad@Idle01")
 gMap.addGestureMapping("ChrBrad@Idle01_IndicateRightRt01", "DEICTIC", "RIGHT", "RIGHT_HAND", "", "ChrBrad@Idle01")
@@ -106,6 +108,11 @@ gMap.addGestureMapping("ChrBrad@Idle02_BeatLowLf01", "EMBLEM", "GREETING", "LEFT
 gMap.addGestureMapping("ChrBrad@Idle03_BeatLowLf01", "EMBLEM", "GREETING", "LEFT_HAND", "", "ChrBrad@Idle03")
 gMap.addGestureMapping("ChrBrad@Idle01_Contemplate01", "ADAPTOR", "CONTEMPLATE", "BOTH_HANDS", "mid", "ChrBrad@Idle01")
 gMap.addGestureMapping("ChrBrad@Idle01_Think01", "ADAPTOR", "CONTEMPLATE", "BOTH_HANDS", "low", "ChrBrad@Idle01")
+gMap.addGestureMapping("ChrBrad@Idle03_DeicticLeft", "DEICTIC", "LEFT", "BOTH_HANDS", "", "ChrBrad@Idle03")
+gMap.addGestureMapping("ChrBrad@Idle03_DeicticRight", "DEICTIC", "RIGHT", "RIGHT_HAND", "", "ChrBrad@Idle03")
+gMap.addGestureMapping("ChrBrad@Idle03_EmptyLarge", "METAPHORIC", "EMPTY", "BOTH_HANDS", "large", "ChrBrad@Idle03")
+gMap.addGestureMapping("ChrBrad@Idle03_EmptyMedium", "METAPHORIC", "EMPTY", "BOTH_HANDS", "medium", "ChrBrad@Idle03")
+gMap.addGestureMapping("ChrBrad@Idle03_Frame", "METAPHORIC", "FRAME", "BOTH_HANDS", "", "ChrBrad@Idle03")
 
 
 # Rachel's gestures
@@ -303,7 +310,7 @@ rachel.setBoolAttribute("steering.pathFollowingMode", True)
 sim.start()
 
 bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01"/>')
-bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01"/>')
+bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01" start="1"/>')
 
 bml.execBML('ChrBrad', '<saccade mode="listen"/>')
 bml.execBML('ChrRachel', '<saccade mode="listen"/>')

@@ -273,4 +273,6 @@ emphasis time: 0.77
 stroke time: 0.77
 relax time: 0.94
 
+noise_frequency: "0.015"
 noise_joints: "l_shoulder l_elbow"
+noise_scale: "0.05"

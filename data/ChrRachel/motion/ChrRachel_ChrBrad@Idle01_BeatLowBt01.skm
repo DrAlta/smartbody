@@ -266,7 +266,9 @@ kt 1.9 fr 0.085258 -0.010916 -0.069724 -0.022874 -0.075411 0.003550 -0.141781 -0
 ready time: 0.43
 strokeStart time: 0.43
 emphasis time: 0.87
-stroke time: 0.87
+stroke time: 1.0
 relax time: 1.03
 
+noise_frequency: "0.015"
 noise_joints: "l_shouder l_elbow r_shoulder r_elbow"
+noise_scale: "0.03"
