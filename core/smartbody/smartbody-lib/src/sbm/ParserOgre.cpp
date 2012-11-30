@@ -185,11 +185,11 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 		DOMNamedNodeMap* childAttr = child->getAttributes();
 		if (childAttr)
 		{
-			DOMNode* boneNode = childAttr->getNamedItem(L"bone");
+			const DOMNode* boneNode = childAttr->getNamedItem(L"bone");
 			std::string boneAttr = "";
 			if (boneNode)
 				xml_utils::xml_translate(&boneAttr, boneNode->getNodeValue());
-			DOMNode* parentNode = childAttr->getNamedItem(L"parent");
+			const DOMNode* parentNode = childAttr->getNamedItem(L"parent");
 			std::string parentAttr = "";
 			if (parentNode)
 				xml_utils::xml_translate(&parentAttr, parentNode->getNodeValue());
@@ -213,11 +213,11 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 		DOMNamedNodeMap* childAttr = child->getAttributes();
 		if (childAttr)
 		{
-			DOMNode* idNode = childAttr->getNamedItem(L"id");
+			const DOMNode* idNode = childAttr->getNamedItem(L"id");
 			std::string idAttr = "";
 			if (idNode)
 				xml_utils::xml_translate(&idAttr, idNode->getNodeValue());
-			DOMNode* nameNode = childAttr->getNamedItem(L"name");
+			const DOMNode* nameNode = childAttr->getNamedItem(L"name");
 			std::string nameAttr = "";
 			if (nameNode)
 				xml_utils::xml_translate(&nameAttr, nameNode->getNodeValue());
@@ -276,17 +276,17 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 						DOMNamedNodeMap* positionAttr = transformNode->getAttributes();
 						if (positionAttr)
 						{
-							DOMNode* xNode = positionAttr->getNamedItem(L"x");
+							const DOMNode* xNode = positionAttr->getNamedItem(L"x");
 							std::string xAttr = "";
 							if (xNode)
 								xml_utils::xml_translate(&xAttr, xNode->getNodeValue());
 							offset.x = (float) atof(xAttr.c_str());
-							DOMNode* yNode = positionAttr->getNamedItem(L"y");
+							const DOMNode* yNode = positionAttr->getNamedItem(L"y");
 							std::string yAttr = "";
 							if (yNode)
 								xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
 							offset.y = (float) atof(yAttr.c_str());
-							DOMNode* zNode = positionAttr->getNamedItem(L"z");
+							const DOMNode* zNode = positionAttr->getNamedItem(L"z");
 							std::string zAttr = "";
 							if (zNode)
 								xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
@@ -301,7 +301,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 						DOMNamedNodeMap* rotationAttr = transformNode->getAttributes();
 						if (rotationAttr)
 						{					
-							DOMNode* angleNode = rotationAttr->getNamedItem(L"angle");
+							const DOMNode* angleNode = rotationAttr->getNamedItem(L"angle");
 							std::string angleAttr = "";
 							if (angleNode)
 								xml_utils::xml_translate(&angleAttr, angleNode->getNodeValue());
@@ -319,17 +319,17 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 								if (axisAttr)
 								{
 									SrVec axis;
-									DOMNode* xNode = axisAttr->getNamedItem(L"x");
+									const DOMNode* xNode = axisAttr->getNamedItem(L"x");
 									std::string xAttr = "";
 									if (xNode)
 										xml_utils::xml_translate(&xAttr, xNode->getNodeValue());
 									axis.x = (float) atof(xAttr.c_str());
-									DOMNode* yNode = axisAttr->getNamedItem(L"y");
+									const DOMNode* yNode = axisAttr->getNamedItem(L"y");
 									std::string yAttr = "";
 									if (yNode)
 										xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
 									axis.y = (float) atof(yAttr.c_str());
-									DOMNode* zNode = axisAttr->getNamedItem(L"z");
+									const DOMNode* zNode = axisAttr->getNamedItem(L"z");
 									std::string zAttr = "";
 									if (zNode)
 										xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
@@ -417,7 +417,7 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 											DOMNamedNodeMap* keyframeAttributeList = firstPassKeyframeNode->getAttributes();
 											if (keyframeAttributeList)
 											{
-												DOMNode* timeNode = keyframeAttributeList->getNamedItem(L"time");
+												const DOMNode* timeNode = keyframeAttributeList->getNamedItem(L"time");
 												std::string timeStr;
 												xml_utils::xml_translate(&timeStr, timeNode->getNodeValue());
 												float time = (float) atof(timeStr.c_str());
@@ -456,11 +456,11 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 			DOMNamedNodeMap* animationAttributeList = animationNode->getAttributes();
 			if (animationAttributeList)
 			{
-				DOMNode* nameNode = animationAttributeList->getNamedItem(L"name");
+				const DOMNode* nameNode = animationAttributeList->getNamedItem(L"name");
 				std::string animationName;
 				xml_utils::xml_translate(&animationName, nameNode->getNodeValue());
 				motion->setName(animationName);
-				DOMNode* lengthNode = animationAttributeList->getNamedItem(L"length");
+				const DOMNode* lengthNode = animationAttributeList->getNamedItem(L"length");
 				std::string lengthStr;
 				xml_utils::xml_translate(&lengthStr, lengthNode->getNodeValue());
 				float length = (float) atof(lengthStr.c_str());
@@ -499,7 +499,7 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 								DOMNamedNodeMap* trackAttributeList = trackNode->getAttributes();
 								if (trackAttributeList)
 								{
-									DOMNode* trackBoneNode = trackAttributeList->getNamedItem(L"bone");
+									const DOMNode* trackBoneNode = trackAttributeList->getNamedItem(L"bone");
 									xml_utils::xml_translate(&trackBoneStr, trackBoneNode->getNodeValue());
 									if (trackBoneStr == "")
 										continue;
@@ -523,7 +523,7 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 													DOMNamedNodeMap* keyframeAttributeList = keyframeNode->getAttributes();
 													if (keyframeAttributeList)
 													{
-														DOMNode* timeNode = keyframeAttributeList->getNamedItem(L"time");
+														const DOMNode* timeNode = keyframeAttributeList->getNamedItem(L"time");
 														std::string timeStr;
 														xml_utils::xml_translate(&timeStr, timeNode->getNodeValue());
 														float time = (float) atof(timeStr.c_str());
@@ -552,17 +552,17 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 																DOMNamedNodeMap* positionAttr = transformNode->getAttributes();
 																if (positionAttr)
 																{
-																	DOMNode* xNode = positionAttr->getNamedItem(L"x");
+																	const DOMNode* xNode = positionAttr->getNamedItem(L"x");
 																	std::string xAttr = "";
 																	if (xNode)
 																		xml_utils::xml_translate(&xAttr, xNode->getNodeValue());
 																	translation.x = (float) atof(xAttr.c_str());
-																	DOMNode* yNode = positionAttr->getNamedItem(L"y");
+																	const DOMNode* yNode = positionAttr->getNamedItem(L"y");
 																	std::string yAttr = "";
 																	if (yNode)
 																		xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
 																	translation.y = (float) atof(yAttr.c_str());
-																	DOMNode* zNode = positionAttr->getNamedItem(L"z");
+																	const DOMNode* zNode = positionAttr->getNamedItem(L"z");
 																	std::string zAttr = "";
 																	if (zNode)
 																		xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
