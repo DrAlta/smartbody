@@ -185,11 +185,11 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 		DOMNamedNodeMap* childAttr = child->getAttributes();
 		if (childAttr)
 		{
-			const DOMNode* boneNode = childAttr->getNamedItem(L"bone");
+			const DOMNode* boneNode = childAttr->getNamedItem(BML::BMLDefs::OGRE_BONE);
 			std::string boneAttr = "";
 			if (boneNode)
 				xml_utils::xml_translate(&boneAttr, boneNode->getNodeValue());
-			const DOMNode* parentNode = childAttr->getNamedItem(L"parent");
+			const DOMNode* parentNode = childAttr->getNamedItem(BML::BMLDefs::OGRE_PARENT);
 			std::string parentAttr = "";
 			if (parentNode)
 				xml_utils::xml_translate(&parentAttr, parentNode->getNodeValue());
@@ -213,11 +213,11 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 		DOMNamedNodeMap* childAttr = child->getAttributes();
 		if (childAttr)
 		{
-			const DOMNode* idNode = childAttr->getNamedItem(L"id");
+			const DOMNode* idNode = childAttr->getNamedItem(BML::BMLDefs::OGRE_ID);
 			std::string idAttr = "";
 			if (idNode)
 				xml_utils::xml_translate(&idAttr, idNode->getNodeValue());
-			const DOMNode* nameNode = childAttr->getNamedItem(L"name");
+			const DOMNode* nameNode = childAttr->getNamedItem(BML::BMLDefs::OGRE_NAME);
 			std::string nameAttr = "";
 			if (nameNode)
 				xml_utils::xml_translate(&nameAttr, nameNode->getNodeValue());
@@ -276,17 +276,17 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 						DOMNamedNodeMap* positionAttr = transformNode->getAttributes();
 						if (positionAttr)
 						{
-							const DOMNode* xNode = positionAttr->getNamedItem(L"x");
+							const DOMNode* xNode = positionAttr->getNamedItem(BML::BMLDefs::OGRE_X);
 							std::string xAttr = "";
 							if (xNode)
 								xml_utils::xml_translate(&xAttr, xNode->getNodeValue());
 							offset.x = (float) atof(xAttr.c_str());
-							const DOMNode* yNode = positionAttr->getNamedItem(L"y");
+							const DOMNode* yNode = positionAttr->getNamedItem(BML::BMLDefs::OGRE_Y);
 							std::string yAttr = "";
 							if (yNode)
 								xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
 							offset.y = (float) atof(yAttr.c_str());
-							const DOMNode* zNode = positionAttr->getNamedItem(L"z");
+							const DOMNode* zNode = positionAttr->getNamedItem(BML::BMLDefs::OGRE_Z);
 							std::string zAttr = "";
 							if (zNode)
 								xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
@@ -301,7 +301,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 						DOMNamedNodeMap* rotationAttr = transformNode->getAttributes();
 						if (rotationAttr)
 						{					
-							const DOMNode* angleNode = rotationAttr->getNamedItem(L"angle");
+							const DOMNode* angleNode = rotationAttr->getNamedItem(BML::BMLDefs::OGRE_ANGLE);
 							std::string angleAttr = "";
 							if (angleNode)
 								xml_utils::xml_translate(&angleAttr, angleNode->getNodeValue());
@@ -319,17 +319,17 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 								if (axisAttr)
 								{
 									SrVec axis;
-									const DOMNode* xNode = axisAttr->getNamedItem(L"x");
+									const DOMNode* xNode = axisAttr->getNamedItem(BML::BMLDefs::OGRE_X);
 									std::string xAttr = "";
 									if (xNode)
 										xml_utils::xml_translate(&xAttr, xNode->getNodeValue());
 									axis.x = (float) atof(xAttr.c_str());
-									const DOMNode* yNode = axisAttr->getNamedItem(L"y");
+									const DOMNode* yNode = axisAttr->getNamedItem(BML::BMLDefs::OGRE_Y);
 									std::string yAttr = "";
 									if (yNode)
 										xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
 									axis.y = (float) atof(yAttr.c_str());
-									const DOMNode* zNode = axisAttr->getNamedItem(L"z");
+									const DOMNode* zNode = axisAttr->getNamedItem(BML::BMLDefs::OGRE_Z);
 									std::string zAttr = "";
 									if (zNode)
 										xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
@@ -417,7 +417,7 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 											DOMNamedNodeMap* keyframeAttributeList = firstPassKeyframeNode->getAttributes();
 											if (keyframeAttributeList)
 											{
-												const DOMNode* timeNode = keyframeAttributeList->getNamedItem(L"time");
+												const DOMNode* timeNode = keyframeAttributeList->getNamedItem(BML::BMLDefs::OGRE_TIME);
 												std::string timeStr;
 												xml_utils::xml_translate(&timeStr, timeNode->getNodeValue());
 												float time = (float) atof(timeStr.c_str());
@@ -456,11 +456,11 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 			DOMNamedNodeMap* animationAttributeList = animationNode->getAttributes();
 			if (animationAttributeList)
 			{
-				const DOMNode* nameNode = animationAttributeList->getNamedItem(L"name");
+				const DOMNode* nameNode = animationAttributeList->getNamedItem(BML::BMLDefs::OGRE_NAME);
 				std::string animationName;
 				xml_utils::xml_translate(&animationName, nameNode->getNodeValue());
 				motion->setName(animationName);
-				const DOMNode* lengthNode = animationAttributeList->getNamedItem(L"length");
+				const DOMNode* lengthNode = animationAttributeList->getNamedItem(BML::BMLDefs::OGRE_LENGTH);
 				std::string lengthStr;
 				xml_utils::xml_translate(&lengthStr, lengthNode->getNodeValue());
 				float length = (float) atof(lengthStr.c_str());
@@ -499,7 +499,7 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 								DOMNamedNodeMap* trackAttributeList = trackNode->getAttributes();
 								if (trackAttributeList)
 								{
-									const DOMNode* trackBoneNode = trackAttributeList->getNamedItem(L"bone");
+									const DOMNode* trackBoneNode = trackAttributeList->getNamedItem(BML::BMLDefs::OGRE_BONE);
 									xml_utils::xml_translate(&trackBoneStr, trackBoneNode->getNodeValue());
 									if (trackBoneStr == "")
 										continue;
@@ -523,7 +523,7 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 													DOMNamedNodeMap* keyframeAttributeList = keyframeNode->getAttributes();
 													if (keyframeAttributeList)
 													{
-														const DOMNode* timeNode = keyframeAttributeList->getNamedItem(L"time");
+														const DOMNode* timeNode = keyframeAttributeList->getNamedItem(BML::BMLDefs::OGRE_TIME);
 														std::string timeStr;
 														xml_utils::xml_translate(&timeStr, timeNode->getNodeValue());
 														float time = (float) atof(timeStr.c_str());
@@ -552,17 +552,17 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 																DOMNamedNodeMap* positionAttr = transformNode->getAttributes();
 																if (positionAttr)
 																{
-																	const DOMNode* xNode = positionAttr->getNamedItem(L"x");
+																	const DOMNode* xNode = positionAttr->getNamedItem(BML::BMLDefs::OGRE_X);
 																	std::string xAttr = "";
 																	if (xNode)
 																		xml_utils::xml_translate(&xAttr, xNode->getNodeValue());
 																	translation.x = (float) atof(xAttr.c_str());
-																	const DOMNode* yNode = positionAttr->getNamedItem(L"y");
+																	const DOMNode* yNode = positionAttr->getNamedItem(BML::BMLDefs::OGRE_Y);
 																	std::string yAttr = "";
 																	if (yNode)
 																		xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
 																	translation.y = (float) atof(yAttr.c_str());
-																	const DOMNode* zNode = positionAttr->getNamedItem(L"z");
+																	const DOMNode* zNode = positionAttr->getNamedItem(BML::BMLDefs::OGRE_Z);
 																	std::string zAttr = "";
 																	if (zNode)
 																		xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
@@ -579,7 +579,7 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 																DOMNamedNodeMap* rotationAttr = transformNode->getAttributes();
 																if (rotationAttr)
 																{			
-																	DOMNode* angleNode = rotationAttr->getNamedItem(L"angle");
+																	DOMNode* angleNode = rotationAttr->getNamedItem(BML::BMLDefs::OGRE_ANGLE);
 																	std::string angleAttr = "";
 																	if (angleNode)
 																		xml_utils::xml_translate(&angleAttr, angleNode->getNodeValue());
@@ -598,17 +598,17 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 																		DOMNamedNodeMap* axisAttr = angleChildNode->getAttributes();
 																		if (axisAttr)
 																		{																			
-																			DOMNode* xNode = axisAttr->getNamedItem(L"x");
+																			DOMNode* xNode = axisAttr->getNamedItem(BML::BMLDefs::OGRE_X);
 																			std::string xAttr = "";
 																			if (xNode)
 																				xml_utils::xml_translate(&xAttr, xNode->getNodeValue());
 																			axis.x = (float) atof(xAttr.c_str());
-																			DOMNode* yNode = axisAttr->getNamedItem(L"y");
+																			DOMNode* yNode = axisAttr->getNamedItem(BML::BMLDefs::OGRE_Y);
 																			std::string yAttr = "";
 																			if (yNode)
 																				xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
 																			axis.y = (float) atof(yAttr.c_str());
-																			DOMNode* zNode = axisAttr->getNamedItem(L"z");
+																			DOMNode* zNode = axisAttr->getNamedItem(BML::BMLDefs::OGRE_Z);
 																			std::string zAttr = "";
 																			if (zNode)
 																				xml_utils::xml_translate(&zAttr, zNode->getNodeValue());

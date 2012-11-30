@@ -332,6 +332,25 @@ XMLCh* BMLDefs::ATTR_STATENAME = NULL;
 
 XMLCh* BMLDefs::ATTR_POLICY = NULL;
 
+XMLCh* BMLDefs::OGRE_BONE = NULL;
+XMLCh* BMLDefs::OGRE_PARENT = NULL;
+XMLCh* BMLDefs::OGRE_ID = NULL;
+XMLCh* BMLDefs::OGRE_NAME = NULL;
+XMLCh* BMLDefs::OGRE_LENGTH = NULL;
+XMLCh* BMLDefs::OGRE_X = NULL;
+XMLCh* BMLDefs::OGRE_Y = NULL;
+XMLCh* BMLDefs::OGRE_Z = NULL;
+XMLCh* BMLDefs::OGRE_ANGLE = NULL;
+XMLCh* BMLDefs::OGRE_AXIS = NULL;
+XMLCh* BMLDefs::OGRE_ANIMATION = NULL;
+XMLCh* BMLDefs::OGRE_TRACKS = NULL;
+XMLCh* BMLDefs::OGRE_TRACK = NULL;
+XMLCh* BMLDefs::OGRE_KEYFRAMES = NULL;
+XMLCh* BMLDefs::OGRE_KEYFRAME = NULL;
+XMLCh* BMLDefs::OGRE_TRANSLATE = NULL;
+XMLCh* BMLDefs::OGRE_ROTATE = NULL;
+XMLCh* BMLDefs::OGRE_TIME = NULL;
+
 
 BMLDefs::BMLDefs()
 {
@@ -676,6 +695,26 @@ BMLDefs::BMLDefs()
 	ATTR_STATENAME = XMLString::transcode("sbm:state-name");
 
 	ATTR_POLICY = XMLString::transcode("policy");
+
+	OGRE_BONE = XMLString::transcode("bone");
+	OGRE_PARENT = XMLString::transcode("parent");
+	OGRE_ID = XMLString::transcode("id");
+	OGRE_NAME = XMLString::transcode("name");
+	OGRE_LENGTH = XMLString::transcode("length");
+	OGRE_X = XMLString::transcode("x");
+	OGRE_Y = XMLString::transcode("y");
+	OGRE_Z = XMLString::transcode("z");
+	OGRE_ANGLE = XMLString::transcode("angle");
+	OGRE_AXIS = XMLString::transcode("axis");
+	OGRE_ANIMATION = XMLString::transcode("animation");
+	OGRE_TRACKS = XMLString::transcode("tracks");
+	OGRE_TRACK = XMLString::transcode("track");
+	OGRE_KEYFRAMES = XMLString::transcode("keyframes");
+	OGRE_KEYFRAME = XMLString::transcode("keyframe");
+	OGRE_TRANSLATE = XMLString::transcode("translate");
+	OGRE_ROTATE = XMLString::transcode("rotate");
+	OGRE_TIME = XMLString::transcode("time");
+
 }
 
 }
