@@ -53,6 +53,7 @@ copy /Y %OGRE_HOME%\media\packs\dragon.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\fresneldemo.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\ogredance.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\ogretestmap.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\profiler.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\SdkTrays.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\Sinbad.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\skybox.zip  ..\media\packs
@@ -109,6 +110,7 @@ copy /Y %OGRE_HOME%\media\packs\dragon.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\fresneldemo.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\ogredance.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\ogretestmap.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\profiler.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\SdkTrays.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\Sinbad.zip  ..\media\packs
 copy /Y %OGRE_HOME%\media\packs\skybox.zip  ..\media\packs
