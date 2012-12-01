@@ -54,8 +54,8 @@ using namespace xml_utils;
 
 const bool USE_CUSTOM_PRUNE_POLICY          = false; // Future feature
 
-const bool LOG_BEHAVIOR_SYNCHPOINTS         = true;
-const bool LOG_BML_BEHAVIOR_SCHEDULE        = true;
+const bool LOG_BEHAVIOR_SYNCHPOINTS         = false;
+const bool LOG_BML_BEHAVIOR_SCHEDULE        = false;
 const bool LOG_METHODS						= false;
 const bool LOG_CONTROLLER_SCHEDULE			= false;
 const bool LOG_REQUEST_REALIZE_TIME_SPAN	= false;
@@ -400,8 +400,8 @@ void BmlRequest::gestureRequestProcess()
 
 			// re-pick the best matching gesture based on previous gesture
 			SBMotion* closestMotion = NULL;
-			float minSpeedDiffL = 1000;
-			float minSpeedDiffR = 1000;
+			float minSpeedDiffL = 100000;
+			float minSpeedDiffR = 100000;
 			float lWristTransitionDistance = -1;
 			float rWristTransitionDistance = -1;
 			float currLWristSpeed = -1;
@@ -410,6 +410,7 @@ void BmlRequest::gestureRequestProcess()
 			if (currGestureList.size() == 0)
 			{
 				currGestureList.push_back(sbMotion->getName());
+				closestMotion = sbMotion;
 			}
 			for (size_t l = 0; l < currGestureList.size(); ++l)
 			{
