@@ -58,7 +58,7 @@ static int inihandler(void* user, const char* section, const char* name,
 {
 	OgreRenderer* renderer = (OgreRenderer*) user;
 
-    #define MATCH(s, n) stricmp(section, s) == 0 && stricmp(name, n) == 0
+    #define MATCH(s, n) _stricmp(section, s) == 0 && _stricmp(name, n) == 0
     if (MATCH("GENERAL", "UseBoneBus"))
 	{
 		std::string boneBusValue(value);
