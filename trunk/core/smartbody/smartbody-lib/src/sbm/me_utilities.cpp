@@ -438,7 +438,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 
 		std::string ext = extension( pathname );
 		std::string filebase = boost::filesystem::basename(pathname);
-
+		std::string fullName = filebase + ext;
 		SkSkeleton* skeleton = NULL;
 		if (ext == ".sk")
 		{			
@@ -472,7 +472,8 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 			std::ifstream filestream(pathname.string().c_str());
 			skeleton = new SmartBody::SBSkeleton();
 			skeleton->ref();
-			skeleton->skfilename(filebase.c_str());
+			skeleton->skfilename(fullName.c_str());
+			skeleton->setName(fullName);
 			SkMotion motion;
 			bool ok = ParserBVH::parse(*skeleton, motion, filebase, filestream, float(scale));
 			if (ok)
@@ -495,8 +496,9 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 		{		
 			std::ifstream filestream(pathname.string().c_str());
 			std::ifstream datastream("");
-			skeleton = new SmartBody::SBSkeleton();
-			skeleton->skfilename(filebase.c_str());
+			skeleton = new SmartBody::SBSkeleton();			
+			skeleton->skfilename(fullName.c_str());
+			skeleton->setName(fullName.c_str());
 			SkMotion motion;
 			bool ok = ParserASFAMC::parse(*skeleton, motion, filestream, datastream, float(scale));
 			if (ok)
@@ -517,9 +519,9 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 		}
 		else if (ext == ".dae" || ext == ".DAE")
 		{			
-			skeleton =  new SmartBody::SBSkeleton();
-			skeleton->skfilename(filebase.c_str());
-			skeleton->name(filebase.c_str());
+			skeleton =  new SmartBody::SBSkeleton();			
+			skeleton->skfilename(fullName.c_str());				
+			skeleton->setName(fullName.c_str());
 			SkMotion motion;
 			bool ok = ParserOpenCOLLADA::parse(*skeleton, motion, pathname.string(), float(scale), true, false);
 			if (ok)
@@ -541,8 +543,8 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 		else if (ext == ".xml" || ext == ".XML")
 		{			
 			skeleton =  new SmartBody::SBSkeleton();
-			skeleton->skfilename(filebase.c_str());
-			skeleton->name(filebase.c_str());
+			skeleton->skfilename(fullName.c_str());			
+			skeleton->setName(fullName);
 			std::vector<SkMotion*> motions;
 			bool ok = ParserOgre::parse(*skeleton, motions, pathname.string(), float(scale), true, false);
 			if (ok)
