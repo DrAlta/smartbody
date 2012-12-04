@@ -121,13 +121,17 @@ bool isDone = false;
 
 
 #if !defined(WIN32) && !defined(__APPLE__)
-SpeechRequestData xmlMetaData;
-std::map<std::string, std::pair<std::string, double> > phonemeToViseme;
-std::string mapping;
+	SpeechRequestData xmlMetaData;
+	std::map<std::string, std::pair<std::string, double> > phonemeToViseme;
+	std::string mapping;
 #else 
-extern std::string mapping;
-extern SpeechRequestData xmlMetaData;
-extern std::multimap<std::string, std::pair<string, double> > phonemeToViseme;
+	#if defined(WIN32)
+		std::string mapping;
+	#else
+		extern std::string mapping;
+	#endif
+	extern SpeechRequestData xmlMetaData;
+	extern std::multimap<std::string, std::pair<string, double> > phonemeToViseme;
 #endif
 std::string festivalLibDir = "";
 
