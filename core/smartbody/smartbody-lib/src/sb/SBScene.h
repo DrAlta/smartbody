@@ -50,20 +50,20 @@ class SBScene : public SBObject
 
 		SBAPI void command(const std::string& command);
 		SBAPI void commandAt(float seconds, const std::string& command);
-		SBAPI void sendVHMsg(std::string message);
-		SBAPI void sendVHMsg2(std::string messageType, std::string encodedMessage);		
+		SBAPI void sendVHMsg(const std::string& message);
+		SBAPI void sendVHMsg2(const std::string&, const std::string& encodedMessage);		
 
-		SBAPI SBCharacter* createCharacter(std::string charName, std::string metaInfo);
-		SBAPI SBPawn* createPawn(std::string);
+		SBAPI SBCharacter* createCharacter(const std::string&, const std::string&);
+		SBAPI SBPawn* createPawn(const std::string& pawnName);
 		SBAPI void removeAllCharacters();
-		SBAPI void removeCharacter(std::string charName);
-		SBAPI void removePawn(std::string pawnName);
+		SBAPI void removeCharacter(const std::string& charName);
+		SBAPI void removePawn(const std::string& pawnName);
 		SBAPI void removeAllPawns();
 		SBAPI int getNumCharacters();
 		SBAPI int getNumPawns();
-		SBAPI SBCharacter* getCharacter(std::string name);
-		SBAPI SBSkeleton* getSkeleton(std::string name);		
-		SBAPI SBPawn* getPawn(std::string name);
+		SBAPI SBCharacter* getCharacter(const std::string& name);
+		SBAPI SBSkeleton* getSkeleton(const std::string& name);		
+		SBAPI SBPawn* getPawn(const std::string& name);
 
 		SBAPI SBFaceDefinition* createFaceDefinition(const std::string& name);
 		SBAPI void removeFaceDefinition(const std::string& name);
@@ -76,41 +76,41 @@ class SBScene : public SBObject
 
 		SBAPI void removePendingCommands();
 		
-		SBAPI SBSkeleton* createSkeleton(std::string char_name);
+		SBAPI SBSkeleton* createSkeleton(const std::string&char_name);
 
-		SBAPI SBMotion* getMotion(std::string name);
+		SBAPI SBMotion* getMotion(const std::string& name);
 		SBAPI int getNumMotions();
 		SBAPI std::vector<std::string> getMotionNames();
 		SBAPI std::vector<std::string> getSkeletonNames();
 		SBAPI std::vector<std::string> getEventHandlerNames();
 
-		SBAPI void setMediaPath(std::string path);
+		SBAPI void setMediaPath(const std::string& path);
 		SBAPI const std::string& getMediaPath();
-		SBAPI void addAssetPath(std::string type, std::string path);
-		SBAPI std::vector<std::string> getAssetPaths(std::string type);
-		SBAPI std::vector<std::string> getLocalAssetPaths(std::string type);
-		SBAPI void removeAssetPath(std::string type, std::string path);
-		SBAPI void removeAllAssetPaths(std::string type);
+		SBAPI void addAssetPath(const std::string& type, const std::string& path);
+		SBAPI std::vector<std::string> getAssetPaths(const std::string& type);
+		SBAPI std::vector<std::string> getLocalAssetPaths(const std::string& type);
+		SBAPI void removeAssetPath(const std::string& type, const std::string& path);
+		SBAPI void removeAllAssetPaths(const std::string& type);
 		SBAPI void loadAssets();
-		SBAPI void loadAssetsFromPath(std::string assetPath);
+		SBAPI void loadAssetsFromPath(const std::string& assetPath);
 		SBAPI void loadMotions();
-		SBAPI void addPose(std::string path, bool recursive);
-		SBAPI void addMotion(std::string path, bool recursive);
-		SBAPI SBSkeleton* addSkeletonDefinition(std::string skelName);
-		SBAPI SBMotion* addMotionDefinition(std::string motionName, double duration);			
+		SBAPI void addPose(const std::string& path, bool recursive);
+		SBAPI void addMotion(const std::string& path, bool recursive);
+		SBAPI SBSkeleton* addSkeletonDefinition(const std::string& skelName);
+		SBAPI SBMotion* addMotionDefinition(const std::string& motionName, double duration);			
 				
-		SBAPI void run(std::string command);
-		SBAPI void runScript(std::string script);
+		SBAPI void run(const std::string& command);
+		SBAPI void runScript(const std::string& script);
 
 		SBAPI void setDefaultCharacter(const std::string& character);
 		SBAPI void setDefaultRecipient(const std::string& recipient);
 
 		SBAPI void reset();
 
-		SBAPI void addScript(std::string name, SBScript* script);
-		SBAPI void removeScript(std::string name);
+		SBAPI void addScript(const std::string& name, SBScript* script);
+		SBAPI void removeScript(const std::string& name);
 		SBAPI int getNumScripts();
-		SBAPI SBScript* getScript(std::string name);
+		SBAPI SBScript* getScript(const std::string& name);
 		SBAPI std::vector<std::string> getScriptNames();
 		SBAPI std::map<std::string, SBScript*>& getScripts();
 

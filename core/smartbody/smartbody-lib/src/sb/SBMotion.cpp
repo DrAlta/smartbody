@@ -956,6 +956,11 @@ SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 		
 		mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, motion));
 	}
+
+	// create a trail indicating that this motion was mirrored
+	sbmotion->createStringAttribute("mirrorMotion", this->getName(), false, "mirroring", 110, false, false, false, "Which motion has this motion been mirrored from");
+	sbmotion->createStringAttribute("mirrorSkeleton", skeletonName, false, "mirroring", 120, false, false, false, "Which skeleton has this motion been mirrored from");
+
 	return sbmotion;
 }
 
