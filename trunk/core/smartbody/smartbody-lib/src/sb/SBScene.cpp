@@ -262,7 +262,7 @@ void SBScene::notify( SBSubject* subject )
 	}
 }
 
-SBCharacter* SBScene::createCharacter(std::string charName, std::string metaInfo)
+SBCharacter* SBScene::createCharacter(const std::string& charName, const std::string& metaInfo)
 {	
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	SbmCharacter* character = mcu.getCharacter(charName);
@@ -294,7 +294,7 @@ SBCharacter* SBScene::createCharacter(std::string charName, std::string metaInfo
 	}
 }
 
-SBPawn* SBScene::createPawn(std::string pawnName)
+SBPawn* SBScene::createPawn(const std::string& pawnName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	SbmPawn* pawn = mcu.getPawn(pawnName);
@@ -331,7 +331,7 @@ SBPawn* SBScene::createPawn(std::string pawnName)
 	}
 }
 
-void SBScene::removeCharacter(std::string charName)
+void SBScene::removeCharacter(const std::string& charName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SBCharacter* character = this->getCharacter(charName);
@@ -369,7 +369,7 @@ void SBScene::removeAllCharacters()
 	}
 }
 
-void SBScene::removePawn(std::string pawnName)
+void SBScene::removePawn(const std::string& pawnName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmPawn* pawn = mcu.getPawn(pawnName);
@@ -418,7 +418,7 @@ int SBScene::getNumPawns()
 	return mcu.getNumPawns() - mcu.getNumCharacters(); 
 }
 
-SBPawn* SBScene::getPawn(std::string name)
+SBPawn* SBScene::getPawn(const std::string& name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmPawn* pawn = mcu.getPawn(name);
@@ -434,7 +434,7 @@ SBPawn* SBScene::getPawn(std::string name)
 	}
 }
 
-SBCharacter* SBScene::getCharacter(std::string name)
+SBCharacter* SBScene::getCharacter(const std::string& name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmCharacter* character = mcu.getCharacter(name);
@@ -450,7 +450,7 @@ SBCharacter* SBScene::getCharacter(std::string name)
 	}
 }
 
-SBSkeleton* SBScene::getSkeleton(std::string name)
+SBSkeleton* SBScene::getSkeleton(const std::string& name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::map<std::string, SkSkeleton*>::iterator iter = mcu.skeleton_map.find(name);
@@ -461,7 +461,7 @@ SBSkeleton* SBScene::getSkeleton(std::string name)
 	return sbskel;
 }
 
-SBMotion* SBScene::getMotion(std::string name)
+SBMotion* SBScene::getMotion(const std::string& name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SkMotion* motion = mcu.getMotion(name);
@@ -561,7 +561,7 @@ std::vector<std::string> SBScene::getEventHandlerNames()
 	return ret;
 }
 
-std::vector<std::string> SBScene::getAssetPaths(std::string type)
+std::vector<std::string> SBScene::getAssetPaths(const std::string& type)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
@@ -599,7 +599,7 @@ std::vector<std::string> SBScene::getAssetPaths(std::string type)
 	return list;
 }
 
-std::vector<std::string> SBScene::getLocalAssetPaths(std::string type)
+std::vector<std::string> SBScene::getLocalAssetPaths(const std::string& type)
 {
 
 	std::string mediaPath = getMediaPath();
@@ -633,7 +633,7 @@ std::vector<std::string> SBScene::getLocalAssetPaths(std::string type)
 
 }
 
-void SBScene::addAssetPath(std::string type, std::string path)
+void SBScene::addAssetPath(const std::string& type, const std::string& path)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	PathResource* pres = new PathResource();
@@ -667,7 +667,7 @@ void SBScene::addAssetPath(std::string type, std::string path)
 	mcu.resource_manager->addResource(pres);
 }
 
-void SBScene::removeAssetPath(std::string type, std::string path)
+void SBScene::removeAssetPath(const std::string& type, const std::string& path)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 
@@ -696,7 +696,7 @@ void SBScene::removeAssetPath(std::string type, std::string path)
 	}
 }
 
-void SBScene::removeAllAssetPaths(std::string type)
+void SBScene::removeAllAssetPaths(const std::string& type)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 
@@ -739,7 +739,7 @@ void SBScene::loadAssets()
 	}
 }
 
-void SBScene::loadAssetsFromPath(std::string assetPath)
+void SBScene::loadAssetsFromPath(const std::string& assetPath)
 {
 	const std::string& mediaPath = this->getMediaPath();
 	boost::filesystem::path p( mediaPath );
@@ -763,7 +763,7 @@ void SBScene::loadAssetsFromPath(std::string assetPath)
 	mcu.load_skeletons(finalPath.c_str(), true);
 }
 
-SBSkeleton* SBScene::addSkeletonDefinition( std::string skelName )
+SBSkeleton* SBScene::addSkeletonDefinition(const std::string& skelName )
 {
 	SBSkeleton* sbSkel = new SBSkeleton();
 	SkSkeleton* skSkel = sbSkel;	
@@ -773,7 +773,7 @@ SBSkeleton* SBScene::addSkeletonDefinition( std::string skelName )
 	return sbSkel;
 }
 
-SBMotion* SBScene::addMotionDefinition( std::string motionName, double duration )
+SBMotion* SBScene::addMotionDefinition(const std::string& motionName, double duration )
 {
 	SBMotion* sbMotion = new SBMotion();
 	if (duration > 0)
@@ -787,19 +787,19 @@ SBMotion* SBScene::addMotionDefinition( std::string motionName, double duration 
 	return sbMotion;
 }
 
-void SBScene::addPose(std::string path, bool recursive)
+void SBScene::addPose(const std::string& path, bool recursive)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	mcu.load_poses(path.c_str(), recursive);
 }
 
-void SBScene::addMotion(std::string path, bool recursive)
+void SBScene::addMotion(const std::string& path, bool recursive)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	mcu.load_motions(path.c_str(), recursive);
 }
 
-void SBScene::setMediaPath(std::string path)
+void SBScene::setMediaPath(const std::string& path)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.setMediaPath(path);
@@ -823,7 +823,7 @@ void SBScene::setDefaultRecipient(const std::string& recipient)
 	mcu.test_recipient_default = recipient;
 }
 
-SBSkeleton* SBScene::createSkeleton(std::string skeletonDefinition)
+SBSkeleton* SBScene::createSkeleton(const std::string& skeletonDefinition)
 {
 	SBSkeleton* skeleton = new SBSkeleton(skeletonDefinition);
 	return skeleton;
@@ -858,25 +858,25 @@ void SBScene::removePendingCommands()
 	mcu.pendingSequences.clear();
 }
 
-void SBScene::sendVHMsg(std::string message)
+void SBScene::sendVHMsg(const std::string& message)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	mcu.vhmsg_send(message.c_str());
 }
 
-void SBScene::sendVHMsg2(std::string message, std::string message2)
+void SBScene::sendVHMsg2(const std::string& message, const std::string& message2)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	mcu.vhmsg_send(message.c_str(), message2.c_str());
 }
 
-void SBScene::run(std::string command)
+void SBScene::run(const std::string& command)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	mcu.executePython(command.c_str());
 }
 
-void SBScene::runScript(std::string script)
+void SBScene::runScript(const std::string& script)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	mcu.executePythonFile(script.c_str());
@@ -1037,7 +1037,7 @@ std::vector<std::string> SBScene::getFaceDefinitionNames()
 	return faces;
 }
 
-void SBScene::addScript(std::string name, SBScript* script)
+void SBScene::addScript(const std::string& name, SBScript* script)
 {
 	std::map<std::string, SBScript*>::iterator iter = _scripts.find(name);
 	if (iter != _scripts.end())
@@ -1049,7 +1049,7 @@ void SBScene::addScript(std::string name, SBScript* script)
 	_scripts.insert(std::pair<std::string, SBScript*>(name, script));
 }
 
-void SBScene::removeScript(std::string name)
+void SBScene::removeScript(const std::string& name)
 {
 	std::map<std::string, SBScript*>::iterator iter = _scripts.find(name);
 	if (iter != _scripts.end())
@@ -1081,7 +1081,7 @@ std::vector<std::string> SBScene::getScriptNames()
 
 }
 
-SBScript* SBScene::getScript(std::string name)
+SBScript* SBScene::getScript(const std::string& name)
 {
 	std::map<std::string, SBScript*>::iterator iter = _scripts.find(name);
 	if (iter == _scripts.end())
@@ -1213,6 +1213,30 @@ std::string SBScene::save(bool remoteSetup)
 		strstr << "# -------------------- load assets\n";
 		strstr << "scene.loadAssets()\n";
 	}	
+
+	// create any mirrored assets
+	std::vector<std::string> motions = this->getMotionNames();
+	for (std::vector<std::string>::iterator iter = motions.begin();
+		 iter != motions.end();
+		 iter++)
+	{
+		SBMotion* mirroredMotion = this->getMotion(*iter);
+		StringAttribute* mirroredMotionAttr = dynamic_cast<StringAttribute*>(mirroredMotion->getAttribute("mirrorMotion"));
+		if (mirroredMotionAttr)
+		{
+			strstr << "motion = scene.getMotion(\"" << mirroredMotionAttr->getValue() << "\")\n";
+			// make sure the skeleton exists
+			StringAttribute* mirroredSkeletonAttr = dynamic_cast<StringAttribute*>(mirroredMotion->getAttribute("mirrorSkeleton"));
+			if (mirroredSkeletonAttr)
+			{
+				const std::string& skeletonName = mirroredSkeletonAttr->getValue();
+				strstr << "mirrorSkeleton = scene.getSkeleton(\"" << skeletonName << "\")\n";
+				strstr << "if mirrorSkeleton is not None:\n";
+				strstr << "\tmirroredMotion = motion.mirror(\"" << mirroredMotion->getName() << "\", \"" << skeletonName << "\")\n";
+			}
+
+		}
+	}
 	
 	strstr << "# -------------------- face definitions\n";
 	// face definitions

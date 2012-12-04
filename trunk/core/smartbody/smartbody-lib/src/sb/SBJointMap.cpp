@@ -312,7 +312,7 @@ std::string SBJointMap::getTarget(int num)
 {
 	if (_map.size() > (size_t) num)
 	{
-		return _map[num].first;
+		return _map[num].second;
 	}
 	return "";
 }
@@ -321,7 +321,7 @@ std::string SBJointMap::getSource(int num)
 {
 	if (_map.size() > (size_t) num)
 	{
-		return _map[num].second;
+		return _map[num].first;
 	}
 	return "";
 }
