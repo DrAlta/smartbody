@@ -328,7 +328,7 @@ BehaviorSpan BmlRequest::getBehaviorSpan() {
 void BmlRequest::gestureRequestProcess()
 {
 	// handle gesture transition
-	if (!actor->getBoolAttribute("bmlRequest.autoGestureTransition"))
+	if (!actor->getBoolAttribute("gestureRequest.autoGestureTransition"))
 		return;
 
 	std::vector<GestureRequest*> gestures;
@@ -395,8 +395,8 @@ void BmlRequest::gestureRequestProcess()
 			SkMotion* prevMotion = prev_motion_ct->motion();
 			SBMotion* prevSBMotion = dynamic_cast<SBMotion*> (prevMotion);
 			prevSBMotion->connect(actor->getSkeleton());
-			SrVec prevLWristPos = prevSBMotion->getJointPosition(lWrist, (float)motion->time_stroke_emphasis());
-			SrVec prevRWristPos = prevSBMotion->getJointPosition(rWrist, (float)motion->time_stroke_emphasis());
+			SrVec prevLWristPos = prevSBMotion->getJointPosition(lWrist, (float)motion->time_stroke_end());
+			SrVec prevRWristPos = prevSBMotion->getJointPosition(rWrist, (float)motion->time_stroke_end());
 
 			// re-pick the best matching gesture based on previous gesture
 			SBMotion* closestMotion = NULL;
@@ -420,8 +420,8 @@ void BmlRequest::gestureRequestProcess()
 				motionInList->connect(actor->getSkeleton());
 				float lWristSpeed = motionInList->getJointSpeed(lWrist, (float)motionInList->time_stroke_start(), (float)motionInList->time_stroke_end());
 				float rWristSpeed = motionInList->getJointSpeed(rWrist, (float)motionInList->time_stroke_start(), (float)motionInList->time_stroke_end());
-				SrVec currLWristPos = motionInList->getJointPosition(lWrist, (float)motionInList->time_stroke_emphasis());
-				SrVec currRWristPos = motionInList->getJointPosition(rWrist, (float)motionInList->time_stroke_emphasis());
+				SrVec currLWristPos = motionInList->getJointPosition(lWrist, (float)motionInList->time_stroke_start());
+				SrVec currRWristPos = motionInList->getJointPosition(rWrist, (float)motionInList->time_stroke_start());
 				float desiredLWristSpeed = (currLWristPos - prevLWristPos).len() / (float)blendTime;
 				float desiredRWristSpeed = (currRWristPos - prevRWristPos).len() / (float)blendTime;
 				float speedDiffL = lWristSpeed - desiredLWristSpeed;
@@ -439,12 +439,12 @@ void BmlRequest::gestureRequestProcess()
 			}
 			if (closestMotion->getName() != sbMotion->getName())
 			{
-				if (actor->getBoolAttribute("bmlRequest.gestureLog"))
+				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 					LOG("gestureRequestProcess: after calculating the closest gesture, changing from %s to %s", sbMotion->getName().c_str(), closestMotion->getName().c_str());
 				motion_ct->init(const_cast<SbmCharacter*>(actor), closestMotion, 0.0, 1.0);
 			}
-			if (fabs(minSpeedDiffL) < actor->getDoubleAttribute("bmlRequest.gestureSpeedThreshold") && 
-				fabs(minSpeedDiffR) < actor->getDoubleAttribute("bmlRequest.gestureSpeedThreshold"))
+			if (fabs(minSpeedDiffL) < actor->getDoubleAttribute("gestureRequest.gestureSpeedThreshold") && 
+				fabs(minSpeedDiffR) < actor->getDoubleAttribute("gestureRequest.gestureSpeedThreshold"))
 			{
 				shouldFilter = false;
 			}
@@ -453,7 +453,7 @@ void BmlRequest::gestureRequestProcess()
 				shouldFilter = true;
 				logIndex = 0;
 			}
-			if (actor->getBoolAttribute("bmlRequest.gestureLog"))
+			if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 			{
 				LOG("gestureRequestProcess: transition from %s to %s", gestures[j]->anim_ct->getName().c_str(), gestures[i]->anim_ct->getName().c_str());
 				LOG("minSpeedDiffL: %f, minSpeedDiffR: %f", minSpeedDiffL, minSpeedDiffR);
@@ -463,42 +463,56 @@ void BmlRequest::gestureRequestProcess()
 			{
 				if (minSpeedDiffL < 0 && minSpeedDiffR < 0)		// if desired wrist speed is higher than next gesture wrist speed, then just blend
 				{
-					gestures[i]->behav_syncs.sync_start()->set_time(currGestureStrokeStartAt - blendTime);
-					gestures[i]->behav_syncs.sync_ready()->set_time(currGestureStrokeStartAt - blendTime);
+					if (currGestureStartAt < prevGestureRelaxAt)
+					{
+						gestures[i]->behav_syncs.sync_start()->set_time(currGestureStrokeStartAt - blendTime);
+						gestures[i]->behav_syncs.sync_ready()->set_time(currGestureStrokeStartAt - blendTime);
+					}
 				}
 				else											// else, elongate the holding period of previous gesture
 				{
-					float desiredTransitionTime = 0.0f;
-					float desiredTransitionTimeL = -1.0f;
-					float desiredTransitionTimeR = -1.0f;
-					if (currLWristSpeed > actor->getDoubleAttribute("bmlRequest.gestureWristActiveThreshold"))
+					if (actor->getBoolAttribute("gestureRequest.matchingSpeed"))
 					{
-						desiredTransitionTimeL = lWristTransitionDistance / currLWristSpeed;
-					}
-					if (currRWristSpeed > actor->getDoubleAttribute("bmlRequest.gestureWristActiveThreshold"))
-					{
-						desiredTransitionTimeR = rWristTransitionDistance / currRWristSpeed;
-					}
-					if (desiredTransitionTimeL >= 0 && desiredTransitionTimeR >= 0)
-						desiredTransitionTime = 0.5f * (desiredTransitionTimeL + desiredTransitionTimeR);
-					else if (desiredTransitionTimeL >= 0 || desiredTransitionTimeR >= 0)
-						desiredTransitionTime = desiredTransitionTimeL >= 0 ? desiredTransitionTimeL : desiredTransitionTimeR;
-					if (desiredTransitionTime < blendTime)
-					{
-						gestures[j]->behav_syncs.sync_relax()->set_time(desiredTransitionTime + prevGestureRelaxAt);
-						gestures[j]->behav_syncs.sync_end()->set_time(desiredTransitionTime + prevGestureEndAt);
-						gestures[i]->behav_syncs.sync_start()->set_time((float)currGestureStrokeStartAt - ((float)blendTime - desiredTransitionTime));
-						gestures[i]->behav_syncs.sync_ready()->set_time((float)currGestureStrokeStartAt - ((float)blendTime - desiredTransitionTime));
+						float desiredTransitionTime = 0.0f;
+						float desiredTransitionTimeL = -1.0f;
+						float desiredTransitionTimeR = -1.0f;
+						if (currLWristSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold"))
+						{
+							desiredTransitionTimeL = lWristTransitionDistance / currLWristSpeed;
+						}
+						if (currRWristSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold"))
+						{
+							desiredTransitionTimeR = rWristTransitionDistance / currRWristSpeed;
+						}
+						if (desiredTransitionTimeL >= 0 && desiredTransitionTimeR >= 0)
+							desiredTransitionTime = 0.5f * (desiredTransitionTimeL + desiredTransitionTimeR);
+						else if (desiredTransitionTimeL >= 0 || desiredTransitionTimeR >= 0)
+							desiredTransitionTime = desiredTransitionTimeL >= 0 ? desiredTransitionTimeL : desiredTransitionTimeR;
+						if (desiredTransitionTime < blendTime)
+						{
+							gestures[j]->behav_syncs.sync_relax()->set_time(desiredTransitionTime + prevGestureRelaxAt);
+							gestures[j]->behav_syncs.sync_end()->set_time(desiredTransitionTime + prevGestureEndAt);
+							gestures[i]->behav_syncs.sync_start()->set_time((float)currGestureStrokeStartAt - ((float)blendTime - desiredTransitionTime));
+							gestures[i]->behav_syncs.sync_ready()->set_time((float)currGestureStrokeStartAt - ((float)blendTime - desiredTransitionTime));
+						}
+						else
+						{
+							LOG("gestureRequestProcess: ERROR blend time is shorter than desired transition time, should not happen.");
+						}
+						if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+						{
+							LOG("gestureRequestProcess: desiredRelaxTimeL: %f, desiredRelaxTimeR: %f, actual desiredRelaxTime: %f (local)", desiredTransitionTimeL, desiredTransitionTimeR, desiredTransitionTime);
+							LOG("gestureRequestProcess: desired transition speed %f is lower than current gesture speed %f (l_wrist)", lWristTransitionDistance / blendTime, currLWristSpeed);
+							LOG("gestureRequestProcess: previous gesture %s relax time is being delayed by %f", gestures[j]->anim_ct->getName().c_str(), desiredTransitionTime);
+						}
 					}
 					else
 					{
-						LOG("gestureRequestProcess: ERROR blend time is shorter than desired transition time, should not happen.");
-					}
-					if (actor->getBoolAttribute("bmlRequest.gestureLog"))
-					{
-						LOG("gestureRequestProcess: desiredRelaxTimeL: %f, desiredRelaxTimeR: %f, actual desiredRelaxTime: %f (local)", desiredTransitionTimeL, desiredTransitionTimeR, desiredTransitionTime);
-						LOG("gestureRequestProcess: desired transition speed %f is lower than current gesture speed %f (l_wrist)", lWristTransitionDistance / blendTime, currLWristSpeed);
-						LOG("gestureRequestProcess: previous gesture %s relax time is being delayed by %f", gestures[j]->anim_ct->getName().c_str(), desiredTransitionTime);
+						if (currGestureStartAt < prevGestureRelaxAt)
+						{
+							gestures[i]->behav_syncs.sync_start()->set_time(currGestureStrokeStartAt - blendTime);
+							gestures[i]->behav_syncs.sync_ready()->set_time(currGestureStrokeStartAt - blendTime);
+						}
 					}
 				}
 			}
@@ -510,24 +524,24 @@ void BmlRequest::gestureRequestProcess()
 		}
 		if (shouldFilter)	// filter the gesture
 		{
-			if (logIndex == 1 && actor->getBoolAttribute("bmlRequest.gestureLog"))
+			if (logIndex == 1 && actor->getBoolAttribute("gestureRequest.gestureLog"))
 			{
 				LOG("gestureRequestProcess: filter reason -> previous relax is later than current stroke start");
 			}
-			if (logIndex == 0 && actor->getBoolAttribute("bmlRequest.gestureLog"))
+			if (logIndex == 0 && actor->getBoolAttribute("gestureRequest.gestureLog"))
 			{
 				LOG("gestureRequestProcess: filter reason -> blending time too short");
 			}
 			if (gestures[i]->priority > gestures[j]->priority)
 			{
 				gestures[j]->filtered = true;
-				if (actor->getBoolAttribute("bmlRequest.gestureLog"))
+				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 					LOG("gestureRequestProcess: filter gesture %s", gestures[j]->anim_ct->getName().c_str());
 			}
 			else
 			{
 				gestures[i]->filtered = true;
-				if (actor->getBoolAttribute("bmlRequest.gestureLog"))
+				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 					LOG("gestureRequestProcess: filter gesture %s", gestures[i]->anim_ct->getName().c_str());
 			}
 		}
