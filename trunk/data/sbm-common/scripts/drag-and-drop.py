@@ -8,7 +8,7 @@ def createStandardCharacter(charName, skelName, meshName, position):
 	sbChar = scene.createCharacter(charName, "")
 	sbSkeleton = scene.createSkeleton(skelName)		
 	sbChar.setSkeleton(sbSkeleton)
-	sbChar.setFaceDefinition(defaultFace)
+	#sbChar.setFaceDefinition(defaultFace)
 	sbPos = position
 	sbChar.setPosition(sbPos)	
 	sbChar.setVoice("remote")
