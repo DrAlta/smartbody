@@ -788,11 +788,12 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 		module->interpolator->initChanId(_context, baseJointName);
 		SkJoint* baseJoint = character->getSkeleton()->search_joint(baseJointName.c_str());
 		if (!baseJoint)
-			return NULL;
-		module->interpolator->initPreRotation(baseJoint->quat()->prerot());
+			return NULL;		
+		module->interpolator->initPreRotation(baseJoint->quat()->orientation()*baseJoint->quat()->prerot());
 		module->woManager->setMotionContextMaps(_context);
-		module->woManager->initChanId(_context, baseJointName);
-		SrQuat preRot = character->getSkeleton()->search_joint(baseJointName.c_str())->quat()->prerot();
+		module->woManager->initChanId(_context, baseJointName);		
+		//SrQuat preRot = character->getSkeleton()->search_joint(baseJointName.c_str())->quat()->prerot();
+		SrQuat preRot = baseJoint->quat()->orientation()*baseJoint->quat()->prerot();
 		module->woManager->initPreRotation(preRot);
 	}
 	else
