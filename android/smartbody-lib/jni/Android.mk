@@ -490,7 +490,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBPhoneme.cpp \
 	$(SBM_MY_DIR)/sb/SBBehaviorSet.cpp \
 	$(SBM_MY_DIR)/sb/SBBehaviorSetManager.cpp \
-	$(SBM_MY_DIR)/sbm/action_unit.cpp
+	$(SBM_MY_DIR)/sbm/action_unit.cpp \
+	$(SBM_MY_DIR)/sbm/MiscCommands.cpp
 	
 	
 LOCAL_LDLIBS    := -llog 
