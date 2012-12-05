@@ -43,6 +43,106 @@
 #endif
 
 
+bool ParserOgre::parseSkinMesh( std::vector<SrModel*>& meshModelVec, std::vector<SkinWeight*>& skinWeights, std::string pathName, float scale, bool doParseMesh, bool doParseSkinWeight )
+{
+	try 
+	{
+		XMLPlatformUtils::Initialize();
+	}
+	catch (const XMLException& toCatch) 
+	{
+		std::string message = "";
+		xml_utils::xml_translate(&message, toCatch.getMessage());
+		LOG("Error during ParserOgre initialization! :\n %s\n", message.c_str());
+		return false;
+	}
+
+	XercesDOMParser* parser = new XercesDOMParser();
+	parser->setValidationScheme(XercesDOMParser::Val_Always);
+	parser->setDoNamespaces(true);    // optional
+
+	ErrorHandler* errHandler = (ErrorHandler*) new HandlerBase();
+	parser->setErrorHandler(errHandler);
+
+	bool parseOk = false;
+
+	try 
+	{
+		std::string filebasename = boost::filesystem::basename(pathName);
+		std::string fileextension = boost::filesystem::extension(pathName);
+		std::stringstream strstr;
+		if (fileextension.size() > 0 && fileextension[0] == '.')
+			strstr << filebasename << fileextension;
+		else
+			strstr << filebasename << "." << fileextension;
+		parser->parse(pathName.c_str());
+		DOMDocument* doc = parser->getDocument();
+
+		if (doParseMesh)
+		{
+			DOMNode* meshNode = getNode("mesh", doc);
+			if (!meshNode)
+			{
+				// is this a COLLADA file? 
+				DOMNode* colladaNode = getNode("library_geometry", doc);
+				if (colladaNode)
+				{
+					LOG("File is a COLLADA file, not an Ogre file. Please use a .dae extension.");
+					return false;
+				}
+				LOG("<mesh> was not found in file %s.", pathName.c_str());
+				return false;
+			}
+			parseOk = parseMesh(meshNode, meshModelVec, scale);
+		}
+
+
+		if (doParseSkinWeight)
+		{
+			DOMNode* meshNode = getNode("mesh", doc);
+			if (!meshNode)
+			{
+				// is this a COLLADA file? 
+				DOMNode* colladaNode = getNode("library_controller", doc);
+				if (colladaNode)
+				{
+					LOG("File is a COLLADA file, not an Ogre file. Please use a .dae extension.");
+					return false;
+				}
+				LOG("<mesh> was not found in file %s. No skinweights will be loaded.", pathName.c_str());
+				return false;
+			}			
+			parseOk =  parseSkinWeight(meshNode, skinWeights, scale);
+		}
+
+		return parseOk;
+
+	}
+	catch (const XMLException& toCatch) 
+	{
+		std::string message = "";
+		xml_utils::xml_translate(&message, toCatch.getMessage());
+		std::cout << "Exception message is: \n" << message << "\n";
+		return false;
+	}
+	catch (const DOMException& toCatch) {
+		std::string message = "";
+		xml_utils::xml_translate(&message, toCatch.msg);
+		std::cout << "Exception message is: \n" << message << "\n";
+		return false;
+	}
+	catch (...) {
+		LOG("Unexpected Exception in ParserOgreSkeleton::parse()");
+		return false;
+	}
+
+	delete parser;
+	delete errHandler;
+	return true;
+
+}
+
+
 bool ParserOgre::parse(SkSkeleton& skeleton, std::vector<SkMotion*>& motions, std::string pathName, float scale, bool doParseSkeleton, bool doParseMotion)
 {
 	try 
@@ -797,3 +897,241 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 	}
 	return true;
 }
+
+bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelVec, float scaleFactor )
+{
+	LOG("ParseOgre::parseMesh");
+	DOMNode* subMeshNode = getNode("submeshes",meshNode);
+	if (!subMeshNode) return false;
+	const DOMNodeList* subMeshList = subMeshNode->getChildNodes();
+	LOG("Num of submeshes = %d",subMeshList->getLength());
+	for (unsigned int i=0;i<subMeshList->getLength(); i++)
+	{
+		DOMNode* subMesh = subMeshList->item(i);	
+		std::string subMeshStr;
+		xml_utils::xml_translate(&subMeshStr, subMesh->getNodeName());
+		if (subMeshStr != "submesh")
+			continue;
+		SrModel* model = new SrModel();
+		meshModelVec.push_back(model);
+		LOG("SubMesh %d ... ",i);
+		const DOMNodeList* subMeshChildren = subMesh->getChildNodes();
+		for (unsigned int a = 0; a < subMeshChildren->getLength(); a++)
+		{
+			DOMNode* subMeshChild = subMeshChildren->item(a);
+			std::string childNodeStr;
+			xml_utils::xml_translate(&childNodeStr, subMeshChild->getNodeName());
+			if (childNodeStr == "geometry")
+			{
+				LOG("parse geometry");
+				DOMNamedNodeMap* childAttr = subMeshChild->getAttributes();
+				int vertexCount = 0;
+				if (childAttr)
+				{
+					const DOMNode* countNode = childAttr->getNamedItem(BML::BMLDefs::OGRE_VERTEX_COUNT);
+					std::string countAttr = "";
+					if (countNode)
+						xml_utils::xml_translate(&countAttr, countNode->getNodeValue());
+					vertexCount = atoi(countAttr.c_str());
+				}
+				const DOMNodeList* bufferList = subMeshChild->getChildNodes();
+				for (unsigned int b = 0; b < bufferList->getLength(); b++)
+				{
+					DOMNode* bufferNode = bufferList->item(b);
+					std::string bufferNodeStr;
+					xml_utils::xml_translate(&bufferNodeStr, bufferNode->getNodeName());
+					if (bufferNodeStr != "vertexbuffer")
+						continue;
+					LOG("vertex buffer %d ...",b);
+					const DOMNodeList* vertexList = bufferNode->getChildNodes();
+					for (unsigned int v = 0; v < vertexList->getLength(); v++)
+					{
+						DOMNode* vertexNode = vertexList->item(v);
+						std::string vertexStr;
+						xml_utils::xml_translate(&vertexStr, vertexNode->getNodeName());
+						if (vertexStr != "vertex")
+							continue;
+						//LOG("vertex %d ... ",v);
+						const DOMNodeList* vertexDataList = vertexNode->getChildNodes();
+						for (unsigned int j = 0; j < vertexDataList->getLength(); j++)
+						{
+							DOMNode* transformNode = vertexDataList->item(j);
+							std::string transformNodeName;
+							xml_utils::xml_translate(&transformNodeName, transformNode->getNodeName());
+							if (transformNodeName == "position" || transformNodeName == "normal")
+							{
+								DOMNamedNodeMap* positionAttr = transformNode->getAttributes();
+								if (positionAttr)
+								{
+									SrVec offset;
+									const DOMNode* xNode = positionAttr->getNamedItem(BML::BMLDefs::OGRE_X);
+									std::string xAttr = "";
+									if (xNode)
+										xml_utils::xml_translate(&xAttr, xNode->getNodeValue());
+									offset.x = (float) atof(xAttr.c_str());
+									const DOMNode* yNode = positionAttr->getNamedItem(BML::BMLDefs::OGRE_Y);
+									std::string yAttr = "";
+									if (yNode)
+										xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
+									offset.y = (float) atof(yAttr.c_str());
+									const DOMNode* zNode = positionAttr->getNamedItem(BML::BMLDefs::OGRE_Z);
+									std::string zAttr = "";
+									if (zNode)
+										xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
+									offset.z = (float) atof(zAttr.c_str());
+									offset *= scaleFactor;
+									if (transformNodeName == "position")
+										model->V.push(offset);
+									else if (transformNodeName == "normal")
+										model->N.push(offset);
+								}
+								
+							}							
+							else if (transformNodeName == "texcoord")
+							{
+								DOMNamedNodeMap* texcoordAttr = transformNode->getAttributes();
+								if (texcoordAttr)
+								{
+									SrPnt2 offset;
+									const DOMNode* xNode = texcoordAttr->getNamedItem(BML::BMLDefs::OGRE_U);
+									std::string xAttr = "";
+									if (xNode)
+										xml_utils::xml_translate(&xAttr, xNode->getNodeValue());
+									offset.x = (float) atof(xAttr.c_str());
+									const DOMNode* yNode = texcoordAttr->getNamedItem(BML::BMLDefs::OGRE_V);
+									std::string yAttr = "";
+									if (yNode)
+										xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
+									offset.y = (float) atof(yAttr.c_str());									
+									
+									offset *= scaleFactor;
+									model->T.push(offset);
+								}
+
+							}						
+						}
+						
+					}
+				}
+				LOG("parse geometry complete");
+
+			}
+			else if (childNodeStr == "faces")
+			{
+				LOG("parse faces");
+				const DOMNodeList* faceList = subMeshChild->getChildNodes();
+				for (unsigned int f = 0; f < faceList->getLength(); f++)
+				{
+					DOMNode* faceNode = faceList->item(f);
+					std::string faceStr;
+					xml_utils::xml_translate(&faceStr, faceNode->getNodeName());
+					if (faceStr != "face")
+						continue;
+					DOMNamedNodeMap* faceAttr = faceNode->getAttributes();
+					if (faceAttr)
+					{
+						int v1,v2,v3;
+						const DOMNode* xNode = faceAttr->getNamedItem(BML::BMLDefs::OGRE_V1);
+						std::string xAttr = "";
+						if (xNode)
+							xml_utils::xml_translate(&xAttr, xNode->getNodeValue());
+						v1 = atoi(xAttr.c_str());
+						const DOMNode* yNode = faceAttr->getNamedItem(BML::BMLDefs::OGRE_V2);
+						std::string yAttr = "";
+						if (yNode)
+							xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
+						v2 = atoi(yAttr.c_str());
+						const DOMNode* zNode = faceAttr->getNamedItem(BML::BMLDefs::OGRE_V3);
+						std::string zAttr = "";
+						if (zNode)
+							xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
+						v3 = atoi(zAttr.c_str());
+						
+						// no material for now.
+						model->Fm.push(-1);
+						model->F.push().set(v1,v2,v3);
+						model->Ft.push().set(v1,v2,v3);
+						model->Fn.push().set(v1,v2,v3);
+					}					
+				}
+				LOG("parse faces complete");
+			}
+		}
+	}
+	LOG("ParseOgre::parseMesh complete");
+	return true;
+}
+
+bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& skinWeights, float scaleFactor )
+{
+	LOG("ParseOgre::parseSkinWeight");
+	DOMNode* subMeshNode = getNode("submeshes",meshNode);
+	if (!subMeshNode) return false;
+	const DOMNodeList* subMeshList = subMeshNode->getChildNodes();
+
+	for (unsigned int i=0;i<subMeshList->getLength(); i++)
+	{
+		DOMNode* subMesh = subMeshList->item(i);			
+		const DOMNodeList* subMeshChildren = subMesh->getChildNodes();
+		for (unsigned int a = 0; a < subMeshChildren->getLength(); a++)
+		{
+			DOMNode* subMeshChild = subMeshChildren->item(a);
+			std::string childNodeStr;
+			xml_utils::xml_translate(&childNodeStr, subMeshChild->getNodeName());
+			if (childNodeStr == "boneassignments")
+			{		
+				SkinWeight* sw = new SkinWeight();
+				const DOMNodeList* weightList = subMeshChild->getChildNodes();
+				int prevVtxIdx = -1;
+				int infJointCount = 0;
+				//std::map<int,int> infJointCount;
+				for (unsigned int w = 0; w < weightList->getLength(); w++)
+				{
+					DOMNode* weightNode = weightList->item(w);
+					DOMNamedNodeMap* weightAttr = weightNode->getAttributes();
+					if (weightAttr)
+					{
+						int vtxIdx, boneIdx;
+						float weight;
+						const DOMNode* vtxIdxNode = weightAttr->getNamedItem(BML::BMLDefs::OGRE_VERTEX_INDEX);
+						std::string xAttr = "";
+						if (vtxIdxNode)
+							xml_utils::xml_translate(&xAttr, vtxIdxNode->getNodeValue());
+						vtxIdx = atoi(xAttr.c_str());
+						if (prevVtxIdx != vtxIdx)
+						{
+							if (prevVtxIdx != -1)
+							{
+								sw->numInfJoints.push_back(infJointCount);
+							}
+							prevVtxIdx = vtxIdx;
+							infJointCount = 0;
+						}
+						infJointCount++;
+						const DOMNode* boneIdxNode = weightAttr->getNamedItem(BML::BMLDefs::OGRE_BONE_INDEX);
+						std::string yAttr = "";
+						if (boneIdxNode)
+							xml_utils::xml_translate(&yAttr, boneIdxNode->getNodeValue());
+						boneIdx = atoi(yAttr.c_str());
+						const DOMNode* zNode = weightAttr->getNamedItem(BML::BMLDefs::OGRE_WEIGHT);
+						std::string zAttr = "";
+						if (zNode)
+							xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
+						weight = (float) atof(zAttr.c_str());
+						
+						sw->weightIndex.push_back(sw->bindWeight.size());
+						sw->bindWeight.push_back(weight);
+						sw->jointNameIndex.push_back(boneIdx);						
+					}					
+				}				
+			}
+		}			
+	}
+
+	LOG("ParseOgre::parseSkinWeight Complete");
+
+	return true;
+}
+
+
+

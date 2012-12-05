@@ -330,11 +330,17 @@ class BMLDefs
 		static XMLCh* OGRE_BONE;
 		static XMLCh* OGRE_PARENT;
 		static XMLCh* OGRE_ID;
+		static XMLCh* OGRE_VERTEX_COUNT;
 		static XMLCh* OGRE_NAME;
 		static XMLCh* OGRE_LENGTH;
 		static XMLCh* OGRE_X;
 		static XMLCh* OGRE_Y;
 		static XMLCh* OGRE_Z;
+		static XMLCh* OGRE_U;
+		static XMLCh* OGRE_V;
+		static XMLCh* OGRE_V1;
+		static XMLCh* OGRE_V2;
+		static XMLCh* OGRE_V3;
 		static XMLCh* OGRE_ANGLE;
 		static XMLCh* OGRE_AXIS;
 		static XMLCh* OGRE_ANIMATION;
@@ -345,6 +351,10 @@ class BMLDefs
 		static XMLCh* OGRE_TRANSLATE;
 		static XMLCh* OGRE_ROTATE;
 		static XMLCh* OGRE_TIME;
+		static XMLCh* OGRE_VERTEX_INDEX;
+		static XMLCh* OGRE_BONE_INDEX;
+		static XMLCh* OGRE_WEIGHT;
+
 
 };
 

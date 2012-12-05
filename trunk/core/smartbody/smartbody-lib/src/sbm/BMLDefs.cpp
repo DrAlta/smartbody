@@ -335,8 +335,14 @@ XMLCh* BMLDefs::ATTR_POLICY = NULL;
 XMLCh* BMLDefs::OGRE_BONE = NULL;
 XMLCh* BMLDefs::OGRE_PARENT = NULL;
 XMLCh* BMLDefs::OGRE_ID = NULL;
+XMLCh* BMLDefs::OGRE_VERTEX_COUNT = NULL;
 XMLCh* BMLDefs::OGRE_NAME = NULL;
 XMLCh* BMLDefs::OGRE_LENGTH = NULL;
+XMLCh* BMLDefs::OGRE_U = NULL;
+XMLCh* BMLDefs::OGRE_V = NULL;
+XMLCh* BMLDefs::OGRE_V1 = NULL;
+XMLCh* BMLDefs::OGRE_V2 = NULL;
+XMLCh* BMLDefs::OGRE_V3 = NULL;
 XMLCh* BMLDefs::OGRE_X = NULL;
 XMLCh* BMLDefs::OGRE_Y = NULL;
 XMLCh* BMLDefs::OGRE_Z = NULL;
@@ -350,6 +356,9 @@ XMLCh* BMLDefs::OGRE_KEYFRAME = NULL;
 XMLCh* BMLDefs::OGRE_TRANSLATE = NULL;
 XMLCh* BMLDefs::OGRE_ROTATE = NULL;
 XMLCh* BMLDefs::OGRE_TIME = NULL;
+XMLCh* BMLDefs::OGRE_VERTEX_INDEX = NULL;
+XMLCh* BMLDefs::OGRE_BONE_INDEX = NULL;
+XMLCh* BMLDefs::OGRE_WEIGHT = NULL;
 
 
 BMLDefs::BMLDefs()
@@ -699,11 +708,17 @@ BMLDefs::BMLDefs()
 	OGRE_BONE = XMLString::transcode("bone");
 	OGRE_PARENT = XMLString::transcode("parent");
 	OGRE_ID = XMLString::transcode("id");
+	OGRE_VERTEX_COUNT = XMLString::transcode("vertexcount");
 	OGRE_NAME = XMLString::transcode("name");
 	OGRE_LENGTH = XMLString::transcode("length");
 	OGRE_X = XMLString::transcode("x");
 	OGRE_Y = XMLString::transcode("y");
 	OGRE_Z = XMLString::transcode("z");
+	OGRE_U = XMLString::transcode("u");
+	OGRE_V = XMLString::transcode("v");
+	OGRE_V = XMLString::transcode("v1");
+	OGRE_V = XMLString::transcode("v2");
+	OGRE_V = XMLString::transcode("v3");
 	OGRE_ANGLE = XMLString::transcode("angle");
 	OGRE_AXIS = XMLString::transcode("axis");
 	OGRE_ANIMATION = XMLString::transcode("animation");
@@ -714,6 +729,9 @@ BMLDefs::BMLDefs()
 	OGRE_TRANSLATE = XMLString::transcode("translate");
 	OGRE_ROTATE = XMLString::transcode("rotate");
 	OGRE_TIME = XMLString::transcode("time");
+	OGRE_VERTEX_INDEX = XMLString::transcode("vertexindex");
+	OGRE_BONE_INDEX = XMLString::transcode("boneindex");
+	OGRE_WEIGHT = XMLString::transcode("weight");
 
 }
 
