@@ -15,6 +15,12 @@ namespace SmartBody {
 			SBAPI SBMotionBlendBase();
 			SBAPI SBMotionBlendBase(const std::string& name, const std::string& skelName, int dimension);
 			SBAPI ~SBMotionBlendBase();			
+
+			SBAPI int getNumDimensions();
+			SBAPI const std::string& getSkeleton();
+			SBAPI const std::string& getInterpType();
+			SBAPI const std::string& getBlendType();
+
 			SBAPI virtual void addMotion(const std::string& motion, std::vector<double>& parameter);
 			SBAPI virtual void setMotionParameter(const std::string& motion, std::vector<double>& parameter);
 			SBAPI virtual std::vector<double> getMotionParameter(const std::string& motion);
@@ -31,11 +37,14 @@ namespace SmartBody {
 			SBAPI virtual void getParametersFromWeights(float& x, float& y, float& z, std::vector<double>& weights);
 			SBAPI void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
 
+			SBAPI virtual std::string saveToString();
+
 		protected:
 			MeCtBlendEngine* blendEngine;			
 			int parameterDim;
 			std::string interpType;		
 			std::string skeletonName;
+			std::string blendType;
 
 	};
 }
