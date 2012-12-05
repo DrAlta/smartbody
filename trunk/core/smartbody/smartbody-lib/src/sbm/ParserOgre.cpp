@@ -913,6 +913,8 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 		if (subMeshStr != "submesh")
 			continue;
 		SrModel* model = new SrModel();
+		std::string meshName = subMeshStr + boost::lexical_cast<std::string>(i);
+		model->name = meshName.c_str();
 		meshModelVec.push_back(model);
 		LOG("SubMesh %d ... ",i);
 		const DOMNodeList* subMeshChildren = subMesh->getChildNodes();
@@ -1071,7 +1073,13 @@ bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& s
 
 	for (unsigned int i=0;i<subMeshList->getLength(); i++)
 	{
-		DOMNode* subMesh = subMeshList->item(i);			
+		DOMNode* subMesh = subMeshList->item(i);	
+		std::string subMeshStr;
+		xml_utils::xml_translate(&subMeshStr, subMesh->getNodeName());
+		if (subMeshStr != "submesh")
+			continue;
+		SrModel* model = new SrModel();
+		std::string meshName = subMeshStr + boost::lexical_cast<std::string>(i);
 		const DOMNodeList* subMeshChildren = subMesh->getChildNodes();
 		for (unsigned int a = 0; a < subMeshChildren->getLength(); a++)
 		{
@@ -1081,6 +1089,8 @@ bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& s
 			if (childNodeStr == "boneassignments")
 			{		
 				SkinWeight* sw = new SkinWeight();
+				sw->sourceMesh = meshName;
+				skinWeights.push_back(sw);
 				const DOMNodeList* weightList = subMeshChild->getChildNodes();
 				int prevVtxIdx = -1;
 				int infJointCount = 0;
@@ -1121,9 +1131,11 @@ bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& s
 						
 						sw->weightIndex.push_back(sw->bindWeight.size());
 						sw->bindWeight.push_back(weight);
-						sw->jointNameIndex.push_back(boneIdx);						
+						sw->jointNameIndex.push_back(boneIdx);	
+						//sw->bindPoseMat.push_back(SrMat::id);
 					}					
-				}				
+				}	
+				sw->numInfJoints.push_back(infJointCount); // add the last set of infJoints
 			}
 		}			
 	}

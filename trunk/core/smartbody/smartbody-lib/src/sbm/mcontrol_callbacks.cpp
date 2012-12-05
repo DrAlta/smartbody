@@ -1661,7 +1661,12 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p
 		}
 		meshModelVec.push_back(objModel);
 	}
-	if (ext == ".dae" || ext == ".DAE" || ext == ".xml" || ext == ".XML")
+	else if (ext == ".xml" || ext == ".XML")
+	{
+		std::vector<SkinWeight*> tempWeights;
+		ParserOgre::parseSkinMesh(meshModelVec,tempWeights,obj_file,1.0,true,false);		
+	}
+	else if (ext == ".dae" || ext == ".DAE")// || ext == ".xml" || ext == ".XML")
 	{
 		DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file);
 		if (geometryNode)
@@ -1698,48 +1703,46 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p
 			{
 				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap);
 			}
-
 			// parsing geometry
 			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f);
-
-			float factor = 1.0f;
-			for (unsigned int i = 0; i < meshModelVec.size(); i++)
-			{
-				for (int j = 0; j < meshModelVec[i]->V.size(); j++)
-				{
-					meshModelVec[i]->V[j] *= factor;
-				}
-
-
-				SrSnModel* srSnModelStatic = new SrSnModel();
-				srSnModelStatic->shape(*meshModelVec[i]);
-				srSnModelStatic->shape().name = meshModelVec[i]->name;
-				if (pawn->dMesh_p)
-				{
-					pawn->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
-					srSnModelStatic->ref();
-				}
-				SrSnGroup* meshGroup = new SrSnGroup();
-				meshGroup->separator(true);
-				meshGroup->add(srSnModelStatic);
-				// find the group of the root joint
-				SrSn* node = pawn->scene_p->get(0);
-				if (node)
-				{
-					SrSnGroup* srSnGroup = dynamic_cast<SrSnGroup*>(node);
-					if (srSnGroup)
-						srSnGroup->add(meshGroup);
-				}
-			
-				delete meshModelVec[i];
-			}
-
 		}
 		else
 		{
 			LOG( "Could not load mesh from file '%s'", obj_file);
 			return CMD_FAILURE;
 		}
+	}
+
+	float factor = 1.0f;
+	for (unsigned int i = 0; i < meshModelVec.size(); i++)
+	{
+		for (int j = 0; j < meshModelVec[i]->V.size(); j++)
+		{
+			meshModelVec[i]->V[j] *= factor;
+		}
+
+
+		SrSnModel* srSnModelStatic = new SrSnModel();
+		srSnModelStatic->shape(*meshModelVec[i]);
+		srSnModelStatic->shape().name = meshModelVec[i]->name;
+		if (pawn->dMesh_p)
+		{
+			pawn->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
+			srSnModelStatic->ref();
+		}
+		SrSnGroup* meshGroup = new SrSnGroup();
+		meshGroup->separator(true);
+		meshGroup->add(srSnModelStatic);
+		// find the group of the root joint
+		SrSn* node = pawn->scene_p->get(0);
+		if (node)
+		{
+			SrSnGroup* srSnGroup = dynamic_cast<SrSnGroup*>(node);
+			if (srSnGroup)
+				srSnGroup->add(meshGroup);
+		}
+
+		delete meshModelVec[i];
 	}
 
 	return CMD_SUCCESS;
@@ -2234,13 +2237,15 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 				for (unsigned int i=0; i< sbmChar->dMesh_p->skinWeights.size(); i++)
 				{
 					SkinWeight* sw = sbmChar->dMesh_p->skinWeights[i];
-					SBSkeleton* sbSkeleton = sbmChar->getSkeleton();
-					for (int k=0;k<sbSkeleton->getNumJoints();k++)
+					SBSkeleton* sbSkeleton = sbmChar->getSkeleton();		
+					SBSkeleton* sbOrigSk = SmartBody::SBScene::getScene()->getSkeleton(sbSkeleton->getName());
+					for (int k=0;k<sbOrigSk->getNumJoints();k++)
 					{
 						// manually add all joint names
-						SBJoint* joint = sbSkeleton->getJoint(k);
+						SBJoint* joint = sbOrigSk->getJoint(k);
 						sw->infJointName.push_back(joint->getName());
 						sw->infJoint.push_back(joint);
+						sw->bindPoseMat.push_back(joint->gmatZero().inverse());
 					}
 				}
 			}
