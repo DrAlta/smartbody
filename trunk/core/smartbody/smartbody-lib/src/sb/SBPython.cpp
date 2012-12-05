@@ -936,6 +936,10 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getParameter", &SBMotionBlendBase::getMotionParameter, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the parameter of a given motion")
 		.def("buildBlendBase", &SBMotionBlendBase::buildBlendBase, "Initialize BlendBase. \n Input : Motion Parameter Name, Interpolator Type \n Output: NULL")
 		.def("addTetrahedron", &SBMotionBlendBase::addTetrahedron, "Add tetrahedrons to the state. By changing the point inside tetrahedron, you can get different blending weights and different results")
+		.def("getSkeleton", &SBMotionBlendBase::getSkeleton, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the skeleton used when constructing the blend")
+		.def("getInterpType", &SBMotionBlendBase::getInterpType, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the interpolation type of the blend.")
+		.def("getBlendType", &SBMotionBlendBase::getBlendType, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the type of blend, which dictates which joints are used for parameterization.")
+		.def("getNumDimensions", &SBMotionBlendBase::getNumDimensions, "Returns the number of dimensions for the blend.")
 		;
 
 	boost::python::class_<SBAnimationTransition>("SBAnimationTransition")

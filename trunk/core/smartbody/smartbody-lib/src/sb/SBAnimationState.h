@@ -44,7 +44,7 @@ class SBAnimationBlend : public PABlend
 		SBAPI virtual std::string getDimension();
 		SBAPI bool validateState();
 
-		SBAPI std::string saveToString();
+		SBAPI virtual std::string saveToString();
 
 		// Functions to build visualization surface
 		SBAPI void buildVisSurfaces(const std::string& errorType, const std::string& surfaceType, int segments, int dimensions);
