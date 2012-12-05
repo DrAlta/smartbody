@@ -24,6 +24,7 @@
 #define _PARSER_OGRRESKELETON_H_
 
 #include <fstream>
+#include "sbm/sbm_deformable_mesh.h"
 #include "sbm/xercesc_utils.hpp"
 #include "sk/sk_skeleton.h"
 #include "sk/sk_motion.h"
@@ -33,11 +34,14 @@
 class ParserOgre
 {
 	public:
-		static bool parse(SkSkeleton& skeleton, std::vector<SkMotion*>& motions, std::string fileName, float scale, bool doParseSkeleton, bool doParseMotion);
+		static bool parse(SkSkeleton& skeleton, std::vector<SkMotion*>& motions, std::string fileName, float scale, bool doParseSkeleton, bool doParseMotion);		
+		static bool parseSkinMesh(std::vector<SrModel*>& meshModelVec, std::vector<SkinWeight*>& skinWeights, std::string filename, float scale, bool doParseMesh, bool doParseSkinWeight);
 		static DOMNode* getNode(const std::string& nodeName, DOMNode* node);
 
 		static bool parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std::string fileName, float scale);
 		static bool parseMotion(DOMNode* motionNode, std::vector<SkMotion*>& motions, SkMotion* motion,std::string fileName, float scale);
+		static bool parseMesh(DOMNode* meshNode, std::vector<SrModel*>& meshModelVec, float scaleFactor);
+		static bool parseSkinWeight(DOMNode* node, std::vector<SkinWeight*>& skinWeights, float scaleFactor);
 
 };
 

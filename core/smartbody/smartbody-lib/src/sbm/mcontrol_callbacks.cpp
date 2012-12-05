@@ -68,6 +68,7 @@
 #include "sbm_pawn.hpp"
 #include "sbm/Event.h"
 #include "sbm/ParserOpenCOLLADA.h"
+#include "sbm/ParserOgre.h"
 
 #include "SteeringAgent.h"
 #include <boost/filesystem/operations.hpp>
@@ -1774,6 +1775,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 	}
 
 	// Here, detect which type of file it is
+	std::string filename = obj_file;
 	std::string ext = boost::filesystem2::extension(obj_file);
 	std::string file = boost::filesystem::basename(obj_file);	
 	std::vector<SrModel*> meshModelVec;
@@ -1791,6 +1793,12 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 //	else if (ext == ".xml" || ext == ".XML")
 	//{
 	//}
+	else if ( filename.find(".mesh.xml") == (filename.size() - 9) || filename.find(".MESH.xml") == (filename.size() - 9) ) // ogre file
+	{
+		// load ogre mesh
+		std::vector<SkinWeight*> tempWeights;
+		ParserOgre::parseSkinMesh(meshModelVec,tempWeights,obj_file,factor,true,false);
+	}
 	else if (ext == ".dae" || ext == ".DAE" || ext == ".xml" || ext == ".XML")
 	{
 		DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file);
@@ -2193,17 +2201,51 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 	ErrorHandler* errHandler = (ErrorHandler*) new HandlerBase();
 	parser->setErrorHandler(errHandler);
 
+	std::string ext = boost::filesystem2::extension(skin_file);
+	std::string file = boost::filesystem::basename(skin_file);	
+
 	try 
 	{
 		parser->parse(skin_file);
 		DOMDocument* doc = parser->getDocument();
-		DOMNode* controllerNode = ParserOpenCOLLADA::getNode("library_controllers", doc);
-		if (!controllerNode)
+
+		if (ext == ".dae" || ext == ".DAE")
 		{
-			LOG("mcu_character_load_skinweights ERR: no binding info contained");
-			return CMD_FAILURE;
+			DOMNode* controllerNode = ParserOpenCOLLADA::getNode("library_controllers", doc);		
+			if (!controllerNode)
+			{
+				LOG("mcu_character_load_skinweights ERR: no binding info contained");
+				return CMD_FAILURE;
+			}
+			parseLibraryControllers(controllerNode, char_name, scaleFactor, jointNamePrefix, mcu_p);
+		}	
+		else if (ext == ".xml" || ext == ".XML")
+		{
+			SbmCharacter* sbmChar = mcu_p->getCharacter(char_name);
+			if (sbmChar && sbmChar->dMesh_p)
+			{
+				DOMNode* controllerNode = ParserOpenCOLLADA::getNode("mesh", doc);		
+				if (!controllerNode)
+				{
+					LOG("mcu_character_load_skinweights ERR: no ogre mesh info contained");
+					return CMD_FAILURE;
+				}
+				ParserOgre::parseSkinWeight(controllerNode,sbmChar->dMesh_p->skinWeights,scaleFactor);
+				for (unsigned int i=0; i< sbmChar->dMesh_p->skinWeights.size(); i++)
+				{
+					SkinWeight* sw = sbmChar->dMesh_p->skinWeights[i];
+					SBSkeleton* sbSkeleton = sbmChar->getSkeleton();
+					for (int k=0;k<sbSkeleton->getNumJoints();k++)
+					{
+						// manually add all joint names
+						SBJoint* joint = sbSkeleton->getJoint(k);
+						sw->infJointName.push_back(joint->getName());
+						sw->infJoint.push_back(joint);
+					}
+				}
+			}
 		}
-		parseLibraryControllers(controllerNode, char_name, scaleFactor, jointNamePrefix, mcu_p);
+		
 	}
 	catch (const XMLException& toCatch) 
 	{
