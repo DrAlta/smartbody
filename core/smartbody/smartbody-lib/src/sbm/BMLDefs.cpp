@@ -716,9 +716,9 @@ BMLDefs::BMLDefs()
 	OGRE_Z = XMLString::transcode("z");
 	OGRE_U = XMLString::transcode("u");
 	OGRE_V = XMLString::transcode("v");
-	OGRE_V = XMLString::transcode("v1");
-	OGRE_V = XMLString::transcode("v2");
-	OGRE_V = XMLString::transcode("v3");
+	OGRE_V1 = XMLString::transcode("v1");
+	OGRE_V2 = XMLString::transcode("v2");
+	OGRE_V3 = XMLString::transcode("v3");
 	OGRE_ANGLE = XMLString::transcode("angle");
 	OGRE_AXIS = XMLString::transcode("axis");
 	OGRE_ANIMATION = XMLString::transcode("animation");
