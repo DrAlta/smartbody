@@ -17,6 +17,9 @@
 #if !defined(BOOST_NUMERIC_BINDINGS_USE_CLAPACK) && !defined(__ANDROID__)
 #  include <boost/numeric/bindings/traits/fortran.h>
 #else
+#if defined(FORTRAN_ID)
+    #undef FORTRAN_ID
+#endif
 #  define FORTRAN_ID( id ) id##_
 #endif  
 
