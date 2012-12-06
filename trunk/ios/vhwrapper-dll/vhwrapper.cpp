@@ -46,6 +46,10 @@ typedef bool (*SBM_SetProcessId_DEF)( SBMHANDLE, const char * );
 typedef bool (*SBM_SetMediaPath_DEF)( SBMHANDLE, const char * );
 typedef bool (*SBM_Init_DEF)( SBMHANDLE, const char *, bool );
 typedef bool (*SBM_Shutdown_DEF)( SBMHANDLE );
+typedef bool (*SBM_LoadSkeleton_DEF)( SBMHANDLE, const void *, int, const char * );
+typedef bool (*SBM_LoadMotion_DEF)( SBMHANDLE, const void *, int, const char * );
+typedef bool (*SBM_MapSkeleton_DEF)( SBMHANDLE, const char *, const char * );
+typedef bool (*SBM_MapMotion_DEF)( SBMHANDLE, const char *, const char * );
 typedef bool (*SBM_SetListener_DEF)( SBMHANDLE, SBM_OnCreateCharacterCallback, SBM_OnCharacterDeleteCallback, SBM_OnCharacterChangeCallback, SBM_OnVisemeCallback, SBM_OnChannelCallback);
 typedef bool (*SBM_Update_DEF)(SBMHANDLE, double);
 typedef bool (*SBM_SetDebuggerId_DEF)(SBMHANDLE, const char * );
@@ -75,6 +79,10 @@ SBM_SetProcessId_DEF               g_SBM_SetProcessId = NULL;
 SBM_SetMediaPath_DEF               g_SBM_SetMediaPath = NULL;
 SBM_Init_DEF                       g_SBM_Init = NULL;
 SBM_Shutdown_DEF                   g_SBM_Shutdown = NULL;
+SBM_LoadSkeleton_DEF               g_SBM_LoadSkeleton = NULL;
+SBM_LoadMotion_DEF                 g_SBM_LoadMotion = NULL;
+SBM_MapSkeleton_DEF                g_SBM_MapSkeleton = NULL;
+SBM_MapMotion_DEF                  g_SBM_MapMotion = NULL;
 SBM_SetListener_DEF                g_SBM_SetListener = NULL;
 SBM_Update_DEF                     g_SBM_Update = NULL;
 SBM_SetDebuggerId_DEF              g_SBM_SetDebuggerId = NULL;
@@ -123,6 +131,10 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
    g_SBM_SetMediaPath               = (SBM_SetMediaPath_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetMediaPath");
    g_SBM_Init                       = (SBM_Init_DEF)GetProcAddress(g_SBM_HINST, "SBM_Init");
    g_SBM_Shutdown                   = (SBM_Shutdown_DEF)GetProcAddress(g_SBM_HINST, "SBM_Shutdown");
+   g_SBM_LoadSkeleton               = (SBM_LoadSkeleton_DEF)GetProcAddress(g_SBM_HINST, "SBM_LoadSkeleton");
+   g_SBM_LoadMotion                 = (SBM_LoadMotion_DEF)GetProcAddress(g_SBM_HINST, "SBM_LoadMotion");
+   g_SBM_MapSkeleton                = (SBM_MapSkeleton_DEF)GetProcAddress(g_SBM_HINST, "SBM_MapSkeleton");
+   g_SBM_MapMotion                  = (SBM_MapMotion_DEF)GetProcAddress(g_SBM_HINST, "SBM_MapMotion");
    g_SBM_SetListener                = (SBM_SetListener_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetListener");
    g_SBM_Update                     = (SBM_Update_DEF)GetProcAddress(g_SBM_HINST, "SBM_Update");
    g_SBM_SetDebuggerId              = (SBM_SetDebuggerId_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerId");
@@ -235,6 +247,59 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle )
    return SBM_Shutdown(sbmHandle);
 #endif
 }
+
+VHWRAPPERDLL_API bool WRAPPER_SBM_LoadSkeleton( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * skeletonName )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_LoadSkeleton)
+   {
+      return g_SBM_LoadSkeleton(sbmHandle, data, sizeBytes, skeletonName);
+   }
+   return false;
+#else
+   return SBM_LoadSkeleton(sbmHandle, data, sizeBytes, skeletonName);
+#endif
+}
+
+VHWRAPPERDLL_API bool WRAPPER_SBM_LoadMotion( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * motionName )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_LoadMotion)
+   {
+      return g_SBM_LoadMotion(sbmHandle, data, sizeBytes, motionName);
+   }
+   return false;
+#else
+   return SBM_LoadMotion(sbmHandle, data, sizeBytes, motionName);
+#endif
+}
+
+VHWRAPPERDLL_API bool WRAPPER_SBM_MapSkeleton( SBMHANDLE sbmHandle, const char * mapName, const char * skeletonName )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_MapSkeleton)
+   {
+      return g_SBM_MapSkeleton(sbmHandle, mapName, skeletonName);
+   }
+   return false;
+#else
+   return SBM_MapSkeleton(sbmHandle, mapName, skeletonName);
+#endif
+}
+
+VHWRAPPERDLL_API bool WRAPPER_SBM_MapMotion( SBMHANDLE sbmHandle, const char * mapName, const char * motionName )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_MapMotion)
+   {
+      return g_SBM_MapMotion(sbmHandle, mapName, motionName);
+   }
+   return false;
+#else
+   return SBM_MapMotion(sbmHandle, mapName, motionName);
+#endif
+}
+
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB,
                                                SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changeCB,
