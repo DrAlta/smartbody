@@ -200,7 +200,6 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/external/ANN/ANN.cpp \
 	$(SBM_MY_DIR)/external/parser/UnitRules.cpp \
 	$(SBM_MY_DIR)/external/parser/utils.cpp \
 	$(SBM_MY_DIR)/external/parser/ValHeap.cpp \
-	$(SBM_MY_DIR)/external/parser/SentRep.cpp \
 	$(SBM_MY_DIR)/external/perlin/perlin.cpp 
 	
 	
