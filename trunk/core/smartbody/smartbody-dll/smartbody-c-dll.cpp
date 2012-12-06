@@ -262,6 +262,49 @@ SMARTBODY_C_DLL_API bool SBM_Shutdown( SBMHANDLE sbmHandle )
 }
 
 
+SMARTBODY_C_DLL_API bool SBM_LoadSkeleton( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * skeletonName )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   return g_smartbodyInstances[ sbmHandle ]->LoadSkeleton(data, sizeBytes, skeletonName);
+}
+
+
+SMARTBODY_C_DLL_API bool SBM_LoadMotion( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * motionName )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   return g_smartbodyInstances[ sbmHandle ]->LoadMotion(data, sizeBytes, motionName);
+}
+
+
+SMARTBODY_C_DLL_API bool SBM_MapSkeleton( SBMHANDLE sbmHandle, const char * mapName, const char * skeletonName )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   return g_smartbodyInstances[ sbmHandle ]->MapSkeleton(mapName, skeletonName);
+}
+
+SMARTBODY_C_DLL_API bool SBM_MapMotion( SBMHANDLE sbmHandle, const char * mapName, const char * motionName )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   return g_smartbodyInstances[ sbmHandle ]->MapMotion(mapName, motionName);
+}
+
+
 SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changedCB, SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB )
 {
    if ( !SBM_HandleExists( sbmHandle ) )

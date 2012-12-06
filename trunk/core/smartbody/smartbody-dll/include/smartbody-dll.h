@@ -85,6 +85,12 @@ class Smartbody_dll
       SMARTBODY_DLL_API bool Init(const std::string& pythonLibPath, bool logToFile);
       SMARTBODY_DLL_API bool Shutdown();
 
+      SMARTBODY_DLL_API bool LoadSkeleton( const void * data, int sizeBytes, const char * skeletonName );
+      SMARTBODY_DLL_API bool LoadMotion( const void * data, int sizeBytes, const char * motionName );
+
+      SMARTBODY_DLL_API bool MapSkeleton( const char * mapName, const char * skeletonName );
+      SMARTBODY_DLL_API bool MapMotion( const char * mapName, const char * motionName );
+
       SMARTBODY_DLL_API void SetListener( SmartbodyListener * listener );
 
       SMARTBODY_DLL_API bool Update( const double timeInSeconds );
