@@ -6,6 +6,8 @@
 
 //#define ENABLE_SBM
 
+#include "vhcl_public.h"
+
 #include "smartbody-c-dll.h"
 
 #ifdef ENABLE_VHMSG_WRAPPER
@@ -13,7 +15,7 @@
 #endif
 
 
-#if WIN32
+#if defined(WIN_BUILD)
 #ifdef VHWRAPPERDLL_EXPORTS
 #define VHWRAPPERDLL_API __declspec(dllexport)
 #else
@@ -27,12 +29,11 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
-
-
+#endif
 
 
 VHWRAPPERDLL_API void __stdcall SetLogMessageCallback(LogMessageCallback cb);
+
 // SBM
 VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode);
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandle, const char * basePath );
@@ -40,39 +41,38 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_SetProcessId( SBMHANDLE sbmHandle, const char 
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * path );
 VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle, const char * pythonPath, bool logToFile );
 VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle );
-
-#ifdef WIN32
+VHWRAPPERDLL_API bool WRAPPER_SBM_LoadSkeleton( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * skeletonName );
+VHWRAPPERDLL_API bool WRAPPER_SBM_LoadMotion( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * motionName );
+VHWRAPPERDLL_API bool WRAPPER_SBM_MapSkeleton( SBMHANDLE sbmHandle, const char * mapName, const char * skeletonName );
+VHWRAPPERDLL_API bool WRAPPER_SBM_MapMotion( SBMHANDLE sbmHandle, const char * mapName, const char * motionName );
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB,
-                                              SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changeCB,
-                                              SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB );
-#else
-VHWRAPPERDLL_API bool WRAPPER_SBM_SetListener( SBMHANDLE sbmHandle);
-#endif
+                                               SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changeCB,
+                                               SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB );
 VHWRAPPERDLL_API bool WRAPPER_SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds );
 VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerId( SBMHANDLE sbmHandle, const char * id );
 VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar );
 VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmHandle, bool enabled );
 VHWRAPPERDLL_API bool WRAPPER_SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args );
 VHWRAPPERDLL_API int  WRAPPER_SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle );
+VHWRAPPERDLL_API bool WRAPPER_SBM_InitCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character );
 VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character );
 VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character );
-VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character );
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetLogMessageCallback( LogMessageCallback cb );
-VHWRAPPERDLL_API void WRAPPER_SBM_LogMessage(const char* message, int messageType);
+VHWRAPPERDLL_API void WRAPPER_SBM_LogMessage( const char * message, int messageType );
 
 // used for polling on iOS since callbacks aren't allowed
-VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterCreated( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** objectClass );
-VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, int * numCharacters, char *** name);
-VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterChanged( SBMHANDLE sbmHandle, int * numCharacters, char *** name);
-VHWRAPPERDLL_API bool WRAPPER_SBM_IsVisemeSet( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** visemeName, float** weight, float** blendTime);
-VHWRAPPERDLL_API bool WRAPPER_SBM_IsChannelSet( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** channelName, float ** value);
+VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * objectClass, int maxObjectClassLen );
+VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, char * name, int maxNameLen );
+VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterChanged( SBMHANDLE sbmHandle, char * name, int maxNameLen );
+VHWRAPPERDLL_API bool WRAPPER_SBM_IsVisemeSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * visemeName, int maxVisemeNameLen, float * weight, float * blendTime );
+VHWRAPPERDLL_API bool WRAPPER_SBM_IsChannelSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * channelName, int maxChannelNameLen, float * value );
 
 // functions can't be distinguished by return type alone so they are named differently
-VHWRAPPERDLL_API bool WRAPPER_SBM_PythonCommandVoid(SBMHANDLE sbmHandle, const char * command);
-VHWRAPPERDLL_API bool WRAPPER_SBM_PythonCommandBool(SBMHANDLE sbmHandle, const char * command);
-VHWRAPPERDLL_API int WRAPPER_SBM_PythonCommandInt(SBMHANDLE sbmHandle, const char * command);
-VHWRAPPERDLL_API float WRAPPER_SBM_PythonCommandFloat(SBMHANDLE sbmHandle, const char *command);
-VHWRAPPERDLL_API char* WRAPPER_SBM_PythonCommandString(SBMHANDLE sbmHandle, const char * command, char* output, int maxLen);
+VHWRAPPERDLL_API bool   WRAPPER_SBM_PythonCommandVoid(SBMHANDLE sbmHandle, const char * command);
+VHWRAPPERDLL_API bool   WRAPPER_SBM_PythonCommandBool(SBMHANDLE sbmHandle, const char * command);
+VHWRAPPERDLL_API int    WRAPPER_SBM_PythonCommandInt(SBMHANDLE sbmHandle, const char * command);
+VHWRAPPERDLL_API float  WRAPPER_SBM_PythonCommandFloat(SBMHANDLE sbmHandle, const char * command);
+VHWRAPPERDLL_API char * WRAPPER_SBM_PythonCommandString(SBMHANDLE sbmHandle, const char * command, char * output, int maxLen);
 
 
 // VHCL AUDIO
@@ -127,9 +127,30 @@ VHWRAPPERDLL_API int WRAPPER_VHMSG_GetNumQueuedMessages( );
 char* ConvertWCharToChar(const wchar_t * wc);
 bool VHMSG_HandleExists( const VHMSGHANDLE handle );
 void WRAPPER_tt_client_callback(const char * op, const char * args, void * user_data);
-#endif
 //////////////////////////////////////////////////////////////
+#endif
+
 
 #ifdef __cplusplus
 }
+#endif
+
+
+
+// stubs for testing library loading on different platforms
+#if 0
+
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef intptr_t SBMHANDLE;
+SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
