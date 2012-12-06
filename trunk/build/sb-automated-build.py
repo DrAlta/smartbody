@@ -163,9 +163,15 @@ def cleanBuild():
             p.wait()
         else:
             # remove unversioned/ignored files
-            # search for the ?, trim the beginning of the line, then call rm on the file/folder
-            p = subprocess.Popen("svn status --no-ignore build.sandbox | grep '^\?' | sed 's/^\?       //'  | xargs -Ixx rm -rf xx", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            # search for '?' (unversioned), trim the beginning of the line, then call rm on the file/folder
             cleanSandboxOutput = []
+            p = subprocess.Popen("svn status --no-ignore build.sandbox | grep '^\?' | sed 's/^\?       //'  | xargs -Ixx rm -rf xx", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in p.stdout:
+                cleanSandboxOutput.append(line.strip())
+            p.wait()
+
+            # search for 'I' (ignored), trim the beginning of the line, then call rm on the file/folder
+            p = subprocess.Popen("svn status --no-ignore build.sandbox | grep '^\I' | sed 's/^\I       //'  | xargs -Ixx rm -rf xx", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             for line in p.stdout:
                 cleanSandboxOutput.append(line.strip())
             p.wait()
