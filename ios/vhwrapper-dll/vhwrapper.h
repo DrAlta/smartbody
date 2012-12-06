@@ -41,6 +41,10 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_SetProcessId( SBMHANDLE sbmHandle, const char 
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * path );
 VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle, const char * pythonPath, bool logToFile );
 VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle );
+VHWRAPPERDLL_API bool WRAPPER_SBM_LoadSkeleton( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * skeletonName );
+VHWRAPPERDLL_API bool WRAPPER_SBM_LoadMotion( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * motionName );
+VHWRAPPERDLL_API bool WRAPPER_SBM_MapSkeleton( SBMHANDLE sbmHandle, const char * mapName, const char * skeletonName );
+VHWRAPPERDLL_API bool WRAPPER_SBM_MapMotion( SBMHANDLE sbmHandle, const char * mapName, const char * motionName );
 VHWRAPPERDLL_API bool WRAPPER_SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB,
                                                SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changeCB,
                                                SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB );
