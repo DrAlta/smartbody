@@ -679,6 +679,46 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 	return CMD_SUCCESS;
 }
 
+int load_me_motion_individual( SrInput & input, const std::string & motionName, std::map<std::string, SkMotion*>& map, double scale )
+{
+	SkMotion* motion = new SmartBody::SBMotion();
+
+	bool parseSuccessful = motion->load( input, scale );
+
+	MotionResource * motionRes = new MotionResource();
+	motionRes->setType("skm");
+
+	std::string filename = motionName;
+
+	motionRes->setMotionFile( motionName );
+
+	SBResourceManager* manager = SBResourceManager::getResourceManager();
+
+	manager->addResource(motionRes);
+
+	string filebase = basename( motionName );
+	const char* name = motion->getName().c_str();
+	if( name && _stricmp( filebase.c_str(), name ) )
+	{
+		LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, motionName.c_str(), filebase.c_str());
+		motion->setName( filebase.c_str() );
+	}
+
+	motion->filename( motionName.c_str() );
+
+	std::map<std::string, SkMotion*>::iterator motionIter = map.find(filebase);
+	if (motionIter != map.end()) 
+	{
+		LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), motionName.c_str());
+		delete motion;
+		return CMD_FAILURE;
+	}
+
+	map.insert(std::pair<std::string, SkMotion*>(filebase, motion));
+
+	return CMD_SUCCESS;
+}
+
 int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, SBResourceManager* manager, double scale ) {
 	path motions_path(pathname);
 	
@@ -701,6 +741,43 @@ int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map
 		LOG("ERROR: Invalid motion path \"%s\".", finalPath.string().c_str());
 		return CMD_FAILURE;
 	}
+}
+
+int load_me_skeleton_individual( SrInput & input, const std::string & skeletonName, std::map<std::string, SkSkeleton*>& map, double scale )
+{
+	SkSkeleton * skeleton = new SmartBody::SBSkeleton();
+	skeleton->ref();
+
+	//path skeletonPath(skeletonName);
+	//string ext = extension(skeletonPath);
+	//ext = vhcl::ToLower(ext);
+	//if (ext == ".sk")
+
+	if( !skeleton->load( input, scale ) )
+	{ 
+		LOG("Problem loading skeleton from file ''.");
+		input.close();
+		delete skeleton;
+		return CMD_FAILURE;
+	}
+	else
+	{
+		skeleton->setName(skeletonName);
+		SmartBody::SBSkeleton* sbskel = dynamic_cast<SmartBody::SBSkeleton*>(skeleton);
+		sbskel->setFileName(skeletonName);
+		map.insert(std::pair<std::string, SkSkeleton*>(skeletonName, skeleton));
+	}
+
+
+	skeleton->skfilename(skeletonName.c_str());
+	skeleton->name(skeleton->skfilename());
+	SBResourceManager* manager = SBResourceManager::getResourceManager();
+	SkeletonResource* skelRes = new SkeletonResource();
+	skelRes->setType("skm");
+	skelRes->setSkeletonFile(skeletonName.c_str());
+	manager->addResource(skelRes);
+
+	return CMD_SUCCESS;
 }
 
 int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, SBResourceManager* manager, double scale ) {

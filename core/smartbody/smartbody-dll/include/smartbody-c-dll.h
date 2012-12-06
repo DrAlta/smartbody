@@ -67,6 +67,12 @@ SMARTBODY_C_DLL_API bool SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * pat
 SMARTBODY_C_DLL_API bool SBM_Init( SBMHANDLE sbmHandle, const char* pythonLibPath, bool logToFile );
 SMARTBODY_C_DLL_API bool SBM_Shutdown( SBMHANDLE sbmHandle );
 
+SMARTBODY_C_DLL_API bool SBM_LoadSkeleton( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * skeletonName );
+SMARTBODY_C_DLL_API bool SBM_LoadMotion( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * motionName );
+
+SMARTBODY_C_DLL_API bool SBM_MapSkeleton( SBMHANDLE sbmHandle, const char * mapName, const char * skeletonName );
+SMARTBODY_C_DLL_API bool SBM_MapMotion( SBMHANDLE sbmHandle, const char * mapName, const char * motionName );
+
 SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changedCB, SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB );
 
 SMARTBODY_C_DLL_API bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds );

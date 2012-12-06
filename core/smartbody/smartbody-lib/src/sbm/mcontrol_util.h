@@ -469,6 +469,13 @@ public:
 		int load_motions( const char* pathname, bool recursive );
 		int load_skeletons( const char* pathname, bool recursive );
 		int load_poses( const char* pathname, bool recursive );
+
+		int load_skeleton( const void* data, int sizeBytes, const char* skeletonName );
+		int load_motion( const void* data, int sizeBytes, const char* motionName );
+
+		int map_skeleton( const char * mapName, const char * skeletonName );
+		int map_motion( const char * mapName, const char * motionName );
+
 		// ----------------------------------------------
 		// END asset management
 		// ----------------------------------------------

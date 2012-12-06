@@ -101,7 +101,9 @@
 #include <sb/SBScript.h>
 #include <sb/SBServiceManager.h>
 #include <sb/SBAnimationState.h>
+#include <sb/SBMotion.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBJointMapManager.h>
 #include "SbmDebuggerServer.h"
 #include "SbmDebuggerClient.h"
 #include <controllers/me_ct_param_animation_utilities.h>
@@ -1677,6 +1679,83 @@ int mcuCBHandle::load_motions( const char* pathname, bool recursive ) {
 int mcuCBHandle::load_skeletons( const char* pathname, bool recursive ) {
 	return load_me_skeletons( pathname, skeleton_map, recursive, resource_manager, skScale );
 }
+
+int mcuCBHandle::load_skeleton( const void* data, int sizeBytes, const char* skeletonName )
+{
+	SrInput input( (char *)data, sizeBytes );
+	return load_me_skeleton_individual( input, skeletonName, skeleton_map, skScale );
+}
+
+int mcuCBHandle::load_motion( const void* data, int sizeBytes, const char* motionName )
+{
+	SrInput input( (char *)data, sizeBytes );
+	return load_me_motion_individual( input, motionName, motion_map, skmScale );
+}
+
+int mcuCBHandle::map_skeleton( const char * mapName, const char * skeletonName )
+{
+	// ED - taken from skeletonmap_func()
+
+	SmartBody::SBSkeleton* sbskeleton = NULL;
+	std::map<std::string, SkSkeleton*>::iterator iter = skeleton_map.find(skeletonName);
+	if (iter == skeleton_map.end())
+	{
+		LOG("Cannot find skeleton named %s.", skeletonName);
+		return CMD_FAILURE;
+	}
+	else
+	{
+		sbskeleton = dynamic_cast<SmartBody::SBSkeleton*>((*iter).second);
+	}
+
+	// find the bone map name
+	SmartBody::SBJointMap* jointMap = SBScene::getScene()->getJointMapManager()->getJointMap(mapName);
+	if (!jointMap)
+	{
+		LOG("Cannot find joint map name '%s'.", mapName);
+		return CMD_FAILURE;
+	}
+
+	// apply the map
+	jointMap->applySkeleton(sbskeleton);
+
+	LOG("Applied joint map %s to skeleton %s.", mapName, skeletonName);
+
+	return CMD_SUCCESS;
+}
+
+int mcuCBHandle::map_motion( const char * mapName, const char * motionName )
+{
+	// taken from motionmap_func()
+
+	SmartBody::SBMotion* sbmotion = NULL;
+	std::map<std::string, SkMotion*>::iterator iter = motion_map.find(motionName);
+	if (iter == motion_map.end())
+	{
+		LOG("Cannot find motion name %s.", motionName);
+		return CMD_FAILURE;
+	}
+	else
+	{
+		sbmotion = dynamic_cast<SmartBody::SBMotion*>((*iter).second);
+	}
+
+	// find the bone map name
+	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(mapName);
+	if (!jointMap)
+	{
+		LOG("Cannot find bone map name '%s'.", mapName);
+		return CMD_FAILURE;
+	}
+
+	// apply the map
+	jointMap->applyMotion(sbmotion);
+
+	LOG("Applied bone map %s to motion %s.", mapName, motionName);
+
+	return CMD_SUCCESS;
+}
+
 
 int mcuCBHandle::load_poses( const char* pathname, bool recursive ) {
 	return load_me_postures( pathname, pose_map, recursive, resource_manager, skmScale );

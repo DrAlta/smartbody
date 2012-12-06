@@ -268,6 +268,37 @@ SMARTBODY_DLL_API bool Smartbody_dll::Shutdown()
 }
 
 
+SMARTBODY_DLL_API bool Smartbody_dll::LoadSkeleton( const void * data, int sizeBytes, const char * skeletonName )
+{
+    mcuCBHandle & mcu = mcuCBHandle::singleton();
+    int ret = mcu.load_skeleton( data, sizeBytes, skeletonName );
+    return ret == CMD_SUCCESS;
+}
+
+
+SMARTBODY_DLL_API bool Smartbody_dll::LoadMotion( const void * data, int sizeBytes, const char * motionName )
+{
+    mcuCBHandle & mcu = mcuCBHandle::singleton();
+    int ret = mcu.load_motion( data, sizeBytes, motionName );
+    return ret == CMD_SUCCESS;
+}
+
+
+SMARTBODY_DLL_API bool Smartbody_dll::MapSkeleton( const char * mapName, const char * skeletonName )
+{
+    mcuCBHandle & mcu = mcuCBHandle::singleton();
+    int ret = mcu.map_skeleton( mapName, skeletonName );
+    return ret == CMD_SUCCESS;
+}
+
+SMARTBODY_DLL_API bool Smartbody_dll::MapMotion( const char * mapName, const char * motionName )
+{
+    mcuCBHandle & mcu = mcuCBHandle::singleton();
+    int ret = mcu.map_motion( mapName, motionName );
+    return ret == CMD_SUCCESS;
+}
+
+
 SMARTBODY_DLL_API void Smartbody_dll::SetListener( SmartbodyListener * listener )
 {
    m_listener = listener;
