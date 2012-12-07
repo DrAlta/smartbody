@@ -42,6 +42,10 @@ class ParserOgre
 		static bool parseMotion(DOMNode* motionNode, std::vector<SkMotion*>& motions, SkMotion* motion,std::string fileName, float scale);
 		static bool parseMesh(DOMNode* meshNode, std::vector<SrModel*>& meshModelVec, float scaleFactor);
 		static bool parseSkinWeight(DOMNode* node, std::vector<SkinWeight*>& skinWeights, float scaleFactor);
+		static bool parseMeshMaterial(std::vector<SrModel*>& meshModelVec, std::string materialFilePath);
+protected:
+		static void loadTexture(int type, std::string texFileName, const SrStringArray& paths);
+		static void loadMeshMaterial(std::vector<SrModel*>& meshModelVec, std::string materialFileName, std::string materialFilePath);
 
 };
 

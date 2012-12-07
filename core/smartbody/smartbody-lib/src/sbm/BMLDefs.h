@@ -332,6 +332,7 @@ class BMLDefs
 		static XMLCh* OGRE_ID;
 		static XMLCh* OGRE_VERTEX_COUNT;
 		static XMLCh* OGRE_NAME;
+		static XMLCh* OGRE_MATERIAL;
 		static XMLCh* OGRE_LENGTH;
 		static XMLCh* OGRE_X;
 		static XMLCh* OGRE_Y;
