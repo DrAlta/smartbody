@@ -3248,6 +3248,7 @@
 				GCC_PREFIX_HEADER = "smartbody-lib/smartbody-lib-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
 					../boost/boost_1_44_0,
@@ -3307,6 +3308,7 @@
 				GCC_PREFIX_HEADER = "smartbody-lib/smartbody-lib-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
 					../boost/boost_1_44_0,
