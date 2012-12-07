@@ -665,6 +665,10 @@
 		C423E81015BF654F00D22BBB /* sr_sn_colorsurf.h in Headers */ = {isa = PBXBuildFile; fileRef = C423E80E15BF654F00D22BBB /* sr_sn_colorsurf.h */; };
 		C42C3DA5160D394F00A7D1D4 /* perlin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C42C3DA3160D394F00A7D1D4 /* perlin.cpp */; };
 		C42C3DA6160D394F00A7D1D4 /* perlin.h in Headers */ = {isa = PBXBuildFile; fileRef = C42C3DA4160D394F00A7D1D4 /* perlin.h */; };
+		C4430093167176EC00AE63D0 /* MiscCommands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4430091167176EC00AE63D0 /* MiscCommands.cpp */; };
+		C4430094167176EC00AE63D0 /* MiscCommands.h in Headers */ = {isa = PBXBuildFile; fileRef = C4430092167176EC00AE63D0 /* MiscCommands.h */; };
+		C44300971671771700AE63D0 /* ParserOgre.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C44300961671771700AE63D0 /* ParserOgre.cpp */; };
+		C44300991671772100AE63D0 /* ParserOgre.h in Headers */ = {isa = PBXBuildFile; fileRef = C44300981671772100AE63D0 /* ParserOgre.h */; };
 		C4D195C515BF3E9900EDEE47 /* ParserASFAMC.cxx in Sources */ = {isa = PBXBuildFile; fileRef = C4D195C315BF3E9900EDEE47 /* ParserASFAMC.cxx */; };
 		C4D195C615BF3E9900EDEE47 /* ParserBVH.cxx in Sources */ = {isa = PBXBuildFile; fileRef = C4D195C415BF3E9900EDEE47 /* ParserBVH.cxx */; };
 /* End PBXBuildFile section */
@@ -1330,6 +1334,10 @@
 		C423E80E15BF654F00D22BBB /* sr_sn_colorsurf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_sn_colorsurf.h; sourceTree = "<group>"; };
 		C42C3DA3160D394F00A7D1D4 /* perlin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = perlin.cpp; path = perlin/perlin.cpp; sourceTree = "<group>"; };
 		C42C3DA4160D394F00A7D1D4 /* perlin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = perlin.h; path = perlin/perlin.h; sourceTree = "<group>"; };
+		C4430091167176EC00AE63D0 /* MiscCommands.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MiscCommands.cpp; sourceTree = "<group>"; };
+		C4430092167176EC00AE63D0 /* MiscCommands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MiscCommands.h; sourceTree = "<group>"; };
+		C44300961671771700AE63D0 /* ParserOgre.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserOgre.cpp; sourceTree = "<group>"; };
+		C44300981671772100AE63D0 /* ParserOgre.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserOgre.h; sourceTree = "<group>"; };
 		C4D195C315BF3E9900EDEE47 /* ParserASFAMC.cxx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserASFAMC.cxx; sourceTree = "<group>"; };
 		C4D195C415BF3E9900EDEE47 /* ParserBVH.cxx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserBVH.cxx; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -2193,6 +2201,10 @@
 		AA9CD64E141FF8D00064C27A /* sbm */ = {
 			isa = PBXGroup;
 			children = (
+				C44300981671772100AE63D0 /* ParserOgre.h */,
+				C44300961671771700AE63D0 /* ParserOgre.cpp */,
+				C4430091167176EC00AE63D0 /* MiscCommands.cpp */,
+				C4430092167176EC00AE63D0 /* MiscCommands.h */,
 				C4D195C315BF3E9900EDEE47 /* ParserASFAMC.cxx */,
 				C4D195C415BF3E9900EDEE47 /* ParserBVH.cxx */,
 				C4126A2715B6567F00D530A3 /* SbmDeformableMeshGPU.cpp */,
@@ -2796,6 +2808,8 @@
 				C41FE6681666931100265409 /* me_ct_noise_controller.h in Headers */,
 				C41FE66C1666937800265409 /* SBAnimationTransitionRule.h in Headers */,
 				C41FE6701666B81100265409 /* bml_noise.hpp in Headers */,
+				C4430094167176EC00AE63D0 /* MiscCommands.h in Headers */,
+				C44300991671772100AE63D0 /* ParserOgre.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3188,6 +3202,8 @@
 				C41FE6671666931100265409 /* me_ct_noise_controller.cpp in Sources */,
 				C41FE66B1666937800265409 /* SBAnimationTransitionRule.cpp in Sources */,
 				C41FE66F1666B81100265409 /* bml_noise.cpp in Sources */,
+				C4430093167176EC00AE63D0 /* MiscCommands.cpp in Sources */,
+				C44300971671771700AE63D0 /* ParserOgre.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
