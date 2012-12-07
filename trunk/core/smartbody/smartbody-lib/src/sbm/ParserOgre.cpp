@@ -70,6 +70,9 @@ bool ParserOgre::parseSkinMesh( std::vector<SrModel*>& meshModelVec, std::vector
 	{
 		std::string filebasename = boost::filesystem::basename(pathName);
 		std::string fileextension = boost::filesystem::extension(pathName);
+		boost::filesystem::path filepath(pathName);
+		//LOG("directory string = %s",filepath.parent_path().directory_string().c_str());
+		//std::string filepath = boost::filesystem::
 		std::stringstream strstr;
 		if (fileextension.size() > 0 && fileextension[0] == '.')
 			strstr << filebasename << fileextension;
@@ -94,6 +97,12 @@ bool ParserOgre::parseSkinMesh( std::vector<SrModel*>& meshModelVec, std::vector
 				return false;
 			}
 			parseOk = parseMesh(meshNode, meshModelVec, scale);
+			if (parseOk)
+			{
+				parseMeshMaterial(meshModelVec,filepath.parent_path().string());
+			}
+			for (unsigned int i=0;i<meshModelVec.size();i++)
+				meshModelVec[i]->validate();
 		}
 
 
@@ -434,6 +443,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 									if (zNode)
 										xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
 									axis.z = (float) atof(zAttr.c_str());
+									//LOG("axis = %f %f %f, angle = %f",axis.x,axis.y,axis.z,angle);
 									SrQuat orientation(axis, angle);	
 									SkJointQuat* jointQuat = joint->quat();
 									jointQuat->prerot(orientation);
@@ -915,6 +925,19 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 		SrModel* model = new SrModel();
 		std::string meshName = subMeshStr + boost::lexical_cast<std::string>(i);
 		model->name = meshName.c_str();
+		DOMNamedNodeMap* subMeshAttr = subMesh->getAttributes();
+		std::string materialName = "";
+		if (subMeshAttr)
+		{
+			const DOMNode* matNode = subMeshAttr->getNamedItem(BML::BMLDefs::OGRE_MATERIAL);
+			std::string matAttr = "";
+			if (matNode)
+				xml_utils::xml_translate(&matAttr, matNode->getNodeValue());
+			materialName = matAttr;
+		}
+		if (materialName != "")
+			model->mtlnames.push(materialName.c_str());
+
 		meshModelVec.push_back(model);
 		LOG("SubMesh %d ... ",i);
 		const DOMNodeList* subMeshChildren = subMesh->getChildNodes();
@@ -1004,7 +1027,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 									std::string yAttr = "";
 									if (yNode)
 										xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
-									offset.y = (float) atof(yAttr.c_str());									
+									offset.y = 1.f - (float) atof(yAttr.c_str());									
 									
 									offset *= scaleFactor;
 									model->T.push(offset);
@@ -1050,7 +1073,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 						v3 = atoi(zAttr.c_str());
 						
 						// no material for now.
-						model->Fm.push(-1);
+						model->Fm.push(0); // use first material
 						model->F.push().set(v1,v2,v3);
 						model->Ft.push().set(v1,v2,v3);
 						model->Fn.push().set(v1,v2,v3);
@@ -1141,9 +1164,211 @@ bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& s
 	}
 
 	LOG("ParseOgre::parseSkinWeight Complete");
+	return true;
+}
+
+bool isFloat(std::string someString)
+{
+	using boost::lexical_cast;
+	using boost::bad_lexical_cast; 
+	try
+	{
+		boost::lexical_cast<float>(someString);
+	}
+	catch (bad_lexical_cast &)
+	{
+		return false;
+	}
 
 	return true;
 }
 
+void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::string materialFileName, std::string materialFilePath )
+{	
+	std::map<std::string, std::vector<int> > materialModelIndexMap;
+	std::map<std::string, std::string> materialTextureMap;
+	std::map<std::string, std::string> materialNormalMap;
+	std::map<std::string, SrMaterial> materialMap;
+	for (unsigned int i=0;i<meshModelVec.size();i++)
+	{
+		SrModel* model = meshModelVec[i];
+		if (model->mtlnames.size() > 0)
+		{			
+			std::string matName = model->mtlnames.get(0);
+			if (materialModelIndexMap.find(matName) == materialModelIndexMap.end())
+			{
+				materialModelIndexMap[matName] = std::vector<int>();
+				SrMaterial tempMat; tempMat.init();
+				materialMap[matName] = tempMat;
+			}
+			materialModelIndexMap[matName].push_back(i);
+
+		}
+	}
+	std::ifstream t(materialFileName);
+	std::stringstream buffer;
+	buffer << t.rdbuf();
+	std::string matFileContent = buffer.str();
+	std::vector<std::string> tokens;
+	vhcl::Tokenize(matFileContent,tokens," \t\n");
+	unsigned int idx = 0;
+	while (idx < tokens.size())
+	{
+		if (tokens[idx] == "material")
+		{
+			idx++;
+			if (materialModelIndexMap.find(tokens[idx]) != materialModelIndexMap.end())
+			// the material name is in the mesh models, parse this material
+			{
+				std::string materialName = tokens[idx];
+				SrMaterial& curMaterial = materialMap[materialName];
+				int bracketCounter = 0;
+				do {
+					idx++;
+					if (tokens[idx] == "{")
+					{
+						bracketCounter++;
+					}
+					else if (tokens[idx] == "}")
+					{
+						bracketCounter--;
+					}
+					else if (tokens[idx] == "texture") // texture file
+					{
+						idx++;
+						materialTextureMap[materialName] = tokens[idx]; // set texture map						
+					}
+					else if (tokens[idx] == "ambient")
+					{
+						if (isFloat(tokens[idx+1]) && isFloat(tokens[idx+2]) && isFloat(tokens[idx+3]) && isFloat(tokens[idx+4]))
+						{
+							float c[4];
+							for (int i=0;i<3;i++)
+								c[i] = (float)atof(tokens[idx++].c_str());
+							curMaterial.ambient = SrColor(c);
+						}						
+					}
+					else if (tokens[idx] == "diffuse")
+					{
+						if (isFloat(tokens[idx+1]) && isFloat(tokens[idx+2]) && isFloat(tokens[idx+3]) && isFloat(tokens[idx+4]))
+						{
+							float c[4];
+							for (int i=0;i<3;i++)
+								c[i] = (float)atof(tokens[idx++].c_str());
+							curMaterial.diffuse = SrColor(c);
+						}
+
+					}
+					else if (tokens[idx] == "specular")
+					{
+						if (isFloat(tokens[idx+1]) && isFloat(tokens[idx+2]) && isFloat(tokens[idx+3]) && isFloat(tokens[idx+4]))
+						{
+							float c[4];
+							for (int i=0;i<3;i++)
+								c[i] = (float)atof(tokens[idx++].c_str());
+							curMaterial.specular = SrColor(c);
+							curMaterial.shininess = atoi(tokens[idx++].c_str());
+						}						
+					}				
+
+				} while (bracketCounter != 0);
+
+			}
+		}
+		idx++;
+	}
+
+	SrStringArray pathArray;
+	pathArray.push(materialFilePath.c_str());
+
+	std::map<std::string, std::vector<int> >::iterator mi;
+	for ( mi  = materialModelIndexMap.begin();
+		  mi != materialModelIndexMap.end();
+		  mi++)
+	{
+		std::string matName = mi->first;
+		std::string textureName = "";
+		if (materialTextureMap.find(matName) != materialTextureMap.end())
+		{
+			 textureName = materialTextureMap[matName];
+			ParserOgre::loadTexture(SbmTextureManager::TEXTURE_DIFFUSE,textureName,pathArray);
+		}
+		std::vector<int> modelIdxList = mi->second;
+		for (unsigned int j=0;j<modelIdxList.size();j++)
+		{
+			int modelIdx = modelIdxList[j];
+			SrModel* model = meshModelVec[modelIdx];
+			model->M.size(1);
+			model->M.set(0,materialMap[matName]);
+			if (textureName != "")
+				model->mtlTextureNameMap[matName] = textureName;
+		}
+	}
+
+
+
+// 	in.lowercase_tokens(false);
+// 	in.init ( fopen(materialFileName.c_str(),"rt") );
+// 
+// 	if ( !in.valid() ) return; // could not get materials
+// 
+// 	while ( !in.finished() )
+// 	{ in.get_token();	  
+// 	  if ( in.last_token() == "material" )
+// 	  { 	
+// 		  in.get_token();
+// 		  std::string materialName = in.last_token();
+// 		  if (materialModelIndexMap.find(materialName) != materialModelIndexMap.end())
+// 		  {
+// 			 			  			  
+// 		  }
+// 	  }	  	
+// 	}	
+}
+
+bool ParserOgre::parseMeshMaterial( std::vector<SrModel*>& meshModelVec, std::string materialFilePath )
+{
+	boost::filesystem2::path curpath( materialFilePath );
+	boost::filesystem2::directory_iterator end;
+	std::vector<std::string> materialFileList;
+	for (boost::filesystem2::directory_iterator iter(curpath); iter != end ; iter++)
+	{
+		if (boost::filesystem2::is_regular(*iter))
+		{
+			std::string fileName = (*iter).string();			
+			std::string ext = boost::filesystem::extension(fileName);
+			if (ext == ".material" || ext == ".MATERIAL")
+			{
+				materialFileList.push_back(fileName);
+			}			
+		}
+	}
+	for (unsigned int i=0;i<materialFileList.size();i++)
+	{
+		loadMeshMaterial(meshModelVec,materialFileList[i],materialFilePath+"/");
+	}
+	return true;
+}
+
+void ParserOgre::loadTexture( int type, std::string texFileName, const SrStringArray& paths )
+{
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+	SrString s;
+	SrInput in;
+	std::string imageFile = texFileName;
+	in.init( fopen(texFileName.c_str(),"r"));
+	int i = 0;
+	while ( !in.valid() && i < paths.size())
+	{
+		s = paths[i++];
+		s << texFileName.c_str();
+		imageFile = s;
+		in.init ( fopen(s,"r") );
+	}
+	if (!in.valid()) return;		
+	SbmTextureManager& texManager = SbmTextureManager::singleton();
+	texManager.loadTexture(type,texFileName.c_str(),s);	
+#endif
+}
 
 

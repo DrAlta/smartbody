@@ -337,6 +337,7 @@ XMLCh* BMLDefs::OGRE_PARENT = NULL;
 XMLCh* BMLDefs::OGRE_ID = NULL;
 XMLCh* BMLDefs::OGRE_VERTEX_COUNT = NULL;
 XMLCh* BMLDefs::OGRE_NAME = NULL;
+XMLCh* BMLDefs::OGRE_MATERIAL = NULL;
 XMLCh* BMLDefs::OGRE_LENGTH = NULL;
 XMLCh* BMLDefs::OGRE_U = NULL;
 XMLCh* BMLDefs::OGRE_V = NULL;
@@ -710,6 +711,7 @@ BMLDefs::BMLDefs()
 	OGRE_ID = XMLString::transcode("id");
 	OGRE_VERTEX_COUNT = XMLString::transcode("vertexcount");
 	OGRE_NAME = XMLString::transcode("name");
+	OGRE_MATERIAL = XMLString::transcode("material");
 	OGRE_LENGTH = XMLString::transcode("length");
 	OGRE_X = XMLString::transcode("x");
 	OGRE_Y = XMLString::transcode("y");
