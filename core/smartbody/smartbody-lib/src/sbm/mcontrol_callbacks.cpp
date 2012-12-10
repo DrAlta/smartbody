@@ -2245,7 +2245,8 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 						SBJoint* joint = sbOrigSk->getJoint(k);
 						sw->infJointName.push_back(joint->getName());
 						sw->infJoint.push_back(joint);
-						sw->bindPoseMat.push_back(joint->gmatZero().inverse());
+						SrMat gmatZeroInv = joint->gmatZero().rigidInverse();						
+						sw->bindPoseMat.push_back(gmatZeroInv);
 					}
 				}
 			}

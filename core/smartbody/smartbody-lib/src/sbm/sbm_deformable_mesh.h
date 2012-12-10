@@ -26,6 +26,7 @@ public:
 public:
 	SkinWeight();
 	~SkinWeight();
+	void normalizeWeights();
 };
 
 class SbmSubMesh

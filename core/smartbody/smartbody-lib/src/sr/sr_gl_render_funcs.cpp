@@ -151,7 +151,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 			   glEnable ( GL_ALPHA_TEST );
 			   glEnable (GL_BLEND);
 			   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			   //glAlphaFunc ( GL_GREATER, 0.3f ) ;
+			   glAlphaFunc ( GL_GREATER, 0.3f ) ;
 			   
 			   glDisable(GL_COLOR_MATERIAL);	   
 			   glActiveTexture(GL_TEXTURE0);
@@ -162,6 +162,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 			   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);//_MIPMAP_LINEAR);
 			   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
 			   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	  
+			   //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);	 
 			   glBegin ( GL_TRIANGLES );
 			   //glColor3f(1.f,0.f,1.f);
 			   for (unsigned int k=0; k<mtlFaces.size(); k++ )

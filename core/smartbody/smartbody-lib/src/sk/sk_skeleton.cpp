@@ -178,12 +178,17 @@ SkJoint* SkSkeleton::add_joint ( SkJoint::RotType rtype, int parentid )
 	_jointMap.clear();
 
 	SkJoint* parent=0;
-	if ( parentid<0 ) {
+	if ( parentid < 0 ) {
 		if( _joints.size()>0 )
 			parent =_joints[_joints.size() - 1];
 		else
 			parent=NULL;
-	} else {
+	} 	
+	else if (parentid > (int)_joints.size())
+	{
+		parent = NULL;
+	}
+	else {
 		parent = _joints[parentid];
 	}
 
