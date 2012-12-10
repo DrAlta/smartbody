@@ -27,6 +27,29 @@ SkinWeight::~SkinWeight()
 	infJoint.clear();
 }
 
+void SkinWeight::normalizeWeights()
+{
+	int idx = 0;
+	for (unsigned int i=0;i<numInfJoints.size();i++)
+	{
+		int nJoint = numInfJoints[i];
+		float wTotal = 0.f;
+		for (int k=0;k<nJoint;k++)
+		{
+			int widx = weightIndex[idx+k];
+			wTotal += bindWeight[widx];			
+		}
+
+		for (int k=0;k<nJoint;k++)
+		{
+			int widx = weightIndex[idx+k];
+			bindWeight[widx] /= wTotal;			
+		}
+
+		idx+= nJoint;
+	}
+}
+
 DeformableMesh::DeformableMesh() 
 {
 	meshName = "null";

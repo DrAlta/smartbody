@@ -277,6 +277,7 @@ DOMNode* ParserOgre::getNode(const std::string& nodeName, DOMNode* node)
 bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std::string pathName, float scale)
 {
 	// get the bone hierarchy
+	//LOG("Start Parse Ogre Skeleton");
 	DOMNode* hierarchy = getNode("bonehierarchy", skeletonNode);
 	if (!hierarchy)
 	{
@@ -333,7 +334,9 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 
 			if (idNode && nameNode)
 			{
-				int parentId = -1;
+				int parentId = skeleton.joints().size() + 10;
+				
+				/*
 				std::map<std::string, std::string>::iterator iter = parentHierarchy.find(nameAttr);
 				if (iter != parentHierarchy.end())
 				{
@@ -348,6 +351,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 						parentId = parentJoint->index();
 					}
 				}
+				*/			
 
 				if (skeleton.joints().size() == 0)
 					parentId = -1;
@@ -455,6 +459,33 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 			}	
 		}
 	}
+
+	SkJoint* rootJoint = NULL;
+	for (unsigned int i=0;i<skeleton.joints().size();i++)
+	{
+		SkJoint* joint = skeleton.joints()[i];
+		std::string jointName = joint->name();
+		std::map<std::string, std::string>::iterator iter = parentHierarchy.find(jointName);
+		if (iter != parentHierarchy.end())
+		{
+			const std::string& parent = (*iter).second;
+			SkJoint* parentJoint = skeleton.linear_search_joint(parent.c_str());
+			if (!parentJoint)
+			{
+				LOG("Parent joint %s to joint %s was not found in file %s.", parent.c_str(), jointName.c_str(), pathName.c_str());
+			}
+			else
+			{
+				parentJoint->add_child(joint);
+			}
+		}
+		else // root joint
+		{
+			//LOG("root joint = %s",joint->name().c_str());
+			rootJoint = joint;
+			skeleton.root(rootJoint);
+		}
+	}	
 
 	skeleton.updateGlobalMatricesZero();
 
@@ -1117,6 +1148,7 @@ bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& s
 				const DOMNodeList* weightList = subMeshChild->getChildNodes();
 				int prevVtxIdx = -1;
 				int infJointCount = 0;
+				
 				//std::map<int,int> infJointCount;
 				for (unsigned int w = 0; w < weightList->getLength(); w++)
 				{
@@ -1159,6 +1191,7 @@ bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& s
 					}					
 				}	
 				sw->numInfJoints.push_back(infJointCount); // add the last set of infJoints
+				sw->normalizeWeights();
 			}
 		}			
 	}
@@ -1221,6 +1254,7 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 			// the material name is in the mesh models, parse this material
 			{
 				std::string materialName = tokens[idx];
+				//LOG("material name = %s",materialName.c_str());
 				SrMaterial& curMaterial = materialMap[materialName];
 				int bracketCounter = 0;
 				do {
@@ -1240,34 +1274,75 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 					}
 					else if (tokens[idx] == "ambient")
 					{
-						if (isFloat(tokens[idx+1]) && isFloat(tokens[idx+2]) && isFloat(tokens[idx+3]) && isFloat(tokens[idx+4]))
+						std::vector<float> floatVec;
+						int offset = 1;
+						while (isFloat(tokens[idx+1]))
+						{
+							floatVec.push_back((float)atof(tokens[idx+1].c_str()));
+							idx++;
+						}			
+						//LOG("ambient, vec size = %d",floatVec.size());
+						if (floatVec.size() >=3 && floatVec.size() <= 4)
 						{
 							float c[4];
-							for (int i=0;i<3;i++)
-								c[i] = (float)atof(tokens[idx++].c_str());
+							for (unsigned int i=0;i<floatVec.size();i++)
+								c[i] = floatVec[i];
+							if (floatVec.size() == 3)
+								c[3] = 1.f;
+							//LOG("color = %f %f %f %f",c[0],c[1],c[2],c[3]);
 							curMaterial.ambient = SrColor(c);
 						}						
 					}
 					else if (tokens[idx] == "diffuse")
 					{
-						if (isFloat(tokens[idx+1]) && isFloat(tokens[idx+2]) && isFloat(tokens[idx+3]) && isFloat(tokens[idx+4]))
+						std::vector<float> floatVec;
+						int offset = 1;
+						while (isFloat(tokens[idx+1]))
+						{
+							floatVec.push_back((float)atof(tokens[idx+1].c_str()));
+							idx++;
+						}			
+						//LOG("diffuse, vec size = %d",floatVec.size());
+						if (floatVec.size() >=3 && floatVec.size() <= 4)
 						{
 							float c[4];
-							for (int i=0;i<3;i++)
-								c[i] = (float)atof(tokens[idx++].c_str());
+							for (unsigned int i=0;i<floatVec.size();i++)
+								c[i] = floatVec[i];
+							if (floatVec.size() == 3)
+								c[3] = 1.f;
+							//LOG("color = %f %f %f %f",c[0],c[1],c[2],c[3]);
 							curMaterial.diffuse = SrColor(c);
-						}
+						}	
 
 					}
 					else if (tokens[idx] == "specular")
 					{
-						if (isFloat(tokens[idx+1]) && isFloat(tokens[idx+2]) && isFloat(tokens[idx+3]) && isFloat(tokens[idx+4]))
+						std::vector<float> floatVec;
+						int offset = 1;
+						while (isFloat(tokens[idx+1]))
+						{
+							floatVec.push_back((float)atof(tokens[idx+1].c_str()));
+							idx++;
+						}
+						//LOG("specular, vec size = %d",floatVec.size());
+						if (floatVec.size() >=3 && floatVec.size() <= 5)
 						{
 							float c[4];
-							for (int i=0;i<3;i++)
-								c[i] = (float)atof(tokens[idx++].c_str());
+							for (unsigned int i=0;i<3;i++)
+								c[i] = floatVec[i];
+							if (floatVec.size() < 5)
+								c[3] = 1.f;			
+
+							if (floatVec.size() == 5)
+							{
+								c[3] = floatVec[3];
+								curMaterial.shininess = (int)floatVec[4];
+							}
+							else if (floatVec.size() == 4)
+								curMaterial.shininess = (int)floatVec[3];
+
 							curMaterial.specular = SrColor(c);
-							curMaterial.shininess = atoi(tokens[idx++].c_str());
+							//LOG("color = %f %f %f %f",c[0],c[1],c[2],c[3]);
 						}						
 					}				
 

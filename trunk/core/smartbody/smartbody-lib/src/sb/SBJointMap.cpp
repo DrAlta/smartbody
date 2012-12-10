@@ -404,16 +404,26 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 	//-------------------------------------------------------------------------
 	// first find hips
 #define BASE_SEARCHES 10
+	
+	base = skeleton->root();
 	const unsigned int base_searchs = jnts.size()<BASE_SEARCHES ? jnts.size() : BASE_SEARCHES;
-	for(unsigned int i=0; i<base_searchs; i++)
+	if (base->num_children() == 3)
 	{
-		if(jnts[i]->num_children()==3)
+		setJointMap("base", base, prtMap);
+	}
+	else
+	{		
+		for(unsigned int i=0; i<base_searchs; i++)
 		{
-			base = jnts[i];
-			setJointMap("base", base, prtMap);
-			break;
+			if(jnts[i]->num_children()==3)
+			{
+				base = jnts[i];
+				setJointMap("base", base, prtMap);
+				break;
+			}
 		}
 	}
+	
 	if(!base) // no joint with 3 children found, try finding one with 2 children...
 	{
 		for(unsigned int i=0; i<base_searchs; i++)
