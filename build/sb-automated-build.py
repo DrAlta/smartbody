@@ -231,6 +231,25 @@ def makeDist(distLocation):
 
     print "Removing source and extra data from: {0}".format(distLocation)
 
+    deleteDir(os.path.join(distLocation, "android/vh_wrapper/obj/local/armeabi/objs"))
+    deleteDir(os.path.join(distLocation, "core/FestivalRelay/Release"))
+    deleteDir(os.path.join(distLocation, "core/ogre-viewer/build/vs2008/Debug"))
+    deleteDir(os.path.join(distLocation, "core/ogre-viewer/build/vs2008/Release"))
+    deleteDir(os.path.join(distLocation, "core/sbmonitor/gui/Debug"))
+    deleteDir(os.path.join(distLocation, "core/sbmonitor/gui/Release"))
+    deleteDir(os.path.join(distLocation, "core/smartbody/sbm/visualc9/obj"))
+    deleteDir(os.path.join(distLocation, "core/smartbody/smartbody-lib/visualc9/obj"))
+    deleteDir(os.path.join(distLocation, "core/smartbody/steersuite-1.3/steerlib/build/win32/Debug"))
+    deleteDir(os.path.join(distLocation, "core/smartbody/steersuite-1.3/steerlib/build/win32/Release"))
+    deleteDir(os.path.join(distLocation, "core/smartbody/steersuite-1.3/pprAI/build/win32/Debug"))
+    deleteDir(os.path.join(distLocation, "core/smartbody/steersuite-1.3/pprAI/build/win32/Release"))
+    deleteDir(os.path.join(distLocation, "core/smartbody/steersuite-1.3/build/win32/Debug"))
+    deleteDir(os.path.join(distLocation, "core/smartbody/steersuite-1.3/build/win32/Release"))
+    deleteDir(os.path.join(distLocation, "core/TtsRelay/FestivalDll/obj"))
+    deleteDir(os.path.join(distLocation, "lib/qt/qt"))
+    deleteDir(os.path.join(distLocation, "tools/elsender/bin"))
+    deleteDir(os.path.join(distLocation, "tools/elsender/obj"))
+
 
 def fullBuild(svnPassword, buildSuffix, doFreshBuild):
 
