@@ -28,6 +28,7 @@
 # include <FL/Fl.H>
 # include <GL/gl.h>
 # include <GL/glu.h>
+# include <FL/glut.h>
 //# include <fltk/visual.h>
 //# include <fltk/compat/FL/Fl_Menu_Item.H>
 # include <FL/fl_draw.H>
@@ -385,6 +386,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->showaxis = false;
    _data->showmasses = false;
    _data->showBoundingVolume = false;
+   _data->showJointLabels = false;
    _data->showlocomotionall = false;
    _data->showvelocity = false;
    _data->showorientation = false;
@@ -627,6 +629,8 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 						}
 						else
 							_gestureData->toggleFeedback(true);
+					   break;
+		case CmdShowJoints: _data->showJointLabels = !_data->showJointLabels;
 					   break;
 	  case CmdInteractiveLocomotion  : _data->interactiveLocomotion = !_data->interactiveLocomotion;
                        break;
@@ -1016,6 +1020,7 @@ void FltkViewer::init_opengl ( int w, int h )
 
 
    updateLights();
+   
  }
 
 void FltkViewer::close_requested ()
@@ -1493,6 +1498,7 @@ void FltkViewer::draw()
 	drawDynamics();
 	drawLocomotion();
 	drawGestures();
+	drawJointLabels();
 
 	drawMotionVectorFlow();
 	drawPlotMotion();
@@ -3931,6 +3937,37 @@ void FltkViewer::drawArrow(SrVec& from, SrVec& to, float width, SrVec& color)
 	}
 	glEnd();
 	glDisable(GL_BLEND); 
+}
+
+void FltkViewer::drawJointLabels()
+{
+	if (!_data->showJointLabels)
+		return;
+
+	SbmCharacter* character = getCurrentCharacter();
+	if (!character)
+		return;
+	/*
+	glPushAttrib(GL_LIGHTING | GL_COLOR_BUFFER_BIT);
+	
+	float sceneScale = SmartBody::SBScene::getScene()->getScale();
+	if (sceneScale == 0.0f)
+		sceneScale = 1.0f;
+	float textSize = .01f / sceneScale * .02f;
+	int numJoints = character->getSkeleton()->getNumJoints();
+	for (int j = 0; j < numJoints; j++)
+	{
+		SkJoint* joint = character->getSkeleton()->getJoint(j);
+		const SrMat& mat = joint->gmat();
+		glPushMatrix();
+		glMultMatrixf((const float*) mat);
+		glColor3f(1.0f, 1.0f, 0.0f);
+		glScalef(textSize, textSize, textSize);
+		glutStrokeString(GLUT_STROKE_ROMAN, (const unsigned char*) joint->name().c_str());
+		glPopMatrix();
+	}
+	glPopAttrib();
+	*/
 }
 
 void FltkViewer::drawGestures()

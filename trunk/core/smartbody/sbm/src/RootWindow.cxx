@@ -50,6 +50,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 //	menubar->add("&View/Character/Locomotion/Trajectory", 0, TrajectoryCB, this, NULL);
 	menubar->add("&View/Character/Show Trajectory", 0, TrajectoryCB, this, NULL);
 	menubar->add("&View/Character/Show Gesture", 0, GestureCB, this, NULL);
+	menubar->add("&View/Character/Show Joint Labels", 0, JointLabelCB, this, NULL);
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
 	menubar->add("&View/Shadows", 0, ShadowsCB, this, NULL);
 	menubar->add("&View/Grid", 0, GridCB, this, NULL);
@@ -81,6 +82,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, NULL);
 	menubar->add("&Window/Viseme Viewer", 0, LaunchVisemeViewerCB, this, NULL);
 	menubar->add("&Window/Retarget Creator", 0, LaunchRetargetCreatorCB, this, NULL);
+	//menubar->add("&Window/Behavior Sets", 0, LaunchBehaviorSetsCB, this, NULL);
 	menubar->add("&Window/Motion Editor", 0, LaunchMotionEditorCB, this, NULL);
 	menubar->add("&Help/Documentation", 0, DocumentationCB, this, NULL);
 	menubar->add("&Help/Create Python API", 0, CreatePythonAPICB, this, NULL);
@@ -162,6 +164,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	dataViewerWindow = NULL;
 	resourceWindow = NULL;
 	panimationWindow = NULL;
+	behaviorSetViewer = NULL;
 
 }
 
@@ -516,6 +519,18 @@ void BaseWindow::LaunchRetargetCreatorCB(Fl_Widget* widget, void* data)
 	}
 	rootWindow->retargetCreatorWindow->show();
 }
+
+void BaseWindow::LaunchBehaviorSetsCB(Fl_Widget* widget, void* data)
+{
+	// console doesn't receive commands - why?
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->behaviorSetViewer)
+	{
+		rootWindow->behaviorSetViewer = new RetargetViewer(150, 150, 320, 320, "Behavior Sets");
+	}
+	rootWindow->behaviorSetViewer->show();
+}
+
 
 void BaseWindow::LaunchMotionEditorCB(Fl_Widget* widget, void* data)
 {
@@ -1204,6 +1219,14 @@ void BaseWindow::GestureCB(Fl_Widget* w, void* data)
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowGesture, NULL);	
+#endif
+}
+
+void BaseWindow::JointLabelCB(Fl_Widget* w, void* data)
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowJoints, NULL);	
 #endif
 }
 

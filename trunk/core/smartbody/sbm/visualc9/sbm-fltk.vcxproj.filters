@@ -28,9 +28,6 @@
     <Filter Include="bmlcreator">
       <UniqueIdentifier>{fbaae2c9-1e25-4b03-b1cf-0b767bb24300}</UniqueIdentifier>
     </Filter>
-    <Filter Include="retargetviewer">
-      <UniqueIdentifier>{7f983ecd-5e90-4253-bde5-ff7f00300634}</UniqueIdentifier>
-    </Filter>
     <Filter Include="retargetcreator">
       <UniqueIdentifier>{56361f18-4f18-4cc4-b99b-6afd39fa8ac8}</UniqueIdentifier>
     </Filter>
@@ -42,6 +39,9 @@
     </Filter>
     <Filter Include="motioneditor">
       <UniqueIdentifier>{42bd09ff-f612-4031-bf07-476a23845bec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="behaviorsetviewer">
+      <UniqueIdentifier>{7f983ecd-5e90-4253-bde5-ff7f00300634}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -233,7 +233,7 @@
       <Filter>viewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\retargetviewer\RetargetViewer.cpp">
-      <Filter>retargetviewer</Filter>
+      <Filter>behaviorsetviewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\monitorviewer\MonitorConnectWindow.cpp">
       <Filter>monitorviewer</Filter>
@@ -429,7 +429,7 @@
       <Filter>viewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\retargetviewer\RetargetViewer.h">
-      <Filter>retargetviewer</Filter>
+      <Filter>behaviorsetviewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\monitorviewer\MonitorConnectWindow.h">
       <Filter>monitorviewer</Filter>

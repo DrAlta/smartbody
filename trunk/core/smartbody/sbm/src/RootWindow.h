@@ -21,6 +21,7 @@
 #include "faceviewer/FaceViewer.h"
 #include "channelbufferviewer/channelbufferWindow.hpp"
 #include "CharacterCreatorWindow.h"
+#include "retargetviewer/RetargetViewer.h"
 
 class SbmCharacter;
 
@@ -75,6 +76,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		ChannelBufferWindow* dataViewerWindow;
 		ResourceWindow* resourceWindow;
 		PanimationWindow* panimationWindow;
+		RetargetViewer* behaviorSetViewer;
 
 		Fl_Menu_Bar* menubar;
 		Fl_Button* buttonPlay;
@@ -96,6 +98,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void LaunchConsoleCB(Fl_Widget* widget, void* data);
 		static void LaunchBMLCreatorCB(Fl_Widget* widget, void* data);
 		static void LaunchRetargetCreatorCB(Fl_Widget* widget, void* data);
+		static void LaunchBehaviorSetsCB(Fl_Widget* widget, void* data);
 		static void LaunchMotionEditorCB(Fl_Widget* widget, void* data);
 		static void LaunchResourceViewerCB(Fl_Widget* widget, void* data);		
 		static void LaunchFaceViewerCB(Fl_Widget* widget, void* data);
@@ -148,6 +151,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void VelocityCB(Fl_Widget* w, void* data);
 		static void TrajectoryCB(Fl_Widget* w, void* data);
 		static void GestureCB(Fl_Widget* w, void* data);
+		static void JointLabelCB(Fl_Widget* w, void* data);
 		static void SteeringCharactersCB(Fl_Widget* w, void* data);
 		static void SteeringAllCB(Fl_Widget* w, void* data);
 		static void SteeringNoneCB(Fl_Widget* w, void* data);	

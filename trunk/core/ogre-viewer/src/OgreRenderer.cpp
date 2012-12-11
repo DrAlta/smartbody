@@ -205,6 +205,7 @@ void OgreRenderer::createScene()
 	vhmsg::ttu_notify2( "vrComponent", "renderer all" );
 
 	// sbm related vhmsgs
+    vhmsg::ttu_register( "sb" );
     vhmsg::ttu_register( "sbm" );
     vhmsg::ttu_register( "vrAllCall" );
     vhmsg::ttu_register( "vrKillComponent" );
