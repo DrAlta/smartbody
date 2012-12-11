@@ -27,6 +27,7 @@
 #include <map>
 #include <cctype>
 #include <string>
+#include <fstream>
 #include <sbm/BMLDefs.h>
 
 #ifdef __APPLE__
@@ -1238,7 +1239,7 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 
 		}
 	}
-	std::ifstream t(materialFileName);
+	std::ifstream t(materialFileName.c_str());
 	std::stringstream buffer;
 	buffer << t.rdbuf();
 	std::string matFileContent = buffer.str();
