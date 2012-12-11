@@ -122,6 +122,9 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	enum EyeLidMode { ModeNoEyeLids,
 					   ModeEyeLids
                 };
+	enum JointMode { ModeShowJoints,
+					 ModeNoJoints
+                };
 	enum DynamicsMode { ModeNoDynamics,
 					    ModeShowCOM,
 						ModeShowCOMSupportPolygon,
@@ -172,6 +175,8 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 				   CmdGazeOnTargetType3,
 				   CmdGazeOnTargetType4,
 				   CmdRemoveAllGazeTarget,
+				   CmdShowJoints,
+				   CmdNoJoints,
 				   CmdNoTerrain,
 				   CmdTerrainWireframe,
 				   CmdTerrain,
@@ -321,6 +326,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	void drawDynamics();
 	void drawLocomotion();
 	void drawGestures();
+	void drawJointLabels();
 
 	void drawReach();
 	void drawInteractiveLocomotion();
@@ -370,6 +376,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	ObjectManipulationHandle _objManipulator; // a hack for testing. 
 
 
+
 protected:
 	
 	void set_gaze_target(int itype, const char* targetname);	
@@ -392,6 +399,7 @@ protected:
    SrSn*  root;              // contains the user scene
    FltkViewer::RenderMode rendermode; // render mode
    FltkViewer::CharacterMode charactermode; // character mode
+   FltkViewer::JointMode jointmode; // character mode
    FltkViewer::PawnMode pawnmode; // pawn mode
    FltkViewer::ShadowMode shadowmode;     // shadow mode
    FltkViewer::terrainMode terrainMode;     // terrain mode
@@ -417,6 +425,7 @@ protected:
    bool showaxis;
    bool showmasses;
    bool showBoundingVolume;
+   bool showJointLabels;
 
    bool locomotionenabled;
    bool showlocomotionall;
@@ -448,6 +457,8 @@ protected:
 
    GLuint  shadowMapID, depthMapID, depthFB, rboID;
    GLfloat shadowCPM[16];
+
+
 
  };
 
