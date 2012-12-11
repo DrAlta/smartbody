@@ -539,6 +539,9 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
         buildServerShareName = "\\\\roscoemini\\sbm-builds\\"
         emailSubjectPrefix = "[SB-MAC]"
 
+    if not doFreshBuild:
+        buildServerShareName = buildServerShareName + "incremental\\"
+
     f = open(finalMailFile,"w")
     f.write("Build #{0} - {1}\n".format(buildNumber, "Fresh Build" if doFreshBuild else "Incremental Build"))
     f.write("\n")
@@ -547,6 +550,7 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
         f.write("   Build Success.\n")
     else:
         f.write("   Build FAILED!!\n")
+        f.write("   Log: {0}{1}{2}\n".format(buildServerShareName, buildFolderName, "\\BuildLog.txt"))
     f.write("\n")
     f.write("Broken projects:\n")
     if len(buildCompileErrors) > 0:
@@ -571,8 +575,9 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
     f.write("\n")
     f.write("Build size: {0} ({1} files, {2} dirs)\n".format(intWithCommas(dirSizeTotal), intWithCommas(numFilesTotal), intWithCommas(numDirsTotal)))
     f.write("\n")
-    f.write("Build is available at {0}{1}\n".format(buildServerShareName, buildFolderName))
-    f.write("\n")
+    if doFreshBuild:
+        f.write("Build is available at {0}{1}\n".format(buildServerShareName, buildFolderName))
+        f.write("\n")
     f.write("Log: {0}{1}{2}\n".format(buildServerShareName, buildFolderName, "\\BuildLog.txt"))
     f.write("\n")
     f.write("Revisions used:\n")
