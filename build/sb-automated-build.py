@@ -13,6 +13,9 @@ import sys
 import time
 
 
+timeToForceBuildIfRunning = 24 * 60 * 60  # in hours * 60 * 60
+
+
 def getFreeSpace(folder):
 
     # Return folder/drive free space (in bytes)
@@ -144,8 +147,13 @@ def deleteFiles(folder, wildcard):
 def cleanBuild():
     # Check to see if a build is already running
     if os.path.exists("BUILD_RUNNING"):
-       print "Build is already running.  Exiting...\n";
-       sys.exit()
+        print "Build is already running.\n";
+        if time.time() - os.path.getctime("BUILD_RUNNING") > timeToForceBuildIfRunning:
+            print "Build has been running for too long, forcing build."
+            os.remove("BUILD_RUNNING")
+        else:
+            print "  Exiting..."
+            sys.exit()
 
     # remove the exported build folder on fresh builds
     if os.path.exists("build"):
@@ -196,8 +204,13 @@ def cleanSandbox():
 
     # Check to see if a build is already running
     if os.path.exists("BUILD_RUNNING"):
-       print "Build is already running.  Exiting...\n";
-       sys.exit()
+        print "Build is already running.\n";
+        if time.time() - os.path.getctime("BUILD_RUNNING") > timeToForceBuildIfRunning:
+            print "Build has been running for too long, forcing build."
+            os.remove("BUILD_RUNNING")
+        else:
+            print "  Exiting..."
+            sys.exit()
 
     print "Removing build.sandbox folder to make way for a clean checkout"
 
@@ -292,8 +305,13 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
 
     # Check to see if a build is already running
     if os.path.exists("BUILD_RUNNING"):
-       print "Build is already running.  Exiting...\n";
-       sys.exit()
+        print "Build is already running.\n";
+        if time.time() - os.path.getctime("BUILD_RUNNING") > timeToForceBuildIfRunning:
+            print "Build has been running for too long, forcing build."
+            os.remove("BUILD_RUNNING")
+        else:
+            print "  Exiting..."
+            sys.exit()
 
 
     # Create the build running file, and update the timestamp file
@@ -657,8 +675,13 @@ def checkIfTimeForBuild(svnURL, svnUser, svnPassword, minFreeSpaceRequiredForBui
 
     # Check to see if a build is already running
     if os.path.exists("BUILD_RUNNING"):
-       print "Build is already running.  Exiting...\n";
-       sys.exit()
+        print "Build is already running.\n";
+        if time.time() - os.path.getctime("BUILD_RUNNING") > timeToForceBuildIfRunning:
+            print "Build has been running for too long, forcing build."
+            os.remove("BUILD_RUNNING")
+        else:
+            print "  Exiting..."
+            sys.exit()
 
 
     # Get time of last build
