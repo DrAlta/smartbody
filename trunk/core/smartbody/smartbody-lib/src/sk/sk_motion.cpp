@@ -913,6 +913,11 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		{
 			SrVec srcdir = tempSrcSk->boneGlobalDirection(pjoint->name(),childName);
 			SrVec dstdir = interSk->boneGlobalDirection(pjoint->name(),childName);	
+			//LOG("pjoint = %s, childName = %s",pjoint->name().c_str(), childName.c_str());
+
+			//LOG("src dir = %f %f %f, dst dir = %f %f %f",srcdir[0],srcdir[1],srcdir[2], dstdir[0],dstdir[1],dstdir[2]);
+
+
 			//jointQueues.push(child->name());
 			srcDirList.push_back(srcdir);			
 			dstDirList.push_back(dstdir);			
@@ -958,18 +963,20 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		//LOG("joint = %s, src dir = %f %f %f, dst dir = %f %f %f, rot axist = %f %f %f, angle = %f",pjointName.c_str(), srcDir[0],srcDir[1],srcDir[2], dstDir[0],dstDir[1],dstDir[2], rotAxis[0], rotAxis[1], rotAxis[2], sr_todeg(angle));
 
 
-		SrMat gmatRot = pjoint->gmat().get_rotation();
+		SrMat gmatRot = pjoint->gmat().get_rotation();				
 		if (pjoint->parent())
 			pmatInv = pjoint->parent()->gmat().get_rotation().inverse();
 		pjoint->quat()->prerot().get_mat(prerotMat);
 		alignQuat.get_mat(alignMat);
 		//SrMat gmatInv = prerotMat.inverse()*pjoint->parent()->gmat().get_rotation();//pjoint->gmat().get_rotation();//(prerotMat*pjoint->parent()->gmat()).inverse();//pjoint->gmatZero().get_rotation().inverse();//(prerotMat*pjoint->parent()->gmat()).inverse();
 		//rotAxisAngle = rotAxisAngle*gmatInv;
-		SrMat quatMat = prerotMat.inverse()*gmatRot*alignMat*pmatInv;//alignMat*gmatRot.inverse();//prerotMat.inverse()*gmatRot*alignMat*pmat;
+		//SrMat quatMat = prerotMat.inverse()*gmatRot*alignMat*pmatInv;//alignMat*gmatRot.inverse();//prerotMat.inverse()*gmatRot*alignMat*pmat;
+		SrMat quatMat = gmatRot*alignMat*gmatRot.inverse();
 		//SrQuat quat = SrQuat(prerotMat.inverse())*SrQuat(gmatRot)*alignQuat*SrQuat(pmatInv);
 		//SrVec alignRotAxisAngle = rotAxisAngle*gmatRot.inverse();								
-		SrVec alignRotAxisAngle = rotAxisAngle*pmatInv;		
-		SrQuat quat = pjoint->quat()->rawValue()*SrQuat(alignRotAxisAngle);//*pjoint->quat()->rawValue();
+		//SrVec alignRotAxisAngle = rotAxisAngle*pmatInv;		
+		SrQuat quat = pjoint->quat()->rawValue()*SrQuat(quatMat);
+		//SrQuat quat = pjoint->quat()->rawValue()*SrQuat(alignRotAxisAngle);//*pjoint->quat()->rawValue();
 		jointRotationMap[pjointName] = quat;
 		pjoint->quat()->value(quat);
 		pjoint->set_lmat_changed();
@@ -1012,6 +1019,10 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 	retarget_p->init( mchan_arr ); // use the target channels instead
 	int num_f = this->frames();
 
+// 	for (unsigned int i=0;i<relativeJoints.size();i++)
+// 	{
+// 		LOG("relativeJoint %d = %s",i,relativeJoints[i].c_str());
+// 	}
 
 	std::map<std::string, SrQuat> jointRotationMap;
 	std::queue<std::string> jointQueues;
@@ -1045,6 +1056,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 		{
 			//LOG("pjoint name = %s",pjointName.c_str());
 			convertBoneOrientation(pjointName, interSk, tempSrcSk, jointQueues, jointRotationMap, endJoints);
+			interSk->invalidate_global_matrices();
 			interSk->update_global_matrices();
 			SkJoint* pjoint = interSk->search_joint(pjointName.c_str());	
 			if (!pjoint)

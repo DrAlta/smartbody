@@ -95,8 +95,8 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 	cons->efffectorName = reachEndEffector->name().c_str();
 
 	std::vector<std::string> consJointList;
-	consJointList.push_back("sternoclavicular");
-	consJointList.push_back("acromioclavicular");
+	//consJointList.push_back("sternoclavicular");
+	//consJointList.push_back("acromioclavicular");
 	consJointList.push_back("shoulder");
 
 	std::string preFix = "r_";	
@@ -384,19 +384,29 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 	
 	if (footIKFix)
 	{
-		for (int i=0;i<2;i++)
+		bool hasIKJoints = true;
+		if (!skeletonCopy->search_joint(lFootName[0].c_str()) || !skeletonCopy->search_joint(lFootName[0].c_str()))
 		{
-			EffectorConstantConstraint* lfoot = dynamic_cast<EffectorConstantConstraint*>(leftFootConstraint[lFootName[i]]);
-			lfoot->targetPos = motionParameter->getMotionFrameJoint(inputMotionFrame,lFootName[i].c_str())->gmat().get_translation();
-			EffectorConstantConstraint* rfoot = dynamic_cast<EffectorConstantConstraint*>(rightFootConstraint[rFootName[i]]);
-			rfoot->targetPos = motionParameter->getMotionFrameJoint(inputMotionFrame,rFootName[i].c_str())->gmat().get_translation();				
-		} 			
-		ikScenario.ikPosEffectors = &leftFootConstraint;
-		ikCCD.update(&ikScenario);
-		ikScenario.ikPosEffectors = &rightFootConstraint;
-		ikCCD.update(&ikScenario);	
-		ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);
-	}
+			// does not have foot IK joints, do not solve for foot IK
+			hasIKJoints = false;
+		}
+
+		if (hasIKJoints)
+		{
+			for (int i=0;i<2;i++)
+			{			
+				EffectorConstantConstraint* lfoot = dynamic_cast<EffectorConstantConstraint*>(leftFootConstraint[lFootName[i]]);
+				lfoot->targetPos = motionParameter->getMotionFrameJoint(inputMotionFrame,lFootName[i].c_str())->gmat().get_translation();
+				EffectorConstantConstraint* rfoot = dynamic_cast<EffectorConstantConstraint*>(rightFootConstraint[rFootName[i]]);
+				rfoot->targetPos = motionParameter->getMotionFrameJoint(inputMotionFrame,rFootName[i].c_str())->gmat().get_translation();				
+			} 			
+			ikScenario.ikPosEffectors = &leftFootConstraint;
+			ikCCD.update(&ikScenario);
+			ikScenario.ikPosEffectors = &rightFootConstraint;
+			ikCCD.update(&ikScenario);	
+			ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);
+		}		
+	}	
 
 	outFrame = refFrame;
 	ikScenario.getTreeNodeQuat(outFrame.jointQuat,QUAT_CUR); 	

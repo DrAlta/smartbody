@@ -3947,7 +3947,7 @@ void FltkViewer::drawJointLabels()
 	SbmCharacter* character = getCurrentCharacter();
 	if (!character)
 		return;
-	/*
+	
 	glPushAttrib(GL_LIGHTING | GL_COLOR_BUFFER_BIT);
 	
 	float sceneScale = SmartBody::SBScene::getScene()->getScale();
@@ -3961,13 +3961,28 @@ void FltkViewer::drawJointLabels()
 		const SrMat& mat = joint->gmat();
 		glPushMatrix();
 		glMultMatrixf((const float*) mat);
+		float modelview[16];
+		glGetFloatv(GL_MODELVIEW_MATRIX , modelview);
+		// undo all rotations
+		// beware all scaling is lost as well 
+		for( int a=0; a<3; a++ ) 
+		{
+			for( int b=0; b<3; b++ ) {
+				if ( a==b )
+					modelview[a*4+b] = 1.0;
+				else
+					modelview[a*4+b] = 0.0;
+			}
+		}
+		// set the modelview with no rotations
+		glLoadMatrixf(modelview);
+
 		glColor3f(1.0f, 1.0f, 0.0f);
 		glScalef(textSize, textSize, textSize);
 		glutStrokeString(GLUT_STROKE_ROMAN, (const unsigned char*) joint->name().c_str());
 		glPopMatrix();
 	}
-	glPopAttrib();
-	*/
+	glPopAttrib();	
 }
 
 void FltkViewer::drawGestures()

@@ -302,6 +302,7 @@ std::vector<std::string> PanimationWindow::tokenize(const std::string& str,const
 void PanimationWindow::refreshUI(Fl_Widget* widget, void* data)
 {
 	PanimationWindow* window = (PanimationWindow*) data;
+	loadCharacters(window->characterList); // reload all character names
 	if (window->tabGroup->value() == window->runTimeEditor)
 		window->runTimeEditor->initializeRunTimeEditor();
 
@@ -312,6 +313,7 @@ void PanimationWindow::refreshUI(Fl_Widget* widget, void* data)
 void PanimationWindow::loadCharacters(Fl_Choice* characterList)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	characterList->clear();
 	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
 		iter != mcu.getCharacterMap().end();
 		iter++)
@@ -331,7 +333,7 @@ void PanimationWindow::reset(Fl_Widget* widget, void* data)
 	execCmd(window, command.str());
 	std::stringstream resetPosCommand;
 	resetPosCommand << "set char " << charName << " world_offset x 0 z 0 h 0 p 0 r 0";
-	execCmd(window, resetPosCommand.str());
+	execCmd(window, resetPosCommand.str());		
 }
 
 void PanimationWindow::changeTabGroup(Fl_Widget* widget, void* data)
