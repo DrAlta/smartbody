@@ -125,11 +125,7 @@ bool isDone = false;
 	std::map<std::string, std::pair<std::string, double> > phonemeToViseme;
 	std::string mapping;
 #else 
-	#if defined(WIN32)
-		std::string mapping;
-	#else
-		extern std::string mapping;
-	#endif
+	std::string mapping;
 	extern SpeechRequestData xmlMetaData;
 	extern std::multimap<std::string, std::pair<string, double> > phonemeToViseme;
 #endif
