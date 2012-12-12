@@ -19,11 +19,11 @@ def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :
 	#endJoints.append('l_ankle')
 	endJoints.append('l_forefoot')
 	endJoints.append('l_toe')
-	endJoints.append('l_acromioclavicular')
+	endJoints.append('l_acromioclavicular')	
 	#endJoints.append('r_ankle')		
 	endJoints.append('r_forefoot')	
 	endJoints.append('r_toe')
-	endJoints.append('r_acromioclavicular')
+	endJoints.append('r_acromioclavicular')	
 	
 	relativeJoints = StringVec();
 	relativeJoints.append('spine1')
@@ -31,6 +31,8 @@ def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :
 	relativeJoints.append('spine3')
 	relativeJoints.append('spine4')
 	relativeJoints.append('spine5')
+	endJoints.append('l_sternoclavicular')
+	endJoints.append('r_sternoclavicular')
 	
 	
 	effectorJoints = StringVec();	
