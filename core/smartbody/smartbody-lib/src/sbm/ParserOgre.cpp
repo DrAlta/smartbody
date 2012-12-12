@@ -1364,11 +1364,13 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 	{
 		std::string matName = mi->first;
 		std::string textureName = "";
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
 		if (materialTextureMap.find(matName) != materialTextureMap.end())
 		{
 			 textureName = materialTextureMap[matName];
-			ParserOgre::loadTexture(SbmTextureManager::TEXTURE_DIFFUSE,textureName,pathArray);
+			 ParserOgre::loadTexture(SbmTextureManager::TEXTURE_DIFFUSE,textureName,pathArray);
 		}
+#endif
 		std::vector<int> modelIdxList = mi->second;
 		for (unsigned int j=0;j<modelIdxList.size();j++)
 		{
