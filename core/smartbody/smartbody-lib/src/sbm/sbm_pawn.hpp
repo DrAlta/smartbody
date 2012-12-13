@@ -199,16 +199,10 @@ public:
 
 
 
-	/**
-	 *  Handles commands beginning with "set pawn <pawn id> world_offset ...".
-	 */
-	static int set_world_offset_cmd( SbmPawn* pawn, srArgBuffer& args );
-
-
 	MeCtChannelWriter* get_world_offset_writer_p()	{return world_offset_writer_p;}
 
 	void wo_cache_update();
-	int parse_pawn_command( std::string cmd, srArgBuffer& args);
+	
 
 	/**
 	 *  WSP access functions.

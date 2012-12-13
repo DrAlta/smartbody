@@ -161,6 +161,7 @@ class SBScene : public SBObject
 		std::map<std::string, SBScript*> _scripts;
 		float _scale;
 		bool _isRemoteMode;
+		static bool _firstTime;
 
 		SbmDebuggerServer*	_debuggerServer;
 		SbmDebuggerClient*	_debuggerClient;

@@ -41,6 +41,8 @@
 
 namespace SmartBody {
 
+bool SBScene::_firstTime = true;
+
 SBScene::SBScene(void)
 {
 	_sim = new SBSimulationManager();
@@ -115,6 +117,11 @@ SBScene::~SBScene(void)
 
 SBScene* SBScene::getScene()
 {
+	if (_firstTime)
+	{
+		XMLPlatformUtils::Initialize(); 
+		_firstTime = false;
+	}
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	return mcu._scene;
 }
