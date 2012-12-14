@@ -1661,6 +1661,9 @@ void appendPythonModule(const char* moduleName, void (*initfunc)(void))
 
 void initPython(std::string pythonLibPath)
 {	
+
+	XMLPlatformUtils::Initialize(); 
+
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.initPythonLibPath = pythonLibPath;
 	std::string pythonHome = pythonLibPath + "/..";

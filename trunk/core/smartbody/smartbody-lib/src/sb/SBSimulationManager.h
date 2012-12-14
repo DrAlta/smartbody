@@ -36,6 +36,7 @@ class SBSimulationManager
 		SBAPI void reset();
 		SBAPI void pause();
 		SBAPI void resume();
+		SBAPI void update();
 		SBAPI void step(int n);
 		SBAPI void setSleepFps(float v);
 		SBAPI void setEvalFps(float v);
