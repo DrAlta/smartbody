@@ -42,17 +42,17 @@ endif()
 
 
 
-set( SBM_BATCH_SRC
+set( SIMPLESMARTBODY_SRC
 
-	sbm-batch.cpp 
+	simplesmartbody.cpp 
 )
 
-add_executable( sbm-batch 
+add_executable( simplesmartbody 
 
-	${SBM_BATCH_SRC}
+	${SIMPLESMARTBODY_SRC}
 )
 
-target_link_libraries( sbm-batch 
+target_link_libraries( simplesmartbody 
 
 	smartbody-dll
 	activemq-cpp
@@ -94,5 +94,5 @@ set_target_properties(
 
 install( 
 	TARGETS ${EXEC_LIST}
-	RUNTIME DESTINATION core/smartbody/sbm-batch
+	RUNTIME DESTINATION core/smartbody/simplesmartbody
 )
