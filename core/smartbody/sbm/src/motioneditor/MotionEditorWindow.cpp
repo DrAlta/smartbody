@@ -2,6 +2,8 @@
 #include <sb/SBScene.h>
 #include <sb/SBBmlProcessor.h>
 #include <FL/Fl_File_Chooser.H>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) : Fl_Double_Window(x, y, w, h, label)
 {
@@ -13,16 +15,19 @@ MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) 
 		_buttonRefresh->callback(OnButtonRefresh, this);
 		_buttonSaveMotion = new Fl_Button(300, 10, 100, 20, "Save");
 		_buttonSaveMotion->callback(OnButtonSaveMotion, this);
-		_browserMotionList = new Fl_Hold_Browser(10, 40, 300, 200, "Motion List");
+		_browserMotionList = new Fl_Hold_Browser(10, 40, 300, 180, "Motion List");
 		_browserMotionList->callback(OnBrowserMotionList, this);
-		_buttonPlayMotion = new Fl_Button(320, 200, 80, 20, "Play");
+		_buttonPlayMotion = new Fl_Button(320, 190, 80, 20, "Play");
 		_buttonPlayMotion->callback(OnButtonPlayMotion, this);
-		_checkButtonPlayMotion = new Fl_Check_Button(10, 260, 50, 20, "Scrub");
+		_checkButtonPlayMotion = new Fl_Check_Button(10, 240, 50, 20, "Scrub");
 		_checkButtonPlayMotion->callback(OnCheckButtonPlayMotion, this);
-		_sliderMotionFrame = new Fl_Value_Slider(60, 260, 300, 20);
+		_sliderMotionFrame = new Fl_Value_Slider(60, 240, 300, 20);
 		_sliderMotionFrame->type(FL_HORIZONTAL);
 		_sliderMotionFrame->callback(OnSliderMotionFrame, this);
 		_sliderMotionFrame->deactivate();
+		_buttonPlayMotionFolder = new Fl_Button(10, 260, 80, 20, "Play Folder");
+		_buttonPlayMotionFolder->callback(OnButtonPlayMotionFolder, this);
+		_inputFilePath = new Fl_Input(90, 260, 270, 20, "");
 
 		_groupMetaInfo = new Fl_Group(10, 300, 400, 355, "Motion MetaData");
 		int groupMetaInfoX = _groupMetaInfo->x();
@@ -259,6 +264,51 @@ void MotionEditorWindow::OnSliderMotionFrame(Fl_Widget* widget, void* data)
 	std::stringstream ss;
 	ss << "motionplayer " << curChar->getName() << " " << curMotion->getName() << " " << frameNumber;
 	SmartBody::SBScene::getScene()->command(ss.str());
+}
+
+/*
+	For now, not recursive, only reading skm
+*/
+void MotionEditorWindow::OnButtonPlayMotionFolder(Fl_Widget* widget, void* data)
+{
+	MotionEditorWindow* editor = (MotionEditorWindow*) data;
+	SBCharacter* curChar = editor->getCurrentCharacter();
+	if (!curChar)
+		return;
+
+	std::string motionFolderPath = editor->_inputFilePath->value();
+	boost::filesystem::path motionFolder(motionFolderPath);
+	if (!boost::filesystem2::is_directory(motionFolder))
+	{
+		LOG("MotionEditorWindow::OnButtonPlayMotionFolder ERR: Please input a valid directory %s", motionFolderPath.c_str());
+		return;
+	}
+
+	std::vector<std::string> skmMotionNames;
+	boost::filesystem::directory_iterator end;
+	for (boost::filesystem::directory_iterator iter(motionFolder); iter != end; ++iter)
+	{
+		const boost::filesystem::path& cur = *iter;
+		if (boost::filesystem::is_directory(cur))
+			continue;
+		std::string ext = boost::filesystem::extension(cur);
+		if (ext != ".skm")
+			continue;
+		std::string fileName = boost::filesystem::basename(cur);
+		skmMotionNames.push_back(fileName);
+	}
+	LOG("Playing animations in folder %s", motionFolderPath.c_str());
+	stringstream command;
+	for (size_t i = 0; i < skmMotionNames.size(); ++i)
+	{
+		LOG("%s", skmMotionNames[i].c_str());
+		command << "<animation name=\"" << skmMotionNames[i] << "\" id=\"anim" << i << "\"";
+		if (i > 0)
+			command << " start=\"anim" << (i - 1) << ":end\"/>";
+		else
+			command << " start=\"0\"/>";
+	}
+	SmartBody::SBScene::getScene()->getBmlProcessor()->execBML(curChar->getName(), command.str());
 }
 
 void MotionEditorWindow::updateSyncPointsUI()
