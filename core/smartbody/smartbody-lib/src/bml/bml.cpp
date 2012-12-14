@@ -461,7 +461,7 @@ void BmlRequest::gestureRequestProcess()
 
 			if (!shouldFilter)
 			{
-				if (minSpeedDiffL < 0 && minSpeedDiffR < 0)		// if desired wrist speed is higher than next gesture wrist speed, then just blend
+				if (minSpeedDiffL < 0 || minSpeedDiffR < 0)		// if desired wrist speed is higher than next gesture wrist speed, then just blend
 				{
 					if (currGestureStartAt < prevGestureRelaxAt)
 					{
@@ -490,10 +490,10 @@ void BmlRequest::gestureRequestProcess()
 							desiredTransitionTime = desiredTransitionTimeL >= 0 ? desiredTransitionTimeL : desiredTransitionTimeR;
 						if (desiredTransitionTime < blendTime)
 						{
-							gestures[j]->behav_syncs.sync_relax()->set_time(desiredTransitionTime + prevGestureRelaxAt);
-							gestures[j]->behav_syncs.sync_end()->set_time(desiredTransitionTime + prevGestureEndAt);
-							gestures[i]->behav_syncs.sync_start()->set_time((float)currGestureStrokeStartAt - ((float)blendTime - desiredTransitionTime));
-							gestures[i]->behav_syncs.sync_ready()->set_time((float)currGestureStrokeStartAt - ((float)blendTime - desiredTransitionTime));
+							gestures[j]->behav_syncs.sync_relax()->set_time(((float)blendTime - desiredTransitionTime) + prevGestureRelaxAt);
+							gestures[j]->behav_syncs.sync_end()->set_time(((float)blendTime - desiredTransitionTime) + prevGestureEndAt);
+							gestures[i]->behav_syncs.sync_start()->set_time((float)currGestureStrokeStartAt - desiredTransitionTime);
+							gestures[i]->behav_syncs.sync_ready()->set_time((float)currGestureStrokeStartAt - desiredTransitionTime);
 						}
 						else
 						{

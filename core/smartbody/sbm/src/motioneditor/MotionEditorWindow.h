@@ -37,6 +37,7 @@ public:
 	static void OnButtonSaveMotion(Fl_Widget* widget, void* data);
 	static void OnBrowserMotionList(Fl_Widget* widget, void* data);
 	static void OnButtonPlayMotion(Fl_Widget* widget, void* data);
+	static void OnCheckButtonPlayMotion(Fl_Widget* widget, void* data);
 	static void OnSliderMotionFrame(Fl_Widget* widget, void* data);
 
 	void updateSyncPointsUI();
@@ -59,6 +60,7 @@ public:
 	Fl_Button*			_buttonRefresh;
 	Fl_Button*			_buttonSaveMotion;
 	Fl_Hold_Browser*	_browserMotionList;
+	Fl_Button*			_buttonPlayMotion;
 	Fl_Check_Button*	_checkButtonPlayMotion;
 	Fl_Value_Slider*	_sliderMotionFrame;
 
