@@ -1,6 +1,8 @@
 #ifndef _SBMPYTHON_
 #define _SBMPYTHON_
+
+#include <sb/SBTypes.h>
 	
-void initPython(std::string pythonLibPath);
+SBAPI void initPython(std::string pythonLibPath);
 
 #endif
