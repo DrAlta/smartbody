@@ -1,16 +1,18 @@
 viewer = getViewer()
 viewer.show()
 
+sscale = 1.0/scene.getScale()
+
 camera = getCamera()
-camera.setEye(0, 166, 185)
-camera.setCenter(0, 92, 0)
+camera.setEye(0*sscale, 1.66*sscale, 1.85*sscale)
+camera.setCenter(0, .92*sscale, 0)
 
 cameraPawn = scene.createPawn("camera")
-cameraPos = SrVec(0, 166, 185)
+cameraPos = SrVec(0, 1.66*sscale, 1.85*sscale)
 cameraPawn.setPosition(cameraPos)
 
 light0 = scene.createPawn("light0")
-light0Pos = SrVec(100, 250, 400)
+light0Pos = SrVec(1.00*sscale, 2.50*sscale, 4.00*sscale)
 light0.setPosition(light0Pos)
 
 light0.createBoolAttribute("lightIsDirectional", True, True, "LightAttributes", 5, False, False, False, "Is the light a directional light")
@@ -26,7 +28,7 @@ light0.createDoubleAttribute("lightQuadraticAttenuation", 0.0, True, "LightAttri
 
 
 light1 = scene.createPawn("light1")
-light1Pos = SrVec(100, 500, -1000)
+light1Pos = SrVec(1.00*sscale, 5.00*sscale, -10.00*sscale)
 light1.setPosition(light1Pos)
 
 light1.createBoolAttribute("lightIsDirectional", True, True, "LightAttributes", 5, False, False, False, "Is the light a directional light")

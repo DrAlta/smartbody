@@ -1,5 +1,8 @@
 behaviorSetManager = scene.getBehaviorSetManager()
 
+behav = behaviorSetManager.createBehaviorSet("MaleMocapLocomotion")
+behav.setScript("BehaviorSetMaleMocapLocomotion.py")
+
 behav = behaviorSetManager.createBehaviorSet("MaleLocomotion")
 behav.setScript("BehaviorSetMaleLocomotion.py")
 

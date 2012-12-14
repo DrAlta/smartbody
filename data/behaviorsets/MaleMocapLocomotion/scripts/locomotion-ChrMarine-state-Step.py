@@ -3,7 +3,7 @@
 
 stateManager = scene.getStateManager()
 
-stateChrMarineStep = stateManager.createState2D("backovicStep")
+stateChrMarineStep = stateManager.createState2D("ChrMarineStep")
 
 motions = StringVec()
 motions.append("ChrMarine@Idle01")
