@@ -39,6 +39,7 @@ public:
 	static void OnButtonPlayMotion(Fl_Widget* widget, void* data);
 	static void OnCheckButtonPlayMotion(Fl_Widget* widget, void* data);
 	static void OnSliderMotionFrame(Fl_Widget* widget, void* data);
+	static void OnButtonPlayMotionFolder(Fl_Widget* widget, void* data);
 
 	void updateSyncPointsUI();
 	void updateMotionSyncPoints(const std::string& type);
@@ -63,6 +64,8 @@ public:
 	Fl_Button*			_buttonPlayMotion;
 	Fl_Check_Button*	_checkButtonPlayMotion;
 	Fl_Value_Slider*	_sliderMotionFrame;
+	Fl_Input*			_inputFilePath;
+	Fl_Button*			_buttonPlayMotionFolder;
 
 	// meta information
 	Fl_Group*			_groupMetaInfo;
