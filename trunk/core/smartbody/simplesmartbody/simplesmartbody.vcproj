@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="sbm-batch"
+	Name="simplesmartbody"
 	ProjectGUID="{8C3800DB-85D8-490A-9E4B-14235F2A2711}"
 	RootNamespace="sbm-batch"
 	Keyword="Win32Proj"
@@ -343,7 +343,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\sbm-batch.cpp"
+			RelativePath=".\simplesmartbody.cpp"
 			>
 		</File>
 	</Files>
