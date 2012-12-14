@@ -16,8 +16,6 @@
  *  License along with SBM.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
  *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently at UC Merced)
  */
 
 # ifndef TRANSPARENT_VIEWER_H

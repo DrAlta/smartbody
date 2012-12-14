@@ -34,14 +34,6 @@
 #include <vector>
 #include <fstream>
 
-//#include "fltk_viewer.h"
-//#include "RootWindow.h"
-//#include <bmlviewer/BehaviorWindow.h>
-//#include <panimationviewer/PanimationWindow.h>
-//#include <channelbufferviewer/channelbufferWindow.hpp>
-//#include <resourceViewer/ResourceWindow.h>
-//#include <faceviewer/FaceViewer.h>
-
 #if USE_WSP
 #include "wsp.h"
 #endif
@@ -172,12 +164,6 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 
 	mcuCBHandle::singleton()._scene->getDebuggerServer()->ProcessVHMsgs(op, args);
 }
-
-int sbm_vhmsg_register_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
-	
-	return( CMD_SUCCESS );
-}
-
 
 int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
@@ -315,35 +301,6 @@ class SBMCrashCallback : public vhcl::Crash::CrashCallback
 
 
 ///////////////////////////////////////////////////////////////////////////////////
-std::string test_cmdl_tab_callback( std::string io_str )	{
-	std::string prompt( "X> " );
-
-	gwiz::cmdl commandline;
-	commandline.set_callback( gwiz::cmdl::editor_callback );
-	commandline.render_prompt( prompt );
-	commandline.write( io_str );
-
-	bool quit = false;
-	while( !quit ) {
-		if( commandline.pending( prompt ) )	{
-
-			std::string new_str = commandline.read();
-			if( new_str == "t" )	{
-				commandline.write( std::string( "test" ) );
-			}
-			else
-			if( new_str == "q" )	{
-				quit = true;
-				io_str = "done";
-			}
-		}
-	}
-	fprintf( stdout, "<exit>" ); 
-	fprintf( stdout, "\n" ); 
-	return( io_str );
-}
-
-///////////////////////////////////////////////////////////////////////////////////
 int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWinMode)
 {
 //int main( int argc, char **argv )	{
@@ -365,43 +322,11 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	int y = 150;
 
 
-
-
- // 808: undefined reference to `bonebus::BoneBusCharacter::StartSendBoneRotations()'
-//	return( 0 );
-#if SBM_REPORT_MEMORY_LEAKS
-	// CRT Debugging flags - Search help:
-	//   _CrtSetDbgFlag
-	// Memory Leaks - To find out where a memory leak happens:
-	//   Rerun the programs and set this variable in the debugger
-	//   to the alloc # that leaks: {,,msvcr90d.dll}_crtBreakAlloc
-	//   The program will stop right before the alloc happens
-
-	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	//_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_DELAY_FREE_MEM_DF );
-
-	_CrtMemState  state;
-	_CrtMemCheckpoint( &state );
-	_CrtMemDumpStatistics( &state );
-#endif
-
 #if SBM_EMAIL_CRASH_REPORTS
 	// Log crashes, with a dialog option to report via email
 	vhcl::Crash::EnableExceptionHandling( true );
 	vhcl::Crash::AddCrashCallback( new SBMCrashCallback() );
 #endif
-
-	
-	
-	
-
-	// init glew to use OpenGL extension
-	//bool hasShaderSupport = SbmShader::initShader();
-
-	//CommandWindow* commandWindow = new CommandWindow(100, 100, 640, 480, "Commands");
-	//commandWindow->show();
-	//vhcl::Log::g_log.AddListener(commandWindow);
-	//FltkViewer* viewer = new FltkViewer(100, 150, 640, 480, "SmartBody");
 
 	// register the log listener
 	vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
@@ -426,18 +351,6 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 
 	TransparentListener transparentListener;
 	mcu.sbm_character_listener = &transparentListener;
-
-	
-
-	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
-	//viewerFactory->setFltkViewer(viewer);
-	
-//	mcu.register_bmlviewer_factory(new BehaviorViewerFactory());
-//	mcu.register_panimationviewer_factory(new PanimationViewerFactory());
-//	mcu.register_channelbufferviewer_factory(new ChannelBufferViewerFactory());	
-//	mcu.register_ResourceViewer_factory(new ResourceViewerFactory());
-//	mcu.register_FaceViewer_factory(new FaceViewerFactory());
-
 	
 	mcu_register_callbacks();
 
@@ -724,19 +637,10 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 
 	mcu._scene->getDebuggerServer()->SetID("sbdesktop");
 
-//	(void)signal( SIGABRT, signal_handler );
-//	(void)signal( SIGFPE, signal_handler );
-//	(void)signal( SIGILL, signal_handler );
-//	(void)signal( SIGINT, signal_handler );
-//	(void)signal( SIGSEGV, signal_handler );
-//	(void)signal( SIGTERM, signal_handler );
+
 #ifdef WIN32
 	(void)signal( SIGBREAK, signal_handler );
 #endif
-//	atexit( exit_callback );
-
-	gwiz::cmdl commandline;
-	commandline.set_callback( mcuCBHandle::cmdl_tab_callback );
 
 #if ENABLE_DEFAULT_BOOTSTRAP
 	vector<string>::iterator it;
@@ -844,12 +748,8 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	while( mcu.loop )	{
 
 		mcu.update_profiler();
-//		mcu.update_profiler( SBM_get_real_time() );
 		bool update_sim = mcu.update_timer();
-//		bool update_sim = mcu.update_timer( SBM_get_real_time() );
 
-	//	mcu.mark( "main", 0, "fltk-check" );
-//		Fl::check();
 		MSG msg;
 
 		 while (PeekMessage(&msg,NULL,0,0,PM_NOREMOVE))
@@ -930,14 +830,6 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 			mcu.update();
 		}
 
-		/*for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-			 iter != mcu.getCharacterMap().end();
-			 iter++)
-		{
-			SbmCharacter* character = (*iter).second;
-			if (character->scene_p)
-				character->scene_p->update();	
-		}*/
 		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
 			 iter != mcu.getPawnMap().end();
 			 iter++)
@@ -966,25 +858,10 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 			mcu.viewer_p->set_camera( mcu.camera_p );
 		}	
 
-//		if((ChannelBufferWindow*)mcu.channelbufferviewer_p != NULL)
-//		{
-//			((ChannelBufferWindow*)mcu.channelbufferviewer_p)->update();
-//		}
-
-//		if((ResourceWindow*)mcu.resourceViewer_p != NULL)
-//		{
-//			((ResourceWindow*)mcu.resourceViewer_p)->update();
-//		}
-
-		//LOG("mcu.render");
 		mcu.render();
 	
 	}	
 	cleanup();
-	//vhcl::Log::g_log.RemoveAllListeners();
-	//delete listener;
-//	delete sbmWindow;
 
-//	return( 0 ); // NOT NEEDED ??
 }
 
