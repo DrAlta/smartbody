@@ -1,5 +1,6 @@
 #include "MotionEditorWindow.h"
-#include "sb/SBScene.h"
+#include <sb/SBScene.h>
+#include <sb/SBBmlProcessor.h>
 #include <FL/Fl_File_Chooser.H>
 
 MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) : Fl_Double_Window(x, y, w, h, label)
@@ -14,8 +15,10 @@ MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) 
 		_buttonSaveMotion->callback(OnButtonSaveMotion, this);
 		_browserMotionList = new Fl_Hold_Browser(10, 40, 300, 200, "Motion List");
 		_browserMotionList->callback(OnBrowserMotionList, this);
-		_checkButtonPlayMotion = new Fl_Check_Button(10, 260, 50, 20, "Play");
-		_checkButtonPlayMotion->callback(OnButtonPlayMotion, this);
+		_buttonPlayMotion = new Fl_Button(320, 200, 80, 20, "Play");
+		_buttonPlayMotion->callback(OnButtonPlayMotion, this);
+		_checkButtonPlayMotion = new Fl_Check_Button(10, 260, 50, 20, "Scrub");
+		_checkButtonPlayMotion->callback(OnCheckButtonPlayMotion, this);
 		_sliderMotionFrame = new Fl_Value_Slider(60, 260, 300, 20);
 		_sliderMotionFrame->type(FL_HORIZONTAL);
 		_sliderMotionFrame->callback(OnSliderMotionFrame, this);
@@ -164,7 +167,7 @@ void MotionEditorWindow::OnButtonRefresh(Fl_Widget* widget, void* data)
 	OnBrowserMotionList(widget, data);
 	editor->_checkButtonPlayMotion->value(0);
 	editor->_sliderMotionFrame->deactivate();
-	OnButtonPlayMotion(widget, data);
+	OnCheckButtonPlayMotion(widget, data);
 }
 
 void MotionEditorWindow::OnButtonSaveMotion(Fl_Widget* widget, void* data)
@@ -190,6 +193,17 @@ void MotionEditorWindow::OnBrowserMotionList(Fl_Widget* widget, void* data)
 }
 
 void MotionEditorWindow::OnButtonPlayMotion(Fl_Widget* widget, void* data)
+{
+	MotionEditorWindow* editor = (MotionEditorWindow*) data;
+	SmartBody::SBCharacter* curChar = editor->getCurrentCharacter();
+	if (!curChar)	return;
+	SmartBody::SBMotion* curMotion = editor->getCurrentMotion();
+	if (!curMotion)	return;
+	std::string bml = "<animation name=\"" + curMotion->getName() + "\"/>";
+	SmartBody::SBScene::getScene()->getBmlProcessor()->execBML(curChar->getName(), bml);
+}
+
+void MotionEditorWindow::OnCheckButtonPlayMotion(Fl_Widget* widget, void* data)
 {
 	MotionEditorWindow* editor = (MotionEditorWindow*) data;
 	SmartBody::SBCharacter* curChar = editor->getCurrentCharacter();
