@@ -536,6 +536,14 @@ std::vector<std::string> SBScene::getCharacterNames()
 }
 
 
+int SBScene::getNumSkeletons()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	return mcu.getSkeletonMap().size();
+}
+
+
 std::vector<std::string> SBScene::getSkeletonNames()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();

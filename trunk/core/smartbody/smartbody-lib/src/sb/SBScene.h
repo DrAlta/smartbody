@@ -81,6 +81,7 @@ class SBScene : public SBObject
 		SBAPI SBMotion* getMotion(const std::string& name);
 		SBAPI int getNumMotions();
 		SBAPI std::vector<std::string> getMotionNames();
+		SBAPI int getNumSkeletons();
 		SBAPI std::vector<std::string> getSkeletonNames();
 		SBAPI std::vector<std::string> getEventHandlerNames();
 
