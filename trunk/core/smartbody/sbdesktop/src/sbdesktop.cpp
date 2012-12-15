@@ -740,8 +740,6 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 #if EARLY_EXIT
 	mcu.loop = 0;
 #endif
-//	commandline.render_prompt( "> " );
-
 	std::string pythonPrompt = "# ";
 	std::string commandPrompt = "> ";
 
@@ -778,48 +776,6 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		vector<string> commands;// = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
 			mcu.execute( (char *)commands[i].c_str() );
-		}
-
-		if (mcu.getInteractive())
-		{
-			bool hasCommands = false;
-			if (mcu.use_python)
-				hasCommands =  commandline.pending( pythonPrompt );
-			else
-				hasCommands =  commandline.pending( commandPrompt );
-
-			if ( hasCommands )
-			{
-				std::string cmd_str = commandline.read();
-				char *cmd = (char*)cmd_str.c_str();
-
-				if( strlen( cmd ) )	{
-
-					int result = CMD_FAILURE;
-					if (mcu.use_python) {
-						result = mcu.executePython(cmd);
-					} else {
-						result = mcu.execute(cmd);
-					}
-
-					switch( result ) {
-						case CMD_NOT_FOUND:
-							printf("SBM ERR: command NOT FOUND: '%s'\n", cmd );
-							fprintf( stdout, "> " ); fflush( stdout );
-							break;
-						case CMD_FAILURE:
-							printf("SBM ERR: command FAILED: '%s'\n", cmd );
-							fprintf( stdout, "> " ); fflush( stdout );
-							break;
-						case CMD_SUCCESS:						
-							break;
-						default:
-							printf("SBM ERR: return value %d ERROR: '%s'\n", result, cmd );
-							fprintf( stdout, "> " ); fflush( stdout );
-							break;
-					}
-				}
-			}
 		}
 
 #if USE_WSP
