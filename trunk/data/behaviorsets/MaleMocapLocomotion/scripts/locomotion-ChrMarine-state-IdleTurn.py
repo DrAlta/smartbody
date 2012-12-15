@@ -1,4 +1,4 @@
-def marineLocomotionSetup(skeletonName, baseJoint, preFix, statePreFix):
+def mocapIdleTurnSetup(skeletonName, baseJoint, preFix, statePreFix):
 		
 	stateManager = scene.getStateManager()
 
