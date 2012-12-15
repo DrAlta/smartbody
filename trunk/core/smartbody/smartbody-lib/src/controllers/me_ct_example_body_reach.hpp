@@ -49,6 +49,7 @@ protected:
 	float                 autoReturnDuration;
 	float                 reachVelocityScale;	
 	float                 desireLinearVel;
+	float                 desireGrabSpeed;
 	vector<SkJoint*>      affectedJoints;		
 	BodyMotionFrame       inputMotionFrame;		
 	float 			      _duration;
@@ -75,6 +76,7 @@ public:
 	void setHandActionState(MeCtReachEngine::HandActionState newState);
 	MeCtReachEngine::HandActionState getHandActionState();
 	void setLinearVelocity(float vel);
+	void setGrabSpeed( float vel );
 	void setReachCompleteDuration(float duration);	
 	bool addHandConstraint(SkJoint* targetJoint, const char* effectorName);
 	SbmPawn* getAttachedPawn();
@@ -94,7 +96,7 @@ protected:
 	int  determineReachType(SrVec& targetPos);
 	int  getReachTypeWithAttachedPawn();
 	void setNewReachEngine(MeCtReachEngine* newReachEngine);
-	bool isValidReachEngine(int reachType);
+	bool isValidReachEngine(int reachType);	
 };
 
 #endif

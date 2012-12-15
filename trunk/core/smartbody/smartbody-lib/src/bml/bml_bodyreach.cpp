@@ -135,6 +135,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	const XMLCh* attrReachDuration = elem->getAttribute( BMLDefs::ATTR_REACH_DURATION );
 	float reachDuration = xml_parse_float(BMLDefs::ATTR_REACH_DURATION,elem,-1.f,REQUIRED_ATTR);//-1.f;	
 	float reachVelocity = xml_parse_float(BMLDefs::ATTR_REACH_VELOCITY,elem,-1.f,REQUIRED_ATTR);
+	float grabSpeed = xml_parse_float(BMLDefs::ATTR_GRAB_SPEED,elem,-1.f,false);
 
 	std::string reachType = xml_parse_string(BMLDefs::ATTR_REACH_TYPE,elem,"none",false);
 
@@ -204,6 +205,10 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	//if (reachVelocity > 0)
 	{
 		bodyReachCt->setLinearVelocity(reachVelocity);		
+	}
+	if (grabSpeed > 0)
+	{
+		bodyReachCt->setGrabSpeed(grabSpeed);
 	}
 
 	bool hasTarget = false;

@@ -251,7 +251,7 @@ XMLCh* BMLDefs::ATTR_CONS_JOINT = NULL;
 XMLCh* BMLDefs::ATTR_CONS_TARGET = NULL;
 
 XMLCh* BMLDefs::ATTR_WRIST = NULL;
-XMLCh* BMLDefs::ATTR_GRAB_VELOCITY = NULL;
+XMLCh* BMLDefs::ATTR_GRAB_SPEED = NULL;
 XMLCh* BMLDefs::ATTR_GRAB_FINISH = NULL;
 XMLCh* BMLDefs::ATTR_GRAB_TYPE = NULL;
 XMLCh* BMLDefs::ATTR_APEX_DURATION = NULL;
@@ -631,7 +631,7 @@ BMLDefs::BMLDefs()
 	ATTR_CONS_TARGET = XMLString::transcode("sbm:cons-target");
 	ATTR_APEX_DURATION = XMLString::transcode("sbm:apex-duration");
 	ATTR_WRIST = XMLString::transcode("sbm:wrist");
-	ATTR_GRAB_VELOCITY = XMLString::transcode("sbm:grab-velocity");
+	ATTR_GRAB_SPEED = XMLString::transcode("sbm:grab-speed");
 	ATTR_GRAB_FINISH = XMLString::transcode("sbm:grab-finish");
 	ATTR_GRAB_TYPE = XMLString::transcode("sbm:grab-type");
 	ATTR_OBSTACLE = XMLString::transcode("sbm:obstacle");

@@ -24,7 +24,7 @@ void FingerChain::init( MeCtIKTreeNode* figTip )
 		fingerNodes.push_back(node);
 		node = node->parent;
 	}
-	//fingerQuats.resize(fingerNodes.size());
+	//fingerQuats.resize(fingerNodes.size());	
 }
 
 void FingerChain::unlockChain()
@@ -85,7 +85,8 @@ MeCtHand::MeCtHand( SkSkeleton* sk, SkJoint* wrist)
 	grabTargetName = "";
 	attachedPawnName = "";
 	currentGrabState = GRAB_RETURN;
-	grabVelocity = 15.f;
+	grabSpeed = 50.f;
+	jointSpeed = 20.f;
 	_duration = -1.f;	
 }
 
@@ -276,7 +277,7 @@ void MeCtHand::solveIK(float dt)
 	ikScenario.setTreeNodeQuat(releaseFrame.jointQuat,QUAT_REF);								
 	ikScenario.ikPosEffectors = &handPosConstraint;
 	ikScenario.ikRotEffectors = &handRotConstraint;
-	ik.maxOffset = grabVelocity*dt;
+	ik.maxOffset = grabSpeed*dt;
 	ik.dampJ = 0.5f;
 	ik.refDampRatio = 0.1;
 	for (int i=0;i<1;i++)
@@ -340,7 +341,14 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 
 	ikScenario.setTreeNodeQuat(currentFrame.jointQuat,QUAT_CUR);
 	ikScenario.ikTreeRoot->lock = true;
-	updateFingerChains(curTargetFrame,0.01f);
+
+	float maxAngleDelta = sr_torad(grabSpeed*dt);		
+	
+	//if (maxAngleDelta > 0.01)
+	//LOG("maxAngleDelta = %f",maxAngleDelta);
+	//LOG("handControl grabSpeed = %f",grabSpeed);
+	updateFingerChains(curTargetFrame,maxAngleDelta);
+	//updateFingerChains(curTargetFrame,0.01f);
 
 	skeletonRef->invalidate_global_matrices();
 	skeletonRef->update_global_matrices();
@@ -403,7 +411,7 @@ void MeCtHand::updateFingerChains( BodyMotionFrame& targetMotionFrame, float max
 			if (angle > maxAngDelta)
 				angle = maxAngDelta;
 			SrQuat newQ;
-			if (fabs(angle) < 0.001)
+			if (fabs(angle) < maxAngDelta)
 				newQ = qT;
 			else
 				newQ = SrQuat(diff.axis(),angle)*q;
@@ -460,7 +468,7 @@ void MeCtHand::print_state( int tabs )
 
 void MeCtHand::controller_start()
 {
-
+	controlRestart();
 }
 
 void MeCtHand::controller_map_updated()
