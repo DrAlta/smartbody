@@ -107,7 +107,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
-	float grabVelocity = xml_parse_float(BMLDefs::ATTR_GRAB_VELOCITY,elem,-1.f,false);
+	float grabVelocity = xml_parse_float(BMLDefs::ATTR_GRAB_SPEED,elem,-1.f,false);
 	
 	float fadeOutTime = xml_parse_float(BMLDefs::ATTR_FADE_OUT,elem,-1.f,false);
 	float fadeInTime = xml_parse_float(BMLDefs::ATTR_FADE_IN,elem,-1.f,false);
@@ -123,16 +123,14 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	std::string localId = xml_parse_string(BMLDefs::ATTR_ID,elem,"",false);
 	
 	bool bCreateNewController = false;
-	
+	//LOG("grabSpeed = %f",grabVelocity);
 	if (!handCt)
 	{
 		handCt = new MeCtHand(request->actor->getSkeleton(), wristJoint);		
 		handCt->handle(handle);
 		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
 		
-		handCt->init(grabType,chr->getReachHandData(),chr->getGrabHandData(),chr->getReleaseHandData(), chr->getPointHandData());		
-		if (grabVelocity > 0)
-			handCt->grabVelocity = grabVelocity;		
+		handCt->init(grabType,chr->getReachHandData(),chr->getGrabHandData(),chr->getReleaseHandData(), chr->getPointHandData());				
 		bCreateNewController = true;
 	}
 
@@ -168,7 +166,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	
 
 	if (grabVelocity > 0)
-		handCt->grabVelocity = grabVelocity;
+		handCt->grabSpeed = grabVelocity;
 
 	if( target_pawn )	{	
 		SbmPawn* pawn = const_cast<SbmPawn*>(target_pawn);

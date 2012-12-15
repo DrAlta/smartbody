@@ -1035,8 +1035,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 									std::string zAttr = "";
 									if (zNode)
 										xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
-									offset.z = (float) atof(zAttr.c_str());
-									offset *= scaleFactor;
+									offset.z = (float) atof(zAttr.c_str());									
 									if (transformNodeName == "position")
 										model->V.push(offset);
 									else if (transformNodeName == "normal")
@@ -1059,9 +1058,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 									std::string yAttr = "";
 									if (yNode)
 										xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
-									offset.y = 1.f - (float) atof(yAttr.c_str());									
-									
-									offset *= scaleFactor;
+									offset.y = 1.f - (float) atof(yAttr.c_str());	
 									model->T.push(offset);
 								}
 

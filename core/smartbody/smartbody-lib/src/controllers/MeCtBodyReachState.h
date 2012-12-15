@@ -64,8 +64,8 @@ public:
 	void putDownAttachedPawn(ReachStateData* rd);
 	virtual int getType();
 protected:
-	std::string generateGrabCmd(const std::string& charName, const std::string& targetName, const std::string& grabState, int type);
-	std::string generateAttachCmd(const std::string& charName, const std::string& targetName, int type);
+	std::string generateGrabCmd(const std::string& charName, const std::string& targetName, const std::string& grabState, int type, float grabSpeed);
+	std::string generateAttachCmd(const std::string& charName, const std::string& targetName, int type, float grabSpeed);
 };
 
 class ReachHandPickUpAction : public ReachHandAction 
@@ -140,6 +140,7 @@ public:
 	MeCtExampleBodyReach* reachControl;
 public:
 	float linearVel;
+	float grabSpeed;
 	float reachRegion;
 public:	
 	ReachStateData();

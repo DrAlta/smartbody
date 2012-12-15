@@ -250,7 +250,7 @@ class BMLDefs
 		static XMLCh* ATTR_CONS_TARGET;
 		static XMLCh* ATTR_WRIST;
 		static XMLCh* ATTR_GRAB_TYPE;
-		static XMLCh* ATTR_GRAB_VELOCITY;
+		static XMLCh* ATTR_GRAB_SPEED;
 		static XMLCh* ATTR_GRAB_FINISH;
 		static XMLCh* ATTR_OBSTACLE;
 		static XMLCh* ATTR_GRAB_STATE;

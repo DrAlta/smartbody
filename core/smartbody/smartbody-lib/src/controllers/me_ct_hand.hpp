@@ -62,7 +62,8 @@ protected:
 	SrMat                 attachMat;
 
 public:
-	float                 grabVelocity;
+	float                 grabSpeed;
+	float                 jointSpeed;
 
 public:
 	MeCtHand(SkSkeleton* sk, SkJoint* wrist);

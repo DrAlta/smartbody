@@ -211,7 +211,7 @@ void ReachHandAction::reachPreCompleteAction( ReachStateData* rd )
 // 	}	
 // 	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:wrist=\"" + wristName + "\"sbm:grab-type=\"" + reachType + "\" sbm:grab-state=\"start\" target=\"" + targetName  + "\"/>";
 
-	cmd = generateGrabCmd(charName,targetName,"start",rd->reachType);
+	cmd = generateGrabCmd(charName,targetName,"start",rd->reachType, rd->grabSpeed);
 	sendReachEvent("reach",cmd);
 
 	cmd = "bml char " + charName + " reach-preComplete";
@@ -236,7 +236,7 @@ void ReachHandAction::reachCompleteAction( ReachStateData* rd )
 // 		wristName = "l_wrist";
  		reachType = "left";
  	}	
-	cmd = generateGrabCmd(charName,targetName,"reach",rd->reachType);
+	cmd = generateGrabCmd(charName,targetName,"reach",rd->reachType, rd->grabSpeed);
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:wrist=\"r_wrist\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:wrist=\"" + wristName + "\"sbm:grab-type=\"" + reachType + "\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
 
@@ -256,7 +256,7 @@ void ReachHandAction::reachNewTargetAction( ReachStateData* rd )
 	if (estate.getAttachedPawn())
 		return; // don't do any hand animation if there is a pawn attached
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"finish\"/>";
-	cmd = generateGrabCmd(charName,"","finish",rd->reachType);
+	cmd = generateGrabCmd(charName,"","finish",rd->reachType, rd->grabSpeed);
 	ReachTarget& rtarget = rd->reachTarget;
 	if (rtarget.targetHasGeometry())
 	{
@@ -279,7 +279,7 @@ void ReachHandAction::reachReturnAction( ReachStateData* rd )
 		return; // don't do any hand animation if there is a pawn attached
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"return\"/>";
 	
-	cmd = generateGrabCmd(charName,"","return",rd->reachType);
+	cmd = generateGrabCmd(charName,"","return",rd->reachType, rd->grabSpeed);
 	sendReachEvent("reach",cmd);
 
  	std::string reachType = "right";
@@ -321,7 +321,7 @@ void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 	std::string targetName = attachedPawn->getName();
 	std::string cmd;
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:source-joint=\"" + "r_wrist" + "\" sbm:attach-pawn=\"" + targetName + "\"/>";
-	cmd = generateAttachCmd(charName,targetName,rd->reachType);
+	cmd = generateAttachCmd(charName,targetName,rd->reachType, rd->grabSpeed);
 	LOG("   pawn attached: %s",targetName.c_str());
 	rd->curHandAction->sendReachEvent("reach",cmd);
 
@@ -344,7 +344,7 @@ void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
 
 	std::string charName = rd->charName;	
 	std::string cmd;
-	cmd = generateAttachCmd(charName,"",rd->reachType);
+	cmd = generateAttachCmd(charName,"",rd->reachType, rd->grabSpeed);
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:release-pawn=\"true\"/>";	
 	rd->curHandAction->sendReachEvent("reach",cmd);
 
@@ -368,7 +368,7 @@ void ReachHandAction::reachPreReturnAction( ReachStateData* rd )
 	ReachHandAction::reachNewTargetAction(rd);	
 }
 
-std::string ReachHandAction::generateGrabCmd( const std::string& charName, const std::string& targetName, const std::string& grabState, int type )
+std::string ReachHandAction::generateGrabCmd( const std::string& charName, const std::string& targetName, const std::string& grabState, int type, float grabSpeed )
 {
 	std::string wristName = "r_wrist";
 	std::string reachType = "right";
@@ -381,14 +381,19 @@ std::string ReachHandAction::generateGrabCmd( const std::string& charName, const
 	if (targetName != "")
 	{
 		targetStr = " target=\"" + targetName + "\"";
-	}		
+	}	
+	std::string grabStr = "";
+	if (grabSpeed > 0.0)
+	{
+		grabStr = " sbm:grab-speed=\"" + boost::lexical_cast<std::string>(grabSpeed) + "\"";
+	}
 	std::string cmd;
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:wrist=\"r_wrist\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
-	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:wrist=\"" + wristName + "\" sbm:grab-type=\"" + reachType + "\" sbm:grab-state=\""+ grabState + "\"" + targetStr + "/>";
+	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:wrist=\"" + wristName + "\" sbm:grab-type=\"" + reachType + "\" sbm:grab-state=\""+ grabState + "\"" + targetStr + grabStr + "/>";
 	return cmd;
 }
 
-std::string ReachHandAction::generateAttachCmd( const std::string& charName, const std::string& targetName, int type )
+std::string ReachHandAction::generateAttachCmd( const std::string& charName, const std::string& targetName, int type, float grabSpeed )
 {
 	std::string wristName = "r_wrist";
 	std::string reachType = "right";
@@ -404,9 +409,16 @@ std::string ReachHandAction::generateAttachCmd( const std::string& charName, con
 	}	
 	else
 		targetStr = " sbm:release-pawn=\"true\"";
+
+	std::string grabStr = "";
+	if (grabSpeed > 0.0)
+	{
+		grabStr = " sbm:grab-speed=\"" + boost::lexical_cast<std::string>(grabSpeed) + "\"";
+	}
+
 	std::string cmd;
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:wrist=\"r_wrist\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
-	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:source-joint=\"" + wristName + "\" sbm:grab-type=\"" + reachType + "\"" + targetStr + "/>";
+	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:source-joint=\"" + wristName + "\" sbm:grab-type=\"" + reachType + "\"" + targetStr + grabStr + "/>";
 	return cmd;
 }
 
@@ -518,7 +530,7 @@ void ReachHandPointAction::reachPreCompleteAction( ReachStateData* rd )
 		return; // don't do any hand animation if there is a pawn attached
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"return\"/>";
 
-	cmd = generateGrabCmd(charName,"","point",rd->reachType);
+	cmd = generateGrabCmd(charName,"","point",rd->reachType, rd->grabSpeed);
 	sendReachEvent("reach",cmd);
 
 	cmd = "bml char " + charName + " reach-preComplete";
@@ -548,6 +560,7 @@ ReachStateData::ReachStateData()
 	curHandAction = NULL;
 
 	linearVel = 70.f;
+	grabSpeed = 50.f;
 }
 
 ReachStateData::~ReachStateData()
