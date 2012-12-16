@@ -104,8 +104,8 @@
 #include <sb/SBMotion.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBJointMapManager.h>
-#include "SbmDebuggerServer.h"
-#include "SbmDebuggerClient.h"
+#include <sb/SBDebuggerServer.h>
+#include <sb/SBDebuggerClient.h>
 #include <controllers/me_ct_param_animation_utilities.h>
 #include <controllers/me_ct_param_animation_data.h>
 #include <sbm/MiscCommands.h>

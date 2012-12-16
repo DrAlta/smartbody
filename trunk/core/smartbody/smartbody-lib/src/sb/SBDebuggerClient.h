@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "NetRequest.h"
+#include "sbm/NetRequest.h"
 
 class SBDebuggerClient
 {

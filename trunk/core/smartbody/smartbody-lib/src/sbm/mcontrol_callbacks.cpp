@@ -83,8 +83,8 @@
 #include <sb/SBAnimationState.h>
 #include <sb/SBMotion.h>
 #include <math.h>
-#include <sbm/SBDebuggerServer.h>
-#include <sbm/SBDebuggerClient.h>
+#include <sb/SBDebuggerServer.h>
+#include <sb/SBDebuggerClient.h>
 
 
 #include <controllers/me_ct_motion_player.h>

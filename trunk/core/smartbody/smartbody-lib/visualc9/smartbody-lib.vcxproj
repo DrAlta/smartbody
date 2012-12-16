@@ -268,14 +268,14 @@
     <ClCompile Include="..\src\sbm\Resource.cpp" />
     <ClCompile Include="..\src\sbm\resource_cmds.cpp" />
     <ClCompile Include="..\src\sbm\ResourceManager.cpp" />
-    <ClCompile Include="..\src\sbm\SBDebuggerClient.cpp" />
-    <ClCompile Include="..\src\sbm\SBDebuggerServer.cpp" />
-    <ClCompile Include="..\src\sbm\SBDebuggerUtility.cpp" />
     <ClCompile Include="..\src\sbm\sbm_speech_impl_skeleton.cpp" />
     <ClCompile Include="..\src\sb\SBAnimationTransitionRule.cpp" />
     <ClCompile Include="..\src\sb\SBBehaviorSet.cpp" />
     <ClCompile Include="..\src\sb\SBBehaviorSetManager.cpp" />
     <ClCompile Include="..\src\sb\SBBoneBusManager.cpp" />
+    <ClCompile Include="..\src\sb\SBDebuggerClient.cpp" />
+    <ClCompile Include="..\src\sb\SBDebuggerServer.cpp" />
+    <ClCompile Include="..\src\sb\SBDebuggerUtility.cpp" />
     <ClCompile Include="..\src\sb\SBJointMap.cpp" />
     <ClCompile Include="..\src\sb\SBJointMapManager.cpp" />
     <ClCompile Include="..\src\sbm\sbm_audio.cpp" />
@@ -715,9 +715,6 @@
     <ClInclude Include="..\src\sbm\Resource.h" />
     <ClInclude Include="..\src\sbm\resource_cmds.h" />
     <ClInclude Include="..\src\sbm\ResourceManager.h" />
-    <ClInclude Include="..\src\sbm\SBDebuggerClient.h" />
-    <ClInclude Include="..\src\sbm\SBDebuggerServer.h" />
-    <ClInclude Include="..\src\sbm\SBDebuggerUtility.h" />
     <ClInclude Include="..\src\sbm\sbm_audio.h" />
     <ClInclude Include="..\src\sbm\sbm_character.hpp" />
     <ClInclude Include="..\src\sbm\sbm_constants.h" />
@@ -729,6 +726,9 @@
     <ClInclude Include="..\src\sbm\sbm_test_cmds.hpp" />
     <ClInclude Include="..\src\sb\SBAnimationTransitionRule.h" />
     <ClInclude Include="..\src\sb\SBBoneBusManager.h" />
+    <ClInclude Include="..\src\sb\SBDebuggerClient.h" />
+    <ClInclude Include="..\src\sb\SBDebuggerServer.h" />
+    <ClInclude Include="..\src\sb\SBDebuggerUtility.h" />
     <ClInclude Include="..\src\sb\SBJointMap.h" />
     <ClInclude Include="..\src\sb\SBJointMapManager.h" />
     <ClInclude Include="..\src\sbm\sr_arg_buff.h" />

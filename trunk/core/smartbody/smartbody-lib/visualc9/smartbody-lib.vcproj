@@ -616,30 +616,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SbmDebuggerClient.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SbmDebuggerClient.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SbmDebuggerServer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SbmDebuggerServer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SbmDebuggerUtility.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SbmDebuggerUtility.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\sr_arg_buff.cpp"
 				>
 			</File>
@@ -3685,6 +3661,30 @@
 			</File>
 			<File
 				RelativePath="..\src\sb\SBController.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBDebuggerClient.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBDebuggerClient.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBDebuggerServer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBDebuggerServer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBDebuggerUtility.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBDebuggerUtility.h"
 				>
 			</File>
 			<File
