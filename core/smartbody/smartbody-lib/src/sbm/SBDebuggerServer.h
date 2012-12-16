@@ -7,7 +7,7 @@ namespace SmartBody { class SBScene; }
 namespace SmartBody { class SBJoint; }
 
 
-class SbmDebuggerServer
+class SBDebuggerServer
 {
 private:
    std::vector<std::string> m_processIdList;
@@ -33,8 +33,8 @@ public:
 
 
 public:
-   SbmDebuggerServer();
-   virtual ~SbmDebuggerServer();
+   SBDebuggerServer();
+   virtual ~SBDebuggerServer();
 
    void Init();
    void Close();

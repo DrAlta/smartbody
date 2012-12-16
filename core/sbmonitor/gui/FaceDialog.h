@@ -3,7 +3,7 @@
 
 #include "ui_FaceDialog.h"
 #include "SbmDebuggerCommon.h"
-#include "SbmDebuggerClient.h"
+#include "SBDebuggerClient.h"
 
 #include <QtGui>
 #include <QWidget>
@@ -20,11 +20,11 @@ class FaceDialog : public QDialog
    Q_OBJECT
 
 public:
-   FaceDialog(SbmDebuggerClient* client, QWidget* parent = 0);
+   FaceDialog(SBDebuggerClient* client, QWidget* parent = 0);
    ~FaceDialog();
    void AddFacialExpression(const string& name, double weight);
    Ui::FaceDialog ui;
-   SbmDebuggerClient* m_client;
+   SBDebuggerClient* m_client;
 
    // used for storage until the sides ("left", "right", "both") of the au's are obtained
    vector<string> m_AUNums;

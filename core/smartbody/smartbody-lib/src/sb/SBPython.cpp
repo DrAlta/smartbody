@@ -1508,6 +1508,8 @@ boost::python::class_<SBReach>("SBReach")
 
 
 	boost::python::class_<SBScene, boost::python::bases<SBObject> >("SBScene")
+		.def("setProcessId", &SBScene::setProcessId, "Sets the process id of the SmartBody instance.")
+		.def("getProcessId", &SBScene::getProcessId,  boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the process id of the SmartBody instance.")
 		.def("createCharacter", &SBScene::createCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new character given character name. \n Input: character name \nOutput: character object")
 		.def("createPawn", &SBScene::createPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new pawn.")
 		.def("createFaceDefinition", &SBScene::createFaceDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new face definition with a given name.")

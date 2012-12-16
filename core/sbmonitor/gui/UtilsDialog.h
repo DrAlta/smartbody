@@ -7,7 +7,7 @@
 
 #include "ui_UtilsDialog.h"
 #include "ui_SbmDebuggerForm.h"
-#include "SbmDebuggerClient.h"
+#include "SBDebuggerClient.h"
 
 class Scene;
 class GLWidget;
@@ -20,14 +20,14 @@ class UtilsDialog : public QObject
    Q_OBJECT
 
 public:
-   UtilsDialog(SbmDebuggerClient* client, GLWidget* pRenderView, Ui::MainWindow& ui);
+   UtilsDialog(SBDebuggerClient* client, GLWidget* pRenderView, Ui::MainWindow& ui);
    ~UtilsDialog();
    vector<string> m_animations;
    Ui::MainWindow ui;
 
 private:
    std::string GetSelectedChar();
-   SbmDebuggerClient* m_client;
+   SBDebuggerClient* m_client;
    Scene* m_pScene;
    GLWidget* m_pRenderView;
 

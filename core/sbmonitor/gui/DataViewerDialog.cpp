@@ -6,7 +6,7 @@ using vhcl::Vector4;
 //callbacks
 bool GetStringList(void* caller, NetRequest* req);
 
-DataViewerDialog::DataViewerDialog(SbmDebuggerClient* client, QWidget* parent) : QDialog(parent)
+DataViewerDialog::DataViewerDialog(SBDebuggerClient* client, QWidget* parent) : QDialog(parent)
 {
    m_client = client;
    m_pScene = m_client->GetScene();

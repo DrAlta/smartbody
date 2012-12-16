@@ -2,8 +2,8 @@
 #include "vhcl_socket.h"
 
 #include "NetRequest.h"
-#include "SbmDebuggerUtility.h"
-#include "SbmDebuggerClient.h"
+#include "SBDebuggerUtility.h"
+#include "SBDebuggerClient.h"
 
 #include <sb/SBScene.h>
 #include <sb/SBMotion.h>
@@ -17,24 +17,24 @@
 
 bool QueryResourcesCB(void* caller, NetRequest* req);
 
-SbmDebuggerUtility::SbmDebuggerUtility()
+SBDebuggerUtility::SBDebuggerUtility()
 {
 }
 
-SbmDebuggerUtility::~SbmDebuggerUtility()
+SBDebuggerUtility::~SBDebuggerUtility()
 {
 }
 
 
-void SbmDebuggerUtility::initScene()
+void SBDebuggerUtility::initScene()
 {
 	
 }
 
-void SbmDebuggerUtility::queryResources()
+void SBDebuggerUtility::queryResources()
 {
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
-	SbmDebuggerClient* client = sbScene->getDebuggerClient();
+	SBDebuggerClient* client = sbScene->getDebuggerClient();
 	if (!client)
 		return;
 
@@ -60,7 +60,7 @@ void SbmDebuggerUtility::queryResources()
 /*
 	Init character given serialized skeleton information
 */
-void SbmDebuggerUtility::initCharacter(const std::string& name, const std::string& skelName)
+void SBDebuggerUtility::initCharacter(const std::string& name, const std::string& skelName)
 {
 	if (name == "")
 	{
@@ -88,7 +88,7 @@ void SbmDebuggerUtility::initCharacter(const std::string& name, const std::strin
 	sbCharacter->setSkeleton(copySbSkeleton);	
 }
 
-void SbmDebuggerUtility::initCharacterFaceDefinition(const std::string& characterName, const std::string& faceDefName, const std::string& message)
+void SBDebuggerUtility::initCharacterFaceDefinition(const std::string& characterName, const std::string& faceDefName, const std::string& message)
 {
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
 	SBCharacter* sbCharacter = sbScene->getCharacter(characterName);
@@ -102,7 +102,7 @@ void SbmDebuggerUtility::initCharacterFaceDefinition(const std::string& characte
 	sbCharacter->setFaceDefinition(faceDef);
 }
 
-void SbmDebuggerUtility::initPawn(const std::string& name)
+void SBDebuggerUtility::initPawn(const std::string& name)
 {
 	SBPawn* sbPawn = SmartBody::SBScene::getScene()->createPawn(name);
 }
@@ -113,12 +113,12 @@ void SbmDebuggerUtility::initPawn(const std::string& name)
 	- Init transition
 	- Init face definition
 */
-void SbmDebuggerUtility::runPythonCommand(const std::string& info)
+void SBDebuggerUtility::runPythonCommand(const std::string& info)
 {
 	mcuCBHandle::singleton().executePython(info.c_str());
 }
 
-void SbmDebuggerUtility::initSkeleton(const std::string& skFileName, const std::string& info)
+void SBDebuggerUtility::initSkeleton(const std::string& skFileName, const std::string& info)
 {
 	SrInput input(info.c_str());
 	SBSkeleton* sbSkel = new SBSkeleton();
@@ -129,7 +129,7 @@ void SbmDebuggerUtility::initSkeleton(const std::string& skFileName, const std::
 }
 
 
-void SbmDebuggerUtility::updateCharacter(const std::string& cName, const std::string& jName, 
+void SBDebuggerUtility::updateCharacter(const std::string& cName, const std::string& jName, 
 										 float& posX, float& posY, float& posZ, 
 										 float& rotX, float& rotY, float& rotZ, float& rotW)
 {
@@ -149,7 +149,7 @@ void SbmDebuggerUtility::updateCharacter(const std::string& cName, const std::st
 	}
 }
 
-void SbmDebuggerUtility::updatePawn(const std::string& pName, float& posX, float& posY, float& posZ, 
+void SBDebuggerUtility::updatePawn(const std::string& pName, float& posX, float& posY, float& posZ, 
 									float& rotX, float& rotY, float& rotZ, float& rotW)
 {
 	SBPawn* sbPawn  = SmartBody::SBScene::getScene()->getPawn(pName);
@@ -167,7 +167,7 @@ void SbmDebuggerUtility::updatePawn(const std::string& pName, float& posX, float
 	}
 }
 
-void SbmDebuggerUtility::updateCamera(float& eyePosX, float& eyePosY, float& eyePosZ, 
+void SBDebuggerUtility::updateCamera(float& eyePosX, float& eyePosY, float& eyePosZ, 
 									  float& lookAtPosX, float& lookAtPosY, float& lookAtPosZ, 
 									  float& fovY, float& aspect, float& zNear, float zFar)
 {

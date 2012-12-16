@@ -2,7 +2,7 @@
 #include "vhcl.h"
 #include "vhmsg-tt.h"
 
-CommandDialog::CommandDialog(SbmDebuggerClient* client, QWidget *parent) : QDialog(parent)
+CommandDialog::CommandDialog(SBDebuggerClient* client, QWidget *parent) : QDialog(parent)
 {
    m_client = client;
    ui.setupUi(this);

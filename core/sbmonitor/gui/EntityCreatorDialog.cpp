@@ -4,7 +4,7 @@
 
 bool GetSkeletonNamesCB(void* caller, NetRequest* req);
 
-EntityCreatorDialog::EntityCreatorDialog(SbmDebuggerClient* client, QWidget* parent) : QDialog(parent)
+EntityCreatorDialog::EntityCreatorDialog(SBDebuggerClient* client, QWidget* parent) : QDialog(parent)
 {
    ui.setupUi(this);
 

@@ -2,7 +2,7 @@
 #include "vhcl.h"
 #include "vhcl_socket.h"
 
-#include "SbmDebuggerServer.h"
+#include "SBDebuggerServer.h"
 
 #include <stdio.h>
 
@@ -19,7 +19,7 @@ using std::string;
 using std::vector;
 
 
-SbmDebuggerServer::SbmDebuggerServer()
+SBDebuggerServer::SBDebuggerServer()
 {
    m_sbmFriendlyName = "sbm";
    m_connectResult = false;
@@ -30,7 +30,7 @@ SbmDebuggerServer::SbmDebuggerServer()
 }
 
 
-SbmDebuggerServer::~SbmDebuggerServer()
+SBDebuggerServer::~SBDebuggerServer()
 {
 }
 
@@ -41,7 +41,7 @@ vhcl::socket_t m_sockTCP;
 vector< vhcl::socket_t > m_sockConnectionsTCP;
 
 
-void SbmDebuggerServer::Init()
+void SBDebuggerServer::Init()
 {
    bool ret = vhcl::SocketStartup();
    if (!ret)
@@ -107,7 +107,7 @@ void SbmDebuggerServer::Init()
    //return true;
 }
 
-void SbmDebuggerServer::Close()
+void SBDebuggerServer::Close()
 {
    if ( m_sockTCP )
    {
@@ -118,18 +118,18 @@ void SbmDebuggerServer::Close()
    vhcl::SocketShutdown();
 }
 
-void SbmDebuggerServer::SetID(const std::string & id)
+void SBDebuggerServer::SetID(const std::string & id)
 {
    m_sbmFriendlyName = id;
    m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
 }
 
-const std::string& SbmDebuggerServer::GetID()
+const std::string& SBDebuggerServer::GetID()
 {
 	return m_fullId;
 }
 
-void SbmDebuggerServer::Update()
+void SBDebuggerServer::Update()
 {
    if (m_updateFrequencyS > 0)
    {
@@ -291,7 +291,7 @@ void SbmDebuggerServer::Update()
 }
 
 
-void SbmDebuggerServer::GenerateInitHierarchyMsg(SBJoint * root, string & msg, int tab)
+void SBDebuggerServer::GenerateInitHierarchyMsg(SBJoint * root, string & msg, int tab)
 {
    string name = root->getName();
    float posx = root->offset().x;
@@ -312,7 +312,7 @@ void SbmDebuggerServer::GenerateInitHierarchyMsg(SBJoint * root, string & msg, i
 }
 
 
-void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
+void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 {
    string message = string(op) + " " + string(args);
    vector<string> split;
@@ -322,7 +322,7 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
    {
       if (split[0] == "sbmdebugger")
       {
-         //LOG("SbmDebuggerServer::ProcessVHMsgs() - %s", message.c_str());
+         //LOG("SBDebuggerServer::ProcessVHMsgs() - %s", message.c_str());
 
          if (split.size() > 1)
          {
@@ -472,7 +472,7 @@ void SbmDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
             }
             else if (split[1] == "queryids")
             {
-               LOG("SbmDebuggerServer::ProcessVHMsgs() - queryids");
+               LOG("SBDebuggerServer::ProcessVHMsgs() - queryids");
 
                vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s id", m_fullId.c_str()).c_str());
             }

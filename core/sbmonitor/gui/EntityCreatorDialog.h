@@ -2,20 +2,20 @@
 #define ENTITY_CREATOR_DIALOG_H_
 
 #include "ui_EntityCreatorDialog.h"
-#include "SbmDebuggerClient.h"
+#include "SBDebuggerClient.h"
 
 class EntityCreatorDialog : public QDialog
 {
    Q_OBJECT
 
 public:
-   EntityCreatorDialog(SbmDebuggerClient* client, QWidget* parent = 0);
+   EntityCreatorDialog(SBDebuggerClient* client, QWidget* parent = 0);
    ~EntityCreatorDialog();
    Ui::EntityCreator ui;
 
 private:
    std::string GetSelectedChar();
-   SbmDebuggerClient* m_client;
+   SBDebuggerClient* m_client;
    Scene* m_pScene;
 
 private slots:

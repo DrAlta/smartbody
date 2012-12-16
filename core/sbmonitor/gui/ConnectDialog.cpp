@@ -4,14 +4,14 @@
 #include "ConnectDialog.h"
 
 #include "vhmsg-tt.h"
-#include "SBMDebuggerClient.h"
+#include "SBDebuggerClient.h"
 
 
 using std::vector;
 using std::string;
 
 
-extern SbmDebuggerClient c;
+extern SBDebuggerClient c;
 
 
 ConnectDialog::ConnectDialog(QWidget *parent)

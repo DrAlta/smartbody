@@ -74,8 +74,8 @@
 #include <sb/SBPython.h>
 #include <sb/SBSteerManager.h>
 #include "FLTKListener.h"
-#include <sbm/SbmDebuggerServer.h>
-#include <sbm/SbmDebuggerClient.h>
+#include <sbm/SBDebuggerServer.h>
+#include <sbm/SBDebuggerClient.h>
 
 #if USE_OGRE_VIEWER > 0
 #include "FLTKOgreViewer.h"

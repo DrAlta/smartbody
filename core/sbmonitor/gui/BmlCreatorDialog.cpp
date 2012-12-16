@@ -4,7 +4,7 @@
 
 static const QString UnSelected = "-----";
 
-BmlCreatorDialog::BmlCreatorDialog(SbmDebuggerClient* client, QWidget *parent)
+BmlCreatorDialog::BmlCreatorDialog(SBDebuggerClient* client, QWidget *parent)
 {
    m_client = client;
    m_pScene = client->GetScene();

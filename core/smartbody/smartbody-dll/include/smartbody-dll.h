@@ -22,12 +22,12 @@
 class SmartbodyListener
 {
    public:
-      virtual void OnCharacterCreate( const std::string& name, const std::string& objectClass ) {}
-      virtual void OnCharacterDelete( const std::string& name ) {}
-      virtual void OnCharacterChanged( const std::string& name ) {}
-      virtual void OnPawnCreate( const std::string& name ) {}
-      virtual void OnViseme( const std::string& name, const std::string& visemeName, const float weight, const float blendTime ) {}
-      virtual void OnChannel( const std::string& name, const std::string& channelName, const float value ) {}
+      SMARTBODY_DLL_API virtual void OnCharacterCreate( const std::string& name, const std::string& objectClass ) {}
+      SMARTBODY_DLL_API virtual void OnCharacterDelete( const std::string& name ) {}
+      SMARTBODY_DLL_API virtual void OnCharacterChanged( const std::string& name ) {}
+      SMARTBODY_DLL_API virtual void OnPawnCreate( const std::string& name ) {}
+      SMARTBODY_DLL_API virtual void OnViseme( const std::string& name, const std::string& visemeName, const float weight, const float blendTime ) {}
+      SMARTBODY_DLL_API virtual void OnChannel( const std::string& name, const std::string& channelName, const float value ) {}
 };
 
 
@@ -64,7 +64,7 @@ class SmartbodyCharacter
 
 
 class Smartbody_dll_SBMCharacterListener_Internal;
-class SbmDebuggerServer;
+class SBDebuggerServer;
 
 class Smartbody_dll
 {

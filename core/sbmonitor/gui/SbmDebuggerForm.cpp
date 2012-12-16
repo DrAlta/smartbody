@@ -3,7 +3,7 @@
 #include "SbmDebuggerForm.h"
 
 #include "vhmsg-tt.h"
-#include "SbmDebuggerClient.h"
+#include "SBDebuggerClient.h"
 
 #include "SettingsDialog.h"
 #include "ResourceDialog.h"
@@ -18,7 +18,7 @@ using std::vector;
 using std::string;
 
 
-SbmDebuggerClient c;
+SBDebuggerClient c;
 
 bool GetSceneScale(void* caller, NetRequest* req);
 

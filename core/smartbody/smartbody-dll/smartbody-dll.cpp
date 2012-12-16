@@ -15,21 +15,15 @@
 #pragma warning(push)
 #pragma warning(disable:4121)  // needed for boost::python::extract<std::string>() below
 #include "sb/SBScene.h"
-#include "sbm/xercesc_utils.hpp"
 #include "sbm/mcontrol_util.h"
-#include "sbm/mcontrol_callbacks.h"
-#include "sbm/sbm_character.hpp"
-#include "sbm/sbm_test_cmds.hpp"
-#include "sbm/resource_cmds.h"
-#include "sbm/locomotion_cmds.hpp"
-#include "sbm/sbm_audio.h"
 #include "sb/SBPython.h"
 #include "sb/SBCharacter.h"
 #include "sb/SBSkeleton.h"
+#include "sb/SBSimulationManager.h"
 #pragma warning(pop)
 
 
-#include "sbm/SbmDebuggerServer.h"
+#include "sbm/SBDebuggerServer.h"
 
 
 using std::string;
@@ -156,34 +150,24 @@ SMARTBODY_DLL_API Smartbody_dll::~Smartbody_dll()
 
 SMARTBODY_DLL_API void Smartbody_dll::SetSpeechAudiofileBasePath( const std::string & basePath )
 {
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
-   SBScene * scene = mcu._scene;
+   SBScene * scene = SmartBody::SBScene::getScene();
 
-   // TODO: need a scene->clearAssetPath("audio");
-   // TODO: need a scene->setPathPrefix(??);
-
-   // clear the old audio path list
-   mcu.audio_paths = srPathList();
-   mcu.audio_paths.setPathPrefix(mcu.getMediaPath());
+   scene->removeAllAssetPaths("audio");
    scene->addAssetPath("audio", basePath);
 }
 
 SMARTBODY_DLL_API void Smartbody_dll::SetProcessId( const std::string & processId )
 {
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
-   SBScene * scene = mcu._scene;
-
-   // TODO: need a scene->setProcessId(processId);
-   scene;
-   mcu.set_process_id( processId.c_str() );
+   SBScene * scene = SmartBody::SBScene::getScene();
+	
+   scene->setProcessId(processId);
 }
 
 
 SMARTBODY_DLL_API void Smartbody_dll::SetMediaPath( const std::string & path )
 {
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
-   SBScene * scene = mcu._scene;
-   scene->setMediaPath(path);
+  SBScene * scene = SmartBody::SBScene::getScene();
+  scene->setMediaPath(path);
 }
 
 
@@ -307,14 +291,12 @@ SMARTBODY_DLL_API void Smartbody_dll::SetListener( SmartbodyListener * listener 
 
 SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
 {
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
-   SBScene * scene = mcu._scene;
-
-   // TODO: replace with SBScene->getSimulationManager()?
-   scene;
-   bool update_sim = mcu.update_timer( timeInSeconds );
-   if( update_sim ) mcu.update();
-   return true;
+	SBScene * scene = SmartBody::SBScene::getScene();
+	SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
+	sim->setTime(timeInSeconds);
+	sim->update();
+   
+	return true;
 }
 
 
@@ -354,8 +336,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerRendererRightHanded( bool enabl
 
 SMARTBODY_DLL_API bool Smartbody_dll::ProcessVHMsgs( const char * op, const char * args )
 {
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
-   SBScene * scene = mcu._scene;
+	SBScene * scene = SmartBody::SBScene::getScene();
 
    string s = string(op) + string(" ") + string(args);
    scene->command( s.c_str() );
@@ -367,28 +348,20 @@ SMARTBODY_DLL_API bool Smartbody_dll::ProcessVHMsgs( const char * op, const char
 
 SMARTBODY_DLL_API bool Smartbody_dll::ExecutePython( const char * command )
 {
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
-   int ret = mcu.executePython(command);
-   if (ret == CMD_SUCCESS)
-      return true;
-   else
-      return false;
+	SBScene * scene = SmartBody::SBScene::getScene();
+	return scene->run(command);
 }
-
-
 
 SMARTBODY_DLL_API int Smartbody_dll::GetNumberOfCharacters()
 {
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
-   SBScene * scene = mcu._scene;
-   return scene->getNumCharacters();
+  SBScene * scene = SmartBody::SBScene::getScene();
+  return scene->getNumCharacters();
 }
 
 
 SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string & name )
 {
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
-   SBScene * scene = mcu._scene;
+	SBScene * scene = SmartBody::SBScene::getScene();
 
    SBCharacter * char_p = scene->getCharacter(name);
    if ( char_p )
@@ -528,10 +501,10 @@ bool Smartbody_dll::InitVHMsg()
 SMARTBODY_DLL_API bool Smartbody_dll::PythonCommandVoid( const std::string & command )
 {
 #if USE_SBPYTHON
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
-   return mcu.executePython(command.c_str()) == 1 ? true : false;
+	SBScene * scene = SmartBody::SBScene::getScene();
+	return scene->run(command) == 1 ? true : false;
 #else
-   return false;
+	return false;
 #endif
 }
 

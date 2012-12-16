@@ -3,7 +3,7 @@
 
 #include "ui_BMLCreatorDialog.h"
 #include "SbmDebuggerCommon.h"
-#include "SbmDebuggerClient.h"
+#include "SBDebuggerClient.h"
 
 using std::string;
 
@@ -13,7 +13,7 @@ class BmlCreatorDialog : public QDialog
 
 public:
 
-   BmlCreatorDialog(SbmDebuggerClient* client, QWidget *parent = 0);
+   BmlCreatorDialog(SBDebuggerClient* client, QWidget *parent = 0);
    ~BmlCreatorDialog();
 
    Ui::BMLCreator ui;
@@ -32,7 +32,7 @@ public slots:
    void ChangedTab(int currTab);
 
 private:
-   SbmDebuggerClient* m_client;
+   SBDebuggerClient* m_client;
    Scene* m_pScene;
 
    void BuildConnections(QObject* widget);
