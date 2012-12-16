@@ -770,15 +770,15 @@ SbmGeomObject* SbmPawn::getGeomObject()
 // }
 
 
-SbmPhysicsObj* SbmPawn::getPhysicsObject()
+SBPhysicsObj* SbmPawn::getPhysicsObject()
 {
-	SbmPhysicsSim* phyEngine = SbmPhysicsSim::getPhysicsEngine();
+	SBPhysicsSim* phyEngine = SBPhysicsSim::getPhysicsEngine();
 	return phyEngine->getPhysicsPawn(getName());	
 }
 
 void SbmPawn::updateToColObject()
 {
-	SbmPhysicsObj* phyObj = getPhysicsObject();
+	SBPhysicsObj* phyObj = getPhysicsObject();
 	if (phyObj)
 	{
 		SRT newWorldState; 

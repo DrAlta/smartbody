@@ -706,16 +706,7 @@
     <ClCompile Include="..\src\sbm\sbm_test_cmds.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\Physics\SbmColObject.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\GPU\SbmDeformableMeshGPU.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\Physics\SbmPhysicsSim.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\Physics\SbmPhysicsSimODE.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\GPU\SbmShader.cpp">
@@ -990,6 +981,15 @@
     </ClCompile>
     <ClCompile Include="..\src\external\parser\Field.cpp">
       <Filter>external\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\Physics\SBPhysicsSim.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\Physics\SBPhysicsSimODE.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\Physics\SBColObject.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1695,16 +1695,7 @@
     <ClInclude Include="..\src\sbm\ResourceManager.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\Physics\SbmColObject.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\GPU\SbmDeformableMeshGPU.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\Physics\SbmPhysicsSim.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\Physics\SbmPhysicsSimODE.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\GPU\SbmShader.h">
@@ -2027,6 +2018,15 @@
     </ClInclude>
     <ClInclude Include="..\src\external\parser\Field.h">
       <Filter>external\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\Physics\SBPhysicsSim.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\Physics\SBPhysicsSimODE.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\Physics\SBColObject.h">
+      <Filter>sbm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

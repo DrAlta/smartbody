@@ -4,8 +4,8 @@
 #include <sb/SBTypes.h>
 #include <sb/SBService.h>
 
-class SbmPhysicsSim;
-class SbmPhysicsSimODE;
+class SBPhysicsSim;
+class SBPhysicsSimODE;
 
 namespace SmartBody {
 
@@ -24,7 +24,7 @@ class SBPhysicsManager : public SBService
 		SBAPI virtual void afterUpdate(double time);
 		SBAPI virtual void stop();
 
-		SBAPI SbmPhysicsSim* getPhysicsEngine();
+		SBAPI SBPhysicsSim* getPhysicsEngine();
 				
 		SBAPI SmartBody::SBObject* createPhysicsCharacter(std::string charName);
 		SBAPI SmartBody::SBObject* createPhysicsPawn(std::string pawnName, std::string geomType, SrVec geomSize);
@@ -40,7 +40,7 @@ class SBPhysicsManager : public SBService
 
 
 	protected:
-		SbmPhysicsSimODE* _ode;
+		SBPhysicsSimODE* _ode;
 		double            physicsTime;
 		void updatePhysicsCharacter(std::string charName);
 		void updatePhysicsPawn(std::string pawnName);

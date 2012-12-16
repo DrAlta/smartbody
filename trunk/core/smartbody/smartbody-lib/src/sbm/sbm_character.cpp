@@ -551,15 +551,15 @@ void SbmCharacter::setJointCollider( std::string jointName, float len, float rad
 	SkJoint* joint = _skeleton->search_joint(jointName.c_str());
 	if (!joint || joint->parent() == 0)
 		return;
-	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	SBPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
 	if (!phySim)
 		return;
 
-	std::map<std::string, SbmPhysicsObj*>::iterator mi = jointPhyObjMap.find(jointName);
+	std::map<std::string, SBPhysicsObj*>::iterator mi = jointPhyObjMap.find(jointName);
 	// clean up first
 	if (mi != jointPhyObjMap.end())
 	{
-		SbmPhysicsObj* phyObj = mi->second;		
+		SBPhysicsObj* phyObj = mi->second;		
 		SbmGeomObject* geomObj = phyObj->getColObj();		
 		phySim->removePhysicsObj(phyObj);
 		delete geomObj;
@@ -579,7 +579,7 @@ void SbmCharacter::setJointCollider( std::string jointName, float len, float rad
 
 	// generate new geometry
 	SbmGeomObject* newGeomObj = new SbmGeomCapsule(center-dir*len*0.5f, center+dir*len*0.5f,radius);
-	SbmPhysicsObj* jointPhy = phySim->createPhyObj();	
+	SBPhysicsObj* jointPhy = phySim->createPhyObj();	
 	jointPhy->setGeometry(newGeomObj,10.f);	
 	phySim->addPhysicsObj(jointPhy);
 	phySim->updatePhyObjGeometry(jointPhy);		

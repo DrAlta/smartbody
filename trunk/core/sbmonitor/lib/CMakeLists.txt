@@ -11,8 +11,8 @@ include_directories( "../../../lib/vhmsg/vhmsg-c/include" )
 
 set( SBM_DEBUGGER_LIB_SRC
 
-	SbmDebuggerCommon.cpp
-	SbmDebuggerClient.cpp
+	SBDebuggerCommon.cpp
+	SBDebuggerClient.cpp
 
 )
 

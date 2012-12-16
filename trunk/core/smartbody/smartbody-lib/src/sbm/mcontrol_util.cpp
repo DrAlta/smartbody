@@ -94,7 +94,7 @@
 
 
 #include "sbm_deformable_mesh.h"
-#include "sbm/Physics/SbmPhysicsSimODE.h"
+#include "sbm/Physics/SBPhysicsSimODE.h"
 #include <sbm/locomotion_cmds.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <sb/SBBoneBusManager.h>
@@ -309,7 +309,7 @@ mcuCBHandle::mcuCBHandle()
 	SmartBody::SBFaceDefinition* faceDefinition = new SmartBody::SBFaceDefinition();
 	faceDefinition->setName("_default_");
 	face_map["_default_"] = faceDefinition;
-	//physicsEngine = new SbmPhysicsSimODE();
+	//physicsEngine = new SBPhysicsSimODE();
 	//physicsEngine->initSimulation();
 	_scene = new SmartBody::SBScene();
 
@@ -1205,7 +1205,7 @@ void mcuCBHandle::update( void )
 		pawn->ct_tree_p->evaluate( time );
 		pawn->ct_tree_p->applyBufferToAllSkeletons();
 
-// 		if (pawn->hasPhysicsSim() && SbmPhysicsSim::getPhysicsEngine()->getBoolAttribute("enable"))
+// 		if (pawn->hasPhysicsSim() && SBPhysicsSim::getPhysicsEngine()->getBoolAttribute("enable"))
 // 		{
 // 			//pawn->updateFromColObject();
 // 		}

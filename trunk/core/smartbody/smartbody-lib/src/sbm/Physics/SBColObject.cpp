@@ -1,7 +1,7 @@
-#include "SbmColObject.h"
-#include "SbmPhysicsSim.h"
+#include "SBColObject.h"
+#include "SBPhysicsSim.h"
 #include <sbm/gwiz_math.h>
-#include "SbmPhysicsSimODE.h"
+#include "SBPhysicsSimODE.h"
 #include <ode/collision.h>
 #include <sb/SBCollisionManager.h>
 #include <sb/SBScene.h>
@@ -532,11 +532,11 @@ bool SbmCollisionUtil::checkIntersection( SbmGeomObject* obj1, SbmGeomObject* ob
 
 void SbmCollisionUtil::collisionDetection( SbmGeomObject* obj1, SbmGeomObject* obj2, std::vector<SbmGeomContact>& contactPts )
 {
-	dGeomID odeGeom1 = SbmPhysicsSimODE::createODERawGeometry(obj1);
-	dGeomID odeGeom2 = SbmPhysicsSimODE::createODERawGeometry(obj2);
+	dGeomID odeGeom1 = SBPhysicsSimODE::createODERawGeometry(obj1);
+	dGeomID odeGeom2 = SBPhysicsSimODE::createODERawGeometry(obj2);
 
-	SbmPhysicsSimODE::updateODEGeometryTransform(obj1,odeGeom1);
-	SbmPhysicsSimODE::updateODEGeometryTransform(obj2,odeGeom2);
+	SBPhysicsSimODE::updateODEGeometryTransform(obj1,odeGeom1);
+	SBPhysicsSimODE::updateODEGeometryTransform(obj2,odeGeom2);
 
 	const int N = 1;
 	dContact contact[N];

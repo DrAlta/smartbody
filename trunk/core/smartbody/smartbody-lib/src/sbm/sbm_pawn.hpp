@@ -27,7 +27,7 @@
 
 #include <sk/sk_scene.h>
 #include <sk/sk_skeleton.h>
-#include <sbm/Physics/SbmColObject.h>
+#include <sbm/Physics/SBColObject.h>
 #include <sbm/SteerSuiteEngineDriver.h>
 
 #include <controllers/me_controller_tree_root.hpp>
@@ -46,7 +46,7 @@
 
 #include "sbm_constants.h"
 #include "sbm_deformable_mesh.h"
-#include "sbm/Physics/SbmPhysicsSim.h"
+#include "sbm/Physics/SBPhysicsSim.h"
 // Declare classes used (avoid circular references)
 class srArgBuffer;
 
@@ -124,7 +124,7 @@ public:
 	const std::string& getGeomObjectName();
 	SbmGeomObject* getGeomObject(); // get geometry object associated with the pawn
 	//void setGeomObject(SbmGeomObject* obj);
-	SbmPhysicsObj* getPhysicsObject();
+	SBPhysicsObj* getPhysicsObject();
 
  	void updateToColObject();
 	void updateToSteeringSpaceObject();

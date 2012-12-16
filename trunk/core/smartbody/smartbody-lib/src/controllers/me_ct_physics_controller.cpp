@@ -66,9 +66,9 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 #if 1
 	if (_valid && _context )
 	{
-		SbmPhysicsSim* phyEngine = SbmPhysicsSim::getPhysicsEngine();
+		SBPhysicsSim* phyEngine = SBPhysicsSim::getPhysicsEngine();
 		std::string charName = _character->getName();
-		SbmPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(charName);//_character->getPhysicsCharacter();
+		SBPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(charName);//_character->getPhysicsCharacter();
 		if (!phyChar) return true;
 
 		bool hasPhy = (phyEngine->getBoolAttribute("enable") && phyChar->getBoolAttribute("enable"));		
@@ -149,7 +149,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 		for (unsigned int i=0;i<jointObjList.size();i++)
 		{
 			SbmJointObj* obj = jointObjList[i];
-			SbmPhysicsJoint* phyJoint = obj->getPhyJoint();
+			SBPhysicsJoint* phyJoint = obj->getPhyJoint();
 			SBJoint* joint = obj->getPhyJoint()->getSBJoint();
 			if (!joint)	continue;
 			
@@ -264,7 +264,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 		for (unsigned int i=0;i<jointObjList.size();i++)
 		{
 			SbmJointObj* obj = jointObjList[i];
-			SbmPhysicsJoint* phyJoint = obj->getPhyJoint();
+			SBPhysicsJoint* phyJoint = obj->getPhyJoint();
 			SBJoint* sbJoint = phyJoint->getSBJoint();
 			SBJoint* joint = NULL; 
 			if (sbJoint)

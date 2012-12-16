@@ -1,13 +1,13 @@
-#ifndef _SBMPHYSICSSIM_H_ 
-#define _SBMPHYSICSSIM_H_ 
+#ifndef _SBPhysicsSIM_H_ 
+#define _SBPhysicsSIM_H_ 
 #include <deque>
-#include "SbmColObject.h"
+#include "SBColObject.h"
 #include <sb/SBObject.h>
 #include <sb/SBJoint.h>
 
 using namespace SmartBody;
 
-class SbmPhysicsObjInterface : public SbmTransformObjInterface
+class SBPhysicsObjInterface : public SbmTransformObjInterface
 {
 protected:
 	bool          bHasPhysicsSim;
@@ -34,7 +34,7 @@ public:
 	unsigned long getID();	
 };
 
-class SbmPhysicsObj : public SbmPhysicsObjInterface, public SmartBody::SBObject// abstraction for rigid objects in the physics engine
+class SBPhysicsObj : public SBPhysicsObjInterface, public SmartBody::SBObject// abstraction for rigid objects in the physics engine
 {
 protected:	
 	SbmGeomObject* colObj;		
@@ -43,8 +43,8 @@ protected:
 	SrVec         linearVel, angularVel;	
 	bool          initGeom;
 public:
-	SbmPhysicsObj();
-	~SbmPhysicsObj();
+	SBPhysicsObj();
+	~SBPhysicsObj();
 
 	virtual void enablePhysicsSim(bool bPhy);
 	virtual void enableCollisionSim(bool bCol);	
@@ -71,13 +71,13 @@ public:
 	void  setAngularVel(SrVec val);
 
 	virtual void notify(SBSubject* subject);	
-	virtual void handleCollision(SrVec contactPt, SbmPhysicsObj* colObj);
+	virtual void handleCollision(SrVec contactPt, SBPhysicsObj* colObj);
 };
 
 class SbmJointObj;
-class SbmPhysicsCharacter;
+class SBPhysicsCharacter;
 
-class SbmPhysicsJoint : public SmartBody::SBObject
+class SBPhysicsJoint : public SmartBody::SBObject
 {
 protected:
 	SBJoint* sbmJoint;
@@ -88,8 +88,8 @@ protected:
 	SrVec jointTorque;
 	float totalSupportMass; // all 	
 public:
-	SbmPhysicsJoint(SBJoint* joint);
-	~SbmPhysicsJoint();
+	SBPhysicsJoint(SBJoint* joint);
+	~SBPhysicsJoint();
 	SBJoint* getSBJoint() { return sbmJoint; }
 	SrQuat& getRefQuat() { return refQuat; }
 	void setRefQuat(SrQuat val) { refQuat = val; }
@@ -117,46 +117,46 @@ struct CollisionRecord
 	SrVec collisionPt;
 	SrVec momentum; 
 	SbmJointObj* hitJointObj;
-	SbmPhysicsObj* collider;
+	SBPhysicsObj* collider;
 public:
 	CollisionRecord& operator= (const CollisionRecord& rt);
 };
 
-class SbmJointObj : public SbmPhysicsObj 
+class SbmJointObj : public SBPhysicsObj 
 // Modeling each body part as a SbmPhyObj
 {
 protected:	
-	SbmPhysicsCharacter* phyChar;
-	SbmPhysicsJoint* phyJoint;	
+	SBPhysicsCharacter* phyChar;
+	SBPhysicsJoint* phyJoint;	
 public:
-	SbmJointObj(SbmPhysicsCharacter* phyc);
+	SbmJointObj(SBPhysicsCharacter* phyc);
 	~SbmJointObj();
 	SrMat getRelativeOrientation();
-	SbmPhysicsJoint* getPhyJoint() { return phyJoint; 	}
+	SBPhysicsJoint* getPhyJoint() { return phyJoint; 	}
 	SBJoint*         getSBJoint() { return phyJoint->getSBJoint(); }
-	SbmPhysicsCharacter* getPhysicsCharacter() { return phyChar; }
+	SBPhysicsCharacter* getPhysicsCharacter() { return phyChar; }
 
-	SbmPhysicsJoint* getChildJoint(int i);
+	SBPhysicsJoint* getChildJoint(int i);
 	int getNumChildJoints();
 
 	SbmJointObj* getParentObj() { return phyJoint->getParentObj(); }
 	//void setParentObj(SbmJointObj* parent) { parentObj = parent; }
-	virtual void initJoint(SbmPhysicsJoint* joint);
-	virtual void handleCollision(SrVec contactPt, SbmPhysicsObj* colObj);
+	virtual void initJoint(SBPhysicsJoint* joint);
+	virtual void handleCollision(SrVec contactPt, SBPhysicsObj* colObj);
 };
 
 
-class SbmPhysicsCharacter : public SbmPhysicsObjInterface, public SmartBody::SBObject // interface for articulated dynamic character 
+class SBPhysicsCharacter : public SBPhysicsObjInterface, public SmartBody::SBObject // interface for articulated dynamic character 
 {
 protected:	
-	SbmPhysicsJoint* root;
-	std::map<std::string, SbmPhysicsJoint*> jointMap;
+	SBPhysicsJoint* root;
+	std::map<std::string, SBPhysicsJoint*> jointMap;
 	std::map<std::string, SbmJointObj*>     jointObjMap;
 	//std::map<std::string, SbmGeomObject*>   jointGeometryMap;
 	std::string characterName;	
 	std::vector<CollisionRecord> collisionRecords;
 public:
-	SbmPhysicsCharacter();
+	SBPhysicsCharacter();
 	virtual void initPhysicsCharacter(std::string& charName, std::vector<std::string>& jointNameList, bool buildGeometry = false);	
 
 	virtual void enablePhysicsSim(bool bPhy);
@@ -165,73 +165,73 @@ public:
 
 	std::string getPhysicsCharacterName() { return characterName; }		
 	SbmJointObj* getJointObj(const std::string& jointName); // get body part associated with this joint
-	SbmPhysicsJoint* getPhyJoint(const std::string& jointName);
-	SbmPhysicsJoint* getPhyJointRoot() { return root; }
+	SBPhysicsJoint* getPhyJoint(const std::string& jointName);
+	SBPhysicsJoint* getPhyJointRoot() { return root; }
 	std::vector<SbmJointObj*> getJointObjList();
-	std::vector<SbmPhysicsJoint*> getPhyJointList();
+	std::vector<SBPhysicsJoint*> getPhyJointList();
 	std::map<std::string,SbmJointObj*>& getJointObjMap();
 	virtual void notify(SBSubject* subject);
 	void updatePDTorque();
 protected:
 	void cleanUpJoints();
 	SbmGeomObject* createJointGeometry(SBJoint* joint, float radius = -1);
-	void updateJointAxis(SbmPhysicsJoint* phyJoint);
+	void updateJointAxis(SBPhysicsJoint* phyJoint);
 	SrVec computePDTorque(SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD, float Ks, float Kd);
 	SrVec computeSPDTorque(SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD, float Ks, float Kd, float dt, float mass);
 };
 
-//typedef std::deque<SbmPhysicsObj*> SbmPhysicsObjList;
-typedef std::map<unsigned long, SbmPhysicsJoint*> SbmPhysicsJointMap;
-typedef std::map<unsigned long,SbmPhysicsObj*> SbmPhysicsObjMap;
-typedef std::map<std::string, SbmPhysicsCharacter*> SbmPhysicsCharacterMap;
-typedef std::map<std::string, SbmPhysicsObj*> SbmPhysicsPawnMap;
-class SbmPhysicsSim : public SmartBody::SBObject
+//typedef std::deque<SBPhysicsObj*> SBPhysicsObjList;
+typedef std::map<unsigned long, SBPhysicsJoint*> SBPhysicsJointMap;
+typedef std::map<unsigned long,SBPhysicsObj*> SBPhysicsObjMap;
+typedef std::map<std::string, SBPhysicsCharacter*> SBPhysicsCharacterMap;
+typedef std::map<std::string, SBPhysicsObj*> SBPhysicsPawnMap;
+class SBPhysicsSim : public SmartBody::SBObject
 {
 friend class SbmPhyObj;
 protected:
-	SbmPhysicsObjMap physicsObjList;		
-	SbmPhysicsJointMap physicsJointList;
-	SbmPhysicsCharacterMap characterMap;
-	SbmPhysicsPawnMap      pawnObjMap;
+	SBPhysicsObjMap physicsObjList;		
+	SBPhysicsJointMap physicsJointList;
+	SBPhysicsCharacterMap characterMap;
+	SBPhysicsPawnMap      pawnObjMap;
 public:
-	SbmPhysicsSim(void);
-	~SbmPhysicsSim(void);		
+	SBPhysicsSim(void);
+	~SBPhysicsSim(void);		
 	void updateSimulation(float timestep);
 	void setEnable(bool enable);
 	void setGravity(float gravity);	
-	virtual bool hasPhysicsObj(SbmPhysicsObj* obj);
-	virtual bool hasPhysicsCharacter(SbmPhysicsCharacter* phyChar);	
-	SbmPhysicsCharacterMap& getCharacterMap() { return characterMap; }
-	SbmPhysicsPawnMap&       getPawnObjMap() { return pawnObjMap; }
-	SbmPhysicsCharacter* getPhysicsCharacter(const std::string& charName);
-	SbmPhysicsObj*       getPhysicsPawn(const std::string& pawnName);
+	virtual bool hasPhysicsObj(SBPhysicsObj* obj);
+	virtual bool hasPhysicsCharacter(SBPhysicsCharacter* phyChar);	
+	SBPhysicsCharacterMap& getCharacterMap() { return characterMap; }
+	SBPhysicsPawnMap&       getPawnObjMap() { return pawnObjMap; }
+	SBPhysicsCharacter* getPhysicsCharacter(const std::string& charName);
+	SBPhysicsObj*       getPhysicsPawn(const std::string& pawnName);
 
-	virtual void addPhysicsObj(SbmPhysicsObj* obj);
-	virtual void removePhysicsObj(SbmPhysicsObj* obj);
-	virtual void addPhysicsCharacter(SbmPhysicsCharacter* phyChar);	
-	virtual void removePhysicsCharacter(SbmPhysicsCharacter* phyChar) = 0;	
+	virtual void addPhysicsObj(SBPhysicsObj* obj);
+	virtual void removePhysicsObj(SBPhysicsObj* obj);
+	virtual void addPhysicsCharacter(SBPhysicsCharacter* phyChar);	
+	virtual void removePhysicsCharacter(SBPhysicsCharacter* phyChar) = 0;	
 
-	virtual void enablePhysicsSim(SbmPhysicsObj* obj, bool bSim) = 0;
-	virtual void enableCollisionSim(SbmPhysicsObj* obj, bool bCol) = 0;	
+	virtual void enablePhysicsSim(SBPhysicsObj* obj, bool bSim) = 0;
+	virtual void enableCollisionSim(SBPhysicsObj* obj, bool bCol) = 0;	
 
-	virtual void writeToPhysicsObj(SbmPhysicsObj* obj) = 0; // write sim data to colObj
-	virtual void readFromPhysicsObj(SbmPhysicsObj* obj) = 0; // read sim data from colObj	
+	virtual void writeToPhysicsObj(SBPhysicsObj* obj) = 0; // write sim data to colObj
+	virtual void readFromPhysicsObj(SBPhysicsObj* obj) = 0; // read sim data from colObj	
 
 	void updateAllPhysicsJoints();
-	virtual void updatePhysicsJoint(SbmPhysicsJoint* phyJoint) = 0; // update joint parameters		
-	virtual void updatePhyObjGeometry(SbmPhysicsObj* obj, SbmGeomObject* geom = NULL) = 0;
+	virtual void updatePhysicsJoint(SBPhysicsJoint* phyJoint) = 0; // update joint parameters		
+	virtual void updatePhyObjGeometry(SBPhysicsObj* obj, SbmGeomObject* geom = NULL) = 0;
 
 	//virtual void applyTorque(SBJoint* joint, )
 
-	virtual SrVec getJointConstraintPos(SbmPhysicsJoint* joint) = 0;
-	virtual SrVec getJointRotationAxis(SbmPhysicsJoint* joint, int axis) = 0;
+	virtual SrVec getJointConstraintPos(SBPhysicsJoint* joint) = 0;
+	virtual SrVec getJointRotationAxis(SBPhysicsJoint* joint, int axis) = 0;
 
 	virtual void initSimulation() = 0;		
 	virtual void updateSimulationInternal(float timeStep) = 0;
-	virtual SbmPhysicsObj* createPhyObj() = 0;	
+	virtual SBPhysicsObj* createPhyObj() = 0;	
 
 	virtual void notify(SBSubject* subject);
-	static SbmPhysicsSim* getPhysicsEngine();
+	static SBPhysicsSim* getPhysicsEngine();
 };
 
 

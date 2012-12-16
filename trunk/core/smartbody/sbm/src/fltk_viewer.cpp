@@ -63,7 +63,7 @@
 # include <controllers/MeCtBodyReachState.h>
 # include <controllers/me_ct_example_body_reach.hpp>
 # include <controllers/me_ct_constraint.hpp>
-# include <sbm/Physics/SbmColObject.h>
+# include <sbm/Physics/SBColObject.h>
 # include <controllers/me_ct_param_animation_data.h>
 # include <sbm/GPU/SbmDeformableMeshGPU.h>
 # include <sb/SBScene.h>
@@ -3249,13 +3249,13 @@ void FltkViewer::drawCharacterPhysicsObjs()
 {
 	float pawnSize = 1.0;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPhysicsSim* phyEngine = SbmPhysicsSim::getPhysicsEngine();
+	SBPhysicsSim* phyEngine = SBPhysicsSim::getPhysicsEngine();
 	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
 		iter != mcu.getCharacterMap().end();
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		SbmPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(character->getName());//character->getPhysicsCharacter();				
+		SBPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(character->getName());//character->getPhysicsCharacter();				
 		if (!phyChar) 
 		{			
 			continue;
@@ -3281,7 +3281,7 @@ void FltkViewer::drawCharacterPhysicsObjs()
 			SbmJointObj* obj = mi->second;
 			SrMat gmat = obj->getGlobalTransform().gmat();
 			SBJoint* joint = obj->getSBJoint();	
-			SbmPhysicsSim* physics = SbmPhysicsSim::getPhysicsEngine();
+			SBPhysicsSim* physics = SBPhysicsSim::getPhysicsEngine();
 #if 1
 			if (physics)
 			{

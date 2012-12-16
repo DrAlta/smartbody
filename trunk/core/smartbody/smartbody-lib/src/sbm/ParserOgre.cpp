@@ -451,7 +451,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 									//LOG("axis = %f %f %f, angle = %f",axis.x,axis.y,axis.z,angle);
 									SrQuat orientation(axis, angle);	
 									SkJointQuat* jointQuat = joint->quat();
-									jointQuat->prerot(orientation);
+									jointQuat->orientation(orientation);
 								}
 							}
 						}
