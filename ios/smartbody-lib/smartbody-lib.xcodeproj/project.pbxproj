@@ -27,8 +27,8 @@
 		AA07BE0614D245480073B99A /* SBSteerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AA07BDFC14D245480073B99A /* SBSteerManager.h */; };
 		AA07BE0A14D245850073B99A /* me_ct_physics_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA07BE0814D245850073B99A /* me_ct_physics_controller.cpp */; };
 		AA07BE0B14D245850073B99A /* me_ct_physics_controller.h in Headers */ = {isa = PBXBuildFile; fileRef = AA07BE0914D245850073B99A /* me_ct_physics_controller.h */; };
-		AA07BE0E14D245FC0073B99A /* SbmDebuggerServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA07BE0C14D245FC0073B99A /* SbmDebuggerServer.cpp */; };
-		AA07BE0F14D245FC0073B99A /* SbmDebuggerServer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA07BE0D14D245FC0073B99A /* SbmDebuggerServer.h */; };
+		AA07BE0E14D245FC0073B99A /* SBDebuggerServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA07BE0C14D245FC0073B99A /* SBDebuggerServer.cpp */; };
+		AA07BE0F14D245FC0073B99A /* SBDebuggerServer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA07BE0D14D245FC0073B99A /* SBDebuggerServer.h */; };
 		AA2193CD143147D400187A71 /* action_unit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA2193CC143147D400187A71 /* action_unit.cpp */; };
 		AA563F0714D3A44600D4A91D /* SBPython.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD77D141FF8D10064C27A /* SBPython.cpp */; };
 		AA563F0814D3A44600D4A91D /* SBPythonClass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD77F141FF8D10064C27A /* SBPythonClass.cpp */; };
@@ -410,12 +410,12 @@
 		AA9CD993141FF8D10064C27A /* ParserFBX.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD74A141FF8D10064C27A /* ParserFBX.h */; };
 		AA9CD994141FF8D10064C27A /* ParserOpenCOLLADA.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD74B141FF8D10064C27A /* ParserOpenCOLLADA.cpp */; };
 		AA9CD995141FF8D10064C27A /* ParserOpenCOLLADA.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD74C141FF8D10064C27A /* ParserOpenCOLLADA.h */; };
-		AA9CD996141FF8D10064C27A /* SbmColObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD74E141FF8D10064C27A /* SbmColObject.cpp */; };
-		AA9CD997141FF8D10064C27A /* SbmColObject.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD74F141FF8D10064C27A /* SbmColObject.h */; };
-		AA9CD998141FF8D10064C27A /* SbmPhysicsSim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD750141FF8D10064C27A /* SbmPhysicsSim.cpp */; };
-		AA9CD999141FF8D10064C27A /* SbmPhysicsSim.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD751141FF8D10064C27A /* SbmPhysicsSim.h */; };
-		AA9CD99A141FF8D10064C27A /* SbmPhysicsSimODE.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD752141FF8D10064C27A /* SbmPhysicsSimODE.cpp */; };
-		AA9CD99B141FF8D10064C27A /* SbmPhysicsSimODE.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD753141FF8D10064C27A /* SbmPhysicsSimODE.h */; };
+		AA9CD996141FF8D10064C27A /* SbmColObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD74E141FF8D10064C27A /* SBColObject.cpp */; };
+		AA9CD997141FF8D10064C27A /* SbmColObject.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD74F141FF8D10064C27A /* SBColObject.h */; };
+		AA9CD998141FF8D10064C27A /* SBPhysicsSim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD750141FF8D10064C27A /* SBPhysicsSim.cpp */; };
+		AA9CD999141FF8D10064C27A /* SBPhysicsSim.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD751141FF8D10064C27A /* SBPhysicsSim.h */; };
+		AA9CD99A141FF8D10064C27A /* SBPhysicsSimODE.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD752141FF8D10064C27A /* SBPhysicsSimODE.cpp */; };
+		AA9CD99B141FF8D10064C27A /* SBPhysicsSimODE.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD753141FF8D10064C27A /* SBPhysicsSimODE.h */; };
 		AA9CD9A0141FF8D10064C27A /* remote_speech.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD758141FF8D10064C27A /* remote_speech.cpp */; };
 		AA9CD9A1141FF8D10064C27A /* remote_speech.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD759141FF8D10064C27A /* remote_speech.h */; };
 		AA9CD9A2141FF8D10064C27A /* Resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD75A141FF8D10064C27A /* Resource.cpp */; };
@@ -633,10 +633,10 @@
 		AAF8C71514DA2D970075F2C2 /* SBGestureMapManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AAF8C71114DA2D970075F2C2 /* SBGestureMapManager.h */; };
 		AAF8C71914DA2DA20075F2C2 /* bml_gesture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAF8C71714DA2DA20075F2C2 /* bml_gesture.cpp */; };
 		C4126A1115B60B7600D530A3 /* bml_gesture.hpp in Headers */ = {isa = PBXBuildFile; fileRef = C4126A1015B60B7600D530A3 /* bml_gesture.hpp */; };
-		C4126A1B15B6540000D530A3 /* SbmDebuggerClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4126A1715B653FF00D530A3 /* SbmDebuggerClient.cpp */; };
-		C4126A1C15B6540000D530A3 /* SbmDebuggerClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C4126A1815B653FF00D530A3 /* SbmDebuggerClient.h */; };
-		C4126A1D15B6540000D530A3 /* SbmDebuggerUtility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4126A1915B6540000D530A3 /* SbmDebuggerUtility.cpp */; };
-		C4126A1E15B6540000D530A3 /* SbmDebuggerUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = C4126A1A15B6540000D530A3 /* SbmDebuggerUtility.h */; };
+		C4126A1B15B6540000D530A3 /* SBDebuggerClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4126A1715B653FF00D530A3 /* SBDebuggerClient.cpp */; };
+		C4126A1C15B6540000D530A3 /* SBDebuggerClient.h in Headers */ = {isa = PBXBuildFile; fileRef = C4126A1815B653FF00D530A3 /* SBDebuggerClient.h */; };
+		C4126A1D15B6540000D530A3 /* SBDebuggerUtility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4126A1915B6540000D530A3 /* SBDebuggerUtility.cpp */; };
+		C4126A1E15B6540000D530A3 /* SBDebuggerUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = C4126A1A15B6540000D530A3 /* SBebuggerUtility.h */; };
 		C4126A2315B6552200D530A3 /* SBPhoneme.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4126A1F15B6552200D530A3 /* SBPhoneme.cpp */; };
 		C4126A2415B6552200D530A3 /* SBPhoneme.h in Headers */ = {isa = PBXBuildFile; fileRef = C4126A2015B6552200D530A3 /* SBPhoneme.h */; };
 		C4126A2515B6552200D530A3 /* SBPhonemeManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4126A2115B6552200D530A3 /* SBPhonemeManager.cpp */; };
@@ -694,8 +694,8 @@
 		AA07BDFC14D245480073B99A /* SBSteerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBSteerManager.h; path = sb/SBSteerManager.h; sourceTree = "<group>"; };
 		AA07BE0814D245850073B99A /* me_ct_physics_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_physics_controller.cpp; sourceTree = "<group>"; };
 		AA07BE0914D245850073B99A /* me_ct_physics_controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = me_ct_physics_controller.h; sourceTree = "<group>"; };
-		AA07BE0C14D245FC0073B99A /* SbmDebuggerServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SbmDebuggerServer.cpp; sourceTree = "<group>"; };
-		AA07BE0D14D245FC0073B99A /* SbmDebuggerServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmDebuggerServer.h; sourceTree = "<group>"; };
+		AA07BE0C14D245FC0073B99A /* SBDebuggerServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBDebuggerServer.cpp; sourceTree = "<group>"; };
+		AA07BE0D14D245FC0073B99A /* SBDebuggerServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBDebuggerServer.h; sourceTree = "<group>"; };
 		AA2193CC143147D400187A71 /* action_unit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = action_unit.cpp; sourceTree = "<group>"; };
 		AA563F1214D3AF2900D4A91D /* AnsHeap.C */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AnsHeap.C; path = parser/AnsHeap.C; sourceTree = "<group>"; };
 		AA563F1314D3AF2900D4A91D /* AnsHeap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnsHeap.h; path = parser/AnsHeap.h; sourceTree = "<group>"; };
@@ -1075,12 +1075,12 @@
 		AA9CD74A141FF8D10064C27A /* ParserFBX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserFBX.h; sourceTree = "<group>"; };
 		AA9CD74B141FF8D10064C27A /* ParserOpenCOLLADA.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserOpenCOLLADA.cpp; sourceTree = "<group>"; };
 		AA9CD74C141FF8D10064C27A /* ParserOpenCOLLADA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserOpenCOLLADA.h; sourceTree = "<group>"; };
-		AA9CD74E141FF8D10064C27A /* SbmColObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SbmColObject.cpp; sourceTree = "<group>"; };
-		AA9CD74F141FF8D10064C27A /* SbmColObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmColObject.h; sourceTree = "<group>"; };
-		AA9CD750141FF8D10064C27A /* SbmPhysicsSim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SbmPhysicsSim.cpp; sourceTree = "<group>"; };
-		AA9CD751141FF8D10064C27A /* SbmPhysicsSim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmPhysicsSim.h; sourceTree = "<group>"; };
-		AA9CD752141FF8D10064C27A /* SbmPhysicsSimODE.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SbmPhysicsSimODE.cpp; sourceTree = "<group>"; };
-		AA9CD753141FF8D10064C27A /* SbmPhysicsSimODE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmPhysicsSimODE.h; sourceTree = "<group>"; };
+		AA9CD74E141FF8D10064C27A /* SBColObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBColObject.cpp; sourceTree = "<group>"; };
+		AA9CD74F141FF8D10064C27A /* SBColObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBColObject.h; sourceTree = "<group>"; };
+		AA9CD750141FF8D10064C27A /* SBPhysicsSim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBPhysicsSim.cpp; sourceTree = "<group>"; };
+		AA9CD751141FF8D10064C27A /* SBPhysicsSim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBPhysicsSim.h; sourceTree = "<group>"; };
+		AA9CD752141FF8D10064C27A /* SBPhysicsSimODE.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBPhysicsSimODE.cpp; sourceTree = "<group>"; };
+		AA9CD753141FF8D10064C27A /* SBPhysicsSimODE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBPhysicsSimODE.h; sourceTree = "<group>"; };
 		AA9CD758141FF8D10064C27A /* remote_speech.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = remote_speech.cpp; sourceTree = "<group>"; };
 		AA9CD759141FF8D10064C27A /* remote_speech.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = remote_speech.h; sourceTree = "<group>"; };
 		AA9CD75A141FF8D10064C27A /* Resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Resource.cpp; sourceTree = "<group>"; };
@@ -1302,10 +1302,10 @@
 		AAF8C71114DA2D970075F2C2 /* SBGestureMapManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBGestureMapManager.h; path = sb/SBGestureMapManager.h; sourceTree = "<group>"; };
 		AAF8C71714DA2DA20075F2C2 /* bml_gesture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bml_gesture.cpp; path = bml/bml_gesture.cpp; sourceTree = "<group>"; };
 		C4126A1015B60B7600D530A3 /* bml_gesture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bml_gesture.hpp; path = bml/bml_gesture.hpp; sourceTree = "<group>"; };
-		C4126A1715B653FF00D530A3 /* SbmDebuggerClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SbmDebuggerClient.cpp; sourceTree = "<group>"; };
-		C4126A1815B653FF00D530A3 /* SbmDebuggerClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmDebuggerClient.h; sourceTree = "<group>"; };
-		C4126A1915B6540000D530A3 /* SbmDebuggerUtility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SbmDebuggerUtility.cpp; sourceTree = "<group>"; };
-		C4126A1A15B6540000D530A3 /* SbmDebuggerUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmDebuggerUtility.h; sourceTree = "<group>"; };
+		C4126A1715B653FF00D530A3 /* SBDebuggerClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBDebuggerClient.cpp; sourceTree = "<group>"; };
+		C4126A1815B653FF00D530A3 /* SBDebuggerClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBDebuggerClient.h; sourceTree = "<group>"; };
+		C4126A1915B6540000D530A3 /* SBDebuggerUtility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBDebuggerUtility.cpp; sourceTree = "<group>"; };
+		C4126A1A15B6540000D530A3 /* SBDebuggerUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBDebuggerUtility.h; sourceTree = "<group>"; };
 		C4126A1F15B6552200D530A3 /* SBPhoneme.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPhoneme.cpp; path = sb/SBPhoneme.cpp; sourceTree = "<group>"; };
 		C4126A2015B6552200D530A3 /* SBPhoneme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBPhoneme.h; path = sb/SBPhoneme.h; sourceTree = "<group>"; };
 		C4126A2115B6552200D530A3 /* SBPhonemeManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPhonemeManager.cpp; path = sb/SBPhonemeManager.cpp; sourceTree = "<group>"; };
@@ -2209,10 +2209,10 @@
 				C4D195C415BF3E9900EDEE47 /* ParserBVH.cxx */,
 				C4126A2715B6567F00D530A3 /* SbmDeformableMeshGPU.cpp */,
 				C4126A2815B6567F00D530A3 /* SbmDeformableMeshGPU.h */,
-				C4126A1715B653FF00D530A3 /* SbmDebuggerClient.cpp */,
-				C4126A1815B653FF00D530A3 /* SbmDebuggerClient.h */,
-				C4126A1915B6540000D530A3 /* SbmDebuggerUtility.cpp */,
-				C4126A1A15B6540000D530A3 /* SbmDebuggerUtility.h */,
+				C4126A1715B653FF00D530A3 /* SBDebuggerClient.cpp */,
+				C4126A1815B653FF00D530A3 /* SBDebuggerClient.h */,
+				C4126A1915B6540000D530A3 /* SBDebuggerUtility.cpp */,
+				C4126A1A15B6540000D530A3 /* SBDebuggerUtility.h */,
 				AA9CD74D141FF8D10064C27A /* Physics */,
 				AA73BC8C146C641500B199A1 /* steering */,
 				AA9CD64F141FF8D00064C27A /* action_unit.hpp */,
@@ -2275,8 +2275,8 @@
 				AA9CD777141FF8D10064C27A /* sbm_test_cmds.cpp */,
 				AA9CD778141FF8D10064C27A /* sbm_test_cmds.hpp */,
 				AADDAE7A154DCE3D00A86087 /* SbmCharacterListener.h */,
-				AA07BE0C14D245FC0073B99A /* SbmDebuggerServer.cpp */,
-				AA07BE0D14D245FC0073B99A /* SbmDebuggerServer.h */,
+				AA07BE0C14D245FC0073B99A /* SBDebuggerServer.cpp */,
+				AA07BE0D14D245FC0073B99A /* SBDebuggerServer.h */,
 				AA9CD785141FF8D10064C27A /* sr_arg_buff.cpp */,
 				AA9CD786141FF8D10064C27A /* sr_arg_buff.h */,
 				AA9CD787141FF8D10064C27A /* sr_cmd_line.cpp */,
@@ -2311,12 +2311,12 @@
 		AA9CD74D141FF8D10064C27A /* Physics */ = {
 			isa = PBXGroup;
 			children = (
-				AA9CD74E141FF8D10064C27A /* SbmColObject.cpp */,
-				AA9CD74F141FF8D10064C27A /* SbmColObject.h */,
-				AA9CD750141FF8D10064C27A /* SbmPhysicsSim.cpp */,
-				AA9CD751141FF8D10064C27A /* SbmPhysicsSim.h */,
-				AA9CD752141FF8D10064C27A /* SbmPhysicsSimODE.cpp */,
-				AA9CD753141FF8D10064C27A /* SbmPhysicsSimODE.h */,
+				AA9CD74E141FF8D10064C27A /* SBColObject.cpp */,
+				AA9CD74F141FF8D10064C27A /* SBColObject.h */,
+				AA9CD750141FF8D10064C27A /* SBPhysicsSim.cpp */,
+				AA9CD751141FF8D10064C27A /* SBPhysicsSim.h */,
+				AA9CD752141FF8D10064C27A /* SBPhysicsSimODE.cpp */,
+				AA9CD753141FF8D10064C27A /* SBPhysicsSimODE.h */,
 			);
 			path = Physics;
 			sourceTree = "<group>";
@@ -2616,8 +2616,8 @@
 				AA9CD993141FF8D10064C27A /* ParserFBX.h in Headers */,
 				AA9CD995141FF8D10064C27A /* ParserOpenCOLLADA.h in Headers */,
 				AA9CD997141FF8D10064C27A /* SbmColObject.h in Headers */,
-				AA9CD999141FF8D10064C27A /* SbmPhysicsSim.h in Headers */,
-				AA9CD99B141FF8D10064C27A /* SbmPhysicsSimODE.h in Headers */,
+				AA9CD999141FF8D10064C27A /* SBPhysicsSim.h in Headers */,
+				AA9CD99B141FF8D10064C27A /* SBPhysicsSimODE.h in Headers */,
 				AA9CD9A1141FF8D10064C27A /* remote_speech.h in Headers */,
 				AA9CD9A3141FF8D10064C27A /* Resource.h in Headers */,
 				AA9CD9A5141FF8D10064C27A /* resource_cmds.h in Headers */,
@@ -2744,7 +2744,7 @@
 				AA07BE0414D245480073B99A /* SBSteerAgent.h in Headers */,
 				AA07BE0614D245480073B99A /* SBSteerManager.h in Headers */,
 				AA07BE0B14D245850073B99A /* me_ct_physics_controller.h in Headers */,
-				AA07BE0F14D245FC0073B99A /* SbmDebuggerServer.h in Headers */,
+				AA07BE0F14D245FC0073B99A /* SBDebuggerServer.h in Headers */,
 				AA563F5F14D3AF2900D4A91D /* AnsHeap.h in Headers */,
 				AA563F6114D3AF2900D4A91D /* AnswerTree.h in Headers */,
 				AA563F6314D3AF2900D4A91D /* Bchart.h in Headers */,
@@ -2792,8 +2792,8 @@
 				AADDAE8D154DCEB900A86087 /* SBJointMapManager.h in Headers */,
 				AADDAE91154DCED800A86087 /* SBJointMap.h in Headers */,
 				C4126A1115B60B7600D530A3 /* bml_gesture.hpp in Headers */,
-				C4126A1C15B6540000D530A3 /* SbmDebuggerClient.h in Headers */,
-				C4126A1E15B6540000D530A3 /* SbmDebuggerUtility.h in Headers */,
+				C4126A1C15B6540000D530A3 /* SBDebuggerClient.h in Headers */,
+				C4126A1E15B6540000D530A3 /* SBDebuggerUtility.h in Headers */,
 				C4126A2415B6552200D530A3 /* SBPhoneme.h in Headers */,
 				C4126A2615B6552200D530A3 /* SBPhonemeManager.h in Headers */,
 				C4126A2A15B6567F00D530A3 /* SbmDeformableMeshGPU.h in Headers */,
@@ -3012,8 +3012,8 @@
 				AA9CD992141FF8D10064C27A /* ParserFBX.cpp in Sources */,
 				AA9CD994141FF8D10064C27A /* ParserOpenCOLLADA.cpp in Sources */,
 				AA9CD996141FF8D10064C27A /* SbmColObject.cpp in Sources */,
-				AA9CD998141FF8D10064C27A /* SbmPhysicsSim.cpp in Sources */,
-				AA9CD99A141FF8D10064C27A /* SbmPhysicsSimODE.cpp in Sources */,
+				AA9CD998141FF8D10064C27A /* SBPhysicsSim.cpp in Sources */,
+				AA9CD99A141FF8D10064C27A /* SBPhysicsSimODE.cpp in Sources */,
 				AA9CD9A0141FF8D10064C27A /* remote_speech.cpp in Sources */,
 				AA9CD9A2141FF8D10064C27A /* Resource.cpp in Sources */,
 				AA9CD9A4141FF8D10064C27A /* resource_cmds.cpp in Sources */,
@@ -3137,7 +3137,7 @@
 				AA07BE0314D245480073B99A /* SBSteerAgent.cpp in Sources */,
 				AA07BE0514D245480073B99A /* SBSteerManager.cpp in Sources */,
 				AA07BE0A14D245850073B99A /* me_ct_physics_controller.cpp in Sources */,
-				AA07BE0E14D245FC0073B99A /* SbmDebuggerServer.cpp in Sources */,
+				AA07BE0E14D245FC0073B99A /* SBDebuggerServer.cpp in Sources */,
 				AA563F5E14D3AF2900D4A91D /* AnsHeap.C in Sources */,
 				AA563F6014D3AF2900D4A91D /* AnswerTree.C in Sources */,
 				AA563F6214D3AF2900D4A91D /* Bchart.cpp in Sources */,
@@ -3184,8 +3184,8 @@
 				AADDAE8B154DCEB900A86087 /* SBBoneBusManager.cpp in Sources */,
 				AADDAE8E154DCEB900A86087 /* SBJointMapManager.cpp in Sources */,
 				AADDAE8F154DCEB900A86087 /* SBJointMap.cpp in Sources */,
-				C4126A1B15B6540000D530A3 /* SbmDebuggerClient.cpp in Sources */,
-				C4126A1D15B6540000D530A3 /* SbmDebuggerUtility.cpp in Sources */,
+				C4126A1B15B6540000D530A3 /* SBDebuggerClient.cpp in Sources */,
+				C4126A1D15B6540000D530A3 /* SBDebuggerUtility.cpp in Sources */,
 				C4126A2315B6552200D530A3 /* SBPhoneme.cpp in Sources */,
 				C4126A2515B6552200D530A3 /* SBPhonemeManager.cpp in Sources */,
 				C4126A2915B6567F00D530A3 /* SbmDeformableMeshGPU.cpp in Sources */,

@@ -446,7 +446,7 @@ SkJoint* ParserFBX::createJoint(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion&
       joint->quat()->activate();
    }
 
-   SrVec offset, rot, jointRot;
+   SrVec offset, rot, jointRot; 
 
    if (parent == NULL)
       skeleton.root(joint);

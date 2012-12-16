@@ -1,4 +1,4 @@
-#include "SbmPhysicsSim.h"
+#include "SBPhysicsSim.h"
 #include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
 #include <sb/SBPhysicsManager.h>
@@ -8,7 +8,7 @@
 
 //#include <boost/math/special_functions/fpclassify.hpp>
 
-SbmPhysicsSim::SbmPhysicsSim(void)
+SBPhysicsSim::SBPhysicsSim(void)
 {
 	
 	SBObject::createDoubleAttribute("dT",0.0003, true, "Basic", 20, false, false, false, "?");
@@ -22,39 +22,39 @@ SbmPhysicsSim::SbmPhysicsSim(void)
 	SBObject::createBoolAttribute("enable",false,true, "Basic", 20, false, false, false, "?");	
 }
 
-SbmPhysicsSim::~SbmPhysicsSim(void)
+SBPhysicsSim::~SBPhysicsSim(void)
 {
 }
 
-void SbmPhysicsSim::updateSimulation( float timestep )
+void SBPhysicsSim::updateSimulation( float timestep )
 {
 	bool enableSim = SBObject::getBoolAttribute("enable");
 	if (enableSim)
 	{
 		// update PD torque for each physics character
-		SbmPhysicsCharacterMap::iterator ci;
+		SBPhysicsCharacterMap::iterator ci;
 		for ( ci  = characterMap.begin();
 			  ci != characterMap.end();
 			  ci++)
 		{
-			SbmPhysicsCharacter* phyChar = ci->second;
+			SBPhysicsCharacter* phyChar = ci->second;
 			phyChar->updatePDTorque();
 		}
 		updateSimulationInternal(timestep);
 	}
 }
 
-void SbmPhysicsSim::setEnable( bool enable )
+void SBPhysicsSim::setEnable( bool enable )
 {
 	SBObject::setBoolAttribute("enable",enable);
 }
 
-void SbmPhysicsSim::setGravity( float gravity )
+void SBPhysicsSim::setGravity( float gravity )
 {
 	SBObject::setDoubleAttribute("gravity",gravity);
 }
 
-void SbmPhysicsSim::addPhysicsObj( SbmPhysicsObj* obj )
+void SBPhysicsSim::addPhysicsObj( SBPhysicsObj* obj )
 {
 	//physicsObjList.push_back(obj);
 	if (physicsObjList.find(obj->getID()) == physicsObjList.end())
@@ -66,7 +66,7 @@ void SbmPhysicsSim::addPhysicsObj( SbmPhysicsObj* obj )
 }
 
 
-void SbmPhysicsSim::addPhysicsCharacter( SbmPhysicsCharacter* phyChar )
+void SBPhysicsSim::addPhysicsCharacter( SBPhysicsCharacter* phyChar )
 {
 	if (characterMap.find(phyChar->getPhysicsCharacterName()) == characterMap.end())
 	{
@@ -75,7 +75,7 @@ void SbmPhysicsSim::addPhysicsCharacter( SbmPhysicsCharacter* phyChar )
 }
 
 
-void SbmPhysicsSim::removePhysicsObj( SbmPhysicsObj* obj )
+void SBPhysicsSim::removePhysicsObj( SBPhysicsObj* obj )
 {
 	if (physicsObjList.find(obj->getID()) != physicsObjList.end())
 	{
@@ -85,7 +85,7 @@ void SbmPhysicsSim::removePhysicsObj( SbmPhysicsObj* obj )
 	}
 }
 
-bool SbmPhysicsSim::hasPhysicsObj( SbmPhysicsObj* obj )
+bool SBPhysicsSim::hasPhysicsObj( SBPhysicsObj* obj )
 {
 	if (physicsObjList.find(obj->getID()) != physicsObjList.end())
 		return true;
@@ -93,7 +93,7 @@ bool SbmPhysicsSim::hasPhysicsObj( SbmPhysicsObj* obj )
 		return false;
 }
 
-bool SbmPhysicsSim::hasPhysicsCharacter( SbmPhysicsCharacter* phyChar )
+bool SBPhysicsSim::hasPhysicsCharacter( SBPhysicsCharacter* phyChar )
 {
 	if (characterMap.find(phyChar->getPhysicsCharacterName()) != characterMap.end())
 		return true;
@@ -102,25 +102,25 @@ bool SbmPhysicsSim::hasPhysicsCharacter( SbmPhysicsCharacter* phyChar )
 }
 
 
-SbmPhysicsObj* SbmPhysicsSim::getPhysicsPawn( const std::string& pawnName )
+SBPhysicsObj* SBPhysicsSim::getPhysicsPawn( const std::string& pawnName )
 {
-	SbmPhysicsPawnMap::iterator iter = pawnObjMap.find(pawnName);
+	SBPhysicsPawnMap::iterator iter = pawnObjMap.find(pawnName);
 	if (iter == pawnObjMap.end())
 		return NULL;
 	else
 		return (*iter).second;
 }
 
-SbmPhysicsCharacter* SbmPhysicsSim::getPhysicsCharacter( const std::string& charName )
+SBPhysicsCharacter* SBPhysicsSim::getPhysicsCharacter( const std::string& charName )
 {
-	SbmPhysicsCharacterMap::iterator iter = characterMap.find(charName);
+	SBPhysicsCharacterMap::iterator iter = characterMap.find(charName);
 	if (iter == characterMap.end())
 		return NULL;
 	else
 		return (*iter).second;
 }
 
-void SbmPhysicsSim::notify( SBSubject* subject )
+void SBPhysicsSim::notify( SBSubject* subject )
 {
 	SBAttribute* attribute = dynamic_cast<SBAttribute*>(subject);
 	if (attribute)
@@ -131,12 +131,12 @@ void SbmPhysicsSim::notify( SBSubject* subject )
 		}	
 		else if (attribute->getName() == "enable")
 		{
-			SbmPhysicsObjMap::iterator mi;
+			SBPhysicsObjMap::iterator mi;
 			for ( mi  = physicsObjList.begin();
 				  mi != physicsObjList.end();
 				  mi++)
 			{
-				SbmPhysicsObj* obj = mi->second;				
+				SBPhysicsObj* obj = mi->second;				
 				obj->setLinearVel(obj->getVec3Attribute("refLinearVelocity"));
 				obj->setAngularVel(obj->getVec3Attribute("refAngularVelocity"));
 				obj->updatePhySim();
@@ -145,24 +145,24 @@ void SbmPhysicsSim::notify( SBSubject* subject )
 	}
 }
 
-void SbmPhysicsSim::updateAllPhysicsJoints()
+void SBPhysicsSim::updateAllPhysicsJoints()
 {
-	SbmPhysicsCharacterMap::iterator mi;
+	SBPhysicsCharacterMap::iterator mi;
 	for ( mi  = characterMap.begin();
 		  mi != characterMap.end();
 		  mi++)
 	{
-		SbmPhysicsCharacter* phyChar = mi->second;
-		std::vector<SbmPhysicsJoint*> jointList = phyChar->getPhyJointList();
+		SBPhysicsCharacter* phyChar = mi->second;
+		std::vector<SBPhysicsJoint*> jointList = phyChar->getPhyJointList();
 		for (unsigned int i=0;i<jointList.size();i++)
 		{
-			SbmPhysicsJoint* phyJoint = jointList[i];
+			SBPhysicsJoint* phyJoint = jointList[i];
 			updatePhysicsJoint(phyJoint);
 		}
 	}
 }
 
-SbmPhysicsSim* SbmPhysicsSim::getPhysicsEngine()
+SBPhysicsSim* SBPhysicsSim::getPhysicsEngine()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if ( mcu._scene)
@@ -175,38 +175,38 @@ SbmPhysicsSim* SbmPhysicsSim::getPhysicsEngine()
 /* SbmPhyObjInterface                                                   */
 /************************************************************************/
 
-void SbmPhysicsObjInterface::setGlobalTransform( SbmTransform& rt )
+void SBPhysicsObjInterface::setGlobalTransform( SbmTransform& rt )
 {			
 		globalTransform.rot  = rt.rot;
 		globalTransform.tran = rt.tran;	
 }
 
 
-void SbmPhysicsObjInterface::setGlobalTransform( const SrMat& newState )
+void SBPhysicsObjInterface::setGlobalTransform( const SrMat& newState )
 {	
 	SRT gtran; gtran.gmat(newState);
 	setGlobalTransform(gtran);	
 }
 
-void SbmPhysicsObjInterface::setRefTransform( SbmTransform& rt )
+void SBPhysicsObjInterface::setRefTransform( SbmTransform& rt )
 {			
 	refTransform.rot  = rt.rot;
 	refTransform.tran = rt.tran;	
 }
 
 
-void SbmPhysicsObjInterface::setRefTransform( const SrMat& newState )
+void SBPhysicsObjInterface::setRefTransform( const SrMat& newState )
 {	
 	SRT gtran; gtran.gmat(newState);
 	setRefTransform(gtran);	
 }
 
-unsigned long SbmPhysicsObjInterface::getID()
+unsigned long SBPhysicsObjInterface::getID()
 {
 	return (unsigned long)this;
 }
 
-SbmPhysicsObj::SbmPhysicsObj()
+SBPhysicsObj::SBPhysicsObj()
 {
 	colObj = NULL;		
 	objDensity = 0.01f;
@@ -234,14 +234,14 @@ SbmPhysicsObj::SbmPhysicsObj()
 	SBObject::createVec3Attribute("geomSize",1.f,1.f,1.f,true, "Geom", 20, false, false, false, "?");
 }
 
-SbmPhysicsObj::~SbmPhysicsObj()
+SBPhysicsObj::~SBPhysicsObj()
 {
 	if (colObj)
 		delete colObj;
 }
 
 
-void SbmPhysicsObj::setGeometry( SbmGeomObject* obj)
+void SBPhysicsObj::setGeometry( SbmGeomObject* obj)
 {
 	initGeom = false;
 	colObj = obj;
@@ -252,31 +252,31 @@ void SbmPhysicsObj::setGeometry( SbmGeomObject* obj)
 	initGeom = true;
 }
 
-void SbmPhysicsObj::enablePhysicsSim( bool bPhy )
+void SBPhysicsObj::enablePhysicsSim( bool bPhy )
 {	
-	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
+	SBPhysicsSim* phySim = SBPhysicsSim::getPhysicsEngine();
 	phySim->enablePhysicsSim(this,bPhy);	
 }
 
-void SbmPhysicsObj::enableCollisionSim( bool bCol )
+void SBPhysicsObj::enableCollisionSim( bool bCol )
 {
-	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
+	SBPhysicsSim* phySim = SBPhysicsSim::getPhysicsEngine();
 	phySim->enableCollisionSim(this,bCol);
 }
 
-void SbmPhysicsObj::updateSbmObj()
+void SBPhysicsObj::updateSbmObj()
 {
-	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
+	SBPhysicsSim* phySim = SBPhysicsSim::getPhysicsEngine();
 	phySim->writeToPhysicsObj(this);
 }
 
-void SbmPhysicsObj::updatePhySim()
+void SBPhysicsObj::updatePhySim()
 {
-	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
+	SBPhysicsSim* phySim = SBPhysicsSim::getPhysicsEngine();
 	phySim->readFromPhysicsObj(this);
 }
 
-void SbmPhysicsObj::notify( SBSubject* subject )
+void SBPhysicsObj::notify( SBSubject* subject )
 {
 	SBAttribute* attribute = dynamic_cast<SBAttribute*>(subject);
 	if (attribute)
@@ -298,7 +298,7 @@ void SbmPhysicsObj::notify( SBSubject* subject )
 	}
 }
 
-void SbmPhysicsObj::changeGeometry( std::string& geomType, SrVec extends )
+void SBPhysicsObj::changeGeometry( std::string& geomType, SrVec extends )
 {
 	initGeom = false;
 	SbmTransform localTran;	
@@ -311,7 +311,7 @@ void SbmPhysicsObj::changeGeometry( std::string& geomType, SrVec extends )
 	colObj->setLocalTransform(localTran);
 	colObj->attachToObj(this);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
+	SBPhysicsSim* phySim = SBPhysicsSim::getPhysicsEngine();
 	phySim->updatePhyObjGeometry(this);
 
 	setStringAttribute("geomType",colObj->geomType());
@@ -320,37 +320,37 @@ void SbmPhysicsObj::changeGeometry( std::string& geomType, SrVec extends )
 	initGeom = true;
 }
 
-float SbmPhysicsObj::getMass()
+float SBPhysicsObj::getMass()
 {
 	return (float)getDoubleAttribute("mass");
 }
 
-void SbmPhysicsObj::setMass( float mass )
+void SBPhysicsObj::setMass( float mass )
 {
 	setDoubleAttribute("mass",(double)mass);
 }
 
-SrVec SbmPhysicsObj::getLinearVel()
+SrVec SBPhysicsObj::getLinearVel()
 {
 	return linearVel;
 }
 
-void SbmPhysicsObj::setLinearVel( SrVec val )
+void SBPhysicsObj::setLinearVel( SrVec val )
 {
 	linearVel = val;
 }
 
-SrVec SbmPhysicsObj::getAngularVel()
+SrVec SBPhysicsObj::getAngularVel()
 {
 	return angularVel;
 }
 
-void SbmPhysicsObj::setAngularVel( SrVec val )
+void SBPhysicsObj::setAngularVel( SrVec val )
 {
 	angularVel = val;
 }
 
-void SbmPhysicsObj::handleCollision( SrVec contactPt, SbmPhysicsObj* colObj )
+void SBPhysicsObj::handleCollision( SrVec contactPt, SBPhysicsObj* colObj )
 {
 
 }
@@ -358,7 +358,7 @@ void SbmPhysicsObj::handleCollision( SrVec contactPt, SbmPhysicsObj* colObj )
 /* Physics Joint                                                        */
 /************************************************************************/
 
-SbmPhysicsJoint::SbmPhysicsJoint( SBJoint* joint ) 
+SBPhysicsJoint::SBPhysicsJoint( SBJoint* joint ) 
 {
 	sbmJoint = joint;
 	jointTorque = SrVec(0,0,0);
@@ -368,12 +368,12 @@ SbmPhysicsJoint::SbmPhysicsJoint( SBJoint* joint )
 	SBObject::createDoubleAttribute("KScale",1.0, true, "Basic", 20, false, false, false, "?");
 }
 
-unsigned long SbmPhysicsJoint::getID()
+unsigned long SBPhysicsJoint::getID()
 {
 	return (unsigned long)(this);
 }
 
-void SbmPhysicsJoint::updateTotalSupportMass()
+void SBPhysicsJoint::updateTotalSupportMass()
 {
 	totalSupportMass = 0.f;
 	SbmJointObj* obj = getChildObj();
@@ -381,7 +381,7 @@ void SbmPhysicsJoint::updateTotalSupportMass()
 
 	for (int i=0;i<obj->getNumChildJoints();i++)
 	{
-		SbmPhysicsJoint* cj = obj->getChildJoint(i);
+		SBPhysicsJoint* cj = obj->getChildJoint(i);
 		if (cj)
 		{
 			cj->updateTotalSupportMass();
@@ -391,10 +391,10 @@ void SbmPhysicsJoint::updateTotalSupportMass()
 	LOG("joint %s, total mass = %f",this->getSBJoint()->getName().c_str(),totalSupportMass);
 }
 
-void SbmPhysicsJoint::notify( SBSubject* subject )
+void SBPhysicsJoint::notify( SBSubject* subject )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
+	SBPhysicsSim* phySim = SBPhysicsSim::getPhysicsEngine();
 	phySim->updatePhysicsJoint(this);	
 }
 
@@ -402,7 +402,7 @@ void SbmPhysicsJoint::notify( SBSubject* subject )
 /* SbmJointObj                                                          */
 /************************************************************************/
 
-SbmJointObj::SbmJointObj(SbmPhysicsCharacter* phyc) : SbmPhysicsObj()
+SbmJointObj::SbmJointObj(SBPhysicsCharacter* phyc) : SBPhysicsObj()
 {
 	phyJoint = NULL;
 	phyChar = phyc;	
@@ -413,7 +413,7 @@ SbmJointObj::~SbmJointObj()
 
 }
 
-SbmPhysicsJoint* SbmJointObj::getChildJoint( int i )
+SBPhysicsJoint* SbmJointObj::getChildJoint( int i )
 {
 	SBJoint* joint = getSBJoint();
 	if (i>=0 && i<joint->getNumChildren())
@@ -430,7 +430,7 @@ int SbmJointObj::getNumChildJoints()
 	return joint->getNumChildren();
 }
 
-void SbmJointObj::initJoint( SbmPhysicsJoint* phyj )
+void SbmJointObj::initJoint( SBPhysicsJoint* phyj )
 {	
 	phyJoint = phyj;
 	SBJoint* joint = phyj->getSBJoint();
@@ -530,7 +530,7 @@ SrMat SbmJointObj::getRelativeOrientation()
 }
 
 
-void SbmJointObj::handleCollision( SrVec contactPt, SbmPhysicsObj* colObj )
+void SbmJointObj::handleCollision( SrVec contactPt, SBPhysicsObj* colObj )
 {
 	SbmJointObj* colJointObj = dynamic_cast<SbmJointObj*>(colObj);
 	if (colJointObj && colJointObj->getPhysicsCharacter() == phyChar) // do not handle self-collision
@@ -553,14 +553,14 @@ void SbmJointObj::handleCollision( SrVec contactPt, SbmPhysicsObj* colObj )
 /* Physics Character                                                    */
 /************************************************************************/
 
-SbmPhysicsCharacter::SbmPhysicsCharacter()
+SBPhysicsCharacter::SBPhysicsCharacter()
 {
 	SBObject::createBoolAttribute("enable",false,true, "Basic", 20, false, false, false, "?");	
 	SBObject::createBoolAttribute("kinematicRoot",false,true, "Basic", 20, false, false, false, "?");	
 	SBObject::createBoolAttribute("usePD",false,true, "Basic", 20, false, false, false, "?");	
 }
 
-SbmJointObj* SbmPhysicsCharacter::getJointObj(const std::string& jointName )
+SbmJointObj* SBPhysicsCharacter::getJointObj(const std::string& jointName )
 {
 	if (jointObjMap.find(jointName) != jointObjMap.end())
 	{
@@ -570,7 +570,7 @@ SbmJointObj* SbmPhysicsCharacter::getJointObj(const std::string& jointName )
 }
 
 
-SbmPhysicsJoint* SbmPhysicsCharacter::getPhyJoint(const std::string& jointName )
+SBPhysicsJoint* SBPhysicsCharacter::getPhyJoint(const std::string& jointName )
 {
 	if (jointMap.find(jointName) != jointMap.end())
 	{
@@ -579,7 +579,7 @@ SbmPhysicsJoint* SbmPhysicsCharacter::getPhyJoint(const std::string& jointName )
 	return NULL;
 }
 
-std::vector<SbmJointObj*> SbmPhysicsCharacter::getJointObjList()
+std::vector<SbmJointObj*> SBPhysicsCharacter::getJointObjList()
 {
 	std::vector<SbmJointObj*> jointObjList;
 	std::map<std::string, SbmJointObj*>::iterator mi = jointObjMap.begin();
@@ -593,10 +593,10 @@ std::vector<SbmJointObj*> SbmPhysicsCharacter::getJointObjList()
 }
 
 
-std::vector<SbmPhysicsJoint*> SbmPhysicsCharacter::getPhyJointList()
+std::vector<SBPhysicsJoint*> SBPhysicsCharacter::getPhyJointList()
 {
-	std::vector<SbmPhysicsJoint*> jointList;
-	std::map<std::string, SbmPhysicsJoint*>::iterator mi = jointMap.begin();
+	std::vector<SBPhysicsJoint*> jointList;
+	std::map<std::string, SBPhysicsJoint*>::iterator mi = jointMap.begin();
 	for ( mi  = jointMap.begin();
 		  mi != jointMap.end();
 		  mi++)
@@ -607,16 +607,16 @@ std::vector<SbmPhysicsJoint*> SbmPhysicsCharacter::getPhyJointList()
 }
 
 
-std::map<std::string,SbmJointObj*>& SbmPhysicsCharacter::getJointObjMap()
+std::map<std::string,SbmJointObj*>& SBPhysicsCharacter::getJointObjMap()
 {
 	return jointObjMap;
 }
 
-void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vector<std::string>& jointNameList, bool buildGeometry )
+void SBPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vector<std::string>& jointNameList, bool buildGeometry )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SBScene* scene = mcu._scene;
-	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
+	SBPhysicsSim* phySim = SBPhysicsSim::getPhysicsEngine();
 	SBCharacter* character = scene->getCharacter(charName);
 	if (!character) // no character
 		return;
@@ -629,7 +629,7 @@ void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vect
 		SBJoint* joint = skel->getJointByName(jointNameList[i]);
 		if (!joint)
 			continue;
-		SbmPhysicsJoint* phyJoint = new SbmPhysicsJoint(joint);
+		SBPhysicsJoint* phyJoint = new SBPhysicsJoint(joint);
 		SbmJointObj* jointObj = new SbmJointObj(this);//phySim->createJointObj();		
 		if (joint->mass() > 0)
 			jointObj->setMass(joint->mass());
@@ -653,7 +653,7 @@ void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vect
 	{
 		SbmJointObj* obj = mi->second;
 		// set the child rigid body for the joint
-		SbmPhysicsJoint* oj = obj->getPhyJoint();
+		SBPhysicsJoint* oj = obj->getPhyJoint();
 		if (oj && jointObjMap.find(oj->getSBJoint()->getName()) != jointObjMap.end())
 		{
 			oj->setChildObj(obj);	 
@@ -667,22 +667,22 @@ void SbmPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vect
 		}		
 	}
 
-	std::map<std::string, SbmPhysicsJoint*>::iterator ji = jointMap.begin();
+	std::map<std::string, SBPhysicsJoint*>::iterator ji = jointMap.begin();
 	for ( ji  = jointMap.begin();
 		  ji != jointMap.end();
 		  ji++)
 	{
-		SbmPhysicsJoint* phyJ = ji->second;
+		SBPhysicsJoint* phyJ = ji->second;
 		if (!phyJ->getParentObj()) root = phyJ;
 		updateJointAxis(phyJ);
 	}
 	root->updateTotalSupportMass();
 }
 
-void SbmPhysicsCharacter::cleanUpJoints()
+void SBPhysicsCharacter::cleanUpJoints()
 {
 	std::map<std::string, SbmJointObj*>::iterator mi;
-	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
+	SBPhysicsSim* phySim = SBPhysicsSim::getPhysicsEngine();
 	// remove all joint objs
 	for ( mi  = jointObjMap.begin();
 		  mi != jointObjMap.end();
@@ -695,7 +695,7 @@ void SbmPhysicsCharacter::cleanUpJoints()
 	jointObjMap.clear();	
 }
 
-SbmGeomObject* SbmPhysicsCharacter::createJointGeometry( SBJoint* joint, float radius )
+SbmGeomObject* SBPhysicsCharacter::createJointGeometry( SBJoint* joint, float radius )
 {
 	SbmGeomObject* newGeomObj = NULL;
 	SbmCharacter* curCharacter = mcuCBHandle::singleton().getCharacter(characterName);
@@ -759,7 +759,7 @@ SbmGeomObject* SbmPhysicsCharacter::createJointGeometry( SBJoint* joint, float r
 	return newGeomObj;
 }
 
-void SbmPhysicsCharacter::updateJointAxis( SbmPhysicsJoint* phyJoint )
+void SBPhysicsCharacter::updateJointAxis( SBPhysicsJoint* phyJoint )
 {
 	SBJoint* joint = phyJoint->getSBJoint();
 	SbmJointObj* childObj = phyJoint->getChildObj();
@@ -786,7 +786,7 @@ void SbmPhysicsCharacter::updateJointAxis( SbmPhysicsJoint* phyJoint )
 
 }
 
-void SbmPhysicsCharacter::updatePDTorque()
+void SBPhysicsCharacter::updatePDTorque()
 {
 	std::vector<SbmJointObj*> jointObjList = getJointObjList();
 
@@ -796,14 +796,14 @@ void SbmPhysicsCharacter::updatePDTorque()
 		for (unsigned int i=0;i<jointObjList.size();i++)
 		{
 			SbmJointObj* obj = jointObjList[i];
-			SbmPhysicsJoint* phyJoint = obj->getPhyJoint();
+			SBPhysicsJoint* phyJoint = obj->getPhyJoint();
 			phyJoint->setJointTorque(SrVec(0,0,0));
 		}
 		return;
 	}
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPhysicsSim* phySim = SbmPhysicsSim::getPhysicsEngine();
+	SBPhysicsSim* phySim = SBPhysicsSim::getPhysicsEngine();
 	float Ks = (float)phySim->getDoubleAttribute("Ks");
 	float Kd = (float)phySim->getDoubleAttribute("Kd");
 	
@@ -811,7 +811,7 @@ void SbmPhysicsCharacter::updatePDTorque()
 	for (unsigned int i=0;i<jointObjList.size();i++)
 	{
 		SbmJointObj* obj = jointObjList[i];
-		SbmPhysicsJoint* phyJoint = obj->getPhyJoint();
+		SBPhysicsJoint* phyJoint = obj->getPhyJoint();
 		SBJoint* joint = obj->getPhyJoint()->getSBJoint();
 		if (!joint)	continue;		
 		bool kinematicRoot = (joint->getName() == "base" || joint->getName() == "JtPelvis") && this->getBoolAttribute("kinematicRoot");		
@@ -881,7 +881,7 @@ void SbmPhysicsCharacter::updatePDTorque()
 	}
 }
 
-SrVec SbmPhysicsCharacter::computePDTorque( SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD, float Ks, float Kd )
+SrVec SBPhysicsCharacter::computePDTorque( SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD, float Ks, float Kd )
 {
 	SrVec torque;	
 	SrQuat qErr = q.inverse()*qD;//qD*q.inverse();
@@ -909,7 +909,7 @@ SrVec SbmPhysicsCharacter::computePDTorque( SrQuat& q, SrQuat& qD, SrVec& w, SrV
 	return torque;
 }
 
-SrVec SbmPhysicsCharacter::computeSPDTorque( SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD, float Ks, float Kd, float dt, float mass )
+SrVec SBPhysicsCharacter::computeSPDTorque( SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD, float Ks, float Kd, float dt, float mass )
 {
 
 	SrVec torque;	
@@ -956,7 +956,7 @@ SrVec SbmPhysicsCharacter::computeSPDTorque( SrQuat& q, SrQuat& qD, SrVec& w, Sr
 	return torque;
 }
 
-void SbmPhysicsCharacter::enablePhysicsSim( bool bPhy )
+void SBPhysicsCharacter::enablePhysicsSim( bool bPhy )
 {
 	std::map<std::string, SbmJointObj*>::iterator mi = jointObjMap.begin();
 	for ( mi  = jointObjMap.begin();
@@ -968,7 +968,7 @@ void SbmPhysicsCharacter::enablePhysicsSim( bool bPhy )
 	}
 }
 
-void SbmPhysicsCharacter::enableCollisionSim( bool bCol )
+void SBPhysicsCharacter::enableCollisionSim( bool bCol )
 {
 	std::map<std::string, SbmJointObj*>::iterator mi = jointObjMap.begin();
 	for ( mi  = jointObjMap.begin();
@@ -980,7 +980,7 @@ void SbmPhysicsCharacter::enableCollisionSim( bool bCol )
 	}
 }
 
-void SbmPhysicsCharacter::notify( SBSubject* subject )
+void SBPhysicsCharacter::notify( SBSubject* subject )
 {
 	SBAttribute* attribute = dynamic_cast<SBAttribute*>(subject);
 	if (attribute)
@@ -1002,7 +1002,7 @@ void SbmPhysicsCharacter::notify( SBSubject* subject )
 	}
 }
 
-// SbmGeomObject* SbmPhysicsCharacter::createJointGeometry( SBJoint* joint, float radius )
+// SbmGeomObject* SBPhysicsCharacter::createJointGeometry( SBJoint* joint, float radius )
 // {
 // 	SbmGeomObject* newGeomObj = NULL;
 // 	SbmCharacter* curCharacter = mcuCBHandle::singleton().getCharacter(characterName);

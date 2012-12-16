@@ -5,7 +5,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBCollisionManager.h>
-#include <sbm/Physics/SbmColObject.h>
+#include <sbm/Physics/SBColObject.h>
 
 
 namespace SmartBody {

@@ -4,7 +4,7 @@
 #endif
 #include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
-#include <sbm/Physics/SbmPhysicsSimODE.h>
+#include <sbm/Physics/SBPhysicsSimODE.h>
 
 #ifdef __ANDROID__
 #define USE_PHYSICS_CHARACTER 0
@@ -21,7 +21,7 @@ SBPhysicsManager::SBPhysicsManager()
 	setName("physics");
 
 	physicsTime = 0;
-	_ode = new SbmPhysicsSimODE();
+	_ode = new SBPhysicsSimODE();
 	_ode->initSimulation();
 }
 
@@ -30,7 +30,7 @@ SBPhysicsManager::~SBPhysicsManager()
 	delete _ode;
 }
 
-SbmPhysicsSim* SBPhysicsManager::getPhysicsEngine()
+SBPhysicsSim* SBPhysicsManager::getPhysicsEngine()
 {
 	return _ode;
 }
@@ -67,7 +67,7 @@ void SBPhysicsManager::beforeUpdate(double time)
 
 void SBPhysicsManager::update(double time)
 {
-	SbmPhysicsSim* physicsEngine = getPhysicsEngine();
+	SBPhysicsSim* physicsEngine = getPhysicsEngine();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	static double prevTime = -1;
 	if (isEnable())
@@ -132,8 +132,8 @@ SmartBody::SBObject* SBPhysicsManager::getPhysicsCharacter( std::string charName
 
 SmartBody::SBObject* SBPhysicsManager::getPhysicsJoint( std::string charName, std::string jointName )
 {
-	SbmPhysicsCharacter* phyChar = this->getPhysicsEngine()->getPhysicsCharacter(charName);
-	SbmPhysicsJoint* phyJoint = NULL;
+	SBPhysicsCharacter* phyChar = this->getPhysicsEngine()->getPhysicsCharacter(charName);
+	SBPhysicsJoint* phyJoint = NULL;
 	if (phyChar)
 	{
 		phyJoint = phyChar->getPhyJoint(jointName);		
@@ -143,7 +143,7 @@ SmartBody::SBObject* SBPhysicsManager::getPhysicsJoint( std::string charName, st
 
 SmartBody::SBObject* SBPhysicsManager::getJointObj( std::string charName, std::string jointName )
 {
-	SbmPhysicsCharacter* phyChar = this->getPhysicsEngine()->getPhysicsCharacter(charName);
+	SBPhysicsCharacter* phyChar = this->getPhysicsEngine()->getPhysicsCharacter(charName);
 	SbmJointObj* jointObj = NULL;
 	if (phyChar)
 	{
@@ -154,7 +154,7 @@ SmartBody::SBObject* SBPhysicsManager::getJointObj( std::string charName, std::s
 
 void SBPhysicsManager::applyForceToPawn( std::string pawnName, SrVec force )
 {
-	SbmPhysicsObj* phyObj = getPhysicsEngine()->getPhysicsPawn(pawnName);
+	SBPhysicsObj* phyObj = getPhysicsEngine()->getPhysicsPawn(pawnName);
 	if (phyObj)
 	{
 		LOG("Find phyobj, name = %s", pawnName.c_str());
@@ -164,7 +164,7 @@ void SBPhysicsManager::applyForceToPawn( std::string pawnName, SrVec force )
 
 void SBPhysicsManager::applyForceToCharacter( std::string charName, std::string jointName, SrVec force  )
 {
-	SbmPhysicsObj* phyObj = dynamic_cast<SbmPhysicsObj*>(getJointObj(charName, jointName));
+	SBPhysicsObj* phyObj = dynamic_cast<SBPhysicsObj*>(getJointObj(charName, jointName));
 	if (phyObj)
 	{
 		phyObj->setExternalForce(force);
@@ -183,10 +183,10 @@ SmartBody::SBObject* SBPhysicsManager::createPhysicsPawn( std::string pawnName, 
 	SmartBody::SBScene* scene = mcu._scene;
 	SmartBody::SBPawn* pawn = scene->getPawn(pawnName);
 	if (!pawn) return NULL;
-	SbmPhysicsObj* phyObj = pawn->getPhysicsObject();//new SbmPhysicsObj();
+	SBPhysicsObj* phyObj = pawn->getPhysicsObject();//new SBPhysicsObj();
 	if (phyObj) getPhysicsEngine()->removePhysicsObj(phyObj); // remove existing physics object
 
-	phyObj = new SbmPhysicsObj();
+	phyObj = new SBPhysicsObj();
 	phyObj->setName(pawnName);
 	SbmGeomObject* geomObj = SbmGeomObject::createGeometry(geomType,geomSize);
 	phyObj->setGeometry(geomObj);
@@ -202,14 +202,14 @@ SmartBody::SBObject* SBPhysicsManager::createPhysicsCharacter( std::string charN
 	SmartBody::SBScene* scene = mcu._scene;
 	SmartBody::SBCharacter* sbmChar = scene->getCharacter(charName);
 	if (!sbmChar) return NULL; // no character with the name
-	SbmPhysicsCharacter* phyChar = NULL;
+	SBPhysicsCharacter* phyChar = NULL;
 	phyChar = getPhysicsEngine()->getPhysicsCharacter(charName);
 	if (phyChar) return phyChar; // physics character of the same name already exist
 
 	// create physics character
 	const std::vector<SkJoint*>& joints = sbmChar->getSkeleton()->joints();	
 	//printf("init physics obj\n");	
-	phyChar = new SbmPhysicsCharacter();
+	phyChar = new SBPhysicsCharacter();
 	std::queue<SkJoint*> tempJointList;
 	std::vector<std::string> jointNameList;
 	std::set<std::string> excludeNameList; 
@@ -251,8 +251,8 @@ void SBPhysicsManager::updatePhysicsPawn( std::string pawnName )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SmartBody::SBScene* scene = mcu._scene;
-	SbmPhysicsSim* phyEngine = getPhysicsEngine();
-	SbmPhysicsObj* phyObj = phyEngine->getPhysicsPawn(pawnName);
+	SBPhysicsSim* phyEngine = getPhysicsEngine();
+	SBPhysicsObj* phyObj = phyEngine->getPhysicsPawn(pawnName);
 	SBPawn* pawn = scene->getPawn(pawnName);
 	if (!phyObj || !pawn) return;
 
@@ -275,8 +275,8 @@ void SBPhysicsManager::updatePhysicsPawn( std::string pawnName )
 
 void SBPhysicsManager::updatePhysicsCharacter( std::string charName )
 {	
-	SbmPhysicsSim* phyEngine = getPhysicsEngine();
-	SbmPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(charName);
+	SBPhysicsSim* phyEngine = getPhysicsEngine();
+	SBPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(charName);
 	if (!phyChar) return; 
 
 	bool charPhySim = (phyEngine->getBoolAttribute("enable") && phyChar->getBoolAttribute("enable"));

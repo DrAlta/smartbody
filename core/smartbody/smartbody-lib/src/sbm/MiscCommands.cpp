@@ -968,7 +968,7 @@ int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 		else
 			return CMD_FAILURE;
 
-		SbmPhysicsObj* phyObj = pawn->getPhysicsObject();
+		SBPhysicsObj* phyObj = pawn->getPhysicsObject();
 		if (phyObj) phyObj->enablePhysicsSim(turnOn);
 
 		//setPhysicsSim(turnOn);
@@ -985,7 +985,7 @@ int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 		else
 			return CMD_FAILURE;
 
-		SbmPhysicsObj* phyObj = pawn->getPhysicsObject();
+		SBPhysicsObj* phyObj = pawn->getPhysicsObject();
 		if (phyObj) phyObj->enableCollisionSim(turnOn);
 
 		//setCollision(turnOn);			

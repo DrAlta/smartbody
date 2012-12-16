@@ -264,6 +264,9 @@
     <ClCompile Include="..\src\sbm\ParserFBX.cpp" />
     <ClCompile Include="..\src\sbm\ParserOgre.cpp" />
     <ClCompile Include="..\src\sbm\ParserOpenCOLLADA.cpp" />
+    <ClCompile Include="..\src\sbm\Physics\SBColObject.cpp" />
+    <ClCompile Include="..\src\sbm\Physics\SBPhysicsSim.cpp" />
+    <ClCompile Include="..\src\sbm\Physics\SBPhysicsSimODE.cpp" />
     <ClCompile Include="..\src\sbm\remote_speech.cpp" />
     <ClCompile Include="..\src\sbm\Resource.cpp" />
     <ClCompile Include="..\src\sbm\resource_cmds.cpp" />
@@ -303,9 +306,6 @@
     <ClCompile Include="..\src\sbm\GPU\SbmTexture.cpp" />
     <ClCompile Include="..\src\sbm\GPU\TBOData.cpp" />
     <ClCompile Include="..\src\sbm\GPU\VBOData.cpp" />
-    <ClCompile Include="..\src\sbm\Physics\SbmColObject.cpp" />
-    <ClCompile Include="..\src\sbm\Physics\SbmPhysicsSim.cpp" />
-    <ClCompile Include="..\src\sbm\Physics\SbmPhysicsSimODE.cpp" />
     <ClCompile Include="..\src\sbm\SteeringAgent.cpp" />
     <ClCompile Include="..\src\sbm\SteerSuiteEnginerDriver.cpp" />
     <ClCompile Include="..\src\controllers\me_controller.cpp" />
@@ -711,6 +711,9 @@
     <ClInclude Include="..\src\sbm\ParserFBX.h" />
     <ClInclude Include="..\src\sbm\ParserOgre.h" />
     <ClInclude Include="..\src\sbm\ParserOpenCOLLADA.h" />
+    <ClInclude Include="..\src\sbm\Physics\SBColObject.h" />
+    <ClInclude Include="..\src\sbm\Physics\SBPhysicsSim.h" />
+    <ClInclude Include="..\src\sbm\Physics\SBPhysicsSimODE.h" />
     <ClInclude Include="..\src\sbm\remote_speech.h" />
     <ClInclude Include="..\src\sbm\Resource.h" />
     <ClInclude Include="..\src\sbm\resource_cmds.h" />
@@ -758,9 +761,6 @@
     <ClInclude Include="..\src\sbm\GPU\gfx\vec2.h" />
     <ClInclude Include="..\src\sbm\GPU\gfx\vec3.h" />
     <ClInclude Include="..\src\sbm\GPU\gfx\vec4.h" />
-    <ClInclude Include="..\src\sbm\Physics\SbmColObject.h" />
-    <ClInclude Include="..\src\sbm\Physics\SbmPhysicsSim.h" />
-    <ClInclude Include="..\src\sbm\Physics\SbmPhysicsSimODE.h" />
     <ClInclude Include="..\src\sbm\SteeringAgent.h" />
     <ClInclude Include="..\src\sbm\SteerSuiteEngineDriver.h" />
     <ClInclude Include="..\src\controllers\me_controller.h" />

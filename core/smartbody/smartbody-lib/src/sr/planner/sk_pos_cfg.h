@@ -6,7 +6,7 @@
 # include "sr_cfg_planner.h"
 # include <sr/sr_vec.h>
 # include <vector>
-# include <sbm/Physics/SbmColObject.h>
+# include <sbm/Physics/SBColObject.h>
 
 // basic interface for the object to be grabbed
 class ColObject

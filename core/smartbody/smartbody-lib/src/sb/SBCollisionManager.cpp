@@ -5,7 +5,7 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBSkeleton.h>
 #include <sbm/Event.h>
-#include <sbm/Physics/SbmPhysicsSimODE.h>
+#include <sbm/Physics/SBPhysicsSimODE.h>
 #include <boost/lexical_cast.hpp>
 #include <sbm/mcontrol_util.h>
 

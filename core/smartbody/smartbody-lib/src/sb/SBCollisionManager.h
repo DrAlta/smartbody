@@ -4,7 +4,7 @@
 #include <sb/SBTypes.h>
 #include <sb/SBService.h>
 #include <sb/SBSubject.h>
-#include <sbm/Physics/SbmColObject.h>
+#include <sbm/Physics/SBColObject.h>
 #include <sk/sk_joint.h>
 
 namespace SmartBody {

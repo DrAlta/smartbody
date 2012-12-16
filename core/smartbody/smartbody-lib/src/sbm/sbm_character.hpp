@@ -81,7 +81,7 @@ class MeCtSaccade;
 class SteeringAgent;
 class MeCtBasicLocomotion;
 class MeCtDataReceiver;
-class SbmPhysicsCharacter;
+class SBPhysicsCharacter;
 class MeCtPhysicsController;
 class MeCtNoiseController;
 class MeCtMotionPlayer;
@@ -98,7 +98,7 @@ public:
 	int	_numSteeringGoal;
 	bool _reachTarget;
 	bool _lastReachStatus;
-	//SbmPhysicsCharacter* phyChar;
+	//SBPhysicsCharacter* phyChar;
 
 	enum LocomotionType {Basic, Example, Procedural};
 	enum SteeringStateConfig { MINIMAL = 0, STANDARD};
@@ -149,7 +149,7 @@ protected:
 
 	// associate each joint with a physics object
 	// currently, we assume the vis-geo as the geometry ( or an capsule to the child if vis-geo is not available )
-	//std::map<std::string, SbmPhysicsObj*> jointPhyObjMap; 	
+	//std::map<std::string, SBPhysicsObj*> jointPhyObjMap; 	
 
 	// reach engine map
 	ReachEngineMap reachEngineMap;
@@ -327,7 +327,7 @@ public:
 	int   getCurrentReachType() { return currentReachType; }
 	void   setCurrentReachType(int type) { currentReachType = type; }
 
-	//SbmPhysicsCharacter* getPhysicsCharacter() { return phyChar; }
+	//SBPhysicsCharacter* getPhysicsCharacter() { return phyChar; }
 	//void buildJointPhyObjs();
 	//void updateJointPhyObjs(bool phySim = false);
 	//void setJointCollider(std::string jointName, float size);	

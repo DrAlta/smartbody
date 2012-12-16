@@ -429,9 +429,9 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/time_profiler.cpp \
 	$(SBM_MY_DIR)/sbm/time_regulator.cpp \
 	$(SBM_MY_DIR)/sbm/xercesc_utils.cpp \
-	$(SBM_MY_DIR)/sbm/Physics/SbmColObject.cpp \
-	$(SBM_MY_DIR)/sbm/Physics/SbmPhysicsSim.cpp \
-	$(SBM_MY_DIR)/sbm/Physics/SbmPhysicsSimODE.cpp \
+	$(SBM_MY_DIR)/sbm/Physics/SBColObject.cpp \
+	$(SBM_MY_DIR)/sbm/Physics/SBPhysicsSim.cpp \
+	$(SBM_MY_DIR)/sbm/Physics/SBPhysicsSimODE.cpp \
 	$(SBM_MY_DIR)/sbm/SteeringAgent.cpp \
 	$(SBM_MY_DIR)/sbm/SteerSuiteEnginerDriver.cpp \
 	$(SBM_MY_DIR)/sb/SBAttribute.cpp \
@@ -482,9 +482,9 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBBoneBusManager.cpp \
 	$(SBM_MY_DIR)/sb/SBGestureMapManager.cpp \
 	$(SBM_MY_DIR)/sb/SBGestureMap.cpp \
-	$(SBM_MY_DIR)/sbm/SbmDebuggerServer.cpp \
-	$(SBM_MY_DIR)/sbm/SbmDebuggerClient.cpp \
-	$(SBM_MY_DIR)/sbm/SbmDebuggerUtility.cpp \
+	$(SBM_MY_DIR)/sb/SBDebuggerServer.cpp \
+	$(SBM_MY_DIR)/sb/SBDebuggerClient.cpp \
+	$(SBM_MY_DIR)/sb/SBDebuggerUtility.cpp \
 	$(SBM_MY_DIR)/sb/SBPhonemeManager.cpp \
 	$(SBM_MY_DIR)/sb/SBPhoneme.cpp \
 	$(SBM_MY_DIR)/sb/SBBehaviorSet.cpp \

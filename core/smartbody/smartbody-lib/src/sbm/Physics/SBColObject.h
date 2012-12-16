@@ -33,7 +33,7 @@ public:
 
 typedef SbmTransform SRT;
 
-class SbmPhysicsObjInterface;
+class SBPhysicsObjInterface;
 
 enum { GEOM_NULL = 0, GEOM_SPHERE, GEOM_BOX, GEOM_CAPSULE, GEOM_MESH, NUM_OF_GEOMS };
 

@@ -311,10 +311,10 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/time_regulator.cpp
 	sbm/xercesc_utils.cpp
 	
-	sbm/Physics/SbmColObject.cpp
-	sbm/Physics/SbmColObject.cpp
-	sbm/Physics/SbmPhysicsSim.cpp
-	sbm/Physics/SbmPhysicsSimODE.cpp
+	sbm/Physics/SBColObject.cpp
+	sbm/Physics/SBColObject.cpp
+	sbm/Physics/SBPhysicsSim.cpp
+	sbm/Physics/SBPhysicsSimODE.cpp
 
 	sbm/GPU/SbmTexture.cpp
 	sbm/GPU/SbmDeformableMeshGPU.cpp
@@ -377,9 +377,9 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/nvbg.cpp
 	sbm/MiniBrain.cpp
 	sb/SBBehavior.cpp
-	sbm/SbmDebuggerServer.cpp
-	sbm/SbmDebuggerClient.cpp
-	sbm/SbmDebuggerUtility.cpp
+	sb/SBDebuggerServer.cpp
+	sb/SBDebuggerClient.cpp
+	sb/SBDebuggerUtility.cpp
 	sbm/SteerPath.cpp
 	sbm/MiscCommands.cpp
 
