@@ -5,9 +5,9 @@
 #include <sb/SBObject.h>
 #include <sb/SBScript.h>
 
-class SbmDebuggerServer;
-class SbmDebuggerClient;
-class SbmDebuggerUtility;
+class SBDebuggerServer;
+class SBDebuggerClient;
+class SBDebuggerUtility;
 
 namespace SmartBody {
 
@@ -40,6 +40,9 @@ class SBScene : public SBObject
 		SBAPI SBScene(void);
 		SBAPI ~SBScene(void);
 
+		SBAPI void setProcessId(const std::string& id);
+		SBAPI const std::string& getProcessId();
+
 		SBAPI void update();
 		SBAPI std::string save(bool remoteSetup = false);
 		SBAPI void exportScene(const std::string& filename);
@@ -48,8 +51,8 @@ class SBScene : public SBObject
 		SBAPI void setScale(float val);
 		SBAPI float getScale();
 
-		SBAPI void command(const std::string& command);
-		SBAPI void commandAt(float seconds, const std::string& command);
+		SBAPI bool command(const std::string& command);
+		SBAPI bool commandAt(float seconds, const std::string& command);
 		SBAPI void sendVHMsg(const std::string& message);
 		SBAPI void sendVHMsg2(const std::string&, const std::string& encodedMessage);		
 
@@ -100,8 +103,8 @@ class SBScene : public SBObject
 		SBAPI SBSkeleton* addSkeletonDefinition(const std::string& skelName);
 		SBAPI SBMotion* addMotionDefinition(const std::string& motionName, double duration);			
 				
-		SBAPI void run(const std::string& command);
-		SBAPI void runScript(const std::string& script);
+		SBAPI bool run(const std::string& command);
+		SBAPI bool runScript(const std::string& script);
 
 		SBAPI void setDefaultCharacter(const std::string& character);
 		SBAPI void setDefaultRecipient(const std::string& recipient);
@@ -133,9 +136,9 @@ class SBScene : public SBObject
 
 		SBAPI SBParser* getParser();
 
-		SBAPI SbmDebuggerServer * getDebuggerServer() { return _debuggerServer; }
-		SBAPI SbmDebuggerClient * getDebuggerClient() { return _debuggerClient; }
-		SBAPI SbmDebuggerUtility* getDebuggerUtility() { return _debuggerUtility; }
+		SBAPI SBDebuggerServer * getDebuggerServer() { return _debuggerServer; }
+		SBAPI SBDebuggerClient * getDebuggerClient() { return _debuggerClient; }
+		SBAPI SBDebuggerUtility* getDebuggerUtility() { return _debuggerUtility; }
 		SBAPI bool isRemoteMode();
 		SBAPI void setRemoteMode(bool val);
 
@@ -164,9 +167,9 @@ class SBScene : public SBObject
 		bool _isRemoteMode;
 		static bool _firstTime;
 
-		SbmDebuggerServer*	_debuggerServer;
-		SbmDebuggerClient*	_debuggerClient;
-		SbmDebuggerUtility*	_debuggerUtility;
+		SBDebuggerServer*	_debuggerServer;
+		SBDebuggerClient*	_debuggerClient;
+		SBDebuggerUtility*	_debuggerUtility;
 };
 
 SBScene* getScene();

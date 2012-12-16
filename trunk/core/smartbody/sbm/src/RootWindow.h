@@ -87,6 +87,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		Fl_Input *inputTimeStep;
 
 		std::string scriptFolder;
+		std::vector<std::string> windowSizes;
 	
 		static void LoadCB(Fl_Widget* widget, void* data);
 		static void SaveCB(Fl_Widget* widget, void* data);
@@ -158,6 +159,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void GridCB(Fl_Widget* w, void* data);	
 		static void CreatePythonAPICB(Fl_Widget* widget, void* data);
 		static void DocumentationCB(Fl_Widget* widget, void* data);
+		static void ResizeWindowCB(Fl_Widget* widget, void* data);
 
 };
 

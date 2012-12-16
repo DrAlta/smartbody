@@ -2,7 +2,7 @@
 #define COMMAND_DIALOG_H_
 
 #include "ui_CommandDialog.h"
-#include "SbmDebuggerClient.h"
+#include "SBDebuggerClient.h"
 
 using std::string;
 using std::vector;
@@ -19,7 +19,7 @@ public slots:
    void ClearOutputBox();
 
 public:
-   CommandDialog(SbmDebuggerClient* client, QWidget *parent = 0);
+   CommandDialog(SBDebuggerClient* client, QWidget *parent = 0);
    ~CommandDialog();
 
    QPlainTextEdit* CurrentTextEditor();
@@ -34,7 +34,7 @@ private:
       VHMsg,
    };
 
-   SbmDebuggerClient* m_client;
+   SBDebuggerClient* m_client;
    vector<string> m_previousCommands;
 
    void SaveCommand(string& command);

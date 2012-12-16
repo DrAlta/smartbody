@@ -268,8 +268,9 @@
     <ClCompile Include="..\src\sbm\Resource.cpp" />
     <ClCompile Include="..\src\sbm\resource_cmds.cpp" />
     <ClCompile Include="..\src\sbm\ResourceManager.cpp" />
-    <ClCompile Include="..\src\sbm\SbmDebuggerClient.cpp" />
-    <ClCompile Include="..\src\sbm\SbmDebuggerUtility.cpp" />
+    <ClCompile Include="..\src\sbm\SBDebuggerClient.cpp" />
+    <ClCompile Include="..\src\sbm\SBDebuggerServer.cpp" />
+    <ClCompile Include="..\src\sbm\SBDebuggerUtility.cpp" />
     <ClCompile Include="..\src\sbm\sbm_speech_impl_skeleton.cpp" />
     <ClCompile Include="..\src\sb\SBAnimationTransitionRule.cpp" />
     <ClCompile Include="..\src\sb\SBBehaviorSet.cpp" />
@@ -284,7 +285,6 @@
     <ClCompile Include="..\src\sbm\sbm_speech.cpp" />
     <ClCompile Include="..\src\sbm\sbm_speech_audiofile.cpp" />
     <ClCompile Include="..\src\sbm\sbm_test_cmds.cpp" />
-    <ClCompile Include="..\src\sbm\SbmDebuggerServer.cpp" />
     <ClCompile Include="..\src\sbm\sr_arg_buff.cpp" />
     <ClCompile Include="..\src\sbm\sr_cmd_line.cpp" />
     <ClCompile Include="..\src\sbm\sr_cmd_seq.cpp" />
@@ -715,8 +715,9 @@
     <ClInclude Include="..\src\sbm\Resource.h" />
     <ClInclude Include="..\src\sbm\resource_cmds.h" />
     <ClInclude Include="..\src\sbm\ResourceManager.h" />
-    <ClInclude Include="..\src\sbm\SbmDebuggerClient.h" />
-    <ClInclude Include="..\src\sbm\SbmDebuggerUtility.h" />
+    <ClInclude Include="..\src\sbm\SBDebuggerClient.h" />
+    <ClInclude Include="..\src\sbm\SBDebuggerServer.h" />
+    <ClInclude Include="..\src\sbm\SBDebuggerUtility.h" />
     <ClInclude Include="..\src\sbm\sbm_audio.h" />
     <ClInclude Include="..\src\sbm\sbm_character.hpp" />
     <ClInclude Include="..\src\sbm\sbm_constants.h" />

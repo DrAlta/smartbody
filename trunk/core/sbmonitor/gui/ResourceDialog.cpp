@@ -6,7 +6,7 @@
 // callbacks
 bool GetPathsCB(void* caller, NetRequest* req);
 
-ResourceDialog::ResourceDialog(SbmDebuggerClient* client, QWidget *parent) 
+ResourceDialog::ResourceDialog(SBDebuggerClient* client, QWidget *parent) 
 : QDialog(parent)
 {
    m_client = client;

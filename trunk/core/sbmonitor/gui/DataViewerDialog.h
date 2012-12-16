@@ -7,7 +7,7 @@
 
 #include "SbmDebuggerCommon.h"
 #include "GLGraphWidget.h"
-#include "SbmDebuggerClient.h"
+#include "SBDebuggerClient.h"
 
 using std::string;
 
@@ -16,7 +16,7 @@ class DataViewerDialog : public QDialog
    Q_OBJECT
 
 public:
-   DataViewerDialog(SbmDebuggerClient* client, QWidget* parent = 0);
+   DataViewerDialog(SBDebuggerClient* client, QWidget* parent = 0);
    ~DataViewerDialog();
    Ui::DataViewerDialog ui;
 
@@ -31,7 +31,7 @@ private slots:
 private:
    Scene* m_pScene;
    GLGraphWidget* m_pGraphWidget;
-   SbmDebuggerClient* m_client;
+   SBDebuggerClient* m_client;
    QBasicTimer timer;
    float m_DrawIntervals;
    float m_AccumTime;

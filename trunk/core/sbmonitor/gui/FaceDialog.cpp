@@ -11,7 +11,7 @@ bool GetAUNumbers(void* caller, NetRequest* req);
 bool GetAUSide(void* caller, NetRequest* req);
 
 
-FaceDialog::FaceDialog(SbmDebuggerClient* client, QWidget* parent ) : QDialog(parent)
+FaceDialog::FaceDialog(SBDebuggerClient* client, QWidget* parent ) : QDialog(parent)
 {
    m_BlockSending = false;
    m_client = client;

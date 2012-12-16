@@ -7,7 +7,7 @@
 
 #include "NetRequest.h"
 
-class SbmDebuggerClient
+class SBDebuggerClient
 {
 private:
    //vhmsg::Client m_vhmsg;
@@ -20,8 +20,8 @@ private:
    NetRequestManager m_netRequestManager;
 
 public:
-   SbmDebuggerClient();
-   virtual ~SbmDebuggerClient();
+   SBDebuggerClient();
+   virtual ~SBDebuggerClient();
 
    void QuerySbmProcessIds();
    const std::vector<std::string> & GetSbmProcessIds() const { return m_processIdList; }

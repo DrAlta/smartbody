@@ -58,7 +58,7 @@
 #include <sb/SBSteerManager.h>
 #include "TransparentListener.h"
 #include "TransparentViewer.h"
-#include "sbm/SbmDebuggerServer.h"
+#include "sbm/SBDebuggerServer.h"
 #include "sbm/GPU/SbmShader.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////

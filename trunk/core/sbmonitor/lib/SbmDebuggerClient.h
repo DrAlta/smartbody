@@ -6,7 +6,7 @@
 #include "SbmDebuggerCommon.h"
 #include "NetRequest.h"
 
-class SbmDebuggerClient
+class SBDebuggerClient
 {
 public:
    typedef void (*OnClose)(void* data);
@@ -23,8 +23,8 @@ private:
    void* m_pCloseCBData;
 
 public:
-   SbmDebuggerClient();
-   virtual ~SbmDebuggerClient();
+   SBDebuggerClient();
+   virtual ~SBDebuggerClient();
 
    Scene* GetScene() { return &m_scene; }
 

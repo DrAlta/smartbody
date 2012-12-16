@@ -251,7 +251,7 @@ void SBCollisionManager::afterUpdate(double time)
 					{
 						Event* collisionEvent = eventManager->createEvent("collision",c1->getName()+"/"+c2->getName());
 						eventManager->handleEvent(collisionEvent, time);
-						LOG("Collision detected between character %s and character %s",c1->getName().c_str(), c2->getName().c_str());
+						//LOG("Collision detected between character %s and character %s",c1->getName().c_str(), c2->getName().c_str());
 						delete collisionEvent; // free the memory
 
 						// collision resolution
@@ -315,7 +315,7 @@ void SBCollisionManager::afterUpdate(double time)
 					const std::string& obj1 = potentialCollisions[i].first;
 					const std::string& obj2 = potentialCollisions[i].second;
 
-					LOG("Collision detected between %s and %s", obj1.c_str(), obj2.c_str());
+					//LOG("Collision detected between %s and %s", obj1.c_str(), obj2.c_str());
 
 					Event* collisionEvent = eventManager->createEvent("collision",obj1+"/"+obj2);
 					eventManager->handleEvent(collisionEvent, time);

@@ -2,7 +2,7 @@
 #include "vhcl.h"
 #include "vhcl_socket.h"
 
-#include "SbmDebuggerClient.h"
+#include "SBDebuggerClient.h"
 
 #include <string>
 #include <vector>
@@ -19,15 +19,15 @@ using std::string;
 using std::vector;
 
 
-SbmDebuggerClient::SbmDebuggerClient()
+SBDebuggerClient::SBDebuggerClient()
 {
 }
 
-SbmDebuggerClient::~SbmDebuggerClient()
+SBDebuggerClient::~SBDebuggerClient()
 {
 }
 
-void SbmDebuggerClient::QuerySbmProcessIds()
+void SBDebuggerClient::QuerySbmProcessIds()
 {
    m_processIdList.clear();
    vhmsg::ttu_notify1("sbmdebugger queryids");
@@ -41,7 +41,7 @@ void SbmDebuggerClient::QuerySbmProcessIds()
 vhcl::socket_t m_sockTCP = NULL;
 
 
-void SbmDebuggerClient::Connect(const string & id)
+void SBDebuggerClient::Connect(const string & id)
 {
    m_sbmId = id;
    m_connectResult = false;
@@ -82,7 +82,7 @@ void SbmDebuggerClient::Connect(const string & id)
    }
 }
 
-void SbmDebuggerClient::Disconnect()
+void SBDebuggerClient::Disconnect()
 {
    if ( m_sockTCP )
    {
@@ -103,7 +103,7 @@ void SbmDebuggerClient::Disconnect()
    m_scene.m_rendererIsRightHanded = true;
 }
 
-void SbmDebuggerClient::Init()
+void SBDebuggerClient::Init()
 {
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s send_init", m_sbmId.c_str()).c_str());
 }
@@ -116,7 +116,7 @@ void SbmDebuggerClient::Init()
 string m_tcpData;
 int m_tcpDataCount = 0;
 
-void SbmDebuggerClient::Update()
+void SBDebuggerClient::Update()
 {
    {
       vhcl::socket_t s = m_sockTCP;
@@ -336,17 +336,17 @@ void SbmDebuggerClient::Update()
    }
 }
 
-void SbmDebuggerClient::StartUpdates(double updateFrequencyS)
+void SBDebuggerClient::StartUpdates(double updateFrequencyS)
 {
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s start_update %f", m_sbmId.c_str(), updateFrequencyS).c_str());
 }
 
-void SbmDebuggerClient::EndUpdates()
+void SBDebuggerClient::EndUpdates()
 {
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s end_update", m_sbmId.c_str()).c_str());
 }
 
-void SbmDebuggerClient::GetResourcePaths()
+void SBDebuggerClient::GetResourcePaths()
 {
    // store query ids
    // send queries
@@ -362,7 +362,7 @@ void SbmDebuggerClient::GetResourcePaths()
    //NetRequest* req = new NetRequest();
 }
 
-void SbmDebuggerClient::SendSBMCommand(int requestId, const std::string & command)
+void SBDebuggerClient::SendSBMCommand(int requestId, const std::string & command)
 {
    // send a void command, not expecting a return
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s %d request void \"ret = %s\"", m_sbmId.c_str(), 42, command.c_str()).c_str());
@@ -370,7 +370,7 @@ void SbmDebuggerClient::SendSBMCommand(int requestId, const std::string & comman
    m_netRequestManager.CreateNetRequest(requestId, NULL, NULL);
 }
 
-void SbmDebuggerClient::SendSBMCommand(int requestId, const std::string & returnValue, const std::string & functionNameandParams,
+void SBDebuggerClient::SendSBMCommand(int requestId, const std::string & returnValue, const std::string & functionNameandParams,
                                        NetRequest::RequestCallback cb,  void* callbackOwner)
 {
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s %d request %s \"ret = %s\"", m_sbmId.c_str(),
@@ -380,7 +380,7 @@ void SbmDebuggerClient::SendSBMCommand(int requestId, const std::string & return
 }
 
 
-void SbmDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
+void SBDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
 {
    string message = string(op) + " " + string(args);
    vector<string> split;

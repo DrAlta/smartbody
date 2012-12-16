@@ -29,9 +29,9 @@
 #include <sb/SBBehaviorSetManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBParser.h>
-#include <sbm/SbmDebuggerServer.h>
-#include <sbm/SbmDebuggerClient.h>
-#include <sbm/SbmDebuggerUtility.h>
+#include <sbm/SBDebuggerServer.h>
+#include <sbm/SBDebuggerClient.h>
+#include <sbm/SBDebuggerUtility.h>
 #include <sbm/sbm_audio.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -69,9 +69,9 @@ SBScene::SBScene(void)
 
 	_parser = new SBParser();
 
-	_debuggerServer = new SbmDebuggerServer();
-	_debuggerClient = new SbmDebuggerClient();
-	_debuggerUtility = new SbmDebuggerUtility();
+	_debuggerServer = new SBDebuggerServer();
+	_debuggerClient = new SBDebuggerClient();
+	_debuggerUtility = new SBDebuggerUtility();
 	_isRemoteMode = false;
 
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
@@ -124,6 +124,18 @@ SBScene* SBScene::getScene()
 	}
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	return mcu._scene;
+}
+
+void SBScene::setProcessId(const std::string& id)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.process_id = id;
+}
+
+const std::string& SBScene::getProcessId()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	return mcu.process_id;
 }
 
 void SBScene::update()
@@ -854,16 +866,26 @@ EventManager* SBScene::getEventManager()
 
 
 
-void SBScene::command(const std::string& command)
+bool SBScene::command(const std::string& command)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.execute((char*) command.c_str());
+	int ret = mcu.execute((char*) command.c_str());
+
+	if (ret == CMD_SUCCESS)
+		return true;
+	else
+		return false;
 }
 
-void SBScene::commandAt(float seconds, const std::string& command)
+bool SBScene::commandAt(float seconds, const std::string& command)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.execute_later((char*) command.c_str(), seconds);
+	int ret = mcu.execute_later((char*) command.c_str(), seconds);
+
+	if (ret == CMD_SUCCESS)
+		return true;
+	else
+		return false;
 }
 
 void SBScene::removePendingCommands()
@@ -885,16 +907,26 @@ void SBScene::sendVHMsg2(const std::string& message, const std::string& message2
 	mcu.vhmsg_send(message.c_str(), message2.c_str());
 }
 
-void SBScene::run(const std::string& command)
+bool SBScene::run(const std::string& command)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.executePython(command.c_str());
+	int ret = mcu.executePython(command.c_str());
+
+	if (ret == CMD_SUCCESS)
+		return true;
+	else
+		return false;
 }
 
-void SBScene::runScript(const std::string& script)
+bool SBScene::runScript(const std::string& script)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.executePythonFile(script.c_str());
+	int ret = mcu.executePythonFile(script.c_str());
+	
+	if (ret == CMD_SUCCESS)
+		return true;
+	else
+		return false;
 }
 
 SBSimulationManager* SBScene::getSimulationManager()

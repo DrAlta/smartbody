@@ -3,11 +3,11 @@
 
 #include <string>
 
-class SbmDebuggerUtility
+class SBDebuggerUtility
 {
 public:
-	SbmDebuggerUtility();
-	~SbmDebuggerUtility();
+	SBDebuggerUtility();
+	~SBDebuggerUtility();
 
 	void initScene();
 	void queryResources();

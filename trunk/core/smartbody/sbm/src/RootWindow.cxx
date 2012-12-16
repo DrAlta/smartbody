@@ -13,7 +13,7 @@
 #include <fstream>
 #include "CommandWindow.h"
 #include <sb/SBSkeleton.h>
-#include <sbm/SbmDebuggerClient.h>
+#include <sbm/SBDebuggerClient.h>
 
 BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
 {
@@ -60,7 +60,42 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Terrain/No Terrain", 0, TerrainNoneCB, this, NULL);	
 	menubar->add("&View/Steer/Characters and Goals", 0, SteeringCharactersCB, this, NULL);
 	menubar->add("&View/Steer/All Steering", 0, SteeringAllCB, this, NULL);
-	menubar->add("&View/Steer/No Steering", 0, SteeringNoneCB, this, NULL);	
+	menubar->add("&View/Steer/No Steering", 0, SteeringNoneCB, this, NULL);
+/*
+	windowSizes.push_back("640x480");
+	windowSizes.push_back("720x480");
+	windowSizes.push_back("720x576");
+	windowSizes.push_back("800x600");
+	windowSizes.push_back("854x480");
+	windowSizes.push_back("960x600");
+	windowSizes.push_back("1024x576");
+	windowSizes.push_back("1024x768");
+	windowSizes.push_back("1280x720");
+	windowSizes.push_back("1280x768");
+	windowSizes.push_back("1366x768");
+	windowSizes.push_back("1280x800");
+	windowSizes.push_back("1280x1024");
+	windowSizes.push_back("1440x900");
+	windowSizes.push_back("1600x900");
+	windowSizes.push_back("1920x1080");
+
+	menubar->add("&View/Size/640.480", 0, ResizeWindowCB, this, 0);
+	menubar->add("&View/Size/720.480", 0, ResizeWindowCB, this, 1);
+	menubar->add("&View/Size/720x576", 0, ResizeWindowCB, this, 2);
+	menubar->add("&View/Size/800x600", 0, ResizeWindowCB, this, 3);
+	menubar->add("&View/Size/854x480", 0, ResizeWindowCB, this, 4);
+	menubar->add("&View/Size/960x600", 0, ResizeWindowCB, this, 5);
+	menubar->add("&View/Size/1024x576", 0, ResizeWindowCB, this, 6);
+	menubar->add("&View/Size/1024x768", 0, ResizeWindowCB, this, 7);
+	menubar->add("&View/Size/1280x720", 0, ResizeWindowCB, this, 8);
+	menubar->add("&View/Size/1280x768", 0, ResizeWindowCB, this, 9);
+	menubar->add("&View/Size/1366x768", 0, ResizeWindowCB, this, 10);
+	menubar->add("&View/Size/1280x800", 0, ResizeWindowCB, this, 11);
+	menubar->add("&View/Size/1280x1024", 0, ResizeWindowCB, this, 12);
+	menubar->add("&View/Size/1440x900", 0, ResizeWindowCB, this, 13);
+	menubar->add("&View/Size/1600x900", 0, ResizeWindowCB, this, 14);
+	menubar->add("&View/Size/1920x1080", 0, ResizeWindowCB, this, 15);
+*/
 	menubar->add("&Create/Character...", 0, CreateCharacterCB, this, NULL);
 	menubar->add("&Create/Pawn...", 0, CreatePawnCB, this, NULL);
 	menubar->add("&Create/Light...", 0, CreateLightCB, this, NULL);
@@ -1325,6 +1360,31 @@ void BaseWindow::DocumentationCB(Fl_Widget* widget, void* data)
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->run(strstr.str());
 }
+
+void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+
+	int windowIndex = (int) data;
+
+	std::cout << windowIndex << std::endl;
+
+	return;
+	
+	std::vector<std::string> tokens;
+	vhcl::Tokenize(rootWindow->windowSizes[windowIndex], tokens, "x");
+	if (tokens.size() < 2)
+		return;
+
+	int width = atoi(tokens[0].c_str());
+	int height = atoi(tokens[1].c_str());
+	std::cout << width << " " << height << std::endl;
+	
+	//rootWindow->w(width);
+	//rootWindow->h(height);
+}
+
+
 
 
 //== Viewer Factory ========================================================

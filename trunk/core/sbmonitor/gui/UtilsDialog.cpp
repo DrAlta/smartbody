@@ -16,7 +16,7 @@ using std::string;
 bool GetAnimationNames(void* caller, NetRequest* req);
 
 
-UtilsDialog::UtilsDialog(SbmDebuggerClient* client, GLWidget* pRenderView, Ui::MainWindow& ui) //: QDialog(parent)
+UtilsDialog::UtilsDialog(SBDebuggerClient* client, GLWidget* pRenderView, Ui::MainWindow& ui) //: QDialog(parent)
 {
    m_client = client;
    this->ui = ui;

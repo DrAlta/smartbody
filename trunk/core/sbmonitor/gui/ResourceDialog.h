@@ -3,7 +3,7 @@
 
 #include "ui_ResourceDialog.h"
 #include "SbmDebuggerCommon.h"
-#include "SbmDebuggerClient.h"
+#include "SBDebuggerClient.h"
 
 using std::string;
 
@@ -27,7 +27,7 @@ public:
       Services
    };
 
-   ResourceDialog(SbmDebuggerClient* client, QWidget *parent = 0);
+   ResourceDialog(SBDebuggerClient* client, QWidget *parent = 0);
    ~ResourceDialog();
 
    Ui::ResourceDialog ui;
@@ -38,7 +38,7 @@ public slots:
    void Refresh();
 
 private:
-   SbmDebuggerClient* m_client;
+   SBDebuggerClient* m_client;
    Scene* m_pScene;
 
    void SendGetAssetPathCommand(string assetType, NetRequest::RequestId rid);

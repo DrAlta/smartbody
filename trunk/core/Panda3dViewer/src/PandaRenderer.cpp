@@ -1,10 +1,11 @@
+#include <vhcl.h>
 #include "PandaRenderer.h"
 #include "pandaFramework.h"
 #include "pandaSystem.h"
  
 #include "genericAsyncTask.h"
 #include "asyncTaskManager.h"
-#include <vhcl.h>
+
 
 PandaRenderer::PandaRenderer(PandaFramework* framework, WindowFramework *window)
 {
@@ -13,7 +14,7 @@ PandaRenderer::PandaRenderer(PandaFramework* framework, WindowFramework *window)
 
 	m_sbListener = new SBListener(this);
 	m_sbm = new Smartbody_dll;
-	m_sbm->Init("../../../Python26/Lib");
+	m_sbm->Init("../../../Python26/Lib", true);
 	LOG("SmartBody initialized...");
 	vhcl::Log::g_log.AddListener(new vhcl::Log::StdoutListener());
 	

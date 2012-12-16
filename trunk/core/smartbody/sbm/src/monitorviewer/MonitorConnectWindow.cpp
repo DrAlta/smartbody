@@ -4,8 +4,8 @@
 #include "MonitorConnectWindow.h"
 #include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
-#include <sbm/SbmDebuggerClient.h>
-#include <sbm/SbmDebuggerServer.h>
+#include <sbm/SBDebuggerClient.h>
+#include <sbm/SBDebuggerServer.h>
 #include <sbm/mcontrol_util.h>
 #include <sb/SBPythonClass.h>
 
@@ -52,8 +52,8 @@ void MonitorConnectWindow::loadProcesses()
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
 	SmartBody::SBScene::getScene()->setRemoteMode(true);
 
-	SbmDebuggerClient* c = sbScene->getDebuggerClient();
-	SbmDebuggerServer* s = sbScene->getDebuggerServer();
+	SBDebuggerClient* c = sbScene->getDebuggerClient();
+	SBDebuggerServer* s = sbScene->getDebuggerServer();
 	c->QuerySbmProcessIds();
 	vhcl::Sleep(2);
 	vhmsg::ttu_poll();
@@ -70,8 +70,8 @@ void MonitorConnectWindow::OnConfirmCB(Fl_Widget* widget, void* data)
 {
 	MonitorConnectWindow* monitorConnectWindow = (MonitorConnectWindow*) data;
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
-	SbmDebuggerClient* c = sbScene->getDebuggerClient();
-	SbmDebuggerServer* s = sbScene->getDebuggerServer();
+	SBDebuggerClient* c = sbScene->getDebuggerClient();
+	SBDebuggerServer* s = sbScene->getDebuggerServer();
 
 	if (monitorConnectWindow->_browserSBProcesses->value() <= 0)
 		return;
