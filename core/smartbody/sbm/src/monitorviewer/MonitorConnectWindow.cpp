@@ -4,8 +4,8 @@
 #include "MonitorConnectWindow.h"
 #include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
-#include <sbm/SBDebuggerClient.h>
-#include <sbm/SBDebuggerServer.h>
+#include <sb/SBDebuggerClient.h>
+#include <sb/SBDebuggerServer.h>
 #include <sbm/mcontrol_util.h>
 #include <sb/SBPythonClass.h>
 

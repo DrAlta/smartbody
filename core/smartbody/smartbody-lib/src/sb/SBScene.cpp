@@ -29,9 +29,9 @@
 #include <sb/SBBehaviorSetManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBParser.h>
-#include <sbm/SBDebuggerServer.h>
-#include <sbm/SBDebuggerClient.h>
-#include <sbm/SBDebuggerUtility.h>
+#include <sb/SBDebuggerServer.h>
+#include <sb/SBDebuggerClient.h>
+#include <sb/SBDebuggerUtility.h>
 #include <sbm/sbm_audio.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>

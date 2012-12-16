@@ -152,19 +152,19 @@
 			>
 		</File>
 		<File
-			RelativePath=".\SbmDebuggerClient.cpp"
+			RelativePath=".\SBDebuggerClient.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\SbmDebuggerClient.h"
+			RelativePath=".\SBDebuggerClient.h"
 			>
 		</File>
 		<File
-			RelativePath=".\SbmDebuggerCommon.cpp"
+			RelativePath=".\SBDebuggerCommon.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\SbmDebuggerCommon.h"
+			RelativePath=".\SBDebuggerCommon.h"
 			>
 		</File>
 	</Files>

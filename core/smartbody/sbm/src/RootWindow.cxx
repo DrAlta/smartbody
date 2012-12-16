@@ -13,7 +13,7 @@
 #include <fstream>
 #include "CommandWindow.h"
 #include <sb/SBSkeleton.h>
-#include <sbm/SBDebuggerClient.h>
+#include <sb/SBDebuggerClient.h>
 
 BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
 {

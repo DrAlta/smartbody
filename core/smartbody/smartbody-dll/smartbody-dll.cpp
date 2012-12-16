@@ -23,7 +23,7 @@
 #pragma warning(pop)
 
 
-#include "sbm/SBDebuggerServer.h"
+#include "sb/SBDebuggerServer.h"
 
 
 using std::string;
