@@ -619,7 +619,7 @@
   </library_effects>
   <library_images>
     <image id="file12" name="file12">
-      <init_from>file:///C:/ICT/simcoachart/art/textures/ChrBillFord/ChrBillFord_Head_Alpha.tga</init_from>
+      <init_from>file:///ChrBillFord_Head_Alpha.TGA.jpg</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -629,7 +629,7 @@
       </extra>
     </image>
     <image id="file1" name="file1">
-      <init_from>file:///C:/ICT/simcoachart/art/textures/ChrBillFord/ChrBillFord_Head_Diffuse.TGA</init_from>
+      <init_from>file:///ChrBillFord_Head_Diffuse.TGA.jpg</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -639,7 +639,7 @@
       </extra>
     </image>
     <image id="file10" name="file10">
-      <init_from>file:///C:/ICT/simcoachart/art/textures/ChrBillFord/ChrBillFord_Head_Displacement.tga</init_from>
+      <init_from>file:///ChrBillFord_Head_Displacement.jpg</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -649,7 +649,7 @@
       </extra>
     </image>
     <image id="file11" name="file11">
-      <init_from>file:///C:/ICT/simcoachart/art/textures/ChrBillFord/ChrBillFord_Head_Normal.tga</init_from>
+      <init_from>file:///ChrBillFord_Head_Normal.tga.jpg</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -659,7 +659,7 @@
       </extra>
     </image>
     <image id="file14" name="file14">
-      <init_from>file:///C:/ICT/simcoachart/art/textures/ChrBillFord/ChrBillFord_Head_Specular.tga</init_from>
+      <init_from>file:///ChrBillFord_Head_Specular.jpg</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -669,7 +669,7 @@
       </extra>
     </image>
     <image id="file4" name="file4">
-      <init_from>file:///C:/ICT/simcoachart/art/textures/ChrBillFord/ChrBillFord_LowerBody_Diffuse.tga</init_from>
+      <init_from>file:///ChrBillFord_LowerBody_Diffuse.tga.jpg</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -679,7 +679,7 @@
       </extra>
     </image>
     <image id="file15" name="file15">
-      <init_from>file:///C:/ICT/simcoachart/art/textures/ChrBillFord/ChrBillFord_LowerBody_Displacement.tga</init_from>
+      <init_from>file:///ChrBillFord_LowerBody_Displacement.jpg</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -689,7 +689,7 @@
       </extra>
     </image>
     <image id="file7" name="file7">
-      <init_from>file:///C:/ICT/simcoachart/art/textures/ChrBillFord/ChrBillFord_UpperBody_Diffuse.TGA</init_from>
+      <init_from>file:///ChrBillFord_UpperBody_Diffuse.TGA.jpg</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -699,7 +699,7 @@
       </extra>
     </image>
     <image id="file16" name="file16">
-      <init_from>file:///C:/ICT/simcoachart/art/textures/ChrBillFord/ChrBillFord_UpperBody_Displacement.TGA</init_from>
+      <init_from>file:///ChrBillFord_UpperBody_Displacement.jpg</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
@@ -709,7 +709,7 @@
       </extra>
     </image>
     <image id="file9" name="file9">
-      <init_from>file:///C:/ICT/simcoachart/art/textures/ChrBillFord/ChrBillFord_UpperBody_Specular.tga</init_from>
+      <init_from>file:///ChrBillFord_UpperBody_Specular.jpg</init_from>
       <extra>
         <technique profile="OpenCOLLADAMaya">
           <dgnode_type>kFile</dgnode_type>
