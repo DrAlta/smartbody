@@ -150,8 +150,11 @@ namespace BML {
 
 		void cleanup( Processor* bp, mcuCBHandle* mcu );
 
-		// this function handles all the special process in between behaviors' schedule and realize
+		// this function handles all the gesture process in between behaviors' schedule and realize
 		void gestureRequestProcess();
+
+		// this function takes scheduled speech request behaviors and hand the information over to Cerebella
+		void speechRequestProcess();
 
 	public:
 		virtual ~BmlRequest();
@@ -201,8 +204,9 @@ namespace BML {
 		const std::string         unique_id;
 		const std::string         local_id;
 		bool                      required;
-		BehaviorSyncPoints behav_syncs;
+		BehaviorSyncPoints		  behav_syncs;
 		BehaviorSchedulerPtr      scheduler;
+		std::string				  group_id;
 
 	private:
         time_sec audioOffset;

@@ -231,7 +231,7 @@ brad.setVoice("remote")
 brad.setVoiceCode("Festival_voice_kal_diphone")
 # gesture map setup
 brad.setStringAttribute("gestureMap", "ChrBrad")
-brad.setBoolAttribute("bmlRequest.autoGestureTransition", True)
+brad.setBoolAttribute("gestureRequest.autoGestureTransition", True)
 # retarget
 retargetCharacter("ChrBrad", "ChrBrad.sk")
 
@@ -290,7 +290,7 @@ rachel.setVoice("remote")
 rachel.setVoiceCode("MicrosoftAnna")
 # gesture map setup
 rachel.setStringAttribute("gestureMap", "ChrRachel")
-rachel.setBoolAttribute("bmlRequest.autoGestureTransition", True)
+rachel.setBoolAttribute("gestureRequest.autoGestureTransition", True)
 # retarget
 retargetCharacter("ChrRachel", "ChrRachel.sk")
 
