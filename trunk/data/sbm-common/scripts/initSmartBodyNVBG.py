@@ -112,6 +112,19 @@ class SmartBodyNVBG(Nvbg):
                         self.nvbg.set_push_to_talk(False)
                 return True
 
+        def executeSpeechRequest(self, behaviors, times, targets, info):
+                """
+                Necessary
+                Override the C++ executeSpeechRequest function
+                Process listening feedback request from virtual world
+                """
+                if hasattr(self, 'nvbg') is False:
+                        return
+                
+                bmlstr = self.nvbg.process_feedback_virtual(behaviors, times, targets, info)
+                bml.execBML(self.nvbg.characterName, str(bmlstr))
+                return True
+        
         def executeEvent(self, character, messageId, state):
                 """
                 Necessary

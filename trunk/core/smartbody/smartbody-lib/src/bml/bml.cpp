@@ -44,7 +44,9 @@
 #include <sb/SBAnimationState.h>
 #include <sb/SBBehavior.h>
 #include <sb/SBMotion.h>
-
+#include <sb/SBGestureMapManager.h>
+#include <sb/SBGestureMap.h>
+#include <sb/SBSimulationManager.h>
 
 using namespace std;
 using namespace BML;
@@ -548,6 +550,152 @@ void BmlRequest::gestureRequestProcess()
 	}
 }
 
+void BML::BmlRequest::speechRequestProcess()
+{
+	float curTime = (float)SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
+	std::vector<std::string> behList;
+	std::vector<float> times;
+	std::vector<std::string> targets;
+	std::vector<std::string> info;
+
+	std::map<std::string, float> nodReqTimeMap;
+	std::map<std::string, std::vector<BehaviorRequest*> > groupMap; 
+	for (VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behaviors.end(); ++i) 
+	{
+		BehaviorRequest* behavior = (*i).get();
+		float startTime = (float)behavior->behav_syncs.sync_start()->time() - curTime;
+		float readyTime = (float)behavior->behav_syncs.sync_ready()->time() - curTime;
+		float strokeTime = (float)behavior->behav_syncs.sync_stroke()->time() - curTime;
+
+		// group behaviors together
+		if (behavior->group_id != "")
+		{
+			if (behavior->group_id != "")
+			{
+				std::map<std::string, std::vector<BehaviorRequest*> >::iterator iter = groupMap.find(behavior->group_id);
+				if (iter == groupMap.end())
+				{
+					std::vector<BehaviorRequest*> behVec;
+					behVec.push_back(behavior);
+					groupMap.insert(std::make_pair(behavior->group_id, behVec));
+				}
+				else
+				{
+					iter->second.push_back(behavior);
+				}
+			}
+		}
+
+		/*
+		// Head movement
+		// Output parameters: <head group_id> <start time>
+		// P.S. assume group id is specified
+		NodRequest* nodRequest = dynamic_cast<NodRequest*> (behavior);
+		if (nodRequest)
+		{
+			if (nodRequest->group_id != "")
+			{
+				std::map<std::string, float>::const_iterator iter = nodReqTimeMap.find(nodRequest->group_id);
+				if (iter == nodReqTimeMap.end())
+				{
+					nodReqTimeMap.insert(std::make_pair(nodRequest->group_id, startTime));
+				}
+				else
+				{
+					if (startTime < iter->second)
+						nodReqTimeMap[iter->first] = startTime;
+				}
+			}
+			else	// if group id is not specified, should probably also pass it down to Cerebella
+			{
+				;
+			}
+		}
+		*/
+
+		// Gestures
+		// Output parameters: <gesture type> <start time> <target> <wrist speed>
+		// P.S. assume gesture map is setup correctly
+		GestureRequest* gestureRequest = dynamic_cast<GestureRequest*> (behavior);
+		if (gestureRequest)
+		{
+			if (gestureRequest->filtered)	continue;
+			SBJoint* l_wrist = actor->getSkeleton()->getJointByName("l_wrist");
+			SBJoint* r_wrist = actor->getSkeleton()->getJointByName("r_wrist");
+			if (l_wrist && r_wrist)
+			{
+				MeCtMotion* motionCt = dynamic_cast<MeCtMotion*> (gestureRequest->anim_ct);
+				if (!motionCt)	continue;
+				SBMotion* sbMotion = dynamic_cast<SBMotion*> (motionCt->motion());
+				if (!sbMotion) continue;
+				if (gestureRequest->group_id == "")	// if group id is not specified, should probably also pass it down to Cerebella
+					continue;
+
+				behList.push_back(gestureRequest->group_id);
+				times.push_back(startTime);
+				sbMotion->connect(actor->getSkeleton());
+				float lWristSpeed = sbMotion->getJointSpeed(l_wrist, (float)sbMotion->getTimeStart(), (float)sbMotion->getTimeStop());
+				float rWristSpeed = sbMotion->getJointSpeed(r_wrist, (float)sbMotion->getTimeStart(), (float)sbMotion->getTimeStop());
+				if (lWristSpeed > rWristSpeed)
+				{
+					std::string target = actor->getName() + ":l_wrist";
+					targets.push_back(target);
+					stringstream ss;
+					ss << lWristSpeed;
+					info.push_back(ss.str());
+				}
+				else
+				{
+					std::string target = actor->getName() + ":r_wrist";
+					targets.push_back(target);
+					stringstream ss;
+					ss << rWristSpeed;
+					info.push_back(ss.str());
+				}
+			}
+		}
+	}
+
+	// push in all the head movement related behaviors
+	/*
+	for (std::map<std::string, float>::const_iterator iter = nodReqTimeMap.begin(); iter != nodReqTimeMap.end(); ++iter)
+	{
+		behList.push_back(iter->first);
+		times.push_back(iter->second);
+		targets.push_back("");
+		info.push_back("");
+	}
+	*/
+	for (std::map<std::string, std::vector<BehaviorRequest*> >::iterator iter = groupMap.begin(); iter != groupMap.end(); ++iter)
+	{
+		float startTime = -1.0f;
+		bool hasHead = false;
+		std::vector<BehaviorRequest*>& behVec = iter->second;
+		for (size_t i = 0; i < behVec.size(); i++)
+		{
+			float behStartTime = (float)behVec[i]->behav_syncs.sync_start()->time() - curTime;
+			if (startTime < 0)
+				startTime = behStartTime;
+			else
+				startTime = startTime < behStartTime ? startTime : behStartTime;
+			NodRequest* nodRequest = dynamic_cast<NodRequest*> (behVec[i]);
+			if (nodRequest)
+			{
+				hasHead = true;
+			}
+		}
+		if (hasHead)
+		{
+			behList.push_back(iter->first);
+			times.push_back(startTime);
+			targets.push_back("");
+			info.push_back("");
+		}
+	}
+
+	if (actor->getNvbg())
+		actor->getNvbg()->executeSpeechRequest(behList, times, targets, info);
+}
 
 void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	// Self reference to pass on...
@@ -754,6 +902,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	}
 
 	gestureRequestProcess();
+	speechRequestProcess();
 
 	// Realize behaviors
 #if USE_CUSTOM_PRUNE_POLICY
@@ -1199,7 +1348,8 @@ BehaviorRequest::BehaviorRequest( const std::string& unique_id, const std::strin
 	unique_id( unique_id ),
 	local_id( local ),
 	audioOffset(TIME_UNSET),
-	required(false)
+	required(false),
+	group_id("")
 {
 
 	//std::cout << "BEHAVIOR REQUEST " << unique_id << " WITH " << behav_syncs.size() << " SYNC POINTS" << std::endl;

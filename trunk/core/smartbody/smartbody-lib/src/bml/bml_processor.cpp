@@ -472,6 +472,10 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			
 
 			if( behavior != NULL ) {
+				const XMLCh* groupIdAttr = child->getAttribute(BMLDefs::ATTR_GROUP);
+				std::string group_id;
+				xml_utils::xml_translate(&group_id, groupIdAttr);
+				behavior->group_id = group_id;
 				behavior->required = required;
 				request->registerBehavior( xml_utils::xml_s2w(idStr), behavior );
 				if (bml_feedback)

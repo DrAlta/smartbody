@@ -115,10 +115,28 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 		return Nvbg::executeSpeech(character, speechStatus, speechId, speaker);
 	}
 
+	virtual bool executeSpeechRequest(std::vector<std::string> behaviors, std::vector<float> times, std::vector<std::string> targets, std::vector<std::string> info)
+	{
+		if (boost::python::override o = this->get_override("executeSpeechRequest"))
+		{
+			try {
+				return o(behaviors, times, targets, info);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		return Nvbg::executeSpeechRequest(behaviors, times, targets, info);
+	}
 
 	bool default_executeSpeech(std::string character, std::string speechStatus, std::string speechId, std::string speaker)
 	{
 		return Nvbg::executeSpeech(character, speechStatus, speechId, speaker);
+	}
+
+	bool default_executeSpeechRequest(std::vector<std::string> behaviors, std::vector<float> times, std::vector<std::string> targets, std::vector<std::string> info)
+	{
+		return Nvbg::executeSpeechRequest(behaviors, times, targets, info);
 	}
 
 	virtual void notifyAction(std::string name)
@@ -1474,6 +1492,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the xml vrX message.")
 		.def("executeEvent", &Nvbg::executeEvent, &NvbgWrap::default_executeEvent, "Execute the vrAgent message.")
 		.def("executeSpeech", &Nvbg::executeSpeech, &NvbgWrap::default_executeSpeech, "Execute the vrSpeech message.")
+		.def("executeSpeechRequest", &Nvbg::executeSpeechRequest, &NvbgWrap::default_executeSpeechRequest, "Execute the listening feedback from virtual agents.")
 		.def("notifyAction", &Nvbg::notifyAction, &NvbgWrap::default_notifyAction, "Notifies NVBG processor of a bool attribute.")
 		.def("notifyBool", &Nvbg::notifyBool, &NvbgWrap::default_notifyBool, "Notifies NVBG processor of a bool attribute")
 		.def("notifyInt", &Nvbg::notifyInt, &NvbgWrap::default_notifyInt, "Notifies NVBG processor of an int attribute")
