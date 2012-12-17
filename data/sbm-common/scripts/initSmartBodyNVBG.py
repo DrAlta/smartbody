@@ -112,7 +112,7 @@ class SmartBodyNVBG(Nvbg):
                         self.nvbg.set_push_to_talk(False)
                 return True
 
-        def executeSpeechRequest(self, behaviors, times, targets, info):
+        def executeSpeechRequest(self, behaviors, types, times, targets, info):
                 """
                 Necessary
                 Override the C++ executeSpeechRequest function
@@ -120,9 +120,10 @@ class SmartBodyNVBG(Nvbg):
                 """
                 if hasattr(self, 'nvbg') is False:
                         return
-                
-                bmlstr = self.nvbg.process_feedback_virtual(behaviors, times, targets, info)
-                bml.execBML(self.nvbg.characterName, str(bmlstr))
+
+                bmlstr, listeners = self.nvbg.process_feedback_virtual(behaviors, types, times, targets, info)
+                for i in range(0, len(listeners)):
+                        bml.execBML(listeners[i], str(bmlstr))
                 return True
         
         def executeEvent(self, character, messageId, state):

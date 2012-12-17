@@ -552,8 +552,12 @@ void BmlRequest::gestureRequestProcess()
 
 void BML::BmlRequest::speechRequestProcess()
 {
+	if (!speech_request)
+		return;
+
 	float curTime = (float)SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 	std::vector<std::string> behList;
+	std::vector<std::string> types;
 	std::vector<float> times;
 	std::vector<std::string> targets;
 	std::vector<std::string> info;
@@ -632,7 +636,8 @@ void BML::BmlRequest::speechRequestProcess()
 					continue;
 
 				behList.push_back(gestureRequest->group_id);
-				times.push_back(startTime);
+				types.push_back("gesture");
+				times.push_back(readyTime);
 				sbMotion->connect(actor->getSkeleton());
 				float lWristSpeed = sbMotion->getJointSpeed(l_wrist, (float)sbMotion->getTimeStart(), (float)sbMotion->getTimeStop());
 				float rWristSpeed = sbMotion->getJointSpeed(r_wrist, (float)sbMotion->getTimeStart(), (float)sbMotion->getTimeStop());
@@ -687,6 +692,7 @@ void BML::BmlRequest::speechRequestProcess()
 		if (hasHead)
 		{
 			behList.push_back(iter->first);
+			types.push_back("head");
 			times.push_back(startTime);
 			targets.push_back("");
 			info.push_back("");
@@ -694,7 +700,7 @@ void BML::BmlRequest::speechRequestProcess()
 	}
 
 	if (actor->getNvbg())
-		actor->getNvbg()->executeSpeechRequest(behList, times, targets, info);
+		actor->getNvbg()->executeSpeechRequest(behList, types, times, targets, info);
 }
 
 void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {

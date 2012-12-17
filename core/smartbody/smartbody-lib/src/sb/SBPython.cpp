@@ -117,18 +117,18 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 		return Nvbg::executeSpeech(character, speechStatus, speechId, speaker);
 	}
 
-	virtual bool executeSpeechRequest(std::vector<std::string> behaviors, std::vector<float> times, std::vector<std::string> targets, std::vector<std::string> info)
+	virtual bool executeSpeechRequest(std::vector<std::string> behaviors, std::vector<std::string> types, std::vector<float> times, std::vector<std::string> targets, std::vector<std::string> info)
 	{
 		if (boost::python::override o = this->get_override("executeSpeechRequest"))
 		{
 			try {
-				return o(behaviors, times, targets, info);
+				return o(behaviors, types, times, targets, info);
 			} catch (...) {
 				PyErr_Print();
 			}
 		}
 
-		return Nvbg::executeSpeechRequest(behaviors, times, targets, info);
+		return Nvbg::executeSpeechRequest(behaviors, types, times, targets, info);
 	}
 
 	bool default_executeSpeech(std::string character, std::string speechStatus, std::string speechId, std::string speaker)
@@ -136,9 +136,9 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 		return Nvbg::executeSpeech(character, speechStatus, speechId, speaker);
 	}
 
-	bool default_executeSpeechRequest(std::vector<std::string> behaviors, std::vector<float> times, std::vector<std::string> targets, std::vector<std::string> info)
+	bool default_executeSpeechRequest(std::vector<std::string> behaviors, std::vector<std::string> types, std::vector<float> times, std::vector<std::string> targets, std::vector<std::string> info)
 	{
-		return Nvbg::executeSpeechRequest(behaviors, times, targets, info);
+		return Nvbg::executeSpeechRequest(behaviors, types, times, targets, info);
 	}
 
 	virtual void notifyAction(std::string name)
