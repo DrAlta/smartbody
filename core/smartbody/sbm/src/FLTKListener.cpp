@@ -277,7 +277,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 	}
 }
 
-void FLTKListener::setOtherListener( SBMCharacterListener* listener )
+void FLTKListener::setOtherListener( SBCharacterListener* listener )
 {
 	otherListener = listener;
 }

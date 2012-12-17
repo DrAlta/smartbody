@@ -38,13 +38,17 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <sbm/nvbg.h>
+#include <sbm/SBCharacterListener.h>
 
 namespace SmartBody {
 
+SBScene* SBScene::_scene = NULL;
 bool SBScene::_firstTime = true;
 
 SBScene::SBScene(void)
 {
+	_characterListener = NULL;
+
 	_sim = new SBSimulationManager();
 	_profiler = new SBProfiler();
 	_bml = new SBBmlProcessor();
@@ -121,9 +125,20 @@ SBScene* SBScene::getScene()
 	{
 		XMLPlatformUtils::Initialize(); 
 		_firstTime = false;
+		_scene = new SBScene();
 	}
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	return mcu._scene;
+
+	return _scene;
+}
+
+void SBScene::destroyScene()
+{
+	if (_scene)
+	{
+		delete _scene;
+		_scene = NULL;
+		_firstTime = true;
+	}
 }
 
 void SBScene::setProcessId(const std::string& id)
@@ -1143,6 +1158,16 @@ SBScript* SBScene::getScript(const std::string& name)
 std::map<std::string, SBScript*>& SBScene::getScripts()
 {
 	return _scripts;
+}
+
+void SBScene::setCharacterListener(SBCharacterListener* listener)
+{
+	_characterListener = listener;
+}
+
+SBCharacterListener* SBScene::getCharacterListener()
+{
+	return _characterListener;
 }
 
 std::string SBScene::save(bool remoteSetup)

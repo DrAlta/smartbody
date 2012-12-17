@@ -1506,6 +1506,16 @@ boost::python::class_<SBReach>("SBReach")
 		.def("check", &SBAnimationTransitionRule::check, &TransitionRuleWrap::default_check, "Determines if the transition rule should be triggered.")
 		;
 
+	boost::python::class_<SBCharacterListener>("SBCharacterListener")
+		.def("OnCharacterCreate", &SBCharacterListener::OnCharacterCreate, "Triggered when a character is created.")
+		.def("OnCharacterDelete", &SBCharacterListener::OnCharacterDelete, "Triggered when a character is deleted.")
+		.def("OnCharacterUpdate", &SBCharacterListener::OnCharacterUpdate, "Triggered when a character is updated.")
+		.def("OnCharacterChanged", &SBCharacterListener::OnCharacterChanged, "Triggered when a character is changed.")
+		.def("OnCharacterChangeMesh", &SBCharacterListener::OnCharacterChangeMesh, "Triggered when a character's mesh is created.")
+		.def("OnPawnCreate", &SBCharacterListener::OnPawnCreate, "Triggered when a pawn is created.")
+		.def("OnPawnDelete", &SBCharacterListener::OnPawnDelete, "Triggered when a pawn is deleted.")
+		.def("OnViseme", &SBCharacterListener::OnViseme, "Visemes sent every frame.")
+		;
 
 	boost::python::class_<SBScene, boost::python::bases<SBObject> >("SBScene")
 		.def("setProcessId", &SBScene::setProcessId, "Sets the process id of the SmartBody instance.")
@@ -1559,6 +1569,8 @@ boost::python::class_<SBReach>("SBReach")
 		.def("isRemoteMode", &SBScene::isRemoteMode, "Returns the boolean indicating whether scene is in remote mode.")
 		.def("setRemoteMode", &SBScene::setRemoteMode, "Sets the scene remote mode.")
 		.def("removePendingCommands", &SBScene::removePendingCommands, "Removes any commands stored in SmartBody awaiting execution.")
+		.def("setCharacterListener", &SBScene::setCharacterListener, "Sets the listener for character and pawn events.")
+		.def("getCharacterListener", &SBScene::getCharacterListener, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the listener for character and pawn events.")
 		.def("save", &SBScene::save, "Saves the SmartBody configuration. Returns a string containing Python commands representing the configuration.")
 		.def("exportScene", &SBScene::exportScene, "Saves the entire SmartBody configuration, including assets, into a given file location.")
 

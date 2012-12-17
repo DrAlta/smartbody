@@ -37,7 +37,7 @@
 #if USE_WSP
 #include "wsp.h"
 #endif
-
+#include <sb/SBScene.h>
 #include <sbm/sbm_constants.h>
 #include <sbm/xercesc_utils.hpp>
 #include <sbm/mcontrol_util.h>
@@ -350,7 +350,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	TransparentListener transparentListener;
-	mcu.sbm_character_listener = &transparentListener;
+	SmartBody::SBScene::getScene()->setCharacterListener(&transparentListener);
 	
 	mcu_register_callbacks();
 

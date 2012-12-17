@@ -321,6 +321,8 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 
 int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
 	string pawn_name = args.read_token();
 	if( pawn_name.length()==0 )
 	{
@@ -398,9 +400,9 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		skeleton->name( skel_name.c_str() );
 		// Init channels
 		skeleton->make_active_channels();
-		if (mcu_p->sbm_character_listener)
+		if (scene->getCharacterListener())
 		{
-			mcu_p->sbm_character_listener->OnCharacterChanged(pawn_name);
+			scene->getCharacterListener()->OnCharacterChanged(pawn_name);
 		}
 
 		int err = pawn_p->init( skeleton );
@@ -476,9 +478,9 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		if (mcu_p->sendPawnUpdates)
 			pawn_p->bonebusCharacter = mcu_p->_scene->getBoneBusManager()->getBoneBus().CreateCharacter( pawn_name.c_str(), pawn_p->getClassType().c_str(), false );
 
-		if ( mcuCBHandle::singleton().sbm_character_listener )
+		if ( scene->getCharacterListener() )
 		{
-			mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( pawn_name, pawn_p->getClassType().c_str() );
+			scene->getCharacterListener()->OnCharacterCreate( pawn_name, pawn_p->getClassType().c_str() );
 		}
 
 		return CMD_SUCCESS;
@@ -658,6 +660,8 @@ int character_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 
 int create_remote_pawn_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
 	std::string pawn_and_attribute = args.read_token();
 	int interval = args.read_int();
 
@@ -684,9 +688,9 @@ int create_remote_pawn_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 	// Init channels
 	skeleton->make_active_channels();	
 
-	if (mcu_p->sbm_character_listener)
+	if (scene->getCharacterListener())
 	{
-		mcu_p->sbm_character_listener->OnCharacterChanged(pawn_and_attribute);
+		scene->getCharacterListener()->OnCharacterChanged(pawn_and_attribute);
 	}
 
 	int err = pawn_p->init( skeleton );

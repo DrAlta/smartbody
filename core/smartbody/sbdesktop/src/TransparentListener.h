@@ -4,7 +4,7 @@
 #include <sbm/mcontrol_util.h>
 #include <sk/sk_scene.h>
 
-class TransparentListener : public SBMCharacterListener, public SmartBody::SBObserver
+class TransparentListener : public SBCharacterListener, public SmartBody::SBObserver
 {
    public:
 	  TransparentListener();

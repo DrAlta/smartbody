@@ -84,7 +84,7 @@ class mcuCBHandle;
 
 #include <sbm/KinectProcessor.h>
 #include <sb/SBScene.h>
-#include <sbm/SbmCharacterListener.h>
+#include <sbm/SBCharacterListener.h>
 
 
 #ifndef USE_PYTHON
@@ -197,7 +197,6 @@ class mcuCBHandle {
 		bool        updatePhysics;
 		bool		sendPawnUpdates; // if true, sends the pawn information over bonebus in the same wasy as the characters
 		bool        resourceDataChanged;
-		SBMCharacterListener * sbm_character_listener;   // only one listener possible, must be set manually
 		std::string speech_audiofile_base_path;
 		std::string process_id;
 		bool		play_internal_audio;	

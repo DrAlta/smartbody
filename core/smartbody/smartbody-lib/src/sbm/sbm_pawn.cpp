@@ -188,9 +188,10 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 	_skeleton = sk;
 	_skeleton->ref();	
 	ct_tree_p->add_skeleton( _skeleton->name(), _skeleton );	
-	if ( mcuCBHandle::singleton().sbm_character_listener )
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	if ( scene->getCharacterListener() )
 	{		
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterChanged( getName() );
+		scene->getCharacterListener()->OnCharacterChanged( getName() );
 	}
 	//scene_p->init(_skeleton);
 	//int err = mcu.add_scene(scene_p);	
@@ -216,10 +217,11 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 			return CMD_FAILURE; 
 		}
 		ct_tree_p->add_skeleton( _skeleton->name(), _skeleton );
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		if (mcu.sbm_character_listener)
+		if (scene->getCharacterListener())
 		{
-			mcu.sbm_character_listener->OnCharacterChanged(getName());
+			scene->getCharacterListener()->OnCharacterChanged(getName());
 		}
 	}
 
@@ -273,9 +275,10 @@ int SbmPawn::setup() {
 	wo_cache.p = 0;
 	wo_cache.r = 0;
 
-	if ( mcuCBHandle::singleton().sbm_character_listener )
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	if ( scene->getCharacterListener() )
 	{
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterUpdate( getName(), getClassType() );
+		scene->getCharacterListener()->OnCharacterUpdate( getName(), getClassType() );
 	}
 	return( CMD_SUCCESS ); 
 }
@@ -390,10 +393,11 @@ void SbmPawn::exec_controller_cleanup( MeController* ct, mcuCBHandle* mcu_p ) {
 //  Destructor
 SbmPawn::~SbmPawn()	{
 
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if ( mcu.sbm_character_listener )
+	if ( scene->getCharacterListener() )
 	{
-		mcu.sbm_character_listener->OnCharacterDelete( getName() );
+		scene->getCharacterListener()->OnCharacterDelete( getName() );
 	}
 
 	if ( bonebusCharacter )
