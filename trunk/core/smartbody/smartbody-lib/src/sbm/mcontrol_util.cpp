@@ -261,7 +261,6 @@ mcuCBHandle::mcuCBHandle()
 	profiler_p( NULL ),
 	net_bone_updates( false ),
 	net_world_offset_updates( true ),
-	sbm_character_listener( NULL ),
 	play_internal_audio( false ),
 	resourceDataChanged( false ),
 	perceptionData( new PerceptionData() ),
@@ -311,7 +310,7 @@ mcuCBHandle::mcuCBHandle()
 	face_map["_default_"] = faceDefinition;
 	//physicsEngine = new SBPhysicsSimODE();
 	//physicsEngine->initSimulation();
-	_scene = new SmartBody::SBScene();
+	_scene = SmartBody::SBScene::getScene();
 
 	_scene->getDebuggerServer()->Init();
 	_scene->getDebuggerServer()->SetSBScene(_scene);
@@ -437,7 +436,10 @@ void mcuCBHandle::reset( void )
 	SmartBody::SBFaceDefinition* faceDefinition = new SmartBody::SBFaceDefinition();
 	faceDefinition->setName("_default_");
 	face_map["_default_"] = faceDefinition;
-	_scene = new SmartBody::SBScene();
+	SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
+	SmartBody::SBScene::destroyScene();
+	_scene = SmartBody::SBScene::getScene();
+	_scene->setCharacterListener(listener);
 	_scene->getDebuggerServer()->Init();
 	_scene->getDebuggerServer()->SetSBScene(_scene);
 	SmartBody::SBAnimationBlend0D* idleState = new SmartBody::SBAnimationBlend0D(PseudoIdleState);
@@ -891,8 +893,6 @@ void mcuCBHandle::clear( void )
 	if (_scene->getBoneBusManager()->getBoneBus().IsOpen())
 		_scene->getBoneBusManager()->getBoneBus().CloseConnection();
 
-	delete _scene;
-	_scene = NULL;
 }
 
 /////////////////////////////////////////////////////////////
@@ -2226,6 +2226,8 @@ std::string mcuCBHandle::getValidName(const std::string& name)
 
 int mcuCBHandle::registerPawn(SbmPawn* pawn)
 {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
 	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(pawn->getName());
 	if (iter != pawn_map.end())
 	{
@@ -2235,16 +2237,17 @@ int mcuCBHandle::registerPawn(SbmPawn* pawn)
 
 	pawn_map.insert(std::pair<std::string, SbmPawn*>(pawn->getName(), pawn));
 	
-	if ( mcuCBHandle::singleton().sbm_character_listener )
-		mcuCBHandle::singleton().sbm_character_listener->OnPawnCreate( pawn->getName().c_str() );
+	if (scene->getCharacterListener())
+		scene->getCharacterListener()->OnPawnCreate( pawn->getName().c_str() );
 
 	return CMD_SUCCESS;
 }
 
 int mcuCBHandle::unregisterPawn(SbmPawn* pawn)
 {
-	if ( mcuCBHandle::singleton().sbm_character_listener )
-		mcuCBHandle::singleton().sbm_character_listener->OnPawnDelete( pawn->getName().c_str() );
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	if (scene->getCharacterListener())
+		scene->getCharacterListener()->OnPawnDelete( pawn->getName().c_str() );
 
 	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(pawn->getName());
 	if (iter != pawn_map.end())
@@ -2277,16 +2280,16 @@ int mcuCBHandle::registerCharacter(SbmCharacter* character)
 
 	if (_scene->getBoneBusManager()->isEnable())
 		_scene->getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true );
-	if ( mcuCBHandle::singleton().sbm_character_listener )
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
+	if ( _scene->getCharacterListener() )
+		_scene->getCharacterListener()->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
 
 	return 1;
 }
 
 int mcuCBHandle::unregisterCharacter(SbmCharacter* character)
 {
-	if ( mcuCBHandle::singleton().sbm_character_listener )
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( character->getName().c_str() );
+	if (_scene->getCharacterListener() )
+		_scene->getCharacterListener()->OnCharacterDelete( character->getName().c_str() );
 
 	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(character->getName());
 	if (iter != pawn_map.end())

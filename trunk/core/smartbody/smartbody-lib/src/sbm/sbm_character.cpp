@@ -210,16 +210,16 @@ SbmCharacter::~SbmCharacter( void )	{
 	}
 	reachEngineMap.clear();
 
-
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if ( mcu.sbm_character_listener )
+	if (scene->getCharacterListener())
 	{
-		mcu.sbm_character_listener->OnCharacterDelete( getName() );
+		scene->getCharacterListener()->OnCharacterDelete( getName() );
 	}
 
 	if ( bonebusCharacter )
 	{
-		mcu._scene->getBoneBusManager()->getBoneBus().DeleteCharacter( bonebusCharacter );
+		scene->getBoneBusManager()->getBoneBus().DeleteCharacter( bonebusCharacter );
 		bonebusCharacter = NULL;
 	}
 
@@ -769,12 +769,14 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 
 	steeringAgent = new SteeringAgent(this);
 
-	if (mcuCBHandle::singleton().net_bone_updates)
-		bonebusCharacter = mcuCBHandle::singleton()._scene->getBoneBusManager()->getBoneBus().CreateCharacter( getName().c_str(), classType, true );
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
-	if ( mcuCBHandle::singleton().sbm_character_listener )
+	if (mcuCBHandle::singleton().net_bone_updates)
+		bonebusCharacter = scene->getBoneBusManager()->getBoneBus().CreateCharacter( getName().c_str(), classType, true );
+
+	if (scene->getCharacterListener())
 	{		
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( getName(), classType );
+		scene->getCharacterListener()->OnCharacterCreate( getName(), classType );
 	}
 
 	// This needs to be tested
@@ -977,10 +979,10 @@ int SbmCharacter::init_skeleton() {
 	// Rebuild the active channels to include new joints
 	_skeleton->make_active_channels();
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.sbm_character_listener)
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	if (scene->getCharacterListener())
 	{
-		mcu.sbm_character_listener->OnCharacterChanged(getName());
+		scene->getCharacterListener()->OnCharacterChanged(getName());
 	}
 
 	for( int i=0; i<viseme_channel_count; i++ ) {
@@ -1827,7 +1829,7 @@ void SbmCharacter::schedule_viseme_blend_ramp(
 
 void SbmCharacter::forward_visemes( double curTime )
 {
-	SBMCharacterListener *listener_p = mcuCBHandle::singleton().sbm_character_listener;
+	SBCharacterListener *listener_p = SmartBody::SBScene::getScene()->getCharacterListener();
 
 	if( bonebusCharacter || listener_p )
 	{
@@ -1862,7 +1864,8 @@ void SbmCharacter::forward_visemes( double curTime )
 
 void SbmCharacter::forward_parameters( double curTime )
 {
-	SBMCharacterListener *listener_p = mcuCBHandle::singleton().sbm_character_listener;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SBCharacterListener *listener_p = scene->getCharacterListener();
 
 	if( listener_p )
 	{
@@ -1985,6 +1988,8 @@ bool SbmCharacter::is_face_controller_enabled() {
 
 int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, bool all_characters )
 {
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
 
 	if (cmd == "mesh")
@@ -2009,9 +2014,9 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, b
 			LOG("Mesh %s already exist, using mesh instance.",meshName.c_str());
 			dMesh_p = deformableMesh;		
 			dMeshInstance_p->setDeformableMesh(deformableMesh);
-			if ( mcuCBHandle::singleton().sbm_character_listener )
+			if ( scene->getCharacterListener() )
 			{		
-				mcuCBHandle::singleton().sbm_character_listener->OnCharacterChangeMesh( getName() );
+				 scene->getCharacterListener()->OnCharacterChangeMesh( getName() );
 			}		
 			return CMD_SUCCESS;
 		}
@@ -2162,9 +2167,9 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, b
 
 		}
 
-		if ( mcuCBHandle::singleton().sbm_character_listener )
+		if (  scene->getCharacterListener() )
 		{		
-			mcuCBHandle::singleton().sbm_character_listener->OnCharacterChangeMesh( getName() );
+			 scene->getCharacterListener()->OnCharacterChangeMesh( getName() );
 		}
 		return CMD_SUCCESS;
 	}

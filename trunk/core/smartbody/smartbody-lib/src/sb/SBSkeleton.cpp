@@ -251,9 +251,10 @@ void SBSkeleton::update()
 	SBCharacter* character = dynamic_cast<SBCharacter*>(pawn);
 	if (character)
 	{
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		if ( mcuCBHandle::singleton().sbm_character_listener )
-			mcuCBHandle::singleton().sbm_character_listener->OnCharacterUpdate( character->getName().c_str(), character->getClassType() );
+		if (scene->getCharacterListener())
+			scene->getCharacterListener()->OnCharacterUpdate( character->getName().c_str(), character->getClassType() );
 	}
 }
 

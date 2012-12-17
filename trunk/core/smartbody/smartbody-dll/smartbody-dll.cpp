@@ -56,18 +56,18 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 #endif
 
 
-class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
+class Smartbody_dll_SBCharacterListener_Internal : public SBCharacterListener
 {
    private:
       Smartbody_dll * m_dll;
 
    public:
-      explicit Smartbody_dll_SBMCharacterListener_Internal( Smartbody_dll * dll ) :
+      explicit Smartbody_dll_SBCharacterListener_Internal( Smartbody_dll * dll ) :
          m_dll( dll )
       {
       }
 
-      virtual ~Smartbody_dll_SBMCharacterListener_Internal()
+      virtual ~Smartbody_dll_SBCharacterListener_Internal()
       {
       }
 
@@ -173,7 +173,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetMediaPath( const std::string & path )
 
 SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath, bool logToFile)
 {
-   m_internalListener = new Smartbody_dll_SBMCharacterListener_Internal( this );
+   m_internalListener = new Smartbody_dll_SBCharacterListener_Internal( this );
    
    XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
 
@@ -182,7 +182,8 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath, boo
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
    // TODO: Replace with g_scene->SetCharacterListener(m_internalListener)
-   mcu.sbm_character_listener = m_internalListener;
+   SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+   scene->setCharacterListener(m_internalListener);
    
    SetSpeechAudiofileBasePath( "../../" );
 
@@ -302,9 +303,9 @@ SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
 
 SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerId( const std::string & id )
 {
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
+	SBScene * scene = SmartBody::SBScene::getScene();
 
-   mcu._scene->getDebuggerServer()->SetID( id );
+	scene->getDebuggerServer()->SetID( id );
 }
 
 
@@ -328,9 +329,9 @@ SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerCameraValues( double x, double 
 
 SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerRendererRightHanded( bool enabled )
 {
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
+  SBScene * scene = SmartBody::SBScene::getScene();
 
-   mcu._scene->getDebuggerServer()->m_rendererIsRightHanded = enabled;
+   scene->getDebuggerServer()->m_rendererIsRightHanded = enabled;
 }
 
 

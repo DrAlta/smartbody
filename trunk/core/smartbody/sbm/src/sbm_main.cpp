@@ -428,7 +428,8 @@ int main( int argc, char **argv )	{
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	FLTKListener fltkListener;
-	mcu.sbm_character_listener = &fltkListener;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->setCharacterListener(&fltkListener);
 
 	// change the default font size
 	FL_NORMAL_SIZE = 12;

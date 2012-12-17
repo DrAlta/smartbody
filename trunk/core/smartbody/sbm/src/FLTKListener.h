@@ -4,7 +4,7 @@
 #include <sbm/mcontrol_util.h>
 #include <sk/sk_scene.h>
 
-class FLTKListener : public SBMCharacterListener, public SmartBody::SBObserver
+class FLTKListener : public SBCharacterListener, public SmartBody::SBObserver
 {
    public:
 	  FLTKListener();
@@ -23,9 +23,9 @@ class FLTKListener : public SBMCharacterListener, public SmartBody::SBObserver
 
 	  virtual void notify(SmartBody::SBSubject* subject);
 
-	  void setOtherListener(SBMCharacterListener* listener);
+	  void setOtherListener(SBCharacterListener* listener);
 	protected:
-      SBMCharacterListener* otherListener;	
+      SBCharacterListener* otherListener;	
 };
 
 #endif

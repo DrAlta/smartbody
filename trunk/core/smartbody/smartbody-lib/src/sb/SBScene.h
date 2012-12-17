@@ -9,6 +9,8 @@ class SBDebuggerServer;
 class SBDebuggerClient;
 class SBDebuggerUtility;
 
+class SBCharacterListener;
+
 namespace SmartBody {
 
 class SBPawn;
@@ -47,6 +49,7 @@ class SBScene : public SBObject
 		SBAPI std::string save(bool remoteSetup = false);
 		SBAPI void exportScene(const std::string& filename);
 		SBAPI static SBScene* getScene();
+		SBAPI static void destroyScene();
 
 		SBAPI void setScale(float val);
 		SBAPI float getScale();
@@ -142,6 +145,9 @@ class SBScene : public SBObject
 		SBAPI bool isRemoteMode();
 		SBAPI void setRemoteMode(bool val);
 
+		SBAPI void setCharacterListener(SBCharacterListener* listener);
+		SBAPI SBCharacterListener* getCharacterListener();
+
 		SBAPI void notify(SBSubject* subject);
 
 	protected:
@@ -160,6 +166,8 @@ class SBScene : public SBObject
 		SBDiphoneManager* _diphoneManager;
 		SBParser* _parser;
 
+		SBCharacterListener* _characterListener;
+
 		SBBehaviorSetManager* _behaviorSetManager;
 
 		std::map<std::string, SBScript*> _scripts;
@@ -170,6 +178,8 @@ class SBScene : public SBObject
 		SBDebuggerServer*	_debuggerServer;
 		SBDebuggerClient*	_debuggerClient;
 		SBDebuggerUtility*	_debuggerUtility;
+
+		static SBScene* _scene;
 };
 
 SBScene* getScene();

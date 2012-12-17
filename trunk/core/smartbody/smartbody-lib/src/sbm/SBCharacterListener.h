@@ -4,7 +4,7 @@
 
 // This class is meant for listening to specific events that could be handled externally from smartbody
 // Currently being used by smartbody-dll
-class SBMCharacterListener
+class SBCharacterListener
 {
 public:
 	virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass ) {}
