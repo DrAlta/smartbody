@@ -34,7 +34,7 @@ bool Nvbg::executeSpeech(std::string character, std::string speechStatus, std::s
 	return true;
 }
 
-bool Nvbg::executeSpeechRequest(std::vector<std::string> behaviors, std::vector<float> times, std::vector<std::string> targets, std::vector<std::string> info)
+bool Nvbg::executeSpeechRequest(std::vector<std::string> behaviors, std::vector<std::string> types, std::vector<float> times, std::vector<std::string> targets, std::vector<std::string> info)
 {
 	LOG("Executing NVBG listening feedback from agent speech.");
 	return true;
