@@ -52,7 +52,7 @@ PAParameterEditor::PAParameterEditor(PABlendEditor* editor, int x, int y, int w,
 	choiceParameter->value(0);
 
 	inputJoint = new Fl_Choice(xDis + csx + 100, 10 * yDis, 10 * xDis, 2 * yDis, "Joint");
-	SBCharacter* character = stateEditor->paWindow->getCurrentCharacter();
+	SmartBody::SBCharacter* character = stateEditor->paWindow->getCurrentCharacter();
 	if (character)
 	{
 		const std::vector<std::string>& charJNames = character->getSkeleton()->getJointNames();
@@ -99,8 +99,8 @@ void PAParameterEditor::confirmEditting(Fl_Widget* widget, void* data)
 	PAParameterEditor* paramEditor = (PAParameterEditor*) data;
 	std::string selectedParameter = paramEditor->choiceParameter->text();
 	std::string jointName = paramEditor->inputJoint->text();
-	SBCharacter* curCharacter = paramEditor->stateEditor->paWindow->getCurrentCharacter();
-	SBJoint* joint = curCharacter->getSkeleton()->getJointByName(jointName);
+	SmartBody::SBCharacter* curCharacter = paramEditor->stateEditor->paWindow->getCurrentCharacter();
+	SmartBody::SBJoint* joint = curCharacter->getSkeleton()->getJointByName(jointName);
 	if (!joint)
 	{
 		LOG("PAParameterEditor::confirmEditting WARNING: %s not found!", jointName.c_str());
@@ -122,7 +122,7 @@ void PAParameterEditor::confirmEditting(Fl_Widget* widget, void* data)
 	
 	for (size_t i = 0; i < selectedMotions.size(); i++)
 	{
-		SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
 		motion->connect(curCharacter->getSkeleton());
 		
 		// get start time and end time

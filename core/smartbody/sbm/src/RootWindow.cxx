@@ -1363,6 +1363,7 @@ void BaseWindow::DocumentationCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 {
+/*
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
 	int windowIndex = (int) data;
@@ -1382,6 +1383,7 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 	
 	//rootWindow->w(width);
 	//rootWindow->h(height);
+*/
 }
 
 
