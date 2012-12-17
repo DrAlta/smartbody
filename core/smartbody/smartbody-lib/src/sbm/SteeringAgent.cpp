@@ -554,12 +554,12 @@ void SteeringAgent::evaluate(double dtime)
 void SteeringAgent::sendLocomotionEvent(const std::string& status)
 {
 	std::string eventType = "locomotion";
-	MotionEvent motionEvent;
+	SmartBody::MotionEvent motionEvent;
 	motionEvent.setType(eventType);			
 	std::stringstream strstr;
 	strstr << character->getName() << " " << status;
 	motionEvent.setParameters(strstr.str());
-	EventManager* manager = EventManager::getEventManager();		
+	SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();		
 	manager->handleEvent(&motionEvent, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 }
 
@@ -1488,12 +1488,12 @@ void SteeringAgent::adjustFacingAngle( float angleDiff )
 	}
 	else
 	{
-		MotionEvent facingEvent;
+		SmartBody::MotionEvent facingEvent;
 		facingEvent.setType("adjustFacing");
 		std::string cmd = "bml chr " + character->getName() + " success";
 		//cmd = cmd + " facing: " + boost::lexical_cast<std::string>(facing)
 		facingEvent.setParameters(cmd);
-		EventManager* manager = EventManager::getEventManager();		
+		SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();		
 		manager->handleEvent(&facingEvent, 0.0f);
 		facingAdjust = false; // stop facing adjustment
 	}

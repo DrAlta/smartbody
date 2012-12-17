@@ -44,6 +44,8 @@
 
 #ifdef USE_PYTHON
 
+namespace SmartBody 
+{
 struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 {
 	virtual void objectEvent(std::string character, std::string name, bool isAnimate, SrVec charPosition, SrVec charVelocity, SrVec objPosition, SrVec objVelocity, SrVec relativePosition, SrVec relativeVelocity)
@@ -474,6 +476,8 @@ struct TransitionRuleWrap : SmartBody::SBAnimationTransitionRule, boost::python:
 		return SBAnimationTransitionRule::check(character, blend);
 	}
 };
+
+}
 
 // wrapper for std::map
 template<class T>

@@ -8,7 +8,7 @@ std::string MeCtPhysicsController::CONTROLLER_TYPE = "PhysicsController";
 MeCtPhysicsController::MeCtPhysicsController(SbmCharacter* character) : SmartBody::SBController()
 {
 	_character = character;
-	_skeletonCopy = new SBSkeleton();
+	_skeletonCopy = new SmartBody::SBSkeleton();
 	_skeletonCopy->copy(_character->getSkeleton());
 	_valid = true;
 	_prevTime = 0.0;
@@ -66,35 +66,35 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 #if 1
 	if (_valid && _context )
 	{
-		SBPhysicsSim* phyEngine = SBPhysicsSim::getPhysicsEngine();
+		SmartBody::SBPhysicsSim* phyEngine = SmartBody::SBPhysicsSim::getPhysicsEngine();
 		std::string charName = _character->getName();
-		SBPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(charName);//_character->getPhysicsCharacter();
+		SmartBody::SBPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(charName);//_character->getPhysicsCharacter();
 		if (!phyChar) return true;
 
 		bool hasPhy = (phyEngine->getBoolAttribute("enable") && phyChar->getBoolAttribute("enable"));		
-		std::vector<SbmJointObj*> jointObjList = phyChar->getJointObjList();
+		std::vector<SmartBody::SbmJointObj*> jointObjList = phyChar->getJointObjList();
 
-		std::vector<CollisionRecord>& colRecords = phyChar->getCollisionRecords();
+		std::vector<SmartBody::CollisionRecord>& colRecords = phyChar->getCollisionRecords();
 		static bool hasGaze = false;
 		static bool hasPD = true;
 		static float fadeOutTime = 0.f;
 		if (colRecords.size() > 0 && !hasGaze)
 		{
-			CollisionRecord& col = colRecords[0];
+			SmartBody::CollisionRecord& col = colRecords[0];
 			SrVec hitPos = col.collisionPt;
 			char eventMsg[256];
 			
 			//start collision event
 			//sprintf(eventMsg,"start %s %f %f %f",_character->getName().c_str(),hitPos[0],hitPos[1],hitPos[2]);
-			SBJoint* hitJoint = col.hitJointObj->getSBJoint();
+			SmartBody::SBJoint* hitJoint = col.hitJointObj->getSBJoint();
 			sprintf(eventMsg,"start %s %s %s %f %f %f %f",_character->getName().c_str(),col.collider->getName().c_str(),hitJoint->name().c_str(),hitPos[0],hitPos[1],hitPos[2], col.momentum.len());			
 			LOG("eventMsg = %s",eventMsg);
 			std::string cmd = eventMsg;
-			MotionEvent motionEvent;
+			SmartBody::MotionEvent motionEvent;
 			std::string eventType = "collision";
 			motionEvent.setType(eventType);			
 			motionEvent.setParameters(cmd);
-			EventManager* manager = EventManager::getEventManager();		
+			SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();		
 			manager->handleEvent(&motionEvent,t);
 			colRecords.clear();
 			hasGaze = true;
@@ -108,11 +108,11 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 // 			if (!hasPD)
 // 				phyChar->setBoolAttribute("usePD",false);
 			std::string cmd = eventMsg;
-			MotionEvent motionEvent;
+			SmartBody::MotionEvent motionEvent;
 			std::string eventType = "collision";
 			motionEvent.setType(eventType);						
 			motionEvent.setParameters(cmd);
-			EventManager* manager = EventManager::getEventManager();	
+			SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();	
 			manager->handleEvent(&motionEvent,t);
 			hasGaze = false;
 			hasPD = true;
@@ -129,7 +129,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 		SrVec wpos;
 		getJointChannelValues(wname,frame,wquat,wpos);
 
-		SBJoint* wjoint = _skeletonCopy->getJointByName(wname);
+		SmartBody::SBJoint* wjoint = _skeletonCopy->getJointByName(wname);
 		if (wjoint)
 		{
 			if (wjoint->pos())
@@ -148,9 +148,9 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 		// update physics simulation results to character channel arrays
 		for (unsigned int i=0;i<jointObjList.size();i++)
 		{
-			SbmJointObj* obj = jointObjList[i];
-			SBPhysicsJoint* phyJoint = obj->getPhyJoint();
-			SBJoint* joint = obj->getPhyJoint()->getSBJoint();
+			SmartBody::SbmJointObj* obj = jointObjList[i];
+			SmartBody::SBPhysicsJoint* phyJoint = obj->getPhyJoint();
+			SmartBody::SBJoint* joint = obj->getPhyJoint()->getSBJoint();
 			if (!joint)	continue;
 			
 			SrMat tran = obj->getRelativeOrientation();				
@@ -160,7 +160,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			getJointChannelValues(jname,frame,inQuat,inPos);
 			
 			
-			SBJoint* jointCopy = _skeletonCopy->getJointByName(jname);
+			SmartBody::SBJoint* jointCopy = _skeletonCopy->getJointByName(jname);
 			if (jointCopy)
 			{
 				if (jointCopy->pos())
@@ -263,10 +263,10 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 		_skeletonCopy->update_global_matrices();
 		for (unsigned int i=0;i<jointObjList.size();i++)
 		{
-			SbmJointObj* obj = jointObjList[i];
-			SBPhysicsJoint* phyJoint = obj->getPhyJoint();
-			SBJoint* sbJoint = phyJoint->getSBJoint();
-			SBJoint* joint = NULL; 
+			SmartBody::SbmJointObj* obj = jointObjList[i];
+			SmartBody::SBPhysicsJoint* phyJoint = obj->getPhyJoint();
+			SmartBody::SBJoint* sbJoint = phyJoint->getSBJoint();
+			SmartBody::SBJoint* joint = NULL; 
 			if (sbJoint)
 				joint = _skeletonCopy->getJointByName(sbJoint->getName());
 			if (joint)

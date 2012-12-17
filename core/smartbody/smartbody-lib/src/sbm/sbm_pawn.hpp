@@ -124,7 +124,6 @@ public:
 	const std::string& getGeomObjectName();
 	SbmGeomObject* getGeomObject(); // get geometry object associated with the pawn
 	//void setGeomObject(SbmGeomObject* obj);
-	SBPhysicsObj* getPhysicsObject();
 
  	void updateToColObject();
 	void updateToSteeringSpaceObject();

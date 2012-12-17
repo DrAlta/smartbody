@@ -51,7 +51,7 @@ void TransparentListener::OnCharacterCreate( const std::string & name, const std
 		character->dMesh_p =  new SbmDeformableMeshGPU();
 		character->dMeshInstance_p =  new SbmDeformableMeshGPUInstance();
 	#endif
-	SBSkeleton* sbSkel = character->getSkeleton();
+	SmartBody::SBSkeleton* sbSkel = character->getSkeleton();
 	character->dMesh_p->setSkeleton(sbSkel);
 	character->dMeshInstance_p->setSkeleton(sbSkel);
 }

@@ -67,19 +67,19 @@ void SBDebuggerUtility::initCharacter(const std::string& name, const std::string
 		LOG("Character has no name - will not be created.");
 		return;
 	}
-	SBCharacter* sbCharacter = SmartBody::SBScene::getScene()->createCharacter(name, "");
+	SmartBody::SBCharacter* sbCharacter = SmartBody::SBScene::getScene()->createCharacter(name, "");
 	if (!sbCharacter)
 	{
 		LOG("Problem creating character %s, will not be created in remote session...", name.c_str());
 		return;
 	}
-	SBSkeleton* sbSkeleton = SmartBody::SBScene::getScene()->getSkeleton(skelName);
+	SmartBody::SBSkeleton* sbSkeleton = SmartBody::SBScene::getScene()->getSkeleton(skelName);
 	if (!sbSkeleton)
 	{
 		LOG("Problem creating skeleton %s, character %s will not be created in remote session...", name.c_str(), skelName.c_str());
 		return;
 	}
-	SBSkeleton* copySbSkeleton = new SBSkeleton(sbSkeleton);
+	SmartBody::SBSkeleton* copySbSkeleton = new SmartBody::SBSkeleton(sbSkeleton);
 	if (!copySbSkeleton)
 	{
 		LOG("Problem creating copy of skeleton %s, character %s will not be created in remote session...", name.c_str(), skelName.c_str());
@@ -91,11 +91,11 @@ void SBDebuggerUtility::initCharacter(const std::string& name, const std::string
 void SBDebuggerUtility::initCharacterFaceDefinition(const std::string& characterName, const std::string& faceDefName, const std::string& message)
 {
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
-	SBCharacter* sbCharacter = sbScene->getCharacter(characterName);
+	SmartBody::SBCharacter* sbCharacter = sbScene->getCharacter(characterName);
 	if (!sbCharacter)
 		return;
 
-	SBFaceDefinition* faceDef = sbScene->getFaceDefinition(faceDefName);
+	SmartBody::SBFaceDefinition* faceDef = sbScene->getFaceDefinition(faceDefName);
 	if (!faceDef)
 		return;
 
@@ -104,7 +104,7 @@ void SBDebuggerUtility::initCharacterFaceDefinition(const std::string& character
 
 void SBDebuggerUtility::initPawn(const std::string& name)
 {
-	SBPawn* sbPawn = SmartBody::SBScene::getScene()->createPawn(name);
+	SmartBody::SBPawn* sbPawn = SmartBody::SBScene::getScene()->createPawn(name);
 }
 
 /*
@@ -121,7 +121,7 @@ void SBDebuggerUtility::runPythonCommand(const std::string& info)
 void SBDebuggerUtility::initSkeleton(const std::string& skFileName, const std::string& info)
 {
 	SrInput input(info.c_str());
-	SBSkeleton* sbSkel = new SBSkeleton();
+	SmartBody::SBSkeleton* sbSkel = new SmartBody::SBSkeleton();
 	SkSkeleton* skSkel = sbSkel;
 	skSkel->load(input);
 	skSkel->skfilename(skFileName.c_str());
@@ -133,11 +133,11 @@ void SBDebuggerUtility::updateCharacter(const std::string& cName, const std::str
 										 float& posX, float& posY, float& posZ, 
 										 float& rotX, float& rotY, float& rotZ, float& rotW)
 {
-	SBCharacter* sbCharacter = SmartBody::SBScene::getScene()->getCharacter(cName);
+	SmartBody::SBCharacter* sbCharacter = SmartBody::SBScene::getScene()->getCharacter(cName);
 	if (!sbCharacter)
 		return;
 
-	SBJoint* sbJoint = sbCharacter->getSkeleton()->getJointByName(jName);
+	SmartBody::SBJoint* sbJoint = sbCharacter->getSkeleton()->getJointByName(jName);
 	if (sbJoint)
 	{
 		sbJoint->pos()->value(0, (float)posX);
@@ -152,7 +152,7 @@ void SBDebuggerUtility::updateCharacter(const std::string& cName, const std::str
 void SBDebuggerUtility::updatePawn(const std::string& pName, float& posX, float& posY, float& posZ, 
 									float& rotX, float& rotY, float& rotZ, float& rotW)
 {
-	SBPawn* sbPawn  = SmartBody::SBScene::getScene()->getPawn(pName);
+	SmartBody::SBPawn* sbPawn  = SmartBody::SBScene::getScene()->getPawn(pName);
 	if (!sbPawn)
 		return;
 

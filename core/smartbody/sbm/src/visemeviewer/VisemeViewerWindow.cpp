@@ -127,7 +127,7 @@ void VisemeViewerWindow::update()
 		return;
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SBCharacter* character = mcu._scene->getCharacter(charName);
+	SmartBody::SBCharacter* character = mcu._scene->getCharacter(charName);
 	if (!character)
 		return;
 
@@ -167,7 +167,7 @@ void VisemeViewerWindow::draw()
 
 bool  VisemeViewerWindow::loadData()
 {
-	SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
+	SmartBody::SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
 	std::vector<std::string> commonPhonemes = diphoneManager->getCommonPhonemes();
 
 	for (int x = 0; x < 2; x++)
@@ -218,13 +218,13 @@ void VisemeViewerWindow::resetViseme()
 	_sliderCurveAnimation->deactivate();
 }
 
-SBCharacter* VisemeViewerWindow::getCurrentCharacter()
+SmartBody::SBCharacter* VisemeViewerWindow::getCurrentCharacter()
 {
 	int characterIndex = _choiceCharacter->value();
 	if (characterIndex >= 0)
 	{
 		const char* characterName = _choiceCharacter->menu()[_choiceCharacter->value()].label();
-		SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);	
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);	
 		return character;
 	}
 	else
@@ -243,7 +243,7 @@ std::string VisemeViewerWindow::getCurrentCharacterName()
 		return "";
 }
 
-SBDiphone* VisemeViewerWindow::getCurrentDiphone()
+SmartBody::SBDiphone* VisemeViewerWindow::getCurrentDiphone()
 {
 	if (_browserPhoneme[0]->value() <= 0)
 		return NULL;
@@ -256,7 +256,7 @@ SBDiphone* VisemeViewerWindow::getCurrentDiphone()
 
 	const std::string& diphoneMap = SmartBody::SBScene::getScene()->getCharacter(getCurrentCharacterName())->getStringAttribute("diphoneSetName");
 
-	SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(phoneme1, phoneme2, diphoneMap);
+	SmartBody::SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(phoneme1, phoneme2, diphoneMap);
 	return diphone;
 }
 
@@ -273,8 +273,8 @@ void VisemeViewerWindow::updateViseme()
 
 void VisemeViewerWindow::refreshData()
 {
-	SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
-	SBDiphone* diphone = getCurrentDiphone();
+	SmartBody::SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
+	SmartBody::SBDiphone* diphone = getCurrentDiphone();
 
 	if (!diphone)
 	{
@@ -395,7 +395,7 @@ void VisemeViewerWindow::OnVisemeSelectCB(Fl_Widget* widget, void* data)
 	int viseme = viewer->_browserViseme->value();
 	std::vector<float> curveData;
 
-	SBDiphone* diphone = viewer->getCurrentDiphone();
+	SmartBody::SBDiphone* diphone = viewer->getCurrentDiphone();
 	if (diphone)
 	{
 		const std::vector<std::string>& visemeNames = diphone->getVisemeNames();
@@ -453,7 +453,7 @@ void VisemeViewerWindow::selectViseme(const char * phoneme1, const char * phonem
 
 	const std::string& diphoneMap = SmartBody::SBScene::getScene()->getCharacter(getCurrentCharacterName())->getStringAttribute("diphoneSetName");
 
-	SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(p1, p2, diphoneMap);
+	SmartBody::SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(p1, p2, diphoneMap);
 	if (diphone)
 	{
 		_browserViseme->deselect();
@@ -510,7 +510,7 @@ void VisemeViewerWindow::selectPhonemes(const char * viseme)
 void VisemeViewerWindow::OnSliderSelectCB(Fl_Widget* widget, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
-	SBDiphone* curDiphone = viewer->getCurrentDiphone();
+	SmartBody::SBDiphone* curDiphone = viewer->getCurrentDiphone();
 	if (!curDiphone)
 		return;
 
@@ -661,7 +661,7 @@ void VisemeViewerWindow::OnSaveCB(Fl_Widget* widget, void* data)
 	std::string diphoneSetName = viewer->getCurrentCharacter()->getStringAttribute("diphoneSetName");
 	if (diphoneSetName == "")
 		diphoneSetName = viewer->getCurrentCharacterName();
-	std::vector<SBDiphone*>& diphones = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphones(diphoneSetName);
+	std::vector<SmartBody::SBDiphone*>& diphones = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphones(diphoneSetName);
 	for (size_t i = 0; i < diphones.size(); i++)
 	{
 		strstr << "diphone = diphoneManager.createDiphone(\"" << diphones[i]->getFromPhonemeName() << "\", \"" << diphones[i]->getToPhonemeName() << "\", \"" << diphoneMap << "\")" << "\n";
@@ -892,10 +892,10 @@ void VisemeViewerWindow::OnShowStatsCB(Fl_Widget* widget, void* data)
 	}
 
 	float instanceCountF = (float) instanceCount;
-	SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
+	SmartBody::SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(viewer->getCurrentCharacterName());
 	std::string curDiphoneSet = character->getStringAttribute("diphoneSetName");
-	std::vector<SBDiphone*>& diphones = diphoneManager->getDiphones(curDiphoneSet);
+	std::vector<SmartBody::SBDiphone*>& diphones = diphoneManager->getDiphones(curDiphoneSet);
 		
 	std::stringstream strstr;
 	for (std::vector<data_a>::iterator iter = sortedDiphones.begin();
@@ -909,7 +909,7 @@ void VisemeViewerWindow::OnShowStatsCB(Fl_Widget* widget, void* data)
 		vhcl::Tokenize((*iter).first, tmp, " -");
 		if (tmp.size() == 2)
 		{
-			SBDiphone* diphone = diphoneManager->getDiphone(tmp[0], tmp[1], curDiphoneSet);
+			SmartBody::SBDiphone* diphone = diphoneManager->getDiphone(tmp[0], tmp[1], curDiphoneSet);
 			if (!diphone)
 				strstr << "**** missing";
 		}
@@ -970,7 +970,7 @@ void VisemeViewerWindow::OnDumpCB(Fl_Widget* widget, void* data)
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
 
 	// construct the entire list of diphones
-	SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
+	SmartBody::SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
 
 	std::vector<std::string> commonPhonemes = diphoneManager->getCommonPhonemes();
 	for (size_t i = 0; i < commonPhonemes.size(); i++)
@@ -993,7 +993,7 @@ void VisemeViewerWindow::OnDumpCB(Fl_Widget* widget, void* data)
 	// gather the current diphones, compare to entire list, and show missing ones
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(viewer->getCurrentCharacterName());
 	std::string curDiphoneSet = character->getStringAttribute("diphoneSetName");
-	std::vector<SBDiphone*>& diphones = diphoneManager->getDiphones(curDiphoneSet);
+	std::vector<SmartBody::SBDiphone*>& diphones = diphoneManager->getDiphones(curDiphoneSet);
 
 	
 	file << "# Autogenerated by SmartBody " << "\n";
@@ -1014,7 +1014,7 @@ void VisemeViewerWindow::OnDumpCB(Fl_Widget* widget, void* data)
 	{
 		for (size_t j = 0; j < commonPhonemes.size(); j++)
 		{
-			 SBDiphone* diphone = diphoneManager->getDiphone(commonPhonemes[i], commonPhonemes[j], curDiphoneSet);
+			 SmartBody::SBDiphone* diphone = diphoneManager->getDiphone(commonPhonemes[i], commonPhonemes[j], curDiphoneSet);
 			 if (!diphone)
 			 {
 				 file <<  commonPhonemes[i] << " - " <<  commonPhonemes[j] << "\n";

@@ -265,14 +265,14 @@ void MeCtEyeLidRegulator::init(SbmPawn* pawn,  bool tracking_pitch)	{
 	MeController::init(pawn);
 
 
-	SBCharacter* c = dynamic_cast<SBCharacter*> (pawn);
+	SmartBody::SBCharacter* c = dynamic_cast<SmartBody::SBCharacter*> (pawn);
 	if (c)
 	{
-		SBSkeleton* skel = c->getSkeleton();
+		SmartBody::SBSkeleton* skel = c->getSkeleton();
 		if (skel)
 		{
-			SBJoint* lEyeJoint = skel->getJointByName("eyeball_left");
-			SBJoint* rEyeJoint = skel->getJointByName("eyeball_right");
+			SmartBody::SBJoint* lEyeJoint = skel->getJointByName("eyeball_left");
+			SmartBody::SBJoint* rEyeJoint = skel->getJointByName("eyeball_right");
 			if (lEyeJoint && rEyeJoint)
 			{
 				_leftPreRot = lEyeJoint->quat()->prerot();

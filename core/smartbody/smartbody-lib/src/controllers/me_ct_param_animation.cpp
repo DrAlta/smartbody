@@ -277,7 +277,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	{
 		///////////////////////////////////////////////////////////////////////
 		// check automatic transitions
-		SmartBody::SBScene* scene = SBScene::getScene();
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SmartBody::SBAnimationBlendManager* blendManager = scene->getBlendManager();
 		PABlend* blend = curStateData->state;
 		SmartBody::SBAnimationBlend* sbstate = dynamic_cast<SmartBody::SBAnimationBlend*>(blend);
@@ -886,7 +886,7 @@ void MeCtParamAnimation::updateWo(SrMat& mat, MeCtChannelWriter* woWriter, SrBuf
 
 void MeCtParamAnimation::updateIK( PABlendData* curBlendData, SrMat& woMat, SrBuffer<float>& buff )
 {
-	SBAnimationBlend* blend = dynamic_cast<SBAnimationBlend*>(curBlendData->state);
+	SmartBody::SBAnimationBlend* blend = dynamic_cast<SmartBody::SBAnimationBlend*>(curBlendData->state);
 	if (!blend) return;
 	MotionAnalysis* moAnalysis = blend->getMotionAnalysis();
 	if (!moAnalysis) return;

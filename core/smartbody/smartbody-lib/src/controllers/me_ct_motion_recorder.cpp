@@ -49,13 +49,13 @@ void MeCtMotionRecorder::stopRecording( const std::string& motionName )
 void MeCtMotionRecorder::init(SbmPawn* pawn)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	SBSkeleton* skel = scene->getSkeleton(pawn->getSkeleton()->getName());	
+	SmartBody::SBSkeleton* skel = scene->getSkeleton(pawn->getSkeleton()->getName());	
 	if (!skel) return;
 	SkJoint* rootJoint = findRootJoint(skel);	
 	rootJointName = rootJoint->name();	
 	for (int i=0;i<skel->getNumJoints();i++)
 	{
-		SBJoint* jo = skel->getJoint(i);
+		SmartBody::SBJoint* jo = skel->getJoint(i);
 		if (jo->quat()->active()) // add quat channel
 		{
 			channels.add(jo->name(), (SkChannel::Type)(SkChannel::Quat));
@@ -172,10 +172,10 @@ bool MeCtMotionRecorder::controller_evaluate(double t, MeFrameData& frame)
 	if (recordFrame)
 	{
 		// swap joint rotation + joint translation	
-		SBSkeleton* skel = character->getSkeleton();
+		SmartBody::SBSkeleton* skel = character->getSkeleton();
 		skel->update_global_matrices();
 		
-		SBJoint* rootJoint = skel->getJointByName(rootJointName);
+		SmartBody::SBJoint* rootJoint = skel->getJointByName(rootJointName);
 		SrQuat oldQuat;
 		SrVec oldPos;	
 		getJointChannelValues(rootJointName,frame, oldQuat, oldPos);
@@ -203,7 +203,7 @@ bool MeCtMotionRecorder::controller_evaluate(double t, MeFrameData& frame)
 	return true;
 }
 
-SkJoint* MeCtMotionRecorder::findRootJoint( SBSkeleton* skel )
+SkJoint* MeCtMotionRecorder::findRootJoint( SmartBody::SBSkeleton* skel )
 {
 	SkJoint* rootJoint = skel->root();
 	bool bStop = false;

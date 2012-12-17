@@ -433,7 +433,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    // register gesture event handler
 	GestureVisualizationHandler* gv = new GestureVisualizationHandler();
 	gv->setGestureData(_gestureData);
-	EventManager* manager = EventManager::getEventManager();
+	SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();
 	manager->addEventHandler("bmlstatus", gv);
 
 }
@@ -1109,7 +1109,7 @@ void FltkViewer::updateLights()
 			SmartBody::SBPawn* sbpawn = dynamic_cast<SmartBody::SBPawn*>(pawn);
 			SrLight light;
 			light.position = sbpawn->getPosition();
-			SmartBody::BoolAttribute* directionalAttr = dynamic_cast<BoolAttribute*>(sbpawn->getAttribute("lightIsDirectional"));
+			SmartBody::BoolAttribute* directionalAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("lightIsDirectional"));
 			if (directionalAttr)
 			{
 				light.directional = directionalAttr->getValue();
@@ -2148,7 +2148,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 	//	return;
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SBScene* scene = mcu._scene;
+	SmartBody::SBScene* scene = mcu._scene;
 	char cmdStr[256];
 	SrVec p1;
 	SrVec p2;
@@ -2160,7 +2160,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 	{
 		//dest.y = 102;		
 		std::string skelName = toks[1].c_str();
-		SBSkeleton* skel = mcu._scene->getSkeleton(skelName);
+		SmartBody::SBSkeleton* skel = mcu._scene->getSkeleton(skelName);
 		if (skel)
 		{
 			sprintf(cmdStr,"char defaultChar%d init %s",characterCount,toks[1].c_str());
@@ -2268,7 +2268,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		// load the new skeleton
  		mcu.load_skeletons(retargetDir.c_str(), false);
  		//boost::filesystem::copy_file()
- 		SBSkeleton* skel = mcu._scene->getSkeleton(skelName);
+ 		SmartBody::SBSkeleton* skel = mcu._scene->getSkeleton(skelName);
  		float yOffset = -skel->getBoundingBox().a.y;
  		dest.y = yOffset;		
 		std::stringstream strstr;
@@ -3196,7 +3196,7 @@ void FltkViewer::drawEyeLids()
 
 void FltkViewer::drawCharacterBoundingVolumes()
 {
-	SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
+	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
 	if(!colManager->isEnable())
 		return;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -3249,27 +3249,27 @@ void FltkViewer::drawCharacterPhysicsObjs()
 {
 	float pawnSize = 1.0;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SBPhysicsSim* phyEngine = SBPhysicsSim::getPhysicsEngine();
+	SmartBody::SBPhysicsSim* phyEngine = SmartBody::SBPhysicsSim::getPhysicsEngine();
 	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
 		iter != mcu.getCharacterMap().end();
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		SBPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(character->getName());//character->getPhysicsCharacter();				
+		SmartBody::SBPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(character->getName());//character->getPhysicsCharacter();				
 		if (!phyChar) 
 		{			
 			continue;
 		}
 
 
-		std::map<std::string,SbmJointObj*>& jointPhyObjs = phyChar->getJointObjMap();
-		std::map<std::string,SbmJointObj*>::iterator mi;
+		std::map<std::string,SmartBody::SbmJointObj*>& jointPhyObjs = phyChar->getJointObjMap();
+		std::map<std::string,SmartBody::SbmJointObj*>::iterator mi;
 		float totalMass = 0.f;
 		for ( mi  = jointPhyObjs.begin();
 			  mi != jointPhyObjs.end();
 			  mi++)
 		{
-			SbmJointObj* obj = mi->second;
+			SmartBody::SbmJointObj* obj = mi->second;
 			totalMass += obj->getMass();
 		}
 		if (totalMass == 0.f) totalMass = 1.f;
@@ -3278,10 +3278,10 @@ void FltkViewer::drawCharacterPhysicsObjs()
 			  mi != jointPhyObjs.end();
 			  mi++)
 		{
-			SbmJointObj* obj = mi->second;
+			SmartBody::SbmJointObj* obj = mi->second;
 			SrMat gmat = obj->getGlobalTransform().gmat();
-			SBJoint* joint = obj->getSBJoint();	
-			SBPhysicsSim* physics = SBPhysicsSim::getPhysicsEngine();
+			SmartBody::SBJoint* joint = obj->getSBJoint();	
+			SmartBody::SBPhysicsSim* physics = SmartBody::SBPhysicsSim::getPhysicsEngine();
 #if 1
 			if (physics)
 			{
@@ -3990,7 +3990,7 @@ void FltkViewer::drawGestures()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (_gestureData->currentCharacter == "")
 		return;
-	SBCharacter* character = mcu._scene->getCharacter(_gestureData->currentCharacter);
+	SmartBody::SBCharacter* character = mcu._scene->getCharacter(_gestureData->currentCharacter);
 	if (!character)
 		return;
 
@@ -4004,8 +4004,8 @@ void FltkViewer::drawGestures()
 
 	std::string wristLfName = "l_wrist";
 	std::string wristRtName = "r_wrist";
-	SBJoint* wristLfJoint = character->getSkeleton()->getJointByName(wristLfName);
-	SBJoint* wristRtJoint = character->getSkeleton()->getJointByName(wristRtName);
+	SmartBody::SBJoint* wristLfJoint = character->getSkeleton()->getJointByName(wristLfName);
+	SmartBody::SBJoint* wristRtJoint = character->getSkeleton()->getJointByName(wristRtName);
 	if (!wristLfJoint || !wristRtJoint)
 		return;
 
@@ -4391,10 +4391,10 @@ SbmCharacter* FltkViewer::getCurrentCharacter()
 SmartBody::SBAnimationBlend* FltkViewer::getCurrentCharacterAnimationBlend()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	const std::string& chrname = mcu.getPAWinSelChrName();
 	if(chrname.length() == 0) return 0;
-	SBCharacter* character = scene->getCharacter(chrname);
+	SmartBody::SBCharacter* character = scene->getCharacter(chrname);
 	if (!character) return 0;
 
 	SmartBody::SBAnimationBlend* animBlend = NULL;
@@ -4404,7 +4404,7 @@ SmartBody::SBAnimationBlend* FltkViewer::getCurrentCharacterAnimationBlend()
 	{
 		PABlendData* pblendData = panimCt->getCurrentPABlendData();
 		if (pblendData)
-			animBlend = dynamic_cast<SBAnimationBlend*>(pblendData->state);
+			animBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(pblendData->state);
 	}	
 	return animBlend;
 }
@@ -4909,7 +4909,7 @@ void GestureVisualizationHandler::setGestureData(GestureData* data)
 	_gestureData = data;
 }
 
-void GestureVisualizationHandler::executeAction(Event* event)
+void GestureVisualizationHandler::executeAction(SmartBody::Event* event)
 {
 	if (!_gestureData)
 		return;

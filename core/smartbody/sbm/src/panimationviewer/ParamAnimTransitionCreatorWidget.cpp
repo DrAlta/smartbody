@@ -82,16 +82,16 @@ void PATransitionCreator::setInfo(bool isCreateMode, const std::string& stateNam
 		}
 
 
-		SBAnimationBlend0D* state0d = dynamic_cast<SBAnimationBlend0D*>(state);
+		SmartBody::SBAnimationBlend0D* state0d = dynamic_cast<SmartBody::SBAnimationBlend0D*>(state);
 		if (state0d)
 			choiceStateType->value(0);
-		SBAnimationBlend1D* state1d = dynamic_cast<SBAnimationBlend1D*>(state);
+		SmartBody::SBAnimationBlend1D* state1d = dynamic_cast<SmartBody::SBAnimationBlend1D*>(state);
 		if (state1d)
 			choiceStateType->value(1);
-		SBAnimationBlend2D* state2d = dynamic_cast<SBAnimationBlend2D*>(state);
+		SmartBody::SBAnimationBlend2D* state2d = dynamic_cast<SmartBody::SBAnimationBlend2D*>(state);
 		if (state2d)
 			choiceStateType->value(2);
-		SBAnimationBlend3D* state3d = dynamic_cast<SBAnimationBlend3D*>(state);
+		SmartBody::SBAnimationBlend3D* state3d = dynamic_cast<SmartBody::SBAnimationBlend3D*>(state);
 		if (state3d)
 			choiceStateType->value(3);
 
@@ -163,7 +163,7 @@ std::string PATransitionCreator::getUniqueStateName(std::string prefix)
 		strstr << prefix << lastNameIndex;
 		lastNameIndex++;
 
-		SBAnimationBlend* state = stateManager->getBlend(strstr.str());
+		SmartBody::SBAnimationBlend* state = stateManager->getBlend(strstr.str());
 		if (state)
 			lastNameIndex++;
 	}
@@ -261,10 +261,10 @@ void PATransitionCreator::createState(Fl_Widget* widget, void* data)
 			if (foundIter == motionMap.end())
 			{
 				// new motion to be added to the state
-				SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SBAnimationBlend0D*>(state);	
-				SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SBAnimationBlend1D*>(state);
-				SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SBAnimationBlend2D*>(state);
-				SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SBAnimationBlend3D*>(state);
+				SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SmartBody::SBAnimationBlend0D*>(state);	
+				SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SmartBody::SBAnimationBlend1D*>(state);
+				SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(state);
+				SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(state);
 				if (state0D)
 				{
 					state0D->addMotion((*newMotionIter));
@@ -292,10 +292,10 @@ void PATransitionCreator::createState(Fl_Widget* widget, void* data)
 			if (foundIter == updatedMap.end())
 			{
 				// motion to be removed from the state
-				SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SBAnimationBlend0D*>(state);	
-				SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SBAnimationBlend1D*>(state);
-				SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SBAnimationBlend2D*>(state);
-				SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SBAnimationBlend3D*>(state);
+				SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SmartBody::SBAnimationBlend0D*>(state);	
+				SmartBody::SBAnimationBlend1D* state1D = dynamic_cast<SmartBody::SBAnimationBlend1D*>(state);
+				SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(state);
+				SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(state);
 				if (state0D)
 				{
 					state0D->removeMotion((*toDeleteIter));

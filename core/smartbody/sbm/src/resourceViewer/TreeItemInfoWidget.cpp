@@ -435,8 +435,8 @@ EventItemInfoWidget::EventItemInfoWidget( int x, int y, int w, int h, const char
 	eventInfoObject->createStringAttribute("Action","",true,"Basic",20,false,false,false,"?");
 	updateWidget();
 
-	EventManager* manager = EventManager::getEventManager();
-	EventHandlerMap& eventMap = manager->getEventHandlers();		
+	SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();
+	SmartBody::EventHandlerMap& eventMap = manager->getEventHandlers();		
 	eventInfoObject->registerObserver(this);
 	this->begin();
 		attrWindow = new AttributeWindow(eventInfoObject,x,y,w,h,name);
@@ -453,14 +453,14 @@ EventItemInfoWidget::EventItemInfoWidget( int x, int y, int w, int h, const char
 
 void EventItemInfoWidget::updateWidget()
 {	
-	EventManager* manager = EventManager::getEventManager();
-	EventHandlerMap& eventMap = manager->getEventHandlers();	
-	EventHandlerMap::iterator mi = eventMap.find(eventName);
+	SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();
+	SmartBody::EventHandlerMap& eventMap = manager->getEventHandlers();	
+	SmartBody::EventHandlerMap::iterator mi = eventMap.find(eventName);
 	if (mi != eventMap.end())
 	{
 		SmartBody::EventHandler* handler = mi->second;
 		eventInfoObject->setStringAttribute("EventType", mi->first);
-		BasicHandler* basicHandler = dynamic_cast<BasicHandler*>(handler);
+		SmartBody::BasicHandler* basicHandler = dynamic_cast<SmartBody::BasicHandler*>(handler);
 		if (basicHandler)
 		{
 			eventInfoObject->setStringAttribute("Action",basicHandler->getAction());	
@@ -470,13 +470,13 @@ void EventItemInfoWidget::updateWidget()
 
 void EventItemInfoWidget::notify( SmartBody::SBSubject* subject )
 {
-	EventManager* manager = EventManager::getEventManager();
-	EventHandlerMap& eventMap = manager->getEventHandlers();
-	EventHandlerMap::iterator mi = eventMap.find(eventName);
+	SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();
+	SmartBody::EventHandlerMap& eventMap = manager->getEventHandlers();
+	SmartBody::EventHandlerMap::iterator mi = eventMap.find(eventName);
 	if (mi != eventMap.end())
 	{
 		SmartBody::EventHandler* handler = mi->second;
-		BasicHandler* basicHandler = dynamic_cast<BasicHandler*>(handler);
+		SmartBody::BasicHandler* basicHandler = dynamic_cast<SmartBody::BasicHandler*>(handler);
 		if (basicHandler)
 			basicHandler->setAction(eventInfoObject->getStringAttribute("Action"));		
 	}		

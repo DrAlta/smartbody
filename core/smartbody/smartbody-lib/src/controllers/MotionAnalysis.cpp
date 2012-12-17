@@ -165,7 +165,7 @@ void LocomotionAnalyzer::sampleLegCycle(LegInfo* legInfo, LocomotionLegCycle& le
 {
 	legCycle.samples.resize(nSample);
 	
-	SBJoint* baseJoint = skel->getJointByName(legInfo->base);
+	SmartBody::SBJoint* baseJoint = skel->getJointByName(legInfo->base);
 	motion->connect(skel);
 	double dt = legCycle.cycleDuration/nSample;	
 	for (int i=0;i<nSample;i++)
@@ -177,7 +177,7 @@ void LocomotionAnalyzer::sampleLegCycle(LegInfo* legInfo, LocomotionLegCycle& le
 		legSample.supportPos.resize(legInfo->supportJoints.size());
 		for (unsigned int sup = 0; sup < legInfo->supportJoints.size(); sup++)
 		{
-			SBJoint* supJoint = skel->getJointByName(legInfo->supportJoints[sup]);		
+			SmartBody::SBJoint* supJoint = skel->getJointByName(legInfo->supportJoints[sup]);		
 			legSample.supportPos[sup] = supJoint->gmat().get_translation()*baseJoint->gmat().inverse();
 		}		
 	}		
@@ -185,7 +185,7 @@ void LocomotionAnalyzer::sampleLegCycle(LegInfo* legInfo, LocomotionLegCycle& le
 	legCycle.stanceSupportPos.resize(legInfo->supportJoints.size());
 	for (unsigned int sup = 0; sup < legInfo->supportJoints.size(); sup++)
 	{
-		SBJoint* supJoint = skel->getJointByName(legInfo->supportJoints[sup]);		
+		SmartBody::SBJoint* supJoint = skel->getJointByName(legInfo->supportJoints[sup]);		
 		legCycle.stanceSupportPos[sup] = supJoint->gmat().get_translation()*baseJoint->gmat().inverse();
 	}		
 	motion->disconnect();

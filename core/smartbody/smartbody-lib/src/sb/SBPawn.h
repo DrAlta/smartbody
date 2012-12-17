@@ -7,6 +7,7 @@
 namespace SmartBody {
 
 class SBSkeleton;
+class SBPhysicsSim;
 
 class SBPawn : public SbmPawn
 {
@@ -28,6 +29,8 @@ class SBPawn : public SbmPawn
 		SBAPI void setHPR(SrVec hpr);
 		SBAPI void setHPRSmooth(SrVec hpr, float smoothTime);
 		SBAPI SrVec getHPR();
+
+		SBAPI SBPhysicsObj* getPhysicsObject();
 
 		SBAPI virtual void afterUpdate(double time);
 		SBAPI virtual void notify(SBSubject* subject);

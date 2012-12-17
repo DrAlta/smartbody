@@ -22,7 +22,7 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	int curY = 10;
 
 	_choiceCharacters = new Fl_Choice(110, curY, 150, 20, "Character");
-	//choiceCharacters->callback(CharacterCB, this);
+//	choiceCharacters->callback(CharacterCB, this);
 	std::vector<std::string> characters = scene->getCharacterNames();
 	for (size_t c = 0; c < characters.size(); c++)
 	{
@@ -31,7 +31,7 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	curY += 25;
 
 	_choiceSkeletons = new Fl_Choice(110, curY, 150, 20, "Skeleton");
-	//choiceSkeleton->callback(SkeletonCB, this);
+//	choiceSkeleton->callback(SkeletonCB, this);
 	std::vector<std::string> skeletons = scene->getSkeletonNames();
 	for (size_t c = 0; c < skeletons.size(); c++)
 	{
@@ -123,7 +123,7 @@ void RetargetViewer::RetargetCB(Fl_Widget* widget, void* data)
 				SmartBody::SBBehaviorSet* behavSet = behavMgr->getBehaviorSet(check->label());
 				if (behavSet)
 				{
-					LOG("Retargetting %s...", check->label());
+					LOG("Retargetting %s on %s with %s...", check->label(), viewer->getCharacterName().c_str(), viewer->getSkeletonName().c_str());
 					const std::string& script = behavSet->getScript();
 					SmartBody::SBScene::getScene()->runScript(script.c_str());
 					std::stringstream strstr;

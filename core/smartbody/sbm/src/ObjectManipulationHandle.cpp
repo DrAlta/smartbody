@@ -110,6 +110,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 	for (unsigned int i=0;i<pawn_list.size();i++)
 	{
 		SbmPawn* pawn = pawn_list[i];
+		SmartBody::SBPawn* sbpawn = dynamic_cast<SmartBody::SBPawn*>(pawn);
 		SrVec pawn_pos = PawnPosControl::get_pawn_pos(pawn);
 		glPushName(0xffffffff);
 		glLoadName(i);
@@ -125,9 +126,9 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 			SrBox bbox = curChar->getBoundingBox();
 			PositionControl::drawBox(bbox);						
 		}
-		else if (pawn->getPhysicsObject())
+		else if (sbpawn->getPhysicsObject())
 		{
-			SrMat gmat = pawn->getPhysicsObject()->getGlobalTransform().gmat();
+			SrMat gmat = sbpawn->getPhysicsObject()->getGlobalTransform().gmat();
 			//FltkViewer::drawColObject(pawn->getGeomObject(), gmat);
 		}
 		else

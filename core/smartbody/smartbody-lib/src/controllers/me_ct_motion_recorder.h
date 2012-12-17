@@ -24,7 +24,7 @@ public:
 	virtual bool controller_evaluate( double t, MeFrameData& frame );
 
 protected:
-	SkJoint* findRootJoint( SBSkeleton* skel );
+	SkJoint* findRootJoint( SmartBody::SBSkeleton* skel );
 
 	void getJointChannelValues(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat, SrVec& outPos);
 	void setJointChannelQuat(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat);
