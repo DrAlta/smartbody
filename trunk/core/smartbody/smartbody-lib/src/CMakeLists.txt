@@ -391,11 +391,11 @@ set( SMARTBODY_LIB_SBM_SRC
 #set( CMAKE_MODULE_LINKER_FLAGS -m32 )
 set_source_files_properties( ${SMARTBODY_LIB_EXT_SOIL_SRC} PROPERTIES LANGUAGE CXX )
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	if (${CMAKE_C_COMPILER_VERSION} VERSION_GREATER 4.2.0)
-		add_definitions(-Wno-deprecated-writable-strings)
-	endif()
-endif()
+#if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+#	if (${CMAKE_C_COMPILER_VERSION} VERSION_GREATER 4.2.0)
+#		add_definitions(-Wno-deprecated-writable-strings)
+#	endif()
+#endif()
 
 
 add_library(

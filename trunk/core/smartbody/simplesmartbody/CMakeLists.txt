@@ -66,7 +66,7 @@ target_link_libraries( simplesmartbody
 
 set( EXEC_LIST
 
-	sbm-batch 
+	simplesmartbody
 )
 
 set( APP_LIBRARY_BINARY_PATHS

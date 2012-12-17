@@ -20,7 +20,7 @@ void ErrorVisualization::setDrawType( const std::string& type )
 }
 
 
-void ErrorVisualization::setAnimationState( SBAnimationBlend* animBlend )
+void ErrorVisualization::setAnimationState( SmartBody::SBAnimationBlend* animBlend )
 {
 	curBlend = animBlend;
 }
