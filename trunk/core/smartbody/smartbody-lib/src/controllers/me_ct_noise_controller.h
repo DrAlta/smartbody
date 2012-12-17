@@ -17,7 +17,7 @@ class MeCtNoiseController : public SmartBody::SBController
 		float 			_duration;
 		SkChannelArray	_channels;
 		SbmCharacter* 	_character;
-		SBSkeleton*     _skeletonCopy;
+		SmartBody::SBSkeleton*     _skeletonCopy;
 		bool			_valid;	
 		std::map<std::string, Perlin> perlinMap;
 		float perlinScale, perlinFrequency, perlinDuration;

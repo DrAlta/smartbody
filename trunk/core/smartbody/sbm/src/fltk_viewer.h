@@ -516,14 +516,14 @@ class LocomotionData
 		float off_height_comp;
 };
 
-class GestureVisualizationHandler : public EventHandler
+class GestureVisualizationHandler : public SmartBody::EventHandler
 {
 	public:
 		GestureVisualizationHandler();
 		~GestureVisualizationHandler();
 		void setGestureData(GestureData* data);
 
-		virtual void executeAction(Event* event);
+		virtual void executeAction(SmartBody::Event* event);
 
 	private:
 		GestureData* _gestureData;

@@ -171,10 +171,10 @@ ReachTarget& ReachTarget::operator=( const ReachTarget& rt )
 void ReachHandAction::sendReachEvent(const std::string& etype, const std::string& cmd, float time /*= 0.0*/ )
 {
 	std::string eventType = etype;		
-	MotionEvent motionEvent;
+	SmartBody::MotionEvent motionEvent;
 	motionEvent.setType(eventType);			
 	motionEvent.setParameters(cmd);
-	EventManager* manager = EventManager::getEventManager();		
+	SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();		
 	manager->handleEvent(&motionEvent,time);
 }
 

@@ -450,7 +450,7 @@ void mcuCBHandle::reset( void )
 	_scene->getSimulationManager()->start();
 
 #ifndef __native_client__
-	SrViewer* viewer = getViewer();
+	SrViewer* viewer = SmartBody::getViewer();
 	if (viewer)
 		viewer->show_viewer();
 #endif
@@ -1709,7 +1709,7 @@ int mcuCBHandle::map_skeleton( const char * mapName, const char * skeletonName )
 	}
 
 	// find the bone map name
-	SmartBody::SBJointMap* jointMap = SBScene::getScene()->getJointMapManager()->getJointMap(mapName);
+	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(mapName);
 	if (!jointMap)
 	{
 		LOG("Cannot find joint map name '%s'.", mapName);

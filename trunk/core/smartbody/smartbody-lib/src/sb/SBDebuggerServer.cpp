@@ -157,7 +157,7 @@ void SBDebuggerServer::Update()
 
                for (int j = 0; j < c->getSkeleton()->getNumJoints(); j++)
                {
-                  SBJoint * joint = c->getSkeleton()->getJoint(j);
+                  SmartBody::SBJoint * joint = c->getSkeleton()->getJoint(j);
 
                   // beware of temporaries
                   float posx = joint->getPosition().x;
@@ -193,7 +193,7 @@ void SBDebuggerServer::Update()
                   vector<string> pawnNames = m_scene->getPawnNames();
                   for (size_t i = 0; i < pawnNames.size(); i++)
                   {
-                     SBPawn* p = m_scene->getPawn(pawnNames[i]);
+                     SmartBody::SBPawn* p = m_scene->getPawn(pawnNames[i]);
                      msg += vhcl::Format("sbmdebugger %s update pawn %s", m_fullId.c_str(), p->getName().c_str());
                      SrVec pos = p->getPosition();
                      SrQuat rot = p->getOrientation();
@@ -291,7 +291,7 @@ void SBDebuggerServer::Update()
 }
 
 
-void SBDebuggerServer::GenerateInitHierarchyMsg(SBJoint * root, string & msg, int tab)
+void SBDebuggerServer::GenerateInitHierarchyMsg(SmartBody::SBJoint * root, string & msg, int tab)
 {
    string name = root->getName();
    float posx = root->offset().x;

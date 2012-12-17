@@ -44,7 +44,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 	xml_utils::xml_translate(&mode, modeAttr);
 	xml_utils::xml_translate(&style, styleAttr);
 
-	SBCharacter* character = dynamic_cast<SBCharacter*>(request->actor);
+	SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(request->actor);
 	const std::string& gestureMapName = character->getStringAttribute("gestureMap");
 	std::vector<std::string> animationList;
 	if (animationName == "")	// If you have assigned the animation name, do not look for the map
@@ -137,7 +137,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 			mForCt = mForCt->buildPoststrokeHoldMotion(poststrokehold, jointVec, scale, freq, postIdleMotion);
 		}
 		//motionCt->init(const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0);
-		SBCharacter* sbCharacter = dynamic_cast<SBCharacter*>(request->actor);
+		SmartBody::SBCharacter* sbCharacter = dynamic_cast<SmartBody::SBCharacter*>(request->actor);
 		bool isInLocomotion = false;
 		if (sbCharacter->steeringAgent)
 		{

@@ -150,7 +150,7 @@ SMARTBODY_DLL_API Smartbody_dll::~Smartbody_dll()
 
 SMARTBODY_DLL_API void Smartbody_dll::SetSpeechAudiofileBasePath( const std::string & basePath )
 {
-   SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 
    scene->removeAllAssetPaths("audio");
    scene->addAssetPath("audio", basePath);
@@ -158,7 +158,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetSpeechAudiofileBasePath( const std::str
 
 SMARTBODY_DLL_API void Smartbody_dll::SetProcessId( const std::string & processId )
 {
-   SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 	
    scene->setProcessId(processId);
 }
@@ -166,7 +166,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetProcessId( const std::string & processI
 
 SMARTBODY_DLL_API void Smartbody_dll::SetMediaPath( const std::string & path )
 {
-  SBScene * scene = SmartBody::SBScene::getScene();
+  SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
   scene->setMediaPath(path);
 }
 
@@ -292,7 +292,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetListener( SmartbodyListener * listener 
 
 SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
 {
-	SBScene * scene = SmartBody::SBScene::getScene();
+	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
 	sim->setTime(timeInSeconds);
 	sim->update();
@@ -303,7 +303,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
 
 SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerId( const std::string & id )
 {
-	SBScene * scene = SmartBody::SBScene::getScene();
+	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 
 	scene->getDebuggerServer()->SetID( id );
 }
@@ -329,7 +329,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerCameraValues( double x, double 
 
 SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerRendererRightHanded( bool enabled )
 {
-  SBScene * scene = SmartBody::SBScene::getScene();
+  SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 
    scene->getDebuggerServer()->m_rendererIsRightHanded = enabled;
 }
@@ -337,7 +337,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerRendererRightHanded( bool enabl
 
 SMARTBODY_DLL_API bool Smartbody_dll::ProcessVHMsgs( const char * op, const char * args )
 {
-	SBScene * scene = SmartBody::SBScene::getScene();
+	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 
    string s = string(op) + string(" ") + string(args);
    scene->command( s.c_str() );
@@ -349,22 +349,22 @@ SMARTBODY_DLL_API bool Smartbody_dll::ProcessVHMsgs( const char * op, const char
 
 SMARTBODY_DLL_API bool Smartbody_dll::ExecutePython( const char * command )
 {
-	SBScene * scene = SmartBody::SBScene::getScene();
+	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 	return scene->run(command);
 }
 
 SMARTBODY_DLL_API int Smartbody_dll::GetNumberOfCharacters()
 {
-  SBScene * scene = SmartBody::SBScene::getScene();
+  SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
   return scene->getNumCharacters();
 }
 
 
 SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string & name )
 {
-	SBScene * scene = SmartBody::SBScene::getScene();
+	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 
-   SBCharacter * char_p = scene->getCharacter(name);
+   SmartBody::SBCharacter * char_p = scene->getCharacter(name);
    if ( char_p )
    {
       std::map<std::string,SmartbodyCharacter*>::iterator mi = m_characters.find(name);
@@ -484,7 +484,7 @@ bool Smartbody_dll::InitVHMsg()
 #if !defined(ANDROID_BUILD) && !defined(IPHONE_BUILD)
 
    mcuCBHandle & mcu = mcuCBHandle::singleton();
-   SBScene * scene = mcu._scene;
+   SmartBody::SBScene * scene = mcu._scene;
 
    printf( "Starting VHMsg (DLL side)\n" );
 
@@ -502,7 +502,7 @@ bool Smartbody_dll::InitVHMsg()
 SMARTBODY_DLL_API bool Smartbody_dll::PythonCommandVoid( const std::string & command )
 {
 #if USE_SBPYTHON
-	SBScene * scene = SmartBody::SBScene::getScene();
+	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 	return scene->run(command) == 1 ? true : false;
 #else
 	return false;

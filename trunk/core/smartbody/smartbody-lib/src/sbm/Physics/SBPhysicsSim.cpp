@@ -7,6 +7,8 @@
 #include <sr/sr_output.h>
 
 //#include <boost/math/special_functions/fpclassify.hpp>
+namespace SmartBody 
+{
 
 SBPhysicsSim::SBPhysicsSim(void)
 {
@@ -1039,4 +1041,6 @@ CollisionRecord& CollisionRecord::operator=( const CollisionRecord& rt )
 	hitJointObj = rt.hitJointObj;
 	momentum    = rt.momentum;
 	return *this;
+}
+
 }

@@ -399,7 +399,7 @@ void MeCtMotion::loadMotionEvents()
 
 	if (_motion)
 	{
-		std::vector<MotionEvent*>& motionEvents = _motion->getMotionEvents();
+		std::vector<SmartBody::MotionEvent*>& motionEvents = _motion->getMotionEvents();
 		for (size_t x = 0; x < motionEvents.size(); x++)
 		{
 			_events.push(motionEvents[x]);
@@ -411,10 +411,10 @@ void MeCtMotion::checkMotionEvents(double time)
 {
 	while (!_events.empty())
 	{
-		MotionEvent* motionEvent = _events.front();		
+		SmartBody::MotionEvent* motionEvent = _events.front();		
 		if (motionEvent->isEnabled() && time >= motionEvent->getTime())
 		{
-			EventManager* manager = EventManager::getEventManager();
+			SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();
 			manager->handleEvent(motionEvent, time);
 			std::string type = motionEvent->getType();
 			std::string params = motionEvent->getParameters();

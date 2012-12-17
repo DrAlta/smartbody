@@ -284,7 +284,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			// now there's adjust for the channels by default
 			//animationPostProcessByChannels(skeleton, motion, channelsForAdjusting);
 			SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(motion);
-			int pretrimFrames = SBScene::getScene()->getIntAttribute("colladaTrimFrames");
+			int pretrimFrames = SmartBody::SBScene::getScene()->getIntAttribute("colladaTrimFrames");
 			if (pretrimFrames > 0 && sbMotion)
 			{
 				sbMotion->trim(pretrimFrames,0);				

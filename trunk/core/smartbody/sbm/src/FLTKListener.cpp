@@ -54,7 +54,7 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 		character->dMesh_p         =  new SbmDeformableMeshGPU();
 		character->dMeshInstance_p =  new SbmDeformableMeshGPUInstance();		
 	#endif
-	SBSkeleton* sbSkel = character->getSkeleton();
+	SmartBody::SBSkeleton* sbSkel = character->getSkeleton();
 	character->dMesh_p->setSkeleton(sbSkel);
 	character->dMeshInstance_p->setSkeleton(sbSkel);
 	
@@ -193,7 +193,7 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 	pawn->dMesh_p         =  new SbmDeformableMeshGPU();
 	pawn->dMeshInstance_p =  new SbmDeformableMeshGPUInstance();	
 
-	float sceneScale = 0.01f/SBScene::getScene()->getScale();
+	float sceneScale = 0.01f/SmartBody::SBScene::getScene()->getScale();
 
 	pawn->scene_p = new SkScene();
 	pawn->scene_p->ref();

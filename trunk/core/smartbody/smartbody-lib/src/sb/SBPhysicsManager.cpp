@@ -4,6 +4,7 @@
 #endif
 #include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
+#include <sbm/Physics/SBPhysicsSim.h>
 #include <sbm/Physics/SBPhysicsSimODE.h>
 
 #ifdef __ANDROID__
@@ -251,9 +252,9 @@ void SBPhysicsManager::updatePhysicsPawn( std::string pawnName )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SmartBody::SBScene* scene = mcu._scene;
-	SBPhysicsSim* phyEngine = getPhysicsEngine();
+	SmartBody::SBPhysicsSim* phyEngine = getPhysicsEngine();
 	SBPhysicsObj* phyObj = phyEngine->getPhysicsPawn(pawnName);
-	SBPawn* pawn = scene->getPawn(pawnName);
+	SmartBody::SBPawn* pawn = scene->getPawn(pawnName);
 	if (!phyObj || !pawn) return;
 
 	bool pawnPhySim = (phyEngine->getBoolAttribute("enable") && pawn->getBoolAttribute("enablePhysics"));

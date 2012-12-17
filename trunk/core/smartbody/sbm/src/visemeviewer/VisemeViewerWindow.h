@@ -79,9 +79,9 @@ protected:
 	bool getUseRemote();
 	
 
-	SBCharacter* getCurrentCharacter();
+	SmartBody::SBCharacter* getCurrentCharacter();
 	std::string getCurrentCharacterName();
-	SBDiphone* getCurrentDiphone();
+	SmartBody::SBDiphone* getCurrentDiphone();
 
 	static void OnDiphoneSelectCB(Fl_Widget* widget, void* data);
 	static void OnCharacterSelectCB(Fl_Widget* widget, void* data);

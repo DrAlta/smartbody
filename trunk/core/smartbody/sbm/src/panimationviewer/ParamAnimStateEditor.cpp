@@ -293,7 +293,7 @@ void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 
 		editor->createStateButton->label("Edit Blend");
 		// determine the state type
-		SBAnimationBlend0D* state0d = dynamic_cast<SBAnimationBlend0D*>(currentState);
+		SmartBody::SBAnimationBlend0D* state0d = dynamic_cast<SmartBody::SBAnimationBlend0D*>(currentState);
 		if (state0d)
 		{
 			editor->choiceStateType->value(1);
@@ -318,7 +318,7 @@ void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 			editor->triangleVisualization->show();
 			editor->triangleVisualization->redraw();
 		}
-		SBAnimationBlend1D* state1d = dynamic_cast<SBAnimationBlend1D*>(currentState);
+		SmartBody::SBAnimationBlend1D* state1d = dynamic_cast<SmartBody::SBAnimationBlend1D*>(currentState);
 		if (state1d)
 		{
 			editor->choiceStateType->value(2);
@@ -343,7 +343,7 @@ void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 			editor->triangleVisualization->show();
 			editor->triangleVisualization->redraw();
 		}
-		SBAnimationBlend2D* state2d = dynamic_cast<SBAnimationBlend2D*>(currentState);
+		SmartBody::SBAnimationBlend2D* state2d = dynamic_cast<SmartBody::SBAnimationBlend2D*>(currentState);
 		if (state2d)
 		{
 			editor->choiceStateType->value(3);
@@ -368,7 +368,7 @@ void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 			editor->triangleVisualization->show();
 			editor->triangleVisualization->redraw();
 		}
-		SBAnimationBlend3D* state3d = dynamic_cast<SBAnimationBlend3D*>(currentState);
+		SmartBody::SBAnimationBlend3D* state3d = dynamic_cast<SmartBody::SBAnimationBlend3D*>(currentState);
 		if (state3d)
 		{
 			editor->choiceStateType->value(4);
@@ -838,7 +838,7 @@ void PABlendEditor::alignLeft(Fl_Widget* widget, void* data)
 	const std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
 	for (size_t i = 0; i < selectedMotions.size(); i++)
 	{
-		SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
 		if (motion)
 			motion->alignToBegin(1);
 	}
@@ -852,7 +852,7 @@ void PABlendEditor::alignRight(Fl_Widget* widget, void* data)
 	const std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
 	for (size_t i = 0; i < selectedMotions.size(); i++)
 	{
-		SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
 		if (motion)
 			motion->alignToEnd(1);
 	}
@@ -866,7 +866,7 @@ void PABlendEditor::alignRecover(Fl_Widget* widget, void* data)
 	const std::vector<std::string>& selectedMotions = editor->getSelectedMotions();
 	for (size_t i = 0; i < selectedMotions.size(); i++)
 	{
-		SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[i]);
 		if (motion)
 			motion->recoverAlign();
 	}
@@ -882,7 +882,7 @@ void PABlendEditor::refreshAlign()
 	std::vector<double> alignTimes;
 	for (int i = 0 ;i < currentState->getNumMotions(); i++)
 	{
-		SBMotion* motion = dynamic_cast<SBMotion*> (currentState->motions[i]);
+		SmartBody::SBMotion* motion = dynamic_cast<SmartBody::SBMotion*> (currentState->motions[i]);
 		if (motion)
 		{
 			int alignId = motion->getAlignIndex();
@@ -1012,7 +1012,7 @@ void PABlendEditor::save(Fl_Widget* widget, void* data)
 	strstr << "# align motions first if needed\n";
 	for (int i = 0; i < state->getNumMotions(); i++)
 	{
-		SBMotion* motion = dynamic_cast<SBMotion*>(state->motions[i]);
+		SmartBody::SBMotion* motion = dynamic_cast<SmartBody::SBMotion*>(state->motions[i]);
 		if (!motion)
 			continue;
 		int alignIndex = motion->getAlignIndex();
@@ -1578,7 +1578,7 @@ void PABlendEditor::updateMotionPlayer(double t)
 
 	if (selectedMotions.size() == 1)
 	{
-		SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[0]);
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[0]);
 		if (!motion)
 			return;
 

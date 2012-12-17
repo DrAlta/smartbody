@@ -408,7 +408,7 @@ void MeCtBreathing::notify(SBSubject* subject)
 		{
 			SmartBody::StringAttribute* attr = dynamic_cast<SmartBody::StringAttribute*>(attribute);
 			mcuCBHandle& mcu = mcuCBHandle::singleton();
-			SBMotion* motion = mcu._scene->getMotion(attr->getValue());
+			SmartBody::SBMotion* motion = mcu._scene->getMotion(attr->getValue());
 			if (!motion)
 			{
 				LOG("No motion named %s found.", motion->getName().c_str());

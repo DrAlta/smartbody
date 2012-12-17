@@ -17,6 +17,8 @@ class RetargetViewer : public Fl_Double_Window
 		const std::string& getCharacterName();
 		const std::string& getSkeletonName();
 
+	//	static void CharacterCB(Fl_Widget* widget, void* data);
+		//static void SkeletonCB(Fl_Widget* widget, void* data);
 		static void RetargetCB(Fl_Widget* widget, void* data);
 		static void CancelCB(Fl_Widget* widget, void* data);
 

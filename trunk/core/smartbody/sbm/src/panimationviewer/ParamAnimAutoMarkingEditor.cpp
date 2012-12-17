@@ -35,7 +35,7 @@ PAAutoFootStepsEditor::PAAutoFootStepsEditor(PABlendEditor* editor, int x, int y
 	inputSpeedDetectWindow->deactivate();
 	
 	browserJoint = new Fl_Multi_Browser(xDis + csx + 100, 13 * yDis, 28 * xDis, 20 * yDis, "Joint");
-	SBCharacter* character = stateEditor->paWindow->getCurrentCharacter();
+	SmartBody::SBCharacter* character = stateEditor->paWindow->getCurrentCharacter();
 	if (character)
 	{
 		const std::vector<std::string>& charJNames = character->getSkeleton()->getJointNames();
@@ -109,7 +109,7 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 		footStepEditor->isPrintDebugInfo = true;
 
 	const std::vector<std::string>& selectedMotions = footStepEditor->stateEditor->getSelectedMotions();
-	SBCharacter* curCharacter = footStepEditor->stateEditor->paWindow->getCurrentCharacter();
+	SmartBody::SBCharacter* curCharacter = footStepEditor->stateEditor->paWindow->getCurrentCharacter();
 	std::vector<std::string> selectedJoints;
 	for (int i = 0; i < footStepEditor->browserJoint->size(); i++)
 	{
@@ -140,7 +140,7 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 		std::vector<std::vector<double> > vecTiming;
 		vecTiming.resize(selectedJoints.size());
 
-		SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[m]);
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(selectedMotions[m]);
 		if (!motion)
 			continue;
 

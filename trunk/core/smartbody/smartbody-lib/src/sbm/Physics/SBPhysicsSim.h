@@ -5,7 +5,8 @@
 #include <sb/SBObject.h>
 #include <sb/SBJoint.h>
 
-using namespace SmartBody;
+namespace SmartBody
+{
 
 class SBPhysicsObjInterface : public SbmTransformObjInterface
 {
@@ -233,6 +234,8 @@ public:
 	virtual void notify(SBSubject* subject);
 	static SBPhysicsSim* getPhysicsEngine();
 };
+
+}
 
 
 #endif

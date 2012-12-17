@@ -8,7 +8,7 @@ std::string MeCtNoiseController::CONTROLLER_TYPE = "NoiseController";
 MeCtNoiseController::MeCtNoiseController(SbmCharacter* character) : SmartBody::SBController()
 {
 	_character = character;
-	_skeletonCopy = new SBSkeleton();
+	_skeletonCopy = new SmartBody::SBSkeleton();
 	_skeletonCopy->copy(_character->getSkeleton());
 	_valid = true;
 	_prevTime = 0.0;
@@ -29,7 +29,7 @@ void MeCtNoiseController::setJointNoise( std::vector<std::string>& jointNames, f
 	for (unsigned int i=0;i<jointNames.size();i++)
 	{
 		std::string jname = jointNames[i];
-		SBJoint* joint = _skeletonCopy->getJointByName(jname);
+		SmartBody::SBJoint* joint = _skeletonCopy->getJointByName(jname);
 		if (joint) // joint actually exist 
 		{
 			perlinMap[jname] = Perlin();

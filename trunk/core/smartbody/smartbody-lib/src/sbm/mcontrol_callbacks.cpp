@@ -2028,7 +2028,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 												jointName.erase(0, jointPrefix.size());
 											}
 											//cout << "joint name = " << jointName << endl;	
-											SBJoint* joint = char_p->getSkeleton()->getJointByName(jointName);
+											SmartBody::SBJoint* joint = char_p->getSkeleton()->getJointByName(jointName);
 											if (joint)
 												skinWeight->infJointName.push_back(joint->getName());
 											else
@@ -2237,12 +2237,12 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 				for (unsigned int i=0; i< sbmChar->dMesh_p->skinWeights.size(); i++)
 				{
 					SkinWeight* sw = sbmChar->dMesh_p->skinWeights[i];
-					SBSkeleton* sbSkeleton = sbmChar->getSkeleton();		
-					SBSkeleton* sbOrigSk = SmartBody::SBScene::getScene()->getSkeleton(sbSkeleton->getName());
+					SmartBody::SBSkeleton* sbSkeleton = sbmChar->getSkeleton();		
+					SmartBody::SBSkeleton* sbOrigSk = SmartBody::SBScene::getScene()->getSkeleton(sbSkeleton->getName());
 					for (int k=0;k<sbOrigSk->getNumJoints();k++)
 					{
 						// manually add all joint names
-						SBJoint* joint = sbOrigSk->getJoint(k);
+						SmartBody::SBJoint* joint = sbOrigSk->getJoint(k);
 						sw->infJointName.push_back(joint->getName());
 						sw->infJoint.push_back(joint);
 						SrMat gmatZeroInv = joint->gmatZero().rigidInverse();						
@@ -4336,9 +4336,9 @@ int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 	char* params = args.read_token();
 
-	EventManager* eventManager = EventManager::getEventManager();
+	SmartBody::EventManager* eventManager = SmartBody::EventManager::getEventManager();
 	std::string parameters = params;
-	Event e;
+	SmartBody::Event e;
 	e.setType(eventType);
 	e.setParameters(parameters);
 	eventManager->handleEvent(&e, mcu_p->time);
@@ -4420,7 +4420,7 @@ int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 	}
 
-	MotionEvent* motionEvent = new MotionEvent();
+	SmartBody::MotionEvent* motionEvent = new SmartBody::MotionEvent();
 	if (isOnce)
 		motionEvent->setIsOnceOnly(true);
 	motionEvent->setTime(time);
@@ -4454,7 +4454,7 @@ int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		{
 			SkMotion* motion = (*iter).second;
 			numMotions++;
-			std::vector<MotionEvent*>& motionEvents = motion->getMotionEvents();
+			std::vector<SmartBody::MotionEvent*>& motionEvents = motion->getMotionEvents();
 			for (size_t x = 0; x < motionEvents.size(); x++)
 			{
 				delete motionEvents[x];
@@ -4474,7 +4474,7 @@ int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	SkMotion* motion = (*iter).second;
-	std::vector<MotionEvent*>& motionEvents = motion->getMotionEvents();
+	std::vector<SmartBody::MotionEvent*>& motionEvents = motion->getMotionEvents();
 	int numEvents = motionEvents.size();
 	for (size_t x = 0; x < motionEvents.size(); x++)
 	{
@@ -4507,7 +4507,7 @@ int disableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		{
 			SkMotion* motion = (*iter).second;
 			numMotions++;
-			std::vector<MotionEvent*>& motionEvents = motion->getMotionEvents();
+			std::vector<SmartBody::MotionEvent*>& motionEvents = motion->getMotionEvents();
 			for (size_t x = 0; x < motionEvents.size(); x++)
 			{
 				motionEvents[x]->setEnabled(false);
@@ -4526,7 +4526,7 @@ int disableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	SkMotion* motion = (*iter).second;
-	std::vector<MotionEvent*>& motionEvents = motion->getMotionEvents();
+	std::vector<SmartBody::MotionEvent*>& motionEvents = motion->getMotionEvents();
 	int numEvents = motionEvents.size();
 	for (size_t x = 0; x < motionEvents.size(); x++)
 	{
@@ -4558,7 +4558,7 @@ int enableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		{
 			SkMotion* motion = (*iter).second;
 			numMotions++;
-			std::vector<MotionEvent*>& motionEvents = motion->getMotionEvents();
+			std::vector<SmartBody::MotionEvent*>& motionEvents = motion->getMotionEvents();
 			for (size_t x = 0; x < motionEvents.size(); x++)
 			{
 				motionEvents[x]->setEnabled(true);
@@ -4577,7 +4577,7 @@ int enableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	SkMotion* motion = (*iter).second;
-	std::vector<MotionEvent*>& motionEvents = motion->getMotionEvents();
+	std::vector<SmartBody::MotionEvent*>& motionEvents = motion->getMotionEvents();
 	int numEvents = motionEvents.size();
 	for (size_t x = 0; x < motionEvents.size(); x++)
 	{
@@ -4600,8 +4600,8 @@ int registerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 	char* action = args.read_token();
 
-	EventManager* eventManager = EventManager::getEventManager();
-	BasicHandler* handler = new BasicHandler();
+	SmartBody::EventManager* eventManager = SmartBody::EventManager::getEventManager();
+	SmartBody::BasicHandler* handler = new SmartBody::BasicHandler();
 	handler->setAction(action);
 	eventManager->addEventHandler(type, handler);
 
@@ -4618,7 +4618,7 @@ int unregisterevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		return CMD_SUCCESS;
 	}
 
-	EventManager* eventManager = EventManager::getEventManager();
+	SmartBody::EventManager* eventManager = SmartBody::EventManager::getEventManager();
 	eventManager->removeEventHandler(type);
 
 	return CMD_SUCCESS;
@@ -4708,14 +4708,14 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		LOG("Path %s is not a directory, so motion mapping will not occur.", finalPath.string().c_str());
 		return CMD_FAILURE;
 	}
-	SBScene* scene = mcu_p->_scene;
+	SmartBody::SBScene* scene = mcu_p->_scene;
 
 	std::vector<std::string> motionNames = scene->getMotionNames();
 	for (std::vector<std::string>::iterator iter = motionNames.begin();
 		 iter != motionNames.end();
 		 iter++)
 	{
-		SBMotion* motion = scene->getMotion((*iter));
+		SmartBody::SBMotion* motion = scene->getMotion((*iter));
 		if (!motion)
 		{
 			LOG("Motion not found for name '%s'.", (*iter).c_str());
@@ -5910,7 +5910,7 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		float factor = args.read_float();
 
-		SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
+		SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(motion);
 		bool result = sbMotion->scale(factor);
 		if (result)
 			return CMD_SUCCESS;
@@ -5926,7 +5926,7 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		float factor = args.read_float();
 
-		SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
+		SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(motion);
 		bool result = sbMotion->retime(factor);
 		if (result)
 			return CMD_SUCCESS;
@@ -5945,7 +5945,7 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		offset[1] = args.read_float();
 		offset[2] = args.read_float();
 
-		SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
+		SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(motion);
 		bool result = sbMotion->translate(offset[0], offset[1], offset[2], "base");
 		if (result)
 			return CMD_SUCCESS;
@@ -5964,7 +5964,7 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		rotation[1] = args.read_float();
 		rotation[2] = args.read_float();
 
-		SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
+		SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(motion);
 		bool result = sbMotion->rotate(rotation[0], rotation[1], rotation[2], "base");
 		if (result)
 			return CMD_SUCCESS;

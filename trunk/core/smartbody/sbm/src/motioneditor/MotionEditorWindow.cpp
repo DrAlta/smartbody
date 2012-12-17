@@ -272,7 +272,7 @@ void MotionEditorWindow::OnSliderMotionFrame(Fl_Widget* widget, void* data)
 void MotionEditorWindow::OnButtonPlayMotionFolder(Fl_Widget* widget, void* data)
 {
 	MotionEditorWindow* editor = (MotionEditorWindow*) data;
-	SBCharacter* curChar = editor->getCurrentCharacter();
+	SmartBody::SBCharacter* curChar = editor->getCurrentCharacter();
 	if (!curChar)
 		return;
 

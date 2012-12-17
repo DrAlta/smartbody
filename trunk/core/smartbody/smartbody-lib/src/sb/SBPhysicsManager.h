@@ -4,10 +4,11 @@
 #include <sb/SBTypes.h>
 #include <sb/SBService.h>
 
-class SBPhysicsSim;
 class SBPhysicsSimODE;
 
 namespace SmartBody {
+
+class SBPhysicsSim;
 
 class SBPhysicsManager : public SBService
 {		

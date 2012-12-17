@@ -6,7 +6,7 @@
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBCollisionManager.h>
 #include <sbm/Physics/SBColObject.h>
-
+#include <sbm/Physics/SBPhysicsSim.h>
 
 namespace SmartBody {
 
@@ -322,6 +322,12 @@ void SBPawn::notify(SBSubject* subject)
 			}
 		}
 	}
+}
+
+SBPhysicsObj* SBPawn::getPhysicsObject()
+{
+	SBPhysicsSim* phyEngine = SBPhysicsSim::getPhysicsEngine();
+	return phyEngine->getPhysicsPawn(getName());	
 }
 
 };

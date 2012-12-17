@@ -427,7 +427,7 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 					size[i] = uniformSize;
 			}			
 			//pawn_p->initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
-			SBPhysicsManager* phyManager = mcu_p->_scene->getPhysicsManager();
+			SmartBody::SBPhysicsManager* phyManager = mcu_p->_scene->getPhysicsManager();
 			phyManager->createPhysicsPawn(pawn_p->getName(),geom_str,size);
 		}
 		if (pawn_p->getGeomObject())
@@ -462,21 +462,23 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		}
 		*/
 
-		if (pawn_p->getPhysicsObject())
+		SmartBody::SBPawn* sbpawn = dynamic_cast<SmartBody::SBPawn*>(pawn_p);
+
+		if (sbpawn->getPhysicsObject())
 		{
-			pawn_p->setWorldOffset(pawn_p->getPhysicsObject()->getGlobalTransform().gmat());
+			sbpawn->setWorldOffset(sbpawn->getPhysicsObject()->getGlobalTransform().gmat());
 		}
 		// [BMLR] Send notification to the renderer that a pawn was created.
 		// NOTE: This is sent both for characters AND pawns
 		mcu_p->_scene->getBoneBusManager()->getBoneBus().SendCreatePawn( pawn_name.c_str(), loc[ 0 ], loc[ 1 ], loc[ 2 ] );
 		float x,y,z,h,p,r;
-		pawn_p->get_world_offset(x,y,z,h,p,r);
+		sbpawn->get_world_offset(x,y,z,h,p,r);
 		//printf("h = %f, p = %f, r = %f\n",h,p,r);	
-		pawn_p->set_world_offset(loc[0],loc[1],loc[2],h,p,r);	
-		pawn_p->wo_cache_update();
+		sbpawn->set_world_offset(loc[0],loc[1],loc[2],h,p,r);	
+		sbpawn->wo_cache_update();
 
 		if (mcu_p->sendPawnUpdates)
-			pawn_p->bonebusCharacter = mcu_p->_scene->getBoneBusManager()->getBoneBus().CreateCharacter( pawn_name.c_str(), pawn_p->getClassType().c_str(), false );
+			sbpawn->bonebusCharacter = mcu_p->_scene->getBoneBusManager()->getBoneBus().CreateCharacter( pawn_name.c_str(), pawn_p->getClassType().c_str(), false );
 
 		if ( scene->getCharacterListener() )
 		{
@@ -945,7 +947,7 @@ int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 		if (has_geom)
 		{				
 			//initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
-			SBPhysicsManager* phyManager = mcu_p->_scene->getPhysicsManager();
+			SmartBody::SBPhysicsManager* phyManager = mcu_p->_scene->getPhysicsManager();
 			phyManager->createPhysicsPawn(pawn->getName(),geom_str,size);
 			// init steering space
 			if (!setRec)
@@ -972,7 +974,8 @@ int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 		else
 			return CMD_FAILURE;
 
-		SBPhysicsObj* phyObj = pawn->getPhysicsObject();
+		SmartBody::SBPawn* sbpawn = dynamic_cast<SmartBody::SBPawn*>(pawn);
+		SmartBody::SBPhysicsObj* phyObj = sbpawn->getPhysicsObject();
 		if (phyObj) phyObj->enablePhysicsSim(turnOn);
 
 		//setPhysicsSim(turnOn);
@@ -989,7 +992,8 @@ int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 		else
 			return CMD_FAILURE;
 
-		SBPhysicsObj* phyObj = pawn->getPhysicsObject();
+		SmartBody::SBPawn* sbpawn = dynamic_cast<SmartBody::SBPawn*>(pawn);
+		SmartBody::SBPhysicsObj* phyObj = sbpawn->getPhysicsObject();
 		if (phyObj) phyObj->enableCollisionSim(turnOn);
 
 		//setCollision(turnOn);			
