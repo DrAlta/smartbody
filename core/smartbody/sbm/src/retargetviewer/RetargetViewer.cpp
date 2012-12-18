@@ -15,8 +15,6 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 {
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-
-
 	begin();
 
 	int curY = 10;

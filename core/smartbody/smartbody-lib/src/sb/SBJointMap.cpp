@@ -267,6 +267,12 @@ void SBJointMap::setMapping(const std::string& from, const std::string& to)
 	_map.push_back(std::pair<std::string, std::string>(from, to));
 }
 
+void SBJointMap::clearMapping()
+{
+	_map.clear();
+}
+
+
 void SBJointMap::removeMapping(const std::string& from)
 {
 }
@@ -1444,6 +1450,8 @@ SkJoint* SBJointMap::getDeepestLevelJoint(const std::vector<SkJoint*>& j_list)
 	}
 	return return_j;
 }
+
+
 
 void SBJointMap::setJointMap(const std::string& SB_jnt, SkJoint* j, bool prtMap)
 {
