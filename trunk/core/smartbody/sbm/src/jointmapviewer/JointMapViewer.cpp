@@ -49,6 +49,7 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	{
 		_choiceCharacters->add(characters[c].c_str());
 	}	
+	_choiceCharacters->callback(SelectCharacterCB,this);
 	curY += 25;
 // 
 // 
@@ -77,10 +78,16 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 		//LOG("joint name = %s",name.c_str());
  		//Fl_Check_Button* check = new Fl_Check_Button(20, curY, 100, 20, _strdup(name.c_str()));
 		//Fl_Group* jointMapGroup = new Fl_Group(20, curY , 200, 20, _strdup(name.c_str()));
-		Fl_Input* input = new Fl_Input(100 , scrollY, 150, 20, _strdup(name.c_str()));
+		//Fl_Input* input = new Fl_Input(100 , scrollY, 150, 20, _strdup(name.c_str()));
+		Fl_Input_Choice* choice = new Fl_Input_Choice(100, scrollY, 150, 20, _strdup(name.c_str()));
+		_jointChoiceList.push_back(choice);
+ 		choice->input()->when(FL_WHEN_CHANGED);
+ 		choice->input()->callback(JointNameChange,this);
+ 		choice->menubutton()->when(FL_WHEN_CHANGED);
+ 		choice->menubutton()->callback(JointNameChange,this);
  		scrollY += 25;
  	}
-
+	
 	_scrollGroup->end();
 	curY += 450  + 25;
 	Fl_Button* buttonApply = new Fl_Button(100, curY, 60, 20, "Apply Map");
@@ -88,12 +95,18 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	Fl_Button* buttonCancel = new Fl_Button(180, curY, 60, 20, "Cancel");
 	buttonCancel->callback(CancelCB, this);
 	end();
-	if (characters.size() > 0) _choiceCharacters->value(0);	
+
 	if (jointMapNames.size() > 0) 
 	{
 		_choiceJointMaps->value(0);
 		updateSelectMap();
 	}
+
+	if (characters.size() > 0)
+	{		
+		_choiceCharacters->value(0);	
+		updateCharacter();
+	}	
 }
 
 
@@ -101,7 +114,83 @@ JointMapViewer::~JointMapViewer()
 {
 }
 
+void JointMapViewer::JointNameChange( Fl_Widget* widget, void* data )
+{
+	Fl_Input* input = dynamic_cast<Fl_Input*>(widget);
+	Fl_Menu_Button* menuButton = dynamic_cast<Fl_Menu_Button*>(widget);
 
+	Fl_Input_Choice* inputChoice = NULL;
+	if (input)
+		inputChoice = dynamic_cast<Fl_Input_Choice*>(input->parent());
+	if (menuButton)
+		inputChoice = dynamic_cast<Fl_Input_Choice*>(menuButton->parent());
+	if (inputChoice)
+	{
+		JointMapViewer* viewer = (JointMapViewer*) data;
+		viewer->updateJointName(inputChoice);
+	}	
+}
+
+
+void JointMapViewer::updateJointName( Fl_Input_Choice* jointChoice )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string charName = _choiceCharacters->text();
+	SmartBody::SBCharacter* curChar = scene->getCharacter(charName);
+	SmartBody::SBSkeleton* charSk = curChar->getSkeleton();		
+	int valueIndex = jointChoice->menubutton()->value();	
+	std::string choiceStr = "";
+	if (valueIndex >= 0)
+	{
+		jointChoice->value(valueIndex);
+		choiceStr = jointChoice->value();
+		if (choiceStr == "--empty--")
+			jointChoice->value("");
+	}
+	jointChoice->clear();
+	jointChoice->add("--empty--"); // add empty string as the first choice
+	std::string filterLabel = jointChoice->value();
+	for (unsigned int i=0;i<skeletonJointNames.size();i++)
+	{
+		std::string& jname = skeletonJointNames[i];
+		if (jname.find(filterLabel) != std::string::npos)
+		{
+			jointChoice->add(jname.c_str());			
+		}
+	}		
+	if (valueIndex >= 0)
+	{
+		if (choiceStr == "--empty--")
+			jointChoice->value("");
+		else
+			jointChoice->value(choiceStr.c_str());
+	}	
+}
+
+void JointMapViewer::updateCharacter()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string charName = _choiceCharacters->text();
+	SmartBody::SBCharacter* curChar = scene->getCharacter(charName);
+	SmartBody::SBSkeleton* charSk = curChar->getSkeleton();
+	skeletonJointNames = charSk->getJointNames();
+
+	int numChildren = _scrollGroup->children();
+	for (int i=0;i<numChildren;i++)
+	{
+		Fl_Input_Choice* input = dynamic_cast<Fl_Input_Choice*>(_scrollGroup->child(i));
+		if (!input)
+		{
+			continue;
+		}	
+		updateJointName(input);
+// 		input->clear();
+// 		for (unsigned int k=0;k<jointNames.size();k++)
+// 		{
+// 			input->add(jointNames[k].c_str());
+// 		}		
+	}
+}
 
 void JointMapViewer::updateSelectMap()
 {
@@ -114,7 +203,7 @@ void JointMapViewer::updateSelectMap()
 	int numChildren = _scrollGroup->children();
 	for (int i=0;i<numChildren;i++)
 	{
-		Fl_Input* input = dynamic_cast<Fl_Input*>(_scrollGroup->child(i));
+		Fl_Input_Choice* input = dynamic_cast<Fl_Input_Choice*>(_scrollGroup->child(i));
 		if (input)
 		{
 			std::string targetName = input->label();
@@ -145,7 +234,7 @@ void JointMapViewer::applyJointMap()
 	jointMap->clearMapping();
 	for (int i=0;i<numChildren;i++)
 	{
-		Fl_Input* input = dynamic_cast<Fl_Input*>(_scrollGroup->child(i));
+		Fl_Input_Choice* input = dynamic_cast<Fl_Input_Choice*>(_scrollGroup->child(i));
 		if (input)
 		{
 			std::string targetName = input->label();
@@ -162,6 +251,14 @@ void JointMapViewer::SelectMapCB( Fl_Widget* widget, void* data )
 {
 	JointMapViewer* viewer = (JointMapViewer*) data;
 	viewer->updateSelectMap();
+	viewer->updateCharacter();	
+}
+
+
+void JointMapViewer::SelectCharacterCB( Fl_Widget* widget, void* data )
+{
+	JointMapViewer* viewer = (JointMapViewer*) data;	
+	viewer->updateCharacter();	
 }
 
 
@@ -169,6 +266,7 @@ void JointMapViewer::ApplyMapCB(Fl_Widget* widget, void* data)
 {
 	JointMapViewer* viewer = (JointMapViewer*) data;
 	viewer->applyJointMap();
+	viewer->updateCharacter();
 
 // 	SmartBody::SBBehaviorSetManager* behavMgr = SmartBody::SBScene::getScene()->getBehaviorSetManager();
 // 
