@@ -22,6 +22,7 @@
 #include "channelbufferviewer/channelbufferWindow.hpp"
 #include "CharacterCreatorWindow.h"
 #include "retargetviewer/RetargetViewer.h"
+#include "jointmapviewer/JointMapViewer.h"
 
 class SbmCharacter;
 
@@ -77,6 +78,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		ResourceWindow* resourceWindow;
 		PanimationWindow* panimationWindow;
 		RetargetViewer* behaviorSetViewer;
+		JointMapViewer* jointMapViewer;
 
 		Fl_Menu_Bar* menubar;
 		Fl_Button* buttonPlay;
@@ -104,6 +106,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void LaunchResourceViewerCB(Fl_Widget* widget, void* data);		
 		static void LaunchFaceViewerCB(Fl_Widget* widget, void* data);
 		static void LaunchSpeechRelayCB(Fl_Widget* widget, void* data);
+		static void LaunchJointMapViewerCB(Fl_Widget* widget, void* data);
 		static void NewCB(Fl_Widget* widget, void* data);
 		static void QuitCB(Fl_Widget* widget, void* data);
 		static void LaunchConnectCB(Fl_Widget* widget, void* data);

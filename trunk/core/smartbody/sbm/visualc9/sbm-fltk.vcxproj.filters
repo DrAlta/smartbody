@@ -43,6 +43,9 @@
     <Filter Include="behaviorsetviewer">
       <UniqueIdentifier>{7f983ecd-5e90-4253-bde5-ff7f00300634}</UniqueIdentifier>
     </Filter>
+    <Filter Include="jointmapviewer">
+      <UniqueIdentifier>{5c85f00a-4129-4993-aa40-cd28f3358310}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -241,6 +244,9 @@
     <ClCompile Include="..\src\motioneditor\MotionEditorWindow.cpp">
       <Filter>motioneditor</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\jointmapviewer\JointMapViewer.cpp">
+      <Filter>jointmapviewer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -436,6 +442,9 @@
     </ClInclude>
     <ClInclude Include="..\src\motioneditor\MotionEditorWindow.h">
       <Filter>motioneditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\jointmapviewer\JointMapViewer.h">
+      <Filter>jointmapviewer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
