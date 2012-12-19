@@ -169,6 +169,7 @@ set( SBM_FLTK_SRC
 
 	src/monitorviewer/MonitorConnectWindow.cpp 
 	src/motioneditor/MotionEditorWindow.cpp
+	src/jointmapviewer/JointMapViewer.cpp
 
 	src/faceviewer/FaceViewer.cpp
 	src/FLTKListener.cpp
