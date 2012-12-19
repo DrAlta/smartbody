@@ -26,9 +26,9 @@
 //#include <FL/enumerations.H>
 # include "fltk_viewer.h"
 # include <FL/Fl.H>
-# include <GL/gl.h>
+# include <FL/gl.h>
 # include <GL/glu.h>
-# include <FL/glut.h>
+# include <FL/glut.H>
 //# include <fltk/visual.h>
 //# include <fltk/compat/FL/Fl_Menu_Item.H>
 # include <FL/fl_draw.H>
