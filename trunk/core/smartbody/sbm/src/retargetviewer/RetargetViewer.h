@@ -4,6 +4,7 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Scroll.H>
+#include <FL/Fl_Button.H>
 #include <string>
 
 class RetargetViewer : public Fl_Double_Window
@@ -17,6 +18,7 @@ class RetargetViewer : public Fl_Double_Window
 		const std::string& getCharacterName();
 		const std::string& getSkeletonName();
 
+		void hideButtons();
 	//	static void CharacterCB(Fl_Widget* widget, void* data);
 		//static void SkeletonCB(Fl_Widget* widget, void* data);
 		static void RetargetCB(Fl_Widget* widget, void* data);
@@ -29,6 +31,7 @@ class RetargetViewer : public Fl_Double_Window
 		Fl_Choice* _choiceCharacters;
 		Fl_Choice* _choiceSkeletons;
 		Fl_Scroll* _scrollGroup;
-
+		Fl_Button* _retargetButton;
+		Fl_Button* _cancelButton;
 };
 #endif

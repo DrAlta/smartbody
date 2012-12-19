@@ -83,6 +83,7 @@
 #endif
 
 #include "jointmapviewer/JointMapViewer.h"
+#include "jointmapviewer/RetargetStepWindow.h"
 #include <sbm/mcontrol_util.h>
 
 //#include <sbm/SbmShader.h>
@@ -2285,6 +2286,12 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		mcu.executePythonFile("drag-and-drop.py");
 		mcu.executePython(cmdStr);
 
+		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 600, 740, "Retarget Step Window");
+		_retargetStepWindow->show();	
+		_retargetStepWindow->setJointMapName(skelName);
+		_retargetStepWindow->setCharacterName(charName);
+		_retargetStepWindow->setSkeletonName(skelName);
+		/*
 		if (_jointMapViewer)
 		{
 			delete _jointMapViewer;
@@ -2302,13 +2309,10 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		}
 		_retargetViewer = new RetargetViewer(this->x() + 50, this->y() + 50, 320, 320, "Behavior Sets");
 		_retargetViewer->setCharacterName(charName);
-		_retargetViewer->setSkeletonName(skelName);
+		_retargetViewer->setSkeletonName(skelName);		
 
-		
-
-		_retargetViewer->show();
-
-		
+		_retargetViewer->show();		
+		*/
 	}
 }
 

@@ -33,6 +33,16 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	_jointMapName = "";
 	_skelName = "";
 
+	_choiceCharacters = new Fl_Choice(110, curY, 150, 20, "Character");
+	//choiceCharacters->callback(CharacterCB, this);
+	std::vector<std::string> characters = scene->getCharacterNames();
+	for (size_t c = 0; c < characters.size(); c++)
+	{
+		_choiceCharacters->add(characters[c].c_str());
+	}	
+	_choiceCharacters->callback(SelectCharacterCB,this);
+	curY += 25;
+
 	_choiceJointMaps = new Fl_Choice(110, curY, 150, 20, "JointMaps");
 	//choiceCharacters->callback(CharacterCB, this);
 	//std::vector<std::string> characters = scene->getCharacterNames();
@@ -46,15 +56,7 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 
 	curY += 25;
 
-	_choiceCharacters = new Fl_Choice(110, curY, 150, 20, "Character");
-	//choiceCharacters->callback(CharacterCB, this);
-	std::vector<std::string> characters = scene->getCharacterNames();
-	for (size_t c = 0; c < characters.size(); c++)
-	{
-		_choiceCharacters->add(characters[c].c_str());
-	}	
-	_choiceCharacters->callback(SelectCharacterCB,this);
-	curY += 25;
+	
 // 
 // 
 // 	SmartBody::SBBehaviorSetManager* behavMgr = SmartBody::SBScene::getScene()->getBehaviorSetManager();
@@ -83,7 +85,7 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
  		//Fl_Check_Button* check = new Fl_Check_Button(20, curY, 100, 20, _strdup(name.c_str()));
 		//Fl_Group* jointMapGroup = new Fl_Group(20, curY , 200, 20, _strdup(name.c_str()));
 		//Fl_Input* input = new Fl_Input(100 , scrollY, 150, 20, _strdup(name.c_str()));
-		Fl_Input_Choice* choice = new Fl_Input_Choice(100, scrollY, 150, 20, _strdup(name.c_str()));
+		Fl_Input_Choice* choice = new Fl_Input_Choice(140, scrollY, 190, 20, _strdup(name.c_str()));
 		_jointChoiceList.push_back(choice);
  		choice->input()->when(FL_WHEN_CHANGED);
  		choice->input()->callback(JointNameChange,this);
@@ -94,10 +96,10 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	
 	_scrollGroup->end();
 	curY += 450  + 25;
-	Fl_Button* buttonApply = new Fl_Button(100, curY, 60, 20, "Apply Map");
-	buttonApply->callback(ApplyMapCB, this);
-	Fl_Button* buttonCancel = new Fl_Button(180, curY, 60, 20, "Cancel");
-	buttonCancel->callback(CancelCB, this);
+	_buttonApply = new Fl_Button(100, curY, 60, 20, "Apply Map");
+	_buttonApply->callback(ApplyMapCB, this);
+	_buttonCancel = new Fl_Button(180, curY, 60, 20, "Cancel");
+	_buttonCancel->callback(CancelCB, this);
 	end();
 
 	if (jointMapNames.size() > 0) 
@@ -118,6 +120,12 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 
 JointMapViewer::~JointMapViewer()
 {
+}
+
+void JointMapViewer::hideButtons()
+{
+	_buttonApply->hide();
+	_buttonCancel->hide();
 }
 
 void JointMapViewer::setCharacterName( std::string charName )
@@ -344,4 +352,5 @@ void JointMapViewer::CancelCB(Fl_Widget* widget, void* data)
 
 	viewer->hide();
 }
+
 

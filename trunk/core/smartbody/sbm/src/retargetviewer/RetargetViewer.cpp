@@ -35,13 +35,14 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	{
 		_choiceSkeletons->add(skeletons[c].c_str());
 	}
-	curY += 25;
+	curY += 45;
 
 
 	SmartBody::SBBehaviorSetManager* behavMgr = SmartBody::SBScene::getScene()->getBehaviorSetManager();
 	std::map<std::string, SmartBody::SBBehaviorSet*>& behavSets = behavMgr->getBehaviorSets();
 
-	_scrollGroup = new Fl_Scroll(10, curY, this->w() - 20, 150, "");
+	int scrollHeight = this->h() - curY - 50;
+	_scrollGroup = new Fl_Scroll(10, curY, this->w() - 20, scrollHeight, "");
 	_scrollGroup->type(Fl_Scroll::VERTICAL);
 	_scrollGroup->begin();
 
@@ -55,10 +56,10 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	}
 	_scrollGroup->end();
 
-	Fl_Button* buttonRetarget = new Fl_Button(20, curY, 60, 20, "Retarget");
-	buttonRetarget->callback(RetargetCB, this);
-	Fl_Button* buttonCancel = new Fl_Button(100, curY, 60, 20, "Cancel");
-	buttonCancel->callback(CancelCB, this);
+	_retargetButton = new Fl_Button(20, curY, 60, 20, "Retarget");
+	_retargetButton->callback(RetargetCB, this);
+	_cancelButton = new Fl_Button(100, curY, 60, 20, "Cancel");
+	_cancelButton->callback(CancelCB, this);
 
 	end();
 }
@@ -102,6 +103,13 @@ const std::string& RetargetViewer::getSkeletonName()
 {
 	return _skelName;
 }
+
+void RetargetViewer::hideButtons()
+{
+	_retargetButton->hide();
+	_cancelButton->hide();
+}
+
 
 void RetargetViewer::RetargetCB(Fl_Widget* widget, void* data)
 {
