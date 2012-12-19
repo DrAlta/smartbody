@@ -16,7 +16,7 @@ def createStandardCharacter(charName, skelName, meshName, position):
 	sbChar.createStandardControllers()
 	sbChar.setStringAttribute("deformableMesh", meshName)		
 	print 'retarget character : ' + charName + '  , skelName : ' + skelName;
-	retargetCharacter(charName,skelName)
+	#retargetCharacter(charName,skelName)
 	
 
 
@@ -25,25 +25,19 @@ def createDragAndDropCharacter(charName, skelName, meshName, position):
 	dndSkel = scene.getSkeleton(skelName)
 	if (dndSkel == None):
 		return
-	# jointMapManager = scene.getJointMapManager()
-	# jointMap = jointMapManager.getJointMap(skelName)
-	# if (jointMap == None):
-		# jointMap = jointMapManager.createJointMap(skelName)
-		# jointMap.guessMapping(dndSkel, False)
+	jointMapManager = scene.getJointMapManager()
+	jointMap = jointMapManager.getJointMap(skelName)
+	if (jointMap == None):
+		jointMap = jointMapManager.createJointMap(skelName)
+		jointMap.guessMapping(dndSkel, False)	
 	
-	# dndSkel = scene.getSkeleton(skelName)
-	# jointMap.applySkeleton(dndSkel)
-	remapSkeleton(skelName, skelName)
-	createStandardCharacter(charName, skelName, meshName, position)
-	
+	createStandardCharacter(charName, skelName, meshName, position)	
 	print 'drag and drop position =' + str(position.getData(0)) + ' ,' + str(position.getData(1)) + ', ' + str(position.getData(2))
-
-	steerManager = scene.getSteerManager()
-	steerManager.setBoolAttribute("useEnvironmentCollisions",False)
-	steerManager.setEnable(False)
-	steerManager.setEnable(True)
+	# steerManager = scene.getSteerManager()
+	# steerManager.setBoolAttribute("useEnvironmentCollisions",False)
+	# steerManager.setEnable(False)
+	# steerManager.setEnable(True)
 	scene.setBoolAttribute("internalAudio", True)
-
 	# start the simulation
 	sim.start()
 	bml.execBML(charName, '<body posture="'+ skelName +'HandsAtSide_Motex"/>')

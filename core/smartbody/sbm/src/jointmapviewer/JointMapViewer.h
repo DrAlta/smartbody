@@ -5,6 +5,7 @@
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Input_Choice.H>
+#include <FL/Fl_Button.H>
 #include <string>
 
 class JointMapViewer : public Fl_Double_Window
@@ -26,7 +27,8 @@ class JointMapViewer : public Fl_Double_Window
 		void updateSelectMap();
 		void updateCharacter();
 		void updateUI();
-		void updateJointName(Fl_Input_Choice* jointChoice);				
+		void updateJointName(Fl_Input_Choice* jointChoice);		
+		void hideButtons();
 
 	protected:
 		std::string _jointMapName;
@@ -38,6 +40,8 @@ class JointMapViewer : public Fl_Double_Window
 		Fl_Choice* _choiceJointMaps;
 		Fl_Choice* _choiceCharacters;
 		Fl_Scroll* _scrollGroup;
+		Fl_Button* _buttonApply;
+		Fl_Button* _buttonCancel;
 		std::vector<Fl_Input_Choice*> _jointChoiceList;
 };
 #endif

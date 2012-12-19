@@ -66,6 +66,7 @@ class MeCtDataDrivenReach;
 class MeCtConstraint;
 class MeCtExampleBodyReach;
 class JointMapViewer;
+class RetargetStepWindow;
 
 /*! \class SrViewer sr_viewer.h
     \brief A fltk-opengl viewer
@@ -394,6 +395,7 @@ protected:
 	
 	RetargetViewer* _retargetViewer;
 	JointMapViewer* _jointMapViewer;
+	RetargetStepWindow* _retargetStepWindow;
  };
 
 

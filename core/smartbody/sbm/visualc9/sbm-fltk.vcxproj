@@ -481,6 +481,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClCompile Include="..\src\FLTKListener.cpp" />
     <ClCompile Include="..\src\fltk_viewer.cpp" />
     <ClCompile Include="..\src\jointmapviewer\JointMapViewer.cpp" />
+    <ClCompile Include="..\src\jointmapviewer\RetargetStepWindow.cpp" />
     <ClCompile Include="..\src\monitorviewer\MonitorConnectWindow.cpp" />
     <ClCompile Include="..\src\motioneditor\MotionEditorWindow.cpp" />
     <ClCompile Include="..\src\ObjectManipulationHandle.cpp" />
@@ -552,6 +553,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClInclude Include="..\src\FLTKListener.h" />
     <ClInclude Include="..\src\fltk_viewer.h" />
     <ClInclude Include="..\src\jointmapviewer\JointMapViewer.h" />
+    <ClInclude Include="..\src\jointmapviewer\RetargetStepWindow.h" />
     <ClInclude Include="..\src\monitorviewer\MonitorConnectWindow.h" />
     <ClInclude Include="..\src\motioneditor\MotionEditorWindow.h" />
     <ClInclude Include="..\src\ObjectManipulationHandle.h" />
