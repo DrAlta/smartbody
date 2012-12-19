@@ -3,6 +3,7 @@
 #include "sr/sr_string.h"
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBPawn.h>
 #include <sb/SBScene.h>
 #include <cstring>
 #include <boost/filesystem/operations.hpp>
@@ -167,8 +168,7 @@ void SBJointMap::applySkeletonInverse( SmartBody::SBSkeleton* skeleton )
 		std::string from = (*iter).second;
 		channels.changeChannelName(from, to);
 	}
-	skeleton->resetSearchJoint();
-
+	skeleton->resetSearchJoint();	
 	for (std::vector<std::string>::iterator iter = _mappedSkeletons.begin();
 		 iter != _mappedSkeletons.end();
 		 iter++)
@@ -179,7 +179,11 @@ void SBJointMap::applySkeletonInverse( SmartBody::SBSkeleton* skeleton )
 			break;
 		}
 	}
-
+	SmartBody::SBPawn* pawn = skeleton->getPawn();
+	if (pawn)
+	{
+		pawn->ct_tree_p->child_channels_updated(NULL);
+	}
 }
 
 void SBJointMap::applySkeleton(SmartBody::SBSkeleton* skeleton)
@@ -216,7 +220,13 @@ void SBJointMap::applySkeleton(SmartBody::SBSkeleton* skeleton)
 		channels.changeChannelName(from, to);
 	}
 	skeleton->resetSearchJoint();
+	skeleton->updateJointMap();
 
+	SmartBody::SBPawn* pawn = skeleton->getPawn();
+	if (pawn)
+	{
+		pawn->ct_tree_p->child_channels_updated(NULL);
+	}
 	_mappedSkeletons.push_back(skeleton->getName());
 }
 

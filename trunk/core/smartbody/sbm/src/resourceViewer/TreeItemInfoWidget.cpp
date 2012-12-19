@@ -39,8 +39,9 @@ SkeletonItemInfoWidget::SkeletonItemInfoWidget( int x, int y, int w, int h, cons
 	attrWindow->end();
 	this->end();	
 	this->resizable(skeletonTree);
-	itemSkeleton = NULL;
+	itemSkeleton = NULL;	
 	skeletonName = inputItem->label();
+	charName = inputItem->parent()->label();
 	updateWidget();
 }
 
@@ -50,13 +51,19 @@ void SkeletonItemInfoWidget::updateWidget()
 	skeletonTree->clear_children(skeletonTree->root());
 	if (!treeItem->label())
 		return;
-
-	std::string skelName = skeletonName;	
-	if (mcu.skeleton_map.find(skelName) == mcu.skeleton_map.end())
-		return; // skeleton is lost, no update
-
-	//LOG("skelName = %s\n",skelName.c_str());
-	itemSkeleton = mcu.skeleton_map[skelName];
+	SbmCharacter* sbmChar = mcu.getCharacter(charName);
+	if (sbmChar)
+	{
+		itemSkeleton = sbmChar->getSkeleton();
+	}
+	else
+	{
+		std::string skelName = skeletonName;	
+		if (mcu.skeleton_map.find(skelName) == mcu.skeleton_map.end())
+			return; // skeleton is lost, no update
+		//LOG("skelName = %s\n",skelName.c_str());
+		itemSkeleton = mcu.skeleton_map[skelName];
+	}	
 	updateSkeletonTree(skeletonTree->root(),itemSkeleton);	
 }
 

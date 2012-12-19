@@ -12,6 +12,9 @@ class JointMapViewer : public Fl_Double_Window
 	public:
 		JointMapViewer(int x, int y, int w, int h, char* name);
 		~JointMapViewer();
+
+		void setCharacterName(std::string charName);
+		void setJointMapName(std::string jointMapName);
 		
 		static void ApplyMapCB(Fl_Widget* widget, void* data);
 		static void CancelCB(Fl_Widget* widget, void* data);
@@ -28,6 +31,7 @@ class JointMapViewer : public Fl_Double_Window
 	protected:
 		std::string _jointMapName;
 		std::string _skelName;
+		std::string _charName;
 		std::vector<std::string> standardJointNames;
 		std::vector<std::string> skeletonJointNames;
 
