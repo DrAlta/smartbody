@@ -88,6 +88,7 @@ def retargetBehaviorSet(charName, skelName):
 	outDir = '../../../../data/retarget/motion/' + skelName + '/';
 	if not os.path.exists(outDir):
 		os.makedirs(outDir)
+	scene.loadAssetsFromPath(outDir+"jumping/")
 		
 	# retarget jumping
 	for n in range(0, len(jumpMotions)):

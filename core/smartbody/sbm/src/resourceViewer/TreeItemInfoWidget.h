@@ -31,6 +31,7 @@ protected:
 	TreeInfoObject*  jointInfoObject;
 	std::string      curJointName;
 	std::string      skeletonName;
+	std::string      charName;
 public:
 	SkeletonItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type);	
 	virtual void updateWidget();

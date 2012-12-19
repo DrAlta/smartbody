@@ -72,8 +72,7 @@ void MeCtMotionPlayer::init(SbmPawn* pawn, std::string name, double n)
 	std::string controllerName;
 	controllerName = "motion player for " + motionName;
 	controller->setName(controllerName.c_str());
-
-
+	
 	_sub_context->add_controller(controller);
 	controller->ref();
 	controller_map_updated();

@@ -82,6 +82,7 @@
 #include "sbm/GPU/SbmTexture.h"
 #endif
 
+#include "jointmapviewer/JointMapViewer.h"
 #include <sbm/mcontrol_util.h>
 
 //#include <sbm/SbmShader.h>
@@ -426,6 +427,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _lastSelectedCharacter = "";
 
    _retargetViewer = NULL;
+   _jointMapViewer = NULL;
 
    // init timer update for keyboard
    Fl::add_timeout(0.01,timerUpdate,_paLocoData);
@@ -2282,6 +2284,16 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		LOG("pythonCmd = %s",cmdStr);
 		mcu.executePythonFile("drag-and-drop.py");
 		mcu.executePython(cmdStr);
+
+		if (_jointMapViewer)
+		{
+			delete _jointMapViewer;
+		}
+
+		_jointMapViewer = new JointMapViewer(this->x(), this->y(), 450, 600, "Joint Map Viewer");
+		_jointMapViewer->setJointMapName(skelName);
+		_jointMapViewer->setCharacterName(charName);
+		_jointMapViewer->show();
 		
 		// launch the retargetting window 
 		if (_retargetViewer)
@@ -2292,7 +2304,11 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		_retargetViewer->setCharacterName(charName);
 		_retargetViewer->setSkeletonName(skelName);
 
+		
+
 		_retargetViewer->show();
+
+		
 	}
 }
 

@@ -29,6 +29,10 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	begin();	
 	int curY = 10;
+	_charName ="";
+	_jointMapName = "";
+	_skelName = "";
+
 	_choiceJointMaps = new Fl_Choice(110, curY, 150, 20, "JointMaps");
 	//choiceCharacters->callback(CharacterCB, this);
 	//std::vector<std::string> characters = scene->getCharacterNames();
@@ -99,19 +103,51 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	if (jointMapNames.size() > 0) 
 	{
 		_choiceJointMaps->value(0);
-		updateSelectMap();
+		setJointMapName(_choiceJointMaps->text());
+		//updateSelectMap();
 	}
 
 	if (characters.size() > 0)
 	{		
 		_choiceCharacters->value(0);	
-		updateCharacter();
+		setCharacterName(_choiceCharacters->text());
+		//updateCharacter();
 	}	
 }
 
 
 JointMapViewer::~JointMapViewer()
 {
+}
+
+void JointMapViewer::setCharacterName( std::string charName )
+{
+	_charName = charName;
+	for (int c = 0; c < _choiceCharacters->size(); c++)
+	{
+		if (charName == _choiceCharacters->text(c))
+		{
+			_choiceJointMaps->value(c);
+			break;
+		}
+	}
+	updateCharacter();	
+}
+
+void JointMapViewer::setJointMapName( std::string jointMapName )
+{
+	_jointMapName = jointMapName;
+	for (int c = 0; c < _choiceJointMaps->size(); c++)
+	{
+		if (jointMapName == _choiceJointMaps->text(c))
+		{
+			_choiceJointMaps->value(c);
+			break;
+		}
+	}
+
+	updateSelectMap();
+	updateCharacter();	
 }
 
 void JointMapViewer::JointNameChange( Fl_Widget* widget, void* data )
@@ -135,7 +171,7 @@ void JointMapViewer::JointNameChange( Fl_Widget* widget, void* data )
 void JointMapViewer::updateJointName( Fl_Input_Choice* jointChoice )
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::string charName = _choiceCharacters->text();
+	std::string charName = _charName;
 	SmartBody::SBCharacter* curChar = scene->getCharacter(charName);
 	SmartBody::SBSkeleton* charSk = curChar->getSkeleton();		
 	int valueIndex = jointChoice->menubutton()->value();	
@@ -170,8 +206,10 @@ void JointMapViewer::updateJointName( Fl_Input_Choice* jointChoice )
 void JointMapViewer::updateCharacter()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::string charName = _choiceCharacters->text();
+	std::string charName = _charName;
 	SmartBody::SBCharacter* curChar = scene->getCharacter(charName);
+	if (!curChar) return;
+
 	SmartBody::SBSkeleton* charSk = curChar->getSkeleton();
 	skeletonJointNames = charSk->getJointNames();
 
@@ -183,23 +221,19 @@ void JointMapViewer::updateCharacter()
 		{
 			continue;
 		}	
-		updateJointName(input);
-// 		input->clear();
-// 		for (unsigned int k=0;k<jointNames.size();k++)
-// 		{
-// 			input->add(jointNames[k].c_str());
-// 		}		
+		updateJointName(input);	
 	}
 }
 
 void JointMapViewer::updateSelectMap()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::string jointMapName = _choiceJointMaps->text();
+	std::string jointMapName = _jointMapName;
 	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
 	SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(jointMapName);
 	if (!jointMap) return;
 
+	_jointMapName = jointMapName;
 	int numChildren = _scrollGroup->children();
 	for (int i=0;i<numChildren;i++)
 	{
@@ -224,7 +258,7 @@ void JointMapViewer::updateSelectMap()
 void JointMapViewer::applyJointMap()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::string jointMapName = _choiceJointMaps->text();
+	std::string jointMapName = _jointMapName;
 	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
 	SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(jointMapName);
 
@@ -244,21 +278,27 @@ void JointMapViewer::applyJointMap()
 	}	
 	SmartBody::SBSkeleton* sceneSk = scene->getSkeleton(curChar->getSkeleton()->getName());
 	jointMap->applySkeleton(sceneSk);
-	jointMap->applySkeleton(curChar->getSkeleton());	
+	jointMap->applySkeleton(curChar->getSkeleton());
+	// in addition to update the skeleton, we also need to update the character controllers so all joint names are mapped correctly.
+	//curChar->ct_tree_p->child_channels_updated(NULL);
 }
 
 void JointMapViewer::SelectMapCB( Fl_Widget* widget, void* data )
 {
+	Fl_Choice* mapChoice = dynamic_cast<Fl_Choice*>(widget);	
 	JointMapViewer* viewer = (JointMapViewer*) data;
-	viewer->updateSelectMap();
-	viewer->updateCharacter();	
+	viewer->setJointMapName(mapChoice->text());
+	//viewer->updateSelectMap();
+	//viewer->updateCharacter();	
 }
 
 
 void JointMapViewer::SelectCharacterCB( Fl_Widget* widget, void* data )
 {
 	JointMapViewer* viewer = (JointMapViewer*) data;	
-	viewer->updateCharacter();	
+	Fl_Choice* charChoice = dynamic_cast<Fl_Choice*>(widget);	
+	viewer->setCharacterName(charChoice->text());
+	//viewer->updateCharacter();	
 }
 
 
@@ -304,3 +344,4 @@ void JointMapViewer::CancelCB(Fl_Widget* widget, void* data)
 
 	viewer->hide();
 }
+

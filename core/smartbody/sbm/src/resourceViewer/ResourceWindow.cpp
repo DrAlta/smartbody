@@ -581,7 +581,13 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* characte
 	SmartBody::SBCharacter* sbcharacter = dynamic_cast<SmartBody::SBCharacter*>(character);
 	Fl_Tree_Item* item = resourceTree->add(tree,character->getName().c_str());
 	item->user_data((void*)ITEM_CHARACTER);
-	resourceTree->sortorder(FL_TREE_SORT_NONE);	
+	resourceTree->sortorder(FL_TREE_SORT_NONE);		
+	SmartBody::SBSkeleton* sbSk = sbcharacter->getSkeleton();
+	if (sbSk)
+	{
+		Fl_Tree_Item* charSkItem = resourceTree->add(item, sbSk->getName().c_str());
+		charSkItem->user_data((void*)ITEM_SKELETON);
+	}
 	Fl_Tree_Item* controllerFolder = resourceTree->add(item,"controllers");	
 	controllerFolder->user_data((void*)-1);
 	controllerFolder->close();

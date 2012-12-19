@@ -43,6 +43,7 @@
 # include <sr/sr_sa_bbox.h>
 # include <FL/Fl_Menu.H>
 #include "retargetviewer/RetargetViewer.h"
+//#include "jointmapviewer/JointMapViewer.h"
 #include <sb/SBMotionBlendBase.h>
 #include <sbm/Event.h>
 
@@ -64,6 +65,7 @@ class SbmCharacter;
 class MeCtDataDrivenReach;
 class MeCtConstraint;
 class MeCtExampleBodyReach;
+class JointMapViewer;
 
 /*! \class SrViewer sr_viewer.h
     \brief A fltk-opengl viewer
@@ -391,6 +393,7 @@ protected:
 	SmartBody::SBAnimationBlend* getCurrentCharacterAnimationBlend(); // for visualization plots
 	
 	RetargetViewer* _retargetViewer;
+	JointMapViewer* _jointMapViewer;
  };
 
 
