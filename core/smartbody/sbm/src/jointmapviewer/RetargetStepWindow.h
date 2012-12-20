@@ -22,6 +22,7 @@ public:
 	~RetargetStepWindow();
 	
 public:	
+	virtual void draw();
 	void setCharacterName(std::string charName);
 	void setSkeletonName(std::string skName);
 	void setJointMapName(std::string jointMapName);

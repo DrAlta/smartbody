@@ -429,6 +429,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
    _retargetViewer = NULL;
    _jointMapViewer = NULL;
+   _retargetStepWindow = NULL;
 
    // init timer update for keyboard
    Fl::add_timeout(0.01,timerUpdate,_paLocoData);
@@ -1533,7 +1534,10 @@ void FltkViewer::draw()
       _data->message.set ( "" ); // will not deallocate the string but set len==0
     }
 
-
+   if (_retargetStepWindow)
+   {
+	   _retargetStepWindow->redraw();
+   }
    //----- Fltk will then flush and swap buffers -----------------------------
  }
 
@@ -2286,7 +2290,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		mcu.executePythonFile("drag-and-drop.py");
 		mcu.executePython(cmdStr);
 
-		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 600, 740, "Retarget Step Window");
+		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 1000, 740, "Retarget Step Window");
 		_retargetStepWindow->show();	
 		_retargetStepWindow->setJointMapName(skelName);
 		_retargetStepWindow->setCharacterName(charName);

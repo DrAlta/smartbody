@@ -117,3 +117,10 @@ void RetargetStepWindow::CancelCB( Fl_Widget* widget, void* data )
 	RetargetStepWindow* viewer = (RetargetStepWindow*) data;
 	viewer->hide();
 }
+
+void RetargetStepWindow::draw()
+{
+	if (jointMapViewer)
+		jointMapViewer->redraw();
+	Fl_Double_Window::draw();
+}

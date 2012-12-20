@@ -31,6 +31,8 @@ class SBJointMap
 
 		SBAPI void setMapping(const std::string& from, const std::string& to);
 		SBAPI void removeMapping(const std::string& from);
+		SBAPI void removeMappingTo(const std::string& to);
+
 		SBAPI void clearMapping(); // remove all mapings
 
 		SBAPI std::string getMapTarget(const std::string& to);

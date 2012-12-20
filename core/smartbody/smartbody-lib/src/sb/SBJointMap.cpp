@@ -285,6 +285,34 @@ void SBJointMap::clearMapping()
 
 void SBJointMap::removeMapping(const std::string& from)
 {
+	std::vector<std::pair<std::string, std::string> > tempMap;
+	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
+		iter != _map.end();
+		iter++)
+	{
+		std::string f = (*iter).first;
+		if (from != f)
+		{
+			tempMap.push_back((*iter));
+		}
+	}
+	tempMap.swap(_map);
+}
+
+void SBJointMap::removeMappingTo( const std::string& to )
+{
+	std::vector<std::pair<std::string, std::string> > tempMap;
+	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
+		iter != _map.end();
+		iter++)
+	{
+		std::string f = (*iter).second;
+		if (to != f)
+		{
+			tempMap.push_back((*iter));
+		}
+	}
+	tempMap.swap(_map);
 }
 
 std::string SBJointMap::getMapSource(const std::string& to)
