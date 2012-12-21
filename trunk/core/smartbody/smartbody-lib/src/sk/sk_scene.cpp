@@ -310,6 +310,7 @@ void SkScene::setJointColor( SkJoint* joint, SrColor color )
 	g = _jgroup[i];
 	sphere = (SrSnSphere*) g->get(SpherePos);
 	sphere->color(color);
+	sphere->override_material(sphere->material());
 }
 
 void SkScene::set_skeleton_radius ( float r )
