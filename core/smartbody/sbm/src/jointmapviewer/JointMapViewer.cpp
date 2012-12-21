@@ -67,6 +67,7 @@ void SkeletonViewer::setFocusJointName( std::string focusName )
 			}
 			else
 			{
+				//skeletonScene->setJointColor(joint, SrColor(1.f,1.f,1.f));
 				skeletonScene->setJointColor(joint, SrColor(1.f,1.f,1.f));
 				skeletonScene->setJointRadius(joint, defaultRadius);
 			}
@@ -198,7 +199,7 @@ void SkeletonViewer::draw()
 	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, mat_speclar );
 	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
 	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
-	glEnable( GL_COLOR_MATERIAL );
+	//glEnable( GL_COLOR_MATERIAL );
 	glEnable( GL_NORMALIZE );
 
 	//----- Set Projection ----------------------------------------------
@@ -237,8 +238,8 @@ void SkeletonViewer::drawJointMapLabels( std::string jointMapName )
 	{
 		bool highLight = false;
 		std::string jointName = skelJointNames[j];
-		if (jointMap->getMapTarget(jointName) == "")
-			continue;
+		//if (jointMap->getMapTarget(jointName) == "")
+		//	continue;
 		if (jointName == focusJointName)
 			highLight = true;
 
@@ -298,7 +299,6 @@ const std::string rightLegJointNames[5] = { "r_hip", "r_knee", "r_ankle", "r_for
 
 JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h, name)
 {
-
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	begin();	
 	int curY = 10;
