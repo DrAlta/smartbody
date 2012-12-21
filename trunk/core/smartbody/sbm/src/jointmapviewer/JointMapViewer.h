@@ -77,6 +77,8 @@ class JointMapViewer : public Fl_Double_Window
 		void updateJointName(Fl_Input_Choice* jointChoice);		
 		void hideButtons();
 		virtual void draw();
+	protected:
+		void updateJointLists();
 
 	protected:
 		std::string _jointMapName;
@@ -90,7 +92,8 @@ class JointMapViewer : public Fl_Double_Window
 		Fl_Scroll* _scrollGroup;
 		Fl_Button* _buttonApply;
 		Fl_Button* _buttonCancel;
-		std::vector<Fl_Input_Choice*> _jointChoiceList;
+		std::vector<JointMapInputChoice*> _jointChoiceList;
 		SkeletonViewer* skeletonViewer;
+		int scrollY;
 };
 #endif

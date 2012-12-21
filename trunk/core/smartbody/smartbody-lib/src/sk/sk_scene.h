@@ -54,6 +54,7 @@ class SkScene : public SrSnGroup
         The skeleton ref()/unref() methods are respected. */
     void init ( SkSkeleton* s, float scale = 1.f );
 
+	SrSnSphere* createSphere( float scaleFactor );
     /*! Update the transformations of the scene graph according
         to the joints in the skeleton sent to init(). */
     void update ();
@@ -78,6 +79,9 @@ class SkScene : public SrSnGroup
 
     /*! Change the radius of the cylinders used to draw the skeleton */
     void set_skeleton_radius ( float radius );
+
+	void setJointRadius( SkJoint* joint, float radius);
+	void setJointColor( SkJoint* joint, SrColor color);
     
     /*! Update the length of the axis to the new value */
     void set_axis_length ( float l );

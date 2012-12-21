@@ -2291,10 +2291,10 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		mcu.executePython(cmdStr);
 
 		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 1000, 740, "Retarget Step Window");
-		_retargetStepWindow->show();	
-		_retargetStepWindow->setJointMapName(skelName);
+		_retargetStepWindow->show();			
 		_retargetStepWindow->setCharacterName(charName);
 		_retargetStepWindow->setSkeletonName(skelName);
+		_retargetStepWindow->setJointMapName(skelName);
 		/*
 		if (_jointMapViewer)
 		{
