@@ -113,16 +113,10 @@ void SkScene::init ( SkSkeleton* s, float scale )
    }
    g->separator ( true );
   
-   sphere = new SrSnSphere; // shared sphere
-   sphere->color(SrColor::white);
    float height = s->getCurrentHeight();
    float scaleFactor =  height / 175.0f;
    if (scaleFactor == 0.0f)
 	   scaleFactor = scale;
-   sphere->shape().radius = scaleFactor * _cradius * _sfactor;
-   sphere->visible ( true );
-   sphere->ref();
-
    axis = new SrSnLines; // shared axis
    axis->shape().push_axis ( SrVec::null, _axislen*scaleFactor, 3, "xyz"/*let*/, false/*rule*/ );
    axis->ref();
@@ -145,6 +139,8 @@ void SkScene::init ( SkSkeleton* s, float scale )
       // add all visual elements:
 	  SrSnGroup* group_p = _jgroup[i];
       group_p->add ( gaxis, AxisPos );
+
+	  sphere = createSphere(scaleFactor);
       group_p->add ( sphere, SpherePos );
       group_p->add ( new SrSnMatrix, MatrixPos );
 
@@ -293,6 +289,29 @@ void SkScene::set_visibility ( SkJoint* joint, int skel, int visgeo, int colgeo,
     }
  }
 
+
+void SkScene::setJointRadius( SkJoint* joint, float radius )
+{
+	int i;
+	SrSnSphere* sphere;
+	SrSnGroup* g;
+	i = joint->index();	
+	g = _jgroup[i];
+	sphere = (SrSnSphere*) g->get(SpherePos);
+	sphere->shape().radius = radius * _sfactor;		
+}
+
+void SkScene::setJointColor( SkJoint* joint, SrColor color )
+{
+	int i;
+	SrSnSphere* sphere;
+	SrSnGroup* g;
+	i = joint->index();
+	g = _jgroup[i];
+	sphere = (SrSnSphere*) g->get(SpherePos);
+	sphere->color(color);
+}
+
 void SkScene::set_skeleton_radius ( float r )
  {
    SrSnGroup* g;
@@ -423,4 +442,13 @@ void SkScene::get_defaults ( float& sradius, float& alen )
    alen = DEF_AXIS_LEN;
  }
 
+SrSnSphere* SkScene::createSphere(float scaleFactor )
+{
+	SrSnSphere* sphere = new SrSnSphere; // shared sphere
+	sphere->color(SrColor::white);   
+	sphere->shape().radius = scaleFactor * _cradius * _sfactor;
+	sphere->visible ( true );
+	sphere->ref();	
+	return sphere;
+}
 //============================= EOF ===================================

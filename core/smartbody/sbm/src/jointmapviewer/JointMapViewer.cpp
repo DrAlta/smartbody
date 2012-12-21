@@ -47,6 +47,32 @@ void SkeletonViewer::setJointMap( std::string mapName )
 void SkeletonViewer::setFocusJointName( std::string focusName )
 {
 	focusJointName = focusName;
+
+	if (skeleton)
+	{
+		float defaultRadius, defaultLen;
+		skeletonScene->get_defaults(defaultRadius,defaultLen);
+		//skeletonScene->set_skeleton_radius(defaultRadius*10.f);
+
+		std::vector<std::string> skelJointNames = skeleton->getJointNames();
+		for (unsigned int i=0;i<skelJointNames.size();i++)
+		{
+			std::string jname = skelJointNames[i];
+			SkJoint* joint = skeleton->search_joint(jname.c_str());
+			if (focusJointName == jname)
+			{
+				//LOG("focus joint name = %s",jname.c_str());
+				skeletonScene->setJointColor(joint, SrColor(1.f,0.f,0.f));
+				skeletonScene->setJointRadius(joint, defaultRadius*2.5f);
+			}
+			else
+			{
+				skeletonScene->setJointColor(joint, SrColor(1.f,1.f,1.f));
+				skeletonScene->setJointRadius(joint, defaultRadius);
+			}
+		}
+	}
+	
 }
 
 void SkeletonViewer::updateLights()
@@ -187,7 +213,7 @@ void SkeletonViewer::draw()
 
 	glScalef ( camera.scale, camera.scale, camera.scale );
 	if (skeletonScene)
-	{
+	{	
 		renderFunction.apply(skeletonScene);	
 		drawJointMapLabels(jointMapName);
 	}	
@@ -205,18 +231,22 @@ void SkeletonViewer::drawJointMapLabels( std::string jointMapName )
 	float textSize = skeleton->getCurrentHeight()*0.0002f;
 	
 	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
-	SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(jointMapName);	
-	
-	for (unsigned int j = 0; j < standardJointNames.size(); j++)
+	SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(jointMapName);		
+	std::vector<std::string> skelJointNames = skeleton->getJointNames();
+	for (unsigned int j = 0; j < skelJointNames.size(); j++)
 	{
 		bool highLight = false;
-		std::string standardName = standardJointNames[j];
-		if (jointMap->getMapSource(standardName) == "")
+		std::string jointName = skelJointNames[j];
+		if (jointMap->getMapTarget(jointName) == "")
 			continue;
-		if (standardName == focusJointName)
+		if (jointName == focusJointName)
 			highLight = true;
-		std::string source = jointMap->getMapSource(standardName);
-		std::string target = standardName;		
+
+		if (!highLight)
+			continue;
+
+		std::string source = jointName;
+		std::string target = jointMap->getMapTarget(jointName);
 		SkJoint* joint = skeleton->search_joint(source.c_str());
 		if (!joint) continue;		
 
@@ -237,19 +267,18 @@ void SkeletonViewer::drawJointMapLabels( std::string jointMapName )
 			}
 		}
 		// set the modelview with no rotations
-		glLoadMatrixf(modelview);
-
+		glLoadMatrixf(modelview);		
 		if (highLight)
 		{
 			glColor3f(1.0f, 0.0f, 0.0f);
-			glScalef(textSize*1.5f, textSize*1.5f, textSize*1.5f);
+			glScalef(textSize*1.5f, textSize*1.5f, textSize*1.5f);				
 		}
 		else
 		{
 			glColor3f(1.0f, 1.0f, 0.0f);
-			glScalef(textSize, textSize, textSize);
+			glScalef(textSize, textSize, textSize);			
 		}		
-		glutStrokeString(GLUT_STROKE_ROMAN, (const unsigned char*) target.c_str());
+		glutStrokeString(GLUT_STROKE_ROMAN, (const unsigned char*) source.c_str());
 		glPopMatrix();
 		glColor3f(1.0f,1.0f,1.0f);
 	}
@@ -311,8 +340,8 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	for (int i=0;i<7;i++) standardJointNames.push_back(spineJointNames[i]);
 	for (int i=0;i<5;i++) standardJointNames.push_back(leftArmJointNames[i]);
 	for (int i=0;i<5;i++) standardJointNames.push_back(rightArmJointNames[i]);
-	//for (int i=0;i<20;i++) standardJointNames.push_back(leftHandJointNames[i]);
-	//for (int i=0;i<20;i++) standardJointNames.push_back(rightHandJointNames[i]);
+	for (int i=0;i<20;i++) standardJointNames.push_back(leftHandJointNames[i]);
+	for (int i=0;i<20;i++) standardJointNames.push_back(rightHandJointNames[i]);
 	for (int i=0;i<5;i++) standardJointNames.push_back(leftLegJointNames[i]);
 	for (int i=0;i<5;i++) standardJointNames.push_back(rightLegJointNames[i]);
 
@@ -320,24 +349,9 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	
  	_scrollGroup = new Fl_Scroll(10, curY, this->w() - 600, 450, "");
  	_scrollGroup->type(Fl_Scroll::VERTICAL);
- 	_scrollGroup->begin();
- 
-	int scrollY = curY;
- 	for (unsigned int i=0;i<standardJointNames.size();i++)
-	{
- 		std::string name = standardJointNames[i];
-		//LOG("joint name = %s",name.c_str());
- 		//Fl_Check_Button* check = new Fl_Check_Button(20, curY, 100, 20, _strdup(name.c_str()));
-		//Fl_Group* jointMapGroup = new Fl_Group(20, curY , 200, 20, _strdup(name.c_str()));
-		//Fl_Input* input = new Fl_Input(100 , scrollY, 150, 20, _strdup(name.c_str()));
-		JointMapInputChoice* choice = new JointMapInputChoice(140, scrollY, 190, 20, _strdup(name.c_str()));
-		_jointChoiceList.push_back(choice);		
-		choice->input()->when(FL_WHEN_CHANGED);
- 		choice->input()->callback(JointNameChange,this);
- 		choice->menubutton()->when(FL_WHEN_CHANGED);
- 		choice->menubutton()->callback(JointNameChange,this);
- 		scrollY += 25;
- 	}
+ 	_scrollGroup->begin(); 
+	scrollY = curY;
+	
 	
 	_scrollGroup->end();
 	curY += 450  + 25;
@@ -355,12 +369,19 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	this->resizable(rightGroup);
 	end();
 
-	int numChildren = _scrollGroup->children();
-	for (int i=0;i<numChildren;i++)
-	{
-		JointMapInputChoice* input = dynamic_cast<JointMapInputChoice*>(_scrollGroup->child(i));
-		if (input)
-			input->setViewer(skeletonViewer);
+// 	int numChildren = _scrollGroup->children();
+// 	for (int i=0;i<numChildren;i++)
+// 	{
+// 		JointMapInputChoice* input = dynamic_cast<JointMapInputChoice*>(_scrollGroup->child(i));
+// 		if (input)
+// 			input->setViewer(skeletonViewer);
+// 	}
+
+	if (characters.size() > 0)
+	{		
+		_choiceCharacters->value(0);	
+		setCharacterName(_choiceCharacters->text());
+		//updateCharacter();
 	}
 
 	if (jointMapNames.size() > 0) 
@@ -368,14 +389,41 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 		_choiceJointMaps->value(0);
 		setJointMapName(_choiceJointMaps->text());
 		//updateSelectMap();
-	}
+	}		
+}
 
-	if (characters.size() > 0)
-	{		
-		_choiceCharacters->value(0);	
-		setCharacterName(_choiceCharacters->text());
-		//updateCharacter();
-	}	
+
+void JointMapViewer::updateJointLists()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBSkeleton* skel = scene->getSkeleton(_skelName);
+	int tempY = scrollY;
+	std::vector<std::string> skelJointNames = skel->getJointNames();
+	for (unsigned int i=0;i<_jointChoiceList.size();i++)
+	{
+		JointMapInputChoice* input = _jointChoiceList[i];
+		delete input;
+	}
+	_jointChoiceList.clear();
+	_scrollGroup->clear();
+	_scrollGroup->begin();
+	for (unsigned int i=0;i<skelJointNames.size();i++)
+	{
+		std::string name = skelJointNames[i];
+		//LOG("joint name = %s",name.c_str());
+		//Fl_Check_Button* check = new Fl_Check_Button(20, curY, 100, 20, _strdup(name.c_str()));
+		//Fl_Group* jointMapGroup = new Fl_Group(20, curY , 200, 20, _strdup(name.c_str()));
+		//Fl_Input* input = new Fl_Input(100 , scrollY, 150, 20, _strdup(name.c_str()));
+		JointMapInputChoice* choice = new JointMapInputChoice(140, tempY, 190, 20, _strdup(name.c_str()));
+		_jointChoiceList.push_back(choice);		
+		choice->input()->when(FL_WHEN_CHANGED);
+		choice->input()->callback(JointNameChange,this);
+		choice->menubutton()->when(FL_WHEN_CHANGED);
+		choice->menubutton()->callback(JointNameChange,this);
+		choice->setViewer(skeletonViewer);
+		tempY += 25;
+	}
+	_scrollGroup->end();
 }
 
 
@@ -405,7 +453,9 @@ void JointMapViewer::setCharacterName( std::string charName )
 	if (sbChar && skeletonViewer)
 	{
 		skeletonViewer->setSkeleton(sbChar->getSkeleton()->getName());
+		_skelName = sbChar->getSkeleton()->getName();
 	}
+	updateJointLists();
 	updateCharacter();	
 }
 
@@ -466,9 +516,9 @@ void JointMapViewer::updateJointName( Fl_Input_Choice* jointChoice )
 	jointChoice->clear();
 	jointChoice->add("--empty--"); // add empty string as the first choice
 	std::string filterLabel = jointChoice->value();
-	for (unsigned int i=0;i<skeletonJointNames.size();i++)
+	for (unsigned int i=0;i<standardJointNames.size();i++)
 	{
-		std::string& jname = skeletonJointNames[i];
+		std::string& jname = standardJointNames[i];
 		if (jname.find(filterLabel) != std::string::npos)
 		{
 			jointChoice->add(jname.c_str());			
@@ -480,38 +530,7 @@ void JointMapViewer::updateJointName( Fl_Input_Choice* jointChoice )
 			jointChoice->value("");
 		else
 			jointChoice->value(choiceStr.c_str());		
-	}	
-	SkJoint* joint = charSk->search_joint(jointChoice->value());
-	if (joint)
-	{
-		SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
-		SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(_jointMapName);
-		std::string mapSource = jointMap->getMapSource(jointChoice->label());
-		std::string mapTarget = jointMap->getMapTarget(jointChoice->value());
-
-		if (jointMap)
-		{
-			jointMap->removeMappingTo(jointChoice->label());
-			jointMap->setMapping(jointChoice->value(),jointChoice->label());
-		}
-// 		if (mapSource == "" && mapTarget == "") // no mapping exist yet
-// 		{
-// 			jointMap->setMapping(jointChoice->value(),jointChoice->label());			
-// 		}
-// 		else if (mapSource != "")
-// 		{
-// 
-// 		}
-// 		if (jointMap && jointMap->getMapTarget(joint->name()) != jointChoice->label())
-// 		{				
-// 			jointMap->setMapping(jointChoice->value(),jointChoice->label());
-// 		}
-// 		else if (jointMap)
-// 		{
-// 			jointMap->removeMappingTo(jointChoice->label());
-// 			jointMap->setMapping(jointChoice->value(),jointChoice->label());
-// 		}		
-	}	
+	}		
 }
 
 void JointMapViewer::updateCharacter()
@@ -551,15 +570,15 @@ void JointMapViewer::updateSelectMap()
 		Fl_Input_Choice* input = dynamic_cast<JointMapInputChoice*>(_scrollGroup->child(i));
 		if (input)
 		{
-			std::string targetName = input->label();
-			std::string sourceName = jointMap->getMapSource(targetName);
-			if (sourceName == "")
+			std::string sourceName = input->label();
+			std::string targetName = jointMap->getMapTarget(sourceName);
+			if (targetName == "")
 			{
 				input->value("");
 			}
 			else
 			{
-				input->value(sourceName.c_str());
+				input->value(targetName.c_str());
 			}
 		}
 	}
@@ -582,8 +601,8 @@ void JointMapViewer::applyJointMap()
 		Fl_Input_Choice* input = dynamic_cast<JointMapInputChoice*>(_scrollGroup->child(i));
 		if (input)
 		{
-			std::string targetName = input->label();
-			std::string sourceName = input->value();		
+			std::string sourceName = input->label();
+			std::string targetName = input->value();		
 			jointMap->setMapping(sourceName, targetName);
 		}
 	}	
