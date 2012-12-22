@@ -5,7 +5,7 @@
 #include "ui_DataViewerDialog.h"
 #include "QtCrtDbgOn.h"
 
-#include "SbmDebuggerCommon.h"
+#include "SBDebuggerCommon.h"
 #include "GLGraphWidget.h"
 #include "SBDebuggerClient.h"
 

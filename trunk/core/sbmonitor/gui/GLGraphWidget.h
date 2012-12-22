@@ -13,7 +13,7 @@
 #include <GL/glu.h>
 #endif
 
-#include "SbmDebuggerCommon.h"
+#include "SBDebuggerCommon.h"
 
 #include "vhcl_public.h"
 

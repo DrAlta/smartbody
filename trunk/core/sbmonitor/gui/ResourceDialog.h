@@ -2,7 +2,7 @@
 #define RESOURCE_DIALOG_H_
 
 #include "ui_ResourceDialog.h"
-#include "SbmDebuggerCommon.h"
+#include "SBDebuggerCommon.h"
 #include "SBDebuggerClient.h"
 
 using std::string;
