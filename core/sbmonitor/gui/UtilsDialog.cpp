@@ -5,7 +5,7 @@
 #include <algorithm>
 
 #include "vhmsg-tt.h"
-#include "SbmDebuggerCommon.h"
+#include "SBDebuggerCommon.h"
 #include "glwidget.h"
 
 //#include <QtUiTools>

@@ -17,7 +17,7 @@
 
 #include "vhcl_timer.h"
 #include "Camera.h"
-#include "SbmDebuggerCommon.h"
+#include "SBDebuggerCommon.h"
 #include "SettingsDialog.h"
 
 

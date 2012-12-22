@@ -2,7 +2,7 @@
 #define FACE_DIALOG_H_
 
 #include "ui_FaceDialog.h"
-#include "SbmDebuggerCommon.h"
+#include "SBDebuggerCommon.h"
 #include "SBDebuggerClient.h"
 
 #include <QtGui>

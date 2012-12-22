@@ -2,7 +2,7 @@
 #define BML_CREATOR_DIALOG_H_
 
 #include "ui_BMLCreatorDialog.h"
-#include "SbmDebuggerCommon.h"
+#include "SBDebuggerCommon.h"
 #include "SBDebuggerClient.h"
 
 using std::string;
