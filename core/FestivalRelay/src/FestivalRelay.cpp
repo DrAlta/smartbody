@@ -125,9 +125,16 @@ bool isDone = false;
 	std::map<std::string, std::pair<std::string, double> > phonemeToViseme;
 	std::string mapping;
 #else 
+#if defined(__APPLE__)
+	std::string mapping;
+	extern SpeechRequestData xmlMetaData;
+	extern std::multimap<std::string, std::pair<string, double> > phonemeToViseme;
+#else
+
 	extern std::string mapping;
 	extern SpeechRequestData xmlMetaData;
 	std::multimap<std::string, std::pair<string, double> > phonemeToViseme;
+#endif
 #endif
 std::string festivalLibDir = "";
 
