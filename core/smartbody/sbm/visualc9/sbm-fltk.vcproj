@@ -46,7 +46,7 @@
 				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;&quot;..\..\sbm-debugger\lib&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\fltk-1.3.0rc6&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;..\..\sbm\src\channelbufferviewer;..\..\..\..\lib\ANN;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python26\include;..\..\..\..\lib\OgreSDK\include\OGRE;..\..\..\..\lib\OgreSDK\include\"
-				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;"
+				PreprocessorDefinitions="SB_EXPORTS;WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
@@ -140,7 +140,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\fltk-1.3.0rc6&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;&quot;..\..\sbm-ui\channelbufferviewer\src&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python26\include;..\..\..\..\lib\OgreSDK\include\OGRE;..\..\..\..\lib\OgreSDK\include\"
-				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT"
+				PreprocessorDefinitions="SB_EXPORTS;WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				PrecompiledHeaderFile=""
@@ -474,50 +474,6 @@
 				RelativePath="..\src\RotationControl.h"
 				>
 			</File>
-			<Filter
-				Name="ogreviewer"
-				>
-				<File
-					RelativePath="..\src\EmbeddedOgre.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\EmbeddedOgre.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\ExampleFrameListener.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\ExampleFrameListener.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\FLTKOgreViewer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\FLTKOgreViewer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\OgreFrameListener.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\OgreFrameListener.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\SBOgreListener.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\SBOgreListener.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="bmlviewer"
@@ -1020,6 +976,26 @@
 			</File>
 			<File
 				RelativePath="..\src\motioneditor\MotionEditorWindow.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="jointmapviewer"
+			>
+			<File
+				RelativePath="..\src\jointmapviewer\JointMapViewer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\jointmapviewer\JointMapViewer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\jointmapviewer\RetargetStepWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\jointmapviewer\RetargetStepWindow.h"
 				>
 			</File>
 		</Filter>
