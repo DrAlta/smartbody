@@ -253,7 +253,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y ..\..\bin\smartbody\sbm\bin\pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\activemq-cpp.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\libapr-1.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\libapriconv-1.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\libaprutil-1.dll bin&#x0D;&#x0A;copy /Y ..\..\bin\smartbody\sbm\bin\glut32.dll bin&#x0D;&#x0A;xcopy /D /S /I /Y .\Data bin\Data&#x0D;&#x0A;"
+				CommandLine="copy /Y ..\pthreads\lib9\pthreadVSE2.dll bin&#x0D;&#x0A;copy /Y ..\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll bin&#x0D;&#x0A;copy /Y ..\activemq\apr\apr\lib9\libapr-1.dll bin&#x0D;&#x0A;copy /Y ..\activemq\apr\apr-iconv\lib9\libapriconv-1.dll bin&#x0D;&#x0A;copy /Y ..\activemq\apr\apr-util\lib9\libaprutil-1.dll bin&#x0D;&#x0A;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -284,7 +284,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../../Include;../../Samples/NiUserTracker"
+				AdditionalIncludeDirectories=".;Include;&quot;C:\Program Files (x86)\OpenNI\Include&quot;;&quot;C:\Program Files (x86)\PrimeSense\NITE\Include&quot;;&quot;../vhmsg/vhmsg-c/include&quot;;../vhcl/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -304,10 +304,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="openNI64.lib glut64.lib"
+				AdditionalDependencies="openNI.lib glut32.lib vhmsg.lib vhcl.lib activemq-cpp.lib XnVNITE_1_5_2.lib XnVCNITE_1_5_2.lib XnVFeatures_1_5_2.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../../../Lib64/$(ConfigurationName);../../Samples/NiUserTracker/Libs"
+				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\OpenNI\Lib&quot;;&quot;C:\Program Files (x86)\PrimeSense\NITE\Lib&quot;;.\libs;&quot;..\vhmsg\vhmsg-c\lib&quot;;..\vhcl\lib;&quot;..\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="1"
@@ -356,22 +356,6 @@
 			</File>
 			<File
 				RelativePath=".\src\SceneDrawer.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Res"
-			>
-			<File
-				RelativePath=".\Res\mainicon.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\Res\OpenNI.rc"
-				>
-			</File>
-			<File
-				RelativePath=".\Res\Resource-OpenNI.h"
 				>
 			</File>
 		</Filter>
