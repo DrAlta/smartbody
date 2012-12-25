@@ -6,7 +6,7 @@
 
 class OgreFramework;
 
-class SBListener : public SBMCharacterListener
+class SBListener : public SBCharacterListener
 {
 	public:
 		SBListener(OgreFramework* app);		

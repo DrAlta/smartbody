@@ -229,8 +229,9 @@ void DemoApp::setupDemoScene()
 
     MCUInitialize();
     m_sbListener = new SBListener(OgreFramework::getSingletonPtr());
+    SmartBody::SBScene::getScene()->setCharacterListener(m_sbListener);
     mcuCBHandle& mcu = mcuCBHandle::singleton();
-    mcu.sbm_character_listener = m_sbListener;
+    //mcu.sbm_character_listener = m_sbListener;
      
 /*
     std::string command = "load skeletons -R \"" + OgreFramework::getSingletonPtr()->m_ResourcePath + "/sbm/\"";
