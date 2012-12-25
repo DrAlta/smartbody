@@ -8,6 +8,17 @@ include_directories(
 	/usr/include/python2.6
 )
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+include_directories(
+	/usr/local/python2.6
+)
+else()
+include_directories(
+	/usr/local/include/python2.6
+)
+endif()
+
+
 add_subdirectory( smartbody-lib/src )
 add_subdirectory( smartbody-dll )
 add_subdirectory( SmartBody )
