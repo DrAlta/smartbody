@@ -38,9 +38,9 @@ D:        Step right
 #ifdef WIN32_LEAN_AND_MEAN
 #undef WIN32_LEAN_AND_MEAN
 #endif
-#include "Ogre.h"
-#include "OgreStringConverter.h"
-#include "OgreException.h"
+#include "OGRE/Ogre.h"
+#include "OGRE/OgreStringConverter.h"
+#include "OGRE/OgreException.h"
 
 //Use this define to signify OIS will be used as a DLL
 //(so that dll import/export macros are in effect)

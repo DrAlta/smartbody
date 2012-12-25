@@ -4,6 +4,7 @@ print "|--------------------------------------------|"
 print "|         Starting Ogre Demo           |"
 print "|--------------------------------------------|"
 
+scene.setScale(1.0)
 # Add asset paths
 scene.setMediaPath('../../../../data')
 scene.addAssetPath('script', 'sbm-common/scripts')
@@ -17,7 +18,6 @@ scene.addAssetPath('motion', 'sbm-common/common-sk')
 scene.loadAssets()
 
 # Set scene parameters and camera
-scene.setScale(0.05)
 #scene.getPawn('camera').setPosition(SrVec(0, -5, 0))
 
 # Set joint map for Sinbad

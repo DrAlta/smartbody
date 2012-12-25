@@ -811,27 +811,27 @@
 				Name="Physics"
 				>
 				<File
-					RelativePath="..\src\sbm\Physics\SbmColObject.cpp"
+					RelativePath="..\src\sbm\Physics\SBColObject.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\Physics\SbmColObject.h"
+					RelativePath="..\src\sbm\Physics\SBColObject.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\Physics\SbmPhysicsSim.cpp"
+					RelativePath="..\src\sbm\Physics\SBPhysicsSim.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\Physics\SbmPhysicsSim.h"
+					RelativePath="..\src\sbm\Physics\SBPhysicsSim.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\Physics\SbmPhysicsSimODE.cpp"
+					RelativePath="..\src\sbm\Physics\SBPhysicsSimODE.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\Physics\SbmPhysicsSimODE.h"
+					RelativePath="..\src\sbm\Physics\SBPhysicsSimODE.h"
 					>
 				</File>
 			</Filter>

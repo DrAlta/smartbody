@@ -1,8 +1,8 @@
 #pragma once
-#include <sbm/SbmCharacterListener.h>
+#include <sbm/SBCharacterListener.h>
 
 class EmbeddedOgre;
-class OgreListener : public SBMCharacterListener
+class OgreListener : public SBCharacterListener
 {
 public:
 	OgreListener(EmbeddedOgre* ogreInterface);
