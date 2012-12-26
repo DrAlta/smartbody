@@ -33,14 +33,14 @@ c) copy the directory (SmartBodyDir)/android/sbm-jni/sbmjniData and its files to
 d) Use Eclipse to open the project (SmartBodyDir)/android/sbm/. 
 e) Select Project->Build Project. Connect the device and then run the program as "Android Application".
 
-(3B) sbm-ogre :
+(3B) sbogreapp :
 
-sbm-ogre combines SmartBody and ogre for high quality rendering. Currently, it is very slow when rendering in deformable model mode.
-a) Go to (SmartBodyDir)/android/sbm-ogre/
+sbogreapp combines SmartBody and Ogre for high quality rendering. Currently, it is very slow when rendering in deformable model mode.
+a) Go to (SmartBodyDir)/android/sbogreapp/
 b) ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading).
-c) copy the directory (SmartBodyDir)/android/sbm-ogre/SbmOgre and its files to sdcard directory of your android device. ( Usually under /sdcard/ )
-d) Use Eclipse to open the project (SmartBodyDir)/android/sbm-ogre/. 
-e) Select Project->Build Project. ThConnect the device and then run the program as "Android Application".
+c) copy the directory (SmartBodyDir)/android/sbm-ogre/sbogredir and its files to sdcard directory of your android device. ( Usually under /sdcard/ )
+d) Use Eclipse to open the project (SmartBodyDir)/android/sbogreapp/. 
+e) Select Project->Build Project. Connect the device and then run the program as "Android Application".
 
 (3C) vh-wrapper
 
