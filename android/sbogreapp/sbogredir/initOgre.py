@@ -1,5 +1,5 @@
 
-scene.addAssetPath('ME', '/sdcard/SbmOgre/ogre/sbm/')
+scene.addAssetPath('motion', '/sdcard/SbmOgre/ogre/sbm/')
 print ">>> Loading common motions and poses..."
 scene.loadAssets()
 print ">>> Finish loading motions and poses..."
@@ -18,9 +18,4 @@ print ">>> Finish creating standard control..."
 
 sim.start()
 bml.execBML('brad', '<body posture="HandsAtSide_Motex"/>')
-#0 char brad init common.sk
-#0 set character brad world_offset x -35 y 102 h -17
-#0 char doctor init common.sk
-#0 set character doctor world_offset x 35 y 102 h -17  
-#1 bml char brad <body posture="HandsAtSide_Motex"/>
-#1 bml char doctor <body posture="HandsAtSide_Motex"/>
+

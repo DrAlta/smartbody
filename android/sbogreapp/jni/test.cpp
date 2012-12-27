@@ -255,7 +255,7 @@ void initConnection(const char* serverName, const char* portName)
 
 }
 
-void initSBMPython()
+void initSBPython()
 {
 #ifdef ANDROID_PYTHON
 	std::string python_lib_path = "/sdcard/sbmmedia/python";
@@ -276,15 +276,15 @@ void MCUInitialize()
     const char* port = "61616";
     LOG("Before Init Connection");
     initConnection(serverName,port);
-    initSBMPython();
+    initSBPython();
     //SBMExecuteCmd("time resume");
 }
         
-void SBMInitialize(const char* mediaPath)
+void SBInitialize(const char* mediaPath)
 {
     LOG("before add asset path");
     mcuCBHandle& mcu = mcuCBHandle::singleton();
-    mcu.executePython("scene.addAssetPath('seq', '/sdcard/SbmOgre/')");
+    mcu.executePython("scene.addAssetPath('script', '/sdcard/sbogredir/')");
     LOG("before execute python file");
     mcu.executePythonFile("initOgre.py");
     LOG("after execute python file");
@@ -302,7 +302,7 @@ void SBMInitialize(const char* mediaPath)
     */
 }
        
-void SBMUpdateX(float t)
+void SBUpdateX(float t)
 {
     mcuCBHandle& mcu = mcuCBHandle::singleton();
     bool updateSim = mcu.update_timer(t);
@@ -317,7 +317,7 @@ void SBMUpdateX(float t)
         mcu.update();
 }
     
-void SBMExecuteCmd(const char* command)
+void SBExecuteCmd(const char* command)
 {
     //if (!mcuInit) return;
     mcuCBHandle& mcu = mcuCBHandle::singleton();

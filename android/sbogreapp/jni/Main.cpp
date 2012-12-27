@@ -57,7 +57,7 @@ bool mcuInit = false;
 AndroidLogListener gLogListener;
 DemoApp ogreApp;
 
-vhcl::Log::AndroidListener sbmLogListener;
+vhcl::Log::AndroidListener sbLogListener;
 
 
 jboolean init(JNIEnv* env, jobject thiz, jstring arg, jint width, jint height)
@@ -67,11 +67,11 @@ jboolean init(JNIEnv* env, jobject thiz, jstring arg, jint width, jint height)
 	ogreLog = Ogre::LogManager::getSingleton().createLog("OgreLogFile.log",true,true,false);
 	Ogre::LogManager::getSingleton().getDefaultLog()->addListener(&gLogListener);
 	ogreApp.startDemo(width, height);
-	vhcl::Log::g_log.AddListener(&sbmLogListener);
+	vhcl::Log::g_log.AddListener(&sbLogListener);
 	mcuInit = true;
 
 /*
-	LOGI("Init sbmOgre");
+	LOGI("Init sbOgreApp");
 	root = new Ogre::Root("","");
 	renderSystem = new Ogre::GLES2Plugin();
 	root->installPlugin(renderSystem);
@@ -79,7 +79,7 @@ jboolean init(JNIEnv* env, jobject thiz, jstring arg, jint width, jint height)
 	root->setRenderSystem(renderers[0]);
 	root->initialise(false);
 	LOGI("Finish initialize OgreRoot");
-	renderWindow = Ogre::Root::getSingleton().createRenderWindow("sbmOgre",1024,768,false);
+	renderWindow = Ogre::Root::getSingleton().createRenderWindow("sbOgreApp",1024,768,false);
 	LOGI("Finish create OgreWindow");
 	sceneManager = root->createSceneManager(Ogre::ST_GENERIC,"SceneManager");
 	if (sceneManager == NULL)
@@ -103,11 +103,11 @@ jboolean init(JNIEnv* env, jobject thiz, jstring arg, jint width, jint height)
 	return JNI_TRUE;
 }
 
-jboolean executeSbm(JNIEnv* env, jobject thiz, jstring arg)
+jboolean executeSB(JNIEnv* env, jobject thiz, jstring arg)
 {
 	if (!mcuInit) return false;
-	const char* sbmCmd = (env)->GetStringUTFChars(arg,NULL);
-	SBMExecuteCmd(sbmCmd);
+	const char* sbCmd = (env)->GetStringUTFChars(arg,NULL);
+	SBExecuteCmd(sbCmd);
 	return true;
 }
 
@@ -138,7 +138,7 @@ void setDeformable(JNIEnv* env, jobject thiz, jint isDeformable)
 jboolean render(JNIEnv* env, jobject thiz, jint drawWidth, jint drawHeight, jboolean forceRedraw)
 {
 	//LOG_FOOT;
-	//LOGI("Update sbmOgre");
+	//LOGI("Update sbOgreApp");
 	//root->renderOneFrame();
 
 	ogreApp.renderDemo(drawWidth,drawHeight);
@@ -158,8 +158,8 @@ jstring getLogStr(JNIEnv* env, jobject thiz)
 	std::list<std::string>::iterator vi;
 	int msgCounter = 0;
 	std::string headStr = "#";
-	for ( vi = sbmLogListener.logList.begin();
-		  vi != sbmLogListener.logList.end();
+	for ( vi = sbLogListener.logList.begin();
+		  vi != sbLogListener.logList.end();
 		  vi++)
 	{
 		std::string logLine = headStr + boost::lexical_cast<std::string>(msgCounter++) + " " + (*vi) + "\n\n";
@@ -237,9 +237,9 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 			(void *) setOffsets
 		},
 		{
-		            "executeSbm",
+		            "executeSB",
 		            "(Ljava/lang/String;)Z",
-		            (void *) executeSbm
+		            (void *) executeSB
 		},
 		{
 		            "openConnection",
@@ -263,7 +263,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 		},
     };
     jclass k;
-    k = (env)->FindClass ("com/android/sbmogre/Main");
+    k = (env)->FindClass ("com/android/sbogreapp/Main");
     (env)->RegisterNatives(k, methods, 11);
 
     return JNI_VERSION_1_4;

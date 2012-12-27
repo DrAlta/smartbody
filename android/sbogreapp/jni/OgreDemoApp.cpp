@@ -241,7 +241,7 @@ void DemoApp::setupDemoScene()
     OgreFramework::getSingletonPtr()->m_pLog->logMessage(command1.c_str());
     SBMExecuteCmd(command1.c_str());    
 */
-    SBMInitialize("");  
+    SBInitialize("");  
 
 /*    
     m_pCubeEntity = OgreFramework::getSingletonPtr()->m_pSceneMgr->createEntity("Brad", "Brad.mesh");
