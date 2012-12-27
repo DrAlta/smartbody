@@ -25,7 +25,7 @@
 -------------------------------------------------------------------------------
 */
 
-package com.android.sbmogre;
+package com.android.sbogreapp;
 
 import com.nvidia.devtech.NvGLES2Activity;
 import com.nvidia.devtech.NvGLESActivity;
@@ -231,7 +231,7 @@ public class Main
 	static
 	{	
 		//System.loadLibrary("python2.6");
-		System.loadLibrary("sbmogre");
+		System.loadLibrary("sbogreapp");
 	}
 }
 

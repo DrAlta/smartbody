@@ -325,7 +325,7 @@ void OgreFramework::updateOgre(double timeSinceLastFrame)
     
     static double timer = 0.0;
     timer += 0.016;
-	 SBMUpdateX(timer);
+	 SBUpdateX(timer);
 
      for (int i=0;i<m_characterNameList.size();i++)
       {
