@@ -263,7 +263,7 @@ void renderFrame() {
 	glColorPointer(4, GL_FLOAT, 0, quadColor);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
 	glDisableClientState(GL_COLOR_ARRAY);
-	drawSBM(mcu);
+	drawSB(mcu);
 	//eglSwapBuffers(engine->display, engine->surface);    
 }
 
@@ -293,7 +293,7 @@ void initPython()
 void initSmartBody()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.executePython("scene.addAssetPath('seq', '/sdcard/sbjniappdata/')");
+	mcu.executePython("scene.addAssetPath('script', '/sdcard/sbjniappdata/')");
 	mcu.executePythonFile("default.py");
 //	mcu.execute("path seq /sdcard/sbmjniData/");
 //	mcu.execute("seq default.seq");	
@@ -303,7 +303,7 @@ void initSmartBody()
 	timer.start();	
 }
 
-JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_init(JNIEnv * env, jobject obj,  jint width, jint height)
+JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_init(JNIEnv * env, jobject obj,  jint width, jint height)
 {
 	if (mcuInit)
 		return;	
@@ -327,7 +327,7 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_init(JNIEnv * env, jobj
 	initConnection();
 }
 
-JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_step(JNIEnv * env, jobject obj)
+JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_step(JNIEnv * env, jobject obj)
 {
 	if (!mcuInit) return;
 
@@ -340,7 +340,7 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_step(JNIEnv * env, jobj
     	renderFrame();
 }
 
-JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executeSB(JNIEnv * env, jobject obj, jstring sbmCmd)
+JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executeSB(JNIEnv * env, jobject obj, jstring sbmCmd)
 {
 	if (!mcuInit) return;
 
@@ -352,7 +352,7 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executeSB(JNIEnv * env,
 	//mcu.vhmsg_send("sbm","testing sbm message");
 }
 
-JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd)
+JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd)
 {	
 #ifdef ANDROID_PYTHON
 	if (!mcuInit) return;
@@ -367,13 +367,13 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executePython(JNIEnv * 
 #endif
 }
 
-JNIEXPORT jstring JNICALL Java_com_android_sbmjni_SbmJNILib_getLog( JNIEnv * env, jobject obj )
+JNIEXPORT jstring JNICALL Java_com_android_sbjniapp_SBJNIAppLib_getLog( JNIEnv * env, jobject obj )
 {
 	std::string logStr = engine.androidListener.getLogs();	
 	return env->NewStringUTF(logStr.c_str());
 }
 
-JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_restart( JNIEnv * env, jobject obj )
+JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_restart( JNIEnv * env, jobject obj )
 {
 	/*
 	if (!mcuInit) return;
@@ -387,12 +387,12 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_restart( JNIEnv * env, 
 
 
 
-JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_openConnection( JNIEnv * env, jobject obj )
+JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_openConnection( JNIEnv * env, jobject obj )
 {
 	return initConnection();
 }
 
-JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_closeConnection( JNIEnv * env, jobject obj )
+JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_closeConnection( JNIEnv * env, jobject obj )
 {	
 	vhmsg::ttu_close();
 }
