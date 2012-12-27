@@ -1,8 +1,0 @@
-0 load skeletons -R /sdcard/sbmmedia/
-0 load motions -R /sdcard/sbmmedia/
-1 char doctor init common.sk
-1 bml char doctor <body posture="test"/>
-1 set character doctor world_offset x 35 y 102 h -17
-1 char elder init common.sk 
-1 set character elder world_offset x -35 y 102 h -17
-1 bml char elder <body posture="test"/>
