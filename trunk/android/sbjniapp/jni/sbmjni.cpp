@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define  LOG_TAG    "libsbmjni"
+#define  LOG_TAG    "libsbjniapp"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
@@ -127,7 +127,7 @@ void mcu_register_callbacks( void ) {
 */
 }
 
-void drawSBM(mcuCBHandle& mcu)
+void drawSB(mcuCBHandle& mcu)
 {
 	static SrVec jointPos[200];
 	static unsigned short boneIdx[400];
@@ -273,7 +273,7 @@ extern "C" {
     JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_step(JNIEnv * env, jobject obj);
 	JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_openConnection(JNIEnv * env, jobject obj);
 	JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_closeConnection(JNIEnv * env, jobject obj);
-    JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executeSbm(JNIEnv * env, jobject obj, jstring sbmCmd);
+    JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executeSB(JNIEnv * env, jobject obj, jstring sbmCmd);
     JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd);
 	JNIEXPORT jstring JNICALL Java_com_android_sbmjni_SbmJNILib_getLog(JNIEnv * env, jobject obj);
 };
@@ -293,7 +293,7 @@ void initPython()
 void initSmartBody()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.executePython("scene.addAssetPath('seq', '/sdcard/sbmjniData/')");
+	mcu.executePython("scene.addAssetPath('seq', '/sdcard/sbjniappdata/')");
 	mcu.executePythonFile("default.py");
 //	mcu.execute("path seq /sdcard/sbmjniData/");
 //	mcu.execute("seq default.seq");	
@@ -340,7 +340,7 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_step(JNIEnv * env, jobj
     	renderFrame();
 }
 
-JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executeSbm(JNIEnv * env, jobject obj, jstring sbmCmd)
+JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executeSB(JNIEnv * env, jobject obj, jstring sbmCmd)
 {
 	if (!mcuInit) return;
 
