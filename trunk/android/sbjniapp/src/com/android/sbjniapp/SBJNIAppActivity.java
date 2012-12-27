@@ -1,4 +1,4 @@
-package com.android.sbmjni;
+package com.android.sbjniapp;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -24,7 +24,7 @@ import android.view.View.OnClickListener;
 import java.io.File;
 
 
-public class SbmJNIActivity extends Activity {
+public class SBJNIAppActivity extends Activity {
     @Override protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);        
         setContentView(R.layout.main);

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.android.sbmjni;
+package com.android.sbjniapp;
 
 // Wrapper for native library
 
-public class SbmJNILib {
+public class SBJNIAppLib {
 
      static {
     	 //System.loadLibrary("python2.6");
     	 //System.loadLibrary("sbm");
-         System.loadLibrary("sbmjni");
+         System.loadLibrary("sbjniapp");
      }
 
     /**
