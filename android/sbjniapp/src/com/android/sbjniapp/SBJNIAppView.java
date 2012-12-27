@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.sbmjni;
+package com.android.sbjniapp;
 /*
  * Copyright (C) 2008 The Android Open Source Project
  *
@@ -45,22 +45,22 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.opengles.GL10;
 
-class SbmJNIView extends GLSurfaceView {
+class SBJNIAppView extends GLSurfaceView {
     private static String TAG = "GL2JNIView";
     private static final boolean DEBUG = false;    
 
-    public SbmJNIView(Context context) {
+    public SBJNIAppView(Context context) {
         super(context);
         init(false, 0, 0);
     }
     
-    public SbmJNIView(Context context, AttributeSet attrs)
+    public SBJNIAppView(Context context, AttributeSet attrs)
     {
         super(context, attrs);
         init(false, 0, 0);
     }
    
-    public SbmJNIView(Context context, boolean translucent, int depth, int stencil) {
+    public SBJNIAppView(Context context, boolean translucent, int depth, int stencil) {
         super(context);
         init(translucent, depth, stencil);
     }
@@ -81,11 +81,11 @@ class SbmJNIView extends GLSurfaceView {
 
     private static class Renderer implements GLSurfaceView.Renderer {
         public void onDrawFrame(GL10 gl) {
-            SbmJNILib.step();
+            SBJNIAppLib.step();
         }
 
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-        	SbmJNILib.init(width, height);
+        	SBJNIAppLib.init(width, height);
         }
 
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
