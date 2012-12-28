@@ -1,5 +1,5 @@
 
-scene.addAssetPath('motion', '/sdcard/SbmOgre/ogre/sbm/')
+scene.addAssetPath('motion', '/sdcard/sbogreappdir/ogre/sbm/')
 print ">>> Loading common motions and poses..."
 scene.loadAssets()
 print ">>> Finish loading motions and poses..."
