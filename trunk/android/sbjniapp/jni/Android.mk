@@ -20,7 +20,7 @@ include $(SBM_ANDROID_LOCAL_PATH)/../../smartbody-lib/jni/Android.mk
 LOCAL_PATH = $(SBM_ANDROID_LOCAL_PATH)
 include $(CLEAR_VARS)
 SB_LIB_PATH := ../../../lib
-LOCAL_MODULE    := libsbmjni
+LOCAL_MODULE    := libsbjniapp
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					$(LOCAL_PATH)/../../pythonLib/include/python2.6 \
 					$(LOCAL_PATH)/../../boost \
@@ -38,7 +38,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../android/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/src
 LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti
-LOCAL_SRC_FILES := sbmjni.cpp
+LOCAL_SRC_FILES := sbjniapp.cpp
 LOCAL_LDLIBS    := -llog -lEGL -lGLESv1_CM
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
 LOCAL_STATIC_LIBRARIES := sbm xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt python-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt  

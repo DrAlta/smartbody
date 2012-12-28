@@ -35,7 +35,7 @@ public class SBJNIAppActivity extends Activity {
 
     @Override protected void onPause() {
         super.onPause();
-        SbmJNILib.executeSbm("time pause"); 
+        SBJNIAppLib.executeSbm("time pause"); 
         //mView.onPause();
     }
 
@@ -51,7 +51,7 @@ public class SBJNIAppActivity extends Activity {
     	}
     	*/
         super.onResume();
-        SbmJNILib.executeSbm("time resume"); 
+        SBJNIAppLib.executeSB("time resume"); 
         //mView.onResume();
     }
     
@@ -75,10 +75,10 @@ public class SBJNIAppActivity extends Activity {
         	showDialog(0);
         	break;
         case R.id.Connect:
-        	SbmJNILib.openConnection();
+        	SBJNIAppLib.openConnection();
             break;
         case R.id.Disconnect:
-        	SbmJNILib.closeConnection();
+        	SBJNIAppLib.closeConnection();
             break;
         }
         return super.onOptionsItemSelected(item);
@@ -128,7 +128,7 @@ public class SBJNIAppActivity extends Activity {
         	else
         	*/
         	//SbmJNILib.executeSbm(sbmCmd); 
-        	SbmJNILib.executePython(sbmCmd);  
+        	SBJNIAppLib.executePython(sbmCmd);  
         	sbmTextEdit.getText().clear();
         }
     };
