@@ -268,14 +268,14 @@ void renderFrame() {
 }
 
 extern "C" {
-    JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_init(JNIEnv * env, jobject obj,  jint width, jint height);
-	JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_restart(JNIEnv * env, jobject obj);
-    JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_step(JNIEnv * env, jobject obj);
-	JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_openConnection(JNIEnv * env, jobject obj);
-	JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_closeConnection(JNIEnv * env, jobject obj);
-    JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executeSB(JNIEnv * env, jobject obj, jstring sbmCmd);
-    JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd);
-	JNIEXPORT jstring JNICALL Java_com_android_sbmjni_SbmJNILib_getLog(JNIEnv * env, jobject obj);
+    JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_init(JNIEnv * env, jobject obj,  jint width, jint height);
+	JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_restart(JNIEnv * env, jobject obj);
+    JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_step(JNIEnv * env, jobject obj);
+	JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_openConnection(JNIEnv * env, jobject obj);
+	JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_closeConnection(JNIEnv * env, jobject obj);
+    JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executeSB(JNIEnv * env, jobject obj, jstring sbmCmd);
+    JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd);
+	JNIEXPORT jstring JNICALL Java_com_android_sbjniapp_SBJNIAppLib_getLog(JNIEnv * env, jobject obj);
 };
 
 
@@ -295,9 +295,7 @@ void initSmartBody()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.executePython("scene.addAssetPath('script', '/sdcard/sbjniappdata/')");
 	mcu.executePythonFile("default.py");
-//	mcu.execute("path seq /sdcard/sbmjniData/");
-//	mcu.execute("seq default.seq");	
-//	mcu.executePython("print 'aaa'");	
+
 	TimeRegulator& timer = engine.timer;
 	timer.reset();
 	timer.start();	

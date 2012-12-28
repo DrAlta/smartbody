@@ -16,9 +16,9 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := libsbmjni
+LOCAL_MODULE    := libsbjniapp
 LOCAL_CFLAGS    := -Werror
-LOCAL_SRC_FILES := sbmjni.cpp
+LOCAL_SRC_FILES := sbjniapp.cpp
 LOCAL_LDLIBS    := -llog -lEGL -lGLESv1_CM
 
 include $(BUILD_SHARED_LIBRARY)

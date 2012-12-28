@@ -36,7 +36,7 @@ public class SBJNIAppLib {
      public static native void openConnection();
      public static native void closeConnection();
      public static native void restart();
-     public static native void executeSbm(String sbmCmd);
+     public static native void executeSB(String sbmCmd);
      public static native void executePython(String pyCmd);
      public static native String getLog();
 }

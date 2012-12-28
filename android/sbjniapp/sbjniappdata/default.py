@@ -1,4 +1,4 @@
-scene.addAssetPath('ME', '/sdcard/sbmjniData/')
+scene.addAssetPath('ME', '/sdcard/sbjniappdata/')
 print ">>> Loading common motions and poses..."
 scene.loadAssets()
 
