@@ -26,7 +26,7 @@ import javax.microedition.khronos.egl.EGL10;
 import android.view.Menu;
 import android.view.MenuInflater;
 
-import com.android.sbmogre.R;
+import com.android.sbogreapp.R;
 
 /**
  * This helper class takes {@link NvGLESActivity} one step further by enabling

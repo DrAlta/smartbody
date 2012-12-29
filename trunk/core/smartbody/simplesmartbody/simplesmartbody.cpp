@@ -44,16 +44,31 @@ int main( int argc, char ** argv )
 	// attach the skeleton to the character
 	character->setSkeleton(skeleton);
 
+	// create the standard set of controllers (idling, gesture, nodding, etc.)
+	character->createStandardControllers();
+
 	// get the simulation object 
 	SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
 
-	sim->setTime(0.0);
+	// if you want to use a real-time clock do the following:
+	bool useRealTimeClock = true;
+	if (useRealTimeClock)
+	{
+		sim->setupTimer();
+	}
+	else
+	{
+		// otherwise, set the times manually:
+		sim->setTime(0.0);
+	}
+	
 	LOG("Starting the simulation...");
 	sim->start();
-	while (sim->getTime() < 100.0) // run for 100 simulated seconds
+	while (sim->getTime() < 100.0) // run for 100 simulation seconds
 	{
 		sim->update();
-		sim->setTime(sim->getTime() + 0.16); // update at 1/60 of a second
+		if (!useRealTimeClock)
+			sim->setTime(sim->getTime() + 0.16); // update at 1/60 of a second when running in simulated time
 	}
 
 	sim->stop();

@@ -227,38 +227,10 @@ void DemoApp::setupDemoScene()
     m_pCubeNode->setVisible(true);  
 
 
-    MCUInitialize();
     m_sbListener = new SBListener(OgreFramework::getSingletonPtr());
     SmartBody::SBScene::getScene()->setCharacterListener(m_sbListener);
-    mcuCBHandle& mcu = mcuCBHandle::singleton();
-    //mcu.sbm_character_listener = m_sbListener;
      
-/*
-    std::string command = "load skeletons -R \"" + OgreFramework::getSingletonPtr()->m_ResourcePath + "/sbm/\"";
-    OgreFramework::getSingletonPtr()->m_pLog->logMessage(command.c_str());
-    SBMExecuteCmd(command.c_str());
-    std::string command1 = "load motions -R \"" + OgreFramework::getSingletonPtr()->m_ResourcePath + "/sbm/\"";
-    OgreFramework::getSingletonPtr()->m_pLog->logMessage(command1.c_str());
-    SBMExecuteCmd(command1.c_str());    
-*/
     SBInitialize("");  
-
-/*    
-    m_pCubeEntity = OgreFramework::getSingletonPtr()->m_pSceneMgr->createEntity("Brad", "Brad.mesh");
-    m_pCubeNode = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->createChildSceneNode("Brad");
-    m_pCubeNode->attachObject(m_pCubeEntity);
-    
-    m_pCubeEntity = OgreFramework::getSingletonPtr()->m_pSceneMgr->createEntity("Doctor", "Brad.mesh");
-    m_pCubeNode = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->createChildSceneNode("Doctor");
-    m_pCubeNode->attachObject(m_pCubeEntity);
-    
-    Ogre::Node* node = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->getChild("Brad");
-    if (node)
-        node->setPosition(-35, 102, 0);   
-    node = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->getChild("Doctor");
-    if (node)
-        node->setPosition(35, 102, 0);  
-*/ 
 }
 
 void DemoApp::renderDemo(int width, int height)

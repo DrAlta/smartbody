@@ -214,7 +214,7 @@ include $(SBM_LOCAL_PATH)/../../steersuite-1.3/jni/Android.mk
 SB_LIB_PATH := ../../../lib
 LOCAL_PATH := $(SBM_LOCAL_PATH)
 include $(CLEAR_VARS)
-LOCAL_MODULE := sbm
+LOCAL_MODULE := smartbody
 #LOCAL_CFLAGS    :=  -gstabs -g -DBUILD_ANDROID -frtti 
 #$(SBM_LOCAL_PATH)/../../cerevoice/cerevoice_eng/include \
 LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions 

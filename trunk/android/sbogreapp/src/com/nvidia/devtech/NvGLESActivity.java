@@ -32,7 +32,7 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL11;
 
-import com.android.sbmogre.R;
+import com.android.sbogreapp.R;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;

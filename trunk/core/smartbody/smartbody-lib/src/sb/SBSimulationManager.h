@@ -37,7 +37,8 @@ class SBSimulationManager
 		SBAPI void pause();
 		SBAPI void resume();
 		SBAPI void update();
-		SBAPI void step(int n);
+
+		SBAPI void setupTimer();
 		SBAPI void setSleepFps(float v);
 		SBAPI void setEvalFps(float v);
 		SBAPI void setSimFps(float v);
@@ -45,6 +46,11 @@ class SBSimulationManager
 		SBAPI void setEvalDt(float v);
 		SBAPI void setSimDt(float v);
 		SBAPI void setSpeed(float v);
+
+	protected:
+		bool _simStarted;
+		bool _simPlaying;
+		bool _hasTimer;
 };
 
 };

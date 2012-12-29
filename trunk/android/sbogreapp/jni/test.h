@@ -7,7 +7,6 @@
 //
 #include <iostream>
 void mcu_register_callbacks();
-void MCUInitialize();
 void initConnection(const char* serverName, const char* portName);
 void endConnection();
 void SBInitialize(const char* mediaPath);
