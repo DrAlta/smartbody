@@ -39,7 +39,7 @@ sbogreapp combines SmartBody and Ogre for high quality rendering. Currently, it 
 a) Go to (SmartBodyDir)/android/sbogreapp/
 b) ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading).
 c) copy the directory (SmartBodyDir)/android/sbm-ogre/sbogredir and its files to sdcard directory of your android device. ( Usually under /sdcard/ )
-d) Use Eclipse to open the project (SmartBodyDir)/android/sbogreapp/. 
+d) Use Eclipse to import the project (SmartBodyDir)/android/sbogreapp/. 
 e) Select Project->Build Project. Connect the device and then run the program as "Android Application".
 
 (3C) vh-wrapper
