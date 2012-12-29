@@ -20,8 +20,10 @@
 #include <vhcl_string.h>
 #include <vhmsg-tt.h>
 #include <sbm/mcontrol_util.h>
-#include <sbm/mcontrol_callbacks.h>
-#include <sbm/sbm_test_cmds.hpp>
+#include <sb/SBScene.h>
+#include <sb/SBSimulationManager.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBSkeleton.h>
 #include <boost/filesystem/operations.hpp>
 #include <sr/sr_camera.h>
 
@@ -66,7 +68,7 @@ static void checkGlError(const char* op) {
     }
 }
 
-void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
+void sb_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 	// Replace singleton with a user_data pointer
 	if (!mcuInit) return;
 	//LOG("VHMSG Callback : op = %s ,args = %s\n",op,args);
@@ -79,95 +81,48 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 			break;
 	}
 }
-/*
-int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
-
-	const char* token = args.read_token();
-	if( strcmp(token,"id")==0 ) {  // Process specific
-		token = args.read_token(); // Process id
-		const char* process_id = mcu_p->process_id.c_str();
-		if( ( mcu_p->process_id == "" )        // If process id unassigned
-			|| strcmp( token, process_id )!=0 ) // or doesn't match
-			return CMD_SUCCESS;                 // Ignore.
-		token = args.read_token(); // Sub-command
-	}
-
-	const char* args_raw = args.read_remainder_raw();
-	srArgBuffer argsRawBuff(args_raw);
-	int result = mcu_p->execute( token, argsRawBuff );
-	switch( result ) {
-		case CMD_NOT_FOUND:
-			LOG("SBM ERR: command NOT FOUND: '%s %s' ", token, args_raw );
-			break;
-		case CMD_FAILURE:
-			LOG("SBM ERR: command FAILED: '%s %s' ", token, args_raw );
-			break;
-		case CMD_SUCCESS:
-			break;
-	}
-	return CMD_SUCCESS;
-}
-*/
-
-void mcu_register_callbacks( void ) {
-
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-/*
-	mcu.insert( "q",			mcu_quit_func );
-	mcu.insert( "quit",			mcu_quit_func );
-
-	mcu.insert( "snapshot",		mcu_snapshot_func );
-	mcu.insert( "viewer",		mcu_viewer_func );
-	mcu.insert( "bmlviewer",    mcu_bmlviewer_func);
-	mcu.insert( "panimviewer",  mcu_panimationviewer_func);
-	mcu.insert( "cbufviewer",	mcu_channelbufferviewer_func); // deprecated
-	mcu.insert( "dataviewer",	mcu_channelbufferviewer_func);
-	mcu.insert( "resourceviewer",	mcu_resourceViewer_func);	
-	mcu.insert( "faceviewer",	mcu_faceViewer_func);
-*/
-}
 
 void drawSB(mcuCBHandle& mcu)
 {
 	static SrVec jointPos[200];
 	static unsigned short boneIdx[400];
-	//LOGI("Num of Pawns = %d\n",mcu.getPawnMap().size());
-	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-		iter != mcu.getPawnMap().end();
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> characterNames = scene->getCharacterNames();
+
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		SbmPawn* pawn = (*iter).second;
-		SbmCharacter* char_p = mcu.getCharacter(pawn->getName() );
-		if( char_p )
+		SmartBody::SBCharacter* character = scene->getCharacter(*iter);
+
+		SmartBody::SBSkeleton* skeleton = character->getSkeleton();
+		skeleton->update_global_matrices();
+		std::map<int,int> indexMap;
+		for (int i=0;i<skeleton->joints().size();i++)
 		{
-			SkSkeleton* sk = char_p->_skeleton;
-			sk->update_global_matrices();
-			std::map<int,int> indexMap;
-			for (int i=0;i<sk->joints().size();i++)
-			{
-				SkJoint* joint = sk->joints()[i];
-				SrVec pos = joint->gmat().get_translation();
-				jointPos[i] = pos;
-				indexMap[joint->index()] = i;
-				boneIdx[i*2+0] = joint->index();
-				if (joint->parent())
-					boneIdx[i*2+1] = joint->parent()->index();
-				else
-					boneIdx[i*2+1] = joint->index();
-			}
-
-			for (int i=0;i<sk->joints().size();i++)
-			{
-				boneIdx[i*2] = indexMap[boneIdx[i*2]];
-				boneIdx[i*2+1] = indexMap[boneIdx[i*2+1]];
-			}
-
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glVertexPointer(3, GL_FLOAT, 0, (const GLfloat*)&jointPos[0]);
-			//glDrawArrays(GL_POINTS, 0, sk->joints().size());
-			glDrawElements(GL_LINES,sk->joints().size()*2,GL_UNSIGNED_SHORT, boneIdx);
-			glDisableClientState(GL_VERTEX_ARRAY);
+			SkJoint* joint = skeleton->joints()[i];
+			SrVec pos = joint->gmat().get_translation();
+			jointPos[i] = pos;
+			indexMap[joint->index()] = i;
+			boneIdx[i*2+0] = joint->index();
+			if (joint->parent())
+				boneIdx[i*2+1] = joint->parent()->index();
+			else
+				boneIdx[i*2+1] = joint->index();
 		}
+
+		for (int i=0;i<skeleton->joints().size();i++)
+		{
+			boneIdx[i*2] = indexMap[boneIdx[i*2]];
+			boneIdx[i*2+1] = indexMap[boneIdx[i*2+1]];
+		}
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, 0, (const GLfloat*)&jointPos[0]);
+		//glDrawArrays(GL_POINTS, 0, sk->joints().size());
+		glDrawElements(GL_LINES,skeleton->joints().size()*2,GL_UNSIGNED_SHORT, boneIdx);
+		glDisableClientState(GL_VERTEX_ARRAY);
 	}
 }
 
@@ -182,7 +137,7 @@ void initConnection()
 	int openConnection = vhmsg::ttu_open(serverName,scope,port);
 	if( openConnection == vhmsg::TTU_SUCCESS )
 	{
-		vhmsg::ttu_set_client_callback( sbm_vhmsg_callback );
+		vhmsg::ttu_set_client_callback( sb_vhmsg_callback );
 		err = vhmsg::ttu_register( "sb" );
 		err = vhmsg::ttu_register( "sbm" );
 		err = vhmsg::ttu_register( "vrAgentBML" );
@@ -278,91 +233,51 @@ extern "C" {
 	JNIEXPORT jstring JNICALL Java_com_android_sbjniapp_SBJNIAppLib_getLog(JNIEnv * env, jobject obj);
 };
 
-
-
-
-void initPython()
-{
-#ifdef ANDROID_PYTHON
-	std::string python_lib_path = "/sdcard/sbmmedia/python";
-	//LOGI("Before init Python");
-	initPython(python_lib_path);
-#endif
-}
-
 void initSmartBody()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.executePython("scene.addAssetPath('script', '/sdcard/sbjniappdata/')");
-	mcu.executePythonFile("default.py");
+	mcuInit = true;
+	std::string python_lib_path = "/sdcard/sbmmedia/python";
+	initPython(python_lib_path);
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
-	TimeRegulator& timer = engine.timer;
-	timer.reset();
-	timer.start();	
+	scene->getSimulationManager()->setupTimer();
+	scene->getSimulationManager()->setTime(0.0);
+	scene->getSimulationManager()->start();
+
+	scene->addAssetPath("script", "/sdcard/sbjniappdir");
+	scene->runScript("default.py");
 }
 
 JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_init(JNIEnv * env, jobject obj,  jint width, jint height)
 {
 	if (mcuInit)
-		return;	
-	XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu_register_callbacks();	
-	vhcl::Log::g_log.AddListener(&engine.androidListener);
-#ifdef ANDROID_PYTHON
-	initPython();
-#endif
-	
-	TimeRegulator& timer = engine.timer;
+		return;
 
-	mcu.register_timer( timer );
-	TimeIntervalProfiler* profiler = new TimeIntervalProfiler();
-	mcu.register_profiler(*profiler);
 	initSmartBody();
-
+	vhcl::Log::g_log.AddListener(&engine.androidListener);
+	
 	setupGraphics(width, height);    
-	mcuInit = true;
-	initConnection();
+
 }
 
 JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_step(JNIEnv * env, jobject obj)
 {
 	if (!mcuInit) return;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();	
-	bool update_sim = mcu.update_timer();	
 	int err = vhmsg::ttu_poll();
-	if( update_sim ) {
-		mcu.update();
-	}
-    	renderFrame();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->getSimulationManager()->update();
+    renderFrame();
 }
 
 JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executeSB(JNIEnv * env, jobject obj, jstring sbmCmd)
 {
 	if (!mcuInit) return;
-
-	const char* sbmCmdStrConst = (env)->GetStringUTFChars( sbmCmd , NULL ) ;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();	
-	char* sbmCmdStr = const_cast<char*>(sbmCmdStrConst);
-	mcu.execute(sbmCmdStr);
-	//mcu.vhmsg_send("sbm",sbmCmdStr);
-	//mcu.vhmsg_send("sbm","testing sbm message");
-}
-
-JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd)
-{	
-#ifdef ANDROID_PYTHON
-	if (!mcuInit) return;
-	const char* pyCmdStrConst = (env)->GetStringUTFChars( pythonCmd , NULL ) ;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	const char* pyCmdStrConst = (env)->GetStringUTFChars( sbmCmd , NULL ) ;
 	//LOG("python cmd = %s",pyCmdStrConst);
 	char* pyCmdStr = const_cast<char*>(pyCmdStrConst);
-	mcu.executePython(pyCmdStr);
-#else // if there is no python, then run the sbm command. 
-	//Java_com_android_sbmjni_SbmJNILib_executeSbm(env,obj,pythonCmd);
-	LOG("Python now supported");
-#endif
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->run(pyCmdStr);
 }
 
 JNIEXPORT jstring JNICALL Java_com_android_sbjniapp_SBJNIAppLib_getLog( JNIEnv * env, jobject obj )

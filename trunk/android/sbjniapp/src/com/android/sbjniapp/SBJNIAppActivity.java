@@ -35,7 +35,7 @@ public class SBJNIAppActivity extends Activity {
 
     @Override protected void onPause() {
         super.onPause();
-        SBJNIAppLib.executeSbm("time pause"); 
+        SBJNIAppLib.executeSB("sim.pause()"); 
         //mView.onPause();
     }
 
@@ -51,7 +51,7 @@ public class SBJNIAppActivity extends Activity {
     	}
     	*/
         super.onResume();
-        SBJNIAppLib.executeSB("time resume"); 
+        SBJNIAppLib.executeSB("sim.resume()"); 
         //mView.onResume();
     }
     
@@ -94,7 +94,7 @@ public class SBJNIAppActivity extends Activity {
     protected void onPrepareDialog(int id, Dialog dialog) {     
     	AlertDialog alertDialog = (AlertDialog)dialog;
     	TextView text = (TextView)dialog.findViewById(R.id.TextView02); 
-    	String logs = SbmJNILib.getLog();
+    	String logs = SBJNIAppLib.getLog();
     	text.setText(logs);
   	  	//text.setText("fjajfiosajgihagosdghaogiha");    	
     }    
@@ -128,7 +128,7 @@ public class SBJNIAppActivity extends Activity {
         	else
         	*/
         	//SbmJNILib.executeSbm(sbmCmd); 
-        	SBJNIAppLib.executePython(sbmCmd);  
+        	SBJNIAppLib.executeSB(sbmCmd);  
         	sbmTextEdit.getText().clear();
         }
     };

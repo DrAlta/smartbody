@@ -41,5 +41,5 @@ LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti
 LOCAL_SRC_FILES := sbjniapp.cpp
 LOCAL_LDLIBS    := -llog -lEGL -lGLESv1_CM
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
-LOCAL_STATIC_LIBRARIES := sbm xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt python-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt  
+LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt python-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt  
 include $(BUILD_SHARED_LIBRARY) 
