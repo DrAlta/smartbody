@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------------
 package com.nvidia.devtech;
 
-import com.android.sbmogre.R;
+import com.android.sbogreapp.R;
 import android.app.Activity;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;

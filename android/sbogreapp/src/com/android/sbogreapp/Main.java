@@ -105,11 +105,11 @@ public class Main
         switch (item.getItemId()) {
         case R.id.StartSim:    
         	//onResume();
-        	executeSbm("time resume"); 
+        	executeSB("SmartBody.getScene().getSimulationManager().resume()"); 
             break;
         case R.id.PauseSim:
         	//onPause();
-        	executeSbm("time pause");         	
+        	executeSB("SmartBody.getScene().getSimulationManager().pause()");         	
             break;
         case R.id.ShowLog:   
         	showDialog(0);
@@ -171,7 +171,7 @@ public class Main
         	}
         	else
         	*/
-        	executeSbm(sbmCmd); 
+        	executeSB(sbmCmd); 
         	sbmTextEdit.getText().clear();
         }
     };
@@ -220,7 +220,7 @@ public class Main
 	
 	public native void setOffsets(int x, int y);
 	
-	public native boolean executeSbm(String sbmCmd);
+	public native boolean executeSB(String sbmCmd);
 	
 	public native void openConnection();
 	

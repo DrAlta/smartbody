@@ -32,7 +32,7 @@ OgreFramework::OgreFramework()
 	m_pMouse			= 0;
     
 #ifdef __ANDROID__
-    m_ResourcePath = "/sdcard/SbmOgre/ogre/";
+    m_ResourcePath = "/sdcard/sbogreappdir/ogre/";
 #else
     m_ResourcePath = "";
     m_pTrayMgr          = 0;
@@ -63,7 +63,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 		return false;
 	m_pRoot->initialise(false);
 
-	m_pRenderWnd = Ogre::Root::getSingleton().createRenderWindow("sbmOgre",resX,resY,true);
+	m_pRenderWnd = Ogre::Root::getSingleton().createRenderWindow("SmartBody Ogre App",resX,resY,true);
     
 	m_pSceneMgr = m_pRoot->createSceneManager(ST_GENERIC, "SceneManager");
 	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(0.7f, 0.7f, 0.7f));
@@ -324,73 +324,73 @@ void OgreFramework::updateOgre(double timeSinceLastFrame)
     // smartbody update
     
     static double timer = 0.0;
-    timer += 0.016;
+    timer += .033;
 	 SBUpdateX(timer);
 
      for (int i=0;i<m_characterNameList.size();i++)
       {
     	 std::string charName = m_characterNameList[i];
-    	 Ogre::SceneNode* bradNode = (SceneNode *)m_pSceneMgr->getRootSceneNode()->getChild(charName);
-    	 Ogre::SceneNode* bradSkelNode = (SceneNode *)m_pSceneMgr->getRootSceneNode()->getChild(charName+"_skel");
-    	 Ogre::Entity* bradEnt = (Entity *)bradNode->getAttachedObject(charName);
-    	 Ogre::Skeleton* bradSkel = bradEnt->getSkeleton();
-    	 for (int i = 0; i < bradSkel->getNumBones(); i++)
+    	 Ogre::SceneNode* characterNode = (SceneNode *)m_pSceneMgr->getRootSceneNode()->getChild(charName);
+    	 Ogre::SceneNode* skelNode = (SceneNode *)m_pSceneMgr->getRootSceneNode()->getChild(charName+"_skel");
+    	 Ogre::Entity* entity = (Entity *)characterNode->getAttachedObject(charName);
+    	 Ogre::Skeleton* skeleton = entity->getSkeleton();
+    	 for (int i = 0; i < skeleton->getNumBones(); i++)
     	 {
-    		 Ogre::Bone* bradBone = bradSkel->getBone(i);
-    		 bradBone->setManuallyControlled(true);
+    		 Ogre::Bone* bone = skeleton->getBone(i);
+    		 bone->setManuallyControlled(true);
     	 }
-    	 Ogre::Node* bradCharacter = m_pSceneMgr->getRootSceneNode()->getChild(charName);
+    	 Ogre::Node* character = m_pSceneMgr->getRootSceneNode()->getChild(charName);
     	 float x, y, z, qw, qx, qy, qz;
     	 getCharacterWo(charName.c_str(), x, y, z, qw, qx, qy, qz);
-    	 bradCharacter->setPosition(x, y, z);
-    	 bradCharacter->setOrientation(Quaternion(qw, qx, qy, qz));
-    	 bradSkelNode->setPosition(x, y, z);
-    	 bradSkelNode->setOrientation(Quaternion(qw, qx, qy, qz));
-    	 for (int i = 0; i < bradSkel->getNumBones(); i++)
+    	 character->setPosition(x, y, z);
+    	 character->setOrientation(Quaternion(qw, qx, qy, qz));
+    	 skelNode->setPosition(x, y, z);
+    	 skelNode->setOrientation(Quaternion(qw, qx, qy, qz));
+    	 for (int i = 0; i < skeleton->getNumBones(); i++)
     	 {
-    		 Ogre::Bone* bradBone = bradSkel->getBone(i);
-    		 if (bradBone)
+    		 Ogre::Bone* bone = skeleton->getBone(i);
+    		 if (bone)
     		 {
     	             float q = 1;
     	             float x = 0;
     	             float y = 0;
     	             float z = 0;
     	             Quaternion quat;
-    	             getJointRotation(charName.c_str(), bradBone->getName().c_str(), q, x, y, z);
+    	             getJointRotation(charName.c_str(), bone->getName().c_str(), q, x, y, z);
     	             quat.w = q;
     	             quat.x = x;
     	             quat.y = y;
     	             quat.z = z;
-    	             bradBone->setOrientation(quat);
+    	             bone->setOrientation(quat);
     	    }
     	}
 
-    	 for (int i = 0; i < bradSkel->getNumBones(); i++)
+    	 for (int i = 0; i < skeleton->getNumBones(); i++)
     	 {
-    		 Ogre::Bone* bradBone = bradSkel->getBone(i);
-    		 bradBone->_update(true,true);
-    		 bradBone->needUpdate();
+    		 Ogre::Bone* bone = skeleton->getBone(i);
+    		 bone->_update(true,true);
+    		 bone->needUpdate();
     	 }
     	 //bradSkel->_updateTransforms();
     	 //bradSkel->_notifyManualBonesDirty();
-    	 for (int i = 0; i < bradSkel->getNumBones(); i++)
+    	 for (int i = 0; i < skeleton->getNumBones(); i++)
     	 {
-    	     		Ogre::Bone* bradBone = bradSkel->getBone(i);
+    	     		Ogre::Bone* bone = skeleton->getBone(i);
     	     		Ogre::String jointName = charName+"_joint#"+Ogre::StringConverter::toString(i);
-    	     		Ogre::SceneNode* jointNode = (SceneNode *)bradSkelNode->getChild(jointName);
-    	     		jointNode->setOrientation(bradBone->_getDerivedOrientation());
-    	     		jointNode->setPosition(bradBone->_getDerivedPosition());
+    	     		Ogre::SceneNode* jointNode = (SceneNode *)skelNode->getChild(jointName);
+    	     		jointNode->setOrientation(bone->_getDerivedOrientation());
+    	     		jointNode->setPosition(bone->_getDerivedPosition());
     	 }
     	 //
     	 if (m_ShowDeformModel)
     	 {
-    		 bradNode->setVisible(true);
-    		 bradSkelNode->setVisible(false);
+    		 characterNode->setVisible(true);
+    		 skelNode->setVisible(false);
     	 }
     	 else
     	 {
-    		 bradNode->setVisible(false);
-    		 bradSkelNode->setVisible(true);
+    		 characterNode->setVisible(false);
+    		 skelNode->setVisible(true);
     	 }
       }
     

@@ -35,10 +35,17 @@ void SBProfiler::printStats()
 
 SBSimulationManager::SBSimulationManager()
 {
+	_simStarted = false;
+	_simPlaying = false;
 }
 
 SBSimulationManager::~SBSimulationManager()
 {
+	if (_hasTimer)
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		delete mcu.timer_p;
+	}
 }
 
 void SBSimulationManager::printInfo()
@@ -67,7 +74,7 @@ void SBSimulationManager::printPerf(float v)
 			mcu.timer_p->set_perf(10.0);	
 	}
 	else
-		LOG("Time regulator not exist!");
+		LOG("Time regulator does not exist!");
 }
 
 double SBSimulationManager::getTime()
@@ -91,6 +98,12 @@ void SBSimulationManager::setTime(double time)
 void SBSimulationManager::update()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if (mcu.timer_p)
+	{
+		bool doUpdate = mcu.update_timer();
+		if (!doUpdate)
+			return;
+	}
 	mcu.update();
 }
 
@@ -100,7 +113,12 @@ bool SBSimulationManager::isStarted()
 	if (mcu.timer_p)
 		return mcu.timer_p->isStarted();
 	else
-		return false;
+	{
+		if (_simStarted)
+			return true;
+		else
+			return false;
+	}
 }
 
 bool SBSimulationManager::isRunning()
@@ -109,7 +127,12 @@ bool SBSimulationManager::isRunning()
 	if (mcu.timer_p)
 		return mcu.timer_p->isRunning();
 	else
-		return false;
+	{
+		if (_simPlaying)
+			return true;
+		else
+			return false;
+	}
 }
 
 void SBSimulationManager::reset()
@@ -118,7 +141,9 @@ void SBSimulationManager::reset()
 	if (mcu.timer_p)	
 		mcu.timer_p->reset();
 	else
-		LOG("Time regulator not exist!");
+	{
+		return;
+	}
 }
 
 void SBSimulationManager::start()
@@ -136,9 +161,13 @@ void SBSimulationManager::start()
 	
 
 	if (mcu.timer_p)	
+	{
 		mcu.timer_p->start();
+	}
 	else
-		LOG("Time regulator not exist!");
+	{
+		_simStarted = true;
+	}
 }
 
 void SBSimulationManager::stop()
@@ -154,43 +183,41 @@ void SBSimulationManager::stop()
 		(*iter).second->stop();
 	}
 	
-
 	if (mcu.timer_p)	
+	{
 		mcu.timer_p->stop();
+	}
 	else
-		LOG("Time regulator not exist!");
+	{
+		_simStarted = false;
+		_simPlaying = false;
+	}
 }
 
 void SBSimulationManager::pause()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)	
+	if (mcu.timer_p)
+	{
 		mcu.timer_p->pause();
+	}
 	else
-		LOG("Time regulator not exist!");
+	{
+		_simPlaying = false;
+	}
 }
 
 void SBSimulationManager::resume()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)	
-		mcu.timer_p->resume();
-	else
-		LOG("Time regulator not exist!");
-}
-
-void SBSimulationManager::step(int n)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (mcu.timer_p)
 	{
-		if (n)
-			mcu.timer_p->step(n);
-		else
-			mcu.timer_p->step(1);
+		mcu.timer_p->resume();
 	}
 	else
-		LOG("Time regulator not exist!");
+	{
+		_simPlaying = true;
+	}
 }
 
 void SBSimulationManager::setSleepFps(float v)
@@ -209,7 +236,7 @@ void SBSimulationManager::setEvalFps(float v)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (!mcu.timer_p)	
 	{
-		LOG("Time regulator not exist!");
+		LOG("Time regulator does not exist!");
 		return;
 	}
 	mcu.timer_p->set_eval_fps(v);
@@ -220,7 +247,7 @@ void SBSimulationManager::setSimFps(float v)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (!mcu.timer_p)	
 	{
-		LOG("Time regulator not exist!");
+		LOG("Time regulator does not exist!");
 		return;
 	}
 	mcu.timer_p->set_sim_fps(v);
@@ -242,7 +269,7 @@ void SBSimulationManager::setEvalDt(float v)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (!mcu.timer_p)	
 	{
-		LOG("Time regulator not exist!");
+		LOG("Time regulator does not exist!");
 		return;
 	}
 	mcu.timer_p->set_eval_dt(v);
@@ -253,7 +280,7 @@ void SBSimulationManager::setSimDt(float v)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (!mcu.timer_p)	
 	{
-		LOG("Time regulator not exist!");
+		LOG("Time regulator does not exist!");
 		return;
 	}
 	mcu.timer_p->set_sim_dt(v);
@@ -265,7 +292,16 @@ void SBSimulationManager::setSpeed(float v)
 	if (mcu.timer_p)	
 		mcu.timer_p->set_speed(v);
 	else
-		LOG("Time regulator not exist!");
+		LOG("Time regulator does not exist!");
+}
+
+void SBSimulationManager::setupTimer()
+{
+	TimeRegulator* timer = new TimeRegulator();
+	_hasTimer = true;
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.register_timer( *timer );
 }
 
 }

@@ -841,7 +841,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("reset", &SBSimulationManager::reset, "Set the clock time to 0. ")
 		.def("pause", &SBSimulationManager::pause, "Pause the clock. ")
 		.def("resume", &SBSimulationManager::resume, "Resume the clock. ")
-		.def("step", &SBSimulationManager::step, "Running the system in the step mode, user can input how many steps they want to run. \n Input: number of steps at a time \n Output: NULL")
+		.def("setupTimer", &SBSimulationManager::setupTimer, "Sets up a real time clock that will be used to update the system.")
 		.def("setSleepFps", &SBSimulationManager::setSleepFps, "Set the sleep fps. Sleep fps defines the target loop rate. \n Input: sleep fps \n Output: NULL")
 		.def("setEvalFps", &SBSimulationManager::setEvalFps, "Set the eval fps. Define the minimum interval to evaluate the frame. \n Input: evaluation fps \n Output: NULL")
 		.def("setSimFps", &SBSimulationManager::setSimFps, "Set the simulation fps. Add a fixed increment to output time every update. \n Input: simulation fps \n Output: NULL")
