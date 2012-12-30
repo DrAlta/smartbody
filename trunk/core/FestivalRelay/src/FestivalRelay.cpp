@@ -131,9 +131,9 @@ bool isDone = false;
 	extern std::multimap<std::string, std::pair<string, double> > phonemeToViseme;
 #else
 
-	extern std::string mapping;
+	std::string mapping;
 	extern SpeechRequestData xmlMetaData;
-	std::multimap<std::string, std::pair<string, double> > phonemeToViseme;
+	extern std::multimap<std::string, std::pair<string, double> > phonemeToViseme;
 #endif
 #endif
 std::string festivalLibDir = "";
