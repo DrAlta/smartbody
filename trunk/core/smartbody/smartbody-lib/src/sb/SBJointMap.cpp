@@ -468,7 +468,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		}
 	}
 	
-	if(!base) // no joint with 3 children found, try finding one with 2 children...
+	if(!base || base->num_children() < 3) // no joint with 3 children found, try finding one with 2 children...
 	{
 		for(unsigned int i=0; i<base_searchs; i++)
 		{

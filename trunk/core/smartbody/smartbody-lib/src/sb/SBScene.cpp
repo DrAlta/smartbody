@@ -45,6 +45,8 @@ namespace SmartBody {
 SBScene* SBScene::_scene = NULL;
 bool SBScene::_firstTime = true;
 
+std::map<std::string, std::string> SBScene::_systemParameters;
+
 SBScene::SBScene(void)
 {
 	_characterListener = NULL;
@@ -1709,6 +1711,64 @@ std::string SBScene::save(bool remoteSetup)
 
 void SBScene::exportScene(const std::string& filename)
 {
+}
+
+void SBScene::setSystemParameter(const std::string& name, const std::string& value)
+{
+	std::map<std::string, std::string>::iterator iter = _systemParameters.find(name);
+	if (iter != _systemParameters.end())
+	{
+		(*iter).second = value;
+	}
+	else
+	{
+		_systemParameters.insert(std::pair<std::string, std::string>(name, value));
+	}
+		
+}
+
+std::string SBScene::getSystemParameter(const std::string& name)
+{
+	std::map<std::string, std::string>::iterator iter = _systemParameters.find(name);
+	if (iter != _systemParameters.end())
+	{
+		return (*iter).second;
+	}
+	else
+	{
+		return "";
+	}
+}
+
+void SBScene::removeSystemParameter(const std::string& name)
+{
+	std::map<std::string, std::string>::iterator iter = _systemParameters.find(name);
+	if (iter != _systemParameters.end())
+	{
+		_systemParameters.erase(iter);
+		return;
+	}
+
+	LOG("Cannot remove system parameter named '%s', does not exist.", name.c_str());
+
+}
+
+void SBScene::removeAllSystemParameters()
+{
+	_systemParameters.clear();
+}
+
+std::vector<std::string> SBScene::getSystemParameterNames()
+{
+	std::vector<std::string> names;
+	for (std::map<std::string, std::string>::iterator iter = _systemParameters.begin();
+		 iter != _systemParameters.end();
+		 iter++)
+	{
+		names.push_back((*iter).first);
+	}
+
+	return names;
 }
 
 

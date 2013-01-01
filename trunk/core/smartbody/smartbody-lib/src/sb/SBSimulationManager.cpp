@@ -37,6 +37,7 @@ SBSimulationManager::SBSimulationManager()
 {
 	_simStarted = false;
 	_simPlaying = false;
+	_hasTimer = false;
 }
 
 SBSimulationManager::~SBSimulationManager()

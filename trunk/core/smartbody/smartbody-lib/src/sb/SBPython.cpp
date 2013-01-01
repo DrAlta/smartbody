@@ -1621,6 +1621,12 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getDiphoneManager", &SBScene::getDiphoneManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the diphone manager object.")
 		.def("getBehaviorSetManager", &SBScene::getBehaviorSetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the behavior set manager.")
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
+
+		.def("setSystemParameter", &SBScene::setSystemParameter, "Sets a name/value pair that persists between scene sessions.")
+		.def("getSystemParameter", &SBScene::getSystemParameter, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a value for a given name.")
+		.def("removeSystemParameter", &SBScene::removeSystemParameter, "Removes a system parameter.")
+		.def("removeAllSystemParameters", &SBScene::removeSystemParameter, "Removes a system parameter.")
+		.def("getSystemParameterNames", &SBScene::getSystemParameterNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns names of all system parameters.")
 	;
 #endif
 	}

@@ -452,8 +452,63 @@ int main( int argc, char **argv )	{
 	std::string python_lib_path = "../../../../core/smartbody/Python26/Lib";
 	std::string festivalLibDir = "../../../../lib/festival/festival/lib/";
 	std::string festivalCacheDir = "../../../../data/cache/festival/";
+	std::string mediaPath = "../../../../data";
+
 
 	std::string cereprocLibDir = "../../../../lib/cerevoice/voices/";	
+
+
+
+	// look for a file called .smartbodysettings in the current directory
+	// to determine the initial settings
+	std::ifstream settingsFile(".smartbodysettings");
+
+	if (!settingsFile.good())
+	{
+		LOG("Did not find .smartbodysettings in current directory, using default paths.");
+	}
+	else
+	{
+		LOG("Found .smartbodysettings file.");
+		std::string line;
+		while (!settingsFile.eof())
+		{
+			getline(settingsFile, line);
+			
+			std::vector<std::string> tokens;
+			vhcl::Tokenize(line, tokens, "=");
+			for (size_t t = 0; t < tokens.size(); t++)
+			{
+				if (tokens[t] == "pythonlibpath")
+				{
+					if (tokens.size() > t + 1)
+					{
+						python_lib_path = tokens[t + 1];
+						LOG("Setting Python Library path to %s", tokens[t + 1].c_str());
+						SmartBody::SBScene::setSystemParameter("pythonlibpath", python_lib_path);
+						t++;
+					}
+					
+				}
+				else if (tokens[t] == "mediapath")
+				{
+					if (tokens.size() > t + 1)
+					{
+						mediaPath = tokens[t + 1];
+						LOG("Setting mediapath to %s", tokens[t + 1].c_str());
+						SmartBody::SBScene::setSystemParameter("mediapath", mediaPath);
+						t++;
+					}
+				}
+				else
+				{
+					LOG("Unknown setting found in .smartbodysettings file: %s", line.c_str());
+					LOG("Valid settings are: pythonlibpath=<dir>  or mediapath=<dir>");
+				}
+			}
+		}
+	}
+	settingsFile.close();
 	// EDF - taken from tre_main.cpp, a fancier command line parser can be put here if desired.
 	//	check	command line parameters:
 	bool lock_dt_mode = false;
@@ -601,14 +656,14 @@ int main( int argc, char **argv )	{
 		}
 		else if ( s.search( "-mediapath=" ) == 0 )
 		{
-			std::string mediaPath = (const char*) s;
+			mediaPath = (const char*) s;
 			mediaPath = mediaPath.substr(11);
-			mcu.setMediaPath(mediaPath);
+			
 		}
-                else if ( s.search ("-noninteractive") == 0)
-                {
-                       mcu.setInteractive(false);
-                }
+        else if ( s.search ("-noninteractive") == 0)
+        {
+                mcu.setInteractive(false);
+        }
 		else
 		{
 			LOG( "ERROR: Unrecognized command line argument: \"%s\"\n", (const char*)s );
@@ -618,7 +673,9 @@ int main( int argc, char **argv )	{
 		timer.set_sleep_lock();
 	}
 
+	mcu.setMediaPath(mediaPath);
 	// initialize python
+	LOG("Initializing Pyton with libraries at location: %s", python_lib_path.c_str());
 	initPython(python_lib_path);
 	mcu.festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
 	mcu.cereprocRelay()->initSpeechRelay(cereprocLibDir,festivalCacheDir);
@@ -657,9 +714,6 @@ int main( int argc, char **argv )	{
 			LOG( "SmartBody: VHMSG_SERVER='%s': Messaging disabled.\n", vhmsg_server?"NULL":vhmsg_server );
 		} else {
 #if 0 // disable server name query until vhmsg is fixed
-			const char* vhmsg_server_actual = vhmsg::ttu_get_server();
-			LOG( "SmartBody Error: ttu_open VHMSG_SERVER='%s' FAILED\n", vhmsg_server_actual?"NULL":vhmsg_server_actual );
-#else
 			std::string vhserver = (vhmsg_server? vhmsg_server : "localhost");
 			std::string vhport = (vhmsg_port ? vhmsg_port : "61616");
 			LOG( "SmartBody Error: ttu_open FAILED\n" );
