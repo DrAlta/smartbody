@@ -143,7 +143,8 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void ModeDynamicsSupportPolygonCB(Fl_Widget* w, void* data);
 		static void ModeDynamicsMassesCB(Fl_Widget* w, void* data);
 		static void ShowBoundingVolumeCB(Fl_Widget* w, void* data);
-		static void SettingsSofteyesToggleCB(Fl_Widget* w, void* data);
+		static void SettingsDefaultMediaPathCB(Fl_Widget* w, void* data);
+		static void SettingsPythonLibCB(Fl_Widget* w, void* data);
 		static void TrackCharacterCB(Fl_Widget* w, void* data);
 		static void AudioCB(Fl_Widget* w, void* data);
 		static void CreateCharacterCB(Fl_Widget* w, void* data);

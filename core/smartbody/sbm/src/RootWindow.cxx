@@ -105,7 +105,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Camera/Face Camera", 0, FaceCameraCB, this, NULL);
 	menubar->add("&Camera/Track Character", 0, TrackCharacterCB, this, NULL);
 	menubar->add("&Camera/Rotate Around Selected", 0, RotateSelectedCB, this, NULL);
-//	menubar->add("&Settings/Softeyes", 0, SettingsSofteyesToggleCB, this, NULL);
+	menubar->add("&Settings/Default Media Path", 0, SettingsDefaultMediaPathCB, this, NULL);
 	menubar->add("&Settings/Internal Audio", 0, AudioCB, this, NULL);	
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
 	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
@@ -1114,20 +1114,17 @@ void BaseWindow::ShowBoundingVolumeCB( Fl_Widget* w, void* data )
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowBoundingVolume, NULL);
 }
 
-
-
-void BaseWindow::SettingsSofteyesToggleCB(Fl_Widget* w, void* data)
+void BaseWindow::SettingsDefaultMediaPathCB(Fl_Widget* w, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string path = scene->getSystemParameter("mediapath");
 
-	bool currentSetting = true;
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
+	const char* result = fl_input("Default Media Path", path.c_str());
+	if (result)
 	{
-		SbmCharacter* character = (*iter).second;
-		currentSetting = character->isSoftEyes();
+		scene->setSystemParameter("mediapath", result);
 	}
 }
 
