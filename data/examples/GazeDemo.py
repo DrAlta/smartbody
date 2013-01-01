@@ -3,7 +3,6 @@ print "|             Starting Gaze Demo             |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.setMediaPath('../../../../data')
 scene.addAssetPath('script','examples')
 scene.addAssetPath('script','sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')

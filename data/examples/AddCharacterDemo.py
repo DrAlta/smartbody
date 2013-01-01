@@ -3,7 +3,9 @@ print "|         Starting Character Demo            |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.setMediaPath('../../../../data')
+mediaPath = os.path.join( os.path.dirname ( __file__), os.path.pardir)
+scene.setMediaPath(mediaPath)
+print "MEDIAPATH IS " + mediaPath
 scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('mesh', 'retarget/mesh')
