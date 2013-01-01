@@ -337,7 +337,7 @@ def retargetSetup(targetSkelName):
 	
 	
 	#outDir = '../../../../data/sbm-common/common-sk/motion/' + targetSkelName + '/';
-	outDir = '../../../../data/retarget/motion/' + targetSkelName + '/';
+	outDir = scene.getMediaPath() + '/' + 'retarget/motion/' + targetSkelName + '/';
 	print 'outDir = ' + outDir ;
 	if not os.path.exists(outDir):
 		os.makedirs(outDir)
