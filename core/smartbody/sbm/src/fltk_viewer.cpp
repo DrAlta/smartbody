@@ -2933,10 +2933,10 @@ void FltkViewer::drawGrid()
 {
 	if (_data->gridMode == ModeNoGrid)
 		return;
-//	if( gridList != -1 )	{
-//		glCallList( gridList );
-//		return;
-//	}
+	if( gridList != -1 )	{
+		glCallList( gridList );
+		return;
+	}
 
 	GLfloat floor_height = 0.0f;
 

@@ -377,13 +377,15 @@ void BaseWindow::resetWindow()
 
 void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 {
-	const char* seqFile = fl_file_chooser("Load file:", "*.py", NULL);
+	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+
+	const char* seqFile = fl_file_chooser("Load file:", "*.py", mediaPath.c_str());
 	if (!seqFile)
 		return;
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.reset();
-	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+
 	if (mediaPath != "")
 		SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
 	std::string filebasename = boost::filesystem::basename(seqFile);
@@ -397,7 +399,9 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
 {
-	const char* saveFile = fl_file_chooser("Save file:", "*.py", NULL);
+	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+
+	const char* saveFile = fl_file_chooser("Save file:", "*.py", mediaPath.c_str());
 	if (!saveFile)
 		return;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
