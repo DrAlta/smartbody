@@ -5,7 +5,6 @@ print "|       Starting Facial Movement Demo        |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.setMediaPath('../../../../data')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')

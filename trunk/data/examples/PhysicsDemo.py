@@ -4,7 +4,6 @@ print "|          Starting Physics Demo             |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.setMediaPath('../../../../data')
 scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('mesh', 'retarget/mesh')
@@ -200,7 +199,7 @@ def boxingLogic():
 			bml.execBML('brad2', '<sbm:reach sbm:action="touch" sbm:reach-finish="true" sbm:reach-type="right" target="pawn3"/>')
 		if randDodge == 2:
 			phyManager.getPhysicsCharacter('doctor').setBoolAttribute('enable', False)
-			bml.execBML('doctor', '<animation name="ChrUtah_Relax001_CrouchProtectHead_right"/>')
+			#bml.execBML('doctor', '<animation name="ChrUtah_Relax001_CrouchProtectHead_right"/>')
 		currentTurn = 'doctor'
 	# Doctor's turn, toggle physics and play reach
 	elif currentTurn == 'doctor':
@@ -215,7 +214,7 @@ def boxingLogic():
 			bml.execBML('doctor', '<sbm:reach sbm:action="touch" sbm:reach-finish="true" sbm:reach-type="left" target="pawn5"/>')
 		if randDodge == 2:
 			phyManager.getPhysicsCharacter('brad2').setBoolAttribute('enable', False)
-			bml.execBML('brad2', '<animation name="ChrUtah_Relax001_CrouchProtectHead_right"/>')
+			#bml.execBML('brad2', '<animation name="ChrUtah_Relax001_CrouchProtectHead_right"/>')
 		currentTurn = 'brad2'
 		
 class CollisionHandler(EventHandler):

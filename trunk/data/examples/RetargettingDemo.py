@@ -3,7 +3,6 @@ print "|        Starting Retargetting Demo          |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.setMediaPath('../../../../data')
 scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('mesh', 'retarget/mesh')
@@ -53,8 +52,10 @@ scene.run('motion-retarget.py')
 print 'About to run retargetting'
 motion = scene.getMotion('ChrBrad@Guitar01')
 motion.scale(100)
-retargetMotionWithGuessMap('ChrBrad@Guitar01', 'ChrBrad.sk', 'common.sk', '../../../../data/sbm-common/common-sk/retargetMotion/')
+retargetMotionWithGuessMap('ChrBrad@Guitar01', 'ChrBrad.sk', 'common.sk', scene.getMediaPath() + '/' + 'sbm-common/common-sk/retargetMotion/')
 output = 'common.skChrBrad@Guitar01'
+retargetedMotion = scene.getMotion(output)
+retargetedMotion.scale(.01)
 	
 last = 0
 canTime = True

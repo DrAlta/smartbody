@@ -6,7 +6,6 @@ print "|--------------------------------------------|"
 
 scene.setScale(1.0)
 # Add asset paths
-scene.setMediaPath('../../../../data')
 scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('script', 'sbm-common/scripts/behaviorsets')
 scene.addAssetPath('mesh', 'mesh')

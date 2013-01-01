@@ -4,7 +4,6 @@ print "|        Starting Physics Pawn Demo          |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.setMediaPath('../../../../data')
 scene.addAssetPath('script', 'sbm-common/scripts')
 scene.loadAssets()
 
