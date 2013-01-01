@@ -5,10 +5,10 @@ print "|--------------------------------------------|"
 scene.run("default-viewer.py")
 
 ### Load data/sbm-common assets
-scene.addAssetPath("seq", "../../../../data/sbm-common/scripts")
-scene.addAssetPath("seq", "../../../../data/sbm-test/scripts")
-scene.addAssetPath("mesh", "../../../../data/mesh")
-scene.addAssetPath("mesh", "../../../../data/retarget/mesh")
+scene.addAssetPath("seq", "sbm-common/scripts")
+scene.addAssetPath("seq", "sbm-test/scripts")
+scene.addAssetPath("mesh", "mesh")
+scene.addAssetPath("mesh", "retarget/mesh")
 
 scene.run("init-common-assets.py")
 scene.run("init-common-face.py")

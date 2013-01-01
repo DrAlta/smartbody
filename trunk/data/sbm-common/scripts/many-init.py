@@ -6,9 +6,9 @@ scene.run("default-viewer.py")
 
 ### Load data/sbm-common assets
 ### Assumes current directory is: core/smartbody/sbm/bin
-scene.addAssetPath("seq", "../../../../data/sbm-common/scripts")
-scene.addAssetPath("seq", "../../../../data/sbm-test/scripts")
-scene.addAssetPath("mesh", "../../../../data/mesh")
+scene.addAssetPath("seq", "sbm-common/scripts")
+scene.addAssetPath("seq", "sbm-test/scripts")
+scene.addAssetPath("mesh", "mesh")
 
 scene.run("init-common-assets.py")
 #0	seq init-general-parameters

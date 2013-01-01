@@ -3,7 +3,6 @@ print "|  data/sbm-common/scripts/bradrachel.py  |"
 print "|--------------------------------------------|"
 
 scene.run("motion-retarget.py")
-scene.setMediaPath("../../../../data")
 ### Load data/sbm-common assets
 scene.addAssetPath("script", "sbm-common/scripts")
 scene.addAssetPath("mesh", "mesh")
@@ -36,7 +35,7 @@ zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
 
 scene.addAssetPath("motion", "ChrRachel")
 scene.addAssetPath("motion", "ChrBrad")
-scene.addAssetPath("motion", "retarget\motion")
+scene.addAssetPath("motion", "retarget/motion")
 scene.addAssetPath("motion", "sbm-common/common-sk")
 scene.loadAssets()
 
@@ -306,6 +305,7 @@ steerManager.setEnable(False)
 brad.setBoolAttribute("steering.pathFollowingMode", True)
 rachel.setBoolAttribute("steering.pathFollowingMode", True)
 
+#scene.run("runNVBG.py")
 # start the simulation
 sim.start()
 
