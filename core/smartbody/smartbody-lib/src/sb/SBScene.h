@@ -5,6 +5,8 @@
 #include <sb/SBObject.h>
 #include <sb/SBScript.h>
 
+#include <map>
+
 class SBDebuggerServer;
 class SBDebuggerClient;
 class SBDebuggerUtility;
@@ -150,6 +152,12 @@ class SBScene : public SBObject
 
 		SBAPI void notify(SBSubject* subject);
 
+		SBAPI static void setSystemParameter(const std::string& name, const std::string& value);
+		SBAPI static std::string getSystemParameter(const std::string& name);
+		SBAPI static void removeSystemParameter(const std::string& name);
+		SBAPI static void removeAllSystemParameters();
+		SBAPI static std::vector<std::string> getSystemParameterNames();
+
 	protected:
 		SBSimulationManager* _sim;
 		SBProfiler* _profiler;
@@ -180,6 +188,7 @@ class SBScene : public SBObject
 		SBDebuggerUtility*	_debuggerUtility;
 
 		static SBScene* _scene;
+		static std::map<std::string, std::string> _systemParameters;
 };
 
 SBScene* getScene();

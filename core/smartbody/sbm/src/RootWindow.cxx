@@ -383,6 +383,9 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.reset();
+	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+	if (mediaPath != "")
+		SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
 	std::string filebasename = boost::filesystem::basename(seqFile);
 	std::string fileextension = boost::filesystem::extension(seqFile);
 	std::string fullfilename = std::string(seqFile);
@@ -490,6 +493,10 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		mcu.reset();
+		std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+		if (mediaPath != "")
+			SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
+		
 		CameraResetCB(widget, data);
 	}
 }

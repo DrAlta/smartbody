@@ -65,8 +65,9 @@ namespace SteerLib {
 			 */
 
 			if (_numItems >= maxItems) {
-				_gridCellMutex.unlock();			
-				throw Util::GenericException("There are too many items in a single cell of the grid database.\nIn the next version, this will be handled robstly and not be an error.\nFor now, use a higher number for maxItemsPerGridCell (in the config file), or\nincrease the resolution of the grid (both of which may decrease performance).");
+
+				//_gridCellMutex.unlock();			
+				//throw Util::GenericException("There are too many items in a single cell of the grid database.\nIn the next version, this will be handled robstly and not be an error.\nFor now, use a higher number for maxItemsPerGridCell (in the config file), or\nincrease the resolution of the grid (both of which may decrease performance).");
 			}
 			_numItems++;
 			unsigned int i=0;
@@ -87,14 +88,16 @@ namespace SteerLib {
 
 			if (_numItems <= 0) {
 				_gridCellMutex.unlock();
-				throw Util::GenericException("Tried to remove an object from a grid cell, but the grid cell was empty.");
+				//throw Util::GenericException("Tried to remove an object from a grid cell, but the grid cell was empty.");
+				return;
 			}
 			_numItems--;
 			unsigned int i=0;
 			while ((_items[i] != entry) && (i<maxItems)) i++;
 			if (i >= maxItems) {
 				_gridCellMutex.unlock();
-				throw Util::GenericException("Tried to remove an object from a grid cell, but it did not exist there in the first place.");
+				//throw Util::GenericException("Tried to remove an object from a grid cell, but it did not exist there in the first place.");
+				return;
 			}
 			_items[i] = NULL;
 
