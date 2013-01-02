@@ -26,7 +26,7 @@
 
 #include <FL/gl.h>
 #include <cstring>
-#include <SB/SBScene.h>
+#include <sb/SBScene.h>
 
 
 GlChartViewCoordinate::GlChartViewCoordinate()
