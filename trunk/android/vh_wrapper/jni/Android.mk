@@ -51,7 +51,7 @@ LOCAL_SRC_FILES := $(SBM_PATH)/../smartbody-dll/smartbody-dll.cpp \
 #LOCAL_LDLIBS    := -llog -lOpenSLES  -fuse-ld=gold
 LOCAL_LDLIBS    := -llog -lOpenSLES
 #LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile alut festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt cerevoice-eng cerevoice-pmod cerehts cerevoice python-prebuilt 
-LOCAL_STATIC_LIBRARIES := sbm xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile alut festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt python-prebuilt 
+LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile alut festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt python-prebuilt 
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
 include $(BUILD_SHARED_LIBRARY) 
 
