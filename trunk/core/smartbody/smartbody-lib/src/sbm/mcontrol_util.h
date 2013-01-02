@@ -197,7 +197,6 @@ class mcuCBHandle {
 		bool        updatePhysics;
 		bool		sendPawnUpdates; // if true, sends the pawn information over bonebus in the same wasy as the characters
 		bool        resourceDataChanged;
-		std::string speech_audiofile_base_path;
 		std::string process_id;
 		bool		play_internal_audio;	
 		SmartBody::SBScene*     _scene;

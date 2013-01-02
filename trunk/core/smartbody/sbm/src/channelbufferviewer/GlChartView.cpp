@@ -28,6 +28,7 @@
 #include <FL/gl.h>
 
 #include <sr/sr_gl.h>
+#include <SB/SBScene.h>
 
 
 GlChartView::GlChartView(int x, int y, int w, int h, char* name) : Fl_Gl_Window( x, y, w, h, name ), SrViewer(x, y, w, h, name)
@@ -98,7 +99,9 @@ void GlChartView::initFont()
 	glGenTextures(0, &textureName);
 
 #ifdef WIN32
-	if (!label.Create("../../../../data/fonts/font.glf", 0))
+	std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
+	std::string fontPath = mediaPath + "/" +  "fonts/font.glf";
+	if (!label.Create(fontPath.c_str(), 0))
 	{
 		if(!label.Create(".font.glf", 0))
 			LOG("GlChartViewCoordinate::InitFont(): Error: Cannot load font file\n");

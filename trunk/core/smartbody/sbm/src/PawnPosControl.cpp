@@ -11,7 +11,7 @@
 #include <sr/sr_sn_group.h>
 #include <sr/sr_sa_gl_render.h>
 #include <sr/sr_gl_render_funcs.h>
-
+#include <sb/SBScene.h>
 
 void PawnControl::init_font()
 {	
@@ -21,7 +21,9 @@ void PawnControl::init_font()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glGenTextures(0, &textureName);
 #ifdef WIN32
-	if (!label.Create("../../../../data/fonts/font.glf", 0))
+	std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
+	std::string fontPath = mediaPath + "/" +  "fonts/font.glf";
+	if (!label.Create(fontPath.c_str(), 0))
 	{
 		if(!label.Create(".font.glf", 0))
 			LOG("PawnPosControl::InitFont(): Error: Cannot load font file\n");
