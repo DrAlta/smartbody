@@ -26,6 +26,7 @@
 
 #include <FL/gl.h>
 #include <cstring>
+#include <SB/SBScene.h>
 
 
 GlChartViewCoordinate::GlChartViewCoordinate()
@@ -73,7 +74,9 @@ void GlChartViewCoordinate::InitFont()
 	glGenTextures(0, &textureName);
 
 #ifdef WIN32
-	if (!label.Create("../../../../data/fonts/font.glf", 0))
+	std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
+	std::string fontPath = mediaPath + "/" +  "fonts/font.glf";
+	if (!label.Create(fontPath.c_str(), 0))
 	{
 		if(!label.Create(".font.glf", 0))
 			LOG("GlChartViewCoordinate::InitFont(): Error: Cannot load font file\n");

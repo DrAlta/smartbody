@@ -25,7 +25,10 @@ RetargetCreatorWindow::RetargetCreatorWindow(int x, int y, int w, int h, char* n
 	_buttonDirChoose = new Fl_Button(350, 80, 120, 25, "Output Dir");
 	_buttonDirChoose->callback(OnDirChooseCB, this);
 	_curOutputDir    = new Fl_Input(480, 80, 250, 25);
-	_curOutputDir->value("../../../../data/sbm-common/common-sk/retargetMotion/");
+
+	std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
+	std::string outputPath = mediaPath + "/" +  "sbm-common/common-sk/retargetMotion/";
+	_curOutputDir->value(outputPath.c_str());
 	//_curOutputDir->deactivate();
 
 	_buttonAssetDirChoose = new Fl_Button(350, 120, 120, 25, "Add Asset Dir");
@@ -33,8 +36,7 @@ RetargetCreatorWindow::RetargetCreatorWindow(int x, int y, int w, int h, char* n
 
 	_buttonAssetDirChoose = new Fl_Button(350, 150, 120, 25, "Remove Asset Dir");
 	_buttonAssetDirChoose->callback(OnAssetDirRemoveCB, this);
-	//_curAssetDir    = new Fl_Input(450, 120, 250, 25);
-	//_curAssetDir->value("../../../../data/");
+
 	_assetDirList = new Fl_Multi_Browser(480, 120, 250, 100, "Motion Asset Dirs");
 	_buttonRetarget  = new Fl_Button(350, 280, 100, 25, "Retarget");
 	_buttonRetarget->callback(OnRetargetCB, this);
@@ -110,7 +112,7 @@ void RetargetCreatorWindow::OnDirChooseCB( Fl_Widget* widget, void* data )
 void RetargetCreatorWindow::OnAssetDirChooseCB( Fl_Widget* widget, void* data )
 {
 	RetargetCreatorWindow* viewer = (RetargetCreatorWindow*) data;
-	const char* assetDir = fl_dir_chooser("Add Asset Dir", defaultAssetDir.c_str(), 1);
+	const char* assetDir = fl_dir_chooser("Add Asset Dir", SmartBody::SBScene::getScene()->getMediaPath().c_str(), 1);
 	if (!assetDir)
 		return;
 	//viewer->_curAssetDir->value(assetDir);

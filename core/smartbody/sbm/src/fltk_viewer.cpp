@@ -2226,8 +2226,9 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		bool hasMesh = false;
 		bool hasSkeleton = false;
 		// copy the file over
-		std::string meshDir = "../../../../data/retarget/mesh/";
-		std::string retargetDir = "../../../../data/retarget/";
+		std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
+		std::string meshDir = mediaPath + "/" +  "retarget/mesh/";
+		std::string retargetDir = mediaPath + "/" + "retarget/";
 
 		// create the folder if they do not exist
 		if (!boost::filesystem::exists(retargetDir))
@@ -2484,15 +2485,67 @@ int FltkViewer::handle ( int event )
         //translate_event ( e, SrEvent::Keyboard, w(), h() );
         //break;
 
-	  case FL_KEYBOARD:
-        //SR_TRACE1 ( "Key Pressed : "<< Fl::event_key() <<" "<<fltk::event_text() );
+	  case FL_KEYDOWN:
+		  switch (Fl::event_key())
+		  {
+			case 'f': // frame selected object
+				{
+				SrBox sceneBox;
+				SrCamera* camera = SmartBody::getCamera();
+				
+				SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
+				if (selectedPawn)
+				{
+					SrBox box = selectedPawn->getSkeleton()->getBoundingBox();
+					sceneBox.extend(box);
+				}
+				else
+				{
+					std::vector<std::string> pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
+					for (std::vector<std::string>::iterator iter = pawnNames.begin();
+					iter != pawnNames.end();
+					iter++)
+					{
+						SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(*iter);
+						SrBox box = pawn->getSkeleton()->getBoundingBox();
+						sceneBox.extend(box);
+					}
+				}
+				
+				camera->view_all(sceneBox, camera->fovy);	
+				float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
+				float znear = 0.01f*scale;
+				float zfar = 100.0f*scale;
+				camera->setNearPlane(znear);
+				camera->setFarPlane(zfar);
+				}
+			break;
+			case FL_Delete: // delete selected object
+				SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
+				LOG("1");
+				if (selectedPawn)
+				{
+					SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(selectedPawn);
+					if (character)
+					{
+						SmartBody::SBScene::getScene()->removeCharacter(character->getName());
+						ret = 1;
+						LOG("2");
+					}
+					else
+					{
+						SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(selectedPawn);
+						SmartBody::SBScene::getScene()->removePawn(pawn->getName());
+						ret = 1;
+						LOG("3");
+					}
+				}
+				LOG("4");
+				break;
+		  }
+		break;
         //translate_keyboard_event ( e, SrEvent::Keyboard, w(), h());
         break;
-
-//      case FL_KEYBOARDBOARD:
-        //SR_TRACE1 ( "Key Pressed : "<< Fl::event_key() <<" "<<fltk::event_text() );
-//        translate_event ( e, SrEvent::Keyboard, w(), h() );
-     //   break;
 
       case FL_HIDE: // Called when the window is iconized
         { //SR_TRACE1 ( "Hide" );

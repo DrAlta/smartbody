@@ -633,8 +633,6 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		}
 	}
 
-	mcu.speech_audiofile_base_path = "../../../../";
-
 	mcu._scene->getDebuggerServer()->SetID("sbdesktop");
 
 
