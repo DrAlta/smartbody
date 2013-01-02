@@ -28,7 +28,7 @@
 #include <FL/gl.h>
 
 #include <sr/sr_gl.h>
-#include <SB/SBScene.h>
+#include <sb/SBScene.h>
 
 
 GlChartView::GlChartView(int x, int y, int w, int h, char* name) : Fl_Gl_Window( x, y, w, h, name ), SrViewer(x, y, w, h, name)
