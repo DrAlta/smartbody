@@ -34,7 +34,7 @@
 
 SkSkeleton::SkSkeleton () : SmartBody::SBObject()
 {
-	_name = "noname";
+	setName("noname");
 	_root = 0;
 	_coldetid = -1;       // index used in collision detection
 	_gmat_uptodate = false;
@@ -45,7 +45,7 @@ SkSkeleton::SkSkeleton () : SmartBody::SBObject()
 
 SkSkeleton::SkSkeleton (SkSkeleton* origSkel)  : SmartBody::SBObject()
 {
-	_name = origSkel->name();
+	setName(origSkel->getName());
 	_skfilename = origSkel->skfilename();
 	if (!origSkel->root())
 	{
@@ -98,7 +98,7 @@ void SkSkeleton::copy(SkSkeleton* origSkel)
 		LOG("Original skeleton has no root joint, cannot be copied.");
 		return;
 	}
-	_name = origSkel->name();
+	setName(origSkel->getName());
 	_skfilename = origSkel->skfilename();
 	setName(origSkel->getName());
 	

@@ -312,7 +312,7 @@ public:
 
 		// Remove skeletons
 		if( _skeleton )  // only one in this implementation
-			remove_skeleton( _skeleton->name() );
+			remove_skeleton( _skeleton->getName() );
 	}
 
 	SbmPawn* getPawn()

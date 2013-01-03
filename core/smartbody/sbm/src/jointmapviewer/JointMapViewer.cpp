@@ -398,7 +398,10 @@ void JointMapViewer::updateJointLists()
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSkeleton* skel = scene->getSkeleton(_skelName);
 	int tempY = scrollY;
-	std::vector<std::string> skelJointNames = skel->getJointNames();
+	
+	std::vector<std::string> skelJointNames;
+	if (skel)
+		skelJointNames = skel->getJointNames();
 	for (unsigned int i=0;i<_jointChoiceList.size();i++)
 	{
 		JointMapInputChoice* input = _jointChoiceList[i];

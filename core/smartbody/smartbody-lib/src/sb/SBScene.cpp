@@ -39,6 +39,8 @@
 #include <boost/foreach.hpp>
 #include <sbm/nvbg.h>
 #include <sbm/SBCharacterListener.h>
+#include <sbm/ParserBVH.h>
+
 
 namespace SmartBody {
 
@@ -783,6 +785,106 @@ void SBScene::loadAssets()
 	}
 }
 
+void SBScene::loadAsset(const std::string& assetPath)
+{
+	const std::string& mediaPath = this->getMediaPath();
+	boost::filesystem::path p( mediaPath );
+	boost::filesystem::path assetP( assetPath );
+
+	boost::filesystem::path abs_p = boost::filesystem::complete( assetP );	
+
+	if( boost::filesystem2::exists( abs_p ))
+	{
+		p = assetP;
+	}
+	else
+	{
+		p /= assetP;
+	}
+	boost::filesystem::path final = boost::filesystem::complete( p );
+	std::string finalPath = p.string();
+
+	// make sure the file exists and is readable
+	std::ifstream file(finalPath);
+	if (!file.good())
+	{
+		LOG("File %s cannot be read, asset will not be loaded.", finalPath.c_str());
+		return;
+	}
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+
+	std::string ext = boost::filesystem::extension( finalPath );
+	// determine the type of asset: skeleton, motion, mesh, texture, ...
+	if( _stricmp( ext.c_str(), ".skm" ) == 0)
+	{
+		FILE* myfile = fopen(finalPath.c_str(), "rt");
+		SrInput in( myfile );
+		SmartBody::SBMotion* motion = new SmartBody::SBMotion();
+		bool parseSuccessful = motion->load( in, 1.0 );
+		if (parseSuccessful)
+			mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motion->getName(), motion));
+		else
+			delete motion;
+		return;
+	}
+
+	if( _stricmp( ext.c_str(), ".bvh" ) == 0)
+	{
+		SmartBody::SBSkeleton* skeleton = new SmartBody::SBSkeleton();
+		SmartBody::SBMotion* motion = new SmartBody::SBMotion();
+		bool parseSuccessful = ParserBVH::parse(*skeleton, *motion, finalPath, file, 1.0);
+		if (parseSuccessful)
+		{
+			mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motion->getName(), motion));
+			mcu.skeleton_map.insert(std::pair<std::string, SkSkeleton*>(skeleton->getName(), skeleton));
+		}
+		else
+		{
+			delete motion;
+			delete skeleton;
+		}
+			
+		return;
+	}
+
+	if( _stricmp( ext.c_str(), ".sk" ) == 0)
+	{
+		FILE* myfile = fopen(finalPath.c_str(), "rt");
+		SrInput input(myfile);
+		SmartBody::SBSkeleton* skeleton = new SmartBody::SBSkeleton();
+		SkSkeleton* skel = skeleton;
+		if( skel->load( input, 1.0) )
+		{
+			mcu.skeleton_map.insert(std::pair<std::string, SkSkeleton*>(skeleton->getName(), skeleton));
+		}
+		else
+		{
+			delete skeleton;
+		}
+		return;
+	}
+
+	if( _stricmp( ext.c_str(), ".dae" ) == 0)
+	{
+
+	}
+
+	if( _stricmp( ext.c_str(), ".xml" ) == 0)
+	{
+
+	}
+
+	if( _stricmp( ext.c_str(), ".asf" ) == 0)
+	{
+
+	}
+	if( _stricmp( ext.c_str(), ".amc" ) == 0)
+	{
+
+	}
+}
+
 void SBScene::loadAssetsFromPath(const std::string& assetPath)
 {
 	const std::string& mediaPath = this->getMediaPath();
@@ -869,8 +971,19 @@ void SBScene::setDefaultRecipient(const std::string& recipient)
 
 SBSkeleton* SBScene::createSkeleton(const std::string& skeletonDefinition)
 {
-	SBSkeleton* skeleton = new SBSkeleton(skeletonDefinition);
+	SBSkeleton* skeleton = NULL;
+	SBSkeleton* templateSkeleton = this->getSkeleton(skeletonDefinition);
+	if (templateSkeleton)
+	{
+		skeleton = new SBSkeleton(templateSkeleton);
+	}
+	else
+	{
+		skeleton = new SBSkeleton(skeletonDefinition);
+	}
+
 	return skeleton;
+	
 }
 
 

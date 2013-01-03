@@ -44,7 +44,6 @@ class SkColdet;
 class SkSkeleton : public SmartBody::SBObject, public SrSharedClass
  { private :
     // basic data:
-	std::string _name;
 	std::string _skfilename;
     SkJoint* _root;
     std::vector<SkJoint*> _joints;
@@ -74,12 +73,6 @@ class SkSkeleton : public SmartBody::SBObject, public SrSharedClass
 
     /*! Destructor is public but pay attention to the use of ref()/unref() */
     virtual ~SkSkeleton ();
-
-    /*! Set a name for the skeleton */
-	void name ( const std::string&  s ) { _name = s; }
-
-    /*! Access to the skeleton name */
-	const std::string& name () { return _name; }
 
 	/*! Sets the filename used to load the skeleton, if any */
     void skfilename ( const char* s ) { _skfilename = s; }

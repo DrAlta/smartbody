@@ -1064,7 +1064,7 @@ void BehaviorWindow::processControllerRequest(BML::MeControllerRequest* controll
 		std::stringstream strstr;
 		if (joint)
 		{
-			strstr << joint->skeleton()->name() << "(" << x << ", " << y << ", " << z << ")";
+			strstr << joint->skeleton()->getName() << "(" << x << ", " << y << ", " << z << ")";
 			block->setName(strstr.str());
 		}
 		// gaze parameters

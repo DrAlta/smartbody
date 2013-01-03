@@ -182,12 +182,12 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 
 	if (_skeleton)
 	{		
-		ct_tree_p->remove_skeleton( _skeleton->name() );
+		ct_tree_p->remove_skeleton( _skeleton->getName() );
 		_skeleton->unref();
 	}
 	_skeleton = sk;
 	_skeleton->ref();	
-	ct_tree_p->add_skeleton( _skeleton->name(), _skeleton );	
+	ct_tree_p->add_skeleton( _skeleton->getName(), _skeleton );	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	if ( scene->getCharacterListener() )
 	{		
@@ -207,7 +207,7 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 
 int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 	if( _skeleton ) {
-		ct_tree_p->remove_skeleton( _skeleton->name() );
+		ct_tree_p->remove_skeleton( _skeleton->getName() );
 		_skeleton->unref();
 	}
 	_skeleton = new_skeleton_p;
@@ -216,7 +216,7 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 		if( init_skeleton()!=CMD_SUCCESS ) {
 			return CMD_FAILURE; 
 		}
-		ct_tree_p->add_skeleton( _skeleton->name(), _skeleton );
+		ct_tree_p->add_skeleton( _skeleton->getName(), _skeleton );
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		if (scene->getCharacterListener())

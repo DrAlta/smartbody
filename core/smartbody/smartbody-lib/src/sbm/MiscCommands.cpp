@@ -397,7 +397,7 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		SkSkeleton* skeleton = new SmartBody::SBSkeleton();
 		skeleton->ref();
 		string skel_name = pawn_name+"-skel";
-		skeleton->name( skel_name.c_str() );
+		skeleton->setName( skel_name);
 		// Init channels
 		skeleton->make_active_channels();
 		if (scene->getCharacterListener())
@@ -686,7 +686,7 @@ int create_remote_pawn_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 	SkSkeleton* skeleton = new SmartBody::SBSkeleton();
 	skeleton->ref();
 	std::string skel_name = pawn_and_attribute+"-skel";
-	skeleton->name( skel_name.c_str() );
+	skeleton->setName( skel_name.c_str() );
 	// Init channels
 	skeleton->make_active_channels();	
 

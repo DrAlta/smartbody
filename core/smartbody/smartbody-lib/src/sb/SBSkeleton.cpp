@@ -291,7 +291,7 @@ void SBSkeleton::_createSkelWithoutPreRot(SBSkeleton* TposeSk, SBSkeleton* newSk
 	newSk->copy(TposeSk); // first copy
 	if(new_name || strlen(new_name)<1)
 	{
-		newSk->name(string(new_name));
+		newSk->setName(string(new_name));
 		SrString fname(TposeSk->skfilename().c_str());
 		fname.remove_file_name();
 		fname.append(new_name); 

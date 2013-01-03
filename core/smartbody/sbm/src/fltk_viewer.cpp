@@ -68,10 +68,12 @@
 # include <sbm/GPU/SbmDeformableMeshGPU.h>
 # include <sb/SBScene.h>
 # include <sb/SBSkeleton.h>
+# include <sb/SBCharacter.h>
 # include <sb/SBSteerManager.h>
 # include <sb/SBSteerAgent.h>
 # include <sb/SBAnimationStateManager.h>
 # include <sb/SBCollisionManager.h>
+# include <sb/SBJointMapManager.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -2271,26 +2273,52 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 			}
 		}
 		
-
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		
 		// load the new skeleton
- 		mcu.load_skeletons(retargetDir.c_str(), false);
+
+		boost::filesystem::path tempPath(retargetDir);
+		boost::filesystem::path completePath = boost::filesystem::complete( tempPath );	
+ 		scene->loadAsset(targetSkelFile);
  		//boost::filesystem::copy_file()
- 		SmartBody::SBSkeleton* skel = mcu._scene->getSkeleton(skelName);
- 		float yOffset = -skel->getBoundingBox().a.y;
- 		dest.y = yOffset;		
+
+		// create the joint mapping before creating the skeleton for the character
+		SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
+		SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(skelName);
+		if (!jointMap)
+		{
+			jointMap = jointMapManager->createJointMap(skelName);
+			jointMap->guessMapping(scene->getSkeleton(skelName), false);
+		}
+
+ 		SmartBody::SBSkeleton* skel = scene->createSkeleton(skelName);
+
 		std::stringstream strstr;
 		strstr << "defaultChar";
 		strstr << characterCount;
 		characterCount++;
 		std::string charName = strstr.str();
+
+		SmartBody::SBCharacter* character = scene->createCharacter(charName, "");
+		character->setSkeleton(skel);
+		
+
+ 		float yOffset = -skel->getBoundingBox().a.y;
+ 		dest.y = yOffset;		
+		character->setPosition(SrVec(dest.x,dest.y,dest.z));
+
+	/*
+		std::string charName = strstr.str();
 		sprintf(cmdStr,"createDragAndDropCharacter('%s','%s','%s',SrVec(%f,%f,%f))",charName.c_str(),skelName.c_str(),meshName.c_str(),
 			    dest.x,dest.y,dest.z);
+		->
+		
+			
 		
 		LOG("pythonCmd = %s",cmdStr);
 		mcu.executePythonFile("drag-and-drop.py");
 		mcu.executePython(cmdStr);
-
+		*/
 		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 1000, 740, "Retarget Step Window");
 		_retargetStepWindow->show();			
 		_retargetStepWindow->setCharacterName(charName);
