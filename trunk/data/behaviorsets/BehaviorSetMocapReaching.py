@@ -2,9 +2,9 @@ scene.run("BehaviorSetCommon.py")
 
 def setupBehaviorSet():
 	print "Setting up behavior set for gestures..."
-	scene.loadAssetsFromPath("../../../../data/behaviorsets/MocapReaching/skeletons")
-	scene.loadAssetsFromPath("../../../../data/behaviorsets/MocapReaching/motions")
-	scene.addAssetPath("script", "../../../../data/behaviorsets/MocapReaching/scripts")
+	scene.loadAssetsFromPath("behaviorsets/MocapReaching/skeletons")
+	scene.loadAssetsFromPath("behaviorsets/MocapReaching/motions")
+	scene.addAssetPath("script", "behaviorsets/MocapReaching/scripts")
 	# map the zebra2 skeleton
 	
 	scene.run("zebra2-map.py")
@@ -195,7 +195,7 @@ def retargetBehaviorSet(charName, skelName):
 	mocapReachMotions.append("HandsAtSide_LArm_GestureYou")
 	mocapReachMotions.append("HandsAtSide_RArm_GestureYou")
 	
-	outDir = '../../../../data/retarget/motion/' + skelName + '/';
+	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
 	print 'outDir = ' + outDir ;
 	if not os.path.exists(outDir):
 		os.makedirs(outDir)

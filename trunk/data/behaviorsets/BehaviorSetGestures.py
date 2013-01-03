@@ -2,9 +2,9 @@ scene.run("BehaviorSetCommon.py")
 
 def setupBehaviorSet():
 	print "Setting up behavior set for gestures..."
-	scene.loadAssetsFromPath("../../../../data/behaviorsets/Gestures/skeletons")
-	scene.loadAssetsFromPath("../../../../data/behaviorsets/Gestures/motions")
-	scene.addAssetPath("script", "../../../../data/behaviorsets/Gestures/scripts")
+	scene.loadAssetsFromPath("behaviorsets/Gestures/skeletons")
+	scene.loadAssetsFromPath("behaviorsets/Gestures/motions")
+	scene.addAssetPath("script", "behaviorsets/Gestures/scripts")
 	# map the zebra2 skeleton
 	scene.run("zebra2-map.py")
 	zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
@@ -97,7 +97,7 @@ def retargetBehaviorSet(charName, skelName):
 	gestureMotions.append("ChrBrad@Idle01_WeightShift02")
 	gestureMotions.append("ChrBrad@Idle01_YouLf01")
 	
-	outDir = '../../../../data/retarget/motion/' + skelName + '/';
+	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
 	print 'outDir = ' + outDir ;
 	if not os.path.exists(outDir):
 		os.makedirs(outDir)
