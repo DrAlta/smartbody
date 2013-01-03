@@ -74,6 +74,7 @@
 # include <sb/SBAnimationStateManager.h>
 # include <sb/SBCollisionManager.h>
 # include <sb/SBJointMapManager.h>
+# include <sb/SBBehaviorSetManager.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -2319,6 +2320,26 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		mcu.executePythonFile("drag-and-drop.py");
 		mcu.executePython(cmdStr);
 		*/
+
+
+		// load the behavior sets if they have not yet been loaded
+		SmartBody::SBBehaviorSetManager* manager = scene->getBehaviorSetManager();
+		if (manager->getNumBehaviorSets() == 0)
+		{
+			// look for the behavior set directory under the media path
+			scene->addAssetPath("script", "behaviorsets");
+			scene->runScript("default-behavior-sets.py");
+
+			if (manager->getNumBehaviorSets() == 0)
+			{
+				LOG("Can not find any behavior sets under path %s/behaviorsets.", scene->getMediaPath().c_str());
+			}
+			else
+			{
+				LOG("Found %d behavior sets under path %s/behaviorsets", manager->getNumBehaviorSets(), scene->getMediaPath().c_str());
+			}
+		}
+
 		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 1000, 740, "Retarget Step Window");
 		_retargetStepWindow->show();			
 		_retargetStepWindow->setCharacterName(charName);
