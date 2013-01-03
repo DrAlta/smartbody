@@ -36,6 +36,7 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 		_choiceSkeletons->add(skeletons[c].c_str());
 	}
 	curY += 45;
+	int choiceSize = _choiceSkeletons->size();
 
 
 	SmartBody::SBBehaviorSetManager* behavMgr = SmartBody::SBScene::getScene()->getBehaviorSetManager();
@@ -70,8 +71,8 @@ RetargetViewer::~RetargetViewer()
 
 void RetargetViewer::setCharacterName(const std::string& name)
 {
-	_charName = name;
-	for (int c = 0; c < _choiceCharacters->size(); c++)
+	_charName = name;	
+	for (int c = 0; c < _choiceCharacters->size()-1; c++)
 	{
 		if (name == _choiceCharacters->text(c))
 		{
@@ -83,9 +84,8 @@ void RetargetViewer::setCharacterName(const std::string& name)
 
 void RetargetViewer::setSkeletonName(const std::string& name)
 {
-	_skelName = name;
-	int choiceSize = _choiceSkeletons->size();
-	for (int c = 0; c < _choiceSkeletons->size(); c++)
+	_skelName = name;	
+	for (int c = 0; c < _choiceSkeletons->size()-1; c++)
 	{
 		std::string choiceName = _choiceSkeletons->text(c);
 		if (name == choiceName)

@@ -815,6 +815,8 @@ void SBScene::loadAsset(const std::string& assetPath)
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 
 	std::string ext = boost::filesystem::extension( finalPath );
+	std::string baseName = boost::filesystem::basename( finalPath );
+	std::string fileName = baseName+ext;
 	// determine the type of asset: skeleton, motion, mesh, texture, ...
 	if( _stricmp( ext.c_str(), ".skm" ) == 0)
 	{
@@ -856,7 +858,10 @@ void SBScene::loadAsset(const std::string& assetPath)
 		SkSkeleton* skel = skeleton;
 		if( skel->load( input, 1.0) )
 		{
-			mcu.skeleton_map.insert(std::pair<std::string, SkSkeleton*>(skeleton->getName(), skeleton));
+			skeleton->ref();
+			skeleton->setFileName(fileName);
+			skeleton->setName(skeleton->getFileName());
+			mcu.skeleton_map.insert(std::pair<std::string, SkSkeleton*>(skel->getName(), skeleton));
 		}
 		else
 		{
