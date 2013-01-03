@@ -38,6 +38,7 @@ class SkScene : public SrSnGroup
  { private :
     SrArray<SrSnGroup*> _jgroup;
     float _cradius, _sfactor, _axislen;
+	float scaleFactor;
     SkSkeleton* _skeleton;
 
    public :
@@ -98,7 +99,7 @@ class SkScene : public SrSnGroup
     void set_geometry_style ( SkJoint* j, SrModel* m, srRenderMode mode, bool mark, int alpha=-1 );
     
     /*! Get the default values for the skeleton radius and axis length */
-    static void get_defaults ( float& sradius, float& alen );
+    void get_defaults ( float& sradius, float& alen );
  };
 
 
