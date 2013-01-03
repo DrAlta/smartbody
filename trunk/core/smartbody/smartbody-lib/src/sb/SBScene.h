@@ -101,6 +101,7 @@ class SBScene : public SBObject
 		SBAPI void removeAssetPath(const std::string& type, const std::string& path);
 		SBAPI void removeAllAssetPaths(const std::string& type);
 		SBAPI void loadAssets();
+		SBAPI void loadAsset(const std::string& assetPath);
 		SBAPI void loadAssetsFromPath(const std::string& assetPath);
 		SBAPI void loadMotions();
 		SBAPI void addPose(const std::string& path, bool recursive);

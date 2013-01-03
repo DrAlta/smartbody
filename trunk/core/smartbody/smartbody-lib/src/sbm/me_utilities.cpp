@@ -139,7 +139,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, SBResou
 		SkMotion motion;
 		ParserOpenCOLLADA::parse(*skeleton_p, motion, filename, float(scale), true, false);
 		skeleton_p->skfilename(filename.c_str());
-		skeleton_p->name(skel_file);
+		skeleton_p->setName(skel_file);
 	}
 	else if (filename.find(".skeleton.xml") == (filename.size() - 13) || 
 			 filename.find(".SKELETON.XML") == (filename.size() - 13))
@@ -150,7 +150,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, SBResou
 		motions.push_back(&motion);
 		ParserOgre::parse(*skeleton_p, motions, filename, float(scale), true, false);
 		skeleton_p->skfilename(filename.c_str());
-		skeleton_p->name(skel_file);
+		skeleton_p->setName(skel_file);
 	}
 #if ENABLE_FBX_PARSER
 	else if (filename.find(".fbx") == (filename.size() - 4) || 
@@ -592,7 +592,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 
 		skeleton->ref();
 		skeleton->skfilename(pathname.string().c_str());	
-		skeleton->name(skeleton->skfilename());
+		skeleton->setName(skeleton->skfilename());
 		SBResourceManager* manager = SBResourceManager::getResourceManager();
 		SkeletonResource* skelRes = new SkeletonResource();
 		skelRes->setType("skm");
@@ -771,7 +771,7 @@ int load_me_skeleton_individual( SrInput & input, const std::string & skeletonNa
 
 
 	skeleton->skfilename(skeletonName.c_str());
-	skeleton->name(skeleton->skfilename());
+	skeleton->setName(skeleton->skfilename());
 	SBResourceManager* manager = SBResourceManager::getResourceManager();
 	SkeletonResource* skelRes = new SkeletonResource();
 	skelRes->setType("skm");

@@ -84,9 +84,11 @@ void RetargetViewer::setCharacterName(const std::string& name)
 void RetargetViewer::setSkeletonName(const std::string& name)
 {
 	_skelName = name;
+	int choiceSize = _choiceSkeletons->size();
 	for (int c = 0; c < _choiceSkeletons->size(); c++)
 	{
-		if (name == _choiceSkeletons->text(c))
+		std::string choiceName = _choiceSkeletons->text(c);
+		if (name == choiceName)
 		{
 			_choiceSkeletons->value(c);
 			break;

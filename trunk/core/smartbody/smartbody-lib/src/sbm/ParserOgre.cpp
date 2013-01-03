@@ -185,7 +185,7 @@ bool ParserOgre::parse(SkSkeleton& skeleton, std::vector<SkMotion*>& motions, st
 			strstr << filebasename << fileextension;
 		else
 			strstr << filebasename << "." << fileextension;
-		skeleton.name(strstr.str().c_str());
+		skeleton.setName(strstr.str().c_str());
 		parser->parse(pathName.c_str());
 		DOMDocument* doc = parser->getDocument();
 

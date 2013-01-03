@@ -108,7 +108,7 @@ void SkScene::init ( SkSkeleton* s, float scale )
    SrSnGroup* g = make_joint_group ( root, s, _jgroup );
    if (!g)
    {
-	   LOG("Skeleton %s cannot be added to the scene.", _skeleton->name().c_str());
+	   LOG("Skeleton %s cannot be added to the scene.", _skeleton->getName().c_str());
 	   return;
    }
    g->separator ( true );
