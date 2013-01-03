@@ -724,9 +724,8 @@ int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map
 	path motions_path(pathname);
 	
 	path finalPath;
-	// include the media path in the pathname if applicable
-	path absPath = boost::filesystem::complete( motions_path );
-	std::string rootDir = absPath.root_directory();
+
+	std::string rootDir = motions_path.root_directory();
 	if (rootDir.size() == 0)
 	{	
 		std::string mediaPath = mcuCBHandle::singleton().getMediaPath();
@@ -787,8 +786,8 @@ int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>&
 	
 	path finalPath;
 	// include the media path in the pathname if applicable
-	path absPath = boost::filesystem::complete( motions_path );
-	std::string rootDir = absPath.root_directory();
+	
+	std::string rootDir = motions_path.root_directory();
 	if (rootDir.size() == 0)
 	{		
 		finalPath = operator/(mcuCBHandle::singleton().getMediaPath(), motions_path);
