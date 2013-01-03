@@ -107,7 +107,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				{
 					str = strtok(NULL, " ");
 					if (str != NULL)
-						skeleton.name(str);
+						skeleton.setName(str);
 					state = 2;
 				}
 				else

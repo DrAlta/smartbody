@@ -805,7 +805,7 @@ void SBScene::loadAsset(const std::string& assetPath)
 	std::string finalPath = p.string();
 
 	// make sure the file exists and is readable
-	std::ifstream file(finalPath);
+	std::ifstream file(finalPath.c_str());
 	if (!file.good())
 	{
 		LOG("File %s cannot be read, asset will not be loaded.", finalPath.c_str());
