@@ -187,6 +187,7 @@ public:
 
 	virtual void createStandardControllers();
 
+	void createReachEngine();
 	//* Overrides SbmPawn::prune_controller_tree()
 	virtual int prune_controller_tree();
 

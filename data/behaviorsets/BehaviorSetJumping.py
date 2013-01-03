@@ -1,7 +1,7 @@
 scene.run("BehaviorSetCommon.py")
 
 def setupBehaviorSet():
-	print "Setting up behavior set for Female Locomotion..."
+	print "Setting up behavior set for Jumping..."
 	scene.loadAssetsFromPath("behaviorsets/jumping/skeletons")
 	scene.loadAssetsFromPath("behaviorsets/jumping/motions")
 	scene.addAssetPath("script", "behaviorsets/jumping/scripts")
