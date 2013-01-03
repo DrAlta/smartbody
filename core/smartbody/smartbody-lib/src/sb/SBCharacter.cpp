@@ -30,6 +30,9 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createDoubleAttribute("gestureRequest.gestureSpeedThreshold", 1.5, true, "Basic", 95, false, false, false, "The speed threshold used to determine whether it's suitable to transition from one gesture to another"); 
 	createDoubleAttribute("gestureRequest.gestureWristActiveThreshold", 0.15, true, "Basic", 96, false, false, false, "The speed threshold used to determine if this hand moving."); 
 	createStringAttribute("gestureMap", "", true, "Basic", 50, false, false, false, "Name of the gesture map to use.");
+	createStringAttribute("gestureMapMeek", "", true, "Basic", 51, false, false, false, "Name of the gesture map to use that is meek.");
+	createStringAttribute("gestureMapEmphatic", "", true, "Basic", 52, false, false, false, "Name of the gesture map to use that is emphatic.");
+
 
 	std::vector<std::string> gesturePolicyVec;
 	gesturePolicyVec.push_back("random");

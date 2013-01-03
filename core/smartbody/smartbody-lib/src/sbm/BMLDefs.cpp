@@ -27,6 +27,7 @@ XMLCh* BMLDefs::ATTR_SCALE = NULL;
 XMLCh* BMLDefs::ATTR_FREQUENCY = NULL;
 XMLCh* BMLDefs::ATTR_PRIORITY = NULL;
 XMLCh* BMLDefs::ATTR_GROUP = NULL;
+XMLCh* BMLDefs::ATTR_EMOTION = NULL;
 
 XMLCh* BMLDefs::TM_START = NULL;
 XMLCh* BMLDefs::TM_READY = NULL;
@@ -388,6 +389,7 @@ BMLDefs::BMLDefs()
 	ATTR_FREQUENCY = XMLString::transcode("sbm:frequency");
 	ATTR_PRIORITY = XMLString::transcode("priority");
 	ATTR_GROUP = XMLString::transcode("group");
+	ATTR_EMOTION = XMLString::transcode("emotion");
 
 	TM_START = XMLString::transcode("start");
 	TM_READY = XMLString::transcode("ready");

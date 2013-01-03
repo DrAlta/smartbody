@@ -36,6 +36,7 @@ class BMLDefs
 		static XMLCh* ATTR_FREQUENCY;
 		static XMLCh* ATTR_PRIORITY;
 		static XMLCh* ATTR_GROUP;
+		static XMLCh* ATTR_EMOTION;
 
 		static XMLCh* TM_START;
 		static XMLCh* TM_READY;

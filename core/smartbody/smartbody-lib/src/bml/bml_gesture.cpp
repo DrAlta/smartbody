@@ -44,8 +44,24 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 	xml_utils::xml_translate(&mode, modeAttr);
 	xml_utils::xml_translate(&style, styleAttr);
 
+	std::string emotion = xml_utils::xml_parse_string(BMLDefs::ATTR_EMOTION, elem, "neutral");
+	GestureRequest::EmotionTag tag = GestureRequest::NEUTRAL;
+	if (emotion == "sad")
+		tag = GestureRequest::MEEK;
+	else if (emotion == "angry")
+		tag = GestureRequest::EMPHATIC;
+	else
+		tag = GestureRequest::NEUTRAL;
+
 	SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(request->actor);
-	const std::string& gestureMapName = character->getStringAttribute("gestureMap");
+	std::string gestureMapName = "";
+	if (tag == GestureRequest::EMPHATIC)
+		gestureMapName = character->getStringAttribute("gestureMapEmphatic");
+	if (tag == GestureRequest::MEEK)
+		gestureMapName = character->getStringAttribute("gestureMapMeek");
+	if (gestureMapName == "")
+		gestureMapName = character->getStringAttribute("gestureMap");
+
 	std::vector<std::string> animationList;
 	if (animationName == "")	// If you have assigned the animation name, do not look for the map
 	{
@@ -163,7 +179,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		}
 
 		int priority = xml_utils::xml_parse_int(BMLDefs::ATTR_PRIORITY, elem, 0);
-		BehaviorRequestPtr behavPtr(new GestureRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs, animationList, joints, scale, freq, priority) );
+		BehaviorRequestPtr behavPtr(new GestureRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs, animationList, joints, scale, freq, priority, tag) );
 		return behavPtr; 
 	} 
 	else 
