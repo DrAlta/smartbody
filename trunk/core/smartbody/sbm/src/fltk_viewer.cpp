@@ -2302,6 +2302,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 
 		SmartBody::SBCharacter* character = scene->createCharacter(charName, "");
 		character->setSkeleton(skel);
+		character->createStandardControllers();
 		
 
  		float yOffset = -skel->getBoundingBox().a.y;
