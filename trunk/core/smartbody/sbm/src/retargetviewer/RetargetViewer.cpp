@@ -26,6 +26,7 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	{
 		_choiceCharacters->add(characters[c].c_str());
 	}
+	_choiceCharacters->callback(CharacterCB,this);
 	curY += 25;
 
 	_choiceSkeletons = new Fl_Choice(110, curY, 150, 20, "Skeleton");
@@ -35,6 +36,7 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	{
 		_choiceSkeletons->add(skeletons[c].c_str());
 	}
+	_choiceSkeletons->callback(SkeletonCB,this);
 	curY += 45;
 	int choiceSize = _choiceSkeletons->size();
 
@@ -128,8 +130,8 @@ void RetargetViewer::RetargetCB(Fl_Widget* widget, void* data)
 		{
 			if (check->value())
 			{
-				SmartBody::SBBehaviorSet* behavSet = behavMgr->getBehaviorSet(check->label());
-				if (behavSet)
+				SmartBody::SBBehaviorSet* behavSet = behavMgr->getBehaviorSet(check->label());				
+				if (behavSet && viewer->getCharacterName() != "" && viewer->getSkeletonName() != "")
 				{
 					LOG("Retargetting %s on %s with %s...", check->label(), viewer->getCharacterName().c_str(), viewer->getSkeletonName().c_str());
 					const std::string& script = behavSet->getScript();
@@ -152,4 +154,18 @@ void RetargetViewer::CancelCB(Fl_Widget* widget, void* data)
 	RetargetViewer* viewer = (RetargetViewer*) data;
 
 	viewer->hide();
+}
+
+void RetargetViewer::CharacterCB( Fl_Widget* widget, void* data )
+{
+	RetargetViewer* viewer = (RetargetViewer*) data;	
+	Fl_Choice* charChoice = dynamic_cast<Fl_Choice*>(widget);	
+	viewer->setCharacterName(charChoice->text());
+}
+
+void RetargetViewer::SkeletonCB( Fl_Widget* widget, void* data )
+{
+	RetargetViewer* viewer = (RetargetViewer*) data;	
+	Fl_Choice* skelChoice = dynamic_cast<Fl_Choice*>(widget);	
+	viewer->setSkeletonName(skelChoice->text());
 }

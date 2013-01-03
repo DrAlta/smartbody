@@ -10,8 +10,8 @@ def Zebra2map():
 
     jointMapManager = scene.getJointMapManager()
     zebra2Map = jointMapManager.getJointMap("zebra2")
-	if zebra2Map == None:
-		zebra2Map = jointMapManager.createJointMap('zebra2')
+    if zebra2Map == None:
+        zebra2Map = jointMapManager.createJointMap('zebra2')
 
     # Core
     zebra2Map.setMapping("JtRoot", "base")

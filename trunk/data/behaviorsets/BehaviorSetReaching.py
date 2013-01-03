@@ -1,5 +1,11 @@
 scene.run("BehaviorSetCommon.py")
-
+def setupBehaviorSet():
+	print "Setting up behavior set for Reaching ..."
+	scene.loadAssetsFromPath("behaviorsets/reaching/skeletons")
+	scene.loadAssetsFromPath("behaviorsets/reaching/motions")
+	scene.addAssetPath("script", "behaviorsets/reaching/scripts")
+	
+	
 def retargetBehaviorSet(charName, skelName):
 	reachMotions = StringVec()
 	reachMotions.append("ChrHarmony_Relax001_ArmReachRtHigh")
@@ -31,6 +37,7 @@ def retargetBehaviorSet(charName, skelName):
 	reachMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Grasp")
 	reachMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Reach")
 	reachMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Release")
+	reachMotions.append("HandsAtSide_RArm_GestureYou")
 	
 	outDir = scene.getMediaPath() + 'retarget/motion/' + skelName + '/';
 	print 'outDir = ' + outDir ;
@@ -42,6 +49,4 @@ def retargetBehaviorSet(charName, skelName):
 		retargetMotion(reachMotions[n], 'common.sk', skelName, outDir + 'Reaching/');
 
 	scene.run("init-example-reach.py")
-	reachSetup(charName, KNN", skelName)
-
-		
+	reachSetup(charName, "KNN", skelName)	

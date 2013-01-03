@@ -112,4 +112,3 @@ def retargetBehaviorSet(charName, skelName):
 	steerManager.setEnable(False)
 	setupSteerAgent(charName, skelName)	
 	steerManager.setEnable(True)
-		

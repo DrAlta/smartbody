@@ -102,7 +102,9 @@ void SBReach::build(SBCharacter* character)
 	if (!_character)
 		return;
 
-	
+	// create the reach engine if the character does not have one.
+	_character->createReachEngine();
+
 	for (ReachEngineMap::iterator mi = _character->getReachEngineMap().begin();
 		mi != _character->getReachEngineMap().end();
 		mi++)

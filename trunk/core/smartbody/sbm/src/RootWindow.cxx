@@ -574,7 +574,7 @@ void BaseWindow::LaunchBehaviorSetsCB(Fl_Widget* widget, void* data)
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (!rootWindow->behaviorSetViewer)
 	{
-		rootWindow->behaviorSetViewer = new RetargetViewer(150, 150, 320, 320, "Behavior Sets");
+		rootWindow->behaviorSetViewer = new RetargetViewer(150, 150, 320, 520, "Behavior Sets");
 	}
 	rootWindow->behaviorSetViewer->show();
 }
@@ -586,7 +586,7 @@ void BaseWindow::LaunchJointMapViewerCB( Fl_Widget* widget, void* data )
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (!rootWindow->jointMapViewer)
 	{
-		rootWindow->jointMapViewer = new JointMapViewer(150, 150, 450, 600, "Joint Map Viewer");
+		rootWindow->jointMapViewer = new JointMapViewer(150, 150, 950, 600, "Joint Map Viewer");
 	}
 	rootWindow->jointMapViewer->show();
 }
