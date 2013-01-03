@@ -46,6 +46,7 @@ SkScene::SkScene ()
    _cradius = DEF_CYL_RADIUS;
    _sfactor = DEF_SPH_FACTOR;
    _axislen = DEF_AXIS_LEN;
+   scaleFactor = 1.f;
    _skeleton = 0;
  }
 
@@ -79,7 +80,7 @@ static SrSnGroup* make_joint_group ( const SkJoint* j, SkSkeleton* s, SrArray<Sr
    return g;
  }
 
-enum GroupPos { AxisPos=0, SpherePos=1, MatrixPos=2, GeoPos=3 };
+enum GroupPos { AxisPos=0, MatrixPos=1, SpherePos=2, GeoPos=3 };
 enum GeoGroupPos { VisgeoPos=0, ColgeoPos=1, FirstCylPos=2 };
 
 void SkScene::init ( SkSkeleton* s, float scale )
@@ -114,7 +115,7 @@ void SkScene::init ( SkSkeleton* s, float scale )
    g->separator ( true );
   
    float height = s->getCurrentHeight();
-   float scaleFactor =  height / 175.0f;
+   scaleFactor =  height / 175.0f;
    if (scaleFactor == 0.0f)
 	   scaleFactor = scale;
    axis = new SrSnLines; // shared axis
@@ -140,9 +141,12 @@ void SkScene::init ( SkSkeleton* s, float scale )
 	  SrSnGroup* group_p = _jgroup[i];
       group_p->add ( gaxis, AxisPos );
 
-	  sphere = createSphere(scaleFactor);
-      group_p->add ( sphere, SpherePos );
-      group_p->add ( new SrSnMatrix, MatrixPos );
+	  sphere = createSphere(scaleFactor);	 
+	  group_p->add ( new SrSnMatrix, MatrixPos );
+	  group_p->add ( sphere, SpherePos );
+	  
+	  
+      
 
       g = new SrSnGroup; // geometry group of the joint
       group_p->add ( g, GeoPos );
@@ -298,7 +302,7 @@ void SkScene::setJointRadius( SkJoint* joint, float radius )
 	i = joint->index();	
 	g = _jgroup[i];
 	sphere = (SrSnSphere*) g->get(SpherePos);
-	sphere->shape().radius = radius * _sfactor;		
+	sphere->shape().radius = radius * _sfactor * scaleFactor;		
 }
 
 void SkScene::setJointColor( SkJoint* joint, SrColor color )
@@ -439,8 +443,8 @@ void SkScene::unmark_all_geometries ()
 
 void SkScene::get_defaults ( float& sradius, float& alen )
  {
-   sradius = DEF_CYL_RADIUS;
-   alen = DEF_AXIS_LEN;
+   sradius = _cradius;
+   alen = _axislen;
  }
 
 SrSnSphere* SkScene::createSphere(float scaleFactor )
