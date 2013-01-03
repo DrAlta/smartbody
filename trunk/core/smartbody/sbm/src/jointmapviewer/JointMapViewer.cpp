@@ -605,8 +605,9 @@ void JointMapViewer::applyJointMap()
 		if (input)
 		{
 			std::string sourceName = input->label();
-			std::string targetName = input->value();		
-			jointMap->setMapping(sourceName, targetName);
+			std::string targetName = input->value();	
+			if (sourceName != "" && targetName != "")
+				jointMap->setMapping(sourceName, targetName);
 		}
 	}	
 	SmartBody::SBSkeleton* sceneSk = scene->getSkeleton(curChar->getSkeleton()->getName());

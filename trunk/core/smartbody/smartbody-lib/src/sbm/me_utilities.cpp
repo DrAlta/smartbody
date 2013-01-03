@@ -390,7 +390,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, SBResourceManager* manager, double scale, const char* error_prefix ) {
 		
 	if( !exists( pathname ) ) {
-		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
+		LOG("%s Skeleton path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
 		return CMD_FAILURE;
 	}
 
@@ -725,7 +725,8 @@ int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map
 	
 	path finalPath;
 	// include the media path in the pathname if applicable
-	std::string rootDir = motions_path.root_directory();
+	path absPath = boost::filesystem::complete( motions_path );
+	std::string rootDir = absPath.root_directory();
 	if (rootDir.size() == 0)
 	{	
 		std::string mediaPath = mcuCBHandle::singleton().getMediaPath();
@@ -786,7 +787,8 @@ int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>&
 	
 	path finalPath;
 	// include the media path in the pathname if applicable
-	std::string rootDir = motions_path.root_directory();
+	path absPath = boost::filesystem::complete( motions_path );
+	std::string rootDir = absPath.root_directory();
 	if (rootDir.size() == 0)
 	{		
 		finalPath = operator/(mcuCBHandle::singleton().getMediaPath(), motions_path);
