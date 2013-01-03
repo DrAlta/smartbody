@@ -64,7 +64,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 		return false;
 	}
 	char line[8192];
-	skeleton.name(name.c_str());
+	skeleton.setName(name);
 	int state = 0;
 	char* str = NULL;
 	stack<SkJoint*> stack;
