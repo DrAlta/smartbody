@@ -2,9 +2,9 @@ scene.run("BehaviorSetCommon.py")
 
 def setupBehaviorSet():
 	print "Setting up behavior set for MaleLocomotion..."
-	scene.loadAssetsFromPath("../../../../data/behaviorsets/MaleLocomotion/skeletons")
-	scene.loadAssetsFromPath("../../../../data/behaviorsets/MaleLocomotion/motions")
-	scene.addAssetPath("script", "../../../../data/behaviorsets/MaleLocomotion/scripts")
+	scene.loadAssetsFromPath("behaviorsets/MaleLocomotion/skeletons")
+	scene.loadAssetsFromPath("behaviorsets/MaleLocomotion/motions")
+	scene.addAssetPath("script", "behaviorsets/MaleLocomotion/scripts")
 
 def retargetBehaviorSet(charName, skelName):
 	locoMotions = StringVec()
@@ -43,7 +43,7 @@ def retargetBehaviorSet(charName, skelName):
 	locoMotions.append("ChrUtah_Idle01_StepForwardLf01")
 	locoMotions.append("ChrUtah_Idle01_StepSidewaysLf01")
 	
-	outDir = '../../../../data/retarget/motion/' + skelName + '/';
+	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
 	if not os.path.exists(outDir):
 		os.makedirs(outDir)
 		

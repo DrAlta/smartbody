@@ -2,9 +2,9 @@ scene.run("BehaviorSetCommon.py")
 
 def setupBehaviorSet():
 	print "Setting up behavior set for Female Locomotion..."
-	scene.loadAssetsFromPath("../../../../data/behaviorsets/jumping/skeletons")
-	scene.loadAssetsFromPath("../../../../data/behaviorsets/jumping/motions")
-	scene.addAssetPath("script", "../../../../data/behaviorsets/jumping/scripts")
+	scene.loadAssetsFromPath("behaviorsets/jumping/skeletons")
+	scene.loadAssetsFromPath("behaviorsets/jumping/motions")
+	scene.addAssetPath("script", "behaviorsets/jumping/scripts")
 	# map the Backovic skeleton
 	scene.run("zebra2-map.py")
 	zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
@@ -85,7 +85,7 @@ def retargetBehaviorSet(charName, skelName):
 	jumpMotions.append("ChrGarza@IdleStand01_JumpLeft90LowMid01"+"Rt")
 	jumpMotions.append("ChrGarza@IdleStand01_JumpLeft90LowNear01"+"Rt")	
 	
-	outDir = '../../../../data/retarget/motion/' + skelName + '/';
+	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
 	if not os.path.exists(outDir):
 		os.makedirs(outDir)
 	scene.loadAssetsFromPath(outDir+"jumping/")

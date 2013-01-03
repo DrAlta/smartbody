@@ -32,7 +32,7 @@ def retargetBehaviorSet(charName, skelName):
 	reachMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Reach")
 	reachMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Release")
 	
-	outDir = '../../../../data/retarget/motion/' + skelName + '/';
+	outDir = scene.getMediaPath() + 'retarget/motion/' + skelName + '/';
 	print 'outDir = ' + outDir ;
 	if not os.path.exists(outDir):
 		os.makedirs(outDir)
