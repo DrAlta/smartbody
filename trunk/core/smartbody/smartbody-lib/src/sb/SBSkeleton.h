@@ -30,6 +30,7 @@ public:
 	SBAPI SBJoint* getJoint(int index);		
 	SBAPI SBJoint* getJointByName(const std::string& jointName);
 	SBAPI std::vector<std::string> getJointNames();
+	SBAPI std::vector<std::string> getJointOriginalNames();
 	SBAPI std::vector<std::string> getUpperBodyJointNames();
 
 	SBAPI int getNumChannels();

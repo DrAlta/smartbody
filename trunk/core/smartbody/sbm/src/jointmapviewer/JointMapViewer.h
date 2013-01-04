@@ -1,6 +1,7 @@
 #ifndef _JOINTMAPVIEWER_
 #define _JOINTMAPVIEWER_
 
+#include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Gl_Window.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Choice.H>
@@ -38,6 +39,7 @@ public:
 	~SkeletonViewer();
 
 public:
+	void setShowJointLabels(int showLabel);
 	void setSkeleton(std::string skelName);
 	void setJointMap(std::string mapName);
 	void setFocusJointName(std::string focusName);
@@ -55,7 +57,7 @@ protected:
 	
 protected:	
 	SrSaGlRender renderFunction;
-	
+	int showJointLabels;
 	std::vector<SrLight> lights;
 	SkScene* skeletonScene;
 	SmartBody::SBSkeleton* skeleton;
@@ -87,13 +89,16 @@ class JointMapViewer : public Fl_Double_Window
 		void setCharacterName(std::string charName);
 		void setJointMapName(std::string jointMapName);
 		
+		static void ResetMapCB(Fl_Widget* widget, void* data);
 		static void ApplyMapCB(Fl_Widget* widget, void* data);
 		static void CancelCB(Fl_Widget* widget, void* data);
 		static void SelectMapCB(Fl_Widget* widget, void* data);
 		static void SelectCharacterCB(Fl_Widget* widget, void* data);
 		static void JointNameChange(Fl_Widget* widget, void* data);
 		static void AddJointMapCB(Fl_Widget* widget, void* data);
+		static void CheckShowJointLabelCB(Fl_Widget* widget, void* data);
 
+		void resetJointMap(bool restore = false);
 		void addFocusJointMap();
 		void applyJointMap();
 		void updateSelectMap();
@@ -101,22 +106,26 @@ class JointMapViewer : public Fl_Double_Window
 		void updateUI();
 		void updateJointName(Fl_Input_Choice* jointChoice);		
 		void hideButtons();
+		void showJointLabels(int showLabel);
 		virtual void draw();
 	protected:
 		void updateJointLists();
 
-	protected:
+	
 		std::string _jointMapName;
 		std::string _skelName;
 		std::string _charName;
 		std::vector<std::string> standardJointNames;
 		std::vector<std::string> skeletonJointNames;
-
+	public:
+		Fl_Choice* _buttonJointLabel;
 		Fl_Choice* _choiceJointMaps;
 		Fl_Choice* _choiceCharacters;
 		Fl_Scroll* _scrollGroup;
 		Fl_Button* _buttonApply;
 		Fl_Button* _buttonCancel;
+		Fl_Button* _buttonReset;
+		Fl_Button* _buttonRestore;
 		Fl_Button* _buttonAddMapping;
 		std::vector<JointMapInputChoice*> _jointChoiceList;
 		SkeletonViewer* targetSkeletonViewer;

@@ -863,6 +863,7 @@ SkeletonViewer::SkeletonViewer( int x, int y, int w, int h, char* name ) : Mouse
 	skeleton = NULL;
 	jointMapName = "";
 	focusJointName = "";
+	showJointLabels = 0;
 }
 
 SkeletonViewer::~SkeletonViewer()
@@ -959,6 +960,12 @@ std::string SkeletonViewer::pickJointName( float x, float y )
 	return jointName;	
 }
 
+
+void SkeletonViewer::setShowJointLabels( int showLabel )
+{
+	showJointLabels = showLabel;
+}
+
 std::vector<int> SkeletonViewer::process_hit(unsigned int *pickbuffer,int nhits)
 {
 	GLuint d1,d2,i,n,zmin,zmax,sel=0;
@@ -1000,11 +1007,13 @@ void SkeletonViewer::setFocusJointName( std::string focusName )
 		//skeletonScene->set_skeleton_radius(defaultRadius*10.f);
 
 		std::vector<std::string> skelJointNames = skeleton->getJointNames();
+		std::vector<std::string> skelOriginalNames = skeleton->getJointOriginalNames();
 		for (unsigned int i=0;i<skelJointNames.size();i++)
 		{
 			std::string jname = skelJointNames[i];
+			std::string origName = skelOriginalNames[i];
 			SkJoint* joint = skeleton->search_joint(jname.c_str());
-			if (focusJointName == jname)
+			if (focusJointName == jname || focusJointName == origName)
 			{
 				//LOG("focus joint name = %s",jname.c_str());
 				skeletonScene->setJointColor(joint, SrColor(1.f,0.f,0.f));
@@ -1184,22 +1193,26 @@ void SkeletonViewer::drawJointMapLabels( std::string jointMapName )
 	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
 	SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(jointMapName);		
 	std::vector<std::string> skelJointNames = skeleton->getJointNames();
+	std::vector<std::string> skelOrigNames = skeleton->getJointOriginalNames();
+	
+
 	for (unsigned int j = 0; j < skelJointNames.size(); j++)
 	{
 		bool highLight = false;
 		std::string jointName = skelJointNames[j];
+		std::string origName = skelOrigNames[j];
 		//if (jointMap->getMapTarget(jointName) == "")
 		//	continue;
-		if (jointName == focusJointName)
+		if (jointName == focusJointName || origName == focusJointName)
 			highLight = true;
 
-		//if (!highLight)
-		//	continue;
+		if (!highLight && showJointLabels == 0)
+			continue;
 
-		std::string source = jointName;
-		std::string target = source;
-		if (jointMap)
-			target = jointMap->getMapTarget(jointName);
+		std::string source = origName;
+		if (showJointLabels == 2)
+			source = jointName;
+
 		SkJoint* joint = skeleton->search_joint(source.c_str());
 		if (!joint) continue;		
 
@@ -1261,7 +1274,7 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	_jointMapName = "";
 	_skelName = "";
 
-	Fl_Group* leftGroup	= new Fl_Group(10, startY, w - 600, h - startY, "");
+	Fl_Group* leftGroup	= new Fl_Group(10, startY, 400, h - startY, "");
 	leftGroup->begin();
 	_choiceCharacters = new Fl_Choice(110, curY, 150, 20, "Character");
 	//choiceCharacters->callback(CharacterCB, this);
@@ -1284,7 +1297,15 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	}
 	_choiceJointMaps->callback(SelectMapCB,this);
 
-	curY += 25;	
+	curY += 35;	
+
+	_buttonReset = new Fl_Button(40, curY, 120, 20, "Reset Mapping");
+	_buttonReset->callback(ResetMapCB,this);
+
+	_buttonRestore = new Fl_Button(180, curY, 120, 20, "Restore Mapping");
+	_buttonRestore->callback(ResetMapCB,this);
+
+
 // 
 // 
 // 	SmartBody::SBBehaviorSetManager* behavMgr = SmartBody::SBScene::getScene()->getBehaviorSetManager();
@@ -1299,20 +1320,21 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	for (int i=0;i<5;i++) standardJointNames.push_back(leftLegJointNames[i]);
 	for (int i=0;i<5;i++) standardJointNames.push_back(rightLegJointNames[i]);
 
-	curY += 25;
+	curY += 35;
 	
- 	_scrollGroup = new Fl_Scroll(10, curY, this->w() - 1180, 480, "");
+ 	_scrollGroup = new Fl_Scroll(10, curY, 400, h - curY - 50, "");
  	_scrollGroup->type(Fl_Scroll::VERTICAL);
  	_scrollGroup->begin(); 
 	scrollY = curY;
 	
 	
 	_scrollGroup->end();
-	curY += 450  + 25;
+	curY += (h-curY-50)  + 15;
 	_buttonApply = new Fl_Button(100, curY, 60, 20, "Apply Map");
 	_buttonApply->callback(ApplyMapCB, this);
 	_buttonCancel = new Fl_Button(180, curY, 60, 20, "Cancel");
 	_buttonCancel->callback(CancelCB, this);
+	
 	leftGroup->end();
 
 	std::string commonSkName = "common.sk";	
@@ -1324,14 +1346,20 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 		commonSk->ref();
 	}
 
-	Fl_Group* rightGroup = new Fl_Group(w-1180 + 20, startY, 1200 , h - startY, "");
+	Fl_Group* rightGroup = new Fl_Group(420, startY, w-420 , h - startY, "");
 	rightGroup->begin();	
-	targetSkeletonViewer = new SkeletonViewer(w-1180+20, startY, 580, h-startY - 50, "Skeleton");	
-	standardSkeletonViewer = new SkeletonViewer(w-580+20, startY, 580, h-startY - 50, "Common Skeleton");
-	_buttonAddMapping = new Fl_Button(w-1180+20, h - 50 + 10, 80, 30, "Add Joint Map");
-	_buttonAddMapping->callback(AddJointMapCB,this);
+	targetSkeletonViewer = new SkeletonViewer(420+10, startY, 260, h-startY - 50, "Skeleton");	
+	standardSkeletonViewer = new SkeletonViewer(420+20+260, startY, w-420-260, h-startY - 50, "Common Skeleton");
+	_buttonJointLabel = new Fl_Choice(420 + 10 + 100, h - 50 + 10, 90, 30, "Show Joint Labels");
+	_buttonJointLabel->add("None");
+	_buttonJointLabel->add("Original Name");
+	_buttonJointLabel->add("Mapped Name");
+	_buttonJointLabel->value(0);
+	_buttonJointLabel->callback(CheckShowJointLabelCB,this);
+	_buttonAddMapping = new Fl_Button(420 + 10 + 250, h - 50 + 10, 90, 30, "Add Joint Map");
+	_buttonAddMapping->callback(AddJointMapCB,this);	
 	rightGroup->end();
-	rightGroup->resizable(targetSkeletonViewer);		
+	//rightGroup->resizable(targetSkeletonViewer);		
 	this->resizable(rightGroup);
 	end();
 
@@ -1369,7 +1397,14 @@ void JointMapViewer::updateJointLists()
 	
 	std::vector<std::string> skelJointNames;
 	if (skel)
-		skelJointNames = skel->getJointNames();
+	{
+		for (unsigned int i=0;i<skel->joints().size();i++)
+		{
+			SmartBody::SBJoint* joint = skel->getJoint(i);
+			skelJointNames.push_back(joint->extName());
+		}
+		//skelJointNames = skel->getJointNames();
+	}
 	for (unsigned int i=0;i<_jointChoiceList.size();i++)
 	{
 		JointMapInputChoice* input = _jointChoiceList[i];
@@ -1428,6 +1463,7 @@ void JointMapViewer::setCharacterName( std::string charName )
 	}
 	updateJointLists();
 	updateCharacter();	
+	updateSelectMap();
 }
 
 void JointMapViewer::setJointMapName( std::string jointMapName )
@@ -1653,6 +1689,23 @@ void JointMapViewer::CancelCB(Fl_Widget* widget, void* data)
 	viewer->hide();
 }
 
+void JointMapViewer::ResetMapCB( Fl_Widget* widget, void* data )
+{
+	JointMapViewer* viewer = (JointMapViewer*) data;
+	Fl_Button* button = (Fl_Button*)widget;
+	if (button == viewer->_buttonReset)
+		viewer->resetJointMap(false);
+	else if (button == viewer->_buttonRestore)
+		viewer->resetJointMap(true);
+}
+
+void JointMapViewer::CheckShowJointLabelCB( Fl_Widget* widget, void* data )
+{
+	JointMapViewer* viewer = (JointMapViewer*) data;
+	Fl_Choice* checkButton = (Fl_Choice*) widget;		
+	viewer->showJointLabels(checkButton->value());
+}
+
 
 void JointMapViewer::draw()
 {
@@ -1695,6 +1748,31 @@ void JointMapViewer::addFocusJointMap()
 			}
 		}
 	}
+}
+
+void JointMapViewer::resetJointMap(bool restore)
+{
+	int numChildren = _scrollGroup->children();
+	if (restore) 
+	{
+		updateSelectMap();
+		return;
+	}
+	for (int i=0;i<numChildren;i++)
+	{
+		Fl_Input_Choice* input = dynamic_cast<JointMapInputChoice*>(_scrollGroup->child(i));
+		if (input)
+		{
+			input->value("");
+		}
+	}	
+}
+
+void JointMapViewer::showJointLabels( int showLabel )
+{
+	LOG("joint label = %d",showLabel);
+	standardSkeletonViewer->setShowJointLabels(showLabel);
+	targetSkeletonViewer->setShowJointLabels(showLabel);
 }
 
 JointMapInputChoice::JointMapInputChoice( int x, int y, int w, int h, char* name ) : Fl_Input_Choice(x,y,w,h,name)

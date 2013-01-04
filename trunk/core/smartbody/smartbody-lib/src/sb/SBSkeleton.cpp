@@ -163,6 +163,17 @@ std::vector<std::string> SBSkeleton::getJointNames()
 	return jointNames;
 }
 
+std::vector<std::string> SBSkeleton::getJointOriginalNames()
+{
+	std::vector<std::string> jointNames;
+	const std::vector<SkJoint*>& alljoints = joints();
+	for (size_t i = 0; i < alljoints.size(); i++)
+	{
+		jointNames.push_back(alljoints[i]->extName());
+	}
+	return jointNames;
+}
+
 std::vector<std::string> SBSkeleton::getUpperBodyJointNames()
 {
 	std::vector<std::string> jointNames;
