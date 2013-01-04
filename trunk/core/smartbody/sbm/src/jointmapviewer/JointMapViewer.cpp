@@ -1450,7 +1450,7 @@ void JointMapViewer::setCharacterName( std::string charName )
 	{
 		if (charName == _choiceCharacters->text(c))
 		{
-			_choiceJointMaps->value(c);
+			_choiceCharacters->value(c);
 			break;
 		}
 	}
@@ -1478,8 +1478,8 @@ void JointMapViewer::setJointMapName( std::string jointMapName )
 		}
 	}
 
-	updateSelectMap();
 	updateCharacter();	
+	updateSelectMap();	
 	if (targetSkeletonViewer)
 	{
 		targetSkeletonViewer->setJointMap(jointMapName);
@@ -1571,7 +1571,6 @@ void JointMapViewer::updateSelectMap()
 	SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(jointMapName);
 	if (!jointMap) return;
 
-	_jointMapName = jointMapName;
 	int numChildren = _scrollGroup->children();
 	for (int i=0;i<numChildren;i++)
 	{
