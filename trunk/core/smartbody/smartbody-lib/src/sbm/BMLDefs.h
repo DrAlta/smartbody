@@ -95,9 +95,6 @@ class BMLDefs
 		static XMLCh* TAG_TORSO;
 		static XMLCh* TAG_REQUIRED;
 		static XMLCh* TAG_GESTURE;
-		#ifdef BMLR_BML2ANIM
-		static XMLCh* TAG_POSTURE;
-		#endif
 		static XMLCh* TAG_HEAD;
 		static XMLCh* TAG_TM;
 		static XMLCh* TAG_MARK;

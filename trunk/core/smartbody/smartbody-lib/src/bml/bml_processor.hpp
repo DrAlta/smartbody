@@ -33,11 +33,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
-
-//deprecated, using bml gesture directly
-//#define BMLR_BML2ANIM  0
-
-
 // Forward Declaration
 class mcuCBHandle;
 
@@ -93,9 +88,6 @@ namespace BML {
 		bool log_syncpoints;
 		bool warn_unknown_agents;
 		bool bml_feedback;
-#ifdef BMLR_BML2ANIM
-		std::string bml2animText; // [BMLR] Stores the bml 2 animation mapping file
-#endif
 
 		XercesDOMParser* xmlParser;
 
@@ -249,12 +241,6 @@ namespace BML {
 
 ///  Is the following necessary anymore?
 //		friend BML::BehaviorRequest* BML::parse_bml_interrupt( DOMElement* elem, BML::BehaviorSyncPoints& behav_syncs, BML::BmlRequestPtr request, mcuCBHandle *mcu );
-//#ifdef BMLR_BML2ANIM
-//		BehaviorRequest* parse_bml_to_anim( DOMElement* elem, BehaviorSyncPoints& behav_syncs, BmlRequestPtr request, mcuCBHandle *mcu ); // [BMLR]
-//#endif
-#ifdef BMLR_BML2ANIM
-		BML::BehaviorRequestPtr parse_bml_to_anim( DOMElement* elem, std::string& unique_id,  BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu );
-#endif
 		
 	}; // class Processor
 };  // end namespace BML
