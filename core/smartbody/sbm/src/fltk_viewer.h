@@ -43,7 +43,7 @@
 # include <sr/sr_sa_bbox.h>
 # include <FL/Fl_Menu.H>
 #include "retargetviewer/RetargetViewer.h"
-//#include "jointmapviewer/JointMapViewer.h"
+#include "jointmapviewer/RetargetStepWindow.h"
 #include <sb/SBMotionBlendBase.h>
 #include <sbm/Event.h>
 
@@ -379,8 +379,8 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	PALocomotionData* _paLocoData;
 	ObjectManipulationHandle _objManipulator; // a hack for testing. 
 
-
-
+public:
+	RetargetStepWindow* _retargetStepWindow;
 protected:
 	
 	void set_gaze_target(int itype, const char* targetname);	
@@ -392,11 +392,8 @@ protected:
 	SbmCharacter*        getCurrentCharacter();
 	std::vector<SrLight> _lights;
 
-	SmartBody::SBAnimationBlend* getCurrentCharacterAnimationBlend(); // for visualization plots
+	SmartBody::SBAnimationBlend* getCurrentCharacterAnimationBlend(); // for visualization plots	
 	
-	RetargetViewer* _retargetViewer;
-	JointMapViewer* _jointMapViewer;
-	RetargetStepWindow* _retargetStepWindow;
  };
 
 

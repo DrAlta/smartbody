@@ -431,10 +431,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _arrowTime = 0.0f;
 
    init_foot_print();
-   _lastSelectedCharacter = "";
-
-   _retargetViewer = NULL;
-   _jointMapViewer = NULL;
+   _lastSelectedCharacter = "";   
    _retargetStepWindow = NULL;
 
    // init timer update for keyboard
@@ -2344,7 +2341,8 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 			}
 		}
 
-		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 1580, 740, "Retarget Step Window");
+		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 1024, 500, "Retarget Step Window");
+		_retargetStepWindow->setApplyType(true);
 		_retargetStepWindow->show();			
 		_retargetStepWindow->setCharacterName(charName);
 		_retargetStepWindow->setSkeletonName(skelName);

@@ -46,13 +46,19 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 		secondGroup->end();
 	tabGroup->end();
 	this->resizable(tabGroup);
-	this->size_range(600, 740);
+	//this->size_range(600, 740);
 	
 	int curY = tabGroupH + 20;
 
-	_buttonApply = new Fl_Button(100, curY, 100, 25, "Apply");
-	_buttonApply->callback(ApplyCB, this);
-	_buttonCancel = new Fl_Button(250, curY, 100, 25, "Cancel");
+	_buttonApplyAll = new Fl_Button(100, curY, 120, 25, "Apply");
+	_buttonApplyAll->callback(ApplyCB, this);
+	_buttonApplyMap = new Fl_Button(100, curY, 120, 25, "Apply Joint Map");
+	_buttonApplyMap->callback(ApplyJointMapCB,this);
+	_buttonApplyBehaviorSet = new Fl_Button(220, curY, 120, 25, "Apply Behavior Set");
+	_buttonApplyBehaviorSet->callback(ApplyBehaviorSetCB,this);		
+	
+	
+	_buttonCancel = new Fl_Button(360, curY, 120, 25, "Cancel");
 	_buttonCancel->callback(CancelCB, this);
 
 	retargetViewer->hideButtons();
@@ -75,6 +81,24 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	//secondGroup->resizable(retargetViewer);
 	//this->resizable(secondGroup);
 	//this->size_range(800, 480);
+}
+
+
+void RetargetStepWindow::setApplyType( bool applyAll )
+{
+	if (applyAll)
+	{
+		_buttonApplyAll->show();
+		_buttonApplyBehaviorSet->hide();
+		_buttonApplyMap->hide();
+	}
+	else 
+	{
+		_buttonApplyAll->hide();
+		_buttonApplyBehaviorSet->show();
+		_buttonApplyMap->show();
+	}
+
 }
 
 RetargetStepWindow::~RetargetStepWindow()
@@ -123,4 +147,18 @@ void RetargetStepWindow::draw()
 	if (jointMapViewer)
 		jointMapViewer->redraw();
 	Fl_Double_Window::draw();
+}
+
+void RetargetStepWindow::ApplyJointMapCB( Fl_Widget* widget, void* data )
+{
+	RetargetStepWindow* viewer = (RetargetStepWindow*) data;
+	viewer->jointMapViewer->applyJointMap();
+	viewer->hide();
+}
+
+void RetargetStepWindow::ApplyBehaviorSetCB( Fl_Widget* widget, void* data )
+{
+	RetargetStepWindow* viewer = (RetargetStepWindow*) data;
+	viewer->retargetViewer->RetargetCB(NULL,viewer->retargetViewer);
+	viewer->hide();
 }

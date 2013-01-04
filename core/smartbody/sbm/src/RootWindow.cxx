@@ -117,9 +117,9 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, NULL);
 	menubar->add("&Window/Viseme Viewer", 0, LaunchVisemeViewerCB, this, NULL);
 	menubar->add("&Window/Retarget Creator", 0, LaunchRetargetCreatorCB, this, NULL);
-	menubar->add("&Window/Behavior Sets", 0, LaunchBehaviorSetsCB, this, NULL);
+	//menubar->add("&Window/Behavior Sets", 0, LaunchBehaviorSetsCB, this, NULL);
 	menubar->add("&Window/Motion Editor", 0, LaunchMotionEditorCB, this, NULL);
-	menubar->add("&Window/Joint Map Viewer", 0, LaunchJointMapViewerCB, this, NULL);
+	menubar->add("&Window/Retarget Viewer", 0, LaunchJointMapViewerCB, this, NULL);
 	menubar->add("&Help/Documentation", 0, DocumentationCB, this, NULL);
 	menubar->add("&Help/Create Python API", 0, CreatePythonAPICB, this, NULL);
 	//menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
@@ -199,10 +199,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	bmlViewerWindow = NULL;
 	dataViewerWindow = NULL;
 	resourceWindow = NULL;
-	panimationWindow = NULL;
-	behaviorSetViewer = NULL;
-	jointMapViewer = NULL;
-
+	panimationWindow = NULL;	
 }
 
 BaseWindow::~BaseWindow() {
@@ -568,27 +565,28 @@ void BaseWindow::LaunchRetargetCreatorCB(Fl_Widget* widget, void* data)
 	rootWindow->retargetCreatorWindow->show();
 }
 
-void BaseWindow::LaunchBehaviorSetsCB(Fl_Widget* widget, void* data)
-{
-	// console doesn't receive commands - why?
-	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (!rootWindow->behaviorSetViewer)
-	{
-		rootWindow->behaviorSetViewer = new RetargetViewer(150, 150, 320, 520, "Behavior Sets");
-	}
-	rootWindow->behaviorSetViewer->show();
-}
+// void BaseWindow::LaunchBehaviorSetsCB(Fl_Widget* widget, void* data)
+// {
+// 	// console doesn't receive commands - why?
+// 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+// 	if (!rootWindow->behaviorSetViewer)
+// 	{
+// 		rootWindow->behaviorSetViewer = new RetargetViewer(150, 150, 320, 520, "Behavior Sets");
+// 	}
+// 	rootWindow->behaviorSetViewer->show();
+// }
 
 
 void BaseWindow::LaunchJointMapViewerCB( Fl_Widget* widget, void* data )
 {
 	// console doesn't receive commands - why?
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (!rootWindow->jointMapViewer)
+	if (rootWindow->fltkViewer && !rootWindow->fltkViewer->_retargetStepWindow)
 	{
-		rootWindow->jointMapViewer = new JointMapViewer(150, 150, 950, 600, "Joint Map Viewer");
+		rootWindow->fltkViewer->_retargetStepWindow = new RetargetStepWindow(150, 150, 1024, 500, "Joint Map Viewer");
 	}
-	rootWindow->jointMapViewer->show();
+	rootWindow->fltkViewer->_retargetStepWindow->setApplyType(false);
+	rootWindow->fltkViewer->_retargetStepWindow->show();
 }
 
 
