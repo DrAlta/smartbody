@@ -14,7 +14,24 @@
 #include <sb/SBSkeleton.h>
 #include <string>
 
-class SkeletonViewer : public Fl_Gl_Window
+class MouseViewer : public Fl_Gl_Window
+{
+public:
+	MouseViewer(int x, int y, int w, int h, char* name);
+	~MouseViewer();
+
+public:
+	virtual int handle( int event );
+	void translate_event(SrEvent& e, SrEvent::EventType t, int w, int h, MouseViewer* viewer);
+	void mouse_event(SrEvent& e);	
+protected:
+	SrVec rotate_point(SrVec point, SrVec origin, SrVec direction, float angle);
+protected:
+	SrEvent e;
+	SrCamera cam;
+};
+
+class SkeletonViewer : public MouseViewer
 {
 public:
 	SkeletonViewer(int x, int y, int w, int h, char* name);
@@ -24,15 +41,21 @@ public:
 	void setSkeleton(std::string skelName);
 	void setJointMap(std::string mapName);
 	void setFocusJointName(std::string focusName);
+	std::string getFocusJointName();
 	void focusOnSkeleton();
+	virtual int handle( int event );
 	virtual void draw();
+	
 protected:
 	void updateLights();
 	void init_opengl();
 	void drawJointMapLabels(std::string jointMapName);
+	std::vector<int> process_hit(unsigned int *pickbuffer,int nhits);
+	std::string pickJointName(float x, float y);
+	
 protected:	
 	SrSaGlRender renderFunction;
-	SrCamera camera;
+	
 	std::vector<SrLight> lights;
 	SkScene* skeletonScene;
 	SmartBody::SBSkeleton* skeleton;
@@ -69,7 +92,9 @@ class JointMapViewer : public Fl_Double_Window
 		static void SelectMapCB(Fl_Widget* widget, void* data);
 		static void SelectCharacterCB(Fl_Widget* widget, void* data);
 		static void JointNameChange(Fl_Widget* widget, void* data);
+		static void AddJointMapCB(Fl_Widget* widget, void* data);
 
+		void addFocusJointMap();
 		void applyJointMap();
 		void updateSelectMap();
 		void updateCharacter();
@@ -92,8 +117,10 @@ class JointMapViewer : public Fl_Double_Window
 		Fl_Scroll* _scrollGroup;
 		Fl_Button* _buttonApply;
 		Fl_Button* _buttonCancel;
+		Fl_Button* _buttonAddMapping;
 		std::vector<JointMapInputChoice*> _jointChoiceList;
-		SkeletonViewer* skeletonViewer;
+		SkeletonViewer* targetSkeletonViewer;
+		SkeletonViewer* standardSkeletonViewer;
 		int scrollY;
 };
 #endif
