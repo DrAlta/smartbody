@@ -81,9 +81,6 @@ XMLCh* BMLDefs::TAG_BODY  = NULL;
 XMLCh* BMLDefs::TAG_GESTURE = NULL;
 XMLCh* BMLDefs::TAG_TORSO  = NULL;
 XMLCh* BMLDefs::TAG_REQUIRED = NULL;
-	#ifdef BMLR_BML2ANIM
-XMLCh* BMLDefs::TAG_POSTURE = NULL;
-	#endif
 XMLCh* BMLDefs::TAG_HEAD = NULL;
 XMLCh* BMLDefs::TAG_TM  = NULL;
 XMLCh* BMLDefs::TAG_MARK = NULL;
@@ -447,9 +444,6 @@ BMLDefs::BMLDefs()
 	TAG_BODY      = XMLString::transcode("body");
 	TAG_TORSO      = XMLString::transcode("torso");
 	TAG_REQUIRED  = XMLString::transcode("required");
-	#ifdef BMLR_BML2ANIM
-	TAG_POSTURE   = XMLString::transcode("posture"); // [BMLR] For bml2anim postures
-	#endif
 	TAG_GESTURE = XMLString::transcode("gesture");
 	TAG_HEAD      = XMLString::transcode("head");
 	TAG_TM        = XMLString::transcode("tm");
