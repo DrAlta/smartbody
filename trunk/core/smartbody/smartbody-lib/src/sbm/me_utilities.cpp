@@ -590,8 +590,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 		}
 #endif
 
-		skeleton->ref();
-		skeleton->skfilename(pathname.string().c_str());	
+		skeleton->ref();		
 		skeleton->setName(skeleton->skfilename());
 		SBResourceManager* manager = SBResourceManager::getResourceManager();
 		SkeletonResource* skelRes = new SkeletonResource();
@@ -771,7 +770,9 @@ int load_me_skeleton_individual( SrInput & input, const std::string & skeletonNa
 
 
 	skeleton->skfilename(skeletonName.c_str());
-	skeleton->setName(skeleton->skfilename());
+	std::string filebasename = boost::filesystem::basename(skeleton->skfilename());
+	std::string fileextension = boost::filesystem::extension(skeleton->skfilename());
+	skeleton->setName(filebasename+fileextension);	
 	SBResourceManager* manager = SBResourceManager::getResourceManager();
 	SkeletonResource* skelRes = new SkeletonResource();
 	skelRes->setType("skm");
