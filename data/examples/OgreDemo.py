@@ -7,7 +7,8 @@ print "|--------------------------------------------|"
 scene.setScale(1.0)
 # Add asset paths
 scene.addAssetPath('script', 'sbm-common/scripts')
-scene.addAssetPath('script', 'sbm-common/scripts/behaviorsets')
+#scene.addAssetPath('script', 'sbm-common/scripts/behaviorsets')
+scene.addAssetPath('script', 'behaviorsets')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'Ogre')
