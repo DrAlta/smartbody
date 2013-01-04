@@ -2341,7 +2341,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 			}
 		}
 
-		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 1000, 740, "Retarget Step Window");
+		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 1580, 740, "Retarget Step Window");
 		_retargetStepWindow->show();			
 		_retargetStepWindow->setCharacterName(charName);
 		_retargetStepWindow->setSkeletonName(skelName);
