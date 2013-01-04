@@ -56,7 +56,9 @@
 #include "sbm_audio.h"
 #include "sb/SBScene.h"
 #include "me_utilities.hpp"
-
+#include <sbm/mcontrol_callbacks.h>
+#include <sbm/resource_cmds.h>
+#include <sbm/sbm_test_cmds.hpp>
 
 #if USE_WSP
 #include "wsp.h"
@@ -108,6 +110,12 @@
 #include <sb/SBDebuggerClient.h>
 #include <controllers/me_ct_param_animation_utilities.h>
 #include <controllers/me_ct_param_animation_data.h>
+#include <controllers/me_ct_saccade.h>
+#include <controllers/me_ct_data_receiver.h>
+#include <controllers/me_ct_eyelid.h>
+#include <controllers/me_ct_scheduler2.h>
+#include <controllers/me_ct_breathing.h>
+#include <controllers/me_ct_gaze.h>
 #include <sbm/MiscCommands.h>
 
 

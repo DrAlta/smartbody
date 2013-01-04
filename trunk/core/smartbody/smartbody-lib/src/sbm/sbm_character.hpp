@@ -41,17 +41,6 @@
 #include "sbm_speech.hpp"
 #include <sbm/sr_linear_curve.h>
 
-#include <controllers/me_ct_scheduler2.h>
-#include <controllers/me_ct_face.h>
-#include <controllers/me_ct_eyelid.h>
-#include <controllers/me_ct_gaze.h>
-#include <controllers/me_ct_reach.hpp>
-#include <controllers/me_ct_constraint.hpp>
-#include <controllers/me_ct_example_body_reach.hpp>
-#include <controllers/me_ct_hand.hpp>
-#include <controllers/MeCtReachEngine.h>
-#include <controllers/me_ct_breathing_interface.h>
-#include <controllers/me_ct_breathing.h>
 #include <sb/SBFaceDefinition.h>
 #define MeCtSchedulerClass MeCtScheduler2
 
@@ -63,13 +52,9 @@
 #include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
 
-#include <controllers/me_ct_param_animation.h>
-#include <controllers/me_ct_saccade.h>
-#include <controllers/me_ct_basic_locomotion.h>
-#include "SteeringAgent.h"
+#include <controllers/me_ct_reach.hpp>
+#include <controllers/me_ct_example_body_reach.hpp>
 
-#include <controllers/me_ct_data_receiver.h>
-#include <controllers/me_ct_physics_controller.h>
 #include <sbm/nvbg.h>
 #include <sbm/MiniBrain.h>
 
@@ -86,6 +71,13 @@ class MeCtPhysicsController;
 class MeCtNoiseController;
 class MeCtMotionPlayer;
 class MeCtMotionRecorder;
+class MeCtSchedulerClass;
+class MeCtEyeLidRegulator;
+class MeCtFace;
+class MeCtEyeLid;
+class MeCtBreathing;
+class MeCtBasicLocomotion;
+class MeCtReachEngine;
 
 class SbmCharacter : public SmartBody::SBPawn	{
 
@@ -111,14 +103,19 @@ public:
 	// Static Constants
 	GeneralParamMap*   param_map;
 
-protected:
-	// reach motion database for example-based IK reaching
-	MotionDataSet      reachMotionData;
+		// reach motion database for example-based IK reaching
+	MotionDataSet*      reachMotionData;
+	MotionDataSet*      reachHandData;
+	MotionDataSet*      grabHandData;
+	MotionDataSet*      releaseHandData;
+	MotionDataSet*      pointHandData;
+		// reach engine map
+	ReachEngineMap* reachEngineMap;
+	int            currentReachType;
 
-	MotionDataSet      reachHandData;
-	MotionDataSet      grabHandData;
-	MotionDataSet      releaseHandData;
-	MotionDataSet      pointHandData;
+
+protected:
+
 
 	// The implementation to be used for speech (NULL if unset) 
 	SmartBody::SpeechInterface* speech_impl;
@@ -151,9 +148,6 @@ protected:
 	// currently, we assume the vis-geo as the geometry ( or an capsule to the child if vis-geo is not available )
 	//std::map<std::string, SBPhysicsObj*> jointPhyObjMap; 	
 
-	// reach engine map
-	ReachEngineMap reachEngineMap;
-	int            currentReachType;
 
 	// Viseme Curve Info
 	bool	use_viseme_curve;
@@ -306,7 +300,6 @@ public:
 
 
 	static int character_cmd_func( srArgBuffer& args );
-	int parse_character_command( std::string cmd, srArgBuffer& args, bool all_characters );
 
 	static int character_init_cmd( srArgBuffer& args);
 
@@ -318,13 +311,13 @@ public:
 	bool addReachMotion(int tag, SkMotion* motion);
 	bool removeReachMotion(int tag, SkMotion* motion);
 	SkMotion* getReachMotion(int index);
-	const MotionDataSet& getReachMotionDataSet() const { return reachMotionData;}
+	const MotionDataSet& getReachMotionDataSet() const { return *reachMotionData;}
 
-	const MotionDataSet& getPointHandData() const { return pointHandData;}
-	const MotionDataSet& getGrabHandData() const { return grabHandData;}
-	const MotionDataSet& getReachHandData() const { return reachHandData;}
-	const MotionDataSet& getReleaseHandData() const { return releaseHandData;}
-	std::map<int,MeCtReachEngine*>& getReachEngineMap() { return reachEngineMap; }
+	const MotionDataSet& getPointHandData() const { return *pointHandData;}
+	const MotionDataSet& getGrabHandData() const { return *grabHandData;}
+	const MotionDataSet& getReachHandData() const { return *reachHandData;}
+	const MotionDataSet& getReleaseHandData() const { return *releaseHandData;}
+	std::map<int,MeCtReachEngine*>& getReachEngineMap() { return *reachEngineMap; }
 	int   getCurrentReachType() { return currentReachType; }
 	void   setCurrentReachType(int type) { currentReachType = type; }
 
@@ -345,12 +338,7 @@ public:
 	void set_viseme_magnitude( float magnitude ) { viseme_magnitude = magnitude; }
 	float get_viseme_magnitude( void ) const		{ return( viseme_magnitude ); }
 
-	void setSoftEyes( bool val )	{
-		_soft_eyes_enabled = val;
-		if( eyelid_ct )	{
-			eyelid_ct->setEnable(!val);
-		}
-	}
+	void setSoftEyes( bool val );
 	bool isSoftEyes( void ) const { return _soft_eyes_enabled; }
 	bool isVisemePlateau( void ) const { return _visemePlateau; }
 	void setVisemePlateau( bool val ) { _visemePlateau = val; }
@@ -379,6 +367,8 @@ public:
 
 	virtual void setMiniBrain(MiniBrain* mini);
 	virtual MiniBrain* getMiniBrain();
+	int writeSkeletonHierarchy(std::string file, double scale);
+
 
 private:
 
@@ -415,7 +405,6 @@ protected:
 	void add_face_channel( const std::string& name, const int wo_index );
 
 	
-	int writeSkeletonHierarchy(std::string file, double scale);
 	void writeSkeletonHierarchyRecurse(SkJoint* joint, std::ofstream& ostream, double scale, int indentLevel);
 	void indent(int num, std::ofstream& ostream);
 

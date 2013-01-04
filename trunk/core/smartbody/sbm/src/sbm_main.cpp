@@ -76,6 +76,7 @@
 #include "FLTKListener.h"
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
+#include <sbm/SteeringAgent.h>
 
 #if USE_OGRE_VIEWER > 0
 #include "FLTKOgreViewer.h"

@@ -13,6 +13,7 @@
 #include <sbm/mcontrol_util.h>
 #include <controllers/me_ct_blend.hpp>
 #include <controllers/me_ct_time_shift_warp.hpp>
+#include <controllers/me_ct_gaze.h>
 #include "BehaviorBlock.h"
 #include <bml/bml_types.hpp>
 #include <sbm/text_speech.h>

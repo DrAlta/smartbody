@@ -43,6 +43,10 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBBoneBusManager.h>
+#include <controllers/me_ct_param_animation.h>
+#include <controllers/me_ct_data_receiver.h>
+#include <controllers/me_ct_scheduler2.h>
+#include <controllers/me_ct_breathing.h>
 
 #ifdef WIN32
 #include <direct.h>
@@ -86,7 +90,7 @@
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
 
-
+#include <controllers/me_ct_gaze.h>
 #include <controllers/me_ct_motion_player.h>
 
 #ifdef USE_GOOGLE_PROFILER

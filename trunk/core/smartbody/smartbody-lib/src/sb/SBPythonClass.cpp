@@ -2,6 +2,18 @@
 #include "SBPythonClass.h"
 #include "controllers/me_ct_reach.hpp"
 
+#include <sbm/resource_cmds.h>
+#include <sbm/sbm_character.hpp>
+#include <sbm/me_utilities.hpp>
+#include <sk/sk_skeleton.h>
+#include <sk/sk_joint.h>
+#include <sbm/sbm_test_cmds.hpp>
+#include <controllers/me_ct_param_animation.h>
+#include <controllers/me_ct_scheduler2.h>
+#include <controllers/me_ct_gaze.h>
+#include <controllers/me_ct_eyelid.h>
+#include <controllers/me_ct_face.h>
+
 namespace SmartBody 
 {
 

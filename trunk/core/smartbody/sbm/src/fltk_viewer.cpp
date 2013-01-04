@@ -63,6 +63,9 @@
 # include <controllers/MeCtBodyReachState.h>
 # include <controllers/me_ct_example_body_reach.hpp>
 # include <controllers/me_ct_constraint.hpp>
+# include <controllers/me_ct_param_animation.h>
+# include <controllers/me_ct_scheduler2.h>
+
 # include <sbm/Physics/SBColObject.h>
 # include <controllers/me_ct_param_animation_data.h>
 # include <sbm/GPU/SbmDeformableMeshGPU.h>

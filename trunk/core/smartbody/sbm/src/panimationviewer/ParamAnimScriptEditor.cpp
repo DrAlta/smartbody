@@ -23,6 +23,7 @@
 #include "ParamAnimScriptEditor.h"
 #include <sbm/mcontrol_util.h>
 #include <FL/Fl_Hold_Browser.H>
+#include <controllers/me_ct_param_animation.h>
 
 #define transitionTrace 0
 

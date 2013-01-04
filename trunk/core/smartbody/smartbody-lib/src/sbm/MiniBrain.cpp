@@ -2,6 +2,8 @@
 #include <sbm/mcontrol_util.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
+#include <controllers/me_ct_scheduler2.h>
+#include <controllers/me_ct_gaze.h>
 
 MiniBrain::MiniBrain()
 {

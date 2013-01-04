@@ -29,7 +29,8 @@
 #include <sb/SBPythonClass.h>
 #endif
 
-#include <controllers/me_ct_param_animation_data.h>
+#include <controllers/me_ct_param_animation.h>
+#include <controllers/me_ct_basic_locomotion.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBSimulationManager.h>

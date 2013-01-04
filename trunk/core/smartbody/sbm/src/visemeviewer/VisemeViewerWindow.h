@@ -21,6 +21,7 @@
 #include "VisemeCurveEditor.h"
 #include <sb/SBCharacter.h>
 #include <sb/SBPhoneme.h>
+#include <bml/bml.hpp>
 
 
 class VisemeCurveEditor;
