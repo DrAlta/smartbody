@@ -11,6 +11,9 @@
 #include <sb/SBGestureMap.h>
 #include <sb/SBGestureMapManager.h>
 #include <sb/SBBehavior.h>
+#include <sbm/SteeringAgent.h>
+#include <controllers/me_ct_motion.h>
+#include <controllers/me_ct_scheduler2.h>
 
 using namespace std;
 using namespace BML;

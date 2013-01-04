@@ -56,6 +56,7 @@
 //#include "SBMWindow.h"
 #include <sb/SBPython.h>
 #include <sb/SBSteerManager.h>
+#include <sbm/SteeringAgent.h>
 #include "TransparentListener.h"
 #include "TransparentViewer.h"
 #include "sb/SBDebuggerServer.h"

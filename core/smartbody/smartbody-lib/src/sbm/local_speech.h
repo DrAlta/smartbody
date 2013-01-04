@@ -65,7 +65,7 @@ public:
     //void evalFestivalCommand( const char * cmd );	
 protected:
 	std::string generateReply(const char * utterance,const char * soundFileName);	
-	void removeTabsFromString(string &spoken_text);
+	void removeTabsFromString(std::string &spoken_text);
 	std::string storeXMLMetaData( const std::string & txt);
 	//void cleanString(std::string &message);
 	void set_phonemes_to_visemes();
@@ -81,7 +81,7 @@ protected:
 	std::string tempDir;
 	std::string fullAudioDir;
 	CPRCEN_engine* voiceEngine;
-	std::map<string,string> phonemeToViseme;
+	std::map<std::string, std::string> phonemeToViseme;
 public:
 	CereprocSpeechRelayLocal();
 	~CereprocSpeechRelayLocal();

@@ -1120,12 +1120,13 @@ float SBMotion::getJointAngularSpeed(SBJoint* joint, float startTime, float endT
 		connected_skeleton()->update_global_matrices();
 		const SrMat& srcMat = joint->gmat();
 		float rx, ry, rz;
-		sr_euler_angles(rotType, srcMat, rx, ry, rz);
+		
+		sr_euler_angles(joint->rot_type(), srcMat, rx, ry, rz);
 		float srcRotY = ry;
 		apply_frame(i + 1);
 		connected_skeleton()->update_global_matrices();
 		const SrMat& destMat = joint->gmat();
-		sr_euler_angles(rotType, destMat, rx, ry, rz);
+		sr_euler_angles(joint->rot_type(), destMat, rx, ry, rz);
 		float destRotY = ry;
 		float diff;
 		if (destRotY * srcRotY < 0 && fabs(destRotY) > 1.0f)
@@ -1173,7 +1174,7 @@ float SBMotion::getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis
 		connected_skeleton()->update_global_matrices();
 		const SrMat& srcMat = joint->gmat();
 		float rx, ry, rz;
-		sr_euler_angles(rotType, srcMat, rx, ry, rz);
+		sr_euler_angles(joint->rot_type(), srcMat, rx, ry, rz);
 		float srcRot = rx;
 		if (axisIndex == 0)
 			srcRot = rx;
@@ -1185,7 +1186,7 @@ float SBMotion::getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis
 		apply_frame(i + 1);
 		connected_skeleton()->update_global_matrices();
 		const SrMat& destMat = joint->gmat();
-		sr_euler_angles(rotType, destMat, rx, ry, rz);
+		sr_euler_angles(joint->rot_type(), destMat, rx, ry, rz);
 
 		float destRot = rx;
 		if (axisIndex == 0)
@@ -1237,8 +1238,8 @@ std::vector<float> SBMotion::getJointTransition(SBJoint* joint, float startTime,
 	SrVec srcPnt = SrVec(srcMat.get(12), srcMat.get(13), srcMat.get(14));
 	float rx, ry, rz;
 	float rx0, ry0, rz0;
-	sr_euler_angles(rotType, srcMat, rx, ry, rz);
-	sr_euler_angles(rotType, srcMat0, rx0, ry0, rz0);
+	sr_euler_angles(joint->rot_type(), srcMat, rx, ry, rz);
+	sr_euler_angles(joint->rot_type(), srcMat0, rx0, ry0, rz0);
 	apply_frame(maxFrameId);
 	connected_skeleton()->update_global_matrices();
 	const SrMat& destMat = joint->gmat();

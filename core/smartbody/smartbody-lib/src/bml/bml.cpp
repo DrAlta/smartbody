@@ -40,6 +40,10 @@
 
 #include "controllers/me_ct_blend.hpp"
 #include "controllers/me_ct_blend.hpp"
+#include "controllers/me_ct_param_animation.h"
+#include "controllers/me_ct_scheduler2.h"
+#include "controllers/me_ct_gaze.h"
+
 #include "sbm/BMLDefs.h"
 #include <sb/SBAnimationState.h>
 #include <sb/SBBehavior.h>
@@ -47,6 +51,7 @@
 #include <sb/SBGestureMapManager.h>
 #include <sb/SBGestureMap.h>
 #include <sb/SBSimulationManager.h>
+#include <sbm/SteeringAgent.h>
 
 using namespace std;
 using namespace BML;

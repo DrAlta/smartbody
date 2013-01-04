@@ -29,6 +29,7 @@
 #include <xercesc/util/XMLStringTokenizer.hpp>
 #include <controllers/me_ct_channel_writer.hpp>
 #include <controllers/me_ct_param_animation.h>
+#include <sbm/SteeringAgent.h>
 
 #include "bml_locomotion.hpp"
 #include "bml_event.hpp"

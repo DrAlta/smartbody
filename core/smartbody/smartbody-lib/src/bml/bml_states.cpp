@@ -5,7 +5,7 @@
 #include <string>
 #include <boost/algorithm/string.hpp> 
 #include <sb/SBAnimationState.h>
-
+#include <controllers/me_ct_param_animation.h>
 #include "bml_states.hpp"
 #include "sbm/mcontrol_util.h"
 #include "bml_xml_consts.hpp"

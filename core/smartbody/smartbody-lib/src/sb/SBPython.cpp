@@ -2,6 +2,8 @@
 #include "SBPython.h"
 #include "SBPythonClass.h"
 #include "controllers/me_ct_scheduler2.h"
+#include "controllers/me_ct_gaze.h"
+#include "controllers/me_ct_eyelid.h"
 #include "SBFaceDefinition.h"
 #include "sbm/nvbg.h"
 #include "SBBehavior.h"

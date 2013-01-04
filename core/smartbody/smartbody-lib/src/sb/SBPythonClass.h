@@ -3,17 +3,13 @@
 
 
 
-#include <sbm/resource_cmds.h>
-#include <sbm/sbm_character.hpp>
-#include <sbm/me_utilities.hpp>
-#include <sk/sk_skeleton.h>
-#include <sk/sk_joint.h>
-#include <sbm/sbm_test_cmds.hpp>
+
 #include <map>
 #include <sb/SBJoint.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBController.h>
+#include <sr/sr_viewer.h>
 
 #ifdef __APPLE__
 #include "TargetConditionals.h"

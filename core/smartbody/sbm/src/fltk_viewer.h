@@ -67,6 +67,7 @@ class MeCtConstraint;
 class MeCtExampleBodyReach;
 class JointMapViewer;
 class RetargetStepWindow;
+class PALocomotionData;
 
 /*! \class SrViewer sr_viewer.h
     \brief A fltk-opengl viewer

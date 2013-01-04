@@ -28,7 +28,7 @@
 #include <FL/fl_draw.H>
 #include <sbm/mcontrol_util.h>
 #include "ErrorVisualization.h"
-
+#include <controllers/me_ct_param_animation.h>
 
 
 VisualizationView::VisualizationView(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h)

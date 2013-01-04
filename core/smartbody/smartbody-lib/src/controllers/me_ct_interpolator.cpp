@@ -21,6 +21,7 @@
  */
 
 #include <controllers/me_ct_interpolator.h>
+#include <controllers/me_ct_param_animation.h>
 
 std::string MeCtInterpolator::Context::CONTEXT_TYPE = "MeCtInterpolator::Context";
 std::string MeCtInterpolator::CONTROLLER_TYPE = "MeCtInterpolator";
