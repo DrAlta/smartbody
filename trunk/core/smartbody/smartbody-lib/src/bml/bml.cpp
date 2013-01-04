@@ -401,7 +401,7 @@ void BmlRequest::gestureRequestProcess()
 			SrVec prevRWristPos = prevSBMotion->getJointPosition(rWrist, (float)motion->time_stroke_end());
 
 			// re-pick the best matching gesture based on previous gesture
-			SBMotion* closestMotion = NULL;
+			SBMotion* closestMotion = sbMotion;
 			float minSpeedDiffL = 100000;
 			float minSpeedDiffR = 100000;
 			float lWristTransitionDistance = -1;
