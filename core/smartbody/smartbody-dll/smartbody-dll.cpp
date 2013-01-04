@@ -16,6 +16,7 @@
 #pragma warning(disable:4121)  // needed for boost::python::extract<std::string>() below
 #include "sb/SBScene.h"
 #include "sbm/mcontrol_util.h"
+#include "sbm/mcontrol_callbacks.h"
 #include "sb/SBPython.h"
 #include "sb/SBCharacter.h"
 #include "sb/SBSkeleton.h"
