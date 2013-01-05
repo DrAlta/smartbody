@@ -15,7 +15,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <controllers/me_controller_tree_root.hpp>
-#include <sbm/nvbg.h>
+#include <sb/nvbg.h>
 #include <sb/SBServiceManager.h>
 #include <sb/SBJointMapManager.h>
 #include <sb/SBJointMap.h>
@@ -628,7 +628,7 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* characte
 	*/
 
 	// add NVBG
-	Nvbg* nvbg = character->getNvbg();
+	SmartBody::Nvbg* nvbg = character->getNvbg();
 	if (nvbg)
 	{
 		Fl_Tree_Item* ctrlItem = resourceTree->add(item, "NVBG");

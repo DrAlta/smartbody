@@ -57,7 +57,7 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 #endif
 
 
-class Smartbody_dll_SBCharacterListener_Internal : public SBCharacterListener
+class Smartbody_dll_SBCharacterListener_Internal : public SmartBody::SBCharacterListener
 {
    private:
       Smartbody_dll * m_dll;

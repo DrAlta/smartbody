@@ -37,8 +37,8 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
-#include <sbm/nvbg.h>
-#include <sbm/SBCharacterListener.h>
+#include <sb/nvbg.h>
+#include <sb/SBCharacterListener.h>
 #include <sbm/ParserBVH.h>
 
 

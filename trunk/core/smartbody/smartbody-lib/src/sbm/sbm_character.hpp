@@ -40,8 +40,8 @@
 
 #include "sbm_pawn.hpp"
 
-#include <sbm/nvbg.h>
-#include <sbm/MiniBrain.h>
+#include <sb/nvbg.h>
+#include <sb/MiniBrain.h>
 
 //#include <controllers/me_spline_1d.hpp>
 class MeCtMotionPlayer;
@@ -157,8 +157,8 @@ protected:
 
 	bool _isControllerPruning;
 
-	Nvbg* _nvbg;
-	MiniBrain* _miniBrain;
+	SmartBody::Nvbg* _nvbg;
+	SmartBody::MiniBrain* _miniBrain;
 public:
 	//  Methods
 	SbmCharacter();
@@ -356,11 +356,11 @@ public:
 	virtual void updateFaceDefinition();
 	void removeAllFaceChannels();
 
-	virtual void setNvbg(Nvbg* nvbg);
-	virtual Nvbg* getNvbg();
+	virtual void setNvbg(SmartBody::Nvbg* nvbg);
+	virtual SmartBody::Nvbg* getNvbg();
 
-	virtual void setMiniBrain(MiniBrain* mini);
-	virtual MiniBrain* getMiniBrain();
+	virtual void setMiniBrain(SmartBody::MiniBrain* mini);
+	virtual SmartBody::MiniBrain* getMiniBrain();
 	int writeSkeletonHierarchy(std::string file, double scale);
 
 

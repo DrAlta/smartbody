@@ -2,6 +2,9 @@
 #include "vhcl.h"
 #include <sb/SBAttribute.h>
 
+namespace SmartBody 
+{
+
 Nvbg::Nvbg()
 {
 
@@ -140,6 +143,7 @@ void Nvbg::notifyMatrix(std::string name, SrMat val)
 	notifyLocal(name);
 }
 
+}
 
 
 

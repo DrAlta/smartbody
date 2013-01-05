@@ -257,7 +257,6 @@
     <ClCompile Include="..\src\sbm\local_speech.cpp" />
     <ClCompile Include="..\src\sbm\mcontrol_callbacks.cpp" />
     <ClCompile Include="..\src\sbm\mcontrol_util.cpp" />
-    <ClCompile Include="..\src\sbm\MiniBrain.cpp" />
     <ClCompile Include="..\src\sbm\MiscCommands.cpp" />
     <ClCompile Include="..\src\sbm\ParserASFAMC.cxx" />
     <ClCompile Include="..\src\sbm\ParserBVH.cxx" />
@@ -272,6 +271,8 @@
     <ClCompile Include="..\src\sbm\resource_cmds.cpp" />
     <ClCompile Include="..\src\sbm\ResourceManager.cpp" />
     <ClCompile Include="..\src\sbm\sbm_speech_impl_skeleton.cpp" />
+    <ClCompile Include="..\src\sb\MiniBrain.cpp" />
+    <ClCompile Include="..\src\sb\nvbg.cpp" />
     <ClCompile Include="..\src\sb\SBAnimationTransitionRule.cpp" />
     <ClCompile Include="..\src\sb\SBBehaviorSet.cpp" />
     <ClCompile Include="..\src\sb\SBBehaviorSetManager.cpp" />
@@ -676,7 +677,6 @@
     <ClCompile Include="..\src\sb\SBSteerManager.cpp" />
     <ClCompile Include="..\src\sb\SBCollisionManager.cpp" />
     <ClCompile Include="..\src\sb\SBSubject.cpp" />
-    <ClCompile Include="..\src\sbm\nvbg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\bml\bml_noise.hpp" />
@@ -703,7 +703,6 @@
     <ClInclude Include="..\src\sbm\local_speech.h" />
     <ClInclude Include="..\src\sbm\mcontrol_callbacks.h" />
     <ClInclude Include="..\src\sbm\mcontrol_util.h" />
-    <ClInclude Include="..\src\sbm\MiniBrain.h" />
     <ClInclude Include="..\src\sbm\MiscCommands.h" />
     <ClInclude Include="..\src\sbm\NetRequest.h" />
     <ClInclude Include="..\src\sbm\ParserASFAMC.h" />
@@ -727,6 +726,8 @@
     <ClInclude Include="..\src\sbm\sbm_speech_audiofile.hpp" />
     <ClInclude Include="..\src\sbm\sbm_speech_impl_skeleton.hpp" />
     <ClInclude Include="..\src\sbm\sbm_test_cmds.hpp" />
+    <ClInclude Include="..\src\sb\MiniBrain.h" />
+    <ClInclude Include="..\src\sb\nvbg.h" />
     <ClInclude Include="..\src\sb\SBAnimationTransitionRule.h" />
     <ClInclude Include="..\src\sb\SBBoneBusManager.h" />
     <ClInclude Include="..\src\sb\SBDebuggerClient.h" />
@@ -1023,7 +1024,6 @@
     <ClInclude Include="..\src\sb\SBSteerManager.h" />
     <ClInclude Include="..\src\sb\SBCollisionManager.h" />
     <ClInclude Include="..\src\sb\SBSubject.h" />
-    <ClInclude Include="..\src\sbm\nvbg.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag" />

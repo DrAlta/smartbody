@@ -460,14 +460,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\MiniBrain.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\MiniBrain.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\MiscCommands.cpp"
 				>
 			</File>
@@ -3552,6 +3544,22 @@
 			Name="sb"
 			>
 			<File
+				RelativePath="..\src\sb\MiniBrain.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\MiniBrain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\nvbg.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\nvbg.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sb\SBAnimationState.cpp"
 				>
 			</File>
@@ -3901,18 +3909,6 @@
 			</File>
 			<File
 				RelativePath="..\src\sb\SBSubject.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="nvbg"
-			>
-			<File
-				RelativePath="..\src\sbm\nvbg.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\nvbg.h"
 				>
 			</File>
 		</Filter>

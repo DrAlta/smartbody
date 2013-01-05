@@ -474,8 +474,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/SteerPath.cpp \
 	$(SBM_MY_DIR)/sb/SBParser.cpp \
 	$(SBM_MY_DIR)/sb/SBParseNode.cpp \
-	$(SBM_MY_DIR)/sbm/nvbg.cpp \
-	$(SBM_MY_DIR)/sbm/MiniBrain.cpp \
+	$(SBM_MY_DIR)/sb/nvbg.cpp \
+	$(SBM_MY_DIR)/sb/MiniBrain.cpp \
 	$(SBM_MY_DIR)/sb/SBBehavior.cpp \
 	$(SBM_MY_DIR)/sbm/ParserBVH.cpp \
 	$(SBM_MY_DIR)/sbm/ParserASFAMC.cpp \

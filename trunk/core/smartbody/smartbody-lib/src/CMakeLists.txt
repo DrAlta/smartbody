@@ -370,12 +370,12 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBBehaviorSet.cpp
 	sb/SBBehaviorSetManager.cpp
 	sb/SBMotionBlendBase.cpp
+	sb/nvbg.cpp
+	sb/MiniBrain.cpp
 
 	sb/SBPython.cpp
 	sb/SBPythonClass.cpp
 
-	sbm/nvbg.cpp
-	sbm/MiniBrain.cpp
 	sb/SBBehavior.cpp
 	sb/SBDebuggerServer.cpp
 	sb/SBDebuggerClient.cpp

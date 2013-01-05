@@ -1960,7 +1960,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 									{
 										if (args.calc_num_tokens() == 0)
 										{
-											MiniBrain* miniBrain = character->getMiniBrain();
+											SmartBody::MiniBrain* miniBrain = character->getMiniBrain();
 											if (miniBrain)
 											{
 												LOG("Character %s has an active minibrain.", character->getName().c_str());
@@ -1975,18 +1975,18 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 										std::string tok = args.read_token();
 										if (tok == "on")
 										{
-											MiniBrain* miniBrain = character->getMiniBrain();
+											SmartBody::MiniBrain* miniBrain = character->getMiniBrain();
 											if (miniBrain)
 											{
 												delete miniBrain;
 											}
-											miniBrain = new MiniBrain();
+											miniBrain = new SmartBody::MiniBrain();
 											character->setMiniBrain(miniBrain);
 											LOG("Minibrain for character %s is now on", character->getName().c_str());
 										}
 										else if (tok == "off")
 										{
-											MiniBrain* miniBrain = character->getMiniBrain();
+											SmartBody::MiniBrain* miniBrain = character->getMiniBrain();
 											if (miniBrain)
 											{
 												delete miniBrain;
