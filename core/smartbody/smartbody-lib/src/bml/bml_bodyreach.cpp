@@ -35,6 +35,7 @@
 
 #include "sbm/mcontrol_util.h"
 #include "controllers/me_ct_example_body_reach.hpp"
+#include "controllers/me_controller_tree_root.hpp"
 #include <sb/SBCharacter.h>
 
 #include "bml_target.hpp"

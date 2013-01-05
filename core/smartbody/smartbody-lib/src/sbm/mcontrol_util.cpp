@@ -116,6 +116,7 @@
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_breathing.h>
 #include <controllers/me_ct_gaze.h>
+#include <controllers/me_controller_tree_root.hpp>
 #include <sbm/MiscCommands.h>
 
 

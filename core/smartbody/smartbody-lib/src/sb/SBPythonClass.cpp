@@ -13,6 +13,7 @@
 #include <controllers/me_ct_gaze.h>
 #include <controllers/me_ct_eyelid.h>
 #include <controllers/me_ct_face.h>
+#include <controllers/me_ct_curve_writer.hpp>
 
 namespace SmartBody 
 {

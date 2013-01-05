@@ -30,9 +30,7 @@
 #include <sbm/Physics/SBColObject.h>
 #include <sbm/SteerSuiteEngineDriver.h>
 
-#include <controllers/me_controller_tree_root.hpp>
-#include <controllers/me_ct_channel_writer.hpp>
-#include <controllers/me_ct_curve_writer.hpp>
+
 #include <sb/SBObject.h>
 #include <SteerLib.h>
 
@@ -45,10 +43,14 @@
 #include <map>
 
 #include "sbm_constants.h"
-#include "sbm_deformable_mesh.h"
 #include "sbm/Physics/SBPhysicsSim.h"
 // Declare classes used (avoid circular references)
 class srArgBuffer;
+
+class MeCtChannelWriter;
+class MeControllerTreeRoot;
+class DeformableMesh;
+class DeformableMeshInstance;
 
 
 #define SBM_PAWN_USE_WORLD_OFFSET_WRITER	(1)

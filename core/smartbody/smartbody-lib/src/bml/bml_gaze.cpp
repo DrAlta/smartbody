@@ -38,6 +38,7 @@
 #include "bml_xml_consts.hpp"
 #include "sbm/xercesc_utils.hpp"
 #include "sbm/BMLDefs.h"
+#include "controllers/me_controller_tree_root.hpp"
 
 
 #define LOG_GAZE_PARAMS				(0)

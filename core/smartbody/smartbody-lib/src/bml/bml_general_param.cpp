@@ -32,6 +32,7 @@
 #include "sbm/general_param_setting.h"
 #include "bml_xml_consts.hpp"
 #include "sbm/BMLDefs.h"
+#include "controllers/me_ct_channel_writer.hpp"
 
 
 
