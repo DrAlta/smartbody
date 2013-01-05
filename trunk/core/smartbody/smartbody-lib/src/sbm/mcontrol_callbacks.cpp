@@ -47,6 +47,7 @@
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_breathing.h>
+#include <controllers/me_controller_tree_root.hpp>
 
 #ifdef WIN32
 #include <direct.h>

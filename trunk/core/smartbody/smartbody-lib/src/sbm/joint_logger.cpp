@@ -27,7 +27,7 @@
 #include <string>
 
 #include <controllers/me_ct_blend.hpp>
-
+#include <controllers/me_controller_tree_root.hpp>
 #include "joint_logger.hpp"
 
 using namespace std;

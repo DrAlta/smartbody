@@ -31,8 +31,14 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <map>
 
 #include <sk/sk_skeleton.h>
+#include <sk/sk_motion.h>
+#include "sr_path_list.h"
+
+#include <sbm/general_param_setting.h>
+#include <sbm/action_unit.hpp>
 #include <controllers/me_ct_blend.hpp>
 #include <controllers/me_ct_time_shift_warp.hpp>
 #include "sbm/mcontrol_util.h"
@@ -43,6 +49,8 @@
 #include <controllers/me_ct_interpolator.h>
 #include "sr_curve_builder.h"
 #include "sbm/lin_win.h"
+#include "sbm_speech.hpp"
+#include "sbm/general_param_setting.h"
 #include <boost/filesystem/operations.hpp>
 #include <sb/SBSkeleton.h>
 #include <sb/SBJoint.h>
@@ -62,6 +70,8 @@
 #include <controllers/me_ct_breathing.h>
 #include <controllers/me_ct_hand.hpp>
 #include <controllers/me_ct_face.h>
+#include <controllers/me_ct_curve_writer.hpp>
+#include <controllers/me_controller_tree_root.hpp>
 #include "SteeringAgent.h"
 
 #include <controllers/me_ct_data_receiver.h>
@@ -547,7 +557,7 @@ void SbmCharacter::initData()
 	_height = 1.0f;
 	bonebusCharacter = NULL;
 
-	param_map = new GeneralParamMap;
+	param_map = new std::map<std::string, GeneralParam*>();
 
 	use_viseme_curve = false;
 	viseme_time_offset = 0.0;
@@ -996,7 +1006,7 @@ int SbmCharacter::init_skeleton() {
 
 	// Adding general parameter channels using a format of <char_name>_1_1, <char_name>_2_1, <char_name>_2_2, <char_name>_2_3...(for joint name)
 	int Index = 0;
-	for( GeneralParamMap::const_iterator pos = param_map->begin(); pos != param_map->end(); pos++ )
+	for( std::map< std::string, GeneralParam * >::const_iterator pos = param_map->begin(); pos != param_map->end(); pos++ )
 	{
 		for( int m = 0; m < (int)pos->second->char_names.size(); m++ )
 		{

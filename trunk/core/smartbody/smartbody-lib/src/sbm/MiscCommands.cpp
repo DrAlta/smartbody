@@ -10,6 +10,8 @@
 #include <controllers/me_ct_blend.hpp>
 #include <controllers/me_ct_gaze.h>
 #include <controllers/me_ct_eyelid.h>
+#include <controllers/me_controller_tree_root.hpp>
+#include <controllers/me_ct_channel_writer.hpp>
 #include <boost/filesystem/operations.hpp>
 // android does not use GPU shader for now
 #if !defined(__ANDROID__)

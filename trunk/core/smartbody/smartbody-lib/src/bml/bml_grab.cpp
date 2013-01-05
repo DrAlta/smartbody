@@ -34,6 +34,7 @@
 
 #include "sbm/mcontrol_util.h"
 #include "controllers/me_ct_hand.hpp"
+#include "controllers/me_controller_tree_root.hpp"
 
 #include "bml_target.hpp"
 #include "bml_xml_consts.hpp"

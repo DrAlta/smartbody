@@ -8,6 +8,7 @@
 #include <cstring>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
+#include <controllers/me_controller_tree_root.hpp>
 
 namespace SmartBody {
 

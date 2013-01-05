@@ -35,22 +35,15 @@
 
 #include <sb/SBPawn.h>
 
-#include <sk/sk_motion.h>
-
 #include "sbm_constants.h"
-#include "sbm_speech.hpp"
-#include <sbm/sr_linear_curve.h>
 
 #include <sb/SBFaceDefinition.h>
 #define MeCtSchedulerClass MeCtScheduler2
 
-#include "sr_path_list.h"
 
 #include "sbm_pawn.hpp"
 
-#include <sbm/action_unit.hpp>
 #include <sbm/viseme_map.hpp>
-#include <sbm/general_param_setting.h>
 
 #include <controllers/me_ct_reach.hpp>
 #include <controllers/me_ct_example_body_reach.hpp>
@@ -79,6 +72,15 @@ class MeCtBreathing;
 class MeCtBasicLocomotion;
 class MeCtReachEngine;
 
+class ActionUnit;
+class SkMotion;
+struct GeneralParam;
+
+namespace SmartBody
+{
+	class SpeechInterface;
+}
+
 class SbmCharacter : public SmartBody::SBPawn	{
 
 	// Locomotion + steering
@@ -101,7 +103,7 @@ public:
 
 public:
 	// Static Constants
-	GeneralParamMap*   param_map;
+	std::map<std::string, GeneralParam*>*   param_map;
 
 		// reach motion database for example-based IK reaching
 	MotionDataSet*      reachMotionData;
@@ -174,7 +176,7 @@ public:
 	
 	int init( SkSkeleton* skeleton_p,
 			  SmartBody::SBFaceDefinition* faceDefinition,
-			  GeneralParamMap* param_map,
+			  std::map< std::string, GeneralParam * >* param_map,
 			  const char* classType);
 
 	virtual int setup();
