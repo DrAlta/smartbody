@@ -6,7 +6,7 @@
 #include "controllers/me_ct_eyelid.h"
 #include "controllers/me_ct_curve_writer.hpp"
 #include "SBFaceDefinition.h"
-#include "sbm/nvbg.h"
+#include <sb/nvbg.h>
 #include "SBBehavior.h"
 #include <sb/SBMotion.h>
 #include <sb/SBParseNode.h>

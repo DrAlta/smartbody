@@ -446,7 +446,7 @@ void mcuCBHandle::reset( void )
 	SmartBody::SBFaceDefinition* faceDefinition = new SmartBody::SBFaceDefinition();
 	faceDefinition->setName("_default_");
 	face_map["_default_"] = faceDefinition;
-	SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
+	SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
 	SmartBody::SBScene::destroyScene();
 	_scene = SmartBody::SBScene::getScene();
 	_scene->setCharacterListener(listener);
@@ -867,11 +867,11 @@ void mcuCBHandle::clear( void )
 	getPawnMap().clear();
 
 	// remove NVBG
-	for (std::map<std::string, Nvbg*>::iterator nvbgIter = nvbgMap.begin();
+	for (std::map<std::string, SmartBody::Nvbg*>::iterator nvbgIter = nvbgMap.begin();
 		nvbgIter != nvbgMap.end();
 		nvbgIter++)
 	{
-		Nvbg* nvbg = (*nvbgIter).second;
+		SmartBody::Nvbg* nvbg = (*nvbgIter).second;
 		delete nvbg;
 	}
 	nvbgMap.clear();
@@ -1253,10 +1253,11 @@ void mcuCBHandle::update( void )
 		if( char_p ) {
 
 			// run the minibrain, if available
-			MiniBrain* brain = char_p->getMiniBrain();
+			SmartBody::MiniBrain* brain = char_p->getMiniBrain();
 			if (brain)
 			{
-				brain->update(char_p, time, time_dt);
+				SmartBody::SBCharacter* sbchar = dynamic_cast<SmartBody::SBCharacter*>(char_p);
+				brain->update(sbchar, time, time_dt);
 			}
 
 			// scene update moved to renderer

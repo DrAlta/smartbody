@@ -11,10 +11,9 @@ class SBDebuggerServer;
 class SBDebuggerClient;
 class SBDebuggerUtility;
 
-class SBCharacterListener;
-
 namespace SmartBody {
 
+class SBCharacterListener;
 class SBPawn;
 class SBCharacter;
 class SBSkeleton;

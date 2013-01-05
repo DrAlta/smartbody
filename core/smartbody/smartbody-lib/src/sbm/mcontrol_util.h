@@ -79,11 +79,11 @@ class mcuCBHandle;
 #include <sb/SBPythonClass.h>
 #endif
 
-#include <sbm/nvbg.h>
+#include <sb/nvbg.h>
 
 #include <sbm/KinectProcessor.h>
 #include <sb/SBScene.h>
-#include <sbm/SBCharacterListener.h>
+#include <sb/SBCharacterListener.h>
 
 
 #ifndef USE_PYTHON
@@ -300,7 +300,7 @@ class mcuCBHandle {
 
 		SkMotion* getMotion(const std::string& motionName);
 
-		std::map<std::string, Nvbg*> nvbgMap;
+		std::map<std::string, SmartBody::Nvbg*> nvbgMap;
 		std::map<std::string, SbmPawn*>	pawn_map;
 		std::map<std::string, SbmCharacter*> character_map;
 

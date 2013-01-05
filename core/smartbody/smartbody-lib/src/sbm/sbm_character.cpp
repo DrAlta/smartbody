@@ -1888,7 +1888,7 @@ void SbmCharacter::schedule_viseme_blend_ramp(
 
 void SbmCharacter::forward_visemes( double curTime )
 {
-	SBCharacterListener *listener_p = SmartBody::SBScene::getScene()->getCharacterListener();
+	SmartBody::SBCharacterListener *listener_p = SmartBody::SBScene::getScene()->getCharacterListener();
 
 	if( bonebusCharacter || listener_p )
 	{
@@ -1924,7 +1924,7 @@ void SbmCharacter::forward_visemes( double curTime )
 void SbmCharacter::forward_parameters( double curTime )
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	SBCharacterListener *listener_p = scene->getCharacterListener();
+	SmartBody::SBCharacterListener *listener_p = scene->getCharacterListener();
 
 	if( listener_p )
 	{
@@ -2489,23 +2489,23 @@ void SbmCharacter::addActionUnitChannel(int auNum, ActionUnit* au)
 	}
 }
 
-void SbmCharacter::setNvbg(Nvbg* nvbg)
+void SbmCharacter::setNvbg(SmartBody::Nvbg* nvbg)
 {
 	LOG("set character %s NVBG",getName().c_str());
 	_nvbg = nvbg;
 }
 
-Nvbg* SbmCharacter::getNvbg()
+SmartBody::Nvbg* SbmCharacter::getNvbg()
 {
 	return _nvbg;
 }
 
-void SbmCharacter::setMiniBrain(MiniBrain* mini)
+void SbmCharacter::setMiniBrain(SmartBody::MiniBrain* mini)
 {
 	_miniBrain = mini;
 }
 
-MiniBrain* SbmCharacter::getMiniBrain()
+SmartBody::MiniBrain* SbmCharacter::getMiniBrain()
 {
 	return _miniBrain;
 }

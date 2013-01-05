@@ -4,6 +4,9 @@
 #include <sb/SBObject.h>
 #include <string>
 
+namespace SmartBody 
+{
+
 class Nvbg : public SmartBody::SBObject
 {
 public:
@@ -28,5 +31,6 @@ public:
 
 };
 
+}
 
 #endif

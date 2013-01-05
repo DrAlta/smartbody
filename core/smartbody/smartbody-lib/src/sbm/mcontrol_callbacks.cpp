@@ -3765,7 +3765,7 @@ int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				if (!character)
 					continue;
 
-				Nvbg* nvbg = character->getNvbg();
+				SmartBody::Nvbg* nvbg = character->getNvbg();
 				if (!nvbg)
 					continue;
 
@@ -3800,7 +3800,7 @@ int mcu_vrBCFeedback_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		SbmCharacter* character = mcu_p->getCharacter(cName);
 		if (character)
 		{
-			Nvbg* nvbg = character->getNvbg();
+			SmartBody::Nvbg* nvbg = character->getNvbg();
 			if (!nvbg)
 			{
 				LOG("mcu_vrBCFeedback_func ERR: character %s doesn't has NVBG attached", cName.c_str());
@@ -3846,7 +3846,7 @@ int mcu_vrSpeech_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			if (!character)
 				continue;
 
-			Nvbg* nvbg = character->getNvbg();
+			SmartBody::Nvbg* nvbg = character->getNvbg();
 			if (!nvbg)
 				continue;
 
@@ -5586,7 +5586,7 @@ int mcu_vrExpress_func( srArgBuffer& args, mcuCBHandle *mcu )
 	if (!character)
 		return CMD_SUCCESS;
 
-	Nvbg* nvbg = character->getNvbg();
+	SmartBody::Nvbg* nvbg = character->getNvbg();
 	if (!nvbg)
 		return CMD_SUCCESS;
 

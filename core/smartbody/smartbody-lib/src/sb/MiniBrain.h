@@ -6,6 +6,9 @@
 #include <string>
 #include <list>
 
+namespace SmartBody 
+{
+
 struct ObjectData
 {
 	SrVec velocity;
@@ -17,7 +20,7 @@ struct ObjectData
 	bool isAnimate;
 };
 
-class SbmCharacter;
+class SBCharacter;
 
 class MiniBrain
 {
@@ -25,11 +28,13 @@ class MiniBrain
 		MiniBrain();
 		virtual ~MiniBrain();
 
-		virtual void update(SbmCharacter* character, double time, double dt);
+		virtual void update(SBCharacter* character, double time, double dt);
 
 	protected:
 		std::map<std::string, ObjectData> _data;
 		int _cacheLimit;
 };
+
+}
 
 #endif

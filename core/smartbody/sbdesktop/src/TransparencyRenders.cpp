@@ -7,7 +7,8 @@
 #include <sb/SBJoint.h>
 #include "TransparentViewer.h"
 #include <sbm/GPU/SbmShader.h>
-
+#include <sbm/GPU/SbmShader.h>
+#include <sbm\sbm_deformable_mesh.h>
 
 
 TransparencyRenders::TransparencyRenders(TransparentViewer* viewer)

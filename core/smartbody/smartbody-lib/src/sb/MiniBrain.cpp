@@ -5,6 +5,9 @@
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_gaze.h>
 
+namespace SmartBody 
+{
+
 MiniBrain::MiniBrain()
 {
 	_cacheLimit = 5;
@@ -17,7 +20,7 @@ MiniBrain::~MiniBrain()
 
 int minibrainCounter = 0;
 
-void MiniBrain::update(SbmCharacter* character, double time, double dt)
+void MiniBrain::update(SBCharacter* character, double time, double dt)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (minibrainCounter < 300)
@@ -229,3 +232,4 @@ void MiniBrain::update(SbmCharacter* character, double time, double dt)
 }
 
 
+}
