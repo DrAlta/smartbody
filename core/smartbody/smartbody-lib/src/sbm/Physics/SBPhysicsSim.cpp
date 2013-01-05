@@ -5,6 +5,8 @@
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sr/sr_output.h>
+#include <controllers/me_ct_ublas.hpp>
+
 
 //#include <boost/math/special_functions/fpclassify.hpp>
 namespace SmartBody 
