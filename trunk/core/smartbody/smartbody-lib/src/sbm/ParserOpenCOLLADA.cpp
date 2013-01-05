@@ -1289,23 +1289,23 @@ std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 {
 	boost::algorithm::to_lower(idString);
 	size_t found = idString.find("position");
-	if (found != string::npos)
+	if (found != std::string::npos)
 		return "positions";
 
 	found = idString.find("binormal");
-	if (found != string::npos)
+	if (found != std::string::npos)
 		return "";
 
 	found = idString.find("normal");
-	if (found != string::npos)
+	if (found != std::string::npos)
 		return "normals";
 
 	found = idString.find("uv");
-	if (found != string::npos)
+	if (found != std::string::npos)
 		return "texcoords";
 
 	found = idString.find("map");
-	if (found != string::npos)
+	if (found != std::string::npos)
 		return "texcoords";
 
 //	LOG("ParserOpenCOLLADA::getGeometryType WARNING: type %s not supported!", idString.c_str());	
