@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8BBCFC4A-6B52-461E-8BBA-A86DE3FAD6F6}</ProjectGuid>
+    <RootNamespace>SmartBody</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>$(ProjectName)_d</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\smartbody-dll\include;..\smartbody-lib\src;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python26\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>SB_EXPORTS;dDOUBLE;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libFestival.lib;libestbase.lib;libestools.lib;libeststring.lib;smartbodyd.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc100-mt-gd-1_44.lib;boost_system-vc100-mt-gd-1_44.lib;boost_regex-vc100-mt-gd-1_44.lib;boost_python-vc100-mt-gd-1_44.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\smartbody-lib\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;..\clapack\lib;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug;..\..\..\core\smartbody\ode\lib;..\..\..\core\smartbody\Python26\libs;..\..\..\lib\festival\festival\src\lib;..\..\..\lib\festival\speech_tools\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>if not exist lib mkdir lib
+copy /Y "$(TargetPath)" lib
+copy /Y "$(OutDir)$(ProjectName)_d.lib" lib
+copy /Y "$(OutDir)$(ProjectName)_d.pdb" lib
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>SB_EXPORTS;dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\smartbody-dll\include;..\smartbody-lib\src;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python26\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>..\smartbody-lib\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;..\..\..\lib\festival\festival\src\lib;..\..\..\lib\festival\speech_tools\lib;..\ode\lib;..\clapack\lib;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release;..\..\..\core\smartbody\Python26\libs;..\..\..\lib\cerevoice\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>smartbody.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_44.lib;boost_system-vc100-mt-1_44.lib;boost_regex-vc100-mt-1_44.lib;boost_python-vc100-mt-1_44.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <PostBuildEvent>
+      <Command>if not exist lib mkdir lib
+copy /Y "$(TargetPath)" lib
+copy /Y "$(OutDir)$(ProjectName).lib" lib
+copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\smartbody-dll\smartbody-c-dll.cpp" />
+    <ClCompile Include="..\smartbody-dll\smartbody-dll.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\smartbody-dll\include\smartbody-c-dll.h" />
+    <ClInclude Include="..\smartbody-dll\include\smartbody-dll.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
