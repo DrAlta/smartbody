@@ -28,6 +28,7 @@
 
 #include <bml/bml.hpp>
 #include <sb/SBSkeleton.h>
+#include <controllers/me_controller_tree_root.hpp>
 
 ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
 {

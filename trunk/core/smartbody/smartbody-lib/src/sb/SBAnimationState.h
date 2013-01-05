@@ -4,6 +4,8 @@
 #include <sb/SBTypes.h>
 #include <sr/sr_sn_colorsurf.h>
 #include <controllers/me_ct_param_animation_data.h>
+#include <sr/sr_lines.h>
+
 # define VFLOW_LINE_WIDTH 2.0f
 
 typedef std::map<std::string, std::vector<double> > KeyTag;
@@ -107,7 +109,7 @@ class SBAnimationBlend : public PABlend
 
 		SrMat plotMotionTransform;
 		SrMat plotVectorFlowTransform;
-		std::vector<SrSnLines*> vecflowLinesArray;
+		std::vector<SrSnShape<SrLines>*> vecflowLinesArray;
 		// put a list of joint global positions into array
 		void getJointsGPosFromSkel(SkSkeleton* sk, SrArray<SrVec>& pnts_array, const std::vector<SkJoint*>& jnt_list);
 		// find maximum vector norm (vector are connected between jnt global positions in consecutive frame pairs)

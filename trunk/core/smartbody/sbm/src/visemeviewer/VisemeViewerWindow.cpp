@@ -758,10 +758,10 @@ void VisemeViewerWindow::OnDiphoneSelectCB(Fl_Widget* widget, void* data)
 		return;
 
 	std::string str = viewer->_browserDiphone->text(viewer->_browserDiphone->value());
-	std::vector<string> diphones;
+	std::vector<std::string> diphones;
 	std::stringstream ss(str);
 
-	string tok;
+	std::string tok;
 
 	while (ss >> tok)
 	{

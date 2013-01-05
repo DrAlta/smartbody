@@ -12,6 +12,8 @@
 #include <controllers/me_ct_eyelid.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <controllers/me_ct_channel_writer.hpp>
+#include <controllers/MeCtReachEngine.h>
+#include <controllers/me_ct_example_body_reach.hpp>
 #include <boost/filesystem/operations.hpp>
 // android does not use GPU shader for now
 #if !defined(__ANDROID__)
@@ -19,7 +21,7 @@
 #endif
 
 
-int set_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args)
+int set_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args)
 {
 	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
 
@@ -74,7 +76,7 @@ int set_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args)
 }
 
 
-int print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args)
+int print_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args)
 {
 	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
 	std::stringstream strstr;
@@ -93,7 +95,7 @@ int print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args)
 	} else if( attribute=="joint" || attribute=="joints" ) {
 		//  Command: print character <character id> [joint|joints] <joint name>*
 		//  Print out the current state of the named joints
-		string joint_name = args.read_token();
+		std::string joint_name = args.read_token();
 		if( joint_name.length()==0 ) {
 			LOG("ERROR: SbmPawn::print_attribute(..): Missing joint name of joint to print.");
 			return CMD_FAILURE;
@@ -181,7 +183,7 @@ void handle_wsp_error( std::string id, std::string attribute_name, int error, st
 
 int pawn_set_cmd_funcx( srArgBuffer& args, mcuCBHandle* mcu_p)
 {
-	string pawn_id = args.read_token();
+	std::string pawn_id = args.read_token();
 	if( pawn_id.length()==0 ) {
 		LOG("ERROR: SbmPawn::set_cmd_func(..): Missing pawn id.");
 		return CMD_FAILURE;
@@ -193,7 +195,7 @@ int pawn_set_cmd_funcx( srArgBuffer& args, mcuCBHandle* mcu_p)
 		return CMD_FAILURE;
 	}
 
-	string attribute = args.read_token();
+	std::string attribute = args.read_token();
 	if( attribute.length()==0 ) {
 		LOG("ERROR: SbmPawn::set_cmd_func(..): Missing attribute \"%s\" to set.", attribute.c_str());
 		return CMD_FAILURE;
@@ -212,7 +214,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 
 	if( strlen( impl_id )==0 ) {
 		character->set_speech_impl( NULL );
-		string s( "" );
+		std::string s( "" );
 		character->set_voice_code( s );
 
 		// Give feedback if unsetting
@@ -224,7 +226,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl( mcu_p->speech_rvoice() );
-		string s( voice_id );
+		std::string s( voice_id );
 		character->set_voice_code( s );
 	} else if( _stricmp( impl_id, "local" )==0 ) {
 		const char* voice_id = args.read_token();
@@ -236,7 +238,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 		character->set_speech_impl( mcu_p->speech_localvoice() );
 		FestivalSpeechRelayLocal* relay = mcu_p->festivalRelay();
 		relay->setVoice(voice_id);
-		string s( voice_id );
+		std::string s( voice_id );
 		character->set_voice_code( s );
 	} else if( _stricmp( impl_id, "audiofile" )==0 ) {
 		const char* voice_path = args.read_token();
@@ -245,7 +247,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl( mcu_p->speech_audiofile() );
-		string voice_path_str= "";
+		std::string voice_path_str= "";
 		voice_path_str+=voice_path;
 		character->set_voice_code( voice_path_str );
 	} else if( _stricmp( impl_id, "text" )==0 ) {
@@ -255,7 +257,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl( mcu_p->speech_text() );
-		string voice_path_str= "";
+		std::string voice_path_str= "";
 		voice_path_str+=voice_path;
 		character->set_voice_code( voice_path_str );
 	} else {
@@ -275,7 +277,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 
 	if( strlen( impl_id )==0 ) {
 		character->set_speech_impl_backup( NULL );
-		string s("");
+		std::string s("");
 		character->set_voice_code_backup( s );
 
 		// Give feedback if unsetting
@@ -287,7 +289,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl_backup( mcu_p->speech_rvoice() );
-		string s( voice_id );
+		std::string s( voice_id );
 		character->set_voice_code_backup( s );
 	} else if( _stricmp( impl_id, "local" )==0 ) {
 		const char* voice_id = args.read_token();
@@ -299,7 +301,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 		character->set_speech_impl_backup( mcu_p->speech_localvoice() );
 		FestivalSpeechRelayLocal* relay = mcu_p->festivalRelay();
 		relay->setVoice(voice_id);
-		string s( voice_id );
+		std::string s( voice_id );
 		character->set_voice_code_backup( s );
 	} else if( _stricmp( impl_id, "audiofile" )==0 ) {
 		const char* voice_path = args.read_token();
@@ -308,7 +310,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl_backup( mcu_p->speech_audiofile() );
-		string voice_path_str= "";
+		std::string voice_path_str= "";
 		voice_path_str+=voice_path;
 		character->set_voice_code_backup( voice_path_str );
 	} else if( _stricmp( impl_id, "text" )==0 ) {
@@ -318,7 +320,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl_backup( mcu_p->speech_text() );
-		string voice_path_str= "";
+		std::string voice_path_str= "";
 		voice_path_str+=voice_path;
 		character->set_voice_code_backup( voice_path_str );
 	} else {
@@ -337,14 +339,14 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
-	string pawn_name = args.read_token();
+	std::string pawn_name = args.read_token();
 	if( pawn_name.length()==0 )
 	{
 		LOG("ERROR: Expected pawn name.");
 		return CMD_FAILURE;
 	}
 
-	string pawn_cmd = args.read_token();
+	std::string pawn_cmd = args.read_token();
 	if( pawn_cmd.length()==0 )
 	{
 		LOG("ERROR: Expected pawn command.");
@@ -373,7 +375,7 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		SrVec rec;
 		std::string defaultColor = "red";
 		while( args.calc_num_tokens() > 0 ) {
-			string option = args.read_token();
+			std::string option = args.read_token();
 			// TODO: Make the following option case insensitive
 			if( option == "loc" ) {
 				args.read_float_vect( loc, 3 );
@@ -401,7 +403,7 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 				has_geom = true;
 			} else {
 				std::stringstream strstr;
-				strstr << "WARNING: Unrecognized pawn init option \"" << option << "\"." << endl;
+				strstr << "WARNING: Unrecognized pawn init option \"" << option << "\"." << std::endl;
 				LOG(strstr.str().c_str());
 			}
 		}		
@@ -410,7 +412,7 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		pawn_p->setClassType("pawn");
 		SkSkeleton* skeleton = new SmartBody::SBSkeleton();
 		skeleton->ref();
-		string skel_name = pawn_name+"-skel";
+		std::string skel_name = pawn_name+"-skel";
 		skeleton->setName( skel_name);
 		// Init channels
 		skeleton->make_active_channels();
@@ -543,7 +545,7 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 
 int character_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 {
-	string char_name = args.read_token();
+	std::string char_name = args.read_token();
 	if( char_name.length()==0 ) {
 		LOG( "HELP: char <> <command>" );
 		LOG( "  param" );
@@ -584,7 +586,7 @@ int character_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		return( CMD_SUCCESS );
 	}
 
-	string char_cmd = args.read_token();
+	std::string char_cmd = args.read_token();
 	if( char_cmd.length()==0 ) {
 		LOG( "SbmCharacter::character_cmd_func: ERR: Expected character command." );
 		return CMD_FAILURE;
@@ -665,7 +667,7 @@ int character_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 			}
 			else
 			{
-				mcu_p->param_map.insert(make_pair(string(param_name),new_param));
+				mcu_p->param_map.insert(make_pair(std::string(param_name),new_param));
 			}
 			return( CMD_SUCCESS );
 		}
@@ -746,7 +748,7 @@ int create_remote_pawn_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 
 int character_set_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 {
-	string character_id = args.read_token();
+	std::string character_id = args.read_token();
 	if( character_id.length()==0 ) {
 		LOG("ERROR: SbmCharacter::set_cmd_func(..): Missing character id.");
 		return CMD_FAILURE;
@@ -758,7 +760,7 @@ int character_set_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		return CMD_FAILURE;
 	}
 
-	string attribute = args.read_token();
+	std::string attribute = args.read_token();
 	if( attribute.length()==0 ) {
 		LOG("ERROR: SbmCharacter::set_cmd_func(..): Missing attribute to set.");
 		return CMD_FAILURE;
@@ -776,7 +778,7 @@ int character_set_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 
 int pawn_print_cmd_funcx( srArgBuffer& args, mcuCBHandle* mcu_p)
 {
-	string pawn_id = args.read_token();
+	std::string pawn_id = args.read_token();
 	if( pawn_id.length()==0 ) {
 		LOG("ERROR: SbmPawn::print_cmd_func(..): Missing pawn id.");
 		return CMD_FAILURE;
@@ -788,7 +790,7 @@ int pawn_print_cmd_funcx( srArgBuffer& args, mcuCBHandle* mcu_p)
 		return CMD_FAILURE;
 	}
 
-	string attribute = args.read_token();
+	std::string attribute = args.read_token();
 	if( attribute.length()==0 ) {
 		LOG("ERROR: SbmPawn::print_cmd_func(..): Missing attribute to print.");
 		return CMD_FAILURE;
@@ -799,7 +801,7 @@ int pawn_print_cmd_funcx( srArgBuffer& args, mcuCBHandle* mcu_p)
 
 int character_print_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 {
-	string character_id = args.read_token();
+	std::string character_id = args.read_token();
 	if( character_id.length()==0 ) {
 		LOG("ERROR: SbmCharacter::print_cmd_func(..): Missing character id.");
 		return CMD_FAILURE;
@@ -811,7 +813,7 @@ int character_print_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		return CMD_FAILURE;
 	}
 
-	string attribute = args.read_token();
+	std::string attribute = args.read_token();
 	if( attribute.length()==0 ) {
 		LOG("ERROR: SbmCharacter::print_cmd_func(..): Missing attribute to print.");
 		return CMD_FAILURE;
@@ -833,9 +835,9 @@ int character_print_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 
 
 // Print error on error..
-bool parse_float_or_error( float& var, const char* str, const string& var_name )
+bool parse_float_or_error( float& var, const char* str, const std::string& var_name )
 {
-	if( istringstream( str ) >> var )
+	if( std::istringstream( str ) >> var )
 		return true; // no error
 	// else
 	LOG("ERROR: Invalid value for %s: %s", var_name.c_str(), str);
@@ -849,7 +851,7 @@ int set_world_offset_cmd( SbmPawn* pawn, srArgBuffer& args )
 	pawn->get_world_offset( x, y, z, h, p, r );
 
 	bool has_error = false;
-	string arg = args.read_token();
+	std::string arg = args.read_token();
 	if( arg.length() == 0 ) {
 		LOG("ERROR: SbmPawn::set_world_offset: Missing offset parameters.");
 		return CMD_FAILURE;
@@ -923,7 +925,7 @@ int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 		SrVec size = SrVec(1.f,1.f,1.f);		
 		while( args.calc_num_tokens() > 0 )
 		{
-			string option = args.read_token();
+			std::string option = args.read_token();
 			// TODO: Make the following option case insensitive
 			if( option=="geom" ) {
 				geom_str = args.read_token();
@@ -978,7 +980,7 @@ int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 	}
 	else if (cmd == "physics")
 	{
-		string option = args.read_token();
+		std::string option = args.read_token();
 
 		bool turnOn = false;
 		if (option == "on" || option == "ON")
@@ -997,7 +999,7 @@ int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 	}
 	else if (cmd == "collision")
 	{	
-		string option = args.read_token();
+		std::string option = args.read_token();
 		bool turnOn = false;
 		if (option == "on" || option == "ON")
 			turnOn = true;			
@@ -1700,7 +1702,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 						} 
 			else if( cmd == "gazefade" ) {
 
-					string fade_cmd = args.read_token();
+					std::string fade_cmd = args.read_token();
 					bool fade_in;
 					bool print_track = false;
 					if( fade_cmd == "in" ) {
@@ -1784,7 +1786,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 								{
 									if( character->eyelid_reg_ct_p )	{
 
-										string eyelid_cmd  = args.read_token();
+										std::string eyelid_cmd  = args.read_token();
 										if( eyelid_cmd.length()==0 ) {
 
 											LOG( "char <> eyelid <command>:" );
@@ -1949,8 +1951,8 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 									}
 									else if (cmd == "sk")
 									{
-										string file = args.read_token();
-										string scaleStr = args.read_token();
+										std::string file = args.read_token();
+										std::string scaleStr = args.read_token();
 										double scale = atof(scaleStr.c_str());
 										return character->writeSkeletonHierarchy(file, scale);		
 									}
@@ -2029,11 +2031,11 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 // 									}
 									else if ( cmd == "handmotion")
 									{
-										string hand_cmd = args.read_token();	
+										std::string hand_cmd = args.read_token();	
 										if (hand_cmd == "grabhand" || hand_cmd == "reachhand" || hand_cmd == "releasehand")
 										{
-											string motion_name = args.read_token();
-											string tagName = args.read_token();
+											std::string motion_name = args.read_token();
+											std::string tagName = args.read_token();
 											SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
 											//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
 											int reachType = MeCtReachEngine::getReachType(tagName);//
@@ -2061,7 +2063,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 									}
 									else if ( cmd == "reachmotion" )
 									{
-										string reach_cmd = args.read_token();		
+										std::string reach_cmd = args.read_token();		
 										bool print_track = false;
 										if (reach_cmd == "add")
 										{			

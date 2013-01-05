@@ -172,7 +172,7 @@ namespace BML {
 		*/
 		void processVisemes(std::vector<SmartBody::VisemeData*>* visemes, BmlRequestPtr request, float scale = 1.0f);
 
-		string	policy;
+		std::string policy;
 
 	protected:
 		void createStandardSyncPoint( const std::wstring& attr, SyncPointPtr& sync );

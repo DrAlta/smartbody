@@ -8,6 +8,7 @@
 #include "sbm/mcontrol_util.h"
 #include "sb/SBScene.h"
 #include <controllers/me_ct_motion_blend.hpp>
+#include <controllers/me_ct_example_body_reach.hpp>
 #include "me_ct_barycentric_interpolation.h"
 #include "sbm/Event.h"
 #include <sb/SBSteerManager.h>

@@ -298,7 +298,7 @@ void MotionEditorWindow::OnButtonPlayMotionFolder(Fl_Widget* widget, void* data)
 		skmMotionNames.push_back(fileName);
 	}
 	LOG("Playing animations in folder %s", motionFolderPath.c_str());
-	stringstream command;
+	std::stringstream command;
 	for (size_t i = 0; i < skmMotionNames.size(); ++i)
 	{
 		LOG("%s", skmMotionNames[i].c_str());

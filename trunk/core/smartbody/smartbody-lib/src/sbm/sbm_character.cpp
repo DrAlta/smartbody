@@ -72,6 +72,8 @@
 #include <controllers/me_ct_face.h>
 #include <controllers/me_ct_curve_writer.hpp>
 #include <controllers/me_controller_tree_root.hpp>
+#include <controllers/me_ct_reach.hpp>
+#include <controllers/me_ct_example_body_reach.hpp>
 #include "SteeringAgent.h"
 
 #include <controllers/me_ct_data_receiver.h>
