@@ -36,7 +36,7 @@
 #include <sk/sk_skeleton.h>
 #include <sk/sk_motion.h>
 #include "sr_path_list.h"
-
+#include "sbm_constants.h"
 #include <sbm/general_param_setting.h>
 #include <sbm/action_unit.hpp>
 #include <controllers/me_ct_blend.hpp>

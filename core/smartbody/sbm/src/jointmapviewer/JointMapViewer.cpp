@@ -19,6 +19,7 @@
 #include <sr/sr_gl_render_funcs.h>
 #include <sr/sr_sphere.h>
 #include <sr/sr_sn_shape.h>
+#include <sbm/gwiz_math.h>
 
 #ifndef WIN32
 #define _strdup strdup
