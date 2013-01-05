@@ -23,8 +23,12 @@
 
 #ifndef _ME_CT_PARAM_ANIMATION_DATA_H_
 #define _ME_CT_PARAM_ANIMATION_DATA_H_
-#include "controllers/me_ct_param_animation_utilities.h"
+
 #include <sr/sr_triangle.h>
+#include <sr/sr_vec.h>
+#include <string>
+#include <vector>
+#include <sk/sk_motion.h>
 
 namespace SmartBody {
 	class MotionEvent;

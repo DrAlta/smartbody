@@ -1,5 +1,6 @@
 #include "SBAnimationTransition.h"
 #include <sb/SBAnimationState.h>
+#include <sstream>
 
 namespace SmartBody {
 
