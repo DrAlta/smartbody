@@ -58,8 +58,8 @@ class SteeringAgent
 		void normalizeAngle(float& angle);
 		inline float cmToM(float v)		{return (v / 100.0f);}
 		inline float mToCm(float v)		{return (v * 100.0f);}
-		inline float degToRad(float v)	{return (v * float(M_PI) / 180.0f);}
-		inline float radToDeg(float v)	{return (v * 180.0f / float(M_PI));}
+		inline float degToRad(float v)	{return (v * 3.14159f / 180.0f);}
+		inline float radToDeg(float v)	{return (v * 180.0f / 3.14159f);}
 
 		float evaluateBasicLoco(float dt, float x, float y, float z, float yaw);
 		float evaluateExampleLoco(float dt, float x, float y, float z, float yaw);

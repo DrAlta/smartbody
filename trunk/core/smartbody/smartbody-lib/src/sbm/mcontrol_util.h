@@ -71,7 +71,6 @@ class mcuCBHandle;
 #include "ResourceManager.h"
 #include "sbm/Event.h"
 #include <sbm/action_unit.hpp>
-#include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
 
 #include <sb/SBJointMap.h>

@@ -34,16 +34,12 @@
 #include <map>
 
 #include <sb/SBPawn.h>
-
-#include "sbm_constants.h"
-
 #include <sb/SBFaceDefinition.h>
 #define MeCtSchedulerClass MeCtScheduler2
 
 
 #include "sbm_pawn.hpp"
 
-#include <sbm/viseme_map.hpp>
 #include <sbm/nvbg.h>
 #include <sbm/MiniBrain.h>
 
@@ -126,7 +122,7 @@ protected:
 	// Evaluation time face data
 	SkMotion*				face_neutral;
 
-	VisemeMotionMap 		viseme_map;
+	std::map< std::string, SkMotion* > 		viseme_map;
 
 	//MeCtLocomotionAnalysis* locomotion_ct_analysis;
 
