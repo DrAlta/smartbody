@@ -182,7 +182,7 @@ void SBSteerManager::start()
 		mcu._scene->getSteerManager()->getEngineDriver()->finish();
 		delete steerOptions;
 		return;
-	} catch (exception& e) {
+	} catch (std::exception& e) {
 		if (e.what())
 			LOG("Problem starting steering engine: %s", e.what()); 
 		else

@@ -65,6 +65,7 @@
 # include <controllers/me_ct_constraint.hpp>
 # include <controllers/me_ct_param_animation.h>
 # include <controllers/me_ct_scheduler2.h>
+# include <controllers/me_controller_tree_root.hpp>
 
 # include <sbm/Physics/SBColObject.h>
 # include <controllers/me_ct_param_animation_data.h>

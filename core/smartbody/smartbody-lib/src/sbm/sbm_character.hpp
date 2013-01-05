@@ -44,10 +44,6 @@
 #include "sbm_pawn.hpp"
 
 #include <sbm/viseme_map.hpp>
-
-#include <controllers/me_ct_reach.hpp>
-#include <controllers/me_ct_example_body_reach.hpp>
-
 #include <sbm/nvbg.h>
 #include <sbm/MiniBrain.h>
 
@@ -106,13 +102,13 @@ public:
 	std::map<std::string, GeneralParam*>*   param_map;
 
 		// reach motion database for example-based IK reaching
-	MotionDataSet*      reachMotionData;
-	MotionDataSet*      reachHandData;
-	MotionDataSet*      grabHandData;
-	MotionDataSet*      releaseHandData;
-	MotionDataSet*      pointHandData;
+	std::set<std::pair<int,SkMotion*> >*      reachMotionData;
+	std::set<std::pair<int,SkMotion*> >*      reachHandData;
+	std::set<std::pair<int,SkMotion*> >*      grabHandData;
+	std::set<std::pair<int,SkMotion*> >*      releaseHandData;
+	std::set<std::pair<int,SkMotion*> >*      pointHandData;
 		// reach engine map
-	ReachEngineMap* reachEngineMap;
+	std::map<int,MeCtReachEngine*>* reachEngineMap;
 	int            currentReachType;
 
 
@@ -308,17 +304,17 @@ public:
 	static int character_ctrl_cmd( srArgBuffer& args);
 
 public:
-	static SkMotion* findTagSkMotion(int tag, const MotionDataSet& motionSet);
-	static void addTagSkMotion(int tag, SkMotion* motion, MotionDataSet& motionSet);
+	static SkMotion* findTagSkMotion(int tag, const std::set<std::pair<int,SkMotion*> >& motionSet);
+	static void addTagSkMotion(int tag, SkMotion* motion, std::set<std::pair<int,SkMotion*> >& motionSet);
 	bool addReachMotion(int tag, SkMotion* motion);
 	bool removeReachMotion(int tag, SkMotion* motion);
 	SkMotion* getReachMotion(int index);
-	const MotionDataSet& getReachMotionDataSet() const { return *reachMotionData;}
+	const std::set<std::pair<int,SkMotion*> >& getReachMotionDataSet() const { return *reachMotionData;}
 
-	const MotionDataSet& getPointHandData() const { return *pointHandData;}
-	const MotionDataSet& getGrabHandData() const { return *grabHandData;}
-	const MotionDataSet& getReachHandData() const { return *reachHandData;}
-	const MotionDataSet& getReleaseHandData() const { return *releaseHandData;}
+	const std::set<std::pair<int,SkMotion*> >& getPointHandData() const { return *pointHandData;}
+	const std::set<std::pair<int,SkMotion*> >& getGrabHandData() const { return *grabHandData;}
+	const std::set<std::pair<int,SkMotion*> >& getReachHandData() const { return *reachHandData;}
+	const std::set<std::pair<int,SkMotion*> >& getReleaseHandData() const { return *releaseHandData;}
 	std::map<int,MeCtReachEngine*>& getReachEngineMap() { return *reachEngineMap; }
 	int   getCurrentReachType() { return currentReachType; }
 	void   setCurrentReachType(int type) { currentReachType = type; }

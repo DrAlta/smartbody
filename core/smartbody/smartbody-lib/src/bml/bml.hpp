@@ -133,7 +133,7 @@ namespace BML {
 #endif
 		void init( BmlRequestPtr self );
 
-		std::string buildUniqueBehaviorId( const string& tagStr, const string& idStr, size_t ordinal );
+		std::string buildUniqueBehaviorId( const std::string& tagStr, const std::string& idStr, size_t ordinal );
 
 		bool hasExistingBehaviorId( const std::wstring& id );
 		void importNamedSyncPoints( BehaviorSyncPoints& behav_syncs, const std::wstring& id, const std::wstring& logging_label );
@@ -141,7 +141,7 @@ namespace BML {
 		BehaviorSpan getBehaviorSpan();
 
 		/**
-		 *  Schedules and realizes teh behaviors of the BmlRequest.
+		 *  Schedules and realizes the behaviors of the BmlRequest.
 		 *  May throw BML::RealizationException if error occurs or request is unschedulable.
 		 */
 		void realize( Processor* bp, mcuCBHandle *mcu );

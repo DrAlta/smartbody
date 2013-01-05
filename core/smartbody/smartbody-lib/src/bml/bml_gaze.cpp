@@ -94,7 +94,7 @@ namespace BML {
 
 		bool parse_children( DOMElement* elem, Gaze::KeyData* key_data[] );
 
-		ostream& operator<<( ostream& os, const Gaze::KeyData key_data ) {
+		std::ostream& operator<<( std::ostream& os, const Gaze::KeyData key_data ) {
 			os <<"KeyData: heading="<<key_data.bias_heading
 					<<", pitch="<<key_data.bias_pitch
 					<<", roll="<<key_data.bias_roll

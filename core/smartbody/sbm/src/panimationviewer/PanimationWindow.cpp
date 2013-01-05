@@ -276,7 +276,7 @@ void PanimationWindow::addTimeMarkToBlock(nle::Block* block, double t)
 
 std::vector<std::string> PanimationWindow::tokenize(const std::string& str,const std::string& delimiters)
 {
-	std::vector<string> tokens;
+	std::vector<std::string> tokens;
     	
 	// skip delimiters at beginning.
 	std::string::size_type lastPos = str.find_first_not_of(delimiters, 0);

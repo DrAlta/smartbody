@@ -14,6 +14,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <controllers/me_controller_tree_root.hpp>
 #include <sbm/nvbg.h>
 #include <sb/SBServiceManager.h>
 #include <sb/SBJointMapManager.h>
@@ -498,7 +499,7 @@ void ResourceWindow::updateSeqFiles( Fl_Tree_Item* tree, std::string pname )
 		for( directory_iterator i( seqPath ); i!=end; ++i ) {
 			const path& cur = *i;
 			if( !is_directory( cur ) ) {
-				string ext = extension( cur );	
+				std::string ext = extension( cur );	
 				if (_stricmp(ext.c_str(),".seq") == 0 ||
 					_stricmp(ext.c_str(),".SEQ") == 0 )
 				{
