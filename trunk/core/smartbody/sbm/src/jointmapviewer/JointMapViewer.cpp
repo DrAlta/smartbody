@@ -884,7 +884,15 @@ int SkeletonViewer::handle( int event )
 			//LOG("focus joint name = %s",focusName.c_str());
 			if (focusName != "")
 			{
-				setFocusJointName(focusName);
+				if (focusName != focusJointName)
+				{
+					setFocusJointName(focusName);
+				}
+				else
+				{
+					setFocusJointName("");
+
+				}				
 				pickMsg = true;
 			}
 		}
@@ -1266,6 +1274,7 @@ const std::string rightLegJointNames[5] = { "r_hip", "r_knee", "r_ankle", "r_for
 
 JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h, name)
 {
+	rootWindow = NULL;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	begin();	
 	int curY = 10;
@@ -1330,9 +1339,9 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	
 	_scrollGroup->end();
 	curY += (h-curY-50)  + 15;
-	_buttonApply = new Fl_Button(100, curY, 60, 20, "Apply Map");
+	_buttonApply = new Fl_Button(40, curY, 120, 20, "Apply Map");
 	_buttonApply->callback(ApplyMapCB, this);
-	_buttonCancel = new Fl_Button(180, curY, 60, 20, "Cancel");
+	_buttonCancel = new Fl_Button(180, curY, 120, 20, "Cancel");
 	_buttonCancel->callback(CancelCB, this);
 	
 	leftGroup->end();
@@ -1356,7 +1365,7 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	_buttonJointLabel->add("Mapped Name");
 	_buttonJointLabel->value(0);
 	_buttonJointLabel->callback(CheckShowJointLabelCB,this);
-	_buttonAddMapping = new Fl_Button(420 + 10 + 250, h - 50 + 10, 90, 30, "Add Joint Map");
+	_buttonAddMapping = new Fl_Button(420 + 10 + 250, h - 50 + 10, 90, 30, "Add Maping");
 	_buttonAddMapping->callback(AddJointMapCB,this);	
 	rightGroup->end();
 	//rightGroup->resizable(targetSkeletonViewer);		
@@ -1437,10 +1446,18 @@ JointMapViewer::~JointMapViewer()
 {
 }
 
-void JointMapViewer::hideButtons()
+void JointMapViewer::setShowButton(bool showButton)
 {
-	_buttonApply->hide();
-	_buttonCancel->hide();
+	if (showButton)
+	{
+		_buttonApply->show();
+		_buttonCancel->show();
+	}
+	else
+	{
+		_buttonApply->hide();
+		_buttonCancel->hide();
+	}	
 }
 
 void JointMapViewer::setCharacterName( std::string charName )
@@ -1678,14 +1695,21 @@ void JointMapViewer::ApplyMapCB(Fl_Widget* widget, void* data)
 // 			}
 // 		}
 // 	}
-	viewer->hide();
+	//viewer->hide();
+	if (viewer->rootWindow)
+	{
+		viewer->rootWindow->hide();
+	}
 }
 
 void JointMapViewer::CancelCB(Fl_Widget* widget, void* data)
 {
 	JointMapViewer* viewer = (JointMapViewer*) data;
-
-	viewer->hide();
+	//viewer->hide();
+	if (viewer->rootWindow)
+	{
+		viewer->rootWindow->hide();
+	}
 }
 
 void JointMapViewer::ResetMapCB( Fl_Widget* widget, void* data )
@@ -1794,10 +1818,10 @@ int JointMapInputChoice::handle( int event )
 		ret = 1;
 		break;
 	}
-// 	if (ret == 1 && skelViewer)
-// 	{
-// 		skelViewer->setFocusJointName(label());				
-// 	}
+	if (ret == 1 && skelViewer)
+	{
+		skelViewer->setFocusJointName(label());				
+	}
 	
 	return Fl_Input_Choice::handle(event);
 }

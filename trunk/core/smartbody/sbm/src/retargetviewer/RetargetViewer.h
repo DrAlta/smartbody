@@ -18,7 +18,7 @@ class RetargetViewer : public Fl_Double_Window
 		const std::string& getCharacterName();
 		const std::string& getSkeletonName();
 
-		void hideButtons();
+		void setShowButton(bool showButton);
 		static void CharacterCB(Fl_Widget* widget, void* data);
 		static void SkeletonCB(Fl_Widget* widget, void* data);
 		static void RetargetCB(Fl_Widget* widget, void* data);
@@ -33,5 +33,7 @@ class RetargetViewer : public Fl_Double_Window
 		Fl_Scroll* _scrollGroup;
 		Fl_Button* _retargetButton;
 		Fl_Button* _cancelButton;
+	public:
+		Fl_Double_Window* rootWindow;
 };
 #endif
