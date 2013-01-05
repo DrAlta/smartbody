@@ -13,7 +13,7 @@
 
 RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h, name)
 {
-
+	rootWindow = NULL;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	begin();
 
@@ -54,14 +54,14 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 		 iter++)
 	{
 		std::string name = (*iter).first;
-		Fl_Check_Button* check = new Fl_Check_Button(20, curY, 100, 20, _strdup(name.c_str()));
+		Fl_Check_Button* check = new Fl_Check_Button(40, curY, 100, 20, _strdup(name.c_str()));
 		curY += 25;
 	}
 	_scrollGroup->end();
 
-	_retargetButton = new Fl_Button(20, curY, 60, 20, "Retarget");
+	_retargetButton = new Fl_Button(40, curY, 120, 20, "Retarget");
 	_retargetButton->callback(RetargetCB, this);
-	_cancelButton = new Fl_Button(100, curY, 60, 20, "Cancel");
+	_cancelButton = new Fl_Button(180, curY, 120, 20, "Cancel");
 	_cancelButton->callback(CancelCB, this);
 
 	end();
@@ -108,10 +108,18 @@ const std::string& RetargetViewer::getSkeletonName()
 	return _skelName;
 }
 
-void RetargetViewer::hideButtons()
+void RetargetViewer::setShowButton(bool showButton)
 {
-	_retargetButton->hide();
-	_cancelButton->hide();
+	if (showButton)
+	{
+		_retargetButton->show();
+		_cancelButton->show();
+	}
+	else
+	{
+		_retargetButton->hide();
+		_cancelButton->hide();
+	}	
 }
 
 
@@ -146,14 +154,21 @@ void RetargetViewer::RetargetCB(Fl_Widget* widget, void* data)
 			}
 		}
 	}
-	viewer->hide();
+	//viewer->hide();
+	if (viewer->rootWindow)
+	{
+		viewer->rootWindow->hide();
+	}
 }
 
 void RetargetViewer::CancelCB(Fl_Widget* widget, void* data)
 {
 	RetargetViewer* viewer = (RetargetViewer*) data;
-
-	viewer->hide();
+	if (viewer->rootWindow)
+	{
+		viewer->rootWindow->hide();
+	}
+	//viewer->hide();
 }
 
 void RetargetViewer::CharacterCB( Fl_Widget* widget, void* data )

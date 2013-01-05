@@ -39,7 +39,7 @@ public:
 	RetargetViewer* retargetViewer;
 
 protected:
-	Fl_Tabs*		tabGroup;	
+	Fl_Tabs*	tabGroup;	
 	Fl_Button* _buttonApplyMap;
 	Fl_Button* _buttonApplyBehaviorSet;
 	Fl_Button* _buttonApplyAll;

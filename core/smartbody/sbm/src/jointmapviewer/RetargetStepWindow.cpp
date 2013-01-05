@@ -48,21 +48,21 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	this->resizable(tabGroup);
 	//this->size_range(600, 740);
 	
-	int curY = tabGroupH + 20;
+	jointMapViewer->rootWindow = this;
+	retargetViewer->rootWindow = this;
 
-	_buttonApplyAll = new Fl_Button(100, curY, 120, 25, "Apply");
+	int curY = tabGroupH + 20;	
+	_buttonApplyAll = new Fl_Button(100, curY, 120, 25, "Apply All");
 	_buttonApplyAll->callback(ApplyCB, this);
-	_buttonApplyMap = new Fl_Button(100, curY, 120, 25, "Apply Joint Map");
-	_buttonApplyMap->callback(ApplyJointMapCB,this);
-	_buttonApplyBehaviorSet = new Fl_Button(220, curY, 120, 25, "Apply Behavior Set");
-	_buttonApplyBehaviorSet->callback(ApplyBehaviorSetCB,this);		
-	
-	
+// 	_buttonApplyMap = new Fl_Button(100, curY, 120, 25, "Apply Joint Map");
+// 	_buttonApplyMap->callback(ApplyJointMapCB,this);
+// 	_buttonApplyBehaviorSet = new Fl_Button(220, curY, 120, 25, "Apply Behavior Set");
+// 	_buttonApplyBehaviorSet->callback(ApplyBehaviorSetCB,this);			
 	_buttonCancel = new Fl_Button(360, curY, 120, 25, "Cancel");
 	_buttonCancel->callback(CancelCB, this);
 
-	retargetViewer->hideButtons();
-	jointMapViewer->hideButtons();
+	retargetViewer->setShowButton(false);
+	jointMapViewer->setShowButton(false);
 	/*
 	Fl_Group* firstGroup = new Fl_Group(xOffset, yOffset, w/2 - 20, h - 20, "Joint Mapper");
 	firstGroup->begin();		
@@ -89,14 +89,21 @@ void RetargetStepWindow::setApplyType( bool applyAll )
 	if (applyAll)
 	{
 		_buttonApplyAll->show();
-		_buttonApplyBehaviorSet->hide();
-		_buttonApplyMap->hide();
+		_buttonCancel->show();
+		retargetViewer->setShowButton(false);
+		jointMapViewer->setShowButton(false);
+		//_buttonApplyBehaviorSet->hide();
+		//_buttonApplyMap->hide();
+
 	}
 	else 
 	{
 		_buttonApplyAll->hide();
-		_buttonApplyBehaviorSet->show();
-		_buttonApplyMap->show();
+		_buttonCancel->hide();
+		retargetViewer->setShowButton(true);
+		jointMapViewer->setShowButton(true);
+		//_buttonApplyBehaviorSet->show();
+		//_buttonApplyMap->show();
 	}
 
 }
