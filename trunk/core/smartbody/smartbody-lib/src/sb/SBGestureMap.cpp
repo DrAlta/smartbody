@@ -7,6 +7,10 @@
 #include <ctime> 
 #include <math.h>
 
+#ifndef WIN32
+#define _stricmp strcasecmp
+#endif
+
 namespace SmartBody {
 
 SBGestureMap::SBGestureMap() : SBObject()

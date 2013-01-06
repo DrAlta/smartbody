@@ -41,6 +41,9 @@
 #include <sb/SBCharacterListener.h>
 #include <sbm/ParserBVH.h>
 
+#ifndef WIN32
+#define _stricmp strcasecmp
+#endif
 
 namespace SmartBody {
 
