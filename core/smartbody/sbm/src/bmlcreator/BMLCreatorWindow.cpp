@@ -20,11 +20,16 @@
 #include "BMLStateObject.h"
 #include "sbm/mcontrol_util.h"
 
+#ifndef WIN32
+#define _strdup strdup
+#endif
+
 BMLCreatorWindow::BMLCreatorWindow(int x,int y,int w,int h, const char* s) : Fl_Double_Window(x, y, w, h, s)
 {
 
 	BMLObject* body = new BMLBodyObject();
 	body->setName("body");
+
 	BMLObject* locomotion = new BMLLocomotionObject();
 	locomotion->setName("locomotion");
 	BMLObject* animation = new BMLAnimationObject();
