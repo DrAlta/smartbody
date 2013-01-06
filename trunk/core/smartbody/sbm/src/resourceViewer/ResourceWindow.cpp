@@ -2,6 +2,7 @@
 #include "vhcl.h"
 
 #include "ResourceWindow.h"
+#include <sbm/lin_win.h>
 
 #include <iostream>
 #include <vector>

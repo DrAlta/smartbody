@@ -535,7 +535,7 @@ class GestureVisualizationHandler : public SmartBody::EventHandler
 class GestureData
 {
 public:
-	enum Status { START, READY, STROKE, STROKE_START, STROKE_END, RELAX, END, OTHER };
+	enum status { START, READY, STROKE, STROKE_START, STROKE_END, RELAX, END, OTHER };
 
 public:
 	GestureData();

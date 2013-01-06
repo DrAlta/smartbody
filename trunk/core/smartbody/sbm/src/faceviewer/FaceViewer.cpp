@@ -3,6 +3,7 @@
 #include <FL/Fl_Value_Slider.H>
 #include <sstream>
 #include <sb/SBSkeleton.h>
+#include <sbm/lin_win.h>
 
 FaceViewer::FaceViewer(int x, int y, int w, int h, char* name) : GenericViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
 {
