@@ -4,6 +4,7 @@ include_directories( "../../lib/festival/src/include" )
 include_directories( "../../lib/festival/src/modules/VHDuration" )
 include_directories( "../../lib/speech_tools/include" )
 
+set(SB_EXPORTS 1)
 
 ####
 
