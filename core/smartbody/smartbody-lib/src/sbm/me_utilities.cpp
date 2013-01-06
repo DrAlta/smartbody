@@ -53,6 +53,7 @@
 #include "ParserFBX.h"
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
+#include <sbm/lin_win.h>
 
 using namespace std;
 using namespace boost::filesystem;
@@ -228,18 +229,18 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			} else {
 				string ext = extension( cur );
 #if ENABLE_FBX_PARSER
-				if( strcasecmp( ext.c_str(), MOTION_EXT ) == 0 || 
-					strcasecmp( ext.c_str(), ".bvh" ) == 0 ||
-					strcasecmp( ext.c_str(), ".dae" ) == 0 ||
-					strcasecmp( ext.c_str(), ".amc" ) == 0 ||
-					strcasecmp( ext.c_str(), ".xml" ) == 0 ||
-					strcasecmp( ext.c_str(), ".fbx" ) == 0)
+				if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || 
+					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
+					_stricmp( ext.c_str(), ".dae" ) == 0 ||
+					_stricmp( ext.c_str(), ".amc" ) == 0 ||
+					_stricmp( ext.c_str(), ".xml" ) == 0 ||
+					_stricmp( ext.c_str(), ".fbx" ) == 0)
 #else
-				if( strcasecmp( ext.c_str(), MOTION_EXT ) == 0 || 
-					strcasecmp( ext.c_str(), ".bvh" ) == 0 ||
-					strcasecmp( ext.c_str(), ".dae" ) == 0 ||
-					strcasecmp( ext.c_str(), ".xml" ) == 0 ||
-					strcasecmp( ext.c_str(), ".amc" ) == 0)
+				if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || 
+					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
+					_stricmp( ext.c_str(), ".dae" ) == 0 ||
+					_stricmp( ext.c_str(), ".xml" ) == 0 ||
+					_stricmp( ext.c_str(), ".amc" ) == 0)
 #endif
 				{
 					load_me_motions_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
@@ -313,7 +314,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 				if (!is_directory(cur)) 
 				{
 					std::string ext = extension(cur);
-					if (strcasecmp(ext.c_str(), ".asf") == 0)
+					if (_stricmp(ext.c_str(), ".asf") == 0)
 					{
 						asf = cur.string().c_str();
 						break;
@@ -365,7 +366,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 
 				string filebase = basename( pathname );
 				const char* name = motion->getName().c_str();
-				if( name && strcasecmp( filebase.c_str(), name ) ) {
+				if( name && _stricmp( filebase.c_str(), name ) ) {
 					LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.native_file_string().c_str(), filebase.c_str());
 					//motion->setName( filebase.c_str() );
 				}
@@ -410,25 +411,25 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 			} else {
 				string ext = extension( cur );
 #if ENABLE_FBX_PARSER
-				if( strcasecmp( ext.c_str(), ".sk" ) == 0 ||
-					strcasecmp( ext.c_str(), ".bvh" ) == 0 ||
-					strcasecmp( ext.c_str(), ".BVH" ) == 0 ||
-					strcasecmp( ext.c_str(), ".dae" ) == 0 ||
-					strcasecmp( ext.c_str(), ".DAE" ) == 0 ||
-					strcasecmp( ext.c_str(), ".asf" ) == 0 ||
-					strcasecmp( ext.c_str(), ".ASF" ) == 0 ||
-					strcasecmp( ext.c_str(), ".fbx" ) == 0 ||
-					strcasecmp( ext.c_str(), ".xml" ) == 0 ||
-					strcasecmp( ext.c_str(), ".FBX" ) == 0)
+				if( _stricmp( ext.c_str(), ".sk" ) == 0 ||
+					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
+					_stricmp( ext.c_str(), ".BVH" ) == 0 ||
+					_stricmp( ext.c_str(), ".dae" ) == 0 ||
+					_stricmp( ext.c_str(), ".DAE" ) == 0 ||
+					_stricmp( ext.c_str(), ".asf" ) == 0 ||
+					_stricmp( ext.c_str(), ".ASF" ) == 0 ||
+					_stricmp( ext.c_str(), ".fbx" ) == 0 ||
+					_stricmp( ext.c_str(), ".xml" ) == 0 ||
+					_stricmp( ext.c_str(), ".FBX" ) == 0)
 #else
-				if( strcasecmp( ext.c_str(), ".sk" ) == 0 ||
-					strcasecmp( ext.c_str(), ".bvh" ) == 0 ||
-					strcasecmp( ext.c_str(), ".BVH" ) == 0 ||
-					strcasecmp( ext.c_str(), ".dae" ) == 0 ||
-					strcasecmp( ext.c_str(), ".DAE" ) == 0 ||
-					strcasecmp( ext.c_str(), ".asf" ) == 0 ||
-					strcasecmp( ext.c_str(), ".ASF" ) == 0 ||
-					strcasecmp( ext.c_str(), ".xml" ) == 0)
+				if( _stricmp( ext.c_str(), ".sk" ) == 0 ||
+					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
+					_stricmp( ext.c_str(), ".BVH" ) == 0 ||
+					_stricmp( ext.c_str(), ".dae" ) == 0 ||
+					_stricmp( ext.c_str(), ".DAE" ) == 0 ||
+					_stricmp( ext.c_str(), ".asf" ) == 0 ||
+					_stricmp( ext.c_str(), ".ASF" ) == 0 ||
+					_stricmp( ext.c_str(), ".xml" ) == 0)
 #endif
 				{
 					load_me_skeletons_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
@@ -623,7 +624,7 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 					load_me_postures_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
 			} else {
 				string ext = extension( cur );
-				if( strcasecmp( ext.c_str(), POSTURE_EXT )==0 ) {
+				if( _stricmp( ext.c_str(), POSTURE_EXT )==0 ) {
 					load_me_postures_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
 				} else if( DEBUG_LOAD_PATHS ) {
 					LOG("DEBUG: load_me_posture_impl(): Skipping \"%s\". Extension \"%s\" does not match POSTURE_EXT.",  cur.string().c_str(), ext.c_str());
@@ -662,7 +663,7 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 
 			string filebase = basename( pathname );
 			const char* name = posture->name();
-			if( name && strcasecmp( filebase.c_str(), name ) ) {
+			if( name && _stricmp( filebase.c_str(), name ) ) {
 				std::stringstream strstr;
 				strstr << "WARNING: Posture name \"" << name << "\" does not equal base of filename \"" << pathname.native_file_string() << "\".  Using \"" << filebase << "\" in posture map." << endl;
 				LOG(strstr.str().c_str());
@@ -702,7 +703,7 @@ int load_me_motion_individual( SrInput & input, const std::string & motionName, 
 
 	string filebase = basename( motionName );
 	const char* name = motion->getName().c_str();
-	if( name && strcasecmp( filebase.c_str(), name ) )
+	if( name && _stricmp( filebase.c_str(), name ) )
 	{
 		LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, motionName.c_str(), filebase.c_str());
 		motion->setName( filebase.c_str() );

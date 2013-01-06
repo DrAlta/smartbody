@@ -34,8 +34,8 @@
 #include <stack>
 #include <map>
 
-#include <strings.h>
 #include "sbm/sr_arg_buff.h"
+#include <sbm/lin_win.h>
 
 #include <xercesc/util/XMLStringTokenizer.hpp>
 
@@ -1046,11 +1046,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	}
 
 
-#ifdef  WIN32
 	if( _stricmp( command, "request" )==0 ) {
-#else
-	if( strcasecmp( command, "request" )==0 ) {
-#endif
 		//  NOTE: "vrAgentBML ... request" currently mimics vrSpeak,
 		//  until we can figure out how to support multiple requests in an message
 
@@ -1099,11 +1095,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		//	vrSpeakFailed( character_id, recipient_id, message_id, msg.str().c_str() );
 		//	return CMD_FAILURE;
 		}
-#ifdef WIN32
 	} else if( _stricmp( command, "start" )==0 ) {
-#else
-	} else if( strcasecmp( command, "start" )==0 ) {
-#endif
 		// TODO: Mark act as started
 			Nvbg* nvbg = character->getNvbg();
 			if (nvbg)
@@ -1112,11 +1104,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 			}
 
 		return CMD_SUCCESS;
-#ifdef WIN32
 	} else if( _stricmp( command, "end" )==0 ) {
-#else
-	} else if( strcasecmp( command, "end" )==0 ) {
-#endif
 		try {
 #if USE_RECIPIENT
 			return bp.bml_end( BMLProcessorMsg( character_id, recipient_id, message_id, character, NULL, args ), mcu );
