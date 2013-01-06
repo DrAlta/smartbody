@@ -42,7 +42,6 @@
 
 #include <map>
 
-#include "sbm_constants.h"
 #include "sbm/Physics/SBPhysicsSim.h"
 // Declare classes used (avoid circular references)
 class srArgBuffer;

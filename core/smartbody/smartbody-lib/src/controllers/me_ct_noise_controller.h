@@ -2,7 +2,7 @@
 #define _ME_CT_NOISE_CONTROLLER_H_
 
 #include <sb/SBController.h>
-#include <sbm/sbm_character.hpp>
+#include <sb/sbm_character.hpp>
 #include <external/perlin/perlin.h>
 #include <map>
 

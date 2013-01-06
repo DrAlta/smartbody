@@ -3,7 +3,7 @@
 #include "controllers/me_ct_reach.hpp"
 
 #include <sbm/resource_cmds.h>
-#include <sbm/sbm_character.hpp>
+#include <sb/sbm_character.hpp>
 #include <sbm/me_utilities.hpp>
 #include <sk/sk_skeleton.h>
 #include <sk/sk_joint.h>

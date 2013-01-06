@@ -36,7 +36,7 @@
 #include <sk/sk_channel_array.h>
 #include <sbm/ResourceManager.h>
 #include "sbm/mcontrol_util.h"
-#include <sbm/sbm_pawn.hpp>
+#include <sb/sbm_pawn.hpp>
 
 
 using namespace std;

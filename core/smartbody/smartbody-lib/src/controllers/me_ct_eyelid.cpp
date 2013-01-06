@@ -24,7 +24,7 @@
 using namespace gwiz;
 
 #include "controllers/me_ct_eyelid.h"
-#include <sbm/sbm_pawn.hpp>
+#include <sb/sbm_pawn.hpp>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBJoint.h>

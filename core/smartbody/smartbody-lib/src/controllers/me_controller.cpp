@@ -33,7 +33,7 @@
 #include <sbm/ResourceManager.h>
 #include <vhcl_log.h>
 #include <controllers/me_controller_tree_root.hpp>
-#include <sbm/sbm_pawn.hpp>
+#include <sb/sbm_pawn.hpp>
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
 

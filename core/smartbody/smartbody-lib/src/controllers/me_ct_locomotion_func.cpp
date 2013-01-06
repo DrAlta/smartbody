@@ -22,7 +22,7 @@
 
 #include "controllers/me_ct_locomotion_func.hpp"
 
-//#include "sbm/sbm_character.hpp"
+//#include "sb/sbm_character.hpp"
 #include "sbm/gwiz_math.h"
 #include "limits.h"
 #include <vhcl_log.h>

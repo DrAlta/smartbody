@@ -24,7 +24,7 @@
 #define _ME_CT_PARAM_ANIMATION_H_
 
 #include <controllers/me_ct_container.hpp>
-#include <sbm/sbm_character.hpp>
+#include <sb/sbm_character.hpp>
 #include <controllers/me_ct_param_animation_utilities.h>
 #include <controllers/me_ct_param_animation_data.h>
 #include <controllers/me_ct_motion_example.hpp>

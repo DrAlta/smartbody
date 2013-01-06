@@ -27,7 +27,7 @@
 #include <controllers/me_controller.h>
 #include <controllers/me_ct_channel_writer.hpp>
 #include <sbm/sr_linear_curve.h>
-#include <sbm/sbm_pawn.hpp>
+#include <sb/sbm_pawn.hpp>
 #include <controllers/me_ct_param_animation_data.h>
 
 #define LoopHandle 0

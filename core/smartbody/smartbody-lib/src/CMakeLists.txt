@@ -293,9 +293,7 @@ set( SMARTBODY_LIB_SBM_SRC
 
 ## UNUSED:
 ##	sbm/sbm_bml.cpp
-	sbm/sbm_character.cpp
 	sbm/sbm_deformable_mesh.cpp
-	sbm/sbm_pawn.cpp
 	sbm/sbm_speech_audiofile.cpp
 	sbm/sbm_speech.cpp
 	sbm/sbm_speech_impl_skeleton.cpp
@@ -325,6 +323,9 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SteeringAgent.cpp
 	sbm/SteerSuiteEnginerDriver.cpp
 	sbm/sr_path_list.cpp
+
+	sb/sbm_character.cpp
+	sb/sbm_pawn.cpp
 
 	sb/SBAttribute.cpp
 	sb/SBAttributeManager.cpp

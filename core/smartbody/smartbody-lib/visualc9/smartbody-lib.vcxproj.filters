@@ -682,13 +682,7 @@
     <ClCompile Include="..\src\sbm\sbm_audio.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\sbm_character.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\sbm_deformable_mesh.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\sbm_pawn.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbm\sbm_speech.cpp">
@@ -989,6 +983,12 @@
       <Filter>sb</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sb\nvbg.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\sbm_character.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\sbm_pawn.cpp">
       <Filter>sb</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1731,16 +1731,10 @@
     <ClInclude Include="..\src\sbm\sbm_speech.hpp">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_pawn.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\sbm_deformable_mesh.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\sbm_constants.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sbm_character.hpp">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\sbm_audio.h">
@@ -2028,11 +2022,14 @@
     <ClInclude Include="..\src\sb\nvbg.h">
       <Filter>sb</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\sb\sbm_character.hpp">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\sbm_pawn.hpp">
+      <Filter>sb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\sbm\sbm_pawn.cpp.bak">
-      <Filter>sbm</Filter>
-    </None>
     <None Include="..\src\sbm\sbm_deformable_mesh.cpp.bak">
       <Filter>sbm</Filter>
     </None>
