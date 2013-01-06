@@ -32,7 +32,7 @@
 #include <map>
 #include <string>
 #include <controllers/me_spline_1d.hpp>
-#include <sbm/sbm_character.hpp>
+#include <sb/sbm_character.hpp>
 #include <sbm/mcontrol_util.h>
 
 class MeCtInterpolator : public MeCtContainer

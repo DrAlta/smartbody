@@ -22,7 +22,7 @@
 
 #include "me_ct_IK_scenario.hpp"
 
-#include "sbm/sbm_character.hpp"
+#include "sb/sbm_character.hpp"
 #include "sbm/gwiz_math.h"
 #include "limits.h"
 

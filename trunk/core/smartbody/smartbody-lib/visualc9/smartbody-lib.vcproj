@@ -552,14 +552,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\sbm_character.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\sbm_character.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\sbm_constants.h"
 				>
 			</File>
@@ -569,14 +561,6 @@
 			</File>
 			<File
 				RelativePath="..\src\sbm\sbm_deformable_mesh.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\sbm_pawn.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\sbm_pawn.hpp"
 				>
 			</File>
 			<File
@@ -3741,6 +3725,22 @@
 			</File>
 			<File
 				RelativePath="..\src\sb\SBJointMapManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\sbm_character.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\sbm_character.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\sbm_pawn.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\sbm_pawn.hpp"
 				>
 			</File>
 			<File

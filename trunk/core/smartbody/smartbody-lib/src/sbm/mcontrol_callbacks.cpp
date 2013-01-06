@@ -70,7 +70,7 @@
 #endif
 
 #include "sr/sr_model.h"
-#include "sbm_pawn.hpp"
+#include "sb/sbm_pawn.hpp"
 #include "sbm/Event.h"
 #include "sbm/ParserOpenCOLLADA.h"
 #include "sbm/ParserOgre.h"

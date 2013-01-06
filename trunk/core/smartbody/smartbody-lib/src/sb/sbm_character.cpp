@@ -24,7 +24,7 @@
 */
 
 #include "vhcl.h"
-#include "sbm/sbm_character.hpp"
+#include "sb/sbm_character.hpp"
 
 #include <stdio.h>
 
@@ -35,21 +35,21 @@
 
 #include <sk/sk_skeleton.h>
 #include <sk/sk_motion.h>
-#include "sr_path_list.h"
-#include "sbm_constants.h"
+#include "sbm/sr_path_list.h"
+#include "sbm/sbm_constants.h"
 #include <sbm/general_param_setting.h>
 #include <sbm/action_unit.hpp>
 #include <controllers/me_ct_blend.hpp>
 #include <controllers/me_ct_time_shift_warp.hpp>
 #include "sbm/mcontrol_util.h"
-#include "mcontrol_callbacks.h"
+#include "sbm/mcontrol_callbacks.h"
 #include "sb/SBScene.h"
-#include "me_utilities.hpp"
+#include "sbm/me_utilities.hpp"
 #include <controllers/me_spline_1d.hpp>
 #include <controllers/me_ct_interpolator.h>
-#include "sr_curve_builder.h"
+#include "sbm/sr_curve_builder.h"
 #include "sbm/lin_win.h"
-#include "sbm_speech.hpp"
+#include "sbm/sbm_speech.hpp"
 #include "sbm/general_param_setting.h"
 #include <boost/filesystem/operations.hpp>
 #include <sb/SBSkeleton.h>
@@ -74,7 +74,7 @@
 #include <controllers/me_controller_tree_root.hpp>
 #include <controllers/me_ct_reach.hpp>
 #include <controllers/me_ct_example_body_reach.hpp>
-#include "SteeringAgent.h"
+#include "sbm/SteeringAgent.h"
 
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_physics_controller.h>

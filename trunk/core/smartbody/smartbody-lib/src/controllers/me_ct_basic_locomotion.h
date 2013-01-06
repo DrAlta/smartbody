@@ -24,7 +24,7 @@
 #define _ME_CT_BASIC_LOCOMOTION_H_
 
 #include <controllers/me_controller.h>
-#include <sbm/sbm_character.hpp>
+#include <sb/sbm_character.hpp>
 #include <sb/SBController.h>
 
 class MeCtBasicLocomotion : public SmartBody::SBController

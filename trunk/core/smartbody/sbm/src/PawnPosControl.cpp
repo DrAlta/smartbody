@@ -1,6 +1,6 @@
 #include "PawnPosControl.h"
 #include <sbm/mcontrol_util.h>
-#include <sbm/sbm_pawn.hpp>
+#include <sb/sbm_pawn.hpp>
 #include "vhcl.h"
 #include <FL/gl.h>
 #include <GL/glu.h>

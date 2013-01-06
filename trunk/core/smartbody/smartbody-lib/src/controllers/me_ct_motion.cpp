@@ -25,7 +25,7 @@
 
 #include <controllers/me_ct_motion.h>
 #include <sbm/Event.h>
-#include <sbm/sbm_pawn.hpp>
+#include <sb/sbm_pawn.hpp>
 
 //=================================== MeCtMotion =====================================
 

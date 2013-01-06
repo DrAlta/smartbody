@@ -57,8 +57,8 @@ class mcuCBHandle;
 #include "sr_cmd_map.h"
 #include "sr_cmd_seq.h"
 #include "sr_path_list.h"
-#include "sbm_pawn.hpp"
-#include "sbm/sbm_character.hpp"
+#include "sb/sbm_pawn.hpp"
+#include "sb/sbm_character.hpp"
 #include "remote_speech.h"
 #include "local_speech.h"
 #include "text_speech.h" // [BMLR]

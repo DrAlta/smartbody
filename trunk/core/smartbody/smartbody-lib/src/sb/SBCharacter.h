@@ -2,7 +2,7 @@
 #define _SBCHARACTER_H_
 
 #include <sb/SBTypes.h>
-#include <sbm/sbm_character.hpp>
+#include <sb/sbm_character.hpp>
 
 namespace SmartBody {
 

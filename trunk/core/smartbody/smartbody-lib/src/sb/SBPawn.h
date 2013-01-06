@@ -2,7 +2,7 @@
 #define _SBPAWN_H_
 
 #include <sb/SBTypes.h>
-#include <sbm/sbm_pawn.hpp>
+#include <sb/sbm_pawn.hpp>
 
 namespace SmartBody {
 

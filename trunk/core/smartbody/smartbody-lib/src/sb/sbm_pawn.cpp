@@ -24,6 +24,7 @@
 
 #include "vhcl.h"
 #include <sbm/mcontrol_util.h>
+#include "sbm_pawn.hpp"
 #include <sb/SBScene.h>
 
 #ifndef __native_client__
@@ -37,9 +38,9 @@
 #include <controllers/me_controller_tree_root.hpp>
 #include <controllers/me_ct_channel_writer.hpp>
 #include <controllers/me_ct_curve_writer.hpp>
-#include "sbm_pawn.hpp"
+#include "sbm/sbm_constants.h"
 
-#include "sbm_deformable_mesh.h"
+#include "sbm/sbm_deformable_mesh.h"
 
 #ifdef __APPLE__
 #include "TargetConditionals.h"
@@ -62,14 +63,14 @@
 #ifndef __native_client__
 
 // added by AShapiro 6/30/11 - not sure why the USE_WSP variable this is not being picked up in mcontrol_util.h
-#define USE_WSP 1
+
 #if USE_WSP
 #include "wsp.h"
 #endif
 
 #endif
 
-#include "me_utilities.hpp"
+#include "sbm/me_utilities.hpp"
 #include "sr/sr_model.h"
 #include "sr/sr_euler.h"
 #include <sb/SBSkeleton.h>

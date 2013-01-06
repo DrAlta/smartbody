@@ -6,7 +6,7 @@
 #include "controllers/me_ct_jacobian_IK.hpp"
 #include "controllers/me_ct_ccd_IK.hpp"
 #include "controllers/me_ct_constraint.hpp"
-#include <sbm/sbm_pawn.hpp>
+#include <sb/sbm_pawn.hpp>
 
 class SbmCharacter;
 class ReachStateData;

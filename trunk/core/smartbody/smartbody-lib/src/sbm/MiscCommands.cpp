@@ -4,8 +4,8 @@
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBBoneBusManager.h>
 #include <sbm/me_utilities.hpp>
-#include <sbm/sbm_pawn.hpp>
-#include <sbm/sbm_character.hpp>
+#include <sb/sbm_pawn.hpp>
+#include <sb/sbm_character.hpp>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_blend.hpp>
 #include <controllers/me_ct_gaze.h>

@@ -33,7 +33,7 @@ class remote_speech;
 #include "sbm/sbm_speech.hpp"
 #include "sr_hash_map.h"
 #include "sr_arg_buff.h"
-#include "sbm/sbm_character.hpp"
+#include "sb/sbm_character.hpp"
 // Predeclare class
 class mcuCBHandle;
 

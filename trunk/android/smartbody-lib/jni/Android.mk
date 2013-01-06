@@ -411,9 +411,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/MeCtBodyReachState.cpp \
 	$(SBM_MY_DIR)/controllers/MeCtReachEngine.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_saccade.cpp \
-	$(SBM_MY_DIR)/sbm/sbm_character.cpp \
 	$(SBM_MY_DIR)/sbm/sbm_deformable_mesh.cpp \
-	$(SBM_MY_DIR)/sbm/sbm_pawn.cpp \
 	$(SBM_MY_DIR)/sbm/sbm_speech_audiofile.cpp \
 	$(SBM_MY_DIR)/sbm/sbm_speech.cpp \
 	$(SBM_MY_DIR)/sbm/sbm_speech_impl_skeleton.cpp \
@@ -434,6 +432,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/Physics/SBPhysicsSimODE.cpp \
 	$(SBM_MY_DIR)/sbm/SteeringAgent.cpp \
 	$(SBM_MY_DIR)/sbm/SteerSuiteEnginerDriver.cpp \
+	$(SBM_MY_DIR)/sb/sbm_character.cpp \
+	$(SBM_MY_DIR)/sb/sbm_pawn.cpp \	
 	$(SBM_MY_DIR)/sb/SBAttribute.cpp \
 	$(SBM_MY_DIR)/sb/SBAttributeManager.cpp \
 	$(SBM_MY_DIR)/sb/SBObject.cpp \

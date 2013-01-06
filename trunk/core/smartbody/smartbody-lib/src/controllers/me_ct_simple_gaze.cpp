@@ -23,7 +23,7 @@
  */
 
 #include "sbm/lin_win.h"
-#include "sbm/sbm_pawn.hpp"
+#include "sb/sbm_pawn.hpp"
 #include "controllers/me_ct_simple_gaze.h"
 #include "sbm/gwiz_math.h"
 using namespace gwiz;

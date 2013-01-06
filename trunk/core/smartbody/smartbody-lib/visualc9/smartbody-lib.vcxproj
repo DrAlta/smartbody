@@ -283,9 +283,7 @@
     <ClCompile Include="..\src\sb\SBJointMap.cpp" />
     <ClCompile Include="..\src\sb\SBJointMapManager.cpp" />
     <ClCompile Include="..\src\sbm\sbm_audio.cpp" />
-    <ClCompile Include="..\src\sbm\sbm_character.cpp" />
     <ClCompile Include="..\src\sbm\sbm_deformable_mesh.cpp" />
-    <ClCompile Include="..\src\sbm\sbm_pawn.cpp" />
     <ClCompile Include="..\src\sbm\sbm_speech.cpp" />
     <ClCompile Include="..\src\sbm\sbm_speech_audiofile.cpp" />
     <ClCompile Include="..\src\sbm\sbm_test_cmds.cpp" />
@@ -395,6 +393,8 @@
     <ClCompile Include="..\src\bml\bml_target.cpp" />
     <ClCompile Include="..\src\sbm\BMLDefs.cpp" />
     <ClCompile Include="..\src\sb\SBMotionBlendBase.cpp" />
+    <ClCompile Include="..\src\sb\sbm_character.cpp" />
+    <ClCompile Include="..\src\sb\sbm_pawn.cpp" />
     <ClCompile Include="..\src\sb\SBPhoneme.cpp" />
     <ClCompile Include="..\src\sb\SBPhonemeManager.cpp" />
     <ClCompile Include="..\src\sk\sk_channel.cpp" />
@@ -718,10 +718,8 @@
     <ClInclude Include="..\src\sbm\resource_cmds.h" />
     <ClInclude Include="..\src\sbm\ResourceManager.h" />
     <ClInclude Include="..\src\sbm\sbm_audio.h" />
-    <ClInclude Include="..\src\sbm\sbm_character.hpp" />
     <ClInclude Include="..\src\sbm\sbm_constants.h" />
     <ClInclude Include="..\src\sbm\sbm_deformable_mesh.h" />
-    <ClInclude Include="..\src\sbm\sbm_pawn.hpp" />
     <ClInclude Include="..\src\sbm\sbm_speech.hpp" />
     <ClInclude Include="..\src\sbm\sbm_speech_audiofile.hpp" />
     <ClInclude Include="..\src\sbm\sbm_speech_impl_skeleton.hpp" />
@@ -855,6 +853,8 @@
     <ClInclude Include="..\src\bml\bml_xml_consts.hpp" />
     <ClInclude Include="..\src\sbm\BMLDefs.h" />
     <ClInclude Include="..\src\sb\SBMotionBlendBase.h" />
+    <ClInclude Include="..\src\sb\sbm_character.hpp" />
+    <ClInclude Include="..\src\sb\sbm_pawn.hpp" />
     <ClInclude Include="..\src\sb\SBPhoneme.h" />
     <ClInclude Include="..\src\sb\SBPhonemeManager.h" />
     <ClInclude Include="..\src\sb\SBTypes.h" />
@@ -1029,7 +1029,6 @@
     <None Include="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag" />
     <None Include="..\src\sbm\GPU\shaderFiles\vs_skin_pos.vert" />
     <None Include="..\src\sbm\sbm_deformable_mesh.cpp.bak" />
-    <None Include="..\src\sbm\sbm_pawn.cpp.bak" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\lib\bonebus\bonebus.vcxproj">

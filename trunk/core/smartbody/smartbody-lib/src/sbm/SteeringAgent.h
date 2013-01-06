@@ -24,7 +24,7 @@
 #ifndef _STEERINGAGENT_H_
 #define _STEERINGAGENT_H_
 
-#include <sbm/sbm_character.hpp>
+#include <sb/sbm_character.hpp>
 #include <sbm/SteerSuiteEngineDriver.h>
 #include <sbm/SteerPath.h>
 
