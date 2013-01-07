@@ -318,7 +318,7 @@ mcuCBHandle::mcuCBHandle()
 	SmartBody::SBFaceDefinition* faceDefinition = new SmartBody::SBFaceDefinition();
 	faceDefinition->setName("_default_");
 	face_map["_default_"] = faceDefinition;
-	//physicsEngine = new SBPhysicsSimODE();
+	//physicsEngine = new ODEPhysicsSim();
 	//physicsEngine->initSimulation();
 	_scene = SmartBody::SBScene::getScene();
 

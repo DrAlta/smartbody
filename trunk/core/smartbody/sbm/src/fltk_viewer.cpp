@@ -3374,7 +3374,7 @@ void FltkViewer::drawCharacterBoundingVolumes()
 						if(offset_len < 0.03*chrHeight) continue; // skip short bones
 						std::string colObjName = character->getGeomObjectName() + ":" + j->name();
 						if(k>0) colObjName = colObjName + ":" + boost::lexical_cast<std::string>(k);
-						SbmGeomObject* geomObj = colManager->getCollisionObject(colObjName);
+						SBGeomObject* geomObj = colManager->getCollisionObject(colObjName);
 						if(!geomObj) continue;
 						const SrMat& gmat = j->gmat();
 						this->drawColObject(geomObj, (SrMat&)gmat);
@@ -3529,7 +3529,7 @@ void FltkViewer::drawPawns()
 			continue;
 
 		SrMat gmat = pawn->get_world_offset();//pawn->get_world_offset_joint()->gmat();		
-		if (pawn->getGeomObject() && dynamic_cast<SbmGeomNullObject*>(pawn->getGeomObject()) == NULL)
+		if (pawn->getGeomObject() && dynamic_cast<SBGeomNullObject*>(pawn->getGeomObject()) == NULL)
 		{
 			//pawn->colObj_p->updateTransform(gmat);
 			//gmat = pawn->colObj_p->worldState.gmat();
@@ -4764,7 +4764,7 @@ void FltkViewer::makeGLContext()
 
 
 
-void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
+void FltkViewer::drawColObject( SBGeomObject* colObj, SrMat& gmat )
 {
 	glEnable(GL_LIGHTING);
 	glPushMatrix();
@@ -4783,19 +4783,19 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 	SrMat lMat = colObj->getLocalTransform().gmat();	
 	glMultMatrixf((const float*) gMat);
 	glMultMatrixf((const float*) lMat);
-	if (dynamic_cast<SbmGeomSphere*>(colObj))
+	if (dynamic_cast<SBGeomSphere*>(colObj))
 	{
 		// draw sphere
-		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(colObj);
+		SBGeomSphere* sph = dynamic_cast<SBGeomSphere*>(colObj);
 		SrSnSphere sphere;					
 		sphere.shape().radius = sph->radius;
 		sphere.color(objColor);
 		sphere.render_mode(srRenderModeSmooth);
 		SrGlRenderFuncs::render_sphere(&sphere);		
 	}
-	else if (dynamic_cast<SbmGeomBox*>(colObj))
+	else if (dynamic_cast<SBGeomBox*>(colObj))
 	{
-		SbmGeomBox* box = dynamic_cast<SbmGeomBox*>(colObj);
+		SBGeomBox* box = dynamic_cast<SBGeomBox*>(colObj);
 		SrSnBox sbox;					
 		sbox.shape().a = -box->extent;
 		sbox.shape().b = box->extent;
@@ -4803,9 +4803,9 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 		sbox.render_mode(srRenderModeSmooth);
 		SrGlRenderFuncs::render_box(&sbox);
 	}
-	else if (dynamic_cast<SbmGeomCapsule*>(colObj))
+	else if (dynamic_cast<SBGeomCapsule*>(colObj))
 	{
-		SbmGeomCapsule* cap = dynamic_cast<SbmGeomCapsule*>(colObj);
+		SBGeomCapsule* cap = dynamic_cast<SBGeomCapsule*>(colObj);
 		// render two end cap
 		SrSnSphere sphere;				
 		sphere.shape().center = cap->endPts[0];//SrVec(0,-cap->extent,0);
@@ -4825,9 +4825,9 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 		cyc.render_mode(srRenderModeSmooth);
 		SrGlRenderFuncs::render_cylinder(&cyc);
 	}
-	else if (dynamic_cast<SbmGeomTriMesh*>(colObj))
+	else if (dynamic_cast<SBGeomTriMesh*>(colObj))
 	{
-		SbmGeomTriMesh* mesh = dynamic_cast<SbmGeomTriMesh*>(colObj);
+		SBGeomTriMesh* mesh = dynamic_cast<SBGeomTriMesh*>(colObj);
 		if (mesh->geoMesh)
 		{
 			SrSnModel model;

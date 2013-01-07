@@ -610,7 +610,7 @@ void SbmCharacter::setJointCollider( std::string jointName, float len, float rad
 	if (mi != jointPhyObjMap.end())
 	{
 		SBPhysicsObj* phyObj = mi->second;		
-		SbmGeomObject* geomObj = phyObj->getColObj();		
+		SBGeomObject* geomObj = phyObj->getColObj();		
 		phySim->removePhysicsObj(phyObj);
 		delete geomObj;
 		delete phyObj;
@@ -628,7 +628,7 @@ void SbmCharacter::setJointCollider( std::string jointName, float len, float rad
 		radius = len*0.2f;	
 
 	// generate new geometry
-	SbmGeomObject* newGeomObj = new SbmGeomCapsule(center-dir*len*0.5f, center+dir*len*0.5f,radius);
+	SBGeomObject* newGeomObj = new SBGeomCapsule(center-dir*len*0.5f, center+dir*len*0.5f,radius);
 	SBPhysicsObj* jointPhy = phySim->createPhyObj();	
 	jointPhy->setGeometry(newGeomObj,10.f);	
 	phySim->addPhysicsObj(jointPhy);

@@ -27,19 +27,19 @@ class SBCollisionManager : public SBService
 		SBAPI virtual void onCharacterDelete(SBCharacter* character);
 		SBAPI virtual void onPawnDelete(SBPawn* character);
 
-		SBAPI SbmGeomObject* createCollisionObject(const std::string& geomName, const std::string& geomType, SrVec size, SrVec from = SrVec(), SrVec to = SrVec());	
-		SBAPI SbmGeomObject* getCollisionObject(const std::string& geomName);
+		SBAPI SBGeomObject* createCollisionObject(const std::string& geomName, const std::string& geomType, SrVec size, SrVec from = SrVec(), SrVec to = SrVec());	
+		SBAPI SBGeomObject* getCollisionObject(const std::string& geomName);
 		SBAPI bool           removeCollisionObject(const std::string& geomName);
 		SBAPI bool           addObjectToCollisionSpace(const std::string& geomName);
 		SBAPI bool           removeObjectFromCollisionSpace(const std::string& geomName);
 
 	protected:
-		SbmCollisionSpace* collisionSpace;
+		SBCollisionSpace* collisionSpace;
 		float _characterRadius;
 		int _maxIterations;
 		std::map<std::string, SrVec> _velocities;
 		std::map<std::string, SrVec> _positions;
-		std::map<std::string, SbmGeomObject*> geomObjectMap;
+		std::map<std::string, SBGeomObject*> geomObjectMap;
 
 		bool _singleChrCapsuleMode;
 		float _jointBVLenRadRatio;

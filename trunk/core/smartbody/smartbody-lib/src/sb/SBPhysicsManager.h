@@ -4,7 +4,7 @@
 #include <sb/SBTypes.h>
 #include <sb/SBService.h>
 
-class SBPhysicsSimODE;
+class ODEPhysicsSim;
 
 namespace SmartBody {
 
@@ -41,7 +41,7 @@ class SBPhysicsManager : public SBService
 
 
 	protected:
-		SBPhysicsSimODE* _ode;
+		ODEPhysicsSim* _ode;
 		double            physicsTime;
 		void updatePhysicsCharacter(std::string charName);
 		void updatePhysicsPawn(std::string pawnName);

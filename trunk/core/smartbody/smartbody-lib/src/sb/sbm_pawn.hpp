@@ -55,7 +55,7 @@ class DeformableMeshInstance;
 #define SBM_PAWN_USE_WORLD_OFFSET_WRITER	(1)
 #define SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK	(0)
 
-class SbmPawn : public SmartBody::SBObject, public SbmTransformObjInterface {
+class SbmPawn : public SmartBody::SBObject, public SBTransformObjInterface {
 public:
 	//  Public Constants
 	static const char* WORLD_OFFSET_JOINT_NAME;
@@ -85,7 +85,7 @@ protected:
 
 	MeCtChannelWriter*  world_offset_writer_p;
 	float	_height;
-	//SbmGeomObject* _collisionObject;
+	//SBGeomObject* _collisionObject;
 	std::string collisionObjName;
 
 #if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
@@ -110,7 +110,7 @@ public:  // TODO - properly encapsulate / privatize the following
 	// Temporarily, until there is a unified multi-skeleton controller tree
 	MeControllerTreeRoot	*ct_tree_p;
 	bonebus::BoneBusCharacter * bonebusCharacter;
-	SbmTransform                globalTransform;
+	SBTransform                globalTransform;
 
 public:	
 	//  Public Methods
@@ -123,8 +123,8 @@ public:
 	virtual int init( SkSkeleton* skeleton_p );
 
 	const std::string& getGeomObjectName();
-	SbmGeomObject* getGeomObject(); // get geometry object associated with the pawn
-	//void setGeomObject(SbmGeomObject* obj);
+	SBGeomObject* getGeomObject(); // get geometry object associated with the pawn
+	//void setGeomObject(SBGeomObject* obj);
 
  	void updateToColObject();
 	void updateToSteeringSpaceObject();
@@ -144,8 +144,8 @@ public:
 	const SkJoint* get_world_offset_joint() const
 	{	return get_joint( WORLD_OFFSET_JOINT_NAME ); }
 
-	virtual SbmTransform& getGlobalTransform();
-	virtual void setGlobalTransform(SbmTransform& newGlobalTransform);
+	virtual SBTransform& getGlobalTransform();
+	virtual void setGlobalTransform(SBTransform& newGlobalTransform);
 
 	SrMat get_world_offset();
 	void get_world_offset( float& x, float& y, float& z,

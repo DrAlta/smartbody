@@ -22,7 +22,7 @@ SBPhysicsManager::SBPhysicsManager()
 	setName("physics");
 
 	physicsTime = 0;
-	_ode = new SBPhysicsSimODE();
+	_ode = new ODEPhysicsSim();
 	_ode->initSimulation();
 }
 
@@ -189,7 +189,7 @@ SmartBody::SBObject* SBPhysicsManager::createPhysicsPawn( std::string pawnName, 
 
 	phyObj = new SBPhysicsObj();
 	phyObj->setName(pawnName);
-	SbmGeomObject* geomObj = SbmGeomObject::createGeometry(geomType,geomSize);
+	SBGeomObject* geomObj = SBGeomObject::createGeometry(geomType,geomSize);
 	phyObj->setGeometry(geomObj);
 	//phyObj->changeGeometry(geomType,geomSize);
 	getPhysicsEngine()->addPhysicsObj(phyObj);

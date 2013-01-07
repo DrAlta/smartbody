@@ -201,7 +201,7 @@ void SBDebuggerServer::Update()
                      msg += vhcl::Format(" pos %.3f %.3f %.3f rot %.3f %.3f %.3f %.3f", 
                         pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w); 
 
-                     SbmGeomObject* geom = p->getGeomObject();
+                     SBGeomObject* geom = p->getGeomObject();
                      if (geom)
                         msg += vhcl::Format(" geom %s size %.3f", geom->geomType().c_str(), geom->getGeomSize().x);    
                      else 

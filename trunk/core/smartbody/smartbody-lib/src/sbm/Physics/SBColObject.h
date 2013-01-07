@@ -1,5 +1,5 @@
-#ifndef _SBMCOLOBJECT_H_
-#define _SBMCOLOBJECT_H_
+#ifndef _SBCOLOBJECT_H_
+#define _SBCOLOBJECT_H_
 
 #include <sr/sr_mat.h>
 #include <sr/sr_quat.h>
@@ -10,62 +10,62 @@
 #include <map>
 #include <string>
 
-class SbmTransform
+class SBTransform
 {
 public:
 	SrQuat rot;
 	SrVec  tran;
 public:
-	SbmTransform();
-	SbmTransform(const SrQuat& q, const SrVec& t) { rot = q; tran = t;}
+	SBTransform();
+	SBTransform(const SrQuat& q, const SrVec& t) { rot = q; tran = t;}
 	SrVec localToGlobal(const SrVec& vLocal);
 	SrVec globalToLocal(const SrVec& vGlobal);
 	SrMat gmat() const;	
 	void  gmat(const SrMat& inMat);
-	void  add(const SbmTransform& delta);	
-	static SbmTransform diff(const SbmTransform& r1, const SbmTransform& r2);
-	static SbmTransform mult(const SbmTransform& r1, const SbmTransform& r2);  // return r1*r2
-	static SbmTransform blend(SbmTransform& r1, SbmTransform& r2, float weight );
-	static float             dist(const SbmTransform& r1, const SbmTransform& r2);
+	void  add(const SBTransform& delta);	
+	static SBTransform diff(const SBTransform& r1, const SBTransform& r2);
+	static SBTransform mult(const SBTransform& r1, const SBTransform& r2);  // return r1*r2
+	static SBTransform blend(SBTransform& r1, SBTransform& r2, float weight );
+	static float             dist(const SBTransform& r1, const SBTransform& r2);
 
-	SbmTransform& operator= (const SbmTransform& rt);
+	SBTransform& operator= (const SBTransform& rt);
 };
 
-typedef SbmTransform SRT;
+typedef SBTransform SRT;
 
 class SBPhysicsObjInterface;
 
 enum { GEOM_NULL = 0, GEOM_SPHERE, GEOM_BOX, GEOM_CAPSULE, GEOM_MESH, NUM_OF_GEOMS };
 
-class SbmTransformObjInterface
+class SBTransformObjInterface
 {	
 public:
-	virtual SbmTransform& getGlobalTransform() = 0;
-	virtual void setGlobalTransform(SbmTransform& newGlobalTransform) = 0;
+	virtual SBTransform& getGlobalTransform() = 0;
+	virtual void setGlobalTransform(SBTransform& newGlobalTransform) = 0;
 };
 
-class SbmGeomObject
+class SBGeomObject
 {
 public:
 	std::string  color;	
 protected:	
-	// a SbmGeomObject can be attached to a pawn or physics object as needed
-	SbmTransformObjInterface* attachedObj;
-	SbmTransform globalTransform;
-	SbmTransform localTransform;	
-	SbmTransform combineTransform;	
+	// a SBGeomObject can be attached to a pawn or physics object as needed
+	SBTransformObjInterface* attachedObj;
+	SBTransform globalTransform;
+	SBTransform localTransform;	
+	SBTransform combineTransform;	
 public:
-	SbmGeomObject(void);	
-	virtual ~SbmGeomObject(void);	
-	void attachToObj(SbmTransformObjInterface* phyObj);
-	SbmTransformObjInterface* getAttachObj();
+	SBGeomObject(void);	
+	virtual ~SBGeomObject(void);	
+	void attachToObj(SBTransformObjInterface* phyObj);
+	SBTransformObjInterface* getAttachObj();
 
-	SbmTransform& getLocalTransform() { return localTransform; }	
-	void          setLocalTransform(SbmTransform& newLocalTran);	
-	SbmTransform& getGlobalTransform();
-	void          setGlobalTransform(SbmTransform& newGlobalTran);
+	SBTransform& getLocalTransform() { return localTransform; }	
+	void          setLocalTransform(SBTransform& newLocalTran);	
+	SBTransform& getGlobalTransform();
+	void          setGlobalTransform(SBTransform& newGlobalTran);
 
-	SbmTransform& getCombineTransform();
+	SBTransform& getCombineTransform();
 	virtual SrVec getCenter();	
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) { return false; } // check if a point is inside the object	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f) { return false; }; // check if a line segment is intersect with the object
@@ -75,15 +75,15 @@ public:
 	virtual SrVec       getGeomSize() { return SrVec(); }
 	virtual void	    setGeomSize(SrVec& size) { return; }
 
-	static SbmGeomObject* createGeometry(const std::string& type, SrVec extends, SrVec from = SrVec(), SrVec to = SrVec() );
+	static SBGeomObject* createGeometry(const std::string& type, SrVec extends, SrVec from = SrVec(), SrVec to = SrVec() );
 };
 
 // a default null object with no geometry
-class SbmGeomNullObject : public SbmGeomObject
+class SBGeomNullObject : public SBGeomObject
 {
 public:
-	SbmGeomNullObject() {}
-	~SbmGeomNullObject() {}
+	SBGeomNullObject() {}
+	~SBGeomNullObject() {}
 	virtual bool isInside(const SrVec& gPos, float offset = 0.f) { return false;}
 	virtual bool estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
 	virtual std::string  geomType() { return "null"; }
@@ -91,13 +91,13 @@ public:
 	virtual void         setGeomSize(SrVec& size) {}
 };
 
-class SbmGeomSphere : public SbmGeomObject
+class SBGeomSphere : public SBGeomObject
 {
 public:
 	float radius;
 public:
-	SbmGeomSphere(float r);
-	virtual ~SbmGeomSphere();
+	SBGeomSphere(float r);
+	virtual ~SBGeomSphere();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
@@ -109,14 +109,14 @@ public:
 
 };
 
-class SbmGeomBox : public SbmGeomObject
+class SBGeomBox : public SBGeomObject
 {
 public:
 	SrVec extent;
 public:
-	SbmGeomBox(const SrVec& ext);
-	SbmGeomBox(SrBox& bbox); 
-	virtual ~SbmGeomBox();
+	SBGeomBox(const SrVec& ext);
+	SBGeomBox(SrBox& bbox); 
+	virtual ~SBGeomBox();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
@@ -126,15 +126,15 @@ public:
 };
 
 // assuming the length is along local y-axis
-class SbmGeomCapsule : public SbmGeomObject
+class SBGeomCapsule : public SBGeomObject
 {
 public:
 	float extent, radius;	
 	SrVec endPts[2];	
 public:
-	SbmGeomCapsule(float length, float radius);
-	SbmGeomCapsule(const SrVec& p1, const SrVec& p2, float radius);	
-	virtual ~SbmGeomCapsule();
+	SBGeomCapsule(float length, float radius);
+	SBGeomCapsule(const SrVec& p1, const SrVec& p2, float radius);	
+	virtual ~SBGeomCapsule();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
@@ -144,13 +144,13 @@ public:
 };
 
 // this is a adapting interface to integrate SrModel tri-mesh into physical simulation framework
-class SbmGeomTriMesh : public SbmGeomObject
+class SBGeomTriMesh : public SBGeomObject
 {
 public:
 	SrModel* geoMesh;
 public:
-	SbmGeomTriMesh(SrModel* model) { geoMesh = model;  }
-	virtual ~SbmGeomTriMesh() { }
+	SBGeomTriMesh(SrModel* model) { geoMesh = model;  }
+	virtual ~SBGeomTriMesh() { }
 	// no operations for now
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) { return false; }
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f) { return false; }
@@ -160,42 +160,42 @@ public:
 	virtual void         setGeomSize(SrVec& size) { }
 };
 
-typedef std::vector<SbmGeomObject*> VecOfSbmColObj;
+typedef std::vector<SBGeomObject*> VecOfSbmColObj;
 
 // struct for contact point
-class SbmGeomContact 
+class SBGeomContact 
 {
 public:
 	SrVec contactPoint;
 	SrVec contactNormal;
 	float penetrationDepth;	
 public:
-	SbmGeomContact& operator= (const SbmGeomContact& rt);
+	SBGeomContact& operator= (const SBGeomContact& rt);
 };
 
 typedef std::pair<std::string,std::string> SbmCollisionPair;
 typedef std::vector<SbmCollisionPair> SbmCollisionPairList;
 
-class SbmCollisionSpace
+class SBCollisionSpace
 {
 protected:
-	//std::list<SbmGeomObject*> collisionObjs;
-	std::map<std::string,SbmGeomObject*> collsionObjMap;
+	//std::list<SBGeomObject*> collisionObjs;
+	std::map<std::string,SBGeomObject*> collsionObjMap;
 	std::map<SbmCollisionPair, bool> excludePairMap;
 public:
-	SbmCollisionSpace();
-	~SbmCollisionSpace();
+	SBCollisionSpace();
+	~SBCollisionSpace();
 	virtual void addCollisionObjects(const std::string& objName);
 	virtual void removeCollisionObjects(const std::string& objName);
 	virtual void addExcludePair(const std::string& objName1, const std::string& objName2);
 	virtual void getPotentialCollisionPairs(std::vector<SbmCollisionPair>& collisionPairs) = 0;
 };
 
-class SbmCollisionUtil
+class SBCollisionUtil
 {
 public:
-	static bool checkIntersection(SbmGeomObject* obj1, SbmGeomObject* obj2);
-	static void collisionDetection(SbmGeomObject* obj1, SbmGeomObject* obj2, std::vector<SbmGeomContact>& contactPts);
+	static bool checkIntersection(SBGeomObject* obj1, SBGeomObject* obj2);
+	static void collisionDetection(SBGeomObject* obj1, SBGeomObject* obj2, std::vector<SBGeomContact>& contactPts);
 };
 
 #endif

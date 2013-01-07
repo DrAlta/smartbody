@@ -7,19 +7,19 @@
 /* Physics Sim ODE                                                      */
 /************************************************************************/
 
-SBPhysicsSimODE::SBPhysicsSimODE(void)
+ODEPhysicsSim::ODEPhysicsSim(void)
 {
 	hasInit = false;
 	initSimulation();
 }
-SBPhysicsSimODE::~SBPhysicsSimODE(void)
+ODEPhysicsSim::~ODEPhysicsSim(void)
 {
 }
 
-void SBPhysicsSimODE::nearCallBack(void *data, dGeomID o1, dGeomID o2)
+void ODEPhysicsSim::nearCallBack(void *data, dGeomID o1, dGeomID o2)
 {		
 	const int N = 4;
-	SBPhysicsSimODE* phyODE = static_cast<SBPhysicsSimODE*>(data);
+	ODEPhysicsSim* phyODE = static_cast<ODEPhysicsSim*>(data);
 	if (!phyODE)
 		return;
 
@@ -75,7 +75,7 @@ static void myMessageFunction(int errnum, const char* msg, va_list ap)
 	LOG("ODE Error %d %s", errnum, msg);
 }
 
-void SBPhysicsSimODE::initSimulation()
+void ODEPhysicsSim::initSimulation()
 {	
 	dSetErrorHandler(&myMessageFunction);
 	dSetDebugHandler(&myMessageFunction);
@@ -106,7 +106,7 @@ void SBPhysicsSimODE::initSimulation()
 	hasInit = true;
 }
 
-void SBPhysicsSimODE::updateSimulationInternal( float timeStep )
+void ODEPhysicsSim::updateSimulationInternal( float timeStep )
 {	
 	float gravity = (float)SBObject::getDoubleAttribute("gravity");
 	dWorldSetGravity(worldID,0.f,-fabs(gravity),0.f);	
@@ -116,12 +116,12 @@ void SBPhysicsSimODE::updateSimulationInternal( float timeStep )
 
 
 	// set external force & torque for each rigid body
-	SbmODEObjMap::iterator vi;
+	ODEObjMap::iterator vi;
 	for ( vi  = odeObjMap.begin();
 		  vi != odeObjMap.end();
 		  vi++)
 	{
-		SbmODEObj* odeObj = (vi)->second;
+		ODEObj* odeObj = (vi)->second;
 	    SmartBody::SBPhysicsObj* obj = odeObj->physicsObj;
 		if (obj)
 		{
@@ -134,12 +134,12 @@ void SBPhysicsSimODE::updateSimulationInternal( float timeStep )
 	}
 	
 	// set torque for each joint
-	SbmODEJointMap::iterator ji;
+	ODEJointMap::iterator ji;
 	for ( ji  = odeJointMap.begin();
 		  ji != odeJointMap.end();
 		  ji++)
 	{
-		SbmODEJoint* odeJ = (ji)->second;
+		ODEJoint* odeJ = (ji)->second;
 		SmartBody::SBPhysicsJoint* j = odeJ->joint;
 		if (j)
 		{
@@ -150,7 +150,7 @@ void SBPhysicsSimODE::updateSimulationInternal( float timeStep )
 		}
 	}
 
-	dSpaceCollide(spaceID,this,SBPhysicsSimODE::nearCallBack);		
+	dSpaceCollide(spaceID,this,ODEPhysicsSim::nearCallBack);		
 	//dWorldStep(worldID,timeStep);
 	//dWorldStepFast1(worldID,timeStep,10);
 	dWorldQuickStep(worldID,timeStep);	
@@ -167,15 +167,15 @@ void SBPhysicsSimODE::updateSimulationInternal( float timeStep )
 	}
 }
 
-SBPhysicsSimODE* SBPhysicsSimODE::getODESim()
+ODEPhysicsSim* ODEPhysicsSim::getODESim()
 {
-	SBPhysicsSimODE* odePhysics = dynamic_cast<SBPhysicsSimODE*>(SBPhysicsSim::getPhysicsEngine());
+	ODEPhysicsSim* odePhysics = dynamic_cast<ODEPhysicsSim*>(SBPhysicsSim::getPhysicsEngine());
 	return odePhysics;
 }
 
-void SBPhysicsSimODE::updatePhysicsJoint( SmartBody::SBPhysicsJoint* phyJoint )
+void ODEPhysicsSim::updatePhysicsJoint( SmartBody::SBPhysicsJoint* phyJoint )
 {
-	SbmODEJoint* odeJoint = getODEJoint(phyJoint);
+	ODEJoint* odeJoint = getODEJoint(phyJoint);
 	if (!odeJoint)
 		return;
 
@@ -213,21 +213,21 @@ void SBPhysicsSimODE::updatePhysicsJoint( SmartBody::SBPhysicsJoint* phyJoint )
 	}
 }
 
-void SBPhysicsSimODE::linkJointObj( SmartBody::SbmJointObj* obj )
+void ODEPhysicsSim::linkJointObj( SmartBody::SbmJointObj* obj )
 {
 	SmartBody::SbmJointObj* parent = obj->getParentObj();	
-	SbmODEObj* odeObj = getODEObj(obj);	
+	ODEObj* odeObj = getODEObj(obj);	
 	if (!parent) 
 	{		
 		return;
 	}
 
-	SbmODEObj* pode = getODEObj(parent);
+	ODEObj* pode = getODEObj(parent);
 	std::string jname = obj->getSBJoint()->getName();
 	
 	SmartBody::SBJoint* joint = obj->getSBJoint();
 	SmartBody::SBPhysicsJoint* phyJoint = obj->getPhyJoint();
-	SbmODEJoint* odeJoint = new SbmODEJoint();	
+	ODEJoint* odeJoint = new ODEJoint();	
 	odeJoint->joint = phyJoint;
 	odeJoint->parentID = pode->bodyID;
 	odeJoint->childID = odeObj->bodyID;
@@ -273,7 +273,7 @@ void SBPhysicsSimODE::linkJointObj( SmartBody::SbmJointObj* obj )
 	updatePhysicsJoint(phyJoint);
 }
 
-void SBPhysicsSimODE::addPhysicsCharacter( SmartBody::SBPhysicsCharacter* phyChar )
+void ODEPhysicsSim::addPhysicsCharacter( SmartBody::SBPhysicsCharacter* phyChar )
 {
 	std::vector<SmartBody::SbmJointObj*> jointObjList = phyChar->getJointObjList();	
 	// add rigid body object
@@ -312,32 +312,32 @@ void SBPhysicsSimODE::addPhysicsCharacter( SmartBody::SBPhysicsCharacter* phyCha
 		
 }
 
-void SBPhysicsSimODE::removePhysicsCharacter( SmartBody::SBPhysicsCharacter* phyChar )
+void ODEPhysicsSim::removePhysicsCharacter( SmartBody::SBPhysicsCharacter* phyChar )
 {
 
 }
 
 
-void SBPhysicsSimODE::addPhysicsObj( SmartBody::SBPhysicsObj* obj )
+void ODEPhysicsSim::addPhysicsObj( SmartBody::SBPhysicsObj* obj )
 {
 	if (hasPhysicsObj(obj)) return;
-	SBPhysicsSimODE* odeSim = SBPhysicsSimODE::getODESim();
+	ODEPhysicsSim* odeSim = ODEPhysicsSim::getODESim();
 	if (!odeSim)	return;
 	if (!odeSim->systemIsInit())   return;
 
 	SmartBody::SBPhysicsSim::addPhysicsObj(obj);
 	if (odeObjMap.find(obj->getID()) == odeObjMap.end())
 	{
-		odeObjMap[obj->getID()] = new SbmODEObj();
+		odeObjMap[obj->getID()] = new ODEObj();
 	}
 
-	SbmODEObj* odeObj = getODEObj(obj);		
+	ODEObj* odeObj = getODEObj(obj);		
 	odeObj->bodyID = dBodyCreate(odeSim->getWorldID());
 	dBodySetData(odeObj->bodyID,obj); // attach physics obj with ode body
 	odeObj->physicsObj = obj;
 	if (obj)
 	{	
-		SbmTransform& curT = obj->getGlobalTransform();
+		SBTransform& curT = obj->getGlobalTransform();
 		dQuaternion quat;
 		quat[0] = (dReal)curT.rot.w;	
 		quat[1] = (dReal)curT.rot.x;
@@ -351,9 +351,9 @@ void SBPhysicsSimODE::addPhysicsObj( SmartBody::SBPhysicsObj* obj )
 }
 
 
-void SBPhysicsSimODE::updateODEGeometryTransform( SbmGeomObject* geomObj, dGeomID geomID )
+void ODEPhysicsSim::updateODEGeometryTransform( SBGeomObject* geomObj, dGeomID geomID )
 {	
-	SbmTransform& curT = geomObj->getCombineTransform();
+	SBTransform& curT = geomObj->getCombineTransform();
 	dQuaternion quat; 
 	quat[0] = (dReal)curT.rot.w;	
 	quat[1] = (dReal)curT.rot.x;
@@ -365,31 +365,31 @@ void SBPhysicsSimODE::updateODEGeometryTransform( SbmGeomObject* geomObj, dGeomI
 }
 
 
-void SBPhysicsSimODE::removePhysicsObj( SmartBody::SBPhysicsObj* obj )
+void ODEPhysicsSim::removePhysicsObj( SmartBody::SBPhysicsObj* obj )
 {
 	if (!hasPhysicsObj(obj)) return;
-	SBPhysicsSimODE* odeSim = SBPhysicsSimODE::getODESim();
+	ODEPhysicsSim* odeSim = ODEPhysicsSim::getODESim();
 	if (!odeSim)	return;
 	if (!odeSim->systemIsInit())   return;
 
 	SBPhysicsSim::removePhysicsObj(obj);
-	SbmODEObjMap::iterator li = odeObjMap.find(obj->getID());
+	ODEObjMap::iterator li = odeObjMap.find(obj->getID());
 	if (li != odeObjMap.end())
 	{
-		SbmODEObj* odeObj = li->second;
+		ODEObj* odeObj = li->second;
 		delete odeObj;
 		odeObjMap.erase(li);
 	}
 }
 
-SmartBody::SBPhysicsObj* SBPhysicsSimODE::createPhyObj()
+SmartBody::SBPhysicsObj* ODEPhysicsSim::createPhyObj()
 {
 	return new SmartBody::SBPhysicsObj();
 }
 
-SbmODEObj* SBPhysicsSimODE::getODEObj( SmartBody::SBPhysicsObj* obj )
+ODEObj* ODEPhysicsSim::getODEObj( SmartBody::SBPhysicsObj* obj )
 {
-	SbmODEObj* odeObj = NULL;
+	ODEObj* odeObj = NULL;
 	if (hasPhysicsObj(obj))
 	{
 		odeObj = odeObjMap[obj->getID()];
@@ -398,9 +398,9 @@ SbmODEObj* SBPhysicsSimODE::getODEObj( SmartBody::SBPhysicsObj* obj )
 }
 
 
-SbmODEJoint* SBPhysicsSimODE::getODEJoint( SmartBody::SBPhysicsJoint* joint )
+ODEJoint* ODEPhysicsSim::getODEJoint( SmartBody::SBPhysicsJoint* joint )
 {
-	SbmODEJoint* odeJoint = NULL;
+	ODEJoint* odeJoint = NULL;
 	unsigned long jointID = (unsigned long)joint;
 	if (odeJointMap.find(jointID) != odeJointMap.end())
 	{
@@ -410,9 +410,9 @@ SbmODEJoint* SBPhysicsSimODE::getODEJoint( SmartBody::SBPhysicsJoint* joint )
 }
 
 
-SrVec SBPhysicsSimODE::getJointConstraintPos( SmartBody::SBPhysicsJoint* joint )
+SrVec ODEPhysicsSim::getJointConstraintPos( SmartBody::SBPhysicsJoint* joint )
 {
-	SbmODEJoint* odeJoint = getODEJoint(joint);
+	ODEJoint* odeJoint = getODEJoint(joint);
 	if (!odeJoint) return SrVec(0,0,0);
 
 	dVector3 jointPoint;
@@ -421,9 +421,9 @@ SrVec SBPhysicsSimODE::getJointConstraintPos( SmartBody::SBPhysicsJoint* joint )
 	return SrVec((float)jointPoint[0],(float)jointPoint[1],(float)jointPoint[2]);
 }
 
-SrVec SBPhysicsSimODE::getJointRotationAxis( SmartBody::SBPhysicsJoint* joint, int axis )
+SrVec ODEPhysicsSim::getJointRotationAxis( SmartBody::SBPhysicsJoint* joint, int axis )
 {
-	SbmODEJoint* odeJoint = getODEJoint(joint);
+	ODEJoint* odeJoint = getODEJoint(joint);
 	if (!odeJoint) return SrVec(0,0,0);
 
 	dVector3 jointAxis;
@@ -432,12 +432,12 @@ SrVec SBPhysicsSimODE::getJointRotationAxis( SmartBody::SBPhysicsJoint* joint, i
 	return SrVec((float)jointAxis[0],(float)jointAxis[1],(float)jointAxis[2])*10.f;	
 }
 
-void SBPhysicsSimODE::updatePhyObjGeometry( SmartBody::SBPhysicsObj* obj, SbmGeomObject* geom /*= NULL*/ )
+void ODEPhysicsSim::updatePhyObjGeometry( SmartBody::SBPhysicsObj* obj, SBGeomObject* geom /*= NULL*/ )
 {
-	SBPhysicsSimODE* odeSim = SBPhysicsSimODE::getODESim();
+	ODEPhysicsSim* odeSim = ODEPhysicsSim::getODESim();
 	if (!odeSim)	return;
 	if (!odeSim->systemIsInit())   return;
-	SbmODEObj* odeObj = getODEObj(obj);	
+	ODEObj* odeObj = getODEObj(obj);	
 	if (odeObj)
 	{
 		if (geom && geom != obj->getColObj())
@@ -451,7 +451,7 @@ void SBPhysicsSimODE::updatePhyObjGeometry( SmartBody::SBPhysicsObj* obj, SbmGeo
 		if (odeObj->geomID && obj->getColObj())
 		{			
 			dGeomSetBody(odeObj->geomID ,odeObj->bodyID);
-			SbmTransform& offsetT = obj->getColObj()->getLocalTransform();
+			SBTransform& offsetT = obj->getColObj()->getLocalTransform();
 			dGeomSetOffsetPosition(odeObj->geomID,(dReal)offsetT.tran[0],(dReal)offsetT.tran[1],(dReal)offsetT.tran[2]);
 			dQuaternion quat;
 			quat[0] = (dReal)offsetT.rot.w;	
@@ -466,9 +466,9 @@ void SBPhysicsSimODE::updatePhyObjGeometry( SmartBody::SBPhysicsObj* obj, SbmGeo
 		dBodySetMass(odeObj->bodyID,&odeObj->odeMass);				
 	}	
 }
-void SBPhysicsSimODE::enablePhysicsSim( SmartBody::SBPhysicsObj* obj, bool bSim )
+void ODEPhysicsSim::enablePhysicsSim( SmartBody::SBPhysicsObj* obj, bool bSim )
 {
-	SbmODEObj* odeObj = getODEObj(obj);	
+	ODEObj* odeObj = getODEObj(obj);	
 	obj->hasPhysicsSim(bSim);
 	if (obj->hasPhysicsSim())
 		//dBodyEnable(odeObj->bodyID);
@@ -478,9 +478,9 @@ void SBPhysicsSimODE::enablePhysicsSim( SmartBody::SBPhysicsObj* obj, bool bSim 
 		//dBodyDisable(odeObj->bodyID);	
 }
 
-void SBPhysicsSimODE::enableCollisionSim( SmartBody::SBPhysicsObj* obj, bool bCol )
+void ODEPhysicsSim::enableCollisionSim( SmartBody::SBPhysicsObj* obj, bool bCol )
 {
-	SbmODEObj* odeObj = getODEObj(obj);	
+	ODEObj* odeObj = getODEObj(obj);	
 	obj->hasCollisionSim(bCol);
 	if (obj->hasCollisionSim())
 		dGeomEnable(odeObj->geomID);
@@ -488,13 +488,13 @@ void SBPhysicsSimODE::enableCollisionSim( SmartBody::SBPhysicsObj* obj, bool bCo
 		dGeomDisable(odeObj->geomID);
 }
 
-void SBPhysicsSimODE::writeToPhysicsObj( SmartBody::SBPhysicsObj* obj )
+void ODEPhysicsSim::writeToPhysicsObj( SmartBody::SBPhysicsObj* obj )
 {
 	if (!obj->hasPhysicsSim())
 		return;
-	SbmODEObj* odeObj = getODEObj(obj);	
+	ODEObj* odeObj = getODEObj(obj);	
 	// write the current simulation result into object world state
-	SbmTransform curT;//colObj->getGlobalTransform();
+	SBTransform curT;//colObj->getGlobalTransform();
 	const dReal* quat = dBodyGetQuaternion(odeObj->bodyID);
 	curT.rot.w = (float)quat[0];
 	curT.rot.x = (float)quat[1];
@@ -514,10 +514,10 @@ void SBPhysicsSimODE::writeToPhysicsObj( SmartBody::SBPhysicsObj* obj )
 	obj->setAngularVel(SrVec((float)angVel[0],(float)angVel[1],(float)angVel[2]));
 }
 
-void SBPhysicsSimODE::readFromPhysicsObj( SmartBody::SBPhysicsObj* obj )
+void ODEPhysicsSim::readFromPhysicsObj( SmartBody::SBPhysicsObj* obj )
 {
-	SbmODEObj* odeObj = getODEObj(obj);	
-	SbmTransform& curT = obj->getGlobalTransform();
+	ODEObj* odeObj = getODEObj(obj);	
+	SBTransform& curT = obj->getGlobalTransform();
 	dQuaternion quat;
 	quat[0] = (dReal)curT.rot.w;	
 	quat[1] = (dReal)curT.rot.x;
@@ -532,24 +532,24 @@ void SBPhysicsSimODE::readFromPhysicsObj( SmartBody::SBPhysicsObj* obj )
  	dBodySetAngularVel(odeObj->bodyID,(dReal)avel[0],(dReal)avel[1],(dReal)avel[2]);	
 }
 
-dGeomID SBPhysicsSimODE::createODERawGeometry( SbmGeomObject* geomObj )
+dGeomID ODEPhysicsSim::createODERawGeometry( SBGeomObject* geomObj )
 {
 	if (!geomObj) return 0;
 	dGeomID geomID = 0;
 	if (geomObj->geomType() == "sphere")
 	{
-		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(geomObj);
+		SBGeomSphere* sph = dynamic_cast<SBGeomSphere*>(geomObj);
 		geomID = dCreateSphere(0,(dReal)sph->radius);
 	}
 	else if (geomObj->geomType() == "box")
 	{
-		SbmGeomBox* box = dynamic_cast<SbmGeomBox*>(geomObj);
+		SBGeomBox* box = dynamic_cast<SBGeomBox*>(geomObj);
 		SrVec extent = box->extent*2.f;
 		geomID = dCreateBox(0,(dReal)extent.x,(dReal)extent.y,(dReal)extent.z);
 	}
 	else if (geomObj->geomType() == "capsule")
 	{
-		SbmGeomCapsule* cap = dynamic_cast<SbmGeomCapsule*>(geomObj);		
+		SBGeomCapsule* cap = dynamic_cast<SBGeomCapsule*>(geomObj);		
 		if (cap->extent == 0.0)
 			cap->extent = 0.01f;
 		geomID = dCreateCapsule(0,(dReal)cap->radius,(dReal)cap->extent);
@@ -558,7 +558,7 @@ dGeomID SBPhysicsSimODE::createODERawGeometry( SbmGeomObject* geomObj )
 	return geomID;
 }
 
-void SBPhysicsSimODE::updateODEMass( dMass& odeMass, SbmGeomObject* geomObj, float mass )
+void ODEPhysicsSim::updateODEMass( dMass& odeMass, SBGeomObject* geomObj, float mass )
 {
 	if (!geomObj)
 	{
@@ -568,18 +568,18 @@ void SBPhysicsSimODE::updateODEMass( dMass& odeMass, SbmGeomObject* geomObj, flo
 
 	if (geomObj->geomType() == "sphere")
 	{
-		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(geomObj);
+		SBGeomSphere* sph = dynamic_cast<SBGeomSphere*>(geomObj);
 		dMassSetSphereTotal(&odeMass,(dReal)mass,(dReal)sph->radius);
 	}
 	else if (geomObj->geomType() == "box")
 	{
-		SbmGeomBox* box = dynamic_cast<SbmGeomBox*>(geomObj);
+		SBGeomBox* box = dynamic_cast<SBGeomBox*>(geomObj);
 		SrVec extent = box->extent*2.f;
 		dMassSetBoxTotal(&odeMass,(dReal)mass,(dReal)extent.x,(dReal)extent.y,(dReal)extent.z);
 	}
 	else if (geomObj->geomType() == "capsule")
 	{
-		SbmGeomCapsule* cap = dynamic_cast<SbmGeomCapsule*>(geomObj);		
+		SBGeomCapsule* cap = dynamic_cast<SBGeomCapsule*>(geomObj);		
 		if (cap->extent == 0.0)
 			cap->extent = 0.01f;
 		dMassSetCapsuleTotal(&odeMass,(dReal)mass,3,(dReal)cap->radius,(dReal)cap->extent);
@@ -590,45 +590,45 @@ void SBPhysicsSimODE::updateODEMass( dMass& odeMass, SbmGeomObject* geomObj, flo
 	}
 }
 
-dGeomID SBPhysicsSimODE::createODEGeometry( SmartBody::SBPhysicsObj* obj, float mass )
+dGeomID ODEPhysicsSim::createODEGeometry( SmartBody::SBPhysicsObj* obj, float mass )
 {
-	SBPhysicsSimODE* odeSim = SBPhysicsSimODE::getODESim();
+	ODEPhysicsSim* odeSim = ODEPhysicsSim::getODESim();
 	if (!odeSim)	return 0;
 	if (!odeSim->systemIsInit())   return 0;
-	SbmODEObj* odeObj = getODEObj(obj);	
-	SbmGeomObject* geom = obj->getColObj();
-	dGeomID geomID = SBPhysicsSimODE::createODERawGeometry(geom);
+	ODEObj* odeObj = getODEObj(obj);	
+	SBGeomObject* geom = obj->getColObj();
+	dGeomID geomID = ODEPhysicsSim::createODERawGeometry(geom);
 	if (geomID) dSpaceAdd(odeSim->getSpaceID(),geomID);
-	SBPhysicsSimODE::updateODEMass(odeObj->odeMass,geom,mass);	
+	ODEPhysicsSim::updateODEMass(odeObj->odeMass,geom,mass);	
 	return geomID;
 
 /*
 	dGeomID geomID = 0;
-	if (dynamic_cast<SbmGeomSphere*>(geom))
+	if (dynamic_cast<SBGeomSphere*>(geom))
 	{
-		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(geom);
+		SBGeomSphere* sph = dynamic_cast<SBGeomSphere*>(geom);
 		geomID = dCreateSphere(odeSim->getSpaceID(),(dReal)sph->radius);
 		dMassSetSphereTotal(&odeObj->odeMass,(dReal)mass,(dReal)sph->radius);
 	}
-	else if (dynamic_cast<SbmGeomBox*>(geom))
+	else if (dynamic_cast<SBGeomBox*>(geom))
 	{
-		SbmGeomBox* box = dynamic_cast<SbmGeomBox*>(geom);
+		SBGeomBox* box = dynamic_cast<SBGeomBox*>(geom);
 		SrVec extent = box->extent*2.f;
 		geomID = dCreateBox(odeSim->getSpaceID(),(dReal)extent.x,(dReal)extent.y,(dReal)extent.z);
 		dMassSetBoxTotal(&odeObj->odeMass,(dReal)mass,(dReal)extent.x,(dReal)extent.y,(dReal)extent.z);
 	}
-	else if (dynamic_cast<SbmGeomCapsule*>(geom))
+	else if (dynamic_cast<SBGeomCapsule*>(geom))
 	{
-		SbmGeomCapsule* cap = dynamic_cast<SbmGeomCapsule*>(geom);		
+		SBGeomCapsule* cap = dynamic_cast<SBGeomCapsule*>(geom);		
 		if (cap->extent == 0.0)
 			cap->extent = 0.01f;
 		geomID = dCreateCapsule(odeSim->getSpaceID(),(dReal)cap->radius,(dReal)cap->extent);
 		dMassSetCapsuleTotal(&odeObj->odeMass,(dReal)mass,3,(dReal)cap->radius,(dReal)cap->extent);
 	}
 #if USE_ODE_MESH
-	else if (dynamic_cast<SbmGeomTriMesh*>(geom))
+	else if (dynamic_cast<SBGeomTriMesh*>(geom))
 	{
-		SbmGeomTriMesh* tri = dynamic_cast<SbmGeomTriMesh*>(geom);
+		SBGeomTriMesh* tri = dynamic_cast<SBGeomTriMesh*>(geom);
 		SrModel* model = tri->geoMesh;
 		//model->invert_faces();
 		SrBox bbox;		
@@ -653,7 +653,7 @@ dGeomID SBPhysicsSimODE::createODEGeometry( SmartBody::SBPhysicsObj* obj, float 
 }
 
 
-SbmODEObj::SbmODEObj()
+ODEObj::ODEObj()
 {
 	bodyID = 0;
 	geomID = 0;
@@ -661,14 +661,14 @@ SbmODEObj::SbmODEObj()
 	physicsObj = NULL;
 }
 
-SbmODEObj::~SbmODEObj()
+ODEObj::~ODEObj()
 {
 	cleanGeometry();
 	if (bodyID)
 		dBodyDestroy(bodyID);
 }
 
-void SbmODEObj::cleanGeometry()
+void ODEObj::cleanGeometry()
 {
 	if (geomID)
 		dGeomDestroy(geomID);
@@ -680,7 +680,7 @@ void SbmODEObj::cleanGeometry()
 
 
 
-SbmODEJoint::SbmODEJoint()
+ODEJoint::ODEJoint()
 {
 	jointID = 0;
 	aMotorID = 0;
@@ -688,7 +688,7 @@ SbmODEJoint::SbmODEJoint()
 	joint = NULL;
 }
 
-SbmODEJoint::~SbmODEJoint()
+ODEJoint::~ODEJoint()
 {
 	
 }
@@ -697,32 +697,32 @@ SbmODEJoint::~SbmODEJoint()
 /* Collision Space ODE                                                  */
 /************************************************************************/
 
-SbmCollisionSpaceODE::SbmCollisionSpaceODE()
+ODECollisionSpace::ODECollisionSpace()
 {
 	// in case ode is not yet initialized
 	dInitODE();	
 	spaceID = dSimpleSpaceCreate(0);	
 }
 
-void SbmCollisionSpaceODE::addCollisionObjects( const std::string& objName )
+void ODECollisionSpace::addCollisionObjects( const std::string& objName )
 {
 	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
-	SbmGeomObject* obj = colManager->getCollisionObject(objName);
+	SBGeomObject* obj = colManager->getCollisionObject(objName);
 	if (obj)
 	{
-		SbmCollisionSpace::addCollisionObjects(objName);
-		dGeomID geomID = SBPhysicsSimODE::createODERawGeometry(obj);
-		SBPhysicsSimODE::updateODEGeometryTransform(obj,geomID);
+		SBCollisionSpace::addCollisionObjects(objName);
+		dGeomID geomID = ODEPhysicsSim::createODERawGeometry(obj);
+		ODEPhysicsSim::updateODEGeometryTransform(obj,geomID);
 		odeGeomMap[objName] = geomID;
 		odeGeomNameMap[geomID] = objName;
 		dSpaceAdd(spaceID,geomID);		
 	}	
 }
 
-void SbmCollisionSpaceODE::removeCollisionObjects( const std::string& objName )
+void ODECollisionSpace::removeCollisionObjects( const std::string& objName )
 {
 	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
-	SbmGeomObject* obj = colManager->getCollisionObject(objName);
+	SBGeomObject* obj = colManager->getCollisionObject(objName);
 	if (!obj) return;
 
 	dGeomID geomID = getODEGeomID(objName);
@@ -734,10 +734,10 @@ void SbmCollisionSpaceODE::removeCollisionObjects( const std::string& objName )
 		dSpaceRemove(spaceID,geomID);
 		dGeomDestroy(geomID);		
 	}
-	SbmCollisionSpace::removeCollisionObjects(objName);
+	SBCollisionSpace::removeCollisionObjects(objName);
 }
 
-dGeomID SbmCollisionSpaceODE::getODEGeomID( const std::string& geomName )
+dGeomID ODECollisionSpace::getODEGeomID( const std::string& geomName )
 {
 	dGeomID geomID = NULL;
 	if (odeGeomMap.find(geomName) != odeGeomMap.end())
@@ -747,41 +747,41 @@ dGeomID SbmCollisionSpaceODE::getODEGeomID( const std::string& geomName )
 	return geomID;
 }
 
-void SbmCollisionSpaceODE::getPotentialCollisionPairs( SbmCollisionPairList& collisionPairs )
+void ODECollisionSpace::getPotentialCollisionPairs( SbmCollisionPairList& collisionPairs )
 {
-	std::map<std::string,SbmGeomObject*>::iterator vi;
+	std::map<std::string,SBGeomObject*>::iterator vi;
 	for ( vi  = collsionObjMap.begin();
 		  vi != collsionObjMap.end();
 		  vi++)
 	{
 		std::string geomName = (*vi).first;
-		SbmGeomObject* geomObj = (*vi).second;
+		SBGeomObject* geomObj = (*vi).second;
 		dGeomID geomID = getODEGeomID(geomName);
 		if (geomID)
 		{
-			SBPhysicsSimODE::updateODEGeometryTransform(geomObj,geomID);
+			ODEPhysicsSim::updateODEGeometryTransform(geomObj,geomID);
 		}
 	}
 	curCollisionPairs.clear();
-	dSpaceCollide(spaceID,this,SbmCollisionSpaceODE::collisionSpaceNearCallBack);
+	dSpaceCollide(spaceID,this,ODECollisionSpace::collisionSpaceNearCallBack);
 	collisionPairs = curCollisionPairs;
 }
 
-void SbmCollisionSpaceODE::collisionSpaceNearCallBack( void *data, dGeomID o1, dGeomID o2 )
+void ODECollisionSpace::collisionSpaceNearCallBack( void *data, dGeomID o1, dGeomID o2 )
 {
-	SbmCollisionSpaceODE* colSpace = (SbmCollisionSpaceODE*)data;
+	ODECollisionSpace* colSpace = (ODECollisionSpace*)data;
 	SbmCollisionPairList& curColPairs = colSpace->getCurrentCollisionPairList();
-	//SbmGeomObject* g1 = (SbmGeomObject*)dGeomGetData(o1);
-	//SbmGeomObject* g2 = (SbmGeomObject*)dGeomGetData(o2);
+	//SBGeomObject* g1 = (SBGeomObject*)dGeomGetData(o1);
+	//SBGeomObject* g2 = (SBGeomObject*)dGeomGetData(o2);
 	curColPairs.push_back(SbmCollisionPair(colSpace->getODEGeomName(o1),colSpace->getODEGeomName(o2)));
 }
 
-SbmCollisionSpaceODE::~SbmCollisionSpaceODE()
+ODECollisionSpace::~ODECollisionSpace()
 {
 
 }
 
-std::string SbmCollisionSpaceODE::getODEGeomName( dGeomID geomID )
+std::string ODECollisionSpace::getODEGeomName( dGeomID geomID )
 {
 	std::string geomName = "";
 	if (odeGeomNameMap.find(geomID) != odeGeomNameMap.end())
@@ -791,7 +791,7 @@ std::string SbmCollisionSpaceODE::getODEGeomName( dGeomID geomID )
 	return geomName;
 }
 
-SbmCollisionPairList& SbmCollisionSpaceODE::getCurrentCollisionPairList()
+SbmCollisionPairList& ODECollisionSpace::getCurrentCollisionPairList()
 {
 	return curCollisionPairs;
 }

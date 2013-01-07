@@ -78,7 +78,7 @@ bool SkPosCfg::valid ()
 	VecOfSbmColObj& colList = _cman->ColObstacles();
 	for (unsigned int i=0;i<colList.size();i++)
 	{
-		SbmGeomObject* col = colList[i];
+		SBGeomObject* col = colList[i];
 		bool isCol = col->isInside(*this, 0.1f);
 		if (isCol)
 			return false;

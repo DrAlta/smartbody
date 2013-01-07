@@ -6,17 +6,17 @@
 #include <sb/SBCollisionManager.h>
 #include <sb/SBScene.h>
 
-SrVec SbmTransform::localToGlobal( const SrVec& vLocal )
+SrVec SBTransform::localToGlobal( const SrVec& vLocal )
 {
 	return vLocal*rot + tran;	
 }
 
-SrVec SbmTransform::globalToLocal( const SrVec& vGlobal )
+SrVec SBTransform::globalToLocal( const SrVec& vGlobal )
 {
 	return (vGlobal-tran)*rot.inverse();
 }
 
-SrMat SbmTransform::gmat() const
+SrMat SBTransform::gmat() const
 {
 	SrMat mat;
 	mat = rot.get_mat(mat);
@@ -24,24 +24,24 @@ SrMat SbmTransform::gmat() const
 	return mat;
 }
 
-void SbmTransform::gmat(const SrMat& inMat )
+void SBTransform::gmat(const SrMat& inMat )
 {
 	tran = inMat.get_translation();
 	rot  = SrQuat(inMat);
 }
 
-SbmTransform SbmTransform::diff( const SbmTransform& r1, const SbmTransform& r2 )
+SBTransform SBTransform::diff( const SBTransform& r1, const SBTransform& r2 )
 {
-	SbmTransform rout;
+	SBTransform rout;
 	rout.tran = r2.tran - r1.tran;
 	rout.rot  = r1.rot.inverse()*r2.rot;	
 	rout.rot.normalize();
 	return rout;
 }
 
-SbmTransform SbmTransform::mult( const SbmTransform& r1, const SbmTransform& r2 )
+SBTransform SBTransform::mult( const SBTransform& r1, const SBTransform& r2 )
 {
-	SbmTransform rout;
+	SBTransform rout;
 	SrMat g1 = r1.gmat();
 	SrMat g2 = r2.gmat();
 	rout.gmat(g1*g2);
@@ -52,86 +52,86 @@ SbmTransform SbmTransform::mult( const SbmTransform& r1, const SbmTransform& r2 
 }
 
 
-SbmTransform SbmTransform::blend( SbmTransform& r1, SbmTransform& r2, float weight )
+SBTransform SBTransform::blend( SBTransform& r1, SBTransform& r2, float weight )
 {
-	SbmTransform rout;
+	SBTransform rout;
 	rout.tran = r1.tran*(1.f-weight) + r2.tran*weight;
 	rout.rot  = slerp( r1.rot, r2.rot, weight );
 	rout.rot.normalize();
 	return rout;
 }
 
-SbmTransform& SbmTransform::operator=( const SbmTransform& rt )
+SBTransform& SBTransform::operator=( const SBTransform& rt )
 {
 	tran = rt.tran;
 	rot  = rt.rot;
 	return *this;
 }
 
-float SbmTransform::dist( const SbmTransform& r1, const SbmTransform& r2 )
+float SBTransform::dist( const SBTransform& r1, const SBTransform& r2 )
 {
-	SbmTransform diffT = diff(r1,r2);
+	SBTransform diffT = diff(r1,r2);
 	return diffT.tran.norm();
 }
 
-void SbmTransform::add( const SbmTransform& delta )
+void SBTransform::add( const SBTransform& delta )
 {
 	tran = tran + delta.tran;//curEffectorPos + offset;
 	rot  = rot*delta.rot;//rotOffset;
 	rot.normalize();
 }
 
-SbmTransform::SbmTransform()
+SBTransform::SBTransform()
 {
 	rot = SrQuat();
 	tran = SrVec(0,0,0);
 }
 
-SbmGeomObject::SbmGeomObject(void)
+SBGeomObject::SBGeomObject(void)
 {
 	color = "r";
 		
 }
 
-SbmGeomObject::~SbmGeomObject(void)
+SBGeomObject::~SBGeomObject(void)
 {
 	
 }
 
-SrVec SbmGeomObject::getCenter()
+SrVec SBGeomObject::getCenter()
 {
 	return getCombineTransform().tran;
 }
 
-void SbmGeomObject::attachToObj(SbmTransformObjInterface* phyObj)
+void SBGeomObject::attachToObj(SBTransformObjInterface* phyObj)
 {
 	attachedObj = phyObj;	
 }
 
-SbmTransformObjInterface* SbmGeomObject::getAttachObj()
+SBTransformObjInterface* SBGeomObject::getAttachObj()
 {
 	return attachedObj;
 }
 
-SbmTransform& SbmGeomObject::getCombineTransform()
+SBTransform& SBGeomObject::getCombineTransform()
 {
 	if (attachedObj)
-		combineTransform = SbmTransform::mult(localTransform,attachedObj->getGlobalTransform());
+		combineTransform = SBTransform::mult(localTransform,attachedObj->getGlobalTransform());
 	else
-		combineTransform = SbmTransform::mult(localTransform,globalTransform);
+		combineTransform = SBTransform::mult(localTransform,globalTransform);
 	return combineTransform;	
 }
 
-SbmGeomObject* SbmGeomObject::createGeometry(const std::string& type, SrVec size, SrVec from, SrVec to)
+SBGeomObject* SBGeomObject::createGeometry(const std::string& type, SrVec size, SrVec from, SrVec to)
 {
-	SbmGeomObject* geomObj = NULL;
+	SBGeomObject* geomObj = NULL;
 	if (type == "sphere")
 	{
-		geomObj = new SbmGeomSphere(size[0]);		
+		geomObj = new SBGeomSphere(size[0]);		
 	}
 	else if (type == "box")
 	{
-		geomObj = new SbmGeomBox(SrVec(size[0],size[1],size[2]));		
+		geomObj = new SBGeomBox(SrVec(size[0],size[1],size[2]));		
 	}
 	else if (type == "capsule")
 	{	
@@ -139,26 +139,26 @@ SbmGeomObject* SbmGeomObject::createGeometry(const std::string& type, SrVec size
 		if (from == to && from == SrVec())
 		{
 			p1 = SrVec(0,-size[0],0); p2 = SrVec(0,size[0],0);
-			geomObj = new SbmGeomCapsule(size[0]*2.f,size[1]);//new SbmGeomCapsule(p1,p2,size[1]);//new SbmGeomCapsule(size[0]*2.f,size[1]);
+			geomObj = new SBGeomCapsule(size[0]*2.f,size[1]);//new SBGeomCapsule(p1,p2,size[1]);//new SBGeomCapsule(size[0]*2.f,size[1]);
 		}
 		else
 		{
-			geomObj = new SbmGeomCapsule(from, to, size[1]);
+			geomObj = new SBGeomCapsule(from, to, size[1]);
 		}				
 	}	
 	else
 	{
-		geomObj = new SbmGeomNullObject();
+		geomObj = new SBGeomNullObject();
 	}
 	return geomObj;
 }
 
-void SbmGeomObject::setLocalTransform( SbmTransform& newLocalTran )
+void SBGeomObject::setLocalTransform( SBTransform& newLocalTran )
 {
 	localTransform = newLocalTran;
 }
 
-SbmTransform& SbmGeomObject::getGlobalTransform()
+SBTransform& SBGeomObject::getGlobalTransform()
 {
 	if (attachedObj) 
 		return attachedObj->getGlobalTransform();
@@ -166,7 +166,7 @@ SbmTransform& SbmGeomObject::getGlobalTransform()
 		return globalTransform;
 }
 
-void SbmGeomObject::setGlobalTransform( SbmTransform& newGlobalTran )
+void SBGeomObject::setGlobalTransform( SBTransform& newGlobalTran )
 {
 	if (attachedObj) 
 		attachedObj->setGlobalTransform(newGlobalTran);
@@ -175,7 +175,7 @@ void SbmGeomObject::setGlobalTransform( SbmTransform& newGlobalTran )
 
 }
 
-bool SbmGeomNullObject::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
+bool SBGeomNullObject::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
 {
 	outHandPos = getCenter(); outHandRot = naturalRot; return false;
 }
@@ -184,7 +184,7 @@ bool SbmGeomNullObject::estimateHandPosture( const SrQuat& naturalRot, SrVec& ou
 /* Sphere collider                                                      */
 /************************************************************************/
 
-bool SbmGeomSphere::isInside( const SrVec& gPos, float offset )
+bool SBGeomSphere::isInside( const SrVec& gPos, float offset )
 {
 	SrVec lpos = getCombineTransform().globalToLocal(gPos);
 	if (lpos.norm() < radius + offset)
@@ -192,12 +192,12 @@ bool SbmGeomSphere::isInside( const SrVec& gPos, float offset )
 	return false;
 }
 
-SbmGeomSphere::~SbmGeomSphere()
+SBGeomSphere::~SBGeomSphere()
 {
 
 }
 
-bool SbmGeomSphere::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
+bool SBGeomSphere::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
 {
 	SrVec p1 = getCombineTransform().globalToLocal(gPos1);
 	SrVec p2 = getCombineTransform().globalToLocal(gPos2);
@@ -214,24 +214,24 @@ bool SbmGeomSphere::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float o
 	return false;
 }
 
-bool SbmGeomSphere::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
+bool SBGeomSphere::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
 {
 	outHandPos = getCenter() + SrVec(0,radius+offsetDist,0)*naturalRot;
 	outHandRot = naturalRot;
 	return true;
 }
 
-float SbmGeomSphere::getRadius()
+float SBGeomSphere::getRadius()
 {
 	return radius;
 }
 
-void SbmGeomSphere::setRadius(float val)
+void SBGeomSphere::setRadius(float val)
 {
 	radius = val;
 }
 
-SbmGeomSphere::SbmGeomSphere( float r )
+SBGeomSphere::SBGeomSphere( float r )
 {
 	radius = r;
 }
@@ -239,22 +239,22 @@ SbmGeomSphere::SbmGeomSphere( float r )
 /* Box collider                                                         */
 /************************************************************************/
 
-SbmGeomBox::SbmGeomBox( const SrVec& ext )
+SBGeomBox::SBGeomBox( const SrVec& ext )
 {
 	extent = ext;	
 }
 
-SbmGeomBox::SbmGeomBox( SrBox& bbox )
+SBGeomBox::SBGeomBox( SrBox& bbox )
 {
 	extent = (bbox.b - bbox.a)*0.5f;	
 }
 
-SbmGeomBox::~SbmGeomBox()
+SBGeomBox::~SBGeomBox()
 {
 
 }
 
-bool SbmGeomBox::isInside( const SrVec& gPos, float offset )
+bool SBGeomBox::isInside( const SrVec& gPos, float offset )
 {
 	SrVec lpos = getCombineTransform().globalToLocal(gPos);
 	
@@ -266,7 +266,7 @@ bool SbmGeomBox::isInside( const SrVec& gPos, float offset )
 	return false;
 }
 
-bool SbmGeomBox::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
+bool SBGeomBox::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
 {
 	SrVec p1 = getCombineTransform().globalToLocal(gPos1);
 	SrVec p2 = getCombineTransform().globalToLocal(gPos2);
@@ -285,7 +285,7 @@ bool SbmGeomBox::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offs
 	return true;
 }
 
-bool SbmGeomBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
+bool SBGeomBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
 {	
 	SrVec yAxis = SrVec(0,1,0);
 	yAxis = yAxis*naturalRot;
@@ -402,7 +402,7 @@ static float findLineSegmentDistOnLineSegment(SrVec e1[2], SrVec e2[2], SrVec& c
 	return dline;
 }
 
-SbmGeomCapsule::SbmGeomCapsule( float len, float r )
+SBGeomCapsule::SBGeomCapsule( float len, float r )
 {
 	extent = len*0.5f;
 	radius = r;
@@ -410,7 +410,7 @@ SbmGeomCapsule::SbmGeomCapsule( float len, float r )
 	endPts[1]   = SrVec(0,0,extent);
 }
 
-SbmGeomCapsule::SbmGeomCapsule( const SrVec& p1, const SrVec& p2, float r )
+SBGeomCapsule::SBGeomCapsule( const SrVec& p1, const SrVec& p2, float r )
 {
 	extent = (p2-p1).norm()*0.5f;
 	SrVec zAxis = SrVec(0,0,1);
@@ -432,19 +432,19 @@ SbmGeomCapsule::SbmGeomCapsule( const SrVec& p1, const SrVec& p2, float r )
 	//updateGlobalTransform(SrMat::id);
 }
 
-SbmGeomCapsule::~SbmGeomCapsule()
+SBGeomCapsule::~SBGeomCapsule()
 {
 
 }
 
-void SbmGeomCapsule::setGeomSize(SrVec& size) 
+void SBGeomCapsule::setGeomSize(SrVec& size) 
 { 
 	extent = size[0]; radius = size[1]; 
 	endPts[0] = SrVec(0,0,-extent);
 	endPts[1]   = SrVec(0,0,extent);
 }
 
-bool SbmGeomCapsule::isInside( const SrVec& gPos, float offset)
+bool SBGeomCapsule::isInside( const SrVec& gPos, float offset)
 {
 	SrVec lpos = getCombineTransform().globalToLocal(gPos);
 	SrVec cPts;
@@ -456,7 +456,7 @@ bool SbmGeomCapsule::isInside( const SrVec& gPos, float offset)
 	return false;
 }
 
-bool SbmGeomCapsule::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
+bool SBGeomCapsule::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
 {
 	SrVec lpos[2];
 	SrVec cpt;
@@ -475,7 +475,7 @@ bool SbmGeomCapsule::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float 
 	return false;
 }
 
-bool SbmGeomCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
+bool SBGeomCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
 {
 	SrVec capAxis = (endPts[1]-endPts[0]); capAxis.normalize();
 	capAxis = capAxis*getCombineTransform().rot;
@@ -495,7 +495,7 @@ bool SbmGeomCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHa
 
 
 
-SbmGeomContact& SbmGeomContact::operator=( const SbmGeomContact& rt )
+SBGeomContact& SBGeomContact::operator=( const SBGeomContact& rt )
 {
 	contactPoint  = rt.contactPoint;
 	contactNormal = rt.contactNormal;
@@ -504,22 +504,22 @@ SbmGeomContact& SbmGeomContact::operator=( const SbmGeomContact& rt )
 }
 
 
-bool SbmCollisionUtil::checkIntersection( SbmGeomObject* obj1, SbmGeomObject* obj2 )
+bool SBCollisionUtil::checkIntersection( SBGeomObject* obj1, SBGeomObject* obj2 )
 {
-	if (dynamic_cast<SbmGeomSphere*>(obj1))
+	if (dynamic_cast<SBGeomSphere*>(obj1))
 	{
-		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(obj1);
+		SBGeomSphere* sph = dynamic_cast<SBGeomSphere*>(obj1);
 		return obj2->isInside(obj1->getCombineTransform().tran,sph->radius);
 	}
-	else if (dynamic_cast<SbmGeomCapsule*>(obj1))
+	else if (dynamic_cast<SBGeomCapsule*>(obj1))
 	{
-		SbmGeomCapsule* cap = dynamic_cast<SbmGeomCapsule*>(obj1);
+		SBGeomCapsule* cap = dynamic_cast<SBGeomCapsule*>(obj1);
 		SrVec g1,g2;
 		g1 = cap->endPts[0]*cap->getCombineTransform().gmat();
 		g2 = cap->endPts[1]*cap->getCombineTransform().gmat();
 		return obj2->isIntersect(g1,g2,cap->radius);		
 	}
-	else if (dynamic_cast<SbmGeomBox*>(obj1))
+	else if (dynamic_cast<SBGeomBox*>(obj1))
 	{
 		return false;
 	}
@@ -530,13 +530,13 @@ bool SbmCollisionUtil::checkIntersection( SbmGeomObject* obj1, SbmGeomObject* ob
 }
 
 
-void SbmCollisionUtil::collisionDetection( SbmGeomObject* obj1, SbmGeomObject* obj2, std::vector<SbmGeomContact>& contactPts )
+void SBCollisionUtil::collisionDetection( SBGeomObject* obj1, SBGeomObject* obj2, std::vector<SBGeomContact>& contactPts )
 {
-	dGeomID odeGeom1 = SBPhysicsSimODE::createODERawGeometry(obj1);
-	dGeomID odeGeom2 = SBPhysicsSimODE::createODERawGeometry(obj2);
+	dGeomID odeGeom1 = ODEPhysicsSim::createODERawGeometry(obj1);
+	dGeomID odeGeom2 = ODEPhysicsSim::createODERawGeometry(obj2);
 
-	SBPhysicsSimODE::updateODEGeometryTransform(obj1,odeGeom1);
-	SBPhysicsSimODE::updateODEGeometryTransform(obj2,odeGeom2);
+	ODEPhysicsSim::updateODEGeometryTransform(obj1,odeGeom1);
+	ODEPhysicsSim::updateODEGeometryTransform(obj2,odeGeom2);
 
 	const int N = 1;
 	dContact contact[N];
@@ -544,7 +544,7 @@ void SbmCollisionUtil::collisionDetection( SbmGeomObject* obj1, SbmGeomObject* o
 	int nContact = dCollide(odeGeom1,odeGeom2,N,&contact[0].geom,sizeof(dContact));
 	for (int i=0;i<nContact;i++)
 	{
-		SbmGeomContact geomContact;
+		SBGeomContact geomContact;
 		dContactGeom& ct = contact[i].geom;
 		geomContact.contactPoint = SrVec((float)ct.pos[0],(float)ct.pos[1],(float)ct.pos[2]);	
 		geomContact.contactNormal = SrVec((float)ct.normal[0],(float)ct.normal[1],(float)ct.normal[2]);
@@ -559,20 +559,20 @@ void SbmCollisionUtil::collisionDetection( SbmGeomObject* obj1, SbmGeomObject* o
 /* Collision Space                                                      */
 /************************************************************************/
 
-SbmCollisionSpace::SbmCollisionSpace()
+SBCollisionSpace::SBCollisionSpace()
 {
 
 }
 
-SbmCollisionSpace::~SbmCollisionSpace()
+SBCollisionSpace::~SBCollisionSpace()
 {
 
 }
 
-void SbmCollisionSpace::addCollisionObjects( const std::string& objName )
+void SBCollisionSpace::addCollisionObjects( const std::string& objName )
 {	
 	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
-	SbmGeomObject* obj = colManager->getCollisionObject(objName);
+	SBGeomObject* obj = colManager->getCollisionObject(objName);
 	// remove the old one if it exists
 	if (collsionObjMap.find(objName) != collsionObjMap.end())
 	{
@@ -581,17 +581,17 @@ void SbmCollisionSpace::addCollisionObjects( const std::string& objName )
 	collsionObjMap[objName] = obj;
 }
 
-void SbmCollisionSpace::removeCollisionObjects( const std::string& objName  )
+void SBCollisionSpace::removeCollisionObjects( const std::string& objName  )
 {
 	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
-	SbmGeomObject* obj = colManager->getCollisionObject(objName);
+	SBGeomObject* obj = colManager->getCollisionObject(objName);
 	if (collsionObjMap.find(objName) != collsionObjMap.end())
 	{
 		collsionObjMap.erase(objName);					
 	}		
 }
 
-void SbmCollisionSpace::addExcludePair( const std::string& objName1, const std::string& objName2 )
+void SBCollisionSpace::addExcludePair( const std::string& objName1, const std::string& objName2 )
 {
 	
 }

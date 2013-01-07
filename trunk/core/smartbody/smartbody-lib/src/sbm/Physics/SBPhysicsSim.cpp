@@ -179,7 +179,7 @@ SBPhysicsSim* SBPhysicsSim::getPhysicsEngine()
 /* SbmPhyObjInterface                                                   */
 /************************************************************************/
 
-void SBPhysicsObjInterface::setGlobalTransform( SbmTransform& rt )
+void SBPhysicsObjInterface::setGlobalTransform( SBTransform& rt )
 {			
 		globalTransform.rot  = rt.rot;
 		globalTransform.tran = rt.tran;	
@@ -192,7 +192,7 @@ void SBPhysicsObjInterface::setGlobalTransform( const SrMat& newState )
 	setGlobalTransform(gtran);	
 }
 
-void SBPhysicsObjInterface::setRefTransform( SbmTransform& rt )
+void SBPhysicsObjInterface::setRefTransform( SBTransform& rt )
 {			
 	refTransform.rot  = rt.rot;
 	refTransform.tran = rt.tran;	
@@ -245,7 +245,7 @@ SBPhysicsObj::~SBPhysicsObj()
 }
 
 
-void SBPhysicsObj::setGeometry( SbmGeomObject* obj)
+void SBPhysicsObj::setGeometry( SBGeomObject* obj)
 {
 	initGeom = false;
 	colObj = obj;
@@ -305,13 +305,13 @@ void SBPhysicsObj::notify( SBSubject* subject )
 void SBPhysicsObj::changeGeometry( std::string& geomType, SrVec extends )
 {
 	initGeom = false;
-	SbmTransform localTran;	
+	SBTransform localTran;	
 	if (colObj)
 	{
 		localTran = colObj->getLocalTransform();
 		delete colObj;
 	}
-	colObj = SbmGeomObject::createGeometry(geomType,extends);
+	colObj = SBGeomObject::createGeometry(geomType,extends);
 	colObj->setLocalTransform(localTran);
 	colObj->attachToObj(this);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -639,7 +639,7 @@ void SBPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vecto
 			jointObj->setMass(joint->mass());
 		if (buildGeometry)
 		{
-			SbmGeomObject* jointGeom = createJointGeometry(joint);
+			SBGeomObject* jointGeom = createJointGeometry(joint);
 			jointObj->setGeometry(jointGeom);
 			//jointGeometryMap[jointNameList[i]] = jointGeom;
 		}
@@ -699,9 +699,9 @@ void SBPhysicsCharacter::cleanUpJoints()
 	jointObjMap.clear();	
 }
 
-SbmGeomObject* SBPhysicsCharacter::createJointGeometry( SBJoint* joint, float radius )
+SBGeomObject* SBPhysicsCharacter::createJointGeometry( SBJoint* joint, float radius )
 {
-	SbmGeomObject* newGeomObj = NULL;
+	SBGeomObject* newGeomObj = NULL;
 	SbmCharacter* curCharacter = mcuCBHandle::singleton().getCharacter(characterName);
 	if (radius < 0.0)
 		radius = curCharacter->getHeight()*0.03f;
@@ -731,7 +731,7 @@ SbmGeomObject* SBPhysicsCharacter::createJointGeometry( SBJoint* joint, float ra
 // 		{
 // 			bbox.extend(joint->getChild(i)->offset());
 // 		}
-// 		newGeomObj = new SbmGeomBox(bbox);	
+// 		newGeomObj = new SBGeomBox(bbox);	
 // 	}
 	if (0)
 	{
@@ -747,7 +747,7 @@ SbmGeomObject* SBPhysicsCharacter::createJointGeometry( SBJoint* joint, float ra
 		{
 			bbox.extend(joint->getChild(i)->offset());
 		}
-		newGeomObj = new SbmGeomBox(bbox);		
+		newGeomObj = new SBGeomBox(bbox);		
 	}
 	else if (joint->getNumChildren() == 1)
 	{
@@ -758,7 +758,7 @@ SbmGeomObject* SBPhysicsCharacter::createJointGeometry( SBJoint* joint, float ra
 		float boneLen = offset.len();	
 		float len = boneLen+extend*0.1f;
 		// generate new geometry
-		newGeomObj = new SbmGeomCapsule(center-dir*len*0.5f, center+dir*len*0.5f,radius);		
+		newGeomObj = new SBGeomCapsule(center-dir*len*0.5f, center+dir*len*0.5f,radius);		
 	}
 	return newGeomObj;
 }
@@ -1006,9 +1006,9 @@ void SBPhysicsCharacter::notify( SBSubject* subject )
 	}
 }
 
-// SbmGeomObject* SBPhysicsCharacter::createJointGeometry( SBJoint* joint, float radius )
+// SBGeomObject* SBPhysicsCharacter::createJointGeometry( SBJoint* joint, float radius )
 // {
-// 	SbmGeomObject* newGeomObj = NULL;
+// 	SBGeomObject* newGeomObj = NULL;
 // 	SbmCharacter* curCharacter = mcuCBHandle::singleton().getCharacter(characterName);
 // 	if (joint->getParent() && joint->getParent()->getParent())
 // 	{
@@ -1021,12 +1021,12 @@ void SBPhysicsCharacter::notify( SBSubject* subject )
 // 		if (radius <= 0.f)
 // 			radius = 1.0;//curCharacter->getHeight()*0.05f;//	
 // 		// generate new geometry
-// 		newGeomObj = new SbmGeomCapsule(center-dir*len*0.5f, center+dir*len*0.5f,radius);
-// 		//newGeomObj = new SbmGeomCapsule(SrVec(0,-len*0.3f,0), SrVec(0,len*0.3f,0),radius);
+// 		newGeomObj = new SBGeomCapsule(center-dir*len*0.5f, center+dir*len*0.5f,radius);
+// 		//newGeomObj = new SBGeomCapsule(SrVec(0,-len*0.3f,0), SrVec(0,len*0.3f,0),radius);
 // 	}
 // 	else 
 // 	{
-// 		newGeomObj = new SbmGeomSphere(1.0f);//SbmGeomSphere(0.01f);
+// 		newGeomObj = new SBGeomSphere(1.0f);//SBGeomSphere(0.01f);
 // 	}
 // 	return newGeomObj;
 // }

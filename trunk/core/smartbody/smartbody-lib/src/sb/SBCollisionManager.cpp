@@ -72,7 +72,7 @@ void SBCollisionManager::start()
 	_velocities.clear();
 	if (!collisionSpace)
 	{
-		collisionSpace = new SbmCollisionSpaceODE();
+		collisionSpace = new ODECollisionSpace();
 	}
 	std::vector<std::string> characterNames = scene->getCharacterNames();
 	for (std::vector<std::string>::iterator iter = characterNames.begin();
@@ -86,14 +86,14 @@ void SBCollisionManager::start()
 		{
 			if(_singleChrCapsuleMode)
 			{
-				//SbmGeomObject* obj = new SbmGeomCapsule()			
+				//SBGeomObject* obj = new SBGeomCapsule()			
 				SrBox bbox = character->getBoundingBox();	
 				float yoffset = bbox.getMinimum().y - character->get_world_offset().get_translation().y;
 				SrVec size = SrVec(0,_characterRadius,0);
-				SbmGeomObject* obj = createCollisionObject(character->getGeomObjectName(),"capsule",size,SrVec(0,yoffset,0),SrVec(0,yoffset+character->getHeight(),0));
+				SBGeomObject* obj = createCollisionObject(character->getGeomObjectName(),"capsule",size,SrVec(0,yoffset,0),SrVec(0,yoffset+character->getHeight(),0));
 				obj->attachToObj(character);
 				addObjectToCollisionSpace(character->getGeomObjectName());
-				//new SbmGeomCapsule(SrVec(0,yoffset,0),SrVec(0,yoffset+character->getHeight(),0),_characterRadius);
+				//new SBGeomCapsule(SrVec(0,yoffset,0),SrVec(0,yoffset+character->getHeight(),0),_characterRadius);
 				//character->setGeomObject(obj);
 				//collisionSpace->addCollisionObjects(obj);
 			}
@@ -142,9 +142,9 @@ void SBCollisionManager::start()
 						if(offset_len < 0.03*chrHeight) continue; // skip short bones
 						std::string colObjName = chrName + ":" + j->name();
 						if(k>0) colObjName = colObjName + ":" + boost::lexical_cast<std::string>(k);
-						SbmGeomObject* obj = createCollisionObject(colObjName,"capsule",SrVec(0, radius, 0),SrVec::null,offset);
+						SBGeomObject* obj = createCollisionObject(colObjName,"capsule",SrVec(0, radius, 0),SrVec::null,offset);
 						LOG("SBColMan: col primitive added: %s, len: %f, radius: %f", colObjName.c_str(), offset_len, radius);
-						obj->attachToObj(dynamic_cast<SbmTransformObjInterface*>(j));
+						obj->attachToObj(dynamic_cast<SBTransformObjInterface*>(j));
 						addObjectToCollisionSpace(colObjName);
 					}
 				}
@@ -159,8 +159,8 @@ void SBCollisionManager::start()
 		SBPawn* pawn = scene->getPawn(*iter);
 		if(pawn->getGeomObject()->geomType() != "null")
 		{
-			//SbmGeomObject* obj = pawn->getGeomObject();
-			SbmGeomObject* obj = createCollisionObject(pawn->getGeomObjectName(),pawn->getGeomObject()->geomType(),pawn->getGeomObject()->getGeomSize(),SrVec::null,SrVec::null);
+			//SBGeomObject* obj = pawn->getGeomObject();
+			SBGeomObject* obj = createCollisionObject(pawn->getGeomObjectName(),pawn->getGeomObject()->geomType(),pawn->getGeomObject()->getGeomSize(),SrVec::null,SrVec::null);
 			obj->attachToObj(pawn);
 
 			addObjectToCollisionSpace(pawn->getGeomObjectName());
@@ -223,8 +223,8 @@ void SBCollisionManager::afterUpdate(double time)
 		{
 			// unfiltered
 			//LOG("Collision Pair = %s %s",potentialCollisions[i].first.c_str(), potentialCollisions[i].second.c_str());
-			SbmGeomObject* g1 = getCollisionObject(potentialCollisions[i].first);
-			SbmGeomObject* g2 = getCollisionObject(potentialCollisions[i].second);
+			SBGeomObject* g1 = getCollisionObject(potentialCollisions[i].first);
+			SBGeomObject* g2 = getCollisionObject(potentialCollisions[i].second);
 
 			// skip self-collision within skeleton/character's joints
 			if(!_singleChrCapsuleMode) 
@@ -238,8 +238,8 @@ void SBCollisionManager::afterUpdate(double time)
 			// filtered, exclude all collisions within each character/skeleton
 			//LOG("Potential Collision Pair: %s %s",potentialCollisions[i].first.c_str(), potentialCollisions[i].second.c_str());
 
-			std::vector<SbmGeomContact> contactPts;
-			SbmCollisionUtil::collisionDetection(g1,g2,contactPts);
+			std::vector<SBGeomContact> contactPts;
+			SBCollisionUtil::collisionDetection(g1,g2,contactPts);
 			if (contactPts.size() > 0)	
 			{
 				// collision handling here
@@ -263,7 +263,7 @@ void SBCollisionManager::afterUpdate(double time)
 							v2[1] = 0.0;
 							//LOG("v1 len = %f, v2 len = %f",v1.len(),v2.len());
 							SBCharacter* cMove = (v1.len() > v2.len()) ? c1 : c2;				
-							SbmGeomContact& contact = contactPts[0];
+							SBGeomContact& contact = contactPts[0];
 							SrVec normalDir = (v1.len() > v2.len()) ? contact.contactNormal : -contact.contactNormal;
 							normalDir[1] = 0.0;
 
@@ -343,8 +343,8 @@ void SBCollisionManager::afterUpdate(double time)
 			{
 				SBCharacter* character2 =  scene->getCharacter((*iter2));
 				// determine if the two characters are in collision
-				std::vector<SbmGeomContact> contactPts;
-				SbmCollisionUtil::collisionDetection(character1->getGeomObject(),character2->getGeomObject(),contactPts);
+				std::vector<SBGeomContact> contactPts;
+				SBCollisionUtil::collisionDetection(character1->getGeomObject(),character2->getGeomObject(),contactPts);
 				
 				if (contactPts.size() > 0)
 				{
@@ -423,9 +423,9 @@ void SBCollisionManager::notify(SBSubject* subject)
 // 	}
 }
 
-SbmGeomObject* SBCollisionManager::createCollisionObject( const std::string& geomName, const std::string& geomType, SrVec size, SrVec from, SrVec to )
+SBGeomObject* SBCollisionManager::createCollisionObject( const std::string& geomName, const std::string& geomType, SrVec size, SrVec from, SrVec to )
 {	
-	SbmGeomObject* newObj = SbmGeomObject::createGeometry(geomType,size,from,to);
+	SBGeomObject* newObj = SBGeomObject::createGeometry(geomType,size,from,to);
 	if (newObj)
 	{
 		removeCollisionObject(geomName); // remove existing one
@@ -434,9 +434,9 @@ SbmGeomObject* SBCollisionManager::createCollisionObject( const std::string& geo
 	return newObj;
 }
 
-SbmGeomObject* SBCollisionManager::getCollisionObject( const std::string& geomName )
+SBGeomObject* SBCollisionManager::getCollisionObject( const std::string& geomName )
 {
-	SbmGeomObject* obj = NULL;
+	SBGeomObject* obj = NULL;
 	if (geomObjectMap.find(geomName) != geomObjectMap.end())
 	{
 		obj = geomObjectMap[geomName];
@@ -446,7 +446,7 @@ SbmGeomObject* SBCollisionManager::getCollisionObject( const std::string& geomNa
 
 bool SBCollisionManager::removeCollisionObject( const std::string& geomName )
 {
-	SbmGeomObject* geomObj = getCollisionObject(geomName);
+	SBGeomObject* geomObj = getCollisionObject(geomName);
 	if (geomObj)
 	{		
 		removeObjectFromCollisionSpace(geomName);
@@ -459,7 +459,7 @@ bool SBCollisionManager::removeCollisionObject( const std::string& geomName )
 
 bool SBCollisionManager::addObjectToCollisionSpace( const std::string& geomName )
 {
-	SbmGeomObject* geomObj = getCollisionObject(geomName);
+	SBGeomObject* geomObj = getCollisionObject(geomName);
 	if (geomObj)
 	{
 		collisionSpace->addCollisionObjects(geomName);
@@ -471,7 +471,7 @@ bool SBCollisionManager::addObjectToCollisionSpace( const std::string& geomName 
 
 bool SBCollisionManager::removeObjectFromCollisionSpace( const std::string& geomName )
 {
-	SbmGeomObject* geomObj = getCollisionObject(geomName);
+	SBGeomObject* geomObj = getCollisionObject(geomName);
 	if (geomObj)
 	{
 		if (collisionSpace)
