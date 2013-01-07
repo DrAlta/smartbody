@@ -1713,9 +1713,6 @@
     <ClInclude Include="..\src\sbm\time_regulator.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\viseme_map.hpp">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\sbm_test_cmds.hpp">
       <Filter>sbm</Filter>
     </ClInclude>
