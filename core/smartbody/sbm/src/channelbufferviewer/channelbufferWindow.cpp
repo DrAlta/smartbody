@@ -19,6 +19,8 @@
  *  CONTRIBUTORS:
  *      Jingqiao Fu, USC
  */
+
+#include "vhcl.h"
 #include "channelbufferWindow.hpp"
 
 #include <iostream>
@@ -26,8 +28,10 @@
 #include <vector>
 #include <algorithm>
 
-#include <bml/bml.hpp>
+#include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBMotion.h>
+#include <bml/bml.hpp>
 #include <controllers/me_controller_tree_root.hpp>
 
 ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
@@ -376,26 +380,25 @@ void ChannelBufferWindow::set_default_values()
 
 void ChannelBufferWindow::loadMotions(ChannelBufferWindow* window)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	window->motion->clear();
 	window->motion->add(&(window->no_motion.get(0)));
-	for (std::map<std::string, SkMotion*>::iterator it = mcu.motion_map.begin(); it != mcu.motion_map.end(); ++it)
+	std::vector<std::string> motionNames = SmartBody::SBScene::getScene()->getMotionNames();
+	for (size_t i = 0; i < motionNames.size(); i++)
 	{
-		window->motion->add((*it).first.c_str());
+		const std::string & name = motionNames[i];
+		window->motion->add(name.c_str());
 	}
 	window->motion->value(0);
 }
 
 void ChannelBufferWindow::loadCharacters(Fl_Choice* characterChoice)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	characterChoice->clear();
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
+	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (size_t i = 0; i < charNames.size(); i++)
 	{
-		SbmCharacter* character = (*iter).second;
-		characterChoice->add(character->getName().c_str());
+		const std::string & charName = charNames[i];
+		characterChoice->add(charName.c_str());
 	}
 	int ind = 0;
 	characterChoice->value(0);
@@ -403,13 +406,11 @@ void ChannelBufferWindow::loadCharacters(Fl_Choice* characterChoice)
 
 void ChannelBufferWindow::loadControllers(Fl_Choice* controller, Fl_Choice* character)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	controller->clear();
 
 	if(character->mvalue()== NULL) return;
 
-	SbmCharacter* actor = mcu.getCharacter(character->mvalue()->label());
+	SmartBody::SBCharacter* actor = SmartBody::SBScene::getScene()->getCharacter(character->mvalue()->label());
 
 	controller->add("All controllers");
 
@@ -474,9 +475,8 @@ void ChannelBufferWindow::refreshMonitoredChannelsWidget(ChannelBufferWindow* wi
 void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 {
 	Fl_Choice* character = window->character;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if(character->mvalue()== NULL) return;
-	SbmCharacter* actor = mcu.getCharacter(character->mvalue()->label());
+	SmartBody::SBCharacter* actor = SmartBody::SBScene::getScene()->getCharacter(character->mvalue()->label());
 	SkSkeleton* skeleton = actor->getSkeleton();
 
 	SkChannelArray& channels = actor->ct_tree_p->channels(); //skeleton->channels();
@@ -552,7 +552,6 @@ void ChannelBufferWindow::refreshChannels(Fl_Widget* widget, void* data)
 void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	int j = 0;
 	refreshControllerVisibilities(window);
 	
@@ -573,11 +572,10 @@ void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 		return;
 	}
 	window->mode = 2;
-	SbmCharacter* actor = mcu.getCharacter(window->character->mvalue()->label());
-	std::map<std::string, SkMotion*>::iterator motionIter = mcu.motion_map.find(window->motion->mvalue()->label());
-	if (motionIter != mcu.motion_map.end())
+	SmartBody::SBCharacter* actor = SmartBody::SBScene::getScene()->getCharacter(window->character->mvalue()->label());
+	SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(window->motion->mvalue()->label());
+	if (motion)
 	{
-		SkMotion* motion = (*motionIter).second;
 		motion->connect(actor->getSkeleton());
 		refreshMaxSize(window, motion->frames());
 		SkChannelArray& channels = motion->channels();
@@ -648,8 +646,7 @@ void ChannelBufferWindow::refreshControllerChannels(Fl_Widget* widget, void* dat
 		refreshChannelsWidget(window);
 		return;
 	}
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmCharacter* actor = mcu.getCharacter(window->character->mvalue()->label());
+	SbmCharacter* actor = SmartBody::SBScene::getScene()->getCharacter(window->character->mvalue()->label());
 	
 	for(int i = 0; i < window->Channel_item_list.size(); ++i)
 	{
@@ -677,16 +674,14 @@ void ChannelBufferWindow::addMonitoredChannel(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	GlChartViewSeries* series = NULL;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::map<std::string, SkMotion*>::iterator motionIter;
 	SkMotion* motion = NULL;
 	if(window->mode == 2)
 	{
-		SbmCharacter* actor = mcu.getCharacter(window->character->mvalue()->label());
-		motionIter = mcu.motion_map.find(window->motion->mvalue()->label());
-		if (motionIter != mcu.motion_map.end())
+		SmartBody::SBCharacter* actor = SmartBody::SBScene::getScene()->getCharacter(window->character->mvalue()->label());
+		SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(window->motion->mvalue()->label());
+		if (motion)
 		{
-			motion = (*motionIter).second;
 			motion->connect(actor->getSkeleton());
 		}
 	}
@@ -821,8 +816,6 @@ void ChannelBufferWindow::label_viewer(std::string name)
 
 void ChannelBufferWindow::show_viewer()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	this->show();
 }
 
@@ -838,8 +831,8 @@ void ChannelBufferWindow::update_viewer()
 }
 
 void ChannelBufferWindow::show()
-{    
-	Fl_Window::show();   
+{
+	Fl_Window::show();
 }
 
 void ChannelBufferWindow::update()
@@ -849,14 +842,12 @@ void ChannelBufferWindow::update()
 		if (character->size() == 0)
 			return;
 
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		SbmPawn* pawn_p = NULL;
-		SbmCharacter* actor = mcu.getCharacter(character->mvalue()->label());
-		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-			iter != mcu.getPawnMap().end();
-			iter++)
+		SmartBody::SBPawn* pawn_p = NULL;
+		SmartBody::SBCharacter* actor = SmartBody::SBScene::getScene()->getCharacter(character->mvalue()->label());
+		std::vector<std::string> pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+		for (size_t i = 0; i < pawnNames.size(); i++)
 		{
-			SbmPawn* pawn = (*iter).second;
+			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnNames[i]);
 			const char* name = getSelectedCharacterName();
 			if( name && strcmp(pawn->getName().c_str(), name) == 0)
 			{
@@ -865,7 +856,7 @@ void ChannelBufferWindow::update()
 			}
 		}
 		if(pawn_p != NULL)
-		{			
+		{
 			if(mode != 2)
 			{
 				SrBuffer<float>& buffer = pawn_p->ct_tree_p->getLastFrame().buffer();

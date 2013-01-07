@@ -28,6 +28,7 @@
 #include <FL/gl.h>
 
 #include <sr/sr_gl.h>
+#include <sbm/gwiz_math.h>
 #include <sb/SBScene.h>
 
 

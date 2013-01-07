@@ -23,7 +23,6 @@
 #ifndef _CHANNEL_BUFFER_WINDOW_H_
 #define _CHANNEL_BUFFER_WINDOW_H_
 
-#include <vhcl.h>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Multi_Browser.H>
@@ -33,9 +32,9 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Input.H>
 
+#include <sk/sk_channel.h>
+#include <sk/sk_motion.h>
 #include <sbm/GenericViewer.h>
-
-#include <sbm/mcontrol_util.h>
 #include "GlChartView.hpp"
 
 class ChannelItem

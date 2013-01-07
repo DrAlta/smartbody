@@ -23,6 +23,8 @@
 #ifndef _GL_CHART_COORDINATE_H_
 #define _GL_CHART_COORDINATE_H_
 
+#include <string>
+#include <utility>
 #include <sr/sr_vec.h>
 #include <sr/sr_vec2.h>
 #include <sr/sr_quat.h>
@@ -31,13 +33,10 @@
 #include <sr/sr_camera.h>
 #include <sr/sr_buffer.h>
 #include <sr/sr_string.h>
-#include <string>
-#include <utility>
 #include "math.h"
+
 #ifdef WIN32
 #include "glfont2.h"
-
-
 using namespace glfont;
 #endif
 

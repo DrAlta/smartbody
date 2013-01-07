@@ -26,10 +26,12 @@
 
 #include <FL/Fl_Gl_Window.H>
 #include <sr/sr_camera.h>
+#include <sr/sr_event.h>
 #include <sr/sr_light.h>
+#include <sr/sr_viewer.h>
 #include "GlChartViewCoordinate.hpp"
 #include "GlChartViewArchive.hpp"
-#include <sbm/mcontrol_util.h>
+
 #ifdef WIN32
 #include "glfont2.h"
 #endif
