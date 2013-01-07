@@ -20,7 +20,7 @@ struct CollisionJoint
 {
 public:
 	SkJoint* joint;
-	SbmGeomObject* colGeo;
+	SBGeomObject* colGeo;
 };
 
 class SkBlendCfgManager

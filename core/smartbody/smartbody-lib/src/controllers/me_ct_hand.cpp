@@ -45,11 +45,11 @@ void FingerChain::getLineSeg( std::vector<SrVec>& lineSeg )
 	}
 }
 
-void FingerChain::testCollision( SbmGeomObject* colObj )
+void FingerChain::testCollision( SBGeomObject* colObj )
 {
 	std::vector<SrVec> lineSeg;
 	getLineSeg(lineSeg);
-	SbmGeomNullObject* colNullObj = dynamic_cast<SbmGeomNullObject*>(colObj);
+	SBGeomNullObject* colNullObj = dynamic_cast<SBGeomNullObject*>(colObj);
 	if (lineSeg.size() < 2 || !colObj || colNullObj)
 	{
 		isLock = true;
@@ -361,7 +361,7 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 	SbmPawn* grabTarget = getTargetObject();
 	if (grabTarget && grabTarget->getGeomObject())
 	{
-		SbmGeomObject* geomObj = grabTarget->getGeomObject();
+		SBGeomObject* geomObj = grabTarget->getGeomObject();
 		for (int i=0;i<MeCtHand::F_NUM_FINGERS;i++)
 		{
 			FingerChain& fig = fingerChains[i];

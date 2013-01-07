@@ -8,22 +8,22 @@
 namespace SmartBody
 {
 
-class SBPhysicsObjInterface : public SbmTransformObjInterface
+class SBPhysicsObjInterface : public SBTransformObjInterface
 {
 protected:
 	bool          bHasPhysicsSim;
 	bool          bHasCollisionSim;	
-	SbmTransform  globalTransform;	
-	SbmTransform  refTransform;
+	SBTransform  globalTransform;	
+	SBTransform  refTransform;
 
 public:	
-	virtual SbmTransform& getGlobalTransform() { return globalTransform; }
-	virtual void setGlobalTransform(SbmTransform& rt);	
+	virtual SBTransform& getGlobalTransform() { return globalTransform; }
+	virtual void setGlobalTransform(SBTransform& rt);	
 
 	void setGlobalTransform(const SrMat& gmat);
-	SbmTransform& getRefTransform() { return refTransform; }
+	SBTransform& getRefTransform() { return refTransform; }
 	void setRefTransform(const SrMat& gmat);
-	void setRefTransform(SbmTransform& rt);
+	void setRefTransform(SBTransform& rt);
 
 	virtual void enablePhysicsSim(bool bPhy) = 0;
 	virtual void enableCollisionSim(bool bCol) = 0;
@@ -38,7 +38,7 @@ public:
 class SBPhysicsObj : public SBPhysicsObjInterface, public SmartBody::SBObject// abstraction for rigid objects in the physics engine
 {
 protected:	
-	SbmGeomObject* colObj;		
+	SBGeomObject* colObj;		
 	float         objDensity;
 	SrVec         externalForce, externalTorque;
 	SrVec         linearVel, angularVel;	
@@ -52,10 +52,10 @@ public:
 	virtual void updateSbmObj();
 	virtual void updatePhySim();
 
-	void setGeometry(SbmGeomObject* obj);
+	void setGeometry(SBGeomObject* obj);
 	void changeGeometry(std::string& geomType, SrVec extends);
 
-	SbmGeomObject* getColObj() { return colObj; }
+	SBGeomObject* getColObj() { return colObj; }
 	float         getMass();	
 	void          setMass(float mass);
 	float         getDensity() { return objDensity; }
@@ -153,7 +153,7 @@ protected:
 	SBPhysicsJoint* root;
 	std::map<std::string, SBPhysicsJoint*> jointMap;
 	std::map<std::string, SbmJointObj*>     jointObjMap;
-	//std::map<std::string, SbmGeomObject*>   jointGeometryMap;
+	//std::map<std::string, SBGeomObject*>   jointGeometryMap;
 	std::string characterName;	
 	std::vector<CollisionRecord> collisionRecords;
 public:
@@ -175,7 +175,7 @@ public:
 	void updatePDTorque();
 protected:
 	void cleanUpJoints();
-	SbmGeomObject* createJointGeometry(SBJoint* joint, float radius = -1);
+	SBGeomObject* createJointGeometry(SBJoint* joint, float radius = -1);
 	void updateJointAxis(SBPhysicsJoint* phyJoint);
 	SrVec computePDTorque(SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD, float Ks, float Kd);
 	SrVec computeSPDTorque(SrQuat& q, SrQuat& qD, SrVec& w, SrVec& vD, float Ks, float Kd, float dt, float mass);
@@ -220,7 +220,7 @@ public:
 
 	void updateAllPhysicsJoints();
 	virtual void updatePhysicsJoint(SBPhysicsJoint* phyJoint) = 0; // update joint parameters		
-	virtual void updatePhyObjGeometry(SBPhysicsObj* obj, SbmGeomObject* geom = NULL) = 0;
+	virtual void updatePhyObjGeometry(SBPhysicsObj* obj, SBGeomObject* geom = NULL) = 0;
 
 	//virtual void applyTorque(SBJoint* joint, )
 

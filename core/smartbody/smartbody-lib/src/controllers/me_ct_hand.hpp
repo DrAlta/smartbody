@@ -23,7 +23,7 @@ public:
 	void init(MeCtIKTreeNode* figTip);	
 	void unlockChain();
 	void getLineSeg(std::vector<SrVec>& lineSeg);
-	void testCollision(SbmGeomObject* colObj);
+	void testCollision(SBGeomObject* colObj);
 };
 
 

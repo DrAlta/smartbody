@@ -65,8 +65,8 @@ bool SkBlendCfg::valid ()
 #endif
 		for (unsigned int j=0;j<_cman->colObstacles.size();j++)
 		{
-			SbmGeomObject* obs = _cman->colObstacles[j];
-			bool isIntersect = SbmCollisionUtil::checkIntersection(colJ.colGeo,obs);
+			SBGeomObject* obs = _cman->colObstacles[j];
+			bool isIntersect = SBCollisionUtil::checkIntersection(colJ.colGeo,obs);
 			if (isIntersect)
 				return false;
 		}		

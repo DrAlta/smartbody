@@ -36,7 +36,7 @@ public:
 
 typedef std::vector<ColObject*> VecOfColObj;
 
-typedef std::vector<SbmGeomObject*> VecOfSbmColObj;
+typedef std::vector<SBGeomObject*> VecOfSbmColObj;
 
 //=================================== SkPosCfg =====================================
 

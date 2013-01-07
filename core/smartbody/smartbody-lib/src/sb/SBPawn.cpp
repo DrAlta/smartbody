@@ -269,14 +269,14 @@ void SBPawn::notify(SBSubject* subject)
 		}
 		else if (attribute->getName() == "collisionShape")
 		{
-			SbmGeomObject* object = getGeomObject();
+			SBGeomObject* object = getGeomObject();
 			std::string shapeName = getStringAttribute("collisionShape");
 			LOG("collisionShape = %s",shapeName.c_str());
 			if (shapeName != object->geomType())
 			{
 				SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
 				SrVec size = getVec3Attribute("collisionShapeScale");
-				SbmGeomObject* obj = colManager->createCollisionObject(collisionObjName,shapeName,size);
+				SBGeomObject* obj = colManager->createCollisionObject(collisionObjName,shapeName,size);
 				if (obj) obj->attachToObj(this);
 			}
 			else
@@ -287,7 +287,7 @@ void SBPawn::notify(SBSubject* subject)
 		else if (attribute->getName() == "collisionShapeScale")
 		{
 			SrVec scale = getVec3Attribute("collisionShapeScale");
-			SbmGeomObject* object = getGeomObject();
+			SBGeomObject* object = getGeomObject();
 			object->setGeomSize(scale);
 		}
 		else if (attribute->getName() == "enablePhysics")

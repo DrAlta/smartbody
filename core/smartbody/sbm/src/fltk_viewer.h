@@ -49,7 +49,7 @@
 
 #include "ObjectManipulationHandle.h"
 
-class SbmGeomObject;
+class SBGeomObject;
 class SrQuat;
 class SrVec;
 class SrEvent;
@@ -338,7 +338,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	void drawCharacterPhysicsObjs();
 	void drawCharacterBoundingVolumes();
 	void drawSteeringInfo();
-	void drawColObject(SbmGeomObject* colObj, SrMat& gmat);		
+	void drawColObject(SBGeomObject* colObj, SrMat& gmat);		
 	void drawMotionVectorFlow();
 	void drawPlotMotion();
 

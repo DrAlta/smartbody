@@ -82,7 +82,7 @@ bool ReachTarget::targetHasGeometry()
 	SbmPawn* targetPawn = getTargetPawn();
 	if (!targetPawn) return false;
 	if (targetPawn->getGeomObject() == NULL) return false;
-	SbmGeomNullObject* nullObject = dynamic_cast<SbmGeomNullObject*>(targetPawn->getGeomObject());
+	SBGeomNullObject* nullObject = dynamic_cast<SBGeomNullObject*>(targetPawn->getGeomObject());
 	if (nullObject) return false;
 	return true;
 }

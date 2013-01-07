@@ -161,7 +161,7 @@ void SbmPawn::initData()
 	collisionObjName += "_BV"; // bounding volume
 
 	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();	
-	SbmGeomObject* geomObj = colManager->createCollisionObject(collisionObjName,"null",SrVec());
+	SBGeomObject* geomObj = colManager->createCollisionObject(collisionObjName,"null",SrVec());
 	geomObj->attachToObj(this);
 
 	wo_cache.x = 0;
@@ -491,13 +491,13 @@ SrMat SbmPawn::get_world_offset()
 	return gmat;
 }
 
-SbmTransform& SbmPawn::getGlobalTransform()
+SBTransform& SbmPawn::getGlobalTransform()
 {	
 	globalTransform.gmat(get_world_offset());
 	return globalTransform;
 }
 
-void SbmPawn::setGlobalTransform( SbmTransform& newGlobalTransform )
+void SbmPawn::setGlobalTransform( SBTransform& newGlobalTransform )
 {
 	SrMat gmat = globalTransform.gmat();
 	setWorldOffset(gmat);
@@ -762,15 +762,15 @@ const std::string& SbmPawn::getGeomObjectName()
 	return collisionObjName;
 }
 
-SbmGeomObject* SbmPawn::getGeomObject()
+SBGeomObject* SbmPawn::getGeomObject()
 {	
 	//return _collisionObject;
 	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
-	SbmGeomObject* geomObj = colManager->getCollisionObject(collisionObjName);
+	SBGeomObject* geomObj = colManager->getCollisionObject(collisionObjName);
 	return geomObj;
 } 
 
-// void SbmPawn::setGeomObject(SbmGeomObject* object)
+// void SbmPawn::setGeomObject(SBGeomObject* object)
 // {	
 // 	if (_collisionObject)
 // 		delete _collisionObject;

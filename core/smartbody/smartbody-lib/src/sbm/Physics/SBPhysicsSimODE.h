@@ -1,11 +1,11 @@
-#ifndef _SBPhysicsSIMODE_H_
-#define _SBPhysicsSIMODE_H_
+#ifndef _ODEPhysicsSim_H_
+#define _ODEPhysicsSim_H_
 
 #include <ode/ode.h>
 #include <ode/common.h>
 #include "SBPhysicsSim.h"
 
-class SbmODEObj
+class ODEObj
 {
 public:
 	dBodyID bodyID;
@@ -14,12 +14,12 @@ public:
 	dTriMeshDataID meshdataID; // optional mesh data ID
 	SmartBody::SBPhysicsObj* physicsObj; // rigid body
 public:
-	SbmODEObj();
-	~SbmODEObj();
+	ODEObj();
+	~ODEObj();
 	void cleanGeometry();
 };
 
-class SbmODEJoint
+class ODEJoint
 {
 public:
 	dJointID jointID;
@@ -27,14 +27,14 @@ public:
 	dBodyID  parentID, childID;
 	SmartBody::SBPhysicsJoint* joint;
 public:
-	SbmODEJoint();
-	~SbmODEJoint();
+	ODEJoint();
+	~ODEJoint();
 };
 
-typedef std::map<unsigned long,SbmODEObj*> SbmODEObjMap;
-typedef std::map<unsigned long, SbmODEJoint*> SbmODEJointMap;
+typedef std::map<unsigned long,ODEObj*> ODEObjMap;
+typedef std::map<unsigned long, ODEJoint*> ODEJointMap;
 
-class SBPhysicsSimODE :
+class ODEPhysicsSim :
 	public SmartBody::SBPhysicsSim
 {
 public:
@@ -44,11 +44,11 @@ protected:
 	dSpaceID spaceID;		
 	dJointGroupID contactGroupID;
 	bool   hasInit;	
-	SbmODEObjMap odeObjMap;
-	SbmODEJointMap odeJointMap;
+	ODEObjMap odeObjMap;
+	ODEJointMap odeJointMap;
 public:
-	SBPhysicsSimODE(void);
-	~SBPhysicsSimODE(void);
+	ODEPhysicsSim(void);
+	~ODEPhysicsSim(void);
 	dWorldID getWorldID() { return worldID; }
 	dSpaceID getSpaceID() { return spaceID; }	
 	dJointGroupID getContactGroupID() { return contactGroupID; }
@@ -66,26 +66,26 @@ public:
 	virtual SrVec getJointConstraintPos(SmartBody::SBPhysicsJoint* joint);
 	virtual SrVec getJointRotationAxis(SmartBody::SBPhysicsJoint* joint, int axis);
 	virtual void updatePhysicsJoint(SmartBody::SBPhysicsJoint* phyJoint); // update joint parameters		
-	virtual void updatePhyObjGeometry(SmartBody::SBPhysicsObj* obj, SbmGeomObject* geom = NULL);
+	virtual void updatePhyObjGeometry(SmartBody::SBPhysicsObj* obj, SBGeomObject* geom = NULL);
 	virtual void enablePhysicsSim(SmartBody::SBPhysicsObj* obj, bool bSim);
 	virtual void enableCollisionSim(SmartBody::SBPhysicsObj* obj, bool bCol);	
 	virtual void writeToPhysicsObj(SmartBody::SBPhysicsObj* obj); // write sim data to colObj
 	virtual void readFromPhysicsObj(SmartBody::SBPhysicsObj* obj); // read sim data from colObj	
 
 public:
-	static dGeomID createODERawGeometry(SbmGeomObject* geomObj); 	
-	static void updateODEGeometryTransform(SbmGeomObject* geomObj, dGeomID geomID);
-	static SBPhysicsSimODE* getODESim();
+	static dGeomID createODERawGeometry(SBGeomObject* geomObj); 	
+	static void updateODEGeometryTransform(SBGeomObject* geomObj, dGeomID geomID);
+	static ODEPhysicsSim* getODESim();
 protected:
-	static void updateODEMass(dMass& odeMass, SbmGeomObject* geomObj, float mass);
+	static void updateODEMass(dMass& odeMass, SBGeomObject* geomObj, float mass);
 	static void nearCallBack(void *data, dGeomID o1, dGeomID o2);
-	SbmODEObj* getODEObj(SmartBody::SBPhysicsObj* obj);
-	SbmODEJoint* getODEJoint(SmartBody::SBPhysicsJoint* joint);
+	ODEObj* getODEObj(SmartBody::SBPhysicsObj* obj);
+	ODEJoint* getODEJoint(SmartBody::SBPhysicsJoint* joint);
 	dGeomID createODEGeometry(SmartBody::SBPhysicsObj* obj, float mass);
 	void linkJointObj(SmartBody::SbmJointObj* obj);
 };
 
-class SbmCollisionSpaceODE : public SbmCollisionSpace
+class ODECollisionSpace : public SBCollisionSpace
 {
 protected:
 	dSpaceID spaceID;	
@@ -93,8 +93,8 @@ protected:
 	std::map<dGeomID, std::string> odeGeomNameMap;	
 	SbmCollisionPairList curCollisionPairs;
 public:
-	SbmCollisionSpaceODE();
-	~SbmCollisionSpaceODE();
+	ODECollisionSpace();
+	~ODECollisionSpace();
 
 	virtual void addCollisionObjects(const std::string& objName);
 	virtual void removeCollisionObjects(const std::string& objName);

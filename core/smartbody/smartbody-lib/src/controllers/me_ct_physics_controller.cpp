@@ -249,7 +249,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			}
 			else
 			{
-				SbmTransform diffSRT = SbmTransform::diff(obj->getGlobalTransform(),obj->getRefTransform());
+				SBTransform diffSRT = SBTransform::diff(obj->getGlobalTransform(),obj->getRefTransform());
 				SrVec refAngVel = diffSRT.rot.axisAngle()*obj->getGlobalTransform().rot;
 				refAngVel = refAngVel*invDt;
 				SrVec refLinearVel = diffSRT.tran*invDt;

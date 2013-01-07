@@ -462,7 +462,7 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		}
 		// 		else // default null geom object
 		// 		{
-		// 			SbmGeomObject* colObj = new SbmGeomNullObject();
+		// 			SBGeomObject* colObj = new SBGeomNullObject();
 		// 			pawn_p->colObj_p = colObj;
 		// 		}
 

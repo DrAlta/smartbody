@@ -16,7 +16,7 @@ namespace SmartBody {
 class SBSkeleton;
 #endif
 
-class SBJoint : public SkJoint, public SbmTransformObjInterface
+class SBJoint : public SkJoint, public SBTransformObjInterface
 {
 	public:
 		SBAPI SBJoint();
@@ -61,12 +61,12 @@ class SBJoint : public SkJoint, public SbmTransformObjInterface
 		SBAPI void setPostrotation(SrQuat& quat);
 		SBAPI SrQuat getPostrotation();
 
-		SBAPI virtual SbmTransform& getGlobalTransform();
-		SBAPI virtual void setGlobalTransform(SbmTransform& newGlobalTransform);
+		SBAPI virtual SBTransform& getGlobalTransform();
+		SBAPI virtual void setGlobalTransform(SBTransform& newGlobalTransform);
 
 	protected:
 		SrVec _localCenter;
-		SbmTransform globalTransform;
+		SBTransform globalTransform;
 };
 
 };
