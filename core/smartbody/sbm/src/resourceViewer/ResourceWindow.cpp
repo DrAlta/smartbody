@@ -10,18 +10,26 @@
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Scroll.H>
-#include <sbm/mcontrol_util.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <controllers/me_controller_tree_root.hpp>
-#include <sb/nvbg.h>
+#include <sb/SBScene.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBMotion.h>
 #include <sb/SBServiceManager.h>
 #include <sb/SBJointMapManager.h>
 #include <sb/SBJointMap.h>
 #include <sb/SBGestureMap.h>
 #include <sb/SBGestureMapManager.h>
+#include <sb/nvbg.h>
+#include <sbm/mcontrol_util.h>
+#include <sbm/action_unit.hpp>
+#include <sbm/sr_path_list.h>
+#include <sb/sbm_character.hpp>
+
 
 // enum {
 // 	ITEM_PHYSICS = 0,
@@ -41,6 +49,7 @@
 // 	ITEM_AU_MAP,
 // 	ITEM_VISEME_MAP,
 // 	ITEM_SIZE };
+
 
 std::string ResourceWindow::ItemNameList[ITEM_SIZE] = { "SCENE", "SERVICES",  
 														"SEQ_PATH", "ME_PATH", "AUDIO_PATH", "MESH_PATH", "SEQ_FILES", 
@@ -120,7 +129,6 @@ void ResourceWindow::label_viewer( std::string name )
 
 void ResourceWindow::show_viewer()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	this->show();
 }
 
@@ -215,7 +223,7 @@ void ResourceWindow::updateGUI()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	SmartBody::SBScene* scene = mcu._scene;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
 	resourceTree->sortorder(FL_TREE_SORT_ASCENDING);	
 	// update path tree	
@@ -236,18 +244,17 @@ void ResourceWindow::updateGUI()
 	}	
 
 	// update skeleton
-	SkSkeletonMap::iterator ski;
-	resourceTree->clear_children(treeItemList[ITEM_SKELETON]);	
-	for ( ski  = mcu.skeleton_map.begin();
-		  ski != mcu.skeleton_map.end();
-		  ski++)
+	resourceTree->clear_children(treeItemList[ITEM_SKELETON]);
+	std::vector<std::string> skeletons = scene->getSkeletonNames();
+	for (size_t c = 0; c < skeletons.size(); c++)
 	{
-		updateSkeleton(treeItemList[ITEM_SKELETON],ski->second);
+		SmartBody::SBSkeleton * skel = scene->getSkeleton(skeletons[c]);
+		updateSkeleton(treeItemList[ITEM_SKELETON], skel);
 	}
 
 	// update joint maps
 	resourceTree->clear_children(treeItemList[ITEM_JOINT_MAP]);	
-	SmartBody::SBJointMapManager* jointMapManager = SmartBody::SBScene::getScene()->getJointMapManager();
+	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
 	std::vector<std::string> jointMapNames = jointMapManager->getJointMapNames();
 	for (std::vector<std::string>::iterator iter = jointMapNames.begin();
 		 iter != jointMapNames.end(); 
@@ -258,27 +265,25 @@ void ResourceWindow::updateGUI()
 	}
 
 	// update motion map
-	SkMotionMap::iterator mi;
 	resourceTree->clear_children(treeItemList[ITEM_MOTION]);
-	for ( mi  = mcu.motion_map.begin();
-		  mi != mcu.motion_map.end();
-		  mi++)
+	std::vector<std::string> motionNames = scene->getMotionNames();
+	for (size_t i = 0; i < motionNames.size(); i++)
 	{
 		//resourceTree->add(treeItemList[ITEM_MOTION],mi->first.c_str());
-		updateMotion(treeItemList[ITEM_MOTION],mi->second);
+		SmartBody::SBMotion * motion = scene->getMotion(motionNames[i]);
+		updateMotion(treeItemList[ITEM_MOTION], motion);
 	}
 
 	// update face definition map
-	std::map<std::string, SmartBody::SBFaceDefinition*>::iterator fi;
 	resourceTree->clear_children(treeItemList[ITEM_FACE_DEFINITION]);
-	for ( fi  = mcu.face_map.begin();
-		  fi != mcu.face_map.end();
-		  fi++)
+	std::vector<std::string> faceNames = scene->getFaceDefinitionNames();
+	for (size_t i = 0; i < faceNames.size(); i++)
 	{
 		//resourceTree->add(treeItemList[ITEM_MOTION],mi->first.c_str());
-		Fl_Tree_Item* faceTree = resourceTree->add(treeItemList[ITEM_FACE_DEFINITION],fi->first.c_str());
+		SmartBody::SBFaceDefinition * face = scene->getFaceDefinition(faceNames[i]);
+		Fl_Tree_Item* faceTree = resourceTree->add(treeItemList[ITEM_FACE_DEFINITION], face->getName().c_str());
 		faceTree->user_data((void*)ITEM_FACE_DEFINITION);
-		updateFaceMotion(faceTree,fi->second);
+		updateFaceMotion(faceTree, face);
 	}
 
 	// update event handler list
@@ -298,26 +303,23 @@ void ResourceWindow::updateGUI()
 	// Below are instance objects :
 
 	// update pawn objects
-	SbmPawn* pawn_p = NULL;
 	resourceTree->clear_children(treeItemList[ITEM_PAWN]);
-	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-		iter != mcu.getPawnMap().end();
-		iter++)
+	std::vector<std::string> pawnNames = scene->getPawnNames();
+	for (size_t i = 0; i < pawnNames.size(); i++)
 	{
-		SbmPawn* pawn = (*iter).second;
+		SmartBody::SBPawn* pawn = scene->getPawn(pawnNames[i]);
 		updatePawn(treeItemList[ITEM_PAWN], pawn);
 	}
 
 	// update characters
 	resourceTree->clear_children(treeItemList[ITEM_CHARACTER]);
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
+	std::vector<std::string> charNames = scene->getCharacterNames();
+	for (size_t i = 0; i < charNames.size(); i++)
 	{
-		SbmCharacter* character = (*iter).second;
-		resourceTree->sortorder(FL_TREE_SORT_ASCENDING);	
-		updateCharacter(treeItemList[ITEM_CHARACTER],character);
-	}		
+		SmartBody::SBCharacter* character = scene->getCharacter(charNames[i]);
+		resourceTree->sortorder(FL_TREE_SORT_ASCENDING);
+		updateCharacter(treeItemList[ITEM_CHARACTER], character);
+	}
 
 	
 // 	for (SBPhysicsObjMap::iterator iter = phySim->getPhysicsObjMap().begin();
@@ -537,21 +539,21 @@ void ResourceWindow::updateEventHandler( Fl_Tree_Item* tree, SmartBody::EventHan
 	//item->user_data((void*)ITEM_EVENT_HANDLERS);
 }
 
-void ResourceWindow::updateSkeleton( Fl_Tree_Item* tree, SkSkeleton* skel )
+void ResourceWindow::updateSkeleton( Fl_Tree_Item* tree, SmartBody::SBSkeleton* skel )
 {
 	std::string ext = boost::filesystem2::extension( skel->skfilename() );
 	std::string filebase = boost::filesystem::basename(skel->skfilename());
-	Fl_Tree_Item* item = resourceTree->add(tree,(filebase+ext).c_str());	
-	item->user_data((void*)ITEM_SKELETON);	
+	Fl_Tree_Item* item = resourceTree->add(tree,(filebase+ext).c_str());
+	item->user_data((void*)ITEM_SKELETON);
 }
 
-void ResourceWindow::updateMotion( Fl_Tree_Item* tree, SkMotion* motion )
+void ResourceWindow::updateMotion( Fl_Tree_Item* tree, SmartBody::SBMotion* motion )
 {
-	Fl_Tree_Item* item = resourceTree->add(tree,motion->getName().c_str());
+	Fl_Tree_Item* item = resourceTree->add(tree, motion->getName().c_str());
 	item->user_data((void*)ITEM_MOTION);
 }
 
-void ResourceWindow::updatePawn( Fl_Tree_Item* tree, SbmPawn* pawn )
+void ResourceWindow::updatePawn( Fl_Tree_Item* tree, SmartBody::SBPawn* pawn )
 {
 	if (dynamic_cast<SbmCharacter*>(pawn) != NULL)
 		return; // this is actually a character
@@ -578,7 +580,7 @@ void ResourceWindow::updatePhysicsCharacter( Fl_Tree_Item* tree, SmartBody::SBPh
 
 }
 
-void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* character )
+void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SmartBody::SBCharacter* character )
 {
 	SmartBody::SBCharacter* sbcharacter = dynamic_cast<SmartBody::SBCharacter*>(character);
 	Fl_Tree_Item* item = resourceTree->add(tree,character->getName().c_str());
@@ -714,7 +716,6 @@ void ResourceWindow::clearInfoWidget()
 
 TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* treeItem, int itemType )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	TreeItemInfoWidget* widget = NULL;
 	if (itemType == ITEM_SKELETON)
@@ -735,7 +736,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_PAWN)
 	{
-		SbmPawn* curPawn = mcuCBHandle::singleton().getPawn(treeItem->label());
+		SmartBody::SBPawn* curPawn = scene->getPawn(treeItem->label());
 		/*if (curPawn)
 			widget = new PawnItemInfoWidget(x,y,w,h,name,treeItem,itemType,this);
 		else 
@@ -745,7 +746,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_CHARACTER)
 	{
-		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->label());
+		SmartBody::SBCharacter* curChar = scene->getCharacter(treeItem->label());
 		if (curChar)
 			widget = new AttributeItemWidget(curChar,x,y,w,h,name,treeItem,itemType,this);
 		else
@@ -795,7 +796,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_SCENE)
 	{
-		widget = new AttributeItemWidget(mcuCBHandle::singleton()._scene,x,y,w,h,name,treeItem,itemType,this);
+		widget = new AttributeItemWidget(scene,x,y,w,h,name,treeItem,itemType,this);
 	}
 	else if (itemType == ITEM_SERVICES)
 	{
@@ -808,7 +809,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_CONTROLLER)
 	{
-		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->parent()->parent()->label()); // a controller's parent is its character name
+		SmartBody::SBCharacter* curChar = scene->getCharacter(treeItem->parent()->parent()->label()); // a controller's parent is its character name
 		MeController* ctrl = NULL;
 		if (curChar)
 		{			
@@ -826,12 +827,12 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_GESTUREMAP)
 	{
-		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->parent()->parent()->label()); // a controller's parent is its character name
+		SmartBody::SBCharacter* curChar = scene->getCharacter(treeItem->parent()->parent()->label()); // a controller's parent is its character name
 		widget = new TreeItemInfoWidget(x,y,w,h,name,treeItem,itemType);
 	}
 	else if (itemType == ITEM_NVBG)
 	{
-		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->parent()->label());
+		SmartBody::SBCharacter* curChar = scene->getCharacter(treeItem->parent()->label());
 		widget = new AttributeItemWidget(curChar->getNvbg(),x,y,w,h,name,treeItem,itemType,this);
 	}
 	else

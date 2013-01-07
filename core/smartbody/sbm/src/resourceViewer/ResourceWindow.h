@@ -6,22 +6,18 @@
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Light_Button.H>
+#include <sb/SBFaceDefinition.h>
+#include <sb/SBService.h>
+#include <sb/SBPhysicsManager.h>
+#include <sb/SBJointMap.h>
+#include <sbm/GenericViewer.h>
+#include <sbm/Physics/SBPhysicsSim.h>
+#include <sbm/Event.h>
 #include "Fl_Tree_Horizontal.h" // a custom tree widget with horizontal scroll bar
 #include "TreeItemInfoWidget.h"
 #include "TreeInfoObject.h"
-#include <sbm/GenericViewer.h>
-#include <sb/SBFaceDefinition.h>
-#include <sb/SBService.h>
-#include <sbm/Physics/SBPhysicsSim.h>
-#include <sb/SBPhysicsManager.h>
-#include <sbm/Event.h>
-#include <sb/SBJointMap.h>
 
 class srPathList;
-class SkSkeleton;
-class SkMotion;
-class SbmPawn;
-class SbmCharacter;
 class BoneMap;
 class FaceMotion;
 class EventHandler;
@@ -91,13 +87,13 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 	protected:
 		void updatePath(Fl_Tree_Item* tree, srPathList& pathList);
 		void updateSeqFiles(Fl_Tree_Item* tree, std::string pathName);
-		void updateSkeleton(Fl_Tree_Item* tree, SkSkeleton* skel);
+		void updateSkeleton(Fl_Tree_Item* tree, SmartBody::SBSkeleton* skel);
 		void updateJointMap(Fl_Tree_Item* tree, SmartBody::SBJointMap* jointMap);
-		void updateMotion(Fl_Tree_Item* tree, SkMotion* motion);
-		void updatePawn(Fl_Tree_Item* tree, SbmPawn* pawn);
-		void updateCharacter(Fl_Tree_Item* tree, SbmCharacter* character);	
-		void updatePhysicsCharacter(Fl_Tree_Item* tree, SmartBody::SBPhysicsCharacter* phyChar);		
-		void updateService(Fl_Tree_Item* tree, SmartBody::SBService* service);	
+		void updateMotion(Fl_Tree_Item* tree, SmartBody::SBMotion* motion);
+		void updatePawn(Fl_Tree_Item* tree, SmartBody::SBPawn* pawn);
+		void updateCharacter(Fl_Tree_Item* tree, SmartBody::SBCharacter* character);
+		void updatePhysicsCharacter(Fl_Tree_Item* tree, SmartBody::SBPhysicsCharacter* phyChar);
+		void updateService(Fl_Tree_Item* tree, SmartBody::SBService* service);
 		void updatePhysicsManager(Fl_Tree_Item* tree, SmartBody::SBPhysicsManager* phyService);
 		void updateFaceMotion(Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition);
 		void updateEventHandler(Fl_Tree_Item* tree, SmartBody::EventHandler* handler);
