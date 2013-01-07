@@ -16,15 +16,13 @@
  *  License along with SmartBody-lib.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
  *
- *  CONTRIBUTORS:
- *      Yuyu Xu, USC
  */
 
 
-#include "SteeringAgent.h"
+#include "PPRAISteeringAgent.h"
 #include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
-
+#include <sb/sbm_character.hpp>
 #ifndef __native_client__
 #include <sb/SBPythonClass.h>
 #endif
@@ -34,6 +32,9 @@
 #include <sb/SBSteerManager.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBSimulationManager.h>
+
+#include <sbm/SteerPath.h>
+
 #include <sb/SBAnimationState.h>
 
 #include "sbm/Event.h"
@@ -41,8 +42,9 @@
 #define DebugInfo 0
 #define FastStart 1
 
-SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
+PPRAISteeringAgent::PPRAISteeringAgent(SmartBody::SBCharacter* c) : SmartBody::SBSteerAgent(c)
 {
+	character = c;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	agent = NULL;
 	target = NULL;
@@ -84,13 +86,15 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	initSteerParams();
 	_curFrame = 0;
 	currentTargetSpeed = 1.5f;
+	
+	_numSteeringGoal = 0;
 }
 
-SteeringAgent::~SteeringAgent()
+PPRAISteeringAgent::~PPRAISteeringAgent()
 {
 }
 
-void SteeringAgent::addSteeringAttributes()
+void PPRAISteeringAgent::addSteeringAttributes()
 {
 	if (!character)
 		return;
@@ -188,7 +192,7 @@ void SteeringAgent::addSteeringAttributes()
 	setSteerParamsDirty(false);
 }
 
-void SteeringAgent::initSteerParams()
+void PPRAISteeringAgent::initSteerParams()
 {
 	if (character && character->hasAttribute("steering.basicLocoAngleGain"))
 		basicLocoAngleGain = (float) character->getDoubleAttribute("steering.basicLocoAngleGain");
@@ -329,7 +333,7 @@ void SteeringAgent::initSteerParams()
 
 }
 
-void SteeringAgent::updateSteerStateName()
+void PPRAISteeringAgent::updateSteerStateName()
 {
 	if (!character)
 		return;
@@ -347,7 +351,7 @@ void SteeringAgent::updateSteerStateName()
 
 
 
-SrVec SteeringAgent::getCollisionFreeGoal( SrVec targetPos, SrVec curPos )
+SrVec PPRAISteeringAgent::getCollisionFreeGoal( SrVec targetPos, SrVec curPos )
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSteerManager* manager = scene->getSteerManager();
@@ -378,7 +382,7 @@ SrVec SteeringAgent::getCollisionFreeGoal( SrVec targetPos, SrVec curPos )
 	return newGoal;
 }
 
-void SteeringAgent::evaluate(double dtime)
+void PPRAISteeringAgent::evaluate(double dtime)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSteerManager* manager = scene->getSteerManager();
@@ -407,10 +411,8 @@ void SteeringAgent::evaluate(double dtime)
 
 	if (!agent)
 		return;
-	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
-	if (!pprAgent)
-		return;
 
+	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
 	//mcu.mark("Steering",0,"Evaluate");
 	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
 	int numGoals = goalQueue.size();
@@ -469,11 +471,11 @@ void SteeringAgent::evaluate(double dtime)
 	try {
 		//if (accumTime > 0.1f)
 		{
-			pprAgent->updateAgentState(newPosition, newOrientation, newSpeed);
+			agent->updateAgentState(newPosition, newOrientation, newSpeed);
 			//accumTime -= 0.1f;
 		}		
 		//accumTime += dt;
-		pprAgent->updateAI((float)mcu.time, dt, _curFrame++);
+		agent->updateAI((float)mcu.time, dt, _curFrame++);
 	} catch (Util::GenericException& ge) {
 		std::string message = ge.what();
 		if (lastMessage == message)
@@ -547,12 +549,12 @@ void SteeringAgent::evaluate(double dtime)
 		}
 	}
 
-	character->_numSteeringGoal = goalQueue.size();
+	_numSteeringGoal = goalQueue.size();
 
 	//mcu.mark("Steering");
 }
 
-void SteeringAgent::sendLocomotionEvent(const std::string& status)
+void PPRAISteeringAgent::sendLocomotionEvent(const std::string& status)
 {
 	std::string eventType = "locomotion";
 	SmartBody::MotionEvent motionEvent;
@@ -564,7 +566,7 @@ void SteeringAgent::sendLocomotionEvent(const std::string& status)
 	manager->handleEvent(&motionEvent, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 }
 
-void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, float yaw)
+void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, float yaw)
 {
 	PABlendData* curStateData = character->param_animation_ct->getCurrentPABlendData();	
 	std::string curStateName = "";
@@ -746,38 +748,34 @@ void SteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, f
 }
 
 
-void SteeringAgent::setAgent(SteerLib::AgentInterface* a)
+void PPRAISteeringAgent::setAgent(SteerLib::AgentInterface* a)
 {
 	agent = a;
 }
 
-SteerLib::AgentInterface* SteeringAgent::getAgent()
+SteerLib::AgentInterface* PPRAISteeringAgent::getAgent()
 {
 	return agent;
 }
 
-void SteeringAgent::setCharacter(SbmCharacter* c)
+void PPRAISteeringAgent::setCharacter(SbmCharacter* c)
 {
 	character = c;
 	addSteeringAttributes();
 }
 
-SbmCharacter* SteeringAgent::getCharacter()
-{
-	return character;
-}
 
-void SteeringAgent::setTargetAgent(SbmCharacter* tChar)
+void PPRAISteeringAgent::setTargetAgent(SbmCharacter* tChar)
 {
 	target = tChar;
 }
 
-SbmCharacter* SteeringAgent::getTargetAgent()
+SbmCharacter* PPRAISteeringAgent::getTargetAgent()
 {
 	return target;
 }
 
-void SteeringAgent::normalizeAngle(float& angle)
+void PPRAISteeringAgent::normalizeAngle(float& angle)
 {
 	while (angle > 180.0f)
 		angle -= 360.0f;
@@ -790,7 +788,7 @@ void SteeringAgent::normalizeAngle(float& angle)
 	- The proximity is decided by Steering Suite
 	- Facing not supported
 */
-float SteeringAgent::evaluateBasicLoco(float dt, float x, float y, float z, float yaw)
+float PPRAISteeringAgent::evaluateBasicLoco(float dt, float x, float y, float z, float yaw)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	
@@ -986,7 +984,7 @@ float SteeringAgent::evaluateBasicLoco(float dt, float x, float y, float z, floa
 	Notes:
 	- Proximity controller by user
 */
-float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, float yaw)
+float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, float yaw)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	
@@ -996,7 +994,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 	
 
 	//*** IMPORTANT: use the example-based animation to update the steering agent
-	forward = pprAgent->forward();
+	forward = agent->forward();
 	rightSide = rightSideInXZPlane(forward);
 
 	//--------------------------------------------------------
@@ -1097,7 +1095,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 
 		if (distToTarget < distDownThreshold)
 		{
-			character->steeringAgent->getAgent()->clearGoals();
+			getAgent()->clearGoals();
 			sendLocomotionEvent("success");
 			sentLocomotionEvent = true;
 		}
@@ -1108,7 +1106,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		reachTarget = true;
 		character->_reachTarget = reachTarget;
 	}
-	if (character->_numSteeringGoal == 0 && numGoals != 0 && distToTarget < distThreshold)
+	if (_numSteeringGoal == 0 && numGoals != 0 && distToTarget < distThreshold)
 		stepAdjust = true;
 	if (distToTarget > distThreshold)
 		stepAdjust = false;
@@ -1201,7 +1199,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 		}
 		else
 		{
-	//		if (character->steeringConfig == character->MINIMAL)
+	//		if (steeringConfig == character->MINIMAL)
 			{
 				std::stringstream command;
 				command << "panim schedule char " << character->getName();
@@ -1213,7 +1211,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 	}	
 
 	//---end locomotion
-	if (character->_numSteeringGoal != 0 && numGoals == 0)
+	if (_numSteeringGoal != 0 && numGoals == 0)
 	{
 		if (goalList.size() == 0)
 		{
@@ -1248,7 +1246,8 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 
 	//---If the facing angle is not correct, use idle turning
 
-	if (character->param_animation_ct->isIdle() && fabs(facingAngle) <= 180 && character->steeringConfig == character->STANDARD)
+	if (character->param_animation_ct->isIdle() && fabs(facingAngle) <= 180 && 
+		steeringConfig == STANDARD)
 	{
 		float diff = facingAngle - yaw;
 		normalizeAngle(diff);
@@ -1388,7 +1387,7 @@ float SteeringAgent::evaluateExampleLoco(float dt, float x, float y, float z, fl
 }
 
 
-void SteeringAgent::startLocomotion( float angleDiff )
+void PPRAISteeringAgent::startLocomotion( float angleDiff )
 {
 	//		if (character->steeringConfig == character->STANDARD)
 	{
@@ -1469,7 +1468,7 @@ void SteeringAgent::startLocomotion( float angleDiff )
 	}
 }
 
-void SteeringAgent::adjustFacingAngle( float angleDiff )
+void PPRAISteeringAgent::adjustFacingAngle( float angleDiff )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
 	std::string playNow;
@@ -1506,7 +1505,7 @@ void SteeringAgent::adjustFacingAngle( float angleDiff )
 	*/
 }
 
-float SteeringAgent::evaluateSteppingLoco(float dt, float x, float y, float z, float yaw)
+float PPRAISteeringAgent::evaluateSteppingLoco(float dt, float x, float y, float z, float yaw)
 {
 	if (!character->param_animation_ct)
 		return .0f;
@@ -1542,7 +1541,7 @@ float SteeringAgent::evaluateSteppingLoco(float dt, float x, float y, float z, f
 	return 0.0f;
 }
 
-void SteeringAgent::startParameterTesting()
+void PPRAISteeringAgent::startParameterTesting()
 {
 	LOG("Parameter Testing Start...");
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -1555,7 +1554,7 @@ void SteeringAgent::startParameterTesting()
 	normalizeAngle(prevYaw);
 }
 
-void SteeringAgent::parameterTesting()
+void PPRAISteeringAgent::parameterTesting()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if ((mcu.time - paramTestStartTime) > paramTestDur)
@@ -1586,14 +1585,14 @@ void SteeringAgent::parameterTesting()
 	normalizeAngle(prevYaw);
 }
 
-void SteeringAgent::cacheParameter(std::list<float>& sampleData, float data, int size)
+void PPRAISteeringAgent::cacheParameter(std::list<float>& sampleData, float data, int size)
 {
 	sampleData.push_back(data);
 	while (sampleData.size() > (size_t)size)
 		sampleData.pop_front();
 }
 
-float SteeringAgent::getFilteredParameter(std::list<float>& sampleData)
+float PPRAISteeringAgent::getFilteredParameter(std::list<float>& sampleData)
 {
 	float ret = 0.0f;
 	std::list<float>::iterator iter = sampleData.begin();
@@ -1603,17 +1602,17 @@ float SteeringAgent::getFilteredParameter(std::list<float>& sampleData)
 	return ret;
 }
 
-void SteeringAgent::setSteerParamsDirty(bool val)
+void PPRAISteeringAgent::setSteerParamsDirty(bool val)
 {
 	_dirty = val;
 }
 
-bool SteeringAgent::isSteerParamsDirty()
+bool PPRAISteeringAgent::isSteerParamsDirty()
 {
 	return _dirty;
 }
 
-void SteeringAgent::locomotionHalt()
+void PPRAISteeringAgent::locomotionHalt()
 {
 	std::vector<double> weights;
 	ScheduleType sc;
@@ -1626,7 +1625,7 @@ void SteeringAgent::locomotionHalt()
 	steerPath.clearPath();
 }
 
-bool SteeringAgent::isInLocomotion()
+bool PPRAISteeringAgent::isInLocomotion()
 {
 	if (!character->param_animation_ct)
 		return false;
@@ -1635,7 +1634,7 @@ bool SteeringAgent::isInLocomotion()
 	return true;
 }
 
-bool SteeringAgent::isHittingOnTarget()
+bool PPRAISteeringAgent::isHittingOnTarget()
 {
 	return (character->_reachTarget && !character->_lastReachStatus);
 }

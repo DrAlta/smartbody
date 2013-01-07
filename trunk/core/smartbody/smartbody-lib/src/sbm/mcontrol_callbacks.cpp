@@ -48,6 +48,7 @@
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_breathing.h>
 #include <controllers/me_controller_tree_root.hpp>
+#include <sbm/PPRAISteeringAgent.h>
 
 #ifdef WIN32
 #include <direct.h>
@@ -75,7 +76,6 @@
 #include "sbm/ParserOpenCOLLADA.h"
 #include "sbm/ParserOgre.h"
 
-#include "SteeringAgent.h"
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>
@@ -4891,10 +4891,13 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				SbmCharacter* character = mcu_p->getCharacter(characterName);
 				if (character)
 				{
-					if (character->steeringAgent)
+					SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+					SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+					if (steerAgent)
 					{
+						PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
 						character->trajectoryGoalList.clear();
-						SteerPath& steerPath = character->steeringAgent->steerPath;
+						SteerPath& steerPath = ppraiAgent->steerPath;
 						float pathRadius = 1.f;												
 						float x, y, z;
 						float yaw, pitch, roll;
@@ -4905,20 +4908,20 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 						if (mode == "normal")
 						{
-							if (character->steeringAgent->getAgent())
+							if (ppraiAgent->getAgent())
 							{
-								const SteerLib::AgentGoalInfo& curGoal = character->steeringAgent->getAgent()->currentGoal();
-								character->steeringAgent->getAgent()->clearGoals();
+								const SteerLib::AgentGoalInfo& curGoal = ppraiAgent->getAgent()->currentGoal();
+								ppraiAgent->getAgent()->clearGoals();
 							}
-							if (character->steeringAgent->goalList.size() > 0)
+							if (ppraiAgent->goalList.size() > 0)
 							{
-								character->steeringAgent->sendLocomotionEvent("interrupt");
+								ppraiAgent->sendLocomotionEvent("interrupt");
 							}
-							character->steeringAgent->goalList.clear();
+							ppraiAgent->goalList.clear();
 							for (int i = 0; i < num; i++)
 							{
 								float v = args.read_float();
-								character->steeringAgent->goalList.push_back(v);
+								ppraiAgent->goalList.push_back(v);
 								character->trajectoryGoalList.push_back(v);
 							}
 						}
@@ -4927,7 +4930,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 							for (int i = 0; i < num; i++)
 							{
 								float v = args.read_float();
-								character->steeringAgent->goalList.push_back(v);
+								ppraiAgent->goalList.push_back(v);
 								character->trajectoryGoalList.push_back(v);
 							}
 						}
@@ -4955,8 +4958,19 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			SbmCharacter* character = mcu_p->getCharacter(characterName);
 			if (character)
 			{
-				character->steeringAgent->distThreshold = (float)args.read_double() / scene->getScale();
-				return CMD_SUCCESS;
+				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+				SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+				if (steerAgent)
+				{
+					ppraiAgent->distThreshold = (float)args.read_double() / scene->getScale();
+					return CMD_SUCCESS;
+				}
+				else
+				{
+					LOG("No steering agent for character '%s'.", character->getName().c_str());
+					return CMD_FAILURE;
+				}
 			}
 		}
 		else if (command == "fastinitial")
@@ -4965,11 +4979,14 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			SbmCharacter* character = mcu_p->getCharacter(characterName);
 			if (character)
 			{
+				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+				SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
 				std::string fastinitialString = args.read_token();
 				if (fastinitialString == "true")
-					character->steeringAgent->fastInitial = true;
+					ppraiAgent->fastInitial = true;
 				else
-					character->steeringAgent->fastInitial = false;
+					ppraiAgent->fastInitial = false;
 				return CMD_SUCCESS;
 			}
 		}
@@ -4979,9 +4996,12 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			SbmCharacter* character = mcu_p->getCharacter(characterName);
 			if (character)
 			{
+				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+				SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
 				if (character->locomotion_type != character->Procedural)
 				{
-					character->steeringAgent->desiredSpeed = (float)args.read_double();
+					ppraiAgent->desiredSpeed = (float)args.read_double();
 					return CMD_SUCCESS;
 				}
 			}		
@@ -5024,8 +5044,14 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				if (type == "procedural")
 				{
 					character->locomotion_type = character->Procedural;
-					if (character->steeringAgent)
-						character->steeringAgent->desiredSpeed = 1.6f;
+					SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+					SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+					if (steerAgent)
+					{
+						PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+						ppraiAgent->desiredSpeed = 1.6f;
+					}
+						
 					/*
 					if (character->param_animation_ct)
 						character->param_animation_ct->set_pass_through(true);
@@ -5058,7 +5084,10 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			SbmCharacter* character = mcu_p->getCharacter(characterName);
 			if (character)
 			{
-				character->steeringAgent->facingAngle = (float)args.read_double();
+				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+				SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+				ppraiAgent->facingAngle = (float)args.read_double();
 				return CMD_SUCCESS;
 			}				
 		}
@@ -5068,11 +5097,14 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			SbmCharacter* character = mcu_p->getCharacter(characterName);
 			if (character)
 			{
-				character->steeringAgent->brakingGain = (float)args.read_double();
-				if (character->steeringAgent->brakingGain < 1.0f)
-					character->steeringAgent->brakingGain = 1.0f;
-				if (character->steeringAgent->brakingGain > 4.5f)
-					character->steeringAgent->brakingGain = 4.5f;
+				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+				SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+				ppraiAgent->brakingGain = (float)args.read_double();
+				if (ppraiAgent->brakingGain < 1.0f)
+					ppraiAgent->brakingGain = 1.0f;
+				if (ppraiAgent->brakingGain > 4.5f)
+					ppraiAgent->brakingGain = 4.5f;
 				return CMD_SUCCESS;
 			}				
 		}
@@ -5082,7 +5114,10 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			SbmCharacter* character = mcu_p->getCharacter(characterName);
 			if (character)
 			{
-				character->steeringAgent->startParameterTesting();
+				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+				SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+				ppraiAgent->startParameterTesting();
 				return CMD_SUCCESS;
 			}
 		}

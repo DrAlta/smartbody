@@ -51,10 +51,14 @@
 #include "sbm/lin_win.h"
 #include "sbm/sbm_speech.hpp"
 #include "sbm/general_param_setting.h"
+#include <sbm/SteeringAgent.h>
+#include <sbm/PPRAISteeringAgent.h>
 #include <boost/filesystem/operations.hpp>
 #include <sb/SBSkeleton.h>
 #include <sb/SBJoint.h>
 #include <sb/SBBoneBusManager.h>
+#include <sb/SBSteerManager.h>
+#include <sb/SBSteerAgent.h>
 #include <controllers/me_ct_motion_player.h>
 #include <controllers/me_ct_pose.h>
 #include <controllers/me_ct_quick_draw.h>
@@ -74,7 +78,7 @@
 #include <controllers/me_controller_tree_root.hpp>
 #include <controllers/me_ct_reach.hpp>
 #include <controllers/me_ct_example_body_reach.hpp>
-#include "sbm/SteeringAgent.h"
+
 
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_physics_controller.h>
@@ -276,7 +280,6 @@ SbmCharacter::~SbmCharacter( void )	{
 		viseme_history_arr = NULL;
 	}
 
-	delete steeringAgent;
 	if (_miniBrain)
 		delete _miniBrain;
 }
@@ -575,8 +578,6 @@ void SbmCharacter::initData()
 	_classType = "";
 	_minVisemeTime = 0.0f;
 	_faceDefinition = NULL;
-	steeringAgent = NULL;
-	_numSteeringGoal = 0;
 	_reachTarget = false;
 	_lastReachStatus = true;
 	_height = 1.0f; 
@@ -817,7 +818,9 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 
 	scene_p->init( _skeleton ); 
 
-	steeringAgent = new SteeringAgent(this);
+	SmartBody::SBCharacter* sbcharacter = dynamic_cast<SmartBody::SBCharacter*>(this);
+	SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+	SmartBody::SBSteerAgent* steerAgent = steerManager->createSteerAgent(getName());
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
@@ -2513,8 +2516,13 @@ SmartBody::MiniBrain* SbmCharacter::getMiniBrain()
 
 bool SbmCharacter::checkExamples()
 {
-	if (steeringAgent)
-		steeringAgent->updateSteerStateName();
+	SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+	SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(getName());
+	if (steerAgent)
+	{
+		PPRAISteeringAgent* steersuiteAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+		steersuiteAgent->updateSteerStateName();
+	}
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::string prefix = this->getName();
@@ -2547,8 +2555,13 @@ bool SbmCharacter::checkExamples()
 	if (numMissing == 0)
 	{
 		LOG("%s: Steering works under standard config.", this->getName().c_str());
-		this->steeringConfig = STANDARD;
-		return true;
+		if (steerAgent)
+		{
+			PPRAISteeringAgent* steersuiteAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+			steersuiteAgent->steeringConfig = PPRAISteeringAgent::STANDARD;
+			return true;
+		}
+		
 	}
 
 	std::vector<std::string> minimalRequiredStates;
@@ -2570,7 +2583,8 @@ bool SbmCharacter::checkExamples()
 	if (numMissing1 == 0)
 	{
 		LOG("%s: Steering works under minimal config.", this->getName().c_str());
-		this->steeringConfig = MINIMAL;
+		PPRAISteeringAgent* steersuiteAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+		steersuiteAgent->steeringConfig = PPRAISteeringAgent::MINIMAL;
 		return true;
 	}
 	LOG("%s: Steering cannot work under example mode, reverting back to basic mode", this->getName().c_str());

@@ -76,7 +76,7 @@
 #include "FLTKListener.h"
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
-#include <sbm/SteeringAgent.h>
+#include <sbm/PPRAISteeringAgent.h>
 
 #if USE_OGRE_VIEWER > 0
 #include "FLTKOgreViewer.h"
@@ -219,8 +219,12 @@ int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			iter++)
 		{
 			SbmCharacter* character = (*iter).second;
-			if (character->steeringAgent)
-				character->steeringAgent->setAgent(NULL);
+			SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(character->getName());
+			if (steerAgent)
+			{
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+				ppraiAgent->setAgent(NULL);
+			}
 		}
 	}
 	return( CMD_SUCCESS );

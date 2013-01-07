@@ -48,7 +48,6 @@ class MeCtMotionPlayer;
 class MeCtPAnimation;
 class MeCtParamAnimation;
 class MeCtSaccade;
-class SteeringAgent;
 class MeCtBasicLocomotion;
 class MeCtDataReceiver;
 class SBPhysicsCharacter;
@@ -80,16 +79,14 @@ public:
 	std::list<SrVec> trajectoryBuffer;
 	std::vector<float> trajectoryGoalList;
 	static const int trajectoryLength = 1000;
-	SteeringAgent* steeringAgent;
-	int	_numSteeringGoal;
+	
 	bool _reachTarget;
 	bool _lastReachStatus;
 	//SBPhysicsCharacter* phyChar;
 
 	enum LocomotionType {Basic, Example, Procedural};
-	enum SteeringStateConfig { MINIMAL = 0, STANDARD};
+	
 	LocomotionType								locomotion_type;
-	SteeringStateConfig							steeringConfig;
 	std::string									statePrefix;
 	bool checkExamples();
 

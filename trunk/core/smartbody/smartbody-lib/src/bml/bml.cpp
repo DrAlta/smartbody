@@ -52,7 +52,9 @@
 #include <sb/SBGestureMapManager.h>
 #include <sb/SBGestureMap.h>
 #include <sb/SBSimulationManager.h>
-#include <sbm/SteeringAgent.h>
+#include <sb/SBSteerManager.h>
+#include <sb/SBSteerAgent.h>
+#include <sbm/PPRAISteeringAgent.h>
 
 using namespace std;
 using namespace BML;
@@ -1559,7 +1561,9 @@ void GestureRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		SkMotion* holdM = motion->buildPoststrokeHoldMotion((float)holdTime, jointVec, scale, freq, NULL);
 		SBCharacter* sbCharacter = dynamic_cast<SBCharacter*>(request->actor);
 		bool isInLocomotion = false;
-		if (sbCharacter->steeringAgent)
+		SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+		SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(sbCharacter->getName());
+		if (steerAgent)
 		{
 			for (size_t i = 0; i < request->behaviors.size(); ++i)
 			{
@@ -1569,7 +1573,8 @@ void GestureRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 					break;
 				}
 			}
-			if (sbCharacter->steeringAgent->isInLocomotion())
+			PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+			if (ppraiAgent->isInLocomotion())
 				isInLocomotion = true;
 		}
 		if (isInLocomotion)

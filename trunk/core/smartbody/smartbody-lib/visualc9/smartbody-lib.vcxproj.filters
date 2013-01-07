@@ -703,9 +703,6 @@
     <ClCompile Include="..\src\sbm\GPU\SbmTexture.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\SteeringAgent.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\SteerPath.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
@@ -990,6 +987,9 @@
     </ClCompile>
     <ClCompile Include="..\src\sb\sbm_pawn.cpp">
       <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\PPRAISteeringAgent.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1698,9 +1698,6 @@
     <ClInclude Include="..\src\sbm\GPU\SbmTexture.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\SteeringAgent.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\SteerPath.h">
       <Filter>sbm</Filter>
     </ClInclude>
@@ -2027,6 +2024,9 @@
     </ClInclude>
     <ClInclude Include="..\src\sb\sbm_pawn.hpp">
       <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\PPRAISteeringAgent.h">
+      <Filter>sbm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
