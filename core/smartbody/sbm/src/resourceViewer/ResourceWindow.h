@@ -13,7 +13,6 @@
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBJointMap.h>
 #include <sbm/GenericViewer.h>
-#include <sbm/Physics/SBPhysicsSim.h>
 #include <sbm/Event.h>
 #include "Fl_Tree_Horizontal.h" // a custom tree widget with horizontal scroll bar
 #include "TreeItemInfoWidget.h"
