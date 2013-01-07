@@ -1,3 +1,5 @@
+#include "vhcl.h"
+#include <sstream>
 #include "BMLCreatorWindow.h"
 #include "AttributeWindow.h"
 #include "BMLObject.h"
@@ -5,6 +7,7 @@
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Choice.H>
+#include <sb/SBScene.h>
 #include "BMLBodyObject.h"
 #include "BMLLocomotionObject.h"
 #include "BMLAnimationObject.h"
@@ -18,7 +21,6 @@
 #include "BMLEventObject.h"
 #include "BMLSaccadeObject.h"
 #include "BMLStateObject.h"
-#include "sbm/mcontrol_util.h"
 
 #ifndef WIN32
 #define _strdup strdup
@@ -149,14 +151,15 @@ void BMLCreatorWindow::RunBMLCB(Fl_Widget* w, void *data)
 {
 	BMLCreatorWindow* window = (BMLCreatorWindow*) data;
 	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
 	if (!sbScene->isRemoteMode())
-		mcu.executePython(window->_editor->buffer()->text());
+	{
+		SmartBody::SBScene::getScene()->run(window->_editor->buffer()->text());
+	}
 	else
 	{
 		std::string sendStr = "send sbm python " + std::string(window->_editor->buffer()->text());
-		mcu.execute((char*)sendStr.c_str());
+		SmartBody::SBScene::getScene()->command(sendStr);
 	}
 }
 
@@ -167,14 +170,11 @@ void BMLCreatorWindow::RefreshCharactersCB(Fl_Widget* w, void *data)
 	window->_choiceCharacters->clear();
 	window->_choiceCharacters->add("*");
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
+	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (size_t i = 0; i < charNames.size(); i++)
 	{
-		SbmCharacter* character = (*iter).second;
-		window->_choiceCharacters->add(character->getName().c_str());
+		const std::string & charName = charNames[i];
+		window->_choiceCharacters->add(charName.c_str());
 	}
 }
 
@@ -224,14 +224,11 @@ void BMLCreatorWindow::ResetBMLCB(Fl_Widget* w, void *data)
 	window->_choiceCharacters->clear();
 	window->_choiceCharacters->add("*");
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
+	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (size_t i = 0; i < charNames.size(); i++)
 	{
-		SbmCharacter* character = (*iter).second;
-		window->_choiceCharacters->add(character->getName().c_str());
+		const std::string & charName = charNames[i];
+		window->_choiceCharacters->add(charName.c_str());
 	}
 }
 
