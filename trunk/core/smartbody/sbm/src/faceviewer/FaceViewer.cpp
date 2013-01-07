@@ -1,7 +1,8 @@
+#include "vhcl.h"
 #include "FaceViewer.h"
-#include <sbm/mcontrol_util.h>
 #include <FL/Fl_Value_Slider.H>
-#include <sstream>
+#include <sb/SBScene.h>
+#include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sbm/lin_win.h>
 
@@ -52,9 +53,8 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 	faceViewer->bottomGroup->clear();
 
 	int curY = faceViewer->bottomGroup->y() + 25;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	const Fl_Menu_Item* menu = faceViewer->choiceCharacters->menu();
-	SbmCharacter* character = mcu.getCharacter(menu[faceViewer->choiceCharacters->value()].label());
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(menu[faceViewer->choiceCharacters->value()].label());
 	if (character)
 	{	
 		int startIndex = character->viseme_channel_start_pos;
@@ -113,14 +113,11 @@ void FaceViewer::RefreshCB(Fl_Widget* widget, void* data)
 
 	faceViewer->choiceCharacters->clear();
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
+	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (size_t i = 0; i < charNames.size(); i++)
 	{
-		SbmCharacter* character = (*iter).second;
-		faceViewer->choiceCharacters->add(character->getName().c_str());
+		const std::string & charName = charNames[i];
+		faceViewer->choiceCharacters->add(charName.c_str());
 	}
 }
 
@@ -128,9 +125,8 @@ void FaceViewer::ResetCB(Fl_Widget* widget, void* data)
 {
 	FaceViewer* faceViewer = (FaceViewer*) data;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	const Fl_Menu_Item* menu = faceViewer->choiceCharacters->menu();
-	SbmCharacter* character = mcu.getCharacter(menu[faceViewer->choiceCharacters->value()].label());
+	SbmCharacter* character = SmartBody::SBScene::getScene()->getCharacter(menu[faceViewer->choiceCharacters->value()].label());
 	if (character)
 	{
 		int numSliders = faceViewer->bottomGroup->children();
@@ -140,15 +136,16 @@ void FaceViewer::ResetCB(Fl_Widget* widget, void* data)
 			if (slider)
 			{
 				slider->value(0);
-				std::stringstream strstr;
 				std::string name = slider->label();
-				strstr << "char " << faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label() << " viseme " << name << " " << slider->value();
-				if (!mcu._scene->isRemoteMode())
-					mcu.execute((char*) strstr.str().c_str());
+				std::string message = vhcl::Format("char %s viseme %s %f", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label(), name.c_str(), slider->value());
+				if (!SmartBody::SBScene::getScene()->isRemoteMode())
+				{
+					SmartBody::SBScene::getScene()->command(message);
+				}
 				else
 				{
-					std::string sendStr = "send sbm " + strstr.str();
-					mcu.execute((char*) sendStr.c_str());
+					std::string sendStr = "send sbm " + message;
+					SmartBody::SBScene::getScene()->command(sendStr);
 				}
 			}
 
@@ -161,9 +158,8 @@ void FaceViewer::ShowCommandsCB(Fl_Widget* widget, void* data)
 {
 	FaceViewer* faceViewer = (FaceViewer*) data;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	const Fl_Menu_Item* menu = faceViewer->choiceCharacters->menu();
-	SbmCharacter* character = mcu.getCharacter(menu[faceViewer->choiceCharacters->value()].label());
+	SbmCharacter* character = SmartBody::SBScene::getScene()->getCharacter(menu[faceViewer->choiceCharacters->value()].label());
 	if (character)
 	{
 		SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
@@ -194,16 +190,16 @@ void FaceViewer::FaceCB(Fl_Widget* widget, void* data)
 	if (!slider)
 		return;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::stringstream strstr;
 	std::string name = slider->label();
-	strstr << "char " << faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label() << " viseme " << name << " " << slider->value();
-	if (!mcu._scene->isRemoteMode())
-		mcu.execute((char*) strstr.str().c_str());
+	std::string message = vhcl::Format("char %s viseme %s %f", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label(), name.c_str(), slider->value());
+	if (!SmartBody::SBScene::getScene()->isRemoteMode())
+	{
+		SmartBody::SBScene::getScene()->command(message);
+	}
 	else
 	{
-		std::string sendStr = "send sbm " + strstr.str();
-		mcu.execute((char*) sendStr.c_str());
+		std::string sendStr = "send sbm " + message;
+		SmartBody::SBScene::getScene()->command(sendStr);
 	}
 }
 
@@ -224,28 +220,26 @@ void FaceViewer::FaceWeightCB(Fl_Widget* widget, void* data)
 		visemeName = labelName.substr(0, pos);
 	}
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::stringstream strstr;
-	strstr << "char " << faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label()  << " " << " visemeweight " << visemeName  << " " << weightSlider->value();
-	if (!mcu._scene->isRemoteMode())
-		mcu.execute((char*) strstr.str().c_str());
+	std::string message = vhcl::Format("char %s visemeweight %s %f", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label(), visemeName.c_str(), weightSlider->value());
+	if (!SmartBody::SBScene::getScene()->isRemoteMode())
+	{
+		SmartBody::SBScene::getScene()->command(message);
+	}
 	else
 	{
-		std::string sendStr = "send sbm " + strstr.str();
-		mcu.execute((char*) sendStr.c_str());
+		std::string sendStr = "send sbm " + message;
+		SmartBody::SBScene::getScene()->command(sendStr);
 	}
 }
 
 
 void FaceViewer::show_viewer()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	show();
 }
 
 void FaceViewer::hide_viewer()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	hide();
 }
 
@@ -264,5 +258,3 @@ FaceViewerFactory::FaceViewerFactory()
 {
 
 }
-
-
