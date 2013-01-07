@@ -10,10 +10,12 @@
 #include "bml_xml_consts.hpp"
 #include <sb/SBGestureMap.h>
 #include <sb/SBGestureMapManager.h>
+#include <sb/SBSteerManager.h>
+#include <sb/SBSteerAgent.h>
 #include <sb/SBBehavior.h>
-#include <sbm/SteeringAgent.h>
 #include <controllers/me_ct_motion.h>
 #include <controllers/me_ct_scheduler2.h>
+#include <sbm/PPRAISteeringAgent.h>
 
 using namespace std;
 using namespace BML;
@@ -158,7 +160,9 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		//motionCt->init(const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0);
 		SmartBody::SBCharacter* sbCharacter = dynamic_cast<SmartBody::SBCharacter*>(request->actor);
 		bool isInLocomotion = false;
-		if (sbCharacter->steeringAgent)
+		SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+		SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(request->actor->getName());
+		if (steerAgent)
 		{
 			for (size_t i = 0; i < request->behaviors.size(); ++i)
 			{
@@ -168,7 +172,8 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 					break;
 				}
 			}
-			if (sbCharacter->steeringAgent->isInLocomotion())
+			PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+			if (ppraiAgent->isInLocomotion())
 				isInLocomotion = true;
 		}
 		if (isInLocomotion)

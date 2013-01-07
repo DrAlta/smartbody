@@ -29,7 +29,7 @@
 #include <xercesc/util/XMLStringTokenizer.hpp>
 #include <controllers/me_ct_channel_writer.hpp>
 #include <controllers/me_ct_param_animation.h>
-#include <sbm/SteeringAgent.h>
+#include <sbm/PPRAISteeringAgent.h>
 
 #include "bml_locomotion.hpp"
 #include "bml_event.hpp"
@@ -115,12 +115,16 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
 	}
 	std::stringstream command;
+	SmartBody::SBSteerManager* manager = SmartBody::SBScene::getScene()->getSteerManager();
+	SmartBody::SBSteerAgent* steerAgent = manager->getSteerAgent(request->actor->getName());
 	SbmCharacter* c = mcu->getCharacter(request->actor->getName());
-	if (!c->steeringAgent)
+	if (!steerAgent)
 	{
 		LOG("Steering Agent not attached. Check initialization");
 		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));	
 	}
+
+	PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
 
 	// Enable/disable locomotion controller
 	attrEnable = elem->getAttribute( BMLDefs::ATTR_ENABLE );
@@ -132,11 +136,11 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		}
 		else if( XMLString::compareIString( attrEnable, BMLDefs::ATTR_FALSE )==0 )
 		{
-			c->steeringAgent->locomotionHalt();
+			ppraiAgent->locomotionHalt();
 		}
 	}
 
-	c->steeringAgent->steppingMode = false;
+	ppraiAgent->steppingMode = false;
 	bool stepMode = false;
 	bool stepTargetMode = false;
 	std::string stepDirection = "";
@@ -147,11 +151,11 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	std::string locotype = xml_parse_string(BMLDefs::ATTR_TYPE, elem);
 	std::string steerTypeCommand = "steer type " + locotype;
 	mcu->execute((char*) steerTypeCommand.c_str());
-	float proximity = xml_parse_float(BMLDefs::ATTR_PROXIMITY, elem, c->steeringAgent->distThreshold);
-	c->steeringAgent->distThreshold = proximity;
-	c->steeringAgent->acceleration = xml_parse_float(BMLDefs::ATTR_STEERACCEL, elem, c->steeringAgent->acceleration);
-	c->steeringAgent->scootAcceleration = xml_parse_float(BMLDefs::ATTR_STEERSCOOTACCEL, elem, c->steeringAgent->scootAcceleration);
-	c->steeringAgent->angleAcceleration = xml_parse_float(BMLDefs::ATTR_STEERANGLEACCEL, elem, c->steeringAgent->angleAcceleration);
+	float proximity = xml_parse_float(BMLDefs::ATTR_PROXIMITY, elem, ppraiAgent->distThreshold);
+	ppraiAgent->distThreshold = proximity;
+	ppraiAgent->acceleration = xml_parse_float(BMLDefs::ATTR_STEERACCEL, elem, ppraiAgent->acceleration);
+	ppraiAgent->scootAcceleration = xml_parse_float(BMLDefs::ATTR_STEERSCOOTACCEL, elem, ppraiAgent->scootAcceleration);
+	ppraiAgent->angleAcceleration = xml_parse_float(BMLDefs::ATTR_STEERANGLEACCEL, elem, ppraiAgent->angleAcceleration);
 
 
 	float speed = xml_parse_float( BMLDefs::ATTR_SPEED, elem, -1.0f );
@@ -163,13 +167,13 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 	if (speed > 0.0f)
 	{
-		c->steeringAgent->desiredSpeed = speed;
+		ppraiAgent->desiredSpeed = speed;
 		//c->setDoubleAttribute("steering.pathMaxSpeed",(double)speed);
-		c->steeringAgent->currentTargetSpeed = speed;
+		ppraiAgent->currentTargetSpeed = speed;
 	}
 	else
 	{
-		c->steeringAgent->currentTargetSpeed = (float)c->getDoubleAttribute("steering.pathMaxSpeed");
+		ppraiAgent->currentTargetSpeed = (float)c->getDoubleAttribute("steering.pathMaxSpeed");
 	}
 
 	if (manner != "")
@@ -183,21 +187,21 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 		if (manner == "walk" && speed <= 0.0f)
 		{
-			c->steeringAgent->desiredSpeed = 1.2f;			
+			ppraiAgent->desiredSpeed = 1.2f;			
 			//c->setDoubleAttribute("steering.pathMaxSpeed",1.2);
-			c->steeringAgent->currentTargetSpeed = 1.2f;
+			ppraiAgent->currentTargetSpeed = 1.2f;
 		}
 		else if (manner == "jog" && speed <= 0.0f)
 		{
-			c->steeringAgent->desiredSpeed = 2.5f;
+			ppraiAgent->desiredSpeed = 2.5f;
 			//c->setDoubleAttribute("steering.pathMaxSpeed",2.5);
-			c->steeringAgent->currentTargetSpeed = 2.5f;
+			ppraiAgent->currentTargetSpeed = 2.5f;
 		}
 		else if (manner == "run" && speed <= 0.0f)
 		{
-			c->steeringAgent->desiredSpeed = 3.5f;
+			ppraiAgent->desiredSpeed = 3.5f;
 			//c->setDoubleAttribute("steering.pathMaxSpeed",3.5);
-			c->steeringAgent->currentTargetSpeed = 3.5f;
+			ppraiAgent->currentTargetSpeed = 3.5f;
 		}
 		else if (manner == "sbm:step")
 			stepMode = true;
@@ -205,17 +209,17 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		{
 			if (c->param_animation_ct)
 			{
-				if (c->param_animation_ct->hasPABlend(c->steeringAgent->jumpName))
+				if (c->param_animation_ct->hasPABlend(ppraiAgent->jumpName))
 					return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
 				std::stringstream command1;
-				if (c->param_animation_ct->getCurrentPABlendData()->state->stateName == c->steeringAgent->locomotionName)
+				if (c->param_animation_ct->getCurrentPABlendData()->state->stateName == ppraiAgent->locomotionName)
 				{
-					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"" << c->steeringAgent->jumpName << "\" sbm:startnow=\"true\"/>";
-					command1 << "<sbm:states loop=\"true\" name=\"" << c->steeringAgent->locomotionName << "\" sbm:startnow=\"false\"/>";
+					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"" << ppraiAgent->jumpName << "\" sbm:startnow=\"true\"/>";
+					command1 << "<sbm:states loop=\"true\" name=\"" << ppraiAgent->locomotionName << "\" sbm:startnow=\"false\"/>";
 				}
 				else
 				{
-					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"" << c->steeringAgent->jumpName << "\" sbm:startnow=\"true\"/>";
+					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"" << ppraiAgent->jumpName << "\" sbm:startnow=\"true\"/>";
 				}
 				mcu->execute((char*)command1.str().c_str());
 				return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
@@ -292,7 +296,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	}
 	std::string following = xml_parse_string(BMLDefs::ATTR_FOLLOW, elem);
 	SbmCharacter* followingC = mcu->getCharacter(following);
-	c->steeringAgent->setTargetAgent(followingC);
+	ppraiAgent->setTargetAgent(followingC);
 
 	// parsing target
 	std::string targetString = xml_parse_string(BMLDefs::ATTR_TARGET, elem);
@@ -382,14 +386,14 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			LOG("Parameterized Animation Engine not setup, cannot use step control.");
 			return BehaviorRequestPtr();
 		}
-		if (c->param_animation_ct->hasPABlend(c->steeringAgent->stepStateName) || !c->param_animation_ct->isIdle())
+		if (c->param_animation_ct->hasPABlend(ppraiAgent->stepStateName) || !c->param_animation_ct->isIdle())
 			return BehaviorRequestPtr();
-		c->steeringAgent->stepAdjust = false;
+		ppraiAgent->stepAdjust = false;
 		if (stepTargetMode)		// given target
 		{
-			c->steeringAgent->steppingMode = true;
-			c->steeringAgent->stepTargetX = stepTargetX;
-			c->steeringAgent->stepTargetZ = stepTargetZ;
+			ppraiAgent->steppingMode = true;
+			ppraiAgent->stepTargetX = stepTargetX;
+			ppraiAgent->stepTargetZ = stepTargetZ;
 		}
 		else					// given direction and number of steps
 		{
@@ -397,7 +401,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			{
 				std::stringstream command1;
 				command1 << "panim schedule char " << c->getName();
-				command1 << " state " << c->steeringAgent->stepStateName << " loop false playnow false ";
+				command1 << " state " << ppraiAgent->stepStateName << " loop false playnow false ";
 				if (stepDirection == "forward")
 					command1 << "0 0 1 0 0 0 0";
 				if (stepDirection == "backward")

@@ -7,8 +7,11 @@
 #include "bml/bml_types.hpp"
 #include "bml/bml_speech.hpp"
 #include "sb/SBBehavior.h"
+#include <sbm/PPRAISteeringAgent.h>
 #include <sb/SBSteerAgent.h>
 #include <sb/SBPhysicsManager.h>
+#include <sb/SBSteerManager.h>
+#include <sb/SBSteerAgent.h>
 #include <sb/SBPhoneme.h>
 #include <sb/SBPhonemeManager.h>
 #include <controllers/me_ct_motion_recorder.h>
@@ -467,9 +470,12 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 	}
 
 	// locomotion
-	if (this->steeringAgent)
+	SmartBody::SBSteerManager* manager = SmartBody::SBScene::getScene()->getSteerManager();
+	SmartBody::SBSteerAgent* steerAgent = manager->getSteerAgent(this->getName());
+	if (steerAgent)
 	{
-		const SteerLib::AgentGoalInfo& goal = this->steeringAgent->getAgent()->currentGoal();
+		PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+		const SteerLib::AgentGoalInfo& goal = ppraiAgent->getAgent()->currentGoal();
 		Util::Point goalTarget = goal.targetLocation;
 		LocomotionBehavior* locoBehavior = new LocomotionBehavior();
 		SrVec target(goalTarget.x, 0.f, goalTarget.z);
@@ -522,11 +528,6 @@ SBFaceDefinition* SBCharacter::getFaceDefinition()
 void SBCharacter::setFaceDefinition(SBFaceDefinition* face)
 {
 	SbmCharacter::setFaceDefinition(face);
-}
-
-void SBCharacter::setSteerAgent(SBSteerAgent* sbAgent)
-{
-	sbAgent->setCurrentSBCharacter(this);
 }
 
 void SBCharacter::notify(SBSubject* subject)
@@ -613,8 +614,13 @@ void SBCharacter::notify(SBSubject* subject)
 		if (attrName.find("steering.") == 0)
 		{
 			// update the steering params on the next evaluation cycle
-			if (steeringAgent)
-				steeringAgent->setSteerParamsDirty(true);
+			SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+			SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(getName());
+			if (steerAgent)
+			{
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+				ppraiAgent->setSteerParamsDirty(true);
+			}
 		}
 	}
 

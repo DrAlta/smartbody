@@ -271,6 +271,7 @@
     <ClCompile Include="..\src\sbm\resource_cmds.cpp" />
     <ClCompile Include="..\src\sbm\ResourceManager.cpp" />
     <ClCompile Include="..\src\sbm\sbm_speech_impl_skeleton.cpp" />
+    <ClCompile Include="..\src\sbm\PPRAISteeringAgent.cpp" />
     <ClCompile Include="..\src\sb\MiniBrain.cpp" />
     <ClCompile Include="..\src\sb\nvbg.cpp" />
     <ClCompile Include="..\src\sb\SBAnimationTransitionRule.cpp" />
@@ -305,7 +306,6 @@
     <ClCompile Include="..\src\sbm\GPU\SbmTexture.cpp" />
     <ClCompile Include="..\src\sbm\GPU\TBOData.cpp" />
     <ClCompile Include="..\src\sbm\GPU\VBOData.cpp" />
-    <ClCompile Include="..\src\sbm\SteeringAgent.cpp" />
     <ClCompile Include="..\src\sbm\SteerSuiteEnginerDriver.cpp" />
     <ClCompile Include="..\src\controllers\me_controller.cpp" />
     <ClCompile Include="..\src\controllers\me_controller_context.cpp" />
@@ -724,6 +724,7 @@
     <ClInclude Include="..\src\sbm\sbm_speech_audiofile.hpp" />
     <ClInclude Include="..\src\sbm\sbm_speech_impl_skeleton.hpp" />
     <ClInclude Include="..\src\sbm\sbm_test_cmds.hpp" />
+    <ClInclude Include="..\src\sbm\PPRAISteeringAgent.h" />
     <ClInclude Include="..\src\sb\MiniBrain.h" />
     <ClInclude Include="..\src\sb\nvbg.h" />
     <ClInclude Include="..\src\sb\SBAnimationTransitionRule.h" />
@@ -760,7 +761,6 @@
     <ClInclude Include="..\src\sbm\GPU\gfx\vec2.h" />
     <ClInclude Include="..\src\sbm\GPU\gfx\vec3.h" />
     <ClInclude Include="..\src\sbm\GPU\gfx\vec4.h" />
-    <ClInclude Include="..\src\sbm\SteeringAgent.h" />
     <ClInclude Include="..\src\sbm\SteerSuiteEngineDriver.h" />
     <ClInclude Include="..\src\controllers\me_controller.h" />
     <ClInclude Include="..\src\controllers\me_controller_context.hpp" />

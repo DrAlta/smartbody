@@ -4,12 +4,16 @@
 #include <sb/SBCharacter.h>
 #include <PPRAgent.h>
 #include <sb/SBSteerAgent.h>
+#include <sbm/PPRAISteeringAgent.h>
+#include <sbm/SteerSuiteEngineDriver.h>
+#include <SteerLib.h>
 
 namespace SmartBody {
 
 SBSteerManager::SBSteerManager() : SBService()
 {
 	setName("steering");
+	_driver = new SteerSuiteEngineDriver();
 #ifdef WIN32
 			createStringAttribute("aimodule", "pprAI", true, "Basic", 60, false, false, false, "Agent module library");
 #endif
@@ -42,12 +46,14 @@ SBSteerManager::~SBSteerManager()
 	}
 	_steerAgents.clear();
 
+	delete _driver;
+
 	// TODO: boundaryObstacles
 }
 
 SteerSuiteEngineDriver* SBSteerManager::getEngineDriver()
 {
-	return &_driver;
+	return _driver;
 }
 
 void SBSteerManager::setEnable(bool enable)
@@ -96,8 +102,9 @@ void SBSteerManager::update(double time)
 					iter++)
 				{
 					SbmCharacter* character = (*iter).second;
-					if (character->steeringAgent)
-						character->steeringAgent->evaluate(timeDiff);
+					SmartBody::SBSteerAgent* steerAgent = getSteerAgent(character->getName());
+					if (steerAgent)
+						steerAgent->evaluate(timeDiff);
 				}
 
 				bool running = getEngineDriver()->_engine->update(false, true, (float) (mcu.time - getEngineDriver()->getStartTime()));
@@ -204,8 +211,9 @@ void SBSteerManager::start()
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-
-		if (!character->steeringAgent)
+		SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+		SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+		if (!steerAgent)
 		{
 			LOG("No steering agent for character %s", character->getName().c_str());
 			continue;
@@ -226,8 +234,9 @@ void SBSteerManager::start()
 		initialConditions.speed = 0.0f;
 		initialConditions.goals.clear();
 		initialConditions.name = character->getName();		
-		SteerLib::AgentInterface* agent = mcu._scene->getSteerManager()->getEngineDriver()->_engine->createAgent( initialConditions, pprAIModule );					
-		character->steeringAgent->setAgent(agent);
+		SteerLib::AgentInterface* agent = mcu._scene->getSteerManager()->getEngineDriver()->_engine->createAgent( initialConditions, pprAIModule );			
+		PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+		ppraiAgent->setAgent(agent);
 		agent->reset(initialConditions, dynamic_cast<SteerLib::EngineInterface*>(pprAIModule));
 		LOG("Setting up steering agent for character %s", character->getName().c_str());
 		numSetup++;
@@ -290,8 +299,14 @@ void SBSteerManager::stop()
 			iter != mcu.getCharacterMap().end();
 			iter++)
 		{
-			if ((*iter).second->steeringAgent)
-				(*iter).second->steeringAgent->setAgent(NULL);
+			SmartBody::SBSteerAgent* steerAgent = getSteerAgent((*iter).second->getName());
+		
+			if (steerAgent)
+			{
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+				ppraiAgent->setAgent(NULL);
+			}
+				
 		}
 
 		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
@@ -317,13 +332,20 @@ void SBSteerManager::stop()
 
 SBSteerAgent* SBSteerManager::createSteerAgent(std::string name)
 {
-	SBSteerAgent* agent = new SBSteerAgent();
+	
 	std::map<std::string, SBSteerAgent*>::iterator iter = _steerAgents.find(name);
 	if (iter != _steerAgents.end())
 	{
 		LOG("Steer agent with name %s already exists.", name.c_str());
 		return iter->second;
 	}
+	SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
+	if (!character)
+	{
+		LOG("Character named '%s' does not exist, steering agent cannot be constructed.", name.c_str());
+		return NULL;
+	}
+	SBSteerAgent* agent = new PPRAISteeringAgent(character);
 	_steerAgents.insert(std::pair<std::string, SBSteerAgent*>(name, agent));
 	return agent;
 }

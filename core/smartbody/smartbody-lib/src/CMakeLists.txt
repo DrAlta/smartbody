@@ -320,7 +320,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/GPU/TBOData.cpp
 	sbm/GPU/VBOData.cpp
 	sbm/GPU/SbmShader.cpp
-	sbm/SteeringAgent.cpp
+	sbm/PPRAISteeringAgent.cpp
 	sbm/SteerSuiteEnginerDriver.cpp
 	sbm/sr_path_list.cpp
 

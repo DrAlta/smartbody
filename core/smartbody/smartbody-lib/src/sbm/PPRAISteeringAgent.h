@@ -21,24 +21,31 @@
  */
 
 
-#ifndef _STEERINGAGENT_H_
-#define _STEERINGAGENT_H_
+#ifndef _PPRAISteeringAgent_H_
+#define _PPRAISteeringAgent_H_
 
-#include <sb/sbm_character.hpp>
-#include <sbm/SteerSuiteEngineDriver.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBSteerAgent.h>
 #include <sbm/SteerPath.h>
+#include <sbm/SteerSuiteEngineDriver.h>
 
-class SteeringAgent
+class SbmCharacter;
+
+class PPRAISteeringAgent : public SmartBody::SBSteerAgent
 {
 	public:
-		SteeringAgent(SbmCharacter* c);
-		~SteeringAgent();
+		enum SteeringStateConfig { MINIMAL = 0, STANDARD};
+		
+		PPRAISteeringAgent(SmartBody::SBCharacter* c);
+		~PPRAISteeringAgent();
 
+		void setCharacter(SbmCharacter* c);
 		void evaluate(double dt);
+
 		void setAgent(SteerLib::AgentInterface* a);
 		SteerLib::AgentInterface* getAgent();
-		void setCharacter(SbmCharacter* c);
-		SbmCharacter* getCharacter();
+		
+		
 		void setTargetAgent(SbmCharacter* tChar);
 		SbmCharacter* getTargetAgent();
 		void startParameterTesting();
@@ -53,6 +60,8 @@ class SteeringAgent
 
 		bool isInLocomotion();		// include starting moving and ending
 		bool isHittingOnTarget();	// is sending out reaching target signal (one time)
+
+		SteeringStateConfig steeringConfig;
 
 	private:
 		void normalizeAngle(float& angle);
@@ -75,6 +84,9 @@ class SteeringAgent
 		SrVec getCollisionFreeGoal(SrVec target, SrVec curPos);
 
 	private:
+		
+		int	_numSteeringGoal;
+		
 		SteerLib::AgentInterface* agent;
 		SbmCharacter* character;
 		SbmCharacter* target;

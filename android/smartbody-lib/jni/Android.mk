@@ -430,7 +430,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/Physics/SBColObject.cpp \
 	$(SBM_MY_DIR)/sbm/Physics/SBPhysicsSim.cpp \
 	$(SBM_MY_DIR)/sbm/Physics/SBPhysicsSimODE.cpp \
-	$(SBM_MY_DIR)/sbm/SteeringAgent.cpp \
+	$(SBM_MY_DIR)/sbm/PPRAISteeringAgent.cpp \
 	$(SBM_MY_DIR)/sbm/SteerSuiteEnginerDriver.cpp \
 	$(SBM_MY_DIR)/sb/sbm_character.cpp \
 	$(SBM_MY_DIR)/sb/sbm_pawn.cpp \	

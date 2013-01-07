@@ -1773,7 +1773,6 @@ std::string SBScene::save(bool remoteSetup)
 			strstr << "steeragent = scene.getSteerManager().createSteerAgent(\"" << character->getName() << "\")\n";
 			strstr << "steeragent.setSteerStateNamePrefix(\"" << steerAgent->getSteerStateNamePrefix() << "\")\n";
 			strstr << "steeragent.setSteerType(\"" << steerAgent->getSteerType() << "\")\n";
-			strstr << "obj.setSteerAgent(steeragent)\n";
 		}
 		else
 		{

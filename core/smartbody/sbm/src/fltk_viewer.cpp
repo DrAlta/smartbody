@@ -92,6 +92,7 @@
 #include "jointmapviewer/JointMapViewer.h"
 #include "jointmapviewer/RetargetStepWindow.h"
 #include <sbm/mcontrol_util.h>
+#include <sbm/PPRAISteeringAgent.h>
 
 //#include <sbm/SbmShader.h>
 
@@ -2492,9 +2493,11 @@ int FltkViewer::handle ( int event )
 		 {
 			 if (_paLocoData->character)
 			 {
-				 if (_paLocoData->character->steeringAgent)
+				 SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(_paLocoData->character->getName());
+				 if (steerAgent)
 				 {
-					_paLocoData->character->steeringAgent->setTargetAgent(NULL);
+					 PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+					ppraiAgent->setTargetAgent(NULL);
 					SrVec p1;
 					SrVec p2;
 					_data->camera->get_ray(e.mouse.x, e.mouse.y, p1, p2);
@@ -2766,7 +2769,15 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 				{
 					SbmCharacter* selectedCharacter = dynamic_cast<SbmCharacter*> (selectedPawn);
 					if (selectedCharacter)
-						_paLocoData->character->steeringAgent->setTargetAgent(selectedCharacter);
+					{
+						SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(_paLocoData->character->getName());
+						if (steerAgent)
+						{
+							PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+							ppraiAgent->setTargetAgent(selectedCharacter);
+						}
+						
+					}
 				}
 		 }
 		return 1;
@@ -4294,22 +4305,23 @@ void FltkViewer::drawLocomotion()
 			glEnable(GL_LIGHTING);
 
 			glDisable(GL_LIGHTING);
-			float scale = (float)1.0/SmartBody::SBScene::getScene()->getScale(); // if it's in meter
-			if (character->steeringAgent)
+			float scale = (float)1.0/SmartBody::SBScene::getScene()->getScale(); // if it's in meters
+			SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(character->getName());
+			if (steerAgent)
 			{
-				SteeringAgent* agent = character->steeringAgent;
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
 
 				SrVec color1(0.1f, 0.3f, 1.0f);
-				SrVec steerDir = agent->curSteerPos + agent->curSteerDir * 0.5f*scale;
-				drawArrow(agent->curSteerPos, steerDir, 0.15f*scale, color1);
+				SrVec steerDir = ppraiAgent->curSteerPos + ppraiAgent->curSteerDir * 0.5f*scale;
+				drawArrow(ppraiAgent->curSteerPos, steerDir, 0.15f*scale, color1);
 
 				SrVec color2(0.f,1.f,0.f);
-				drawCircle(agent->nextSteerPos.x,agent->nextSteerPos.y,agent->nextSteerPos.z, 0.3f*scale, 72, color2);
-				SrVec nextSteerPos = agent->nextSteerPos + agent->nextSteerDir * 0.5*scale;
-				drawArrow(agent->nextSteerPos, nextSteerPos, 0.15f*scale, color2);
+				drawCircle(ppraiAgent->nextSteerPos.x,ppraiAgent->nextSteerPos.y,ppraiAgent->nextSteerPos.z, 0.3f*scale, 72, color2);
+				SrVec nextSteerPos = ppraiAgent->nextSteerPos + ppraiAgent->nextSteerDir * 0.5*scale;
+				drawArrow(ppraiAgent->nextSteerPos, nextSteerPos, 0.15f*scale, color2);
 
 				SrVec color3(1.f,0.f,0.f);
-				drawCircle(agent->nextPtOnPath.x, agent->nextPtOnPath.y, agent->nextPtOnPath.z, 0.3f*scale, 72, color3);											
+				drawCircle(ppraiAgent->nextPtOnPath.x, ppraiAgent->nextPtOnPath.y, ppraiAgent->nextPtOnPath.z, 0.3f*scale, 72, color3);											
 			}
 			glEnable(GL_LIGHTING);
 		}

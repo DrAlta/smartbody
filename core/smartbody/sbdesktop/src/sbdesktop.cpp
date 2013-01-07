@@ -57,6 +57,7 @@
 #include <sb/SBPython.h>
 #include <sb/SBSteerManager.h>
 #include <sbm/SteeringAgent.h>
+#include <sbm/PPRAISteeringAgent.h>
 #include "TransparentListener.h"
 #include "TransparentViewer.h"
 #include "sb/SBDebuggerServer.h"
@@ -182,7 +183,10 @@ int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		{
 			SbmCharacter* character = (*iter).second;
 			if (character->steeringAgent)
-				character->steeringAgent->setAgent(NULL);
+			{
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(character->steeringAgent);
+				ppraiAgent->setAgent(NULL);
+			}
 		}
 	}
 	return( CMD_SUCCESS );

@@ -3,10 +3,13 @@
 
 #include <sb/SBTypes.h>
 #include <vhcl.h>
-#include <SteerLib.h>
-
 #include <sb/SBService.h>
-#include <sbm/SteerSuiteEngineDriver.h>
+
+class SteerSuiteEngineDriver;
+namespace SteerLib
+{
+	class BoxObstacle;
+}
 
 namespace SmartBody {
 
@@ -40,7 +43,7 @@ class SBSteerManager : public SmartBody::SBService
 		std::map<std::string, SBSteerAgent*> _steerAgents;
 		std::vector<SteerLib::BoxObstacle*> _boundaryObstacles;
 
-		SteerSuiteEngineDriver _driver;
+		SteerSuiteEngineDriver* _driver;
 		double _maxUpdateFrequency;
 
 
