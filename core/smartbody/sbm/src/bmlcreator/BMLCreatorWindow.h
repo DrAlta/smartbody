@@ -2,7 +2,6 @@
 #define _BMLCREATORWINDOW_H_
 
 #include <FL/Fl_Menu_Item.H>
-#include "vhcl.h"
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Text_Editor.H>
