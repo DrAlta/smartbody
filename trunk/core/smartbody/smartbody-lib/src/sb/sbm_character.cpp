@@ -51,7 +51,6 @@
 #include "sbm/lin_win.h"
 #include "sbm/sbm_speech.hpp"
 #include "sbm/general_param_setting.h"
-#include <sbm/SteeringAgent.h>
 #include <sbm/PPRAISteeringAgent.h>
 #include <boost/filesystem/operations.hpp>
 #include <sb/SBSkeleton.h>
