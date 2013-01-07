@@ -11,7 +11,7 @@
 
 #include <sr/planner/sk_pos_planner.h>
 #include <sr/planner/sk_blend_planner.h>
-#include <sbm/Physics/SBColObject.h>
+#include <sb/SBColObject.h>
 #include <sb/sbm_pawn.hpp>
 
 #include <controllers/MeCtReachEngine.h>

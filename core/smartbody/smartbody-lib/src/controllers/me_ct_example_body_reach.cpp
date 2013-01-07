@@ -13,6 +13,7 @@
 #include "MeCtBodyReachState.h"
 #include <sb/SBSteerManager.h>
 #include <controllers/me_ct_example_body_reach.hpp>
+#include <sbm/SteerSuiteEngineDriver.h>
 
 
 using namespace boost;

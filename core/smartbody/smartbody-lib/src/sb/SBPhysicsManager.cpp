@@ -4,8 +4,8 @@
 #endif
 #include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
-#include <sbm/Physics/SBPhysicsSim.h>
-#include <sbm/Physics/SBPhysicsSimODE.h>
+#include <sb/SBPhysicsSim.h>
+#include <sbm/ODEPhysicsSim.h>
 
 #ifdef __ANDROID__
 #define USE_PHYSICS_CHARACTER 0

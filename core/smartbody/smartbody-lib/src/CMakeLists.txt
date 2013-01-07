@@ -310,10 +310,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/time_regulator.cpp
 	sbm/xercesc_utils.cpp
 	
-	sbm/Physics/SBColObject.cpp
-	sbm/Physics/SBColObject.cpp
-	sbm/Physics/SBPhysicsSim.cpp
-	sbm/Physics/SBPhysicsSimODE.cpp
+	
+	sbm/ODEPhysicsSim.cpp
 
 	sbm/GPU/SbmTexture.cpp
 	sbm/GPU/SbmDeformableMeshGPU.cpp
@@ -374,6 +372,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBMotionBlendBase.cpp
 	sb/nvbg.cpp
 	sb/MiniBrain.cpp
+	sb/SBColObject.cpp
+	sb/SBPhysicsSim.cpp
 
 	sb/SBPython.cpp
 	sb/SBPythonClass.cpp

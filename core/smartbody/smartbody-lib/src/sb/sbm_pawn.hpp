@@ -27,10 +27,8 @@
 
 #include <sk/sk_scene.h>
 #include <sk/sk_skeleton.h>
-#include <sbm/Physics/SBColObject.h>
-#include <sbm/SteerSuiteEngineDriver.h>
-
-
+#include <sb/SBColObject.h>
+#include <sb/SBPhysicsSim.h>
 #include <sb/SBObject.h>
 #include <SteerLib.h>
 
@@ -42,7 +40,7 @@
 
 #include <map>
 
-#include "sbm/Physics/SBPhysicsSim.h"
+
 // Declare classes used (avoid circular references)
 class srArgBuffer;
 

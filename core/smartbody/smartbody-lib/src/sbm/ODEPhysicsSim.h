@@ -3,7 +3,7 @@
 
 #include <ode/ode.h>
 #include <ode/common.h>
-#include "SBPhysicsSim.h"
+#include <sb/SBPhysicsSim.h>
 
 class ODEObj
 {

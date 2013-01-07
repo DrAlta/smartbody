@@ -1,10 +1,11 @@
 #ifndef _SBCOLLISIONMANAGER_H_
 #define _SBCOLLISIONMANAGER_H_
 
+#include <vhcl.h>
 #include <sb/SBTypes.h>
 #include <sb/SBService.h>
 #include <sb/SBSubject.h>
-#include <sbm/Physics/SBColObject.h>
+#include <sb/SBColObject.h>
 #include <sk/sk_joint.h>
 
 namespace SmartBody {

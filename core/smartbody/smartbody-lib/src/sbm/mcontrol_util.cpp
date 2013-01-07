@@ -96,7 +96,7 @@
 
 
 #include "sbm_deformable_mesh.h"
-#include "sbm/Physics/SBPhysicsSimODE.h"
+#include <sbm/ODEPhysicsSim.h>
 #include <sbm/locomotion_cmds.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <sb/SBBoneBusManager.h>

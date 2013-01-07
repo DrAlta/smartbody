@@ -427,9 +427,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/time_profiler.cpp \
 	$(SBM_MY_DIR)/sbm/time_regulator.cpp \
 	$(SBM_MY_DIR)/sbm/xercesc_utils.cpp \
-	$(SBM_MY_DIR)/sbm/Physics/SBColObject.cpp \
-	$(SBM_MY_DIR)/sbm/Physics/SBPhysicsSim.cpp \
-	$(SBM_MY_DIR)/sbm/Physics/SBPhysicsSimODE.cpp \
+	$(SBM_MY_DIR)/sbm/ODEPhysicsSim.cpp \
 	$(SBM_MY_DIR)/sbm/PPRAISteeringAgent.cpp \
 	$(SBM_MY_DIR)/sbm/SteerSuiteEnginerDriver.cpp \
 	$(SBM_MY_DIR)/sb/sbm_character.cpp \
@@ -490,7 +488,9 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBBehaviorSet.cpp \
 	$(SBM_MY_DIR)/sb/SBBehaviorSetManager.cpp \
 	$(SBM_MY_DIR)/sbm/action_unit.cpp \
-	$(SBM_MY_DIR)/sbm/MiscCommands.cpp
+	$(SBM_MY_DIR)/sbm/MiscCommands.cpp \
+	$(SBM_MY_DIR)/sb/SBColObject.cpp \
+	$(SBM_MY_DIR)/sb/SBPhysicsSim.cpp \
 	
 	
 LOCAL_LDLIBS    := -llog 

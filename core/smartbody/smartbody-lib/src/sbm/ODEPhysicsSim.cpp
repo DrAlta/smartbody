@@ -1,4 +1,4 @@
-#include "SBPhysicsSimODE.h"
+#include "ODEPhysicsSim.h"
 #include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
 #include <sb/SBCollisionManager.h>
