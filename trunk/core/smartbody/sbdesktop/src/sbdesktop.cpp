@@ -56,7 +56,6 @@
 //#include "SBMWindow.h"
 #include <sb/SBPython.h>
 #include <sb/SBSteerManager.h>
-#include <sbm/SteeringAgent.h>
 #include <sbm/PPRAISteeringAgent.h>
 #include "TransparentListener.h"
 #include "TransparentViewer.h"
@@ -182,9 +181,10 @@ int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			iter++)
 		{
 			SbmCharacter* character = (*iter).second;
-			if (character->steeringAgent)
+			SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(character->getName());
+			if (steerAgent)
 			{
-				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(character->steeringAgent);
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
 				ppraiAgent->setAgent(NULL);
 			}
 		}
