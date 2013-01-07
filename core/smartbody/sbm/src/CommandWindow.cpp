@@ -39,20 +39,22 @@ that is distributed: */
 		Paco Abad (fjabad@dsic.upv.es)
 **********************************************************/
 
+#include "vhcl.h"
 #include "CommandWindow.h"
 #include <vector>
-
-#include <sys/stat.h> 
-#include <sys/types.h>
 #include <iostream>
-#include <sbm/mcontrol_util.h>
-#include <boost/algorithm/string/replace.hpp>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <FL/Fl.H>
+#include <boost/algorithm/string/replace.hpp>
+#include <sb/SBScene.h>
 
 
-using namespace std;
+using std::string;
+
 
 void updateDisplay(int pos, int nInserted, int nDeleted,int b, const char* d, void* v);
+
 
 //creating FLTK multiline editor to connect to the interpreter
 CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, s)
@@ -189,7 +191,7 @@ void CommandWindow::entercb(int key, Fl_Text_Editor* editor)
 	CommandWindow* commandWindow =  CommandWindow::getCommandWindow(editor);
 
 	Fl_Text_Buffer* tempBuffer = editor->buffer();
-	char* c = (char*) tempBuffer->text();
+	char* c = tempBuffer->text();
 	int len = (int) strlen(c);
 
 	string str = "-> ";
@@ -205,23 +207,27 @@ void CommandWindow::entercb(int key, Fl_Text_Editor* editor)
 	if (editor == commandWindow->textEditor[1])
 	{
 		if (!sbScene->isRemoteMode())
-			mcuCBHandle::singleton().executePython(c);
+		{
+			sbScene->run(c);
+		}
 		else
 		{
 			string sendStr = "send sbm python ";
 			sendStr.append(c);
-			mcuCBHandle::singleton().execute((char*)sendStr.c_str());
+			sbScene->command(sendStr);
 		}
 	}
 	else
 	{
 		if (!sbScene->isRemoteMode())
-			mcuCBHandle::singleton().execute(c);
+		{
+			sbScene->command(c);
+		}
 		else
 		{
 			string sendStr = "send sbm ";
 			sendStr.append(c);
-			mcuCBHandle::singleton().execute((char*)sendStr.c_str());
+			sbScene->command(sendStr);
 		}
 	}
 

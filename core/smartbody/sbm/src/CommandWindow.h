@@ -44,7 +44,6 @@ that is distributed: */
 
 
 #include <FL/Fl_Slider.H>
-#include <vhcl.h>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Float_Input.H>
@@ -67,8 +66,6 @@ that is distributed: */
 #include <string>
 #include <vector>
 #include <sbm/GenericViewer.h>
-
-#define MAXHISTORYSIZE 10
 
 
 class CommandWindow : public GenericViewer, public Fl_Double_Window, public vhcl::Log::Listener
@@ -114,6 +111,8 @@ public:
 	static void FindFiles(char*, char*);
 
 private:
+	static const int MAXHISTORYSIZE = 10;
+
 	void freeHistorySpace(int index);
 
 	int historyCounter[2];	

@@ -8,7 +8,11 @@
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Tabs.H>
-#include <sk/sk_skeleton.h>
+
+
+namespace SmartBody { class SBSkeleton; }
+class SkJoint;
+
 
 class TreeItemInfoWidget : public Fl_Group
 {
@@ -26,7 +30,7 @@ class SkeletonItemInfoWidget : public TreeItemInfoWidget
 {
 protected:
 	Fl_Tree*    skeletonTree;
-	SkSkeleton* itemSkeleton;
+	SmartBody::SBSkeleton* itemSkeleton;
 	AttributeWindow* attrWindow;
 	TreeInfoObject*  jointInfoObject;
 	std::string      curJointName;
@@ -38,7 +42,7 @@ public:
 	void updateJointAttributes(std::string jointName);
 	static void treeCallBack(Fl_Widget* widget, void* data);
 protected:
-	void updateSkeletonTree(Fl_Tree_Item* root, SkSkeleton* skel);
+	void updateSkeletonTree(Fl_Tree_Item* root, SmartBody::SBSkeleton* skel);
 	void updateJointTree(Fl_Tree_Item* root, SkJoint* node);
 };
 

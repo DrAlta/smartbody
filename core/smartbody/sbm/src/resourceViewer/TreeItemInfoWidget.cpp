@@ -1,11 +1,20 @@
-#include <sbm/mcontrol_util.h>
-#include <FL/Fl_Float_Input.H>
+
+#include "vhcl.h"
 #include "TreeItemInfoWidget.h"
+
+#include <FL/Fl_Float_Input.H>
+#include <sb/SBScene.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBMotion.h>
+#include "sbm/Event.h"
+#include "sbm/mcontrol_util.h"
 #include "ResourceWindow.h"
-#include <channelbufferviewer/GlChartViewArchive.hpp>
-#include <sbm/Event.h>
+#include "channelbufferviewer/GlChartViewArchive.hpp"
+
 
 const int Pad = 10;
+
 
 /************************************************************************/
 /* Tree Item Info Widget                                                */
@@ -47,24 +56,26 @@ SkeletonItemInfoWidget::SkeletonItemInfoWidget( int x, int y, int w, int h, cons
 
 void SkeletonItemInfoWidget::updateWidget()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	skeletonTree->clear_children(skeletonTree->root());
 	if (!treeItem->label())
 		return;
-	SbmCharacter* sbmChar = mcu.getCharacter(charName);
+
+	SmartBody::SBCharacter* sbmChar = SmartBody::SBScene::getScene()->getCharacter(charName);
 	if (sbmChar)
 	{
 		itemSkeleton = sbmChar->getSkeleton();
 	}
 	else
 	{
-		std::string skelName = skeletonName;	
-		if (mcu.skeleton_map.find(skelName) == mcu.skeleton_map.end())
+		SmartBody::SBSkeleton * skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
+		if (!skeleton)
 			return; // skeleton is lost, no update
+
 		//LOG("skelName = %s\n",skelName.c_str());
-		itemSkeleton = mcu.skeleton_map[skelName];
-	}	
-	updateSkeletonTree(skeletonTree->root(),itemSkeleton);	
+		itemSkeleton = skeleton;
+	}
+
+	updateSkeletonTree(skeletonTree->root(), itemSkeleton);
 }
 
 void SkeletonItemInfoWidget::updateJointAttributes(std::string jointName)
@@ -111,7 +122,7 @@ void SkeletonItemInfoWidget::updateJointAttributes(std::string jointName)
 	this->redraw();
 }
 
-void SkeletonItemInfoWidget::updateSkeletonTree( Fl_Tree_Item* root, SkSkeleton* skel )
+void SkeletonItemInfoWidget::updateSkeletonTree( Fl_Tree_Item* root, SmartBody::SBSkeleton* skel )
 {
 	SkJoint* skelRoot = skel->root();	
 	if (!root)
@@ -121,7 +132,7 @@ void SkeletonItemInfoWidget::updateSkeletonTree( Fl_Tree_Item* root, SkSkeleton*
 	root->label(skelRoot->name().c_str());	
 	for (int i=0;i<skelRoot->num_children();i++)
 	{
-		updateJointTree(root,skelRoot->child(i));
+		updateJointTree(root, skelRoot->child(i));
 	}
 }
 
@@ -187,13 +198,12 @@ MotionItemInfoWidget::MotionItemInfoWidget( int x, int y, int w, int h, const ch
 
 void MotionItemInfoWidget::updateWidget()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	channelBrowser->clear();	
-	
-	if (mcu.motion_map.find(motionName) == mcu.motion_map.end())
-		return; 	
-	SkMotion* motion = mcu.motion_map[motionName];
-	frameSlider->bounds(1,motion->frames());
+	channelBrowser->clear();
+
+	SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(motionName);
+	if (!motion)
+		return;
+	frameSlider->bounds(1, motion->frames());
 	frameSlider->step(1.0);
 	motionFrame = 0;
 	channelIndex = -1;
@@ -229,11 +239,10 @@ void MotionItemInfoWidget::sliderCallBack( Fl_Widget* widget, void* data )
 }
 
 void MotionItemInfoWidget::updateChannelAttributes()
-{		
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.motion_map.find(motionName) == mcu.motion_map.end())
-		return; 	
-	SkMotion* motion = mcu.motion_map[motionName];
+{
+	SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(motionName);
+	if (!motion)
+		return;
 	SkChannelArray& channels = motion->channels();
 	if (motionFrame < 0 || motionFrame >= motion->frames() || channelIndex < 0 || channelIndex >= channels.size())
 		return;
@@ -293,28 +302,30 @@ void PathItemInfoWidget::addDirectoryCallback( Fl_Widget* widget, void* data )
 	PathItemInfoWidget* pathInfoWidget = (PathItemInfoWidget*)data;
 	pathInfoWidget->addDirectory(NULL);	
 }
+
 void PathItemInfoWidget::addDirectory( const char* dirName )
 {
 	pathChooser->show();
-	while (pathChooser->visible()) {
+	while (pathChooser->visible())
+	{
 		Fl::wait();
-	}	
+	}
 	char relativePath[256];
 	int count = pathChooser->count();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (count > 0)
-	{		
+	{
 		for (int i = 1; i <= count; i ++)
 		{
 			if (!pathChooser->value(i))
 				break;
-			fl_filename_relative(relativePath, sizeof(relativePath), pathChooser->value(i));					
-			
+
+			fl_filename_relative(relativePath, sizeof(relativePath), pathChooser->value(i));
+
 			std::string paraType = getTypeParameter(itemType);
 			std::string pathCmd = "path ";
 			pathCmd = pathCmd + paraType + relativePath;
-			mcu.execute(const_cast<char*>(pathCmd.c_str()));					
-		}		
+			SmartBody::SBScene::getScene()->command(pathCmd);
+		}
 	}
 }
 
@@ -382,14 +393,13 @@ void SeqItemInfoWidget::updateWidget()
 void SeqItemInfoWidget::runSeqCallback( Fl_Widget* widget, void* data )
 {
 	SeqItemInfoWidget* seqInfoWidget = (SeqItemInfoWidget*)data;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (seqInfoWidget)
 	{
 		std::string seqName = seqInfoWidget->getSeqFile();
 		std::string seqCmd = "seq ";
 		seqCmd += seqName;
-		LOG("seq cmd = %s\n",seqCmd.c_str());
-		mcu.execute(const_cast<char*>(seqCmd.c_str()));
+		LOG("seq cmd = %s\n", seqCmd.c_str());
+		SmartBody::SBScene::getScene()->command(seqCmd);
 	}
 }
 
@@ -501,25 +511,23 @@ void EventItemInfoWidget::addEventCallback( Fl_Widget* widget, void* data )
 
 void EventItemInfoWidget::addNewEvent()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::string eventType = eventInfoObject->getStringAttribute("EventType");
 	std::string eventAction = eventInfoObject->getStringAttribute("Action");	
 	if (eventType != "" && eventAction != "")
 	{
 		std::string eventCmd = "registerevent " + eventType + " " + "\"" + eventAction + "\"";	
-		mcu.execute(const_cast<char*>(eventCmd.c_str()));		
+		SmartBody::SBScene::getScene()->command(eventCmd);
 	}
 }
 
 void EventItemInfoWidget::removeEvent()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::string eventType = eventInfoObject->getStringAttribute("EventType");
 	std::string eventAction = eventInfoObject->getStringAttribute("Action");	
 	if (eventType != "" && eventAction != "")
 	{
-		std::string eventCmd = "unregisterevent " + eventType;	
-		mcu.execute(const_cast<char*>(eventCmd.c_str()));		
+		std::string eventCmd = "unregisterevent " + eventType;
+		SmartBody::SBScene::getScene()->command(eventCmd);
 		//LOG("Remove Event %s",eventType.c_str());
 	}
 }
@@ -530,14 +538,13 @@ PawnItemInfoWidget::PawnItemInfoWidget( int x, int y, int w, int h, const char* 
 : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
 {
 	pawnInfoObject = NULL;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	pawnName = inputItem->label();
 	updateWidget();
 	//if (observerWindow)
 	//	pawnInfoObject->registerObserver(observerWindow);
 	
 	this->begin();
-		SbmPawn* pawn = mcu.getPawn(pawnName);
+		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnName);
 		if (pawn)
 			pawn->registerObserver(this);
 		attrWindow = new AttributeWindow(pawn,x,y,w,h,name);
@@ -549,8 +556,7 @@ PawnItemInfoWidget::PawnItemInfoWidget( int x, int y, int w, int h, const char* 
 
 void PawnItemInfoWidget::updateWidget()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = mcu.getPawn(pawnName);
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnName);
 	if (!pawn) return;
 	float x, y, z, h, p, r;
 	pawn->get_world_offset(x,y,z,h,p,r);
@@ -567,8 +573,7 @@ void PawnItemInfoWidget::updateWidget()
 
 void PawnItemInfoWidget::notify( SmartBody::SBSubject* subject )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = mcu.getPawn(pawnName);
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnName);
 	if (!pawn) return;
 
 	TreeInfoObject* infoObject = dynamic_cast<TreeInfoObject*>(subject);
