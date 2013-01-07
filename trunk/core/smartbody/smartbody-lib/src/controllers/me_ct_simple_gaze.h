@@ -23,6 +23,7 @@
 #ifndef ME_CT_SIMPLE_GAZE_H
 #define ME_CT_SIMPLE_GAZE_H
 
+#include <vhcl.h>
 #include <sk/sk_skeleton.h>
 #include <sb/SBController.h>
 

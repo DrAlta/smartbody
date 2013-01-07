@@ -8,6 +8,8 @@
 #include <FL/Fl_Light_Button.H>
 #include <sb/SBFaceDefinition.h>
 #include <sb/SBService.h>
+#include <sb/SBPhysicsSim.h>
+
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBJointMap.h>
 #include <sbm/GenericViewer.h>

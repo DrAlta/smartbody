@@ -258,14 +258,12 @@
     <ClCompile Include="..\src\sbm\mcontrol_callbacks.cpp" />
     <ClCompile Include="..\src\sbm\mcontrol_util.cpp" />
     <ClCompile Include="..\src\sbm\MiscCommands.cpp" />
+    <ClCompile Include="..\src\sbm\ODEPhysicsSim.cpp" />
     <ClCompile Include="..\src\sbm\ParserASFAMC.cxx" />
     <ClCompile Include="..\src\sbm\ParserBVH.cxx" />
     <ClCompile Include="..\src\sbm\ParserFBX.cpp" />
     <ClCompile Include="..\src\sbm\ParserOgre.cpp" />
     <ClCompile Include="..\src\sbm\ParserOpenCOLLADA.cpp" />
-    <ClCompile Include="..\src\sbm\Physics\SBColObject.cpp" />
-    <ClCompile Include="..\src\sbm\Physics\SBPhysicsSim.cpp" />
-    <ClCompile Include="..\src\sbm\Physics\SBPhysicsSimODE.cpp" />
     <ClCompile Include="..\src\sbm\remote_speech.cpp" />
     <ClCompile Include="..\src\sbm\Resource.cpp" />
     <ClCompile Include="..\src\sbm\resource_cmds.cpp" />
@@ -278,6 +276,7 @@
     <ClCompile Include="..\src\sb\SBBehaviorSet.cpp" />
     <ClCompile Include="..\src\sb\SBBehaviorSetManager.cpp" />
     <ClCompile Include="..\src\sb\SBBoneBusManager.cpp" />
+    <ClCompile Include="..\src\sb\SBColObject.cpp" />
     <ClCompile Include="..\src\sb\SBDebuggerClient.cpp" />
     <ClCompile Include="..\src\sb\SBDebuggerServer.cpp" />
     <ClCompile Include="..\src\sb\SBDebuggerUtility.cpp" />
@@ -397,6 +396,7 @@
     <ClCompile Include="..\src\sb\sbm_pawn.cpp" />
     <ClCompile Include="..\src\sb\SBPhoneme.cpp" />
     <ClCompile Include="..\src\sb\SBPhonemeManager.cpp" />
+    <ClCompile Include="..\src\sb\SBPhysicsSim.cpp" />
     <ClCompile Include="..\src\sk\sk_channel.cpp" />
     <ClCompile Include="..\src\sk\sk_channel_array.cpp" />
     <ClCompile Include="..\src\sk\sk_joint.cpp" />
@@ -705,14 +705,12 @@
     <ClInclude Include="..\src\sbm\mcontrol_util.h" />
     <ClInclude Include="..\src\sbm\MiscCommands.h" />
     <ClInclude Include="..\src\sbm\NetRequest.h" />
+    <ClInclude Include="..\src\sbm\ODEPhysicsSim.h" />
     <ClInclude Include="..\src\sbm\ParserASFAMC.h" />
     <ClInclude Include="..\src\sbm\ParserBVH.h" />
     <ClInclude Include="..\src\sbm\ParserFBX.h" />
     <ClInclude Include="..\src\sbm\ParserOgre.h" />
     <ClInclude Include="..\src\sbm\ParserOpenCOLLADA.h" />
-    <ClInclude Include="..\src\sbm\Physics\SBColObject.h" />
-    <ClInclude Include="..\src\sbm\Physics\SBPhysicsSim.h" />
-    <ClInclude Include="..\src\sbm\Physics\SBPhysicsSimODE.h" />
     <ClInclude Include="..\src\sbm\remote_speech.h" />
     <ClInclude Include="..\src\sbm\Resource.h" />
     <ClInclude Include="..\src\sbm\resource_cmds.h" />
@@ -729,6 +727,7 @@
     <ClInclude Include="..\src\sb\nvbg.h" />
     <ClInclude Include="..\src\sb\SBAnimationTransitionRule.h" />
     <ClInclude Include="..\src\sb\SBBoneBusManager.h" />
+    <ClInclude Include="..\src\sb\SBColObject.h" />
     <ClInclude Include="..\src\sb\SBDebuggerClient.h" />
     <ClInclude Include="..\src\sb\SBDebuggerServer.h" />
     <ClInclude Include="..\src\sb\SBDebuggerUtility.h" />
@@ -856,6 +855,7 @@
     <ClInclude Include="..\src\sb\sbm_pawn.hpp" />
     <ClInclude Include="..\src\sb\SBPhoneme.h" />
     <ClInclude Include="..\src\sb\SBPhonemeManager.h" />
+    <ClInclude Include="..\src\sb\SBPhysicsSim.h" />
     <ClInclude Include="..\src\sb\SBTypes.h" />
     <ClInclude Include="..\src\sk\sk_channel.h" />
     <ClInclude Include="..\src\sk\sk_channel_array.h" />

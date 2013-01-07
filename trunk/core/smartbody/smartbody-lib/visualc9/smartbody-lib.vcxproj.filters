@@ -967,15 +967,6 @@
     <ClCompile Include="..\src\external\parser\Field.cpp">
       <Filter>external\parser</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\Physics\SBPhysicsSim.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\Physics\SBPhysicsSimODE.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\Physics\SBColObject.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sb\MiniBrain.cpp">
       <Filter>sb</Filter>
     </ClCompile>
@@ -990,6 +981,15 @@
     </ClCompile>
     <ClCompile Include="..\src\sbm\PPRAISteeringAgent.cpp">
       <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBPhysicsSim.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\ODEPhysicsSim.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBColObject.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2001,15 +2001,6 @@
     <ClInclude Include="..\src\external\parser\Field.h">
       <Filter>external\parser</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\Physics\SBPhysicsSim.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\Physics\SBPhysicsSimODE.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\Physics\SBColObject.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sb\MiniBrain.h">
       <Filter>sb</Filter>
     </ClInclude>
@@ -2024,6 +2015,15 @@
     </ClInclude>
     <ClInclude Include="..\src\sbm\PPRAISteeringAgent.h">
       <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBPhysicsSim.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\ODEPhysicsSim.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBColObject.h">
+      <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

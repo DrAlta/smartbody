@@ -791,27 +791,11 @@
 				Name="Physics"
 				>
 				<File
-					RelativePath="..\src\sbm\Physics\SBColObject.cpp"
+					RelativePath="..\src\sbm\ODEPhysicsSim.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\Physics\SBColObject.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\Physics\SBPhysicsSim.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\Physics\SBPhysicsSim.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\Physics\SBPhysicsSimODE.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\Physics\SBPhysicsSimODE.h"
+					RelativePath="..\src\sbm\ODEPhysicsSim.h"
 					>
 				</File>
 			</Filter>
@@ -3652,6 +3636,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sb\SBColObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBColObject.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sb\SBController.cpp"
 				>
 			</File>
@@ -3825,6 +3817,14 @@
 			</File>
 			<File
 				RelativePath="..\src\sb\SBPhysicsManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBPhysicsSim.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBPhysicsSim.h"
 				>
 			</File>
 			<File

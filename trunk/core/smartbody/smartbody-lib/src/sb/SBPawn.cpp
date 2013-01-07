@@ -5,8 +5,8 @@
 #include <sb/SBScene.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBCollisionManager.h>
-#include <sbm/Physics/SBColObject.h>
-#include <sbm/Physics/SBPhysicsSim.h>
+#include <sb/SBColObject.h>
+#include <sb/SBPhysicsSim.h>
 #include <sbm/sbm_deformable_mesh.h>
 
 namespace SmartBody {

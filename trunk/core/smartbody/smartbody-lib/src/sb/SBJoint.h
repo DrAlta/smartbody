@@ -3,7 +3,7 @@
 
 #include <sb/SBTypes.h>
 #include <sk/sk_joint.h>
-#include <sbm/Physics/SBColObject.h>
+#include <sb/SBColObject.h>
 #include <string>
 
 #ifdef __native_client__

@@ -39,6 +39,7 @@
 #include <controllers/me_ct_channel_writer.hpp>
 #include <controllers/me_ct_curve_writer.hpp>
 #include "sbm/sbm_constants.h"
+#include <sbm/SteerSuiteEngineDriver.h>
 
 #include "sbm/sbm_deformable_mesh.h"
 
