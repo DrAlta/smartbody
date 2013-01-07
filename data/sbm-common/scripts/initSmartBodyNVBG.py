@@ -94,6 +94,10 @@ class SmartBodyNVBG(Nvbg):
                                         bmlStr = bmlVec[i]
                                         self.getAttribute("bml").setValue(bmlStr)
                                         return
+                                
+                if (name == "emotion"):
+                        selectedEmotion = self.getAttribute("emotion").getValue()
+                        self.nvbg.curEmotion = selectedEmotion
 		return
 
         def executeSpeech(self, character, speechStatus, speechId, speaker):
@@ -211,6 +215,14 @@ class SmartBodyNVBG(Nvbg):
                 self.createActionAttribute("play dialog", True, "nvbgs", 60, False, False, False, "Play the chosen dialog")
                 self.createActionAttribute("save", True, "nvbgs", 70, False, False, False, "Save the behavior to autoXML.xml")
 
+                ''' chosing the right emotion set '''
+                emotionVec = StringVec()
+                emotionVec.append("neutral")
+                emotionVec.append("angry")
+                emotionVec.append("sad")
+                emotion = self.createStringAttribute("emotion", "", True, "nvbgs", 80, False, False, False, "Emotion set available")
+                emotion.setValidValues(emotionVec)
+                
                 ''' nvbg behaviors '''
                 behavior = self.createStringAttribute("default behavior", "", True, "nvbgs", 100, False, False, False, "Universal behaviors availabe")
                 bmlHidden = self.createStringAttribute("bml hidden", "", True, "nvbgs", 110, False, False, True, "Hidden bml drop list")
