@@ -748,7 +748,6 @@
     <ClInclude Include="..\src\sbm\text_speech.h" />
     <ClInclude Include="..\src\sbm\time_profiler.h" />
     <ClInclude Include="..\src\sbm\time_regulator.h" />
-    <ClInclude Include="..\src\sbm\viseme_map.hpp" />
     <ClInclude Include="..\src\sbm\xercesc_utils.hpp" />
     <ClInclude Include="..\src\sbm\GPU\SbmDeformableMeshGPU.h" />
     <ClInclude Include="..\src\sbm\GPU\SbmShader.h" />
