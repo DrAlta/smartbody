@@ -1426,15 +1426,17 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	rightGroup->begin();	
 	targetSkeletonViewer = new SkeletonViewer(420+10, startY, 260, h-startY - 50, "Skeleton");	
 	standardSkeletonViewer = new SkeletonViewer(420+20+260, startY, w-420-260, h-startY - 50, "Common Skeleton");
-	_buttonJointLabel = new Fl_Choice(420 + 10 + 100, h - 50 + 10, 90, 30, "Show Joint Labels");
+	_buttonJointLabel = new Fl_Choice(420 + 10 + 50, h - 50 + 10, 90, 30, "Joint Labels");
 	_buttonJointLabel->add("None");
 	_buttonJointLabel->add("Original Name");
 	_buttonJointLabel->add("Mapped Name");
 	_buttonJointLabel->value(0);
 	_buttonJointLabel->callback(CheckShowJointLabelCB,this);
-	_buttonAddMapping = new Fl_Button(420 + 10 + 250, h - 50 + 10, 90, 30, "Add Maping");
+	_buttonAddMapping = new Fl_Button(420 + 10 + 150, h - 50 + 10, 90, 30, "Add Maping");
 	_buttonAddMapping->callback(AddJointMapCB,this);	
-	_buttonTestPlayMotion = new Fl_Button(420 + 10 + 350, h - 50 + 10, 90, 30, "Test Motion");
+	_choiceTestMotions = new Fl_Choice(420 + 10 + 350, h - 50 + 10, 90, 30, "Test Motions");
+	_choiceTestMotions->callback(ChangeTestMotionCB,this);
+	_buttonTestPlayMotion = new Fl_Button(420 + 10 + 450, h - 50 + 10, 90, 30, "Run Test");
 	_buttonTestPlayMotion->callback(TestPlayMotionCB,this);
 	testPlay = false;
 	rightGroup->end();
@@ -1454,6 +1456,10 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	testTargetMotion = NULL;
 	standardSkeletonViewer->setSkeleton(commonSkName);
 	standardSkeletonViewer->setTestMotion(testCommonSkMotion);	
+
+	updateTestMotions();
+	if (_choiceTestMotions->size() >= 1)
+		_choiceTestMotions->value(0);
 
 	if (characters.size() > 0)
 	{		
@@ -1517,6 +1523,11 @@ void JointMapViewer::updateJointLists()
 
 JointMapViewer::~JointMapViewer()
 {
+	if (testTargetMotion)
+	{
+		testTargetMotion->disconnect();
+		delete testTargetMotion;
+	}
 }
 
 void JointMapViewer::setShowButton(bool showButton)
@@ -1810,6 +1821,15 @@ void JointMapViewer::TestPlayMotionCB( Fl_Widget* widget, void* data )
 }
 
 
+void JointMapViewer::ChangeTestMotionCB( Fl_Widget* widget, void* data )
+{
+	JointMapViewer* viewer = (JointMapViewer*) data;
+	Fl_Choice* motionChoice = (Fl_Choice*)widget;
+	viewer->setTestMotion(motionChoice->text());	
+}
+
+
+
 
 void JointMapViewer::draw()
 {
@@ -1944,9 +1964,27 @@ void JointMapViewer::testPlayMotion()
 		}
 		testTargetMotion = retargetMotion;
 		targetSkeletonViewer->setTestMotion(testTargetMotion);
+		standardSkeletonViewer->setTestMotion(testCommonSkMotion);
 	}
 	
 	targetSkeletonViewer->setPlayMotion(testPlay);
+}
+
+void JointMapViewer::updateTestMotions()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> motionNames = scene->getMotionNames();
+	_choiceTestMotions->clear();
+	for (unsigned int i=0;i<motionNames.size();i++)
+		_choiceTestMotions->add(motionNames[i].c_str());
+}
+
+void JointMapViewer::setTestMotion( std::string motionName )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBMotion* motion = scene->getMotion(motionName);
+	if (motion)
+		testCommonSkMotion = motion;
 }
 
 JointMapInputChoice::JointMapInputChoice( int x, int y, int w, int h, char* name ) : Fl_Input_Choice(x,y,w,h,name)
