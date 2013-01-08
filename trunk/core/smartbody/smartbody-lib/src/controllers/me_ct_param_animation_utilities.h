@@ -29,6 +29,7 @@
 #include <sbm/sr_linear_curve.h>
 #include <sb/sbm_pawn.hpp>
 #include <controllers/me_ct_param_animation_data.h>
+#include <sb/SBAnimationTransition.h>
 
 #define LoopHandle 0
 const int rotType = 132;
@@ -199,15 +200,13 @@ class PABlendData
 		void updateMotionIndices();
 };
 
-
-class PATransition;
 class PATransitionManager
 {
 	public:
 		
 		PATransitionManager(float transitionLen);
 		PATransitionManager(double easeOutStart, double duration);
-		PATransitionManager(PATransition* transition, PABlendData* from, PABlendData* to);
+		PATransitionManager(SmartBody::SBAnimationTransition* transition, PABlendData* from, PABlendData* to);
 		~PATransitionManager();
 
 		void align(PABlendData* current, PABlendData* next);
@@ -223,7 +222,7 @@ class PATransitionManager
 
 		PABlendData* from;
 		PABlendData* to;
-		PATransition* transition;
+		SmartBody::SBAnimationTransition* transition;
 		srLinearCurve* curve;
 		double duration;
 		double localTime;

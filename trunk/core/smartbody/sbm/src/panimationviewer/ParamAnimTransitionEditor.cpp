@@ -29,6 +29,8 @@
 #include "ParamAnimBlock.h"
 #include "ParamAnimEditorWidget.h"
 #include "PanimationWindow.h"
+#include <sb/SBAnimationState.h>
+#include <sb/SBAnimationTransition.h>
 
 
 PATransitionEditor::PATransitionEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
@@ -127,7 +129,7 @@ void PATransitionEditor::loadTransitions()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	for (size_t i = 0; i < mcu.param_anim_transitions.size(); i++)
 	{
-		std::string transitionName = mcu.param_anim_transitions[i]->fromState->stateName + std::string(" + ") + mcu.param_anim_transitions[i]->toState->stateName;
+		std::string transitionName = mcu.param_anim_transitions[i]->getSourceBlend()->stateName + std::string(" + ") + mcu.param_anim_transitions[i]->getDestinationBlend()->stateName;
 		transitionList->add(transitionName.c_str());
 	}
 	transitionList->value(0);
@@ -278,7 +280,7 @@ void PATransitionEditor::removeTransitionTimeMark(Fl_Widget* widget, void* data)
 void PATransitionEditor::updateTransitionTimeMark(Fl_Widget* widget, void* data)
 {
 	PATransitionEditor* editor = (PATransitionEditor*) data;
-	PATransition* transition = NULL;
+	SmartBody::SBAnimationTransition* transition = NULL;
 	std::string fromStateName = "";
 	std::string toStateName = "";
 	if (!editor->transitionList->active())
@@ -305,36 +307,39 @@ void PATransitionEditor::updateTransitionTimeMark(Fl_Widget* widget, void* data)
 	{
 		nle::Block* block1 = editor->transitionEditorNleModel->getTrack(0)->getBlock(0);
 		nle::Block* block2 = editor->transitionEditorNleModel->getTrack(1)->getBlock(0);		
-		PABlend* fromState = mcuCBHandle::singleton().lookUpPABlend(fromStateName);
-		PABlend* toState = mcuCBHandle::singleton().lookUpPABlend(toStateName);
-		transition->fromState = fromState;
-		transition->toState = toState;
-		transition->fromMotionName = block1->getName();
+		SmartBody::SBAnimationBlend* fromState = dynamic_cast<SmartBody::SBAnimationBlend*>(mcuCBHandle::singleton().lookUpPABlend(fromStateName));
+		SmartBody::SBAnimationBlend* toState = dynamic_cast<SmartBody::SBAnimationBlend*>(mcuCBHandle::singleton().lookUpPABlend(toStateName));
+		transition->set(fromState, toState);
+		
 		if (block1->getNumMarks() == 0)	
 		{
-			transition->easeOutStart.push_back(mcuCBHandle::singleton().lookUpMotion(transition->fromMotionName.c_str())->duration() - defaultTransition);
-			transition->easeOutEnd.push_back(mcuCBHandle::singleton().lookUpMotion(transition->fromMotionName.c_str())->duration());
+			transition->addEaseOutInterval(block1->getName(), 
+											(float) mcuCBHandle::singleton().lookUpMotion(transition->getSourceMotionName().c_str())->duration() - (float) defaultTransition,
+											(float) mcuCBHandle::singleton().lookUpMotion(transition->getSourceMotionName().c_str())->duration());
 		}
 		else
 		{
-			transition->easeOutStart.clear();
-			transition->easeOutEnd.clear();
+			int numEaseOutIntervals = transition->getNumEaseOutIntervals();
+			for (int i = 0; i < numEaseOutIntervals; i++)
+				transition->removeEaseOutInterval(0);
+
+			
 			for (int i = 0; i < block1->getNumMarks() / 2; i++)
 			{
-				transition->easeOutStart.push_back(block1->getMark(i * 2 + 0)->getStartTime());
-				transition->easeOutEnd.push_back(block1->getMark(i * 2 + 1)->getStartTime());	
+				transition->addEaseOutInterval(block1->getName(), 
+											   (float) block1->getMark(i * 2 + 0)->getStartTime(),
+											   (float) block1->getMark(i * 2 + 1)->getStartTime());	
 			}
 		}
-		transition->toMotionName = block2->getName();
+
+		
 		if (block2->getNumMarks() == 0)
 		{
-			transition->easeInStart = 0.0;
-			transition->easeInEnd = defaultTransition;
+			transition->setEaseInInterval(block2->getName(), 0.0f, (float) defaultTransition);
 		}
 		else
 		{
-			transition->easeInStart = block2->getMark(0)->getStartTime();
-			transition->easeInEnd = block2->getMark(1)->getStartTime();
+			transition->setEaseInInterval(block2->getName(), (float) block2->getMark(0)->getStartTime(), (float) block2->getMark(1)->getStartTime());
 		}
 		for (int i = 0; i < block1->getNumMarks(); i++)
 			block1->getMark(i)->setSelected(false);
@@ -352,19 +357,18 @@ void PATransitionEditor::createNewTransition(Fl_Widget* widget, void* data)
 	std::string fromStateName = editor->stateList1->menu()[editor->stateList1->value()].label();
 	std::string toStateName = editor->stateList2->menu()[editor->stateList2->value()].label();
 
-	PATransition* transition = mcu.lookUpPATransition(fromStateName, toStateName);
+	SmartBody::SBAnimationTransition* transition = mcu.lookUpPATransition(fromStateName, toStateName);
 	if (transition != NULL)
 	{
 		LOG("Transition %s to %s already exist.", fromStateName.c_str(), toStateName.c_str());
 		return;
 	}
-	PABlend* fromState = mcuCBHandle::singleton().lookUpPABlend(fromStateName);
-	PABlend* toState = mcuCBHandle::singleton().lookUpPABlend(toStateName);
+	SmartBody::SBAnimationBlend* fromState = dynamic_cast<SmartBody::SBAnimationBlend*>(mcuCBHandle::singleton().lookUpPABlend(fromStateName));
+	SmartBody::SBAnimationBlend* toState = dynamic_cast<SmartBody::SBAnimationBlend*>(mcuCBHandle::singleton().lookUpPABlend(toStateName));
 	if (fromState != NULL && toState != NULL)
 	{
-		transition = new PATransition();
-		transition->fromState = fromState;
-		transition->toState = toState;
+		transition = new SmartBody::SBAnimationTransition();
+		transition->set(fromState, toState);
 		mcu.addPATransition(transition);
 		updateTransitionTimeMark(widget, data);
 	}
@@ -395,25 +399,25 @@ void PATransitionEditor::changeTransitionList(Fl_Widget* widget, void* data)
 		return;
 	std::string fromStateName = fullName.substr(0, seperateMarkPos - 1);
 	std::string toStateName = fullName.substr(seperateMarkPos + 2, fullName.size() - 1);
-	PATransition* transition = mcu.lookUpPATransition(fromStateName, toStateName);
+	SmartBody::SBAnimationTransition* transition = mcu.lookUpPATransition(fromStateName, toStateName);
 
 	block1->removeAllMarks();
-	block1->setName(transition->fromMotionName);
-	SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(transition->fromMotionName);
+	block1->setName(transition->getSourceMotionName());
+	SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(transition->getSourceMotionName());
 	block1->setStartTime(0);
 	block1->setEndTime(motion->duration());
-	for (int i = 0; i < transition->getNumEaseOut(); i++)
+	for (int i = 0; i < transition->getNumEaseOutIntervals(); i++)
 	{
-		editor->paWindow->addTimeMarkToBlock(block1, transition->easeOutStart[i]);
-		editor->paWindow->addTimeMarkToBlock(block1, transition->easeOutEnd[i]);
+		editor->paWindow->addTimeMarkToBlock(block1, transition->getEaseOutStart()[i]);
+		editor->paWindow->addTimeMarkToBlock(block1, transition->getEaseOutEnd()[i]);
 	}
 	block2->removeAllMarks();
-	block2->setName(transition->toMotionName);
-	motion = SmartBody::SBScene::getScene()->getMotion(transition->toMotionName);
+	block2->setName(transition->getDestinationMotionName());
+	motion = SmartBody::SBScene::getScene()->getMotion(transition->getDestinationMotionName());
 	block2->setStartTime(0);
 	block2->setEndTime(motion->duration());
-	editor->paWindow->addTimeMarkToBlock(block2, transition->easeInStart);
-	editor->paWindow->addTimeMarkToBlock(block2, transition->easeInEnd);
+	editor->paWindow->addTimeMarkToBlock(block2, transition->getEaseInStart());
+	editor->paWindow->addTimeMarkToBlock(block2, transition->getEaseInEnd());
 
 	editor->paWindow->redraw();
 }

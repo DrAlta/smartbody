@@ -83,6 +83,7 @@ class mcuCBHandle;
 #include <sbm/KinectProcessor.h>
 #include <sb/SBScene.h>
 #include <sb/SBCharacterListener.h>
+#include <sb/SBAnimationTransition.h>
 
 
 #ifndef USE_PYTHON
@@ -213,7 +214,7 @@ class mcuCBHandle {
 		KinectProcessor*							kinectProcessor;
 
 		std::vector<PABlend*>					param_anim_blends;
-		std::vector<PATransition*>				param_anim_transitions;
+		std::vector<SmartBody::SBAnimationTransition*>				param_anim_transitions;
 		
 
 		TimeRegulator	*internal_timer_p;
@@ -490,8 +491,8 @@ public:
 
 		PABlend* lookUpPABlend(std::string stateName);
 		void addPABlend(PABlend* state);
-		PATransition* lookUpPATransition(std::string fromStateName, std::string toStateName);
-		void addPATransition(PATransition* transition);
+		SmartBody::SBAnimationTransition* lookUpPATransition(std::string fromStateName, std::string toStateName);
+		void addPATransition(SmartBody::SBAnimationTransition* transition);
 		// ----------------------------------------------
 		// END blends and transitions
 		// ----------------------------------------------

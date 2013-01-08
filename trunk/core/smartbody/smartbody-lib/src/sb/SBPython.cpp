@@ -986,6 +986,8 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getDestinationMotionName", &SBAnimationTransition::getDestinationMotionName, boost::python::return_value_policy<boost::python::return_by_value>(), "")
 		.def("getEaseInStart", &SBAnimationTransition::getEaseInStart, "")
 		.def("getEaseInEnd", &SBAnimationTransition::getEaseInEnd, "")
+		.def("setEaseInStart", &SBAnimationTransition::setEaseInStart, "")
+		.def("setEaseInEnd", &SBAnimationTransition::setEaseInEnd, "")
 		.def("getTransitionRule", &SBAnimationTransition::getTransitionRule, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the rule associated with this transition.")
 		.def("setTransitionRule", &SBAnimationTransition::setTransitionRule, "Sets the rule associated with this transition.")
 		;

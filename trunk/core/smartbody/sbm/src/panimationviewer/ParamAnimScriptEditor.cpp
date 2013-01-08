@@ -25,6 +25,7 @@
 #include <FL/Fl_Hold_Browser.H>
 #include <sbm/mcontrol_util.h>
 #include <controllers/me_ct_param_animation.h>
+#include <sb/SBAnimationState.h>
 
 #define transitionTrace 0
 
@@ -238,8 +239,8 @@ void PAScriptEditor::updateAvailableStates(std::string currentState)
 	availableStateList->clear();
 	for (size_t i = 0; i < mcu.param_anim_transitions.size(); i++)
 	{
-		if (mcu.param_anim_transitions[i]->fromState->stateName == currentState)
-			availableStateList->add(mcu.param_anim_transitions[i]->toState->stateName.c_str());
+		if (mcu.param_anim_transitions[i]->getSourceBlend()->stateName == currentState)
+			availableStateList->add(mcu.param_anim_transitions[i]->getDestinationBlend()->stateName.c_str());
 	}
 }
 

@@ -709,7 +709,7 @@ void MeCtParamAnimation::autoScheduling(double time)
 	{
 		if (transitionManager)
 			delete transitionManager;
-		PATransition* data = NULL;
+		SmartBody::SBAnimationTransition* data = NULL;
 		if (nextUnit.data)
 			data = mcuCBHandle::singleton().lookUpPATransition(curStateData->state->stateName, nextUnit.data->stateName);
 		nextStateData = createStateModule(nextUnit);

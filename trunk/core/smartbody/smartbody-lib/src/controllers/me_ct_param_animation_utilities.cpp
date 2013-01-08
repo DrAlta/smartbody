@@ -1082,12 +1082,12 @@ PATransitionManager::PATransitionManager(double easeOutStart, double dur)
 #endif
 }
 
-PATransitionManager::PATransitionManager(PATransition* trans, PABlendData* f, PABlendData* t)
+PATransitionManager::PATransitionManager(SmartBody::SBAnimationTransition* trans, PABlendData* f, PABlendData* t)
 {
 	from = f;
 	to = t;
 	//transition = trans;
-	transition = new PATransition(trans, f->state, to->state);
+	transition = new SmartBody::SBAnimationTransition(trans, f->state, to->state);
 	update();
 	localTime = 0.0;
 	startTransition = false;
@@ -1176,51 +1176,51 @@ void PATransitionManager::update()
 	int id;
 	
 
-	for (int i = 0; i < transition->fromState->getNumMotions(); i++)
+	for (int i = 0; i < transition->getSourceBlend()->getNumMotions(); i++)
 	{
-		std::string motionName = transition->fromState->motions[i]->getName();
-		if (motionName == transition->fromMotionName)
+		std::string motionName = transition->getSourceBlend()->motions[i]->getName();
+		if (motionName == transition->getSourceMotionName())
 		{
-			fromKey = transition->fromState->keys[i];
+			fromKey = transition->getSourceBlend()->keys[i];
 			id = i;
 		}
 	}
 	
 	if (fromKey.size() > 0)
 	{
-		for (int i = 0; i < transition->getNumEaseOut(); i++)
+		for (int i = 0; i < transition->getNumEaseOutIntervals(); i++)
 		{
-			if (transition->easeOutStart[i] < fromKey[0])
+			if (transition->getEaseOutStart()[i] < fromKey[0])
 			{
-				transition->easeOutStart[i] += transition->fromState->motions[id]->duration();
-				transition->easeOutEnd[i] += transition->fromState->motions[id]->duration();
+				transition->getEaseOutStart()[i] += transition->getSourceBlend()->motions[id]->duration();
+				transition->getEaseOutEnd()[i] += transition->getSourceBlend()->motions[id]->duration();
 			}
-			easeOutStarts.push_back(getTime(transition->easeOutStart[i], fromKey, transition->fromState->keys, from->weights));
-			easeOutEnds.push_back(getTime(transition->easeOutEnd[i], fromKey, transition->fromState->keys, from->weights));
+			easeOutStarts.push_back(getTime(transition->getEaseOutStart()[i], fromKey, transition->getSourceBlend()->keys, from->weights));
+			easeOutEnds.push_back(getTime(transition->getEaseOutEnd()[i], fromKey, transition->getSourceBlend()->keys, from->weights));
 		}
 	}
 	
 
 	std::vector<double> toKey;
-	for (int i = 0; i < transition->toState->getNumMotions(); i++)
+	for (int i = 0; i < transition->getDestinationBlend()->getNumMotions(); i++)
 	{
-		std::string motionName = transition->toState->motions[i]->getName();
-		if (motionName == transition->toMotionName)
+		std::string motionName = transition->getDestinationBlend()->motions[i]->getName();
+		if (motionName == transition->getDestinationMotionName())
 		{
-			toKey = transition->toState->keys[i];
+			toKey = transition->getDestinationBlend()->keys[i];
 			id = i;
 		}
 	}
 	if (toKey.size() > 0)
 	{
-		if (transition->easeInStart < toKey[0])
+		if (transition->getEaseInStart() < toKey[0])
 		{
-			transition->easeInStart += transition->toState->motions[id]->duration();
-			transition->easeInEnd += transition->toState->motions[id]->duration();
+			transition->setEaseInStart(transition->getEaseInStart() + transition->getDestinationBlend()->motions[id]->duration());
+			transition->setEaseInEnd(transition->getEaseInEnd() + transition->getDestinationBlend()->motions[id]->duration());
 		}
 	}
-	s2 = getTime(transition->easeInStart, toKey, transition->toState->keys, to->weights);
-	e2 = getTime(transition->easeInEnd, toKey, transition->toState->keys, to->weights);
+	s2 = getTime(transition->getEaseInStart(), toKey, transition->getDestinationBlend()->keys, to->weights);
+	e2 = getTime(transition->getEaseInEnd(), toKey, transition->getDestinationBlend()->keys, to->weights);
 
 	duration = e2 - s2;
 }
