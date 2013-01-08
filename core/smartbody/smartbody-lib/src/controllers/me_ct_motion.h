@@ -37,7 +37,7 @@
 
 namespace SmartBody {
 
-class MotionEvent;
+class SBMotionEvent;
 }
 
 
@@ -57,7 +57,7 @@ class MeCtMotion : public SmartBody::SBController
     bool                 _loop;      // if the motion is to be played in loop
     int                  _last_apply_frame; // to optimize shared motion evaluation
 	SrBuffer<int>        _mChan_to_buff; // motion's channels to context's buffer index
-	std::queue<SmartBody::MotionEvent*> _events;
+	std::queue<SmartBody::SBMotionEvent*> _events;
 	std::vector<std::string>	_joints;	// Joints that motion data would be applied to. Empty means applying all.
 	int					 _lastCycle;
 

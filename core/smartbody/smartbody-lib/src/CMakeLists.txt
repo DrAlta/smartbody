@@ -217,7 +217,6 @@ set( SMARTBODY_LIB_SBM_SRC
 	bml/bml_saccade.cpp
 	bml/bml_noise.cpp
 	bml/bml_states.cpp
-	sbm/Event.cpp
 	sbm/GenericViewer.cpp
 	sbm/gwiz_cmdl.cpp
 	sbm/gwiz_math.cpp
@@ -374,6 +373,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/MiniBrain.cpp
 	sb/SBColObject.cpp
 	sb/SBPhysicsSim.cpp
+	sb/SBEvent.cpp
+
 
 	sb/SBPython.cpp
 	sb/SBPythonClass.cpp

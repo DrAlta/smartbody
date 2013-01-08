@@ -1,5 +1,5 @@
 #include "MeCtBodyReachState.h"
-#include "sbm/Event.h"
+#include <sb/SBEvent.h>
 #include "sbm/mcontrol_util.h"
 #include <boost/lexical_cast.hpp>
 
@@ -171,10 +171,10 @@ ReachTarget& ReachTarget::operator=( const ReachTarget& rt )
 void ReachHandAction::sendReachEvent(const std::string& etype, const std::string& cmd, float time /*= 0.0*/ )
 {
 	std::string eventType = etype;		
-	SmartBody::MotionEvent motionEvent;
+	SmartBody::SBMotionEvent motionEvent;
 	motionEvent.setType(eventType);			
 	motionEvent.setParameters(cmd);
-	SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();		
+	SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();		
 	manager->handleEvent(&motionEvent,time);
 }
 

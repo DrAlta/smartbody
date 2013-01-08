@@ -54,3 +54,32 @@ for name in scene.getCharacterNames():
 
 # Set camera position
 scene.getPawn('camera').setPosition(SrVec(0, -50, 0))
+
+# randomly look at a different Rachel character every 5 seconds
+class RamdomGazeScript(SBScript):
+	
+	nextTimes = []
+	numCharacters = 0
+
+	def start(self):
+		import random
+		names = scene.getCharacterNames()
+		self.numCharacters = len(names)
+		for i in range(0, len(names)):
+			self.nextTimes.insert(sim.getTime() + 3 + random.randrange(0, 6, 1))
+			which = random.randrange(0, len(names), 1)
+			bml.execBML("ChrRachel", "<gaze target=\"ChrRachel" + str(which) + "\"/>")
+						
+		print "Starting random gaze..."
+	def stop(self):
+		print "Stopping random gaze..."
+	def update(self, time):
+		curTime = sim.getTime()
+		for i in range(0, self.numCharacters):
+			if (curTime > self.nextTimes[i]):
+				self.nextTimes[i](sim.getTime() + 3 + random.randrange(0, 6, 1))
+				which = random.randrange(0, len(names), 1)
+				bml.execBML("ChrRachel", "<gaze target=\"ChrRachel" + str(which) + "\"/>")
+
+gazeScript = RamdomGazeScript()
+scene.addScript("randomgaze", gazeScript)

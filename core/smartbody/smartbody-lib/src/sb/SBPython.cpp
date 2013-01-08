@@ -356,9 +356,9 @@ struct SBScriptWrap :  SBScript, boost::python::wrapper<SBScript>
 };
 
 
-struct EventHandlerWrap :  EventHandler, boost::python::wrapper<EventHandler>
+struct SBEventHandlerWrap :  SBEventHandler, boost::python::wrapper<SBEventHandler>
 {
-	virtual void executeAction(Event* event)
+	virtual void executeAction(SBEvent* event)
 	{
 		if (boost::python::override o = this->get_override("executeAction"))
 		{
@@ -369,12 +369,12 @@ struct EventHandlerWrap :  EventHandler, boost::python::wrapper<EventHandler>
 			}
 		}
 
-		return EventHandler::executeAction(event);
+		return SBEventHandler::executeAction(event);
 	}
 
-	void default_executeAction(Event* event)
+	void default_executeAction(SBEvent* event)
 	{
-		EventHandler::executeAction(event);
+		SBEventHandler::executeAction(event);
 	}
 };
 
@@ -1412,21 +1412,21 @@ boost::python::class_<SBReach>("SBReach")
 		.def("removeAllJointMaps", &SBJointMapManager::removeAllJointMaps, "Removes all the joint maps.")
 		;
 
-	boost::python::class_<Event>("Event")
+	boost::python::class_<SBEvent>("SBEvent")
 		.def(boost::python::init<>())
-		.def("getType", &Event::getType, "Returns the event type.")
-		.def("setType", &Event::setType, "Sets the event type.")
-		.def("getParameters", &Event::getParameters, "Returns the event parameters.")
-		.def("setParameters", &Event::setParameters, "Sets the event parameters.")
+		.def("getType", &SBEvent::getType, "Returns the event type.")
+		.def("setType", &SBEvent::setType, "Sets the event type.")
+		.def("getParameters", &SBEvent::getParameters, "Returns the event parameters.")
+		.def("setParameters", &SBEvent::setParameters, "Sets the event parameters.")
 		;
 
-	boost::python::class_<EventManager>("EventManager")
-		.def("handleEvent", &EventManager::handleEvent, "Processes an event by the appropriate event handler.")
-		.def("addEventHandler", &EventManager::addEventHandler, "Returns the event type.")
-		.def("removeEventHandler", &EventManager::removeEventHandler, "Returns the event type.")
-		.def("getNumHandlers", &EventManager::getNumEventHandlers, "Gets the number of event handlers.")
-		.def("getEventHandler", &EventManager::getEventHandler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the number of event handlers.")
-		.def("createEvent", &EventManager::createEvent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates an event of a given type with given parameters.")
+	boost::python::class_<SBEventManager>("SBEventManager")
+		.def("handleEvent", &SBEventManager::handleEvent, "Processes an event by the appropriate event handler.")
+		.def("addEventHandler", &SBEventManager::addEventHandler, "Returns the event type.")
+		.def("removeEventHandler", &SBEventManager::removeEventHandler, "Returns the event type.")
+		.def("getNumHandlers", &SBEventManager::getNumEventHandlers, "Gets the number of event handlers.")
+		.def("getEventHandler", &SBEventManager::getEventHandler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the number of event handlers.")
+		.def("createEvent", &SBEventManager::createEvent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates an event of a given type with given parameters.")
 		;
 
 	boost::python::class_<SBParseNode>("SBParseNode")
@@ -1516,8 +1516,8 @@ boost::python::class_<SBReach>("SBReach")
 		.def("stop", &SBScript::stop, &SBScriptWrap::default_stop, "Script stop.")
 		;
 
-	boost::python::class_<EventHandlerWrap, boost::noncopyable>("EventHandler")
-		.def("executeAction", &EventHandler::executeAction, &EventHandlerWrap::default_executeAction, "Execute the event handler.")
+	boost::python::class_<SBEventHandlerWrap, boost::noncopyable>("SBEventHandler")
+		.def("executeAction", &SBEventHandler::executeAction, &SBEventHandlerWrap::default_executeAction, "Execute the event handler.")
 		;
 
 	boost::python::class_<PythonControllerWrap, boost::python::bases<SBController>, boost::noncopyable> ("PythonController")

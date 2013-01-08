@@ -31,7 +31,7 @@
 #include <sk/sk_motion.h>
 
 namespace SmartBody {
-	class MotionEvent;
+	class SBMotionEvent;
 }
 
 
@@ -113,8 +113,8 @@ class PABlend
 		std::vector<TriangleInfo>& getTriangles() {return triangles;}
 		std::vector<TetrahedronInfo> & getTetrahedrons() {return tetrahedrons;}
 
-		std::vector<std::pair<SmartBody::MotionEvent*, int> >& getEvents();
-		void addEventToMotion(const std::string& motion, SmartBody::MotionEvent* motionEvent);
+		std::vector<std::pair<SmartBody::SBMotionEvent*, int> >& getEvents();
+		void addEventToMotion(const std::string& motion, SmartBody::SBMotionEvent* motionEvent);
 
 		std::string stateName;
 		std::vector<SkMotion*> motions;
@@ -144,7 +144,7 @@ class PABlend
 		std::vector<TriangleInfo> triangles;
 		std::vector<TetrahedronInfo> tetrahedrons;
 		std::string emptyString;
-		std::vector<std::pair<SmartBody::MotionEvent*, int> > _events;
+		std::vector<std::pair<SmartBody::SBMotionEvent*, int> > _events;
 };
 
 //There are PATransition stored inside mcu

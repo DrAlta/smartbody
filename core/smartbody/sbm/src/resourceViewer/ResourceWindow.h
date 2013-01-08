@@ -13,7 +13,7 @@
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBJointMap.h>
 #include <sbm/GenericViewer.h>
-#include <sbm/Event.h>
+#include <sb/SBEvent.h>
 #include "Fl_Tree_Horizontal.h" // a custom tree widget with horizontal scroll bar
 #include "TreeItemInfoWidget.h"
 #include "TreeInfoObject.h"
@@ -97,7 +97,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 		void updateService(Fl_Tree_Item* tree, SmartBody::SBService* service);
 		void updatePhysicsManager(Fl_Tree_Item* tree, SmartBody::SBPhysicsManager* phyService);
 		void updateFaceMotion(Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition);
-		void updateEventHandler(Fl_Tree_Item* tree, SmartBody::EventHandler* handler);
+		void updateEventHandler(Fl_Tree_Item* tree, SmartBody::SBEventHandler* handler);
 		
 		int  findTreeItemType(Fl_Tree_Item* treeItem);
 		void clearInfoWidget();

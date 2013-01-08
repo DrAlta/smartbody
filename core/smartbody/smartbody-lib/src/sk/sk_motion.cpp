@@ -33,7 +33,7 @@
 # include <sk/sk_motion.h>
 # include <sk/sk_posture.h>
 # include <sk/sk_skeleton.h>
-#include "sbm/Event.h"
+#include <sb/SBEvent.h>
 #include <sbm/gwiz_math.h>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
@@ -778,19 +778,19 @@ void SkMotion::equalize_frames ( SrArray<SkMotion*> motions )
 
 //============================ End of File ===========================
 
-const bool ascendingTime(SmartBody::MotionEvent* a, SmartBody::MotionEvent* b)
+const bool ascendingTime(SmartBody::SBMotionEvent* a, SmartBody::SBMotionEvent* b)
 {
 	return (a->getTime() < b->getTime());
 }
 
-void SkMotion::addMotionEvent(SmartBody::MotionEvent* motionEvent)
+void SkMotion::addMotionEvent(SmartBody::SBMotionEvent* motionEvent)
 {
 	_motionEvents.push_back(motionEvent);
 	// make sure that the motion events are ordered by time
 	std::sort(_motionEvents.begin(), _motionEvents.end(), ascendingTime);
 }
 
-std::vector<SmartBody::MotionEvent*>& SkMotion::getMotionEvents()
+std::vector<SmartBody::SBMotionEvent*>& SkMotion::getMotionEvents()
 {
 	return _motionEvents;
 }

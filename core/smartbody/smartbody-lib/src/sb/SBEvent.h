@@ -6,11 +6,11 @@
 
 namespace SmartBody {
 
-class Event
+class SBEvent
 {
 	public:
-		Event() : m_type(""), m_params("") {};
-		~Event() {}
+		SBEvent() : m_type(""), m_params("") {};
+		~SBEvent() {}
 		virtual void setParameters(std::string params) { m_params = params; }
 		virtual std::string getParameters() { return m_params; };
 		virtual void setType(std::string type) { m_type = type; }
@@ -21,58 +21,58 @@ class Event
 		std::string m_params;
 };
 
-class EventHandler
+class SBEventHandler
 {
 	public:
-		EventHandler() : m_type(""), m_action("") {}
-		~EventHandler() {}
+		SBEventHandler() : m_type(""), m_action("") {}
+		~SBEventHandler() {}
 
 	//	void setType(const std::string& type) { m_type = type; }
 	//	const std::string& getType() { return m_type; }
-		virtual void executeAction(Event* event) {}
+		virtual void executeAction(SBEvent* event) {}
 
 	protected:
 		std::string m_type;
 		std::string m_action;
 };
 
-class BasicHandler : public EventHandler
+class SBBasicHandler : public SBEventHandler
 {
 	public:
-		BasicHandler();
+		SBBasicHandler();
 		void setAction(const std::string& action);
 		const std::string& getAction();
-		virtual void executeAction(Event* event);
+		virtual void executeAction(SBEvent* event);
 };
 
-typedef std::map<std::string, EventHandler*> EventHandlerMap;
+typedef std::map<std::string, SBEventHandler*> SBEventHandlerMap;
 
-class EventManager
+class SBEventManager
 {
 	public:
-		EventManager();
-		~EventManager();
+		SBEventManager();
+		~SBEventManager();
 
-		void handleEvent(Event* e, double time);
-		Event* createEvent(const std::string& type, const std::string parameters);
-		void addEventHandler(const std::string& type, EventHandler* handle);
+		void handleEvent(SBEvent* e, double time);
+		SBEvent* createEvent(const std::string& type, const std::string parameters);
+		void addEventHandler(const std::string& type, SBEventHandler* handle);
 		void removeEventHandler(const std::string& type);
 		int getNumEventHandlers();
-		EventHandler* getEventHandlerByIndex(int num);
-		EventHandler* getEventHandler(const std::string& type);
-		static EventManager* getEventManager();
-		EventHandlerMap& getEventHandlers() { return eventHandlers; }
+		SBEventHandler* getEventHandlerByIndex(int num);
+		SBEventHandler* getEventHandler(const std::string& type);
+		static SBEventManager* getEventManager();
+		SBEventHandlerMap& getEventHandlers() { return eventHandlers; }
 
 	private:
-		static EventManager* _eventManager;
-		EventHandlerMap eventHandlers;
+		static SBEventManager* _eventManager;
+		SBEventHandlerMap eventHandlers;
 };
 
-class MotionEvent : public Event
+class SBMotionEvent : public SBEvent
 {
 	public:
-		MotionEvent() : Event(), m_time(0.0), m_isOnce(false), m_enabled(true) {};
-		~MotionEvent() {};
+		SBMotionEvent() : SBEvent(), m_time(0.0), m_isOnce(false), m_enabled(true) {};
+		~SBMotionEvent() {};
 
 		void setTime(double time) { m_time = time; }
 		double getTime() { return m_time; }

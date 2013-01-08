@@ -344,7 +344,6 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/bml/bml_saccade.cpp \
 	$(SBM_MY_DIR)/bml/bml_states.cpp \
 	$(SBM_MY_DIR)/bml/bml_noise.cpp \
-	$(SBM_MY_DIR)/sbm/Event.cpp \
 	$(SBM_MY_DIR)/sbm/GenericViewer.cpp \
 	$(SBM_MY_DIR)/sbm/gwiz_cmdl.cpp \
 	$(SBM_MY_DIR)/sbm/gwiz_math.cpp \
@@ -491,6 +490,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/MiscCommands.cpp \
 	$(SBM_MY_DIR)/sb/SBColObject.cpp \
 	$(SBM_MY_DIR)/sb/SBPhysicsSim.cpp \
+	$(SBM_MY_DIR)/sb/SBEvent.cpp \
 	
 	
 LOCAL_LDLIBS    := -llog 

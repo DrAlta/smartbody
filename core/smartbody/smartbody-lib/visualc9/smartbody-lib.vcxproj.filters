@@ -619,9 +619,6 @@
     <ClCompile Include="..\src\sbm\DefaultAttributeTable.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\Event.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\GenericViewer.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
@@ -989,6 +986,9 @@
       <Filter>sbm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sb\SBColObject.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBEvent.cpp">
       <Filter>sb</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1629,9 +1629,6 @@
     <ClInclude Include="..\src\sbm\DefaultAttributeTable.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\Event.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\general_param_setting.h">
       <Filter>sbm</Filter>
     </ClInclude>
@@ -2023,6 +2020,9 @@
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sb\SBColObject.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBEvent.h">
       <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>

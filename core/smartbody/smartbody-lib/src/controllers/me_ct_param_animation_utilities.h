@@ -80,7 +80,7 @@ class PATimeManager
 		int getSection(double time);
 		
 
-		std::queue<std::pair<SmartBody::MotionEvent*, int> > _events;
+		std::queue<std::pair<SmartBody::SBMotionEvent*, int> > _events;
 };
 
 class PAMotions

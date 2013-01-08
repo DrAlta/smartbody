@@ -37,7 +37,7 @@
 
 #include <sb/SBAnimationState.h>
 
-#include "sbm/Event.h"
+#include <sb/SBEvent.h>
 
 #define DebugInfo 0
 #define FastStart 1
@@ -557,12 +557,12 @@ void PPRAISteeringAgent::evaluate(double dtime)
 void PPRAISteeringAgent::sendLocomotionEvent(const std::string& status)
 {
 	std::string eventType = "locomotion";
-	SmartBody::MotionEvent motionEvent;
+	SmartBody::SBMotionEvent motionEvent;
 	motionEvent.setType(eventType);			
 	std::stringstream strstr;
 	strstr << character->getName() << " " << status;
 	motionEvent.setParameters(strstr.str());
-	SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();		
+	SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();		
 	manager->handleEvent(&motionEvent, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 }
 
@@ -1488,12 +1488,12 @@ void PPRAISteeringAgent::adjustFacingAngle( float angleDiff )
 	}
 	else
 	{
-		SmartBody::MotionEvent facingEvent;
+		SmartBody::SBMotionEvent facingEvent;
 		facingEvent.setType("adjustFacing");
 		std::string cmd = "bml chr " + character->getName() + " success";
 		//cmd = cmd + " facing: " + boost::lexical_cast<std::string>(facing)
 		facingEvent.setParameters(cmd);
-		SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();		
+		SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();		
 		manager->handleEvent(&facingEvent, 0.0f);
 		facingAdjust = false; // stop facing adjustment
 	}

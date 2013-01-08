@@ -442,7 +442,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    // register gesture event handler
 	GestureVisualizationHandler* gv = new GestureVisualizationHandler();
 	gv->setGestureData(_gestureData);
-	SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();
+	SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();
 	manager->addEventHandler("bmlstatus", gv);
 
 }
@@ -5052,7 +5052,7 @@ void GestureVisualizationHandler::setGestureData(GestureData* data)
 	_gestureData = data;
 }
 
-void GestureVisualizationHandler::executeAction(SmartBody::Event* event)
+void GestureVisualizationHandler::executeAction(SmartBody::SBEvent* event)
 {
 	if (!_gestureData)
 		return;

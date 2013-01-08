@@ -37,7 +37,7 @@ class SkPosture;
 class SkSkeleton;
 
 namespace SmartBody {
-	class MotionEvent;
+	class SBMotionEvent;
 }
 
 
@@ -60,7 +60,7 @@ public:
 	SkChannelArray _channels; // channels
 	int _last_apply_frame;    // used to speed up playing with monotone time
 
-	std::vector<SmartBody::MotionEvent*> _motionEvents;
+	std::vector<SmartBody::SBMotionEvent*> _motionEvents;
 
 	// Unset times are given a value of -1
 #if 0
@@ -317,8 +317,8 @@ public :
 	void setFrameOffset(std::vector<SrVec>& offset);
 	std::vector<SrVec>& getFrameOffset();
 
-	void addMotionEvent(SmartBody::MotionEvent* motionEvent);
-	std::vector<SmartBody::MotionEvent*>& getMotionEvents();
+	void addMotionEvent(SmartBody::SBMotionEvent* motionEvent);
+	std::vector<SmartBody::SBMotionEvent*>& getMotionEvents();
 
 private : 
 	bool _load_bvh ( SrInput& in );

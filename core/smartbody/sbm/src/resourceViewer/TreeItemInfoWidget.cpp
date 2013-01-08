@@ -7,7 +7,7 @@
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
-#include "sbm/Event.h"
+#include <sb/SBEvent.h>
 #include "sbm/mcontrol_util.h"
 #include "ResourceWindow.h"
 #include "channelbufferviewer/GlChartViewArchive.hpp"
@@ -452,8 +452,8 @@ EventItemInfoWidget::EventItemInfoWidget( int x, int y, int w, int h, const char
 	eventInfoObject->createStringAttribute("Action","",true,"Basic",20,false,false,false,"?");
 	updateWidget();
 
-	SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();
-	SmartBody::EventHandlerMap& eventMap = manager->getEventHandlers();		
+	SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();
+	SmartBody::SBEventHandlerMap& eventMap = manager->getEventHandlers();		
 	eventInfoObject->registerObserver(this);
 	this->begin();
 		attrWindow = new AttributeWindow(eventInfoObject,x,y,w,h,name);
@@ -470,14 +470,14 @@ EventItemInfoWidget::EventItemInfoWidget( int x, int y, int w, int h, const char
 
 void EventItemInfoWidget::updateWidget()
 {	
-	SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();
-	SmartBody::EventHandlerMap& eventMap = manager->getEventHandlers();	
-	SmartBody::EventHandlerMap::iterator mi = eventMap.find(eventName);
+	SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();
+	SmartBody::SBEventHandlerMap& eventMap = manager->getEventHandlers();	
+	SmartBody::SBEventHandlerMap::iterator mi = eventMap.find(eventName);
 	if (mi != eventMap.end())
 	{
-		SmartBody::EventHandler* handler = mi->second;
+		SmartBody::SBEventHandler* handler = mi->second;
 		eventInfoObject->setStringAttribute("EventType", mi->first);
-		SmartBody::BasicHandler* basicHandler = dynamic_cast<SmartBody::BasicHandler*>(handler);
+		SmartBody::SBBasicHandler* basicHandler = dynamic_cast<SmartBody::SBBasicHandler*>(handler);
 		if (basicHandler)
 		{
 			eventInfoObject->setStringAttribute("Action",basicHandler->getAction());	
@@ -487,13 +487,13 @@ void EventItemInfoWidget::updateWidget()
 
 void EventItemInfoWidget::notify( SmartBody::SBSubject* subject )
 {
-	SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();
-	SmartBody::EventHandlerMap& eventMap = manager->getEventHandlers();
-	SmartBody::EventHandlerMap::iterator mi = eventMap.find(eventName);
+	SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();
+	SmartBody::SBEventHandlerMap& eventMap = manager->getEventHandlers();
+	SmartBody::SBEventHandlerMap::iterator mi = eventMap.find(eventName);
 	if (mi != eventMap.end())
 	{
-		SmartBody::EventHandler* handler = mi->second;
-		SmartBody::BasicHandler* basicHandler = dynamic_cast<SmartBody::BasicHandler*>(handler);
+		SmartBody::SBEventHandler* handler = mi->second;
+		SmartBody::SBBasicHandler* basicHandler = dynamic_cast<SmartBody::SBBasicHandler*>(handler);
 		if (basicHandler)
 			basicHandler->setAction(eventInfoObject->getStringAttribute("Action"));		
 	}		

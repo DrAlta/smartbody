@@ -287,9 +287,9 @@ void ResourceWindow::updateGUI()
 	}
 
 	// update event handler list
-	SmartBody::EventManager* eventManager = SmartBody::EventManager::getEventManager();
-	SmartBody::EventHandlerMap& eventMap = eventManager->getEventHandlers();
-	SmartBody::EventHandlerMap::iterator ei;
+	SmartBody::SBEventManager* eventManager = SmartBody::SBEventManager::getEventManager();
+	SmartBody::SBEventHandlerMap& eventMap = eventManager->getEventHandlers();
+	SmartBody::SBEventHandlerMap::iterator ei;
 	resourceTree->clear_children(treeItemList[ITEM_EVENT_HANDLERS]);
 	for ( ei  = eventMap.begin();
 		  ei != eventMap.end();
@@ -533,7 +533,7 @@ void ResourceWindow::updateJointMap( Fl_Tree_Item* tree, SmartBody::SBJointMap* 
 	}
 }
 
-void ResourceWindow::updateEventHandler( Fl_Tree_Item* tree, SmartBody::EventHandler* handler )
+void ResourceWindow::updateEventHandler( Fl_Tree_Item* tree, SmartBody::SBEventHandler* handler )
 {
 	//Fl_Tree_Item* item = resourceTree->add(tree,(handler->getType() + ":" + "\""+ handler->getAction() + "\"").c_str());
 	//item->user_data((void*)ITEM_EVENT_HANDLERS);

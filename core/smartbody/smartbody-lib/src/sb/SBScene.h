@@ -1,6 +1,7 @@
 #ifndef SBSCENE_H
 #define SBSCENE_H
 
+#include <vhcl.h>
 #include <sb/SBTypes.h>
 #include <sb/SBObject.h>
 #include <sb/SBScript.h>
@@ -19,7 +20,7 @@ class SBCharacter;
 class SBSkeleton;
 class SBFaceDefinition;
 class SBMotion;
-class EventManager;
+class SBEventManager;
 class SBSimulationManager;
 class SBProfiler;
 class SBBmlProcessor;
@@ -123,7 +124,7 @@ class SBScene : public SBObject
 		SBAPI std::vector<std::string> getScriptNames();
 		SBAPI std::map<std::string, SBScript*>& getScripts();
 
-		SBAPI EventManager* getEventManager();		
+		SBAPI SBEventManager* getEventManager();		
 		SBAPI SBSimulationManager* getSimulationManager();
 		SBAPI SBProfiler* getProfiler();
 		SBAPI SBBmlProcessor* getBmlProcessor();

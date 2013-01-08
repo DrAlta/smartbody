@@ -39,7 +39,7 @@ class SBAnimationBlend : public PABlend
 		SBAPI virtual void removeMotion(const std::string& motionName);
 		SBAPI virtual void addEvent(const std::string& motion, double time, const std::string& type, const std::string& parameters, bool onceOnly);
 		SBAPI virtual void removeEvent(int index);
-		SBAPI virtual MotionEvent* getEvent(int index);
+		SBAPI virtual SBMotionEvent* getEvent(int index);
 		SBAPI virtual void removeAllEvents();
 		SBAPI virtual int getNumEvents();
 
