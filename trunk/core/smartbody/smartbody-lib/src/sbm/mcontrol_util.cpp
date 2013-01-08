@@ -281,7 +281,6 @@ mcuCBHandle::mcuCBHandle()
 	camera_p( NULL ),
 	root_group_p( new SrSnGroup() ),
 	height_field_p( NULL ),
-	logger_p( new joint_logger::EvaluationLogger() ),
 	test_character_default( "" ),
 	test_recipient_default( "ALL" ),
 	queued_cmds( 0 ),
@@ -302,7 +301,6 @@ mcuCBHandle::mcuCBHandle()
 	testBMLId = 0;
 	registerCallbacks();
 	root_group_p->ref();
-	logger_p->ref();
 	kinectProcessor = new KinectProcessor();
 #if USE_WSP
 	theWSP = WSP::create_manager();
@@ -417,7 +415,6 @@ void mcuCBHandle::reset( void )
 	skmScale = 1.0;
 	skScale = 1.0;
 	root_group_p = new SrSnGroup();
-	logger_p = new joint_logger::EvaluationLogger();
 	test_character_default = "";
 	test_recipient_default = "ALL";
 	queued_cmds = 0;
@@ -434,7 +431,6 @@ void mcuCBHandle::reset( void )
 	testBMLId = 0;
 	registerCallbacks();
 	root_group_p->ref();
-	logger_p->ref();
 	kinectProcessor = new KinectProcessor();
 #if USE_WSP
 	theWSP = WSP::create_manager();
@@ -539,8 +535,6 @@ void mcuCBHandle::registerCallbacks()
 	insert( "RemoteSpeechCmd"  ,   mcuFestivalRemoteSpeechCmd_func );
 	insert( "RemoteSpeechReply",   remoteSpeechResult_func );
 	insert( "RemoteSpeechTimeOut", remoteSpeechTimeOut_func);  // internally routed message
-	insert( "joint_logger",        joint_logger::start_stop_func );
-	insert( "J_L",                 joint_logger::start_stop_func );  // shorthand
 //	insert( "locomotion",          locomotion_cmd_func );
 //	insert( "loco",                locomotion_cmd_func ); // shorthand
 	insert( "resource",            resource_cmd_func );
@@ -595,8 +589,6 @@ void mcuCBHandle::registerCallbacks()
 	insert_set_cmd( "character",      character_set_cmd_func );
 	insert_set_cmd( "char",           character_set_cmd_func );
 	insert_set_cmd( "face",           mcu_set_face_func );
-	insert_set_cmd( "joint_logger",   joint_logger::set_func );
-	insert_set_cmd( "J_L",            joint_logger::set_func );  // shorthand
 	insert_set_cmd( "test",           sbm_set_test_func );
 
 	insert_print_cmd( "bp",           BML_PROCESSOR::print_func );
@@ -604,8 +596,6 @@ void mcuCBHandle::registerCallbacks()
 	insert_print_cmd( "character",    character_print_cmd_func );
 	insert_print_cmd( "char",         character_print_cmd_func );
 	insert_print_cmd( "face",         mcu_print_face_func );
-	insert_print_cmd( "joint_logger", joint_logger::print_func );
-	insert_print_cmd( "J_L",          joint_logger::print_func );  // shorthand
 	insert_print_cmd( "test",         sbm_print_test_func );
 
 	insert_test_cmd( "args", test_args_func );
@@ -885,12 +875,6 @@ void mcuCBHandle::clear( void )
 		theWSP = NULL;
 	}
 #endif
-	if( logger_p ) 
-	{
-		logger_p->unref();
-		logger_p = NULL;
-	}
-	
 	resource_manager->cleanup();
 	resource_manager = NULL;
 	cameraTracking.clear();

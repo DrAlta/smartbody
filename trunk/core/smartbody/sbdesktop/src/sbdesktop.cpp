@@ -46,7 +46,6 @@
 #include <sbm/sbm_test_cmds.hpp>
 #include BML_PROCESSOR_INCLUDE
 #include <sbm/remote_speech.h>
-#include <sbm/joint_logger.hpp>
 #include <sbm/sbm_audio.h>
 #include <sbm/sbm_speech_audiofile.hpp>
 #include <sbm/text_speech.h> // [BMLR]

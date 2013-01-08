@@ -67,7 +67,6 @@ class mcuCBHandle;
 #include "time_profiler.h"
 #include "Heightfield.h"
 
-#include "joint_logger.hpp"
 #include "ResourceManager.h"
 #include <sb/SBEvent.h>
 #include <sbm/action_unit.hpp>
@@ -320,7 +319,6 @@ public:
 		WSP::Manager*				theWSP;
 #endif
 
-		joint_logger::EvaluationLogger* logger_p;
 		SBResourceManager*			resource_manager;
 		std::vector<CameraTrack*>	cameraTracking;
 

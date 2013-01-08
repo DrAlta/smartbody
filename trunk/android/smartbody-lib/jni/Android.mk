@@ -349,7 +349,6 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/gwiz_math.cpp \
 	$(SBM_MY_DIR)/sbm/gwiz_spline.cpp \
 	$(SBM_MY_DIR)/sbm/Heightfield.cpp \
-	$(SBM_MY_DIR)/sbm/joint_logger.cpp \
 	$(SBM_MY_DIR)/sbm/lin_win.cpp \
 	$(SBM_MY_DIR)/sbm/mcontrol_callbacks.cpp \
 	$(SBM_MY_DIR)/sbm/mcontrol_util.cpp \

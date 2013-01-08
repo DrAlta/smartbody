@@ -634,9 +634,6 @@
     <ClCompile Include="..\src\sbm\Heightfield.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\joint_logger.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\KinectProcessor.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
@@ -1642,9 +1639,6 @@
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\Heightfield.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\joint_logger.hpp">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\KinectProcessor.h">
