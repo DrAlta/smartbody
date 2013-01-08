@@ -6,7 +6,6 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBDebuggerClient.h>
 #include <sb/SBDebuggerServer.h>
-#include <sbm/mcontrol_util.h>
 #include <sb/SBPythonClass.h>
 
 MonitorConnectWindow::MonitorConnectWindow(int x, int y, int w, int h, char* label) : Fl_Double_Window(x, y, w, h, label)

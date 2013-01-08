@@ -1,3 +1,4 @@
+#include "vhcl.h"
 #include "RetargetStepWindow.h"
 #include <iostream>
 #include <fstream>
