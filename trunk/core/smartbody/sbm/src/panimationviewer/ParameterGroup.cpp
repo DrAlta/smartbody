@@ -1,10 +1,12 @@
+#include "vhcl.h"
 #include "ParameterGroup.h"
-#include <sbm/mcontrol_util.h>
-#include "ParameterVisualization.h"
-#include "Parameter3DVisualization.h"
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
+#include <sbm/mcontrol_util.h>
 #include <controllers/me_ct_param_animation.h>
+#include "ParameterVisualization.h"
+#include "Parameter3DVisualization.h"
+#include "PanimationWindow.h"
 
 ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PABlendData* s, PanimationWindow* window, bool ex) : Fl_Group(x, y, w, h, name), blendData(s), paWindow(window), exec(ex)
 {

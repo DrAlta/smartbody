@@ -24,10 +24,8 @@
 #define _PARAM_ANIM_SCRIPT_EDITOR_H_
 
 #include <FL/Fl_Slider.H>
-#include <vhcl.h>
 #include "PanimationWindow.h"
 
-class PanimationWindow;
 class PAScriptEditor : public Fl_Group
 {
 	public:

@@ -7,6 +7,7 @@
 #include <FL/Fl_Choice.H>
 
 class PABlendEditor;
+
 class PAParameterEditor : public Fl_Window
 {
 public:

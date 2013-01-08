@@ -24,7 +24,6 @@
 #define _PANIMATION_WINDOW_H_
 
 #include <FL/Fl_Slider.H>
-#include "vhcl.h"
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Button.H>
@@ -44,9 +43,10 @@
 #include <map>
 
 
-
 const static int yDis = 10;
 const static int xDis = 10;
+
+
 class PABlendEditor;
 class PATransitionEditor;
 class PATransitionEditor2;
@@ -61,10 +61,10 @@ namespace nle {
 	class Track;
 }
 
-
 namespace SmartBody {
 	class SBCharacter;
 }
+
 
 class PanimationWindow : public Fl_Double_Window, public GenericViewer
 {

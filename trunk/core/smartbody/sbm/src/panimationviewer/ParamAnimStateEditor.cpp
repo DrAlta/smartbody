@@ -20,13 +20,15 @@
  *      Yuyu Xu, USC
  */
 
+#include "vhcl.h"
 #include "ParamAnimStateEditor.h"
-#include <sbm/mcontrol_util.h>
-#include "ParamAnimBlock.h"
+#include <FL/Fl_File_Chooser.H>
+#include <sb/SBScene.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBMotion.h>
-#include <FL/Fl_File_Chooser.H>
+#include <sbm/mcontrol_util.h>
+#include "ParamAnimBlock.h"
 #include "ParamAnimStateCreatorWidget.h"
 #include "ParamAnimParameterEditor.h"
 #include "ParameterVisualization.h"
@@ -201,7 +203,6 @@ void PABlendEditor::loadStates()
 void PABlendEditor::updateStateTimeMarkEditor(Fl_Widget* widget, void* data, bool toAdd)
 {
 	PABlendEditor* editor = (PABlendEditor*) data;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	if (editor->stateAnimationList->size() == 0)
 		editor->stateEditorNleModel->removeAllTracks();
@@ -216,11 +217,11 @@ void PABlendEditor::updateStateTimeMarkEditor(Fl_Widget* widget, void* data, boo
 			{
 				ParamAnimTrack* newTrack = new ParamAnimTrack();
 				newTrack->setName(motionName.c_str());
-				std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(motionName);
+				SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(motionName);
 				ParamAnimBlock* block = new ParamAnimBlock();
 				block->setName(motionName.c_str());
 				block->setStartTime(0);
-				block->setEndTime(iter->second->duration());
+				block->setEndTime(motion->duration());
 				editor->stateEditorNleModel->addTrack(newTrack);
 				newTrack->addBlock(block);		
 				editor->stateEditorNleModel->update();

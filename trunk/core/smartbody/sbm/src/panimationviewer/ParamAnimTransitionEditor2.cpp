@@ -20,15 +20,17 @@
  *      Yuyu Xu, USC
  */
 
+#include "vhcl.h"
 #include "ParamAnimTransitionEditor2.h"
-#include <sbm/mcontrol_util.h>
-#include "ParamAnimBlock.h"
+#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Hold_Browser.H>
+#include <sb/SBScene.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBMotion.h>
-#include <FL/Fl_File_Chooser.H>
-#include <FL/Fl_Hold_Browser.H>
+#include <sbm/mcontrol_util.h>
+#include "ParamAnimBlock.h"
 #include "ParamAnimTransitionCreatorWidget.h"
 #include "ParameterVisualization.h"
 #include "Parameter3DVisualization.h"
@@ -174,7 +176,6 @@ void PATransitionEditor2::loadStates()
 void PATransitionEditor2::updateTransitionTimeMarkEditor(Fl_Widget* widget, void* data, bool toAdd)
 {
 	PATransitionEditor2* editor = (PATransitionEditor2*) data;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	if (editor->state1AnimationList->size() == 0)
 		editor->transitionEditorNleModel->removeAllTracks();
@@ -189,11 +190,11 @@ void PATransitionEditor2::updateTransitionTimeMarkEditor(Fl_Widget* widget, void
 			{
 				ParamAnimTrack* newTrack = new ParamAnimTrack();
 				newTrack->setName(motionName.c_str());
-				std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(motionName);
+				SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(motionName);
 				ParamAnimBlock* block = new ParamAnimBlock();
 				block->setName(motionName.c_str());
 				block->setStartTime(0);
-				block->setEndTime(iter->second->duration());
+				block->setEndTime(motion->duration());
 				editor->transitionEditorNleModel->addTrack(newTrack);
 				newTrack->addBlock(block);		
 				editor->transitionEditorNleModel->update();
@@ -763,7 +764,6 @@ void PATransitionEditor2::save(Fl_Widget* widget, void* data)
 void PATransitionEditor2::selectState1Animations(Fl_Widget* widget, void* data)
 {
 	PATransitionEditor2* editor = (PATransitionEditor2*) data;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::string motionName1 = "";
 	for (int i = 0; i < editor->state1AnimationList->size(); i++)
 	{
@@ -784,21 +784,21 @@ void PATransitionEditor2::selectState1Animations(Fl_Widget* widget, void* data)
 	}
 	if (motionName1 != "")
 	{
-		std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(motionName1);
+		SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(motionName1);
 		nle::Block* block = editor->transitionEditorNleModel->getTrack(0)->getBlock(0);
 		block->removeAllMarks();
 		block->setName(motionName1);
 		block->setStartTime(0);
-		block->setEndTime(iter->second->duration() - editor->precisionCompensate);
+		block->setEndTime(motion->duration() - editor->precisionCompensate);
 	}
 	if (motionName2 != "")
 	{
-		std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(motionName2);
+		SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(motionName2);
 		nle::Block* block = editor->transitionEditorNleModel->getTrack(1)->getBlock(0);
 		block->removeAllMarks();
 		block->setName(motionName2);
 		block->setStartTime(0);
-		block->setEndTime(iter->second->duration() - editor->precisionCompensate);		
+		block->setEndTime(motion->duration() - editor->precisionCompensate);
 	}
 
 	editor->transitionTimeMarkWidget->setup();
@@ -808,7 +808,6 @@ void PATransitionEditor2::selectState1Animations(Fl_Widget* widget, void* data)
 void PATransitionEditor2::selectState2Animations(Fl_Widget* widget, void* data)
 {
 	PATransitionEditor2* editor = (PATransitionEditor2*) data;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::string motionName1 = "";
 	for (int i = 0; i < editor->state1AnimationList->size(); i++)
 	{
@@ -829,21 +828,21 @@ void PATransitionEditor2::selectState2Animations(Fl_Widget* widget, void* data)
 	}
 	if (motionName1 != "")
 	{
-		std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(motionName1);
+		SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(motionName1);
 		nle::Block* block = editor->transitionEditorNleModel->getTrack(0)->getBlock(0);
 		block->removeAllMarks();
 		block->setName(motionName1);
 		block->setStartTime(0);
-		block->setEndTime(iter->second->duration() - editor->precisionCompensate);
+		block->setEndTime(motion->duration() - editor->precisionCompensate);
 	}
 	if (motionName2 != "")
 	{
-		std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(motionName2);
+		SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(motionName2);
 		nle::Block* block = editor->transitionEditorNleModel->getTrack(1)->getBlock(0);
 		block->removeAllMarks();
 		block->setName(motionName2);
 		block->setStartTime(0);
-		block->setEndTime(iter->second->duration() - editor->precisionCompensate);		
+		block->setEndTime(motion->duration() - editor->precisionCompensate);
 	}
 
 	editor->transitionTimeMarkWidget->setup();

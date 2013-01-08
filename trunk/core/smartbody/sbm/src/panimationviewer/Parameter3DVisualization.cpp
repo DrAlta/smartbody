@@ -1,6 +1,9 @@
+#include "vhcl.h"
 #include "Parameter3DVisualization.h"
 #include <sr/sr_gl.h>
 #include <sr/sr_light.h>
+#include "PanimationWindow.h"
+#include "ParameterGroup.h"
 
 # define ROTATING2(e)	(e.alt && e.button1)
 # define DOLLYING(e)	(e.alt && e.button3)

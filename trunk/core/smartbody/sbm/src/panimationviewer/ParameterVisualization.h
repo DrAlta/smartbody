@@ -3,7 +3,11 @@
 
 #include <FL/Fl_Group.H>
 #include <controllers/me_ct_param_animation_data.h>
-#include "ParameterGroup.h"
+
+
+class PABlendData;
+class ParameterGroup;
+
 
 class ParameterVisualization : public Fl_Group
 {

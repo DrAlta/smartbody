@@ -1,7 +1,6 @@
 #ifndef _PARAM_ANIM_TRANSITION_CREATOR_H_
 #define _PARAM_ANIM_TRANSITION_CREATOR_H_
 
-#include <vhcl.h>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Multi_Browser.H>
 #include <FL/Fl_Button.H>

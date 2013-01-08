@@ -1,11 +1,12 @@
+#include "vhcl.h"
 #include "ParamAnimAutoMarkingEditor.h"
-#include "ParamAnimEditorWidget.h"
-#include "ParamAnimStateEditor.h"
 #include <sb/SBCharacter.h>
 #include <sb/SBJoint.h>
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
+#include "ParamAnimEditorWidget.h"
+#include "ParamAnimStateEditor.h"
 
 PAAutoFootStepsEditor::PAAutoFootStepsEditor(PABlendEditor* editor, int x, int y, int w, int h) : Fl_Window(x, y, w, h)
 {
@@ -339,5 +340,3 @@ void PAAutoFootStepsEditor::refreshSelectedMotions()
 		isProcessAll = false;
 	}
 }
-
-

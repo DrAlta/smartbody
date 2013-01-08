@@ -2,15 +2,16 @@
 #define _PARAMETERGROUP_H_
 
 #include <FL/Fl_Group.H>
+#include <FL/Fl_Slider.H>
+#include <FL/Fl_Value_Slider.H>
 #include <controllers/me_ct_param_animation_data.h>
-#include "PanimationWindow.h"
 
+class PABlendData;
 class ParameterVisualization;
 class Parameter3DVisualization;
+class PanimationWindow;
+namespace SmartBody { class SBCharacter; }
 
-namespace SmartBody {
-	class SBCharacter;
-}
 class ParameterGroup : public Fl_Group
 {
 	public:
