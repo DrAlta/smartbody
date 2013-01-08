@@ -1,8 +1,8 @@
 #ifndef _FLTKLISTENER_H_
 #define _FLTKLISTENER_H_
 
-#include <sbm/mcontrol_util.h>
-#include <sk/sk_scene.h>
+#include "sb/SBCharacterListener.h"
+#include "sb/SBObserver.h"
 
 class FLTKListener : public SmartBody::SBCharacterListener, public SmartBody::SBObserver
 {
@@ -25,7 +25,7 @@ class FLTKListener : public SmartBody::SBCharacterListener, public SmartBody::SB
 
 	  void setOtherListener(SBCharacterListener* listener);
 	protected:
-      SmartBody::SBCharacterListener* otherListener;	
+	  SmartBody::SBCharacterListener* otherListener;
 };
 
 #endif

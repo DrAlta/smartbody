@@ -6,7 +6,6 @@
 #include <FL/Fl_File_Chooser.H>
 #include <sstream>
 #include <FL/filename.H>
-#include "sbm/mcontrol_util.h"
 #include "boost/filesystem.hpp"
 #include <boost/algorithm/string/replace.hpp>
 #include "sbm/sbm_audio.h"
