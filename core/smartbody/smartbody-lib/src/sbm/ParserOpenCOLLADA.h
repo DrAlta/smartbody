@@ -55,6 +55,7 @@ struct ColladChannel
 class ParserOpenCOLLADA
 {
 	public:
+		static void getChildNodes(const std::string& nodeName, DOMNode* node, std::vector<DOMNode*>& childs );
 		static DOMNode* getNode(const std::string& nodeName, DOMNode* node);
 		static DOMNode* getNode(const std::string& nodeName, std::string fileName);
 		static std::string getNodeAttributeString(DOMNode* node, XMLCh* attrName);
@@ -69,11 +70,11 @@ class ParserOpenCOLLADA
 	
 		static void animationPostProcess(SkSkeleton& skeleton, SkMotion& motion);
 		static void animationPostProcessByChannels(SkSkeleton& skeleton, SkMotion& motion, SkChannelArray& channels);
-		static void parseLibraryGeometries(DOMNode* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames,std::map<std::string, std::string>& materialId2Name,  std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::vector<SrModel*>& meshModelVec, float scale);
+		static void parseLibraryGeometries(DOMNode* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap,std::vector<SrModel*>& meshModelVec, float scale);
 		static void load_texture(int type, const char* file, const SrStringArray& paths);
 		static void parseLibraryMaterials(DOMNode* node, std::map<std::string, std::string>& effectId2MaterialId);
 		static void parseLibraryImages(DOMNode* node, std::map<std::string, std::string>& pictureId2File);
-		static void parseLibraryEffects(DOMNode* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap);
+		static void parseLibraryEffects(DOMNode* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap);
 
 	private:
 		static int getMotionChannelId(SkChannelArray& channels, const std::string&  sourceName);

@@ -13,6 +13,7 @@
 #include <sr/sr_sa_gl_render.h>
 #include <sr/sr_light.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBMotion.h>
 #include <string>
 
 class MouseViewer : public Fl_Gl_Window
@@ -39,6 +40,8 @@ public:
 	~SkeletonViewer();
 
 public:
+	void setPlayMotion(bool play);
+	void setTestMotion(SmartBody::SBMotion* motion);
 	void setShowJointLabels(int showLabel);
 	void setSkeleton(std::string skelName);
 	void setJointMap(std::string mapName);
@@ -47,6 +50,7 @@ public:
 	void focusOnSkeleton();
 	virtual int handle( int event );
 	virtual void draw();
+	SmartBody::SBSkeleton* getSkeleton();
 	
 protected:
 	void updateLights();
@@ -56,6 +60,8 @@ protected:
 	std::string pickJointName(float x, float y);
 	
 protected:	
+	bool playMotion;
+	SmartBody::SBMotion* testMotion;
 	SrSaGlRender renderFunction;
 	int showJointLabels;
 	std::vector<SrLight> lights;
@@ -63,6 +69,8 @@ protected:
 	SmartBody::SBSkeleton* skeleton;
 	std::string jointMapName;
 	std::string focusJointName;
+	float curTime, prevTime, deltaTime;
+	float motionTime;
 public:
 	std::vector<std::string> standardJointNames;	
 };
@@ -89,6 +97,7 @@ class JointMapViewer : public Fl_Double_Window
 		void setCharacterName(std::string charName);
 		void setJointMapName(std::string jointMapName);
 		
+		static void TestPlayMotionCB(Fl_Widget* widget, void* data);
 		static void ResetMapCB(Fl_Widget* widget, void* data);
 		static void ApplyMapCB(Fl_Widget* widget, void* data);
 		static void CancelCB(Fl_Widget* widget, void* data);
@@ -98,6 +107,7 @@ class JointMapViewer : public Fl_Double_Window
 		static void AddJointMapCB(Fl_Widget* widget, void* data);
 		static void CheckShowJointLabelCB(Fl_Widget* widget, void* data);
 
+		void testPlayMotion();
 		void resetJointMap(bool restore = false);
 		void addFocusJointMap();
 		void applyJointMap();
@@ -110,13 +120,14 @@ class JointMapViewer : public Fl_Double_Window
 		virtual void draw();
 	protected:
 		void updateJointLists();
-
 	
 		std::string _jointMapName;
 		std::string _skelName;
 		std::string _charName;
 		std::vector<std::string> standardJointNames;
 		std::vector<std::string> skeletonJointNames;
+		SmartBody::SBMotion* testCommonSkMotion;
+		SmartBody::SBMotion* testTargetMotion;
 	public:
 		Fl_Choice* _buttonJointLabel;
 		Fl_Choice* _choiceJointMaps;
@@ -127,10 +138,12 @@ class JointMapViewer : public Fl_Double_Window
 		Fl_Button* _buttonReset;
 		Fl_Button* _buttonRestore;
 		Fl_Button* _buttonAddMapping;
+		Fl_Button* _buttonTestPlayMotion;
 		std::vector<JointMapInputChoice*> _jointChoiceList;
 		SkeletonViewer* targetSkeletonViewer;
 		SkeletonViewer* standardSkeletonViewer;
 		Fl_Double_Window* rootWindow;
 		int scrollY;
+		bool testPlay;
 };
 #endif

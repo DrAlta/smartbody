@@ -977,6 +977,7 @@ void SrModel::operator = ( const SrModel& m )
 
    mtlTextureNameMap = m.mtlTextureNameMap;
    mtlNormalTexNameMap = m.mtlNormalTexNameMap;
+   mtlSpecularTexNameMap = m.mtlSpecularTexNameMap;
    mtlFaceIndices = m.mtlFaceIndices;
     
    name = m.name;

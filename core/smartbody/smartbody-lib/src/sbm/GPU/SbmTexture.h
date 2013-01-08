@@ -14,10 +14,11 @@ typedef std::map<std::string,SbmTexture*> StrTextureMap;
 class SbmTextureManager
 {
 public:
-	enum { TEXTURE_DIFFUSE = 0, TEXTURE_NORMALMAP };
+	enum { TEXTURE_DIFFUSE = 0, TEXTURE_NORMALMAP, TEXTURE_SPECULARMAP };
 protected:
 	StrTextureMap textureMap;
 	StrTextureMap normalTexMap;
+	StrTextureMap specularTexMap;
 private:
 	static SbmTextureManager* _singleton;
 	SbmTextureManager(void);

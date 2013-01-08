@@ -35,6 +35,7 @@ public:
 	SrMaterial  material;
 	std::string texName;
 	std::string normalMapName;
+	std::string specularMapName;
 	int numTri;
 	std::vector<SrVec3i> triBuf;
 };
