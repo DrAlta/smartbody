@@ -20,18 +20,15 @@
  *      Yuyu Xu, USC
  */
 
-
 #include "vhcl.h"
 #include "PanimationWindow.h"
-#include "ParamAnimBlock.h"
-
-#include <sbm/mcontrol_util.h>
-#include <bml/bml.hpp>
-
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <sbm/mcontrol_util.h>
+#include <bml/bml.hpp>
+#include "ParamAnimBlock.h"
 #include "ParamAnimEditorWidget.h"
 #include "ParamAnimStateEditor.h"
 #include "ParamAnimTransitionEditor.h"
@@ -39,6 +36,7 @@
 #include "ParamAnimRunTimeEditor.h"
 #include "ParamAnimScriptEditor.h"
 #include "VisualizationView.h"
+
 
 PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
 {
@@ -111,8 +109,6 @@ void PanimationWindow::label_viewer(std::string name)
 
 void PanimationWindow::show_viewer()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	this->show();
 }
 
@@ -128,9 +124,8 @@ void PanimationWindow::update_viewer()
 	if (characterList->size() == 0)
 		return;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::string charName = characterList->menu()[characterList->value()].label();
-	SbmCharacter* character = mcu.getCharacter(charName);
+	SmartBody::SBCharacter * character = SmartBody::SBScene::getScene()->getCharacter(charName);
 	if (!character)
 		return;
 
@@ -380,5 +375,3 @@ void PanimationViewerFactory::destroy(GenericViewer* viewer)
 {
 	delete viewer;
 }
-
-

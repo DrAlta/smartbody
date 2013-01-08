@@ -24,7 +24,6 @@
 #define _PARAM_ANIM_RUN_TIME_EDITOR_H_
 
 #include <FL/Fl_Slider.H>
-#include <vhcl.h>
 #include <FL/Fl_Gl_Window.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <sr/sr_gl.h>

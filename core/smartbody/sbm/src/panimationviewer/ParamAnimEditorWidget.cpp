@@ -20,13 +20,14 @@
  *      Yuyu Xu, USC
  */
 
+#include "vhcl.h"
 #include "ParamAnimEditorWidget.h"
-#include "ParamAnimBlock.h"
-#include "ParamAnimStateEditor.h"
-#include "ParamAnimTransitionEditor.h"
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBScene.h>
+#include "ParamAnimBlock.h"
+#include "ParamAnimStateEditor.h"
+#include "ParamAnimTransitionEditor.h"
 
 ParamAnimEditorWidget::ParamAnimEditorWidget(Fl_Group* g, int x, int y, int w, int h, char* name) : EditorWidget(x, y, w, h, name)
 {

@@ -20,11 +20,15 @@
  *      Yuyu Xu, USC
  */
 
+#include "vhcl.h"
 #include "ParamAnimTransitionEditor.h"
-#include <sbm/mcontrol_util.h>
+#include <FL/Fl_Hold_Browser.H>
+#include "sb/SBScene.h"
+#include "sb/SBMotion.h"
+#include "sbm/mcontrol_util.h"
 #include "ParamAnimBlock.h"
 #include "ParamAnimEditorWidget.h"
-#include <FL/Fl_Hold_Browser.H>
+#include "PanimationWindow.h"
 
 
 PATransitionEditor::PATransitionEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
@@ -395,9 +399,9 @@ void PATransitionEditor::changeTransitionList(Fl_Widget* widget, void* data)
 
 	block1->removeAllMarks();
 	block1->setName(transition->fromMotionName);
-	std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(transition->fromMotionName);
+	SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(transition->fromMotionName);
 	block1->setStartTime(0);
-	block1->setEndTime(iter->second->duration());
+	block1->setEndTime(motion->duration());
 	for (int i = 0; i < transition->getNumEaseOut(); i++)
 	{
 		editor->paWindow->addTimeMarkToBlock(block1, transition->easeOutStart[i]);
@@ -405,9 +409,9 @@ void PATransitionEditor::changeTransitionList(Fl_Widget* widget, void* data)
 	}
 	block2->removeAllMarks();
 	block2->setName(transition->toMotionName);
-	iter = mcu.motion_map.find(transition->toMotionName);
+	motion = SmartBody::SBScene::getScene()->getMotion(transition->toMotionName);
 	block2->setStartTime(0);
-	block2->setEndTime(iter->second->duration());
+	block2->setEndTime(motion->duration());
 	editor->paWindow->addTimeMarkToBlock(block2, transition->easeInStart);
 	editor->paWindow->addTimeMarkToBlock(block2, transition->easeInEnd);
 

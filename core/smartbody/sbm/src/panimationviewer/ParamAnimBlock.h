@@ -20,7 +20,6 @@
  *      Yuyu Xu, USC
  */
 
-
 #ifndef _PARAMANIMBLOCK_
 #define _PARAMANIMBLOCK_
 

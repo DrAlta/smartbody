@@ -20,9 +20,10 @@
  *      Yuyu Xu, USC
  */
 
+#include "vhcl.h"
 #include "ParamAnimScriptEditor.h"
-#include <sbm/mcontrol_util.h>
 #include <FL/Fl_Hold_Browser.H>
+#include <sbm/mcontrol_util.h>
 #include <controllers/me_ct_param_animation.h>
 
 #define transitionTrace 0
@@ -256,7 +257,7 @@ void PAScriptEditor::refresh()
 void PAScriptEditor::update()
 {
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
-	SbmCharacter* character = mcuCBHandle::singleton().getCharacter(charName);
+	SmartBody::SBCharacter * character = SmartBody::SBScene::getScene()->getCharacter(charName);
 	if (!character)
 		return;
 	if (!character->param_animation_ct)

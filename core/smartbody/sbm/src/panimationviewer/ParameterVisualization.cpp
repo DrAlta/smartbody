@@ -1,6 +1,9 @@
+#include "vhcl.h"
 #include "ParameterVisualization.h"
 #include <sb/SBCharacter.h>
 #include <controllers/me_ct_param_animation.h>
+#include "ParameterGroup.h"
+#include "PanimationWindow.h"
 
 
 ParameterVisualization::ParameterVisualization(bool isInteractive, int x, int y, int w, int h, char* name, PABlendData* s, ParameterGroup* group) : Fl_Group(x, y, w, h, name), blendData(s), paramGroup(group)

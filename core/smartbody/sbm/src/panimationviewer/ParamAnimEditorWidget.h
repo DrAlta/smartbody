@@ -24,7 +24,6 @@
 #define _PARAMANIMEDITORWIDGET_
 
 #include <FL/Fl_Slider.H>
-#include <vhcl.h>
 #include "nle/NonLinearEditorWidget.h"
 
 class PABlendEditor;

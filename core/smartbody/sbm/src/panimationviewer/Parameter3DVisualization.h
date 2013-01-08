@@ -4,8 +4,11 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Gl_Window.H>
 #include <controllers/me_ct_param_animation_data.h>
-#include "ParameterGroup.h"
 #include <sr/sr_camera.h>
+#include <sr/sr_event.h>
+
+class PABlendData;
+class ParameterGroup;
 
 class VisualizationBase : public Fl_Gl_Window
 {

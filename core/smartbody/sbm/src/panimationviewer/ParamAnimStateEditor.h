@@ -23,11 +23,9 @@
 #ifndef _PARAM_ANIM_STATE_EDITOR_H_
 #define _PARAM_ANIM_STATE_EDITOR_H_
 
-#include <vhcl.h>
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Float_Input.H>
-#include <vhcl.h>
 #include <FL/Fl_Multi_Browser.H>
 #include <FL/Fl_Check_Button.H>
 #include "PanimationWindow.h"

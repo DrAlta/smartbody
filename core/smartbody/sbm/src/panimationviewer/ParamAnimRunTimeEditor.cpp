@@ -20,6 +20,7 @@
  *      Yuyu Xu, USC
  */
 
+#include "vhcl.h"
 #include "ParamAnimRunTimeEditor.h"
 #include <FL/gl.h>
 #include <GL/glu.h>
@@ -59,7 +60,7 @@ PARunTimeEditor::~PARunTimeEditor()
 void PARunTimeEditor::update()
 {
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
-	SbmCharacter* character = mcuCBHandle::singleton().getCharacter(charName);
+	SmartBody::SBCharacter * character = SmartBody::SBScene::getScene()->getCharacter(charName);
 	if (!character)
 		return;
 
@@ -185,7 +186,7 @@ void PARunTimeEditor::initializeRunTimeEditor()
 		return;
 
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
-	SbmCharacter* character = mcuCBHandle::singleton().getCharacter(charName);
+	SmartBody::SBCharacter * character = SmartBody::SBScene::getScene()->getCharacter(charName);
 	if (character)
 	{
 		if (character->param_animation_ct == NULL)

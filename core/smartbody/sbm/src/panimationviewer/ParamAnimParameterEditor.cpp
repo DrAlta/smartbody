@@ -1,12 +1,12 @@
-#include <vhcl.h>
+#include "vhcl.h"
 #include "ParamAnimParameterEditor.h"
-#include "ParamAnimStateEditor.h"
 #include <sb/SBAnimationState.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBScene.h>
 #include <sb/SBJoint.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
+#include "ParamAnimStateEditor.h"
 
 PAParameterEditor::PAParameterEditor(PABlendEditor* editor, int x, int y, int w, int h) : Fl_Window(x, y, w, h)
 {

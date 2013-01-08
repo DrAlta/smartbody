@@ -24,10 +24,16 @@
 #define _PARAM_ANIM_TRANSITION_EDITOR_H_
 
 #include <FL/Fl_Slider.H>
-#include "PanimationWindow.h"
+#include <FL/Fl_Choice.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Browser.H>
 
 class ParamAnimEditorWidget;
 class PanimationWindow;
+namespace nle { class NonLinearEditorModel; }
+
 
 class PATransitionEditor : public Fl_Group
 {
