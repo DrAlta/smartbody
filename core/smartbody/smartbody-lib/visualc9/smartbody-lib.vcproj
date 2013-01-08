@@ -404,14 +404,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\joint_logger.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\joint_logger.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\KinectProcessor.cpp"
 				>
 			</File>

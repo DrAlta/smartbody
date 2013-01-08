@@ -222,7 +222,6 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/gwiz_math.cpp
 	sbm/gwiz_spline.cpp
 	sbm/Heightfield.cpp
-	sbm/joint_logger.cpp
 	sbm/lin_win.cpp
 	sbm/mcontrol_callbacks.cpp
 	sbm/mcontrol_util.cpp

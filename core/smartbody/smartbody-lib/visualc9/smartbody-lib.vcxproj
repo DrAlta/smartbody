@@ -250,7 +250,6 @@
     <ClCompile Include="..\src\sbm\gwiz_math.cpp" />
     <ClCompile Include="..\src\sbm\gwiz_spline.cpp" />
     <ClCompile Include="..\src\sbm\Heightfield.cpp" />
-    <ClCompile Include="..\src\sbm\joint_logger.cpp" />
     <ClCompile Include="..\src\sbm\KinectProcessor.cpp" />
     <ClCompile Include="..\src\sbm\lin_win.cpp" />
     <ClCompile Include="..\src\sbm\local_speech.cpp" />
@@ -696,7 +695,6 @@
     <ClInclude Include="..\src\sbm\gwiz_cmdl.h" />
     <ClInclude Include="..\src\sbm\gwiz_math.h" />
     <ClInclude Include="..\src\sbm\Heightfield.h" />
-    <ClInclude Include="..\src\sbm\joint_logger.hpp" />
     <ClInclude Include="..\src\sbm\KinectProcessor.h" />
     <ClInclude Include="..\src\sbm\lin_win.h" />
     <ClInclude Include="..\src\sbm\local_speech.h" />
