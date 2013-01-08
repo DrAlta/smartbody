@@ -880,11 +880,7 @@ SkeletonViewer::~SkeletonViewer()
 }
 
 void SkeletonViewer::setTestMotion( SmartBody::SBMotion* motion )
-{
-	if (testMotion)
-	{
-		testMotion->disconnect();
-	}
+{	
 	testMotion = motion;
 	if (testMotion)
 		testMotion->connect(skeleton);
@@ -1420,7 +1416,7 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	if (!commonSkMotion) // load from string
 	{		
 		std::string mediaPath = scene->getMediaPath();		
-		std::string retargetDir = mediaPath + "/" + "retarget/motion/";
+		std::string retargetDir = mediaPath + "/" + "behaviorsets/test/";
 		std::string targetMotionFile = retargetDir+"/"+commonSkMotionName + motionExt;
 		scene->loadAsset(targetMotionFile); // load motion
 		
@@ -1439,7 +1435,7 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	_buttonAddMapping = new Fl_Button(420 + 10 + 250, h - 50 + 10, 90, 30, "Add Maping");
 	_buttonAddMapping->callback(AddJointMapCB,this);	
 	_buttonTestPlayMotion = new Fl_Button(420 + 10 + 350, h - 50 + 10, 90, 30, "Test Motion");
-	//_buttonTestPlayMotion->callback(TestPlayMotionCB,this);
+	_buttonTestPlayMotion->callback(TestPlayMotionCB,this);
 	testPlay = false;
 	rightGroup->end();
 	//rightGroup->resizable(targetSkeletonViewer);		
@@ -1903,16 +1899,19 @@ void JointMapViewer::testPlayMotion()
 
 	
 	// create a temporary retarget motion
-	if (testPlay && !testTargetMotion)
+	if (testPlay)
 	{
 		SmartBody::SBJointMap jointMap;
 		int numChildren = _scrollGroup->children();
 		for (int i=0;i<numChildren;i++)
 		{
 			Fl_Input_Choice* input = dynamic_cast<JointMapInputChoice*>(_scrollGroup->child(i));
-			if (input && input->value() != "")
+			if (!input) continue;
+			std::string mapValue = input->value();
+			std::string mapSource = input->label();
+			if (input && mapValue != "")
 			{
-				jointMap.setMapping(input->label(),input->value());			
+				jointMap.setMapping(mapSource,mapValue);			
 			}
 		}
 		std::vector<std::string> endJoints;
@@ -1938,6 +1937,11 @@ void JointMapViewer::testPlayMotion()
 		SmartBody::SBMotion* retargetMotion = dynamic_cast<SmartBody::SBMotion*>(testCommonSkMotion->buildRetargetMotionV2(commonSk,targetSk,endJoints,relativeJoints,offsetJoints));
 		jointMap.applySkeletonInverse(targetSk);
 		jointMap.applyMotionInverse(retargetMotion);
+		if (testTargetMotion)
+		{
+			testTargetMotion->disconnect();
+			delete testTargetMotion;
+		}
 		testTargetMotion = retargetMotion;
 		targetSkeletonViewer->setTestMotion(testTargetMotion);
 	}
