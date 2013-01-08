@@ -145,15 +145,15 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	cameraChoice = new Fl_Choice(curX, curY, 80, 25, "Camera");
 	cameraChoice->when(FL_WHEN_NOT_CHANGED|FL_WHEN_CHANGED);
 	cameraChoice->callback(ChooseCameraCB, this);
+	updateCameraList();	
+	cameraChoice->value(0);
 	curX += 85;
 	saveCamera = new Fl_Button(curX, curY, 45, 25, "Save");
 	saveCamera->callback(SaveCameraCB, this);
 
  	curX += 125;
 // 	deleteCamera = new Fl_Button(curX, curY, 45, 25, "Del");
-// 	deleteCamera->callback(DeleteCameraCB, this);		
-	updateCameraList();
-
+// 	deleteCamera->callback(DeleteCameraCB, this);			
 	windowSizes.push_back("640x480");
 	windowSizes.push_back("720x480");
 	windowSizes.push_back("720x576");
@@ -172,11 +172,13 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	windowSizes.push_back("1920x1080");
 
 	resolutionChoice = new Fl_Choice(curX, curY, 80, 25, "Resolution");
+	resolutionChoice->add("Default");
 	for (unsigned int i=0;i<windowSizes.size();i++)
 		resolutionChoice->add(windowSizes[i].c_str());
 	resolutionChoice->add("Custom...");	
 	resolutionChoice->when(FL_WHEN_NOT_CHANGED|FL_WHEN_CHANGED);
 	resolutionChoice->callback(ResizeWindowCB,this);
+	resolutionChoice->value(0);
 	cameraGroup->end();	
 
 	curY += 30;
@@ -1434,7 +1436,12 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 	
 	std::vector<std::string> tokens;	
 	std::string resStr = resChoice->text();
-	if (resStr == "Custom...")
+	if (resStr == "Default")
+	{
+		rootWindow->resize(rootWindow->x(),rootWindow->y(),800,800);
+		return;
+	}
+	else if (resStr == "Custom...")
 	{
 		if (!rootWindow->resWindow)
 		{
@@ -1442,6 +1449,7 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 			rootWindow->resWindow->baseWin = rootWindow;
 		}
 		rootWindow->resWindow->show();
+		return;
 	}
 
 	vhcl::Tokenize(resStr, tokens, "x");

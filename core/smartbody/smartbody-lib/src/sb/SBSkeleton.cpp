@@ -128,7 +128,7 @@ std::string SBSkeleton::saveToString()
 
 void SBSkeleton::loadFromString(const std::string& info )
 {
-	LOG("loadFromString = %s",info.c_str());
+	//LOG("loadFromString = %s",info.c_str());
 	SrInput input(info.c_str());	
 	SkSkeleton::load(input);
 }
