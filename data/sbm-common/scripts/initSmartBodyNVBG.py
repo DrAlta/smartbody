@@ -37,14 +37,17 @@ class SmartBodyNVBG(Nvbg):
                 if (name == "play dialog"):
                         dialogStr = self.getAttribute("dialog").getValue()
                         audioStr = self.getAttribute("audio").getValue()
+                        tagStr = self.getAttribute("tag").getValue()
                         if (dialogStr == ""):
                                 #print "dialog not selected, play default one"
                                 self.nvbg.speak()
                         else:
                                 if (audioStr == ""):
                                         self.nvbg.speak(dialogStr)
+                                elif (tagStr == ""):
+                                        self.nvbg.speak(dialogStr, audioStr)
                                 else:
-                                        self.nvbg.speak(dialogStr, audioStr) 
+                                        self.nvbg.speak(dialogStr, audioStr, tagStr)
                 if (name == "save"):
                         dialogStr = self.getAttribute("dialog").getValue()
                         audioStr = self.getAttribute("audio").getValue()
@@ -211,7 +214,8 @@ class SmartBodyNVBG(Nvbg):
 
                 ''' dialogs '''
                 dialog = self.createStringAttribute("dialog", "", True, "nvbgs", 50, False, False, False, "Dialog")
-                audio = self.createStringAttribute("audio", "", True, "nvbgs", 55, False, False, False, "Dialog")
+                audio = self.createStringAttribute("audio", "", True, "nvbgs", 55, False, False, False, "Audio file")
+                tag = self.createStringAttribute("tag", "", True, "nvbgs", 57, False, False, False, "Emotion Tag")
                 self.createActionAttribute("play dialog", True, "nvbgs", 60, False, False, False, "Play the chosen dialog")
                 self.createActionAttribute("save", True, "nvbgs", 70, False, False, False, "Save the behavior to autoXML.xml")
 
