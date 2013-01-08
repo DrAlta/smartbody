@@ -41,8 +41,8 @@ class ChannelItem
 {
 public:
 	int index;
-	SrString* name;
-	SrString* label;
+	std::string * name;
+	std::string * label;
 	SkChannel::Type type;
 	bool monitored;
 	bool channel_filtered;
@@ -99,7 +99,7 @@ public:
 	int mode; //0: character; 1: controller; 2: motion
 
 protected:
-	SrString no_motion;
+	std::string no_motion;
 
 public:
 	const char* getSelectedCharacterName();

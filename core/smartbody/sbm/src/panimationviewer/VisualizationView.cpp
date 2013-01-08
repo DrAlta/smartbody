@@ -225,22 +225,22 @@ void VisualizationView::refreshJointList()
 	const std::vector<SkJoint*>& jnts = sk->joints();
 	for(unsigned int i=0; i<jnts.size(); i++)
 	{
-		SrString jname(jnts[i]->name().c_str());
-		if(jname.search("face")>=0) continue;
-		if(jname.search("brow")>=0) continue;
-		if(jname.search("eye")>=0)  continue;
-		if(jname.search("nose")>=0) continue;
-		if(jname.search("lid")>=0)  continue;
-		if(jname.search("jaw")>=0)  continue;
-		if(jname.search("tongue")>=0) continue;
-		if(jname.search("lip")>=0)    continue;
-		if(jname.search("cheek")>=0)  continue;
-		if(jname.search("finger")>=0) continue;
-		if(jname.search("thumb")>=0)  continue;
-		if(jname.search("index")>=0)  continue;
-		if(jname.search("middle")>=0) continue;
-		if(jname.search("pinky")>=0)  continue;
-		if(jname.search("ring")>=0)   continue;
+		std::string jname = jnts[i]->name();
+		if(jname.compare("face")!=0) continue;
+		if(jname.compare("brow")!=0) continue;
+		if(jname.compare("eye")!=0)  continue;
+		if(jname.compare("nose")!=0) continue;
+		if(jname.compare("lid")!=0)  continue;
+		if(jname.compare("jaw")!=0)  continue;
+		if(jname.compare("tongue")!=0) continue;
+		if(jname.compare("lip")!=0)    continue;
+		if(jname.compare("cheek")!=0)  continue;
+		if(jname.compare("finger")!=0) continue;
+		if(jname.compare("thumb")!=0)  continue;
+		if(jname.compare("index")!=0)  continue;
+		if(jname.compare("middle")!=0) continue;
+		if(jname.compare("pinky")!=0)  continue;
+		if(jname.compare("ring")!=0)   continue;
 		plotJointChoice->add(jnts[i]->name().c_str());
 	}
 }

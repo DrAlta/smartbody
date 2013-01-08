@@ -463,7 +463,7 @@ GlChartViewArchive::~GlChartViewArchive()
 void GlChartViewArchive::NewSeries(const char* title, int type, int buffer_index)
 {
 	GlChartViewSeries* series = new GlChartViewSeries();
-	series->title.set(title);
+	series->title = title;
 	series->data_type = type;
 	series->SetBufferIndex(buffer_index);
 	if(series_list.size() == 0) series->SetRGBColor();
@@ -483,7 +483,7 @@ void GlChartViewArchive::DeleteSeries(const char* title)
 	for(int i = 0; i < series_list.size(); ++i)
 	{
 		series = series_list.get(i);
-		if(strcmp(&(series->title.get(0)), title) == 0)
+		if(strcmp(series->title.c_str(), title) == 0)
 		{
 			series->Clear();
 			delete series;
@@ -534,7 +534,7 @@ GlChartViewSeries* GlChartViewArchive::GetSeries(const char* title)
 {
 	for(int i = 0; i < series_list.size(); ++i)
 	{
-		if(strcmp((const char*)(series_list.get(i)->title), title) == 0) return series_list.get(i);
+		if(strcmp(series_list.get(i)->title.c_str(), title) == 0) return series_list.get(i);
 	}
 	return NULL;
 }

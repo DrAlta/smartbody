@@ -349,7 +349,7 @@ void GlChartView::draw_series_3D_euler(GlChartViewSeries* series)
 
 }
 
-void GlChartView::get_label(char* label, SrString& str, int type)
+void GlChartView::get_label(char* label, const std::string & str, int type)
 {
 	label[0] = '\0';
 	switch(type)
@@ -369,7 +369,7 @@ void GlChartView::get_label(char* label, SrString& str, int type)
 		default:
 			break;
 	}
-	strcat(label, &(str.get(0)));
+	strcat(label, &(str[0]));
 	label[strlen(label)-3] = '\0';
 
 }
