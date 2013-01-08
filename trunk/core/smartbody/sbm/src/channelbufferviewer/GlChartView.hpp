@@ -82,7 +82,7 @@ protected:
 	void initGL(int width, int height);
 	void initFont();
 
-	void get_label(char* label, SrString& str, int type);
+	void get_label(char* label, const std::string & str, int type);
 	
 	void reshape(int width, int height);
 

@@ -23,9 +23,7 @@
 #ifndef _GL_CHART_VIEW_ARCHIVE_H_
 #define _GL_CHART_VIEW_ARCHIVE_H_
 
-#include <string.h>
-#include <math.h>
-#include <stdlib.h>
+#include <string>
 #include <sr/sr_vec.h>
 #include <sr/sr_vec2.h>
 #include <sr/sr_quat.h>
@@ -43,7 +41,7 @@
 class GlChartViewSeries
 {
 public:
-	SrString title;
+	std::string title;
 	int data_type;
 	int max_size;
 	int current_ind;

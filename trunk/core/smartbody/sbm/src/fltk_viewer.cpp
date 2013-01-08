@@ -482,8 +482,9 @@ void FltkViewer::root ( SrSn *r )
 
 void FltkViewer::draw_message ( const char* s )
  {
-   if ( _data->message!=s ) redraw();
-   _data->message.set(s);
+   if ( _data->message != s )
+      redraw();
+   _data->message = s;
  }
 
 void FltkViewer::show_menu ()
@@ -1526,17 +1527,19 @@ void FltkViewer::draw()
 
 	_data->fcounter.stop();
 
-   if ( _data->message.len() )
-    { gl_draw_string ( _data->message, -1, -1 );
+    if ( !_data->message.empty() )
+    {
+        gl_draw_string ( _data->message.c_str(), -1, -1 );
     }
-   else if ( _data->statistics )
-    { _data->message.setf ( "FPS:%5.2f frame(%2.0f):%4.1fms render:%4.1fms", 
+    else if ( _data->statistics )
+    {
+        _data->message = vhcl::Format( "FPS:%5.2f frame(%2.0f):%4.1fms render:%4.1fms", 
                   _data->fcounter.mps(),
                   _data->fcounter.measurements(),
                   _data->fcounter.loopdt()*1000.0,
                   _data->fcounter.meandt()*1000.0 );
-      gl_draw_string ( _data->message, -1.0f, -1.0f );
-      _data->message.set ( "" ); // will not deallocate the string but set len==0
+        gl_draw_string ( _data->message.c_str(), -1.0f, -1.0f );
+        _data->message = "";
     }
 
    if (_retargetStepWindow)
@@ -2212,9 +2215,8 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		if(fileextension == ".camera") // camera config file, load camera
 		{
 			mcuCBHandle& mcu = mcuCBHandle::singleton();
-			FILE * pFile;
-			SrString f(fullPathName.c_str());
-			pFile = fopen (f,"r");
+			std::string f = fullPathName;
+			FILE * pFile = fopen (f.c_str(), "r");
 			if (pFile!=0)
 			{
 				SrInput file_in (pFile);

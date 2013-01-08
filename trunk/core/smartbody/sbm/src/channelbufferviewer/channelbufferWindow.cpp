@@ -156,8 +156,8 @@ void ChannelBufferWindow::initChannelItem(ChannelBufferWindow* window, int num)
 	window->Channel_item_list.size(num);
 	for(int i = 0; i < num; ++i)
 	{
-		window->Channel_item_list.get(i).label = new SrString();
-		window->Channel_item_list.get(i).name = new SrString();
+		window->Channel_item_list.get(i).label = new std::string();
+		window->Channel_item_list.get(i).name = new std::string();
 	}
 }
 
@@ -178,11 +178,11 @@ void ChannelBufferWindow::refreshBold(Fl_Widget* widget, void* data)
 				ChannelItem& item = window->Channel_item_list.get(i);
 				if(item.monitored)
 				{
-					if(strcmp(&(item.label->get(0)), label) == 0)
+					if(strcmp(item.label->c_str(), label) == 0)
 					{
 						for(int k = 0; k < window->chartview->get_archive()->GetSeriesCount(); ++k)
 						{
-							if(strcmp(&(window->chartview->get_archive()->GetSeries(k)->title.get(0)), &(item.label->get(0)))==0)
+							if(strcmp(window->chartview->get_archive()->GetSeries(k)->title.c_str(), item.label->c_str())==0)
 							{
 								window->chartview->get_archive()->GetSeries(k)->bold = true;
 								break;
@@ -226,7 +226,7 @@ void ChannelBufferWindow::FilterItem(ChannelBufferWindow* window, Fl_Browser* li
 	for(int i = 0; i < window->Channel_item_list.size(); ++i)
 	{
 		if(window->Channel_item_list.get(i).monitored != monitored) continue;
-		const char* item = &(window->Channel_item_list.get(i).label->get(0));
+		const char* item = window->Channel_item_list.get(i).label->c_str();
 		if(strstr(item, keyword)!= NULL) 
 		{
 			window->Channel_item_list.get(i).not_in_search = false;
@@ -375,13 +375,13 @@ void ChannelBufferWindow::set_default_values()
 	num_of_frames = 800;
 	mode = 1;
 	hide_other_channels = true;
-	no_motion.set("------");
+	no_motion = "------";
 }
 
 void ChannelBufferWindow::loadMotions(ChannelBufferWindow* window)
 {
 	window->motion->clear();
-	window->motion->add(&(window->no_motion.get(0)));
+	window->motion->add(window->no_motion.c_str());
 	std::vector<std::string> motionNames = SmartBody::SBScene::getScene()->getMotionNames();
 	for (size_t i = 0; i < motionNames.size(); i++)
 	{
@@ -437,17 +437,17 @@ void ChannelBufferWindow::refreshChannelsWidget(ChannelBufferWindow* window)
 		{
 			if(window->mode == 2)
 			{
-				window->channel_list->add(&(item.label->get(0)));
+				window->channel_list->add(item.label->c_str());
 			}
 			else 
 			{
 				if(!item.channel_filtered)
 				{
-					window->channel_list->add(&(item.label->get(0)));
+					window->channel_list->add(item.label->c_str());
 				}
 				else if(!window->hide_other_channels)
 				{
-					window->channel_list->add(&(item.label->get(0)));
+					window->channel_list->add(item.label->c_str());
 					window->channel_list->child(window->channel_list->size()-1)->labelcolor(color);
 				}
 			}
@@ -466,7 +466,7 @@ void ChannelBufferWindow::refreshMonitoredChannelsWidget(ChannelBufferWindow* wi
 		ChannelItem& item = window->Channel_item_list.get(i);
 		if(item.monitored && !item.not_in_search)
 		{
-			window->channel_monitor->add(&(item.label->get(0)));
+			window->channel_monitor->add(item.label->c_str());
 			if(item.motion_filtered) window->channel_monitor->child(window->channel_monitor->size()-1)->labelcolor(color);
 		}
 	}
@@ -509,8 +509,8 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 		item.monitored = false;
 		item.not_in_search = false;
 		item.index = channel_index;
-		item.label->set(str);
-		item.name->set(joint->name().c_str());
+		item.label->assign(str);
+		item.name->assign(joint->name());
 		item.type = channel.type;
 		channel_index += channelSize;
 	}
@@ -555,7 +555,7 @@ void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 	int j = 0;
 	refreshControllerVisibilities(window);
 	
-	if(strcmp(window->motion->mvalue()->label(), &(window->no_motion.get(0))) == 0)
+	if(strcmp(window->motion->mvalue()->label(), window->no_motion.c_str()) == 0)
 	{
 		for(j = 0; j < window->Channel_item_list.size(); ++j)
 		{
@@ -563,7 +563,7 @@ void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 			item.motion_filtered = false;
 			if(item.monitored) 
 			{
-				window->chartview->get_archive()->GetSeries(&(item.label->get(0)))->Reset();
+				window->chartview->get_archive()->GetSeries(item.label->c_str())->Reset();
 			}
 		}
 		window->mode = 1;
@@ -590,7 +590,7 @@ void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 			SkChannel::Type type = channels.get(i).type;
 			for(j = 0; j < window->Channel_item_list.size(); ++j)
 			{
-				if(strcmp(&(window->Channel_item_list.get(j).name->get(0)), name.c_str()) == 0
+				if(strcmp(window->Channel_item_list.get(j).name->c_str(), name.c_str()) == 0
 					&& window->Channel_item_list.get(j).type == type)
 				{
 					window->Channel_item_list.get(j).motion_filtered = false;
@@ -613,7 +613,7 @@ void ChannelBufferWindow::refreshHideOtherChannels(Fl_Widget* widget, void* data
 
 void ChannelBufferWindow::refreshControllerVisibilities(ChannelBufferWindow* window)
 {
-	if(strcmp(window->motion->mvalue()->label(), &(window->no_motion.get(0))) == 0)
+	if(strcmp(window->motion->mvalue()->label(), window->no_motion.c_str()) == 0)
 	{
 		window->controller->activate();
 	}
@@ -692,11 +692,11 @@ void ChannelBufferWindow::addMonitoredChannel(Fl_Widget* widget, void* data)
 		{
 			for(int j = 0; j < window->Channel_item_list.size(); ++j)
 			{
-				if(strcmp(&(window->Channel_item_list.get(j).label->get(0)), window->channel_list->text(i+1)) == 0)
+				if(strcmp(window->Channel_item_list.get(j).label->c_str(), window->channel_list->text(i+1)) == 0)
 				{
 					ChannelItem& item = window->Channel_item_list.get(j);
 					item.monitored = true;
-					const char* label = &(item.label->get(0));
+					const char* label = item.label->c_str();
 					window->chartview->get_archive()->NewSeries(label, get_size(label), window->Channel_item_list.get(j).index);
 					series = window->chartview->get_archive()->GetLastSeries();
 					series->SetMaxSize(window->num_of_frames);
@@ -718,7 +718,7 @@ void ChannelBufferWindow::fillSeriesWithMotionData(ChannelBufferWindow* window, 
 	if(motion == NULL || motion->connected_skeleton() == NULL) return;
 	if(series == NULL)
 	{
-		series = window->chartview->get_archive()->GetSeries(&(item.label->get(0)));
+		series = window->chartview->get_archive()->GetSeries(item.label->c_str());
 	}
 	float val[4];
 	int index = 0;
@@ -727,7 +727,7 @@ void ChannelBufferWindow::fillSeriesWithMotionData(ChannelBufferWindow* window, 
 	{
 		if(channels[index].joint == NULL) continue;
 		std::string name = channels[index].joint->name().c_str();
-		if(strcmp(name.c_str(), &(item.name->get(0))) == 0 && item.type == channels[index].type)
+		if(strcmp(name.c_str(), item.name->c_str()) == 0 && item.type == channels[index].type)
 		{
 			break;
 		}
@@ -768,10 +768,10 @@ void ChannelBufferWindow::removeMonitoredChannel(Fl_Widget* widget, void* data)
 		{
 			for(int j = 0; j < window->Channel_item_list.size(); ++j)
 			{
-				if(strcmp(&(window->Channel_item_list.get(j).label->get(0)), window->channel_monitor->text(i+1)) == 0)
+				if(strcmp(window->Channel_item_list.get(j).label->c_str(), window->channel_monitor->text(i+1)) == 0)
 				{
 					ChannelItem& item = window->Channel_item_list.get(j);
-					const char* label = &(item.label->get(0));
+					const char* label = item.label->c_str();
 					item.monitored = false;
 					window->chartview->get_archive()->DeleteSeries(label);
 					break;
@@ -881,11 +881,11 @@ void ChannelBufferWindow::update()
 								|| Channel_item_list.get(index).type == SkChannel::YPos
 								|| Channel_item_list.get(index).type == SkChannel::ZPos)
 								{
-									chartview->get_archive()->GetSeries(&(Channel_item_list.get(index).label->get(0)))->SetLast(buff[buff_counter]);
+									chartview->get_archive()->GetSeries(Channel_item_list.get(index).label->c_str())->SetLast(buff[buff_counter]);
 								}
 								else if(Channel_item_list.get(index).type == SkChannel::Quat) 
 								{
-									chartview->get_archive()->GetSeries(&(Channel_item_list.get(index).label->get(0)))->SetLast(buff[buff_counter], buff[buff_counter+1], buff[buff_counter+2], buff[buff_counter+3]);
+									chartview->get_archive()->GetSeries(Channel_item_list.get(index).label->c_str())->SetLast(buff[buff_counter], buff[buff_counter+1], buff[buff_counter+2], buff[buff_counter+3]);
 								}
 							}
 							if(Channel_item_list.get(index).type == SkChannel::XPos

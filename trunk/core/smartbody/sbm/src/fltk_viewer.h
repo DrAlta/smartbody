@@ -441,7 +441,7 @@ protected:
    bool showgesture;
    bool interactiveLocomotion;
 
-   SrString message;   // user msg to display in the window
+   std::string message;   // user msg to display in the window
    SrLight light;
 
    SrTimer    fcounter;   // To count frames and measure frame rate
