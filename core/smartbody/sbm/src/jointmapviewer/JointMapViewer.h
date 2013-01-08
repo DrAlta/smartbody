@@ -92,11 +92,14 @@ class JointMapViewer : public Fl_Double_Window
 {
 	public:
 		JointMapViewer(int x, int y, int w, int h, char* name);
+
+		void updateTestMotions();
 		~JointMapViewer();
 		
 		void setCharacterName(std::string charName);
 		void setJointMapName(std::string jointMapName);
 		
+		static void ChangeTestMotionCB(Fl_Widget* widget, void* data);
 		static void TestPlayMotionCB(Fl_Widget* widget, void* data);
 		static void ResetMapCB(Fl_Widget* widget, void* data);
 		static void ApplyMapCB(Fl_Widget* widget, void* data);
@@ -107,6 +110,7 @@ class JointMapViewer : public Fl_Double_Window
 		static void AddJointMapCB(Fl_Widget* widget, void* data);
 		static void CheckShowJointLabelCB(Fl_Widget* widget, void* data);
 
+		void setTestMotion(std::string motionName);
 		void testPlayMotion();
 		void resetJointMap(bool restore = false);
 		void addFocusJointMap();
@@ -132,6 +136,7 @@ class JointMapViewer : public Fl_Double_Window
 		Fl_Choice* _buttonJointLabel;
 		Fl_Choice* _choiceJointMaps;
 		Fl_Choice* _choiceCharacters;
+		Fl_Choice* _choiceTestMotions;
 		Fl_Scroll* _scrollGroup;
 		Fl_Button* _buttonApply;
 		Fl_Button* _buttonCancel;
