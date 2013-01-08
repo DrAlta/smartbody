@@ -17,7 +17,6 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Input.H>
 
-#include <sb/SBCharacter.h>
 
 class RetargetCreatorWindow : public Fl_Double_Window{
 public:
