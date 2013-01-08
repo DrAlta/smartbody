@@ -43,6 +43,8 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBBoneBusManager.h>
+#include <sb/SBAnimationState.h>
+#include <sb/SBAnimationTransition.h>
 #include <controllers/me_ct_param_animation.h>
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_scheduler2.h>
@@ -72,7 +74,7 @@
 
 #include "sr/sr_model.h"
 #include "sb/sbm_pawn.hpp"
-#include <sb/SBEvent.h>
+#include "sb/SBEvent.h"
 #include "sbm/ParserOpenCOLLADA.h"
 #include "sbm/ParserOgre.h"
 
@@ -935,47 +937,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			if (operation == "basename")
 				character->param_animation_ct->setBaseJointName(args.read_token());
 		}
-		else if (operation == "transition")
-		{
-			PATransition* newTransition = new PATransition();
-			std::string fromStateString = args.read_token();
-			if (fromStateString != "fromstate")
-				return CMD_FAILURE;
-			PABlend* fromState = mcu_p->lookUpPABlend(args.read_token());
-			if (!fromState)
-				return CMD_FAILURE;
-			newTransition->fromState = fromState;
-			std::string toStateString = args.read_token();
-			if (toStateString != "tostate")
-				return CMD_FAILURE;
-			PABlend* toState = mcu_p->lookUpPABlend(args.read_token());
-			if (!toState)
-				return CMD_FAILURE;
-			newTransition->toState = toState;
-			if (args.calc_num_tokens() == 2)
-			{
-				newTransition->fromMotionName = args.read_token();
-				newTransition->easeOutStart.push_back(mcu_p->lookUpMotion(newTransition->fromMotionName.c_str())->duration() - defaultTransition);
-				newTransition->easeOutEnd.push_back(mcu_p->lookUpMotion(newTransition->fromMotionName.c_str())->duration());
-				newTransition->toMotionName = args.read_token();
-				newTransition->easeInStart = 0.0;
-				newTransition->easeInEnd = defaultTransition;
-			}
-			else
-			{
-				newTransition->fromMotionName = args.read_token();
-				int numOfEaseOut = args.read_int();
-				for (int i = 0; i < numOfEaseOut; i++)
-				{
-					newTransition->easeOutStart.push_back(args.read_double());
-					newTransition->easeOutEnd.push_back(args.read_double());
-				}
-				newTransition->toMotionName = args.read_token();
-				newTransition->easeInStart = args.read_double();
-				newTransition->easeInEnd = args.read_double();
-				mcu_p->addPATransition(newTransition);
-			}
-		}
+		
 		else
 		{
 			LOG("mcu_panim_cmd_func ERR: operation not valid.");
@@ -2351,10 +2313,7 @@ int mcu_character_init(
 	}
 
 	err = char_p->init( skeleton_p, faceDefinition, &mcu_p->param_map, className );
-	if( err == CMD_SUCCESS ) {
 
-		char_p->ct_tree_p->set_evaluation_logger( mcu_p->logger_p );
-	}
 
 
 #if USE_WSP

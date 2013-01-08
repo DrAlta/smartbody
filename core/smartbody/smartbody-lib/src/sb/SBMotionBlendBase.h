@@ -4,8 +4,8 @@
 #include <sb/SBTypes.h>
 #include <sb/SBAnimationState.h>
 #include <controllers/me_ct_param_animation_data.h>
-#include <controllers/MeCtBlendEngine.h>
 
+class MeCtBlendEngine;
 
 namespace SmartBody {
 

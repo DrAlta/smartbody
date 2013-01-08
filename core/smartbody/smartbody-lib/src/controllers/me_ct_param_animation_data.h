@@ -147,31 +147,6 @@ class PABlend
 		std::vector<std::pair<SmartBody::SBMotionEvent*, int> > _events;
 };
 
-//There are PATransition stored inside mcu
-//Everytime PATransitionManager is created, it would copy the data from mcu.param_animation_transitions.
-//fromState and toState are just pointers and they have to be changed when PATransitionManager is created.
-class PATransition
-{
-	public:
-		PATransition();
-		PATransition(PATransition* data, PABlend* from, PABlend* to);
-		~PATransition();
-
-	public:
-		PABlend* fromState;
-		PABlend* toState;
-		std::string fromMotionName;
-		std::string toMotionName;
-		std::vector<double> easeOutStart;
-		std::vector<double> easeOutEnd;
-		double easeInStart;
-		double easeInEnd;
-		
-	public:
-		virtual int getNumEaseOut();
-};
-
-
 
 class MotionParameters
 {

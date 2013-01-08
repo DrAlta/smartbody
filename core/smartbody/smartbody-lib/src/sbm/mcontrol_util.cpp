@@ -2057,19 +2057,19 @@ void mcuCBHandle::addPABlend(PABlend* state)
 		param_anim_blends.push_back(state);
 }
 
-PATransition* mcuCBHandle::lookUpPATransition(std::string fromStateName, std::string toStateName)
+SmartBody::SBAnimationTransition* mcuCBHandle::lookUpPATransition(std::string fromStateName, std::string toStateName)
 {
 	for (size_t i = 0; i < param_anim_transitions.size(); i++)
 	{
-		if (param_anim_transitions[i]->fromState->stateName == fromStateName && param_anim_transitions[i]->toState->stateName == toStateName)
+		if (param_anim_transitions[i]->getSourceBlend()->stateName == fromStateName && param_anim_transitions[i]->getDestinationBlend()->stateName == toStateName)
 			return param_anim_transitions[i];
 	}
 	return NULL;	
 }
 
-void mcuCBHandle::addPATransition(PATransition* transition)
+void mcuCBHandle::addPATransition(SmartBody::SBAnimationTransition* transition)
 {
-	if (!lookUpPATransition(transition->fromState->stateName, transition->toState->stateName))
+	if (!lookUpPATransition(transition->getSourceBlend()->stateName, transition->getDestinationBlend()->stateName))
 		param_anim_transitions.push_back(transition);
 }
 

@@ -153,8 +153,8 @@ std::vector<std::string> SBAnimationBlendManager::getTransitionBlends(const std:
 
 	for (size_t i = 0; i < mcu.param_anim_transitions.size(); i++)
 	{
-		if (mcu.param_anim_transitions[i]->fromState->stateName == source)
-			blends.push_back(mcu.param_anim_transitions[i]->toState->stateName);
+		if (mcu.param_anim_transitions[i]->getSourceBlend()->stateName == source)
+			blends.push_back(mcu.param_anim_transitions[i]->getDestinationBlend()->stateName);
 	}
 
 	return blends;
@@ -164,8 +164,7 @@ SBAnimationTransition* SBAnimationBlendManager::getTransition(const std::string&
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	PATransition* transition = mcu.lookUpPATransition(source, dest);
-	SBAnimationTransition* animTransition = dynamic_cast<SBAnimationTransition*>(transition);
+	SBAnimationTransition* animTransition = mcu.lookUpPATransition(source, dest);
 
 	return animTransition;
 }
@@ -175,8 +174,7 @@ SBAnimationTransition* SBAnimationBlendManager::getTransitionByIndex(int id)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (id >= 0 && id < (int)mcu.param_anim_transitions.size())
 	{
-		PATransition* transition = mcu.param_anim_transitions[id];
-		SBAnimationTransition* animTransition = dynamic_cast<SBAnimationTransition*>(transition);
+		SBAnimationTransition* animTransition = mcu.param_anim_transitions[id];
 		return animTransition;
 	}
 	
@@ -198,8 +196,8 @@ std::vector<std::string> SBAnimationBlendManager::getTransitionNames()
 	std::vector<string> transitionNames;
 	for (size_t i = 0; i < mcu.param_anim_transitions.size(); i++)
 	{
-		transitionNames.push_back(mcu.param_anim_transitions[i]->fromState->stateName +
-								  "/" + mcu.param_anim_transitions[i]->toState->stateName );
+		transitionNames.push_back(mcu.param_anim_transitions[i]->getSourceBlend()->stateName +
+								  "/" + mcu.param_anim_transitions[i]->getDestinationBlend()->stateName );
 	}
 	return transitionNames;
 }

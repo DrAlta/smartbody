@@ -4,15 +4,30 @@
 
 namespace SmartBody {
 
-SBAnimationTransition::SBAnimationTransition() : PATransition()
+SBAnimationTransition::SBAnimationTransition() 
 {
 	_rule = NULL;
 }
 
-SBAnimationTransition::SBAnimationTransition(std::string name) : PATransition()
+SBAnimationTransition::SBAnimationTransition(std::string name) 
 {
 	_rule = NULL;
 }
+
+SBAPI SBAnimationTransition::SBAnimationTransition(SBAnimationTransition* transition, PABlend* from, PABlend* to)
+{
+	this->fromState = from;
+	this->toState = to;
+	this->fromMotionName = transition->fromMotionName;
+	this->toMotionName = transition->toMotionName;
+	for (unsigned int i = 0; i < transition->easeOutStart.size(); i++)
+		this->easeOutStart.push_back(transition->easeOutStart[i]);
+	for (unsigned int i = 0; i < transition->easeOutEnd.size(); i++)
+		this->easeOutEnd.push_back(transition->easeOutEnd[i]);
+	this->easeInStart = transition->getEaseInStart();
+	this->easeInEnd = transition->getEaseInEnd();
+}
+
 
 SBAnimationTransition::~SBAnimationTransition()
 {
@@ -27,6 +42,26 @@ double SBAnimationTransition::getEaseInStart()
 double SBAnimationTransition::getEaseInEnd()
 {
 	return easeInEnd;
+}
+
+void SBAnimationTransition::setEaseInStart(double val)
+{
+	easeInStart = val;
+}
+
+void SBAnimationTransition::setEaseInEnd(double val)
+{
+	easeInEnd = val;
+}
+
+std::vector<double>& SBAnimationTransition::getEaseOutStart()
+{
+	return easeOutStart;
+}
+
+std::vector<double>& SBAnimationTransition::getEaseOutEnd()
+{
+	return easeOutEnd;
 }
 
 

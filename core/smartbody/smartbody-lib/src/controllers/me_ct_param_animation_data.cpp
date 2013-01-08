@@ -126,7 +126,7 @@ int PABlend::getMotionId(const std::string& motion)
 	return -1;
 }
 
-
+/*
 PATransition::PATransition()
 {
 }
@@ -155,6 +155,8 @@ int PATransition::getNumEaseOut()
 {
 	return easeOutStart.size();
 }
+
+*/
 
 bool PABlend::getWeightsFromParameters(double x, std::vector<double>& weights)
 {
