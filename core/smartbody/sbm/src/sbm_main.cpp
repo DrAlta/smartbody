@@ -419,14 +419,14 @@ int main( int argc, char **argv )	{
 
 
 	int err;
-	SrString net_host;
+	string net_host;
 	vector<string> seq_paths;
 	vector<string> py_paths;
 	vector<string> me_paths;
 	vector<string> audio_paths;
 	vector<string> init_seqs;
 	vector<string> init_pys;
-	SrString proc_id;
+	string proc_id;
 	
 	XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
 
@@ -518,11 +518,10 @@ int main( int argc, char **argv )	{
 	//	check	command line parameters:
 	bool lock_dt_mode = false;
 	int i;
-	SrString	s;
 	for (	i=1; i<argc; i++ )
 	{
 		LOG( "SmartBody ARG[%d]: '%s'", i, argv[i] );
-		s = argv[i];
+		string s = argv[i];
 
 		if( s == "-pythonpath" )  // argument -pythonpath
 		{
@@ -534,10 +533,10 @@ int main( int argc, char **argv )	{
 				// return -1
 			}
 		}
-		else if( s.search(	"-host=" ) == 0 )  // argument starts with -host=
+		else if( s.compare( "-host=" ) == 0 )  // argument starts with -host=
 		{
 			net_host = s;
-			net_host.remove( 0, 6 );
+			net_host.erase(0, 6);
 		}
 		else if( s == "-mepath" )  // -mepath <dirpath> to specify where Motion Engine files (.sk, .skm) should be loaded from
 		{
@@ -618,60 +617,59 @@ int main( int argc, char **argv )	{
 				// return -1
 			}
 		}
-		else if( s.search( "-procid=" ) == 0 )  // argument starts with -procid=
+		else if( s.compare( "-procid=" ) == 0 )  // argument starts with -procid=
 		{
 			proc_id = s;
-			proc_id.remove( 0, 8 );
+			proc_id.erase( 0, 8 );
 		}
-		else if( s.search( "-audio" ) == 0 )  // argument equals -audio
+		else if( s.compare( "-audio" ) == 0 )  // argument equals -audio
 		{
 			mcu.play_internal_audio = true;
 		}
-		else if( s.search( "-lockdt" ) == 0 )  // argument equals -lockdt
+		else if( s.compare( "-lockdt" ) == 0 )  // argument equals -lockdt
 		{
 			lock_dt_mode = true;
 		}
-		else if( s.search( "-fps=" ) == 0 )  // argument starts with -fps=
+		else if( s.compare( "-fps=" ) == 0 )  // argument starts with -fps=
 		{
-			SrString fps = s;
-			fps.remove( 0, 5 );
-			timer.set_sleep_fps( atof( fps ) );
+			string fps = s;
+			fps.erase( 0, 5 );
+			timer.set_sleep_fps( atof( fps.c_str() ) );
 		}
-		else if( s.search( "-perf=" ) == 0 )  // argument starts with -perf=
+		else if( s.compare( "-perf=" ) == 0 )  // argument starts with -perf=
 		{
-			SrString interval = s;
-			interval.remove( 0, 6 );
-			timer.set_perf( atof( interval ) );
+			string interval = s;
+			interval.erase( 0, 6 );
+			timer.set_perf( atof( interval.c_str() ) );
 		}
-		else if ( s.search( "-facebone" ) == 0 )
+		else if ( s.compare( "-facebone" ) == 0 )
 		{
 			LOG("-facebone option has been deprecated.");
 		}
-		else if ( s.search( "-skscale=" ) == 0 )
+		else if ( s.compare( "-skscale=" ) == 0 )
 		{
-			SrString skScale = s;
-			skScale.remove( 0, 9 );
-			mcu.skScale = atof(skScale);
+			string skScale = s;
+			skScale.erase( 0, 9 );
+			mcu.skScale = atof(skScale.c_str());
 		}
-		else if ( s.search( "-skmscale=" ) == 0 )
+		else if ( s.compare( "-skmscale=" ) == 0 )
 		{
-			SrString skmScale = s;
-			skmScale.remove( 0, 10 );
-			mcu.skmScale = atof(skmScale);
+			string skmScale = s;
+			skmScale.erase( 0, 10 );
+			mcu.skmScale = atof(skmScale.c_str());
 		}
-		else if ( s.search( "-mediapath=" ) == 0 )
+		else if ( s.compare( "-mediapath=" ) == 0 )
 		{
-			mediaPath = (const char*) s;
+			mediaPath = s;
 			mediaPath = mediaPath.substr(11);
-			
 		}
-        else if ( s.search ("-noninteractive") == 0)
+        else if ( s.compare("-noninteractive") == 0)
         {
                 mcu.setInteractive(false);
         }
 		else
 		{
-			LOG( "ERROR: Unrecognized command line argument: \"%s\"\n", (const char*)s );
+			LOG( "ERROR: Unrecognized command line argument: \"%s\"\n", s.c_str() );
 		}
 	}
 	if( lock_dt_mode )	{ 
@@ -729,11 +727,13 @@ int main( int argc, char **argv )	{
 	}
 #endif
 
-	// Sets up the network connection for sending bone rotations over to Unreal
+	// Sets up the network connection for sending bone rotations over to the renderer
 	if( net_host != "" )
-		mcu.set_net_host( net_host );
-	if( proc_id != "" ) {
-		mcu.set_process_id( (const char*)proc_id );
+		mcu.set_net_host( net_host.c_str() );
+
+	if( proc_id != "" )
+	{
+		mcu.set_process_id( proc_id.c_str() );
 
 		// Using a process id is a sign that we're running in a multiple SBM environment.
 		// So.. ignore BML requests with unknown agents by default
@@ -786,7 +786,6 @@ int main( int argc, char **argv )	{
 	{
 		std::stringstream strstr;
 		strstr << "path seq " << (it->c_str());
-		SrString seq_command = SrString( "path seq " );
 		mcu.execute( (char *) strstr.str().c_str() );
 	}
 
@@ -827,8 +826,8 @@ int main( int argc, char **argv )	{
 		 it != init_seqs.end();
 		 ++it )
 	{
-		SrString seq_command = SrString( "seq " ) << (it->c_str()) << " begin";
-		mcu.execute( (char *)(const char *)seq_command );
+		string seq_command = "seq " + (*it) + " begin";
+		mcu.execute((char *)seq_command.c_str());
 	}
 
 
