@@ -1,6 +1,6 @@
 #pragma once
-#include "PawnPosControl.h"
 #include <vector>
+#include "PawnPosControl.h"
 
 class ObjectManipulationHandle
 {

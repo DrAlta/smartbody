@@ -1,9 +1,9 @@
+#include "vhcl.h"
 #include "ObjectManipulationHandle.h"
 #include "fltk_viewer.h"
-#include "vhcl.h"
 #include <FL/gl.h>
 #include <GL/glu.h>
-#include <sbm/mcontrol_util.h>
+#include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 
 ObjectManipulationHandle::ObjectManipulationHandle(void)
@@ -19,12 +19,10 @@ ObjectManipulationHandle::~ObjectManipulationHandle(void)
 
 void ObjectManipulationHandle::get_pawn_list(std::vector<SbmPawn*>& pawn_list)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-		iter != mcu.getPawnMap().end();
-		iter++)
+	std::vector<std::string> pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+	for (size_t i = 0; i < pawnNames.size(); i++)
 	{
-		SbmPawn* pawn = (*iter).second;
+		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnNames[i]);
 		pawn_list.push_back(pawn);
 	}
 }
@@ -97,12 +95,10 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 
 	// determine the size of the pawns relative to the size of the characters
 	float pawnSize = 1.0;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
+	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (size_t i = 0; i < charNames.size(); i++)
 	{
-		SbmCharacter* character = (*iter).second;
+		SmartBody::SBCharacter * character = SmartBody::SBScene::getScene()->getCharacter(charNames[i]);
 		pawnSize = character->getHeight() / 30.0f;
 		break;
 	}
