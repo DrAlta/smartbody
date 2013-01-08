@@ -1,55 +1,9 @@
 #include "vhcl.h"
-#include <sb/SBPython.h>
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
-#include <sb/SBSimulationManager.h>
-
-#include <sb/SBAnimationState.h>
-#include <sb/SBAnimationStateManager.h>
-#include <sb/SBAnimationTransition.h>
-#include <sb/SBAnimationTransitionRule.h>
-#include <sb/SBAttribute.h>
-#include <sb/SBAttributeManager.h>
-#include <sb/SBBehavior.h>
-#include <sb/SBBehaviorSet.h>
-#include <sb/SBBehaviorSetManager.h>
-#include <sb/SBBmlProcessor.h>
-#include <sb/SBBoneBusManager.h>
-#include <sb/SBCharacter.h>
-#include <sb/SBCollisionManager.h>
-#include <sb/SBController.h>
-#include <sb/SBDebuggerClient.h>
-#include <sb/SBDebuggerServer.h>
-#include <sb/SBDebuggerUtility.h>
-#include <sb/SBFaceDefinition.h>
-#include <sb/SBGestureMap.h>
-#include <sb/SBGestureMapManager.h>
-#include <sb/SBJoint.h>
-#include <sb/SBJointMap.h>
-#include <sb/SBJointMapManager.h>
-#include <sb/SBJointMap.h>
-#include <sb/SBMotion.h>
-#include <sb/SBObject.h>
-#include <sb/SBObserver.h>
-#include <sb/SBParseNode.h>
-#include <sb/SBParser.h>
-#include <sb/SBPhoneme.h>
-#include <sb/SBPhysicsManager.h>
 #include <sb/SBPython.h>
-#include <sb/SBPythonClass.h>
-#include <sb/SBReach.h>
-#include <sb/SBReachManager.h>
-#include <sb/SBScene.h>
-#include <sb/SBScript.h>
-#include <sb/SBService.h>
-#include <sb/SBServiceManager.h>
 #include <sb/SBSimulationManager.h>
-#include <sb/SBSkeleton.h>
-#include <sb/SBSteerAgent.h>
-#include <sb/SBSteerManager.h>
-#include <sb/SBSubject.h>
-#include <sb/SBTypes.h>
 
 int main( int argc, char ** argv )
 {
