@@ -315,6 +315,7 @@ class BMLDefs
 		static XMLCh* ATTR_SYMBOL;
 		static XMLCh* ATTR_MATERIAL;
 		static XMLCh* ATTR_OPAQUE;
+		static XMLCh* ATTR_TEXTURE;
 
 		// locomotion
 		static XMLCh* ATTR_BRAKING;

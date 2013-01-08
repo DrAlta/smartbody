@@ -24,6 +24,8 @@ StrTextureMap& SbmTextureManager::findMap( int type )
 		return textureMap;
 	else if (type == TEXTURE_NORMALMAP)
 		return normalTexMap;
+	else if (type == TEXTURE_SPECULARMAP)
+		return specularTexMap;
 
 	return textureMap;
 }
@@ -61,6 +63,15 @@ void SbmTextureManager::updateTexture()
 		if (!tex->hasBuild())
 			tex->buildTexture();
 		}
+
+	for ( vi  = specularTexMap.begin();
+		vi != specularTexMap.end();
+		vi++)
+	{
+		SbmTexture* tex = vi->second;
+		if (!tex->hasBuild())
+			tex->buildTexture();
+	}
 }
 
 SbmTexture* SbmTextureManager::findTexture(int type, const char* textureName )
@@ -132,7 +143,7 @@ void SbmTexture::buildTexture()
 	glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);//_MIPMAP_LINEAR);
+	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(iType, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:100");	
@@ -146,8 +157,8 @@ void SbmTexture::buildTexture()
 		internal_format = GL_RGBA8;
 		texture_format = GL_RGBA;				
 	}
-	glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);	
-	//gluBuild2DMipmaps(iType, channels, width, height, texture_format, GL_UNSIGNED_BYTE, buffer );
+	//glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);	
+	gluBuild2DMipmaps(iType, channels, width, height, texture_format, GL_UNSIGNED_BYTE, buffer );
 	//glGenerateMipmap(iType);
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:200");
 

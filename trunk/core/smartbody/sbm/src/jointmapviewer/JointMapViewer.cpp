@@ -6,6 +6,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBSimulationManager.h>
 #include <sk/sk_joint.h>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Input.H>
@@ -653,6 +654,7 @@ char commenSkString[] = "# SK Skeleton Definition - M. Kallmann 2004\n"
 	"\n"
 	"end\n"
 	"";
+
 MouseViewer::MouseViewer( int x, int y, int w, int h, char* name ) : Fl_Gl_Window(x,y,w,h,name)
 {
 
@@ -865,11 +867,43 @@ SkeletonViewer::SkeletonViewer( int x, int y, int w, int h, char* name ) : Mouse
 	jointMapName = "";
 	focusJointName = "";
 	showJointLabels = 0;
+	curTime = 0.f;
+	prevTime = 0.f;
+	motionTime = 0.f;
+	testMotion = NULL;
+	playMotion = false;
 }
 
 SkeletonViewer::~SkeletonViewer()
 {
 
+}
+
+void SkeletonViewer::setTestMotion( SmartBody::SBMotion* motion )
+{
+	if (testMotion)
+	{
+		testMotion->disconnect();
+	}
+	testMotion = motion;
+	if (testMotion)
+		testMotion->connect(skeleton);
+}
+
+void SkeletonViewer::setPlayMotion( bool play )
+{
+	// replay motion
+	if (play && !playMotion)
+	{
+		// reset motion time
+		motionTime = 0.f;
+	}
+	else // clear skeleton
+	{
+		skeleton->clearJointValues();	
+		skeletonScene->update();
+	}
+	playMotion = play;
 }
 
 int SkeletonViewer::handle( int event )
@@ -1008,7 +1042,6 @@ void SkeletonViewer::setJointMap( std::string mapName )
 void SkeletonViewer::setFocusJointName( std::string focusName )
 {
 	focusJointName = focusName;
-
 	if (skeleton)
 	{
 		float defaultRadius, defaultLen;
@@ -1126,6 +1159,27 @@ void SkeletonViewer::focusOnSkeleton()
 
 void SkeletonViewer::draw()
 {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBSimulationManager* simManager = scene->getSimulationManager();	
+
+	prevTime = curTime;
+	curTime = (float)simManager->getTime();
+	deltaTime = curTime - prevTime;
+	
+	if (playMotion && testMotion)
+	{
+		motionTime += deltaTime;
+		// normalize motion time
+		while (motionTime > testMotion->getDuration())
+		{
+			motionTime -= (float)testMotion->getDuration();
+		}
+		testMotion->apply(motionTime);
+		for (int i=0;i<3;i++) // fix the root position
+			skeleton->root()->pos()->value(i,0.f);
+		skeletonScene->update();
+	}
+
 	make_current();
 
 	if (!visible()) 
@@ -1263,6 +1317,10 @@ void SkeletonViewer::drawJointMapLabels( std::string jointMapName )
 	glEnable(GL_DEPTH_TEST);
 }
 
+SmartBody::SBSkeleton* SkeletonViewer::getSkeleton()
+{
+	return skeleton;
+}
 
 const std::string spineJointNames[7] = {"base","spine1", "spine2", "spine3", "spine4", "spine5", "skullbase" };
 const std::string leftArmJointNames[5] = {"l_sternoclavicular","l_shoulder", "l_elbow", "l_forearm", "l_wrist" };
@@ -1356,6 +1414,18 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 		commonSk->ref();
 	}
 
+	std::string commonSkMotionName = "commonSkTest";
+	std::string motionExt = ".skm";
+	SmartBody::SBMotion* commonSkMotion = scene->getMotion(commonSkMotionName);
+	if (!commonSkMotion) // load from string
+	{		
+		std::string mediaPath = scene->getMediaPath();		
+		std::string retargetDir = mediaPath + "/" + "retarget/motion/";
+		std::string targetMotionFile = retargetDir+"/"+commonSkMotionName + motionExt;
+		scene->loadAsset(targetMotionFile); // load motion
+		
+	}
+
 	Fl_Group* rightGroup = new Fl_Group(420, startY, w-420 , h - startY, "");
 	rightGroup->begin();	
 	targetSkeletonViewer = new SkeletonViewer(420+10, startY, 260, h-startY - 50, "Skeleton");	
@@ -1368,6 +1438,9 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	_buttonJointLabel->callback(CheckShowJointLabelCB,this);
 	_buttonAddMapping = new Fl_Button(420 + 10 + 250, h - 50 + 10, 90, 30, "Add Maping");
 	_buttonAddMapping->callback(AddJointMapCB,this);	
+	_buttonTestPlayMotion = new Fl_Button(420 + 10 + 350, h - 50 + 10, 90, 30, "Test Motion");
+	//_buttonTestPlayMotion->callback(TestPlayMotionCB,this);
+	testPlay = false;
 	rightGroup->end();
 	//rightGroup->resizable(targetSkeletonViewer);		
 	this->resizable(rightGroup);
@@ -1381,7 +1454,10 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 // 			input->setViewer(skeletonViewer);
 // 	}
 
+	testCommonSkMotion = scene->getMotion(commonSkMotionName);
+	testTargetMotion = NULL;
 	standardSkeletonViewer->setSkeleton(commonSkName);
+	standardSkeletonViewer->setTestMotion(testCommonSkMotion);	
 
 	if (characters.size() > 0)
 	{		
@@ -1731,6 +1807,14 @@ void JointMapViewer::CheckShowJointLabelCB( Fl_Widget* widget, void* data )
 }
 
 
+void JointMapViewer::TestPlayMotionCB( Fl_Widget* widget, void* data )
+{
+	JointMapViewer* viewer = (JointMapViewer*) data;
+	viewer->testPlayMotion();
+}
+
+
+
 void JointMapViewer::draw()
 {
 	if (targetSkeletonViewer)
@@ -1797,6 +1881,68 @@ void JointMapViewer::showJointLabels( int showLabel )
 	LOG("joint label = %d",showLabel);
 	standardSkeletonViewer->setShowJointLabels(showLabel);
 	targetSkeletonViewer->setShowJointLabels(showLabel);
+}
+
+void JointMapViewer::testPlayMotion()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBSkeleton* targetSk = targetSkeletonViewer->getSkeleton();
+	SmartBody::SBSkeleton* commonSk = standardSkeletonViewer->getSkeleton();
+	if (!targetSk || !commonSk) return;
+
+	testPlay = !testPlay;
+	if (testPlay)
+	{
+		_buttonTestPlayMotion->label("Stop Playing");	
+	}
+	else
+	{
+		_buttonTestPlayMotion->label("Test Motion");
+	}
+	standardSkeletonViewer->setPlayMotion(testPlay);
+
+	
+	// create a temporary retarget motion
+	if (testPlay && !testTargetMotion)
+	{
+		SmartBody::SBJointMap jointMap;
+		int numChildren = _scrollGroup->children();
+		for (int i=0;i<numChildren;i++)
+		{
+			Fl_Input_Choice* input = dynamic_cast<JointMapInputChoice*>(_scrollGroup->child(i));
+			if (input && input->value() != "")
+			{
+				jointMap.setMapping(input->label(),input->value());			
+			}
+		}
+		std::vector<std::string> endJoints;
+		std::vector<std::string> relativeJoints;
+		std::map<std::string, SrVec> offsetJoints;	
+
+		endJoints.push_back("l_forefoot");
+		endJoints.push_back("l_toe");
+		endJoints.push_back("l_acromioclavicular");
+		endJoints.push_back("r_forefoot");	
+		endJoints.push_back("r_toe");
+		endJoints.push_back("r_acromioclavicular");
+		endJoints.push_back("l_sternoclavicular");
+		endJoints.push_back("r_sternoclavicular");
+
+		relativeJoints.push_back("spine1");
+		relativeJoints.push_back("spine2");
+		relativeJoints.push_back("spine3");
+		relativeJoints.push_back("spine4");
+		relativeJoints.push_back("spine5");
+
+		jointMap.applySkeleton(targetSk);	
+		SmartBody::SBMotion* retargetMotion = dynamic_cast<SmartBody::SBMotion*>(testCommonSkMotion->buildRetargetMotionV2(commonSk,targetSk,endJoints,relativeJoints,offsetJoints));
+		jointMap.applySkeletonInverse(targetSk);
+		jointMap.applyMotionInverse(retargetMotion);
+		testTargetMotion = retargetMotion;
+		targetSkeletonViewer->setTestMotion(testTargetMotion);
+	}
+	
+	targetSkeletonViewer->setPlayMotion(testPlay);
 }
 
 JointMapInputChoice::JointMapInputChoice( int x, int y, int w, int h, char* name ) : Fl_Input_Choice(x,y,w,h,name)

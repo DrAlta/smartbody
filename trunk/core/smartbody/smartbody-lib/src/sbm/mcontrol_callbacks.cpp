@@ -1703,13 +1703,14 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p
 			SrStringArray mnames;
 			std::map<std::string,std::string> mtlTextMap;
 			std::map<std::string,std::string> mtlTextBumpMap;
+			std::map<std::string,std::string> mtlTextSpecularMap;
 			DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", obj_file);
 			if (effectNode)
 			{
-				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap);
+				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
 			}
 			// parsing geometry
-			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f);
+			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f);
 		}
 		else
 		{
@@ -1839,14 +1840,15 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 			SrStringArray mnames;
 			std::map<std::string,std::string> mtlTextMap;
 			std::map<std::string,std::string> mtlTextBumpMap;
+			std::map<std::string,std::string> mtlTextSpecularMap;
 			DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", obj_file);
 			if (effectNode)
 			{
-				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap);
+				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
 			}
 
 			// parsing geometry
-			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames,  materialId2Name, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f); 
+			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames,  materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f); 
 		}
 		else
 		{

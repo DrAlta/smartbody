@@ -155,9 +155,9 @@ lightDir[1] = normalize(( vec4(posDir,0.0)).xyz);\n\
 halfVector[1] = normalize((vec4(gl_LightSource[1].halfVector.xyz,0.0)).xyz);\n\
 int colorIdx = int(gl_Vertex.w); \n\
 gl_TexCoord[0] = gl_MultiTexCoord0;\n\
-normal = normalize(gl_NormalMatrix * gl_Normal);\n\
-tv     = normalize(gl_NormalMatrix * tangent.xyz);\n\
-bv     = normalize(gl_NormalMatrix * binormal.xyz);\n\
+normal = normalize(gl_NormalMatrix * skin[1].xyz);\n\
+tv     = normalize(gl_NormalMatrix * skin[2].xyz);\n\
+bv     = normalize(gl_NormalMatrix * skin[3].xyz);\n\
 }\n";
 
 std::string shaderBasicFS =
@@ -170,9 +170,11 @@ std::string shaderFS =
 "const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.f)*(vec3(0.2,0.2,0.2));\n\
 uniform sampler2D diffuseTexture;\n\
 uniform sampler2D normalTexture;\n\
+uniform sampler2D specularTexture;\n\
 uniform sampler2D tex;\n\
 uniform int  useTexture;\n\
 uniform int  useNormalMap;\n\
+uniform int  useSpecularMap;\n\
 uniform int  useShadowMap;\n\
 varying vec3 normal,lightDir[2],halfVector[2];\n\
 varying vec3 tv,bv;\n\
@@ -204,12 +206,16 @@ void main (void)\n\
 	vec4 texColor = texture2D(diffuseTexture,gl_TexCoord[0].st);\n\
 	vec3 normalColor = normalize(texture2D(normalTexture,gl_TexCoord[0].st).xyz* 2.0 - 1.0);\n\
 	vec3 normalMapN = normalize(newtv*normalColor.x+newbv*normalColor.y+newn*normalColor.z); \n\
+	vec3 specularColor = texture2D(specularTexture, gl_TexCoord[0].st).xyz;\n\
+	vec3 specMat = specularMaterial.rgb;\n\
 	if (useTexture == 0) \n\
 		texColor = diffuseMaterial;//vec4(matColor,1.0);\n\
 	color.a = texColor.a*diffuseMaterial.a;\n\
 	n = normalize(normal);\n\
 	if (useNormalMap == 1)\n\
 		n = normalMapN;\n\
+	if (useSpecularMap == 1)\n\
+		specMat = specularColor;\n\
 	float shadowWeight = 1.0;\n\
 	if (useShadowMap == 1)\n\
 	{\n\
@@ -223,7 +229,7 @@ void main (void)\n\
 		color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0)*att;\n\
 			halfV = normalize(halfVector[i]);\n\
 			NdotHV = max(dot(n,halfV),0.0);\n\
-			color += vec4(specularMaterial.rgb*pow(NdotHV, shineness+1.0),0)*att;\n\
+			color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0)*att;\n\
 		}   \n\
 	}\n\
 	const float shadow_ambient = 1.0;\n\
@@ -279,6 +285,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 
 	GLuint diffuse_sampler_location = glGetUniformLocation(program,"diffuseTexture");	
 	GLuint normal_sampler_location = glGetUniformLocation(program,"normalTexture");	
+	GLuint specular_sampler_location = glGetUniformLocation(program,"specularTexture");	
 	GLuint shadow_sampler_location = glGetUniformLocation(program,"tex");	
 	GLuint bone_loc1 = glGetAttribLocation(program,"BoneID1");
 	GLuint weight_loc1 = glGetAttribLocation(program,"BoneWeight1");	
@@ -291,6 +298,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 	GLuint shinenessLoc = glGetUniformLocation(program,"shineness");
 	GLuint useTextureLoc = glGetUniformLocation(program,"useTexture");
 	GLuint useNormalMapLoc = glGetUniformLocation(program,"useNormalMap");
+	GLuint useSpecularMapLoc = glGetUniformLocation(program,"useSpecularMap");
 	GLuint useShadowMapLoc = glGetUniformLocation(program,"useShadowMap");
 
 	GLuint idQuery;
@@ -390,6 +398,20 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 		else
 		{
 			glUniform1i(useNormalMapLoc,0);
+		}
+
+		SbmTexture* texSpecular = texManager.findTexture(SbmTextureManager::TEXTURE_SPECULARMAP,mesh->specularMapName.c_str());		
+		if (texSpecular)
+		{
+			//LOG("use texture specualr, id = %d",texSpecular->getID());
+			glActiveTexture(GL_TEXTURE3_ARB);
+			glBindTexture(GL_TEXTURE_2D,texSpecular->getID());
+			glUniform1i(specular_sampler_location, 3);
+			glUniform1i(useSpecularMapLoc,1);
+		}		
+		else
+		{
+			glUniform1i(useSpecularMapLoc,0);
 		}
 		if (SbmDeformableMeshGPU::shadowMapID != -1)
 		{

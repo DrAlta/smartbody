@@ -319,6 +319,7 @@ XMLCh* BMLDefs::ATTR_TRIM = NULL;
 XMLCh* BMLDefs::ATTR_SYMBOL = NULL;
 XMLCh* BMLDefs::ATTR_MATERIAL = NULL;
 XMLCh* BMLDefs::ATTR_OPAQUE = NULL;
+XMLCh* BMLDefs::ATTR_TEXTURE = NULL;
 
 
 
@@ -694,6 +695,7 @@ BMLDefs::BMLDefs()
 	ATTR_SYMBOL = XMLString::transcode("symbol");
 	ATTR_MATERIAL = XMLString::transcode("material");
 	ATTR_OPAQUE = XMLString::transcode("opaque");
+	ATTR_TEXTURE = XMLString::transcode("texture");
 
 	// locomotion
 	ATTR_BRAKING = XMLString::transcode("sbm:braking");

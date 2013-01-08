@@ -162,6 +162,29 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 	return true;
 }
 
+void ParserOpenCOLLADA::getChildNodes(const std::string& nodeName, DOMNode* node, std::vector<DOMNode*>& childs )
+{
+	int type = node->getNodeType();
+	std::string name;
+	xml_utils::xml_translate(&name, node->getNodeName());
+	std::string value;
+	xml_utils::xml_translate(&value, node->getNodeValue());
+	if (name == nodeName && node->getNodeType() ==  DOMNode::ELEMENT_NODE)
+		childs.push_back(node);
+
+	DOMNode* child = NULL;
+	const DOMNodeList* list = node->getChildNodes();
+	for (unsigned int c = 0; c < list->getLength(); c++)
+	{
+		getChildNodes(nodeName,list->item(c), childs);
+		//child = getNode(nodeName, list->item(c));
+		//if (child)
+		//	break;
+	}
+	//return child;
+
+}
+
 DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, DOMNode* node)
 {
 	int type = node->getNodeType();
@@ -1312,7 +1335,7 @@ std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 	return "";
 }
 
-void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames,std::map<std::string, std::string>& materialId2Name,  std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::vector<SrModel*>& meshModelVec, float scale)
+void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap,std::vector<SrModel*>& meshModelVec, float scale )
 {
 	const DOMNodeList* list = node->getChildNodes();
 
@@ -1577,6 +1600,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 
 			newModel->mtlTextureNameMap = mtlTexMap;
 			newModel->mtlNormalTexNameMap = mtlTexBumpMap;
+			newModel->mtlSpecularTexNameMap = mtlTexSpecularMap;
 			newModel->M = M;
 			newModel->mtlnames = mnames;
 
@@ -1602,6 +1626,11 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 			   if (newModel->mtlNormalTexNameMap.find(matName) != newModel->mtlNormalTexNameMap.end())
 			   {
 				   ParserOpenCOLLADA::load_texture(SbmTextureManager::TEXTURE_NORMALMAP, newModel->mtlNormalTexNameMap[matName].c_str(), paths);	   
+			   }
+			   if (newModel->mtlSpecularTexNameMap.find(matName) != newModel->mtlSpecularTexNameMap.end())
+			   {
+				   LOG("Load specular map = %s",newModel->mtlSpecularTexNameMap[matName].c_str());
+				   ParserOpenCOLLADA::load_texture(SbmTextureManager::TEXTURE_SPECULARMAP, newModel->mtlSpecularTexNameMap[matName].c_str(), paths);	   
 			   }
 			}
 #endif
@@ -1725,7 +1754,7 @@ void ParserOpenCOLLADA::parseLibraryImages(DOMNode* node, std::map<std::string, 
 	}
 }
 
-void ParserOpenCOLLADA::parseLibraryEffects(DOMNode* node, std::map<std::string, std::string>& effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap)
+void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap )
 {
 	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int c = 0; c < list->getLength(); c++)
@@ -1747,18 +1776,77 @@ void ParserOpenCOLLADA::parseLibraryEffects(DOMNode* node, std::map<std::string,
 			SrString matName(materialId.c_str());
 			mnames.push(matName);
 
-			DOMNode* initFromNode = ParserOpenCOLLADA::getNode("init_from", node);
-			if (initFromNode)
+			std::vector<DOMNode*> initNodes;
+			ParserOpenCOLLADA::getChildNodes("init_from", node, initNodes);
+			std::string diffuseTexture, normalTexture, specularTexture;
+			diffuseTexture = "";
+			normalTexture = "";
+			specularTexture = "";
+			DOMNode* diffuseNode = ParserOpenCOLLADA::getNode("diffuse",node);			
+			DOMNode* bumpNode = ParserOpenCOLLADA::getNode("bump",node);
+			DOMNode* specularNode = ParserOpenCOLLADA::getNode("specularLevel",node);
+			if (diffuseNode)
+			{
+				DOMNode* texNode = ParserOpenCOLLADA::getNode("texture",diffuseNode);
+				if (texNode)
+				{
+					DOMNamedNodeMap* texAttr = texNode->getAttributes();
+					DOMNode* texAttrNode = texAttr->getNamedItem(BML::BMLDefs::ATTR_TEXTURE);			
+					std::string texID;
+					xml_utils::xml_translate(&texID, texAttrNode->getNodeValue());
+					diffuseTexture = texID;
+				}			
+			}
+
+			if (bumpNode)
+			{
+				DOMNode* texNode = ParserOpenCOLLADA::getNode("texture",bumpNode);
+				if (texNode)
+				{
+					DOMNamedNodeMap* texAttr = texNode->getAttributes();
+					DOMNode* texAttrNode = texAttr->getNamedItem(BML::BMLDefs::ATTR_TEXTURE);			
+					std::string texID;
+					xml_utils::xml_translate(&texID, texAttrNode->getNodeValue());
+					normalTexture = texID;
+					M.top().specular = SrColor(0.2f,0.2f,0.2f,1.f);
+					M.top().shininess = 20;
+				}			
+			}
+
+			if (specularNode)
+			{
+				DOMNode* texNode = ParserOpenCOLLADA::getNode("texture",specularNode);
+				if (texNode)
+				{
+					DOMNamedNodeMap* texAttr = texNode->getAttributes();
+					DOMNode* texAttrNode = texAttr->getNamedItem(BML::BMLDefs::ATTR_TEXTURE);			
+					std::string texID;
+					xml_utils::xml_translate(&texID, texAttrNode->getNodeValue());
+					specularTexture = texID;
+					M.top().specular = SrColor(0.2f,0.2f,0.2f,0.2f);
+					M.top().shininess = 20;
+				}			
+			}
+			//DOMNode* initFromNode = ParserOpenCOLLADA::getNode("init_from", node);
+			//if (initFromNode)
+			// get all textures
+			for (unsigned int i=0;i<initNodes.size();i++)
 			{
 				std::string imageId;
+				DOMNode* initFromNode = initNodes[i];
 				xml_utils::xml_translate(&imageId, initFromNode->getTextContent());
 				std::string imageFile = pictureId2File[imageId];
 				SrString mapKaName(imageFile.c_str());
 				std::string texFile = (const char*) mapKaName;
 				std::string mtlName = mnames.top();
 				std::string fileExt = boost::filesystem2::extension(texFile);
-				std::string fileName = boost::filesystem::basename(texFile);	
-				mtlTexMap[mtlName] = fileName + fileExt;	
+				std::string fileName = boost::filesystem::basename(texFile);
+				if (diffuseTexture.find(imageId) != std::string::npos)
+					mtlTexMap[mtlName] = fileName + fileExt;	
+				else if (normalTexture.find(imageId) != std::string::npos)
+					mtlTexBumpMap[mtlName] = fileName + fileExt;
+				else if (specularTexture.find(imageId) != std::string::npos)
+					mtlTexSpecularMap[mtlName] = fileName + fileExt;				
 			}
 
 			DOMNode* emissionNode = ParserOpenCOLLADA::getNode("emission", node);

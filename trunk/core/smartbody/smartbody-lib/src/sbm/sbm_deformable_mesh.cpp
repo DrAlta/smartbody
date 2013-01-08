@@ -197,6 +197,7 @@ bool DeformableMesh::buildVertexBuffer()
 	//std::vector<SrColor> allMatList;
 	std::vector<std::string> allTexNameList;
 	std::vector<std::string> allNormalTexNameList;
+	std::vector<std::string> allSpecularTexNameList;
 	SrMaterial defaultMaterial;
 	defaultMaterial.diffuse = SrColor(0.6f,0.6f,0.6f);//SrColor::gray;	
 	defaultMaterial.specular = SrColor(101,101,101);//SrColor::gray;
@@ -205,6 +206,7 @@ bool DeformableMesh::buildVertexBuffer()
 	allMatList.push_back(defaultMaterial);
 	allTexNameList.push_back("");
 	allNormalTexNameList.push_back("");
+	allSpecularTexNameList.push_back("");
 	meshSubsetMap[0] = std::vector<int>(); // default material group : gray color
 	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 	{
@@ -219,7 +221,8 @@ bool DeformableMesh::buildVertexBuffer()
 			dMeshStatic->shape().computeTangentBiNormal();
 			SrArray<SrMaterial>& matList = dMeshDynamic->shape().M; 	
 			std::map<std::string,std::string> mtlTexMap = dMeshDynamic->shape().mtlTextureNameMap;
-			std::map<std::string,std::string> mtlNormalTexMap = dMeshDynamic->shape().mtlNormalTexNameMap;			
+			std::map<std::string,std::string> mtlNormalTexMap = dMeshDynamic->shape().mtlNormalTexNameMap;		
+			std::map<std::string,std::string> mtlSpecularTexMap = dMeshDynamic->shape().mtlSpecularTexNameMap;		
 			for (int j=0;j<matList.size();j++)
 			{			
 				SrMaterial& mat = matList[j];	
@@ -240,6 +243,15 @@ bool DeformableMesh::buildVertexBuffer()
 				else
 				{
 					allNormalTexNameList.push_back("");
+				}
+
+				if (mtlSpecularTexMap.find(mtlName) != mtlSpecularTexMap.end())
+				{
+					allSpecularTexNameList.push_back(mtlSpecularTexMap[mtlName]);
+				}
+				else
+				{
+					allSpecularTexNameList.push_back("");
 				}
 				allMatList.push_back(mat);
 				//colorArray[j%6].get(fcolor);				
@@ -530,6 +542,7 @@ bool DeformableMesh::buildVertexBuffer()
 		mesh->material = allMatList[iMaterial];
 		mesh->texName  = allTexNameList[iMaterial];
 		mesh->normalMapName = allNormalTexNameList[iMaterial];		
+		mesh->specularMapName = allSpecularTexNameList[iMaterial];
 		mesh->numTri = faceIdxList.size();
 		mesh->triBuf.resize(faceIdxList.size());		
 		for (unsigned int k=0;k<faceIdxList.size();k++)
