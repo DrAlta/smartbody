@@ -245,7 +245,6 @@
     <ClCompile Include="..\src\external\perlin\perlin.cpp" />
     <ClCompile Include="..\src\sbm\action_unit.cpp" />
     <ClCompile Include="..\src\sbm\DefaultAttributeTable.cpp" />
-    <ClCompile Include="..\src\sbm\Event.cpp" />
     <ClCompile Include="..\src\sbm\GenericViewer.cpp" />
     <ClCompile Include="..\src\sbm\gwiz_cmdl.cpp" />
     <ClCompile Include="..\src\sbm\gwiz_math.cpp" />
@@ -280,6 +279,7 @@
     <ClCompile Include="..\src\sb\SBDebuggerClient.cpp" />
     <ClCompile Include="..\src\sb\SBDebuggerServer.cpp" />
     <ClCompile Include="..\src\sb\SBDebuggerUtility.cpp" />
+    <ClCompile Include="..\src\sb\SBEvent.cpp" />
     <ClCompile Include="..\src\sb\SBJointMap.cpp" />
     <ClCompile Include="..\src\sb\SBJointMapManager.cpp" />
     <ClCompile Include="..\src\sbm\sbm_audio.cpp" />
@@ -691,7 +691,6 @@
     <ClInclude Include="..\src\external\perlin\perlin.h" />
     <ClInclude Include="..\src\sbm\action_unit.hpp" />
     <ClInclude Include="..\src\sbm\DefaultAttributeTable.h" />
-    <ClInclude Include="..\src\sbm\Event.h" />
     <ClInclude Include="..\src\sbm\general_param_setting.h" />
     <ClInclude Include="..\src\sbm\GenericViewer.h" />
     <ClInclude Include="..\src\sbm\gwiz_cmdl.h" />
@@ -731,6 +730,7 @@
     <ClInclude Include="..\src\sb\SBDebuggerClient.h" />
     <ClInclude Include="..\src\sb\SBDebuggerServer.h" />
     <ClInclude Include="..\src\sb\SBDebuggerUtility.h" />
+    <ClInclude Include="..\src\sb\SBEvent.h" />
     <ClInclude Include="..\src\sb\SBJointMap.h" />
     <ClInclude Include="..\src\sb\SBJointMapManager.h" />
     <ClInclude Include="..\src\sbm\sr_arg_buff.h" />

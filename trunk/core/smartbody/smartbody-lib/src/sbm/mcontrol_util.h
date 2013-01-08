@@ -69,7 +69,7 @@ class mcuCBHandle;
 
 #include "joint_logger.hpp"
 #include "ResourceManager.h"
-#include "sbm/Event.h"
+#include <sb/SBEvent.h>
 #include <sbm/action_unit.hpp>
 #include <sbm/general_param_setting.h>
 

@@ -4,7 +4,7 @@
 #include <sb/SBSteerManager.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBSkeleton.h>
-#include <sbm/Event.h>
+#include <sb/SBEvent.h>
 #include <sbm/ODEPhysicsSim.h>
 #include <boost/lexical_cast.hpp>
 #include <sbm/mcontrol_util.h>
@@ -209,7 +209,7 @@ void SBCollisionManager::afterUpdate(double time)
 	int curIteration = 0;
 	bool needMoreIterations = true;	
 
-	EventManager* eventManager = EventManager::getEventManager();	
+	SBEventManager* eventManager = SBEventManager::getEventManager();	
 
 	const std::string& collisionResMethod = getStringAttribute("collisionResolutionType");	
 
@@ -249,7 +249,7 @@ void SBCollisionManager::afterUpdate(double time)
 					SBCharacter* c2 = dynamic_cast<SBCharacter*>(g2->getAttachObj());
 					if (c1 && c2)
 					{
-						Event* collisionEvent = eventManager->createEvent("collision",c1->getName()+"/"+c2->getName());
+						SBEvent* collisionEvent = eventManager->createEvent("collision",c1->getName()+"/"+c2->getName());
 						eventManager->handleEvent(collisionEvent, time);
 						//LOG("Collision detected between character %s and character %s",c1->getName().c_str(), c2->getName().c_str());
 						delete collisionEvent; // free the memory
@@ -317,7 +317,7 @@ void SBCollisionManager::afterUpdate(double time)
 
 					//LOG("Collision detected between %s and %s", obj1.c_str(), obj2.c_str());
 
-					Event* collisionEvent = eventManager->createEvent("collision",obj1+"/"+obj2);
+					SBEvent* collisionEvent = eventManager->createEvent("collision",obj1+"/"+obj2);
 					eventManager->handleEvent(collisionEvent, time);
 					delete collisionEvent; // free the memory
 				}

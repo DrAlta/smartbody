@@ -1562,7 +1562,7 @@ double SBMotion::getFrameRate()
 
 void SBMotion::addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly)
 {
-	MotionEvent* motionEvent = new MotionEvent();
+	SBMotionEvent* motionEvent = new SBMotionEvent();
 	motionEvent->setIsOnceOnly(onceOnly);
 	motionEvent->setTime(time);
 	motionEvent->setType(type);

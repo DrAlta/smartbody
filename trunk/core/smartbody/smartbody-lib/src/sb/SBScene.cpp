@@ -6,7 +6,7 @@
 #include <sb/SBCharacter.h>
 #include <sb/SBMotion.h>
 #include <sb/SBScript.h>
-#include <sbm/Event.h>
+#include <sb/SBEvent.h>
 #include <sb/SBPhoneme.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBBmlProcessor.h>
@@ -596,11 +596,11 @@ std::vector<std::string> SBScene::getSkeletonNames()
 
 std::vector<std::string> SBScene::getEventHandlerNames()
 {
-	EventManager* eventManager = getEventManager();
+	SBEventManager* eventManager = getEventManager();
 	
 	std::vector<std::string> ret;
 
-	for(EventHandlerMap::iterator iter = eventManager->getEventHandlers().begin();
+	for(SBEventHandlerMap::iterator iter = eventManager->getEventHandlers().begin();
 		iter != eventManager->getEventHandlers().end();
 		iter++)
 	{
@@ -979,9 +979,9 @@ SBSkeleton* SBScene::createSkeleton(const std::string& skeletonDefinition)
 
 
 
-EventManager* SBScene::getEventManager()
+SBEventManager* SBScene::getEventManager()
 {
-	return EventManager::getEventManager();
+	return SBEventManager::getEventManager();
 }
 
 

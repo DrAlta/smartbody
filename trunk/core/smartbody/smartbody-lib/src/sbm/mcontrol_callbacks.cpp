@@ -72,7 +72,7 @@
 
 #include "sr/sr_model.h"
 #include "sb/sbm_pawn.hpp"
-#include "sbm/Event.h"
+#include <sb/SBEvent.h>
 #include "sbm/ParserOpenCOLLADA.h"
 #include "sbm/ParserOgre.h"
 
@@ -4343,9 +4343,9 @@ int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 	char* params = args.read_token();
 
-	SmartBody::EventManager* eventManager = SmartBody::EventManager::getEventManager();
+	SmartBody::SBEventManager* eventManager = SmartBody::SBEventManager::getEventManager();
 	std::string parameters = params;
-	SmartBody::Event e;
+	SmartBody::SBEvent e;
 	e.setType(eventType);
 	e.setParameters(parameters);
 	eventManager->handleEvent(&e, mcu_p->time);
@@ -4427,7 +4427,7 @@ int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 	}
 
-	SmartBody::MotionEvent* motionEvent = new SmartBody::MotionEvent();
+	SmartBody::SBMotionEvent* motionEvent = new SmartBody::SBMotionEvent();
 	if (isOnce)
 		motionEvent->setIsOnceOnly(true);
 	motionEvent->setTime(time);
@@ -4461,7 +4461,7 @@ int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		{
 			SkMotion* motion = (*iter).second;
 			numMotions++;
-			std::vector<SmartBody::MotionEvent*>& motionEvents = motion->getMotionEvents();
+			std::vector<SmartBody::SBMotionEvent*>& motionEvents = motion->getMotionEvents();
 			for (size_t x = 0; x < motionEvents.size(); x++)
 			{
 				delete motionEvents[x];
@@ -4481,7 +4481,7 @@ int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	SkMotion* motion = (*iter).second;
-	std::vector<SmartBody::MotionEvent*>& motionEvents = motion->getMotionEvents();
+	std::vector<SmartBody::SBMotionEvent*>& motionEvents = motion->getMotionEvents();
 	int numEvents = motionEvents.size();
 	for (size_t x = 0; x < motionEvents.size(); x++)
 	{
@@ -4514,7 +4514,7 @@ int disableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		{
 			SkMotion* motion = (*iter).second;
 			numMotions++;
-			std::vector<SmartBody::MotionEvent*>& motionEvents = motion->getMotionEvents();
+			std::vector<SmartBody::SBMotionEvent*>& motionEvents = motion->getMotionEvents();
 			for (size_t x = 0; x < motionEvents.size(); x++)
 			{
 				motionEvents[x]->setEnabled(false);
@@ -4533,7 +4533,7 @@ int disableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	SkMotion* motion = (*iter).second;
-	std::vector<SmartBody::MotionEvent*>& motionEvents = motion->getMotionEvents();
+	std::vector<SmartBody::SBMotionEvent*>& motionEvents = motion->getMotionEvents();
 	int numEvents = motionEvents.size();
 	for (size_t x = 0; x < motionEvents.size(); x++)
 	{
@@ -4565,7 +4565,7 @@ int enableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		{
 			SkMotion* motion = (*iter).second;
 			numMotions++;
-			std::vector<SmartBody::MotionEvent*>& motionEvents = motion->getMotionEvents();
+			std::vector<SmartBody::SBMotionEvent*>& motionEvents = motion->getMotionEvents();
 			for (size_t x = 0; x < motionEvents.size(); x++)
 			{
 				motionEvents[x]->setEnabled(true);
@@ -4584,7 +4584,7 @@ int enableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	SkMotion* motion = (*iter).second;
-	std::vector<SmartBody::MotionEvent*>& motionEvents = motion->getMotionEvents();
+	std::vector<SmartBody::SBMotionEvent*>& motionEvents = motion->getMotionEvents();
 	int numEvents = motionEvents.size();
 	for (size_t x = 0; x < motionEvents.size(); x++)
 	{
@@ -4607,8 +4607,8 @@ int registerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 	char* action = args.read_token();
 
-	SmartBody::EventManager* eventManager = SmartBody::EventManager::getEventManager();
-	SmartBody::BasicHandler* handler = new SmartBody::BasicHandler();
+	SmartBody::SBEventManager* eventManager = SmartBody::SBEventManager::getEventManager();
+	SmartBody::SBBasicHandler* handler = new SmartBody::SBBasicHandler();
 	handler->setAction(action);
 	eventManager->addEventHandler(type, handler);
 
@@ -4625,7 +4625,7 @@ int unregisterevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		return CMD_SUCCESS;
 	}
 
-	SmartBody::EventManager* eventManager = SmartBody::EventManager::getEventManager();
+	SmartBody::SBEventManager* eventManager = SmartBody::SBEventManager::getEventManager();
 	eventManager->removeEventHandler(type);
 
 	return CMD_SUCCESS;

@@ -45,7 +45,7 @@
 #include "retargetviewer/RetargetViewer.h"
 #include "jointmapviewer/RetargetStepWindow.h"
 #include <sb/SBMotionBlendBase.h>
-#include <sbm/Event.h>
+#include <sb/SBEvent.h>
 
 #include "ObjectManipulationHandle.h"
 
@@ -519,14 +519,14 @@ class LocomotionData
 		float off_height_comp;
 };
 
-class GestureVisualizationHandler : public SmartBody::EventHandler
+class GestureVisualizationHandler : public SmartBody::SBEventHandler
 {
 	public:
 		GestureVisualizationHandler();
 		~GestureVisualizationHandler();
 		void setGestureData(GestureData* data);
 
-		virtual void executeAction(SmartBody::Event* event);
+		virtual void executeAction(SmartBody::SBEvent* event);
 
 	private:
 		GestureData* _gestureData;

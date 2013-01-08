@@ -26,7 +26,7 @@
 #include <controllers/me_ct_ublas.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
-#include <sbm/Event.h>
+#include <sb/SBEvent.h>
 
 #ifdef USE_TETGEN
 #include <external/tetgen/tetgen.h>
@@ -1275,17 +1275,17 @@ double PABlend::getMotionTime(double localTime, int motionIndex)
 	return motionTime;
 }
 
-const bool ascendingTime2(std::pair<SmartBody::MotionEvent*, int>* a, std::pair<SmartBody::MotionEvent*, int>* b)
+const bool ascendingTime2(std::pair<SmartBody::SBMotionEvent*, int>* a, std::pair<SmartBody::SBMotionEvent*, int>* b)
 {
 	return (a->first->getTime() < b->first->getTime());
 }
 
-std::vector<std::pair<SmartBody::MotionEvent*, int> >& PABlend::getEvents()
+std::vector<std::pair<SmartBody::SBMotionEvent*, int> >& PABlend::getEvents()
 {
 	return _events;
 }
 
-void PABlend::addEventToMotion(const std::string& motion, SmartBody::MotionEvent* motionEvent)
+void PABlend::addEventToMotion(const std::string& motion, SmartBody::SBMotionEvent* motionEvent)
 {
 	// determine the motion index
 	int index = getMotionId(motion);
@@ -1294,7 +1294,7 @@ void PABlend::addEventToMotion(const std::string& motion, SmartBody::MotionEvent
 		LOG("Could not add event to state %s: no motion named %s found.", stateName.c_str(), motion.c_str());
 	}
 
-	_events.push_back(std::pair<SmartBody::MotionEvent*, int>(motionEvent, index));
+	_events.push_back(std::pair<SmartBody::SBMotionEvent*, int>(motionEvent, index));
 	// make sure that the motion events are ordered by time
 //	std::sort(_events.begin(), _events.end(), ascendingTime2);
 }

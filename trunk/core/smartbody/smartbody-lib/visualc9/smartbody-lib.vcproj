@@ -364,14 +364,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\Event.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\Event.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\general_param_setting.h"
 				>
 			</File>
@@ -3673,6 +3665,14 @@
 			</File>
 			<File
 				RelativePath="..\src\sb\SBDebuggerUtility.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBEvent.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBEvent.h"
 				>
 			</File>
 			<File

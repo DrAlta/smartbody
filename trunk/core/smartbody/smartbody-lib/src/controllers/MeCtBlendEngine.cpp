@@ -9,7 +9,7 @@
 #include "sbm/mcontrol_util.h"
 #include "controllers/me_ct_barycentric_interpolation.h"
 #include "controllers/me_ct_inverse_interpolation.h"
-#include "sbm/Event.h"
+#include <sb/SBEvent.h>
 #include <sb/SBMotion.h>
 
 

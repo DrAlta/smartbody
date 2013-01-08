@@ -1174,7 +1174,7 @@ bool SBAnimationBlend::validateState()
 
 void SBAnimationBlend::addEvent(const std::string& motion, double time, const std::string& type, const std::string& parameters, bool onceOnly)
 {
-	MotionEvent* motionEvent = new MotionEvent();
+	SBMotionEvent* motionEvent = new SBMotionEvent();
 	motionEvent->setIsOnceOnly(onceOnly);
 	motionEvent->setTime(time);
 	motionEvent->setType(type);
@@ -1188,7 +1188,7 @@ void SBAnimationBlend::removeEvent(int index)
 		return;
 }
 
-MotionEvent* SBAnimationBlend::getEvent(int index)
+SBMotionEvent* SBAnimationBlend::getEvent(int index)
 {
 	if (index < 0 || (int) _events.size() > index)
 		return NULL;
@@ -1198,7 +1198,7 @@ MotionEvent* SBAnimationBlend::getEvent(int index)
 
 void SBAnimationBlend::removeAllEvents()
 {
-	for (std::vector<std::pair<MotionEvent*, int> >::iterator iter = _events.begin();
+	for (std::vector<std::pair<SBMotionEvent*, int> >::iterator iter = _events.begin();
 		 iter != _events.end();
 		 iter++)
 	{

@@ -9,7 +9,7 @@
 #include "sb/SBScene.h"
 #include "me_ct_example_body_reach.hpp"
 #include "me_ct_barycentric_interpolation.h"
-#include "sbm/Event.h"
+#include <sb/SBEvent.h>
 #include "MeCtBodyReachState.h"
 #include <sb/SBSteerManager.h>
 #include <controllers/me_ct_example_body_reach.hpp>

@@ -163,7 +163,7 @@ void PATimeManager::loadEvents()
 		_events.pop();
 
 
-	std::vector<std::pair<SmartBody::MotionEvent*, int> >& events = blendData->state->getEvents();
+	std::vector<std::pair<SmartBody::SBMotionEvent*, int> >& events = blendData->state->getEvents();
 	for (size_t x = 0; x < events.size(); x++)
 	{
 		_events.push(events[x]);
@@ -178,12 +178,12 @@ void PATimeManager::checkEvents()
 
 	while (!_events.empty())
 	{
-		std::pair<SmartBody::MotionEvent*, int>& event = _events.front();
+		std::pair<SmartBody::SBMotionEvent*, int>& event = _events.front();
 		motionIndex = event.second;
 		// localTime is the parameterized time, determine the local time of the event
 		if (event.first->isEnabled() && localTimes[motionIndex] >= event.first->getTime())
 		{
-			SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();
+			SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();
 			manager->handleEvent(event.first, localTimes[motionIndex]);
 			std::string type = event.first->getType();
 			std::string params = event.first->getParameters();

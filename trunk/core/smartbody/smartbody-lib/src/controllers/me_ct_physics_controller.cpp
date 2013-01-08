@@ -90,11 +90,11 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			sprintf(eventMsg,"start %s %s %s %f %f %f %f",_character->getName().c_str(),col.collider->getName().c_str(),hitJoint->name().c_str(),hitPos[0],hitPos[1],hitPos[2], col.momentum.len());			
 			LOG("eventMsg = %s",eventMsg);
 			std::string cmd = eventMsg;
-			SmartBody::MotionEvent motionEvent;
+			SmartBody::SBMotionEvent motionEvent;
 			std::string eventType = "collision";
 			motionEvent.setType(eventType);			
 			motionEvent.setParameters(cmd);
-			SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();		
+			SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();		
 			manager->handleEvent(&motionEvent,t);
 			colRecords.clear();
 			hasGaze = true;
@@ -108,11 +108,11 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 // 			if (!hasPD)
 // 				phyChar->setBoolAttribute("usePD",false);
 			std::string cmd = eventMsg;
-			SmartBody::MotionEvent motionEvent;
+			SmartBody::SBMotionEvent motionEvent;
 			std::string eventType = "collision";
 			motionEvent.setType(eventType);						
 			motionEvent.setParameters(cmd);
-			SmartBody::EventManager* manager = SmartBody::EventManager::getEventManager();	
+			SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();	
 			manager->handleEvent(&motionEvent,t);
 			hasGaze = false;
 			hasPD = true;
