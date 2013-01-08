@@ -57,6 +57,17 @@ SrCamera::SrCamera ( const SrPnt& e, const SrPnt& c, const SrVec& u )
    aspect = 1.0f;
  }
 
+void SrCamera::copyCamera( const SrCamera* c )
+{
+	eye = c->eye;
+	center = c->center;
+	up = c->up;
+	fovy  = c->fovy;
+	znear = c->znear;
+	zfar  = c->zfar;
+	aspect = c->aspect;
+	scale = c->scale;
+}
 
 void SrCamera::setScale(float s)
 {
@@ -386,5 +397,6 @@ void SrCamera::reset()
 	setEye(0, 166, 185);
 	setCenter(0, 92, 0);
 }
+
 
 //================================ End of File =========================================

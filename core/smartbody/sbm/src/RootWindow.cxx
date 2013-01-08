@@ -1,6 +1,6 @@
 #include <vhcl.h>
 #include "RootWindow.h"
-
+#include "CharacterCreatorWindow.h"
 #include <FL/Fl_Pack.H>
 #include <FL/fl_ask.H>
 #include <FL/Fl_File_Chooser.H>
@@ -138,6 +138,48 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 
 	
 	int curY= 30;
+	Fl_Group* cameraGroup = new Fl_Group(10, curY, w, 25, NULL);	
+	//cameraGroup->type(Fl_Pack::HORIZONTAL);
+	int curX = 60;
+
+	cameraChoice = new Fl_Choice(curX, curY, 80, 25, "Camera");
+	cameraChoice->when(FL_WHEN_NOT_CHANGED|FL_WHEN_CHANGED);
+	cameraChoice->callback(ChooseCameraCB, this);
+	curX += 85;
+	saveCamera = new Fl_Button(curX, curY, 45, 25, "Save");
+	saveCamera->callback(SaveCameraCB, this);
+
+ 	curX += 125;
+// 	deleteCamera = new Fl_Button(curX, curY, 45, 25, "Del");
+// 	deleteCamera->callback(DeleteCameraCB, this);		
+	updateCameraList();
+
+	windowSizes.push_back("640x480");
+	windowSizes.push_back("720x480");
+	windowSizes.push_back("720x576");
+	windowSizes.push_back("800x600");
+	windowSizes.push_back("854x480");
+	windowSizes.push_back("960x600");
+	windowSizes.push_back("1024x576");
+	windowSizes.push_back("1024x768");
+	windowSizes.push_back("1280x720");
+	windowSizes.push_back("1280x768");
+	windowSizes.push_back("1366x768");
+	windowSizes.push_back("1280x800");
+	windowSizes.push_back("1280x1024");
+	windowSizes.push_back("1440x900");
+	windowSizes.push_back("1600x900");
+	windowSizes.push_back("1920x1080");
+
+	resolutionChoice = new Fl_Choice(curX, curY, 80, 25, "Resolution");
+	for (unsigned int i=0;i<windowSizes.size();i++)
+		resolutionChoice->add(windowSizes[i].c_str());
+	resolutionChoice->add("Custom...");	
+	resolutionChoice->when(FL_WHEN_NOT_CHANGED|FL_WHEN_CHANGED);
+	resolutionChoice->callback(ResizeWindowCB,this);
+	cameraGroup->end();	
+
+	curY += 30;
 
 	/*
 	Fl_Pack* simGroup = new Fl_Pack(10, curY, 75, 25, NULL);
@@ -185,6 +227,8 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	ReloadScriptsCB(NULL, this);
 
 	characterCreator = NULL;
+
+	resWindow = NULL;
 
 	visemeViewerWindow = NULL;
 
@@ -1382,31 +1426,74 @@ void BaseWindow::DocumentationCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 {
-/*
+
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	Fl_Choice* resChoice = static_cast<Fl_Choice*>(widget);
 
-	int windowIndex = (int) data;
-
-	std::cout << windowIndex << std::endl;
-
-	return;
+	int windowIndex = (int) data;	
 	
-	std::vector<std::string> tokens;
-	vhcl::Tokenize(rootWindow->windowSizes[windowIndex], tokens, "x");
+	std::vector<std::string> tokens;	
+	std::string resStr = resChoice->text();
+	if (resStr == "Custom...")
+	{
+		if (!rootWindow->resWindow)
+		{
+			rootWindow->resWindow = new ResolutionWindow(rootWindow->x() + 20, rootWindow->y() + 20, 480, 150, strdup("Change Resolution"));
+			rootWindow->resWindow->baseWin = rootWindow;
+		}
+		rootWindow->resWindow->show();
+	}
+
+	vhcl::Tokenize(resStr, tokens, "x");
 	if (tokens.size() < 2)
 		return;
 
 	int width = atoi(tokens[0].c_str());
 	int height = atoi(tokens[1].c_str());
-	std::cout << width << " " << height << std::endl;
-	
-	//rootWindow->w(width);
-	//rootWindow->h(height);
-*/
+	//std::cout << width << " " << height << std::endl;	
+	rootWindow->resize(rootWindow->x(),rootWindow->y(),width+20,height+70);
+// 	rootWindow->w(width);
+// 	rootWindow->h(height);
+
 }
 
+void BaseWindow::SaveCameraCB( Fl_Widget* widget, void* data )
+{
+	BaseWindow* window = (BaseWindow*)data;	
+	SrCamera* camera = new SrCamera(window->get_camera());
+	window->cameraList.push_back(camera);
+	window->updateCameraList();
+}
 
+void BaseWindow::DeleteCameraCB( Fl_Widget* widget, void* data )
+{
 
+}
+
+void BaseWindow::ChooseCameraCB( Fl_Widget* widget, void* data )
+{
+	BaseWindow* window = (BaseWindow*)data;	
+	Fl_Choice* choice = (Fl_Choice*)widget;
+	int cameraIdx = choice->value() - 1;	
+	if (cameraIdx >=0 && cameraIdx < (int)window->cameraList.size())
+	{
+		SrCamera* cam = window->cameraList[cameraIdx];		
+		//window->set_camera(cam);
+		window->get_camera()->copyCamera(cam);
+	}
+}
+
+void BaseWindow::updateCameraList()
+{
+	cameraChoice->clear();
+	cameraChoice->add("-----");
+	for (unsigned int i=0;i<cameraList.size();i++)
+	{
+		std::string cameraName = "cam";
+		cameraName += boost::lexical_cast<std::string>(i);
+		cameraChoice->add(cameraName.c_str());
+	}
+}
 
 //== Viewer Factory ========================================================
 SrViewer* FltkViewerFactory::s_viewer = NULL;
