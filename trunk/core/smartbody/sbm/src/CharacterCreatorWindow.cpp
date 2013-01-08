@@ -2,6 +2,7 @@
 #include <sbm/mcontrol_util.h>
 #include <sstream>
 #include <FL/fl_ask.H>
+#include "RootWindow.h"
 
 CharacterCreatorWindow::CharacterCreatorWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h, name)
 {
@@ -53,4 +54,37 @@ void CharacterCreatorWindow::CreateCB(Fl_Widget* w, void* data)
 	strstr << "char " << creator->inputName->value() << " init " << skel;
 	mcu.execute((char*) strstr.str().c_str());
 
+}
+
+ResolutionWindow::ResolutionWindow( int x, int y, int w, int h, char* name ): Fl_Double_Window(x, y, w, h, name)
+{
+	baseWin = NULL;
+	begin();	
+	inputXRes = new Fl_Input(100, 20, 100, 25, "X Res");
+	inputYRes = new Fl_Input(100, 50, 100, 25, "Y Res");
+	buttonSet = new Fl_Button(100, 95, 60, 25, "Set Res");
+	buttonSet->callback(SetCB, this);
+	end();
+}
+
+ResolutionWindow::~ResolutionWindow()
+{
+
+}
+
+void ResolutionWindow::SetCB( Fl_Widget* w, void* data )
+{
+	ResolutionWindow* resWin = static_cast<ResolutionWindow*>(data);
+	resWin->setResolution();
+	resWin->hide();
+}
+
+void ResolutionWindow::setResolution()
+{
+	int resX = atoi(inputXRes->value());
+	int resY = atoi(inputYRes->value());
+	if (resX > 0 && resY > 0 && baseWin)
+	{
+		baseWin->resize(baseWin->x(),baseWin->y(),resX,resY);
+	}
 }

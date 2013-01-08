@@ -8,6 +8,8 @@
 #include <vector>
 #include <sk/sk_skeleton.h>
 
+class BaseWindow;
+
 class CharacterCreatorWindow : public Fl_Double_Window
 {
 	public:
@@ -20,6 +22,20 @@ class CharacterCreatorWindow : public Fl_Double_Window
 		Fl_Choice* choiceSkeletons;
 		Fl_Input* inputName;
 		Fl_Button* buttonCreate;
+};
+
+class ResolutionWindow : public Fl_Double_Window
+{
+public:
+	ResolutionWindow(int x, int y, int w, int h, char* name);
+	~ResolutionWindow();
+	
+	static void SetCB(Fl_Widget* w, void* data);
+	void setResolution();
+
+	BaseWindow* baseWin;
+	Fl_Input *inputXRes, *inputYRes;
+	Fl_Button* buttonSet;
 };
 
 

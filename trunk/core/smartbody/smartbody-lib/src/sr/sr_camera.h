@@ -62,6 +62,7 @@ class SrCamera
     /*! Initialize the camera with the main parameters eye, center and up. */
     SrCamera ( const SrPnt& e, const SrPnt& c, const SrVec& u );
 
+	void copyCamera(const SrCamera* c);
 	void setScale(float scale);
 	float getScale();
 	void setEye(float x, float y, float z);

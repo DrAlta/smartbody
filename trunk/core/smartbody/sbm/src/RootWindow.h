@@ -20,7 +20,6 @@
 #include "panimationviewer/PanimationWindow.h"
 #include "faceviewer/FaceViewer.h"
 #include "channelbufferviewer/channelbufferWindow.hpp"
-#include "CharacterCreatorWindow.h"
 #include "retargetviewer/RetargetViewer.h"
 #include "jointmapviewer/RetargetStepWindow.h"
 
@@ -36,6 +35,9 @@ class SbmCharacter;
 #if USE_OGRE_VIEWER > 0
 #include "FLTKOgreViewer.h"
 #endif
+
+class CharacterCreatorWindow;
+class ResolutionWindow;
 
 class  BaseWindow : public SrViewer, public Fl_Double_Window
 {
@@ -86,11 +88,24 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		Fl_Button* buttonStop;
 		Fl_Button* buttonPlaybackStepForward;
 		CharacterCreatorWindow* characterCreator;
+		ResolutionWindow* resWindow;
+
+		Fl_Choice* cameraChoice;
+		Fl_Button* saveCamera;
+		Fl_Button* deleteCamera;
+		Fl_Choice* resolutionChoice;
 
 		Fl_Input *inputTimeStep;
 
 		std::string scriptFolder;
 		std::vector<std::string> windowSizes;
+		std::vector<SrCamera*> cameraList;
+
+		void updateCameraList();
+
+		static void SaveCameraCB(Fl_Widget* widget, void* data);
+		static void DeleteCameraCB(Fl_Widget* widget, void* data);
+		static void ChooseCameraCB(Fl_Widget* widget, void* data);
 	
 		static void LoadCB(Fl_Widget* widget, void* data);
 		static void SaveCB(Fl_Widget* widget, void* data);
