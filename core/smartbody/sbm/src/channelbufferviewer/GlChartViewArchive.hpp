@@ -23,18 +23,16 @@
 #ifndef _GL_CHART_VIEW_ARCHIVE_H_
 #define _GL_CHART_VIEW_ARCHIVE_H_
 
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
 #include <sr/sr_vec.h>
 #include <sr/sr_vec2.h>
 #include <sr/sr_quat.h>
 #include <sr/sr_mat.h>
 #include <sr/sr_array.h>
-//#include <sr/sr_channel_array.h>
 #include <sr/sr_buffer.h>
 #include <sr/sr_string.h>
-#include "string.h"
-#include "math.h"
-#include "stdlib.h"
-//#include <sbm/mcontrol_util.h>
 
 #define CHART_DATA_TYPE_UNKNOWN -1
 #define CHART_DATA_TYPE_VALUE 1

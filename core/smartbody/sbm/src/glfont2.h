@@ -10,12 +10,6 @@
 
 #include <string.h>
 
-//#include <sbm/BMLViewer.h>
-//#include <sbm/mcontrol_util.h>
-// 01/10/2011 changed by feng.
-// I changed the function name GetCharWidth,GetCharHeight so it does not collide with some default marco defined in WinAPI. 
-// Therefore it should not be necessary to include these files for this font library class.
-
 //*******************************************************************
 //GLFont Interface
 //*******************************************************************
