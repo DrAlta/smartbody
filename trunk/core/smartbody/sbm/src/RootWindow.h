@@ -99,7 +99,16 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 
 		std::string scriptFolder;
 		std::vector<std::string> windowSizes;
+		std::vector<Fl_Menu_Item> resolutionMenuList;
+		int setResolutionMenuIndex;
+		
+		int loadCameraMenuIndex, deleteCameraMenuIndex;
+		std::vector<Fl_Menu_Item> loadCameraList;
+		std::vector<Fl_Menu_Item> deleteCameraList;
+
 		std::vector<SrCamera*> cameraList;
+		std::map<std::string,SrCamera*> cameraMap;
+
 
 		void updateCameraList();
 
