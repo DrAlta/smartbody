@@ -1667,8 +1667,8 @@ SkMotion* SkMotion::buildPoststrokeHoldMotion(float holdTime, std::vector<std::s
 	else if (joints.size() > 0)	// joint specified, add perlin noise
 	{
 		newMotion->addPerlinNoise(joints, strokeEndFrameId, strokeEndFrameId + numHoldFrames, scale, freq);
-		newMotion->smoothAtFrame(strokeEndFrameId, 3, 5);
-		newMotion->smoothAtFrame(strokeEndFrameId + numHoldFrames, 3, 5);
+		//newMotion->smoothAtFrame(strokeEndFrameId, 3, 5);
+		//newMotion->smoothAtFrame(strokeEndFrameId + numHoldFrames, 3, 5);
 	}
 
 	
