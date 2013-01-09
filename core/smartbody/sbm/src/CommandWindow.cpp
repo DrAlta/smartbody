@@ -376,7 +376,7 @@ void CommandWindow::UpdateOutput(char *text, bool origCommand)
 
 	// if the display is approaching capacity, then keep the last minOutputSize characters
 	int bufferLength = textDisplay->buffer()->length();
-	if (bufferLength > getMinOutputSize() * 4)
+	if (bufferLength > getMinOutputSize() * 100)
 	{
 		textDisplay->buffer()->remove(0, bufferLength -  getMinOutputSize());
 	}
