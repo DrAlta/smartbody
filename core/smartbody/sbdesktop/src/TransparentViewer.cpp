@@ -1,3 +1,4 @@
+#include "vhcl.h"
 #include "TransparentViewer.h"
 #include <windowsx.h>
 //#include <GL/glaux.h>
