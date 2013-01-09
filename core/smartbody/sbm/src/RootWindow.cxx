@@ -60,6 +60,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Steer/Characters and Goals", 0, SteeringCharactersCB, this, NULL);
 	menubar->add("&View/Steer/All Steering", 0, SteeringAllCB, this, NULL);
 	menubar->add("&View/Steer/No Steering", 0, SteeringNoneCB, this, NULL);
+
 /*
 	windowSizes.push_back("640x480");
 	windowSizes.push_back("720x480");
@@ -99,13 +100,22 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Create/Pawn...", 0, CreatePawnCB, this, NULL);
 	menubar->add("&Create/Light...", 0, CreateLightCB, this, NULL);
 	menubar->add("&Create/Terrain...", 0, CreateTerrainCB, this, NULL);
+
+	menubar->add("&Camera/Save Camera View", 0, SaveCameraCB, this, NULL );
+	loadCameraMenuIndex = menubar->add("&Camera/Load Camera", 0, 0, 0, FL_SUBMENU_POINTER );
+	deleteCameraMenuIndex = menubar->add("&Camera/Delete Camera", 0, 0, 0, FL_SUBMENU_POINTER );
 	menubar->add("&Camera/Reset", 0, CameraResetCB, this, NULL);
 	menubar->add("&Camera/Frame All", 0, CameraFrameCB, this, NULL);
 	menubar->add("&Camera/Face Camera", 0, FaceCameraCB, this, NULL);
 	menubar->add("&Camera/Track Character", 0, TrackCharacterCB, this, NULL);
-	menubar->add("&Camera/Rotate Around Selected", 0, RotateSelectedCB, this, NULL);
+	menubar->add("&Camera/Rotate Around Selected", 0, RotateSelectedCB, this, NULL);	
+	
+	
 	menubar->add("&Settings/Default Media Path", 0, SettingsDefaultMediaPathCB, this, NULL);
 	menubar->add("&Settings/Internal Audio", 0, AudioCB, this, NULL);	
+
+	setResolutionMenuIndex = menubar->add("&Window/Set Resolution", 0, 0, 0, FL_SUBMENU_POINTER);
+
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
 	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
 	menubar->add("&Window/Blend Viewer", 0, LaunchParamAnimViewerCB, this, NULL);
@@ -137,21 +147,21 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	*/
 
 	
-	int curY= 30;
-	Fl_Group* cameraGroup = new Fl_Group(10, curY, w, 25, NULL);	
+	int curY= 2;
+	//Fl_Group* cameraGroup = new Fl_Group(10, curY, w, 25, NULL);	
 	//cameraGroup->type(Fl_Pack::HORIZONTAL);
-	int curX = 60;
-
-	cameraChoice = new Fl_Choice(curX, curY, 80, 25, "Camera");
-	cameraChoice->when(FL_WHEN_NOT_CHANGED|FL_WHEN_CHANGED);
-	cameraChoice->callback(ChooseCameraCB, this);
-	updateCameraList();	
-	cameraChoice->value(0);
-	curX += 85;
-	saveCamera = new Fl_Button(curX, curY, 45, 25, "Save");
-	saveCamera->callback(SaveCameraCB, this);
-
- 	curX += 125;
+ 	
+// 
+// 	cameraChoice = new Fl_Choice(curX, curY, 80, 25, "Camera");
+// 	cameraChoice->when(FL_WHEN_NOT_CHANGED|FL_WHEN_CHANGED);
+// 	cameraChoice->callback(ChooseCameraCB, this);
+// 	updateCameraList();	
+// 	cameraChoice->value(0);
+// 	curX += 85;
+// 	saveCamera = new Fl_Button(curX, curY, 45, 25, "Save");
+// 	saveCamera->callback(SaveCameraCB, this);
+// 
+  	int curX = 500;
 // 	deleteCamera = new Fl_Button(curX, curY, 45, 25, "Del");
 // 	deleteCamera->callback(DeleteCameraCB, this);			
 	windowSizes.push_back("640x480");
@@ -171,17 +181,27 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	windowSizes.push_back("1600x900");
 	windowSizes.push_back("1920x1080");
 
-	resolutionChoice = new Fl_Choice(curX, curY, 80, 25, "Resolution");
-	resolutionChoice->add("Default");
+	resolutionMenuList.clear();
+	Fl_Menu_Item defaultItem = {"Default", 0, ResizeWindowCB, this};
+	resolutionMenuList.push_back(defaultItem);
 	for (unsigned int i=0;i<windowSizes.size();i++)
-		resolutionChoice->add(windowSizes[i].c_str());
-	resolutionChoice->add("Custom...");	
-	resolutionChoice->when(FL_WHEN_NOT_CHANGED|FL_WHEN_CHANGED);
-	resolutionChoice->callback(ResizeWindowCB,this);
-	resolutionChoice->value(0);
-	cameraGroup->end();	
+	{
+		Fl_Menu_Item resItem = { windowSizes[i].c_str(), 0, ResizeWindowCB, this } ;
+		resolutionMenuList.push_back(resItem);
+	}
 
-	curY += 30;
+	Fl_Menu_Item customItem = {"Custom...", 0, ResizeWindowCB, this};
+	Fl_Menu_Item tempItem = {0};
+	resolutionMenuList.push_back(customItem);
+	resolutionMenuList.push_back(tempItem);
+	
+	Fl_Menu_Item* menuList = const_cast<Fl_Menu_Item*>(menubar->menu());
+	Fl_Menu_Item& resolutionSubMenu = menuList[setResolutionMenuIndex];
+	resolutionSubMenu.user_data(&resolutionMenuList[0]);
+
+	//cameraGroup->end();	
+
+	curY += 28;
 
 	/*
 	Fl_Pack* simGroup = new Fl_Pack(10, curY, 75, 25, NULL);
@@ -1435,7 +1455,8 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 	int windowIndex = (int) data;	
 	
 	std::vector<std::string> tokens;	
-	std::string resStr = resChoice->text();
+	const Fl_Menu_Item* menuItem = ((Fl_Menu_*)widget)->mvalue();
+	std::string resStr = menuItem->label();
 	if (resStr == "Default")
 	{
 		rootWindow->resize(rootWindow->x(),rootWindow->y(),800,800);
@@ -1468,31 +1489,51 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 void BaseWindow::SaveCameraCB( Fl_Widget* widget, void* data )
 {
 	BaseWindow* window = (BaseWindow*)data;	
+	static int cameraCount = 0;
 	SrCamera* camera = new SrCamera(window->get_camera());
-	window->cameraList.push_back(camera);
+	std::string cameraName = "camera";
+	cameraName += boost::lexical_cast<std::string>(cameraCount++);
+	std::string msg = "Current camera view is saved to '" + cameraName +"'";
+	fl_message(msg.c_str());
+	window->cameraMap[cameraName] = camera;
 	window->updateCameraList();
+	//window->cameraList.push_back(camera);
+	//window->updateCameraList();
 }
 
 void BaseWindow::DeleteCameraCB( Fl_Widget* widget, void* data )
 {
-
+	const Fl_Menu_Item* menuItem = ((Fl_Menu_*)widget)->mvalue();
+	std::string camName = menuItem->label();
+	BaseWindow* window = (BaseWindow*)data;	
+	window->cameraMap.erase(camName);	
+	window->updateCameraList();
 }
 
 void BaseWindow::ChooseCameraCB( Fl_Widget* widget, void* data )
 {
-	BaseWindow* window = (BaseWindow*)data;	
-	Fl_Choice* choice = (Fl_Choice*)widget;
-	int cameraIdx = choice->value() - 1;	
-	if (cameraIdx >=0 && cameraIdx < (int)window->cameraList.size())
+	const Fl_Menu_Item* menuItem = ((Fl_Menu_*)widget)->mvalue();
+	//LOG("load camera %s", menuItem->label());
+	std::string camName = menuItem->label();
+ 	BaseWindow* window = (BaseWindow*)data;	
+	if (window->cameraMap.find(camName) != window->cameraMap.end())
 	{
-		SrCamera* cam = window->cameraList[cameraIdx];		
-		//window->set_camera(cam);
+		SrCamera* cam = window->cameraMap[camName];
 		window->get_camera()->copyCamera(cam);
 	}
+// 	Fl_Choice* choice = (Fl_Choice*)widget;
+// 	int cameraIdx = choice->value() - 1;	
+// 	if (cameraIdx >=0 && cameraIdx < (int)window->cameraList.size())
+// 	{
+// 		SrCamera* cam = window->cameraList[cameraIdx];		
+// 		//window->set_camera(cam);
+// 		window->get_camera()->copyCamera(cam);
+// 	}
 }
 
 void BaseWindow::updateCameraList()
 {
+	/*
 	cameraChoice->clear();
 	cameraChoice->add("-----");
 	for (unsigned int i=0;i<cameraList.size();i++)
@@ -1501,6 +1542,30 @@ void BaseWindow::updateCameraList()
 		cameraName += boost::lexical_cast<std::string>(i);
 		cameraChoice->add(cameraName.c_str());
 	}
+	*/
+	Fl_Menu_Item* menuList = const_cast<Fl_Menu_Item*>(menubar->menu());
+	Fl_Menu_Item& loadCameraSubMenu = menuList[loadCameraMenuIndex];	
+	Fl_Menu_Item& deleteCameraSubMenu = menuList[deleteCameraMenuIndex];	
+	loadCameraList.clear();
+	deleteCameraList.clear();
+	std::map<std::string,SrCamera*>::iterator mi;
+	for ( mi  = cameraMap.begin();
+		  mi != cameraMap.end();
+		  mi++)
+	{		
+		const std::string& camName = mi->first;
+		Fl_Menu_Item temp_LoadCam = { camName.c_str(), 0, ChooseCameraCB, this };		
+		loadCameraList.push_back(temp_LoadCam);		
+
+		Fl_Menu_Item temp_DeleteCam = { camName.c_str(), 0, DeleteCameraCB, this };		
+		deleteCameraList.push_back(temp_DeleteCam);		
+	}
+	Fl_Menu_Item temp = {0};
+	loadCameraList.push_back(temp);
+	deleteCameraList.push_back(temp);
+
+	loadCameraSubMenu.user_data(&loadCameraList[0]);
+	deleteCameraSubMenu.user_data(&deleteCameraList[0]);
 }
 
 //== Viewer Factory ========================================================
