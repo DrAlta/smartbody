@@ -2903,7 +2903,7 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 # define ROTATING2(e)    (e.alt && e.button1)
 # define ROTATING(e)   (e.alt && e.shift && e.button1)
 //# define ZOOMING(e)   (e.alt && e.button3)
-# define ZOOMING(e)     (e.shift && e.ctrl && e.button3)
+# define ZOOMING(e)     (e.shift && e.alt && e.button3)
 # define DOLLYING(e)     (e.alt && e.button3)
 # define TRANSLATING(e) (e.alt && e.button2)
 

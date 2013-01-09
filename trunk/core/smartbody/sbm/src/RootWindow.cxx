@@ -111,10 +111,11 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Camera/Rotate Around Selected", 0, RotateSelectedCB, this, NULL);	
 	
 	
+	setResolutionMenuIndex = menubar->add("&Settings/Set Resolution", 0, 0, 0, FL_SUBMENU_POINTER);
 	menubar->add("&Settings/Default Media Path", 0, SettingsDefaultMediaPathCB, this, NULL);
 	menubar->add("&Settings/Internal Audio", 0, AudioCB, this, NULL);	
 
-	setResolutionMenuIndex = menubar->add("&Window/Set Resolution", 0, 0, 0, FL_SUBMENU_POINTER);
+	
 
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
 	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
