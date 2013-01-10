@@ -1601,6 +1601,15 @@ boost::python::class_<SBReach>("SBReach")
 		.def("save", &SBScene::save, "Saves the SmartBody configuration. Returns a string containing Python commands representing the configuration.")
 		.def("exportScene", &SBScene::exportScene, "Saves the entire SmartBody configuration, including assets, into a given file location.")
 
+		// cameras
+		.def("createCamera", &SBScene::createCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a camera with a given name and returns it.")
+		.def("removeCamera", &SBScene::removeCamera, "Removes a camera.")
+		.def("setActiveCamera", &SBScene::setActiveCamera, "Sets the camera to be used in the viewer.")
+		.def("getActiveCamera", &SBScene::getActiveCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the camera currently being used in the viewer.")
+		.def("getCamera", &SBScene::getCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a camera by name.")
+		.def("getNumCameras", &SBScene::getNumCameras, "Returns the number of cameras available.")
+		.def("getCameraNames", &SBScene::getCameraNames, "Gets the names of all the cameras available.")
+
 		// command processing
 		.def("command", &SBScene::command, "Runs an old-Style SmartBody command.")
 		.def("commandAt", &SBScene::commandAt, "Runs an old-style SmartBody command at a set time in the future.")

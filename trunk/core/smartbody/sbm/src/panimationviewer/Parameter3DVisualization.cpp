@@ -14,9 +14,9 @@ VisualizationBase::VisualizationBase(int x, int y, int w, int h, char* name) : F
 	this->begin();
 	this->end();
 
-	cam.center.set(0, 0, 0);
-	cam.eye.set(300, -300, 400);
-	cam.up.set(0, 0, 1);
+	cam.setCenter(0, 0, 0);
+	cam.setEye(300, -300, 400);
+	cam.setUpVector(SrVec(0, 0, 1));
 	gridSize = 700;
 	gridStep = 40;
 	floorHeight = 0;
@@ -47,14 +47,14 @@ void VisualizationBase::draw()
 
 	//----- Set Projection ----------------------------------------------
 	SrMat mat;
-	cam.aspect = (float)w()/(float)h();
+	cam.setAspectRatio((float)w()/(float)h());
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrix(cam.get_perspective_mat(mat));
 
 	//----- Set Visualisation -------------------------------------------
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrix(cam.get_view_mat(mat));
-	glScalef(cam.scale, cam.scale, cam.scale);
+	glScalef(cam.getScale(), cam.getScale(), cam.getScale());
 	SrLight light;
 	//	light.directional = false;
 	light.directional = true;
@@ -216,9 +216,9 @@ void VisualizationBase::translate_event(SrEvent& e, SrEvent::EventType t, int w,
 	if ( t==SrEvent::EventPush)
 	{
 		e.button = Fl::event_button();
-		e.origUp = viewer->cam.up;
-		e.origEye = viewer->cam.eye;
-		e.origCenter = viewer->cam.center;
+		e.origUp = viewer->cam.getUpVector();
+		e.origEye = viewer->cam.getEye();
+		e.origCenter = viewer->cam.getCenter();
 		e.origMouse.x = e.mouseCoord.x;
 		e.origMouse.y = e.mouseCoord.y;
 	}
@@ -273,13 +273,13 @@ void VisualizationBase::mouse_event(SrEvent& e)
 {
 	if ( e.type==SrEvent::EventDrag )
 	{ 
-		float dx = e.mousedx() * cam.aspect;
-		float dy = e.mousedy() / cam.aspect;
+		float dx = e.mousedx() * cam.getAspectRatio();
+		float dy = e.mousedy() / cam.getAspectRatio();
 		if ( DOLLYING(e) )
 		{ 
 			float amount = dx;
-			SrVec cameraPos(cam.eye);
-			SrVec targetPos(cam.center);
+			SrVec cameraPos(cam.getEye());
+			SrVec targetPos(cam.getCenter());
 			SrVec diff = targetPos - cameraPos;
 			float distance = diff.len();
 			diff.normalize();
@@ -290,10 +290,12 @@ void VisualizationBase::mouse_event(SrEvent& e)
 			SrVec diffVector = diff;
 			SrVec adjustment = diffVector * distance * amount;
 			cameraPos += adjustment;
-			SrVec oldEyePos = cam.eye;
-			cam.eye = cameraPos;
-			SrVec cameraDiff = cam.eye - oldEyePos;
-			cam.center += cameraDiff;
+			SrVec oldEyePos = cam.getEye();
+			cam.setEye(cameraPos.x, cameraPos.y, cameraPos.z);
+			SrVec cameraDiff = cam.getEye() - oldEyePos;
+			SrVec tmpCenter = cam.getCenter();
+			tmpCenter += cameraDiff;
+			cam.setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);
 			redraw();
 		}
 		else if ( TRANSLATING(e) )
@@ -320,7 +322,7 @@ void VisualizationBase::mouse_event(SrEvent& e)
 			SrVec camera = rotate_point(origCamera, origCenter, dirX, -deltaX * float(M_PI));
 			camera = rotate_point(camera, origCenter, dirY, deltaY * float(M_PI));
 
-			cam.eye = camera;
+			cam.setEye(camera.x, camera.y, camera.z);
 			redraw();
 		}
 	}
@@ -366,9 +368,9 @@ Parameter3DVisualization::Parameter3DVisualization(int x, int y, int w, int h, c
 	this->begin();
 	this->end();
 	
-	cam.center.set(0, 0, 0);
-	cam.eye.set(300, -300, 400);
-	cam.up.set(0, 0, 1);
+	cam.setCenter(0, 0, 0);
+	cam.setEye(300, -300, 400);
+	cam.setUpVector(SrVec(0, 0, 1));
 	gridSize = 700;
 	gridStep = 40;
 	floorHeight = 0;
@@ -405,14 +407,14 @@ void Parameter3DVisualization::draw()
 
 	//----- Set Projection ----------------------------------------------
 	SrMat mat;
-	cam.aspect = (float)w()/(float)h();
+	cam.setAspectRatio((float)w()/(float)h());
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrix(cam.get_perspective_mat(mat));
 
 	//----- Set Visualisation -------------------------------------------
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrix(cam.get_view_mat(mat));
-	glScalef(cam.scale, cam.scale, cam.scale);
+	glScalef(cam.getScale(), cam.getScale(), cam.getScale());
 	SrLight light;
 //	light.directional = false;
 	light.directional = true;

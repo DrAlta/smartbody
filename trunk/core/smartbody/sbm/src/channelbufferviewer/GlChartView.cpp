@@ -113,14 +113,10 @@ void GlChartView::initFont()
 void GlChartView::init_camera(int type)
 {
 	camera.init();
-	camera.aspect = (float)w()/(float)h();
+	camera.setAspectRatio((float)w()/(float)h());
 	coordinate.Update((float)w(), (float)h(), camera);
-	camera.eye.x = coordinate.GetXScale()/2;
-	camera.eye.z = 2000.0f;
-	camera.eye.y = 0.0f;
-	camera.center.x = coordinate.GetXScale()/2;
-	camera.center.y = 0.0f;
-	camera.center.z = 0.0f;
+	camera.setEye(coordinate.GetXScale()/2, 2000.0f, 0.0f);
+	camera.setCenter(coordinate.GetXScale()/2, 0.0f, 0.0f);
 	automatic_scale = true;
 	if(type == 0) 
 	{
@@ -175,7 +171,7 @@ void GlChartView::draw()
 
 	glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-	camera.aspect = (float)w()/(float)h();
+	camera.setAspectRatio((float)w()/(float)h());
 
 	glMatrixMode ( GL_PROJECTION );
 	glLoadMatrix ( camera.get_perspective_mat(mat) );
@@ -183,7 +179,7 @@ void GlChartView::draw()
 	glMatrixMode ( GL_MODELVIEW );
 	glLoadMatrix ( camera.get_view_mat(mat) );
 
-	glScalef ( camera.scale, camera.scale, camera.scale );
+	glScalef ( camera.getScale(), camera.getScale(), camera.getScale() );
 
 	glEnable ( GL_LIGHTING );
 	glLight ( 0, light1 );
@@ -994,9 +990,9 @@ void GlChartView::translate_event ( SrEvent& e, SrEvent::EventType t, int w, int
    if ( t==SrEvent::EventPush)
    {
 	   e.button = Fl::event_button();
-	   e.origUp = viewer->camera.up;
-	   e.origEye = viewer->camera.eye;
-	   e.origCenter = viewer->camera.center;
+	   e.origUp = viewer->camera.getUpVector();
+	   e.origEye = viewer->camera.getEye();
+	   e.origCenter = viewer->camera.getCenter();
 	   e.origMouse.x = e.mouseCoord.x;
 	   e.origMouse.y = e.mouseCoord.y;
    }
@@ -1054,8 +1050,8 @@ int GlChartView::mouse_event ( const SrEvent &e )
 	{ 
 		if ( e.type == SrEvent::EventDrag )
 		{ 
-			float dx = e.mousedx() * camera.aspect;
-			float dy = e.mousedy() / camera.aspect;
+			float dx = e.mousedx() * camera.getAspectRatio();
+			float dy = e.mousedy() / camera.getAspectRatio();
 
 			if ( e.alt && e.button3 )
 			{
@@ -1078,8 +1074,12 @@ int GlChartView::mouse_event ( const SrEvent &e )
 			}
 			else if(e.button1 && e.alt)
 			{
-				camera.center.y += (e.lmouse.y - e.mouse.y)*coordinate.y_scale;
-				camera.eye.y += (e.lmouse.y - e.mouse.y)*coordinate.y_scale;
+				SrVec center = camera.getCenter();
+				center.y +=  (e.lmouse.y - e.mouse.y)*coordinate.y_scale;
+				camera.setCenter(center.x, center.y, center.z);
+				SrVec eye = camera.getEye();
+				eye.y += (e.lmouse.y - e.mouse.y)*coordinate.y_scale;
+				camera.setEye(eye.x, eye.y, eye.z);
 			}
 			/*else if ( e.alt && e.button3 )
 			{ 

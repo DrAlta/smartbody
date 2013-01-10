@@ -406,6 +406,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->interactiveLocomotion = false;
    _data->showtrajectory = false;
    _data->showgesture = false;
+   _data->camera = NULL;
 
    _data->light.init();
 
@@ -841,9 +842,9 @@ void FltkViewer::update_axis ()
 
 void FltkViewer::view_all ()
  {
-   _data->camera->center = SrVec::null;
-   _data->camera->up = SrVec::j;
-   _data->camera->eye.set ( 0, 0, 1.0f );
+   _data->camera->setCenter(SrVec::null.x, SrVec::null.y, SrVec::null.z);
+   _data->camera->setUpVector(SrVec::j);
+   _data->camera->setEye( 0, 0, 1.0f );
 
    if ( _data->root )
     { update_bbox ();
@@ -858,7 +859,7 @@ void FltkViewer::view_all ()
       float s = box.max_size();
       // _data->light.constant_attenuation = s;
       //_data->camera.view_all ( box, SR_TORAD(60) );
-      _data->camera->scale = 1.0f / s;
+      _data->camera->setScale(1.0f / s);
       //_data->camera.center = box.center();
       //_data->camera.eye = _data->camera.center;
       //_data->camera.eye.z = s.z;
@@ -1029,8 +1030,8 @@ void FltkViewer::init_opengl ( int w, int h )
    float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
    
    // camera near = 0.1 m, camera far plane is 100 m
-   cam->znear = 0.1f*scale;
-   cam->zfar  = 100.f*scale;
+   cam->setNearPlane(0.1f*scale);
+   cam->setFarPlane(100.f*scale);
 
 
    // init shader
@@ -1459,8 +1460,12 @@ void FltkViewer::draw()
    glClearColor ( _data->bcolor );
    glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+   // if there is no active camera, then only show the blank screen
+   if (!cam)
+	   return;
+
    //----- Set Projection ----------------------------------------------
-   cam->aspect = (float)w()/(float)h();
+   cam->setAspectRatio((float)w()/(float)h());
 
    glMatrixMode ( GL_PROJECTION );
    glLoadMatrix ( cam->get_perspective_mat(mat) );
@@ -1469,7 +1474,7 @@ void FltkViewer::draw()
    glMatrixMode ( GL_MODELVIEW );
    glLoadMatrix ( cam->get_view_mat(mat) );
 
-   glScalef ( cam->scale, cam->scale, cam->scale );
+   glScalef ( cam->getScale(), cam->getScale(), cam->getScale() );
 
     updateLights();
 	glEnable ( GL_LIGHTING );
@@ -1477,10 +1482,6 @@ void FltkViewer::draw()
 	{
 		glLight ( x, _lights[x] );		
 	}
-
-	glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.0f);
-	glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.2f);
-	glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.08f);	
 
 	static GLfloat mat_emissin[] = { 0.0,  0.0,    0.0,    1.0 };
 	static GLfloat mat_ambient[] = { 0.0,  0.0,    0.0,    1.0 };
@@ -1567,6 +1568,9 @@ void FltkViewer::draw()
 // transformed coords in SrEvent are in "normalized device coordinates" [-1,-1]x[1,1]
 static void translate_event ( SrEvent& e, SrEvent::EventType t, int w, int h, FltkViewer* viewer )
  {
+	 if (!viewer->getData()->camera)
+		 return;
+
    e.init_lmouse ();
 
    e.type = t;
@@ -1583,9 +1587,9 @@ static void translate_event ( SrEvent& e, SrEvent::EventType t, int w, int h, Fl
    if ( t==SrEvent::EventPush)
    {
 	   e.button = Fl::event_button();
-	   e.origUp = viewer->getData()->camera->up;
-	   e.origEye = viewer->getData()->camera->eye;
-	   e.origCenter = viewer->getData()->camera->center;
+	   e.origUp = viewer->getData()->camera->getUpVector();
+	   e.origEye = viewer->getData()->camera->getEye();
+	   e.origCenter = viewer->getData()->camera->getCenter();
 	   e.origMouse.x = e.mouseCoord.x;
 	   e.origMouse.y = e.mouseCoord.y;
    }
@@ -2562,7 +2566,9 @@ int FltkViewer::handle ( int event )
 			case 'f': // frame selected object
 				{
 				SrBox sceneBox;
-				SrCamera* camera = SmartBody::getCamera();
+				SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+				if (!camera)
+					return ret;
 				
 				SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
 				if (selectedPawn)
@@ -2583,7 +2589,7 @@ int FltkViewer::handle ( int event )
 					}
 				}
 				
-				camera->view_all(sceneBox, camera->fovy);	
+				camera->view_all(sceneBox, camera->getFov());	
 				float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
 				float znear = 0.01f*scale;
 				float zfar = 100.0f*scale;
@@ -2675,7 +2681,7 @@ int FltkViewer::handle ( int event )
    if ( e.type == SrEvent::EventNone ) return 0; // not an interesting event
 
    if ( event==FL_PUSH || event==FL_DRAG )
-    { SrPlane plane ( _data->camera->center, SrVec::k );
+    { SrPlane plane ( _data->camera->getCenter(), SrVec::k );
       _data->camera->get_ray ( e.mouse.x, e.mouse.y, e.ray.p1, e.ray.p2 );
       _data->camera->get_ray ( e.lmouse.x, e.lmouse.y, e.lray.p1, e.lray.p2 );
       e.mousep = plane.intersect ( e.ray.p1, e.ray.p2 );
@@ -2925,20 +2931,20 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
  {
    if ( e.type==SrEvent::EventDrag )
     { 
-      float dx = e.mousedx() * _data->camera->aspect;
-      float dy = e.mousedy() / _data->camera->aspect;
+      float dx = e.mousedx() * _data->camera->getAspectRatio();
+      float dy = e.mousedy() / _data->camera->getAspectRatio();
 
 		if ( ZOOMING(e) )
 		{
-			_data->camera->fovy += (dx+dy);//40.0f;
-			_data->camera->fovy = SR_BOUND ( _data->camera->fovy, 0.001f, srpi );
+			float tmpFov = _data->camera->getFov() + (dx+dy);//40.0f;
+			_data->camera->setFov(SR_BOUND ( tmpFov, 0.001f, srpi ));
 			redraw();
 		}
 		else if ( DOLLYING(e) )
 		{ 
 			float amount = dx-dy;
-			SrVec cameraPos(_data->camera->eye);
-			SrVec targetPos(_data->camera->center);
+			SrVec cameraPos(_data->camera->getEye());
+			SrVec targetPos(_data->camera->getCenter());
 			SrVec diff = targetPos - cameraPos;
 			float distance = diff.len();
 			diff.normalize();
@@ -2949,10 +2955,12 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 			SrVec diffVector = diff;
 			SrVec adjustment = diffVector * distance * amount;
 			cameraPos += adjustment;
-			SrVec oldEyePos = _data->camera->eye;
-			_data->camera->eye = cameraPos;
-			SrVec cameraDiff = _data->camera->eye - oldEyePos;
-			_data->camera->center += cameraDiff;
+			SrVec oldEyePos = _data->camera->getEye();
+			_data->camera->setEye(cameraPos.x, cameraPos.y, cameraPos.z);
+			SrVec cameraDiff = _data->camera->getEye() - oldEyePos;
+			SrVec tmpCenter = _data->camera->getCenter();
+			tmpCenter += cameraDiff;
+			_data->camera->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);
 			redraw();
 		}
       else if ( TRANSLATING(e) )
@@ -2981,14 +2989,16 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 		   SrVec forward =origCenter - origCamera; 		   
 		   SrQuat q = SrQuat(origUp, vhcl::DEG_TO_RAD()*deltaX*150.f);			   
 		   forward = forward*q;
-		   _data->camera->center = _data->camera->eye + forward;
+		   SrVec tmp = _data->camera->getEye() + forward;
+		   _data->camera->setCenter(tmp.x, tmp.y, tmp.z);
 
 		   SrVec cameraRight = cross(forward,origUp);
 		   cameraRight.normalize();		   
 		   q = SrQuat(cameraRight, vhcl::DEG_TO_RAD()*deltaY*150.f);	
-		   _data->camera->up = origUp*q;
+		   _data->camera->setUpVector(origUp*q);
 		   forward = forward*q;
-		   _data->camera->center = _data->camera->eye + forward;		  
+		   SrVec tmpCenter = _data->camera->getEye() + forward;
+		   _data->camera->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);		  
 		   redraw();
        }
       else if ( ROTATING2(e) )
@@ -3010,7 +3020,7 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 		SrVec camera = rotatePoint(origCamera, origCenter, dirX, -deltaX * float(M_PI));
 		camera = rotatePoint(camera, origCenter, dirY, deltaY * float(M_PI));
 
-		_data->camera->eye = camera;
+		_data->camera->setEye(camera.x, camera.y, camera.z);
 		redraw();
 	  }
     }
@@ -3529,11 +3539,16 @@ void FltkViewer::drawPawns()
 		break;
 	}
 
+	SrCamera* currentCamera = SmartBody::SBScene::getScene()->getActiveCamera();
+
 	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
 		iter != mcu.getPawnMap().end();
 		iter++)
 	{
 		SbmPawn* pawn = (*iter).second;
+		SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
+		if (camera && camera == currentCamera) // don't draw the current active camera
+			continue;
 		if (!pawn->getSkeleton()) 
 			continue;
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
@@ -3563,7 +3578,10 @@ void FltkViewer::drawPawns()
 			glDisable(GL_LIGHTING);
 			glPushMatrix();
 			glMultMatrixf((const float*) gmat);
-			glColor3f(1.0, 0.0, 0.0);
+			if (camera)
+				glColor3f(1.0, 0.0, 0.0);
+			else
+				glColor3f(1.0, 1.0, 0.0);
 			SrSnSphere sphere;
 			glPushMatrix();
 			sphere.shape().center = SrPnt(0, 0, 0);

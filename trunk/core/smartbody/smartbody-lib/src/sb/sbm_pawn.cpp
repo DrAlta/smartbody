@@ -97,8 +97,11 @@ SkChannelArray SbmPawn::WORLD_OFFSET_CHANNELS_P;
 
 SbmPawn::SbmPawn() : SBObject(),
 dMesh_p( NULL ),
-dMeshInstance_p(NULL)
+dMeshInstance_p(NULL),
+_skeleton(NULL),
+scene_p( NULL )
 {
+	_skeleton = NULL;
 	SbmPawn::initData();
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 

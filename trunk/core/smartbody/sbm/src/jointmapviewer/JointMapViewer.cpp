@@ -745,9 +745,9 @@ void MouseViewer::translate_event( SrEvent& e, SrEvent::EventType t, int w, int 
 	if ( t==SrEvent::EventPush)
 	{
 		e.button = Fl::event_button();
-		e.origUp = viewer->cam.up;
-		e.origEye = viewer->cam.eye;
-		e.origCenter = viewer->cam.center;
+		e.origUp = viewer->cam.getUpVector();
+		e.origEye = viewer->cam.getEye();
+		e.origCenter = viewer->cam.getCenter();
 		e.origMouse.x = e.mouseCoord.x;
 		e.origMouse.y = e.mouseCoord.y;
 	}
@@ -773,13 +773,13 @@ void MouseViewer::mouse_event( SrEvent& e )
 {
 	if ( e.type==SrEvent::EventDrag )
 	{ 
-		float dx = e.mousedx() * cam.aspect;
-		float dy = e.mousedy() / cam.aspect;
+		float dx = e.mousedx() * cam.getAspectRatio();
+		float dy = e.mousedy() / cam.getAspectRatio();
 		if ( DOLLYING(e) )
 		{ 
 			float amount = dx;
-			SrVec cameraPos(cam.eye);
-			SrVec targetPos(cam.center);
+			SrVec cameraPos(cam.getEye());
+			SrVec targetPos(cam.getCenter());
 			SrVec diff = targetPos - cameraPos;
 			float distance = diff.len();
 			diff.normalize();
@@ -790,10 +790,12 @@ void MouseViewer::mouse_event( SrEvent& e )
 			SrVec diffVector = diff;
 			SrVec adjustment = diffVector * distance * amount;
 			cameraPos += adjustment;
-			SrVec oldEyePos = cam.eye;
-			cam.eye = cameraPos;
-			SrVec cameraDiff = cam.eye - oldEyePos;
-			cam.center += cameraDiff;
+			SrVec oldEyePos = cam.getEye();
+			cam.setEye(cameraPos.x, cameraPos.y, cameraPos.z);
+			SrVec cameraDiff = cam.getEye() - oldEyePos;
+			SrVec center = cam.getCenter();
+			center += cameraDiff;
+			cam.setCenter(center.x, center.y, center.z);
 			redraw();
 		}
 		else if ( TRANSLATING(e) )
@@ -820,7 +822,7 @@ void MouseViewer::mouse_event( SrEvent& e )
 			SrVec camera = rotate_point(origCamera, origCenter, dirX, -deltaX * float(M_PI));
 			camera = rotate_point(camera, origCenter, dirY, deltaY * float(M_PI));
 
-			cam.eye = camera;
+			cam.setEye(camera.x, camera.y, camera.z);
 			redraw();
 		}
 	}
@@ -1144,7 +1146,7 @@ void SkeletonViewer::focusOnSkeleton()
 	if (!skeleton) return;
 
 	sceneBox = skeleton->getBoundingBox();	
-	cam.view_all(sceneBox, cam.fovy);	
+	cam.view_all(sceneBox, cam.getFov());	
 	float scale = skeleton->getCurrentHeight();
 	float znear = 0.01f*scale;
 	float zfar = 100.0f*scale;
@@ -1221,7 +1223,7 @@ void SkeletonViewer::draw()
 	glEnable( GL_NORMALIZE );
 
 	//----- Set Projection ----------------------------------------------
-	cam.aspect = (float)w()/(float)h();
+	cam.setAspectRatio((float)w()/(float)h());
 
 	glMatrixMode ( GL_PROJECTION );
 	glLoadMatrix ( cam.get_perspective_mat(mat) );
@@ -1230,7 +1232,7 @@ void SkeletonViewer::draw()
 	glMatrixMode ( GL_MODELVIEW );
 	glLoadMatrix ( cam.get_view_mat(mat) );
 
-	glScalef ( cam.scale, cam.scale, cam.scale );
+	glScalef ( cam.getScale(), cam.getScale(), cam.getScale() );
 	if (skeletonScene)
 	{	
 		renderFunction.apply(skeletonScene);	

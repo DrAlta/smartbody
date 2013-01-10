@@ -97,6 +97,8 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 
 		Fl_Input *inputTimeStep;
 
+		int cameraCount;
+
 		std::string scriptFolder;
 		std::vector<std::string> windowSizes;
 		std::vector<Fl_Menu_Item> resolutionMenuList;
@@ -106,8 +108,8 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		std::vector<Fl_Menu_Item> loadCameraList;
 		std::vector<Fl_Menu_Item> deleteCameraList;
 
-		std::vector<SrCamera*> cameraList;
-		std::map<std::string,SrCamera*> cameraMap;
+		//std::vector<SrCamera*> cameraList;
+		//std::map<std::string,SrCamera*> cameraMap;
 
 
 		void updateCameraList();
@@ -175,6 +177,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void CreateCharacterCB(Fl_Widget* w, void* data);
 		static void CreatePawnCB(Fl_Widget* w, void* data);
 		static void CreateLightCB(Fl_Widget* w, void* data);
+		static void CreateCameraCB(Fl_Widget* w, void* data);
 		static void CreateTerrainCB(Fl_Widget* w, void* data);
 		static void KinematicFootstepsCB(Fl_Widget* w, void* data);
 		static void LocomotionFootstepsCB(Fl_Widget* w, void* data);

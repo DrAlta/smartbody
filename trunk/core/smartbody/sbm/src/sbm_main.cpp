@@ -966,9 +966,9 @@ int main( int argc, char **argv )	{
 			if (fabs(jointGmat[13] - mcu.cameraTracking[x]->yPos) < mcu.cameraTracking[x]->threshold)
 				newJointLoc.y = (float)mcu.cameraTracking[x]->yPos;
 			SrVec cameraLoc = newJointLoc + mcu.cameraTracking[x]->jointToCamera;
-			mcu.camera_p->eye.set(cameraLoc.x, cameraLoc.y, cameraLoc.z);
+			mcu.camera_p->setEye(cameraLoc.x, cameraLoc.y, cameraLoc.z);
 			SrVec targetLoc = cameraLoc - mcu.cameraTracking[x]->targetToCamera;
-			mcu.camera_p->center.set( targetLoc.x, targetLoc.y, targetLoc.z);
+			mcu.camera_p->setCenter(targetLoc.x, targetLoc.y, targetLoc.z);
 			mcu.viewer_p->set_camera(mcu.camera_p);
 		}	
 

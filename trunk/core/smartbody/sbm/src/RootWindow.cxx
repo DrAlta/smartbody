@@ -102,7 +102,12 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Create/Character...", 0, CreateCharacterCB, this, NULL);
 	menubar->add("&Create/Pawn...", 0, CreatePawnCB, this, NULL);
 	menubar->add("&Create/Light...", 0, CreateLightCB, this, NULL);
+	menubar->add("&Create/Camera...", 0, CreateCameraCB, this, NULL);
 	menubar->add("&Create/Terrain...", 0, CreateTerrainCB, this, NULL);
+	
+	setResolutionMenuIndex = menubar->add("&Settings/Set Resolution", 0, 0, 0, FL_SUBMENU_POINTER);
+	menubar->add("&Settings/Default Media Path", 0, SettingsDefaultMediaPathCB, this, NULL);
+	menubar->add("&Settings/Internal Audio", 0, AudioCB, this, NULL);	
 
 	menubar->add("&Camera/Save Camera View", 0, SaveCameraCB, this, NULL );
 	loadCameraMenuIndex = menubar->add("&Camera/Load Camera", 0, 0, 0, FL_SUBMENU_POINTER );
@@ -112,12 +117,6 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Camera/Face Camera", 0, FaceCameraCB, this, NULL);
 	menubar->add("&Camera/Track Character", 0, TrackCharacterCB, this, NULL);
 	menubar->add("&Camera/Rotate Around Selected", 0, RotateSelectedCB, this, NULL);	
-	
-	
-	setResolutionMenuIndex = menubar->add("&Settings/Set Resolution", 0, 0, 0, FL_SUBMENU_POINTER);
-	menubar->add("&Settings/Default Media Path", 0, SettingsDefaultMediaPathCB, this, NULL);
-	menubar->add("&Settings/Internal Audio", 0, AudioCB, this, NULL);	
-
 	
 
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
@@ -168,6 +167,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
   	int curX = 500;
 // 	deleteCamera = new Fl_Button(curX, curY, 45, 25, "Del");
 // 	deleteCamera->callback(DeleteCameraCB, this);			
+	windowSizes.push_back("640x360");
 	windowSizes.push_back("640x480");
 	windowSizes.push_back("720x480");
 	windowSizes.push_back("720x576");
@@ -206,6 +206,8 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	//cameraGroup->end();	
 
 	curY += 28;
+
+	cameraCount = 0;
 
 	/*
 	Fl_Pack* simGroup = new Fl_Pack(10, curY, 75, 25, NULL);
@@ -716,8 +718,10 @@ void BaseWindow::ResetCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::CameraResetCB(Fl_Widget* widget, void* data)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute((char*)"camera reset");
+	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+	if (!camera)
+		return;
+	camera->reset();
 }
 
 void BaseWindow::CameraFrameCB(Fl_Widget* widget, void* data)
@@ -743,7 +747,7 @@ void BaseWindow::RotateSelectedCB(Fl_Widget* widget, void* data)
 	SrCamera* camera = mcu.viewer_p->get_camera();
 	float x,y,z,h,p,r;
 	pawn->get_world_offset(x, y, z, h, p, r);
-	camera->center = SrVec(x, y, z);
+	camera->setCenter(x, y, z);
 #endif
 }
 
@@ -791,8 +795,10 @@ void BaseWindow::FaceCameraCB(Fl_Widget* widget, void* data)
 		float max = faceBox.max_size();
 		float min = faceBox.min_size();
 
-		camera->center = (point + point2) / 2.0f;		
-		camera->eye = camera->center + height / 4.0f * facingVector;
+		SrVec tmpCenter = (point + point2) / 2.0f;
+		camera->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);
+		SrVec tmp = camera->getCenter() + height / 4.0f * facingVector;
+		camera->setEye(tmp.x, tmp.y, tmp.z);
 	}
 	else
 	{
@@ -1253,6 +1259,7 @@ void BaseWindow::CreateCharacterCB(Fl_Widget* w, void* data)
 	rootWindow->characterCreator->setSkeletons(skeletons);
 
 	rootWindow->characterCreator->show();
+	
 }
 
 void BaseWindow::CreatePawnCB(Fl_Widget* w, void* data)
@@ -1299,6 +1306,40 @@ void BaseWindow::CreateLightCB(Fl_Widget* w, void* data)
 	strstr << "light.createDoubleAttribute(\"lightQuadraticAttenuation\", 0, True, \"LightParameters\", 290, False, False, False, \"Quadratic attenuation\")\n";
 	scene->run(strstr.str());
 #endif
+}
+
+void BaseWindow::CreateCameraCB(Fl_Widget* w, void* data)
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	std::string cameraName = "camera";
+	cameraName += boost::lexical_cast<std::string>(rootWindow->cameraCount++);
+	const char* userCamName = fl_input("Camera name:", cameraName.c_str());
+	if (!userCamName)
+	{
+		rootWindow->cameraCount--;
+		return;
+	}
+
+	std::string cameraNameStr = userCamName;
+	SrCamera* camera = SmartBody::SBScene::getScene()->createCamera(cameraNameStr);
+
+	if (!camera)
+	{
+		fl_alert("Camera with name '%s' cannot be created.", cameraNameStr.c_str());
+		return;
+	}
+	float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
+	SrVec camEye = SrVec(0,1.66f,1.85f)*scale;
+	SrVec camCenter = SrVec(0,0.92f,0)*scale;	
+	float znear = 0.01f*scale;
+	float zfar = 100.0f*scale;
+	camera->setEye(camEye[0],camEye[1],camEye[2]);
+	camera->setCenter(camCenter[0],camCenter[1],camCenter[2]);
+	camera->setNearPlane(znear);
+	camera->setFarPlane(zfar);
+
+	if (!SmartBody::SBScene::getScene()->getActiveCamera())
+		SmartBody::SBScene::getScene()->setActiveCamera(camera);
 }
 
 void BaseWindow::CreateTerrainCB(Fl_Widget* w, void* data)
@@ -1519,13 +1560,26 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 void BaseWindow::SaveCameraCB( Fl_Widget* widget, void* data )
 {
 	BaseWindow* window = (BaseWindow*)data;	
-	static int cameraCount = 0;
-	SrCamera* camera = new SrCamera(window->get_camera());
+	
 	std::string cameraName = "camera";
-	cameraName += boost::lexical_cast<std::string>(cameraCount++);
-	std::string msg = "Current camera view is saved to '" + cameraName +"'";
-	fl_message(msg.c_str());
-	window->cameraMap[cameraName] = camera;
+	cameraName += boost::lexical_cast<std::string>(window->cameraCount++);
+	const char* userCamName = fl_input("Camera name:", cameraName.c_str());
+	if (!userCamName)
+	{
+		window->cameraCount--;
+		return;
+	}
+
+	std::string cameraNameStr = userCamName;
+	SrCamera* camera = SmartBody::SBScene::getScene()->createCamera(cameraNameStr);
+	if (!camera)
+	{
+		fl_alert("Camera with name '%s' cannot be created.", cameraNameStr.c_str());
+		return;
+	}
+
+	camera->copyCamera(SmartBody::SBScene::getScene()->getActiveCamera());
+	
 	window->updateCameraList();
 	//window->cameraList.push_back(camera);
 	//window->updateCameraList();
@@ -1536,7 +1590,13 @@ void BaseWindow::DeleteCameraCB( Fl_Widget* widget, void* data )
 	const Fl_Menu_Item* menuItem = ((Fl_Menu_*)widget)->mvalue();
 	std::string camName = menuItem->label();
 	BaseWindow* window = (BaseWindow*)data;	
-	window->cameraMap.erase(camName);	
+	SrCamera* camera = SmartBody::SBScene::getScene()->getCamera(camName);
+	if (!camera)
+	{
+		fl_alert("No camera named '%s' found, cannot remove it.", camName.c_str());
+		return;
+	}
+	SmartBody::SBScene::getScene()->removeCamera(camera);
 	window->updateCameraList();
 }
 
@@ -1546,11 +1606,14 @@ void BaseWindow::ChooseCameraCB( Fl_Widget* widget, void* data )
 	//LOG("load camera %s", menuItem->label());
 	std::string camName = menuItem->label();
  	BaseWindow* window = (BaseWindow*)data;	
-	if (window->cameraMap.find(camName) != window->cameraMap.end())
+	SrCamera* cam = SmartBody::SBScene::getScene()->getCamera(camName);
+	if (!cam)
 	{
-		SrCamera* cam = window->cameraMap[camName];
-		window->get_camera()->copyCamera(cam);
+		fl_alert("No camera with name '%s' found.", camName.c_str());
+		return;
 	}
+	
+	SmartBody::SBScene::getScene()->setActiveCamera(cam);
 // 	Fl_Choice* choice = (Fl_Choice*)widget;
 // 	int cameraIdx = choice->value() - 1;	
 // 	if (cameraIdx >=0 && cameraIdx < (int)window->cameraList.size())
@@ -1578,16 +1641,16 @@ void BaseWindow::updateCameraList()
 	Fl_Menu_Item& deleteCameraSubMenu = menuList[deleteCameraMenuIndex];	
 	loadCameraList.clear();
 	deleteCameraList.clear();
-	std::map<std::string,SrCamera*>::iterator mi;
-	for ( mi  = cameraMap.begin();
-		  mi != cameraMap.end();
-		  mi++)
+	std::vector<std::string> cameraNames = SmartBody::SBScene::getScene()->getCameraNames();
+	for (std::vector<std::string>::iterator iter = cameraNames.begin();
+		  iter != cameraNames.end();
+		  iter++)
 	{		
-		const std::string& camName = mi->first;
-		Fl_Menu_Item temp_LoadCam = { camName.c_str(), 0, ChooseCameraCB, this };		
+		const std::string camName = (*iter);
+		Fl_Menu_Item temp_LoadCam = { strdup(camName.c_str()), 0, ChooseCameraCB, this };		
 		loadCameraList.push_back(temp_LoadCam);		
 
-		Fl_Menu_Item temp_DeleteCam = { camName.c_str(), 0, DeleteCameraCB, this };		
+		Fl_Menu_Item temp_DeleteCam = { strdup(camName.c_str()), 0, DeleteCameraCB, this };		
 		deleteCameraList.push_back(temp_DeleteCam);		
 	}
 	Fl_Menu_Item temp = {0};

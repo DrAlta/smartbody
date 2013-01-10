@@ -117,7 +117,7 @@ void RotationControl::draw(SrCamera& cam)
 		SrVec dirx,diry;
 		screenParallelPlane(cam,center,dirx,diry);
 		float ratio=(dirx).norm();
-		SrVec nm=cam.eye - cam.center;//cross(diry,dirx);
+		SrVec nm=cam.getEye() - cam.getCenter();//cross(diry,dirx);
 		nm.normalize();
 
 		glDisable(GL_LIGHTING);
@@ -181,7 +181,7 @@ bool RotationControl::drag(SrCamera& cam,  float fx, float fy, float tx, float t
 	SrVec dirx,diry;
 	screenParallelPlane(cam,center,dirx,diry);
 	float ratio=(dirx).norm();
-	SrVec nm=cam.eye - cam.center;//cross(diry,dirx);
+	SrVec nm=cam.getEye() - cam.getCenter();//cross(diry,dirx);
 	nm.normalize();
 
 	GLint viewport[4];
