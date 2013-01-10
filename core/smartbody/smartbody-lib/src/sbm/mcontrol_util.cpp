@@ -1338,20 +1338,20 @@ void mcuCBHandle::update( void )
 		SrMat m;
 		SrQuat quat = SrQuat(viewer_p->get_camera()->get_view_mat(m).get_rotation());
 
-		_scene->getDebuggerServer()->m_cameraPos.x = viewer_p->get_camera()->eye.x;
-		_scene->getDebuggerServer()->m_cameraPos.y = viewer_p->get_camera()->eye.y;
-		_scene->getDebuggerServer()->m_cameraPos.z = viewer_p->get_camera()->eye.z;
-		_scene->getDebuggerServer()->m_cameraLookAt.x = viewer_p->get_camera()->center.x;
-		_scene->getDebuggerServer()->m_cameraLookAt.y = viewer_p->get_camera()->center.y;
-		_scene->getDebuggerServer()->m_cameraLookAt.z = viewer_p->get_camera()->center.z;
+		_scene->getDebuggerServer()->m_cameraPos.x = viewer_p->get_camera()->getEye().x;
+		_scene->getDebuggerServer()->m_cameraPos.y = viewer_p->get_camera()->getEye().y;
+		_scene->getDebuggerServer()->m_cameraPos.z = viewer_p->get_camera()->getEye().z;
+		_scene->getDebuggerServer()->m_cameraLookAt.x = viewer_p->get_camera()->getCenter().x;
+		_scene->getDebuggerServer()->m_cameraLookAt.y = viewer_p->get_camera()->getCenter().y;
+		_scene->getDebuggerServer()->m_cameraLookAt.z = viewer_p->get_camera()->getCenter().z;
 		_scene->getDebuggerServer()->m_cameraRot.x = quat.x;
 		_scene->getDebuggerServer()->m_cameraRot.y = quat.y;
 		_scene->getDebuggerServer()->m_cameraRot.z = quat.z;
 		_scene->getDebuggerServer()->m_cameraRot.w = quat.w;
-		_scene->getDebuggerServer()->m_cameraFovY   = sr_todeg(viewer_p->get_camera()->fovy);
-		_scene->getDebuggerServer()->m_cameraAspect = viewer_p->get_camera()->aspect;
-		_scene->getDebuggerServer()->m_cameraZNear  = viewer_p->get_camera()->znear;
-		_scene->getDebuggerServer()->m_cameraZFar   = viewer_p->get_camera()->zfar;
+		_scene->getDebuggerServer()->m_cameraFovY   = sr_todeg(viewer_p->get_camera()->getFov());
+		_scene->getDebuggerServer()->m_cameraAspect = viewer_p->get_camera()->getAspectRatio();
+		_scene->getDebuggerServer()->m_cameraZNear  = viewer_p->get_camera()->getNearPlane();
+		_scene->getDebuggerServer()->m_cameraZFar   = viewer_p->get_camera()->getFarPlane();
 	}
 	
 	/*

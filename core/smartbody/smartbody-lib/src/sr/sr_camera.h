@@ -30,9 +30,14 @@
 # include <sr/sr_vec.h>
 # include <sr/sr_quat.h>
 #include <string>
+#include <sb/SBPawn.h>
 
 class SrMat;
 class SrBox;
+
+namespace SmartBody {
+	class SBSubject;
+}
 
 /*! \class SrCamera sr_camera.h
     \brief Keeps camera parameters
@@ -40,16 +45,8 @@ class SrBox;
     SrCamera contains the parameters to define a camera.
     Attention: if znear is too small inconsistencies in the rendering may appear;
     a minimal value of 0.1 should be considered. */
-class SrCamera
- { public :
-    SrPnt  eye;    //!< position of the eye, default is (0,0,2).
-    SrPnt  center; //!< position where the eye is looking to, default is (0,0,0).
-    SrVec  up;     //!< the up vector orients the camera around the eye-center vector, default is (0,1,0)
-    float  fovy;   //!< the y field of view in radians. Default is pi/3 (60deg), range is [0.01,pi].
-    float  znear;  //!< must be >0, default is 0.1.
-    float  zfar;   //!< must be >0, default is 1000.
-    float  aspect; //!< normally is set to the screen width/heigh, default is 1.
-    float  scale;  //!< a scale factor to be applied between the view matrix and the scene
+class SrCamera : public SmartBody::SBPawn
+ {
 
    public :
     
@@ -146,6 +143,19 @@ class SrCamera
     /*! Input camera data. Not all keywords are required to exist. The routine
         returns when a non-keyword entry is found (which is 'ungetted' in inp). */
     friend SrInput& operator>> ( SrInput& inp, SrCamera& c );
+
+	virtual void notify(SmartBody::SBSubject* subject);
+
+ protected:
+    SrPnt  eye;    //!< position of the eye, default is (0,0,2).
+    SrPnt  center; //!< position where the eye is looking to, default is (0,0,0).
+    SrVec  up;     //!< the up vector orients the camera around the eye-center vector, default is (0,1,0)
+    float  fovy;   //!< the y field of view in radians. Default is pi/3 (60deg), range is [0.01,pi].
+    float  znear;  //!< must be >0, default is 0.1.
+    float  zfar;   //!< must be >0, default is 1000.
+    float  aspect; //!< normally is set to the screen width/heigh, default is 1.
+    float  scale;  //!< a scale factor to be applied between the view matrix and the scene
+
  };
 
 //================================ End of File =================================================

@@ -88,12 +88,17 @@ void GlChartViewCoordinate::Update(float WindowWidth, float WindowHeight, SrCame
 {
 	prev_x_scale = x_scale;
 	prev_y_scale = y_scale;
-	SrVec dis = camera.eye - camera.center;
-	y_scale = tan(camera.fovy/2)*dis.len()*(1.0f-y_margin_ratio);
+	SrVec dis = camera.getEye() - camera.getCenter();
+	y_scale = tan(camera.getFov()/2)*dis.len()*(1.0f-y_margin_ratio);
 	x_scale = 2.0f * y_scale * (1.0f-x_margin_ratio) * WindowWidth / WindowHeight;
 
-	camera.center.x *= x_scale/prev_x_scale;
-	camera.eye.x *= x_scale/prev_x_scale;
+	SrVec center = camera.getCenter();
+	center.x *= x_scale/prev_x_scale;
+	camera.setCenter(center.x, center.y, center.z);
+
+	SrVec eye = camera.getEye();
+	eye.x *= x_scale/prev_x_scale;
+	camera.setEye(eye.x, eye.y, eye.z);
 }
 
 float GlChartViewCoordinate::GetXScale()

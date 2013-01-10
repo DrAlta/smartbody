@@ -203,6 +203,18 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 
 	if (otherListener)
 		otherListener->OnPawnCreate(name);
+
+	// if this is a camera, update the camera list in the main window
+	SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
+	if (camera)
+	{
+		BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+		if (window)
+		{
+			window->updateCameraList();
+		}
+	}
+
 }
 
 void FLTKListener::OnPawnDelete( const std::string & name )
@@ -236,6 +248,14 @@ void FLTKListener::OnPawnDelete( const std::string & name )
 	{
 		otherListener->OnPawnDelete(name);
 	}
+
+	// if this is a camera, update the camera list in the main window
+	SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
+	if (camera)
+	{
+		window->updateCameraList();
+	}
+
 }
 
 

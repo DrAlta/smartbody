@@ -11,6 +11,7 @@
 class SBDebuggerServer;
 class SBDebuggerClient;
 class SBDebuggerUtility;
+class SrCamera;
 
 namespace SmartBody {
 
@@ -159,6 +160,14 @@ class SBScene : public SBObject
 		SBAPI static void removeAllSystemParameters();
 		SBAPI static std::vector<std::string> getSystemParameterNames();
 
+		SBAPI SrCamera* createCamera(const std::string& name);
+		SBAPI void removeCamera(SrCamera* camera);
+		SBAPI void setActiveCamera(SrCamera* camera);
+		SBAPI SrCamera* getActiveCamera();
+		SBAPI SrCamera* getCamera(const std::string& name);
+		SBAPI int getNumCameras();
+		SBAPI std::vector<std::string> getCameraNames();
+
 	protected:
 		SBSimulationManager* _sim;
 		SBProfiler* _profiler;
@@ -187,6 +196,7 @@ class SBScene : public SBObject
 		SBDebuggerServer*	_debuggerServer;
 		SBDebuggerClient*	_debuggerClient;
 		SBDebuggerUtility*	_debuggerUtility;
+		std::map<std::string, SrCamera*> _cameras;
 
 		static SBScene* _scene;
 		static std::map<std::string, std::string> _systemParameters;

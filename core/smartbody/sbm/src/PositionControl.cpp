@@ -127,10 +127,10 @@ SrVec ObjectControl::screenToWorld( const SrCamera& cam, const SrVec& win )
 SrVec ObjectControl::mouseToWorld( SrCamera& cam, float fx, float fy, float tx, float ty )
 {
 	SrVec p1, p2, x, inc;	
-	SrVec center = cam.center;//getWorldPt();
+	SrVec center = cam.getCenter();//getWorldPt();
 	//sr_out << "old center = " << center << "  ";
-	SrVec eye = cam.eye;
-	SrPlane plane ( center, eye-cam.center );
+	SrVec eye = cam.getEye();
+	SrPlane plane ( center, eye-cam.getCenter() );
 	cam.get_ray ( fx, fy, p1, x );
 	p1 = plane.intersect ( p1, x );
 	cam.get_ray ( tx, ty, p2, x );
@@ -475,7 +475,7 @@ bool PositionControl::drag(SrCamera& cam,  float fx, float fy, float tx, float t
 	if (opdir == 3)
 	{
 		inc = mouseToWorld(cam,fx,fy,tx,ty);
-		ratio = -worldToEye(cam,center).z/(cam.center-cam.eye).norm();
+		ratio = -worldToEye(cam,center).z/(cam.getCenter()-cam.getEye()).norm();
 		inc *= ratio;
 	}
 	else

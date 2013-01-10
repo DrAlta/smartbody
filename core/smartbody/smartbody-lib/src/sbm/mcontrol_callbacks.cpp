@@ -992,26 +992,29 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	
 	if( mcu_p )	{
 		if( mcu_p->viewer_p )	{
+			SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+			if (!camera)
+			{
+				LOG("No active camera. Camera command not executed.");
+				return CMD_FAILURE;
+			}
 			char *cam_cmd = args.read_token();
 			if( strcmp( cam_cmd, "eye" ) == 0 )	{
 				float x = args.read_float();
 				float y = args.read_float();
 				float z = args.read_float();
-				mcu_p->camera_p->eye.set( x, y, z );
-				mcu_p->viewer_p->set_camera( mcu_p->camera_p );
+				camera->setEye( x, y, z );
 			}
 			else
 			if( strcmp( cam_cmd, "center" ) == 0 )	{
 				float x = args.read_float();
 				float y = args.read_float();
 				float z = args.read_float();
-				mcu_p->camera_p->center.set( x, y, z );
-				mcu_p->viewer_p->set_camera( mcu_p->camera_p );
+				camera->setCenter( x, y, z );
 			}
 			else
 			if( strcmp( cam_cmd, "scale" ) == 0 )	{
-				mcu_p->camera_p->scale = args.read_float();
-				mcu_p->viewer_p->set_camera( mcu_p->camera_p );
+				camera->setScale(args.read_float());
 			}
 			else
 			if( strcmp( cam_cmd, "track" ) == 0 )	{
@@ -1081,9 +1084,9 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				cameraTrack->yPos = jointMat[13];
 				cameraTrack->threshold = 100.0;
 				SrCamera cam;
-				cameraTrack->jointToCamera = mcu_p->viewer_p->get_camera()->eye - jointPos;
+				cameraTrack->jointToCamera = mcu_p->viewer_p->get_camera()->getEye() - jointPos;
 				LOG("Vector from joint to target is %f %f %f", cameraTrack->jointToCamera.x, cameraTrack->jointToCamera.y, cameraTrack->jointToCamera.z);
-				cameraTrack->targetToCamera = mcu_p->viewer_p->get_camera()->eye - mcu_p->viewer_p->get_camera()->center;
+				cameraTrack->targetToCamera = mcu_p->viewer_p->get_camera()->getEye() - mcu_p->viewer_p->get_camera()->getCenter();
 				LOG("Vector from target to eye is %f %f %f", cameraTrack->targetToCamera.x, cameraTrack->targetToCamera.y, cameraTrack->targetToCamera.z);				
 				mcu_p->cameraTracking.push_back(cameraTrack);
 				LOG("Object %s will now be tracked at joint %s.", name, jointName);
@@ -1107,15 +1110,13 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				sprintf(camCommand,"camera eye %f %f %f",camEye[0],camEye[1],camEye[2]);				
 				mcu_p->execute((char*)camCommand);
 				sprintf(camCommand,"camera center %f %f %f",camCenter[0],camCenter[1],camCenter[2]);
-				mcu_p->execute((char*)camCommand);	
-				SrCamera* camera = mcu_p->viewer_p->get_camera();
+				mcu_p->execute((char*)camCommand);			
 				camera->setNearPlane(znear);
 				camera->setFarPlane(zfar);
 
 			}
 			else if (strcmp( cam_cmd, "frame" ) == 0 ) {
 				SrBox sceneBox;
-				SrCamera* camera = mcu_p->viewer_p->get_camera();
 				for (std::map<std::string, SbmPawn*>::iterator iter = mcu_p->getPawnMap().begin();
 					iter != mcu_p->getPawnMap().end();
 					iter++)
@@ -1123,7 +1124,7 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 					SrBox box = (*iter).second->getSkeleton()->getBoundingBox();
 					sceneBox.extend(box);
 				}
-				camera->view_all(sceneBox, camera->fovy);	
+				camera->view_all(sceneBox, camera->getFov());	
 				float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
 				float znear = 0.01f*scale;
 				float zfar = 100.0f*scale;

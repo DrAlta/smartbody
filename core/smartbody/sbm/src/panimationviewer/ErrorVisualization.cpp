@@ -45,14 +45,14 @@ void ErrorVisualization::draw()
 
 	//----- Set Projection ----------------------------------------------
 	SrMat mat;
-	cam.aspect = (float)w()/(float)h();
+	cam.setAspectRatio((float)w()/(float)h());
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrix(cam.get_perspective_mat(mat));
 
 	//----- Set Visualisation -------------------------------------------
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrix(cam.get_view_mat(mat));
-	glScalef(cam.scale, cam.scale, cam.scale);
+	glScalef(cam.getScale(), cam.getScale(), cam.getScale());
 	SrLight light;
 	//	light.directional = false;
 	light.directional = true;

@@ -452,7 +452,6 @@ protected:
    SrColor    floorColor;
    SrBox      bbox;       // Bounding box of the root, calculated with viewall
    SrCamera*  camera;     // The current camera parameters
-
    SrSnLines* scenebox;  // contains the bounding box to display, and use in view_all
    SrSnLines* sceneaxis; // the current axis being displayed
 
@@ -463,6 +462,7 @@ protected:
 
    GLuint  shadowMapID, depthMapID, depthFB, rboID;
    GLfloat shadowCPM[16];
+
 
 
 

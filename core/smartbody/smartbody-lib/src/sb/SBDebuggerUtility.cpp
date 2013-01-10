@@ -173,16 +173,12 @@ void SBDebuggerUtility::updateCamera(float& eyePosX, float& eyePosY, float& eyeP
 {
 	SrCamera* camera = mcuCBHandle::singleton().viewer_p->get_camera();
 
-	camera->eye.x = eyePosX;
-	camera->eye.y = eyePosY;
-	camera->eye.z = eyePosZ;
-	camera->center.x = lookAtPosX;
-	camera->center.y = lookAtPosY;
-	camera->center.z = lookAtPosZ;
-	camera->fovy = sr_torad(fovY);
-	camera->aspect = aspect;
-	camera->znear = zNear;
-	camera->zfar = zFar;
+	camera->setEye(eyePosX, eyePosY, eyePosZ);
+	camera->setCenter(lookAtPosX, lookAtPosY, lookAtPosZ);
+	camera->setFov(sr_torad(fovY));
+	camera->setAspectRatio(aspect);
+	camera->setNearPlane(zNear);
+	camera->setFarPlane(zFar);
 }
 
 
