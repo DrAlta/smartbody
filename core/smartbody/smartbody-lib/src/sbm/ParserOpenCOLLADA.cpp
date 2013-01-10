@@ -1651,8 +1651,19 @@ void ParserOpenCOLLADA::setModelVertexSource( std::string& sourceName, std::stri
 
 	if ( semanticName == "POSITION" && sourceArray && model->V.size() == 0)
 	{
+		bool printOut = false;
+// 		if (sourceName.find("LEyeLashShape-positions") != std::string::npos || sourceName.find("REyelashShape-positions") != std::string::npos)
+// 		{
+// 			LOG("sourname = %s",sourceName.c_str());
+// 			printOut = true;
+// 		}
 		for (unsigned int i=0;i<sourceArray->size();i++)
 		{
+// 			if (printOut)
+// 			{
+// 				SrVec pos = (*sourceArray)[i];
+// 				LOG("pos = %f %f %f",pos[0],pos[1],pos[2]);
+// 			}
 			model->V.push((*sourceArray)[i]);										
 		}
 	}

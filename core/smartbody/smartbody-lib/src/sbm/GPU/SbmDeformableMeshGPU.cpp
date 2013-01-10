@@ -205,7 +205,7 @@ void main (void)\n\
 	vec3 newn  = normalize(cross(tv,bv));\n\
 	vec4 texColor = texture2D(diffuseTexture,gl_TexCoord[0].st);\n\
 	vec3 normalColor = normalize(texture2D(normalTexture,gl_TexCoord[0].st).xyz* 2.0 - 1.0);\n\
-	vec3 normalMapN = normalize(newtv*normalColor.x+newbv*normalColor.y+newn*normalColor.z); \n\
+	vec3 normalMapN = normalize(-newtv*normalColor.x-newbv*normalColor.y+newn*normalColor.z); \n\
 	vec3 specularColor = texture2D(specularTexture, gl_TexCoord[0].st).xyz;\n\
 	vec3 specMat = specularMaterial.rgb;\n\
 	if (useTexture == 0) \n\
@@ -387,15 +387,15 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 			glUniform1i(useTextureLoc,0);
 		}
 
-		SbmTexture* texNormal = texManager.findTexture(SbmTextureManager::TEXTURE_NORMALMAP,mesh->normalMapName.c_str());		
-		if (texNormal)
-		{
-			glActiveTexture(GL_TEXTURE2_ARB);
-			glBindTexture(GL_TEXTURE_2D,texNormal->getID());
-			glUniform1i(normal_sampler_location, 2);
-			glUniform1i(useNormalMapLoc,1);
-		}		
-		else
+		SbmTexture* texNormal = texManager.findTexture(SbmTextureManager::TEXTURE_NORMALMAP,mesh->normalMapName.c_str());			
+ 		if (texNormal)
+ 		{			
+ 			glActiveTexture(GL_TEXTURE2_ARB);
+ 			glBindTexture(GL_TEXTURE_2D,texNormal->getID());
+ 			glUniform1i(normal_sampler_location, 2);
+ 			glUniform1i(useNormalMapLoc,1);
+ 		}		
+ 		else
 		{
 			glUniform1i(useNormalMapLoc,0);
 		}
@@ -433,6 +433,12 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 		subMeshTris[i]->VBO()->BindBuffer();
 		glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
 		subMeshTris[i]->VBO()->UnbindBuffer();
+
+		glActiveTexture(GL_TEXTURE1_ARB);
+		glBindTexture(GL_TEXTURE_2D,0);
+		glActiveTexture(GL_TEXTURE2_ARB);
+		glBindTexture(GL_TEXTURE_2D,0);
+		glActiveTexture(GL_TEXTURE3_ARB);
 		glBindTexture(GL_TEXTURE_2D,0);
 	}	
 
