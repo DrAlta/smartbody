@@ -345,14 +345,14 @@ BOOL TransparentViewer::renderSC()
 	SrMat mat ( SrMat::NotInitialized );
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );	
 
-	_data.camera.aspect = (float)viewer->width/(float)viewer->height;
+	_data.camera.setAspectRatio((float)viewer->width/(float)viewer->height);
 	glMatrixMode ( GL_PROJECTION );
     glLoadMatrix ( _data.camera.get_perspective_mat(mat) );
 
    glMatrixMode ( GL_MODELVIEW );
 
    glLoadMatrix ( _data.camera.get_view_mat(mat) );
-   glScalef ( _data.camera.scale, _data.camera.scale, _data.camera.scale );
+   glScalef ( _data.camera.getScale(), _data.camera.getScale(), _data.camera.getScale() );
 
    updateLights();
 	glEnable ( GL_LIGHTING );
@@ -727,8 +727,8 @@ void TransparentViewer::init_opengl ( int w, int h )
    float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
    
    // camera near = 0.1 m, camera far plane is 100 m
-   cam.znear = 0.1f*scale;
-   cam.zfar  = 100.f*scale;
+   cam.setNearPlane(0.1f*scale);
+   cam.setFarPlane(100.f*scale);
 
 
    // init shader
