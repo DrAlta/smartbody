@@ -406,7 +406,7 @@ bool DeformableMesh::buildVertexBuffer()
 				SrVec& lv = dMeshStatic->shape().V[i];					
 				posBuf[iVtx] = lv*skinWeight->bindShapeMat;  
 				SrVec& lt =	dMeshStatic->shape().Tangent[i];		
-				SrVec  lb = dMeshStatic->shape().BiNormal[i];
+				SrVec& lb = dMeshStatic->shape().BiNormal[i];
 				tangentBuf[iVtx] = lt*skinWeight->bindShapeMat;
 				binormalBuf[iVtx] = lb*skinWeight->bindShapeMat;
 				

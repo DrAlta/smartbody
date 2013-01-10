@@ -20,6 +20,8 @@ ObjectManipulationHandle::~ObjectManipulationHandle(void)
 void ObjectManipulationHandle::get_pawn_list(std::vector<SbmPawn*>& pawn_list)
 {
 	std::vector<std::string> pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	pawnNames.insert(pawnNames.begin(),charNames.begin(),charNames.end());
 	for (size_t i = 0; i < pawnNames.size(); i++)
 	{
 		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnNames[i]);
