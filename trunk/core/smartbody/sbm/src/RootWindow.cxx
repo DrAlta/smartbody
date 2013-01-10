@@ -53,6 +53,9 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
 	menubar->add("&View/Shadows", 0, ShadowsCB, this, NULL);
 	menubar->add("&View/Grid", 0, GridCB, this, NULL);
+	menubar->add("&View/Background Color", 0, BackgroundColorCB, this, NULL);
+	menubar->add("&View/Floor/Show Floor", 0, FloorCB, this, NULL);
+	menubar->add("&View/Floor/Floor Color", 0, FloorColorCB, this, NULL);
 	//menubar->add("&View/Reach Pose Examples", 0, ShowPoseExamples, this, NULL);	
 	menubar->add("&View/Terrain/Shaded", 0, TerrainShadedCB, this, NULL);
 	menubar->add("&View/Terrain/Wireframe", 0, TerrainWireframeCB, this, NULL);
@@ -1111,6 +1114,32 @@ void BaseWindow::ShadowsCB(Fl_Widget* w, void* data)
 #endif
 }
 
+void BaseWindow::FloorCB( Fl_Widget* w, void* data )
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->getData()->showFloor = !rootWindow->fltkViewer->getData()->showFloor;
+#endif
+}
+
+void BaseWindow::FloorColorCB( Fl_Widget* w, void* data )
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdFloorColor, NULL);	
+#endif
+
+}
+
+void BaseWindow::BackgroundColorCB( Fl_Widget* w, void* data )
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdBackground, NULL);	
+#endif
+
+}
+
 void BaseWindow::TerrainShadedCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
@@ -1568,6 +1597,7 @@ void BaseWindow::updateCameraList()
 	loadCameraSubMenu.user_data(&loadCameraList[0]);
 	deleteCameraSubMenu.user_data(&deleteCameraList[0]);
 }
+
 
 //== Viewer Factory ========================================================
 SrViewer* FltkViewerFactory::s_viewer = NULL;
