@@ -410,6 +410,8 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->light.init();
 
    _data->bcolor = SrColor(.63f, .63f, .63f);
+   _data->floorColor = SrColor(0.5f,0.5f,0.5f);
+   _data->showFloor = true;
 
    _data->scenebox = new SrSnLines;
    _data->sceneaxis = new SrSnLines;
@@ -538,6 +540,13 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 			  SrColor c = background(); 
 			  fl_color_chooser("Set background color:", c.r, c.g, c.b);
 			  background(c);
+		  } break;
+
+	  case CmdFloorColor:
+		  {
+			  SrColor c = _data->floorColor;
+			  fl_color_chooser("Set floor color:", c.r, c.g, c.b);
+			  _data->floorColor = c;
 		  } break;
 
       case CmdAsIs   : _data->rendermode = ModeAsIs;
@@ -1349,33 +1358,38 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	}	
 	
 #if USE_OGRE_VIEWER  < 1 // ogre will draw its own floor
-	static GLfloat mat_emissin[] = { 0.f,  0.f,    0.f,    1.f };
-	static GLfloat mat_ambient[] = { 0.f,  0.f,    0.f,    1.f };
-	static GLfloat mat_diffuse[] = { 0.5f,  0.5f,    0.5f,    1.f };
-	static GLfloat mat_speclar[] = { 0.f,  0.f,    0.f,    1.f }; 
-	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin );
-	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient );
-	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse );
-	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, mat_speclar );
-	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
-	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
-	glEnable(GL_LIGHTING);
-	float floorSize = 1200;
-	float planeY = -0.0f;
-	glBegin(GL_QUADS);
-	glTexCoord2f(0,0);
-	glNormal3f(0,1,0);
-	glVertex3f(-floorSize,planeY,floorSize);	
-	glTexCoord2f(0,1);
-	glNormal3f(0,1,0);
-	glVertex3f(floorSize,planeY,floorSize);
-	glTexCoord2f(1,1);
-	glNormal3f(0,1,0);
-	glVertex3f(floorSize,planeY,-floorSize);
-	glTexCoord2f(1,0);
-	glNormal3f(0,1,0);
-	glVertex3f(-floorSize,planeY,-floorSize);	
-	glEnd();
+	if (_data->showFloor)
+	{
+		static GLfloat mat_emissin[] = { 0.f,  0.f,    0.f,    1.f };
+		static GLfloat mat_ambient[] = { 0.f,  0.f,    0.f,    1.f };
+		static GLfloat mat_diffuse[] = { 0.5f,  0.5f,    0.5f,    1.f };
+		static GLfloat mat_speclar[] = { 0.f,  0.f,    0.f,    1.f }; 
+		glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin );
+		glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient );
+
+		_data->floorColor.get(mat_diffuse);
+		glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse );	
+		glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, mat_speclar );
+		glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
+		glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
+		glEnable(GL_LIGHTING);
+		float floorSize = 1200;
+		float planeY = -0.0f;
+		glBegin(GL_QUADS);
+		glTexCoord2f(0,0);
+		glNormal3f(0,1,0);
+		glVertex3f(-floorSize,planeY,floorSize);	
+		glTexCoord2f(0,1);
+		glNormal3f(0,1,0);
+		glVertex3f(floorSize,planeY,floorSize);
+		glTexCoord2f(1,1);
+		glNormal3f(0,1,0);
+		glVertex3f(floorSize,planeY,-floorSize);
+		glTexCoord2f(1,0);
+		glNormal3f(0,1,0);
+		glVertex3f(-floorSize,planeY,-floorSize);	
+		glEnd();
+	}	
 #endif
 
 	drawPawns();
@@ -4960,13 +4974,15 @@ void FltkViewer::makeShadowMap()
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();	
 	glLoadIdentity();
-	gluPerspective(70,1,30.f,3000.f);
+	gluPerspective(70,1,_data->camera->getNearPlane(),_data->camera->getFarPlane());
 	
 	SrLight& shadowLight = _lights[0]; // assume direction light
 	SrVec dir = shadowLight.position;
 	dir.normalize();
-	float distance = 800;
+	float sceneScale = 1.f/SmartBody::SBScene::getScene()->getScale();
+	float distance = 10*sceneScale;
 	dir*= distance;
+	SrVec pos = shadowLight.position;
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
@@ -4976,6 +4992,7 @@ void FltkViewer::makeShadowMap()
 	//gluLookAt(0, 0, 0, -light.position[0], -light.position[1], -light.position[2], -1.0f, 0.0f, 0.0f);
 	//gluLookAt(0, 600, 700, 0,0,0, 0.0f, 1.0f, 0.0f);
 	gluLookAt(dir[0],dir[1],dir[2],0,0,0,0,1,0);
+	//gluLookAt(pos[0],pos[1],pos[2],0,0,0,0,1,0);
 	glGetFloatv(GL_MODELVIEW_MATRIX, shad_modelview);
 	// redirect rendering to the depth texture
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _data->depthFB);

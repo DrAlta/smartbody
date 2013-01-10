@@ -152,6 +152,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 
     enum MenuCmd { CmdViewAll,
                    CmdBackground,
+				   CmdFloorColor,
                    CmdAsIs,
                    CmdDefault,
                    CmdSmooth,
@@ -424,6 +425,7 @@ protected:
    bool showgeometry;
    bool showcollisiongeometry;
    bool showdeformablegeometry;
+   bool showFloor;   
    bool showbones;
    bool showaxis;
    bool showmasses;
@@ -447,6 +449,7 @@ protected:
    SrTimer    fcounter;   // To count frames and measure frame rate
    SrEvent    event;      // The translated event from fltk to sr format
    SrColor    bcolor;     // Background color currently used
+   SrColor    floorColor;
    SrBox      bbox;       // Bounding box of the root, calculated with viewall
    SrCamera*  camera;     // The current camera parameters
 
