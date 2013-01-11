@@ -54,7 +54,8 @@ void ExportWindow::FileCB(Fl_Widget* widget, void* data)
 {
 	ExportWindow* window = (ExportWindow*) data;
 
-	const char* fileName = fl_file_chooser("Diphone file:", "*.py", NULL);
+	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+	const char* fileName = fl_file_chooser("Save to:", "*.py", mediaPath.c_str());
 
 	if (fileName)
 		window->inputFile->value(fileName);

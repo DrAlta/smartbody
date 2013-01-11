@@ -1584,8 +1584,6 @@ void SBScene::saveCameras(std::stringstream& strstr, bool remoteSetup)
 		cameraIter != cameras.end();
 		cameraIter++)
 	{
-		if (*cameraIter == "cameraDefault")
-			continue; // don't save default camera
 		SrCamera* camera = getCamera((*cameraIter));
 		strstr << "obj = scene.getCamera(\"" << camera->getName() << "\")\n";
 		strstr << "if obj == None:\n";
@@ -1633,6 +1631,8 @@ void SBScene::savePawns(std::stringstream& strstr, bool remoteSetup)
 		strstr << "obj = scene.createPawn(\"" << pawn->getName() << "\")\n";
 		SrVec position = pawn->getPosition();
 		strstr << "obj.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
+		SrQuat orientation = pawn->getOrientation();
+		strstr << "obj.setOrientation(SrQuat(" << orientation.w << ", " << orientation.x << ", " << orientation.y << ", " << "orientation.z))\n";
 		// attributes
 		std::vector<std::string> attributeNames = pawn->getAttributeNames();
 		for (std::vector<std::string>::iterator iter = attributeNames.begin();
@@ -1702,6 +1702,9 @@ void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 		strstr << "obj.setSkeleton(skeleton)\n";
 		SrVec position = character->getPosition();
 		strstr << "obj.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
+		SrQuat orientation = character->getOrientation();
+		strstr << "obj.setOrientation(SrQuat(" << orientation.w << ", " << orientation.x << ", " << orientation.y << ", " << "orientation.z))\n";
+
 		// face definition
 		SBFaceDefinition* faceDef = character->getFaceDefinition();
 		if (faceDef)
@@ -1824,35 +1827,35 @@ void SBScene::saveLights(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- lights\n";
 	// lights
-	std::vector<std::string> cameras = getCameraNames();
-	for (std::vector<std::string>::iterator cameraIter = cameras.begin();
-		 cameraIter != cameras.end();
-		 cameraIter++)
-	{		
-		SrCamera* camera = getCamera((*cameraIter));
-		strstr << "obj = scene.createCamera(\"" << camera->getName() << "\")\n";		
-		strstr << "obj.setEye(" << camera->getEye().x << ", " << camera->getEye().y << ", " << camera->getEye().z << ")\n";
-		strstr << "obj.setCenter(" << camera->getCenter().x << ", " << camera->getCenter().y << ", " << camera->getCenter().z << ")\n";
-		strstr << "obj.setUpVector(SrVec(" << camera->getUpVector().x << ", " << camera->getUpVector().y << ", " << camera->getUpVector().z << "))\n";
-		strstr << "obj.setScale(" << camera->getScale() << ")\n";
-		strstr << "obj.setFov(" << camera->getFov() << ")\n";
-		strstr << "obj.setFarPlane(" << camera->getFarPlane() << ")\n";
-		strstr << "obj.setNearPlane(" << camera->getNearPlane() << ")\n";
-		strstr << "obj.setAspectRatio(" << camera->getAspectRatio() << ")\n";
-	
+	std::vector<std::string> pawns = getPawnNames();
+	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+		 pawnIter != pawns.end();
+		 pawnIter++)
+	{
+		SBPawn* pawn = getPawn((*pawnIter));
+		SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
+		if (camera)
+			continue; 
+		if (pawn->getName().find("light") != 0)
+		{
+			continue;
+		}
+		strstr << "\n# ---- light: " << pawn->getName() << "\n";
+		strstr << "obj = scene.createPawn(\"" << pawn->getName() << "\")\n";
+		SrVec position = pawn->getPosition();
+		strstr << "obj.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
+		SrQuat orientation = pawn->getOrientation();
+		strstr << "obj.setOrientation(SrQuat(" << orientation.w << ", " << orientation.x << ", " << orientation.y << ", " << "orientation.z))\n";
+
 		// attributes
-		std::vector<std::string> attributeNames = camera->getAttributeNames();
+		std::vector<std::string> attributeNames = pawn->getAttributeNames();
 		for (std::vector<std::string>::iterator iter = attributeNames.begin();
 			 iter != attributeNames.end();
 			 iter++)
 		{
-			SmartBody::SBAttribute* attr = camera->getAttribute((*iter));
+			SmartBody::SBAttribute* attr = pawn->getAttribute((*iter));
 			std::string attrWrite = attr->write();
 			strstr << attrWrite;
-		}
-		if (getActiveCamera() == camera)
-		{
-			strstr << "scene.setActiveCamera(obj)\n";
 		}
 	}
 }
