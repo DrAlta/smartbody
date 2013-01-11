@@ -358,6 +358,11 @@ void BmlRequest::gestureRequestProcess()
 	SBJoint* rWrist = actor->getSkeleton()->getJointByName("r_wrist");
 	for (size_t i = 0; i < gestures.size(); ++i)
 	{
+		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+		{
+			LOG("...");
+			LOG("Processing %s", gestures[i]->anim_ct->getName().c_str());
+		}
 		// get motion information	
 		MeCtMotion* motion_ct = dynamic_cast<MeCtMotion*> (gestures[i]->anim_ct);
 		SkMotion* motion = motion_ct->motion();
@@ -409,7 +414,7 @@ void BmlRequest::gestureRequestProcess()
 			SrVec prevRWristPos = prevSBMotion->getJointPosition(rWrist, (float)motion->time_stroke_end());
 
 			// re-pick the best matching gesture based on previous gesture
-			SBMotion* closestMotion = sbMotion;
+			SBMotion* closestMotion = NULL;
 			float minSpeedDiffL = 100000;
 			float minSpeedDiffR = 100000;
 			float lWristTransitionDistance = -1;
@@ -447,7 +452,17 @@ void BmlRequest::gestureRequestProcess()
 					closestMotion = motionInList;
 				}
 			}
-			if (closestMotion->getName() != sbMotion->getName())
+			if (closestMotion == NULL)
+			{
+				closestMotion = sbMotion;
+				minSpeedDiffL = 0;
+				minSpeedDiffR = 0;
+				lWristTransitionDistance = 0;
+				rWristTransitionDistance = 0;
+				currLWristSpeed = 0;
+				currRWristSpeed = 0;
+			}
+			else if (closestMotion->getName() != sbMotion->getName())
 			{
 				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 					LOG("gestureRequestProcess: after calculating the closest gesture, changing from %s to %s", sbMotion->getName().c_str(), closestMotion->getName().c_str());
@@ -556,6 +571,26 @@ void BmlRequest::gestureRequestProcess()
 			}
 		}
 	}
+
+	// LOG in case if something goes wrong
+	if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+	{
+		for (size_t i = 0; i < gestures.size(); ++i)
+		{
+			if (gestures[i]->filtered)
+				continue;
+			LOG("Gesture %s's timing: %f, %f, %f, %f, %f, %f, %f", gestures[i]->anim_ct->getName().c_str(), 
+				gestures[i]->behav_syncs.sync_start()->time(), gestures[i]->behav_syncs.sync_ready()->time(),
+				gestures[i]->behav_syncs.sync_stroke_start()->time(), gestures[i]->behav_syncs.sync_stroke()->time(), gestures[i]->behav_syncs.sync_stroke_end()->time(),
+				gestures[i]->behav_syncs.sync_relax()->time(), gestures[i]->behav_syncs.sync_end()->time());
+
+			if (gestures[i]->behav_syncs.sync_ready()->time() > gestures[i]->behav_syncs.sync_stroke_start()->time())
+			{
+				LOG("gestureRequestProcess: should not be here, ready time is bigger than stroke start!");
+			}
+		}
+	}
+	
 }
 
 void BML::BmlRequest::speechRequestProcess()
