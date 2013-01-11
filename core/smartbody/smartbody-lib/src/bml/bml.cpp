@@ -486,7 +486,7 @@ void BmlRequest::gestureRequestProcess()
 
 			if (!shouldFilter)
 			{
-				if (minSpeedDiffL < 0 || minSpeedDiffR < 0)		// if desired wrist speed is higher than next gesture wrist speed, then just blend
+				if (minSpeedDiffL <= 0 || minSpeedDiffR <= 0)		// if desired wrist speed is higher than next gesture wrist speed, then just blend
 				{
 					if (currGestureStartAt < prevGestureRelaxAt)
 					{
