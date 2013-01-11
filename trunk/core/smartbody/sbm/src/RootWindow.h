@@ -22,6 +22,7 @@
 #include "channelbufferviewer/channelbufferWindow.hpp"
 #include "retargetviewer/RetargetViewer.h"
 #include "jointmapviewer/RetargetStepWindow.h"
+#include "ExportWindow.h"
 
 class SbmCharacter;
 
@@ -79,6 +80,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		ChannelBufferWindow* dataViewerWindow;
 		ResourceWindow* resourceWindow;
 		PanimationWindow* panimationWindow;
+		ExportWindow* exportWindow;
 		//RetargetViewer* behaviorSetViewer;
 		//JointMapViewer* jointMapViewer;
 		RetargetStepWindow* retargetStepWindow;
@@ -120,6 +122,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 	
 		static void LoadCB(Fl_Widget* widget, void* data);
 		static void SaveCB(Fl_Widget* widget, void* data);
+		static void ExportCB(Fl_Widget* widget, void* data);
 		static void SaveSceneSettingCB(Fl_Widget* widget, void* data);
 		static void LoadSceneSettingCB(Fl_Widget* widget, void* data);
 		static void RunCB(Fl_Widget* widget, void* data);

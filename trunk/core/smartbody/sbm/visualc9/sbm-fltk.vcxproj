@@ -480,6 +480,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
   <ItemGroup>
     <ClCompile Include="..\src\bmlcreator\TextEditor.cpp" />
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp" />
+    <ClCompile Include="..\src\ExportWindow.cpp" />
     <ClCompile Include="..\src\FLTKListener.cpp" />
     <ClCompile Include="..\src\fltk_viewer.cpp" />
     <ClCompile Include="..\src\jointmapviewer\JointMapViewer.cpp" />
@@ -552,6 +553,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
   <ItemGroup>
     <ClInclude Include="..\src\bmlcreator\TextEditor.h" />
     <ClInclude Include="..\src\CharacterCreatorWindow.h" />
+    <ClInclude Include="..\src\ExportWindow.h" />
     <ClInclude Include="..\src\FLTKListener.h" />
     <ClInclude Include="..\src\fltk_viewer.h" />
     <ClInclude Include="..\src\jointmapviewer\JointMapViewer.h" />
