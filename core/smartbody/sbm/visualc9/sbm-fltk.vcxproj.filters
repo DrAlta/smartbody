@@ -250,6 +250,9 @@
     <ClCompile Include="..\src\fltk_viewer.cpp">
       <Filter>viewer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ExportWindow.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -451,6 +454,9 @@
     </ClInclude>
     <ClInclude Include="..\src\jointmapviewer\RetargetStepWindow.h">
       <Filter>jointmapviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ExportWindow.h">
+      <Filter>viewer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

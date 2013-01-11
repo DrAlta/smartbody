@@ -7,6 +7,7 @@
 #include <sb/SBScript.h>
 
 #include <map>
+#include <sstream>
 
 class SBDebuggerServer;
 class SBDebuggerClient;
@@ -51,7 +52,7 @@ class SBScene : public SBObject
 		SBAPI void update();
 		SBAPI std::string save(bool remoteSetup = false);
 		SBAPI std::string saveSceneSetting();
-		SBAPI void exportScene(const std::string& filename);
+		SBAPI std::string exportScene(const std::vector<std::string>& aspects, bool remoteSetup);
 		SBAPI static SBScene* getScene();		
 		SBAPI static void destroyScene();
 
@@ -170,6 +171,22 @@ class SBScene : public SBObject
 		SBAPI std::vector<std::string> getCameraNames();
 
 	protected:
+
+		void saveScene(std::stringstream& strstr, bool remoteSetup);
+		void saveAssets(std::stringstream& strstr, bool remoteSetup);
+		void saveCameras(std::stringstream& strstr, bool remoteSetup);
+		void savePawns(std::stringstream& strstr, bool remoteSetup);
+		void saveCharacters(std::stringstream& strstr, bool remoteSetup);
+		void saveLights(std::stringstream& strstr, bool remoteSetup);
+		void saveBlends(std::stringstream& strstr, bool remoteSetup);
+		void saveJointMaps(std::stringstream& strstr, bool remoteSetup);
+		void saveFaceDefinitions(std::stringstream& strstr, bool remoteSetup);
+		void saveGestureMaps(std::stringstream& strstr, bool remoteSetup);
+		void saveLipSyncing(std::stringstream& strstr, bool remoteSetup);
+		void saveServices(std::stringstream& strstr, bool remoteSetup);
+		void savePositions(std::stringstream& strstr, bool remoteSetup);
+
+
 		SBSimulationManager* _sim;
 		SBProfiler* _profiler;
 		SBBmlProcessor* _bml;

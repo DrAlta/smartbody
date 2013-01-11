@@ -3579,9 +3579,9 @@ void FltkViewer::drawPawns()
 			glPushMatrix();
 			glMultMatrixf((const float*) gmat);
 			if (camera)
-				glColor3f(1.0, 0.0, 0.0);
-			else
 				glColor3f(1.0, 1.0, 0.0);
+			else
+				glColor3f(1.0, 0.0, 0.0);
 			SrSnSphere sphere;
 			glPushMatrix();
 			sphere.shape().center = SrPnt(0, 0, 0);

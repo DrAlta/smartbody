@@ -24,7 +24,8 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->labelsize(10);
 	menubar->add("&File/New", 0, NewCB, this, NULL);	
 	menubar->add("&File/Save", 0, SaveCB, this, NULL);	
-	menubar->add("&File/Load...", 0, LoadCB, this, NULL);	
+	menubar->add("&File/Export...", 0, ExportCB, this, NULL);	
+	menubar->add("&File/Load...", 0, LoadCB, this, NULL);
 	menubar->add("&File/Save Scene Setting", 0, SaveSceneSettingCB, this, NULL);	
 	menubar->add("&File/Load Scene Setting...", 0, LoadSceneSettingCB, this, NULL);	
 	menubar->add("&File/Connect...", 0, LaunchConnectCB, this, NULL);
@@ -273,6 +274,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	dataViewerWindow = NULL;
 	resourceWindow = NULL;
 	panimationWindow = NULL;	
+	exportWindow = NULL;
 }
 
 BaseWindow::~BaseWindow() {
@@ -442,6 +444,12 @@ void BaseWindow::resetWindow()
 		delete panimationWindow;
 		panimationWindow = NULL;
 	}
+	if (exportWindow)
+	{
+		delete exportWindow;
+		exportWindow = NULL;
+	}
+
 
 }
 
@@ -494,6 +502,16 @@ void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
 	scenePrompt.append(saveFile);
 	scenePrompt.append("'");
 	fl_message(scenePrompt.c_str());
+}
+
+void BaseWindow::ExportCB(Fl_Widget* widget, void* data)
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->exportWindow)
+	{
+		rootWindow->exportWindow = new ExportWindow(rootWindow->x() + 50, rootWindow->y() + 50, 300, 600, "Export");
+	}
+	rootWindow->exportWindow->show();
 }
 
 void BaseWindow::SaveSceneSettingCB( Fl_Widget* widget, void* data )
