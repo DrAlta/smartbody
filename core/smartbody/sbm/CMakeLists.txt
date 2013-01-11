@@ -106,7 +106,7 @@ set( SBM_FLTK_SRC
 	src/PositionControl.cpp
 	src/RotationControl.cpp
 	src/RootWindow.cxx
-	src/ExportWindow.cxx
+	src/ExportWindow.cpp
 	src/fltk_viewer.cpp
 	${OGRE_SRCS}
 	src/pic.cpp
@@ -184,15 +184,15 @@ add_executable( sbm-fltk
 )
 
 if(NOT APPLE )
-set ( XFT Xft )	
+set ( XFT  "")	
 else()
 set ( XFT "" ) 
 endif()
 
 target_link_libraries( sbm-fltk
 
-	#tcmalloc
-	#profiler
+	tcmalloc
+	profiler
 	smartbody-lib
 	bonebus
 	vhmsg
@@ -212,9 +212,9 @@ target_link_libraries( sbm-fltk
 	fltk_gl 
 	${OPENGL_LIBRARIES}
 	activemq-cpp
+	ode
 	steerlib
 	pprAI
-	ode
 	python2.6
     	ncurses	
 	pthread
