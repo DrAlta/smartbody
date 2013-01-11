@@ -247,7 +247,9 @@
     <ClCompile Include="..\src\jointmapviewer\RetargetStepWindow.cpp">
       <Filter>jointmapviewer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\fltk_viewer.cpp" />
+    <ClCompile Include="..\src\fltk_viewer.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">

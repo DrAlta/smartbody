@@ -50,8 +50,9 @@ class SBScene : public SBObject
 
 		SBAPI void update();
 		SBAPI std::string save(bool remoteSetup = false);
+		SBAPI std::string saveSceneSetting();
 		SBAPI void exportScene(const std::string& filename);
-		SBAPI static SBScene* getScene();
+		SBAPI static SBScene* getScene();		
 		SBAPI static void destroyScene();
 
 		SBAPI void setScale(float val);

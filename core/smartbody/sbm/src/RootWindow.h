@@ -120,6 +120,8 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 	
 		static void LoadCB(Fl_Widget* widget, void* data);
 		static void SaveCB(Fl_Widget* widget, void* data);
+		static void SaveSceneSettingCB(Fl_Widget* widget, void* data);
+		static void LoadSceneSettingCB(Fl_Widget* widget, void* data);
 		static void RunCB(Fl_Widget* widget, void* data);
 		static void LaunchVisemeViewerCB(Fl_Widget* widget, void* data);
 		static void LaunchBMLViewerCB(Fl_Widget* widget, void* data);

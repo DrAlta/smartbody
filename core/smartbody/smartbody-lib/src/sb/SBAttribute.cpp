@@ -327,6 +327,8 @@ std::string BoolAttribute::write()
 	bool val = getDefaultValue();
 	strstr << "attr.setDefaultValue(";
 	val? strstr << "True)\n" : strstr << "False)\n"; 
+	//strstr << "attr.setValue(";
+	//val? strstr << "True)\n" : strstr << "False)\n"; 
 
 	return strstr.str();
 }
@@ -453,6 +455,7 @@ std::string IntAttribute::write()
 
 	int val = getDefaultValue();
 	strstr << "attr.setDefaultValue(" << val << ")\n";
+	//strstr << "attr.setValue(" << val << ")\n";
 
 	return strstr.str();
 }
@@ -583,6 +586,7 @@ std::string DoubleAttribute::write()
 
 	double val = getDefaultValue();
 	strstr << "attr.setDefaultValue(" << val << ")\n";
+	//strstr << "attr.setValue(" << val << ")\n";
 	return strstr.str();
 }
 
@@ -678,9 +682,15 @@ std::string StringAttribute::write()
 
 	const std::string& defaultVal = getDefaultValue();
 	if (defaultVal == "")
+	{
 		strstr << "attr.setDefaultValue(\"\")\n";
+		//strstr << "attr.setValue(\"\")\n";
+	}
 	else
+	{
 		strstr << "attr.setDefaultValue(\"" << defaultVal << "\")\n";
+		//strstr << "attr.setValue(\"" << defaultVal << "\")\n";
+	}
 	strstr << "validValues = StringVec()\n";
 	const std::vector<std::string>& values = getValidValues();
 	for (std::vector<std::string>::const_iterator iter = values.begin();
@@ -798,6 +808,7 @@ std::string Vec3Attribute::write()
 	strstr << "vec.setData(1, " << val.x << ")\n";
 	strstr << "vec.setData(2, " << val.x << ")\n";
 	strstr << "attr.setDefaultValue(vec)\n";
+	//strstr << "attr.setValue(vec)\n";
 
 	return strstr.str();
 }
@@ -901,6 +912,7 @@ std::string MatrixAttribute::write()
 		for (int c = 0; c < 4; c++)
 			strstr << "defMat.setData(" << defMat.getData(r, c) << ")\n";
 	strstr << "attr.setDefaultValue(defMat)\n";
+	//strstr << "attr.setValue(defMat)\n";
 
 	return strstr.str();
 }
