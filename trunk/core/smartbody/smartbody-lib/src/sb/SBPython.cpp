@@ -859,30 +859,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("printStats", &SBProfiler::printStats, "Print time profiler statistics. ")
 		;
 
-	boost::python::class_<SrCamera>("Camera")
-		.def("print", &SrCamera::print, "Shows all the camera statistics. ")
-		.def("reset", &SrCamera::reset, "Reset camera with camera eye (0 166 185), camera center (0 92 0). ")
-		.def("setEye", &SrCamera::setEye, "Set camera eye position. \n Input: camera eye position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
-		.def("getEye", &SrCamera::getEye, "Get camera eye position.")
-		.def("setCenter", &SrCamera::setCenter, "Set camera center. \n Input: camera center position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
-		.def("getCenter", &SrCamera::getCenter, "Get camera center.")
-		.def("setScale", &SrCamera::setScale, "Set camera scale. \n camera scale: NULL \n Output: NULL")
-		.def("getScale", &SrCamera::getScale, "Get camera scale.")
-		.def("setTrack", &SrCamera::setTrack, "Set camera track. \n Input: character name, joint name \n Output: NULL")
-		.def("removeTrack", &SrCamera::removeTrack, "Remove camera track.")
-		.def("setUpVector", &SrCamera::setUpVector, "Set camera up vector.")
-		.def("getUpVector", &SrCamera::getUpVector, "Returns the camera up vector.")
-		.def("setFov", &SrCamera::setFov, "Set's the camera's field of view.")
-		.def("getFov", &SrCamera::getFov, "Get's the camera's field of view.")
-		.def("setNearPlane", &SrCamera::setNearPlane, "Set's the camera's near plane.")
-		.def("getNearPlane", &SrCamera::getNearPlane, "Get's the camera's near plane.")
-		.def("setFarPlane", &SrCamera::setFarPlane, "Set's the camera's far plane.")
-		.def("getFarPlane", &SrCamera::getFarPlane, "Get's the camera's far plane.")
-		.def("setAspectRatio", &SrCamera::setAspectRatio, "Set's the camera's aspect ratio.")
-		.def("getAspectRatio", &SrCamera::getAspectRatio, "Get's the camera's aspect ratio.")
-		;
-
-
+	
 	boost::python::class_<SrViewer>("Viewer")
 		.def("show", &SrViewer::show_viewer, "Shows the viewer.")
 		.def("hide", &SrViewer::hide_viewer, "Hides the viewer.")
@@ -1298,6 +1275,29 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getHPR", &SBPawn::getHPR, "Gets the heading, pitch and roll of the character's world offset.")
 		.def("setHPRSmooth", &SBPawn::setHPRSmooth, "Sets the heading, pitch and roll of the character's world offset. The character will be rotated smoothly overtime to avoid popping.")
 	;
+
+	boost::python::class_<SrCamera, boost::python::bases<SBPawn>>("Camera")
+		.def("print", &SrCamera::print, "Shows all the camera statistics. ")
+		.def("reset", &SrCamera::reset, "Reset camera with camera eye (0 166 185), camera center (0 92 0). ")
+		.def("setEye", &SrCamera::setEye, "Set camera eye position. \n Input: camera eye position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
+		.def("getEye", &SrCamera::getEye, "Get camera eye position.")
+		.def("setCenter", &SrCamera::setCenter, "Set camera center. \n Input: camera center position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
+		.def("getCenter", &SrCamera::getCenter, "Get camera center.")
+		.def("setScale", &SrCamera::setScale, "Set camera scale. \n camera scale: NULL \n Output: NULL")
+		.def("getScale", &SrCamera::getScale, "Get camera scale.")
+		.def("setTrack", &SrCamera::setTrack, "Set camera track. \n Input: character name, joint name \n Output: NULL")
+		.def("removeTrack", &SrCamera::removeTrack, "Remove camera track.")
+		.def("setUpVector", &SrCamera::setUpVector, "Set camera up vector.")
+		.def("getUpVector", &SrCamera::getUpVector, "Returns the camera up vector.")
+		.def("setFov", &SrCamera::setFov, "Set's the camera's field of view.")
+		.def("getFov", &SrCamera::getFov, "Get's the camera's field of view.")
+		.def("setNearPlane", &SrCamera::setNearPlane, "Set's the camera's near plane.")
+		.def("getNearPlane", &SrCamera::getNearPlane, "Get's the camera's near plane.")
+		.def("setFarPlane", &SrCamera::setFarPlane, "Set's the camera's far plane.")
+		.def("getFarPlane", &SrCamera::getFarPlane, "Get's the camera's far plane.")
+		.def("setAspectRatio", &SrCamera::setAspectRatio, "Set's the camera's aspect ratio.")
+		.def("getAspectRatio", &SrCamera::getAspectRatio, "Get's the camera's aspect ratio.")
+		;
 
 	boost::python::class_<SBCharacter, boost::python::bases<SBPawn, SBObject> >("SBCharacter")
 		//.def(boost::python::init<std::string, std::string>())

@@ -107,7 +107,7 @@ attribute vec4 BoneID1,BoneID2;   \n\
 attribute vec4 BoneWeight1,BoneWeight2;\n \
 attribute vec3 tangent, binormal;\n\
 varying vec4 vPos;\n\
-varying vec3 normal,lightDir[2],halfVector[2];\n\
+varying vec3 normal,lightDir[4],halfVector[4];\n\
 varying vec3 tv,bv;\n\
 varying float dist[2];\n\
 mat4 GetTransformation(float id)\n \
@@ -146,13 +146,18 @@ mat4 skin = TransformPos(pos,gl_Normal,tangent,binormal,BoneID1,BoneWeight1) + T
 vPos = gl_TextureMatrix[7]* gl_ModelViewMatrix * vec4(skin[0].xyz,1.0);\n\
 gl_Position = gl_ModelViewProjectionMatrix*vec4(skin[0].xyz,1.0);\n\
 //gl_Position = gl_ModelViewProjectionMatrix*vec4(pos.xyz,1.0);\n\
-lightDir[0] = normalize((vec4(gl_LightSource[0].position.xyz,0.0)).xyz);\n\
-halfVector[0] = normalize((vec4(gl_LightSource[0].halfVector.xyz,0.0)).xyz);\n\
-dist[0] = 0.0;\n\
-vec3 posDir = vec3(gl_LightSource[1].position);// - gl_ModelViewMatrix * vec4(skin[0].xyz,1.0));\n\
-dist[1] = 0.0;//length(posDir);\n\
-lightDir[1] = normalize(( vec4(posDir,0.0)).xyz);\n\
-halfVector[1] = normalize((vec4(gl_LightSource[1].halfVector.xyz,0.0)).xyz);\n\
+//dist[0] = 0.0;\n\
+//vec3 posDir = vec3(gl_LightSource[1].position);// - gl_ModelViewMatrix * vec4(skin[0].xyz,1.0));\n\
+//dist[1] = 0.0;//length(posDir);\n\
+//lightDir[0] = normalize((vec4(gl_LightSource[0].position.xyz,0.0)).xyz);\n\
+//halfVector[0] = normalize((vec4(gl_LightSource[0].halfVector.xyz,0.0)).xyz);\n\
+for (int i=0;i<4;i++)\n\
+{\n\
+vec3 posDir = vec3(gl_LightSource[i].position);\n\
+vec3 hv = vec3(gl_LightSource[i].halfVector.xyz);\n\
+lightDir[i] = normalize(posDir);\n\
+halfVector[i] = normalize(hv);\n\
+}\n\
 int colorIdx = int(gl_Vertex.w); \n\
 gl_TexCoord[0] = gl_MultiTexCoord0;\n\
 normal = normalize(gl_NormalMatrix * skin[1].xyz);\n\
@@ -176,7 +181,7 @@ uniform int  useTexture;\n\
 uniform int  useNormalMap;\n\
 uniform int  useSpecularMap;\n\
 uniform int  useShadowMap;\n\
-varying vec3 normal,lightDir[2],halfVector[2];\n\
+varying vec3 normal,lightDir[4],halfVector[4];\n\
 varying vec3 tv,bv;\n\
 varying vec4 vPos;\n\
 uniform vec4 diffuseMaterial;\n\
@@ -221,15 +226,17 @@ void main (void)\n\
 	{\n\
 		shadowWeight = shadowCoef();\n\
 	}\n\
-	for (int i=0;i<2;i++)\n\
+	for (int i=0;i<4;i++)\n\
 	{\n\
 		att = 1.0/(gl_LightSource[i].constantAttenuation + gl_LightSource[i].linearAttenuation * dist[i] + gl_LightSource[i].quadraticAttenuation * dist[i] * dist[i]);	\n\
 		NdotL = max(dot(n,lightDir[i]),0.0);\n\
 		if (NdotL > 0.0) {\n\
-		color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0)*att;\n\
+		    //color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0)*att;\n\
+			color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0);\n\
 			halfV = normalize(halfVector[i]);\n\
 			NdotHV = max(dot(n,halfV),0.0);\n\
-			color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0)*att;\n\
+			color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0);\n\
+			//color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0)*att;\n\
 		}   \n\
 	}\n\
 	const float shadow_ambient = 1.0;\n\
@@ -271,7 +278,6 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 	glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );	
 
 	glDisable(GL_POLYGON_SMOOTH);
-
 	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

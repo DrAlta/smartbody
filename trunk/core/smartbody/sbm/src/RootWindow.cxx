@@ -24,7 +24,9 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->labelsize(10);
 	menubar->add("&File/New", 0, NewCB, this, NULL);	
 	menubar->add("&File/Save", 0, SaveCB, this, NULL);	
-	menubar->add("&File/Load...", 0, LoadCB, this, NULL);
+	menubar->add("&File/Load...", 0, LoadCB, this, NULL);	
+	menubar->add("&File/Save Scene Setting", 0, SaveSceneSettingCB, this, NULL);	
+	menubar->add("&File/Load Scene Setting...", 0, LoadSceneSettingCB, this, NULL);	
 	menubar->add("&File/Connect...", 0, LaunchConnectCB, this, NULL);
 	menubar->add("&File/Disconnect", 0, DisconnectRemoteCB, this, NULL);
 	menubar->add("&File/&Quit", 0, QuitCB, this, NULL);
@@ -492,6 +494,57 @@ void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
 	scenePrompt.append(saveFile);
 	scenePrompt.append("'");
 	fl_message(scenePrompt.c_str());
+}
+
+void BaseWindow::SaveSceneSettingCB( Fl_Widget* widget, void* data )
+{
+	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+
+	const char* saveFile = fl_file_chooser("Save file:", "*.py", mediaPath.c_str());
+	if (!saveFile)
+		return;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string fileString = scene->saveSceneSetting();
+
+	std::ofstream file(saveFile);
+	if (!file.good())
+	{
+		std::string message = "Cannot save to file '";
+		message.append(saveFile);
+		message.append("'");
+		fl_alert(message.c_str());
+		file.close();
+	}
+	file << fileString;
+	file.close();
+
+	std::string scenePrompt = "Scene saved to file '";
+	scenePrompt.append(saveFile);
+	scenePrompt.append("'");
+	fl_message(scenePrompt.c_str());
+}
+
+void BaseWindow::LoadSceneSettingCB( Fl_Widget* widget, void* data )
+{
+	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+
+	const char* seqFile = fl_file_chooser("Load file:", "*.py", mediaPath.c_str());
+	if (!seqFile)
+		return;
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
+	if (mediaPath != "")
+		scene->setMediaPath(mediaPath);
+	std::string filebasename = boost::filesystem::basename(seqFile);
+	std::string fileextension = boost::filesystem::extension(seqFile);
+	std::string fullfilename = std::string(seqFile);
+	size_t pos = fullfilename.find(filebasename);
+	std::string path = fullfilename.substr(0, pos - 1);
+	scene->addAssetPath("script", path);
+	scene->runScript(filebasename);
+
 }
 
 void BaseWindow::RunCB(Fl_Widget* widget, void* data)
