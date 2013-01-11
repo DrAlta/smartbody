@@ -106,6 +106,7 @@ set( SBM_FLTK_SRC
 	src/PositionControl.cpp
 	src/RotationControl.cpp
 	src/RootWindow.cxx
+	src/ExportWindow.cxx
 	src/fltk_viewer.cpp
 	${OGRE_SRCS}
 	src/pic.cpp
