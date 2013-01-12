@@ -88,7 +88,8 @@ static int inihandler(void* user, const char* section, const char* name,
 	else if (MATCH("GENERAL", "MediaPath"))
 	{
 		std::string temp = "python scene.setMediaPath(\"" + std::string(value) + "\")";
-		renderer->m_initialCommands.push_back(temp);
+		// make sure that the media path is run first
+		renderer->m_initialCommands.insert(renderer->m_initialCommands.begin(), temp);
     }
 	else if (MATCH("GENERAL", "Scene"))
 	{
