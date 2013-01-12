@@ -1276,7 +1276,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("setHPRSmooth", &SBPawn::setHPRSmooth, "Sets the heading, pitch and roll of the character's world offset. The character will be rotated smoothly overtime to avoid popping.")
 	;
 
-	boost::python::class_<SrCamera, boost::python::bases<SBPawn>>("Camera")
+	boost::python::class_<SrCamera, boost::python::bases<SBPawn> >("Camera")
 		.def("print", &SrCamera::print, "Shows all the camera statistics. ")
 		.def("reset", &SrCamera::reset, "Reset camera with camera eye (0 166 185), camera center (0 92 0). ")
 		.def("setEye", &SrCamera::setEye, "Set camera eye position. \n Input: camera eye position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
