@@ -421,8 +421,8 @@ void BmlRequest::gestureRequestProcess()
 			SkMotion* prevMotion = prev_motion_ct->motion();
 			SBMotion* prevSBMotion = dynamic_cast<SBMotion*> (prevMotion);
 			prevSBMotion->connect(actor->getSkeleton());
-			SrVec prevLWristPos = prevSBMotion->getJointPosition(lWrist, (float)motion->time_stroke_end());
-			SrVec prevRWristPos = prevSBMotion->getJointPosition(rWrist, (float)motion->time_stroke_end());
+			SrVec prevLWristPos = prevSBMotion->getJointPosition(lWrist, (float)prevMotion->time_stroke_end());
+			SrVec prevRWristPos = prevSBMotion->getJointPosition(rWrist, (float)prevMotion->time_stroke_end());
 
 			// re-pick the best matching gesture based on previous gesture
 			SBMotion* closestMotion = NULL;
@@ -432,13 +432,34 @@ void BmlRequest::gestureRequestProcess()
 			float rWristTransitionDistance = -1;
 			float currLWristSpeed = -1;
 			float currRWristSpeed = -1;
-			std::vector<std::string> currGestureList = gestures[i]->gestureList;
+			float prevLMotionSpeed = prevSBMotion->getJointSpeed(lWrist, (float)prevMotion->time_start(), (float)prevMotion->time_stop());
+			float prevRMotionSpeed = prevSBMotion->getJointSpeed(rWrist, (float)prevMotion->time_start(), (float)prevMotion->time_stop());
+			const std::vector<std::string>& currGestureList = gestures[i]->gestureList;	
 			for (size_t l = 0; l < currGestureList.size(); ++l)
 			{
 				SBMotion *motionInList = SmartBody::SBScene::getScene()->getMotion(currGestureList[l]);
 				if (!motionInList)
 					continue;
+				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+					LOG("Motion in list: %s", currGestureList[l].c_str());
 				motionInList->connect(actor->getSkeleton());
+				if (actor->getBoolAttribute("gestureRequest.matchingHandness"))
+				{
+					float lMotionSpeed = motionInList->getJointSpeed(lWrist, (float)motionInList->time_start(), (float)motionInList->time_stop());
+					float rMotionSpeed = motionInList->getJointSpeed(rWrist, (float)motionInList->time_start(), (float)motionInList->time_stop());
+					bool prevMotionActive = (prevLMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold")) || (prevRMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold"));
+					bool motionActive = (lMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold")) || (rMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold"));
+					bool leftHand = (prevLMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold")) && (lMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold"));
+					bool rightHand = (prevRMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold")) && (rMotionSpeed > actor->getDoubleAttribute("gestureRequest.gestureWristActiveThreshold"));
+					if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+						LOG("PrevMotion: %f, %f CurrMotion: %f, %f", prevLMotionSpeed, prevRMotionSpeed, lMotionSpeed, rMotionSpeed);
+					if (prevMotionActive && motionActive && !leftHand && !rightHand)
+					{
+						if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+							LOG("Motion Filtered");
+						continue;
+					}
+				}
 				float lWristSpeed = motionInList->getJointSpeed(lWrist, (float)motionInList->time_stroke_start(), (float)motionInList->time_stroke_end());
 				float rWristSpeed = motionInList->getJointSpeed(rWrist, (float)motionInList->time_stroke_start(), (float)motionInList->time_stroke_end());
 				SrVec currLWristPos = motionInList->getJointPosition(lWrist, (float)motionInList->time_stroke_start());
@@ -449,7 +470,6 @@ void BmlRequest::gestureRequestProcess()
 				float speedDiffR = rWristSpeed - desiredRWristSpeed;
 				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 				{
-					LOG("Motion in list: %s", currGestureList[l].c_str());
 					LOG("lSpd: %f, rSpd: %f, transLSpd: %f, transRSpd: %f, diffL: %f, diffR: %f", lWristSpeed, rWristSpeed, desiredLWristSpeed, desiredRWristSpeed, speedDiffL, speedDiffR);
 				}
 				if (fabs(speedDiffL) < fabs(minSpeedDiffL) && fabs(speedDiffR) < fabs(minSpeedDiffR))
