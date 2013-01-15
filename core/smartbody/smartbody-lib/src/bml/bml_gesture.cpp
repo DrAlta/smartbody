@@ -123,7 +123,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		// validate gesture timing input (stroke && relax)
 		float motionStrokeToRelax = float(motion->synch_points.get_time(srSynchPoints::RELAX) - motion->synch_points.get_time(srSynchPoints::STROKE));
 		float inputStrokeToRelax = behav_syncs.sync_relax()->offset() - behav_syncs.sync_stroke()->offset();
-		if (inputStrokeToRelax < motionStrokeToRelax)
+		if (inputStrokeToRelax > 0 && inputStrokeToRelax < motionStrokeToRelax)
 		{
 			float gap = motionStrokeToRelax - inputStrokeToRelax;
 			behav_syncs.sync_relax()->set_offset(behav_syncs.sync_relax()->offset() + gap);

@@ -396,6 +396,7 @@ void BmlRequest::gestureRequestProcess()
 			else
 				j--;
 		}
+		double prveGestureStrokeEndAt = (double)gestures[j]->behav_syncs.sync_stroke()->time();
 		double prevGestureRelaxAt = (double)gestures[j]->behav_syncs.sync_relax()->time();
 		double prevGestureEndAt = (double)gestures[j]->behav_syncs.sync_end()->time();
 		if (prevGestureEndAt < currGestureStartAt)
@@ -403,6 +404,16 @@ void BmlRequest::gestureRequestProcess()
 		double blendTime = currGestureStrokeStartAt - prevGestureRelaxAt;
 		bool shouldFilter = false;
 		int logIndex = -1;
+		bool transitionToStroke = false;
+		if (blendTime <= 0 && actor->getBoolAttribute("gestureRequest.enableTransitionToStroke"))
+		{
+			transitionToStroke = true;
+			blendTime = currGestureStrokeAt - prevGestureRelaxAt;
+			if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+			{
+				LOG("Transition directly to stroke");
+			}
+		}
 		if (blendTime > 0)	// check the transition speed, decide whether to filter
 		{
 			// check previous gesture hand position
@@ -422,11 +433,6 @@ void BmlRequest::gestureRequestProcess()
 			float currLWristSpeed = -1;
 			float currRWristSpeed = -1;
 			std::vector<std::string> currGestureList = gestures[i]->gestureList;
-			if (currGestureList.size() == 0)
-			{
-				currGestureList.push_back(sbMotion->getName());
-				closestMotion = sbMotion;
-			}
 			for (size_t l = 0; l < currGestureList.size(); ++l)
 			{
 				SBMotion *motionInList = SmartBody::SBScene::getScene()->getMotion(currGestureList[l]);
@@ -441,6 +447,11 @@ void BmlRequest::gestureRequestProcess()
 				float desiredRWristSpeed = (currRWristPos - prevRWristPos).len() / (float)blendTime;
 				float speedDiffL = lWristSpeed - desiredLWristSpeed;
 				float speedDiffR = rWristSpeed - desiredRWristSpeed;
+				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+				{
+					LOG("Motion in list: %s", currGestureList[l].c_str());
+					LOG("lSpd: %f, rSpd: %f, transLSpd: %f, transRSpd: %f, diffL: %f, diffR: %f", lWristSpeed, rWristSpeed, desiredLWristSpeed, desiredRWristSpeed, speedDiffL, speedDiffR);
+				}
 				if (fabs(speedDiffL) < fabs(minSpeedDiffL) && fabs(speedDiffR) < fabs(minSpeedDiffR))
 				{
 					minSpeedDiffL = speedDiffL;
@@ -459,8 +470,8 @@ void BmlRequest::gestureRequestProcess()
 				minSpeedDiffR = 0;
 				lWristTransitionDistance = 0;
 				rWristTransitionDistance = 0;
-				currLWristSpeed = 0;
-				currRWristSpeed = 0;
+				currLWristSpeed = sbMotion->getJointSpeed(lWrist, (float)sbMotion->time_stroke_start(), (float)sbMotion->time_stroke_end());
+				currRWristSpeed = sbMotion->getJointSpeed(rWrist, (float)sbMotion->time_stroke_start(), (float)sbMotion->time_stroke_end());
 			}
 			else if (closestMotion->getName() != sbMotion->getName())
 			{
@@ -490,8 +501,17 @@ void BmlRequest::gestureRequestProcess()
 				{
 					if (currGestureStartAt < prevGestureRelaxAt)
 					{
-						gestures[i]->behav_syncs.sync_start()->set_time(currGestureStrokeStartAt - blendTime);
-						gestures[i]->behav_syncs.sync_ready()->set_time(currGestureStrokeStartAt - blendTime);
+						if (!transitionToStroke)
+						{
+							gestures[i]->behav_syncs.sync_start()->set_time(currGestureStrokeStartAt - blendTime);
+							gestures[i]->behav_syncs.sync_ready()->set_time(currGestureStrokeStartAt - blendTime);
+						}
+						else
+						{
+							gestures[i]->behav_syncs.sync_start()->set_time(currGestureStrokeAt - blendTime);
+							gestures[i]->behav_syncs.sync_ready()->set_time(currGestureStrokeAt - blendTime);
+							gestures[i]->behav_syncs.sync_stroke_start()->set_time(currGestureStrokeAt - blendTime);
+						}
 					}
 				}
 				else											// else, elongate the holding period of previous gesture
@@ -515,10 +535,21 @@ void BmlRequest::gestureRequestProcess()
 							desiredTransitionTime = desiredTransitionTimeL >= 0 ? desiredTransitionTimeL : desiredTransitionTimeR;
 						if (desiredTransitionTime < blendTime)
 						{
-							gestures[j]->behav_syncs.sync_relax()->set_time(((float)blendTime - desiredTransitionTime) + prevGestureRelaxAt);
-							gestures[j]->behav_syncs.sync_end()->set_time(((float)blendTime - desiredTransitionTime) + prevGestureEndAt);
-							gestures[i]->behav_syncs.sync_start()->set_time((float)currGestureStrokeStartAt - desiredTransitionTime);
-							gestures[i]->behav_syncs.sync_ready()->set_time((float)currGestureStrokeStartAt - desiredTransitionTime);
+							if (!transitionToStroke)
+							{
+								gestures[j]->behav_syncs.sync_relax()->set_time(((float)blendTime - desiredTransitionTime) + prevGestureRelaxAt);
+								gestures[j]->behav_syncs.sync_end()->set_time(((float)blendTime - desiredTransitionTime) + prevGestureEndAt);
+								gestures[i]->behav_syncs.sync_start()->set_time((float)currGestureStrokeStartAt - desiredTransitionTime);
+								gestures[i]->behav_syncs.sync_ready()->set_time((float)currGestureStrokeStartAt - desiredTransitionTime);
+							}
+							else
+							{
+								gestures[j]->behav_syncs.sync_relax()->set_time(((float)blendTime - desiredTransitionTime) + prevGestureRelaxAt);
+								gestures[j]->behav_syncs.sync_end()->set_time(((float)blendTime - desiredTransitionTime) + prevGestureEndAt);
+								gestures[i]->behav_syncs.sync_start()->set_time((float)currGestureStrokeAt - desiredTransitionTime);
+								gestures[i]->behav_syncs.sync_ready()->set_time((float)currGestureStrokeAt - desiredTransitionTime);
+								gestures[i]->behav_syncs.sync_stroke_start()->set_time((float)currGestureStrokeAt - desiredTransitionTime);
+							}
 						}
 						else
 						{
@@ -535,8 +566,17 @@ void BmlRequest::gestureRequestProcess()
 					{
 						if (currGestureStartAt < prevGestureRelaxAt)
 						{
-							gestures[i]->behav_syncs.sync_start()->set_time(currGestureStrokeStartAt - blendTime);
-							gestures[i]->behav_syncs.sync_ready()->set_time(currGestureStrokeStartAt - blendTime);
+							if (!transitionToStroke)
+							{
+								gestures[i]->behav_syncs.sync_start()->set_time(currGestureStrokeStartAt - blendTime);
+								gestures[i]->behav_syncs.sync_ready()->set_time(currGestureStrokeStartAt - blendTime);
+							}
+							else
+							{
+								gestures[i]->behav_syncs.sync_start()->set_time(currGestureStrokeAt - blendTime);
+								gestures[i]->behav_syncs.sync_ready()->set_time(currGestureStrokeAt - blendTime);
+								gestures[i]->behav_syncs.sync_stroke_start()->set_time(currGestureStrokeAt - blendTime);
+							}
 						}
 					}
 				}
@@ -577,8 +617,8 @@ void BmlRequest::gestureRequestProcess()
 	{
 		for (size_t i = 0; i < gestures.size(); ++i)
 		{
-			if (gestures[i]->filtered)
-				continue;
+//			if (gestures[i]->filtered)
+//				continue;
 			LOG("Gesture %s's timing: %f, %f, %f, %f, %f, %f, %f", gestures[i]->anim_ct->getName().c_str(), 
 				gestures[i]->behav_syncs.sync_start()->time(), gestures[i]->behav_syncs.sync_ready()->time(),
 				gestures[i]->behav_syncs.sync_stroke_start()->time(), gestures[i]->behav_syncs.sync_stroke()->time(), gestures[i]->behav_syncs.sync_stroke_end()->time(),
