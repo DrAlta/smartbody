@@ -4,6 +4,7 @@
 #include <sb/SBScene.h>
 #include <FL/Fl_File_Chooser.H>
 #include <fstream>
+#include <sbm/lin_win.h>
 
 ExportWindow::ExportWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h, name)
 {
