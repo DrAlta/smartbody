@@ -18,11 +18,7 @@
 </font></dt><dd>
 <dl>
 <dt><font face="helvetica, arial"><a href="SmartBody.html#BmlProcessor">BmlProcessor</a>
-</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#Camera">Camera</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#DoubleVec">DoubleVec</a>
-</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#Event">Event</a>
-</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#EventHandler">EventHandler</a>
-</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#EventManager">EventManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#FloatVec">FloatVec</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#GenericViewer">GenericViewer</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#GestureInfo">GestureInfo</a>
@@ -47,6 +43,9 @@
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBCharacterListener">SBCharacterListener</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBDiphone">SBDiphone</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBDiphoneManager">SBDiphoneManager</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBEvent">SBEvent</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBEventHandler">SBEventHandler</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBEventManager">SBEventManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBFaceDefinition">SBFaceDefinition</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBGestureMap">SBGestureMap</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBGestureMapManager">SBGestureMapManager</a>
@@ -81,7 +80,8 @@
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBPawn">SBPawn</a>
 </font></dt><dd>
 <dl>
-<dt><font face="helvetica, arial"><a href="SmartBody.html#SBCharacter">SBCharacter</a>(<a href="SmartBody.html#SBPawn">SBPawn</a>, <a href="SmartBody.html#SBObject">SBObject</a>)
+<dt><font face="helvetica, arial"><a href="SmartBody.html#Camera">Camera</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBCharacter">SBCharacter</a>(<a href="SmartBody.html#SBPawn">SBPawn</a>, <a href="SmartBody.html#SBObject">SBObject</a>)
 </font></dt></dl>
 </dd>
 <dt><font face="helvetica, arial"><a href="SmartBody.html#SBScene">SBScene</a>
@@ -319,11 +319,13 @@ Data and other attributes inherited from Boost.Python.instance:<br>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="Camera">class <strong>Camera</strong></a>(Boost.Python.instance)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="Camera">class <strong>Camera</strong></a>(<a href="SmartBody.html#SBPawn">SBPawn</a>)</font></td></tr>
     
 <tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="SmartBody.html#Camera">Camera</a></dd>
+<dd><a href="SmartBody.html#SBPawn">SBPawn</a></dd>
+<dd><a href="SmartBody.html#SBObject">SBObject</a></dd>
 <dd>Boost.Python.instance</dd>
 <dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
 </dl>
@@ -403,7 +405,119 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 64</dl>
+<dl><dt><strong>__instance_size__</strong> = 448</dl>
+
+<hr>
+Methods inherited from <a href="SmartBody.html#SBPawn">SBPawn</a>:<br>
+<dl><dt><a name="Camera-getHPR"><strong>getHPR</strong></a>(...)</dt><dd><tt><a href="#Camera-getHPR">getHPR</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;heading,&nbsp;pitch&nbsp;and&nbsp;roll&nbsp;of&nbsp;the&nbsp;character's&nbsp;world&nbsp;offset.</tt></dd></dl>
+
+<dl><dt><a name="Camera-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#Camera-getName">getName</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;pawn..</tt></dd></dl>
+
+<dl><dt><a name="Camera-getOrientation"><strong>getOrientation</strong></a>(...)</dt><dd><tt><a href="#Camera-getOrientation">getOrientation</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SrQuat">SrQuat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;current&nbsp;orientation&nbsp;of&nbsp;the&nbsp;character's&nbsp;world&nbsp;offset.</tt></dd></dl>
+
+<dl><dt><a name="Camera-getPosition"><strong>getPosition</strong></a>(...)</dt><dd><tt><a href="#Camera-getPosition">getPosition</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;current&nbsp;position&nbsp;of&nbsp;the&nbsp;character's&nbsp;world&nbsp;offset.</tt></dd></dl>
+
+<dl><dt><a name="Camera-getSkeleton"><strong>getSkeleton</strong></a>(...)</dt><dd><tt><a href="#Camera-getSkeleton">getSkeleton</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBSkeleton">SBSkeleton</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;skeleton&nbsp;object&nbsp;of&nbsp;the&nbsp;pawn.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setHPR"><strong>setHPR</strong></a>(...)</dt><dd><tt><a href="#Camera-setHPR">setHPR</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1,&nbsp;(<a href="#SrVec">SrVec</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;heading,&nbsp;pitch&nbsp;and&nbsp;roll&nbsp;of&nbsp;the&nbsp;character's&nbsp;world&nbsp;offset.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setHPRSmooth"><strong>setHPRSmooth</strong></a>(...)</dt><dd><tt><a href="#Camera-setHPRSmooth">setHPRSmooth</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1,&nbsp;(<a href="#SrVec">SrVec</a>)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;heading,&nbsp;pitch&nbsp;and&nbsp;roll&nbsp;of&nbsp;the&nbsp;character's&nbsp;world&nbsp;offset.&nbsp;The&nbsp;character&nbsp;will&nbsp;be&nbsp;rotated&nbsp;smoothly&nbsp;overtime&nbsp;to&nbsp;avoid&nbsp;popping.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setName"><strong>setName</strong></a>(...)</dt><dd><tt><a href="#Camera-setName">setName</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;or&nbsp;changes&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;character.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setOrientation"><strong>setOrientation</strong></a>(...)</dt><dd><tt><a href="#Camera-setOrientation">setOrientation</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Set&nbsp;the&nbsp;current&nbsp;orientation&nbsp;of&nbsp;the&nbsp;character's&nbsp;world&nbsp;offset.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setPosition"><strong>setPosition</strong></a>(...)</dt><dd><tt><a href="#Camera-setPosition">setPosition</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1,&nbsp;(<a href="#SrVec">SrVec</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;current&nbsp;position&nbsp;of&nbsp;the&nbsp;character's&nbsp;world&nbsp;offset.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setPositionSmooth"><strong>setPositionSmooth</strong></a>(...)</dt><dd><tt><a href="#Camera-setPositionSmooth">setPositionSmooth</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1,&nbsp;(<a href="#SrVec">SrVec</a>)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;current&nbsp;position&nbsp;of&nbsp;the&nbsp;character's&nbsp;world&nbsp;offset.&nbsp;The&nbsp;character&nbsp;will&nbsp;be&nbsp;translated&nbsp;smoothly&nbsp;overtime&nbsp;to&nbsp;avoid&nbsp;popping.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setSkeleton"><strong>setSkeleton</strong></a>(...)</dt><dd><tt><a href="#Camera-setSkeleton">setSkeleton</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1,&nbsp;(<a href="#SBSkeleton">SBSkeleton</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Attaches&nbsp;the&nbsp;skeleton&nbsp;to&nbsp;the&nbsp;character.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
+<dl><dt><a name="Camera-clearAttributes"><strong>clearAttributes</strong></a>(...)</dt><dd><tt><a href="#Camera-clearAttributes">clearAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Clear&nbsp;all&nbsp;the&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="Camera-createActionAttribute"><strong>createActionAttribute</strong></a>(...)</dt><dd><tt><a href="#Camera-createActionAttribute">createActionAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(bool)arg3,&nbsp;(str)arg4,&nbsp;(int)arg5,&nbsp;(bool)arg6,&nbsp;(bool)arg7,&nbsp;(bool)arg8,&nbsp;(str)arg9)&nbsp;-&gt;&nbsp;<a href="#ActionAttribute">ActionAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;action&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="Camera-createBoolAttribute"><strong>createBoolAttribute</strong></a>(...)</dt><dd><tt><a href="#Camera-createBoolAttribute">createBoolAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(bool)arg3,&nbsp;(bool)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(bool)arg7,&nbsp;(bool)arg8,&nbsp;(bool)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#BoolAttribute">BoolAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;boolean&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="Camera-createDoubleAttribute"><strong>createDoubleAttribute</strong></a>(...)</dt><dd><tt><a href="#Camera-createDoubleAttribute">createDoubleAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(bool)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(bool)arg7,&nbsp;(bool)arg8,&nbsp;(bool)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#DoubleAttribute">DoubleAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;double&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="Camera-createIntAttribute"><strong>createIntAttribute</strong></a>(...)</dt><dd><tt><a href="#Camera-createIntAttribute">createIntAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3,&nbsp;(bool)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(bool)arg7,&nbsp;(bool)arg8,&nbsp;(bool)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#IntAttribute">IntAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;an&nbsp;integer&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="Camera-createStringAttribute"><strong>createStringAttribute</strong></a>(...)</dt><dd><tt><a href="#Camera-createStringAttribute">createStringAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(bool)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(bool)arg7,&nbsp;(bool)arg8,&nbsp;(bool)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#StringAttribute">StringAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;string&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="Camera-createVec3Attribute"><strong>createVec3Attribute</strong></a>(...)</dt><dd><tt><a href="#Camera-createVec3Attribute">createVec3Attribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5,&nbsp;(bool)arg6,&nbsp;(str)arg7,&nbsp;(int)arg8,&nbsp;(bool)arg9,&nbsp;(bool)arg10,&nbsp;(bool)arg11,&nbsp;(str)arg12)&nbsp;-&gt;&nbsp;<a href="#Vec3Attribute">Vec3Attribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;vec3&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="Camera-getAttribute"><strong>getAttribute</strong></a>(...)</dt><dd><tt><a href="#Camera-getAttribute">getAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBAttribute">SBAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;an&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name</tt></dd></dl>
+
+<dl><dt><a name="Camera-getAttributeNames"><strong>getAttributeNames</strong></a>(...)</dt><dd><tt><a href="#Camera-getAttributeNames">getAttributeNames</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="Camera-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#Camera-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#Camera-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setActionAttribute"><strong>setActionAttribute</strong></a>(...)</dt><dd><tt><a href="#Camera-setActionAttribute">setActionAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setBool"><strong>setBool</strong></a>(...)</dt><dd><tt><a href="#Camera-setBool">setBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(bool)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setBoolAttribute"><strong>setBoolAttribute</strong></a>(...)</dt><dd><tt><a href="#Camera-setBoolAttribute">setBoolAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(bool)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setDouble"><strong>setDouble</strong></a>(...)</dt><dd><tt><a href="#Camera-setDouble">setDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setDoubleAttribute"><strong>setDoubleAttribute</strong></a>(...)</dt><dd><tt><a href="#Camera-setDoubleAttribute">setDoubleAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setInt"><strong>setInt</strong></a>(...)</dt><dd><tt><a href="#Camera-setInt">setInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setIntAttribute"><strong>setIntAttribute</strong></a>(...)</dt><dd><tt><a href="#Camera-setIntAttribute">setIntAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setMatrix"><strong>setMatrix</strong></a>(...)</dt><dd><tt><a href="#Camera-setMatrix">setMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrMat">SrMat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setMatrixAttribute"><strong>setMatrixAttribute</strong></a>(...)</dt><dd><tt><a href="#Camera-setMatrixAttribute">setMatrixAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrMat">SrMat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setString"><strong>setString</strong></a>(...)</dt><dd><tt><a href="#Camera-setString">setString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setStringAttribute"><strong>setStringAttribute</strong></a>(...)</dt><dd><tt><a href="#Camera-setStringAttribute">setStringAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setVec3"><strong>setVec3</strong></a>(...)</dt><dd><tt><a href="#Camera-setVec3">setVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;vector&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Camera-setVec3Attribute"><strong>setVec3Attribute</strong></a>(...)</dt><dd><tt><a href="#Camera-setVec3Attribute">setVec3Attribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;vector&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -664,139 +778,6 @@ Data descriptors inherited from Boost.Python.instance:<br>
 <hr>
 Data and other attributes inherited from Boost.Python.instance:<br>
 <dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#DoubleVec-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="Event">class <strong>Event</strong></a>(Boost.Python.instance)</font></td></tr>
-    
-<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="SmartBody.html#Event">Event</a></dd>
-<dd>Boost.Python.instance</dd>
-<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="Event-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#Event-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None<br>
-&nbsp;<br>
-<a href="#Event-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
-
-<dl><dt><a name="Event-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
-
-<dl><dt><a name="Event-getParameters"><strong>getParameters</strong></a>(...)</dt><dd><tt><a href="#Event-getParameters">getParameters</a>(&nbsp;(<a href="#Event">Event</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;event&nbsp;parameters.</tt></dd></dl>
-
-<dl><dt><a name="Event-getType"><strong>getType</strong></a>(...)</dt><dd><tt><a href="#Event-getType">getType</a>(&nbsp;(<a href="#Event">Event</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;event&nbsp;type.</tt></dd></dl>
-
-<dl><dt><a name="Event-setParameters"><strong>setParameters</strong></a>(...)</dt><dd><tt><a href="#Event-setParameters">setParameters</a>(&nbsp;(<a href="#Event">Event</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;event&nbsp;parameters.</tt></dd></dl>
-
-<dl><dt><a name="Event-setType"><strong>setType</strong></a>(...)</dt><dd><tt><a href="#Event-setType">setType</a>(&nbsp;(<a href="#Event">Event</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;event&nbsp;type.</tt></dd></dl>
-
-<hr>
-Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 68</dl>
-
-<hr>
-Data descriptors inherited from Boost.Python.instance:<br>
-<dl><dt><strong>__dict__</strong></dt>
-</dl>
-<dl><dt><strong>__weakref__</strong></dt>
-</dl>
-<hr>
-Data and other attributes inherited from Boost.Python.instance:<br>
-<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#Event-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="EventHandler">class <strong>EventHandler</strong></a>(Boost.Python.instance)</font></td></tr>
-    
-<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="SmartBody.html#EventHandler">EventHandler</a></dd>
-<dd>Boost.Python.instance</dd>
-<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="EventHandler-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#EventHandler-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
-
-<dl><dt><a name="EventHandler-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
-
-<dl><dt><a name="EventHandler-executeAction"><strong>executeAction</strong></a>(...)</dt><dd><tt><a href="#EventHandler-executeAction">executeAction</a>(&nbsp;(<a href="#EventHandler">EventHandler</a>)arg1,&nbsp;(<a href="#Event">Event</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Execute&nbsp;the&nbsp;event&nbsp;handler.<br>
-&nbsp;<br>
-<a href="#EventHandler-executeAction">executeAction</a>(&nbsp;(<a href="#EventHandler">EventHandler</a>)arg1,&nbsp;(<a href="#Event">Event</a>)arg2)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
-
-<hr>
-Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 72</dl>
-
-<hr>
-Data descriptors inherited from Boost.Python.instance:<br>
-<dl><dt><strong>__dict__</strong></dt>
-</dl>
-<dl><dt><strong>__weakref__</strong></dt>
-</dl>
-<hr>
-Data and other attributes inherited from Boost.Python.instance:<br>
-<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#EventHandler-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="EventManager">class <strong>EventManager</strong></a>(Boost.Python.instance)</font></td></tr>
-    
-<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="SmartBody.html#EventManager">EventManager</a></dd>
-<dd>Boost.Python.instance</dd>
-<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="EventManager-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#EventManager-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
-
-<dl><dt><a name="EventManager-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
-
-<dl><dt><a name="EventManager-addEventHandler"><strong>addEventHandler</strong></a>(...)</dt><dd><tt><a href="#EventManager-addEventHandler">addEventHandler</a>(&nbsp;(<a href="#EventManager">EventManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#EventHandler">EventHandler</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;event&nbsp;type.</tt></dd></dl>
-
-<dl><dt><a name="EventManager-createEvent"><strong>createEvent</strong></a>(...)</dt><dd><tt><a href="#EventManager-createEvent">createEvent</a>(&nbsp;(<a href="#EventManager">EventManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;<a href="#Event">Event</a>&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;an&nbsp;event&nbsp;of&nbsp;a&nbsp;given&nbsp;type&nbsp;with&nbsp;given&nbsp;parameters.</tt></dd></dl>
-
-<dl><dt><a name="EventManager-getEventHandler"><strong>getEventHandler</strong></a>(...)</dt><dd><tt><a href="#EventManager-getEventHandler">getEventHandler</a>(&nbsp;(<a href="#EventManager">EventManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#EventHandler">EventHandler</a>&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;number&nbsp;of&nbsp;event&nbsp;handlers.</tt></dd></dl>
-
-<dl><dt><a name="EventManager-getNumHandlers"><strong>getNumHandlers</strong></a>(...)</dt><dd><tt><a href="#EventManager-getNumHandlers">getNumHandlers</a>(&nbsp;(<a href="#EventManager">EventManager</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;number&nbsp;of&nbsp;event&nbsp;handlers.</tt></dd></dl>
-
-<dl><dt><a name="EventManager-handleEvent"><strong>handleEvent</strong></a>(...)</dt><dd><tt><a href="#EventManager-handleEvent">handleEvent</a>(&nbsp;(<a href="#EventManager">EventManager</a>)arg1,&nbsp;(<a href="#Event">Event</a>)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Processes&nbsp;an&nbsp;event&nbsp;by&nbsp;the&nbsp;appropriate&nbsp;event&nbsp;handler.</tt></dd></dl>
-
-<dl><dt><a name="EventManager-removeEventHandler"><strong>removeEventHandler</strong></a>(...)</dt><dd><tt><a href="#EventManager-removeEventHandler">removeEventHandler</a>(&nbsp;(<a href="#EventManager">EventManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;event&nbsp;type.</tt></dd></dl>
-
-<hr>
-Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
-
-<hr>
-Data descriptors inherited from Boost.Python.instance:<br>
-<dl><dt><strong>__dict__</strong></dt>
-</dl>
-<dl><dt><strong>__weakref__</strong></dt>
-</dl>
-<hr>
-Data and other attributes inherited from Boost.Python.instance:<br>
-<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#EventManager-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -3144,7 +3125,11 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBAnimationTransition-setDestinationState"><strong>setDestinationState</strong></a>(...)</dt><dd><tt><a href="#SBAnimationTransition-setDestinationState">setDestinationState</a>(&nbsp;(<a href="#SBAnimationTransition">SBAnimationTransition</a>)arg1,&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg2)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
 
+<dl><dt><a name="SBAnimationTransition-setEaseInEnd"><strong>setEaseInEnd</strong></a>(...)</dt><dd><tt><a href="#SBAnimationTransition-setEaseInEnd">setEaseInEnd</a>(&nbsp;(<a href="#SBAnimationTransition">SBAnimationTransition</a>)arg1,&nbsp;(float)arg2)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
 <dl><dt><a name="SBAnimationTransition-setEaseInInterval"><strong>setEaseInInterval</strong></a>(...)</dt><dd><tt><a href="#SBAnimationTransition-setEaseInInterval">setEaseInInterval</a>(&nbsp;(<a href="#SBAnimationTransition">SBAnimationTransition</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationTransition-setEaseInStart"><strong>setEaseInStart</strong></a>(...)</dt><dd><tt><a href="#SBAnimationTransition-setEaseInStart">setEaseInStart</a>(&nbsp;(<a href="#SBAnimationTransition">SBAnimationTransition</a>)arg1,&nbsp;(float)arg2)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
 
 <dl><dt><a name="SBAnimationTransition-setSourceBlend"><strong>setSourceBlend</strong></a>(...)</dt><dd><tt><a href="#SBAnimationTransition-setSourceBlend">setSourceBlend</a>(&nbsp;(<a href="#SBAnimationTransition">SBAnimationTransition</a>)arg1,&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg2)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
 
@@ -3155,7 +3140,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 136</dl>
+<dl><dt><strong>__instance_size__</strong> = 128</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -3700,9 +3685,6 @@ Methods defined here:<br>
 <dl><dt><a name="SBCharacter-setSoftEyes"><strong>setSoftEyes</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setSoftEyes">setSoftEyes</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(bool)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;soft&nbsp;eyes&nbsp;feature.</tt></dd></dl>
 
-<dl><dt><a name="SBCharacter-setSteerAgent"><strong>setSteerAgent</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setSteerAgent">setSteerAgent</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(<a href="#SBSteerAgent">SBSteerAgent</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Set&nbsp;the&nbsp;steer&nbsp;agent&nbsp;of&nbsp;the&nbsp;character</tt></dd></dl>
-
 <dl><dt><a name="SBCharacter-setUseVisemeCurves"><strong>setUseVisemeCurves</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setUseVisemeCurves">setUseVisemeCurves</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(bool)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Use&nbsp;curves&nbsp;when&nbsp;interpreting&nbsp;visemes.</tt></dd></dl>
 
@@ -3729,7 +3711,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 872</dl>
+<dl><dt><strong>__instance_size__</strong> = 792</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBPawn">SBPawn</a>:<br>
@@ -4266,6 +4248,139 @@ Data descriptors inherited from Boost.Python.instance:<br>
 <hr>
 Data and other attributes inherited from Boost.Python.instance:<br>
 <dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBDiphoneManager-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBEvent">class <strong>SBEvent</strong></a>(Boost.Python.instance)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBEvent">SBEvent</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBEvent-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBEvent-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None<br>
+&nbsp;<br>
+<a href="#SBEvent-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBEvent-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBEvent-getParameters"><strong>getParameters</strong></a>(...)</dt><dd><tt><a href="#SBEvent-getParameters">getParameters</a>(&nbsp;(<a href="#SBEvent">SBEvent</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;event&nbsp;parameters.</tt></dd></dl>
+
+<dl><dt><a name="SBEvent-getType"><strong>getType</strong></a>(...)</dt><dd><tt><a href="#SBEvent-getType">getType</a>(&nbsp;(<a href="#SBEvent">SBEvent</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;event&nbsp;type.</tt></dd></dl>
+
+<dl><dt><a name="SBEvent-setParameters"><strong>setParameters</strong></a>(...)</dt><dd><tt><a href="#SBEvent-setParameters">setParameters</a>(&nbsp;(<a href="#SBEvent">SBEvent</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;event&nbsp;parameters.</tt></dd></dl>
+
+<dl><dt><a name="SBEvent-setType"><strong>setType</strong></a>(...)</dt><dd><tt><a href="#SBEvent-setType">setType</a>(&nbsp;(<a href="#SBEvent">SBEvent</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;event&nbsp;type.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 68</dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBEvent-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBEventHandler">class <strong>SBEventHandler</strong></a>(Boost.Python.instance)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBEventHandler">SBEventHandler</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBEventHandler-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBEventHandler-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBEventHandler-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBEventHandler-executeAction"><strong>executeAction</strong></a>(...)</dt><dd><tt><a href="#SBEventHandler-executeAction">executeAction</a>(&nbsp;(<a href="#SBEventHandler">SBEventHandler</a>)arg1,&nbsp;(<a href="#SBEvent">SBEvent</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Execute&nbsp;the&nbsp;event&nbsp;handler.<br>
+&nbsp;<br>
+<a href="#SBEventHandler-executeAction">executeAction</a>(&nbsp;(<a href="#SBEventHandler">SBEventHandler</a>)arg1,&nbsp;(<a href="#SBEvent">SBEvent</a>)arg2)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 72</dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBEventHandler-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBEventManager">class <strong>SBEventManager</strong></a>(Boost.Python.instance)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBEventManager">SBEventManager</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBEventManager-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBEventManager-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBEventManager-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBEventManager-addEventHandler"><strong>addEventHandler</strong></a>(...)</dt><dd><tt><a href="#SBEventManager-addEventHandler">addEventHandler</a>(&nbsp;(<a href="#SBEventManager">SBEventManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SBEventHandler">SBEventHandler</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;event&nbsp;type.</tt></dd></dl>
+
+<dl><dt><a name="SBEventManager-createEvent"><strong>createEvent</strong></a>(...)</dt><dd><tt><a href="#SBEventManager-createEvent">createEvent</a>(&nbsp;(<a href="#SBEventManager">SBEventManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;<a href="#SBEvent">SBEvent</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;an&nbsp;event&nbsp;of&nbsp;a&nbsp;given&nbsp;type&nbsp;with&nbsp;given&nbsp;parameters.</tt></dd></dl>
+
+<dl><dt><a name="SBEventManager-getEventHandler"><strong>getEventHandler</strong></a>(...)</dt><dd><tt><a href="#SBEventManager-getEventHandler">getEventHandler</a>(&nbsp;(<a href="#SBEventManager">SBEventManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBEventHandler">SBEventHandler</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;number&nbsp;of&nbsp;event&nbsp;handlers.</tt></dd></dl>
+
+<dl><dt><a name="SBEventManager-getNumHandlers"><strong>getNumHandlers</strong></a>(...)</dt><dd><tt><a href="#SBEventManager-getNumHandlers">getNumHandlers</a>(&nbsp;(<a href="#SBEventManager">SBEventManager</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;number&nbsp;of&nbsp;event&nbsp;handlers.</tt></dd></dl>
+
+<dl><dt><a name="SBEventManager-handleEvent"><strong>handleEvent</strong></a>(...)</dt><dd><tt><a href="#SBEventManager-handleEvent">handleEvent</a>(&nbsp;(<a href="#SBEventManager">SBEventManager</a>)arg1,&nbsp;(<a href="#SBEvent">SBEvent</a>)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Processes&nbsp;an&nbsp;event&nbsp;by&nbsp;the&nbsp;appropriate&nbsp;event&nbsp;handler.</tt></dd></dl>
+
+<dl><dt><a name="SBEventManager-removeEventHandler"><strong>removeEventHandler</strong></a>(...)</dt><dd><tt><a href="#SBEventManager-removeEventHandler">removeEventHandler</a>(&nbsp;(<a href="#SBEventManager">SBEventManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;event&nbsp;type.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 24</dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBEventManager-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -5894,6 +6009,9 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-commandAt"><strong>commandAt</strong></a>(...)</dt><dd><tt><a href="#SBScene-commandAt">commandAt</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(float)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Runs&nbsp;an&nbsp;old-style&nbsp;SmartBody&nbsp;command&nbsp;at&nbsp;a&nbsp;set&nbsp;time&nbsp;in&nbsp;the&nbsp;future.</tt></dd></dl>
 
+<dl><dt><a name="SBScene-createCamera"><strong>createCamera</strong></a>(...)</dt><dd><tt><a href="#SBScene-createCamera">createCamera</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#Camera">Camera</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;camera&nbsp;with&nbsp;a&nbsp;given&nbsp;name&nbsp;and&nbsp;returns&nbsp;it.</tt></dd></dl>
+
 <dl><dt><a name="SBScene-createCharacter"><strong>createCharacter</strong></a>(...)</dt><dd><tt><a href="#SBScene-createCharacter">createCharacter</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;<a href="#SBCharacter">SBCharacter</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;new&nbsp;character&nbsp;given&nbsp;character&nbsp;name.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;character&nbsp;name&nbsp;<br>
@@ -5908,8 +6026,11 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-createSkeleton"><strong>createSkeleton</strong></a>(...)</dt><dd><tt><a href="#SBScene-createSkeleton">createSkeleton</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBSkeleton">SBSkeleton</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;new&nbsp;skeleton&nbsp;given&nbsp;a&nbsp;skeleton&nbsp;definition.</tt></dd></dl>
 
-<dl><dt><a name="SBScene-exportScene"><strong>exportScene</strong></a>(...)</dt><dd><tt><a href="#SBScene-exportScene">exportScene</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+<dl><dt><a name="SBScene-exportScene"><strong>exportScene</strong></a>(...)</dt><dd><tt><a href="#SBScene-exportScene">exportScene</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(<a href="#StringVec">StringVec</a>)arg2,&nbsp;(bool)arg3)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;entire&nbsp;SmartBody&nbsp;configuration,&nbsp;including&nbsp;assets,&nbsp;into&nbsp;a&nbsp;given&nbsp;file&nbsp;location.</tt></dd></dl>
+
+<dl><dt><a name="SBScene-getActiveCamera"><strong>getActiveCamera</strong></a>(...)</dt><dd><tt><a href="#SBScene-getActiveCamera">getActiveCamera</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#Camera">Camera</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;camera&nbsp;currently&nbsp;being&nbsp;used&nbsp;in&nbsp;the&nbsp;viewer.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getAssetPaths"><strong>getAssetPaths</strong></a>(...)</dt><dd><tt><a href="#SBScene-getAssetPaths">getAssetPaths</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;path&nbsp;names&nbsp;for&nbsp;a&nbsp;given&nbsp;type:&nbsp;seq,&nbsp;me,&nbsp;audio,&nbsp;mesh.</tt></dd></dl>
@@ -5925,6 +6046,12 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBScene-getBoneBusManager"><strong>getBoneBusManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getBoneBusManager">getBoneBusManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBBoneBusManager">SBBoneBusManager</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;Bone&nbsp;Bus&nbsp;manager&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBScene-getCamera"><strong>getCamera</strong></a>(...)</dt><dd><tt><a href="#SBScene-getCamera">getCamera</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#Camera">Camera</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;a&nbsp;camera&nbsp;by&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBScene-getCameraNames"><strong>getCameraNames</strong></a>(...)</dt><dd><tt><a href="#SBScene-getCameraNames">getCameraNames</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;names&nbsp;of&nbsp;all&nbsp;the&nbsp;cameras&nbsp;available.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getCharacter"><strong>getCharacter</strong></a>(...)</dt><dd><tt><a href="#SBScene-getCharacter">getCharacter</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBCharacter">SBCharacter</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;character&nbsp;object&nbsp;given&nbsp;its&nbsp;name.&nbsp;<br>
@@ -5950,7 +6077,7 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;NULL&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;list&nbsp;of&nbsp;event&nbsp;handler&nbsp;names</tt></dd></dl>
 
-<dl><dt><a name="SBScene-getEventManager"><strong>getEventManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getEventManager">getEventManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#EventManager">EventManager</a>&nbsp;:<br>
+<dl><dt><a name="SBScene-getEventManager"><strong>getEventManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getEventManager">getEventManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBEventManager">SBEventManager</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;event&nbsp;manager.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getFaceDefinition"><strong>getFaceDefinition</strong></a>(...)</dt><dd><tt><a href="#SBScene-getFaceDefinition">getFaceDefinition</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBFaceDefinition">SBFaceDefinition</a>&nbsp;:<br>
@@ -5978,6 +6105,9 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBScene-getMotionNames"><strong>getMotionNames</strong></a>(...)</dt><dd><tt><a href="#SBScene-getMotionNames">getMotionNames</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;names&nbsp;of&nbsp;motions&nbsp;available.</tt></dd></dl>
+
+<dl><dt><a name="SBScene-getNumCameras"><strong>getNumCameras</strong></a>(...)</dt><dd><tt><a href="#SBScene-getNumCameras">getNumCameras</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;cameras&nbsp;available.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getNumCharacters"><strong>getNumCharacters</strong></a>(...)</dt><dd><tt><a href="#SBScene-getNumCharacters">getNumCharacters</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;characters.<br>
@@ -6057,6 +6187,12 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-getSteerManager"><strong>getSteerManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getSteerManager">getSteerManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBSteerManager">SBSteerManager</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;steer&nbsp;manager&nbsp;object.</tt></dd></dl>
 
+<dl><dt><a name="SBScene-getSystemParameter"><strong>getSystemParameter</strong></a>(...)</dt><dd><tt><a href="#SBScene-getSystemParameter">getSystemParameter</a>(&nbsp;(str)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;a&nbsp;value&nbsp;for&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBScene-getSystemParameterNames"><strong>getSystemParameterNames</strong></a>(...)</dt><dd><tt><a href="#SBScene-getSystemParameterNames">getSystemParameterNames</a>()&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;names&nbsp;of&nbsp;all&nbsp;system&nbsp;parameters.</tt></dd></dl>
+
 <dl><dt><a name="SBScene-isRemoteMode"><strong>isRemoteMode</strong></a>(...)</dt><dd><tt><a href="#SBScene-isRemoteMode">isRemoteMode</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;boolean&nbsp;indicating&nbsp;whether&nbsp;scene&nbsp;is&nbsp;in&nbsp;remote&nbsp;mode.</tt></dd></dl>
 
@@ -6077,10 +6213,16 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-removeAllPawns"><strong>removeAllPawns</strong></a>(...)</dt><dd><tt><a href="#SBScene-removeAllPawns">removeAllPawns</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;all&nbsp;the&nbsp;pawns.</tt></dd></dl>
 
+<dl><dt><a name="SBScene-removeAllSystemParameters"><strong>removeAllSystemParameters</strong></a>(...)</dt><dd><tt><a href="#SBScene-removeAllSystemParameters">removeAllSystemParameters</a>(&nbsp;(str)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;a&nbsp;system&nbsp;parameter.</tt></dd></dl>
+
 <dl><dt><a name="SBScene-removeAssetPath"><strong>removeAssetPath</strong></a>(...)</dt><dd><tt><a href="#SBScene-removeAssetPath">removeAssetPath</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;a&nbsp;&nbsp;path&nbsp;resource&nbsp;given&nbsp;path&nbsp;type&nbsp;and&nbsp;actual&nbsp;path&nbsp;string.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;type(can&nbsp;be&nbsp;cript|motion|audio),&nbsp;path&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;NULL</tt></dd></dl>
+
+<dl><dt><a name="SBScene-removeCamera"><strong>removeCamera</strong></a>(...)</dt><dd><tt><a href="#SBScene-removeCamera">removeCamera</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(<a href="#Camera">Camera</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;a&nbsp;camera.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-removeCharacter"><strong>removeCharacter</strong></a>(...)</dt><dd><tt><a href="#SBScene-removeCharacter">removeCharacter</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Remove&nbsp;the&nbsp;character&nbsp;given&nbsp;its&nbsp;name.&nbsp;<br>
@@ -6098,11 +6240,17 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-removeScript"><strong>removeScript</strong></a>(...)</dt><dd><tt><a href="#SBScene-removeScript">removeScript</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;scripts.</tt></dd></dl>
 
+<dl><dt><a name="SBScene-removeSystemParameter"><strong>removeSystemParameter</strong></a>(...)</dt><dd><tt><a href="#SBScene-removeSystemParameter">removeSystemParameter</a>(&nbsp;(str)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;a&nbsp;system&nbsp;parameter.</tt></dd></dl>
+
 <dl><dt><a name="SBScene-run"><strong>run</strong></a>(...)</dt><dd><tt><a href="#SBScene-run">run</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Runs&nbsp;a&nbsp;python&nbsp;script.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-save"><strong>save</strong></a>(...)</dt><dd><tt><a href="#SBScene-save">save</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(bool)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;SmartBody&nbsp;configuration.&nbsp;Returns&nbsp;a&nbsp;string&nbsp;containing&nbsp;Python&nbsp;commands&nbsp;representing&nbsp;the&nbsp;configuration.</tt></dd></dl>
+
+<dl><dt><a name="SBScene-setActiveCamera"><strong>setActiveCamera</strong></a>(...)</dt><dd><tt><a href="#SBScene-setActiveCamera">setActiveCamera</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(<a href="#Camera">Camera</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;camera&nbsp;to&nbsp;be&nbsp;used&nbsp;in&nbsp;the&nbsp;viewer.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-setCharacterListener"><strong>setCharacterListener</strong></a>(...)</dt><dd><tt><a href="#SBScene-setCharacterListener">setCharacterListener</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(<a href="#SBCharacterListener">SBCharacterListener</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;listener&nbsp;for&nbsp;character&nbsp;and&nbsp;pawn&nbsp;events.</tt></dd></dl>
@@ -6125,6 +6273,9 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-setScale"><strong>setScale</strong></a>(...)</dt><dd><tt><a href="#SBScene-setScale">setScale</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(float)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;scene&nbsp;scale&nbsp;in&nbsp;meters.</tt></dd></dl>
 
+<dl><dt><a name="SBScene-setSystemParameter"><strong>setSystemParameter</strong></a>(...)</dt><dd><tt><a href="#SBScene-setSystemParameter">setSystemParameter</a>(&nbsp;(str)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;name/value&nbsp;pair&nbsp;that&nbsp;persists&nbsp;between&nbsp;scene&nbsp;sessions.</tt></dd></dl>
+
 <dl><dt><a name="SBScene-vhmsg"><strong>vhmsg</strong></a>(...)</dt><dd><tt><a href="#SBScene-vhmsg">vhmsg</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sends&nbsp;a&nbsp;virtual&nbsp;human&nbsp;message.</tt></dd></dl>
 
@@ -6133,7 +6284,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 224</dl>
+<dl><dt><strong>__instance_size__</strong> = 240</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -6611,7 +6762,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 352</dl>
+<dl><dt><strong>__instance_size__</strong> = 324</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -6715,7 +6866,7 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBSteerAgent-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
 
-<dl><dt><a name="SBSteerAgent-getCurrentSBCharacter"><strong>getCurrentSBCharacter</strong></a>(...)</dt><dd><tt><a href="#SBSteerAgent-getCurrentSBCharacter">getCurrentSBCharacter</a>(&nbsp;(<a href="#SBSteerAgent">SBSteerAgent</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBCharacter">SBCharacter</a>&nbsp;:<br>
+<dl><dt><a name="SBSteerAgent-getCharacter"><strong>getCharacter</strong></a>(...)</dt><dd><tt><a href="#SBSteerAgent-getCharacter">getCharacter</a>(&nbsp;(<a href="#SBSteerAgent">SBSteerAgent</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBCharacter">SBCharacter</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Return&nbsp;<a href="#SBCharacter">SBCharacter</a>&nbsp;that&nbsp;<a href="#SBSteerAgent">SBSteerAgent</a>&nbsp;is&nbsp;attached&nbsp;to.</tt></dd></dl>
 
 <dl><dt><a name="SBSteerAgent-getSteerStateNamePrefix"><strong>getSteerStateNamePrefix</strong></a>(...)</dt><dd><tt><a href="#SBSteerAgent-getSteerStateNamePrefix">getSteerStateNamePrefix</a>(&nbsp;(<a href="#SBSteerAgent">SBSteerAgent</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
@@ -6732,7 +6883,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 668</dl>
+<dl><dt><strong>__instance_size__</strong> = 72</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -6787,7 +6938,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 320</dl>
+<dl><dt><strong>__instance_size__</strong> = 176</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBService">SBService</a>:<br>
