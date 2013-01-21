@@ -1121,6 +1121,9 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 					iter != mcu_p->getPawnMap().end();
 					iter++)
 				{
+					bool visible = (*iter).second->getBoolAttribute("visible");
+						if (!visible)
+							continue;
 					SrBox box = (*iter).second->getSkeleton()->getBoundingBox();
 					sceneBox.extend(box);
 				}
@@ -5224,7 +5227,7 @@ int stopheapprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 // receiver echo <content>
 // receiver enable
 // receiver skeleton <skeletonName> <emitterType> position <joint-index/joint-name> <x> <y> <z>	
-// receiver skeleton <skeletonName> <emitterType> positions <x1> <y1> <z1> <x2> <y2> <z2> ...							20 Joints in total if emitterType == "kinect"
+// receiver skeleton <skeletonName> <emitterType> positions <x1> <y1> <z1> <x2> <y2> <z2> ...							24 Joints in total if emitterType == "kinect"
 // receiver skeleton <skeletonName> <emitterType> rotation <joint-index/joint-name> <q.w> <q.x> <q.y> <q.z>
 // receiver skeleton <skeletonName> <emitterType> rotations <q1.w> <q1.x> <q1.y> <q1.z> <q2.w> <q2.x> <q2.y> <q2.z>...	20 Joints in total if emitterType == "kinect"
 // 
@@ -5239,9 +5242,10 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 	{
 		std::string skelName = args.read_token();
 		std::string emitterName = args.read_token();
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		float scale = 1.0f;
 		if (emitterName == "kinect")
-			scale = 0.1f;
+			scale = .1f;
 
 		std::string skeletonType = args.read_token();
 		if (skeletonType == "position")
@@ -5331,19 +5335,20 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			if (emitterName == "kinect")
 			{
 				int numRemainTokens = args.calc_num_tokens();
-				if (numRemainTokens < 80)
+				if (numRemainTokens < 96)
 				{
 					LOG("Kinect skeleton %s rotation data is not valid.", skelName.c_str());
 					return CMD_FAILURE;
 				}
 				std::vector<SrQuat> quats;
-				for (int i = 0; i < 20; i++)
+				for (int i = 0; i < 24; i++)
 				{
 					SrQuat quat;
 					quat.w = args.read_float();
 					quat.x = args.read_float();
 					quat.y = args.read_float();
 					quat.z = args.read_float();
+					quat.normalize();
 					quats.push_back(quat);
 				}
 				KinectProcessor::processGlobalRotation(quats);
@@ -5351,10 +5356,14 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 				SbmCharacter* character = mcu->getCharacter(skelName);	
 				if (character)
 				{
-					for (int i = 0; i < 20; i++)
+					for (int i = 0; i < 24; i++)
 					{
 						if (quats[i].w != 0)
-							character->datareceiver_ct->setLocalRotation(mcu->kinectProcessor->getSBJointName(i), quats[i]);
+						{
+							const std::string& mappedJointName = mcu->kinectProcessor->getSBJointName(i);
+							if (mappedJointName != "")
+								character->datareceiver_ct->setLocalRotation(mappedJointName, quats[i]);
+						}
 					}
 				}
 			}

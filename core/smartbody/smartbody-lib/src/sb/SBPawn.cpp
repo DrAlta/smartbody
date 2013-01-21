@@ -322,6 +322,16 @@ void SBPawn::notify(SBSubject* subject)
 				}
 			}
 		}
+		else if (attribute->getName() == "visible")
+		{
+			if (!this->scene_p)
+				return;
+			SmartBody::BoolAttribute* visibleAttr = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			if (visibleAttr->getValue())
+				this->scene_p->visible(true);
+			else
+				this->scene_p->visible(false);
+		}
 	}
 }
 
