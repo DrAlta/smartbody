@@ -22,7 +22,7 @@ MeCtDataReceiver::~MeCtDataReceiver()
 	_quatMap.clear();
 }
 
-void MeCtDataReceiver::setGlobalPosition(std::string jName, SrVec& pos)
+void MeCtDataReceiver::setGlobalPosition(const std::string& jName, SrVec& pos)
 {
 	std::map<std::string, SrVec>::iterator iter = _posMap.find(jName);
 	if (iter == _posMap.end())
@@ -35,7 +35,7 @@ void MeCtDataReceiver::setGlobalPosition(std::string jName, SrVec& pos)
 }
 
 
-void MeCtDataReceiver::setLocalPosition(std::string jName, SrVec& pos)
+void MeCtDataReceiver::setLocalPosition(const std::string& jName, SrVec& pos)
 {
 	std::map<std::string, SrVec>::iterator iter = _localPosMap.find(jName);
 	if (iter == _localPosMap.end())
@@ -46,7 +46,7 @@ void MeCtDataReceiver::setLocalPosition(std::string jName, SrVec& pos)
 		iter->second = pos;
 }
 
-void MeCtDataReceiver::setLocalRotation(std::string jName, SrQuat& q)
+void MeCtDataReceiver::setLocalRotation(const std::string& jName, SrQuat& q)
 {
 	std::map<std::string, SrQuat>::iterator iter = _quatMap.find(jName);
 	if (iter == _quatMap.end())
@@ -55,14 +55,14 @@ void MeCtDataReceiver::setLocalRotation(std::string jName, SrQuat& q)
 		iter->second = q;
 }
 
-void MeCtDataReceiver::removeLocalRotation(std::string jName)
+void MeCtDataReceiver::removeLocalRotation(const std::string& jName)
 {
 	std::map<std::string, SrQuat>::iterator iter = _quatMap.find(jName);
 	if (iter != _quatMap.end())
 		_quatMap.erase(iter);
 }
 
-void MeCtDataReceiver::removeLocalPosition(std::string jName)
+void MeCtDataReceiver::removeLocalPosition(const std::string& jName)
 {
 	std::map<std::string, SrVec>::iterator iter = _localPosMap.find(jName);
 	if (iter != _localPosMap.end())

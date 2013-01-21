@@ -31,6 +31,11 @@ void TransparentListener::OnCharacterCreate( const std::string & name, const std
 	character->scene_p = new SkScene();
 	character->scene_p->ref();
 	character->scene_p->init(character->getSkeleton());
+	bool visible = character->getBoolAttribute("visible");
+	if (visible)
+		character->scene_p->visible(true);
+	else
+		character->scene_p->visible(false);
 	mcu.add_scene(character->scene_p);
 
 
@@ -145,6 +150,11 @@ void TransparentListener::OnPawnCreate( const std::string & name )
 	pawn->scene_p = new SkScene();
 	pawn->scene_p->ref();
 	pawn->scene_p->init(pawn->getSkeleton());
+	bool visible = pawn->getBoolAttribute("visible");
+	if (visible)
+		pawn->scene_p->visible(true);
+	else
+		pawn->scene_p->visible(false);
 	mcu.add_scene(pawn->scene_p);
 }
 

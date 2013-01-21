@@ -2584,6 +2584,9 @@ int FltkViewer::handle ( int event )
 					iter++)
 					{
 						SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(*iter);
+						bool visible = pawn->getBoolAttribute("visible");
+						if (!visible)
+							continue;
 						SrBox box = pawn->getSkeleton()->getBoundingBox();
 						sceneBox.extend(box);
 					}
@@ -3527,6 +3530,7 @@ void FltkViewer::drawPawns()
 
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
 	// determine the size of the pawns relative to the size of the characters
 	float pawnSize = 1.0;
@@ -3539,7 +3543,7 @@ void FltkViewer::drawPawns()
 		break;
 	}
 
-	SrCamera* currentCamera = SmartBody::SBScene::getScene()->getActiveCamera();
+	SrCamera* currentCamera = scene->getActiveCamera();
 
 	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
 		iter != mcu.getPawnMap().end();
@@ -3547,8 +3551,14 @@ void FltkViewer::drawPawns()
 	{
 		SbmPawn* pawn = (*iter).second;
 		SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
-		if (camera && camera == currentCamera) // don't draw the current active camera
-			continue;
+		if (camera)
+		{ 
+			if ((scene->getNumCameras() == 1) ||
+			    (camera == currentCamera)) // don't draw the current active camera
+			 continue;
+		}
+		
+			
 		if (!pawn->getSkeleton()) 
 			continue;
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
