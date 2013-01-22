@@ -244,7 +244,6 @@
     <ClCompile Include="..\src\controllers\MotionAnalysis.cpp" />
     <ClCompile Include="..\src\external\perlin\perlin.cpp" />
     <ClCompile Include="..\src\sbm\action_unit.cpp" />
-    <ClCompile Include="..\src\sbm\DefaultAttributeTable.cpp" />
     <ClCompile Include="..\src\sbm\GenericViewer.cpp" />
     <ClCompile Include="..\src\sbm\gwiz_cmdl.cpp" />
     <ClCompile Include="..\src\sbm\gwiz_math.cpp" />
@@ -268,6 +267,7 @@
     <ClCompile Include="..\src\sbm\ResourceManager.cpp" />
     <ClCompile Include="..\src\sbm\sbm_speech_impl_skeleton.cpp" />
     <ClCompile Include="..\src\sbm\PPRAISteeringAgent.cpp" />
+    <ClCompile Include="..\src\sb\DefaultAttributeTable.cpp" />
     <ClCompile Include="..\src\sb\MiniBrain.cpp" />
     <ClCompile Include="..\src\sb\nvbg.cpp" />
     <ClCompile Include="..\src\sb\SBAnimationTransitionRule.cpp" />
@@ -689,7 +689,6 @@
     <ClInclude Include="..\src\controllers\MotionAnalysis.h" />
     <ClInclude Include="..\src\external\perlin\perlin.h" />
     <ClInclude Include="..\src\sbm\action_unit.hpp" />
-    <ClInclude Include="..\src\sbm\DefaultAttributeTable.h" />
     <ClInclude Include="..\src\sbm\general_param_setting.h" />
     <ClInclude Include="..\src\sbm\GenericViewer.h" />
     <ClInclude Include="..\src\sbm\gwiz_cmdl.h" />
@@ -701,7 +700,6 @@
     <ClInclude Include="..\src\sbm\mcontrol_callbacks.h" />
     <ClInclude Include="..\src\sbm\mcontrol_util.h" />
     <ClInclude Include="..\src\sbm\MiscCommands.h" />
-    <ClInclude Include="..\src\sbm\NetRequest.h" />
     <ClInclude Include="..\src\sbm\ODEPhysicsSim.h" />
     <ClInclude Include="..\src\sbm\ParserASFAMC.h" />
     <ClInclude Include="..\src\sbm\ParserBVH.h" />
@@ -720,7 +718,9 @@
     <ClInclude Include="..\src\sbm\sbm_speech_impl_skeleton.hpp" />
     <ClInclude Include="..\src\sbm\sbm_test_cmds.hpp" />
     <ClInclude Include="..\src\sbm\PPRAISteeringAgent.h" />
+    <ClInclude Include="..\src\sb\DefaultAttributeTable.h" />
     <ClInclude Include="..\src\sb\MiniBrain.h" />
+    <ClInclude Include="..\src\sb\NetRequest.h" />
     <ClInclude Include="..\src\sb\nvbg.h" />
     <ClInclude Include="..\src\sb\SBAnimationTransitionRule.h" />
     <ClInclude Include="..\src\sb\SBBoneBusManager.h" />

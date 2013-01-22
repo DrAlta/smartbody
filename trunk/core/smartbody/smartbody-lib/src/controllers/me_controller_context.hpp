@@ -35,12 +35,11 @@
 
 
 // Predeclare class because of circular reference:
+class MeController;
 class MeControllerContext;
 class MeFrameData;
 
-#include <controllers/me_controller.h>
-#include <controllers/me_evaluation_logger.hpp>
-
+class MeEvaluationLogger;
 
 
 

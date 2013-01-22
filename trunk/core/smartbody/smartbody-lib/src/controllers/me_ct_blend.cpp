@@ -32,6 +32,8 @@
 #include <set>
 
 #include <controllers/me_controller_context_proxy.hpp>
+#include <controllers/me_controller_context_proxy.hpp>
+#include <controllers/me_evaluation_logger.hpp>
 
 
 using namespace std;

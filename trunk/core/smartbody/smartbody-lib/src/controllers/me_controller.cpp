@@ -30,6 +30,7 @@
 #include <sr/sr_quat.h>
 #include <sr/sr_euler.h>
 #include <controllers/me_prune_policy.hpp>
+#include <controllers/me_default_prune_policy.hpp>
 #include <sbm/ResourceManager.h>
 #include <vhcl_log.h>
 #include <controllers/me_controller_tree_root.hpp>
