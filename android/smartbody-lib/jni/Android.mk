@@ -435,7 +435,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBObject.cpp \
 	$(SBM_MY_DIR)/sb/SBObserver.cpp \
 	$(SBM_MY_DIR)/sb/SBSubject.cpp \
-	$(SBM_MY_DIR)/sbm/DefaultAttributeTable.cpp \
+	$(SBM_MY_DIR)/sb/DefaultAttributeTable.cpp \
 	$(SBM_MY_DIR)/sb/SBScene.cpp \
 	$(SBM_MY_DIR)/sbm/KinectProcessor.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_data_receiver.cpp \

@@ -1,7 +1,7 @@
 #include "vhcl.h"
 #include "vhcl_socket.h"
 
-#include "sbm/NetRequest.h"
+#include "sb/NetRequest.h"
 #include "SBDebuggerUtility.h"
 #include "SBDebuggerClient.h"
 

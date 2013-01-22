@@ -328,7 +328,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBObject.cpp
 	sb/SBObserver.cpp
 	sb/SBSubject.cpp
-	sbm/DefaultAttributeTable.cpp
+	sb/DefaultAttributeTable.cpp
 
 	sb/SBScene.cpp
 	sbm/KinectProcessor.cpp

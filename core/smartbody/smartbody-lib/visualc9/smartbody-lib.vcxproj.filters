@@ -616,9 +616,6 @@
     <ClCompile Include="..\src\sbm\action_unit.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\DefaultAttributeTable.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\GenericViewer.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
@@ -986,6 +983,9 @@
       <Filter>sb</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sb\SBEvent.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\DefaultAttributeTable.cpp">
       <Filter>sb</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1623,9 +1623,6 @@
     <ClInclude Include="..\src\sbm\action_unit.hpp">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\DefaultAttributeTable.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\general_param_setting.h">
       <Filter>sbm</Filter>
     </ClInclude>
@@ -1733,9 +1730,6 @@
     </ClInclude>
     <ClInclude Include="..\src\sb\SBPhonemeManager.h">
       <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\NetRequest.h">
-      <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sb\SBMotionBlendBase.h">
       <Filter>sb</Filter>
@@ -2017,6 +2011,12 @@
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sb\SBEvent.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\NetRequest.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\DefaultAttributeTable.h">
       <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>

@@ -38,15 +38,16 @@
 #include <sk/sk_skeleton.h>
 #include <sb/SBObject.h>
 #include <sb/SBAttribute.h>
-#include <sbm/DefaultAttributeTable.h>
+#include <sb/DefaultAttributeTable.h>
+#include <controllers/me_controller_context.hpp>
 
 
 // Predeclare class because of circular reference:
 class MeController;
 class SbmPawn;
+class MeControllerContext;
+class MePrunePolicy;
 
-#include <controllers/me_controller_context.hpp>
-#include <controllers/me_default_prune_policy.hpp>
 
 
 #define VALIDATE_BLEND_CHANNEL_REMAP (0)  // See MeCtBlend::controller_evaluate(..)
