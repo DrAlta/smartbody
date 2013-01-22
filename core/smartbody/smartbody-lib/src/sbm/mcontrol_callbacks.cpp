@@ -5241,8 +5241,27 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 	if (operation == "skeleton")
 	{
 		std::string skelName = args.read_token();
-		std::string emitterName = args.read_token();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		std::vector<std::string> characterNames = scene->getCharacterNames();
+		std::vector<SmartBody::SBCharacter*> controlledCharacters;
+		for (std::vector<std::string>::iterator iter = characterNames.begin();
+				iter != characterNames.end();
+				iter++)
+		{
+			SmartBody::SBCharacter* character = scene->getCharacter((*iter));
+			std::string receiverName = character->getStringAttribute("receiverName");
+			if (receiverName == skelName)
+			{
+				controlledCharacters.push_back(character);
+			}
+		}
+
+		if (controlledCharacters.size() == 0)
+			return CMD_SUCCESS;
+
+
+		std::string emitterName = args.read_token();
+		
 		float scale = 1.0f;
 		if (emitterName == "kinect")
 			scale = .1f;
@@ -5258,32 +5277,20 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			float x = args.read_float() * scale;
 			float y = args.read_float() * scale;
 			float z = args.read_float() * scale;
-			SbmCharacter* character = mcu->getCharacter(skelName);
-			if (!character)
+
+			for (std::vector<SmartBody::SBCharacter*>::iterator iter = controlledCharacters.begin();
+				 iter != controlledCharacters.end();
+				 iter++)
 			{
-				std::map<std::string, SbmCharacter*>& characterMap = mcu->getCharacterMap();
-				for (std::map<std::string, SbmCharacter*>::iterator iter = characterMap.begin();
-					iter != characterMap.end();
-					iter++)
-				{
-					SbmCharacter* ch = (*iter).second;
-					std::string mappedName = ch->getStringAttribute("receiverName");
-					if (mappedName == skelName)
-					{
-						character = ch;
-						break;
-					}
-				}
+				SmartBody::SBCharacter* character = (*iter);
+				SrVec vec(x, y, z);
+				if (emitterName == "kinect")
+					character->datareceiver_ct->setGlobalPosition(jName, vec);
+				else
+					character->datareceiver_ct->setLocalPosition(jName, vec);
 			}
-			if (!character)
-			{
-				return CMD_SUCCESS;
-			}
-			SrVec vec(x, y, z);
-			if (emitterName == "kinect")
-				character->datareceiver_ct->setGlobalPosition(jName, vec);
-			else
-				character->datareceiver_ct->setLocalPosition(jName, vec);
+			
+			
 		}
 		else if (skeletonType == "positions")
 		{
@@ -5302,9 +5309,13 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			quat.x = args.read_float();
 			quat.y = args.read_float();
 			quat.z = args.read_float();
-			SbmCharacter* character = mcu->getCharacter(skelName);	
-			if (character)
+			for (std::vector<SmartBody::SBCharacter*>::iterator iter = controlledCharacters.begin();
+				 iter != controlledCharacters.end();
+				 iter++)
+			{
+				SmartBody::SBCharacter* character = (*iter);
 				character->datareceiver_ct->setLocalRotation(jName, quat);
+			}
 		}
 		else if (skeletonType == "norotation")
 		{
@@ -5314,9 +5325,13 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			else
 				jName = args.read_token();
 
-			SbmCharacter* character = mcu->getCharacter(skelName);
-			if (character)
+			for (std::vector<SmartBody::SBCharacter*>::iterator iter = controlledCharacters.begin();
+				 iter != controlledCharacters.end();
+				 iter++)
+			{
+				SmartBody::SBCharacter* character = (*iter);
 				character->datareceiver_ct->removeLocalRotation(jName);
+			}
 		}
 		else if (skeletonType == "noposition")
 		{
@@ -5326,9 +5341,13 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			else
 				jName = args.read_token();
 
-			SbmCharacter* character = mcu->getCharacter(skelName);
-			if (character)
+			for (std::vector<SmartBody::SBCharacter*>::iterator iter = controlledCharacters.begin();
+				 iter != controlledCharacters.end();
+				 iter++)
+			{
+				SmartBody::SBCharacter* character = (*iter);
 				character->datareceiver_ct->removeLocalPosition(jName);
+			}
 		}
 		else if (skeletonType == "rotations")
 		{
@@ -5353,9 +5372,12 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 				}
 				KinectProcessor::processGlobalRotation(quats);
 	//			mcu->kinectProcessor->filterRotation(quats);
-				SbmCharacter* character = mcu->getCharacter(skelName);	
-				if (character)
+				for (std::vector<SmartBody::SBCharacter*>::iterator iter = controlledCharacters.begin();
+				 iter != controlledCharacters.end();
+				 iter++)
 				{
+					SmartBody::SBCharacter* character = (*iter);
+				
 					for (int i = 0; i < 24; i++)
 					{
 						if (quats[i].w != 0)
