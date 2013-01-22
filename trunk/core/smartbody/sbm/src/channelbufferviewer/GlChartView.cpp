@@ -94,6 +94,12 @@ void GlChartView::initGL(int width, int height)
 
 void GlChartView::initFont()
 {
+	GLint src;
+	glGetIntegerv(GL_BLEND_SRC, &src);
+	GLint dest;
+	glGetIntegerv(GL_BLEND_DST, &dest);
+
+	glPushAttrib(GL_ENABLE_BIT);
 	GLuint textureName;	
 	glEnable(GL_TEXTURE_2D);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -108,6 +114,8 @@ void GlChartView::initFont()
 			LOG("GlChartViewCoordinate::InitFont(): Error: Cannot load font file\n");
 	}
 #endif
+	glPopAttrib();
+	glBlendFunc(src, dest);
 }
 
 void GlChartView::init_camera(int type)
@@ -181,9 +189,13 @@ void GlChartView::draw()
 
 	glScalef ( camera.getScale(), camera.getScale(), camera.getScale() );
 
+	glPushAttrib(GL_ENABLE_BIT);
 	glEnable ( GL_LIGHTING );
 	glLight ( 0, light1 );
 	glLight ( 1, light2 );
+
+	glEnable(GL_TEXTURE_2D);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	static GLfloat mat_emissin[] = { 0.0,  0.0,    0.0,    1.0 };
 	static GLfloat mat_ambient[] = { 0.0,  0.0,    0.0,    1.0 };
@@ -200,6 +212,10 @@ void GlChartView::draw()
 
 	draw_coordinate();
 	draw_series();
+	
+	glDisable(GL_TEXTURE_2D);
+	glPopAttrib();
+	
 }
 
 void GlChartView::draw_coordinate()
