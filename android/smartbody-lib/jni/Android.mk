@@ -381,7 +381,6 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_player.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_timewarp.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_param_animation.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_param_animation_data.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_param_animation_utilities.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_quick_draw.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_hand.cpp \
@@ -436,6 +435,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBObserver.cpp \
 	$(SBM_MY_DIR)/sb/SBSubject.cpp \
 	$(SBM_MY_DIR)/sb/DefaultAttributeTable.cpp \
+	$(SBM_MY_DIR)/sb/PABlend.cpp \
 	$(SBM_MY_DIR)/sb/SBScene.cpp \
 	$(SBM_MY_DIR)/sbm/KinectProcessor.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_data_receiver.cpp \

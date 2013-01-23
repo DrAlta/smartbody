@@ -3,7 +3,7 @@
 
 #include <sb/SBTypes.h>
 #include <vector>
-#include <controllers/me_ct_param_animation_data.h>
+#include <sb/PABlend.h>
 
 class PABlend;
 

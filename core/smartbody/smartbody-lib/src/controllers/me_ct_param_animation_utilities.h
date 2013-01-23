@@ -28,7 +28,7 @@
 #include <controllers/me_ct_channel_writer.hpp>
 #include <sbm/sr_linear_curve.h>
 #include <sb/sbm_pawn.hpp>
-#include <controllers/me_ct_param_animation_data.h>
+#include <sb/PABlend.h>
 #include <sb/SBAnimationTransition.h>
 
 #define LoopHandle 0

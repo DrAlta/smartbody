@@ -26,7 +26,7 @@
 #include <controllers/me_ct_container.hpp>
 #include <sb/sbm_character.hpp>
 #include <controllers/me_ct_param_animation_utilities.h>
-#include <controllers/me_ct_param_animation_data.h>
+#include <sb/PABlend.h>
 #include <controllers/me_ct_motion_example.hpp>
 #include <controllers/me_ct_jacobian_IK.hpp>
 

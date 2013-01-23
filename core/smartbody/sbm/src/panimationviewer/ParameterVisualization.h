@@ -2,7 +2,7 @@
 #define _PARAMETERVISUALIZATION_H_
 
 #include <FL/Fl_Group.H>
-#include <controllers/me_ct_param_animation_data.h>
+#include <sb/PABlend.h>
 
 
 class PABlendData;

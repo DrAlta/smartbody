@@ -109,7 +109,7 @@
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
 #include <controllers/me_ct_param_animation_utilities.h>
-#include <controllers/me_ct_param_animation_data.h>
+#include <sb/PABlend.h>
 #include <controllers/me_ct_saccade.h>
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_eyelid.h>

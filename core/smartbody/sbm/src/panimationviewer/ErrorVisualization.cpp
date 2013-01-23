@@ -4,7 +4,7 @@
 #include <sr/sr_gl.h>
 #include <sr/sr_light.h>
 #include <sr/sr_camera.h>
-#include <controllers/me_ct_param_animation_data.h>
+#include <sb/PABlend.h>
 
 ErrorVisualization::ErrorVisualization( int x, int y, int w, int h, char* name) : VisualizationBase(x,y,w,h,name)
 {

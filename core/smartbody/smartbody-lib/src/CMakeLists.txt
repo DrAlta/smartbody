@@ -251,7 +251,6 @@ set( SMARTBODY_LIB_SBM_SRC
 	controllers/me_ct_motion_player.cpp
 	controllers/me_ct_motion_timewarp.cpp
 	controllers/me_ct_param_animation.cpp
-	controllers/me_ct_param_animation_data.cpp
 	controllers/me_ct_param_animation_utilities.cpp
 	controllers/me_ct_quick_draw.cpp
 	controllers/me_ct_reach.cpp
@@ -373,7 +372,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBColObject.cpp
 	sb/SBPhysicsSim.cpp
 	sb/SBEvent.cpp
-
+	sb/PABlend.cpp
 
 	sb/SBPython.cpp
 	sb/SBPythonClass.cpp
