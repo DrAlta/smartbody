@@ -775,14 +775,6 @@
 				Name="steering"
 				>
 				<File
-					RelativePath="..\src\sbm\SteeringAgent.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\sbm\SteeringAgent.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\sbm\SteerPath.cpp"
 					>
 				</File>
@@ -1428,14 +1420,6 @@
 				</File>
 				<File
 					RelativePath="..\src\controllers\me_ct_param_animation.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\controllers\me_ct_param_animation_data.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\controllers\me_ct_param_animation_data.h"
 					>
 				</File>
 				<File
@@ -3513,6 +3497,14 @@
 			</File>
 			<File
 				RelativePath="..\src\sb\nvbg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\PABlend.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\PABlend.h"
 				>
 			</File>
 			<File
