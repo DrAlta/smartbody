@@ -3,7 +3,7 @@
 
 #include <sb/SBTypes.h>
 #include <sr/sr_sn_colorsurf.h>
-#include <controllers/me_ct_param_animation_data.h>
+#include <sb/PABlend.h>
 #include <sr/sr_lines.h>
 
 # define VFLOW_LINE_WIDTH 2.0f

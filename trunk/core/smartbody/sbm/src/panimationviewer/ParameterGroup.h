@@ -4,7 +4,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Value_Slider.H>
-#include <controllers/me_ct_param_animation_data.h>
+#include <sb/PABlend.h>
 
 class PABlendData;
 class ParameterVisualization;

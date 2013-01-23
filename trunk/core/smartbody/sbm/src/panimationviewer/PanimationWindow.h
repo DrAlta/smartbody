@@ -39,7 +39,7 @@
 #include <FL/fl_ask.H>
 #include <sbm/GenericViewer.h>
 #include <controllers/me_ct_param_animation_utilities.h>
-#include <controllers/me_ct_param_animation_data.h>
+#include <sb/PABlend.h>
 #include <map>
 
 

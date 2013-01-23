@@ -68,7 +68,7 @@
 # include <controllers/me_controller_tree_root.hpp>
 
 # include <sb/SBColObject.h>
-# include <controllers/me_ct_param_animation_data.h>
+#include <sb/PABlend.h>
 # include <sbm/GPU/SbmDeformableMeshGPU.h>
 # include <sb/SBScene.h>
 # include <sb/SBSkeleton.h>
@@ -2939,7 +2939,7 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 
 		if ( ZOOMING(e) )
 		{
-			float tmpFov = _data->camera->getFov() + (dx+dy);//40.0f;
+			float tmpFov = _data->camera->getFov() + (-dx+dy);//40.0f;
 			_data->camera->setFov(SR_BOUND ( tmpFov, 0.001f, srpi ));
 			redraw();
 		}

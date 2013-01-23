@@ -121,9 +121,6 @@
     <ClCompile Include="..\src\controllers\me_ct_param_animation.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\controllers\me_ct_param_animation_data.cpp">
-      <Filter>controllers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\controllers\me_ct_param_animation_utilities.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
@@ -988,6 +985,9 @@
     <ClCompile Include="..\src\sb\DefaultAttributeTable.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sb\PABlend.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -1108,9 +1108,6 @@
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\controllers\me_ct_param_animation.h">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\controllers\me_ct_param_animation_data.h">
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\controllers\me_ct_param_animation_utilities.h">
@@ -2017,6 +2014,9 @@
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sb\DefaultAttributeTable.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\PABlend.h">
       <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>
