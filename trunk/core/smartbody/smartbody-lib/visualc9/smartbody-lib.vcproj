@@ -356,14 +356,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\DefaultAttributeTable.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\DefaultAttributeTable.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\general_param_setting.h"
 				>
 			</File>
@@ -449,10 +441,6 @@
 			</File>
 			<File
 				RelativePath="..\src\sbm\MiscCommands.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\NetRequest.h"
 				>
 			</File>
 			<File
@@ -3500,11 +3488,23 @@
 			Name="sb"
 			>
 			<File
+				RelativePath="..\src\sb\DefaultAttributeTable.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\DefaultAttributeTable.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sb\MiniBrain.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\src\sb\MiniBrain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\NetRequest.h"
 				>
 			</File>
 			<File
