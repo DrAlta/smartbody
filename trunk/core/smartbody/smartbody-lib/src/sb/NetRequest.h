@@ -1,6 +1,7 @@
 #ifndef NETREQUEST_H_
 #define NETREQUEST_H_
 
+#include <sb/SBTypes.h>
 #include <stdio.h>
 
 using std::vector;
@@ -35,12 +36,12 @@ public:
    NetRequest(RequestId _rid, RequestCallback _cb, void* _callbackOwner = NULL) { rid = _rid; cb = _cb; callbackOwner = _callbackOwner; }
    virtual ~NetRequest() {}
 
-   bool DataAvailable()
+   SBAPI bool DataAvailable()
    {
       return false;
    }
 
-   bool ProcessRequest(vector<string>& _args)
+   SBAPI bool ProcessRequest(vector<string>& _args)
    {
       if (!cb)
       {
@@ -53,15 +54,15 @@ public:
    }
 
    template<typename DataType>
-   DataType getCaller()
+   SBAPI DataType getCaller()
    {
       return static_cast<DataType>(callbackOwner);
    }
 
-   RequestId Rid() { return rid; }
-   vector<string> Args() { return args; }
+   SBAPI RequestId Rid() { return rid; }
+   SBAPI vector<string> Args() { return args; }
 
-   string ArgsAsString()
+   SBAPI string ArgsAsString()
    {
       string ret = "";
 

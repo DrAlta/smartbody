@@ -21,9 +21,10 @@
  */
 
 
-#ifndef _ME_CT_PARAM_ANIMATION_DATA_H_
-#define _ME_CT_PARAM_ANIMATION_DATA_H_
+#ifndef _PABLEND_H_
+#define _PABLEND_H_
 
+#include <sb/SBTypes.h>
 #include <sr/sr_triangle.h>
 #include <sr/sr_vec.h>
 #include <string>
@@ -60,61 +61,61 @@ struct TetrahedronInfo
 class PABlend
 {
 	public:
-		PABlend();
-		PABlend(PABlend* data);
-		PABlend(const std::string& name);
-		~PABlend();
+		SBAPI PABlend();
+		SBAPI PABlend(PABlend* data);
+		SBAPI PABlend(const std::string& name);
+		SBAPI ~PABlend();
 
-		virtual bool getWeightsFromParameters(double x, std::vector<double>& weights);
-		virtual bool getWeightsFromParameters(double x, double y, std::vector<double>& weights);
-		virtual bool getWeightsFromParameters(double x, double y, double z, std::vector<double>& weights);
-		virtual void getParametersFromWeights(float& x, std::vector<double>& weights);
-		virtual void getParametersFromWeights(float& x, float& y, std::vector<double>& weights);
-		virtual void getParametersFromWeights(float& x, float& y, float& z, std::vector<double>& weights);
-		void setParameter(const std::string& motion, double x);
-		void setParameter(const std::string& motion, double x, double y);
-		void setParameter(const std::string& motion, double x, double y, double z);
-		void getParameter(const std::string& motion, double& x);
-		void getParameter(const std::string& motion, double& x, double& y);
-		void getParameter(const std::string& motion, double& x, double& y, double& z);
-		void removeParameter(const std::string& motion);
-		void addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3);
-		int getTriangleIndex(const std::string& motion1, const std::string& motion2, const std::string& motion3);
-		void removeTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3);
-		void removeTriangles(const std::string& motion);
-		void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
-		void removeTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
-		void removeTetrahedrons(const std::string& motion);
-		int getTetrahedronIndex(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
-		void buildTetrahedron();
-		int getType();
-		void setType(int typ);
-		double getLocalTime(double motionTime, int motionIndex);
-		double getMotionTime(double localTime, int motionIndex);
-		double getMotionKey(const std::string& motionName, int iKey);
+		SBAPI virtual bool getWeightsFromParameters(double x, std::vector<double>& weights);
+		SBAPI virtual bool getWeightsFromParameters(double x, double y, std::vector<double>& weights);
+		SBAPI virtual bool getWeightsFromParameters(double x, double y, double z, std::vector<double>& weights);
+		SBAPI virtual void getParametersFromWeights(float& x, std::vector<double>& weights);
+		SBAPI virtual void getParametersFromWeights(float& x, float& y, std::vector<double>& weights);
+		SBAPI virtual void getParametersFromWeights(float& x, float& y, float& z, std::vector<double>& weights);
+		SBAPI void setParameter(const std::string& motion, double x);
+		SBAPI void setParameter(const std::string& motion, double x, double y);
+		SBAPI void setParameter(const std::string& motion, double x, double y, double z);
+		SBAPI void getParameter(const std::string& motion, double& x);
+		SBAPI void getParameter(const std::string& motion, double& x, double& y);
+		SBAPI void getParameter(const std::string& motion, double& x, double& y, double& z);
+		SBAPI void removeParameter(const std::string& motion);
+		SBAPI void addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3);
+		SBAPI int getTriangleIndex(const std::string& motion1, const std::string& motion2, const std::string& motion3);
+		SBAPI void removeTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3);
+		SBAPI void removeTriangles(const std::string& motion);
+		SBAPI void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
+		SBAPI void removeTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
+		SBAPI void removeTetrahedrons(const std::string& motion);
+		SBAPI int getTetrahedronIndex(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
+		SBAPI void buildTetrahedron();
+		SBAPI int getType();
+		SBAPI void setType(int typ);
+		SBAPI double getLocalTime(double motionTime, int motionIndex);
+		SBAPI double getMotionTime(double localTime, int motionIndex);
+		SBAPI double getMotionKey(const std::string& motionName, int iKey);
 
-		int getNumParameters();
-		int getMinVecX();
-		int getMinVecY();
-		int getMinVecZ();
-		int getMaxVecX();
-		int getMaxVecY();
-		int getMaxVecZ();
-		SrVec getVec(const std::string& motion);
-		SrVec getVec(int id);
-		const std::string& getMotionName(int id);
-		int getMotionId(const std::string& name);
+		SBAPI int getNumParameters();
+		SBAPI int getMinVecX();
+		SBAPI int getMinVecY();
+		SBAPI int getMinVecZ();
+		SBAPI int getMaxVecX();
+		SBAPI int getMaxVecY();
+		SBAPI int getMaxVecZ();
+		SBAPI SrVec getVec(const std::string& motion);
+		SBAPI SrVec getVec(int id);
+		SBAPI const std::string& getMotionName(int id);
+		SBAPI int getMotionId(const std::string& name);
 
-		int getNumTriangles();
-		SrTriangle& getTriangle(int id);
-		float getMinimumDist(SrVec& pt, SrVec& a, SrVec& b, SrVec& minimumPt);
+		SBAPI int getNumTriangles();
+		SBAPI SrTriangle& getTriangle(int id);
+		SBAPI float getMinimumDist(SrVec& pt, SrVec& a, SrVec& b, SrVec& minimumPt);
 
-		std::vector<SrVec>& getParameters() {return parameters;}
-		std::vector<TriangleInfo>& getTriangles() {return triangles;}
-		std::vector<TetrahedronInfo> & getTetrahedrons() {return tetrahedrons;}
+		SBAPI std::vector<SrVec>& getParameters() {return parameters;}
+		SBAPI std::vector<TriangleInfo>& getTriangles() {return triangles;}
+		SBAPI std::vector<TetrahedronInfo> & getTetrahedrons() {return tetrahedrons;}
 
-		std::vector<std::pair<SmartBody::SBMotionEvent*, int> >& getEvents();
-		void addEventToMotion(const std::string& motion, SmartBody::SBMotionEvent* motionEvent);
+		SBAPI std::vector<std::pair<SmartBody::SBMotionEvent*, int> >& getEvents();
+		SBAPI void addEventToMotion(const std::string& motion, SmartBody::SBMotionEvent* motionEvent);
 
 		std::string stateName;
 		std::vector<SkMotion*> motions;
@@ -123,8 +124,8 @@ class PABlend
 		bool cycle;
 		bool incrementWorldOffsetY;
 
-		virtual int getNumMotions();
-		virtual int getNumKeys();
+		SBAPI virtual int getNumMotions();
+		SBAPI virtual int getNumKeys();
 
 	protected:
 		void updateParameterScale();
