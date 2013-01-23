@@ -63,18 +63,22 @@ int main( int argc, char ** argv )
 	}
 	
 	LOG("Starting the simulation...");
+	double lastPrint = 0;
 	sim->start();
 	while (sim->getTime() < 100.0) // run for 100 simulation seconds
 	{
 		sim->update();
 		if (!useRealTimeClock)
 			sim->setTime(sim->getTime() + 0.16); // update at 1/60 of a second when running in simulated time
+
+		if (sim->getTime() > lastPrint)
+		{
+			printf("Simulation is at time: %5.2f\n", sim->getTime());
+			lastPrint = sim->getTime() + 10;
+		}
 	}
 
 	sim->stop();
 	
 	return 0;
 }
-
-
-

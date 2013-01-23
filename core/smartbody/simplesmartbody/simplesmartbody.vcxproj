@@ -103,8 +103,8 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>smartbody-dll_d.lib;vhcl_d.lib;vhmsg_d.lib;pthreadVSE2.lib;activemq-cppd.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\smartbody-dll\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SmartBody_d.lib;vhcl_d.lib;vhmsg_d.lib;pthreadVSE2.lib;activemq-cppd.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\SmartBody\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -115,7 +115,7 @@
     <PostBuildEvent>
       <Command>if not exist .\bin mkdir .\bin
 copy /Y "$(TargetPath)" .\bin
-copy /Y ..\smartbody-dll\lib\smartbody-dll_d.dll .\bin
+copy /Y ..\SmartBody\lib\SmartBody_d.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll .\bin
@@ -154,8 +154,8 @@ copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>smartbody-dll.lib;vhcl.lib;vhmsg.lib;pthreadVSE2.lib;activemq-cpp.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\smartbody-dll\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SmartBody.lib;vhcl.lib;vhmsg.lib;pthreadVSE2.lib;activemq-cpp.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\SmartBody\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -168,7 +168,7 @@ copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
     <PostBuildEvent>
       <Command>if not exist .\bin mkdir .\bin
 copy /Y "$(TargetPath)" .\bin
-copy /Y ..\smartbody-dll\lib\smartbody-dll.dll .\bin
+copy /Y ..\SmartBody\lib\SmartBody.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll .\bin
@@ -207,8 +207,8 @@ copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>smartbody-dll_d.lib;vhcl_d.lib;vhmsg_d.lib;pthreadVSE2.lib;activemq-cppd.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\smartbody-dll\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SmartBody_d.lib;vhcl_d.lib;vhmsg_d.lib;pthreadVSE2.lib;activemq-cppd.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\SmartBody\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -219,7 +219,7 @@ copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
     <PostBuildEvent>
       <Command>if not exist .\bin mkdir .\bin
 copy /Y "$(TargetPath)" .\bin
-copy /Y ..\smartbody-dll\lib\smartbody-dll_d.dll .\bin
+copy /Y ..\SmartBody\lib\SmartBody_d.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll .\bin
@@ -257,8 +257,8 @@ copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>smartbody-dll.lib;vhcl.lib;vhmsg.lib;pthreadVSE2.lib;activemq-cpp.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\smartbody-dll\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SmartBody.lib;vhcl.lib;vhmsg.lib;pthreadVSE2.lib;activemq-cpp.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\SmartBody\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -271,7 +271,7 @@ copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
     <PostBuildEvent>
       <Command>if not exist .\bin mkdir .\bin
 copy /Y "$(TargetPath)" .\bin
-copy /Y ..\smartbody-dll\lib\smartbody-dll.dll .\bin
+copy /Y ..\SmartBody\lib\SmartBody.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll .\bin
