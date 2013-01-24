@@ -2937,7 +2937,7 @@ void FltkViewer::drawPawns()
 
 	std::vector<std::string> pawnNames = scene->getPawnNames();
 	for (std::vector<std::string>::iterator iter = pawnNames.begin();
-		iter != characterNames.end();
+		iter != pawnNames.end();
 		iter++)
 	{
 		SmartBody::SBPawn* pawn = scene->getPawn((*iter));
