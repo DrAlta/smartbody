@@ -23,6 +23,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>    
+#include <boost/lexical_cast.hpp>    
 #include <algorithm>
 #include <map>
 #include <cctype>

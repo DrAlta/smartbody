@@ -98,9 +98,6 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
 	if (window)
 	{
-		if (window->fltkViewer->_paLocoData && 
-			window->fltkViewer->_paLocoData->character == character)
-			window->fltkViewer->_paLocoData->character = NULL;
 		if (window->fltkViewer->_objManipulator.get_selected_pawn() == character)
 		{
 			window->fltkViewer->_objManipulator.set_selected_pawn(NULL);
@@ -128,9 +125,7 @@ void FLTKListener::OnCharacterUpdate( const std::string & name, const std::strin
 
 void FLTKListener::OnCharacterChanged( const std::string& name )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	SbmCharacter* character = mcu.getCharacter(name);
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
 		return;
 
@@ -147,9 +142,7 @@ void FLTKListener::OnCharacterChanged( const std::string& name )
 
 void FLTKListener::OnCharacterChangeMesh( const std::string& name )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	SbmCharacter* character = mcu.getCharacter(name);
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
 		return;	
 
@@ -280,8 +273,6 @@ void FLTKListener::OnChannel( const std::string & name, const std::string & chan
 
 void FLTKListener::OnReset()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 }
 
 void FLTKListener::notify(SmartBody::SBSubject* subject)

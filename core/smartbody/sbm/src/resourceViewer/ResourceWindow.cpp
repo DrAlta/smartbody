@@ -134,8 +134,6 @@ void ResourceWindow::show_viewer()
 
 void ResourceWindow::hide_viewer()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.bml_processor.registerRequestCallback(NULL, NULL);
 	this->hide();
 }
 
@@ -287,7 +285,7 @@ void ResourceWindow::updateGUI()
 	}
 
 	// update event handler list
-	SmartBody::SBEventManager* eventManager = SmartBody::SBEventManager::getEventManager();
+	SmartBody::SBEventManager* eventManager = SmartBody::SBScene::getScene()->getEventManager();
 	SmartBody::SBEventHandlerMap& eventMap = eventManager->getEventHandlers();
 	SmartBody::SBEventHandlerMap::iterator ei;
 	resourceTree->clear_children(treeItemList[ITEM_EVENT_HANDLERS]);

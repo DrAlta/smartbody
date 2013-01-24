@@ -29,8 +29,6 @@ void SBBasicHandler::executeAction(SBEvent* event)
 	mcu.execute((char*) action.c_str());
 }
 
-SBEventManager* SBEventManager::_eventManager = NULL;
-
 SBEventManager::SBEventManager()
 {
 }
@@ -45,17 +43,6 @@ SBEventManager::~SBEventManager()
 		delete handler;
 	}
 }
-
-SBEventManager* SBEventManager::getEventManager()
-{ 
-	if (_eventManager == NULL)
-	{
-		_eventManager = new SBEventManager();
-	}
-
-	return _eventManager;
-}
-
 
 void SBEventManager::handleEvent(SBEvent* e, double time)
 {

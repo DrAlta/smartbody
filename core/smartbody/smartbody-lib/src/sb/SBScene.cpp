@@ -71,6 +71,7 @@ SBScene::SBScene(void)
 	_collisionManager = new SBCollisionManager();
 	_diphoneManager = new SBDiphoneManager();
 	_behaviorSetManager = new SBBehaviorSetManager();
+	_eventManager = new SBEventManager();
 	_scale = .01f; // default scale is centimeters
 
 	// add the services
@@ -117,6 +118,7 @@ SBScene::~SBScene(void)
 	delete _diphoneManager;
 	delete _behaviorSetManager;
 	delete _serviceManager;
+	delete _eventManager;
 
 	delete _parser;
 
@@ -988,10 +990,8 @@ SBSkeleton* SBScene::createSkeleton(const std::string& skeletonDefinition)
 
 SBEventManager* SBScene::getEventManager()
 {
-	return SBEventManager::getEventManager();
+	return _eventManager;
 }
-
-
 
 
 bool SBScene::command(const std::string& command)

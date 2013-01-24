@@ -27,6 +27,7 @@
  * parses input file or string */
 
 // sr_array.h cannot be included here because of circular references
+#include <sb/SBTypes.h>
 # include <stdio.h>
 # include <sr/sr_string.h>
 
@@ -96,14 +97,14 @@ class SrInput
         an init() function later. While SrInput is of type Null, the valid() method will
         return false. The parameter com is the comment style for this input and is 0 by
         default. See comment_style() for a description of possible styles. */
-    SrInput ( char com=0 ); // init as a null input
+    SBAPI SrInput ( char com=0 ); // init as a null input
 
     /*! Construct an input of type SrInput::TypeString.
         In this way SrInput will read bytes from the given null-terminated string buffer. 
         If buff is null, SrInput will be initialized as TypeNull, and not as a String type.
         Com is the comment style for this input and is 0 by default. 
         See comment_style() for a description of possible styles. */
-    SrInput ( const char *buff, char com=0 ); // init as a string input
+    SBAPI SrInput ( const char *buff, char com=0 ); // init as a string input
 
     /*! Construct an input of type SrInput::File
         In this way, SrInput will read bytes from the given C-style file stream. If the file pointer
@@ -111,159 +112,159 @@ class SrInput
         position pointed by file is considered to be the start, and so the size is measured
         since this given position. The parameter com is the comment style for this input and 
         is 0 by default. See comment_style() for a description of possible styles */
-    SrInput ( FILE *file, char com=0 ); // init as a file input
+    SBAPI SrInput ( FILE *file, char com=0 ); // init as a file input
 
     /*! Construct an input of type SrInput::File, from a given filename.
         This is similar to the previous constructor, but it receives the fopen() parameters
         directly (file name and mode strings) and stores internally the given file name. */
-    SrInput ( const char* filename, const char* mode, char com=0 ); // init as a file input
+    SBAPI SrInput ( const char* filename, const char* mode, char com=0 ); // init as a file input
 
     /*! Closes the associated file if it is a TypeFile input.
         If it is required to leave the associated input file open, call leave_file() before. */
-    virtual ~SrInput ();
+    SBAPI virtual ~SrInput ();
 
     /*! Closes actual input, and init it as TypeString.
         If buff is null, SrInput will be initialized as TypeNull, and not as a String type. 
         The comment style is not changed, but unget data are freed. */
-    void init ( const char *buff );
+    SBAPI void init ( const char *buff );
 
     /*! Closes actual input, and init it as a File type.
         If file is null, SrInput will be initialized as TypeNull, and not as a File type. 
         The comment style is not changed, but unget data are freed. */
-    void init ( FILE *file );
+    SBAPI void init ( FILE *file );
 
     /*! Closes actual input, and init it as a File type, opening given file name in given mode.
         If file could not be open, SrInput is initialized as TypeNull, and not as a File type. 
         Filename is stored, the comment style is not changed, but unget data are freed. */
-    void init ( const char* filename, const char* mode );
+    SBAPI void init ( const char* filename, const char* mode );
 
     /*! Closes actual input and set it as TypeNull.
         If SrInput is of type file, the associated file is closed. In all cases,
         unget data is freed, filename is set to null, the last error is cleaned,
         and size and curline are set to zero. */
-    void close ();
+    SBAPI void close ();
 
     /*! Puts SrInput into TypeNull mode but without closing the current file.
         If SrInput is not of File type, the effect is the same as close(). */
-    void leave_file ();
+    SBAPI void leave_file ();
 
     /*! If the input is done from a file, return the FILE pointer associated, otherwise
         will return 0 */
-    FILE* filept ();
+    SBAPI FILE* filept ();
 
     /*! Returns the file name used for opening a file input, or null if not available */
-    const char* filename () const { return _filename; }
+    SBAPI const char* filename () const { return _filename; }
     
     /*! Associates with the input a file name. The string is stored but not used by SrInput. */
-    void filename ( const char* s ) { sr_string_set(_filename,s); }
+    SBAPI void filename ( const char* s ) { sr_string_set(_filename,s); }
 
     /*! Returns true if the input is not of TypeNull type. */
-    bool valid () const;
+    SBAPI bool valid () const;
 
     /*! Returns the type of the SrInput. */
-    Type type () const { return (Type) _type; }
+    SBAPI Type type () const { return (Type) _type; }
 
     /*! Returns the size of the current input. Size is calculated as the number in bytes from
         the beginning of the input to the end of the input. The beginning is considered to be
         the pointer passed to the constructor or init() method, when it is calculated. */
-    int size () const { return _size; }
+    SBAPI int size () const { return _size; }
 
     /*! Returns the current line of the input. When SrInput is created or initialized, the
         current line is set to 1. Afterwards, the current line is updated internally each
         time a newline char is read. Note that when pos(int) method is used, the current
         line is no more valid. */
-    int curline () const { return _curline; }
+    SBAPI int curline () const { return _curline; }
 
     /*! Defines the comment style used for all "get methods", with exception to get_byte().
         The style can be set to 0 if no comments are allowed, can be set to 'C' to have
         standard C and C++ nested comments parsed, or otherwise when the specified
         character is encountered the whole line is skiped. */
-    void comment_style ( char style ) { _comment_style=style; } // style can be 0,'C','anychar'
+    SBAPI void comment_style ( char style ) { _comment_style=style; } // style can be 0,'C','anychar'
 
     /*! Returns the current comment style being used. */
-    char comment_style () const { return _comment_style; }
+    SBAPI char comment_style () const { return _comment_style; }
 
     /*! Returns true if the current input is pointing after the end of the file. If the
         input source is empty but there is data to unget, the input is not considered finished.*/
-    bool finished ();
+    SBAPI bool finished ();
 
     /*! Gets all bytes of the input, starting from the current position, and put them 
         in the given buffer. The input will point to its end. If input is of TypeNull, 
         nothing is done. Note: the input is not parsed, just copied, therefore comments
         are also copied. */
-    void getall ( SrString& buf );
+    SBAPI void getall ( SrString& buf );
 
     /*! Gets all bytes of the current line, i.e. untill a '\n' is read,
         and put them in the given buffer (inlcuding the '\n').
         The input will point to the first byte after the new line character.
         The last character read is returned and will be either '\n' or EOF.
         Uses method get(), and therefore comments are parsed. */
-    int getline ( SrString& buf );
+    SBAPI int getline ( SrString& buf );
 
     /*! Get current character and advances pointer, will return -1 if end was reached.
         Will read next char from the associated string or file. If SrInput is of
         TypeNull, -1 is always returned. Comments are not considered, but unget
         chars are correctly handled. */
-    int getchar_sr(); 
+    SBAPI int getchar_sr(); 
 
     /*! Get current byte and advance, will return 0 if finish is reached.
         This is for ascii inputs where comments are skipped according to
         the current style. */
-    int get (); // comments handled
+    SBAPI int get (); // comments handled
 
     /*! Puts a byte in the unget stack. */
-    void unget ( char c );
+    SBAPI void unget ( char c );
 
     /*! Reads the next n bytes of the current input.
         Note that unget data are considered, but comments are not. */
-    void advance ( int n=1 );
+    SBAPI void advance ( int n=1 );
 
     /*! puts the pointer in the beginning of the input.
         Any unget data is cleared. Nothing is done if SrInput is of type Null. */
-    void rewind ();
+    SBAPI void rewind ();
 
     /*! Offset in bytes from the begining of the input. */
-    int pos ();
+    SBAPI int pos ();
 
     /*! Puts the input pointer to the position pos, clearing all unget data.
         After calling it, curline() becomes invalid. Alternatively, method
         set_pos_and_update_cur_line() can be used */
-    void pos ( int pos ); 
+    SBAPI void pos ( int pos ); 
 
     /*! Puts the input pointer to the position pos, clears all unget data and
         determines the line number using rewind() and advance(pos). */
-    void set_pos_and_update_cur_line ( int pos );
+    SBAPI void set_pos_and_update_cur_line ( int pos );
 
     /*! Reads all the current line (with getchar), stopping one byte after the
         first newline encountered. */
-    void skip_line ();     
+    SBAPI void skip_line ();     
 
     /*! Sets the maximum allowed size for parsed tokens. Default is 256. */
-    void max_token_size ( int s ) { _max_token_size=s; }
+    SBAPI void max_token_size ( int s ) { _max_token_size=s; }
 
     /*! Returns the current maximum allowed size for parsed tokens. */
-    int max_token_size () const { return _max_token_size; }
+    SBAPI int max_token_size () const { return _max_token_size; }
 
     /*! Determines if parsed tokens are transformed to lowercase or not. Default is true. */
-    void lowercase_tokens ( bool b ) { _lowercase_tokens = b; }
+    SBAPI void lowercase_tokens ( bool b ) { _lowercase_tokens = b; }
 
     /*! Retrieves the state if parsed tokens are transformed to lowercase or not. */
-    bool lowercase_tokens () const { return _lowercase_tokens? true:false; }
+    SBAPI bool lowercase_tokens () const { return _lowercase_tokens? true:false; }
 
     /*! Returns the number of leading spaces skipped during the 
         last call to get_token() */
-    int skipped_spaces () const { return _skipped_spaces; }
+    SBAPI int skipped_spaces () const { return _skipped_spaces; }
 
     /*! Affects the next call to all methods using get_token(). 
         The token is copied and stored within SrInput, leaving the user buffer untouched. */
-    void unget_token ( const char *token, TokenType type );
+    SBAPI void unget_token ( const char *token, TokenType type );
 
     /*! Affects the next call to all methods using get_token(). 
         The last token parsed is ungetted, if its type is not EndOfFile */
-    void unget_token ();
+    SBAPI void unget_token ();
 
     /*! Returns true if any data (token or byte) was put in the unget stacks */
-    bool has_unget_data () const;
+    SBAPI bool has_unget_data () const;
 
     /*! Puts a token in buf, returning its type, skipping comments, and considering
         unget() and unget_token() data. When EOF is reached, buf[0] is set to 0.
@@ -273,45 +274,45 @@ class SrInput
         the error occured. 
         Note: get_token() will parse an input like "-3" as having two tokens, a
         delimiter and an integer (use getn() for reading numbers). */
-    TokenType get_token ( SrString& buf ); 
+    SBAPI TokenType get_token ( SrString& buf ); 
 
     /* Does the same as get_token(SrString&), but the parsed token and token type
        are kept in an internal buffer, to be later retrieved by last_token() and
        last_token_type() */
-    TokenType get_token (); 
+    SBAPI TokenType get_token (); 
 
     /* Returns a reference to the internal buffer containing the last token parsed
        with get_token(void). */
-    SrString& last_token() { return _last_token; }
+    SBAPI SrString& last_token() { return _last_token; }
 
     /* Returns the type of the last token parsed with get_token(void). */
-    TokenType last_token_type() const { return (TokenType)_last_token_type; }
+    SBAPI TokenType last_token_type() const { return (TokenType)_last_token_type; }
 
     /*! Returns the last error occured, if any. Errors are generated by methods
         using get_token() methods. */
-    ErrorType last_error () const { return (ErrorType)_last_error; }
+    SBAPI ErrorType last_error () const { return (ErrorType)_last_error; }
 
     /*! Returns true if there an error occured, and false otherwise. */
-    bool had_error () const { return ((ErrorType)_last_error)==NoError? false:true; }
+    SBAPI bool had_error () const { return ((ErrorType)_last_error)==NoError? false:true; }
 
     /*! Sets the last error to NoError. */
-    void reset_error () { _last_error=(srbyte)NoError; }
+    SBAPI void reset_error () { _last_error=(srbyte)NoError; }
 
     /*! This static method will return a describing error message if t is one
         of the following: UndefChar, UnexpectedToken, TooBig, OpenString, or InvalidPoint.
         Otherwise it will return 0 : */
-    static char* error_desc ( ErrorType t );
+    SBAPI static char* error_desc ( ErrorType t );
 
     /*! Gets the next token of type string or name using get_token(void),
         and returns the token, which is kept in the internal last_token() string.
         If the returned string has length 0 (ie equal to ""), it means that
         the parsed token is not a string, neithert a name, or EOF was reached.
         In any of these cases, last_error() will return UnexpectedToken. */
-    SrString& gets ();
+    SBAPI SrString& gets ();
 
     /*! Same as gets(void), but without using the internal buffer of last_token(),
         the given buffer buf is used instead. A reference to buf is retorned. */
-    SrString& gets ( SrString& buf );
+    SBAPI SrString& gets ( SrString& buf );
 
     /*! Gets the next token, considering it is a number (type int or real)
         preceeded or not by delimiters + or -, and returns the token, which
@@ -320,69 +321,69 @@ class SrInput
         If the returned string has length 0 (ie equal to ""), it means that
         the parsed token is not a number or EOF was reached.
         In any of these cases, last_error() will return UnexpectedToken. */
-    SrString& getn ();
+    SBAPI SrString& getn ();
 
     /*! Reads the next token using get_token(), and tests if it is a delimiter.
         Returns the delimiter char if a delimiter was found, otherwise returns 0.
         When 0 is returned, last_error() will be set to UnexpectedToken. */
-    char getd ();
+    SBAPI char getd ();
 
     /*! Skips next n tokens, by calling get_token(). n has a default value of 1.
         False is returned if any error occurred or EOF is encountered.
         Otherwise true is returned. */
-    bool skip ( int n=1 );
+    SBAPI bool skip ( int n=1 );
 
     /*! Reads tokens using get_token() until the given name is read as type Name. 
         skipto() uses the sr_compare() function that is case-insensitive.
         Returns false if EOF was reached before, otherwise returns true. */
-    bool skipto ( const char *name );
+    SBAPI bool skipto ( const char *name );
 
     /*! Returns true if there is a field like <nnn> in the current position,
         or otherwise false is returned. All parsed tokens are ungetted, so that
         the effect is as the current input position is not changed. */
-    bool has_field ();
+    SBAPI bool has_field ();
 
     /*! Parse the input expecting to encounter a field like <name>, and puts
         field_name in the string name. If unexpected tokens are read, an error occurs
         and false is returned. If EOF is encountered, false is returned. */
-    bool read_field ( SrString& name );
+    SBAPI bool read_field ( SrString& name );
  
     /*! Checks if the following tokens in input is </name>, returning true or false. */
-    bool close_field ( const SrString& name );
+    SBAPI bool close_field ( const SrString& name );
 
     /*! Reads the input until reading </name>. If the field is not found, false is
         returned. Otherwise true is returned and the input will point after </name>. */
-    bool skip_field ( const SrString& name );
+    SBAPI bool skip_field ( const SrString& name );
 
     /*! Operator to read an integer using method getn() and function atoi(). 
         Errors can be tracked using last_error(). */
-    friend SrInput& operator>> ( SrInput& in, int& i );
+    SBAPI friend SrInput& operator>> ( SrInput& in, int& i );
 
     /*! Operator to read an unsigned integer using method getn() and function atoi(). 
         Errors can be tracked using last_error(). */
-    friend SrInput& operator>> ( SrInput& in, sruint& i );
+    SBAPI friend SrInput& operator>> ( SrInput& in, sruint& i );
 
     /*! Operator to read an unsigned char using method getn() and function atoi(). 
         Errors can be tracked using last_error(). */
-    friend SrInput& operator>> ( SrInput& in, srbyte& c );
+    SBAPI friend SrInput& operator>> ( SrInput& in, srbyte& c );
 
     /*! Operator to read a float using method getn() and function atof(). 
         Errors can be tracked using last_error(). */
-    friend SrInput& operator>> ( SrInput& in, float& f );
+    SBAPI friend SrInput& operator>> ( SrInput& in, float& f );
 
     /*! Operator to read a double using method getn() and function atof(). 
         Errors can be tracked using last_error(). */
-    friend SrInput& operator>> ( SrInput& in, double& d );
+    SBAPI friend SrInput& operator>> ( SrInput& in, double& d );
 
     /*! Operator to read a string using method gets(). st must point to a buffer
         with enought space to receive the input. The input is read using the 
         internal buffer, and the result is copied to st using simply strcpy().
         Errors can be tracked using last_error(). */
-    friend SrInput& operator>> ( SrInput& in, char* st );
+    SBAPI friend SrInput& operator>> ( SrInput& in, char* st );
 
     /*! Operator to read a SrString using method gets(SrString&). 
         Errors can be tracked using last_error(). Implemented inline. */
-    friend SrInput& operator>> ( SrInput& in, SrString& s ) { in.gets(s); return in; }
+    SBAPI friend SrInput& operator>> ( SrInput& in, SrString& s ) { in.gets(s); return in; }
  };
 
 //============================== end of file ===============================

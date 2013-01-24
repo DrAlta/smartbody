@@ -87,7 +87,7 @@ class mcuCBHandle;
 
 
 #ifndef USE_PYTHON
-#define USE_PYTHON
+//#define USE_PYTHON
 #endif
 
 #ifdef USE_PYTHON
@@ -496,10 +496,6 @@ public:
 		// ----------------------------------------------
 		// END blends and transitions
 		// ----------------------------------------------
-		
-		std::string PAWinSelChrName;
-		void setPAWinSelChrName(const std::string& name) { PAWinSelChrName.assign(name); }
-		const std::string& getPAWinSelChrName() { return PAWinSelChrName; }
 
 
 		// ----------------------------------------------

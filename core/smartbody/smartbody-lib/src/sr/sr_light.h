@@ -26,7 +26,7 @@
 /** \file sr_light.h 
  * Keeps light parameters
  */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_vec.h>
 # include <sr/sr_color.h>
 
@@ -36,7 +36,7 @@
     SrLight Keeps light parameters following the OpenGL specifications.
     Note however that this class only stores data and has no dependency on
     OpenGL functions. */
-class SrLight
+class SBAPI SrLight
  { public :
 
     /*! Higher spot exponents result in a more focused light source. The default 

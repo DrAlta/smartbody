@@ -209,7 +209,7 @@ void SBCollisionManager::afterUpdate(double time)
 	int curIteration = 0;
 	bool needMoreIterations = true;	
 
-	SBEventManager* eventManager = SBEventManager::getEventManager();	
+	SBEventManager* eventManager = SmartBody::SBScene::getScene()->getEventManager();	
 
 	const std::string& collisionResMethod = getStringAttribute("collisionResolutionType");	
 

@@ -25,7 +25,7 @@
 /** \file sr_sa_render_mode.h 
  * changes the render mode
  */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_sa.h>
 # include <sr/sr_sn_shape.h>
 
@@ -41,16 +41,16 @@ class SrSaRenderMode : public SrSa
    public :
 
     /*! Constructor that initializes the action to override the render mode to m */
-    SrSaRenderMode ( srRenderMode m ) { set_mode(m); }
+    SBAPI SrSaRenderMode ( srRenderMode m ) { set_mode(m); }
 
     /*! Constructor that initializes the action to restore the original render mode */
-    SrSaRenderMode () { _render_mode=srRenderModeSmooth; _override=false; }
+    SBAPI SrSaRenderMode () { _render_mode=srRenderModeSmooth; _override=false; }
 
     /*! Set the mode m to be overriden */
-    void set_mode ( srRenderMode m ) { _render_mode=m; _override=true; }
+    SBAPI void set_mode ( srRenderMode m ) { _render_mode=m; _override=true; }
 
     /*! Set the action to restore the original render mode */
-    void restore_mode () { _override=false; }
+    SBAPI void restore_mode () { _override=false; }
 
    private : // virtual methods
     virtual void mult_matrix ( const SrMat& mat ) {}

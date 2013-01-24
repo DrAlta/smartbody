@@ -26,6 +26,7 @@
 # ifndef SR_SPLINE_H
 # define SR_SPLINE_H
 
+#include <sb/SBTypes.h>
 # include <math.h>
 # include <sr/sr_array.h> 
 
@@ -52,27 +53,27 @@ class SrSpline
 
     /*! The constructor initializes a piecewise spline with
         given dimension and number of knots. */
-    SrSpline ( int d=0, int k=0 ) { init(d,k); }
+    SBAPI SrSpline ( int d=0, int k=0 ) { init(d,k); }
 
     /*! Copy constructor. */
-    SrSpline ( const SrSpline& c );
+    SBAPI SrSpline ( const SrSpline& c );
 
     /*! Initializes spline in given dimension and number of knots.
         The start and end points are considered to be knots, thus a meaningfull
         number of knots will be >= 2. */
-    void init ( int d, int k );
+    SBAPI void init ( int d, int k );
 
     /*! Returns the number of knots (which include endpoints) */
-    int knots () const { return _pieces+1; }
+    SBAPI int knots () const { return _pieces+1; }
     
     /*! Returns a pointer to the n-dimensional coordinates of given knot
         Parameter k must obey 0<=k<knots() */
-    float* knot ( int k ) { return &_spline[k*_dim*3]; }
+    SBAPI float* knot ( int k ) { return &_spline[k*_dim*3]; }
     
     /*! Returns a pointer to the n-dimensional coordinates of the control
         point c relative to the spline starting at knot k.
         Parameters must obey 0<=k<knots()-1, and 1<=c<=2 */
-    float* control ( int k, int c ) { return &_spline[(k*_dim*3)+(_dim*c)]; }
+    SBAPI float* control ( int k, int c ) { return &_spline[(k*_dim*3)+(_dim*c)]; }
     
     /*! Output */
     //friend SrOutput& operator<< ( SrOutput& out, const SrSpline& c );

@@ -36,6 +36,7 @@
 #include "ParamAnimRunTimeEditor.h"
 #include "ParamAnimScriptEditor.h"
 #include "VisualizationView.h"
+#include <sb/SBScene.h>
 
 
 PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
@@ -90,6 +91,7 @@ PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_
 //	tabGroup->selected_child(scriptEditor);
 	tabGroup->value(runTimeEditor);
 	lastCommand = "";
+	_currentCharacterName = "";
 }
 
 
@@ -114,8 +116,6 @@ void PanimationWindow::show_viewer()
 
 void PanimationWindow::hide_viewer()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.bml_processor.registerRequestCallback(NULL, NULL);
 	this->hide();
 }
 
@@ -175,6 +175,7 @@ bool PanimationWindow::checkCommand(std::string command)
 
 void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double tOffset)
 {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	BML::SbmCommand* command = new BML::SbmCommand(cmd, (float)(mcu.time + tOffset));
@@ -194,7 +195,7 @@ void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double
 	}
 	if( success )
 	{
-		if (!mcu._scene->isRemoteMode())
+		if (!scene->isRemoteMode())
 		{
 			if( mcu.execute_seq(seq) != CMD_SUCCESS ) 
 				LOG("ERROR: PanimationWindow::generateBML: Failed to execute sequence.");			
@@ -203,9 +204,9 @@ void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double
 		{
 			//if( mcu.execute_seq(seq) != CMD_SUCCESS ) 
 			//	LOG("ERROR: PanimationWindow::generateBML: Failed to execute sequence.");				
-			mcu.execute((char*)cmd.c_str());
+			SmartBody::SBScene::getScene()->command((char*)cmd.c_str());
 			std::string sendStr = "send sbm " + cmd;
-			mcu.execute((char*) sendStr.c_str());
+			SmartBody::SBScene::getScene()->command((char*) sendStr.c_str());
 		}		
 	}
 }
@@ -307,14 +308,14 @@ void PanimationWindow::refreshUI(Fl_Widget* widget, void* data)
 
 void PanimationWindow::loadCharacters(Fl_Choice* characterList)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+
 	characterList->clear();
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		SbmCharacter* character = (*iter).second;
-		characterList->add(character->getName().c_str());
+		characterList->add((*iter).c_str());
 	}
 	characterList->value(0);
 }
@@ -351,14 +352,24 @@ PanimationWindow* PanimationWindow::getPAnimationWindow( Fl_Widget* w )
 	return panimWindow;
 }
 
+void PanimationWindow::setCurrentCharacterName(const std::string& name)
+{
+	_currentCharacterName = name;
+}
+
+const std::string& PanimationWindow::getCurrentCharacterName()
+{
+	return _currentCharacterName;
+}
+
 SmartBody::SBCharacter* PanimationWindow::getCurrentCharacter()
 {
 	if (!characterList->menu())
 		return NULL;
 
 	std::string charName = characterList->menu()[characterList->value()].label();
-	SmartBody::SBScene* _scene = SmartBody::SBScene::getScene();
-	return _scene->getCharacter(charName);
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	return scene->getCharacter(charName);
 }
 
 PanimationViewerFactory::PanimationViewerFactory()

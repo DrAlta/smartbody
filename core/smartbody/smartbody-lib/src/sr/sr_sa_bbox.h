@@ -25,7 +25,7 @@
 /** \file sr_sa_bbox.h 
  * retrives the bbox
  */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_sa.h>
 
 /*! \class SrSaBBox sr_sa_bbox.h
@@ -37,9 +37,9 @@ class SrSaBBox : public SrSa
     SrBox _box;
 
    public :
-    void init () { _box.set_empty(); }
-    void apply ( SrSn* n ) { init(); SrSa::apply(n); }
-    const SrBox& get () const { return _box; }
+    SBAPI void init () { _box.set_empty(); }
+    SBAPI void apply ( SrSn* n ) { init(); SrSa::apply(n); }
+    SBAPI const SrBox& get () const { return _box; }
 
    private : // virtual methods
     virtual bool shape_apply ( SrSnShapeBase* s );

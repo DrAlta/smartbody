@@ -27,6 +27,7 @@
 # ifndef SR_TREE_H
 # define SR_TREE_H
 
+#include <sb/SBTypes.h>
 # include <sr/sr_class_manager.h>
 # include <sr/sr_output.h>
 
@@ -56,10 +57,10 @@ class SrTreeNode
     SrTreeNode* right;  //!> Pointer to node's righ child.
    public :
     /*! Default Constructor. */
-    SrTreeNode ( Color c=Red ) : color(c), parent(null), left(null), right(null) {}
+    SBAPI SrTreeNode ( Color c=Red ) : color(c), parent(null), left(null), right(null) {}
    public :
     /*! Sets all links to SrTreeNode::null, but leaves color unchanged. */
-    void init () { parent=left=right=null; }
+    SBAPI void init () { parent=left=right=null; }
  };
 
 /*! \class SrTreeBase sr_tree.h
@@ -95,118 +96,118 @@ class SrTreeBase
 
     /*! Initiates an empty tree. The class manager must manage a user class
         deriving from SrTreeNode. */
-    SrTreeBase ( SrClassManagerBase* m );
+    SBAPI SrTreeBase ( SrClassManagerBase* m );
 
     /*! Copy constructor. The class manager of t is shared. */
-    SrTreeBase ( const SrTreeBase& t );
+    SBAPI SrTreeBase ( const SrTreeBase& t );
 
     /*! Destructor. */
-    virtual ~SrTreeBase ();
+    SBAPI virtual ~SrTreeBase ();
 
     /*! Deletes all elements of the tree. */
-    void init ();
+    SBAPI void init ();
 
     /*! Returns true iff there is no nodes in the tree. */
-    bool empty () const { return _root==SrTreeNode::null? true:false; } 
+    SBAPI bool empty () const { return _root==SrTreeNode::null? true:false; } 
   
     /*! Returns the number of elements of the tree. */
-    int elements () const { return _elements; }
+    SBAPI int elements () const { return _elements; }
 
     /*! Method to find the minimum node of the subtree rooted at the given node x. */
-    SrTreeNode* get_min ( SrTreeNode* x ) const;
+    SBAPI SrTreeNode* get_min ( SrTreeNode* x ) const;
 
     /*! Method to find the maximum node of the subtree rooted at the given node x. */
-    SrTreeNode* get_max ( SrTreeNode* x ) const;
+    SBAPI SrTreeNode* get_max ( SrTreeNode* x ) const;
 
     /*! Method to find the successor node of the given node x in the tree. */
-    SrTreeNode* get_next ( SrTreeNode* x ) const;
+    SBAPI SrTreeNode* get_next ( SrTreeNode* x ) const;
 
     /*! Method to find the predecessor node of the given node x in the tree. */
-    SrTreeNode* get_prior ( SrTreeNode* x ) const;
+    SBAPI SrTreeNode* get_prior ( SrTreeNode* x ) const;
 
     /*! Returns the current element being pointed, that will be SrTreeNode::null
         if the tree is emptyis returned. */
-    SrTreeNode* cur () const { return _cur; }
+    SBAPI SrTreeNode* cur () const { return _cur; }
 
     /*! Sets the current element to be c, which must be a node of the tree. */
-    void cur ( SrTreeNode* c ) { _cur = c; }
+    SBAPI void cur ( SrTreeNode* c ) { _cur = c; }
 
     /*! Returns the root of the tree, that will be SrTreeNode::null if the tree is empty. */
-    SrTreeNode* root () { return _root; }
+    SBAPI SrTreeNode* root () { return _root; }
 
     /*! Returns the first element of the tree, ie, the minimum according
         to the comparison function. */
-    SrTreeNode* first () const { return get_min(_root); }
+    SBAPI SrTreeNode* first () const { return get_min(_root); }
 
     /*! Returns the last element of the tree, ie, the maximum. */
-    SrTreeNode* last () const { return get_max(_root); }
+    SBAPI SrTreeNode* last () const { return get_max(_root); }
 
     /*! Will put the current position cur() pointing to the node with minimum value.
         If the list is empty, cur will point to SrTreeNode::null. */
-    void gofirst () { _cur = get_min(_root); }
+    SBAPI void gofirst () { _cur = get_min(_root); }
 
     /*! Will put the current position cur() pointing to the node with maximum value.
         If the list is empty, cur will point to SrTreeNode::null. */
-    void golast () { _cur = get_max(_root); }
+    SBAPI void golast () { _cur = get_max(_root); }
 
     /*! Returns the next element of the current position cur().
         If cur points to null, SrTreeNode::Null is returned. */
-    SrTreeNode* curnext () const { return get_next(_cur); }
+    SBAPI SrTreeNode* curnext () const { return get_next(_cur); }
 
     /*! Returns the prior element of the current position cur().
         If cur points to null, SrTreeNode::null is returned. */
-    SrTreeNode* curprior () const { return get_prior(_cur); }
+    SBAPI SrTreeNode* curprior () const { return get_prior(_cur); }
 
     /*! Will put the current position cur() pointing to the next
         node curnext(), cur can become SrTreeNode::null. */
-    void gonext () { _cur = get_next(_cur); }
+    SBAPI void gonext () { _cur = get_next(_cur); }
 
     /*! Will put the current position cur() pointing to the prior
         link curprior(), cur can become SrTreeNode::null. */
-    void goprior () { _cur = get_prior(_cur); }
+    SBAPI void goprior () { _cur = get_prior(_cur); }
 
     /*! Returns a pointer to the item that is equal to the given key, or 0
         if it could not find the key in the tree. cur will be the last node
         visited during the search. */
-    SrTreeNode* search ( const SrTreeNode *key );
+    SBAPI SrTreeNode* search ( const SrTreeNode *key );
 
     /*! If inserted, will return key, otherwise will return 0, and cur will 
         point to key. Duplication is not allowed. */
-    SrTreeNode* insert ( SrTreeNode* key );
+    SBAPI SrTreeNode* insert ( SrTreeNode* key );
 
     /*! Tries to insert key using method insert(). In case of duplication
         key is not inserted, key is deleted, and 0 is returned. The returned
         node will be pointing to key in case of sucees, or pointing to the
         node in the tree that is equal to key in case of failure. In all cases,
         cur will be the last node visited during the search for key. */
-    SrTreeNode* insert_or_del ( SrTreeNode* key );
+    SBAPI SrTreeNode* insert_or_del ( SrTreeNode* key );
 
     /*! Duplicates and inserts all elements of t in the tree. */
-    void insert_tree ( const SrTreeBase& t );
+    SBAPI void insert_tree ( const SrTreeBase& t );
 
     /*! Extracts node z that must be inside the tree; z is returned. */
-    SrTreeNode* extract ( SrTreeNode* z );
+    SBAPI SrTreeNode* extract ( SrTreeNode* z );
 
     /*! Removes and delete node z, which must be inside the tree. */
-    void remove ( SrTreeNode* z );
+    SBAPI void remove ( SrTreeNode* z );
 
     /*! Extracts the item equal to the key and return it or 0 if the 
         key was not found. */
-    SrTreeNode* search_and_extract ( const SrTreeNode* key );
+    SBAPI SrTreeNode* search_and_extract ( const SrTreeNode* key );
 
     /*! Removes and deletes the item equal to the key. Returns true if a node
         is found and deleted, otherwise false is returned. */
-    bool search_and_remove ( const SrTreeNode* key );
+    SBAPI bool search_and_remove ( const SrTreeNode* key );
 
     /*! Take control of the tree in t, and set t to an empty tree. Both
         trees must manage the same derived class of SrTreeNode. */
-    void take_data ( SrTreeBase& t );
+    SBAPI void take_data ( SrTreeBase& t );
 
     /*! Copy operator */
-    void operator= ( const SrTreeBase& t );
+    SBAPI void operator= ( const SrTreeBase& t );
 
     /*! Outputs the tree in the format: [e1 e2 en] */
-    friend SrOutput& operator<< ( SrOutput& o, const SrTreeBase& t );
+    SBAPI friend SrOutput& operator<< ( SrOutput& o, const SrTreeBase& t );
  };
 
 /*! \class SrTree sr_tree.h

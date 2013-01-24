@@ -32,11 +32,11 @@
 #include <sr/sr_shared_class.h>
 #include <sr/sr_buffer.h>
 #include <sk/sk_channel_array.h>
+#include <controllers/me_controller_context.hpp>
 
 
 // Predeclare class because of circular reference:
 class MeController;
-class MeControllerContext;
 class MeFrameData;
 
 class MeEvaluationLogger;

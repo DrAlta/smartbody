@@ -26,7 +26,7 @@
 /** \file sr_box.h 
  * 3d axis-aligned box
  */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_vec.h>
 
 class SrMat;
@@ -48,117 +48,117 @@ class SrBox
    public :
 
     /*! Default constructor initializes the box as the empty box (1,1,1)(0,0,0). */
-    SrBox () : a(SrPnt::one), b(SrPnt::null) {}
+    SBAPI SrBox () : a(SrPnt::one), b(SrPnt::null) {}
 
     /*! Constructs a box with all vertices the same. This degenerated
         box is identical to a single point and is not considered an
         empty box. */
-    SrBox ( const SrPnt& p ) : a(p), b(p) {}
+    SBAPI SrBox ( const SrPnt& p ) : a(p), b(p) {}
 
     /*! Constructs the box from the given min and max points. */
-    SrBox ( const SrPnt& min, const SrPnt& max ) : a(min), b(max) {}
+    SBAPI SrBox ( const SrPnt& min, const SrPnt& max ) : a(min), b(max) {}
 
     /*! Copy constructor. */
-    SrBox ( const SrBox& box ) : a(box.a), b(box.b) {}
+    SBAPI SrBox ( const SrBox& box ) : a(box.a), b(box.b) {}
 
     /* Constructs SrBox containing the two given boxes. */
-    SrBox ( const SrBox& x, const SrBox& y );
+    SBAPI SrBox ( const SrBox& x, const SrBox& y );
 
-	SrPnt& getMinimum() { return a;}
+	SBAPI SrPnt& getMinimum() { return a;}
 
-	SrPnt& getMaximum() { return b;}
+	SBAPI SrPnt& getMaximum() { return b;}
 
-	void setMinimum(SrPnt& pt) { a = pt;}
+	SBAPI void setMinimum(SrPnt& pt) { a = pt;}
 
-	void setMaximum(SrPnt& pt) { b = pt;}
+	SBAPI void setMaximum(SrPnt& pt) { b = pt;}
 
 	/*! Init the box as (0,0,0)(0,0,0). */
-    void set_null () { a=SrPnt::null; b=SrPnt::null; }
+    SBAPI void set_null () { a=SrPnt::null; b=SrPnt::null; }
 
     /*! Sets the minimum and maximum vertices of the box. */
-    void set ( const SrPnt& min, const SrPnt& max ) { a=min; b=max; }
+    SBAPI void set ( const SrPnt& min, const SrPnt& max ) { a=min; b=max; }
 
     /*! Sets the box to be empty, ie, invalid, just by putting
         the x coordinate of the minimum vertex (a) greater than
         the x coordinate of the maximum vertex (b). */
-    void set_empty () { a.x=1.0; b.x=0.0; }
+    SBAPI void set_empty () { a.x=1.0; b.x=0.0; }
 
     /*! Returns true if the box is empty (or invalid), ie, when 
         some coordinate of a is greater than b. */
-    bool empty () const;
+    SBAPI bool empty () const;
 
     /*! Returns the volume of the box. */
-    float volume () const;
+    SBAPI float volume () const;
 
     /*! Returns the center point of the box (b+a)/2. */
-    SrPnt center () const;
+    SBAPI SrPnt center () const;
 
 	 /*! Returns the center point of the box (b+a)/2. */
-    SrPnt getCenter () const;
+    SBAPI SrPnt getCenter () const;
 
     /*! Translates SrBox to have its center in p. */
-    void center ( const SrPnt& p );
+    SBAPI void center ( const SrPnt& p );
 
     /*! Changes the position of the maximum vertex b of the box in order to
         achieve the desired dimensions given in v (b=a+v). */
-    void size ( const SrVec& v );
+    SBAPI void size ( const SrVec& v );
 
     /*! Returns the dimensions in each axis (b-a). */
-    SrVec size () const;
+    SBAPI SrVec size () const;
 
 	/*! Returns the dimensions in each axis (b-a). */
-    SrVec getSize () const;
+    SBAPI SrVec getSize () const;
 
     /*! Returns the maximum dimension of the box. */
-    float max_size () const;
+    SBAPI float max_size () const;
 
     /*! Returns the minimum dimension of the box. */
-    float min_size () const;
+    SBAPI float min_size () const;
 
     /*! Extends SrBox (if needed) to contain the given point. If SrBox
         is empty, SrBox min and max vertices become the given point. */
-    void extend ( const SrPnt& p );
+    SBAPI void extend ( const SrPnt& p );
 
     /*! Extends SrBox (if needed) to contain the given box, if the given
         box is not empty(). If SrBox is empty, SrBox becomes the given box. */
-    void extend ( const SrBox& box );
+    SBAPI void extend ( const SrBox& box );
 
     /*! Adds (dx,dy,dz) to b, and diminish it from a. */
-    void grows ( float dx, float dy, float dz );
+    SBAPI void grows ( float dx, float dy, float dz );
 
     /*! Returns true if SrBox contains the given point. */
-    bool contains ( const SrPnt& p ) const;
+    SBAPI bool contains ( const SrPnt& p ) const;
 
     /*! Returns true if SrBox intersects with the given box. */
-    bool intersects ( const SrBox& box ) const;
+    SBAPI bool intersects ( const SrBox& box ) const;
 
     /*! Returns the four corners of side s={0,..,5} of the box.
         Side 0 has all x coordinates equal to a.x, side 1 equal to b.x.
         Side 2 has all y coordinates equal to a.y, side 3 equal to b.y. 
         Side 4 has all z coordinates equal to a.z, side 5 equal to b.z.
         Order is ccw, starting with the point with more SrBox::a coordinates */
-    void get_side ( SrPnt& p1, SrPnt& p2, SrPnt& p3, SrPnt& p4, int s ) const;
+    SBAPI void get_side ( SrPnt& p1, SrPnt& p2, SrPnt& p3, SrPnt& p4, int s ) const;
 
     /*! The bounding box is identical to SrBox (needed by SrSceneShapeTpl). */
-    void get_bounding_box ( SrBox &box ) const { box=*this; }
+    SBAPI void get_bounding_box ( SrBox &box ) const { box=*this; }
 
     /* Translates SrBox by v. */
-    void operator += ( const SrVec& v );
+    SBAPI void operator += ( const SrVec& v );
 
     /* Scales SrBox by the factor s. */
-    void operator *= ( float s );
+    SBAPI void operator *= ( float s );
 
     /* Returns the bounding box of the transformed vertices vM of b. */
-    friend SrBox operator * ( const SrBox& b, const SrMat& m );
+    SBAPI friend SrBox operator * ( const SrBox& b, const SrMat& m );
 
     /* Returns the bounding box of the transformed vertices Mv of b. */
-    friend SrBox operator * ( const SrMat& m, const SrBox& b );
+    SBAPI friend SrBox operator * ( const SrMat& m, const SrBox& b );
 
     /*! Outputs in format: "x y z a b c". */
-    friend SrOutput& operator<< ( SrOutput& o, const SrBox& box );
+    SBAPI friend SrOutput& operator<< ( SrOutput& o, const SrBox& box );
 
     /*! Inputs from format: "x y z a b c". */
-    friend SrInput& operator>> ( SrInput& in, SrBox& box );
+    SBAPI friend SrInput& operator>> ( SrInput& in, SrBox& box );
  };
 
 //================================ End of File =================================================

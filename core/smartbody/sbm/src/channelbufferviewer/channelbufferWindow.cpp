@@ -821,8 +821,6 @@ void ChannelBufferWindow::show_viewer()
 
 void ChannelBufferWindow::hide_viewer()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.bml_processor.registerRequestCallback(NULL, NULL);
 	this->hide();
 }
 

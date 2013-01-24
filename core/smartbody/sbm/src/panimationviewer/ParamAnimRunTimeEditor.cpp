@@ -30,6 +30,8 @@
 #include "ParameterGroup.h"
 #include "ParameterVisualization.h"
 #include "Parameter3DVisualization.h"
+#include <sb/SBAnimationStateManager.h>
+#include <sb/SBAnimationState.h>
 
 PARunTimeEditor::PARunTimeEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
 {
@@ -116,8 +118,7 @@ void PARunTimeEditor::update()
 void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 {
 	nextCycleStates->clear();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	PABlend* state = mcu.lookUpPABlend(currentState);
+	PABlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(currentState);
 
 //	if (blendData)
 //		if (!blendData->cycle)
@@ -128,10 +129,13 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 
 	if (currentState == PseudoIdleState)
 	{
-		for (size_t i = 0; i < mcu.param_anim_blends.size(); i++)
+		std::vector<std::string> blendNames = SmartBody::SBScene::getScene()->getBlendManager()->getBlendNames();
+		for (std::vector<std::string>::iterator iter = blendNames.begin();
+			 iter != blendNames.end();
+			 iter++)
 		{
 //			if (mcu.param_anim_blends[i]->cycle)
-				addItem(nextCycleStates, mcu.param_anim_blends[i]->stateName);
+				addItem(nextCycleStates, (*iter));
 		}
 	}
 	else
@@ -212,7 +216,8 @@ void PARunTimeEditor::updateNonCycleState(Fl_Widget* widget, void* data)
 		if (editor->availableTransitions->selected(i+1))
 			nonCycleState = editor->availableTransitions->text(i+1);
 	}
-	PABlend* state = mcuCBHandle::singleton().lookUpPABlend(nonCycleState);
+	PABlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(nonCycleState);
+	
 	if (state && state->getNumParameters() > 0)
 	{
 		if (editor->paramGroup)
@@ -235,7 +240,6 @@ void PARunTimeEditor::updateNonCycleState(Fl_Widget* widget, void* data)
 void PARunTimeEditor::updateTransitionStates(Fl_Widget* widget, void* data)
 {
 	PARunTimeEditor* editor = (PARunTimeEditor*) data;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	editor->availableTransitions->clear();
 	std::string currentState = editor->currentCycleState->value();
 	std::string nextState = "";
@@ -244,7 +248,10 @@ void PARunTimeEditor::updateTransitionStates(Fl_Widget* widget, void* data)
 		if (editor->nextCycleStates->selected(i+1))
 			nextState = editor->nextCycleStates->text(i+1);
 	}
-	for (size_t i = 0; i < mcu.param_anim_blends.size(); i++)
+	std::vector<std::string> blendNames = SmartBody::SBScene::getScene()->getBlendManager()->getBlendNames();
+	for (std::vector<std::string>::iterator iter = blendNames.begin();
+		 iter != blendNames.end();
+		 iter++)
 	{
 		bool fromHit = false;
 		bool toHit = false;
@@ -298,7 +305,7 @@ void PARunTimeEditor::updateTransitionStates(Fl_Widget* widget, void* data)
 				*/
 
 			if (fromHit && toHit)
-				editor->availableTransitions->add(mcu.param_anim_blends[i]->stateName.c_str());	
+				editor->availableTransitions->add((*iter).c_str());	
 		}
 	}
 }

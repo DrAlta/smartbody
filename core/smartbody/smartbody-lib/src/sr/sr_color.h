@@ -27,6 +27,7 @@
  * A color definition
  */
 
+#include <sb/SBTypes.h>
 # include <sr/sr_input.h>
 # include <sr/sr_output.h>
 
@@ -37,20 +38,24 @@
      and more 8 bits for the alpha (the opacity). In this way, each component can
      have a value from 0 to 255 and the total class has a sizeof of 4 bytes.
      The default constructor initializes with values (r,g,b,a)=(127,127,127,255). */
-class SrColor
+
+
+
+class SBAPI SrColor
  { public :
-    static const SrColor black,   //!< black color (0,0,0)
-                         red,     //!< red color (255,0,0)
-                         green,   //!< green color (0,255,0)
-                         yellow,  //!< yellow color (255,255,0)
-                         blue,    //!< blue color (0,0,255)
-                         magenta, //!< magenta color (255,0,255)
-                         cyan,    //!< cyan color (0,255,255)
-                         white,   //!< white color (255,255,255)
-                         gray,    //!< gray color (127,127,127)
-						 darkgray, //!< gray color (64,64,64)
-						 lightgray;//!< gray color (225,225,225)
- 
+
+  static const SrColor black;   //!< black color (0,0,0)
+  static const SrColor red;    //!< red color (255,0,0)
+  static const SrColor green;   //!< green color (0,255,0)
+  static const SrColor yellow;  //!< yellow color (255,255,0)
+  static const SrColor blue;   //!< blue color (0,0,255)
+  static const SrColor magenta; //!< magenta color (255,0,255)
+  static const SrColor cyan;    //!< cyan color (0,255,255)
+  static const SrColor white;   //!< white color (255,255,255)
+  static const SrColor gray;    //!< gray color (127,127,127)
+  static const SrColor darkgray; //!< gray color (64,64,64)
+  static const SrColor lightgray;//!< gray color (225,225,225)
+    
     srbyte r; //!< r component, in {0,...,255}, default is 127
     srbyte g; //!< g component, in {0,...,255}, default is 127
     srbyte b; //!< b component, in {0,...,255}, default is 127

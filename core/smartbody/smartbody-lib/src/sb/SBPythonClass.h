@@ -22,7 +22,7 @@
 
 //#if !defined (__ANDROID__)
 #ifndef USE_PYTHON
-#define USE_PYTHON
+//#define USE_PYTHON
 #endif
 //#endif
 

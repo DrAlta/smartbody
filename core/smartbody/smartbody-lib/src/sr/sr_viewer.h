@@ -28,6 +28,7 @@
 # ifndef SR_VIEWER_H
 # define SR_VIEWER_H
 
+#include <sb/SBTypes.h>
 #include <cstdio>
 
 class SrQuat;
@@ -54,17 +55,17 @@ class SrViewer
     SrViewer ( int x, int y, int w, int h, const char *label=0 );
 
     /*! Destructs all internal data, and calls unref() for the root node. */
-    virtual ~SrViewer ();
+    SBAPI virtual ~SrViewer ();
 
     /*! Retreave the scene root pointer, without calling unref() for it. Note that
         if the user does not give any root node to SrViewer, an empty (but valid)
         SrSnGroup is returned. */
-    virtual SrSn *root ();
+    SBAPI virtual SrSn *root ();
 
     /*! Changes the scene root pointer. When the new node r is given, r->ref() is 
         called, and the old root node has its unref() method called. If r is null,
         an empty SrSnGroup is created and used as root */
-    virtual void root ( SrSn *r );
+    SBAPI virtual void root ( SrSn *r );
 
 
     /*! Sets the camera to see the whole bounding box of the scene. The camera
@@ -72,36 +73,36 @@ class SrViewer
         the line passing throught the center and parallel to the z axis, in a
         sufficient distance from the center to visualize the entire bounding,
         leaving the camera with a 60 degreed fovy. The up vector is set to (0,1,0). */
-    virtual void view_all ();
+    SBAPI virtual void view_all ();
 
     /*! Will make SrViewer to render the scene in the next fltk loop. If the
         current scene is spinning, then the scene is already being rendered by the
         spin animation timeout with a defined frequency, an then a call to render()
         will have no effect. */
-    virtual void render ();
+    SBAPI virtual void render ();
 
 	// feng : since we need access to OpenGL context before any shader call, 
 	// this hack ensure that we have a valid gl context ( from fltkViewer or other render GUI ) before any GPGPU calls
-	virtual void makeGLContext() {}
+	SBAPI virtual void makeGLContext() {}
 
-	virtual void label_viewer(const char* str);
+	SBAPI virtual void label_viewer(const char* str);
 
-    virtual SrCamera* get_camera();
-    virtual void set_camera ( const SrCamera* cam );
+    SBAPI virtual SrCamera* get_camera();
+    SBAPI virtual void set_camera ( const SrCamera* cam );
 
-	virtual void show_viewer();
-	virtual void hide_viewer();
+	SBAPI virtual void show_viewer();
+	SBAPI virtual void hide_viewer();
 
  };
 
 class SrViewerFactory
 {
 	public:
-		SrViewerFactory();
+		SBAPI SrViewerFactory();
 		
-		virtual SrViewer* create(int x, int y, int w, int h);
-		virtual void remove(SrViewer* viewer);
-		virtual void reset(SrViewer* viewer);
+		SBAPI virtual SrViewer* create(int x, int y, int w, int h);
+		SBAPI virtual void remove(SrViewer* viewer);
+		SBAPI virtual void reset(SrViewer* viewer);
 };
 
 //================================ End of File =================================================

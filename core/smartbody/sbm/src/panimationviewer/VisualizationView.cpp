@@ -26,9 +26,9 @@
 #include <FL/gl.h>
 #include <GL/glu.h>
 #include <FL/fl_draw.H>
-#include <sbm/mcontrol_util.h>
 #include "ErrorVisualization.h"
 #include <controllers/me_ct_param_animation.h>
+#include <sbm/mcontrol_util.h>
 
 
 VisualizationView::VisualizationView(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h)
@@ -97,10 +97,9 @@ void VisualizationView::update()
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
 
 	// pass current selected char to mcu for visualization plots
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.setPAWinSelChrName(charName);
+	paWindow->setCurrentCharacterName(charName);
 
-	SbmCharacter* character = mcuCBHandle::singleton().getCharacter(charName);
+	SbmCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
 	if (!character)
 		return;
 
@@ -172,14 +171,14 @@ void VisualizationView::plotMotion(bool randomColor)
 	{
 		std::string moName = curBlend->getMotion(i);
 		//SkMotion* mo = getSkMotion(moName);
-		bool randomColor = plotRandomColorCheckbox->value();
+		bool randomColor = plotRandomColorCheckbox->value()? 1 : 0;
 		curBlend->plotMotion(moName, sbChar->getName(), 10, false, randomColor);
 	}
 }
 void VisualizationView::plotMotion(Fl_Widget* widget, void* data)
 {
 	VisualizationView* vizView = (VisualizationView*)(data);
-	bool randomColor = vizView->plotRandomColorCheckbox->value();
+	bool randomColor = vizView->plotRandomColorCheckbox->value()? 1 : 0;
 	vizView->plotMotion(randomColor);
 }
 
@@ -205,7 +204,7 @@ void VisualizationView::plotJointTraj(Fl_Widget* widget, void* data)
 	if(sel >=0 && sel < vizView->plotJointChoice->size())
 	{
 		std::string jntName = vizView->plotJointChoice->text(sel);
-		bool randomColor = vizView->plotRandomColorCheckbox->value();
+		bool randomColor = vizView->plotRandomColorCheckbox->value()? 1 : 0;
 		vizView->plotJointTraj(jntName, randomColor);
 	}
 	else

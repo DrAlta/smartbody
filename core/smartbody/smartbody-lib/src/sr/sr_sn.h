@@ -26,6 +26,7 @@
  * base scene node class
  */
 
+#include <sb/SBTypes.h>
 # include <sr/sr_box.h>
 # include <sr/sr_mat.h>
 # include <sr/sr_event.h>
@@ -75,23 +76,23 @@ class SrSn : public SrSharedClass
     /*! Returns a const string with the name of the instantiated node class.
         The convention is exactly the name of the instantiated class,
         without the leading "SrSn" word. */
-    const char* inst_class_name () const { return _inst_class_name; }
+    SBAPI const char* inst_class_name () const { return _inst_class_name; }
 
     /*! Returns the type of this node. The type is set at instantiation
         and cannot be changed later. */
-    Type type () const { return (Type) _type; }
+    SBAPI Type type () const { return (Type) _type; }
 
     /*! Gets the visible state of this node. */
-    bool visible () const { return _visible? true:false; }
+    SBAPI bool visible () const { return _visible? true:false; }
 
     /*! Changes the active state of this node. */
-    void visible ( bool b ) { _visible = (char)b; }
+    SBAPI void visible ( bool b ) { _visible = (char)b; }
 
     /*! Defines any label to be kept within the node. */
-    void label ( const char* s );
+    SBAPI void label ( const char* s );
 
     /*! Returns the associated label, or an empty string. */
-    const char* label () const;
+    SBAPI const char* label () const;
  };
 
 //================================ End of File =================================================

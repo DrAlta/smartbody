@@ -562,7 +562,7 @@ void PPRAISteeringAgent::sendLocomotionEvent(const std::string& status)
 	std::stringstream strstr;
 	strstr << character->getName() << " " << status;
 	motionEvent.setParameters(strstr.str());
-	SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();		
+	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 	manager->handleEvent(&motionEvent, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 }
 
@@ -1493,7 +1493,7 @@ void PPRAISteeringAgent::adjustFacingAngle( float angleDiff )
 		std::string cmd = "bml chr " + character->getName() + " success";
 		//cmd = cmd + " facing: " + boost::lexical_cast<std::string>(facing)
 		facingEvent.setParameters(cmd);
-		SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();		
+		SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 		manager->handleEvent(&facingEvent, 0.0f);
 		facingAdjust = false; // stop facing adjustment
 	}

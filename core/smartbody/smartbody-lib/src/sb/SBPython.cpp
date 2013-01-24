@@ -1710,9 +1710,11 @@ extern "C" {
 
 void appendPythonModule(const char* moduleName, void (*initfunc)(void))
 {
+#ifdef USE_PYTHON
 	// TODO - remove (char *) cast when moving to new python version that has a proper const-aware header
 	int result = PyImport_AppendInittab((char *)moduleName, initfunc);
 	LOG("initialize module %s, result = %d",moduleName, result);
+#endif
 }
 
 

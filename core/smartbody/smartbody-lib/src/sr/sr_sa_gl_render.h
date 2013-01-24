@@ -25,7 +25,7 @@
 /** \file sr_gl_render_action.h 
  * OpenGL render action
  */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_sa.h>
 # include <sr/sr_sn_shape.h>
 
@@ -36,7 +36,7 @@ struct SrOGLData;
     \brief OpenGL render action
 
     OpenGL render action */
-class SrSaGlRender : public SrSa
+class SBAPI SrSaGlRender : public SrSa
  { public :
     typedef void (*render_function)(SrSnShapeBase*);
 

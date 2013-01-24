@@ -8,6 +8,7 @@
 #include <FL/filename.H>
 #include "boost/filesystem.hpp"
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/lexical_cast.hpp>
 #include "sbm/sbm_audio.h"
 #include <fstream>
 #include "CommandWindow.h"
@@ -427,8 +428,8 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	if (!seqFile)
 		return;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.reset();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->reset();
 
 	if (mediaPath != "")
 		SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
@@ -437,8 +438,8 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	std::string fullfilename = std::string(seqFile);
 	size_t pos = fullfilename.find(filebasename);
 	std::string path = fullfilename.substr(0, pos - 1);
-	mcu._scene->addAssetPath("script", path);
-	mcu._scene->runScript(filebasename);
+	scene->addAssetPath("script", path);
+	scene->runScript(filebasename);
 }
 
 void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
@@ -448,8 +449,8 @@ void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
 	const char* saveFile = fl_file_chooser("Save file:", "*.py", mediaPath.c_str());
 	if (!saveFile)
 		return;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SmartBody::SBScene* scene = mcu._scene;
+	
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::string fileString = scene->save();
 
 	std::ofstream file(saveFile);
@@ -487,7 +488,6 @@ void BaseWindow::SaveSceneSettingCB( Fl_Widget* widget, void* data )
 	const char* saveFile = fl_file_chooser("Save file:", "*.py", mediaPath.c_str());
 	if (!saveFile)
 		return;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::string fileString = scene->saveSceneSetting();
 
@@ -600,8 +600,7 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 	int confirm = fl_choice("This will reset the current session.\nContinue?", "No", "Yes", NULL);
 	if (confirm == 1)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		mcu.reset();
+		SmartBody::SBScene::getScene()->reset();
 		std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 		if (mediaPath != "")
 			SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
@@ -615,8 +614,7 @@ void BaseWindow::QuitCB(Fl_Widget* widget, void* data)
 	int confirm = fl_choice("This will quit SmartBody.\nContinue?", "No", "Yes", NULL);
 	if (confirm == 1)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		mcu.executePython("quit()");
+		SmartBody::SBScene::getScene()->run("quit()");
 	}
 }
 
@@ -633,9 +631,8 @@ void BaseWindow::LaunchConnectCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::DisconnectRemoteCB(Fl_Widget* widget, void* data)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu._scene->getDebuggerClient()->Disconnect();
-	mcu.reset();
+	SmartBody::SBScene::getScene()->getDebuggerClient()->Disconnect();
+	SmartBody::SBScene::getScene()->reset();
 }
 
 void BaseWindow::LaunchConsoleCB(Fl_Widget* widget, void* data)
@@ -725,32 +722,25 @@ void BaseWindow::LaunchVisemeViewerCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::StartCB(Fl_Widget* widget, void* data)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 }
 
 void BaseWindow::StopCB(Fl_Widget* widget, void* data)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 }
 
 void BaseWindow::StepCB(Fl_Widget* widget, void* data)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	
+
 }
 
 void BaseWindow::PauseCB(Fl_Widget* widget, void* data)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute((char*)"time pause");
+	SmartBody::SBScene::getScene()->command((char*)"time pause");
 }
 
 void BaseWindow::ResetCB(Fl_Widget* widget, void* data)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute((char*)"reset");
+	SmartBody::SBScene::getScene()->command((char*)"reset");
 }
 
 void BaseWindow::CameraResetCB(Fl_Widget* widget, void* data)
@@ -763,15 +753,13 @@ void BaseWindow::CameraResetCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::CameraFrameCB(Fl_Widget* widget, void* data)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute((char*)"camera frame");
+	SmartBody::SBScene::getScene()->command((char*)"camera frame");
 }
 
 void BaseWindow::RotateSelectedCB(Fl_Widget* widget, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
+	
 #if !NO_OGRE_VIEWER_CMD
 	SbmPawn* pawn = rootWindow->fltkViewer->getObjectManipulationHandle().get_selected_pawn();
 	if (!pawn)
@@ -781,7 +769,9 @@ void BaseWindow::RotateSelectedCB(Fl_Widget* widget, void* data)
 			return;
 	}
 
-	SrCamera* camera = mcu.viewer_p->get_camera();
+	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+	if (!camera)
+		return;
 	float x,y,z,h,p,r;
 	pawn->get_world_offset(x, y, z, h, p, r);
 	camera->setCenter(x, y, z);
@@ -792,15 +782,16 @@ void BaseWindow::RotateSelectedCB(Fl_Widget* widget, void* data)
 void BaseWindow::FaceCameraCB(Fl_Widget* widget, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
+	
 	SbmCharacter* character = rootWindow->getSelectedCharacter();
 	if (!character)
 		return;
 	
 	// position the camera such that the character's face appears in the frame
 	SrBox faceBox;
-	SrCamera* camera = mcu.viewer_p->get_camera();
+	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+	if (!camera)
+		return;
 
 	SkSkeleton* skeleton = character->getSkeleton();
 	float height = skeleton->getCurrentHeight();
@@ -901,7 +892,6 @@ void BaseWindow::runScript(std::string filename)
 		fl_alert(message.c_str());
 		file.close();
 	}
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	SbmCharacter* character = getSelectedCharacter();
 	std::string selectedCharacterName = "";
@@ -950,7 +940,7 @@ void BaseWindow::runScript(std::string filename)
 		boost::replace_all(lineStr, "$CHARACTER", selectedCharacterName);
 		boost::replace_all(lineStr, "$TARGET", selectedTargetName);
 
-		mcu.execute((char*)lineStr.c_str());
+		SmartBody::SBScene::getScene()->command((char*)lineStr.c_str());
 	}
 	file.close();
 #endif	
@@ -1271,8 +1261,7 @@ void BaseWindow::SettingsDefaultMediaPathCB(Fl_Widget* w, void* data)
 void BaseWindow::AudioCB(Fl_Widget* w, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SmartBody::SBScene* scene = mcu._scene;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	const bool val = scene->getBoolAttribute("internalAudio");
 	scene->setBoolAttribute("internalAudio", !val);
 }
@@ -1280,20 +1269,13 @@ void BaseWindow::AudioCB(Fl_Widget* w, void* data)
 void BaseWindow::CreateCharacterCB(Fl_Widget* w, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	// get a list of existing skeletons
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::vector<std::string> skeletons;
-	for (std::map<std::string, SkSkeleton*>::iterator iter = mcu.skeleton_map.begin(); 
-		 iter != mcu.skeleton_map.end();
-		 iter++)
-	{
-		skeletons.push_back((*iter).first);
-	}
 
+	std::vector<std::string> skeletonNames = SmartBody::SBScene::getScene()->getSkeletonNames();
+	
 	if (!rootWindow->characterCreator)
 		rootWindow->characterCreator = new CharacterCreatorWindow(rootWindow->x() + 20, rootWindow->y() + 20, 480, 150, strdup("Create a Character"));
 
-	rootWindow->characterCreator->setSkeletons(skeletons);
+	rootWindow->characterCreator->setSkeletons(skeletonNames);
 
 	rootWindow->characterCreator->show();
 	
@@ -1388,7 +1370,7 @@ void BaseWindow::CreateTerrainCB(Fl_Widget* w, void* data)
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		std::string terrainCommand = "terrain load ";
 		terrainCommand.append(terrainFile);
-		mcu.execute((char*)terrainCommand.c_str());
+		SmartBody::SBScene::getScene()->command((char*)terrainCommand.c_str());
 		if (mcu.height_field_p)
 		{
 			mcu.height_field_p->set_scale( 5000.0f, 300.0f, 5000.0f );
@@ -1400,12 +1382,12 @@ void BaseWindow::CreateTerrainCB(Fl_Widget* w, void* data)
 void BaseWindow::TrackCharacterCB(Fl_Widget* w, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (mcu.cameraTracking.size() > 0)
 	{
 		// if any tracks are active, remove them
-		mcu.execute((char*)"camera track");
+		SmartBody::SBScene::getScene()->command((char*)"camera track");
 		return;
 	}
 
@@ -1423,7 +1405,7 @@ void BaseWindow::TrackCharacterCB(Fl_Widget* w, void* data)
 	trackCommand.append(" ");
 	trackCommand.append(joint->name());
 
-	mcu.execute((char*)trackCommand.c_str());
+	SmartBody::SBScene::getScene()->command((char*)trackCommand.c_str());
 }
 
 void BaseWindow::KinematicFootstepsCB(Fl_Widget* w, void* data)

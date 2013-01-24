@@ -452,7 +452,7 @@ EventItemInfoWidget::EventItemInfoWidget( int x, int y, int w, int h, const char
 	eventInfoObject->createStringAttribute("Action","",true,"Basic",20,false,false,false,"?");
 	updateWidget();
 
-	SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();
+	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
 	SmartBody::SBEventHandlerMap& eventMap = manager->getEventHandlers();		
 	eventInfoObject->registerObserver(this);
 	this->begin();
@@ -470,7 +470,7 @@ EventItemInfoWidget::EventItemInfoWidget( int x, int y, int w, int h, const char
 
 void EventItemInfoWidget::updateWidget()
 {	
-	SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();
+	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
 	SmartBody::SBEventHandlerMap& eventMap = manager->getEventHandlers();	
 	SmartBody::SBEventHandlerMap::iterator mi = eventMap.find(eventName);
 	if (mi != eventMap.end())
@@ -487,7 +487,7 @@ void EventItemInfoWidget::updateWidget()
 
 void EventItemInfoWidget::notify( SmartBody::SBSubject* subject )
 {
-	SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();
+	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
 	SmartBody::SBEventHandlerMap& eventMap = manager->getEventHandlers();
 	SmartBody::SBEventHandlerMap::iterator mi = eventMap.find(eventName);
 	if (mi != eventMap.end())
