@@ -87,7 +87,7 @@ class mcuCBHandle;
 
 
 #ifndef USE_PYTHON
-//#define USE_PYTHON
+#define USE_PYTHON
 #endif
 
 #ifdef USE_PYTHON
