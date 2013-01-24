@@ -40,6 +40,10 @@ const SrLine SrLine::z ( SrVec(0,0,0), SrVec(0,0,1.0f) );
 
 #define EPSILON 0.00001 // floats have 7 decimals
 
+SrLine::SrLine () : p1(SrPnt::null), p2(SrPnt::i)
+ {
+ }
+
 // Original code from : http://www.acm.org/jgt/papers/MollerTrumbore97/
 bool SrLine::intersects_triangle ( const SrVec &v0, const SrVec &v1, const SrVec &v2,
                                    float &t, float &u, float &v ) const

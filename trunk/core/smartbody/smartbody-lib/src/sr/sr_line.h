@@ -52,7 +52,7 @@ class SrLine
    public :
 
     /*! Initializes SrLine as the x axis (0,0,0)--(1,0,0) line. */
-    SBAPI SrLine () : p1(SrPnt::null), p2(SrPnt::i) {}
+    SBAPI SrLine ();
 
     /*! Copy constructor. */
     SBAPI SrLine ( const SrLine &l ) : p1(l.p1), p2(l.p2) {}

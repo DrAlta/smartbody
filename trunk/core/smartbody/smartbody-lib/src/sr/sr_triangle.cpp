@@ -64,6 +64,10 @@ static SrVec barycentric ( const SrPnt2& a, const SrPnt2& b, const SrPnt2& c, co
    # undef DET3
  }*/
 
+SrTriangle::SrTriangle () : a(SrPnt::i), b(SrPnt::j), c(SrPnt::k)
+ {
+ }
+
 SrVec SrTriangle::barycentric ( const SrVec &p ) const
  {
    float m[9];
@@ -111,4 +115,3 @@ SrInput& operator>> ( SrInput& in, SrTriangle& t )
  }
 
 //================================== End of File ===========================================
-

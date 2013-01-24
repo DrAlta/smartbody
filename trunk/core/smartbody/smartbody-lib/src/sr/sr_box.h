@@ -48,7 +48,7 @@ class SrBox
    public :
 
     /*! Default constructor initializes the box as the empty box (1,1,1)(0,0,0). */
-    SBAPI SrBox () : a(SrPnt::one), b(SrPnt::null) {}
+    SBAPI SrBox ();
 
     /*! Constructs a box with all vertices the same. This degenerated
         box is identical to a single point and is not considered an
@@ -73,7 +73,7 @@ class SrBox
 	SBAPI void setMaximum(SrPnt& pt) { b = pt;}
 
 	/*! Init the box as (0,0,0)(0,0,0). */
-    SBAPI void set_null () { a=SrPnt::null; b=SrPnt::null; }
+    SBAPI void set_null ();
 
     /*! Sets the minimum and maximum vertices of the box. */
     SBAPI void set ( const SrPnt& min, const SrPnt& max ) { a=min; b=max; }

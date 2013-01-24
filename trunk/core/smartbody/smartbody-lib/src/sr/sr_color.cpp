@@ -38,6 +38,11 @@ const SrColor SrColor::lightgray (225,225,225);
 
 //========================================= SrColor =======================================
 
+SrColor::SrColor ()
+ {
+   *this=gray;
+ }
+
 void SrColor::set ( srbyte x, srbyte y, srbyte z, srbyte w )
  {
    r=x; g=y; b=z; a=w;

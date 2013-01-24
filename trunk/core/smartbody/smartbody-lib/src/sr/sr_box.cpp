@@ -28,10 +28,20 @@
 
 const char* SrBox::class_name = "Box";
 
+SrBox::SrBox () : a(SrPnt::one), b(SrPnt::null)
+ {
+ }
+
 SrBox::SrBox ( const SrBox& x, const SrBox& y )
       : a ( SR_MIN(x.a.x,y.a.x), SR_MIN(x.a.y,y.a.y), SR_MIN(x.a.z,y.a.z) ),
         b ( SR_MAX(x.b.x,y.b.x), SR_MAX(x.b.y,y.b.y), SR_MAX(x.b.z,y.b.z) ) 
  {
+ }
+
+void SrBox::set_null ()
+ {
+   a=SrPnt::null;
+   b=SrPnt::null;
  }
 
 bool SrBox::empty () const

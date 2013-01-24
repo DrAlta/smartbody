@@ -40,7 +40,7 @@ class SrTriangle
    public :
 
     /*! Initializes SrTriangle as the triangle (i,j,k). Implemented inline. */
-    SBAPI SrTriangle () : a(SrPnt::i), b(SrPnt::j), c(SrPnt::k) {}
+    SBAPI SrTriangle ();
 
     /*! Constructor from three points. */
     SBAPI SrTriangle ( const SrPnt& p1, const SrPnt& p2, const SrPnt& p3 ) : a(p1), b(p2), c(p3) {}
