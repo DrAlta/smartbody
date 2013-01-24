@@ -64,7 +64,7 @@ class SBAPI SrColor
    public :
 
     /*! Default constructor. Initializes with color gray. */
-    SrColor () { *this=gray; }
+    SrColor ();
 
     /*! Constructor setting all components. */
     SrColor ( srbyte x, srbyte y, srbyte z, srbyte w=255 ) { set(x,y,z,w); }

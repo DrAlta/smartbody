@@ -46,7 +46,7 @@ class SBAPI SrMat
    public :
 
     /*! Default constructor initializes SrMat as identity. */
-    SrMat () { set(id.e); }
+    SrMat ();
 
     /*! Copy constructor. */
     SrMat ( const SrMat &m ) { set(m.e); }
@@ -156,19 +156,19 @@ class SBAPI SrMat
     void setl4 ( const SrVec &v ) { e[12]=v.x; e[13]=v.y; e[14]=v.z; }
 
     /*! Returns true if all elements are equal to 0.0, false otherwise. */
-    bool isnull () const { return *this==null; }
+    bool isnull () const;
 
     /*! Returns true if the matrix is identical to SrMat::id, false otherwise. */
-    bool isid () const { return *this==id;   }
+    bool isid () const;
 
     /*! Makes SrMatrix be a null matrix. */
-    void zero () { *this=null; }
+    void zero ();
 
     /*! Make elements in interval [-epsilon,epsilon] to become 0 */
     void round ( float epsilon );
 
     /*! Makes SrMatrix be an identity matrix. */
-    void identity () { *this=id; }
+    void identity ();
 
     /*! Transpose SrMatrix. */
     void transpose ();

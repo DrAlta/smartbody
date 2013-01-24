@@ -55,6 +55,10 @@ const SrMat SrMat::id   ( 1.0, 0.0, 0.0, 0.0,
 
 //==================================== SrMat ========================================
 
+SrMat::SrMat ()
+ {
+   set ( id.e );
+ }
 
 SrMat::SrMat ( const float *p )
  {
@@ -97,11 +101,31 @@ void SrMat::set ( const double *p )
    setl4 ( (float)p[12], (float)p[13], (float)p[14], (float)p[15] );
  }
 
+bool SrMat::isnull () const
+ {
+   return *this==null;
+ }
+
+bool SrMat::isid () const
+ {
+   return *this==id;
+ }
+
+void SrMat::zero ()
+ {
+   *this=null;
+ }
+
 void SrMat::round ( float epsilon )
  {
    int i;
    for ( i=0; i<16; i++ )
     if ( e[i]>=-epsilon && e[i]<=epsilon ) e[i]=0;
+ }
+
+void SrMat::identity ()
+ {
+   *this=id;
  }
 
 void SrMat::transpose ()
