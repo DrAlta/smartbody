@@ -32,15 +32,14 @@ void CharacterCreatorWindow::setSkeletons(std::vector<std::string>& skeletonName
 void CharacterCreatorWindow::CreateCB(Fl_Widget* w, void* data)
 {
 	CharacterCreatorWindow* creator = (CharacterCreatorWindow*) (data);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
+	
 	if (creator->inputName->size() == 0)
 	{
 		fl_alert("Please enter a character name.");
 		return;
 	}
 
-	SbmCharacter* character = mcu.getCharacter(creator->inputName->value());
+	SbmCharacter* character = SmartBody::SBScene::getScene()->getCharacter(creator->inputName->value());
 	if (character)
 	{
 		fl_alert("Character name already exists.");
@@ -52,7 +51,7 @@ void CharacterCreatorWindow::CreateCB(Fl_Widget* w, void* data)
 
 	std::stringstream strstr;
 	strstr << "char " << creator->inputName->value() << " init " << skel;
-	mcu.execute((char*) strstr.str().c_str());
+	SmartBody::SBScene::getScene()->command((char*) strstr.str().c_str());
 
 }
 

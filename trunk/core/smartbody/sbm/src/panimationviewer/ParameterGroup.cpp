@@ -188,7 +188,7 @@ void ParameterGroup::updateWeight(std::vector<double>& weights)
 PABlendData* ParameterGroup::getCurrentPABlendData()
 {
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
-	SbmCharacter* character = mcuCBHandle::singleton().getCharacter(charName);
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
 	if (!character)
 		return NULL;
 	if (!character->param_animation_ct)

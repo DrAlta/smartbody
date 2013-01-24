@@ -10,7 +10,6 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Scroll.H>
 
-#include <sbm/mcontrol_util.h>
 #include <controllers/me_ct_blend.hpp>
 #include <controllers/me_ct_time_shift_warp.hpp>
 #include <controllers/me_ct_gaze.h>
@@ -330,8 +329,7 @@ void BehaviorWindow::ReplayCB(Fl_Widget* widget, void* data)
 				strstr << bml;
 
 				// run that bml
-				mcuCBHandle& mcu = mcuCBHandle::singleton();
-				mcu.execute((char*) strstr.str().c_str());
+				SmartBody::SBScene::getScene()->command((char*) strstr.str().c_str());
 				window->updateGUI();
 				window->redraw();
 			}

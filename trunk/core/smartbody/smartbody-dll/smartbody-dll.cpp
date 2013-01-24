@@ -33,7 +33,7 @@ using std::string;
 #if (NACL_BUILD) 
 #define USE_SBPYTHON  0
 #else
-#define USE_SBPYTHON  1
+#define USE_SBPYTHON  0
 #endif
 
 

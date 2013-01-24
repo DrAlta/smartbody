@@ -188,13 +188,15 @@ PABlendEditor::~PABlendEditor()
 
 void PABlendEditor::loadStates()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	stateList->clear();
 	stateList->add("---");
 	// states may have names that conflict with FLTK's parsing, such as a '@'
-	for (size_t i = 0; i < mcu.param_anim_blends.size(); i++)
+	std::vector<std::string> blendNames = SmartBody::SBScene::getScene()->getBlendManager()->getBlendNames();
+	for (std::vector<std::string>::iterator iter = blendNames.begin();
+		 iter != blendNames.end();
+		 iter++)
 	{
-		stateList->add(mcu.param_anim_blends[i]->stateName.c_str());
+		stateList->add((*iter).c_str());
 	}
 	
 	stateList->value(0);
@@ -277,13 +279,13 @@ void PABlendEditor::editStateMotions(Fl_Widget* widget, void* data)
 void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 {
 	PABlendEditor* editor = (PABlendEditor*) data;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	int curValue = editor->stateList->value();
 	editor->loadStates();
 	editor->stateList->value(curValue);
 	editor->stateEditorNleModel->removeAllTracks();
 	std::string currentStateName = editor->stateList->menu()[editor->stateList->value()].label();
-	PABlend* currentState = mcu.lookUpPABlend(currentStateName);
+	PABlend* currentState = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(currentStateName);
+	
 	if (currentState)
 	{
 		if (editor->blendData)
@@ -1183,8 +1185,8 @@ void PABlendEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 	}
 
 	const char* stateText = editor->stateList->text();
-	PABlend* currentState = NULL;
-	currentState = mcuCBHandle::singleton().lookUpPABlend(stateText);
+	PABlend* currentState = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateText);
+	
 	if (!currentState)
 		return;
 
@@ -1388,8 +1390,8 @@ void PABlendEditor::addShape(Fl_Widget* widget, void* data)
 {
 	PABlendEditor* editor = (PABlendEditor*) data;
 	const char* stateText = editor->stateList->text();
-	PABlend* currentState = NULL;
-	currentState = mcuCBHandle::singleton().lookUpPABlend(stateText);
+	PABlend* currentState = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateText);
+	
 	if (!currentState)
 		return;
 
@@ -1419,8 +1421,8 @@ void PABlendEditor::removeShape(Fl_Widget* widget, void* data)
 {
 	PABlendEditor* editor = (PABlendEditor*) data;
 	const char* stateText = editor->stateList->text();
-	PABlend* currentState = NULL;
-	currentState = mcuCBHandle::singleton().lookUpPABlend(stateText);
+	PABlend* currentState = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateText);
+	
 	if (!currentState)
 		return;
 
@@ -1538,9 +1540,10 @@ void PABlendEditor::scrub(Fl_Widget* widget, void* data)
 
 	if (selectedMotions.size() == 1)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		std::string currentStateName = editor->stateList->menu()[editor->stateList->value()].label();
-		PABlend* currentState = mcu.lookUpPABlend(currentStateName);
+
+		PABlend* currentState = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(currentStateName);
+	
 		int lastMotionIndex = currentState->getMotionId(editor->lastSelectedMotion);
 		double curTime = editor->sliderScrub->value();
 		double localTime = currentState->getLocalTime(curTime, lastMotionIndex);

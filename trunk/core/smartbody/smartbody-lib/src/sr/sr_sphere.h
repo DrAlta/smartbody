@@ -26,7 +26,7 @@
 /** \file sr_sphere.h 
  * a sphere
  */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_vec.h>
 
 class SrBox;
@@ -45,19 +45,19 @@ class SrSphere
    public :
 
     /*! Constructs as a sphere centered at (0,0,0) with radius 1 */
-    SrSphere ();
+    SBAPI SrSphere ();
 
     /*! Copy constructor */
-    SrSphere ( const SrSphere& s );
+    SBAPI SrSphere ( const SrSphere& s );
 
     /* Returns the bounding box of all vertices used. The returned box can be empty. */
-    void get_bounding_box ( SrBox &b ) const;
+    SBAPI void get_bounding_box ( SrBox &b ) const;
 
     /*! Outputs in format: "center radius". */
-    friend SrOutput& operator<< ( SrOutput& o, const SrSphere& sph );
+    SBAPI friend SrOutput& operator<< ( SrOutput& o, const SrSphere& sph );
 
     /*! Input from format: "center radius". */
-    friend SrInput& operator>> ( SrInput& in, SrSphere& sph );
+    SBAPI friend SrInput& operator>> ( SrInput& in, SrSphere& sph );
  };
 
 

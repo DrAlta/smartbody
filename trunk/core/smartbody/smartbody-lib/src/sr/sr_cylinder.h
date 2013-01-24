@@ -27,6 +27,7 @@
  * a cylinder
  */
 
+#include <sb/SBTypes.h>
 # include <sr/sr_vec.h>
 
 class SrBox;
@@ -45,19 +46,19 @@ class SrCylinder
    public :
 
     /*! Constructs a cylinder with endpoints (0,0,0) and (1,0,0) and radius 1 */
-    SrCylinder ();
+    SBAPI SrCylinder ();
 
     /*! Copy constructor */
-    SrCylinder ( const SrCylinder& c );
+    SBAPI SrCylinder ( const SrCylinder& c );
 
     /*! Returns the bounding box of all vertices used. The returned box can be empty. */
-    void get_bounding_box ( SrBox &b ) const;
+    SBAPI void get_bounding_box ( SrBox &b ) const;
 
     /*! Outputs in format "p1 p2 radius " */
-    friend SrOutput& operator<< ( SrOutput& o, const SrCylinder& c );
+    SBAPI friend SrOutput& operator<< ( SrOutput& o, const SrCylinder& c );
 
     /*! Input from format "p1 p2 radius " */
-    friend SrInput& operator>> ( SrInput& in, SrCylinder& c );
+    SBAPI friend SrInput& operator>> ( SrInput& in, SrCylinder& c );
  };
 
 

@@ -79,6 +79,8 @@ class PanimationWindow : public Fl_Double_Window, public GenericViewer
 		void draw();
         void show();  
 
+		void setCurrentCharacterName(const std::string& name);
+		const std::string& getCurrentCharacterName();
 		SmartBody::SBCharacter* getCurrentCharacter();
 		bool checkCommand(std::string command);
 		static void execCmd(PanimationWindow* window, std::string command, double tOffset = 0.0);
@@ -108,6 +110,7 @@ class PanimationWindow : public Fl_Double_Window, public GenericViewer
 
 	public:
 		std::string lastCommand;
+		std::string _currentCharacterName;
 	
 		Fl_Tabs*		tabGroup;
 		//PATransitionEditor* transitionEditor;

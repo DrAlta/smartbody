@@ -54,7 +54,7 @@ public:
    }
 
    template<typename DataType>
-   SBAPI DataType getCaller()
+   DataType getCaller()
    {
       return static_cast<DataType>(callbackOwner);
    }

@@ -200,6 +200,7 @@ class SBScene : public SBObject
 		SBJointMapManager* _jointMapManager;
 		SBCollisionManager* _collisionManager;
 		SBDiphoneManager* _diphoneManager;
+		SBEventManager* _eventManager;
 		SBParser* _parser;
 
 		SBCharacterListener* _characterListener;

@@ -25,7 +25,7 @@
 /** \file sr_sa.h 
  * scene action base class
  */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_sn.h>
 
 class SrSnGroup;
@@ -37,7 +37,7 @@ class SrSnShapeBase;
     \brief scene action base class
 
     Defines a base class for applying actions to the scene graph */
-class SrSa
+class SBAPI SrSa
  { protected :
     SrArray<SrMat> _matrix_stack;
 

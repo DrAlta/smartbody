@@ -26,7 +26,7 @@
 /** \file sr_points.h 
  * manages a set of points
  */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_box.h>
 # include <sr/sr_vec2.h>
 # include <sr/sr_color.h>
@@ -50,37 +50,37 @@ class SrPoints
    public :
 
     /* Default constructor. */
-    SrPoints ();
+    SBAPI SrPoints ();
 
     /* Destructor . */
-    virtual ~SrPoints ();
+    SBAPI virtual ~SrPoints ();
 
     /*! Set the size of array P to zero. */
-    void init ();
+    SBAPI void init ();
 
     /*! Allocates A if needed, and set the size of array P and A to zero. */
-    void init_with_attributes ();
+    SBAPI void init_with_attributes ();
 
     /*! Returns true if P array is empty; false otherwise. */
-    bool empty () const { return P.size()==0? true:false; }
+    SBAPI bool empty () const { return P.size()==0? true:false; }
 
     /*! Compress array P and A. */
-    void compress ();
+    SBAPI void compress ();
 
     /*! Push in P a new point */
-    void push ( const SrPnt& p );
-    void push ( const SrPnt2& p );
-    void push ( float x, float y, float z=0 );
+    SBAPI void push ( const SrPnt& p );
+    SBAPI void push ( const SrPnt2& p );
+    SBAPI void push ( float x, float y, float z=0 );
 
     /*! Push in P a new point and push attributes in A. Only valid
         if init_with_attributes() was called before */
-    void push ( const SrPnt& p, SrColor c, float size=1.0f );
-    void push ( const SrPnt2& p, SrColor c, float size=1.0f );
-    void push ( float x, float y, SrColor c, float size=1.0f );
-    void push ( float x, float y, float z, SrColor c, float size=1.0f );
+    SBAPI void push ( const SrPnt& p, SrColor c, float size=1.0f );
+    SBAPI void push ( const SrPnt2& p, SrColor c, float size=1.0f );
+    SBAPI void push ( float x, float y, SrColor c, float size=1.0f );
+    SBAPI void push ( float x, float y, float z, SrColor c, float size=1.0f );
 
     /*! Returns the bounding box of all vertices used. The returned box can be empty. */
-    void get_bounding_box ( SrBox &b ) const;
+    SBAPI void get_bounding_box ( SrBox &b ) const;
  };
 
 

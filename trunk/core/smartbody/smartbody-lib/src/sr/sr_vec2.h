@@ -26,6 +26,7 @@
 # ifndef SR_VEC2_H
 # define SR_VEC2_H
 
+#include <sb/SBTypes.h>
 # include <sr/sr_input.h> 
 # include <sr/sr_output.h> 
 
@@ -37,14 +38,14 @@ class SrVec2;
     interpreting the meaning of parameters. */
 typedef SrVec2 SrPnt2;
 
-float ccw ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3 );
-float dist ( const SrPnt2& p1, const SrPnt2& p2 );
+SBAPI float ccw ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3 );
+SBAPI float dist ( const SrPnt2& p1, const SrPnt2& p2 );
 
 /*! \class SrVec2 sr_vec2.h
     \brief Two dimensional vector. 
 
     Its two coordinates are of type float. */
-class SrVec2
+class SBAPI SrVec2
  { public :
     float x, y;
    public :
@@ -150,135 +151,135 @@ class SrVec2
     void operator /= ( float r ) { x/=r; y/=r; }
 
     /*! Unary minus. Implemented inline. */
-    friend SrVec2 operator - ( const SrVec2& v )
+    SBAPI friend SrVec2 operator - ( const SrVec2& v )
            { return SrVec2 ( -v.x, -v.y ); }
 
     /*! Adds two vectors. Implemented inline. */
-    friend SrVec2 operator + ( const SrVec2& v1, const SrVec2& v2 ) 
+    SBAPI friend SrVec2 operator + ( const SrVec2& v1, const SrVec2& v2 ) 
            { return SrVec2 (v1.x+v2.x, v1.y+v2.y); }
 
     /*! Subtracts two vectors. Implemented inline. */
-    friend SrVec2 operator - ( const SrVec2& v1, const SrVec2& v2 ) 
+    SBAPI friend SrVec2 operator - ( const SrVec2& v1, const SrVec2& v2 ) 
            { return SrVec2 (v1.x-v2.x, v1.y-v2.y); }
 
     /*! Comparison operator. Implemented inline. */
-    friend bool operator == ( const SrVec2& v1, const SrVec2& v2 )
+    SBAPI friend bool operator == ( const SrVec2& v1, const SrVec2& v2 )
            { return v1.x==v2.x && v1.y==v2.y? true:false; }
 
     /*! Comparison operator. Implemented inline. */
-    friend bool operator != ( const SrVec2& v1, const SrVec2& v2 )
+    SBAPI friend bool operator != ( const SrVec2& v1, const SrVec2& v2 )
            { return v1.x!=v2.x || v1.y!=v2.y? true:false; }
 
     /*! Multiplication by scalar. Implemented inline. */
-    friend SrVec2 operator * ( const SrVec2& v, float r )
+    SBAPI friend SrVec2 operator * ( const SrVec2& v, float r )
            { return SrVec2 (v.x*r, v.y*r); }
 
     /*! Division by scalar. Implemented inline. */
-    friend SrVec2 operator / ( const SrVec2& v, float r )
+    SBAPI friend SrVec2 operator / ( const SrVec2& v, float r )
            { return SrVec2 (v.x/r, v.y/r); }
 
     /*! Returns true if dist(v1,v2)<=ds, otherwise returns false. Implemented inline. */
-    friend bool next ( const SrVec2& v1, const SrVec2& v2, float ds )
+    SBAPI friend bool next ( const SrVec2& v1, const SrVec2& v2, float ds )
            { return dist2(v1,v2)<=ds*ds? true:false; }
 
     /*! Swaps the contents of v1 with v2. */
-    friend void swap ( SrVec2& v1, SrVec2& v2 );
+    SBAPI friend void swap ( SrVec2& v1, SrVec2& v2 );
 
     /*! Returns the distance between v1 and v2 using norm_max(). */
-    friend float dist_max ( const SrVec2& v1, const SrVec2& v2 );
+    SBAPI friend float dist_max ( const SrVec2& v1, const SrVec2& v2 );
 
     /*! Returns the distance between p1 and p2. */
-    friend float dist ( const SrPnt2& p1, const SrPnt2& p2 );
+    SBAPI friend float dist ( const SrPnt2& p1, const SrPnt2& p2 );
 
     /*! Returns the square of the distance between p1 and p2. */
-    friend float dist2 ( const SrPnt2& p1, const SrPnt2& p2 );
+    SBAPI friend float dist2 ( const SrPnt2& p1, const SrPnt2& p2 );
 
     /*! Returns the angle in radians between v1 and v2,
         which is inside the interval [0,pi] */
-    friend float angle ( const SrVec2& v1, const SrVec2& v2 );
+    SBAPI friend float angle ( const SrVec2& v1, const SrVec2& v2 );
 
-    friend float angle_fornormvecs ( const SrVec2 &v1, const SrVec2 &v2 );
+    SBAPI friend float angle_fornormvecs ( const SrVec2 &v1, const SrVec2 &v2 );
 
     /*! Returns the oriented angle in radians between v1 and v2,
         which is inside the interval (-pi,pi] */
-    friend float angle_ori ( const SrVec2& v1, const SrVec2& v2 );
+    SBAPI friend float angle_ori ( const SrVec2& v1, const SrVec2& v2 );
 
     /*! Returns the angle between v1 and v2, but using the max norm.
         The angle will be a value inside the interval [0,4]. */
-    friend float angle_max ( const SrVec2& v1, const SrVec2& v2 ); // [0,4]
+    SBAPI friend float angle_max ( const SrVec2& v1, const SrVec2& v2 ); // [0,4]
 
     /*! Returns the oriented angle between v1 and v2, but using the max norm.
         The angle will be a value inside the interval (-4,4]. */
-    friend float angle_max_ori ( const SrVec2 &v1, const SrVec2 &v2 ); // (-4,4]
+    SBAPI friend float angle_max_ori ( const SrVec2 &v1, const SrVec2 &v2 ); // (-4,4]
 
     /*! Returns the cross product z coordinate of v1 and v2: a zero value means
         that the vectors are colinear, otherwise, a positive number means that
         v2 is on the left side of v1, and a negative number means that v2 is on
         the right side of v1. */
-    friend float cross ( const SrVec2& v1, const SrVec2& v2 );
+    SBAPI friend float cross ( const SrVec2& v1, const SrVec2& v2 );
 
     /*! Returns the dot product of v1 and v2 (v1.x*v2.x + v1.y*v2.y). */
-    friend float dot ( const SrVec2& v1, const SrVec2& v2 );
+    SBAPI friend float dot ( const SrVec2& v1, const SrVec2& v2 );
 
     /*! Returns the linear interpolation of v1 v2 in parameter t ( v1(1-t)+v2(t) ). */
-    friend SrVec2 lerp ( const SrVec2& v1, const SrVec2& v2, float t );
+    SBAPI friend SrVec2 lerp ( const SrVec2& v1, const SrVec2& v2, float t );
 
     /*! Returns -1,0,1 depending if v1 is less, equal or greater than v2, 
         using a comparison by coordinates. */
-    friend int compare ( const SrVec2& v1, const SrVec2& v2 );
+    SBAPI friend int compare ( const SrVec2& v1, const SrVec2& v2 );
 
     /*! Pointer version of the compare function. */
-    friend int compare ( const SrVec2* v1, const SrVec2* v2 );
+    SBAPI friend int compare ( const SrVec2* v1, const SrVec2* v2 );
 
     /*! Returns -1,0,1 depending if v1 is less, equal or greater than v2, 
         using a 2d polar comparison with în relation to (1,0) (using angle_max()). */
-    friend int compare_polar ( const SrVec2& v1, const SrVec2& v2 );
+    SBAPI friend int compare_polar ( const SrVec2& v1, const SrVec2& v2 );
 
     /*! Pointer version of the compare_polar function. */
-    friend int compare_polar ( const SrVec2* v1, const SrVec2* v2 );
+    SBAPI friend int compare_polar ( const SrVec2* v1, const SrVec2* v2 );
 
     /*! Returns u,v,w==1-u-v, u+v+w==1, such that p1*u + p2*v + p3*w == p */
-    friend void barycentric ( const SrPnt2& p1, const SrPnt2& p2, const SrPnt2& p3, const SrPnt2& p,
+    SBAPI friend void barycentric ( const SrPnt2& p1, const SrPnt2& p2, const SrPnt2& p3, const SrPnt2& p,
                               float& u, float& v, float& w );
 
     /*! Wrapper for the sr_ccw() function in sr_geo2.h */
-    friend float ccw ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3 );
+    SBAPI friend float ccw ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3 );
 
     /*! Wrapper for the equivalent sr_segments_intersect function in sr_geo2.h */
-    friend bool segments_intersect ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3, const SrVec2& p4 );
+    SBAPI friend bool segments_intersect ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3, const SrVec2& p4 );
 
     /*! Wrapper for the equivalent sr_segments_intersect function in sr_geo2.h */
-    friend bool segments_intersect ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3, const SrVec2& p4, SrVec2& p );
+    SBAPI friend bool segments_intersect ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3, const SrVec2& p4, SrVec2& p );
 
     /*! Wrapper for the equivalent sr_lines_intersect function in sr_geo2.h */
-    friend bool lines_intersect ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3, const SrVec2& p4 );
+    SBAPI friend bool lines_intersect ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3, const SrVec2& p4 );
 
     /*! Wrapper for the equivalent sr_lines_intersect function in sr_geo2.h */
-    friend bool lines_intersect ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3, const SrVec2& p4, SrVec2& p );
+    SBAPI friend bool lines_intersect ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3, const SrVec2& p4, SrVec2& p );
 
     /*! Wrapper for the equivalent sr_line_projection function in sr_geo2.h */
-    friend void line_projection ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p, SrVec2& q );
+    SBAPI friend void line_projection ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p, SrVec2& q );
 
     /*! Wrapper for the equivalent sr_segment_projection function in sr_geo2.h */
-    friend bool segment_projection ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p, SrVec2& q, float epsilon );
+    SBAPI friend bool segment_projection ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p, SrVec2& q, float epsilon );
 
     /*! Wrapper for the equivalent sr_in_segment function in sr_geo2.h */
-    friend bool in_segment ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p, float epsilon );
+    SBAPI friend bool in_segment ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p, float epsilon );
 
     /*! Wrapper for the equivalent sr_in_segment function in sr_geo2.h */
-    friend bool in_segment ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p, float epsilon, float& dist2 );
+    SBAPI friend bool in_segment ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p, float epsilon, float& dist2 );
 
     /*! Wrapper for the equivalent sr_in_triangle function in sr_geo2.h */
-    friend bool in_triangle ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3, const SrVec2& p );
+    SBAPI friend bool in_triangle ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3, const SrVec2& p );
 
     /*! Wrapper for the equivalent sr_in_circle function in sr_geo2.h */
     bool in_circle ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3, const SrVec2& p );
 
     /*! Outputs in format: "x y". */
-    friend SrOutput& operator<< ( SrOutput& o, const SrVec2& v );
+    SBAPI friend SrOutput& operator<< ( SrOutput& o, const SrVec2& v );
 
     /*! Inputs from format: "x y". */
-    friend SrInput& operator>> ( SrInput& in, SrVec2& v );
+    SBAPI friend SrInput& operator>> ( SrInput& in, SrVec2& v );
  };
 
 //============================== end of file ===============================

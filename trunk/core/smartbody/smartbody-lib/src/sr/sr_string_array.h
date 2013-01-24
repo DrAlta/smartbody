@@ -26,7 +26,7 @@
 
 /** \file sr_string_array.h 
  * resizeable array of strings */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_array.h> 
 
 /*! \class SrStringArray sr_string_array.h
@@ -38,90 +38,90 @@
 class SrStringArray : private SrArray<char*>
  { public :
     /*! Default constructor */
-    SrStringArray ( int s=0, int c=0 );
+    SBAPI SrStringArray ( int s=0, int c=0 );
 
     /*! Copy constructor */
-    SrStringArray ( const SrStringArray& a );
+    SBAPI SrStringArray ( const SrStringArray& a );
 
     /*! Destructor */
-    virtual ~SrStringArray ();
+    SBAPI virtual ~SrStringArray ();
 
     /*! Returns true if the array has no elements, and false otherwise. */
-    bool empty () const { return SrArray<char*>::empty(); }
+    SBAPI bool empty () const { return SrArray<char*>::empty(); }
 
     /*! Returns the capacity of the array. */
-    int capacity () const { return SrArray<char*>::capacity(); }
+    SBAPI int capacity () const { return SrArray<char*>::capacity(); }
 
     /*! Returns the current size of the array. */
-    int size () const { return SrArray<char*>::size(); }
+    SBAPI int size () const { return SrArray<char*>::size(); }
 
     /*! Changes the size of the array. */
-    void size ( int ns );
+    SBAPI void size ( int ns );
 
     /*! Changes the capacity of the array. */
-    void capacity ( int nc );
+    SBAPI void capacity ( int nc );
 
     /*! Makes capacity to be equal to size. */
-    void compress ();
+    SBAPI void compress ();
 
     /*! Returns a valid index as if the given index references a circular
         array, ie, it returns index%size() for positive numbers. Negative
         numbers are also correctly mapped. */
-    int validate ( int index ) const { return SrArray<char*>::validate(index); }
+    SBAPI int validate ( int index ) const { return SrArray<char*>::validate(index); }
 
     /*! Sets all elements to s */
-    void setall ( const char* s );
+    SBAPI void setall ( const char* s );
 
     /*! Sets element i to become a copy of s. Index i must be a valid entry. */
-    void set ( int i, const char* s );
+    SBAPI void set ( int i, const char* s );
 
     /*! Gets a const pointer to the string index i. If that string was not
         defined it returns a pointer to a static empty string "", so that
         always a valid string is returned. */
-    const char* get ( int i ) const;
+    SBAPI const char* get ( int i ) const;
 
     /*! Operator version of get() */
-    const char* operator[] ( int i ) const { return get(i); }
+    SBAPI const char* operator[] ( int i ) const { return get(i); }
 
     /*! Returns a const pointer to the last element or 0 if the array is empty*/
-    const char* top () const;
+    SBAPI const char* top () const;
 
     /*! Pop and frees element size-1 if the array is not empty */
-    void pop ();
+    SBAPI void pop ();
 
     /*! Appends one element */
-    void push ( const char* s );
+    SBAPI void push ( const char* s );
 
     /*! Inserts dp positions, starting at pos i, and seting string s in
         each new position created. */
-    void insert ( int i, const char* s, int dp=1 );
+    SBAPI void insert ( int i, const char* s, int dp=1 );
 
     /*! Removes dp positions starting from pos i */
-    void remove ( int i, int dp=1 );
+    SBAPI void remove ( int i, int dp=1 );
 
     /*! Copy operator */
-    void operator = ( const SrStringArray& a );
+    SBAPI void operator = ( const SrStringArray& a );
 
     /*! Inserts one string, considering the array is sorted. Returns the inserted position, 
         or -1 if duplication occurs and allowdup is false. */
-    int insort ( const char* s, bool allowdup=true );
+    SBAPI int insort ( const char* s, bool allowdup=true );
 
     /*! Sort array */
-    void sort ();
+    SBAPI void sort ();
 
     /*! Linear search */
-    int lsearch ( const char* s ) const;
+    SBAPI int lsearch ( const char* s ) const;
 
     /*! Binary search for sorted arrays. Returns index of the element found, 
         or -1 if not found. If not found and pos is not 0, pos will have the 
         position to insert the element keeping the array sorted. */
-    int bsearch ( const char* s, int* pos=0 );
+    SBAPI int bsearch ( const char* s, int* pos=0 );
 
     /*! Validate path to be a valid path and push it to the string array.
         If the path is not valid (eg null), or is already in the array, nothing
         is done and -1 is returned. Case sensitive comparison is used.
         In case of success the position of the added path is returned. */
-    int push_path ( const char* path );
+    SBAPI int push_path ( const char* path );
 
     /*! Considers that the string array contains a list of paths and tries to locate
         and open a file by searching in these paths.
@@ -136,18 +136,18 @@ class SrStringArray : private SrArray<char*>
         Returns true if the file could be open. In such case, the successfull full file
         name can be found in inp.filename(). False is returned in case of failure.
         Parameter mode is the fopen() mode: "rt", etc.  */
-    bool open_file ( SrInput& inp, const char* filename, const char* mode, const char* basedir );
+    SBAPI bool open_file ( SrInput& inp, const char* filename, const char* mode, const char* basedir );
 
     /*! Frees the data of SrStringArray, and then makes SrStringArray be the
         given array a. After this, a is set to be a valid empty array. The data
         is moved without reallocation. */
-    void take_data ( SrStringArray& a );
+    SBAPI void take_data ( SrStringArray& a );
 
     /*! Outputs all elements of the array in format ["e0" "e1" ... "en"]. */
-    friend SrOutput& operator<< ( SrOutput& o, const SrStringArray& a );
+    SBAPI friend SrOutput& operator<< ( SrOutput& o, const SrStringArray& a );
 
     /*! Inputs elements in format ["e0" "e1" ... "en"]. */
-    friend SrInput& operator>> ( SrInput& in, SrStringArray& a );
+    SBAPI friend SrInput& operator>> ( SrInput& in, SrStringArray& a );
  };
 
 #endif // SR_STRING_ARRAY_H

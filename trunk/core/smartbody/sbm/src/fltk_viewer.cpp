@@ -83,6 +83,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 #if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support
 #include "sbm/GPU/SbmShader.h"
@@ -368,8 +369,6 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
    _data = new FltkViewerData();
    _gestureData = new GestureData();
-   _locoData = new LocomotionData();
-   _paLocoData = new PALocomotionData();
 
    _data->root = new SrSnGroup; // we maintain root pointer always valid
    _data->rendermode = ModeAsIs;
@@ -439,13 +438,10 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _lastSelectedCharacter = "";   
    _retargetStepWindow = NULL;
 
-   // init timer update for keyboard
-   Fl::add_timeout(0.01,timerUpdate,_paLocoData);
-
    // register gesture event handler
 	GestureVisualizationHandler* gv = new GestureVisualizationHandler();
 	gv->setGestureData(_gestureData);
-	SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();
+	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
 	manager->addEventHandler("bmlstatus", gv);
 
 }
@@ -508,12 +504,13 @@ void FltkViewer::show_menu ()
 
 void FltkViewer::applyToCharacters()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> characterNames = scene->getCharacterNames();
+	for (std::vector<std::string> ::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		SbmCharacter* character = (*iter).second;
+		SmartBody::SBCharacter* character = scene->getCharacter(*iter);
 		// set the visibility parameters of the scene
 		//character->scene_p->set_visibility(_data->showbones,_data->showgeometry, _data->showcollisiongeometry, _data->showaxis);
 
@@ -1112,21 +1109,19 @@ void MakeShadowMatrix( GLfloat points[3][3], GLfloat light[4], GLfloat matrix[4]
 
 void FltkViewer::updateLights()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
+	
 	// get any pawns called 'light#' 
 	// if none exist, use the standard lights
 	_lights.clear();
-	std::map<std::string, SbmPawn*>& pawnMap = mcu.getPawnMap();
-	for (std::map<std::string, SbmPawn*>::iterator iter = pawnMap.begin();
-		 iter != pawnMap.end();
-		 iter++)
+	std::vector<std::string> pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::iterator iter = pawnNames.begin();
+		 iter != pawnNames.end();
+	      iter++)
 	{
-		SbmPawn* pawn = (*iter).second;
-		const std::string& name = pawn->getName();
+		SmartBody::SBPawn* sbpawn = SmartBody::SBScene::getScene()->getPawn(*iter);
+		const std::string& name = sbpawn->getName();
 		if (name.find("light") == 0)
 		{
-			SmartBody::SBPawn* sbpawn = dynamic_cast<SmartBody::SBPawn*>(pawn);
 			SrLight light;
 			light.position = sbpawn->getPosition();
 			SmartBody::BoolAttribute* directionalAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("lightIsDirectional"));
@@ -1623,552 +1618,7 @@ static void translate_event ( SrEvent& e, SrEvent::EventType t, int w, int h, Fl
 
 void FltkViewer::translate_keyboard_state()
 {
-	_paLocoData->prevJumping = _paLocoData->jumping;
-	_paLocoData->prevStarting = _paLocoData->starting;
-	_paLocoData->prevStopping = _paLocoData->stopping;
-	bool locomotion_cmd = false;
-	bool paLocomotionCmd = false;
-	float prevV = _paLocoData->v;
-	float prevW = _paLocoData->w;
-	float scoot = 0.0f;
-	char cmd[300];
-	cmd[0] = '\0';
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	if(_locoData->x_flag == 0 && _locoData->z_flag == 0)
-	{
-		_locoData->rps_flag = 0;
-		_locoData->z_flag = 1;
-		_locoData->x_flag = 0;
-		_locoData->spd = _locoData->z_spd;
-		sprintf(_locoData->t_direction, "forward ");
-	}
-
-	int counter = 0;
-	SbmCharacter* character = NULL;
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
-	{
-		if (counter == _locoData->char_index)
-		{
-			character = (*iter).second;
-			sprintf(_locoData->character, "char %s ", character->getName().c_str());
-		}
-		counter++;
-	}
-	if (!character)
-		return;
-
-
-	sprintf(cmd, "test loco ");
-	strcat(cmd, _locoData->character);
-
-
-	if(Fl::event_key('r'))
-	{
-		_locoData->height_disp += _locoData->height_disp_delta;
-		//if(height_disp > 0.0f) height_disp = 0.0f;
-	}
-
-// 	if (Fl::event_key('c'))
-// 	{
-// 		LOG("push c");
-//  		MeCtExampleBodyReach* bodyReachCt = getCurrentCharacterBodyReachController();
-// 		if (bodyReachCt)
-// 		{
-// 			bodyReachCt->simplexIndex = (bodyReachCt->simplexIndex + 1)%bodyReachCt->simplexList.size();
-// 		}
-// 	}
-
-	if(Fl::event_key('f'))
-	{
-		_locoData->height_disp -= _locoData->height_disp_delta;
-		//if(height_disp < -50.0f) height_disp = -50.0f;
-	}
-	if(Fl::event_key('k'))
-	{
-		++_locoData->off_height_comp;
-	}
-	if(Fl::event_key('m'))
-	{
-		--_locoData->off_height_comp;
-	}
-	if(Fl::event_key('x'))
-	{
-		SbmCharacter* actor = NULL;		
-		//for(int i = 0; i < mcu.character_map.get_num_entries(); ++i)
-		{
-			++_locoData->char_index;
-			if(_locoData->char_index >= mcu.getNumCharacters())
-			{
-				_locoData->char_index = 0;
-			}
-			int counter = 0;
-			for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-				iter != mcu.getCharacterMap().end();
-				iter++)
-			{
-				if (counter != _locoData->char_index)
-				{
-					counter++;
-					continue;
-				}
-				if (_paLocoData->character)
-					_paLocoData->character->unregisterObserver(this);
-				_paLocoData->character = actor;
-				if (_paLocoData->character)
-					_paLocoData->character->registerObserver(this);
-				break;
-			}
-
-		}
-
-		//_data->showselection = !_data->showselection;
-		// check the widget
-		/*int numChildren = _data->menubut->children();
-		for (int c = 0; c < numChildren; c++)
-		{
-			Widget* wchild = _data->menubut->child(c);
-			if (strcmp(wchild->label(), "&locomotion") == 0)
-			{
-				Group* group = dynamic_cast<Group*>(wchild);
-				if (group)
-				{
-					int numGrandChildren = group->children();
-					for (int g = 0; g < numGrandChildren; g++)
-					{
-						std::cout << group->label() << std::endl;
-						Widget* grandChild = group->child(g);
-						if (strcmp(grandChild->label(), "&show selection") == 0)
-						{
-							int vals[1] = { g };
-							
-							grandChild->click_to_focus();
-							grandChild->set_selected();
-							grandChild->redraw();
-							_data->menubut->set_item(vals, 1);
-							fltk::ToggleItem* item = dynamic_cast<fltk::ToggleItem*>(grandChild);
-							int y = 0;
-							if (item)
-							{
-								
-							}
-						}
-						
-					}
-				}
-				std::cout << group->label() << std::endl;
-				
-			}
-			
-		}*/
-
-	}
-
-	if(Fl::event_key('w'))
-	{
-		if(_locoData->z_flag != 0) _locoData->z_spd += 10;
-		else if(_locoData->x_flag != 0) _locoData->x_spd += 1;
-	}
-	if(Fl::event_key('s'))
-	{
-		if(_locoData->z_flag != 0) _locoData->z_spd -= 10;
-		else if(_locoData->x_flag != 0) _locoData->x_spd -= 1;
-		if(_locoData->z_spd < 0) _locoData->z_spd = 0;
-		if(_locoData->x_spd < 0) _locoData->x_spd = 0;
-	}
-
-	if(Fl::event_key('l'))
-	{
-		return;
-	}
-
-	if(Fl::event_key('p'))
-	{
-		return;
-	}
-
-	//direction control
-	PABlendData* blendData = NULL;
-	if (_paLocoData->character && _paLocoData->character->param_animation_ct)
-		if (_paLocoData->character->param_animation_ct)
-			blendData = _paLocoData->character->param_animation_ct->getCurrentPABlendData();
-
-#ifdef OLD_LOCOMOTION_CONTROL
-	if(Fl::event_key(FL_Up))
-	{
-		if(!_locoData->upkey)
-		{
-			_locoData->rps_flag = 0;
-			_locoData->z_flag = 1;
-			_locoData->x_flag = 0;
-			_locoData->spd = _locoData->z_spd;
-			_locoData->kmode = 0;
-			sprintf(_locoData->t_direction, "forward ");
-			_locoData->upkey = true;
-		}
-		if (_paLocoData->character->locomotion_type == SbmCharacter::Example)
-		{
-
-			if (Fl::event_state(FL_ALT))
-				_paLocoData->starting = true;
-			if (!_paLocoData->starting)
-				if (_paLocoData->v < -9990 && state)
-					state->getParameter(_paLocoData->v, _paLocoData->w, scoot);
-				else
-					_paLocoData->v += _paLocoData->linearVelocityIncrement;
-			paLocomotionCmd = true;
-		}
-	}
-	else
-	{
-		_locoData->upkey = false;
-	}
-	if(Fl::event_key(FL_Down))
-	{
-		if(!_locoData->downkey)
-		{
-			_locoData->z_flag = -1;
-			_locoData->x_flag = 0;
-			_locoData->rps_flag = 0;
-			_locoData->spd = _locoData->z_spd;
-			_locoData->kmode = 0;
-			sprintf(_locoData->t_direction, "backward ");
-			_locoData->downkey = true;
-		}
-		if (_paLocoData->character->locomotion_type == SbmCharacter::Example)
-		{
-			if (Fl::event_state(FL_ALT))
-				_paLocoData->stopping = true;
-			if (!_paLocoData->stopping)
-				if (_paLocoData->v < -9990 && state)
-					state->getParameter(_paLocoData->v, _paLocoData->w, scoot);
-				else
-					_paLocoData->v -= _paLocoData->linearVelocityIncrement;
-			paLocomotionCmd = true;
-		}
-	}
-	else
-	{
-		_locoData->downkey = false;
-	}
-	if(Fl::event_key(FL_Left))
-	{
-		if(!_locoData->leftkey)
-		{
-			_locoData->rps_flag = -1;
-			_locoData->leftkey = true;
-		}
-		if (_paLocoData->character->locomotion_type == SbmCharacter::Example)
-		{
-			if (_paLocoData->w < -9990 && state)
-				state->getParameter(_paLocoData->v, _paLocoData->w, scoot);
-			else
-				_paLocoData->w += _paLocoData->angularVelocityIncrement;
-			paLocomotionCmd = true;
-		}
-	}
-	else
-	{
-		_locoData->leftkey = false;
-	}
-	if(Fl::event_key(FL_Right))
-	{
-		if(!_locoData->rightkey)
-		{
-			_locoData->rps_flag = 1;
-			_locoData->rightkey = true;
-		}
-		if (_paLocoData->character->locomotion_type == SbmCharacter::Example)
-		{
-			if (_paLocoData->w < -9990 && state)
-				state->getParameter(_paLocoData->v, _paLocoData->w, scoot);
-			else
-				_paLocoData->w -= _paLocoData->angularVelocityIncrement;
-			paLocomotionCmd = true;
-		}
-	}
-	else
-	{
-		_locoData->rightkey = false;
-	}
-	if (Fl::event_key(' '))
-	{
-		_paLocoData->jumping = true;
-		_paLocoData->starting = false;
-		_paLocoData->stopping = false;
-		paLocomotionCmd = true;
-	}
-
-	if(Fl::event_key('a'))//speed control
-	{
-		if(!_locoData->a_key)
-		{
-			_locoData->x_flag = 1;
-			_locoData->z_flag = 0;
-			_locoData->rps_flag = 0;
-			_locoData->spd = _locoData->x_spd;
-			sprintf(_locoData->t_direction, "leftward ");
-			_locoData->a_key = true;
-		}
-	}
-	else
-	{
-		_locoData->a_key = false;
-	}
-
-	if(Fl::event_key('d'))//speed control
-	{
-		if(!_locoData->d_key)
-		{
-			_locoData->x_flag = -1;
-			_locoData->z_flag = 0;
-			_locoData->rps_flag = 0;
-			_locoData->spd = _locoData->x_spd;
-			sprintf(_locoData->t_direction, "rightward ");
-			_locoData->d_key = true;
-		}
-	}
-	else
-	{
-		_locoData->d_key = false;
-	}
-
-	if(!_locoData->rightkey && !_locoData->leftkey)
-	{
-		_locoData->rps_flag = 0;
-	}
-
-		if(_locoData->upkey
-		|| _locoData->downkey
-		|| _locoData->rightkey
-		|| _locoData->leftkey
-		|| _locoData->a_key
-		|| _locoData->d_key)
-	{
-		locomotion_cmd = true;
-	}
-
-	char tt[200];
-	
-	strcat(cmd, _locoData->t_direction);
-	//sprintf(tt, "spd %f rps %f time 0.5", spd, rps_flag * rps);
-
-	if(_locoData->kmode == 0) sprintf(tt, "spd 0 rps %f time 0.7", _locoData->rps_flag * _locoData->rps);
-	else sprintf(tt, "spd 0 lrps %f angle 3.14159265 time 1.0", _locoData->rps_flag * _locoData->rps);
-
-	if (_paLocoData->character && _paLocoData->character->locomotion_type == SbmCharacter::Example)
- 		locomotion_cmd = false;
-	if(locomotion_cmd) 
-	{
-		strcat(cmd, tt);
-		//printf("\n%s", cmd);
-		mcu.execute(cmd);
-	}
-	if (paLocomotionCmd)
-	{
-		// p.s. quite confused about the logic here: _paLocoData->starting && _paLocoData->prevStarting? why this works?
-		//if (_paLocoData->starting && _paLocoData->prevStarting && state && state->stateName == PseudoIdleState)
-		if (_paLocoData->starting && state && state->stateName == PseudoIdleState)
-		{
-			std::stringstream command1;			
-			command1 << "panim schedule char " << _paLocoData->character->getName() << " state allLocomotion loop true playnow false additive false joint null";
-			//std::stringstream command2;
-			//command2 << "panim schedule char " << _paLocoData->character->getName() << " state UtahLocomotion loop true playnow false additive false joint null";
-			mcu.execute((char*)command1.str().c_str());
-			//mcu.execute((char*)command2.str().c_str());			
-			_paLocoData->starting = false;
-		}
-		else if (_paLocoData->stopping && _paLocoData->prevStopping && state && state->stateName == "allLocomotion")
-		{
-			std::stringstream command;
-			command << "panim schedule char " << _paLocoData->character->getName() << " state UtahWalkToStop loop false playnow false additive false joint null ";
-			mcu.execute((char*)command.str().c_str());
-			_paLocoData->stopping = false;
-		}
-		else if (_paLocoData->jumping && _paLocoData->prevJumping && state && state->stateName == "allLocomotion")
-		{
-			std::stringstream command1;
-			command1 << "panim schedule char " << _paLocoData->character->getName() << " state UtahJump loop false playnow false additive false joint null ";
-			mcu.execute((char*)command1.str().c_str());	
-			std::stringstream command2;
-			command2 << "panim schedule char " << _paLocoData->character->getName() << " state UtahLocomotion loop true playnow false additive false joint null ";
-			for (int i = 0; i < state->getNumMotions(); i++)
-				command2 << state->weights[i] << " ";
-			mcu.execute((char*)command2.str().c_str());
- 			_paLocoData->jumping = false;
-		}
-		else
-		{
-			if (state)
-			{
-				if (_paLocoData->v < -9990 || _paLocoData->w < -9990)
-					state->getParameter(_paLocoData->v, _paLocoData->w, scoot);
-				bool success = state->setWeight(_paLocoData->v, _paLocoData->w, scoot);
-
-				// in case scoot value comes as non-zero
-				float x = 0.0f, y = 0.0f, z = 0.0f;
-				state->getParameter(x, y, z);
-
-				if (!success || z != 0.0f)
-				{
-					_paLocoData->v = prevV;
-					_paLocoData->w = prevW;
-					state->setWeight(_paLocoData->v, _paLocoData->w, scoot);
-				}
-				_paLocoData->character->param_animation_ct->updateWeights();
-			}
-		}
-	}
-#else
-	
-	static std::map<int,int> keyMap;
-	if (keyMap.size() == 0)
-	{
-		keyMap['w'] = PALocomotionData::KEY_UP;
-		keyMap['s'] = PALocomotionData::KEY_DOWN;
-		keyMap['a'] = PALocomotionData::KEY_LEFT;
- 		keyMap['d'] = PALocomotionData::KEY_RIGHT;
-		keyMap['q'] = PALocomotionData::KEY_TURNLEFT;
-		keyMap['e'] = PALocomotionData::KEY_TURNRIGHT;
-	}
-
-	std::map<int,int>::iterator mi;
-	for ( mi  = keyMap.begin();
-		  mi != keyMap.end();
-		  mi++)
-	{
-		if (Fl::event_key(mi->first))
-		{
-			_paLocoData->pressKey(mi->second);
-		}
-		else
-		{
-			_paLocoData->releaseKey(mi->second);
-		}
-	}	
-#endif
 }
-
-
-/*
-static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h)
-{
-	e.type = t;
-	bool not_locomotion = false;
-	e.key = Fl::event_key();
-	char cmd[300];
-	cmd[0] = '\0';
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	if(_locoData->x_flag == 0 && _locoData->z_flag == 0)
-	{
-		_locoData->rps_flag = 0;
-		_locoData->z_flag = 1;
-		_locoData->x_flag = 0;
-		_locoData->spd = _locoData->z_spd;
-		sprintf(_locoData->t_direction, "forward ");
-	}
-
-	SbmCharacter* actor = NULL;
-	mcu.character_map.reset();
-	for(int i = 0; i <= _locoData->char_index; ++i)
-	{
-		actor = mcu.character_map.next();
-		sprintf(_locoData->character, "char %s ", actor->name);
-	}
-
-	sprintf(cmd, "test loco ");
-
-	// locomotion control
-	switch (e.key)
-	{
-	case FL_UP: //move forward
-		_locoData->rps_flag = 0;
-		_locoData->z_flag = 1;
-		_locoData->x_flag = 0;
-		_locoData->spd = _locoData->z_spd;
-		sprintf(_locoData->t_direction, "forward ");
-		break;
-
-    case FL_DOWN://move back
-		_locoData->z_flag = -1;
-		_locoData->x_flag = 0;
-		_locoData->rps_flag = 0;
-		_locoData->spd = _locoData->z_spd;
-		sprintf(_locoData->t_direction, "backward ");
-		break;
-
-	case FL_Left://turn left
-		_locoData->rps_flag = -1;
-		break;
-
-	case 'x':
-		++_locoData->char_index;
-		if(_locoData->char_index >= mcu.character_map.get_num_entries())
-		{
-			_locoData->char_index = 0;
-		}
-		not_locomotion = true;
-		break;
-
-	case FL_Right://turn right
-		rps_flag = 1;
-		break;
-
-	case 'w'://speed control
-		if(z_flag != 0) z_spd += 10;
-		else if(x_flag != 0) x_spd += 1;
-		not_locomotion = true;
-		break;
-
-	case 's'://speed control
-		if(z_flag != 0) z_spd -= 10;
-		else if(x_flag != 0) x_spd -= 1;
-		if(z_spd < 0) z_spd = 0;
-		if(x_spd < 0) x_spd = 0;
-		not_locomotion = true;
-		break;
-
-	case 'a'://speed control
-		x_flag = 1;
-		z_flag = 0;
-		rps_flag = 0;
-		spd = x_spd;
-		sprintf(t_direction, "leftward ");
-		break;
-
-	case 'd'://speed control
-		x_flag = -1;
-		z_flag = 0;
-		rps_flag = 0;
-		spd = x_spd;
-		sprintf(t_direction, "rightward ");
-		break;
-
-	case ' ':// stop
-		sprintf(cmd, "test loco stop");
-		break;
-	default:
-		not_locomotion = true;
-		break;
-	}
-	char tt[200];
-	strcat(cmd, character);
-	strcat(cmd, t_direction);
-	//sprintf(tt, "spd %f rps %f time 0.5", spd, rps_flag * rps);
-
-	sprintf(tt, "spd 0 rps %f time 0.5", rps_flag * rps);
-	if(not_locomotion == false) 
-	{
-		strcat(cmd, tt);
-		//printf("\n%s", cmd);
-		mcu.execute(cmd);
-	}
-}
-*/
-
 
 void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 {
@@ -2180,8 +1630,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 	//if (toks.size() != 2)
 	//	return;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SmartBody::SBScene* scene = mcu._scene;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	char cmdStr[256];
 	SrVec p1;
 	SrVec p2;
@@ -2193,16 +1642,16 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 	{
 		//dest.y = 102;		
 		std::string skelName = toks[1].c_str();
-		SmartBody::SBSkeleton* skel = mcu._scene->getSkeleton(skelName);
+		SmartBody::SBSkeleton* skel = scene->getSkeleton(skelName);
 		if (skel)
 		{
 			sprintf(cmdStr,"char defaultChar%d init %s",characterCount,toks[1].c_str());
-			mcu.execute(cmdStr);
+			SmartBody::SBScene::getScene()->command(cmdStr);
 			float yOffset = -skel->getBoundingBox().a.y;
 			dest.y = yOffset;
 			sprintf(cmdStr,"set char defaultChar%d world_offset x %f y %f z %f",characterCount,dest.x,dest.y,dest.z);
 			//LOG("setCmd = %s",cmdStr);
-			mcu.execute(cmdStr);
+			SmartBody::SBScene::getScene()->command(cmdStr);
 			characterCount++;
 		}
 		else
@@ -2214,9 +1663,9 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 	{
 		dest.y = 10;
 		sprintf(cmdStr,"pawn defaultPawn%d init",pawnCount);
-		mcu.execute(cmdStr);
+		SmartBody::SBScene::getScene()->command(cmdStr);
 		sprintf(cmdStr,"set pawn defaultPawn%d world_offset x %f y %f z %f",pawnCount,dest.x,dest.y,dest.z);
-		mcu.execute(cmdStr);
+		SmartBody::SBScene::getScene()->command(cmdStr);
 		pawnCount++;
 	}
 	else // drag a file from explorer
@@ -2232,15 +1681,15 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 
 		if(fileextension == ".camera") // camera config file, load camera
 		{
-			mcuCBHandle& mcu = mcuCBHandle::singleton();
 			std::string f = fullPathName;
 			FILE * pFile = fopen (f.c_str(), "r");
 			if (pFile!=0)
 			{
 				SrInput file_in (pFile);
-				file_in >> *(mcu.camera_p);
+				SrCamera* camera = SmartBody::SBScene::getScene()->createCamera("defaultCamera");
+				file_in >> *(camera);
 				fclose (pFile);
-				mcu.viewer_p->set_camera(mcu.camera_p);
+				SmartBody::SBScene::getScene()->setActiveCamera(camera);
 			}
 			else
 				LOG("WARNING: can not load cam file!");
@@ -2448,27 +1897,6 @@ int FltkViewer::handle ( int event )
 		 //char exe_cmd[256];
 		 if (e.button1)
 		 {
-			 /*
-			 if (Fl::event_clicks())
-			 {
-				 // pick-up object
-				 makeGLContext();
-				 std::vector<int> hitList;
-				 SbmCharacter* curChar = getCurrentCharacter();		
-				 SbmPawn* selectedPawn = _objManipulator.getPickingPawn(e.mouse.x, e.mouse.y, _data->camera, hitList);
-				 if (selectedPawn && curChar)
-				 {
-					 //std::string cmd;
-					 //cmd = "bml char " + curChar->name + " <sbm:reach sbm:handle=\"r" + curChar->name + "\" action=\"pick-up\" target=\""+ selectedPawn->name + "\" />";
-					 //sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:reach-duration=\"0.01\" sbm:action=\"pick-up\" target=\"%s\"/>",curChar->name,curChar->name,selectedPawn->name);
-					 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:reach-duration=\"-1.0\" sbm:action=\"touch\" target=\"%s\"/>",curChar->getName().c_str(),selectedPawn->getName().c_str());
-
-					 mcuCBHandle& mcu = mcuCBHandle::singleton();
-					 mcu.execute(exe_cmd);
-				 }
-			 }
-			 else
-			 */
 			 {				 			 
 				 makeGLContext();
 				 _objManipulator.picking(e.mouse.x, e.mouse.y, _data->camera);
@@ -2479,10 +1907,6 @@ int FltkViewer::handle ( int event )
 					 if (isCharacter)
 					 {
 						 _lastSelectedCharacter = isCharacter->getName();
-						 if (_paLocoData->character)
-							 _paLocoData->character->unregisterObserver(this);
-						 _paLocoData->character = isCharacter;
-						 _paLocoData->character->registerObserver(this);
 					 }
 				 }
 			 }			 
@@ -2490,44 +1914,27 @@ int FltkViewer::handle ( int event )
 
 		 if (e.button3 && Fl::event_clicks() && e.alt)
 		 {
-			 // put-down object
-			 /*
-			 SbmCharacter* curChar = getCurrentCharacter();			 
-			 SrVec p1;
-			 SrVec p2;
-			 
-			 if (curChar)
-			 {
-				 _data->camera.get_ray(e.mouse.x, e.mouse.y, p1, p2);
-				 SrPlane ground(SrVec(0,curChar->getHeight()*0.0f,0), SrVec(0, 1, 0));
-				 SrVec dest = ground.intersect(p1, p2);
-				 dest.y = curChar->getHeight()*0.6f;
-				 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:action=\"put-down\" sbm:target-pos=\"%f %f %f\"/>",curChar->getName().c_str(),curChar->getName().c_str(),dest.x,dest.y,dest.z);
-				 mcuCBHandle& mcu = mcuCBHandle::singleton();
-				 mcu.execute(exe_cmd);	 
-			 }
-			 */
 			
 		 }
-		 else if (mcuCBHandle::singleton()._scene->getSteerManager()->getEngineDriver()->isInitialized() && e.button3 && !e.alt)
+		 else if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized() && e.button3 && !e.alt)
 		 {
-			 if (_paLocoData->character)
+		
+			 SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
+			 SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(selectedPawn);
+			 SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(character->getName());
+			 if (steerAgent)
 			 {
-				 SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(_paLocoData->character->getName());
-				 if (steerAgent)
-				 {
-					 PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
-					ppraiAgent->setTargetAgent(NULL);
-					SrVec p1;
-					SrVec p2;
-					_data->camera->get_ray(e.mouse.x, e.mouse.y, p1, p2);
-					SrPlane ground(SrVec(0,0,0), SrVec(0, 1, 0));
-					SrVec dest = ground.intersect(p1, p2);
-					dest.y = _paLocoData->character->getHeight() / 100.0f;
-					std::stringstream command;
-					command << "steer move " << _paLocoData->character->getName() << " normal " << dest.x << " " << dest.y << " " << dest.z;
-					mcuCBHandle::singleton().execute((char*)command.str().c_str());
-				 }
+				 PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+				ppraiAgent->setTargetAgent(NULL);
+				SrVec p1;
+				SrVec p2;
+				_data->camera->get_ray(e.mouse.x, e.mouse.y, p1, p2);
+				SrPlane ground(SrVec(0,0,0), SrVec(0, 1, 0));
+				SrVec dest = ground.intersect(p1, p2);
+				dest.y = character->getHeight() / 100.0f;
+				std::stringstream command;
+				command << "steer move " << character->getName() << " normal " << dest.x << " " << dest.y << " " << dest.z;
+				SmartBody::SBScene::getScene()->command((char*)command.str().c_str());
 			 }
 		 }
        } break;
@@ -2580,8 +1987,8 @@ int FltkViewer::handle ( int event )
 				{
 					std::vector<std::string> pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
 					for (std::vector<std::string>::iterator iter = pawnNames.begin();
-					iter != pawnNames.end();
-					iter++)
+						 iter != pawnNames.end();
+					      iter++)
 					{
 						SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(*iter);
 						bool visible = pawn->getBoolAttribute("visible");
@@ -2762,26 +2169,6 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 				 _objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_POS);
 			 else if (e.shift)
 				 _objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_ROT);
-			 /*
-			 // unify the pawn selection and the locomotion selection
-			 SbmPawn* pawn = _objManipulator.get_selected_pawn();
-			 SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
-			 if (character)
-			 {
-				 mcuCBHandle& mcu = mcuCBHandle::singleton();
-				 int index = 0;
-				 mcu.character_map.reset();
-				 while (SbmCharacter* c = mcu.character_map.next())
-				 {
-					 if (character == c)
-					 {
-						 _locoData->char_index = index;
-						 break;
-					 }
-					 index++;
-				 }	
-			 }
-			 */
 		 }
 		 if (e.button3 && e.shift)
 		 {
@@ -2790,20 +2177,19 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 			_objManipulator.picking(e.mouse.x, e.mouse.y, _data->camera);
 			SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
 			if (selectedPawn)
-				if (selectedPawn->getName() != _paLocoData->character->getName())
+			{
+				SbmCharacter* selectedCharacter = dynamic_cast<SbmCharacter*> (selectedPawn);
+				if (selectedCharacter)
 				{
-					SbmCharacter* selectedCharacter = dynamic_cast<SbmCharacter*> (selectedPawn);
-					if (selectedCharacter)
+					SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(selectedPawn->getName());
+					if (steerAgent)
 					{
-						SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(_paLocoData->character->getName());
-						if (steerAgent)
-						{
-							PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
-							ppraiAgent->setTargetAgent(selectedCharacter);
-						}
-						
+						PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+						ppraiAgent->setTargetAgent(selectedCharacter);
 					}
+					
 				}
+			}
 		 }
 		return 1;
 	 }
@@ -2831,10 +2217,10 @@ void FltkViewer::create_pawn()
 	const char* pawn_name = fl_input("Input Pawn Name","foo");
 	if (!pawn_name) // no name is input
 		return;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	char cmd_pawn[256];
 	sprintf(cmd_pawn,"pawn %s init",pawn_name);
-	mcu.execute(cmd_pawn);
+	SmartBody::SBScene::getScene()->command(cmd_pawn);
 }
 
 
@@ -2842,15 +2228,17 @@ void FltkViewer::set_reach_target( int itype, const char* targetname )
 {
 	char exe_cmd[256];
 	SbmCharacter* actor = NULL;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	int counter = 0;
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		if (counter == _locoData->char_index)
+		SmartBody::SBCharacter* character = scene->getCharacter((*iter));
+		//if (counter == _locoData->char_index)
 		{
-			actor = (*iter).second;
+			actor = character;
 			break;
 		}
 		counter++;
@@ -2874,14 +2262,12 @@ void FltkViewer::set_reach_target( int itype, const char* targetname )
 			strcpy(pawn_name,targetname);
 
 		sprintf(exe_cmd,"bml char %s <sbm:reach target=\"%s\" reach-arm=\"%s\"/>",actor->getName().c_str(),pawn_name,reach_type[itype]);
-		mcu.execute_later(exe_cmd,1.0); // delay execution for one second to avoid popping
+		scene->commandAt(1.0, exe_cmd); // delay execution for one second to avoid popping
 	}
 }
 
 void FltkViewer::set_gaze_target(int itype, const char* label)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	SbmPawn* pawn = this->getObjectManipulationHandle().get_selected_pawn();
 
 	SbmCharacter* actor = this->getCurrentCharacter();
@@ -2892,7 +2278,7 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 	{
 		std::stringstream strstr;
 		strstr << "char " << actor->getName() << "gazefade out 0";
-		mcu.execute((char*) strstr.str().c_str());
+		SmartBody::SBScene::getScene()->command((char*) strstr.str().c_str());
 		return;
 	}
 		
@@ -2917,7 +2303,7 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 
 		std::stringstream strstr;
 		strstr << "bml char " << actor->getName() << " <gaze target=\"" << pawn_name << "\" sbm:joint-range=\"" << gaze_type[itype] << "\"/>";
-		mcu.execute((char*) strstr.str().c_str());
+		SmartBody::SBScene::getScene()->command((char*) strstr.str().c_str());
 	}
 }
 
@@ -3099,8 +2485,7 @@ void FltkViewer::drawGrid()
 	glLineWidth(1);
 //	glLineStipple(1, 0xAAAA);
 	glBegin(GL_LINES);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	float sceneScale =  mcu._scene->getScale();
+	float sceneScale = SmartBody::SBScene::getScene()->getScale();
 	float adjustedGridStep = gridStep;
 	if (sceneScale > 0.f)
 	{
@@ -3148,12 +2533,13 @@ void FltkViewer::drawEyeBeams()
 	if (_data->eyeBeamMode == ModeNoEyeBeams)
 		return;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		SbmCharacter* character = (*iter).second;
+		SmartBody::SBCharacter* character = scene->getCharacter((*iter));
 		character->getSkeleton()->invalidate_global_matrices();
 		character->getSkeleton()->update_global_matrices();
 		SkJoint* eyeRight = character->getSkeleton()->search_joint("eyeball_right");
@@ -3197,12 +2583,13 @@ void FltkViewer::drawEyeLids()
 
 	glPushAttrib(GL_LIGHTING_BIT | GL_POINT_BIT);
 	glDisable(GL_LIGHTING);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		SbmCharacter* character = (*iter).second;
+		SmartBody::SBCharacter* character = scene->getCharacter((*iter));
 		MeControllerTreeRoot* controllerTree = character->ct_tree_p;
 		int numControllers = controllerTree->count_controllers();
 	
@@ -3368,14 +2755,15 @@ void FltkViewer::drawCharacterBoundingVolumes()
 	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
 	if(!colManager->isEnable())
 		return;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	bool singleChrCapsuleMode = colManager->getJointCollisionMode();
 
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		SbmCharacter* character = (*iter).second;
+		SmartBody::SBCharacter* character = scene->getCharacter((*iter));
 		if(singleChrCapsuleMode)
 		{
 			if (character && character->getGeomObject())
@@ -3417,13 +2805,15 @@ void FltkViewer::drawCharacterBoundingVolumes()
 void FltkViewer::drawCharacterPhysicsObjs()
 {
 	float pawnSize = 1.0;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SmartBody::SBPhysicsSim* phyEngine = SmartBody::SBPhysicsSim::getPhysicsEngine();
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		SbmCharacter* character = (*iter).second;
+		SmartBody::SBCharacter* character = scene->getCharacter((*iter));
 		SmartBody::SBPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(character->getName());//character->getPhysicsCharacter();				
 		if (!phyChar) 
 		{			
@@ -3529,27 +2919,28 @@ void FltkViewer::drawPawns()
 		return;
 
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
 	// determine the size of the pawns relative to the size of the characters
 	float pawnSize = 1.0;
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	std::vector<std::string> characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		SbmCharacter* character = (*iter).second;
+		SmartBody::SBCharacter* character = scene->getCharacter((*iter));
 		pawnSize = character->getHeight()/ 30.0f;
 		break;
 	}
 
 	SrCamera* currentCamera = scene->getActiveCamera();
 
-	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-		iter != mcu.getPawnMap().end();
+	std::vector<std::string> pawnNames = scene->getPawnNames();
+	for (std::vector<std::string>::iterator iter = pawnNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		SbmPawn* pawn = (*iter).second;
+		SmartBody::SBPawn* pawn = scene->getPawn((*iter));
 		SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
 		if (camera)
 		{ 
@@ -3868,7 +3259,6 @@ static SrVec footprintoffset;
 void FltkViewer::ChangeOffGroundHeight(Fl_Widget* widget, void* data)
 {
 	FltkViewer* window = (FltkViewer*) data;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	const char* motionName = window->off_height_window->value();
 
@@ -4171,10 +3561,11 @@ void FltkViewer::drawJointLabels()
 
 void FltkViewer::drawGestures()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (_gestureData->currentCharacter == "")
 		return;
-	SmartBody::SBCharacter* character = mcu._scene->getCharacter(_gestureData->currentCharacter);
+
+
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(_gestureData->currentCharacter);
 	if (!character)
 		return;
 
@@ -4262,14 +3653,14 @@ void FltkViewer::drawGestures()
 static int pre_dominant = 0;
 void FltkViewer::drawLocomotion()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	int counter = 0;
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		SbmCharacter* character = (*iter).second;
+		SmartBody::SBCharacter* character = scene->getCharacter((*iter));
 		//if(!character->get_locomotion_ct()->is_valid()) continue;
 		float x, y, z, yaw, pitch, roll;
 		character->get_world_offset(x, y, z, yaw, pitch, roll);
@@ -4281,7 +3672,7 @@ void FltkViewer::drawLocomotion()
 		}
 		if(_data->showselection)
 		{
-			if(counter == _locoData->char_index)
+			/*if(counter == _locoData->char_index)
 			{
 				float height = character->getHeight();
 				SrVec color;
@@ -4293,6 +3684,7 @@ void FltkViewer::drawLocomotion()
 				color.set(1.0f, 0.0f, 0.0f);
 				drawActiveArrow(arrow_start, arrow_end, 3, 10.0f, color, false);
 			}
+			*/
 		}
 		if(_data->showkinematicfootprints)
 		{
@@ -4377,13 +3769,14 @@ void FltkViewer::drawInteractiveLocomotion()
 	if (!_data->interactiveLocomotion)
 		return;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	float pawnSize = 1.0;
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		SbmCharacter* character = (*iter).second;
+		SmartBody::SBCharacter* character = scene->getCharacter((*iter));
 		pawnSize = character->getHeight() / 8.0f;
 		break;
 	}
@@ -4402,13 +3795,13 @@ void FltkViewer::drawDynamics()
 {
 	if (_data->dynamicsMode == ModeNoDynamics && !_data->showmasses)
 		return;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-			iter != mcu.getCharacterMap().end();
-			iter++)
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
+		iter++)
 	{
-		SbmCharacter* character = (*iter).second;
+		SmartBody::SBCharacter* character = scene->getCharacter((*iter));
 		character->getSkeleton()->update_global_matrices();
 
 		const std::vector<SkJoint*>& joints = character->getSkeleton()->joints();
@@ -4544,23 +3937,23 @@ void FltkViewer::drawDynamics()
 
 SbmCharacter* FltkViewer::getCurrentCharacter()
 {
-	 mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	 SbmPawn* selectedPawn = getObjectManipulationHandle().get_selected_pawn();
 	 if (!selectedPawn)
 	 {
-		 SbmCharacter* character = mcu.getCharacter(_lastSelectedCharacter);
+		 SbmCharacter* character = scene->getCharacter(_lastSelectedCharacter);
 		 if (character)
+		 {
 			 return character;
+		 }
 		 else
 		 {
-			 // get the first character
-			 std::map<std::string, SbmCharacter*>& characterMap = mcu.getCharacterMap();
-			 std::map<std::string, SbmCharacter*>::iterator iter = characterMap.begin();
-			 if (iter !=  characterMap.end())
+			 std::vector<std::string> characterNames =  scene->getCharacterNames();
+			 if (characterNames.size() > 0)
 			 {
-				 _lastSelectedCharacter = (*iter).second->getName();
-				  SbmCharacter* character = mcu.getCharacter(_lastSelectedCharacter);
-				 return character;
+				 // get the first character
+				 SbmCharacter* character = scene->getCharacter(characterNames[0]);
+				  return character;
 			 }
 			 else
 			 {
@@ -4575,12 +3968,11 @@ SbmCharacter* FltkViewer::getCurrentCharacter()
 
 SmartBody::SBAnimationBlend* FltkViewer::getCurrentCharacterAnimationBlend()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	const std::string& chrname = mcu.getPAWinSelChrName();
-	if(chrname.length() == 0) return 0;
-	SmartBody::SBCharacter* character = scene->getCharacter(chrname);
-	if (!character) return 0;
+	SbmCharacter* sbmChar = getCurrentCharacter();
+	SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(sbmChar);
+	if (!character)
+		return NULL;
 
 	SmartBody::SBAnimationBlend* animBlend = NULL;
 
@@ -4596,7 +3988,6 @@ SmartBody::SBAnimationBlend* FltkViewer::getCurrentCharacterAnimationBlend()
 
 MeCtExampleBodyReach* FltkViewer::getCurrentCharacterBodyReachController()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmCharacter* character = getCurrentCharacter();
 
 	MeCtExampleBodyReach* reachCt = NULL;
@@ -4622,7 +4013,6 @@ MeCtExampleBodyReach* FltkViewer::getCurrentCharacterBodyReachController()
 
 MeCtConstraint* FltkViewer::getCurrentCharacterConstraintController()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmCharacter* character = getCurrentCharacter();
 
 	MeCtConstraint* reachCt = NULL;
@@ -4894,7 +4284,6 @@ void FltkViewer::drawSteeringInfo()
 		return;
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (!scene->getSteerManager()->getEngineDriver()->isInitialized() || 
 		!scene->getSteerManager()->getEngineDriver()->_engine)
 		return;
@@ -4906,14 +4295,14 @@ void FltkViewer::drawSteeringInfo()
 	glScalef(1 / scene->getScale(), 1 / scene->getScale(), 1 / scene->getScale());
 
 	//comment out for now, have to take a look at the steering code
-	const std::vector<SteerLib::AgentInterface*>& agents = mcu._scene->getSteerManager()->getEngineDriver()->_engine->getAgents();
+	const std::vector<SteerLib::AgentInterface*>& agents = scene->getSteerManager()->getEngineDriver()->_engine->getAgents();
 	for (size_t x = 0; x < agents.size(); x++)
 	{
-		mcu._scene->getSteerManager()->getEngineDriver()->_engine->selectAgent(agents[x]);
+		scene->getSteerManager()->getEngineDriver()->_engine->selectAgent(agents[x]);
 		agents[x]->draw();
 	}
 
-	const std::set<SteerLib::ObstacleInterface*>& obstacles = mcu._scene->getSteerManager()->getEngineDriver()->_engine->getObstacles();
+	const std::set<SteerLib::ObstacleInterface*>& obstacles = scene->getSteerManager()->getEngineDriver()->_engine->getObstacles();
 	for (std::set<SteerLib::ObstacleInterface*>::const_iterator iter = obstacles.begin();
 		iter != obstacles.end();
 		iter++)
@@ -4923,7 +4312,7 @@ void FltkViewer::drawSteeringInfo()
 	
 	if (_data->steerMode == ModeSteerAll)
 	{
-		mcu._scene->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->draw();
+		scene->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->draw();
 	}
 
 	glPopMatrix();
@@ -4976,17 +4365,7 @@ void FltkViewer::drawPlotMotion()
 
 void FltkViewer::notify(SmartBody::SBSubject* subject)
 {
-	SbmPawn* pawn = dynamic_cast<SbmPawn*>(subject);
-	if (pawn)
-	{
-		if (_paLocoData)
-		{
-			if (_paLocoData->character == pawn)
-			{
-				_paLocoData->character = NULL;
-			}
-		}
-	}
+	
 }
 
 void FltkViewer::makeShadowMap()
@@ -5073,14 +4452,6 @@ void FltkViewer::makeShadowMap()
 	//SbmShaderProgram::printOglError("shadowMapError");
 
 }
-
-void FltkViewer::timerUpdate( void* data )
-{
-	PALocomotionData* paLocoData = (PALocomotionData*)data;	
-	paLocoData->updateKeys(0.01f);
-	Fl::repeat_timeout(0.01,timerUpdate,paLocoData);	
-}
-
 
 GestureVisualizationHandler::GestureVisualizationHandler()
 {
@@ -5210,253 +4581,6 @@ void GestureData::reset()
 	syncPoints.clear();
 }
 
-PALocomotionData::PALocomotionData()
-{
-	w = 0;
-	v = 0;
-	s = 0;
-	character = NULL;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
-	{
-		character = (*iter).second;
-		break;
-	}
-	
-	starting = false;
-	stopping = false;
-	jumping = false;
-	prevStarting = false;
-	prevStopping = false;
-	prevJumping = false;
-	linearVelocityIncrement = 5.0f;
-	angularVelocityIncrement = 10.0f;	
-	keyControl = false;
 
-	keyPressMap[KEY_LEFT] = false;
-	keyPressMap[KEY_RIGHT] = false;
-	keyPressMap[KEY_TURNLEFT] = false;
-	keyPressMap[KEY_TURNRIGHT] = false;
-	keyPressMap[KEY_UP] = false;
-	keyPressMap[KEY_DOWN] = false;
-	keyPressMap[KEY_SHIFT] = false;
-}
-
-PALocomotionData::~PALocomotionData()
-{
-}
-
-void PALocomotionData::pressKey( int keyID )
-{
-	keyPressMap[keyID] = true;	
-	keyControl = true;
-}
-
-void PALocomotionData::releaseKey( int keyID )
-{
-	keyPressMap[keyID] = false;
-}
-
-std::string PALocomotionData::getLocomotionStateName()
-{
-	if (!character)
-		return "";
-	SmartBody::SBSteerManager* manager = SmartBody::SBScene::getScene()->getSteerManager();
-// 	SmartBody::SBSteerAgent* steerAgent = manager->getSteerAgent(character->getName());
-// 	if (!steerAgent)
-// 		return "";
-// 	const std::string& prefix = steerAgent->getSteerStateNamePrefix();
-	//std::string stateName = prefix + "Locomotion";
-	std::string stateName = "ChrMarineLocomotion";
-	return stateName;
-}
-
-void PALocomotionData::updateKeys(float dt)
-{
-	//LOG("paLocomotionUpdateKeys");
-	// acceleration when the key is pressed
-	if (!keyControl) return;
-
-	std::string locoStateName = getLocomotionStateName();
-	if (locoStateName == "")
-		return;
-	PABlendData* blendData = NULL;
-	if (character && character->param_animation_ct)
-		if (character->param_animation_ct)
-			blendData = character->param_animation_ct->getCurrentPABlendData();	
-
-	if (!blendData) return;
-	float unitScale = 1.f/SmartBody::SBScene::getScene()->getScale();
-	float scale = 0.05f;
-	if (blendData->state->stateName == locoStateName)
-		scale = 1.f;
-	
-	float linearAcc = 1.f*scale*unitScale;
-	float angularAcc = 200.f*scale;
-	float strifeAcc = 1.f*scale*unitScale;
-
-	// automatic de-acceleration when the key is not pressed
-	float linearDcc = linearAcc*2.5f;
-	float angularDcc = angularAcc*2.0f;
-	float straifeDc = strifeAcc*2.5f;
-	
-	if (keyPressMap[KEY_UP] || keyPressMap[KEY_DOWN])
-	{
-		if (keyPressMap[KEY_UP])
-		{
-			v += linearAcc*dt;
-		}
-		else if (keyPressMap[KEY_DOWN])
-		{
-			v -= linearAcc*dt;
-		}
-	}
-	else // gradually de-accelerate
-	{
-		if (v > 0)
-		{
-			v -= linearDcc*dt; 			
-		}		
-	}
-
-	if (keyPressMap[KEY_LEFT] || keyPressMap[KEY_RIGHT])
-	{
-		if (keyPressMap[KEY_RIGHT])
-		{
-			s += strifeAcc*dt;
-		}
-		else if (keyPressMap[KEY_LEFT])
-		{
-			s -= strifeAcc*dt;
-		}
-	}
-	else // gradually de-accelerate
-	{
-		if (s > 0) 
-		{
-			s -= straifeDc*dt; 
-			if (s < 0) s = 0;
-		}
-		else if (s < 0) 
-		{
-			s += straifeDc*dt;
-			if (s > 0) w =s;
-		}	
-	}
-
-	if (keyPressMap[KEY_TURNLEFT] || keyPressMap[KEY_TURNRIGHT])
-	{
-		if (keyPressMap[KEY_TURNLEFT])
-		{
-			w += angularAcc*dt;		
-		}
-		else 
-		{
-			w -= angularAcc*dt;
-		}
-	}
-	else // gradually de-accelerate
-	{
-		if (w > 0) 
-		{
-			w -= angularDcc*dt; 
-			if (w < 0) w = 0;
-		}
-		else if (w < 0) 
-		{
-			w += angularDcc*dt;
-			if (w > 0) w =0;
-		}
-	}
-
-	// speed limits	
-	float runSpeedLimit = 4.f*unitScale;
-	float walkSpeedLimit = 1.2f*unitScale;
-	float angSpeedLimit = 140.f;
-	float strifeSpeedLimit = 1.f*unitScale;
-	// make sure the control parameter does not exceed limits
-	
-
-	if (w > angSpeedLimit) w = angSpeedLimit;
-	if (w < -angSpeedLimit) w = -angSpeedLimit;
-
-	if (s > strifeSpeedLimit) s = strifeSpeedLimit;
-	if (s < -strifeSpeedLimit) s = -strifeSpeedLimit;
-	//if (v > runSpeedLimit) v = runSpeedLimit;		
-	if (keyPressMap[KEY_SHIFT])
-	{
-		if (v > runSpeedLimit)
-			v = runSpeedLimit;
-
-		if (v <= runSpeedLimit && v > walkSpeedLimit)
-		{
-			v -= (linearAcc*dt+linearDcc*dt);	
-			if (v < walkSpeedLimit)
-				v = walkSpeedLimit;
-		}
-	}
-	else
-	{
-		if (v > runSpeedLimit)
-			v = runSpeedLimit;
-	}
-	if (v < 0) v = 0; // we don't allow backward walking....yet 
-	
-	// update speed 	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	//float pv, pw, ps;
-	//state->getParameter(pv,pw,ps);
-	float speedEps = 0.001f*unitScale;	
-	float angleEps = 0.01f;
-	if ( (fabs(v) > 0 || fabs(w) > 0 || fabs(s)) && 
-		blendData->state->stateName == PseudoIdleState && !starting)
-	{
-		std::string locomotionStateName =  getLocomotionStateName();
-		std::stringstream command1;			
-		PABlend* locoState = mcu.lookUpPABlend(locomotionStateName);
-		if (!locoState)
-			return;
-		std::vector<double> weights;
-		weights.resize(locoState->getNumMotions());
-		locoState->getWeightsFromParameters(0, 0, 0, weights);
-		command1 << "panim schedule char " << character->getName() << " state " <<  locomotionStateName << " loop true playnow false additive false joint null ";		
-		for (int i = 0; i < locoState->getNumMotions(); i++)
-			command1 << weights[i] << " ";
-		//LOG("startLocomotion, %s",command1.str().c_str());
-		mcu.execute((char*)command1.str().c_str());	
-		starting = true;
-		stopping = false;
-	}
-	else if (fabs(v) < speedEps && 
-		     fabs(w) < angleEps && 
-			 fabs(s) < speedEps && 
-			 blendData->state->stateName == locoStateName && 
-			 !stopping)
-	{	
-		//LOG("stop, v = %f, w = %f, s = %f",v,w,s);
-		v = w = 0;
-		std::vector<double> weights;
-		weights.resize(blendData->state->getNumMotions());
-		bool success = blendData->state->getWeightsFromParameters(0,0,0, weights);
-		std::stringstream command;
-		command << "panim schedule char " << character->getName() << " state " << "null" << " loop true playnow true additive false joint null ";
-		
-		//LOG("stopLocomotion, %s",command.str().c_str());
-		mcu.execute((char*)command.str().c_str());				
-		stopping = true;
-		starting = false;
-		keyControl = false;
-	}
-	else // update moving parameter
-	{		
-		std::vector<double> weights;
-		weights.resize(blendData->state->getNumMotions());
-		bool success = blendData->state->getWeightsFromParameters(v, w, s, weights);		
- 		character->param_animation_ct->updateWeights(weights);
-	}	
-		
-}
 
 //================================ End of File =================================================

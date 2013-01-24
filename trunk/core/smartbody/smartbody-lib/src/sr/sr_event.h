@@ -26,7 +26,7 @@
 /** \file sr_event.h 
  * A user-generated window-event
  */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_vec2.h>
 # include <sr/sr_line.h>
 # include <sr/sr_output.h>
@@ -91,29 +91,29 @@ class SrEvent
    public : //--- methods :
 
     /*! Initialize as a None event type, by calling init(). */
-    SrEvent ();
+    SBAPI SrEvent ();
 
     /*! Makes the event as the None type, and puts all data with their default values of zero. */
-    void init ();
+    SBAPI void init ();
 
     /*! Puts mouse keyboard information to their default value, but saves the mouse
         values in the lmouse variables. */
-    void init_lmouse ();
+    SBAPI void init_lmouse ();
 
     /*! Returns a string with the name of the event type. */
-    const char *type_name () const;
+    SBAPI const char *type_name () const;
 
     /*! Returns the difference: mousex-lmousex. */
-    float mousedx () const { return mouse.x-lmouse.x; }
+    SBAPI float mousedx () const { return mouse.x-lmouse.x; }
 
     /*! Returns the difference: mousey-lmousey. */
-    float mousedy () const { return mouse.y-lmouse.y; }
+    SBAPI float mousedy () const { return mouse.y-lmouse.y; }
 
     /*! Returns true if the event type is push, drag, or release; and false otherwise. */
-    bool mouse_event () const { return type==EventPush||type==EventDrag||type==EventRelease? true:false; }
+    SBAPI bool mouse_event () const { return type==EventPush||type==EventDrag||type==EventRelease? true:false; }
 
     /*! Outputs data of this event for data inspection. */
-    friend SrOutput& operator<< ( SrOutput& out, const SrEvent& e );
+    SBAPI friend SrOutput& operator<< ( SrOutput& out, const SrEvent& e );
  };
 
 

@@ -26,14 +26,15 @@
 # ifndef SR_VEC_H
 # define SR_VEC_H
 
+#include <sb/SBTypes.h>
 # include <sr/sr_input.h> 
 # include <sr/sr_output.h> 
 
 class SrVec;
 class SrVec2;
 
-float dist2 ( const SrVec& v1, const SrVec& v2 );
-float angle ( const SrVec& v1, const SrVec& v2 ); 
+SBAPI float dist2 ( const SrVec& v1, const SrVec& v2 );
+SBAPI float angle ( const SrVec& v1, const SrVec& v2 ); 
 
 /*! This "point typedef" is used mainly to coherently describe variables,
     making possible to distiguish points from vectors parameters. */
@@ -46,7 +47,7 @@ typedef SrVec SrPnt;
     provided methods or as a float array, to be compatible with other libraries.
     Access as a float array is done with an overloaded typecast, that should
     correctly work with most compilers. */
-class SrVec
+class SBAPI SrVec
  { public :
     float x, y, z;
    public :
@@ -191,64 +192,64 @@ class SrVec
     void operator /= ( float r ) { x/=r; y/=r; z/=r; }
 
     /*! Unary minus. Implemented inline. */
-    friend SrVec operator - ( const SrVec& v )
+    SBAPI friend SrVec operator - ( const SrVec& v )
            { return SrVec ( -v.x, -v.y, -v.z ); }
 
     /*! Adds two vectors. Implemented inline. */
-    friend SrVec operator + ( const SrVec& v1, const SrVec& v2 ) 
+    SBAPI friend SrVec operator + ( const SrVec& v1, const SrVec& v2 ) 
            { return SrVec (v1.x+v2.x, v1.y+v2.y, v1.z+v2.z); }
 
     /*! Subtracts two vectors. Implemented inline. */
-    friend SrVec operator - ( const SrVec& v1, const SrVec& v2 ) 
+    SBAPI friend SrVec operator - ( const SrVec& v1, const SrVec& v2 ) 
            { return SrVec (v1.x-v2.x, v1.y-v2.y, v1.z-v2.z); }
 
     /*! Comparison operator. Implemented inline. */
-    friend bool operator == ( const SrVec& v1, const SrVec& v2 )
+    SBAPI friend bool operator == ( const SrVec& v1, const SrVec& v2 )
            { return v1.x==v2.x && v1.y==v2.y && v1.z==v2.z? true:false; }
 
     /*! Comparison operator. Implemented inline. */
-    friend bool operator != ( const SrVec& v1, const SrVec& v2 )
+    SBAPI friend bool operator != ( const SrVec& v1, const SrVec& v2 )
            { return v1.x!=v2.x || v1.y!=v2.y || v1.z!=v2.z? true:false; }
 
     /*! Pos multiplication by scalar. Implemented inline. */
-    friend SrVec operator * ( const SrVec& v, float r )
+    SBAPI friend SrVec operator * ( const SrVec& v, float r )
            { return SrVec (v.x*r, v.y*r, v.z*r); }
 
     /*! Pre multiplication by scalar. Implemented inline. */
-    friend SrVec operator * ( float r, const SrVec& v )
+    SBAPI friend SrVec operator * ( float r, const SrVec& v )
            { return SrVec (v.x*r, v.y*r, v.z*r); }
 
     /*! Division by scalar. Implemented inline. */
-    friend SrVec operator / ( const SrVec& v, float r )
+    SBAPI friend SrVec operator / ( const SrVec& v, float r )
            { return SrVec (v.x/r, v.y/r, v.z/r); }
 
     /*! Swaps the contents of v1 with v2. */
-    friend void swap ( SrVec& v1, SrVec& v2 );
+    SBAPI friend void swap ( SrVec& v1, SrVec& v2 );
 
     /*! Returns true if dist(v1,v2)<=ds, otherwise returns false. Implemented inline. */
-    friend bool next ( const SrVec& v1, const SrVec& v2, float ds )
+    SBAPI friend bool next ( const SrVec& v1, const SrVec& v2, float ds )
            { return dist2(v1,v2)<=ds*ds? true:false; }
 
     /*! Returns the distance between v1 and v2 using norm_max(). */
-    friend float dist_max ( const SrVec& v1, const SrVec& v2 );
+    SBAPI friend float dist_max ( const SrVec& v1, const SrVec& v2 );
 
     /*! Returns the distance between v1 and v2. */
-    friend float dist ( const SrVec& v1, const SrVec& v2 );
+    SBAPI friend float dist ( const SrVec& v1, const SrVec& v2 );
 
     /*! Returns the square of the distance between v1 and v2. */
-    friend float dist2 ( const SrVec& v1, const SrVec& v2 );
+    SBAPI friend float dist2 ( const SrVec& v1, const SrVec& v2 );
 
     /*! Returns the angle between v1 and v2, that is inside the interval [0,pi],
         using acosf. The returned angle is in radians. */
-    friend float angle ( const SrVec& v1, const SrVec& v2 ); 
+    SBAPI friend float angle ( const SrVec& v1, const SrVec& v2 ); 
 	float vecAngle(const SrVec& v1, const SrVec& v2);
 
     /*! Returns the angle between v1 and v2, but considering that
         v1 and v2 are already normalized, ie, computes acosf(dot(v1,v2)). */
-    friend float angle_fornormvecs ( const SrVec& v1, const SrVec& v2 ); 
+    SBAPI friend float angle_fornormvecs ( const SrVec& v1, const SrVec& v2 ); 
 
     /*! Returns the cross product of v1 and v2. */
-    friend SrVec cross ( const SrVec& v1, const SrVec& v2 );
+    SBAPI friend SrVec cross ( const SrVec& v1, const SrVec& v2 );
 
     /*! Inline version of cross(), but as a member. 
         Attention: v1 or v2 cannot be the same as SrVec. */
@@ -257,27 +258,27 @@ class SrVec
     /*! Returns the dot product of v1 and v2 (v1.x*v2.x + v1.y*v2.y + v1.z*v2.z).
         Its interpretation is the length of the projection of v1 onto v2
         ( v1.v2 = |v1||v2|cos(ang) ). */
-    friend float dot ( const SrVec& v1, const SrVec& v2 );
+    SBAPI friend float dot ( const SrVec& v1, const SrVec& v2 );
 
     /* Returns the normalized normal of triangle (a,b,c) */
-    friend SrVec triangle_normal ( const SrPnt& a, const SrPnt& b, const SrPnt& c );
+    SBAPI friend SrVec triangle_normal ( const SrPnt& a, const SrPnt& b, const SrPnt& c );
 
     /*! Returns -1,0,1 depending if v1 is less, equal or greater than v2, 
         using a comparison by coordinates. Parameters are passed by reference. */
-    friend int compare ( const SrVec& v1, const SrVec& v2 );
+    SBAPI friend int compare ( const SrVec& v1, const SrVec& v2 );
 
     /*! Returns -1,0,1 depending if v1 is less, equal or greater than v2, 
         using a comparison by coordinates. Parameters are passed by pointers. */
-    friend int compare ( const SrVec* v1, const SrVec* v2 );
+    SBAPI friend int compare ( const SrVec* v1, const SrVec* v2 );
 
     /*! Returns the linear interpolation of v1 v2 in parameter t ( v1(1-t)+v2(t) ). */
-    friend SrVec lerp ( const SrVec& v1, const SrVec& v2, float t );
+    SBAPI friend SrVec lerp ( const SrVec& v1, const SrVec& v2, float t );
 
     /*! Outputs in format: "x y z". */
-    friend SrOutput& operator<< ( SrOutput& o, const SrVec& v );
+    SBAPI friend SrOutput& operator<< ( SrOutput& o, const SrVec& v );
 
     /*! Inputs from format: "x y z". */
-    friend SrInput& operator>> ( SrInput& in, SrVec& v );
+    SBAPI friend SrInput& operator>> ( SrInput& in, SrVec& v );
 
 	/*! Set the value specified by the index */
     void setData ( int index, float val ) { (*this)[index] = val;}

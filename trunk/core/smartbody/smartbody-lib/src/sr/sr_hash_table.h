@@ -25,6 +25,7 @@
 # ifndef SR_HASH_TABLE_H
 # define SR_HASH_TABLE_H
 
+#include <sb/SBTypes.h>
 # include <sr/sr_array.h>
 # include <sr/sr_shared_class.h>
 
@@ -39,7 +40,7 @@
     elements but less practical for removing elements (removal was not implemented).
     Note2: the user is responsible for allocation/deallocation of the appended user data,
     which is merely stored as given void pointers, more info about that in the SrHashTable class. */
-class SrHashTableBase
+class SBAPI SrHashTableBase
  { protected:
     struct Entry { char* st;     // the string id of this entry, or null if empty entry
                    void* data;   // the user data associated or null if none
@@ -145,17 +146,17 @@ template <class X>
 class SrHashTable : public SrHashTableBase
  { public:
     /*! This constructor simply calls the constructor of the base class */
-    SrHashTable ( int hsize ) : SrHashTableBase(hsize) {}
+    SBAPI SrHashTable ( int hsize ) : SrHashTableBase(hsize) {}
     
     /*! Simple type cast to the base class method */
-    X data ( int id ) const { return (X)SrHashTableBase::data(id); }
+    SBAPI X data ( int id ) const { return (X)SrHashTableBase::data(id); }
 
     /*! Simple type cast to the base class method */
-    X lookup ( const char* st ) const { return (X)SrHashTableBase::lookup(st); }
+    SBAPI X lookup ( const char* st ) const { return (X)SrHashTableBase::lookup(st); }
 
     /*! Will delete and set to zero all attached data in the hash table using
         the delete operator after a type cast to (X*). */
-    void delete_data ()
+    SBAPI void delete_data ()
      { int i; 
        for (i=0; i<_table.size(); i++)
         { delete (X*)_table[i].data; _table[i].data=0; } // delete 0 is ok
@@ -163,14 +164,14 @@ class SrHashTable : public SrHashTableBase
 
     /*! Will call unref() and set to zero all attached data in the hash table. It assumes
         that X derives SrSharedClass, and therefore X* is type-casted to SrSharedClass*. */
-    void unref_data ()
+    SBAPI void unref_data ()
      { int i;
        for (i=0; i<_table.size(); i++)
         { if (_table[i].data) { ((SrSharedClass*)_table[i].data)->unref(); _table[i].data=0; } }
      }
 
     /*! Simple type cast to the base class method */
-    X remove ( const char *st ) { return (X)SrHashTableBase::remove(st); }
+    SBAPI X remove ( const char *st ) { return (X)SrHashTableBase::remove(st); }
  };
  
 //============================== end of file ===============================

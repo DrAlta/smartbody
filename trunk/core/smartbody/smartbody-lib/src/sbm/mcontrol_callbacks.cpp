@@ -3827,6 +3827,7 @@ int mcu_vrSpeech_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
+#ifdef USE_PYTHON	
 #ifndef __ANDROID__
 #ifndef __native_client__
 	std::string instanceId = args.read_token();
@@ -3852,7 +3853,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
 		return CMD_FAILURE;
 	}
-	
+
 	PyObject* pyResult = NULL;
 	if (returnType == "void")
 	{
@@ -3991,6 +3992,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
 	return CMD_FAILURE;
 #endif	
+#endif
 #endif
 	return CMD_SUCCESS;
 
@@ -4306,7 +4308,7 @@ int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 	char* params = args.read_token();
 
-	SmartBody::SBEventManager* eventManager = SmartBody::SBEventManager::getEventManager();
+	SmartBody::SBEventManager* eventManager = SmartBody::SBScene::getScene()->getEventManager();
 	std::string parameters = params;
 	SmartBody::SBEvent e;
 	e.setType(eventType);
@@ -4570,7 +4572,7 @@ int registerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 	char* action = args.read_token();
 
-	SmartBody::SBEventManager* eventManager = SmartBody::SBEventManager::getEventManager();
+	SmartBody::SBEventManager* eventManager = SmartBody::SBScene::getScene()->getEventManager();
 	SmartBody::SBBasicHandler* handler = new SmartBody::SBBasicHandler();
 	handler->setAction(action);
 	eventManager->addEventHandler(type, handler);
@@ -4588,7 +4590,7 @@ int unregisterevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		return CMD_SUCCESS;
 	}
 
-	SmartBody::SBEventManager* eventManager = SmartBody::SBEventManager::getEventManager();
+	SmartBody::SBEventManager* eventManager = SmartBody::SBScene::getScene()->getEventManager();
 	eventManager->removeEventHandler(type);
 
 	return CMD_SUCCESS;

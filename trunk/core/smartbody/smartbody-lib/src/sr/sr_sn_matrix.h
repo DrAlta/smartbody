@@ -27,6 +27,7 @@
  * matrix transformation
  */
 
+#include <sb/SBTypes.h>
 # include <sr/sr_sn.h>
 
 //======================================= SrSnMatrix ====================================
@@ -50,16 +51,16 @@ class SrSnMatrix : public SrSn
 
    public :
     /*! Default constructor */
-    SrSnMatrix ();
+    SBAPI SrSnMatrix ();
 
     /*! Constructor receiving a matrix */
-    SrSnMatrix ( const SrMat& m );
+    SBAPI SrSnMatrix ( const SrMat& m );
 
     /*! Set the matrix. */
-    void set ( const SrMat& m ) { _mat=m; }
+    SBAPI void set ( const SrMat& m ) { _mat=m; }
 
     /*! Get the matrix. */
-    SrMat& get () { return _mat; }
+    SBAPI SrMat& get () { return _mat; }
  };
 
 

@@ -93,8 +93,8 @@ void SBPawn::setSkeleton(SBSkeleton* skel)
 {
 	SrVec position;
 	SrVec hpr;	
-	bool hasSkeleton = this->getSkeleton();
-	if (hasSkeleton)
+	SBSkeleton* sk = this->getSkeleton();
+	if (sk)
 	{		
 		position = this->getPosition();
 		hpr = this->getHPR();
@@ -103,7 +103,7 @@ void SBPawn::setSkeleton(SBSkeleton* skel)
 	SbmPawn::setSkeleton(skel);	
 	setup();
 
-	if (hasSkeleton)
+	if (sk)
 	{		
 		this->setPosition(position);
 		this->setHPR(hpr);

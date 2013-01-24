@@ -26,7 +26,7 @@
 
 /** \file sr_array.h 
  * fast resizeable array template */
-
+#include <sb/SBTypes.h>
 # include <sr/sr.h> 
 # include <sr/sr_input.h> 
 # include <sr/sr_output.h> 
@@ -40,7 +40,7 @@
     functions are used. So that void pointers are used to refer to user's data.
     Most methods need to know the size of each element that is the parameter 
     sizeofx appearing several times. */
-class SrArrayBase
+class SBAPI SrArrayBase
  { protected :
 
     void* _data;     //!< Array pointer used for storage
@@ -154,7 +154,7 @@ class SrArrayBase
     that can be reallocated. For example, the following code is wrong: a.push()=a[x],
     because a[x] referentiates a memory space that can be reallocated by push() */
 template <class X>
-class SrArray : protected SrArrayBase
+class SBAPI SrArray : protected SrArrayBase
  { public:
 
     /*! Constructs with the given size and capacity. If the given capacity 

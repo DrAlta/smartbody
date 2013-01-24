@@ -23,6 +23,7 @@
 #ifndef _ME_CT_PARAM_ANIMATION_UTILITIES_H_
 #define _ME_CT_PARAM_ANIMATION_UTILITIES_H_
 
+#include <sb/SBTypes.h>
 #include <sk/sk_motion.h>
 #include <controllers/me_controller.h>
 #include <controllers/me_ct_channel_writer.hpp>

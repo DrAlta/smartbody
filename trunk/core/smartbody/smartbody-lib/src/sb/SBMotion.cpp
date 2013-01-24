@@ -9,6 +9,7 @@
 #include <sb/SBJointMapManager.h>
 #include <controllers/me_ct_jacobian_IK.hpp>
 #include <controllers/me_ct_ccd_IK.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace SmartBody {
 

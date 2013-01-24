@@ -27,7 +27,7 @@
 /** \file sr_sn_colorsurf.h 
  * color interpolation in a mesh
  */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_model.h>
 # include <sr/sr_sn_shape.h>
 #include <vector>
@@ -55,36 +55,36 @@ class SrSnColorSurf : public SrSnShapeBase
 
     /* Constructor may receive a SrModel to reference. If the
        given pointer is null (the default) a new one is used. */
-    SrSnColorSurf ( SrModel* m=0 );
+    SBAPI SrSnColorSurf ( SrModel* m=0 );
 
     /* Destructor. */
-   ~SrSnColorSurf ();
+   SBAPI ~SrSnColorSurf ();
 
     /*! Set the shared SrModel object to display and
         mark this shape node as changed. A null pointer
         can be given, in which case a new SrModel is used. */
-    void model( SrModel* m );
+    SBAPI void model( SrModel* m );
 
     /*! Access to the (always valid) shared SrModel object. */
-    SrModel* model () const { return _model; }
+    SBAPI SrModel* model () const { return _model; }
 
     /*! Const access to the (always valid) shared SrModel. */
-    const SrModel* cmodel () const { return _model; }
+    SBAPI const SrModel* cmodel () const { return _model; }
 
    public :
 
     /*! Returns the bounding box of all vertices used.
         The returned box can be empty. */
-    void get_bounding_box ( SrBox &b ) const;
+    SBAPI void get_bounding_box ( SrBox &b ) const;
 
     /*! This method is called right before gl_render_node() and 
         loads any needed texture not yet loaded.*/
-    virtual void gl_prior_render_node () const;
+    SBAPI virtual void gl_prior_render_node () const;
 
     /*! Makes OpenGL calls to draw the lines.
         If no colors are specified, SnShape::color() is used.
         The line width can be set with SnShape::resolution(). */
-    virtual void gl_render_node(bool alphaBlend=true) const;
+    SBAPI virtual void gl_render_node(bool alphaBlend=true) const;
  };
 
 //================================ End of File =================================================

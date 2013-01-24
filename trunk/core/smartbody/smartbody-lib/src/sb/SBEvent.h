@@ -60,11 +60,9 @@ class SBEventManager
 		int getNumEventHandlers();
 		SBEventHandler* getEventHandlerByIndex(int num);
 		SBEventHandler* getEventHandler(const std::string& type);
-		static SBEventManager* getEventManager();
 		SBEventHandlerMap& getEventHandlers() { return eventHandlers; }
 
 	private:
-		static SBEventManager* _eventManager;
 		SBEventHandlerMap eventHandlers;
 };
 

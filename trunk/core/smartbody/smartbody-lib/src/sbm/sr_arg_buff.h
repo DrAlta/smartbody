@@ -24,7 +24,7 @@
 #ifndef SR_ARG_BUFFER_H
 #define SR_ARG_BUFFER_H
 
-
+#include <sb/SBTypes.h>
 #include	<stdlib.h>
 
 
@@ -32,7 +32,7 @@
 
 //////////////////////////////////////////////////////////////////
 
-class srArgBuffer	{
+class SBAPI srArgBuffer	{
     public:
 		srArgBuffer( const char *arg );
 		virtual ~srArgBuffer( void );

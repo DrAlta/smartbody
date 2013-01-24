@@ -26,6 +26,7 @@
 /** \file sr_timer.h 
  * Measure time and execution per second rates.*/
 
+#include <sb/SBTypes.h>
 # include <sr/sr.h>
 
 /*! \class SrUtcTimer sr_timer.h
@@ -37,11 +38,11 @@ class SrUtcTimer
 
    public :
     /*! Constructor checks if high performance counter can be used in windows */
-    SrUtcTimer ();
+    SBAPI SrUtcTimer ();
 
     /*! Returns the time in seconds since midnight (00:00:00) of
         January 1, 1970, coordinated universal time (UTC). */
-    double time ();
+    SBAPI double time ();
  };
  
 /*! \class SrTimer sr_timer.h
@@ -78,56 +79,56 @@ class SrTimer : public SrUtcTimer
         In this case, each time the pair start()/stop() is called "interval" 
         times, a new mps() rate value is calculated. If interval is initialized
         with 0, mean times are not computed. */ 
-    SrTimer ( sruint interval=15 );
+    SBAPI SrTimer ( sruint interval=15 );
 
     /*! Changes the sampling interval being used. */
-    void interval ( sruint i ) { _interval=(double)i; }
+    SBAPI void interval ( sruint i ) { _interval=(double)i; }
 
     /*! Returns the sampling interval being used. */
-    sruint interval () { return (sruint)_interval; }
+    SBAPI sruint interval () { return (sruint)_interval; }
 
     /*! To be called just before your time measurement starts.
         This method simply calls the base class method start(). */
-    void start () { _last_start=SrUtcTimer::time(); }
+    SBAPI void start () { _last_start=SrUtcTimer::time(); }
 
     /*! To be called just after your time measurement ends.
         This method calculates the ellapsed time since the last start()
         call (retrievable with dt()), and updates the mean times if the
         number of measurements performed reaches the specified interval. */
-    void stop ();
+    SBAPI void stop ();
 
     /*! Returns the elapsed time since the last call to start(). */
-    double t () { return time()-_last_start; }
+    SBAPI double t () { return time()-_last_start; }
 
     /*! Returns the time taken by the last start/stop measurement. */
-    double dt () { return _dt; } 
+    SBAPI double dt () { return _dt; } 
 
     /*! Returns the number of measurements already performed. The returned
         double type contains an integer value. */
-    double measurements () { return _measurement_number; }
+    SBAPI double measurements () { return _measurement_number; }
 
     /*! Returns the mean elapsed time taken by the last interval measurements,
         according to the specified sampling interval. */
-    double meandt () { return _meandt; } 
+    SBAPI double meandt () { return _meandt; } 
 
     /*! Returns the current measurements per second rate being achieved,
         measured according to the current sampling interval. Note: if the 
         sampling interval is zero, the mps is simply not computed and the
         last value is returned. */
-    double mps () { return _mps; }
+    SBAPI double mps () { return _mps; }
 
     /*! Returns the mean time taken between measurements, according to the
         current sampling interval. One "loop delta t" is considered to be
         the ellapsed time of two consecutive stop() calls. As such measurements
         makes only sense to perform inside loops, loopdt() returns always the
         mean value according to the sampling interval. */
-    double loopdt () { return _loopdt; }
+    SBAPI double loopdt () { return _loopdt; }
 
     /*! Returns the time of the last call to stop(). */
-    double last_stop () { return _last_stop; } 
+    SBAPI double last_stop () { return _last_stop; } 
 
     /*! Returns the time of the last call to start(). */
-    double last_start () { return _last_start; } 
+    SBAPI double last_start () { return _last_start; } 
  };
 
 //============================= end of file ==========================

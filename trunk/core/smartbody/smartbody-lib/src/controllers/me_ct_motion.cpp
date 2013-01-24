@@ -25,6 +25,7 @@
 
 #include <controllers/me_ct_motion.h>
 #include <sb/SBEvent.h>
+#include <sb/SBScene.h>
 #include <sb/sbm_pawn.hpp>
 
 //=================================== MeCtMotion =====================================
@@ -414,7 +415,7 @@ void MeCtMotion::checkMotionEvents(double time)
 		SmartBody::SBMotionEvent* motionEvent = _events.front();		
 		if (motionEvent->isEnabled() && time >= motionEvent->getTime())
 		{
-			SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();
+			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
 			manager->handleEvent(motionEvent, time);
 			std::string type = motionEvent->getType();
 			std::string params = motionEvent->getParameters();

@@ -23,6 +23,8 @@
 # ifndef SR_H
 # define SR_H
 
+#include <sb/SBTypes.h>
+
 /** \file sr.h 
  * Main header file of the SR toolkit
  *
@@ -257,49 +259,49 @@ const sruint sruintmax = ((sruint)0)-1; //!< the unsigned int maximum value
 // ============================== Math Utilities ===========================
 
 /*! Returns the convertion from radians to degrees (float version). */
-float sr_todeg ( float radians );
+SBAPI float sr_todeg ( float radians );
 
 /*! Returns the convertion from radians to degrees (double version). */
-double sr_todeg ( double radians );
+SBAPI double sr_todeg ( double radians );
 
 /*! Returns the convertion from degrees to radians (float version). */
-float sr_torad ( float degrees );
+SBAPI float sr_torad ( float degrees );
 
 /*! Returns the convertion from degrees to radians (double version). */
-double sr_torad ( double degrees );
+SBAPI double sr_torad ( double degrees );
 
 /*! Returns the integer part of x by using a sequence of type casts (float version). */
-float sr_trunc ( float x );
+SBAPI float sr_trunc ( float x );
 
 /*! Returns the integer part of x by using a sequence of type casts (double version). */
-double sr_trunc ( double x );
+SBAPI double sr_trunc ( double x );
 
 /*! Returns the closest integer of x (float version). */
-float sr_round ( float x );
+SBAPI float sr_round ( float x );
 
 /*! Returns the closest integer of x (double version). */
-double sr_round ( double x );
+SBAPI double sr_round ( double x );
 
 /*! Returns the lowest rounded value of x (float version). */
-float sr_floor ( float x );
+SBAPI float sr_floor ( float x );
 
 /*! Returns the lowest rounded value of x (double version). */
-double sr_floor ( double x );
+SBAPI double sr_floor ( double x );
 
 /*! Returns the highest rounded value of x (float version). */
-float sr_ceil ( float x );
+SBAPI float sr_ceil ( float x );
 
 /*! Returns the highest rounded value of x (double version). */
-double sr_ceil ( double x );
+SBAPI double sr_ceil ( double x );
 
 /*! Returns the square root for integer values, with no use of floating point. */
-int sr_sqrt ( int x );
+SBAPI int sr_sqrt ( int x );
 
 /*! sr_fact returns the factorial of x. */
-int sr_fact ( int x );
+SBAPI int sr_fact ( int x );
 
 /*! returns "b^e", e must be >=0 */
-int sr_pow ( int b, int e );
+SBAPI int sr_pow ( int b, int e );
 
 // ============================= Compare Functions ============================
 
@@ -309,32 +311,32 @@ int sr_pow ( int b, int e );
     s1 and s2 must be non-null pointers, otherwise unpredictable results will arise. 
     If two strings have the first n characters equal, where one has lenght n, and
     the other has length >n, the smaller one is considered to come first. */
-int sr_compare ( const char *s1, const char *s2 );
+SBAPI int sr_compare ( const char *s1, const char *s2 );
 
 /*! Case sensitive comparison of strings in the C style */
-int sr_compare_cs ( const char *s1, const char *s2 );
+SBAPI int sr_compare_cs ( const char *s1, const char *s2 );
 
 /*! Case insensitive compare strings, but compares a maximum of n characters. */
-int sr_compare ( const char *s1, const char *s2, int n );
+SBAPI int sr_compare ( const char *s1, const char *s2, int n );
 
 /*! Case sensitive compare strings, but compares a maximum of n characters. */
-int sr_compare_cs ( const char *s1, const char *s2, int n );
+SBAPI int sr_compare_cs ( const char *s1, const char *s2, int n );
 
 /*! Compares two integers, returning 0 if they're equal, <0 if i1<i2, and >0 otherwise. */
-int sr_compare ( const int *i1, const int *i2 );
+SBAPI int sr_compare ( const int *i1, const int *i2 );
 
 /*! Compares two floats, returning 0 if they're equal, <0 if f1<f2, and >0 otherwise. */
-int sr_compare ( const float *f1, const float *f2 );
+SBAPI int sr_compare ( const float *f1, const float *f2 );
 
 /*! Compares two doubles, returning 0 if they're equal, <0 if d1<d2, and >0 otherwise. */
-int sr_compare ( const double *d1, const double *d2 );
+SBAPI int sr_compare ( const double *d1, const double *d2 );
 
 // ============================== C String Utilities ============================
 
 /*! Allocates a string with sufficient size to copy 'tocopy' in it.
     The allocation is simply done with operator new, and the allocated
     memory pointer is returned. If tocopy==0, the value 0 is returned. */
-char* sr_string_new ( const char* tocopy );
+SBAPI char* sr_string_new ( const char* tocopy );
 
 /*! Deletes s, and reallocates s with sufficient size to copy 'tocopy'
     in it. If tocopy==0, s will be a null pointer, and 0 is returned. 
@@ -342,7 +344,7 @@ char* sr_string_new ( const char* tocopy );
     allocated memory pointer is returned and s is changed to point to
     this new memory allocated so that the returned value will be the 
     same as s. */
-char* sr_string_set ( char*& s, const char *tocopy );
+SBAPI char* sr_string_set ( char*& s, const char *tocopy );
 
 /*! Deletes s, and reallocates it with the given size also copying its
     contents to the new allocated position. If size<=0, s is simply
@@ -351,13 +353,13 @@ char* sr_string_set ( char*& s, const char *tocopy );
     and will be a valid string, having the ending null char. This
     function is similar to the C standard realloc function, but using
     C++ operators new/delete. */
-char* sr_string_realloc ( char*& s, int size );
+SBAPI char* sr_string_realloc ( char*& s, int size );
 
 // ============================== Standard IO ============================
 
 /*! Redirects the C streams stdout and stderr to the text files 
     stdout.txt and stderr.txt in the current folder */
-void sr_stdout_to_file ();
+SBAPI void sr_stdout_to_file ();
 
 // ============================== Bit Operation ============================
 

@@ -22,6 +22,7 @@
 # ifndef SR_SHARED_CLASS_H
 # define SR_SHARED_CLASS_H
 
+#include <sb/SBTypes.h>
 
 /*! \file sr_shared_class.h 
     reference counter for smart-pointer like behavior.
@@ -43,14 +44,14 @@ class SrSharedClass
    public :
 
     /*! Returns the current reference counter value. */
-    int getref () const { return _ref; }
+    SBAPI int getref () const { return _ref; }
 
     /*! Increments the reference counter. */
-    void ref () { _ref++; }
+    SBAPI void ref () { _ref++; }
 
     /*! Decrements the reference counter (if >0), and if the
         counter becomes 0, the class is automatically self deleted. */
-    void unref() { if(_ref>0) _ref--; if(_ref==0) delete this; }
+    SBAPI void unref() { if(_ref>0) _ref--; if(_ref==0) delete this; }
  };
 
 //============================== end of file ===============================

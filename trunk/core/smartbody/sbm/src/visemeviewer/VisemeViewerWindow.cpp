@@ -939,7 +939,7 @@ void VisemeViewerWindow::OnGatherStatsCB(Fl_Widget* widget, void* data)
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
 
 	Fl_Check_Button* check = dynamic_cast<Fl_Check_Button*>(widget);
-	viewer->_gatherStats = check->value();
+	viewer->_gatherStats = check->value()? 1 : 0;
 }
 
 void VisemeViewerWindow::OnCharacterRefreshCB(Fl_Widget* widget, void* data)

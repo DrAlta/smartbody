@@ -4,7 +4,7 @@
 
 /** \file sr_heap.h 
  * Template for a heap based on SrArray. */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_array.h> 
 
 /*! \class SrHeap sr_heap.h
@@ -27,29 +27,29 @@ class SrHeap
    public :
 
     /*! Default constructor. */
-    SrHeap () {}
+    SBAPI SrHeap () {}
 
     /*! Copy constructor. */
-    SrHeap ( const SrHeap& h ) : _heap(h._heap) {}
+    SBAPI SrHeap ( const SrHeap& h ) : _heap(h._heap) {}
 
     /*! Set the capacity of the internal array */
-    void capacity ( int c ) { _heap.capacity(c); }
+    SBAPI void capacity ( int c ) { _heap.capacity(c); }
 
     /*! Returns true if the heap is empty, false otherwise. */
-    bool empty () const { return _heap.empty(); }
+    SBAPI bool empty () const { return _heap.empty(); }
 
     /*! Returns the number of elements in the queue. */
-    int size () const { return _heap.size(); }
+    SBAPI int size () const { return _heap.size(); }
 
     /*! Initializes as an empty heap */
-    void init () { _heap.size(0); }
+    SBAPI void init () { _heap.size(0); }
 
     /*! Compress the internal heap array */
-    void compress () { _heap.compress(0); }
+    SBAPI void compress () { _heap.compress(0); }
 
     /*! Make the heap have the given size, by removing the worst elements.
         Only applicable when s < size(). */
-    void size ( int s )
+    SBAPI void size ( int s )
      { if ( s<=0 ) { init(); return; }
        if ( s>=size() ) return;
        SrArray<Elem> tmp(s,s);
@@ -65,7 +65,7 @@ class SrHeap
      }
     
     /*! Insert a new element with the given cost */
-    void insert ( const X& elem, Y cost )
+    SBAPI void insert ( const X& elem, Y cost )
      { // insert at the end:
        _heap.push();
        _heap.top().e = elem;
@@ -81,7 +81,7 @@ class SrHeap
 
     /*! Removes the element in the top of the heap, which is always
         the element with lowest cost. */
-    void remove ()
+    SBAPI void remove ()
      { // put last element in top:
        _heap[0] = _heap.pop();
        // sink down: (children of node k are 2k and 2k+1)
@@ -100,25 +100,25 @@ class SrHeap
 
     /*! Get a reference to the top element of the the heap,
         which is always the element with lowest cost. */
-    const X& top () const { return _heap[0].e; }
+    SBAPI const X& top () const { return _heap[0].e; }
 
     /*! Get the lowest cost in the heap,
         which is always the cost of the top element. */
-    Y lowest_cost () const { return _heap[0].c; }
+    SBAPI Y lowest_cost () const { return _heap[0].c; }
 
     /*! Returns elem i (0<=i<size) for inspection */
     const X& elem ( int i ) const { return _heap[i].e; }
 
     /*! Returns the cost of elem i (0<=i<size) for inspection */
-    Y cost ( int i ) const { return _heap[i].c; }
+    SBAPI Y cost ( int i ) const { return _heap[i].c; }
 
     /*! Assumes elements X are pointers and deletes all
         stored elements, and set the heap to size 0 */
-    void delete_all () { while (_heap.size()) delete _heap.pop().e; }
+    SBAPI void delete_all () { while (_heap.size()) delete _heap.pop().e; }
 
     /*! Assumes elements X are pointers, so it will first delete the
         top() element of the heap and then call remove() */
-    void delremove () { delete _heap[0].e; remove(); }
+    SBAPI void delremove () { delete _heap[0].e; remove(); }
  };
 
 //============================== end of file ===============================

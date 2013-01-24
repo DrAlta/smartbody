@@ -41,6 +41,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <sstream>
 
 #include "fltk_viewer.h"
 #include "RootWindow.h"
@@ -123,21 +124,24 @@ using std::string;
 ///////////////////////////////////////////////////////////////////////////////////
 
 void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) 
-{
+{	
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	// Replace singleton with a user_data pointer
-	if (mcuCBHandle::singleton()._scene->isRemoteMode())
+	if (scene->isRemoteMode())
 	{
-		mcuCBHandle::singleton()._scene->getDebuggerClient()->ProcessVHMsgs(op, args);
+		scene->getDebuggerClient()->ProcessVHMsgs(op, args);
 		return;
 	}
 	else
-		mcuCBHandle::singleton()._scene->getDebuggerServer()->ProcessVHMsgs(op, args);
+	{
+		scene->getDebuggerServer()->ProcessVHMsgs(op, args);
+	}
 
-	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
-        case CMD_NOT_FOUND:
-            LOG("SmartBody Error: command NOT FOUND: '%s' + '%s'", op, args );
-            break;
-        case CMD_FAILURE:
+	std::stringstream strstr;
+	strstr << op << "  " << args;
+	switch( scene->command(strstr.str() ))
+	{
+        case false:
             LOG("SmartBody Error: command FAILED: '%s' + '%s'", op, args );
             break;
     }
@@ -206,18 +210,19 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 	mcu_p->loop = false;
-
-	if (mcu_p->_scene->getSteerManager()->getEngineDriver()->isInitialized())
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	if (scene->getSteerManager()->getEngineDriver()->isInitialized())
 	{
-		mcu_p->_scene->getSteerManager()->getEngineDriver()->stopSimulation();
-		mcu_p->_scene->getSteerManager()->getEngineDriver()->unloadSimulation();
-		mcu_p->_scene->getSteerManager()->getEngineDriver()->finish();
+		scene->getSteerManager()->getEngineDriver()->stopSimulation();
+		scene->getSteerManager()->getEngineDriver()->unloadSimulation();
+		scene->getSteerManager()->getEngineDriver()->finish();
 	
-		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
-			iter != mcu_p->getCharacterMap().end();
+		std::vector<std::string> characterNames = scene->getCharacterNames();
+		for (std::vector<std::string>::iterator iter = characterNames.begin();
+			iter != characterNames.end();
 			iter++)
 		{
-			SbmCharacter* character = (*iter).second;
+			SmartBody::SBCharacter* character = scene->getCharacter((*iter));
 			SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(character->getName());
 			if (steerAgent)
 			{
@@ -776,7 +781,7 @@ int main( int argc, char **argv )	{
 	{
 		std::stringstream strstr;
 		strstr << "path me " << it->c_str();
-		mcu.execute( (char *) strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->command( (char *) strstr.str().c_str() );
 	}
 
 	for( it = seq_paths.begin();
@@ -785,7 +790,7 @@ int main( int argc, char **argv )	{
 	{
 		std::stringstream strstr;
 		strstr << "path seq " << (it->c_str());
-		mcu.execute( (char *) strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->command( (char *) strstr.str().c_str() );
 	}
 
 	for( it = audio_paths.begin();
@@ -794,7 +799,7 @@ int main( int argc, char **argv )	{
 	{
 		std::stringstream strstr;
 		strstr <<  "path audio " << it->c_str();
-		mcu.execute( (char *) strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->command( (char *) strstr.str().c_str() );
 	}
 
 
@@ -826,7 +831,7 @@ int main( int argc, char **argv )	{
 		 ++it )
 	{
 		string seq_command = "seq " + (*it) + " begin";
-		mcu.execute((char *)seq_command.c_str());
+		SmartBody::SBScene::getScene()->command((char *)seq_command.c_str());
 	}
 
 
@@ -883,7 +888,7 @@ int main( int argc, char **argv )	{
 
 		vector<string> commands;// = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
-			mcu.execute( (char *)commands[i].c_str() );
+			SmartBody::SBScene::getScene()->command( (char *)commands[i].c_str() );
 		}
 
 		if (mcu.getInteractive())
@@ -905,7 +910,7 @@ int main( int argc, char **argv )	{
 					if (mcu.use_python) {
 						result = mcu.executePython(cmd);
 					} else {
-						result = mcu.execute(cmd);
+						result = SmartBody::SBScene::getScene()->command(cmd);
 					}
 
 					switch( result ) {

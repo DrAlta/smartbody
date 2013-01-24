@@ -24,7 +24,7 @@
 
 /** \file sr_mat.h 
  * A 4x4 matrix */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_vec.h>
 
 /*! \class SrMat sr_mat.h
@@ -36,7 +36,7 @@
     When using the matrix as a geometric transformation, the
     first three elements of the fourth line represent the 
     translation vector. This is to follow the OpenGL design. */
-class SrMat
+class SBAPI SrMat
  { private :
     float e[16];
    public :
@@ -296,10 +296,10 @@ class SrMat
     void sub ( const SrMat &m1, const SrMat &m2 );
 
     /*! Distance between two matrices, considering them as a 16-dimensional vector. */
-    friend float dist ( const SrMat &a, const SrMat &b );
+    SBAPI friend float dist ( const SrMat &a, const SrMat &b );
 
     /*! Distance between two matrices raised to two, considering them as a 16-dimensional vector. */
-    friend float dist2 ( const SrMat &a, const SrMat &b );
+    SBAPI friend float dist2 ( const SrMat &a, const SrMat &b );
 
     /*! Operator to multiply SrMat by a scalar. */
     void operator *= ( float r );
@@ -311,37 +311,37 @@ class SrMat
     void operator += ( const SrMat &m );
 
     /*! Operator to multiply a SrMat to a scalar, returning another SrMat. */
-    friend SrMat operator * ( const SrMat &m, float r );
+    SBAPI friend SrMat operator * ( const SrMat &m, float r );
 
     /*! Operator to multiply a scalar to a SrMat, returning another SrMat. */
-    friend SrMat operator * ( float r, const SrMat &m );
+    SBAPI friend SrMat operator * ( float r, const SrMat &m );
 
     /*! Operator to multiply a SrMat to a SrVec, returning another SrMat. */
-    friend SrVec operator * ( const SrMat &m,  const SrVec &v  );
+    SBAPI friend SrVec operator * ( const SrMat &m,  const SrVec &v  );
 
     /*! Operator to multiply a SrVec to a SrMat, returning another SrMat. */
-    friend SrVec operator * ( const SrVec &v,  const SrMat &m  );
+    SBAPI friend SrVec operator * ( const SrVec &v,  const SrMat &m  );
 
     /*! Operator to multiply two SrMat, returning another SrMat. */
-    friend SrMat operator * ( const SrMat &m1, const SrMat &m2 );
+    SBAPI friend SrMat operator * ( const SrMat &m1, const SrMat &m2 );
 
     /*! Operator to add two SrMat, returning another SrMat. */
-    friend SrMat operator + ( const SrMat &m1, const SrMat &m2 );
+    SBAPI friend SrMat operator + ( const SrMat &m1, const SrMat &m2 );
 
     /*! Operator to compute the difference two SrMat, returning another SrMat. */
-    friend SrMat operator - ( const SrMat &m1, const SrMat &m2 );
+    SBAPI friend SrMat operator - ( const SrMat &m1, const SrMat &m2 );
 
     /*! Comparison operator to check if two SrMat are equal. */
-    friend bool operator == ( const SrMat &m1, const SrMat &m2 );
+    SBAPI friend bool operator == ( const SrMat &m1, const SrMat &m2 );
 
     /*! Comparison operator to check if two SrMat are different. */
-    friend bool operator != ( const SrMat &m1, const SrMat &m2 );
+    SBAPI friend bool operator != ( const SrMat &m1, const SrMat &m2 );
 
     /*! Outputs 4 elements per line. */
-    friend SrOutput& operator<< ( SrOutput& o, const SrMat& m );
+    SBAPI friend SrOutput& operator<< ( SrOutput& o, const SrMat& m );
 
     /*! Reads 16 float numbers from the input. */
-    friend SrInput&  operator>> ( SrInput& in, SrMat& m );
+    SBAPI friend SrInput&  operator>> ( SrInput& in, SrMat& m );
   };
 
 //============================== end of file ===============================

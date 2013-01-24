@@ -26,7 +26,7 @@
 /** \file sr_trackball.h 
  * trackball manipulation
  */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_vec.h>
 # include <sr/sr_quat.h>
 
@@ -45,33 +45,33 @@ class SrTrackball
    public :
     
     /*! Initialize the trackball with the default parameters, see init(). */
-    SrTrackball ();
+    SBAPI SrTrackball ();
 
     /*! Copy constructor. */
-    SrTrackball ( const SrTrackball& t );
+    SBAPI SrTrackball ( const SrTrackball& t );
 
     /*! Set the parameters to their default values, which is a null rotation. */
-    void init ();
+    SBAPI void init ();
 
     /*! Set m to be the equivalent transformation matrix. A reference to m
         is returned. */
-    SrMat& get_mat ( SrMat& m ) const;
+    SBAPI SrMat& get_mat ( SrMat& m ) const;
 
     /*! Gets the rotation induced by a mouse displacement,
         according to the trackball metaphor. Window coordinates must be
         normalized in [-1,1]x[-1,1]. */
-    static void get_spin_from_mouse_motion ( float lwinx, float lwiny, float winx, float winy, SrQuat& spin );
+    SBAPI static void get_spin_from_mouse_motion ( float lwinx, float lwiny, float winx, float winy, SrQuat& spin );
 
     /*! Accumulates the rotation induced by a mouse displacement,
         according to the trackball metaphor. Window coordinates must be
         normalized in [-1,1]x[-1,1]. */
-    void increment_from_mouse_motion ( float lwinx, float lwiny, float winx, float winy );
+    SBAPI void increment_from_mouse_motion ( float lwinx, float lwiny, float winx, float winy );
 
     /*! Accumulates the rotation with the given quaternion (left-multiplied) */
-    void increment_rotation ( const SrQuat& spin );
+    SBAPI void increment_rotation ( const SrQuat& spin );
 
     /*! Outputs trackball data for inspection. */
-    friend SrOutput& operator<< ( SrOutput& out, const SrTrackball& tb );
+    SBAPI friend SrOutput& operator<< ( SrOutput& out, const SrTrackball& tb );
  };
 
 //================================ End of File =================================================

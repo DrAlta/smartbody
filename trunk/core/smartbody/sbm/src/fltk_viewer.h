@@ -278,7 +278,6 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
     void set_camera (const SrCamera* cam);
 
 	FltkViewerData* getData() { return _data; };
-	LocomotionData* getLocomotionData() { return _locoData; };
 	ObjectManipulationHandle& getObjectManipulationHandle() { return _objManipulator; };
 	std::string _lastSelectedCharacter;
 
@@ -353,7 +352,6 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	void drawKinematicFootprints(int index);
 	void newPrints(bool newprint, int index, SrVec& pos, SrVec& orientation, SrVec& normal, SrVec& color, int side, int type);
 	static void ChangeOffGroundHeight(Fl_Widget* widget, void* data);
-	static void timerUpdate(void* data);
 	void updateLights();
 
 	void create_pawn();
@@ -374,10 +372,8 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	virtual void makeGLContext();
 
     FltkViewerData* _data;
-	LocomotionData* _locoData;
 	GestureData* _gestureData;
 	float _arrowTime;
-	PALocomotionData* _paLocoData;
 	ObjectManipulationHandle _objManipulator; // a hack for testing. 
 
 public:
@@ -468,60 +464,6 @@ protected:
 
  };
 
-class LocomotionData
-{
-	public:
-		LocomotionData() 
-		{
-			rps = 0.7f;
-			x_flag = 0;
-			z_flag = 0;
-			rps_flag = 0;
-			spd;
-			x_spd = 7;
-			z_spd = 70;
-			t_direction[0];
-			character[0];
-			char_index = 0;
-			kmode = 0;
-			height_disp = 0.0f;
-			height_disp_delta = 1.0f;
-			height_disp_inc = false;
-			height_disp_dec = false;
-			upkey = false;
-			downkey = false;
-			leftkey = false;
-			rightkey = false;
-			a_key = false;
-			d_key = false;
-
-			off_height_comp = 0.0f;
-		}
-		
-		float rps;
-		int x_flag;
-		int z_flag;
-		int rps_flag;
-		float spd;
-		float x_spd;
-		float z_spd;
-		char t_direction[200];
-		char character[100];
-		int char_index;
-		int kmode;
-		float height_disp;
-		float height_disp_delta;
-		bool height_disp_inc;
-		bool height_disp_dec;
-		bool upkey;
-		bool downkey;
-		bool leftkey;
-		bool rightkey;
-		bool a_key;
-		bool d_key;
-		float off_height_comp;
-};
-
 class GestureVisualizationHandler : public SmartBody::SBEventHandler
 {
 	public:
@@ -579,35 +521,7 @@ public:
 	std::string currentCharacter;
 };
 
-class PALocomotionData
-{
-public:
-	enum KeyID { KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, KEY_TURNLEFT, KEY_TURNRIGHT , KEY_SHIFT };
-public:
-	PALocomotionData();
-	~PALocomotionData();
 
-	std::string getLocomotionStateName();
-
-	float w;	// angular velocity
-	float v;	// velocity
-	float s;    // strife velocity
-	SbmCharacter* character;
-	bool jumping;
-	bool starting;
-	bool stopping;
-	bool prevJumping;
-	bool prevStarting;
-	bool prevStopping;
-	bool keyControl;
-	float linearVelocityIncrement;
-	float angularVelocityIncrement;	
-	std::map<int,bool> keyPressMap;
-public:	
-	void pressKey(int keyID);
-	void releaseKey(int keyID);
-	void updateKeys(float dt);
-};
 //================================ End of File =================================================
 
 # endif // FLTK_VIEWER_H

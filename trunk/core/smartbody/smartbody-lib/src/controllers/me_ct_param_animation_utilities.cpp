@@ -183,7 +183,7 @@ void PATimeManager::checkEvents()
 		// localTime is the parameterized time, determine the local time of the event
 		if (event.first->isEnabled() && localTimes[motionIndex] >= event.first->getTime())
 		{
-			SmartBody::SBEventManager* manager = SmartBody::SBEventManager::getEventManager();
+			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
 			manager->handleEvent(event.first, localTimes[motionIndex]);
 			std::string type = event.first->getType();
 			std::string params = event.first->getParameters();

@@ -29,6 +29,7 @@
 class SrCylinder;
 class SrSphere;
 
+#include <sb/SBTypes.h>
 # include <sr/sr_box.h>
 # include <sr/sr_vec.h>
 # include <sr/sr_mat.h>
@@ -96,126 +97,126 @@ class SrModel : public SrSharedClass
 	SrString name;
 
     /*! Constructor lets all internal arrays as empty and culling is set to true */
-    SrModel ();
+    SBAPI SrModel ();
 
     /*! Virtual Destructor */
-    virtual ~SrModel ();
+    SBAPI virtual ~SrModel ();
 
-	void computeTangentBiNormal(); // build the tangent and binormal vectors for each vertex. Used for tangent space normal mapping
+	SBAPI void computeTangentBiNormal(); // build the tangent and binormal vectors for each vertex. Used for tangent space normal mapping
 
     /*! Returns true if the model has no faces, and false otherwise */
-    bool empty () { return F.empty(); }
+    SBAPI bool empty () { return F.empty(); }
 
     /*! Sets to an empty model. Internal arrays are not compressed. */
-    void init ();
+    SBAPI void init ();
 
     /*! Compress all internal array buffers. */
-    void compress ();
+    SBAPI void compress ();
 
     /*! Ensures that Fm, Fn, Ft arrays have the same size as F or have size 0. */
-    void validate ();
+    SBAPI void validate ();
     
     /*! Removes unreferenced or duplicated materials. */
-    void remove_redundant_materials ();
+    SBAPI void remove_redundant_materials ();
 
     /*! Removes redundant normals, which are closer than the given angular distance. */
-    void remove_redundant_normals ( float dang=SR_TORAD(0.5f) );
+    SBAPI void remove_redundant_normals ( float dang=SR_TORAD(0.5f) );
 
     /*! Check and remove redundant vertices */
-    void merge_redundant_vertices ( float prec );
+    SBAPI void merge_redundant_vertices ( float prec );
 
     /*! Reads a SrModel format. */
-    bool load ( SrInput &in );
+    SBAPI bool load ( SrInput &in );
 
     /*! Save in the SrModel format. */
-    bool save ( SrOutput &o ) const;
+    SBAPI bool save ( SrOutput &o ) const;
 
     /*! Imports .obj file format. If the import is succesfull, true
        is returned, and otherwise false is returned. */
-    bool import_obj ( const char* file );
+    SBAPI bool import_obj ( const char* file );
 
     /*! Exports .iv file format. If the export is succesfull, true
        is returned, and otherwise false is returned. */
-    bool export_iv ( const char* file );
+    SBAPI bool export_iv ( const char* file );
 
     /*! Makes E to be an array containing the indices of the model edges. */
-    void make_edges ( SrArray<int>& E );
+    SBAPI void make_edges ( SrArray<int>& E );
    
     /*! Count and return the mean number of edges adjacent to a vertex in the model. */
-    float count_mean_vertex_degree ();
+    SBAPI float count_mean_vertex_degree ();
 
     /*! Calculates the bounding box of this model. */
-    void get_bounding_box ( SrBox &box ) const;
+    SBAPI void get_bounding_box ( SrBox &box ) const;
 
     /*! Translate the position of each vertex of the model. */
-    void translate ( const SrVec &tr );
+    SBAPI void translate ( const SrVec &tr );
 
     /*! Scale each vertex of the model. */
-    void scale ( float factor );
+    SBAPI void scale ( float factor );
 
     /*! Translates so that the bounding box center becomes (0,0,0). */
-    void centralize ();
+    SBAPI void centralize ();
 
     /*! Centralizes and scale to achieve maxcoord. */
-    void normalize ( float maxcoord );
+    SBAPI void normalize ( float maxcoord );
 
     /*! Returns the number of common vertices between the two faces indices. */
-    int common_vertices_of_faces ( int i, int j );
+    SBAPI int common_vertices_of_faces ( int i, int j );
 
     /*! Clear the N and Fn arrays, with compression. */
-    void flat ();
+    SBAPI void flat ();
 
     /*! Clear materials and then set M and Fm so that all triangles use the
         same material m, with compression. */
-    void set_one_material ( const SrMaterial& m );
+    SBAPI void set_one_material ( const SrMaterial& m );
 
     /*! Clear material names, and the M and Fm array, with compression. */
-    void clear_materials ();
+    SBAPI void clear_materials ();
 
     /*! Clear the T and Ft array (with compression). */
-    void clear_textures ();
+    SBAPI void clear_textures ();
 
     /*! Generates normals smoothly, respecting the given crease
         angle in radians. Compression is called in the end.
         If the crease angle is <0, it is not considered and
         only an overall smooth is done. */
-    void smooth ( float crease_angle=SR_TORAD(35.0f) );
+    SBAPI void smooth ( float crease_angle=SR_TORAD(35.0f) );
 
     /*! Calculates and returns the normalized normal of the given face index. */
-    SrVec face_normal ( int f ) const;
+    SBAPI SrVec face_normal ( int f ) const;
 
     /*! Inverts faces orientations by swaping b and c indices, 
         and does the same to the normals. */
-    void invert_faces ();
+    SBAPI void invert_faces ();
 
     /*! Multiply all normals in N by -1 */
-    void invert_normals ();
+    SBAPI void invert_normals ();
 
     /*! Multiply arrays V and N with the given matrix */
-    void apply_transformation ( const SrMat& mat );
+    SBAPI void apply_transformation ( const SrMat& mat );
 
     /*! Add faces, materials and normals of m to SrModel */
-    void add_model ( const SrModel& m );
+    SBAPI void add_model ( const SrModel& m );
 
     /*! Copy operator */
-    void operator = ( const SrModel& m );
+    SBAPI void operator = ( const SrModel& m );
 
     /*! Make a box shape */
-    void make_box ( const SrBox& b );
+    SBAPI void make_box ( const SrBox& b );
 
     /*! Make a sphere shape */
-    void make_sphere ( const SrSphere& s, float resolution=1 );
+    SBAPI void make_sphere ( const SrSphere& s, float resolution=1 );
 
     /*! Make a cylinder shape */
-    void make_cylinder ( const SrCylinder& c, float resolution=1, bool smooth=true );
+    SBAPI void make_cylinder ( const SrCylinder& c, float resolution=1, bool smooth=true );
 
     /*! Returns the index of the face intersecting with the line, or -1 if
         no face is found. In case several intersections are found, the closest
         to line.p1 is returned */
-    int pick_face ( const SrLine& line ) const;
+    SBAPI int pick_face ( const SrLine& line ) const;
 
-	void saveOriginalVertices();
-	void restoreOriginalVertices();
+	SBAPI void saveOriginalVertices();
+	SBAPI void restoreOriginalVertices();
  };
 
 //================================ End of File =================================================

@@ -25,7 +25,7 @@
 /** \file sr_sa.h 
  * propagates events
  */
-
+#include <sb/SBTypes.h>
 # include <sr/sr_sa.h>
 # include <sr/sr_event.h>
 
@@ -39,9 +39,9 @@ class SrSaEvent : public SrSa
     int _result;
 
    public :
-    SrSaEvent ( const SrEvent& e ) { _ev=e; _result=0; }
-    SrEvent& get () { return _ev; }
-    int result () const { return _result; }
+    SBAPI SrSaEvent ( const SrEvent& e ) { _ev=e; _result=0; }
+    SBAPI SrEvent& get () { return _ev; }
+    SBAPI int result () const { return _result; }
 
    private : // virtual methods
     virtual bool editor_apply ( SrSnEditor* m );

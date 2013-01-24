@@ -1,9 +1,10 @@
 #ifndef _GENERICVIEWER_
 #define _GENERICVIEWER_
 
+#include <sb/SBTypes.h>
 #include <string>
 
-class GenericViewer
+class SBAPI GenericViewer
 {
 	public:
 		GenericViewer();
@@ -17,7 +18,7 @@ class GenericViewer
 
 };
 
-class GenericViewerFactory
+class SBAPI GenericViewerFactory
 {
 	public:
 		GenericViewerFactory();
