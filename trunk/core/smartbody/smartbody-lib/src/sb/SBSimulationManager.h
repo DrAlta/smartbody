@@ -46,6 +46,7 @@ class SBSimulationManager
 		SBAPI void setEvalDt(float v);
 		SBAPI void setSimDt(float v);
 		SBAPI void setSpeed(float v);
+		SBAPI void setSleepLock();
 
 	protected:
 		bool _simStarted;

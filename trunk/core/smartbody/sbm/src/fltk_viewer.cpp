@@ -3942,6 +3942,8 @@ SbmCharacter* FltkViewer::getCurrentCharacter()
 	 SbmPawn* selectedPawn = getObjectManipulationHandle().get_selected_pawn();
 	 if (!selectedPawn)
 	 {
+		 if (_lastSelectedCharacter == "")
+			 return NULL;
 		 SbmCharacter* character = scene->getCharacter(_lastSelectedCharacter);
 		 if (character)
 		 {

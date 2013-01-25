@@ -33,7 +33,7 @@ SrViewer* getViewer()
 	return mcu.viewer_p;
 }
 
-#ifdef USE_PYTHON
+#ifndef SB_NO_PYTHON
 
 
 std::string PyLogger::strBuffer = "";
@@ -105,16 +105,7 @@ SBController* createController(std::string controllerType, std::string controlle
 
 SrCamera* getCamera()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	if (mcu.camera_p)
-	{
-		return mcu.camera_p;
-	}
-	else
-	{
-		LOG("Camera does not exist.");
-		return NULL;
-	}
+	return SmartBody::SBScene::getScene()->getActiveCamera();
 }
 
 void showCommandResources()

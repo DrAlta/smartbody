@@ -72,6 +72,7 @@
 #include "CommandWindow.h"
 #include <sb/SBPython.h>
 #include <sb/SBSteerManager.h>
+#include <sb/SBSimulationManager.h>
 #include "FLTKListener.h"
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
@@ -145,12 +146,6 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data )
             break;
     }
 }
-
-int sbm_vhmsg_register_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
-	
-	return( CMD_SUCCESS );
-}
-
 
 // snapshot <windowHeight> <windowWidth> <offsetHeight> <offsetWidth> <output file>
 // The offset is according to the left bottom corner of the image frame buffer
@@ -248,6 +243,7 @@ void mcu_register_callbacks( void ) {
 
 void cleanup( void )	{
 	{
+
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		if( mcu.loop )	{
 			LOG( "SmartBody NOTE: unexpected exit " );
@@ -451,8 +447,7 @@ int main( int argc, char **argv )	{
 	
 	mcu_register_callbacks();
 
-	TimeRegulator timer;
-	mcu.register_timer( timer );
+	scene->getSimulationManager()->setupTimer();
 
 	TimeIntervalProfiler* profiler = new TimeIntervalProfiler();
 	mcu.register_profiler(*profiler);
@@ -637,13 +632,13 @@ int main( int argc, char **argv )	{
 		{
 			string fps = s;
 			fps.erase( 0, 5 );
-			timer.set_sleep_fps( atof( fps.c_str() ) );
+			scene->getSimulationManager()->setSleepFps( (float) atof( fps.c_str() ) );
 		}
 		else if( s.compare( "-perf=" ) == 0 )  // argument starts with -perf=
 		{
 			string interval = s;
 			interval.erase( 0, 6 );
-			timer.set_perf( atof( interval.c_str() ) );
+			scene->getSimulationManager()->printPerf((float) atof( interval.c_str() ) );
 		}
 		else if ( s.compare( "-facebone" ) == 0 )
 		{
@@ -676,13 +671,15 @@ int main( int argc, char **argv )	{
 		}
 	}
 	if( lock_dt_mode )	{ 
-		timer.set_sleep_lock();
+		scene->getSimulationManager()->setSleepLock();
 	}
 
-	mcu.setMediaPath(mediaPath);
+	scene->setMediaPath(mediaPath);
+#ifndef SB_NO_PYTHON
 	// initialize python
 	LOG("Initializing Pyton with libraries at location: %s", python_lib_path.c_str());
 	initPython(python_lib_path);
+#endif
 	mcu.festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
 	mcu.cereprocRelay()->initSpeechRelay(cereprocLibDir,festivalCacheDir);
 
@@ -765,7 +762,7 @@ int main( int argc, char **argv )	{
 //	atexit( exit_callback );
 
 	gwiz::cmdl commandline;
-	commandline.set_callback( mcuCBHandle::cmdl_tab_callback );
+	//commandline.set_callback( cmdl_tab_callback );
 
 	vector<string>::iterator it;
 
@@ -852,7 +849,7 @@ int main( int argc, char **argv )	{
 	srArgBuffer argBuff("");
 	mcu_vrAllCall_func( argBuff, &mcu );
 
-	timer.start();
+	scene->getSimulationManager()->start();
 
 #if ENABLE_808_TEST
 	return( 0 );

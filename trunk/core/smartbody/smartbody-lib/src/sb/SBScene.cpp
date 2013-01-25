@@ -280,6 +280,8 @@ void SBScene::reset()
 	AUDIO_Close();
 	AUDIO_Init();
 
+	mcu.vhmsg_send( "vrProcEnd sbm" );
+
 
 }
 
@@ -497,7 +499,6 @@ SBCharacter* SBScene::getCharacter(const std::string& name)
 	}
 	else
 	{
-		LOG("Character %s does not exist.", name.c_str());
 		return NULL;
 	}
 }
