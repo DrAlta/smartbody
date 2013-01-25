@@ -530,6 +530,8 @@ void SbmPawn::set_world_offset( float x, float y, float z,
 
 	gwiz::quat_t q = gwiz::euler_t(pitch,yaw,roll);
 	float data[7] = { x, y, z, (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() };
+	if (!world_offset_writer_p)
+		return;
 	world_offset_writer_p->set_data( data );
 	return;
 

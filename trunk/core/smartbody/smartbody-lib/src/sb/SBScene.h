@@ -219,6 +219,7 @@ class SBScene : public SBObject
 		SBDebuggerClient*	_debuggerClient;
 		SBDebuggerUtility*	_debuggerUtility;
 		std::map<std::string, SrCamera*> _cameras;
+		std::string _activeCamera;
 
 		static SBScene* _scene;
 		static std::map<std::string, std::string> _systemParameters;

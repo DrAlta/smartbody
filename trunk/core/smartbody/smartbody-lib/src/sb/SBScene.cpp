@@ -2249,23 +2249,24 @@ void SBScene::removeCamera(SrCamera* camera)
 
 void SBScene::setActiveCamera(SrCamera* camera)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (camera)
+	if (!camera)
 	{
-		mcu.viewer_p->set_camera(camera);
+		_activeCamera = "";
+		return;
 	}
-	else
-	{
-		mcu.viewer_p->set_camera(NULL);
-	}
+
+	_activeCamera = camera->getName();
 }
 
 SrCamera* SBScene::getActiveCamera()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if (_activeCamera == "")
+		return NULL;
+	std::map<std::string, SrCamera*>::iterator iter = _cameras.find(_activeCamera);
+	if (iter == _cameras.end())
+		return NULL;
 
-	SrCamera* camera = mcu.viewer_p->get_camera();
-	return camera;
+	return (*iter).second;
 }
 
 SrCamera* SBScene::getCamera(const std::string& name)
