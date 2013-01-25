@@ -38,6 +38,8 @@
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBBehaviorSet.h>
 #include <sb/SBBehaviorSetManager.h>
+#include <sb/SBRetarget.h>
+#include <sb/SBRetargetManager.h>
 #include <sr/sr_box.h>
 #include <sr/sr_camera.h>
 #include <stdlib.h>
@@ -1074,6 +1076,17 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getScript", &SBBehaviorSet::getScript, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the name of the script to be run for this behavior set.")
 		;
 
+	boost::python::class_<SBRetargetManager>("SBRetargetManager")
+		.def("createRetarget", &SBRetargetManager::createRetarget, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a retarget instance for the source/target skeleton pair.")
+		.def("getRetarget", &SBRetargetManager::getRetarget, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get the retarget instance for the source/target skeleton pair.")
+		;
+
+	boost::python::class_<SBRetarget>("SBRetarget")
+		.def("initRetarget", &SBRetarget::initRetarget, "Initialize retarget instance.")
+		.def("applyRetargetJointRotation", &SBRetarget::applyRetargetJointRotation, "Apply retargeting on the joint rotation.")
+		.def("applyRetargetJointTranslation", &SBRetarget::applyRetargetJointTranslation, "Apply retargeting on the joint translation.")
+		;
+
 
 /*
 	boost::python::class_<Viseme>("Viseme")		
@@ -1633,6 +1646,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getCollisionManager", &SBScene::getCollisionManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the collision manager object.")
 		.def("getDiphoneManager", &SBScene::getDiphoneManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the diphone manager object.")
 		.def("getBehaviorSetManager", &SBScene::getBehaviorSetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the behavior set manager.")
+		.def("getRetargetManager", &SBScene::getRetargetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the retarget manager.")
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
 
 		.def("setSystemParameter", &SBScene::setSystemParameter, "Sets a name/value pair that persists between scene sessions.")

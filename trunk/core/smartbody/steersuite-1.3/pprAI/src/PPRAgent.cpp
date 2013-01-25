@@ -598,8 +598,9 @@ void PPRAgent::runShortTermPlanningPhase()
 
 		// at this point in code, closestPathNode is the node that is closest to your ped's position.
 
-		// 2. iterate over nodes tracing rays to the find the local target
-		if (closestPathNode < _midTermPathSize-3)
+		// 2. iterate over nodes tracing rays to the find the local target	
+		//printf("closest path node = %d, midtermPathSize = %d",closestPathNode, _midTermPathSize);
+		if (closestPathNode < _midTermPathSize-3 && _midTermPathSize > 2)
 		{
 			float dummyt;
 			SpatialDatabaseItemPtr dummyObject;
@@ -625,7 +626,9 @@ void PPRAgent::runShortTermPlanningPhase()
 				// if localTargetIndex is valid
 				localTargetCellID = _midTermPath[localTargetIndex];
 				gSpatialDatabase->getLocationFromIndex( localTargetCellID, _localTargetLocation );
-				if ((_localTargetLocation - _waypoints[_currentWaypointIndex]).length() < 2.0f * PED_REACHED_TARGET_DISTANCE_THRESHOLD) {
+				float localToWayPointDist = (_localTargetLocation - _waypoints[_currentWaypointIndex]).length();
+				//printf("localToWayPointDist = %f\n",localToWayPointDist);
+				if ( localToWayPointDist < 2.0f * PED_REACHED_TARGET_DISTANCE_THRESHOLD ) {
 					_localTargetLocation = _waypoints[_currentWaypointIndex];
 				}
 			}

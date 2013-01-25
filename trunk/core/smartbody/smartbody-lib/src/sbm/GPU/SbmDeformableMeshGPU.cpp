@@ -207,7 +207,7 @@ void main (void)\n\
 	vec4 color = vec4(ambient,1.0);	\n\
 	vec3 newtv = normalize(tv - bv*dot(tv,bv));\n\
 	vec3 newbv = normalize(bv);\n\
-	vec3 newn  = normalize(cross(tv,bv));\n\
+	vec3 newn  = normalize(normal);//normalize(cross(tv,bv));\n\
 	vec4 texColor = texture2D(diffuseTexture,gl_TexCoord[0].st);\n\
 	vec3 normalColor = normalize(texture2D(normalTexture,gl_TexCoord[0].st).xyz* 2.0 - 1.0);\n\
 	vec3 normalMapN = normalize(-newtv*normalColor.x-newbv*normalColor.y+newn*normalColor.z); \n\
@@ -217,8 +217,10 @@ void main (void)\n\
 		texColor = diffuseMaterial;//vec4(matColor,1.0);\n\
 	color.a = texColor.a*diffuseMaterial.a;\n\
 	n = normalize(normal);\n\
-	if (useNormalMap == 1)\n\
+	if (useNormalMap == 1 && dot(normalMapN,n) > 0.0)\n\
+	{\n\
 		n = normalMapN;\n\
+	}\n\
 	if (useSpecularMap == 1)\n\
 		specMat = specularColor;\n\
 	float shadowWeight = 1.0;\n\

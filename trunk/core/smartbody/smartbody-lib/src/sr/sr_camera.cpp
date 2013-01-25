@@ -27,6 +27,7 @@
 # include <sr/sr_camera.h>
 #include <sstream>
 #include <sbm/mcontrol_util.h>
+#include <sbm/gwiz_math.h>
 #include <sb/SBSubject.h>
 #include <sb/SBAttribute.h>
 
@@ -45,7 +46,7 @@ SrCamera::SrCamera () : SBPawn()
 	createDoubleAttribute("scale", true, true, "Basic", 280, false, false, false, "");
 	
    init ();
-   setBoolAttribute("visible", false); // don't show the camera in the scene by default
+   //setBoolAttribute("visible", false); // don't show the camera in the scene by default
  }
 
 SrCamera::SrCamera ( const SrCamera* c )
@@ -92,6 +93,18 @@ void SrCamera::setScale(float s)
 }
 
 
+void SrCamera::updateOrientation()
+{
+	SrMat viewMat;
+	get_view_mat(viewMat);
+	SrMat rotMat = viewMat.get_rotation().inverse();
+	SrQuat quat = SrQuat(rotMat);
+	gwiz::quat_t q = gwiz::quat_t(quat.w,quat.x,quat.y,quat.z);
+	gwiz::euler_t e = gwiz::euler_t(q);	
+	setHPR(SrVec((float)e.h(),(float)e.p(),(float)e.r()));
+}
+
+
 float SrCamera::getScale()
 {
 	return scale;
@@ -111,6 +124,9 @@ void SrCamera::setEye(float x, float y, float z)
 	posY->setValueFast(y);
 	SmartBody::DoubleAttribute* posZ = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("posZ"));
 	posZ->setValueFast(z);
+	
+	updateOrientation();	
+	setPosition(SrVec(x,y,z));
 }
 
 SrVec SrCamera::getEye()
@@ -130,6 +146,8 @@ void SrCamera::setCenter(float x, float y, float z)
 	centerY->setValueFast(y);
 	SmartBody::DoubleAttribute* centerZ = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("centerZ"));
 	centerZ->setValueFast(z);
+
+	updateOrientation();
 }
 
 SrVec SrCamera::getCenter()
@@ -140,6 +158,7 @@ SrVec SrCamera::getCenter()
 void SrCamera::setUpVector(SrVec u)
 {
 	up = u;
+	updateOrientation();
 }
 
 SrVec SrCamera::getUpVector()

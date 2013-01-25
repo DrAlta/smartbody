@@ -243,10 +243,13 @@ public :
 	// retarget the motion from source skeleton to target skeleton
 	SkMotion* buildRetargetMotionV2(SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints, 
 									std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJoints);
+
+#if 0
 	SkMotion* buildRetargetMotion(SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints, 
 								  std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJoints);	
 	SkMotion* buildRetargetMotion2(SkSkeleton* sourceSk, SkSkeleton* targetSk);
 	SkMotion* buildRetargetMotion3( SkSkeleton* sourceSk, SkSkeleton* targetSk );
+#endif
 
 	/*! Change the angle values of all channels in euler angles type by
 	adding +-2PI, in order to have the smallest distance between frames,
@@ -322,8 +325,10 @@ public :
 
 private : 
 	bool _load_bvh ( SrInput& in );
-protected:
-	void convertBoneOrientation( std::string &pjointName, SkSkeleton* interSk, SkSkeleton* tempSrcSk, std::queue<std::string> &jointQueues, std::map<std::string, SrQuat> &jointRotationMap, std::vector<std::string>& endJoints );
+public:
+	//static void convertBoneOrientation( std::string &pjointName, SkSkeleton* interSk, SkSkeleton* tempSrcSk, std::queue<std::string> &jointQueues, std::map<std::string, SrQuat> &jointRotationMap, std::vector<std::string>& endJoints );
+	static void convertBoneOrientation( std::string &pjointName, SkSkeleton* interSk, SkSkeleton* tempSrcSk, std::vector<std::string>& endJoints );
+
 };
 
 //================================ End of File =================================================

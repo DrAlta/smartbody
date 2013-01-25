@@ -1,10 +1,11 @@
 #include "vhcl.h"
 #include "ObjectManipulationHandle.h"
-#include "fltk_viewer.h"
-#include <FL/gl.h>
-#include <GL/glu.h>
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
+//#include "fltk_viewer.h"
+
+#include <FL/gl.h>
+#include <GL/glu.h>
 
 ObjectManipulationHandle::ObjectManipulationHandle(void)
 {
@@ -96,14 +97,15 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 	this->get_pawn_list(pawn_list);
 
 	// determine the size of the pawns relative to the size of the characters
-	float pawnSize = 1.0;
-	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
-	for (size_t i = 0; i < charNames.size(); i++)
-	{
-		SmartBody::SBCharacter * character = SmartBody::SBScene::getScene()->getCharacter(charNames[i]);
-		pawnSize = character->getHeight() / 30.0f;
-		break;
-	}
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	float pawnSize = 0.05f / scene->getScale();
+// 	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+// 	for (size_t i = 0; i < charNames.size(); i++)
+// 	{
+// 		SmartBody::SBCharacter * character = SmartBody::SBScene::getScene()->getCharacter(charNames[i]);
+// 		pawnSize = character->getHeight() / 30.0f;
+// 		break;
+// 	}
 
 	for (unsigned int i=0;i<pawn_list.size();i++)
 	{

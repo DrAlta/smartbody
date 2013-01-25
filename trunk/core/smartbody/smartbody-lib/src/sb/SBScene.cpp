@@ -27,6 +27,7 @@
 #include <sb/SBCollisionManager.h>
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBBehaviorSetManager.h>
+#include <sb/SBRetargetManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBParser.h>
 #include <sb/SBDebuggerServer.h>
@@ -71,6 +72,7 @@ SBScene::SBScene(void)
 	_collisionManager = new SBCollisionManager();
 	_diphoneManager = new SBDiphoneManager();
 	_behaviorSetManager = new SBBehaviorSetManager();
+	_retargetManager = new SBRetargetManager();
 	_eventManager = new SBEventManager();
 	_scale = .01f; // default scale is centimeters
 
@@ -1107,6 +1109,12 @@ SBBehaviorSetManager* SBScene::getBehaviorSetManager()
 {
 	return _behaviorSetManager;
 }
+
+SBRetargetManager* SBScene::getRetargetManager()
+{
+	return _retargetManager;
+}
+
 
 SBPhysicsManager* SBScene::getPhysicsManager()
 {

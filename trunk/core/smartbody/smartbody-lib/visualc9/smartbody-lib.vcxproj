@@ -396,6 +396,8 @@
     <ClCompile Include="..\src\sb\SBPhoneme.cpp" />
     <ClCompile Include="..\src\sb\SBPhonemeManager.cpp" />
     <ClCompile Include="..\src\sb\SBPhysicsSim.cpp" />
+    <ClCompile Include="..\src\sb\SBRetarget.cpp" />
+    <ClCompile Include="..\src\sb\SBRetargetManager.cpp" />
     <ClCompile Include="..\src\sk\sk_channel.cpp" />
     <ClCompile Include="..\src\sk\sk_channel_array.cpp" />
     <ClCompile Include="..\src\sk\sk_joint.cpp" />
@@ -854,6 +856,8 @@
     <ClInclude Include="..\src\sb\SBPhoneme.h" />
     <ClInclude Include="..\src\sb\SBPhonemeManager.h" />
     <ClInclude Include="..\src\sb\SBPhysicsSim.h" />
+    <ClInclude Include="..\src\sb\SBRetarget.h" />
+    <ClInclude Include="..\src\sb\SBRetargetManager.h" />
     <ClInclude Include="..\src\sb\SBTypes.h" />
     <ClInclude Include="..\src\sk\sk_channel.h" />
     <ClInclude Include="..\src\sk\sk_channel_array.h" />

@@ -1819,7 +1819,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 					std::string texID;
 					xml_utils::xml_translate(&texID, texAttrNode->getNodeValue());
 					normalTexture = texID;
-					M.top().specular = SrColor(0.2f,0.2f,0.2f,1.f);
+					M.top().specular = SrColor(0.1f,0.1f,0.1f,1.f);
 					M.top().shininess = 20;
 				}			
 			}
@@ -1834,7 +1834,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 					std::string texID;
 					xml_utils::xml_translate(&texID, texAttrNode->getNodeValue());
 					specularTexture = texID;
-					M.top().specular = SrColor(0.2f,0.2f,0.2f,0.2f);
+					M.top().specular = SrColor(0.1f,0.1f,0.1f,1.f);
 					M.top().shininess = 20;
 				}			
 			}

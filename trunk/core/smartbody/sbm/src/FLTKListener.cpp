@@ -1,10 +1,11 @@
 #include "vhcl.h"
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
 #include "FLTKListener.h"
 #include <sb/SBPawn.h>
 #include <sb/SBSkeleton.h>
-#include <sbm/GPU/SbmDeformableMeshGPU.h>
-#include <fltk_viewer.h>
 #include <RootWindow.h>
+#include <fltk_viewer.h>
+
 
 FLTKListener::FLTKListener()
 {

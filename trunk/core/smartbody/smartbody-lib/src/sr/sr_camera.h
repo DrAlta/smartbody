@@ -64,6 +64,8 @@ class SrCamera : public SmartBody::SBPawn
 	SBAPI void setScale(float scale);
 	SBAPI float getScale();
 	SBAPI void setEye(float x, float y, float z);
+
+	SBAPI void updateOrientation();
 	SBAPI SrVec getEye();
 	SBAPI void setCenter(float x, float y, float z);
 	SBAPI SrVec getCenter();

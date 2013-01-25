@@ -29,7 +29,7 @@
 # define FLTK_VIEWER_H
 
 //#define USE_GLEW 1
-#include <sbm/GPU/SbmShader.h>
+//#include <sbm/GPU/SbmShader.h>
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Menu_Button.H>
 #include <FL/Fl_Menu_Item.H>
@@ -427,6 +427,8 @@ protected:
    bool showmasses;
    bool showBoundingVolume;
    bool showJointLabels;
+   bool showCameras;
+   bool showLights;
 
    bool locomotionenabled;
    bool showlocomotionall;
@@ -456,8 +458,8 @@ protected:
    SrSaGlRender render_action;
    SrSaBBox bbox_action;
 
-   GLuint  shadowMapID, depthMapID, depthFB, rboID;
-   GLfloat shadowCPM[16];
+   unsigned int  shadowMapID, depthMapID, depthFB, rboID;
+   float shadowCPM[16];
 
 
 
