@@ -90,7 +90,7 @@ class mcuCBHandle;
 #define USE_PYTHON
 #endif
 
-#ifdef USE_PYTHON
+#ifndef SB_NO_PYTHON
 #ifndef __native_client__
 #include <boost/python.hpp>
 #endif
@@ -305,7 +305,7 @@ class mcuCBHandle {
 		std::map<std::string, SbmCharacter*> character_map;
 
 
-#ifdef USE_PYTHON
+#ifndef SB_NO_PYTHON
 #ifndef __native_client__
 		boost::python::object mainModule;
 		boost::python::object mainDict;
@@ -407,8 +407,6 @@ public:
 		// ----------------------------------------------
 		// END time and performance management
 		// ----------------------------------------------
-
-		static std::string cmdl_tab_callback( std::string str );
 
 		// ----------------------------------------------
 		// scene management

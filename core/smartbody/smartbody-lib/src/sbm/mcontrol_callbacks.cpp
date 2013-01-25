@@ -3827,7 +3827,7 @@ int mcu_vrSpeech_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
-#ifdef USE_PYTHON	
+#ifndef SB_NO_PYTHON	
 #ifndef __ANDROID__
 #ifndef __native_client__
 	std::string instanceId = args.read_token();

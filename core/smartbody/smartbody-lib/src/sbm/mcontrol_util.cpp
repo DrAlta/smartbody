@@ -69,12 +69,12 @@
 #include <sb/SBPythonClass.h>
 #include <sb/SBPython.h>
 
-#ifdef USE_PYTHON
+#ifndef SB_NO_PYTHON
 #include <boost/python.hpp> // boost python support
 #endif
 
 #else
-#ifdef USE_PYTHON
+#ifndef SB_NO_PYTHON
 #undef USE_PYTHON
 #endif 
 #endif
@@ -347,7 +347,7 @@ mcuCBHandle::~mcuCBHandle() {
 	ogreViewerFactory = NULL;
 
 	// clean up python
-#ifdef USE_PYTHON
+#ifndef SB_NO_PYTHON
 	Py_Finalize();
 
 #if defined(WIN_BUILD)
@@ -465,7 +465,7 @@ void mcuCBHandle::reset( void )
 #ifndef __native_client__
 	//Py_Finalize();
 	//initPython(initPythonLibPath);
-#ifdef USE_PYTHON
+#ifndef SB_NO_PYTHON
 	PyRun_SimpleString("scene = getScene()");
 	PyRun_SimpleString("bml = scene.getBmlProcessor()");
 	PyRun_SimpleString("sim = scene.getSimulationManager()");
@@ -891,112 +891,7 @@ void mcuCBHandle::clear( void )
 
 /////////////////////////////////////////////////////////////
 
-std::string mcuCBHandle::cmdl_tab_callback( std::string cmdl_str )	{
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	srHashMapBase* map = NULL;
-
-	// get the current partial command
-	std::string partialCommand( cmdl_str );
-	std::string commandPrefix = "";
-
-	// only use tab completion on the first word
-	size_t index = partialCommand.find_first_of(" ");
-	if( index != std::string::npos )
-	{
-
-		// if the command matches 'set', 'print' or 'test' use those maps
-		std::string firstToken = partialCommand.substr(0, index);
-		if (firstToken == "set")
-		{
-			map = &mcu.set_cmd_map.getHashMap();
-			partialCommand = partialCommand.substr(index + 1);
-			commandPrefix = "set ";
-		}
-		else if (firstToken == "print")
-		{
-			map = &mcu.print_cmd_map.getHashMap();
-			partialCommand = partialCommand.substr(index + 1);
-			commandPrefix = "print ";
-		}
-		else if (firstToken == "test")
-		{
-			map = &mcu.test_cmd_map.getHashMap();
-			partialCommand = partialCommand.substr(index + 1);
-			commandPrefix = "test ";
-		}
-		else
-		{
-			// transform tabs into a space
-			cmdl_str += " ";
-		}
-
-	}
-
-	// find a match against the current list of commands
-
-	if( !map )
-		map = &mcu.cmd_map.getHashMap();
-	int numEntries = map->get_num_entries();
-	map->reset();
-	int numMatches = 0;
-	char* key = NULL;
-	int numChecked = 0;
-	map->next( &key );
-	std::vector<std::string> options;
-
-	while( key )
-	{
-		bool match = false;
-		std::string keyString = key;
-		numChecked++;
-		if( partialCommand.size() <= keyString.size() )
-		{
-			match = true;
-			for( size_t a = 0; a < partialCommand.size() && a < keyString.size(); a++ )
-			{
-				if( partialCommand[ a ] != keyString[ a ] )
-				{
-					match = false;
-					break;
-				}
-			}
-			if( match )
-			{
-				options.push_back( keyString );
-				numMatches++;
-			}
-		}
-		map->next( &key );
-		std::string nextKey = key;
-		if( nextKey == keyString )
-			break; // shouldn't map.next(key) make key == NULL? This doesn't seem to happen.
-	}
-
-	if( numMatches == 1 )
-	{
-		cmdl_str = commandPrefix + options[0] + " ";
-	}
-	else 
-	if (numMatches > 1)
-	{ // more than one match, show the options on the line below
-
-		fprintf( stdout, "\n");
-		std::sort( options.begin(), options.end() );
-		for( size_t x = 0; x < options.size(); x++ )
-		{
-			fprintf( stdout, "%s ", options[x].c_str() );
-		}
-	}
-	else 
-	if( numMatches == 0 )
-	{
-		// transform tabs into a space
-		cmdl_str += " ";
-	}
-
-	return( cmdl_str );
-}
 
 /////////////////////////////////////////////////////////////
 
@@ -1948,7 +1843,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 
 int mcuCBHandle::executePythonFile(const char* filename)
 {
-#ifdef USE_PYTHON
+#ifndef SB_NO_PYTHON
 	char buffer[ MAX_FILENAME_LEN ];
 	char label[ MAX_FILENAME_LEN ];	
 	// add the .seq extension if necessary
@@ -1997,7 +1892,7 @@ int mcuCBHandle::executePythonFile(const char* filename)
 
 int mcuCBHandle::executePython(const char* command)
 {
-#ifdef USE_PYTHON
+#ifndef SB_NO_PYTHON
 	try {
 		CmdResource* resource = new CmdResource();
 		resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number

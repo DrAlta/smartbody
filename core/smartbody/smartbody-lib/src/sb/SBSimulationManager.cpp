@@ -305,5 +305,16 @@ void SBSimulationManager::setupTimer()
 	mcu.register_timer( *timer );
 }
 
+void SBSimulationManager::setSleepLock()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if (!mcu.timer_p)	
+	{
+		LOG("Time regulator does not exist!");
+		return;
+	}
+	mcu.timer_p->set_sleep_lock();
+}
+
 }
 

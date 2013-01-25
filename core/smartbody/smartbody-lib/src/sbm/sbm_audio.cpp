@@ -61,6 +61,8 @@ void AUDIO_Stop( const char * audio_file )
 
 void AUDIO_Close()
 {
+   if (!g_audio)
+	   return;
    g_audio->Close();
    delete g_audio;
    g_audio = NULL;
