@@ -1,4 +1,5 @@
 #include <vhcl.h>
+#include <sbm/GPU/SbmShader.h>
 #include "RootWindow.h"
 #include "CharacterCreatorWindow.h"
 #include <FL/Fl_Pack.H>
@@ -55,6 +56,8 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Character/Show Gesture", 0, GestureCB, this, NULL);
 	menubar->add("&View/Character/Show Joint Labels", 0, JointLabelCB, this, NULL);
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
+	menubar->add("&View/Show Cameras", 0, ShowCamerasCB, this, NULL);
+	menubar->add("&View/Show Lights", 0, ShowLightsCB, this, NULL);
 	menubar->add("&View/Shadows", 0, ShadowsCB, this, NULL);
 	menubar->add("&View/Grid", 0, GridCB, this, NULL);
 	menubar->add("&View/Background Color", 0, BackgroundColorCB, this, NULL);
@@ -1680,7 +1683,46 @@ void BaseWindow::updateCameraList()
 	deleteCameraSubMenu.user_data(&deleteCameraList[0]);
 }
 
+void BaseWindow::ShowCamerasCB( Fl_Widget* w, void* data )
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->getData()->showCameras = !rootWindow->fltkViewer->getData()->showCameras;
+	bool showCamera = rootWindow->fltkViewer->getData()->showCameras;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> camNames = scene->getCameraNames();
+	for (unsigned int i=0;i<camNames.size();i++)
+	{
+		SrCamera* cam = scene->getCamera(camNames[i]);
+		if (cam)
+		{
+			cam->setBoolAttribute("visible", showCamera);
+		}
+	}
+#endif
 
+}
+
+void BaseWindow::ShowLightsCB( Fl_Widget* w, void* data )
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->getData()->showLights = !rootWindow->fltkViewer->getData()->showLights;
+	bool showLight = rootWindow->fltkViewer->getData()->showLights;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> pawnNames = scene->getPawnNames();
+	for (unsigned int i=0;i<pawnNames.size();i++)
+	{
+		std::string name = pawnNames[i];
+		SmartBody::SBPawn* pawn = scene->getPawn(name);
+		if (name.find("light") == 0 && pawn) // is light
+		{
+			pawn->setBoolAttribute("visible",showLight);			
+		}
+	}
+#endif
+
+}
 //== Viewer Factory ========================================================
 SrViewer* FltkViewerFactory::s_viewer = NULL;
 

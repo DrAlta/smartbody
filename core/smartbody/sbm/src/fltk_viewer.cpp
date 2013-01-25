@@ -24,6 +24,11 @@
 #include "FL/Fl_Slider.H"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
 #include "vhcl.h"
 //#include <FL/enumerations.H>
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support
+#include "sbm/GPU/SbmShader.h"
+#include "sbm/GPU/SbmTexture.h"
+#endif
+# include <sbm/GPU/SbmDeformableMeshGPU.h>
 # include "fltk_viewer.h"
 # include <FL/Fl.H>
 # include <FL/gl.h>
@@ -69,7 +74,6 @@
 
 # include <sb/SBColObject.h>
 #include <sb/PABlend.h>
-# include <sbm/GPU/SbmDeformableMeshGPU.h>
 # include <sb/SBScene.h>
 # include <sb/SBSkeleton.h>
 # include <sb/SBCharacter.h>
@@ -85,10 +89,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support
-#include "sbm/GPU/SbmShader.h"
-#include "sbm/GPU/SbmTexture.h"
-#endif
+
 
 #include "jointmapviewer/JointMapViewer.h"
 #include "jointmapviewer/RetargetStepWindow.h"

@@ -196,6 +196,8 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void GridCB(Fl_Widget* w, void* data);	
 		static void FloorCB(Fl_Widget* w, void* data);	
 		static void FloorColorCB(Fl_Widget* w, void* data);	
+		static void ShowCamerasCB(Fl_Widget* w, void* data);
+		static void ShowLightsCB(Fl_Widget* w, void* data);
 		static void BackgroundColorCB(Fl_Widget* w, void* data);	
 		static void CreatePythonAPICB(Fl_Widget* widget, void* data);
 		static void DocumentationCB(Fl_Widget* widget, void* data);

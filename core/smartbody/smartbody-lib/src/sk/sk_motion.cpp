@@ -869,7 +869,7 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 	return smooth_p;
 }
 
-void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* interSk, SkSkeleton* tempSrcSk, std::queue<std::string> &jointQueues, std::map<std::string, SrQuat> &jointRotationMap, std::vector<std::string>& endJoints )
+void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* interSk, SkSkeleton* tempSrcSk, std::vector<std::string>& endJoints )
 {	
 	if (std::find(endJoints.begin(),endJoints.end(),pjointName) != endJoints.end())
 		return;
@@ -977,7 +977,7 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		//SrVec alignRotAxisAngle = rotAxisAngle*pmatInv;		
 		SrQuat quat = pjoint->quat()->rawValue()*SrQuat(quatMat);
 		//SrQuat quat = pjoint->quat()->rawValue()*SrQuat(alignRotAxisAngle);//*pjoint->quat()->rawValue();
-		jointRotationMap[pjointName] = quat;
+		//jointRotationMap[pjointName] = quat;
 		pjoint->quat()->value(quat);
 		pjoint->set_lmat_changed();
 		pjoint->update_gmat();	
@@ -1055,7 +1055,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 		else
 		{
 			//LOG("pjoint name = %s",pjointName.c_str());
-			convertBoneOrientation(pjointName, interSk, tempSrcSk, jointQueues, jointRotationMap, endJoints);
+			convertBoneOrientation(pjointName, interSk, tempSrcSk, endJoints);
 			interSk->invalidate_global_matrices();
 			interSk->update_global_matrices();
 			SkJoint* pjoint = interSk->search_joint(pjointName.c_str());	
@@ -1131,7 +1131,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 	return retarget_p;
 }
 
-
+#if 0
 SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints, 
 										 std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJoints )
 {
@@ -1224,7 +1224,7 @@ SkMotion* SkMotion::buildRetargetMotion( SkSkeleton* sourceSk, SkSkeleton* targe
 			}
 			else
 			{
-				convertBoneOrientation(pjointName, interSk, tempSrcSk, jointQueues, jointRotationMap, endJoints);								
+				convertBoneOrientation(pjointName, interSk, tempSrcSk, jointRotationMap, endJoints);								
 				SkJoint* pjoint = interSk->search_joint(pjointName.c_str());
 				for (int i=0; i< pjoint->num_children(); i++)
 				{
@@ -1515,6 +1515,7 @@ SkMotion* SkMotion::buildRetargetMotion2( SkSkeleton* sourceSk, SkSkeleton* targ
 	this->disconnect();
 	return retarget_p;
 }
+#endif
 
 SkMotion* SkMotion::copyMotion()
 {

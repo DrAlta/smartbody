@@ -1,8 +1,10 @@
 #include "CharacterCreatorWindow.h"
-#include <sbm/mcontrol_util.h>
 #include <sstream>
 #include <FL/fl_ask.H>
+#include <sbm/mcontrol_util.h>
 #include "RootWindow.h"
+
+
 
 CharacterCreatorWindow::CharacterCreatorWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h, name)
 {

@@ -32,8 +32,8 @@
 #define SBM_REPORT_MEMORY_LEAKS  0
 #define SBM_EMAIL_CRASH_REPORTS  1
 
-#include "vhcl.h"
 #include "external/glew/glew.h"
+#include "vhcl.h"
 #include <sbm/lin_win.h>
 #include <signal.h>
 #include <iostream>
@@ -42,7 +42,6 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
-
 #include "fltk_viewer.h"
 #include "RootWindow.h"
 #include <bmlviewer/BehaviorWindow.h>

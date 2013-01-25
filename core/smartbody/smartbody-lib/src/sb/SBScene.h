@@ -37,6 +37,7 @@ class SBJointMapManager;
 class SBCollisionManager;
 class SBDiphoneManager;
 class SBBehaviorSetManager;
+class SBRetargetManager;
 class SBParser;
 class SBSubject;
 
@@ -142,6 +143,7 @@ class SBScene : public SBObject
 		SBAPI SBCollisionManager* getCollisionManager();
 		SBAPI SBDiphoneManager* getDiphoneManager();
 		SBAPI SBBehaviorSetManager* getBehaviorSetManager();
+		SBAPI SBRetargetManager* getRetargetManager();
 
 		SBAPI SBParser* getParser();
 
@@ -200,6 +202,7 @@ class SBScene : public SBObject
 		SBJointMapManager* _jointMapManager;
 		SBCollisionManager* _collisionManager;
 		SBDiphoneManager* _diphoneManager;
+		SBRetargetManager* _retargetManager;
 		SBEventManager* _eventManager;
 		SBParser* _parser;
 

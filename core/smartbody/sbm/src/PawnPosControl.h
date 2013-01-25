@@ -4,8 +4,6 @@
 #include <sb/SBObserver.h>
 #ifdef WIN32
 #include "glfont2.h"
-
-
 using namespace glfont;
 #endif
 

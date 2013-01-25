@@ -27,6 +27,9 @@
 #include <sb/SBEvent.h>
 #include <sb/SBScene.h>
 #include <sb/sbm_pawn.hpp>
+#include <sb/SBScene.h>
+#include <sb/SBRetargetManager.h>
+#include <sb/SBRetarget.h>
 
 //=================================== MeCtMotion =====================================
 
@@ -330,17 +333,57 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	//_motion->apply( float(t)*_twarp + float(_offset),
 	//	            &(frame.buffer()[0]),  // pointer to buffer's float array
 	//				&_mChan_to_buff,
-	//	            _play_mode, &_last_apply_frame );
+	//	            _play_mode, &_last_apply_frame );	
 	_motion->apply( float(t),
 		            &(frame.buffer()[0]),  // pointer to buffer's float array
 					&_mChan_to_buff,
 		            _play_mode, &_last_apply_frame );
 
 	SkChannelArray& allChannels = _motion->channels();
-	for (int i = 0; i < allChannels.size(); ++i)
+
+#define TEST_ONLINE_RETARGET 0
+#if TEST_ONLINE_RETARGET
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBRetarget* retarget = scene->getRetargetManager()->getRetarget("ChrBrad.sk","player.dae");	
+	if (retarget)
 	{
+		for (int i=0; i< allChannels.size();i++)
+		{
+			SkChannel& chan = allChannels[i];		
+			std::string cname = allChannels.name(i);
+			int index = _mChan_to_buff[i];	
+			if (index >=0 && index < frame.buffer().size())
+			{
+				if (chan.type == SkChannel::Quat)
+				{
+					SrQuat finalQ, initQ;
+
+					initQ.w = frame.buffer()[ index + 0 ] ;
+					initQ.x = frame.buffer()[ index + 1 ] ;
+					initQ.y = frame.buffer()[ index + 2 ] ;
+					initQ.z = frame.buffer()[ index + 3 ] ;
+
+					//initQ = SrQuat();
+					finalQ = retarget->applyRetargetJointRotation(cname,initQ);
+
+					frame.buffer()[ index + 0 ] = (float)finalQ.w;
+					frame.buffer()[ index + 1 ] = (float)finalQ.x;
+					frame.buffer()[ index + 2 ] = (float)finalQ.y;
+					frame.buffer()[ index + 3 ] = (float)finalQ.z;
+				}
+				else if (chan.type == SkChannel::XPos || chan.type == SkChannel::YPos || chan.type == SkChannel::ZPos)
+				{
+					frame.buffer()[ index ] = retarget->applyRetargetJointTranslation(cname,frame.buffer()[index]);
+				}
+			}					
+		}
+	}
+#endif
+	for (int i = 0; i < allChannels.size(); ++i)
+	{		
 		frame.channelUpdated(i);
 	}
+
 
 	checkMotionEvents(t);
 
