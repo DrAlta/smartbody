@@ -434,6 +434,9 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->reset();
 
+	SrCamera* camera = SmartBody::SBScene::getScene()->createCamera("cameraDefault");
+	camera->reset();
+
 	if (mediaPath != "")
 		SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
 	std::string filebasename = boost::filesystem::basename(seqFile);
@@ -608,7 +611,8 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 		if (mediaPath != "")
 			SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
 		
-		CameraResetCB(widget, data);
+		SrCamera* camera = SmartBody::SBScene::getScene()->createCamera("cameraDefault");
+		camera->reset();
 	}
 }
 

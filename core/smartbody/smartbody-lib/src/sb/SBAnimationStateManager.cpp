@@ -281,6 +281,7 @@ void SBAnimationBlendManager::removeAllBlends()
 	{
 		delete mcu.param_anim_blends[i];
 	}
+	mcu.param_anim_blends.clear();
 
 	stateGraph = BoostGraph();
 
