@@ -325,10 +325,6 @@ mcuCBHandle::mcuCBHandle()
 
 	SmartBody::SBAnimationBlend0D* idleState = new SmartBody::SBAnimationBlend0D(PseudoIdleState);
 	addPABlend(idleState);
-
-	
-
-
 }
 
 /////////////////////////////////////////////////////////////

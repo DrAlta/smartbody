@@ -204,6 +204,11 @@ void SBScene::reset()
 	getBlendManager()->removeAllBlends();
 	getBlendManager()->removeAllTransitions();
 
+	// always need a PseudoIdle state
+	SmartBody::SBAnimationBlend0D* idleState = getBlendManager()->createBlend0D(PseudoIdleState);
+	//addPABlend(idleState);
+
+
 	// clear out the default face definitions
 	std::vector<std::string> faceDefinitions = getFaceDefinitionNames();
 
