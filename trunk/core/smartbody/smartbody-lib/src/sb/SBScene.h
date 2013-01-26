@@ -228,6 +228,8 @@ class SBScene : public SBObject
 		std::map<std::string, SrCamera*> _cameras;
 		std::string _activeCamera;
 
+		std::map<std::string, SmartBody::SBFaceDefinition*> _faceDefinitions;
+
 		std::string _mediaPath;
 		std::vector<SBController*> _defaultControllers;
 		

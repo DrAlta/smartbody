@@ -252,7 +252,6 @@ class mcuCBHandle {
 		SequenceManager	pendingSequences;
 		SequenceManager activeSequences;
 
-		std::map<std::string, SmartBody::SBFaceDefinition*> face_map;
 		std::map<std::string, SkPosture*> pose_map;
 		std::map<std::string, SkMotion*> motion_map;
 		std::map<std::string, SkSkeleton*> skeleton_map;

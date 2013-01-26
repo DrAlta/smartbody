@@ -2302,20 +2302,12 @@ int mcu_character_init(
 	SmartBody::SBFaceDefinition* faceDefinition = NULL;
 
 	// get the face motion mapping per character
-	std::map<std::string, SmartBody::SBFaceDefinition*>::iterator faceIter = mcu_p->face_map.find(std::string(char_name));
-	if (faceIter !=  mcu_p->face_map.end())
-	{
-		faceDefinition = (*faceIter).second;
-	}
-	else
+	faceDefinition = SmartBody::SBScene::getScene()->getFaceDefinition(char_name);
+	if (!faceDefinition)
 	{
 		// get the default face motion mapping
-		faceIter = mcu_p->face_map.find("_default_");
-		if (faceIter !=  mcu_p->face_map.end())
-		{
-			faceDefinition = (*faceIter).second;
-		}
-		else
+		faceDefinition = SmartBody::SBScene::getScene()->getFaceDefinition("_default_");
+		if (!faceDefinition)
 		{
 			LOG("Couldn't find _default_ face motion mappings! Check code.");
 		}
@@ -2532,18 +2524,11 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	} else if( type=="neutral" ) {
 		const string motion_name = args.read_token();
 
-		SmartBody::SBFaceDefinition* faceDefinition = NULL;
-		std::map<std::string, SmartBody::SBFaceDefinition*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
-		if (faceMotionIter == mcu_p->face_map.end())
+		SmartBody::SBFaceDefinition* faceDefinition = SmartBody::SBScene::getScene()->getFaceDefinition(characterName);
+		if (!faceDefinition)
 		{
 			// face motion mappings for character do not yet exist - create them
-			faceDefinition = new SmartBody::SBFaceDefinition();
-			faceDefinition->setName(characterName);
-			mcu_p->face_map.insert(std::pair<std::string, SmartBody::SBFaceDefinition*>(characterName, faceDefinition));
-		}
-		else
-		{
-			faceDefinition = (*faceMotionIter).second;
+			faceDefinition = SmartBody::SBScene::getScene()->createFaceDefinition(characterName);
 		}
 
 		if (motion_name.size() > 0)
@@ -2650,18 +2635,11 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string cha
 		side = "";
 	}
 	
-	SmartBody::SBFaceDefinition* faceDefinition = NULL;
-	std::map<std::string, SmartBody::SBFaceDefinition*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
-	if (faceMotionIter == mcu_p->face_map.end())
+	SmartBody::SBFaceDefinition* faceDefinition = SmartBody::SBScene::getScene()->getFaceDefinition(characterName);
+	if (!faceDefinition)
 	{
 		// face motion mappings for character do not yet exist - create them
-		faceDefinition = new SmartBody::SBFaceDefinition();
-		faceDefinition->setName(characterName);
-		mcu_p->face_map.insert(std::pair<std::string, SmartBody::SBFaceDefinition*>(characterName, faceDefinition));
-	}
-	else
-	{
-		faceDefinition = (*faceMotionIter).second;
+		faceDefinition =  SmartBody::SBScene::getScene()->createFaceDefinition(characterName);
 	}
 
 	faceDefinition->setAU(unit, side, motion);
@@ -2735,18 +2713,14 @@ int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string c
 		}
 	}
 
-	SmartBody::SBFaceDefinition* faceDefinition = NULL;
-	std::map<std::string, SmartBody::SBFaceDefinition*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
-	if (faceMotionIter == mcu_p->face_map.end())
+	SmartBody::SBFaceDefinition* faceDefinition = SmartBody::SBScene::getScene()->getFaceDefinition(characterName);
+	if (!faceDefinition)
 	{
 		// face motion mappings for character do not yet exist
 		LOG("Character %s does not yet have any AU mappings for the face.", characterName.c_str());
 		return CMD_FAILURE;
 	}
-	else
-	{
-		faceDefinition = (*faceMotionIter).second;
-	}
+	
 
 	if( unit == ALL_ACTION_UNITS )
 	{
@@ -2788,18 +2762,11 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string
 		return CMD_SUCCESS;
 	}
 
-	SmartBody::SBFaceDefinition* faceDefinition = NULL;
-	std::map<std::string, SmartBody::SBFaceDefinition*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
-	if (faceMotionIter == mcu_p->face_map.end())
+	SmartBody::SBFaceDefinition* faceDefinition = SmartBody::SBScene::getScene()->getFaceDefinition(characterName);
+	if (!faceDefinition)
 	{
 		// face motion mappings for character do not yet exist - create them
-		faceDefinition = new SmartBody::SBFaceDefinition();
-		faceDefinition->setName(characterName);
-		mcu_p->face_map.insert(std::pair<std::string, SmartBody::SBFaceDefinition*>(characterName, faceDefinition));
-	}
-	else
-	{
-		faceDefinition = (*faceMotionIter).second;
+		faceDefinition =  SmartBody::SBScene::getScene()->createFaceDefinition(characterName);
 	}
 
 	std::string motionName = args.read_token();
@@ -2839,16 +2806,14 @@ int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p,std::strin
 		return CMD_SUCCESS;
 	}
 
-	SmartBody::SBFaceDefinition* faceDefinition = NULL;
-	std::map<std::string, SmartBody::SBFaceDefinition*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
-	if (faceMotionIter == mcu_p->face_map.end())
+	SmartBody::SBFaceDefinition* faceDefinition = SmartBody::SBScene::getScene()->getFaceDefinition(characterName);
+	if (!faceDefinition)
 	{
 		// face motion mappings for character do not yet exist
 		LOG("Character %s does not yet have any viseme mappings for the face.", characterName.c_str());
 		return CMD_FAILURE;
 	}
-	faceDefinition = (*faceMotionIter).second;
-
+	
 	if (viseme == "*")
 	{
 		int numVisemes = faceDefinition->getNumVisemes();
