@@ -175,7 +175,7 @@ void SBMotion::checkSkeleton(std::string skel)
 		return;
 	}
 
-	SkSkeleton* skSkel = load_skeleton(skel.c_str(), mcu.me_paths, mcu.resource_manager, mcu.skScale);
+	SkSkeleton* skSkel = load_skeleton(skel.c_str(), mcu.me_paths, mcu.skScale);
 	if (skSkel)
 	{
 		int numValidChannels = motion->connect(skSkel);	// connect and check for the joints

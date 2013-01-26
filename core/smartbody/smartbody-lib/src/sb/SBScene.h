@@ -38,6 +38,7 @@ class SBCollisionManager;
 class SBDiphoneManager;
 class SBBehaviorSetManager;
 class SBRetargetManager;
+class SBAssetManager;
 class SBParser;
 class SBSubject;
 class SBController;
@@ -145,6 +146,7 @@ class SBScene : public SBObject
 		SBAPI SBDiphoneManager* getDiphoneManager();
 		SBAPI SBBehaviorSetManager* getBehaviorSetManager();
 		SBAPI SBRetargetManager* getRetargetManager();
+		SBAPI SBAssetManager* getAssetManager();
 
 		SBAPI SBParser* getParser();
 
@@ -211,6 +213,8 @@ class SBScene : public SBObject
 		SBDiphoneManager* _diphoneManager;
 		SBRetargetManager* _retargetManager;
 		SBEventManager* _eventManager;
+		SBAssetManager* _assetManager;
+
 		SBParser* _parser;
 
 		SBCharacterListener* _characterListener;

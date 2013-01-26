@@ -34,7 +34,6 @@
 
 #include <sr/sr.h>
 #include <sk/sk_channel_array.h>
-#include <sbm/ResourceManager.h>
 #include "sbm/mcontrol_util.h"
 #include <sb/sbm_pawn.hpp>
 

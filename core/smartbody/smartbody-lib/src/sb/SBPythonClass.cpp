@@ -2,7 +2,6 @@
 #include "SBPythonClass.h"
 #include "controllers/me_ct_reach.hpp"
 
-#include <sbm/resource_cmds.h>
 #include <sb/sbm_character.hpp>
 #include <sbm/me_utilities.hpp>
 #include <sk/sk_skeleton.h>
@@ -106,100 +105,6 @@ SrCamera* getCamera()
 	return SmartBody::SBScene::getScene()->getActiveCamera();
 }
 
-void showCommandResources()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	int numResources = mcu.resource_manager->getNumResources();
-
-	for (int r = 0; r < numResources; r++)
-	{
-		CmdResource * res = dynamic_cast<CmdResource *>(mcu.resource_manager->getResource(r));
-		if (res)
-			LOG("%s", res->dump().c_str());
-	}	
-}
-
-void showMotionResources()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	int numResources = mcu.resource_manager->getNumResources();
-
-	for (int r = 0; r < numResources; r++)
-	{
-		MotionResource * res = dynamic_cast<MotionResource  *>(mcu.resource_manager->getResource(r));
-		if(res)
-			LOG("%s", res->dump().c_str());
-
-	}	
-}
-
-
-void showSkeletonResources()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	int numResources = mcu.resource_manager->getNumResources();
-
-	for (int r = 0; r < numResources; r++)
-	{
-		SkeletonResource * res = dynamic_cast<SkeletonResource  *>(mcu.resource_manager->getResource(r));
-		if(res)
-			LOG("%s", res->dump().c_str());
-
-	}	
-}
-
-void showPathResources()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	int numResources = mcu.resource_manager->getNumResources();
-
-	for (int r = 0; r < numResources; r++)
-	{
-		PathResource * res = dynamic_cast<PathResource *>(mcu.resource_manager->getResource(r));
-		if(res)
-			LOG("%s", res->dump().c_str());
-	}
-}
-
-void showScriptResources()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	int numResources = mcu.resource_manager->getNumResources();
-
-	for (int r = 0; r < numResources; r++)
-	{
-		FileResource * res = dynamic_cast<FileResource *>(mcu.resource_manager->getResource(r));
-		if(res)
-			LOG("%s", res->dump().c_str());
-	}
-}
-
-void showControllerResources()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	int numResources = mcu.resource_manager->getNumResources();
-
-	for (int r = 0; r < numResources; r++)
-	{
-		ControllerResource * res = dynamic_cast<ControllerResource  *>(mcu.resource_manager->getResource(r));
-		if(res)
-			LOG("%s", res->dump().c_str());
-	}	
-}
-
-void getResourceLimit()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.resource_manager->getLimit();
-}
-
-void setResourceLimit(int limit)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	if (limit > 0)
-		mcu.resource_manager->setLimit(limit);
-}
-
 
 std::string getScriptFromFile(std::string fileName)
 {
@@ -214,14 +119,7 @@ std::string getScriptFromFile(std::string fileName)
 	while (filename.size() > 0 && filename != "")	{
 		file_p = fopen( filename.c_str(), "r" );
 		if( file_p != NULL ) {
-	
-			// add the file resource
-			FileResource* fres = new FileResource();
-			std::stringstream stream;
-			stream << filename;
-			fres->setFilePath(stream.str());
-			mcu.resource_manager->addResource(fres);
-			
+		
 			break;
 		}
 		filename = mcu.seq_paths.next_filename( buffer, label );
@@ -234,12 +132,6 @@ std::string getScriptFromFile(std::string fileName)
 		while (filename.size() > 0)	{
 			if( ( file_p = fopen( filename.c_str(), "r" ) ) != NULL ) {
 				
-				// add the file resource
-				FileResource* fres = new FileResource();
-				std::stringstream stream;
-				stream << filename;
-				fres->setFilePath(stream.str());
-				mcu.resource_manager->addResource(fres);
 				break;
 			}
 			filename = mcu.seq_paths.next_filename( buffer, label );

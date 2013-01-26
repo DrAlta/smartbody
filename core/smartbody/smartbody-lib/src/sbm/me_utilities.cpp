@@ -68,7 +68,7 @@ const char* POSTURE_EXT = ".skp";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, SBResourceManager* manager, double scale ) {
+SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, double scale ) {
 	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::map<std::string, SkSkeleton*>::iterator iter = mcu.skeleton_map.find(std::string(skel_file));
@@ -182,8 +182,6 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, SBResou
 //	char CurrentPath[_MAX_PATH];
 //	_getcwd(CurrentPath, _MAX_PATH);
 //	char *full_filename = new char[_MAX_PATH];
-	SkeletonResource * skelRes = new SkeletonResource();
-	skelRes->setType("sk");
 
 //	full_filename = mcn_return_full_filename_func( CurrentPath, filename.c_str() );
 //	char *full_filename = new char[_MAX_PATH]; // REALLY??
@@ -192,8 +190,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, SBResou
 	boost::filesystem::path abs_p = boost::filesystem::complete( p );
     if ( boost::filesystem2::exists( abs_p ) )	{
 //		sprintf( full_filename, "%s", abs_p.string().c_str() );
-		skelRes->setSkeletonFile( abs_p.string() );
-		manager->addResource(skelRes);
+		
 	}
 	else	{
 		LOG( "load_skeleton ERR: path '%s' does not exist\n", abs_p.string().c_str() );
@@ -203,7 +200,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, SBResou
 
 }
 
-int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, SBResourceManager* manager, double scale, const char* error_prefix ) {
+int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, double scale, const char* error_prefix ) {
 	if( !exists( pathname ) ) {
 		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
 		return CMD_FAILURE;
@@ -226,7 +223,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 
 			if( is_directory( cur ) ) {
 				if( recurse_dirs )
-					load_me_motions_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
+					load_me_motions_impl( cur, map, recurse_dirs, scale, "WARNING: " );
 			} else {
 				string ext = extension( cur );
 #if ENABLE_FBX_PARSER
@@ -244,7 +241,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 					_stricmp( ext.c_str(), ".amc" ) == 0)
 #endif
 				{
-					load_me_motions_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
+					load_me_motions_impl( cur, map, recurse_dirs, scale, "WARNING: " );
 				} 
 				else if( DEBUG_LOAD_PATHS ) {
 					LOG("DEBUG: load_me_motion_impl(): Skipping \"%s\".  Extension \"%s\" does not match MOTION_EXT.", cur.string().c_str(), ext.c_str() );
@@ -357,13 +354,10 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 				getcwd(CurrentPath, _MAX_PATH);
 #endif
 				std::string filename;
-				MotionResource * motionRes = new MotionResource();
-				motionRes->setType("skm");
+			
 				filename = pathname.filename().c_str();
 			
 				//filename = mcn_return_full_filename_func( CurrentPath, finalPath.string().c_str() );
-				motionRes->setMotionFile( pathname.string() );
-				manager->addResource(motionRes);
 
 				string filebase = basename( pathname );
 				const char* name = motion->getName().c_str();
@@ -393,7 +387,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 	return CMD_SUCCESS;
 }
 
-int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, SBResourceManager* manager, double scale, const char* error_prefix ) {
+int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, double scale, const char* error_prefix ) {
 		
 	if( !exists( pathname ) ) {
 		LOG("%s Skeleton path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
@@ -408,7 +402,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 
 			if( is_directory( cur ) ) {
 				if( recurse_dirs )
-					load_me_skeletons_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
+					load_me_skeletons_impl( cur, map, recurse_dirs, scale, "WARNING: " );
 			} else {
 				string ext = extension( cur );
 #if ENABLE_FBX_PARSER
@@ -433,7 +427,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 					_stricmp( ext.c_str(), ".xml" ) == 0)
 #endif
 				{
-					load_me_skeletons_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
+					load_me_skeletons_impl( cur, map, recurse_dirs, scale, "WARNING: " );
 				} 
 				else if( DEBUG_LOAD_PATHS ) {
 					LOG("DEBUG: load_me_skeleton_impl(): Skipping \"%s\".  Extension \"%s\" does not match .sk.", cur.string().c_str(), ext.c_str() );
@@ -598,16 +592,12 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 
 		skeleton->ref();		
 		skeleton->setName(skeleton->skfilename());
-		SBResourceManager* manager = SBResourceManager::getResourceManager();
-		SkeletonResource* skelRes = new SkeletonResource();
-		skelRes->setType("skm");
-		skelRes->setSkeletonFile(pathname.string());
-		manager->addResource(skelRes);
+		
 	}
 	return CMD_SUCCESS;
 }
 
-int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture*>& map, bool recurse_dirs, SBResourceManager* manager, double scale, const char* error_prefix ) {
+int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture*>& map, bool recurse_dirs, double scale, const char* error_prefix ) {
 	
 	if( !exists( pathname ) ) {
 		LOG("%s Posture path \"%s\" not found.", error_prefix, pathname.native_file_string().c_str());
@@ -622,11 +612,11 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 
 			if( is_directory( cur ) ) {
 				if( recurse_dirs )
-					load_me_postures_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
+					load_me_postures_impl( cur, map, recurse_dirs, scale, "WARNING: " );
 			} else {
 				string ext = extension( cur );
 				if( _stricmp( ext.c_str(), POSTURE_EXT )==0 ) {
-					load_me_postures_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
+					load_me_postures_impl( cur, map, recurse_dirs,scale, "WARNING: " );
 				} else if( DEBUG_LOAD_PATHS ) {
 					LOG("DEBUG: load_me_posture_impl(): Skipping \"%s\". Extension \"%s\" does not match POSTURE_EXT.",  cur.string().c_str(), ext.c_str());
 				}
@@ -648,8 +638,6 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 //			char CurrentPath[_MAX_PATH];
 //			_getcwd(CurrentPath, _MAX_PATH);
 			std::string filename;
-			MotionResource * motionRes = new MotionResource();
-			motionRes->setType("skp");
 			
 //			filename = mcn_return_full_filename_func( CurrentPath, pathname.string().c_str() );
 
@@ -658,9 +646,6 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
             if ( boost::filesystem2::exists( abs_p ) )	{
 				filename = abs_p.string();
 			}
-			
-			motionRes->setMotionFile( filename );
-			manager->addResource(motionRes);
 
 			string filebase = basename( pathname );
 			const char* name = posture->name();
@@ -691,16 +676,7 @@ int load_me_motion_individual( SrInput & input, const std::string & motionName, 
 
 	bool parseSuccessful = motion->load( input, scale );
 
-	MotionResource * motionRes = new MotionResource();
-	motionRes->setType("skm");
-
 	std::string filename = motionName;
-
-	motionRes->setMotionFile( motionName );
-
-	SBResourceManager* manager = SBResourceManager::getResourceManager();
-
-	manager->addResource(motionRes);
 
 	string filebase = basename( motionName );
 	const char* name = motion->getName().c_str();
@@ -725,7 +701,7 @@ int load_me_motion_individual( SrInput & input, const std::string & motionName, 
 	return CMD_SUCCESS;
 }
 
-int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, SBResourceManager* manager, double scale ) {
+int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, double scale ) {
 	path motions_path(pathname);
 	
 	path finalPath;
@@ -742,7 +718,7 @@ int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map
 	}
 
 	if (1) {
-		return load_me_motions_impl( finalPath, map, recurse_dirs, manager, scale, "ERROR: " );
+		return load_me_motions_impl( finalPath, map, recurse_dirs, scale, "ERROR: " );
 	} else {
 		LOG("ERROR: Invalid motion path \"%s\".", finalPath.string().c_str());
 		return CMD_FAILURE;
@@ -779,16 +755,12 @@ int load_me_skeleton_individual( SrInput & input, const std::string & skeletonNa
 	std::string filebasename = boost::filesystem::basename(skeleton->skfilename());
 	std::string fileextension = boost::filesystem::extension(skeleton->skfilename());
 	skeleton->setName(filebasename+fileextension);	
-	SBResourceManager* manager = SBResourceManager::getResourceManager();
-	SkeletonResource* skelRes = new SkeletonResource();
-	skelRes->setType("skm");
-	skelRes->setSkeletonFile(skeletonName.c_str());
-	manager->addResource(skelRes);
+
 
 	return CMD_SUCCESS;
 }
 
-int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, SBResourceManager* manager, double scale ) {
+int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, double scale ) {
 	path motions_path(pathname);
 	
 	path finalPath;
@@ -805,14 +777,14 @@ int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>&
 	}
 
 	if (1) {
-		return load_me_skeletons_impl( finalPath, map, recurse_dirs, manager, scale, "ERROR: " );
+		return load_me_skeletons_impl( finalPath, map, recurse_dirs, scale, "ERROR: " );
 	} else {
 		LOG("ERROR: Invalid skeleton path \"%s\".", finalPath.string().c_str() );
 		return CMD_FAILURE;
 	}
 }
 
-int load_me_postures( const char* pathname, std::map<std::string, SkPosture*>& map, bool recurse_dirs, SBResourceManager* manager, double scale ) {
+int load_me_postures( const char* pathname, std::map<std::string, SkPosture*>& map, bool recurse_dirs, double scale ) {
 	path posture_path(pathname);
 
 	path finalPath;
@@ -828,7 +800,7 @@ int load_me_postures( const char* pathname, std::map<std::string, SkPosture*>& m
 	}
 
 	if (1) {
-		return load_me_postures_impl( finalPath, map, recurse_dirs, manager, scale, "ERROR: " );
+		return load_me_postures_impl( finalPath, map, recurse_dirs, scale, "ERROR: " );
 	} else {
 		LOG("ERROR: Invalid posture path \"%s\".", pathname);
 		return CMD_FAILURE;

@@ -30,7 +30,7 @@
 # include <sr/sr_shared_class.h>
 # include <sk/sk_channel_array.h>
 # include <sbm/sr_synch_points.h>
-# include <sb/SBObject.h>
+# include <sb/SBAsset.h>
 # include <queue>
 
 class SkPosture;
@@ -43,7 +43,7 @@ namespace SmartBody {
 
 /*! Maintains a motion defined as a sequence of keyframes, each
 with a time stamp */
-class SkMotion : public SmartBody::SBObject
+class SkMotion : public SmartBody::SBAsset
 {
 public:
 	struct Frame { 

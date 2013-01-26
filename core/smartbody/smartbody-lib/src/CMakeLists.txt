@@ -279,9 +279,6 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/ParserOgre.cpp
 	sbm/ParserOpenCOLLADA.cpp
 	sbm/remote_speech.cpp
-	sbm/resource_cmds.cpp
-	sbm/Resource.cpp
-	sbm/ResourceManager.cpp
 	sbm/sbm_audio.cpp
 	controllers/MeCtBodyReachState.cpp
 	controllers/MeCtReachEngine.cpp
@@ -375,6 +372,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/PABlend.cpp
 	sb/SBRetarget.cpp
 	sb/SBRetargetManager.cpp
+	sb/SBAsset.cpp
+	sb/SBAssetManager.cpp
 
 	sb/SBPython.cpp
 	sb/SBPythonClass.cpp

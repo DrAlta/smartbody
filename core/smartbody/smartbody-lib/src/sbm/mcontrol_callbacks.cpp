@@ -220,12 +220,9 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		char *path_tok = args.read_token();
 		char* path = args.read_token();
 
-		PathResource* pres = new PathResource();
-		pres->setPath(path);
 		if( strcmp( path_tok, "seq" ) == 0 ||
 			strcmp( path_tok, "script" ) == 0)
 		{	
-			pres->setType("seq");
 			mcu_p->seq_paths.insert( path );
 		}
 		else if( (strcmp( path_tok, "me" ) == 0 ) ||
@@ -233,12 +230,10 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			   ( strcmp( path_tok, "motion" ) == 0 )
 			   )
 		{
-			pres->setType("me");
 			mcu_p->me_paths.insert( path );
 		}
 		else if(strcmp( path_tok, "audio") == 0 )
 		{
-			pres->setType("audio");
 			// remove the old paths 
 			mcu_p->audio_paths = srPathList();
 			mcu_p->audio_paths.setPathPrefix(SmartBody::SBScene::getScene()->getMediaPath());
@@ -246,17 +241,14 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		else if(strcmp( path_tok, "mesh") == 0 )
 		{
-			pres->setType("mesh");
 			mcu_p->mesh_paths.insert( path );
 		}
 		else
 		{
-			delete pres;
 			LOG( "mcu_filepath_func ERR: token '%s' NOT FOUND\n", path_tok );
 			return( CMD_FAILURE );
 		}
 		
-		mcu_p->resource_manager->addResource(pres);
 		return( CMD_SUCCESS );
 	}
 	return( CMD_FAILURE );
@@ -2281,7 +2273,7 @@ int mcu_character_init(
 	std::map<std::string, SkSkeleton*>::iterator skelIter = mcu_p->skeleton_map.find(skel_file);
 	if (skelIter ==  mcu_p->skeleton_map.end())
 	{
-		SkSkeleton* cachedSkeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager, mcu_p->skScale );
+		SkSkeleton* cachedSkeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->skScale );
 		if( !cachedSkeleton ) {
 			LOG( "init_character ERR: Failed to load skeleton \"%s\"\n", skel_file ); 
 			mcu_p->unregisterCharacter(char_p);

@@ -658,15 +658,6 @@
     <ClCompile Include="..\src\sbm\remote_speech.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\Resource.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\resource_cmds.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbm\ResourceManager.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\sbm_audio.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
@@ -988,8 +979,18 @@
     <ClCompile Include="..\src\sb\PABlend.cpp">
       <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sb\SBRetarget.cpp" />
-    <ClCompile Include="..\src\sb\SBRetargetManager.cpp" />
+    <ClCompile Include="..\src\sb\SBAsset.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBAssetManager.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBRetarget.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBRetargetManager.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -1667,15 +1668,6 @@
     <ClInclude Include="..\src\sbm\remote_speech.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\Resource.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\resource_cmds.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\ResourceManager.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbm\GPU\SbmDeformableMeshGPU.h">
       <Filter>sbm</Filter>
     </ClInclude>
@@ -2021,8 +2013,18 @@
     <ClInclude Include="..\src\sb\PABlend.h">
       <Filter>sb</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sb\SBRetarget.h" />
-    <ClInclude Include="..\src\sb\SBRetargetManager.h" />
+    <ClInclude Include="..\src\sb\SBAsset.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBAssetManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBRetargetManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBRetarget.h">
+      <Filter>sb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\sbm_deformable_mesh.cpp.bak">

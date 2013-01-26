@@ -500,30 +500,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\Resource.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\Resource.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\resource_cmds.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\resource_cmds.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\ResourceManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\ResourceManager.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\sbm_audio.cpp"
 				>
 			</File>

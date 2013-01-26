@@ -401,9 +401,6 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/ParserOgre.cpp \
 	$(SBM_MY_DIR)/sbm/remote_speech.cpp \
 	$(SBM_MY_DIR)/sbm/local_speech.cpp \
-	$(SBM_MY_DIR)/sbm/resource_cmds.cpp \
-	$(SBM_MY_DIR)/sbm/Resource.cpp \
-	$(SBM_MY_DIR)/sbm/ResourceManager.cpp \
 	$(SBM_MY_DIR)/sbm/sbm_audio.cpp \
 	$(SBM_MY_DIR)/controllers/MeCtBodyReachState.cpp \
 	$(SBM_MY_DIR)/controllers/MeCtReachEngine.cpp \
@@ -492,6 +489,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBEvent.cpp \
 	$(SBM_MY_DIR)/sb/SBRetarget.cpp \
 	$(SBM_MY_DIR)/sb/SBRetargetManager.cpp \
+	$(SBM_MY_DIR)/sb/SBAsset.cpp \
+	$(SBM_MY_DIR)/sb/SBAssetManager.cpp \
 	
 	
 LOCAL_LDLIBS    := -llog 

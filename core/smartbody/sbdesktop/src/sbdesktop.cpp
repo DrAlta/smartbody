@@ -50,7 +50,6 @@
 #include <sbm/sbm_speech_audiofile.hpp>
 #include <sbm/text_speech.h> // [BMLR]
 #include <sbm/locomotion_cmds.hpp>
-#include <sbm/resource_cmds.h>
 #include <sbm/time_regulator.h>
 //#include "SBMWindow.h"
 #include <sb/SBPython.h>
