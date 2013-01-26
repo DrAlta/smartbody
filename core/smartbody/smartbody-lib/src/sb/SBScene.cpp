@@ -152,7 +152,7 @@ void SBScene::initialize()
 	// Create default settings
 	createDefaultControllers();
 	SmartBody::SBFaceDefinition* faceDefinition = createFaceDefinition("_default_");
-	mcu.face_map["_default_"] = faceDefinition;
+	
 	SmartBody::SBCharacterListener* listener = getCharacterListener();
 	//_scene = SmartBody::SBScene::getScene();
 	setCharacterListener(listener);
@@ -1310,17 +1310,15 @@ void SBScene::setRemoteMode(bool val)
 
 SmartBody::SBFaceDefinition* SBScene::createFaceDefinition(const std::string& name)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	// make sure the name doesn't already exist
-	if (mcu.face_map.find(name) != mcu.face_map.end())
+	if (_faceDefinitions.find(name) != _faceDefinitions.end())
 	{
 		LOG("Face definition named '%s' already exists.", name.c_str());
 		return NULL;
 	}
 
 	SBFaceDefinition* face = new SBFaceDefinition(name);
-	mcu.face_map.insert(std::pair<std::string, SBFaceDefinition*>(name, face));
+	_faceDefinitions.insert(std::pair<std::string, SBFaceDefinition*>(name, face));
 
 	return face;
 }
@@ -1330,8 +1328,8 @@ void SBScene::removeFaceDefinition(const std::string& name)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	// make sure the name doesn't already exist
-	std::map<std::string, SBFaceDefinition*>::iterator iter = mcu.face_map.find(name);
-	if (iter == mcu.face_map.end())
+	std::map<std::string, SBFaceDefinition*>::iterator iter = _faceDefinitions.find(name);
+	if (iter ==_faceDefinitions.end())
 	{
 		LOG("Face definition named '%s' does not exist.", name.c_str());
 		return;
@@ -1339,16 +1337,14 @@ void SBScene::removeFaceDefinition(const std::string& name)
 
 	delete iter->second;
 	iter->second = NULL;
-	mcu.face_map.erase(iter);
+	_faceDefinitions.erase(iter);
 }
 
 SmartBody::SBFaceDefinition* SBScene::getFaceDefinition(const std::string& name)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	// make sure the name doesn't already exist
-	std::map<std::string, SBFaceDefinition*>::iterator iter = mcu.face_map.find(name);
-	if (iter == mcu.face_map.end())
+	std::map<std::string, SBFaceDefinition*>::iterator iter = _faceDefinitions.find(name);
+	if (iter == _faceDefinitions.end())
 	{
 		LOG("Face definition named '%s' does not exist.", name.c_str());
 		return NULL;
@@ -1359,16 +1355,14 @@ SmartBody::SBFaceDefinition* SBScene::getFaceDefinition(const std::string& name)
 
 int SBScene::getNumFaceDefinitions()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	return 	mcu.face_map.size();
+	return 	_faceDefinitions.size();
 }
 
 std::vector<std::string> SBScene::getFaceDefinitionNames()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::vector<std::string> faces;
-	for (std::map<std::string, SBFaceDefinition*>::iterator iter =  mcu.face_map.begin();
-		 iter !=  mcu.face_map.end();
+	for (std::map<std::string, SBFaceDefinition*>::iterator iter =  _faceDefinitions.begin();
+		 iter !=  _faceDefinitions.end();
 		 iter++)
 	{
 		faces.push_back((*iter).second->getName());
