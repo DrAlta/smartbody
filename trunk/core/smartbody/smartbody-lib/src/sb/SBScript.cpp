@@ -2,7 +2,7 @@
 
 namespace SmartBody {
 
-SBScript::SBScript() : SBObject()
+SBScript::SBScript() : SBAsset()
 {
 	_enabled = true;
 }

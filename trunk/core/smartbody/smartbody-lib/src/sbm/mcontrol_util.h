@@ -62,9 +62,6 @@ class mcuCBHandle;
 #include "sbm_speech_audiofile.hpp"
 #include "time_regulator.h"
 #include "time_profiler.h"
-
-
-#include "ResourceManager.h"
 #include <sbm/action_unit.hpp>
 #include <sbm/general_param_setting.h>
 
@@ -310,7 +307,6 @@ public:
 		WSP::Manager*				theWSP;
 #endif
 
-		SBResourceManager*			resource_manager;
 		std::vector<CameraTrack*>	cameraTracking;
 
 		//SbmPhysicsSim*              physicsEngine;
@@ -459,11 +455,7 @@ public:
 		int execute( const char *key, srArgBuffer& args ) { 
 			std::stringstream strstr;
 			strstr << key << " " << args.peek_string();
-			CmdResource* resource = new CmdResource();
-			resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number
-			resource->setCommand(strstr.str());
-			resource->setTime(time);
-			resource_manager->addCommandResource(resource);
+			
 
 			int ret = ( cmd_map.execute( key, args, this ) );
 			if (ret == CMD_SUCCESS)
@@ -475,11 +467,6 @@ public:
 		int execute( const char *key, char* strArgs ) {
 			std::stringstream strstr;
 			strstr << key << " " << strArgs;
-			CmdResource* resource = new CmdResource();
-			resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number
-			resource->setCommand(strstr.str());
-			resource->setTime(time);
-			resource_manager->addCommandResource(resource);
 
             srArgBuffer args( strArgs );
 			
@@ -491,11 +478,6 @@ public:
 		}
 
 		int execute( char *cmd ) { 
-			CmdResource* resource = new CmdResource();
-			resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number						
-			resource->setCommand(cmd);
-			resource->setTime(time);
-			resource_manager->addCommandResource(resource);
 
 			//LOG("execute cmd = %s\n",cmd);
 			// check to see if this is a sequence command
@@ -504,17 +486,6 @@ public:
 			size_t startpos = checkCmd.find_first_not_of(" \t");
 			if( std::string::npos != startpos )
 				checkCmd = checkCmd.substr( startpos );
-			unsigned int seqPos = checkCmd.find("seq");
-			if (seqPos == 0)
-			{
-				std::string remainderCmd = checkCmd.substr(3, checkCmd.size() - 3);
-				size_t startpos = remainderCmd.find_first_not_of(" \t");
-				if( std::string::npos != startpos )
-					remainderCmd = remainderCmd.substr( startpos );
-				size_t endpos = remainderCmd.find_first_of(" \t");
-				remainderCmd = remainderCmd.substr(0, endpos);
-				resource->setId(remainderCmd);
-			}
 
 			int ret = ( cmd_map.execute( cmd, this ) ); 
 			if (ret == CMD_SUCCESS)

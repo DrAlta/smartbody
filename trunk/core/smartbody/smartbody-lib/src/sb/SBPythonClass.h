@@ -135,22 +135,6 @@ SBController* createController(std::string controllerType, std::string controlle
 SrCamera* getCamera();
 
 //Script* getScript(std::string fileName);
-void showCommandResources();
-void showMotionResources();
-void showSkeletonResources();
-void showPathResources();
-void showScriptResources();
-void showControllerResources();
-void getResourceLimit();
-void setResourceLimit(int limit);
-
-
-
-
-
-
-
-
 
 // helper functions
 std::string getScriptFromFile(std::string fileName);

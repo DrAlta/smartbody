@@ -2,11 +2,11 @@
 #define _SBSCRIPT_H_
 
 #include <sb/SBTypes.h>
-#include <sb/SBObject.h>
+#include <sb/SBAsset.h>
 
 namespace SmartBody {
 
-class SBScript : public SBObject
+class SBScript : public SBAsset
 {
 	public:
 		SBAPI SBScript();

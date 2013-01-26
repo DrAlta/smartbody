@@ -57,7 +57,6 @@
 #include "sb/SBScene.h"
 #include "me_utilities.hpp"
 #include <sbm/mcontrol_callbacks.h>
-#include <sbm/resource_cmds.h>
 #include <sbm/sbm_test_cmds.hpp>
 
 #if USE_WSP
@@ -300,7 +299,6 @@ mcuCBHandle::mcuCBHandle()
 	updatePhysics( false ),
 	viewer_factory ( new SrViewerFactory() ),
 	ogreViewerFactory ( new SrViewerFactory() ),
-	resource_manager(SBResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
 	use_python( true ),
 	sendPawnUpdates(false),
@@ -411,7 +409,6 @@ void mcuCBHandle::reset( void )
 	test_recipient_default = "ALL";
 	queued_cmds = 0;
 	updatePhysics = false;
-	resource_manager = SBResourceManager::getResourceManager();
 	snapshot_counter = 1;
 	use_python = true;
 	sendPawnUpdates = false;
@@ -483,7 +480,6 @@ void mcuCBHandle::registerCallbacks()
 	insert( "RemoteSpeechTimeOut", remoteSpeechTimeOut_func);  // internally routed message
 //	insert( "locomotion",          locomotion_cmd_func );
 //	insert( "loco",                locomotion_cmd_func ); // shorthand
-	insert( "resource",            resource_cmd_func );
 	insert( "syncpolicy",          mcu_syncpolicy_func );
 	insert( "check",			   mcu_check_func);		// check matching between .skm and .sk
 	insert( "pythonscript",		   mcu_pythonscript_func);
@@ -597,12 +593,6 @@ void mcuCBHandle::registerCallbacks()
 		file_p = fopen( filename.c_str(), "r" );
 		if( file_p != NULL ) {
 	
-			// add the file resource
-			FileResource* fres = new FileResource();
-			std::stringstream stream;
-			stream << filename;
-			fres->setFilePath(stream.str());
-			resource_manager->addResource(fres);
 			fullPath = filename;			
 			break;
 		}
@@ -618,12 +608,6 @@ void mcuCBHandle::registerCallbacks()
 		while( filename.size() > 0 )	{
 			if( ( file_p = fopen( filename.c_str(), "r" ) ) != NULL ) {
 				
-				// add the file resource
-				FileResource* fres = new FileResource();				
-				std::stringstream stream;
-				stream << filename;
-				fres->setFilePath(stream.str());
-				resource_manager->addResource(fres);
 				fullPath = filename;
 				break;
 			}
@@ -730,11 +714,6 @@ void mcuCBHandle::clear( void )
 	//SbmDeformableMeshGPU::initShader = false;
 	//SbmShaderManager::destroy_singleton();
 
-
-
-
-	resource_manager->cleanup();
-	resource_manager = NULL;
 	cameraTracking.clear();
 
 
@@ -897,13 +876,6 @@ void mcuCBHandle::update( void )
 		char *cmd;
 		while( cmd = seq->pop( (float)time ) )
 		{
-#if 0
-			// the parent resource is associated with seq_name
-			CmdResource* cmdResource = resource_manager->getCmdResource(seq_name);
-			if(cmdResource)	{
-				resource_manager->addParent(cmdResource);
-			}
-#endif
 			int err = execute( cmd );
 			if( err != CMD_SUCCESS )	{
 				LOG( "mcuCBHandle::update ERR: execute FAILED: '%s'\n", cmd );
@@ -921,11 +893,6 @@ void mcuCBHandle::update( void )
 		{
 			sequencesToDelete.push_back(seqName);
 		}
-#if 0
-		if (cmdResource)	{
-			resource_manager->removeParent();
-		}
-#endif
 	}
 
 	for (size_t d = 0; d < sequencesToDelete.size(); d++)
@@ -1413,11 +1380,11 @@ int mcuCBHandle::vhmsg_send( const char* message ) {
 }
 
 int mcuCBHandle::load_motions( const char* pathname, bool recursive ) {
-	return load_me_motions( pathname, motion_map, recursive, resource_manager, skmScale );
+	return load_me_motions( pathname, motion_map, recursive, skmScale );
 }
 
 int mcuCBHandle::load_skeletons( const char* pathname, bool recursive ) {
-	return load_me_skeletons( pathname, skeleton_map, recursive, resource_manager, skScale );
+	return load_me_skeletons( pathname, skeleton_map, recursive, skScale );
 }
 
 int mcuCBHandle::load_skeleton( const void* data, int sizeBytes, const char* skeletonName )
@@ -1498,7 +1465,7 @@ int mcuCBHandle::map_motion( const char * mapName, const char * motionName )
 
 
 int mcuCBHandle::load_poses( const char* pathname, bool recursive ) {
-	return load_me_postures( pathname, pose_map, recursive, resource_manager, skmScale );
+	return load_me_postures( pathname, pose_map, recursive, skmScale );
 }
 
 void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map )
@@ -1676,10 +1643,6 @@ int mcuCBHandle::executePython(const char* command)
 {
 #ifndef SB_NO_PYTHON
 	try {
-		CmdResource* resource = new CmdResource();
-		resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number
-		resource->setCommand(command);
-		resource_manager->addResource(resource);
 		//LOG("executePython = %s",command);
 
 		int result = PyRun_SimpleString(command);

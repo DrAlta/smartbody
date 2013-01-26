@@ -45,7 +45,7 @@ using namespace gwiz;
 
 //============================= SkMotion ============================
 
-SkMotion::SkMotion() : SBObject(),
+SkMotion::SkMotion() : SBAsset(),
 	_postsize( 0 ),
 	_filename( "" ),
 	_skeleton( NULL ),

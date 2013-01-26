@@ -28,6 +28,7 @@
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBBehaviorSetManager.h>
 #include <sb/SBRetargetManager.h>
+#include <sb/SBAssetManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBParser.h>
 #include <sb/SBDebuggerServer.h>
@@ -90,6 +91,9 @@ void SBScene::initialize()
 	_behaviorSetManager = new SBBehaviorSetManager();
 	_retargetManager = new SBRetargetManager();
 	_eventManager = new SBEventManager();
+	_assetManager = new SBAssetManager();
+
+
 	_scale = .01f; // default scale is centimeters
 
 	// add the services
@@ -130,7 +134,6 @@ void SBScene::initialize()
 	mcu.test_recipient_default = "ALL";
 	mcu.queued_cmds = 0;
 	mcu.updatePhysics = false;
-	mcu.resource_manager = SBResourceManager::getResourceManager();
 	mcu.snapshot_counter = 1;
 	mcu.use_python = true;
 	mcu.sendPawnUpdates = false;
@@ -296,6 +299,42 @@ void SBScene::cleanup()
 	removeAllAssetPaths("mesh");
 	removeAllAssetPaths("audio");
 
+
+	delete _sim;
+	delete _profiler;
+	delete _bml;
+	delete _blendManager;
+	delete _reachManager;
+	delete _steerManager;
+	delete _serviceManager;
+	delete _physicsManager;
+	delete _gestureMapManager;
+	delete _jointMapManager;
+	delete _boneBusManager;
+	delete _collisionManager;
+	delete _diphoneManager;
+	delete _behaviorSetManager;
+	delete _retargetManager;
+	delete _eventManager;
+	delete _assetManager;
+
+	_sim = NULL;
+	_profiler = NULL;
+	_bml = NULL;
+	_blendManager = NULL;
+	_reachManager = NULL;
+	_steerManager= NULL;
+	_serviceManager = NULL;
+	_physicsManager = NULL;
+	_gestureMapManager= NULL;
+	_jointMapManager = NULL;
+	_boneBusManager = NULL;
+	_collisionManager = NULL;
+	_diphoneManager = NULL;
+	_behaviorSetManager = NULL;
+	_retargetManager = NULL;
+	_eventManager = NULL;
+	_assetManager = NULL;
 	
 	AUDIO_Close();
 	AUDIO_Init();
@@ -845,35 +884,28 @@ std::vector<std::string> SBScene::getLocalAssetPaths(const std::string& type)
 void SBScene::addAssetPath(const std::string& type, const std::string& path)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	PathResource* pres = new PathResource();
-	pres->setPath(path);
+	
 	if (type == "seq" || type == "script")
 	{
-		pres->setType("seq");
 		mcu.seq_paths.insert(const_cast<char *>(path.c_str()));
 	}
 	else if (type == "me" || type == "ME" || type == "motion")
 	{
-		pres->setType("me");
 		mcu.me_paths.insert(const_cast<char *>(path.c_str()));
 	}
 	else if (type == "audio")
 	{
-		pres->setType("audio");
 		mcu.audio_paths.insert(const_cast<char *>(path.c_str()));
 	}
 	else if (type == "mesh")
 	{
-		pres->setType("mesh");
 		mcu.mesh_paths.insert(const_cast<char *>(path.c_str()));
 	}
 	else
 	{
-		delete pres;
 		LOG("Input type %s not recognized!", type.c_str());
 		return;
 	}
-	mcu.resource_manager->addResource(pres);
 }
 
 void SBScene::removeAssetPath(const std::string& type, const std::string& path)
@@ -1271,6 +1303,12 @@ SBRetargetManager* SBScene::getRetargetManager()
 {
 	return _retargetManager;
 }
+
+SBAssetManager* SBScene::getAssetManager()
+{
+	return _assetManager;
+}
+
 
 
 SBPhysicsManager* SBScene::getPhysicsManager()

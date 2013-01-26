@@ -66,7 +66,6 @@
 #include <sbm/sbm_speech_audiofile.hpp>
 #include <sbm/text_speech.h> // [BMLR]
 #include <sbm/locomotion_cmds.hpp>
-#include <sbm/resource_cmds.h>
 #include <sbm/time_regulator.h>
 //#include "SBMWindow.h"
 #include "CommandWindow.h"
@@ -268,7 +267,6 @@ void cleanup( void )	{
 	
 	XMLPlatformUtils::Terminate();
 
-	SBResourceManager::cleanup();
 	LOG( "SBM: terminated gracefully." );
 
 
@@ -292,7 +290,7 @@ void signal_handler(int sig) {
 	char buffer[PATH_MAX];
 	getcwd(buffer, PATH_MAX);
 #endif
-
+	/*
 	// dump to an available file in the current directory
 	int counter = 1;
 	bool fileOk = false;
@@ -330,6 +328,7 @@ void signal_handler(int sig) {
 		  counter++;
 		}
 	}
+	*/
 	
 	//cleanup(); // 
 	//exit(sig);

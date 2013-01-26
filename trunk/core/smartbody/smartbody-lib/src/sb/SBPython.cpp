@@ -681,16 +681,6 @@ BOOST_PYTHON_MODULE(SmartBody)
 //	boost::python::def("getScript", getScript, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the sequence file object. \n Input: script name \n Output: script object");
 	
 
-	// resource access
-	boost::python::def("showCommandResources", showCommandResources, "Returns the command resources. ");
-	boost::python::def("showMotionResources", showMotionResources, "Returns the motion resources. ");
-	boost::python::def("showSkeletonResources", showSkeletonResources, "Returns the motion resources. ");
-	boost::python::def("showPathResources", showPathResources, "Returns the path resources. ");
-	boost::python::def("showScriptResources", showScriptResources, "Returns the seq file resources. ");
-	boost::python::def("showControllerResources", showControllerResources, "Returns the controller resources. ");
-	boost::python::def("getResourceLimit", getResourceLimit, "Returns resource up limit. \n Input: NULL \n Output: resource display up limit");
-	boost::python::def("setResourceLimit", setResourceLimit, "Set resource up limit. \n Input: resource display up limit \n Output: NULL");	
-
 
 	// system
 	boost::python::def("pythonexit", pythonExit, "Exits the Python interpreter. ");
