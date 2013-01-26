@@ -626,7 +626,7 @@ int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 			return CMD_FAILURE;
 		}
 		
-		SkSkeleton* skeleton = mcu_p->_scene->getSkeleton(skeletonName);	
+		SkSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);	
 		if (!skeleton)
 		{
 			LOG("No skeleton named '%s' found. Cannot mirror motion %s.", skeletonName.c_str(), refMotionName.c_str());
@@ -663,13 +663,13 @@ int mcu_physics_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		if (operation == "enable")
 		{
 			//mcu_p->setPhysicsEngine(true);
-			mcu_p->_scene->getPhysicsManager()->setEnable(true);
+			SmartBody::SBScene::getScene()->getPhysicsManager()->setEnable(true);
 			return CMD_SUCCESS;
 		}
 		else if (operation == "disable")
 		{
 			//mcu_p->setPhysicsEngine(false);	
-			mcu_p->_scene->getPhysicsManager()->setEnable(false);
+			SmartBody::SBScene::getScene()->getPhysicsManager()->setEnable(false);
 			return CMD_SUCCESS;
 		}
 		else if (operation == "gravity")
@@ -677,7 +677,7 @@ int mcu_physics_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			float gravity = args.read_float();
 			//if (gravity > 0.f)
 			//	mcu_p->physicsEngine->setGravity(gravity);		
-			mcu_p->_scene->getPhysicsManager()->getPhysicsEngine()->setGravity(gravity);
+			SmartBody::SBScene::getScene()->getPhysicsManager()->getPhysicsEngine()->setGravity(gravity);
 		}
 	}
 	return CMD_SUCCESS;
@@ -1164,7 +1164,7 @@ int mcu_terrain_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			int n = args.calc_num_tokens();
 			if( n == 0 )	{
 				mcu_p->height_field_p->load( (char*)"../../../../data/terrain/range1.e.ppm" );
-				mcu_p->height_field_p->set_scale( 5000.0f * mcu_p->_scene->getScale() / 100.0f, 300.0f * mcu_p->_scene->getScale() / 100.0f, 5000.0f  * mcu_p->_scene->getScale() / 100.0f);
+				mcu_p->height_field_p->set_scale( 5000.0f * SmartBody::SBScene::getScene()->getScale() / 100.0f, 300.0f * SmartBody::SBScene::getScene()->getScale() / 100.0f, 5000.0f  * SmartBody::SBScene::getScene()->getScale() / 100.0f);
 				mcu_p->height_field_p->set_auto_origin();
 			}
 			else	{
@@ -1610,7 +1610,7 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p, const char* option)
 {
 	// make sure the pawn exists
-	SbmPawn* pawn = mcu_p->_scene->getPawn(pawnName);
+	SbmPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnName);
 	if (!pawn)
 	{
 		LOG("No pawn named '%s' found, mesh from '%s' not loaded.", pawnName, obj_file);
@@ -3238,16 +3238,16 @@ int mcu_load_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 int mcu_net_reset( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	bool ret = CMD_SUCCESS;
-	mcu_p->_scene->getBoneBusManager()->getBoneBus().CloseConnection();
-	mcu_p->_scene->getBoneBusManager()->setEnable(true);
-	mcu_p->_scene->getBoneBusManager()->getBoneBus().UpdateAllCharacters();
+	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CloseConnection();
+	SmartBody::SBScene::getScene()->getBoneBusManager()->setEnable(true);
+	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().UpdateAllCharacters();
 	
 	return (CMD_SUCCESS);
 }
 
 int mcu_net_check( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
-	if (!mcu_p->_scene->getBoneBusManager()->getBoneBus().IsOpen())
+	if (!SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().IsOpen())
 	{
 		return mcu_net_reset(args, mcu_p);
 	}
@@ -3376,7 +3376,7 @@ int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          }
          else
          {
-            mcu_p->_scene->getBoneBusManager()->getBoneBus().SendPlaySound( soundFile.c_str(), characterName.c_str() );
+            SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendPlaySound( soundFile.c_str(), characterName.c_str() );
          }
 
          return CMD_SUCCESS;
@@ -3473,7 +3473,7 @@ int mcu_stop_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		 }
 		 else
 		 {
-	         mcu_p->_scene->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() );
+	         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() );
 		 }
 
          return CMD_SUCCESS;
@@ -3512,7 +3512,7 @@ int mcu_uscriptexec_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          }
 
          //SendWinsockExecScript( command.c_str() );
-         mcu_p->_scene->getBoneBusManager()->getBoneBus().ExecScript( command.c_str() );
+         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().ExecScript( command.c_str() );
 
          return CMD_SUCCESS;
       }
@@ -3546,7 +3546,7 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          float y = args.read_float();
          float z = args.read_float();
 
-         mcu_p->_scene->getBoneBusManager()->getBoneBus().SetCameraPosition( x, y, z );
+         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SetCameraPosition( x, y, z );
 
          return CMD_SUCCESS;
       }
@@ -3558,7 +3558,7 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
          gwiz::quat_t q = gwiz::euler_t( x, y, z );
 
-         mcu_p->_scene->getBoneBusManager()->getBoneBus().SetCameraRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() );
+         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SetCameraRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() );
 
          return CMD_SUCCESS;
       }
@@ -4680,7 +4680,7 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		LOG("Path %s is not a directory, so motion mapping will not occur.", finalPath.string().c_str());
 		return CMD_FAILURE;
 	}
-	SmartBody::SBScene* scene = mcu_p->_scene;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
 	std::vector<std::string> motionNames = scene->getMotionNames();
 	for (std::vector<std::string>::iterator iter = motionNames.begin();
@@ -4835,12 +4835,12 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		else if (command == "start")
 		{
-			mcu_p->_scene->getSteerManager()->setEnable(true);
+			SmartBody::SBScene::getScene()->getSteerManager()->setEnable(true);
 			return CMD_SUCCESS;
 		}
 		else if (command == "stop")
 		{
-			mcu_p->_scene->getSteerManager()->setEnable(false);
+			SmartBody::SBScene::getScene()->getSteerManager()->setEnable(false);
 			return CMD_SUCCESS;
 		}
 		else if (command == "move")
@@ -4853,7 +4853,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				LOG("Syntax: steer move <character> <mode> <x1> <y1> <z1> <x2> <y2> <z2> ...");
 				return CMD_FAILURE;
 			}
-			if (mcu_p->_scene->getSteerManager()->getEngineDriver()->isInitialized())
+			if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
 			{
 				SbmCharacter* character = mcu_p->getCharacter(characterName);
 				if (character)
@@ -5720,13 +5720,13 @@ int mcu_vhmsg_disconnect_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 void mcu_vhmsg_callback( const char *op, const char *args, void * user_data )
 {
-	if (mcuCBHandle::singleton()._scene->isRemoteMode())
+	if (SmartBody::SBScene::getScene()->isRemoteMode())
 	{
-		mcuCBHandle::singleton()._scene->getDebuggerClient()->ProcessVHMsgs(op, args);
+		SmartBody::SBScene::getScene()->getDebuggerClient()->ProcessVHMsgs(op, args);
 		return;
 	}
 	else
-		mcuCBHandle::singleton()._scene->getDebuggerServer()->ProcessVHMsgs(op, args);
+		SmartBody::SBScene::getScene()->getDebuggerServer()->ProcessVHMsgs(op, args);
 
 	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
@@ -6126,7 +6126,7 @@ int skmscale_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 int mcu_reset_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 {
 	// TODO: If arg, call as init, else call previous init
-	mcu_p->reset();
+	SmartBody::SBScene::destroyScene();
 	return( CMD_SUCCESS );
 }
 

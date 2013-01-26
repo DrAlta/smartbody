@@ -36,6 +36,9 @@ PATimeManager::PATimeManager(PABlendData* data)
 {
 	blendData = data;
 
+	if (!blendData->state)
+		return;
+
 	if (blendData->state->keys.size() > 0)
 	{
 		if (blendData->state->keys[0].size() > 0)
@@ -330,6 +333,8 @@ PAMotions::~PAMotions()
 void PAMotions::setMotionContextMaps(MeControllerContext* context)
 {
 	SkChannelArray& cChannels = context->channels();
+	if (!blendData->state)
+		return;
 	for (size_t mId = 0; mId < blendData->state->motions.size(); mId++)
 	{
 		SkChannelArray& mChannels = blendData->state->motions[mId]->channels();
@@ -348,6 +353,8 @@ void PAMotions::setMotionContextMaps(MeControllerContext* context)
 
 int PAMotions::getNumMotions()
 {
+	if (!blendData->state)
+		return 0;
 	return blendData->state->motions.size();
 }
 

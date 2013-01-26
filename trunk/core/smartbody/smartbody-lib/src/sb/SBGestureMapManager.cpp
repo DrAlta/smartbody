@@ -22,7 +22,7 @@ SBGestureMapManager::~SBGestureMapManager()
 SBGestureMap* SBGestureMapManager::createGestureMap(std::string gestureName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SBScene* scene = mcu._scene;
+	SBScene* scene = SmartBody::SBScene::getScene();
 
 	std::map<std::string, SBGestureMap*>::iterator iter = _gestureMaps.find(gestureName);
 	if (iter != _gestureMaps.end())

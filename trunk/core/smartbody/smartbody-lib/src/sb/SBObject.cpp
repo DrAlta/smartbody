@@ -165,6 +165,8 @@ std::vector<std::string> SBObject::getAttributeNames()
 	return false;
  }
 
+
+
   BoolAttribute* SBObject::createBoolAttribute(const std::string& name, bool value, bool notifySelf, const std::string& groupName, int priority, 
 											  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {

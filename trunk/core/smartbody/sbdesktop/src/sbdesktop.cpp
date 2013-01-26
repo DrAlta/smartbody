@@ -162,18 +162,18 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
             break;
     }
 
-	mcuCBHandle::singleton()._scene->getDebuggerServer()->ProcessVHMsgs(op, args);
+	SmartBody::SBScene::getScene()->getDebuggerServer()->ProcessVHMsgs(op, args);
 }
 
 int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 	mcu_p->loop = false;
 
-	if (mcu_p->_scene->getSteerManager()->getEngineDriver()->isInitialized())
+	if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
 	{
-		mcu_p->_scene->getSteerManager()->getEngineDriver()->stopSimulation();
-		mcu_p->_scene->getSteerManager()->getEngineDriver()->unloadSimulation();
-		mcu_p->_scene->getSteerManager()->getEngineDriver()->finish();
+		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->stopSimulation();
+		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->unloadSimulation();
+		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->finish();
 	
 		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
 			iter != mcu_p->getCharacterMap().end();
@@ -637,7 +637,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		}
 	}
 
-	mcu._scene->getDebuggerServer()->SetID("sbdesktop");
+	SmartBody::SBScene::getScene()->getDebuggerServer()->SetID("sbdesktop");
 
 
 #ifdef WIN32

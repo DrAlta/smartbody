@@ -147,9 +147,9 @@ class SBScene : public SBObject
 
 		SBAPI SBParser* getParser();
 
-		SBAPI SBDebuggerServer * getDebuggerServer() { return _debuggerServer; }
-		SBAPI SBDebuggerClient * getDebuggerClient() { return _debuggerClient; }
-		SBAPI SBDebuggerUtility* getDebuggerUtility() { return _debuggerUtility; }
+		SBAPI SBDebuggerServer * getDebuggerServer();
+		SBAPI SBDebuggerClient * getDebuggerClient();
+		SBAPI SBDebuggerUtility* getDebuggerUtility();
 		SBAPI bool isRemoteMode();
 		SBAPI void setRemoteMode(bool val);
 
@@ -174,6 +174,8 @@ class SBScene : public SBObject
 
 	protected:
 
+		void initialize();
+		void cleanup();
 		void saveScene(std::stringstream& strstr, bool remoteSetup);
 		void saveAssets(std::stringstream& strstr, bool remoteSetup);
 		void saveCameras(std::stringstream& strstr, bool remoteSetup);

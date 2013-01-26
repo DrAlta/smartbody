@@ -443,7 +443,7 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 					size[i] = uniformSize;
 			}			
 			//pawn_p->initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
-			SmartBody::SBPhysicsManager* phyManager = mcu_p->_scene->getPhysicsManager();
+			SmartBody::SBPhysicsManager* phyManager = SmartBody::SBScene::getScene()->getPhysicsManager();
 			phyManager->createPhysicsPawn(pawn_p->getName(),geom_str,size);
 		}
 		if (pawn_p->getGeomObject())
@@ -486,7 +486,7 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		}
 		// [BMLR] Send notification to the renderer that a pawn was created.
 		// NOTE: This is sent both for characters AND pawns
-		mcu_p->_scene->getBoneBusManager()->getBoneBus().SendCreatePawn( pawn_name.c_str(), loc[ 0 ], loc[ 1 ], loc[ 2 ] );
+		SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendCreatePawn( pawn_name.c_str(), loc[ 0 ], loc[ 1 ], loc[ 2 ] );
 		float x,y,z,h,p,r;
 		sbpawn->get_world_offset(x,y,z,h,p,r);
 		//printf("h = %f, p = %f, r = %f\n",h,p,r);	
@@ -494,7 +494,7 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		sbpawn->wo_cache_update();
 
 		if (mcu_p->sendPawnUpdates)
-			sbpawn->bonebusCharacter = mcu_p->_scene->getBoneBusManager()->getBoneBus().CreateCharacter( pawn_name.c_str(), pawn_p->getClassType().c_str(), false );
+			sbpawn->bonebusCharacter = SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CreateCharacter( pawn_name.c_str(), pawn_p->getClassType().c_str(), false );
 
 		if ( scene->getCharacterListener() )
 		{
@@ -901,7 +901,7 @@ int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 
 	if (cmd == "remove")
 	{	
-		mcu_p->_scene->removePawn(pawn->getName());
+		SmartBody::SBScene::getScene()->removePawn(pawn->getName());
 		return CMD_SUCCESS;
 	}
 	else if (cmd == "prune")
@@ -963,7 +963,7 @@ int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 		if (has_geom)
 		{				
 			//initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
-			SmartBody::SBPhysicsManager* phyManager = mcu_p->_scene->getPhysicsManager();
+			SmartBody::SBPhysicsManager* phyManager = SmartBody::SBScene::getScene()->getPhysicsManager();
 			phyManager->createPhysicsPawn(pawn->getName(),geom_str,size);
 			// init steering space
 			if (!setRec)
@@ -1279,7 +1279,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 				return mcu_character_ctrl_cmd( character->getName().c_str(), args, mcu_p );
 			} 
 		else if( cmd == "remove" ) {
-				mcu_p->_scene->removeCharacter(character->getName());
+				SmartBody::SBScene::getScene()->removeCharacter(character->getName());
 				return CMD_SUCCESS;
 
 			} 

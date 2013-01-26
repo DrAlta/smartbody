@@ -273,7 +273,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	
 
 	// if there's only one state, update current state
-	if (curStateData && curStateData->state->stateName != PseudoIdleState)
+	if (curStateData && curStateData->state && curStateData->state->stateName != PseudoIdleState)
 	{
 		///////////////////////////////////////////////////////////////////////
 		// check automatic transitions

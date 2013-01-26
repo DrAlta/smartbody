@@ -80,7 +80,7 @@ void SBSteerManager::update(double time)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	SBScene* scene = mcu._scene;
+	SBScene* scene = SmartBody::SBScene::getScene();
 	if (getEngineDriver()->isInitialized())
 	{
 		if (!getEngineDriver()->isDone())
@@ -134,29 +134,29 @@ void SBSteerManager::start()
 
 	SteerLib::SimulationOptions* steerOptions = new SteerLib::SimulationOptions();
 	steerOptions->moduleOptionsDatabase["testCasePlayer"]["testcase"] = "3-way-confusion-1.xml";
-	std::string ai = dynamic_cast<SmartBody::StringAttribute*>( mcu._scene->getSteerManager()->getAttribute("aimodule") )->getValue();
+	std::string ai = dynamic_cast<SmartBody::StringAttribute*>( SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("aimodule") )->getValue();
 
 	if (ai == "")
 		return;
 	steerOptions->moduleOptionsDatabase["testCasePlayer"]["ai"] = ai;
 	steerOptions->engineOptions.startupModules.insert("testCasePlayer");
-	std::string testCases = dynamic_cast<SmartBody::StringAttribute*>( mcu._scene->getSteerManager()->getAttribute("engineOptions.testCaseSearchPath") )->getValue();
+	std::string testCases = dynamic_cast<SmartBody::StringAttribute*>( SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("engineOptions.testCaseSearchPath") )->getValue();
 	steerOptions->engineOptions.testCaseSearchPath = testCases;
-	std::string moduleSearchPath = dynamic_cast<SmartBody::StringAttribute*>( mcu._scene->getSteerManager()->getAttribute("engineOptions.moduleSearchPath") )->getValue();
+	std::string moduleSearchPath = dynamic_cast<SmartBody::StringAttribute*>( SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("engineOptions.moduleSearchPath") )->getValue();
 	steerOptions->engineOptions.moduleSearchPath = moduleSearchPath;
-	double gridSizeX = dynamic_cast<SmartBody::DoubleAttribute*>( mcu._scene->getSteerManager()->getAttribute("gridDatabaseOptions.gridSizeX") )->getValue();
-	double gridSizeZ = dynamic_cast<SmartBody::DoubleAttribute*>( mcu._scene->getSteerManager()->getAttribute("gridDatabaseOptions.gridSizeZ") )->getValue();
+	double gridSizeX = dynamic_cast<SmartBody::DoubleAttribute*>( SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("gridDatabaseOptions.gridSizeX") )->getValue();
+	double gridSizeZ = dynamic_cast<SmartBody::DoubleAttribute*>( SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("gridDatabaseOptions.gridSizeZ") )->getValue();
 	steerOptions->gridDatabaseOptions.gridSizeX = float(gridSizeX);
     steerOptions->gridDatabaseOptions.gridSizeZ = float(gridSizeZ);
-	int numGridCellsX = dynamic_cast<SmartBody::IntAttribute*> (mcu._scene->getSteerManager()->getAttribute("gridDatabaseOptions.numGridCellsX"))->getValue();
-	int numGridCellsZ = dynamic_cast<SmartBody::IntAttribute*> (mcu._scene->getSteerManager()->getAttribute("gridDatabaseOptions.numGridCellsZ"))->getValue();
-	int maxItemsPerGridCell = dynamic_cast<SmartBody::IntAttribute*> (mcu._scene->getSteerManager()->getAttribute("gridDatabaseOptions.maxItemsPerGridCell"))->getValue();
+	int numGridCellsX = dynamic_cast<SmartBody::IntAttribute*> (SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("gridDatabaseOptions.numGridCellsX"))->getValue();
+	int numGridCellsZ = dynamic_cast<SmartBody::IntAttribute*> (SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("gridDatabaseOptions.numGridCellsZ"))->getValue();
+	int maxItemsPerGridCell = dynamic_cast<SmartBody::IntAttribute*> (SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("gridDatabaseOptions.maxItemsPerGridCell"))->getValue();
 	LOG("max Items per grid cell = %d",maxItemsPerGridCell);
 	steerOptions->gridDatabaseOptions.numGridCellsX = numGridCellsX;
 	steerOptions->gridDatabaseOptions.numGridCellsZ = numGridCellsZ;
 	steerOptions->gridDatabaseOptions.maxItemsPerGridCell = maxItemsPerGridCell;
 
-	bool setBoundaries = mcu._scene->getSteerManager()->getBoolAttribute("addBoundaryWalls");
+	bool setBoundaries = SmartBody::SBScene::getScene()->getSteerManager()->getBoolAttribute("addBoundaryWalls");
 	if (setBoundaries)
 	{
 		for (std::vector<SteerLib::BoxObstacle*>::iterator iter = _boundaryObstacles.begin();
@@ -183,10 +183,10 @@ void SBSteerManager::start()
 
 	LOG("INIT STEERSIM");
 	try {
-		mcu._scene->getSteerManager()->getEngineDriver()->init(steerOptions);
+		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->init(steerOptions);
 	} catch (Util::GenericException& ge) {
 		LOG("Problem starting steering engine: %s", ge.what()); 
-		mcu._scene->getSteerManager()->getEngineDriver()->finish();
+		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->finish();
 		delete steerOptions;
 		return;
 	} catch (std::exception& e) {
@@ -195,17 +195,17 @@ void SBSteerManager::start()
 		else
 			LOG("Unknown problem starting steering engine: %s", e.what()); 
 
-		mcu._scene->getSteerManager()->getEngineDriver()->finish();
+		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->finish();
 		delete steerOptions;
 		return;
 	}
 
 	LOG("LOADING STEERSIM");
-	mcu._scene->getSteerManager()->getEngineDriver()->loadSimulation();
+	SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->loadSimulation();
 
 	int numSetup = 0;
 	// create an agent based on the current characters and positions
-	SteerLib::ModuleInterface* pprAIModule = mcu._scene->getSteerManager()->getEngineDriver()->_engine->getModule(ai);
+	SteerLib::ModuleInterface* pprAIModule = SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine->getModule(ai);
 	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
 		iter != mcu.getCharacterMap().end();
 		iter++)
@@ -226,7 +226,7 @@ void SBSteerManager::start()
 		initialConditions.position = Util::Point( x * scene->getScale(), 0.0f, z * scene->getScale() );
 		Util::Vector orientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
 		initialConditions.direction = orientation;
-		double initialRadius = dynamic_cast<SmartBody::DoubleAttribute*>( mcu._scene->getSteerManager()->getAttribute("initialConditions.radius") )->getValue();
+		double initialRadius = dynamic_cast<SmartBody::DoubleAttribute*>( SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("initialConditions.radius") )->getValue();
 		if (initialRadius == 0.0)
 			initialConditions.radius = 0.3f;//0.2f;//0.4f;
 		else
@@ -234,7 +234,7 @@ void SBSteerManager::start()
 		initialConditions.speed = 0.0f;
 		initialConditions.goals.clear();
 		initialConditions.name = character->getName();		
-		SteerLib::AgentInterface* agent = mcu._scene->getSteerManager()->getEngineDriver()->_engine->createAgent( initialConditions, pprAIModule );			
+		SteerLib::AgentInterface* agent = SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine->createAgent( initialConditions, pprAIModule );			
 		PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
 		ppraiAgent->setAgent(agent);
 		agent->reset(initialConditions, dynamic_cast<SteerLib::EngineInterface*>(pprAIModule));
@@ -276,8 +276,8 @@ void SBSteerManager::start()
 	}
 
 	LOG("STARTING STEERSIM");
-	mcu._scene->getSteerManager()->getEngineDriver()->startSimulation();
-	mcu._scene->getSteerManager()->getEngineDriver()->setStartTime(0.0f);
+	SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->startSimulation();
+	SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->setStartTime(0.0f);
 
 	_maxUpdateFrequency = getDoubleAttribute("maxUpdateFrequency");
 	if (_maxUpdateFrequency != 0.0)
@@ -289,11 +289,11 @@ void SBSteerManager::start()
 void SBSteerManager::stop()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu._scene->getSteerManager()->getEngineDriver()->isInitialized())
+	if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
 	{
-		mcu._scene->getSteerManager()->getEngineDriver()->stopSimulation();
-		mcu._scene->getSteerManager()->getEngineDriver()->unloadSimulation();
-		mcu._scene->getSteerManager()->getEngineDriver()->finish();
+		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->stopSimulation();
+		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->unloadSimulation();
+		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->finish();
 
 		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
 			iter != mcu.getCharacterMap().end();

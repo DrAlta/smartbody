@@ -536,7 +536,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	}
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	//reachData->hasSteering = (mcu._scene->getSteerManager()->isInitialized());
+	//reachData->hasSteering = (SmartBody::SBScene::getScene()->getSteerManager()->isInitialized());
 
 	curReachState->updateEffectorTargetState(reachData);		
 	curReachState->update(reachData);	

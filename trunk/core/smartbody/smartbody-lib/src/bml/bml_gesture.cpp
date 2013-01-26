@@ -70,7 +70,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 	std::vector<std::string> animationList;
 	if (animationName == "")	// If you have assigned the animation name, do not look for the map
 	{
-		SmartBody::SBGestureMap* gestureMap = mcu->_scene->getGestureMapManager()->getGestureMap(gestureMapName);
+		SmartBody::SBGestureMap* gestureMap = SmartBody::SBScene::getScene()->getGestureMapManager()->getGestureMap(gestureMapName);
 		if (!gestureMap)
 		{
 			LOG("WARNING: BML::parse_bml_gesture(): gesture map for character %s doesn't exist.", request->actor->getName().c_str());
@@ -138,12 +138,12 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		SkMotion* mForCt = motion;
 		float prestrokehold = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_PRESTROKE_HOLD, elem, -1.0);
 		std::string prestrokehold_idlemotion = xml_utils::xml_parse_string(BMLDefs::ATTR_PRESTROKE_HOLD_IDLEMOTION, elem);
-		SkMotion* preIdleMotion = (SkMotion*)mcu->_scene->getMotion(prestrokehold_idlemotion);
+		SkMotion* preIdleMotion = (SkMotion*)SmartBody::SBScene::getScene()->getMotion(prestrokehold_idlemotion);
 		if (prestrokehold > 0)
 			mForCt = motion->buildPrestrokeHoldMotion(prestrokehold, preIdleMotion);
 		float poststrokehold = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_POSTSTROKE_HOLD, elem, -1.0);
 		std::string poststrokehold_idlemotion = xml_utils::xml_parse_string(BMLDefs::ATTR_POSTSTROKE_HOLD_IDLEMOTION, elem);
-		SkMotion* postIdleMotion = (SkMotion*)mcu->_scene->getMotion(poststrokehold_idlemotion);
+		SkMotion* postIdleMotion = (SkMotion*)SmartBody::SBScene::getScene()->getMotion(poststrokehold_idlemotion);
 		
 		std::string joints = xml_utils::xml_parse_string(BMLDefs::ATTR_JOINT_RANGE, elem);
 		float scale = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_SCALE, elem, 0.02f);

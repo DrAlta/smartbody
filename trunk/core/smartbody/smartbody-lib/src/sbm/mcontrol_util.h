@@ -186,10 +186,12 @@ class mcuCBHandle {
 		text_speech					_speech_text; // [BMLR]
 		FestivalSpeechRelayLocal    _festivalRelayLocal; 
 		CereprocSpeechRelayLocal    _cereprocRelayLocal;
-		unsigned int				queued_cmds;
 
 	public:
 		// Data
+		unsigned int				queued_cmds;
+		bool _interactive;
+
 		bool		loop;
 		bool		vhmsg_enabled;
 		vhcl::Log::Listener* logListener;
@@ -200,7 +202,6 @@ class mcuCBHandle {
 		bool        resourceDataChanged;
 		std::string process_id;
 		bool		play_internal_audio;	
-		SmartBody::SBScene*     _scene;
 		int testBMLId;
 
 		//For Perception
@@ -329,7 +330,6 @@ public:
 		// Constant
 		static mcuCBHandle* _singleton;
 
-        bool _interactive;
 		std::vector<MeController*> _defaultControllers;
 
 		//  Constructor
@@ -357,8 +357,8 @@ public:
 			_singleton = NULL;
 		}		
 
-		void reset();
 
+		void reset();
 		// ----------------------------------------------
 		// time and performance management
 		// ----------------------------------------------

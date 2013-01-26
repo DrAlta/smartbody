@@ -414,7 +414,7 @@ SbmPawn::~SbmPawn()	{
 	{
 		
 		if (mcu.sendPawnUpdates)
-			mcu._scene->getBoneBusManager()->getBoneBus().DeleteCharacter( bonebusCharacter );
+			SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().DeleteCharacter( bonebusCharacter );
 		bonebusCharacter = NULL;
 	}
 
@@ -431,12 +431,12 @@ SbmPawn::~SbmPawn()	{
 	
 	if (steeringSpaceObj_p)
 	{
-		if (mcuCBHandle::singleton()._scene->getSteerManager()->getEngineDriver()->isInitialized())
+		if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
 		{
-			if (mcuCBHandle::singleton()._scene->getSteerManager()->getEngineDriver()->_engine)
+			if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine)
 			{
-				mcuCBHandle::singleton()._scene->getSteerManager()->getEngineDriver()->_engine->removeObstacle(steeringSpaceObj_p);
-				mcuCBHandle::singleton()._scene->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
+				SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine->removeObstacle(steeringSpaceObj_p);
+				SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
 			}
 		}
 		delete steeringSpaceObj_p;
@@ -631,7 +631,7 @@ int SbmPawn::remove_remote_pawn_func( srArgBuffer& args)
 		mcu_p->theWSP->unsubscribe( pawn_name, "position", 1 );
 #endif
 
-		mcu_p->_scene->removePawn(pawn_p->getName());
+		SmartBody::SBScene::getScene()->removePawn(pawn_p->getName());
 
 		return CMD_SUCCESS;
 	} else {
@@ -802,8 +802,8 @@ void SbmPawn::updateToColObject()
 void SbmPawn::updateToSteeringSpaceObject()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu._scene->getSteerManager()->getEngineDriver()->isInitialized())	return;
-	if (!mcu._scene->getSteerManager()->getEngineDriver()->_engine)	return;
+	if (!SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())	return;
+	if (!SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine)	return;
 	if (steeringSpaceObj_p)
 		initSteeringSpaceObject();
 }
@@ -838,7 +838,7 @@ void SbmPawn::initSteeringSpaceObject()
 			fabs(box.zmax - zmax) > .0001 ||
 			fabs(box.zmin - zmin) > .0001)
 		{
-			mcu._scene->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
+			SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
 			Util::AxisAlignedBox& mutableBox = const_cast<Util::AxisAlignedBox&>(box);
 			mutableBox.xmax = xmax;
 			mutableBox.xmin = xmin;
@@ -846,14 +846,14 @@ void SbmPawn::initSteeringSpaceObject()
 			mutableBox.ymin = ymin;
 			mutableBox.zmax = zmax;
 			mutableBox.zmin = zmin;
-			mcu._scene->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
+			SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
 		}
 	}
 	else
 	{
 		steeringSpaceObj_p = new SteerLib::BoxObstacle(xmin, xmax, ymin, ymax, zmin, zmax);
-		mcu._scene->getSteerManager()->getEngineDriver()->_engine->addObstacle(steeringSpaceObj_p);
-		mcu._scene->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());	
+		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine->addObstacle(steeringSpaceObj_p);
+		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());	
 	}
 }
 

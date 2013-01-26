@@ -58,7 +58,7 @@ void TransparencyRenders::drawGrid()
 	glLineWidth(1);
 //	glLineStipple(1, 0xAAAA);
 	glBegin(GL_LINES);
-	//float sceneScale =  mcu._scene->getScale();
+	//float sceneScale =  SmartBody::SBScene::getScene()->getScale();
 	float adjustedGridStep = gridStep;
 	if (sceneScale > 0.f)
 	{

@@ -152,7 +152,7 @@ void SBSimulationManager::start()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	// run the start scripts
-	std::map<std::string, SBScript*>& scripts = mcu._scene->getScripts();
+	std::map<std::string, SBScript*>& scripts = SmartBody::SBScene::getScene()->getScripts();
 	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
 		 iter != scripts.end();
 		 iter++)
@@ -176,7 +176,7 @@ void SBSimulationManager::stop()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	// run the stop scripts
-	std::map<std::string, SBScript*>& scripts = mcu._scene->getScripts();
+	std::map<std::string, SBScript*>& scripts = SmartBody::SBScene::getScene()->getScripts();
 	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
 		 iter != scripts.end();
 		 iter++)

@@ -874,7 +874,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		// 1) ignore this block
 		// 2) queue this block
 		// 3) interrupt the old block and run this one instead
-		SBCharacter* character = mcu->_scene->getCharacter(actorId);
+		SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(actorId);
 		if (character)
 		{
 		
