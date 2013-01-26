@@ -351,8 +351,8 @@ SBScene::~SBScene(void)
 	delete _debuggerClient;
 	delete _debuggerUtility;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.reset();
+//	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	//mcu.reset();
 
 
 }
