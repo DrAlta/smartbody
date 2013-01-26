@@ -1925,6 +1925,8 @@ int FltkViewer::handle ( int event )
 		
 			 SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
 			 SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(selectedPawn);
+			 if (!selectedPawn)
+				 return ret;
 			 SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(character->getName());
 			 if (steerAgent)
 			 {
