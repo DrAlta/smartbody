@@ -1,6 +1,12 @@
 include_directories( include )
 include_directories( ../smartbody-lib/src )
 
+set(SB_EXPORTS 1)
+set(SMARTBODY_DLL_EXPORTS 1)
+set(SMARTBODY_C_DLL_EXPORTS 1)
+set(_COMPILING_STEERLIB 1)
+
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
 find_library (COREAUDIO_LIBRARY CoreAudio)
 find_library (AUDIOUNIT_LIBRARY AudioUnit)
@@ -59,8 +65,8 @@ add_library(
 
 target_link_libraries( smartbody-dll
 
-#	tcmalloc
-#	profiler
+	#tcmalloc
+	#profiler
 	smartbody-lib
 	bonebus
 	vhmsg
