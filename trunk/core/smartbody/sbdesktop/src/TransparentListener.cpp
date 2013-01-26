@@ -3,6 +3,7 @@
 #include <sb/SBPawn.h>
 #include <sb/SBSkeleton.h>
 #include "TransparentViewer.h"
+#include <sbm/mcontrol_util.h>
 
 TransparentListener::TransparentListener()
 {

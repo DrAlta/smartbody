@@ -21,6 +21,7 @@
 #include "sb/SBCharacter.h"
 #include "sb/SBSkeleton.h"
 #include "sb/SBSimulationManager.h"
+#include "sb/SBCharacterListener.h"
 #pragma warning(pop)
 
 
@@ -312,8 +313,6 @@ SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerId( const std::string & id )
 
 SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerCameraValues( double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
 {
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
-
    SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.x = x;
    SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.y = y;
    SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.z = z;
