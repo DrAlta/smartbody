@@ -490,6 +490,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBColObject.cpp \
 	$(SBM_MY_DIR)/sb/SBPhysicsSim.cpp \
 	$(SBM_MY_DIR)/sb/SBEvent.cpp \
+	$(SBM_MY_DIR)/sb/SBRetarget.cpp \
+	$(SBM_MY_DIR)/sb/SBRetargetManager.cpp \
 	
 	
 LOCAL_LDLIBS    := -llog 

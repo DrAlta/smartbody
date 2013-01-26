@@ -373,6 +373,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBPhysicsSim.cpp
 	sb/SBEvent.cpp
 	sb/PABlend.cpp
+	sb/SBRetarget.cpp
+	sb/SBRetargetManager.cpp
 
 	sb/SBPython.cpp
 	sb/SBPythonClass.cpp
