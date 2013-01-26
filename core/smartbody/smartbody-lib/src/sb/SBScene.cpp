@@ -60,6 +60,9 @@ SBScene::SBScene(void) : SBObject()
 
 void SBScene::initialize()
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.reset();
+
 	_characterListener = NULL;
 
 	_sim = new SBSimulationManager();
@@ -102,7 +105,7 @@ void SBScene::initialize()
 
 		// re-initialize
 	// initialize everything
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	mcu.loop = true;
 	mcu.vhmsg_enabled = false;
 	mcu.net_bone_updates = false;
@@ -281,7 +284,7 @@ void SBScene::cleanup()
 
 	mcu.vhmsg_send( "vrProcEnd sbm" );
 
-	mcu.reset();
+	
 
 	
 }
@@ -319,6 +322,11 @@ SBScene::~SBScene(void)
 	delete _debuggerServer;  // TODO: should delete these in reverse order?
 	delete _debuggerClient;
 	delete _debuggerUtility;
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.reset();
+
+
 }
 
 SBDebuggerServer* SBScene::getDebuggerServer()
