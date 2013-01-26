@@ -35,6 +35,7 @@
 #include <sb/SBSteerManager.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBCollisionManager.h>
+#include <sb/SBCharacterListener.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <controllers/me_ct_channel_writer.hpp>
 #include <controllers/me_ct_curve_writer.hpp>

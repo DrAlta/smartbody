@@ -27,6 +27,7 @@
 #include "sbm/mcontrol_util.h"
 #include "rapidxml_utils.hpp"
 #include <fstream>
+#include <sb/SBScene.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>

@@ -2,6 +2,7 @@
 #include <sb/SBMotion.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBScene.h>
 #include <sbm/mcontrol_util.h>
 #include <boost/algorithm/string.hpp>
 #include <controllers/MeCtBlendEngine.h>

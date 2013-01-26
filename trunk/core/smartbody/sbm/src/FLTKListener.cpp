@@ -3,6 +3,7 @@
 #include "FLTKListener.h"
 #include <sb/SBPawn.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBScene.h>
 #include <RootWindow.h>
 #include <fltk_viewer.h>
 

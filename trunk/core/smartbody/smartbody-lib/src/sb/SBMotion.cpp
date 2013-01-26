@@ -6,6 +6,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBJoint.h>
 #include <sb/SBJointMap.h>
+#include <sb/SBEvent.h>
 #include <sb/SBJointMapManager.h>
 #include <controllers/me_ct_jacobian_IK.hpp>
 #include <controllers/me_ct_ccd_IK.hpp>

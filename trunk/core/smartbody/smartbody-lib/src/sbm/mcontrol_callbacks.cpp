@@ -44,6 +44,7 @@
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBAnimationState.h>
+#include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationTransition.h>
 #include <controllers/me_ct_param_animation.h>
 #include <controllers/me_ct_data_receiver.h>
@@ -51,6 +52,9 @@
 #include <controllers/me_ct_breathing.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <sbm/PPRAISteeringAgent.h>
+#include <sr/sr_camera.h>
+#include <sbm/Heightfield.h>
+#include <sbm/KinectProcessor.h>
 
 #ifdef WIN32
 #include <direct.h>
@@ -89,6 +93,7 @@
 #include <sb/SBJointMap.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBMotion.h>
+#include <sb/SBScene.h>
 #include <math.h>
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
@@ -236,7 +241,7 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			pres->setType("audio");
 			// remove the old paths 
 			mcu_p->audio_paths = srPathList();
-			mcu_p->audio_paths.setPathPrefix(mcu_p->getMediaPath());
+			mcu_p->audio_paths.setPathPrefix(SmartBody::SBScene::getScene()->getMediaPath());
 			mcu_p->audio_paths.insert( path );
 		}
 		else if(strcmp( path_tok, "mesh") == 0 )
@@ -739,11 +744,11 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					newState->keys.push_back(keysForOneMotion);
 				}
 
-				mcu_p->addPABlend(newState);
+				//SmartBody::SBScene::getScene()->getBlendManager()->addBlend(newState);
 			}
 			else if (nextString == "parameter")
 			{
-				PABlend* blend = mcu_p->lookUpPABlend(blendName);
+				SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
 				if (!blend) return CMD_FAILURE;
 				std::string type = args.read_token();
 				if (type == "1D") blend->setType(0);
@@ -790,7 +795,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			}
 			else if (nextString == "triangle")
 			{
-				PABlend* blend = mcu_p->lookUpPABlend(blendName);
+				SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
 				if (!blend) return CMD_FAILURE;
 				int numTriangles = args.read_int();
 				for (int i = 0; i < numTriangles; i++)
@@ -803,7 +808,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			}
 			else if (nextString == "tetrahedron")
 			{ 
-				PABlend* blend = mcu_p->lookUpPABlend(blendName);
+				SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
 				if (!blend) return CMD_FAILURE;
 				int numTetrahedrons = args.read_int();
 				for (int i = 0; i < numTetrahedrons; i++)
@@ -838,7 +843,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				if (blendString != "state")
 					return CMD_FAILURE;
 				std::string blendName = args.read_token();
-				PABlend* blend = mcu_p->lookUpPABlend(blendName);
+				SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
 				if (!blend)
 					LOG("Blend %s not exist, schedule Idle blend.", blendName.c_str());
 				std::string loopString = args.read_token();
@@ -3021,7 +3026,7 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		else
 		{
 			// Non-initializing controllers need an actual instance
-			MeController* ctrl_p = mcu_p->lookup_ctrl( string( ctrl_name ), "ERROR: ctrl <controller name>: " );
+			MeController* ctrl_p = NULL;// removed lookup_ctrl function 1/26/13 mcu_p->lookup_ctrl( string( ctrl_name ), "ERROR: ctrl <controller name>: " );
 			if( ctrl_p==NULL ) {
 				// should have printed error from above function
 				return CMD_FAILURE;
@@ -4288,12 +4293,12 @@ int mcu_mediapath_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 		if (mcu_p)
 		{
-			mcu_p->setMediaPath(path);
+			SmartBody::SBScene::getScene()->setMediaPath(path);
 		}
 		return CMD_SUCCESS;
 	}
 
-	LOG("mediapath is '%s'", mcu_p->getMediaPath().c_str());
+	LOG("mediapath is '%s'", SmartBody::SBScene::getScene()->getMediaPath().c_str());
 	return CMD_SUCCESS;
 }
 
@@ -4659,7 +4664,7 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		return CMD_FAILURE;
 	}
 
-	std::string mediaPath = mcuCBHandle::singleton().getMediaPath();
+	std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
 
 	boost::filesystem::path path(directory);
 	

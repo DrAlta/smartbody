@@ -4,6 +4,7 @@
 #include <sb/SBMotionBlendBase.h>
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBCharacter.h>
+#include <sb/SBScene.h>
 #include <controllers/me_ct_param_animation.h>
 
 namespace SmartBody {
@@ -55,7 +56,7 @@ SBAnimationBlend0D* SBAnimationBlendManager::createBlend0D(const std::string& na
 	SBAnimationBlend0D* blend = new SBAnimationBlend0D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	addBlendToGraph(name);
-	mcu.addPABlend(blend);
+	_blends.push_back(blend);
 	return blend;
 }
 
@@ -64,7 +65,7 @@ SBAnimationBlend1D* SBAnimationBlendManager::createBlend1D(const std::string& na
 	SBAnimationBlend1D* blend = new SBAnimationBlend1D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	addBlendToGraph(name);
-	mcu.addPABlend(blend);
+	_blends.push_back(blend);
 	return blend;
 }
 
@@ -73,7 +74,7 @@ SBAnimationBlend2D* SBAnimationBlendManager::createBlend2D(const std::string& na
 	SBAnimationBlend2D* blend = new SBAnimationBlend2D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	addBlendToGraph(name);
-	mcu.addPABlend(blend);
+	_blends.push_back(blend);
 	return blend;
 }
 
@@ -82,7 +83,7 @@ SBAnimationBlend3D* SBAnimationBlendManager::createBlend3D(const std::string& na
 	SBAnimationBlend3D* blend = new SBAnimationBlend3D(name);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	addBlendToGraph(name);
-	mcu.addPABlend(blend);
+	_blends.push_back(blend);
 	return blend;
 }
 
@@ -91,7 +92,7 @@ SBMotionBlendBase* SBAnimationBlendManager::createMotionBlendBase( const std::st
 	SBMotionBlendBase* blend = new SBMotionBlendBase(name,skelName, dimension);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	//	addBlendToGraph(name);
-	mcu.addPABlend(blend);
+	_blends.push_back(blend);
 	return blend;
 }
 
@@ -114,34 +115,33 @@ SBAnimationTransition* SBAnimationBlendManager::createTransition(const std::stri
 	SBAnimationTransition* transition = new SBAnimationTransition(source + "/" + dest);
 	transition->set(sourceBlend, destBlend);
 
-	mcu.addPATransition(transition);
+	_transitions.push_back(transition);
 	return transition;
 }
 
 SBAnimationBlend* SBAnimationBlendManager::getBlend(const std::string& name)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	PABlend* blendData = mcu.lookUpPABlend(name);
-	SBAnimationBlend* blend = dynamic_cast<SBAnimationBlend*>(blendData);
-	return blend;
+	for (std::vector<SBAnimationBlend*>::iterator iter = _blends.begin();
+		 iter != _blends.end();
+		 iter++)
+	{
+		if ((*iter)->stateName == name)
+			return (*iter);
+	}
+	return NULL;
 }
 
 int SBAnimationBlendManager::getNumBlends()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	return mcu.param_anim_blends.size();
+	return _blends.size();
 }
 
 std::vector<std::string> SBAnimationBlendManager::getBlendNames()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	std::vector<std::string> states;
-	for (size_t i = 0; i < mcu.param_anim_blends.size(); i++)
+	for (size_t i = 0; i < _blends.size(); i++)
 	{
-		states.push_back(mcu.param_anim_blends[i]->stateName);
+		states.push_back(_blends[i]->stateName);
 	}
 	return states;
 }
@@ -149,12 +149,11 @@ std::vector<std::string> SBAnimationBlendManager::getBlendNames()
 std::vector<std::string> SBAnimationBlendManager::getTransitionBlends(const std::string& source)
 {
 	std::vector<std::string> blends;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	for (size_t i = 0; i < mcu.param_anim_transitions.size(); i++)
+	
+	for (size_t i = 0; i < _transitions.size(); i++)
 	{
-		if (mcu.param_anim_transitions[i]->getSourceBlend()->stateName == source)
-			blends.push_back(mcu.param_anim_transitions[i]->getDestinationBlend()->stateName);
+		if (_transitions[i]->getSourceBlend()->stateName == source)
+			blends.push_back(_transitions[i]->getDestinationBlend()->stateName);
 	}
 
 	return blends;
@@ -162,19 +161,21 @@ std::vector<std::string> SBAnimationBlendManager::getTransitionBlends(const std:
 
 SBAnimationTransition* SBAnimationBlendManager::getTransition(const std::string& source, const std::string& dest)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	for (size_t i = 0; i < _transitions.size(); i++)
+	{
+		if (_transitions[i]->getSourceBlend()->stateName == source &&
+			_transitions[i]->getDestinationBlend()->stateName == dest)
+			return _transitions[i];
+	}
 
-	SBAnimationTransition* animTransition = mcu.lookUpPATransition(source, dest);
-
-	return animTransition;
+	return NULL;
 }
 
 SBAnimationTransition* SBAnimationBlendManager::getTransitionByIndex(int id)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (id >= 0 && id < (int)mcu.param_anim_transitions.size())
+	if (id >= 0 && id < (int) _transitions.size())
 	{
-		SBAnimationTransition* animTransition = mcu.param_anim_transitions[id];
+		SBAnimationTransition* animTransition = _transitions[id];
 		return animTransition;
 	}
 	
@@ -184,20 +185,16 @@ SBAnimationTransition* SBAnimationBlendManager::getTransitionByIndex(int id)
 
 int SBAnimationBlendManager::getNumTransitions()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	return mcu.param_anim_transitions.size();
+	return _transitions.size();
 }
 
 std::vector<std::string> SBAnimationBlendManager::getTransitionNames()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	std::vector<string> transitionNames;
-	for (size_t i = 0; i < mcu.param_anim_transitions.size(); i++)
+	for (size_t i = 0; i < _transitions.size(); i++)
 	{
-		transitionNames.push_back(mcu.param_anim_transitions[i]->getSourceBlend()->stateName +
-								  "/" + mcu.param_anim_transitions[i]->getDestinationBlend()->stateName );
+		transitionNames.push_back(_transitions[i]->getSourceBlend()->stateName +
+								  "/" + _transitions[i]->getDestinationBlend()->stateName );
 	}
 	return transitionNames;
 }
@@ -272,16 +269,14 @@ bool SBAnimationBlendManager::isBlendScheduled(const std::string& characterName,
 
 void SBAnimationBlendManager::removeAllBlends()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	// remove the transitions, too
 	removeAllTransitions();
 
-	for (size_t i = 0; i < mcu.param_anim_blends.size(); i++)
+	for (size_t i = 0; i < _blends.size(); i++)
 	{
-		delete mcu.param_anim_blends[i];
+		delete _blends[i];
 	}
-	mcu.param_anim_blends.clear();
+	_blends.clear();
 
 	stateGraph = BoostGraph();
 
@@ -289,13 +284,11 @@ void SBAnimationBlendManager::removeAllBlends()
 
 void SBAnimationBlendManager::removeAllTransitions()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	for (size_t i = 0; i < mcu.param_anim_transitions.size(); i++)
+	for (size_t i = 0; i < _transitions.size(); i++)
 	{
-		delete mcu.param_anim_transitions[i];
+		delete _transitions[i];
 	}
-	mcu.param_anim_transitions.clear();
+	_transitions.clear();
 }
 
 }

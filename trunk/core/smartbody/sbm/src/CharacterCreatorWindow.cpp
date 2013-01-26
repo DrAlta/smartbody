@@ -1,7 +1,7 @@
 #include "CharacterCreatorWindow.h"
 #include <sstream>
 #include <FL/fl_ask.H>
-#include <sbm/mcontrol_util.h>
+#include <sb/SBScene.h>
 #include "RootWindow.h"
 
 

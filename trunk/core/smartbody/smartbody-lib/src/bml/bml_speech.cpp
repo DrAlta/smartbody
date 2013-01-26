@@ -32,6 +32,7 @@
 #include "bml_exception.hpp"
 #include "bml_xml_consts.hpp"
 #include "sbm/BMLDefs.h"
+#include <sb/SBScene.h>
 #include <sb/SBPhoneme.h>
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBCharacter.h>

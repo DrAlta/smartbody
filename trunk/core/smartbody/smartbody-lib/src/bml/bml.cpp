@@ -46,7 +46,9 @@
 #include "controllers/me_controller_tree_root.hpp"
 
 #include "sbm/BMLDefs.h"
+#include <sb/SBScene.h>
 #include <sb/SBAnimationState.h>
+#include <sb/SBAnimationStateManager.h>
 #include <sb/SBBehavior.h>
 #include <sb/SBMotion.h>
 #include <sb/SBGestureMapManager.h>
@@ -1708,7 +1710,7 @@ void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, mcuCBHa
 
 		// error check: 1 - state name not empty 2 - state does exist 3 - it's a 3D state(x: tilt right y: tilt forward z: duration) 4 - it has 4 corresponding points (start stroke relax end)
 		// TODO: Add more flexibility later
-		PABlend* state = mcu->lookUpPABlend(stateName);
+		SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 		if (!state)
 		{
 			LOG("ParameterizedAnimationRequest::realize_impl ERR: Can't find state name %s", stateName.c_str());

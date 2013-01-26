@@ -72,8 +72,9 @@
 # include <controllers/me_ct_scheduler2.h>
 # include <controllers/me_controller_tree_root.hpp>
 
+# include <sb/SBJointMap.h>
 # include <sb/SBColObject.h>
-#include <sb/PABlend.h>
+# include <sb/PABlend.h>
 # include <sb/SBScene.h>
 # include <sb/SBSkeleton.h>
 # include <sb/SBCharacter.h>

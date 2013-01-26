@@ -28,7 +28,9 @@
 #include <FL/fl_draw.H>
 #include "ErrorVisualization.h"
 #include <controllers/me_ct_param_animation.h>
-#include <sbm/mcontrol_util.h>
+#include <sb/SBScene.h>
+#include <sb/SBSkeleton.h>
+
 
 
 VisualizationView::VisualizationView(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h)
@@ -219,7 +221,7 @@ void VisualizationView::refreshJointList()
 
 	SmartBody::SBCharacter* sbChar = paWindow->getCurrentCharacter();
 	if (!sbChar) return;
-	SkSkeleton* sk = sbChar->getSkeleton();
+	SmartBody::SBSkeleton* sk = sbChar->getSkeleton();
 	if (!sk) return;
 	const std::vector<SkJoint*>& jnts = sk->joints();
 	for(unsigned int i=0; i<jnts.size(); i++)

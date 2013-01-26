@@ -60,6 +60,9 @@ protected:
 		bool addTransitionEdgeToGraph(const std::string& source, const std::string& dest);
 
 		BoostGraph stateGraph;		
+
+		std::vector<SBAnimationBlend*> _blends;
+		std::vector<SmartBody::SBAnimationTransition*> _transitions;
 };
 
 }

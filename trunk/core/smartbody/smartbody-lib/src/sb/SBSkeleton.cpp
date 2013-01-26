@@ -3,7 +3,8 @@
 #include "SBPawn.h"
 #include "SBAttribute.h"
 #include <sbm/mcontrol_util.h>
-
+#include <sb/SBScene.h>
+#include <sb/SBCharacterListener.h>
 #include <sr/sr_string.h>
 
 namespace SmartBody {

@@ -14,8 +14,10 @@
 #include <fstream>
 #include "CommandWindow.h"
 #include <sb/SBSkeleton.h>
+#include <sb/SBScene.h>
 #include <sb/SBDebuggerClient.h>
 #include <sb/SBSimulationManager.h>
+#include <sbm/Heightfield.h>
 
 BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
 {
@@ -432,8 +434,10 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	if (!seqFile)
 		return;
 
+	SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
 	SmartBody::SBScene::destroyScene();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->setCharacterListener(listener);
 
 	scene->getSimulationManager()->setupTimer();
 
@@ -609,10 +613,12 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 	int confirm = fl_choice("This will reset the current session.\nContinue?", "No", "Yes", NULL);
 	if (confirm == 1)
 	{
+		SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
 		SmartBody::SBScene::destroyScene();
 		std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 		if (mediaPath != "")
 			SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
+		SmartBody::SBScene::getScene()->setCharacterListener(listener);
 
 		SmartBody::SBScene::getScene()->getSimulationManager()->setupTimer();
 		

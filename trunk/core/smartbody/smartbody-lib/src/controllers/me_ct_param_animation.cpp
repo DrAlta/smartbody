@@ -28,6 +28,8 @@
 #include <sb/SBAnimationTransitionRule.h>
 #include <sb/SBMotionBlendBase.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBScene.h>
+#include <sb/SBCharacterListener.h>
 #include <sr/sr_euler.h>
 #include "controllers/MotionAnalysis.h"
 
@@ -711,7 +713,7 @@ void MeCtParamAnimation::autoScheduling(double time)
 			delete transitionManager;
 		SmartBody::SBAnimationTransition* data = NULL;
 		if (nextUnit.data)
-			data = mcuCBHandle::singleton().lookUpPATransition(curStateData->state->stateName, nextUnit.data->stateName);
+			data = SmartBody::SBScene::getScene()->getBlendManager()->getTransition(curStateData->state->stateName, nextUnit.data->stateName);
 		nextStateData = createStateModule(nextUnit);
 		nextStateData->active = false;
 		if (!data) // no existing transition data

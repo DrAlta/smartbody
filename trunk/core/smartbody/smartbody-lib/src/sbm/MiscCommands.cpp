@@ -6,6 +6,8 @@
 #include <sbm/me_utilities.hpp>
 #include <sb/sbm_pawn.hpp>
 #include <sb/sbm_character.hpp>
+#include <sb/SBCharacterListener.h>
+#include <sb/SBScene.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_blend.hpp>
 #include <controllers/me_ct_gaze.h>

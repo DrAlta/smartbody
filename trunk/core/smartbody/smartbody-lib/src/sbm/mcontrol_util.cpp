@@ -120,6 +120,19 @@
 #include <controllers/me_ct_example_body_reach.hpp>
 #include <sbm/MiscCommands.h>
 
+#include "Heightfield.h"
+#include "sb/sbm_pawn.hpp"
+#include "sb/sbm_character.hpp"
+#include <sb/nvbg.h>
+#include <sb/SBScene.h>
+#include <sbm/KinectProcessor.h>
+#include <sb/SBJointMap.h>
+#include <sb/SBEvent.h>
+#include <sr/sr_viewer.h>
+#include <sr/sr_camera.h>
+#include <sb/SBCharacterListener.h>
+#include <sb/SBAnimationTransition.h>
+
 
 using namespace std;
 
@@ -290,8 +303,6 @@ mcuCBHandle::mcuCBHandle()
 	resource_manager(SBResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
 	use_python( true ),
-	media_path("."),
-	_interactive(true),
 	sendPawnUpdates(false),
 	logListener(NULL),
 	useXmlCache(false),
@@ -309,8 +320,6 @@ mcuCBHandle::mcuCBHandle()
 	// processes will be identified differently
 	theWSP->init( "SMARTBODY" );
 #endif
-
-	createDefaultControllers();
 
 }
 
@@ -405,8 +414,6 @@ void mcuCBHandle::reset( void )
 	resource_manager = SBResourceManager::getResourceManager();
 	snapshot_counter = 1;
 	use_python = true;
-	media_path = ".";
-	_interactive = true;
 	sendPawnUpdates = false;
 	logListener = NULL;
 	useXmlCache = false;
@@ -423,19 +430,8 @@ void mcuCBHandle::reset( void )
 
 }
 
- void mcuCBHandle::createDefaultControllers()
- {
 
-	 _defaultControllers.push_back(new MeCtEyeLidRegulator());
-	 _defaultControllers.push_back(new MeCtSaccade(NULL));
-	 std::map<int, MeCtReachEngine*> reachMap;
-	 _defaultControllers.push_back(new MeCtExampleBodyReach(reachMap));
-	 _defaultControllers.push_back(new MeCtBreathing());
-	 _defaultControllers.push_back(new MeCtGaze());
 
-	 for (size_t x = 0; x < _defaultControllers.size(); x++)
-		 _defaultControllers[x]->ref();
- }
 
 
 void mcuCBHandle::registerCallbacks()
@@ -665,18 +661,6 @@ void mcuCBHandle::clear( void )
 		kinectProcessor = NULL;
 	}
 
-	for (size_t i = 0; i < param_anim_blends.size(); i++)
-	{
-		delete param_anim_blends[i];
-	}
-	param_anim_blends.clear();
-
-	for (size_t i = 0; i < param_anim_transitions.size(); i++)
-	{
-		delete param_anim_transitions[i];
-	}
-	param_anim_transitions.clear();
-
 	//close_viewer();
 	if (viewer_p)	
 	{
@@ -713,12 +697,6 @@ void mcuCBHandle::clear( void )
 		height_field_p = NULL;
 	}
 
-	// srPathList? srCmdMap? Ignore clear for now
-	seq_paths.getPaths().clear();
-	me_paths.getPaths().clear();
-	audio_paths.getPaths().clear();
-	mesh_paths.getPaths().clear();
-
 /*	cmd_map.reset();
 
 
@@ -739,45 +717,7 @@ void mcuCBHandle::clear( void )
 	}
 */
 
-	pendingSequences.clear();
-	activeSequences.clear();
 
-	for (std::map<std::string, SmartBody::SBFaceDefinition*>::iterator iter = face_map.begin();
-		iter != face_map.end();
-		iter++)
-	{
-		SmartBody::SBFaceDefinition* face = (*iter).second;
-		delete face;
-	}
-	face_map.clear();
-
-	for (std::map<std::string, SkPosture*>::iterator postureIter = pose_map.begin();
-		postureIter != pose_map.end();
-		postureIter++)
-	{
-		SkPosture* posture = (*postureIter).second;
-		delete posture;
-	}
-	pose_map.clear();
-
-	for (std::map<std::string, SkMotion*>::iterator motionIter = motion_map.begin();
-		motionIter != motion_map.end();
-		motionIter++)
-	{
-
-		SkMotion* motion = (*motionIter).second;
-		delete motion;
-	}
-	motion_map.clear();
-
-	for (std::map<std::string, SkSkeleton*>::iterator skelIter = skeleton_map.begin();
-		skelIter != skeleton_map.end();
-		skelIter++)
-	{
-		SkSkeleton* skeleton = (*skelIter).second;
-		delete skeleton;
-	}
-	skeleton_map.clear();
 
 	for (std::map<std::string, DeformableMesh*>::iterator deformableIter = deformableMeshMap.begin();
 		deformableIter != deformableMeshMap.end();
@@ -791,47 +731,12 @@ void mcuCBHandle::clear( void )
 	//SbmShaderManager::destroy_singleton();
 
 
-	// srHashMap? Ignore for now
 
-	// remove the XML cache
-	for (std::map<std::string, DOMDocument*>::iterator xmlIter = xmlCache.begin();
-		xmlIter != xmlCache.end();
-		xmlIter++)
-	{
-		(*xmlIter).second->release();
-	}
-	xmlCache.clear();
 
-	// remove pawns (cannot direct destruct, smart pointer)
-	getCharacterMap().clear();
-	getPawnMap().clear();
-
-	// remove NVBG
-	for (std::map<std::string, SmartBody::Nvbg*>::iterator nvbgIter = nvbgMap.begin();
-		nvbgIter != nvbgMap.end();
-		nvbgIter++)
-	{
-		SmartBody::Nvbg* nvbg = (*nvbgIter).second;
-		delete nvbg;
-	}
-	nvbgMap.clear();
-
-#if USE_WSP
-	theWSP->shutdown();
-
-	if (theWSP)
-	{
-		delete theWSP;
-		theWSP = NULL;
-	}
-#endif
 	resource_manager->cleanup();
 	resource_manager = NULL;
 	cameraTracking.clear();
 
-	for (size_t x = 0; x < _defaultControllers.size(); x++)
-		_defaultControllers[x]->unref();
-	_defaultControllers.clear();
 
 }
 
@@ -1416,7 +1321,7 @@ int mcuCBHandle::deleteSequence( const char* name ) {
 	srCmdSeq* seq = pendingSequences.getSequence( name );
 	if( seq  )
 	{
-		pendingSequences.removeSequence( name, this );
+		pendingSequences.removeSequence( name, true );
 		result = CMD_SUCCESS;
 	}
 
@@ -1595,74 +1500,6 @@ int mcuCBHandle::map_motion( const char * mapName, const char * motionName )
 int mcuCBHandle::load_poses( const char* pathname, bool recursive ) {
 	return load_me_postures( pathname, pose_map, recursive, resource_manager, skmScale );
 }
-
-//  Usage example: mcu_p->lookup_ctrl( ctrl_name, "ERROR: ctrl <controller name>: " );
-MeController* mcuCBHandle::lookup_ctrl( const string& ctrl_name, const char* print_error_prefix  ) {
-	MeController* ctrl_p;
-	if( ctrl_name[0]=='~' ) {  // Referenced relative to a character
-		string::size_type index = ctrl_name.find( "/" );
-		if( index == string::npos ) {
-			if( print_error_prefix )
-				LOG("%s Invalid controller name \"%s\".  Missing '/' after character name.", print_error_prefix, ctrl_name.c_str());
-			return NULL;
-		}
-		const string char_name( ctrl_name, 1, index-1 );
-		if( char_name.length() == 0 ) {
-			if( print_error_prefix )
-				LOG("%s Invalid controller name \"%s\".  Empty character name.", print_error_prefix, ctrl_name.c_str() );
-			return NULL;
-		}
-
-		SbmCharacter* char_p = getCharacter(char_name);
-		if( char_p == NULL ) {
-			if( print_error_prefix )
-				LOG("%s Unknown character \"%s\" in controller reference \"%s\"", print_error_prefix, char_name.c_str(), ctrl_name.c_str());
-			return NULL;
-		}
-
-		++index; // character after slash
-		if( index == ctrl_name.length() ) {  // slash was the last character
-			if( print_error_prefix )
-				LOG("%s Invalid controller name \"%s\". Missing controller name after character.", print_error_prefix, ctrl_name.c_str());
-			return NULL;
-		}
-		const string ctrl_subname( ctrl_name, index );
-
-		if( ctrl_subname == "posture_sched" ) {
-			ctrl_p = char_p->posture_sched_p;
-		} else if( ctrl_subname == "motion_sched" ) {
-			ctrl_p = char_p->motion_sched_p;
-		} else if( ctrl_subname == "gaze_sched" ) {
-			ctrl_p = char_p->gaze_sched_p;
-		} else if( ctrl_subname == "head_sched" ) {
-			ctrl_p = char_p->head_sched_p;
-		} else if( ctrl_subname == "param_sched" ) {
-			ctrl_p = char_p->param_sched_p;
-		} else if( ctrl_subname == "data_receiver" ) {
-			ctrl_p = char_p->datareceiver_ct;
-		} else {
-			// TODO: Character specific hash map?
-
-			if( print_error_prefix )
-			{
-				std::stringstream strstr;
-				strstr <<print_error_prefix<<"Unknown controller \""<<ctrl_subname<<"\" relative to character \""<<char_name<<"\".";
-				LOG(strstr.str().c_str());
-			}
-				
-			return NULL;
-		}
-	} else {
-		ctrl_p = controller_map.lookup( ctrl_name.c_str() );
-		if( ctrl_p == NULL ) {
-			if( print_error_prefix )
-				LOG("%s Unknown controller %s.", print_error_prefix, ctrl_name.c_str());
-			return NULL;
-		}
-	}
-	return ctrl_p;
-}
-
 
 void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map )
 {
@@ -1856,22 +1693,6 @@ int mcuCBHandle::executePython(const char* command)
 	return CMD_FAILURE;
 }
 
-
-void mcuCBHandle::setMediaPath(std::string path)
-{
-	media_path = path;
-	// update all the paths with the media path prefix
-	seq_paths.setPathPrefix(media_path);
-	me_paths.setPathPrefix(media_path);
-	audio_paths.setPathPrefix(media_path);
-	mesh_paths.setPathPrefix(media_path);
-}
-
-const std::string& mcuCBHandle::getMediaPath()
-{
-	return media_path;
-}
-
 SkMotion* mcuCBHandle::lookUpMotion( const char* motionName )
 {
 	SkMotion* anim_p = NULL;
@@ -1879,48 +1700,6 @@ SkMotion* mcuCBHandle::lookUpMotion( const char* motionName )
 	if (animIter != motion_map.end())
 		anim_p = (*animIter).second;
 	return anim_p;
-}
-
-PABlend* mcuCBHandle::lookUpPABlend(std::string stateName)
-{
-	for (size_t i = 0; i < param_anim_blends.size(); i++)
-	{
-		if (param_anim_blends[i]->stateName == stateName)
-			return param_anim_blends[i];
-	}
-	return NULL;
-}
-
-void mcuCBHandle::addPABlend(PABlend* state)
-{
-	if (!lookUpPABlend(state->stateName))
-		param_anim_blends.push_back(state);
-}
-
-SmartBody::SBAnimationTransition* mcuCBHandle::lookUpPATransition(std::string fromStateName, std::string toStateName)
-{
-	for (size_t i = 0; i < param_anim_transitions.size(); i++)
-	{
-		if (param_anim_transitions[i]->getSourceBlend()->stateName == fromStateName && param_anim_transitions[i]->getDestinationBlend()->stateName == toStateName)
-			return param_anim_transitions[i];
-	}
-	return NULL;	
-}
-
-void mcuCBHandle::addPATransition(SmartBody::SBAnimationTransition* transition)
-{
-	if (!lookUpPATransition(transition->getSourceBlend()->stateName, transition->getDestinationBlend()->stateName))
-		param_anim_transitions.push_back(transition);
-}
-
-void mcuCBHandle::setInteractive(bool val)
-{
-    _interactive = val;
-}
-
-bool mcuCBHandle::getInteractive()
-{
-    return _interactive;
 }
 
 // void mcuCBHandle::setPhysicsEngine( bool start )
@@ -1941,10 +1720,6 @@ bool mcuCBHandle::getInteractive()
 // 	}
 // }
 
-std::vector<MeController*>& mcuCBHandle::getDefaultControllers()
-{
-	return _defaultControllers;
-}
 
 std::map<std::string, SbmPawn*>& mcuCBHandle::getPawnMap()
 {
@@ -2148,5 +1923,23 @@ void mcuCBHandle::render()
 	if (ogreViewer_p) { ogreViewer_p->render(); }
 }
 
+
+void mcuCBHandle::render_terrain( int renderMode ) {
+			if( height_field_p )	{
+				height_field_p->render(renderMode);
+			}
+		}
+
+float mcuCBHandle::query_terrain( float x, float z, float *normal_p )	{
+			if( height_field_p )	{
+				return( height_field_p->get_elevation( x, z, normal_p ) );
+			}
+			if( normal_p )	{
+				normal_p[ 0 ] = 0.0;
+				normal_p[ 1 ] = 1.0;
+				normal_p[ 2 ] = 0.0;
+			}
+			return( 0.0 );
+		}
 
 /////////////////////////////////////////////////////////////

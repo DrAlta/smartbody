@@ -1,5 +1,6 @@
 #include "MeCtBodyReachState.h"
 #include <sb/SBEvent.h>
+#include <sb/SBScene.h>
 #include "sbm/mcontrol_util.h"
 #include <boost/lexical_cast.hpp>
 

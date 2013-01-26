@@ -1,5 +1,6 @@
 #include "Resource.h"
 #include <sbm/mcontrol_util.h>
+#include <sb/SBScene.h>
 
 #include <sstream>
 
@@ -166,7 +167,7 @@ std::string PathResource::dump()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::stringstream stream;
-	stream << "Path: [" << type << "] [media path=" << mcu.getMediaPath() << "] " << path;
+	stream << "Path: [" << type << "] [media path=" << SmartBody::SBScene::getScene()->getMediaPath() << "] " << path;
 	stream << Resource::dump();
 	return stream.str();
 }
