@@ -15,6 +15,7 @@
 #include "CommandWindow.h"
 #include <sb/SBSkeleton.h>
 #include <sb/SBDebuggerClient.h>
+#include <sb/SBSimulationManager.h>
 
 BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
 {
@@ -431,8 +432,10 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	if (!seqFile)
 		return;
 
+	SmartBody::SBScene::destroyScene();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	scene->reset();
+
+	scene->getSimulationManager()->setupTimer();
 
 	SrCamera* camera = SmartBody::SBScene::getScene()->createCamera("cameraDefault");
 	camera->reset();
@@ -606,10 +609,12 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 	int confirm = fl_choice("This will reset the current session.\nContinue?", "No", "Yes", NULL);
 	if (confirm == 1)
 	{
-		SmartBody::SBScene::getScene()->reset();
+		SmartBody::SBScene::destroyScene();
 		std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 		if (mediaPath != "")
 			SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
+
+		SmartBody::SBScene::getScene()->getSimulationManager()->setupTimer();
 		
 		SrCamera* camera = SmartBody::SBScene::getScene()->createCamera("cameraDefault");
 		camera->reset();
@@ -639,7 +644,7 @@ void BaseWindow::LaunchConnectCB(Fl_Widget* widget, void* data)
 void BaseWindow::DisconnectRemoteCB(Fl_Widget* widget, void* data)
 {
 	SmartBody::SBScene::getScene()->getDebuggerClient()->Disconnect();
-	SmartBody::SBScene::getScene()->reset();
+	SmartBody::SBScene::destroyScene();
 }
 
 void BaseWindow::LaunchConsoleCB(Fl_Widget* widget, void* data)

@@ -314,17 +314,17 @@ SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerCameraValues( double x, double 
 {
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
-   mcu._scene->getDebuggerServer()->m_cameraPos.x = x;
-   mcu._scene->getDebuggerServer()->m_cameraPos.y = y;
-   mcu._scene->getDebuggerServer()->m_cameraPos.z = z;
-   mcu._scene->getDebuggerServer()->m_cameraRot.x = rx;
-   mcu._scene->getDebuggerServer()->m_cameraRot.y = ry;
-   mcu._scene->getDebuggerServer()->m_cameraRot.z = rz;
-   mcu._scene->getDebuggerServer()->m_cameraRot.w = rw;
-   mcu._scene->getDebuggerServer()->m_cameraFovY   = fov;
-   mcu._scene->getDebuggerServer()->m_cameraAspect = aspect;
-   mcu._scene->getDebuggerServer()->m_cameraZNear  = zNear;
-   mcu._scene->getDebuggerServer()->m_cameraZFar   = zFar;
+   SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.x = x;
+   SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.y = y;
+   SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.z = z;
+   SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.x = rx;
+   SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.y = ry;
+   SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.z = rz;
+   SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.w = rw;
+   SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraFovY   = fov;
+   SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraAspect = aspect;
+   SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZNear  = zNear;
+   SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZFar   = zFar;
 }
 
 
@@ -485,7 +485,7 @@ bool Smartbody_dll::InitVHMsg()
 #if !defined(ANDROID_BUILD) && !defined(IPHONE_BUILD)
 
    mcuCBHandle & mcu = mcuCBHandle::singleton();
-   SmartBody::SBScene * scene = mcu._scene;
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 
    printf( "Starting VHMsg (DLL side)\n" );
 

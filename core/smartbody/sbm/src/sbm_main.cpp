@@ -432,8 +432,6 @@ int main( int argc, char **argv )	{
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	FLTKListener fltkListener;
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	scene->setCharacterListener(&fltkListener);
 
 	// change the default font size
 	FL_NORMAL_SIZE = 12;
@@ -447,10 +445,7 @@ int main( int argc, char **argv )	{
 	
 	mcu_register_callbacks();
 
-	scene->getSimulationManager()->setupTimer();
 
-	TimeIntervalProfiler* profiler = new TimeIntervalProfiler();
-	mcu.register_profiler(*profiler);
 
 	std::string python_lib_path = "../../../../core/smartbody/Python26/Lib";
 	std::string festivalLibDir = "../../../../lib/festival/festival/lib/";
@@ -515,6 +510,8 @@ int main( int argc, char **argv )	{
 	// EDF - taken from tre_main.cpp, a fancier command line parser can be put here if desired.
 	//	check	command line parameters:
 	bool lock_dt_mode = false;
+	float sleepFPS = -1;
+	float intervalAmount = -1;
 	int i;
 	for (	i=1; i<argc; i++ )
 	{
@@ -632,13 +629,14 @@ int main( int argc, char **argv )	{
 		{
 			string fps = s;
 			fps.erase( 0, 5 );
-			scene->getSimulationManager()->setSleepFps( (float) atof( fps.c_str() ) );
+			sleepFPS = (float) atof( fps.c_str() );
 		}
 		else if( s.compare( "-perf=" ) == 0 )  // argument starts with -perf=
 		{
 			string interval = s;
 			interval.erase( 0, 6 );
-			scene->getSimulationManager()->printPerf((float) atof( interval.c_str() ) );
+			intervalAmount = (float) atof( interval.c_str() );
+			
 		}
 		else if ( s.compare( "-facebone" ) == 0 )
 		{
@@ -670,16 +668,31 @@ int main( int argc, char **argv )	{
 			LOG( "ERROR: Unrecognized command line argument: \"%s\"\n", s.c_str() );
 		}
 	}
+
+	#ifndef SB_NO_PYTHON
+	// initialize python
+	LOG("Initializing Pyton with libraries at location: %s", python_lib_path.c_str());
+	initPython(python_lib_path);
+#endif
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->setCharacterListener(&fltkListener);
+
+	if (sleepFPS != -1.f)
+		scene->getSimulationManager()->setSleepFps( sleepFPS) ;
+	if (intervalAmount != -1.f)
+		scene->getSimulationManager()->printPerf(intervalAmount);
+
+	scene->getSimulationManager()->setupTimer();
+
+	TimeIntervalProfiler* profiler = new TimeIntervalProfiler();
+	mcu.register_profiler(*profiler);
+
 	if( lock_dt_mode )	{ 
 		scene->getSimulationManager()->setSleepLock();
 	}
 
 	scene->setMediaPath(mediaPath);
-#ifndef SB_NO_PYTHON
-	// initialize python
-	LOG("Initializing Pyton with libraries at location: %s", python_lib_path.c_str());
-	initPython(python_lib_path);
-#endif
+
 	mcu.festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
 	mcu.cereprocRelay()->initSpeechRelay(cereprocLibDir,festivalCacheDir);
 
@@ -748,7 +761,7 @@ int main( int argc, char **argv )	{
 		}
 	}
 
-	mcu._scene->getDebuggerServer()->SetID("sbm-fltk");
+	SmartBody::SBScene::getScene()->getDebuggerServer()->SetID("sbm-fltk");
 
 //	(void)signal( SIGABRT, signal_handler );
 //	(void)signal( SIGFPE, signal_handler );

@@ -54,7 +54,11 @@ bool SBScene::_firstTime = true;
 
 std::map<std::string, std::string> SBScene::_systemParameters;
 
-SBScene::SBScene(void)
+SBScene::SBScene(void) : SBObject()
+{
+}
+
+void SBScene::initialize()
 {
 	_characterListener = NULL;
 
@@ -95,95 +99,83 @@ SBScene::SBScene(void)
 	createIntAttribute("colladaTrimFrames",0,true,"",40,false,false,false,"Number of frames to be trimmed in the front when loading a collada motion.");
 	createBoolAttribute("useFastXMLParsing",false,true,"",50,false,false,false,"Use faster parsing when reading XML from a file.");
 	createBoolAttribute("delaySpeechIfNeeded",true,true,"",60,false,false,false,"Delays any speech until other behaviors specified in the same BML need to execute beforehand. This can occur when a gesture is synchronized to a word early in the utterance, and the gesture motion needs to be played for awhile before the synch point.");
-}
 
-SBScene::~SBScene(void)
-{
-	for (std::map<std::string, SBScript*>::iterator iter = _scripts.begin();
-		 iter != _scripts.end();
-		 iter++)
-	{
-	//	delete (*iter).second;
-	}
-
-	delete _sim;
-	delete _profiler;
-	delete _bml;
-	delete _blendManager;
-	delete _reachManager;
-	delete _steerManager;
-	delete _physicsManager;
-	delete _boneBusManager;
-	delete _collisionManager;
-	delete _gestureMapManager;
-	delete _jointMapManager;
-	delete _diphoneManager;
-	delete _behaviorSetManager;
-	delete _serviceManager;
-	delete _eventManager;
-
-	delete _parser;
-
-	_debuggerClient->Disconnect();
-	_debuggerServer->Close();
-	delete _debuggerServer;  // TODO: should delete these in reverse order?
-	delete _debuggerClient;
-	delete _debuggerUtility;
-}
-
-SBScene* SBScene::getScene()
-{
-	if (_firstTime)
-	{
-		XMLPlatformUtils::Initialize(); 
-		_firstTime = false;
-		_scene = new SBScene();
-	}
-
-	return _scene;
-}
-
-void SBScene::destroyScene()
-{
-	if (_scene)
-	{
-		delete _scene;
-		_scene = NULL;
-		_firstTime = true;
-	}
-}
-
-void SBScene::setProcessId(const std::string& id)
-{
+		// re-initialize
+	// initialize everything
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.process_id = id;
+	mcu.loop = true;
+	mcu.vhmsg_enabled = false;
+	mcu.net_bone_updates = false;
+	mcu.net_world_offset_updates = true;
+	mcu.play_internal_audio = false;
+	mcu.resourceDataChanged = false;
+	mcu.perceptionData = new PerceptionData();
+	mcu.skmScale = 1.0;
+	mcu.skScale = 1.0;
+	mcu.root_group_p = new SrSnGroup();
+	mcu.test_character_default = "";
+	mcu.test_recipient_default = "ALL";
+	mcu.queued_cmds = 0;
+	mcu.updatePhysics = false;
+	mcu.resource_manager = SBResourceManager::getResourceManager();
+	mcu.snapshot_counter = 1;
+	mcu.use_python = true;
+	mcu.media_path = ".";
+	mcu._interactive = true;
+	mcu.sendPawnUpdates = false;
+	mcu.logListener = NULL;
+	mcu.useXmlCache = false;
+	mcu.useXmlCacheAuto = false;
+	mcu.testBMLId = 0;
+	mcu.registerCallbacks();
+	mcu.root_group_p->ref();
+	mcu.kinectProcessor = new KinectProcessor();
+#if USE_WSP
+	mcu.theWSP = WSP::create_manager();
+	mcu.theWSP->init( "SMARTBODY" );
+#endif
+	mcu.internal_timer_p = NULL;
+	mcu.external_timer_p = NULL;
+	mcu.timer_p = NULL;
+
+	// Create default settings
+	mcu.createDefaultControllers();
+	SmartBody::SBFaceDefinition* faceDefinition = createFaceDefinition("_default_");
+	mcu.face_map["_default_"] = faceDefinition;
+	SmartBody::SBCharacterListener* listener = getCharacterListener();
+	//_scene = SmartBody::SBScene::getScene();
+	setCharacterListener(listener);
+
+	_debuggerServer->Init();
+	_debuggerServer->SetSBScene(_scene);
+	SmartBody::SBAnimationBlend0D* idleState = new SmartBody::SBAnimationBlend0D(PseudoIdleState);
+	mcu.addPABlend(idleState);
+
+	// reset timer & viewer window
+	getSimulationManager()->reset();
+	getSimulationManager()->start();
+
+#ifndef __native_client__
+	SrViewer* viewer = SmartBody::getViewer();
+	if (viewer)
+		viewer->show_viewer();
+#endif
+
+	command("vhmsgconnect");
+#ifndef __native_client__
+	//Py_Finalize();
+	//initPython(initPythonLibPath);
+#ifndef SB_NO_PYTHON
+	PyRun_SimpleString("scene = getScene()");
+	PyRun_SimpleString("bml = scene.getBmlProcessor()");
+	PyRun_SimpleString("sim = scene.getSimulationManager()");
+#endif
+#endif
+
+
 }
 
-const std::string& SBScene::getProcessId()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	return mcu.process_id;
-}
-
-void SBScene::update()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.update();
-}
-
-
-
-void SBScene::setScale(float val)
-{
-	_scale = val;
-}
-
-float SBScene::getScale()
-{
-	return _scale;
-}
-
-void SBScene::reset()
+void SBScene::cleanup()
 {
 	// stop the simulation
 	getSimulationManager()->stop();
@@ -205,7 +197,7 @@ void SBScene::reset()
 	getBlendManager()->removeAllTransitions();
 
 	// always need a PseudoIdle state
-	SmartBody::SBAnimationBlend0D* idleState = getBlendManager()->createBlend0D(PseudoIdleState);
+	//SmartBody::SBAnimationBlend0D* idleState = getBlendManager()->createBlend0D(PseudoIdleState);
 	//addPABlend(idleState);
 
 
@@ -282,11 +274,126 @@ void SBScene::reset()
 	}
 	mcu.nvbgMap.clear();
 
+	clearAttributes();
+	
 	AUDIO_Close();
 	AUDIO_Init();
 
 	mcu.vhmsg_send( "vrProcEnd sbm" );
 
+	mcu.reset();
+
+	
+}
+
+SBScene::~SBScene(void)
+{
+	cleanup();
+	for (std::map<std::string, SBScript*>::iterator iter = _scripts.begin();
+		 iter != _scripts.end();
+		 iter++)
+	{
+	//	delete (*iter).second;
+	}
+
+	delete _sim;
+	delete _profiler;
+	delete _bml;
+	delete _blendManager;
+	delete _reachManager;
+	delete _steerManager;
+	delete _physicsManager;
+	delete _boneBusManager;
+	delete _collisionManager;
+	delete _gestureMapManager;
+	delete _jointMapManager;
+	delete _diphoneManager;
+	delete _behaviorSetManager;
+	delete _serviceManager;
+	delete _eventManager;
+
+	delete _parser;
+
+	_debuggerClient->Disconnect();
+	_debuggerServer->Close();
+	delete _debuggerServer;  // TODO: should delete these in reverse order?
+	delete _debuggerClient;
+	delete _debuggerUtility;
+}
+
+SBDebuggerServer* SBScene::getDebuggerServer()
+{
+	return _debuggerServer; 
+}
+
+SBDebuggerClient* SBScene::getDebuggerClient()
+{
+	return _debuggerClient; 
+}
+
+
+SBDebuggerUtility* SBScene::getDebuggerUtility()
+{
+	return _debuggerUtility; 
+}
+
+SBScene* SBScene::getScene()
+{
+	if (_firstTime)
+	{
+		XMLPlatformUtils::Initialize(); 
+		_firstTime = false;
+		_scene = new SBScene();
+		_scene->initialize();
+	}
+
+	return _scene;
+}
+
+void SBScene::destroyScene()
+{
+	if (_scene)
+	{
+		delete _scene;
+		_scene = NULL;
+		_firstTime = true;
+	}
+}
+
+void SBScene::setProcessId(const std::string& id)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.process_id = id;
+}
+
+const std::string& SBScene::getProcessId()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	return mcu.process_id;
+}
+
+void SBScene::update()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.update();
+}
+
+
+
+void SBScene::setScale(float val)
+{
+	_scale = val;
+}
+
+float SBScene::getScale()
+{
+	return _scale;
+}
+
+void SBScene::reset()
+{
+	cleanup();
+	initialize();
 
 }
 

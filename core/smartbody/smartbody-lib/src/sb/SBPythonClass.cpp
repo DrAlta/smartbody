@@ -50,8 +50,7 @@ void quitSbm()
 
 void reset()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.reset();
+	SmartBody::SBScene::destroyScene();
 }
 
 void printLog(const std::string& message)

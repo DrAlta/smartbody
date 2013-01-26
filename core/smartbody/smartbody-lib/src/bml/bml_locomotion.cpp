@@ -104,12 +104,12 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	//-------------starting  from here, it's BML Spec 1.0
 	std::string localId = "locomotion";
 
-	if (!mcu->_scene->getSteerManager()->getEngineDriver()->isInitialized())
+	if (!SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
 	{
 		LOG("Steering Engine not started. Call \"steer start\" first");
 		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
 	}
-	if (!mcu->_scene->getSteerManager()->getEngineDriver()->_engine)
+	if (!SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine)
 	{
 		LOG("Steering Engine not started. Call \"steer start\" first");
 		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));

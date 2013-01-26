@@ -541,13 +541,13 @@ SBMotion* SBMotion::duplicateCycle(int num, std::string newName)
 SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints, std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJointMap)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	SBSkeleton* srcSkeleton = mcu._scene->getSkeleton(srcSkeletonName);
+	SBSkeleton* srcSkeleton = SmartBody::SBScene::getScene()->getSkeleton(srcSkeletonName);
 	if (!srcSkeleton)
 	{
 		LOG("No retarget source skeleton named %s found.", srcSkeletonName.c_str());
 		return NULL;
 	}
-	SBSkeleton* dstSkeleton = mcu._scene->getSkeleton(dstSkeletonName);
+	SBSkeleton* dstSkeleton = SmartBody::SBScene::getScene()->getSkeleton(dstSkeletonName);
 	if (!dstSkeleton)
 	{
 		LOG("No retarget destination skeleton named %s found.", dstSkeletonName.c_str());
@@ -935,7 +935,7 @@ SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkele
 SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	SBSkeleton* skeleton = mcu._scene->getSkeleton(skeletonName);
+	SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
 	if (!skeleton)
 	{
 		LOG("Skeleton %s not found. Mirror motion %s not built.",skeletonName.c_str(),name.c_str());
@@ -971,7 +971,7 @@ SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 SBMotion* SBMotion::mirrorChildren( std::string name, std::string skeletonName, std::string parentJointName )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	SBSkeleton* skeleton = mcu._scene->getSkeleton(skeletonName);
+	SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
 	if (!skeleton)
 	{
 		LOG("Skeleton %s not found. Mirror motion %s not built.",skeletonName.c_str(),name.c_str());

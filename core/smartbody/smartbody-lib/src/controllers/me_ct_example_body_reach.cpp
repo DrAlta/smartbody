@@ -225,7 +225,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 			updateReachType(targetPos);
 		return true;
 	}
-	else if (dist > character->getHeight()*0.35f && !isMoving && startReach && mcu._scene->getSteerManager()->getEngineDriver()->isInitialized() )//currentReachData->startReach) 
+	else if (dist > character->getHeight()*0.35f && !isMoving && startReach && SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized() )//currentReachData->startReach) 
 	{	
 		// if the target is far away, move the character first
 		//printf("idle to walk\n");

@@ -312,19 +312,6 @@ mcuCBHandle::mcuCBHandle()
 
 	createDefaultControllers();
 
-	// initialize the default face motion mappings
-	SmartBody::SBFaceDefinition* faceDefinition = new SmartBody::SBFaceDefinition();
-	faceDefinition->setName("_default_");
-	face_map["_default_"] = faceDefinition;
-	//physicsEngine = new ODEPhysicsSim();
-	//physicsEngine->initSimulation();
-	_scene = SmartBody::SBScene::getScene();
-
-	_scene->getDebuggerServer()->Init();
-	_scene->getDebuggerServer()->SetSBScene(_scene);
-
-	SmartBody::SBAnimationBlend0D* idleState = new SmartBody::SBAnimationBlend0D(PseudoIdleState);
-	addPABlend(idleState);
 }
 
 /////////////////////////////////////////////////////////////
@@ -880,8 +867,8 @@ void mcuCBHandle::clear( void )
 	_defaultControllers.clear();
 
 
-	if (_scene->getBoneBusManager()->getBoneBus().IsOpen())
-		_scene->getBoneBusManager()->getBoneBus().CloseConnection();
+	if (SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().IsOpen())
+		SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CloseConnection();
 
 }
 
@@ -977,13 +964,12 @@ int mcuCBHandle::remove_scene( SrSnGroup *scene_p )	{
 	}
 	return( CMD_FAILURE );
 }
-
 void mcuCBHandle::update( void )	
 {
 	// remote mode
-	if (_scene->isRemoteMode())
+	if (SmartBody::SBScene::getScene()->isRemoteMode())
 	{
-		_scene->getDebuggerClient()->Update();
+		SmartBody::SBScene::getScene()->getDebuggerClient()->Update();
 		std::map<std::string, SbmPawn*>::iterator iter;
 		for (iter = getPawnMap().begin();
 			iter != getPawnMap().end();
@@ -998,7 +984,7 @@ void mcuCBHandle::update( void )
 	}
 
 	// scripts
-	std::map<std::string, SmartBody::SBScript*>& scripts = _scene->getScripts();
+	std::map<std::string, SmartBody::SBScript*>& scripts = SmartBody::SBScene::getScene()->getScripts();
 	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();
 		iter++)
@@ -1008,7 +994,7 @@ void mcuCBHandle::update( void )
 	}
 
 	// services
-	std::map<std::string, SmartBody::SBService*>& services = _scene->getServiceManager()->getServices();
+	std::map<std::string, SmartBody::SBService*>& services = SmartBody::SBScene::getScene()->getServiceManager()->getServices();
 	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
 		iter != services.end();
 		iter++)
@@ -1102,12 +1088,12 @@ void mcuCBHandle::update( void )
 		SbmCharacter* char_p = getCharacter(pawn->getName().c_str() );
 		if (!char_p)
 		{
-			if (_scene->getBoneBusManager()->isEnable())
+			if (SmartBody::SBScene::getScene()->getBoneBusManager()->isEnable())
 			{
-				if (!isClosingBoneBus && !pawn->bonebusCharacter && _scene->getBoneBusManager()->getBoneBus().IsOpen() && sendPawnUpdates)
+				if (!isClosingBoneBus && !pawn->bonebusCharacter && SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().IsOpen() && sendPawnUpdates)
 				{
 					// bonebus was connected after character creation, create it now
-					pawn->bonebusCharacter = _scene->getBoneBusManager()->getBoneBus().CreateCharacter( pawn->getName().c_str(), pawn->getClassType().c_str() , false );
+					pawn->bonebusCharacter = SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CreateCharacter( pawn->getName().c_str(), pawn->getClassType().c_str() , false );
 				}
 				if (sendPawnUpdates)
 					NetworkSendSkeleton( pawn->bonebusCharacter, pawn->getSkeleton(), &param_map );
@@ -1115,12 +1101,12 @@ void mcuCBHandle::update( void )
 				{
 					// connection is bad, remove the bonebus character 
 					LOG("BoneBus cannot connect to server. Removing pawn %s", pawn->getName().c_str());
-					bool success = _scene->getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
+					bool success = SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
 					char_p->bonebusCharacter = NULL;
 					isClosingBoneBus = true;
-					if (_scene->getBoneBusManager()->getBoneBus().GetNumCharacters() == 0)
+					if (SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().GetNumCharacters() == 0)
 					{
-						_scene->getBoneBusManager()->getBoneBus().CloseConnection();
+						SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CloseConnection();
 					}
 				}
 			}
@@ -1159,7 +1145,7 @@ void mcuCBHandle::update( void )
 
 			
 
-			if ( _scene->getBoneBusManager()->isEnable() && char_p->getSkeleton() && char_p->bonebusCharacter ) {
+			if ( SmartBody::SBScene::getScene()->getBoneBusManager()->isEnable() && char_p->getSkeleton() && char_p->bonebusCharacter ) {
 				NetworkSendSkeleton( char_p->bonebusCharacter, (SkSkeleton *)(char_p->getSkeleton()), &param_map );
 
 				if ( net_world_offset_updates ) {
@@ -1190,10 +1176,10 @@ void mcuCBHandle::update( void )
 					}
 				}
 			}
-			else if (!isClosingBoneBus && !char_p->bonebusCharacter && _scene->getBoneBusManager()->getBoneBus().IsOpen())
+			else if (!isClosingBoneBus && !char_p->bonebusCharacter && SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().IsOpen())
 			{
 				// bonebus was connected after character creation, create it now
-				char_p->bonebusCharacter = _scene->getBoneBusManager()->getBoneBus().CreateCharacter( char_p->getName().c_str(), char_p->getClassType().c_str(), true );
+				char_p->bonebusCharacter = SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CreateCharacter( char_p->getName().c_str(), char_p->getClassType().c_str(), true );
 			}
 		}  // end of char_p processing
 	} // end of loop
@@ -1207,12 +1193,12 @@ void mcuCBHandle::update( void )
 			SbmPawn* pawn = (*iter).second;
 			if (pawn->bonebusCharacter)
 			{
-				bool success = _scene->getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
+				bool success = SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
 				pawn->bonebusCharacter = NULL;
 			}
 		}
 
-		_scene->getBoneBusManager()->getBoneBus().CloseConnection();
+		SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CloseConnection();
 	}
 
 	for (std::map<std::string, SbmPawn*>::iterator iter = getPawnMap().begin();
@@ -1229,20 +1215,20 @@ void mcuCBHandle::update( void )
 		SrMat m;
 		SrQuat quat = SrQuat(viewer_p->get_camera()->get_view_mat(m).get_rotation());
 
-		_scene->getDebuggerServer()->m_cameraPos.x = viewer_p->get_camera()->getEye().x;
-		_scene->getDebuggerServer()->m_cameraPos.y = viewer_p->get_camera()->getEye().y;
-		_scene->getDebuggerServer()->m_cameraPos.z = viewer_p->get_camera()->getEye().z;
-		_scene->getDebuggerServer()->m_cameraLookAt.x = viewer_p->get_camera()->getCenter().x;
-		_scene->getDebuggerServer()->m_cameraLookAt.y = viewer_p->get_camera()->getCenter().y;
-		_scene->getDebuggerServer()->m_cameraLookAt.z = viewer_p->get_camera()->getCenter().z;
-		_scene->getDebuggerServer()->m_cameraRot.x = quat.x;
-		_scene->getDebuggerServer()->m_cameraRot.y = quat.y;
-		_scene->getDebuggerServer()->m_cameraRot.z = quat.z;
-		_scene->getDebuggerServer()->m_cameraRot.w = quat.w;
-		_scene->getDebuggerServer()->m_cameraFovY   = sr_todeg(viewer_p->get_camera()->getFov());
-		_scene->getDebuggerServer()->m_cameraAspect = viewer_p->get_camera()->getAspectRatio();
-		_scene->getDebuggerServer()->m_cameraZNear  = viewer_p->get_camera()->getNearPlane();
-		_scene->getDebuggerServer()->m_cameraZFar   = viewer_p->get_camera()->getFarPlane();
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.x = viewer_p->get_camera()->getEye().x;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.y = viewer_p->get_camera()->getEye().y;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.z = viewer_p->get_camera()->getEye().z;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraLookAt.x = viewer_p->get_camera()->getCenter().x;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraLookAt.y = viewer_p->get_camera()->getCenter().y;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraLookAt.z = viewer_p->get_camera()->getCenter().z;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.x = quat.x;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.y = quat.y;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.z = quat.z;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.w = quat.w;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraFovY   = sr_todeg(viewer_p->get_camera()->getFov());
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraAspect = viewer_p->get_camera()->getAspectRatio();
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZNear  = viewer_p->get_camera()->getNearPlane();
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZFar   = viewer_p->get_camera()->getFarPlane();
 	}
 	
 	/*
@@ -1252,22 +1238,22 @@ void mcuCBHandle::update( void )
 		SrMat m;
 		SrQuat quat = SrQuat(defaultCam.get_view_mat(m).get_rotation());
 
-		_scene->getDebuggerServer()->m_cameraPos.x = defaultCam.eye.x;
-		_scene->getDebuggerServer()->m_cameraPos.y = defaultCam.eye.y;
-		_scene->getDebuggerServer()->m_cameraPos.z = defaultCam.eye.z;
-		_scene->getDebuggerServer()->m_cameraRot.x = quat.x;
-		_scene->getDebuggerServer()->m_cameraRot.y = quat.y;
-		_scene->getDebuggerServer()->m_cameraRot.z = quat.z;
-		_scene->getDebuggerServer()->m_cameraRot.w = quat.w;
-		_scene->getDebuggerServer()->m_cameraFovY   = sr_todeg(defaultCam.fovy);
-		_scene->getDebuggerServer()->m_cameraAspect = defaultCam.aspect;
-		_scene->getDebuggerServer()->m_cameraZNear  = defaultCam.znear;
-		_scene->getDebuggerServer()->m_cameraZFar   = defaultCam.zfar;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.x = defaultCam.eye.x;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.y = defaultCam.eye.y;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.z = defaultCam.eye.z;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.x = quat.x;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.y = quat.y;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.z = quat.z;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.w = quat.w;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraFovY   = sr_todeg(defaultCam.fovy);
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraAspect = defaultCam.aspect;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZNear  = defaultCam.znear;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZFar   = defaultCam.zfar;
 	}
 	*/
 
-	if (!_scene->isRemoteMode())
-		_scene->getDebuggerServer()->Update();
+	if (!SmartBody::SBScene::getScene()->isRemoteMode())
+		SmartBody::SBScene::getScene()->getDebuggerServer()->Update();
 
 	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();
@@ -1478,9 +1464,9 @@ void mcuCBHandle::set_net_host( const char * net_host )
 {
 	// EDF
 	// Sets up the network connection for sending bone rotations over to Unreal
-	_scene->getBoneBusManager()->setHost(net_host);
-	_scene->getBoneBusManager()->setEnable(true);
-	_scene->getBoneBusManager()->getBoneBus().UpdateAllCharacters();
+	SmartBody::SBScene::getScene()->getBoneBusManager()->setHost(net_host);
+	SmartBody::SBScene::getScene()->getBoneBusManager()->setEnable(true);
+	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().UpdateAllCharacters();
 }
 
 void mcuCBHandle::set_process_id( const char * process_id )
@@ -2164,18 +2150,18 @@ int mcuCBHandle::registerCharacter(SbmCharacter* character)
 	}
 	character_map.insert(std::pair<std::string, SbmCharacter*>(character->getName(), character));
 
-	if (_scene->getBoneBusManager()->isEnable())
-		_scene->getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true );
-	if ( _scene->getCharacterListener() )
-		_scene->getCharacterListener()->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
+	if (SmartBody::SBScene::getScene()->getBoneBusManager()->isEnable())
+		SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true );
+	if ( SmartBody::SBScene::getScene()->getCharacterListener() )
+		SmartBody::SBScene::getScene()->getCharacterListener()->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
 
 	return 1;
 }
 
 int mcuCBHandle::unregisterCharacter(SbmCharacter* character)
 {
-	if (_scene->getCharacterListener() )
-		_scene->getCharacterListener()->OnCharacterDelete( character->getName().c_str() );
+	if (SmartBody::SBScene::getScene()->getCharacterListener() )
+		SmartBody::SBScene::getScene()->getCharacterListener()->OnCharacterDelete( character->getName().c_str() );
 
 	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(character->getName());
 	if (iter != pawn_map.end())

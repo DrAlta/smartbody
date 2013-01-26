@@ -16,7 +16,7 @@ SBReachManager::~SBReachManager()
 SBReach* SBReachManager::createReach(std::string characterName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SBScene* scene = mcu._scene;
+	SBScene* scene = SmartBody::SBScene::getScene();
 	// get the character
 	SBCharacter* character = scene->getCharacter(characterName);
 	if (!character)

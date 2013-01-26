@@ -271,7 +271,7 @@ int text_speech::text_speech_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		int msgNumber = args.read_int();
 		char* agentName = args.read_token();
 		char* text = args.read_remainder_raw();
-		mcu_p->_scene->getBoneBusManager()->getBoneBus().SendSpeakText(msgNumber, agentName, text);
+		SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendSpeakText(msgNumber, agentName, text);
 	}
 	return CMD_SUCCESS;
 }
