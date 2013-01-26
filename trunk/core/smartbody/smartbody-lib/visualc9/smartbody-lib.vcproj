@@ -3828,6 +3828,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sb\SBRetarget.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBRetarget.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBRetargetManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBRetargetManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sb\SBScene.cpp"
 				>
 			</File>
