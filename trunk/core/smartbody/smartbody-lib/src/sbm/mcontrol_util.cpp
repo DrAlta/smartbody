@@ -420,40 +420,7 @@ void mcuCBHandle::reset( void )
 	theWSP->init( "SMARTBODY" );
 #endif
 
-	// Create default settings
-	createDefaultControllers();
-	SmartBody::SBFaceDefinition* faceDefinition = new SmartBody::SBFaceDefinition();
-	faceDefinition->setName("_default_");
-	face_map["_default_"] = faceDefinition;
-	SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
-	SmartBody::SBScene::destroyScene();
-	_scene = SmartBody::SBScene::getScene();
-	_scene->setCharacterListener(listener);
-	_scene->getDebuggerServer()->Init();
-	_scene->getDebuggerServer()->SetSBScene(_scene);
-	SmartBody::SBAnimationBlend0D* idleState = new SmartBody::SBAnimationBlend0D(PseudoIdleState);
-	addPABlend(idleState);
 
-	// reset timer & viewer window
-	_scene->getSimulationManager()->reset();
-	_scene->getSimulationManager()->start();
-
-#ifndef __native_client__
-	SrViewer* viewer = SmartBody::getViewer();
-	if (viewer)
-		viewer->show_viewer();
-#endif
-
-	_scene->command("vhmsgconnect");
-#ifndef __native_client__
-	//Py_Finalize();
-	//initPython(initPythonLibPath);
-#ifndef SB_NO_PYTHON
-	PyRun_SimpleString("scene = getScene()");
-	PyRun_SimpleString("bml = scene.getBmlProcessor()");
-	PyRun_SimpleString("sim = scene.getSimulationManager()");
-#endif
-#endif
 }
 
  void mcuCBHandle::createDefaultControllers()
@@ -865,10 +832,6 @@ void mcuCBHandle::clear( void )
 	for (size_t x = 0; x < _defaultControllers.size(); x++)
 		_defaultControllers[x]->unref();
 	_defaultControllers.clear();
-
-
-	if (SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().IsOpen())
-		SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CloseConnection();
 
 }
 

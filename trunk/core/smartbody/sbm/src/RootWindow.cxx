@@ -437,7 +437,7 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 
 	scene->getSimulationManager()->setupTimer();
 
-	SrCamera* camera = SmartBody::SBScene::getScene()->createCamera("cameraDefault");
+	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
 	camera->reset();
 
 	if (mediaPath != "")
@@ -616,7 +616,7 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 
 		SmartBody::SBScene::getScene()->getSimulationManager()->setupTimer();
 		
-		SrCamera* camera = SmartBody::SBScene::getScene()->createCamera("cameraDefault");
+		SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
 		camera->reset();
 	}
 }
