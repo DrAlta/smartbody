@@ -14,6 +14,7 @@
 #include <sb/SBSteerAgent.h>
 #include <sb/SBPhoneme.h>
 #include <sb/SBPhonemeManager.h>
+#include <sb/SBScene.h>
 #include <controllers/me_ct_motion_recorder.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_gaze.h>

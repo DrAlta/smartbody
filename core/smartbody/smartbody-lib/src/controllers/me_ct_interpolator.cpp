@@ -22,6 +22,9 @@
 
 #include <controllers/me_ct_interpolator.h>
 #include <controllers/me_ct_param_animation.h>
+#include <sb/SBAnimationStateManager.h>
+#include <sb/SBAnimationState.h>
+#include <sb/SBScene.h>
 
 std::string MeCtInterpolator::Context::CONTEXT_TYPE = "MeCtInterpolator::Context";
 std::string MeCtInterpolator::CONTROLLER_TYPE = "MeCtInterpolator";
@@ -166,7 +169,7 @@ void MeCtInterpolator::initKeys()
 	key1.clear();
 	key2.clear();
 
-	PABlend* state = mcu.lookUpPABlend(this->getName());
+	SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(this->getName());
 	if (state != NULL)
 	{
 		for (int i = 0; i < state->getNumMotions(); i++)

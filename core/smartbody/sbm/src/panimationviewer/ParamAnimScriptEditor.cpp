@@ -23,11 +23,12 @@
 #include "vhcl.h"
 #include "ParamAnimScriptEditor.h"
 #include <FL/Fl_Hold_Browser.H>
-#include <sbm/mcontrol_util.h>
 #include <controllers/me_ct_param_animation.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBAnimationStateManager.h>
+#include <sb/SBScene.h>
+#include <sb/SBCharacter.h>
 
 #define transitionTrace 0
 

@@ -25,6 +25,9 @@
 #include <sbm/mcontrol_util.h>
 #include <sr/sr_euler.h>
 #include <sb/SBAnimationState.h>
+#include <sb/SBAnimationStateManager.h>
+#include <sb/SBEvent.h>
+#include <sb/SBScene.h>
 
 const double timeThreshold = 0.05;
 
@@ -880,7 +883,7 @@ PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, B
 	blendEndTrim = (float)blendEndTrim;
 	directPlay = dplay;
 	playSpeed = 1.f;
-	PABlend* s = mcu.lookUpPABlend(stateName);
+	SmartBody::SBAnimationBlend* s = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	state = s;
 	if (state)
 	{

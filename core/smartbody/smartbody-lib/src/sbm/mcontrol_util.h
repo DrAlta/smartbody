@@ -49,41 +49,35 @@ class mcuCBHandle;
 #endif
 
 #include <sbm/GenericViewer.h>
-#include <sr/sr_viewer.h>
-#include <sr/sr_camera.h>
+
 #include "sbm_constants.h"
 
 #include "sr_hash_map.h"
 #include "sr_cmd_map.h"
 #include "sr_cmd_seq.h"
 #include "sr_path_list.h"
-#include "sb/sbm_pawn.hpp"
-#include "sb/sbm_character.hpp"
 #include "remote_speech.h"
 #include "local_speech.h"
 #include "text_speech.h" // [BMLR]
 #include "sbm_speech_audiofile.hpp"
 #include "time_regulator.h"
 #include "time_profiler.h"
-#include "Heightfield.h"
+
 
 #include "ResourceManager.h"
-#include <sb/SBEvent.h>
 #include <sbm/action_unit.hpp>
 #include <sbm/general_param_setting.h>
 
-#include <sb/SBJointMap.h>
+
 
 #ifndef __native_client__
 #include <sb/SBPythonClass.h>
 #endif
 
-#include <sb/nvbg.h>
 
-#include <sbm/KinectProcessor.h>
-#include <sb/SBScene.h>
-#include <sb/SBCharacterListener.h>
-#include <sb/SBAnimationTransition.h>
+
+
+
 
 
 #ifndef USE_PYTHON
@@ -113,6 +107,13 @@ namespace WSP
 
 class PABlend;
 class PATransition;
+class Heightfield;
+class SbmPawn;
+class SbmCharacter;
+class Nvbg;
+class KinectProcessor;
+class SrViewer;
+class SrCamera;
 
 //////////////////////////////////////////////////////////////////
 
@@ -133,11 +134,6 @@ class FaceMotion
 	
 		FaceMotion() { face_neutral_p = NULL; }
 };
-
-typedef std::map<std::string, FaceMotion*> FaceMotionMap;
-typedef std::map<std::string, SkPosture*> SkPostureMap;
-typedef std::map<std::string, SkMotion*> SkMotionMap;
-typedef std::map<std::string, SkSkeleton*> SkSkeletonMap;
 
 class SequenceManager
 {
@@ -190,8 +186,7 @@ class mcuCBHandle {
 	public:
 		// Data
 		unsigned int				queued_cmds;
-		bool _interactive;
-
+		
 		bool		loop;
 		bool		vhmsg_enabled;
 		vhcl::Log::Listener* logListener;
@@ -213,10 +208,6 @@ class mcuCBHandle {
 		//double      physicsTime;
 
 		KinectProcessor*							kinectProcessor;
-
-		std::vector<PABlend*>					param_anim_blends;
-		std::vector<SmartBody::SBAnimationTransition*>				param_anim_transitions;
-		
 
 		TimeRegulator	*internal_timer_p;
 		TimeRegulator	*external_timer_p;
@@ -246,7 +237,6 @@ class mcuCBHandle {
 		srPathList	audio_paths;
 		srPathList	mesh_paths;
 
-		std::string media_path;
 		std::string initPythonLibPath;
 
 		/** Character id for test commands to use when required but not specified. */
@@ -329,8 +319,6 @@ public:
 	private:
 		// Constant
 		static mcuCBHandle* _singleton;
-
-		std::vector<MeController*> _defaultControllers;
 
 		//  Constructor
 		mcuCBHandle( void );
@@ -421,22 +409,8 @@ public:
 		// ----------------------------------------------
 		// terrain management
 		// ----------------------------------------------
-		void render_terrain( int renderMode ) {
-			if( height_field_p )	{
-				height_field_p->render(renderMode);
-			}
-		}
-		float query_terrain( float x, float z, float *normal_p )	{
-			if( height_field_p )	{
-				return( height_field_p->get_elevation( x, z, normal_p ) );
-			}
-			if( normal_p )	{
-				normal_p[ 0 ] = 0.0;
-				normal_p[ 1 ] = 1.0;
-				normal_p[ 2 ] = 0.0;
-			}
-			return( 0.0 );
-		}
+		void render_terrain( int renderMode ) ;
+		float query_terrain( float x, float z, float *normal_p );
 		// ----------------------------------------------
 		// END terrain management
 		// ----------------------------------------------
@@ -476,25 +450,9 @@ public:
 		// END asset management
 		// ----------------------------------------------
 
-
-		MeController* lookup_ctrl( const std::string& ctrl_name, const char* print_error_prefix=NULL );
-
 		srCmdSeq* lookup_seq( const char* );
 
 		SkMotion* lookUpMotion(const char* motionName);
-
-		// ----------------------------------------------
-		// blends and transitions
-		// ----------------------------------------------
-
-		PABlend* lookUpPABlend(std::string stateName);
-		void addPABlend(PABlend* state);
-		SmartBody::SBAnimationTransition* lookUpPATransition(std::string fromStateName, std::string toStateName);
-		void addPATransition(SmartBody::SBAnimationTransition* transition);
-		// ----------------------------------------------
-		// END blends and transitions
-		// ----------------------------------------------
-
 
 		// ----------------------------------------------
 		// command management
@@ -657,15 +615,6 @@ public:
 		// END command setup management
 		// ----------------------------------------------
 
-		void setMediaPath(std::string path);
-		const std::string& getMediaPath();
-
-        void setInteractive(bool val);
-        bool getInteractive();
-
-
-		void createDefaultControllers();
-		std::vector<MeController*>& getDefaultControllers();
 
 	public:
 		FILE* open_sequence_file( const char *seq_name, std::string& fullPath );

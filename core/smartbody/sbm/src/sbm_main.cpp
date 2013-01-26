@@ -512,6 +512,7 @@ int main( int argc, char **argv )	{
 	bool lock_dt_mode = false;
 	float sleepFPS = -1;
 	float intervalAmount = -1;
+	bool isInteractive = true;
 	int i;
 	for (	i=1; i<argc; i++ )
 	{
@@ -661,7 +662,7 @@ int main( int argc, char **argv )	{
 		}
         else if ( s.compare("-noninteractive") == 0)
         {
-                mcu.setInteractive(false);
+                isInteractive = false;
         }
 		else
 		{
@@ -900,7 +901,7 @@ int main( int argc, char **argv )	{
 			SmartBody::SBScene::getScene()->command( (char *)commands[i].c_str() );
 		}
 
-		if (mcu.getInteractive())
+		if (isInteractive)
 		{
 			bool hasCommands = false;
 			if (mcu.use_python)

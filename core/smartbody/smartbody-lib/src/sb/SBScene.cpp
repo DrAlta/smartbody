@@ -39,9 +39,16 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <sb/nvbg.h>
+#include <sb/SBJointMap.h>
 #include <sb/SBCharacterListener.h>
 #include <sbm/ParserBVH.h>
 #include <sr/sr_camera.h>
+#include <controllers/me_ct_gaze.h>
+#include <controllers/me_ct_eyelid.h>
+#include <controllers/me_ct_breathing.h>
+#include <controllers/me_ct_example_body_reach.hpp>
+#include <controllers/me_ct_saccade.h>
+#include <sbm/KinectProcessor.h>
 
 #ifndef WIN32
 #define _stricmp strcasecmp
@@ -62,6 +69,8 @@ void SBScene::initialize()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.reset();
+
+	createDefaultControllers();
 
 	_characterListener = NULL;
 
@@ -103,6 +112,7 @@ void SBScene::initialize()
 	createBoolAttribute("useFastXMLParsing",false,true,"",50,false,false,false,"Use faster parsing when reading XML from a file.");
 	createBoolAttribute("delaySpeechIfNeeded",true,true,"",60,false,false,false,"Delays any speech until other behaviors specified in the same BML need to execute beforehand. This can occur when a gesture is synchronized to a word early in the utterance, and the gesture motion needs to be played for awhile before the synch point.");
 
+	_mediaPath = ".";
 		// re-initialize
 	// initialize everything
 	
@@ -123,8 +133,6 @@ void SBScene::initialize()
 	mcu.resource_manager = SBResourceManager::getResourceManager();
 	mcu.snapshot_counter = 1;
 	mcu.use_python = true;
-	mcu.media_path = ".";
-	mcu._interactive = true;
 	mcu.sendPawnUpdates = false;
 	mcu.logListener = NULL;
 	mcu.useXmlCache = false;
@@ -142,7 +150,7 @@ void SBScene::initialize()
 	mcu.timer_p = NULL;
 
 	// Create default settings
-	mcu.createDefaultControllers();
+	createDefaultControllers();
 	SmartBody::SBFaceDefinition* faceDefinition = createFaceDefinition("_default_");
 	mcu.face_map["_default_"] = faceDefinition;
 	SmartBody::SBCharacterListener* listener = getCharacterListener();
@@ -151,8 +159,7 @@ void SBScene::initialize()
 
 	_debuggerServer->Init();
 	_debuggerServer->SetSBScene(_scene);
-	SmartBody::SBAnimationBlend0D* idleState = new SmartBody::SBAnimationBlend0D(PseudoIdleState);
-	mcu.addPABlend(idleState);
+	SmartBody::SBAnimationBlend0D* idleState = getBlendManager()->createBlend0D(PseudoIdleState);
 
 	// reset timer & viewer window
 	getSimulationManager()->reset();
@@ -182,7 +189,7 @@ void SBScene::cleanup()
 {
 	// stop the simulation
 	getSimulationManager()->stop();
-
+	
 	// reset the simulation parameters
 	getSimulationManager()->setSimFps(0);
 
@@ -277,10 +284,31 @@ void SBScene::cleanup()
 	}
 	mcu.nvbgMap.clear();
 
+
+	removePendingCommands();
+
 	clearAttributes();
+
+	removeDefaultControllers();
+
+	removeAllAssetPaths("script");
+	removeAllAssetPaths("motion");
+	removeAllAssetPaths("mesh");
+	removeAllAssetPaths("audio");
+
 	
 	AUDIO_Close();
 	AUDIO_Init();
+
+#if USE_WSP
+	mcu.theWSP->shutdown();
+
+	if (mcu.theWSP)
+	{
+		delete mcu.theWSP;
+		mcu.theWSP = NULL;
+	}
+#endif
 
 	mcu.vhmsg_send( "vrProcEnd sbm" );
 
@@ -894,6 +922,10 @@ void SBScene::removeAllAssetPaths(const std::string& type)
 	{
 		mcu.audio_paths.removeAll();
 	}
+	else if (type == "mesh")
+	{
+		mcu.mesh_paths.removeAll();
+	}
 	else
 	{
 		LOG("Input type %s not recognized!", type.c_str());
@@ -1070,14 +1102,18 @@ void SBScene::addMotion(const std::string& path, bool recursive)
 
 void SBScene::setMediaPath(const std::string& path)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.setMediaPath(path);
+	_mediaPath = path;
+	// update all the paths with the media path prefix
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	mcu.seq_paths.setPathPrefix(_mediaPath);
+	mcu.me_paths.setPathPrefix(_mediaPath);
+	mcu.audio_paths.setPathPrefix(_mediaPath);
+	mcu.mesh_paths.setPathPrefix(_mediaPath);
 }
 
 const std::string& SBScene::getMediaPath()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	return mcu.getMediaPath();
+	return _mediaPath;
 }
 
 void SBScene::setDefaultCharacter(const std::string& character)
@@ -2418,5 +2454,33 @@ std::vector<std::string> SBScene::getCameraNames()
 
 	return cameraNames;
 }
+
+
+std::vector<SBController*>& SBScene::getDefaultControllers()
+{
+	return _defaultControllers;
+}
+
+void SBScene::createDefaultControllers()
+{
+	 _defaultControllers.push_back(new MeCtEyeLidRegulator());
+	 _defaultControllers.push_back(new MeCtSaccade(NULL));
+	 std::map<int, MeCtReachEngine*> reachMap;
+	 _defaultControllers.push_back(new MeCtExampleBodyReach(reachMap));
+	 _defaultControllers.push_back(new MeCtBreathing());
+	 _defaultControllers.push_back(new MeCtGaze());
+
+	 for (size_t x = 0; x < _defaultControllers.size(); x++)
+		 _defaultControllers[x]->ref();
+}
+
+void SBScene::removeDefaultControllers()
+{
+	 for (size_t x = 0; x < _defaultControllers.size(); x++)
+		 _defaultControllers[x]->unref();
+	 _defaultControllers.clear();
+}
+
+
 
 };

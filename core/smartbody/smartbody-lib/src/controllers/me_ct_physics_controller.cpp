@@ -2,6 +2,9 @@
 #include <sr/sr_euler.h>
 #include <sbm/mcontrol_util.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBEvent.h>
+#include <sb/SBScene.h>
+#include <sb/SBCharacterListener.h>
 
 std::string MeCtPhysicsController::CONTROLLER_TYPE = "PhysicsController";
 

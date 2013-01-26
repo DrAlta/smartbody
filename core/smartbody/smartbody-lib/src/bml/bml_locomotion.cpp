@@ -229,7 +229,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			return BehaviorRequestPtr();
 
 		// also has to update state weight
-	//	PABlend* locoData = mcu->lookUpPABlend(c->steeringAgent->locomotionName);
+	//	PABlend* locoData = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(c->steeringAgent->locomotionName);
 	//	if (locoData)
 	//		locoData->setWeight(c->steeringAgent->desiredSpeed * 100.0f, 0.0);
 	}

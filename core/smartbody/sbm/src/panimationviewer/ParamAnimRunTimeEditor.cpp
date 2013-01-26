@@ -32,6 +32,8 @@
 #include "Parameter3DVisualization.h"
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationState.h>
+#include <sb/SBScene.h>
+#include <sb/SBSkeleton.h>
 
 PARunTimeEditor::PARunTimeEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
 {

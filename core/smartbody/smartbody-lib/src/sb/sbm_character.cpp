@@ -54,10 +54,14 @@
 #include <sbm/PPRAISteeringAgent.h>
 #include <boost/filesystem/operations.hpp>
 #include <sb/SBSkeleton.h>
+#include <sb/SBScene.h>
 #include <sb/SBJoint.h>
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBSteerAgent.h>
+#include <sb/SBAnimationStateManager.h>
+#include <sb/SBAnimationState.h>
+#include <sb/SBCharacterListener.h>
 #include <controllers/me_ct_motion_player.h>
 #include <controllers/me_ct_pose.h>
 #include <controllers/me_ct_quick_draw.h>
@@ -495,7 +499,7 @@ void SbmCharacter::createStandardControllers()
 
 	// get the default attributes from the default controllers
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::vector<MeController*>& defaultControllers = mcu.getDefaultControllers();
+	std::vector<SmartBody::SBController*>& defaultControllers = SmartBody::SBScene::getScene()->getDefaultControllers();
 	for (size_t x = 0; x < defaultControllers.size(); x++)
 	{
 		MeController* controller = defaultControllers[x];
@@ -933,7 +937,7 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 
 
 	// get the default attributes from the default controllers
-	std::vector<MeController*>& defaultControllers = mcu.getDefaultControllers();
+	const std::vector<SmartBody::SBController*>& defaultControllers = SmartBody::SBScene::getScene()->getDefaultControllers();
 	for (size_t x = 0; x < defaultControllers.size(); x++)
 	{
 		MeController* controller = defaultControllers[x];
@@ -2544,7 +2548,7 @@ bool SbmCharacter::checkExamples()
 	int numMissing = 0;
 	for (size_t x = 0; x < standardRequiredStates.size(); x++)
 	{
-		PABlend* state = mcu.lookUpPABlend(standardRequiredStates[x]);
+		SmartBody::SBAnimationBlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(standardRequiredStates[x]);
 		if (!state)
 		{
 			numMissing++;
@@ -2572,7 +2576,7 @@ bool SbmCharacter::checkExamples()
 	int numMissing1 = 0;
 	for (size_t x = 0; x < minimalRequiredStates.size(); x++)
 	{
-		PABlend* state = mcu.lookUpPABlend(minimalRequiredStates[x]);
+		PABlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(minimalRequiredStates[x]);
 		if (!state)
 		{
 			numMissing1++;

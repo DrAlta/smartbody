@@ -53,6 +53,7 @@
 #include "ParserFBX.h"
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
+#include <sb/SBScene.h>
 #include <sbm/lin_win.h>
 
 using namespace std;
@@ -732,7 +733,7 @@ int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map
 	std::string rootDir = motions_path.root_directory();
 	if (rootDir.size() == 0)
 	{	
-		std::string mediaPath = mcuCBHandle::singleton().getMediaPath();
+		std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
 		finalPath = operator/(mediaPath, motions_path);
 	}
 	else
@@ -796,7 +797,7 @@ int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>&
 	std::string rootDir = motions_path.root_directory();
 	if (rootDir.size() == 0)
 	{		
-		finalPath = operator/(mcuCBHandle::singleton().getMediaPath(), motions_path);
+		finalPath = operator/(SmartBody::SBScene::getScene()->getMediaPath(), motions_path);
 	}
 	else
 	{
@@ -819,7 +820,7 @@ int load_me_postures( const char* pathname, std::map<std::string, SkPosture*>& m
 	std::string rootDir = posture_path.root_directory();
 	if (rootDir.size() == 0)
 	{		
-		finalPath = operator/(mcuCBHandle::singleton().getMediaPath(), posture_path);
+		finalPath = operator/(SmartBody::SBScene::getScene()->getMediaPath(), posture_path);
 	}
 	else
 	{

@@ -31,6 +31,7 @@
 # include <sr/sr_output.h>
 #include <cstdio>
 #include <sb/SBMotion.h>
+#include <sb/SBScene.h>
 #include <sbm/mcontrol_util.h>
 
 std::string MeCtBreathing::type_name = "Breathing";

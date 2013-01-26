@@ -40,6 +40,7 @@ class SBBehaviorSetManager;
 class SBRetargetManager;
 class SBParser;
 class SBSubject;
+class SBController;
 
 class SBScene : public SBObject
 {
@@ -171,6 +172,7 @@ class SBScene : public SBObject
 		SBAPI SrCamera* getCamera(const std::string& name);
 		SBAPI int getNumCameras();
 		SBAPI std::vector<std::string> getCameraNames();
+		SBAPI std::vector<SBController*>& getDefaultControllers();
 
 	protected:
 
@@ -189,6 +191,9 @@ class SBScene : public SBObject
 		void saveLipSyncing(std::stringstream& strstr, bool remoteSetup);
 		void saveServices(std::stringstream& strstr, bool remoteSetup);
 		void savePositions(std::stringstream& strstr, bool remoteSetup);
+
+		void createDefaultControllers();
+		void removeDefaultControllers();
 
 
 		SBSimulationManager* _sim;
@@ -222,6 +227,10 @@ class SBScene : public SBObject
 		SBDebuggerUtility*	_debuggerUtility;
 		std::map<std::string, SrCamera*> _cameras;
 		std::string _activeCamera;
+
+		std::string _mediaPath;
+		std::vector<SBController*> _defaultControllers;
+		
 
 		static SBScene* _scene;
 		static std::map<std::string, std::string> _systemParameters;

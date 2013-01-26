@@ -1,5 +1,6 @@
 #include "SBBmlProcessor.h"
 #include <sbm/mcontrol_util.h>
+#include <sb/SBScene.h>
 
 namespace SmartBody {
 

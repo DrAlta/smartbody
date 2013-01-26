@@ -72,6 +72,7 @@
 #include <boost/filesystem/convenience.hpp>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
+#include <sb/nvbg.h>
 
 using namespace std;
 using namespace BML;
@@ -1097,7 +1098,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		}
 	} else if( _stricmp( command, "start" )==0 ) {
 		// TODO: Mark act as started
-			Nvbg* nvbg = character->getNvbg();
+			SmartBody::Nvbg* nvbg = character->getNvbg();
 			if (nvbg)
 			{
 				nvbg->executeEvent(character_id, message_id, "start");
@@ -1112,7 +1113,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 			BMLProcessorMsg msg( character_id, message_id, character, NULL, args );
 			int ret = bp.bml_end( msg, mcu );
 
-			Nvbg* nvbg = character->getNvbg();
+			SmartBody::Nvbg* nvbg = character->getNvbg();
 			if (nvbg)
 			{
 				nvbg->executeEvent(character_id, message_id, "end");

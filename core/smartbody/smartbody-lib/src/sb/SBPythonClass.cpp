@@ -8,6 +8,7 @@
 #include <sk/sk_skeleton.h>
 #include <sk/sk_joint.h>
 #include <sbm/sbm_test_cmds.hpp>
+#include <sb/SBScene.h>
 #include <controllers/me_ct_param_animation.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_gaze.h>

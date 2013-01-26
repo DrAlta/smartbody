@@ -4,7 +4,9 @@
 #include <sstream>
 #include <string>
 #include <boost/algorithm/string.hpp> 
+#include <sb/SBScene.h>
 #include <sb/SBAnimationState.h>
+#include <sb/SBAnimationStateManager.h>
 #include <controllers/me_ct_param_animation.h>
 #include "bml_states.hpp"
 #include "sbm/mcontrol_util.h"
@@ -38,7 +40,7 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 		LOG("parse_bml_states ERR: expecting a state name.");
 		return BehaviorRequestPtr();
 	}
-	PABlend* state = mcu->lookUpPABlend(stateName);
+	PABlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	if (!state)
 	{
 		LOG("parse_bml_states WARNING: Can't find state name %s, will schedule PseudoIdle state under schedule mode", stateName.c_str());

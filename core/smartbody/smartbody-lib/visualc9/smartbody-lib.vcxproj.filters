@@ -988,6 +988,8 @@
     <ClCompile Include="..\src\sb\PABlend.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sb\SBRetarget.cpp" />
+    <ClCompile Include="..\src\sb\SBRetargetManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\sbm\me_utilities.hpp">
@@ -2019,6 +2021,8 @@
     <ClInclude Include="..\src\sb\PABlend.h">
       <Filter>sb</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\sb\SBRetarget.h" />
+    <ClInclude Include="..\src\sb\SBRetargetManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\sbm_deformable_mesh.cpp.bak">

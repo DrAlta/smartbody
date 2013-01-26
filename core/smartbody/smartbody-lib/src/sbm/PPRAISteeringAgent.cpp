@@ -587,7 +587,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 	//	return; 
 	if (character->param_animation_ct->isIdle() && steerPath.pathLength() > 0)    // need to define when you want to start the locomotion
 	{
-		PABlend* locoState = mcu.lookUpPABlend(locomotionName.c_str());
+		PABlend* locoState = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(locomotionName.c_str());
 		SrVec pathDir;
 		float pathDist;		
 		curSteerPos = SrVec(x,0,z);
@@ -1474,7 +1474,7 @@ void PPRAISteeringAgent::adjustFacingAngle( float angleDiff )
 	std::string playNow;
 	if (fabs(angleDiff) > facingAngleThreshold && !character->param_animation_ct->hasPABlend(idleTurnName.c_str()))
 	{
-		PABlend* idleTurnState = mcu.lookUpPABlend(idleTurnName.c_str());
+		PABlend* idleTurnState = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(idleTurnName.c_str());
 		std::vector<double> weights;
 		weights.resize(idleTurnState->getNumMotions());
 
@@ -1523,7 +1523,7 @@ float PPRAISteeringAgent::evaluateSteppingLoco(float dt, float x, float y, float
 		float offsetx = dot(agentToTargetVec, verticalHeading);
 		if (!character->param_animation_ct->hasPABlend(stepStateName.c_str()))
 		{
-			PABlend* stepState = mcu.lookUpPABlend(stepStateName.c_str());
+			PABlend* stepState = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stepStateName.c_str());
 			std::vector<double> weights;
 			weights.resize(stepState->getNumMotions());
 			stepState->getWeightsFromParameters(x, y, weights);
