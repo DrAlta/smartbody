@@ -724,7 +724,7 @@ void mcuCBHandle::clear( void )
 		deformableIter++)
 	{
 		DeformableMesh* deformableMesh = (*deformableIter).second;
-		delete deformableMesh;
+	//	delete deformableMesh;
 	}
 	deformableMeshMap.clear();
 	//SbmDeformableMeshGPU::initShader = false;
