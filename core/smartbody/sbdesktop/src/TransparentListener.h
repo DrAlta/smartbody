@@ -1,7 +1,8 @@
 #ifndef _TRANSPARENTLISTENER_H_
 #define _TRANSPARENTLISTENER_H_
 
-#include <sbm/mcontrol_util.h>
+#include <sb/SBCharacterListener.h>
+#include <sb/SBObserver.h>
 #include <sk/sk_scene.h>
 
 class TransparentListener : public SmartBody::SBCharacterListener, public SmartBody::SBObserver

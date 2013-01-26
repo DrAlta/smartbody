@@ -371,6 +371,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	// EDF - taken from tre_main.cpp, a fancier command line parser can be put here if desired.
 	//	check	command line parameters:
 	bool lock_dt_mode = false;
+	bool isInteractive = true;
 	int i;
 	SrString	s;
 	for (	i=1; i<argc; i++ )
@@ -517,11 +518,11 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		{
 			std::string mediaPath = (const char*) s;
 			mediaPath = mediaPath.substr(11);
-			mcu.setMediaPath(mediaPath);
+			SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
 		}
         else if ( s.search ("-noninteractive") == 0)
         {
-               mcu.setInteractive(false);
+              isInteractive = false;
         }
 		else if ( s.search ("-x") == 0)
         {
