@@ -5,42 +5,6 @@ include_directories(
 	../smartbody-dll/include
 )
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-find_library (COREAUDIO_LIBRARY CoreAudio)
-find_library (AUDIOUNIT_LIBRARY AudioUnit)
-find_library (CORESERVICES_LIBRARY CoreServices)
-find_library (LIBSNDFILE sndfile )
-find_library (ALUT alut )
-find_library (OPENAL openal)
-find_library (FESTIVAL Festival ../../lib/festival/festival/src/lib)
-find_library (ESTBASE estbase ../../lib/festival/speech_tools/lib)
-find_library (ESTSTRING eststring ../../lib/festival/speech_tools/lib)
-find_library (ESTOOLS estools ../../lib/festival/speech_tools/lib)
-endif()
-
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-set( MORE_LIBS
-        ${COREAUDIO_LIBRARY}
-        ${AUDIOUNIT_LIBRARY}
-        ${CORESERVICES_LIBRARY}
-        ${LIBSNDFILE}
-        ${ALUT}
-        ${OPENAL}
-        ${FESTIVAL}
-        ${ESTBASE}
-        ${ESTSTRING}
-        ${ESTOOLS}
-)
-else()
-set( MORE_LIBS
-        ${LIBSNDFILE}
-        ${ALUT}
-        ${OPENAL}
-)
-endif()
-
-
 
 set( SIMPLESMARTBODY_SRC
 
@@ -55,13 +19,10 @@ add_executable( simplesmartbody
 target_link_libraries( simplesmartbody 
 
 	smartbody-dll
-	activemq-cpp
+	pthread
 #	tcmalloc
 #	profiler
 #	${CMAKE_REQUIRED_LIBRARIES} 
-	ncurses
-	pthread
-	${MORE_LIBS}
 )
 
 set( EXEC_LIST
@@ -94,5 +55,5 @@ set_target_properties(
 
 install( 
 	TARGETS ${EXEC_LIST}
-	RUNTIME DESTINATION core/smartbody/simplesmartbody
+	RUNTIME DESTINATION core/smartbody/sbm/bin
 )
