@@ -180,7 +180,7 @@ scene.removeScript('physicsforcedemo')
 physicsforcedemo = PhysicsForceDemo()
 scene.addScript('physicsforcedemo', physicsforcedemo)
 
-class ReachingHandler(EventHandler):
+class ReachingHandler(SBEventHandler):
 	def executeAction(self, ev):
 		params = ev.getParameters()
 		if 'brad1' in params and 'reach-complete' in params:

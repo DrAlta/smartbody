@@ -1,7 +1,9 @@
 
 
 def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :	
-	testMotion = scene.getMotion(motionName);
+	testMotion = scene.getMotion(motionName)
+	if testMotion is None:
+		return
 	outMotionName = tgtSkelName + motionName		
 	existMotion = scene.getMotion(outMotionName)
 	if existMotion != None : # do nothing if the retargeted motion is already there

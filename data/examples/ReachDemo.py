@@ -200,7 +200,7 @@ scene.removeScript('reachdemo')
 reachdemo = ReachDemo()
 scene.addScript('reachdemo', reachdemo)
 
-class ReachingHandler(EventHandler):
+class ReachingHandler(SBEventHandler):
 	def executeAction(self, ev):
 		params = ev.getParameters()
 		global area1PickUp, area1PutDown, area2PickUp, area2PutDown, moving

@@ -24,7 +24,8 @@
 #include "sr/sr_euler.h"
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
-#include <boost/algorithm/string.hpp>    
+#include <boost/algorithm/string.hpp>
+#include <boost/tokenizer.hpp>
 #include <algorithm>
 #include <cctype>
 #include <string>
@@ -46,6 +47,7 @@
 
 bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::string pathName, float scale, bool doParseSkeleton, bool doParseMotion)
 {
+	
 	try 
 	{
 		XMLPlatformUtils::Initialize();
@@ -100,7 +102,8 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 			}
 		}
 
-		DOMNode* skNode = getNode("library_visual_scenes", doc);
+		int depth = 0;
+		DOMNode* skNode = getNode("library_visual_scenes", doc, depth, 2);
 		if (!skNode)
 		{
 			LOG("ParserOpenCOLLADA::parse ERR: no skeleton info contained in this file");
@@ -128,7 +131,8 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 			}
 		}		
 		skeleton.updateGlobalMatricesZero();
-		DOMNode* skmNode = getNode("library_animations", doc);
+		depth = 0;
+		DOMNode* skmNode = getNode("library_animations", doc, depth, 1);
 		if (!skmNode)
 		{
 		//	LOG("ParserOpenCOLLADA::parse WARNING: no motion info contained in this file");
@@ -188,12 +192,12 @@ void ParserOpenCOLLADA::getChildNodes(const std::string& nodeName, DOMNode* node
 DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, DOMNode* node)
 {
 	int type = node->getNodeType();
-	std::string name;
-	xml_utils::xml_translate(&name, node->getNodeName());
-	std::string value;
-	xml_utils::xml_translate(&value, node->getNodeValue());
-	if (name == nodeName && node->getNodeType() ==  DOMNode::ELEMENT_NODE)
-		return node;
+	if (type ==  DOMNode::ELEMENT_NODE)
+	{
+		std::string name = XMLString::transcode(node->getNodeName());
+		if (name == nodeName)
+			return node;
+	}
 
 	DOMNode* child = NULL;
 	const DOMNodeList* list = node->getChildNodes();
@@ -205,6 +209,88 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, DOMNode* node)
 	}
 	return child;
 }
+
+DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, DOMNode* node, int& curDepth, int maximumDepth)
+{
+	int type = node->getNodeType();
+	if (type ==  DOMNode::ELEMENT_NODE)
+	{
+		std::string name = XMLString::transcode(node->getNodeName());
+		if (name == nodeName)
+			return node;
+	}
+
+	if (maximumDepth > -1 &&
+		curDepth >= maximumDepth)
+		return NULL;
+
+	curDepth++;
+	
+
+	DOMNode* child = NULL;
+	const DOMNodeList* list = node->getChildNodes();
+	for (unsigned int c = 0; c < list->getLength(); c++)
+	{
+		child = getNode(nodeName, list->item(c), curDepth, maximumDepth);
+		if (child)
+			break;
+	}
+	return child;
+}
+
+DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, std::string fileName, int maximumDepth)
+{
+	try 
+	{
+		XMLPlatformUtils::Initialize();
+	}
+	catch (const XMLException& toCatch) 
+	{
+		std::string message = "";
+		xml_utils::xml_translate(&message, toCatch.getMessage());
+		std::cout << "Error during initialization! :\n" << message << "\n";
+		return NULL;
+	}
+
+	XercesDOMParser* parser = new XercesDOMParser();
+	parser->setValidationScheme(XercesDOMParser::Val_Always);
+	parser->setDoNamespaces(true);    // optional
+
+	ErrorHandler* errHandler = (ErrorHandler*) new HandlerBase();
+	parser->setErrorHandler(errHandler);
+
+	try 
+	{
+		std::string filebasename = boost::filesystem::basename(fileName);
+		parser->parse(fileName.c_str());
+		DOMDocument* doc = parser->getDocument();
+		
+		int depth = 0;
+		return getNode(nodeName, doc, depth, maximumDepth);
+	}
+	catch (const XMLException& toCatch) 
+	{
+		std::string message = "";
+		xml_utils::xml_translate(&message, toCatch.getMessage());
+		LOG("Exception message is: %s", message.c_str());
+		return NULL;
+	}
+	catch (const DOMException& toCatch) {
+		std::string message = "";
+		xml_utils::xml_translate(&message, toCatch.msg);
+		LOG("Exception message is: %s", message.c_str());
+		return NULL;
+	}
+		catch (...) {
+		LOG("Unexpected Exception in ParserOpenCOLLADA::getNode()");
+		return NULL;
+	}
+
+	delete parser;
+	delete errHandler;
+	return NULL;
+}
+
 
 DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, std::string fileName)
 {
@@ -232,6 +318,7 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, std::string fil
 		std::string filebasename = boost::filesystem::basename(fileName);
 		parser->parse(fileName.c_str());
 		DOMDocument* doc = parser->getDocument();
+		
 		return getNode(nodeName, doc);
 	}
 	catch (const XMLException& toCatch) 
@@ -298,6 +385,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 
 			DOMNode* typeNode = childAttr->getNamedItem(BML::BMLDefs::ATTR_TYPE);
 			std::string typeAttr = "";
+			
 			DOMNode* tempMaterialNode = ParserOpenCOLLADA::getNode("bind_material", childNode);
 			if (typeNode)
 				xml_utils::xml_translate(&typeAttr, typeNode->getNodeValue());
@@ -1383,17 +1471,37 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 					std::transform(idString.begin(), idString.end(), idString.begin(), ::tolower);
 					std::string idType = getGeometryType(idString);
 					// below is a faster way to parse all the data, have potential bug
-					DOMNode* floatNode = ParserOpenCOLLADA::getNode("float_array", node1);					
+					DOMNode* floatNode = ParserOpenCOLLADA::getNode("float_array", node1);			
 					DOMNode* countNode = floatNode->getAttributes()->getNamedItem(BML::BMLDefs::ATTR_COUNT);				
-					DOMNode* accessorNode = ParserOpenCOLLADA::getNode("accessor", node1);	
+					DOMNode* accessorNode = ParserOpenCOLLADA::getNode("accessor", node1);
 					DOMNode* strideNode = accessorNode->getAttributes()->getNamedItem(BML::BMLDefs::ATTR_STRIDE);
 					int count = xml_utils::xml_translate_int(countNode->getNodeValue());
 					int stride = xml_utils::xml_translate_int(strideNode->getNodeValue());				
 					//int strde = atoi()		
 					std::string floatString;
 					xml_utils::xml_translate(&floatString, floatNode->getTextContent());
+
+					boost::char_separator<char> sep(" \n");
+					boost::tokenizer<boost::char_separator<char> > tokens(floatString, sep);
+					int i = 0;
+					floatArrayMap[sourceID] = std::vector<SrVec>();			
+					for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
+							it != tokens.end();
+							)
+					{
+						int nstep = stride > 3 ? 3 : stride;
+						SrVec tempV;
+						for (int k=0;k<nstep;k++)
+						{
+							tempV[k] = (float)atof((*it).c_str());
+							it++;
+						}
+						floatArrayMap[sourceID].push_back(tempV);
+					}
+					/*
 					std::vector<std::string> tokens;
 					vhcl::Tokenize(floatString, tokens, " \n");
+					
 					floatArrayMap[sourceID] = std::vector<SrVec>();					
 					for (int i=0; i< count ; i+= stride)
 					{
@@ -1405,6 +1513,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 						}
 						floatArrayMap[sourceID].push_back(tempV);
 					}
+					*/
 
 
 #if 0
@@ -1793,7 +1902,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 			diffuseTexture = "";
 			normalTexture = "";
 			specularTexture = "";
-			DOMNode* diffuseNode = ParserOpenCOLLADA::getNode("diffuse",node);			
+			DOMNode* diffuseNode = ParserOpenCOLLADA::getNode("diffuse",node);
 			DOMNode* bumpNode = ParserOpenCOLLADA::getNode("bump",node);
 			DOMNode* specularNode = ParserOpenCOLLADA::getNode("specularLevel",node);
 			if (diffuseNode)
@@ -1900,7 +2009,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 						
 					if (opaqueMode == "RGB_ZERO")
 					{
-						DOMNode* colorNode = ParserOpenCOLLADA::getNode("color", transparentNode);				
+						DOMNode* colorNode = ParserOpenCOLLADA::getNode("color", transparentNode);		
 						std::string color;
 						if (colorNode)
 						{
