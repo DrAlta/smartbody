@@ -1636,12 +1636,12 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p
 	}
 	else if (ext == ".dae" || ext == ".DAE")// || ext == ".xml" || ext == ".XML")
 	{
-		DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file);
+		DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file, 2);
 		if (geometryNode)
 		{
 			// first from library visual scene retrieve the material id to name mapping (TODO: needs reorganizing the assets management)
 			std::map<std::string, std::string> materialId2Name;
-			DOMNode* visualSceneNode = ParserOpenCOLLADA::getNode("library_visual_scenes", obj_file);
+			DOMNode* visualSceneNode = ParserOpenCOLLADA::getNode("library_visual_scenes", obj_file, 2);
 			if (!visualSceneNode)
 				LOG("mcu_character_load_mesh ERR: .dae file doesn't contain correct geometry information.");
 			SkSkeleton skeleton;
@@ -1651,13 +1651,13 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p
 
 			// get picture id to file mapping
 			std::map<std::string, std::string> pictureId2File;
-			DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", obj_file);
+			DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", obj_file, 2);
 			if (imageNode)
 				ParserOpenCOLLADA::parseLibraryImages(imageNode, pictureId2File);
 
 			// start parsing mateiral
 			std::map<std::string, std::string> effectId2MaterialId;
-			DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", obj_file);
+			DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", obj_file, 2);
 			if (materialNode)
 				ParserOpenCOLLADA::parseLibraryMaterials(materialNode, effectId2MaterialId);
 
@@ -1667,7 +1667,7 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p
 			std::map<std::string,std::string> mtlTextMap;
 			std::map<std::string,std::string> mtlTextBumpMap;
 			std::map<std::string,std::string> mtlTextSpecularMap;
-			DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", obj_file);
+			DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", obj_file, 2);
 			if (effectNode)
 			{
 				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
@@ -1773,12 +1773,13 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 	}
 	else if (ext == ".dae" || ext == ".DAE" || ext == ".xml" || ext == ".XML")
 	{
-		DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file);
+		DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file, 2);
 		if (geometryNode)
 		{
 			// first from library visual scene retrieve the material id to name mapping (TODO: needs reorganizing the assets management)
 			std::map<std::string, std::string> materialId2Name;
-			DOMNode* visualSceneNode = ParserOpenCOLLADA::getNode("library_visual_scenes", obj_file);
+			
+			DOMNode* visualSceneNode = ParserOpenCOLLADA::getNode("library_visual_scenes", obj_file, 2);
 			if (!visualSceneNode)
 				LOG("mcu_character_load_mesh ERR: .dae file doesn't contain correct geometry information.");
 			SkSkeleton skeleton;
@@ -1788,13 +1789,15 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 
 			// get picture id to file mapping
 			std::map<std::string, std::string> pictureId2File;
-			DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", obj_file);
+			
+			DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", obj_file, 2);
 			if (imageNode)
 				ParserOpenCOLLADA::parseLibraryImages(imageNode, pictureId2File);
 
 			// start parsing mateiral
 			std::map<std::string, std::string> effectId2MaterialId;
-			DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", obj_file);
+			
+			DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", obj_file, 2);
 			if (materialNode)
 				ParserOpenCOLLADA::parseLibraryMaterials(materialNode, effectId2MaterialId);
 
@@ -1804,7 +1807,8 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 			std::map<std::string,std::string> mtlTextMap;
 			std::map<std::string,std::string> mtlTextBumpMap;
 			std::map<std::string,std::string> mtlTextSpecularMap;
-			DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", obj_file);
+			
+			DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", obj_file, 2);
 			if (effectNode)
 			{
 				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
@@ -2184,7 +2188,8 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 
 		if (ext == ".dae" || ext == ".DAE")
 		{
-			DOMNode* controllerNode = ParserOpenCOLLADA::getNode("library_controllers", doc);		
+			int depth = 0;
+			DOMNode* controllerNode = ParserOpenCOLLADA::getNode("library_controllers", doc, depth, 2);		
 			if (!controllerNode)
 			{
 				LOG("mcu_character_load_skinweights ERR: no binding info contained");

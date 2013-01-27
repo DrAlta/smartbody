@@ -107,7 +107,7 @@ locomotiondemo = LocomotionDemo()
 scene.addScript('locomotiondemo', locomotiondemo)
 
 # Locomotion handler to check if characters have arrived
-class LocomotionHandler(EventHandler):
+class LocomotionHandler(SBEventHandler):
 	def executeAction(self, ev):
 		global brad1Reached, brad2Reached, brad3Reached
 		params = ev.getParameters()

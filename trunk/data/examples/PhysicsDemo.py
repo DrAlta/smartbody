@@ -217,7 +217,7 @@ def boxingLogic():
 			#bml.execBML('brad2', '<animation name="ChrUtah_Relax001_CrouchProtectHead_right"/>')
 		currentTurn = 'brad2'
 		
-class CollisionHandler(EventHandler):
+class CollisionHandler(SBEventHandler):
 	def executeAction(self, ev):
 		params = ev.getParameters()
 		list = params.split()

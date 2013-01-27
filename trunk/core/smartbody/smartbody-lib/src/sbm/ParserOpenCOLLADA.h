@@ -56,7 +56,9 @@ class ParserOpenCOLLADA
 {
 	public:
 		static void getChildNodes(const std::string& nodeName, DOMNode* node, std::vector<DOMNode*>& childs );
+		static DOMNode* getNode(const std::string& nodeName, DOMNode* node, int& curDepth, int maximumDepth);
 		static DOMNode* getNode(const std::string& nodeName, DOMNode* node);
+		static DOMNode* getNode(const std::string& nodeName, std::string fileName, int maximumDepth);
 		static DOMNode* getNode(const std::string& nodeName, std::string fileName);
 		static std::string getNodeAttributeString(DOMNode* node, XMLCh* attrName);
 		static int         getNodeAttributeInt(DOMNode* node, XMLCh* attrName);

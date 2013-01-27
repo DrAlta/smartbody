@@ -40,7 +40,7 @@ SBEventManager::~SBEventManager()
 		 iter++)
 	{
 		SBEventHandler* handler = (*iter).second;
-		delete handler;
+//		delete handler;
 	}
 }
 

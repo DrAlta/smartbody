@@ -42,7 +42,7 @@ scene.run('init-diphoneDefault.py')
 # Set up animation
 print 'Setting up animation'
 scene.run('init-param-animation.py')
-
+''
 # Set up retargeting
 print 'Setting up retargeting'
 scene.run('motion-retarget.py')

@@ -458,6 +458,9 @@ void SBScene::update()
 void SBScene::setScale(float val)
 {
 	_scale = val;
+
+	DoubleAttribute* scaleAttribute = dynamic_cast<DoubleAttribute*>(getAttribute("scale"));
+	scaleAttribute->setValueFast(_scale);
 }
 
 float SBScene::getScale()

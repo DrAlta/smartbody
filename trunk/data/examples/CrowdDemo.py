@@ -114,7 +114,7 @@ scene.addScript('crowddemo', crowddemo)
 
 reachCount = 0
 # Locomotion handler to check if characters have arrived
-class LocomotionHandler(EventHandler):
+class LocomotionHandler(SBEventHandler):
 	def executeAction(self, ev):
 		global bradReached, reachCount
 		params = ev.getParameters()
