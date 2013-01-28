@@ -103,6 +103,7 @@ void main()\n \
 
 std::string shaderVS_2 = 
 "uniform mat4 Transform[140]; \n\
+uniform int  updateNormal;\n\
 attribute vec4 BoneID1,BoneID2;   \n\
 attribute vec4 BoneWeight1,BoneWeight2;\n \
 attribute vec3 tangent, binormal;\n\
@@ -160,9 +161,17 @@ halfVector[i] = normalize(hv);\n\
 }\n\
 int colorIdx = int(gl_Vertex.w); \n\
 gl_TexCoord[0] = gl_MultiTexCoord0;\n\
-normal = normalize(gl_NormalMatrix * skin[1].xyz);\n\
-tv     = normalize(gl_NormalMatrix * skin[2].xyz);\n\
-bv     = normalize(gl_NormalMatrix * skin[3].xyz);\n\
+//if (useNormalMap == 1 )\n\
+//{\n\
+//normal = normalize(gl_NormalMatrix * skin[1].xyz);\n\
+//tv     = normalize(gl_NormalMatrix * skin[2].xyz);\n\
+//bv     = normalize(gl_NormalMatrix * skin[3].xyz);\n\
+//}\n\
+//else {\n\
+normal = normalize(gl_NormalMatrix * gl_Normal.xyz);\n\
+tv     = normalize(gl_NormalMatrix * tangent.xyz);\n\
+bv     = normalize(gl_NormalMatrix * binormal.xyz);\n\
+//}\n\
 }\n";
 
 std::string shaderBasicFS =
@@ -246,6 +255,78 @@ void main (void)\n\
 	//gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n\
 }";
 
+/*
+std::string shaderFSSimple =
+	"const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.f)*(vec3(0.2,0.2,0.2));\n\
+	uniform sampler2D diffuseTexture;\n\
+	uniform sampler2D tex;\n\
+	uniform int  useTexture;\n\
+	uniform int  useShadowMap;\n\
+	varying vec3 normal,lightDir[4],halfVector[4];\n\
+	varying vec3 tv,bv;\n\
+	varying vec4 vPos;\n\
+	uniform vec4 diffuseMaterial;\n\
+	uniform vec4 specularMaterial;\n\
+	uniform float  shineness;\n\
+	//uniform vec3 specularColors;\n\
+	varying float dist[2];\n\
+	float shadowCoef()\n\
+	{\n\
+	int index = 0;\n\
+	vec4 shadow_coord = vPos/vPos.w;\n\
+	shadow_coord.z += 0.000005;\n\
+	float shadow_d = texture2D(tex, shadow_coord.st).x;\n\
+	float diff = 1.0;\n\
+	diff = (shadow_d - shadow_coord.z);\n\
+	return clamp( diff*850.0 + 1.0, 0.0, 1.0);//(shadow_d-0.9)*10;//clamp( diff*250.0 + 1.0, 0.0, 1.0);\n\
+	}\n\
+	void main (void)\n\
+	{  \n\
+	vec3 n,halfV;\n\
+	float NdotL,NdotHV;\n\
+	float att;\n\
+	vec4 color = vec4(ambient,1.0);	\n\
+	vec3 newtv = normalize(tv - bv*dot(tv,bv));\n\
+	vec3 newbv = normalize(bv);\n\
+	vec3 newn  = normalize(normal);//normalize(cross(tv,bv));\n\
+	vec4 texColor = texture2D(diffuseTexture,gl_TexCoord[0].st);\n\
+	vec3 normalColor = normalize(texture2D(normalTexture,gl_TexCoord[0].st).xyz* 2.0 - 1.0);\n\
+	vec3 normalMapN = normalize(-newtv*normalColor.x-newbv*normalColor.y+newn*normalColor.z); \n\
+	vec3 specularColor = texture2D(specularTexture, gl_TexCoord[0].st).xyz;\n\
+	vec3 specMat = specularMaterial.rgb;\n\
+	if (useTexture == 0) \n\
+	texColor = diffuseMaterial;//vec4(matColor,1.0);\n\
+	color.a = texColor.a*diffuseMaterial.a;\n\
+	n = normalize(normal);\n\
+	if (useNormalMap == 1 && dot(normalMapN,n) > 0.0)\n\
+	{\n\
+	n = normalMapN;\n\
+	}\n\
+	if (useSpecularMap == 1)\n\
+	specMat = specularColor;\n\
+	float shadowWeight = 1.0;\n\
+	if (useShadowMap == 1)\n\
+	{\n\
+	shadowWeight = shadowCoef();\n\
+	}\n\
+	for (int i=0;i<4;i++)\n\
+	{\n\
+	att = 1.0/(gl_LightSource[i].constantAttenuation + gl_LightSource[i].linearAttenuation * dist[i] + gl_LightSource[i].quadraticAttenuation * dist[i] * dist[i]);	\n\
+	NdotL = max(dot(n,lightDir[i]),0.0);\n\
+	if (NdotL > 0.0) {\n\
+	//color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0)*att;\n\
+	color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0);\n\
+	halfV = normalize(halfVector[i]);\n\
+	NdotHV = max(dot(n,halfV),0.0);\n\
+	color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0);\n\
+	//color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0)*att;\n\
+	}   \n\
+	}\n\
+	const float shadow_ambient = 1.0;\n\
+	gl_FragColor = vec4(color.rgb*shadowWeight*shadow_ambient,color.a);//color*shadow_ambient*shadowWeight;//vec4(color.rgb*shadowWeight,color.a);//color*shadowWeight;\n\
+	//gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n\
+	}";
+*/
 
 typedef std::pair<int,int> IntPair;
 

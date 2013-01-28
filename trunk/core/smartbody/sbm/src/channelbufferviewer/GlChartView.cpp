@@ -103,14 +103,14 @@ void GlChartView::initFont()
 	GLuint textureName;	
 	glEnable(GL_TEXTURE_2D);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glGenTextures(0, &textureName);
+	glGenTextures(1, &textureName);
 
 #ifdef WIN32
 	std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
 	std::string fontPath = mediaPath + "/" +  "fonts/font.glf";
-	if (!label.Create(fontPath.c_str(), 0))
+	if (!label.Create(fontPath.c_str(), textureName))
 	{
-		if(!label.Create(".font.glf", 0))
+		if(!label.Create(".font.glf", textureName))
 			LOG("GlChartViewCoordinate::InitFont(): Error: Cannot load font file\n");
 	}
 #endif
@@ -123,7 +123,7 @@ void GlChartView::init_camera(int type)
 	camera.init();
 	camera.setAspectRatio((float)w()/(float)h());
 	coordinate.Update((float)w(), (float)h(), camera);
-	camera.setEye(coordinate.GetXScale()/2, 2000.0f, 0.0f);
+	camera.setEye(coordinate.GetXScale()/2, 0.0f, 2000.0f);
 	camera.setCenter(coordinate.GetXScale()/2, 0.0f, 0.0f);
 	automatic_scale = true;
 	if(type == 0) 
