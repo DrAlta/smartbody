@@ -878,6 +878,8 @@ int main( int argc, char **argv )	{
 
 	while( mcu.loop )	{
 
+
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		mcu.update_profiler();
 //		mcu.update_profiler( SBM_get_real_time() );
 		bool update_sim = mcu.update_timer();
@@ -897,7 +899,7 @@ int main( int argc, char **argv )	{
 
 		vector<string> commands;// = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
-			SmartBody::SBScene::getScene()->command( (char *)commands[i].c_str() );
+			scene->command( (char *)commands[i].c_str() );
 		}
 
 		if (isInteractive)
@@ -919,7 +921,7 @@ int main( int argc, char **argv )	{
 					if (mcu.use_python) {
 						result = mcu.executePython(cmd);
 					} else {
-						result = SmartBody::SBScene::getScene()->command(cmd);
+						result = scene->command(cmd);
 					}
 
 					switch( result ) {
@@ -980,10 +982,10 @@ int main( int argc, char **argv )	{
 			if (fabs(jointGmat[13] - mcu.cameraTracking[x]->yPos) < mcu.cameraTracking[x]->threshold)
 				newJointLoc.y = (float)mcu.cameraTracking[x]->yPos;
 			SrVec cameraLoc = newJointLoc + mcu.cameraTracking[x]->jointToCamera;
-			mcu.camera_p->setEye(cameraLoc.x, cameraLoc.y, cameraLoc.z);
+			SrCamera* activeCamera = scene->getActiveCamera();
+			activeCamera->setEye(cameraLoc.x, cameraLoc.y, cameraLoc.z);
 			SrVec targetLoc = cameraLoc - mcu.cameraTracking[x]->targetToCamera;
-			mcu.camera_p->setCenter(targetLoc.x, targetLoc.y, targetLoc.z);
-			mcu.viewer_p->set_camera(mcu.camera_p);
+			activeCamera->setCenter(targetLoc.x, targetLoc.y, targetLoc.z);
 		}	
 
 		BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(mcu.viewer_p);
