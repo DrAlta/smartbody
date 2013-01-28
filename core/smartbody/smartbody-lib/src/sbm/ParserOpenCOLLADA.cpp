@@ -1656,10 +1656,20 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 					DOMNode* pNode = ParserOpenCOLLADA::getNode("p", node1);
 					std::string pString;
 					xml_utils::xml_translate(&pString, pNode->getTextContent());
+
+					/*
 					std::vector<std::string> tokens;
 					vhcl::Tokenize(pString, tokens, " \n");
 					int index = 0;
+					for (int i = 0; i < count; i++)
+					{
+					*/
+
 					pStride += 1;
+					boost::char_separator<char> sep(" \n");
+					boost::tokenizer<boost::char_separator<char> > tokens(pString, sep);
+					boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
+					int index = 0;
 					for (int i = 0; i < count; i++)
 					{
 						std::vector<int> fVec;
@@ -1673,15 +1683,16 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 								if (semantic == "VERTEX")
 								{
 									if (vertexSemantics.find("POSITION") != vertexSemantics.end())																								
-										fVec.push_back(atoi(tokens[index].c_str()));
+										fVec.push_back(atoi((*it).c_str()));
 									if (vertexSemantics.find("NORMAL") != vertexSemantics.end())
-										fnVec.push_back(atoi(tokens[index].c_str()));									
+										fnVec.push_back(atoi((*it).c_str()));									
 								}
 								if (semantic == "TEXCOORD")
-									ftVec.push_back(atoi(tokens[index].c_str()));
+									ftVec.push_back(atoi((*it).c_str()));
 
 								if (semantic == "NORMAL" && vertexSemantics.find("NORMAL") == vertexSemantics.end())
-									fnVec.push_back(atoi(tokens[index].c_str()));
+									fnVec.push_back(atoi((*it).c_str()));
+								it++;
 								index++;
 							}
 						}
@@ -1701,9 +1712,10 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 								newModel->Fn.push().set(0, 1, 0);
 						}
 					}
-
+					/*
 					if (tokens.size() != index)
 						LOG("ParserOpenCOLLADA::parseLibraryGeometries ERR: parsing <p> list uncorrectly (%s)!", nameAttr.c_str());
+						*/
 				}
 			}
 
