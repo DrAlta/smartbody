@@ -67,18 +67,18 @@ void GlChartViewCoordinate::SetXSize(float size)
 }
 
 void GlChartViewCoordinate::InitFont()
-{
+{	
 	GLuint textureName;	
 	glEnable(GL_TEXTURE_2D);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glGenTextures(0, &textureName);
+	glGenTextures(1, &textureName);
 
 #ifdef WIN32
 	std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
 	std::string fontPath = mediaPath + "/" +  "fonts/font.glf";
-	if (!label.Create(fontPath.c_str(), 0))
+	if (!label.Create(fontPath.c_str(), textureName))
 	{
-		if(!label.Create(".font.glf", 0))
+		if(!label.Create(".font.glf", textureName))
 			LOG("GlChartViewCoordinate::InitFont(): Error: Cannot load font file\n");
 	}
 #endif

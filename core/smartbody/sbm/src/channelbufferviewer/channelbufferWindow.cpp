@@ -840,24 +840,24 @@ void ChannelBufferWindow::update()
 		if (character->size() == 0)
 			return;
 
-		SmartBody::SBPawn* pawn_p = NULL;
+		SmartBody::SBCharacter* char_p = NULL;
 		SmartBody::SBCharacter* actor = SmartBody::SBScene::getScene()->getCharacter(character->mvalue()->label());
-		std::vector<std::string> pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
-		for (size_t i = 0; i < pawnNames.size(); i++)
+		std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+		for (size_t i = 0; i < charNames.size(); i++)
 		{
-			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnNames[i]);
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charNames[i]);
 			const char* name = getSelectedCharacterName();
-			if( name && strcmp(pawn->getName().c_str(), name) == 0)
+			if( name && strcmp(character->getName().c_str(), name) == 0)
 			{
-				pawn_p = pawn;
+				char_p = character;
 				break;
 			}
 		}
-		if(pawn_p != NULL)
+		if(char_p != NULL)
 		{
 			if(mode != 2)
 			{
-				SrBuffer<float>& buffer = pawn_p->ct_tree_p->getLastFrame().buffer();
+				SrBuffer<float>& buffer = char_p->ct_tree_p->getLastFrame().buffer();
 				chartview->get_archive()->Update(buffer);
 			}
 			if(mode == 1)
