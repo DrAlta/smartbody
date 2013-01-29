@@ -92,7 +92,7 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 		{
 			mcu.root_group_p->remove( character->dMesh_p->dMeshDynamic_p[i] );
 		}
-		delete character->dMesh_p;
+		//delete character->dMesh_p; // AS 1/28/13 causing crash related to mesh instances
 		character->dMesh_p = NULL;
 	}
 #if 1 //!USE_OGRE_VIEWER
