@@ -6,7 +6,6 @@ def setupSteerAgent(charName, prefix):
 	steerAgent.setSteerStateNamePrefix(prefix)
 	steerAgent.setSteerType("example")
 	sbCharacter = scene.getCharacter(charName)
-	sbCharacter.setSteerAgent(steerAgent)
 	
 
 
