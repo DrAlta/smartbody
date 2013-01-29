@@ -40,6 +40,9 @@
 #include <iostream>
 #include <string>
 #include <boost/tokenizer.hpp>
+#include <sb/SBScene.h>
+#include <sb/SBMotion.h>
+#include <sb/SBAssetManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBBoneBusManager.h>
@@ -578,10 +581,11 @@ std::string tokenize( std::string& str,
 double parseMotionParameters(std::string m, std::string parameter, double min, double max)
 {
 	std::string skeletonName = tokenize(parameter, "|");
-	SkSkeleton* sk = NULL;
+	SmartBody::SBSkeleton* sk = NULL;
 	if (parameter != "")
 	{
-		std::map<std::string, SkSkeleton*>::iterator iter = mcuCBHandle::singleton().skeleton_map.find(skeletonName);
+
+		std::map<std::string, SmartBody::SBSkeleton*>::iterator iter = mcuCBHandle::singleton().skeleton_map.find(skeletonName);
 		if (iter != mcuCBHandle::singleton().skeleton_map.end())
 			sk = iter->second;
 		else
@@ -605,7 +609,7 @@ double parseMotionParameters(std::string m, std::string parameter, double min, d
 	if (parameter == "avgrooty")
 		type = 7;
 	if (!sk) return -9999;
-	MotionParameters mParam(mcuCBHandle::singleton().lookUpMotion(m.c_str()), sk, "base");
+	MotionParameters mParam(SmartBody::SBScene::getScene()->getAssetManager()->getMotion(m), sk, "base");
 	mParam.setFrameId(min, max);
 	return mParam.getParameter(type);
 }
@@ -623,13 +627,13 @@ int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 			return CMD_FAILURE;
 		}
 		
-		SkSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);	
+		SmartBody::SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);	
 		if (!skeleton)
 		{
 			LOG("No skeleton named '%s' found. Cannot mirror motion %s.", skeletonName.c_str(), refMotionName.c_str());
 			return CMD_FAILURE;
 		}
-		SkMotion* refMotion = mcu_p->lookUpMotion(refMotionName.c_str());
+		SmartBody::SBMotion* refMotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(refMotionName);
 		if (!refMotion)
 		{
 			LOG("No motion named '%s' found. Cannot mirror motion %s.", refMotionName.c_str(), refMotionName.c_str());
@@ -638,12 +642,13 @@ int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 		if (refMotion && skeleton)
 		{
 #if 1
-			std::map<std::string, SkMotion*>& map = mcu_p->motion_map;
 			SkMotion* mirrorMotion = refMotion->buildMirrorMotion(skeleton);
 			if (mirrorMotionName == EMPTY_STRING)
 				mirrorMotionName = refMotionName + "_mirror";
 			mirrorMotion->setName(mirrorMotionName.c_str());
-			map.insert(std::pair<std::string, SkMotion*>(mirrorMotionName, mirrorMotion));			
+
+			SmartBody::SBMotion* sbmotion = dynamic_cast<SmartBody::SBMotion*>(mirrorMotion);
+			SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);			
 #endif
 			return CMD_SUCCESS;
 		}		
@@ -706,10 +711,11 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				for (int i = 0; i < numMotions; i++)
 				{
 					std::string motionName = args.read_token();
-					std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motionName);
-					if (iter == mcu_p->motion_map.end())
+					SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+
+					if (!motion)
 						return CMD_FAILURE;
-					newState->motions.push_back(iter->second);
+					newState->motions.push_back(motion);
 				}
 				int numKeys = args.read_int();
 				for (int i = 0; i < numMotions; i++)
@@ -2271,14 +2277,14 @@ int mcu_character_init(
 	}
 
 	//SbmCharacter *char_p = new SbmCharacter(char_name);
-	SmartBody::SBCharacter *char_p = new SmartBody::SBCharacter(char_name, className);
+	SmartBody::SBCharacter* char_p = new SmartBody::SBCharacter(char_name, className);
 	mcu_p->registerCharacter(char_p);
-	SkSkeleton* skeleton_p = NULL;
+	SmartBody::SBSkeleton* skeleton_p = NULL;
 	// does the skeleton already exist in the skeleton map?
-	std::map<std::string, SkSkeleton*>::iterator skelIter = mcu_p->skeleton_map.find(skel_file);
+	std::map<std::string, SmartBody::SBSkeleton*>::iterator skelIter = mcu_p->skeleton_map.find(skel_file);
 	if (skelIter ==  mcu_p->skeleton_map.end())
 	{
-		SkSkeleton* cachedSkeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->skScale );
+		SmartBody::SBSkeleton* cachedSkeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->skScale );
 		if( !cachedSkeleton ) {
 			LOG( "init_character ERR: Failed to load skeleton \"%s\"\n", skel_file ); 
 			mcu_p->unregisterCharacter(char_p);
@@ -2287,7 +2293,7 @@ int mcu_character_init(
 			return CMD_FAILURE;
 		}
 		cachedSkeleton->ref();
-		mcu_p->skeleton_map.insert(std::pair<std::string, SkSkeleton*>(skel_file, cachedSkeleton));
+		mcu_p->skeleton_map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(skel_file, cachedSkeleton));
 		skelIter = mcu_p->skeleton_map.find(skel_file);
 	}
 
@@ -2530,11 +2536,10 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 		if (motion_name.size() > 0)
 		{
-			std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(motion_name);
-			if (motionIter != mcu_p->motion_map.end())
+			SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motion_name);
+			if (motion)
 			{
-				SkMotion* motion_p = (*motionIter).second;
-				faceDefinition->setFaceNeutral(motion_p->getName());
+				faceDefinition->setFaceNeutral(motion->getName());
 				return CMD_SUCCESS;
 			} else {
 				LOG("ERROR: Unknown motion \"%s\".", motion_name.c_str());
@@ -3143,57 +3148,7 @@ int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 /////////////////////////////////////////////////////////////
 
-/*
 
-	load ME | content <me-file>
-	load motion <file-path> [-R]
-	load skeleton <file-path> [-R]
-	load pose <file-path> [-R]
-*/
-
-int mcu_load_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
-	if( mcu_p )	{
-		char *load_cmd = args.read_token();
-		
-		if( strcmp( load_cmd, "motion" )==0 ||
-		    strcmp( load_cmd, "motions" )==0 )
-		{
-			const char* token = args.read_token();
-
-			bool recursive = false;
-			if( strcmp( token, "-R" )==0 ) {
-				recursive = true;
-				token = args.read_token();
-			}
-			return mcu_p->load_motions( token, recursive );
-		} else if( strcmp( load_cmd, "pose" )==0 ||
-		           strcmp( load_cmd, "poses" )==0 )
-		{
-			const char* token = args.read_token();
-
-			bool recursive = false;
-			if( strcmp( token, "-R" )==0 ) {
-				recursive = true;
-				token = args.read_token();
-			}
-			return mcu_p->load_poses( token, recursive);
-		} else if( strcmp( load_cmd, "skeleton" )==0 ||
-		           strcmp( load_cmd, "skeletons" )==0 )
-		{
-			const char* token = args.read_token();
-
-			bool recursive = false;
-			if( strcmp( token, "-R" )==0 ) {
-				recursive = true;
-				token = args.read_token();
-			}
-			return mcu_p->load_skeletons( token, recursive );
-		}
-
-		return( CMD_NOT_FOUND );
-	}
-	return( CMD_FAILURE );
-}
 
 /*
 
@@ -4049,11 +4004,8 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 
 		SbmCharacter* character = mcu_p->getCharacter(charName);
-		SkMotion* motion;
-		std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.find(motionName);
-		if (motionIter != mcu_p->motion_map.end())
-			motion = motionIter->second;
-		else
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+		if (!motion)
 		{
 			LOG("mcu_check_func ERR: Motion %s NOT EXIST!", motionName);
 			return CMD_FAILURE;
@@ -4219,7 +4171,7 @@ int mcu_adjust_motion_function( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		std::string motionName = args.read_token();
 		std::string charName = args.read_token();
-		SkMotion* motion = mcu_p->lookUpMotion(motionName.c_str());
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 		if (!motion)
 		{
 			LOG("mcu_adjust_motion_function ERR: motion %s not found!", motionName.c_str());
@@ -4327,14 +4279,13 @@ int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 	// find the motion
 	std::string motionName = tok;
-	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motionName);
-	if (iter == mcu_p->motion_map.end())
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+	if (!motion)
 	{
 		LOG("Motion %s not found, no event added.", motionName.c_str());
 		return CMD_FAILURE;
 	}
 
-	SkMotion* motion = (*iter).second;
 	float time = args.read_float();
 	char* type = args.read_token();
 	if (!type)
@@ -4387,11 +4338,12 @@ int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		int numMotions = 0;
 		int numEvents = 0;
-		for (std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.begin();
-			 iter != mcu_p->motion_map.end();
+		std::vector<std::string> motionNames = SmartBody::SBScene::getScene()->getAssetManager()->getMotionNames();
+		for (std::vector<std::string>::iterator iter = motionNames.begin();
+			 iter != motionNames.end();
 			 iter++)
 		{
-			SkMotion* motion = (*iter).second;
+			SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(*iter);
 			numMotions++;
 			std::vector<SmartBody::SBMotionEvent*>& motionEvents = motion->getMotionEvents();
 			for (size_t x = 0; x < motionEvents.size(); x++)
@@ -4405,14 +4357,13 @@ int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 	}
 
-	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motionName);
-	if (iter == mcu_p->motion_map.end())
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+	if (!motion)
 	{
 		LOG("Motion %s not found, no events removed.", motionName.c_str());
 		return CMD_FAILURE;
 	}
 
-	SkMotion* motion = (*iter).second;
 	std::vector<SmartBody::SBMotionEvent*>& motionEvents = motion->getMotionEvents();
 	int numEvents = motionEvents.size();
 	for (size_t x = 0; x < motionEvents.size(); x++)
@@ -4440,11 +4391,12 @@ int disableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		int numMotions = 0;
 		int numEvents = 0;
-		for (std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.begin();
-			 iter != mcu_p->motion_map.end();
+		const std::vector<std::string> motionNames = SmartBody::SBScene::getScene()->getAssetManager()->getMotionNames();
+		for (std::vector<std::string>::const_iterator iter = motionNames.begin();
+			 iter != motionNames.end();
 			 iter++)
 		{
-			SkMotion* motion = (*iter).second;
+			SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(*iter);
 			numMotions++;
 			std::vector<SmartBody::SBMotionEvent*>& motionEvents = motion->getMotionEvents();
 			for (size_t x = 0; x < motionEvents.size(); x++)
@@ -4457,14 +4409,13 @@ int disableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 	}
 
-	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motionName);
-	if (iter == mcu_p->motion_map.end())
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+	if (!motion)
 	{
 		LOG("Motion %s not found, no events disabled.", motionName.c_str());
 		return CMD_FAILURE;
 	}
 
-	SkMotion* motion = (*iter).second;
 	std::vector<SmartBody::SBMotionEvent*>& motionEvents = motion->getMotionEvents();
 	int numEvents = motionEvents.size();
 	for (size_t x = 0; x < motionEvents.size(); x++)
@@ -4491,11 +4442,12 @@ int enableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		int numMotions = 0;
 		int numEvents = 0;
-		for (std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.begin();
-			 iter != mcu_p->motion_map.end();
+		const std::vector<std::string> motionNames = SmartBody::SBScene::getScene()->getAssetManager()->getMotionNames();
+		for (std::vector<std::string>::const_iterator iter = motionNames.begin();
+			 iter != motionNames.end();
 			 iter++)
 		{
-			SkMotion* motion = (*iter).second;
+			SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(*iter);
 			numMotions++;
 			std::vector<SmartBody::SBMotionEvent*>& motionEvents = motion->getMotionEvents();
 			for (size_t x = 0; x < motionEvents.size(); x++)
@@ -4508,14 +4460,13 @@ int enableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 	}
 
-	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motionName);
-	if (iter == mcu_p->motion_map.end())
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+	if (!motion)
 	{
 		LOG("Motion %s not found, no events enabled.", motionName.c_str());
 		return CMD_FAILURE;
 	}
 
-	SkMotion* motion = (*iter).second;
 	std::vector<SmartBody::SBMotionEvent*>& motionEvents = motion->getMotionEvents();
 	int numEvents = motionEvents.size();
 	for (size_t x = 0; x < motionEvents.size(); x++)
@@ -4696,23 +4647,18 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int motionmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
-	char* motion = args.read_token();
-	if (!motion || strcmp(motion, "help") == 0)
+	char* motionName = args.read_token();
+	if (!motionName || strcmp(motionName, "help") == 0)
 	{
 		LOG("Use: motionmap <motion> <mapname>");
 		return CMD_SUCCESS;
 	}
 
-	SmartBody::SBMotion* sbmotion = NULL;
-	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motion);
-	if (iter == mcu_p->motion_map.end())
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+	if (!motion)
 	{
 		LOG("Cannot find motion name %s.", motion);
 		return CMD_FAILURE;
-	}
-	else
-	{
-		 sbmotion = dynamic_cast<SmartBody::SBMotion*>((*iter).second);
 	}
 
 	char* mapname =  args.read_token();
@@ -4731,7 +4677,7 @@ int motionmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	// apply the map
-	jointMap->applyMotion(sbmotion);
+	jointMap->applyMotion(motion);
 
 	LOG("Applied bone map %s to motion %s.", mapname, motion);
 	
@@ -4748,15 +4694,11 @@ int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	SmartBody::SBSkeleton* sbskeleton = NULL;
-	std::map<std::string, SkSkeleton*>::iterator iter = mcu_p->skeleton_map.find(skeleton);
+	std::map<std::string, SmartBody::SBSkeleton*>::iterator iter = mcu_p->skeleton_map.find(skeleton);
 	if (iter == mcu_p->skeleton_map.end())
 	{
 		LOG("Cannot find skeleton named %s.", skeleton);
 		return CMD_FAILURE;
-	}
-	else
-	{
-		 sbskeleton = dynamic_cast<SmartBody::SBSkeleton*>((*iter).second);
 	}
 
 	char* mapname =  args.read_token();
@@ -5096,10 +5038,9 @@ int syncpoint_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		LOG("Usage: syncpoint <motion> <start> <ready> <strokestart> <stroke> <strokeend> <relax> <end>");
 	}
 
-	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motionStr);
-	if (iter != mcu_p->motion_map.end())
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionStr);	
+	if (motion)
 	{
-		SkMotion* motion = (*iter).second;
 		int num = args.calc_num_tokens();
 		if (num == 0)
 		{
@@ -5435,13 +5376,14 @@ int mcu_character_breathing( const char* name, srArgBuffer& args, mcuCBHandle *m
 	}
 	else if( strcmp( breathing_cmd, "motion" ) == 0 )	
 	{
-		char *motion = args.read_token();
-		SkMotion *mot_p = mcu_p->getMotion( motion );
-		if( mot_p == NULL ) {
-			printf( "Breathing motion '%s' NOT FOUND in motion map\n", motion ); 
+		char* name = args.read_token();
+		SmartBody::SBMotion* sbmotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(name);
+		
+		if( sbmotion == NULL ) {
+			printf( "Breathing motion '%s' NOT FOUND in motion map\n", name ); 
 			return( CMD_FAILURE );
 		}
-		breathing_p->motion(mot_p);
+		breathing_p->motion(sbmotion);
 		return( CMD_SUCCESS );
 	}
 	else if( strcmp( breathing_cmd, "incremental" ) == 0 )
@@ -5715,28 +5657,6 @@ int mcuFestivalRemoteSpeechCmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 	return 0;
 }
 
-int register_animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
-{
-	SkMotion* motion = mcu_p->getMotion("ChrRio_Entry001");
-	if (!motion)
-		return CMD_FAILURE;
-
-	motion->registerAnimation();
-	return CMD_SUCCESS;
-
-}
-
-int unregister_animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
-{
-	SkMotion* motion = mcu_p->getMotion("ChrRio_Entry001");
-	if (!motion)
-		return CMD_FAILURE;
-
-	motion->unregisterAnimation();
-	return CMD_SUCCESS;
-
-}
-
 int resetanim_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	std::string motionName;
@@ -5770,7 +5690,7 @@ int resetanim_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		return CMD_FAILURE;
 	}
 
-	SkMotion* motion = mcu_p->getMotion(motionName);
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);	
 	if (!motion)
 	{
 		LOG("Motion %s not found. Cannot reset motion to origin.", motionName.c_str());
@@ -5834,7 +5754,7 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		return CMD_SUCCESS;
 	}
 
-	SkMotion* motion = mcu_p->getMotion(motionName);
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);	
 	if (!motion)
 	{
 		LOG("Motion %s not found. Cannot reset motion to origin.", motionName.c_str());

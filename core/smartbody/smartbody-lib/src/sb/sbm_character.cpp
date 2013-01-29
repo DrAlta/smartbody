@@ -54,9 +54,11 @@
 #include <sbm/PPRAISteeringAgent.h>
 #include <boost/filesystem/operations.hpp>
 #include <sb/SBSkeleton.h>
+#include <sb/SBMotion.h>
 #include <sb/SBScene.h>
 #include <sb/SBJoint.h>
 #include <sb/SBBoneBusManager.h>
+#include <sb/SBAssetManager.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBSteerAgent.h>
 #include <sb/SBAnimationStateManager.h>
@@ -2422,10 +2424,10 @@ void SbmCharacter::addVisemeChannel(std::string visemeName, std::string motionNa
 
 	if (motionName != "")
 	{
-		std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(motionName);
-		if (iter != mcu.motion_map.end())
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+		if (motion)
 		{
-			addVisemeChannel(visemeName, (*iter).second);
+			addVisemeChannel(visemeName, motion);
 		}
 		else
 		{

@@ -52,6 +52,9 @@ class SBScene : public SBObject
 		SBAPI void setProcessId(const std::string& id);
 		SBAPI const std::string& getProcessId();
 
+		SBAPI void setMediaPath(const std::string& path);
+		SBAPI const std::string& getMediaPath();
+
 		SBAPI void update();
 		SBAPI std::string save(bool remoteSetup = false);
 		SBAPI std::string saveSceneSetting();
@@ -76,7 +79,6 @@ class SBScene : public SBObject
 		SBAPI int getNumCharacters();
 		SBAPI int getNumPawns();
 		SBAPI SBCharacter* getCharacter(const std::string& name);
-		SBAPI SBSkeleton* getSkeleton(const std::string& name);		
 		SBAPI SBPawn* getPawn(const std::string& name);
 
 		SBAPI SBFaceDefinition* createFaceDefinition(const std::string& name);
@@ -89,32 +91,10 @@ class SBScene : public SBObject
 		SBAPI std::vector<std::string> getCharacterNames();
 
 		SBAPI void removePendingCommands();
-		
-		SBAPI SBSkeleton* createSkeleton(const std::string&char_name);
 
-		SBAPI SBMotion* getMotion(const std::string& name);
-		SBAPI int getNumMotions();
-		SBAPI std::vector<std::string> getMotionNames();
-		SBAPI int getNumSkeletons();
-		SBAPI std::vector<std::string> getSkeletonNames();
 		SBAPI std::vector<std::string> getEventHandlerNames();
 
-		SBAPI void setMediaPath(const std::string& path);
-		SBAPI const std::string& getMediaPath();
-		SBAPI void addAssetPath(const std::string& type, const std::string& path);
-		SBAPI std::vector<std::string> getAssetPaths(const std::string& type);
-		SBAPI std::vector<std::string> getLocalAssetPaths(const std::string& type);
-		SBAPI void removeAssetPath(const std::string& type, const std::string& path);
-		SBAPI void removeAllAssetPaths(const std::string& type);
-		SBAPI void loadAssets();
-		SBAPI void loadAsset(const std::string& assetPath);
-		SBAPI void loadAssetsFromPath(const std::string& assetPath);
-		SBAPI void loadMotions();
-		SBAPI void addPose(const std::string& path, bool recursive);
-		SBAPI void addMotion(const std::string& path, bool recursive);
-		SBAPI SBSkeleton* addSkeletonDefinition(const std::string& skelName);
-		SBAPI SBMotion* addMotionDefinition(const std::string& motionName, double duration);			
-				
+	
 		SBAPI bool run(const std::string& command);
 		SBAPI bool runScript(const std::string& script);
 
@@ -176,6 +156,28 @@ class SBScene : public SBObject
 		SBAPI std::vector<std::string> getCameraNames();
 		SBAPI std::vector<SBController*>& getDefaultControllers();
 
+		// deprecated
+		SBAPI SBSkeleton* createSkeleton(const std::string&char_name);
+		SBAPI SBSkeleton* getSkeleton(const std::string& name);		
+		SBAPI void addAssetPath(const std::string& type, const std::string& path);
+		SBAPI std::vector<std::string> getAssetPaths(const std::string& type);
+		SBAPI std::vector<std::string> getLocalAssetPaths(const std::string& type);
+		SBAPI void removeAssetPath(const std::string& type, const std::string& path);
+		SBAPI void removeAllAssetPaths(const std::string& type);
+		SBAPI void loadAssets();
+		SBAPI void loadAsset(const std::string& assetPath);
+		SBAPI void loadAssetsFromPath(const std::string& assetPath);
+		SBAPI void loadMotions();
+		SBAPI void addMotions(const std::string& path, bool recursive);
+		SBAPI SBSkeleton* addSkeletonDefinition(const std::string& skelName);
+		SBAPI SBMotion* addMotionDefinition(const std::string& motionName, double duration);
+		SBAPI SBMotion* getMotion(const std::string& name);
+		SBAPI int getNumMotions();
+		SBAPI std::vector<std::string> getMotionNames();
+		SBAPI int getNumSkeletons();
+		SBAPI std::vector<std::string> getSkeletonNames();
+
+				
 	protected:
 
 		void initialize();

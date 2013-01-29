@@ -30,6 +30,8 @@
 #include <string>
 #include <fstream>
 #include <sbm/BMLDefs.h>
+#include <sb/SBMotion.h>
+#include <sb/SBSkeleton.h>
 
 #ifdef __APPLE__
 #include "TargetConditionals.h"
@@ -154,7 +156,7 @@ bool ParserOgre::parseSkinMesh( std::vector<SrModel*>& meshModelVec, std::vector
 }
 
 
-bool ParserOgre::parse(SkSkeleton& skeleton, std::vector<SkMotion*>& motions, std::string pathName, float scale, bool doParseSkeleton, bool doParseMotion)
+bool ParserOgre::parse(SmartBody::SBSkeleton& skeleton, std::vector<SmartBody::SBMotion*>& motions, std::string pathName, float scale, bool doParseSkeleton, bool doParseMotion)
 {
 	try 
 	{
@@ -224,7 +226,7 @@ bool ParserOgre::parse(SkSkeleton& skeleton, std::vector<SkMotion*>& motions, st
 				LOG("<animations> was not found in file %s. No motions will be loaded.", pathName.c_str());
 				return false;
 			}
-			SkMotion* motion = new SkMotion(); 
+			SmartBody::SBMotion* motion = new SmartBody::SBMotion(""); 
 			motions.push_back(motion);
 			parseOk =  parseMotion(animations, motions, motion, pathName, scale);
 		}
@@ -276,7 +278,7 @@ DOMNode* ParserOgre::getNode(const std::string& nodeName, DOMNode* node)
 	return child;
 }
 
-bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std::string pathName, float scale)
+bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& skeleton, std::string pathName, float scale)
 {
 	// get the bone hierarchy
 	//LOG("Start Parse Ogre Skeleton");
@@ -495,7 +497,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std:
 }
 
 
-bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& motions, SkMotion* motion,std::string pathName, float scale)
+bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SmartBody::SBMotion*>& motions, SmartBody::SBMotion* motion, std::string pathName, float scale)
 {
 	// many animations might be present. for now, only parse one of them
 	DOMNode* animationNode = NULL;
@@ -510,7 +512,7 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SkMotion*>& mo
 		{
 			if (hasAnimation)
 			{
-				SkMotion* motion2 = new SkMotion();
+				SmartBody::SBMotion* motion2 = new SmartBody::SBMotion();
 				motions.push_back(motion2);
 				motion = motion2;
 			}

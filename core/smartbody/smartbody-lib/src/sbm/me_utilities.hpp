@@ -34,18 +34,19 @@
 #include "sbm/mcontrol_util.h"
 #include "mcontrol_callbacks.h"
 
-#include <boost/filesystem/path.hpp>
 
 
-SkSkeleton* load_skeleton( const char *filename, srPathList &path_list, double scale = 1.0 );
+namespace SmartBody {
 
-int load_me_motion_individual( SrInput & input, const std::string & motionName, std::map<std::string, SkMotion*>& map, double scale = 1.0 );
-int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map, bool recursive, double scale = 1.0 );
-int load_me_skeleton_individual( SrInput & input, const std::string & skeletonName, std::map<std::string, SkSkeleton*>& map, double scale = 1.0 );
-int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>& map, bool recursive, double scale = 1.0 );
+class SBMotion;
+class SBSkeleton;
 
-// For Posture scaling, using skmScale for now
-int load_me_postures( const char* pathname, std::map<std::string, SkPosture*>& map, bool recursive, double scale = 1.0 );
+}
+
+SmartBody::SBSkeleton* load_skeleton( const char *filename, srPathList &path_list, double scale = 1.0 );
+
+int load_me_skeleton_individual( SrInput & input, const std::string & skeletonName, std::map<std::string, SmartBody::SBSkeleton*>& map, double scale = 1.0 );
+int load_me_skeletons( const char* pathname, std::map<std::string, SmartBody::SBSkeleton*>& map, bool recursive, double scale = 1.0 );
 
 void print_joint( const SkJoint* joint );
 

@@ -103,6 +103,7 @@
 #include <sb/SBServiceManager.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBMotion.h>
+#include <sb/SBAssetManager.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBJointMapManager.h>
 #include <sb/SBDebuggerServer.h>
@@ -508,8 +509,6 @@ void mcuCBHandle::registerCallbacks()
 	insert( "pawnbonebus",		   pawnbonebus_func);
 	insert( "vhmsgconnect",		   mcu_vhmsg_connect_func);
 	insert( "vhmsgdisconnect",	   mcu_vhmsg_disconnect_func);
-	insert( "registeranimation",   register_animation_func);
-	insert( "unregisteranimation", unregister_animation_func);
     insert( "resetanimation",	   resetanim_func);
 	insert( "animation",		   animation_func);
 	insert( "vhmsglog",			   vhmsglog_func);
@@ -534,9 +533,6 @@ void mcuCBHandle::registerCallbacks()
 	insert_set_cmd( "test",           sbm_set_test_func );
 
 	insert_print_cmd( "bp",           BML_PROCESSOR::print_func );
-	insert_print_cmd( "pawn",         pawn_print_cmd_funcx);
-	insert_print_cmd( "character",    character_print_cmd_func );
-	insert_print_cmd( "char",         character_print_cmd_func );
 	insert_print_cmd( "face",         mcu_print_face_func );
 	insert_print_cmd( "test",         sbm_print_test_func );
 
@@ -1379,9 +1375,6 @@ int mcuCBHandle::vhmsg_send( const char* message ) {
 	return( CMD_SUCCESS );
 }
 
-int mcuCBHandle::load_motions( const char* pathname, bool recursive ) {
-	return load_me_motions( pathname, motion_map, recursive, skmScale );
-}
 
 int mcuCBHandle::load_skeletons( const char* pathname, bool recursive ) {
 	return load_me_skeletons( pathname, skeleton_map, recursive, skScale );
@@ -1393,18 +1386,12 @@ int mcuCBHandle::load_skeleton( const void* data, int sizeBytes, const char* ske
 	return load_me_skeleton_individual( input, skeletonName, skeleton_map, skScale );
 }
 
-int mcuCBHandle::load_motion( const void* data, int sizeBytes, const char* motionName )
-{
-	SrInput input( (char *)data, sizeBytes );
-	return load_me_motion_individual( input, motionName, motion_map, skmScale );
-}
-
 int mcuCBHandle::map_skeleton( const char * mapName, const char * skeletonName )
 {
 	// ED - taken from skeletonmap_func()
 
 	SmartBody::SBSkeleton* sbskeleton = NULL;
-	std::map<std::string, SkSkeleton*>::iterator iter = skeleton_map.find(skeletonName);
+	std::map<std::string, SmartBody::SBSkeleton*>::iterator iter = skeleton_map.find(skeletonName);
 	if (iter == skeleton_map.end())
 	{
 		LOG("Cannot find skeleton named %s.", skeletonName);
@@ -1435,18 +1422,13 @@ int mcuCBHandle::map_motion( const char * mapName, const char * motionName )
 {
 	// taken from motionmap_func()
 
-	SmartBody::SBMotion* sbmotion = NULL;
-	std::map<std::string, SkMotion*>::iterator iter = motion_map.find(motionName);
-	if (iter == motion_map.end())
+	SmartBody::SBMotion* sbmotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+	if (!sbmotion)
 	{
 		LOG("Cannot find motion name %s.", motionName);
 		return CMD_FAILURE;
 	}
-	else
-	{
-		sbmotion = dynamic_cast<SmartBody::SBMotion*>((*iter).second);
-	}
-
+	
 	// find the bone map name
 	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(mapName);
 	if (!jointMap)
@@ -1461,11 +1443,6 @@ int mcuCBHandle::map_motion( const char * mapName, const char * motionName )
 	LOG("Applied bone map %s to motion %s.", mapName, motionName);
 
 	return CMD_SUCCESS;
-}
-
-
-int mcuCBHandle::load_poses( const char* pathname, bool recursive ) {
-	return load_me_postures( pathname, pose_map, recursive, skmScale );
 }
 
 void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map )
@@ -1656,14 +1633,6 @@ int mcuCBHandle::executePython(const char* command)
 	return CMD_FAILURE;
 }
 
-SkMotion* mcuCBHandle::lookUpMotion( const char* motionName )
-{
-	SkMotion* anim_p = NULL;
-	std::map<std::string, SkMotion*>::iterator animIter = motion_map.find(motionName);
-	if (animIter != motion_map.end())
-		anim_p = (*animIter).second;
-	return anim_p;
-}
 
 // void mcuCBHandle::setPhysicsEngine( bool start )
 // {
@@ -1732,7 +1701,7 @@ std::map<std::string, SbmCharacter*>& mcuCBHandle::getCharacterMap()
 	return character_map;
 }
 
-std::map<std::string, SkSkeleton*>& mcuCBHandle::getSkeletonMap()
+std::map<std::string, SmartBody::SBSkeleton*>& mcuCBHandle::getSkeletonMap()
 {
 	return skeleton_map;
 }
@@ -1760,15 +1729,6 @@ DeformableMesh* mcuCBHandle::getDeformableMesh( const std::string& name )
 {
 	std::map<std::string, DeformableMesh*>::iterator iter = deformableMeshMap.find(name);
 	if (iter == deformableMeshMap.end())
-		return NULL;
-	else
-		return (*iter).second;
-}
-
-SkMotion* mcuCBHandle::getMotion(const std::string& motionName)
-{
-	std::map<std::string, SkMotion*>::iterator iter = this->motion_map.find(motionName);
-	if (iter == this->motion_map.end())
 		return NULL;
 	else
 		return (*iter).second;

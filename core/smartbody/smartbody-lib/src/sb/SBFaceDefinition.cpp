@@ -3,6 +3,8 @@
 #include <sk/sk_motion.h>
 #include "sbm/action_unit.hpp"
 #include <sb/SBMotion.h>
+#include <sb/SBScene.h>
+#include <sb/SBAssetManager.h>
 #include <ostream>
 
 
@@ -81,8 +83,7 @@ void SBFaceDefinition::setFaceNeutral(const std::string& motionName)
 	SkMotion* motion = NULL;
 	if (motionName.length() > 0)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		motion = mcu.getMotion(motionName);
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 		if (!motion)
 		{
 			LOG("ERROR: Unknown facial neutral motion \"%s\".", motionName.c_str());
@@ -131,8 +132,7 @@ void SBFaceDefinition::setAU(int auNum, const std::string& side, const std::stri
 	SkMotion* motion = NULL;
 	if (motionName.length() > 0)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		motion = mcu.getMotion(motionName);
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 		if (!motion)
 		{
 			LOG("ERROR: Unknown facial pose \"%s\".", motionName.c_str());
@@ -262,8 +262,7 @@ void SBFaceDefinition::setViseme(const std::string& visemeName, const std::strin
 		}
 
 		// motion name given, find the associated motion
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		SkMotion* motion = mcu.getMotion(motionName);
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 		if (!motion)
 		{
 			LOG("Cannot find viseme named '%s'. Viseme named '%s' not added.", visemeName.c_str(), motionName.c_str());
@@ -289,8 +288,7 @@ void SBFaceDefinition::setViseme(const std::string& visemeName, const std::strin
 			}
 			else
 			{
-				mcuCBHandle& mcu = mcuCBHandle::singleton();
-				SkMotion* newMotion = mcu.getMotion(motionName);
+				SmartBody::SBMotion* newMotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 				if (!newMotion)
 				{
 					LOG("Cannot find viseme named '%s'. Viseme named '%s' not added.", visemeName.c_str(), motionName.c_str());

@@ -20,6 +20,7 @@
 #include "sb/SBPython.h"
 #include "sb/SBCharacter.h"
 #include "sb/SBSkeleton.h"
+#include "sb/SBAssetManager.h"
 #include "sb/SBSimulationManager.h"
 #include "sb/SBCharacterListener.h"
 #pragma warning(pop)
@@ -265,8 +266,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::LoadSkeleton( const void * data, int sizeB
 
 SMARTBODY_DLL_API bool Smartbody_dll::LoadMotion( const void * data, int sizeBytes, const char * motionName )
 {
-    mcuCBHandle & mcu = mcuCBHandle::singleton();
-    int ret = mcu.load_motion( data, sizeBytes, motionName );
+	int ret = SmartBody::SBScene::getScene()->getAssetManager()->load_motion( data, sizeBytes, motionName );
     return ret == CMD_SUCCESS;
 }
 

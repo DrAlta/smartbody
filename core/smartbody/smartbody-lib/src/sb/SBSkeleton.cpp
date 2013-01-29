@@ -4,6 +4,7 @@
 #include "SBAttribute.h"
 #include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
+#include <sb/SBAssetManager.h>
 #include <sb/SBCharacterListener.h>
 #include <sr/sr_string.h>
 
@@ -40,13 +41,10 @@ const std::string& SBSkeleton::getFileName()
 
 bool SBSkeleton::load(std::string skeletonFile)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::map<std::string, SkSkeleton*>::iterator iter = mcu.skeleton_map.find(std::string(skeletonFile.c_str()));
-	if (iter != mcu.skeleton_map.end())
+	SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skeletonFile.c_str());
+	if (skeleton)
 	{
-		SkSkeleton* existingSkel = iter->second;
-		SmartBody::SBSkeleton* existingSBSkel = dynamic_cast<SmartBody::SBSkeleton*>(existingSkel);
-		copy(existingSBSkel);
+		copy(skeleton);
 		update();
 		return true;
 	}
@@ -63,7 +61,7 @@ bool SBSkeleton::load(std::string skeletonFile)
 		if (input.valid())
 		{
 			input.filename(skeletonFile.c_str());
-			if (!SkSkeleton::load(input, 1.0f))
+			if (!SkSkeleton::loadSk(input, 1.0f))
 			{
 				LOG("Problem loading skeleton from file %s.", skeletonFile.c_str());
 				return false;
@@ -131,7 +129,7 @@ void SBSkeleton::loadFromString(const std::string& info )
 {
 	//LOG("loadFromString = %s",info.c_str());
 	SrInput input(info.c_str());	
-	SkSkeleton::load(input);
+	SkSkeleton::loadSk(input);
 }
 
 int SBSkeleton::getNumJoints()

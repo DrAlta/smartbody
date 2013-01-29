@@ -28,6 +28,7 @@
 #include <sb/SBReachManager.h>
 #include <sb/SBGestureMap.h>
 #include <sb/SBGestureMapManager.h>
+#include <sb/SBAssetManager.h>
 #include <sb/SBJointMap.h>
 #include <sb/SBJointMapManager.h>
 #include <sb/SBParser.h>
@@ -1549,6 +1550,24 @@ boost::python::class_<SBReach>("SBReach")
 		.def("OnViseme", &SBCharacterListener::OnViseme, "Visemes sent every frame.")
 		;
 
+	boost::python::class_<SBAssetManager, boost::python::bases<SBObject> >("SBAssetManager")
+		.def("createSkeleton", &SBAssetManager::createSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a skeleton definition.")
+		.def("getSkeleton", &SBAssetManager::getSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skeleton object given its name. \n Input: skeleton name \nOutput: skeleton object")
+		.def("addAssetPath", &SBAssetManager::addAssetPath, "Add path resource given path type and actual path string. \n Input: type(can be seq|me|ME), path \n Output: NULL")
+		.def("removeAssetPath", &SBAssetManager::removeAssetPath, "Removes a  path resource given path type and actual path string. \n Input: type(can be cript|motion|audio), path \n Output: NULL")
+		.def("removeAllAssetPaths", &SBAssetManager::removeAllAssetPaths, "Removes all paths resource given path type and actual path string. \n Input: type(can be script|motion|audio), path \n Output: NULL")
+		.def("getAssetPaths", &SBAssetManager::getAssetPaths, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all path names for a given type: seq, me, audio, mesh.")
+		.def("getLocalAssetPaths", &SBAssetManager::getLocalAssetPaths, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all path names for a given type excluding the media path: seq, me, audio, mesh.")
+		.def("loadAssets", &SBAssetManager::loadAssets, "Loads the skeletons and motions from the asset paths.")
+		.def("loadAssetsFromPath", &SBAssetManager::loadAssetsFromPath, "Loads the skeletons and motions from a given path. The path will not be stored for later use.")
+		.def("addMotions", &SBAssetManager::addMotions, "Add motion resource given filepath and recursive flag. \n Input: path, recursive flag(boolean variable indicating whether to tranverse all the children directories) \n Output: NULL")
+		.def("getMotion", &SBAssetManager::getMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a the motion of given name.")
+		.def("getNumMotions", &SBAssetManager::getNumMotions, "Returns the number of motions available.")
+		.def("getMotionNames", &SBAssetManager::getMotionNames, "Returns the names of motions available.")
+		.def("getNumSkeletons", &SBAssetManager::getNumSkeletons, "Returns the number of skeletons available.")
+		.def("getSkeletonNames", &SBAssetManager::getSkeletonNames, "Returns a list of all skeleton names.\n Input: NULL \nOutput: list of skeleton names")
+		;
+
 	boost::python::class_<SBScene, boost::python::bases<SBObject> >("SBScene")
 		.def("setProcessId", &SBScene::setProcessId, "Sets the process id of the SmartBody instance.")
 		.def("getProcessId", &SBScene::getProcessId,  boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the process id of the SmartBody instance.")
@@ -1566,29 +1585,13 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getNumCharacters", &SBScene::getNumCharacters, "Returns the number of characters.\n Input: NULL \nOutput: number of characters.")
 		.def("getPawn", &SBScene::getPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the pawn object given its name. \n Input: pawn name \nOutput: pawn object")
 		.def("getCharacter", &SBScene::getCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the character object given its name. \n Input: character name \nOutput: character object")
-		.def("getSkeleton", &SBScene::getSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skeleton object given its name. \n Input: skeleton name \nOutput: skeleton object")
-		.def("getMotion", &SBScene::getMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a the motion of given name.")
-		.def("getNumMotions", &SBScene::getNumMotions, "Returns the number of motions available.")
-		.def("getMotionNames", &SBScene::getMotionNames, "Returns the names of motions available.")
 		.def("getPawnNames", &SBScene::getPawnNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all character names.\n Input: NULL \nOutput: list of pawn names")
 		.def("getCharacterNames", &SBScene::getCharacterNames, "Returns a list of all character names.\n Input: NULL \nOutput: list of character names")
-		.def("getNumSkeletons", &SBScene::getNumSkeletons, "Returns the number of skeletons available.")
-		.def("getSkeletonNames", &SBScene::getSkeletonNames, "Returns a list of all skeleton names.\n Input: NULL \nOutput: list of skeleton names")
 		.def("getEventHandlerNames", &SBScene::getEventHandlerNames, "Returns a list of names of all event handlers.\n Input: NULL \nOutput: list of event handler names")
-		.def("addMotion", &SBScene::addMotion, "Add motion resource given filepath and recursive flag. \n Input: path, recursive flag(boolean variable indicating whether to tranverse all the children directories) \n Output: NULL")
-		.def("addPose", &SBScene::addPose, "Add pose resource given filepath and recursive flag. \n Input: path, recursive flag(boolean variable indicating whether to tranverse all the children directories) \n Output: NULL")		
-		.def("addAssetPath", &SBScene::addAssetPath, "Add path resource given path type and actual path string. \n Input: type(can be seq|me|ME), path \n Output: NULL")
-		.def("removeAssetPath", &SBScene::removeAssetPath, "Removes a  path resource given path type and actual path string. \n Input: type(can be cript|motion|audio), path \n Output: NULL")
-		.def("removeAllAssetPaths", &SBScene::removeAllAssetPaths, "Removes all paths resource given path type and actual path string. \n Input: type(can be script|motion|audio), path \n Output: NULL")
-		.def("getAssetPaths", &SBScene::getAssetPaths, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all path names for a given type: seq, me, audio, mesh.")
-		.def("getLocalAssetPaths", &SBScene::getLocalAssetPaths, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all path names for a given type excluding the media path: seq, me, audio, mesh.")
-		.def("loadAssets", &SBScene::loadAssets, "Loads the skeletons and motions from the asset paths.")
-		.def("loadAssetsFromPath", &SBScene::loadAssetsFromPath, "Loads the skeletons and motions from a given path. The path will not be stored for later use.")
 		.def("setMediaPath",&SBScene::setMediaPath, "Sets the media path.")
 		.def("getMediaPath",&SBScene::getMediaPath, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the media path.")
 		.def("setDefaultCharacter", &SBScene::setDefaultCharacter, "Sets the default character.")
 		.def("setDefaultRecipient", &SBScene::setDefaultRecipient, "Sets the default recipient.")
-		.def("createSkeleton", &SBScene::createSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a skeleton definition.")
 		.def("addSkeletonDefinition", &SBScene::addSkeletonDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Add an new empty skeleton into system. \n Input: skeleton name \nOutput: skeleton object")
 		.def("addMotionDefinition", &SBScene::addMotionDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Add an new empty motion into system. \n Input: motion name, motion duration \nOutput: motion object")
 		.def("addScript", &SBScene::addScript, "Adds a script to the scene.")
@@ -1639,6 +1642,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getDiphoneManager", &SBScene::getDiphoneManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the diphone manager object.")
 		.def("getBehaviorSetManager", &SBScene::getBehaviorSetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the behavior set manager.")
 		.def("getRetargetManager", &SBScene::getRetargetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the retarget manager.")
+		.def("getAssetManager", &SBScene::getAssetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the asset manager.")
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
 
 		.def("setSystemParameter", &SBScene::setSystemParameter, "Sets a name/value pair that persists between scene sessions.")
@@ -1646,6 +1650,24 @@ boost::python::class_<SBReach>("SBReach")
 		.def("removeSystemParameter", &SBScene::removeSystemParameter, "Removes a system parameter.")
 		.def("removeAllSystemParameters", &SBScene::removeSystemParameter, "Removes a system parameter.")
 		.def("getSystemParameterNames", &SBScene::getSystemParameterNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns names of all system parameters.")
+
+		// deprecated
+		.def("createSkeleton", &SBScene::createSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a skeleton definition.")
+		.def("getSkeleton", &SBScene::getSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skeleton object given its name. \n Input: skeleton name \nOutput: skeleton object")
+		.def("addAssetPath", &SBScene::addAssetPath, "Add path resource given path type and actual path string. \n Input: type(can be seq|me|ME), path \n Output: NULL")
+		.def("removeAssetPath", &SBScene::removeAssetPath, "Removes a  path resource given path type and actual path string. \n Input: type(can be cript|motion|audio), path \n Output: NULL")
+		.def("removeAllAssetPaths", &SBScene::removeAllAssetPaths, "Removes all paths resource given path type and actual path string. \n Input: type(can be script|motion|audio), path \n Output: NULL")
+		.def("getAssetPaths", &SBScene::getAssetPaths, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all path names for a given type: seq, me, audio, mesh.")
+		.def("getLocalAssetPaths", &SBScene::getLocalAssetPaths, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all path names for a given type excluding the media path: seq, me, audio, mesh.")
+		.def("loadAssets", &SBScene::loadAssets, "Loads the skeletons and motions from the asset paths.")
+		.def("loadAssetsFromPath", &SBScene::loadAssetsFromPath, "Loads the skeletons and motions from a given path. The path will not be stored for later use.")
+		.def("addMotions", &SBScene::addMotions, "Add motion resource given filepath and recursive flag. \n Input: path, recursive flag(boolean variable indicating whether to tranverse all the children directories) \n Output: NULL")
+		.def("getMotion", &SBScene::getMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a the motion of given name.")
+		.def("getNumMotions", &SBScene::getNumMotions, "Returns the number of motions available.")
+		.def("getMotionNames", &SBScene::getMotionNames, "Returns the names of motions available.")
+		.def("getNumSkeletons", &SBScene::getNumSkeletons, "Returns the number of skeletons available.")
+		.def("getSkeletonNames", &SBScene::getSkeletonNames, "Returns a list of all skeleton names.\n Input: NULL \nOutput: list of skeleton names")
+
 	;
 #endif
 	}
@@ -1892,6 +1914,7 @@ void initPython(std::string pythonLibPath)
 		PyRun_SimpleString("scene = getScene()");
 		PyRun_SimpleString("bml = scene.getBmlProcessor()");
 		PyRun_SimpleString("sim = scene.getSimulationManager()");
+		PyRun_SimpleString("assets = scene.getAssetManager()");
 #endif
 		//LOG("After import os");
 

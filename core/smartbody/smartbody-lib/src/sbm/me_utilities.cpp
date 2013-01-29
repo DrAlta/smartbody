@@ -39,10 +39,12 @@
 #endif
 #endif
 
+#include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
 #include <sk/sk_posture.h>
+#include <sb/SBMotion.h>
 
 #include "sbm_constants.h"
 #include "sbm/gwiz_math.h"
@@ -60,24 +62,20 @@ using namespace std;
 using namespace boost::filesystem;
 
 
-#define DEBUG_LOAD_PATHS (0)
+#define DEBUG_LOAD_PATHS1 (0)
 
-
-const char* MOTION_EXT  = ".skm";
-const char* POSTURE_EXT = ".skp";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, double scale ) {
+SmartBody::SBSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, double scale ) {
 	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::map<std::string, SkSkeleton*>::iterator iter = mcu.skeleton_map.find(std::string(skel_file));
+	std::map<std::string, SmartBody::SBSkeleton*>::iterator iter = mcu.skeleton_map.find(std::string(skel_file));
 	if (iter != mcu.skeleton_map.end())
 	{
 		//SkSkeleton* ret = new SkSkeleton(iter->second);
-		SkSkeleton* existingSkel = iter->second;
-		SmartBody::SBSkeleton* existingSBSkel = dynamic_cast<SmartBody::SBSkeleton*>(existingSkel);
-		SkSkeleton* ret = new SmartBody::SBSkeleton(existingSBSkel);
+		SmartBody::SBSkeleton* existingSkel = iter->second;
+		SmartBody::SBSkeleton* ret = new SmartBody::SBSkeleton(existingSkel);
 		ret->ref();
 		return ret;
 	}
@@ -110,7 +108,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, double 
 		return NULL;
 	}
 
-	SkSkeleton* skeleton_p = new SmartBody::SBSkeleton();
+	SmartBody::SBSkeleton* skeleton_p = new SmartBody::SBSkeleton();
 	skeleton_p->ref();
 #if 0
 	if( !skeleton_p->load( input, path ) )	{ 
@@ -120,7 +118,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, double 
 	{
 		fclose(fp);
 		std::ifstream filestream(filename.c_str());
-		SkMotion motion;
+		SmartBody::SBMotion motion;
 		ParserBVH::parse(*skeleton_p, motion, skel_file, filestream, float(scale));
 		skeleton_p->skfilename(filename.c_str());
 	}
@@ -130,7 +128,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, double 
 		fclose(fp);
 		std::ifstream filestream(filename.c_str());
 		std::ifstream datastream("");
-		SkMotion motion;
+		SmartBody::SBMotion motion;
 		ParserASFAMC::parse(*skeleton_p, motion, filestream, datastream, float(scale));
 		skeleton_p->skfilename(filename.c_str());
 	}
@@ -138,7 +136,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, double 
 			 filename.find(".DAE") == (filename.size() - 4))
 	{
 		fclose(fp);
-		SkMotion motion;
+		SmartBody::SBMotion motion;
 		ParserOpenCOLLADA::parse(*skeleton_p, motion, filename, float(scale), true, false);
 		skeleton_p->skfilename(filename.c_str());
 		skeleton_p->setName(skel_file);
@@ -147,8 +145,8 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, double 
 			 filename.find(".SKELETON.XML") == (filename.size() - 13))
 	{
 		fclose(fp);
-		SkMotion motion;
-		std::vector<SkMotion*> motions;
+		SmartBody::SBMotion motion;
+		std::vector<SmartBody::SBMotion*> motions;
 		motions.push_back(&motion);
 		ParserOgre::parse(*skeleton_p, motions, filename, float(scale), true, false);
 		skeleton_p->skfilename(filename.c_str());
@@ -172,7 +170,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, double 
 		//but for extracting the path from a file name, the filename should be
 		//associated with the input, as done here:
 		input.filename(filename.c_str());
-		if( !skeleton_p->load( input, scale ) )	{ 
+		if( !skeleton_p->loadSk( input, scale ) )	{ 
 #endif
 			LOG("ERROR: load_skeleton(..): Unable to load skeleton file \"%s\".", skel_file);
 			return NULL;
@@ -200,194 +198,9 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, double 
 
 }
 
-int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, double scale, const char* error_prefix ) {
-	if( !exists( pathname ) ) {
-		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
-		return CMD_FAILURE;
-	}
 
-	if( is_directory( pathname ) ) {
-		// ignore any '.' diretories
-		std::string filebase = pathname.leaf();
-		if (filebase.find(".") == 0 && filebase.size() > 1)
-		{
-			// ignore hidden directories
-			return CMD_SUCCESS;
-		}
-		LOG("Attempting to load motions from path '%s'...", pathname.string().c_str());	
-	
 
-		directory_iterator end;
-		for( directory_iterator i( pathname ); i!=end; ++i ) {
-			const path& cur = *i;
-
-			if( is_directory( cur ) ) {
-				if( recurse_dirs )
-					load_me_motions_impl( cur, map, recurse_dirs, scale, "WARNING: " );
-			} else {
-				string ext = extension( cur );
-#if ENABLE_FBX_PARSER
-				if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || 
-					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
-					_stricmp( ext.c_str(), ".dae" ) == 0 ||
-					_stricmp( ext.c_str(), ".amc" ) == 0 ||
-					_stricmp( ext.c_str(), ".xml" ) == 0 ||
-					_stricmp( ext.c_str(), ".fbx" ) == 0)
-#else
-				if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || 
-					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
-					_stricmp( ext.c_str(), ".dae" ) == 0 ||
-					_stricmp( ext.c_str(), ".xml" ) == 0 ||
-					_stricmp( ext.c_str(), ".amc" ) == 0)
-#endif
-				{
-					load_me_motions_impl( cur, map, recurse_dirs, scale, "WARNING: " );
-				} 
-				else if( DEBUG_LOAD_PATHS ) {
-					LOG("DEBUG: load_me_motion_impl(): Skipping \"%s\".  Extension \"%s\" does not match MOTION_EXT.", cur.string().c_str(), ext.c_str() );
-				}
-			}
-		}
-	} else {
-
-		std::vector<SkMotion*> motions;
-		std::string ext = extension( pathname );
-		SkMotion* motion = new SmartBody::SBMotion();
-		bool parseSuccessful = false;
-
-		if (ext == ".skm" || ext == ".SKM")
-		{
-			SrInput in( pathname.string().c_str(), "rt" );
-			SrString fullin_string;
-			in.getall( fullin_string );
-			SrInput fullin( (const char *)fullin_string );
-			fullin.filename( pathname.string().c_str() ); // copy filename for error message
-			
-			parseSuccessful = motion->load( fullin, scale );
-			if (parseSuccessful)
-				motions.push_back(motion);
-		}
-		else if (ext == ".bvh" || ext == ".BVH")
-		{
-			std::ifstream filestream( pathname.string().c_str() );
-			
-			SkSkeleton skeleton;
-			parseSuccessful = ParserBVH::parse(skeleton, *motion, pathname.string(), filestream, float(scale));
-			if (parseSuccessful)
-				motions.push_back(motion);
-		}
-		else if (ext == ".dae" || ext == ".DAE")
-		{			
-			SkSkeleton skeleton;
-			parseSuccessful = ParserOpenCOLLADA::parse(skeleton, *motion, pathname.string(), float(scale), true, true);		
-			// now there's adjust for the channels by default
-			//animationPostProcessByChannels(skeleton, motion, channelsForAdjusting);
-			SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(motion);
-			int pretrimFrames = SmartBody::SBScene::getScene()->getIntAttribute("colladaTrimFrames");
-			if (pretrimFrames > 0 && sbMotion)
-			{
-				sbMotion->trim(pretrimFrames,0);				
-			}
-			if (parseSuccessful)
-				motions.push_back(motion);
-
-		}
-		else if (ext == ".xml" || ext == ".XML")
-		{			
-			SkSkeleton skeleton;
-			parseSuccessful = ParserOgre::parse(skeleton, motions, pathname.string(), float(scale), true, true);			
-		}
-		else if (ext == ".amc" || ext == ".AMC")
-		{
-			// at the same directory, looking for one asf file
-			std::string asf = "";
-			directory_iterator end;
-			std::string filebase = basename(pathname);
-			std::string fileext = extension(pathname);
-			int dirSize = pathname.string().size() - filebase.size() - fileext.size() - 1;
-			std::string directory = pathname.string().substr(0, dirSize);
-			for( directory_iterator i( directory ); i!=end; ++i ) 
-			{
-				const path& cur = *i;
-				if (!is_directory(cur)) 
-				{
-					std::string ext = extension(cur);
-					if (_stricmp(ext.c_str(), ".asf") == 0)
-					{
-						asf = cur.string().c_str();
-						break;
-					}
-				}
-			}
-			std::ifstream metafilestream(asf.c_str());
-			std::ifstream filestream(pathname.string().c_str());
-			SkSkeleton skeleton;
-			parseSuccessful = ParserASFAMC::parse(skeleton, *motion, metafilestream, filestream, float(scale));
-			motion->setName(filebase.c_str());
-			if (parseSuccessful)
-				motions.push_back(motion);
-		}
-#if ENABLE_FBX_PARSER
-		else if (ext == ".fbx" || ext == ".FBX")
-		{
-			SkSkeleton skeleton;
-			LOG("FBX motion parse: %s", pathname.string().c_str());
-			parseSuccessful = ParserFBX::parse(skeleton, *motion, pathname.string(), float(scale));	
-			if (parseSuccessful)
-				motions.push_back(motion);
-		}
-#endif
-		if (parseSuccessful)
-		{
-			// register the motion
-			//motion->registerAnimation();
-
-			for (std::vector<SkMotion*>::iterator iter = motions.begin();
-				 iter != motions.end();
-				 iter++)
-			{
-				SkMotion* motion = (*iter);
-				char CurrentPath[_MAX_PATH];
-#ifdef WIN32
-				_getcwd(CurrentPath, _MAX_PATH);
-#else
-				getcwd(CurrentPath, _MAX_PATH);
-#endif
-				std::string filename;
-			
-				filename = pathname.filename().c_str();
-			
-				//filename = mcn_return_full_filename_func( CurrentPath, finalPath.string().c_str() );
-
-				string filebase = basename( pathname );
-				const char* name = motion->getName().c_str();
-				if( name && _stricmp( filebase.c_str(), name ) ) {
-					LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.native_file_string().c_str(), filebase.c_str());
-					//motion->setName( filebase.c_str() );
-				}
-				motion->filename( pathname.native_file_string().c_str() );
-
-				std::map<std::string, SkMotion*>::iterator motionIter = map.find(filebase);
-				if (motionIter != map.end()) {
-					LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
-					delete motion;
-					return CMD_FAILURE;
-				}
-				map.insert(std::pair<std::string, SkMotion*>(motion->getName(), motion));
-			}
-			
-		} else {
-			// SkMotion::load() already prints an error...
-			//strstr << error_prefix << "Failed to load motion \"" << pathname.string() << "\"." << endl;
-			delete motion;
-			return CMD_FAILURE;
-		}
-		
-	}
-	return CMD_SUCCESS;
-}
-
-int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, double scale, const char* error_prefix ) {
+int load_me_skeletons_impl( const path& pathname, std::map<std::string, SmartBody::SBSkeleton*>& map, bool recurse_dirs, double scale, const char* error_prefix ) {
 		
 	if( !exists( pathname ) ) {
 		LOG("%s Skeleton path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
@@ -429,7 +242,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 				{
 					load_me_skeletons_impl( cur, map, recurse_dirs, scale, "WARNING: " );
 				} 
-				else if( DEBUG_LOAD_PATHS ) {
+				else if( DEBUG_LOAD_PATHS1 ) {
 					LOG("DEBUG: load_me_skeleton_impl(): Skipping \"%s\".  Extension \"%s\" does not match .sk.", cur.string().c_str(), ext.c_str() );
 				}
 			}
@@ -439,7 +252,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 		std::string ext = extension( pathname );
 		std::string filebase = boost::filesystem::basename(pathname);
 		std::string fullName = filebase + ext;
-		SkSkeleton* skeleton = NULL;
+		SmartBody::SBSkeleton* skeleton = NULL;
 		if (ext == ".sk")
 		{			
 			skeleton = new SmartBody::SBSkeleton();
@@ -450,7 +263,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 			{
 				SrInput input(fp);
 				input.filename(pathname.string().c_str());
-				if( !skeleton->load( input, scale ) )
+				if( !skeleton->loadSk( input, scale ) )
 				{ 
 					LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
 					input.close();
@@ -463,7 +276,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 					skeleton->setName(fullName);
 					SmartBody::SBSkeleton* sbskel = dynamic_cast<SmartBody::SBSkeleton*>(skeleton);
 					sbskel->setFileName(pathname.string());
-					map.insert(std::pair<std::string, SkSkeleton*>(fullName, skeleton));
+					map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(fullName, skeleton));
 				}
 			}
 		}
@@ -478,13 +291,13 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 			bool ok = ParserBVH::parse(*skeleton, motion, filebase, filestream, float(scale));
 			if (ok)
 			{
-				std::map<std::string, SkSkeleton*>::iterator motionIter = map.find(filebase);
+				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
 				if (motionIter != map.end()) {
 					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
 					delete skeleton;
 					return CMD_FAILURE;
 				}
-				map.insert(std::pair<std::string, SkSkeleton*>(filebase + ext, skeleton));
+				map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(filebase + ext, skeleton));
 			}
 			else
 			{
@@ -503,13 +316,13 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 			bool ok = ParserASFAMC::parse(*skeleton, motion, filestream, datastream, float(scale));
 			if (ok)
 			{
-				std::map<std::string, SkSkeleton*>::iterator motionIter = map.find(filebase);
+				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
 				if (motionIter != map.end()) {
 					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
 					delete skeleton;
 					return CMD_FAILURE;
 				}
-				map.insert(std::pair<std::string, SkSkeleton*>(filebase + ext, skeleton));
+				map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(filebase + ext, skeleton));
 			}
 			else
 			{
@@ -526,13 +339,13 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 			bool ok = ParserOpenCOLLADA::parse(*skeleton, motion, pathname.string(), float(scale), true, false);
 			if (ok)
 			{
-				std::map<std::string, SkSkeleton*>::iterator motionIter = map.find(filebase);
+				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
 				if (motionIter != map.end()) {
 					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
 					delete skeleton;
 					return CMD_FAILURE;
 				}
-				map.insert(std::pair<std::string, SkSkeleton*>(filebase + ext, skeleton));
+				map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(filebase + ext, skeleton));
 			}
 			else
 			{
@@ -545,17 +358,17 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 			skeleton =  new SmartBody::SBSkeleton();
 			skeleton->skfilename(fullName.c_str());			
 			skeleton->setName(fullName);
-			std::vector<SkMotion*> motions;
+			std::vector<SmartBody::SBMotion*> motions;
 			bool ok = ParserOgre::parse(*skeleton, motions, pathname.string(), float(scale), true, false);
 			if (ok)
 			{
-				std::map<std::string, SkSkeleton*>::iterator motionIter = map.find(filebase);
+				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
 				if (motionIter != map.end()) {
 					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
 					delete skeleton;
 					return CMD_FAILURE;
 				}
-				map.insert(std::pair<std::string, SkSkeleton*>(filebase + ext, skeleton));
+				map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(filebase + ext, skeleton));
 			}
 			else
 			{
@@ -597,137 +410,12 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 	return CMD_SUCCESS;
 }
 
-int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture*>& map, bool recurse_dirs, double scale, const char* error_prefix ) {
-	
-	if( !exists( pathname ) ) {
-		LOG("%s Posture path \"%s\" not found.", error_prefix, pathname.native_file_string().c_str());
-		return CMD_FAILURE;
-	}
 
-	if( is_directory( pathname ) ) {
-		
-		directory_iterator end;
-		for( directory_iterator i( pathname ); i!=end; ++i ) {
-			const path& cur = *i;
 
-			if( is_directory( cur ) ) {
-				if( recurse_dirs )
-					load_me_postures_impl( cur, map, recurse_dirs, scale, "WARNING: " );
-			} else {
-				string ext = extension( cur );
-				if( _stricmp( ext.c_str(), POSTURE_EXT )==0 ) {
-					load_me_postures_impl( cur, map, recurse_dirs,scale, "WARNING: " );
-				} else if( DEBUG_LOAD_PATHS ) {
-					LOG("DEBUG: load_me_posture_impl(): Skipping \"%s\". Extension \"%s\" does not match POSTURE_EXT.",  cur.string().c_str(), ext.c_str());
-				}
-			}
-		}
-	} else {
-		SkPosture* posture = new SkPosture();
-		
-		SrInput in( pathname.string().c_str(), "rt" );
-		in >> (*posture);
-		if( in.had_error() ) {
-			std::stringstream strstr;
-			strstr << error_prefix << "Failed to load posture \"" << pathname.string() << "\".";
-			LOG(strstr.str().c_str());
-			delete posture;
-			return CMD_FAILURE;
-		} else {
 
-//			char CurrentPath[_MAX_PATH];
-//			_getcwd(CurrentPath, _MAX_PATH);
-			std::string filename;
-			
-//			filename = mcn_return_full_filename_func( CurrentPath, pathname.string().c_str() );
-
-//			boost::filesystem::path p( pathname.string() );
-			boost::filesystem::path abs_p = boost::filesystem::complete( pathname );
-            if ( boost::filesystem2::exists( abs_p ) )	{
-				filename = abs_p.string();
-			}
-
-			string filebase = basename( pathname );
-			const char* name = posture->name();
-			if( name && _stricmp( filebase.c_str(), name ) ) {
-				std::stringstream strstr;
-				strstr << "WARNING: Posture name \"" << name << "\" does not equal base of filename \"" << pathname.native_file_string() << "\".  Using \"" << filebase << "\" in posture map." << endl;
-				LOG(strstr.str().c_str());
-				posture->name( filebase.c_str() );
-			}
-			posture->filename( pathname.native_file_string().c_str() );
-
-			std::map<std::string, SkPosture*>::iterator postureIter = map.find(filebase);
-			if (postureIter != map.end()) {
-				std::stringstream strstr;
-				strstr << "ERROR: Posture by name of \"" << filebase << "\" already exists.  Ignoring file \"" << pathname.native_file_string() << "\"." << endl;
-				LOG(strstr.str().c_str());
-				return CMD_FAILURE;
-			}
-			map.insert(std::pair<std::string, SkPosture*>(filebase, posture));
-		}
-	}
-	return CMD_SUCCESS;
-}
-
-int load_me_motion_individual( SrInput & input, const std::string & motionName, std::map<std::string, SkMotion*>& map, double scale )
+int load_me_skeleton_individual( SrInput & input, const std::string & skeletonName, std::map<std::string, SmartBody::SBSkeleton*>& map, double scale )
 {
-	SkMotion* motion = new SmartBody::SBMotion();
-
-	bool parseSuccessful = motion->load( input, scale );
-
-	std::string filename = motionName;
-
-	string filebase = basename( motionName );
-	const char* name = motion->getName().c_str();
-	if( name && _stricmp( filebase.c_str(), name ) )
-	{
-		LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, motionName.c_str(), filebase.c_str());
-		motion->setName( filebase.c_str() );
-	}
-
-	motion->filename( motionName.c_str() );
-
-	std::map<std::string, SkMotion*>::iterator motionIter = map.find(filebase);
-	if (motionIter != map.end()) 
-	{
-		LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), motionName.c_str());
-		delete motion;
-		return CMD_FAILURE;
-	}
-
-	map.insert(std::pair<std::string, SkMotion*>(filebase, motion));
-
-	return CMD_SUCCESS;
-}
-
-int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, double scale ) {
-	path motions_path(pathname);
-	
-	path finalPath;
-
-	std::string rootDir = motions_path.root_directory();
-	if (rootDir.size() == 0)
-	{	
-		std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
-		finalPath = operator/(mediaPath, motions_path);
-	}
-	else
-	{
-		finalPath = pathname;
-	}
-
-	if (1) {
-		return load_me_motions_impl( finalPath, map, recurse_dirs, scale, "ERROR: " );
-	} else {
-		LOG("ERROR: Invalid motion path \"%s\".", finalPath.string().c_str());
-		return CMD_FAILURE;
-	}
-}
-
-int load_me_skeleton_individual( SrInput & input, const std::string & skeletonName, std::map<std::string, SkSkeleton*>& map, double scale )
-{
-	SkSkeleton * skeleton = new SmartBody::SBSkeleton();
+	SmartBody::SBSkeleton* skeleton = new SmartBody::SBSkeleton();
 	skeleton->ref();
 
 	//path skeletonPath(skeletonName);
@@ -735,7 +423,7 @@ int load_me_skeleton_individual( SrInput & input, const std::string & skeletonNa
 	//ext = vhcl::ToLower(ext);
 	//if (ext == ".sk")
 
-	if( !skeleton->load( input, scale ) )
+	if( !skeleton->loadSk( input, scale ) )
 	{ 
 		LOG("Problem loading skeleton from file ''.");
 		input.close();
@@ -747,7 +435,7 @@ int load_me_skeleton_individual( SrInput & input, const std::string & skeletonNa
 		skeleton->setName(skeletonName);
 		SmartBody::SBSkeleton* sbskel = dynamic_cast<SmartBody::SBSkeleton*>(skeleton);
 		sbskel->setFileName(skeletonName);
-		map.insert(std::pair<std::string, SkSkeleton*>(skeletonName, skeleton));
+		map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(skeletonName, skeleton));
 	}
 
 
@@ -760,7 +448,7 @@ int load_me_skeleton_individual( SrInput & input, const std::string & skeletonNa
 	return CMD_SUCCESS;
 }
 
-int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, double scale ) {
+int load_me_skeletons( const char* pathname, std::map<std::string, SmartBody::SBSkeleton*>& map, bool recurse_dirs, double scale ) {
 	path motions_path(pathname);
 	
 	path finalPath;
@@ -784,70 +472,5 @@ int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>&
 	}
 }
 
-int load_me_postures( const char* pathname, std::map<std::string, SkPosture*>& map, bool recurse_dirs, double scale ) {
-	path posture_path(pathname);
 
-	path finalPath;
-	// include the media path in the pathname if applicable
-	std::string rootDir = posture_path.root_directory();
-	if (rootDir.size() == 0)
-	{		
-		finalPath = operator/(SmartBody::SBScene::getScene()->getMediaPath(), posture_path);
-	}
-	else
-	{
-		finalPath = pathname;
-	}
 
-	if (1) {
-		return load_me_postures_impl( finalPath, map, recurse_dirs, scale, "ERROR: " );
-	} else {
-		LOG("ERROR: Invalid posture path \"%s\".", pathname);
-		return CMD_FAILURE;
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
-void print_joint( const SkJoint* joint ) {
-	const SkJointPos* pos = joint->const_pos();
-	std::stringstream strstr;
-
-	strstr << "position:\t" << pos->value(SkVecLimits::X) << ", "
-	                        << pos->value(SkVecLimits::Y) << ", "
-	                        << pos->value(SkVecLimits::Z) << endl;
-
-	switch( joint->rot_type() ) {
-		case SkJoint::TypeEuler: {
-			const SkJointEuler* euler = joint->const_euler();
-			strstr << "rotation euler:\t" << euler->value(SkVecLimits::X) << ", "
-			                              << euler->value(SkVecLimits::Y) << ", "
-			                              << euler->value(SkVecLimits::Z) << endl;
-			break;
-		}
-		case SkJoint::TypeQuat: {
-			// const_cast because the SrQuat does validation (no const version of value())
-			const SrQuat& quat = (const_cast<SkJoint*>(joint))->quat()->value();
-			strstr << "rotation quat:\t" << quat.w << ", "
-			                             << quat.x << ", "
-			                             << quat.y << ", "
-			                             << quat.z;
-			// Marcus's mappings
-			gwiz::euler_t euler( gwiz::quat_t( quat.w, quat.x, quat.y, quat.z ) );
-			strstr << "(as hpr: " << euler.y() << ", "
-			                      << euler.x() << ", "
-			                      << euler.z() << ")" << endl;
-			break;
-		}
-		case SkJoint::TypeSwingTwist: {
-			// const_cast because the SwingTwist does validation (no const version of swingx(), etc.)
-			SkJointSwingTwist* st = (const_cast<SkJoint*>(joint))->st();
-			strstr << "rotation swing-twist (xyt):\t" << st->swingx() << ", "
-			                                         << st->swingy() << ", "
-			                                         << st->twist() << endl;
-
-			break;
-		}
-	}
-	LOG(strstr.str().c_str());
-}
