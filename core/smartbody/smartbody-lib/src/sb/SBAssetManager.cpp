@@ -12,6 +12,7 @@
 #include <sbm/ParserOgre.h>
 #include <sbm/ParserASFAMC.h>
 #include <sbm/ParserFBX.h>
+#include <sbm/lin_win.h>
 
 #ifdef WIN32
 #include <direct.h>
