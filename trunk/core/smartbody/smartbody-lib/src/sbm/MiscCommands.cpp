@@ -3,11 +3,13 @@
 #include <sbm/mcontrol_util.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBBoneBusManager.h>
+#include <sb/SBAssetManager.h>
 #include <sbm/me_utilities.hpp>
 #include <sb/sbm_pawn.hpp>
 #include <sb/sbm_character.hpp>
 #include <sb/SBCharacterListener.h>
 #include <sb/SBScene.h>
+#include <sb/SBMotion.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_blend.hpp>
 #include <controllers/me_ct_gaze.h>
@@ -73,53 +75,6 @@ int set_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args)
 	else 
 	{
 		LOG("ERROR: SbmPawn::set_cmd_func(..): Unknown attribute \"%s\".", attribute.c_str() );
-		return CMD_FAILURE;
-	}
-}
-
-
-int print_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args)
-{
-	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
-	std::stringstream strstr;
-	if( attribute=="world_offset" || attribute=="world-offset" ) {
-		//  Command: print pawn <character id> world_offset
-		//  Print out the current state of the world_offset joint
-		strstr << "pawn " << pawn->getName() << " world_offset:\t";
-		const SkJoint* joint = pawn->get_world_offset_joint();
-		LOG(strstr.str().c_str());
-		if( joint==NULL ) {
-			LOG("No world_offset joint.");
-		} else {
-			print_joint( joint );
-		}
-		return CMD_SUCCESS;
-	} else if( attribute=="joint" || attribute=="joints" ) {
-		//  Command: print character <character id> [joint|joints] <joint name>*
-		//  Print out the current state of the named joints
-		std::string joint_name = args.read_token();
-		if( joint_name.length()==0 ) {
-			LOG("ERROR: SbmPawn::print_attribute(..): Missing joint name of joint to print.");
-			return CMD_FAILURE;
-		}
-
-		do {
-			strstr.clear();
-			strstr << "pawn " << pawn->getName() << " joint "<<joint_name<<":\t";
-			const SkJoint* joint = pawn->get_joint( joint_name.c_str() );
-			LOG(strstr.str().c_str());
-			if( joint==NULL ) {
-				LOG("No joint \"%s\".", joint_name.c_str() );
-			} else {
-				print_joint( joint );
-			}
-
-			joint_name = args.read_token();
-		} while( joint_name.length()>0 );
-
-		return CMD_SUCCESS;
-	} else {
-		LOG("ERROR: SbmPawn::print_attribute(..): Unknown attribute \"%s\".", attribute.c_str() );
 		return CMD_FAILURE;
 	}
 }
@@ -777,64 +732,6 @@ int character_set_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		return set_attribute( character, attribute, args );
 	}
 }
-
-int pawn_print_cmd_funcx( srArgBuffer& args, mcuCBHandle* mcu_p)
-{
-	std::string pawn_id = args.read_token();
-	if( pawn_id.length()==0 ) {
-		LOG("ERROR: SbmPawn::print_cmd_func(..): Missing pawn id.");
-		return CMD_FAILURE;
-	}
-
-	SbmPawn* pawn = mcu_p->getPawn( pawn_id );
-	if( pawn==NULL ) {
-		LOG("ERROR: SbmPawn::print_cmd_func(..): Unknown pawn \"%s\".", pawn_id.c_str());
-		return CMD_FAILURE;
-	}
-
-	std::string attribute = args.read_token();
-	if( attribute.length()==0 ) {
-		LOG("ERROR: SbmPawn::print_cmd_func(..): Missing attribute to print.");
-		return CMD_FAILURE;
-	}
-
-	return print_attribute( pawn, attribute, args);
-}
-
-int character_print_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
-{
-	std::string character_id = args.read_token();
-	if( character_id.length()==0 ) {
-		LOG("ERROR: SbmCharacter::print_cmd_func(..): Missing character id.");
-		return CMD_FAILURE;
-	}
-
-	SbmCharacter* character = mcu_p->getCharacter( character_id );
-	if( character==NULL ) {
-		LOG("ERROR: SbmCharacter::print_cmd_func(..): Unknown character \"%s\".", character_id.c_str());
-		return CMD_FAILURE;
-	}
-
-	std::string attribute = args.read_token();
-	if( attribute.length()==0 ) {
-		LOG("ERROR: SbmCharacter::print_cmd_func(..): Missing attribute to print.");
-		return CMD_FAILURE;
-	}
-
-	if( attribute=="voice" || attribute=="voice_code" || attribute=="voice-code" ) {
-		//  Command: print character <character id> voice_code
-		//  Print out the character's voice_id
-		std::stringstream strstr;
-		strstr << "character " << character_id << "'s voice_code: " << character->get_voice_code();
-		LOG(strstr.str().c_str());
-		return CMD_SUCCESS;
-	} else if( attribute=="schedule" ) {
-		return character->print_controller_schedules();
-	} else {
-		return print_attribute( character, attribute, args);
-	}
-}
-
 
 // Print error on error..
 bool parse_float_or_error( float& var, const char* str, const std::string& var_name )
@@ -2038,7 +1935,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 										{
 											std::string motion_name = args.read_token();
 											std::string tagName = args.read_token();
-											SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
+											SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motion_name);
 											//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
 											int reachType = MeCtReachEngine::getReachType(tagName);//
 											if (reachType == -1)
@@ -2074,7 +1971,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 											int reachType = MeCtReachEngine::getReachType(tagName);//
 											if (reachType == -1)
 												reachType = MeCtReachEngine::RIGHT_ARM;
-											SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
+											SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motion_name);
 											//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
 											if (motion)
 											{

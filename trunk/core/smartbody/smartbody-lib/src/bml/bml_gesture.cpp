@@ -9,6 +9,7 @@
 #include "sb/SBScene.h"
 #include "bml_xml_consts.hpp"
 #include <sb/SBGestureMap.h>
+#include <sb/SBAssetManager.h>
 #include <sb/SBGestureMapManager.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBSteerAgent.h>
@@ -16,6 +17,7 @@
 #include <controllers/me_ct_motion.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <sbm/PPRAISteeringAgent.h>
+#include <sb/SBMotion.h>
 
 using namespace std;
 using namespace BML;
@@ -114,10 +116,10 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		LOG("Character %s does not have a motion scheduler, so cannot schedule motion.", request->actor->getName().c_str());
 		return BehaviorRequestPtr();
 	}
-	std::map<std::string, SkMotion*>::iterator motionIter = mcu->motion_map.find(animationName);
-	if (motionIter != mcu->motion_map.end())
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(animationName);
+
+	if (motion)
 	{
-		SkMotion* motion = (*motionIter).second;
 		MeCtMotion* motionCt = new MeCtMotion();
 
 		// validate gesture timing input (stroke && relax)

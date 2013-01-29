@@ -32,6 +32,9 @@
 #include "bml/bml.hpp"  // for #define USE_RECIPIENT
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_channel_writer.hpp>
+#include <sb/SBScene.h>
+#include <sb/SBAssetManager.h>
+
 
 using namespace std;
 
@@ -415,10 +418,9 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			return CMD_FAILURE;
 		}
 
-		std::map<std::string, SkMotion*>::iterator motionIter = mcu->motion_map.find(anim);
-		if (motionIter == mcu->motion_map.end()) {
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(anim);
+		if (!motion)
 			LOG("WARNING: Unknown animation \"%s\".", anim.c_str());
-		}
 
 		ostringstream bml;
 		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -433,12 +435,6 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 		if( posture.length()==0 ) {
 			LOG("ERROR: test bml %s Missing posture name.", arg.c_str());
 			return CMD_FAILURE;
-		}
-
-		std::map<std::string, SkPosture*>::iterator postureIter = mcu->pose_map.find(posture);
-		if (postureIter == mcu->pose_map.end()) {
-			// the pose_map is deprecated - don't show the message
-			//LOG("WARNING: Unknown posture \"%s\".", posture.c_str());
 		}
 
 		ostringstream bml;

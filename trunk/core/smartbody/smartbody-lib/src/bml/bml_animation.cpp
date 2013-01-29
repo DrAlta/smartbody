@@ -30,6 +30,9 @@
 #include "sbm/mcontrol_util.h"
 #include "bml_xml_consts.hpp"
 #include <sb/SBSkeleton.h>
+#include <sb/SBMotion.h>
+#include <sb/SBScene.h>
+#include <sb/SBAssetManager.h>
 
 using namespace std;
 using namespace BML;
@@ -54,8 +57,8 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 		// Look up motion
 		string asciiName( xml_utils::asciiString( animName ) );
 
-		std::map<std::string, SkMotion*>::iterator motionIter = mcu->motion_map.find(asciiName);
-		if (motionIter != mcu->motion_map.end())
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(asciiName);
+		if (motion)
 		{
 /*
 			double twarp = 1.0;
@@ -68,7 +71,7 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 */
 			double twarp = xml_utils::xml_parse_double( BMLDefs::ATTR_SPEED, elem, 1.0 );
 
-			SkMotion* motion = (*motionIter).second;
+			
 			MeCtMotion* motionCt = new MeCtMotion();
 
 			// Name controller with behavior unique_id

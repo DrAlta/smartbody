@@ -5,6 +5,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBEvent.h>
+#include <sb/SBAssetManager.h>
 #include <sbm/mcontrol_util.h>
 #include <boost/algorithm/string.hpp>
 
@@ -447,7 +448,7 @@ void SBAnimationBlend::createMotionVectorFlow(const std::string& motionName, con
 	if(sk==0)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
+		std::map<std::string, SBSkeleton*>& skeletonMap = mcu.getSkeletonMap();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SBCharacter* sbSk = scene->getCharacter(chrName);
 		if(sbSk)
@@ -596,7 +597,7 @@ void SBAnimationBlend::plotMotion(const std::string& motionName, const std::stri
 	if(sk==0)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
+		std::map<std::string, SBSkeleton*>& skeletonMap = mcu.getSkeletonMap();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SBCharacter* sbSk = scene->getCharacter(chrName);
 		if(sbSk)
@@ -677,7 +678,7 @@ void SBAnimationBlend::plotMotionFrameTime(const std::string& motionName, const 
 	if(sk==0)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
+		std::map<std::string, SBSkeleton*>& skeletonMap = mcu.getSkeletonMap();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SBCharacter* sbSk = scene->getCharacter(chrName);
 		if(sbSk)
@@ -745,7 +746,7 @@ void SBAnimationBlend::plotMotionJointTrajectory(const std::string& motionName, 
 	if(sk==0)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
+		std::map<std::string, SBSkeleton*>& skeletonMap = mcu.getSkeletonMap();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SBCharacter* sbSk = scene->getCharacter(chrName);
 		if(sbSk)
@@ -817,7 +818,7 @@ void SBAnimationBlend::clearPlotMotion(void)
 void SBAnimationBlend::setChrPlotMotionTransform(const std::string& chrName)
 {
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
+		std::map<std::string, SBSkeleton*>& skeletonMap = mcu.getSkeletonMap();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SBCharacter* sbSk = scene->getCharacter(chrName);
 		if(sbSk)
@@ -838,7 +839,7 @@ void SBAnimationBlend::setPlotMotionTransform(SrVec offset, float yRot)
 void SBAnimationBlend::setChrPlotVectorFlowTransform(const std::string& chrName)
 {
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		std::map<std::string, SkSkeleton*>& skeletonMap = mcu.getSkeletonMap();
+		std::map<std::string, SBSkeleton*>& skeletonMap = mcu.getSkeletonMap();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SBCharacter* sbSk = scene->getCharacter(chrName);
 		if(sbSk)
@@ -1050,10 +1051,11 @@ void SBAnimationBlend::removeMotion(const std::string& motionName)
 bool SBAnimationBlend::addSkMotion(const std::string& motion)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SkMotion* skMotion = mcu.getMotion(motion);
-	if (skMotion)
+	SBMotion* sbmotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motion);
+
+	if (sbmotion)
 	{
-		motions.push_back(skMotion);
+		motions.push_back(sbmotion);
 /*		
 		// adding two correspondence points when the first motion got inserted
 		if (motions.size() == 1)
@@ -1075,7 +1077,7 @@ bool SBAnimationBlend::addSkMotion(const std::string& motion)
 			if (numPoints > 0)
 			{
 				keyVec.resize(numPoints);
-				double duration = skMotion->duration();
+				double duration = sbmotion->duration();
 				if (numPoints >= 2)
 				{
 					keyVec[0] = 0.0f;
@@ -1138,13 +1140,13 @@ void SBAnimationBlend::validateCorrespondencePoints()
 	for (int i = 0; i < getNumMotions(); i++)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		SkMotion* skMotion = mcu.lookUpMotion(motions[i]->getName().c_str());		
+		SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motions[i]->getName());		
 		for (int j = 1; j < getNumCorrespondencePoints(); j++)
 		{
 			if (keys[i][j] < keys[i][j - 1])
 			{
 				for (int k = j; k < getNumCorrespondencePoints(); k++)
-					keys[i][k] += skMotion->duration();
+					keys[i][k] += motion->duration();
 			}
 		}
 	}
@@ -1158,7 +1160,7 @@ bool SBAnimationBlend::validateState()
 	for (int i=0; i < getNumMotions(); i++)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		SkMotion* skMotion = mcu.lookUpMotion(motions[i]->getName().c_str());		
+		SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motions[i]->getName());		
 		if ((int)keys.size() < i) // no keys for this state
 		{			
 			keys.push_back(std::vector<double>());			
@@ -1167,7 +1169,7 @@ bool SBAnimationBlend::validateState()
 		if (keyVec.size() == 0) // if no keys for the motion, automatically set up this based on motion duration
 		{
 			keyVec.push_back(0.0);
-			keyVec.push_back(skMotion->duration());
+			keyVec.push_back(motion->duration());
 		}
 	}
 	_isFinalized = true;

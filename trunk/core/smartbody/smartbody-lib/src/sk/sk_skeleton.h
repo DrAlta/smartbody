@@ -161,7 +161,7 @@ class SkSkeleton : public SmartBody::SBAsset, public SrSharedClass
        and in the current directory. Also, relative paths in sk become relative to basedir.
        If basedir is not given (null), it is extracted from in.filename(), if available.
        Method compress() is called after the file is loaded. */
-    bool load ( SrInput& in, double scale = 1.0, const char* basedir=0 );
+    bool loadSk ( SrInput& in, double scale = 1.0, const char* basedir=0 );
 
     /*! Save in .sk format the current skeleton.
         Geometries are also exported if parameter geopath is provided, or if

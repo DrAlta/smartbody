@@ -6,6 +6,7 @@
 #include "SBDebuggerClient.h"
 
 #include <sb/SBScene.h>
+#include <sb/SBAssetManager.h>
 #include <sb/SBMotion.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
@@ -124,10 +125,9 @@ void SBDebuggerUtility::initSkeleton(const std::string& skFileName, const std::s
 {
 	SrInput input(info.c_str());
 	SmartBody::SBSkeleton* sbSkel = new SmartBody::SBSkeleton();
-	SkSkeleton* skSkel = sbSkel;
-	skSkel->load(input);
-	skSkel->skfilename(skFileName.c_str());
-	mcuCBHandle::singleton().skeleton_map.insert(std::pair<std::string, SkSkeleton*>(sbSkel->getName(), skSkel));
+	sbSkel->loadSk(input);
+	sbSkel->skfilename(skFileName.c_str());
+	mcuCBHandle::singleton().skeleton_map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(sbSkel->getName(), sbSkel));
 }
 
 
@@ -219,10 +219,7 @@ bool QueryResourcesCB(void* caller, NetRequest* req)
 	case NetRequest::Get_Motion_Names:
 		for (size_t i = 0; i < args.size(); i++)
 		{
-			std::map<std::string, SkMotion*>& motionMap = mcuCBHandle::singleton().motion_map;
-			SkMotion* dummyMotion = new SkMotion();
-			motionMap.insert(std::make_pair(args[i], dummyMotion));
-			dummyMotion->setName(args[i]);
+			SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->addMotionDefinition(args[i], 0);
 		}
 		break;
 

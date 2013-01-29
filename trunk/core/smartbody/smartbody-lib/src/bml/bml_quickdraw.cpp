@@ -29,6 +29,9 @@
 #include "bml_target.hpp"
 #include "sbm/xercesc_utils.hpp"
 #include "sbm/BMLDefs.h"
+#include <sb/SBScene.h>
+#include <sb/SBAssetManager.h>
+#include <sb/SBMotion.h>
 
 char* DEFAULT_QUICKDRAW_ANIM	= (char*)"AdultM_FastDraw001";
 
@@ -60,13 +63,12 @@ BehaviorRequestPtr BML::parse_bml_quickdraw(
 	}
 
 	string anim_name = xml_parse_string( BMLDefs::ATTR_ANIM, elem, DEFAULT_QUICKDRAW_ANIM );
-	map< string, SkMotion* >::iterator motionIter = mcu->motion_map.find( anim_name );
-	if( motionIter ==  mcu->motion_map.end() ){
+	SmartBody::SBMotion* anim = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(anim_name);
+	if (!anim){
 		LOG( "BML::parse_bml_quickdraw ERR: unknown motion: \"%s\"", anim_name.c_str() );
 		return BehaviorRequestPtr();  // NULL
 	}
-	SkMotion* anim = (*motionIter).second;
-
+	
 	float track_duration = xml_parse_float( BMLDefs::ATTR_TRACK_DUR, elem, -1.0 );
 
 	bool set_gundraw_dur_param = false;

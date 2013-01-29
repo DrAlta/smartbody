@@ -239,21 +239,20 @@ void SBScene::cleanup()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	// remove the motions and skeleton
-	for (std::map<std::string, SkMotion*>::iterator motionIter = mcu.motion_map.begin();
-		motionIter !=  mcu.motion_map.end();
-		motionIter++)
+	const std::vector<std::string> motionNames = SmartBody::SBScene::getScene()->getAssetManager()->getMotionNames();
+	for (std::vector<std::string>::const_iterator iter = motionNames.begin();
+			 iter != motionNames.end();
+			 iter++)
 	{
-
-		SkMotion* motion = (*motionIter).second;
-		delete motion;
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(*iter);
+		SmartBody::SBScene::getScene()->getAssetManager()->removeMotion(motion);
 	}
-	mcu.motion_map.clear();
 
-	for (std::map<std::string, SkSkeleton*>::iterator skelIter =  mcu.skeleton_map.begin();
+	for (std::map<std::string, SBSkeleton*>::iterator skelIter =  mcu.skeleton_map.begin();
 		skelIter !=  mcu.skeleton_map.end();
 		skelIter++)
 	{
-		SkSkeleton* skeleton = (*skelIter).second;
+		SBSkeleton* skeleton = (*skelIter).second;
 		delete skeleton;
 	}
 	mcu.skeleton_map.clear();
@@ -695,47 +694,27 @@ SBCharacter* SBScene::getCharacter(const std::string& name)
 
 SBSkeleton* SBScene::getSkeleton(const std::string& name)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::map<std::string, SkSkeleton*>::iterator iter = mcu.skeleton_map.find(name);
-	SkSkeleton* skskel = NULL;
-	if (iter != mcuCBHandle::singleton().skeleton_map.end())
-		skskel = iter->second;
-	SBSkeleton* sbskel = dynamic_cast<SBSkeleton*>(skskel);
-	return sbskel;
+	LOG("DEPRECATED: Use AssetManager.getSkeleton() instead.");
+	return getAssetManager()->getSkeleton(name);
 }
 
 SBMotion* SBScene::getMotion(const std::string& name)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SkMotion* motion = mcu.getMotion(name);
-	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);	
-	return sbmotion;
+	LOG("DEPRECATED: Use AssetManager.getMotion() instead.");
+	return getAssetManager()->getMotion(name);
 }
 
 int SBScene::getNumMotions()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	return mcu.motion_map.size();
+	LOG("DEPRECATED: Use AssetManager.getNumMotions() instead.");
+	return getAssetManager()->getNumMotions();
 }
 
 std::vector<std::string> SBScene::getMotionNames()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::vector<std::string> ret;
-
-	for(std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.begin();
-		iter != mcu.motion_map.end();
-		iter++)
-	{
-		SkMotion* motion = (*iter).second;
-		ret.push_back(motion->getName());
-	}
-
-	return ret;
+	LOG("DEPRECATED: Use AssetManager.getNumMotions() instead.");
+	return getAssetManager()->getMotionNames();
 }
-
-
 
 std::vector<std::string> SBScene::getPawnNames()
 {
@@ -771,31 +750,6 @@ std::vector<std::string> SBScene::getCharacterNames()
 	return ret;
 }
 
-
-int SBScene::getNumSkeletons()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	return mcu.getSkeletonMap().size();
-}
-
-
-std::vector<std::string> SBScene::getSkeletonNames()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::vector<std::string> ret;
-
-	for(std::map<std::string, SkSkeleton*>::iterator iter = mcu.getSkeletonMap().begin();
-		iter != mcu.getSkeletonMap().end();
-		iter++)
-	{
-		SkSkeleton* skeleton = (*iter).second;
-		ret.push_back(std::string(iter->first));
-	}
-
-	return ret;	
-}
-
 std::vector<std::string> SBScene::getEventHandlerNames()
 {
 	SBEventManager* eventManager = getEventManager();
@@ -812,328 +766,6 @@ std::vector<std::string> SBScene::getEventHandlerNames()
 	return ret;
 }
 
-std::vector<std::string> SBScene::getAssetPaths(const std::string& type)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	std::vector<std::string> list;
-	srPathList* path = NULL;
-	if (type == "seq" || type == "script")
-	{
-		path = &mcu.seq_paths;
-	}
-	else if (type == "me" || type == "ME" || type == "motion")
-	{
-		path = &mcu.me_paths;
-	}
-	else if (type == "audio")
-	{
-		path = &mcu.audio_paths;
-	}
-	else if (type == "mesh")
-	{
-		path = &mcu.mesh_paths;
-	}
-	else
-	{
-		LOG("Unknown path type: %s", type.c_str());
-		return list;
-	}
-	
-	path->reset();
-	std::string nextPath = path->next_path(false);
-	while (nextPath != "")
-	{
-		list.push_back(nextPath);
-		nextPath = path->next_path(false);
-	}
-	return list;
-}
-
-std::vector<std::string> SBScene::getLocalAssetPaths(const std::string& type)
-{
-
-	std::string mediaPath = getMediaPath();
-	boost::filesystem::path mpath(mediaPath);
-	std::string completeMediaPath =  boost::filesystem::complete(mpath).string();
-	size_t mediaPathLength = completeMediaPath.size();
-
-	std::vector<std::string> paths = getAssetPaths(type);
-
-	std::vector<std::string> localPaths;
-
-	// remove the media path
-	for (std::vector<std::string>::iterator iter = paths.begin();
-		 iter != paths.end();
-		 iter++)
-	{
-		boost::filesystem::path path((*iter));
-		std::string completePath = boost::filesystem::complete( path ).string();
-		size_t loc = completePath.find(completeMediaPath);
-		if (loc == 0)
-		{
-			localPaths.push_back(completePath.substr(mediaPathLength + 1));
-		}
-		else
-		{
-			localPaths.push_back((*iter));
-		}
-	}
-
-	return localPaths;
-
-}
-
-void SBScene::addAssetPath(const std::string& type, const std::string& path)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	
-	if (type == "seq" || type == "script")
-	{
-		mcu.seq_paths.insert(const_cast<char *>(path.c_str()));
-	}
-	else if (type == "me" || type == "ME" || type == "motion")
-	{
-		mcu.me_paths.insert(const_cast<char *>(path.c_str()));
-	}
-	else if (type == "audio")
-	{
-		mcu.audio_paths.insert(const_cast<char *>(path.c_str()));
-	}
-	else if (type == "mesh")
-	{
-		mcu.mesh_paths.insert(const_cast<char *>(path.c_str()));
-	}
-	else
-	{
-		LOG("Input type %s not recognized!", type.c_str());
-		return;
-	}
-}
-
-void SBScene::removeAssetPath(const std::string& type, const std::string& path)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-
-	bool ret = false;
-	if (type == "seq" || type == "script")
-	{
-		ret = mcu.seq_paths.remove(const_cast<char *>(path.c_str()));
-	}
-	else if (type == "me" || type == "ME" || type == "motion")
-	{
-		ret = mcu.me_paths.remove(const_cast<char *>(path.c_str()));
-	}
-	else if (type == "audio")
-	{
-		ret = mcu.audio_paths.remove(const_cast<char *>(path.c_str()));
-	}
-	else
-	{
-		LOG("Input type %s not recognized!", type.c_str());
-		return;
-	}
-
-	if (ret)
-	{
-		// remove the resource from the resource manager
-	}
-}
-
-void SBScene::removeAllAssetPaths(const std::string& type)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-
-	bool ret = false;
-	if (type == "seq" || type == "script")
-	{
-		 mcu.seq_paths.removeAll();
-	}
-	else if (type == "me" || type == "ME" || type == "motion")
-	{
-		mcu.me_paths.removeAll();
-	}
-	else if (type == "audio")
-	{
-		mcu.audio_paths.removeAll();
-	}
-	else if (type == "mesh")
-	{
-		mcu.mesh_paths.removeAll();
-	}
-	else
-	{
-		LOG("Input type %s not recognized!", type.c_str());
-		return;
-	}
-
-	if (ret)
-	{
-		// remove the resource from the resource manager
-	}
-}
-
-void SBScene::loadAssets()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.me_paths.reset();
-
-	std::string path = mcu.me_paths.next_path(false);
-	while (path != "")
-	{
-		mcu.load_motions(path.c_str(), true);
-		mcu.load_skeletons(path.c_str(), true);
-		path = mcu.me_paths.next_path(false);
-	}
-}
-
-void SBScene::loadAsset(const std::string& assetPath)
-{
-	const std::string& mediaPath = this->getMediaPath();
-	boost::filesystem::path p( mediaPath );
-	boost::filesystem::path assetP( assetPath );
-
-	boost::filesystem::path abs_p = boost::filesystem::complete( assetP );	
-
-	if( boost::filesystem2::exists( abs_p ))
-	{
-		p = assetP;
-	}
-	else
-	{
-		p /= assetP;
-	}
-	boost::filesystem::path final = boost::filesystem::complete( p );
-	std::string finalPath = p.string();
-
-	// make sure the file exists and is readable
-	std::ifstream file(finalPath.c_str());
-	if (!file.good())
-	{
-		LOG("File %s cannot be read, asset will not be loaded.", finalPath.c_str());
-		return;
-	}
-
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-
-	std::string ext = boost::filesystem::extension( finalPath );
-	std::string baseName = boost::filesystem::basename( finalPath );
-	std::string fileName = baseName+ext;
-	// determine the type of asset: skeleton, motion, mesh, texture, ...
-	if( _stricmp( ext.c_str(), ".skm" ) == 0)
-	{
-		FILE* myfile = fopen(finalPath.c_str(), "rt");
-		SrInput in( myfile );
-		SmartBody::SBMotion* motion = new SmartBody::SBMotion();
-		bool parseSuccessful = motion->load( in, 1.0 );
-		if (parseSuccessful)
-			mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motion->getName(), motion));
-		else
-			delete motion;
-		return;
-	}
-
-	if( _stricmp( ext.c_str(), ".bvh" ) == 0)
-	{
-		SmartBody::SBSkeleton* skeleton = new SmartBody::SBSkeleton();
-		SmartBody::SBMotion* motion = new SmartBody::SBMotion();
-		bool parseSuccessful = ParserBVH::parse(*skeleton, *motion, finalPath, file, 1.0);
-		if (parseSuccessful)
-		{
-			mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motion->getName(), motion));
-			mcu.skeleton_map.insert(std::pair<std::string, SkSkeleton*>(skeleton->getName(), skeleton));
-		}
-		else
-		{
-			delete motion;
-			delete skeleton;
-		}
-			
-		return;
-	}
-
-	if( _stricmp( ext.c_str(), ".sk" ) == 0)
-	{
-		FILE* myfile = fopen(finalPath.c_str(), "rt");
-		SrInput input(myfile);
-		SmartBody::SBSkeleton* skeleton = new SmartBody::SBSkeleton();
-		SkSkeleton* skel = skeleton;
-		if( skel->load( input, 1.0) )
-		{
-			skeleton->ref();
-			skeleton->setFileName(fileName);
-			skeleton->setName(skeleton->getFileName());
-			mcu.skeleton_map.insert(std::pair<std::string, SkSkeleton*>(skel->getName(), skeleton));
-		}
-		else
-		{
-			delete skeleton;
-		}
-		return;
-	}
-
-	if( _stricmp( ext.c_str(), ".dae" ) == 0)
-	{
-
-	}
-
-	if( _stricmp( ext.c_str(), ".xml" ) == 0)
-	{
-
-	}
-
-	if( _stricmp( ext.c_str(), ".asf" ) == 0)
-	{
-
-	}
-	if( _stricmp( ext.c_str(), ".amc" ) == 0)
-	{
-
-	}
-}
-
-void SBScene::loadAssetsFromPath(const std::string& assetPath)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.load_motions(assetPath.c_str(), true);
-	mcu.load_skeletons(assetPath.c_str(), true);
-}
-
-SBSkeleton* SBScene::addSkeletonDefinition(const std::string& skelName )
-{
-	SBSkeleton* sbSkel = new SBSkeleton();
-	SkSkeleton* skSkel = sbSkel;	
-	sbSkel->setName(skelName);
-	skSkel->skfilename(skelName.c_str());
-	mcuCBHandle::singleton().skeleton_map.insert(std::pair<std::string, SkSkeleton*>(sbSkel->getName(), skSkel));
-	return sbSkel;
-}
-
-SBMotion* SBScene::addMotionDefinition(const std::string& motionName, double duration )
-{
-	SBMotion* sbMotion = new SBMotion();
-	if (duration > 0)
-	{
-		sbMotion->insert_frame(0,0.f);
-		sbMotion->insert_frame(1,(float)duration);
-	}	
-	sbMotion->setName(motionName);	
-	//mcuCBHandle::singleton().motion_map.insert(std::pair<std::string, SkMotion*>(motionName, sbMotion));
-	mcuCBHandle::singleton().motion_map[motionName] = sbMotion;
-	return sbMotion;
-}
-
-void SBScene::addPose(const std::string& path, bool recursive)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.load_poses(path.c_str(), recursive);
-}
-
-void SBScene::addMotion(const std::string& path, bool recursive)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.load_motions(path.c_str(), recursive);
-}
 
 void SBScene::setMediaPath(const std::string& path)
 {
@@ -1165,21 +797,9 @@ void SBScene::setDefaultRecipient(const std::string& recipient)
 
 SBSkeleton* SBScene::createSkeleton(const std::string& skeletonDefinition)
 {
-	SBSkeleton* skeleton = NULL;
-	SBSkeleton* templateSkeleton = this->getSkeleton(skeletonDefinition);
-	if (templateSkeleton)
-	{
-		skeleton = new SBSkeleton(templateSkeleton);
-	}
-	else
-	{
-		skeleton = new SBSkeleton(skeletonDefinition);
-	}
-
-	return skeleton;
-	
+	LOG("DEPRECATED: Use AssetManager.createSkeleton() instead.");
+	return getAssetManager()->createSkeleton(skeletonDefinition);
 }
-
 
 
 SBEventManager* SBScene::getEventManager()
@@ -2516,6 +2136,83 @@ void SBScene::removeDefaultControllers()
 	 _defaultControllers.clear();
 }
 
+std::vector<std::string> SBScene::getAssetPaths(const std::string& type)
+{
+	LOG("DEPRECATED: Use AssetManager.getAssetPaths() instead.");
+	return getAssetManager()->getAssetPaths(type);
+}
+
+std::vector<std::string> SBScene::getLocalAssetPaths(const std::string& type)
+{
+	LOG("DEPRECATED: Use AssetManager.getLocalAssetPaths() instead.");
+	return getAssetManager()->getLocalAssetPaths(type);
+}
+
+void SBScene::addAssetPath(const std::string& type, const std::string& path)
+{
+	LOG("DEPRECATED: Use AssetManager.addAssetPath() instead.");
+	getAssetManager()->addAssetPath(type, path);
+}
+
+void SBScene::removeAssetPath(const std::string& type, const std::string& path)
+{
+	LOG("DEPRECATED: Use AssetManager.addAssetPath() instead.");
+	getAssetManager()->removeAssetPath(type, path);
+}
+
+void SBScene::removeAllAssetPaths(const std::string& type)
+{
+	LOG("DEPRECATED: Use AssetManager.removeAllAssetPaths() instead.");
+	getAssetManager()->removeAllAssetPaths(type);
+}
+
+void SBScene::loadAssets()
+{
+	LOG("DEPRECATED: Use AssetManager.addAssetPath() instead.");
+	getAssetManager()->loadAssets();
+}
+
+void SBScene::loadAsset(const std::string& assetPath)
+{
+	LOG("DEPRECATED: Use AssetManager.loadAsset() instead.");
+	getAssetManager()->loadAsset(assetPath);
+}
+
+void SBScene::loadAssetsFromPath(const std::string& assetPath)
+{
+	LOG("DEPRECATED: Use AssetManager.loadAssetsFromPath() instead.");
+	getAssetManager()->loadAssetsFromPath(assetPath);
+}
+
+SBSkeleton* SBScene::addSkeletonDefinition(const std::string& skelName )
+{
+	LOG("DEPRECATED: Use AssetManager.addSkeletonDefinition() instead.");
+	return getAssetManager()->addSkeletonDefinition(skelName);
+}
+
+SBMotion* SBScene::addMotionDefinition(const std::string& motionName, double duration )
+{
+	LOG("DEPRECATED: Use AssetManager.addMotionDefinition() instead.");
+	return getAssetManager()->addMotionDefinition(motionName, duration);
+}
+
+void SBScene::addMotions(const std::string& path, bool recursive)
+{
+	LOG("DEPRECATED: Use AssetManager.addMotion() instead.");
+	getAssetManager()->addMotions(path, recursive);
+}
+
+int SBScene::getNumSkeletons()
+{
+	LOG("DEPRECATED: Use AssetManager.getNumSkeletons() instead.");
+	return getAssetManager()->getNumSkeletons();
+}
+
+std::vector<std::string> SBScene::getSkeletonNames()
+{
+	LOG("DEPRECATED: Use AssetManager.getSkeletonNames() instead.");
+	return getAssetManager()->getSkeletonNames();
+}
 
 
 };

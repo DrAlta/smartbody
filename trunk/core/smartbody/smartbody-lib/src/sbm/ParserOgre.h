@@ -31,15 +31,21 @@
 #include "sbm/mcontrol_util.h"
 #include "sbm/gwiz_math.h"
 
+namespace SmartBody {
+
+	class SBMotion;
+	class SBSkeleton;
+}
+
 class ParserOgre
 {
 	public:
-		static bool parse(SkSkeleton& skeleton, std::vector<SkMotion*>& motions, std::string fileName, float scale, bool doParseSkeleton, bool doParseMotion);		
+		static bool parse(SmartBody::SBSkeleton& skeleton, std::vector<SmartBody::SBMotion*>& motions, std::string fileName, float scale, bool doParseSkeleton, bool doParseMotion);		
 		static bool parseSkinMesh(std::vector<SrModel*>& meshModelVec, std::vector<SkinWeight*>& skinWeights, std::string filename, float scale, bool doParseMesh, bool doParseSkinWeight);
 		static DOMNode* getNode(const std::string& nodeName, DOMNode* node);
 
-		static bool parseSkeleton(DOMNode* skeletonNode, SkSkeleton& skeleton, std::string fileName, float scale);
-		static bool parseMotion(DOMNode* motionNode, std::vector<SkMotion*>& motions, SkMotion* motion,std::string fileName, float scale);
+		static bool parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& skeleton, std::string fileName, float scale);
+		static bool parseMotion(DOMNode* motionNode, std::vector<SmartBody::SBMotion*>& motions, SmartBody::SBMotion* motion,std::string fileName, float scale);
 		static bool parseMesh(DOMNode* meshNode, std::vector<SrModel*>& meshModelVec, float scaleFactor);
 		static bool parseSkinWeight(DOMNode* node, std::vector<SkinWeight*>& skinWeights, float scaleFactor);
 		static bool parseMeshMaterial(std::vector<SrModel*>& meshModelVec, std::string materialFilePath);

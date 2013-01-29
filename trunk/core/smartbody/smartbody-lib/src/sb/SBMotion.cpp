@@ -8,6 +8,7 @@
 #include <sb/SBJointMap.h>
 #include <sb/SBEvent.h>
 #include <sb/SBJointMapManager.h>
+#include <sb/SBAssetManager.h>
 #include <controllers/me_ct_jacobian_IK.hpp>
 #include <controllers/me_ct_ccd_IK.hpp>
 #include <boost/lexical_cast.hpp>
@@ -165,20 +166,17 @@ void SBMotion::checkSkeleton(std::string skel)
 	int chanSize;
 	SkChannel chan;
 
-	SkMotion* motion;
-	std::map<std::string, SkMotion*>::iterator motionIter = mcu.motion_map.find(getName().c_str());
-	if (motionIter != mcu.motion_map.end())
-		motion = motionIter->second;
-	else
+	SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(getName());
+	if (!motion)
 	{
 		LOG("checkSkeleton ERR: Motion %s NOT EXIST!", getName().c_str());
 		return;
 	}
 
-	SkSkeleton* skSkel = load_skeleton(skel.c_str(), mcu.me_paths, mcu.skScale);
+	SmartBody::SBSkeleton* skSkel = load_skeleton(skel.c_str(), mcu.me_paths, mcu.skScale);
 	if (skSkel)
 	{
-		int numValidChannels = motion->connect(skSkel);	// connect and check for the joints
+		motion->connect(skSkel);	// connect and check for the joints
 		SkChannelArray& mChanArray = motion->channels();
 		int mChanSize = mChanArray.size();
 		SkChannelArray& skelChanArray = skSkel->channels();
@@ -225,9 +223,9 @@ void SBMotion::checkSkeleton(std::string skel)
 		LOG("Skeleton %s NOT EXIST!", skel.c_str());
 }
 
-void SBMotion::connect(SBSkeleton* skel)
+int SBMotion::connect(SBSkeleton* skel)
 {
-	SkMotion::connect(skel);
+	return SkMotion::connect(skel);
 }
 
 void SBMotion::disconnect()
@@ -462,7 +460,8 @@ SBMotion* SBMotion::duplicateCycle(int num, std::string newName)
 	}
 
 	copyMotion->setName(copyMotionName);
-	mcu.motion_map.insert(std::pair<std::string, SkMotion*>(copyMotionName, copyMotion));
+	SmartBody::SBScene::getScene()->getAssetManager()->addMotion(copyMotion);
+	
 	srSynchPoints sp(synch_points);
 	copyMotion->synch_points = sp;
 	copyMotion->init(mchan_arr);
@@ -580,7 +579,7 @@ SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std
 
 
 		//mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, motion));
-		mcu.motion_map[motionName] = motion;
+		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);
 	}
 	return sbmotion;
 }
@@ -957,8 +956,7 @@ SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 			motionName = name;
 		sbmotion->setName(motionName.c_str());
 
-		
-		mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, motion));
+		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);
 	}
 
 	// create a trail indicating that this motion was mirrored
@@ -1001,8 +999,7 @@ SBMotion* SBMotion::mirrorChildren( std::string name, std::string skeletonName, 
 			motionName = name;
 		sbmotion->setName(motionName.c_str());
 
-
-		mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, motion));
+		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);
 	}
 	return sbmotion;
 }
@@ -1024,7 +1021,7 @@ SBMotion* SBMotion::smoothCycle( std::string name, float timeInterval )
 		else
 			motionName = name;
 		sbmotion->setName(motionName.c_str());
-		mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, motion));
+		 SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);
 	}
 	return sbmotion;
 }
@@ -1671,7 +1668,7 @@ SBMotion* SBMotion::constrain( std::string name, std::string srcSkeletonName, st
 		constraintMotion->setName(motionName.c_str());
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		//mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, cleanUpMotion));
-		mcu.motion_map[motionName] = constraintMotion;
+		 SmartBody::SBScene::getScene()->getAssetManager()->addMotion(constraintMotion);
 	}
 	return constraintMotion;
 
@@ -1715,9 +1712,7 @@ SBMotion* SBMotion::footSkateCleanUp( std::string name, std::vector<std::string>
 		else
 			motionName = name;
 		cleanUpMotion->setName(motionName.c_str());
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		//mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, cleanUpMotion));
-		mcu.motion_map[motionName] = cleanUpMotion;
+		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(cleanUpMotion);
 	}
 	return cleanUpMotion;
 }

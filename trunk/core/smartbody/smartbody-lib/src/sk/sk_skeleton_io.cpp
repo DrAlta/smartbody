@@ -427,7 +427,7 @@ SkJoint* SkSkeleton::_loadj ( SrInput& in, SkJoint* p, SrStringArray& paths, boo
 }
 
 // parse main keywords
-bool SkSkeleton::load ( SrInput& in, double skScale, const char* basedir )
+bool SkSkeleton::loadSk ( SrInput& in, double skScale, const char* basedir )
 {
 	SrString path;
 	SrPathArray paths;

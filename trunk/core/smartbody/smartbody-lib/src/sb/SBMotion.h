@@ -52,7 +52,7 @@ class SBMotion : public SkMotion
 		SBAPI std::vector<std::string> getChannels();
 		SBAPI void checkSkeleton(std::string skel);
 		
-		SBAPI virtual void connect(SBSkeleton* skel);
+		SBAPI virtual int connect(SBSkeleton* skel);
 		SBAPI virtual void disconnect();
 
 		SBAPI void alignToBegin(int numFrames);

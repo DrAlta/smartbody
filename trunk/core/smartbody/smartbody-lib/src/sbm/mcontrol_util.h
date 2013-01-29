@@ -249,9 +249,7 @@ class mcuCBHandle {
 		SequenceManager	pendingSequences;
 		SequenceManager activeSequences;
 
-		std::map<std::string, SkPosture*> pose_map;
-		std::map<std::string, SkMotion*> motion_map;
-		std::map<std::string, SkSkeleton*> skeleton_map;
+		std::map<std::string, SmartBody::SBSkeleton*> skeleton_map;
 		std::map<std::string, DeformableMesh*> deformableMeshMap;
 
 		GeneralParamMap				param_map;			// map that contains the information of shader parameters
@@ -280,12 +278,10 @@ class mcuCBHandle {
 
 		
 		std::map<std::string, SbmCharacter*>& getCharacterMap();
-		std::map<std::string, SkSkeleton*>& getSkeletonMap();
+		std::map<std::string, SmartBody::SBSkeleton*>& getSkeletonMap();
 
 		SbmCharacter* getCharacter(const std::string& name);
 		int getNumCharacters();
-
-		SkMotion* getMotion(const std::string& motionName);
 
 		std::map<std::string, SmartBody::Nvbg*> nvbgMap;
 		std::map<std::string, SbmPawn*>	pawn_map;
@@ -431,13 +427,10 @@ public:
 		// ----------------------------------------------
 		// asset management
 		// ----------------------------------------------
-		int load_motions( const char* pathname, bool recursive );
 		int load_skeletons( const char* pathname, bool recursive );
-		int load_poses( const char* pathname, bool recursive );
 
 		int load_skeleton( const void* data, int sizeBytes, const char* skeletonName );
-		int load_motion( const void* data, int sizeBytes, const char* motionName );
-
+		
 		int map_skeleton( const char * mapName, const char * skeletonName );
 		int map_motion( const char * mapName, const char * motionName );
 
@@ -446,8 +439,6 @@ public:
 		// ----------------------------------------------
 
 		srCmdSeq* lookup_seq( const char* );
-
-		SkMotion* lookUpMotion(const char* motionName);
 
 		// ----------------------------------------------
 		// command management

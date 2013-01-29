@@ -73,6 +73,9 @@
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/nvbg.h>
+#include <sb/SBScene.h>
+#include <sb/SBMotion.h>
+#include <sb/SBAssetManager.h>
 
 using namespace std;
 using namespace BML;
@@ -536,22 +539,11 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 		// Look up pose
 		const char* ascii_pose_id = xml_utils::asciiString(postureName);
 		string pose_id = ascii_pose_id;
-		delete [] ascii_pose_id;
-		std::map<std::string, SkPosture*>::iterator postureIter =  mcu->pose_map.find(pose_id);
-		if( postureIter !=  mcu->pose_map.end()) {
-		
-			SkPosture* posture = (*postureIter).second;
-			MeCtPose* poseCt = new MeCtPose();
-			poseCt->setName( posture->name() );  // TODO: include BML act and behavior ids
-			poseCt->init(const_cast<SbmCharacter*>(request->actor), *posture );
-
-			return BehaviorRequestPtr( new PostureRequest( unique_id, localId, poseCt, 1, request->actor, behav_syncs ) );
-		} else {
+		{
 			// Check for a motion (a motion texture, or motex) of the same name
-			std::map<std::string, SkMotion*>::iterator motionIter = mcu->motion_map.find(pose_id);
-			if (motionIter != mcu->motion_map.end())
+			SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(pose_id);
+			if (motion)
 			{
-				SkMotion* motion = (*motionIter).second;
 				MeCtMotion* motionCt = new MeCtMotion();
 				motionCt->setName( motion->getName() );  // TODO: include BML act and behavior ids
 				motionCt->init(const_cast<SbmCharacter*>(request->actor), motion );

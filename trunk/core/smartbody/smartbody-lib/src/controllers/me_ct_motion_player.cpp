@@ -22,6 +22,9 @@
 
 #include <controllers/me_ct_motion_player.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBMotion.h>
+#include <sb/SBScene.h>
+#include <sb/SBAssetManager.h>
 
 std::string MeCtMotionPlayer::Context::CONTEXT_TYPE = "MeCtMotionPlayer::Context";
 std::string MeCtMotionPlayer::CONTROLLER_TYPE = "MeCtMotionPlayer";
@@ -59,12 +62,9 @@ void MeCtMotionPlayer::init(SbmPawn* pawn, std::string name, double n)
 	}
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(name);
-	if (iter == mcu.motion_map.end())
-		return;
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(name);
 
 	motionName = name;
-	SkMotion* motion = (*iter).second;
 	motion->connect(character->getSkeleton());
 	controller = new MeCtMotion();
 	MeCtMotion* mController = dynamic_cast<MeCtMotion*> (controller);
