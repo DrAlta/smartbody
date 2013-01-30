@@ -404,7 +404,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SmartBod
 #endif
 
 		skeleton->ref();		
-		skeleton->setName(skeleton->skfilename());
+		//skeleton->setName(skeleton->skfilename());
 		
 	}
 	return CMD_SUCCESS;

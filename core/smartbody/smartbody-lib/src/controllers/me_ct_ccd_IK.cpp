@@ -53,7 +53,7 @@ void MeCtCCDIK::CCDUpdate( MeCtIKTreeNode* startNode, EffectorConstraint* con )
 	MeCtIKTreeNode* pNode = endEffector->parent;
 	while (pNode != startNode)
 	{		
-		if (!pNode->lock)
+		if (!pNode->lock && pNode->active)
 		//LOG("node name = %s\n",pNode->nodeName.c_str());
 		{
 			CCDIteration(pNode,con);

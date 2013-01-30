@@ -24,7 +24,7 @@
 #define _ME_CT_PARAM_ANIMATION_H_
 
 #include <controllers/me_ct_container.hpp>
-#include <sb/sbm_character.hpp>
+#include <sb/SBCharacter.h>
 #include <controllers/me_ct_param_animation_utilities.h>
 #include <sb/PABlend.h>
 #include <controllers/me_ct_motion_example.hpp>
@@ -135,7 +135,7 @@ class MeCtParamAnimation : public MeCtContainer
 	private:
 
 		SkChannelArray	channels;
-		SbmCharacter*	character;
+		SmartBody::SBCharacter*	character;
 		std::string baseJointName;
 		MeCtChannelWriter* woWriter;
 		PATransitionManager* transitionManager;
@@ -145,5 +145,6 @@ class MeCtParamAnimation : public MeCtContainer
 		PABlendData*	nextStateData;
 		std::list<ScheduleUnit> waitingList;
 		BodyMotionFrame inputFrame, outputFrame;
+		MeCtIKTreeScenario ikScenario;
 };
 #endif
