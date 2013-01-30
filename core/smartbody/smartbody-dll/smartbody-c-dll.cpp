@@ -21,6 +21,8 @@ struct SBM_CallbackInfo
     string visemeName;
     float weight;
     float blendTime;
+    string logMessage;
+    int logMessageType;
 
     SBM_CallbackInfo() : weight(0), blendTime(0) {}	
     void operator = ( const SBM_CallbackInfo &l )
@@ -29,6 +31,8 @@ struct SBM_CallbackInfo
       visemeName = l.visemeName;
       weight = l.weight;
       blendTime = l.blendTime;
+      logMessage = l.logMessage;
+      logMessageType = l.logMessageType;
     }
 };
 
@@ -51,6 +55,15 @@ public:
          messageType = 1;
       }
       SBM_LogMessage(message.c_str(), messageType);
+
+#if defined(IPHONE_BUILD)
+      SBM_CallbackInfo info;
+      info.logMessage = message;
+      info.logMessageType = messageType;
+
+      //g_LogCallbackInfo[m_sbmHandle].push_back(info);
+       g_LogCallbackInfo[0].push_back(info);
+#endif
    }
 };
 LogMessageListener* g_pLogMessageListener = NULL;
@@ -61,6 +74,7 @@ std::map< int, std::vector<SBM_CallbackInfo> > g_DeleteCallbackInfo;
 std::map< int, std::vector<SBM_CallbackInfo> > g_ChangeCallbackInfo;
 std::map< int, std::vector<SBM_CallbackInfo> > g_VisemeCallbackInfo;
 std::map< int, std::vector<SBM_CallbackInfo> > g_ChannelCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo> > g_LogCallbackInfo;
 
 LogMessageCallback g_LogMessageFunc = NULL;
 
@@ -575,6 +589,21 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char * nam
     return true;
 }
 
+SMARTBODY_C_DLL_API bool SBM_IsLogMessageWaiting( SBMHANDLE sbmHandle, char *logMessage, int maxLogMessageLen, int* logMessageType)
+{
+    if (g_LogCallbackInfo[0].size() == 0)
+    {
+        return false;
+    }
+
+    SBM_CallbackInfo info = g_LogCallbackInfo[0].back();
+    g_LogCallbackInfo[0].pop_back();
+    strncpy(logMessage, info.logMessage.c_str(), maxLogMessageLen);
+    *logMessageType = info.logMessageType;
+
+    return true;
+}
+
 SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, char * name, int maxNameLen )
 {
     if ( !SBM_HandleExists( sbmHandle ) || g_DeleteCallbackInfo[sbmHandle].size() == 0)
@@ -732,6 +761,7 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, char * nam
 SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, char * name, int maxNameLen ) { return false; }
 SMARTBODY_C_DLL_API bool SBM_IsVisemeSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * visemeName, int maxVisemeNameLen, float * weight, float * blendTime ) { return false; }
 SMARTBODY_C_DLL_API bool SBM_IsChannelSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * channelName, int maxChannelNameLen, float * value ) { return false; }
+SMARTBODY_C_DLL_API bool SBM_IsLogMessageWaiting( SBMHANDLE sbmHandle, char *logMessage, int maxLogMessageLen, int* logMessageType ) { return false; }
 
 // python usage functions
 // functions can't be distinguished by return type alone so they are named differently
