@@ -1,5 +1,6 @@
 #include "MotionAnalysis.h"
 #include <sb/SBScene.h>
+#include <sb/SBAssetManager.h>
 /************************************************************************/
 /* Locomotion Leg Cycle                                                 */
 /************************************************************************/
@@ -22,8 +23,8 @@ SrVec LocomotionLegCycle::getStanceSupportPos( int idx )
 SrVec LocomotionLegCycle::getSupportPos( float motionTime, int idx )
 {	
 	float cycleTime = getNormalizedCycleTime(motionTime);
-	int index = (int)(cycleTime*samples.size());
-	float weight = cycleTime*samples.size() - index;
+	int index = (int)(cycleTime*(samples.size()-1));
+	float weight = cycleTime*(samples.size()-1) - index;
 
 	SrVec supportPos = samples[index].supportPos[idx]*(1.f-weight) + samples[(index+1)%samples.size()].supportPos[idx]*weight;
 	return supportPos;
@@ -80,7 +81,7 @@ LocomotionLegCycle* LocomotionAnalyzer::getLegCycle( int iLeg, float motionTime 
 		float s2 = legCycleVec[iNext].stanceTime;
 		if (s1 > s2) // loop back to beginning
 		{
-			if (motionTime < s1 || motionTime >= s2)
+			if (motionTime >= s1 || motionTime < s2)
 				return &legCycleVec[i];
 		}
 		else // normal interval
@@ -95,11 +96,14 @@ LocomotionLegCycle* LocomotionAnalyzer::getLegCycle( int iLeg, float motionTime 
 void LocomotionAnalyzer::initLegCycles( const std::string& name, SmartBody::SBAnimationBlend* locoBlend, KeyTagMap& keyTagMap, SmartBody::SBSkeleton* skelCopy )
 {
 	KeyTagMap::iterator mi;
-	startTime = (float)locoBlend->getMotionKey(name, 0);
-	endTime = (float)locoBlend->getMotionKey(name, locoBlend->getNumKeys()-1);
+	//startTime = (float)locoBlend->getMotionKey(name, 0);
+	//endTime = (float)locoBlend->getMotionKey(name, locoBlend->getNumKeys()-1);
 	int nSample = 50;
     motionName = name;
-	SmartBody::SBMotion* sbMotion = SmartBody::SBScene::getScene()->getMotion(motionName);
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	SmartBody::SBMotion* sbMotion = assetManager->getMotion(motionName);
+	startTime = 0.f;
+	endTime = (float)sbMotion->getDuration();
 	for ( mi  = keyTagMap.begin(); mi != keyTagMap.end(); mi++)
 	{
 		KeyTag& keyTag = mi->second;
@@ -130,7 +134,7 @@ void LocomotionAnalyzer::initLegCycles( const std::string& name, SmartBody::SBAn
 			}
 			else
 			{
-				c1.cycleDuration = (endTime-c2.stanceTime) + (c1.stanceTime - startTime);
+				c1.cycleDuration = (endTime-c1.stanceTime) + (c2.stanceTime - startTime);
 			}
 			// compute cycle time and normalized time
 			c1.cycleStartTime = c1.stanceTime;
@@ -167,10 +171,11 @@ void LocomotionAnalyzer::sampleLegCycle(LegInfo* legInfo, LocomotionLegCycle& le
 	
 	SmartBody::SBJoint* baseJoint = skel->getJointByName(legInfo->base);
 	motion->connect(skel);
-	double dt = legCycle.cycleDuration/nSample;	
+	double dt = legCycle.cycleDuration/(nSample-1);	
 	for (int i=0;i<nSample;i++)
 	{
 		double motionTime = legCycle.stanceTime + dt*i;
+		if (motionTime > motion->duration()) motionTime -= motion->duration();
 		motion->apply((float)motionTime);		
 		skel->update_global_matrices();
 		LegCycleSample& legSample = legCycle.samples[i];
@@ -182,6 +187,7 @@ void LocomotionAnalyzer::sampleLegCycle(LegInfo* legInfo, LocomotionLegCycle& le
 		}		
 	}		
 	motion->apply(legCycle.stanceTime);
+	skel->update_global_matrices();
 	legCycle.stanceSupportPos.resize(legInfo->supportJoints.size());
 	for (unsigned int sup = 0; sup < legInfo->supportJoints.size(); sup++)
 	{
@@ -203,17 +209,17 @@ MotionAnalysis::~MotionAnalysis(void)
 {
 }
 
-void MotionAnalysis::init(std::string skeletonName, std::string baseJoint, SmartBody::SBAnimationBlend* locomotionBlend )
+void MotionAnalysis::init(std::string skeletonName, std::string baseJoint, SmartBody::SBAnimationBlend* locomotionBlend, const std::vector<std::string>& motions, std::string motionPrefix )
 {		
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSkeleton* sbSkel = scene->getSkeleton(skeletonName);
 	skelCopy = new SmartBody::SBSkeleton(sbSkel);
 	initLegInfos();
-	int numMotions = locomotionBlend->getNumMotions();	
+	int numMotions = motions.size();	
 	for (int i=0;i<numMotions;i++)
 	{
-		const std::string& motionName = locomotionBlend->getMotionName(i);
-		KeyTagMap& keyTagMap = *locomotionBlend->getKeyTagMap(motionName);
+		const std::string& motionName = motions[i];
+		KeyTagMap& keyTagMap = *locomotionBlend->getKeyTagMap(motionPrefix+motionName);
 		LocomotionAnalyzer* analyzer = new LocomotionAnalyzer();
 		analyzer->legInfos = legInfos;
 		analyzer->initLegCycles(motionName,locomotionBlend,keyTagMap,skelCopy);
@@ -223,10 +229,11 @@ void MotionAnalysis::init(std::string skeletonName, std::string baseJoint, Smart
 
 void MotionAnalysis::initLegInfos()
 {
-	const std::string lFootName[] = {"l_forefoot", "l_ankle" };
-	const std::string rFootName[] = {"r_forefoot", "r_ankle" };
+	const std::string lFootName[] = {"l_forefoot", "l_toe" };
+	const std::string rFootName[] = {"r_forefoot", "r_toe" };
 
 	LegInfo* lLeg = new LegInfo();	
+	lLeg->supportOffset.resize(2);
 	lLeg->supportJoints.resize(2);
 	lLeg->supportJoints[1] = lFootName[1];
 	lLeg->supportJoints[0] = lFootName[0];
@@ -234,6 +241,7 @@ void MotionAnalysis::initLegInfos()
 	lLeg->hip = "l_hip";	
 
 	LegInfo* rLeg = new LegInfo();
+	rLeg->supportOffset.resize(2);
 	rLeg->supportJoints.resize(2);
 	rLeg->supportJoints[1] = rFootName[1];
 	rLeg->supportJoints[0] = rFootName[0];
@@ -257,20 +265,46 @@ void MotionAnalysis::initLegInfos()
 		rLeg->ikConstraint[rFoot->efffectorName] = rFoot;
 
 		legStates[i].curSupportPos.resize(2);
-	}
-
-	std::vector<std::string> stopJoint;
-	stopJoint.push_back("spine1");
-	ikScenario.buildIKTreeFromJointRoot(skelCopy->getJointByName("base"),stopJoint);
+		legStates[i].globalSupportPos.resize(2);
+	}	
+	//ikScenario.buildIKTreeFromJointRoot(skelCopy->getJointByName("base"),stopJoint);
 }
 
-void MotionAnalysis::applyIKFix( std::vector<double>& weights, PATimeManager* timeManager, SrMat worldOffsetMat, BodyMotionFrame& inputFrame, BodyMotionFrame& outFrame )
+void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBSkeleton* charSk, std::vector<double>& weights, PATimeManager* timeManager, SrMat worldOffsetMat, BodyMotionFrame& inputFrame, BodyMotionFrame& outFrame )
 {
+	static SrQuat prevQuat;
+
 	ikScenario.ikGlobalMat = worldOffsetMat;
 	ikScenario.ikTreeRootPos = inputFrame.rootPos;
 	ikScenario.setTreeNodeQuat(inputFrame.jointQuat, QUAT_INIT);
+	ikScenario.copyTreeNodeQuat(QUAT_INIT,QUAT_CUR);
 	std::string baseName = "base";	
 	MeCtIKTreeNode* rootNode = ikScenario.findIKTreeNode(baseName.c_str());
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBAssetManager* assetManager = scene->getAssetManager();
+	SmartBody::SBSkeleton* srcSk = assetManager->getSkeleton(skelCopy->getName());
+	SmartBody::SBSkeleton* tgtSk = assetManager->getSkeleton(charSk->getName());
+	SmartBody::SBJoint* srcBase = srcSk->getJointByName(baseName);
+	SmartBody::SBJoint* tgtBase = tgtSk->getJointByName(baseName);
+
+	float scaleRatio = tgtSk->getBaseHeight(baseName)/srcSk->getBaseHeight(baseName);
+
+	for (unsigned int i=0;i<legInfos.size();i++)
+	{
+		LegInfo* info = legInfos[i];
+		for (unsigned int k=0;k<info->supportJoints.size();k++)
+		{
+			MeCtIKTreeNode* supNode = ikScenario.findIKTreeNode(info->supportJoints[k].c_str());
+			supNode->active = false;
+			SmartBody::SBJoint* srcSupJoint = srcSk->getJointByName(info->supportJoints[k]);
+			SmartBody::SBJoint* tgtSupJoint = tgtSk->getJointByName(info->supportJoints[k]);
+			SrVec srcOffset = (srcSupJoint->getPosition() - srcBase->getPosition())*scaleRatio;
+			SrVec tgtOffset = tgtSupJoint->getPosition() - tgtBase->getPosition();
+			info->supportOffset[k] = tgtOffset - srcOffset;
+		}
+	}	
+
 	ikScenario.updateNodeGlobalMat(rootNode, QUAT_INIT);
 	SrMat gmatBase = rootNode->gmat;
 	for (unsigned int k=0;k<legStates.size();k++)
@@ -311,7 +345,13 @@ void MotionAnalysis::applyIKFix( std::vector<double>& weights, PATimeManager* ti
 		LegCycleState& legState = legStates[k];
 		for (unsigned int m=0;m<legState.curSupportPos.size();m++)
 		{
-			legState.curSupportPos[m] = legState.curSupportPos[m]*gmatBase; // transform to global space	
+			legState.globalSupportPos[m] = (legState.curSupportPos[m]*scaleRatio + legInfos[k]->supportOffset[m])*gmatBase; // transform to global space	
+			if (k==0 && m==0)
+			{
+				SrVec spos;
+				spos = legState.curSupportPos[m];
+				//LOG("leg support pos = %f %f %f",spos.x, spos.y, spos.z);
+			}
 		}
 // 		if (legState.stanceSupportPos.size() != legState.curSupportPos.size()) // if stance pos is not initialized yet
 // 			legState.stanceSupportPos = legState.curSupportPos;
@@ -339,11 +379,18 @@ void MotionAnalysis::applyIKFix( std::vector<double>& weights, PATimeManager* ti
 		for (unsigned int k=0;k<leg->supportJoints.size();k++)
 		{			
 			EffectorConstantConstraint* foot = dynamic_cast<EffectorConstantConstraint*>(constraint[leg->supportJoints[k]]);
-			foot->targetPos = legState.curSupportPos[k];
+			foot->targetPos = legState.globalSupportPos[k];
 		}		
 		ikScenario.ikPosEffectors = &constraint;
 		ikCCD.update(&ikScenario);		
 	}
+// 	SrQuat curQuat = ikScenario.findIKTreeNode("r_knee")->getQuat();
+// 	SrQuat deltaQ = curQuat*prevQuat.inverse();
+// 	if (fabs(deltaQ.angle()) > 0.05)
+// 	{
+// 		LOG("sudden change in joint angle !");
+// 	}
+// 	prevQuat = curQuat;
 	outFrame = inputFrame;
 	// write the result to output frame
 	ikScenario.getTreeNodeQuat(outFrame.jointQuat,QUAT_CUR); 		

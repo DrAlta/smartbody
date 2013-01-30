@@ -1413,13 +1413,13 @@ MotionAnalysis* SBAnimationBlend::getMotionAnalysis()
 	return motionAnalysis;
 }
 
-void SBAnimationBlend::buildMotionAnalysis( const std::string& skeletonName, const std::string& baseName )
+void SBAnimationBlend::buildMotionAnalysis( const std::string& skeletonName, const std::string& baseName, const std::vector<std::string>& motions, std::string motionPrefix )
 {
 	if (motionAnalysis)
 		delete motionAnalysis;	
 
 	motionAnalysis = new MotionAnalysis();
-	motionAnalysis->init(skeletonName,baseName, this);	
+	motionAnalysis->init(skeletonName,baseName, this, motions, motionPrefix);	
 }
 
 SBAnimationBlend0D::SBAnimationBlend0D() : SBAnimationBlend("unknown")

@@ -57,6 +57,8 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createBoolAttribute("diphoneSplineCurve", true, true, "Basic", 170, false, false, false, "Use diphones spline/linear curve.");
 	SmartBody::DoubleAttribute* diphoneSmoothWindow = createDoubleAttribute("diphoneSmoothWindow", .2, true, "Basic", 180, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
 
+	createBoolAttribute("ikPostFix", false, true, "Basic", 170, false, false, false, "Post-Processing IK to fix foot sliding.");
+
 	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
 	timeDelayAttr->setMin(0.0);
 	createStringAttribute("deformableMesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");

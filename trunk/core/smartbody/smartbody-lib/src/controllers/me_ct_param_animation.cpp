@@ -22,6 +22,7 @@
 
 #include "controllers/me_ct_param_animation.h"
 #include <sbm/mcontrol_util.h>
+#include <sb/SBCharacter.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationTransition.h>
@@ -64,8 +65,9 @@ MeCtParamAnimation::MeCtParamAnimation() : MeCtContainer(new MeCtParamAnimation:
 	woWriter = NULL;
 }
 
-MeCtParamAnimation::MeCtParamAnimation(SbmCharacter* c, MeCtChannelWriter* wo) : MeCtContainer(new MeCtParamAnimation::Context(this)), character(c), woWriter(wo)
+MeCtParamAnimation::MeCtParamAnimation(SbmCharacter* c, MeCtChannelWriter* wo) : MeCtContainer(new MeCtParamAnimation::Context(this)), woWriter(wo)
 {
+	character = dynamic_cast<SmartBody::SBCharacter*>(c);
 	baseJointName = "base";
 	curStateData = NULL;
 	nextStateData = NULL;
@@ -313,7 +315,10 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 			curStateData->evaluate(timeStep, frame.buffer());	
 			if (!curStateData->isPartialBlending())
 				updateWo(curStateData->woManager->getBaseTransformMat(), woWriter, frame.buffer());
-			//updateIK(curStateData, curStateData->woManager->getBaseTransformMat(), frame.buffer());
+#if 0 // disable IK post processing for now, until it is stable enough.
+			if (character && character->getBoolAttribute("ikPostFix"))
+				updateIK(curStateData, character->get_world_offset(), frame.buffer());
+#endif				
 			return true;
 		}
 		else
@@ -892,11 +897,18 @@ void MeCtParamAnimation::updateIK( PABlendData* curBlendData, SrMat& woMat, SrBu
 	if (!blend) return;
 	MotionAnalysis* moAnalysis = blend->getMotionAnalysis();
 	if (!moAnalysis) return;
+	
+	if (ikScenario.ikTreeNodes.size() == 0) // initialize ik nodes
+	{
+		std::vector<std::string> stopJoint;
+		stopJoint.push_back("spine1");
+		ikScenario.buildIKTreeFromJointRoot(character->getSkeleton()->getJointByName("base"),stopJoint);
+	}	
+	
+	updateMotionFrame(inputFrame, ikScenario, buff, true); // read data from frame
+	moAnalysis->applyIKFix(ikScenario, character->getSkeleton(), curBlendData->weights, curBlendData->timeManager, woMat, inputFrame, outputFrame);
 
-	updateMotionFrame(inputFrame, moAnalysis->getIKTreeScenario(), buff, true); // read data from frame
-	moAnalysis->applyIKFix(curBlendData->weights, curBlendData->timeManager, woMat, inputFrame, outputFrame);
-
-	updateMotionFrame(outputFrame, moAnalysis->getIKTreeScenario(), buff, false);
+	updateMotionFrame(outputFrame, ikScenario, buff, false);
 }
 
 void MeCtParamAnimation::updateMotionFrame( BodyMotionFrame& motionFrame, MeCtIKTreeScenario& ikScenario, SrBuffer<float>& buff, bool readData /*= true*/ )

@@ -12,6 +12,7 @@ struct LegInfo
 {
 	std::string base, hip;
 	std::vector<std::string> supportJoints;
+	std::vector<SrVec> supportOffset;
 	ConstraintMap ikConstraint;
 };
 
@@ -23,6 +24,7 @@ struct LegCycleSample
 struct LegCycleState
 {
 	std::vector<SrVec> curSupportPos;
+	std::vector<SrVec> globalSupportPos;
 	std::vector<SrVec> stanceSupportPos;
 };
 
@@ -79,7 +81,7 @@ class MotionAnalysis
 protected:		
 	std::vector<std::string> motionNames;
 	MeCtCCDIK             ikCCD;
-	MeCtIKTreeScenario    ikScenario;	
+	//MeCtIKTreeScenario    ikScenario;	
 	std::vector<LegInfo*>  legInfos;
 	std::vector<LegCycleState> legStates;
 	std::vector<LocomotionAnalyzer*> locoAnalyzers;
@@ -87,10 +89,10 @@ protected:
 public:
 	MotionAnalysis(void);
 	~MotionAnalysis(void);		
-	MeCtIKTreeScenario& getIKTreeScenario() { return ikScenario; }
-	void init(std::string skeletonName, std::string baseJoint, SmartBody::SBAnimationBlend* locomotionBlend);
+	//MeCtIKTreeScenario& getIKTreeScenario() { return ikScenario; }
+	void init(std::string skeletonName, std::string baseJoint, SmartBody::SBAnimationBlend* locomotionBlend, const std::vector<std::string>& motions, std::string motionPrefix);
 	void initLegInfos();
-	void applyIKFix( std::vector<double>& weights, PATimeManager* timeManager, SrMat worldOffsetMat, BodyMotionFrame& inputFrame, BodyMotionFrame& outFrame);
+	void applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBSkeleton* charSk, std::vector<double>& weights, PATimeManager* timeManager, SrMat worldOffsetMat, BodyMotionFrame& inputFrame, BodyMotionFrame& outFrame);
 };
 
 #endif

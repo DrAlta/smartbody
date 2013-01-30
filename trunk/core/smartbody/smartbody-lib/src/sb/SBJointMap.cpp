@@ -1086,7 +1086,12 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 			if(j1 && j2)
 			{
 				//gsout << "  Toe_End joints: " << j1->name() <<gspc<< j2->name() << gsnl;
-				if(getJointHierarchyLevel(j1)-getJointHierarchyLevel(l_ankle)>=2)
+				if(getJointHierarchyLevel(j1)-getJointHierarchyLevel(l_ankle)>=3)
+				{
+					guessLeftRightFromJntNames(j1->parent()->parent(), j2->parent()->parent(), l_forefoot, r_forefoot);
+					guessLeftRightFromJntNames(j1->parent(), j2->parent(), l_toe, r_toe);					
+				}
+				else if(getJointHierarchyLevel(j1)-getJointHierarchyLevel(l_ankle)>=2)
 				{
 					guessLeftRightFromJntNames(j1->parent(), j2->parent(), l_forefoot, r_forefoot);
 					guessLeftRightFromJntNames(j1, j2, l_toe, r_toe);					
