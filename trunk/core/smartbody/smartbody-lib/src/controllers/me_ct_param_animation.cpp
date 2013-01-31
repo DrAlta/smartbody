@@ -769,7 +769,7 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 		{
 			SmartBody::SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();			
 			SmartBody::SBRetarget* retarget = retargetManager->getRetarget(animBlend->getBlendSkeleton(),character->getSkeleton()->getName());
-			if (retarget)
+			if (retarget && character->getBoolAttribute("onlineRetarget"))
 				module->retarget = retarget;
 			else
 				module->retarget = NULL;

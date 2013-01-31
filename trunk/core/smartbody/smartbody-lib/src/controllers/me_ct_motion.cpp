@@ -30,6 +30,8 @@
 #include <sb/SBScene.h>
 #include <sb/SBRetargetManager.h>
 #include <sb/SBRetarget.h>
+#include <sb/SBMotion.h>
+#include <sb/SBSkeleton.h>
 
 //=================================== MeCtMotion =====================================
 
@@ -64,6 +66,8 @@ void MeCtMotion::init(SbmPawn* pawn, SkMotion* m_p, double time_offset, double t
 
 	_motion = m_p;
 	_last_apply_frame = 0;
+
+	_character = dynamic_cast<SmartBody::SBCharacter*>(pawn);
 
 	_motion->move_keytimes ( 0 ); // make sure motion starts at 0
 //	_duration = _motion->duration() / _twarp;
@@ -327,6 +331,14 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	} else {
 		//LOG("MeCtMotion::controller_evaluate %s time %f, duration %f", this->getName().c_str(), t, dur);
 		continuing = t < dur;
+	}	
+	SmartBody::SBRetarget* retarget = NULL;
+	if (_character)
+	{
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(_motion);
+		if (sbMotion)
+			retarget = scene->getRetargetManager()->getRetarget(sbMotion->getMotionSkeletonName(),_character->getSkeleton()->getName());		
 	}
 
 	// Controller Context and FrameData set, use the new available buffer
@@ -337,7 +349,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	_motion->apply( float(t),
 		            &(frame.buffer()[0]),  // pointer to buffer's float array
 					&_mChan_to_buff,
-		            _play_mode, &_last_apply_frame );
+		            _play_mode, &_last_apply_frame, false, retarget );
 
 	SkChannelArray& allChannels = _motion->channels();
 
