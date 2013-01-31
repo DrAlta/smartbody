@@ -38,6 +38,7 @@ class SkSkeleton;
 
 namespace SmartBody {
 	class SBMotionEvent;
+	class SBRetarget;
 }
 
 
@@ -209,7 +210,10 @@ public :
 	serves as a starting point for the search, resulting in maximum efficiency.
 	To optimize evaluations from several controllers sharing a same motion file,
 	parameter lastframe can be used and will store the last frame used per controller. */
-	void apply ( float t, float* buffer, SrBuffer<int>* map_p, InterpType=Linear, int* lastframe=NULL, bool isAdditive = false );
+	void apply ( float t, float* buffer, SrBuffer<int>* map_p, InterpType=Linear, int* lastframe=NULL, bool isAdditive = false, SmartBody::SBRetarget* retarget = NULL );
+
+	void applyNew ( float t, float* buffer, SrBuffer<int>* map_p, InterpType=Linear, int* lastframe=NULL, bool isAdditive = false, SmartBody::SBRetarget* retarget = NULL );
+
 
 	/*! Returns a string describing the interpolation type */
 	static const char* interp_type_name ( InterpType type );

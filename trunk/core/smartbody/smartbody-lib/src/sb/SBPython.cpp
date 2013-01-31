@@ -903,7 +903,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("clearPlotMotion", &SBAnimationBlend::clearPlotMotion, "clear Plotted motions. \n Input: NULL. \n Output: NULL")
 		.def("addKeyTagValue", &SBAnimationBlend::addKeyTagValue, "add the key time tag for motion analysis. \n Input : motion name, tag type, tag name, value. \n Output : NULL")
 		.def("buildMotionAnalysis", &SBAnimationBlend::buildMotionAnalysis, "build the motion analysis structure \n Input : NULL. \n Output : NULL")
-
+		.def("setBlendSkeleton", &SBAnimationBlend::setBlendSkeleton, "set the skeleton that should be associated with this animation blend")
 		;
 
 	boost::python::class_<SBAnimationBlend0D, boost::python::bases<SBAnimationBlend> >("SBAnimationBlend0D")

@@ -60,7 +60,7 @@ typedef std::vector<LocomotionLegCycle> LegCycleVec;
 class LocomotionAnalyzer
 {
 protected:
-	SmartBody::SBAnimationBlend* locomotionBlend;	
+	//SmartBody::SBAnimationBlend* locomotionBlend;	
 	std::string motionName;
 	float startTime, endTime;
 	std::map<int,LegCycleVec> legCycleMap;
@@ -80,16 +80,14 @@ class MotionAnalysis
 {
 protected:		
 	std::vector<std::string> motionNames;
-	MeCtCCDIK             ikCCD;
-	//MeCtIKTreeScenario    ikScenario;	
+	MeCtCCDIK             ikCCD;	
 	std::vector<LegInfo*>  legInfos;
 	std::vector<LegCycleState> legStates;
 	std::vector<LocomotionAnalyzer*> locoAnalyzers;
 	SmartBody::SBSkeleton* skelCopy;	
 public:
 	MotionAnalysis(void);
-	~MotionAnalysis(void);		
-	//MeCtIKTreeScenario& getIKTreeScenario() { return ikScenario; }
+	~MotionAnalysis(void);			
 	void init(std::string skeletonName, std::string baseJoint, SmartBody::SBAnimationBlend* locomotionBlend, const std::vector<std::string>& motions, std::string motionPrefix);
 	void initLegInfos();
 	void applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBSkeleton* charSk, std::vector<double>& weights, PATimeManager* timeManager, SrMat worldOffsetMat, BodyMotionFrame& inputFrame, BodyMotionFrame& outFrame);

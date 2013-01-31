@@ -1422,6 +1422,21 @@ void SBAnimationBlend::buildMotionAnalysis( const std::string& skeletonName, con
 	motionAnalysis->init(skeletonName,baseName, this, motions, motionPrefix);	
 }
 
+void SBAnimationBlend::setBlendSkeleton( std::string skelName )
+{
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	SmartBody::SBSkeleton* skel = assetManager->getSkeleton(skelName);
+	if (skel)
+	{
+		blendSkelName = skelName;
+	}
+}
+
+std::string SBAnimationBlend::getBlendSkeleton()
+{
+	return blendSkelName;
+}
+
 SBAnimationBlend0D::SBAnimationBlend0D() : SBAnimationBlend("unknown")
 {
 }
