@@ -47,6 +47,8 @@ class SBMotion : public SkMotion
 		SBAPI int getFrameSize();
 		void setMotionType(MotionType type);
 
+		SBAPI void setMotionSkeletonName(std::string skelName);
+		SBAPI const std::string& getMotionSkeletonName();
 
 		SBAPI int getNumChannels();
 		SBAPI std::vector<std::string> getChannels();
@@ -128,6 +130,7 @@ class SBMotion : public SkMotion
 
 		std::string _motionFile;
 		std::string _emptyString;
+		std::string _motionSkeleton;
 		int alignIndex;
 		std::map<std::string, std::string> tagAttrMap; // store the tagged attributes in a map
 		MotionType _motionType;

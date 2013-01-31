@@ -33,6 +33,7 @@
 # include <sk/sk_motion.h>
 
 # include <sb/SBController.h>
+#include <sb/SBCharacter.h>
 #include <queue>
 
 namespace SmartBody {
@@ -60,6 +61,7 @@ class MeCtMotion : public SmartBody::SBController
 	std::queue<SmartBody::SBMotionEvent*> _events;
 	std::vector<std::string>	_joints;	// Joints that motion data would be applied to. Empty means applying all.
 	int					 _lastCycle;
+	SmartBody::SBCharacter* _character;
 
    public :
 	   static std::string type_name;

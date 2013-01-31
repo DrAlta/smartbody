@@ -58,6 +58,8 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	SmartBody::DoubleAttribute* diphoneSmoothWindow = createDoubleAttribute("diphoneSmoothWindow", .2, true, "Basic", 180, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
 
 	createBoolAttribute("ikPostFix", false, true, "Basic", 170, false, false, false, "Post-Processing IK to fix foot sliding.");
+	createBoolAttribute("onlineRetarget", false, true, "Basic", 170, false, false, false, "Use on-line retargeting to adjust joint angles when playing animation blend.");
+
 
 	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
 	timeDelayAttr->setMin(0.0);

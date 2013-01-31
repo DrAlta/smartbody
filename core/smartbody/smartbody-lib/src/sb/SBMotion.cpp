@@ -2024,4 +2024,13 @@ std::vector<std::string> SBMotion::getMetaDataTags()
 	return tagList;
 }
 
+SBAPI void SBMotion::setMotionSkeletonName( std::string skelName)
+{
+	_motionSkeleton = skelName;
+}
+
+SBAPI const std::string& SBMotion::getMotionSkeletonName()
+{
+	return _motionSkeleton;
+}
 };
