@@ -140,7 +140,7 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 			//character->param_animation_ct->schedule(state, x, y, z, wrapMode, scheduleMode, blendMode, joint, timeOffset, stateStartOffset, stateEndTrim, transitionLen, directPlay);
 			character->param_animation_ct->schedule(state, weights, scType);
 		else
-			character->param_animation_ct->schedule(state, weights);
+			character->param_animation_ct->schedule(state, weights, scType);
 	}
 
 	// update parameter
