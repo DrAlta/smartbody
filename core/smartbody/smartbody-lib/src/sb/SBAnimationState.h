@@ -21,6 +21,9 @@ class SBAnimationBlend : public PABlend
 		SBAPI SBAnimationBlend(const std::string& name);
 		SBAPI ~SBAnimationBlend();
 
+		SBAPI void setBlendSkeleton(std::string skelName);
+		SBAPI std::string getBlendSkeleton();
+
 		SBAPI void setIncrementWorldOffsetY(bool flag);
 		SBAPI void addCorrespondencePoints(const std::vector<std::string>& motions, const std::vector<double>& points);			
 		SBAPI void removeCorrespondencePoints(int index);
@@ -101,6 +104,7 @@ class SBAnimationBlend : public PABlend
 	protected:
 		MotionAnalysis* motionAnalysis;
 		std::string _dimension;
+		std::string blendSkelName;
 		bool _isFinalized;
 
 		std::vector<SrSnColorSurf*> errorSurfaces;

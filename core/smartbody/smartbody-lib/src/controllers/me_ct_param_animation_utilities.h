@@ -31,6 +31,7 @@
 #include <sb/sbm_pawn.hpp>
 #include <sb/PABlend.h>
 #include <sb/SBAnimationTransition.h>
+#include <sb/SBRetarget.h>
 
 #define LoopHandle 0
 const int rotType = 132;
@@ -187,7 +188,7 @@ class PABlendData
 		PATimeManager* timeManager;
 		PAWoManager* woManager;
 		PAInterpolator* interpolator;
-
+		SmartBody::SBRetarget* retarget;
 		WrapMode wrapMode;
 		BlendMode blendMode;
 		ScheduleMode scheduleMode;

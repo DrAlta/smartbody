@@ -390,7 +390,7 @@ void PAMotions::getBuffer(SkMotion* motion, double t, SrBuffer<int>& map, SrBuff
 {
 	double deltaT = motion->duration() / double(motion->frames() - 1);
 	int lastFrame = int (t/deltaT);
-	motion->apply(float(t), &buff[0], &map, SkMotion::Linear, &lastFrame);
+	motion->apply(float(t), &buff[0], &map, SkMotion::Linear, &lastFrame, false);
 }
 
 
@@ -669,6 +669,9 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 				finalQ = origQ * currQ;
 			else
 				finalQ = currQ;
+			if (blendData->retarget)
+				finalQ = blendData->retarget->applyRetargetJointRotation(joints[i].c_str(),finalQ);
+
 			buff[buffId.q + 0] = finalQ.w;
 			buff[buffId.q + 1] = finalQ.x;
 			buff[buffId.q + 2] = finalQ.y;
@@ -676,7 +679,35 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 		}
 	}
 	else
+	{
+		if (blendData->retarget) // perform a final retarget pass before output the buffer values
+		{
+			SkChannelArray& bufChannels = _context->channels();
+			int chanSize = bufChannels.size();
+			for (int i = 0; i < chanSize; i++)
+			{
+				int buffId = _context->toBufferIndex(i);
+				if (bufChannels.type(i) == SkChannel::Quat)
+				{
+					SrQuat origQ;
+					origQ.w = buffer[buffId + 0];
+					origQ.x = buffer[buffId + 1];
+					origQ.y = buffer[buffId + 2];
+					origQ.z = buffer[buffId + 3];
+					SrQuat finalQ = blendData->retarget->applyRetargetJointRotation(bufChannels.name(i),origQ);
+					buffer[buffId + 0] = finalQ.w;
+					buffer[buffId + 1] = finalQ.x;
+					buffer[buffId + 2] = finalQ.y;
+					buffer[buffId + 3] = finalQ.z;					
+				}
+				else if (bufChannels.type(i) <= SkChannel::ZPos) // xyz channel
+				{
+					buffer[buffId] = blendData->retarget->applyRetargetJointTranslation(bufChannels.name(i),buffer[buffId]);
+				}
+			}
+		}
 		buff = buffer;
+	}
 }
 
 void PAInterpolator::clearBlendingJoints()
@@ -783,7 +814,7 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 				SrMat mat = tempMat;
 				matInterp(tempMat, mat, mats[i], (float)(w));
 			}
-			baseTransformMat = tempMat;
+			baseTransformMat = tempMat;					
 		}
 	}
 	else
@@ -792,6 +823,17 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 		currentBaseTransformMat = currentBaseMats[0];
 		firstTime = false;
 	}
+
+	if (blendData->retarget)
+	{
+		SrVec tran = baseTransformMat.get_translation();
+		for (unsigned int i=0;i<3;i++)
+		{
+			tran[i] = blendData->retarget->applyRetargetJointTranslation("base",tran[i]);
+		}
+		baseTransformMat.set_translation(tran);
+	}	
+
 	baseMats = currentBaseMats;
 }
 
@@ -883,6 +925,7 @@ PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, B
 	blendEndTrim = (float)blendEndTrim;
 	directPlay = dplay;
 	playSpeed = 1.f;
+	retarget = NULL;
 	SmartBody::SBAnimationBlend* s = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	state = s;
 	if (state)
@@ -915,6 +958,7 @@ PABlendData::PABlendData(PABlend* s, std::vector<double>& w, BlendMode blend, Wr
 	blendEndTrim = (float)blendTrim;
 	directPlay = dplay;
 	playSpeed = 1.f;
+	retarget = NULL;
 	state = s;
 	weights.resize(s->getNumMotions());
 	for (size_t x = 0; x < w.size(); x++)

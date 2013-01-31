@@ -229,8 +229,8 @@ void MotionAnalysis::init(std::string skeletonName, std::string baseJoint, Smart
 
 void MotionAnalysis::initLegInfos()
 {
-	const std::string lFootName[] = {"l_forefoot", "l_toe" };
-	const std::string rFootName[] = {"r_forefoot", "r_toe" };
+	const std::string lFootName[] = {"l_forefoot", "l_ankle" };
+	const std::string rFootName[] = {"r_forefoot", "r_ankle" };
 
 	LegInfo* lLeg = new LegInfo();	
 	lLeg->supportOffset.resize(2);
@@ -317,7 +317,7 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBSke
 	double maxBlendWeight = -1;
 	for (unsigned int i=0;i<locoAnalyzers.size();i++) // weighted sum of local foot base
 	{
-		LocomotionAnalyzer* analyzer = locoAnalyzers[i];
+		LocomotionAnalyzer* analyzer = locoAnalyzers[i];		
 		double moTime = timeManager->motionTimes[i];
 		for (unsigned int k=0;k<legStates.size();k++)
 		{

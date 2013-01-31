@@ -39,6 +39,7 @@
 #include <boost/algorithm/string.hpp>
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBRetarget.h>
 #include <external/perlin/perlin.h>
 
 using namespace gwiz;
@@ -288,10 +289,11 @@ void SkMotion::apply ( float t, SkMotion::InterpType itype, int* lastframe ) {
 
 #define DEBUG_T 0
 
-void SkMotion::apply ( float t,  
+void SkMotion::applyNew ( float t,  
                        float* buffer, SrBuffer<int>* map_p,
-                       SkMotion::InterpType itype, int* lastframe, bool isAdditive )
+                       SkMotion::InterpType itype, int* lastframe, bool isAdditive, SmartBody::SBRetarget* retarget )
 {
+	// old version of apply skMotion
 	int fsize=_frames.size();
 	if ( fsize<=0 )
 		return;
@@ -374,7 +376,7 @@ void SkMotion::apply ( float t,
 							num = _channels[i].interp ( addQuat, fp1, fp2, t );
 							SrQuat orig(v[0], v[1], v[2], v[3]);
 							SrQuat add(addQuat[0], addQuat[1], addQuat[2], addQuat[3]);
-							SrQuat final = orig * add;
+							SrQuat final = orig * add;							
 							for (int x = 0; x < 4; x++)
 								v[x] = final.getData(x);
 						}
@@ -395,8 +397,7 @@ void SkMotion::apply ( float t,
 					{
 						
 						num = _channels[i].interp ( v, fp1, fp2, t );
-					}
-					
+					}		
 				}
 
 				// Increment frame data pointers
@@ -486,6 +487,195 @@ void SkMotion::apply ( float t,
 			fp1+=num; fp2+=num;
 		}
 	}
+}
+
+
+void SkMotion::apply ( float t,  
+	float* buffer, SrBuffer<int>* map_p,
+	SkMotion::InterpType itype, int* lastframe, bool isAdditive, SmartBody::SBRetarget* retarget )
+{
+	// new version of apply skMotion
+	int fsize=_frames.size();
+	if ( fsize<=0 )
+		return;
+	if ( t!= 0.f && t<=_frames[0].keytime )	{
+#if DEBUG_T
+		LOG("SkMotion::apply NOTICE: t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
+#endif
+		return;
+	}
+
+	if ( itype==CubicSpline )
+		t = _cubic ( t, _frames[0].keytime, _frames[_frames.size() - 1].keytime );
+
+#if DEBUG_T
+	if ( t<_frames[0].keytime )	{
+		LOG("SkMotion::apply ERR: cubic t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
+	}
+#endif
+
+	// optimize keytime search for sequenced calls to apply
+	int fini=0;
+	if ( lastframe )
+		_last_apply_frame = *lastframe;
+	if ( _last_apply_frame>0 && _last_apply_frame<fsize ) {
+		if ( t>_frames[_last_apply_frame].keytime )
+			fini=_last_apply_frame+1;
+	}
+
+	int f;
+	for ( f=fini; f<fsize; f++ ) {
+		if ( t<_frames[f].keytime )
+			break;
+	}
+
+	if ( f==_frames.size() ) {
+		// Apply last frame
+		apply_frame( f-1, buffer, map_p );
+		return;
+	}
+
+	f--;
+	_last_apply_frame = f;
+	if ( lastframe )
+		*lastframe = _last_apply_frame;
+
+	float* fp1 = _frames[f].posture;
+	float* fp2 = _frames[f+1].posture;
+
+	// convert t to [0,1] according to the keytimes:
+	t = (t-_frames[f].keytime) / (_frames[f+1].keytime-_frames[f].keytime);
+
+#if DEBUG_T
+	if ( t<0.0 )	{
+		LOG("SkMotion::apply ERR: mapped t=%.16f < 0.0 \n", t );
+	}
+#endif
+
+	//sr_out<<"t: "<<t<<" frames: "<<f<<srspc<<(f+1)<<"\n";
+	int num;
+	int csize = _channels.size();
+
+	
+	float outValue[4], origValue[4], newValue[4]; // at most 4 
+	// Apply to float* buffer
+	float* v = NULL;
+	int sum = 0;		
+	for ( int i=0; i<csize; i++ ) {
+	// Channel size
+		num = _channels[i].size();
+		// Find mapped buffer location
+		int index = i; 
+		if (buffer)
+		{
+			if (map_p)
+			{
+				index = map_p->get( i );
+				v = buffer + index;
+			}
+			else
+			{
+				v = buffer + sum;
+			}
+			for (int x=0;x<num;x++)
+				origValue[x] = v[x];				
+		}
+		else if (_channels[i].joint)
+		{
+			_channels[i].get(origValue);						
+		}
+		else 
+		{
+			index = -1;
+		}
+
+		_channels[i].interp ( newValue, fp1, fp2, t );
+		if( index >= 0 ) {
+			if (_channels[i].type == SkChannel::Quat) // rotation channel
+			{				
+				SrQuat orig(origValue[0], origValue[1], origValue[2], origValue[3]);
+				SrQuat add(newValue[0], newValue[1], newValue[2], newValue[3]);
+				SrQuat final = isAdditive ? orig*add : add; 	
+				if (retarget)
+					final = retarget->applyRetargetJointRotation(_channels.name(i),final);
+				for (int x = 0; x < 4; x++)
+					outValue[x] = final.getData(x);
+			}
+			else if (num <= 3) // positional channel
+			{				
+				for (int x = 0; x < num; x++)
+				{
+					outValue[x] = isAdditive? origValue[x]+newValue[x] : newValue[x];
+					if (retarget)
+						outValue[x] = retarget->applyRetargetJointTranslation(_channels.name(i),outValue[x]);
+				}
+			}
+			else
+			{
+				// more that 3 channels but not a quaternion? Don't add data, just replace it...
+				for (int x = 0; x < num; x++)
+				{
+					outValue[x] = newValue[x];
+					if (retarget)
+						outValue[x] = retarget->applyRetargetJointTranslation(_channels.name(i),outValue[x]);
+				}
+			}
+			if (buffer)
+			{
+				for (int x = 0; x < num; x++)
+					v[x] = outValue[x];
+			}
+			else
+			{
+				_channels[i].set(outValue);
+			}
+		}	
+		// Increment frame data pointers
+		fp1+=num; fp2+=num; sum+=num;
+	}			
+		
+#if 0
+	else
+	{
+		// Apply to channel joints
+		float values[4]; // 4 is the max num of values per channel
+		for ( int i=0; i<csize; i++ ) {
+			if ( _channels[i].joint ) {
+				_channels[i].interp ( values, fp1, fp2, t );
+				float origValues[4];
+				_channels[i].get(origValues);
+				if (_channels[i].type == SkChannel::Quat)
+				{
+					SrQuat orig(origValues[0], origValues[1], origValues[2], origValues[3]);
+					SrQuat add(values[0], values[1], values[2], values[3]);
+					SrQuat final = orig * add;
+					float finalVal[4];
+					for (int x = 0; x < 4; x++)
+						finalVal[x] = final.getData(x);
+					_channels[i].set(finalVal);
+				}
+				else if (num <= 3)
+				{
+					float vec[3];
+					num = _channels[i].interp ( vec, fp1, fp2, t );
+					for (int x = 0; x < num; x++)
+						origValues[x] += vec[x];
+					_channels[i].set(origValues);
+				}
+				else
+				{
+					// more that 3 channels but not a quaternion? Don't add data, just replace it...
+					num = _channels[i].set ( values );
+				}				
+				
+			} else {
+				num = _channels[i].size();
+			}
+
+			fp1+=num; fp2+=num;
+		}
+	}
+#endif 
 }
 
 // static 

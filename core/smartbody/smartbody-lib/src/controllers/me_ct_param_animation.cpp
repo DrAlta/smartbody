@@ -31,6 +31,8 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
 #include <sb/SBCharacterListener.h>
+#include <sb/SBRetargetManager.h>
+#include <sb/SBRetarget.h>
 #include <sr/sr_euler.h>
 #include "controllers/MotionAnalysis.h"
 
@@ -311,11 +313,11 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 
 		
 		if (curStateData->active)
-		{			
+		{
 			curStateData->evaluate(timeStep, frame.buffer());	
 			if (!curStateData->isPartialBlending())
 				updateWo(curStateData->woManager->getBaseTransformMat(), woWriter, frame.buffer());
-#if 0 // disable IK post processing for now, until it is stable enough.
+#if 1 // disable IK post processing for now, until it is stable enough.
 			if (character && character->getBoolAttribute("ikPostFix"))
 				updateIK(curStateData, character->get_world_offset(), frame.buffer());
 #endif				
@@ -762,6 +764,17 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	if (su.data)
 	{
 		module = new PABlendData(su.data, su.weights, su.blend, su.wrap, su.schedule, su.stateTimeOffset, su.stateTimeTrim, su.directPlay);		
+		SmartBody::SBAnimationBlend* animBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(su.data);
+		if (animBlend) // set retarget information if it is available
+		{
+			SmartBody::SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();			
+			SmartBody::SBRetarget* retarget = retargetManager->getRetarget(animBlend->getBlendSkeleton(),character->getSkeleton()->getName());
+			if (retarget)
+				module->retarget = retarget;
+			else
+				module->retarget = NULL;
+		}
+
 		module->blendStartOffset = su.stateTimeOffset;
 		module->blendEndTrim = su.stateTimeTrim;
 		module->transitionLength = su.transitionLength;
