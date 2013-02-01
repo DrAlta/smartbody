@@ -2,6 +2,8 @@
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #include <sb/SBPawn.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBScene.h>
+#include <sb/SBSimulationManager.h>
 #include "TransparentViewer.h"
 #include <sbm/mcontrol_util.h>
 
