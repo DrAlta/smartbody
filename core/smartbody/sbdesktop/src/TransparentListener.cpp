@@ -17,7 +17,7 @@ void TransparentListener::OnCharacterCreate( const std::string & name, const std
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	SbmCharacter* character = mcu.getCharacter(name);
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
 		return;
 
@@ -66,7 +66,7 @@ void TransparentListener::OnCharacterDelete( const std::string & name )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	SbmCharacter* character = mcu.getCharacter(name);
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
 		return;
 
@@ -101,7 +101,7 @@ void TransparentListener::OnCharacterChanged( const std::string& name )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	SbmCharacter* character = mcu.getCharacter(name);
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
 		return;
 
