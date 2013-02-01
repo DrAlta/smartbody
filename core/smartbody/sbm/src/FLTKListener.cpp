@@ -21,7 +21,7 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	SbmCharacter* character = mcu.getCharacter(name);
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
 		return;
 
@@ -74,7 +74,7 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	SbmCharacter* character = mcu.getCharacter(name);
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
 		return;
 

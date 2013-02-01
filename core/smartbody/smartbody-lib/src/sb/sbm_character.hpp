@@ -294,7 +294,6 @@ public:
 
 	static int character_init_cmd( srArgBuffer& args);
 
-	static int character_ctrl_cmd( srArgBuffer& args);
 
 public:
 	static SkMotion* findTagSkMotion(int tag, const std::set<std::pair<int,SkMotion*> >& motionSet);

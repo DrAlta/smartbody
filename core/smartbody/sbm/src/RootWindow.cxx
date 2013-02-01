@@ -1567,7 +1567,7 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 	std::string resStr = menuItem->label();
 	if (resStr == "Default")
 	{
-		rootWindow->resize(rootWindow->x(),rootWindow->y(),800,800);
+		rootWindow->resize(rootWindow->x(),rootWindow->y(),800,600);
 		return;
 	}
 	else if (resStr == "Custom...")

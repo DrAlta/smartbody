@@ -25,6 +25,8 @@
 #include <ctime> 
 #include <math.h>
 #include <sbm/mcontrol_util.h>
+#include <sb/SBSimulationManager.h>
+#include <sb/SBScene.h>
 
 using namespace gwiz;
 std::string MeCtSaccade::CONTROLLER_TYPE = "Saccade";
@@ -135,7 +137,7 @@ void MeCtSaccade::spawnOnce(float dir, float amplitude, float dur)
 	_lastFixedRotation = _rotation;
 	_fixedRotation = SrQuat(_axis, _magnitude * (float)M_PI / 180.0f);
 
-	_time = (float)mcuCBHandle::singleton().time;
+	_time = (float) SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
 }
 
 void MeCtSaccade::spawning(double t)
@@ -175,7 +177,7 @@ void MeCtSaccade::spawning(double t)
 void MeCtSaccade::processing(double t, MeFrameData& frame)
 {
 	float time = float(t);
-	float dt = (float)mcuCBHandle::singleton().time_dt;
+	float dt = (float) SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt();;
 	if (_time == -1.0f)
 		return;
 

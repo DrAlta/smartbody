@@ -134,11 +134,6 @@ SBController* createController(std::string controllerType, std::string controlle
 
 SrCamera* getCamera();
 
-//Script* getScript(std::string fileName);
-
-// helper functions
-std::string getScriptFromFile(std::string fileName);
-
 class PythonController :  public SBController
 {
 public:

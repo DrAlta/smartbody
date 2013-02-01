@@ -475,7 +475,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 			//accumTime -= 0.1f;
 		}		
 		//accumTime += dt;
-		agent->updateAI((float)mcu.time, dt, _curFrame++);
+		agent->updateAI((float) SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), dt, _curFrame++);
 	} catch (Util::GenericException& ge) {
 		std::string message = ge.what();
 		if (lastMessage == message)
@@ -1545,7 +1545,7 @@ void PPRAISteeringAgent::startParameterTesting()
 {
 	LOG("Parameter Testing Start...");
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	paramTestStartTime = (float)mcu.time;
+	paramTestStartTime = (float) SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 	paramTestFlag = true;
 	paramTestAngle = 0.0f;
 	paramTestDistance = 0.0f;
@@ -1557,7 +1557,7 @@ void PPRAISteeringAgent::startParameterTesting()
 void PPRAISteeringAgent::parameterTesting()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if ((mcu.time - paramTestStartTime) > paramTestDur)
+	if ((SmartBody::SBScene::getScene()->getSimulationManager()->getTime() - paramTestStartTime) > paramTestDur)
 	{
 		paramTestFlag = false;
 		paramTestAngle *= (float(M_PI) / 1.8f);

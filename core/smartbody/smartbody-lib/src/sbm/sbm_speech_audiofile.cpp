@@ -28,6 +28,8 @@
 #include "rapidxml_utils.hpp"
 #include <fstream>
 #include <sb/SBScene.h>
+#include <sb/SBAssetManager.h>
+
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
@@ -55,6 +57,15 @@ AudioFileSpeech::~AudioFileSpeech()
 {
    delete m_xmlParser;  m_xmlParser = NULL;
    delete m_xmlHandler;  m_xmlHandler = NULL;
+
+   	// remove the XML cache
+	for (std::map<std::string, DOMDocument*>::iterator xmlIter = xmlCache.begin();
+		xmlIter != xmlCache.end();
+		xmlIter++)
+	{
+		(*xmlIter).second->release();
+	}
+	xmlCache.clear();
 }
 
 
@@ -91,7 +102,6 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 {
 	
     mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.mark("requestSpeechAudioFast", 0, "begin");
 	rapidxml::xml_document<> doc;
 	//std::vector<char> xml(text.begin(), text.end());
     //xml.push_back('\0');
@@ -115,22 +125,22 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 		m_speechRequestInfo[ m_requestIdCounter ].id = speechId;
 	} catch (...) {
 		LOG("Problem parsing XML speech request.");
-		mcu.mark("requestSpeechAudioFast");
 		return 0;
 	}
 
-   SbmCharacter * agent = mcu.getCharacter(agentName );
+   SmartBody::SBCharacter * agent = SmartBody::SBScene::getScene()->getCharacter(agentName );
    if ( agent == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
-	  mcu.mark("requestSpeechAudioFast");
       return 0;
    }
 
    // if an audio path is present, use it
    bool useAudioPaths = true;
-   mcu.audio_paths.reset();
-   std::string relativeAudioPath = mcu.audio_paths.next_path();
+   std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
+   std::string relativeAudioPath = "";
+   if (audioPaths.size() > 0)
+		relativeAudioPath = audioPaths[0];
 
 	boost::filesystem::path p( relativeAudioPath );
 	p /= voiceCode;
@@ -139,7 +149,6 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 	if( !boost::filesystem2::exists( abs_p ))
 	{
 	  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
-	  mcu.mark("requestSpeechAudio");
       return 0;
 	}
 
@@ -153,25 +162,18 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 
 	string bmlFilename = bmlPath.native_directory_string().c_str();
 
-	mcu.mark("requestSpeechAudioFast", 0, "lips");
 	rapidxml::file<char> bmlFile(bmlFilename.c_str());
-	mcu.mark("requestSpeechAudioFast", 0, "fileconstruction");
 	rapidxml::xml_document<> bmldoc;
-	mcu.mark("requestSpeechAudioFast", 0, "parse");
 	bmldoc.parse< rapidxml::parse_declaration_node>(bmlFile.data());
-
-	mcu.mark("requestSpeechAudioFast", 0, "traverse");
 
 	m_speechRequestInfo[ m_requestIdCounter ].visemeData.clear();
 	ReadVisemeDataBMLFast( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent, bmldoc );
 	if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
 	{
 	  LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
-	  mcu.mark("requestSpeechAudioFast");
 	  return 0;
 	}
 
-	mcu.mark("requestSpeechAudioFast", 0, "sync");
 	ReadSpeechTimingFast( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers, bmldoc );
 	if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
 	{
@@ -181,7 +183,6 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 	}
 
 	mcu.execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
-	mcu.mark("requestSpeechAudioFast");
 	return m_requestIdCounter++;
 }
 
@@ -190,7 +191,6 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 {
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.mark("requestSpeechAudio", 0, "begin");
    // TODO:  Does return 0 signify error code?
    // TODO:  Handle xerces exceptions?
 
@@ -212,11 +212,10 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
    
 
-   SbmCharacter * agent = mcu.getCharacter( agentName );
+   SmartBody::SBCharacter * agent = SmartBody::SBScene::getScene()->getCharacter( agentName );
    if ( agent == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
-	  mcu.mark("requestSpeechAudio");
       return 0;
    }
 
@@ -228,9 +227,11 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    boost::filesystem::path voicecodeabs_p = boost::filesystem::complete( abs_p );	
    if( !boost::filesystem2::exists( voicecodeabs_p ))
    {
-	    mcu.audio_paths.reset();
-	    std::string relativeAudioPath = mcu.audio_paths.next_path();
-
+	    std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
+		std::string relativeAudioPath = "";
+		if (audioPaths.size() > 0)
+			relativeAudioPath = audioPaths[0];
+	    
 		boost::filesystem::path p( relativeAudioPath );
 		p /= voiceCode;
 		abs_p = boost::filesystem::complete( p );	
@@ -238,7 +239,6 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 		if( !boost::filesystem2::exists( abs_p ))
 		{
 		  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
-		  mcu.mark("requestSpeechAudio");
 		  return 0;
 		}
    }
@@ -251,21 +251,17 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
 	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.native_directory_string().c_str();
 
-   mcu.mark("requestSpeechAudio", 0, "lips");
    ReadVisemeDataBML( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
-	  mcu.mark("requestSpeechAudio");
       return 0;
    }
 
-   mcu.mark("requestSpeechAudio", 0, "sync");
    ReadSpeechTiming( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
    if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.native_directory_string().c_str() );
-	  //mcu.mark("requestSpeechAudio");
       //return 0;
    }
 
@@ -273,7 +269,6 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    mcu.execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
 
 
-   mcu.mark("requestSpeechAudio");
    return m_requestIdCounter++;
 }
 
@@ -520,26 +515,25 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
    visemeData.clear();
 
     mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.mark("ReadVisemeDataBML", 0, "start");
 
 	DOMDocument* xmlDoc = NULL;
-	if (mcu.useXmlCache)
+	if (SmartBody::SBScene::getScene()->getBoolAttribute("useXMLCache"))
 	{
 		boost::filesystem::path path(filename);
 		boost::filesystem::path absPath = boost::filesystem::complete(path);
 		std::string absPathStr = absPath.string();
-		std::map<std::string, DOMDocument*>::iterator iter = mcu.xmlCache.find(absPathStr);
-		if (iter !=  mcu.xmlCache.end())
+		std::map<std::string, DOMDocument*>::iterator iter = xmlCache.find(absPathStr);
+		if (iter !=  xmlCache.end())
 		{
 			xmlDoc = (*iter).second;
 		}
 		else
 		{
 			xmlDoc = xml_utils::parseMessageXml( m_xmlParser, filename );
-			if (mcu.useXmlCacheAuto)
+			if (SmartBody::SBScene::getScene()->getBoolAttribute("useXMLCacheAuto"))
 			{
 				// add to the cache if in auto cache mode
-				mcu.xmlCache.insert(std::pair<std::string, DOMDocument*>(absPathStr, xmlDoc));
+				xmlCache.insert(std::pair<std::string, DOMDocument*>(absPathStr, xmlDoc));
 			}
 		}
 	}
@@ -550,7 +544,6 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 
    if ( xmlDoc == NULL )
    {
-	  mcu.mark("ReadVisemeDataBML");
       return;
    }
 
@@ -563,7 +556,6 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
    bool useVisemeCurveMode = visemeCurveMode;
    if (useVisemeCurveMode)
    {
-	   mcu.mark("ReadVisemeDataBML", 0, "curve mode");
 	   DOMNodeList* syncCurveList = bml->getElementsByTagName( BML::BMLDefs::TAG_CURVE );
 	   XMLSize_t length = syncCurveList->getLength();
 	   for (XMLSize_t i = 0; i < length; i++)
@@ -590,7 +582,6 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
    
    if (!useVisemeCurveMode)
    {
-	   mcu.mark("ReadVisemeDataBML", 0, "non-curve mode");
 	   DOMNodeList * syncList = bml->getElementsByTagName( BML::BMLDefs::TAG_LIPS );
 	   XMLSize_t length = syncList->getLength();
 	   for ( XMLSize_t i = 0; i < length; i++ )
@@ -696,7 +687,6 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 		   }
 	   }
    }
-   mcu.mark("ReadVisemeDataBML");
 }
 
 
@@ -745,9 +735,6 @@ void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector<
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	//ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
 	m_speechRequestInfo[ m_requestIdCounter ].visemeData.clear();
-
-
-	mcu.mark("requestSpeechAudioFast", 0, "traverse");
 
 	bool useCurveMode = visemeCurveMode;
 	if (useCurveMode)
@@ -946,7 +933,6 @@ void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector<
 void AudioFileSpeech::ReadSpeechTimingFast( const char * filename, std::map< std::string, float > & timeMarkers, rapidxml::xml_document<>& bmldoc)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.mark("requestSpeechAudioFast", 0, "sync");
 	m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.clear();
 
 	//rapidxml::xml_document<> bmldoc;
@@ -976,5 +962,4 @@ void AudioFileSpeech::ReadSpeechTimingFast( const char * filename, std::map< std
 			}
 		}
 	}
-	mcu.mark("requestSpeechAudioFast");
 }

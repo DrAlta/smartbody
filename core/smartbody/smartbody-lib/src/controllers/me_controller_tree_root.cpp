@@ -36,6 +36,8 @@
 #include <sk/sk_channel_array.h>
 #include "sbm/mcontrol_util.h"
 #include <sb/sbm_pawn.hpp>
+#include <sb/SBSimulationManager.h>
+#include <sb/SBScene.h>
 
 
 using namespace std;
@@ -151,7 +153,7 @@ struct RemapAndActivate_Func {
 	void operator() ( controller_ptr& ct ){
 		ct->remap();
 		if( !ct->active() ) {
-			ct->start(mcuCBHandle::singleton().time);
+			ct->start(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 		}
 	}
 };
@@ -343,7 +345,7 @@ public:
 
 		if( _state==VALID ) {
 			ct->remap();
-			ct->start(mcuCBHandle::singleton().time);
+			ct->start(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 		}
 	}
 

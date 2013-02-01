@@ -225,20 +225,19 @@ void ResourceWindow::updateGUI()
 
 	resourceTree->sortorder(FL_TREE_SORT_ASCENDING);	
 	// update path tree	
-	updatePath(treeItemList[ITEM_SEQ_PATH],mcu.seq_paths);	
-	updatePath(treeItemList[ITEM_ME_PATH],mcu.me_paths);
-	updatePath(treeItemList[ITEM_AUDIO_PATH],mcu.audio_paths);	
-	updatePath(treeItemList[ITEM_MESH_PATH],mcu.mesh_paths);	
+	updatePath(treeItemList[ITEM_SEQ_PATH], SmartBody::SBScene::getScene()->getAssetPaths("script"));	
+	updatePath(treeItemList[ITEM_ME_PATH], SmartBody::SBScene::getScene()->getAssetPaths("motion"));	
+	updatePath(treeItemList[ITEM_AUDIO_PATH], SmartBody::SBScene::getScene()->getAssetPaths("audio"));	
+	updatePath(treeItemList[ITEM_MESH_PATH], SmartBody::SBScene::getScene()->getAssetPaths("mesh"));	
 	
 
 	// update sequence file list
-	mcu.seq_paths.reset();
-	std::string pathName = mcu.seq_paths.next_path();
+
+	const std::vector<std::string> scriptPaths = SmartBody::SBScene::getScene()->getAssetPaths("script");
 	resourceTree->clear_children(treeItemList[ITEM_SEQ_FILES]);
-	while (pathName != "")
+	for (size_t p = 0; p < scriptPaths.size(); p++)
 	{
-		updateSeqFiles(treeItemList[ITEM_SEQ_FILES],pathName);
-		pathName = mcu.seq_paths.next_path();
+		updateSeqFiles(treeItemList[ITEM_SEQ_FILES], scriptPaths[p]);
 	}	
 
 	// update skeleton
@@ -477,16 +476,13 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefi
 	}
 }
 
-void ResourceWindow::updatePath( Fl_Tree_Item* tree, srPathList& pathList )
+void ResourceWindow::updatePath( Fl_Tree_Item* tree, const std::vector<std::string>& pathList )
 {
 	resourceTree->clear_children(tree);	
-	pathList.reset();
-	std::string pathName = pathList.next_path();
-	while (pathName != "")
+	for (size_t p = 0; p < pathList.size(); p++)
 	{
-		Fl_Tree_Item* item = resourceTree->add(tree,pathName.c_str());
+		Fl_Tree_Item* item = resourceTree->add(tree, pathList[p].c_str());
 		item->user_data(tree->user_data());
-		pathName = pathList.next_path();
 	}	
 }
 

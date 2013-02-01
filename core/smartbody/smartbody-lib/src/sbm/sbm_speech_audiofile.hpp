@@ -81,6 +81,8 @@ class AudioFileSpeech : public SpeechInterface
       virtual void ReadSpeechTiming( const char * filename, std::map< std::string, float > & timeMarkers );
 	  virtual void ReadSpeechTimingFast( const char * filename, std::map< std::string, float > & timeMarkers, rapidxml::xml_document<>& bmlDoc);
 	  virtual void ReadVisemeDataBMLFast( const char * filename, std::vector< VisemeData > & visemeData, const SbmCharacter* character, rapidxml::xml_document<>& bmldoc);
+
+	  std::map<std::string, DOMDocument*> xmlCache;
 };
 
 };

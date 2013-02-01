@@ -127,7 +127,7 @@ void SBDebuggerUtility::initSkeleton(const std::string& skFileName, const std::s
 	SmartBody::SBSkeleton* sbSkel = new SmartBody::SBSkeleton();
 	sbSkel->loadSk(input);
 	sbSkel->skfilename(skFileName.c_str());
-	mcuCBHandle::singleton().skeleton_map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(sbSkel->getName(), sbSkel));
+	SmartBody::SBScene::getScene()->getAssetManager()->addSkeleton(sbSkel);
 }
 
 

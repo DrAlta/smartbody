@@ -37,6 +37,7 @@
 #include "ParamAnimScriptEditor.h"
 #include "VisualizationView.h"
 #include <sb/SBScene.h>
+#include <sb/SBSimulationManager.h>
 
 
 PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
@@ -178,7 +179,7 @@ void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	BML::SbmCommand* command = new BML::SbmCommand(cmd, (float)(mcu.time + tOffset));
+	BML::SbmCommand* command = new BML::SbmCommand(cmd, (float)(SmartBody::SBScene::getScene()->getSimulationManager()->getTime() + tOffset));
 	bool success = true;
 	srCmdSeq *seq = new srCmdSeq(); //sequence that holds the commands
 	if( command != NULL ) 

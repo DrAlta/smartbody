@@ -24,6 +24,7 @@
 #include <controllers/me_ct_param_animation.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationState.h>
+#include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 
 std::string MeCtInterpolator::Context::CONTEXT_TYPE = "MeCtInterpolator::Context";
@@ -332,7 +333,7 @@ void MeCtInterpolator::adjustStartTime(double origW, double newW)
 		keyP.push_back(k);
 	}
 
-	double t = mcu.time - startTime;
+	double t = SmartBody::SBScene::getScene()->getSimulationManager()->getTime() - startTime;
 	double dur = key[key.size() - 1] - key[0];
 	if (t > dur) t -= dur; 
 	bool err = true;

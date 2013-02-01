@@ -54,6 +54,8 @@
 //#include "SBMWindow.h"
 #include <sb/SBPython.h>
 #include <sb/SBSteerManager.h>
+#include <sb/SBSimulationManager.h>
+#include <sb/SBAssetManager.h>
 #include <sbm/PPRAISteeringAgent.h>
 #include "TransparentListener.h"
 #include "TransparentViewer.h"
@@ -209,7 +211,7 @@ void cleanup( void )	{
 			mcu.loop = false;
 		}
 
-		if ( mcu.play_internal_audio )
+		if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
 		{
 			AUDIO_Close();
 		}
@@ -357,11 +359,9 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	
 	mcu_register_callbacks();
 
-	TimeRegulator timer;
-	mcu.register_timer( timer );
+	SmartBody::SBScene::getScene()->getSimulationManager()->registerTimer();
 
-	TimeIntervalProfiler* profiler = new TimeIntervalProfiler();
-	mcu.register_profiler(*profiler);
+	SmartBody::SBScene::getScene()->getSimulationManager()->registerProfiler();
 
 	std::string python_lib_path = "../../../../core/smartbody/Python26/Lib";
 	std::string festivalLibDir = "../../../../lib/festival/festival/lib/";
@@ -458,7 +458,6 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 					{
 						LOG( "    Loading sequence '%s'\n", argv[i] );
 						init_seqs.push_back( argv[i] );
-						mcu.use_python = false;
 					}
 				}
 				else
@@ -479,7 +478,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		}
 		else if( s.search( "-audio" ) == 0 )  // argument equals -audio
 		{
-			mcu.play_internal_audio = true;
+			 SmartBody::SBScene::getScene()->setBoolAttribute("internalAudio", true);
 		}
 		else if( s.search( "-lockdt" ) == 0 )  // argument equals -lockdt
 		{
@@ -495,7 +494,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		{
 			SrString interval = s;
 			interval.remove( 0, 6 );
-			timer.set_perf( atof( interval ) );
+			SmartBody::SBScene::getScene()->getSimulationManager()->set_perf( atof( interval ) );
 		}
 		else if ( s.search( "-facebone" ) == 0 )
 		{
@@ -505,13 +504,13 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		{
 			SrString skScale = s;
 			skScale.remove( 0, 9 );
-			mcu.skScale = atof(skScale);
+			SmartBody::SBScene::getScene()->getAssetManager()->setDoubleAttribute("globalSkeletonScale()", atof(skScale));
 		}
 		else if ( s.search( "-skmscale=" ) == 0 )
 		{
 			SrString skmScale = s;
 			skmScale.remove( 0, 10 );
-			mcu.skmScale = atof(skmScale);
+			SmartBody::SBScene::getScene()->getAssetManager()->setDoubleAttribute("globalMotionScale()", atof(skmScale));
 		}
 		else if ( s.search( "-mediapath=" ) == 0 )
 		{
@@ -622,14 +621,14 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	if( net_host != "" )
 		mcu.set_net_host( net_host );
 	if( proc_id != "" ) {
-		mcu.set_process_id( (const char*)proc_id );
+		SmartBody::SBScene::getScene()->getProcessId( (const char*)proc_id );
 
 		// Using a process id is a sign that we're running in a multiple SBM environment.
 		// So.. ignore BML requests with unknown agents by default
 		mcu.bml_processor.set_warn_unknown_agents( false );
 	}
 
-	if ( mcu.play_internal_audio )
+	if ( SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
 	{
 		if ( !AUDIO_Init() )
 		{
@@ -693,16 +692,8 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	// run the specified scripts
 	if( init_seqs.empty() && init_pys.empty())
 	{
-		if (!mcu.use_python)
-		{
-			LOG( "No sequences specified. Loading sequence '%s'\n", DEFAULT_SEQUENCE_FILE );
-			init_seqs.push_back( DEFAULT_SEQUENCE_FILE );
-		}
-		else
-		{
-			LOG( "No Python scripts specified. Loading script '%s'\n", DEFAULT_PY_FILE );
-			init_pys.push_back( DEFAULT_PY_FILE );
-		}
+		LOG( "No Python scripts specified. Loading script '%s'\n", DEFAULT_PY_FILE );
+		init_pys.push_back( DEFAULT_PY_FILE );
 	}
 
 	for( it = init_seqs.begin();
@@ -747,8 +738,9 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 
 	while( mcu.loop )	{
 
-		mcu.update_profiler();
-		bool update_sim = mcu.update_timer();
+		SmartBody::SBScene::getScene()->getSimulationManager()->updateProfiler();
+		bool update_sim =SmartBody::SBScene::getScene()->getSimulationManager()->updateTimer();
+		
 
 		MSG msg;
 
@@ -785,7 +777,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 #endif
 
 		if( update_sim )	{
-			mcu.update();
+			SmartBody::SBScene::getScene()->update();
 		}
 
 		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();

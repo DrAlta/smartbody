@@ -3,7 +3,6 @@
 #include "controllers/me_ct_reach.hpp"
 
 #include <sb/sbm_character.hpp>
-#include <sbm/me_utilities.hpp>
 #include <sk/sk_skeleton.h>
 #include <sk/sk_joint.h>
 #include <sbm/sbm_test_cmds.hpp>
@@ -23,7 +22,7 @@ SrViewer* getViewer()
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	if (!mcu.viewer_p)
 	{
-		mcu.viewer_p = mcu.viewer_factory->create(100, 100, 800, 800);
+		mcu.viewer_p = mcu.viewer_factory->create(100, 100, 800, 600);
 		mcu.viewer_p->label_viewer("Visual Debugger");
 		SmartBody::SBScene::getScene()->createCamera("cameraDefault");
 		mcu.viewer_p->root(mcu.root_group_p);
@@ -39,7 +38,6 @@ std::string PyLogger::strBuffer = "";
 void pythonExit()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.use_python = false;
 }
 
 void quitSbm()
@@ -106,42 +104,6 @@ SrCamera* getCamera()
 }
 
 
-std::string getScriptFromFile(std::string fileName)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	FILE* file_p = NULL;
-	char buffer[ MAX_FILENAME_LEN ];
-	char label[ MAX_FILENAME_LEN ];
-	sprintf( label, "%s", fileName.c_str() );
-	mcu.seq_paths.reset();
-	std::string filename = mcu.seq_paths.next_filename( buffer, label );
-	
-	while (filename.size() > 0 && filename != "")	{
-		file_p = fopen( filename.c_str(), "r" );
-		if( file_p != NULL ) {
-		
-			break;
-		}
-		filename = mcu.seq_paths.next_filename( buffer, label );
-	}
-	if( file_p == NULL ) {
-		// Could not find the file as named.  Perhap it excludes the extension	
-		sprintf( label, "%s.py", fileName.c_str() );
-		mcu.seq_paths.reset();
-		filename = mcu.seq_paths.next_filename( buffer, label );
-		while (filename.size() > 0)	{
-			if( ( file_p = fopen( filename.c_str(), "r" ) ) != NULL ) {
-				
-				break;
-			}
-			filename = mcu.seq_paths.next_filename( buffer, label );
-		}
-	}
-
-	// return empty string if file not found
-	if (file_p == NULL)	return "";
-	else				return std::string(filename);	
-}
 
 ////////////////////////////////////////////
 

@@ -14,6 +14,7 @@
 #include <controllers/me_ct_time_shift_warp.hpp>
 #include <controllers/me_ct_gaze.h>
 #include <sb/SBScene.h>
+#include <sb/SBSimulationManager.h>
 #include "BehaviorBlock.h"
 #include <bml/bml_types.hpp>
 #include <sbm/text_speech.h>
@@ -398,7 +399,7 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 	model->clear(true);
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	double curTime = mcu.time;
+	double curTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 
 	// first, display the bml request in an intuitive way
 	RequestTrack* requestTrack = new RequestTrack();

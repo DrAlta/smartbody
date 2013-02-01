@@ -13,6 +13,7 @@
 #include <sbm/ParserASFAMC.h>
 #include <sbm/ParserFBX.h>
 #include <sbm/lin_win.h>
+#include <sbm/sr_path_list.h>
 
 #ifdef WIN32
 #include <direct.h>
@@ -29,6 +30,11 @@ namespace SmartBody {
 
 SBAssetManager::SBAssetManager()
 {
+	seq_paths = new srPathList();	
+	me_paths = new srPathList();	
+	audio_paths = new srPathList();
+	mesh_paths = new srPathList();
+
 	createDoubleAttribute("globalSkeletonScale", 1,true,"",30,false,false,false,"Multiplier when loading all skeletons. ");
 	createDoubleAttribute("globalMotionScale", 1,true,"",30,false,false,false,"Multiplier when loading all motions.");
 	
@@ -36,8 +42,45 @@ SBAssetManager::SBAssetManager()
 
 SBAssetManager::~SBAssetManager()
 {
+	for (std::map<std::string, SBMotion*>::iterator iter = _motions.begin();
+		 iter != _motions.end();
+		 iter++)
+	{
+		delete (*iter).second;
+	}
+
+	for (std::map<std::string, SBSkeleton*>::iterator iter = _skeletons.begin();
+		iter != _skeletons.end();
+		iter++)
+	{
+		delete (*iter).second;
+	}
+
+	delete seq_paths;
+	delete me_paths;
+	delete audio_paths;
+	delete mesh_paths;
 }
 
+double SBAssetManager::getGlobalMotionScale()
+{
+	return getDoubleAttribute("globalMotionScale");
+}
+
+void SBAssetManager::setGlobalMotionScale(double val)
+{
+	setDoubleAttribute("globalMotionScale", val);
+}
+
+double SBAssetManager::getGlobalSkeletonScale()
+{
+	return getDoubleAttribute("globalSkeletonScale");
+}
+
+void SBAssetManager::setGlobalSkeletonScale(double val)
+{
+	setDoubleAttribute("globalSkeletonScale", val);
+}
 
 SBSkeleton* SBAssetManager::createSkeleton(const std::string& skeletonDefinition)
 {
@@ -60,36 +103,70 @@ SBSkeleton* SBAssetManager::createSkeleton(const std::string& skeletonDefinition
 SBSkeleton* SBAssetManager::getSkeleton(const std::string& name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::map<std::string, SBSkeleton*>::iterator iter = mcu.skeleton_map.find(name);
-	SkSkeleton* skskel = NULL;
-	if (iter != mcuCBHandle::singleton().skeleton_map.end())
-		skskel = iter->second;
-	SBSkeleton* sbskel = dynamic_cast<SBSkeleton*>(skskel);
+	std::map<std::string, SBSkeleton*>::iterator iter = _skeletons.find(name);
+	SBSkeleton* sbskel = NULL;
+	if (iter != _skeletons.end())
+		sbskel = iter->second;
 	return sbskel;
 }
 
 
 std::vector<std::string> SBAssetManager::getAssetPaths(const std::string& type)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::vector<std::string> list;
+	srPathList* path = NULL;
+	if (type == "seq" || type == "script")
+	{
+		path = seq_paths;
+	}
+	else if (type == "me" || type == "ME" || type == "motion")
+	{
+		path = me_paths;
+	}
+	else if (type == "audio")
+	{
+		path = audio_paths;
+	}
+	else if (type == "mesh")
+	{
+		path = mesh_paths;
+	}
+	else
+	{
+		LOG("Unknown path type: %s", type.c_str());
+		return list;
+	}
+	
+	path->reset();
+	std::string nextPath = path->next_path(true);
+	while (nextPath != "")
+	{
+		list.push_back(nextPath);
+		nextPath = path->next_path(false);
+	}
+	return list;
+}
+
+std::vector<std::string> SBAssetManager::getLocalAssetPaths(const std::string& type)
+{
 
 	std::vector<std::string> list;
 	srPathList* path = NULL;
 	if (type == "seq" || type == "script")
 	{
-		path = &mcu.seq_paths;
+		path = seq_paths;
 	}
 	else if (type == "me" || type == "ME" || type == "motion")
 	{
-		path = &mcu.me_paths;
+		path = me_paths;
 	}
 	else if (type == "audio")
 	{
-		path = &mcu.audio_paths;
+		path = audio_paths;
 	}
 	else if (type == "mesh")
 	{
-		path = &mcu.mesh_paths;
+		path = mesh_paths;
 	}
 	else
 	{
@@ -107,59 +184,23 @@ std::vector<std::string> SBAssetManager::getAssetPaths(const std::string& type)
 	return list;
 }
 
-std::vector<std::string> SBAssetManager::getLocalAssetPaths(const std::string& type)
-{
-
-	std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
-	boost::filesystem::path mpath(mediaPath);
-	std::string completeMediaPath =  boost::filesystem::complete(mpath).string();
-	size_t mediaPathLength = completeMediaPath.size();
-
-	std::vector<std::string> paths = getAssetPaths(type);
-
-	std::vector<std::string> localPaths;
-
-	// remove the media path
-	for (std::vector<std::string>::iterator iter = paths.begin();
-		 iter != paths.end();
-		 iter++)
-	{
-		boost::filesystem::path path((*iter));
-		std::string completePath = boost::filesystem::complete( path ).string();
-		size_t loc = completePath.find(completeMediaPath);
-		if (loc == 0)
-		{
-			localPaths.push_back(completePath.substr(mediaPathLength + 1));
-		}
-		else
-		{
-			localPaths.push_back((*iter));
-		}
-	}
-
-	return localPaths;
-
-}
-
 void SBAssetManager::addAssetPath(const std::string& type, const std::string& path)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	
 	if (type == "seq" || type == "script")
 	{
-		mcu.seq_paths.insert(const_cast<char *>(path.c_str()));
+		seq_paths->insert(const_cast<char *>(path.c_str()));
 	}
 	else if (type == "me" || type == "ME" || type == "motion")
 	{
-		mcu.me_paths.insert(const_cast<char *>(path.c_str()));
+		me_paths->insert(const_cast<char *>(path.c_str()));
 	}
 	else if (type == "audio")
 	{
-		mcu.audio_paths.insert(const_cast<char *>(path.c_str()));
+		audio_paths->insert(const_cast<char *>(path.c_str()));
 	}
 	else if (type == "mesh")
 	{
-		mcu.mesh_paths.insert(const_cast<char *>(path.c_str()));
+		mesh_paths->insert(const_cast<char *>(path.c_str()));
 	}
 	else
 	{
@@ -170,30 +211,23 @@ void SBAssetManager::addAssetPath(const std::string& type, const std::string& pa
 
 void SBAssetManager::removeAssetPath(const std::string& type, const std::string& path)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-
 	bool ret = false;
 	if (type == "seq" || type == "script")
 	{
-		ret = mcu.seq_paths.remove(const_cast<char *>(path.c_str()));
+		seq_paths->remove(const_cast<char *>(path.c_str()));
 	}
 	else if (type == "me" || type == "ME" || type == "motion")
 	{
-		ret = mcu.me_paths.remove(const_cast<char *>(path.c_str()));
+		me_paths->remove(const_cast<char *>(path.c_str()));
 	}
 	else if (type == "audio")
 	{
-		ret = mcu.audio_paths.remove(const_cast<char *>(path.c_str()));
+		audio_paths->remove(const_cast<char *>(path.c_str()));
 	}
 	else
 	{
 		LOG("Input type %s not recognized!", type.c_str());
 		return;
-	}
-
-	if (ret)
-	{
-		// remove the resource from the resource manager
 	}
 }
 
@@ -204,43 +238,37 @@ void SBAssetManager::removeAllAssetPaths(const std::string& type)
 	bool ret = false;
 	if (type == "seq" || type == "script")
 	{
-		 mcu.seq_paths.removeAll();
+		seq_paths->removeAll();
 	}
 	else if (type == "me" || type == "ME" || type == "motion")
 	{
-		mcu.me_paths.removeAll();
+		me_paths->removeAll();
 	}
 	else if (type == "audio")
 	{
-		mcu.audio_paths.removeAll();
+		audio_paths->removeAll();
 	}
 	else if (type == "mesh")
 	{
-		mcu.mesh_paths.removeAll();
+		mesh_paths->removeAll();
 	}
 	else
 	{
 		LOG("Input type %s not recognized!", type.c_str());
 		return;
 	}
-
-	if (ret)
-	{
-		// remove the resource from the resource manager
-	}
 }
 
 void SBAssetManager::loadAssets()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.me_paths.reset();
+	me_paths->reset();
 
-	std::string path = mcu.me_paths.next_path(false);
+	std::string path = me_paths->next_path(false);
 	while (path != "")
 	{
 		load_motions(path.c_str(), true);
-		mcu.load_skeletons(path.c_str(), true);
-		path = mcu.me_paths.next_path(false);
+		load_skeletons(path.c_str(), true);
+		path = me_paths->next_path(false);
 	}
 }
 
@@ -298,7 +326,7 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 		if (parseSuccessful)
 		{
 			_motions.insert(std::pair<std::string, SBMotion*>(motion->getName(), motion));
-			mcu.skeleton_map.insert(std::pair<std::string, SBSkeleton*>(skeleton->getName(), skeleton));
+			_skeletons.insert(std::pair<std::string, SBSkeleton*>(skeleton->getName(), skeleton));
 		}
 		else
 		{
@@ -320,7 +348,7 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 			skeleton->ref();
 			skeleton->setFileName(fileName);
 			skeleton->setName(skeleton->getFileName());
-			mcu.skeleton_map.insert(std::pair<std::string, SBSkeleton*>(skel->getName(), skeleton));
+			_skeletons.insert(std::pair<std::string, SBSkeleton*>(skel->getName(), skeleton));
 		}
 		else
 		{
@@ -352,8 +380,7 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 void SBAssetManager::loadAssetsFromPath(const std::string& assetPath)
 {
 	load_motions(assetPath.c_str(), true);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.load_skeletons(assetPath.c_str(), true);
+	load_skeletons(assetPath.c_str(), true);
 }
 
 SBSkeleton* SBAssetManager::addSkeletonDefinition(const std::string& skelName )
@@ -361,8 +388,13 @@ SBSkeleton* SBAssetManager::addSkeletonDefinition(const std::string& skelName )
 	SBSkeleton* sbSkel = new SBSkeleton();	
 	sbSkel->setName(skelName);
 	sbSkel->skfilename(skelName.c_str());
-	mcuCBHandle::singleton().skeleton_map.insert(std::pair<std::string, SBSkeleton*>(sbSkel->getName(), sbSkel));
+	_skeletons.insert(std::pair<std::string, SBSkeleton*>(sbSkel->getName(), sbSkel));
 	return sbSkel;
+}
+
+SBAPI void SBAssetManager::addSkeleton(SmartBody::SBSkeleton* skeleton)
+{
+	_skeletons[skeleton->getName()] = skeleton;
 }
 
 SBMotion* SBAssetManager::addMotionDefinition(const std::string& motionName, double duration )
@@ -431,19 +463,16 @@ std::vector<std::string> SBAssetManager::getMotionNames()
 
 int SBAssetManager::getNumSkeletons()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	return mcu.getSkeletonMap().size();
+	return _skeletons.size();
 }
 
 
 std::vector<std::string> SBAssetManager::getSkeletonNames()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::vector<std::string> ret;
 
-	for(std::map<std::string, SBSkeleton*>::iterator iter = mcu.getSkeletonMap().begin();
-		iter != mcu.getSkeletonMap().end();
+	for(std::map<std::string, SBSkeleton*>::iterator iter = _skeletons.begin();
+		iter != _skeletons.end();
 		iter++)
 	{
 		SBSkeleton* skeleton = (*iter).second;
@@ -711,4 +740,522 @@ int SBAssetManager::load_motion( const void* data, int sizeBytes, const char* mo
 	SrInput input( (char *)data, sizeBytes );
 	return load_me_motion_individual( input, motionName, _motions, scale );
 }
+
+int SBAssetManager::load_skeletons( const char* pathname, bool recursive ) {
+	return load_me_skeletons( pathname, _skeletons, recursive, SmartBody::SBScene::getScene()->getAssetManager()->getGlobalSkeletonScale() );
+}
+
+int SBAssetManager::load_skeleton( const void* data, int sizeBytes, const char* skeletonName )
+{
+	SrInput input( (char *)data, sizeBytes );
+	return load_me_skeleton_individual( input, skeletonName, _skeletons, SmartBody::SBScene::getScene()->getAssetManager()->getGlobalSkeletonScale() );
+}
+
+SmartBody::SBSkeleton* SBAssetManager::load_skeleton( const char *skel_file, srPathList &path_list, double scale ) {
+	
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::map<std::string, SmartBody::SBSkeleton*>::iterator iter =_skeletons.find(std::string(skel_file));
+	if (iter != _skeletons.end())
+	{
+		//SkSkeleton* ret = new SkSkeleton(iter->second);
+		SmartBody::SBSkeleton* existingSkel = iter->second;
+		SmartBody::SBSkeleton* ret = new SmartBody::SBSkeleton(existingSkel);
+		ret->ref();
+		return ret;
+	}
+	
+	FILE *fp = NULL;
+	char buffer[ MAX_FILENAME_LEN ];
+	std::string filename;
+	//char *path = NULL;
+	path_list.reset();
+	int done = FALSE;
+	while( !done )	{
+		//filename = path_list.next_filename( buffer, skel_file, & path );
+		filename = path_list.next_filename( buffer, skel_file);
+		if( filename.size() > 0 )	{
+			if( fp = fopen( filename.c_str(), "rt" ) )	{
+				done = TRUE;
+			}
+		}
+		else	{
+			done = TRUE;
+		}
+	}
+	if( fp == NULL )	{
+		LOG("ERROR: load_skeleton(..): Skeleton file \"%s\" not found.", skel_file);
+		return NULL;
+	}
+	SrInput input( fp );
+	if( !input.valid() ) {
+		LOG("ERROR: load_skeleton(..): Unable to access skeleton file \"%s\".", skel_file);
+		return NULL;
+	}
+
+	SmartBody::SBSkeleton* skeleton_p = new SmartBody::SBSkeleton();
+	skeleton_p->ref();
+#if 0
+	if( !skeleton_p->load( input, path ) )	{ 
+#else
+	if (filename.find(".bvh") == (filename.size() - 4) || 
+		filename.find(".BVH") == (filename.size() - 4))
+	{
+		fclose(fp);
+		std::ifstream filestream(filename.c_str());
+		SmartBody::SBMotion motion;
+		ParserBVH::parse(*skeleton_p, motion, skel_file, filestream, float(scale));
+		skeleton_p->skfilename(filename.c_str());
+	}
+	else if (filename.find(".asf") == (filename.size() - 4) || 
+			 filename.find(".ASF") == (filename.size() - 4))
+	{
+		fclose(fp);
+		std::ifstream filestream(filename.c_str());
+		std::ifstream datastream("");
+		SmartBody::SBMotion motion;
+		ParserASFAMC::parse(*skeleton_p, motion, filestream, datastream, float(scale));
+		skeleton_p->skfilename(filename.c_str());
+	}
+	else if (filename.find(".dae") == (filename.size() - 4) || 
+			 filename.find(".DAE") == (filename.size() - 4))
+	{
+		fclose(fp);
+		SmartBody::SBMotion motion;
+		ParserOpenCOLLADA::parse(*skeleton_p, motion, filename, float(scale), true, false);
+		skeleton_p->skfilename(filename.c_str());
+		skeleton_p->setName(skel_file);
+	}
+	else if (filename.find(".skeleton.xml") == (filename.size() - 13) || 
+			 filename.find(".SKELETON.XML") == (filename.size() - 13))
+	{
+		fclose(fp);
+		SmartBody::SBMotion motion;
+		std::vector<SmartBody::SBMotion*> motions;
+		motions.push_back(&motion);
+		ParserOgre::parse(*skeleton_p, motions, filename, float(scale), true, false);
+		skeleton_p->skfilename(filename.c_str());
+		skeleton_p->setName(skel_file);
+	}
+#if ENABLE_FBX_PARSER
+	else if (filename.find(".fbx") == (filename.size() - 4) || 
+			 filename.find(".FBX") == (filename.size() - 4))
+	{
+		fclose(fp);
+		SkMotion motion;
+		//LOG("FBX parse load skeleton: %s", filename.c_str());
+		ParserFBX::parse(*skeleton_p, motion, filename, float(scale));
+		skeleton_p->skfilename(filename.c_str());
+		skeleton_p->name(skel_file);
+	}
+#endif
+	else
+	{
+		//now the "geopath" can be still sent in the load() method as before,
+		//but for extracting the path from a file name, the filename should be
+		//associated with the input, as done here:
+		input.filename(filename.c_str());
+		if( !skeleton_p->loadSk( input, scale ) )	{ 
+#endif
+			LOG("ERROR: load_skeleton(..): Unable to load skeleton file \"%s\".", skel_file);
+			return NULL;
+		}
+		skeleton_p->skfilename(filename.c_str());
+	}
+//	char CurrentPath[_MAX_PATH];
+//	_getcwd(CurrentPath, _MAX_PATH);
+//	char *full_filename = new char[_MAX_PATH];
+
+//	full_filename = mcn_return_full_filename_func( CurrentPath, filename.c_str() );
+//	char *full_filename = new char[_MAX_PATH]; // REALLY??
+	
+	boost::filesystem::path p( filename );
+	boost::filesystem::path abs_p = boost::filesystem::complete( p );
+    if ( boost::filesystem2::exists( abs_p ) )	{
+//		sprintf( full_filename, "%s", abs_p.string().c_str() );
+		
+	}
+	else	{
+		LOG( "load_skeleton ERR: path '%s' does not exist\n", abs_p.string().c_str() );
+	}
+	// SUCCESS
+	return skeleton_p;
+
+}
+
+
+
+int SBAssetManager::load_me_skeletons_impl( const boost::filesystem::path& pathname, std::map<std::string, SmartBody::SBSkeleton*>& map, bool recurse_dirs, double scale, const char* error_prefix )
+{
+		
+	if( !exists( pathname ) ) {
+		LOG("%s Skeleton path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
+		return CMD_FAILURE;
+	}
+
+	if( is_directory( pathname ) ) {
+
+		boost::filesystem::directory_iterator end;
+		for( boost::filesystem::directory_iterator i( pathname ); i!=end; ++i ) {
+			const boost::filesystem::path& cur = *i;
+
+			if( boost::filesystem::is_directory( cur ) ) {
+				if( recurse_dirs )
+					load_me_skeletons_impl( cur, map, recurse_dirs, scale, "WARNING: " );
+			} else {
+				std::string ext = boost::filesystem::extension( cur );
+#if ENABLE_FBX_PARSER
+				if( _stricmp( ext.c_str(), ".sk" ) == 0 ||
+					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
+					_stricmp( ext.c_str(), ".BVH" ) == 0 ||
+					_stricmp( ext.c_str(), ".dae" ) == 0 ||
+					_stricmp( ext.c_str(), ".DAE" ) == 0 ||
+					_stricmp( ext.c_str(), ".asf" ) == 0 ||
+					_stricmp( ext.c_str(), ".ASF" ) == 0 ||
+					_stricmp( ext.c_str(), ".fbx" ) == 0 ||
+					_stricmp( ext.c_str(), ".xml" ) == 0 ||
+					_stricmp( ext.c_str(), ".FBX" ) == 0)
+#else
+				if( _stricmp( ext.c_str(), ".sk" ) == 0 ||
+					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
+					_stricmp( ext.c_str(), ".BVH" ) == 0 ||
+					_stricmp( ext.c_str(), ".dae" ) == 0 ||
+					_stricmp( ext.c_str(), ".DAE" ) == 0 ||
+					_stricmp( ext.c_str(), ".asf" ) == 0 ||
+					_stricmp( ext.c_str(), ".ASF" ) == 0 ||
+					_stricmp( ext.c_str(), ".xml" ) == 0)
+#endif
+				{
+					load_me_skeletons_impl( cur, map, recurse_dirs, scale, "WARNING: " );
+				} 
+				else if( DEBUG_LOAD_PATHS2 ) {
+					LOG("DEBUG: load_me_skeleton_impl(): Skipping \"%s\".  Extension \"%s\" does not match .sk.", cur.string().c_str(), ext.c_str() );
+				}
+			}
+		}
+	} else {
+
+		std::string ext = extension( pathname );
+		std::string filebase = boost::filesystem::basename(pathname);
+		std::string fullName = filebase + ext;
+		SmartBody::SBSkeleton* skeleton = NULL;
+		if (ext == ".sk")
+		{			
+			skeleton = new SmartBody::SBSkeleton();
+			skeleton->ref();
+			
+			FILE* fp = fopen( pathname.string().c_str(), "rt" );
+			if (fp)
+			{
+				SrInput input(fp);
+				input.filename(pathname.string().c_str());
+				if( !skeleton->loadSk( input, scale ) )
+				{ 
+					LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+					input.close();
+					delete skeleton;
+					return CMD_FAILURE;
+				}
+				else
+				{
+					std::string fullName = filebase + ext;
+					skeleton->setName(fullName);
+					SmartBody::SBSkeleton* sbskel = dynamic_cast<SmartBody::SBSkeleton*>(skeleton);
+					sbskel->setFileName(pathname.string());
+					map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(fullName, skeleton));
+				}
+			}
+		}
+		else if (ext == ".bvh" || ext == ".BVH")
+		{		
+			std::ifstream filestream(pathname.string().c_str());
+			skeleton = new SmartBody::SBSkeleton();
+			skeleton->ref();
+			skeleton->skfilename(fullName.c_str());
+			skeleton->setName(fullName);
+			SkMotion motion;
+			bool ok = ParserBVH::parse(*skeleton, motion, filebase, filestream, float(scale));
+			if (ok)
+			{
+				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
+				if (motionIter != map.end()) {
+					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					delete skeleton;
+					return CMD_FAILURE;
+				}
+				map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(filebase + ext, skeleton));
+			}
+			else
+			{
+				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+				return CMD_FAILURE;
+			}
+		}
+		else if (ext == ".asf" || ext == ".ASF")
+		{		
+			std::ifstream filestream(pathname.string().c_str());
+			std::ifstream datastream("");
+			skeleton = new SmartBody::SBSkeleton();			
+			skeleton->skfilename(fullName.c_str());
+			skeleton->setName(fullName.c_str());
+			SkMotion motion;
+			bool ok = ParserASFAMC::parse(*skeleton, motion, filestream, datastream, float(scale));
+			if (ok)
+			{
+				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
+				if (motionIter != map.end()) {
+					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					delete skeleton;
+					return CMD_FAILURE;
+				}
+				map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(filebase + ext, skeleton));
+			}
+			else
+			{
+				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+				return CMD_FAILURE;
+			}
+		}
+		else if (ext == ".dae" || ext == ".DAE")
+		{			
+			skeleton =  new SmartBody::SBSkeleton();			
+			skeleton->skfilename(fullName.c_str());				
+			skeleton->setName(fullName.c_str());
+			SkMotion motion;
+			bool ok = ParserOpenCOLLADA::parse(*skeleton, motion, pathname.string(), float(scale), true, false);
+			if (ok)
+			{
+				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
+				if (motionIter != map.end()) {
+					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					delete skeleton;
+					return CMD_FAILURE;
+				}
+				map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(filebase + ext, skeleton));
+			}
+			else
+			{
+				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+				return CMD_FAILURE;
+			}
+		}
+		else if (ext == ".xml" || ext == ".XML")
+		{			
+			skeleton =  new SmartBody::SBSkeleton();
+			skeleton->skfilename(fullName.c_str());			
+			skeleton->setName(fullName);
+			std::vector<SmartBody::SBMotion*> motions;
+			bool ok = ParserOgre::parse(*skeleton, motions, pathname.string(), float(scale), true, false);
+			if (ok)
+			{
+				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
+				if (motionIter != map.end()) {
+					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					delete skeleton;
+					return CMD_FAILURE;
+				}
+				map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(filebase + ext, skeleton));
+			}
+			else
+			{
+				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+				return CMD_FAILURE;
+			}
+		}
+#if ENABLE_FBX_PARSER
+		else if (ext == ".fbx" || ext == ".FBX")
+		{
+			skeleton = new SkSkeleton();
+			skeleton->skfilename(filebase.c_str());
+			skeleton->name(filebase.c_str());
+			SkMotion motion;
+			//LOG("FBX skeleton skeleton load: %s", pathname.string().c_str());
+			bool ok = ParserFBX::parse(*skeleton, motion, pathname.string(), float(scale));
+			if (ok)
+			{
+				std::map<std::string, SkSkeleton*>::iterator motionIter = map.find(filebase);
+				if (motionIter != map.end()) {
+					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					delete skeleton;
+					return CMD_FAILURE;
+				}
+				map.insert(std::pair<std::string, SkSkeleton*>(filebase + ext, skeleton));
+			}
+			else
+			{
+				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+				return CMD_FAILURE;
+			}
+		}
+#endif
+
+		skeleton->ref();		
+		//skeleton->setName(skeleton->skfilename());
+		
+	}
+	return CMD_SUCCESS;
+}
+
+
+
+
+int SBAssetManager::load_me_skeleton_individual( SrInput & input, const std::string & skeletonName, std::map<std::string, SmartBody::SBSkeleton*>& map, double scale )
+{
+	SmartBody::SBSkeleton* skeleton = new SmartBody::SBSkeleton();
+	skeleton->ref();
+
+	//path skeletonPath(skeletonName);
+	//string ext = extension(skeletonPath);
+	//ext = vhcl::ToLower(ext);
+	//if (ext == ".sk")
+
+	if( !skeleton->loadSk( input, scale ) )
+	{ 
+		LOG("Problem loading skeleton from file ''.");
+		input.close();
+		delete skeleton;
+		return CMD_FAILURE;
+	}
+	else
+	{
+		skeleton->setName(skeletonName);
+		SmartBody::SBSkeleton* sbskel = dynamic_cast<SmartBody::SBSkeleton*>(skeleton);
+		sbskel->setFileName(skeletonName);
+		map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(skeletonName, skeleton));
+	}
+
+
+	skeleton->skfilename(skeletonName.c_str());
+	std::string filebasename = boost::filesystem::basename(skeleton->skfilename());
+	std::string fileextension = boost::filesystem::extension(skeleton->skfilename());
+	skeleton->setName(filebasename+fileextension);	
+
+
+	return CMD_SUCCESS;
+}
+
+int SBAssetManager::load_me_skeletons( const char* pathname, std::map<std::string, SmartBody::SBSkeleton*>& map, bool recurse_dirs, double scale ) {
+	boost::filesystem::path motions_path(pathname);
+	
+	boost::filesystem::path finalPath;
+	// include the media path in the pathname if applicable
+	
+	std::string rootDir = motions_path.root_directory();
+	if (rootDir.size() == 0)
+	{		
+		finalPath = operator/(SmartBody::SBScene::getScene()->getMediaPath(), motions_path);
+	}
+	else
+	{
+		finalPath = pathname;
+	}
+
+	if (1) {
+		return load_me_skeletons_impl( finalPath, map, recurse_dirs, scale, "ERROR: " );
+	} else {
+		LOG("ERROR: Invalid skeleton path \"%s\".", finalPath.string().c_str() );
+		return CMD_FAILURE;
+	}
+}
+
+FILE* SBAssetManager::open_sequence_file( const char *seq_name, std::string& fullPath ) {
+
+	FILE* file_p = NULL;
+
+	char buffer[ MAX_FILENAME_LEN ];
+	char label[ MAX_FILENAME_LEN ];	
+	// add the .seq extension if necessary
+	std::string candidateSeqName = seq_name;
+	if (candidateSeqName.find(".seq") == std::string::npos)
+	{
+		candidateSeqName.append(".seq");
+	}
+	sprintf( label, "%s", candidateSeqName.c_str());
+	// current path containing .exe
+	char CurrentPath[_MAX_PATH];
+	_getcwd(CurrentPath, _MAX_PATH);
+
+	seq_paths->reset();
+	std::string filename = seq_paths->next_filename( buffer, candidateSeqName.c_str() );
+	//filename = mcn_return_full_filename_func( CurrentPath, filename );
+	//LOG("seq name = %s, filename = %s\n",seq_name,filename.c_str());
+	
+	while(filename.size() > 0)	{
+		file_p = fopen( filename.c_str(), "r" );
+		if( file_p != NULL ) {
+	
+			fullPath = filename;			
+			break;
+		}
+		filename = seq_paths->next_filename( buffer, candidateSeqName.c_str() );
+		//filename = mcn_return_full_filename_func( CurrentPath, filename );
+	}
+	if( file_p == NULL ) {
+		// Could not find the file as named.  Perhap it excludes the extension	
+		sprintf( label, "%s.seq", seq_name );
+		seq_paths->reset();
+		filename = seq_paths->next_filename( buffer, candidateSeqName.c_str() );
+		//filename = mcn_return_full_filename_func( CurrentPath, filename );
+		while( filename.size() > 0 )	{
+			if( ( file_p = fopen( filename.c_str(), "r" ) ) != NULL ) {
+				
+				fullPath = filename;
+				break;
+			}
+			filename = seq_paths->next_filename( buffer, candidateSeqName.c_str() );
+			//filename = mcn_return_full_filename_func( CurrentPath, filename );
+		}
+	}
+
+	// return empty string if file not found
+	return file_p;
+}
+
+const std::string SBAssetManager::findFileName(const std::string& type, const std::string& filename)
+{
+	srPathList* path = NULL;
+	if (type == "script")
+	{
+		path = seq_paths;
+	}
+	else if (type == "motion")
+	{
+		path = me_paths;
+	}
+	else if (type == "mesh")
+	{
+		path = mesh_paths;
+	}
+	else if (type == "audio")
+	{
+		path = audio_paths;
+	}
+	else
+	{
+		LOG("findFileName(): type name needs to be 'script', 'motion', 'mesh' or 'audio'");
+		return "";
+	}
+
+	char buffer[ MAX_FILENAME_LEN ];
+
+	path->reset();
+	std::string curFilename = path->next_filename( buffer, filename.c_str() );
+	while (curFilename.size() > 0)
+	{
+		FILE* file = fopen(curFilename.c_str(), "r");
+		if (file)
+		{
+			fclose(file);
+			return curFilename;
+		}
+		else
+		{
+			curFilename = path->next_filename( buffer, filename.c_str() );
+		}
+	}
+
+	return "";
+}
+
+
+
 }

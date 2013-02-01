@@ -20,7 +20,6 @@
 
 class srPathList;
 class BoneMap;
-class FaceMotion;
 class EventHandler;
 
 
@@ -86,7 +85,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 
 		
 	protected:
-		void updatePath(Fl_Tree_Item* tree, srPathList& pathList);
+		void updatePath(Fl_Tree_Item* tree, const std::vector<std::string>& pathList);
 		void updateSeqFiles(Fl_Tree_Item* tree, std::string pathName);
 		void updateSkeleton(Fl_Tree_Item* tree, SmartBody::SBSkeleton* skel);
 		void updateJointMap(Fl_Tree_Item* tree, SmartBody::SBJointMap* jointMap);

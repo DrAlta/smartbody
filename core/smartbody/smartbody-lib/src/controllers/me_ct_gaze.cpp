@@ -27,6 +27,8 @@
 #include "sbm/lin_win.h"
 using namespace gwiz;
 #include <vhcl_log.h>
+#include <sb/SBSimulationManager.h>
+#include <sb/SBScene.h>
 
 //#define DFL_GAZE_HEAD_SPEED 180.0
 //#define DFL_GAZE_EYE_SPEED  1000.0
@@ -1172,7 +1174,7 @@ void MeCtGaze::set_fade_in_scheduled(float interval, double time)
 	FadingInfo info;
 	info.fadingMode = FADING_MODE_IN;
 	info.fadingInterval = interval;
-	double fadingScheduleTime = mcuCBHandle::singleton().time + time;
+	double fadingScheduleTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime() + time;
 	fadingSchedules.insert(std::make_pair((float)fadingScheduleTime, info));
 	//LOG("set_fade_in_scheduled(%s): Current time %f, scheduled fading time is at %f.", this->_handle.c_str(), mcuCBHandle::singleton().time, fadingScheduleTime);
 }
@@ -1182,7 +1184,7 @@ void MeCtGaze::set_fade_out_scheduled(float interval, double time)
 	FadingInfo info;
 	info.fadingMode = FADING_MODE_OUT;
 	info.fadingInterval = interval;
-	double fadingScheduleTime = mcuCBHandle::singleton().time + time;
+	double fadingScheduleTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime() + time;
 	fadingSchedules.insert(std::make_pair((float)fadingScheduleTime, info));
 	//LOG("set_fade_out_scheduled(%s): Current time %f, scheduled fading time is at %f.", this->_handle.c_str(), mcuCBHandle::singleton().time, fadingScheduleTime);
 }
@@ -1195,7 +1197,7 @@ bool MeCtGaze::update_fading( float dt )	{
 	std::map<double, FadingInfo>::iterator iter = fadingSchedules.begin();
 	for (; iter != fadingSchedules.end(); ++iter)
 	{
-		if (mcuCBHandle::singleton().time >= iter->first)
+		if (SmartBody::SBScene::getScene()->getSimulationManager()->getTime() >= iter->first)
 		{
 			//LOG("update_fading(%s): Current time %f, scheduled fading time is at %f.", this->_handle.c_str(), mcuCBHandle::singleton().time, scheduled_time);	
 			if (iter->second.fadingMode == FADING_MODE_IN)
@@ -1290,8 +1292,6 @@ bool MeCtGaze::update_fading( float dt )	{
 
 bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.mark("Gaze",0,"controller_evaluate");
 	float dt;
 	if( getStart() ) {
 		setStart(0);
@@ -1438,7 +1438,6 @@ printf( "eyelim: %f %f %f %f\n",
 #if TEST_SENSOR
 	sensor_p->controller_evaluate( t, frame );
 #endif
-	mcu.mark("Gaze");
 	return( TRUE );
 }
 

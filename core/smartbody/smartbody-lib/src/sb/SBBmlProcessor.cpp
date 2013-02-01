@@ -1,5 +1,6 @@
 #include "SBBmlProcessor.h"
 #include <sbm/mcontrol_util.h>
+#include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 
 namespace SmartBody {
@@ -46,8 +47,8 @@ std::string SBBmlProcessor::build_vrX(std::ostringstream& buffer, const std::str
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	std::stringstream msgId;
-	if (mcu.process_id != "")
-		msgId << "sbm_" << mcu.process_id << "_test_bml_" << (++mcu.testBMLId);
+	if (SmartBody::SBScene::getScene()->getProcessId()!= "")
+		msgId << "sbm_" << SmartBody::SBScene::getScene()->getProcessId() << "_test_bml_" << (++mcu.testBMLId);
 	else
 		msgId << "sbm_test_bml_" << ++mcu.testBMLId;
 
@@ -94,7 +95,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 	}else {
 		// Command sequence to trigger vrSpeak
 		srCmdSeq *seq = new srCmdSeq(); // sequence file that holds the bml command(s)
-		seq->offset( (float)( mcu.time ) );
+		seq->offset( (float)( SmartBody::SBScene::getScene()->getSimulationManager()->getTime()) );
 
 		if( echo ) {
 			msg << "echo // Running sequence \"" << seq_id << "\"...";

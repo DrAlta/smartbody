@@ -73,6 +73,7 @@
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/nvbg.h>
+#include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBMotion.h>
 #include <sb/SBAssetManager.h>
@@ -673,7 +674,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 			{
 				std::string stateName = xml_utils::xml_parse_string(BMLDefs::ATTR_STATENAME, elem);
 				std::string characterName = request->actor->getName();
-				SbmCharacter* character = mcu->getCharacter(characterName);
+				SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 				if (character == NULL)
 				{
 					LOG("parse_bml_states ERR: cannot find character with name %s.", characterName.c_str());
@@ -925,7 +926,7 @@ int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performan
 		bml_requests.erase( result );
 	} else {
 		// add this interrupt requests to a map of pending interrupt requests
-		pendingInterrupts[request_id] = mcu->time;
+		pendingInterrupts[request_id] = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 		// clean up any old requests that have expired
 		std::vector<std::string> interruptsToDelete;
 		for (std::map<std::string, double>::iterator iter = pendingInterrupts.begin();
@@ -933,7 +934,7 @@ int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performan
 			 iter++)
 		{
 			double lastTime = (*iter).second;
-			if (lastTime - mcu->time > 60.0) // has a minute elapsed?
+			if (lastTime - SmartBody::SBScene::getScene()->getSimulationManager()->getTime() > 60.0) // has a minute elapsed?
 			{
 				interruptsToDelete.push_back(request_id);
 			}
@@ -1013,7 +1014,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	Processor& bp = mcu->bml_processor;
 
 	const char   *character_id     = args.read_token();
-	SbmCharacter *character        = mcu->getCharacter( character_id );
+	SmartBody::SBCharacter *character        = SmartBody::SBScene::getScene()->getCharacter( character_id );
 	if( character == NULL ) {
 		//  Character is not managed by this SBM process
 		if( bp.warn_unknown_agents )
@@ -1180,7 +1181,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 			}
 		}
 
-		SbmCharacter *agent = mcu->getCharacter( agent_id );
+		SmartBody::SBCharacter* agent = SmartBody::SBScene::getScene()->getCharacter( agent_id );
 		if( agent==NULL ) {
 			//  Agent is not managed by this SBM process
 			if( bp.warn_unknown_agents )
@@ -1202,25 +1203,14 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 
 		DOMDocument* xmlDoc = NULL;
 		// check the cache to see if it exists first
-		if (mcu->useXmlCache)
+		if (SmartBody::SBScene::getScene()->getBoolAttribute("useXMLCache"))
 		{
 			boost::filesystem::path path(xml);
 			boost::filesystem::path absPath = boost::filesystem::complete(path);
 			std::string absPathStr = absPath.string();
-			std::map<std::string, DOMDocument*>::iterator iter = mcu->xmlCache.find(absPathStr);
-			if (iter !=  mcu->xmlCache.end())
-			{
-				xmlDoc = (*iter).second;
-			}
-			else
-			{
-				xmlDoc = xml_utils::parseMessageXml( bp.xmlParser, xml );
-				if (mcu->useXmlCacheAuto)
-				{
-					// add to the cache if in auto cache mode
-					mcu->xmlCache.insert(std::pair<std::string, DOMDocument*>(absPathStr, xmlDoc));
-				}
-			}
+			
+			xmlDoc = xml_utils::parseMessageXml( bp.xmlParser, xml );
+			
 		}
 		else
 		{
@@ -1272,7 +1262,7 @@ int BML::Processor::vrSpoke_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	try {
 		//cout << "DEBUG: vrSpoke " << agent_id << " " << recipientId << " " << message_id << endl;
 
-		SbmCharacter *agent = mcu->getCharacter( agent_id );
+		SmartBody::SBCharacter* agent = SmartBody::SBScene::getScene()->getCharacter( agent_id );
 		if( agent==NULL ) {
 			// Ignore unknown agent.  Probably managed by other SBM process.
 			return CMD_SUCCESS;
@@ -1311,7 +1301,7 @@ int BML::Processor::bp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 	} else if( command == "speech_ready" ) {
 		// bp speech_ready <CharacterId> <RequestId> SUCCESS/ERROR reason
 		char* actorId = args.read_token();
-		SbmCharacter* actor = mcu->getCharacter( actorId );
+		SmartBody::SBCharacter* actor = SmartBody::SBScene::getScene()->getCharacter( actorId );
 		if( actor==NULL ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::Processor::bp_cmd_func(): Unknown actor \"" << actorId << "\".  This is probably an error since the command \"bp speech_reply\" is not supposed to be sent over the network, thus it should not be coming from another SBM process." << endl;
@@ -1332,7 +1322,7 @@ int BML::Processor::bp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			return CMD_FAILURE;
 		}
 
-		SbmCharacter* actor = mcu->getCharacter( actor_id );
+		SmartBody::SBCharacter* actor = SmartBody::SBScene::getScene()->getCharacter( actor_id );
 		if( actor==NULL ) {
 			// Unknown actor.  ignore and 
 			cout << "WARNING: bp interrupt: Unknown actor \""<<actor_id<<"\"." << endl;

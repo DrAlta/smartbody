@@ -35,6 +35,9 @@
 #include <sstream>
 #include <float.h>
 #include "time.h"
+#include <sb/SBSpeechManager.h>
+#include <sb/SBSimulationManager.h>
+#include <sb/SBScene.h>
 
 #include "sbm/xercesc_utils.hpp"
 #include "sbm/BMLDefs.h"
@@ -156,7 +159,7 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 	string soundFile= "../../data/cache/audio/utt_" +date+ "_"+ time+ "_"+ string(agentName)+"_"+ myStream.str()+".aiff"; //gives sound file correct name to Remote speech process (and thus relative to Remote speech process)
 	string* soundFilePtr= new string(soundFile);
 	//mcu.character_map.lookup(agentName)->getVoice()-- gets the voice name from the character in meCharacter (it's a string pointer so the * dereferences it)
-	SbmCharacter* agent = mcuCBHandle::singleton().getCharacter(agentName);
+	SmartBody::SBCharacter* agent = SmartBody::SBScene::getScene()->getCharacter(agentName);
 	
 	//LOG("sound file = %s",soundFile.c_str());
 	if( agent == NULL ) {
@@ -200,7 +203,7 @@ void remote_speech::sendSpeechTimeout(std::ostringstream& outStream)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	srCmdSeq *rVoiceTimeout= new srCmdSeq(); 
-	rVoiceTimeout->offset((float)(mcu.time));
+	rVoiceTimeout->offset((float)(SmartBody::SBScene::getScene()->getSimulationManager()->getTime()));
 	string argumentString="RemoteSpeechTimeOut";
 	argumentString += " ";
 	argumentString += outStream.str().c_str();
@@ -562,7 +565,7 @@ int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p ) { //this fu
 
 	//LOG("remoteSpeechReply Func");
 	char* character_name = args.read_token(); //character speaking
-	SbmCharacter* character = mcu_p->getCharacter( character_name );
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter( character_name );
 	if( character==NULL )
 		return( CMD_SUCCESS );  // Ignore messages for characters who are not present in this SBM process
 
@@ -577,12 +580,12 @@ int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p ) { //this fu
 	}
 
 	//return mcu_p->speech_rvoice()->handleRemoteSpeechResult( character, msgID, status, result, mcu_p );
-	int ret = mcu_p->speech_rvoice()->handleRemoteSpeechResult( character, msgID, status, result, mcu_p );
+	int ret = SmartBody::SBScene::getScene()->getSpeechManager()->speech_rvoice()->handleRemoteSpeechResult( character, msgID, status, result, mcu_p );
 	// if the result is not from a remote speech relay, handle the result with local speech
 	if (ret != CMD_SUCCESS)
 	{
 		LOG("Not for the remote speech, handle with local speech");
-		ret =  mcu_p->speech_localvoice()->handleRemoteSpeechResult( character, msgID, status, result, mcu_p );
+		ret = SmartBody::SBScene::getScene()->getSpeechManager()->speech_localvoice()->handleRemoteSpeechResult( character, msgID, status, result, mcu_p );
 	}
 	return ret;
 }
@@ -775,12 +778,12 @@ int remote_speech_test( srArgBuffer& args, mcuCBHandle* mcu_p ) { //Tester funct
 
 int set_char_voice(char* char_name, char* voiceCode, mcuCBHandle* mcu_p) //handles the voice command
 {	
-	if( mcu_p->getCharacter( char_name ) )	{ 
+	if( SmartBody::SBScene::getScene()->getCharacter( char_name ) )	{ 
 		string voiceCodeStr= "";
 		voiceCodeStr= voiceCodeStr+voiceCode;
 		//char* voiceCodeCharArray= new char[voiceCodeStr.length()]; 
 		//strcpy(voiceCodeCharArray,voiceCodeStr.c_str()); //Allocates memory andcopies the string to a char*
-		mcu_p->getCharacter( char_name )->set_voice_code(voiceCodeStr);
+		SmartBody::SBScene::getScene()->getCharacter( char_name )->set_voice_code(voiceCodeStr);
 		return (CMD_SUCCESS);
 	}
 	else{
@@ -793,7 +796,7 @@ int set_char_voice(char* char_name, char* voiceCode, mcuCBHandle* mcu_p) //handl
 int remoteSpeechTimeOut_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 	const char* request_id_str = args.read_token();
 	// is valid arg?
-	return mcu_p->speech_rvoice()->testRemoteSpeechTimeOut( request_id_str, mcu_p );
+	return SmartBody::SBScene::getScene()->getSpeechManager()->speech_rvoice()->testRemoteSpeechTimeOut( request_id_str, mcu_p );
 }
 
 int remote_speech::testRemoteSpeechTimeOut( const char* request_id_str, mcuCBHandle* mcu_p )

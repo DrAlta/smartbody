@@ -39,6 +39,7 @@ class SBDiphoneManager;
 class SBBehaviorSetManager;
 class SBRetargetManager;
 class SBAssetManager;
+class SBSpeechManager;
 class SBParser;
 class SBSubject;
 class SBController;
@@ -127,6 +128,7 @@ class SBScene : public SBObject
 		SBAPI SBBehaviorSetManager* getBehaviorSetManager();
 		SBAPI SBRetargetManager* getRetargetManager();
 		SBAPI SBAssetManager* getAssetManager();
+		SBAPI SBSpeechManager* getSpeechManager();
 
 		SBAPI SBParser* getParser();
 
@@ -216,6 +218,7 @@ class SBScene : public SBObject
 		SBRetargetManager* _retargetManager;
 		SBEventManager* _eventManager;
 		SBAssetManager* _assetManager;
+		SBSpeechManager* _speechManager;
 
 		SBParser* _parser;
 
@@ -239,7 +242,7 @@ class SBScene : public SBObject
 		std::string _mediaPath;
 		std::vector<SBController*> _defaultControllers;
 		
-
+		std::string _processId;
 		static SBScene* _scene;
 		static std::map<std::string, std::string> _systemParameters;
 };

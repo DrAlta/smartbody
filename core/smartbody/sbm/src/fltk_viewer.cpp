@@ -84,6 +84,7 @@
 # include <sb/SBCollisionManager.h>
 # include <sb/SBJointMapManager.h>
 # include <sb/SBBehaviorSetManager.h>
+# include <sb/SBSimulationManager.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -1302,7 +1303,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		SbmDeformableMeshGPU::shadowMapID = -1;
 	}
 	
-	bool updateSim = mcu.update_timer();
+	bool updateSim = SmartBody::SBScene::getScene()->getSimulationManager()->updateTimer();
 	SbmDeformableMeshGPU::useShadowPass = shadowPass;
 	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
 		iter != mcu.getPawnMap().end();

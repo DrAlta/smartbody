@@ -311,7 +311,6 @@
     <ClCompile Include="..\src\controllers\me_controller_tree_root.cpp" />
     <ClCompile Include="..\src\controllers\me_default_prune_policy.cpp" />
     <ClCompile Include="..\src\controllers\me_spline_1d.cpp" />
-    <ClCompile Include="..\src\sbm\me_utilities.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_IK_scenario.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_gaze.cpp" />
     <ClCompile Include="..\src\controllers\me_ct_gaze_alg.cpp" />
@@ -397,6 +396,7 @@
     <ClCompile Include="..\src\sb\SBPhysicsSim.cpp" />
     <ClCompile Include="..\src\sb\SBRetarget.cpp" />
     <ClCompile Include="..\src\sb\SBRetargetManager.cpp" />
+    <ClCompile Include="..\src\sb\SBSpeechManager.cpp" />
     <ClCompile Include="..\src\sk\sk_channel.cpp" />
     <ClCompile Include="..\src\sk\sk_channel_array.cpp" />
     <ClCompile Include="..\src\sk\sk_joint.cpp" />
@@ -767,7 +767,6 @@
     <ClInclude Include="..\src\controllers\me_evaluation_logger.hpp" />
     <ClInclude Include="..\src\controllers\me_prune_policy.hpp" />
     <ClInclude Include="..\src\controllers\me_spline_1d.hpp" />
-    <ClInclude Include="..\src\sbm\me_utilities.hpp" />
     <ClInclude Include="..\src\controllers\me_ct_IK_scenario.hpp" />
     <ClInclude Include="..\src\controllers\me_ct_gaze.h" />
     <ClInclude Include="..\src\controllers\me_ct_gaze_alg.h" />
@@ -856,6 +855,7 @@
     <ClInclude Include="..\src\sb\SBPhysicsSim.h" />
     <ClInclude Include="..\src\sb\SBRetarget.h" />
     <ClInclude Include="..\src\sb\SBRetargetManager.h" />
+    <ClInclude Include="..\src\sb\SBSpeechManager.h" />
     <ClInclude Include="..\src\sb\SBTypes.h" />
     <ClInclude Include="..\src\sk\sk_channel.h" />
     <ClInclude Include="..\src\sk\sk_channel_array.h" />

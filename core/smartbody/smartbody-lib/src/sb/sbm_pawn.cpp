@@ -25,6 +25,7 @@
 #include "vhcl.h"
 #include <sbm/mcontrol_util.h>
 #include "sbm_pawn.hpp"
+#include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 
 #ifndef __native_client__
@@ -72,7 +73,6 @@
 
 #endif
 
-#include "sbm/me_utilities.hpp"
 #include "sr/sr_model.h"
 #include "sr/sr_euler.h"
 #include <sb/SBSkeleton.h>
@@ -412,10 +412,7 @@ SbmPawn::~SbmPawn()	{
 	}
 
 	if ( bonebusCharacter )
-	{
-		
-		if (mcu.sendPawnUpdates)
-			SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().DeleteCharacter( bonebusCharacter );
+	{		
 		bonebusCharacter = NULL;
 	}
 
@@ -470,7 +467,7 @@ const SkJoint* SbmPawn::get_joint( const char* joint_name ) const {
 
 void SbmPawn::get_world_offset( float& x, float& y, float& z,
 							   float& yaw, float& pitch, float& roll ) {
-								   if( mcuCBHandle::singleton().time != wo_cache_timestamp )
+								   if( SmartBody::SBScene::getScene()->getSimulationManager()->getTime() != wo_cache_timestamp )
 									   wo_cache_update();
 
 								   x = wo_cache.x;
@@ -527,7 +524,7 @@ void SbmPawn::set_world_offset( float x, float y, float z,
 	wo_cache.h = yaw;
 	wo_cache.p = pitch;
 	wo_cache.r = roll;
-	wo_cache_timestamp = mcuCBHandle::singleton().time;
+	wo_cache_timestamp = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 
 	gwiz::quat_t q = gwiz::euler_t(pitch,yaw,roll);
 	float data[7] = { x, y, z, (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() };

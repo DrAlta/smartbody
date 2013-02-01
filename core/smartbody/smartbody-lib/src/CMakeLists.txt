@@ -262,7 +262,6 @@ set( SMARTBODY_LIB_SBM_SRC
 	controllers/me_ct_simple_gaze.cpp
 	controllers/me_ct_tether.cpp
 	controllers/me_ct_ublas.cpp
-	sbm/me_utilities.cpp
 	controllers/me_ct_breathing.cpp
 	controllers/me_ct_breathing_interface.cpp
 	controllers/me_ct_physics_controller.cpp
@@ -374,6 +373,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBRetargetManager.cpp
 	sb/SBAsset.cpp
 	sb/SBAssetManager.cpp
+	sb/SBSpeechManager.cpp
 
 	sb/SBPython.cpp
 	sb/SBPythonClass.cpp

@@ -2,12 +2,15 @@
 #include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
 #include <sb/SBScript.h>
+#include <sbm/time_regulator.h>
+#include <sbm/time_profiler.h>
 
 
 namespace SmartBody {
 
 SBProfiler::SBProfiler()
 {
+	_profiler = new TimeIntervalProfiler();
 }
 
 SBProfiler::~SBProfiler()
@@ -16,20 +19,12 @@ SBProfiler::~SBProfiler()
 
 void SBProfiler::printLegend()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.profiler_p)	
-		mcu.profiler_p->print_legend();
-	else
-		LOG("Profiler does not exist!");
+	_profiler->print_legend();
 }
 
 void SBProfiler::printStats()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.profiler_p)	
-		mcu.profiler_p->print();
-	else
-		LOG("Profiler does not exist!");
+	_profiler->print();
 }
 
 
@@ -38,41 +33,56 @@ SBSimulationManager::SBSimulationManager()
 	_simStarted = false;
 	_simPlaying = false;
 	_hasTimer = false;
+
+	internal_profiler_p = NULL;
+	external_profiler_p = NULL;
+	profiler_p = NULL;
+	internal_timer_p = NULL;
+	external_timer_p = NULL;
+	timer_p = NULL;
+
+	_profiler = new SBProfiler();
 }
 
 SBSimulationManager::~SBSimulationManager()
 {
 	if (_hasTimer)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		delete mcu.timer_p;
+		timer_p;
 	}
+
+	internal_profiler_p = NULL;
+	external_profiler_p = NULL;
+	profiler_p = NULL;
+	internal_timer_p = NULL;
+	external_timer_p = NULL;
+	timer_p = NULL;
+
+	delete _profiler;
 }
 
 void SBSimulationManager::printInfo()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)	
-		mcu.timer_p->print();
+	if (timer_p)	
+		timer_p->print();
 	else	
 	{
 		LOG( "TIME:%.3f ~ DT:%.3f %.2f:FPS\n",
-			mcu.time,
-			mcu.time_dt,
-			1.0 / mcu.time_dt
+			time,
+			time_dt,
+			1.0 / time_dt
 		);
 	}
 }
 
 void SBSimulationManager::printPerf(float v)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)
+	if (timer_p)
 	{
 		if (v > 0.0) 
-			mcu.timer_p->set_perf(v);
+			timer_p->set_perf(v);
 		else	
-			mcu.timer_p->set_perf(10.0);	
+			timer_p->set_perf(10.0);	
 	}
 	else
 		LOG("Time regulator does not exist!");
@@ -80,39 +90,36 @@ void SBSimulationManager::printPerf(float v)
 
 double SBSimulationManager::getTime()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	return mcu.time;
+	return time;
 }
 
 double SBSimulationManager::getTimeDt()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	return mcu.time_dt;
+	return time_dt;
 }
 
 void SBSimulationManager::setTime(double time)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.update_timer(time);
+	updateTimer(time);
 }
 
 void SBSimulationManager::update()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)
+	if (timer_p)
 	{
-		bool doUpdate = mcu.update_timer();
+		bool doUpdate = updateTimer();
 		if (!doUpdate)
 			return;
 	}
-	mcu.update();
+	
+	
+
 }
 
 bool SBSimulationManager::isStarted()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)
-		return mcu.timer_p->isStarted();
+	if (timer_p)
+		return timer_p->isStarted();
 	else
 	{
 		if (_simStarted)
@@ -124,9 +131,8 @@ bool SBSimulationManager::isStarted()
 
 bool SBSimulationManager::isRunning()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)
-		return mcu.timer_p->isRunning();
+	if (timer_p)
+		return timer_p->isRunning();
 	else
 	{
 		if (_simPlaying)
@@ -138,9 +144,8 @@ bool SBSimulationManager::isRunning()
 
 void SBSimulationManager::reset()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)	
-		mcu.timer_p->reset();
+	if (timer_p)	
+		timer_p->reset();
 	else
 	{
 		return;
@@ -149,8 +154,6 @@ void SBSimulationManager::reset()
 
 void SBSimulationManager::start()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	// run the start scripts
 	std::map<std::string, SBScript*>& scripts = SmartBody::SBScene::getScene()->getScripts();
 	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
@@ -161,9 +164,9 @@ void SBSimulationManager::start()
 	}
 	
 
-	if (mcu.timer_p)	
+	if (timer_p)	
 	{
-		mcu.timer_p->start();
+		timer_p->start();
 	}
 	else
 	{
@@ -173,8 +176,6 @@ void SBSimulationManager::start()
 
 void SBSimulationManager::stop()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	// run the stop scripts
 	std::map<std::string, SBScript*>& scripts = SmartBody::SBScene::getScene()->getScripts();
 	for (std::map<std::string, SBScript*>::iterator iter = scripts.begin();
@@ -184,9 +185,9 @@ void SBSimulationManager::stop()
 		(*iter).second->stop();
 	}
 	
-	if (mcu.timer_p)	
+	if (timer_p)	
 	{
-		mcu.timer_p->stop();
+		timer_p->stop();
 	}
 	else
 	{
@@ -197,10 +198,9 @@ void SBSimulationManager::stop()
 
 void SBSimulationManager::pause()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)
+	if (timer_p)
 	{
-		mcu.timer_p->pause();
+		timer_p->pause();
 	}
 	else
 	{
@@ -210,10 +210,9 @@ void SBSimulationManager::pause()
 
 void SBSimulationManager::resume()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)
+	if (timer_p)
 	{
-		mcu.timer_p->resume();
+		timer_p->resume();
 	}
 	else
 	{
@@ -221,77 +220,78 @@ void SBSimulationManager::resume()
 	}
 }
 
+void SBSimulationManager::step(int numSteps)
+{
+	if (timer_p)
+	{
+		timer_p->step(numSteps);
+	}
+}
+
 void SBSimulationManager::setSleepFps(float v)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.timer_p)	
+	if (!timer_p)	
 	{
 		LOG("Time regulator not exist!");
 		return;
 	}
-	mcu.timer_p->set_sleep_fps(v);
+	timer_p->set_sleep_fps(v);
 }
 
 void SBSimulationManager::setEvalFps(float v)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.timer_p)	
+	if (!timer_p)	
 	{
 		LOG("Time regulator does not exist!");
 		return;
 	}
-	mcu.timer_p->set_eval_fps(v);
+	timer_p->set_eval_fps(v);
 }
 
 void SBSimulationManager::setSimFps(float v)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.timer_p)	
+	if (!timer_p)	
 	{
 		LOG("Time regulator does not exist!");
 		return;
 	}
-	mcu.timer_p->set_sim_fps(v);
+	timer_p->set_sim_fps(v);
 }
 
 void SBSimulationManager::setSleepDt(float v)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.timer_p)	
+	if (!timer_p)	
 	{
 		LOG("Time regulator not exist!");
 		return;
 	}
-	mcu.timer_p->set_sleep_dt(v);
+	timer_p->set_sleep_dt(v);
 }
 
 void SBSimulationManager::setEvalDt(float v)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.timer_p)	
+	if (!timer_p)	
 	{
 		LOG("Time regulator does not exist!");
 		return;
 	}
-	mcu.timer_p->set_eval_dt(v);
+	timer_p->set_eval_dt(v);
 }
 
 void SBSimulationManager::setSimDt(float v)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.timer_p)	
+	if (!timer_p)	
 	{
 		LOG("Time regulator does not exist!");
 		return;
 	}
-	mcu.timer_p->set_sim_dt(v);
+	timer_p->set_sim_dt(v);
 }
 
 void SBSimulationManager::setSpeed(float v)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.timer_p)	
-		mcu.timer_p->set_speed(v);
+	if (timer_p)	
+		timer_p->set_speed(v);
 	else
 		LOG("Time regulator does not exist!");
 }
@@ -301,20 +301,75 @@ void SBSimulationManager::setupTimer()
 	TimeRegulator* timer = new TimeRegulator();
 	_hasTimer = true;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.register_timer( *timer );
+	register_timer( *timer );
 }
 
 void SBSimulationManager::setSleepLock()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.timer_p)	
+	if (!timer_p)	
 	{
 		LOG("Time regulator does not exist!");
 		return;
 	}
-	mcu.timer_p->set_sleep_lock();
+	timer_p->set_sleep_lock();
 }
+
+SBProfiler* SBSimulationManager::getProfiler()
+{
+	return _profiler;
+}
+
+void SBSimulationManager::setupProfiler()
+{
+	external_profiler_p = new TimeIntervalProfiler();
+	profiler_p = external_profiler_p;
+}
+void SBSimulationManager::switch_internal_profiler( void )	{
+	if( internal_profiler_p == NULL ) internal_profiler_p = new TimeIntervalProfiler;
+	profiler_p = internal_profiler_p;
+}
+void SBSimulationManager::mark( const char* group_name, int level, const char* label )	{
+	if( profiler_p ) profiler_p->mark( group_name, level, label );
+}
+int SBSimulationManager::mark( const char* group_name )	{
+	if( profiler_p ) return( profiler_p->mark( group_name ) );
+	return( 0 );
+}
+
+void SBSimulationManager::set_perf(float val)
+{
+	if (timer_p)
+		timer_p->set_perf(val);
+}
+
+void SBSimulationManager::register_timer( TimeRegulator& time_reg )	{
+	external_timer_p = &( time_reg );
+	timer_p = external_timer_p;
+}
+void SBSimulationManager::switch_internal_timer( void )	{
+	if( internal_timer_p == NULL ) internal_timer_p = new TimeRegulator;
+	timer_p = internal_timer_p;
+}
+void SBSimulationManager::updateProfiler( double in_time )
+{
+	if( profiler_p )	{
+		profiler_p->update();
+	}
+}
+bool SBSimulationManager::updateTimer( double in_time)
+{
+	if( timer_p )	{
+		bool ret = timer_p->update( in_time );
+		time = timer_p->get_time();
+		time_dt = timer_p->get_dt();
+		return( ret );
+	}
+	double prev = time;
+	time = in_time;
+	time_dt = time - prev;
+	return( true );
+}
+
 
 }
 

@@ -60,8 +60,7 @@ class mcuCBHandle;
 #include "local_speech.h"
 #include "text_speech.h" // [BMLR]
 #include "sbm_speech_audiofile.hpp"
-#include "time_regulator.h"
-#include "time_profiler.h"
+
 #include <sbm/action_unit.hpp>
 #include <sbm/general_param_setting.h>
 
@@ -124,14 +123,6 @@ class CameraTrack
 		double threshold;
 };
 
-class FaceMotion
-{
-	public:
-		SkMotion* face_neutral_p;
-	
-		FaceMotion() { face_neutral_p = NULL; }
-};
-
 class SequenceManager
 {
 	public:
@@ -153,32 +144,10 @@ class SequenceManager
 
 class VHMsgLog;
 
-class PerceptionData 
-{
-public:
-	
-	float pos[3];
-	float rot[3];
-
-	PerceptionData()
-	{
-	}
-
-	~PerceptionData()
-	{
-	}
-};
-
-// Motion Controller Utility Callback Handle (Yes, seriously.)
 class mcuCBHandle {
 	protected:
 		// Data
-		remote_speech				_speech_rvoice;
-		local_speech                _speech_localvoice;
-		SmartBody::AudioFileSpeech	_speech_audiofile;
-		text_speech					_speech_text; // [BMLR]
-		FestivalSpeechRelayLocal    _festivalRelayLocal; 
-		CereprocSpeechRelayLocal    _cereprocRelayLocal;
+	
 
 	public:
 		// Data
@@ -189,36 +158,13 @@ class mcuCBHandle {
 		vhcl::Log::Listener* logListener;
 		bool		net_bone_updates;
 		bool		net_world_offset_updates;
-		bool        updatePhysics;
-		bool		sendPawnUpdates; // if true, sends the pawn information over bonebus in the same wasy as the characters
 		bool        resourceDataChanged;
-		std::string process_id;
-		bool		play_internal_audio;	
 		int testBMLId;
 
-		//For Perception
-		PerceptionData* perceptionData;
 		
-		// scale factor (used for SmartBody to handle unit convert, both sk and skm)
-		double		skScale;
-		double		skmScale;
 		//double      physicsTime;
 
 		KinectProcessor*							kinectProcessor;
-
-		TimeRegulator	*internal_timer_p;
-		TimeRegulator	*external_timer_p;
-		TimeRegulator	*timer_p;
-		double			time; // AKA sim_time
-		double			time_dt;
-
-		TimeIntervalProfiler	*internal_profiler_p;
-		TimeIntervalProfiler	*external_profiler_p;
-		TimeIntervalProfiler	*profiler_p;
-
-		int			snapshot_counter;
-		bool		use_python;
-
 		SrViewerFactory *viewer_factory;
 		SrViewerFactory *ogreViewerFactory;
 		SrViewer	*viewer_p;
@@ -228,18 +174,8 @@ class mcuCBHandle {
 		SrSnGroup	*root_group_p;
 		
 		Heightfield *height_field_p;
-		
-		srPathList	seq_paths;
-		srPathList	me_paths;
-		srPathList	audio_paths;
-		srPathList	mesh_paths;
 
 		std::string initPythonLibPath;
-
-		/** Character id for test commands to use when required but not specified. */
-		std::string test_character_default;
-		/** Character id for test commands to use as recipient when required but not specified. */
-		std::string test_recipient_default;
 
 		srCmdMap <mcuCBHandle>		cmd_map;
 		srCmdMap <mcuCBHandle>		set_cmd_map;
@@ -249,17 +185,9 @@ class mcuCBHandle {
 		SequenceManager	pendingSequences;
 		SequenceManager activeSequences;
 
-		std::map<std::string, SmartBody::SBSkeleton*> skeleton_map;
 		std::map<std::string, DeformableMesh*> deformableMeshMap;
 
 		GeneralParamMap				param_map;			// map that contains the information of shader parameters
-
-		srHashMap <MeController>	controller_map;
-
-		std::map<std::string, DOMDocument*> xmlCache;
-		bool useXmlCache;
-		bool useXmlCacheAuto;
-
 
 		std::string getValidName(const std::string& name);
 		int registerCharacter(SbmCharacter* character);
@@ -278,10 +206,7 @@ class mcuCBHandle {
 
 		
 		std::map<std::string, SbmCharacter*>& getCharacterMap();
-		std::map<std::string, SmartBody::SBSkeleton*>& getSkeletonMap();
 
-		SbmCharacter* getCharacter(const std::string& name);
-		int getNumCharacters();
 
 		std::map<std::string, SmartBody::Nvbg*> nvbgMap;
 		std::map<std::string, SbmPawn*>	pawn_map;
@@ -338,54 +263,6 @@ public:
 
 
 		void reset();
-		// ----------------------------------------------
-		// time and performance management
-		// ----------------------------------------------
-		void register_profiler( TimeIntervalProfiler& time_prof )	{
-			external_profiler_p = &( time_prof );
-			profiler_p = external_profiler_p;
-		}
-		void switch_internal_profiler( void )	{
-			if( internal_profiler_p == NULL ) internal_profiler_p = new TimeIntervalProfiler;
-			profiler_p = internal_profiler_p;
-		}
-		void mark( const char* group_name, int level, const char* label )	{
-			if( profiler_p ) profiler_p->mark( group_name, level, label );
-		}
-		int mark( const char* group_name )	{
-			if( profiler_p ) return( profiler_p->mark( group_name ) );
-			return( 0 );
-		}
-
-		void register_timer( TimeRegulator& time_reg )	{
-			external_timer_p = &( time_reg );
-			timer_p = external_timer_p;
-		}
-		void switch_internal_timer( void )	{
-			if( internal_timer_p == NULL ) internal_timer_p = new TimeRegulator;
-			timer_p = internal_timer_p;
-		}
-		void update_profiler( double in_time = -1.0 )	{
-			if( profiler_p )	{
-				profiler_p->update();
-			}
-		}
-		bool update_timer( double in_time = -1.0 )	{
-			
-			if( timer_p )	{
-				bool ret = timer_p->update( in_time );
-				time = timer_p->get_time();
-				time_dt = timer_p->get_dt();
-				return( ret );
-			}
-			double prev = time;
-			time = in_time;
-			time_dt = time - prev;
-			return( true );
-		}
-		// ----------------------------------------------
-		// END time and performance management
-		// ----------------------------------------------
 
 		// ----------------------------------------------
 		// scene management
@@ -406,14 +283,11 @@ public:
 		// END terrain management
 		// ----------------------------------------------
 		
-		void update( void );
-
 
 		// ----------------------------------------------
 		// vhmsg and network management
 		// ----------------------------------------------
 		void set_net_host( const char * net_host );
-		void set_process_id( const char * process_id );
 
 		int vhmsg_send( const char *op, const char* message );
 
@@ -427,9 +301,6 @@ public:
 		// ----------------------------------------------
 		// asset management
 		// ----------------------------------------------
-		int load_skeletons( const char* pathname, bool recursive );
-
-		int load_skeleton( const void* data, int sizeBytes, const char* skeletonName );
 		
 		int map_skeleton( const char * mapName, const char * skeletonName );
 		int map_motion( const char * mapName, const char * motionName );
@@ -508,20 +379,6 @@ public:
 		// END command management
 		// ----------------------------------------------
 
-		// ----------------------------------------------
-		// speech relay management
-		// ----------------------------------------------
-		FestivalSpeechRelayLocal* festivalRelay() { return &_festivalRelayLocal; }
-		CereprocSpeechRelayLocal* cereprocRelay() { return &_cereprocRelayLocal; }
-		remote_speech* speech_rvoice() { return &_speech_rvoice; }
-		local_speech* speech_localvoice() { return &_speech_localvoice; }
-		SmartBody::AudioFileSpeech* speech_audiofile() { return &_speech_audiofile; }
-		text_speech* speech_text() { return &_speech_text; } // [BMLR]
-
-		// ----------------------------------------------
-		// END speech relay management
-		// ----------------------------------------------
-
 		
 		// ----------------------------------------------
 		// viewer management
@@ -578,7 +435,7 @@ public:
 
 
 	public:
-		FILE* open_sequence_file( const char *seq_name, std::string& fullPath );
+		
 };
 
 class VHMsgLogger : public vhcl::Log::Listener

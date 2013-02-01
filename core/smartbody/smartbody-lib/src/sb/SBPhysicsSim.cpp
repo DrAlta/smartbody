@@ -702,7 +702,7 @@ void SBPhysicsCharacter::cleanUpJoints()
 SBGeomObject* SBPhysicsCharacter::createJointGeometry( SBJoint* joint, float radius )
 {
 	SBGeomObject* newGeomObj = NULL;
-	SbmCharacter* curCharacter = mcuCBHandle::singleton().getCharacter(characterName);
+	SmartBody::SBCharacter* curCharacter = SmartBody::SBScene::getScene()->getCharacter(characterName);
 	if (radius < 0.0)
 		radius = curCharacter->getHeight()*0.03f;
 		//radius = curCharacter->getHeight()*0.01f;
