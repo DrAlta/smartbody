@@ -21,6 +21,7 @@
 #include "sb/SBCharacter.h"
 #include "sb/SBSkeleton.h"
 #include "sb/SBAssetManager.h"
+#include "sb/SBSpeechManager.h"
 #include "sb/SBSimulationManager.h"
 #include "sb/SBCharacterListener.h"
 #pragma warning(pop)
@@ -211,7 +212,6 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath, boo
 void Smartbody_dll::InitLocalSpeechRelay()
 {
 #if 1 //defined(__ANDROID__)
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
    //AUDIO_Init();
 #if defined(__ANDROID__)
    std::string festivalLibDir = "/sdcard/SBUnity/festival/lib/";
@@ -222,8 +222,8 @@ void Smartbody_dll::InitLocalSpeechRelay()
 	std::string festivalCacheDir = "./SBUnity/festival/cache/";
 	std::string cereprocLibDir = "./SBUnity/cerevoice/voices/";	
 #endif
-   mcu.festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
-   mcu.cereprocRelay()->initSpeechRelay(cereprocLibDir,festivalCacheDir);
+	SmartBody::SBScene::getScene()->getSpeechManager()->festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
+	SmartBody::SBScene::getScene()->getSpeechManager()->cereprocRelay()->initSpeechRelay(cereprocLibDir,festivalCacheDir);
 #endif
 }
 
@@ -257,8 +257,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::Shutdown()
 
 SMARTBODY_DLL_API bool Smartbody_dll::LoadSkeleton( const void * data, int sizeBytes, const char * skeletonName )
 {
-    mcuCBHandle & mcu = mcuCBHandle::singleton();
-    int ret = mcu.load_skeleton( data, sizeBytes, skeletonName );
+    int ret = SmartBody::SBScene::getScene()->getAssetManager()->load_skeleton( data, sizeBytes, skeletonName );
     return ret == CMD_SUCCESS;
 }
 
