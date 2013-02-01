@@ -60,6 +60,7 @@
 #include "TransparentListener.h"
 #include "TransparentViewer.h"
 #include "sb/SBDebuggerServer.h"
+#include "sb/SBSpeechManager.h"
 #include "sbm/GPU/SbmShader.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -359,9 +360,9 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	
 	mcu_register_callbacks();
 
-	SmartBody::SBScene::getScene()->getSimulationManager()->registerTimer();
+	SmartBody::SBScene::getScene()->getSimulationManager()->setupTimer();
 
-	SmartBody::SBScene::getScene()->getSimulationManager()->registerProfiler();
+	SmartBody::SBScene::getScene()->getSimulationManager()->setupProfiler();
 
 	std::string python_lib_path = "../../../../core/smartbody/Python26/Lib";
 	std::string festivalLibDir = "../../../../lib/festival/festival/lib/";
@@ -488,7 +489,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		{
 			SrString fps = s;
 			fps.remove( 0, 5 );
-			timer.set_sleep_fps( atof( fps ) );
+			SmartBody::SBScene::getScene()->getSimulationManager()->setSleepFps( atof( fps ) );
 		}
 		else if( s.search( "-perf=" ) == 0 )  // argument starts with -perf=
 		{
@@ -551,7 +552,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		}
 	}
 	if( lock_dt_mode )	{ 
-		timer.set_sleep_lock();
+		SmartBody::SBScene::getScene()->getSimulationManager()->setSleepLock();
 	}
 
 	TransparentViewerFactory* viewerFactory = new TransparentViewerFactory();
@@ -566,7 +567,8 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 
 	// initialize python
 	initPython(python_lib_path);
-	mcu.festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
+
+	SmartBody::SBScene::getScene()->getSpeechManager()->festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
 
 
 
@@ -621,7 +623,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	if( net_host != "" )
 		mcu.set_net_host( net_host );
 	if( proc_id != "" ) {
-		SmartBody::SBScene::getScene()->getProcessId( (const char*)proc_id );
+		SmartBody::SBScene::getScene()->setProcessId( (const char*)proc_id );
 
 		// Using a process id is a sign that we're running in a multiple SBM environment.
 		// So.. ignore BML requests with unknown agents by default
@@ -724,7 +726,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	srArgBuffer argBuff("");
 	mcu_vrAllCall_func( argBuff, &mcu );
 
-	timer.start();
+	SmartBody::SBScene::getScene()->getSimulationManager()->start();
 
 #if ENABLE_808_TEST
 	return( 0 );
