@@ -19,7 +19,7 @@ class SBAssetManager : public SBObject
 		SBAPI SBAssetManager();
 		SBAPI ~SBAssetManager();
 
-		SBAPI double SBAssetManager::getGlobalMotionScale();
+		SBAPI double getGlobalMotionScale();
 		SBAPI void setGlobalMotionScale(double val);
 		SBAPI double getGlobalSkeletonScale();
 		SBAPI void setGlobalSkeletonScale(double val);
