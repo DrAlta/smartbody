@@ -35,6 +35,7 @@
 #include <sb/SBRetargetManager.h>
 #include <sb/SBRetarget.h>
 #include <sr/sr_euler.h>
+#include <sr/sr_mat.h>
 #include "controllers/MotionAnalysis.h"
 
 std::string MeCtParamAnimation::Context::CONTEXT_TYPE = "MeCtParamAnimation::Context";
@@ -317,7 +318,10 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 				updateWo(curStateData->woManager->getBaseTransformMat(), woWriter, frame.buffer());
 #if 1 // disable IK post processing for now, until it is stable enough.
 			if (character && character->getBoolAttribute("ikPostFix"))
-				updateIK(curStateData, character->get_world_offset(), frame.buffer());
+			{
+				SrMat mat = character->get_world_offset();
+				updateIK(curStateData, mat, frame.buffer());
+			}
 #endif				
 			return true;
 		}
