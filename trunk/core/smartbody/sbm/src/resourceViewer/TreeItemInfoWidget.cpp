@@ -378,6 +378,7 @@ void SeqItemInfoWidget::updateWidget()
 	textBuffer->remove_selection();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::string fullSeqPath;
+	/* 
 	FILE* fp = mcu.open_sequence_file(seqFilename.c_str(),fullSeqPath);
 	//LOG("seq file name = %s, full path = %s\n",seqFilename.c_str(),fullSeqPath.c_str());
 	if (fp)
@@ -386,6 +387,7 @@ void SeqItemInfoWidget::updateWidget()
 		seqFullPathName = fullSeqPath;
 		fclose(fp);
 	}
+	*/
 	textDisplay->redraw();
 	//textBuffer->loadfile()
 }

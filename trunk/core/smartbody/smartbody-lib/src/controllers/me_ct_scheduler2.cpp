@@ -35,7 +35,8 @@
 #include <controllers/me_ct_time_shift_warp.hpp>
 #include <controllers/me_ct_motion.h>
 #include <controllers/me_ct_interpolator.h>
-
+#include <sb/SBSimulationManager.h>
+#include <sb/SBScene.h>
 #include <sbm/mcontrol_util.h>
 
 using namespace std;
@@ -294,7 +295,7 @@ MeCtScheduler2::MeCtScheduler2 ()
 MeCtScheduler2::~MeCtScheduler2 () {
 
 	LOG("delete scheduler %s\n",this->getName().c_str());
-   stop (mcuCBHandle::singleton().time);
+   stop (SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
    _sub_sched_context->unref();
    //clear();
    //remove_tracks(_tracks);
@@ -453,7 +454,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 	double endAt    = syncPoints.sync_end()->time();
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	double now = mcu.time;
+	double now = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
 
 	// if any of the sync points begin before the current time, 
 	// then offset the motion accordingly
@@ -644,7 +645,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 	double endAt    = syncPoints.sync_end()->time();
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	double now = mcu.time;
+	double now = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
 
 	// if any of the sync points begin before the current time, 
 	// then offset the motion accordingly
@@ -652,7 +653,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 	double indt  = readyAt - startAt;
 	double outdt = endAt - relaxAt;
 
-	MeCtInterpolator* interpolator = new MeCtInterpolator(ct1, ct2, mcu.time, double(value), loop);
+	MeCtInterpolator* interpolator = new MeCtInterpolator(ct1, ct2, SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), double(value), loop);
 	double ct_dur = interpolator->controller_duration();
 	bool dur_defined = (ct_dur >= 0);
 

@@ -37,8 +37,6 @@ class srPathList
 		srPathList();
 		virtual ~srPathList();
 
-		void setPathPrefix(const std::string& pre);
-		const std::string& getPathPrefix();
 		bool insert(std::string path);
 		bool remove(std::string path);
 		void removeAll();

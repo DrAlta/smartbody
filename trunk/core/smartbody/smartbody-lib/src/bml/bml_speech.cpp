@@ -882,7 +882,6 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	// find set SyncPoints
 	// if more than one, warn and ignore least important
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.mark("speechRequestSchedule", 0, "begin");
 
 	// Convience references
 	SyncPointPtr sp_start( behav_syncs.sync_start()->sync() );
@@ -928,7 +927,6 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	// Extract Visemes	
 	// first copy -> m_speechRequestInfo parsed the visemes from files
 	// second copy -> now getVisems copied it again so it's ready for process
-	mcu.mark("speechRequestSchedule", 0, "getVisemes");
 	vector<VisemeData*>* result_visemes = speech_impl->getVisemes( speech_request_id, actor );
 	if( !result_visemes ) {
 		if (speech_impl_backup) // run the backup speech server if available
@@ -943,12 +941,10 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		phonemes.push_back(newV);
 	}
 
-	mcu.mark("speechRequestSchedule", 0, "processVisemes");
 	// Process Visemes
 	if (actor && actor->isDiphone()) // if use diphone, reconstruct the curves
 		processVisemes(result_visemes, request, actor->getDiphoneScale());			
 
-	mcu.mark("speechRequestSchedule", 0, "postProcessVisemes");
 	if (result_visemes)
 	{
 		//visemes = *result_visemes;  // Copy contents
@@ -1115,7 +1111,6 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		if( LOG_SYNC_POINTS )
 			cout << "   BodyPlannerImpl::speechReply(..): No speech bookmarks" << endl;
 	}
-	mcu.mark("speechRequestSchedule");
 }
 
 void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )

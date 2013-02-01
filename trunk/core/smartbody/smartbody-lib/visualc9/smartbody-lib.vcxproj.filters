@@ -169,9 +169,6 @@
     <ClCompile Include="..\src\controllers\me_spline_1d.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\me_utilities.cpp">
-      <Filter>controllers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\bml\bml.cpp">
       <Filter>bml</Filter>
     </ClCompile>
@@ -991,11 +988,11 @@
     <ClCompile Include="..\src\sb\SBRetargetManager.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sb\SBSpeechManager.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\sbm\me_utilities.hpp">
-      <Filter>controllers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\controllers\me_controller.h">
       <Filter>controllers</Filter>
     </ClInclude>
@@ -2023,6 +2020,9 @@
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sb\SBRetarget.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBSpeechManager.h">
       <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>

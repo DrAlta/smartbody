@@ -1,7 +1,6 @@
 #include "SBMotion.h"
 #include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
-#include <sbm/me_utilities.hpp>
 #include <sr/sr_euler.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBJoint.h>
@@ -173,7 +172,8 @@ void SBMotion::checkSkeleton(std::string skel)
 		return;
 	}
 
-	SmartBody::SBSkeleton* skSkel = load_skeleton(skel.c_str(), mcu.me_paths, mcu.skScale);
+	SmartBody::SBSkeleton* skSkel =  SmartBody::SBScene::getScene()->createSkeleton(skel);
+	//load_skeleton(skel.c_str(), mcu.me_paths, SmartBody::SBScene::getScene()->getAssetManager()->getGlobalSkeletonScale());
 	if (skSkel)
 	{
 		motion->connect(skSkel);	// connect and check for the joints
@@ -220,7 +220,7 @@ void SBMotion::checkSkeleton(std::string skel)
 		}
 	}
 	else
-		LOG("Skeleton %s NOT EXIST!", skel.c_str());
+		LOG("Skeleton %s does NOT exist!", skel.c_str());
 }
 
 int SBMotion::connect(SBSkeleton* skel)

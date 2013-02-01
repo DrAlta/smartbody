@@ -29,6 +29,7 @@
 #include <sb/SBAnimationTransitionRule.h>
 #include <sb/SBMotionBlendBase.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBCharacterListener.h>
 #include <sb/SBRetargetManager.h>
@@ -75,7 +76,7 @@ MeCtParamAnimation::MeCtParamAnimation(SbmCharacter* c, MeCtChannelWriter* wo) :
 	nextStateData = NULL;
 	transitionManager = NULL;
 	waitingList.clear();
-	prevGlobalTime = mcuCBHandle::singleton().time;
+	prevGlobalTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
 }
 
 MeCtParamAnimation::~MeCtParamAnimation()
@@ -100,7 +101,6 @@ double MeCtParamAnimation::controller_duration()
 bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 {	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.mark("locomotion",0,"controller_evaluate");
 
 	double timeStep = t - prevGlobalTime;
 	prevGlobalTime = t;
@@ -116,7 +116,6 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 		{
 			std::vector<double> weights;
 			schedule(NULL, weights);
-			mcu.mark("locomotion");
 			return true;
 		}
 	}	
@@ -263,7 +262,6 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 				transitionManager->step(timeStep*playSpeed);
 				if (!curStateData->isPartialBlending() && !nextStateData->isPartialBlending())
 					updateWo(transformMat, woWriter, frame.buffer());
-				mcu.mark("locomotion");
 				return true;
 			}
 			else
@@ -329,7 +327,6 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 			curStateData = NULL;
 		}
 	}
-	mcu.mark("locomotion");
 	return true;
 }
 
@@ -425,7 +422,7 @@ void MeCtParamAnimation::schedule( PABlend* state, const std::vector<double>& we
 	unit.schedule = scheduleMode;
 	unit.blend = blend;
 	unit.partialJoint = jName;
-	unit.time = mcuCBHandle::singleton().time + timeOffset;
+	unit.time = SmartBody::SBScene::getScene()->getSimulationManager()->getTime() + timeOffset;
 	unit.stateTimeOffset = (float)stateTimeOffset;
 	unit.stateTimeTrim = (float)stateTimeTrim;
 	unit.directPlay = directPlay;

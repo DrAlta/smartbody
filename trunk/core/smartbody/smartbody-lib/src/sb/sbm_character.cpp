@@ -44,7 +44,6 @@
 #include "sbm/mcontrol_util.h"
 #include "sbm/mcontrol_callbacks.h"
 #include "sb/SBScene.h"
-#include "sbm/me_utilities.hpp"
 #include <controllers/me_spline_1d.hpp>
 #include <controllers/me_ct_interpolator.h>
 #include "sbm/sr_curve_builder.h"
@@ -60,6 +59,7 @@
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBSteerManager.h>
+#include <sb/SBSimulationManager.h>
 #include <sb/SBSteerAgent.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationState.h>
@@ -1534,7 +1534,7 @@ int SbmCharacter::prune_controller_tree( )
 {
 	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
 
-	double time = mcu_p->time;  // current time
+	double time = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();  // current time
 
 	if( LOG_PRUNE_CMD_TIME || LOG_CONTROLLER_TREE_PRUNING )
 	{

@@ -25,6 +25,8 @@
 #include <controllers/me_controller_context.hpp>
 #include <controllers/me_evaluation_logger.hpp>
 #include "sbm/mcontrol_util.h"
+#include <sb/SBSimulationManager.h>
+#include <sb/SBScene.h>
 
 
 MeControllerContext::MeControllerContext()
@@ -53,7 +55,7 @@ void MeControllerContext::add_controller( MeController* ct ) {
 
 void MeControllerContext::remove_controller( MeController* ct ) {
 	if( ct->active() )
-		ct->stop(mcuCBHandle::singleton().time);
+		ct->stop(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 
 	ct->_context = NULL;
 	// No unref().  Contexts refs controllers, not vice versa.

@@ -3,7 +3,6 @@
 #include <sbm/mcontrol_util.h>
 #include <sbm/mcontrol_callbacks.h>
 #include "sb/SBController.h"
-#include "sbm/me_utilities.hpp"
 #include "bml/bml_types.hpp"
 #include "bml/bml_speech.hpp"
 #include "sb/SBBehavior.h"
@@ -15,6 +14,7 @@
 #include <sb/SBPhoneme.h>
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBScene.h>
+#include <sb/SBSpeechManager.h>
 #include <controllers/me_ct_motion_recorder.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_gaze.h>
@@ -242,27 +242,25 @@ std::vector<std::string> SBCharacter::getControllerNames()
 
 void SBCharacter::setVoice(std::string type)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	if (type == "")
 	{
 		set_speech_impl(NULL);
 	}
 	else if (type == "remote")
 	{
-		set_speech_impl(mcu.speech_rvoice());
+		set_speech_impl(SmartBody::SBScene::getScene()->getSpeechManager()->speech_rvoice());
 	}
 	else if (type == "audiofile")
 	{
-		set_speech_impl(mcu.speech_audiofile());
+		set_speech_impl(SmartBody::SBScene::getScene()->getSpeechManager()->speech_audiofile());
 	}
 	else if (type == "text")
 	{
-		set_speech_impl(mcu.speech_text());
+		set_speech_impl(SmartBody::SBScene::getScene()->getSpeechManager()->speech_text());
 	}
 	else if (type == "local")
 	{
-		set_speech_impl(mcu.speech_localvoice());
+		set_speech_impl(SmartBody::SBScene::getScene()->getSpeechManager()->speech_localvoice());
 	}
 	else
 	{
@@ -320,19 +318,19 @@ void SBCharacter::setVoiceBackup(std::string type)
 	}
 	else if (type == "remote")
 	{
-		set_speech_impl_backup(mcu.speech_rvoice());
+		set_speech_impl_backup(SmartBody::SBScene::getScene()->getSpeechManager()->speech_rvoice());
 	}
 	else if (type == "audiofile")
 	{
-		set_speech_impl_backup(mcu.speech_audiofile());
+		set_speech_impl_backup(SmartBody::SBScene::getScene()->getSpeechManager()->speech_audiofile());
 	}
 	else if (type == "text")
 	{
-		set_speech_impl_backup(mcu.speech_text());
+		set_speech_impl_backup(SmartBody::SBScene::getScene()->getSpeechManager()->speech_text());
 	}
 	else if (type == "local")
 	{
-		set_speech_impl_backup(mcu.speech_localvoice());
+		set_speech_impl_backup(SmartBody::SBScene::getScene()->getSpeechManager()->speech_localvoice());
 	}
 	else
 	{

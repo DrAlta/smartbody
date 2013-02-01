@@ -7,6 +7,7 @@
 #include <sb/SBCollisionManager.h>
 #include <sb/SBColObject.h>
 #include <sb/SBPhysicsSim.h>
+#include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 #include <sbm/sbm_deformable_mesh.h>
 
@@ -163,7 +164,7 @@ void SBPawn::setPositionSmooth( SrVec pos, float smoothTime )
 {
 	initialPos = getPosition(); // start position
 	targetPos  = pos;
-	posStartTime = (float)mcuCBHandle::singleton().time;
+	posStartTime = (float) SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 	posEndTime = posStartTime + smoothTime;
 	smoothTargetPos = true;
 }
@@ -172,7 +173,7 @@ void SBPawn::setHPRSmooth( SrVec hpr, float smoothTime )
 {
 	initialHPR = getHPR(); // start position
 	targetHPR  = hpr;
-	hprStartTime = (float)mcuCBHandle::singleton().time;
+	hprStartTime = (float) SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 	hprEndTime = hprStartTime + smoothTime;
 	smoothTargetHPR = true;
 }

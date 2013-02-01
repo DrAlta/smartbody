@@ -66,7 +66,6 @@ int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 //int mcu_character_func( srArgBuffer& args, mcuCBHandle *mcu_p );  // Old version... See SbmCharacter::character_cmd_func
 
 int mcu_character_init( const char* char_name, const char *skel_file, const char *unreal_class, mcuCBHandle *mcu_p );
-int mcu_character_ctrl_cmd( const char* char_name, srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_load_mesh( const char* pawnName, const char* obj_file, mcuCBHandle* mcu_p, const char* option = NULL );	// support obj file for now
 int mcu_character_load_mesh( const char* char_name, const char* obj_file, mcuCBHandle* mcu_p, const char* option = NULL );	// support obj file for now
@@ -130,7 +129,6 @@ int resetanim_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_interp_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 int mcu_python_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 int mcu_pythonscript_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
@@ -148,7 +146,6 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int showcharacters_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int showpawns_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int syncpoint_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int pawnbonebus_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 #ifdef USE_GOOGLE_PROFILER
 int startprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int stopprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p );

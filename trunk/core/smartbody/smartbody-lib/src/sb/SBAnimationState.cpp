@@ -447,15 +447,12 @@ void SBAnimationBlend::createMotionVectorFlow(const std::string& motionName, con
 	SkSkeleton* sk = mo->connected_skeleton();
 	if(sk==0)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		std::map<std::string, SBSkeleton*>& skeletonMap = mcu.getSkeletonMap();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SBCharacter* sbSk = scene->getCharacter(chrName);
 		if(sbSk)
 		{
 			std::string sbName = sbSk->getSkeleton()->getName();
-			if(skeletonMap.find(sbName) != skeletonMap.end())
-				sk = skeletonMap[sbName];
+			sk = SmartBody::SBScene::getScene()->getSkeleton(sbName);
 		}
 		if(sk)
 		{
@@ -596,15 +593,12 @@ void SBAnimationBlend::plotMotion(const std::string& motionName, const std::stri
 	SkSkeleton* sk = mo->connected_skeleton();
 	if(sk==0)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		std::map<std::string, SBSkeleton*>& skeletonMap = mcu.getSkeletonMap();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SBCharacter* sbSk = scene->getCharacter(chrName);
 		if(sbSk)
 		{
 			std::string sbName = sbSk->getSkeleton()->getName();
-			if(skeletonMap.find(sbName) != skeletonMap.end())
-				sk = skeletonMap[sbName];
+			sk = SmartBody::SBScene::getScene()->getSkeleton(sbName);
 		}
 		if(sk)
 		{
@@ -677,15 +671,12 @@ void SBAnimationBlend::plotMotionFrameTime(const std::string& motionName, const 
 	SkSkeleton* sk = mo->connected_skeleton();
 	if(sk==0)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		std::map<std::string, SBSkeleton*>& skeletonMap = mcu.getSkeletonMap();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SBCharacter* sbSk = scene->getCharacter(chrName);
 		if(sbSk)
 		{
 			std::string sbName = sbSk->getSkeleton()->getName();
-			if(skeletonMap.find(sbName) != skeletonMap.end())
-				sk = skeletonMap[sbName];
+			sk = SmartBody::SBScene::getScene()->getSkeleton(sbName);
 		}
 		if(sk)
 		{
@@ -746,14 +737,12 @@ void SBAnimationBlend::plotMotionJointTrajectory(const std::string& motionName, 
 	if(sk==0)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		std::map<std::string, SBSkeleton*>& skeletonMap = mcu.getSkeletonMap();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SBCharacter* sbSk = scene->getCharacter(chrName);
 		if(sbSk)
 		{
 			std::string sbName = sbSk->getSkeleton()->getName();
-			if(skeletonMap.find(sbName) != skeletonMap.end())
-				sk = skeletonMap[sbName];
+			sk = SmartBody::SBScene::getScene()->getSkeleton(sbName);
 		}
 		if(sk)
 		{
@@ -817,8 +806,6 @@ void SBAnimationBlend::clearPlotMotion(void)
 
 void SBAnimationBlend::setChrPlotMotionTransform(const std::string& chrName)
 {
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		std::map<std::string, SBSkeleton*>& skeletonMap = mcu.getSkeletonMap();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SBCharacter* sbSk = scene->getCharacter(chrName);
 		if(sbSk)
@@ -838,8 +825,6 @@ void SBAnimationBlend::setPlotMotionTransform(SrVec offset, float yRot)
 
 void SBAnimationBlend::setChrPlotVectorFlowTransform(const std::string& chrName)
 {
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		std::map<std::string, SBSkeleton*>& skeletonMap = mcu.getSkeletonMap();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SBCharacter* sbSk = scene->getCharacter(chrName);
 		if(sbSk)

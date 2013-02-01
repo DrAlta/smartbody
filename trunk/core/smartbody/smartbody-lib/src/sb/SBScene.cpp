@@ -29,6 +29,7 @@
 #include <sb/SBBehaviorSetManager.h>
 #include <sb/SBRetargetManager.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBSpeechManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBParser.h>
 #include <sb/SBDebuggerServer.h>
@@ -50,11 +51,13 @@
 #include <controllers/me_ct_example_body_reach.hpp>
 #include <controllers/me_ct_saccade.h>
 #include <sbm/KinectProcessor.h>
+#include <controllers/me_controller_tree_root.hpp>
 
 #ifndef WIN32
 #define _stricmp strcasecmp
 #endif
 
+#define SHOW_DEPRECATION_MESSAGES 0
 namespace SmartBody {
 
 SBScene* SBScene::_scene = NULL;
@@ -70,6 +73,8 @@ void SBScene::initialize()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.reset();
+
+	_processId = "";
 
 	createDefaultControllers();
 
@@ -92,7 +97,7 @@ void SBScene::initialize()
 	_retargetManager = new SBRetargetManager();
 	_eventManager = new SBEventManager();
 	_assetManager = new SBAssetManager();
-
+	_speechManager = new SBSpeechManager();
 
 	_scale = .01f; // default scale is centimeters
 
@@ -115,7 +120,11 @@ void SBScene::initialize()
 	createIntAttribute("colladaTrimFrames",0,true,"",40,false,false,false,"Number of frames to be trimmed in the front when loading a collada motion.");
 	createBoolAttribute("useFastXMLParsing",false,true,"",50,false,false,false,"Use faster parsing when reading XML from a file.");
 	createBoolAttribute("delaySpeechIfNeeded",true,true,"",60,false,false,false,"Delays any speech until other behaviors specified in the same BML need to execute beforehand. This can occur when a gesture is synchronized to a word early in the utterance, and the gesture motion needs to be played for awhile before the synch point.");
-
+	createBoolAttribute("useXMLCache",false,true,"",500,false,false,false,"Cache the XML used when processing audio files.");
+	createBoolAttribute("useXMLCacheAuto",false,true,"",510,false,false,false,"Automatically add the XML to the cache when processing audio files after playing for the first time.");
+	createStringAttribute("defaultCharacter","",true,"",550,false,false,false,"Default character when processing BML.");
+	createStringAttribute("defaultRecipient","ALL",true,"",550,false,false,false,"Default recipient when processing BML.");
+	
 	_mediaPath = ".";
 		// re-initialize
 	// initialize everything
@@ -124,22 +133,10 @@ void SBScene::initialize()
 	mcu.vhmsg_enabled = false;
 	mcu.net_bone_updates = false;
 	mcu.net_world_offset_updates = true;
-	mcu.play_internal_audio = false;
 	mcu.resourceDataChanged = false;
-	mcu.perceptionData = new PerceptionData();
-	mcu.skmScale = 1.0;
-	mcu.skScale = 1.0;
 	mcu.root_group_p = new SrSnGroup();
-	mcu.test_character_default = "";
-	mcu.test_recipient_default = "ALL";
 	mcu.queued_cmds = 0;
-	mcu.updatePhysics = false;
-	mcu.snapshot_counter = 1;
-	mcu.use_python = true;
-	mcu.sendPawnUpdates = false;
 	mcu.logListener = NULL;
-	mcu.useXmlCache = false;
-	mcu.useXmlCacheAuto = false;
 	mcu.testBMLId = 0;
 	mcu.registerCallbacks();
 	mcu.root_group_p->ref();
@@ -148,9 +145,6 @@ void SBScene::initialize()
 	mcu.theWSP = WSP::create_manager();
 	mcu.theWSP->init( "SMARTBODY" );
 #endif
-	mcu.internal_timer_p = NULL;
-	mcu.external_timer_p = NULL;
-	mcu.timer_p = NULL;
 
 	// Create default settings
 	createDefaultControllers();
@@ -238,25 +232,6 @@ void SBScene::cleanup()
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	// remove the motions and skeleton
-	const std::vector<std::string> motionNames = SmartBody::SBScene::getScene()->getAssetManager()->getMotionNames();
-	for (std::vector<std::string>::const_iterator iter = motionNames.begin();
-			 iter != motionNames.end();
-			 iter++)
-	{
-		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(*iter);
-		SmartBody::SBScene::getScene()->getAssetManager()->removeMotion(motion);
-	}
-
-	for (std::map<std::string, SBSkeleton*>::iterator skelIter =  mcu.skeleton_map.begin();
-		skelIter !=  mcu.skeleton_map.end();
-		skelIter++)
-	{
-		SBSkeleton* skeleton = (*skelIter).second;
-		delete skeleton;
-	}
-	mcu.skeleton_map.clear();
-
 	// remove the deformable meshes
 /*	for (std::map<std::string, DeformableMesh*>::iterator deformableIter =  mcu.deformableMeshMap.begin();
 		deformableIter !=  mcu.deformableMeshMap.end();
@@ -267,14 +242,7 @@ void SBScene::cleanup()
 	}
 	mcu.deformableMeshMap.clear();
 */
-	// remove the XML cache
-	for (std::map<std::string, DOMDocument*>::iterator xmlIter = mcu.xmlCache.begin();
-		xmlIter != mcu.xmlCache.end();
-		xmlIter++)
-	{
-		(*xmlIter).second->release();
-	}
-	mcu.xmlCache.clear();
+
 
 	// remove NVBG
 	for (std::map<std::string, Nvbg*>::iterator nvbgIter = mcu.nvbgMap.begin();
@@ -316,6 +284,7 @@ void SBScene::cleanup()
 	delete _retargetManager;
 	delete _eventManager;
 	delete _assetManager;
+	delete _speechManager;
 
 	_sim = NULL;
 	_profiler = NULL;
@@ -436,20 +405,319 @@ void SBScene::destroyScene()
 
 void SBScene::setProcessId(const std::string& id)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.process_id = id;
+	_processId = id;
 }
 
 const std::string& SBScene::getProcessId()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	return mcu.process_id;
+	return _processId;
 }
 
 void SBScene::update()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.update();
+	// remote mode
+	if (SmartBody::SBScene::getScene()->isRemoteMode())
+	{
+		SmartBody::SBScene::getScene()->getDebuggerClient()->Update();
+		std::map<std::string, SbmPawn*>::iterator iter;
+		for (iter = mcu.getPawnMap().begin();
+			iter != mcu.getPawnMap().end();
+			iter++)
+		{
+			SbmPawn* pawn = (*iter).second;
+			pawn->ct_tree_p->evaluate(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+			pawn->ct_tree_p->applySkeletonToBuffer();
+		}
+
+		return;
+	}
+
+	// scripts
+	std::map<std::string, SmartBody::SBScript*>& scripts = SmartBody::SBScene::getScene()->getScripts();
+	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
+		iter != scripts.end();
+		iter++)
+	{
+		if ((*iter).second->isEnable())
+			(*iter).second->beforeUpdate(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+	}
+
+	// services
+	std::map<std::string, SmartBody::SBService*>& services = SmartBody::SBScene::getScene()->getServiceManager()->getServices();
+	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
+		iter != services.end();
+		iter++)
+	{
+		if ((*iter).second->isEnable())
+			(*iter).second->beforeUpdate(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+	}
+
+// 	if (physicsEngine && physicsEngine->getBoolAttribute("enable"))
+// 	{		
+// 		float dt = (float)physicsEngine->getDoubleAttribute("dT");//timeStep*0.03f;
+// 		//elapseTime += time_dt;
+// 		while (physicsTime < this->time)		
+// 		//if (physicsTime < this->time)
+// 		{
+// 			//printf("elapse time = %f\n",elapseTime);
+// 			physicsEngine->updateSimulation(dt);
+// 			physicsTime += dt;
+// 			//curDt -= dt;
+// 		}		
+// 	}
+// 	else
+// 	{
+// 		physicsTime = this->time;
+// 	}
+
+	std::string seqName = "";
+	std::vector<std::string> sequencesToDelete;
+	for (int s = 0; s < mcu.activeSequences.getNumSequences(); s++)
+	{
+		srCmdSeq* seq = mcu.activeSequences.getSequence(s, seqName);
+		char *cmd;
+		while( cmd = seq->pop( (float) SmartBody::SBScene::getScene()->getSimulationManager()->getTime() ) )
+		{
+			int err = mcu.execute( cmd );
+			if( err != CMD_SUCCESS )	{
+				LOG( "mcuCBHandle::update ERR: execute FAILED: '%s'\n", cmd );
+			}
+			else
+			{
+				// we assume that every command execution could potentially change the resource data
+				// therefore the data changed flag is set.
+				// This is kind of rough, but should work fine.
+				mcu.resourceDataChanged = true; 
+			}
+			delete [] cmd;
+		}
+		if( seq->get_count() < 1 )
+		{
+			sequencesToDelete.push_back(seqName);
+		}
+	}
+
+	for (size_t d = 0; d < sequencesToDelete.size(); d++)
+	{
+		mcu.activeSequences.removeSequence(sequencesToDelete[d], true);
+	}
+
+	bool isClosingBoneBus = false;
+    std::map<std::string, SbmPawn*>::iterator iter;
+	for (iter = mcu.getPawnMap().begin();
+		iter != mcu.getPawnMap().end();
+		iter++)
+	{
+		SbmPawn* pawn = (*iter).second;
+		pawn->reset_all_channels();
+		pawn->ct_tree_p->evaluate( SmartBody::SBScene::getScene()->getSimulationManager()->getTime() );
+		pawn->ct_tree_p->applyBufferToAllSkeletons();
+
+// 		if (pawn->hasPhysicsSim() && SBPhysicsSim::getPhysicsEngine()->getBoolAttribute("enable"))
+// 		{
+// 			//pawn->updateFromColObject();
+// 		}
+// 		else
+		{			
+			//pawn->updateToColObject();
+			pawn->updateToSteeringSpaceObject();
+		}
+		SbmCharacter* char_p = getCharacter(pawn->getName().c_str() );
+		if (!char_p)
+		{
+			if (SmartBody::SBScene::getScene()->getBoneBusManager()->isEnable())
+			{
+				if (pawn->bonebusCharacter && pawn->bonebusCharacter->GetNumErrors() > 3)
+				{
+					// connection is bad, remove the bonebus character 
+					LOG("BoneBus cannot connect to server. Removing pawn %s", pawn->getName().c_str());
+					bool success = SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
+					char_p->bonebusCharacter = NULL;
+					isClosingBoneBus = true;
+					if (SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().GetNumCharacters() == 0)
+					{
+						SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CloseConnection();
+					}
+				}
+			}
+		}
+		if( char_p ) {
+
+			// run the minibrain, if available
+			SmartBody::MiniBrain* brain = char_p->getMiniBrain();
+			if (brain)
+			{
+				SmartBody::SBCharacter* sbchar = dynamic_cast<SmartBody::SBCharacter*>(char_p);
+				brain->update(sbchar, SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt());
+			}
+
+			// scene update moved to renderer
+			//if (char_p->scene_p)
+			//	char_p->scene_p->update();
+			//char_p->dMesh_p->update();
+			//char_p->updateJointPhyObjs();
+			/*
+			bool hasPhySim = physicsEngine->getBoolAttribute("enable");
+			char_p->updateJointPhyObjs(hasPhySim);
+			//char_p->updateJointPhyObjs(false);
+			*/
+			char_p->_skeleton->update_global_matrices();
+
+			char_p->forward_visemes( SmartBody::SBScene::getScene()->getSimulationManager()->getTime() );	
+			char_p->forward_parameters( SmartBody::SBScene::getScene()->getSimulationManager()->getTime() );	
+
+			if (char_p->bonebusCharacter && char_p->bonebusCharacter->GetNumErrors() > 3)
+			{
+				// connection is bad, remove the bonebus character
+				isClosingBoneBus = true;
+				LOG("BoneBus cannot connect to server after visemes sent. Removing all characters.");
+			}
+
+			
+
+			if ( SmartBody::SBScene::getScene()->getBoneBusManager()->isEnable() && char_p->getSkeleton() && char_p->bonebusCharacter ) {
+				mcu.NetworkSendSkeleton( char_p->bonebusCharacter, (SkSkeleton *)(char_p->getSkeleton()), &mcu.param_map );
+
+				if ( mcu.net_world_offset_updates ) {
+
+					const SkJoint * joint = char_p->get_world_offset_joint();
+
+					const SkJointPos * pos = joint->const_pos();
+					float x = pos->value( SkJointPos::X );
+					float y = pos->value( SkJointPos::Y );
+					float z = pos->value( SkJointPos::Z );
+
+					SkJoint::RotType rot_type = joint->rot_type();
+					if ( rot_type != SkJoint::TypeQuat ) {
+						//strstr << "ERROR: Unsupported world_offset rotation type: " << rot_type << " (Expected TypeQuat, "<<SkJoint::TypeQuat<<")"<<endl;
+					}
+
+					// const_cast because the SrQuat does validation (no const version of value())
+					const SrQuat & q = ((SkJoint *)joint)->quat()->value();
+
+					char_p->bonebusCharacter->SetPosition( x, y, z, SmartBody::SBScene::getScene()->getSimulationManager()->getTime() );
+					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.x, (float)q.y, (float)q.z, SmartBody::SBScene::getScene()->getSimulationManager()->getTime() );
+
+					if (char_p->bonebusCharacter->GetNumErrors() > 3)
+					{
+						// connection is bad, remove the bonebus character 
+						isClosingBoneBus = true;
+						LOG("BoneBus cannot connect to server. Removing all characters");
+					}
+				}
+			}
+			else if (!isClosingBoneBus && !char_p->bonebusCharacter && SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().IsOpen())
+			{
+				// bonebus was connected after character creation, create it now
+				char_p->bonebusCharacter = SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CreateCharacter( char_p->getName().c_str(), char_p->getClassType().c_str(), true );
+			}
+		}  // end of char_p processing
+	} // end of loop
+
+	if (isClosingBoneBus)
+	{
+		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+			iter != mcu.getPawnMap().end();
+			iter++)
+		{
+			SbmPawn* pawn = (*iter).second;
+			if (pawn->bonebusCharacter)
+			{
+				bool success = SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
+				pawn->bonebusCharacter = NULL;
+			}
+		}
+
+		SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CloseConnection();
+	}
+
+	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+			iter != mcu.getPawnMap().end();
+		iter++)
+	{
+		SbmPawn* pawn = (*iter).second;
+		pawn->afterUpdate(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+	}
+
+	
+	if (mcu.viewer_p && mcu.viewer_p->get_camera())
+	{
+		SrMat m;
+		SrQuat quat = SrQuat(mcu.viewer_p->get_camera()->get_view_mat(m).get_rotation());
+
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.x = mcu.viewer_p->get_camera()->getEye().x;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.y = mcu.viewer_p->get_camera()->getEye().y;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.z = mcu.viewer_p->get_camera()->getEye().z;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraLookAt.x = mcu.viewer_p->get_camera()->getCenter().x;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraLookAt.y = mcu.viewer_p->get_camera()->getCenter().y;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraLookAt.z = mcu.viewer_p->get_camera()->getCenter().z;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.x = quat.x;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.y = quat.y;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.z = quat.z;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.w = quat.w;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraFovY   = sr_todeg(mcu.viewer_p->get_camera()->getFov());
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraAspect = mcu.viewer_p->get_camera()->getAspectRatio();
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZNear  = mcu.viewer_p->get_camera()->getNearPlane();
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZFar   = mcu.viewer_p->get_camera()->getFarPlane();
+	}
+	
+	/*
+	else
+	{
+		SrCamera defaultCam;
+		SrMat m;
+		SrQuat quat = SrQuat(defaultCam.get_view_mat(m).get_rotation());
+
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.x = defaultCam.eye.x;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.y = defaultCam.eye.y;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.z = defaultCam.eye.z;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.x = quat.x;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.y = quat.y;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.z = quat.z;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.w = quat.w;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraFovY   = sr_todeg(defaultCam.fovy);
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraAspect = defaultCam.aspect;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZNear  = defaultCam.znear;
+		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZFar   = defaultCam.zfar;
+	}
+	*/
+
+	if (!SmartBody::SBScene::getScene()->isRemoteMode())
+		SmartBody::SBScene::getScene()->getDebuggerServer()->Update();
+
+	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
+		iter != scripts.end();
+		iter++)
+	{
+		(*iter).second->update(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+	}
+
+	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
+		iter != services.end();
+		iter++)
+	{
+		(*iter).second->update(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+	}
+
+	// scripts
+	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
+		iter != scripts.end();
+		iter++)
+	{
+		if ((*iter).second->isEnable())
+			(*iter).second->afterUpdate(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+	}
+
+	// services
+	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
+		iter != services.end();
+		iter++)
+	{
+		if ((*iter).second->isEnable())
+			(*iter).second->afterUpdate(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+	}
+
 }
 
 
@@ -480,15 +748,13 @@ void SBScene::notify( SBSubject* subject )
 
 	if (boolAttr && boolAttr->getName() == "internalAudio")
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		if (mcu.play_internal_audio)
+		bool val = boolAttr->getValue();
+		if (!val)
 		{
-			mcu.play_internal_audio = false;
 			AUDIO_Close();
 		}
 		else
 		{
-			mcu.play_internal_audio = true;
 			AUDIO_Init();
 		}
 		return;
@@ -505,7 +771,7 @@ void SBScene::notify( SBSubject* subject )
 SBCharacter* SBScene::createCharacter(const std::string& charName, const std::string& metaInfo)
 {	
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	SbmCharacter* character = mcu.getCharacter(charName);
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
 	if (character)
 	{
 		LOG("Character '%s' already exists!", charName.c_str());
@@ -652,13 +918,13 @@ void SBScene::removeAllPawns()
 int SBScene::getNumCharacters() 
 {  
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	return mcu.getNumCharacters(); 
+	return mcu.character_map.size(); 
 }
 
 int SBScene::getNumPawns() 
 {  
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	return mcu.getNumPawns() - mcu.getNumCharacters(); 
+	return mcu.pawn_map.size() - mcu.character_map.size(); 
 }
 
 SBPawn* SBScene::getPawn(const std::string& name)
@@ -680,40 +946,12 @@ SBPawn* SBScene::getPawn(const std::string& name)
 SBCharacter* SBScene::getCharacter(const std::string& name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmCharacter* character = mcu.getCharacter(name);
-	if (character)
-	{
-		SBCharacter* sbcharacter = dynamic_cast<SBCharacter*>(character);
-		return sbcharacter;
-	}
-	else
-	{
+	std::map<std::string, SbmCharacter*>::iterator iter = mcu.character_map.find(name);
+	if (iter == mcu.character_map.end())
 		return NULL;
-	}
-}
 
-SBSkeleton* SBScene::getSkeleton(const std::string& name)
-{
-	LOG("DEPRECATED: Use AssetManager.getSkeleton() instead.");
-	return getAssetManager()->getSkeleton(name);
-}
-
-SBMotion* SBScene::getMotion(const std::string& name)
-{
-	LOG("DEPRECATED: Use AssetManager.getMotion() instead.");
-	return getAssetManager()->getMotion(name);
-}
-
-int SBScene::getNumMotions()
-{
-	LOG("DEPRECATED: Use AssetManager.getNumMotions() instead.");
-	return getAssetManager()->getNumMotions();
-}
-
-std::vector<std::string> SBScene::getMotionNames()
-{
-	LOG("DEPRECATED: Use AssetManager.getNumMotions() instead.");
-	return getAssetManager()->getMotionNames();
+	SBCharacter* sbcharacter = dynamic_cast<SBCharacter*>((*iter).second);
+	return sbcharacter;
 }
 
 std::vector<std::string> SBScene::getPawnNames()
@@ -770,12 +1008,6 @@ std::vector<std::string> SBScene::getEventHandlerNames()
 void SBScene::setMediaPath(const std::string& path)
 {
 	_mediaPath = path;
-	// update all the paths with the media path prefix
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.seq_paths.setPathPrefix(_mediaPath);
-	mcu.me_paths.setPathPrefix(_mediaPath);
-	mcu.audio_paths.setPathPrefix(_mediaPath);
-	mcu.mesh_paths.setPathPrefix(_mediaPath);
 }
 
 const std::string& SBScene::getMediaPath()
@@ -785,22 +1017,13 @@ const std::string& SBScene::getMediaPath()
 
 void SBScene::setDefaultCharacter(const std::string& character)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.test_character_default = character;
+	SmartBody::SBScene::getScene()->setStringAttribute("defaultCharacter", character);
 }
 
 void SBScene::setDefaultRecipient(const std::string& recipient)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.test_recipient_default = recipient;
+	SmartBody::SBScene::getScene()->setStringAttribute("defaultRecipient", recipient);
 }
-
-SBSkeleton* SBScene::createSkeleton(const std::string& skeletonDefinition)
-{
-	LOG("DEPRECATED: Use AssetManager.createSkeleton() instead.");
-	return getAssetManager()->createSkeleton(skeletonDefinition);
-}
-
 
 SBEventManager* SBScene::getEventManager()
 {
@@ -932,7 +1155,10 @@ SBAssetManager* SBScene::getAssetManager()
 	return _assetManager;
 }
 
-
+SBSpeechManager* SBScene::getSpeechManager()
+{
+	return _speechManager;
+}
 
 SBPhysicsManager* SBScene::getPhysicsManager()
 {
@@ -2138,81 +2364,128 @@ void SBScene::removeDefaultControllers()
 
 std::vector<std::string> SBScene::getAssetPaths(const std::string& type)
 {
-	LOG("DEPRECATED: Use AssetManager.getAssetPaths() instead.");
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.getAssetPaths() instead.");
 	return getAssetManager()->getAssetPaths(type);
 }
 
 std::vector<std::string> SBScene::getLocalAssetPaths(const std::string& type)
 {
-	LOG("DEPRECATED: Use AssetManager.getLocalAssetPaths() instead.");
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.getLocalAssetPaths() instead.");
 	return getAssetManager()->getLocalAssetPaths(type);
 }
 
 void SBScene::addAssetPath(const std::string& type, const std::string& path)
 {
-	LOG("DEPRECATED: Use AssetManager.addAssetPath() instead.");
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.addAssetPath() instead.");
 	getAssetManager()->addAssetPath(type, path);
 }
 
 void SBScene::removeAssetPath(const std::string& type, const std::string& path)
 {
-	LOG("DEPRECATED: Use AssetManager.addAssetPath() instead.");
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.addAssetPath() instead.");
 	getAssetManager()->removeAssetPath(type, path);
 }
 
 void SBScene::removeAllAssetPaths(const std::string& type)
 {
-	LOG("DEPRECATED: Use AssetManager.removeAllAssetPaths() instead.");
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.removeAllAssetPaths() instead.");
 	getAssetManager()->removeAllAssetPaths(type);
 }
 
 void SBScene::loadAssets()
 {
-	LOG("DEPRECATED: Use AssetManager.addAssetPath() instead.");
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.addAssetPath() instead.");
 	getAssetManager()->loadAssets();
 }
 
 void SBScene::loadAsset(const std::string& assetPath)
 {
-	LOG("DEPRECATED: Use AssetManager.loadAsset() instead.");
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.loadAsset() instead.");
 	getAssetManager()->loadAsset(assetPath);
 }
 
 void SBScene::loadAssetsFromPath(const std::string& assetPath)
 {
-	LOG("DEPRECATED: Use AssetManager.loadAssetsFromPath() instead.");
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.loadAssetsFromPath() instead.");
 	getAssetManager()->loadAssetsFromPath(assetPath);
 }
 
 SBSkeleton* SBScene::addSkeletonDefinition(const std::string& skelName )
 {
-	LOG("DEPRECATED: Use AssetManager.addSkeletonDefinition() instead.");
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.addSkeletonDefinition() instead.");
 	return getAssetManager()->addSkeletonDefinition(skelName);
 }
 
 SBMotion* SBScene::addMotionDefinition(const std::string& motionName, double duration )
 {
-	LOG("DEPRECATED: Use AssetManager.addMotionDefinition() instead.");
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.addMotionDefinition() instead.");
 	return getAssetManager()->addMotionDefinition(motionName, duration);
 }
 
 void SBScene::addMotions(const std::string& path, bool recursive)
 {
-	LOG("DEPRECATED: Use AssetManager.addMotion() instead.");
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.addMotion() instead.");
 	getAssetManager()->addMotions(path, recursive);
 }
 
 int SBScene::getNumSkeletons()
 {
-	LOG("DEPRECATED: Use AssetManager.getNumSkeletons() instead.");
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.getNumSkeletons() instead.");
 	return getAssetManager()->getNumSkeletons();
 }
 
 std::vector<std::string> SBScene::getSkeletonNames()
 {
-	LOG("DEPRECATED: Use AssetManager.getSkeletonNames() instead.");
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.getSkeletonNames() instead.");
 	return getAssetManager()->getSkeletonNames();
 }
 
+SBMotion* SBScene::getMotion(const std::string& name)
+{
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.getMotion() instead.");
+	return getAssetManager()->getMotion(name);
+}
+
+int SBScene::getNumMotions()
+{
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.getNumMotions() instead.");
+	return getAssetManager()->getNumMotions();
+}
+
+std::vector<std::string> SBScene::getMotionNames()
+{
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.getNumMotions() instead.");
+	return getAssetManager()->getMotionNames();
+}
+
+SBSkeleton* SBScene::createSkeleton(const std::string& skeletonDefinition)
+{
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.createSkeleton() instead.");
+	return getAssetManager()->createSkeleton(skeletonDefinition);
+}
+
+SBSkeleton* SBScene::getSkeleton(const std::string& name)
+{
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.getSkeleton() instead.");
+	return getAssetManager()->getSkeleton(name);
+}
 
 };

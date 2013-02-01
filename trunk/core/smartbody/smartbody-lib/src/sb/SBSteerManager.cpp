@@ -1,5 +1,6 @@
 #include "SBSteerManager.h"
 #include <sbm/mcontrol_util.h>
+#include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <PPRAgent.h>
@@ -88,15 +89,14 @@ void SBSteerManager::update(double time)
 
 			if (getEngineDriver()->getStartTime() == 0.0)
 			{
-				getEngineDriver()->setStartTime(mcu.time);
-				getEngineDriver()->setLastUpdateTime(mcu.time - _maxUpdateFrequency - .01);
+				getEngineDriver()->setStartTime(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+				getEngineDriver()->setLastUpdateTime(SmartBody::SBScene::getScene()->getSimulationManager()->getTime() - _maxUpdateFrequency - .01);
 			}
 
-			double timeDiff = mcu.time - getEngineDriver()->getLastUpdateTime();
+			double timeDiff = SmartBody::SBScene::getScene()->getSimulationManager()->getTime() - getEngineDriver()->getLastUpdateTime();
 			if (timeDiff >= _maxUpdateFrequency)
 			{ // limit steering to 60 fps
-				mcu.mark("SteeringUpdate",0,"Update");
-				getEngineDriver()->setLastUpdateTime(mcu.time);
+				getEngineDriver()->setLastUpdateTime(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 				for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
 					iter != mcu.getCharacterMap().end();
 					iter++)
@@ -107,10 +107,9 @@ void SBSteerManager::update(double time)
 						steerAgent->evaluate(timeDiff);
 				}
 
-				bool running = getEngineDriver()->_engine->update(false, true, (float) (mcu.time - getEngineDriver()->getStartTime()));
+				bool running = getEngineDriver()->_engine->update(false, true, (float) (SmartBody::SBScene::getScene()->getSimulationManager()->getTime() - getEngineDriver()->getStartTime()));
 				if (!running)
 					getEngineDriver()->setDone(true);
-				mcu.mark("SteeringUpdate");
 			}
 
 		}

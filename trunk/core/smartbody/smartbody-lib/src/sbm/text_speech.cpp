@@ -13,6 +13,8 @@
 #include "text_speech.h"
 #include <sb/SBScene.h>
 #include <sb/SBBoneBusManager.h>
+#include <sb/SBSpeechManager.h>
+#include <sb/SBSimulationManager.h>
 #include "sbm/BMLDefs.h"
 
 
@@ -118,7 +120,7 @@ RequestId text_speech::requestSpeechAudio( const char* agentName, std::string vo
 	srCmdSeq* sq = new srCmdSeq();
 	string s = string(callbackCmd) + *agentNamePtr + " " + myStream.str().c_str() + " SUCCESS";
 	sq->insert(0, s.c_str());
-	sq->offset((float)mcu.time);
+	sq->offset((float)SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 	mcu.activeSequences.addSequence(seqName, sq);
 
 	return (msgNumber); //returns the unique message number
@@ -257,7 +259,7 @@ void text_speech::startSchedule( SmartBody::RequestId requestId ) {
 
 	if (seq != NULL) {
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		seq->offset((float)mcu.time);
+		seq->offset((float)SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 		string seqname = "text_speech_" + myStream.str();
 		mcu.activeSequences.addSequence(seqname, seq);
 	}
@@ -266,7 +268,7 @@ void text_speech::startSchedule( SmartBody::RequestId requestId ) {
 int text_speech::text_speech_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	if (args.calc_num_tokens() == 1) {
 		int id = args.read_int();
-		mcuCBHandle::singleton().speech_text()->startSchedule(id);
+		SmartBody::SBScene::getScene()->getSpeechManager()->speech_text()->startSchedule(id);
 	} else {
 		int msgNumber = args.read_int();
 		char* agentName = args.read_token();

@@ -35,7 +35,8 @@
 #include "bml_event.hpp"
 
 #include "sbm/mcontrol_util.h"
-#include "sb/SBScene.h"
+#include <sb/SBSimulationManager.h>
+#include <sb/SBScene.h>
 
 #include "bml_xml_consts.hpp"
 #include "sbm/xercesc_utils.hpp"
@@ -117,7 +118,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	std::stringstream command;
 	SmartBody::SBSteerManager* manager = SmartBody::SBScene::getScene()->getSteerManager();
 	SmartBody::SBSteerAgent* steerAgent = manager->getSteerAgent(request->actor->getName());
-	SbmCharacter* c = mcu->getCharacter(request->actor->getName());
+	SmartBody::SBCharacter* c = SmartBody::SBScene::getScene()->getCharacter(request->actor->getName());
 	if (!steerAgent)
 	{
 		LOG("Steering Agent not attached. Check initialization");
@@ -283,7 +284,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		
 		command << "steer facing " << c->getName() << " " << facingAngleVal;
 		srCmdSeq *seq = new srCmdSeq();
-		seq->insert(float(mcu->time + mcu->time_dt), command.str().c_str());
+		seq->insert(float(SmartBody::SBScene::getScene()->getSimulationManager()->getTime() + SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt()), command.str().c_str());
 		mcu->execute_seq(seq);
 	}
 	else
@@ -291,11 +292,11 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		std::stringstream command;
 		command << "steer facing " << c->getName() << " " << "-200"; // set to fabs() > 180 to cancel old facing value
 		srCmdSeq *seq = new srCmdSeq();
-		seq->insert(float(mcu->time + mcu->time_dt), command.str().c_str());
+		seq->insert(float(SmartBody::SBScene::getScene()->getSimulationManager()->getTime() + SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt()), command.str().c_str());
 		mcu->execute_seq(seq);
 	}
 	std::string following = xml_parse_string(BMLDefs::ATTR_FOLLOW, elem);
-	SbmCharacter* followingC = mcu->getCharacter(following);
+	SmartBody::SBCharacter* followingC = SmartBody::SBScene::getScene()->getCharacter(following);
 	ppraiAgent->setTargetAgent(followingC);
 
 	// parsing target

@@ -46,6 +46,7 @@
 #include "controllers/me_controller_tree_root.hpp"
 
 #include "sbm/BMLDefs.h"
+#include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
@@ -812,11 +813,11 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	// Self reference to pass on...
 
 	VecOfBehaviorRequest::iterator behav_end = behaviors.end();
-	time_sec now = mcu->time;
+	time_sec now = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
 	this->bml_start->time = now;
 
 	if( LOG_BML_BEHAVIOR_SCHEDULE ) {
-		LOG("DEBUG: BmlRequest::realize(): time = %f", mcu->time);
+		LOG("DEBUG: BmlRequest::realize(): time = %f", SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 	}
 
 	// Find earliest BehaviorRequest start time schedule before speech
@@ -957,11 +958,11 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	if( LOG_REQUEST_REALIZE_TIME_SPAN )
 	{
 		std::stringstream strstr;
-		strstr << "DEBUG: BML::BmlRequest::realize(..): "<< actorId<<" BML \""<<msgId<<"\": time = "<<mcu->time<<"; span = "<<span.start<<" to "<<span.end;
+		strstr << "DEBUG: BML::BmlRequest::realize(..): "<< actorId<<" BML \""<<msgId<<"\": time = "<<SmartBody::SBScene::getScene()->getSimulationManager()->getTime() <<"; span = "<<span.start<<" to "<<span.end;
 		LOG(strstr.str().c_str());
 	}
-	time_sec start_time = span.isSet()? span.start : mcu->time;
-	time_sec end_time   = span.isSet()? span.end : mcu->time;
+	time_sec start_time = span.isSet()? span.start : SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
+	time_sec end_time   = span.isSet()? span.end : SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
 
 
 	//  Schedule vrAgentBML start sequence
@@ -1730,7 +1731,7 @@ void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, mcuCBHa
 		std::vector<double> weights;
 		weights.resize(state->getNumMotions());
 
-		double curTime = mcu->time;
+		double curTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
 		double startTime = startAt - startAt;
 		double strokeTime = strokeAt - startAt;
 		double relaxTime = relaxAt - startAt;
@@ -1794,7 +1795,7 @@ void MeControllerRequest::unschedule( mcuCBHandle* mcu,
 		{
 			MeCtBlend* blend = static_cast<MeCtBlend*>(unary_blend_ct);
 			srLinearCurve& blend_curve = blend->get_curve();
-			double t = mcu->time;
+			double t = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
 #if 0
 			blend_curve.clear_after( t );
 			if( duration > 0 ) {
@@ -2082,7 +2083,7 @@ void GazeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	double relaxAt  = (double)behav_syncs.sync_relax()->time();
 	double endAt    = (double)behav_syncs.sync_end()->time();
 
-	double curTime = mcu->time;
+	double curTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
 	double timeOffset = startAt - curTime;
 
 	if (gazeFadeInterval > 0.0f)
@@ -2302,7 +2303,7 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 #else
 
 	SbmCharacter* actor    = request->actor;
-	SbmCharacter* character = mcu->getCharacter(actor->getName());
+	SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(actor->getName());
 	if (character)
 		character->schedule_viseme_trapezoid( viseme.c_str(), float(startAt), weight, float(endAt - startAt), float(readyAt - startAt), float(endAt - relaxAt));
 	

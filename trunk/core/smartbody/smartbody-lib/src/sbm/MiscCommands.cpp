@@ -1,15 +1,17 @@
 #include "MiscCommands.h"
 
 #include <sbm/mcontrol_util.h>
+#include <sbm/mcontrol_callbacks.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBAssetManager.h>
-#include <sbm/me_utilities.hpp>
 #include <sb/sbm_pawn.hpp>
 #include <sb/sbm_character.hpp>
 #include <sb/SBCharacterListener.h>
+#include <sb/SBSpeechManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBMotion.h>
+#include <sb/SBSimulationManager.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_blend.hpp>
 #include <controllers/me_ct_gaze.h>
@@ -182,7 +184,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			LOG("ERROR: Expected remote voice id.");
 			return CMD_FAILURE;
 		}
-		character->set_speech_impl( mcu_p->speech_rvoice() );
+		character->set_speech_impl(SmartBody::SBScene::getScene()->getSpeechManager()->speech_rvoice() );
 		std::string s( voice_id );
 		character->set_voice_code( s );
 	} else if( _stricmp( impl_id, "local" )==0 ) {
@@ -192,8 +194,8 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			return CMD_FAILURE;
 		}
 		LOG("set local voice");
-		character->set_speech_impl( mcu_p->speech_localvoice() );
-		FestivalSpeechRelayLocal* relay = mcu_p->festivalRelay();
+		character->set_speech_impl( SmartBody::SBScene::getScene()->getSpeechManager()->speech_localvoice() );
+		FestivalSpeechRelayLocal* relay = SmartBody::SBScene::getScene()->getSpeechManager()->festivalRelay();
 		relay->setVoice(voice_id);
 		std::string s( voice_id );
 		character->set_voice_code( s );
@@ -203,7 +205,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			LOG("ERROR: Expected audiofile voice path.");
 			return CMD_FAILURE;
 		}
-		character->set_speech_impl( mcu_p->speech_audiofile() );
+		character->set_speech_impl( SmartBody::SBScene::getScene()->getSpeechManager()->speech_audiofile() );
 		std::string voice_path_str= "";
 		voice_path_str+=voice_path;
 		character->set_voice_code( voice_path_str );
@@ -213,7 +215,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			LOG("ERROR: Expected id.");
 			return CMD_FAILURE;
 		}
-		character->set_speech_impl( mcu_p->speech_text() );
+		character->set_speech_impl(SmartBody::SBScene::getScene()->getSpeechManager()->speech_text() );
 		std::string voice_path_str= "";
 		voice_path_str+=voice_path;
 		character->set_voice_code( voice_path_str );
@@ -245,7 +247,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			LOG("ERROR: Expected remote voice id.");
 			return CMD_FAILURE;
 		}
-		character->set_speech_impl_backup( mcu_p->speech_rvoice() );
+		character->set_speech_impl_backup(SmartBody::SBScene::getScene()->getSpeechManager()->speech_rvoice() );
 		std::string s( voice_id );
 		character->set_voice_code_backup( s );
 	} else if( _stricmp( impl_id, "local" )==0 ) {
@@ -255,8 +257,8 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			return CMD_FAILURE;
 		}
 		LOG("set local voice");
-		character->set_speech_impl_backup( mcu_p->speech_localvoice() );
-		FestivalSpeechRelayLocal* relay = mcu_p->festivalRelay();
+		character->set_speech_impl_backup(SmartBody::SBScene::getScene()->getSpeechManager()->speech_localvoice() );
+		FestivalSpeechRelayLocal* relay =SmartBody::SBScene::getScene()->getSpeechManager()->festivalRelay();
 		relay->setVoice(voice_id);
 		std::string s( voice_id );
 		character->set_voice_code_backup( s );
@@ -266,7 +268,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			LOG("ERROR: Expected audiofile voice path.");
 			return CMD_FAILURE;
 		}
-		character->set_speech_impl_backup( mcu_p->speech_audiofile() );
+		character->set_speech_impl_backup(SmartBody::SBScene::getScene()->getSpeechManager()->speech_audiofile() );
 		std::string voice_path_str= "";
 		voice_path_str+=voice_path;
 		character->set_voice_code_backup( voice_path_str );
@@ -276,7 +278,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 			LOG("ERROR: Expected id.");
 			return CMD_FAILURE;
 		}
-		character->set_speech_impl_backup( mcu_p->speech_text() );
+		character->set_speech_impl_backup(SmartBody::SBScene::getScene()->getSpeechManager()->speech_text() );
 		std::string voice_path_str= "";
 		voice_path_str+=voice_path;
 		character->set_voice_code_backup( voice_path_str );
@@ -450,9 +452,6 @@ int pawn_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		sbpawn->set_world_offset(loc[0],loc[1],loc[2],h,p,r);	
 		sbpawn->wo_cache_update();
 
-		if (mcu_p->sendPawnUpdates)
-			sbpawn->bonebusCharacter = SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CreateCharacter( pawn_name.c_str(), pawn_p->getClassType().c_str(), false );
-
 		if ( scene->getCharacterListener() )
 		{
 			scene->getCharacterListener()->OnCharacterCreate( pawn_name, pawn_p->getClassType().c_str() );
@@ -550,7 +549,7 @@ int character_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 	}
 
 	bool all_characters = false;
-	SbmCharacter* character = NULL;
+	SmartBody::SBCharacter* character = NULL;
 	if( char_name == "*" ) {
 
 		all_characters = true;
@@ -567,7 +566,7 @@ int character_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 			citer++)
 		{
 			srArgBuffer copy_args( args.peek_string() );
-			character = mcu_p->getCharacter( *citer );
+			character = SmartBody::SBScene::getScene()->getCharacter( *citer );
 			int err = character_parse_character_command( character, char_cmd, copy_args, true );
 			if( err != CMD_SUCCESS )
 				return( err );
@@ -575,7 +574,7 @@ int character_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		return( CMD_SUCCESS );
 	} 
 
-	character = mcu_p->getCharacter( char_name );
+	character = SmartBody::SBScene::getScene()->getCharacter( char_name );
 	if( character ) {
 
 		int err = character_parse_character_command( character, char_cmd, args, false );
@@ -711,7 +710,7 @@ int character_set_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 		return CMD_FAILURE;
 	}
 
-	SbmCharacter* character = mcu_p->getCharacter( character_id );
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter( character_id );
 	if( character==NULL ) {
 		LOG("ERROR: SbmCharacter::set_cmd_func(..): Unknown character \"%s\" to set.", character_id.c_str());
 		return CMD_FAILURE;
@@ -982,10 +981,10 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 		// ...
 		// ... FIXME!
 		// ...
-		mcu_p->mesh_paths.reset();
-		std::string path = "";
-		while ((path = mcu_p->mesh_paths.next_path()) != "")
+		std::vector<std::string> meshPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("mesh");
+		for (size_t m = 0; m < meshPaths.size(); m++)
 		{
+			std::string path = meshPaths[m];
 			boost::filesystem2::path curpath( path );
 			LOG("curpath = %s",curpath.directory_string().c_str());
 			if (!boost::filesystem2::is_directory(curpath))
@@ -1173,11 +1172,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 			//printf("prefix name = %s\n",prefixName);
 			return mcu_character_load_skinweights( character->getName().c_str(), skin_file, mcu_p, scaleFactor,prefixName);
 		} 
-		else 
-			if( cmd == "ctrl" ) {
-				return mcu_character_ctrl_cmd( character->getName().c_str(), args, mcu_p );
-			} 
-		else if( cmd == "remove" ) {
+		else if ( cmd == "remove" ) {
 				SmartBody::SBScene::getScene()->removeCharacter(character->getName());
 				return CMD_SUCCESS;
 
@@ -1455,7 +1450,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 								args.read_float_vect( curveInfo, num_remaining );											
 
 								//			schedule_viseme_blend_curve( viseme, mcu_p->time, 1.0f, curveInfo, numKeys, numKeyParams );
-								character->schedule_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams, 0.0f, 0.0f );
+								character->schedule_viseme_curve( viseme, SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), curveInfo, numKeys, numKeyParams, 0.0f, 0.0f );
 								delete [] curveInfo;
 							}
 							else if( _stricmp( next, "trap" ) == 0 )
@@ -1469,13 +1464,13 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 									ramp_in = args.read_float();
 								if( args.calc_num_tokens() > 0 )
 									ramp_out = args.read_float();
-								character->schedule_viseme_trapezoid( viseme, mcu_p->time, weight, dur, ramp_in, ramp_out );
+								character->schedule_viseme_trapezoid( viseme, SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), weight, dur, ramp_in, ramp_out );
 							}
 							else
 							{
 								float weight = (float)atof(next);
 								float rampin_duration = args.read_float();
-								character->schedule_viseme_blend_ramp( viseme, mcu_p->time, weight, rampin_duration );
+								character->schedule_viseme_blend_ramp( viseme, SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), weight, rampin_duration );
 							}
 							return CMD_SUCCESS;
 						}
@@ -1623,7 +1618,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 								LOG( "char '%s' gaze tracks:",character->getName().c_str() );
 							}
 							mcuCBHandle& mcu = mcuCBHandle::singleton();
-							double curTime = mcu.time;
+							double curTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 							MeCtScheduler2::VecOfTrack track_vec = character->gaze_sched_p->tracks();
 							int n = track_vec.size();
 							for( int i = 0; i < n; i++ )	{

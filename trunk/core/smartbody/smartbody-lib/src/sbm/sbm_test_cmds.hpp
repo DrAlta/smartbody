@@ -26,28 +26,6 @@
 #include "sr_arg_buff.h"
 #include "sbm/mcontrol_util.h"
 
-
-
-
-/**
- *  Handles the "set test ..." commands.
- */
-int sbm_set_test_func( srArgBuffer& args, mcuCBHandle *mcu );
-
-/**
- *  Handles the "print test ..." commands.
- */
-int sbm_print_test_func( srArgBuffer& args, mcuCBHandle *mcu );
-
-
-
-
-/**
- *  Handles the "test args ..." commands.
- *  Tests srArgBuffer by counting the arguments and printing them out.
- */
-int test_args_func( srArgBuffer& args, mcuCBHandle *mcu );
-
 /**
  *  Handles the "test bml ..." commands.
  *  Try "test bml help".

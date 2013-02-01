@@ -1,7 +1,7 @@
 #include "sr_path_list.h"
 #include <sstream>
 #include <boost/filesystem.hpp>
-
+#include <sb/SBScene.h>
 
 srPathList::srPathList()
 {
@@ -10,16 +10,6 @@ srPathList::srPathList()
 
 srPathList::~srPathList()
 {
-}
-
-void srPathList::setPathPrefix(const std::string& pre)
-{
-	_prefix = pre;
-}
-
-const std::string& srPathList::getPathPrefix()
-{
-	return _prefix;
 }
 		
 bool srPathList::insert(std::string path)
@@ -69,7 +59,7 @@ std::string srPathList::next_path(bool withPrefix)
 	std::stringstream strstr;
 	// if the path is an absolute path, don't prepend the media path
 	const boost::filesystem::path p = _paths[_curIndex];
-	const std::string& pathPrefix = getPathPrefix();
+	const std::string& pathPrefix = SmartBody::SBScene::getScene()->getMediaPath();
 	if (withPrefix && (pathPrefix.size() > 0 && !p.has_root_path()))
 	{
 		boost::filesystem::path mediapath(pathPrefix);

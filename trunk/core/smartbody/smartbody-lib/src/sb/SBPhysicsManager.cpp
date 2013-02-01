@@ -3,6 +3,7 @@
 #include <sb/SBPythonClass.h>
 #endif
 #include <sbm/mcontrol_util.h>
+#include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBPhysicsSim.h>
 #include <sbm/ODEPhysicsSim.h>
@@ -47,7 +48,7 @@ void SBPhysicsManager::setEnable(bool enable)
 	if (enable)
 	{
 		// ...
-		physicsTime = mcuCBHandle::singleton().time;		
+		physicsTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();		
 	}
 	else
 	{

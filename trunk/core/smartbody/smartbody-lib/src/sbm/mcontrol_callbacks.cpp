@@ -34,8 +34,8 @@
 #endif
 
 #include "mcontrol_callbacks.h"
-#include "sb/SBScene.h"
-
+#include <sb/SBSimulationManager.h>
+#include <sb/SBScene.h>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -45,6 +45,7 @@
 #include <sb/SBAssetManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBPhysicsManager.h>
+#include <sb/SBSpeechManager.h>
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
@@ -72,8 +73,6 @@
 #include <boost/filesystem/path.hpp>
 
 #include "sbm_audio.h"
-
-#include "me_utilities.hpp"
 
 #if USE_WSP
 #include "wsp.h"
@@ -226,25 +225,24 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		if( strcmp( path_tok, "seq" ) == 0 ||
 			strcmp( path_tok, "script" ) == 0)
 		{	
-			mcu_p->seq_paths.insert( path );
+			SmartBody::SBScene::getScene()->getAssetManager()->addAssetPath("script", path);
 		}
 		else if( (strcmp( path_tok, "me" ) == 0 ) ||
 			   ( strcmp( path_tok, "ME" ) == 0 ) ||
 			   ( strcmp( path_tok, "motion" ) == 0 )
 			   )
 		{
-			mcu_p->me_paths.insert( path );
+			SmartBody::SBScene::getScene()->getAssetManager()->addAssetPath("motion", path);
 		}
 		else if(strcmp( path_tok, "audio") == 0 )
 		{
 			// remove the old paths 
-			mcu_p->audio_paths = srPathList();
-			mcu_p->audio_paths.setPathPrefix(SmartBody::SBScene::getScene()->getMediaPath());
-			mcu_p->audio_paths.insert( path );
+			SmartBody::SBScene::getScene()->getAssetManager()->removeAllAssetPaths("audio");
+			SmartBody::SBScene::getScene()->getAssetManager()->addAssetPath("audio", path);
 		}
 		else if(strcmp( path_tok, "mesh") == 0 )
 		{
-			mcu_p->mesh_paths.insert( path );
+			SmartBody::SBScene::getScene()->getAssetManager()->addAssetPath("mesh", path);
 		}
 		else
 		{
@@ -329,7 +327,7 @@ int begin_sequence( char* name, mcuCBHandle* mcu_p )	{
 		srCmdSeq* copySeq = new srCmdSeq;
 		mcu_preprocess_sequence( copySeq, seq, mcu_p );
 
-		copySeq->offset( (float)( mcu_p->time ) );
+		copySeq->offset( (float)( SmartBody::SBScene::getScene()->getSimulationManager()->getTime() ) );
 		bool success = mcu_p->activeSequences.addSequence(name, copySeq );
 
 		if( !success )
@@ -585,10 +583,8 @@ double parseMotionParameters(std::string m, std::string parameter, double min, d
 	if (parameter != "")
 	{
 
-		std::map<std::string, SmartBody::SBSkeleton*>::iterator iter = mcuCBHandle::singleton().skeleton_map.find(skeletonName);
-		if (iter != mcuCBHandle::singleton().skeleton_map.end())
-			sk = iter->second;
-		else
+		sk = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skeletonName);
+		if (!sk)
 			LOG("parseMotionParameters ERR: skeleton %s not found! Parameter won't be setup properly", skeletonName.c_str());
 	}
 	int type = 0;
@@ -826,7 +822,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			std::string charString = args.read_token();
 			if (charString != "char")
 				return CMD_FAILURE;
-			SbmCharacter* character = mcu_p->getCharacter(args.read_token());
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(args.read_token());
 			if (!character)
 				return CMD_FAILURE;
 			if (!character->param_animation_ct)
@@ -955,7 +951,7 @@ int mcu_motion_player_func(srArgBuffer& args, mcuCBHandle *mcu_p )
 	if (mcu_p)
 	{
 		std::string charName = args.read_token();
-		SbmCharacter* character = mcu_p->getCharacter(charName);
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
 		if (character)
 		{
 			if (!character->motionplayer_ct)
@@ -1043,7 +1039,7 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				SbmPawn* pawn = mcu_p->getPawn(name);
 				if (!pawn)
 				{
-					pawn = mcu_p->getCharacter(name);
+					pawn = SmartBody::SBScene::getScene()->getCharacter(name);
 					if (!pawn)
 					{
 						LOG("Object %s was not found, cannot track.", name);
@@ -1286,33 +1282,33 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			return( CMD_SUCCESS );
 		}
 		else
-		if( strcmp( time_cmd, "print" ) == 0 )	{
-			if( mcu_p->timer_p )	{
-				mcu_p->timer_p->print();
+		if( strcmp( time_cmd, "print" ) == 0 )
+		{
+			{
+				SmartBody::SBScene::getScene()->getSimulationManager()->printInfo();
 			}
-			else	{
+			{
 				LOG( "TIME:%.3f ~ DT:%.3f %.2f:FPS\n",
-					mcu_p->time,
-					mcu_p->time_dt,
-					1.0 / mcu_p->time_dt
-				);
+					SmartBody::SBScene::getScene()->getSimulationManager()->getTime(),
+					SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt(),
+					1.0 / SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt()
+			);
 			}
 			return( CMD_SUCCESS );
 		}
 
-		if( mcu_p->timer_p == NULL )	{
+//		if( mcu_p->timer_p == NULL )	{
 			LOG( "mcu_time_func NOTICE: %s: TimeRegulator was NOT REGISTERED\n", time_cmd );
-			mcu_p->switch_internal_timer(); 
-		}
-		TimeRegulator *timer_p = mcu_p->timer_p;
+			SmartBody::SBScene::getScene()->getSimulationManager()->switch_internal_timer(); 
+//		}
 		
 		if( strcmp( time_cmd, "reset" ) == 0 ) {
-			timer_p->reset();
+			SmartBody::SBScene::getScene()->getSimulationManager()->reset();
 		}
 		else 
 		if( ( strcmp( time_cmd, "maxfps" ) == 0 ) || ( strcmp( time_cmd, "fps" ) == 0 ) )	{ // deprecate
 			mcu_print_timer_deprecation_warning();
-			timer_p->set_sleep_fps( args.read_float() );
+			SmartBody::SBScene::getScene()->getSimulationManager()->setSleepFps( args.read_float() );
 		}
 		else
 		if( strcmp( time_cmd, "lockdt" ) == 0 )	{ // deprecate
@@ -1320,62 +1316,62 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			int enable = true;
 			int n = args.calc_num_tokens();
 			if( n ) enable = args.read_int();
-			timer_p->set_sleep_lock( enable != false );
+			SmartBody::SBScene::getScene()->getSimulationManager()->setSleepLock();
 		}
 		else 
 		if( strcmp( time_cmd, "speed" ) == 0 ) {
-			timer_p->set_speed( args.read_float() );
+			SmartBody::SBScene::getScene()->getSimulationManager()->setSpeed( args.read_float() );
 		}
 		else 
 		if( strcmp( time_cmd, "sleepfps" ) == 0 ) {
-			timer_p->set_sleep_fps( args.read_float() );
+			SmartBody::SBScene::getScene()->getSimulationManager()->setSleepFps( args.read_float() );
 		}
 		else 
 		if( strcmp( time_cmd, "evalfps" ) == 0 ) {
-			timer_p->set_eval_fps( args.read_float() );
+			SmartBody::SBScene::getScene()->getSimulationManager()->setEvalFps( args.read_float() );
 		}
 		else
 		if( strcmp( time_cmd, "simfps" ) == 0 ) {
-			timer_p->set_sim_fps( args.read_float() );
+			SmartBody::SBScene::getScene()->getSimulationManager()->setSimFps( args.read_float() );
 		}
 		else 
 		if( strcmp( time_cmd, "sleepdt" ) == 0 ) {
-			timer_p->set_sleep_dt( args.read_float() );
+			SmartBody::SBScene::getScene()->getSimulationManager()->setSleepDt( args.read_float() );
 		}
 		else 
 		if( strcmp( time_cmd, "evaldt" ) == 0 ) {
-			timer_p->set_eval_dt( args.read_float() );
+			SmartBody::SBScene::getScene()->getSimulationManager()->setEvalDt( args.read_float() );
 		}
 		else 
 		if( strcmp( time_cmd, "simdt" ) == 0 ) {
-			timer_p->set_sim_dt( args.read_float() );
+			SmartBody::SBScene::getScene()->getSimulationManager()->setSimDt( args.read_float() );
 		}
 		else
 		if( strcmp( time_cmd, "pause" ) == 0 )	{
-			timer_p->pause();
+			SmartBody::SBScene::getScene()->getSimulationManager()->pause();
 		}
 		else 
 		if( strcmp( time_cmd, "resume" ) == 0 )	{
-			timer_p->resume();
+			SmartBody::SBScene::getScene()->getSimulationManager()->resume();
 		}
 		else 
 		if( strcmp( time_cmd, "step" ) == 0 )	{
 			int n = args.calc_num_tokens();
 			if( n ) {
-				timer_p->step( args.read_int() );
+				SmartBody::SBScene::getScene()->getSimulationManager()->step( args.read_int() );
 			}
 			else	{
-				timer_p->step( 1 );
+				SmartBody::SBScene::getScene()->getSimulationManager()->step( 1 );
 			}
 		}
 		else 
 		if( strcmp( time_cmd, "perf" ) == 0 )	{
 			int n = args.calc_num_tokens();
 			if( n ) {
-				timer_p->set_perf( args.read_float() );
+				SmartBody::SBScene::getScene()->getSimulationManager()->set_perf( args.read_float() );
 			}
 			else	{
-				timer_p->set_perf( 10.0 );
+				SmartBody::SBScene::getScene()->getSimulationManager()->set_perf( 10.0 );
 			}
 		}
 		else {
@@ -1383,6 +1379,7 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		return( CMD_SUCCESS );
 	}
+	
 	return( CMD_FAILURE );
 }
 
@@ -1417,8 +1414,9 @@ void mcu_print_profiler_help( int level = 0 )	{
 	}
 }
 
-int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
-	
+int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+/*	
 	if( mcu_p )	{
 		char *tip_cmd = args.read_token();
 
@@ -1589,23 +1587,20 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		else
 		if( strcmp( tip_cmd, "test" ) == 0 )	{
-			mcu_p->mark( "mcu_tip_func", 0, "test" );
 			int reps = args.read_int();
 			prof_p->test_clock( reps );
-			mcu_p->mark( "mcu_tip_func" );
 		}
 		else
 		if( strcmp( tip_cmd, "test2" ) == 0 )	{
-			mcu_p->mark( "mcu_tip_func", 0, "test2" );
 			int reps = args.read_int();
 			prof_p->test_clock( reps );
-			mcu_p->mark( "mcu_tip_func" );
 		}
 		else {
 			return( CMD_NOT_FOUND );
 		}
 		return( CMD_SUCCESS );
 	}
+	*/
 	return( CMD_FAILURE );
 }
 
@@ -1728,7 +1723,7 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p
 
 int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHandle *mcu_p, const char* option)
 {
-	SbmCharacter* char_p = mcu_p->getCharacter( char_name );
+	SmartBody::SBCharacter* char_p = SmartBody::SBScene::getScene()->getCharacter( char_name );
 	if( !char_p )	
 	{
 		LOG( "mcu_character_load_mesh ERR: SbmCharacter '%s' NOT FOUND\n", char_name ); 
@@ -1899,7 +1894,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 {
 	boost::char_separator<char> sep(" \n");
 
-	SbmCharacter* char_p = mcu_p->getCharacter( char_name );
+	SmartBody::SBCharacter* char_p = SmartBody::SBScene::getScene()->getCharacter( char_name );
 	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
@@ -2205,7 +2200,7 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 		}	
 		else if (ext == ".xml" || ext == ".XML")
 		{
-			SbmCharacter* sbmChar = mcu_p->getCharacter(char_name);
+			SmartBody::SBCharacter* sbmChar = SmartBody::SBScene::getScene()->getCharacter(char_name);
 			if (sbmChar && sbmChar->dMesh_p)
 			{
 				DOMNode* controllerNode = ParserOpenCOLLADA::getNode("mesh", doc);		
@@ -2269,7 +2264,7 @@ int mcu_character_init(
 		LOG( "init_character ERR: Invalid SbmCharacter name '%s'\n", char_name ); 
 		return( CMD_FAILURE );
 	}
-	 SbmCharacter* existingCharacter = mcu_p->getCharacter(char_name);
+	SmartBody::SBCharacter* existingCharacter = SmartBody::SBScene::getScene()->getCharacter(char_name);
 	if (existingCharacter)
 	{
 		LOG( "init_character ERR: SbmCharacter '%s' EXISTS\n", char_name ); 
@@ -2279,29 +2274,8 @@ int mcu_character_init(
 	//SbmCharacter *char_p = new SbmCharacter(char_name);
 	SmartBody::SBCharacter* char_p = new SmartBody::SBCharacter(char_name, className);
 	mcu_p->registerCharacter(char_p);
-	SmartBody::SBSkeleton* skeleton_p = NULL;
-	// does the skeleton already exist in the skeleton map?
-	std::map<std::string, SmartBody::SBSkeleton*>::iterator skelIter = mcu_p->skeleton_map.find(skel_file);
-	if (skelIter ==  mcu_p->skeleton_map.end())
-	{
-		SmartBody::SBSkeleton* cachedSkeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->skScale );
-		if( !cachedSkeleton ) {
-			LOG( "init_character ERR: Failed to load skeleton \"%s\"\n", skel_file ); 
-			mcu_p->unregisterCharacter(char_p);
-			delete char_p;
-
-			return CMD_FAILURE;
-		}
-		cachedSkeleton->ref();
-		mcu_p->skeleton_map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(skel_file, cachedSkeleton));
-		skelIter = mcu_p->skeleton_map.find(skel_file);
-	}
-
-	//skeleton_p = new SkSkeleton((*skelIter).second);
-	SmartBody::SBSkeleton* sbSkeleton = dynamic_cast<SmartBody::SBSkeleton*>((*skelIter).second);
-	skeleton_p = new SmartBody::SBSkeleton(sbSkeleton);
-	skeleton_p->ref();
-
+	
+	SmartBody::SBSkeleton* skeleton_p = SmartBody::SBScene::getScene()->getAssetManager()->createSkeleton(skel_file);
 	SmartBody::SBFaceDefinition* faceDefinition = NULL;
 
 	// get the face motion mapping per character
@@ -2366,119 +2340,6 @@ int mcu_character_init(
 
 	return( err );
 }
-
-
-int begin_controller( 
-	const char *char_name, 
-	const char *ctrl_name, 
-	mcuCBHandle *mcu_p
-)	{
-	
-	SbmCharacter *char_p = mcu_p->getCharacter(char_name );
-	if( char_p )	{
-		MeController *ctrl_p = mcu_p->controller_map.lookup( ctrl_name );
-		if( ctrl_p )	{
-			// Use motion schedule by default
-			MeCtScheduler2* sched_p = char_p->motion_sched_p;
-
-			if( ctrl_p->controller_type() == MeCtGaze::CONTROLLER_TYPE) {
-				sched_p = char_p->gaze_sched_p;
-			}
-
-			sched_p->schedule(
-				ctrl_p, 
-				mcu_p->time,
-				mcu_p->time + ctrl_p->controller_duration(),
-				ctrl_p->indt(), 
-				ctrl_p->outdt()
-			);
-			return( CMD_SUCCESS );
-		}
-		LOG( "begin_controller ERR: ctrl '%s' NOT FOUND\n", ctrl_name );
-		return( CMD_FAILURE );
-	}
-	LOG( "begin_controller ERR: char '%s' NOT FOUND\n", char_name );
-	return( CMD_FAILURE );
-}
-
-int begin_controller( 
-	const char *char_name, 
-	const char *ctrl_name, 
-	float ease_in, 
-	float ease_out, 
-	mcuCBHandle *mcu_p
-)	{
-	
-	SbmCharacter *char_p = mcu_p->getCharacter(char_name );
-	if( char_p )	{
-		MeController *ctrl_p = mcu_p->controller_map.lookup( ctrl_name );
-		if( ctrl_p )	{
-			//char_p->scheduler_p->schedule( 
-			char_p->motion_sched_p->schedule( // Regardless of type, controllers created via ctrl commands are treated as motions
-				ctrl_p, 
-				mcu_p->time, 
-				mcu_p->time + ctrl_p->controller_duration(),
-				ease_in, 
-				ease_out
-			);
-			return( CMD_SUCCESS );
-		}
-		LOG( "begin_controller ERR: ctrl '%s' NOT FOUND\n", ctrl_name );
-		return( CMD_FAILURE );
-	}
-	LOG( "begin_controller ERR: char '%s' NOT FOUND\n", char_name );
-	return( CMD_FAILURE );
-}
-
-
-
-/////////////////////////////////////////////////////////////
-
-
-int mcu_character_ctrl_cmd(
-	const char* char_name,
-	srArgBuffer& args,
-	mcuCBHandle *mcu_p 
-) {
-	const char *ctrl_name = args.read_token();
-	const char *ctrl_cmd = args.read_token();
-	
-	if( strcmp( ctrl_cmd, "begin" ) == 0 )	{
-		int n = args.calc_num_tokens();
-		if( n )	{
-			float ease_in = args.read_float();
-			float ease_out = args.read_float();
-			return(
-				begin_controller( 
-					char_name, 
-					ctrl_name, 
-					ease_in, 
-					ease_out, 
-					mcu_p
-				)
-			);
-		}
-		else	{
-			return(
-				begin_controller( 
-					char_name, 
-					ctrl_name, 
-					mcu_p
-				)
-			);
-		}
-	}
-	else
-	if( strcmp( ctrl_cmd, "end" ) == 0 )	{
-		
-		//// TODO
-		LOG( "ERROR: \"char <char id> ctrl <ctrl id> end ...\" Unimplemented.\n" );
-		return( CMD_FAILURE );
-	}
-	else
-		return( CMD_FAILURE );
-}
-
 
 /////////////////////////////////////////////////////////////
 
@@ -3001,7 +2862,10 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			//example:	ctrl ~doctor/motion_sched record skm(or bvh) start [max 500]
 			//			ctrl ~doctor/motion_sched record skm(or bvh) write file_prefix
 			//			ctrl ~doctor/motion_sched record skm(or bvh) stop
-			if( strcmp( ctrl_cmd, "record" ) == 0 )	{
+
+			/*
+			if( strcmp( ctrl_cmd, "record" ) == 0 )
+			{
 				char *record_type = args.read_token();
 				char *operation = args.read_token();
 				int max_num_of_frames = 0;
@@ -3048,6 +2912,7 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 					return( CMD_SUCCESS );
 				}
 			}
+			*/
 			else
 			if( strcmp( ctrl_cmd, "debugger" ) == 0 )	{
 				char *operation = args.read_token();
@@ -3292,7 +3157,7 @@ int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
             }
          }
 
-         if ( mcu_p->play_internal_audio )
+         if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
          {
             AUDIO_Play( soundFile.c_str() );			
          }
@@ -3389,7 +3254,7 @@ int mcu_stop_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
             }
          }
 #endif
-		 if ( mcu_p->play_internal_audio )
+		 if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
          {
 			AUDIO_Stop(soundFile.c_str());
 		 }
@@ -3588,25 +3453,26 @@ int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				//ideally  this parsing should be a separate method so that the message can contain gavam / kinect in any order
 				if (_stricmp( command, "gavam" ) == 0)
 				{
-					PerceptionData* data = new PerceptionData();
+					SrVec pos;
+					SrVec rot;
 
 					//parse float data
-					data->pos[0] = args.read_float();
-					data->pos[1] = args.read_float();
-					data->pos[2] = args.read_float();
-					data->rot[0] = args.read_float();
-					data->rot[1] = args.read_float();
-					data->rot[2] = args.read_float();
+					pos[0] = args.read_float();
+					pos[1] = args.read_float();
+					pos[2] = args.read_float();
+					rot[0] = args.read_float();
+					rot[1] = args.read_float();
+					rot[2] = args.read_float();
 
 					//For converting data from euler to quaternion
 
-					float cos_z_2 = cosf((float)0.5*data->rot[2]);
-					float cos_y_2 = cosf((float)0.5*data->rot[1]);
-					float cos_x_2 = cosf((float)0.5*data->rot[0]);
+					float cos_z_2 = cosf((float)0.5*rot[2]);
+					float cos_y_2 = cosf((float)0.5*rot[1]);
+					float cos_x_2 = cosf((float)0.5*rot[0]);
 
-					float sin_z_2 = sinf((float)0.5*data->rot[2]);
-					float sin_y_2 = sinf((float)0.5*data->rot[1]);
-					float sin_x_2 = sinf((float)0.5*data->rot[0]);
+					float sin_z_2 = sinf((float)0.5*rot[2]);
+					float sin_y_2 = sinf((float)0.5*rot[1]);
+					float sin_x_2 = sinf((float)0.5*rot[0]);
 
 					// and now compute quaternion
 					float quatW = cos_z_2*cos_y_2*cos_x_2 + sin_z_2*sin_y_2*sin_x_2;
@@ -3615,7 +3481,7 @@ int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					float quatZ = sin_z_2*cos_y_2*cos_x_2 - cos_z_2*sin_y_2*sin_x_2;
 
 					// Log the Gavam data
-					LOG("Gavam Coordinates - %f %f %f %f %f %f", data->pos[0], data->pos[1], data->pos[2], data->rot[0], data->rot[1], data->rot[2]);
+					LOG("Gavam Coordinates - %f %f %f %f %f %f", pos[0], pos[1], pos[2], rot[0], rot[1], rot[2]);
 					char *messg = new char[1024];
 					#ifdef WIN32
 					sprintf_s(messg, 1024, "receiver skeleton brad generic rotation skullbase %f %f %f %f", quatW, quatX, quatY, quatZ);
@@ -3684,7 +3550,7 @@ int mcu_vrBCFeedback_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		std::string cName = args.read_token();
 		std::string xml = args.read_remainder_raw();
-		SbmCharacter* character = mcu_p->getCharacter(cName);
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(cName);
 		if (character)
 		{
 			SmartBody::Nvbg* nvbg = character->getNvbg();
@@ -4003,7 +3869,7 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			return CMD_FAILURE;
 		}
 
-		SbmCharacter* character = mcu_p->getCharacter(charName);
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
 		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 		if (!motion)
 		{
@@ -4177,7 +4043,7 @@ int mcu_adjust_motion_function( srArgBuffer& args, mcuCBHandle *mcu_p )
 			LOG("mcu_adjust_motion_function ERR: motion %s not found!", motionName.c_str());
 			return CMD_FAILURE;
 		}
-		SbmCharacter* character = mcu_p->getCharacter(charName);
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
 		if (!character)
 		{
 			LOG("mcu_adjust_motion_function ERR: character %s not found!", charName.c_str());
@@ -4232,7 +4098,7 @@ int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	SmartBody::SBEvent e;
 	e.setType(eventType);
 	e.setParameters(parameters);
-	eventManager->handleEvent(&e, mcu_p->time);
+	eventManager->handleEvent(&e, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 		
 	return CMD_SUCCESS;
 }
@@ -4242,23 +4108,6 @@ int mcu_python_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 	// executes Python code
 	std::string command = args.read_remainder_raw();
 	return mcu_p->executePython(command.c_str());
-}
-
-int mcu_interp_func( srArgBuffer& args, mcuCBHandle* mcu_p )
-{
-	if (mcu_p->use_python)
-	{
-		mcu_p->use_python = false;
-		LOG("Python interpreter is now active.");
-	}
-	else
-	{
-		mcu_p->use_python = true;
-		LOG("Command interpreter is now active.");
-	}
-
-
-	return CMD_SUCCESS;
 }
 
 int mcu_pythonscript_func( srArgBuffer& args, mcuCBHandle* mcu_p )
@@ -4693,9 +4542,8 @@ int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		return CMD_SUCCESS;
 	}
 
-	SmartBody::SBSkeleton* sbskeleton = NULL;
-	std::map<std::string, SmartBody::SBSkeleton*>::iterator iter = mcu_p->skeleton_map.find(skeleton);
-	if (iter == mcu_p->skeleton_map.end())
+	SmartBody::SBSkeleton* sbskeleton = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skeleton);
+	if (!sbskeleton)
 	{
 		LOG("Cannot find skeleton named %s.", skeleton);
 		return CMD_FAILURE;
@@ -4764,7 +4612,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			}
 			if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
 			{
-				SbmCharacter* character = mcu_p->getCharacter(characterName);
+				SbmCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 				if (character)
 				{
 					SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
@@ -4831,7 +4679,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else if (command == "proximity")
 		{
 			std::string characterName = args.read_token();
-			SbmCharacter* character = mcu_p->getCharacter(characterName);
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 			if (character)
 			{
 				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
@@ -4852,7 +4700,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else if (command == "fastinitial")
 		{
 			std::string characterName = args.read_token();
-			SbmCharacter* character = mcu_p->getCharacter(characterName);
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 			if (character)
 			{
 				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
@@ -4869,7 +4717,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else if (command == "speed")
 		{
 			std::string characterName = args.read_token();
-			SbmCharacter* character = mcu_p->getCharacter(characterName);
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 			if (character)
 			{
 				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
@@ -4885,7 +4733,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else if (command == "stateprefix")
 		{
 			std::string characterName = args.read_token();
-			SbmCharacter* character = mcu_p->getCharacter(characterName);
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 			if (character)
 			{
 				character->statePrefix = args.read_token();
@@ -4897,7 +4745,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else if (command == "type")
 		{
 			std::string characterName = args.read_token();
-			SbmCharacter* character = mcu_p->getCharacter(characterName);
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 			if (character)
 			{
 				std::string type = args.read_token();
@@ -4957,7 +4805,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else if (command == "facing")
 		{
 			std::string characterName = args.read_token();
-			SbmCharacter* character = mcu_p->getCharacter(characterName);
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 			if (character)
 			{
 				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
@@ -4970,7 +4818,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else if (command == "braking")
 		{
 			std::string characterName = args.read_token();
-			SbmCharacter* character = mcu_p->getCharacter(characterName);
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 			if (character)
 			{
 				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
@@ -4987,7 +4835,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else if (command == "test")
 		{
 			std::string characterName = args.read_token();
-			SbmCharacter* character = mcu_p->getCharacter(characterName);
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 			if (character)
 			{
 				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
@@ -5076,32 +4924,6 @@ int syncpoint_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	return CMD_SUCCESS;
-}
-
-int pawnbonebus_func( srArgBuffer& args, mcuCBHandle *mcu_p )
-{
-		std::string next = args.read_token();
-		if (next == "")
-		{
-			LOG("Pawn bonebus is %s", mcu_p->sendPawnUpdates? "on" : "off");
-			return CMD_SUCCESS;
-		}
-
-		if (next == "on")
-		{
-			mcu_p->sendPawnUpdates = true;
-			return CMD_SUCCESS;
-		}
-		else if (next == "off")
-		{
-			mcu_p->sendPawnUpdates = false;
-			return CMD_SUCCESS;
-		}
-		else
-		{
-			LOG("Usage: pawnbonebus <on|off>");
-			return CMD_FAILURE;
-		}
 }
 
 #ifdef USE_GOOGLE_PROFILER
@@ -5306,7 +5128,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 
 int mcu_character_breathing( const char* name, srArgBuffer& args, mcuCBHandle *mcu_p) //Celso: Summer 2008
 {
-	SbmCharacter* char_p = mcu_p->getCharacter( name );
+	SmartBody::SBCharacter* char_p = SmartBody::SBScene::getScene()->getCharacter( name );
 	if( !char_p )	
 	{
 		LOG( "mcu_character_breathing ERR: Character '%s' NOT FOUND\n", name ); 
@@ -5521,7 +5343,7 @@ int mcu_vrExpress_func( srArgBuffer& args, mcuCBHandle *mcu )
 	std::string xml = args.read_remainder_raw();
 
 	// get the NVBG process for the character, if available
-	SbmCharacter* character = mcu->getCharacter(actor);
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(actor);
 	if (!character)
 		return CMD_SUCCESS;
 
@@ -5650,7 +5472,7 @@ void mcu_vhmsg_callback( const char *op, const char *args, void * user_data )
 int mcuFestivalRemoteSpeechCmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 {
 	//FestivalSpeechRelayLocal* speechRelay = mcu_p->festivalRelay();
-	SpeechRelayLocal* speechRelay = mcu_p->cereprocRelay();
+	SpeechRelayLocal* speechRelay = SmartBody::SBScene::getScene()->getSpeechManager()->cereprocRelay();
 	const char* message = args.read_remainder_raw();
 	speechRelay->processSpeechMessage(message);
 	//processSpeechMessage(
@@ -5977,10 +5799,7 @@ int skscale_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		double value = args.read_double();
 
-		if (mcu_p)
-		{
-			mcu_p->skScale = value;
-		}
+		SmartBody::SBScene::getScene()->getAssetManager()->setGlobalSkeletonScale(value);
 		return CMD_SUCCESS;
 	}
 
@@ -6000,10 +5819,7 @@ int skmscale_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		double value = args.read_double();
 
-		if (mcu_p)
-		{
-			mcu_p->skmScale = value;
-		}
+		SmartBody::SBScene::getScene()->getAssetManager()->setGlobalMotionScale(value);
 		return CMD_SUCCESS;
 	}
 
@@ -6020,7 +5836,7 @@ int mcu_reset_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 {
 	std::stringstream timeStr;
-	timeStr << mcu_p->time;
+	timeStr << SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 	std::string echoStr = args.read_remainder_raw();
 	int pos = echoStr.find("$time");
 	if (pos != std::string::npos)
@@ -6036,8 +5852,8 @@ int sb_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
    if ( strcmp( token, "id" ) == 0 )
    {  // Process specific
       token = args.read_token(); // Process id
-      const char * process_id = mcu_p->process_id.c_str();
-      if( ( mcu_p->process_id == "" )         // If process id unassigned
+	  const char * process_id = SmartBody::SBScene::getScene()->getProcessId().c_str();
+      if( ( SmartBody::SBScene::getScene()->getProcessId() == "" )         // If process id unassigned
          || strcmp( token, process_id ) !=0 ) // or doesn't match
          return CMD_SUCCESS;                  // Ignore.
       token = args.read_token(); // Sub-command
@@ -6072,8 +5888,8 @@ int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
    if ( strcmp( token, "id" ) == 0 )
    {  // Process specific
       token = args.read_token(); // Process id
-      const char * process_id = mcu_p->process_id.c_str();
-      if( ( mcu_p->process_id == "" )         // If process id unassigned
+      const char * process_id = SmartBody::SBScene::getScene()->getProcessId().c_str();
+      if( ( SmartBody::SBScene::getScene()->getProcessId() == "" )         // If process id unassigned
          || strcmp( token, process_id ) !=0 ) // or doesn't match
          return CMD_SUCCESS;                  // Ignore.
       token = args.read_token(); // Sub-command
@@ -6113,16 +5929,17 @@ int xmlcachedir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int xmlcache_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
+	/*
 	std::string token = args.read_token();
 	if (token == "on")
 	{
-		mcu_p->useXmlCache = true;
+		SmartBody::SBScene::getScene()->setBoolAttribute("useXMLCache", true);
 		LOG("XML caching is now on");
 		return CMD_SUCCESS;
 	}
 	else if (token == "off")
 	{
-		mcu_p->useXmlCache = false;
+		SmartBody::SBScene::getScene()->setBoolAttribute("useXMLCache", false);
 		LOG("XML caching is now off");
 		return CMD_SUCCESS;
 	}
@@ -6131,19 +5948,20 @@ int xmlcache_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		std::string token = args.read_token();
 		if (token == "on")
 		{
-			mcu_p->useXmlCacheAuto = true;
+			SmartBody::SBScene::getScene()->setBoolAttribute("useXMLCacheAuto", true);
 			LOG("XML automatic caching is now on");
 			return CMD_SUCCESS;
 		}
 		else if (token == "off")
 		{
-			mcu_p->useXmlCacheAuto = false;
+			SmartBody::SBScene::getScene()->setBoolAttribute("useXMLCacheAuto", false);
 			LOG("XML automatic caching is now off");
 			return CMD_SUCCESS;
 		}
 		else
 		{
-			LOG("XML automatic caching is %s", mcu_p->useXmlCacheAuto? "on" : "off");
+			bool val = SmartBody::SBScene::getScene()->getBoolAttribute("useXMLCacheAuto");
+			LOG("XML automatic caching is %s", val? "on" : "off");
 			return CMD_SUCCESS;
 		}
 	}
@@ -6170,4 +5988,6 @@ int xmlcache_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		return CMD_SUCCESS;
 	}
+	*/
+	return CMD_FAILURE;
 }

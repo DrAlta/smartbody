@@ -212,7 +212,6 @@ void Smartbody_dll::InitLocalSpeechRelay()
 {
 #if 1 //defined(__ANDROID__)
    mcuCBHandle & mcu = mcuCBHandle::singleton();
-   //mcu.play_internal_audio = true;
    //AUDIO_Init();
 #if defined(__ANDROID__)
    std::string festivalLibDir = "/sdcard/SBUnity/festival/lib/";

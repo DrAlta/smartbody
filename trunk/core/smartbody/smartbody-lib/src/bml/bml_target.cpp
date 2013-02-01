@@ -28,6 +28,7 @@
 
 #include "bml_target.hpp"
 #include "sbm/BMLDefs.h"
+#include <sb/SBScene.h>
 
 
 #define DEBUG_BML_TARGET				(0)
@@ -67,7 +68,7 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 			string::size_type colon_index = object_id.find( ':' );
 			if( colon_index == string::npos ) {
 				// Missing ':' object/bone delimiter, so guess...
-				target = mcu->getCharacter( object_id );
+				target = SmartBody::SBScene::getScene()->getCharacter( object_id );
 				if( target ) {
 					// Target is a character, look at eyeball
 					bone_id = "eyeball_left";
@@ -130,7 +131,7 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 			// Look up the joint
 			const SkJoint* joint = target->get_joint( bone_id.c_str() );
 			if( joint == NULL ) {				
-				if (mcu->getCharacter( object_id )) // target is a character but does not have eye joint
+				if (SmartBody::SBScene::getScene()->getCharacter( object_id )) // target is a character but does not have eye joint
 				{
 					return target->get_world_offset_joint();
 				}

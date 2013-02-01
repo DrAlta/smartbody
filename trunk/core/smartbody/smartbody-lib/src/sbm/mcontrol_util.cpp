@@ -55,7 +55,6 @@
 
 #include "sbm_audio.h"
 #include "sb/SBScene.h"
-#include "me_utilities.hpp"
 #include <sbm/mcontrol_callbacks.h>
 #include <sbm/sbm_test_cmds.hpp>
 
@@ -274,38 +273,17 @@ int SequenceManager::getNumSequences()
 mcuCBHandle::mcuCBHandle()
 :	loop( true ),
 	vhmsg_enabled( false ),	
-	internal_timer_p( NULL ),
-	external_timer_p( NULL ),
-	timer_p( NULL ),
-	time( 0.0 ),
-	time_dt( 0.0 ),	
-	internal_profiler_p( NULL ),
-	external_profiler_p( NULL ),
-	profiler_p( NULL ),
-	net_bone_updates( false ),
 	net_world_offset_updates( true ),
-	play_internal_audio( false ),
 	resourceDataChanged( false ),
-	perceptionData( new PerceptionData() ),
-	skScale( 1.0 ),
-	skmScale( 1.0 ),
 	viewer_p( NULL ),
 	ogreViewer_p( NULL ),
 	camera_p( NULL ),
 	root_group_p( new SrSnGroup() ),
 	height_field_p( NULL ),
-	test_character_default( "" ),
-	test_recipient_default( "ALL" ),
 	queued_cmds( 0 ),
-	updatePhysics( false ),
 	viewer_factory ( new SrViewerFactory() ),
 	ogreViewerFactory ( new SrViewerFactory() ),
-	snapshot_counter( 1 ),
-	use_python( true ),
-	sendPawnUpdates(false),
 	logListener(NULL),
-	useXmlCache(false),
-	useXmlCacheAuto(false),
 	initPythonLibPath("")
 {	
 	testBMLId = 0;
@@ -328,12 +306,7 @@ mcuCBHandle::~mcuCBHandle() {
 	clear();
 
 	// clean up factories and time profiler which are set externally
-	internal_profiler_p = NULL;
-	external_profiler_p = NULL;
-	profiler_p = NULL;
-	internal_timer_p = NULL;
-	external_timer_p = NULL;
-	timer_p = NULL;
+
 	viewer_factory = NULL;
 	ogreViewerFactory = NULL;
 
@@ -400,22 +373,10 @@ void mcuCBHandle::reset( void )
 	vhmsg_enabled = false;
 	net_bone_updates = false;
 	net_world_offset_updates = true;
-	play_internal_audio = false;
 	resourceDataChanged = false;
-	perceptionData = new PerceptionData();
-	skmScale = 1.0;
-	skScale = 1.0;
 	root_group_p = new SrSnGroup();
-	test_character_default = "";
-	test_recipient_default = "ALL";
 	queued_cmds = 0;
-	updatePhysics = false;
-	snapshot_counter = 1;
-	use_python = true;
-	sendPawnUpdates = false;
 	logListener = NULL;
-	useXmlCache = false;
-	useXmlCacheAuto = false;
 	testBMLId = 0;
 	registerCallbacks();
 	root_group_p->ref();
@@ -486,7 +447,6 @@ void mcuCBHandle::registerCallbacks()
 	insert( "pythonscript",		   mcu_pythonscript_func);
 	insert( "python",			   mcu_python_func);
 	insert( "p",				   mcu_python_func);
-	insert( "interp",		       mcu_interp_func);
 	insert( "adjustmotion",		   mcu_adjust_motion_function);
 	insert( "mediapath",		   mcu_mediapath_func);
 	insert( "bml",				   test_bml_func );
@@ -506,7 +466,6 @@ void mcuCBHandle::registerCallbacks()
 	insert( "pawns",			   showpawns_func );
 	insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 	insert( "syncpoint",		   syncpoint_func);
-	insert( "pawnbonebus",		   pawnbonebus_func);
 	insert( "vhmsgconnect",		   mcu_vhmsg_connect_func);
 	insert( "vhmsgdisconnect",	   mcu_vhmsg_disconnect_func);
     insert( "resetanimation",	   resetanim_func);
@@ -530,13 +489,10 @@ void mcuCBHandle::registerCallbacks()
 	insert_set_cmd( "character",      character_set_cmd_func );
 	insert_set_cmd( "char",           character_set_cmd_func );
 	insert_set_cmd( "face",           mcu_set_face_func );
-	insert_set_cmd( "test",           sbm_set_test_func );
-
+	
 	insert_print_cmd( "bp",           BML_PROCESSOR::print_func );
 	insert_print_cmd( "face",         mcu_print_face_func );
-	insert_print_cmd( "test",         sbm_print_test_func );
-
-	insert_test_cmd( "args", test_args_func );
+	
 	insert_test_cmd( "bml",  test_bml_func );
 	insert_test_cmd( "fml",  test_fml_func );
 	insert_test_cmd( "rhet", remote_speech_test);
@@ -563,58 +519,7 @@ void mcuCBHandle::registerCallbacks()
 }
 
 
- FILE* mcuCBHandle::open_sequence_file( const char *seq_name, std::string& fullPath ) {
-
-	FILE* file_p = NULL;
-
-	char buffer[ MAX_FILENAME_LEN ];
-	char label[ MAX_FILENAME_LEN ];	
-	// add the .seq extension if necessary
-	std::string candidateSeqName = seq_name;
-	if (candidateSeqName.find(".seq") == std::string::npos)
-	{
-		candidateSeqName.append(".seq");
-	}
-	sprintf( label, "%s", candidateSeqName.c_str());
-	// current path containing .exe
-	char CurrentPath[_MAX_PATH];
-	_getcwd(CurrentPath, _MAX_PATH);
-
-	seq_paths.reset();
-	std::string filename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
-	//filename = mcn_return_full_filename_func( CurrentPath, filename );
-	//LOG("seq name = %s, filename = %s\n",seq_name,filename.c_str());
-	
-	while(filename.size() > 0)	{
-		file_p = fopen( filename.c_str(), "r" );
-		if( file_p != NULL ) {
-	
-			fullPath = filename;			
-			break;
-		}
-		filename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
-		//filename = mcn_return_full_filename_func( CurrentPath, filename );
-	}
-	if( file_p == NULL ) {
-		// Could not find the file as named.  Perhap it excludes the extension	
-		sprintf( label, "%s.seq", seq_name );
-		seq_paths.reset();
-		filename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
-		//filename = mcn_return_full_filename_func( CurrentPath, filename );
-		while( filename.size() > 0 )	{
-			if( ( file_p = fopen( filename.c_str(), "r" ) ) != NULL ) {
-				
-				fullPath = filename;
-				break;
-			}
-			filename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
-			//filename = mcn_return_full_filename_func( CurrentPath, filename );
-		}
-	}
-
-	// return empty string if file not found
-	return file_p;
-}
+ 
 
 /**
  *  Clears the contents of the mcuCBHandle.
@@ -629,12 +534,6 @@ void mcuCBHandle::clear( void )
 		logListener = NULL;
 	}
 	
-	if (perceptionData)
-	{
-		delete perceptionData;
-		perceptionData = NULL;
-	}
-
 	if (kinectProcessor)
 	{
 		delete kinectProcessor;
@@ -807,317 +706,6 @@ int mcuCBHandle::remove_scene( SrSnGroup *scene_p )	{
 	}
 	return( CMD_FAILURE );
 }
-void mcuCBHandle::update( void )	
-{
-	// remote mode
-	if (SmartBody::SBScene::getScene()->isRemoteMode())
-	{
-		SmartBody::SBScene::getScene()->getDebuggerClient()->Update();
-		std::map<std::string, SbmPawn*>::iterator iter;
-		for (iter = getPawnMap().begin();
-			iter != getPawnMap().end();
-			iter++)
-		{
-			SbmPawn* pawn = (*iter).second;
-			pawn->ct_tree_p->evaluate(time);
-			pawn->ct_tree_p->applySkeletonToBuffer();
-		}
-
-		return;
-	}
-
-	// scripts
-	std::map<std::string, SmartBody::SBScript*>& scripts = SmartBody::SBScene::getScene()->getScripts();
-	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
-		iter != scripts.end();
-		iter++)
-	{
-		if ((*iter).second->isEnable())
-			(*iter).second->beforeUpdate(this->time);
-	}
-
-	// services
-	std::map<std::string, SmartBody::SBService*>& services = SmartBody::SBScene::getScene()->getServiceManager()->getServices();
-	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
-		iter != services.end();
-		iter++)
-	{
-		if ((*iter).second->isEnable())
-			(*iter).second->beforeUpdate(this->time);
-	}
-
-// 	if (physicsEngine && physicsEngine->getBoolAttribute("enable"))
-// 	{		
-// 		float dt = (float)physicsEngine->getDoubleAttribute("dT");//timeStep*0.03f;
-// 		//elapseTime += time_dt;
-// 		while (physicsTime < this->time)		
-// 		//if (physicsTime < this->time)
-// 		{
-// 			//printf("elapse time = %f\n",elapseTime);
-// 			physicsEngine->updateSimulation(dt);
-// 			physicsTime += dt;
-// 			//curDt -= dt;
-// 		}		
-// 	}
-// 	else
-// 	{
-// 		physicsTime = this->time;
-// 	}
-
-	std::string seqName = "";
-	std::vector<std::string> sequencesToDelete;
-	for (int s = 0; s < activeSequences.getNumSequences(); s++)
-	{
-		srCmdSeq* seq = activeSequences.getSequence(s, seqName);
-		char *cmd;
-		while( cmd = seq->pop( (float)time ) )
-		{
-			int err = execute( cmd );
-			if( err != CMD_SUCCESS )	{
-				LOG( "mcuCBHandle::update ERR: execute FAILED: '%s'\n", cmd );
-			}
-			else
-			{
-				// we assume that every command execution could potentially change the resource data
-				// therefore the data changed flag is set.
-				// This is kind of rough, but should work fine.
-				resourceDataChanged = true; 
-			}
-			delete [] cmd;
-		}
-		if( seq->get_count() < 1 )
-		{
-			sequencesToDelete.push_back(seqName);
-		}
-	}
-
-	for (size_t d = 0; d < sequencesToDelete.size(); d++)
-	{
-		activeSequences.removeSequence(sequencesToDelete[d], true);
-	}
-
-	bool isClosingBoneBus = false;
-    std::map<std::string, SbmPawn*>::iterator iter;
-	for (iter = getPawnMap().begin();
-		iter != getPawnMap().end();
-		iter++)
-	{
-		SbmPawn* pawn = (*iter).second;
-		pawn->reset_all_channels();
-		pawn->ct_tree_p->evaluate( time );
-		pawn->ct_tree_p->applyBufferToAllSkeletons();
-
-// 		if (pawn->hasPhysicsSim() && SBPhysicsSim::getPhysicsEngine()->getBoolAttribute("enable"))
-// 		{
-// 			//pawn->updateFromColObject();
-// 		}
-// 		else
-		{			
-			//pawn->updateToColObject();
-			pawn->updateToSteeringSpaceObject();
-		}
-		SbmCharacter* char_p = getCharacter(pawn->getName().c_str() );
-		if (!char_p)
-		{
-			if (SmartBody::SBScene::getScene()->getBoneBusManager()->isEnable())
-			{
-				if (!isClosingBoneBus && !pawn->bonebusCharacter && SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().IsOpen() && sendPawnUpdates)
-				{
-					// bonebus was connected after character creation, create it now
-					pawn->bonebusCharacter = SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CreateCharacter( pawn->getName().c_str(), pawn->getClassType().c_str() , false );
-				}
-				if (sendPawnUpdates)
-					NetworkSendSkeleton( pawn->bonebusCharacter, pawn->getSkeleton(), &param_map );
-				if (pawn->bonebusCharacter && pawn->bonebusCharacter->GetNumErrors() > 3)
-				{
-					// connection is bad, remove the bonebus character 
-					LOG("BoneBus cannot connect to server. Removing pawn %s", pawn->getName().c_str());
-					bool success = SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
-					char_p->bonebusCharacter = NULL;
-					isClosingBoneBus = true;
-					if (SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().GetNumCharacters() == 0)
-					{
-						SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CloseConnection();
-					}
-				}
-			}
-		}
-		if( char_p ) {
-
-			// run the minibrain, if available
-			SmartBody::MiniBrain* brain = char_p->getMiniBrain();
-			if (brain)
-			{
-				SmartBody::SBCharacter* sbchar = dynamic_cast<SmartBody::SBCharacter*>(char_p);
-				brain->update(sbchar, time, time_dt);
-			}
-
-			// scene update moved to renderer
-			//if (char_p->scene_p)
-			//	char_p->scene_p->update();
-			//char_p->dMesh_p->update();
-			//char_p->updateJointPhyObjs();
-			/*
-			bool hasPhySim = physicsEngine->getBoolAttribute("enable");
-			char_p->updateJointPhyObjs(hasPhySim);
-			//char_p->updateJointPhyObjs(false);
-			*/
-			char_p->_skeleton->update_global_matrices();
-
-			char_p->forward_visemes( time );	
-			char_p->forward_parameters( time );	
-
-			if (char_p->bonebusCharacter && char_p->bonebusCharacter->GetNumErrors() > 3)
-			{
-				// connection is bad, remove the bonebus character
-				isClosingBoneBus = true;
-				LOG("BoneBus cannot connect to server after visemes sent. Removing all characters.");
-			}
-
-			
-
-			if ( SmartBody::SBScene::getScene()->getBoneBusManager()->isEnable() && char_p->getSkeleton() && char_p->bonebusCharacter ) {
-				NetworkSendSkeleton( char_p->bonebusCharacter, (SkSkeleton *)(char_p->getSkeleton()), &param_map );
-
-				if ( net_world_offset_updates ) {
-
-					const SkJoint * joint = char_p->get_world_offset_joint();
-
-					const SkJointPos * pos = joint->const_pos();
-					float x = pos->value( SkJointPos::X );
-					float y = pos->value( SkJointPos::Y );
-					float z = pos->value( SkJointPos::Z );
-
-					SkJoint::RotType rot_type = joint->rot_type();
-					if ( rot_type != SkJoint::TypeQuat ) {
-						//strstr << "ERROR: Unsupported world_offset rotation type: " << rot_type << " (Expected TypeQuat, "<<SkJoint::TypeQuat<<")"<<endl;
-					}
-
-					// const_cast because the SrQuat does validation (no const version of value())
-					const SrQuat & q = ((SkJoint *)joint)->quat()->value();
-
-					char_p->bonebusCharacter->SetPosition( x, y, z, time );
-					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.x, (float)q.y, (float)q.z, time );
-
-					if (char_p->bonebusCharacter->GetNumErrors() > 3)
-					{
-						// connection is bad, remove the bonebus character 
-						isClosingBoneBus = true;
-						LOG("BoneBus cannot connect to server. Removing all characters");
-					}
-				}
-			}
-			else if (!isClosingBoneBus && !char_p->bonebusCharacter && SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().IsOpen())
-			{
-				// bonebus was connected after character creation, create it now
-				char_p->bonebusCharacter = SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CreateCharacter( char_p->getName().c_str(), char_p->getClassType().c_str(), true );
-			}
-		}  // end of char_p processing
-	} // end of loop
-
-	if (isClosingBoneBus)
-	{
-		for (std::map<std::string, SbmPawn*>::iterator iter = getPawnMap().begin();
-			iter != getPawnMap().end();
-			iter++)
-		{
-			SbmPawn* pawn = (*iter).second;
-			if (pawn->bonebusCharacter)
-			{
-				bool success = SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
-				pawn->bonebusCharacter = NULL;
-			}
-		}
-
-		SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CloseConnection();
-	}
-
-	for (std::map<std::string, SbmPawn*>::iterator iter = getPawnMap().begin();
-			iter != getPawnMap().end();
-		iter++)
-	{
-		SbmPawn* pawn = (*iter).second;
-		pawn->afterUpdate(time);
-	}
-
-	
-	if (viewer_p && viewer_p->get_camera())
-	{
-		SrMat m;
-		SrQuat quat = SrQuat(viewer_p->get_camera()->get_view_mat(m).get_rotation());
-
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.x = viewer_p->get_camera()->getEye().x;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.y = viewer_p->get_camera()->getEye().y;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.z = viewer_p->get_camera()->getEye().z;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraLookAt.x = viewer_p->get_camera()->getCenter().x;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraLookAt.y = viewer_p->get_camera()->getCenter().y;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraLookAt.z = viewer_p->get_camera()->getCenter().z;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.x = quat.x;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.y = quat.y;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.z = quat.z;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.w = quat.w;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraFovY   = sr_todeg(viewer_p->get_camera()->getFov());
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraAspect = viewer_p->get_camera()->getAspectRatio();
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZNear  = viewer_p->get_camera()->getNearPlane();
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZFar   = viewer_p->get_camera()->getFarPlane();
-	}
-	
-	/*
-	else
-	{
-		SrCamera defaultCam;
-		SrMat m;
-		SrQuat quat = SrQuat(defaultCam.get_view_mat(m).get_rotation());
-
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.x = defaultCam.eye.x;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.y = defaultCam.eye.y;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.z = defaultCam.eye.z;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.x = quat.x;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.y = quat.y;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.z = quat.z;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.w = quat.w;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraFovY   = sr_todeg(defaultCam.fovy);
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraAspect = defaultCam.aspect;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZNear  = defaultCam.znear;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZFar   = defaultCam.zfar;
-	}
-	*/
-
-	if (!SmartBody::SBScene::getScene()->isRemoteMode())
-		SmartBody::SBScene::getScene()->getDebuggerServer()->Update();
-
-	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
-		iter != scripts.end();
-		iter++)
-	{
-		(*iter).second->update(time);
-	}
-
-	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
-		iter != services.end();
-		iter++)
-	{
-		(*iter).second->update(time);
-	}
-
-	// scripts
-	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
-		iter != scripts.end();
-		iter++)
-	{
-		if ((*iter).second->isEnable())
-			(*iter).second->afterUpdate(this->time);
-	}
-
-	// services
-	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
-		iter != services.end();
-		iter++)
-	{
-		if ((*iter).second->isEnable())
-			(*iter).second->afterUpdate(this->time);
-	}
-}
 
 srCmdSeq* mcuCBHandle::lookup_seq( const char* name ) {
 	int err = CMD_FAILURE;
@@ -1135,7 +723,7 @@ srCmdSeq* mcuCBHandle::lookup_seq( const char* name ) {
 	{
 		// Sequence not found.  Load new instance from file.
 		std::string fullPath;
-		FILE* file = open_sequence_file( name, fullPath );
+		FILE* file = SmartBody::SBScene::getScene()->getAssetManager()->open_sequence_file( name, fullPath );
 		if( file ) {
 			seq = new srCmdSeq();
 			err = seq->read_file( file );
@@ -1186,7 +774,7 @@ int mcuCBHandle::execute_seq_chain( const vector<string>& seq_names, const char*
 
 	const string& first_seq_name = *it;  // convenience reference
 	std::string fullPath;
-	FILE* first_file_p = open_sequence_file( first_seq_name.c_str(), fullPath );
+	FILE* first_file_p = SmartBody::SBScene::getScene()->getAssetManager()->open_sequence_file( first_seq_name.c_str(), fullPath );
 	if( first_file_p == NULL ) {
 		if( error_prefix )
 			LOG("%s Cannot find sequence \"%s\". Aborting seq-chain.", error_prefix, first_seq_name.c_str());
@@ -1212,7 +800,7 @@ int mcuCBHandle::execute_seq_chain( const vector<string>& seq_names, const char*
 		const string& next_seq = *it;  // convenience reference
 
 		std::string fullPath;
-		FILE* file = open_sequence_file( next_seq.c_str(), fullPath );
+		FILE* file = SmartBody::SBScene::getScene()->getAssetManager()->open_sequence_file( next_seq.c_str(), fullPath );
 		if( file == NULL ) {
 			if( error_prefix )
 				LOG("%s Cannot find sequence \"%s\". Aborting seq-chain.", error_prefix, next_seq.c_str() );
@@ -1255,7 +843,7 @@ int mcuCBHandle::execute_seq_chain( const vector<string>& seq_names, const char*
 
 int mcuCBHandle::execute_later( const char* command, float seconds ) {
 	srCmdSeq *temp_seq = new srCmdSeq();
-	temp_seq->insert( (float)time+seconds, command );
+	temp_seq->insert( (float)SmartBody::SBScene::getScene()->getSimulationManager()->getTime()+seconds, command );
 
 	ostringstream seqName;
 	seqName << "execute_later-" << (++queued_cmds);
@@ -1298,11 +886,6 @@ void mcuCBHandle::set_net_host( const char * net_host )
 	SmartBody::SBScene::getScene()->getBoneBusManager()->setHost(net_host);
 	SmartBody::SBScene::getScene()->getBoneBusManager()->setEnable(true);
 	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().UpdateAllCharacters();
-}
-
-void mcuCBHandle::set_process_id( const char * process_id )
-{
-	this->process_id = process_id;
 }
 
 int mcuCBHandle::vhmsg_send( const char *op, const char* message ) {
@@ -1375,33 +958,18 @@ int mcuCBHandle::vhmsg_send( const char* message ) {
 	return( CMD_SUCCESS );
 }
 
-
-int mcuCBHandle::load_skeletons( const char* pathname, bool recursive ) {
-	return load_me_skeletons( pathname, skeleton_map, recursive, skScale );
-}
-
-int mcuCBHandle::load_skeleton( const void* data, int sizeBytes, const char* skeletonName )
-{
-	SrInput input( (char *)data, sizeBytes );
-	return load_me_skeleton_individual( input, skeletonName, skeleton_map, skScale );
-}
-
 int mcuCBHandle::map_skeleton( const char * mapName, const char * skeletonName )
 {
 	// ED - taken from skeletonmap_func()
 
-	SmartBody::SBSkeleton* sbskeleton = NULL;
-	std::map<std::string, SmartBody::SBSkeleton*>::iterator iter = skeleton_map.find(skeletonName);
-	if (iter == skeleton_map.end())
+	SmartBody::SBSkeleton* sbskeleton = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skeletonName);
+
+	if (!sbskeleton)
 	{
 		LOG("Cannot find skeleton named %s.", skeletonName);
 		return CMD_FAILURE;
 	}
-	else
-	{
-		sbskeleton = dynamic_cast<SmartBody::SBSkeleton*>((*iter).second);
-	}
-
+	
 	// find the bone map name
 	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(mapName);
 	if (!jointMap)
@@ -1473,7 +1041,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 
 		const SrQuat& q = j->quat()->value();
 
-		character->AddBoneRotation( j->extName().c_str(), q.w, q.x, q.y, q.z, time );
+		character->AddBoneRotation( j->extName().c_str(), q.w, q.x, q.y, q.z, SmartBody::SBScene::getScene()->getSimulationManager()->getTime() );
 
 		//printf( "%s %f %f %f %f\n", (const char *)j->name(), q.w, q.x, q.y, q.z );
 	}
@@ -1502,7 +1070,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 		//these coordinates are meant to mimic the setpositionbyname coordinates you give to move the character
 		//so if you wanted to move a joint on the face in the x direction you'd do whatever you did to move the actor
 		//itself further in the x position.
-		character->AddBonePosition( j->extName().c_str(), posx, posy, posz, time );
+		character->AddBonePosition( j->extName().c_str(), posx, posy, posz, SmartBody::SBScene::getScene()->getSimulationManager()->getTime() );
 	}
 
 	character->EndSendBonePositions();
@@ -1513,7 +1081,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 		for (size_t i = 0; i < otherJoints.size(); i++)
 		{
 			SkJoint* joint = joints[otherJoints[i]];
-			character->AddGeneralParameters(i, 1, joint->pos()->value( 0 ), i, time);
+			character->AddGeneralParameters(i, 1, joint->pos()->value( 0 ), i, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 
 		}
 		character->EndSendGeneralParameters();
@@ -1570,39 +1138,26 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 int mcuCBHandle::executePythonFile(const char* filename)
 {
 #ifndef SB_NO_PYTHON
-	char buffer[ MAX_FILENAME_LEN ];
-	char label[ MAX_FILENAME_LEN ];	
 	// add the .seq extension if necessary
 	std::string candidateSeqName = filename;
 	if (candidateSeqName.find(".py") == std::string::npos)
 	{
 		candidateSeqName.append(".py");
 	}
-	sprintf( label, "%s", candidateSeqName.c_str());
 	// current path containing .exe
 	char CurrentPath[_MAX_PATH];
 	_getcwd(CurrentPath, _MAX_PATH);
 
-	seq_paths.reset();
-	std::string curFilename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
-	while (curFilename.size() > 0)
+	std::string curFilename = SmartBody::SBScene::getScene()->getAssetManager()->findFileName("script", candidateSeqName);
+	if (filename != "")
 	{
-		try{
-			FILE* file = fopen(curFilename.c_str(), "r");
-			if (file)
-			{
-				fclose(file);
-				std::stringstream strstr;
-				strstr << "execfile(\"" << curFilename << "\")";
-				PyRun_SimpleString(strstr.str().c_str());
-				PyErr_Print();
-				PyErr_Clear();
-				return CMD_SUCCESS;
-			}
-			else
-			{
-				curFilename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
-			}
+		try {
+			std::stringstream strstr;
+			strstr << "execfile(\"" << curFilename << "\")";
+			PyRun_SimpleString(strstr.str().c_str());
+			PyErr_Print();
+			PyErr_Clear();
+			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
 			return CMD_FAILURE;
@@ -1633,24 +1188,6 @@ int mcuCBHandle::executePython(const char* command)
 	return CMD_FAILURE;
 }
 
-
-// void mcuCBHandle::setPhysicsEngine( bool start )
-// {
-// 	if (start)
-// 	{
-// 		physicsTime = time;
-// 		//updatePhysics = true;		
-// 	}
-// 	else
-// 	{
-// 		//updatePhysics = false;
-// 	}
-// 
-// 	if (physicsEngine)
-// 	{
-// 		physicsEngine->setEnable(start);
-// 	}
-// }
 
 
 std::map<std::string, SbmPawn*>& mcuCBHandle::getPawnMap()
@@ -1701,28 +1238,9 @@ std::map<std::string, SbmCharacter*>& mcuCBHandle::getCharacterMap()
 	return character_map;
 }
 
-std::map<std::string, SmartBody::SBSkeleton*>& mcuCBHandle::getSkeletonMap()
-{
-	return skeleton_map;
-}
-
 std::map<std::string, DeformableMesh*>& mcuCBHandle::getDeformableMeshMap()
 {
 	return deformableMeshMap;
-}
-
-SbmCharacter* mcuCBHandle::getCharacter(const std::string& name)
-{
-	std::map<std::string, SbmCharacter*>::iterator iter = character_map.find(name);
-	if (iter == character_map.end())
-		return NULL;
-	else
-		return (*iter).second;
-}
-
-int mcuCBHandle::getNumCharacters()
-{
-	return character_map.size();
 }
 
 DeformableMesh* mcuCBHandle::getDeformableMesh( const std::string& name )

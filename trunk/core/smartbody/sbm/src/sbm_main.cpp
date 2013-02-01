@@ -72,6 +72,8 @@
 #include <sb/SBPython.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBSpeechManager.h>
+#include <sb/SBAssetManager.h>
 #include "FLTKListener.h"
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
@@ -119,6 +121,8 @@
 
 using std::vector;
 using std::string;
+
+int snapshotCounter = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -171,8 +175,8 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		if( output_file == "" )		
 		{
 			std::stringstream output_file_os;
-			output_file_os<< "snapshot_"<< mcu_p->snapshot_counter<< ".ppm";	// default output name
-			mcu_p->snapshot_counter++;
+			output_file_os<< "snapshot_"<< snapshotCounter<< ".ppm";	// default output name
+			snapshotCounter++;
 			output_file = output_file_os.str();
 		}
 		// Allocate a picture buffer 
@@ -249,7 +253,7 @@ void cleanup( void )	{
 			mcu.loop = false;
 		}
 
-		if ( mcu.play_internal_audio )
+		if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
 		{
 			AUDIO_Close();
 		}
@@ -433,7 +437,7 @@ int main( int argc, char **argv )	{
 	FLTKListener fltkListener;
 
 	// change the default font size
-	FL_NORMAL_SIZE = 12;
+	FL_NORMAL_SIZE = 10;
 	FltkViewerFactory* viewerFactory = new FltkViewerFactory();
 	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
 	//viewerFactory->setFltkViewer(viewer);
@@ -598,7 +602,6 @@ int main( int argc, char **argv )	{
 					{
 						LOG( "    Loading sequence '%s'\n", argv[i] );
 						init_seqs.push_back( argv[i] );
-						mcu.use_python = false;
 					}
 				}
 				else
@@ -619,7 +622,7 @@ int main( int argc, char **argv )	{
 		}
 		else if( s.compare( "-audio" ) == 0 )  // argument equals -audio
 		{
-			mcu.play_internal_audio = true;
+			 SmartBody::SBScene::getScene()->setBoolAttribute("internalAudio", true);
 		}
 		else if( s.compare( "-lockdt" ) == 0 )  // argument equals -lockdt
 		{
@@ -646,13 +649,13 @@ int main( int argc, char **argv )	{
 		{
 			string skScale = s;
 			skScale.erase( 0, 9 );
-			mcu.skScale = atof(skScale.c_str());
+			SmartBody::SBScene::getScene()->getAssetManager()->setGlobalSkeletonScale(atof(skScale.c_str()));
 		}
 		else if ( s.compare( "-skmscale=" ) == 0 )
 		{
 			string skmScale = s;
 			skmScale.erase( 0, 10 );
-			mcu.skmScale = atof(skmScale.c_str());
+			SmartBody::SBScene::getScene()->getAssetManager()->setGlobalSkeletonScale(atof(skmScale.c_str()));
 		}
 		else if ( s.compare( "-mediapath=" ) == 0 )
 		{
@@ -684,8 +687,7 @@ int main( int argc, char **argv )	{
 
 	scene->getSimulationManager()->setupTimer();
 
-	TimeIntervalProfiler* profiler = new TimeIntervalProfiler();
-	mcu.register_profiler(*profiler);
+	scene->getSimulationManager()->setupProfiler();
 
 	if( lock_dt_mode )	{ 
 		scene->getSimulationManager()->setSleepLock();
@@ -693,8 +695,8 @@ int main( int argc, char **argv )	{
 
 	scene->setMediaPath(mediaPath);
 
-	mcu.festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
-	mcu.cereprocRelay()->initSpeechRelay(cereprocLibDir,festivalCacheDir);
+	SmartBody::SBScene::getScene()->getSpeechManager()->festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
+	SmartBody::SBScene::getScene()->getSpeechManager()->cereprocRelay()->initSpeechRelay(cereprocLibDir,festivalCacheDir);
 
 #if LINK_VHMSG_CLIENT
 	char * vhmsg_server = getenv( "VHMSG_SERVER" );
@@ -746,14 +748,14 @@ int main( int argc, char **argv )	{
 
 	if( proc_id != "" )
 	{
-		mcu.set_process_id( proc_id.c_str() );
+		SmartBody::SBScene::getScene()->setProcessId( proc_id );
 
 		// Using a process id is a sign that we're running in a multiple SBM environment.
 		// So.. ignore BML requests with unknown agents by default
 		mcu.bml_processor.set_warn_unknown_agents( false );
 	}
 
-	if ( mcu.play_internal_audio )
+	if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
 	{
 		if ( !AUDIO_Init() )
 		{
@@ -824,14 +826,7 @@ int main( int argc, char **argv )	{
 	// run the specified scripts
 	if( init_seqs.empty() && init_pys.empty())
 	{
-		if (!mcu.use_python)
-		{
-			LOG( "No sequences specified.  Loading default configuration.'\n" );
-		}
-		else
-		{
-			LOG( "No Python scripts specified. Loading default configuration.'\n" );
-		}
+		LOG( "No Python scripts specified. Loading default configuration.'\n" );
 		mcu.executePython("getViewer().show()\ngetCamera().reset()");
 	}
 
@@ -880,9 +875,9 @@ int main( int argc, char **argv )	{
 
 
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-		mcu.update_profiler();
+		scene->getSimulationManager()->updateProfiler();
 //		mcu.update_profiler( SBM_get_real_time() );
-		bool update_sim = mcu.update_timer();
+		bool update_sim = scene->getSimulationManager()->updateTimer();
 //		bool update_sim = mcu.update_timer( SBM_get_real_time() );
 
 	//	mcu.mark( "main", 0, "fltk-check" );
@@ -905,10 +900,7 @@ int main( int argc, char **argv )	{
 		if (isInteractive)
 		{
 			bool hasCommands = false;
-			if (mcu.use_python)
-				hasCommands =  commandline.pending( pythonPrompt );
-			else
-				hasCommands =  commandline.pending( commandPrompt );
+			hasCommands =  commandline.pending( pythonPrompt );
 
 			if ( hasCommands )
 			{
@@ -918,11 +910,7 @@ int main( int argc, char **argv )	{
 				if( strlen( cmd ) )	{
 
 					int result = CMD_FAILURE;
-					if (mcu.use_python) {
-						result = mcu.executePython(cmd);
-					} else {
-						result = scene->command(cmd);
-					}
+					result = mcu.executePython(cmd);
 
 					switch( result ) {
 						case CMD_NOT_FOUND:
@@ -943,13 +931,12 @@ int main( int argc, char **argv )	{
 				}
 			}
 		}
-
 #if USE_WSP
 		mcu.theWSP->broadcast_update();
 #endif
 
 		if( update_sim )	{
-			mcu.update();
+			scene->update();
 		}
 
 		/*for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
@@ -987,6 +974,7 @@ int main( int argc, char **argv )	{
 			SrVec targetLoc = cameraLoc - mcu.cameraTracking[x]->targetToCamera;
 			activeCamera->setCenter(targetLoc.x, targetLoc.y, targetLoc.z);
 		}	
+
 
 		BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(mcu.viewer_p);
 

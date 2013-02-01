@@ -34,87 +34,13 @@
 #include <controllers/me_ct_channel_writer.hpp>
 #include <sb/SBScene.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBSimulationManager.h>
+
 
 
 using namespace std;
 
 
-int sbm_set_test_func( srArgBuffer& args, mcuCBHandle *mcu  ) {
-	string arg = args.read_token();
-	if( arg=="char" || arg=="character" ) {
-		mcu->test_character_default = args.read_token();
-
-		if( mcu->test_character_default.length() > 0 ) {
-			if (mcu->getNumCharacters() > 0)
-			{
-				LOG("WARNING: Unknown default test character: \"%s\"", mcu->test_character_default.c_str());
-			} else {
-				LOG("Default test character: \"%s\"", mcu->test_character_default.c_str());
-			}
-		}
-		return CMD_SUCCESS;
-	} else if( arg=="recip" || arg=="recipient" ) {
-		mcu->test_recipient_default = args.read_token();
-
-		if( mcu->test_recipient_default.length() > 0 ) {
-			if (mcu->getNumCharacters() > 0)
-			{
-				LOG("WARNING: Unknown default test recipient: \"%s\"", mcu->test_recipient_default.c_str());
-			} else {
-				LOG("Default test recipient: \"%s\"", mcu->test_recipient_default.c_str());
-			}
-		}
-		return CMD_SUCCESS;
-	} else {
-		LOG("ERROR: Unrecogized test variable \"%s\".", arg.c_str());
-		return CMD_NOT_FOUND;
-	}
-}
-
-
-int sbm_print_test_func( srArgBuffer& args, mcuCBHandle *mcu_p  ) {
-	string arg = args.read_token();
-	if( arg=="char" || arg=="character" ) {
-		LOG("Default test character: \"%s\"", mcu_p->test_character_default.c_str() );
-		return CMD_SUCCESS;
-	} else {
-		LOG("ERROR: Unrecogized test variable \"%s\"", arg.c_str() );
-		return CMD_NOT_FOUND;
-	}
-}
-
-
-
-
-int test_args_func( srArgBuffer& args, mcuCBHandle *mcu_p  ) {
-	int count = args.calc_num_tokens();
-	std::stringstream strstr;
-	strstr << "TEST ARGS: "<< count << " arguments";
-	if( count ) {
-		strstr << ": { \""<< args.read_token();
-
-		string token( args.read_token() );
-		while( token.length() ) {
-			strstr << "\", \"" << token;
-			token = args.read_token();
-		}
-		strstr << "\" }";
-	}
-	LOG("%s", strstr.str().c_str());
-
-
-	////int count = args.calc_num_quotes();
-	////char *A = args.read_quote();
-	////char *B = args.read_quote();
-	////char *C = args.read_quote();
-	//int count = args.calc_num_tokens();
-
-	//char *A = args.read_token();
-	//char *B = args.read_token();
-	//char *C = args.read_token();
-	//LOG( "TEST: [%d]:{ '%s', '%s', '%s' }\n", count,A,B,C );
-	return( CMD_SUCCESS );
-}
 
 
 /**
@@ -138,7 +64,7 @@ bool normalize_character_id( const string& module, const string& role, const str
 	} else {
 		// Lookup character
 		if( char_id!="*" ) {
-			SbmCharacter* character = mcu.getCharacter( char_id );
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter( char_id );
 			if( character == NULL ) {
 				std::stringstream strstr;
 				strstr << "WARNING: "<<module<<": Unknown "<<role<<" id \""<<char_id<<"\".";
@@ -209,8 +135,8 @@ void build_vrX( ostringstream& buffer, const string& cmd, const string& char_id,
 	if( for_seq )
 		buffer << "send " << cmd << " ";
 	buffer << char_id << " "<< recip_id << " sbm";
-	if( mcu.process_id != "" )  // Insert process_id if present.
-		buffer << '_' << mcu.process_id; 
+	if( SmartBody::SBScene::getScene()->getProcessId() != "" )  // Insert process_id if present.
+		buffer << '_' << SmartBody::SBScene::getScene()->getProcessId(); 
 	buffer << "_test_bml_" << (++mcu.testBMLId) << endl << content;
 }
 
@@ -253,7 +179,7 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 	} else {
 		// Command sequence to trigger vrSpeak
 		srCmdSeq *seq = new srCmdSeq(); // sequence file that holds the bml command(s)
-		seq->offset( (float)( mcu.time ) );
+		seq->offset( (float)(SmartBody::SBScene::getScene()->getSimulationManager()->getTime()) );
 
 		if( echo ) {
 			msg << "echo // Running sequence \"" << seq_id << "\"...";
@@ -357,8 +283,8 @@ void print_test_bml_help() {
 
 // Handles all "test bml ..." sbm commands.
 int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
-	string char_id = mcu->test_character_default;
-	string recip_id = mcu->test_recipient_default;
+	string char_id = SmartBody::SBScene::getScene()->getStringAttribute("defaultCharacter");
+	string recip_id = SmartBody::SBScene::getScene()->getStringAttribute("defaultRecipient");
 	string seq_id;
 	bool   echo = true;
 	bool   send = true;
@@ -374,7 +300,7 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 	
 	if (char_id != "*" )
 	{
-		SbmCharacter* character = mcu->getCharacter(char_id);
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(char_id);
 		if (!character)
 		{
 			LOG("No character named '%s'.", char_id.c_str());
@@ -687,8 +613,8 @@ void print_test_fml_help() {
 }
 
 int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
-	string char_id = mcu->test_character_default;
-	string recip_id = mcu->test_recipient_default;
+	string char_id = SmartBody::SBScene::getScene()->getStringAttribute("defaultCharacter");
+	string recip_id = SmartBody::SBScene::getScene()->getStringAttribute("defaultRecipient");
 	string seq_id;
 	bool   echo = true;
 	bool   send = true;
@@ -782,13 +708,13 @@ int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 
 
 int test_bone_pos_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
-	string& character_id = mcu_p->test_character_default;
+	const string& character_id = SmartBody::SBScene::getScene()->getStringAttribute("defaultCharacter");
 	if( character_id.empty() ) {
 		LOG("ERROR: No test character defined");
 		return CMD_FAILURE;
 	}
 
-	SbmCharacter* character = mcu_p->getCharacter( character_id );
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter( character_id );
 	if( character == NULL ) {
 		LOG("ERROR: Unknown test character \"%s\"", character_id.c_str());
 		return CMD_FAILURE;
