@@ -3508,6 +3508,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sb\SBAsset.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBAsset.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBAssetManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBAssetManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sb\SBAttribute.cpp"
 				>
 			</File>
@@ -3860,6 +3876,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sb\SBSpeechManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBSpeechManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sb\SBSteerAgent.cpp"
 				>
 			</File>
@@ -3883,23 +3907,6 @@
 				RelativePath="..\src\sb\SBSubject.h"
 				>
 			</File>
-			<File
-				RelativePath="..\src\sb\SBAssetManager.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sb\SBAssetManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sb\SBSpeechManager.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sb\SBSpeechManager.cpp"
-				>
-			</File>
-
 		</Filter>
 	</Files>
 	<Globals>

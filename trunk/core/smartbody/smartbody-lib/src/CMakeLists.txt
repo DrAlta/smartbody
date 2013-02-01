@@ -373,6 +373,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBRetargetManager.cpp
 	sb/SBAsset.cpp
 	sb/SBAssetManager.cpp
+	sb/SBAsset.cpp
 	sb/SBSpeechManager.cpp
 
 	sb/SBPython.cpp
