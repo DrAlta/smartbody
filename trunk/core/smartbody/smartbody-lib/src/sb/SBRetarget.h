@@ -18,6 +18,7 @@ class SBRetarget
 		SBAPI ~SBRetarget();	
 		SBAPI bool initRetarget(std::vector<std::string>& endJoints, std::vector<std::string>& relativeJoints);
 		SBAPI SrQuat applyRetargetJointRotation(std::string jointName, SrQuat& inQuat);
+		SBAPI SrQuat applyRetargetJointRotationInverse(std::string jointName, SrQuat& inQuat);
 		SBAPI float  applyRetargetJointTranslation(std::string jointName, float inPos);
 	protected:
 		std::string srcSkName;

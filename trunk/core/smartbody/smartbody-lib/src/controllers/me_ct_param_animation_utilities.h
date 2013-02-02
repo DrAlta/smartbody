@@ -35,6 +35,7 @@
 
 #define LoopHandle 0
 const int rotType = 132;
+//const int rotType = 231;
 const double defaultTransition = 0.3;
 
 struct JointChannelId 
@@ -198,6 +199,7 @@ class PABlendData
 		float playSpeed;
 		bool active;	
 		bool directPlay;
+		std::string baseJointName;
 		std::vector<std::vector<int> > motionIndex;
 		void updateMotionIndices();
 };
