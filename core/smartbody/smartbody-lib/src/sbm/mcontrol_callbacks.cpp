@@ -1824,25 +1824,27 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 			return CMD_FAILURE;
 		}
 
-#if 0 // feng : I don't know why the following codes are necessary, but it causes incorrect skinning results. Remove it for now.
+#if 1 // feng : I don't know why the following codes are necessary, but it causes incorrect skinning results. Remove it for now.
 		// below code is to adjust the mesh if there's orientation in the joints. potential bug too because here only detect the first joint
-		SkSkeleton* skel = char_p->getSkeleton();
-		SkJoint* firstJ = skel->root()->child(0);
-		if (firstJ)
+		std::string skelName = char_p->getSkeleton()->getName();
+		SmartBody::SBSkeleton* sbSk = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skelName);		
+		if (sbSk && sbSk->root())
 		{
-			SrQuat orient = skel->root()->child(0)->quat()->orientation();
+			SmartBody::SBJoint* sbRoot = sbSk->getJoint(0);
+			SrQuat orient = sbRoot->quat()->prerot();
 			SrMat rotMat;
 			orient.get_mat(rotMat);
 			for (unsigned int i = 0; i < meshModelVec.size(); i++)
 			{
-				for (int j = 0; j < meshModelVec[i]->V.size(); j++)
-				{
-					SrVec pt = SrVec(meshModelVec[i]->V[j].x, meshModelVec[i]->V[j].y, meshModelVec[i]->V[j].z);
-					SrVec ptp = pt * rotMat;
-					meshModelVec[i]->V[j].x = ptp.x;
-					meshModelVec[i]->V[j].y = ptp.y;
-					meshModelVec[i]->V[j].z = ptp.z;
-				}
+// 				for (int j = 0; j < meshModelVec[i]->V.size(); j++)
+// 				{
+// 					SrVec pt = SrVec(meshModelVec[i]->V[j].x, meshModelVec[i]->V[j].y, meshModelVec[i]->V[j].z);
+// 					SrVec ptp = pt * rotMat;
+// 					meshModelVec[i]->V[j].x = ptp.x;
+// 					meshModelVec[i]->V[j].y = ptp.y;
+// 					meshModelVec[i]->V[j].z = ptp.z;
+// 				}
+				// only adjust the initial normal vector
 				for (int j = 0; j < meshModelVec[i]->N.size(); j++)
 				{
 					SrVec pt = SrVec(meshModelVec[i]->N[j].x, meshModelVec[i]->N[j].y, meshModelVec[i]->N[j].z);

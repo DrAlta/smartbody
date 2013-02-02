@@ -306,7 +306,9 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBSke
 	}	
 
 	ikScenario.updateNodeGlobalMat(rootNode, QUAT_INIT);
-	SrMat gmatBase = rootNode->gmat;
+	SrQuat prerot = rootNode->joint->quat()->prerot();
+	SrMat prerotMat; prerot.get_mat(prerotMat);
+	SrMat gmatBase = prerotMat.inverse()*rootNode->gmat;
 	for (unsigned int k=0;k<legStates.size();k++)
 	{
 		std::vector<SrVec>& supPos = legStates[k].curSupportPos;

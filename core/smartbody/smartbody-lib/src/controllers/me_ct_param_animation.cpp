@@ -796,7 +796,6 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 				joints.push_back(jVec[i]->name());
 			}
 		}
-
 		module->interpolator->setBlendingJoints(joints);
 	}
 	else
