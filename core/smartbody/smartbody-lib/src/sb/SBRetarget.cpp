@@ -191,7 +191,25 @@ SrQuat SBRetarget::applyRetargetJointRotation( std::string jointName, SrQuat& in
 	if (jointPrePostRotMap.find(jointName) != jointPrePostRotMap.end())
 	{
 		QuatPair& qpair = jointPrePostRotMap[jointName];
+		SrMat outMat, firstMat, secondMat, inMat;
+//		firstMat = qpair.first.get_mat(firstMat);
+// 		secondMat = qpair.second.get_mat(secondMat);
+// 		inMat = inQuat.get_mat(inMat);
+// 		outMat = secondMat*inMat*firstMat;
+// 		outQuat = SrQuat(outMat);
 		outQuat = qpair.first*inQuat*qpair.second;
+	}
+	return outQuat;
+}
+
+
+SrQuat SBRetarget::applyRetargetJointRotationInverse( std::string jointName, SrQuat& inQuat )
+{
+	SrQuat outQuat; // identity rotation 
+	if (jointPrePostRotMap.find(jointName) != jointPrePostRotMap.end())
+	{
+		QuatPair& qpair = jointPrePostRotMap[jointName];		
+		outQuat = qpair.first.inverse()*inQuat*qpair.second.inverse();
 	}
 	return outQuat;
 }

@@ -31,6 +31,8 @@
 
 const double timeThreshold = 0.05;
 
+#define NEW_EULER 1
+
 PATimeManager::PATimeManager()
 {
 }
@@ -390,6 +392,7 @@ void PAMotions::getBuffer(SkMotion* motion, double t, SrBuffer<int>& map, SrBuff
 {
 	double deltaT = motion->duration() / double(motion->frames() - 1);
 	int lastFrame = int (t/deltaT);
+	//motion->apply(float(t), &buff[0], &map, SkMotion::Linear, &lastFrame, false, blendData->retarget);
 	motion->apply(float(t), &buff[0], &map, SkMotion::Linear, &lastFrame, false);
 }
 
@@ -430,68 +433,37 @@ void PAMotions::processMat( SrMat& src, SrMat& yMat, SrMat xzMat )
 void PAMotions::getUpdateMat(SrMat& dest, SrMat& src)
 {
 	SrQuat quat = SrQuat(src);
-
+	if (blendData->retarget)
+		quat = blendData->retarget->applyRetargetJointRotation(blendData->baseJointName,quat);
 	SrMat prerotMat;
 //	prerot.get_mat(prerotMat);
 	basePrerot.get_mat(prerotMat);
-/*
-	SrMat src0 = src * prerotMat.inverse();
-	SrMat mat0;
-	float rx, ry, rz;
-	sr_euler_angles(rotType, src0, rx, ry, rz);
-	rx = 0.0;
-	rz = 0.0;
-	sr_euler_mat(rotType, mat0, rx, ry, rz);
-	SrMat mat;
-	mat = mat0;// * prerotMat;
-	SrQuat quatP = SrQuat(mat);
-*/
-/*
-	SrMat mat;
-	float rx, ry, rz;
-	sr_euler_angles(rotType, src, rx, ry, rz);
-	rx = 0.0;
-	rz = 0.0;
-	sr_euler_mat(rotType, mat, rx, ry, rz);
-	SrQuat quatP = SrQuat(mat);
-*/
+
 	SrVec vec = quat.axis() * quat.angle();
 	SrVec vec1 = vec * basePrerot;//prerotMat.inverse();
-// 	if (quat.angle() > 0.01)
-// 	{		
-// 		sr_out << "prerot = " << basePrerot << srnl;	
-// 		sr_out << "vec = " << vec << srnl;
-// 		sr_out << "vec1 = " << vec1 << srnl;
-// 	}
-	quat = SrQuat(vec1);
+	
+	quat = SrQuat(vec1);	
+#if !NEW_EULER
 	SrMat mat;
-	quat.get_mat(mat);
+	quat.get_mat(mat);	
 	float rx, ry, rz;
 	sr_euler_angles(rotType, mat, rx, ry, rz);	
 	rx = 0.0;
 	rz = 0.0;
 	sr_euler_mat(rotType, mat, rx, ry, rz);
-	//SrQuat quatP = SrQuat(mat);
-	//LOG("ry = %f, quat = %f %f %f %f",SR_TODEG(ry), quatP.w, quatP.x, quatP.y, quatP.z);
-	
-
-//	SrVec vec = quat.axis() * quat.angle();
-//	SrVec vec1 = vec * prerotMat.inverse();
-//	vec1.x = 0;
-//	vec1.z = 0;
-//	SrQuat quatP = SrQuat(vec1);
-
-/*
-	quat_t q = quat_t(quat.w, quat.x, quat.y, quat.z);
-	euler_t e = euler_t(q);	
-	e.p(0.0);
-	e.r(0.0);
-	q = quat_t(e);
-	SrQuat quatP = SrQuat((float)q.w(), (float)q.x(), (float)q.y(), (float)q.z());
-*/
-
 	//quatP.get_mat(dest);
 	dest = mat;
+#else
+	gwiz::euler_t eu = gwiz::euler_t(gwiz::quat_t(quat.w, quat.x,quat.y,quat.z));
+	eu.x(0.f);
+	eu.z(0.f);
+	gwiz::quat_t gw_q = gwiz::quat_t(eu);	
+	//vec1.x = 0.0; vec1.z = 0.0;
+	SrQuat newQ = SrQuat((float)gw_q.w(),(float)gw_q.x(),(float)gw_q.y(),(float)gw_q.z());	
+	dest = newQ.get_mat(dest);
+#endif
+	
+	
 	dest.set(12, src.get(12));
 	if (blendData->state->incrementWorldOffsetY)
 		dest.set(13, src.get(13));
@@ -501,51 +473,38 @@ void PAMotions::getUpdateMat(SrMat& dest, SrMat& src)
 void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 {
 	SrQuat quat = SrQuat(src);
-
+	if (blendData->retarget)
+		quat = blendData->retarget->applyRetargetJointRotation(blendData->baseJointName,quat);
 	SrMat prerotMat;
 //	prerot.get_mat(prerotMat);
 	basePrerot.get_mat(prerotMat);
-/*
-	SrMat src0 = src * prerotMat.inverse();
-	SrMat mat0;
-	float rx, ry, rz;
-	sr_euler_angles(rotType, src0, rx, ry, rz);
-	ry = 0.0;
-	sr_euler_mat(rotType, mat0, rx, ry, rz);
-	SrMat mat;
-	mat = mat0 * prerotMat;
-	SrQuat quatP = SrQuat(mat);
-*/
-	/*
-	SrMat mat;
-	float rx, ry, rz;
-	sr_euler_angles(rotType, src, rx, ry, rz);
-	ry = 0.0;
-	sr_euler_mat(rotType, mat, rx, ry, rz);
-	SrQuat quatP = SrQuat(mat);
-	*/
-	
+
 	SrVec vec = quat.axis() * quat.angle();
 	SrVec vec1 = vec * prerotMat;//prerotMat.inverse();
-	quat = SrQuat(vec1);
+	
+	quat = SrQuat(vec1);	
+#if !NEW_EULER
 	SrMat mat;
-	quat.get_mat(mat);
+	quat.get_mat(mat);	
 	float rx, ry, rz;
 	sr_euler_angles(rotType, mat, rx, ry, rz);
 	ry = 0.0;
 	sr_euler_mat(rotType, mat, rx, ry, rz);
 	SrQuat quatP = SrQuat(mat);
-	vec1 = quatP.axis() * quatP.angle();
+#else
+	gwiz::euler_t eu = gwiz::euler_t(gwiz::quat_t(quat.w, quat.x,quat.y,quat.z));
+	eu.y(0.f);
+	gwiz::quat_t gw_q = gwiz::quat_t(eu);
+	SrQuat quatP = SrQuat((float)gw_q.w(),(float)gw_q.x(),(float)gw_q.y(),(float)gw_q.z());
+#endif	
+	vec1 = quatP.axis() * quatP.angle();	
+	
+	//SrQuat quatP;
+	//vec1.y = 0.0;
 	SrVec vec2 = vec1 * prerotMat.inverse();
 	quatP = SrQuat(vec2);
-
-/*
-	quat_t q = quat_t(quat.w, quat.x, quat.y, quat.z);
-	euler_t e = euler_t(q);
-	e.h(0.0);
-	q = quat_t(e);
-	SrQuat quatP = SrQuat((float)q.w(), (float)q.x(), (float)q.y(), (float)q.z());
-*/
+	if (blendData->retarget)
+		quatP = blendData->retarget->applyRetargetJointRotationInverse(blendData->baseJointName,quatP);
 	quatP.get_mat(dest);
 
 	if (!blendData->state->incrementWorldOffsetY)
@@ -681,8 +640,8 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 	else
 	{
 		if (blendData->retarget) // perform a final retarget pass before output the buffer values
-		{
-			SkChannelArray& bufChannels = _context->channels();
+		{			
+			SkChannelArray& bufChannels = _context->channels();			
 			int chanSize = bufChannels.size();
 			for (int i = 0; i < chanSize; i++)
 			{

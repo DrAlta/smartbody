@@ -780,6 +780,7 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 		module->blendEndTrim = su.stateTimeTrim;
 		module->transitionLength = su.transitionLength;
 		module->playSpeed = su.playSpeed;
+		module->baseJointName = baseJointName;
 		if (su.duration > 0.f) // the user set a state duration, adjut playSpeed
 		{
 			module->playSpeed = float(module->timeManager->getDuration()/su.duration);
