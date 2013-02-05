@@ -47,8 +47,8 @@
 #endif
 
 #if USE_CEREPROC_RELAY
-#include "cerevoice_eng.h"
-#include "cerevoice_eng_int.h"
+#include <cerevoice_eng.h>
+#include <cerevoice_eng_int.h>
 #endif
 
 
@@ -510,9 +510,9 @@ void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string
 		std::string fullLicenseName = libPath + licenseNames[i];
 		int success = CPRCEN_engine_load_voice(voiceEngine, fullLicenseName.c_str(), NULL, fullVoiceName.c_str(),CPRC_VOICE_LOAD_EMB_AUDIO);
 		if (!success)
-			LOG("Cerevoice Local Relay : load voice %s fail.",voiceNames[i].c_str());
+			LOG("Cerevoice Local Relay : load voice %s fail.",fullVoiceName.c_str());
 		else
-			LOG("Cerevoice Local Relay : load voice %s success.",voiceNames[i].c_str());
+			LOG("Cerevoice Local Relay : load voice %s success.",fullVoiceName.c_str());
 
 	}
 	

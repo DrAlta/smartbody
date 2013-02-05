@@ -85,6 +85,7 @@
 # include <sb/SBJointMapManager.h>
 # include <sb/SBBehaviorSetManager.h>
 # include <sb/SBSimulationManager.h>
+# include <sb/SBAssetManager.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -1706,8 +1707,24 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		bool hasSkeleton = false;
 		// copy the file over
 		std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
-		std::string meshDir = mediaPath + "/" +  "retarget/mesh/";
+		std::string meshBaseDir = "retarget/mesh/";
+		std::string meshDir = mediaPath + "/" + meshBaseDir ;		
 		std::string retargetDir = mediaPath + "/" + "retarget/";
+
+		SmartBody::SBAssetManager* assetManager = scene->getAssetManager();
+
+		std::vector<std::string> meshPaths = assetManager->getAssetPaths("mesh");
+		bool hasMeshDir = false;
+		for (unsigned int i=0;i<meshPaths.size();i++)
+		{
+			if (meshPaths[i] == meshBaseDir)
+				hasMeshDir = true;
+		}
+		if (!hasMeshDir)
+		{
+			assetManager->addAssetPath("mesh",meshBaseDir);
+		}
+		
 
 		// create the folder if they do not exist
 		if (!boost::filesystem::exists(retargetDir))
@@ -1757,6 +1774,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		boost::filesystem::path tempPath(retargetDir);
 		boost::filesystem::path completePath = boost::filesystem::complete( tempPath );	
  		scene->loadAsset(targetSkelFile);
+		
  		//boost::filesystem::copy_file()
 
 		// create the joint mapping before creating the skeleton for the character
@@ -1779,12 +1797,11 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		SmartBody::SBCharacter* character = scene->createCharacter(charName, "");
 		character->setSkeleton(skel);
 		character->createStandardControllers();
-		
+		character->setStringAttribute("deformableMesh",meshName);
 
  		float yOffset = -skel->getBoundingBox().a.y;
  		dest.y = yOffset;		
 		character->setPosition(SrVec(dest.x,dest.y,dest.z));
-
 	/*
 		std::string charName = strstr.str();
 		sprintf(cmdStr,"createDragAndDropCharacter('%s','%s','%s',SrVec(%f,%f,%f))",charName.c_str(),skelName.c_str(),meshName.c_str(),
@@ -1796,7 +1813,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		LOG("pythonCmd = %s",cmdStr);
 		mcu.executePythonFile("drag-and-drop.py");
 		mcu.executePython(cmdStr);
-		*/
+		*/		
 
 
 		// load the behavior sets if they have not yet been loaded
