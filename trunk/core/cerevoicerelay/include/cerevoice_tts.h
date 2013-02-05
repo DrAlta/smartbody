@@ -28,6 +28,7 @@
 
 #include <string>
 
+struct CPRCEN_engine; 
 
 class cerevoice_tts
 {
@@ -47,6 +48,8 @@ class cerevoice_tts
       /* Directory where audio files get saved, relative to module that plays the sound 
       (like Unreal Tournament). Can be absolute */
       char * temp_audio_dir_player;
+
+	  CPRCEN_engine* voiceEngine;
 
       /* Initializes CereVoiceRelay, given a vector of voice_id's */
       void init( std::vector<char *> );

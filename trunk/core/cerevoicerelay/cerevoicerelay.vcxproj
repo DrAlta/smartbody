@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5C7F4040-A4A8-4523-B509-176874991C9C}</ProjectGuid>
+    <RootNamespace>cerevoicerelay</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>include;..\..\lib\vhcl\include;..\..\lib\vhmsg\vhmsg-c\include;..\..\lib\xerces-c\include;..\..\lib\cerevoice\cerevoice_eng\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>vhcl_d.lib;vhmsg_d.lib;pthreadVSE2.lib;activemq-cppd.lib;xerces-c_3D.lib;libcerevoice_shared-3.lib;libcerevoice_eng_shared-3.lib;winmm.lib;rpcrt4.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>..\..\lib\vhcl\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\pthreads\lib;..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL;..\..\lib\xerces-c\lib;..\..\lib\cerevoice\cerevoice\lib;..\..\lib\cerevoice\cerevoice_eng\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetPath)" .
+copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .
+copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll .
+copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .
+copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .
+copy /Y ..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll . 
+copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_1D.dll .
+copy /Y ..\..\lib\cerevoice\cerehts\lib\libcerehts_shared-3.dll .
+copy /Y ..\..\lib\cerevoice\cerevoice\lib\libcerevoice_shared-3.dll .
+copy /Y ..\..\lib\cerevoice\cerevoice_eng\lib\libcerevoice_eng_shared-3.dll .
+copy /Y ..\..\lib\cerevoice\cerevoice_pmod\lib\libcerevoice_pmod_shared-3.dll .
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\libgcc_s_sjlj-1.dll .
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\msvcr71.dll .
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\python24.dll .
+copy /Y "..\..\lib\cerevoice\3rdparty\lib\libstdc++-6.dll" .
+
+
+if not exist .".\..\bin\cerevoicerelay" mkdir "..\..\bin\cerevoicerelay"
+copy /Y pthreadVSE2.dll "..\..\bin\cerevoicerelay"
+copy /Y libapr-1.dll "..\..\bin\cerevoicerelay"
+copy /Y libapriconv-1.dll "..\..\bin\cerevoicerelay"
+copy /Y libaprutil-1.dll "..\..\bin\cerevoicerelay"
+copy /Y activemq-cppd.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerehts_shared-3.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerevoice_shared-3.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerevoice_eng_shared-3.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerevoice_pmod_shared-3.dll "..\..\bin\cerevoicerelay"
+copy /Y libgcc_s_sjlj-1.dll "..\..\bin\cerevoicerelay"
+copy /Y "libstdc++-6.dll" "..\..\bin\cerevoicerelay"
+copy /Y msvcr71.dll "..\..\bin\cerevoicerelay"
+copy /Y python24.dll "..\..\bin\cerevoicerelay"
+copy /Y cerevoicerelay.exe "..\..\bin\cerevoicerelay"
+copy /Y cerevoicerelay.exe "..\..\bin\cerevoicerelay"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>include;..\..\lib\vhcl\include;..\..\lib\vhmsg\vhmsg-c\include;..\..\lib\xerces-c\include;..\..\lib\cerevoice\cerevoice_eng\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>vhcl.lib;vhmsg.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;libcerevoice_shared-3.lib;libcerevoice_eng_shared-3.lib;winmm.lib;rpcrt4.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\lib\vhcl\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\pthreads\lib;..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL;..\..\lib\xerces-c\lib;..\..\lib\cerevoice\cerevoice_eng\lib;..\..\lib\cerevoice\cerevoice\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetPath)" .
+copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .
+copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll .
+copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .
+copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .
+copy /Y ..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll . 
+copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_1.dll .
+copy /Y ..\..\lib\cerevoice\cerehts\lib\libcerehts_shared-3.dll .
+copy /Y ..\..\lib\cerevoice\cerevoice\lib\libcerevoice_shared-3.dll .
+copy /Y ..\..\lib\cerevoice\cerevoice_eng\lib\libcerevoice_eng_shared-3.dll .
+copy /Y ..\..\lib\cerevoice\cerevoice_pmod\lib\libcerevoice_pmod_shared-3.dll .
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\libgcc_s_sjlj-1.dll .
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\msvcr71.dll .
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\python24.dll .
+copy /Y "..\..\lib\cerevoice\3rdparty\lib\libstdc++-6.dll" .
+
+
+if not exist .".\..\bin\cerevoicerelay" mkdir "..\..\bin\cerevoicerelay"
+copy /Y pthreadVSE2.dll "..\..\bin\cerevoicerelay"
+copy /Y libapr-1.dll "..\..\bin\cerevoicerelay"
+copy /Y libapriconv-1.dll "..\..\bin\cerevoicerelay"
+copy /Y libaprutil-1.dll "..\..\bin\cerevoicerelay"
+copy /Y activemq-cpp.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerehts_shared-3.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerevoice_shared-3.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerevoice_eng_shared-3.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerevoice_pmod_shared-3.dll "..\..\bin\cerevoicerelay"
+copy /Y libgcc_s_sjlj-1.dll "..\..\bin\cerevoicerelay"
+copy /Y "libstdc++-6.dll" "..\..\bin\cerevoicerelay"
+copy /Y msvcr71.dll "..\..\bin\cerevoicerelay"
+copy /Y python24.dll "..\..\bin\cerevoicerelay"
+copy /Y cerevoicerelay.exe "..\..\bin\cerevoicerelay"
+copy /Y cerevoicerelay.exe "..\..\bin\cerevoicerelay"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\cerevoice_tts.cpp" />
+    <ClCompile Include="src\CerevoiceRelay.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\cerevoice_tts.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

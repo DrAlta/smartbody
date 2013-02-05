@@ -66,7 +66,7 @@ struct SpeechRequestMessageData {
 };
 
 /// End new modifications
-
+/*
 extern "C"
 {
    #include "cerenorm_wrap.h"
@@ -75,6 +75,10 @@ extern "C"
 }
 
 #include "cerevoice_pmod.h"
+*/
+
+#include "cerevoice_eng.h"
+#include "cerevoice_eng_int.h"
 
 #define MAXLINESZ 4095
 #define MAXSPURTSZ 32000
@@ -544,14 +548,15 @@ void set_phonemes_to_visemes()
 void cerevoice_tts::init( std::vector<char *> vctVoices )
 {
    // Settings definitions
-   voice_path = "..\\..\\data\\cereproc\\voices\\";
+   voice_path = "../../data/cereproc/voices/";
    voice_file_extension = ".voice";
    license_file_extension = ".lic";
 
+   voiceEngine = CPRCEN_engine_new();
    // the below 2 paths are being set just as default values
    // the actual paths are obtained from SBM through the RemoteSpeechCmd and set at run time
-   temp_audio_dir_cereproc = "..\\..\\data\\cache\\audio\\";
-   temp_audio_dir_player = "data\\cache\\audio\\";
+   temp_audio_dir_cereproc = "../../data/cache/audio/";
+   temp_audio_dir_player = "data/cache/audio/";
 
    abbfile       = "../../lib/cerevoice/veng_db/en/norm/abb.txt";
    pbreakfile    = "../../lib/cerevoice/veng_db/en/norm/pbreak.txt";
@@ -565,7 +570,7 @@ void cerevoice_tts::init( std::vector<char *> vctVoices )
    }
 
    set_phonemes_to_visemes();
-
+   /*
    if ( !fileExists( abbfile ) )
    {
       std::cout<<"Error: normalization file abb.txt not found! See README files for setup information. Press any key to exit.\n";
@@ -600,6 +605,7 @@ void cerevoice_tts::init( std::vector<char *> vctVoices )
       _getch();
       exit(1);
    }
+   */
 
    // Initialize the XML4C2 system.
    try
@@ -612,8 +618,6 @@ void cerevoice_tts::init( std::vector<char *> vctVoices )
       XERCES_STD_QUALIFIER cerr << "Error during Xerces-c Initialization.\n" << "  Exception message:" << pMsg;
       XMLString::release( &pMsg );
    }
-
- 
 }
 
 
@@ -668,6 +672,9 @@ static int _read_license( char * licfile, char ** text, char ** signature )
 
 void cerevoice_tts::load_voice( char * voice_id ) 
 {
+
+	std::string testVoiceID = "cerevoice_katherine_3.0.8_22k";
+    std::string testLicenseFile = "katherine2";
    char * lic_text = EMPTY_STRING;
    char * signature = EMPTY_STRING;
    char lic_file[256] = "";
@@ -676,6 +683,7 @@ void cerevoice_tts::load_voice( char * voice_id )
    // Create full license file name
    strcat( lic_file, voice_path );
    strcat( lic_file, voice_id );
+   //strcat( lic_file, testLicenseFile.c_str());
    strcat( lic_file, license_file_extension );
 
    // Make sure license file exists
@@ -685,11 +693,12 @@ void cerevoice_tts::load_voice( char * voice_id )
       _getch();
       exit(1);
    }
-   _read_license( lic_file, &lic_text, &signature );
+   //_read_license( lic_file, &lic_text, &signature );
 
    // Create full voice file name   
    strcat( voice_file, voice_path );
    strcat( voice_file, voice_id );
+   //strcat( voice_file, testVoiceID.c_str());
    strcat( voice_file, voice_file_extension );
    
    // Make sure voice file exists
@@ -701,12 +710,22 @@ void cerevoice_tts::load_voice( char * voice_id )
    }
 
    // Load voice and add to map, with the voice_id being the key
-   voices[ voice_id ] = CPRC_load_voice( voice_file, lic_text, static_cast<int>( strlen( lic_text ) ), signature, static_cast<int>( strlen( signature ) ) );
+   int success = CPRCEN_engine_load_voice(voiceEngine, lic_file, NULL, voice_file,CPRC_VOICE_LOAD_EMB_AUDIO);
+
+   //std::string result = tts("hello how are you","test.wav","text.xml",voice_id);
+   if (!success)
+   {
+	   //printf("voiceFile = %s, licFile = %s")
+	   std::cout<<"Error: voice file loaded fail. Press any key to exit.\n";
+	   _getch();
+	   exit(1);
+   }
+   //voices[ voice_id ] = CPRCEN_engine_load_voice( voiceEngine, voice_file, lic_text, static_cast<int>( strlen( lic_text ) ), signature, static_cast<int>( strlen( signature ) ) );
    //voices[ voice_id ] = CPRC_load_voicef( lic_file, voice_file );
  
    // Free license strings (aalocated in read_license)
-   free( lic_text );
-   free( signature );
+   //free( lic_text );
+   //free( signature );
 }
 
 std::string cerevoice_tts::addUselTag(std::string text)
@@ -886,12 +905,14 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
    */
 
    // Create a reference to the normaliser, which needs to be passed in to all normaliser functions
+   /*
    int norm_id = Normaliser_create( elNEWID );
    Normaliser_set_abbreviations( norm_id, abbfile );
    Normaliser_set_pbreaks( norm_id, pbreakfile );
    Normaliser_set_rules( norm_id, rulesfile );
    Normaliser_set_homographs( norm_id, homographfile );
    Normaliser_set_reductions( norm_id, reductionfile );
+   */
 
    // file to record database coverage data
    //char * logfile = EMPTY_STRING;
@@ -899,19 +920,15 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
    //char * lexfile = EMPTY_STRING;
 
    // If voice doesn't exist, ignore; another voice relay might pick that up
-   if ( !voices[ voice_id ] )
-   {
-      fprintf( stderr, "ERROR: voice load failed, check voice file and license integrity.\n\nIgnoring voice '%s'.\n", voice_id );
-   }
-   else
-   {
-      // Set up a spurt, an audio buffer for data, and a lexicon search structure
-      CPRC_spurt * spurt = CPRC_spurt_new( voices[ voice_id ] );
-      CPRC_abuf * abuf = CPRC_abuf_new( 22050 );
-      CPRC_lts_search * ltssrch = CPRC_lts_search_new( 0 );
-      CPRC_lexicon_search * lxsrch = CPRC_lexicon_search_new();
+//    if ( !voices[ voice_id ] )
+//    {
+//       fprintf( stderr, "ERROR: voice load failed, check voice file and license integrity.\n\nIgnoring voice '%s'.\n", voice_id );
+//    }
+//    else
+   {    
 
-	  // Local variable to store message XML metadata
+	  
+	   // Local variable to store message XML metadata
 	  SpeechRequestMessageData xmlMetaData;
       // Feed in input text, further data is to come
 	  //Added by Apar Suri
@@ -950,20 +967,13 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
 		  text_string = addUselTag(text_string);
 	  }
 
-	  Normaliser_parse( norm_id, const_cast<char*>( text_string.c_str()) , 1 );
-      //Normaliser_parse( norm_id, "", 1 );
+	  CPRCEN_channel_handle chan = CPRCEN_engine_open_channel(voiceEngine, "", "", voice_id.c_str(), "");
+	  char* fileName = const_cast<char*>(cereproc_file_name);
+	  CPRCEN_engine_channel_to_file(voiceEngine, chan, fileName, CPRCEN_RIFF); /* File output on channel */
+	  // 	/* Speak with streaming input */
+	  CPRC_abuf* abuf = CPRCEN_engine_channel_speak(voiceEngine, chan, text, strlen(text),1);
 
-      int numspts = Normaliser_get_num_spurts( norm_id );
 
-      if ( numspts )
-      {
-         int sptcount = 0;
-         for ( int n = 0; n < numspts; n++ )
-         {
-            CPRCPMOD_spurt_synth( Normaliser_get_spurt( norm_id, n ), spurt, lxsrch, ltssrch, abuf );
-            sptcount++;
-         }
-      }
 
       /* Reset the parser.  This has to be done between input documents
       or the xml will be invalid and the parse will fail.
@@ -979,7 +989,7 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
       */
 
       // make the output file name from the input file less the extension, and the output dir
-      CPRC_riff_save( abuf, cereproc_file_name );
+      //CPRC_riff_save( abuf, cereproc_file_name );
 
       // Watch for special case help request
       int errorCode = 0;
@@ -1157,6 +1167,8 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
             XMLCh * xml_result = theSerializer->writeToString( rootElem );
             result = XMLString::transcode( xml_result );
             theSerializer->release();
+
+			CPRCEN_engine_channel_close(voiceEngine,chan);
          }
          catch ( const OutOfMemoryException & )
          {
@@ -1182,8 +1194,8 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
 
       //int speech_sz = 0;
       //speech_sz += abuf->wav_sz;
-      CPRC_lts_search_reset( ltssrch );
-      CPRC_spurt_clear( spurt );
+      //CPRC_lts_search_reset( ltssrch );
+      //CPRC_spurt_clear( spurt );
       //int fno = 0;
       //fno += 1;
    }
