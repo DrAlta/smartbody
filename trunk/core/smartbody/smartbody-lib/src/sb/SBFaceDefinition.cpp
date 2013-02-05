@@ -80,10 +80,10 @@ SBFaceDefinition::~SBFaceDefinition()
 
 void SBFaceDefinition::setFaceNeutral(const std::string& motionName)
 {
-	SkMotion* motion = NULL;
+	SmartBody::SBMotion* motion = NULL;
 	if (motionName.length() > 0)
 	{
-		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+		motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 		if (!motion)
 		{
 			LOG("ERROR: Unknown facial neutral motion \"%s\".", motionName.c_str());
@@ -129,10 +129,10 @@ void SBFaceDefinition::setAU(int auNum, const std::string& side, const std::stri
 		return;
 	}
 
-	SkMotion* motion = NULL;
+	SmartBody::SBMotion*  motion = NULL;
 	if (motionName.length() > 0)
 	{
-		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+		motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 		if (!motion)
 		{
 			LOG("ERROR: Unknown facial pose \"%s\".", motionName.c_str());

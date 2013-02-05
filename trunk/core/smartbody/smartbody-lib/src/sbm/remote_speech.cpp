@@ -592,7 +592,7 @@ int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p ) { //this fu
 
 int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgID, char* status, char* result, mcuCBHandle* mcu_p ) { //this function is not a member function of remote_speech; it waits for and processes the RemoteSpeechReply
 	if( LOG_RHETORIC_SPEECH ) LOG("\n \n *************in remote_speech::recieving_func***************** \n \n");
-	
+	std::string resultStr = result;
 	if( !remote_speech::commandLookUp.key_in_use( msgID ) ) { //of the response from Rvoice Relay timed out the key would be deleted
 		// TODO: Log / print error
 		return( CMD_FAILURE );  // known character but unknown message id
