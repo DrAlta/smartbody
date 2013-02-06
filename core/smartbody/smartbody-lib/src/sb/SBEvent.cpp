@@ -1,5 +1,6 @@
 //#include "vhcl_log.h"
 #include "SBEvent.h"
+#include <sb/SBCommandManager.h>
 #include "sbm/mcontrol_util.h"
 
 #include <boost/algorithm/string/replace.hpp>
@@ -26,7 +27,7 @@ void SBBasicHandler::executeAction(SBEvent* event)
 	boost::replace_all(action, "$1", event->getParameters());
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute((char*) action.c_str());
+	SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) action.c_str());
 }
 
 SBEventManager::SBEventManager()

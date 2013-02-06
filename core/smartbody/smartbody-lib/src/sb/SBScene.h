@@ -43,6 +43,8 @@ class SBSpeechManager;
 class SBParser;
 class SBSubject;
 class SBController;
+class SBVHMsgManager;
+class SBCommandManager;
 
 class SBScene : public SBObject
 {
@@ -129,6 +131,8 @@ class SBScene : public SBObject
 		SBAPI SBRetargetManager* getRetargetManager();
 		SBAPI SBAssetManager* getAssetManager();
 		SBAPI SBSpeechManager* getSpeechManager();
+		SBAPI SBVHMsgManager* getVHMsgManager();
+		SBAPI SBCommandManager* getCommandManager();
 
 		SBAPI SBParser* getParser();
 
@@ -219,6 +223,8 @@ class SBScene : public SBObject
 		SBEventManager* _eventManager;
 		SBAssetManager* _assetManager;
 		SBSpeechManager* _speechManager;
+		SBVHMsgManager* _vhmsgManager;
+		SBCommandManager* _commandManager;
 
 		SBParser* _parser;
 

@@ -180,37 +180,37 @@ namespace BML {
 		/**
 		 *  Notify BodyPlanner of vrAgentBML commands/messages.
 		 */
-		static int vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu );
+		static int vrAgentBML_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 
 		/**
 		 *  Notify BodyPlanner of vrSpeak command/message.
 		 */
-		static int vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu );
+		static int vrSpeak_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 
 		/**
 		 *  Notify BodyPlanner of vrSpoke messages.
 		 */
-		static int vrSpoke_func( srArgBuffer& args, mcuCBHandle *mcu );
+		static int vrSpoke_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 
 		/**
 		 *  Notify BodyPlanner of completed speech request.
 		 */
-		static int bpSpeechReady_func( srArgBuffer& args, mcuCBHandle *mcu );
+		static int bpSpeechReady_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 
 		/**
 		 *  Notify BodyPlanner of request timings.
 		 */
-		static int bp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu );
+		static int bp_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 
 		/**
 		 *  Handles the command "set bodyplanner" or "set bp"
 		 */
-		static int set_func( srArgBuffer& args, mcuCBHandle *mcu );
+		static int set_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 
 		/**
  		 *  Handles the command "print bodyplanner" or "print bp"
 		 */
-		static int print_func( srArgBuffer& args, mcuCBHandle *mcu );
+		static int print_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 
 		void (*requestcb)(BmlRequest* request, void* data);
 		void* requestData;

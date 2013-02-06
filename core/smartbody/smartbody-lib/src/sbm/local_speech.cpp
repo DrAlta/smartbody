@@ -66,6 +66,7 @@
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/framework/MemBufFormatTarget.hpp>
 #include "sbm/BMLDefs.h"
+#include <sb/SBCommandManager.h>
 
 
 using namespace std;
@@ -1455,8 +1456,7 @@ local_speech::~local_speech()
 void local_speech::sendSpeechCommand(const char* cmd)
 {
 	//LOG("speech cmd = %s",cmd);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	char* cmdConst = const_cast<char*>(cmd);
-	mcu.execute("RemoteSpeechCmd", cmdConst ); //sends the remote speech command using singleton* MCU_p
+	SmartBody::SBScene::getScene()->getCommandManager()->execute("RemoteSpeechCmd", cmdConst ); //sends the remote speech command using singleton* MCU_p
 }
 

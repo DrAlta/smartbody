@@ -37,7 +37,9 @@
 #include "time.h"
 #include <sb/SBSpeechManager.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBCommandManager.h>
 #include <sb/SBScene.h>
+#include <sbm/local_speech.h>
 
 #include "sbm/xercesc_utils.hpp"
 #include "sbm/BMLDefs.h"
@@ -196,12 +198,10 @@ void remote_speech::sendSpeechCommand(const char* cmd)
 {
 	//LOG("send speech command");
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.vhmsg_send( "RemoteSpeechCmd", cmd ); //sends the remote speech command using singleton* MCU_p
+	SmartBody::SBScene::getScene()->getVHMsgManager()->send( "RemoteSpeechCmd", cmd ); //sends the remote speech command using singleton* MCU_p
 }
 void remote_speech::sendSpeechTimeout(std::ostringstream& outStream)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	srCmdSeq *rVoiceTimeout= new srCmdSeq(); 
 	rVoiceTimeout->offset((float)(SmartBody::SBScene::getScene()->getSimulationManager()->getTime()));
 	string argumentString="RemoteSpeechTimeOut";
@@ -212,8 +212,8 @@ void remote_speech::sendSpeechTimeout(std::ostringstream& outStream)
 	char* seqName = new char[ 18+outStream.str().length()+1 ];  // 18 for RemoteSpeechTimeOut, 1 for \0
 //	sprintf( seqName, "RemoteSpeechTimeOut", myStream.str() );  // Anm - huh?? No % in format arg.
 	sprintf( seqName, "RemoteSpeechTimeOut" );  // Anm - huh?? No % in format arg.
-	mcu.activeSequences.removeSequence( seqName, true );  // remove old sequence by this name
-	if( !mcu.activeSequences.addSequence( seqName, rVoiceTimeout ) ) {
+	SmartBody::SBScene::getScene()->getCommandManager()->getActiveSequences()->removeSequence( seqName, true );  // remove old sequence by this name
+	if( !SmartBody::SBScene::getScene()->getCommandManager()->getActiveSequences()->addSequence( seqName, rVoiceTimeout ) ) {
 		LOG( "remote_speech::rVoiceTimeOut ERR:insert Rvoice timeoutCheck into active_seq_map FAILED, msgId=%s\n", seqName ); 
 	}	
 	delete [] seqName;
@@ -560,7 +560,7 @@ char*  remote_speech::getSpeechAudioFilename( RequestId requestId ){
 	return (justName);
 }
 
-int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p ) { //this function is not a member function of remote_speech; it waits for and processes the RemoteSpeechReply
+int remoteSpeechResult_func( srArgBuffer& args, SmartBody::SBCommandManager* manager ) { //this function is not a member function of remote_speech; it waits for and processes the RemoteSpeechReply
 	if( LOG_RHETORIC_SPEECH ) LOG("\n \n *************in recieving_func***************** \n \n" );
 
 	//LOG("remoteSpeechReply Func");
@@ -580,17 +580,18 @@ int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p ) { //this fu
 	}
 
 	//return mcu_p->speech_rvoice()->handleRemoteSpeechResult( character, msgID, status, result, mcu_p );
-	int ret = SmartBody::SBScene::getScene()->getSpeechManager()->speech_rvoice()->handleRemoteSpeechResult( character, msgID, status, result, mcu_p );
+	int ret = SmartBody::SBScene::getScene()->getSpeechManager()->speech_rvoice()->handleRemoteSpeechResult( character, msgID, status, result, manager );
 	// if the result is not from a remote speech relay, handle the result with local speech
 	if (ret != CMD_SUCCESS)
 	{
 		LOG("Not for the remote speech, handle with local speech");
-		ret = SmartBody::SBScene::getScene()->getSpeechManager()->speech_localvoice()->handleRemoteSpeechResult( character, msgID, status, result, mcu_p );
+		ret = SmartBody::SBScene::getScene()->getSpeechManager()->speech_localvoice()->handleRemoteSpeechResult( character, msgID, status, result, manager );
 	}
 	return ret;
 }
 
-int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgID, char* status, char* result, mcuCBHandle* mcu_p ) { //this function is not a member function of remote_speech; it waits for and processes the RemoteSpeechReply
+int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgID, char* status, char* result, SmartBody::SBCommandManager* manager ) 
+{ //this function is not a member function of remote_speech; it waits for and processes the RemoteSpeechReply
 	if( LOG_RHETORIC_SPEECH ) LOG("\n \n *************in remote_speech::recieving_func***************** \n \n");
 	std::string resultStr = result;
 	if( !remote_speech::commandLookUp.key_in_use( msgID ) ) { //of the response from Rvoice Relay timed out the key would be deleted
@@ -641,7 +642,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 			char* callback= new char[callbackCmd.length() + 1];
 			strcpy(callback,callbackCmd.c_str());
 			//LOG("callbackCmd = %s",callback);
-			mcu_p->execute(callback);
+			SmartBody::SBScene::getScene()->getCommandManager()->execute(callback);
 			//mcu_p->execute(callback);
 
 			//TODO: Execute the the CMD for success and failure somehow
@@ -653,7 +654,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 			string callbackCmd= string(remote_speech::commandLookUp.lookup(msgID)) +" "+ character->getName()+" "+ string(msgID)+" ERROR "+result;
 			char* callback= new char[callbackCmd.length()];
 			strcpy(callback,callbackCmd.c_str());
-			mcu_p->execute(callback);
+			SmartBody::SBScene::getScene()->getCommandManager()->execute(callback);
 			//mcu_p->execute(callback);
 
 			//TODO: Execute the the CMD for success and failure somehow
@@ -668,7 +669,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 		string callbackCmd= string(remote_speech::commandLookUp.lookup(msgID)) +" "+ character->getName()+" "+ string(msgID)+" ERROR XercesC error: "+e.what();
 		char* callback= new char[callbackCmd.length()];
 		strcpy(callback,callbackCmd.c_str());
-		mcu_p->execute(callback);
+		SmartBody::SBScene::getScene()->getCommandManager()->execute(callback);
 		//mcu_p->execute(callback);
 
 		//TODO: Execute the the CMD for success and failure somehow
@@ -701,7 +702,7 @@ void remote_speech::requestComplete( RequestId requestId ){
 
 }
 
-int remoteSpeechReady_func(srArgBuffer& args, mcuCBHandle* mcu_p){
+int remoteSpeechReady_func(srArgBuffer& args, SmartBody::SBCommandManager* manager){
 	if( LOG_RHETORIC_SPEECH ) cout<<"***************in remoteSpeechReady_func**********"<<endl;
 
 	remote_speech x;
@@ -752,7 +753,7 @@ int remoteSpeechReady_func(srArgBuffer& args, mcuCBHandle* mcu_p){
 	return (1);
 }
 
-int remote_speech_test( srArgBuffer& args, mcuCBHandle* mcu_p ) { //Tester function for remote Speech 
+int remote_speech_test( srArgBuffer& args, SmartBody::SBCommandManager* manager) { //Tester function for remote Speech 
 	try{
 		if( LOG_RHETORIC_SPEECH ) LOG("\n \n *************In remote_speech_test***************** \n \n");
 //		char* x= "<?xml version=\"1.0\" encoding=\"UTF-8\"?><speak> Something <mark name=\"hello\"/> to <mark name=\"mark\"/> say <mark name= \"wtf\"/>  </speak>";
@@ -793,13 +794,13 @@ int set_char_voice(char* char_name, char* voiceCode, mcuCBHandle* mcu_p) //handl
 	return (CMD_FAILURE);
 }
 
-int remoteSpeechTimeOut_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
+int remoteSpeechTimeOut_func( srArgBuffer& args, SmartBody::SBCommandManager* manager ) {
 	const char* request_id_str = args.read_token();
 	// is valid arg?
-	return SmartBody::SBScene::getScene()->getSpeechManager()->speech_rvoice()->testRemoteSpeechTimeOut( request_id_str, mcu_p );
+	return SmartBody::SBScene::getScene()->getSpeechManager()->speech_rvoice()->testRemoteSpeechTimeOut( request_id_str, manager );
 }
 
-int remote_speech::testRemoteSpeechTimeOut( const char* request_id_str, mcuCBHandle* mcu_p )
+int remote_speech::testRemoteSpeechTimeOut( const char* request_id_str, SmartBody::SBCommandManager* manager)
 {
 	/* function gets called a certain # of seconds (specified by const int timeout in remoteoric::speech and if the request hasn't been
 	processed it's a Timout and all the request info is deleted inside the lookup tables */
@@ -818,7 +819,7 @@ int remote_speech::testRemoteSpeechTimeOut( const char* request_id_str, mcuCBHan
 		char* execCmd = new char[ execStrng.length() + 1 ];
 		strcpy( execCmd, execStrng.c_str() );  
 		requestComplete( request_id ); 
-		mcu_p->execute( execCmd ); //sends error command to bp speechReady
+		SmartBody::SBScene::getScene()->getCommandManager()->execute( execCmd ); //sends error command to bp speechReady
 		
 	}
 	

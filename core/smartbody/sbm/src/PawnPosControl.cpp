@@ -65,8 +65,6 @@ void PawnControl::set_pawn_pos(SbmPawn* pawn, SrVec& pos)
 	
 	pawn->set_world_offset(pos.x,pos.y,pos.z,h,p,r);
 	pawn->updateToColObject();	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.resourceDataChanged = true;
 }
 
 SrQuat PawnControl::get_pawn_rot( SbmPawn* pawn )
@@ -90,8 +88,6 @@ void PawnControl::set_pawn_rot( SbmPawn* pawn, SrQuat& quat )
 	gwiz::euler_t e = gwiz::euler_t(q);
 	pawn->set_world_offset(x,y,z,(float)e.h(),(float)e.p(),(float)e.r());	
 	pawn->updateToColObject();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();	
-	mcu.resourceDataChanged = true;
 }
 
 void PawnControl::notify(SmartBody::SBSubject* subject)

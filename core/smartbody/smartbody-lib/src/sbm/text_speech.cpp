@@ -116,12 +116,12 @@ RequestId text_speech::requestSpeechAudio( const char* agentName, std::string vo
 	uttLookUp.insert(myStream.str().c_str(), replyDoc->getDocumentElement());
 
 	string seqName = "text_speech" + myStream.str();
-	mcu.activeSequences.removeSequence(seqName, true);
+	SmartBody::SBScene::getScene()->getCommandManager()->getActiveSequences()->removeSequence(seqName, true);
 	srCmdSeq* sq = new srCmdSeq();
 	string s = string(callbackCmd) + *agentNamePtr + " " + myStream.str().c_str() + " SUCCESS";
 	sq->insert(0, s.c_str());
 	sq->offset((float)SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
-	mcu.activeSequences.addSequence(seqName, sq);
+	SmartBody::SBScene::getScene()->getCommandManager()->getActiveSequences()->addSequence(seqName, sq);
 
 	return (msgNumber); //returns the unique message number
 }
@@ -261,11 +261,12 @@ void text_speech::startSchedule( SmartBody::RequestId requestId ) {
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		seq->offset((float)SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 		string seqname = "text_speech_" + myStream.str();
-		mcu.activeSequences.addSequence(seqname, seq);
+		SmartBody::SBScene::getScene()->getCommandManager()->getActiveSequences()->addSequence(seqname, seq);
 	}
 }
 
-int text_speech::text_speech_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+int text_speech::text_speech_func( srArgBuffer& args, SmartBody::SBCommandManager* manager )
+{
 	if (args.calc_num_tokens() == 1) {
 		int id = args.read_int();
 		SmartBody::SBScene::getScene()->getSpeechManager()->speech_text()->startSchedule(id);

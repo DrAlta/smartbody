@@ -50,6 +50,10 @@
 #include <resourceViewer/ResourceWindow.h>
 #include <faceviewer/FaceViewer.h>
 
+#ifndef USE_WSP
+#define USE_WSP 1
+#endif
+
 #if USE_WSP
 #include "wsp.h"
 #endif
@@ -62,6 +66,7 @@
 #include <sbm/sbm_test_cmds.hpp>
 #include BML_PROCESSOR_INCLUDE
 #include <sbm/remote_speech.h>
+#include <sbm/local_speech.h>
 #include <sbm/sbm_audio.h>
 #include <sbm/sbm_speech_audiofile.hpp>
 #include <sbm/text_speech.h> // [BMLR]
@@ -72,6 +77,7 @@
 #include <sb/SBPython.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBVHMsgManager.h>
 #include <sb/SBSpeechManager.h>
 #include <sb/SBAssetManager.h>
 #include "FLTKListener.h"
@@ -152,62 +158,63 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data )
 
 // snapshot <windowHeight> <windowWidth> <offsetHeight> <offsetWidth> <output file>
 // The offset is according to the left bottom corner of the image frame buffer
-int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	if( mcu_p )
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	if (!rootWindow)
 	{
-		BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(mcu_p->viewer_p);
-		if (!rootWindow)
-		{
-			LOG("Viewer doesn't exist. Cannot take snapshot.");
-			return CMD_FAILURE;
-		}
-
-		int windowHeight = args.read_int();
-		int windowWidth = args.read_int();
-		int offsetHeight = args.read_int();
-		int offsetWidth = args.read_int();
-
-		string output_file = args.read_token();
-
-		if( windowHeight == 0 )		windowHeight = rootWindow->fltkViewer->h();;							// default window size
-		if( windowWidth == 0 )		windowWidth = rootWindow->fltkViewer->w();
-		if( output_file == "" )		
-		{
-			std::stringstream output_file_os;
-			output_file_os<< "snapshot_"<< snapshotCounter<< ".ppm";	// default output name
-			snapshotCounter++;
-			output_file = output_file_os.str();
-		}
-		// Allocate a picture buffer 
-		Pic * in = pic_alloc(windowWidth, windowHeight, 3, NULL);
-		LOG("  File to save to: %s", output_file.c_str());
-
-		for (int i=windowHeight-1; i>=0; i--) 
-		{
-			glReadPixels(0 + offsetWidth, windowHeight+offsetHeight-i-1, windowWidth, 1 , GL_RGB, GL_UNSIGNED_BYTE, &in->pix[i*in->nx*in->bpp]);
-		}
-
-		if (ppm_write(output_file.c_str(), in))
-		{
-			pic_free(in);
-			LOG("  File saved Successfully\n");
-			return( CMD_SUCCESS );
-		}
-		else
-		{
-			pic_free(in);
-			LOG("  Error in Saving\n");
-			return( CMD_FAILURE );
-		}	
+		LOG("Viewer doesn't exist. Cannot take snapshot.");
+		return CMD_FAILURE;
 	}
+
+	int windowHeight = args.read_int();
+	int windowWidth = args.read_int();
+	int offsetHeight = args.read_int();
+	int offsetWidth = args.read_int();
+
+	string output_file = args.read_token();
+
+	if( windowHeight == 0 )		windowHeight = rootWindow->fltkViewer->h();;							// default window size
+	if( windowWidth == 0 )		windowWidth = rootWindow->fltkViewer->w();
+	if( output_file == "" )		
+	{
+		std::stringstream output_file_os;
+		output_file_os<< "snapshot_"<< snapshotCounter<< ".ppm";	// default output name
+		snapshotCounter++;
+		output_file = output_file_os.str();
+	}
+	// Allocate a picture buffer 
+	Pic * in = pic_alloc(windowWidth, windowHeight, 3, NULL);
+	LOG("  File to save to: %s", output_file.c_str());
+
+	for (int i=windowHeight-1; i>=0; i--) 
+	{
+		glReadPixels(0 + offsetWidth, windowHeight+offsetHeight-i-1, windowWidth, 1 , GL_RGB, GL_UNSIGNED_BYTE, &in->pix[i*in->nx*in->bpp]);
+	}
+
+	if (ppm_write(output_file.c_str(), in))
+	{
+		pic_free(in);
+		LOG("  File saved Successfully\n");
+		return( CMD_SUCCESS );
+	}
+	else
+	{
+		pic_free(in);
+		LOG("  Error in Saving\n");
+		return( CMD_FAILURE );
+	}	
+
 	return( CMD_SUCCESS );
 }
 
-int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
+int mcu_quit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )	{
 
-	mcu_p->loop = false;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->getSimulationManager()->stop();
 	if (scene->getSteerManager()->getEngineDriver()->isInitialized())
 	{
 		scene->getSteerManager()->getEngineDriver()->stopSimulation();
@@ -235,22 +242,22 @@ int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 void mcu_register_callbacks( void ) {
 	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
+	SmartBody::SBCommandManager* cmdMgr = SmartBody::SBScene::getScene()->getCommandManager();
+	
 	// additional commands associated with this viewer
-	mcu.insert( "q",			mcu_quit_func );
-	mcu.insert( "quit",			mcu_quit_func );
-	mcu.insert( "snapshot",		mcu_snapshot_func );
-	mcu.insert( "viewer",		mcu_viewer_func );
+	cmdMgr->insert( "q",			mcu_quit_func );
+	cmdMgr->insert( "quit",			mcu_quit_func );
+	cmdMgr->insert( "snapshot",		mcu_snapshot_func );
+	cmdMgr->insert( "viewer",		mcu_viewer_func );
 }
 
 void cleanup( void )	{
 	{
 
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		if( mcu.loop )	{
+		if (SmartBody::SBScene::getScene()->getSimulationManager()->isStopped())
+		{
 			LOG( "SmartBody NOTE: unexpected exit " );
-			mcu.loop = false;
 		}
 
 		if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
@@ -258,11 +265,12 @@ void cleanup( void )	{
 			AUDIO_Close();
 		}
 
-		mcu.vhmsg_send( "vrProcEnd sbm" );
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send("vrProcEnd sbm");
 
 #if LINK_VHMSG_CLIENT
-		if( mcu.vhmsg_enabled )	{
-			vhmsg::ttu_close();
+		if (SmartBody::SBScene::getScene()->getVHMsgManager()->isEnable())
+		{
+			SmartBody::SBScene::getScene()->getVHMsgManager()->disconnect();
 		}
 #endif
 	}
@@ -285,7 +293,8 @@ void signal_handler(int sig) {
 //	std::cout << "SmartBody shutting down after catching signal " << sig << std::endl;
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.vhmsg_send( "vrProcEnd sbm" );
+
+	SmartBody::SBScene::getScene()->getVHMsgManager()->send("vrProcEnd sbm" );
 	// get the current directory
 #ifdef WIN32
 	char buffer[MAX_PATH];
@@ -437,7 +446,7 @@ int main( int argc, char **argv )	{
 	FLTKListener fltkListener;
 
 	// change the default font size
-	FL_NORMAL_SIZE = 10;
+	FL_NORMAL_SIZE = 12;
 	FltkViewerFactory* viewerFactory = new FltkViewerFactory();
 	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
 	//viewerFactory->setFltkViewer(viewer);
@@ -446,9 +455,7 @@ int main( int argc, char **argv )	{
 	mcu.register_OgreViewer_factory(new OgreViewerFactory());
 #endif
 	
-	mcu_register_callbacks();
-
-
+	
 
 	std::string python_lib_path = "../../../../core/smartbody/Python26/Lib";
 	std::string festivalLibDir = "../../../../lib/festival/festival/lib/";
@@ -672,11 +679,14 @@ int main( int argc, char **argv )	{
 		}
 	}
 
-	#ifndef SB_NO_PYTHON
+#ifndef SB_NO_PYTHON
 	// initialize python
 	LOG("Initializing Pyton with libraries at location: %s", python_lib_path.c_str());
 	initPython(python_lib_path);
 #endif
+
+	mcu_register_callbacks();
+
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->setCharacterListener(&fltkListener);
 
@@ -702,33 +712,36 @@ int main( int argc, char **argv )	{
 	char * vhmsg_server = getenv( "VHMSG_SERVER" );
 	char * vhmsg_port = getenv("VHMSG_PORT");
 	bool vhmsg_disabled = ( vhmsg_server != NULL && strcasecmp( vhmsg_server, "none" ) == 0 );  // hope there is no valid server named "none"
+	std::string vhmsgServerStr = "";
+	if (vhmsg_server)
+		vhmsgServerStr = vhmsg_server;
+	std::string vhmsgPortStr = "";
+	if (vhmsg_port)
+		vhmsgPortStr = vhmsg_port;
 
-	if( !vhmsg_disabled &&
-		vhmsg::ttu_open()==vhmsg::TTU_SUCCESS )
+
+	SmartBody::SBVHMsgManager* vhmsgManager = SmartBody::SBScene::getScene()->getVHMsgManager();
+	if( !vhmsg_disabled)
 	{
-		vhmsg::ttu_set_client_callback( sbm_vhmsg_callback );
-		err = vhmsg::ttu_register( "sb" );
-		err = vhmsg::ttu_register( "sbm" );
-		err = vhmsg::ttu_register( "vrAgentBML" );
-		err = vhmsg::ttu_register( "vrExpress" );
-		err = vhmsg::ttu_register( "vrSpeak" );
-		err = vhmsg::ttu_register( "RemoteSpeechReply" );
-		err = vhmsg::ttu_register( "PlaySound" );
-		err = vhmsg::ttu_register( "StopSound" );
-		err = vhmsg::ttu_register( "CommAPI" );
-		err = vhmsg::ttu_register( "object-data" );
-		err = vhmsg::ttu_register( "vrAllCall" );
-		err = vhmsg::ttu_register( "vrKillComponent" );
-		err = vhmsg::ttu_register( "wsp" );
-		err = vhmsg::ttu_register( "receiver" );
-		err = vhmsg::ttu_register( "sbmdebugger" );
-		err = vhmsg::ttu_register( "vrPerception" );
-		err = vhmsg::ttu_register( "vrBCFeedback" );
-		err = vhmsg::ttu_register( "vrSpeech" );
-
-		mcu.vhmsg_enabled = true;
-	} else {
-		if( vhmsg_disabled ) {
+		if (vhmsgServerStr != "")
+			vhmsgManager->setServer(vhmsgServerStr);
+		if (vhmsgPortStr != "")
+			vhmsgManager->setPort(vhmsgPortStr);
+		
+		bool success = vhmsgManager->connect();
+		if (success)
+		{
+			vhmsgManager->setEnable(true);
+		}
+		else
+		{
+			LOG("Could not connect to server %s, VHMSG service not enabled.", vhmsg_server);
+		}
+	}
+	else
+	{
+		if( vhmsg_disabled )
+		{
 			LOG( "SmartBody: VHMSG_SERVER='%s': Messaging disabled.\n", vhmsg_server?"NULL":vhmsg_server );
 		} else {
 #if 0 // disable server name query until vhmsg is fixed
@@ -738,7 +751,7 @@ int main( int argc, char **argv )	{
 			LOG("Could not connect to %s:%s", vhserver.c_str(), vhport.c_str());
 #endif
 		}
-		mcu.vhmsg_enabled = false;
+		vhmsgManager->setEnable(false);
 	}
 #endif
 
@@ -855,7 +868,7 @@ int main( int argc, char **argv )	{
 
 	// Notify world SBM is ready to receive messages
 	srArgBuffer argBuff("");
-	mcu_vrAllCall_func( argBuff, &mcu );
+	mcu_vrAllCall_func( argBuff, SmartBody::SBScene::getScene()->getCommandManager() );
 
 	scene->getSimulationManager()->start();
 
@@ -871,7 +884,7 @@ int main( int argc, char **argv )	{
 	std::string pythonPrompt = "# ";
 	std::string commandPrompt = "> ";
 
-	while( mcu.loop )	{
+	while((SmartBody::SBScene::getScene()->getSimulationManager()->isRunning()))	{
 
 
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -883,8 +896,11 @@ int main( int argc, char **argv )	{
 	//	mcu.mark( "main", 0, "fltk-check" );
 		Fl::check();
 
+		scene = SmartBody::SBScene::getScene();
+
 #if LINK_VHMSG_CLIENT
-		if( mcu.vhmsg_enabled )	{
+		if (SmartBody::SBScene::getScene()->getVHMsgManager()->isEnable())
+		{
 			err = vhmsg::ttu_poll();
 			if( err == vhmsg::TTU_ERROR )	{
 				fprintf( stderr, "ttu_poll ERROR\n" );

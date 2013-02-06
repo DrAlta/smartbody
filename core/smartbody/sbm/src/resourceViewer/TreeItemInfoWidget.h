@@ -119,6 +119,7 @@ class PawnItemInfoWidget : public TreeItemInfoWidget, public SmartBody::SBObserv
 {
 public:
 	PawnItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SBObserver* observerWindow = NULL);	
+	~PawnItemInfoWidget();
 	virtual void updateWidget();
 	virtual void notify(SmartBody::SBSubject* subject);
 protected:

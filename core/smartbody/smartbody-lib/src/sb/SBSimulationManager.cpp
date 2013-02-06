@@ -33,6 +33,7 @@ SBSimulationManager::SBSimulationManager()
 	_simStarted = false;
 	_simPlaying = false;
 	_hasTimer = false;
+	_simStopped = false;
 
 	internal_profiler_p = NULL;
 	external_profiler_p = NULL;
@@ -142,6 +143,12 @@ bool SBSimulationManager::isRunning()
 	}
 }
 
+
+bool SBSimulationManager::isStopped()
+{
+	return _simStopped;
+}
+
 void SBSimulationManager::reset()
 {
 	if (timer_p)	
@@ -193,6 +200,7 @@ void SBSimulationManager::stop()
 	{
 		_simStarted = false;
 		_simPlaying = false;
+		_simStopped = true;
 	}
 }
 

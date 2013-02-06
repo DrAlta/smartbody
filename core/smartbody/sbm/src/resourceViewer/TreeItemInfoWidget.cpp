@@ -556,6 +556,13 @@ PawnItemInfoWidget::PawnItemInfoWidget( int x, int y, int w, int h, const char* 
 	this->end();
 }
 
+PawnItemInfoWidget::~PawnItemInfoWidget()
+{
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnName);
+	if (pawn)
+		pawn->unregisterObserver(this);
+}
+
 void PawnItemInfoWidget::updateWidget()
 {
 	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnName);

@@ -33,15 +33,6 @@ class mcuCBHandle;
 #include <map>
 #include <vhcl.h>
 
-#ifdef __ANDROID__
-#define LINK_VHMSG_CLIENT		(1)
-#define USE_WSP 1
-#elif defined(__native_client__)
-#define USE_WSP 0
-#else
-#define LINK_VHMSG_CLIENT		(1)
-#define USE_WSP 1
-#endif
 
 
 #if LINK_VHMSG_CLIENT
@@ -49,17 +40,14 @@ class mcuCBHandle;
 #endif
 
 #include <sbm/GenericViewer.h>
-
+#include <sb/SBVHMsgManager.h>
+#include <sb/SBScene.h>
 #include "sbm_constants.h"
 
 #include "sr_hash_map.h"
 #include "sr_cmd_map.h"
 #include "sr_cmd_seq.h"
 #include "sr_path_list.h"
-#include "remote_speech.h"
-#include "local_speech.h"
-#include "text_speech.h" // [BMLR]
-#include "sbm_speech_audiofile.hpp"
 
 #include <sbm/action_unit.hpp>
 #include <sbm/general_param_setting.h>
@@ -123,24 +111,6 @@ class CameraTrack
 		double threshold;
 };
 
-class SequenceManager
-{
-	public:
-		SequenceManager();
-		~SequenceManager();
-
-		bool addSequence(const std::string& seqName, srCmdSeq* seq);
-		bool removeSequence(const std::string& seqName, bool deleteSequence);
-		srCmdSeq* getSequence(const std::string& name);
-		srCmdSeq* getSequence(int num, std::string& name);
-		int getNumSequences();
-
-		void clear();
-
-	protected:
-		std::set<std::string> _sequenceSet;
-		std::vector<std::pair<std::string, srCmdSeq*> > _sequences;
-};
 
 class VHMsgLog;
 
@@ -151,16 +121,9 @@ class mcuCBHandle {
 
 	public:
 		// Data
-		unsigned int				queued_cmds;
-		
-		bool		loop;
-		bool		vhmsg_enabled;
 		vhcl::Log::Listener* logListener;
 		bool		net_bone_updates;
 		bool		net_world_offset_updates;
-		bool        resourceDataChanged;
-		int testBMLId;
-
 		
 		//double      physicsTime;
 
@@ -177,38 +140,24 @@ class mcuCBHandle {
 
 		std::string initPythonLibPath;
 
-		srCmdMap <mcuCBHandle>		cmd_map;
-		srCmdMap <mcuCBHandle>		set_cmd_map;
-		srCmdMap <mcuCBHandle>		print_cmd_map;
-		srCmdMap <mcuCBHandle>		test_cmd_map;
+	
 
-		SequenceManager	pendingSequences;
-		SequenceManager activeSequences;
 
 		std::map<std::string, DeformableMesh*> deformableMeshMap;
 
 		GeneralParamMap				param_map;			// map that contains the information of shader parameters
 
 		std::string getValidName(const std::string& name);
-		int registerCharacter(SbmCharacter* character);
-		int unregisterCharacter(SbmCharacter* character);
-		int registerPawn(SbmPawn* pawn);
-		int unregisterPawn(SbmPawn* pawn);
 
 		std::map<std::string, SbmPawn*>& getPawnMap();
 		bool addPawn(SbmPawn* pawn);
 		void removePawn(const std::string& name);
 		SbmPawn* getPawn(const std::string& name);
 		int getNumPawns();
-
-		std::map<std::string, DeformableMesh*>& getDeformableMeshMap();
-		DeformableMesh* getDeformableMesh(const std::string& name);
-
 		
 		std::map<std::string, SbmCharacter*>& getCharacterMap();
 
 
-		std::map<std::string, SmartBody::Nvbg*> nvbgMap;
 		std::map<std::string, SbmPawn*>	pawn_map;
 		std::map<std::string, SbmCharacter*> character_map;
 
@@ -289,10 +238,6 @@ public:
 		// ----------------------------------------------
 		void set_net_host( const char * net_host );
 
-		int vhmsg_send( const char *op, const char* message );
-
-		int vhmsg_send( const char* message );
-
 		void NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map );
 		// ----------------------------------------------
 		// END vhmsg and network management
@@ -309,75 +254,15 @@ public:
 		// END asset management
 		// ----------------------------------------------
 
-		srCmdSeq* lookup_seq( const char* );
 
 		// ----------------------------------------------
 		// command management
 		// ----------------------------------------------
-		int execute( const char *key, srArgBuffer& args ) { 
-			std::stringstream strstr;
-			strstr << key << " " << args.peek_string();
-			
-
-			int ret = ( cmd_map.execute( key, args, this ) );
-			if (ret == CMD_SUCCESS)
-				resourceDataChanged = true;
-
-			return ret; 
-		}
-
-		int execute( const char *key, char* strArgs ) {
-			std::stringstream strstr;
-			strstr << key << " " << strArgs;
-
-            srArgBuffer args( strArgs );
-			
-			int ret = ( cmd_map.execute( key, args, this ) );
-			if (ret == CMD_SUCCESS)
-				resourceDataChanged = true;
-
-			return ret; 
-		}
-
-		int execute( char *cmd ) { 
-
-			//LOG("execute cmd = %s\n",cmd);
-			// check to see if this is a sequence command
-			// if so, save the command id
-			std::string checkCmd = cmd;
-			size_t startpos = checkCmd.find_first_not_of(" \t");
-			if( std::string::npos != startpos )
-				checkCmd = checkCmd.substr( startpos );
-
-			int ret = ( cmd_map.execute( cmd, this ) ); 
-			if (ret == CMD_SUCCESS)
-				resourceDataChanged = true;
-
-			return ret;
-		}
-
-		int execute_seq( srCmdSeq *seq );
-		int execute_seq( srCmdSeq *seq, const char* seq_name );
-		int execute_seq_chain( const std::vector<std::string>& seq_names, const char* error_prefix = NULL );
-
-		//  Schedule command in some seconds
-		int execute_later( const char* command, float seconds );
-
-		//  Queue command for next frame
-		int execute_later( const char* command ) { 
-			return( execute_later( command, 0 ) ); 
-		}
+		
 
 		int executePython(const char* command);
 		int executePythonFile(const char* filename);
 
-
-		int abortSequence( const char* command );
-		int deleteSequence( const char* command );
-
-		// ----------------------------------------------
-		// END command management
-		// ----------------------------------------------
 
 		
 		// ----------------------------------------------
@@ -406,34 +291,6 @@ public:
 		// ----------------------------------------------
 
 
-		// ----------------------------------------------
-		// command setup management
-		// ----------------------------------------------
-		int insert_set_cmd( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
-			return( set_cmd_map.insert( key, fp ) );
-		}
-
-		int insert_print_cmd( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
-			return( print_cmd_map.insert( key, fp ) );
-		}
-
-		int insert_test_cmd( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
-			return( test_cmd_map.insert( key, fp ) );
-		}
-		int insert( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp, char* description = NULL )
-		{
-			//if (cmd_map.is_command(key))
-				return( cmd_map.insert( key, fp ) );
-			//else
-			//	return CMD_SUCCESS;
-		}
-
-		void registerCallbacks();
-		// ----------------------------------------------
-		// END command setup management
-		// ----------------------------------------------
-
-
 	public:
 		
 };
@@ -451,8 +308,7 @@ class VHMsgLogger : public vhcl::Log::Listener
 
         virtual void OnMessage( const std::string & message )
 		{
-			 mcuCBHandle& mcu = mcuCBHandle::singleton();
-			 mcu.vhmsg_send("sbmlog", message.c_str());
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send("sbmlog", message.c_str());
 		}
 };
 //////////////////////////////////////////////////////////////////

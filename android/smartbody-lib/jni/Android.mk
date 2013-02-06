@@ -395,7 +395,6 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_recorder.cpp \
 	$(SBM_MY_DIR)/controllers/MeCtBlendEngine.cpp \
 	$(SBM_MY_DIR)/controllers/MotionAnalysis.cpp \
-	$(SBM_MY_DIR)/sbm/me_utilities.cpp \
 	$(SBM_MY_DIR)/sbm/ParserFBX.cpp \
 	$(SBM_MY_DIR)/sbm/ParserOpenCOLLADA.cpp \
 	$(SBM_MY_DIR)/sbm/ParserOgre.cpp \
@@ -491,6 +490,10 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBRetargetManager.cpp \
 	$(SBM_MY_DIR)/sb/SBAsset.cpp \
 	$(SBM_MY_DIR)/sb/SBAssetManager.cpp \
+	$(SBM_MY_DIR)/sb/SBAsset.cpp \
+	$(SBM_MY_DIR)/sb/SBSpeechManager.cpp \
+	$(SBM_MY_DIR)/sb/SBVHMsgManager.cpp \
+	$(SBM_MY_DIR)/sb/SBCommandManager.cpp \
 	
 	
 LOCAL_LDLIBS    := -llog 

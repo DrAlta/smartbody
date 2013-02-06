@@ -43,6 +43,7 @@
 #include "sbm/BMLDefs.h"
 #include <boost/lexical_cast.hpp>
 #include <sb/SBSteerManager.h>
+#include <sb/SBCommandManager.h>
 
 ////// XML ATTRIBUTES
 
@@ -151,7 +152,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 	std::string locotype = xml_parse_string(BMLDefs::ATTR_TYPE, elem);
 	std::string steerTypeCommand = "steer type " + locotype;
-	mcu->execute((char*) steerTypeCommand.c_str());
+	SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) steerTypeCommand.c_str());
 	float proximity = xml_parse_float(BMLDefs::ATTR_PROXIMITY, elem, ppraiAgent->distThreshold);
 	ppraiAgent->distThreshold = proximity;
 	ppraiAgent->acceleration = xml_parse_float(BMLDefs::ATTR_STEERACCEL, elem, ppraiAgent->acceleration);
@@ -222,7 +223,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 				{
 					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"" << ppraiAgent->jumpName << "\" sbm:startnow=\"true\"/>";
 				}
-				mcu->execute((char*)command1.str().c_str());
+				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*)command1.str().c_str());
 				return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
 			}
 		}
@@ -241,7 +242,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	{
 		std::stringstream command;
 		command << "steer braking " << c->getName() << " " << (float)atof(brakingFactor);
-		mcu->execute((char*)command.str().c_str());	
+		SmartBody::SBScene::getScene()->getCommandManager()->execute((char*)command.str().c_str());	
 	}
 
 	// for facing angle, we need to execute with some delay
@@ -285,7 +286,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		command << "steer facing " << c->getName() << " " << facingAngleVal;
 		srCmdSeq *seq = new srCmdSeq();
 		seq->insert(float(SmartBody::SBScene::getScene()->getSimulationManager()->getTime() + SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt()), command.str().c_str());
-		mcu->execute_seq(seq);
+		SmartBody::SBScene::getScene()->getCommandManager()->execute_seq(seq);
 	}
 	else
 	{
@@ -293,7 +294,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		command << "steer facing " << c->getName() << " " << "-200"; // set to fabs() > 180 to cancel old facing value
 		srCmdSeq *seq = new srCmdSeq();
 		seq->insert(float(SmartBody::SBScene::getScene()->getSimulationManager()->getTime() + SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt()), command.str().c_str());
-		mcu->execute_seq(seq);
+		SmartBody::SBScene::getScene()->getCommandManager()->execute_seq(seq);
 	}
 	std::string following = xml_parse_string(BMLDefs::ATTR_FOLLOW, elem);
 	SmartBody::SBCharacter* followingC = SmartBody::SBScene::getScene()->getCharacter(following);
@@ -411,7 +412,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 					command1 << "0 0 0 0 0 0 1";
 				if (stepDirection == "right")
 					command1 << "0 0 0 1 0 0 0";
-				mcu->execute((char*)command1.str().c_str());
+				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*)command1.str().c_str());
 			}
 		}
 	}

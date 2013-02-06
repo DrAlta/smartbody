@@ -118,6 +118,8 @@
 #include <controllers/me_controller_tree_root.hpp>
 #include <controllers/me_ct_example_body_reach.hpp>
 #include <sbm/MiscCommands.h>
+#include <sbm/remote_speech.h>
+#include <sbm/text_speech.h>
 
 #include "Heightfield.h"
 #include "sb/sbm_pawn.hpp"
@@ -271,23 +273,17 @@ int SequenceManager::getNumSequences()
 }
 
 mcuCBHandle::mcuCBHandle()
-:	loop( true ),
-	vhmsg_enabled( false ),	
-	net_world_offset_updates( true ),
-	resourceDataChanged( false ),
+:	net_world_offset_updates( true ),
 	viewer_p( NULL ),
 	ogreViewer_p( NULL ),
 	camera_p( NULL ),
 	root_group_p( new SrSnGroup() ),
 	height_field_p( NULL ),
-	queued_cmds( 0 ),
 	viewer_factory ( new SrViewerFactory() ),
 	ogreViewerFactory ( new SrViewerFactory() ),
 	logListener(NULL),
 	initPythonLibPath("")
 {	
-	testBMLId = 0;
-	registerCallbacks();
 	root_group_p->ref();
 	kinectProcessor = new KinectProcessor();
 #if USE_WSP
@@ -369,16 +365,10 @@ void mcuCBHandle::reset( void )
 	clear();
 
 	// initialize everything
-	loop = true;
-	vhmsg_enabled = false;
 	net_bone_updates = false;
 	net_world_offset_updates = true;
-	resourceDataChanged = false;
 	root_group_p = new SrSnGroup();
-	queued_cmds = 0;
 	logListener = NULL;
-	testBMLId = 0;
-	registerCallbacks();
 	root_group_p->ref();
 	kinectProcessor = new KinectProcessor();
 #if USE_WSP
@@ -393,130 +383,6 @@ void mcuCBHandle::reset( void )
 
 
 
-void mcuCBHandle::registerCallbacks()
-{
-	insert( "sb",			sb_main_func );
-	insert( "sbm",			sbm_main_func );
-	insert( "help",			mcu_help_func );
-
-	insert( "reset",		mcu_reset_func );
-	insert( "echo",			mcu_echo_func );
-	
-	insert( "path",			mcu_filepath_func );
-	insert( "seq",			mcu_sequence_func );
-	insert( "seq-chain",	mcu_sequence_chain_func );
-	insert( "send",			sbm_vhmsg_send_func );
-
-	//  cmd prefixes "set" and "print"
-	insert( "set",          mcu_set_func );
-	insert( "print",        mcu_print_func );
-	insert( "test",			mcu_test_func );
-
-	insert( "camera",		mcu_camera_func );
-	insert( "terrain",		mcu_terrain_func );
-	insert( "time",			mcu_time_func );
-	insert( "tip",			mcu_time_ival_prof_func );
-
-	insert( "panim",		mcu_panim_cmd_func );	
-	insert( "physics",		mcu_physics_cmd_func );	
-	insert( "mirror",       mcu_motion_mirror_cmd_func);
-	insert( "motionplayer", mcu_motion_player_func);
-
-	insert( "pawn",			pawn_cmd_func );
-	insert( "char",			character_cmd_func );
-
-	insert( "ctrl",			mcu_controller_func );
-	insert( "wsp",			mcu_wsp_cmd_func );
-	insert( "create_remote_pawn", create_remote_pawn_func );
-
-	insert( "vrAgentBML",   BML_PROCESSOR::vrAgentBML_cmd_func );
-	insert( "bp",		    BML_PROCESSOR::bp_cmd_func );
-	insert( "vrSpeak",		BML_PROCESSOR::vrSpeak_func );
-	insert( "vrExpress",  mcu_vrExpress_func );
-
-	insert( "receiver",		mcu_joint_datareceiver_func );
-	insert( "net_reset",           mcu_net_reset );
-	insert( "net_check",           mcu_net_check );
-	insert( "RemoteSpeechCmd"  ,   mcuFestivalRemoteSpeechCmd_func );
-	insert( "RemoteSpeechReply",   remoteSpeechResult_func );
-	insert( "RemoteSpeechTimeOut", remoteSpeechTimeOut_func);  // internally routed message
-//	insert( "locomotion",          locomotion_cmd_func );
-//	insert( "loco",                locomotion_cmd_func ); // shorthand
-	insert( "syncpolicy",          mcu_syncpolicy_func );
-	insert( "check",			   mcu_check_func);		// check matching between .skm and .sk
-	insert( "pythonscript",		   mcu_pythonscript_func);
-	insert( "python",			   mcu_python_func);
-	insert( "p",				   mcu_python_func);
-	insert( "adjustmotion",		   mcu_adjust_motion_function);
-	insert( "mediapath",		   mcu_mediapath_func);
-	insert( "bml",				   test_bml_func );
-	insert( "triggerevent",		   triggerevent_func );
-	insert( "addevent",			   addevent_func );
-	insert( "removeevent",		   removeevent_func );
-	insert( "enableevents",	       enableevents_func );
-	insert( "disableevents",	   disableevents_func );
-	insert( "registerevent",       registerevent_func );
-	insert( "unregisterevent",     unregisterevent_func );
-	insert( "setmap",			   setmap_func );
-	insert( "motionmap",		   motionmap_func );
-	insert( "motionmapdir",		   motionmapdir_func );
-	insert( "skeletonmap",		   skeletonmap_func );
-	insert( "steer",			   mcu_steer_func);	
-	insert( "characters",		   showcharacters_func );
-	insert( "pawns",			   showpawns_func );
-	insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
-	insert( "syncpoint",		   syncpoint_func);
-	insert( "vhmsgconnect",		   mcu_vhmsg_connect_func);
-	insert( "vhmsgdisconnect",	   mcu_vhmsg_disconnect_func);
-    insert( "resetanimation",	   resetanim_func);
-	insert( "animation",		   animation_func);
-	insert( "vhmsglog",			   vhmsglog_func);
-	insert( "skscale",			   skscale_func);
-	insert( "skmscale",			   skmscale_func);
-
-	insert( "xmlcachedir",		   xmlcachedir_func);
-	insert( "xmlcache",			   xmlcache_func);
-
-
-#ifdef USE_GOOGLE_PROFILER
-	insert( "startprofile",			   startprofile_func );
-	insert( "stopprofile",			   stopprofile_func );
-	insert( "startheapprofile",			   startheapprofile_func );
-	insert( "stopheapprofile",			   stopheapprofile_func );
-#endif
-	insert_set_cmd( "bp",             BML_PROCESSOR::set_func );
-	insert_set_cmd( "pawn",           pawn_set_cmd_funcx );
-	insert_set_cmd( "character",      character_set_cmd_func );
-	insert_set_cmd( "char",           character_set_cmd_func );
-	insert_set_cmd( "face",           mcu_set_face_func );
-	
-	insert_print_cmd( "bp",           BML_PROCESSOR::print_func );
-	insert_print_cmd( "face",         mcu_print_face_func );
-	
-	insert_test_cmd( "bml",  test_bml_func );
-	insert_test_cmd( "fml",  test_fml_func );
-	insert_test_cmd( "rhet", remote_speech_test);
-	insert_test_cmd( "bone_pos", test_bone_pos_func );
-	
-
-	insert( "net",	mcu_net_func );
-
-	insert( "PlaySound", mcu_play_sound_func );
-	insert( "StopSound", mcu_stop_sound_func );
-
-	insert( "uscriptexec", mcu_uscriptexec_func );
-
-	insert( "CommAPI", mcu_commapi_func );
-
-	insert( "vrKillComponent", mcu_vrKillComponent_func );
-	insert( "vrAllCall", mcu_vrAllCall_func );
-	insert( "vrPerception", mcu_vrPerception_func );
-	insert( "vrBCFeedback", mcu_vrBCFeedback_func );
-	insert( "vrSpeech", mcu_vrSpeech_func );
-	insert( "sbmdebugger", mcu_sbmdebugger_func );
-
-	insert( "text_speech", text_speech::text_speech_func ); // [BMLR]
-}
 
 
  
@@ -707,178 +573,6 @@ int mcuCBHandle::remove_scene( SrSnGroup *scene_p )	{
 	return( CMD_FAILURE );
 }
 
-srCmdSeq* mcuCBHandle::lookup_seq( const char* name ) {
-	int err = CMD_FAILURE;
-	
-	// Remove previous activation of sequence.
-	// Anm: Why?  Need clear distrinction (and definition) between pending and active.
-	abortSequence( name );
-
-	srCmdSeq* seq = pendingSequences.getSequence( name );
-	if (seq)
-	{
-		pendingSequences.removeSequence( name, false );
-	}
-	else
-	{
-		// Sequence not found.  Load new instance from file.
-		std::string fullPath;
-		FILE* file = SmartBody::SBScene::getScene()->getAssetManager()->open_sequence_file( name, fullPath );
-		if( file ) {
-			seq = new srCmdSeq();
-			err = seq->read_file( file );
-			fclose( file );
-
-			if( err != CMD_SUCCESS ) {
-				LOG("ERROR: mcuCBHandle::lookup_seq(..): '%s' PARSE FAILED\n", name ); 
-
-				delete seq;
-				seq = NULL;
-			}
-		} else {
-			LOG("ERROR: mcuCBHandle::lookup_seq(..): '%s' NOT FOUND\n", name ); 
-		}
-	}
-	
-	return( seq );
-}
-
-int mcuCBHandle::execute_seq( srCmdSeq* seq ) {
-	ostringstream seq_id;
-	seq_id << "execute_seq-" << (++queued_cmds);
-
-	return execute_seq( seq, seq_id.str().c_str() );
-}
-
-int mcuCBHandle::execute_seq( srCmdSeq* seq_p, const char* seq_id ) {
-
-//	printf( "mcuCBHandle::execute_seq: id: '%s'\n", seq_id );
-//	seq_p->print();
-
-	if ( !activeSequences.addSequence( seq_id, seq_p ) ) {
-		LOG("ERROR: mcuCBHandle::execute_seq(..): Failed to insert srCmdSeq \"%s\"into active_seq_map.", seq_id );
-		return CMD_FAILURE;
-	}	
-	resourceDataChanged = true;
-	return CMD_SUCCESS;
-}
-
-int mcuCBHandle::execute_seq_chain( const vector<string>& seq_names, const char* error_prefix ) {
-	vector<string>::const_iterator it  = seq_names.begin();
-	vector<string>::const_iterator end = seq_names.end();
-
-	if( it == end ) {
-		// No sequences -> NOOP
-		return CMD_SUCCESS;
-	}
-
-	const string& first_seq_name = *it;  // convenience reference
-	std::string fullPath;
-	FILE* first_file_p = SmartBody::SBScene::getScene()->getAssetManager()->open_sequence_file( first_seq_name.c_str(), fullPath );
-	if( first_file_p == NULL ) {
-		if( error_prefix )
-			LOG("%s Cannot find sequence \"%s\". Aborting seq-chain.", error_prefix, first_seq_name.c_str());
-		return CMD_FAILURE;
-	}
-
-	srCmdSeq* seq_p = new srCmdSeq();
-	int parse_result = seq_p->read_file( first_file_p );
-	fclose( first_file_p );
-	if( parse_result != CMD_SUCCESS ) {
-		if( error_prefix )
-			LOG("%s Unable to parse sequence\"%s\".", error_prefix, first_seq_name.c_str());
-
-		delete seq_p;
-		seq_p = NULL;
-
-		return CMD_FAILURE;
-	}
-
-	// Test remaining sequence names, error early if invalid
-	vector<string>::const_iterator second = ++it;
-	for( ; it != end; ++it ) {
-		const string& next_seq = *it;  // convenience reference
-
-		std::string fullPath;
-		FILE* file = SmartBody::SBScene::getScene()->getAssetManager()->open_sequence_file( next_seq.c_str(), fullPath );
-		if( file == NULL ) {
-			if( error_prefix )
-				LOG("%s Cannot find sequence \"%s\". Aborting seq-chain.", error_prefix, next_seq.c_str() );
-			return CMD_FAILURE;
-		} else {
-			fclose( file );
-		}
-	}
-
-	if( second != end ) {  // has more than one seq_name
-		// Append new seq-chian command of remaining seq_names at end of seq_p
-		float time = seq_p->duration();
-
-		// Start from second
-		it = second;
-
-		// build command
-		ostringstream oss;
-		oss << "seq-chain";
-		for( ; it != end; ++it )
-			oss << ' ' << (*it);
-
-		// insert command or error with cleanup
-		int result = seq_p->insert( time, oss.str().c_str() );
-		if( result != CMD_SUCCESS ) {
-			if( error_prefix )
-				LOG("%s Failed to insert seq-chain command at time %f", error_prefix, time);
-
-			delete seq_p;
-			seq_p = NULL;
-
-			return CMD_FAILURE;
-		}
-	}
-
-	execute_seq( seq_p, first_seq_name.c_str() );
-
-	return CMD_SUCCESS;
-}
-
-int mcuCBHandle::execute_later( const char* command, float seconds ) {
-	srCmdSeq *temp_seq = new srCmdSeq();
-	temp_seq->insert( (float)SmartBody::SBScene::getScene()->getSimulationManager()->getTime()+seconds, command );
-
-	ostringstream seqName;
-	seqName << "execute_later-" << (++queued_cmds);
-
-	return execute_seq( temp_seq, seqName.str().c_str() );;
-}
-
-int mcuCBHandle::abortSequence( const char* name ) {
-	srCmdSeq* seq = activeSequences.getSequence(name);
-	if( !seq )
-		return CMD_FAILURE;
-	
-	bool success = activeSequences.removeSequence( name, true );
-	
-
-	srCmdSeq* pending = pendingSequences.getSequence( name );
-	if( pending )
-		success = activeSequences.removeSequence( name, true );
-
-	return CMD_SUCCESS; 
-}
-
-int mcuCBHandle::deleteSequence( const char* name ) {
-	int result = abortSequence( name );
-
-	srCmdSeq* seq = pendingSequences.getSequence( name );
-	if( seq  )
-	{
-		pendingSequences.removeSequence( name, true );
-		result = CMD_SUCCESS;
-	}
-
-	return result;
-}
-
 void mcuCBHandle::set_net_host( const char * net_host )
 {
 	// EDF
@@ -886,76 +580,6 @@ void mcuCBHandle::set_net_host( const char * net_host )
 	SmartBody::SBScene::getScene()->getBoneBusManager()->setHost(net_host);
 	SmartBody::SBScene::getScene()->getBoneBusManager()->setEnable(true);
 	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().UpdateAllCharacters();
-}
-
-int mcuCBHandle::vhmsg_send( const char *op, const char* message ) {
-#if LINK_VHMSG_CLIENT
-	//std::cout<<"Sending :" << cmdName << ' ' << cmdArgs <<std::endl;
-	//LOG("vhmsg_send, op = %s, message = %s",op,message);
-
-	if( vhmsg_enabled ) {
-		int err = vhmsg::ttu_notify2( op, message );
-		if( err != vhmsg::TTU_SUCCESS )	{
-			std::stringstream strstr;
-			strstr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify2 failed on message \"" << op << "  " << message << "\"." << std::endl;
-			LOG(strstr.str().c_str());
-		}
-	} else {
-		// append to command queue if header token has callback function
-		srArgBuffer tokenizer( message );
-		char* token = tokenizer.read_token();
-		if( cmd_map.is_command( op ) ) {
-			// Append to command queue
-			ostringstream command;
-			command << op << " " << message;
-			execute_later( command.str().c_str() );
-		}
-	}
-#else
-	// append to command queue if header token has callback function
-	srArgBuffer tokenizer( message );
-	char* token = tokenizer.read_token();
-	if( cmd_map.is_command( op ) ) {
-		// Append to command queue
-		ostringstream command;
-		command << op << " " << message;
-		execute_later( command.str().c_str() );
-	}
-#endif
-	return( CMD_SUCCESS );
-}
-
-int mcuCBHandle::vhmsg_send( const char* message ) {
-#if LINK_VHMSG_CLIENT
-	//std::cout<<"Sending :" << cmdName << ' ' << cmdArgs <<std::endl;
-
-	if( vhmsg_enabled ) {
-
-		int err = vhmsg::ttu_notify1( message );
-		if( err != vhmsg::TTU_SUCCESS )	{
-			std::stringstream strstr;
-			strstr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify1 failed on message \"" << message << "\"." << std::endl;
-			LOG(strstr.str().c_str());
-		}
-	} else {
-		// append to command queue if header token has callback function
-		srArgBuffer tokenizer( message );
-		char* token = tokenizer.read_token();
-		if( cmd_map.is_command( token ) ) {
-			// Append to command queue
-			execute_later( message );
-		}
-	}
-#else
-	// append to command queue if header token has callback function
-	srArgBuffer tokenizer( message );
-	char* token = tokenizer.read_token();
-	if( cmd_map.is_command( token ) ) {
-		// Append to command queue
-		execute_later( message );
-	}
-#endif
-	return( CMD_SUCCESS );
 }
 
 int mcuCBHandle::map_skeleton( const char * mapName, const char * skeletonName )
@@ -1149,7 +773,7 @@ int mcuCBHandle::executePythonFile(const char* filename)
 	_getcwd(CurrentPath, _MAX_PATH);
 
 	std::string curFilename = SmartBody::SBScene::getScene()->getAssetManager()->findFileName("script", candidateSeqName);
-	if (filename != "")
+	if (curFilename != "")
 	{
 		try {
 			std::stringstream strstr;
@@ -1238,20 +862,6 @@ std::map<std::string, SbmCharacter*>& mcuCBHandle::getCharacterMap()
 	return character_map;
 }
 
-std::map<std::string, DeformableMesh*>& mcuCBHandle::getDeformableMeshMap()
-{
-	return deformableMeshMap;
-}
-
-DeformableMesh* mcuCBHandle::getDeformableMesh( const std::string& name )
-{
-	std::map<std::string, DeformableMesh*>::iterator iter = deformableMeshMap.find(name);
-	if (iter == deformableMeshMap.end())
-		return NULL;
-	else
-		return (*iter).second;
-}
-
 std::string mcuCBHandle::getValidName(const std::string& name)
 {
 	bool nameFound = true;
@@ -1275,87 +885,7 @@ std::string mcuCBHandle::getValidName(const std::string& name)
 	return currentName;
 }
 
-int mcuCBHandle::registerPawn(SbmPawn* pawn)
-{
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
-	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(pawn->getName());
-	if (iter != pawn_map.end())
-	{
-		LOG( "Register pawn: pawn_map.insert(..) '%s' FAILED\n", pawn->getName().c_str() ); 
-		return( CMD_FAILURE );
-	}
-
-	pawn_map.insert(std::pair<std::string, SbmPawn*>(pawn->getName(), pawn));
-	
-	if (scene->getCharacterListener())
-		scene->getCharacterListener()->OnPawnCreate( pawn->getName().c_str() );
-
-	return CMD_SUCCESS;
-}
-
-int mcuCBHandle::unregisterPawn(SbmPawn* pawn)
-{
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	if (scene->getCharacterListener())
-		scene->getCharacterListener()->OnPawnDelete( pawn->getName().c_str() );
-
-	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(pawn->getName());
-	if (iter != pawn_map.end())
-	{
-		pawn_map.erase(iter);
-	}
-	return CMD_SUCCESS;
-}
-
-int mcuCBHandle::registerCharacter(SbmCharacter* character)
-{
-	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(character->getName());
-	if (iter != pawn_map.end())
-	{
-		LOG( "Register character: pawn_map.insert(..) '%s' FAILED\n", character->getName().c_str() ); 
-		return( CMD_FAILURE );
-	}
-
-	pawn_map.insert(std::pair<std::string, SbmPawn*>(character->getName(), character));
-	
-
-	std::map<std::string, SbmCharacter*>::iterator citer = character_map.find(character->getName());
-	if (citer != character_map.end())
-	{
-		LOG( "Register character: character_map.insert(..) '%s' FAILED\n", character->getName().c_str() );
-		pawn_map.erase(iter);
-		return( CMD_FAILURE );
-	}
-	character_map.insert(std::pair<std::string, SbmCharacter*>(character->getName(), character));
-
-	if (SmartBody::SBScene::getScene()->getBoneBusManager()->isEnable())
-		SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true );
-	if ( SmartBody::SBScene::getScene()->getCharacterListener() )
-		SmartBody::SBScene::getScene()->getCharacterListener()->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
-
-	return 1;
-}
-
-int mcuCBHandle::unregisterCharacter(SbmCharacter* character)
-{
-	if (SmartBody::SBScene::getScene()->getCharacterListener() )
-		SmartBody::SBScene::getScene()->getCharacterListener()->OnCharacterDelete( character->getName().c_str() );
-
-	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(character->getName());
-	if (iter != pawn_map.end())
-	{
-		pawn_map.erase(iter);
-	}
-
-	std::map<std::string, SbmCharacter*>::iterator citer = character_map.find(character->getName());
-	if (citer != character_map.end())
-	{
-		character_map.erase(citer);
-	}
-
-	return 1;
-}
 
 
 void mcuCBHandle::render()

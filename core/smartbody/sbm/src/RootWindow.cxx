@@ -18,6 +18,7 @@
 #include <sb/SBDebuggerClient.h>
 #include <sb/SBSimulationManager.h>
 #include <sbm/Heightfield.h>
+#include <sb/SBPython.h>
 
 BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
 {
@@ -298,8 +299,7 @@ SbmCharacter* BaseWindow::getSelectedCharacter()
 void BaseWindow::show_viewer()
 {
 	#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		SbmShaderManager::singleton().setViewer(mcu.viewer_p);
+		SbmShaderManager::singleton().setViewer(this);
 	#endif	
 	show();
 	fltkViewer->show_viewer();
@@ -428,6 +428,7 @@ void BaseWindow::resetWindow()
 
 void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 {
+	BaseWindow* window = (BaseWindow*) data;
 	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 
 	const char* seqFile = fl_file_chooser("Load file:", "*.py", mediaPath.c_str());
@@ -439,11 +440,16 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->setCharacterListener(listener);
 
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.viewer_p = window;
+
 	scene->getSimulationManager()->setupTimer();
 
-	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+	SrCamera* camera = SmartBody::SBScene::getScene()->createCamera("cameraDefault");
 	camera->reset();
 
+	setupPython();
+	
 	if (mediaPath != "")
 		SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
 	std::string filebasename = boost::filesystem::basename(seqFile);
@@ -610,20 +616,33 @@ void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )
 
 void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 {
+	BaseWindow* window = (BaseWindow*) data;
 	int confirm = fl_choice("This will reset the current session.\nContinue?", "No", "Yes", NULL);
 	if (confirm == 1)
 	{
 		SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
 		SmartBody::SBScene::destroyScene();
+
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		mcu.viewer_p = window;
+
+
 		std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 		if (mediaPath != "")
-			SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
-		SmartBody::SBScene::getScene()->setCharacterListener(listener);
+			scene->setMediaPath(mediaPath);
+		scene->setCharacterListener(listener);
 
-		SmartBody::SBScene::getScene()->getSimulationManager()->setupTimer();
+		scene->getSimulationManager()->setupTimer();
 		
-		SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+		SrCamera* camera = scene->createCamera("cameraDefault");
 		camera->reset();
+
+		std::string pythonLibPath = SmartBody::SBScene::getSystemParameter("pythonlibpath");
+		setupPython();
+
+		scene->getVHMsgManager()->setEnable(true);
+
 	}
 }
 

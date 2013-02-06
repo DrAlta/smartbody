@@ -30,6 +30,7 @@ class remote_speech;
 
 
 #include <string>
+#include <sb/SBCommandManager.h>
 #include "sbm/sbm_speech.hpp"
 #include "sr_hash_map.h"
 #include "sr_arg_buff.h"
@@ -37,14 +38,14 @@ class remote_speech;
 // Predeclare class
 class mcuCBHandle;
 
-int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p);
+int remoteSpeechResult_func( srArgBuffer& args, SmartBody::SBCommandManager* manager);
 int set_char_voice(char* char_name, char* voiceCode, mcuCBHandle* mcu_p);
-int remoteSpeechTimeOut_func(srArgBuffer& args, mcuCBHandle* mcu_p);
+int remoteSpeechTimeOut_func(srArgBuffer& args, SmartBody::SBCommandManager* manager);
 
 // Test functions
 // TODO: move to "test ..."
-int remote_speech_test( srArgBuffer& args, mcuCBHandle* mcu_p);
-int remoteSpeechReady_func( srArgBuffer& args, mcuCBHandle* mcu_p);
+int remote_speech_test( srArgBuffer& args, SmartBody::SBCommandManager* manager);
+int remoteSpeechReady_func( srArgBuffer& args, SmartBody::SBCommandManager* manager);
 
 class remote_speech: public SmartBody::SpeechInterface {
     public:
@@ -73,8 +74,8 @@ class remote_speech: public SmartBody::SpeechInterface {
 		virtual void requestComplete( SmartBody::RequestId requestId );
 
 		// RemoteSpeech specific methods
-		int handleRemoteSpeechResult( SbmCharacter* character, char* msgID, char* status, char* result, mcuCBHandle* mcu_p );
-		int testRemoteSpeechTimeOut( const char* request_id_str, mcuCBHandle* mcu_p );
+		int handleRemoteSpeechResult( SbmCharacter* character, char* msgID, char* status, char* result, SmartBody::SBCommandManager* manager);
+		int testRemoteSpeechTimeOut( const char* request_id_str, SmartBody::SBCommandManager* manager);
 	protected:
 		virtual void sendSpeechCommand(const char* cmd);
 		virtual void sendSpeechTimeout(std::ostringstream& outStream);

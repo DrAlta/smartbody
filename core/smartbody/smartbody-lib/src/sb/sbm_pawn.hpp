@@ -25,6 +25,7 @@
 #ifndef SBM_PAWN_HPP
 #define SBM_PAWN_HPP
 
+#include <sb/SBTypes.h>
 #include <sk/sk_scene.h>
 #include <sk/sk_skeleton.h>
 #include <sb/SBColObject.h>

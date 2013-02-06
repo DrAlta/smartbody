@@ -6,7 +6,8 @@
 #include <boost/lexical_cast.hpp>
 #include <sr/sr_timer.h>
 #include "sbm/mcontrol_util.h"
-#include "sb/SBScene.h"
+#include <sb/SBScene.h>
+#include <sb/SBCommandManager.h>
 #include "me_ct_example_body_reach.hpp"
 #include "me_ct_barycentric_interpolation.h"
 #include <sb/SBEvent.h>
@@ -241,7 +242,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 		cmd = "bml char " + charName + " <locomotion target=\"" + boost::lexical_cast<std::string>(steerTarget.x) + " " + 
 			boost::lexical_cast<std::string>(steerTarget.z) + "\"/>";//+ "\" facing=\"" + boost::lexical_cast<std::string>(facing) +"\"/>";//"\" proximity=\"" +  boost::lexical_cast<std::string>(rd->characterHeight*0.8f*0.01f) +"\"/>";
 		//rd->curHandAction->sendReachEvent(cmd);			
-		mcuCBHandle::singleton().execute(const_cast<char*>(cmd.c_str()));
+		SmartBody::SBScene::getScene()->getCommandManager()->execute(const_cast<char*>(cmd.c_str()));
 		isMoving = true;
 		//currentReachData->startReach = false;
 		startReach = false;

@@ -31,6 +31,7 @@ class SBSimulationManager
 
 		SBAPI bool isStarted();
 		SBAPI bool isRunning();
+		SBAPI bool isStopped();
 
 		SBAPI void printInfo();
 		SBAPI void printPerf(float v);
@@ -70,6 +71,7 @@ class SBSimulationManager
 	protected:
 		bool _simStarted;
 		bool _simPlaying;
+		bool _simStopped;
 		bool _hasTimer;
 
 		TimeRegulator* internal_timer_p;

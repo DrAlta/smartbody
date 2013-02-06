@@ -35,7 +35,9 @@
 #include <sb/SBScene.h>
 #include <sb/SBPhoneme.h>
 #include <sb/SBPhonemeManager.h>
+#include <sb/SBCommandManager.h>
 #include <sb/SBCharacter.h>
+#include <sbm/sbm_speech_audiofile.hpp>
 
 using namespace std;
 using namespace BML;
@@ -1274,10 +1276,10 @@ void BML::SpeechRequest::unschedule( mcuCBHandle* mcu,
 	// Clear visemes
 	ostringstream cmd;
 	cmd << "char " << request->actor->getName() << " viseme ALL 0 " << duration;
-	mcu->execute_later( cmd.str().c_str(), 0 );
+	SmartBody::SBScene::getScene()->getCommandManager()->execute_later( cmd.str().c_str(), 0 );
 
 	if( !audioStop.empty() )
-		mcu->execute_later( audioStop.c_str(), request->actor->get_viseme_sound_delay() );
+		SmartBody::SBScene::getScene()->getCommandManager()->execute_later( audioStop.c_str(), request->actor->get_viseme_sound_delay() );
 	else
 		LOG("WARNING: SpeechRequest::unschedule(): unique_id \"%s\": Missing audioStop.", unique_id.c_str());
 }

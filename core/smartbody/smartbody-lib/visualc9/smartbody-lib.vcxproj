@@ -275,6 +275,7 @@
     <ClCompile Include="..\src\sb\SBBehaviorSetManager.cpp" />
     <ClCompile Include="..\src\sb\SBBoneBusManager.cpp" />
     <ClCompile Include="..\src\sb\SBColObject.cpp" />
+    <ClCompile Include="..\src\sb\SBCommandManager.cpp" />
     <ClCompile Include="..\src\sb\SBDebuggerClient.cpp" />
     <ClCompile Include="..\src\sb\SBDebuggerServer.cpp" />
     <ClCompile Include="..\src\sb\SBDebuggerUtility.cpp" />
@@ -397,6 +398,7 @@
     <ClCompile Include="..\src\sb\SBRetarget.cpp" />
     <ClCompile Include="..\src\sb\SBRetargetManager.cpp" />
     <ClCompile Include="..\src\sb\SBSpeechManager.cpp" />
+    <ClCompile Include="..\src\sb\SBVHMsgManager.cpp" />
     <ClCompile Include="..\src\sk\sk_channel.cpp" />
     <ClCompile Include="..\src\sk\sk_channel_array.cpp" />
     <ClCompile Include="..\src\sk\sk_joint.cpp" />
@@ -726,6 +728,7 @@
     <ClInclude Include="..\src\sb\SBAssetManager.h" />
     <ClInclude Include="..\src\sb\SBBoneBusManager.h" />
     <ClInclude Include="..\src\sb\SBColObject.h" />
+    <ClInclude Include="..\src\sb\SBCommandManager.h" />
     <ClInclude Include="..\src\sb\SBDebuggerClient.h" />
     <ClInclude Include="..\src\sb\SBDebuggerServer.h" />
     <ClInclude Include="..\src\sb\SBDebuggerUtility.h" />
@@ -857,6 +860,7 @@
     <ClInclude Include="..\src\sb\SBRetargetManager.h" />
     <ClInclude Include="..\src\sb\SBSpeechManager.h" />
     <ClInclude Include="..\src\sb\SBTypes.h" />
+    <ClInclude Include="..\src\sb\SBVHMsgManager.h" />
     <ClInclude Include="..\src\sk\sk_channel.h" />
     <ClInclude Include="..\src\sk\sk_channel_array.h" />
     <ClInclude Include="..\src\sk\sk_joint.h" />

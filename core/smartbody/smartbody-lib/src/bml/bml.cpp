@@ -57,6 +57,7 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBSteerAgent.h>
+#include <sb/SBCommandManager.h>
 #include <sbm/PPRAISteeringAgent.h>
 
 using namespace std;
@@ -1004,7 +1005,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			oss << actorId << ':' << msgId << ":seq-start";
 			start_seq_name = oss.str();
 		}
-		if( mcu->execute_seq( start_seq, start_seq_name.c_str() ) != CMD_SUCCESS ) {
+		if( SmartBody::SBScene::getScene()->getCommandManager()->execute_seq( start_seq, start_seq_name.c_str() ) != CMD_SUCCESS ) {
 			ostringstream oss;
 			oss << "Failed to execute BmlRequest sequence \""<<start_seq_name<<"\" (actorId=\""<< actorId << "\", msgId=\"" << msgId << "\")"; 
 			throw RealizingException( oss.str().c_str() );
@@ -1093,7 +1094,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		oss << actorId << ':' << msgId << ":seq-cleanup";
 		cleanup_seq_name = oss.str();
 	}
-	if( mcu->execute_seq( cleanup_seq, cleanup_seq_name.c_str() ) != CMD_SUCCESS ) {
+	if( SmartBody::SBScene::getScene()->getCommandManager()->execute_seq( cleanup_seq, cleanup_seq_name.c_str() ) != CMD_SUCCESS ) {
 		ostringstream oss;
 		oss << "Failed to execute BmlRequest sequence \""<<cleanup_seq_name<<"\" (actorId=\""<< actorId << "\", msgId=\"" << msgId << "\")"; 
 		throw RealizingException( oss.str().c_str() );
@@ -1127,7 +1128,7 @@ void BmlRequest::unschedule( Processor* bp, mcuCBHandle* mcu, time_sec duration 
 	}
 
 	// Cancel the normal "vrAgentBML ... end complete"
-	mcu->abortSequence( cleanup_seq_name.c_str() ); // don't clean-up self
+	SmartBody::SBScene::getScene()->getCommandManager()->abortSequence( cleanup_seq_name.c_str() ); // don't clean-up self
 
 	// Replace it with  "vrAgentBML ... end interrupted"
 	ostringstream buff;
@@ -1136,14 +1137,14 @@ void BmlRequest::unschedule( Processor* bp, mcuCBHandle* mcu, time_sec duration 
 #else
 	buff << request->actorId << " " << request->msgId << " end interrupted";
 #endif
-	mcu->vhmsg_send( "vrAgentBML", buff.str().c_str() );
+	SmartBody::SBScene::getScene()->getVHMsgManager()->send( "vrAgentBML", buff.str().c_str() );
 
 
 	if( bp->get_auto_print_controllers() ) {
 		ostringstream oss;
 		oss << "print character "<< actorId << " schedule";
 		string cmd = oss.str();
-		if( mcu->execute( (char*)(cmd.c_str() ) ) != CMD_SUCCESS ) {
+		if( SmartBody::SBScene::getScene()->getCommandManager()->execute( (char*)(cmd.c_str() ) ) != CMD_SUCCESS ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::unschedule(..): msgId=\""<<msgId<<"\": "<<
 				"Failed to execute \"" << cmd << "\" command";
@@ -1153,14 +1154,14 @@ void BmlRequest::unschedule( Processor* bp, mcuCBHandle* mcu, time_sec duration 
 
 	if( bp->get_auto_print_sequence() ) {
 		LOG("DEBUG: BML::BmlRequest::unschedule(..): Sequence \"%s\"", start_seq_name.c_str());
-		srCmdSeq* start_seq = mcu->lookup_seq( start_seq_name.c_str() );
+		srCmdSeq* start_seq = SmartBody::SBScene::getScene()->getCommandManager()->lookup_seq( start_seq_name.c_str() );
 		if( start_seq )
 			start_seq->print();
 		else
 			LOG("WARNING: Cannot find sequence \"%s\"", start_seq_name.c_str());
 
 		LOG("DEBUG: BML::BmlRequest::unschedule(..): Sequence \"%s\":", cleanup_seq_name.c_str());
-		srCmdSeq* cleanup_seq = mcu->lookup_seq( cleanup_seq_name.c_str() );
+		srCmdSeq* cleanup_seq =SmartBody::SBScene::getScene()->getCommandManager()->lookup_seq( cleanup_seq_name.c_str() );
 		if( cleanup_seq )
 			cleanup_seq->print();
 		else
@@ -1194,7 +1195,7 @@ void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 		command += actorId;
 		command += " prune";
 
-		if( mcu->execute_later( command.c_str(), 0 ) != CMD_SUCCESS ) {
+		if( SmartBody::SBScene::getScene()->getCommandManager()->execute_later( command.c_str(), 0 ) != CMD_SUCCESS ) {
 //		if( mcu->execute_later( command.c_str(), 1 ) != CMD_SUCCESS ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::cleanup(..): msgId=\""<<msgId<<"\": "<<
@@ -1202,8 +1203,8 @@ void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 			LOG(strstr.str().c_str());
 		}
 	}
-	mcu->abortSequence( start_seq_name.c_str() );
-	mcu->abortSequence( cleanup_seq_name.c_str() );
+	SmartBody::SBScene::getScene()->getCommandManager()->abortSequence( start_seq_name.c_str() );
+	SmartBody::SBScene::getScene()->getCommandManager()->abortSequence( cleanup_seq_name.c_str() );
 
 
 
@@ -1211,7 +1212,7 @@ void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 		ostringstream oss;
 		oss << "print character "<< actorId << " schedule";
 		string cmd = oss.str();
-		if( mcu->execute( (char*)(cmd.c_str() ) ) != CMD_SUCCESS ) {
+		if( SmartBody::SBScene::getScene()->getCommandManager()->execute( (char*)(cmd.c_str() ) ) != CMD_SUCCESS ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::cleanup(..): msgId=\""<<msgId<<"\": "<<
 				"Failed to execute \"" << cmd << "\" command";
@@ -1221,14 +1222,14 @@ void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 
 	if( bp->get_auto_print_sequence() ) {
 		cout << "DEBUG: BML::BmlRequest::unschedule(..): Sequence \"" << start_seq_name <<"\":"<<endl;
-		srCmdSeq* start_seq = mcu->lookup_seq( start_seq_name.c_str() );
+		srCmdSeq* start_seq = SmartBody::SBScene::getScene()->getCommandManager()->lookup_seq( start_seq_name.c_str() );
 		if( start_seq )
 			start_seq->print();
 		else
 			cout << "WARNING: Cannot find sequence \"" << start_seq_name << "\"" << endl;
 
 		cout << "DEBUG: BML::BmlRequest::unschedule(..): Sequence \"" << cleanup_seq_name <<"\":"<<endl;
-		srCmdSeq* cleanup_seq = mcu->lookup_seq( cleanup_seq_name.c_str() );
+		srCmdSeq* cleanup_seq =SmartBody::SBScene::getScene()->getCommandManager()->lookup_seq( cleanup_seq_name.c_str() );
 		if( cleanup_seq )
 			cleanup_seq->print();
 		else
@@ -2154,7 +2155,7 @@ bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, mcuCBHandle* 
 		return true;
 	}
 
-	if( mcu->activeSequences.getSequence(unique_id))
+	if( SmartBody::SBScene::getScene()->getCommandManager()->getActiveSequences()->getSequence(unique_id))
 	{
 		std::stringstream strstr;
 		strstr << "ERROR: SequenceRequest::realize_sequence(..): SequenceRequest \"" << unique_id << "\": "<<
@@ -2189,7 +2190,7 @@ bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, mcuCBHandle* 
 
 	if( success ) {
 		// TODO: test result, possible throwing RealizingException
-		if( mcu->execute_seq( seq, unique_id.c_str() ) != CMD_SUCCESS ) {
+		if( SmartBody::SBScene::getScene()->getCommandManager()->execute_seq( seq, unique_id.c_str() ) != CMD_SUCCESS ) {
 			// TODO: Throw RealizingException
 			std::stringstream strstr;
 			strstr << "ERROR: SequenceRequest::realize_sequence(..): SequenceRequest \"" << unique_id << "\": " << "Failed to execute sequence \"" << unique_id.c_str() << "\".";
@@ -2202,7 +2203,7 @@ bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, mcuCBHandle* 
 
 bool SequenceRequest::unschedule_sequence( mcuCBHandle* mcu )
 {
-	return ( mcu->abortSequence( unique_id.c_str() )==CMD_SUCCESS );
+	return ( SmartBody::SBScene::getScene()->getCommandManager()->abortSequence( unique_id.c_str() )==CMD_SUCCESS );
 }
 
 //  VisemeRequest

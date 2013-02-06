@@ -19,6 +19,10 @@
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_gaze.h>
 #include <controllers/me_controller_tree_root.hpp>
+#include <sbm/remote_speech.h>
+#include <sbm/local_speech.h>
+#include <sbm/text_speech.h>
+#include <sbm/sbm_speech_audiofile.hpp>
 
 namespace SmartBody {
 
@@ -121,12 +125,25 @@ const std::string& SBCharacter::getName()
 
 void SBCharacter::setName(std::string& name)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	std::string oldName = getName();
-	mcu.unregisterCharacter(this);
+	SBPawn::setName(name);
 
-	SbmCharacter::setName(name);
-	mcu.registerCharacter(this);
+	std::string oldName = getName();
+
+	bool exists = false;
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	std::map<std::string, SbmCharacter*>::iterator citer = mcu.character_map.find(oldName);
+	if (citer != mcu.character_map.end())
+	{
+		mcu.character_map.erase(citer);
+		exists = true;
+	}
+
+	if (exists)
+	{
+		// add to new character name
+		 mcu.character_map.insert(std::pair<std::string, SBCharacter*>(name, this));
+	}
+
 }
 
 void SBCharacter::setType(const std::string& type)
@@ -141,14 +158,12 @@ std::string SBCharacter::getType()
 
 void SBCharacter::setMeshMap(std::string filename)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu_character_load_skinweights( getName().c_str(), filename.c_str(), &mcu, 1.0f );
+	mcu_character_load_skinweights( getName().c_str(), filename.c_str(), SmartBody::SBScene::getScene()->getCommandManager(), 1.0f );
 }
 
 void SBCharacter::addMesh(std::string mesh)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu_character_load_mesh( getName().c_str(), mesh.c_str(), &mcu );
+	mcu_character_load_mesh( getName().c_str(), mesh.c_str(), SmartBody::SBScene::getScene()->getCommandManager() );
 }
 
 int SBCharacter::getNumControllers()
@@ -589,8 +604,7 @@ void SBCharacter::notify(SBSubject* subject)
 				strstr << " -scale " << meshScaleAttribute->getValue();
 			}
 
-			mcuCBHandle& mcu = mcuCBHandle::singleton();
-			int success = mcu.execute((char*) strstr.str().c_str());
+			int success = SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) strstr.str().c_str());
 			if (success != CMD_SUCCESS)
 			{
 				LOG("Problem setting attribute 'mesh' on character %s", getName().c_str());

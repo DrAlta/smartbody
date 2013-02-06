@@ -46,12 +46,13 @@ SrCamera::SrCamera () : SBPawn()
 	createDoubleAttribute("scale", true, true, "Basic", 280, false, false, false, "");
 	
    init ();
-   //setBoolAttribute("visible", false); // don't show the camera in the scene by default
+   setBoolAttribute("visible", false); // don't show the camera in the scene by default
  }
 
 SrCamera::SrCamera ( const SrCamera* c )
          : SBPawn()
  {
+   SrCamera();
    copyCamera(c);
  }
 
@@ -59,6 +60,7 @@ SrCamera::SrCamera ( const SrPnt& e, const SrPnt& c, const SrVec& u )
          :  SBPawn(), eye(e), center(c), up(u)
  {
 
+   SrCamera();
    setEye(eye.x, eye.y, eye.z);
    setCenter(c.x, c.y, c.z);
    setUpVector(up);
@@ -68,6 +70,10 @@ SrCamera::SrCamera ( const SrPnt& e, const SrPnt& c, const SrVec& u )
    setAspectRatio(1.0f);
    setScale(1.0f);
  }
+
+SrCamera::~SrCamera ()
+{
+}
 
 void SrCamera::copyCamera( const SrCamera* c )
 {
