@@ -7,6 +7,7 @@
 #include <sk/sk_joint.h>
 #include <sbm/sbm_test_cmds.hpp>
 #include <sb/SBScene.h>
+#include <sb/SBSimulationManager.h>
 #include <controllers/me_ct_param_animation.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_gaze.h>
@@ -37,13 +38,12 @@ std::string PyLogger::strBuffer = "";
 
 void pythonExit()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	
 }
 
 void quitSbm()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.loop = false;
+	SmartBody::SBScene::getScene()->getSimulationManager()->stop();
 }
 
 void reset()

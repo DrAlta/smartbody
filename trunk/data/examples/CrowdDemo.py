@@ -11,6 +11,7 @@ scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'retarget\motion')
 scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath('script', 'sbm-common/common-sk')
 scene.loadAssets()
 
 scene.setScale(1.0)

@@ -194,10 +194,9 @@ void ResourceWindow::show()
 void ResourceWindow::update()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
-	if (mcu.resourceDataChanged) // don't update the tree if nothing happens
+	if (0) //mcu.resourceDataChanged) // don't update the tree if nothing happens
 	{		
 		updateGUI();
-		mcu.resourceDataChanged = false;
 		if (itemInfoWidget)
 		{
 			itemInfoWidget->updateWidget();

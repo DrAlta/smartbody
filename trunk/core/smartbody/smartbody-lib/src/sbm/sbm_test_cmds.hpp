@@ -30,13 +30,13 @@
  *  Handles the "test bml ..." commands.
  *  Try "test bml help".
  */
-int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu );
+int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 
 /**
  *  Handles the "test fml ..." commands.
  *  Try "test fml help".
  */
-int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu );
+int test_fml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 
 
 /**
@@ -45,7 +45,7 @@ int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu );
  *  line put:
  *    test bone_pos <joint name> <x pos> <y pos> <z pos>
  */
-int test_bone_pos_func( srArgBuffer& args, mcuCBHandle* mcu_p );
+int test_bone_pos_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 
 
 #endif // SBM_TEST_CMDS_HPP

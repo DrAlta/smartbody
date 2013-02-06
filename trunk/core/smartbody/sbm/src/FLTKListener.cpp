@@ -217,6 +217,7 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 		if (window)
 		{
 			window->updateCameraList();
+			window->redraw();
 		}
 	}
 
@@ -258,7 +259,8 @@ void FLTKListener::OnPawnDelete( const std::string & name )
 	SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
 	if (camera)
 	{
-		window->updateCameraList();
+		if (window)
+			window->updateCameraList();
 	}
 
 }

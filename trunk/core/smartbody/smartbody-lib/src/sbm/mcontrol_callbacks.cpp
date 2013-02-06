@@ -46,10 +46,13 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBSpeechManager.h>
+#include <sb/SBVHMsgManager.h>
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationTransition.h>
+#include <sb/SBVHMsgManager.h>
+#include <sb/SBCommandManager.h>
 #include <controllers/me_ct_param_animation.h>
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_scheduler2.h>
@@ -59,6 +62,8 @@
 #include <sr/sr_camera.h>
 #include <sbm/Heightfield.h>
 #include <sbm/KinectProcessor.h>
+#include <sbm/local_speech.h>
+#include <sbm/mcontrol_util.h>
 
 #ifdef WIN32
 #include <direct.h>
@@ -99,6 +104,7 @@
 #include <math.h>
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
+#include <wsp.h>
 
 #include <controllers/me_ct_gaze.h>
 #include <controllers/me_ct_motion_player.h>
@@ -125,9 +131,9 @@ using namespace WSP;
 
 /////////////////////////////////////////////////////////////
 
-int mcu_help_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+int mcu_help_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	
-	if( mcu_p )	{
+	if( cmdMgr )	{
 		int level = args.read_int();
 
 		if( level == 2 )	{
@@ -216,9 +222,9 @@ char * mcn_return_full_filename_func( const char * current_path, const char * fi
 
 */
 
-int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+int mcu_filepath_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 
-    if( mcu_p )	{
+    if( cmdMgr )	{
 		char *path_tok = args.read_token();
 		char* path = args.read_token();
 
@@ -266,7 +272,7 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 */
 
-void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHandle *mcu_p )	{
+void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, SmartBody::SBCommandManager* cmdMgr )	{
 	float t;
 	char *cmd;
 	
@@ -277,13 +283,13 @@ void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHandl
 
 		char *tok = args.read_token();
 		if( strcmp( tok, "mediapath" ) == 0 )	{
-			mcu_mediapath_func( args, mcu_p );
+			mcu_mediapath_func( args, cmdMgr );
 			delete [] cmd;
 			cmd = NULL;
 		}
 		else
 		if( strcmp( tok, "path" ) == 0 )	{
-			mcu_filepath_func( args, mcu_p );
+			mcu_filepath_func( args, cmdMgr );
 			delete [] cmd;
 			cmd = NULL;
 		}
@@ -293,7 +299,7 @@ void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHandl
 			tok = args.read_token();
 			if( strcmp( tok, "inline" ) == 0 )	{
 
-				inline_seq_p = mcu_p->lookup_seq( name );
+				inline_seq_p = SmartBody::SBScene::getScene()->getCommandManager()->lookup_seq( name );
 				delete [] cmd;
 				cmd = NULL;
 				if( inline_seq_p == NULL )	{
@@ -307,7 +313,7 @@ void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHandl
 		if( inline_seq_p )	{
 			// iterate hierarchy
 			inline_seq_p->offset( absolute_offset );
-			mcu_preprocess_sequence( to_seq_p, inline_seq_p, mcu_p );
+			mcu_preprocess_sequence( to_seq_p, inline_seq_p, SmartBody::SBScene::getScene()->getCommandManager() );
 		}
 		else
 		if( cmd )	{
@@ -320,15 +326,17 @@ void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHandl
 
 int begin_sequence( char* name, mcuCBHandle* mcu_p )	{
 	
-	srCmdSeq *seq = mcu_p->lookup_seq( name );
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	srCmdSeq *seq = SmartBody::SBScene::getScene()->getCommandManager()->lookup_seq( name );
 	
 	if( seq )
 	{
 		srCmdSeq* copySeq = new srCmdSeq;
-		mcu_preprocess_sequence( copySeq, seq, mcu_p );
+		mcu_preprocess_sequence( copySeq, seq, SmartBody::SBScene::getScene()->getCommandManager() );
 
 		copySeq->offset( (float)( SmartBody::SBScene::getScene()->getSimulationManager()->getTime() ) );
-		bool success = mcu_p->activeSequences.addSequence(name, copySeq );
+		bool success = SmartBody::SBScene::getScene()->getCommandManager()->getActiveSequences()->addSequence(name, copySeq );
 
 		if( !success )
 		{
@@ -349,70 +357,69 @@ int begin_sequence( char* name, mcuCBHandle* mcu_p )	{
 
 */
 
-int mcu_sequence_func( srArgBuffer& args, mcuCBHandle* mcu )
+int mcu_sequence_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	if( mcu )	{
-		char *seqName = args.read_token();
-		char *seqCmd = args.read_token();
-		//std::cout << "SEQUENCE LOADED: " << seq_name << " " << seq_cmd << std::endl;
-		//std::string seqStr = seq_cmd;
-		//LOG("mcu_sequence_func : seq_name = %s, seqStr = %s",seq_cmd, seqStr.c_str());
-		if( ( strcmp( seqCmd, "begin" ) == 0 )||( strcmp( seqCmd, EMPTY_STRING ) == 0 ) )	{
-			int ret = begin_sequence( seqName, mcu );
-			return ret;
-		}
-		else
-		if( strcmp( seqCmd, "at" ) == 0 )	{
+	char *seqName = args.read_token();
+	char *seqCmd = args.read_token();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	//std::cout << "SEQUENCE LOADED: " << seq_name << " " << seq_cmd << std::endl;
+	//std::string seqStr = seq_cmd;
+	//LOG("mcu_sequence_func : seq_name = %s, seqStr = %s",seq_cmd, seqStr.c_str());
+	if( ( strcmp( seqCmd, "begin" ) == 0 )||( strcmp( seqCmd, EMPTY_STRING ) == 0 ) )	{
+		int ret = begin_sequence( seqName, &mcu );
+		return ret;
+	}
+	else
+	if( strcmp( seqCmd, "at" ) == 0 )	{
 		
-			srCmdSeq* seq = mcu->pendingSequences.getSequence( seqName );
-			if (!seq)
+		srCmdSeq* seq = SmartBody::SBScene::getScene()->getCommandManager()->getPendingSequences()->getSequence( seqName );
+		if (!seq)
+		{
+			seq = new srCmdSeq;
+			bool success = SmartBody::SBScene::getScene()->getCommandManager()->getPendingSequences()->addSequence( seqName, seq );
+			if( !success )
 			{
-				seq = new srCmdSeq;
-				bool success = mcu->pendingSequences.addSequence( seqName, seq );
-				if( !success )
-				{
-					LOG( "mcu_sequence_func ERR: insert pending '%s' FAILED\n", seqName ); 
-					return( CMD_FAILURE );
-				}
-			}
-			
-			float seqTime = args.read_float();
-			char* seqStr = args.read_remainder_raw();
-			int ret = seq->insert( seqTime, seqStr );
-			return ret;
-		}
-		else
-		if( strcmp( seqCmd, "print" ) == 0 )	{
-			
-			srCmdSeq* seq = mcu->pendingSequences.getSequence( seqName );
-			if (!seq)
-			{
-				LOG( "mcu_sequence_func ERR: print: '%s' NOT FOUND\n", seqName ); 
+				LOG( "mcu_sequence_func ERR: insert pending '%s' FAILED\n", seqName ); 
 				return( CMD_FAILURE );
 			}
-			seq->print( stdout );
 		}
-		else
-		if( ( strcmp( seqCmd, "abort" ) == 0 )||( strcmp( seqCmd, "delete" ) == 0 ) )	{
-			int result = mcu->abortSequence( seqName );
-			if( result == CMD_NOT_FOUND )	{
-				LOG( "mcu_sequence_func ERR: abort|delete: '%s' NOT FOUND\n", seqName ); 
-			}
-			return( result );
-		}
-		else {
-			return( CMD_NOT_FOUND );
-		}
-		return( CMD_SUCCESS );
+			
+		float seqTime = args.read_float();
+		char* seqStr = args.read_remainder_raw();
+		int ret = seq->insert( seqTime, seqStr );
+		return ret;
 	}
-	return( CMD_FAILURE );
+	else
+	if( strcmp( seqCmd, "print" ) == 0 )	{
+			
+		srCmdSeq* seq = SmartBody::SBScene::getScene()->getCommandManager()->getPendingSequences()->getSequence( seqName );
+		if (!seq)
+		{
+			LOG( "mcu_sequence_func ERR: print: '%s' NOT FOUND\n", seqName ); 
+			return( CMD_FAILURE );
+		}
+		seq->print( stdout );
+	}
+	else
+	if( ( strcmp( seqCmd, "abort" ) == 0 )||( strcmp( seqCmd, "delete" ) == 0 ) )	{
+		int result = SmartBody::SBScene::getScene()->getCommandManager()->abortSequence( seqName );
+		if( result == CMD_NOT_FOUND )	{
+			LOG( "mcu_sequence_func ERR: abort|delete: '%s' NOT FOUND\n", seqName ); 
+		}
+		return( result );
+	}
+	else {
+		return( CMD_NOT_FOUND );
+	}
+	return( CMD_SUCCESS );
 }
 
 /*
 	seq-chain <seqname>*
 */
 
-int mcu_sequence_chain_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+int mcu_sequence_chain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 	vector<string> seq_names;
 	const char* token = args.read_token();
 	while( token[0] != '\0' ) {
@@ -426,7 +433,7 @@ int mcu_sequence_chain_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return CMD_FAILURE;
 	}
 
-	return mcu_p->execute_seq_chain( seq_names, "ERROR: seq-chian: " );
+	return SmartBody::SBScene::getScene()->getCommandManager()->execute_seq_chain( seq_names, "ERROR: seq-chian: " );
 }
 
 
@@ -436,50 +443,7 @@ int mcu_sequence_chain_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	Executes a command to set a configuration variable.
 */
 
-int mcu_set_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
-    char* arg = args.read_token();
-    int result = mcu_p->set_cmd_map.execute( arg, args, mcu_p );
-	if( result == CMD_NOT_FOUND ) {
-		// TODO: Differentiate between not finding this var and subargs
-		LOG("SBM ERR: Unknown Variable, Cannot set: '%s'\n> ", arg );  // Clarify this as a set command error
-		return CMD_SUCCESS; // Avoid multiple error messages
-	} else {
-		return result;
-	}
-}
 
-/*
-	Executes a command to print to the console some debug data.
-	See insert_print_cmd and its call in main
-*/
-
-int mcu_print_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
-    char* arg = args.read_token();
-    int result = mcu_p->print_cmd_map.execute( arg, args, mcu_p );
-	if( result == CMD_NOT_FOUND ) {
-		// TODO: Differentiate between not finding this var and subargs
-		LOG("SBM ERR: Print command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a print command error
-		return CMD_SUCCESS; // Avoid multiple error messages
-	} else {
-		return result;
-	}
-}
-
-/*
-	Executes a test sub-command.
-	See insert_test_cmd and its call in main
-*/
-
-int mcu_test_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
-    char* arg = args.read_token();
-    int result = mcu_p->test_cmd_map.execute( arg, args, mcu_p );
-	if( result == CMD_NOT_FOUND ) {
-		LOG("SBM ERR: Test command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a test command error
-		return CMD_SUCCESS; // Avoid multiple error messages
-	} else {
-		return result;
-	}
-}
 
 /////////////////////////////////////////////////////////////
 
@@ -490,57 +454,56 @@ int mcu_test_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	
 */
 
-int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	
-	if( mcu_p )	{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	char *view_cmd = args.read_token();
+	if( strcmp( view_cmd, "open" ) == 0 )	{
 
-		char *view_cmd = args.read_token();
-		if( strcmp( view_cmd, "open" ) == 0 )	{
-
-			if( mcu_p->viewer_p == NULL )	{
-				int argc = args.calc_num_tokens();
-				int width = 1024;
-				int height = 768;
-				int px = 100;
-				int py = 100;
-				if( argc >= 4 )	{
-					width = args.read_int();
-					height = args.read_int();
-					px = args.read_int();
-					py = args.read_int();
-				}
-				int err = mcu_p->open_viewer( width, height, px, py );
-				return( err );
+		if( mcu.viewer_p == NULL )	{
+			int argc = args.calc_num_tokens();
+			int width = 1024;
+			int height = 768;
+			int px = 100;
+			int py = 100;
+			if( argc >= 4 )	{
+				width = args.read_int();
+				height = args.read_int();
+				px = args.read_int();
+				py = args.read_int();
 			}
-			else {
-				mcu_p->viewer_p ->show_viewer();
-			}
-		}		
-		else
-		if( strcmp( view_cmd, "close" ) == 0 )	{
-			if( mcu_p->viewer_p )	{
-				mcu_p->close_viewer();
-				return( CMD_SUCCESS );
-			}
+			int err = mcu.open_viewer( width, height, px, py );
+			return( err );
 		}
-		else
-		if( strcmp( view_cmd, "show" ) == 0 )	{
-			if( mcu_p->viewer_p )	{
-				mcu_p->viewer_p->show_viewer();
-				return( CMD_SUCCESS );
-			}
+		else {
+			mcu.viewer_p ->show_viewer();
 		}
-		else
-		if( strcmp( view_cmd, "hide" ) == 0 )	{
-			if( mcu_p->viewer_p )	{
-				mcu_p->viewer_p->hide_viewer();
-				return( CMD_SUCCESS );
-			}
-		}
-		else	{
-			return( CMD_NOT_FOUND );
+	}		
+	else
+	if( strcmp( view_cmd, "close" ) == 0 )	{
+		if( mcu.viewer_p )	{
+			mcu.close_viewer();
+			return( CMD_SUCCESS );
 		}
 	}
+	else
+	if( strcmp( view_cmd, "show" ) == 0 )	{
+		if( mcu.viewer_p )	{
+			mcu.viewer_p->show_viewer();
+			return( CMD_SUCCESS );
+		}
+	}
+	else
+	if( strcmp( view_cmd, "hide" ) == 0 )	{
+		if( mcu.viewer_p )	{
+			mcu.viewer_p->hide_viewer();
+			return( CMD_SUCCESS );
+		}
+	}
+	else	{
+		return( CMD_NOT_FOUND );
+	}
+
 	return( CMD_FAILURE );
 }
 
@@ -610,366 +573,353 @@ double parseMotionParameters(std::string m, std::string parameter, double min, d
 	return mParam.getParameter(type);
 }
 
-int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p )
+int mcu_motion_mirror_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	if (mcu_p)
+	std::string refMotionName = args.read_token();
+	std::string mirrorMotionName = args.read_token();
+	std::string skeletonName = args.read_token();
+	if (refMotionName == "" || skeletonName == "")
 	{
-		std::string refMotionName = args.read_token();
-		std::string mirrorMotionName = args.read_token();
-		std::string skeletonName = args.read_token();
-		if (refMotionName == "" || skeletonName == "")
-		{
-			LOG("Usage: mirror <from> <to> <skeleton>");
-			return CMD_FAILURE;
-		}
+		LOG("Usage: mirror <from> <to> <skeleton>");
+		return CMD_FAILURE;
+	}
 		
-		SmartBody::SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);	
-		if (!skeleton)
-		{
-			LOG("No skeleton named '%s' found. Cannot mirror motion %s.", skeletonName.c_str(), refMotionName.c_str());
-			return CMD_FAILURE;
-		}
-		SmartBody::SBMotion* refMotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(refMotionName);
-		if (!refMotion)
-		{
-			LOG("No motion named '%s' found. Cannot mirror motion %s.", refMotionName.c_str(), refMotionName.c_str());
-			return CMD_FAILURE;
-		}
-		if (refMotion && skeleton)
-		{
+	SmartBody::SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);	
+	if (!skeleton)
+	{
+		LOG("No skeleton named '%s' found. Cannot mirror motion %s.", skeletonName.c_str(), refMotionName.c_str());
+		return CMD_FAILURE;
+	}
+	SmartBody::SBMotion* refMotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(refMotionName);
+	if (!refMotion)
+	{
+		LOG("No motion named '%s' found. Cannot mirror motion %s.", refMotionName.c_str(), refMotionName.c_str());
+		return CMD_FAILURE;
+	}
+	if (refMotion && skeleton)
+	{
 #if 1
-			SkMotion* mirrorMotion = refMotion->buildMirrorMotion(skeleton);
-			if (mirrorMotionName == EMPTY_STRING)
-				mirrorMotionName = refMotionName + "_mirror";
-			mirrorMotion->setName(mirrorMotionName.c_str());
+		SkMotion* mirrorMotion = refMotion->buildMirrorMotion(skeleton);
+		if (mirrorMotionName == EMPTY_STRING)
+			mirrorMotionName = refMotionName + "_mirror";
+		mirrorMotion->setName(mirrorMotionName.c_str());
 
-			SmartBody::SBMotion* sbmotion = dynamic_cast<SmartBody::SBMotion*>(mirrorMotion);
-			SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);			
+		SmartBody::SBMotion* sbmotion = dynamic_cast<SmartBody::SBMotion*>(mirrorMotion);
+		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);			
 #endif
-			return CMD_SUCCESS;
-		}		
-	}
+		return CMD_SUCCESS;
+	}		
 	return CMD_SUCCESS;
 }
 
 
-int mcu_physics_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_physics_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	if (mcu_p)
+	std::string operation = args.read_token();
+	if (operation == "enable")
 	{
-		std::string operation = args.read_token();
-		if (operation == "enable")
-		{
-			//mcu_p->setPhysicsEngine(true);
-			SmartBody::SBScene::getScene()->getPhysicsManager()->setEnable(true);
-			return CMD_SUCCESS;
-		}
-		else if (operation == "disable")
-		{
-			//mcu_p->setPhysicsEngine(false);	
-			SmartBody::SBScene::getScene()->getPhysicsManager()->setEnable(false);
-			return CMD_SUCCESS;
-		}
-		else if (operation == "gravity")
-		{
-			float gravity = args.read_float();
-			//if (gravity > 0.f)
-			//	mcu_p->physicsEngine->setGravity(gravity);		
-			SmartBody::SBScene::getScene()->getPhysicsManager()->getPhysicsEngine()->setGravity(gravity);
-		}
+		//mcu.setPhysicsEngine(true);
+		SmartBody::SBScene::getScene()->getPhysicsManager()->setEnable(true);
+		return CMD_SUCCESS;
+	}
+	else if (operation == "disable")
+	{
+		//mcu.setPhysicsEngine(false);	
+		SmartBody::SBScene::getScene()->getPhysicsManager()->setEnable(false);
+		return CMD_SUCCESS;
+	}
+	else if (operation == "gravity")
+	{
+		float gravity = args.read_float();
+		//if (gravity > 0.f)
+		//	mcu.physicsEngine->setGravity(gravity);		
+		SmartBody::SBScene::getScene()->getPhysicsManager()->getPhysicsEngine()->setGravity(gravity);
 	}
 	return CMD_SUCCESS;
 }
 
-int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_panim_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	if (mcu_p)
+	std::string operation = args.read_token();
+	if (operation == "enable")
 	{
-		std::string operation = args.read_token();
-		if (operation == "enable")
+		LOG("Command: 'panim enable' has been deprecated.");
+		return CMD_FAILURE;
+	}
+	if (operation == "state")
+	{
+		std::string blendName = args.read_token();
+		PABlend* newState = new PABlend(blendName);
+		std::string nextString = args.read_token();
+		if (nextString == "cycle")
 		{
-			LOG("Command: 'panim enable' has been deprecated.");
-			return CMD_FAILURE;
-		}
-		if (operation == "state")
-		{
-			std::string blendName = args.read_token();
-			PABlend* newState = new PABlend(blendName);
-			std::string nextString = args.read_token();
-			if (nextString == "cycle")
+			std::string cycle = args.read_token();
+			if (cycle == "true")
+				newState->cycle = true;
+			if (cycle == "false")
+				newState->cycle = false;
+			int numMotions = args.read_int();
+			for (int i = 0; i < numMotions; i++)
 			{
-				std::string cycle = args.read_token();
-				if (cycle == "true")
-					newState->cycle = true;
-				if (cycle == "false")
-					newState->cycle = false;
-				int numMotions = args.read_int();
-				for (int i = 0; i < numMotions; i++)
-				{
-					std::string motionName = args.read_token();
-					SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+				std::string motionName = args.read_token();
+				SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 
-					if (!motion)
-						return CMD_FAILURE;
-					newState->motions.push_back(motion);
-				}
-				int numKeys = args.read_int();
-				for (int i = 0; i < numMotions; i++)
-				{
-					std::vector<double> keysForOneMotion;
-					if (numKeys == 0)
-					{
-						keysForOneMotion.push_back(0.0);
-						keysForOneMotion.push_back(newState->motions[i]->duration());
-					}
-					else
-					{
-						for (int j = 0; j < numKeys; j++)
-						{
-							double key = args.read_double();
-							keysForOneMotion.push_back(key);
-						}
-						for (int j = 0; j < numKeys - 1; j++)
-						{
-							if (keysForOneMotion[j] > keysForOneMotion[j + 1])
-								keysForOneMotion[j + 1] += newState->motions[i]->duration();
-						}
-					}
-					newState->keys.push_back(keysForOneMotion);
-				}
-
-				//SmartBody::SBScene::getScene()->getBlendManager()->addBlend(newState);
+				if (!motion)
+					return CMD_FAILURE;
+				newState->motions.push_back(motion);
 			}
-			else if (nextString == "parameter")
+			int numKeys = args.read_int();
+			for (int i = 0; i < numMotions; i++)
 			{
-				SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
-				if (!blend) return CMD_FAILURE;
-				std::string type = args.read_token();
-				if (type == "1D") blend->setType(0);
-				else if (type == "2D") blend->setType(1);
-				else if (type == "3D") blend->setType(2);
-				else return CMD_FAILURE;
-				int num = args.read_int();
-				for (int i = 0; i < num; i++)
+				std::vector<double> keysForOneMotion;
+				if (numKeys == 0)
 				{
-					std::string m = args.read_token();
-					if (type == "1D")
+					keysForOneMotion.push_back(0.0);
+					keysForOneMotion.push_back(newState->motions[i]->duration());
+				}
+				else
+				{
+					for (int j = 0; j < numKeys; j++)
 					{
-						std::string parameter = args.read_token();
-						int motionId = blend->getMotionId(m);
-						if (motionId < 0) return CMD_FAILURE;
-						double param = parseMotionParameters(m, parameter, blend->keys[motionId][0], blend->keys[motionId][blend->getNumKeys() - 1]);
-						if (param < -9000) param = atof(parameter.c_str());
-						blend->setParameter(m, param);
+						double key = args.read_double();
+						keysForOneMotion.push_back(key);
 					}
-					else if (type == "2D")
+					for (int j = 0; j < numKeys - 1; j++)
 					{
-						std::string parameterX = args.read_token();
-						std::string parameterY = args.read_token();
-						double paramX = parseMotionParameters(m, parameterX, blend->keys[blend->getMotionId(m)][0], blend->keys[blend->getMotionId(m)][blend->getNumKeys() - 1]);
-						double paramY = parseMotionParameters(m, parameterY, blend->keys[blend->getMotionId(m)][0], blend->keys[blend->getMotionId(m)][blend->getNumKeys() - 1]);
-						if (paramX < -9000) paramX = atof(parameterX.c_str());
-						if (paramY < -9000) paramY = atof(parameterY.c_str());
-						blend->setParameter(m, paramX, paramY);
-					}
-					else if (type == "3D")
-					{
-						double param[3];
-						for (int pc = 0; pc < 3; pc++)
-						{
-							std::string para = args.read_token();
-							param[pc] = parseMotionParameters(m, para, blend->keys[blend->getMotionId(m)][0], blend->keys[blend->getMotionId(m)][blend->getNumKeys() - 1]);
-							if (param[pc] < -9000) param[pc] = atof(para.c_str());
-						}
-						blend->setParameter(m, param[0], param[1], param[2]);
+						if (keysForOneMotion[j] > keysForOneMotion[j + 1])
+							keysForOneMotion[j + 1] += newState->motions[i]->duration();
 					}
 				}
+				newState->keys.push_back(keysForOneMotion);
+			}
+
+			//SmartBody::SBScene::getScene()->getBlendManager()->addBlend(newState);
+		}
+		else if (nextString == "parameter")
+		{
+			SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
+			if (!blend) return CMD_FAILURE;
+			std::string type = args.read_token();
+			if (type == "1D") blend->setType(0);
+			else if (type == "2D") blend->setType(1);
+			else if (type == "3D") blend->setType(2);
+			else return CMD_FAILURE;
+			int num = args.read_int();
+			for (int i = 0; i < num; i++)
+			{
+				std::string m = args.read_token();
+				if (type == "1D")
+				{
+					std::string parameter = args.read_token();
+					int motionId = blend->getMotionId(m);
+					if (motionId < 0) return CMD_FAILURE;
+					double param = parseMotionParameters(m, parameter, blend->keys[motionId][0], blend->keys[motionId][blend->getNumKeys() - 1]);
+					if (param < -9000) param = atof(parameter.c_str());
+					blend->setParameter(m, param);
+				}
+				else if (type == "2D")
+				{
+					std::string parameterX = args.read_token();
+					std::string parameterY = args.read_token();
+					double paramX = parseMotionParameters(m, parameterX, blend->keys[blend->getMotionId(m)][0], blend->keys[blend->getMotionId(m)][blend->getNumKeys() - 1]);
+					double paramY = parseMotionParameters(m, parameterY, blend->keys[blend->getMotionId(m)][0], blend->keys[blend->getMotionId(m)][blend->getNumKeys() - 1]);
+					if (paramX < -9000) paramX = atof(parameterX.c_str());
+					if (paramY < -9000) paramY = atof(parameterY.c_str());
+					blend->setParameter(m, paramX, paramY);
+				}
+				else if (type == "3D")
+				{
+					double param[3];
+					for (int pc = 0; pc < 3; pc++)
+					{
+						std::string para = args.read_token();
+						param[pc] = parseMotionParameters(m, para, blend->keys[blend->getMotionId(m)][0], blend->keys[blend->getMotionId(m)][blend->getNumKeys() - 1]);
+						if (param[pc] < -9000) param[pc] = atof(para.c_str());
+					}
+					blend->setParameter(m, param[0], param[1], param[2]);
+				}
+			}
 //				if (type == "3D")
 //					state->buildTetrahedron();
-			}
-			else if (nextString == "triangle")
+		}
+		else if (nextString == "triangle")
+		{
+			SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
+			if (!blend) return CMD_FAILURE;
+			int numTriangles = args.read_int();
+			for (int i = 0; i < numTriangles; i++)
 			{
-				SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
-				if (!blend) return CMD_FAILURE;
-				int numTriangles = args.read_int();
-				for (int i = 0; i < numTriangles; i++)
-				{
-					std::string motion1 = args.read_token();
-					std::string motion2 = args.read_token();
-					std::string motion3 = args.read_token();
-					blend->addTriangle(motion1, motion2, motion3);
-				}
+				std::string motion1 = args.read_token();
+				std::string motion2 = args.read_token();
+				std::string motion3 = args.read_token();
+				blend->addTriangle(motion1, motion2, motion3);
 			}
-			else if (nextString == "tetrahedron")
-			{ 
-				SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
-				if (!blend) return CMD_FAILURE;
-				int numTetrahedrons = args.read_int();
-				for (int i = 0; i < numTetrahedrons; i++)
-				{
-					std::string motion1 = args.read_token();
-					std::string motion2 = args.read_token();
-					std::string motion3 = args.read_token();
-					std::string motion4 = args.read_token();
-					blend->addTetrahedron(motion1, motion2, motion3, motion4);
-				}				
-			}
+		}
+		else if (nextString == "tetrahedron")
+		{ 
+			SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
+			if (!blend) return CMD_FAILURE;
+			int numTetrahedrons = args.read_int();
+			for (int i = 0; i < numTetrahedrons; i++)
+			{
+				std::string motion1 = args.read_token();
+				std::string motion2 = args.read_token();
+				std::string motion3 = args.read_token();
+				std::string motion4 = args.read_token();
+				blend->addTetrahedron(motion1, motion2, motion3, motion4);
+			}				
+		}
+		else
+			return CMD_FAILURE;
+	}
+	else if (operation == "schedule" || operation == "unschedule" || operation == "update" ||  operation == "updatestate" || operation == "basename")
+	{
+		std::string charString = args.read_token();
+		if (charString != "char")
+			return CMD_FAILURE;
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(args.read_token());
+		if (!character)
+			return CMD_FAILURE;
+		if (!character->param_animation_ct)
+		{
+			LOG("Parameterized Animation Not Enabled!");
+			return CMD_SUCCESS;
+		}
+
+		if (operation == "schedule")
+		{
+			std::string blendString = args.read_token();
+			if (blendString != "state")
+				return CMD_FAILURE;
+			std::string blendName = args.read_token();
+			SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
+			if (!blend)
+				LOG("Blend %s not exist, schedule Idle blend.", blendName.c_str());
+			std::string loopString = args.read_token();
+			if (loopString != "loop")
+				return CMD_FAILURE;
+			std::string loop = args.read_token();
+			PABlendData::WrapMode wrap = PABlendData::Loop;
+			if (loop == "true") wrap = PABlendData::Loop;
+			if (loop == "false") wrap = PABlendData::Once;
+			std::string playNowString = args.read_token();
+			if (playNowString != "playnow")
+				return CMD_FAILURE;
+			PABlendData::ScheduleMode schedule = PABlendData::Queued;
+			std::string playNow = args.read_token();
+			if (playNow == "true") schedule = PABlendData::Now;
+			else if (playNow == "false") schedule = PABlendData::Queued;
+			else 
+				return CMD_FAILURE;
+			PABlendData::BlendMode blendMode = PABlendData::Overwrite;
+			std::string additiveString = args.read_token();
+			if (additiveString != "additive")
+				return CMD_FAILURE;
+			std::string addtive = args.read_token();
+			if (addtive == "true") blendMode = PABlendData::Overwrite;
+			else if (addtive == "false") blendMode = PABlendData::Additive;
 			else
 				return CMD_FAILURE;
+			std::string jointString = args.read_token();
+			if (jointString != "joint")
+				return CMD_FAILURE;
+			std::vector<double> weights;
+			std::string joint = args.read_token();
+			int numWeights = args.calc_num_tokens();
+			if (numWeights > 0)
+			{
+				if (blend)
+				{
+					for (int i = 0; i < blend->getNumMotions(); i++)
+						weights.push_back(args.read_double());
+				}
+			}
+			if (blend && numWeights < blend->getNumMotions())
+			{
+				character->param_animation_ct->schedule(blend, 0, 0, 0, wrap, schedule, blendMode, joint);
+			}
+			else
+			{
+				character->param_animation_ct->schedule(blend, weights, wrap, schedule, blendMode, joint);
+			}
 		}
-		else if (operation == "schedule" || operation == "unschedule" || operation == "update" ||  operation == "updatestate" || operation == "basename")
+
+		if (operation == "unschedule")
+			character->param_animation_ct->unschedule();
+
+		if (operation == "update")
 		{
-			std::string charString = args.read_token();
-			if (charString != "char")
-				return CMD_FAILURE;
-			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(args.read_token());
-			if (!character)
-				return CMD_FAILURE;
-			if (!character->param_animation_ct)
+			std::vector<double> w;
+			if (args.calc_num_tokens() == character->param_animation_ct->getNumWeights())
 			{
-				LOG("Parameterized Animation Not Enabled!");
-				return CMD_SUCCESS;
+				for (int i = 0; i < character->param_animation_ct->getNumWeights(); i++)
+					w.push_back(args.read_double());
+				//LOG("weight size = %d",w.size());
+				character->param_animation_ct->updateWeights(w);
 			}
-
-			if (operation == "schedule")
-			{
-				std::string blendString = args.read_token();
-				if (blendString != "state")
-					return CMD_FAILURE;
-				std::string blendName = args.read_token();
-				SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
-				if (!blend)
-					LOG("Blend %s not exist, schedule Idle blend.", blendName.c_str());
-				std::string loopString = args.read_token();
-				if (loopString != "loop")
-					return CMD_FAILURE;
-				std::string loop = args.read_token();
-				PABlendData::WrapMode wrap = PABlendData::Loop;
-				if (loop == "true") wrap = PABlendData::Loop;
-				if (loop == "false") wrap = PABlendData::Once;
-				std::string playNowString = args.read_token();
-				if (playNowString != "playnow")
-					return CMD_FAILURE;
-				PABlendData::ScheduleMode schedule = PABlendData::Queued;
-				std::string playNow = args.read_token();
-				if (playNow == "true") schedule = PABlendData::Now;
-				else if (playNow == "false") schedule = PABlendData::Queued;
-				else 
-					return CMD_FAILURE;
-				PABlendData::BlendMode blendMode = PABlendData::Overwrite;
-				std::string additiveString = args.read_token();
-				if (additiveString != "additive")
-					return CMD_FAILURE;
-				std::string addtive = args.read_token();
-				if (addtive == "true") blendMode = PABlendData::Overwrite;
-				else if (addtive == "false") blendMode = PABlendData::Additive;
-				else
-					return CMD_FAILURE;
-				std::string jointString = args.read_token();
-				if (jointString != "joint")
-					return CMD_FAILURE;
-				std::vector<double> weights;
-				std::string joint = args.read_token();
-				int numWeights = args.calc_num_tokens();
-				if (numWeights > 0)
-				{
-					if (blend)
-					{
-						for (int i = 0; i < blend->getNumMotions(); i++)
-							weights.push_back(args.read_double());
-					}
-				}
-				if (blend && numWeights < blend->getNumMotions())
-				{
-					character->param_animation_ct->schedule(blend, 0, 0, 0, wrap, schedule, blendMode, joint);
-				}
-				else
-				{
-					character->param_animation_ct->schedule(blend, weights, wrap, schedule, blendMode, joint);
-				}
-			}
-
-			if (operation == "unschedule")
-				character->param_animation_ct->unschedule();
-
-			if (operation == "update")
-			{
-				std::vector<double> w;
-				if (args.calc_num_tokens() == character->param_animation_ct->getNumWeights())
-				{
-					for (int i = 0; i < character->param_animation_ct->getNumWeights(); i++)
-						w.push_back(args.read_double());
-					//LOG("weight size = %d",w.size());
-					character->param_animation_ct->updateWeights(w);
-				}
-			}
-			if (operation == "updatestate")
-			{
-				if (!character->param_animation_ct->getCurrentPABlendData())
-				{
-					LOG("No state available for character %s.", character->getName().c_str());
-					return CMD_FAILURE;
-				}
-
-				int type = character->param_animation_ct->getCurrentPABlendData()->state->getType();
-				if (args.calc_num_tokens() != type + 1)
-				{
-					LOG("Cannot update state %s for character %s which has %d parameters, you sent %d.", character->param_animation_ct->getName().c_str(), character->getName().c_str(), (type + 1), args.calc_num_tokens());
-					return CMD_FAILURE;
-				}
-				std::vector<double> p;
-				for (int i = 0; i < (type + 1); i++)
-					p.push_back(args.read_double());
-				std::vector<double> weights;
-				weights.resize(character->param_animation_ct->getCurrentPABlendData()->state->getNumMotions());
-				if (type == 0)
-					character->param_animation_ct->getCurrentPABlendData()->state->getWeightsFromParameters(p[0], weights);
-				else if (type == 1)
-					character->param_animation_ct->getCurrentPABlendData()->state->getWeightsFromParameters(p[0], p[1], weights);
-				else if (type == 2)
-					character->param_animation_ct->getCurrentPABlendData()->state->getWeightsFromParameters(p[0], p[1], p[2], weights);
-				character->param_animation_ct->updateWeights(weights);
-				return CMD_SUCCESS;
-			}
-
-
-			if (operation == "basename")
-				character->param_animation_ct->setBaseJointName(args.read_token());
 		}
+		if (operation == "updatestate")
+		{
+			if (!character->param_animation_ct->getCurrentPABlendData())
+			{
+				LOG("No state available for character %s.", character->getName().c_str());
+				return CMD_FAILURE;
+			}
+
+			int type = character->param_animation_ct->getCurrentPABlendData()->state->getType();
+			if (args.calc_num_tokens() != type + 1)
+			{
+				LOG("Cannot update state %s for character %s which has %d parameters, you sent %d.", character->param_animation_ct->getName().c_str(), character->getName().c_str(), (type + 1), args.calc_num_tokens());
+				return CMD_FAILURE;
+			}
+			std::vector<double> p;
+			for (int i = 0; i < (type + 1); i++)
+				p.push_back(args.read_double());
+			std::vector<double> weights;
+			weights.resize(character->param_animation_ct->getCurrentPABlendData()->state->getNumMotions());
+			if (type == 0)
+				character->param_animation_ct->getCurrentPABlendData()->state->getWeightsFromParameters(p[0], weights);
+			else if (type == 1)
+				character->param_animation_ct->getCurrentPABlendData()->state->getWeightsFromParameters(p[0], p[1], weights);
+			else if (type == 2)
+				character->param_animation_ct->getCurrentPABlendData()->state->getWeightsFromParameters(p[0], p[1], p[2], weights);
+			character->param_animation_ct->updateWeights(weights);
+			return CMD_SUCCESS;
+		}
+
+
+		if (operation == "basename")
+			character->param_animation_ct->setBaseJointName(args.read_token());
+	}
 		
-		else
-		{
-			LOG("mcu_panim_cmd_func ERR: operation not valid.");
-			return CMD_FAILURE;
-		}
+	else
+	{
+		LOG("mcu_panim_cmd_func ERR: operation not valid.");
+		return CMD_FAILURE;
 	}
 	return CMD_SUCCESS;
 }
 
-int mcu_motion_player_func(srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_motion_player_func(srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	if (mcu_p)
+	std::string charName = args.read_token();
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
+	if (character)
 	{
-		std::string charName = args.read_token();
-		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
-		if (character)
-		{
-			if (!character->motionplayer_ct)
-				return CMD_FAILURE;
+		if (!character->motionplayer_ct)
+			return CMD_FAILURE;
 
-			std::string next = args.read_token();
-			if (next == "on")
-				character->motionplayer_ct->setActive(true);
-			else if (next == "off")
-				character->motionplayer_ct->setActive(false);
-			else
-			{
-				double frameNumber = args.read_double();
-				character->motionplayer_ct->init(character,next, frameNumber);
-			}
-			return CMD_SUCCESS;
+		std::string next = args.read_token();
+		if (next == "on")
+			character->motionplayer_ct->setActive(true);
+		else if (next == "off")
+			character->motionplayer_ct->setActive(false);
+		else
+		{
+			double frameNumber = args.read_double();
+			character->motionplayer_ct->init(character,next, frameNumber);
 		}
-		return CMD_FAILURE;
+		return CMD_SUCCESS;
 	}
 	return CMD_FAILURE;
 }
@@ -987,238 +937,238 @@ int mcu_motion_player_func(srArgBuffer& args, mcuCBHandle *mcu_p )
 
 */
 
-int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	
-	if( mcu_p )	{
-		if( mcu_p->viewer_p )	{
-			SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
-			if (!camera)
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if( mcu.viewer_p )	{
+		SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+		if (!camera)
+		{
+			LOG("No active camera. Camera command not executed.");
+			return CMD_FAILURE;
+		}
+		char *cam_cmd = args.read_token();
+		if( strcmp( cam_cmd, "eye" ) == 0 )	{
+			float x = args.read_float();
+			float y = args.read_float();
+			float z = args.read_float();
+			camera->setEye( x, y, z );
+		}
+		else
+		if( strcmp( cam_cmd, "center" ) == 0 )	{
+			float x = args.read_float();
+			float y = args.read_float();
+			float z = args.read_float();
+			camera->setCenter( x, y, z );
+		}
+		else
+		if( strcmp( cam_cmd, "scale" ) == 0 )	{
+			camera->setScale(args.read_float());
+		}
+		else
+		if( strcmp( cam_cmd, "track" ) == 0 )	{
+			char* name = args.read_token();
+			if (!name || strcmp(name, "") == 0)
 			{
-				LOG("No active camera. Camera command not executed.");
-				return CMD_FAILURE;
-			}
-			char *cam_cmd = args.read_token();
-			if( strcmp( cam_cmd, "eye" ) == 0 )	{
-				float x = args.read_float();
-				float y = args.read_float();
-				float z = args.read_float();
-				camera->setEye( x, y, z );
-			}
-			else
-			if( strcmp( cam_cmd, "center" ) == 0 )	{
-				float x = args.read_float();
-				float y = args.read_float();
-				float z = args.read_float();
-				camera->setCenter( x, y, z );
-			}
-			else
-			if( strcmp( cam_cmd, "scale" ) == 0 )	{
-				camera->setScale(args.read_float());
-			}
-			else
-			if( strcmp( cam_cmd, "track" ) == 0 )	{
-				char* name = args.read_token();
-				if (!name || strcmp(name, "") == 0)
+				if (mcu.cameraTracking.size() > 0)
 				{
-					if (mcu_p->cameraTracking.size() > 0)
-					{
-						for (std::vector<CameraTrack*>::iterator iter = mcu_p->cameraTracking.begin();
-							 iter != mcu_p->cameraTracking.end();
-							 iter++)
-						{
-							CameraTrack* cameraTrack = (*iter);
-							delete cameraTrack;
-						}
-						mcu_p->cameraTracking.clear();
-						LOG("Removing current tracked object.");
-						return( CMD_SUCCESS );
-					}
-					LOG("Need to specify an object and a joint to track.");
-					return( CMD_FAILURE );
-				}
-				SbmPawn* pawn = mcu_p->getPawn(name);
-				if (!pawn)
-				{
-					pawn = SmartBody::SBScene::getScene()->getCharacter(name);
-					if (!pawn)
-					{
-						LOG("Object %s was not found, cannot track.", name);
-						return( CMD_FAILURE );
-					}
-				}
-				char* jointName = args.read_token();
-				if (!jointName || strcmp(jointName, "") == 0)
-				{
-					LOG("Need to specify a joint to track.");
-					return( CMD_FAILURE );
-				}
-				SkSkeleton* skeleton = NULL;
-				skeleton = pawn->getSkeleton();
-
-				SkJoint* joint = pawn->getSkeleton()->search_joint(jointName);
-				if (!joint)
-				{
-					LOG("Could not find joint %s on object %s.", jointName, name);
-					return( CMD_FAILURE );
-				}
-	
-				if (mcu_p->cameraTracking.size() > 0)
-				{
-					for (std::vector<CameraTrack*>::iterator iter = mcu_p->cameraTracking.begin();
-							 iter != mcu_p->cameraTracking.end();
-							 iter++)
+					for (std::vector<CameraTrack*>::iterator iter = mcu.cameraTracking.begin();
+							iter != mcu.cameraTracking.end();
+							iter++)
 					{
 						CameraTrack* cameraTrack = (*iter);
 						delete cameraTrack;
 					}
-					mcu_p->cameraTracking.clear();
+					mcu.cameraTracking.clear();
 					LOG("Removing current tracked object.");
+					return( CMD_SUCCESS );
 				}
-				joint->skeleton()->update_global_matrices();
-				joint->update_gmat();
-				const SrMat& jointMat = joint->gmat();
-				SrVec jointPos(jointMat[12], jointMat[13], jointMat[14]);
-				CameraTrack* cameraTrack = new CameraTrack();
-				cameraTrack->joint = joint;
-				cameraTrack->yPos = jointMat[13];
-				cameraTrack->threshold = 100.0;
-				SrCamera cam;
-				cameraTrack->jointToCamera = mcu_p->viewer_p->get_camera()->getEye() - jointPos;
-				LOG("Vector from joint to target is %f %f %f", cameraTrack->jointToCamera.x, cameraTrack->jointToCamera.y, cameraTrack->jointToCamera.z);
-				cameraTrack->targetToCamera = mcu_p->viewer_p->get_camera()->getEye() - mcu_p->viewer_p->get_camera()->getCenter();
-				LOG("Vector from target to eye is %f %f %f", cameraTrack->targetToCamera.x, cameraTrack->targetToCamera.y, cameraTrack->targetToCamera.z);				
-				mcu_p->cameraTracking.push_back(cameraTrack);
-				LOG("Object %s will now be tracked at joint %s.", name, jointName);
-				
+				LOG("Need to specify an object and a joint to track.");
+				return( CMD_FAILURE );
 			}
-			else
-			if( strcmp( cam_cmd, "default" ) == 0 )	{
-				int preset = args.read_int();
-				
-				if( preset == 1 )	{
-					mcu_p->viewer_p->view_all();
-				}
-			}
-			else if (strcmp( cam_cmd, "reset" ) == 0 ) {
-				float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
-				SrVec camEye = SrVec(0,1.66f,1.85f)*scale;
-				SrVec camCenter = SrVec(0,0.92f,0)*scale;	
-				float znear = 0.01f*scale;
-				float zfar = 100.0f*scale;
-				char camCommand[256];
-				sprintf(camCommand,"camera eye %f %f %f",camEye[0],camEye[1],camEye[2]);				
-				mcu_p->execute((char*)camCommand);
-				sprintf(camCommand,"camera center %f %f %f",camCenter[0],camCenter[1],camCenter[2]);
-				mcu_p->execute((char*)camCommand);			
-				camera->setNearPlane(znear);
-				camera->setFarPlane(zfar);
-
-			}
-			else if (strcmp( cam_cmd, "frame" ) == 0 ) {
-				SrBox sceneBox;
-				for (std::map<std::string, SbmPawn*>::iterator iter = mcu_p->getPawnMap().begin();
-					iter != mcu_p->getPawnMap().end();
-					iter++)
+			SbmPawn* pawn = mcu.getPawn(name);
+			if (!pawn)
+			{
+				pawn = SmartBody::SBScene::getScene()->getCharacter(name);
+				if (!pawn)
 				{
-					bool visible = (*iter).second->getBoolAttribute("visible");
-						if (!visible)
-							continue;
-					SrBox box = (*iter).second->getSkeleton()->getBoundingBox();
-					sceneBox.extend(box);
+					LOG("Object %s was not found, cannot track.", name);
+					return( CMD_FAILURE );
 				}
-				camera->view_all(sceneBox, camera->getFov());	
-				float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
-				float znear = 0.01f*scale;
-				float zfar = 100.0f*scale;
-				camera->setNearPlane(znear);
-				camera->setFarPlane(zfar);
 			}
-			return( CMD_SUCCESS );
+			char* jointName = args.read_token();
+			if (!jointName || strcmp(jointName, "") == 0)
+			{
+				LOG("Need to specify a joint to track.");
+				return( CMD_FAILURE );
+			}
+			SkSkeleton* skeleton = NULL;
+			skeleton = pawn->getSkeleton();
+
+			SkJoint* joint = pawn->getSkeleton()->search_joint(jointName);
+			if (!joint)
+			{
+				LOG("Could not find joint %s on object %s.", jointName, name);
+				return( CMD_FAILURE );
+			}
+	
+			if (mcu.cameraTracking.size() > 0)
+			{
+				for (std::vector<CameraTrack*>::iterator iter = mcu.cameraTracking.begin();
+							iter != mcu.cameraTracking.end();
+							iter++)
+				{
+					CameraTrack* cameraTrack = (*iter);
+					delete cameraTrack;
+				}
+				mcu.cameraTracking.clear();
+				LOG("Removing current tracked object.");
+			}
+			joint->skeleton()->update_global_matrices();
+			joint->update_gmat();
+			const SrMat& jointMat = joint->gmat();
+			SrVec jointPos(jointMat[12], jointMat[13], jointMat[14]);
+			CameraTrack* cameraTrack = new CameraTrack();
+			cameraTrack->joint = joint;
+			cameraTrack->yPos = jointMat[13];
+			cameraTrack->threshold = 100.0;
+			SrCamera cam;
+			cameraTrack->jointToCamera = mcu.viewer_p->get_camera()->getEye() - jointPos;
+			LOG("Vector from joint to target is %f %f %f", cameraTrack->jointToCamera.x, cameraTrack->jointToCamera.y, cameraTrack->jointToCamera.z);
+			cameraTrack->targetToCamera = mcu.viewer_p->get_camera()->getEye() - mcu.viewer_p->get_camera()->getCenter();
+			LOG("Vector from target to eye is %f %f %f", cameraTrack->targetToCamera.x, cameraTrack->targetToCamera.y, cameraTrack->targetToCamera.z);				
+			mcu.cameraTracking.push_back(cameraTrack);
+			LOG("Object %s will now be tracked at joint %s.", name, jointName);
+				
 		}
+		else
+		if( strcmp( cam_cmd, "default" ) == 0 )	{
+			int preset = args.read_int();
+				
+			if( preset == 1 )	{
+				mcu.viewer_p->view_all();
+			}
+		}
+		else if (strcmp( cam_cmd, "reset" ) == 0 ) {
+			float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
+			SrVec camEye = SrVec(0,1.66f,1.85f)*scale;
+			SrVec camCenter = SrVec(0,0.92f,0)*scale;	
+			float znear = 0.01f*scale;
+			float zfar = 100.0f*scale;
+			char camCommand[256];
+			sprintf(camCommand,"camera eye %f %f %f",camEye[0],camEye[1],camEye[2]);				
+			SmartBody::SBScene::getScene()->getCommandManager()->execute((char*)camCommand);
+			sprintf(camCommand,"camera center %f %f %f",camCenter[0],camCenter[1],camCenter[2]);
+			SmartBody::SBScene::getScene()->getCommandManager()->execute((char*)camCommand);			
+			camera->setNearPlane(znear);
+			camera->setFarPlane(zfar);
+
+		}
+		else if (strcmp( cam_cmd, "frame" ) == 0 ) {
+			SrBox sceneBox;
+			for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+				iter != mcu.getPawnMap().end();
+				iter++)
+			{
+				bool visible = (*iter).second->getBoolAttribute("visible");
+					if (!visible)
+						continue;
+				SrBox box = (*iter).second->getSkeleton()->getBoundingBox();
+				sceneBox.extend(box);
+			}
+			camera->view_all(sceneBox, camera->getFov());	
+			float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
+			float znear = 0.01f*scale;
+			float zfar = 100.0f*scale;
+			camera->setNearPlane(znear);
+			camera->setFarPlane(zfar);
+		}
+		return( CMD_SUCCESS );
 	}
+
 	return( CMD_FAILURE );
 }
 
 /////////////////////////////////////////////////////////////
 
-int mcu_terrain_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+int mcu_terrain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	
-	if( mcu_p )	{
-		char *terr_cmd = args.read_token();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
+	char *terr_cmd = args.read_token();
 
-		if( strcmp( terr_cmd, "help" ) == 0 )	{
-			LOG("HELP: terrain");	
-			LOG("  load [<filename>]");
-			LOG("  scale <X Y Z>");
-			LOG("  origin <X Y Z>|auto");
-			LOG("  delete");
-			return( CMD_SUCCESS );
-		}
-		else
-		if( strcmp( terr_cmd, "load" ) == 0 )	{
+	if( strcmp( terr_cmd, "help" ) == 0 )	{
+		LOG("HELP: terrain");	
+		LOG("  load [<filename>]");
+		LOG("  scale <X Y Z>");
+		LOG("  origin <X Y Z>|auto");
+		LOG("  delete");
+		return( CMD_SUCCESS );
+	}
+	else
+	if( strcmp( terr_cmd, "load" ) == 0 )	{
 
-			if( mcu_p->height_field_p == NULL )	{
-				mcu_p->height_field_p = new Heightfield();
-			}
-			int n = args.calc_num_tokens();
-			if( n == 0 )	{
-				mcu_p->height_field_p->load( (char*)"../../../../data/terrain/range1.e.ppm" );
-				mcu_p->height_field_p->set_scale( 5000.0f * SmartBody::SBScene::getScene()->getScale() / 100.0f, 300.0f * SmartBody::SBScene::getScene()->getScale() / 100.0f, 5000.0f  * SmartBody::SBScene::getScene()->getScale() / 100.0f);
-				mcu_p->height_field_p->set_auto_origin();
-			}
-			else	{
-				char *filename = args.read_token();
-				mcu_p->height_field_p->load( filename );
-			}
-			return( CMD_SUCCESS );
+		if( mcu.height_field_p == NULL )	{
+			mcu.height_field_p = new Heightfield();
 		}
-		else
-		if( mcu_p->height_field_p == NULL ) {
-			LOG( "mcu_terrain_func: ERR: no heightfield loaded" );
-			return( CMD_FAILURE );
+		int n = args.calc_num_tokens();
+		if( n == 0 )	{
+			mcu.height_field_p->load( (char*)"../../../../data/terrain/range1.e.ppm" );
+			mcu.height_field_p->set_scale( 5000.0f * SmartBody::SBScene::getScene()->getScale() / 100.0f, 300.0f * SmartBody::SBScene::getScene()->getScale() / 100.0f, 5000.0f  * SmartBody::SBScene::getScene()->getScale() / 100.0f);
+			mcu.height_field_p->set_auto_origin();
 		}
-
-		if( strcmp( terr_cmd, "scale" ) == 0 )	{
-			
-			float x = args.read_float();
-			float y = args.read_float();
-			float z = args.read_float();
-			mcu_p->height_field_p->set_scale( x, y, z );
-		}
-		else
-		if( strcmp( terr_cmd, "origin" ) == 0 )	{
-
-			int n = args.calc_num_tokens();
-			if( n == 1 )	{
-				char *sub_cmd = args.read_token();
-				if( strcmp( sub_cmd, "auto" ) == 0 )	{
-					mcu_p->height_field_p->set_auto_origin();
-				}
-				else	{
-					LOG( "mcu_terrain_func: ERR: token '%s' not recognized", sub_cmd );
-					return( CMD_NOT_FOUND );
-				}
-			}
-			else	{
-				
-				float x = args.read_float();
-				float y = args.read_float();
-				float z = args.read_float();
-				mcu_p->height_field_p->set_origin( x, y, z );
-			}
-		}
-		else
-		if( strcmp( terr_cmd, "delete" ) == 0 )	{
-			
-			delete mcu_p->height_field_p;
-			mcu_p->height_field_p = NULL;
-		}
-		else {
-			return( CMD_NOT_FOUND );
+		else	{
+			char *filename = args.read_token();
+			mcu.height_field_p->load( filename );
 		}
 		return( CMD_SUCCESS );
 	}
-	return( CMD_FAILURE );
+	else
+	if( mcu.height_field_p == NULL ) {
+		LOG( "mcu_terrain_func: ERR: no heightfield loaded" );
+		return( CMD_FAILURE );
+	}
+
+	if( strcmp( terr_cmd, "scale" ) == 0 )	{
+			
+		float x = args.read_float();
+		float y = args.read_float();
+		float z = args.read_float();
+		mcu.height_field_p->set_scale( x, y, z );
+	}
+	else
+	if( strcmp( terr_cmd, "origin" ) == 0 )	{
+
+		int n = args.calc_num_tokens();
+		if( n == 1 )	{
+			char *sub_cmd = args.read_token();
+			if( strcmp( sub_cmd, "auto" ) == 0 )	{
+				mcu.height_field_p->set_auto_origin();
+			}
+			else	{
+				LOG( "mcu_terrain_func: ERR: token '%s' not recognized", sub_cmd );
+				return( CMD_NOT_FOUND );
+			}
+		}
+		else	{
+				
+			float x = args.read_float();
+			float y = args.read_float();
+			float z = args.read_float();
+			mcu.height_field_p->set_origin( x, y, z );
+		}
+	}
+	else
+	if( strcmp( terr_cmd, "delete" ) == 0 )	{
+			
+		delete mcu.height_field_p;
+		mcu.height_field_p = NULL;
+	}
+	else {
+		return( CMD_NOT_FOUND );
+	}
+	return( CMD_SUCCESS );
+	
 }
 
 /////////////////////////////////////////////////////////////
@@ -1256,131 +1206,127 @@ void mcu_print_timer_help( int level = 0 )	{
 	}
 }
 
-int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+int mcu_time_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	
-	if( mcu_p )	{
-		char *time_cmd = args.read_token();
+	char *time_cmd = args.read_token();
 
-		if( strcmp( time_cmd, "help" ) == 0 )	{
-			mcu_print_timer_help();
-			return( CMD_SUCCESS );
-		}
-		else
-		if( strcmp( time_cmd, "fullhelp" ) == 0 )	{
-			mcu_print_timer_help( 1 );
-			return( CMD_SUCCESS );
-		}
-		else
-		if( strcmp( time_cmd, "api" ) == 0 )	{
-			mcu_print_timer_help( 2 );
-			return( CMD_SUCCESS );
-		}
-		else
-		if( strcmp( time_cmd, "test" ) == 0 )	{
+	if( strcmp( time_cmd, "help" ) == 0 )	{
+		mcu_print_timer_help();
+		return( CMD_SUCCESS );
+	}
+	else
+	if( strcmp( time_cmd, "fullhelp" ) == 0 )	{
+		mcu_print_timer_help( 1 );
+		return( CMD_SUCCESS );
+	}
+	else
+	if( strcmp( time_cmd, "api" ) == 0 )	{
+		mcu_print_timer_help( 2 );
+		return( CMD_SUCCESS );
+	}
+	else
+	if( strcmp( time_cmd, "test" ) == 0 )	{
 //			void test_time_regulator( void );
 //			test_time_regulator();
-			return( CMD_SUCCESS );
-		}
-		else
-		if( strcmp( time_cmd, "print" ) == 0 )
+		return( CMD_SUCCESS );
+	}
+	else
+	if( strcmp( time_cmd, "print" ) == 0 )
+	{
 		{
-			{
-				SmartBody::SBScene::getScene()->getSimulationManager()->printInfo();
-			}
-			{
-				LOG( "TIME:%.3f ~ DT:%.3f %.2f:FPS\n",
-					SmartBody::SBScene::getScene()->getSimulationManager()->getTime(),
-					SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt(),
-					1.0 / SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt()
-			);
-			}
-			return( CMD_SUCCESS );
+			SmartBody::SBScene::getScene()->getSimulationManager()->printInfo();
 		}
-
-//		if( mcu_p->timer_p == NULL )	{
-			LOG( "mcu_time_func NOTICE: %s: TimeRegulator was NOT REGISTERED\n", time_cmd );
-			SmartBody::SBScene::getScene()->getSimulationManager()->switch_internal_timer(); 
-//		}
-		
-		if( strcmp( time_cmd, "reset" ) == 0 ) {
-			SmartBody::SBScene::getScene()->getSimulationManager()->reset();
-		}
-		else 
-		if( ( strcmp( time_cmd, "maxfps" ) == 0 ) || ( strcmp( time_cmd, "fps" ) == 0 ) )	{ // deprecate
-			mcu_print_timer_deprecation_warning();
-			SmartBody::SBScene::getScene()->getSimulationManager()->setSleepFps( args.read_float() );
-		}
-		else
-		if( strcmp( time_cmd, "lockdt" ) == 0 )	{ // deprecate
-			mcu_print_timer_deprecation_warning();
-			int enable = true;
-			int n = args.calc_num_tokens();
-			if( n ) enable = args.read_int();
-			SmartBody::SBScene::getScene()->getSimulationManager()->setSleepLock();
-		}
-		else 
-		if( strcmp( time_cmd, "speed" ) == 0 ) {
-			SmartBody::SBScene::getScene()->getSimulationManager()->setSpeed( args.read_float() );
-		}
-		else 
-		if( strcmp( time_cmd, "sleepfps" ) == 0 ) {
-			SmartBody::SBScene::getScene()->getSimulationManager()->setSleepFps( args.read_float() );
-		}
-		else 
-		if( strcmp( time_cmd, "evalfps" ) == 0 ) {
-			SmartBody::SBScene::getScene()->getSimulationManager()->setEvalFps( args.read_float() );
-		}
-		else
-		if( strcmp( time_cmd, "simfps" ) == 0 ) {
-			SmartBody::SBScene::getScene()->getSimulationManager()->setSimFps( args.read_float() );
-		}
-		else 
-		if( strcmp( time_cmd, "sleepdt" ) == 0 ) {
-			SmartBody::SBScene::getScene()->getSimulationManager()->setSleepDt( args.read_float() );
-		}
-		else 
-		if( strcmp( time_cmd, "evaldt" ) == 0 ) {
-			SmartBody::SBScene::getScene()->getSimulationManager()->setEvalDt( args.read_float() );
-		}
-		else 
-		if( strcmp( time_cmd, "simdt" ) == 0 ) {
-			SmartBody::SBScene::getScene()->getSimulationManager()->setSimDt( args.read_float() );
-		}
-		else
-		if( strcmp( time_cmd, "pause" ) == 0 )	{
-			SmartBody::SBScene::getScene()->getSimulationManager()->pause();
-		}
-		else 
-		if( strcmp( time_cmd, "resume" ) == 0 )	{
-			SmartBody::SBScene::getScene()->getSimulationManager()->resume();
-		}
-		else 
-		if( strcmp( time_cmd, "step" ) == 0 )	{
-			int n = args.calc_num_tokens();
-			if( n ) {
-				SmartBody::SBScene::getScene()->getSimulationManager()->step( args.read_int() );
-			}
-			else	{
-				SmartBody::SBScene::getScene()->getSimulationManager()->step( 1 );
-			}
-		}
-		else 
-		if( strcmp( time_cmd, "perf" ) == 0 )	{
-			int n = args.calc_num_tokens();
-			if( n ) {
-				SmartBody::SBScene::getScene()->getSimulationManager()->set_perf( args.read_float() );
-			}
-			else	{
-				SmartBody::SBScene::getScene()->getSimulationManager()->set_perf( 10.0 );
-			}
-		}
-		else {
-			return( CMD_NOT_FOUND );
+		{
+			LOG( "TIME:%.3f ~ DT:%.3f %.2f:FPS\n",
+				SmartBody::SBScene::getScene()->getSimulationManager()->getTime(),
+				SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt(),
+				1.0 / SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt()
+		);
 		}
 		return( CMD_SUCCESS );
 	}
-	
-	return( CMD_FAILURE );
+
+//		if( mcu.timer_p == NULL )	{
+		LOG( "mcu_time_func NOTICE: %s: TimeRegulator was NOT REGISTERED\n", time_cmd );
+		SmartBody::SBScene::getScene()->getSimulationManager()->switch_internal_timer(); 
+//		}
+		
+	if( strcmp( time_cmd, "reset" ) == 0 ) {
+		SmartBody::SBScene::getScene()->getSimulationManager()->reset();
+	}
+	else 
+	if( ( strcmp( time_cmd, "maxfps" ) == 0 ) || ( strcmp( time_cmd, "fps" ) == 0 ) )	{ // deprecate
+		mcu_print_timer_deprecation_warning();
+		SmartBody::SBScene::getScene()->getSimulationManager()->setSleepFps( args.read_float() );
+	}
+	else
+	if( strcmp( time_cmd, "lockdt" ) == 0 )	{ // deprecate
+		mcu_print_timer_deprecation_warning();
+		int enable = true;
+		int n = args.calc_num_tokens();
+		if( n ) enable = args.read_int();
+		SmartBody::SBScene::getScene()->getSimulationManager()->setSleepLock();
+	}
+	else 
+	if( strcmp( time_cmd, "speed" ) == 0 ) {
+		SmartBody::SBScene::getScene()->getSimulationManager()->setSpeed( args.read_float() );
+	}
+	else 
+	if( strcmp( time_cmd, "sleepfps" ) == 0 ) {
+		SmartBody::SBScene::getScene()->getSimulationManager()->setSleepFps( args.read_float() );
+	}
+	else 
+	if( strcmp( time_cmd, "evalfps" ) == 0 ) {
+		SmartBody::SBScene::getScene()->getSimulationManager()->setEvalFps( args.read_float() );
+	}
+	else
+	if( strcmp( time_cmd, "simfps" ) == 0 ) {
+		SmartBody::SBScene::getScene()->getSimulationManager()->setSimFps( args.read_float() );
+	}
+	else 
+	if( strcmp( time_cmd, "sleepdt" ) == 0 ) {
+		SmartBody::SBScene::getScene()->getSimulationManager()->setSleepDt( args.read_float() );
+	}
+	else 
+	if( strcmp( time_cmd, "evaldt" ) == 0 ) {
+		SmartBody::SBScene::getScene()->getSimulationManager()->setEvalDt( args.read_float() );
+	}
+	else 
+	if( strcmp( time_cmd, "simdt" ) == 0 ) {
+		SmartBody::SBScene::getScene()->getSimulationManager()->setSimDt( args.read_float() );
+	}
+	else
+	if( strcmp( time_cmd, "pause" ) == 0 )	{
+		SmartBody::SBScene::getScene()->getSimulationManager()->pause();
+	}
+	else 
+	if( strcmp( time_cmd, "resume" ) == 0 )	{
+		SmartBody::SBScene::getScene()->getSimulationManager()->resume();
+	}
+	else 
+	if( strcmp( time_cmd, "step" ) == 0 )	{
+		int n = args.calc_num_tokens();
+		if( n ) {
+			SmartBody::SBScene::getScene()->getSimulationManager()->step( args.read_int() );
+		}
+		else	{
+			SmartBody::SBScene::getScene()->getSimulationManager()->step( 1 );
+		}
+	}
+	else 
+	if( strcmp( time_cmd, "perf" ) == 0 )	{
+		int n = args.calc_num_tokens();
+		if( n ) {
+			SmartBody::SBScene::getScene()->getSimulationManager()->set_perf( args.read_float() );
+		}
+		else	{
+			SmartBody::SBScene::getScene()->getSimulationManager()->set_perf( 10.0 );
+		}
+	}
+	else {
+		return( CMD_NOT_FOUND );
+	}
+	return( CMD_SUCCESS );
 }
 
 /////////////////////////////////////////////////////////////
@@ -1414,7 +1360,7 @@ void mcu_print_profiler_help( int level = 0 )	{
 	}
 }
 
-int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_time_ival_prof_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 /*	
 	if( mcu_p )	{
@@ -1435,11 +1381,11 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			return( CMD_SUCCESS );
 		}
 
-		if( mcu_p->profiler_p == NULL )	{
+		if( mcu.profiler_p == NULL )	{
 			LOG( "mcu_time_ival_prof_func NOTICE: %s: TimeIntervalProfiler was NOT REGISTERED\n", tip_cmd ); 
-			mcu_p->switch_internal_profiler();
+			mcu.switch_internal_profiler();
 		}
-		TimeIntervalProfiler *prof_p = mcu_p->profiler_p;
+		TimeIntervalProfiler *prof_p = mcu.profiler_p;
 
 		if( strcmp( tip_cmd, "legend" ) == 0 ) {
 			prof_p->print_legend();
@@ -1605,7 +1551,7 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 }
 
 
-int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p, const char* option)
+int mcu_load_mesh(const char* pawnName, const char* obj_file, SmartBody::SBCommandManager* cmdMgr, const char* option)
 {
 	// make sure the pawn exists
 	SbmPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnName);
@@ -1721,7 +1667,7 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, mcuCBHandle *mcu_p
 
 ///////////////////////////////////////////////////////////////////
 
-int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHandle *mcu_p, const char* option)
+int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBody::SBCommandManager* cmdMgr, const char* option)
 {
 	SmartBody::SBCharacter* char_p = SmartBody::SBScene::getScene()->getCharacter( char_name );
 	if( !char_p )	
@@ -1879,7 +1825,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 			srSnModelDynamic->ref();
 			srSnModelStatic->ref();
 		}
-		//mcu_p->root_group_p->add(srSnModelDynamic);
+		//mcu.root_group_p->add(srSnModelDynamic);
 	
 		delete meshModelVec[i];
 	}
@@ -2143,7 +2089,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 }
 
 
-int mcu_character_load_skinweights( const char* char_name, const char* skin_file, mcuCBHandle* mcu_p, float scaleFactor, const char* prefix )
+int mcu_character_load_skinweights( const char* char_name, const char* skin_file, SmartBody::SBCommandManager* cmdMgr, float scaleFactor, const char* prefix )
 {
 
 #if defined(__ANDROID__) || defined(SBM_IPHONE) || defined(__native_client__)
@@ -2198,7 +2144,7 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 				LOG("mcu_character_load_skinweights ERR: no binding info contained");
 				return CMD_FAILURE;
 			}
-			parseLibraryControllers(controllerNode, char_name, scaleFactor, jointNamePrefix, mcu_p);
+			parseLibraryControllers(controllerNode, char_name, scaleFactor, jointNamePrefix, &mcuCBHandle::singleton());
 		}	
 		else if (ext == ".xml" || ext == ".XML")
 		{
@@ -2258,8 +2204,9 @@ int mcu_character_init(
 	const char* char_name, 
 	const char* skel_file, 
 	const char* className, 
-	mcuCBHandle *mcu_p)
+	SmartBody::SBCommandManager* cmdMgr)
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	int err;
 	
 	if( strcmp(char_name, "*" )==0 ) {  // TODO: better character name valiadtion
@@ -2274,25 +2221,15 @@ int mcu_character_init(
 	}
 
 	//SbmCharacter *char_p = new SbmCharacter(char_name);
-	SmartBody::SBCharacter* char_p = new SmartBody::SBCharacter(char_name, className);
-	mcu_p->registerCharacter(char_p);
+	SmartBody::SBCharacter* char_p = SmartBody::SBScene::getScene()->createCharacter(char_name, className);
 	
 	SmartBody::SBSkeleton* skeleton_p = SmartBody::SBScene::getScene()->getAssetManager()->createSkeleton(skel_file);
 	SmartBody::SBFaceDefinition* faceDefinition = NULL;
 
 	// get the face motion mapping per character
 	faceDefinition = SmartBody::SBScene::getScene()->getFaceDefinition(char_name);
-	if (!faceDefinition)
-	{
-		// get the default face motion mapping
-		faceDefinition = SmartBody::SBScene::getScene()->getFaceDefinition("_default_");
-		if (!faceDefinition)
-		{
-			LOG("Couldn't find _default_ face motion mappings! Check code.");
-		}
-	}
 
-	err = char_p->init( skeleton_p, faceDefinition, &mcu_p->param_map, className );
+	err = char_p->init( skeleton_p, faceDefinition, &mcu.param_map, className );
 
 
 
@@ -2301,12 +2238,12 @@ int mcu_character_init(
 		// first register world_offset position/rotation
 		string wsp_world_offset = vhcl::Format( "%s:world_offset", char_name );
 
-		err = mcu_p->theWSP->register_vector_3d_source( wsp_world_offset, "position", SbmPawn::wsp_world_position_accessor, char_p );
+		err = mcu.theWSP->register_vector_3d_source( wsp_world_offset, "position", SbmPawn::wsp_world_position_accessor, char_p );
 		if( err != CMD_SUCCESS )	{
 			LOG( "WARNING: mcu_character_init \"%s\": Failed to register character position.\n", char_name ); 
 		}
 
-		err = mcu_p->theWSP->register_vector_4d_source( wsp_world_offset, "rotation", SbmPawn::wsp_world_rotation_accessor, char_p );
+		err = mcu.theWSP->register_vector_4d_source( wsp_world_offset, "rotation", SbmPawn::wsp_world_rotation_accessor, char_p );
 		if( err != CMD_SUCCESS )	{
 			LOG( "WARNING: mcu_character_init \"%s\": Failed to register character rotation.\n", char_name ); 
 		}
@@ -2324,13 +2261,13 @@ int mcu_character_init(
 #if USE_WSP
 			string wsp_joint_name = vhcl::Format( "%s:%s", char_name, j->name().c_str() );
 
-			err = mcu_p->theWSP->register_vector_3d_source( wsp_joint_name, "position", SbmPawn::wsp_position_accessor, char_p );
+			err = mcu.theWSP->register_vector_3d_source( wsp_joint_name, "position", SbmPawn::wsp_position_accessor, char_p );
 			if ( err != CMD_SUCCESS )
 			{
 				LOG( "WARNING: mcu_character_init \"%s\": Failed to register joint \"%s\" position.\n", char_name, wsp_joint_name.c_str() ); 
 			}
 
-			err = mcu_p->theWSP->register_vector_4d_source( wsp_joint_name, "rotation", SbmPawn::wsp_rotation_accessor, char_p );
+			err = mcu.theWSP->register_vector_4d_source( wsp_joint_name, "rotation", SbmPawn::wsp_rotation_accessor, char_p );
 			if ( err != CMD_SUCCESS )
 			{
 				LOG( "WARNING: mcu_character_init \"%s\": Failed to register joint \"%s\" rotation.\n", char_name, wsp_joint_name.c_str() ); 
@@ -2354,7 +2291,7 @@ const char* PRINT_FACE_VISEME_SYNTAX1_HELP = "print face viseme <viseme name>";
 const char* PRINT_FACE_VISEME_SYNTAX2_HELP = "print face viseme *";
 
 
-int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+int mcu_set_face_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 
 	string type = args.read_token();
 	if( type.length() == 0 || type=="help" ) {
@@ -2384,9 +2321,9 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 
 	if( type=="au" ) {
-		return mcu_set_face_au_func( args, mcu_p, characterName );
+		return mcu_set_face_au_func( args, cmdMgr, characterName );
 	} else if( type=="viseme" ) {
-		return mcu_set_face_viseme_func( args, mcu_p, characterName );
+		return mcu_set_face_viseme_func( args, cmdMgr, characterName );
 	} else if( type=="neutral" ) {
 		const string motion_name = args.read_token();
 
@@ -2420,7 +2357,7 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 }
 
-int mcu_print_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+int mcu_print_face_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 	string type = args.read_token();
 	if( type.length() == 0 || type=="help" ) {
 		// No arguments => help message
@@ -2451,9 +2388,9 @@ int mcu_print_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 
 	if( type=="au" ) {
-		return mcu_print_face_au_func( args, mcu_p, characterName );
+		return mcu_print_face_au_func( args, cmdMgr, characterName );
 	} else if( type=="viseme" ) {
-		return mcu_print_face_viseme_func( args, mcu_p, characterName );
+		return mcu_print_face_viseme_func( args, cmdMgr, characterName );
 	} else if( type=="neutral" ) {
 		LOG("UNIMPLEMENTED");
 		return CMD_FAILURE;
@@ -2469,7 +2406,7 @@ int mcu_print_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
  *  Syntax:
  *		set face au <unit-number> [left|right] <motion-name>
  */
-int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string characterName ) {
+int mcu_set_face_au_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr, std::string characterName ) {
 	string unit_str = args.read_token();
 	if( unit_str.length()==0 ) {
 		// No arguments => help message
@@ -2551,7 +2488,7 @@ inline void print_au( const int unit, const ActionUnit* au ) {
  *     print face au <unit-number>
  *     print face au *
  */
-int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string characterName ) {
+int mcu_print_face_au_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr, std::string characterName ) {
 	const int ALL_ACTION_UNITS = 0;  // Marker
 
 	string unit_str = args.read_token();
@@ -2619,7 +2556,7 @@ int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string c
  *  Syntax: set face viseme <viseme symbol> <motion-name>
  */
 
-int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string characterName ) {
+int mcu_set_face_viseme_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr, std::string characterName ) {
 	string viseme = args.read_token();
 	if( viseme.length() == 0 ) {
 		// No arguments => help message
@@ -2661,7 +2598,7 @@ void print_viseme( const string& viseme, const SkMotion* motion ) {
  *     print face viseme *
  */
 
-int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p,std::string characterName ) {
+int mcu_print_face_viseme_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr,std::string characterName ) {
 	string viseme = args.read_token();
 	if( viseme.length() == 0 ) {
 		// No arguments => help message
@@ -2764,199 +2701,198 @@ int query_controller(
 
 */
 
-int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+int mcu_controller_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	
-	if( mcu_p )	{
-		char *ctrl_name = args.read_token();
-		char *ctrl_cmd = args.read_token();
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	char *ctrl_name = args.read_token();
+	char *ctrl_cmd = args.read_token();
 	
-		if( strcmp(ctrl_cmd, "passthrough" ) == 0 || strcmp(ctrl_cmd, "enable" ) == 0)
+	if( strcmp(ctrl_cmd, "passthrough" ) == 0 || strcmp(ctrl_cmd, "enable" ) == 0)
+	{
+		bool reverseMeaning = false;
+		if (strcmp(ctrl_cmd, "passthrough" ) == 0)
+			reverseMeaning = true;
+
+		bool allControllers = false;
+		if (strcmp(ctrl_name, "*") == 0)
+			allControllers = true;
+
+		char* value = args.read_token();
+		bool passThroughValue = true;
+		bool toggleValue = false;
+		bool checkStatus = false;
+		if (strlen(value) > 0)
 		{
-			bool reverseMeaning = false;
-			if (strcmp(ctrl_cmd, "passthrough" ) == 0)
-				reverseMeaning = true;
-
-			bool allControllers = false;
-			if (strcmp(ctrl_name, "*") == 0)
-				allControllers = true;
-
-			char* value = args.read_token();
-			bool passThroughValue = true;
-			bool toggleValue = false;
-			bool checkStatus = false;
-			if (strlen(value) > 0)
+			if (strcmp("true", value) == 0)
 			{
-				if (strcmp("true", value) == 0)
-				{
-					passThroughValue = true;
-				}
-				else if (strcmp("false", value) == 0)
-				{
-					passThroughValue = false;
-				}
-				else if (strcmp("status", value) == 0)
-				{
-					checkStatus = true;
-				}
-				else
-				{
-					LOG("Use syntax: ctrl %s enable <true|false|status>, or ctrl %s enable ", ctrl_name, ctrl_name);
-					return CMD_FAILURE;
-				}
+				passThroughValue = true;
+			}
+			else if (strcmp("false", value) == 0)
+			{
+				passThroughValue = false;
+			}
+			else if (strcmp("status", value) == 0)
+			{
+				checkStatus = true;
 			}
 			else
 			{
-				toggleValue = true;
-			}
-
-			if (reverseMeaning)
-				passThroughValue = !passThroughValue;
-
-		
-			int numControllersAffected = 0;
-			for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
-				iter != mcu_p->getCharacterMap().end();
-				iter++)
-			{
-				SbmCharacter* character = (*iter).second;
-				MeControllerTreeRoot* controllerTree = character->ct_tree_p;
-				int numControllers = controllerTree->count_controllers();
-			
-				for (int c = 0; c < numControllers; c++)
-				{
-					if (checkStatus)
-					{
-						std::string passThroughStr = (controllerTree->controller(c)->isEnabled())? " true " : " false";							
-						LOG("[%s] %s = %s", character->getName().c_str(), controllerTree->controller(c)->getName().c_str(), passThroughStr.c_str());
-						numControllersAffected = numControllers;	// just so it won't generate error
-					}
-					else if (allControllers)
-					{
-						if (toggleValue)
-							controllerTree->controller(c)->setEnable(!controllerTree->controller(c)->isEnabled());
-						else
-							controllerTree->controller(c)->setEnable(passThroughValue);
-						numControllersAffected++;
-					}
-					else if (controllerTree->controller(c)->getName() == ctrl_name)
-					{
-						if (toggleValue)
-							controllerTree->controller(c)->setEnable(!controllerTree->controller(c)->isEnabled());
-						else
-							controllerTree->controller(c)->setEnable(passThroughValue);
-						numControllersAffected++;
-					}
-				}
-			}
-			if (numControllersAffected > 0)
-				return CMD_SUCCESS;
-			else
+				LOG("Use syntax: ctrl %s enable <true|false|status>, or ctrl %s enable ", ctrl_name, ctrl_name);
 				return CMD_FAILURE;
+			}
 		}
 		else
 		{
-			// Non-initializing controllers need an actual instance
-			MeController* ctrl_p = NULL;// removed lookup_ctrl function 1/26/13 mcu_p->lookup_ctrl( string( ctrl_name ), "ERROR: ctrl <controller name>: " );
-			if( ctrl_p==NULL ) {
-				// should have printed error from above function
-				return CMD_FAILURE;
-			}
-			//example:	ctrl ~doctor/motion_sched record skm(or bvh) start [max 500]
-			//			ctrl ~doctor/motion_sched record skm(or bvh) write file_prefix
-			//			ctrl ~doctor/motion_sched record skm(or bvh) stop
+			toggleValue = true;
+		}
 
-			/*
-			if( strcmp( ctrl_cmd, "record" ) == 0 )
+		if (reverseMeaning)
+			passThroughValue = !passThroughValue;
+
+		
+		int numControllersAffected = 0;
+		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+			iter != mcu.getCharacterMap().end();
+			iter++)
+		{
+			SbmCharacter* character = (*iter).second;
+			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
+			int numControllers = controllerTree->count_controllers();
+			
+			for (int c = 0; c < numControllers; c++)
 			{
-				char *record_type = args.read_token();
-				char *operation = args.read_token();
-				int max_num_of_frames = 0;
-				if( strcmp( operation, "start" ) == 0 )
+				if (checkStatus)
 				{
-					char *optional = args.read_token();
-					if( strcmp( optional, "max" ) == 0 )
-						max_num_of_frames = args.read_int();
-					if(max_num_of_frames<0)	max_num_of_frames = 0;
+					std::string passThroughStr = (controllerTree->controller(c)->isEnabled())? " true " : " false";							
+					LOG("[%s] %s = %s", character->getName().c_str(), controllerTree->controller(c)->getName().c_str(), passThroughStr.c_str());
+					numControllersAffected = numControllers;	// just so it won't generate error
+				}
+				else if (allControllers)
+				{
+					if (toggleValue)
+						controllerTree->controller(c)->setEnable(!controllerTree->controller(c)->isEnabled());
+					else
+						controllerTree->controller(c)->setEnable(passThroughValue);
+					numControllersAffected++;
+				}
+				else if (controllerTree->controller(c)->getName() == ctrl_name)
+				{
+					if (toggleValue)
+						controllerTree->controller(c)->setEnable(!controllerTree->controller(c)->isEnabled());
+					else
+						controllerTree->controller(c)->setEnable(passThroughValue);
+					numControllersAffected++;
+				}
+			}
+		}
+		if (numControllersAffected > 0)
+			return CMD_SUCCESS;
+		else
+			return CMD_FAILURE;
+	}
+	else
+	{
+		// Non-initializing controllers need an actual instance
+		MeController* ctrl_p = NULL;// removed lookup_ctrl function 1/26/13 mcu.lookup_ctrl( string( ctrl_name ), "ERROR: ctrl <controller name>: " );
+		if( ctrl_p==NULL ) {
+			// should have printed error from above function
+			return CMD_FAILURE;
+		}
+		//example:	ctrl ~doctor/motion_sched record skm(or bvh) start [max 500]
+		//			ctrl ~doctor/motion_sched record skm(or bvh) write file_prefix
+		//			ctrl ~doctor/motion_sched record skm(or bvh) stop
+
+		/*
+		if( strcmp( ctrl_cmd, "record" ) == 0 )
+		{
+			char *record_type = args.read_token();
+			char *operation = args.read_token();
+			int max_num_of_frames = 0;
+			if( strcmp( operation, "start" ) == 0 )
+			{
+				char *optional = args.read_token();
+				if( strcmp( optional, "max" ) == 0 )
+					max_num_of_frames = args.read_int();
+				if(max_num_of_frames<0)	max_num_of_frames = 0;
 					
-					if( strcmp( record_type, "skm" ) == 0 )	{
-						ctrl_p->record_motion( max_num_of_frames );
-						return( CMD_SUCCESS );
-					}
-					if( strcmp( record_type, "bvh" ) == 0 )	{
-						if( mcu_p->timer_p )	{
-							double sim_dt = mcu_p->timer_p->get_sim_dt();
-							if( sim_dt > 0.0 )	{
-								ctrl_p->record_bvh( max_num_of_frames, sim_dt );
-								return( CMD_SUCCESS );
-							}
-							else	{
-								LOG( "mcu_controller_func ERR: BVH recording requires 'time simfps|simdt' set\n" );
-								return( CMD_FAILURE );
-							}
+				if( strcmp( record_type, "skm" ) == 0 )	{
+					ctrl_p->record_motion( max_num_of_frames );
+					return( CMD_SUCCESS );
+				}
+				if( strcmp( record_type, "bvh" ) == 0 )	{
+					if( mcu.timer_p )	{
+						double sim_dt = mcu.timer_p->get_sim_dt();
+						if( sim_dt > 0.0 )	{
+							ctrl_p->record_bvh( max_num_of_frames, sim_dt );
+							return( CMD_SUCCESS );
 						}
 						else	{
-							LOG( "mcu_controller_func ERR: BVH recording requires registered TimeRegulator\n" );
+							LOG( "mcu_controller_func ERR: BVH recording requires 'time simfps|simdt' set\n" );
 							return( CMD_FAILURE );
 						}
 					}
-				}
-				if( strcmp( operation, "write" ) == 0 )	{
-					char *full_prefix = args.read_token();
-					ctrl_p->record_write(full_prefix);
-					return( CMD_SUCCESS );
-				}
-				if( strcmp( operation, "stop" ) == 0 )	{
-					ctrl_p->record_stop();
-					return( CMD_SUCCESS );
-				}
-				if( strcmp( operation, "clear" ) == 0 )	{
-					ctrl_p->record_clear();
-					return( CMD_SUCCESS );
-				}
-			}
-			*/
-			else
-			if( strcmp( ctrl_cmd, "debugger" ) == 0 )	{
-				char *operation = args.read_token();
-				if( strcmp( operation, "on" ) == 0 ) {
-					ctrl_p->record_buffer_changes(true);
-					return( CMD_SUCCESS );
-				} else if (strcmp( operation, "off" ) == 0 ) {
-					ctrl_p->record_buffer_changes(false);
-					return( CMD_SUCCESS );
-				}
-			}
-			else
-			if( strcmp( ctrl_cmd, "timing" ) == 0 )	{
-				int n = args.calc_num_tokens();
-				if( n )	{
-					float indt = args.read_float();
-					float outdt = args.read_float();
-					float empht = -1.0;
-					if( n > 2 )	{
-						empht = args.read_float();
+					else	{
+						LOG( "mcu_controller_func ERR: BVH recording requires registered TimeRegulator\n" );
+						return( CMD_FAILURE );
 					}
-					return(
-						set_controller_timing( ctrl_p, indt, outdt, empht )
-					);
 				}
-				return( CMD_FAILURE );
 			}
-			else
-			if( strcmp( ctrl_cmd, "query" ) == 0 )	{
-				return(
-					query_controller( ctrl_p )
-				);
-			}
-			else
-			if( strcmp( ctrl_cmd, "handle" ) == 0 )	{
-				char *handle = args.read_token();
-				ctrl_p->handle( handle );
+			if( strcmp( operation, "write" ) == 0 )	{
+				char *full_prefix = args.read_token();
+				ctrl_p->record_write(full_prefix);
 				return( CMD_SUCCESS );
 			}
-			else
-			return( CMD_NOT_FOUND );
+			if( strcmp( operation, "stop" ) == 0 )	{
+				ctrl_p->record_stop();
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( operation, "clear" ) == 0 )	{
+				ctrl_p->record_clear();
+				return( CMD_SUCCESS );
+			}
 		}
+		*/
+		else
+		if( strcmp( ctrl_cmd, "debugger" ) == 0 )	{
+			char *operation = args.read_token();
+			if( strcmp( operation, "on" ) == 0 ) {
+				ctrl_p->record_buffer_changes(true);
+				return( CMD_SUCCESS );
+			} else if (strcmp( operation, "off" ) == 0 ) {
+				ctrl_p->record_buffer_changes(false);
+				return( CMD_SUCCESS );
+			}
+		}
+		else
+		if( strcmp( ctrl_cmd, "timing" ) == 0 )	{
+			int n = args.calc_num_tokens();
+			if( n )	{
+				float indt = args.read_float();
+				float outdt = args.read_float();
+				float empht = -1.0;
+				if( n > 2 )	{
+					empht = args.read_float();
+				}
+				return(
+					set_controller_timing( ctrl_p, indt, outdt, empht )
+				);
+			}
+			return( CMD_FAILURE );
+		}
+		else
+		if( strcmp( ctrl_cmd, "query" ) == 0 )	{
+			return(
+				query_controller( ctrl_p )
+			);
+		}
+		else
+		if( strcmp( ctrl_cmd, "handle" ) == 0 )	{
+			char *handle = args.read_token();
+			ctrl_p->handle( handle );
+			return( CMD_SUCCESS );
+		}
+		else
+		return( CMD_NOT_FOUND );
 	}
 	return( CMD_FAILURE );
 }
@@ -2964,52 +2900,48 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 /////////////////////////////////////////////////////////////
 
 
-int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_gaze_limit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	if( mcu_p )
+	int n = args.calc_num_tokens();
+	int keyIndex = -1;
+	if (n > 0)
 	{
-		int n = args.calc_num_tokens();
-		int keyIndex = -1;
-		if (n > 0)
+		char *key_label = args.read_token();
+		keyIndex = MeCtGaze::key_index( key_label );
+		if (keyIndex == -1)
 		{
-			char *key_label = args.read_token();
-			keyIndex = MeCtGaze::key_index( key_label );
-			if (keyIndex == -1)
-			{
-					LOG("%s is not a valid key.", key_label);
-					return CMD_FAILURE;
-			}
+				LOG("%s is not a valid key.", key_label);
+				return CMD_FAILURE;
 		}
-		
-		if( n > 3 )
-		{
-			float p_up = args.read_float();
-			float p_dn = args.read_float();
-			float h = args.read_float();
-			float r = args.read_float();
-			
-			MeCtGaze::set_all_limits(keyIndex, p_up, p_dn, h, r );
-		}
-		else if (n == 1 || n == 0)
-		{
-			LOG("To set limits, use: gazelimit <lumbar|thorax|cervical|cranial|optical|back|chest|neck|head|eyes> pitchup pitchdown heading roll");
-			int start = 0; 
-			int finish = MeCtGaze::GAZE_KEY_EYES;
-			if (n == 1)
-				start = finish = keyIndex;
-			for (int x = start; x <= finish; x++)
-			{
-				char* label = MeCtGaze::key_label(x);
-				// show the limits for that particular key
-				LOG("%s Pitch up  : %f ", label, MeCtGaze::DEFAULT_LIMIT_PITCH_UP[x]);
-				LOG("%s Pitch down: %f", label, MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[x]);
-				LOG("%s Heading   : %f", label, MeCtGaze::DEFAULT_LIMIT_HEADING[x]);
-				LOG("%s Roll      : %f", label, MeCtGaze::DEFAULT_LIMIT_ROLL[x]);
-			}
-		}
-		return( CMD_SUCCESS );
 	}
-	return( CMD_FAILURE );
+		
+	if( n > 3 )
+	{
+		float p_up = args.read_float();
+		float p_dn = args.read_float();
+		float h = args.read_float();
+		float r = args.read_float();
+			
+		MeCtGaze::set_all_limits(keyIndex, p_up, p_dn, h, r );
+	}
+	else if (n == 1 || n == 0)
+	{
+		LOG("To set limits, use: gazelimit <lumbar|thorax|cervical|cranial|optical|back|chest|neck|head|eyes> pitchup pitchdown heading roll");
+		int start = 0; 
+		int finish = MeCtGaze::GAZE_KEY_EYES;
+		if (n == 1)
+			start = finish = keyIndex;
+		for (int x = start; x <= finish; x++)
+		{
+			char* label = MeCtGaze::key_label(x);
+			// show the limits for that particular key
+			LOG("%s Pitch up  : %f ", label, MeCtGaze::DEFAULT_LIMIT_PITCH_UP[x]);
+			LOG("%s Pitch down: %f", label, MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[x]);
+			LOG("%s Heading   : %f", label, MeCtGaze::DEFAULT_LIMIT_HEADING[x]);
+			LOG("%s Roll      : %f", label, MeCtGaze::DEFAULT_LIMIT_ROLL[x]);
+		}
+	}
+	return( CMD_SUCCESS );
 }
 
 
@@ -3025,7 +2957,7 @@ int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 */
 
 
-int mcu_net_reset( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+int mcu_net_reset( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 	bool ret = CMD_SUCCESS;
 	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CloseConnection();
 	SmartBody::SBScene::getScene()->getBoneBusManager()->setEnable(true);
@@ -3034,11 +2966,11 @@ int mcu_net_reset( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	return (CMD_SUCCESS);
 }
 
-int mcu_net_check( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+int mcu_net_check( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 
 	if (!SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().IsOpen())
 	{
-		return mcu_net_reset(args, mcu_p);
+		return mcu_net_reset(args, cmdMgr);
 	}
 	else
 		return CMD_SUCCESS;
@@ -3050,35 +2982,32 @@ int mcu_net_check( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 */
 
-int mcu_net_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+int mcu_net_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 
-   if( mcu_p )
-   {
-      char * command = args.read_token();
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+    char * command = args.read_token();
 
-      if ( _stricmp( command, "boneupdates" ) == 0 )
-      {
-         // turns on/off sending character bone information across the network
-         // global setting that affects all characters and bones
+    if ( _stricmp( command, "boneupdates" ) == 0 )
+    {
+        // turns on/off sending character bone information across the network
+        // global setting that affects all characters and bones
 
-         int enable = args.read_int();
-         mcu_p->net_bone_updates = enable ? true : false;
-         return CMD_SUCCESS;
-      }
-      else if ( _stricmp( command, "worldoffsetupdates" ) == 0 )
-      {
-         // turns on/off sending character world offset information across the network
-         // global setting that affects all characters
+        int enable = args.read_int();
+        mcu.net_bone_updates = enable ? true : false;
+        return CMD_SUCCESS;
+    }
+    else if ( _stricmp( command, "worldoffsetupdates" ) == 0 )
+    {
+        // turns on/off sending character world offset information across the network
+        // global setting that affects all characters
 
-         int enable = args.read_int();
-         mcu_p->net_world_offset_updates = enable ? true : false;
-         return CMD_SUCCESS;
-      }
+        int enable = args.read_int();
+        mcu.net_world_offset_updates = enable ? true : false;
+        return CMD_SUCCESS;
+    }
 
-      return CMD_NOT_FOUND;
-   }
-
-   return CMD_FAILURE;
+    return CMD_NOT_FOUND;
+  
 }
 
 
@@ -3089,92 +3018,87 @@ int mcu_net_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
                                           // character_id can be used to position the sound where a character is in the world
 */
 
-int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-   if ( mcu_p )
-   {
-      char * remainder = args.read_remainder_raw();
-      string sArgs = remainder;
-      vector< string > splitArgs;
-      vhcl::Tokenize( sArgs, splitArgs );
+    char * remainder = args.read_remainder_raw();
+    string sArgs = remainder;
+    vector< string > splitArgs;
+    vhcl::Tokenize( sArgs, splitArgs );
 
-      if ( splitArgs.size() >= 2 )
-      {
-         string soundFile = splitArgs[ 0 ];
-         string characterName = splitArgs[ 1 ];
+    if ( splitArgs.size() >= 2 )
+    {
+        string soundFile = splitArgs[ 0 ];
+        string characterName = splitArgs[ 1 ];
 
-         // check for double-quotes around sound file
-         if ( soundFile.length() > 1 )
-         {
-            if ( soundFile[ 0 ] == '\"' )
+        // check for double-quotes around sound file
+        if ( soundFile.length() > 1 )
+        {
+        if ( soundFile[ 0 ] == '\"' )
+        {
+            size_t first = sArgs.find_first_of( "\"" );
+            if ( first == string::npos )
             {
-               size_t first = sArgs.find_first_of( "\"" );
-               if ( first == string::npos )
-               {
-                  LOG( "Error parsing PlaySound message ''", sArgs.c_str() );
-                  return CMD_FAILURE;
-               }
-
-               size_t second = sArgs.find_first_of( "\"", first + 1 );
-               if ( second == string::npos )
-               {
-                  LOG( "Error parsing PlaySound message ''", sArgs.c_str() );
-                  return CMD_FAILURE;
-               }
-
-               soundFile = sArgs.substr( first + 1, second - first - 1 );
-               characterName = sArgs.substr( second + 2 );
+                LOG( "Error parsing PlaySound message ''", sArgs.c_str() );
+                return CMD_FAILURE;
             }
-         }
 
-         bool absolutePath = false;
-
-         if ( soundFile.length() > 1 )
-         {
-            if ( soundFile[ 0 ] == '\\' ||
-                 soundFile[ 0 ] == '/' ||
-                 soundFile[ 1 ] == ':' )
+            size_t second = sArgs.find_first_of( "\"", first + 1 );
+            if ( second == string::npos )
             {
-               absolutePath = true;
+                LOG( "Error parsing PlaySound message ''", sArgs.c_str() );
+                return CMD_FAILURE;
             }
-         }
 
-         if ( !absolutePath )
-         {
-			 std::string soundCacheDir = "../../../../..";
-			 std::string soundDir = SmartBody::SBScene::getScene()->getStringAttribute("speechRelaySoundCacheDir");
-			 if (soundDir != "")
-				 soundCacheDir = soundDir;
+            soundFile = sArgs.substr( first + 1, second - first - 1 );
+            characterName = sArgs.substr( second + 2 );
+        }
+        }
 
-			boost::filesystem::path p( soundCacheDir );
-			boost::filesystem::path abs_p = boost::filesystem::complete( p );
+        bool absolutePath = false;
+
+        if ( soundFile.length() > 1 )
+        {
+        if ( soundFile[ 0 ] == '\\' ||
+                soundFile[ 0 ] == '/' ||
+                soundFile[ 1 ] == ':' )
+        {
+            absolutePath = true;
+        }
+        }
+
+        if ( !absolutePath )
+        {
+			std::string soundCacheDir = "../../../../..";
+			std::string soundDir = SmartBody::SBScene::getScene()->getStringAttribute("speechRelaySoundCacheDir");
+			if (soundDir != "")
+				soundCacheDir = soundDir;
+
+		boost::filesystem::path p( soundCacheDir );
+		boost::filesystem::path abs_p = boost::filesystem::complete( p );
 
 //            char full[ _MAX_PATH ];
 //            if ( _fullpath( full, "..\\..\\..\\..\\..", _MAX_PATH ) != NULL )
-            if ( boost::filesystem2::exists( abs_p ) )
-            {
-                //soundFile = string( full ) + string( "/" ) + soundFile;
-			    p  /= soundFile;
-               soundFile = abs_p.string() + string("/") + soundFile;
-            }
-         }
+        if ( boost::filesystem2::exists( abs_p ) )
+        {
+            //soundFile = string( full ) + string( "/" ) + soundFile;
+			p  /= soundFile;
+            soundFile = abs_p.string() + string("/") + soundFile;
+        }
+        }
 
-         if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
-         {
-            AUDIO_Play( soundFile.c_str() );			
-         }
-         else
-         {
-            SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendPlaySound( soundFile.c_str(), characterName.c_str() );
-         }
+        if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
+        {
+        AUDIO_Play( soundFile.c_str() );			
+        }
+        else
+        {
+        SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendPlaySound( soundFile.c_str(), characterName.c_str() );
+        }
 
-         return CMD_SUCCESS;
-      }
+        return CMD_SUCCESS;
+    }
 
-      return CMD_NOT_FOUND;
-   }
-
-   return CMD_FAILURE;
+    return CMD_NOT_FOUND;
 }
 
 
@@ -3185,93 +3109,88 @@ int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 */
 
-int mcu_stop_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_stop_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-   if ( mcu_p )
-   {
-      char * remainder = args.read_remainder_raw();
-      string sArgs = remainder;
-      vector< string > splitArgs;
-      vhcl::Tokenize( sArgs, splitArgs );
+    char * remainder = args.read_remainder_raw();
+    string sArgs = remainder;
+    vector< string > splitArgs;
+    vhcl::Tokenize( sArgs, splitArgs );
 
-      if ( splitArgs.size() >= 2 )
-      {
-         string soundFile = splitArgs[ 0 ];
-         string characterName = splitArgs[ 1 ];
+    if ( splitArgs.size() >= 2 )
+    {
+        string soundFile = splitArgs[ 0 ];
+        string characterName = splitArgs[ 1 ];
 
-         // check for double-quotes around sound file
-         if ( soundFile.length() > 1 )
-         {
-            if ( soundFile[ 0 ] == '\"' )
+        // check for double-quotes around sound file
+        if ( soundFile.length() > 1 )
+        {
+        if ( soundFile[ 0 ] == '\"' )
+        {
+            size_t first = sArgs.find_first_of( "\"" );
+            if ( first == string::npos )
             {
-               size_t first = sArgs.find_first_of( "\"" );
-               if ( first == string::npos )
-               {
-                  LOG( "Error parsing StopSound message ''", sArgs.c_str() );
-                  return CMD_FAILURE;
-               }
-
-               size_t second = sArgs.find_first_of( "\"", first + 1 );
-               if ( second == string::npos )
-               {
-                  LOG( "Error parsing StopSound message ''", sArgs.c_str() );
-                  return CMD_FAILURE;
-               }
-
-               soundFile = sArgs.substr( first + 1, second - first - 1 );
-               characterName = sArgs.substr( second + 2 );
+                LOG( "Error parsing StopSound message ''", sArgs.c_str() );
+                return CMD_FAILURE;
             }
-         }
 
-         bool absolutePath = false;
-
-         if ( soundFile.length() > 1 )
-         {
-            if ( soundFile[ 0 ] == '\\' ||
-                 soundFile[ 0 ] == '/' ||
-                 soundFile[ 1 ] == ':' )
+            size_t second = sArgs.find_first_of( "\"", first + 1 );
+            if ( second == string::npos )
             {
-               absolutePath = true;
+                LOG( "Error parsing StopSound message ''", sArgs.c_str() );
+                return CMD_FAILURE;
             }
-         }
 
-         if ( !absolutePath )
-         {
-			boost::filesystem::path p( "../../../../.." );
-			boost::filesystem::path abs_p = boost::filesystem::complete( p );
-            if ( boost::filesystem2::exists( abs_p ) )
-            {
-				p  /= soundFile;
-               soundFile = abs_p.string();
-            }
-         }
+            soundFile = sArgs.substr( first + 1, second - first - 1 );
+            characterName = sArgs.substr( second + 2 );
+        }
+        }
+
+        bool absolutePath = false;
+
+        if ( soundFile.length() > 1 )
+        {
+        if ( soundFile[ 0 ] == '\\' ||
+                soundFile[ 0 ] == '/' ||
+                soundFile[ 1 ] == ':' )
+        {
+            absolutePath = true;
+        }
+        }
+
+        if ( !absolutePath )
+        {
+		boost::filesystem::path p( "../../../../.." );
+		boost::filesystem::path abs_p = boost::filesystem::complete( p );
+        if ( boost::filesystem2::exists( abs_p ) )
+        {
+			p  /= soundFile;
+            soundFile = abs_p.string();
+        }
+        }
 
 #if 0
-         if ( !absolutePath )
-         {
-            char full[ _MAX_PATH ];
-            if ( _fullpath( full, "..\\..\\..\\..\\..", _MAX_PATH ) != NULL )
-            {
-               soundFile = string( full ) + string( "\\" ) + soundFile;
-            }
-         }
+        if ( !absolutePath )
+        {
+        char full[ _MAX_PATH ];
+        if ( _fullpath( full, "..\\..\\..\\..\\..", _MAX_PATH ) != NULL )
+        {
+            soundFile = string( full ) + string( "\\" ) + soundFile;
+        }
+        }
 #endif
-		 if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
-         {
-			AUDIO_Stop(soundFile.c_str());
-		 }
-		 else
-		 {
-	         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() );
-		 }
+		if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
+        {
+		AUDIO_Stop(soundFile.c_str());
+		}
+		else
+		{
+	        SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() );
+		}
 
-         return CMD_SUCCESS;
-      }
+        return CMD_SUCCESS;
+    }
 
-      return CMD_NOT_FOUND;
-   }
-
-   return CMD_FAILURE;
+    return CMD_NOT_FOUND;
 }
 
 
@@ -3281,32 +3200,28 @@ int mcu_stop_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
                                   - and wish to keep using it, but don't want to have to run dimr (because of license issues).
 */
 
-int mcu_uscriptexec_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_uscriptexec_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-   if ( mcu_p )
-   {
-      int num = args.calc_num_tokens();
+    int num = args.calc_num_tokens();
 
-      if ( num > 0 )
-      {
-         string command;
+    if ( num > 0 )
+    {
+        string command;
 
-         command += args.read_token();
+        command += args.read_token();
 
-         int i = 0;
-         while ( ++i < num )
-         {
-            command += " ";
-            command += args.read_token();
-         }
+        int i = 0;
+        while ( ++i < num )
+        {
+        command += " ";
+        command += args.read_token();
+        }
 
-         //SendWinsockExecScript( command.c_str() );
-         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().ExecScript( command.c_str() );
+        //SendWinsockExecScript( command.c_str() );
+        SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().ExecScript( command.c_str() );
 
-         return CMD_SUCCESS;
-      }
-   }
-
+        return CMD_SUCCESS;
+    }
    return CMD_FAILURE;
 }
 
@@ -3323,39 +3238,34 @@ int mcu_uscriptexec_func( srArgBuffer& args, mcuCBHandle *mcu_p )
       x,y,z = Orientation in degrees.  (default coord system would match x,y,z to r,h,p
 */
 
-int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_commapi_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-   if ( mcu_p )
-   {
-      char * command = args.read_token();
+    char * command = args.read_token();
 
-      if ( _stricmp( command, "setcameraposition" ) == 0 )
-      {
-         float x = args.read_float();
-         float y = args.read_float();
-         float z = args.read_float();
+    if ( _stricmp( command, "setcameraposition" ) == 0 )
+    {
+        float x = args.read_float();
+        float y = args.read_float();
+        float z = args.read_float();
 
-         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SetCameraPosition( x, y, z );
+        SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SetCameraPosition( x, y, z );
 
-         return CMD_SUCCESS;
-      }
-      else if ( _stricmp( command, "setcamerarotation" ) == 0 )
-      {
-         float x = args.read_float();
-         float y = args.read_float();
-         float z = args.read_float();
+        return CMD_SUCCESS;
+    }
+    else if ( _stricmp( command, "setcamerarotation" ) == 0 )
+    {
+        float x = args.read_float();
+        float y = args.read_float();
+        float z = args.read_float();
 
-         gwiz::quat_t q = gwiz::euler_t( x, y, z );
+        gwiz::quat_t q = gwiz::euler_t( x, y, z );
 
-         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SetCameraRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() );
+        SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SetCameraRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() );
 
-         return CMD_SUCCESS;
-      }
+        return CMD_SUCCESS;
+    }
 
-      return CMD_NOT_FOUND;
-   }
-
-   return CMD_FAILURE;
+    return CMD_NOT_FOUND;
 }
 
 
@@ -3366,24 +3276,21 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
       Kills the sbm process
 */
 
-int mcu_vrKillComponent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_vrKillComponent_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-   if ( mcu_p )
-   {
-      char * command = args.read_token();
-
-      if ( _stricmp( command, "sb" ) == 0 ||
-		   _stricmp( command, "sbm" ) == 0 ||
-           _stricmp( command, "all" ) == 0 )
-      {
-	      mcu_p->loop = false;
-		  std::stringstream strstr;
-		  strstr << "vrProcEnd " << command;
-		  mcu_p->vhmsg_send( strstr.str().c_str() );
-	      return CMD_SUCCESS;
-      }
-   }
-
+    char * command = args.read_token();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
+    if ( _stricmp( command, "sb" ) == 0 ||
+		_stricmp( command, "sbm" ) == 0 ||
+        _stricmp( command, "all" ) == 0 )
+    {
+		SmartBody::SBScene::getScene()->getSimulationManager()->stop();
+		std::stringstream strstr;
+		strstr << "vrProcEnd " << command;
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send( strstr.str().c_str() );
+	    return CMD_SUCCESS;
+    }
 	return CMD_SUCCESS;
 }
 
@@ -3392,26 +3299,22 @@ int mcu_vrKillComponent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
      In response to this message, send out vrComponent to indicate that this component is running
 */
 
-int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_vrAllCall_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-    if ( mcu_p )
-    {
-	    // Anm - All of the following need to identify mcu_p->process_id
-		//       but that breaks the following syntax
-        mcu_p->vhmsg_send( "vrComponent sbm" );
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
+    SmartBody::SBScene::getScene()->getVHMsgManager()->send( "vrComponent sbm" );
  
-        // EDF - For our reply, we're going to send one vrComponent 
-        //       message for each agent loaded
-        for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
-			iter != mcu_p->getCharacterMap().end();
-			iter++)
-		{
-            string message = "sbm ";
-			message += (*iter).second->getName();
-            mcu_p->vhmsg_send( "vrComponent", message.c_str() );
-        }
+    // EDF - For our reply, we're going to send one vrComponent 
+    //       message for each agent loaded
+    for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
+	{
+        string message = "sbm ";
+		message += (*iter).second->getName();
+        SmartBody::SBScene::getScene()->getVHMsgManager()->send( "vrComponent", message.c_str() );
     }
-
 	return CMD_SUCCESS;
 }
 
@@ -3420,180 +3323,99 @@ int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p )
  * vrPerception kinect/gavam ...
  * vrPerception pml-nvbg <pml>
  */
-int mcu_vrPerception_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_vrPerception_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	if (mcu_p)
-	{
-		char * command = args.read_token();
+	char * command = args.read_token();
 		
-		//only considering kinect or gavam or both
-		if (_stricmp(command, "kinect") == 0 || _stricmp(command, "gavam") == 0)
+	//only considering kinect or gavam or both
+	if (_stricmp(command, "kinect") == 0 || _stricmp(command, "gavam") == 0)
+	{
+		LOG("coordinates received");
+		//if the message contains kinect data
+		if (_stricmp(command, "kinect") == 0)
 		{
-			LOG("coordinates received");
-		  //if the message contains kinect data
-			if (_stricmp(command, "kinect") == 0)
+			string stringId = args.read_token();
+			int kinectId = args.read_int();
+			string stringFailed = args.read_token();
+			int kinectFailed = args.read_int();
+			string stringUsers = args.read_token();
+			int kinectUsers = args.read_int();
+
+			for (int indexUsers = 0; indexUsers < kinectUsers; ++indexUsers)
 			{
-				string stringId = args.read_token();
-				int kinectId = args.read_int();
-				string stringFailed = args.read_token();
-				int kinectFailed = args.read_int();
-				string stringUsers = args.read_token();
-				int kinectUsers = args.read_int();
-
-				for (int indexUsers = 0; indexUsers < kinectUsers; ++indexUsers)
-				{
-					string stringPosition = args.read_token();
-					float x = args.read_float();
-					float y = args.read_float();
-					float z = args.read_float();
-				}
-
-				//currently not doing anything with the Kinect data
-				command = args.read_token();
-
-				//if message contains gavam after kinect
-				//ideally  this parsing should be a separate method so that the message can contain gavam / kinect in any order
-				if (_stricmp( command, "gavam" ) == 0)
-				{
-					SrVec pos;
-					SrVec rot;
-
-					//parse float data
-					pos[0] = args.read_float();
-					pos[1] = args.read_float();
-					pos[2] = args.read_float();
-					rot[0] = args.read_float();
-					rot[1] = args.read_float();
-					rot[2] = args.read_float();
-
-					//For converting data from euler to quaternion
-
-					float cos_z_2 = cosf((float)0.5*rot[2]);
-					float cos_y_2 = cosf((float)0.5*rot[1]);
-					float cos_x_2 = cosf((float)0.5*rot[0]);
-
-					float sin_z_2 = sinf((float)0.5*rot[2]);
-					float sin_y_2 = sinf((float)0.5*rot[1]);
-					float sin_x_2 = sinf((float)0.5*rot[0]);
-
-					// and now compute quaternion
-					float quatW = cos_z_2*cos_y_2*cos_x_2 + sin_z_2*sin_y_2*sin_x_2;
-					float quatX = cos_z_2*cos_y_2*sin_x_2 - sin_z_2*sin_y_2*cos_x_2;
-					float quatY = cos_z_2*sin_y_2*cos_x_2 + sin_z_2*cos_y_2*sin_x_2;
-					float quatZ = sin_z_2*cos_y_2*cos_x_2 - cos_z_2*sin_y_2*sin_x_2;
-
-					// Log the Gavam data
-					LOG("Gavam Coordinates - %f %f %f %f %f %f", pos[0], pos[1], pos[2], rot[0], rot[1], rot[2]);
-					char *messg = new char[1024];
-					#ifdef WIN32
-					sprintf_s(messg, 1024, "receiver skeleton brad generic rotation skullbase %f %f %f %f", quatW, quatX, quatY, quatZ);
-					#else
-					snprintf(messg, 1024, "receiver skeleton brad generic rotation skullbase %f %f %f %f", quatW, quatX, quatY, quatZ);
-					#endif
-					//log message before sending it
-					//LOG(messg);
-					//sending temp mesg just to make sure it works 
-					//mcu_p->vhmsg_send("test", messg);
-					//send the receiver message to orient the skullbase of brad as per the user's head orientation as detected by Gavam
-					mcu_p->vhmsg_send("sbm", messg);
-					//after sending the message, send a test message as confirmation
-					//mcu_p->vhmsg_send("testconfirmed", messg);
-				}
+				string stringPosition = args.read_token();
+				float x = args.read_float();
+				float y = args.read_float();
+				float z = args.read_float();
 			}
 
-			else if (_stricmp( command, "gavam" ) == 0)
+			//currently not doing anything with the Kinect data
+			command = args.read_token();
+
+			//if message contains gavam after kinect
+			//ideally  this parsing should be a separate method so that the message can contain gavam / kinect in any order
+			if (_stricmp( command, "gavam" ) == 0)
 			{
-			  //this is only when only gavam is detected (which is not the case right now)
-			  //right now vrPerception send kinect and the gavam coordinates.
+				SrVec pos;
+				SrVec rot;
+
+				//parse float data
+				pos[0] = args.read_float();
+				pos[1] = args.read_float();
+				pos[2] = args.read_float();
+				rot[0] = args.read_float();
+				rot[1] = args.read_float();
+				rot[2] = args.read_float();
+
+				//For converting data from euler to quaternion
+
+				float cos_z_2 = cosf((float)0.5*rot[2]);
+				float cos_y_2 = cosf((float)0.5*rot[1]);
+				float cos_x_2 = cosf((float)0.5*rot[0]);
+
+				float sin_z_2 = sinf((float)0.5*rot[2]);
+				float sin_y_2 = sinf((float)0.5*rot[1]);
+				float sin_x_2 = sinf((float)0.5*rot[0]);
+
+				// and now compute quaternion
+				float quatW = cos_z_2*cos_y_2*cos_x_2 + sin_z_2*sin_y_2*sin_x_2;
+				float quatX = cos_z_2*cos_y_2*sin_x_2 - sin_z_2*sin_y_2*cos_x_2;
+				float quatY = cos_z_2*sin_y_2*cos_x_2 + sin_z_2*cos_y_2*sin_x_2;
+				float quatZ = sin_z_2*cos_y_2*cos_x_2 - cos_z_2*sin_y_2*sin_x_2;
+
+				// Log the Gavam data
+				LOG("Gavam Coordinates - %f %f %f %f %f %f", pos[0], pos[1], pos[2], rot[0], rot[1], rot[2]);
+				char *messg = new char[1024];
+				#ifdef WIN32
+				sprintf_s(messg, 1024, "receiver skeleton brad generic rotation skullbase %f %f %f %f", quatW, quatX, quatY, quatZ);
+				#else
+				snprintf(messg, 1024, "receiver skeleton brad generic rotation skullbase %f %f %f %f", quatW, quatX, quatY, quatZ);
+				#endif
+				//log message before sending it
+				//LOG(messg);
+				//sending temp mesg just to make sure it works 
+				//SmartBody::SBScene::getScene()->getVHMsgManager()->send("test", messg);
+				//send the receiver message to orient the skullbase of brad as per the user's head orientation as detected by Gavam
+				SmartBody::SBScene::getScene()->getVHMsgManager()->send("sbm", messg);
+				//after sending the message, send a test message as confirmation
+				//SmartBody::SBScene::getScene()->getVHMsgManager()->send("testconfirmed", messg);
 			}
 		}
-		else if (_stricmp(command, "pml-nvbg") == 0)
+
+		else if (_stricmp( command, "gavam" ) == 0)
 		{
-			std::string pml = args.read_remainder_raw();
-
-			// all characters should be receiving the perception message
-			std::map<std::string, SbmCharacter*>& cMap = mcu_p->getCharacterMap();
-			std::map<std::string, SbmCharacter*>::iterator iter = cMap.begin();
-			for (; iter!= cMap.end(); iter++)
-			{
-				SbmCharacter* character = iter->second;
-				if (!character)
-					continue;
-
-				SmartBody::Nvbg* nvbg = character->getNvbg();
-				if (!nvbg)
-					continue;
-
-				bool ok = nvbg->execute(iter->first, "", "", pml);
-				if (!ok)
-				{
-					LOG("NVBG for perception did not handle message %s.", pml.c_str());
-				}
-			}			
-			return CMD_SUCCESS;	
-		}
-		else
-		{
-			LOG("mcu_vrPerception_func ERR: message not recognized!");
-			return CMD_FAILURE;
+			//this is only when only gavam is detected (which is not the case right now)
+			//right now vrPerception send kinect and the gavam coordinates.
 		}
 	}
-
-	return CMD_SUCCESS;
-}
-
-/*
- * Callback function for vrBCFeedback message
- * vrBCFeedback <feedback agent name> <xml>
- */
-int mcu_vrBCFeedback_func( srArgBuffer& args, mcuCBHandle *mcu_p )
-{
-	if (mcu_p)
+	else if (_stricmp(command, "pml-nvbg") == 0)
 	{
-		std::string cName = args.read_token();
-		std::string xml = args.read_remainder_raw();
-		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(cName);
-		if (character)
-		{
-			SmartBody::Nvbg* nvbg = character->getNvbg();
-			if (!nvbg)
-			{
-				LOG("mcu_vrBCFeedback_func ERR: character %s doesn't has NVBG attached", cName.c_str());
-				return CMD_FAILURE;
-			}
-			bool ok = nvbg->execute(cName, "", "", xml);
-			if (!ok)
-			{
-				LOG("NVBG for perception did not handle message %s.", xml.c_str());
-				return CMD_FAILURE;
-			}			
-		}
-		else
-		{
-			LOG("mcu_vrBCFeedback_func ERR: character %s not found.", cName.c_str());
-			return CMD_FAILURE;
-		}
-
-	}
-	return CMD_SUCCESS;
-}
-
-/*
- * Callback function for vrSpeech message
- * vrSpeech start id speaker
- * vrSpeech finish-speaking id
- * This message goes into NVBG
- */
-int mcu_vrSpeech_func( srArgBuffer& args, mcuCBHandle *mcu_p )
-{
-	if (mcu_p)
-	{
-		std::string status = args.read_token();
-		std::string id = args.read_token();
-		std::string speaker = args.read_token();
+		std::string pml = args.read_remainder_raw();
 
 		// all characters should be receiving the perception message
-		std::map<std::string, SbmCharacter*>& cMap = mcu_p->getCharacterMap();
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
+		std::map<std::string, SbmCharacter*>& cMap = mcu.getCharacterMap();
 		std::map<std::string, SbmCharacter*>::iterator iter = cMap.begin();
 		for (; iter!= cMap.end(); iter++)
 		{
@@ -3605,18 +3427,94 @@ int mcu_vrSpeech_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			if (!nvbg)
 				continue;
 
-			bool ok = nvbg->executeSpeech(iter->first, status, id, speaker);
+			bool ok = nvbg->execute(iter->first, "", "", pml);
 			if (!ok)
 			{
-				LOG("NVBG cannot handle vrSpeech message");
+				LOG("NVBG for perception did not handle message %s.", pml.c_str());
 			}
 		}			
+		return CMD_SUCCESS;	
+	}
+	else
+	{
+		LOG("mcu_vrPerception_func ERR: message not recognized!");
+		return CMD_FAILURE;
+	}
+
+	return CMD_FAILURE;
+}
+
+/*
+ * Callback function for vrBCFeedback message
+ * vrBCFeedback <feedback agent name> <xml>
+ */
+int mcu_vrBCFeedback_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
+{
+	std::string cName = args.read_token();
+	std::string xml = args.read_remainder_raw();
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(cName);
+	if (character)
+	{
+		SmartBody::Nvbg* nvbg = character->getNvbg();
+		if (!nvbg)
+		{
+			LOG("mcu_vrBCFeedback_func ERR: character %s doesn't has NVBG attached", cName.c_str());
+			return CMD_FAILURE;
+		}
+		bool ok = nvbg->execute(cName, "", "", xml);
+		if (!ok)
+		{
+			LOG("NVBG for perception did not handle message %s.", xml.c_str());
+			return CMD_FAILURE;
+		}			
+	}
+	else
+	{
+		LOG("mcu_vrBCFeedback_func ERR: character %s not found.", cName.c_str());
+		return CMD_FAILURE;
 	}
 	return CMD_SUCCESS;
 }
 
-int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+/*
+ * Callback function for vrSpeech message
+ * vrSpeech start id speaker
+ * vrSpeech finish-speaking id
+ * This message goes into NVBG
+ */
+int mcu_vrSpeech_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::string status = args.read_token();
+	std::string id = args.read_token();
+	std::string speaker = args.read_token();
+
+	// all characters should be receiving the perception message
+	std::map<std::string, SbmCharacter*>& cMap = mcu.getCharacterMap();
+	std::map<std::string, SbmCharacter*>::iterator iter = cMap.begin();
+	for (; iter!= cMap.end(); iter++)
+	{
+		SbmCharacter* character = iter->second;
+		if (!character)
+			continue;
+
+		SmartBody::Nvbg* nvbg = character->getNvbg();
+		if (!nvbg)
+			continue;
+
+		bool ok = nvbg->executeSpeech(iter->first, status, id, speaker);
+		if (!ok)
+		{
+			LOG("NVBG cannot handle vrSpeech message");
+		}
+	}			
+	return CMD_SUCCESS;
+}
+
+int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
 #ifndef SB_NO_PYTHON	
 #ifndef __ANDROID__
 #ifndef __native_client__
@@ -3640,7 +3538,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		std::stringstream strstr;
 		strstr << instanceId << " " << messageId << " response-fail ";
 		strstr << "No Python code sent.";
-		mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
 		return CMD_FAILURE;
 	}
 
@@ -3648,7 +3546,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	if (returnType == "void")
 	{
 		try {
-			boost::python::exec(code.c_str(), *mcu_p->mainDict);
+			boost::python::exec(code.c_str(), *mcu.mainDict);
 		} catch (...) {
 			PyErr_Print();
 		}
@@ -3657,12 +3555,12 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	else if (returnType == "bool")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
-			bool result = boost::python::extract<bool>(mcu_p->mainDict["ret"]);
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
+			bool result = boost::python::extract<bool>(mcu.mainDict["ret"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
-			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3671,12 +3569,12 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	else if (returnType == "int")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
-			int result = boost::python::extract<int>(mcu_p->mainDict["ret"]);
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
+			int result = boost::python::extract<int>(mcu.mainDict["ret"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
-			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3685,12 +3583,12 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	else if (returnType == "float")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
-			float result = boost::python::extract<float>(mcu_p->mainDict["ret"]);
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
+			float result = boost::python::extract<float>(mcu.mainDict["ret"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
-			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3699,12 +3597,12 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	else if (returnType == "string")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
-			std::string result = boost::python::extract<std::string>(mcu_p->mainDict["ret"]);
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
+			std::string result = boost::python::extract<std::string>(mcu.mainDict["ret"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
-			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3713,17 +3611,17 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	else if (returnType == "int-array")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
-			boost::python::object obj2 = boost::python::exec("size = len(ret)", mcu_p->mainDict);
-			int size =  boost::python::extract<int>(mcu_p->mainDict["size"]);
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
+			boost::python::object obj2 = boost::python::exec("size = len(ret)", mcu.mainDict);
+			int size =  boost::python::extract<int>(mcu.mainDict["size"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			for (int x = 0; x < size; x++)
 			{
-				int val =  boost::python::extract<int>(mcu_p->mainDict["ret"][x]);
+				int val =  boost::python::extract<int>(mcu.mainDict["ret"][x]);
 				strstr << " " << val;
 			}
-			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3732,17 +3630,17 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	else if (returnType == "float-array")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
-			boost::python::object obj2 = boost::python::exec("size = len(ret)", mcu_p->mainDict);
-			int size =  boost::python::extract<int>(mcu_p->mainDict["size"]);
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
+			boost::python::object obj2 = boost::python::exec("size = len(ret)", mcu.mainDict);
+			int size =  boost::python::extract<int>(mcu.mainDict["size"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			for (int x = 0; x < size; x++)
 			{
-				float val =  boost::python::extract<float>(mcu_p->mainDict["ret"][x]);
+				float val =  boost::python::extract<float>(mcu.mainDict["ret"][x]);
 				strstr << " " << val;
 			}
-			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3751,17 +3649,17 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	else if (returnType == "string-array")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu_p->mainDict);
-			boost::python::object obj2 = boost::python::exec("size = len(ret)", mcu_p->mainDict);
-			int size =  boost::python::extract<int>(mcu_p->mainDict["size"]);
+			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
+			boost::python::object obj2 = boost::python::exec("size = len(ret)", mcu.mainDict);
+			int size =  boost::python::extract<int>(mcu.mainDict["size"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			for (int x = 0; x < size; x++)
 			{
-				std::string val =  boost::python::extract<std::string>(mcu_p->mainDict["ret"][x]);
+				std::string val =  boost::python::extract<std::string>(mcu.mainDict["ret"][x]);
 				strstr << " " << val;
 			}
-			mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3772,14 +3670,14 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		std::stringstream strstr;
 		strstr << instanceId << " " << messageId << " response-fail ";
 		strstr << "Unknown return type: " << returnType;
-		mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
 		return CMD_FAILURE;
 	}
 
 	std::stringstream strstr;
 	strstr << instanceId << " " << messageId << " response-fail ";
 	strstr << "Problem executing code." << returnType;
-	mcu_p->vhmsg_send( "sbmdebugger", strstr.str().c_str() );
+	SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
 	return CMD_FAILURE;
 #endif	
 #endif
@@ -3792,54 +3690,52 @@ int mcu_sbmdebugger_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 /////////////////////////////////////////////////////////////
 
-int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
-
+int mcu_wsp_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 #if USE_WSP
-	mcu_p->theWSP->process_command( args.read_remainder_raw() );
+	mcu.theWSP->process_command( args.read_remainder_raw() );
 #endif
 
 	return( CMD_SUCCESS );
 }
 
-int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_syncpolicy_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-   if ( mcu_p )
-   {
-      int num = args.calc_num_tokens();
+    int num = args.calc_num_tokens();
 
-      if ( num > 0 )
-      {
-         string command = args.read_token();
-		 if (command == "delay")
-		 {
-			 SmartBody::SBScene::getScene()->setBoolAttribute("delaySpeechIfNeeded", true);
-		 }
-		 else if (command == "nodelay")
-		 {
-			SmartBody::SBScene::getScene()->setBoolAttribute("delaySpeechIfNeeded", false);
-		 }
-		 else
-		 {
-			LOG("Usage: syncpolicy <delay|nodelay>");
-			return CMD_FAILURE;
-		 }
+    if ( num > 0 )
+    {
+        string command = args.read_token();
+		if (command == "delay")
+		{
+			SmartBody::SBScene::getScene()->setBoolAttribute("delaySpeechIfNeeded", true);
+		}
+		else if (command == "nodelay")
+		{
+		SmartBody::SBScene::getScene()->setBoolAttribute("delaySpeechIfNeeded", false);
+		}
+		else
+		{
+		LOG("Usage: syncpolicy <delay|nodelay>");
+		return CMD_FAILURE;
+		}
  
-         return CMD_SUCCESS;
-      }
-	  else
-	  {
-		  if (SmartBody::SBScene::getScene()->getBoolAttribute("delaySpeechIfNeeded"))
-		  {
-			 LOG("Behavior policy is 'delay'. Behaviors will be offset to a future time to make sure that all behaviors are executed in full.");
-		  }
-		  else
-		  {
-			 LOG("Behavior policy is 'nodelay'. Behaviors that are calculated to start in the past will be partially executed.");
-		  }
-		  return CMD_SUCCESS;
-	  }
-   }
-
+        return CMD_SUCCESS;
+    }
+	else
+	{
+		if (SmartBody::SBScene::getScene()->getBoolAttribute("delaySpeechIfNeeded"))
+		{
+			LOG("Behavior policy is 'delay'. Behaviors will be offset to a future time to make sure that all behaviors are executed in full.");
+		}
+		else
+		{
+			LOG("Behavior policy is 'nodelay'. Behaviors that are calculated to start in the past will be partially executed.");
+		}
+		return CMD_SUCCESS;
+	}
    return CMD_FAILURE;
 }
 
@@ -3849,214 +3745,209 @@ int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 // 3. If frame number exist, this will output which channels are affected 
 // check motion/skeleton <character name> <motion name> [frame number]
 // frame number is optional
-int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	if (mcu_p)
+	char* operation = args.read_token();
+	char* charName = args.read_token();
+	char* motionName = args.read_token();
+	char* frameNumString = args.read_token();
+	int frameNum = -1;
+	if (frameNumString != "")	frameNum = atoi(frameNumString);
+	int mode = -1;
+	int chanSize;
+	SkChannel chan;
+
+	if (strcmp(operation, "motion") == 0)	mode = 1;
+	if (strcmp(operation, "skeleton") == 0)	mode = 2;
+	if (mode == -1)
 	{
-		char* operation = args.read_token();
-		char* charName = args.read_token();
-		char* motionName = args.read_token();
-		char* frameNumString = args.read_token();
-		int frameNum = -1;
-		if (frameNumString != "")	frameNum = atoi(frameNumString);
-		int mode = -1;
-		int chanSize;
-		SkChannel chan;
+		LOG("mcu_check_func ERR: Mode %s not FOUND!", operation);
+		return CMD_FAILURE;
+	}
 
-		if (strcmp(operation, "motion") == 0)	mode = 1;
-		if (strcmp(operation, "skeleton") == 0)	mode = 2;
-		if (mode == -1)
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+	if (!motion)
+	{
+		LOG("mcu_check_func ERR: Motion %s NOT EXIST!", motionName);
+		return CMD_FAILURE;
+	}
+	if (character)
+	{
+		int numValidChannels = motion->connect(character->getSkeleton());	// connect and check for the joints
+		SkChannelArray& mChanArray = motion->channels();
+		int mChanSize = mChanArray.size();
+		SkChannelArray& skelChanArray = character->getSkeleton()->channels();
+		int skelChanSize = skelChanArray.size();
+		if (mode == 1)
 		{
-			LOG("mcu_check_func ERR: Mode %s not FOUND!", operation);
-			return CMD_FAILURE;
+			chanSize = mChanSize;
+			LOG("Channels in motion %s's channel matching %s's skeleton are preceeded with '+'", motionName, charName);
+			LOG("motion %s's Channel Info:", motionName);
 		}
-
-		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
-		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
-		if (!motion)
+		if (mode == 2)
 		{
-			LOG("mcu_check_func ERR: Motion %s NOT EXIST!", motionName);
-			return CMD_FAILURE;
+			chanSize = skelChanSize;
+			LOG("Channels in skeleton %s's channel matching motion %s's channel are preceeded with '+'", charName, motionName);
+			LOG("character %s's Channel Info:", charName);
 		}
-		if (character)
-		{
-			int numValidChannels = motion->connect(character->getSkeleton());	// connect and check for the joints
-			SkChannelArray& mChanArray = motion->channels();
-			int mChanSize = mChanArray.size();
-			SkChannelArray& skelChanArray = character->getSkeleton()->channels();
-			int skelChanSize = skelChanArray.size();
+		LOG("Channel Size: %d", chanSize);
+		for (int i = 0; i < chanSize; i++)
+		{				
+			std::stringstream outputInfo;
+			std::string channelName = "";
 			if (mode == 1)
 			{
-				chanSize = mChanSize;
-				LOG("Channels in motion %s's channel matching %s's skeleton are preceeded with '+'", motionName, charName);
-				LOG("motion %s's Channel Info:", motionName);
+				chan = mChanArray[i];
+				channelName = mChanArray.name(i);
 			}
 			if (mode == 2)
 			{
-				chanSize = skelChanSize;
-				LOG("Channels in skeleton %s's channel matching motion %s's channel are preceeded with '+'", charName, motionName);
-				LOG("character %s's Channel Info:", charName);
+				chan = skelChanArray[i];
+				channelName = skelChanArray.name(i);
 			}
-			LOG("Channel Size: %d", chanSize);
-			for (int i = 0; i < chanSize; i++)
-			{				
-				std::stringstream outputInfo;
-				std::string channelName = "";
-				if (mode == 1)
-				{
-					chan = mChanArray[i];
-					channelName = mChanArray.name(i);
-				}
-				if (mode == 2)
-				{
-					chan = skelChanArray[i];
-					channelName = skelChanArray.name(i);
-				}
 
-				if (!chan.joint)
-				{
-					LOG("  %d: (No mathing joint)", i);
-					continue;
-				}
-
-				std::string jointName = chan.joint->name();
-				int	chanType = chan.type;
-				std::string chanTypeString;
-				switch (chanType)
-				{
-					case 0:
-						chanTypeString = "XPos";
-						break;
-					case 1:	
-						chanTypeString = "YPos";
-						break;
-					case 2:
-						chanTypeString = "ZPos";
-						break;
-					case 6:
-						chanTypeString = "Quat";
-						break;
-					default:
-						chanTypeString = "Others";
-				}
-				int pos;
-				if (mode == 1)
-				{
-					pos = skelChanArray.search(chan.joint->name(), chan.type);
-					//pos = skelChanArray.linear_search(chan.joint->name(), chan.type);
-				}
-				if (mode == 2)	
-				{
-					pos = mChanArray.search(chan.joint->name(), chan.type);
-					//pos = mChanArray.linear_search(chan.joint->name(), chan.type);
-				}
-				if (pos != -1)
-					outputInfo << "+ ";
-				if (pos == -1)	
-					outputInfo << "  ";
-				outputInfo << i << ": " << jointName.c_str() << " (" << chanTypeString << ")";
-				LOG("%s", outputInfo.str().c_str());
-			}
-			
-			// check the non-zero channel
-			if (frameNum >= 0 && frameNum < motion->frames())
+			if (!chan.joint)
 			{
-				float* frameData = motion->posture(frameNum);
-				int channelCounter = 0;
-				for (int c = 0; c < mChanArray.size(); c++)
+				LOG("  %d: (No mathing joint)", i);
+				continue;
+			}
+
+			std::string jointName = chan.joint->name();
+			int	chanType = chan.type;
+			std::string chanTypeString;
+			switch (chanType)
+			{
+				case 0:
+					chanTypeString = "XPos";
+					break;
+				case 1:	
+					chanTypeString = "YPos";
+					break;
+				case 2:
+					chanTypeString = "ZPos";
+					break;
+				case 6:
+					chanTypeString = "Quat";
+					break;
+				default:
+					chanTypeString = "Others";
+			}
+			int pos;
+			if (mode == 1)
+			{
+				pos = skelChanArray.search(chan.joint->name(), chan.type);
+				//pos = skelChanArray.linear_search(chan.joint->name(), chan.type);
+			}
+			if (mode == 2)	
+			{
+				pos = mChanArray.search(chan.joint->name(), chan.type);
+				//pos = mChanArray.linear_search(chan.joint->name(), chan.type);
+			}
+			if (pos != -1)
+				outputInfo << "+ ";
+			if (pos == -1)	
+				outputInfo << "  ";
+			outputInfo << i << ": " << jointName.c_str() << " (" << chanTypeString << ")";
+			LOG("%s", outputInfo.str().c_str());
+		}
+			
+		// check the non-zero channel
+		if (frameNum >= 0 && frameNum < motion->frames())
+		{
+			float* frameData = motion->posture(frameNum);
+			int channelCounter = 0;
+			for (int c = 0; c < mChanArray.size(); c++)
+			{
+				int curIndex = channelCounter;
+				SkChannel& channel = mChanArray.get(c);
+				std::string jointName = mChanArray.name(c);
+				int chanSize = channel.size();
+				int numZeroFrames = 0;
+				int	chanType = channel.type;
+				if (chanType == SkChannel::Quat)
 				{
-					int curIndex = channelCounter;
-					SkChannel& channel = mChanArray.get(c);
-					std::string jointName = mChanArray.name(c);
-					int chanSize = channel.size();
-					int numZeroFrames = 0;
-					int	chanType = channel.type;
-					if (chanType == SkChannel::Quat)
+					if (fabs(frameData[channelCounter] - 1.0) > .0001 ||
+						fabs(frameData[channelCounter + 1]) > .0001 ||
+						fabs(frameData[channelCounter + 2]) > .0001 ||
+						fabs(frameData[channelCounter + 3]) > .0001)
 					{
-						if (fabs(frameData[channelCounter] - 1.0) > .0001 ||
-							fabs(frameData[channelCounter + 1]) > .0001 ||
-							fabs(frameData[channelCounter + 2]) > .0001 ||
-							fabs(frameData[channelCounter + 3]) > .0001)
-						{
-							numZeroFrames = 0;
-						}
-						else
-						{
-							numZeroFrames = 1;
-						}
-						channelCounter += 4;
+						numZeroFrames = 0;
 					}
 					else
 					{
-						for (int x = 0; x < chanSize; x++)
-						{
-							if (fabs(frameData[channelCounter]) < .0001)
-								numZeroFrames++;
-							channelCounter++;
-						}
-							
+						numZeroFrames = 1;
 					}
-										
-					if (numZeroFrames == 0)
-					{
-						if (chanType == SkChannel::XPos || chanType == SkChannel::YPos || chanType == SkChannel::ZPos ||
-							chanType == SkChannel::XRot || chanType == SkChannel::YRot || chanType == SkChannel::ZRot || 
-							chanType == SkChannel::Twist)
-							LOG("Channel %s/%s has non-zero value: %f.", jointName.c_str(), channel.type_name(), frameData[curIndex]);
-						else if (chanType == SkChannel::Swing)
-							LOG("Channel %s/%s has non-zero value: %f %f.", jointName.c_str(), channel.type_name(), frameData[curIndex], frameData[curIndex + 1]);
-						else if (chanType == SkChannel::Quat)
-							LOG("Channel %s/%s has non-zero value: %f %f %f %f.", jointName.c_str(), channel.type_name(), frameData[curIndex], frameData[curIndex+ 1], frameData[curIndex + 2], frameData[curIndex + 3]);
-					}
+					channelCounter += 4;
 				}
-				motion->disconnect();
-			}
-			else
-			{
-				if (frameNumString != "")
+				else
 				{
-					LOG("mcu_check_func ERR: Frame Number not Exist!");
-					motion->disconnect();
-					return CMD_FAILURE;			
+					for (int x = 0; x < chanSize; x++)
+					{
+						if (fabs(frameData[channelCounter]) < .0001)
+							numZeroFrames++;
+						channelCounter++;
+					}
+							
+				}
+										
+				if (numZeroFrames == 0)
+				{
+					if (chanType == SkChannel::XPos || chanType == SkChannel::YPos || chanType == SkChannel::ZPos ||
+						chanType == SkChannel::XRot || chanType == SkChannel::YRot || chanType == SkChannel::ZRot || 
+						chanType == SkChannel::Twist)
+						LOG("Channel %s/%s has non-zero value: %f.", jointName.c_str(), channel.type_name(), frameData[curIndex]);
+					else if (chanType == SkChannel::Swing)
+						LOG("Channel %s/%s has non-zero value: %f %f.", jointName.c_str(), channel.type_name(), frameData[curIndex], frameData[curIndex + 1]);
+					else if (chanType == SkChannel::Quat)
+						LOG("Channel %s/%s has non-zero value: %f %f %f %f.", jointName.c_str(), channel.type_name(), frameData[curIndex], frameData[curIndex+ 1], frameData[curIndex + 2], frameData[curIndex + 3]);
 				}
 			}
+			motion->disconnect();
 		}
 		else
 		{
-			LOG("mcu_check_func ERR: Character %s NOT EXIST!", charName);
-			return CMD_FAILURE;
+			if (frameNumString != "")
+			{
+				LOG("mcu_check_func ERR: Frame Number not Exist!");
+				motion->disconnect();
+				return CMD_FAILURE;			
+			}
 		}
 	}
-	return CMD_SUCCESS;
+	else
+	{
+		LOG("mcu_check_func ERR: Character %s NOT EXIST!", charName);
+		return CMD_FAILURE;
+	}
+
+	return CMD_FAILURE;
 }
 
 
 // command: adjustmotion <motion name> <character name>
 // this command adjust the motion with character skeleton's prerotation for once
-int mcu_adjust_motion_function( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_adjust_motion_function( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	if (mcu_p)
+	std::string motionName = args.read_token();
+	std::string charName = args.read_token();
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+	if (!motion)
 	{
-		std::string motionName = args.read_token();
-		std::string charName = args.read_token();
-		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
-		if (!motion)
-		{
-			LOG("mcu_adjust_motion_function ERR: motion %s not found!", motionName.c_str());
-			return CMD_FAILURE;
-		}
-		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
-		if (!character)
-		{
-			LOG("mcu_adjust_motion_function ERR: character %s not found!", charName.c_str());
-			return CMD_FAILURE;
-		}
-		ParserOpenCOLLADA::animationPostProcess(*character->getSkeleton(), *motion);
+		LOG("mcu_adjust_motion_function ERR: motion %s not found!", motionName.c_str());
+		return CMD_FAILURE;
 	}
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
+	if (!character)
+	{
+		LOG("mcu_adjust_motion_function ERR: character %s not found!", charName.c_str());
+		return CMD_FAILURE;
+	}
+	ParserOpenCOLLADA::animationPostProcess(*character->getSkeleton(), *motion);
 	return CMD_SUCCESS;
 }
 
-int mcu_mediapath_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_mediapath_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	int num = args.calc_num_tokens();
 	if ( num > 1)
@@ -4073,10 +3964,8 @@ int mcu_mediapath_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			return CMD_SUCCESS;
 		}
 
-		if (mcu_p)
-		{
-			SmartBody::SBScene::getScene()->setMediaPath(path);
-		}
+		SmartBody::SBScene::getScene()->setMediaPath(path);
+		
 		return CMD_SUCCESS;
 	}
 
@@ -4084,7 +3973,7 @@ int mcu_mediapath_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int triggerevent_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	char* eventType = args.read_token();
 	if (!eventType || strcmp(eventType, "help") == 0)
@@ -4105,21 +3994,22 @@ int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-int mcu_python_func( srArgBuffer& args, mcuCBHandle* mcu_p )
+int mcu_python_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	// executes Python code
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	std::string command = args.read_remainder_raw();
-	return mcu_p->executePython(command.c_str());
+	return mcu.executePython(command.c_str());
 }
 
-int mcu_pythonscript_func( srArgBuffer& args, mcuCBHandle* mcu_p )
+int mcu_pythonscript_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	std::string scriptName = args.read_token();	
-	return mcu_p->executePythonFile(scriptName.c_str());
+	return mcu.executePythonFile(scriptName.c_str());
 }
 
 
-int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int addevent_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	char* tok = args.read_token();
 	if (!tok || strcmp(tok, "help") == 0)
@@ -4174,7 +4064,7 @@ int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int removeevent_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	char* tok = args.read_token();
 	if (!tok || strcmp(tok, "help") == 0)
@@ -4227,7 +4117,7 @@ int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-int disableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int disableevents_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	char* tok = args.read_token();
 	if (!tok || strcmp(tok, "help") == 0)
@@ -4278,7 +4168,7 @@ int disableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-int enableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int enableevents_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	char* tok = args.read_token();
 	if (!tok || strcmp(tok, "help") == 0)
@@ -4330,7 +4220,7 @@ int enableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 }
 
 
-int registerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int registerevent_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	char* type = args.read_token();
 	if (!type || strcmp(type, "help") == 0)
@@ -4350,7 +4240,7 @@ int registerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 }
 
 
-int unregisterevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int unregisterevent_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	char* type = args.read_token();
 	if (!type || strcmp(type, "help") == 0)
@@ -4365,7 +4255,7 @@ int unregisterevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-int setmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int setmap_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	// set bone mapping on a specifically named map
 	char* mapname = args.read_token();
@@ -4405,7 +4295,7 @@ int setmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int motionmapdir_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	std::string directory = args.read_token();
 	if (directory.size() == 0 || directory == "help")
@@ -4482,7 +4372,7 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			{
 				std::stringstream strstr;
 				strstr << "motionmap " << motion->getName() << " " << mapName;
-				mcu_p->execute((char*) strstr.str().c_str());
+				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) strstr.str().c_str());
 				break;
 			}
 			else
@@ -4496,7 +4386,7 @@ int motionmapdir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-int motionmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int motionmap_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	char* motionName = args.read_token();
 	if (!motionName || strcmp(motionName, "help") == 0)
@@ -4535,7 +4425,7 @@ int motionmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int skeletonmap_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	char* skeleton = args.read_token();
 	if (!skeleton || strcmp(skeleton, "help") == 0)
@@ -4575,287 +4465,287 @@ int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 }
 
 
-int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_steer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	if ( mcu_p )
+	
+	std::string command = args.read_token();
+	if (command == "help")
 	{
-		std::string command = args.read_token();
-		if (command == "help")
+		LOG("Use: steer <start|stop>");
+		LOG("     steer move <character> <mode> <x> <y> <z>");
+		return CMD_SUCCESS;
+	}
+	else if (command == "unit")
+	{
+		LOG("Unit no longer supported. Use scene.setScale()");
+		return CMD_SUCCESS;
+	}
+	else if (command == "start")
+	{
+		SmartBody::SBScene::getScene()->getSteerManager()->setEnable(true);
+		return CMD_SUCCESS;
+	}
+	else if (command == "stop")
+	{
+		SmartBody::SBScene::getScene()->getSteerManager()->setEnable(false);
+		return CMD_SUCCESS;
+	}
+	else if (command == "move")
+	{
+		std::string characterName = args.read_token();
+		std::string mode = args.read_token();
+		int num = args.calc_num_tokens();
+		if (num % 3 != 0)
 		{
-			LOG("Use: steer <start|stop>");
-			LOG("     steer move <character> <mode> <x> <y> <z>");
-			return CMD_SUCCESS;
+			LOG("Syntax: steer move <character> <mode> <x1> <y1> <z1> <x2> <y2> <z2> ...");
+			return CMD_FAILURE;
 		}
-		else if (command == "unit")
+		if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
 		{
-			LOG("Unit no longer supported. Use scene.setScale()");
-			return CMD_SUCCESS;
-		}
-		else if (command == "start")
-		{
-			SmartBody::SBScene::getScene()->getSteerManager()->setEnable(true);
-			return CMD_SUCCESS;
-		}
-		else if (command == "stop")
-		{
-			SmartBody::SBScene::getScene()->getSteerManager()->setEnable(false);
-			return CMD_SUCCESS;
-		}
-		else if (command == "move")
-		{
-			std::string characterName = args.read_token();
-			std::string mode = args.read_token();
-			int num = args.calc_num_tokens();
-			if (num % 3 != 0)
-			{
-				LOG("Syntax: steer move <character> <mode> <x1> <y1> <z1> <x2> <y2> <z2> ...");
-				return CMD_FAILURE;
-			}
-			if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
-			{
-				SbmCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
-				if (character)
-				{
-					SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
-					SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
-					if (steerAgent)
-					{
-						PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
-						character->trajectoryGoalList.clear();
-						SteerPath& steerPath = ppraiAgent->steerPath;
-						float pathRadius = 1.f;												
-						float x, y, z;
-						float yaw, pitch, roll;
-						character->get_world_offset(x, y, z, yaw, pitch, roll);
-						character->trajectoryGoalList.push_back(x);
-						character->trajectoryGoalList.push_back(y);
-						character->trajectoryGoalList.push_back(z);
-
-						if (mode == "normal")
-						{
-							if (ppraiAgent->getAgent())
-							{
-								const SteerLib::AgentGoalInfo& curGoal = ppraiAgent->getAgent()->currentGoal();
-								ppraiAgent->getAgent()->clearGoals();
-							}
-							if (ppraiAgent->goalList.size() > 0)
-							{
-								ppraiAgent->sendLocomotionEvent("interrupt");
-							}
-							ppraiAgent->goalList.clear();
-							for (int i = 0; i < num; i++)
-							{
-								float v = args.read_float();
-								ppraiAgent->goalList.push_back(v);
-								character->trajectoryGoalList.push_back(v);
-							}
-						}
-						else if (mode == "additive")
-						{
-							for (int i = 0; i < num; i++)
-							{
-								float v = args.read_float();
-								ppraiAgent->goalList.push_back(v);
-								character->trajectoryGoalList.push_back(v);
-							}
-						}
-						else
-							LOG("steer move mode not recognized!");
-
-						std::vector<float>& trajList = character->trajectoryGoalList;
-						std::vector<SrVec> trajPtList;
-						// add steering path
-						for (size_t i=0; i < trajList.size() / 3; i++)
-						{
-							SrVec trajPt = SrVec(trajList[i*3],trajList[i*3+1],trajList[i*3+2]);
-							trajPtList.push_back(trajPt);
-						}
-						steerPath.clearPath();
-						steerPath.initPath(trajPtList,pathRadius);
-					}
-				}
-			}
-			return CMD_SUCCESS;
-		}
-		else if (command == "proximity")
-		{
-			std::string characterName = args.read_token();
-			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+			SbmCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 			if (character)
 			{
 				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
 				SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
-				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
 				if (steerAgent)
 				{
-					ppraiAgent->distThreshold = (float)args.read_double() / scene->getScale();
-					return CMD_SUCCESS;
-				}
-				else
-				{
-					LOG("No steering agent for character '%s'.", character->getName().c_str());
-					return CMD_FAILURE;
+					PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+					character->trajectoryGoalList.clear();
+					SteerPath& steerPath = ppraiAgent->steerPath;
+					float pathRadius = 1.f;												
+					float x, y, z;
+					float yaw, pitch, roll;
+					character->get_world_offset(x, y, z, yaw, pitch, roll);
+					character->trajectoryGoalList.push_back(x);
+					character->trajectoryGoalList.push_back(y);
+					character->trajectoryGoalList.push_back(z);
+
+					if (mode == "normal")
+					{
+						if (ppraiAgent->getAgent())
+						{
+							const SteerLib::AgentGoalInfo& curGoal = ppraiAgent->getAgent()->currentGoal();
+							ppraiAgent->getAgent()->clearGoals();
+						}
+						if (ppraiAgent->goalList.size() > 0)
+						{
+							ppraiAgent->sendLocomotionEvent("interrupt");
+						}
+						ppraiAgent->goalList.clear();
+						for (int i = 0; i < num; i++)
+						{
+							float v = args.read_float();
+							ppraiAgent->goalList.push_back(v);
+							character->trajectoryGoalList.push_back(v);
+						}
+					}
+					else if (mode == "additive")
+					{
+						for (int i = 0; i < num; i++)
+						{
+							float v = args.read_float();
+							ppraiAgent->goalList.push_back(v);
+							character->trajectoryGoalList.push_back(v);
+						}
+					}
+					else
+						LOG("steer move mode not recognized!");
+
+					std::vector<float>& trajList = character->trajectoryGoalList;
+					std::vector<SrVec> trajPtList;
+					// add steering path
+					for (size_t i=0; i < trajList.size() / 3; i++)
+					{
+						SrVec trajPt = SrVec(trajList[i*3],trajList[i*3+1],trajList[i*3+2]);
+						trajPtList.push_back(trajPt);
+					}
+					steerPath.clearPath();
+					steerPath.initPath(trajPtList,pathRadius);
 				}
 			}
 		}
-		else if (command == "fastinitial")
+		return CMD_SUCCESS;
+	}
+	else if (command == "proximity")
+	{
+		std::string characterName = args.read_token();
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+		if (character)
 		{
-			std::string characterName = args.read_token();
-			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
-			if (character)
+			SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+			SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+			PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+			if (steerAgent)
 			{
-				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
-				SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
-				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
-				std::string fastinitialString = args.read_token();
-				if (fastinitialString == "true")
-					ppraiAgent->fastInitial = true;
-				else
-					ppraiAgent->fastInitial = false;
-				return CMD_SUCCESS;
-			}
-		}
-		else if (command == "speed")
-		{
-			std::string characterName = args.read_token();
-			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
-			if (character)
-			{
-				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
-				SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
-				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
-				if (character->locomotion_type != character->Procedural)
-				{
-					ppraiAgent->desiredSpeed = (float)args.read_double();
-					return CMD_SUCCESS;
-				}
-			}		
-		}
-		else if (command == "stateprefix")
-		{
-			std::string characterName = args.read_token();
-			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
-			if (character)
-			{
-				character->statePrefix = args.read_token();
+				ppraiAgent->distThreshold = (float)args.read_double() / scene->getScale();
 				return CMD_SUCCESS;
 			}
 			else
+			{
+				LOG("No steering agent for character '%s'.", character->getName().c_str());
 				return CMD_FAILURE;
+			}
 		}
-		else if (command == "type")
+	}
+	else if (command == "fastinitial")
+	{
+		std::string characterName = args.read_token();
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+		if (character)
 		{
-			std::string characterName = args.read_token();
-			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
-			if (character)
+			SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+			SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+			PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+			std::string fastinitialString = args.read_token();
+			if (fastinitialString == "true")
+				ppraiAgent->fastInitial = true;
+			else
+				ppraiAgent->fastInitial = false;
+			return CMD_SUCCESS;
+		}
+	}
+	else if (command == "speed")
+	{
+		std::string characterName = args.read_token();
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+		if (character)
+		{
+			SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+			SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+			PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+			if (character->locomotion_type != character->Procedural)
 			{
-				std::string type = args.read_token();
-				if (type == "example")
-				{
-					if (character->checkExamples())
-						character->locomotion_type = character->Example;
-					else
-						character->locomotion_type = character->Basic;
-					/*
-					if (character->param_animation_ct)
-						character->param_animation_ct->set_pass_through(false);
-					if (character->locomotion_ct)
-						character->locomotion_ct->set_pass_through(true);
-					if (character->basic_locomotion_ct)
-						character->basic_locomotion_ct->set_pass_through(true);
-					*/
-					return CMD_SUCCESS;
-				}
-				if (type == "procedural")
-				{
-					character->locomotion_type = character->Procedural;
-					SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
-					SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
-					if (steerAgent)
-					{
-						PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
-						ppraiAgent->desiredSpeed = 1.6f;
-					}
-						
-					/*
-					if (character->param_animation_ct)
-						character->param_animation_ct->set_pass_through(true);
-					if (character->locomotion_ct)
-						character->locomotion_ct->set_pass_through(false);
-					if (character->basic_locomotion_ct)
-						character->basic_locomotion_ct->set_pass_through(true);
-					*/
-
-					return CMD_SUCCESS;
-				}
-				if (type == "basic")
-				{
+				ppraiAgent->desiredSpeed = (float)args.read_double();
+				return CMD_SUCCESS;
+			}
+		}		
+	}
+	else if (command == "stateprefix")
+	{
+		std::string characterName = args.read_token();
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+		if (character)
+		{
+			character->statePrefix = args.read_token();
+			return CMD_SUCCESS;
+		}
+		else
+			return CMD_FAILURE;
+	}
+	else if (command == "type")
+	{
+		std::string characterName = args.read_token();
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+		if (character)
+		{
+			std::string type = args.read_token();
+			if (type == "example")
+			{
+				if (character->checkExamples())
+					character->locomotion_type = character->Example;
+				else
 					character->locomotion_type = character->Basic;
-					/*
-					if (character->param_animation_ct)
-						character->param_animation_ct->set_pass_through(true);
-					if (character->locomotion_ct)
-						character->locomotion_ct->set_pass_through(true);
-					if (character->basic_locomotion_ct)
-						character->basic_locomotion_ct->set_pass_through(false);
-					*/
-					return CMD_SUCCESS;
+				/*
+				if (character->param_animation_ct)
+					character->param_animation_ct->set_pass_through(false);
+				if (character->locomotion_ct)
+					character->locomotion_ct->set_pass_through(true);
+				if (character->basic_locomotion_ct)
+					character->basic_locomotion_ct->set_pass_through(true);
+				*/
+				return CMD_SUCCESS;
+			}
+			if (type == "procedural")
+			{
+				character->locomotion_type = character->Procedural;
+				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+				SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+				if (steerAgent)
+				{
+					PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+					ppraiAgent->desiredSpeed = 1.6f;
 				}
-			}
-		}
-		else if (command == "facing")
-		{
-			std::string characterName = args.read_token();
-			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
-			if (character)
-			{
-				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
-				SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
-				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
-				ppraiAgent->facingAngle = (float)args.read_double();
-				return CMD_SUCCESS;
-			}				
-		}
-		else if (command == "braking")
-		{
-			std::string characterName = args.read_token();
-			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
-			if (character)
-			{
-				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
-				SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
-				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
-				ppraiAgent->brakingGain = (float)args.read_double();
-				if (ppraiAgent->brakingGain < 1.0f)
-					ppraiAgent->brakingGain = 1.0f;
-				if (ppraiAgent->brakingGain > 4.5f)
-					ppraiAgent->brakingGain = 4.5f;
-				return CMD_SUCCESS;
-			}				
-		}
-		else if (command == "test")
-		{
-			std::string characterName = args.read_token();
-			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
-			if (character)
-			{
-				SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
-				SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
-				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
-				ppraiAgent->startParameterTesting();
+						
+				/*
+				if (character->param_animation_ct)
+					character->param_animation_ct->set_pass_through(true);
+				if (character->locomotion_ct)
+					character->locomotion_ct->set_pass_through(false);
+				if (character->basic_locomotion_ct)
+					character->basic_locomotion_ct->set_pass_through(true);
+				*/
+
 				return CMD_SUCCESS;
 			}
+			if (type == "basic")
+			{
+				character->locomotion_type = character->Basic;
+				/*
+				if (character->param_animation_ct)
+					character->param_animation_ct->set_pass_through(true);
+				if (character->locomotion_ct)
+					character->locomotion_ct->set_pass_through(true);
+				if (character->basic_locomotion_ct)
+					character->basic_locomotion_ct->set_pass_through(false);
+				*/
+				return CMD_SUCCESS;
+			}
+		}
+	}
+	else if (command == "facing")
+	{
+		std::string characterName = args.read_token();
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+		if (character)
+		{
+			SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+			SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+			PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+			ppraiAgent->facingAngle = (float)args.read_double();
+			return CMD_SUCCESS;
+		}				
+	}
+	else if (command == "braking")
+	{
+		std::string characterName = args.read_token();
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+		if (character)
+		{
+			SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+			SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+			PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+			ppraiAgent->brakingGain = (float)args.read_double();
+			if (ppraiAgent->brakingGain < 1.0f)
+				ppraiAgent->brakingGain = 1.0f;
+			if (ppraiAgent->brakingGain > 4.5f)
+				ppraiAgent->brakingGain = 4.5f;
+			return CMD_SUCCESS;
+		}				
+	}
+	else if (command == "test")
+	{
+		std::string characterName = args.read_token();
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+		if (character)
+		{
+			SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+			SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
+			PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+			ppraiAgent->startParameterTesting();
+			return CMD_SUCCESS;
 		}
 	}
 	return CMD_FAILURE;
 }
 
 
-int showcharacters_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int showcharacters_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
-		iter != mcu_p->getCharacterMap().end();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
 		iter++)
 	{
 		LOG("%s", (*iter).second->getName().c_str());
@@ -4864,10 +4754,12 @@ int showcharacters_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 }
 
 
-int showpawns_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int showpawns_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	for (std::map<std::string, SbmPawn*>::iterator iter = mcu_p->getPawnMap().begin();
-		iter != mcu_p->getPawnMap().end();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
+	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+		iter != mcu.getPawnMap().end();
 		iter++)
 	{
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>((*iter).second);
@@ -4878,7 +4770,7 @@ int showpawns_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-int syncpoint_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int syncpoint_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	std::string motionStr = args.read_token();
 
@@ -4929,27 +4821,27 @@ int syncpoint_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 }
 
 #ifdef USE_GOOGLE_PROFILER
-int startprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int startprofile_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	LOG("Starting the CPU Profiler...");
 	ProfilerStart("/tmp/smartbodyprofile");
 	return CMD_SUCCESS;
 }
 
-int stopprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int stopprofile_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	LOG("Stopping the CPU Profiler...");
 	ProfilerStop();
 	return CMD_SUCCESS;
 }
-int startheapprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int startheapprofile_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	LOG("Starting the heap Profiler...");
 	HeapProfilerStart("/tmp/smartbodyheapprofile");
 	return CMD_SUCCESS;
 }
 
-int stopheapprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int stopheapprofile_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	LOG("Stopping the heap Profiler...");
 	HeapProfilerStop();
@@ -4967,8 +4859,9 @@ int stopheapprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 // 
 // p.s. 
 // currently position is for global and rotation is for local
-int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
+int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::string operation = args.read_token();
 	if (operation == "echo")
 		LOG("%s", args.read_remainder_raw());
@@ -5005,7 +4898,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 		{
 			std::string jName;
 			if (emitterName == "kinect")
-				jName = mcu->kinectProcessor->getSBJointName(args.read_int());
+				jName = mcu.kinectProcessor->getSBJointName(args.read_int());
 			else
 				jName = args.read_token();
 			float x = args.read_float() * scale;
@@ -5034,7 +4927,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 		{
 			std::string jName;
 			if (emitterName == "kinect")
-				jName = mcu->kinectProcessor->getSBJointName(args.read_int());
+				jName = mcu.kinectProcessor->getSBJointName(args.read_int());
 			else
 				jName = args.read_token();
 
@@ -5055,7 +4948,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 		{
 			std::string jName;
 			if (emitterName == "kinect")
-				jName = mcu->kinectProcessor->getSBJointName(args.read_int());
+				jName = mcu.kinectProcessor->getSBJointName(args.read_int());
 			else
 				jName = args.read_token();
 
@@ -5071,7 +4964,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 		{
 			std::string jName;
 			if (emitterName == "kinect")
-				jName = mcu->kinectProcessor->getSBJointName(args.read_int());
+				jName = mcu.kinectProcessor->getSBJointName(args.read_int());
 			else
 				jName = args.read_token();
 
@@ -5116,7 +5009,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 					{
 						if (quats[i].w != 0)
 						{
-							const std::string& mappedJointName = mcu->kinectProcessor->getSBJointName(i);
+							const std::string& mappedJointName = mcu.kinectProcessor->getSBJointName(i);
 							if (mappedJointName != "")
 								character->datareceiver_ct->setLocalRotation(mappedJointName, quats[i]);
 						}
@@ -5128,7 +5021,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 	return CMD_SUCCESS;
 }
 
-int mcu_character_breathing( const char* name, srArgBuffer& args, mcuCBHandle *mcu_p) //Celso: Summer 2008
+int mcu_character_breathing( const char* name, srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr) //Celso: Summer 2008
 {
 	SmartBody::SBCharacter* char_p = SmartBody::SBScene::getScene()->getCharacter( name );
 	if( !char_p )	
@@ -5332,7 +5225,7 @@ int mcu_character_breathing( const char* name, srArgBuffer& args, mcuCBHandle *m
 }
 
 
-int mcu_vrExpress_func( srArgBuffer& args, mcuCBHandle *mcu )
+int mcu_vrExpress_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	if (args.calc_num_tokens() < 4)
 	{
@@ -5362,8 +5255,9 @@ int mcu_vrExpress_func( srArgBuffer& args, mcuCBHandle *mcu )
 	return CMD_SUCCESS;
 }
 
-int mcu_vhmsg_connect_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_vhmsg_connect_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
+	SmartBody::SBVHMsgManager* vhmsgManager = SmartBody::SBScene::getScene()->getVHMsgManager();
 	char* vhmsgServerVar = getenv( "VHMSG_SERVER" );
 	char* vhmsgPortVar = getenv("VHMSG_PORT");
 	char* vhmsgScopeVar =  getenv("VHMSG_SCOPE");
@@ -5394,44 +5288,29 @@ int mcu_vhmsg_connect_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	// disconnect first in case we are already connected
+	vhmsgManager->setServer(vhmsgServer);
+	vhmsgManager->setPort(vhmsgServer);
+	vhmsgManager->setScope(vhmsgServer);
+	bool success = vhmsgManager->connect();
 
-	vhmsg::ttu_close();
-
-	if (vhmsg::ttu_open(vhmsgServer.c_str(), vhmsgScope.c_str(), vhmsgPort.c_str())==vhmsg::TTU_SUCCESS )
+	if (success)
 	{
-		vhmsg::ttu_set_client_callback( mcu_vhmsg_callback );
-		int err = vhmsg::TTU_SUCCESS;
-		err = vhmsg::ttu_register( "sb" );
-		err = vhmsg::ttu_register( "sbm" );
-		err = vhmsg::ttu_register( "vrAgentBML" );
-		err = vhmsg::ttu_register( "vrExpress" );
-		err = vhmsg::ttu_register( "vrSpeak" );
-		err = vhmsg::ttu_register( "RemoteSpeechReply" );
-		err = vhmsg::ttu_register( "PlaySound" );
-		err = vhmsg::ttu_register( "StopSound" );
-		err = vhmsg::ttu_register( "CommAPI" );
-		err = vhmsg::ttu_register( "object-data" );
-		err = vhmsg::ttu_register( "vrAllCall" );
-		err = vhmsg::ttu_register( "vrKillComponent" );
-		err = vhmsg::ttu_register( "wsp" );
-		err = vhmsg::ttu_register( "receiver" );
-		err = vhmsg::ttu_register( "sbmdebugger" );
-		err = vhmsg::ttu_register( "vrPerception" );
-		mcu_p->vhmsg_enabled = true;
 		return CMD_SUCCESS;
-	} 
+	}
 	else
 	{
 		LOG("Could not connect to %s:%s", vhmsgServer.c_str(), vhmsgPort.c_str());
-		mcu_p->vhmsg_enabled = false;
+		vhmsgManager->setEnable(false);
 		return CMD_FAILURE;
 	}
 
 }
 
-int mcu_vhmsg_disconnect_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int mcu_vhmsg_disconnect_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	if (!mcu_p->vhmsg_enabled)
+	SmartBody::SBVHMsgManager* vhmsgManager = SmartBody::SBScene::getScene()->getVHMsgManager();
+	
+	if (!vhmsgManager->isEnable())
 	{
 		LOG("VHMSG is not connected.");
 		return CMD_FAILURE;
@@ -5444,7 +5323,7 @@ int mcu_vhmsg_disconnect_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 	else
 	{
-		mcu_p->vhmsg_enabled = false;
+		vhmsgManager->setEnable(false);
 		LOG("VHMSG has been disconnected.");
 		return CMD_SUCCESS;
 	}
@@ -5461,7 +5340,7 @@ void mcu_vhmsg_callback( const char *op, const char *args, void * user_data )
 	else
 		SmartBody::SBScene::getScene()->getDebuggerServer()->ProcessVHMsgs(op, args);
 
-	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
+	switch(SmartBody::SBScene::getScene()->getCommandManager()->execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
             LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
             break;
@@ -5471,9 +5350,9 @@ void mcu_vhmsg_callback( const char *op, const char *args, void * user_data )
     }
 }
 
-int mcuFestivalRemoteSpeechCmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
+int mcuFestivalRemoteSpeechCmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 {
-	//FestivalSpeechRelayLocal* speechRelay = mcu_p->festivalRelay();
+	//FestivalSpeechRelayLocal* speechRelay = mcu.festivalRelay();
 	SpeechRelayLocal* speechRelay = SmartBody::SBScene::getScene()->getSpeechManager()->cereprocRelay();
 	const char* message = args.read_remainder_raw();
 	speechRelay->processSpeechMessage(message);
@@ -5481,7 +5360,7 @@ int mcuFestivalRemoteSpeechCmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
 	return 0;
 }
 
-int resetanim_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int resetanim_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	std::string motionName;
 	std::string outputFile;
@@ -5558,7 +5437,7 @@ int resetanim_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int animation_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	std::string motionName;
 
@@ -5733,11 +5612,12 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-int vhmsglog_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int vhmsglog_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (args.calc_num_tokens() == 0)
 	{
-		if (mcu_p->logListener)
+		if (mcu.logListener)
 		{
 			LOG("VHMSG logging is on");
 		}
@@ -5751,31 +5631,31 @@ int vhmsglog_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	std::string token = args.read_token();
 	if (token == "on")
 	{
-		if (mcu_p->logListener)
+		if (mcu.logListener)
 		{
 			LOG("VHMSG logging is already on");
 			return CMD_SUCCESS;
 		}
 		else
 		{
-			mcu_p->logListener = new VHMsgLogger();
-			vhcl::Log::g_log.AddListener(mcu_p->logListener);
+			mcu.logListener = new VHMsgLogger();
+			vhcl::Log::g_log.AddListener(mcu.logListener);
 			LOG("VHMSG logging is now on");
 			return CMD_SUCCESS;
 		}
 	}
 	else if (token == "off")
 	{
-		if (!mcu_p->logListener)
+		if (!mcu.logListener)
 		{
 			LOG("VHMSG logging is already off");
 			return CMD_SUCCESS;
 		}
 		else
 		{
-			vhcl::Log::g_log.RemoveListener(mcu_p->logListener);
-			delete mcu_p->logListener;
-			mcu_p->logListener = NULL;
+			vhcl::Log::g_log.RemoveListener(mcu.logListener);
+			delete mcu.logListener;
+			mcu.logListener = NULL;
 			LOG("VHMSG logging is now off");
 			return CMD_SUCCESS;
 		}
@@ -5788,7 +5668,7 @@ int vhmsglog_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 }
 
-int skscale_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int skscale_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	int num = args.calc_num_tokens();
 	if ( num > 1 )
@@ -5808,7 +5688,7 @@ int skscale_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_FAILURE;
 }
 
-int skmscale_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int skmscale_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	int num = args.calc_num_tokens();
 	if ( num > 1 )
@@ -5828,14 +5708,14 @@ int skmscale_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_FAILURE;
 }
 
-int mcu_reset_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
+int mcu_reset_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )
 {
 	// TODO: If arg, call as init, else call previous init
 	SmartBody::SBScene::destroyScene();
 	return( CMD_SUCCESS );
 }
 
-int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
+int mcu_echo_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )
 {
 	std::stringstream timeStr;
 	timeStr << SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
@@ -5848,8 +5728,9 @@ int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	return( CMD_SUCCESS );
 }
 
-int sb_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
+int sb_main_func( srArgBuffer & args, SmartBody::SBCommandManager* cmdMgr )
 {
+   mcuCBHandle& mcu = mcuCBHandle::singleton();
    const char * token = args.read_token();
    if ( strcmp( token, "id" ) == 0 )
    {  // Process specific
@@ -5866,7 +5747,7 @@ int sb_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
    strstr << token;
    if (args_raw)
 	   strstr << " " << args_raw;
-   int result = mcu_p->executePython( strstr.str().c_str() );
+   int result = mcu.executePython( strstr.str().c_str() );
    switch( result )
    {
       case CMD_NOT_FOUND:
@@ -5884,7 +5765,7 @@ int sb_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
    return CMD_SUCCESS;
 }
 
-int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
+int sbm_main_func( srArgBuffer & args, SmartBody::SBCommandManager* cmdMgr )
 {
    const char * token = args.read_token();
    if ( strcmp( token, "id" ) == 0 )
@@ -5899,7 +5780,7 @@ int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
 
    const char * args_raw = args.read_remainder_raw();
    srArgBuffer arg_buf( args_raw );
-   int result = mcu_p->execute( token, arg_buf );
+   int result = SmartBody::SBScene::getScene()->getCommandManager()->execute( token, arg_buf );
    switch( result )
    {
       case CMD_NOT_FOUND:
@@ -5917,19 +5798,19 @@ int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
    return CMD_SUCCESS;
 }
 
-int sbm_vhmsg_send_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
+int sbm_vhmsg_send_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )
 {
 	char* cmdName = args.read_token();
 	char* cmdArgs = args.read_remainder_raw();
-	return mcu_p->vhmsg_send( cmdName, cmdArgs );
+	return SmartBody::SBScene::getScene()->getVHMsgManager()->send( cmdName, cmdArgs );
 }
 
-int xmlcachedir_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int xmlcachedir_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	return CMD_SUCCESS;
 }
 
-int xmlcache_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int xmlcache_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	/*
 	std::string token = args.read_token();
@@ -5970,8 +5851,8 @@ int xmlcache_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	else if (token == "reset")
 	{
 		// delete the cache
-		for (std::map<std::string, DOMDocument*>::iterator iter = mcu_p->xmlCache.begin();
-			 iter != mcu_p->xmlCache.end();
+		for (std::map<std::string, DOMDocument*>::iterator iter = mcu.xmlCache.begin();
+			 iter != mcu.xmlCache.end();
 			 iter++)
 		{
 			(*iter).second->release();
@@ -5982,8 +5863,8 @@ int xmlcache_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	else
 	{
 		LOG("Current cache:");
-		for (std::map<std::string, DOMDocument*>::iterator iter = mcu_p->xmlCache.begin();
-			 iter != mcu_p->xmlCache.end();
+		for (std::map<std::string, DOMDocument*>::iterator iter = mcu.xmlCache.begin();
+			 iter != mcu.xmlCache.end();
 			 iter++)
 		{
 			LOG("%s", (*iter).first.c_str());

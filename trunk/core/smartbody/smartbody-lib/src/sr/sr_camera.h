@@ -57,6 +57,8 @@ class SrCamera : public SmartBody::SBPawn
     /*! Copy constructor. */
     SBAPI SrCamera ( const SrCamera* c );
 
+	SBAPI ~SrCamera ();
+
     /*! Initialize the camera with the main parameters eye, center and up. */
     SBAPI SrCamera ( const SrPnt& e, const SrPnt& c, const SrVec& u );
 

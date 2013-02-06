@@ -35,7 +35,8 @@
 #include <sb/SBScene.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBSimulationManager.h>
-
+#include <sb/SBCommandManager.h>
+#include <sb/SBAttribute.h>
 
 
 using namespace std;
@@ -129,15 +130,17 @@ bool read_options( const string& module, srArgBuffer& args, string& arg,
  *  Sets the contents of buffer to the cmd (usually vrSpeak or vrExpress) command for the given character & BML.
  */
 void build_vrX( ostringstream& buffer, const string& cmd, const string& char_id, const string& recip_id, const string& content, bool for_seq ) {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	buffer.str("");
 	if( for_seq )
 		buffer << "send " << cmd << " ";
 	buffer << char_id << " "<< recip_id << " sbm";
-	if( SmartBody::SBScene::getScene()->getProcessId() != "" )  // Insert process_id if present.
-		buffer << '_' << SmartBody::SBScene::getScene()->getProcessId(); 
-	buffer << "_test_bml_" << (++mcu.testBMLId) << endl << content;
+	if (scene->getProcessId() != "" )  // Insert process_id if present.
+		buffer << '_' << scene->getProcessId(); 
+
+	SmartBody::IntAttribute* intAttr = dynamic_cast<SmartBody::IntAttribute*>(scene->getAttribute("bmlIndex"));
+	buffer << "_test_bml_" << (intAttr->getValue()) << endl << content;
+	intAttr->setValue(intAttr->getValue() + 1);
 }
 
 /**
@@ -168,11 +171,11 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 					iter++)
 				{
 					build_vrX( msg, cmd, (*iter).second->getName().c_str(), recip_id, bml, false );
-					mcu.vhmsg_send( cmd, msg.str().c_str() );
+					SmartBody::SBScene::getScene()->getVHMsgManager()->send( cmd, msg.str().c_str() );
 				}
 			} else {
 				build_vrX( msg, cmd, char_id, recip_id, bml, false );
-				mcu.vhmsg_send( cmd, msg.str().c_str() );
+				SmartBody::SBScene::getScene()->getVHMsgManager()->send( cmd, msg.str().c_str() );
 			}
 		}
 		return CMD_SUCCESS;
@@ -232,8 +235,8 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 		}
 
 		if( send ) {
-			mcu.activeSequences.removeSequence( seq_id, true );  // remove old sequence by this name
-			if( !mcu.activeSequences.addSequence( seq_id, seq ))
+			SmartBody::SBScene::getScene()->getCommandManager()->getActiveSequences()->removeSequence( seq_id, true );  // remove old sequence by this name
+			if( !SmartBody::SBScene::getScene()->getCommandManager()->getActiveSequences()->addSequence( seq_id, seq ))
 			{
 				std::stringstream strstr;
 				strstr << "ERROR: send_vrX(..): Failed to insert seq into active sequences.";
@@ -241,8 +244,8 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 				return CMD_FAILURE;
 			}
 		} else {
-			mcu.pendingSequences.removeSequence( seq_id, true );   // remove old sequence by this name
-			if( !mcu.pendingSequences.addSequence( seq_id, seq ))
+			SmartBody::SBScene::getScene()->getCommandManager()->getPendingSequences()->removeSequence( seq_id, true );   // remove old sequence by this name
+			if( !SmartBody::SBScene::getScene()->getCommandManager()->getPendingSequences()->addSequence( seq_id, seq ))
 			{
 				std::stringstream strstr;
 				strstr << "ERROR: send_vrX(..): Failed to insert seq into pending sequences.";
@@ -282,7 +285,7 @@ void print_test_bml_help() {
 }
 
 // Handles all "test bml ..." sbm commands.
-int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
+int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 	string char_id = SmartBody::SBScene::getScene()->getStringAttribute("defaultCharacter");
 	string recip_id = SmartBody::SBScene::getScene()->getStringAttribute("defaultRecipient");
 	string seq_id;
@@ -612,7 +615,7 @@ void print_test_fml_help() {
 	LOG("\t<fml>...</fml>              // sends inline <fml> XML");
 }
 
-int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
+int test_fml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 	string char_id = SmartBody::SBScene::getScene()->getStringAttribute("defaultCharacter");
 	string recip_id = SmartBody::SBScene::getScene()->getStringAttribute("defaultRecipient");
 	string seq_id;
@@ -707,7 +710,7 @@ int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 }
 
 
-int test_bone_pos_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
+int test_bone_pos_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 	const string& character_id = SmartBody::SBScene::getScene()->getStringAttribute("defaultCharacter");
 	if( character_id.empty() ) {
 		LOG("ERROR: No test character defined");

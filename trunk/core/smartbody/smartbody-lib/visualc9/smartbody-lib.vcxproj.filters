@@ -403,9 +403,6 @@
     <ClCompile Include="..\src\sr\sr_alg.cpp">
       <Filter>sr</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\sr_arg_buff.cpp">
-      <Filter>sr</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sr\sr_array.cpp">
       <Filter>sr</Filter>
     </ClCompile>
@@ -991,6 +988,15 @@
     <ClCompile Include="..\src\sb\SBSpeechManager.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sb\SBVHMsgManager.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbm\sr_arg_buff.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sb\SBCommandManager.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\controllers\me_controller.h">
@@ -1407,9 +1413,6 @@
     <ClInclude Include="..\src\sr\sr_alg.h">
       <Filter>sr</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbm\sr_arg_buff.h">
-      <Filter>sr</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sr\sr_array.h">
       <Filter>sr</Filter>
     </ClInclude>
@@ -1438,9 +1441,6 @@
       <Filter>sr</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\sr_cmd_line.h">
-      <Filter>sr</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\sr_cmd_map.h">
       <Filter>sr</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\sr_cmd_seq.h">
@@ -2024,6 +2024,18 @@
     </ClInclude>
     <ClInclude Include="..\src\sb\SBSpeechManager.h">
       <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBVHMsgManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sr_arg_buff.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBCommandManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbm\sr_cmd_map.h">
+      <Filter>sbm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

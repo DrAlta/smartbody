@@ -24,6 +24,10 @@
 #include "sb/SBSpeechManager.h"
 #include "sb/SBSimulationManager.h"
 #include "sb/SBCharacterListener.h"
+#include <sbm/remote_speech.h>
+#include <sbm/local_speech.h>
+#include <sbm/text_speech.h>
+#include <sbm/sbm_speech_audiofile.hpp>
 #pragma warning(pop)
 
 
@@ -182,9 +186,6 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath, boo
    XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
 
 
-   // TODO: Replace with SBScene * g_scene = new SBScene();
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
-
    // TODO: Replace with g_scene->SetCharacterListener(m_internalListener)
    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
    scene->setCharacterListener(m_internalListener);
@@ -198,7 +199,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath, boo
    RegisterCallbacks();
 
    srArgBuffer arg_buf( "" );
-   mcu_vrAllCall_func( arg_buf, &mcu );
+   mcu_vrAllCall_func( arg_buf, scene->getCommandManager() );
 
    if (logToFile)
    {
@@ -230,8 +231,7 @@ void Smartbody_dll::InitLocalSpeechRelay()
 SMARTBODY_DLL_API bool Smartbody_dll::Shutdown()
 {
    {
-      mcuCBHandle & mcu = mcuCBHandle::singleton();
-      mcu.vhmsg_send( "vrProcEnd sbm" );
+	   SmartBody::SBScene::getScene()->getVHMsgManager()->send("vrProcEnd sbm");
    }
 
    mcuCBHandle::destroy_singleton();
@@ -481,7 +481,6 @@ bool Smartbody_dll::InitVHMsg()
 {
 #if !defined(ANDROID_BUILD) && !defined(IPHONE_BUILD)
 
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
    SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 
    printf( "Starting VHMsg (DLL side)\n" );
@@ -490,7 +489,7 @@ bool Smartbody_dll::InitVHMsg()
    scene;
    int err = vhmsg::ttu_open();
    if (err == vhmsg::TTU_SUCCESS)
-      mcu.vhmsg_enabled = true;
+	   SmartBody::SBScene::getScene()->getVHMsgManager()->setEnable(true);
 
 #endif
    return true;

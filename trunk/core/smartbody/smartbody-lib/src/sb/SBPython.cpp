@@ -1875,7 +1875,19 @@ void initPython(std::string pythonLibPath)
 		// redirect stdout
 		//LOG("Before redirect stdout");
 
-#ifdef PYLOG
+		setupPython();
+	} catch (...) {
+		PyErr_Print();
+		//LOG("PyError Exception");
+	}
+#endif
+}
+
+void setupPython()
+{
+#ifndef SB_NO_PYTHON
+	try {
+	#ifdef PYLOG
 #ifdef __ANDROID__
 		const char* pyfilename = "/sdcard/sbmmedia/pylog.txt";
 #else

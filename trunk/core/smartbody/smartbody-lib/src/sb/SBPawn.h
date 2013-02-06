@@ -17,6 +17,8 @@ class SBPawn : public SbmPawn
 		SBAPI SBPawn( const char* name );
 		SBAPI ~SBPawn();
 
+		SBAPI void setName(const std::string& name);
+
 		SBAPI virtual void addMesh(std::string mesh);
 		
 		SBAPI virtual SBSkeleton* getSkeleton();

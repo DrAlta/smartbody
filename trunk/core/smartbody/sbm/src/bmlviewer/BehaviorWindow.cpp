@@ -19,6 +19,7 @@
 #include <bml/bml_types.hpp>
 #include <sbm/text_speech.h>
 #include <sbm/remote_speech.h>
+#include <sbm/sbm_speech_audiofile.hpp>
 #include <bml/behavior_scheduler_fixed.hpp>
 #include "sbm/xercesc_utils.hpp"
 

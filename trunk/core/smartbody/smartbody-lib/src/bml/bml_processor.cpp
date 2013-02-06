@@ -124,7 +124,7 @@ namespace BML {
 		ostringstream buff;
 		buff << agent_id << " RECIPIENT " << message_id << " " << error_msg;
 		// TODO: Avoid singleton
-		mcu->vhmsg_send( "vrSpeakFailed", buff.str().c_str() );
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send( "vrSpeakFailed", buff.str().c_str() );
 
 		// New vrAgentBML form...
 		ostringstream buff2;
@@ -134,7 +134,7 @@ namespace BML {
 		buff2 << agent_id << " " << message_id << " end error " << error_msg;
 #endif
 		// TODO: Avoid singleton
-		mcu->vhmsg_send( "vrAgentBML", buff2.str().c_str() );
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send( "vrAgentBML", buff2.str().c_str() );
 	}
 };
 
@@ -1004,14 +1004,17 @@ MapOfBmlRequest& BML::Processor::getBMLRequestMap()
 ///////////////////////////////////////////////////////////////////////////////
 //  Static Command and Message Hooks
 
-int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
+int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	// show the message
 #if 0
 	LOG(args.peek_string());
 #endif
 
-	Processor& bp = mcu->bml_processor;
+	Processor& bp = mcu.bml_processor;
 
 	const char   *character_id     = args.read_token();
 	SmartBody::SBCharacter *character        = SmartBody::SBScene::getScene()->getCharacter( character_id );
@@ -1035,7 +1038,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	//cout << "DEBUG: vrAgentBML " << character_id << " " << recipientId << " " << messageId << endl;
 
 	if( !character->is_initialized() ) {
-		bml_error( character_id, message_id, "Uninitialized SbmCharacter.", mcu );
+		bml_error( character_id, message_id, "Uninitialized SbmCharacter.", &mcu );
 		return CMD_FAILURE;
 	}
 
@@ -1047,7 +1050,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		char       *xml          = args.read_remainder_raw();
 
 		if( xml[0]=='\0' ) {
-			bml_error( character_id, message_id, "\"vrAgentBML .. request\" message incomplete (empty XML argument).", mcu );
+			bml_error( character_id, message_id, "\"vrAgentBML .. request\" message incomplete (empty XML argument).", &mcu );
 			return CMD_FAILURE;
 		}
 		if( xml[0] == '"' ) {
@@ -1059,7 +1062,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		try {
 			DOMDocument *xmlDoc = xml_utils::parseMessageXml( bp.xmlParser, xml );
 			if( xmlDoc == NULL ) {
-				bml_error( character_id, message_id, "XML parser returned NULL document.", mcu );
+				bml_error( character_id, message_id, "XML parser returned NULL document.", &mcu );
 				return CMD_FAILURE;
 			}
 
@@ -1068,7 +1071,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 #else
 			BMLProcessorMsg bpMsg( character_id, message_id, character, xmlDoc, args );
 #endif
-			bp.bml_request( bpMsg, mcu );
+			bp.bml_request( bpMsg, &mcu );
 			if (xmlDoc)
 				xmlDoc->release();
 
@@ -1076,12 +1079,12 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		} catch( BML::BmlException& e ) {
 			ostringstream msg;
 			msg << e.type() << ": "<<e.what();
-			bml_error( character_id, message_id, msg.str().c_str(), mcu );
+			bml_error( character_id, message_id, msg.str().c_str(), &mcu );
 			return CMD_FAILURE;
 		} catch( const std::exception& e ) {
 			ostringstream msg;
 			msg << "std::exception: "<<e.what();
-			bml_error( character_id, message_id, msg.str().c_str(), mcu );
+			bml_error( character_id, message_id, msg.str().c_str(), &mcu );
 			return CMD_FAILURE;
 		//} catch( ... ) {
 		//	ostringstream msg;
@@ -1104,7 +1107,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 			return bp.bml_end( BMLProcessorMsg( character_id, recipient_id, message_id, character, NULL, args ), mcu );
 #else
 			BMLProcessorMsg msg( character_id, message_id, character, NULL, args );
-			int ret = bp.bml_end( msg, mcu );
+			int ret = bp.bml_end( msg, &mcu );
 
 			SmartBody::Nvbg* nvbg = character->getNvbg();
 			if (nvbg)
@@ -1146,8 +1149,10 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	}
 }
 
-int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
-	Processor& bp = mcu->bml_processor;
+int BML::Processor::vrSpeak_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
+	Processor& bp = mcu.bml_processor;
 	int suppress = 1;
 
 	const char *agent_id     = args.read_token();
@@ -1159,7 +1164,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 
 	try {
 		if( xml[0]=='\0' ) {
-			bml_error( agent_id, message_id, "vrSpeak message incomplete (empty XML argument).", mcu );
+			bml_error( agent_id, message_id, "vrSpeak message incomplete (empty XML argument).", &mcu );
 			return CMD_FAILURE;
 		}
 		if( xml[0] == '"' ) {
@@ -1197,7 +1202,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		}
 
 		if( !agent->is_initialized() ) {
-			bml_error( agent_id, message_id, "Uninitialized agent.", mcu );
+			bml_error( agent_id, message_id, "Uninitialized agent.", &mcu );
 			return CMD_FAILURE;
 		}
 
@@ -1218,7 +1223,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		}
 
 		if( xmlDoc == NULL ) {
-			bml_error( agent_id, message_id, "XML parser returned NULL document.", mcu );
+			bml_error( agent_id, message_id, "XML parser returned NULL document.", &mcu );
 			return CMD_FAILURE;
 		}
 
@@ -1227,7 +1232,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 #else
 		BMLProcessorMsg bpMsg( agent_id, message_id, agent, xmlDoc, args );
 #endif
-		bp.bml_request( bpMsg, mcu );
+		bp.bml_request( bpMsg, &mcu );
 		if (xmlDoc)
 			xmlDoc->release();
 
@@ -1235,12 +1240,12 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	} catch( BmlException& e ) {
 		ostringstream msg;
 		msg << e.type() << ": "<<e.what();
-		bml_error( agent_id, message_id, msg.str().c_str(), mcu );
+		bml_error( agent_id, message_id, msg.str().c_str(), &mcu );
 		return CMD_FAILURE;
 	} catch( const std::exception& e ) {
 		ostringstream msg;
 		msg << "std::exception: "<<e.what();
-		bml_error( agent_id, message_id, msg.str().c_str(), mcu );
+		bml_error( agent_id, message_id, msg.str().c_str(), &mcu );
 		return CMD_FAILURE;
 	//} catch( ... ) {
 	//	ostringstream msg;
@@ -1250,8 +1255,10 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	}
 }
 
-int BML::Processor::vrSpoke_func( srArgBuffer& args, mcuCBHandle *mcu )	{
-	Processor& bp = mcu->bml_processor;
+int BML::Processor::vrSpoke_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
+	Processor& bp = mcu.bml_processor;
 
 	//cout << "DEBUG: vrSpoke " << args.read_remainder_raw() << endl;
 	char *agent_id     = args.read_token();
@@ -1273,11 +1280,11 @@ int BML::Processor::vrSpoke_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 #else
 		BMLProcessorMsg bpMsg( agent_id, message_id, agent, NULL, args );
 #endif
-		return bp.bml_end( bpMsg, mcu );
+		return bp.bml_end( bpMsg, &mcu );
 	} catch( BmlException& e ) {
 		ostringstream msg;
 		msg << e.type() << ": "<<e.what();
-		bml_error( agent_id, message_id, msg.str().c_str(), mcu );
+		bml_error( agent_id, message_id, msg.str().c_str(), &mcu );
 		return CMD_FAILURE;
 	} catch( const exception& e ) {
 		std::stringstream strstr;
@@ -1291,8 +1298,10 @@ int BML::Processor::vrSpoke_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	}
 }
 
-int BML::Processor::bp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu ) {
-	Processor& bp = mcu->bml_processor;
+int BML::Processor::bp_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
+	Processor& bp = mcu.bml_processor;
 
     string command = args.read_token();
     if( command == "reset" ) {
@@ -1312,7 +1321,7 @@ int BML::Processor::bp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 		char* requestIdStr = args.read_token(); // as string
 		SmartBody::RequestId requestId = atoi( requestIdStr );
 
-		bp.speechReply( actor, requestId, args, mcu );
+		bp.speechReply( actor, requestId, args, &mcu );
 		return CMD_SUCCESS;  // Errors are dealt with out of band
 	} else if( command == "interrupt" ) {
 		// bp speech_ready <actor id> <BML performace/act id>
@@ -1351,7 +1360,7 @@ int BML::Processor::bp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			duration = 0;
 		}
 
-		return bp.interrupt( actor, performance_id, duration, mcu );
+		return bp.interrupt( actor, performance_id, duration, &mcu );
 	} else if( command == "feedback" ) {
 		std::string flag = args.read_token();
 		if (flag == "on")
@@ -1364,8 +1373,11 @@ int BML::Processor::bp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu ) {
     }
 }
 
-int BML::Processor::set_func( srArgBuffer& args, mcuCBHandle *mcu ) {
-	Processor& bp = mcu->bml_processor;
+int BML::Processor::set_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
+	Processor& bp = mcu.bml_processor;
 
 	string attribute = args.read_token();
 	if( attribute == "auto_print_controllers" ||
@@ -1512,8 +1524,10 @@ int BML::Processor::set_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 	}
 }
 
-int BML::Processor::print_func( srArgBuffer& args, mcuCBHandle *mcu ) {
-	Processor& bp = mcu->bml_processor;
+int BML::Processor::print_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	Processor& bp = mcu.bml_processor;
 
 	string attribute = args.read_token();
 	if( attribute == "auto_print_controllers" ||

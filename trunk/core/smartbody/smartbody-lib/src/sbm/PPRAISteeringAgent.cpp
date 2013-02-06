@@ -32,6 +32,7 @@
 #include <sb/SBSteerManager.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBCommandManager.h>
 
 #include <sbm/SteerPath.h>
 
@@ -622,7 +623,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 				std::stringstream command;
 				command << "panim schedule char " << character->getName();
 				command << " state " << locomotionName << " loop true playnow true";
-				mcu.execute((char*) command.str().c_str());  
+				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());  
 			}	
 		}
 		else
@@ -1412,14 +1413,14 @@ void PPRAISteeringAgent::startLocomotion( float angleDiff )
 				w = (angleDiff - 90) / (maxRotAngle-90);				
 				command << "panim schedule char " << character->getName();			
 				command << " state " << startingLName << " loop false playnow false additive false joint null " << " 0 " << 1 - w << " " << w;
-				mcu.execute((char*) command.str().c_str());				
+				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());				
 			}
 			else
 			{
 				w = angleDiff / 90;				
 				command << "panim schedule char " << character->getName();					
 				command << " state " << startingLName << " loop false playnow false additive false joint null " << 1 - w << " " << w << " " << " 0 ";
-				mcu.execute((char*) command.str().c_str());
+				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());
 			}
 		}		
 		else		
@@ -1430,14 +1431,14 @@ void PPRAISteeringAgent::startLocomotion( float angleDiff )
 				w = (angleDiff + maxRotAngle) / (maxRotAngle-90);				
 				command << "panim schedule char " << character->getName();
 				command << " state " << startingRName << " loop false playnow false additive false joint null " << " 0 " << w << " " << 1 - w;
-				mcu.execute((char*) command.str().c_str());
+				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());
 			}
 			else
 			{
 				w = -angleDiff / 90;					
 				command << "panim schedule char " << character->getName();
 				command << " state " << startingRName << " loop false playnow false additive false joint null " << 1 - w << " " << w << " 0 ";
-				mcu.execute((char*) command.str().c_str());
+				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());
 			}				
 		}
 		//LOG("start turn command = %s",command.str().c_str());
@@ -1464,7 +1465,7 @@ void PPRAISteeringAgent::startLocomotion( float angleDiff )
 		{
 			command1 << " " << weights[x];
 		}
-		mcu.execute((char*) command1.str().c_str());
+		SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command1.str().c_str());
 	}
 }
 
@@ -1484,7 +1485,7 @@ void PPRAISteeringAgent::adjustFacingAngle( float angleDiff )
 		command << " state " << idleTurnName << " loop false playnow false additive false joint null ";
 		for (int i = 0; i < idleTurnState->getNumMotions(); i++)
 			command << weights[i] << " ";
-		mcu.execute((char*) command.str().c_str());
+		SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());
 	}
 	else
 	{
@@ -1532,7 +1533,7 @@ float PPRAISteeringAgent::evaluateSteppingLoco(float dt, float x, float y, float
 			command << " state " << stepStateName << " loop false playnow false additive false joint null ";
 			for (int i = 0; i < stepState->getNumMotions(); i++)
 				command << weights[i] << " ";
-			mcu.execute((char*) command.str().c_str());
+			SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());
 		}	
 	}
 	if (dist < 10.0f)

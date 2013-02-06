@@ -22,5 +22,16 @@
 	#endif
 #endif
 
+#ifdef __ANDROID__
+#define LINK_VHMSG_CLIENT		(1)
+#define USE_WSP 1
+#elif defined(__native_client__)
+#define USE_WSP 0
+#else
+#define LINK_VHMSG_CLIENT		(1)
+#define USE_WSP 1
+#endif
+
+
 #endif
 

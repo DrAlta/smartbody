@@ -29,7 +29,7 @@
 #include <fstream>
 #include <sb/SBScene.h>
 #include <sb/SBAssetManager.h>
-
+#include <sb/SBCommandManager.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
@@ -182,7 +182,7 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 		//return 0;
 	}
 
-	mcu.execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
+	SmartBody::SBScene::getScene()->getCommandManager()->execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
 	return m_requestIdCounter++;
 }
 
@@ -266,7 +266,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    }
 
 
-   mcu.execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
+   SmartBody::SBScene::getScene()->getCommandManager()->execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
 
 
    return m_requestIdCounter++;

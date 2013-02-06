@@ -1,6 +1,7 @@
 #include "SBBmlProcessor.h"
 #include <sbm/mcontrol_util.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBCommandManager.h>
 #include <sb/SBScene.h>
 
 namespace SmartBody {
@@ -21,7 +22,7 @@ void SBBmlProcessor::vrSpeak(std::string agent, std::string recip, std::string m
 	msgStr << agent << " " << recip << " " << msgId << " " << msg;
 	srArgBuffer vrMsg(msgStr.str().c_str());
 	BML::Processor& bp = mcu.bml_processor;
-	bp.vrSpeak_func(vrMsg, &mcu);
+	bp.vrSpeak_func(vrMsg, SmartBody::SBScene::getScene()->getCommandManager());
 }
 
 void SBBmlProcessor::vrAgentBML(std::string op, std::string agent, std::string msgId, std::string msg)
@@ -33,7 +34,7 @@ void SBBmlProcessor::vrAgentBML(std::string op, std::string agent, std::string m
 		msgStr << agent << " " << msgId << " " << op << " " << msg;
 		srArgBuffer vrMsg(msgStr.str().c_str());
 		BML::Processor& bp = mcu.bml_processor;
-		bp.vrAgentBML_cmd_func(vrMsg, &mcu);
+		bp.vrAgentBML_cmd_func(vrMsg, SmartBody::SBScene::getScene()->getCommandManager());
 	}
 	else
 	{
@@ -47,10 +48,13 @@ std::string SBBmlProcessor::build_vrX(std::ostringstream& buffer, const std::str
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	std::stringstream msgId;
+	SmartBody::IntAttribute* intAttr = dynamic_cast<SmartBody::IntAttribute*>(SmartBody::SBScene::getScene()->getAttribute("bmlIndex"));
+
 	if (SmartBody::SBScene::getScene()->getProcessId()!= "")
-		msgId << "sbm_" << SmartBody::SBScene::getScene()->getProcessId() << "_test_bml_" << (++mcu.testBMLId);
+		msgId << "sbm_" << SmartBody::SBScene::getScene()->getProcessId() << "_test_bml_" << (intAttr->getValue());
 	else
-		msgId << "sbm_test_bml_" << ++mcu.testBMLId;
+		msgId << "sbm_test_bml_" << intAttr->getValue();
+	intAttr->setValue(intAttr->getValue() + 1);
 
 	buffer.str("");
 	if( for_seq )
@@ -83,12 +87,12 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 				{
 					SbmCharacter* character = (*iter).second;
 					msgId = build_vrX( msg, cmd, character->getName().c_str(), recip_id, bml, false );
-					mcu.vhmsg_send( cmd, msg.str().c_str() );
+					SmartBody::SBScene::getScene()->getVHMsgManager()->send( cmd, msg.str().c_str() );
 				}
 			} else {
 				msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false );
 				///////LOG("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
-				mcu.vhmsg_send( cmd, msg.str().c_str() );
+				SmartBody::SBScene::getScene()->getVHMsgManager()->send( cmd, msg.str().c_str() );
 			}
 		}
 		return msgId;
@@ -134,8 +138,8 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 		}
 
 		if( send ) {
-			mcu.activeSequences.removeSequence(seq_id, true); // remove old sequence by this name
-			if( !mcu.activeSequences.addSequence(seq_id, seq ))
+			SmartBody::SBScene::getScene()->getCommandManager()->getActiveSequences()->removeSequence(seq_id, true); // remove old sequence by this name
+			if( !SmartBody::SBScene::getScene()->getCommandManager()->getActiveSequences()->addSequence(seq_id, seq ))
 			{
 				std::stringstream strstr;
 				strstr << "ERROR: send_vrX(..): Failed to insert seq into active sequences.";
@@ -143,8 +147,8 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 				return msgId;
 			}
 		} else {
-			mcu.pendingSequences.removeSequence(seq_id, true);  // remove old sequence by this name
-			if (mcu.pendingSequences.addSequence(seq_id, seq))
+			SmartBody::SBScene::getScene()->getCommandManager()->getPendingSequences()->removeSequence(seq_id, true);  // remove old sequence by this name
+			if (SmartBody::SBScene::getScene()->getCommandManager()->getPendingSequences()->addSequence(seq_id, seq))
 			{
 				std::stringstream strstr;
 				strstr << "ERROR: send_vrX(..): Failed to insert seq into pending sequences.";

@@ -34,6 +34,10 @@
 #include <vector>
 #include <fstream>
 
+#ifndef USE_WSP
+#define USE_WSP 1
+#endif
+
 #if USE_WSP
 #include "wsp.h"
 #endif
@@ -48,6 +52,7 @@
 #include <sbm/remote_speech.h>
 #include <sbm/sbm_audio.h>
 #include <sbm/sbm_speech_audiofile.hpp>
+#include <sbm/local_speech.h> // [BMLR]
 #include <sbm/text_speech.h> // [BMLR]
 #include <sbm/locomotion_cmds.hpp>
 #include <sbm/time_regulator.h>
@@ -61,6 +66,8 @@
 #include "TransparentViewer.h"
 #include "sb/SBDebuggerServer.h"
 #include "sb/SBSpeechManager.h"
+#include "sb/SBVHMsgManager.h"
+#include "sb/SBCommandManager.h"
 #include "sbm/GPU/SbmShader.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -153,9 +160,38 @@ void TransparentViewerFactory::reset(SrViewer* viewer)
 }
 
 
+int mcu_quit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )	{
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->getSimulationManager()->stop();
+	if (scene->getSteerManager()->getEngineDriver()->isInitialized())
+	{
+		scene->getSteerManager()->getEngineDriver()->stopSimulation();
+		scene->getSteerManager()->getEngineDriver()->unloadSimulation();
+		scene->getSteerManager()->getEngineDriver()->finish();
+	
+		std::vector<std::string> characterNames = scene->getCharacterNames();
+		for (std::vector<std::string>::iterator iter = characterNames.begin();
+			iter != characterNames.end();
+			iter++)
+		{
+			SmartBody::SBCharacter* character = scene->getCharacter((*iter));
+			SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(character->getName());
+			if (steerAgent)
+			{
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+				ppraiAgent->setAgent(NULL);
+			}
+		}
+	}
+	return( CMD_SUCCESS );
+}
+
 void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 	// Replace singleton with a user_data pointer
-	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
+	switch( SmartBody::SBScene::getScene()->getCommandManager()->execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
             LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
             break;
@@ -169,7 +205,7 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 
 int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
-	mcu_p->loop = false;
+	SmartBody::SBScene::getScene()->getSimulationManager()->stop();
 
 	if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
 	{
@@ -195,21 +231,22 @@ int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 void mcu_register_callbacks( void ) {
 	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
+	SmartBody::SBCommandManager* cmdMgr = SmartBody::SBScene::getScene()->getCommandManager();
+	
 	// additional commands associated with this viewer
-	mcu.insert( "q",			mcu_quit_func );
-	mcu.insert( "quit",			mcu_quit_func );
+	cmdMgr->insert( "q",			mcu_quit_func );
+	cmdMgr->insert( "quit",			mcu_quit_func );
 //	mcu.insert( "snapshot",		mcu_snapshot_func );
-	mcu.insert( "viewer",		mcu_viewer_func );
+	cmdMgr->insert( "viewer",		mcu_viewer_func );
 }
 
 void cleanup( void )	{
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		if( mcu.loop )	{
+		if (SmartBody::SBScene::getScene()->getSimulationManager()->isRunning())
+		{
 			LOG( "SBM NOTE: unexpected exit " );
-			mcu.loop = false;
+			SmartBody::SBScene::getScene()->getSimulationManager()->stop();
 		}
 
 		if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
@@ -217,10 +254,10 @@ void cleanup( void )	{
 			AUDIO_Close();
 		}
 
-		mcu.vhmsg_send( "vrProcEnd sbm" );
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send( "vrProcEnd sbm" );
 
 #if LINK_VHMSG_CLIENT
-		if( mcu.vhmsg_enabled )	{
+		if( SmartBody::SBScene::getScene()->getVHMsgManager()->isEnable() )	{
 			vhmsg::ttu_close();
 		}
 #endif
@@ -245,7 +282,7 @@ void signal_handler(int sig) {
 //	std::cout << "SmartBody shutting down after catching signal " << sig << std::endl;
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.vhmsg_send( "vrProcEnd sbm" );
+	SmartBody::SBScene::getScene()->getVHMsgManager()->send( "vrProcEnd sbm" );
 	// get the current directory
 #ifdef WIN32
 	char buffer[MAX_PATH];
@@ -600,7 +637,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		err = vhmsg::ttu_register( "vrBCFeedback" );
 		err = vhmsg::ttu_register( "vrSpeech" );
 
-		mcu.vhmsg_enabled = true;
+		SmartBody::SBScene::getScene()->getVHMsgManager()->setEnable(true);
 	} else {
 		if( vhmsg_disabled ) {
 			LOG( "SBM: VHMSG_SERVER='%s': Messaging disabled.\n", vhmsg_server?"NULL":vhmsg_server );
@@ -615,7 +652,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 			LOG("Could not connect to %s:%s", vhserver.c_str(), vhport.c_str());
 #endif
 		}
-		mcu.vhmsg_enabled = false;
+		SmartBody::SBScene::getScene()->getVHMsgManager()->setEnable(false);
 	}
 #endif
 
@@ -659,7 +696,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	{
 		std::stringstream strstr;
 		strstr << "path me " << it->c_str();
-		mcu.execute( (char *) strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->getCommandManager()->execute( (char *) strstr.str().c_str() );
 	}
 
 	for( it = seq_paths.begin();
@@ -669,7 +706,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		std::stringstream strstr;
 		strstr << "path seq " << (it->c_str());
 		SrString seq_command = SrString( "path seq " );
-		mcu.execute( (char *) strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->getCommandManager()->execute( (char *) strstr.str().c_str() );
 	}
 
 	for( it = audio_paths.begin();
@@ -678,7 +715,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	{
 		std::stringstream strstr;
 		strstr <<  "path audio " << it->c_str();
-		mcu.execute( (char *) strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->getCommandManager()->execute( (char *) strstr.str().c_str() );
 	}
 
 
@@ -703,7 +740,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		 ++it )
 	{
 		SrString seq_command = SrString( "seq " ) << (it->c_str()) << " begin";
-		mcu.execute( (char *)(const char *)seq_command );
+		SmartBody::SBScene::getScene()->getCommandManager()->execute( (char *)(const char *)seq_command );
 	}
 
 
@@ -724,7 +761,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 
 	// Notify world SBM is ready to receive messages
 	srArgBuffer argBuff("");
-	mcu_vrAllCall_func( argBuff, &mcu );
+	mcu_vrAllCall_func( argBuff, SmartBody::SBScene::getScene()->getCommandManager() );
 
 	SmartBody::SBScene::getScene()->getSimulationManager()->start();
 
@@ -738,7 +775,8 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	std::string pythonPrompt = "# ";
 	std::string commandPrompt = "> ";
 
-	while( mcu.loop )	{
+	while( SmartBody::SBScene::getScene()->getSimulationManager()->isRunning())
+	{
 
 		SmartBody::SBScene::getScene()->getSimulationManager()->updateProfiler();
 		bool update_sim =SmartBody::SBScene::getScene()->getSimulationManager()->updateTimer();
@@ -750,7 +788,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		 {
 			if (msg.message == WM_QUIT)
 			{
-				mcu.loop = false;
+				SmartBody::SBScene::getScene()->getSimulationManager()->stop();
 				break;
 			}
             if (GetMessage(&msg, NULL, 0, 0))
@@ -761,7 +799,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		 }
 
 #if LINK_VHMSG_CLIENT
-		if( mcu.vhmsg_enabled )	{
+		 if( SmartBody::SBScene::getScene()->getVHMsgManager()->isEnable() )	{
 			err = vhmsg::ttu_poll();
 			if( err == vhmsg::TTU_ERROR )	{
 				fprintf( stderr, "ttu_poll ERROR\n" );
@@ -771,7 +809,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 
 		vector<string> commands;// = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
-			mcu.execute( (char *)commands[i].c_str() );
+			SmartBody::SBScene::getScene()->getCommandManager()->execute((char *)commands[i].c_str() );
 		}
 
 #if USE_WSP

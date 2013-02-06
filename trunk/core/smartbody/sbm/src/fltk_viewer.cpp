@@ -3002,7 +3002,7 @@ void FltkViewer::drawPawns()
 		else
 		{
 			// draw default sphere
-			glPushAttrib(GL_LIGHTING_BIT);
+			glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT);
 			glDisable(GL_LIGHTING);
 			glPushMatrix();
 			glMultMatrixf((const float*) gmat);

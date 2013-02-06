@@ -87,7 +87,7 @@ AttributeWindow::AttributeWindow(SmartBody::SBObject* obj, int x, int y, int w, 
 
 AttributeWindow::~AttributeWindow()
 {
-	cleanUpAttributesInfo();
+//	cleanUpAttributesInfo();
 		
 }
 

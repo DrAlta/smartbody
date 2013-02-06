@@ -10,6 +10,7 @@ scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'retarget\motion')
 scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath('script', 'sbm-common/common-sk')
 scene.loadAssets()
 
 # Runs the default viewer for camera

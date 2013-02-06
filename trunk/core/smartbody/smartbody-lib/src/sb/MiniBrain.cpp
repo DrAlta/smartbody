@@ -2,6 +2,8 @@
 #include <sbm/mcontrol_util.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBScene.h>
+#include <sb/SBCommandManager.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_gaze.h>
 
@@ -202,7 +204,7 @@ void MiniBrain::update(SBCharacter* character, double time, double dt)
 			std::stringstream strstr;
 			strstr << "bml char " << character->getName() << " <gaze target=\"" << fastestObject << "\" sbm:joint-range=\"EYES NECK\"/>" << std::endl;
 			fastestData->startGazeTime = time;
-			mcu.execute((char*) strstr.str().c_str());
+			SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) strstr.str().c_str());
 			return;
 		}
 
@@ -217,11 +219,11 @@ void MiniBrain::update(SBCharacter* character, double time, double dt)
 				std::stringstream strstr;
 				strstr << "char " << character->getName() << " gazefade out .5" << std::endl;
 				data.startGazeTime = -1;
-				mcu.execute((char*) strstr.str().c_str());
+				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) strstr.str().c_str());
 
 				std::stringstream strstr2;
 				strstr2 << "char " << character->getName() << " prune" << std::endl;
-				mcu.execute_later((char*) strstr2.str().c_str(), 3 + float(rand() % 100) * .01f);
+				SmartBody::SBScene::getScene()->getCommandManager()->execute_later((char*) strstr2.str().c_str(), 3 + float(rand() % 100) * .01f);
 
 
 			}

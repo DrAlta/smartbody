@@ -77,11 +77,33 @@ SBPawn::~SBPawn()
 {
 }
 
+void SBPawn::setName(const std::string& name)
+{
+	std::string oldName = getName();
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	// remove name from character and pawn maps
+	bool exists = false;
+	std::map<std::string, SbmPawn*>::iterator iter = mcu.pawn_map.find(oldName);
+	if (iter != mcu.pawn_map.end())
+	{
+		mcu.pawn_map.erase(iter);
+		exists = true;
+	}
+
+	SBObject::setName(name);
+
+	if (exists)
+	{
+		// add to new pawn name
+		 mcu.pawn_map.insert(std::pair<std::string, SBPawn*>(name, this));
+	}
+}
 
 void SBPawn::addMesh(std::string mesh)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu_load_mesh( getName().c_str(), mesh.c_str(), &mcu );
+	mcu_load_mesh( getName().c_str(), mesh.c_str(), SmartBody::SBScene::getScene()->getCommandManager());
 }
 
 SBSkeleton* SBPawn::getSkeleton()
@@ -309,7 +331,7 @@ void SBPawn::notify(SBSubject* subject)
 		{
 			SmartBody::StringAttribute* meshAttr = dynamic_cast<SmartBody::StringAttribute*>(attribute);
 			mcuCBHandle& mcu = mcuCBHandle::singleton();
-			mcu_load_mesh(getName().c_str(), meshAttr->getValue().c_str(), &mcu, "");
+			mcu_load_mesh(getName().c_str(), meshAttr->getValue().c_str(), SmartBody::SBScene::getScene()->getCommandManager(), "");
 		}
 		else if (attribute->getName() == "meshScale")
 		{

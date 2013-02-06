@@ -7,6 +7,7 @@ class text_speech;
 
 
 #include <string>
+#include <sb/SBCommandManager.h>
 #include "sbm/sbm_speech.hpp"
 #include "sr_hash_map.h"
 #include "sr_arg_buff.h"
@@ -33,7 +34,7 @@ class text_speech: public SmartBody::SpeechInterface {
 		void requestComplete( SmartBody::RequestId requestId );
 
 		void startSchedule( SmartBody::RequestId requestId );
-		static int text_speech_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+		static int text_speech_func( srArgBuffer& args, SmartBody::SBCommandManager* manager);
 	private:
 		std::vector<SmartBody::VisemeData *>* extractVisemes(DOMNode* node, std::vector<SmartBody::VisemeData*>* visemes, const SbmCharacter* character);
 		std::string forPlaysound;

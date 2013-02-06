@@ -38,7 +38,7 @@
 #include "VisualizationView.h"
 #include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
-
+#include <sb/SBCommandManager.h>
 
 PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
 {
@@ -198,7 +198,7 @@ void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double
 	{
 		if (!scene->isRemoteMode())
 		{
-			if( mcu.execute_seq(seq) != CMD_SUCCESS ) 
+			if( SmartBody::SBScene::getScene()->getCommandManager()->execute_seq(seq) != CMD_SUCCESS ) 
 				LOG("ERROR: PanimationWindow::generateBML: Failed to execute sequence.");			
 		}
 		else
