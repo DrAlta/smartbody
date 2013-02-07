@@ -381,6 +381,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->shadowmode = ModeNoShadows;
    _data->terrainMode = ModeTerrain;
    _data->eyeBeamMode = ModeNoEyeBeams;
+   _data->gazeLimitMode = ModeNoGazeLimit;
    _data->eyeLidMode = ModeNoEyeLids;
    _data->dynamicsMode = ModeNoDynamics;
    _data->locomotionMode = ModeEnableLocomotion;
@@ -592,6 +593,11 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
                        break;
       case CmdEyeBeams: _data->eyeBeamMode = ModeEyeBeams;
                        break;
+	  case CmdNoGazeLimit  : _data->gazeLimitMode = ModeNoGazeLimit;             
+		  break;
+	  case CmdGazeLimit: _data->gazeLimitMode = ModeGazeLimit;
+		  break;
+
 	  case CmdNoEyeLids  : _data->eyeLidMode = ModeNoEyeLids;             
                        break;
 	  case CmdEyeLids: _data->eyeLidMode = ModeEyeLids;
@@ -1520,6 +1526,7 @@ void FltkViewer::draw()
 	drawGrid();
 	drawSteeringInfo();
 	drawEyeBeams();
+	drawGazeJointLimits();
 	drawEyeLids();
 	drawDynamics();
 	drawLocomotion();
@@ -2555,11 +2562,83 @@ void FltkViewer::drawGrid()
 	glPopAttrib();
 }
 
+
+void FltkViewer::drawJointLimitCone( SmartBody::SBJoint* joint, float coneSize, float pitchUpLimit, float pitchDownLimit, float headLimit )
+{
+	SrMat gmat = joint->gmat();
+	SrVec center = SrVec(0,0,0);
+	SrVec pitchUpVec = joint->localGlobalAxis(2)*SrQuat(joint->localGlobalAxis(0),(float)sr_torad(pitchUpLimit));
+	SrVec pitchDownVec = joint->localGlobalAxis(2)*SrQuat(joint->localGlobalAxis(0),(float)sr_torad(pitchDownLimit));
+	SrVec pitchLeftVec = joint->localGlobalAxis(2)*SrQuat(joint->localGlobalAxis(1),(float)sr_torad(headLimit));
+	SrVec pitchRightVec = joint->localGlobalAxis(2)*SrQuat(joint->localGlobalAxis(1),(float)sr_torad(-headLimit));
+	pitchUpVec *= coneSize;	pitchDownVec *= coneSize; pitchLeftVec *= coneSize; pitchRightVec *= coneSize;
+	
+	glPushMatrix();
+	glMultMatrixf((const float*) gmat);
+	glColor3f(1.0, 0.0, 0.0);
+	glBegin(GL_TRIANGLES);
+	glVertex3fv(&center[0]);
+	glVertex3fv(&pitchRightVec[0]);
+	glVertex3fv(&pitchUpVec[0]);
+	glVertex3fv(&center[0]);
+	glVertex3fv(&pitchDownVec[0]);	
+	glVertex3fv(&pitchRightVec[0]);
+	glVertex3fv(&center[0]);
+	glVertex3fv(&pitchLeftVec[0]);	
+	glVertex3fv(&pitchDownVec[0]);	
+	glVertex3fv(&center[0]);
+	glVertex3fv(&pitchUpVec[0]);		
+	glVertex3fv(&pitchLeftVec[0]);		
+	glEnd();
+	glPopMatrix();
+
+}
+
+void FltkViewer::drawGazeJointLimits()
+{	
+	if (_data->gazeLimitMode == ModeNoGazeLimit)
+		return;
+
+	glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE );
+	std::string jointNames[] = {"eyeball_left","eyeball_right", "spine4", "spine3", "spine1"};
+	std::string gazeKeys[] = {"Eyes","Eyes", "Neck", "Chest", "Back"};
+	std::string gazeLimitNames[] = {"gaze.limitPitchUp", "gaze.limitPitchDown", "gaze.limitHeading" };
+	 
+	glDisable(GL_CULL_FACE);
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
+		iter++)
+	{
+		SmartBody::SBCharacter* character = scene->getCharacter((*iter));
+		character->getSkeleton()->invalidate_global_matrices();
+		character->getSkeleton()->update_global_matrices();
+		float coneSize = character->getHeight()*0.1f;
+
+		for (unsigned int i=0;i<5;i++)
+		{
+			SmartBody::SBJoint* joint = character->getSkeleton()->getJointByName(jointNames[i]);
+			if (!joint)
+				continue;
+			float gazeLimits[3];
+			for (unsigned k=0;k<3;k++)
+			{
+				gazeLimits[k] = (float)character->getDoubleAttribute(gazeLimitNames[k]+gazeKeys[i]);
+			}
+			drawJointLimitCone(joint,coneSize,gazeLimits[0],gazeLimits[1],gazeLimits[2]);
+		}		
+	}
+	glEnable(GL_CULL_FACE);
+	glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );
+}
+
+
 void FltkViewer::drawEyeBeams()
 {
 	if (_data->eyeBeamMode == ModeNoEyeBeams)
 		return;
-
+	//drawGazeJointLimits();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::vector<std::string> characterNames = scene->getCharacterNames();
 	for (std::vector<std::string>::iterator iter = characterNames.begin();

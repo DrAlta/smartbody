@@ -297,8 +297,8 @@ SMARTBODY_DLL_API bool Smartbody_dll::MapSkeleton( const char * mapName, const c
 	return CMD_SUCCESS;
 
 
-    int ret = mcu.map_skeleton( mapName, skeletonName );
-    return ret == CMD_SUCCESS;
+    //int ret = mcu.map_skeleton( mapName, skeletonName );
+    //return ret == CMD_SUCCESS;
 }
 
 SMARTBODY_DLL_API bool Smartbody_dll::MapMotion( const char * mapName, const char * motionName )
