@@ -526,13 +526,13 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		{
 			SrString fps = s;
 			fps.remove( 0, 5 );
-			SmartBody::SBScene::getScene()->getSimulationManager()->setSleepFps( atof( fps ) );
+			SmartBody::SBScene::getScene()->getSimulationManager()->setSleepFps( (float)atof( fps ) );
 		}
 		else if( s.search( "-perf=" ) == 0 )  // argument starts with -perf=
 		{
 			SrString interval = s;
 			interval.remove( 0, 6 );
-			SmartBody::SBScene::getScene()->getSimulationManager()->set_perf( atof( interval ) );
+			SmartBody::SBScene::getScene()->getSimulationManager()->set_perf( (float)atof( interval ) );
 		}
 		else if ( s.search( "-facebone" ) == 0 )
 		{
