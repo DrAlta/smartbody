@@ -70,7 +70,7 @@ def retargetBehaviorSet(charName, skelName):
 	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
 	if not os.path.exists(outDir):
 		os.makedirs(outDir)
-		
+	'''	
 	# retarget kicking
 	for n in range(0, len(kickMotions)):
 		retargetMotion(kickMotions[n], 'ChrGarza.sk', skelName, outDir + 'kicking/');
@@ -80,5 +80,9 @@ def retargetBehaviorSet(charName, skelName):
 	# setup standard locomotion
 	scene.run("stateKicking.py")
 	kickingSetup(skelName, "base", skelName, skelName)
+	'''
+	createRetargetInstance('ChrGarza.sk', skelName)
+	scene.run("stateKicking.py")
+	kickingSetup('ChrGarza.sk', "base", '', '')
 	
 		

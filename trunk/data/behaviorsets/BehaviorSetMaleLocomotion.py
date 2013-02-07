@@ -48,30 +48,30 @@ def retargetBehaviorSet(charName, skelName):
 		os.makedirs(outDir)
 		
 	# retarget standard locomotions
-	for n in range(0, len(locoMotions)):
-		curMotion = scene.getMotion(locoMotions[n])
-		if curMotion is not None:
-			retargetMotion(locoMotions[n], 'test_utah.sk', skelName, outDir + 'MaleLocomotion/');
-
+	#for n in range(0, len(locoMotions)):
+	#	curMotion = scene.getMotion(locoMotions[n])
+	#	if curMotion is not None:
+	#		retargetMotion(locoMotions[n], 'test_utah.sk', skelName, outDir + 'MaleLocomotion/');
+	createRetargetInstance('test_utah.sk', skelName)
 	# setup standard locomotion
 	scene.run("stateAllLocomotion.py")
-	locomotionSetup(skelName, "base", skelName, skelName)
+	locomotionSetup('test_utah.sk', 'test_utah.sk', "base", '', 'all')
 	
 	# starting state, starting locomotion with different angle
 	scene.run("stateAllStarting.py")
-	startingSetup(skelName, "base", skelName, skelName)
+	startingSetup('test_utah.sk', 'test_utah.sk', "base", '', 'all')
 
 	# idle turn state, facing adjusting
 	scene.run("stateAllIdleTurn.py")
-	idleTurnSetup(skelName, "base", skelName, skelName)
+	idleTurnSetup('test_utah.sk', 'test_utah.sk', "base", '', 'all')
 
 	# step state, stepping adjusting
 	scene.run("stateAllStep.py")
-	stepSetup(skelName, "base", skelName, skelName)
+	stepSetup('test_utah.sk', 'test_utah.sk', "base", '', 'all')
 
 	# transitions
 	scene.run("transitions.py")
-	transitionSetup(skelName, skelName)
+	transitionSetup('', 'all')
 	
 	# setup steering
 	scene.run("init-steer-agents.py")

@@ -1,4 +1,30 @@
+def createRetargetInstance(srcSkelName, tgtSkelName):
+	endJoints = StringVec();
+	#endJoints.append('l_ankle')
+	endJoints.append('l_forefoot')
+	endJoints.append('l_toe')
+	endJoints.append('l_wrist')
+	#endJoints.append('r_ankle')		
+	endJoints.append('r_forefoot')	
+	endJoints.append('r_toe')	
+	endJoints.append('r_wrist')
 
+	relativeJoints = StringVec();
+	relativeJoints.append('spine1')
+	relativeJoints.append('spine2')
+	relativeJoints.append('spine3')
+	relativeJoints.append('spine4')
+	relativeJoints.append('spine5')
+	relativeJoints.append('r_sternoclavicular')
+	relativeJoints.append('l_sternoclavicular')
+	relativeJoints.append('r_acromioclavicular')
+	relativeJoints.append('l_acromioclavicular')	
+	# replace retarget each animation with just a simple retarget instance
+	retargetManager = scene.getRetargetManager()
+        retarget = retargetManager.getRetarget(srcSkelName,tgtSkelName)
+	if retarget == None:
+		retarget = 	retargetManager.createRetarget(srcSkelName,tgtSkelName)
+		retarget.initRetarget(endJoints,relativeJoints)
 
 def retargetMotion(motionName, srcSkelName, tgtSkelName, outDir) :	
 	testMotion = scene.getMotion(motionName)

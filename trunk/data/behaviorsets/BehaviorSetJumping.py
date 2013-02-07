@@ -90,14 +90,16 @@ def retargetBehaviorSet(charName, skelName):
 		os.makedirs(outDir)
 	scene.loadAssetsFromPath(outDir+"jumping/")
 		
+	createRetargetInstance('ChrGarza.sk', skelName)
 	# retarget jumping
-	for n in range(0, len(jumpMotions)):
-		retargetMotion(jumpMotions[n], 'ChrGarza.sk', skelName, outDir + 'jumping/');
+	#for n in range(0, len(jumpMotions)):
+	#	retargetMotion(jumpMotions[n], 'ChrGarza.sk', skelName, outDir + 'jumping/');
 		
 
 
 	# setup standard locomotion
 	scene.run("stateJumping.py")
-	jumpingSetup(skelName, "base", skelName, skelName)
+	#jumpingSetup(skelName, "base", skelName, skelName)
+	jumpingSetup('ChrGarza.sk', "base", '','')
 	
 		

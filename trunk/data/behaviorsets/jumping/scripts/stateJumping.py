@@ -2,6 +2,8 @@ def jumpingSetup(skeletonName, baseJoint, prefix, statePreFix):
 	blendManager = scene.getBlendManager()
 
 	blendjumping = blendManager.createMotionBlendBase(prefix + "Jump", skeletonName, 3)
+	
+	blendjumping.setBlendSkeleton(skeletonName)
 
 	motions = StringVec()
 	motions = StringVec()

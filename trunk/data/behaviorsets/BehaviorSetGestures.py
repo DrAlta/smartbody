@@ -52,8 +52,9 @@ def setupBehaviorSet():
 	gestureMotions.append("ChrBrad@Idle01_YouLf01")
 	
 	for i in range(0, len(gestureMotions)):
-		motion = scene.getMotion(gestureMotions[i])
+		motion = scene.getMotion(gestureMotions[i])		
 		zebra2Map.applyMotion(motion)
+		
 
 
 def retargetBehaviorSet(charName, skelName):
@@ -97,17 +98,26 @@ def retargetBehaviorSet(charName, skelName):
 	gestureMotions.append("ChrBrad@Idle01_WeightShift02")
 	gestureMotions.append("ChrBrad@Idle01_YouLf01")
 	
-	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
-	print 'outDir = ' + outDir ;
-	if not os.path.exists(outDir):
-		os.makedirs(outDir)
+	motions = StringVec()
+	assetManager = scene.getAssetManager()
+	for i in range(0, len(gestureMotions)):
+		sbMotion = assetManager.getMotion(gestureMotions[i])
+		if sbMotion != None:
+			sbMotion.setMotionSkeletonName("ChrBrad.sk")
+	
+	createRetargetInstance('ChrBrad.sk', skelName)
+	
+	#outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
+	#print 'outDir = ' + outDir ;
+	#if not os.path.exists(outDir):
+	#	os.makedirs(outDir)
 
 	# retarget gestures
-	for n in range(0, len(gestureMotions)):
-		curMotion = scene.getMotion(gestureMotions[n])
-		if curMotion is not None:
-			retargetMotion(gestureMotions[n], 'ChrBrad.sk', skelName, outDir + 'Gestures/');
-		else:
-			print "Cannot find motion " + gestureMotions[n] + ", it will be excluded from the gesture setup..."
+	#for n in range(0, len(gestureMotions)):
+	#	curMotion = scene.getMotion(gestureMotions[n])
+	#	if curMotion is not None:
+	#		retargetMotion(gestureMotions[n], 'ChrBrad.sk', skelName, outDir + 'Gestures/');
+	#	else:
+	#		print "Cannot find motion " + gestureMotions[n] + ", it will be excluded from the gesture setup..."
 
 		

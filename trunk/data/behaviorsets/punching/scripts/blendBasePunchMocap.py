@@ -7,6 +7,7 @@ def blendPunchSetup(skeletonName, baseJoint, preFix, statePreFix, interpolatorTy
 	if (stateManager.getBlend(stateName) != None): # don't create duplicate state
 		return		
 	state = stateManager.createMotionBlendBase(stateName, skeletonName, 3)
+	state.setBlendSkeleton(skeletonName)
 	# add motions
 	motions = StringVec()
 	motions.append("ChrGarza@IdleFight01_PunchForwardFloor01")

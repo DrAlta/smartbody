@@ -2,6 +2,7 @@ def punchingSetup(skeletonName, baseJoint, prefix, statePreFix):
 	blendManager = scene.getBlendManager()
 
 	blendPunching = blendManager.createMotionBlendBase(prefix + "Punch", skeletonName, 3)
+	blendPunching.setBlendSkeleton(skeletonName)
 
 	motions = StringVec()
 	motions = StringVec()
