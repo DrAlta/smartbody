@@ -3996,16 +3996,14 @@ int triggerevent_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 int mcu_python_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	std::string command = args.read_remainder_raw();
-	return mcu.executePython(command.c_str());
+	return SmartBody::SBScene::getScene()->run(command.c_str());
 }
 
 int mcu_pythonscript_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	std::string scriptName = args.read_token();	
-	return mcu.executePythonFile(scriptName.c_str());
+	return SmartBody::SBScene::getScene()->runScript(scriptName.c_str());
 }
 
 
@@ -5747,7 +5745,7 @@ int sb_main_func( srArgBuffer & args, SmartBody::SBCommandManager* cmdMgr )
    strstr << token;
    if (args_raw)
 	   strstr << " " << args_raw;
-   int result = mcu.executePython( strstr.str().c_str() );
+   int result = SmartBody::SBScene::getScene()->run( strstr.str().c_str() );
    switch( result )
    {
       case CMD_NOT_FOUND:

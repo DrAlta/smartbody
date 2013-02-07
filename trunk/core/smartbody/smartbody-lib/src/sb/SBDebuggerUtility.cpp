@@ -118,7 +118,7 @@ void SBDebuggerUtility::initPawn(const std::string& name)
 */
 void SBDebuggerUtility::runPythonCommand(const std::string& info)
 {
-	mcuCBHandle::singleton().executePython(info.c_str());
+	SmartBody::SBScene::getScene()->run(info.c_str());
 }
 
 void SBDebuggerUtility::initSkeleton(const std::string& skFileName, const std::string& info)

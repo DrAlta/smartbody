@@ -242,29 +242,7 @@ public:
 		// ----------------------------------------------
 		// END vhmsg and network management
 		// ----------------------------------------------
-
-		// ----------------------------------------------
-		// asset management
-		// ----------------------------------------------
-		
-		int map_skeleton( const char * mapName, const char * skeletonName );
-		int map_motion( const char * mapName, const char * motionName );
-
-		// ----------------------------------------------
-		// END asset management
-		// ----------------------------------------------
-
-
-		// ----------------------------------------------
-		// command management
-		// ----------------------------------------------
-		
-
-		int executePython(const char* command);
-		int executePythonFile(const char* filename);
-
-
-		
+	
 		// ----------------------------------------------
 		// viewer management
 		// ----------------------------------------------

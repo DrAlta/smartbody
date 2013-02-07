@@ -527,7 +527,10 @@ int main( int argc, char **argv )	{
 	for (	i=1; i<argc; i++ )
 	{
 		LOG( "SmartBody ARG[%d]: '%s'", i, argv[i] );
-		string s = argv[i];
+		std::string s = argv[i];
+		std::string mediapathstr = "";
+		if (s.size() > 11)
+			mediapathstr = s.substr(0, 10);
 
 		if( s == "-pythonpath" )  // argument -pythonpath
 		{
@@ -560,7 +563,7 @@ int main( int argc, char **argv )	{
 			if( ++i < argc ) {
 				LOG( "    Adding sequence path '%s'\n", argv[i] );
 
-				seq_paths.push_back( argv[i] );
+				//seq_paths.push_back( argv[i] );
 				py_paths.push_back( argv[i] );
 			} else {
 				LOG( "ERROR: Expected directory path to follow -seqpath\n" );
@@ -664,10 +667,10 @@ int main( int argc, char **argv )	{
 			skmScale.erase( 0, 10 );
 			SmartBody::SBScene::getScene()->getAssetManager()->setGlobalSkeletonScale(atof(skmScale.c_str()));
 		}
-		else if ( s.compare( "-mediapath=" ) == 0 )
+		else if (mediapathstr == "-mediapath")
 		{
-			mediaPath = s;
-			mediaPath = mediaPath.substr(11);
+			mediaPath = s.substr(11);
+			SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
 		}
         else if ( s.compare("-noninteractive") == 0)
         {
@@ -832,15 +835,15 @@ int main( int argc, char **argv )	{
 		 ++it )
 	{
 		std::stringstream strstr;
-		strstr << "scene.addAssetPath('seq', '" << it->c_str() << "')";
-		mcu.executePython( (char *) strstr.str().c_str() );
+		strstr << "scene.addAssetPath('script', '" << it->c_str() << "')";
+		SmartBody::SBScene::getScene()->run( (char *) strstr.str().c_str() );
 	}
 
 	// run the specified scripts
 	if( init_seqs.empty() && init_pys.empty())
 	{
 		LOG( "No Python scripts specified. Loading default configuration.'\n" );
-		mcu.executePython("getViewer().show()\ngetCamera().reset()");
+		SmartBody::SBScene::getScene()->run("getViewer().show()\ngetCamera().reset()");
 	}
 
 	for( it = init_seqs.begin();
@@ -859,7 +862,7 @@ int main( int argc, char **argv )	{
 		std::string cmd = it->c_str();
 		std::stringstream strstr;
 		strstr << "scene.run(\"" << cmd.c_str() << "\")";
-		mcu.executePython(strstr.str().c_str());
+		SmartBody::SBScene::getScene()->run(strstr.str().c_str());
 	}
 
 	me_paths.clear();
@@ -926,7 +929,7 @@ int main( int argc, char **argv )	{
 				if( strlen( cmd ) )	{
 
 					int result = CMD_FAILURE;
-					result = mcu.executePython(cmd);
+					result = SmartBody::SBScene::getScene()->run(cmd);
 
 					switch( result ) {
 						case CMD_NOT_FOUND:
