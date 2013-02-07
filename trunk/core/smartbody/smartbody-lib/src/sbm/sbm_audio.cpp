@@ -36,6 +36,9 @@ vhcl::Audio * g_audio = NULL;
 
 bool AUDIO_Init()
 {
+   if(g_audio)
+      return false;
+
    g_audio = new vhcl::Audio();
    bool ret = g_audio->Open();
    return ret;
