@@ -443,6 +443,7 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.viewer_p = window;
+	mcu.viewer_p->root(mcu.root_group_p);
 
 	scene->getSimulationManager()->setupTimer();
 
@@ -627,6 +628,7 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		mcu.viewer_p = window;
+		mcu.viewer_p->root(mcu.root_group_p);
 
 
 		std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
