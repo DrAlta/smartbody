@@ -1,5 +1,5 @@
 
-def locomotionSetup(skeletonName, baseJoint, preFix, statePreFix):
+def locomotionSetup(origSkelName, skeletonName, baseJoint, preFix, statePreFix):
 	print "** State: allLocomotion"
 
 	stateManager = scene.getStateManager()
@@ -7,28 +7,38 @@ def locomotionSetup(skeletonName, baseJoint, preFix, statePreFix):
 	if (stateManager.getBlend(stateName) != None): # don't create duplicate state
 		return		
 	state = stateManager.createBlend3D(stateName)
+	state.setBlendSkeleton(origSkelName)
 	# add motions
+	originalMotions = StringVec()
+	originalMotions.append("ChrUtah_Walk001")
+	originalMotions.append("ChrUtah_Idle001")
+	originalMotions.append("ChrUtah_Idle01_ToWalk01_Turn360Lf01")
+	originalMotions.append("ChrUtah_Idle01_ToWalk01_Turn360Rt01")
+	originalMotions.append("ChrUtah_Meander01")
+	originalMotions.append("ChrUtah_Shuffle01")
+	originalMotions.append("ChrUtah_Jog001")
+	originalMotions.append("ChrUtah_Run001")
+	originalMotions.append("ChrUtah_WalkInCircleLeft001")
+	originalMotions.append("ChrUtah_WalkInCircleRight001")
+	originalMotions.append("ChrUtah_WalkInTightCircleLeft001")
+	originalMotions.append("ChrUtah_WalkInTightCircleRight001")
+	originalMotions.append("ChrUtah_RunInCircleLeft001")
+	originalMotions.append("ChrUtah_RunInCircleRight001")
+	originalMotions.append("ChrUtah_RunInTightCircleLeft01")
+	originalMotions.append("ChrUtah_RunInTightCircleRight01")
+	originalMotions.append("ChrUtah_StrafeSlowRt01")
+	originalMotions.append("ChrUtah_StrafeSlowLf01")
+	originalMotions.append("ChrUtah_StrafeFastRt01")
+	originalMotions.append("ChrUtah_StrafeFastLf01")
+	
 	motions = StringVec()
-	motions.append(preFix+"ChrUtah_Walk001")
-	motions.append(preFix+"ChrUtah_Idle001")
-	motions.append(preFix+"ChrUtah_Idle01_ToWalk01_Turn360Lf01")
-	motions.append(preFix+"ChrUtah_Idle01_ToWalk01_Turn360Rt01")
-	motions.append(preFix+"ChrUtah_Meander01")
-	motions.append(preFix+"ChrUtah_Shuffle01")
-	motions.append(preFix+"ChrUtah_Jog001")
-	motions.append(preFix+"ChrUtah_Run001")
-	motions.append(preFix+"ChrUtah_WalkInCircleLeft001")
-	motions.append(preFix+"ChrUtah_WalkInCircleRight001")
-	motions.append(preFix+"ChrUtah_WalkInTightCircleLeft001")
-	motions.append(preFix+"ChrUtah_WalkInTightCircleRight001")
-	motions.append(preFix+"ChrUtah_RunInCircleLeft001")
-	motions.append(preFix+"ChrUtah_RunInCircleRight001")
-	motions.append(preFix+"ChrUtah_RunInTightCircleLeft01")
-	motions.append(preFix+"ChrUtah_RunInTightCircleRight01")
-	motions.append(preFix+"ChrUtah_StrafeSlowRt01")
-	motions.append(preFix+"ChrUtah_StrafeSlowLf01")
-	motions.append(preFix+"ChrUtah_StrafeFastRt01")
-	motions.append(preFix+"ChrUtah_StrafeFastLf01")
+	assetManager = scene.getAssetManager()
+	for i in range(0, len(originalMotions)):
+		motions.append(preFix + originalMotions[i])
+		sbMotion = assetManager.getMotion(originalMotions[i])
+		if sbMotion != None:
+			sbMotion.setMotionSkeletonName(origSkelName)
+			
 	for i in range(0, len(motions)):
 		state.addMotion(motions[i], 0, 0, 0)
 

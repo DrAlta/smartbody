@@ -1,23 +1,46 @@
-def startingSetup(skeletonName, baseJoint, preFix, statePreFix):
+def startingSetup(origSkelName, skeletonName, baseJoint, preFix, statePreFix):
 	
-	mirrorMotion = scene.getMotion(preFix+"ChrUtah_StopToWalkRt01")
-	mirrorMotion.mirror(preFix+"ChrUtah_StopToWalkLf01", skeletonName)
+	mirrorMotion = scene.getMotion("ChrUtah_StopToWalkRt01")
+	mirrorMotion.mirror("ChrUtah_StopToWalkLf01", skeletonName)
 	
-	mirrorMotion1 = scene.getMotion(preFix+"ChrUtah_Idle01_ToWalk01_Turn90Lf01")
-	mirrorMotion1.mirror(preFix+"ChrUtah_Idle01_ToWalk01_Turn90Rt01", skeletonName)
-	mirrorMotion2 = scene.getMotion(preFix+"ChrUtah_Idle01_ToWalk01_Turn180Lf01")
-	mirrorMotion2.mirror(preFix+"ChrUtah_Idle01_ToWalk01_Turn180Rt01", skeletonName)
+	mirrorMotion1 = scene.getMotion("ChrUtah_Idle01_ToWalk01_Turn90Lf01")
+	mirrorMotion1.mirror("ChrUtah_Idle01_ToWalk01_Turn90Rt01", skeletonName)
+	mirrorMotion2 = scene.getMotion("ChrUtah_Idle01_ToWalk01_Turn180Lf01")
+	mirrorMotion2.mirror("ChrUtah_Idle01_ToWalk01_Turn180Rt01", skeletonName)
 
+	originalMotions1 = StringVec()
+	originalMotions2 = StringVec()
+	originalMotions1.append("ChrUtah_StopToWalkLf01")
+	originalMotions1.append("ChrUtah_Idle01_ToWalk01_Turn90Lf01")
+	originalMotions1.append("ChrUtah_Idle01_ToWalk01_Turn180Lf01")
+	originalMotions2.append("ChrUtah_StopToWalkRt01")
+	originalMotions2.append("ChrUtah_Idle01_ToWalk01_Turn90Rt01")
+	originalMotions2.append("ChrUtah_Idle01_ToWalk01_Turn180Rt01")
+	
+	motions1 = StringVec()
+	motions2 = StringVec()
+	assetManager = scene.getAssetManager()
+	for i in range(0, len(originalMotions1)):
+		motions1.append(preFix + originalMotions1[i])
+		motions2.append(preFix + originalMotions2[i])
+		sbMotion1 = assetManager.getMotion(originalMotions1[i])
+		if sbMotion1 != None:
+			sbMotion1.setMotionSkeletonName(origSkelName)
+		sbMotion2 = assetManager.getMotion(originalMotions2[i])
+		if sbMotion2 != None:
+			sbMotion2.setMotionSkeletonName(origSkelName)
+		
 	stateManager = scene.getStateManager()
 
 	print "** State: allStartingLeft"
 	startLefStateName = statePreFix+"StartingLeft"
 	if (stateManager.getBlend(startLefStateName) == None): # don't create duplicate state		
 		state1 = stateManager.createState1D(statePreFix+"StartingLeft")
-		motions1 = StringVec()
-		motions1.append(preFix+"ChrUtah_StopToWalkLf01")
-		motions1.append(preFix+"ChrUtah_Idle01_ToWalk01_Turn90Lf01")
-		motions1.append(preFix+"ChrUtah_Idle01_ToWalk01_Turn180Lf01")
+		state1.setBlendSkeleton(origSkelName)
+		
+		# motions1.append("ChrUtah_StopToWalkLf01")
+		# motions1.append("ChrUtah_Idle01_ToWalk01_Turn90Lf01")
+		# motions1.append("ChrUtah_Idle01_ToWalk01_Turn180Lf01")
 		params1 = DoubleVec()
 		params1.append(0)
 		params1.append(-90)
@@ -47,10 +70,11 @@ def startingSetup(skeletonName, baseJoint, preFix, statePreFix):
 	startRightStateName = statePreFix+"StartingRight"
 	if (stateManager.getBlend(startRightStateName) == None):
 		state2 = stateManager.createState1D(statePreFix+"StartingRight")
-		motions2 = StringVec()
-		motions2.append(preFix+"ChrUtah_StopToWalkRt01")
-		motions2.append(preFix+"ChrUtah_Idle01_ToWalk01_Turn90Rt01")
-		motions2.append(preFix+"ChrUtah_Idle01_ToWalk01_Turn180Rt01")
+		state2.setBlendSkeleton(origSkelName)
+		
+		# motions2.append("ChrUtah_StopToWalkRt01")
+		# motions2.append("ChrUtah_Idle01_ToWalk01_Turn90Rt01")
+		# motions2.append("ChrUtah_Idle01_ToWalk01_Turn180Rt01")
 		params2 = DoubleVec()
 		params2.append(0)
 		params2.append(90)

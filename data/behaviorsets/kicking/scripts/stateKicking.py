@@ -2,6 +2,7 @@ def kickingSetup(skeletonName, baseJoint, prefix, statePreFix):
 	blendManager = scene.getBlendManager()
 
 	blendKicking = blendManager.createMotionBlendBase(prefix + "Kick", skeletonName, 3)
+	blendKicking.setBlendSkeleton(skeletonName)
 
 	motions = StringVec()
 	motions = StringVec()

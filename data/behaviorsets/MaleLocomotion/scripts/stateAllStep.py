@@ -1,4 +1,4 @@
-def stepSetup(skeletonName, baseJoint, preFix, statePreFix):
+def stepSetup(origSkelName, skeletonName, baseJoint, preFix, statePreFix):
 	stateManager = scene.getStateManager()
 
 	print "** State: allStep"
@@ -6,15 +6,25 @@ def stepSetup(skeletonName, baseJoint, preFix, statePreFix):
 	if (stateManager.getBlend(stateName) != None): # don't create duplicate state
 		return				
 	state = stateManager.createState2D(stateName)
+	state.setBlendSkeleton(origSkelName)
 	# add motions
+	originalMotions = StringVec()
+	originalMotions.append("ChrUtah_Idle001")
+	originalMotions.append("ChrUtah_Idle01_StepBackwardRt01")
+	originalMotions.append("ChrUtah_Idle01_StepForwardRt01")
+	originalMotions.append("ChrUtah_Idle01_StepSidewaysRt01")
+	originalMotions.append("ChrUtah_Idle01_StepBackwardLf01")
+	originalMotions.append("ChrUtah_Idle01_StepForwardLf01")
+	originalMotions.append("ChrUtah_Idle01_StepSidewaysLf01")
+	
 	motions = StringVec()
-	motions.append(preFix+"ChrUtah_Idle001")
-	motions.append(preFix+"ChrUtah_Idle01_StepBackwardRt01")
-	motions.append(preFix+"ChrUtah_Idle01_StepForwardRt01")
-	motions.append(preFix+"ChrUtah_Idle01_StepSidewaysRt01")
-	motions.append(preFix+"ChrUtah_Idle01_StepBackwardLf01")
-	motions.append(preFix+"ChrUtah_Idle01_StepForwardLf01")
-	motions.append(preFix+"ChrUtah_Idle01_StepSidewaysLf01")
+	assetManager = scene.getAssetManager()
+	for i in range(0, len(originalMotions)):
+		motions.append(preFix + originalMotions[i])
+		sbMotion = assetManager.getMotion(originalMotions[i])
+		if sbMotion != None:
+			sbMotion.setMotionSkeletonName(origSkelName)
+			
 	for i in range(0, len(motions)):
 		state.addMotion(motions[i], 0, 0)
 

@@ -1,16 +1,25 @@
-def idleTurnSetup(skeletonName, baseJoint, preFix, statePreFix):
+def idleTurnSetup(origSkelName, skeletonName, baseJoint, preFix, statePreFix):
 	print "** State: allIdleTurn"
 	stateManager = scene.getStateManager()	
 	stateName = statePreFix+"IdleTurn"
 	if (stateManager.getBlend(stateName) != None): # don't create duplicate state
 		return	
 	state = stateManager.createState1D(stateName)
+	state.setBlendSkeleton(origSkelName)
+	originalMotions = StringVec()
+	originalMotions.append("ChrUtah_Idle001")
+	originalMotions.append("ChrUtah_Turn90Lf01")
+	originalMotions.append("ChrUtah_Turn180Lf01")
+	originalMotions.append("ChrUtah_Turn90Rt01")
+	originalMotions.append("ChrUtah_Turn180Rt01")
 	motions = StringVec()
-	motions.append(preFix+"ChrUtah_Idle001")
-	motions.append(preFix+"ChrUtah_Turn90Lf01")
-	motions.append(preFix+"ChrUtah_Turn180Lf01")
-	motions.append(preFix+"ChrUtah_Turn90Rt01")
-	motions.append(preFix+"ChrUtah_Turn180Rt01")
+	assetManager = scene.getAssetManager()
+	for i in range(0, len(originalMotions)):
+		motions.append(preFix + originalMotions[i])
+		sbMotion = assetManager.getMotion(originalMotions[i])
+		if sbMotion != None:
+			sbMotion.setMotionSkeletonName(origSkelName)
+			
 	params = DoubleVec()
 	params.append(0)
 	params.append(-90)
