@@ -2,7 +2,7 @@
 #include "vhcl.h"
 #include "sbm/mcontrol_util.h"
 #include "SBScene.h"
-#include <direct.h>
+//#include <direct.h>
 #include <sb/SBObject.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBMotion.h>
@@ -1140,8 +1140,8 @@ bool SBScene::runScript(const std::string& script)
 		candidateSeqName.append(".py");
 	}
 	// current path containing .exe
-	char CurrentPath[_MAX_PATH];
-	_getcwd(CurrentPath, _MAX_PATH);
+	char CurrentPath[FILENAME_MAX];
+	_getcwd(CurrentPath, FILENAME_MAX);
 
 	std::string curFilename = SmartBody::SBScene::getScene()->getAssetManager()->findFileName("script", candidateSeqName);
 	if (curFilename != "")
