@@ -62,7 +62,8 @@ bool SBVHMsgManager::isEnable()
 
 bool SBVHMsgManager::connect()
 {
-	vhmsg::ttu_close();
+	if (vhmsg::ttu_is_open())
+		vhmsg::ttu_close();
 
 	if (vhmsg::ttu_open(_server.c_str(), _scope.c_str(), _port.c_str()) == vhmsg::TTU_SUCCESS)
 	{

@@ -582,61 +582,6 @@ void mcuCBHandle::set_net_host( const char * net_host )
 	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().UpdateAllCharacters();
 }
 
-int mcuCBHandle::map_skeleton( const char * mapName, const char * skeletonName )
-{
-	// ED - taken from skeletonmap_func()
-
-	SmartBody::SBSkeleton* sbskeleton = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skeletonName);
-
-	if (!sbskeleton)
-	{
-		LOG("Cannot find skeleton named %s.", skeletonName);
-		return CMD_FAILURE;
-	}
-	
-	// find the bone map name
-	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(mapName);
-	if (!jointMap)
-	{
-		LOG("Cannot find joint map name '%s'.", mapName);
-		return CMD_FAILURE;
-	}
-
-	// apply the map
-	jointMap->applySkeleton(sbskeleton);
-
-	LOG("Applied joint map %s to skeleton %s.", mapName, skeletonName);
-
-	return CMD_SUCCESS;
-}
-
-int mcuCBHandle::map_motion( const char * mapName, const char * motionName )
-{
-	// taken from motionmap_func()
-
-	SmartBody::SBMotion* sbmotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
-	if (!sbmotion)
-	{
-		LOG("Cannot find motion name %s.", motionName);
-		return CMD_FAILURE;
-	}
-	
-	// find the bone map name
-	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(mapName);
-	if (!jointMap)
-	{
-		LOG("Cannot find bone map name '%s'.", mapName);
-		return CMD_FAILURE;
-	}
-
-	// apply the map
-	jointMap->applyMotion(sbmotion);
-
-	LOG("Applied bone map %s to motion %s.", mapName, motionName);
-
-	return CMD_SUCCESS;
-}
-
 void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map )
 {
 	if ( character == NULL )
@@ -758,61 +703,6 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 */
 	
 }
-
-int mcuCBHandle::executePythonFile(const char* filename)
-{
-#ifndef SB_NO_PYTHON
-	// add the .seq extension if necessary
-	std::string candidateSeqName = filename;
-	if (candidateSeqName.find(".py") == std::string::npos)
-	{
-		candidateSeqName.append(".py");
-	}
-	// current path containing .exe
-	char CurrentPath[_MAX_PATH];
-	_getcwd(CurrentPath, _MAX_PATH);
-
-	std::string curFilename = SmartBody::SBScene::getScene()->getAssetManager()->findFileName("script", candidateSeqName);
-	if (curFilename != "")
-	{
-		try {
-			std::stringstream strstr;
-			strstr << "execfile(\"" << curFilename << "\")";
-			PyRun_SimpleString(strstr.str().c_str());
-			PyErr_Print();
-			PyErr_Clear();
-			return CMD_SUCCESS;
-		} catch (...) {
-			PyErr_Print();
-			return CMD_FAILURE;
-		}
-	}
-
-	LOG("Could not find Python script '%s'", filename);
-	return CMD_FAILURE;
-
-#endif
-	return CMD_FAILURE;
-}
-
-int mcuCBHandle::executePython(const char* command)
-{
-#ifndef SB_NO_PYTHON
-	try {
-		//LOG("executePython = %s",command);
-
-		int result = PyRun_SimpleString(command);
-		//LOG("cmd result = %d",result);
-
-		return CMD_SUCCESS;
-	} catch (...) {
-		PyErr_Print();
-	}
-#endif
-	return CMD_FAILURE;
-}
-
-
 
 std::map<std::string, SbmPawn*>& mcuCBHandle::getPawnMap()
 {

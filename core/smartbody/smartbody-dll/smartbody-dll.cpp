@@ -24,6 +24,8 @@
 #include "sb/SBSpeechManager.h"
 #include "sb/SBSimulationManager.h"
 #include "sb/SBCharacterListener.h"
+#include "sb/SBJointMap.h"
+#include "sb/SBJointMapManager.h"
 #include <sbm/remote_speech.h>
 #include <sbm/local_speech.h>
 #include <sbm/text_speech.h>
@@ -271,16 +273,57 @@ SMARTBODY_DLL_API bool Smartbody_dll::LoadMotion( const void * data, int sizeByt
 
 SMARTBODY_DLL_API bool Smartbody_dll::MapSkeleton( const char * mapName, const char * skeletonName )
 {
-    mcuCBHandle & mcu = mcuCBHandle::singleton();
+   SmartBody::SBSkeleton* sbskeleton = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skeletonName);
+
+	if (!sbskeleton)
+	{
+		LOG("Cannot find skeleton named %s.", skeletonName);
+		return CMD_FAILURE;
+	}
+	
+	// find the bone map name
+	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(mapName);
+	if (!jointMap)
+	{
+		LOG("Cannot find joint map name '%s'.", mapName);
+		return CMD_FAILURE;
+	}
+
+	// apply the map
+	jointMap->applySkeleton(sbskeleton);
+
+	LOG("Applied joint map %s to skeleton %s.", mapName, skeletonName);
+
+	return CMD_SUCCESS;
+
+
     int ret = mcu.map_skeleton( mapName, skeletonName );
     return ret == CMD_SUCCESS;
 }
 
 SMARTBODY_DLL_API bool Smartbody_dll::MapMotion( const char * mapName, const char * motionName )
 {
-    mcuCBHandle & mcu = mcuCBHandle::singleton();
-    int ret = mcu.map_motion( mapName, motionName );
-    return ret == CMD_SUCCESS;
+    SmartBody::SBMotion* sbmotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
+	if (!sbmotion)
+	{
+		LOG("Cannot find motion name %s.", motionName);
+		return CMD_FAILURE;
+	}
+	
+	// find the bone map name
+	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(mapName);
+	if (!jointMap)
+	{
+		LOG("Cannot find bone map name '%s'.", mapName);
+		return CMD_FAILURE;
+	}
+
+	// apply the map
+	jointMap->applyMotion(sbmotion);
+
+	LOG("Applied bone map %s to motion %s.", mapName, motionName);
+
+	return CMD_SUCCESS;
 }
 
 

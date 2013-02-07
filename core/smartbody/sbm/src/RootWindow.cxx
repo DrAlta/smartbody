@@ -1360,6 +1360,7 @@ void BaseWindow::CreateLightCB(Fl_Widget* w, void* data)
 	strstr << "light.createDoubleAttribute(\"lightConstantAttenuation\", 1, True, \"LightParameters\", 270, False, False, False, \"Constant attenuation\")\n";
 	strstr << "light.createDoubleAttribute(\"lightLinearAttenuation\", 1, True, \"LightParameters\", 280, False, False, False, \" Linear attenuation.\")\n";
 	strstr << "light.createDoubleAttribute(\"lightQuadraticAttenuation\", 0, True, \"LightParameters\", 290, False, False, False, \"Quadratic attenuation\")\n";
+	strstr << "light.setBoolAttribute(\"visible\", false)\n";
 	scene->run(strstr.str());
 #endif
 }

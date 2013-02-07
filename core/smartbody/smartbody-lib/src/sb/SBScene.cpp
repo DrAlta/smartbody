@@ -1113,24 +1113,56 @@ void SBScene::sendVHMsg2(const std::string& message, const std::string& message2
 
 bool SBScene::run(const std::string& command)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	int ret = mcu.executePython(command.c_str());
+#ifndef SB_NO_PYTHON
+	try {
+		//LOG("executePython = %s",command);
 
-	if (ret == CMD_SUCCESS)
+		int result = PyRun_SimpleString(command.c_str());
+		//LOG("cmd result = %d",result);
+
 		return true;
-	else
+	} catch (...) {
+		PyErr_Print();
 		return false;
+	}
+#endif
+	return true;
 }
 
 bool SBScene::runScript(const std::string& script)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	int ret = mcu.executePythonFile(script.c_str());
-	
-	if (ret == CMD_SUCCESS)
-		return true;
-	else
-		return false;
+#ifndef SB_NO_PYTHON
+	// add the .seq extension if necessary
+	std::string candidateSeqName = script;
+	if (candidateSeqName.find(".py") == std::string::npos)
+	{
+		candidateSeqName.append(".py");
+	}
+	// current path containing .exe
+	char CurrentPath[_MAX_PATH];
+	_getcwd(CurrentPath, _MAX_PATH);
+
+	std::string curFilename = SmartBody::SBScene::getScene()->getAssetManager()->findFileName("script", candidateSeqName);
+	if (curFilename != "")
+	{
+		try {
+			std::stringstream strstr;
+			strstr << "execfile(\"" << curFilename << "\")";
+			PyRun_SimpleString(strstr.str().c_str());
+			PyErr_Print();
+			PyErr_Clear();
+			return true;
+		} catch (...) {
+			PyErr_Print();
+			return false;
+		}
+	}
+
+	LOG("Could not find Python script '%s'", script.c_str());
+	return false;
+
+#endif
+	return true;
 }
 
 SBSimulationManager* SBScene::getSimulationManager()
