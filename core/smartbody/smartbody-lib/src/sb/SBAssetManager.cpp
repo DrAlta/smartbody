@@ -384,7 +384,27 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 
 	if( _stricmp( ext.c_str(), ".xml" ) == 0)
 	{
-
+		SmartBody::SBSkeleton*skeleton =  new SmartBody::SBSkeleton();					
+		std::vector<SmartBody::SBMotion*> motions;
+		bool ok = ParserOgre::parse(*skeleton,motions, finalPath, 1.f, true, false);		
+		if (ok)
+		{
+			std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = _skeletons.find(fileName);
+			if (motionIter != _skeletons.end()) {
+				LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", fileName.c_str(), finalPath.c_str());
+				delete skeleton;
+				return;
+			}
+			skeleton->ref();
+			skeleton->skfilename(finalPath.c_str());				
+			skeleton->setName(fileName.c_str());
+			_skeletons.insert(std::pair<std::string, SBSkeleton*>(skeleton->getName(), skeleton));
+		}
+		else
+		{
+			LOG("Problem loading skeleton from file '%s'.", finalPath.c_str());
+			return;
+		}
 	}
 
 	if( _stricmp( ext.c_str(), ".asf" ) == 0)

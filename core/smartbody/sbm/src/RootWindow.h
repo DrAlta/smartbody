@@ -164,6 +164,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void ModeGPUDeformableGeometryCB(Fl_Widget* w, void* data);
 		static void ModeAxisCB(Fl_Widget* w, void* data);
 		static void ModeEyebeamsCB(Fl_Widget* w, void* data);
+		static void ModeGazeLimitCB(Fl_Widget* w, void* data);
 		static void ModeEyelidCalibrationCB(Fl_Widget* w, void* data);
 		static void ShadowsCB(Fl_Widget* w, void* data);
 		static void TerrainShadedCB(Fl_Widget* w, void* data);

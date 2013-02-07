@@ -2,6 +2,7 @@
 #include "vhcl.h"
 #include "sbm/mcontrol_util.h"
 #include "SBScene.h"
+#include <direct.h>
 #include <sb/SBObject.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBMotion.h>

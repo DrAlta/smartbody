@@ -47,6 +47,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Character/Axis", 0, ModeAxisCB, this, NULL);
 //	menubar->add("&View/Character/Show Selected", 0, ShowSelectedCB, this, NULL);	
 	menubar->add("&View/Character/Eyebeams", 0, ModeEyebeamsCB, this, NULL);
+	menubar->add("&View/Character/Gaze Limits", 0, ModeGazeLimitCB, this, NULL);
 //	menubar->add("&View/Character/Eyelid calibration", 0, ModeEyelidCalibrationCB, this, NULL);
 	menubar->add("&View/Character/Bounding Volumes", 0, ShowBoundingVolumeCB, this, NULL);
 //	menubar->add("&View/Character/Dynamics/COM", 0, ModeDynamicsCOMCB, this, NULL);
@@ -1150,6 +1151,18 @@ void BaseWindow::ModeEyebeamsCB(Fl_Widget* w, void* data)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoEyeBeams, NULL);
 	else
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdEyeBeams, NULL);
+#endif
+}
+
+void BaseWindow::ModeGazeLimitCB(Fl_Widget* w, void* data)
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+
+	if (rootWindow->fltkViewer->getData()->gazeLimitMode)
+		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoGazeLimit, NULL);
+	else
+		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdGazeLimit, NULL);
 #endif
 }
 

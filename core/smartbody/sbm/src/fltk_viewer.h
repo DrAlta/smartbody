@@ -123,6 +123,10 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	enum EyeBeamMode { ModeNoEyeBeams,
 					   ModeEyeBeams
                 };
+	enum GazeLimitMode { ModeNoGazeLimit,
+		ModeGazeLimit
+	};
+
 	enum EyeLidMode { ModeNoEyeLids,
 					   ModeEyeLids
                 };
@@ -187,6 +191,8 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 				   CmdTerrain,
 				   CmdNoEyeBeams,
 				   CmdEyeBeams,
+				   CmdNoGazeLimit,
+				   CmdGazeLimit,
 				   CmdNoEyeLids,
 				   CmdEyeLids,
 				   CmdNoDynamics,
@@ -332,6 +338,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
 	void drawGestures();
 	void drawJointLabels();
 
+	void drawGazeJointLimits();
 	void drawReach();
 	void drawInteractiveLocomotion();
 	void drawPawns();
@@ -380,6 +387,7 @@ public:
 	RetargetStepWindow* _retargetStepWindow;
 protected:
 	
+	void drawJointLimitCone(SmartBody::SBJoint* joint, float coneSize, float pitchUpLimit, float pitchDownLimit, float headLimit);
 	void set_gaze_target(int itype, const char* targetname);	
 	void set_reach_target(int itype, const char* targetname);	
 	void update_submenus();
@@ -404,6 +412,7 @@ protected:
    FltkViewer::ShadowMode shadowmode;     // shadow mode
    FltkViewer::terrainMode terrainMode;     // terrain mode
    FltkViewer::EyeBeamMode eyeBeamMode;     // eye beam mode
+   FltkViewer::GazeLimitMode gazeLimitMode;
    FltkViewer::EyeLidMode eyeLidMode;     // eye lid mode
    FltkViewer::DynamicsMode dynamicsMode;     // dynamics information mode
    FltkViewer::LocomotionMode locomotionMode;   // locomotion mode
