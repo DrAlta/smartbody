@@ -69,10 +69,14 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 		SkJoint* srcJoint = tempSrcSk->search_joint(pjointName.c_str());
 		SkJoint* targetJoint = interSk->search_joint(pjointName.c_str());
 		bool isRelativeJoint = false;
+		bool isEndJoint = false;
 		
 		// just copy over joint quat if that is a root or relative joint
 		if (pjointName == rootName || std::find(relativeJoints.begin(),relativeJoints.end(), pjointName) != relativeJoints.end())
 			isRelativeJoint = true;
+		if (std::find(endJoints.begin(),endJoints.end(), pjointName) != endJoints.end())
+			isEndJoint = true;
+
 		if ( isRelativeJoint && targetJoint) 
 		{
 			// don't change the t-pose for these joints
@@ -80,6 +84,10 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 			{					
 				jointQueues.push(targetJoint->child(i)->name());
 			}
+		}	
+		else if ( isEndJoint && targetJoint)
+		{
+			// stop aligning children
 		}
 		else
 		{
