@@ -68,6 +68,12 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 	
 	if (otherListener)
 		otherListener->OnCharacterCreate(name,objectClass);
+
+	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	if (window && window->resourceWindow && window->resourceWindow->shown())
+	{
+		window->resourceWindow->updateGUI();
+	}
 }
 
 void FLTKListener::OnCharacterDelete( const std::string & name )
@@ -111,6 +117,11 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 
 	if (otherListener)
 		otherListener->OnCharacterDelete(name);
+
+	if (window && window->resourceWindow && window->resourceWindow->shown())
+	{
+		window->resourceWindow->updateGUI();
+	}
 }
 
 void FLTKListener::OnCharacterUpdate( const std::string & name, const std::string & objectClass )
@@ -122,6 +133,13 @@ void FLTKListener::OnCharacterUpdate( const std::string & name, const std::strin
 	{
 		otherListener->OnCharacterDelete(name);
 		otherListener->OnCharacterCreate(name, objectClass);
+	}
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	if (window && window->resourceWindow && window->resourceWindow->shown())
+	{
+		window->resourceWindow->updateGUI();
 	}
 }
 
@@ -139,6 +157,13 @@ void FLTKListener::OnCharacterChanged( const std::string& name )
 		otherListener->OnCharacterDelete(name);
 		otherListener->OnCharacterCreate(name, character->getClassType());
 	}
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	if (window && window->resourceWindow && window->resourceWindow->shown())
+	{
+		window->resourceWindow->updateGUI();
+	}
 }
 
 
@@ -151,7 +176,7 @@ void FLTKListener::OnCharacterChangeMesh( const std::string& name )
 	if (otherListener)
 	{
 		otherListener->OnCharacterChangeMesh(name);		
-	}	
+	}
 }
 
 void FLTKListener::OnPawnCreate( const std::string & name )
@@ -221,6 +246,12 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 		}
 	}
 
+	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	if (window && window->resourceWindow && window->resourceWindow->shown())
+	{
+		window->resourceWindow->updateGUI();
+	}
+
 }
 
 void FLTKListener::OnPawnDelete( const std::string & name )
@@ -261,6 +292,11 @@ void FLTKListener::OnPawnDelete( const std::string & name )
 	{
 		if (window)
 			window->updateCameraList();
+	}
+
+	if (window && window->resourceWindow && window->resourceWindow->shown())
+	{
+		window->resourceWindow->updateGUI();
 	}
 
 }
