@@ -1579,7 +1579,7 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	Fl_Choice* resChoice = static_cast<Fl_Choice*>(widget);
 
-	int windowIndex = (int) data;	
+	size_t windowIndex = (size_t) data;	
 	
 	std::vector<std::string> tokens;	
 	const Fl_Menu_Item* menuItem = ((Fl_Menu_*)widget)->mvalue();
