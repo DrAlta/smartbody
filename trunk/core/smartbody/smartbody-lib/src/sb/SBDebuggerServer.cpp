@@ -357,11 +357,11 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 						 //fclose(fp);
 						 vhmsg::ttu_notify1(message.c_str());
 
-#if 0
+#if 1
 						 std::vector<string> skeletonNames = m_scene->getSkeletonNames();
 						for (size_t i = 0; i < skeletonNames.size(); ++i)
 						{
-							SBSkeleton* skeleton = m_scene->getSkeleton(skeletonNames[i]);
+							SmartBody::SBSkeleton* skeleton = m_scene->getSkeleton(skeletonNames[i]);
 							if (!skeleton)
 							{
 								LOG("Cannot find skeleton %s.", skeletonNames[i].c_str());
@@ -378,14 +378,14 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
                         vector<string> charNames = m_scene->getCharacterNames();
                         for (size_t i = 0; i < charNames.size(); i++)
                         {
-                           SBCharacter * c = m_scene->getCharacter(charNames[i]);
+                           SmartBody::SBCharacter * c = m_scene->getCharacter(charNames[i]);
 
                            size_t numBones = c->getSkeleton()->getNumJoints();
 
 						   // SbmMonitor character format
                            string msg = vhcl::Format("sbmdebugger %s init", m_fullId.c_str());
                            msg += vhcl::Format(" character %s bones %d\n", c->getName().c_str(), numBones);
-						   SBJoint * root = c->getSkeleton()->getJoint(0);
+						   SmartBody::SBJoint * root = c->getSkeleton()->getJoint(0);
                            GenerateInitHierarchyMsg(root, msg, 4);
 						   vhmsg::ttu_notify1(msg.c_str());
 
@@ -403,7 +403,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
                         vector<string> pawnNames = m_scene->getPawnNames();
                         for (size_t i = 0; i < pawnNames.size(); i++)
                         {
-                           SBPawn* p = m_scene->getPawn(pawnNames[i]);
+                           SmartBody::SBPawn* p = m_scene->getPawn(pawnNames[i]);
                            string msg = vhcl::Format("sbmdebugger %s init pawn %s", m_fullId.c_str(), p->getName().c_str());
                            SrVec pos = p->getPosition();
                            SrQuat rot = p->getOrientation();
@@ -416,7 +416,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 						const std::vector<std::string>& faceDefNames = m_scene->getFaceDefinitionNames();
 						for (size_t i = 0; i < faceDefNames.size(); i++)
 						{
-							SBFaceDefinition* faceDefinition = m_scene->getFaceDefinition(faceDefNames[i]);
+							SmartBody::SBFaceDefinition* faceDefinition = m_scene->getFaceDefinition(faceDefNames[i]);
 							std::string msg = vhcl::Format("sbmdebugger %s init face_definition %s", m_fullId.c_str(), faceDefNames[i].c_str());
 							msg += faceDefinition->saveToString();
 
@@ -425,9 +425,9 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 
 						for (size_t i = 0; i < charNames.size(); i++)
 						{
-							SBCharacter * c = m_scene->getCharacter(charNames[i]);
+							SmartBody::SBCharacter * c = m_scene->getCharacter(charNames[i]);
 							string msg = vhcl::Format("sbmdebugger %s init", m_fullId.c_str());
-							SBFaceDefinition* faceDef = c->getFaceDefinition();
+							SmartBody::SBFaceDefinition* faceDef = c->getFaceDefinition();
 							if (faceDef)
 							{
 								msg += vhcl::Format(" character-face_definition %s %s\n", c->getName().c_str(), faceDef->getName().c_str());
@@ -435,11 +435,11 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 							}
 						}
 						
-						SBAnimationBlendManager* blendManager = m_scene->getBlendManager();
+						SmartBody::SBAnimationBlendManager* blendManager = m_scene->getBlendManager();
 						const std::vector<std::string>& blendNames = blendManager->getBlendNames();
 						for (size_t i = 0; i < blendNames.size(); i++)
 						{
-							SBAnimationBlend* blend = blendManager->getBlend(blendNames[i]);
+							SmartBody::SBAnimationBlend* blend = blendManager->getBlend(blendNames[i]);
 							std::string msg = vhcl::Format("sbmdebugger %s init blend %s", m_fullId.c_str(), blendNames[i].c_str());
 							msg += blend->saveToString();
 
@@ -448,7 +448,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 
 						for (int i = 0; i < blendManager->getNumTransitions(); ++i)
 						{
-							SBAnimationTransition* transition = blendManager->getTransitionByIndex(i);
+							SmartBody::SBAnimationTransition* transition = blendManager->getTransitionByIndex(i);
 							std::string msg = vhcl::Format("sbmdebugger %s init transition ", m_fullId.c_str());
 							msg += transition->saveToString();
 
