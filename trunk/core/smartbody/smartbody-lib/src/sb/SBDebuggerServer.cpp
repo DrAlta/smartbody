@@ -144,7 +144,7 @@ void SBDebuggerServer::Update()
          bool sentPawnUpdates = false;
          if (m_scene)
          {
-            vector<string> charNames = m_scene->getCharacterNames();
+            const std::vector<std::string>& charNames = m_scene->getCharacterNames();
 			string msg = "";
             for (size_t i = 0; i < charNames.size(); i++)
             {
@@ -190,7 +190,7 @@ void SBDebuggerServer::Update()
                if (!sentPawnUpdates)
                {
                   // sbmdebugger <sbmid> update pawn <name> pos <x y z> rot <x y z w> geom <s> size <s> 
-                  vector<string> pawnNames = m_scene->getPawnNames();
+                  const std::vector<std::string>& pawnNames = m_scene->getPawnNames();
                   for (size_t i = 0; i < pawnNames.size(); i++)
                   {
                      SmartBody::SBPawn* p = m_scene->getPawn(pawnNames[i]);
@@ -375,7 +375,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 							}
 						}						
 
-                        vector<string> charNames = m_scene->getCharacterNames();
+                        const std::vector<string>& charNames = m_scene->getCharacterNames();
                         for (size_t i = 0; i < charNames.size(); i++)
                         {
                            SmartBody::SBCharacter * c = m_scene->getCharacter(charNames[i]);
@@ -400,7 +400,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
                            vhmsg::ttu_notify1(msg.c_str());
                         }
 
-                        vector<string> pawnNames = m_scene->getPawnNames();
+                        const std::vector<std::string>& pawnNames = m_scene->getPawnNames();
                         for (size_t i = 0; i < pawnNames.size(); i++)
                         {
                            SmartBody::SBPawn* p = m_scene->getPawn(pawnNames[i]);

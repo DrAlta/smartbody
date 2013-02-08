@@ -1067,9 +1067,9 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 		}
 		else if (strcmp( cam_cmd, "frame" ) == 0 ) {
 			SrBox sceneBox;
-			std::vector<std::string> pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+			const std::vector<std::string>& pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
 
-			for (std::vector<std::string>::iterator iter = pawnNames.begin();
+			for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 				iter != pawnNames.end();
 				iter++)
 			{
@@ -2754,8 +2754,8 @@ int mcu_controller_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 
 		
 		int numControllersAffected = 0;
-		std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-		for (std::vector<std::string>::iterator iter = characterNames.begin();
+		const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+		for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 			iter != characterNames.end();
 			iter++)
 		{
@@ -3311,8 +3311,8 @@ int mcu_vrAllCall_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
  
     // EDF - For our reply, we're going to send one vrComponent 
     //       message for each agent loaded
-	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-    for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+    for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -3421,8 +3421,8 @@ int mcu_vrPerception_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMg
 		// all characters should be receiving the perception message
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-		std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-		for (std::vector<std::string>::iterator iter = characterNames.begin();
+		const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+		for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 			iter != characterNames.end();
 			iter++)
 		{
@@ -3495,8 +3495,8 @@ int mcu_vrSpeech_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	std::string speaker = args.read_token();
 
 	// all characters should be receiving the perception message
-	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -4748,8 +4748,8 @@ int mcu_steer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 int showcharacters_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -4764,8 +4764,8 @@ int showpawns_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	
-	std::vector<std::string> pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
-	for (std::vector<std::string>::iterator iter = pawnNames.begin();
+	const std::vector<std::string>& pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 		iter != pawnNames.end();
 		iter++)
 	{
@@ -4877,9 +4877,9 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 	{
 		std::string skelName = args.read_token();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-		std::vector<std::string> characterNames = scene->getCharacterNames();
+		const std::vector<std::string>& characterNames = scene->getCharacterNames();
 		std::vector<SmartBody::SBCharacter*> controlledCharacters;
-		for (std::vector<std::string>::iterator iter = characterNames.begin();
+		for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 				iter != characterNames.end();
 				iter++)
 		{

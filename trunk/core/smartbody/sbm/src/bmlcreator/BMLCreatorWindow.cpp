@@ -170,7 +170,7 @@ void BMLCreatorWindow::RefreshCharactersCB(Fl_Widget* w, void *data)
 	window->_choiceCharacters->clear();
 	window->_choiceCharacters->add("*");
 
-	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	const std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (size_t i = 0; i < charNames.size(); i++)
 	{
 		const std::string & charName = charNames[i];
@@ -224,7 +224,7 @@ void BMLCreatorWindow::ResetBMLCB(Fl_Widget* w, void *data)
 	window->_choiceCharacters->clear();
 	window->_choiceCharacters->add("*");
 
-	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	const std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (size_t i = 0; i < charNames.size(); i++)
 	{
 		const std::string & charName = charNames[i];

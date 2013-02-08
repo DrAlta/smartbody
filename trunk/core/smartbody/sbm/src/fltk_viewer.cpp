@@ -496,8 +496,8 @@ void FltkViewer::show_menu ()
 void FltkViewer::applyToCharacters()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> characterNames = scene->getCharacterNames();
-	for (std::vector<std::string> ::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = scene->getCharacterNames();
+	for (std::vector<std::string> ::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -1110,8 +1110,8 @@ void FltkViewer::updateLights()
 	// get any pawns called 'light#' 
 	// if none exist, use the standard lights
 	_lights.clear();
-	std::vector<std::string> pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
-	for (std::vector<std::string>::iterator iter = pawnNames.begin();
+	const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 		 iter != pawnNames.end();
 	      iter++)
 	{
@@ -1299,8 +1299,8 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	
 	bool updateSim = SmartBody::SBScene::getScene()->getSimulationManager()->updateTimer();
 	SbmDeformableMeshGPU::useShadowPass = shadowPass;
-	std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
-	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 		pawnIter != pawns.end();
 		pawnIter++)
 	{
@@ -2012,8 +2012,8 @@ int FltkViewer::handle ( int event )
 				}
 				else
 				{
-					std::vector<std::string> pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
-					for (std::vector<std::string>::iterator iter = pawnNames.begin();
+					const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
+					for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 						 iter != pawnNames.end();
 					      iter++)
 					{
@@ -2259,8 +2259,8 @@ void FltkViewer::set_reach_target( int itype, const char* targetname )
 	SbmCharacter* actor = NULL;
 	int counter = 0;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> characterNames = scene->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -2602,8 +2602,8 @@ void FltkViewer::drawGazeJointLimits()
 	 
 	glDisable(GL_CULL_FACE);
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> characterNames = scene->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -2636,8 +2636,8 @@ void FltkViewer::drawEyeBeams()
 		return;
 	//drawGazeJointLimits();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> characterNames = scene->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -2686,8 +2686,8 @@ void FltkViewer::drawEyeLids()
 	glPushAttrib(GL_LIGHTING_BIT | GL_POINT_BIT);
 	glDisable(GL_LIGHTING);
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> characterNames = scene->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -2860,8 +2860,8 @@ void FltkViewer::drawCharacterBoundingVolumes()
 	bool singleChrCapsuleMode = colManager->getJointCollisionMode();
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> characterNames = scene->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -2910,8 +2910,8 @@ void FltkViewer::drawCharacterPhysicsObjs()
 	
 	SmartBody::SBPhysicsSim* phyEngine = SmartBody::SBPhysicsSim::getPhysicsEngine();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> characterNames = scene->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -3025,8 +3025,8 @@ void FltkViewer::drawPawns()
 
 	// determine the size of the pawns relative to the size of the characters
 	float pawnSize = 1.0;
-	std::vector<std::string> characterNames = scene->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -3037,8 +3037,8 @@ void FltkViewer::drawPawns()
 
 	SrCamera* currentCamera = scene->getActiveCamera();
 
-	std::vector<std::string> pawnNames = scene->getPawnNames();
-	for (std::vector<std::string>::iterator iter = pawnNames.begin();
+	const std::vector<std::string>& pawnNames = scene->getPawnNames();
+	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 		iter != pawnNames.end();
 		iter++)
 	{
@@ -3757,8 +3757,8 @@ void FltkViewer::drawLocomotion()
 {
 	int counter = 0;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> characterNames = scene->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -3873,8 +3873,8 @@ void FltkViewer::drawInteractiveLocomotion()
 
 	float pawnSize = 1.0;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> characterNames = scene->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -3898,8 +3898,8 @@ void FltkViewer::drawDynamics()
 	if (_data->dynamicsMode == ModeNoDynamics && !_data->showmasses)
 		return;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> characterNames = scene->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -4052,7 +4052,7 @@ SbmCharacter* FltkViewer::getCurrentCharacter()
 		 }
 		 else
 		 {
-			 std::vector<std::string> characterNames =  scene->getCharacterNames();
+			 const std::vector<std::string>& characterNames =  scene->getCharacterNames();
 			 if (characterNames.size() > 0)
 			 {
 				 // get the first character

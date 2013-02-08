@@ -394,7 +394,7 @@ void ChannelBufferWindow::loadMotions(ChannelBufferWindow* window)
 void ChannelBufferWindow::loadCharacters(Fl_Choice* characterChoice)
 {
 	characterChoice->clear();
-	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	const std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (size_t i = 0; i < charNames.size(); i++)
 	{
 		const std::string & charName = charNames[i];
@@ -842,7 +842,7 @@ void ChannelBufferWindow::update()
 
 		SmartBody::SBCharacter* char_p = NULL;
 		SmartBody::SBCharacter* actor = SmartBody::SBScene::getScene()->getCharacter(character->mvalue()->label());
-		std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+		const std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
 		for (size_t i = 0; i < charNames.size(); i++)
 		{
 			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charNames[i]);

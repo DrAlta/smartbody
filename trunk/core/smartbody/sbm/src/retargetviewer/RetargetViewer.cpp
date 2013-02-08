@@ -21,7 +21,7 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 
 	_choiceCharacters = new Fl_Choice(110, curY, 150, 20, "Character");
 //	choiceCharacters->callback(CharacterCB, this);
-	std::vector<std::string> characters = scene->getCharacterNames();
+	const std::vector<std::string>& characters = scene->getCharacterNames();
 	for (size_t c = 0; c < characters.size(); c++)
 	{
 		_choiceCharacters->add(characters[c].c_str());

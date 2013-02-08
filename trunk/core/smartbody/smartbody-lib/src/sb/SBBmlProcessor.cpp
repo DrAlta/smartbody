@@ -82,8 +82,8 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 			// execute directly
 			if( all_characters )
 			{
-				std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-				for (std::vector<std::string>::iterator iter = characterNames.begin();
+				const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+				for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 					iter != characterNames.end();
 					iter++)
 				{
@@ -119,8 +119,8 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 		}
 		if( all_characters )
 		{
-			std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-			for (std::vector<std::string>::iterator iter = characterNames.begin();
+			const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+			for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 				iter != characterNames.end();
 				iter++)
 			{

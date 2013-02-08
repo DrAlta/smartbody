@@ -240,8 +240,8 @@ SBPawn* SBSkeleton::getPawn()
 	// NOTE: there should be back pointer between the skeleton and the pawn/character
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
-	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 		pawnIter != pawns.end();
 		pawnIter++)
 	{

@@ -174,7 +174,7 @@ int mcu_quit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )	{
 		scene->getSteerManager()->getEngineDriver()->unloadSimulation();
 		scene->getSteerManager()->getEngineDriver()->finish();
 	
-		std::vector<std::string> characterNames = scene->getCharacterNames();
+		const std::vector<std::string>& characterNames = scene->getCharacterNames();
 		for (std::vector<std::string>::iterator iter = characterNames.begin();
 			iter != characterNames.end();
 			iter++)
@@ -830,7 +830,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 			SmartBody::SBScene::getScene()->update();
 		}
 
-			std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
 		for (std::vector<std::string>::iterator pawnIter = pawns.begin();
 			pawnIter != pawns.end();
 			pawnIter++)

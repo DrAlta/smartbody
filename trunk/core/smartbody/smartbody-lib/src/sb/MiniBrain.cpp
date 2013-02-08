@@ -43,8 +43,8 @@ void MiniBrain::update(SBCharacter* character, double time, double dt)
 		SrVec zfacing(0, 0, 1);
 		myFacing = zfacing * quat;
 	}
-	std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
-	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 		pawnIter != pawns.end();
 		pawnIter++)
 	{
