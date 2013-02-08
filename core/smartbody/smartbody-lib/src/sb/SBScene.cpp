@@ -1147,9 +1147,6 @@ bool SBScene::runScript(const std::string& script)
 	{
 		candidateSeqName.append(".py");
 	}
-	// current path containing .exe
-	char CurrentPath[FILENAME_MAX];
-	_getcwd(CurrentPath, FILENAME_MAX);
 
 	std::string curFilename = SmartBody::SBScene::getScene()->getAssetManager()->findFileName("script", candidateSeqName);
 	if (curFilename != "")
