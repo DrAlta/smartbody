@@ -278,7 +278,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::MapSkeleton( const char * mapName, const c
 	if (!sbskeleton)
 	{
 		LOG("Cannot find skeleton named %s.", skeletonName);
-		return CMD_FAILURE;
+		return false;
 	}
 	
 	// find the bone map name
@@ -286,7 +286,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::MapSkeleton( const char * mapName, const c
 	if (!jointMap)
 	{
 		LOG("Cannot find joint map name '%s'.", mapName);
-		return CMD_FAILURE;
+		return false;
 	}
 
 	// apply the map
@@ -294,7 +294,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::MapSkeleton( const char * mapName, const c
 
 	LOG("Applied joint map %s to skeleton %s.", mapName, skeletonName);
 
-	return CMD_SUCCESS;
+	return true;
 
 
     //int ret = mcu.map_skeleton( mapName, skeletonName );
@@ -307,7 +307,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::MapMotion( const char * mapName, const cha
 	if (!sbmotion)
 	{
 		LOG("Cannot find motion name %s.", motionName);
-		return CMD_FAILURE;
+		return false;
 	}
 	
 	// find the bone map name
@@ -315,7 +315,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::MapMotion( const char * mapName, const cha
 	if (!jointMap)
 	{
 		LOG("Cannot find bone map name '%s'.", mapName);
-		return CMD_FAILURE;
+		return true;
 	}
 
 	// apply the map
