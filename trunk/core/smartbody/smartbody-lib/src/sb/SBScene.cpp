@@ -32,6 +32,7 @@
 #include <sb/SBAssetManager.h>
 #include <sb/SBSpeechManager.h>
 #include <sb/SBCommandManager.h>
+#include <sb/SBWSPManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBParser.h>
 #include <sb/SBDebuggerServer.h>
@@ -46,6 +47,7 @@
 #include <sb/SBJointMap.h>
 #include <sb/SBCharacterListener.h>
 #include <sbm/ParserBVH.h>
+#include <sbm/Heightfield.h>
 #include <sr/sr_camera.h>
 #include <controllers/me_ct_gaze.h>
 #include <controllers/me_ct_eyelid.h>
@@ -54,6 +56,7 @@
 #include <controllers/me_ct_saccade.h>
 #include <sbm/KinectProcessor.h>
 #include <controllers/me_controller_tree_root.hpp>
+#include <sr/sr_sn_group.h>
 
 #ifndef WIN32
 #define _stricmp strcasecmp
@@ -77,6 +80,12 @@ void SBScene::initialize()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.reset();
 
+#ifndef SB_NO_PYTHON
+#ifndef __native_client__
+	_mainModule = NULL;
+	_mainDict = NULL;
+#endif
+#endif
 	_processId = "";
 
 	createDefaultControllers();
@@ -103,6 +112,7 @@ void SBScene::initialize()
 	_speechManager = new SBSpeechManager();
 	_vhmsgManager = new SBVHMsgManager();
 	_commandManager = new SBCommandManager();
+	_wspManager = new SBWSPManager();
 
 	_scale = .01f; // default scale is centimeters
 
@@ -112,6 +122,7 @@ void SBScene::initialize()
 	_serviceManager->addService(_boneBusManager);
 	_serviceManager->addService(_collisionManager);
 	_serviceManager->addService(_vhmsgManager);
+	_serviceManager->addService(_wspManager);
 
 	_parser = new SBParser();
 
@@ -137,16 +148,11 @@ void SBScene::initialize()
 		// re-initialize
 	// initialize everything
 	
-	mcu.net_bone_updates = false;
-	mcu.net_world_offset_updates = true;
-	mcu.root_group_p = new SrSnGroup();
-	mcu.logListener = NULL;
-	mcu.root_group_p->ref();
+	_rootGroup = new SrSnGroup();
+	_rootGroup->ref();
+
+	_heightField = NULL;
 	mcu.kinectProcessor = new KinectProcessor();
-#if USE_WSP
-	mcu.theWSP = WSP::create_manager();
-	mcu.theWSP->init( "SMARTBODY" );
-#endif
 
 	// Create default settings
 	createDefaultControllers();
@@ -277,6 +283,7 @@ void SBScene::cleanup()
 	delete _assetManager;
 	delete _speechManager;
 	delete _commandManager;
+	delete _wspManager;
 
 	_sim = NULL;
 	_profiler = NULL;
@@ -295,19 +302,21 @@ void SBScene::cleanup()
 	_retargetManager = NULL;
 	_eventManager = NULL;
 	_assetManager = NULL;
+	_commandManager = NULL;
+	_speechManager = NULL;
+	_wspManager = NULL;
+	
+	if (_heightField)
+	{
+		delete _heightField;
+	}
+	_heightField = NULL;
+
+	_rootGroup->unref();
+	_rootGroup = NULL;
 	
 	AUDIO_Close();
 	AUDIO_Init();
-
-#if USE_WSP
-	mcu.theWSP->shutdown();
-
-	if (mcu.theWSP)
-	{
-		delete mcu.theWSP;
-		mcu.theWSP = NULL;
-	}
-#endif
 
 	if (_vhmsgManager->isEnable())
 		_vhmsgManager->send( "vrProcEnd sbm" );
@@ -411,12 +420,12 @@ void SBScene::update()
 	if (isRemoteMode())
 	{
 		getDebuggerClient()->Update();
-		std::map<std::string, SbmPawn*>::iterator iter;
-		for (iter = mcu.getPawnMap().begin();
-			iter != mcu.getPawnMap().end();
-			iter++)
+		std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+			pawnIter != pawns.end();
+			pawnIter++)
 		{
-			SbmPawn* pawn = (*iter).second;
+			SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
 			pawn->ct_tree_p->evaluate(getSimulationManager()->getTime());
 			pawn->ct_tree_p->applySkeletonToBuffer();
 		}
@@ -488,12 +497,12 @@ void SBScene::update()
 	}
 
 	bool isClosingBoneBus = false;
-    std::map<std::string, SbmPawn*>::iterator iter;
-	for (iter = mcu.getPawnMap().begin();
-		iter != mcu.getPawnMap().end();
-		iter++)
+	std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+		pawnIter != pawns.end();
+		pawnIter++)
 	{
-		SbmPawn* pawn = (*iter).second;
+		SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
 		pawn->reset_all_channels();
 		pawn->ct_tree_p->evaluate( getSimulationManager()->getTime() );
 		pawn->ct_tree_p->applyBufferToAllSkeletons();
@@ -558,37 +567,35 @@ void SBScene::update()
 				LOG("BoneBus cannot connect to server after visemes sent. Removing all characters.");
 			}
 
-			
-
-			if ( getBoneBusManager()->isEnable() && char_p->getSkeleton() && char_p->bonebusCharacter ) {
+			if ( getBoneBusManager()->isEnable() && 
+				 char_p->getSkeleton() && 
+				 char_p->bonebusCharacter)
+			{
 				mcu.NetworkSendSkeleton( char_p->bonebusCharacter, (SkSkeleton *)(char_p->getSkeleton()), &mcu.param_map );
 
-				if ( mcu.net_world_offset_updates ) {
+				const SkJoint * joint = char_p->get_world_offset_joint();
 
-					const SkJoint * joint = char_p->get_world_offset_joint();
+				const SkJointPos * pos = joint->const_pos();
+				float x = pos->value( SkJointPos::X );
+				float y = pos->value( SkJointPos::Y );
+				float z = pos->value( SkJointPos::Z );
 
-					const SkJointPos * pos = joint->const_pos();
-					float x = pos->value( SkJointPos::X );
-					float y = pos->value( SkJointPos::Y );
-					float z = pos->value( SkJointPos::Z );
+				SkJoint::RotType rot_type = joint->rot_type();
+				if ( rot_type != SkJoint::TypeQuat ) {
+					//strstr << "ERROR: Unsupported world_offset rotation type: " << rot_type << " (Expected TypeQuat, "<<SkJoint::TypeQuat<<")"<<endl;
+				}
 
-					SkJoint::RotType rot_type = joint->rot_type();
-					if ( rot_type != SkJoint::TypeQuat ) {
-						//strstr << "ERROR: Unsupported world_offset rotation type: " << rot_type << " (Expected TypeQuat, "<<SkJoint::TypeQuat<<")"<<endl;
-					}
+				// const_cast because the SrQuat does validation (no const version of value())
+				const SrQuat & q = ((SkJoint *)joint)->quat()->value();
 
-					// const_cast because the SrQuat does validation (no const version of value())
-					const SrQuat & q = ((SkJoint *)joint)->quat()->value();
+				char_p->bonebusCharacter->SetPosition( x, y, z, getSimulationManager()->getTime() );
+				char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.x, (float)q.y, (float)q.z, getSimulationManager()->getTime() );
 
-					char_p->bonebusCharacter->SetPosition( x, y, z, getSimulationManager()->getTime() );
-					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.x, (float)q.y, (float)q.z, getSimulationManager()->getTime() );
-
-					if (char_p->bonebusCharacter->GetNumErrors() > 3)
-					{
-						// connection is bad, remove the bonebus character 
-						isClosingBoneBus = true;
-						LOG("BoneBus cannot connect to server. Removing all characters");
-					}
+				if (char_p->bonebusCharacter->GetNumErrors() > 3)
+				{
+					// connection is bad, remove the bonebus character 
+					isClosingBoneBus = true;
+					LOG("BoneBus cannot connect to server. Removing all characters");
 				}
 			}
 			else if (!isClosingBoneBus && !char_p->bonebusCharacter && getBoneBusManager()->getBoneBus().IsOpen())
@@ -601,11 +608,12 @@ void SBScene::update()
 
 	if (isClosingBoneBus)
 	{
-		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-			iter != mcu.getPawnMap().end();
+		std::vector<std::string> pawnNames = getPawnNames();
+		for (std::vector<std::string>::iterator iter = pawnNames.begin();
+			iter != pawnNames.end();
 			iter++)
 		{
-			SbmPawn* pawn = (*iter).second;
+			SBPawn* pawn = getPawn(*iter);
 			if (pawn->bonebusCharacter)
 			{
 				bool success = getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
@@ -616,11 +624,12 @@ void SBScene::update()
 		getBoneBusManager()->getBoneBus().CloseConnection();
 	}
 
-	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-			iter != mcu.getPawnMap().end();
+	std::vector<std::string> pawnNames = getPawnNames();
+	for (std::vector<std::string>::iterator iter = pawnNames.begin();
+		iter != pawnNames.end();
 		iter++)
 	{
-		SbmPawn* pawn = (*iter).second;
+		SBPawn* pawn = getPawn(*iter);
 		pawn->afterUpdate(getSimulationManager()->getTime());
 	}
 
@@ -765,29 +774,32 @@ SBCharacter* SBScene::createCharacter(const std::string& charName, const std::st
 	else
 	{
 		SBCharacter* character = new SBCharacter(charName, metaInfo);
-		SBSkeleton* skeleton = new SBSkeleton();		
-		character->setSkeleton(skeleton);		
-		SkJoint* joint = skeleton->add_joint(SkJoint::TypeQuat);
-		joint->setName("world_offset");		
-		joint->update_gmat();
-
-
-		std::map<std::string, SbmPawn*>::iterator iter = mcu.pawn_map.find(character->getName());
-		if (iter != mcu.pawn_map.end())
+		
+		std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(character->getName());
+		if (iter != _pawnMap.end())
 		{
 			LOG( "Register character: pawn_map.insert(..) '%s' FAILED\n", character->getName().c_str() ); 
 		}
 
-		mcu.pawn_map.insert(std::pair<std::string, SbmPawn*>(character->getName(), character));
+		_pawnMap.insert(std::pair<std::string, SbmPawn*>(character->getName(), character));
 	
 
-		std::map<std::string, SbmCharacter*>::iterator citer = mcu.character_map.find(character->getName());
-		if (citer != mcu.character_map.end())
+		std::map<std::string, SbmCharacter*>::iterator citer = _characterMap.find(character->getName());
+		if (citer != _characterMap.end())
 		{
 			LOG( "Register character: character_map.insert(..) '%s' FAILED\n", character->getName().c_str() );
-			mcu.pawn_map.erase(iter);
+			_pawnMap.erase(iter);
 		}
-		mcu.character_map.insert(std::pair<std::string, SbmCharacter*>(character->getName(), character));
+		_characterMap.insert(std::pair<std::string, SbmCharacter*>(character->getName(), character));
+
+
+		if (getCharacterListener() )
+			getCharacterListener()->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
+		SBSkeleton* skeleton = new SBSkeleton();		
+		character->setSkeleton(skeleton);
+//		SkJoint* joint = skeleton->add_joint(SkJoint::TypeQuat);
+//		joint->setName("world_offset");		
+//		joint->update_gmat();
 
 		if (getBoneBusManager()->isEnable())
 			getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true );
@@ -810,9 +822,8 @@ SBCharacter* SBScene::createCharacter(const std::string& charName, const std::st
 
 SBPawn* SBScene::createPawn(const std::string& pawnName)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	SbmPawn* pawn = mcu.getPawn(pawnName);
-	SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
+	SBPawn* pawn = getPawn(pawnName);
+	SBCharacter* character = dynamic_cast<SBCharacter*>(pawn);
 	if (character)
 	{
 		LOG("Pawn '%s' is a character.", pawnName.c_str());
@@ -831,13 +842,13 @@ SBPawn* SBScene::createPawn(const std::string& pawnName)
 		SkJoint* joint = skeleton->add_joint(SkJoint::TypeQuat);
 		joint->setName("world_offset");
 
-		std::map<std::string, SbmPawn*>::iterator iter = mcu.pawn_map.find(pawn->getName());
-		if (iter != mcu.pawn_map.end())
+		std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(pawn->getName());
+		if (iter != _pawnMap.end())
 		{
 			LOG( "Register pawn: pawn_map.insert(..) '%s' FAILED\n", pawn->getName().c_str() ); 
 		}
 
-		mcu.pawn_map.insert(std::pair<std::string, SbmPawn*>(pawn->getName(), pawn));
+		_pawnMap.insert(std::pair<std::string, SbmPawn*>(pawn->getName(), pawn));
 	
 		if (getCharacterListener())
 			getCharacterListener()->OnPawnCreate( pawn->getName().c_str() );
@@ -881,16 +892,16 @@ void SBScene::removeCharacter(const std::string& charName)
 		if (getCharacterListener() )
 			getCharacterListener()->OnCharacterDelete( character->getName().c_str() );
 
-		std::map<std::string, SbmPawn*>::iterator iter = mcu.pawn_map.find(character->getName());
-		if (iter != mcu.pawn_map.end())
+		std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(character->getName());
+		if (iter != _pawnMap.end())
 		{
-			mcu.pawn_map.erase(iter);
+			_pawnMap.erase(iter);
 		}
 
-		std::map<std::string, SbmCharacter*>::iterator citer = mcu.character_map.find(character->getName());
-		if (citer != mcu.character_map.end())
+		std::map<std::string, SbmCharacter*>::iterator citer = _characterMap.find(character->getName());
+		if (citer != _characterMap.end())
 		{
-			mcu.character_map.erase(citer);
+			_characterMap.erase(citer);
 		}
 
 		delete character;
@@ -913,7 +924,7 @@ void SBScene::removeAllCharacters()
 void SBScene::removePawn(const std::string& pawnName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = mcu.getPawn(pawnName);
+	SbmPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnName);
 	if (pawn)
 	{
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
@@ -933,10 +944,10 @@ void SBScene::removePawn(const std::string& pawnName)
 			if (getCharacterListener())
 				getCharacterListener()->OnPawnDelete( pawn->getName().c_str() );
 
-			std::map<std::string, SbmPawn*>::iterator iter = mcu.pawn_map.find(pawn->getName());
-			if (iter != mcu.pawn_map.end())
+			std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(pawn->getName());
+			if (iter != _pawnMap.end())
 			{
-				mcu.pawn_map.erase(iter);
+				_pawnMap.erase(iter);
 			}
 
 			delete pawn;
@@ -961,55 +972,53 @@ void SBScene::removeAllPawns()
 int SBScene::getNumCharacters() 
 {  
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	return mcu.character_map.size(); 
+	return _characterMap.size(); 
 }
 
 int SBScene::getNumPawns() 
 {  
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	return mcu.pawn_map.size() - mcu.character_map.size(); 
+	return _pawnMap.size() - _characterMap.size(); 
 }
 
 SBPawn* SBScene::getPawn(const std::string& name)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = mcu.getPawn(name);
-	if (pawn)
+	std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(name);
+	if (iter == _pawnMap.end())
 	{
-		SBPawn* sbpawn = dynamic_cast<SBPawn*>(pawn);
-		return sbpawn;
+		return NULL;
 	}
 	else
 	{
-		//LOG("pawn %s does not exist.", name.c_str());
-		return NULL;
+		SBPawn* sbpawn = dynamic_cast<SBPawn*>((*iter).second);
+		return sbpawn;
 	}
 }
 
 SBCharacter* SBScene::getCharacter(const std::string& name)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::map<std::string, SbmCharacter*>::iterator iter = mcu.character_map.find(name);
-	if (iter == mcu.character_map.end())
+	std::map<std::string, SbmCharacter*>::iterator iter = _characterMap.find(name);
+	if (iter == _characterMap.end())
+	{
 		return NULL;
-
-	SBCharacter* sbcharacter = dynamic_cast<SBCharacter*>((*iter).second);
-	return sbcharacter;
+	}
+	else
+	{
+		SBCharacter* sbcharacter = dynamic_cast<SBCharacter*>((*iter).second);
+		return sbcharacter;
+	}
 }
 
 std::vector<std::string> SBScene::getPawnNames()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::vector<std::string> ret;
 
-	for(std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-		iter != mcu.getPawnMap().end();
+	for (std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.begin();
+		iter != _pawnMap.end();
 		iter++)
 	{
 		SbmPawn* pawn = (*iter).second;
-		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
-		if (!character)
-			ret.push_back(std::string(pawn->getName()));
+		ret.push_back(pawn->getName());
 	}
 
 	return ret;
@@ -1017,15 +1026,14 @@ std::vector<std::string> SBScene::getPawnNames()
 
 std::vector<std::string> SBScene::getCharacterNames()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::vector<std::string> ret;
 
-	for(std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	for (std::map<std::string, SbmCharacter*>::iterator iter = _characterMap.begin();
+		iter != _characterMap.end();
 		iter++)
 	{
-		SbmCharacter* sbmCharacter = (*iter).second;
-		ret.push_back(std::string(sbmCharacter->getName()));
+		SbmCharacter* character = (*iter).second;
+		ret.push_back(character->getName());
 	}
 
 	return ret;
@@ -1256,6 +1264,12 @@ SBCommandManager* SBScene::getCommandManager()
 {
 	return _commandManager;
 }
+
+SBWSPManager* SBScene::getWSPManager()
+{
+	return _wspManager;
+}
+
 
 SBVHMsgManager* SBScene::getVHMsgManager()
 {
@@ -2294,9 +2308,7 @@ std::vector<std::string> SBScene::getSystemParameterNames()
 
 SrCamera* SBScene::createCamera(const std::string& name)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	SbmPawn* pawn = mcu.getPawn(name);
+	SBPawn* pawn = getPawn(name);
 	SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
 // 	if (camera)
 // 	{
@@ -2318,13 +2330,13 @@ SrCamera* SBScene::createCamera(const std::string& name)
 
 	_cameras.insert(std::pair<std::string, SrCamera*>(name, camera));
 
-	std::map<std::string, SbmPawn*>:: iterator iter = mcu.pawn_map.find(camera->getName());
-	if (iter != mcu.pawn_map.end())
+	std::map<std::string, SbmPawn*>:: iterator iter = _pawnMap.find(camera->getName());
+	if (iter != _pawnMap.end())
 	{
 		LOG( "Register pawn: pawn_map.insert(..) '%s' FAILED\n", camera->getName().c_str() ); 
 	}
 
-	mcu.pawn_map.insert(std::pair<std::string, SbmPawn*>(camera->getName(), camera));
+	_pawnMap.insert(std::pair<std::string, SbmPawn*>(camera->getName(), camera));
 	
 	if (getCharacterListener())
 		getCharacterListener()->OnPawnCreate( camera->getName().c_str() );
@@ -2352,9 +2364,7 @@ SrCamera* SBScene::createCamera(const std::string& name)
 
 void SBScene::removeCamera(SrCamera* camera)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	SbmPawn* pawn = mcu.getPawn(camera->getName());
+	SBPawn* pawn = getPawn(camera->getName());
 	if (!pawn)
 	{
 		LOG("No camera with name '%s' already exists. Camera will not be removed.", camera->getName().c_str());
@@ -2580,5 +2590,136 @@ SBSkeleton* SBScene::getSkeleton(const std::string& name)
 		LOG("DEPRECATED: Use AssetManager.getSkeleton() instead.");
 	return getAssetManager()->getSkeleton(name);
 }
+
+SrSnGroup* SBScene::getRootGroup()
+{
+	return _rootGroup;
+}
+
+
+std::string SBScene::getValidName(const std::string& name)
+{
+	bool nameFound = true;
+	int nameCounter = 0;
+	std::string currentName = name;
+	while (nameFound)
+	{
+		SmartBody::SBPawn* pawn = getPawn(currentName);
+		if (!pawn)
+		{
+			nameFound = false;
+		}
+		else
+		{
+			SmartBody::SBCharacter* character = getCharacter(currentName);
+			if (!character)
+			{
+				nameFound = false;
+			}
+			else
+			{
+				std::stringstream strstr;
+				strstr << name << nameCounter;
+				nameCounter++;
+				currentName = strstr.str();
+			}
+		}
+	}
+	return currentName;
+}
+
+void SBScene::updatePawnNames()
+{
+	std::vector<SbmPawn*> allPawns;
+	for (std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.begin();
+		 iter != _pawnMap.end();
+		 iter++)
+	{
+		allPawns.push_back((*iter).second);
+	}
+
+	for (std::vector<SbmPawn*>::iterator iter = allPawns.begin();
+		 iter != allPawns.end();
+		 iter++)
+	{
+		_pawnMap.insert(std::pair<std::string, SbmPawn*>((*iter)->getName(), (*iter))); 
+	}
+
+}
+
+void SBScene::updateCharacterNames()
+{
+	std::vector<SbmCharacter*> allCharacters;
+	for (std::map<std::string, SbmCharacter*>::iterator iter = _characterMap.begin();
+		 iter != _characterMap.end();
+		 iter++)
+	{
+		allCharacters.push_back((*iter).second);
+	}
+
+	for (std::vector<SbmCharacter*>::iterator iter = allCharacters.begin();
+		 iter != allCharacters.end();
+		 iter++)
+	{
+		_characterMap.insert(std::pair<std::string, SbmCharacter*>((*iter)->getName(), (*iter))); 
+	}
+}
+
+Heightfield* SBScene::getHeightfield()
+{
+	return _heightField;
+}
+
+
+Heightfield* SBScene::createHeightfield()
+{
+	if (_heightField)
+		delete _heightField;
+	_heightField = new Heightfield();
+	return _heightField;
+}
+
+void SBScene::removeHeightfield()
+{
+	if (_heightField)
+		delete _heightField;
+	_heightField = NULL;
+}
+
+float SBScene::queryTerrain( float x, float z, float *normal_p )
+{
+	if (_heightField)
+	{
+		return( _heightField->get_elevation( x, z, normal_p ) );
+	}
+	if( normal_p )	{
+		normal_p[ 0 ] = 0.0;
+		normal_p[ 1 ] = 1.0;
+		normal_p[ 2 ] = 0.0;
+	}
+	return( 0.0 );
+}
+
+void SBScene::setPythonMainModule(boost::python::object* pyobject)
+{
+	_mainModule = pyobject;
+}
+
+void SBScene::setPythonMainDict(boost::python::object* pyobject)
+{
+	_mainDict = pyobject;
+}
+
+boost::python::object* SBScene::getPythonMainModule()
+{
+	return _mainModule;
+}
+
+boost::python::object* SBScene::getPythonMainDict()
+{
+	return _mainDict;
+}
+
+
 
 };

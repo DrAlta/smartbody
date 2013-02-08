@@ -80,12 +80,14 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 
 		if( send ) {
 			// execute directly
-			if( all_characters ) {
-				for(std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-					iter != mcu.getCharacterMap().end();
+			if( all_characters )
+			{
+				std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+				for (std::vector<std::string>::iterator iter = characterNames.begin();
+					iter != characterNames.end();
 					iter++)
 				{
-					SbmCharacter* character = (*iter).second;
+					SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
 					msgId = build_vrX( msg, cmd, character->getName().c_str(), recip_id, bml, false );
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send( cmd, msg.str().c_str() );
 				}
@@ -115,12 +117,14 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 				////LOG(strstr.str().c_str());
 			}
 		}
-		if( all_characters ) {
-			for(std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-				iter != mcu.getCharacterMap().end();
+		if( all_characters )
+		{
+			std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+			for (std::vector<std::string>::iterator iter = characterNames.begin();
+				iter != characterNames.end();
 				iter++)
 			{
-				SbmCharacter* character = (*iter).second;
+				SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
 				msgId = build_vrX( msg, cmd, character->getName().c_str(), recip_id, bml, true );
 				if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
 					std::stringstream strstr;

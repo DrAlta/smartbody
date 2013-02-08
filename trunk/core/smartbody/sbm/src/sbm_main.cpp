@@ -80,6 +80,8 @@
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBSpeechManager.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBBoneBusManager.h>
+#include <sb/SBWSPManager.h>
 #include "FLTKListener.h"
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
@@ -759,8 +761,12 @@ int main( int argc, char **argv )	{
 #endif
 
 	// Sets up the network connection for sending bone rotations over to the renderer
+	
 	if( net_host != "" )
-		mcu.set_net_host( net_host.c_str() );
+	{
+		SmartBody::SBScene::getScene()->getBoneBusManager()->setHost(net_host);
+		SmartBody::SBScene::getScene()->getBoneBusManager()->setEnable(true);
+	}
 
 	if( proc_id != "" )
 	{
@@ -951,7 +957,9 @@ int main( int argc, char **argv )	{
 			}
 		}
 #if USE_WSP
-		mcu.theWSP->broadcast_update();
+		SmartBody::SBWSPManager* wspManager = SmartBody::SBScene::getScene()->getWSPManager();
+		if (wspManager->isEnable())
+			wspManager->broadcastUpdate();
 #endif
 
 		if( update_sim )	{
@@ -966,11 +974,12 @@ int main( int argc, char **argv )	{
 			if (character->scene_p)
 				character->scene_p->update();	
 		}*/
-		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-			 iter != mcu.getPawnMap().end();
-			 iter++)
+		std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+			pawnIter != pawns.end();
+			pawnIter++)
 		{
-			SbmPawn* pawn = (*iter).second;
+			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
  			if (pawn->scene_p)
  				pawn->scene_p->update();	
 		}

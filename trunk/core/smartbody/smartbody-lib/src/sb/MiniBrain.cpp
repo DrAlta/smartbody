@@ -43,12 +43,12 @@ void MiniBrain::update(SBCharacter* character, double time, double dt)
 		SrVec zfacing(0, 0, 1);
 		myFacing = zfacing * quat;
 	}
-
-	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-		 iter != mcu.getPawnMap().end();
-		 iter++)
+	std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+		pawnIter != pawns.end();
+		pawnIter++)
 	{
-		SbmPawn* pawn = (*iter).second;
+		SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
 
 		// determine the velocity of the object
 		std::map<std::string, ObjectData>::iterator piter = _data.find(pawn->getName());
@@ -176,7 +176,7 @@ void MiniBrain::update(SBCharacter* character, double time, double dt)
 		float characterHeight = character->getHeight();
 		if (fastest > characterHeight / 10.0)
 		{
-			SbmPawn* gazeTarget = mcu.getPawn(fastestObject);
+			SbmPawn* gazeTarget =  SmartBody::SBScene::getScene()->getPawn(fastestObject);
 			if (!gazeTarget)
 				return;
 

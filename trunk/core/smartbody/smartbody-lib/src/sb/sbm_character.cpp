@@ -389,6 +389,12 @@ void SbmCharacter::createStandardControllers()
 		breathingJointY->setUsePosition(0, true);
 		breathingJointY->pos()->limits(SkJointPos::X, -1000, 1000);  // Setting upper bound to 2 allows some exageration
 		rootJoint->addChild(breathingJointY);
+
+		if (SmartBody::SBScene::getScene()->getCharacterListener())
+		{
+			SmartBody::SBScene::getScene()->getCharacterListener()->OnCharacterChanged( getName() );
+		}
+
 	}
 
 	gaze_sched_p = CreateSchedulerCt( getName().c_str(), "gaze" );
@@ -829,7 +835,7 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
-	if (mcuCBHandle::singleton().net_bone_updates)
+	if (scene->getBoneBusManager()->isEnable())
 		bonebusCharacter = scene->getBoneBusManager()->getBoneBus().CreateCharacter( getName().c_str(), classType, true );
 
 	if (scene->getCharacterListener())

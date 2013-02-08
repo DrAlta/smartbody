@@ -26,7 +26,6 @@ SrViewer* getViewer()
 		mcu.viewer_p = mcu.viewer_factory->create(100, 100, 800, 600);
 		mcu.viewer_p->label_viewer("Visual Debugger");
 		SmartBody::SBScene::getScene()->createCamera("cameraDefault");
-		mcu.viewer_p->root(mcu.root_group_p);
 	}
 	return mcu.viewer_p;
 }

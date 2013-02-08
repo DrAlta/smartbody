@@ -329,12 +329,12 @@ void BaseWindow::render ()
 
 void BaseWindow::root(SrSn* r)
 {
-	fltkViewer->root(r);
+	//fltkViewer->root(r);
 }
 
 SrSn* BaseWindow::root()
 {
-	return fltkViewer->root();
+	return SmartBody::SBScene::getScene()->getRootGroup();
 }
 
 
@@ -443,7 +443,8 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.viewer_p = window;
-	mcu.viewer_p->root(mcu.root_group_p);
+	mcu.viewer_p->root(SmartBody::SBScene::getScene()->getRootGroup());
+	SbmShaderManager::singleton().setViewer(window);
 
 	scene->getSimulationManager()->setupTimer();
 
@@ -628,7 +629,8 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		mcu.viewer_p = window;
-		mcu.viewer_p->root(mcu.root_group_p);
+		mcu.viewer_p->root(SmartBody::SBScene::getScene()->getRootGroup());
+		SbmShaderManager::singleton().setViewer(window);
 
 
 		std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
@@ -639,7 +641,7 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 		scene->getSimulationManager()->setupTimer();
 		
 		SrCamera* camera = scene->createCamera("cameraDefault");
-		camera->reset();
+		camera->reset(); 
 
 		std::string pythonLibPath = SmartBody::SBScene::getSystemParameter("pythonlibpath");
 		setupPython();
@@ -1424,10 +1426,10 @@ void BaseWindow::CreateTerrainCB(Fl_Widget* w, void* data)
 		std::string terrainCommand = "terrain load ";
 		terrainCommand.append(terrainFile);
 		SmartBody::SBScene::getScene()->command((char*)terrainCommand.c_str());
-		if (mcu.height_field_p)
+		if (SmartBody::SBScene::getScene()->getHeightfield())
 		{
-			mcu.height_field_p->set_scale( 5000.0f, 300.0f, 5000.0f );
-			mcu.height_field_p->set_auto_origin();
+			SmartBody::SBScene::getScene()->getHeightfield()->set_scale( 5000.0f, 300.0f, 5000.0f );
+			SmartBody::SBScene::getScene()->getHeightfield()->set_auto_origin();
 		}
 	}
 }

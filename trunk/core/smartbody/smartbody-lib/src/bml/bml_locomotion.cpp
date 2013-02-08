@@ -272,7 +272,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		}
 
 		// does the facing angle match a pawn?
-		SbmPawn* facingPawn = mcu->getPawn(facingAngleStr);
+		SbmPawn* facingPawn =  SmartBody::SBScene::getScene()->getPawn(facingAngleStr);
 		if (facingPawn)
 		{
 			float x, y, z, h, p, r;
@@ -319,7 +319,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		}
 		else
 		{
-			SbmPawn* pawn = mcu->getPawn(token);
+			SbmPawn* pawn =  SmartBody::SBScene::getScene()->getPawn(token);
 			if (pawn)
 			{
 				// get the world offset x & z
@@ -351,7 +351,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		while (icount < tokens.size())
 		{			
 			std::string tok1 = tokens[icount];
-			SbmPawn* pawn = mcu->getPawn(tok1);
+			SbmPawn* pawn =  SmartBody::SBScene::getScene()->getPawn(tok1);
 			if (pawn) // use pawn position as way point
 			{				
 				float x,y,z,h,p,r;

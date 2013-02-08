@@ -78,7 +78,8 @@ class PALocomotionData;
     In all modes, mouse interaction is done together with Ctrl and Shift modifiers.
     A popup menu appears with a right button click or ctrl+shift+m. */
 
-class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObserver
+//class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObserver
+class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
  {
    public : // enumerators
 
@@ -231,15 +232,6 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObs
     /*! Destructs all internal data, and calls unref() for the root node. */
     virtual ~FltkViewer ();
 
-    /*! Retreave the scene root pointer, without calling unref() for it. Note that
-        if the user does not give any root node to SrViewer, an empty (but valid)
-        SrSnGroup is returned. */
-    SrSn *root ();
-
-    /*! Changes the scene root pointer. When the new node r is given, r->ref() is 
-        called, and the old root node has its unref() method called. If r is null,
-        an empty SrSnGroup is created and used as root */
-    void root ( SrSn *r );
 
     /*! Draws string in the graphics window. If s==0 it will erase current string. */
     void draw_message ( const char* s );
@@ -404,7 +396,6 @@ protected:
 
  class FltkViewerData
  { public :
-   SrSn*  root;              // contains the user scene
    FltkViewer::RenderMode rendermode; // render mode
    FltkViewer::CharacterMode charactermode; // character mode
    FltkViewer::JointMode jointmode; // character mode

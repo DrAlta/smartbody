@@ -98,7 +98,7 @@ MeCtHand::~MeCtHand( void )
 SbmPawn* MeCtHand::getAttachedPawn()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* attachedPawn = mcu.getPawn(attachedPawnName);	
+	SbmPawn* attachedPawn =  SmartBody::SBScene::getScene()->getPawn(attachedPawnName);	
 	if (attachedPawnName != "" && !attachedPawn) // pawn is removed
 	{
 		releasePawn();
@@ -110,7 +110,7 @@ SbmPawn* MeCtHand::getAttachedPawn()
 SbmPawn* MeCtHand::getTargetObject()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* targetObject = mcu.getPawn(grabTargetName);
+	SbmPawn* targetObject =  SmartBody::SBScene::getScene()->getPawn(grabTargetName);
 	if (grabTargetName != "" && !targetObject) // pawn is removed
 		grabTargetName = "";
 	return targetObject;

@@ -90,14 +90,13 @@ int set_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args)
 WSP::WSP_ERROR remote_pawn_position_update( std::string id, std::string attribute_name, wsp_vector & vector_3d, void * data, const std::string & data_provider )
 {
 	mcuCBHandle * mcu_p = static_cast< mcuCBHandle * >( data );
-
-	SbmPawn * pawn_p = mcu_p->getPawn( id );
-	if ( pawn_p != NULL )
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(id);
+	if ( pawn != NULL )
 	{
 		float x, y, z, h, p, r;
-		pawn_p->get_world_offset( x, y, z, h, p, r );
+		pawn->get_world_offset( x, y, z, h, p, r );
 
-		pawn_p->set_world_offset( (float)vector_3d.x, (float)vector_3d.y, (float)vector_3d.z, h, p, r );
+		pawn->set_world_offset( (float)vector_3d.x, (float)vector_3d.y, (float)vector_3d.z, h, p, r );
 	}
 	else
 	{
@@ -114,7 +113,7 @@ WSP::WSP_ERROR remote_pawn_rotation_update( std::string id, std::string attribut
 {
 	mcuCBHandle * mcu_p = static_cast< mcuCBHandle * >( data );
 
-	SbmPawn * pawn_p = mcu_p->getPawn( id );
+	SbmPawn * pawn_p =  SmartBody::SBScene::getScene()->getPawn( id );
 
 	if ( pawn_p != NULL )
 	{
@@ -154,7 +153,7 @@ int pawn_set_cmd_funcx( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	SbmPawn* pawn = mcu.getPawn( pawn_id );
+	SbmPawn* pawn =  SmartBody::SBScene::getScene()->getPawn( pawn_id );
 	if( pawn==NULL ) {
 		LOG("ERROR: SbmPawn::set_cmd_func(..): Unknown pawn id \"%s\".", pawn_id.c_str());
 		return CMD_FAILURE;
@@ -322,7 +321,7 @@ int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 	if (pawn_cmd == "init")
 	{
 		// pawn <name> init [loc <x> <y> <z>] [geom <shape name>] [color <color hex>] [size <size>]
-		SbmPawn* pawn_p = mcu.getPawn(pawn_name);
+		SbmPawn* pawn_p =  SmartBody::SBScene::getScene()->getPawn(pawn_name);
 		if( pawn_p != NULL ) {
 			LOG("ERROR: Pawn \"%s\" already exists.", pawn_name.c_str());
 			return CMD_FAILURE;
@@ -431,17 +430,6 @@ int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 		// 			pawn_p->colObj_p = colObj;
 		// 		}
 
-		/*
-		bool ok = mcu_p->addPawn( pawn_p );
-		if( !ok )	{
-			std::stringstream strstr;
-			strstr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_name << "\" FAILED";
-			LOG(strstr.str().c_str());
-			delete pawn_p;
-			skeleton->unref();
-			return err;
-		}
-		*/
 
 		SmartBody::SBPawn* sbpawn = dynamic_cast<SmartBody::SBPawn*>(pawn_p);
 
@@ -471,18 +459,13 @@ int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 	if( pawn_name== "*" )
 	{
 		std::vector<std::string> pawns;
-		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-			iter != mcu.getPawnMap().end();
-			iter++)
-		{
-			pawns.push_back((*iter).second->getName());
-		}
+		
 		for (std::vector<std::string>::iterator citer = pawns.begin();
 			citer != pawns.end();
 			citer++)
 		{
 			srArgBuffer copy_args( args.peek_string() );
-			pawn_p = mcu.getPawn( *citer );
+			pawn_p =  SmartBody::SBScene::getScene()->getPawn( *citer );
 			int err = pawn_parse_pawn_command( pawn_p, pawn_cmd, copy_args);
 			if( err != CMD_SUCCESS )
 				return( err );
@@ -491,7 +474,7 @@ int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 	} 
 	else
 	{
-		pawn_p = mcu.getPawn( pawn_name.c_str() );
+		pawn_p = SmartBody::SBScene::getScene()->getPawn( pawn_name.c_str() );
 		if( pawn_p ) 
 		{
 			int ret = pawn_parse_pawn_command( pawn_p, pawn_cmd, args);
@@ -561,13 +544,7 @@ int character_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 	if( char_name == "*" ) {
 
 		all_characters = true;
-		std::vector<std::string> characters;
-		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-			iter != mcu.getCharacterMap().end();
-			iter++)
-		{
-			characters.push_back((*iter).second->getName());
-		}
+		std::vector<std::string> characters =  SmartBody::SBScene::getScene()->getCharacterNames();
 
 		for (std::vector<std::string>::iterator citer = characters.begin();
 			citer != characters.end();
@@ -656,14 +633,14 @@ int create_remote_pawn_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 
 	SbmPawn* pawn_p = NULL;
 
-	pawn_p = mcu.getPawn( pawn_and_attribute );
+	pawn_p =  SmartBody::SBScene::getScene()->getPawn( pawn_and_attribute );
 
 	if( pawn_p != NULL ) {
 		LOG("ERROR: Pawn \"%s\" already exists.", pawn_and_attribute.c_str() );
 		return CMD_FAILURE;
 	}
 
-	pawn_p = new SmartBody::SBPawn( pawn_and_attribute.c_str() );
+	pawn_p = scene->createPawn( pawn_and_attribute.c_str() );
 
 	SkSkeleton* skeleton = new SmartBody::SBSkeleton();
 	skeleton->ref();
@@ -686,8 +663,6 @@ int create_remote_pawn_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 		return err;
 	}
 
-	err = mcu.addPawn( pawn_p );
-
 	if( err != CMD_SUCCESS )	{
 		LOG("ERROR: SbmPawn pawn_map.insert(..) \"%s\" FAILED", pawn_and_attribute.c_str() );
 		delete pawn_p;
@@ -695,19 +670,12 @@ int create_remote_pawn_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 		return err;
 	}
 
-	if( err != CMD_SUCCESS )	{
-		LOG("ERROR: SbmPawn pawn_map.insert(..) \"%s\" FAILED", pawn_and_attribute.c_str() );
-		delete pawn_p;
-		skeleton->unref();
-		return err;
-	}
-
-
+/*
 #if USE_WSP
 	mcu.theWSP->subscribe_vector_3d_interval( pawn_and_attribute, "position", interval, handle_wsp_error, remote_pawn_position_update, &mcu );
 	mcu.theWSP->subscribe_vector_4d_interval( pawn_and_attribute, "rotation", interval, handle_wsp_error, remote_pawn_rotation_update, &mcu );
 #endif
-
+*/
 	return( CMD_SUCCESS );
 }
 

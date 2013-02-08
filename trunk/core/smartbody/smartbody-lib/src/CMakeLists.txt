@@ -377,6 +377,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBSpeechManager.cpp
 	sb/SBVHMsgManager.cpp
 	sb/SBCommandManager.cpp
+	sb/SBWSPManager.cpp
 
 	sb/SBPython.cpp
 	sb/SBPythonClass.cpp

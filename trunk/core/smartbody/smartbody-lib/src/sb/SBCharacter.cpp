@@ -127,22 +127,7 @@ void SBCharacter::setName(std::string& name)
 {
 	SBPawn::setName(name);
 
-	std::string oldName = getName();
-
-	bool exists = false;
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	std::map<std::string, SbmCharacter*>::iterator citer = mcu.character_map.find(oldName);
-	if (citer != mcu.character_map.end())
-	{
-		mcu.character_map.erase(citer);
-		exists = true;
-	}
-
-	if (exists)
-	{
-		// add to new character name
-		 mcu.character_map.insert(std::pair<std::string, SBCharacter*>(name, this));
-	}
+	SmartBody::SBScene::getScene()->updateCharacterNames();
 
 }
 

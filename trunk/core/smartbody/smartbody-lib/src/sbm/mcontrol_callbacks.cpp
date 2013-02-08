@@ -53,6 +53,7 @@
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBCommandManager.h>
+#include <sb/SBWSPManager.h>
 #include <controllers/me_ct_param_animation.h>
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_scheduler2.h>
@@ -986,7 +987,7 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 				LOG("Need to specify an object and a joint to track.");
 				return( CMD_FAILURE );
 			}
-			SbmPawn* pawn = mcu.getPawn(name);
+			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
 			if (!pawn)
 			{
 				pawn = SmartBody::SBScene::getScene()->getCharacter(name);
@@ -1066,14 +1067,17 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 		}
 		else if (strcmp( cam_cmd, "frame" ) == 0 ) {
 			SrBox sceneBox;
-			for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-				iter != mcu.getPawnMap().end();
+			std::vector<std::string> pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+
+			for (std::vector<std::string>::iterator iter = pawnNames.begin();
+				iter != pawnNames.end();
 				iter++)
 			{
-				bool visible = (*iter).second->getBoolAttribute("visible");
+				SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(*iter);
+				bool visible = pawn->getBoolAttribute("visible");
 					if (!visible)
 						continue;
-				SrBox box = (*iter).second->getSkeleton()->getBoundingBox();
+				SrBox box = pawn->getSkeleton()->getBoundingBox();
 				sceneBox.extend(box);
 			}
 			camera->view_all(sceneBox, camera->getFov());	
@@ -1095,6 +1099,7 @@ int mcu_terrain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	
+	Heightfield* heightfield = SmartBody::SBScene::getScene()->getHeightfield();
 	char *terr_cmd = args.read_token();
 
 	if( strcmp( terr_cmd, "help" ) == 0 )	{
@@ -1108,23 +1113,21 @@ int mcu_terrain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	else
 	if( strcmp( terr_cmd, "load" ) == 0 )	{
 
-		if( mcu.height_field_p == NULL )	{
-			mcu.height_field_p = new Heightfield();
-		}
+		Heightfield* heightfield = SmartBody::SBScene::getScene()->createHeightfield();
 		int n = args.calc_num_tokens();
 		if( n == 0 )	{
-			mcu.height_field_p->load( (char*)"../../../../data/terrain/range1.e.ppm" );
-			mcu.height_field_p->set_scale( 5000.0f * SmartBody::SBScene::getScene()->getScale() / 100.0f, 300.0f * SmartBody::SBScene::getScene()->getScale() / 100.0f, 5000.0f  * SmartBody::SBScene::getScene()->getScale() / 100.0f);
-			mcu.height_field_p->set_auto_origin();
+			heightfield->load( (char*)"../../../../data/terrain/range1.e.ppm" );
+			heightfield->set_scale( 5000.0f * SmartBody::SBScene::getScene()->getScale() / 100.0f, 300.0f * SmartBody::SBScene::getScene()->getScale() / 100.0f, 5000.0f  * SmartBody::SBScene::getScene()->getScale() / 100.0f);
+			heightfield->set_auto_origin();
 		}
 		else	{
 			char *filename = args.read_token();
-			mcu.height_field_p->load( filename );
+			heightfield->load( filename );
 		}
 		return( CMD_SUCCESS );
 	}
 	else
-	if( mcu.height_field_p == NULL ) {
+	if( heightfield == NULL ) {
 		LOG( "mcu_terrain_func: ERR: no heightfield loaded" );
 		return( CMD_FAILURE );
 	}
@@ -1134,7 +1137,7 @@ int mcu_terrain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 		float x = args.read_float();
 		float y = args.read_float();
 		float z = args.read_float();
-		mcu.height_field_p->set_scale( x, y, z );
+		heightfield->set_scale( x, y, z );
 	}
 	else
 	if( strcmp( terr_cmd, "origin" ) == 0 )	{
@@ -1143,7 +1146,7 @@ int mcu_terrain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 		if( n == 1 )	{
 			char *sub_cmd = args.read_token();
 			if( strcmp( sub_cmd, "auto" ) == 0 )	{
-				mcu.height_field_p->set_auto_origin();
+				heightfield->set_auto_origin();
 			}
 			else	{
 				LOG( "mcu_terrain_func: ERR: token '%s' not recognized", sub_cmd );
@@ -1155,14 +1158,13 @@ int mcu_terrain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 			float x = args.read_float();
 			float y = args.read_float();
 			float z = args.read_float();
-			mcu.height_field_p->set_origin( x, y, z );
+			heightfield->set_origin( x, y, z );
 		}
 	}
 	else
-	if( strcmp( terr_cmd, "delete" ) == 0 )	{
-			
-		delete mcu.height_field_p;
-		mcu.height_field_p = NULL;
+	if( strcmp( terr_cmd, "delete" ) == 0 )
+	{
+		SmartBody::SBScene::getScene()->removeHeightfield();
 	}
 	else {
 		return( CMD_NOT_FOUND );
@@ -2232,7 +2234,7 @@ int mcu_character_init(
 	err = char_p->init( skeleton_p, faceDefinition, &mcu.param_map, className );
 
 
-
+/*
 #if USE_WSP
 		// register wsp data
 		// first register world_offset position/rotation
@@ -2248,7 +2250,7 @@ int mcu_character_init(
 			LOG( "WARNING: mcu_character_init \"%s\": Failed to register character rotation.\n", char_name ); 
 		}
 #endif
-
+*/
 
 		// now register all joints.  wsp data isn't sent out until a request for it is received
 		const std::vector<SkJoint *> & joints  = char_p->getSkeleton()->joints();
@@ -2257,7 +2259,7 @@ int mcu_character_init(
 		{
 			SkJoint * j = joints[ i ];
 
-
+/*
 #if USE_WSP
 			string wsp_joint_name = vhcl::Format( "%s:%s", char_name, j->name().c_str() );
 
@@ -2273,6 +2275,7 @@ int mcu_character_init(
 				LOG( "WARNING: mcu_character_init \"%s\": Failed to register joint \"%s\" rotation.\n", char_name, wsp_joint_name.c_str() ); 
 			}
 #endif
+*/
 
 		}
 	
@@ -2751,11 +2754,12 @@ int mcu_controller_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 
 		
 		int numControllersAffected = 0;
-		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-			iter != mcu.getCharacterMap().end();
+		std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+		for (std::vector<std::string>::iterator iter = characterNames.begin();
+			iter != characterNames.end();
 			iter++)
 		{
-			SbmCharacter* character = (*iter).second;
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
 			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
 			int numControllers = controllerTree->count_controllers();
 			
@@ -2993,7 +2997,7 @@ int mcu_net_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
         // global setting that affects all characters and bones
 
         int enable = args.read_int();
-        mcu.net_bone_updates = enable ? true : false;
+		SmartBody::SBScene::getScene()->getBoneBusManager()->setEnable(enable ? true : false);
         return CMD_SUCCESS;
     }
     else if ( _stricmp( command, "worldoffsetupdates" ) == 0 )
@@ -3002,7 +3006,7 @@ int mcu_net_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
         // global setting that affects all characters
 
         int enable = args.read_int();
-        mcu.net_world_offset_updates = enable ? true : false;
+		SmartBody::SBScene::getScene()->getBoneBusManager()->setEnable(enable ? true : false);
         return CMD_SUCCESS;
     }
 
@@ -3307,12 +3311,14 @@ int mcu_vrAllCall_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
  
     // EDF - For our reply, we're going to send one vrComponent 
     //       message for each agent loaded
-    for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+    for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
         string message = "sbm ";
-		message += (*iter).second->getName();
+		message += character->getName();
         SmartBody::SBScene::getScene()->getVHMsgManager()->send( "vrComponent", message.c_str() );
     }
 	return CMD_SUCCESS;
@@ -3414,20 +3420,19 @@ int mcu_vrPerception_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMg
 
 		// all characters should be receiving the perception message
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-	
-		std::map<std::string, SbmCharacter*>& cMap = mcu.getCharacterMap();
-		std::map<std::string, SbmCharacter*>::iterator iter = cMap.begin();
-		for (; iter!= cMap.end(); iter++)
-		{
-			SbmCharacter* character = iter->second;
-			if (!character)
-				continue;
 
+		std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+		for (std::vector<std::string>::iterator iter = characterNames.begin();
+			iter != characterNames.end();
+			iter++)
+		{
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
+	
 			SmartBody::Nvbg* nvbg = character->getNvbg();
 			if (!nvbg)
 				continue;
 
-			bool ok = nvbg->execute(iter->first, "", "", pml);
+			bool ok = nvbg->execute(character->getName(), "", "", pml);
 			if (!ok)
 			{
 				LOG("NVBG for perception did not handle message %s.", pml.c_str());
@@ -3490,19 +3495,17 @@ int mcu_vrSpeech_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	std::string speaker = args.read_token();
 
 	// all characters should be receiving the perception message
-	std::map<std::string, SbmCharacter*>& cMap = mcu.getCharacterMap();
-	std::map<std::string, SbmCharacter*>::iterator iter = cMap.begin();
-	for (; iter!= cMap.end(); iter++)
+	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
+		iter++)
 	{
-		SbmCharacter* character = iter->second;
-		if (!character)
-			continue;
-
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
 		SmartBody::Nvbg* nvbg = character->getNvbg();
 		if (!nvbg)
 			continue;
 
-		bool ok = nvbg->executeSpeech(iter->first, status, id, speaker);
+		bool ok = nvbg->executeSpeech(character->getName(), status, id, speaker);
 		if (!ok)
 		{
 			LOG("NVBG cannot handle vrSpeech message");
@@ -3546,7 +3549,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	if (returnType == "void")
 	{
 		try {
-			boost::python::exec(code.c_str(), *mcu.mainDict);
+			boost::python::exec(code.c_str(), *(SmartBody::SBScene::getScene()->getPythonMainDict()));
 		} catch (...) {
 			PyErr_Print();
 		}
@@ -3555,8 +3558,9 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "bool")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
-			bool result = boost::python::extract<bool>(mcu.mainDict["ret"]);
+			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), *(mainDict));
+			bool result = boost::python::extract<bool>((*mainDict)["ret"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
@@ -3569,8 +3573,9 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "int")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
-			int result = boost::python::extract<int>(mcu.mainDict["ret"]);
+			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), *(mainDict));
+			int result = boost::python::extract<int>((*mainDict)["ret"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
@@ -3583,8 +3588,9 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "float")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
-			float result = boost::python::extract<float>(mcu.mainDict["ret"]);
+			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), *(SmartBody::SBScene::getScene()->getPythonMainDict()));
+			float result = boost::python::extract<float>((*mainDict)["ret"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
@@ -3597,8 +3603,9 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "string")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
-			std::string result = boost::python::extract<std::string>(mcu.mainDict["ret"]);
+			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), *(SmartBody::SBScene::getScene()->getPythonMainDict()));
+			std::string result = boost::python::extract<std::string>((*mainDict)["ret"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
@@ -3611,14 +3618,15 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "int-array")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
-			boost::python::object obj2 = boost::python::exec("size = len(ret)", mcu.mainDict);
-			int size =  boost::python::extract<int>(mcu.mainDict["size"]);
+			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), *(mainDict));
+			boost::python::object obj2 = boost::python::exec("size = len(ret)", *(mainDict));
+			int size =  boost::python::extract<int>((*mainDict)["size"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			for (int x = 0; x < size; x++)
 			{
-				int val =  boost::python::extract<int>(mcu.mainDict["ret"][x]);
+				int val =  boost::python::extract<int>((*mainDict)["ret"][x]);
 				strstr << " " << val;
 			}
 			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
@@ -3630,14 +3638,15 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "float-array")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
-			boost::python::object obj2 = boost::python::exec("size = len(ret)", mcu.mainDict);
-			int size =  boost::python::extract<int>(mcu.mainDict["size"]);
+			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), *(SmartBody::SBScene::getScene()->getPythonMainDict()));
+			boost::python::object obj2 = boost::python::exec("size = len(ret)", *(SmartBody::SBScene::getScene()->getPythonMainDict()));
+			int size =  boost::python::extract<int>((*mainDict)["size"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			for (int x = 0; x < size; x++)
 			{
-				float val =  boost::python::extract<float>(mcu.mainDict["ret"][x]);
+				float val =  boost::python::extract<float>((*mainDict)["ret"][x]);
 				strstr << " " << val;
 			}
 			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
@@ -3649,14 +3658,15 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "string-array")
 	{
 		try {
-			boost::python::object obj = boost::python::exec(code.c_str(), mcu.mainDict);
-			boost::python::object obj2 = boost::python::exec("size = len(ret)", mcu.mainDict);
-			int size =  boost::python::extract<int>(mcu.mainDict["size"]);
+			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), *(SmartBody::SBScene::getScene()->getPythonMainDict()));
+			boost::python::object obj2 = boost::python::exec("size = len(ret)", *(SmartBody::SBScene::getScene()->getPythonMainDict()));
+			int size =  boost::python::extract<int>((*mainDict)["size"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			for (int x = 0; x < size; x++)
 			{
-				std::string val =  boost::python::extract<std::string>(mcu.mainDict["ret"][x]);
+				std::string val =  boost::python::extract<std::string>((*mainDict)["ret"][x]);
 				strstr << " " << val;
 			}
 			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
@@ -3692,10 +3702,8 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 
 int mcu_wsp_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	
 #if USE_WSP
-	mcu.theWSP->process_command( args.read_remainder_raw() );
+	SmartBody::SBScene::getScene()->getWSPManager()->processCommand( args.read_remainder_raw() );
 #endif
 
 	return( CMD_SUCCESS );
@@ -4740,13 +4748,13 @@ int mcu_steer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 int showcharacters_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		LOG("%s", (*iter).second->getName().c_str());
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
+		LOG("%s", character->getName().c_str());
 	}
 	return CMD_SUCCESS;
 }
@@ -4756,13 +4764,15 @@ int showpawns_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	
-	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-		iter != mcu.getPawnMap().end();
+	std::vector<std::string> pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::iterator iter = pawnNames.begin();
+		iter != pawnNames.end();
 		iter++)
 	{
-		SbmCharacter* character = dynamic_cast<SbmCharacter*>((*iter).second);
+		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(*iter);
+		SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(pawn);
 		if (!character)
-			LOG("%s", (*iter).second->getName().c_str());
+			LOG("%s", pawn->getName().c_str());
 	}
 
 	return CMD_SUCCESS;
@@ -5612,10 +5622,11 @@ int animation_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 int vhmsglog_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
+	SmartBody::SBVHMsgManager* vhmsgManager = SmartBody::SBScene::getScene()->getVHMsgManager();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (args.calc_num_tokens() == 0)
 	{
-		if (mcu.logListener)
+		if (vhmsgManager->isEnableLogging())
 		{
 			LOG("VHMSG logging is on");
 		}
@@ -5629,31 +5640,28 @@ int vhmsglog_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	std::string token = args.read_token();
 	if (token == "on")
 	{
-		if (mcu.logListener)
+		if (vhmsgManager->isEnableLogging())
 		{
 			LOG("VHMSG logging is already on");
 			return CMD_SUCCESS;
 		}
 		else
 		{
-			mcu.logListener = new VHMsgLogger();
-			vhcl::Log::g_log.AddListener(mcu.logListener);
+			vhmsgManager->setEnableLogging(true);
 			LOG("VHMSG logging is now on");
 			return CMD_SUCCESS;
 		}
 	}
 	else if (token == "off")
 	{
-		if (!mcu.logListener)
+		if (!vhmsgManager->isEnableLogging())
 		{
 			LOG("VHMSG logging is already off");
 			return CMD_SUCCESS;
 		}
 		else
 		{
-			vhcl::Log::g_log.RemoveListener(mcu.logListener);
-			delete mcu.logListener;
-			mcu.logListener = NULL;
+			vhmsgManager->setEnableLogging(false);
 			LOG("VHMSG logging is now off");
 			return CMD_SUCCESS;
 		}

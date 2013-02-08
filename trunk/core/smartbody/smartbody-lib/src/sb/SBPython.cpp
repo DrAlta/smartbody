@@ -1754,7 +1754,6 @@ void initPython(std::string pythonLibPath)
 	XMLPlatformUtils::Initialize(); 
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.initPythonLibPath = pythonLibPath;
 	std::string pythonHome = pythonLibPath + "/..";
 #ifdef __ANDROID__
 	std::string libPath = getenv("LD_LIBRARY_PATH");
@@ -1833,9 +1832,11 @@ void initPython(std::string pythonLibPath)
 	
 	try {
 #ifndef SB_NO_PYTHON
-		mcu.mainModule = boost::python::import("__main__");
-		mcu.mainDict = mcu.mainModule.attr("__dict__");
-	
+		boost::python::object module = boost::python::import("__main__");
+		SmartBody::SBScene::getScene()->setPythonMainModule(&module);
+		boost::python::object dict  = module.attr("__dict__");
+		SmartBody::SBScene::getScene()->setPythonMainDict(&dict);
+
 		PyRun_SimpleString("import sys");
 #endif
 

@@ -37,6 +37,7 @@
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBCollisionManager.h>
 #include <sb/SBCharacterListener.h>
+#include <sb/SBWSPManager.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <controllers/me_ct_channel_writer.hpp>
 #include <controllers/me_ct_curve_writer.hpp>
@@ -105,8 +106,7 @@ scene_p( NULL )
 	_skeleton = NULL;
 	SbmPawn::initData();
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	std::string validName = mcu.getValidName("object");
+	std::string validName =  SmartBody::SBScene::getScene()->getValidName("object");
 	setName(validName);	
 	SbmPawn::initData();
 }
@@ -621,14 +621,14 @@ int SbmPawn::remove_remote_pawn_func( srArgBuffer& args)
 
 	SbmPawn* pawn_p = NULL;
 
-	pawn_p = mcu_p->getPawn( pawn_name );
+	pawn_p = SmartBody::SBScene::getScene()->getPawn( pawn_name );
 
 	if( pawn_p != NULL ) {
-
+/*
 #if USE_WSP
-		mcu_p->theWSP->unsubscribe( pawn_name, "position", 1 );
+		SmartBody::SBScene()->getScene()->getWSPManager()->unsubscribe( pawn_name, "position", 1 );
 #endif
-
+*/
 		SmartBody::SBScene::getScene()->removePawn(pawn_p->getName());
 
 		return CMD_SUCCESS;
