@@ -1176,8 +1176,8 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 		std::vector<float> neigbors;
-		std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
-		for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+		const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 			pawnIter != pawns.end();
 			pawnIter++)
 		{

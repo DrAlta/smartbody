@@ -216,8 +216,8 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 		pawn->dMeshInstance_p = NULL;
 	}
 
-	pawn->dMesh_p         =  new SbmDeformableMeshGPU();
-	pawn->dMeshInstance_p =  new SbmDeformableMeshGPUInstance();	
+	pawn->dMesh_p         =  NULL;//new SbmDeformableMeshGPU();
+	pawn->dMeshInstance_p =  NULL;//new SbmDeformableMeshGPUInstance();	
 
 	float sceneScale = 0.01f/SmartBody::SBScene::getScene()->getScale();
 

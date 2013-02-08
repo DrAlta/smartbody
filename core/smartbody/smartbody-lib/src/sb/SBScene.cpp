@@ -420,8 +420,8 @@ void SBScene::update()
 	if (isRemoteMode())
 	{
 		getDebuggerClient()->Update();
-		std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
-		for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+		const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 			pawnIter != pawns.end();
 			pawnIter++)
 		{
@@ -497,8 +497,8 @@ void SBScene::update()
 	}
 
 	bool isClosingBoneBus = false;
-	std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
-	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 		pawnIter != pawns.end();
 		pawnIter++)
 	{
@@ -608,8 +608,8 @@ void SBScene::update()
 
 	if (isClosingBoneBus)
 	{
-		std::vector<std::string> pawnNames = getPawnNames();
-		for (std::vector<std::string>::iterator iter = pawnNames.begin();
+		const std::vector<std::string>& pawnNames = getPawnNames();
+		for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 			iter != pawnNames.end();
 			iter++)
 		{
@@ -624,8 +624,8 @@ void SBScene::update()
 		getBoneBusManager()->getBoneBus().CloseConnection();
 	}
 
-	std::vector<std::string> pawnNames = getPawnNames();
-	for (std::vector<std::string>::iterator iter = pawnNames.begin();
+	const std::vector<std::string>& pawnNames = getPawnNames();
+	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 		iter != pawnNames.end();
 		iter++)
 	{
@@ -764,7 +764,6 @@ void SBScene::notify( SBSubject* subject )
 
 SBCharacter* SBScene::createCharacter(const std::string& charName, const std::string& metaInfo)
 {	
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
 	if (character)
 	{
@@ -778,20 +777,24 @@ SBCharacter* SBScene::createCharacter(const std::string& charName, const std::st
 		std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(character->getName());
 		if (iter != _pawnMap.end())
 		{
-			LOG( "Register character: pawn_map.insert(..) '%s' FAILED\n", character->getName().c_str() ); 
+			LOG( "Register character: pawn_map.insert(..) '%s' FAILED\n", character->getName().c_str() );
+			delete character;
+			return NULL;
 		}
 
 		_pawnMap.insert(std::pair<std::string, SbmPawn*>(character->getName(), character));
+		_pawnNames.push_back(character->getName());
 	
-
 		std::map<std::string, SbmCharacter*>::iterator citer = _characterMap.find(character->getName());
 		if (citer != _characterMap.end())
 		{
 			LOG( "Register character: character_map.insert(..) '%s' FAILED\n", character->getName().c_str() );
 			_pawnMap.erase(iter);
+			delete character;
+			return NULL;
 		}
 		_characterMap.insert(std::pair<std::string, SbmCharacter*>(character->getName(), character));
-
+		_characterNames.push_back(character->getName());
 
 		if (getCharacterListener() )
 			getCharacterListener()->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
@@ -845,10 +848,13 @@ SBPawn* SBScene::createPawn(const std::string& pawnName)
 		std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(pawn->getName());
 		if (iter != _pawnMap.end())
 		{
-			LOG( "Register pawn: pawn_map.insert(..) '%s' FAILED\n", pawn->getName().c_str() ); 
+			LOG( "Register pawn: pawn_map.insert(..) '%s' FAILED\n", pawn->getName().c_str() );
+			delete pawn;
+			return NULL;
 		}
 
 		_pawnMap.insert(std::pair<std::string, SbmPawn*>(pawn->getName(), pawn));
+		_pawnNames.push_back(pawn->getName());
 	
 		if (getCharacterListener())
 			getCharacterListener()->OnPawnCreate( pawn->getName().c_str() );
@@ -869,8 +875,8 @@ SBPawn* SBScene::createPawn(const std::string& pawnName)
 
 void SBScene::removeCharacter(const std::string& charName)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SBCharacter* character = this->getCharacter(charName);
+	const std::string& name = character->getName();
 	if (character)
 	{
 
@@ -890,18 +896,38 @@ void SBScene::removeCharacter(const std::string& charName)
 	
 
 		if (getCharacterListener() )
-			getCharacterListener()->OnCharacterDelete( character->getName().c_str() );
+			getCharacterListener()->OnCharacterDelete( name );
 
-		std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(character->getName());
+		std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(name);
 		if (iter != _pawnMap.end())
 		{
 			_pawnMap.erase(iter);
 		}
+		for (std::vector<std::string>::iterator iter = _pawnNames.begin();
+			 iter != _pawnNames.end();
+			 iter++)
+		{
+			if (name == (*iter))
+			{
+				_pawnNames.erase(iter);
+				break;
+			}
+		}
 
-		std::map<std::string, SbmCharacter*>::iterator citer = _characterMap.find(character->getName());
+		std::map<std::string, SbmCharacter*>::iterator citer = _characterMap.find(name);
 		if (citer != _characterMap.end())
 		{
 			_characterMap.erase(citer);
+		}
+		for (std::vector<std::string>::iterator iter = _characterNames.begin();
+			 iter != _characterNames.end();
+			 iter++)
+		{
+			if (name == (*iter))
+			{
+				_characterNames.erase(iter);
+				break;
+			}
 		}
 
 		delete character;
@@ -911,22 +937,22 @@ void SBScene::removeCharacter(const std::string& charName)
 void SBScene::removeAllCharacters()
 {
 	std::vector<std::string> characters = getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characters.begin();
+	for (std::vector<std::string>::const_iterator iter = characters.begin();
 		 iter != characters.end();
 		 iter++)
 	{
 		removeCharacter((*iter));
 	}
-	characters.clear();
-
+	
 }
 
 void SBScene::removePawn(const std::string& pawnName)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnName);
 	if (pawn)
 	{
+		const std::string& name = pawn->getName();
+
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
 		if (!character)
 		{
@@ -942,12 +968,22 @@ void SBScene::removePawn(const std::string& pawnName)
 			}
 			
 			if (getCharacterListener())
-				getCharacterListener()->OnPawnDelete( pawn->getName().c_str() );
+				getCharacterListener()->OnPawnDelete( name );
 
-			std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(pawn->getName());
+			std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(name);
 			if (iter != _pawnMap.end())
 			{
 				_pawnMap.erase(iter);
+			}
+			for (std::vector<std::string>::iterator iter = _pawnNames.begin();
+			 iter != _pawnNames.end();
+			 iter++)
+			{
+				if (name == (*iter))
+				{
+					_pawnNames.erase(iter);
+					break;
+				}
 			}
 
 			delete pawn;
@@ -958,13 +994,14 @@ void SBScene::removePawn(const std::string& pawnName)
 void SBScene::removeAllPawns()
 {
 	std::vector<std::string> pawns = getPawnNames();
-	for (std::vector<std::string>::iterator iter = pawns.begin();
+	for (std::vector<std::string>::const_iterator iter = pawns.begin();
 		 iter != pawns.end();
 		 iter++)
 	{
 		removePawn((*iter));
 	}
-	pawns.clear();
+	
+
 	// clear the cameras
 	_cameras.clear();
 }
@@ -977,7 +1014,6 @@ int SBScene::getNumCharacters()
 
 int SBScene::getNumPawns() 
 {  
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	return _pawnMap.size() - _characterMap.size(); 
 }
 
@@ -1009,34 +1045,14 @@ SBCharacter* SBScene::getCharacter(const std::string& name)
 	}
 }
 
-std::vector<std::string> SBScene::getPawnNames()
+const std::vector<std::string>& SBScene::getPawnNames()
 {
-	std::vector<std::string> ret;
-
-	for (std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.begin();
-		iter != _pawnMap.end();
-		iter++)
-	{
-		SbmPawn* pawn = (*iter).second;
-		ret.push_back(pawn->getName());
-	}
-
-	return ret;
+	return _pawnNames;
 }
 
-std::vector<std::string> SBScene::getCharacterNames()
+const std::vector<std::string>& SBScene::getCharacterNames()
 {
-	std::vector<std::string> ret;
-
-	for (std::map<std::string, SbmCharacter*>::iterator iter = _characterMap.begin();
-		iter != _characterMap.end();
-		iter++)
-	{
-		SbmCharacter* character = (*iter).second;
-		ret.push_back(character->getName());
-	}
-
-	return ret;
+	return _characterNames;
 }
 
 std::vector<std::string> SBScene::getEventHandlerNames()
@@ -1460,8 +1476,8 @@ std::string SBScene::saveSceneSetting()
 	}	
 
 	// save all pawns (including light pawns) position & orientation.
-	std::vector<std::string> pawns = getPawnNames();
-	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+	const std::vector<std::string>& pawns = getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 		pawnIter != pawns.end();
 		pawnIter++)
 	{
@@ -1490,8 +1506,8 @@ std::string SBScene::saveSceneSetting()
 	}
 
 	// restore all character position/orientation
-	std::vector<std::string> characters = getCharacterNames();
-	for (std::vector<std::string>::iterator characterIter = characters.begin();
+	const std::vector<std::string>& characters = getCharacterNames();
+	for (std::vector<std::string>::const_iterator characterIter = characters.begin();
 		characterIter != characters.end();
 		characterIter++)
 	{
@@ -1634,7 +1650,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 	{
 		// need to go through all skeleton, and explicitly create those skeletons from script
 		std::vector<std::string> skeletonNames = getSkeletonNames();
-		std::vector<std::string> charNames = getCharacterNames();
+		const std::vector<std::string>& charNames = getCharacterNames();
 		std::map<std::string, std::string> charSkelMap;
 		for (unsigned int i=0;i<charNames.size(); i++)
 		{
@@ -1752,8 +1768,8 @@ void SBScene::savePawns(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- pawns and characters\n";
 	// pawns
-	std::vector<std::string> pawns = getPawnNames();
-	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+	const std::vector<std::string>& pawns = getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 		 pawnIter != pawns.end();
 		 pawnIter++)
 	{
@@ -1788,8 +1804,8 @@ void SBScene::savePawns(std::stringstream& strstr, bool remoteSetup)
 void SBScene::savePositions(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- pawn positions\n";
-	std::vector<std::string> pawns = getPawnNames();
-	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+	const std::vector<std::string>& pawns = getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 		 pawnIter != pawns.end();
 		 pawnIter++)
 	{
@@ -1811,8 +1827,8 @@ void SBScene::savePositions(std::stringstream& strstr, bool remoteSetup)
 	}
 
 	strstr << "# -------------------- character positions\n";
-	std::vector<std::string> characters = getCharacterNames();
-	for (std::vector<std::string>::iterator characterIter = characters.begin();
+	const std::vector<std::string>& characters = getCharacterNames();
+	for (std::vector<std::string>::const_iterator characterIter = characters.begin();
 			characterIter != characters.end();
 			characterIter++)
 	{
@@ -1829,8 +1845,8 @@ void SBScene::savePositions(std::stringstream& strstr, bool remoteSetup)
 void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 {
 	// characters
-	std::vector<std::string> characters = getCharacterNames();
-	for (std::vector<std::string>::iterator characterIter = characters.begin();
+	const std::vector<std::string>& characters = getCharacterNames();
+	for (std::vector<std::string>::const_iterator characterIter = characters.begin();
 		 characterIter != characters.end();
 		 characterIter++)
 	{
@@ -1966,8 +1982,8 @@ void SBScene::saveLights(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- lights\n";
 	// lights
-	std::vector<std::string> pawns = getPawnNames();
-	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+	const std::vector<std::string>& pawns = getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 		 pawnIter != pawns.end();
 		 pawnIter++)
 	{
@@ -2634,12 +2650,15 @@ void SBScene::updatePawnNames()
 	{
 		allPawns.push_back((*iter).second);
 	}
+	_pawnMap.clear();
+	_pawnNames.clear();
 
 	for (std::vector<SbmPawn*>::iterator iter = allPawns.begin();
 		 iter != allPawns.end();
 		 iter++)
 	{
 		_pawnMap.insert(std::pair<std::string, SbmPawn*>((*iter)->getName(), (*iter))); 
+		_pawnNames.push_back((*iter)->getName());
 	}
 
 }
@@ -2653,12 +2672,15 @@ void SBScene::updateCharacterNames()
 	{
 		allCharacters.push_back((*iter).second);
 	}
+	_characterMap.clear();
+	_characterNames.clear();
 
 	for (std::vector<SbmCharacter*>::iterator iter = allCharacters.begin();
 		 iter != allCharacters.end();
 		 iter++)
 	{
 		_characterMap.insert(std::pair<std::string, SbmCharacter*>((*iter)->getName(), (*iter))); 
+		_characterNames.push_back((*iter)->getName());
 	}
 }
 

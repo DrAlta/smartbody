@@ -1350,12 +1350,12 @@ void BaseWindow::CreateLightCB(Fl_Widget* w, void* data)
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	int highestLightNum = 0;
-	std::vector<std::string> pawnNames = scene->getPawnNames();
-	for (std::vector<std::string>::iterator iter =  pawnNames.begin();
+	const std::vector<std::string>& pawnNames = scene->getPawnNames();
+	for (std::vector<std::string>::const_iterator iter =  pawnNames.begin();
 		 iter != pawnNames.end();
 		 iter++)
 	{
-		std::string& pawnName = (*iter);
+		const std::string& pawnName = (*iter);
 		if (pawnName.find("light") == 0)
 		{
 			std::string lightNumStr = pawnName.substr(5, pawnName.size());
@@ -1762,7 +1762,7 @@ void BaseWindow::ShowLightsCB( Fl_Widget* w, void* data )
 	rootWindow->fltkViewer->getData()->showLights = !rootWindow->fltkViewer->getData()->showLights;
 	bool showLight = rootWindow->fltkViewer->getData()->showLights;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> pawnNames = scene->getPawnNames();
+	const std::vector<std::string>& pawnNames = scene->getPawnNames();
 	for (unsigned int i=0;i<pawnNames.size();i++)
 	{
 		std::string name = pawnNames[i];

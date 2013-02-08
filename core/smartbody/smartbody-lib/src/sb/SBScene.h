@@ -100,8 +100,8 @@ class SBScene : public SBObject
 		SBAPI int getNumFaceDefinitions();
 		SBAPI std::vector<std::string> getFaceDefinitionNames();
 
-		SBAPI std::vector<std::string> getPawnNames();
-		SBAPI std::vector<std::string> getCharacterNames();
+		SBAPI const std::vector<std::string>& getPawnNames();
+		SBAPI const std::vector<std::string>& getCharacterNames();
 
 		SBAPI void removePendingCommands();
 
@@ -285,7 +285,9 @@ class SBScene : public SBObject
 
 		SrSnGroup* _rootGroup;
 		std::map<std::string, SbmPawn*>	_pawnMap;
+		std::vector<std::string> _pawnNames;
 		std::map<std::string, SbmCharacter*> _characterMap;
+		std::vector<std::string> _characterNames;
 
 		Heightfield* _heightField;
 

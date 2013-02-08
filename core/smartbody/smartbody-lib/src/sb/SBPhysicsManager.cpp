@@ -96,8 +96,8 @@ void SBPhysicsManager::update(double time)
 	}
 
 	// update character
-	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -106,8 +106,8 @@ void SBPhysicsManager::update(double time)
 		updatePhysicsCharacter(character->getName());
 	}
 
-	std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
-	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 		pawnIter != pawns.end();
 		pawnIter++)
 	{

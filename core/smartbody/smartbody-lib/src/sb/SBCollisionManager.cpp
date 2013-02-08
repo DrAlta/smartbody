@@ -74,8 +74,8 @@ void SBCollisionManager::start()
 	{
 		collisionSpace = new ODECollisionSpace();
 	}
-	std::vector<std::string> characterNames = scene->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = scene->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		 iter != characterNames.end();
 		 iter++)
 	{
@@ -152,8 +152,8 @@ void SBCollisionManager::start()
 		}
 	}
 
-	std::vector<std::string> pawnNames = scene->getPawnNames();
-	for (std::vector<std::string>::iterator iter = pawnNames.begin();
+	const std::vector<std::string>& pawnNames = scene->getPawnNames();
+	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 		 iter != pawnNames.end(); iter++)
 	{
 		SBPawn* pawn = scene->getPawn(*iter);
@@ -193,8 +193,8 @@ void SBCollisionManager::afterUpdate(double time)
 	if (timeDt == 0.0)
 		timeDt = .016;
 	
-	std::vector<std::string> characters = scene->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characters.begin();
+	const std::vector<std::string>& characters = scene->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characters.begin();
 		 iter != characters.end();
 		 iter++)
 	{

@@ -300,7 +300,7 @@ void ResourceWindow::updateGUI()
 
 	// update pawn objects
 	resourceTree->clear_children(treeItemList[ITEM_PAWN]);
-	std::vector<std::string> pawnNames = scene->getPawnNames();
+	const std::vector<std::string>& pawnNames = scene->getPawnNames();
 	for (size_t i = 0; i < pawnNames.size(); i++)
 	{
 		SmartBody::SBPawn* pawn = scene->getPawn(pawnNames[i]);
@@ -309,7 +309,7 @@ void ResourceWindow::updateGUI()
 
 	// update characters
 	resourceTree->clear_children(treeItemList[ITEM_CHARACTER]);
-	std::vector<std::string> charNames = scene->getCharacterNames();
+	const std::vector<std::string>& charNames = scene->getCharacterNames();
 	for (size_t i = 0; i < charNames.size(); i++)
 	{
 		SmartBody::SBCharacter* character = scene->getCharacter(charNames[i]);

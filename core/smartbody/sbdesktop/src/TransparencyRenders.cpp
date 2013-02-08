@@ -119,7 +119,7 @@ void TransparencyRenders::drawCharacters(bool shadowPass)
 	// simple drawing of characters as dots
 	glColor3f(1.0f,.0f,.0f);   
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> names = scene->getCharacterNames();
+	const std::vector<std::string>& names = scene->getCharacterNames();
 	for (std::vector<std::string>::iterator iter = names.begin();
 		 iter != names.end();
 		 iter++)

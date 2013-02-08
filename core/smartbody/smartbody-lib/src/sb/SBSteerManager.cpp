@@ -99,8 +99,8 @@ void SBSteerManager::update(double time)
 				getEngineDriver()->setLastUpdateTime(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 
 
-				std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-				for (std::vector<std::string>::iterator iter = characterNames.begin();
+				const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+				for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 					iter != characterNames.end();
 					iter++)
 				{
@@ -208,8 +208,8 @@ void SBSteerManager::start()
 	int numSetup = 0;
 	// create an agent based on the current characters and positions
 	SteerLib::ModuleInterface* pprAIModule = SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine->getModule(ai);
-	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
@@ -254,8 +254,8 @@ void SBSteerManager::start()
 	if (useEnvironment)
 	{
 		// adding obstacles to the steering space
-		std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
-		for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+		const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 			pawnIter != pawns.end();
 			pawnIter++)
 		{
@@ -299,8 +299,8 @@ void SBSteerManager::stop()
 		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->unloadSimulation();
 		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->finish();
 
-		std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-		for (std::vector<std::string>::iterator iter = characterNames.begin();
+		const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+		for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 			iter != characterNames.end();
 			iter++)
 		{
@@ -315,8 +315,8 @@ void SBSteerManager::stop()
 				
 		}
 
-		std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
-		for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+		const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 			pawnIter != pawns.end();
 			pawnIter++)
 		{

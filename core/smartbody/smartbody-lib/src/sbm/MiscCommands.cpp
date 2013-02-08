@@ -544,9 +544,9 @@ int character_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 	if( char_name == "*" ) {
 
 		all_characters = true;
-		std::vector<std::string> characters =  SmartBody::SBScene::getScene()->getCharacterNames();
+		const std::vector<std::string>& characters =  SmartBody::SBScene::getScene()->getCharacterNames();
 
-		for (std::vector<std::string>::iterator citer = characters.begin();
+		for (std::vector<std::string>::const_iterator citer = characters.begin();
 			citer != characters.end();
 			citer++)
 		{

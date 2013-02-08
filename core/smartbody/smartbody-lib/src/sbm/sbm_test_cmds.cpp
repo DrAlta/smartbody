@@ -167,8 +167,8 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 			// execute directly
 			if( all_characters )
 			{
-				std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-				for (std::vector<std::string>::iterator iter = characterNames.begin();
+				const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+				for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 					iter != characterNames.end();
 					iter++)
 				{
@@ -204,8 +204,8 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 
 		if( all_characters )
 		{
-			std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-			for (std::vector<std::string>::iterator iter = characterNames.begin();
+			const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+			for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 				iter != characterNames.end();
 				iter++)
 			{

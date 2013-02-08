@@ -309,10 +309,10 @@ void PanimationWindow::refreshUI(Fl_Widget* widget, void* data)
 
 void PanimationWindow::loadCharacters(Fl_Choice* characterList)
 {
-	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
 
 	characterList->clear();
-	for (std::vector<std::string>::iterator iter = characterNames.begin();
+	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
 		iter != characterNames.end();
 		iter++)
 	{
