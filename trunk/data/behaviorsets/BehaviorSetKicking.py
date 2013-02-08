@@ -83,6 +83,6 @@ def retargetBehaviorSet(charName, skelName):
 	'''
 	createRetargetInstance('ChrGarza.sk', skelName)
 	scene.run("stateKicking.py")
-	kickingSetup('ChrGarza.sk', "base", '', '')
+	kickingSetup('ChrGarza.sk','ChrGarza.sk', "base", '', '')
 	
 		
