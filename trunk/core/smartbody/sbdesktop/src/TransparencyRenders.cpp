@@ -120,7 +120,7 @@ void TransparencyRenders::drawCharacters(bool shadowPass)
 	glColor3f(1.0f,.0f,.0f);   
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	const std::vector<std::string>& names = scene->getCharacterNames();
-	for (std::vector<std::string>::iterator iter = names.begin();
+	for (std::vector<std::string>::const_iterator iter = names.begin();
 		 iter != names.end();
 		 iter++)
 	{
