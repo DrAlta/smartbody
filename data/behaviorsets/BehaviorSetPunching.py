@@ -100,6 +100,6 @@ def retargetBehaviorSet(charName, skelName):
 	# setup standard locomotion
 	scene.run("statePunching.py")
 	#punchingSetup(skelName, "base", skelName, skelName)
-	punchingSetup('ChrGarza.sk', "base", '', '')
+	punchingSetup('ChrGarza.sk','ChrGarza.sk', "base", '', '')
 	
 		

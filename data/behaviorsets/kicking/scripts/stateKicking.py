@@ -1,23 +1,30 @@
-def kickingSetup(skeletonName, baseJoint, prefix, statePreFix):
+def kickingSetup(origSkelName, skeletonName, baseJoint, prefix, statePreFix):
 	blendManager = scene.getBlendManager()
 
 	blendKicking = blendManager.createMotionBlendBase(prefix + "Kick", skeletonName, 3)
 	blendKicking.setBlendSkeleton(skeletonName)
 
+	originalMotions = StringVec()
+	originalMotions.append( "ChrGarza@IdleFight01_KickBackHigh01")
+	originalMotions.append( "ChrGarza@IdleFight01_KickBackLow01")
+	originalMotions.append( "ChrGarza@IdleFight01_KickBackMedium01")
+	originalMotions.append( "ChrGarza@IdleFight01_KickForwardHigh01")
+	originalMotions.append( "ChrGarza@IdleFight01_KickForwardLow01")
+	originalMotions.append( "ChrGarza@IdleFight01_KickForwardMedium01")
+	originalMotions.append( "ChrGarza@IdleFight01_KickLeftSideHigh01")
+	originalMotions.append( "ChrGarza@IdleFight01_KickLeftSideLow01")
+	originalMotions.append( "ChrGarza@IdleFight01_KickLeftSideMedium01")
+	originalMotions.append( "ChrGarza@IdleFight01_KickRightSideHigh01")
+	originalMotions.append( "ChrGarza@IdleFight01_KickRightSideLow01")
+	originalMotions.append( "ChrGarza@IdleFight01_KickRightSideMedium01")
+	
 	motions = StringVec()
-	motions = StringVec()
-	motions.append(prefix + "ChrGarza@IdleFight01_KickBackHigh01")
-	motions.append(prefix + "ChrGarza@IdleFight01_KickBackLow01")
-	motions.append(prefix + "ChrGarza@IdleFight01_KickBackMedium01")
-	motions.append(prefix + "ChrGarza@IdleFight01_KickForwardHigh01")
-	motions.append(prefix + "ChrGarza@IdleFight01_KickForwardLow01")
-	motions.append(prefix + "ChrGarza@IdleFight01_KickForwardMedium01")
-	motions.append(prefix + "ChrGarza@IdleFight01_KickLeftSideHigh01")
-	motions.append(prefix + "ChrGarza@IdleFight01_KickLeftSideLow01")
-	motions.append(prefix + "ChrGarza@IdleFight01_KickLeftSideMedium01")
-	motions.append(prefix + "ChrGarza@IdleFight01_KickRightSideHigh01")
-	motions.append(prefix + "ChrGarza@IdleFight01_KickRightSideLow01")
-	motions.append(prefix + "ChrGarza@IdleFight01_KickRightSideMedium01")
+	assetManager = scene.getAssetManager()
+	for i in range(0, len(originalMotions)):
+		motions.append(prefix + originalMotions[i])
+		sbMotion = assetManager.getMotion(originalMotions[i])
+		if sbMotion != None:
+			sbMotion.setMotionSkeletonName(origSkelName)
 	
 	para = DoubleVec();
 	for i in range(0,3):

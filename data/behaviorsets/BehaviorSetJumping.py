@@ -100,6 +100,6 @@ def retargetBehaviorSet(charName, skelName):
 	# setup standard locomotion
 	scene.run("stateJumping.py")
 	#jumpingSetup(skelName, "base", skelName, skelName)
-	jumpingSetup('ChrGarza.sk', "base", '','')
+	jumpingSetup('ChrGarza.sk','ChrGarza.sk', "base", '','')
 	
 		
