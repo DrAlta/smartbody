@@ -583,10 +583,10 @@ void DeformableMeshInstance::setSkeleton( SkSkeleton* skel )
 
 void DeformableMeshInstance::cleanUp()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	for (unsigned int i = 0; i < dynamicMesh.size(); i++)
 	{
-		mcu.root_group_p->remove(dynamicMesh[i]);
+
+		SmartBody::SBScene::getScene()->getRootGroup()->remove(dynamicMesh[i]);
 		dynamicMesh[i]->unref();		
 	}
 	dynamicMesh.clear();
@@ -597,7 +597,6 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 	if (!mesh) return;
 	_mesh = mesh;	
 	cleanUp(); // remove all previous dynamic mes
-	mcuCBHandle& mcu = mcuCBHandle::singleton();	
 	for (unsigned int i=0;i<_mesh->dMeshStatic_p.size();i++)
 	{
 		SrSnModel* srSnModel = _mesh->dMeshStatic_p[i];
@@ -608,7 +607,7 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 		srSnModelDynamic->shape().name = srSnModel->shape().name;	
 		dynamicMesh.push_back(srSnModelDynamic);
 		srSnModelDynamic->ref();
-		mcu.root_group_p->add(dynamicMesh[i]);
+		SmartBody::SBScene::getScene()->getRootGroup()->add(dynamicMesh[i]);
 	}	
 	updateJointList();
 }

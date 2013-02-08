@@ -36,7 +36,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
@@ -45,7 +45,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>include;..\..\lib\vhcl\include;..\..\lib\vhmsg\vhmsg-c\include;..\..\lib\xerces-c\include;..\..\lib\cerevoice\cerevoice_eng\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\..\lib\vhcl\include;..\..\lib\vhmsg\vhmsg-c\include;..\..\lib\xerces-c\include;..\..\lib\cerevoice\cerenorm\elmer;..\..\lib\cerevoice\cerevoice\include;..\..\lib\cerevoice\cerevoice_io\include;..\..\lib\cerevoice\cerevoice_pmod\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -58,9 +58,9 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>vhcl_d.lib;vhmsg_d.lib;pthreadVSE2.lib;activemq-cppd.lib;xerces-c_3D.lib;libcerevoice_shared-3.lib;libcerevoice_eng_shared-3.lib;winmm.lib;rpcrt4.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>..\..\lib\vhcl\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\pthreads\lib;..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL;..\..\lib\xerces-c\lib;..\..\lib\cerevoice\cerevoice\lib;..\..\lib\cerevoice\cerevoice_eng\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vhcl_d.lib;vhmsg_d.lib;pthreadVSE2.lib;activemq-cppd.lib;xerces-c_3D.lib;python24.lib;libcerenorm_wrap_shared.lib;libelmer.lib;libcerevoice_shared.lib;libspeex.lib;libexpat.lib;libcerevoice_pmod_shared.lib;winmm.lib;rpcrt4.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName)d.exe</OutputFile>
+      <AdditionalLibraryDirectories>..\..\lib\vhcl\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\pthreads\lib;..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL;..\..\lib\xerces-c\lib;..\..\lib\cerevoice\3rdparty\lib;..\..\lib\cerevoice\cerenorm\lib;..\..\lib\cerevoice\cerevoice\lib;..\..\lib\cerevoice\cerevoice_pmod\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -70,17 +70,16 @@ copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .
 copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll .
 copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .
 copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .
-copy /Y ..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll . 
-copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_1D.dll .
-copy /Y ..\..\lib\cerevoice\cerehts\lib\libcerehts_shared-3.dll .
-copy /Y ..\..\lib\cerevoice\cerevoice\lib\libcerevoice_shared-3.dll .
-copy /Y ..\..\lib\cerevoice\cerevoice_eng\lib\libcerevoice_eng_shared-3.dll .
-copy /Y ..\..\lib\cerevoice\cerevoice_pmod\lib\libcerevoice_pmod_shared-3.dll .
-copy /Y ..\..\lib\cerevoice\3rdparty\lib\libgcc_s_sjlj-1.dll .
-copy /Y ..\..\lib\cerevoice\3rdparty\lib\msvcr71.dll .
+copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll .
+copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_0D.dll .
 copy /Y ..\..\lib\cerevoice\3rdparty\lib\python24.dll .
-copy /Y "..\..\lib\cerevoice\3rdparty\lib\libstdc++-6.dll" .
-
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\pyexpat.pyd .
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\libexpat.dll .
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\libspeex.dll .
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\libSoundTouch.dll .
+copy /Y ..\..\lib\cerevoice\cerenorm\lib\libcerenorm_wrap_shared.dll .
+copy /Y ..\..\lib\cerevoice\cerevoice\lib\libcerevoice_shared.dll .
+copy /Y ..\..\lib\cerevoice\cerevoice_pmod\lib\libcerevoice_pmod_shared.dll .
 
 if not exist .".\..\bin\cerevoicerelay" mkdir "..\..\bin\cerevoicerelay"
 copy /Y pthreadVSE2.dll "..\..\bin\cerevoicerelay"
@@ -88,16 +87,17 @@ copy /Y libapr-1.dll "..\..\bin\cerevoicerelay"
 copy /Y libapriconv-1.dll "..\..\bin\cerevoicerelay"
 copy /Y libaprutil-1.dll "..\..\bin\cerevoicerelay"
 copy /Y activemq-cppd.dll "..\..\bin\cerevoicerelay"
-copy /Y libcerehts_shared-3.dll "..\..\bin\cerevoicerelay"
-copy /Y libcerevoice_shared-3.dll "..\..\bin\cerevoicerelay"
-copy /Y libcerevoice_eng_shared-3.dll "..\..\bin\cerevoicerelay"
-copy /Y libcerevoice_pmod_shared-3.dll "..\..\bin\cerevoicerelay"
-copy /Y libgcc_s_sjlj-1.dll "..\..\bin\cerevoicerelay"
-copy /Y "libstdc++-6.dll" "..\..\bin\cerevoicerelay"
-copy /Y msvcr71.dll "..\..\bin\cerevoicerelay"
+copy /Y xerces-c_3_0D.dll "..\..\bin\cerevoicerelay"
 copy /Y python24.dll "..\..\bin\cerevoicerelay"
-copy /Y cerevoicerelay.exe "..\..\bin\cerevoicerelay"
-copy /Y cerevoicerelay.exe "..\..\bin\cerevoicerelay"</Command>
+copy /Y pyexpat.pyd "..\..\bin\cerevoicerelay"
+copy /Y libexpat.dll "..\..\bin\cerevoicerelay"
+copy /Y libspeex.dll "..\..\bin\cerevoicerelay"
+copy /Y libSoundTouch.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerenorm_wrap_shared.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerevoice_shared.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerevoice_pmod_shared.dll "..\..\bin\cerevoicerelay"
+copy /Y cerevoicerelayd.exe "..\..\bin\cerevoicerelay"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -106,7 +106,7 @@ copy /Y cerevoicerelay.exe "..\..\bin\cerevoicerelay"</Command>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>include;..\..\lib\vhcl\include;..\..\lib\vhmsg\vhmsg-c\include;..\..\lib\xerces-c\include;..\..\lib\cerevoice\cerevoice_eng\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..\..\lib\vhcl\include;..\..\lib\vhmsg\vhmsg-c\include;..\..\lib\xerces-c\include;..\..\lib\cerevoice\cerenorm\elmer;..\..\lib\cerevoice\cerevoice\include;..\..\lib\cerevoice\cerevoice_io\include;..\..\lib\cerevoice\cerevoice_pmod\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
@@ -118,8 +118,8 @@ copy /Y cerevoicerelay.exe "..\..\bin\cerevoicerelay"</Command>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>vhcl.lib;vhmsg.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;libcerevoice_shared-3.lib;libcerevoice_eng_shared-3.lib;winmm.lib;rpcrt4.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\lib\vhcl\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\pthreads\lib;..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL;..\..\lib\xerces-c\lib;..\..\lib\cerevoice\cerevoice_eng\lib;..\..\lib\cerevoice\cerevoice\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vhcl.lib;vhmsg.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;python24.lib;libcerenorm_wrap_shared.lib;libelmer.lib;libcerevoice_shared.lib;libspeex.lib;libexpat.lib;libcerevoice_pmod_shared.lib;winmm.lib;rpcrt4.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\lib\vhcl\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\pthreads\lib;..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL;..\..\lib\xerces-c\lib;..\..\lib\cerevoice\3rdparty\lib;..\..\lib\cerevoice\cerenorm\lib;..\..\lib\cerevoice\cerevoice\lib;..\..\lib\cerevoice\cerevoice_pmod\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <LinkTimeCodeGeneration>
       </LinkTimeCodeGeneration>
@@ -130,17 +130,16 @@ copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .
 copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll .
 copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .
 copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .
-copy /Y ..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll . 
-copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_1.dll .
-copy /Y ..\..\lib\cerevoice\cerehts\lib\libcerehts_shared-3.dll .
-copy /Y ..\..\lib\cerevoice\cerevoice\lib\libcerevoice_shared-3.dll .
-copy /Y ..\..\lib\cerevoice\cerevoice_eng\lib\libcerevoice_eng_shared-3.dll .
-copy /Y ..\..\lib\cerevoice\cerevoice_pmod\lib\libcerevoice_pmod_shared-3.dll .
-copy /Y ..\..\lib\cerevoice\3rdparty\lib\libgcc_s_sjlj-1.dll .
-copy /Y ..\..\lib\cerevoice\3rdparty\lib\msvcr71.dll .
+copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll .
+copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_0.dll .
 copy /Y ..\..\lib\cerevoice\3rdparty\lib\python24.dll .
-copy /Y "..\..\lib\cerevoice\3rdparty\lib\libstdc++-6.dll" .
-
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\pyexpat.pyd .
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\libexpat.dll .
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\libspeex.dll .
+copy /Y ..\..\lib\cerevoice\3rdparty\lib\libSoundTouch.dll .
+copy /Y ..\..\lib\cerevoice\cerenorm\lib\libcerenorm_wrap_shared.dll .
+copy /Y ..\..\lib\cerevoice\cerevoice\lib\libcerevoice_shared.dll .
+copy /Y ..\..\lib\cerevoice\cerevoice_pmod\lib\libcerevoice_pmod_shared.dll .
 
 if not exist .".\..\bin\cerevoicerelay" mkdir "..\..\bin\cerevoicerelay"
 copy /Y pthreadVSE2.dll "..\..\bin\cerevoicerelay"
@@ -148,16 +147,17 @@ copy /Y libapr-1.dll "..\..\bin\cerevoicerelay"
 copy /Y libapriconv-1.dll "..\..\bin\cerevoicerelay"
 copy /Y libaprutil-1.dll "..\..\bin\cerevoicerelay"
 copy /Y activemq-cpp.dll "..\..\bin\cerevoicerelay"
-copy /Y libcerehts_shared-3.dll "..\..\bin\cerevoicerelay"
-copy /Y libcerevoice_shared-3.dll "..\..\bin\cerevoicerelay"
-copy /Y libcerevoice_eng_shared-3.dll "..\..\bin\cerevoicerelay"
-copy /Y libcerevoice_pmod_shared-3.dll "..\..\bin\cerevoicerelay"
-copy /Y libgcc_s_sjlj-1.dll "..\..\bin\cerevoicerelay"
-copy /Y "libstdc++-6.dll" "..\..\bin\cerevoicerelay"
-copy /Y msvcr71.dll "..\..\bin\cerevoicerelay"
+copy /Y xerces-c_3_0.dll "..\..\bin\cerevoicerelay"
 copy /Y python24.dll "..\..\bin\cerevoicerelay"
+copy /Y pyexpat.pyd "..\..\bin\cerevoicerelay"
+copy /Y libexpat.dll "..\..\bin\cerevoicerelay"
+copy /Y libspeex.dll "..\..\bin\cerevoicerelay"
+copy /Y libSoundTouch.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerenorm_wrap_shared.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerevoice_shared.dll "..\..\bin\cerevoicerelay"
+copy /Y libcerevoice_pmod_shared.dll "..\..\bin\cerevoicerelay"
 copy /Y cerevoicerelay.exe "..\..\bin\cerevoicerelay"
-copy /Y cerevoicerelay.exe "..\..\bin\cerevoicerelay"</Command>
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

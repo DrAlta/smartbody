@@ -273,26 +273,14 @@ int SequenceManager::getNumSequences()
 }
 
 mcuCBHandle::mcuCBHandle()
-:	net_world_offset_updates( true ),
-	viewer_p( NULL ),
+:	viewer_p( NULL ),
 	ogreViewer_p( NULL ),
 	camera_p( NULL ),
-	root_group_p( new SrSnGroup() ),
-	height_field_p( NULL ),
 	viewer_factory ( new SrViewerFactory() ),
-	ogreViewerFactory ( new SrViewerFactory() ),
-	logListener(NULL),
-	initPythonLibPath("")
+	ogreViewerFactory ( new SrViewerFactory() )
 {	
-	root_group_p->ref();
 	kinectProcessor = new KinectProcessor();
-#if USE_WSP
-	theWSP = WSP::create_manager();
 
-	// TODO: this needs to have a unique name so that multiple sbm
-	// processes will be identified differently
-	theWSP->init( "SMARTBODY" );
-#endif
 
 }
 
@@ -318,41 +306,41 @@ mcuCBHandle::~mcuCBHandle() {
 		// For reference:  http://docs.python.org/2/c-api/init.html  "Dynamically loaded extension modules loaded by Python are not unloaded"
 
 		// initPythonLibPath - eg:  "../../../../core/smartbody/Python26/Lib"
-
+		std::string pythonLibPath = Py_GetPythonHome();
 		HMODULE hmodule;
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/bz2.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/bz2.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/pyexpat.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/pyexpat.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/select.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/select.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/unicodedata.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/unicodedata.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/winsound.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/winsound.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_bsddb.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_bsddb.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ctypes.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ctypes.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ctypes_test.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ctypes_test.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_elementtree.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_elementtree.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_hashlib.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_hashlib.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_msi.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_msi.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_multiprocessing.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_multiprocessing.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_socket.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_socket.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_sqlite3.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_sqlite3.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ssl.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ssl.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_testcapi.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_testcapi.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_tkinter.pyd", initPythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_tkinter.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
 	}
 #endif  // WIN_BUILD
@@ -364,17 +352,8 @@ void mcuCBHandle::reset( void )
 	// clear everything
 	clear();
 
-	// initialize everything
-	net_bone_updates = false;
-	net_world_offset_updates = true;
-	root_group_p = new SrSnGroup();
-	logListener = NULL;
-	root_group_p->ref();
 	kinectProcessor = new KinectProcessor();
-#if USE_WSP
-	theWSP = WSP::create_manager();
-	theWSP->init( "SMARTBODY" );
-#endif
+
 
 
 }
@@ -393,13 +372,7 @@ void mcuCBHandle::reset( void )
  */
 void mcuCBHandle::clear( void )	
 {
-	if (logListener)
-	{
-		vhcl::Log::g_log.RemoveListener(logListener);
-		delete logListener;
-		logListener = NULL;
-	}
-	
+
 	if (kinectProcessor)
 	{
 		delete kinectProcessor;
@@ -428,18 +401,6 @@ void mcuCBHandle::clear( void )
 	{
 		delete camera_p;
 		camera_p = NULL;
-	}
-
-	if( root_group_p )	
-	{
-		root_group_p->unref();
-		root_group_p = NULL;
-	}
-
-	if( height_field_p )	
-	{
-		delete height_field_p;
-		height_field_p = NULL;
 	}
 
 /*	cmd_map.reset();
@@ -497,8 +458,8 @@ int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{
 		viewer_p->set_camera( camera_p );
 		//((FltkViewer*)viewer_p)->set_mcu(this);
 		viewer_p->show_viewer();
-		if( root_group_p )	{
-			viewer_p->root( root_group_p );
+		if( SmartBody::SBScene::getScene()->getRootGroup() )	{
+			viewer_p->root( SmartBody::SBScene::getScene()->getRootGroup() );
 		}
 #if !defined (__ANDROID__) && !defined(SBM_IPHONE) && !defined(__native_client__)
 		SbmShaderManager::singleton().setViewer(viewer_p);
@@ -533,8 +494,8 @@ int mcuCBHandle::openOgreViewer( int width, int height, int px, int py )	{
 		camera_p = new SrCamera;
 		ogreViewer_p->set_camera( camera_p );		
 		ogreViewer_p->show_viewer();
-		if( root_group_p )	{
-			ogreViewer_p->root( root_group_p );
+		if( SmartBody::SBScene::getScene()->getRootGroup() )	{
+			ogreViewer_p->root( SmartBody::SBScene::getScene()->getRootGroup() );
 		}
 		return( CMD_SUCCESS );
 	}
@@ -553,9 +514,9 @@ void mcuCBHandle::closeOgreViewer( void )	{
 
 int mcuCBHandle::add_scene( SrSnGroup *scene_p )	{
 
-	if( root_group_p )	{
+	if( SmartBody::SBScene::getScene()->getRootGroup() )	{
 		if( scene_p )	{
-			root_group_p->add( scene_p ); 
+			SmartBody::SBScene::getScene()->getRootGroup()->add( scene_p ); 
 			return( CMD_SUCCESS );
 		}
 	}
@@ -564,22 +525,13 @@ int mcuCBHandle::add_scene( SrSnGroup *scene_p )	{
 
 int mcuCBHandle::remove_scene( SrSnGroup *scene_p )	{
 
-	if( root_group_p )	{
+	if( SmartBody::SBScene::getScene()->getRootGroup() )	{
 		if( scene_p )	{
-			root_group_p->remove( scene_p ); 
+			SmartBody::SBScene::getScene()->getRootGroup()->remove( scene_p ); 
 			return( CMD_SUCCESS );
 		}
 	}
 	return( CMD_FAILURE );
-}
-
-void mcuCBHandle::set_net_host( const char * net_host )
-{
-	// EDF
-	// Sets up the network connection for sending bone rotations over to Unreal
-	SmartBody::SBScene::getScene()->getBoneBusManager()->setHost(net_host);
-	SmartBody::SBScene::getScene()->getBoneBusManager()->setEnable(true);
-	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().UpdateAllCharacters();
 }
 
 void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map )
@@ -588,7 +540,6 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 	{
 		return;
 	}
-
 
 	// Send the bone rotation for each joint in the skeleton
 	const std::vector<SkJoint *> & joints  = skeleton->joints();
@@ -704,103 +655,11 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 	
 }
 
-std::map<std::string, SbmPawn*>& mcuCBHandle::getPawnMap()
-{
-	return pawn_map;
-}
-
-bool mcuCBHandle::addPawn(SbmPawn* pawn)
-{
-	SbmPawn* p = getPawn(pawn->getName());
-	if (!p)
-	{
-		pawn_map[pawn->getName()] = pawn;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-
-}
-
-void mcuCBHandle::removePawn(const std::string& name)
-{
-	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(name);
-	if (iter != pawn_map.end())
-	{
-		pawn_map.erase(iter);
-	}
-}
-
-SbmPawn* mcuCBHandle::getPawn(const std::string& name)
-{
-	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(name);
-	if (iter == pawn_map.end())
-		return NULL;
-	else
-		return (*iter).second;
-}
-
-int mcuCBHandle::getNumPawns()
-{
-	return pawn_map.size();
-}
-
-std::map<std::string, SbmCharacter*>& mcuCBHandle::getCharacterMap()
-{
-	return character_map;
-}
-
-std::string mcuCBHandle::getValidName(const std::string& name)
-{
-	bool nameFound = true;
-	int nameCounter = 0;
-	std::string currentName = name;
-	while (nameFound)
-	{
-		std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(currentName);
-		if (iter == pawn_map.end())
-		{
-			nameFound = false;
-		}
-		else
-		{
-			std::stringstream strstr;
-			strstr << name << nameCounter;
-			nameCounter++;
-			currentName = strstr.str();
-		}
-	}
-	return currentName;
-}
-
-
-
-
 void mcuCBHandle::render()
 {
 	if( viewer_p ) { viewer_p->render(); }
 	if (ogreViewer_p) { ogreViewer_p->render(); }
 }
 
-
-void mcuCBHandle::render_terrain( int renderMode ) {
-			if( height_field_p )	{
-				height_field_p->render(renderMode);
-			}
-		}
-
-float mcuCBHandle::query_terrain( float x, float z, float *normal_p )	{
-			if( height_field_p )	{
-				return( height_field_p->get_elevation( x, z, normal_p ) );
-			}
-			if( normal_p )	{
-				normal_p[ 0 ] = 0.0;
-				normal_p[ 1 ] = 1.0;
-				normal_p[ 2 ] = 0.0;
-			}
-			return( 0.0 );
-		}
 
 /////////////////////////////////////////////////////////////

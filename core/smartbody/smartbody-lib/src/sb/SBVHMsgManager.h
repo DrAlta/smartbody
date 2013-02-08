@@ -6,6 +6,12 @@
 #include <sb/SBService.h>
 #include <string>
 
+namespace vhcl {
+	namespace Log {
+		class Listener;
+	}
+}
+
 namespace SmartBody {
 
 class SBVHMsgManager : public SBService
@@ -30,12 +36,17 @@ class SBVHMsgManager : public SBService
 		SBAPI void setScope(const std::string& scope);
 		SBAPI const std::string& getScope();
 
+		SBAPI virtual void setEnableLogging(bool val);
+		SBAPI virtual bool isEnableLogging();
+
+
 	protected:
 		static void vhmsgCallback( const char *op, const char *args, void * user_data );
 
 		std::string _port;
 		std::string _server;
 		std::string _scope;
+		vhcl::Log::Listener* _logListener;
 };
 
 }

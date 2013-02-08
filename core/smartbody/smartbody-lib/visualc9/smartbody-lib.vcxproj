@@ -399,6 +399,7 @@
     <ClCompile Include="..\src\sb\SBRetargetManager.cpp" />
     <ClCompile Include="..\src\sb\SBSpeechManager.cpp" />
     <ClCompile Include="..\src\sb\SBVHMsgManager.cpp" />
+    <ClCompile Include="..\src\sb\SBWSPManager.cpp" />
     <ClCompile Include="..\src\sk\sk_channel.cpp" />
     <ClCompile Include="..\src\sk\sk_channel_array.cpp" />
     <ClCompile Include="..\src\sk\sk_joint.cpp" />
@@ -861,6 +862,7 @@
     <ClInclude Include="..\src\sb\SBSpeechManager.h" />
     <ClInclude Include="..\src\sb\SBTypes.h" />
     <ClInclude Include="..\src\sb\SBVHMsgManager.h" />
+    <ClInclude Include="..\src\sb\SBWSPManager.h" />
     <ClInclude Include="..\src\sk\sk_channel.h" />
     <ClInclude Include="..\src\sk\sk_channel_array.h" />
     <ClInclude Include="..\src\sk\sk_joint.h" />

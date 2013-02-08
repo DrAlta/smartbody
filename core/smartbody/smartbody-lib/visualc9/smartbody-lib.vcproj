@@ -3896,9 +3896,25 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sb\SBCommandManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBCommandManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sb\SBSpeechManager.h"
 				>
 			</File>
+			<File
+				RelativePath="..\src\sb\SBSWSPManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sb\SBWSPManager.h"
+				>
+			</File>			
 			<File
 				RelativePath="..\src\sb\SBSteerAgent.cpp"
 				>

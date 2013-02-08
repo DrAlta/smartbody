@@ -173,7 +173,10 @@ void SBDebuggerUtility::updateCamera(float& eyePosX, float& eyePosY, float& eyeP
 									  float& lookAtPosX, float& lookAtPosY, float& lookAtPosZ, 
 									  float& fovY, float& aspect, float& zNear, float zFar)
 {
-	SrCamera* camera = mcuCBHandle::singleton().viewer_p->get_camera();
+	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+
+	if (!camera)
+		return;
 
 	camera->setEye(eyePosX, eyePosY, eyePosZ);
 	camera->setCenter(lookAtPosX, lookAtPosY, lookAtPosZ);

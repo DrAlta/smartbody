@@ -49,7 +49,7 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 	{
 		for (size_t i = 0; i < character->dMesh_p->dMeshDynamic_p.size(); i++)
 		{
-			mcu.root_group_p->remove( character->dMesh_p->dMeshDynamic_p[i] );
+			SmartBody::SBScene::getScene()->getRootGroup()->remove( character->dMesh_p->dMeshDynamic_p[i] );
 		}
 		delete character->dMesh_p;
 		character->dMesh_p = NULL;
@@ -96,7 +96,7 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 	{
 		for (size_t i = 0; i < character->dMesh_p->dMeshDynamic_p.size(); i++)
 		{
-			mcu.root_group_p->remove( character->dMesh_p->dMeshDynamic_p[i] );
+			SmartBody::SBScene::getScene()->getRootGroup()->remove( character->dMesh_p->dMeshDynamic_p[i] );
 		}
 		//delete character->dMesh_p; // AS 1/28/13 causing crash related to mesh instances
 		character->dMesh_p = NULL;
@@ -182,7 +182,7 @@ void FLTKListener::OnCharacterChangeMesh( const std::string& name )
 void FLTKListener::OnPawnCreate( const std::string & name )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = mcu.getPawn(name);
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
 	if (!pawn)
 		return;
 
@@ -257,7 +257,7 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 void FLTKListener::OnPawnDelete( const std::string & name )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = mcu.getPawn(name);
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
 	if (!pawn)
 		return;
 	pawn->unregisterObserver(this);

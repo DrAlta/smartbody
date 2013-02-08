@@ -120,11 +120,7 @@ class mcuCBHandle {
 	
 
 	public:
-		// Data
-		vhcl::Log::Listener* logListener;
-		bool		net_bone_updates;
-		bool		net_world_offset_updates;
-		
+	
 		//double      physicsTime;
 
 		KinectProcessor*							kinectProcessor;
@@ -134,48 +130,15 @@ class mcuCBHandle {
 		SrViewer    *ogreViewer_p;
 		
 		SrCamera	*camera_p;
-		SrSnGroup	*root_group_p;
 		
-		Heightfield *height_field_p;
-
-		std::string initPythonLibPath;
-
-	
-
 
 		std::map<std::string, DeformableMesh*> deformableMeshMap;
 
 		GeneralParamMap				param_map;			// map that contains the information of shader parameters
-
-		std::string getValidName(const std::string& name);
-
-		std::map<std::string, SbmPawn*>& getPawnMap();
-		bool addPawn(SbmPawn* pawn);
-		void removePawn(const std::string& name);
-		SbmPawn* getPawn(const std::string& name);
-		int getNumPawns();
-		
-		std::map<std::string, SbmCharacter*>& getCharacterMap();
-
-
-		std::map<std::string, SbmPawn*>	pawn_map;
-		std::map<std::string, SbmCharacter*> character_map;
-
-
-#ifndef SB_NO_PYTHON
-#ifndef __native_client__
-		boost::python::object mainModule;
-		boost::python::object mainDict;
-#endif		
-#endif
 	
 public:
 
 		BML_PROCESSOR				bml_processor;
-
-#if USE_WSP
-		WSP::Manager*				theWSP;
-#endif
 
 		std::vector<CameraTrack*>	cameraTracking;
 
@@ -226,8 +189,7 @@ public:
 		// ----------------------------------------------
 		// terrain management
 		// ----------------------------------------------
-		void render_terrain( int renderMode ) ;
-		float query_terrain( float x, float z, float *normal_p );
+		
 		// ----------------------------------------------
 		// END terrain management
 		// ----------------------------------------------
@@ -236,8 +198,6 @@ public:
 		// ----------------------------------------------
 		// vhmsg and network management
 		// ----------------------------------------------
-		void set_net_host( const char * net_host );
-
 		void NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map );
 		// ----------------------------------------------
 		// END vhmsg and network management
@@ -273,22 +233,5 @@ public:
 		
 };
 
-class VHMsgLogger : public vhcl::Log::Listener
-{
-	public:
-		VHMsgLogger() : vhcl::Log::Listener()
-		{
-		}
-        
-		virtual ~VHMsgLogger()
-		{
-		}
-
-        virtual void OnMessage( const std::string & message )
-		{
-			SmartBody::SBScene::getScene()->getVHMsgManager()->send("sbmlog", message.c_str());
-		}
-};
-//////////////////////////////////////////////////////////////////
 
 #endif

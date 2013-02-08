@@ -16,7 +16,7 @@ EffectorState::EffectorState()
 SbmPawn* EffectorState::getAttachedPawn()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* attachedPawn = mcu.getPawn(attachedPawnName);
+	SbmPawn* attachedPawn =  SmartBody::SBScene::getScene()->getPawn(attachedPawnName);
 	if (attachedPawnName != "" && !attachedPawn) // the pawn is no longer exist...
 	{
 		attachedPawnName = "";
@@ -95,8 +95,7 @@ bool ReachTarget::targetIsJoint()
 
 SbmPawn* ReachTarget::getTargetPawn()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* targetPawn = mcu.getPawn(targetPawnName);
+	SmartBody::SBPawn* targetPawn = SmartBody::SBScene::getScene()->getPawn(targetPawnName);
 	if (targetPawnName != "" && !targetPawn) // the pawn is no longer exist...
 	{
 		targetPawnName = "";

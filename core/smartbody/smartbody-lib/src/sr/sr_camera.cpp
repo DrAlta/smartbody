@@ -228,7 +228,7 @@ float SrCamera::getAspectRatio()
 void SrCamera::setTrack(const std::string& characterName, const std::string& jointName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = mcu.getPawn(characterName);
+	SbmPawn* pawn = SmartBody::SBScene::getScene()->getPawn(characterName);
 	if (!pawn)
 	{
 		LOG("Object %s was not found, cannot track.", characterName.c_str());

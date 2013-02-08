@@ -68,6 +68,8 @@
 #include "sb/SBSpeechManager.h"
 #include "sb/SBVHMsgManager.h"
 #include "sb/SBCommandManager.h"
+#include "sb/SBBoneBusManager.h"
+#include "sb/SBWSPManager.h"
 #include "sbm/GPU/SbmShader.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,7 +214,8 @@ int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->stopSimulation();
 		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->unloadSimulation();
 		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->finish();
-	
+
+		/*
 		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
 			iter != mcu_p->getCharacterMap().end();
 			iter++)
@@ -225,6 +228,7 @@ int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 				ppraiAgent->setAgent(NULL);
 			}
 		}
+		*/
 	}
 	return( CMD_SUCCESS );
 }
@@ -598,7 +602,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	SbmShaderManager::singleton().setViewer(viewer);
 	viewer->init(hThisInst, hPrevInst, str, nWinMode);
 	viewer->resizeViewer();
-	viewer->root( mcu.root_group_p );
+	viewer->root( SmartBody::SBScene::getScene()->getRootGroup() );
 	mcu.camera_p = viewer->get_camera();
 	mcu.viewer_p = viewer;
 
@@ -658,7 +662,11 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 
 	// Sets up the network connection for sending bone rotations over to Unreal
 	if( net_host != "" )
-		mcu.set_net_host( net_host );
+	{
+		SmartBody::SBScene::getScene()->getBoneBusManager()->setHost((const char*)net_host);
+		SmartBody::SBScene::getScene()->getBoneBusManager()->setEnable(true);
+	}
+
 	if( proc_id != "" ) {
 		SmartBody::SBScene::getScene()->setProcessId( (const char*)proc_id );
 
@@ -725,7 +733,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	{
 		std::stringstream strstr;
 		strstr << "scene.addAssetPath('seq', '" << it->c_str() << "')";
-		mcu.executePython( (char *) strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->run( (char *) strstr.str().c_str() );
 	}
 
 	// run the specified scripts
@@ -751,7 +759,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		std::string cmd = it->c_str();
 		std::stringstream strstr;
 		strstr << "scene.run(\"" << cmd.c_str() << "\")";
-		mcu.executePython(strstr.str().c_str());
+		SmartBody::SBScene::getScene()->run(strstr.str().c_str());
 	}
 
 	me_paths.clear();
@@ -813,18 +821,21 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		}
 
 #if USE_WSP
-		mcu.theWSP->broadcast_update();
+		SmartBody::SBWSPManager* wspManager = SmartBody::SBScene::getScene()->getWSPManager();
+		if (wspManager->isEnable())
+			wspManager->broadcastUpdate();
 #endif
 
 		if( update_sim )	{
 			SmartBody::SBScene::getScene()->update();
 		}
 
-		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-			 iter != mcu.getPawnMap().end();
-			 iter++)
+			std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+			pawnIter != pawns.end();
+			pawnIter++)
 		{
-			SbmPawn* pawn = (*iter).second;
+			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
 			if (pawn->scene_p)
 				pawn->scene_p->update();	
 		}

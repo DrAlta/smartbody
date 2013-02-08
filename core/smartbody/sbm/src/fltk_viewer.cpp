@@ -92,6 +92,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <sbm/Heightfield.h>
+
 
 
 #include "jointmapviewer/JointMapViewer.h"
@@ -363,7 +365,8 @@ static void _callback_func ( Fl_Widget* win, void* pt )
  }
 
 FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
-         : SrViewer(x, y, w, h) , Fl_Gl_Window ( x, y, w, h, label )
+//         : SrViewer(x, y, w, h) , Fl_Gl_Window ( x, y, w, h, label )
+         : Fl_Gl_Window ( x, y, w, h, label )
  {
 	 Fl::gl_visual( FL_RGB | FL_DOUBLE | FL_DEPTH );//| FL_ALPHA );
 
@@ -374,7 +377,6 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data = new FltkViewerData();
    _gestureData = new GestureData();
 
-   _data->root = new SrSnGroup; // we maintain root pointer always valid
    _data->rendermode = ModeAsIs;
    _data->charactermode = ModeShowGeometry;
    _data->pawnmode = ModePawnShowAsSpheres;
@@ -463,25 +465,10 @@ void FltkViewer::create_popup_menus()
 
 FltkViewer::~FltkViewer ()
  {
-   _data->root->unref ();
    delete _data->scenebox;
    delete _data->sceneaxis;
    delete _data;
 }
-
-SrSn *FltkViewer::root ()
- { 
-   return _data->root; 
- }
-
-void FltkViewer::root ( SrSn *r )
- { 
-   if ( r==_data->root ) return;
-   if ( !r ) r = new SrSnGroup;
-   _data->root->unref();
-   _data->root = r; 
-   _data->root->ref();
- }
 
 void FltkViewer::draw_message ( const char* s )
  {
@@ -552,22 +539,22 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		  } break;
 
       case CmdAsIs   : _data->rendermode = ModeAsIs;
-                       _data->render_action.restore_render_mode ( _data->root );
+					   _data->render_action.restore_render_mode ( SmartBody::SBScene::getScene()->getRootGroup());
                        break;
       case CmdDefault : _data->rendermode = ModeDefault;
-                       _data->render_action.override_render_mode ( _data->root, srRenderModeDefault );
+                       _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModeDefault );
                        break;
       case CmdSmooth : _data->rendermode = ModeSmooth;
-                       _data->render_action.override_render_mode ( _data->root, srRenderModeSmooth );
+                       _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModeSmooth );
                        break;
       case CmdFlat   : _data->rendermode = ModeFlat;
-                       _data->render_action.override_render_mode ( _data->root, srRenderModeFlat );
+                       _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModeFlat );
                        break;
       case CmdLines  : _data->rendermode = ModeLines;
-                       _data->render_action.override_render_mode ( _data->root, srRenderModeLines );
+                       _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModeLines );
                        break;
       case CmdPoints : _data->rendermode = ModePoints;
-                       _data->render_action.override_render_mode ( _data->root, srRenderModePoints );
+                       _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModePoints );
                        break;
 
       case CmdAxis : SR_SWAPB(_data->displayaxis); 
@@ -828,14 +815,14 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
 
 void FltkViewer::update_bbox ()
  {
-   _data->bbox_action.apply ( _data->root );
+   _data->bbox_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
    _data->scenebox->shape().init();
    _data->scenebox->shape().push_box ( _data->bbox_action.get(), true );
  }
 
 void FltkViewer::update_axis ()
  {
-   _data->bbox_action.apply ( _data->root );
+   _data->bbox_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
    SrBox b = _data->bbox_action.get();
    float len1 = SR_MAX3(b.a.x,b.a.y,b.a.z);
    float len2 = SR_MAX3(b.b.x,b.b.y,b.b.z);
@@ -853,7 +840,7 @@ void FltkViewer::view_all ()
    camera->setUpVector(SrVec::j);
    camera->setEye( 0, 0, 1.0f );
 
-   if ( _data->root )
+   if ( SmartBody::SBScene::getScene()->getRootGroup() )
     { update_bbox ();
       SrBox box = _data->bbox_action.get();
 
@@ -1312,11 +1299,12 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	
 	bool updateSim = SmartBody::SBScene::getScene()->getSimulationManager()->updateTimer();
 	SbmDeformableMeshGPU::useShadowPass = shadowPass;
-	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-		iter != mcu.getPawnMap().end();
-		iter++)
+	std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+		pawnIter != pawns.end();
+		pawnIter++)
 	{
-		SbmPawn* pawn = (*iter).second;
+		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
 		if(pawn->dMesh_p && pawn->dMeshInstance_p)
 		{
 			//pawn->dMesh_p->update();
@@ -1359,8 +1347,8 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	    }
     }
 
-	if( _data->root )	{		
-		_data->render_action.apply ( _data->root );
+	if( SmartBody::SBScene::getScene()->getRootGroup() )	{		
+		_data->render_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
 	}	
 	
 #if USE_OGRE_VIEWER  < 1 // ogre will draw its own floor
@@ -1504,9 +1492,17 @@ void FltkViewer::draw()
 	glEnable( GL_NORMALIZE );
 
 	if (_data->terrainMode == FltkViewer::ModeTerrain)
-		mcu.render_terrain(0);
+	{
+		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();
+		if (h)
+			h->render(0);
+	}
 	else if (_data->terrainMode == FltkViewer::ModeTerrainWireframe)
-		mcu.render_terrain(1);
+	{
+		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();
+		if (h)
+			h->render(1);
+	}
 
 	glDisable( GL_COLOR_MATERIAL );
 
@@ -2073,7 +2069,7 @@ int FltkViewer::handle ( int event )
           _data->scenebox->changed(true);
           _data->sceneaxis->changed(true);
           srSaSetShapesChanged sa;
-          sa.apply ( _data->root );
+          sa.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
         } break;
 
       case FL_SHOW: // Called when the window is de-iconized or when show() is called
@@ -2458,7 +2454,7 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 int FltkViewer::handle_scene_event ( const SrEvent& e )
  {
    SrSaEvent ea(e);
-   ea.apply ( _data->root );
+   ea.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
    int used = ea.result();
    if ( used ) render();
    return used;

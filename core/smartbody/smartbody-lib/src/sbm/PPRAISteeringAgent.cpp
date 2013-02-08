@@ -39,6 +39,7 @@
 #include <sb/SBAnimationState.h>
 
 #include <sb/SBEvent.h>
+#include <sbm/Heightfield.h>
 
 #define DebugInfo 0
 #define FastStart 1
@@ -717,7 +718,12 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 #endif
 		// update locomotion state
 		float tnormal[3];
-		float terrainHeight = mcuCBHandle::singleton().query_terrain(x, z, tnormal);
+		float terrainHeight = 0.0f;
+		Heightfield* heightField = SmartBody::SBScene::getScene()->getHeightfield();
+		if (heightField)
+		{
+			terrainHeight = SmartBody::SBScene::getScene()->queryTerrain(x, z, tnormal);
+		}
 		float difference = y - terrainHeight;
 		float ang = - difference * tiltGain;
 		//LOG("current y %f, terrain height %f, character height %f, difference %f, angle %f", y, terrainHeight, character->getHeight(), difference, ang);
@@ -1169,15 +1175,18 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 		// Improve on the starting angle by examining whether there's obstacles around
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-		std::map<std::string, SbmPawn*>& cMap = mcu.getPawnMap();
-		std::map<std::string, SbmPawn*>::iterator iter = cMap.begin();
 		std::vector<float> neigbors;
-		for (; iter != cMap.end(); iter++)
+		std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+			pawnIter != pawns.end();
+			pawnIter++)
 		{
-			if (iter->second->getName() != character->getName())
+		
+			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(*pawnIter);
+			if (pawn->getName() != character->getName())
 			{
 				float cX, cY, cZ, cYaw, cRoll, cPitch;
-				iter->second->get_world_offset(cX, cY, cZ, cYaw, cPitch, cRoll);
+				pawn->get_world_offset(cX, cY, cZ, cYaw, cPitch, cRoll);
 				float cDist = sqrt((x - cX) * (x - cX) + (z - cZ) * (z - cZ));
 				if (cDist < (1.5f / scene->getScale()))
 				{
@@ -1272,7 +1281,11 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 	if (curStateName == locomotionName && numGoals != 0)
 	{
 		float tnormal[3];
-		mcuCBHandle::singleton().query_terrain(x, z, tnormal);
+		Heightfield* heightField = SmartBody::SBScene::getScene()->getHeightfield();
+		if (heightField)
+		{
+			SmartBody::SBScene::getScene()->queryTerrain(x, z, tnormal);
+		}
 		//LOG("current normal %f %f %f", tnormal[0], tnormal[1], tnormal[2]);
 
 		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);		

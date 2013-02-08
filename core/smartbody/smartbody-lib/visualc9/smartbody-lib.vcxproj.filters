@@ -997,6 +997,9 @@
     <ClCompile Include="..\src\sb\SBCommandManager.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sb\SBWSPManager.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\controllers\me_controller.h">
@@ -2036,6 +2039,9 @@
     </ClInclude>
     <ClInclude Include="..\src\sbm\sr_cmd_map.h">
       <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sb\SBWSPManager.h">
+      <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

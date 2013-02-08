@@ -47,7 +47,7 @@ void TransparentListener::OnCharacterCreate( const std::string & name, const std
 	{
 		for (size_t i = 0; i < character->dMesh_p->dMeshDynamic_p.size(); i++)
 		{
-			mcu.root_group_p->remove( character->dMesh_p->dMeshDynamic_p[i] );
+			SmartBody::SBScene::getScene()->getRootGroup()->remove( character->dMesh_p->dMeshDynamic_p[i] );
 		}
 		delete character->dMesh_p;
 		character->dMesh_p = NULL;
@@ -84,7 +84,7 @@ void TransparentListener::OnCharacterDelete( const std::string & name )
 	{
 		for (size_t i = 0; i < character->dMesh_p->dMeshDynamic_p.size(); i++)
 		{
-			mcu.root_group_p->remove( character->dMesh_p->dMeshDynamic_p[i] );
+			SmartBody::SBScene::getScene()->getRootGroup()->remove( character->dMesh_p->dMeshDynamic_p[i] );
 		}
 		delete character->dMesh_p;
 		character->dMesh_p = NULL;
@@ -114,7 +114,7 @@ void TransparentListener::OnCharacterChanged( const std::string& name )
 void TransparentListener::OnPawnCreate( const std::string & name )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = mcu.getPawn(name);
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
 	if (!pawn)
 		return;
 
@@ -164,7 +164,7 @@ void TransparentListener::OnPawnCreate( const std::string & name )
 void TransparentListener::OnPawnDelete( const std::string & name )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = mcu.getPawn(name);
+	SbmPawn* pawn =SmartBody::SBScene::getScene()->getPawn(name);
 	if (!pawn)
 		return;
 	pawn->unregisterObserver(this);

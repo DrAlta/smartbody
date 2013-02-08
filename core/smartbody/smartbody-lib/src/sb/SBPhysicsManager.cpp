@@ -96,20 +96,22 @@ void SBPhysicsManager::update(double time)
 	}
 
 	// update character
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		 iter != mcu.getCharacterMap().end();
-		 iter++)
+	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
+		iter++)
 	{
-		SbmCharacter* character = (*iter).second;
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
 		//character->updateJointPhyObjs(isEnable());
 		updatePhysicsCharacter(character->getName());
 	}
 
-	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-		 iter != mcu.getPawnMap().end();
-		 iter++)
+	std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+		pawnIter != pawns.end();
+		pawnIter++)
 	{
-		SbmPawn* pawn = (*iter).second;
+		SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
 		updatePhysicsPawn(pawn->getName());
 	}
 }

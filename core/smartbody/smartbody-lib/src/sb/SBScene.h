@@ -5,6 +5,11 @@
 #include <sb/SBTypes.h>
 #include <sb/SBObject.h>
 #include <sb/SBScript.h>
+#ifndef SB_NO_PYTHON
+#ifndef __native_client__
+#include <boost/python.hpp>
+#endif
+#endif
 
 #include <map>
 #include <sstream>
@@ -13,6 +18,10 @@ class SBDebuggerServer;
 class SBDebuggerClient;
 class SBDebuggerUtility;
 class SrCamera;
+class SrSnGroup;
+class SbmPawn;
+class SbmCharacter;
+class Heightfield;
 
 namespace SmartBody {
 
@@ -45,6 +54,7 @@ class SBSubject;
 class SBController;
 class SBVHMsgManager;
 class SBCommandManager;
+class SBWSPManager;
 
 class SBScene : public SBObject
 {
@@ -133,6 +143,7 @@ class SBScene : public SBObject
 		SBAPI SBSpeechManager* getSpeechManager();
 		SBAPI SBVHMsgManager* getVHMsgManager();
 		SBAPI SBCommandManager* getCommandManager();
+		SBAPI SBWSPManager* getWSPManager();
 
 		SBAPI SBParser* getParser();
 
@@ -183,6 +194,25 @@ class SBScene : public SBObject
 		SBAPI int getNumSkeletons();
 		SBAPI std::vector<std::string> getSkeletonNames();
 
+		SBAPI SrSnGroup* getRootGroup();
+		SBAPI std::string getValidName(const std::string& name);
+		SBAPI void updatePawnNames();
+		SBAPI void updateCharacterNames();
+
+		SBAPI Heightfield* createHeightfield();
+		SBAPI void removeHeightfield();
+		SBAPI Heightfield* getHeightfield();
+		SBAPI float queryTerrain( float x, float z, float *normal_p );
+
+#ifndef SB_NO_PYTHON
+#ifndef __native_client__
+		SBAPI void setPythonMainModule(boost::python::object* pyobject);
+		SBAPI void setPythonMainDict(boost::python::object* pyobject);
+		SBAPI boost::python::object* getPythonMainModule();
+		SBAPI boost::python::object* getPythonMainDict();
+#endif
+#endif
+
 				
 	protected:
 
@@ -225,6 +255,7 @@ class SBScene : public SBObject
 		SBSpeechManager* _speechManager;
 		SBVHMsgManager* _vhmsgManager;
 		SBCommandManager* _commandManager;
+		SBWSPManager* _wspManager;
 
 		SBParser* _parser;
 
@@ -251,6 +282,19 @@ class SBScene : public SBObject
 		std::string _processId;
 		static SBScene* _scene;
 		static std::map<std::string, std::string> _systemParameters;
+
+		SrSnGroup* _rootGroup;
+		std::map<std::string, SbmPawn*>	_pawnMap;
+		std::map<std::string, SbmCharacter*> _characterMap;
+
+		Heightfield* _heightField;
+
+#ifndef SB_NO_PYTHON
+#ifndef __native_client__
+		boost::python::object* _mainModule;
+		boost::python::object* _mainDict;
+#endif
+#endif
 };
 
 SBScene* getScene();

@@ -21,6 +21,23 @@
 #include "vhmsg-tt.h"
 #endif
 
+class VHMsgLogger : public vhcl::Log::Listener
+{
+	public:
+		VHMsgLogger() : vhcl::Log::Listener()
+		{
+		}
+        
+		virtual ~VHMsgLogger()
+		{
+		}
+
+        virtual void OnMessage( const std::string & message )
+		{
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send("sbmlog", message.c_str());
+		}
+};
+
 namespace SmartBody {
 
 SBVHMsgManager::SBVHMsgManager() : SBService()
@@ -30,11 +47,16 @@ SBVHMsgManager::SBVHMsgManager() : SBService()
 	_port = "61616";
 	_server = "localhost";
 	_scope = "DEFAULT_SCOPE";
+	_logListener = NULL;
 }
 
 SBVHMsgManager::~SBVHMsgManager()
 {
-
+	if (_logListener)
+	{
+		vhcl::Log::g_log.RemoveListener(_logListener);	
+	}
+	delete _logListener;
 }
 
 void SBVHMsgManager::setEnable(bool val)
@@ -224,6 +246,23 @@ void SBVHMsgManager::vhmsgCallback( const char *op, const char *args, void * use
             LOG("SBM ERR: command FAILED: '%s' + '%s'", op, args );
             break;
     }
+}
+
+void SBVHMsgManager::setEnableLogging(bool val)
+{
+	if (val)
+	{
+		_logListener = new VHMsgLogger();
+		vhcl::Log::g_log.AddListener(_logListener);
+	}
+}
+
+bool SBVHMsgManager::isEnableLogging()
+{
+	if (_logListener)
+		return true;
+	else
+		return false;
 }
 
 }

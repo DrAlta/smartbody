@@ -97,11 +97,14 @@ void SBSteerManager::update(double time)
 			if (timeDiff >= _maxUpdateFrequency)
 			{ // limit steering to 60 fps
 				getEngineDriver()->setLastUpdateTime(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
-				for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-					iter != mcu.getCharacterMap().end();
+
+
+				std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+				for (std::vector<std::string>::iterator iter = characterNames.begin();
+					iter != characterNames.end();
 					iter++)
 				{
-					SbmCharacter* character = (*iter).second;
+					SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
 					SmartBody::SBSteerAgent* steerAgent = getSteerAgent(character->getName());
 					if (steerAgent)
 						steerAgent->evaluate(timeDiff);
@@ -205,11 +208,12 @@ void SBSteerManager::start()
 	int numSetup = 0;
 	// create an agent based on the current characters and positions
 	SteerLib::ModuleInterface* pprAIModule = SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine->getModule(ai);
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
+	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (std::vector<std::string>::iterator iter = characterNames.begin();
+		iter != characterNames.end();
 		iter++)
 	{
-		SbmCharacter* character = (*iter).second;
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
 		SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
 		SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
 		if (!steerAgent)
@@ -250,12 +254,13 @@ void SBSteerManager::start()
 	if (useEnvironment)
 	{
 		// adding obstacles to the steering space
-		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-			iter != mcu.getPawnMap().end();
-			iter++)
+		std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+			pawnIter != pawns.end();
+			pawnIter++)
 		{
-			SBPawn* pawn = dynamic_cast<SBPawn*>(iter->second);
-			SBCharacter* character = dynamic_cast<SBCharacter*>(iter->second);
+			SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
+			SBCharacter* character = dynamic_cast<SBCharacter*>(pawn);
 			if (character) continue; // do not set obstacle for the character, it will mess up the steering
 // 			if ((*iter).second->getGeomObject())
 // 				(*iter).second->initSteeringSpaceObject();
@@ -294,11 +299,13 @@ void SBSteerManager::stop()
 		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->unloadSimulation();
 		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->finish();
 
-		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-			iter != mcu.getCharacterMap().end();
+		std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+		for (std::vector<std::string>::iterator iter = characterNames.begin();
+			iter != characterNames.end();
 			iter++)
 		{
-			SmartBody::SBSteerAgent* steerAgent = getSteerAgent((*iter).second->getName());
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
+			SmartBody::SBSteerAgent* steerAgent = getSteerAgent(character->getName());
 		
 			if (steerAgent)
 			{
@@ -308,14 +315,16 @@ void SBSteerManager::stop()
 				
 		}
 
-		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-			iter != mcu.getPawnMap().end();
-			iter++)
+		std::vector<std::string> pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		for (std::vector<std::string>::iterator pawnIter = pawns.begin();
+			pawnIter != pawns.end();
+			pawnIter++)
 		{
-			if ((*iter).second->steeringSpaceObj_p)
+			SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
+			if (pawn->steeringSpaceObj_p)
 			{
-				delete (*iter).second->steeringSpaceObj_p;
-				(*iter).second->steeringSpaceObj_p = NULL;
+				delete pawn->steeringSpaceObj_p;
+				pawn->steeringSpaceObj_p = NULL;
 			}
 		}
 
