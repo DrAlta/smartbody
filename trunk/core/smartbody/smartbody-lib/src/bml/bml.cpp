@@ -1658,6 +1658,9 @@ void GestureRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		}
 		vhcl::Tokenize(joints, jointVec);
 		SkMotion* holdM = motion->buildPoststrokeHoldMotion((float)holdTime, jointVec, scale, freq, NULL);
+		SmartBody::SBMotion* sbHoldM = dynamic_cast<SmartBody::SBMotion*>(holdM);
+		if (sbHoldM)
+			sbHoldM->setMotionSkeletonName(sbMotion->getMotionSkeletonName());
 		SBCharacter* sbCharacter = dynamic_cast<SBCharacter*>(request->actor);
 		bool isInLocomotion = false;
 		SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();

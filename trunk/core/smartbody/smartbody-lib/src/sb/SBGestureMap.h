@@ -32,6 +32,7 @@ class SBGestureMap : public SBObject
 		SBAPI std::string getGestureByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture, const std::string& policy);
 		SBAPI std::vector<std::string> getGestureListByInfo(const std::string& lexeme, const std::string& type, const std::string& hand, const std::string& style, const std::string& posture);
 		SBAPI GestureInfo& getGestureByIndex(int i);
+		SBAPI std::string getGestureAnimation(int i);
 		SBAPI int getNumMappings();
 		SBAPI void validate();
 

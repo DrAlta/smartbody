@@ -73,11 +73,11 @@ void FingerChain::testCollision( SBGeomObject* colObj )
 
 std::string MeCtHand::CONTROLLER_TYPE = "Hand";
 
-MeCtHand::MeCtHand( SkSkeleton* sk, SkJoint* wrist)
+MeCtHand::MeCtHand( SmartBody::SBSkeleton* sk, SmartBody::SBJoint* wrist)
 {		
 	skeletonRef  = sk;	
 	// work on the copy of skeleton to avoid problems
-	skeletonCopy = new SkSkeleton(sk); 	
+	skeletonCopy = new SmartBody::SBSkeleton(sk); 	
 	if (wrist)
 	{
 		wristJoint = wrist;//skeletonCopy->search_joint(wrist->name().get_string());
@@ -217,16 +217,16 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 	for (unsigned int i=0;i<nodeList.size();i++)
 	{
 		MeCtIKTreeNode* node = nodeList[i];
-		SkJoint* joint = skeletonCopy->linear_search_joint(node->nodeName.c_str());
+		SmartBody::SBJoint* joint = skeletonCopy->getJointByName(node->nodeName);
 		SkJointQuat* skQuat = joint->quat();		
 		affectedJoints.push_back(joint);	
 		_channels.add(joint->name(), SkChannel::Quat);		
 	}	
-	SkMotion *releaseHand, *grabHand, *reachHand, *pointHand;
-	releaseHand = SbmCharacter::findTagSkMotion(type,releasePose);
-	grabHand = SbmCharacter::findTagSkMotion(type,grabPose);
-	reachHand = SbmCharacter::findTagSkMotion(type,reachPose);
-	pointHand = SbmCharacter::findTagSkMotion(type, pointPose);	
+	SmartBody::SBMotion *releaseHand, *grabHand, *reachHand, *pointHand;
+	releaseHand = dynamic_cast<SmartBody::SBMotion*>(SbmCharacter::findTagSkMotion(type,releasePose));
+	grabHand = dynamic_cast<SmartBody::SBMotion*>(SbmCharacter::findTagSkMotion(type,grabPose));
+	reachHand = dynamic_cast<SmartBody::SBMotion*>(SbmCharacter::findTagSkMotion(type,reachPose));
+	pointHand = dynamic_cast<SmartBody::SBMotion*>(SbmCharacter::findTagSkMotion(type, pointPose));	
 
 	if (releaseHand)
 		releaseFrame.setMotionPose((float)releaseHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,releaseHand);

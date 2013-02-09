@@ -158,6 +158,9 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 			std::vector<std::string> jointVec;
 			vhcl::Tokenize(joints, jointVec);
 			mForCt = mForCt->buildPoststrokeHoldMotion(poststrokehold, jointVec, scale, freq, postIdleMotion);
+			SmartBody::SBMotion* sbMForCT = dynamic_cast<SmartBody::SBMotion*>(mForCt);
+			if (sbMForCT)
+				sbMForCT->setMotionSkeletonName(motion->getMotionSkeletonName());
 		}
 		//motionCt->init(const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0);
 		SmartBody::SBCharacter* sbCharacter = dynamic_cast<SmartBody::SBCharacter*>(request->actor);

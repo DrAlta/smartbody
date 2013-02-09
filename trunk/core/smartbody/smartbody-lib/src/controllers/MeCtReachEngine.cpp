@@ -23,10 +23,10 @@ const std::string rFootName[] = {"r_forefoot", "r_ankle" };
 
 std::string MeCtReachEngine::ReachTypeTag[REACH_TYPE_SIZE] = { "Right", "Left", "RightJump", "LeftJump" };
 
-MeCtReachEngine::MeCtReachEngine( SbmCharacter* sbmChar, SkSkeleton* sk)
+MeCtReachEngine::MeCtReachEngine( SbmCharacter* sbmChar, SmartBody::SBSkeleton* sk)
 {
 	character = sbmChar;
-	skeletonCopy = new SkSkeleton(sk); 
+	skeletonCopy = new SmartBody::SBSkeleton(sk); 
 	skeletonCopy->ref();
 	skeletonRef  = sk;
 	dataInterpolator = NULL;
@@ -79,14 +79,14 @@ MeCtReachEngine::~MeCtReachEngine( void )
 //	FREE_DATA(motionParameter);
 }
 
-void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
+void MeCtReachEngine::init(int rtype, SmartBody::SBJoint* effectorJoint)
 {
 	assert(skeletonRef);	
 	assert(character);
 	// root is "world_offset", so we use root->child to get the base joint.
 	reachType = rtype;
 	reachEndEffector = effectorJoint;
-	SkJoint* rootJoint = findRootJoint(skeletonCopy);//findRootJoint(skeletonRef);//skeletonRef->root()->child(0);//skeletonCopy->root()->child(0);//skeletonRef->root()->child(0);	
+	SmartBody::SBJoint* rootJoint = findRootJoint(skeletonCopy);//findRootJoint(skeletonRef);//skeletonRef->root()->child(0);//skeletonCopy->root()->child(0);//skeletonRef->root()->child(0);	
 	std::vector<std::string> stopJoints;
 	ikScenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);
 	ikCCDScenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);	
@@ -150,13 +150,13 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 	for (unsigned int i=0;i<nodeList.size();i++)
 	{
 		MeCtIKTreeNode* node = nodeList[i];
-		SkJoint* joint = skeletonCopy->linear_search_joint(node->nodeName.c_str());		
+		SmartBody::SBJoint* joint = skeletonCopy->getJointByName(node->nodeName);		
 		SkJointQuat* skQuat = joint->quat();		
 		affectedJoints.push_back(joint);			
 	}		
 
-	SkJoint* copyEffector = skeletonCopy->linear_search_joint(reachEndEffector->name().c_str());
-	SkJoint* copyRoot = skeletonCopy->linear_search_joint(rootJoint->parent()->name().c_str());
+	SmartBody::SBJoint* copyEffector = skeletonCopy->getJointByName(reachEndEffector->name());
+	SmartBody::SBJoint* copyRoot = skeletonCopy->getJointByName(rootJoint->parent()->name());
 	motionParameter = new ReachMotionParameter(skeletonCopy,affectedJoints,copyEffector,copyRoot);
 	motionExamples.initMotionExampleSet(motionParameter);	
 
@@ -169,7 +169,7 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 	SbmCharacter* curCharacter = character;
 
 	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->name();
-	SrVec initRootPosition = skeletonRef->search_joint(rootName.c_str())->gmat().get_translation();
+	SrVec initRootPosition = skeletonRef->getJointByName(rootName)->gmat().get_translation();
 
 	reachData = new ReachStateData();
 	reachData->characterHeight = characterHeight;		
@@ -225,13 +225,13 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet, st
 		root->pos()->value(i,0.f);
 	}	
 
-	SkJoint* rootJoint = affectedJoints[0];
+	SmartBody::SBJoint* rootJoint = affectedJoints[0];
 	BOOST_FOREACH(TagMotion tagMotion, inMotionSet)
 	{
 		if (tagMotion.first != reachType) // only process motion with correct tag 
 			continue;
 
-		SkMotion* motion = tagMotion.second;
+		SmartBody::SBMotion* motion = dynamic_cast<SmartBody::SBMotion*>(tagMotion.second);
 		if (!motion)
 			continue;
 		if (motionData.find(tagMotion) != motionData.end())
@@ -424,7 +424,7 @@ ReachStateInterface* MeCtReachEngine::getState( const std::string& stateName )
 	return stateTable[stateName];
 }
 
-SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
+SmartBody::SBJoint* MeCtReachEngine::findRootJoint( SmartBody::SBSkeleton* sk )
 {
 
 	SkJoint* rootJoint = sk->root()->child(0); // skip world offset
@@ -438,7 +438,7 @@ SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 	while (!bStop)
 	{
 		if (rootJoint->num_children() == 0)
-			return rootJoint;
+			return dynamic_cast<SmartBody::SBJoint*>(rootJoint);
 		SkJoint* child = rootJoint->child(0);
 		SkJointPos* skRootPos = rootJoint->pos();		
 		SkJointPos* skPos = child->pos();
@@ -460,7 +460,7 @@ SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 		}
 	}
 	//LOG("ReachEngine Root Name = %s\n",rootJoint->name().c_str());
-	return rootJoint;
+	return dynamic_cast<SmartBody::SBJoint*>(rootJoint);
 }
 
 DataInterpolator* MeCtReachEngine::createInterpolator(std::string interpolatorType)
@@ -564,7 +564,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	//ikMotionFrame = reachData->currentRefFrame;
 }
 
-bool MeCtReachEngine::addHandConstraint( SkJoint* targetJoint, const char* effectorName )
+bool MeCtReachEngine::addHandConstraint( SmartBody::SBJoint* targetJoint, const char* effectorName )
 {
 	MeCtIKTreeNode* node = ikScenario.findIKTreeNode(effectorName);
 	if (!node || !targetJoint)

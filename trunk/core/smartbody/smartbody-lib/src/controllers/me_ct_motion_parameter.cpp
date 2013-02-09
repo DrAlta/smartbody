@@ -1,7 +1,7 @@
 #include <sr/sr_euler.h>
 #include "controllers/me_ct_motion_parameter.h"
 
-MotionParameter::MotionParameter(SkSkeleton* skel, std::vector<SkJoint*>& joints)
+MotionParameter::MotionParameter(SmartBody::SBSkeleton* skel, std::vector<SmartBody::SBJoint*>& joints)
 {
 	skeletonRef = skel;
 	affectedJoints = joints;
@@ -33,7 +33,7 @@ SkJoint* MotionParameter::getMotionFrameJoint( const BodyMotionFrame& frame, con
 	return outJoint;
 }
 
-ReachMotionParameter::ReachMotionParameter( SkSkeleton* skel, std::vector<SkJoint*>& joints, SkJoint* rjoint, SkJoint* root ) : MotionParameter(skel,joints)
+ReachMotionParameter::ReachMotionParameter( SmartBody::SBSkeleton* skel, std::vector<SmartBody::SBJoint*>& joints, SmartBody::SBJoint* rjoint, SmartBody::SBJoint* root ) : MotionParameter(skel,joints)
 {
 	reachJoint = rjoint;	
 	rootJoint = root;
@@ -76,7 +76,7 @@ void ReachMotionParameter::getMotionFrameParameter( BodyMotionInterface* motion,
 	getPoseParameter(tempFrame,outPara);	
 }
 
-LocomotionParameter::LocomotionParameter( SkSkeleton* skel, std::vector<SkJoint*>& joints, const std::string& baseName ): MotionParameter(skel,joints)
+LocomotionParameter::LocomotionParameter( SmartBody::SBSkeleton* skel, std::vector<SmartBody::SBJoint*>& joints, const std::string& baseName ): MotionParameter(skel,joints)
 {
 	baseJointName = baseName;
 }
@@ -243,7 +243,7 @@ float LocomotionParameter::getMotionAngularSpeed( BodyMotionInterface* motion, c
 /************************************************************************/
 /* Jump Parameter                                                       */
 /************************************************************************/
-JumpParameter::JumpParameter( SkSkeleton* skel, std::vector<SkJoint*>& joints, const std::string& baseName ): MotionParameter(skel,joints)
+JumpParameter::JumpParameter( SmartBody::SBSkeleton* skel, std::vector<SmartBody::SBJoint*>& joints, const std::string& baseName ): MotionParameter(skel,joints)
 {
 	baseJointName = baseName;
 }

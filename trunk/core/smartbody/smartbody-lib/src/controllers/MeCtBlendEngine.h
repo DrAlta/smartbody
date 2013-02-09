@@ -7,6 +7,8 @@
 #include "controllers/me_ct_ccd_IK.hpp"
 #include "controllers/me_ct_constraint.hpp"
 #include <sb/sbm_pawn.hpp>
+#include <sb/SBSkeleton.h>
+#include <sb/SBJoint.h>
 
 class SbmCharacter;
 
@@ -17,14 +19,14 @@ protected:
 	bool          ikInit;
 	int           reachType;
 	//SbmCharacter* character;
-	SkSkeleton*   skeletonCopy, *skeletonRef;
+	SmartBody::SBSkeleton*   skeletonCopy, *skeletonRef;
 	std::string   rootJointName;
 	std::vector<SkMotion*> motionData;
-	SkMotion*             refMotion;   // reference motion for time warping
+	SmartBody::SBMotion*             refMotion;   // reference motion for time warping
 	MotionExampleSet      motionExamples;
 
 	MeCtIKTreeScenario    ikScenario;
-	vector<SkJoint*>      affectedJoints; // list of joints that are affected by motion interpolation & IK. 
+	vector<SmartBody::SBJoint*>      affectedJoints; // list of joints that are affected by motion interpolation & IK. 
 	// for motion interpolation
 	dVector               targetParameter;
 	MotionParameter*      motionParameter;		
@@ -39,7 +41,7 @@ public:
 	vector<SrVec>         examplePts,resamplePts;
 	VecOfSimplex*         simplexList;
 public:
-	MeCtBlendEngine(SkSkeleton* sk, std::string rootJointName);
+	MeCtBlendEngine(SmartBody::SBSkeleton* sk, std::string rootJointName);
 	virtual ~MeCtBlendEngine(void);	
 	void init(const std::string& paramFuncType);
 	bool isValid() { return valid; }	

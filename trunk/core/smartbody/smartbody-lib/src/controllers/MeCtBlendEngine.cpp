@@ -17,10 +17,10 @@
 /* Blend Engine                                                         */
 /************************************************************************/
 
-MeCtBlendEngine::MeCtBlendEngine(SkSkeleton* sk, std::string rootName)
+MeCtBlendEngine::MeCtBlendEngine(SmartBody::SBSkeleton* sk, std::string rootName)
 {
 	//character = sbmChar;
-	skeletonCopy = new SkSkeleton(sk); 
+	skeletonCopy = new SmartBody::SBSkeleton(sk); 
 	skeletonCopy->ref();
 	skeletonRef  = sk;
 	rootJointName = rootName;
@@ -45,15 +45,15 @@ void MeCtBlendEngine::init(const std::string& paramFuncType)
 	for (unsigned int i=0;i<nodeList.size();i++)
 	{
 		MeCtIKTreeNode* node = nodeList[i];
-		SkJoint* joint = skeletonCopy->linear_search_joint(node->nodeName.c_str());		
+		SmartBody::SBJoint* joint = skeletonCopy->getJointByName(node->nodeName.c_str());		
 		SkJointQuat* skQuat = joint->quat();		
 		affectedJoints.push_back(joint);			
 	}
 
 	if (paramFuncType == "reach")
 	{
-		SkJoint* copyEffector = skeletonCopy->linear_search_joint("r_wrist");
-		SkJoint* copyRoot = skeletonCopy->linear_search_joint("base");
+		SmartBody::SBJoint* copyEffector = skeletonCopy->getJointByName("r_wrist");
+		SmartBody::SBJoint* copyRoot = skeletonCopy->getJointByName("base");
 		motionParameter = new ReachMotionParameter(skeletonCopy,affectedJoints,copyEffector,copyRoot);
 	}
 	else if (paramFuncType == "jump")
@@ -62,8 +62,8 @@ void MeCtBlendEngine::init(const std::string& paramFuncType)
 	}
 	else if (paramFuncType == "kick")
 	{
-		SkJoint* copyEffector = skeletonCopy->linear_search_joint("r_ankle");
-		SkJoint* copyRoot = skeletonCopy->linear_search_joint("base");
+		SmartBody::SBJoint* copyEffector = skeletonCopy->getJointByName("r_ankle");
+		SmartBody::SBJoint* copyRoot = skeletonCopy->getJointByName("base");
 		motionParameter = new ReachMotionParameter(skeletonCopy,affectedJoints,copyEffector,copyRoot);
 	}
 	else if (paramFuncType == "punch")
@@ -111,10 +111,10 @@ void MeCtBlendEngine::updateMotionExamples( const std::vector<SkMotion*>& inMoti
 			root->pos()->value(i,0.f);
 	}	
 
-	SkJoint* rootJoint = affectedJoints[0];
+	SmartBody::SBJoint* rootJoint = affectedJoints[0];
 	for (unsigned int i=0; i < inMotionSet.size(); i++)
 	{		
-		SkMotion* motion = inMotionSet[i];
+		SmartBody::SBMotion* motion = dynamic_cast<SmartBody::SBMotion*>(inMotionSet[i]);
 		if (!motion)
 			continue;
 		if (std::find(motionData.begin(), motionData.end(), motion) != motionData.end())

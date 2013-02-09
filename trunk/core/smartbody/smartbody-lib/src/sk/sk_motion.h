@@ -201,7 +201,7 @@ public :
 	serves as a starting point for the search, resulting in maximum efficiency.
 	To optimize evaluations from several controllers sharing a same motion file,
 	parameter lastframe can be used and will store the last frame used per controller. */
-	void apply ( float t, InterpType=Linear, int* lastframe=NULL );
+	void apply ( float t, InterpType=Linear, int* lastframe=NULL, SmartBody::SBRetarget* retarget = NULL );
 
 	/*! Evaluates and apply the motion at time t to any float* buffer (or channel joints if NULL).
 	Unless map_p is specified, the buffer is assumed to be in motion's channel order with all channels present.

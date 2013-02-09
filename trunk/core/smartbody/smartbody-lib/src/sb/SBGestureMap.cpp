@@ -165,6 +165,13 @@ SBGestureMap::GestureInfo& SBGestureMap::getGestureByIndex(int i)
 	return _gestureMaps[i];
 }
 
+
+SBAPI std::string SBGestureMap::getGestureAnimation( int i )
+{
+	GestureInfo& gesture = getGestureByIndex(i);
+	return gesture._animation;
+}
+
 int SBGestureMap::getNumMappings()
 {
 	return _gestureMaps.size();

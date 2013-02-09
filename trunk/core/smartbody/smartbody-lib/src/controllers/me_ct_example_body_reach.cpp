@@ -150,7 +150,7 @@ void MeCtExampleBodyReach::setGrabSpeed( float vel )
 
 bool MeCtExampleBodyReach::addHandConstraint( SkJoint* targetJoint, const char* effectorName )
 {
-	return currentReachEngine->addHandConstraint(targetJoint,effectorName);
+	return currentReachEngine->addHandConstraint(dynamic_cast<SmartBody::SBJoint*>(targetJoint),effectorName);
 }
 
 SbmPawn* MeCtExampleBodyReach::getAttachedPawn()
