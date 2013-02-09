@@ -283,8 +283,8 @@ inline float _cubic ( float t, float tmin, float tmax ) {
 }
 
 
-void SkMotion::apply ( float t, SkMotion::InterpType itype, int* lastframe ) {
-	apply( t, _floatbuffer, NULL, itype, lastframe );
+void SkMotion::apply ( float t, SkMotion::InterpType itype, int* lastframe, SmartBody::SBRetarget* retarget ) {
+	apply( t, _floatbuffer, NULL, itype, lastframe, false, retarget );
 }
 
 #define DEBUG_T 0

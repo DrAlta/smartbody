@@ -24,9 +24,9 @@ protected:
 	bool          ikInit;
 	int           reachType;
 	SbmCharacter* character;
-	SkSkeleton*   skeletonCopy, *skeletonRef;
+	SmartBody::SBSkeleton*   skeletonCopy, *skeletonRef;
 	MotionDataSet         motionData;
-	SkMotion*             refMotion;   // reference motion for time warping
+	SmartBody::SBMotion*             refMotion;   // reference motion for time warping
 	MotionExampleSet      motionExamples;
 
 	// for motion interpolation
@@ -36,14 +36,14 @@ protected:
 
 	vector<InterpolationExample*>* interpExampleData;
 	vector<InterpolationExample*>* resampleData;
-	vector<SkJoint*>      affectedJoints; // list of joints that are affected by motion interpolation & IK. 
+	vector<SmartBody::SBJoint*>      affectedJoints; // list of joints that are affected by motion interpolation & IK. 
 	// set to the full skeleton by default ( excluding fingers & face bones ).
 	std::map<std::string,ReachStateInterface*> stateTable;
 	std::map<HandActionState,ReachHandAction*> handActionTable;
 	ReachStateInterface*  curReachState;	
 
 
-	SkJoint*              reachEndEffector;
+	SmartBody::SBJoint*              reachEndEffector;
 	ConstraintMap         reachPosConstraint;
 	ConstraintMap         reachRotConstraint;
 	ConstraintMap         reachNoRotConstraint;
@@ -69,7 +69,7 @@ public:
 	bool                  footIKFix;
 
 public:
-	MeCtReachEngine(SbmCharacter* sbmChar, SkSkeleton* sk);
+	MeCtReachEngine(SbmCharacter* sbmChar, SmartBody::SBSkeleton* sk);
 	virtual ~MeCtReachEngine(void);
 	bool isValid() { return valid; }
 	std::string     getReachTypeTag();
@@ -83,16 +83,16 @@ public:
 	ConstraintMap&  getHandConstraint() { return handConstraint; }
 
 
-	bool addHandConstraint(SkJoint* targetJoint, const char* effectorName);
+	bool addHandConstraint(SmartBody::SBJoint* targetJoint, const char* effectorName);
 	void updateReach(float t, float dt, BodyMotionFrame& inputFrame, float blendWeight);
-	void init(int rtype, SkJoint* effectorJoint);
+	void init(int rtype, SmartBody::SBJoint* effectorJoint);
 	void updateMotionExamples(const MotionDataSet& inMotionSet, std::string interpolatorType);
 	void solveIK(ReachStateData* rd, BodyMotionFrame& outFrame );
 	static int getReachType(const std::string& tag);
 protected:
 	void updateSkeletonCopy();
 	ReachStateInterface* getState(const std::string& stateName);
-	SkJoint* findRootJoint(SkSkeleton* sk);
+	SmartBody::SBJoint* findRootJoint(SmartBody::SBSkeleton* sk);
 	DataInterpolator* createInterpolator(std::string interpolatorType);
 	ResampleMotion*   createInterpMotion();	
 	bool hasEffectorRotConstraint(ReachStateData* rd);

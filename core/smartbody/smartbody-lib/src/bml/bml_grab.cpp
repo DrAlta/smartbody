@@ -84,11 +84,12 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	const XMLCh* attrWrist = NULL;
 	const char* wristName = NULL;
 	attrWrist = elem->getAttribute(BMLDefs::ATTR_WRIST);	
-	SkJoint* wristJoint = NULL;
+	SmartBody::SBJoint* wristJoint = NULL;
+	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(request->actor->getSkeleton());
 	if( attrWrist && XMLString::stringLen( attrWrist ) ) 
 	{
 		wristName = asciiString(attrWrist);			
-		wristJoint = request->actor->getSkeleton()->search_joint(wristName);		
+		wristJoint =sbSkel->getJointByName(wristName);		
 	}
 
 	const XMLCh* attrSourceJoint = NULL;
@@ -127,7 +128,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	//LOG("grabSpeed = %f",grabVelocity);
 	if (!handCt)
 	{
-		handCt = new MeCtHand(request->actor->getSkeleton(), wristJoint);		
+		handCt = new MeCtHand(sbSkel, wristJoint);		
 		handCt->handle(handle);
 		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
 		

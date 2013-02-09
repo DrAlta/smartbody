@@ -2,6 +2,9 @@
 #include "controllers/me_ct_data_driven_reach.hpp"
 #include "controllers/me_ct_motion_timewarp.hpp"
 #include "controllers/me_ct_ublas.hpp"
+#include <sb/SBMotion.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBJoint.h>
 
 using namespace std;
 
@@ -29,7 +32,7 @@ public:
 	BodyMotionFrame() {};
 	virtual ~BodyMotionFrame() {};
 	BodyMotionFrame& operator=(const BodyMotionFrame& rhs);
-	void setMotionPose(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints,SkMotion* motion);
+	void setMotionPose(float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& affectedJoints, SmartBody::SBMotion* motion);
 };
 
 class BodyMotionInterface
@@ -42,7 +45,7 @@ public:
 	virtual ~BodyMotionInterface() {}
 public:	
 	virtual void getMotionParameter(dVector& outPara);	
-	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame) = 0;
+	virtual double getMotionFrame(float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame) = 0;
 	virtual SrVec getMotionBaseTranslation(float time, const std::string& baseName) { return SrVec(); }
 	virtual SrQuat getMotionBaseRotation(float time, const std::string& baseName) { return SrQuat(); }
 	
@@ -55,7 +58,7 @@ public:
 class BodyMotion : public BodyMotionInterface
 {
 public:
-	SkMotion* motion;
+	SmartBody::SBMotion* motion;
 	MotionTimeWarpFunc* timeWarp; // time warp function for the motion
 	SrVec rootOffset;
 	SrQuat quatP;
@@ -63,14 +66,14 @@ public:
 	BodyMotion();
 	virtual ~BodyMotion();
 	virtual double strokeEmphasisTime();
-	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame);
+	virtual double getMotionFrame(float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame);
 	virtual SrVec getMotionBaseTranslation(float time, const std::string& baseName);
 	virtual SrQuat getMotionBaseRotation(float time, const std::string& baseName);
 	virtual double motionDuration(DurationType durType);	
 	virtual double motionPercent(float time);
 	virtual double getRefDeltaTime(float u, float dt);	
 
-	void updateRootOffset(SkSkeleton* skel, SkJoint* rootJoint);
+	void updateRootOffset(SmartBody::SBSkeleton* skel, SmartBody::SBJoint* rootJoint);
 };
 
 /************************************************************************/
@@ -118,7 +121,7 @@ public:
 	virtual ~ResampleMotion() {}
 
 	virtual double strokeEmphasisTime();
-	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame);
+	virtual double getMotionFrame(float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame);
 	virtual SrVec getMotionBaseTranslation(float time, const std::string& baseName);
 	virtual SrQuat getMotionBaseRotation(float time, const std::string& baseName);
 	virtual double motionDuration(DurationType durType);	
@@ -161,8 +164,8 @@ public:
 class MotionExampleSet : public ExampleSet
 {
 protected:	
-	SkSkeleton*        skeletonRef; // reference to the connected skeleton
-	vector<SkJoint*>   affectedJoints; // joints that will be affected by this motion set
+	SmartBody::SBSkeleton*        skeletonRef; // reference to the connected skeleton
+	vector<SmartBody::SBJoint*>   affectedJoints; // joints that will be affected by this motion set
 	VecOfBodyMotionPtr motionData;	
 	vector<MotionExample*> motionExamples;
 	vector<InterpolationExample*> resampleExamples;
@@ -180,9 +183,9 @@ public:
 	MotionExample* getMotionExample(const std::string& motionName);
 	
 public:
-	static double blendMotionFunc(float time, SkSkeleton* skel, const vector<SkJoint*>& joints, const VecOfBodyMotionPtr& motions, 
+	static double blendMotionFunc(float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& joints, const VecOfBodyMotionPtr& motions, 
 		                        const VecOfInterpWeight& blendWeight, BodyMotionFrame& outMotionFrame);
-	static double blendMotionFuncFast(float time, SkSkeleton* skel, const vector<SkJoint*>& joints, const VecOfBodyMotionPtr& motions, 
+	static double blendMotionFuncFast(float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& joints, const VecOfBodyMotionPtr& motions, 
 		const VecOfInterpWeight& blendWeight, BodyMotionFrame& outMotionFrame);
 	// blend start frame to end frame based on blend weight
 	static void   blendMotionFrame( BodyMotionFrame& startFrame,  BodyMotionFrame& endFrame, float weight, BodyMotionFrame& outFrame);	

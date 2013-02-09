@@ -5,6 +5,9 @@
 #include "me_ct_constraint.hpp"
 
 #include <sr/planner/sk_pos_cfg.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBJoint.h>
+#include <sb/SBMotion.h>
 
 using namespace std;
 
@@ -36,9 +39,9 @@ public:
 	enum FingerID { F_THUMB = 0, F_INDEX, F_MIDDLE, F_RING, F_PINKY, F_NUM_FINGERS };
 	enum GrabState { GRAB_START, GRAB_REACH, GRAB_FINISH, GRAB_RETURN, GRAB_POINT };
 protected:
-	SkSkeleton*     skeletonRef;
-	SkSkeleton*     skeletonCopy;
-	SkJoint*        wristJoint;
+	SmartBody::SBSkeleton*     skeletonRef;
+	SmartBody::SBSkeleton*     skeletonCopy;
+	SmartBody::SBJoint*        wristJoint;
 	float 			_duration;
 	SkChannelArray	_channels;	
 	GrabState             currentGrabState;
@@ -46,7 +49,7 @@ protected:
 	BodyMotionFrame       releaseFrame, grabFrame, reachFrame, currentFrame, pointFrame, tempFrame, inputFrame;	
 	
 	vector<FingerChain>   fingerChains;
-	vector<SkJoint*>      affectedJoints;
+	vector<SmartBody::SBJoint*>      affectedJoints;
 	
 	ConstraintMap         handPosConstraint;
 	ConstraintMap         handRotConstraint;
@@ -66,7 +69,7 @@ public:
 	float                 jointSpeed;
 
 public:
-	MeCtHand(SkSkeleton* sk, SkJoint* wrist);
+	MeCtHand(SmartBody::SBSkeleton* sk, SmartBody::SBJoint* wrist);
 	~MeCtHand(void);	
 
 	void init(std::string grabType, const MotionDataSet& reachPose, const MotionDataSet& grabPose, const MotionDataSet& releasePose, const MotionDataSet& pointPose);

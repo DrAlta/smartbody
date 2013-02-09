@@ -8,6 +8,9 @@
 #include "controllers/me_ct_motion_parameter.h"
 #include "controllers/me_ct_motion_profile.h"
 #include "controllers/me_ct_ublas.hpp"
+#include <sb/SBScene.h>
+#include <sb/SBRetarget.h>
+#include <sb/SBRetargetManager.h>
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
@@ -26,7 +29,7 @@ BodyMotionFrame& BodyMotionFrame::operator=( const BodyMotionFrame& rhs )
 	return *this;
 }
 
-void BodyMotionFrame::setMotionPose( float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints,SkMotion* motion )
+void BodyMotionFrame::setMotionPose( float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& affectedJoints,SmartBody::SBMotion* motion )
 {
 	SkJoint* rootJoint = affectedJoints[0];
 	motion->connect(skel);	
@@ -81,10 +84,17 @@ double BodyMotion::motionPercent( float time )
 	return timeWarp->invTimeWarp(rt)/timeWarp->refTimeLength();
 }
 
-void BodyMotion::updateRootOffset(SkSkeleton* skel, SkJoint* rootJoint)
-{
+void BodyMotion::updateRootOffset(SmartBody::SBSkeleton* skel, SmartBody::SBJoint* rootJoint)
+{	
+	SmartBody::SBRetarget* retarget = NULL;
+	if (skel->getName() != motion->getMotionSkeletonName()) // set retarget ?
+	{
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		SmartBody::SBRetargetManager* retargetManager = scene->getRetargetManager();
+		retarget = retargetManager->getRetarget(motion->getMotionSkeletonName(),skel->getName());
+	}
 	motion->connect(skel);		
-	motion->apply(0.001f);
+	motion->apply(0.001f,SkMotion::Linear, 0, retarget);
 	SrQuat tempQ = rootJoint->quat()->rawValue();
 	SrMat src, mat;
 	src = tempQ.get_mat(src);
@@ -139,7 +149,7 @@ SrQuat BodyMotion::getMotionBaseRotation( float time, const std::string& baseNam
 }
 
 
-double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame )
+double BodyMotion::getMotionFrame( float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame )
 {
 	// Because the SkMotion stored its joint quats in an indirect way, it is not straightforward to grab corresponding quats we need.
 	// This is a hack to apply the motion on a skeleton, and then get the quat values directly.
@@ -149,6 +159,14 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 	//SrVec rootOffset = SrVec();
 	
 	SkJoint* rootJoint = affectedJoints[0];
+
+	SmartBody::SBRetarget* retarget = NULL;
+	if (skel->getName() != motion->getMotionSkeletonName()) // set retarget ?
+	{
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		SmartBody::SBRetargetManager* retargetManager = scene->getRetargetManager();
+		retarget = retargetManager->getRetarget(motion->getMotionSkeletonName(),skel->getName());
+	}
 	
 	motion->connect(skel);	
 	double rt = timeWarp->timeWarp(time);
@@ -168,7 +186,7 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 	rootOffset.set(rootJoint->pos()->value());	
 	*/
 
-	motion->apply((float)rt);	
+	motion->apply((float)rt,SkMotion::Linear, 0, retarget);	
 	motion->disconnect();
 
 	if (outMotionFrame.jointQuat.size() != affectedJoints.size())
@@ -233,7 +251,7 @@ ResampleMotion::ResampleMotion( VecOfBodyMotionPtr* motionRef )
 }
 
 
-double ResampleMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame )
+double ResampleMotion::getMotionFrame( float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame )
 {
 	// use blended weights to get the motion frame
 	return MotionExampleSet::blendMotionFunc(time,skel,affectedJoints,*motionDataRef,weight,outMotionFrame);	
@@ -548,7 +566,7 @@ void MotionExampleSet::initMotionExampleSet(MotionParameter* parameterFunc)
 	affectedJoints = parameterFunc->affectedJoints;
 }
 
-double MotionExampleSet::blendMotionFunc( float time, SkSkeleton* skel, const vector<SkJoint*>& joints, const VecOfBodyMotionPtr& motions, 
+double MotionExampleSet::blendMotionFunc( float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& joints, const VecOfBodyMotionPtr& motions, 
 									    const VecOfInterpWeight& blendWeight, BodyMotionFrame& outMotionFrame )
 {
 	int idx = blendWeight[0].first;
@@ -598,7 +616,7 @@ void MotionExampleSet::blendMotionFrame( BodyMotionFrame& startFrame, BodyMotion
 }
 
 // faster version, not using slerp for Quat but just do weighted sum then normalize
-double MotionExampleSet::blendMotionFuncFast( float time, SkSkeleton* skel, const vector<SkJoint*>& joints, const VecOfBodyMotionPtr& motions, 
+double MotionExampleSet::blendMotionFuncFast( float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& joints, const VecOfBodyMotionPtr& motions, 
 											 const VecOfInterpWeight& blendWeight, BodyMotionFrame& outMotionFrame )
 {
 	// assuming the weight array has been normalized !!!
@@ -652,7 +670,7 @@ double MotionExampleSet::blendMotionFuncFast( float time, SkSkeleton* skel, cons
 
 void MotionExampleSet::blendMotionFrameProfile( ResampleMotion* motion, BodyMotionFrame& startFrame, BodyMotionFrame& endFrame, float weight, BodyMotionFrame& outFrame )
 {
-	std::vector<SkJoint*>& affectedJoints = motion->motionParameterFunc->affectedJoints;
+	std::vector<SmartBody::SBJoint*>& affectedJoints = motion->motionParameterFunc->affectedJoints;
 	MotionProfile* profile = motion->getValidMotionProfile();
 	if (!profile)
 	{
@@ -694,7 +712,7 @@ void MotionExampleSet::blendMotionFrameProfile( ResampleMotion* motion, BodyMoti
 float MotionExampleSet::blendMotionFrameEulerProfile( ResampleMotion* motion, BodyMotionFrame& startFrame, BodyMotionFrame& endFrame, float scaleFactor, float weight, BodyMotionFrame& outFrame )
 {
 	float retimingScale = 0.f;
-	std::vector<SkJoint*>& affectedJoints = motion->motionParameterFunc->affectedJoints;
+	std::vector<SmartBody::SBJoint*>& affectedJoints = motion->motionParameterFunc->affectedJoints;
 	MotionProfile* profile = motion->getValidMotionProfile();
 	if (!profile)
 	{

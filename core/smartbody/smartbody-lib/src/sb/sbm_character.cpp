@@ -321,40 +321,41 @@ void SbmCharacter::createStandardControllers()
 	this->head_param_anim_ct->setName(headParamAnimName.c_str());
 	this->head_param_anim_ct->ref();
 
-	SkJoint* effector = this->_skeleton->search_joint("r_middle1");
+	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
+	SmartBody::SBJoint* effector = sbSkel->getJointByName("r_middle1");
 	if (!effector) 
-		effector = this->_skeleton->search_joint("r_index1");
+		effector =sbSkel->getJointByName("r_index1");
 	
 	if (!effector)
-		effector = this->_skeleton->search_joint("r_wrist");
+		effector = sbSkel->getJointByName("r_wrist");
 
 	createReachEngine();
 	
 	if (effector)
 	{
-		MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
+		MeCtReachEngine* rengine = new MeCtReachEngine(this,sbSkel);
 		rengine->init(MeCtReachEngine::RIGHT_ARM,effector);
 		(*this->reachEngineMap)[MeCtReachEngine::RIGHT_ARM] = rengine;	
 
-		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,this->_skeleton);
+		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,sbSkel);
 		rengineJump->init(MeCtReachEngine::RIGHT_JUMP,effector);
 		(*this->reachEngineMap)[MeCtReachEngine::RIGHT_JUMP] = rengineJump;	
 	}	
 
-	SkJoint* leftEffector = this->_skeleton->search_joint("l_middle1");
+	SmartBody::SBJoint* leftEffector = sbSkel->getJointByName("l_middle1");
 
 	if (!leftEffector) 
-		leftEffector = this->_skeleton->search_joint("l_index1");
+		leftEffector = sbSkel->getJointByName("l_index1");
 
 	if (!leftEffector)
-		leftEffector = this->_skeleton->search_joint("l_wrist");
+		leftEffector = sbSkel->getJointByName("l_wrist");
 	if (leftEffector)
 	{
-		MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
+		MeCtReachEngine* rengine = new MeCtReachEngine(this,sbSkel);
 		rengine->init(MeCtReachEngine::LEFT_ARM,leftEffector);
 		(*this->reachEngineMap)[MeCtReachEngine::LEFT_ARM] = rengine;	
 
-		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,this->_skeleton);
+		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,sbSkel);
 		rengineJump->init(MeCtReachEngine::LEFT_JUMP,effector);
 		(*this->reachEngineMap)[MeCtReachEngine::LEFT_JUMP] = rengineJump;
 	}
@@ -369,7 +370,7 @@ void SbmCharacter::createStandardControllers()
 	breathing_p = new MeCtBreathing();
 	breathing_p->setName(getName() + "_breathingController");
 	// add two channels for blendshape-based breathing
-	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
+	//SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
 
 	if (rootJoint)
@@ -2618,38 +2619,39 @@ SkMotion* SbmCharacter::findTagSkMotion( int tag, const MotionDataSet& motionSet
 
 void SbmCharacter::createReachEngine()
 {
-	SkJoint* effector = this->_skeleton->search_joint("r_middle1");
+	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
+	SmartBody::SBJoint* effector = sbSkel->getJointByName("r_middle1");
 	if (!effector) 
-		effector = this->_skeleton->search_joint("r_index1");
+		effector = sbSkel->getJointByName("r_index1");
 
 	if (!effector)
-		effector = this->_skeleton->search_joint("r_wrist");
+		effector = sbSkel->getJointByName("r_wrist");
 
 	if (effector && reachEngineMap->find(MeCtReachEngine::RIGHT_ARM) == reachEngineMap->end())
 	{
-		MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
+		MeCtReachEngine* rengine = new MeCtReachEngine(this,sbSkel);
 		rengine->init(MeCtReachEngine::RIGHT_ARM,effector);
 		(*this->reachEngineMap)[MeCtReachEngine::RIGHT_ARM] = rengine;	
 
-		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,this->_skeleton);
+		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,sbSkel);
 		rengineJump->init(MeCtReachEngine::RIGHT_JUMP,effector);
 		(*this->reachEngineMap)[MeCtReachEngine::RIGHT_JUMP] = rengineJump;	
 	}	
 
-	SkJoint* leftEffector = this->_skeleton->search_joint("l_middle1");
+	SmartBody::SBJoint* leftEffector = sbSkel->getJointByName("l_middle1");
 
 	if (!leftEffector) 
-		leftEffector = this->_skeleton->search_joint("l_index1");
+		leftEffector = sbSkel->getJointByName("l_index1");
 
 	if (!leftEffector)
-		leftEffector = this->_skeleton->search_joint("l_wrist");
+		leftEffector = sbSkel->getJointByName("l_wrist");
 	if (leftEffector && reachEngineMap->find(MeCtReachEngine::LEFT_ARM) == reachEngineMap->end())
 	{
-		MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
+		MeCtReachEngine* rengine = new MeCtReachEngine(this,sbSkel);
 		rengine->init(MeCtReachEngine::LEFT_ARM,leftEffector);
 		(*this->reachEngineMap)[MeCtReachEngine::LEFT_ARM] = rengine;	
 
-		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,this->_skeleton);
+		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,sbSkel);
 		rengineJump->init(MeCtReachEngine::LEFT_JUMP,effector);
 		(*this->reachEngineMap)[MeCtReachEngine::LEFT_JUMP] = rengineJump;
 	}
