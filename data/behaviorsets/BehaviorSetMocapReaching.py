@@ -183,33 +183,47 @@ def retargetBehaviorSet(charName, skelName):
 	mocapReachMotions.append("ChrGarza@IdleStand01_LReachRight30MediumMid01")
 	mocapReachMotions.append("ChrGarza@IdleStand01_LReachRight30MediumNear01")	
 	
-	mocapReachMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Grasp")
-	mocapReachMotions.append("ChrHarmony_Relax001_LHandGraspSmSphere_Grasp")	
+	grabMotions = StringVec()
+	grabMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Grasp")
+	grabMotions.append("ChrHarmony_Relax001_LHandGraspSmSphere_Grasp")	
 	
-	mocapReachMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Reach")
-	mocapReachMotions.append("ChrHarmony_Relax001_LHandGraspSmSphere_Reach")	
+	grabMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Reach")
+	grabMotions.append("ChrHarmony_Relax001_LHandGraspSmSphere_Reach")	
 	
-	mocapReachMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Release")
-	mocapReachMotions.append("ChrHarmony_Relax001_LHandGraspSmSphere_Release")	
+	grabMotions.append("ChrHarmony_Relax001_HandGraspSmSphere_Release")
+	grabMotions.append("ChrHarmony_Relax001_LHandGraspSmSphere_Release")	
 	
-	mocapReachMotions.append("HandsAtSide_LArm_GestureYou")
-	mocapReachMotions.append("HandsAtSide_RArm_GestureYou")
+	grabMotions.append("HandsAtSide_LArm_GestureYou")
+	grabMotions.append("HandsAtSide_RArm_GestureYou")
 	
 	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
 	print 'outDir = ' + outDir ;
 	if not os.path.exists(outDir):
 		os.makedirs(outDir)
+		
+	createRetargetInstance('ChrGarza.sk', skelName)
+	
+	assetManager = scene.getAssetManager()
+	for i in range(0, len(mocapReachMotions)):		
+		sbMotion = assetManager.getMotion(mocapReachMotions[i])
+		if sbMotion != None:
+			sbMotion.setMotionSkeletonName('ChrGarza.sk')
 
+	for i in range(0, len(grabMotions)):		
+		sbMotion = assetManager.getMotion(grabMotions[i])
+		if sbMotion != None:
+			sbMotion.setMotionSkeletonName('common.sk')
+			
 	# retarget mocap reaching
-	for n in range(0, len(mocapReachMotions)):
-		motion = scene.getMotion(mocapReachMotions[n])
-		if motion is not None:
-			retargetMotion(mocapReachMotions[n], 'ChrGarza.sk', skelName, outDir + 'MocapReaching/');
-		else:
-			print "Cannot find motion " + mocapReachMotions[n] + ", it will be excluded from the reach setup..."
+	#for n in range(0, len(mocapReachMotions)):
+	#	motion = scene.getMotion(mocapReachMotions[n])
+	#	if motion is not None:
+	#		retargetMotion(mocapReachMotions[n], 'ChrGarza.sk', skelName, outDir + 'MocapReaching/');
+	#	else:
+	#		print "Cannot find motion " + mocapReachMotions[n] + ", it will be excluded from the reach setup..."
 
 	scene.run("init-example-reach-mocap.py")
-	reachSetup(charName, "KNN", skelName)
+	reachSetup(charName, "KNN", 'ChrGarza.sk', '')
 
 
 		
