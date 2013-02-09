@@ -1,4 +1,4 @@
-def reachSetup(characterName, interpolatorType, preFix):
+def reachSetup(characterName, interpolatorType, originalSkeleton, preFix):
 	print "Setting up reach database for " + characterName
 	rightHandMotions = StringVec();
 	rightHandMotions.append(preFix+"ChrGarza@IdleStand01_ReachBackFloor01")
