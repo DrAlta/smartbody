@@ -2722,6 +2722,7 @@ float SBScene::queryTerrain( float x, float z, float *normal_p )
 	return( 0.0 );
 }
 
+#ifndef SB_NO_PYTHON
 void SBScene::setPythonMainModule(boost::python::object* pyobject)
 {
 	_mainModule = pyobject;
@@ -2741,7 +2742,7 @@ boost::python::object* SBScene::getPythonMainDict()
 {
 	return _mainDict;
 }
-
+#endif
 
 
 };
