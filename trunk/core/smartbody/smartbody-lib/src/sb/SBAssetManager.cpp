@@ -776,9 +776,16 @@ int SBAssetManager::load_motions( const char* pathname, bool recursive )
 
 int SBAssetManager::load_motion( const void* data, int sizeBytes, const char* motionName )
 {
+	// SrInput requires a data stream that's null terminated (uses strlen() to figure out length).  So, allocate a new buffer and make sure to null-terminate it.
+	// this is inefficient, but safer than assuming the user has given us valid data.
+	char * dataCopy = new char [sizeBytes + 1];
+	memcpy( dataCopy, data, sizeBytes );
+	dataCopy[ sizeBytes ] = 0;
+	SrInput input( dataCopy );
 	double scale = getDoubleAttribute("globalSkeletonScale");
-	SrInput input( (char *)data, sizeBytes );
-	return load_me_motion_individual( input, motionName, _motions, scale );
+	int ret = load_me_motion_individual( input, motionName, _motions, scale );
+	delete [] dataCopy;
+	return ret;
 }
 
 int SBAssetManager::load_skeletons( const char* pathname, bool recursive ) {
@@ -787,8 +794,15 @@ int SBAssetManager::load_skeletons( const char* pathname, bool recursive ) {
 
 int SBAssetManager::load_skeleton( const void* data, int sizeBytes, const char* skeletonName )
 {
-	SrInput input( (char *)data, sizeBytes );
-	return load_me_skeleton_individual( input, skeletonName, _skeletons, SmartBody::SBScene::getScene()->getAssetManager()->getGlobalSkeletonScale() );
+	// SrInput requires a data stream that's null terminated (uses strlen() to figure out length).  So, allocate a new buffer and make sure to null-terminate it.
+	// this is inefficient, but safer than assuming the user has given us valid data.
+	char * dataCopy = new char [sizeBytes + 1];
+	memcpy( dataCopy, data, sizeBytes );
+	dataCopy[ sizeBytes ] = 0;
+	SrInput input( dataCopy );
+	int ret = load_me_skeleton_individual( input, skeletonName, _skeletons, SmartBody::SBScene::getScene()->getAssetManager()->getGlobalSkeletonScale() );
+	delete [] dataCopy;
+	return ret;
 }
 
 SmartBody::SBSkeleton* SBAssetManager::load_skeleton( const char *skel_file, srPathList &path_list, double scale ) {
