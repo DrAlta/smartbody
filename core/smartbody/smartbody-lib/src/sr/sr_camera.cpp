@@ -225,61 +225,6 @@ float SrCamera::getAspectRatio()
 	return aspect;
 }
 
-void SrCamera::setTrack(const std::string& characterName, const std::string& jointName)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = SmartBody::SBScene::getScene()->getPawn(characterName);
-	if (!pawn)
-	{
-		LOG("Object %s was not found, cannot track.", characterName.c_str());
-		return;
-	}
-	if (jointName == "")
-	{
-		LOG("Need to specify a joint to track.");
-		return;
-	}
-
-	SkSkeleton* skeleton = NULL;
-	skeleton = pawn->getSkeleton();
-
-	SkJoint* joint = pawn->getSkeleton()->search_joint(jointName.c_str());
-	if (!joint)
-	{
-		LOG("Could not find joint %s on object %s.", jointName.c_str(), characterName.c_str());
-		return;
-	}
-
-	joint->skeleton()->update_global_matrices();
-	joint->update_gmat();
-	const SrMat& jointMat = joint->gmat();
-	SrVec jointPos(jointMat[12], jointMat[13], jointMat[14]);
-	CameraTrack* cameraTrack = new CameraTrack();
-	cameraTrack->joint = joint;
-	cameraTrack->jointToCamera = mcu.camera_p->eye - jointPos;
-	LOG("Vector from joint to target is %f %f %f", cameraTrack->jointToCamera.x, cameraTrack->jointToCamera.y, cameraTrack->jointToCamera.z);
-	cameraTrack->targetToCamera = mcu.camera_p->eye - mcu.camera_p->center;
-	LOG("Vector from target to eye is %f %f %f", cameraTrack->targetToCamera.x, cameraTrack->targetToCamera.y, cameraTrack->targetToCamera.z);				
-	mcu.cameraTracking.push_back(cameraTrack);
-	LOG("Object %s will now be tracked at joint %s.", characterName.c_str(), jointName.c_str());
-}
-
-void SrCamera::removeTrack()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.cameraTracking.size() > 0)
-	{
-		for (std::vector<CameraTrack*>::iterator iter = mcu.cameraTracking.begin();
-			 iter != mcu.cameraTracking.end();
-			 iter++)
-		{
-			CameraTrack* cameraTrack = (*iter);
-			delete cameraTrack;
-		}
-		mcu.cameraTracking.clear();
-		LOG("Removing current tracked object.");
-	}
-}
 
 void SrCamera::init () 
  { 

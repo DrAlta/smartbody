@@ -43,7 +43,6 @@ char * mcn_return_full_filename_func( const char * current_path, const char * fi
 int mcu_filepath_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 int mcu_sequence_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 int mcu_sequence_chain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
-int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 int mcu_terrain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 int mcu_time_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );

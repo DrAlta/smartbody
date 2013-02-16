@@ -36,9 +36,22 @@
 class SrMat;
 class SrBox;
 
+
+class SkJoint;
+
 namespace SmartBody {
 	class SBSubject;
 }
+
+class CameraTrack
+{
+	public:
+		SkJoint* joint;
+		SrVec jointToCamera;
+		SrVec targetToCamera;
+		double yPos;
+		double threshold;
+};
 
 /*! \class SrCamera sr_camera.h
     \brief Keeps camera parameters
@@ -81,9 +94,6 @@ class SrCamera : public SmartBody::SBPawn
 	SBAPI float getFarPlane();
 	SBAPI void setAspectRatio(float aspect);
 	SBAPI float getAspectRatio();
-
-	SBAPI void setTrack(const std::string& characterName, const std::string& jointName);
-	SBAPI void removeTrack();
 
 	SBAPI void print();
 	SBAPI void reset();

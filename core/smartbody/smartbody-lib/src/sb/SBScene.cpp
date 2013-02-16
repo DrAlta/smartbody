@@ -308,6 +308,8 @@ void SBScene::cleanup()
 	_commandManager = NULL;
 	_speechManager = NULL;
 	_wspManager = NULL;
+
+	cameraTracking.clear();
 	
 	if (_heightField)
 	{
@@ -2743,6 +2745,92 @@ boost::python::object* SBScene::getPythonMainDict()
 	return _mainDict;
 }
 #endif
+
+void SBScene::setCameraTrack(const std::string& characterName, const std::string& jointName)
+{
+	SrCamera* camera = getActiveCamera();
+	if (!camera)
+	{
+		LOG("No active camera found. Cannot create camera track.");
+		return;
+	}
+	SbmPawn* pawn = SmartBody::SBScene::getScene()->getPawn(characterName);
+	if (!pawn)
+	{
+		LOG("Object %s was not found, cannot track.", characterName.c_str());
+		return;
+	}
+	if (jointName == "")
+	{
+		LOG("Need to specify a joint to track.");
+		return;
+	}
+
+	SkSkeleton* skeleton = NULL;
+	skeleton = pawn->getSkeleton();
+
+	SkJoint* joint = pawn->getSkeleton()->search_joint(jointName.c_str());
+	if (!joint)
+	{
+		LOG("Could not find joint %s on object %s.", jointName.c_str(), characterName.c_str());
+		return;
+	}
+
+	joint->skeleton()->update_global_matrices();
+	joint->update_gmat();
+	const SrMat& jointMat = joint->gmat();
+	SrVec jointPos(jointMat[12], jointMat[13], jointMat[14]);
+	CameraTrack* cameraTrack = new CameraTrack();
+	cameraTrack->joint = joint;
+	cameraTrack->jointToCamera = camera->getEye() - jointPos;
+	LOG("Vector from joint to target is %f %f %f", cameraTrack->jointToCamera.x, cameraTrack->jointToCamera.y, cameraTrack->jointToCamera.z);
+	cameraTrack->targetToCamera = camera->getEye() - camera->getCenter();
+	LOG("Vector from target to eye is %f %f %f", cameraTrack->targetToCamera.x, cameraTrack->targetToCamera.y, cameraTrack->targetToCamera.z);				
+	cameraTracking.push_back(cameraTrack);
+	LOG("Object %s will now be tracked at joint %s.", characterName.c_str(), jointName.c_str());
+}
+
+void SBScene::removeCameraTrack()
+{
+	if (cameraTracking.size() > 0)
+	{
+		for (std::vector<CameraTrack*>::iterator iter = cameraTracking.begin();
+			 iter != cameraTracking.end();
+			 iter++)
+		{
+			CameraTrack* cameraTrack = (*iter);
+			delete cameraTrack;
+		}
+		cameraTracking.clear();
+		LOG("Removing current tracked object.");
+	}
+}
+
+bool SBScene::hasCameraTrack()
+{
+	return cameraTracking.size() > 0;
+}
+
+void SBScene::updateTrackedCameras()
+{
+	for (size_t x = 0; x < cameraTracking.size(); x++)
+	{
+		// move the camera relative to the joint
+		SkJoint* joint = cameraTracking[x]->joint;
+		joint->skeleton()->update_global_matrices();
+		joint->update_gmat();
+		const SrMat& jointGmat = joint->gmat();
+		SrVec jointLoc(jointGmat[12], jointGmat[13], jointGmat[14]);
+		SrVec newJointLoc = jointLoc;
+		if (fabs(jointGmat[13] - cameraTracking[x]->yPos) < cameraTracking[x]->threshold)
+			newJointLoc.y = (float) cameraTracking[x]->yPos;
+		SrVec cameraLoc = newJointLoc + cameraTracking[x]->jointToCamera;
+		SrCamera* activeCamera = getActiveCamera();
+		activeCamera->setEye(cameraLoc.x, cameraLoc.y, cameraLoc.z);
+		SrVec targetLoc = cameraLoc - cameraTracking[x]->targetToCamera;
+		activeCamera->setCenter(targetLoc.x, targetLoc.y, targetLoc.z);
+	}	
+}
 
 
 };
