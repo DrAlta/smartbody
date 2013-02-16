@@ -1,7 +1,7 @@
 print "=== Starting: data/sbm-common/scripts/common-init-face.py"
 
 # 
-defaultFace = scene.getFaceDefinition("_default_")
+defaultFace = scene.createFaceDefinition("_default_")
 defaultFace.setFaceNeutral("face_neutral")
 defaultFace.setAU(1, "left", "fac_1L_inner_brow_raiser")
 defaultFace.setAU(1, "right", "fac_1R_inner_brow_raiser")
