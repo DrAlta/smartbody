@@ -74,7 +74,6 @@ void SBCommandManager::registerCallbacks()
 	insert( "print",        mcu_print_func );
 	insert( "test",			mcu_test_func );
 
-	insert( "camera",		mcu_camera_func );
 	insert( "terrain",		mcu_terrain_func );
 	insert( "time",			mcu_time_func );
 	insert( "tip",			mcu_time_ival_prof_func );

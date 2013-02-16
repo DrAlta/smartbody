@@ -4,8 +4,11 @@
 #include <sb/SBTypes.h>
 #include <sb/SBService.h>
 #include "bonebus.h"
+#include <sbm/general_param_setting.h>
 
 namespace SmartBody {
+
+	class SBSkeleton;
 
 class SBBoneBusManager : public SmartBody::SBService
 {
@@ -24,6 +27,8 @@ class SBBoneBusManager : public SmartBody::SBService
 		SBAPI virtual void stop();
 
 		SBAPI bonebus::BoneBusClient& getBoneBus();
+
+		SBAPI void NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SmartBody::SBSkeleton* skeleton, GeneralParamMap * param_map );
 
 		SBAPI virtual void notify(SBSubject* subject);
 

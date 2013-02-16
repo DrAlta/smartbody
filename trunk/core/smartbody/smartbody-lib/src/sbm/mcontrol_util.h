@@ -1,33 +1,7 @@
-#ifndef MCONTROL_UTIL_H
-#define MCONTROL_UTIL_H
-/*
- *  mcontrol_util.h - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcus Thiebaux, USC
- *      Ed Fast, USC
- *      Andrew n marshall, USC
- *      Ashok Basawapatna, USC (no longer)
- *      Eric Forbell, USC
- *      Thomas Amundsen, USC
- */
-//  Declare classes defined by this file
-//  (prevents include recursion)
+#ifndef _MCONTROL_UTIL_H_
+#define _MCONTROL_UTIL_H_
+
+
 class mcuCBHandle;
 
 #include <map>
@@ -38,6 +12,8 @@ class mcuCBHandle;
 #if LINK_VHMSG_CLIENT
 #include "vhmsg-tt.h"
 #endif
+
+#include <sbm/sbm_constants.h>
 
 #include <sbm/GenericViewer.h>
 #include <sb/SBVHMsgManager.h>
@@ -51,6 +27,7 @@ class mcuCBHandle;
 
 #include <sbm/action_unit.hpp>
 #include <sbm/general_param_setting.h>
+#include <bml/bml_processor.hpp>
 
 
 
@@ -74,7 +51,6 @@ class mcuCBHandle;
 #endif
 #endif
 
-#include BML_PROCESSOR_INCLUDE
 
 namespace SmartBody
 {
@@ -82,34 +58,11 @@ namespace SmartBody
 };
 
 
-#if USE_WSP
-namespace WSP
-{
-    class Manager;
-};
-#endif
-
-class PABlend;
-class PATransition;
-class Heightfield;
-class SbmPawn;
-class SbmCharacter;
-class Nvbg;
 class KinectProcessor;
-class SrViewer;
-class SrCamera;
 
 //////////////////////////////////////////////////////////////////
 
-class CameraTrack
-{
-	public:
-		SkJoint* joint;
-		SrVec jointToCamera;
-		SrVec targetToCamera;
-		double yPos;
-		double threshold;
-};
+
 
 
 class VHMsgLog;
@@ -140,7 +93,7 @@ public:
 
 		BML_PROCESSOR				bml_processor;
 
-		std::vector<CameraTrack*>	cameraTracking;
+		
 
 		//SbmPhysicsSim*              physicsEngine;
 
@@ -182,32 +135,7 @@ public:
 		int add_scene( SrSnGroup *scene_p );
 		int remove_scene( SrSnGroup *scene_p );
 		void render();
-		// ----------------------------------------------
-		// END scene management
-		// ----------------------------------------------
-		
-		// ----------------------------------------------
-		// terrain management
-		// ----------------------------------------------
-		
-		// ----------------------------------------------
-		// END terrain management
-		// ----------------------------------------------
-		
-
-		// ----------------------------------------------
-		// vhmsg and network management
-		// ----------------------------------------------
-		void NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map );
-		// ----------------------------------------------
-		// END vhmsg and network management
-		// ----------------------------------------------
-	
-		// ----------------------------------------------
-		// viewer management
-		// ----------------------------------------------
-
-		
+			
 		int open_viewer( int width, int height, int px, int py );
 		void close_viewer( void );
 

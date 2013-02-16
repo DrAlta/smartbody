@@ -158,6 +158,206 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data )
     }
 }
 
+/*
+
+	viewer open <width> <height> <px> <py> 
+	viewer show|hide
+	
+*/
+
+int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
+	
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	char *view_cmd = args.read_token();
+	if( strcmp( view_cmd, "open" ) == 0 )	{
+
+		if( mcu.viewer_p == NULL )	{
+			int argc = args.calc_num_tokens();
+			int width = 1024;
+			int height = 768;
+			int px = 100;
+			int py = 100;
+			if( argc >= 4 )	{
+				width = args.read_int();
+				height = args.read_int();
+				px = args.read_int();
+				py = args.read_int();
+			}
+			int err = mcu.open_viewer( width, height, px, py );
+			return( err );
+		}
+		else {
+			mcu.viewer_p ->show_viewer();
+		}
+	}		
+	else
+	if( strcmp( view_cmd, "close" ) == 0 )	{
+		if( mcu.viewer_p )	{
+			mcu.close_viewer();
+			return( CMD_SUCCESS );
+		}
+	}
+	else
+	if( strcmp( view_cmd, "show" ) == 0 )	{
+		if( mcu.viewer_p )	{
+			mcu.viewer_p->show_viewer();
+			return( CMD_SUCCESS );
+		}
+	}
+	else
+	if( strcmp( view_cmd, "hide" ) == 0 )	{
+		if( mcu.viewer_p )	{
+			mcu.viewer_p->hide_viewer();
+			return( CMD_SUCCESS );
+		}
+	}
+	else	{
+		return( CMD_NOT_FOUND );
+	}
+
+	return( CMD_FAILURE );
+}
+
+/*
+
+	camera	eye <x y z>
+	camera	center <x y z>
+#	camera	up <x y z>
+#	camera	fovy <degrees>
+	camera	scale <factor>
+	camera	default [<preset>]
+
+*/
+
+int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
+	
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if( mcu.viewer_p )	{
+		SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+		if (!camera)
+		{
+			LOG("No active camera. Camera command not executed.");
+			return CMD_FAILURE;
+		}
+		char *cam_cmd = args.read_token();
+		if( strcmp( cam_cmd, "eye" ) == 0 )	{
+			float x = args.read_float();
+			float y = args.read_float();
+			float z = args.read_float();
+			camera->setEye( x, y, z );
+		}
+		else
+		if( strcmp( cam_cmd, "center" ) == 0 )	{
+			float x = args.read_float();
+			float y = args.read_float();
+			float z = args.read_float();
+			camera->setCenter( x, y, z );
+		}
+		else
+		if( strcmp( cam_cmd, "scale" ) == 0 )	{
+			camera->setScale(args.read_float());
+		}
+		else
+		if( strcmp( cam_cmd, "track" ) == 0 )	{
+			char* name = args.read_token();
+			if (!name || strcmp(name, "") == 0)
+			{
+				if (SmartBody::SBScene::getScene()->hasCameraTrack())
+				{
+					SmartBody::SBScene::getScene()->removeCameraTrack();
+					LOG("Removing current tracked object.");
+						return( CMD_SUCCESS );
+				}
+				LOG("Need to specify an object and a joint to track.");
+				return( CMD_FAILURE );
+			}
+			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
+			if (!pawn)
+			{
+				pawn = SmartBody::SBScene::getScene()->getCharacter(name);
+				if (!pawn)
+				{
+					LOG("Object %s was not found, cannot track.", name);
+					return( CMD_FAILURE );
+				}
+			}
+			char* jointName = args.read_token();
+			if (!jointName || strcmp(jointName, "") == 0)
+			{
+				LOG("Need to specify a joint to track.");
+				return( CMD_FAILURE );
+			}
+			SkSkeleton* skeleton = NULL;
+			skeleton = pawn->getSkeleton();
+
+			SkJoint* joint = pawn->getSkeleton()->search_joint(jointName);
+			if (!joint)
+			{
+				LOG("Could not find joint %s on object %s.", jointName, name);
+				return( CMD_FAILURE );
+			}
+	
+			bool hasTracks = SmartBody::SBScene::getScene()->hasCameraTrack();
+			if (hasTracks)
+			{
+				SmartBody::SBScene::getScene()->removeCameraTrack();
+				LOG("Removing current tracked object.");
+			}
+			SmartBody::SBScene::getScene()->setCameraTrack(name, joint->getName());
+			return CMD_SUCCESS;			
+		}
+		else
+		if( strcmp( cam_cmd, "default" ) == 0 )	{
+			int preset = args.read_int();
+				
+			if( preset == 1 )	{
+				mcu.viewer_p->view_all();
+			}
+		}
+		else if (strcmp( cam_cmd, "reset" ) == 0 ) {
+			float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
+			SrVec camEye = SrVec(0,1.66f,1.85f)*scale;
+			SrVec camCenter = SrVec(0,0.92f,0)*scale;	
+			float znear = 0.01f*scale;
+			float zfar = 100.0f*scale;
+			char camCommand[256];
+			sprintf(camCommand,"camera eye %f %f %f",camEye[0],camEye[1],camEye[2]);				
+			SmartBody::SBScene::getScene()->getCommandManager()->execute((char*)camCommand);
+			sprintf(camCommand,"camera center %f %f %f",camCenter[0],camCenter[1],camCenter[2]);
+			SmartBody::SBScene::getScene()->getCommandManager()->execute((char*)camCommand);			
+			camera->setNearPlane(znear);
+			camera->setFarPlane(zfar);
+
+		}
+		else if (strcmp( cam_cmd, "frame" ) == 0 ) {
+			SrBox sceneBox;
+			const std::vector<std::string>& pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+
+			for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
+				iter != pawnNames.end();
+				iter++)
+			{
+				SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(*iter);
+				bool visible = pawn->getBoolAttribute("visible");
+					if (!visible)
+						continue;
+				SrBox box = pawn->getSkeleton()->getBoundingBox();
+				sceneBox.extend(box);
+			}
+			camera->view_all(sceneBox, camera->getFov());	
+			float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
+			float znear = 0.01f*scale;
+			float zfar = 100.0f*scale;
+			camera->setNearPlane(znear);
+			camera->setFarPlane(zfar);
+		}
+		return( CMD_SUCCESS );
+	}
+
+	return( CMD_FAILURE );
+}
+
+
 // snapshot <windowHeight> <windowWidth> <offsetHeight> <offsetWidth> <output file>
 // The offset is according to the left bottom corner of the image frame buffer
 int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
@@ -251,6 +451,7 @@ void mcu_register_callbacks( void ) {
 	cmdMgr->insert( "quit",			mcu_quit_func );
 	cmdMgr->insert( "snapshot",		mcu_snapshot_func );
 	cmdMgr->insert( "viewer",		mcu_viewer_func );
+	cmdMgr->insert( "camera",		mcu_camera_func );
 }
 
 void cleanup( void )	{
@@ -974,36 +1175,18 @@ int main( int argc, char **argv )	{
 			if (character->scene_p)
 				character->scene_p->update();	
 		}*/
-		const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		const std::vector<std::string>& pawns = scene->getPawnNames();
 		for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 			pawnIter != pawns.end();
 			pawnIter++)
 		{
-			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
+			SmartBody::SBPawn* pawn = scene->getPawn((*pawnIter));
  			if (pawn->scene_p)
  				pawn->scene_p->update();	
 		}
 
-		// update any tracked cameras
-		for (size_t x = 0; x < mcu.cameraTracking.size(); x++)
-		{
-			// move the camera relative to the joint
-			SkJoint* joint = mcu.cameraTracking[x]->joint;
-			joint->skeleton()->update_global_matrices();
-			joint->update_gmat();
-			const SrMat& jointGmat = joint->gmat();
-			SrVec jointLoc(jointGmat[12], jointGmat[13], jointGmat[14]);
-			SrVec newJointLoc = jointLoc;
-			if (fabs(jointGmat[13] - mcu.cameraTracking[x]->yPos) < mcu.cameraTracking[x]->threshold)
-				newJointLoc.y = (float)mcu.cameraTracking[x]->yPos;
-			SrVec cameraLoc = newJointLoc + mcu.cameraTracking[x]->jointToCamera;
-			SrCamera* activeCamera = scene->getActiveCamera();
-			activeCamera->setEye(cameraLoc.x, cameraLoc.y, cameraLoc.z);
-			SrVec targetLoc = cameraLoc - mcu.cameraTracking[x]->targetToCamera;
-			activeCamera->setCenter(targetLoc.x, targetLoc.y, targetLoc.z);
-		}	
-
-
+		scene->updateTrackedCameras();
+		
 		BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(mcu.viewer_p);
 
 		if(rootWindow && rootWindow->dataViewerWindow && rootWindow->dataViewerWindow->shown())

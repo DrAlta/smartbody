@@ -1293,8 +1293,6 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getCenter", &SrCamera::getCenter, "Get camera center.")
 		.def("setScale", &SrCamera::setScale, "Set camera scale. \n camera scale: NULL \n Output: NULL")
 		.def("getScale", &SrCamera::getScale, "Get camera scale.")
-		.def("setTrack", &SrCamera::setTrack, "Set camera track. \n Input: character name, joint name \n Output: NULL")
-		.def("removeTrack", &SrCamera::removeTrack, "Remove camera track.")
 		.def("setUpVector", &SrCamera::setUpVector, "Set camera up vector.")
 		.def("getUpVector", &SrCamera::getUpVector, "Returns the camera up vector.")
 		.def("setFov", &SrCamera::setFov, "Set's the camera's field of view.")

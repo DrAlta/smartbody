@@ -1438,13 +1438,7 @@ void BaseWindow::TrackCharacterCB(Fl_Widget* w, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (mcu.cameraTracking.size() > 0)
-	{
-		// if any tracks are active, remove them
-		SmartBody::SBScene::getScene()->command((char*)"camera track");
-		return;
-	}
+	SmartBody::SBScene::getScene()->removeCameraTrack();
 
 	// track the selected character
 	SbmCharacter* character = rootWindow->getSelectedCharacter();

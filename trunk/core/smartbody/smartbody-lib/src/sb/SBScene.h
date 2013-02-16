@@ -18,6 +18,7 @@ class SBDebuggerServer;
 class SBDebuggerClient;
 class SBDebuggerUtility;
 class SrCamera;
+class CameraTrack;
 class SrSnGroup;
 class SbmPawn;
 class SbmCharacter;
@@ -172,6 +173,10 @@ class SBScene : public SBObject
 		SBAPI int getNumCameras();
 		SBAPI std::vector<std::string> getCameraNames();
 		SBAPI std::vector<SBController*>& getDefaultControllers();
+		SBAPI bool hasCameraTrack();
+		SBAPI void setCameraTrack(const std::string& characterName, const std::string& jointName);
+		SBAPI void removeCameraTrack();
+		SBAPI void updateTrackedCameras();
 
 		// deprecated
 		SBAPI SBSkeleton* createSkeleton(const std::string&char_name);
@@ -290,7 +295,7 @@ class SBScene : public SBObject
 		std::vector<std::string> _characterNames;
 
 		Heightfield* _heightField;
-
+		std::vector<CameraTrack*>	cameraTracking;
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__
 		boost::python::object* _mainModule;

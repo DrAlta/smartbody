@@ -279,7 +279,6 @@ mcuCBHandle::mcuCBHandle()
 	viewer_factory ( new SrViewerFactory() ),
 	ogreViewerFactory ( new SrViewerFactory() )
 {	
-	kinectProcessor = new KinectProcessor();
 
 
 }
@@ -352,10 +351,6 @@ void mcuCBHandle::reset( void )
 	// clear everything
 	clear();
 
-	kinectProcessor = new KinectProcessor();
-
-
-
 }
 
 
@@ -372,12 +367,6 @@ void mcuCBHandle::reset( void )
  */
 void mcuCBHandle::clear( void )	
 {
-
-	if (kinectProcessor)
-	{
-		delete kinectProcessor;
-		kinectProcessor = NULL;
-	}
 
 	//close_viewer();
 	if (viewer_p)	
@@ -435,8 +424,6 @@ void mcuCBHandle::clear( void )
 	deformableMeshMap.clear();
 	//SbmDeformableMeshGPU::initShader = false;
 	//SbmShaderManager::destroy_singleton();
-
-	cameraTracking.clear();
 
 
 }
@@ -534,126 +521,7 @@ int mcuCBHandle::remove_scene( SrSnGroup *scene_p )	{
 	return( CMD_FAILURE );
 }
 
-void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map )
-{
-	if ( character == NULL )
-	{
-		return;
-	}
 
-	// Send the bone rotation for each joint in the skeleton
-	const std::vector<SkJoint *> & joints  = skeleton->joints();
-
-	character->IncrementTime();
-	character->StartSendBoneRotations();
-
-	std::vector<int> otherJoints;
-
-	for ( size_t i = 0; i < joints.size(); i++ )
-	{
-		SkJoint * j = joints[ i ];
-		if (j->getJointType() != SkJoint::TypeJoint)
-		{
-			if (j->getJointType() == SkJoint::TypeOther)
-				otherJoints.push_back(i); // collect the 'other' joins
-			continue;
-		}
-
-		const SrQuat& q = j->quat()->value();
-
-		character->AddBoneRotation( j->extName().c_str(), q.w, q.x, q.y, q.z, SmartBody::SBScene::getScene()->getSimulationManager()->getTime() );
-
-		//printf( "%s %f %f %f %f\n", (const char *)j->name(), q.w, q.x, q.y, q.z );
-	}
-
-	character->EndSendBoneRotations();
-
-
-	character->StartSendBonePositions();
-
-	for ( size_t i = 0; i < joints.size(); i++ )
-	{
-		SkJoint * j = joints[ i ];
-		if (j->getJointType() != SkJoint::TypeJoint)
-			continue;
-
-		float posx = j->pos()->value( 0 );
-		float posy = j->pos()->value( 1 );
-		float posz = j->pos()->value( 2 );
-		if ( false )
-		{
-			posx += j->offset().x;
-			posy += j->offset().y;
-			posz += j->offset().z;
-		}
-
-		//these coordinates are meant to mimic the setpositionbyname coordinates you give to move the character
-		//so if you wanted to move a joint on the face in the x direction you'd do whatever you did to move the actor
-		//itself further in the x position.
-		character->AddBonePosition( j->extName().c_str(), posx, posy, posz, SmartBody::SBScene::getScene()->getSimulationManager()->getTime() );
-	}
-
-	character->EndSendBonePositions();
-
-	if (otherJoints.size() > 0)
-	{
-		character->StartSendGeneralParameters();
-		for (size_t i = 0; i < otherJoints.size(); i++)
-		{
-			SkJoint* joint = joints[otherJoints[i]];
-			character->AddGeneralParameters(i, 1, joint->pos()->value( 0 ), i, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
-
-		}
-		character->EndSendGeneralParameters();
-	}
-	
-
-/*
-	// Passing General Parameters
-	character->StartSendGeneralParameters();
-<<<<<<< .mine
-	for (size_t i = 0; i < joints.size(); i++)
-=======
-	int numFound = 0;
-	for (int i = 0; i < joints.size(); i++)
->>>>>>> .r2317
-	{
-		SkJoint* j = joints[ i ];
-		if (j->getJointType() != SkJoint::TypeOther)
-			continue;
-
-		// judge whether it is joint for general parameters, usually should have a prefix as "param"
-		string j_name = j->name();
-		int name_end_pos = j_name.find_first_of("_");
-		string test_prefix = j_name.substr( 0, name_end_pos );
-		if( test_prefix == character->m_name )	
-		{
-			// if is, prepare adding data
-			int index = 0;
-			GeneralParamMap::iterator pos;
-			for(pos = param_map->begin(); pos != param_map->end(); pos++)
-			{
-				for(int n = 0; n < (int)pos->second->char_names.size(); n++)
-				{
-					if( character->m_name == pos->second->char_names[n] )
-					{
-						index ++;
-						for(int m = 0 ; m < pos->second->size; m++)
-						{
-							std::stringstream joint_name;
-							joint_name << character->m_name << "_" << index << "_" << ( m + 1 );
-							if(_stricmp( j->name().c_str(), joint_name.str().c_str()) == 0)
-								character->AddGeneralParameters(index, pos->second->size, j->pos()->value(0), m, time);
-						}
-					}
-				}
-			}
-		}
-	}
-	character->EndSendGeneralParameters();
-*/
-	
-}
 
 void mcuCBHandle::render()
 {
