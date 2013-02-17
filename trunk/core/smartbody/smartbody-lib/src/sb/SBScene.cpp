@@ -576,7 +576,7 @@ void SBScene::update()
 				 char_p->getSkeleton() && 
 				 char_p->bonebusCharacter)
 			{
-				mcu.NetworkSendSkeleton( char_p->bonebusCharacter, (SkSkeleton *)(char_p->getSkeleton()), &mcu.param_map );
+				getBoneBusManager()->NetworkSendSkeleton( char_p->bonebusCharacter, char_p->getSkeleton(), &mcu.param_map );
 
 				const SkJoint * joint = char_p->get_world_offset_joint();
 
