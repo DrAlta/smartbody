@@ -129,11 +129,6 @@ public:
 
 		void reset();
 
-		// ----------------------------------------------
-		// scene management
-		// ----------------------------------------------
-		int add_scene( SrSnGroup *scene_p );
-		int remove_scene( SrSnGroup *scene_p );
 		void render();
 			
 		int open_viewer( int width, int height, int px, int py );
