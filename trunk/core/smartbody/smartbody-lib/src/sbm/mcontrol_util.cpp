@@ -499,29 +499,6 @@ void mcuCBHandle::closeOgreViewer( void )	{
 
 
 
-int mcuCBHandle::add_scene( SrSnGroup *scene_p )	{
-
-	if( SmartBody::SBScene::getScene()->getRootGroup() )	{
-		if( scene_p )	{
-			SmartBody::SBScene::getScene()->getRootGroup()->add( scene_p ); 
-			return( CMD_SUCCESS );
-		}
-	}
-	return( CMD_FAILURE );
-}
-
-int mcuCBHandle::remove_scene( SrSnGroup *scene_p )	{
-
-	if( SmartBody::SBScene::getScene()->getRootGroup() )	{
-		if( scene_p )	{
-			SmartBody::SBScene::getScene()->getRootGroup()->remove( scene_p ); 
-			return( CMD_SUCCESS );
-		}
-	}
-	return( CMD_FAILURE );
-}
-
-
 
 void mcuCBHandle::render()
 {

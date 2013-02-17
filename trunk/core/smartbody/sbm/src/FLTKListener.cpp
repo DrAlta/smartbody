@@ -28,7 +28,10 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 	// remove any existing scene
 	if (character->scene_p)
 	{
-		mcu.remove_scene(character->scene_p);
+		if( SmartBody::SBScene::getScene()->getRootGroup() )
+		{
+			SmartBody::SBScene::getScene()->getRootGroup()->remove( character->scene_p ); 
+		}
 		character->scene_p->unref();
 		character->scene_p = NULL;
 	}
@@ -41,8 +44,12 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 		character->scene_p->visible(true);
 	else
 		character->scene_p->visible(false);
-	mcu.add_scene(character->scene_p);
 
+
+	if( SmartBody::SBScene::getScene()->getRootGroup() )
+	{
+		SmartBody::SBScene::getScene()->getRootGroup()->add( character->scene_p ); 
+	}
 
 	// remove any existing deformable mesh
 	if (character->dMesh_p)
@@ -87,7 +94,10 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 	// remove any existing scene
 	if (character->scene_p)
 	{
-		mcu.remove_scene(character->scene_p);
+		if( SmartBody::SBScene::getScene()->getRootGroup() )
+		{
+			SmartBody::SBScene::getScene()->getRootGroup()->remove( character->scene_p ); 
+		}
 		character->scene_p->unref();
 		character->scene_p = NULL;
 	}
@@ -200,7 +210,10 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 	// remove any existing scene
 	if (pawn->scene_p)
 	{
-		mcu.remove_scene(pawn->scene_p);
+		if( SmartBody::SBScene::getScene()->getRootGroup() )
+		{
+			SmartBody::SBScene::getScene()->getRootGroup()->remove( pawn->scene_p ); 
+		}
 		pawn->scene_p->unref();
 		pawn->scene_p = NULL;
 	}
@@ -229,7 +242,10 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 		pawn->scene_p->visible(true);
 	else
 		pawn->scene_p->visible(false);
-	mcu.add_scene(pawn->scene_p);
+	if( SmartBody::SBScene::getScene()->getRootGroup() )
+	{
+		SmartBody::SBScene::getScene()->getRootGroup()->add( pawn->scene_p ); 
+	}
 
 	if (otherListener)
 		otherListener->OnPawnCreate(name);
@@ -276,7 +292,10 @@ void FLTKListener::OnPawnDelete( const std::string & name )
 	// remove any existing scene
 	if (pawn->scene_p)
 	{
-		mcu.remove_scene(pawn->scene_p);
+		if( SmartBody::SBScene::getScene()->getRootGroup() )
+		{
+			SmartBody::SBScene::getScene()->getRootGroup()->remove( pawn->scene_p ); 
+		}
 		pawn->scene_p->unref();
 		pawn->scene_p = NULL;
 	}
