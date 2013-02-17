@@ -160,7 +160,58 @@ void TransparentViewerFactory::remove(SrViewer* viewer)
 void TransparentViewerFactory::reset(SrViewer* viewer)
 {
 }
+int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
+	
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	char *view_cmd = args.read_token();
+	if( strcmp( view_cmd, "open" ) == 0 )	{
 
+		if( mcu.viewer_p == NULL )	{
+			int argc = args.calc_num_tokens();
+			int width = 1024;
+			int height = 768;
+			int px = 100;
+			int py = 100;
+			if( argc >= 4 )	{
+				width = args.read_int();
+				height = args.read_int();
+				px = args.read_int();
+				py = args.read_int();
+			}
+			int err = mcu.open_viewer( width, height, px, py );
+			return( err );
+		}
+		else {
+			mcu.viewer_p ->show_viewer();
+		}
+	}		
+	else
+	if( strcmp( view_cmd, "close" ) == 0 )	{
+		if( mcu.viewer_p )	{
+			mcu.close_viewer();
+			return( CMD_SUCCESS );
+		}
+	}
+	else
+	if( strcmp( view_cmd, "show" ) == 0 )	{
+		if( mcu.viewer_p )	{
+			mcu.viewer_p->show_viewer();
+			return( CMD_SUCCESS );
+		}
+	}
+	else
+	if( strcmp( view_cmd, "hide" ) == 0 )	{
+		if( mcu.viewer_p )	{
+			mcu.viewer_p->hide_viewer();
+			return( CMD_SUCCESS );
+		}
+	}
+	else	{
+		return( CMD_NOT_FOUND );
+	}
+
+	return( CMD_FAILURE );
+}
 
 int mcu_quit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )	{
 
@@ -841,23 +892,8 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		}
 
 		// update any tracked cameras
-		for (size_t x = 0; x < mcu.cameraTracking.size(); x++)
-		{
-			// move the camera relative to the joint
-			SkJoint* joint = mcu.cameraTracking[x]->joint;
-			joint->skeleton()->update_global_matrices();
-			joint->update_gmat();
-			const SrMat& jointGmat = joint->gmat();
-			SrVec jointLoc(jointGmat[12], jointGmat[13], jointGmat[14]);
-			SrVec newJointLoc = jointLoc;
-			if (fabs(jointGmat[13] - mcu.cameraTracking[x]->yPos) < mcu.cameraTracking[x]->threshold)
-				newJointLoc.y = (float)mcu.cameraTracking[x]->yPos;
-			SrVec cameraLoc = newJointLoc + mcu.cameraTracking[x]->jointToCamera;
-			mcu.camera_p->setEye(cameraLoc.x, cameraLoc.y, cameraLoc.z);
-			SrVec targetLoc = cameraLoc - mcu.cameraTracking[x]->targetToCamera;
-			mcu.camera_p->setCenter( targetLoc.x, targetLoc.y, targetLoc.z);
-			//mcu.viewer_p->set_camera( mcu.camera_p );
-		}	
+		SmartBody::SBScene::getScene()->updateTrackedCameras();
+		
 
 		mcu.render();
 	
