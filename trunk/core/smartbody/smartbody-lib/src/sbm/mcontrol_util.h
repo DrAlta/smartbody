@@ -17,7 +17,6 @@ class mcuCBHandle;
 
 #include <sbm/GenericViewer.h>
 #include <sb/SBVHMsgManager.h>
-#include <sb/SBScene.h>
 #include "sbm_constants.h"
 
 #include "sr_hash_map.h"
@@ -55,6 +54,7 @@ class mcuCBHandle;
 namespace SmartBody
 {
     class SBScene;
+    class SBCommandManager;
 };
 
 

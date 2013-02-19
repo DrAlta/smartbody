@@ -2,8 +2,8 @@
 #include "vhcl.h"
 #include <sb/SBAttribute.h>
 #include <sb/SBSkeleton.h>
-#include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBScene.h>
 
 namespace SmartBody {
 

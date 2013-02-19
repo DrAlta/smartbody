@@ -29,22 +29,20 @@ namespace rapidxml
 #if 1 
 		file(const char *filename)
         {
-            using namespace std;
-
             // Open stream
-            basic_ifstream<Ch> stream(filename, ios::binary);
+            std::basic_ifstream<Ch> stream(filename, std::ios::binary);
             if (!stream)
-                throw runtime_error(string("cannot open file ") + filename);
-            stream.unsetf(ios::skipws);
+                throw std::runtime_error(std::string("cannot open file ") + filename);
+            stream.unsetf(std::ios::skipws);
             
             // Determine stream size
-            stream.seekg(0, ios::end);
+            stream.seekg(0, std::ios::end);
             size_t size = (size_t) stream.tellg();
             stream.seekg(0);   
             
             // Load data and add terminating 0
             m_data.resize(size + 1);
-            stream.read(&m_data.front(), static_cast<streamsize>(size));
+            stream.read(&m_data.front(), static_cast<std::streamsize>(size));
             m_data[size] = 0;
         }
 #else
@@ -81,22 +79,20 @@ namespace rapidxml
 				}
 			}
 			else	{
-				using namespace std;
-
 				// Open stream
-				basic_ifstream<Ch> stream(filename, ios::binary);
+				std::basic_ifstream<Ch> stream(filename, std::ios::binary);
 				if (!stream)
-					throw runtime_error(string("cannot open file ") + filename);
-				stream.unsetf(ios::skipws);
+					throw std::runtime_error(string("cannot open file ") + filename);
+				stream.unsetf(std::ios::skipws);
 	            
 				// Determine stream size
-				stream.seekg(0, ios::end);
+				stream.seekg(0, std::ios::end);
 				size_t size = stream.tellg();
 				stream.seekg(0);   
 	            
 				// Load data and add terminating 0
 				m_data.resize(size + 1);
-				stream.read(&m_data.front(), static_cast<streamsize>(size));
+				stream.read(&m_data.front(), static_cast<std::streamsize>(size));
 				m_data[size] = 0;
 			}
         }
@@ -109,10 +105,10 @@ namespace rapidxml
             using namespace std;
 
             // Load data and add terminating 0
-            stream.unsetf(ios::skipws);
+            stream.unsetf(std::ios::skipws);
             m_data.assign(istreambuf_iterator<Ch>(stream), istreambuf_iterator<Ch>());
             if (stream.fail() || stream.bad())
-                throw runtime_error("error reading stream");
+                throw std::runtime_error("error reading stream");
             m_data.push_back(0);
         }
         
