@@ -66,6 +66,7 @@
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/framework/MemBufFormatTarget.hpp>
 #include "sbm/BMLDefs.h"
+#include <sb/SBScene.h>
 #include <sb/SBCommandManager.h>
 
 

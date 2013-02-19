@@ -34,12 +34,11 @@
 #endif
 
 #include "mcontrol_callbacks.h"
-#include <sb/SBSimulationManager.h>
-#include <sb/SBScene.h>
 #include <cstdlib>
 #include <iostream>
 #include <string>
 #include <boost/tokenizer.hpp>
+#include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBMotion.h>
 #include <sb/SBAssetManager.h>

@@ -1,5 +1,6 @@
 //#include "vhcl_log.h"
 #include "SBEvent.h"
+#include <sb/SBScene.h>
 #include <sb/SBCommandManager.h>
 #include "sbm/mcontrol_util.h"
 

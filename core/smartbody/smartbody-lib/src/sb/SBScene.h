@@ -5,14 +5,14 @@
 #include <sb/SBTypes.h>
 #include <sb/SBObject.h>
 #include <sb/SBScript.h>
+#include <map>
+#include <sstream>
+
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__
 #include <boost/python.hpp>
 #endif
 #endif
-
-#include <map>
-#include <sstream>
 
 class SBDebuggerServer;
 class SBDebuggerClient;

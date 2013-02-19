@@ -24,7 +24,6 @@
 
 #include <controllers/me_controller_context.hpp>
 #include <controllers/me_evaluation_logger.hpp>
-#include "sbm/mcontrol_util.h"
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 

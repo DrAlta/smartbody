@@ -36,6 +36,9 @@
 // Forward Declaration
 class mcuCBHandle;
 
+namespace SmartBody {
+	class SBCommandManager;
+}
 
 namespace BML {
 	const bool LOG_SYNC_POINTS = false;
