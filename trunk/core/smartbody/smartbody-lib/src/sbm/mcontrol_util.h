@@ -8,7 +8,6 @@
 #include <sr/sr_viewer.h>
 
 class KinectProcessor;
-class SrCamera;
 class DeformableMesh;
 
 //////////////////////////////////////////////////////////////////
@@ -24,13 +23,6 @@ class mcuCBHandle {
 		//double      physicsTime;
 
 		KinectProcessor*							kinectProcessor;
-		SrViewerFactory *viewer_factory;
-		SrViewerFactory *ogreViewerFactory;
-		SrViewer	*viewer_p;
-		SrViewer    *ogreViewer_p;
-		
-		SrCamera	*camera_p;
-		
 
 		std::map<std::string, DeformableMesh*> deformableMeshMap;
 
@@ -39,10 +31,6 @@ class mcuCBHandle {
 public:
 
 		BML_PROCESSOR				bml_processor;
-
-		
-
-		//SbmPhysicsSim*              physicsEngine;
 
 	private:
 		// Constant
@@ -76,30 +64,8 @@ public:
 
 		void reset();
 
-		void render();
-			
-		int open_viewer( int width, int height, int px, int py );
-		void close_viewer( void );
 
-		int openOgreViewer( int width, int height, int px, int py );
-		void closeOgreViewer( void );
-
-
-		void register_viewer_factory(SrViewerFactory* factory) { 
-				if (viewer_factory != NULL) delete viewer_factory;
-				viewer_factory = factory;
-		}
-		
-		void register_OgreViewer_factory(SrViewerFactory* factory) { 
-			if (ogreViewerFactory != NULL) delete ogreViewerFactory;
-			ogreViewerFactory = factory;
-		}	
-		// ----------------------------------------------
-		// END viewer management
-		// ----------------------------------------------
-
-
-	public:
+	
 		
 };
 

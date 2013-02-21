@@ -273,11 +273,6 @@ int SequenceManager::getNumSequences()
 }
 
 mcuCBHandle::mcuCBHandle()
-:	viewer_p( NULL ),
-	ogreViewer_p( NULL ),
-	camera_p( NULL ),
-	viewer_factory ( new SrViewerFactory() ),
-	ogreViewerFactory ( new SrViewerFactory() )
 {	
 
 
@@ -288,10 +283,6 @@ mcuCBHandle::mcuCBHandle()
 mcuCBHandle::~mcuCBHandle() {
 	clear();
 
-	// clean up factories and time profiler which are set externally
-
-	viewer_factory = NULL;
-	ogreViewerFactory = NULL;
 
 	// clean up python
 #ifndef SB_NO_PYTHON
@@ -368,30 +359,6 @@ void mcuCBHandle::reset( void )
 void mcuCBHandle::clear( void )	
 {
 
-	//close_viewer();
-	if (viewer_p)	
-	{
-		viewer_factory->reset(viewer_p);
-		viewer_p = NULL;
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE) && !defined(__native_client__)
-		SbmShaderManager::singleton().setViewer(NULL);
-#endif
-	}
-
-
-	ogreViewerFactory->remove(ogreViewer_p);
-	if (ogreViewer_p)
-	{
-		delete ogreViewer_p;
-		ogreViewer_p = NULL;
-	}
-
-	if (camera_p)
-	{
-		delete camera_p;
-		camera_p = NULL;
-	}
-
 /*	cmd_map.reset();
 
 
@@ -432,79 +399,7 @@ void mcuCBHandle::clear( void )
 
 
 
-/////////////////////////////////////////////////////////////
-
-int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{	
-	
-	if( viewer_p == NULL )	{
-		if (!viewer_factory)
-			return CMD_FAILURE;
-		viewer_p = viewer_factory->create( px, py, width, height );
-		viewer_p->label_viewer( "SBM Viewer - Local Mode" );
-		camera_p = new SrCamera;
-		viewer_p->set_camera( camera_p );
-		//((FltkViewer*)viewer_p)->set_mcu(this);
-		viewer_p->show_viewer();
-		if( SmartBody::SBScene::getScene()->getRootGroup() )	{
-			viewer_p->root( SmartBody::SBScene::getScene()->getRootGroup() );
-		}
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE) && !defined(__native_client__)
-		SbmShaderManager::singleton().setViewer(viewer_p);
-#endif
-		return( CMD_SUCCESS );
-	}
-	return( CMD_FAILURE );
-}
-
-void mcuCBHandle::close_viewer( void )	{
-
-	if( viewer_p )	{
-		viewer_factory->remove(viewer_p);
-		viewer_p = NULL;
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE) && !defined(__native_client__)
-		SbmShaderManager::singleton().setViewer(NULL);
-#endif
-	}
-	if( camera_p )	{
-		delete camera_p;
-		camera_p = NULL;
-	}
-}
-
-int mcuCBHandle::openOgreViewer( int width, int height, int px, int py )	{	
-
-	if( ogreViewer_p == NULL )	{
-		if (!ogreViewerFactory)
-			return CMD_FAILURE;
-		ogreViewer_p = ogreViewerFactory->create( px, py, width, height );
-		ogreViewer_p->label_viewer( "SB Ogre Viewer" );
-		camera_p = new SrCamera;
-		ogreViewer_p->set_camera( camera_p );		
-		ogreViewer_p->show_viewer();
-		if( SmartBody::SBScene::getScene()->getRootGroup() )	{
-			ogreViewer_p->root( SmartBody::SBScene::getScene()->getRootGroup() );
-		}
-		return( CMD_SUCCESS );
-	}
-	return( CMD_FAILURE );
-}
-
-void mcuCBHandle::closeOgreViewer( void )	{
-
-	if( ogreViewer_p )	{
-		ogreViewerFactory->remove(ogreViewer_p);
-		ogreViewer_p = NULL;
-	}	
-}
 
 
 
 
-void mcuCBHandle::render()
-{
-	if( viewer_p ) { viewer_p->render(); }
-	if (ogreViewer_p) { ogreViewer_p->render(); }
-}
-
-
-/////////////////////////////////////////////////////////////

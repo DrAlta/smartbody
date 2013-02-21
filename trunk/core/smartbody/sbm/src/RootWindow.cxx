@@ -442,9 +442,8 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->setCharacterListener(listener);
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.viewer_p = window;
-	mcu.viewer_p->root(SmartBody::SBScene::getScene()->getRootGroup());
+	SmartBody::SBScene::getScene()->setViewer(window);
+	SmartBody::SBScene::getScene()->getViewer()->root(SmartBody::SBScene::getScene()->getRootGroup());
 	SbmShaderManager::singleton().setViewer(window);
 
 	scene->getSimulationManager()->setupTimer();
@@ -628,9 +627,8 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 		SmartBody::SBScene::destroyScene();
 
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		mcu.viewer_p = window;
-		mcu.viewer_p->root(SmartBody::SBScene::getScene()->getRootGroup());
+		scene->setViewer(window);
+		scene->getViewer()->root(scene->getRootGroup());
 		SbmShaderManager::singleton().setViewer(window);
 
 

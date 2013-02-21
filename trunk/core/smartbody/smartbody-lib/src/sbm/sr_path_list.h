@@ -25,6 +25,7 @@
 #ifndef SR_PATH_LIST_H
 #define SR_PATH_LIST_H
 
+#include <vhcl.h>
 #include <cstdio>
 #include <string>
 #include <vector>

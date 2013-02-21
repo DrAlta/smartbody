@@ -76,7 +76,7 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 	if (otherListener)
 		otherListener->OnCharacterCreate(name,objectClass);
 
-	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 	if (window && window->resourceWindow && window->resourceWindow->shown())
 	{
 		window->resourceWindow->updateGUI();
@@ -113,7 +113,7 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 	}
 #if 1 //!USE_OGRE_VIEWER
 	// make sure the character isn't associated with the viewer
-	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 	if (window)
 	{
 		if (window->fltkViewer->_objManipulator.get_selected_pawn() == character)
@@ -145,8 +145,7 @@ void FLTKListener::OnCharacterUpdate( const std::string & name, const std::strin
 		otherListener->OnCharacterCreate(name, objectClass);
 	}
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 	if (window && window->resourceWindow && window->resourceWindow->shown())
 	{
 		window->resourceWindow->updateGUI();
@@ -168,8 +167,7 @@ void FLTKListener::OnCharacterChanged( const std::string& name )
 		otherListener->OnCharacterCreate(name, character->getClassType());
 	}
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 	if (window && window->resourceWindow && window->resourceWindow->shown())
 	{
 		window->resourceWindow->updateGUI();
@@ -200,7 +198,7 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 	if (name.find("light") == 0)
 	{
 		pawn->registerObserver(this);
-		BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+		BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 		if (window)
 		{
 			window->fltkViewer->updateLights();
@@ -254,7 +252,7 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 	SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
 	if (camera)
 	{
-		BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+		BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 		if (window)
 		{
 			window->updateCameraList();
@@ -262,7 +260,7 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 		}
 	}
 
-	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 	if (window && window->resourceWindow && window->resourceWindow->shown())
 	{
 		window->resourceWindow->updateGUI();
@@ -278,7 +276,7 @@ void FLTKListener::OnPawnDelete( const std::string & name )
 		return;
 	pawn->unregisterObserver(this);
 #if 1 //!USE_OGRE_VIEWER
-	BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 	if (window)
 	{
 		if (window->fltkViewer->_objManipulator.get_selected_pawn() == pawn)
@@ -343,8 +341,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 		if (pawn->getName().find("light") == 0)
 		{
 			// adjust the lights based on the new position and color
-			mcuCBHandle& mcu = mcuCBHandle::singleton();
-			BaseWindow* window = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+			BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 			if (window)
 			{
 #if 1 //!USE_OGRE_VIEWER

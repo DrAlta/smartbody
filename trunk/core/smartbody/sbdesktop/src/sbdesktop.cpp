@@ -25,6 +25,7 @@
 #define SBM_EMAIL_CRASH_REPORTS  1
 
 #include "vhcl.h"
+#include "vhmsg-tt.h"
 #include "external/glew/glew.h"
 
 #include <signal.h>
@@ -160,13 +161,14 @@ void TransparentViewerFactory::remove(SrViewer* viewer)
 void TransparentViewerFactory::reset(SrViewer* viewer)
 {
 }
-int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
-	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	char *view_cmd = args.read_token();
-	if( strcmp( view_cmd, "open" ) == 0 )	{
-
-		if( mcu.viewer_p == NULL )	{
+	if( strcmp( view_cmd, "open" ) == 0 )
+	{
+		if( scene->getViewer() == NULL )
+		{
 			int argc = args.calc_num_tokens();
 			int width = 1024;
 			int height = 768;
@@ -178,40 +180,68 @@ int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 				px = args.read_int();
 				py = args.read_int();
 			}
-			int err = mcu.open_viewer( width, height, px, py );
-			return( err );
+
+			if( scene->getViewer() == NULL )
+			{
+				if (!scene->getViewerFactory())
+					return CMD_FAILURE;
+				scene->setViewer(scene->getViewerFactory()->create( px, py, width, height));
+				scene->getViewer()->label_viewer( "SBM Viewer - Local Mode" );
+				SrCamera* camera = scene->createCamera("activeCamera");
+				scene->getViewer()->set_camera( camera );
+				//((FltkViewer*)viewer_p)->set_mcu(this);
+				scene->getViewer()->show_viewer();
+				if( scene->getRootGroup() )	{
+					scene->getViewer()->root( scene->getRootGroup() );
+				}
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE) && !defined(__native_client__)
+				SbmShaderManager::singleton().setViewer(scene->getViewer());
+#endif
+				return( CMD_SUCCESS );
+			}
+			return( CMD_FAILURE );
 		}
-		else {
-			mcu.viewer_p ->show_viewer();
+		else
+		{
+			scene->getViewer()->show_viewer();
 		}
 	}		
-	else
-	if( strcmp( view_cmd, "close" ) == 0 )	{
-		if( mcu.viewer_p )	{
-			mcu.close_viewer();
+	else if( strcmp( view_cmd, "close" ) == 0 )
+	{
+		if( scene->getViewer() )
+		{
+			scene->getViewerFactory()->remove(scene->getViewer());
+			scene->setViewer(NULL);
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE) && !defined(__native_client__)
+			SbmShaderManager::singleton().setViewer(NULL);
+#endif		
+			return( CMD_SUCCESS );
+		}
+	}
+	else if( strcmp( view_cmd, "show" ) == 0 )
+	{
+		if( scene->getViewer() )
+		{
+			scene->getViewer()->show_viewer();
+			return( CMD_SUCCESS );
+		}
+	}
+	else if( strcmp( view_cmd, "hide" ) == 0 )
+	{
+		if( scene->getViewer() )
+		{
+			scene->getViewer()->hide_viewer();
 			return( CMD_SUCCESS );
 		}
 	}
 	else
-	if( strcmp( view_cmd, "show" ) == 0 )	{
-		if( mcu.viewer_p )	{
-			mcu.viewer_p->show_viewer();
-			return( CMD_SUCCESS );
-		}
-	}
-	else
-	if( strcmp( view_cmd, "hide" ) == 0 )	{
-		if( mcu.viewer_p )	{
-			mcu.viewer_p->hide_viewer();
-			return( CMD_SUCCESS );
-		}
-	}
-	else	{
+	{
 		return( CMD_NOT_FOUND );
 	}
 
 	return( CMD_FAILURE );
 }
+
 
 int mcu_quit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )	{
 
@@ -297,11 +327,11 @@ void mcu_register_callbacks( void ) {
 
 void cleanup( void )	{
 	{
+
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		if (SmartBody::SBScene::getScene()->getSimulationManager()->isRunning())
+		if (SmartBody::SBScene::getScene()->getSimulationManager()->isStopped())
 		{
-			LOG( "SBM NOTE: unexpected exit " );
-			SmartBody::SBScene::getScene()->getSimulationManager()->stop();
+			LOG( "SmartBody NOTE: unexpected exit " );
 		}
 
 		if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
@@ -309,16 +339,16 @@ void cleanup( void )	{
 			AUDIO_Close();
 		}
 
-		SmartBody::SBScene::getScene()->getVHMsgManager()->send( "vrProcEnd sbm" );
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send("vrProcEnd sbm");
 
 #if LINK_VHMSG_CLIENT
-		if( SmartBody::SBScene::getScene()->getVHMsgManager()->isEnable() )	{
-			vhmsg::ttu_close();
+		if (SmartBody::SBScene::getScene()->getVHMsgManager()->isEnable())
+		{
+			SmartBody::SBScene::getScene()->getVHMsgManager()->disconnect();
 		}
 #endif
-		mcu.camera_p = NULL;
 	}
-	
+
 	mcuCBHandle::destroy_singleton();
 	
 	XMLPlatformUtils::Terminate();
@@ -648,14 +678,13 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	}
 
 	TransparentViewerFactory* viewerFactory = new TransparentViewerFactory();
-	mcu.register_viewer_factory(viewerFactory);
+	SmartBody::SBScene::getScene()->setViewerFactory(viewerFactory);
 	TransparentViewer* viewer = dynamic_cast<TransparentViewer*>(viewerFactory->create(x, y, w, h));
 	SbmShaderManager::singleton().setViewer(viewer);
 	viewer->init(hThisInst, hPrevInst, str, nWinMode);
 	viewer->resizeViewer();
 	viewer->root( SmartBody::SBScene::getScene()->getRootGroup() );
-	mcu.camera_p = viewer->get_camera();
-	mcu.viewer_p = viewer;
+	SmartBody::SBScene::getScene()->setViewer(viewer);
 
 	// initialize python
 	initPython(python_lib_path);
@@ -833,12 +862,13 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 #endif
 	std::string pythonPrompt = "# ";
 	std::string commandPrompt = "> ";
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
-	while( SmartBody::SBScene::getScene()->getSimulationManager()->isRunning())
+	while( scene->getSimulationManager()->isRunning())
 	{
 
-		SmartBody::SBScene::getScene()->getSimulationManager()->updateProfiler();
-		bool update_sim =SmartBody::SBScene::getScene()->getSimulationManager()->updateTimer();
+		scene->getSimulationManager()->updateProfiler();
+		bool update_sim = scene->getSimulationManager()->updateTimer();
 		
 
 		MSG msg;
@@ -847,7 +877,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		 {
 			if (msg.message == WM_QUIT)
 			{
-				SmartBody::SBScene::getScene()->getSimulationManager()->stop();
+				scene->getSimulationManager()->stop();
 				break;
 			}
             if (GetMessage(&msg, NULL, 0, 0))
@@ -858,7 +888,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		 }
 
 #if LINK_VHMSG_CLIENT
-		 if( SmartBody::SBScene::getScene()->getVHMsgManager()->isEnable() )	{
+		 if( scene->getVHMsgManager()->isEnable() )	{
 			err = vhmsg::ttu_poll();
 			if( err == vhmsg::TTU_ERROR )	{
 				fprintf( stderr, "ttu_poll ERROR\n" );
@@ -868,34 +898,35 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 
 		vector<string> commands;// = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
-			SmartBody::SBScene::getScene()->getCommandManager()->execute((char *)commands[i].c_str() );
+			scene->getCommandManager()->execute((char *)commands[i].c_str() );
 		}
 
 #if USE_WSP
-		SmartBody::SBWSPManager* wspManager = SmartBody::SBScene::getScene()->getWSPManager();
+		SmartBody::SBWSPManager* wspManager = scene->getWSPManager();
 		if (wspManager->isEnable())
 			wspManager->broadcastUpdate();
 #endif
 
 		if( update_sim )	{
-			SmartBody::SBScene::getScene()->update();
+			scene->update();
 		}
 
-		const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+		const std::vector<std::string>& pawns = scene->getPawnNames();
 		for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 			pawnIter != pawns.end();
 			pawnIter++)
 		{
-			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
+			SmartBody::SBPawn* pawn = scene->getPawn((*pawnIter));
 			if (pawn->scene_p)
 				pawn->scene_p->update();	
 		}
 
 		// update any tracked cameras
-		SmartBody::SBScene::getScene()->updateTrackedCameras();
+		scene->updateTrackedCameras();
 		
 
-		mcu.render();
+		if (scene->getViewer())
+			scene->getViewer()->render();
 	
 	}	
 	cleanup();

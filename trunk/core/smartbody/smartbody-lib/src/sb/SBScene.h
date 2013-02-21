@@ -7,6 +7,7 @@
 #include <sb/SBScript.h>
 #include <map>
 #include <sstream>
+#include <sr/sr_viewer.h>
 
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__
@@ -217,6 +218,16 @@ class SBScene : public SBObject
 		SBAPI boost::python::object* getPythonMainDict();
 #endif
 #endif
+	
+		SBAPI SrViewer* getViewer();
+		SBAPI SrViewer* getOgreViewer();
+		SBAPI void setViewer(SrViewer* viewer);
+		SBAPI void setOgreViewer(SrViewer* viewer);
+		SBAPI void setViewerFactory(SrViewerFactory* viewerFactory);
+		SBAPI void setOgreViewerFactory(SrViewerFactory* viewerFactory);
+		SBAPI SrViewerFactory* getViewerFactory();
+		SBAPI SrViewerFactory* getOgreViewerFactory();
+
 
 				
 	protected:
@@ -293,6 +304,11 @@ class SBScene : public SBObject
 		std::vector<std::string> _pawnNames;
 		std::map<std::string, SbmCharacter*> _characterMap;
 		std::vector<std::string> _characterNames;
+
+		SrViewer* _viewer;
+		SrViewer* _ogreViewer;
+		SrViewerFactory* _viewerFactory;
+		SrViewerFactory* _ogreViewerFactory;
 
 		Heightfield* _heightField;
 		std::vector<CameraTrack*>	cameraTracking;
