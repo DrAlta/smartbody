@@ -62,6 +62,7 @@
 #include <sbm/KinectProcessor.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <sr/sr_sn_group.h>
+#include <sbm/GPU/SbmShader.h>
 
 #ifndef WIN32
 #define _stricmp strcasecmp
@@ -83,6 +84,7 @@ SBScene::SBScene(void) : SBObject()
 void SBScene::initialize()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
 	mcu.reset();
 
 #ifndef SB_NO_PYTHON
@@ -152,6 +154,11 @@ void SBScene::initialize()
 	_mediaPath = ".";
 		// re-initialize
 	// initialize everything
+
+	_viewer = NULL;
+	_ogreViewer = NULL;
+	_viewerFactory = NULL;
+	_ogreViewerFactory = NULL;
 	
 	_rootGroup = new SrSnGroup();
 	_rootGroup->ref();
@@ -192,6 +199,27 @@ void SBScene::initialize()
 #endif
 #endif
 	*/
+
+	if (_viewer)	
+	{
+		if (_viewerFactory)
+			_viewerFactory->reset(_viewer);
+		_viewer = NULL;
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE) && !defined(__native_client__)
+		SbmShaderManager::singleton().setViewer(NULL);
+#endif
+	}
+
+	if (_viewerFactory)
+		_viewerFactory->remove(_ogreViewer);
+	if (_ogreViewer)
+	{
+		delete _ogreViewer;
+		_ogreViewer = NULL;
+	}
+
+
+
 
 }
 
@@ -321,6 +349,11 @@ void SBScene::cleanup()
 
 	_rootGroup->unref();
 	_rootGroup = NULL;
+
+	_viewer = NULL;
+	_ogreViewer = NULL;
+	_viewerFactory = NULL;
+	_ogreViewerFactory = NULL;
 	
 	AUDIO_Close();
 	AUDIO_Init();
@@ -642,7 +675,7 @@ void SBScene::update()
 
 	
 	SrCamera* camera = getActiveCamera();
-	if (mcu.viewer_p && camera)
+	if (_viewer && camera)
 	{
 		SrMat m;
 		SrQuat quat = SrQuat(camera->get_view_mat(m).get_rotation());
@@ -2834,5 +2867,48 @@ void SBScene::updateTrackedCameras()
 	}	
 }
 
+SrViewer* SBScene::getViewer()
+{
+	return _viewer;
+}
+
+SrViewer* SBScene::getOgreViewer()
+{
+	return _ogreViewer;
+}
+
+void SBScene::setViewer(SrViewer* viewer)
+{
+	_viewer = viewer;
+}
+
+void SBScene::setOgreViewer(SrViewer* viewer)
+{
+	_ogreViewer = viewer;
+}
+
+SrViewerFactory* SBScene::getViewerFactory()
+{
+	return _viewerFactory;
+}
+
+SrViewerFactory* SBScene::getOgreViewerFactory()
+{
+	return _ogreViewerFactory;
+}
+
+void SBScene::setViewerFactory(SrViewerFactory* viewerFactory)
+{
+	if (_viewerFactory)
+		delete _viewerFactory;
+	_viewerFactory = viewerFactory;
+}
+
+void SBScene::setOgreViewerFactory(SrViewerFactory* viewerFactory)
+{
+	if (_ogreViewerFactory)
+		delete _ogreViewerFactory;
+	_ogreViewerFactory = viewerFactory;
+}
 
 };

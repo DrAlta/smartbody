@@ -50,6 +50,8 @@
 #include <channelbufferviewer/channelbufferWindow.hpp>
 #include <resourceViewer/ResourceWindow.h>
 #include <faceviewer/FaceViewer.h>
+#include <sbm/lin_win.h>
+#include "sbm/GPU/SbmShader.h"
 
 #ifndef USE_WSP
 #define USE_WSP 1
@@ -167,13 +169,14 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data )
 	
 */
 
-int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
-	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	char *view_cmd = args.read_token();
-	if( strcmp( view_cmd, "open" ) == 0 )	{
-
-		if( mcu.viewer_p == NULL )	{
+	if( strcmp( view_cmd, "open" ) == 0 )
+	{
+		if( scene->getViewer() == NULL )
+		{
 			int argc = args.calc_num_tokens();
 			int width = 1024;
 			int height = 768;
@@ -185,35 +188,62 @@ int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 				px = args.read_int();
 				py = args.read_int();
 			}
-			int err = mcu.open_viewer( width, height, px, py );
-			return( err );
+
+			if( scene->getViewer() == NULL )
+			{
+				if (!scene->getViewerFactory())
+					return CMD_FAILURE;
+				scene->setViewer(scene->getViewerFactory()->create( px, py, width, height));
+				scene->getViewer()->label_viewer( "SBM Viewer - Local Mode" );
+				SrCamera* camera = scene->createCamera("activeCamera");
+				scene->getViewer()->set_camera( camera );
+				//((FltkViewer*)viewer_p)->set_mcu(this);
+				scene->getViewer()->show_viewer();
+				if( scene->getRootGroup() )	{
+					scene->getViewer()->root( scene->getRootGroup() );
+				}
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE) && !defined(__native_client__)
+				SbmShaderManager::singleton().setViewer(scene->getViewer());
+#endif
+				return( CMD_SUCCESS );
+			}
+			return( CMD_FAILURE );
 		}
-		else {
-			mcu.viewer_p ->show_viewer();
+		else
+		{
+			scene->getViewer()->show_viewer();
 		}
 	}		
-	else
-	if( strcmp( view_cmd, "close" ) == 0 )	{
-		if( mcu.viewer_p )	{
-			mcu.close_viewer();
+	else if( strcmp( view_cmd, "close" ) == 0 )
+	{
+		if( scene->getViewer() )
+		{
+			scene->getViewerFactory()->remove(scene->getViewer());
+			scene->setViewer(NULL);
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE) && !defined(__native_client__)
+			SbmShaderManager::singleton().setViewer(NULL);
+#endif		
+			return( CMD_SUCCESS );
+		}
+	}
+	else if( strcmp( view_cmd, "show" ) == 0 )
+	{
+		if( scene->getViewer() )
+		{
+			scene->getViewer()->show_viewer();
+			return( CMD_SUCCESS );
+		}
+	}
+	else if( strcmp( view_cmd, "hide" ) == 0 )
+	{
+		if( scene->getViewer() )
+		{
+			scene->getViewer()->hide_viewer();
 			return( CMD_SUCCESS );
 		}
 	}
 	else
-	if( strcmp( view_cmd, "show" ) == 0 )	{
-		if( mcu.viewer_p )	{
-			mcu.viewer_p->show_viewer();
-			return( CMD_SUCCESS );
-		}
-	}
-	else
-	if( strcmp( view_cmd, "hide" ) == 0 )	{
-		if( mcu.viewer_p )	{
-			mcu.viewer_p->hide_viewer();
-			return( CMD_SUCCESS );
-		}
-	}
-	else	{
+	{
 		return( CMD_NOT_FOUND );
 	}
 
@@ -233,8 +263,7 @@ int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 
 int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if( mcu.viewer_p )	{
+	if( SmartBody::SBScene::getScene()->getViewer() )	{
 		SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
 		if (!camera)
 		{
@@ -313,7 +342,7 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 			int preset = args.read_int();
 				
 			if( preset == 1 )	{
-				mcu.viewer_p->view_all();
+				SmartBody::SBScene::getScene()->getViewer()->view_all();
 			}
 		}
 		else if (strcmp( cam_cmd, "reset" ) == 0 ) {
@@ -364,8 +393,7 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 // The offset is according to the left bottom corner of the image frame buffer
 int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+	BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 	if (!rootWindow)
 	{
 		LOG("Viewer doesn't exist. Cannot take snapshot.");
@@ -655,9 +683,9 @@ int main( int argc, char **argv )	{
 	FltkViewerFactory* viewerFactory = new FltkViewerFactory();
 	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
 	//viewerFactory->setFltkViewer(viewer);
-	mcu.register_viewer_factory(viewerFactory);
+	SmartBody::SBScene::getScene()->setViewerFactory(viewerFactory);
 #if USE_OGRE_VIEWER > 0
-	mcu.register_OgreViewer_factory(new OgreViewerFactory());
+	SmartBody::SBScene::getScene()->setOgreViewerFactory(new OgreViewerFactory());
 #endif
 	
 	
@@ -1189,7 +1217,7 @@ int main( int argc, char **argv )	{
 
 		scene->updateTrackedCameras();
 		
-		BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(mcu.viewer_p);
+		BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(scene->getViewer());
 
 		if(rootWindow && rootWindow->dataViewerWindow && rootWindow->dataViewerWindow->shown())
 		{
@@ -1210,7 +1238,10 @@ int main( int argc, char **argv )	{
 			rootWindow->visemeViewerWindow->update();
 		}
 
-		mcu.render();
+		if (scene->getViewer())
+			scene->getViewer()->render();
+		if (scene->getOgreViewer())
+			scene->getOgreViewer()->render();
 	
 	}	
 	cleanup();

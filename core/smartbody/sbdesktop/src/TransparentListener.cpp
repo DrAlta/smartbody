@@ -130,7 +130,7 @@ void TransparentListener::OnPawnCreate( const std::string & name )
 	if (name.find("light") == 0)
 	{
 		pawn->registerObserver(this);
-		TransparentViewer* window = dynamic_cast<TransparentViewer*>(mcu.viewer_p);
+		TransparentViewer* window = dynamic_cast<TransparentViewer*>(SmartBody::SBScene::getScene()->getViewer());
 		if (window)
 		{
 			//window->updateLights();
@@ -222,7 +222,7 @@ void TransparentListener::notify(SmartBody::SBSubject* subject)
 		{
 			// adjust the lights based on the new position and color
 			mcuCBHandle& mcu = mcuCBHandle::singleton();
-			TransparentViewer* window = dynamic_cast<TransparentViewer*>(mcu.viewer_p);
+			TransparentViewer* window = dynamic_cast<TransparentViewer*>(SmartBody::SBScene::getScene()->getViewer());
 			if (window)
 			{
 				//window->updateLights();

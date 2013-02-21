@@ -20,14 +20,14 @@ namespace SmartBody
 
 SrViewer* getViewer()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	if (!mcu.viewer_p)
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	if (!scene->getViewer())
 	{
-		mcu.viewer_p = mcu.viewer_factory->create(100, 100, 800, 600);
-		mcu.viewer_p->label_viewer("Visual Debugger");
+		scene->setViewer(scene->getViewerFactory()->create(100, 100, 800, 600));
+		scene->getViewer()->label_viewer("Visual Debugger");
 		SmartBody::SBScene::getScene()->createCamera("cameraDefault");
 	}
-	return mcu.viewer_p;
+	return scene->getViewer();
 }
 
 #ifndef SB_NO_PYTHON
