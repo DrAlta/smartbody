@@ -38,7 +38,7 @@ namespace BML {
 		void print_gaze_smoothing();
 	};
 
-	BML::BehaviorRequestPtr parse_bml_gaze( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	BML::BehaviorRequestPtr parse_bml_gaze( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, SmartBody::SBScene* scene );
 };
 
 

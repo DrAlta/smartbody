@@ -291,7 +291,7 @@ bool BML::Gaze::parse_children( DOMElement* elem, Gaze::KeyData* key_data[] ) {
 
 
 
-BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene ) {
     const XMLCh* tag      = elem->getTagName();
 	////////////////////////////////////////////////////////////////
 	//  GAZE BEHAVIORS
@@ -353,7 +353,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	const SkJoint* target_joint = NULL;
 	if (attrTarget && XMLString::stringLen( attrTarget ))
 	{
-		target_joint = parse_target( tag, attrTarget, mcu );
+		target_joint = parse_target( tag, attrTarget, scene );
 	}
 	if (target_joint == NULL && !gaze_ct && !validTargetPos) {  // Invalid target.  Assume parse_target(..) printed error.
 		return BehaviorRequestPtr();  // a.k.a., NULL

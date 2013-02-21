@@ -36,6 +36,7 @@
 #include <sb/SBAssetManager.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBCommandManager.h>
+#include <sb/SBVHMsgManager.h>
 #include <sb/SBAttribute.h>
 
 

@@ -70,6 +70,9 @@ namespace std
 //extern std::wostream &std::wcerr;
 #endif
 
+namespace SmartBody {
+	class SBScene;
+}
 
 namespace BML {
 	//  Helper Function
@@ -144,11 +147,11 @@ namespace BML {
 		 *  Schedules and realizes the behaviors of the BmlRequest.
 		 *  May throw BML::RealizationException if error occurs or request is unschedulable.
 		 */
-		void realize( Processor* bp, mcuCBHandle *mcu );
+		void realize( Processor* bp, SmartBody::SBScene* scene );
 
-		void unschedule( Processor* bp, mcuCBHandle* mcu, time_sec transition_duration );
+		void unschedule( Processor* bp, SmartBody::SBScene* scene, time_sec transition_duration );
 
-		void cleanup( Processor* bp, mcuCBHandle* mcu );
+		void cleanup( Processor* bp, SmartBody::SBScene* scene );
 
 		// this function handles all the gesture process in between behaviors' schedule and realize
 		void gestureRequestProcess();
@@ -232,13 +235,13 @@ namespace BML {
 		 *     SbmCharacter* actor: access to character state
 		 *     float startAt: time to start behavior
 		 */
-		virtual void realize( BmlRequestPtr request, mcuCBHandle* mcu );
+		virtual void realize( BmlRequestPtr request, SmartBody::SBScene* scene );
 
 		/**
 		 *   Behavior scheduling method.
 		 *   Reads scheduled times from BehaviorSyncPoints.
 		 */
-        virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu ) = 0;
+        virtual void realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene ) = 0;
 
 		/**
 		 *  returns true is behaviors involves controllers
@@ -276,13 +279,13 @@ namespace BML {
 		 *  Schedules a cancelation / interruption of the behavior
 		 *  at specified time and duration.
 		 */
-		virtual void unschedule( mcuCBHandle* mcu, BmlRequestPtr request, time_sec duration ) = 0;
+		virtual void unschedule( SmartBody::SBScene* scene, BmlRequestPtr request, time_sec duration ) = 0;
 
 		/**
 		 *  Abstract method point for implementing the specific clean-up algorithm.
 		 *  May be called without calling unschedule, or called multiple times.
 		 */
-		virtual void cleanup( mcuCBHandle* mcu, BmlRequestPtr request ) {};
+		virtual void cleanup( SmartBody::SBScene* scene, BmlRequestPtr request ) {};
 	};
 
 	class MeControllerRequest : public BehaviorRequest {
@@ -333,19 +336,19 @@ namespace BML {
 		 **/
 		virtual void register_controller_prune_policy( MePrunePolicy* prune_policy );
 
-		virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
+		virtual void realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene );
 
 		/**
 		 *  Implemtents BehaviorRequest::unschedule(..),
 		 *  ramping down the blend curve of the MeController.
 		 */
-		virtual void unschedule( mcuCBHandle* mcu, BmlRequestPtr request, time_sec duration );
+		virtual void unschedule( SmartBody::SBScene* scene, BmlRequestPtr request, time_sec duration );
 
 		/**
 		 *  Implemtents BehaviorRequest::cleanup(..),
 		 *  removing the MeController from its parent.
 		 */
-		virtual void cleanup( mcuCBHandle* mcu, BmlRequestPtr request );
+		virtual void cleanup( SmartBody::SBScene* scene, BmlRequestPtr request );
 	};
 
 	class MotionRequest : public MeControllerRequest {
@@ -361,7 +364,7 @@ namespace BML {
 		GestureRequest( const std::string& unique_id, const std::string& localId, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
 			const BehaviorSyncPoints& behav_syncs, std::vector<std::string>& gl, const std::string& js = "", float s = 0.03f, float freq = 0.02f, int priority = 0, EmotionTag emo = NEUTRAL);
 
-		virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
+		virtual void realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene );
 
 	public:
 		bool filtered;
@@ -380,9 +383,9 @@ namespace BML {
 	public:
 		ParameterizedAnimationRequest( MeCtParamAnimation* param_anim_ct, const std::string& sName, double x, double y, double z, BML::ParamAnimBehaviorType type, const std::string& unique_id, const std::string& localId, const BehaviorSyncPoints& behav_syncs);
 
-		virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
+		virtual void realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene );
 		
-		virtual void unschedule( mcuCBHandle* mcu, BmlRequestPtr request, time_sec duration );
+		virtual void unschedule( SmartBody::SBScene* scene, BmlRequestPtr request, time_sec duration );
 
 	private:
 		std::string stateName;
@@ -452,7 +455,7 @@ namespace BML {
 	public:
 		GazeRequest(   float interval, int mode, const std::string& unique_id, const std::string& localId, MeController* gaze, MeCtSchedulerClass* schedule_ct,
 			           const BehaviorSyncPoints& behav_syncs );
-		virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
+		virtual void realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene );
 	};
 
 	class SequenceRequest : public BehaviorRequest {
@@ -465,25 +468,25 @@ namespace BML {
 		 *  Implemtents BehaviorRequest::unschedule(..),
 		 *  cancelling remaining sequence.
 		 */
-		virtual void unschedule( mcuCBHandle* mcu, BmlRequestPtr request,
+		virtual void unschedule( SmartBody::SBScene* scene, BmlRequestPtr request,
 			                     time_sec duration );
 
 		/**
 		 *  Implemtents BehaviorRequest::cleanup(..),
 		 *  removing the sequence.
 		 */
-		virtual void cleanup( mcuCBHandle* mcu, BmlRequestPtr request );
+		virtual void cleanup( SmartBody::SBScene* scene, BmlRequestPtr request );
 
 	protected:
 		/**
 		 *  Builds and activates a sequence from commands list.
 		 */
-		bool realize_sequence( VecOfSbmCommand& commands, mcuCBHandle* mcu );
+		bool realize_sequence( VecOfSbmCommand& commands, SmartBody::SBScene* scene );
 
 		/**
 		 *  Aborts the prior sequence.
 		 */
-		bool unschedule_sequence( mcuCBHandle* mcu );
+		bool unschedule_sequence( SmartBody::SBScene* scene );
 	};
 
 	class VisemeRequest : public SequenceRequest {
@@ -516,7 +519,7 @@ namespace BML {
 		float getRampUp();
 		float getRampDown();
 
-		void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
+		void realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene );
 	};
 } // namespace BML
 

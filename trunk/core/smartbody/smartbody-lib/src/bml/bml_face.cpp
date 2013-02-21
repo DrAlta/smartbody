@@ -39,7 +39,7 @@ using namespace BML;
 using namespace xml_utils;
 
 
-BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene ) {
 
 	std::string localId = xml_parse_string( BMLDefs::ATTR_ID, elem );
 

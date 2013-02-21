@@ -26,6 +26,8 @@
 #include <sstream>
 #include <string>
 
+#include <sb/SBScene.h>
+
 #include "sbm/mcontrol_util.h"
 #include "bml_processor.hpp"
 #include "bml_interrupt.hpp"
@@ -56,7 +58,7 @@ namespace BML {
 			performance_id( performance_id )
 		{}
 
-		void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu  )
+		void realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene  )
 		{
 			// Get times from BehaviorSyncPoints
 			time_sec strokeAt = behav_syncs.sync_stroke()->time();
@@ -79,13 +81,13 @@ namespace BML {
 				commands.push_back( new SbmCommand( out2_str, (float)strokeAt ) );
 			}
 
-			realize_sequence( commands, mcu );
+			realize_sequence( commands, scene );
 		}
 	};
 };  // end namespace BML
 
 
-BehaviorRequestPtr BML::parse_bml_interrupt( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_interrupt( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene) {
 
 	std::string local_id = xml_parse_string( BMLDefs::ATTR_ID, elem );
 	std::string perf_id = xml_parse_string( BMLDefs::TAG_ACT, elem );

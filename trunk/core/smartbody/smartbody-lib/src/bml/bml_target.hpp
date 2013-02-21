@@ -32,9 +32,9 @@
 class mcuCBHandle;
 
 namespace BML {
-	SkJoint* parse_target( const XMLCh* Attr, DOMElement* Elem, mcuCBHandle *mcu );	
-	const SkJoint* parse_target( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu );	
-	const SbmPawn* parse_target_pawn( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu );
+	SkJoint* parse_target( const XMLCh* Attr, DOMElement* Elem, SmartBody::SBScene* scene );	
+	const SkJoint* parse_target( const XMLCh* tagname, const XMLCh* attrTarget, SmartBody::SBScene* scene );	
+	const SbmPawn* parse_target_pawn( const XMLCh* tagname, const XMLCh* attrTarget, SmartBody::SBScene* scene );
 };
 
 

@@ -2,6 +2,7 @@
 #include <sbm/mcontrol_util.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBCommandManager.h>
+#include <sb/SBVHMsgManager.h>
 #include <sb/SBScene.h>
 
 namespace SmartBody {
@@ -221,7 +222,8 @@ void SBBmlProcessor::execXMLAt(double time, std::string character, std::string x
 
 void SBBmlProcessor::interruptCharacter(const std::string& character, double seconds)
 {
-	SBCharacter* sbCharacter = SBScene::getScene()->getCharacter(character);
+	SBScene* scene = SBScene::getScene();
+	SBCharacter* sbCharacter = scene->getCharacter(character);
 	if (!sbCharacter)
 	{
 		LOG("No character named '%s' found. Interrupt not done.", character.c_str());
@@ -229,13 +231,14 @@ void SBBmlProcessor::interruptCharacter(const std::string& character, double sec
 	}
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.bml_processor.interrupt(sbCharacter, seconds, &mcu);
+	mcu.bml_processor.interrupt(sbCharacter, seconds, scene);
 	
 }
 
 void SBBmlProcessor::interruptBML(const std::string& character, const std::string& id, double seconds)
 {
-	SBCharacter* sbCharacter = SBScene::getScene()->getCharacter(character);
+	SBScene* scene = SBScene::getScene();
+	SBCharacter* sbCharacter = scene->getCharacter(character);
 	if (!sbCharacter)
 	{
 		LOG("No character named '%s' found. Interrupt not done.", character.c_str());
@@ -243,7 +246,7 @@ void SBBmlProcessor::interruptBML(const std::string& character, const std::strin
 	}
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.bml_processor.interrupt(sbCharacter, id, seconds, &mcu);
+	mcu.bml_processor.interrupt(sbCharacter, id, seconds, scene);
 }
 
 

@@ -28,16 +28,15 @@
 #include "sbm/sr_hash_map.h"
 #include "sbm/xercesc_utils.hpp"
 #include "bml.hpp"
+#include <sbm/sr_arg_buff.h>
 
 // Use Boost Smart Point Impl until TR1 is finalized
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
-// Forward Declaration
-class mcuCBHandle;
-
 namespace SmartBody {
 	class SBCommandManager;
+	class SBScene;
 }
 
 namespace BML {
@@ -143,16 +142,16 @@ namespace BML {
 		/**
 		 *  Handles "vrAgentBML .. request .." and "vrSpeak .." messages
 		 */
-		void bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu );
+		void bml_request( BMLProcessorMsg& bpMsg, SmartBody::SBScene* scene );
 
 		/**
 		 *  Parses <BML> elements
 		 */
-		void parseBML( DOMElement *el, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+		void parseBML( DOMElement *el, BML::BmlRequestPtr request, SmartBody::SBScene* scene );
 
 		/**
 		 */
-		void speechReply( SbmCharacter* character, SmartBody::RequestId requestId, srArgBuffer& response_args, mcuCBHandle *mcu );
+		void speechReply( SbmCharacter* character, SmartBody::RequestId requestId, srArgBuffer& response_args, SmartBody::SBScene* scene );
 
 //// Moved to BmlRequest::realize( Processor*, mcuCBHandle* )
 //		/**
@@ -163,14 +162,14 @@ namespace BML {
 		/**
 		 *  Begins interrupting a BML performance.
 		 */
-		int interrupt( SbmCharacter* actor, const std::string& performance_id, time_sec duration, mcuCBHandle* mcu );
+		int interrupt( SbmCharacter* actor, const std::string& performance_id, time_sec duration, SmartBody::SBScene* scene );
 
-		void interrupt( SbmCharacter* actor, time_sec duration, mcuCBHandle* mcu );
+		void interrupt( SbmCharacter* actor, time_sec duration, SmartBody::SBScene* scene );
 
 		/**
 		 *  Handles "vrAgentBML .. end .." messages
 		 */
-		int bml_end( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu );
+		int bml_end( BMLProcessorMsg& bpMsg, SmartBody::SBScene* scene );
 
 		/**
 		* Returns a map of all BML requests to the BML request objects.
@@ -236,10 +235,10 @@ namespace BML {
 		 *  Parses a group of behavior tags, such as <bml> or <required>.
 		 *  The workhorse function of parseBML(..)
 		 */
-		void parseBehaviorGroup( DOMElement *el, BML::BmlRequestPtr request, mcuCBHandle *mcu, size_t& behavior_ordinal, bool required );
+		void parseBehaviorGroup( DOMElement *el, BML::BmlRequestPtr request, SmartBody::SBScene* scene, size_t& behavior_ordinal, bool required );
 
-		BehaviorRequestPtr parse_bml_body( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu );
-		BehaviorRequestPtr parse_bml_head( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu );
+		BehaviorRequestPtr parse_bml_body( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene );
+		BehaviorRequestPtr parse_bml_head( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene );
 
 
 ///  Is the following necessary anymore?

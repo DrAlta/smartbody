@@ -30,7 +30,7 @@ namespace BML {
 
 
 
-	BML::BehaviorRequestPtr parse_bml_event( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	BML::BehaviorRequestPtr parse_bml_event( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, SmartBody::SBScene* scene );
 
 	class EventRequest : public SequenceRequest {
 		protected:
@@ -41,7 +41,7 @@ namespace BML {
 			EventRequest( const std::string& unique_id, const std::string& localId, const char* message,
 						  const BehaviorSyncPoints& syncs_in, std::string spName );
 		
-			void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
+			void realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene );
 
 			const std::string getMessage();
 			std::string getSyncPointName();

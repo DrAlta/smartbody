@@ -43,7 +43,7 @@ using namespace xml_utils;
 
 SrBuffer<float> Data_Array;
 
-BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene ) {
     const XMLCh* tag		= elem->getTagName();
 	const XMLCh* param_name	= elem->getAttribute( BMLDefs::ATTR_NAME );
 	const XMLCh* value		= elem->getAttribute( BMLDefs::ATTR_VALUE );
@@ -59,8 +59,9 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 
 	int channel_size = 0;
 	int Index = 0;
-	GeneralParamMap::const_iterator pos	=	mcu->param_map.begin();
-	GeneralParamMap::const_iterator end	=	mcu->param_map.end();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	GeneralParamMap::const_iterator pos	=	mcu.param_map.begin();
+	GeneralParamMap::const_iterator end	=	mcu.param_map.end();
 
 	string char_name;
 	string unique_id_copy = unique_id;

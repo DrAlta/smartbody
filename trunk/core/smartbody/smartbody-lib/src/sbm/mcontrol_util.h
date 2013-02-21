@@ -1,71 +1,18 @@
 #ifndef _MCONTROL_UTIL_H_
 #define _MCONTROL_UTIL_H_
 
-
-class mcuCBHandle;
-
 #include <map>
-#include <vhcl.h>
-
-
-
-#if LINK_VHMSG_CLIENT
-#include "vhmsg-tt.h"
-#endif
-
-#include <sbm/sbm_constants.h>
-
 #include <sbm/GenericViewer.h>
-#include <sb/SBVHMsgManager.h>
-#include "sbm_constants.h"
-
-#include "sr_hash_map.h"
-#include "sr_cmd_map.h"
-#include "sr_cmd_seq.h"
-#include "sr_path_list.h"
-
-#include <sbm/action_unit.hpp>
 #include <sbm/general_param_setting.h>
 #include <bml/bml_processor.hpp>
-
-
-
-#ifndef __native_client__
-#include <sb/SBPythonClass.h>
-#endif
-
-
-
-
-
-
-
-#ifndef USE_PYTHON
-#define USE_PYTHON
-#endif
-
-#ifndef SB_NO_PYTHON
-#ifndef __native_client__
-#include <boost/python.hpp>
-#endif
-#endif
-
-
-namespace SmartBody
-{
-    class SBScene;
-    class SBCommandManager;
-};
-
+#include <sr/sr_viewer.h>
 
 class KinectProcessor;
+class SrCamera;
+class DeformableMesh;
 
 //////////////////////////////////////////////////////////////////
 
-
-
-
-class VHMsgLog;
 
 class mcuCBHandle {
 	protected:

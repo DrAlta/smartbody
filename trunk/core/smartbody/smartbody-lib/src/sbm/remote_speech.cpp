@@ -37,6 +37,7 @@
 #include "time.h"
 #include <sb/SBSpeechManager.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBVHMsgManager.h>
 #include <sb/SBCommandManager.h>
 #include <sb/SBScene.h>
 #include <sbm/local_speech.h>

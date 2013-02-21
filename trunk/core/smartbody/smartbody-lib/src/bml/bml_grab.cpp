@@ -49,7 +49,7 @@ using namespace BML;
 using namespace xml_utils;
 
 
-BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene ) {
     
 	const XMLCh* tag      = elem->getTagName();	
 	MeCtHand* handCt = NULL; 
@@ -78,7 +78,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	const SbmPawn* target_pawn = NULL;
 	if (attrTarget && XMLString::stringLen( attrTarget ))
 	{
-		target_pawn = parse_target_pawn( tag, attrTarget, mcu );		
+		target_pawn = parse_target_pawn( tag, attrTarget, scene );		
 	}
 
 	const XMLCh* attrWrist = NULL;
@@ -99,7 +99,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	const SbmPawn* attachPawn = NULL;
 	if (attrAttachPawn && XMLString::stringLen( attrAttachPawn ))
 	{
-		attachPawn = parse_target_pawn( tag, attrAttachPawn, mcu );		
+		attachPawn = parse_target_pawn( tag, attrAttachPawn, scene );		
 	}
 
 	std::string grabType = xml_parse_string(BMLDefs::ATTR_GRAB_TYPE,elem,"right",false);

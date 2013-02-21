@@ -72,7 +72,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	BML::BehaviorSyncPoints& behav_syncs,
 	bool required,
 	BML::BmlRequestPtr request,
-	mcuCBHandle *mcu )
+	SmartBody::SBScene* scene )
 {
 	if (!request->actor->face_ct)
 	{
@@ -1115,7 +1115,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	}
 }
 
-void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
+void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene )
 {
 	// Get times from SyncPoints
 	time_sec startAt  = behav_syncs.sync_start()->time();
@@ -1263,15 +1263,15 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		LOG("WARNING: BodyPlannerImpl::realizeRequest(..): SpeechRequest has no audioPlay command.");
 	}
 
-	realize_sequence( sbm_commands, mcu );
+	realize_sequence( sbm_commands, scene );
 }
 
 
-void BML::SpeechRequest::unschedule( mcuCBHandle* mcu,
+void BML::SpeechRequest::unschedule(  SmartBody::SBScene* scene,
 	                            BmlRequestPtr request,
 	                            time_sec duration )
 {
-	unschedule_sequence( mcu );
+	unschedule_sequence( scene );
 
 	// Clear visemes
 	ostringstream cmd;
@@ -1284,10 +1284,10 @@ void BML::SpeechRequest::unschedule( mcuCBHandle* mcu,
 		LOG("WARNING: SpeechRequest::unschedule(): unique_id \"%s\": Missing audioStop.", unique_id.c_str());
 }
 	                            
-void BML::SpeechRequest::cleanup( mcuCBHandle* mcu, BmlRequestPtr request )
+void BML::SpeechRequest::cleanup( SmartBody::SBScene* scene, BmlRequestPtr request )
 {
 	visemes.clear();
-	unschedule_sequence( mcu );
+	unschedule_sequence( scene );
 
 	speech_impl->requestComplete( speech_request_id );
 }

@@ -34,6 +34,7 @@
 
 #include "external/glew/glew.h"
 #include "vhcl.h"
+#include "vhmsg-tt.h"
 #include <sbm/lin_win.h>
 #include <signal.h>
 #include <iostream>
@@ -86,6 +87,7 @@
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
 #include <sbm/PPRAISteeringAgent.h>
+#include <vhmsg.h>
 
 #if USE_OGRE_VIEWER > 0
 #include "FLTKOgreViewer.h"

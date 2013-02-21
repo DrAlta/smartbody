@@ -51,7 +51,7 @@ using namespace std;
 using namespace BML;
 using namespace xml_utils;
 
-BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene ) {
     const XMLCh* tag      = elem->getTagName();
 
 	DOMElement* child = NULL;
