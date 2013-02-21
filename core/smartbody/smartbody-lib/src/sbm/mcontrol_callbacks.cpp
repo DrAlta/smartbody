@@ -28,7 +28,7 @@
  */
 
 #include "vhcl.h"
-#ifdef __native_client__
+#ifndef __native_client__
 #include "vhmsg.h"
 #include "vhmsg-tt.h"
 #endif
@@ -64,6 +64,8 @@
 #include <sbm/KinectProcessor.h>
 #include <sbm/local_speech.h>
 #include <sbm/mcontrol_util.h>
+#include <sbm/action_unit.hpp>
+#include <vhmsg.h>
 
 #ifdef WIN32
 #include <direct.h>

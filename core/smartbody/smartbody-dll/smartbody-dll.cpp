@@ -1,7 +1,7 @@
 
 #include "vhcl.h"
 
-#if __native_client__
+#ifndef __native_client__
 #include "vhmsg-tt.h"
 #endif
 
@@ -23,6 +23,7 @@
 #include "sb/SBAssetManager.h"
 #include "sb/SBSpeechManager.h"
 #include "sb/SBSimulationManager.h"
+#include "sb/SBVHMsgManager.h"
 #include "sb/SBCharacterListener.h"
 #include "sb/SBJointMap.h"
 #include "sb/SBJointMapManager.h"

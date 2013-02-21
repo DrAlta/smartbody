@@ -17,6 +17,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBDebuggerClient.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBVHMsgManager.h>
 #include <sbm/Heightfield.h>
 #include <sb/SBPython.h>
 

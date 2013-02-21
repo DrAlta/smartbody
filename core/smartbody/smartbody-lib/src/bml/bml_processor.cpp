@@ -74,6 +74,7 @@
 #include <sb/SBAnimationStateManager.h>
 #include <sb/nvbg.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBVHMsgManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBMotion.h>
 #include <sb/SBAssetManager.h>
@@ -108,7 +109,7 @@ namespace BML {
 		const char* agent_id,
 		const char* message_id,
 		const char* error_msg,
-		mcuCBHandle *mcu )
+		 SmartBody::SBScene* scene )
 	{
 		//  Let's not error on our error messages.  Be thorough.
 		if( agent_id==NULL || agent_id[0]=='\0' )
@@ -258,7 +259,7 @@ BmlRequestPtr BML::Processor::createBmlRequest(
 
 
 
-void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
+void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, SmartBody::SBScene* scene ) {
     if(LOG_METHODS) cout<<"BodyPlannerImpl::vrSpeak(..)"<<endl;
 
 	int suppress = 2;
@@ -296,7 +297,7 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 		BmlRequestPtr request( createBmlRequest( bpMsg.actor, bpMsg.actorId, bpMsg.requestId, string(bpMsg.msgId), xml ) );
 #endif
 		try {
- 			parseBML( bmlElem, request, mcu );
+ 			parseBML( bmlElem, request, scene );
 			// make sure that the request id isn't in the pending interrupt list
 			std::map<std::string, double>::iterator isPendingInterruptIter = pendingInterrupts.find(bpMsg.requestId);
 			if (isPendingInterruptIter != pendingInterrupts.end())
@@ -313,7 +314,7 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 		
 			if( !( request->speech_request ) ) {
 				// realize immediately
-				request->realize( this, mcu );
+				request->realize( this, scene );
 			}
 
 			//if (requestcb)
@@ -325,24 +326,25 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 
 			LOG("ERROR: BML::Processor::bml_request(): %s", oss.str().c_str());
 			bml_requests.erase( bpMsg.requestId );  // No further references if we're going to fail.
-			bml_error( bpMsg.actorId, bpMsg.msgId, oss.str().c_str(), mcu );
+			bml_error( bpMsg.actorId, bpMsg.msgId, oss.str().c_str(), scene );
 		}
 	} else {
 		const char* message = "No BML element found.";
 		LOG("ERROR: BML::Processor::bml_request(): %s", message);
-		bml_error( bpMsg.actorId, bpMsg.msgId, message, mcu );
+		bml_error( bpMsg.actorId, bpMsg.msgId, message, scene );
 	}
 }
 
-void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr request, mcuCBHandle* mcu,
+void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr request, SmartBody::SBScene* scene,
                                          size_t& behavior_ordinal, bool required ) {
 
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	// look for BML behavior command tags
 	DOMElement*  child = xml_utils::getFirstChildElement( group );
 	while( child!=NULL ) {
 		const XMLCh *tag = child->getTagName();  // Grand Child (behavior) Tag
 		if( XMLString::compareString( tag, BMLDefs::TAG_REQUIRED )==0 ) {
-			parseBehaviorGroup( child, request, mcu, behavior_ordinal, true );
+			parseBehaviorGroup( child, request, scene, behavior_ordinal, true );
 		} else {
 			const XMLCh* idAttr  = child->getAttribute( BMLDefs::ATTR_ID );
 			std::string idStr;
@@ -380,7 +382,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				// TEMPORARY: <speech> can only be the first behavior
 				if( behavior_ordinal == 1 ) {
 					// This speech is the first
-					BML::SpeechRequestPtr speechPtr =  parse_bml_speech( child, unique_id, behav_syncs, required, request, mcu );
+					BML::SpeechRequestPtr speechPtr =  parse_bml_speech( child, unique_id, behav_syncs, required, request, scene );
 					if (!speechPtr)
 						return;
 					SpeechRequestPtr speech_request(speechPtr);
@@ -412,48 +414,48 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				}
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_ANIMATION )==0 ) {
 				// DEPRECATED FORM
-				behavior = parse_bml_animation( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_animation( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_SBM_ANIMATION )==0 ) {
-				behavior = parse_bml_animation( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_animation( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_BODY )==0 ) {
-				behavior = parse_bml_body( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_body( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_TORSO )==0 ) {
-				behavior = parse_bml_body( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_body( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_HEAD )==0 ) {
-				behavior = parse_bml_head( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_head( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_FACE )==0 ) {
-				behavior = parse_bml_face( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_face( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_GAZE )==0 ) {
-				behavior = /*BML::*/parse_bml_gaze( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = /*BML::*/parse_bml_gaze( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_SACCADE )==0 ) {
-				behavior = /*BML::*/parse_bml_saccade( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = /*BML::*/parse_bml_saccade( child, unique_id, behav_syncs, required, request, scene );
 			}  else if( XMLString::compareString( tag, BMLDefs::TAG_NOISE )==0 ) {
-				behavior = /*BML::*/parse_bml_noise( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = /*BML::*/parse_bml_noise( child, unique_id, behav_syncs, required, request, scene );
 			}else if( XMLString::compareString( tag, BMLDefs::TAG_CONSTRAINT )==0 ) {
-				behavior = /*BML::*/parse_bml_constraint( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = /*BML::*/parse_bml_constraint( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_BODYREACH )==0 ) {
-				behavior = /*BML::*/parse_bml_bodyreach( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = /*BML::*/parse_bml_bodyreach( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_GRAB )==0 ) {
-				behavior = /*BML::*/parse_bml_grab( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = /*BML::*/parse_bml_grab( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_EVENT )==0 ) {
 				// DEPRECATED FORM
-				behavior = parse_bml_event( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_event( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_PARAM )==0 ) {
-				behavior = parse_bml_param( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_param( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_SBM_EVENT )==0 ) {
-				behavior = parse_bml_event( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_event( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_QUICKDRAW )==0 ) {
-				behavior = parse_bml_quickdraw( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_quickdraw( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_SPEECH )==0 ) {
 				LOG("ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK).");
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_LOCOTMOTION )==0 ) {
-				behavior = parse_bml_locomotion( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_locomotion( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_STATES )==0 || XMLString::compareString( tag, BMLDefs::TAG_BLEND )==0) {
-				behavior = parse_bml_states( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_states( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_GESTURE )==0 ) {
-				behavior = parse_bml_gesture( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_gesture( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_INTERRUPT )==0 ) {
-				behavior = parse_bml_interrupt( child, unique_id, behav_syncs, required, request, mcu );
+				behavior = parse_bml_interrupt( child, unique_id, behav_syncs, required, request, scene );
 			} else {
 				std::wstringstream wstrstr;
 				wstrstr<<"WARNING: BML::Processor::parseBML(): <"<<tag<<"> BML tag unrecognized or unsupported.";
@@ -487,9 +489,9 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 						if (i == 6) option = "end";
 						msg << "<sbm:event message=\"sbm triggerevent bmlstatus &quot;syncpointprogress " << request->actorId << " " << request->msgId << ":" << localId << " " << option << " $time&quot;" << "\" stroke=\"" << localId << ":" << option << "\"/>";
 						std::string newId = unique_id + "_" + option;
-						DOMElement* textXml = xml_utils::parseMessageXml( mcu->bml_processor.xmlParser,  msg.str().c_str())->getDocumentElement();
+						DOMElement* textXml = xml_utils::parseMessageXml( mcu.bml_processor.xmlParser,  msg.str().c_str())->getDocumentElement();
 						feedbackSyncStart.parseStandardSyncPoints( textXml, request, newId );
-						BehaviorRequestPtr startRequestBehavior = parse_bml_event(textXml, newId, feedbackSyncStart, required, request, mcu);
+						BehaviorRequestPtr startRequestBehavior = parse_bml_event(textXml, newId, feedbackSyncStart, required, request, scene);
 						startRequestBehavior->required = false;
 						request->registerBehavior( L"", startRequestBehavior );
 					}
@@ -515,10 +517,10 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 	}
 }
 
-void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCBHandle *mcu ) {
+void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, SmartBody::SBScene* scene ) {
 	size_t behavior_ordinal	= 0;
 
-	parseBehaviorGroup( bmlElem, request, mcu, behavior_ordinal, false );
+	parseBehaviorGroup( bmlElem, request, scene, behavior_ordinal, false );
 
 	if( behavior_ordinal==0 ) { // No change
 		return;
@@ -529,7 +531,7 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 	}
 }
 
-BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene ) {
 	
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
@@ -574,7 +576,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 	}
 }
 
-BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene ) {
 	
 	if (!request->actor->head_sched_p)
 	{
@@ -831,7 +833,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
     }
 }
 
-void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requestId, srArgBuffer& response_args, mcuCBHandle *mcu ) {
+void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requestId, srArgBuffer& response_args, SmartBody::SBScene* scene ) {
 	string speechKey = buildSpeechKey( actor, requestId );
 	MapOfSpeechRequest::iterator find_result = speeches.find( speechKey );
 
@@ -864,12 +866,12 @@ void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requ
 						temp = temp->next;
 					}*/
 
-					request->realize( this, mcu );
+					request->realize( this, scene );
 				} catch( std::exception& e ) {
 					std::stringstream strstr;
 					strstr << "ERROR: BML::Processor::speechReply() exception:" << e.what();
 					LOG(strstr.str().c_str());
-					bml_error( actor->getName().c_str(), request->msgId.c_str(), e.what(), mcu );
+					bml_error( actor->getName().c_str(), request->msgId.c_str(), e.what(), scene );
 				}
 			} else {
 				if( LOG_SPEECH )
@@ -899,7 +901,7 @@ void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requ
 	}   // else ignore... not a part of this BodyPlanner or expired
 }
 
-void BML::Processor::interrupt( SbmCharacter* actor, time_sec duration, mcuCBHandle* mcu )
+void BML::Processor::interrupt( SbmCharacter* actor, time_sec duration, SmartBody::SBScene* scene )
 {
 	for (std::map<std::string, BmlRequestPtr>::iterator iter = bml_requests.begin();
 		 iter != bml_requests.end();
@@ -908,13 +910,13 @@ void BML::Processor::interrupt( SbmCharacter* actor, time_sec duration, mcuCBHan
 		BmlRequestPtr request = iter->second;
 		if (request->actor == actor)
 		{
-			interrupt(actor, iter->first, duration, mcu);
+			interrupt(actor, iter->first, duration, scene);
 		}
 	}
 }
 
 // Interrupt BML Performance (usually via message from InterruptBehavior)
-int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performance_id, time_sec duration, mcuCBHandle* mcu ) {
+int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performance_id, time_sec duration, SmartBody::SBScene* scene ) {
 	string request_id = buildRequestId( actor, performance_id );
 	MapOfBmlRequest::iterator result = bml_requests.find( request_id );
 	if( result != bml_requests.end() ) {
@@ -922,7 +924,7 @@ int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performan
 
 		if( BML_LOG_INTERRUPT )
 			cout << "LOG: BML::Processor::interrupt(..): Found BehaviorRequest for \"" << performance_id << "\"." << endl;
-		request->unschedule( this, mcu, duration );
+		request->unschedule( this, scene, duration );
 		bml_requests.erase( result );
 	} else {
 		// add this interrupt requests to a map of pending interrupt requests
@@ -955,7 +957,7 @@ int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performan
 }
 
 // Cleanup Callback
-int BML::Processor::bml_end( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
+int BML::Processor::bml_end( BMLProcessorMsg& bpMsg, SmartBody::SBScene* scene ) {
 	const char* requestId = bpMsg.requestId.c_str();
 	MapOfBmlRequest::iterator find_result = bml_requests.find( requestId );
 	if( find_result == bml_requests.end() ) {
@@ -988,7 +990,7 @@ int BML::Processor::bml_end( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 		LOG(strstr.str().c_str());
 	}
 
-	request->cleanup( this, mcu );
+	request->cleanup( this, scene );
 	bml_requests.erase( requestId );
 
 	return CMD_SUCCESS;
@@ -1038,7 +1040,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, SmartBody::SBCommand
 	//cout << "DEBUG: vrAgentBML " << character_id << " " << recipientId << " " << messageId << endl;
 
 	if( !character->is_initialized() ) {
-		bml_error( character_id, message_id, "Uninitialized SbmCharacter.", &mcu );
+		bml_error( character_id, message_id, "Uninitialized SbmCharacter.", SmartBody::SBScene::getScene() );
 		return CMD_FAILURE;
 	}
 
@@ -1050,7 +1052,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, SmartBody::SBCommand
 		char       *xml          = args.read_remainder_raw();
 
 		if( xml[0]=='\0' ) {
-			bml_error( character_id, message_id, "\"vrAgentBML .. request\" message incomplete (empty XML argument).", &mcu );
+			bml_error( character_id, message_id, "\"vrAgentBML .. request\" message incomplete (empty XML argument).", SmartBody::SBScene::getScene() );
 			return CMD_FAILURE;
 		}
 		if( xml[0] == '"' ) {
@@ -1062,7 +1064,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, SmartBody::SBCommand
 		try {
 			DOMDocument *xmlDoc = xml_utils::parseMessageXml( bp.xmlParser, xml );
 			if( xmlDoc == NULL ) {
-				bml_error( character_id, message_id, "XML parser returned NULL document.", &mcu );
+				bml_error( character_id, message_id, "XML parser returned NULL document.", SmartBody::SBScene::getScene() );
 				return CMD_FAILURE;
 			}
 
@@ -1071,7 +1073,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, SmartBody::SBCommand
 #else
 			BMLProcessorMsg bpMsg( character_id, message_id, character, xmlDoc, args );
 #endif
-			bp.bml_request( bpMsg, &mcu );
+			bp.bml_request( bpMsg, SmartBody::SBScene::getScene() );
 			if (xmlDoc)
 				xmlDoc->release();
 
@@ -1079,12 +1081,12 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, SmartBody::SBCommand
 		} catch( BML::BmlException& e ) {
 			ostringstream msg;
 			msg << e.type() << ": "<<e.what();
-			bml_error( character_id, message_id, msg.str().c_str(), &mcu );
+			bml_error( character_id, message_id, msg.str().c_str(), SmartBody::SBScene::getScene() );
 			return CMD_FAILURE;
 		} catch( const std::exception& e ) {
 			ostringstream msg;
 			msg << "std::exception: "<<e.what();
-			bml_error( character_id, message_id, msg.str().c_str(), &mcu );
+			bml_error( character_id, message_id, msg.str().c_str(), SmartBody::SBScene::getScene() );
 			return CMD_FAILURE;
 		//} catch( ... ) {
 		//	ostringstream msg;
@@ -1107,7 +1109,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, SmartBody::SBCommand
 			return bp.bml_end( BMLProcessorMsg( character_id, recipient_id, message_id, character, NULL, args ), mcu );
 #else
 			BMLProcessorMsg msg( character_id, message_id, character, NULL, args );
-			int ret = bp.bml_end( msg, &mcu );
+			int ret = bp.bml_end( msg, SmartBody::SBScene::getScene() );
 
 			SmartBody::Nvbg* nvbg = character->getNvbg();
 			if (nvbg)
@@ -1164,7 +1166,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, SmartBody::SBCommandManager
 
 	try {
 		if( xml[0]=='\0' ) {
-			bml_error( agent_id, message_id, "vrSpeak message incomplete (empty XML argument).", &mcu );
+			bml_error( agent_id, message_id, "vrSpeak message incomplete (empty XML argument).", SmartBody::SBScene::getScene() );
 			return CMD_FAILURE;
 		}
 		if( xml[0] == '"' ) {
@@ -1202,7 +1204,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, SmartBody::SBCommandManager
 		}
 
 		if( !agent->is_initialized() ) {
-			bml_error( agent_id, message_id, "Uninitialized agent.", &mcu );
+			bml_error( agent_id, message_id, "Uninitialized agent.", SmartBody::SBScene::getScene() );
 			return CMD_FAILURE;
 		}
 
@@ -1223,7 +1225,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, SmartBody::SBCommandManager
 		}
 
 		if( xmlDoc == NULL ) {
-			bml_error( agent_id, message_id, "XML parser returned NULL document.", &mcu );
+			bml_error( agent_id, message_id, "XML parser returned NULL document.", SmartBody::SBScene::getScene() );
 			return CMD_FAILURE;
 		}
 
@@ -1232,7 +1234,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, SmartBody::SBCommandManager
 #else
 		BMLProcessorMsg bpMsg( agent_id, message_id, agent, xmlDoc, args );
 #endif
-		bp.bml_request( bpMsg, &mcu );
+		bp.bml_request( bpMsg, SmartBody::SBScene::getScene() );
 		if (xmlDoc)
 			xmlDoc->release();
 
@@ -1240,12 +1242,12 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, SmartBody::SBCommandManager
 	} catch( BmlException& e ) {
 		ostringstream msg;
 		msg << e.type() << ": "<<e.what();
-		bml_error( agent_id, message_id, msg.str().c_str(), &mcu );
+		bml_error( agent_id, message_id, msg.str().c_str(), SmartBody::SBScene::getScene() );
 		return CMD_FAILURE;
 	} catch( const std::exception& e ) {
 		ostringstream msg;
 		msg << "std::exception: "<<e.what();
-		bml_error( agent_id, message_id, msg.str().c_str(), &mcu );
+		bml_error( agent_id, message_id, msg.str().c_str(), SmartBody::SBScene::getScene() );
 		return CMD_FAILURE;
 	//} catch( ... ) {
 	//	ostringstream msg;
@@ -1280,11 +1282,11 @@ int BML::Processor::vrSpoke_func( srArgBuffer& args, SmartBody::SBCommandManager
 #else
 		BMLProcessorMsg bpMsg( agent_id, message_id, agent, NULL, args );
 #endif
-		return bp.bml_end( bpMsg, &mcu );
+		return bp.bml_end( bpMsg, SmartBody::SBScene::getScene() );
 	} catch( BmlException& e ) {
 		ostringstream msg;
 		msg << e.type() << ": "<<e.what();
-		bml_error( agent_id, message_id, msg.str().c_str(), &mcu );
+		bml_error( agent_id, message_id, msg.str().c_str(), SmartBody::SBScene::getScene() );
 		return CMD_FAILURE;
 	} catch( const exception& e ) {
 		std::stringstream strstr;
@@ -1321,7 +1323,7 @@ int BML::Processor::bp_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager*
 		char* requestIdStr = args.read_token(); // as string
 		SmartBody::RequestId requestId = atoi( requestIdStr );
 
-		bp.speechReply( actor, requestId, args, &mcu );
+		bp.speechReply( actor, requestId, args, SmartBody::SBScene::getScene() );
 		return CMD_SUCCESS;  // Errors are dealt with out of band
 	} else if( command == "interrupt" ) {
 		// bp speech_ready <actor id> <BML performace/act id>
@@ -1360,7 +1362,7 @@ int BML::Processor::bp_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager*
 			duration = 0;
 		}
 
-		return bp.interrupt( actor, performance_id, duration, &mcu );
+		return bp.interrupt( actor, performance_id, duration, SmartBody::SBScene::getScene() );
 	} else if( command == "feedback" ) {
 		std::string flag = args.read_token();
 		if (flag == "on")

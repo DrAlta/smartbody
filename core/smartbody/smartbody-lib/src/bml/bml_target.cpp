@@ -44,12 +44,12 @@ using namespace xml_utils;
  *  Eventually this parsing system will need to support events for lookup query delays.
  */
 
-SkJoint* BML::parse_target( const XMLCh* Attr, DOMElement* Elem, mcuCBHandle *mcu ) {
+SkJoint* BML::parse_target( const XMLCh* Attr, DOMElement* Elem, SmartBody::SBScene* scene ) {
 
-	return( const_cast<SkJoint*>( parse_target( Elem->getTagName(), Elem->getAttribute( Attr ), mcu ) ) );
+	return( const_cast<SkJoint*>( parse_target( Elem->getTagName(), Elem->getAttribute( Attr ), scene ) ) );
 }
 
-const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu ) {
+const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget, SmartBody::SBScene* scene ) {
 	// TODO: If the first non-whitespace character is 0..9.-+, then assume it is a coordinate
 	XMLStringTokenizer tokenizer( attrTarget );	
 	std::stringstream strstr;
@@ -159,7 +159,7 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 	}  // end switch( tokenizer.countTokens() )
 }
 
-const SbmPawn* BML::parse_target_pawn( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu )
+const SbmPawn* BML::parse_target_pawn( const XMLCh* tagname, const XMLCh* attrTarget, SmartBody::SBScene* scene )
 {
 	// TODO: If the first non-whitespace character is 0..9.-+, then assume it is a coordinate
 	XMLStringTokenizer tokenizer( attrTarget );	

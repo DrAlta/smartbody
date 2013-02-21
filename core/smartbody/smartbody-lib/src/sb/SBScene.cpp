@@ -41,6 +41,7 @@
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
 #include <sb/SBDebuggerUtility.h>
+#include <sb/SBVHMsgManager.h>
 #include <sbm/sbm_audio.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -51,6 +52,7 @@
 #include <sb/SBCharacterListener.h>
 #include <sbm/ParserBVH.h>
 #include <sbm/Heightfield.h>
+#include <sbm/action_unit.hpp>
 #include <sr/sr_camera.h>
 #include <controllers/me_ct_gaze.h>
 #include <controllers/me_ct_eyelid.h>

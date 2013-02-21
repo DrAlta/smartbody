@@ -14,6 +14,7 @@
 #include <sb/SBSteerManager.h>
 #include <sb/SBSteerAgent.h>
 #include <sb/SBBehavior.h>
+#include <sb/SBSkeleton.h>
 #include <controllers/me_ct_motion.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <sbm/PPRAISteeringAgent.h>
@@ -29,7 +30,7 @@ using namespace xml_utils;
  *	- you can specify joints, scale, frequency for perlin noise added to gesture holding period. premise is no idle animation is specified.
  */
 
-BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) 
+BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene ) 
 {
 	const XMLCh* animName = elem->getAttribute( BMLDefs::ATTR_NAME );
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);

@@ -31,7 +31,7 @@ class mcuCBHandle;
 
 namespace BML {
 
-	BML::BehaviorRequestPtr parse_bml_saccade( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	BML::BehaviorRequestPtr parse_bml_saccade( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, SmartBody::SBScene* scene );
 };
 
 

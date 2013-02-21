@@ -48,7 +48,7 @@ using namespace xml_utils;
 
 #define REQUIRED_ATTR	(true)
 
-BehaviorRequestPtr BML::parse_bml_constraint( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_constraint( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene ) {
 
 	if (!request->actor->constraint_sched_p)
 	{
@@ -82,7 +82,7 @@ BehaviorRequestPtr BML::parse_bml_constraint( DOMElement* elem, const std::strin
 		}
 		
 		XMLCh *tmp_ch_p = xmlch_translate( val_str );
-		target_joint = parse_target( elem->getTagName(), tmp_ch_p, mcu );
+		target_joint = parse_target( elem->getTagName(), tmp_ch_p, scene );
 		xmlch_release( &tmp_ch_p );
 	}
 

@@ -129,17 +129,17 @@ namespace BML {
 		/**
 		 *  Schedule speech visemes and audio at time startAt.
 		 */
-        virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
+        virtual void realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene );
 
 		/**
 		 *  Cancel speech visemes and audio at specified time.
 		 */
-		virtual void unschedule( mcuCBHandle* mcu, BmlRequestPtr request, time_sec duration );
+		virtual void unschedule( SmartBody::SBScene* scene, BmlRequestPtr request, time_sec duration );
 
 		/**
 		 *  Clean-up remaining objects.
 		 */
-		virtual void cleanup( mcuCBHandle* mcu, BmlRequestPtr request );
+		virtual void cleanup( SmartBody::SBScene* scene, BmlRequestPtr request );
 
 		/**
 		* Returns the speech interface
@@ -184,7 +184,7 @@ namespace BML {
 		friend class BML::Processor;  //temporary
 	};
 
-	BML::SpeechRequestPtr parse_bml_speech( DOMElement* xml, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	BML::SpeechRequestPtr parse_bml_speech( DOMElement* xml, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, SmartBody::SBScene* scene );
 };
 
 

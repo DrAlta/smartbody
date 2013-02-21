@@ -47,7 +47,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw(
 	BehaviorSyncPoints& behav_syncs,
 	bool required,
 	BmlRequestPtr request,
-	mcuCBHandle *mcu
+	SmartBody::SBScene* scene
 )	{
 
 	string localId = xml_parse_string( BMLDefs::ATTR_ID, elem, "", REQUIRED_ATTR );
@@ -57,7 +57,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw(
 		return BehaviorRequestPtr();  // NULL
 	}
 
-	SkJoint* joint = parse_target( BMLDefs::ATTR_TARGET, elem, mcu );
+	SkJoint* joint = parse_target( BMLDefs::ATTR_TARGET, elem, scene );
 	if( joint == NULL ) {  // invalid target (parse_target should have printed something)
 		return BehaviorRequestPtr();  // NULL
 	}

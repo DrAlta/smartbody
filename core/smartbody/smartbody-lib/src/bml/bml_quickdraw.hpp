@@ -30,7 +30,7 @@
 class mcuCBHandle;
 
 namespace BML {
-	BML::BehaviorRequestPtr parse_bml_quickdraw( DOMElement* elem, std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	BML::BehaviorRequestPtr parse_bml_quickdraw( DOMElement* elem, std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, SmartBody::SBScene* scene );
 };
 
 #endif // BML_QUICKDRAW_HPP

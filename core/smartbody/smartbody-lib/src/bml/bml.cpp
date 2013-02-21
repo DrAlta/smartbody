@@ -53,6 +53,7 @@
 #include <sb/SBBehavior.h>
 #include <sb/SBMotion.h>
 #include <sb/SBGestureMapManager.h>
+#include <sb/SBVHMsgManager.h>
 #include <sb/SBGestureMap.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBSteerManager.h>
@@ -810,7 +811,7 @@ void BML::BmlRequest::speechRequestProcess()
 		actor->getNvbg()->executeSpeechRequest(behList, types, times, targets, info);
 }
 
-void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
+void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 	// Self reference to pass on...
 
 	VecOfBehaviorRequest::iterator behav_end = behaviors.end();
@@ -937,7 +938,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 					{
 						// interrupt the current utterance and associated behaviors and
 						// schedule the current behavior set instead
-						bp->interrupt(character, speechMsdId, 0.0, mcu);
+						bp->interrupt(character, speechMsdId, 0.0, scene);
 						break;
 					}
 										
@@ -1026,7 +1027,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 
 		// commented out by Ari Shapiro 8/19/10 to make the output less noisy
 		//LOG("Realizing behavior %s", behavior->unique_id.c_str());
-		behavior->realize( request, mcu );
+		behavior->realize( request, scene);
 
 #if USE_CUSTOM_PRUNE_POLICY
 		if( behavior->has_cts() ) {
@@ -1110,21 +1111,21 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	}
 }
 
-void BmlRequest::unschedule( Processor* bp, mcuCBHandle* mcu, time_sec duration )
+void BmlRequest::unschedule( Processor* bp, SmartBody::SBScene* scene, time_sec duration )
 {
 	BmlRequestPtr request = weak_ptr.lock(); // Ref to this
 	if( bp->get_auto_print_controllers() || bp->get_auto_print_sequence() )
 		LOG("BmlRequest::unschedule(..) %s %s", request->actorId.c_str(), request->requestId.c_str() );
 
 	if( speech_request ) {
-		speech_request->unschedule( mcu, request, duration );
+		speech_request->unschedule( scene, request, duration );
 	}
 
 	VecOfBehaviorRequest::iterator it  = behaviors.begin();
 	VecOfBehaviorRequest::iterator end = behaviors.end();
 	for( ; it != end; ++it ) {
 		BehaviorRequestPtr behavior = *it;
-		behavior->unschedule( mcu, request, duration );
+		behavior->unschedule( scene, request, duration );
 	}
 
 	// Cancel the normal "vrAgentBML ... end complete"
@@ -1170,14 +1171,14 @@ void BmlRequest::unschedule( Processor* bp, mcuCBHandle* mcu, time_sec duration 
 }
 
 
-void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
+void BmlRequest::cleanup( Processor* bp, SmartBody::SBScene* scene )
 {
 	BmlRequestPtr request = weak_ptr.lock(); // Ref to this
 	if( bp->get_auto_print_controllers() || bp->get_auto_print_sequence() )
 		LOG("BmlRequest::cleanup(..) %s %s", request->actorId.c_str() , request->requestId.c_str() );
 
 	if( speech_request ) {
-		speech_request->cleanup( mcu, request );
+		speech_request->cleanup( scene, request );
 	}
 
 	bool has_controllers = false;
@@ -1187,7 +1188,7 @@ void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 		BehaviorRequestPtr behavior = *it;
 
 		has_controllers = behavior->has_cts();
-		behavior->cleanup( mcu, request );
+		behavior->cleanup( scene, request );
 	}
 	if( has_controllers ) {
 		// Schedule a prune command to clear them out later.		
@@ -1503,8 +1504,8 @@ void BehaviorRequest::schedule( time_sec now ) {
 	scheduler->schedule( behav_syncs, now );
 }
 
-void BehaviorRequest::realize( BmlRequestPtr request, mcuCBHandle* mcu ) {
-	realize_impl( request, mcu );
+void BehaviorRequest::realize( BmlRequestPtr request, SmartBody::SBScene* scene ) {
+	realize_impl( request, scene );
 }
 
 
@@ -1569,7 +1570,7 @@ void MeControllerRequest::register_controller_prune_policy( MePrunePolicy* prune
 	}
 }
 
-void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu ) {
+void MeControllerRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene ) {
 	// Get times from BehaviorSyncPoints
 	time_sec startAt  = behav_syncs.sync_start()->time();
 	time_sec readyAt  = behav_syncs.sync_ready()->time();
@@ -1621,7 +1622,7 @@ void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu 
 	// TODO: set sync point times
 }
 
-void GestureRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
+void GestureRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene )
 {
 	if (filtered)
 		return;
@@ -1691,10 +1692,10 @@ void GestureRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController(motion_ct);
 		set_scheduler(scheduler);
 	}
-	MeControllerRequest::realize_impl(request, mcu);
+	MeControllerRequest::realize_impl(request, scene);
 }
 
-void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
+void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene )
 {
 	double startAt  = (double)behav_syncs.sync_start()->time();
 	double readyAt  = (double)behav_syncs.sync_ready()->time();
@@ -1777,7 +1778,7 @@ void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, mcuCBHa
 }
 
 
-void ParameterizedAnimationRequest::unschedule( mcuCBHandle* mcu, BmlRequestPtr request, time_sec duration )
+void ParameterizedAnimationRequest::unschedule( SmartBody::SBScene* scene, BmlRequestPtr request, time_sec duration )
 {
 	// TODO: ... ???
 }
@@ -1787,7 +1788,7 @@ void ParameterizedAnimationRequest::unschedule( mcuCBHandle* mcu, BmlRequestPtr 
  *  ramping down the blend curve of the MeController.
  */
 
-void MeControllerRequest::unschedule( mcuCBHandle* mcu,
+void MeControllerRequest::unschedule( SmartBody::SBScene* scene,
                                       BmlRequestPtr request,
                                       time_sec duration )
 {
@@ -1825,7 +1826,7 @@ void MeControllerRequest::unschedule( mcuCBHandle* mcu,
  *  Implemtents BehaviorRequest::cleanup(..),
  *  removing the MeController from its parent.
  */
-void MeControllerRequest::cleanup( mcuCBHandle* mcu, BmlRequestPtr request )
+void MeControllerRequest::cleanup( SmartBody::SBScene* scene, BmlRequestPtr request )
 {
 	if( schedule_ct ) {
 		if( !persistent ) {
@@ -2079,7 +2080,7 @@ GazeRequest::GazeRequest(   float interval, int mode, const std::string& unique_
 {
 }
 
-void GazeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
+void GazeRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene )
 {
 	double startAt  = (double)behav_syncs.sync_start()->time();
 	double readyAt  = (double)behav_syncs.sync_ready()->time();
@@ -2121,7 +2122,7 @@ void GazeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		}
 	}
 	else
-		MeControllerRequest::realize_impl(request, mcu);
+		MeControllerRequest::realize_impl(request, scene);
 }
 
 
@@ -2137,22 +2138,22 @@ SequenceRequest::SequenceRequest( const std::string& unique_id, const std::strin
  *  Implemtents BehaviorRequest::unschedule(..),
  *  cancelling remaining sequence.
  */
-void SequenceRequest::unschedule( mcuCBHandle* mcu, BmlRequestPtr request,
+void SequenceRequest::unschedule( SmartBody::SBScene* scene, BmlRequestPtr request,
                                   time_sec duration )
 {
-	unschedule_sequence( mcu );
+	unschedule_sequence( scene );
 }
 
 /**
  *  Implemtents BehaviorRequest::cleanup(..),
  *  removing the sequence.
  */
-void SequenceRequest::cleanup( mcuCBHandle* mcu, BmlRequestPtr request )
+void SequenceRequest::cleanup( SmartBody::SBScene* scene, BmlRequestPtr request )
 {
-	unschedule_sequence( mcu );
+	unschedule_sequence( scene );
 }
 
-bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, mcuCBHandle* mcu )
+bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, SmartBody::SBScene* scene )
 {
 	if( commands.empty() ) {
 		return true;
@@ -2204,9 +2205,9 @@ bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, mcuCBHandle* 
 	return success;
 }
 
-bool SequenceRequest::unschedule_sequence( mcuCBHandle* mcu )
+bool SequenceRequest::unschedule_sequence( SmartBody::SBScene* scene )
 {
-	return ( SmartBody::SBScene::getScene()->getCommandManager()->abortSequence( unique_id.c_str() )==CMD_SUCCESS );
+	return ( scene->getCommandManager()->abortSequence( unique_id.c_str() )==CMD_SUCCESS );
 }
 
 //  VisemeRequest
@@ -2245,7 +2246,7 @@ float VisemeRequest::getRampDown()
 	return rampdown;
 }
 
-void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
+void VisemeRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene )
 {
 	// Get times from BehaviorSyncPoints
 	time_sec startAt  = behav_syncs.sync_start()->time();
@@ -2338,7 +2339,7 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
    	commands.push_back( new SbmCommand( start_string, (float)startAt ) );
   // 	commands.push_back( new SbmCommand( stop_cmd.str(), (float)relaxAt ) );
 
-	realize_sequence( commands, mcu );
+	realize_sequence( commands, scene );
 
 #endif
 }

@@ -45,7 +45,7 @@ BML::EventRequest::EventRequest( const std::string& unique_id, const std::string
 {
 }
 	
-void BML::EventRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
+void BML::EventRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene )
 {
 	time_sec strokeAt = behav_syncs.sync_stroke()->time();
 
@@ -66,7 +66,7 @@ void BML::EventRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	string str = cmd.str();
 	commands.push_back( new SbmCommand( str, (float)strokeAt ) );
 
-	realize_sequence( commands, mcu );
+	realize_sequence( commands, scene );
 }
 
 const std::string BML::EventRequest::getMessage() 
@@ -80,7 +80,7 @@ std::string BML::EventRequest::getSyncPointName()
 }
 
 
-BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene ) {
 
     const XMLCh* tag      = elem->getTagName();
 	std::string msg  = xml_parse_string( BMLDefs::ATTR_MESSAGE, elem, "");	

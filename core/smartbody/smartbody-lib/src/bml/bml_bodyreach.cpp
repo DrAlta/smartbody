@@ -71,7 +71,7 @@ using namespace xml_utils;
 
 #define REQUIRED_ATTR	(false)
 
-BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene ) {
     const XMLCh* tag      = elem->getTagName();
 
 	MeCtExampleBodyReach* bodyReachCt = NULL; 
@@ -108,9 +108,9 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	const SkJoint* targetJoint = NULL;
 	if (attrTarget && XMLString::stringLen( attrTarget ))
 	{
-		targetPawn = parse_target_pawn(tag,attrTarget,mcu);
+		targetPawn = parse_target_pawn(tag,attrTarget, scene);
 		if (!targetPawn)
-			targetJoint = parse_target(tag,attrTarget,mcu);
+			targetJoint = parse_target(tag,attrTarget, scene);
 	}
 
 // 	const XMLCh* attrObstracle = elem->getAttribute(BMLDefs::ATTR_OBSTACLE );
@@ -127,7 +127,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	std::string consTargetName = xml_parse_string(BMLDefs::ATTR_CONS_TARGET, elem, "", REQUIRED_ATTR);
 	SkJoint* consTarget = NULL;
 	if (consTargetName.size() > 0)
-		consTarget = const_cast<SkJoint*>(parse_target(tag,attrConsTarget,mcu));
+		consTarget = const_cast<SkJoint*>(parse_target(tag,attrConsTarget, scene));
 
 	const XMLCh* attrTargetPos = elem->getAttribute( BMLDefs::ATTR_TARGET_POS );
 	SrVec targetPos = SrVec();
